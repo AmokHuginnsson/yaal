@@ -20,19 +20,20 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 * Installation process:
 
 Installation process can vary from platform type (FreeBSD/non-FreeBSD),
-or usage so far (fresh install/update), and you expirience (expert/non-expert).
+usage so far (fresh install/update), and your expirience (expert/non-expert).
 So we have six posibilities (yes I know that 2*2*2==8) which we explain below.
 
 Lines that starts with `$' represent commands, lines that start with `#'
 represent comments, for example:
 
 	$ rm -fr /
-	# this is comment, and the line above there is funny command
+	# this is comment, and the line above is a funny command
 
 Let installation begin.
 
 # common step for all cases
-	$ cd /path/to/stdhapi
+	$ cd /path/to/stdhapi/
+	$ cvs up
 
 # first case (FreeBSD/update/expert)
 	$ make
