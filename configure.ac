@@ -9,6 +9,7 @@ AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 dnl Unique file in project: stdhapirc is sample configuration file.
 AC_MSG_RESULT([--- Finding base directory ... ---                      [[12%]]])
 AC_CONFIG_SRCDIR([[stdhapirc]])
+AC_CONFIG_AUX_DIR([aux])
 
 dnl stdhapi is not Free Software.
 AC_COPYRIGHT([[stdhapi (c) 2003 All rights reserved.]])
@@ -46,13 +47,16 @@ dnl We need to know what operating system stdhapi will be compiled on.
 AC_MSG_RESULT([--- Guessing host operating system ... ---              [[69%]]])
 AC_CHECK_HEADER(
 	[[ncurses/ncurses.h]],
-	[AC_DEFINE([[__PLD_HOST__]]) _HOST=['PLD. ---    ']],
+	[AC_DEFINE([[__PLD_HOST__]]) _HOST=['PLD. ---    ']
+		_NCURSES_HEADER=[ncurses/ncurses.h]],
 	[AC_CHECK_HEADER(
 		[[bsd/curses.h]],
-		[AC_DEFINE([[__FREEBSD_HOST__]]) _HOST=['FreeBSD. ---']],
+		[AC_DEFINE([[__FREEBSD_HOST__]]) _HOST=['FreeBSD. ---']
+			_NCURSES_HEADER=[bsd/ncurses.h]],
 		[AC_CHECK_HEADER(
 			[[ncurses.h]],
-			[AC_DEFINE([[__DEBIAN_HOST__]]) _HOST=['Debian. --- ']],
+			[AC_DEFINE([[__DEBIAN_HOST__]]) _HOST=['Debian. --- ']
+				_NCURSES_HEADER=[ncurses.h]],
 			[AC_MSG_ERROR([Can not recognize operating system!])]
 		)]
 	)]
@@ -73,14 +77,24 @@ AC_MSG_RESULT([--- Guessed fetures are $_FLAG____________. ---         [[83%]]])
 
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[84%]]])
+AC_CHECK_LIB([ncurses],[initscr],[],[Can not continue without ncurses.])
 AC_CHECK_LIB([mysqlclient],[mysql_init],[],[Can not continue without MySQL.])
 AC_CHECK_LIB([pq],[PQsetdbLogin],
 							[],[AC_MSG_ERROR([Can not continue without PostGreSQL.])])
 AC_MSG_RESULT([--- All needed libraries found. ---                     [[92%]]])
 
+dnl We need to check if out ncurses devel is not brain-damaged.
+AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
+AC_MSG_CHECKING([if your ncurses-devel is brain-damaged])
+CXXFLAGS=["-W -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
+AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
+void foo(){printw("x");}],[AC_MSG_RESULT([[no :)]])],
+	[AC_MSG_RESULT([[yes :(]])
+		AC_MSG_ERROR([Can not continue with brain-damaged ncurses.])])
+
+AC_MSG_RESULT([--- All ok, good luck! ---                              [[97%]]])
+
 dnl We have to set up proper compiler/linker flags.
 AC_OUTPUT([Makefile])
-
-AC_MSG_RESULT([--- All ok, good luck! ---                              [[99%]]])
 AC_MSG_RESULT([[Now you can type \`make'.                               [100%]]])
 
