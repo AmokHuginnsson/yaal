@@ -261,6 +261,7 @@ void HStatusBarControl::message ( int a_iAttribute,
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
 	console::c_vprintf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
+	console::n_bNeedRepaint = true;
 	return;
 	M_EPILOG
 	}
@@ -273,6 +274,7 @@ void HStatusBarControl::message ( const char * a_pcFormat, ... )
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
 	console::c_vprintf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
 	va_end ( l_xAp );
+	console::n_bNeedRepaint = true;
 	return;
 	M_EPILOG
 	}
