@@ -30,6 +30,8 @@ Copyright:
 #include <string.h>
 #include <stdlib.h>
 
+#include "../config.h"
+
 #include "../hcore/hexception.h"
 #include "../hcore/hlog.h"
 #include "../hcore/hstring.h"
@@ -198,12 +200,15 @@ void dbwrapper_fini ( void )
 	if ( g_pvDlHandle )
 		{
 		fprintf ( stderr, "Unloading dynamic database driver ... " );
+#ifndef __HOST_OS_TYPE_FREEBSD__
 		if ( dlclose ( g_pvDlHandle ) )
 			{
 			dbwrapper_error ( );
 			dbwrapper_exit ( );
 			}
-		else fprintf ( stderr, g_pcDone );
+		else
+#endif /* not __HOST_OS_TYPE_FREEBSD__ */
+			fprintf ( stderr, g_pcDone );
 		}
 	else fprintf ( stderr, "Bailing out.\n" );
 	g_pvDlHandle = NULL;
