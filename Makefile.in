@@ -105,6 +105,7 @@ LINKER_FLAGS = $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 #	h-core
 OBJ4hcore =
 OBJ4hcore += hexception
+OBJ4hcore += harray
 OBJ4hcore += hfile
 OBJ4hcore += hflexiblelist!
 OBJ4hcore += hflexibletree
@@ -135,6 +136,7 @@ OBJ4hconsole += hcontrol!
 OBJ4hconsole += hcontrollist
 OBJ4hconsole += heditcontrol!
 OBJ4hconsole += hhandler
+OBJ4hconsole += hitem
 OBJ4hconsole += hlistcontrol!
 OBJ4hconsole += hmainwindow
 OBJ4hconsole += hmenucontrol
