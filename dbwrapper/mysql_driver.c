@@ -59,7 +59,7 @@ int db_errno ( void * a_pvData )
 	return ( mysql_errno ( ( MYSQL * ) a_pvData ) );
 	}
 
-char * db_error  ( void * a_pvData )
+const char * db_error  ( void * a_pvData )
 	{
 	return ( mysql_error ( ( MYSQL * ) a_pvData ) );
 	}

@@ -68,8 +68,8 @@ void ( * db_disconnect ) ( void * );
 typedef int ( * t2 ) ( void * );
 int ( * db_errno ) ( void * );
 
-typedef char * ( * t3 ) ( void * );
-char * ( * db_error ) ( void * );
+typedef const char * ( * t3 ) ( void * );
+const char * ( * db_error ) ( void * );
 
 typedef void * ( * t4 ) ( void *, const char * );
 void * ( * db_query ) ( void *, const char * );

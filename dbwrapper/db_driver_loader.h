@@ -44,7 +44,7 @@ extern int	n_iDataBaseDriver;
 extern void * ( * db_connect ) ( const char *, const char *, const char * );
 extern void ( * db_disconnect ) ( void * );
 extern int ( * db_errno ) ( void * );
-extern char * ( * db_error ) ( void * );
+extern const char * ( * db_error ) ( void * );
 extern void * ( * db_query ) ( void *, const char * );
 extern void ( * db_unquery ) ( void * );
 extern char * ( * rs_get ) ( void *, int, int );
