@@ -59,6 +59,7 @@ protected:
 	HInfoList 	f_oHeader;						/* list header info */
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
+	long int		f_lComparedItems;			/* items already compared during sorting */
 	/*}*/
 public:
 	/*{*/

@@ -151,6 +151,7 @@ void HStatusBarControl::update_progress ( double a_dStep, const char * a_pcTitle
 		f_iLastPercent = l_iNextPercent;
 		f_iLastMinute = l_iNextMinute;
 		f_iLastSecond = l_iNextSecond;
+		::refresh ( );
 		}
 	return;
 	M_EPILOG

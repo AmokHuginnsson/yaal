@@ -170,6 +170,23 @@ int HWindow::add_control ( HControl * a_poControl, int a_iShortCut )
 	M_EPILOG
 	}
 
+void HWindow::init_progress ( double a_dSize, const char * a_pcMessage,
+		bool a_bEstimate )
+	{
+	M_PROLOG
+	f_poStatusBar->init_progress ( a_dSize, a_pcMessage, a_bEstimate );
+	return;
+	M_EPILOG
+	}
+
+void HWindow::update_progress ( double a_dStep, const char * a_pcMessage )
+	{
+	M_PROLOG
+	f_poStatusBar->update_progress ( a_dStep, a_pcMessage );
+	return;
+	M_EPILOG
+	}
+
 void HWindow::refresh ( void )
 	{
 	M_PROLOG

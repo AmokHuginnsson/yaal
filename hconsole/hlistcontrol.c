@@ -647,6 +647,9 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 			break;
 			}
 		}
+	f_lComparedItems ++;
+	if ( ( f_iQuantity > 128 ) && ! ( f_lComparedItems % 64 ) )
+		f_poParent->update_progress ( f_lComparedItems );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -656,7 +659,10 @@ void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 	M_PROLOG
 	f_iSortColumn = a_iColumn;
 	f_iOrder = a_iOrder;
+	f_lComparedItems = 0;
 	cmp = ( int ( HList<HItem>::* ) ( HElement *, HElement * ) ) & HListControl::cmpc;
+	if ( f_iQuantity > 128 )
+		f_poParent->init_progress ( f_iQuantity * f_iQuantity / 2, " Sorting ..." );
 	sort ( );
 	return;
 	M_EPILOG
