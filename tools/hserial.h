@@ -42,7 +42,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HSerial ( const char * ); /* device */
+	HSerial ( const char * = NULL ); /* device */
 	virtual ~HSerial ( void );
 	bool open ( void );
 	void close ( void );
