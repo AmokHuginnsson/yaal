@@ -28,9 +28,15 @@ Copyright:
 #include <stdio.h>
 #include <string.h>
 
-#include <mysql/mysql.h>
-
 #include <xalloc.h>
+
+#include "../config.h"
+
+#ifdef __HOST_OS_TYPE_FREEBSD__
+#	define TO_BE_INCLUDED_LATER 1
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
+
+#include <mysql/mysql.h>
 
 #ifndef NULL
 #define NULL	0
