@@ -71,7 +71,7 @@ long int HDataBase::query ( const char * a_pcQuery )
 				g_iErrNo );
 	if ( ! f_pvCoreData )
 		throw new HException ( __WHERE__, "not connected to database", g_iErrNo );
-	if ( dbwrapper::n_bLogSQL )::log << "SQL: " << a_pcQuery << endl;
+	if ( g_lLogMask & D_LOG_SQL )::log << "SQL: " << a_pcQuery << endl;
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
 	if ( ! f_pvLastResult )
 		M_LOG ( dbwrapper::db_error ( f_pvCoreData ) );

@@ -24,8 +24,15 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/* This file holds (except HException class declaration) main #defines,
+	 macros and global variables used acros whole stdhapi */
+
 #ifndef __HEXCEPTION_H
 #define __HEXCEPTION_H
+
+#ifndef NULL
+#define NULL 0
+#endif /* not NULL */
 
 #define M_CVSID(id) static char __CVSID__ [ ] __attribute__((__unused__)) = id
 #define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
@@ -33,11 +40,15 @@ Copyright:
 #define M_CATCH }catch ( HException * e ){e->log ( __WHERE__ );throw e;}
 #define M_PROLOG M_TRY
 #define M_EPILOG M_CATCH
-#define g_iErrNo errno
 
-#ifndef NULL
-#define NULL 0
-#endif /* not NULL */
+#define D_LOG_DEBUG			1
+#define D_LOG_INFO			2
+#define D_LOG_NOTICE		4
+#define D_LOG_WARNING		8
+#define D_LOG_ERROR			16
+#define D_LOG_CVSHEADER 32
+
+extern long int g_lLogMask;
 
 /* those types definitions were in hinfo.h but this file (hexception.h)
  * is included into more files, we assume that sizeof ( int ) >= 4 */
@@ -59,6 +70,7 @@ Copyright:
 #define D_TYPE_HTIME				0x4000
 #define D_TYPE_MASK					0xffff
 
+#define g_iErrNo errno
 #ifndef errno
 extern int errno;
 #endif /* not errno */

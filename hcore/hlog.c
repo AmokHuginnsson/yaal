@@ -259,3 +259,4 @@ HLog & endl ( HLog & a_roLog )
 	}
 
 HLog log;
+

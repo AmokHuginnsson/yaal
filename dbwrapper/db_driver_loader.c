@@ -56,12 +56,10 @@ void * g_pvDlHandle = NULL;
 namespace dbwrapper
 	{
 
-bool	n_bLogSQL = false;
 int		n_iDataBaseDriver = 0;
 
 OVariable n_psVariables [ ] =
 	{
-		{ D_TYPE_BOOL, "log_sql", & n_bLogSQL },
 		{ D_TYPE_CHAR_POINTER, "mysql_socket", & g_pcDefaultSockPath },
 		{ 0, NULL, NULL }
 	};
@@ -341,7 +339,13 @@ char * null_rs_column_name ( void * a_pvResult, int a_iColumn )
 
 bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	{
-	if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
+	if ( ! strcasecmp ( a_roOption, "log_mask" ) )
+		{
+		if ( ! strcasecmp ( a_roValue, "LOG_SQL" ) )
+			g_lLogMask |= D_LOG_SQL;
+		else return ( true );
+		}
+	else if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
 		{
 		if ( ! ( strcasecmp ( a_roValue, "none" )
 					&& strcasecmp ( a_roValue, "null" ) ) )

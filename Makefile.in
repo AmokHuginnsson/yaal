@@ -105,7 +105,7 @@ LINKER_FLAGS = $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 
 #	h-core
 OBJ4hcore =
-OBJ4hcore += hexception
+OBJ4hcore += hexception!
 OBJ4hcore += harray
 OBJ4hcore += hfile
 OBJ4hcore += hflexiblelist!

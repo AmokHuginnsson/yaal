@@ -431,12 +431,6 @@ void console_init ( void ); __attribute__ ( ( constructor ) )
 void console_init ( void )
 	{
 	g_iErrNo = 0;
-	if ( sizeof ( int ) < 4 )
-		{
-		::log << "Your CPU or compiler does not support required size of int.";
-		::log << endl;
-		exit ( 1 );
-		}
 	rc_file::process_rc_file ( "stdhapi", "console",
 			console::n_psVariables, set_console_variables );
 	return;

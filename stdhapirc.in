@@ -17,6 +17,18 @@
 # example:
 # log_sql true
 
+### core BEGIN
+[core]
+
+# log_mask decides what types of information will be logged
+# log_mask can occur in all stdhapirc's sections and flag are
+# additive across all sections
+# argument to log_mask can be any combination of flags:
+# LOG_DEBUG, LOG_INFO, LOG_NOTICE, LOG_WARNING, LOG_ERROR, LOG_CVSHEADER
+log_mask LOG_CVSHEADER
+
+### core END
+
 ### console BEGIN
 [console]
 
@@ -80,6 +92,9 @@ ignore_signal_SIGTSTP true
 ### dbwrapper BEGIN
 [dbwrapper]
 
+# log SQL queries
+log_mask LOG_SQL
+
 # select data base driver
 # accepted drivers are:
 # MySQL, PostgreSQL, null, none
@@ -92,9 +107,6 @@ data_base_driver @DEFAULT_DRIVER@
 # mysql driver realises access to datebase thru socket,
 #	which we have to point to
 mysql_socket @MYSQL_SOCKET@
-
-# log SQL queries
-log_sql true
 
 ### dbwrapper END
 

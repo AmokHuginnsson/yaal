@@ -24,6 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -35,6 +36,15 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "xalloc.h"
 #include "hlog.h"
+#include "hstring.h"
+#include "rc_file.h"
+
+long int g_lLogMask = 0;
+
+OVariable g_psHCoreVariables [ ] =
+	{
+		{ 0, NULL, NULL }
+	};
 
 HException::HException ( const char * a_pcFileName,
 												 const char * a_pcFunctionName,
@@ -127,4 +137,56 @@ void HException::dump_call_stack ( int )
 #endif /* _EXECINFO_H */
 	return;
 	}
+
+bool set_core_variables ( HString & a_roOption, HString & a_roValue )
+	{
+	int l_iCtr = 0;
+	HString l_oStr;
+	if ( ! strcasecmp ( a_roOption, "log_mask" ) )
+		{
+		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
+			{
+			if ( ! strcasecmp ( a_roValue, "LOG_DEBUG" ) )
+				g_lLogMask |= D_LOG_DEBUG;
+			if ( ! strcasecmp ( a_roValue, "LOG_INFO" ) )
+				g_lLogMask |= D_LOG_INFO;
+			if ( ! strcasecmp ( a_roValue, "LOG_NOTICE" ) )
+				g_lLogMask |= D_LOG_NOTICE;
+			if ( ! strcasecmp ( a_roValue, "LOG_WARNING" ) )
+				g_lLogMask |= D_LOG_WARNING;
+			if ( ! strcasecmp ( a_roValue, "LOG_ERROR" ) )
+				g_lLogMask |= D_LOG_ERROR;
+			if ( ! strcasecmp ( a_roValue, "LOG_CVSHEADER" ) )
+				g_lLogMask |= D_LOG_CVSHEADER;
+			else return ( true );
+			}
+		}
+	else return ( true );
+	return ( false );
+	}
+
+void core_init ( void ); __attribute__ ( ( constructor ) )
+void core_init ( void )
+	{
+	g_iErrNo = 0;
+	if ( sizeof ( int ) < 4 )
+		{
+		::log << "Your CPU or compiler does not support required size of int.";
+		::log << endl;
+		exit ( 1 );
+		}
+	rc_file::process_rc_file ( "stdhapi", "core", g_psHCoreVariables,
+			set_core_variables );
+	return;
+	}
+
+/* older versions of g++ fail to handle __attribute__((constructor))
+   if no static object exists */
+
+#if __GNUC__ < 3 || \
+	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
+
+HString g_oDummyHCORE;
+
+#endif
 

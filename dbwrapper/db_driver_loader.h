@@ -29,8 +29,10 @@ Copyright:
 #define __DB_DRIVER_LOADER_H
 
 #ifndef NULL
-#define NULL	0
+#define NULL 0
 #endif /* not NULL */
+
+#define D_LOG_SQL 1073741824
 
 #define D_DB_DRIVER_NONE				0
 #define D_DB_DRIVER_MYSQL				1
@@ -39,7 +41,6 @@ Copyright:
 namespace dbwrapper
 	{
 
-extern bool	n_bLogSQL;
 extern int	n_iDataBaseDriver;
 
 extern void * ( * db_connect ) ( const char *, const char *, const char * );
