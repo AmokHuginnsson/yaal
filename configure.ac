@@ -9,6 +9,7 @@ AC_MSG_RESULT([--- Welcome to stdhapi configurator ---                  [[0%]]])
 AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, dafault is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
 #` <- this one fixes syntax highlighting in vim.
 AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, dafault is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
+AC_ARG_WITH([sqlite],[AC_HELP_STRING([--with-sqlite],[Compile with SQLite driver, dafault is `yes' if SQLite can be found.])],[SQLITE=$withval],[SQLITE="auto"])
 #`
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
@@ -48,7 +49,6 @@ dnl and for c preprocesor
 AC_MSG_RESULT([--- Looking for c/c++ preprocessor and egrep ... ---    [[33%]]])
 AC_PROG_CPP
 AC_PROG_CXXCPP
-AC_PROG_EGREP
 
 dnl Looking for main libc headers
 AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])
@@ -58,9 +58,7 @@ dnl We need to know what operating system stdhapi will be compiled on.
 AC_MSG_RESULT([--- Guessing host operating system ... ---              [[58%]]])
 AC_CHECK_FILE(
 	[[/etc/rc]],
-	[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST________=['FreeBSD. ---  ']
-		AC_SUBST([ADDITIONAL_COMMAND],
-			[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);']]) AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
+	[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST________=['FreeBSD. ---  ']],
 	[AC_CHECK_FILE(
 		[[/etc/debconf.conf]],
 		[AC_DEFINE([[__HOST_OS_TYPE_DEBIAN__]]) _HOST________=['Debian. ---   ']],
@@ -81,6 +79,9 @@ dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[63%]]])
 _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
+CXXFLAGS=["-Wextra"]
+AC_TRY_COMPILE([],[int main(void){return(0);}],[AC_SUBST([EXTRA_WARNINGS],[-Wextra])],
+							[AC_SUBST([EXTRA_WARNINGS],[-W])])
 CXXFLAGS=["-Wshadow -Werror"]
 AC_TRY_COMPILE([#include <pthread.h>],[],
 							[AC_SUBST([SPECIAL_COMPILER_FLAGS],[-Wshadow])
@@ -100,6 +101,10 @@ if test ["$_FLAGS"] = [""] ; then
 	_FLAGS='unfortunetely none. ---         [[68%]]'
 fi
 AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
+
+AC_SUBST([SERIAL_DEVICE],['null'])
+AC_CHECK_FILE([[/dev/cuaa0]],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
+	[AC_CHECK_FILE([/dev/ttyS0],[AC_SUBST([SERIAL_DEVICE],['ttyS0'])])])
 
 dnl Test if dynamic loader is in libc or in separate library dl.
 dnl This one is silent.
@@ -180,21 +185,22 @@ AC_SUBST([DEFAULT_DRIVER],["$DEFAULT_DRIVER"])
 
 AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 
-AC_MSG_RESULT([--- Looking for useful functions ... ---                [[83%]]])
+AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 
 AC_CHECK_FUNCS([getline],[],[])
+AC_CHECK_DECL([VSWTC],[],[],[termios.h])
 
-AC_MSG_RESULT([--- Done looking for useful functions. ---              [[92%]]])
+AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 
 dnl We need to check if out ncurses devel is not brain-damaged.
 AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
-AC_MSG_CHECKING([if your ncurses-devel is brain-damaged])
+AC_MSG_CHECKING([if your ncurses-devel is seriously brain-damaged])
 CXXFLAGS=["-W -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
 AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
 [printw("x");],[AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
-		AC_MSG_ERROR([Can not continue with brain-damaged ncurses.])])
-AC_MSG_CHECKING([if your compiler is touchy on char-subscripts in ncurses (acs_map)])
+		AC_MSG_ERROR([Can not continue with seriously brain-damaged ncurses.])])
+AC_MSG_CHECKING([if your ncurses is damaged about char-subscripts in ncurses (acs_map)])
 AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
 [addch(ACS_DARROW);],[AC_DEFINE([HAVE_ASCII_GRAPHICS]) AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])

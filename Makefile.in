@@ -55,11 +55,11 @@ CXX = g++
 LXX = g++
 ARFLAGS = r
 CXXFLAGS =	\
+						@EXTRA_WARNINGS@\
 						-Wall\
 						-Wcast-align\
 						-Wconversion\
 						-Werror\
-						-Wextra\
 						-Winline\
 						-Wlarger-than-4096\
 						-Wlong-long\
@@ -264,7 +264,7 @@ $(TARGET):
 	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(TARGETDIR)/
 	@/bin/mv -f lib$(NAME).a $(TARGETDIR)/
 	@echo -n "making cache ... "
-	@(cd $(TARGETDIR);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;$(TARGETDIR)/mkcache;@ADDITIONAL_COMMAND@ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so)
+	@(cd $(TARGETDIR);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;$(TARGETDIR)/mkcache;ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so)
 	@echo "done."
 
 #-------------------------------------------------------------------
