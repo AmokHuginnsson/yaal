@@ -33,6 +33,7 @@ namespace util
 	{
 
 HString kwota_slownie ( double );
+void usun_ogonki ( char * );
 
 	}
 

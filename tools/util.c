@@ -33,6 +33,8 @@ M_CVSID ( "$CVSHeader$" );
 namespace util
 {
 
+char n_pcTransTableStripPL [ 256 ];
+
 char n_ppcJednNastki [ ] [ 16 ] =
 	{
 	"zero ",
@@ -202,6 +204,17 @@ HString kwota_slownie ( double a_dKwota )
 		}
 	return ( l_oSlownie );
 	M_EPILOG
+	}
+
+void usun_ogonki ( char * a_pcString )
+	{
+	int l_iCtr = 0;
+	while ( a_pcString [ l_iCtr ] )
+		{
+		a_pcString [ l_iCtr ] = n_pcTransTableStripPL [ ( unsigned char ) a_pcString [ l_iCtr ] ];
+		l_iCtr ++;
+		}
+	return;
 	}
 
 }

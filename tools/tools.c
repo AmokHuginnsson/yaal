@@ -37,7 +37,6 @@ M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"       /* log object */
 #include "../hcore/hstring.h"    /* HString class */
 
-
 namespace tools
 {
 
@@ -60,6 +59,11 @@ OVariable n_psVariables [ ] =
 	};
 	
 }
+
+namespace util
+	{
+extern char n_pcTransTableStripPL [ 256 ];
+	}
 
 /* return true means error occured, false - every thing ok */
 bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
@@ -94,9 +98,30 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 void tools_init ( void ); __attribute__ ( ( constructor ) )
 void tools_init ( void )
 	{
+	int l_iCtr = 0;
 	g_iErrNo = 0;
 	rc_file::process_rc_file ( "stdhapi", "tools", tools::n_psVariables,
 			set_tools_variables );
+	for ( l_iCtr = 0; l_iCtr < 256; l_iCtr ++ )
+		util::n_pcTransTableStripPL [ l_iCtr ] = l_iCtr;
+	util::n_pcTransTableStripPL [ ( unsigned char ) '±' ] = 'a';
+	util::n_pcTransTableStripPL [ ( unsigned char ) '¡' ] = 'A';
+	util::n_pcTransTableStripPL [ ( unsigned char ) 'æ' ] = 'c';
+	util::n_pcTransTableStripPL [ ( unsigned char ) 'Æ' ] = 'C';
+	util::n_pcTransTableStripPL [ ( unsigned char ) 'ê' ] = 'e';
+	util::n_pcTransTableStripPL [ ( unsigned char ) 'Ê' ] = 'E';
+	util::n_pcTransTableStripPL [ ( unsigned char ) '³' ] = 'l';
+	util::n_pcTransTableStripPL [ ( unsigned char ) '£' ] = 'L';
+	util::n_pcTransTableStripPL [ ( unsigned char ) 'ñ' ] = 'n';
+	util::n_pcTransTableStripPL [ ( unsigned char ) 'Ñ' ] = 'N';
+	util::n_pcTransTableStripPL [ ( unsigned char ) 'ó' ] = 'o';
+	util::n_pcTransTableStripPL [ ( unsigned char ) 'Ó' ] = 'O';
+	util::n_pcTransTableStripPL [ ( unsigned char ) '¶' ] = 's';
+	util::n_pcTransTableStripPL [ ( unsigned char ) '¦' ] = 'S';
+	util::n_pcTransTableStripPL [ ( unsigned char ) '¼' ] = 'z';
+	util::n_pcTransTableStripPL [ ( unsigned char ) '¬' ] = 'Z';
+	util::n_pcTransTableStripPL [ ( unsigned char ) '¿' ] = 'z';
+	util::n_pcTransTableStripPL [ ( unsigned char ) '¯' ] = 'Z';
 	return;
 	}
 
