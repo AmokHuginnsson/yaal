@@ -527,12 +527,8 @@ template < class tType >
 HMatrix < tType > operator * ( tType d, HMatrix < tType > & a_roMatrix )
 	{
 	M_PROLOG
-	int l_iCtr;
-	HMatrix < tType > l_oMatrix ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
-	for ( l_iCtr = 0; l_iCtr < a_roMatrix.row ( ); l_iCtr++ )
-		{
-		l_oMatrix [ l_iCtr ] = ( a_roMatrix [ l_iCtr ] * d );
-		}
+	HMatrix < tType > l_oMatrix ( a_roMatrix );
+	l_oMatrix *= d;
 	return ( l_oMatrix );
 	M_EPILOG
 	}
