@@ -90,8 +90,6 @@ struct OResource
 																	 holds initialization information about
 																	 parent's record's field-column */
 	int			f_iParent;						/* index of parent control (tree data structure) */
-	HDataControl * f_poDataControl;	/* after initialising any control from resource 
-																		 this field hosts pointer to it */
 	};
 
 /* control type specific */
