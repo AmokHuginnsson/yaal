@@ -283,6 +283,8 @@ void set_handlers ( void )
 		signal( SIGTSTP, SIG_IGN );
 	if ( signal( SIGCONT, signals::signal_CONT ) == SIG_IGN )
 		signal( SIGCONT, SIG_IGN );
+	if ( signal( SIGPIPE, signals::signal_fatal ) == SIG_IGN )
+		signal( SIGPIPE, SIG_IGN );
 	if ( signal( SIGFPE, signals::signal_fatal ) == SIG_IGN )
 		signal( SIGFPE, SIG_IGN );
 	if ( signal( SIGILL, signals::signal_fatal ) == SIG_IGN )
