@@ -175,7 +175,13 @@ void HLog::timestamp ( FILE * a_psStream )
 	l_xCurrentTime = time ( NULL );
 	l_psBrokenTime = localtime ( & l_xCurrentTime );
 	memset ( l_pcBuffer, 0, D_TIMESTAMP_SIZE );
-	l_iSize = strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %e %H:%M:%S", l_psBrokenTime );
+	/* ISO C++ does not support the `%e' strftime format */
+	/* `%e': The day of the month like with `%d', but padded with blank */
+	/* (range ` 1' through `31').) */
+	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
+	/* I will have to wait with using `%e'. */
+	l_iSize = strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
+			l_psBrokenTime );
 	if ( l_iSize > D_TIMESTAMP_SIZE )
 		M_THROW ( _ ( "strftime returned more than D_TIMESTAMP_SIZE" ), l_iSize );
 	if ( f_pcProcessName )
