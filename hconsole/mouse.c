@@ -63,6 +63,7 @@ fun_console_mouse_close_t mouse_close = NULL;
 int hunt_tty ( int a_iOffset )
 	{
 	M_PROLOG
+	/* this hack allows to guess current controling virtual terminal screen */
 	int l_iVC = 0;
 	char * l_pcTtyName = NULL;
 	l_pcTtyName = ttyname ( STDIN_FILENO );
@@ -92,8 +93,6 @@ int console_mouse_open ( void )
 	l_sMouse.operation = MOUSE_MODE;
 	l_sMouse.u.mode.mode = 1;
 	l_sMouse.u.mode.signal = SIGUSR1;
-	
-	/* this hack allows to guess current controling virtual terminal screen */
 
 	l_pcTty [ 9 ] = '0' + hunt_tty ( 1 );
 	n_iMouse = open ( l_pcTty, O_RDWR );
