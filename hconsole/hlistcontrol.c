@@ -85,6 +85,7 @@ void HListControl::refresh ( void )
 	int l_iFlags = 0;
 	int l_iTmp = 0;
 	int l_iColumns = f_oHeader.quantity ( );
+	int l_iHR = f_bDrawHeader ? 1 : 0; /* HR stands for header row */
 	long int l_lValue = 0;
 	double l_dScaled = 0;
 	void * l_pvPointer = NULL;
@@ -116,8 +117,7 @@ void HListControl::refresh ( void )
 				l_iCurrentColumnWidth = l_lValue & 0x000000ff;
 				if ( l_iCurrentColumnWidth )
 					{
-					::move ( f_iRowRaw + l_iCtr + ( f_bDrawHeader ? 1 : 0 ),
-							f_iColumnRaw + l_iColumnOffset );
+					::move ( f_iRowRaw + l_iCtr + l_iHR, f_iColumnRaw + l_iColumnOffset );
 					f_oVarTmpBuffer [ 0 ] = 0;
 					switch ( l_iFlags & D_TYPE_MASK ) /* 0x0ffff is mask for type */
 						{
@@ -232,7 +232,7 @@ void HListControl::refresh ( void )
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		{
-		::move ( f_iRowRaw + l_iCtr + 1,	f_iColumnRaw );
+		::move ( f_iRowRaw + l_iCtr + l_iHR,	f_iColumnRaw );
 		cprintf ( f_oVarTmpBuffer );
 		}
 	for ( l_iCtr = 0; l_iCtr < l_iColumns; l_iCtr ++ )
@@ -258,7 +258,7 @@ void HListControl::refresh ( void )
 			if ( l_iCtr < l_iColumns )
 				{
 				console::set_attr ( f_iDisabledAttribute );
-				for ( l_iCtrLoc = 0; l_iCtrLoc <= f_iHeightRaw; l_iCtrLoc ++ )
+				for ( l_iCtrLoc = 0; l_iCtrLoc < ( f_iHeightRaw + l_iHR ); l_iCtrLoc ++ )
 					{
 					::move ( f_iRowRaw + l_iCtrLoc,	f_iColumnRaw + l_iColumnOffset - 1 );
 					cprintf ( "|" );
@@ -271,19 +271,19 @@ void HListControl::refresh ( void )
 		{
 		if ( f_iControlOffset )
 			{
-			::move ( f_iRowRaw + ( f_bDrawHeader ? 1 : 0 ),
-					f_iColumnRaw + l_iColumnOffset - 1 );
+			::move ( f_iRowRaw + l_iHR, f_iColumnRaw + l_iColumnOffset - 1 );
 			cprintf ( "^" );
 			}
 		if ( ( f_iQuantity - f_iControlOffset ) > f_iHeightRaw )
 			{
-			::move ( f_iRowRaw + f_iHeightRaw, f_iColumnRaw + l_iColumnOffset - 1 );
+			::move ( f_iRowRaw + f_iHeightRaw - ( 1 - l_iHR ),
+					f_iColumnRaw + l_iColumnOffset - 1 );
 			cprintf ( "v" );
 			}
 		l_dScaled = f_iHeightRaw - 3;
 		l_dScaled *= ( double ) ( f_iControlOffset + f_iCursorPosition );
 		l_dScaled /= ( double )f_iQuantity;
-		::move ( f_iRowRaw + ( int ) ( l_dScaled + 2.5 ),
+		::move ( f_iRowRaw + ( int ) ( l_dScaled + 1.5 + l_iHR ),
 				f_iColumnRaw + l_iColumnOffset - 1 );
 		cprintf ( "#" );
 		}
@@ -303,7 +303,7 @@ int HListControl::process_input ( int a_iCode )
 	long l_lShortcutIndex;
 	HElement * l_poElement = f_poSelected;
 	f_poSelected = f_poFirstVisibleRow;
-	l_iOldPosition = f_iControlOffset + f_iCursorPosition;
+	l_iOldPosition = f_iCursorPosition;
 	a_iCode = HControl::process_input ( a_iCode );
 	switch ( a_iCode )
 		{
@@ -314,6 +314,7 @@ int HListControl::process_input ( int a_iCode )
 				if ( f_iControlOffset )
 					{
 					to_head ( f_iHeightRaw - 1, & l_iFlag );
+					l_poElement = f_poSelected;
 					f_iControlOffset -= f_iHeightRaw;
 					f_iControlOffset ++;
 					}
@@ -335,11 +336,16 @@ int HListControl::process_input ( int a_iCode )
 					f_iControlOffset --;
 					if ( f_iControlOffset > ( f_iQuantity - f_iHeightRaw ) )
 						{
-						f_poSelected = f_poHook;
+						l_poElement = f_poSelected = f_poHook;
+						l_iOldPosition = f_iCursorPosition + 1;
 						to_head ( f_iHeightRaw );
 						f_iControlOffset = f_iQuantity - f_iHeightRaw;
 						}
-					else to_tail ( f_iHeightRaw - 1, & l_iFlag );
+					else
+						{
+						to_tail ( f_iHeightRaw - 1, & l_iFlag );
+						l_iOldPosition -= f_iCursorPosition;
+						}
 					}
 				else f_iCursorPosition = f_iHeightRaw - 1;
 				}
@@ -358,6 +364,7 @@ int HListControl::process_input ( int a_iCode )
 				else if ( f_iControlOffset > 0 )
 					{
 					to_head ( );
+					l_poElement = f_poSelected;
 					f_iControlOffset --;
 					}
 				}
@@ -366,18 +373,20 @@ int HListControl::process_input ( int a_iCode )
 			}
 		case ( KEY_HOME ):
 			{
+			l_iOldPosition = 0;
 			f_iCursorPosition = 0;
 			f_iControlOffset = 0;
-			f_poSelected = f_poHook;
+			l_poElement = f_poSelected = f_poHook;
 			break;
 			}
 		case ( KEY_END ):
 			{
 			if ( f_iQuantity >= f_iHeightRaw )
 				{
-				f_poSelected = f_poHook;
+				l_poElement = f_poSelected = f_poHook;
 				to_head ( f_iHeightRaw );
 				f_iCursorPosition = f_iHeightRaw - 1;
+				l_iOldPosition = f_iCursorPosition + 1;
 				f_iControlOffset = f_iQuantity - f_iHeightRaw;
 				}
 			else f_iCursorPosition = f_iQuantity - 1;
@@ -392,6 +401,7 @@ int HListControl::process_input ( int a_iCode )
 					{
 					f_iCursorPosition = f_iHeightRaw - 1;
 					f_iControlOffset ++;
+					l_iOldPosition --;
 					to_tail ( );
 					}
 				}
@@ -438,6 +448,10 @@ int HListControl::process_input ( int a_iCode )
 		}
 	f_poFirstVisibleRow = f_poSelected;
 	f_poSelected = l_poElement;
+	if ( l_iOldPosition > f_iCursorPosition )
+		to_head ( l_iOldPosition - f_iCursorPosition );
+	else if ( l_iOldPosition < f_iCursorPosition )
+		to_tail ( f_iCursorPosition - l_iOldPosition );
 	a_iCode = l_iErrorCode;
 	if ( ! l_iErrorCode )
 		{
