@@ -60,6 +60,15 @@ HDataWindow::~HDataWindow ( void )
 	M_EPILOG
 	}
 
+#define M_STANDART_SETUP	f_psResourcesArray [ l_iCtr ].f_iRow,\
+						f_psResourcesArray [ l_iCtr ].f_iColumn,\
+						f_psResourcesArray [ l_iCtr ].f_iHeight,\
+						f_psResourcesArray [ l_iCtr ].f_iWidth,\
+						f_psResourcesArray [ l_iCtr ].f_pcLabel,\
+						f_psResourcesArray [ l_iCtr ].f_iAttribute,\
+						f_psResourcesArray [ l_iCtr ].f_iEnabledAttribute,\
+						f_psResourcesArray [ l_iCtr ].f_iFocusedAttribute
+						
 int HDataWindow::init ( void )
 	{
 	M_PROLOG
@@ -76,15 +85,7 @@ int HDataWindow::init ( void )
 				}
 			case ( D_CONTROL_LIST ):
 				{
-				l_poDataControl = new HDataListControl ( this, this,
-						f_psResourcesArray [ l_iCtr ].f_iRow,
-						f_psResourcesArray [ l_iCtr ].f_iColumn,
-						f_psResourcesArray [ l_iCtr ].f_iHeight,
-						f_psResourcesArray [ l_iCtr ].f_iWidth,
-						f_psResourcesArray [ l_iCtr ].f_pcLabel,
-						f_psResourcesArray [ l_iCtr ].f_iAttribute,
-						f_psResourcesArray [ l_iCtr ].f_iEnabledAttribute,
-						f_psResourcesArray [ l_iCtr ].f_iFocusedAttribute );
+				l_poDataControl = new HDataListControl ( this, this, M_STANDART_SETUP	);
 				break;
 				}
 			case ( D_CONTROL_TREE ):

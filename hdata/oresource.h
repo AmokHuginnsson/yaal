@@ -67,14 +67,19 @@ struct OResource
 	int			f_iFlags;							/* tell how control should be treaded */
 	int			f_iType;							/* predefined type of control */
 	int			f_iControlParent;			/* index of parent control (tree data structure) */
+	void *	f_pvControlSpecific;	/* additional initialization values control
+																	 specific */
+	};
+
 /* control type specific */
-	char *	f_pcValue;						/* HEditControl specific */
-	char *	f_pcMask;							/* HEditControl specific */
-	bool		f_bMultiLine;					/* HEditControl specific */
-	bool		f_bReplace;						/* HEditControl specific */
-	bool		f_bPassword;					/* HEditControl specific */
-	int			f_iMaxHistoryLevel;		/* HEditControl specific */
-/* end */
+struct OEditControlResource
+	{
+	char *	f_pcValue;						/* initial value for control */
+	char *	f_pcMask;							/* tell what can be inserted into control */
+	bool		f_bMultiLine;					/* is this contorl a multiline edit? */
+	bool		f_bReplace;						/* is control in replace mode? */
+	bool		f_bPassword;					/* is control in password mode? (no echo) */
+	int			f_iMaxHistoryLevel;		/* history buffer size */
 	};
 
 #endif /* not __ORESOURCE_H */
