@@ -393,7 +393,6 @@ template < class tType >
 tType & HList< tType >::add_at ( int a_iIndex, tType a_tObject )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	HElement * l_poElement = NULL;
 	if ( a_iIndex > f_iQuantity )
 		throw new HException ( __WHERE__, "index excides list size", a_iIndex );
@@ -402,18 +401,17 @@ tType & HList< tType >::add_at ( int a_iIndex, tType a_tObject )
 			new HElement ( NULL, f_iHighestNumber );
 	else
 		{
-		l_poElement = f_poHook;
-		for ( l_iCtr = 0; l_iCtr < a_iIndex; l_iCtr ++ )
-			l_poElement = l_poElement->f_poNext;
-		if ( a_iIndex < 0 )l_iCtr = 1;
+		if ( a_iIndex < 0 )l_poElement = f_poHook;
+		else l_poElement = element_by_index ( a_iIndex );
 		l_poElement = new HElement ( l_poElement, f_iHighestNumber );
-		if ( ! l_iCtr )f_poHook = l_poElement;
+		if ( ! a_iIndex )f_poHook = l_poElement;
 		}
 	f_iHighestNumber ++;
 	f_iQuantity ++;
 	if ( a_tObject )l_poElement->put ( a_tObject );
 	else l_poElement->get_object ( ) = a_tObject;
-	if ( f_poIndex && ( a_iIndex <= f_iIndex ) )f_poIndex = f_poIndex->f_poPrevious;
+	if ( f_poIndex &&  ( a_iIndex >= 0 ) && ( a_iIndex <= f_iIndex ) )
+		f_poIndex = f_poIndex->f_poPrevious;
 	return ( l_poElement->f_tObject );
 	M_EPILOG
 	}
@@ -442,9 +440,8 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag )
 	 * So thats it, I ( Amok ) decided that remove_* functions will return
 	 * error code by reference. */
 	int l_iFlag, * l_piFlag = & l_iFlag;
-	int l_iCtr = 0;
 	tType l_oObject;
-	HElement* l_poElement;
+	HElement * l_poElement = NULL;
 	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
 		l_piFlag = a_piFlag;							/* watch out ! */
 	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
@@ -456,8 +453,7 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag )
 			f_iError++;
 			throw new HException ( __WHERE__, "index excides list size", a_iIndex );
 			}
-		for ( l_iCtr = 0; l_iCtr < a_iIndex; l_iCtr ++ )
-			l_poElement = l_poElement->f_poNext;
+		l_poElement = element_by_index ( a_iIndex );
 		if ( l_poElement->f_lHits )
 			{
 			switch ( * l_piFlag )
@@ -805,7 +801,7 @@ we have to check if a_iIndex is lowwer or geater than f_iIndex/2
 */
 	if ( a_iIndex < f_iIndex )
 		{
-		if ( a_iIndex < f_iIndex / 2 )
+		if ( a_iIndex < ( f_iIndex / 2 ) )
 			for ( f_iIndex = 0, f_poIndex = f_poHook; f_iIndex < a_iIndex; f_iIndex ++ )
 				f_poIndex = f_poIndex->f_poNext;
 		else
