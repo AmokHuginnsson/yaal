@@ -99,8 +99,11 @@ int HDataWindow::init ( void )
 	HDataControl * l_poDataControl = NULL;
 	OAttributes l_sAttributes, * l_psAttr = & l_sAttributes;
 	OEditControlResource l_sEditControlResource;
+	OListControlResource l_sListControlResource;
 /* ECR stands for EditControlResource */
 	OEditControlResource * l_psECR = & l_sEditControlResource;
+/* LCR stands for ListControlResource */
+	OListControlResource * l_psLCR = & l_sListControlResource;
 	l_sAttributes.f_iDisabledAttribute = -1;
 	l_sAttributes.f_iEnabledAttribute = -1;
 	l_sAttributes.f_iFocusedAttribute = -1;
@@ -131,8 +134,11 @@ int HDataWindow::init ( void )
 				}
 			case ( D_CONTROL_LIST ):
 				{
+				l_sListControlResource.f_bCheckable = false;
+				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
+					l_psLCR = ( OListControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
 				l_poDataControl = new HDataListControl ( this, this, M_SETUP_STANDART,
-						M_SETUP_ATTRIBUTES );
+						M_SETUP_ATTRIBUTES, l_psLCR->f_bCheckable );
 				break;
 				}
 			case ( D_CONTROL_TREE ):
@@ -164,6 +170,8 @@ int HDataWindow::init ( void )
 				{
 				f_oTable = f_psResourcesArray [ l_iCtr ].f_pcTable;
 				f_oColumns = f_psResourcesArray [ l_iCtr ].f_pcColumns;
+				f_oFilter = f_psResourcesArray [ l_iCtr ].f_pcFilter;
+				f_oSort = f_psResourcesArray [ l_iCtr ].f_pcSort;
 				f_poMainControl = l_poDataControl;
 				f_oViewModeControls.add_tail ( l_poDataControl );
 				l_poDataControl->enable ( true );
@@ -282,14 +290,14 @@ void HDataWindow::sync ( void )
 		l_iCount = f_poSyncStore->get_size ( );
 		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 			( * f_poSyncStore ) [ l_iCtr ] = f_oValues [ l_iCtr ];
-		( * f_poSyncStore ).m_lId = m_id;
+		( * f_poSyncStore ).m_lId = m_lId;
 		}
 	else if ( ( f_iMode == D_MODE_ADDING ) || ( f_iMode == D_MODE_EDITING ) )
 		{
 		l_iCount = f_oEditModeControls.quantity ( );
 		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 			f_oValues [ l_iCtr ] = ( HString & ) ( HInfo ) * ( HControl * ) f_oEditModeControls [ l_iCtr ];
-		m_id = f_poMainControl->get_current_id ( );
+		m_lId = f_poMainControl->get_current_id ( );
 		}
 	return;
 	M_EPILOG
@@ -341,6 +349,7 @@ int HDataWindow::handler_delete ( int )
 				D_FG_BRIGHTRED );
 		return ( 0 );
 		}
+	if ( f_poMainControl )m_lId = f_poMainControl->get_current_id ( );
 	remove ( );
 	f_poMainControl->populate ( );
 	return ( 0 );
@@ -356,7 +365,7 @@ int HDataWindow::handler_save ( int )
 				D_FG_BRIGHTRED );
 		return ( 0 );
 		}
-	m_id = update ( );
+	m_lId = update ( );
 	set_mode ( D_MODE_VIEW );
 	f_poMainControl->populate ( );
 	return ( 0 );

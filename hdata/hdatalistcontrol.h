@@ -38,7 +38,7 @@ protected:
 public:
 	/*{*/
 	HDataListControl ( HRecordSet *, HWindow *, int, int, int, int, const char *, 
-			int = -1, int = -1, int = -1 );
+			int = -1, int = -1, int = -1, bool = false );
 	virtual ~HDataListControl ( void );
 	virtual void populate ( long int );
 	virtual long int get_current_id ( void );

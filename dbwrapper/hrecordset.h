@@ -68,7 +68,7 @@ public:
 	/*{*/
 	HString m_oFilter;		/* additional variable filter (WHERE clause) */
 	HString m_oSort;			/* additional variable sort (ORDER BY clause) */
-	long int m_id;
+	long int m_lId;
 	/*}*/
 protected:
 	/*{*/

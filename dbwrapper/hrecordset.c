@@ -49,7 +49,7 @@ HRecordSet::HRecordSet ( HDataBase * a_poDataBase )
 	f_poDataBase = a_poDataBase;
 	f_oColumns = "*";
 	f_iIdFieldOffset = -1;
-	m_id = 0;
+	m_lId = 0;
 	return;
 	M_EPILOG
 	}
@@ -84,7 +84,7 @@ void HRecordSet::sync ( void )
 		throw new HException ( __WHERE__, E_MODE, f_iMode );
 	for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 		sync ( l_iCtr, f_oValues [ l_iCtr ] );
-	sync ( f_iIdFieldOffset, m_id );
+	sync ( f_iIdFieldOffset, m_lId );
 	return;
 	M_EPILOG
 	}
@@ -112,7 +112,7 @@ void HRecordSet::build_sql ( void )
 			else f_oBuffer.format ( "%s, %s", ( const char * ) m_oSort,
 					( const char * ) f_oSort );
 			if ( ! f_oBuffer.is_empty ( ) )
-				f_oSQL += ( " ORDER BY " + m_oSort );
+				f_oSQL += ( " ORDER BY " + f_oBuffer );
 			f_oSQL += ';';
 			break;
 			}
@@ -127,8 +127,8 @@ void HRecordSet::build_sql ( void )
 				}
 			f_oBuffer += " WHERE id = ";
 			f_oSQL += f_oBuffer;
-			f_oBuffer.format ( "%ld;", m_id );
-			f_oSQL += f_oBuffer;
+			f_oSQL += m_lId;
+			f_oSQL += ';';
 			break;
 			}
 		case ( D_MODE_ADDING ):
@@ -343,12 +343,19 @@ long int HRecordSet::update ( void )
 void HRecordSet::remove ( void )
 	{
 	M_PROLOG
+	int l_iCursorPosition = f_iCursorPosition;
 	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	f_oSQL.format ( "DELETE FROM %s WHERE id = %ld;",
-			( const char * ) f_oTable, m_id );
+			( const char * ) f_oTable, m_lId );
 	f_poDataBase->query ( f_oSQL );
 	f_poDataBase->free_result ( );
 	requery ( );
+	if ( f_iSetQuantity > 0 )
+		{
+		if ( l_iCursorPosition >= f_iSetQuantity )
+			f_iCursorPosition = f_iSetQuantity - 1;
+		else f_iCursorPosition = l_iCursorPosition;
+		}
 	return;
 	M_EPILOG
 	}

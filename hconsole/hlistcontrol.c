@@ -44,7 +44,7 @@ Copyright:
 HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 														 int a_iHeight, int a_iWidth, const char * a_pcLabel,
 														 int a_iDisabledAttribute, int a_iEnabledAttribute,
-														 int a_iFocudesAttribute )
+														 int a_iFocudesAttribute, bool a_bCheckable )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
 												 a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
 												 a_iFocudesAttribute ), HList < HItem > ( )
@@ -52,6 +52,7 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	M_PROLOG
 	f_bEditable = false;
 	f_bFiltered = false;
+	f_bCheckable = a_bCheckable;
 	f_iControlOffset = 0;
 	f_iCursorPosition = 0;
 	f_iSumForOne = 0;
@@ -385,7 +386,8 @@ int HListControl::process_input ( int a_iCode )
 			}
 		case ( ' ' ):
 			{
-			l_poElement->get_object ( ).m_bChecked = ! l_poElement->get_object ( ).m_bChecked;
+			if ( f_bCheckable )
+				l_poElement->get_object ( ).m_bChecked = ! l_poElement->get_object ( ).m_bChecked;
 			break;
 			}
 		case ( '\t' ):
@@ -436,7 +438,6 @@ int HListControl::process_input ( int a_iCode )
 					( * ( HControl * ) l_pvPointer ) = f_poSelected
 																										->get_object ( ) [ l_iCtr ];
 				}
-			l_iOldPosition++;
 			}
 		refresh ( );
 		console::c_printf ( console::n_iHeight - 1, -1, 7, "" );
@@ -508,6 +509,9 @@ HItem & HListControl::add_tail ( HItem & a_roItem )
 	else f_iCursorPosition = f_iQuantity;
 	l_oDummy = & HList < HItem > ::add_tail ( a_roItem );
 	if ( ! f_poFirstVisibleRow )f_poFirstVisibleRow = f_poHook;
+	f_poSelected = f_poHook;
+	to_head ( );
+	console::n_bNeedRepaint = true;
 	return ( * l_oDummy );
 	M_EPILOG
 	}
@@ -557,13 +561,34 @@ void HListControl::recalculate_column_widths ( void )
 HItem HListControl::remove_element ( int * a_piFlag )
 	{
 	M_PROLOG
-	if ( f_poFirstVisibleRow == f_poSelected )
+	bool l_bFlag = true;
+	HElement * l_poElement = NULL;
+	HItem l_oItem;
+	if ( f_iControlOffset
+			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_iQuantity ) )
 		{
-		to_tail ( );
-		f_poFirstVisibleRow = f_poSelected;
+		f_iControlOffset --;
+		l_poElement = f_poSelected;
+		f_poSelected = f_poFirstVisibleRow;
 		to_head ( );
+		f_poFirstVisibleRow = f_poSelected;
+		f_poSelected = l_poElement;
 		}
-	return ( HList < HItem > ::remove_element ( a_piFlag ) );
+	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
+		f_iCursorPosition --;
+	else l_bFlag = false;
+	console::n_bNeedRepaint = true;
+	l_oItem = HList < HItem > ::remove_element ( a_piFlag );
+	if ( l_bFlag )to_head ( );
+	refresh ( );
+	return ( l_oItem );
+	M_EPILOG
+	}
+
+HItem HListControl::remove_tail ( int * a_piFlag )
+	{
+	M_PROLOG
+	return ( HList < HItem > ::remove_tail ( a_piFlag ) );
 	M_EPILOG
 	}
 

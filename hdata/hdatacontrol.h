@@ -38,11 +38,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HDataControl ( HRecordSet *,	/* record-set (table) that will be displayed */
-								 HWindow *,			/* parent window */
-								 int, int, int, int, /* coordinates */
-								 const char *,	/* label */
-								 int = -1, int = -1, int = -1 );	/* attributes */
+	HDataControl ( HRecordSet * );
 	virtual ~HDataControl ( void );
 	virtual void populate ( long int = 0 );
 	virtual long int get_current_id ( void );

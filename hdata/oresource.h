@@ -105,4 +105,9 @@ struct OEditControlResource
 	int			f_iMaxHistoryLevel;	/* history buffer size */
 	};
 
+struct OListControlResource
+	{
+	bool	f_bCheckable;					/* can control items be checked/unchecked */
+	};
+
 #endif /* not __ORESOURCE_H */

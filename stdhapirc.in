@@ -44,8 +44,10 @@ focused_attribute BRIGHTGREEN GRAY BLACK LIGHTGRAY
 ### console END
 
 ### tools BEGIN
-# should CTRL-C typed by user break program ?
-ctrl_c_does_not_break true
+# should CTRL-c typed by user be discarded by program ?
+ignore_signal_SIGINT true
+# is CTRL-z ignored by process?
+ignore_signal_SIGTSTP true
 
 ### tools END
 

@@ -51,11 +51,13 @@ Copyright:
 namespace signals
 {
 
-bool n_bCtrlCDoesNotBreak = false;
+bool n_bIgnoreSignalSIGINT = false;
+bool n_bIgnoreSignalSIGTSTP = false;
 
 OVariable n_psVariables [ ] =
 	{
-		{ D_TYPE_BOOL, "ctrl_c_does_not_break", & n_bCtrlCDoesNotBreak },
+		{ D_TYPE_BOOL, "ignore_signal_SIGINT", & n_bIgnoreSignalSIGINT },
+		{ D_TYPE_BOOL, "ignore_signal_SIGTSTP", & n_bIgnoreSignalSIGTSTP },
 		{ 0, NULL, NULL }
 	};
 	
@@ -95,7 +97,7 @@ void signal_ctrlc ( int a_iSignum )
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
 #ifdef __CONSOLE_H
-	if ( console::is_enabled ( ) && n_bCtrlCDoesNotBreak )
+	if ( console::is_enabled ( ) && n_bIgnoreSignalSIGINT )
 		{
 		if ( signal( SIGINT, signals::signal_ctrlc ) == SIG_IGN )
 			signal( SIGINT, SIG_IGN );
@@ -168,6 +170,19 @@ void signal_stop ( int a_iSignum )
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
+#ifdef __CONSOLE_H
+	if ( console::is_enabled ( ) && n_bIgnoreSignalSIGINT )
+		{
+		if ( signal( SIGTSTP, signals::signal_stop ) == SIG_IGN )
+			signal( SIGTSTP, SIG_IGN );
+		console::n_bInputWaiting = true;
+		console::c_printf ( console::n_iHeight - 1, 0, D_FG_BRIGHTRED,
+				"Suspend is disabled by stdhapi configuration." );
+		ungetch ( D_KEY_CTRL_('z') );
+		return;
+		}
+	if ( console::is_enabled ( ) )console::leave_curses();
+#endif /* __CONSOLE_H */
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nUser typed ^Z, process suspended: ";
 	l_oMessage += l_pcSignalMessage;
@@ -175,9 +190,6 @@ void signal_stop ( int a_iSignum )
 #ifdef __HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HLOG_H */
-#ifdef __CONSOLE_H
-	if ( console::is_enabled ( ) )console::leave_curses();
-#endif /* __CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGTSTP, SIG_DFL );
 	raise ( SIGTSTP );

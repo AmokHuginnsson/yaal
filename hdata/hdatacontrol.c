@@ -28,12 +28,8 @@ Copyright:
 
 #include "../hcore/hexception.h"
 
-HDataControl::HDataControl ( HRecordSet * a_poRecordSet,
-		HWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
-		int a_iWidth, const char * a_pcTitle, int a_iAttribute,
-		int a_iEnabledAttribute, int a_iFocusedAttribute )
-:	HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcTitle,
-			a_iAttribute, a_iEnabledAttribute, a_iFocusedAttribute )
+HDataControl::HDataControl ( HRecordSet * a_poRecordSet )
+						: HControl ( NULL, 0, 0, 0, 0, NULL )
 	{
 	M_PROLOG
 	f_poRecordSet = a_poRecordSet;

@@ -35,7 +35,7 @@ HDataTreeControl::HDataTreeControl ( HRecordSet * a_poRecordSet,
 								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
 										a_iWidth, a_pcTitle, a_iAttribute,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
-								HDataControl ( a_poRecordSet, NULL, 0, 0, 0, 0, NULL, 0, 0, 0 ),
+								HDataControl ( a_poRecordSet ),
 								HTreeControl ( NULL, 0, 0, 0, 0, NULL )
 	{
 	M_PROLOG

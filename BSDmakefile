@@ -5,7 +5,7 @@ all: Makefile
 	@echo "Invoking GNU make (gmake)."
 	@gmake all
 
-Makefile: Makefile.in configure
+Makefile: Makefile.in stdhapirc.in config.h.in configure
 	@make banner
 	@echo "Generating \`Makefile' and rest of necessary files."
 	@./configure

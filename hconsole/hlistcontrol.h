@@ -43,6 +43,7 @@ class HListControl : public HList < HItem >, public virtual HControl
 	{
 protected:
 	/*{*/
+	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool				f_bEditable;					/* is list interactively editable */
 	bool				f_bFiltered;					/* is content of list filtered
 																			 thru pattern */
@@ -61,15 +62,16 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HListControl ( HWindow *,		 	/* parent */
-								 int,						/* row */
-								 int,						/* col */
-								 int,						/* height */
-								 int,						/* width */
-								 const char *,	/* label */
-								 int = -1, 			/* disabled attribute */
-								 int = -1,			/* enabled attribute */
-								 int = -1 );		/* focused attribute */
+	HListControl ( HWindow *,		 		/* parent */
+								 int,							/* row */
+								 int,							/* col */
+								 int,							/* height */
+								 int,							/* width */
+								 const char *,		/* label */
+								 int = -1, 				/* disabled attribute */
+								 int = -1,				/* enabled attribute */
+								 int = -1,				/* focused attribute */
+								 bool = false );	/* checkable */
 	virtual ~HListControl ( void );
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );
@@ -83,6 +85,7 @@ public:
 	virtual HItem & add_tail ( void );
 	virtual HItem & add_tail ( HItem & );
 	virtual HItem remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED );
+	virtual HItem remove_tail ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	/*}*/
 protected:
 	/*{*/

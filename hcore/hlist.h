@@ -120,9 +120,9 @@ public:
 	virtual tType & add_at ( int, tType ); /* adds new element at specified 
 																						position */
 	virtual tType & add_at ( int );
-	virtual tType remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED );    
+	virtual tType remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED, int * = D_TREAT_AS_CLOSED );    
 	/* rmoves element at current cursor position */
-	virtual tType remove_at ( int, int * = D_BLOCK_IF_NOT_EMPTIED );
+	virtual tType remove_at ( int, int * = D_BLOCK_IF_NOT_EMPTIED, int * = D_TREAT_AS_CLOSED );
 	virtual tType remove_head ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	virtual tType remove_tail ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	/* sets cursor at specified index or number */
@@ -426,7 +426,7 @@ tType & HList< tType >::add_at ( int a_iIndex )
 	}
 	
 template < class tType >
-tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag )
+tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat )
 	{
 	M_PROLOG
 	/* This one cant be initialised cause we don't know what it is,
@@ -440,11 +440,14 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag )
 	 * So thats it, I ( Amok ) decided that remove_* functions will return
 	 * error code by reference. */
 	int l_iFlag, * l_piFlag = & l_iFlag;
+	int l_iTreat, * l_piTreat = & l_iTreat;
 	tType l_oObject;
 	HElement * l_poElement = NULL;
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
-		l_piFlag = a_piFlag;							/* watch out ! */
-	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
+	/* watch out, this is sticky ! */
+	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )l_piFlag = a_piFlag;
+	else * l_piFlag = ( int ) a_piFlag;
+	if ( ( unsigned int ) a_piTreat > D_DEFINE_LIMIT )l_piTreat = a_piTreat;
+	else * l_piTreat = ( int ) a_piTreat;
 	l_poElement = f_poHook;
 	if ( f_iQuantity > 0 )
 		{
@@ -485,8 +488,15 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag )
 			}
 		}
 	else throw new HException ( __WHERE__, "list was empty", g_iErrNo );
-	if ( l_poElement == f_poHook ) f_poHook = f_poHook->f_poNext;
-	if ( l_poElement == f_poSelected ) f_poSelected = f_poSelected->f_poNext;
+	if ( l_poElement == f_poHook )f_poHook = f_poHook->f_poNext;
+	if ( l_poElement == f_poSelected )
+		{
+		if ( ( ( * l_piTreat ) == ( ( int ) D_TREAT_AS_OPENED ) )
+				&& ( f_poSelected->f_poNext == f_poHook ) )
+			f_poSelected = f_poSelected->f_poPrevious;
+		else
+			f_poSelected = f_poSelected->f_poNext;
+		}
 	if ( f_poIndex && ( a_iIndex <= f_iIndex ) )f_poIndex = f_poIndex->f_poNext;
 	delete l_poElement;
 	f_iQuantity--;
@@ -500,15 +510,18 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag )
 	}
 
 template < class tType >
-tType HList< tType >::remove_element ( int * a_piFlag )
+tType HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
 	{
 	M_PROLOG
 	int l_iFlag, * l_piFlag = & l_iFlag;
+	int l_iTreat, * l_piTreat = & l_iTreat;
 	tType l_oObject; 
 	HElement * l_poElement = NULL;
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
-		l_piFlag = a_piFlag;							/* watch out ! */
-	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
+	/* watch out, this is sticky ! */
+	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )l_piFlag = a_piFlag;
+	else * l_piFlag = ( int ) a_piFlag;
+	if ( ( unsigned int ) a_piTreat > D_DEFINE_LIMIT )l_piTreat = a_piTreat;
+	else * l_piTreat = ( int ) a_piTreat;
 	l_poElement = f_poSelected;
 	if ( f_iQuantity > 0 )
 		{
@@ -543,7 +556,11 @@ tType HList< tType >::remove_element ( int * a_piFlag )
 			}
 		}
 	else throw new HException ( __WHERE__, "list was empty", g_iErrNo );
-	f_poSelected = f_poSelected->f_poNext;
+	if ( ( ( * l_piTreat ) == ( ( int ) D_TREAT_AS_OPENED ) )
+			&& ( f_poSelected->f_poNext == f_poHook ) )
+		f_poSelected = f_poSelected->f_poPrevious;
+	else
+		f_poSelected = f_poSelected->f_poNext;
 	if ( l_poElement == f_poHook )f_poHook = f_poHook->f_poNext;
 	delete l_poElement;
 	f_iQuantity--;

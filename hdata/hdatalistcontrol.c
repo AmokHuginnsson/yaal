@@ -44,12 +44,12 @@ Copyright:
 HDataListControl::HDataListControl ( HRecordSet * a_poRecordSet,
 		HWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
 		int a_iWidth, const char * a_pcTitle, int a_iAttribute,
-		int a_iEnabledAttribute, int a_iFocusedAttribute )
+		int a_iEnabledAttribute, int a_iFocusedAttribute, bool a_bCheckable )
 								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
 										a_iWidth, a_pcTitle, a_iAttribute,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
-								HDataControl ( a_poRecordSet, NULL, 0, 0, 0, 0, NULL, 0, 0, 0 ),
-								HListControl ( NULL, 0, 0, 0, 0, NULL )
+								HDataControl ( a_poRecordSet ),
+								HListControl ( NULL, 0, 0, 0, 0, NULL, 0, 0, 0, a_bCheckable )
 	{
 	M_PROLOG
 	return;
@@ -66,30 +66,33 @@ HDataListControl::~HDataListControl ( void )
 void HDataListControl::populate ( long int /*a_iId*/ )
 	{
 	M_PROLOG
+	int l_iCtr = 0, l_iQuantity = f_iQuantity;
 	int l_iCursorPosition = f_iCursorPosition;
 	int l_iControlOffset = f_iControlOffset;
-	HElement * l_poSelected = NULL, * l_poFirstVisibleRow = NULL;
-	HItem l_oInfoList ( f_oHeader.quantity ( ) );
+	HElement * l_poSelected = f_poSelected;
+	HElement * l_poFirstVisibleRow = f_poFirstVisibleRow;
+	HItem l_oItem ( f_oHeader.quantity ( ) );
 	HDataWindow * l_poParent = ( HDataWindow * ) f_poParent;
-	l_poParent->set_sync_store ( & l_oInfoList );
+	l_poParent->set_sync_store ( & l_oItem );
 	if ( f_poRecordSet->is_open ( ) )f_poRecordSet->requery ( );
 	else f_poRecordSet->open ( );
-	flush ( );
+	if ( f_iQuantity )go ( 0 );
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
-		l_oInfoList [ 0 ] = f_poRecordSet->m_id;
-		add_tail ( l_oInfoList );
-		if ( l_iControlOffset == ( f_iQuantity - 1 ) )
-			l_poFirstVisibleRow = f_poFirstVisibleRow;
-		if ( ( l_iCursorPosition + l_iControlOffset ) == ( f_iQuantity - 1 ) )
-			l_poSelected = f_poSelected;
+		if ( l_iCtr ++ < l_iQuantity )
+			{	
+			f_poSelected->get_object ( ) = l_oItem;
+			to_tail ( );
+			}
+		else add_tail ( l_oItem );
 		f_poRecordSet->move_next ( );
 		}
-	l_poParent->set_sync_store ( );
-	f_iCursorPosition = l_iCursorPosition;
-	f_iControlOffset = l_iControlOffset;
 	f_poSelected = l_poSelected;
 	f_poFirstVisibleRow = l_poFirstVisibleRow;
+	f_iCursorPosition = l_iCursorPosition;
+	f_iControlOffset = l_iControlOffset;
+	while ( l_iCtr ++ < l_iQuantity )remove_tail ( D_EMPTY_IF_NOT_EMPTIED );
+	l_poParent->set_sync_store ( );
 	return;
 	M_EPILOG
 	}

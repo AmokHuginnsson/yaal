@@ -151,8 +151,8 @@ HString::HString ( int a_iInt )
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	f_pcBuffer = 0;
 	f_iLength = 0;
-	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%d", a_iInt );
-	hs_realloc ( l_iSize + 1 );
+	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%d", a_iInt ) + 1;
+	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%d", a_iInt );
 	return;
 	M_EPILOG
@@ -165,8 +165,8 @@ HString::HString ( long a_lLong )
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	f_pcBuffer = 0;
 	f_iLength = 0;
-	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%ld", a_lLong );
-	hs_realloc ( l_iSize + 1 );
+	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%ld", a_lLong ) + 1;
+	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%ld", a_lLong );
 	return;
 	M_EPILOG
@@ -179,8 +179,8 @@ HString::HString ( double a_dDouble )
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	f_pcBuffer = 0;
 	f_iLength = 0;
-	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%f", a_dDouble );
-	hs_realloc ( l_iSize + 1 );
+	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%f", a_dDouble ) + 1;
+	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%f", a_dDouble );
 	return;
 	M_EPILOG
@@ -193,8 +193,8 @@ HString::HString ( void * a_pvPtrVoid )
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	f_pcBuffer = 0;
 	f_iLength = 0;
-	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%p", a_pvPtrVoid );
-	hs_realloc ( l_iSize + 1 );
+	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%p", a_pvPtrVoid ) + 1;
+	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%p", a_pvPtrVoid );
 	return;
 	M_EPILOG
