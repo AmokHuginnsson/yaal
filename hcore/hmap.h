@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HMAP_H
 #define __HMAP_H
 
-#line 33 "hmap.h"
+#line 31 "hmap.h"
 
 extern unsigned long int * g_pulPrimes;
 
