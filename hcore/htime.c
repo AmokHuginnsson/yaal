@@ -36,8 +36,7 @@ HTime::HTime ( const char * a_pcFormat )
 	{
 	M_PROLOG
 	f_oFormat = a_pcFormat;
-	f_xValue = time ( NULL );
-	localtime_r ( & f_xValue, & f_sBroken );
+	set_now ( );
 	return;
 	M_EPILOG
 	}
@@ -55,7 +54,7 @@ HTime::HTime ( const int a_iYear, const int a_iMonth, const int a_iDay,
 	{
 	M_PROLOG
 	f_oFormat = "%a, %d %b %Y %T %z";
-	set_time ( a_iYear, a_iMonth, a_iDay, a_iHour, a_iMinute, a_iSecond );
+	set_datetime ( a_iYear, a_iMonth, a_iDay, a_iHour, a_iMinute, a_iSecond );
 	return;
 	M_EPILOG
 	}
@@ -78,6 +77,15 @@ HObject * HTime::clone ( void ) const
 	M_EPILOG
 	}
 
+void HTime::set_now ( void )
+	{
+	M_PROLOG
+	f_xValue = time ( NULL );
+	localtime_r ( & f_xValue, & f_sBroken );
+	return;
+	M_EPILOG
+	}
+
 void HTime::format ( const char * a_pcFormat )
 	{
 	M_PROLOG
@@ -86,18 +94,10 @@ void HTime::format ( const char * a_pcFormat )
 	M_EPILOG
 	}
 
-void HTime::set_time ( const int a_iYear, const int a_iMonth,
-											 const int a_iDay, const int a_iHour,
-											 const int a_iMinute, const int a_iSecond )
+void HTime::set_time ( const int a_iHour, const int a_iMinute,
+											 const int a_iSecond )
 	{
 	M_PROLOG
-	f_sBroken.tm_year = a_iYear - 1900;
-	if ( ( a_iMonth < 1 ) || ( a_iMonth > 12 ) )
-		throw new HException ( __WHERE__, "bad month in year", a_iMonth );
-	f_sBroken.tm_mon = a_iMonth - 1;
-	if ( ( a_iDay < 1 ) || ( a_iDay > 31 ) )
-		throw new HException ( __WHERE__, "bad day of month", a_iDay );
-	f_sBroken.tm_mday = a_iDay;
 	if ( ( a_iHour < 0 ) || ( a_iHour > 23 ) )
 		throw new HException ( __WHERE__, "bad hour", a_iHour );
 	f_sBroken.tm_hour = a_iHour;
@@ -108,6 +108,33 @@ void HTime::set_time ( const int a_iYear, const int a_iMonth,
 		throw new HException ( __WHERE__, "bad second", a_iSecond );
 	f_sBroken.tm_sec = a_iSecond;
 	f_xValue = mktime ( & f_sBroken );
+	return;
+	M_EPILOG
+	}
+
+void HTime::set_date ( const int a_iYear, const int a_iMonth,
+											 const int a_iDay )
+	{
+	M_PROLOG
+	f_sBroken.tm_year = a_iYear - 1900;
+	if ( ( a_iMonth < 1 ) || ( a_iMonth > 12 ) )
+		throw new HException ( __WHERE__, "bad month in year", a_iMonth );
+	f_sBroken.tm_mon = a_iMonth - 1;
+	if ( ( a_iDay < 1 ) || ( a_iDay > 31 ) )
+		throw new HException ( __WHERE__, "bad day of month", a_iDay );
+	f_sBroken.tm_mday = a_iDay;
+	f_xValue = mktime ( & f_sBroken );
+	return;
+	M_EPILOG
+	}
+
+void HTime::set_datetime ( const int a_iYear, const int a_iMonth,
+											 const int a_iDay, const int a_iHour,
+											 const int a_iMinute, const int a_iSecond )
+	{
+	M_PROLOG
+	set_date ( a_iYear, a_iMonth, a_iDay );
+	set_time ( a_iHour, a_iMinute, a_iSecond );
 	return;
 	M_EPILOG
 	}
@@ -161,6 +188,16 @@ HTime & HTime::operator = ( const HTime & a_roTime )
 	f_xValue = a_roTime.f_xValue;
 	memcpy ( & f_sBroken, & a_roTime.f_sBroken, sizeof ( tm ) );
 	return ( * this );
+	M_EPILOG
+	}
+
+HTime HTime::operator - ( const HTime & a_roTime )
+	{
+	M_PROLOG
+	HTime l_oTime ( f_oFormat );
+	l_oTime.f_xValue = ( time_t ) difftime ( f_xValue, a_roTime.f_xValue );
+	gmtime_r ( & l_oTime.f_xValue, & l_oTime.f_sBroken );
+	return ( l_oTime );
 	M_EPILOG
 	}
 
@@ -227,7 +264,7 @@ bool HTime::operator > ( const time_t & a_rxTime )
 	M_EPILOG
 	}
 
-HTime::operator HString & ( void )
+HTime::operator const char * ( void )
 	{
 	M_PROLOG
 	int l_iSize = 0;
@@ -242,13 +279,6 @@ HTime::operator HString & ( void )
 	strftime ( f_oBuffer, l_iSize, f_oFormat, & f_sBroken );
 #endif /* not __HOST_OS_TYPE_FREEBSD__ */
 	return ( f_oBuffer );
-	M_EPILOG
-	}
-
-HTime::operator const char * ( void )
-	{
-	M_PROLOG
-	return ( ( HString & ) * this );
 	M_EPILOG
 	}
 

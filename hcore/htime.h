@@ -49,8 +49,11 @@ public:
 			const int = 0 );
 	virtual ~HTime ( void );
 	virtual HObject * clone ( void ) const;
+	void set_now ( void );
 	void format ( const char * = "%a, %d %b %Y %T %z" );
-	void set_time ( const int, const int = 1, const int = 1,
+	void set_time ( const int = 0, const int = 0, const int = 0 );
+	void set_date ( const int, const int = 1, const int = 1 );
+	void set_datetime ( const int, const int = 1, const int = 1,
 						 const int = 0, const int = 0, const int = 0 );
 	int get_year ( void );
 	int get_month ( void );
@@ -59,6 +62,7 @@ public:
 	int get_minute ( void );
 	int get_second ( void );
 	HTime & operator = ( const HTime & );
+	HTime operator - ( const HTime & );
 	const char * operator = ( const char * );
 	time_t operator = ( const time_t & );
 	bool operator == ( const time_t & );
@@ -67,7 +71,6 @@ public:
 	bool operator >= ( const time_t & );
 	bool operator < ( const time_t & );
 	bool operator > ( const time_t & );
-	operator HString & ( void );
 	operator const char * ( void );
 	operator time_t ( void );
 	/*}*/
