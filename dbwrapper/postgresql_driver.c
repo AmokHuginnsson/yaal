@@ -30,11 +30,13 @@ Copyright:
 
 #include "../config.h"
 
-#ifdef __PLD_HOST__
-#	include <libpq-fe.h>
-#else /* __PLD_HOST__ */
+#ifdef HAVE_POSTGRESQL_LIBPQ_FE_H
 #	include <postgresql/libpq-fe.h>
-#endif /* not __PLD_HOST__*/
+#elif HAVE_LIBPQ_FE_H
+#	include <libpq-fe.h>
+#else /* HAVE_LIBPQ_FE_H */
+#	error "No libpq-fe.h header available."
+#endif /* not HAVE_LIBPQ_FE_H */
 
 #include <xalloc.h>
 

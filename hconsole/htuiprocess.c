@@ -29,11 +29,13 @@ Copyright:
 
 #include "../config.h"
 
-#ifdef __PLD_HOST__
-#	include <ncurses/ncurses.h>
-#else /* __PLD_HOST__ */
+#ifdef HAVE_NCURSES_H
 #	include <ncurses.h>
-#endif /* not __PLD_HOST__ */
+#elif HAVE_NCURSES_NCURSES_H
+#	include <ncurses/ncurses.h>
+#else /* HAVE_NCURSES_NCURSES_H */
+#	error "No ncurses header available."
+#endif /* not HAVE_NCURSES_NCURSES_H */
 
 #include "hprocess.h"
 

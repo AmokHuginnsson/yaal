@@ -1,9 +1,29 @@
-/* Define host type here. */
+/* Define operating system host type here. */
 
-#undef __DEBIAN_HOST__
+#undef __HOST_OS_TYPE_DEBIAN__
 
-#undef __PLD_HOST__
+#undef __HOST_OS_TYPE_PLD__
 
-#undef __FREEBSD_HOST__
+#undef __HOST_OS_TYPE_FREEBSD__
 
-/* End of host type definition. */
+/* End of operating system host type definition. */
+
+/* Define available headers */
+
+/* ncurses */
+
+#undef HAVE_NCURSES_H
+
+#undef HAVE_NCURSES_NCURSES_H
+
+/* MySQL */
+
+#undef HAVE_MYSQL_MYSQL_H
+
+/* PostgreSQL */
+
+#undef HAVE_POSTGRESQL_LIBPQ_FE_H
+
+#undef HAVE_LIBPQ_FE_H
+
+/* End of available headers definitions. */
