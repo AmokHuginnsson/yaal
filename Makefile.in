@@ -55,27 +55,27 @@ CXX = g++
 LXX = g++
 ARFLAGS = r
 CXXFLAGS =	\
-						-W\
 						-Wall\
 						-Wcast-align\
 						-Wconversion\
 						-Werror\
+						-Wextra\
 						-Winline\
 						-Wlarger-than-4096\
 						-Wlong-long\
 						-Wmissing-noreturn\
-						-Wmissing-prototypes\
 						-Wpointer-arith\
 						@SPECIAL_COMPILER_FLAGS@\
 						-Wsign-compare\
-						-Wstrict-prototypes\
 						-Wundef\
 						-Wwrite-strings
+#						-Wid-clash-2\ #deprecated
 #						-Wbad-function-cast\
-						-Wid-clash-2\
 						-Wmissing-declarations\
+						-Wmissing-prototypes\
 						-Wnested-externs\
-						-Wtraditional\ #deprecated
+						-Wstrict-prototypes\
+						-Wtraditional\ #C only
 HEAVYCXXFLAGS =	\
 								@SPECIAL_HEAVY_COMPILER_FLAGS@\
 								-Waggregate-return\
@@ -84,7 +84,7 @@ HEAVYCXXFLAGS =	\
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
-COMPILER_PRIME_FLAGS = -pipe -fPIC -D_GNU_SOURCE @DEFS@ -march=i486
+COMPILER_PRIME_FLAGS = -std=gnu++98 -pipe -fPIC -D_GNU_SOURCE @DEFS@ -march=i486
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else

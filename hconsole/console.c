@@ -349,7 +349,8 @@ char get_attr( void )
 	attr_t l_xAttr;
 	short l_hColor = 0;
 	int l_iAttribute = 0;
-	attr_get( & l_xAttr, & l_hColor, 0 );
+	int l_iError = 0;
+	l_iError = attr_get ( & l_xAttr, & l_hColor, NULL );
 	l_iAttribute = ( l_hColor << 1 ) & 56;
 	l_iAttribute |= ( l_hColor & 7 );
 	if ( l_xAttr & A_BOLD )l_iAttribute |= 8;

@@ -239,7 +239,7 @@ int HProcess::preprocess_input ( int a_iCode )
 		l_iCtr = 0;
 		while ( ( l_iCode = ( * l_poHandler ) [ l_iCtr ++ ] ) )
 			if ( l_iCode == a_iCode )
-				a_iCode = ( this->*( ( PROCESS_HANDLER_t ) ( * l_poHandler ) ) ) ( a_iCode );
+				a_iCode = ( this->*( ( PROCESS_HANDLER_t ) ( * l_poHandler ) ) ) ( a_iCode, NULL );
 		}
 	return ( a_iCode );
 	M_EPILOG
@@ -259,7 +259,7 @@ int HProcess::postprocess_input ( int a_iCode )
 		l_iCtr = 0;
 		while ( ( l_iCode = ( * l_poHandler ) [ l_iCtr ++ ] ) )
 			if ( l_iCode == a_iCode )
-				a_iCode = ( this->*( ( PROCESS_HANDLER_t ) ( * l_poHandler ) ) ) ( a_iCode );
+				a_iCode = ( this->*( ( PROCESS_HANDLER_t ) ( * l_poHandler ) ) ) ( a_iCode, NULL );
 		}
 	return ( a_iCode );
 	M_EPILOG

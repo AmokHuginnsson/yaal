@@ -81,8 +81,8 @@ char * ( * rs_get ) ( void *, int, int );
 typedef int ( * t7 ) ( void * );
 int ( * rs_fields_count ) ( void * );
 
-typedef long int ( * t8 ) ( void *, void * = NULL );
-long int ( * rsdb_records_count ) ( void *, void * = NULL );
+typedef long int ( * t8 ) ( void *, void * );
+long int ( * rsdb_records_count ) ( void *, void * );
 
 typedef long int ( * t9 ) ( void *, void * );
 long int ( * rsdb_id ) ( void *, void * );

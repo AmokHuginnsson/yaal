@@ -134,7 +134,7 @@ int HMatrix < tType > ::set ( tType ** d )
 	M_PROLOG
 	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		f_ptArray [ l_iCtr ]->set ( d [ l_iCtr ] );
+		this->f_ptArray [ l_iCtr ]->set ( d [ l_iCtr ] );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -145,7 +145,7 @@ int HMatrix < tType > ::set ( HVector < tType > a_poVector )
 	M_PROLOG
 	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		* f_ptArray [ l_iCtr ] = ( * a_poVector ) [ l_iCtr ];
+		* this->f_ptArray [ l_iCtr ] = ( * a_poVector ) [ l_iCtr ];
 	return ( 0 );
 	M_EPILOG
 	}
@@ -232,7 +232,7 @@ tType HMatrix < tType > ::M ( int r, int c )
 		for ( j = 0; j < f_iColumns; j++ )
 			{
 			if ( j == c ) continue;
-			l_oMatrix [ ii ] [ jj ] = ( * f_ptArray [ l_iCtr ] ) [ j ];
+			l_oMatrix [ ii ] [ jj ] = ( * this->f_ptArray [ l_iCtr ] ) [ j ];
 			jj++;
 			}
 		ii++;
@@ -248,7 +248,7 @@ HMatrix < tType > HMatrix < tType > ::T ( void )
 	int l_iCtr, j;
 	HMatrix l_oMatrix ( f_iColumns, f_iRows );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) for ( j = 0; j < f_iColumns; j++ ) 
-		l_oMatrix [ j ] [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] ) [ j ];
+		l_oMatrix [ j ] [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] ) [ j ];
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -293,7 +293,7 @@ HMatrix < tType > & HMatrix < tType > ::operator = ( tType d )
 	M_PROLOG
 	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		( * f_ptArray  ) [ l_iCtr ] = d;
+		( * this->f_ptArray  ) [ l_iCtr ] = d;
 	return ( * this );
 	M_EPILOG
 	}
@@ -308,7 +308,7 @@ HMatrix < tType > HMatrix < tType > ::operator + ( HMatrix & a_roMatrix )
 		{
 		HMatrix l_oMatrix ( f_iRows, f_iColumns );
 		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			l_oMatrix [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] + a_roMatrix [ l_iCtr ] );
+			l_oMatrix [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] + a_roMatrix [ l_iCtr ] );
 		return ( l_oMatrix );
 		}
 	return ( * this );
@@ -326,7 +326,7 @@ HMatrix < tType > HMatrix < tType > ::operator - ( HMatrix & a_roMatrix )
 		HMatrix l_oMatrix ( f_iRows, f_iColumns );
 		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
 			{
-			l_oMatrix [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] - a_roMatrix [ l_iCtr ] );
+			l_oMatrix [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] - a_roMatrix [ l_iCtr ] );
 			}
 		return ( l_oMatrix );
 		}
@@ -359,7 +359,7 @@ HMatrix < tType > HMatrix < tType > ::operator * ( HMatrix & a_roMatrix )
 				{
 				d = 0;
 				for ( k = 0; k < f_iColumns; k++ ) 
-					d += ( ( * ( f_ptArray [ l_iCtr ] ) ) [ k ] * a_roMatrix [ k ] [ j ] );
+					d += ( ( * ( this->f_ptArray [ l_iCtr ] ) ) [ k ] * a_roMatrix [ k ] [ j ] );
 				l_oMatrix [ l_iCtr ] [ j ] = d;
 				}
 		return ( l_oMatrix );
@@ -375,7 +375,7 @@ HMatrix < tType > HMatrix < tType > ::operator * ( tType d )
 	int l_iCtr;
 	HMatrix l_oMatrix ( f_iRows, f_iColumns );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		l_oMatrix [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] * d );
+		l_oMatrix [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] * d );
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -387,7 +387,7 @@ HMatrix < tType > HMatrix < tType > ::operator / ( tType d )
 	int l_iCtr;
 	HMatrix l_oMatrix ( f_iRows, f_iColumns );
 	if ( d ) for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			l_oMatrix [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] / d );
+			l_oMatrix [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] / d );
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -399,7 +399,8 @@ HMatrix < tType > & HMatrix < tType > ::operator += ( HMatrix & a_roMatrix )
 	int l_iCtr;
 	if ( ( f_iRows == a_roMatrix.f_iRows ) 
 			&& ( f_iColumns == a_roMatrix.f_iColumns ) ) 
-		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) * f_ptArray [ l_iCtr ] += a_roMatrix [ l_iCtr ];
+		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
+			* this->f_ptArray [ l_iCtr ] += a_roMatrix [ l_iCtr ];
 	return ( * this );
 	M_EPILOG
 	}
@@ -411,7 +412,8 @@ HMatrix < tType > & HMatrix < tType > ::operator -= ( HMatrix & a_roMatrix )
 	int l_iCtr;
 	if ( ( f_iRows == a_roMatrix.f_iRows ) 
 			&& ( f_iColumns == a_roMatrix.f_iColumns ) ) 
-		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) * f_ptArray [ l_iCtr ] -= a_roMatrix [ l_iCtr ];
+		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
+			* this->f_ptArray [ l_iCtr ] -= a_roMatrix [ l_iCtr ];
 	return ( * this );
 	M_EPILOG
 	}
@@ -430,7 +432,7 @@ HMatrix < tType > & HMatrix < tType > ::operator *= ( HMatrix & a_roMatrix )
 				{
 				d = 0;
 				for ( k = 0; k < f_iColumns; k++ ) 
-					d += ( * f_ptArray [ l_iCtr ] ) [ k ] * a_roMatrix [ k ] [ j ];
+					d += ( * this->f_ptArray [ l_iCtr ] ) [ k ] * a_roMatrix [ k ] [ j ];
 				l_oMatrix [ l_iCtr ] [ j ] = d;
 				}
 		 * this = l_oMatrix;
@@ -444,7 +446,8 @@ HMatrix < tType > & HMatrix < tType > ::operator *= ( tType d )
 	{
 	M_PROLOG
 	int l_iCtr;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) ( * f_ptArray [ l_iCtr ] *= d );
+	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
+		( * this->f_ptArray [ l_iCtr ] *= d );
 	return ( * this );
 	M_EPILOG
 	}
@@ -454,7 +457,9 @@ HMatrix < tType > & HMatrix < tType > ::operator /= ( tType d )
 	{
 	M_PROLOG
 	int l_iCtr;
-	if ( d ) for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) ( * f_ptArray [ l_iCtr ] /= d );
+	if ( d )
+		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
+			( * this->f_ptArray [ l_iCtr ] /= d );
 	return ( * this );
 	M_EPILOG
 	}
@@ -467,7 +472,7 @@ HMatrix < tType > HMatrix < tType > ::operator ~ ( void )
 	HMatrix l_oMatrix ( f_iRows, f_iColumns );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
 		{
-		l_oMatrix [ l_iCtr ] = ~ * f_ptArray [ l_iCtr ];
+		l_oMatrix [ l_iCtr ] = ~ * this->f_ptArray [ l_iCtr ];
 		}
 	return ( l_oMatrix );
 	M_EPILOG
@@ -487,7 +492,7 @@ int HMatrix < tType > ::operator == ( HMatrix & a_roMatrix )
 	M_PROLOG
 	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) 
-		if ( * f_ptArray [ l_iCtr ] != a_roMatrix [ l_iCtr ] ) return ( 0 );
+		if ( * this->f_ptArray [ l_iCtr ] != a_roMatrix [ l_iCtr ] ) return ( 0 );
 	return ( 1 );
 	M_EPILOG
 	}

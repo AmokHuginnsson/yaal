@@ -84,7 +84,7 @@ protected:
 		virtual ~HNode ( void );
 		void put ( tttType );
 		tttType get ( void );
-		HNode * previous ( int * = D_TREAT_AS_OPENED );
+		HNode * previous ( int * = ( int * ) D_TREAT_AS_OPENED );
 		HNode * next ( void );
 		/*}*/
 		friend class HTree < tttType >;
@@ -129,7 +129,7 @@ template < class ttType >
 HBranchList < ttType > ::~HBranchList ( void )
 	{
 	M_PROLOG
-	flush ( );
+	HList < ttType > ::flush ( );
 	return;
 	M_EPILOG
 	}
@@ -175,7 +175,7 @@ template < class tttType >
 void HTree < tttType > ::HNode::put( tttType a_tttArgument )
 	{
 	M_PROLOG
-	f_oLeaf = a_tttArgument;
+	f_tLeaf = a_tttArgument;
 	f_iHits ++;
 	return ;
 	M_EPILOG
@@ -188,7 +188,7 @@ tttType HTree < tttType > ::HNode::get( void )
 	if ( ! f_iHits ) 
 		throw new HException ( __WHERE__, "no leaf to get from.", g_iErrNo );
 	f_iHits ++;
-	return ( f_oLeaf );
+	return ( f_tLeaf );
 	M_EPILOG
 	}
 

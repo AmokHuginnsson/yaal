@@ -29,22 +29,29 @@ Copyright:
 
 #line 31 "hlist.h"
 
-#define D_ERROR									-1
-#define D_TREAT_AS_CLOSED				( int * ) 1
-#define D_TREAT_AS_OPENED				( int * ) 2
-#define D_SEARCH_AFTER_ORDER    ( int * ) 3
-#define D_SEARCH_AFTER_NUMBER   ( int * ) 4
-#define D_BLOCK_IF_NOT_EMPTIED	( int * ) 5
-#define D_EMPTY_IF_NOT_EMPTIED	( int * ) 6
-#define D_FORCE_REMOVE_ELEMENT	( int * ) 7
-#define D_UNSORTED							0
-#define D_ASCENDING							8
-#define D_DESCENDING						-8
-#define	D_WAS_EMPTIED						9
-#define	D_WAS_NOT_EMPTIED				10
-#define D_FINAL_REACHED					11
-#define D_NOT_FOUND							12
-#define D_DEFINE_LIMIT					16
+#define D_ERROR										-1
+#define D_NP_TREAT_AS_CLOSED			1
+#define D_NP_TREAT_AS_OPENED			2
+#define D_NP_SEARCH_AFTER_ORDER   3
+#define D_NP_SEARCH_AFTER_NUMBER  4
+#define D_NP_BLOCK_IF_NOT_EMPTIED	5
+#define D_NP_EMPTY_IF_NOT_EMPTIED	6
+#define D_NP_FORCE_REMOVE_ELEMENT	7
+#define D_TREAT_AS_CLOSED					( int * ) D_NP_TREAT_AS_CLOSED
+#define D_TREAT_AS_OPENED					( int * ) D_NP_TREAT_AS_OPENED
+#define D_SEARCH_AFTER_ORDER  	  ( int * ) D_NP_SEARCH_AFTER_ORDER
+#define D_SEARCH_AFTER_NUMBER   	( int * ) D_NP_SEARCH_AFTER_NUMBER
+#define D_BLOCK_IF_NOT_EMPTIED		( int * ) D_NP_BLOCK_IF_NOT_EMPTIED
+#define D_EMPTY_IF_NOT_EMPTIED		( int * ) D_NP_EMPTY_IF_NOT_EMPTIED
+#define D_FORCE_REMOVE_ELEMENT		( int * ) D_NP_FORCE_REMOVE_ELEMENT
+#define D_UNSORTED								0
+#define D_ASCENDING								8
+#define D_DESCENDING							-8
+#define	D_WAS_EMPTIED							9
+#define	D_WAS_NOT_EMPTIED					10
+#define D_FINAL_REACHED						11
+#define D_NOT_FOUND								12
+#define D_DEFINE_LIMIT						16
 
 #ifndef NULL
 #define NULL	0
@@ -509,19 +516,19 @@ tType * HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTrea
 			{
 			switch ( * l_piFlag )
 				{
-				case ( ( int ) D_BLOCK_IF_NOT_EMPTIED ):
+				case ( D_NP_BLOCK_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_ERROR;
 					return ( & l_poElement->f_tObject );
 					break;
 					}
-				case ( ( int ) D_EMPTY_IF_NOT_EMPTIED ):
+				case ( D_NP_EMPTY_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_WAS_EMPTIED;
 					empty ( l_poElement );
 					break;
 					}
-				case ( ( int ) D_FORCE_REMOVE_ELEMENT ):
+				case ( D_NP_FORCE_REMOVE_ELEMENT ):
 					{
 					l_ptObject = & l_poElement->f_tObject;
 					* l_piFlag = D_WAS_NOT_EMPTIED;
@@ -579,19 +586,19 @@ tType * HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
 			{
 			switch ( * l_piFlag )
 				{
-				case ( ( int ) D_BLOCK_IF_NOT_EMPTIED ):
+				case ( D_NP_BLOCK_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_ERROR;
 					return ( & l_poElement->f_tObject );
 					break;
 					}
-				case ( ( int ) D_EMPTY_IF_NOT_EMPTIED ):
+				case ( D_NP_EMPTY_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_WAS_EMPTIED;
 					empty ( l_poElement );
 					break;
 					}
-				case ( ( int ) D_FORCE_REMOVE_ELEMENT ):
+				case ( D_NP_FORCE_REMOVE_ELEMENT ):
 					{
 					l_ptObject = & l_poElement->f_tObject;
 					* l_piFlag = D_WAS_NOT_EMPTIED;
@@ -643,19 +650,19 @@ tType * HList< tType >::remove_head ( int * a_piFlag )
 			{
 			switch ( * l_piFlag )
 				{
-				case ( ( int ) D_BLOCK_IF_NOT_EMPTIED ):
+				case ( D_NP_BLOCK_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_ERROR;
 					return ( & l_poElement->f_tObject );
 					break;
 					}
-				case ( ( int ) D_EMPTY_IF_NOT_EMPTIED ):
+				case ( D_NP_EMPTY_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_WAS_EMPTIED;
 					empty ( l_poElement );
 					break;
 					}
-				case ( ( int ) D_FORCE_REMOVE_ELEMENT ):
+				case ( D_NP_FORCE_REMOVE_ELEMENT ):
 					{
 					l_ptObject = & l_poElement->f_tObject;
 					* l_piFlag = D_WAS_NOT_EMPTIED;
@@ -702,19 +709,19 @@ tType * HList< tType >::remove_tail ( int * a_piFlag )
 			{
 			switch ( * l_piFlag )
 				{
-				case ( ( int ) D_BLOCK_IF_NOT_EMPTIED ):
+				case ( D_NP_BLOCK_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_ERROR;
 					return ( & l_poElement->f_tObject );
 					break;
 					}
-				case ( ( int ) D_EMPTY_IF_NOT_EMPTIED ):
+				case ( D_NP_EMPTY_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_WAS_EMPTIED;
 					empty ( l_poElement );
 					break;
 					}
-				case ( ( int ) D_FORCE_REMOVE_ELEMENT ):
+				case ( D_NP_FORCE_REMOVE_ELEMENT ):
 					{
 					l_ptObject = & l_poElement->f_tObject;
 					* l_piFlag = D_WAS_NOT_EMPTIED;
@@ -764,13 +771,13 @@ tType & HList< tType >::to_head ( int a_iOffset, int * a_piFlag )
 	l_poElement = f_poSelected;
 	switch ( * l_piFlag )
 		{
-		case ( ( int ) D_TREAT_AS_CLOSED ):
+		case ( D_NP_TREAT_AS_CLOSED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
 				f_poSelected = f_poSelected->f_poPrevious;
 			break;
 			}
-		case ( ( int ) D_TREAT_AS_OPENED ):
+		case ( D_NP_TREAT_AS_OPENED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
 				{
@@ -810,13 +817,13 @@ tType & HList< tType >::to_tail ( int a_iOffset, int * a_piFlag )
 	l_poElement = f_poSelected;
 	switch ( * l_piFlag )
 		{
-		case ( ( int ) D_TREAT_AS_CLOSED ):
+		case ( D_NP_TREAT_AS_CLOSED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
 				f_poSelected = f_poSelected->f_poNext;
 			break;
 			}
-		case ( ( int ) D_TREAT_AS_OPENED ):
+		case ( D_NP_TREAT_AS_OPENED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
 				{
@@ -931,12 +938,12 @@ tType & HList< tType >::go ( int a_iNumber, int * a_piFlag )
 	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
 	switch ( * l_piFlag )
 		{
-		case ( ( int ) D_SEARCH_AFTER_NUMBER ):
+		case ( D_NP_SEARCH_AFTER_NUMBER ):
 			{
 			f_poSelected = element_by_number ( a_iNumber );
 			break;
 			}
-		case ( ( int ) D_SEARCH_AFTER_ORDER ):
+		case ( D_NP_SEARCH_AFTER_ORDER ):
 			{
 			f_poSelected = element_by_index ( a_iNumber );
 			break;
@@ -999,7 +1006,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int * a_piFlag )
 	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
 	switch ( * l_piFlag )
 		{
-		case ( ( int ) D_SEARCH_AFTER_NUMBER ):
+		case ( D_NP_SEARCH_AFTER_NUMBER ):
 			{
 			l_poLeft = f_poHook;
 			for ( l_iCtr = 0; l_iCtr < f_iQuantity; l_iCtr++ )
@@ -1025,7 +1032,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int * a_piFlag )
 				}
 			break;
 			}
-		case ( ( int ) D_SEARCH_AFTER_ORDER ):
+		case ( D_NP_SEARCH_AFTER_ORDER ):
 			{
 			l_poLeft = element_by_index ( a_iLeft );
 			l_poRight = element_by_index ( a_iRight );

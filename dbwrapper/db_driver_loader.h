@@ -49,7 +49,7 @@ extern void * ( * db_query ) ( void *, const char * );
 extern void ( * db_unquery ) ( void * );
 extern char * ( * rs_get ) ( void *, int, int );
 extern int ( * rs_fields_count ) ( void * );
-extern long int ( * rsdb_records_count ) ( void *, void * = NULL );
+extern long int ( * rsdb_records_count ) ( void *, void * );
 extern long int ( * rsdb_id ) ( void *, void * );
 extern char * ( * rs_column_name ) ( void *, int );
 
