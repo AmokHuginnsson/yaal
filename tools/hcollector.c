@@ -86,15 +86,12 @@ int HCollector::send_line ( const char * a_pcLine )
 	l_iLength += ( 2 /* for lenght */ + 2 /* for crc */ + 1 /* for newline */ );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
 		{
-		if ( tcflush ( f_iFileDes, TCOFLUSH ) )
-			throw new HException ( __WHERE__, "tcflush ( TCOFLUSH )", g_iErrNo );
+		flush ( TCOFLUSH );
 		l_iCtr = write ( l_oLine, l_iLength );
-		if ( tcdrain ( f_iFileDes ) )
-			throw new HException ( __WHERE__, "tcdrain", g_iErrNo );
+		wait_for_eot ( );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
-		if ( tcflush ( f_iFileDes, TCIFLUSH ) )
-			throw new HException ( __WHERE__, "tcflush ( TCIFLUSH )", g_iErrNo );
+		flush ( TCIFLUSH );
 		l_iError ++;
 		}
 	return ( l_iError + l_iLength - l_iCtr );
@@ -115,8 +112,7 @@ int HCollector::receive_line ( char * & a_pcLine )
 		{
 		memset ( f_oLine, 0, D_RECV_BUF_SIZE );
 		read ( f_oLine, D_RECV_BUF_SIZE );
-		if ( tcflush ( f_iFileDes, TCIFLUSH ) )
-			throw new HException ( __WHERE__, "tcflush ( TCIFLUSH )", g_iErrNo );
+		flush ( TCIFLUSH );
 		a_pcLine = ( ( char * ) f_oLine )
 			+ strlen ( D_PROTO_DTA ) + 2 /* for lenght */ + 2 /* for crc */;
 		l_iLength = strlen ( a_pcLine ) - 1;
@@ -136,11 +132,9 @@ int HCollector::receive_line ( char * & a_pcLine )
 			l_iError += ( l_iErrLenght - write ( D_PROTO_ERR, l_iErrLenght ) );
 		l_iError ++;
 		}
-	if ( tcflush ( f_iFileDes, TCOFLUSH ) )
-		throw new HException ( __WHERE__, "tcflush ( TCOFLUSH )", g_iErrNo );
+	flush ( TCOFLUSH );
 	l_iError += ( l_iAckLenght - write ( D_PROTO_ACK, l_iAckLenght ) );
-	if ( tcdrain ( f_iFileDes ) )
-		throw new HException ( __WHERE__, "tcdrain", g_iErrNo );
+	wait_for_eot ( );
 	f_iLines ++;
 	return ( l_iError );
 	M_EPILOG
@@ -168,12 +162,10 @@ int HCollector::establish_connection ( int a_iTimeOut )
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
 		{
-		if ( tcflush ( f_iFileDes, TCOFLUSH ) )
-			throw new HException ( __WHERE__, "tcflush ( TCOFLUSH )", g_iErrNo );
+		flush ( TCOFLUSH );
 		if ( write ( D_PROTO_SYN, l_iLenght ) != l_iLenght )
 			throw new HException ( __WHERE__, "write", l_iLenght );
-		if ( tcdrain ( f_iFileDes ) )
-			throw new HException ( __WHERE__, "tcdrain", g_iErrNo );
+		wait_for_eot ( );
 		if ( tcsendbreak ( f_iFileDes, 0 ) )
 			throw new HException ( __WHERE__, "tcsendbreak", g_iErrNo );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
@@ -185,8 +177,7 @@ int HCollector::establish_connection ( int a_iTimeOut )
 							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
 				&& FD_ISSET ( f_iFileDes, & l_xFileDesSet ) )
 			read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
-		if ( tcflush ( f_iFileDes, TCIFLUSH ) )
-			throw new HException ( __WHERE__, "tcflush ( TCIFLUSH )", g_iErrNo );
+		flush ( TCIFLUSH );
 		l_iError ++;
 		if ( l_iError > a_iTimeOut )return ( -1 );
 		}

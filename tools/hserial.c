@@ -165,3 +165,35 @@ int HSerial::write ( const char * a_pcBuffer, int a_iSize )
 	M_EPILOG
 	}
 
+void HSerial::flush ( int a_iType )
+	{
+	M_PROLOG
+	HString l_oErrMsg;
+	if ( tcflush ( f_iFileDes, a_iType ) )
+		switch ( a_iType )
+			{
+			case ( TCIFLUSH ):
+				throw new HException ( __WHERE__, "tcflush ( TCIFLUSH )", g_iErrNo );
+			case ( TCOFLUSH ):
+				throw new HException ( __WHERE__, "tcflush ( TCOFLUSH )", g_iErrNo );
+			case ( TCIOFLUSH ):
+				throw new HException ( __WHERE__, "tcflush ( TCIOFLUSH )", g_iErrNo );
+			default :
+				{
+				l_oErrMsg.format ( "tcflush ( %d )", a_iType );
+				throw new HException ( __WHERE__, l_oErrMsg, g_iErrNo );
+				}
+			}
+	return;
+	M_EPILOG
+	}
+
+void HSerial::wait_for_eot ( void )
+	{
+	M_PROLOG
+	if ( tcdrain ( f_iFileDes ) )
+		throw new HException ( __WHERE__, "tcdrain", g_iErrNo );
+	return;
+	M_EPILOG
+	}
+

@@ -52,6 +52,8 @@ public:
 	void close ( void );
 	int read ( char *, int );
 	int write ( const char *, int );
+	void flush ( int );
+	void wait_for_eot ( void );
 	/*}*/
 protected:
 	/*{*/
