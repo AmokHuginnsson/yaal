@@ -172,6 +172,13 @@ HControl::operator HInfo ( void )
 	M_EPILOG
 	}
 
+bool HControl::is_enabled ( void )
+	{
+	M_PROLOG
+	return ( false );
+	M_EPILOG
+	}
+
 void HControl::draw_label ( void )
 	{
 	M_PROLOG

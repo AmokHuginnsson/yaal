@@ -83,6 +83,7 @@ public:
 	virtual void refresh ( void ) = 0;
 	virtual HInfo operator = ( const HInfo & );
 	virtual operator HInfo ( void );
+	virtual bool is_searchable ( void );
 	void draw_label ( void );
 	void set_attributes ( int, int, int );
 	void move ( int, int, int, int );
