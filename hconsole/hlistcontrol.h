@@ -31,7 +31,7 @@ Copyright:
 #include <regex.h>			/* this one is obvious */
 
 #include "../hcore/hinfolist.h"
-#include "../hcore/hflexiblelist.h"
+#include "hitem.h"
 #include "hwindow.h"
 
 #define D_ALIGN_LEFT			0x0010000
@@ -39,7 +39,7 @@ Copyright:
 #define D_ALIGN_RIGHT			0x0040000
 #define D_ALIGN_MASK			0x0ff0000
 
-class HListControl : public HFlexibleList, public virtual HControl
+class HListControl : public HList < HItem >, public virtual HControl
 	{
 protected:
 	/*{*/
@@ -80,9 +80,9 @@ public:
 										const int & = D_ALIGN_LEFT,		/* align */
 										const int & = D_TYPE_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
-	virtual HInfoList & add_tail ( void );
-	virtual HInfoList & add_tail ( HInfoList & );
-	virtual HInfoList remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED );
+	virtual HItem & add_tail ( void );
+	virtual HItem & add_tail ( HItem & );
+	virtual HItem remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	/*}*/
 protected:
 	/*{*/

@@ -47,7 +47,7 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 														 int a_iFocudesAttribute )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
 												 a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
-												 a_iFocudesAttribute ), HFlexibleList ( )
+												 a_iFocudesAttribute ), HList < HItem > ( )
 	{
 	M_PROLOG
 	f_bEditable = false;
@@ -193,9 +193,21 @@ void HListControl::refresh ( void )
 							}
 						}
 					if ( l_iCtr == f_iCursorPosition )
-						console::set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
-									: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
-					else M_SET_ATTR_DATA ( );
+						{
+						if ( f_poSelected->get_object ( ).m_bChecked )
+							console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? ~ ( f_iFocusedAttribute >> 8 )
+										: ~ ( f_iEnabledAttribute >> 8 ) ) : ~ ( f_iDisabledAttribute >> 8 ) );
+						else
+							console::set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
+										: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
+						}
+					else
+						{
+						if ( f_poSelected->get_object ( ).m_bChecked )
+							console::set_attr ( f_bEnabled ? ( f_bFocused ? ~ ( f_iFocusedAttribute >> 8 )
+										: ~ ( f_iEnabledAttribute >> 8 ) ) : ~ ( f_iDisabledAttribute >> 8 ) );
+						else M_SET_ATTR_DATA ( );
+						}
 					cprintf ( f_oVarTmpBuffer	);
 					l_iColumnOffset += l_iCurrentColumnWidth;
 					}
@@ -371,6 +383,11 @@ int HListControl::process_input ( int a_iCode )
 			else putchar ( '\a' );
 			break;
 			}
+		case ( ' ' ):
+			{
+			l_poElement->get_object ( ).m_bChecked = ! l_poElement->get_object ( ).m_bChecked;
+			break;
+			}
 		case ( '\t' ):
 			{
 			f_poFirstVisibleRow = f_poSelected;
@@ -462,19 +479,19 @@ void HListControl::add_column ( const int & a_riColumn, const char * a_pcName,
 	M_EPILOG
 	}
 
-HInfoList & HListControl::add_tail ( void )
+HItem & HListControl::add_tail ( void )
 	{
 	M_PROLOG
-	HInfoList l_oDummy ( f_oHeader.quantity ( ) );
+	HItem l_oDummy ( f_oHeader.quantity ( ) );
 	return ( add_tail ( l_oDummy ) );
 	M_EPILOG
 	}
 
-HInfoList & HListControl::add_tail ( HInfoList & a_roInfoList )
+HItem & HListControl::add_tail ( HItem & a_roItem )
 	{
 	M_PROLOG
 	HElement * l_poElement = NULL;
-	HInfoList * l_oDummy = NULL;
+	HItem * l_oDummy = NULL;
 	if ( f_iQuantity >= f_iHeightRaw )
 		{
 		f_iCursorPosition = f_iHeightRaw - 1;
@@ -489,7 +506,7 @@ HInfoList & HListControl::add_tail ( HInfoList & a_roInfoList )
 			}
 		}
 	else f_iCursorPosition = f_iQuantity;
-	l_oDummy = & HFlexibleList::add_tail ( a_roInfoList );
+	l_oDummy = & HList < HItem > ::add_tail ( a_roItem );
 	if ( ! f_poFirstVisibleRow )f_poFirstVisibleRow = f_poHook;
 	return ( * l_oDummy );
 	M_EPILOG
@@ -537,7 +554,7 @@ void HListControl::recalculate_column_widths ( void )
 	M_EPILOG
 	}
 
-HInfoList HListControl::remove_element ( int * a_piFlag )
+HItem HListControl::remove_element ( int * a_piFlag )
 	{
 	M_PROLOG
 	if ( f_poFirstVisibleRow == f_poSelected )
@@ -546,7 +563,7 @@ HInfoList HListControl::remove_element ( int * a_piFlag )
 		f_poFirstVisibleRow = f_poSelected;
 		to_head ( );
 		}
-	return ( HFlexibleList::remove_element ( a_piFlag ) );
+	return ( HList < HItem > ::remove_element ( a_piFlag ) );
 	M_EPILOG
 	}
 
@@ -592,7 +609,7 @@ void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 	M_PROLOG
 	f_iSortColumn = a_iColumn;
 	f_iOrder = a_iOrder;
-	cmp = ( int ( HList<HInfoList>::* ) ( HElement *, HElement * ) ) & HListControl::cmpc;
+	cmp = ( int ( HList<HItem>::* ) ( HElement *, HElement * ) ) & HListControl::cmpc;
 	sort ( );
 	return;
 	M_EPILOG
