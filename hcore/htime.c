@@ -53,7 +53,7 @@ HTime::HTime ( const int a_iYear, const int a_iMonth, const int a_iDay,
 							 const int a_iHour, const int a_iMinute, const int a_iSecond )
 	{
 	M_PROLOG
-	f_oFormat = "%a, %d %b %Y %T %z";
+	f_oFormat = D_DEFAULT_TIME_FORMAT;
 	set_datetime ( a_iYear, a_iMonth, a_iDay, a_iHour, a_iMinute, a_iSecond );
 	return;
 	M_EPILOG

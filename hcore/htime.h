@@ -32,6 +32,8 @@ Copyright:
 #include "hobject.h"
 #include "hstring.h"
 
+#define D_DEFAULT_TIME_FORMAT	"%a, %d %b %Y %T %z"
+
 class HTime : public HObject
 	{
 protected:
@@ -44,13 +46,13 @@ protected:
 public:
 	/*{*/
 	HTime ( const HTime &, int = 0 );
-	HTime ( const char * = "%a, %d %b %Y %T %z" );
+	HTime ( const char * = D_DEFAULT_TIME_FORMAT );
 	HTime ( const int, const int, const int, const int = 0, const int = 0,
 			const int = 0 );
 	virtual ~HTime ( void );
 	virtual HObject * clone ( void ) const;
 	void set_now ( void );
-	void format ( const char * = "%a, %d %b %Y %T %z" );
+	void format ( const char * = D_DEFAULT_TIME_FORMAT );
 	void set_time ( const int = 0, const int = 0, const int = 0 );
 	void set_date ( const int, const int = 1, const int = 1 );
 	void set_datetime ( const int, const int = 1, const int = 1,
