@@ -45,7 +45,7 @@ M_CVSID ( "$CVSHeader$" );
 using namespace dbwrapper;
 
 namespace dbwrapper
-	{
+{
 void dbwrapper_error ( void );
 void dbwrapper_exit ( void ) __attribute__  ((noreturn));
 
@@ -60,7 +60,7 @@ OVariable n_psVariables [ ] =
 		{ 0, NULL, NULL }
 	};
 
-	}
+}
 
 bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	{
