@@ -325,7 +325,7 @@ void tools_init ( void )
  * process hangs just before dbwrapper_fini ( ) */
 /*	_init ( ); */
 	g_iErrNo = 0;
-	rc_file::process_rc_file ( "stdhapi", signals::n_psVariables );
+	rc_file::process_rc_file ( "stdhapi", "tools", signals::n_psVariables );
 	return;
 	}
 

@@ -41,8 +41,9 @@ struct OVariable
 namespace rc_file
 	{
 
-int process_rc_file ( const char *, OVariable *, void ( * ) ( HString &, HString & ) = NULL );
-int read_rc_line ( HString &, HString &, FILE * );
+int process_rc_file ( const char *, const char *,
+		OVariable *, bool ( * ) ( HString &, HString & ) = NULL );
+int read_rc_line ( HString &, HString &, FILE *, int & );
 FILE * rc_open ( const char *, bool, FILE * = NULL );
 void rc_close ( FILE * );
 void rc_set_variable ( const char *, bool & );

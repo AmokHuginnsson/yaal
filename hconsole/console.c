@@ -421,7 +421,7 @@ void set_color ( HString & a_roValue, int & a_riAttribute )
 	return;
 	}
 
-void set_console_variables ( HString & a_roOption, HString & a_roValue )
+bool set_console_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	if ( ! strcasecmp ( a_roOption, "disabled_attribute" ) )
 		set_color ( a_roValue, console::n_iDisabledAttribute );
@@ -429,6 +429,8 @@ void set_console_variables ( HString & a_roOption, HString & a_roValue )
 		set_color ( a_roValue, console::n_iEnabledAttribute );
 	else if ( ! strcasecmp ( a_roOption, "focused_attribute" ) )
 		set_color ( a_roValue, console::n_iFocusedAttribute );
+	else return ( true );
+	return ( false );
 	}
 
 void console_init ( void )
@@ -442,7 +444,8 @@ void console_init ( void )
 		::log << "Your CPU or compiler does not support proper size of int." << endl;
 		exit ( 0 );
 		}
-	rc_file::process_rc_file ( "stdhapi", console::n_psVariables, set_console_variables );
+	rc_file::process_rc_file ( "stdhapi", "console",
+			console::n_psVariables, set_console_variables );
 	return;
 	}
 

@@ -14,6 +14,7 @@
 # log_sql true
 
 ### console BEGIN
+[console]
 
 use_mouse false
 
@@ -44,6 +45,8 @@ focused_attribute BRIGHTGREEN GRAY BLACK LIGHTGRAY
 ### console END
 
 ### tools BEGIN
+[tools]
+
 # should CTRL-c typed by user be discarded by program ?
 ignore_signal_SIGINT true
 # is CTRL-z ignored by process?
@@ -52,6 +55,7 @@ ignore_signal_SIGTSTP true
 ### tools END
 
 ### dbwrapper BEGIN
+[dbwrapper]
 
 # select data base driver
 # accepted drivers are:

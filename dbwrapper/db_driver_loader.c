@@ -345,7 +345,7 @@ extern "C"
 extern void _init ( void );
 extern void _fini ( void );
 
-void set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
+bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
 		{
@@ -362,7 +362,8 @@ void set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 			exit ( 1 );
 			}
 		}
-	return;
+	else return ( true );
+	return ( false );
 	}
 
 void dbwrapper_init ( void )
@@ -381,7 +382,8 @@ void dbwrapper_init ( void )
 	dbwrapper::rsdb_records_count = null_rsdb_records_count;
 	dbwrapper::rsdb_id = null_rsdb_id;
 	dbwrapper::rs_column_name = null_rs_column_name;
-	rc_file::process_rc_file ( "stdhapi", dbwrapper::n_psVariables, set_dbwrapper_variables );
+	rc_file::process_rc_file ( "stdhapi", "dbwrapper",
+			dbwrapper::n_psVariables, set_dbwrapper_variables );
 	return;
 	}
 

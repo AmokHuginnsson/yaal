@@ -39,23 +39,37 @@ Copyright:
 namespace rc_file
 {
 
-int process_rc_file ( const char * a_pcRcName, OVariable * a_psVaraibles,
-		void ( * set_variables ) ( HString &, HString & ) )
+int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
+		OVariable * a_psVaraibles,
+		bool ( * set_variables ) ( HString &, HString & ) )
 	{
-	bool l_pbTFTab [ ] = { false, true };
-	int l_iCtr = 0, l_iCtrOut = 0;
+	bool l_pbTFTab [ ] = { false, true }, l_bSection = false, l_bOptionOK;
+	int l_iCtr = 0, l_iCtrOut = 0, l_iLine = 0;
 	FILE * l_psRc = 0;
 	HString l_oOption, l_oValue;
 	log << "process_rc_file ( ): ";
 	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
 		{
 		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );
-		if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc ) )
+		if ( a_pcSection )::log << "section: " << a_pcSection;
+		if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc, l_iLine ) )
 			{
+			if ( a_pcSection )
+				{
+				if ( l_oValue.is_empty ( ) )
+					{
+					l_oValue.format ( "[%s]", a_pcSection );
+					if ( ( l_oOption == l_oValue ) && ( l_bSection = true ) )continue;
+					else l_bSection = false;
+					}
+				if ( ! l_bSection )continue;
+				}
 			l_iCtr = 0;
+			l_bOptionOK = false;
 			while ( a_psVaraibles [ l_iCtr ].f_pcKey )
 				{
 				if ( ! strcasecmp ( l_oOption, a_psVaraibles [ l_iCtr ].f_pcKey ) )
+					{
 					switch ( a_psVaraibles [ l_iCtr ].f_iType )
 						{
 						case ( D_TYPE_BOOL ):
@@ -83,10 +97,19 @@ int process_rc_file ( const char * a_pcRcName, OVariable * a_psVaraibles,
 							throw new HException ( __WHERE__, "unknown type", a_psVaraibles [ l_iCtr ].f_iType );
 							break;
 							}
+						}
+					l_bOptionOK = true;
 					}
-				if ( set_variables )set_variables ( l_oOption, l_oValue );
 				l_iCtr ++;
 				}
+			if ( set_variables )
+				if ( set_variables ( l_oOption, l_oValue ) && ! l_bOptionOK )
+					{
+					::log << "failed." << endl;
+					::log << "Error: unknown option found: `" << l_oOption;
+					::log << "', with value: `" << l_oValue << "'." << endl;
+					throw new HException ( __WHERE__, "unknown option", l_iLine );
+					}
 			}
 		}
 	if ( l_psRc )rc_close ( l_psRc );
@@ -99,7 +122,8 @@ int process_rc_file ( const char * a_pcRcName, OVariable * a_psVaraibles,
  * stores rest of line in a_pcValue, returns 1 if there are more lines
  * to read and 0 in other case. */
 
-int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile )
+int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
+		int & a_riLine )
 	{
 	M_PROLOG
 	static size_t	l_iBlockSize = 256;
@@ -121,12 +145,14 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile )
 		return ( 0 );
 		}
 	if ( ! l_pcBuffer )l_pcBuffer = ( char * ) xcalloc ( l_iBlockSize );
+	a_roOption = a_roValue = "";
 #ifdef __HOST_OS_TYPE_FREEBSD__
 	while ( ( l_iReadLen = fread ( l_pcBuffer, sizeof ( char ), l_iBlockSize, a_psFile ) ) )
 #else /* __HOST_OS_TYPE_FREEBSD__ */
 	while ( getline ( &l_pcBuffer, &l_iBlockSize, a_psFile ) > 0 )
 #endif /* not __HOST_OS_TYPE_FREEBSD__ */
 		{
+		a_riLine ++;
 #ifdef __HOST_OS_TYPE_FREEBSD__
 		l_pcPtr = ( char * ) memchr ( l_pcBuffer, '\n', l_iReadLen );
 		if ( ! l_pcPtr )continue;
@@ -235,7 +261,7 @@ FILE * rc_open ( const char * a_pcRcName, bool a_bLocal, FILE * a_psFile )
 		l_oRcPath = "config read from: " + l_oRcPath;
 		l_oRcPath += ", ";
 		}
-	log << l_oRcPath;
+	::log << l_oRcPath;
 	return ( l_psRc );
 	M_EPILOG
 	}
@@ -243,8 +269,9 @@ FILE * rc_open ( const char * a_pcRcName, bool a_bLocal, FILE * a_psFile )
 void rc_close ( FILE * a_psRc )
 	{
 	M_PROLOG
+	int l_iDummy = 0;
 	HString l_oTmp;
-	read_rc_line ( l_oTmp, l_oTmp, 0 );
+	read_rc_line ( l_oTmp, l_oTmp, 0, l_iDummy );
 	if ( a_psRc )fclose ( a_psRc );
 	return;
 	M_EPILOG
