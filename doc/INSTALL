@@ -5,17 +5,22 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 * System requirements:
 
 	libraries:
-	- ncurses
-	- MySQL
-	- PostGreSQL
+		- ncurses
+	
+	optional libraries:
+		- MySQL
+		- PostGreSQL
+		- SQLite
+		- SQLite3
+		- gpm
 
 	tools:
-	- autoconf
-	- GNU make
-	- gcc/g++
+		- autoconf
+		- GNU make
+		- gcc/g++
 
 	other:
-	- lots of guts
+		- lots of guts
 
 * Installation process:
 
@@ -71,6 +76,6 @@ Let installation begin.
 	$ make install
 
 # common step for all cases
-# in case of error, read FAQ, if reading FAQ did not helped mail
-# developer with full info of your problem
+# in case of error, read FAQ, if reading FAQ did not help email
+# developer with full info about your problem
 

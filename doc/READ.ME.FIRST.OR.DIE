@@ -2,11 +2,10 @@
 
 * Supported platforms:
 
-	- Debian Woody
-	- Debian Sarge
+	- FreeBSD 6-CURRENT
+	- Debian Sid
 	- PLD DC/AC
-	- FreeBSD 5.1 RELEASE
-	- FreeBSD 5-CURRENT
+	- Debian Woody
 
 If your platform is not on above list, it is very likely that stdhapi
 will not compile/link/work.
