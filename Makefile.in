@@ -276,14 +276,14 @@ $(HCORE): $(OBJ4hcore)
 	@$(MAKE) $(HCORE)\' TARGET=$(HCORE)\' NAME=hcore
 
 $(HCONSOLE): $(HCORE) $(OBJ4hconsole)
-	@$(MAKE) $(HCONSOLE)\' TARGET=$(HCONSOLE)\' NAME=hconsole LIBS="-lncurses -lhcore -Wl,-init,console_init -Wl,-fini,conole_fini"
+	@$(MAKE) $(HCONSOLE)\' TARGET=$(HCONSOLE)\' NAME=hconsole LIBS="-lncurses -lhcore"
 	
 $(TOOLS): $(HCONSOLE) $(OBJ4tools)
-	@$(MAKE) $(TOOLS)\' TARGET=$(TOOLS)\' NAME=tools LIBS="-Wl,-init,tools_init -Wl,-fini,tools_fini -lncurses -lhcore -lhconsole"
+	@$(MAKE) $(TOOLS)\' TARGET=$(TOOLS)\' NAME=tools LIBS="-lncurses -lhcore -lhconsole"
 
 # dbwrapper BEGIN
 $(DBWRAPPER) : $(HCORE) $(OBJ4dbwrapper)
-	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-Wl,-init,dbwrapper_init -Wl,-fini,dbwrapper_fini -rdynamic @DLOPEN_IN@ -lhcore"
+	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-rdynamic @DLOPEN_IN@ -lhcore"
 
 $(MYSQL_DRIVER): $(HCORE) $(OBJ4mysql_driver) $(DBWRAPPER)
 	@$(MAKE) $(MYSQL_DRIVER)\' TARGET=$(MYSQL_DRIVER)\' NAME=mysql_driver LIBS="-lmysqlclient -lhcore -ldbwrapper"

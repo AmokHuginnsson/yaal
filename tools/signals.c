@@ -306,12 +306,6 @@ void set_handlers ( void )
 
 }
 
-extern "C"
-{
-
-extern void _init ( void );
-extern void _fini ( void );
-
 /*
 void set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
@@ -319,21 +313,11 @@ void set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	}
 */
 
+void tools_init ( void ); __attribute__ ( ( constructor ) )
 void tools_init ( void )
 	{
-/* I do not know why but when _init ( ) is called explictly, like here would,
- * process hangs just before dbwrapper_fini ( ) */
-	_init ( );
 	g_iErrNo = 0;
 	rc_file::process_rc_file ( "stdhapi", "tools", signals::n_psVariables );
 	return;
 	}
-
-void tools_fini ( void )
-	{
-	_fini ( );
-	return;
-	}
-
-}
 

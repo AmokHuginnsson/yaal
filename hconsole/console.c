@@ -367,12 +367,6 @@ bool is_enabled ( void )
 
 }
 
-extern "C"
-{
-
-extern void _init ( void );
-extern void _fini ( void );
-
 void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )
 	{
 	int l_iMask = 0x000f;
@@ -433,11 +427,9 @@ bool set_console_variables ( HString & a_roOption, HString & a_roValue )
 	return ( false );
 	}
 
+void console_init ( void ); __attribute__ ( ( constructor ) )
 void console_init ( void )
 	{
-/* I do not know why but when _init ( ) is called explictly, like here would,
- * process hangs just before dbwrapper_fini ( ) */
-	_init ( );
 	g_iErrNo = 0;
 	if ( sizeof ( int ) < 4 )
 		{
@@ -449,12 +441,4 @@ void console_init ( void )
 			console::n_psVariables, set_console_variables );
 	return;
 	}
-
-void console_fini ( void )
-	{
-	_fini ( );
-	return;
-	}
-
-}
 

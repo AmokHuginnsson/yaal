@@ -339,12 +339,6 @@ char * null_rs_column_name ( void * a_pvResult, int a_iColumn )
 
 /* end of driver autoloader section */
 
-extern "C"
-{
-
-extern void _init ( void );
-extern void _fini ( void );
-
 bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
@@ -366,11 +360,9 @@ bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	return ( false );
 	}
 
+void dbwrapper_init ( void ); __attribute__ ( ( constructor ) )
 void dbwrapper_init ( void )
 	{
-/* I do not know why but when _init ( ) is called explictly, like here would,
- * process hangs just before dbwrapper_fini ( ) */
-	_init ( );
 	dbwrapper::db_connect = null_db_connect;
 	dbwrapper::db_disconnect = null_db_disconnect;
 	dbwrapper::db_errno = null_db_errno;
@@ -387,6 +379,7 @@ void dbwrapper_init ( void )
 	return;
 	}
 
+void dbwrapper_fini ( void ); __attribute__ ( ( destructor ) )
 void dbwrapper_fini ( void )
 	{
 	if ( g_pcDefaultSockPath )
@@ -405,9 +398,6 @@ void dbwrapper_fini ( void )
 			fprintf ( stderr, g_pcDone );
 		}
 	g_pvDlHandle = NULL;
-	_fini ( );
 	return;
 	}
-
-}
 
