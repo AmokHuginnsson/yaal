@@ -28,7 +28,9 @@ Copyright:
 #include <unistd.h>
 #include <string.h>
 #include <stdarg.h>
+#include <pwd.h>
 #include <time.h>
+#include <libintl.h>
 
 #include "../config.h"
 
@@ -48,6 +50,8 @@ M_CVSID ( "$CVSHeader$" );
 HLog::HLog ( void )
 	{
 	M_PROLOG
+	pid_t l_iPid = 0;
+	passwd * l_psPasswd = NULL;
 	f_bRealMode = false;
 	f_psStream = NULL;
 	f_bNewLine = true;
@@ -61,7 +65,14 @@ HLog::HLog ( void )
 		throw new HException ( __WHERE__, "tmpfile returned", ( int ) f_psStream );
 	fprintf ( f_psStream, "%-10xProcess started (%d).\n",
 			D_LOG_NOTICE, getpid ( ) );
-	f_pcLoginName = getenv ( "LOGNAME" );
+	l_iPid = getpid ( );
+	l_psPasswd = getpwuid ( l_iPid );
+	if ( l_psPasswd )f_pcLoginName = xstrdup ( l_psPasswd->pw_name );
+	else
+		{
+		f_pcLoginName = ( char * ) xcalloc ( 8 * sizeof ( char ) );
+		snprintf ( f_pcLoginName, 6, "%d", l_iPid );
+		}
 	gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 );
 	return;
 	M_EPILOG
@@ -78,6 +89,8 @@ HLog::~HLog ( void )
 	if ( ( f_psStream != stdout ) && ( f_psStream != stderr ) )
 		fclose ( f_psStream );
 	f_psStream = NULL;
+	if ( f_pcLoginName )
+		xfree ( f_pcLoginName );
 	if ( f_pcHostName )
 		xfree ( f_pcHostName );
 	f_pcHostName = NULL;
@@ -164,10 +177,12 @@ void HLog::timestamp ( FILE * a_psStream )
 	memset ( l_pcBuffer, 0, D_TIMESTAMP_SIZE );
 	l_iSize = strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %e %H:%M:%S", l_psBrokenTime );
 	if ( l_iSize > D_TIMESTAMP_SIZE )
-		throw new HException ( __WHERE__,
-				"strftime returned more than D_TIMESTAMP_SIZE.", l_iSize );
-	if ( f_pcProcessName )fprintf ( a_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_pcLoginName, f_pcHostName, f_pcProcessName );
-	else fprintf ( a_psStream, "%s %s@%s: ", l_pcBuffer, f_pcLoginName, f_pcHostName );
+		M_THROW ( _ ( "strftime returned more than D_TIMESTAMP_SIZE" ), l_iSize );
+	if ( f_pcProcessName )
+		fprintf ( a_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_pcLoginName,
+				f_pcHostName, f_pcProcessName );
+	else fprintf ( a_psStream, "%s %s@%s: ", l_pcBuffer, f_pcLoginName,
+			f_pcHostName );
 	return;
 	M_EPILOG
 	}
