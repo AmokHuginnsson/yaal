@@ -89,7 +89,7 @@ COMPILER_PRIME_FLAGS = -std=gnu++98 -pipe -fPIC -D_GNU_SOURCE @DEFS@ -march=i486
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
-	COMPILER_DEBUG_FLAGS = -g -g3 -ggdb -ggdb3 -gstabs+ -pg -D__DEBUG__ $(DB)
+	COMPILER_DEBUG_FLAGS = -g -g3 -ggdb -ggdb3 -gstabs+ -pg -fno-inline -D__DEBUG__ $(DB)
 endif
 COMPILER_PATH_FLAGS = -I. -I/usr/local/include
 # -fno-external-templates #deprecated
