@@ -171,14 +171,22 @@ OBJ4tools += util!
 OBJ4tools +=
 
 # dbwrapper
-OBJ4mysql_driver = 
-OBJ4mysql_driver += mysql_driver!
-OBJ4postgresql_driver = 
-OBJ4postgresql_driver += postgresql_driver
-OBJ4sqlite_driver = 
-OBJ4sqlite_driver += sqlite_driver
-OBJ4sqlite3_driver = 
-OBJ4sqlite3_driver += sqlite3_driver
+ifdef @TARGET_MYSQL_DRIVER@ # MYSQL_DRIVER
+	OBJ4mysql_driver = 
+	OBJ4mysql_driver += mysql_driver!
+endif # MYSQL_DRIVER
+ifdef @TARGET_POSTGRESQL_DRIVER@ # POSTGRESQL_DRIVER
+	OBJ4postgresql_driver = 
+	OBJ4postgresql_driver += postgresql_driver
+endif # POSTGRESQL_DRIVER
+ifdef @TARGET_SQLITE_DRIVER@ # SQLITE_DRIVER
+	OBJ4sqlite_driver = 
+	OBJ4sqlite_driver += sqlite_driver
+endif # SQLITE_DRIVER
+ifdef @TARGET_SQLITE3_DRIVER@ # SQLITE3_DRIVER
+	OBJ4sqlite3_driver = 
+	OBJ4sqlite3_driver += sqlite3_driver
+endif # SQLITE3_DRIVER
 OBJ4dbwrapper = 
 OBJ4dbwrapper += db_driver_loader
 OBJ4dbwrapper += dbwrapper
@@ -231,25 +239,37 @@ HDR4hdata := $(patsubst %.oo,%.h, $(HDR4hdata))
 OBJ4dbwrapper := $(strip $(OBJ4dbwrapper))
 OBJ4dbwrapper := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4dbwrapper))
 OBJ4dbwrapper := $(patsubst %!.o,%.oo, $(OBJ4dbwrapper))
-OBJ4mysql_driver := $(strip $(OBJ4mysql_driver))
-OBJ4mysql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4mysql_driver))
-OBJ4mysql_driver := $(patsubst %!.o,%.oo, $(OBJ4mysql_driver))
-OBJ4postgresql_driver := $(strip $(OBJ4postgresql_driver))
-OBJ4postgresql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4postgresql_driver))
-OBJ4postgresql_driver := $(patsubst %!.o,%.oo, $(OBJ4postgresql_driver))
-OBJ4sqlite_driver := $(strip $(OBJ4sqlite_driver))
-OBJ4sqlite_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite_driver))
-OBJ4sqlite_driver := $(patsubst %!.o,%.oo, $(OBJ4sqlite_driver))
-OBJ4sqlite3_driver := $(strip $(OBJ4sqlite3_driver))
-OBJ4sqlite3_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite3_driver))
-OBJ4sqlite3_driver := $(patsubst %!.o,%.oo, $(OBJ4sqlite3_driver))
+ifdef @TARGET_MYSQL_DRIVER@ # MYSQL_DRIVER
+	OBJ4mysql_driver := $(strip $(OBJ4mysql_driver))
+	OBJ4mysql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4mysql_driver))
+	OBJ4mysql_driver := $(patsubst %!.o,%.oo, $(OBJ4mysql_driver))
+endif # MYSQL_DRIVER
+ifdef @TARGET_POSTGRESQL_DRIVER@ # POSTGRESQL_DRIVER
+	OBJ4postgresql_driver := $(strip $(OBJ4postgresql_driver))
+	OBJ4postgresql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4postgresql_driver))
+	OBJ4postgresql_driver := $(patsubst %!.o,%.oo, $(OBJ4postgresql_driver))
+endif
+ifdef @TARGET_SQLITE_DRIVER@ # SQLITE_DRIVER
+	OBJ4sqlite_driver := $(strip $(OBJ4sqlite_driver))
+	OBJ4sqlite_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite_driver))
+	OBJ4sqlite_driver := $(patsubst %!.o,%.oo, $(OBJ4sqlite_driver))
+endif # SQLITE_DRIVER
+ifdef @TARGET_SQLITE3_DRIVER@ # SQLITE3_DRIVER
+	OBJ4sqlite3_driver := $(strip $(OBJ4sqlite3_driver))
+	OBJ4sqlite3_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite3_driver))
+	OBJ4sqlite3_driver := $(patsubst %!.o,%.oo, $(OBJ4sqlite3_driver))
+endif # SQLITE3_DRIVER
 HDR4dbwrapper := $(patsubst %.o,%.h, $(OBJ4dbwrapper))
 SRCS += $(patsubst %.h,%.c, $(HDR4dbwrapper))
 HDR4dbwrapper := $(patsubst %.oo,%.h, $(HDR4dbwrapper))
 SRCS += $(patsubst %.o,%.c, $(OBJ4mysql_driver))
 SRCS += $(patsubst %.o,%.c, $(OBJ4postgresql_driver))
-SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite_driver))
-SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite3_driver))
+ifdef @TARGET_SQLITE_DRIVER@ # SQLITE_DRIVER
+	SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite_driver))
+endif # SQLITE_DRIVER
+ifdef @TARGET_SQLITE3_DRIVER@ # SQLITE3_DRIVER
+	SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite3_driver))
+endif # SQLITE3_DRIVER
 
 SRCEXS := $(filter %.oo, $(SRCS))
 SRCS := $(filter-out %.oo, $(SRCS))
@@ -320,7 +340,7 @@ $(POSTGRESQL_DRIVER): $(HCORE) $(OBJ4postgresql_driver)
 	
 $(SQLITE_DRIVER): $(HCORE) $(OBJ4sqlite_driver)
 	@$(MAKE) $(SQLITE_DRIVER)\' TARGET=$(SQLITE_DRIVER)\' NAME=sqlite_driver LIBS="-lsqlite -lhcore"
-	
+
 $(SQLITE3_DRIVER): $(HCORE) $(OBJ4sqlite3_driver)
 	@$(MAKE) $(SQLITE3_DRIVER)\' TARGET=$(SQLITE3_DRIVER)\' NAME=sqlite3_driver LIBS="-lsqlite3 -lhcore"
 # dbwrapper END
