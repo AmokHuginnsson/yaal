@@ -28,6 +28,8 @@ Copyright:
 #include <string.h> /* strcpy ( ), strcat ( ) */
 #include <stdio.h>  /* fopen ( ) */
 
+#include "../config.h"
+
 #include "rc_file.h"
 
 #include "xalloc.h"
@@ -61,6 +63,10 @@ int process_rc_file ( const char * a_pcRcName,
 int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile )
 	{
 	M_PROLOG
+#ifdef __HOST_OS_TYPE_FREEBSD__
+	int l_iReadLen = 0;
+	char * l_pcPtr = NULL;
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
 	int l_iIndex, l_iLenght, l_iSub;
 	static size_t	l_iBlockSize = 256;
 	static char * l_pcBuffer = 0;
@@ -75,8 +81,18 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile )
 		return ( 0 );
 		}
 	if ( ! l_pcBuffer )l_pcBuffer = ( char * ) xcalloc ( l_iBlockSize );
+#ifdef __HOST_OS_TYPE_FREEBSD__
+	while ( ( l_iReadLen = fread ( l_pcBuffer, sizeof ( char ), l_iBlockSize, a_psFile ) ) )
+#else /* __HOST_OS_TYPE_FREEBSD__ */
 	while ( getline ( &l_pcBuffer, &l_iBlockSize, a_psFile ) > 0 )
+#endif /* not __HOST_OS_TYPE_FREEBSD__ */
 		{
+#ifdef __HOST_OS_TYPE_FREEBSD__
+		l_pcPtr = ( char * ) memchr ( l_pcBuffer, '\n', l_iReadLen );
+		if ( ! l_pcPtr )continue;
+		fseek ( a_psFile, l_pcBuffer - l_pcPtr, SEEK_CUR );
+		* l_pcPtr = 0;
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
 		for ( l_iIndex = 0; l_iIndex < ( int ) ( l_iBlockSize - 1 ); l_iIndex++ )
 			{
 			if ( ( l_pcBuffer [ l_iIndex ] == ' ')
