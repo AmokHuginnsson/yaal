@@ -27,4 +27,9 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 	- $ make 
 	# $ gmake #in case of FreeBSD.
 	- pray with passion
+	- $ make install 
+	# (last step applays only if it is first time you install stdhapi
+	   and you have not struggled with LD_LIBRARY_PATH already, if you have
+		 modified LD_LIBRARY_PATH before you have to use the source Luke (aux/msh)
+		 and see what has to be done.)
 
