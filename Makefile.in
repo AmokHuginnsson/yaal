@@ -261,7 +261,7 @@ $(TARGET):
 	@echo "Lack of \`$<'." | tee -a make.log
 
 #phony targets
-.PHONY : all nodebug install dep clean tags mrproper purge
+.PHONY: all nodebug install dep clean tags mrproper purge
 
 all: $(HAPIHDR) .depend $(CACHE) $(HCORE) $(HCONSOLE) $(TOOLS) @TARGET_MYSQL_DRIVER@ @TARGET_POSTGRESQL_DRIVER@ $(DBWRAPPER) $(HDATA)
 
