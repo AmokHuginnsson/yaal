@@ -217,7 +217,7 @@ HString & HString::operator = ( const char a_cChar )
 HString & HString::operator = ( const int a_iInt )
 	{
 	M_PROLOG
-	( * this ) = HString ( a_iInt );
+	this->operator = ( HString ( a_iInt ) );
 	return ( * this );
 	M_EPILOG
 	}
@@ -225,7 +225,7 @@ HString & HString::operator = ( const int a_iInt )
 HString & HString::operator = ( const long int a_lLong )
 	{
 	M_PROLOG
-	( * this ) = HString ( a_lLong );
+	this->operator = ( HString ( a_lLong ) );
 	return ( * this );
 	M_EPILOG
 	}
@@ -233,7 +233,7 @@ HString & HString::operator = ( const long int a_lLong )
 HString & HString::operator = ( const double a_dDouble )
 	{
 	M_PROLOG
-	( * this ) = HString ( a_dDouble );
+	this->operator = ( HString ( a_dDouble ) );
 	return ( * this );
 	M_EPILOG
 	}
@@ -241,7 +241,7 @@ HString & HString::operator = ( const double a_dDouble )
 HString & HString::operator = ( const void * a_pvVoidPtr )
 	{
 	M_PROLOG
-	( * this ) = HString ( a_pvVoidPtr );
+	this->operator = ( HString ( a_pvVoidPtr ) );
 	return ( * this );
 	M_EPILOG
 	}
