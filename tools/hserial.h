@@ -33,8 +33,8 @@ Copyright:
 #	define NULL 0
 #endif /* not NULL */
 
-#include "../hcore/hstring.h"
-#include "../hcore/hrawfile.h"
+#include "hcore/hstring.h"
+#include "hcore/hrawfile.h"
 
 class HSerial : public HRawFile
 	{

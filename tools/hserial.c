@@ -28,9 +28,9 @@ Copyright:
 #include <unistd.h>
 #include <string.h>
 
-#include "../config.h"
+#include "config.h"
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hserial.h"
 #include "tools.h"

@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HDATA_HDATATREECONTROL_H
 #define __HDATA_HDATATREECONTROL_H
 
-#include "../hconsole/htreecontrol.h"
+#include "hconsole/htreecontrol.h"
 #include "hdatacontrol.h"
 
 class HDataWindow;

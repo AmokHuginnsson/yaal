@@ -29,7 +29,7 @@ Copyright:
 #include <string.h>
 #include <stdlib.h>
 
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_NCURSES_H
 #	include <ncurses.h>
@@ -46,12 +46,12 @@ Copyright:
 #	include <gpm.h>
 #endif /* HAVE_GPM_H */
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "mouse.h"
 #include "console.h"
-#include "../hcore/hstring.h"
-#include "../hcore/hlog.h"
+#include "hcore/hstring.h"
+#include "hcore/hlog.h"
 
 namespace mouse
 {

@@ -27,8 +27,8 @@ Copyright:
 #ifndef __HCONSOLE_HITEM_H
 #define __HCONSOLE_HITEM_H
 
-#include "../hcore/harray.h"
-#include "../hcore/hinfo.h"
+#include "hcore/harray.h"
+#include "hcore/hinfo.h"
 
 class HItem : public HArray < HInfo >
 	{

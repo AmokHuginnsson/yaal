@@ -56,7 +56,7 @@ CTAGS = @CTAGS@
 CXX = g++
 LXX = g++
 ARFLAGS = r
-CXXFLAGS =	\
+WARNING_FLAGS =	\
 						@PEDANTIC_ERRORS@\
 						@EXTRA_WARNINGS@\
 						-Wall\
@@ -101,7 +101,7 @@ LINKER_PRIME_FLAGS =	\
 								-Wl,--demangle\
 								-Wl,--export-dynamic\
 								-Wl,-soname,
-COMPILER_FLAGS = $(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) $(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS)
+CXXFLAGS = $(WARNING_FLAGS) $(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) $(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS)
 LINKER_FLAGS = $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 
 #	h-core
@@ -262,11 +262,13 @@ ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
 	SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite3_driver))
 endif # SQLITE3_DRIVER
 
+DEPS=$(subst ~, -MT ,$(join $(patsubst %.c,"%.c~", $(sort $(SRCS))),$(sort $(patsubst %.c,%.o,$(SRCS)))))
+
 # implict pattern rule
 	
 %.o : %.c
 	@echo -n "Compiling \`$@' ... "
-	@$(CXX) $(CXXFLAGS) $(COMPILER_FLAGS) $< -c -o $@ 2>&1 | tee -a make.log
+	@$(CXX) $(CXXFLAGS) $< -c -o $@ 2>&1 | tee -a make.log
 	@echo "done."
 
 #	this is "rule" for linking libs
@@ -354,7 +356,7 @@ $(CACHE):
 dep: .depend
 .depend: $(SRCS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
 	@echo -n 'Making dependicies ... '
-	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCS) | sed -e "s/^\(.\{1,\}: \)\(\(\.\/\)\{0,1\}[a-z]\{1,\}\)/\2\/\1\2/" > .depend
+	@set -e; for DEP in $(DEPS); do $(CXX) $(CXXFLAGS) -MM $${DEP} ; done > .depend
 	@echo "# vim:ft=make:" >> .depend
 	@echo 'done.'
 

@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HDATA_HDATAEDITCONTROL_H
 #define __HDATA_HDATAEDITCONTROL_H
 
-#include "../hconsole/heditcontrol.h"
+#include "hconsole/heditcontrol.h"
 #include "hdatawindow.h"
 
 class HDataEditControl : public HDataControl, public virtual HEditControl

@@ -27,8 +27,8 @@ Copyright:
 #ifndef __HDATA_HDATACONTROL_H
 #define __HDATA_HDATACONTROL_H
 
-#include "../dbwrapper/hrecordset.h"
-#include "../hconsole/hcontrol.h"
+#include "dbwrapper/hrecordset.h"
+#include "hconsole/hcontrol.h"
 
 class HDataControl : public virtual HControl
 	{

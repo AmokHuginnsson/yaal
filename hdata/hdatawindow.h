@@ -27,9 +27,9 @@ Copyright:
 #ifndef __HDATA_HDATAWINDOW_H
 #define __HDATA_HDATAWINDOW_H
 
-#include "../dbwrapper/hrecordset.h"
-#include "../hconsole/hwindow.h"
-#include "../hconsole/hlistcontrol.h"
+#include "dbwrapper/hrecordset.h"
+#include "hconsole/hwindow.h"
+#include "hconsole/hlistcontrol.h"
 #include "hdatacontrol.h"
 #include "hdatalistcontrol.h"
 #include "oresource.h"

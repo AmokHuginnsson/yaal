@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HCONSOLE_HLISTCONTROL_H
 #define __HCONSOLE_HLISTCONTROL_H
 
-#include "../hcore/hinfolist.h"
+#include "hcore/hinfolist.h"
 #include "hitem.h"
 #include "hwindow.h"
 #include "hsearchablecontrol.h"

@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HCONSOLE_HTREECONTROL_H
 #define __HCONSOLE_HTREECONTROL_H
 
-#include "../hcore/htree.h"
+#include "hcore/htree.h"
 #include "hitem.h"
 #include "hwindow.h"
 

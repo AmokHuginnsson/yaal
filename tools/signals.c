@@ -30,7 +30,7 @@ Copyright:
 #include <signal.h>	 /* signal handling */
 #include <libintl.h>
 
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_NCURSES_H
 #	include <ncurses.h>
@@ -40,13 +40,13 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "../hcore/hexception.h" /* M_PROLOG, M_EPILOG */
+#include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
 M_CVSID ( "$CVSHeader$" );
-#include "../hcore/xalloc.h"
-#include "../hconsole/console.h" /* conio (ncurses) ability */
-#include "../hconsole/hconsole.h" /* n_bUseMouse */
-#include "../hcore/hlog.h"       /* log object */
-#include "../hcore/hstring.h"    /* HString class */
+#include "hcore/xalloc.h"
+#include "hconsole/console.h" /* conio (ncurses) ability */
+#include "hconsole/hconsole.h" /* n_bUseMouse */
+#include "hcore/hlog.h"       /* log object */
+#include "hcore/hstring.h"    /* HString class */
 #include "signals.h"
 #include "tools.h"                /* tools namespace */
 

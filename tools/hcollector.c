@@ -28,9 +28,9 @@ Copyright:
 #include <string.h>
 #include <stdlib.h>
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
-#include "../hcore/hlog.h"
+#include "hcore/hlog.h"
 #include "tools.h"
 #include "hcollector.h"
 

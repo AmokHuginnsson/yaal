@@ -30,7 +30,7 @@ Copyright:
 #include <termios.h>
 #include <libintl.h>
 
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_NCURSES_H
 #	include <ncurses.h>
@@ -40,9 +40,9 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
-#include "../hcore/hlog.h"
+#include "hcore/hlog.h"
 #include "hconsole.h"
 #include "console.h"
 

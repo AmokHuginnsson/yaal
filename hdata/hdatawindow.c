@@ -26,7 +26,7 @@ Copyright:
 
 #include <libintl.h>
 
-#include "../config.h"
+#include "config.h"
 
 /* We need ncurses.h here because of KEY_HOME. */
 
@@ -38,7 +38,7 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hdatawindow.h"
 #include "hdatalistcontrol.h"

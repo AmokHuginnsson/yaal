@@ -30,7 +30,7 @@ Copyright:
 #include <sys/types.h>	/* why? - because POSIX says so :/ */
 #include <regex.h>			/* this one is obvious */
 
-#include "../hcore/hstringlist.h"
+#include "hcore/hstringlist.h"
 #include "hcontrol.h"
 
 #define D_MASK_LETTERS	"^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$"

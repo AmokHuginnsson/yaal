@@ -26,7 +26,7 @@ Copyright:
 
 #include <string.h>
 
-#include "../config.h"
+#include "config.h"
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );

@@ -29,7 +29,7 @@ Copyright:
 #include <string.h>
 #include <errno.h>
 
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_POSTGRESQL_LIBPQ_FE_H
 #	include <postgresql/libpq-fe.h>
@@ -39,7 +39,7 @@ Copyright:
 #	error "No libpq-fe.h header available."
 #endif /* not HAVE_LIBPQ_FE_H */
 
-#include "../hcore/xalloc.h"
+#include "hcore/xalloc.h"
 
 #ifndef NULL
 #define NULL	0

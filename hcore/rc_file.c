@@ -28,7 +28,7 @@ Copyright:
 #include <string.h> /* strcpy ( ), strcat ( ) */
 #include <stdio.h>  /* fopen ( ) */
 
-#include "../config.h"
+#include "config.h"
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );

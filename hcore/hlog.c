@@ -32,7 +32,7 @@ Copyright:
 #include <time.h>
 #include <libintl.h>
 
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_BASE_NAME_IN_LIBGEN
 #	include <libgen.h>

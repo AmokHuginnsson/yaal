@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HDATA_HDATALISTCONTROL_H
 #define __HDATA_HDATALISTCONTROL_H
 
-#include "../hconsole/hlistcontrol.h"
+#include "hconsole/hlistcontrol.h"
 #include "hdatacontrol.h"
 
 class HDataWindow;

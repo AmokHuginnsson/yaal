@@ -28,8 +28,8 @@ Copyright:
 #define __HCONSOLE_HCONTROL_H
 
 #include "console.h"
-#include "../hcore/hstring.h"
-#include "../hcore/hinfo.h"
+#include "hcore/hstring.h"
+#include "hcore/hinfo.h"
 
 class HWindow;
 

@@ -27,8 +27,8 @@ Copyright:
 #ifndef __HDATA_HDATAPROCESS_H
 #define __HDATA_HDATAPROCESS_H
 
-#include "../hconsole/hprocess.h"
-#include "../dbwrapper/hdatabase.h"
+#include "hconsole/hprocess.h"
+#include "dbwrapper/hdatabase.h"
 
 class HDataProcess : public HProcess
 	{

@@ -30,13 +30,13 @@ Copyright:
 #include <signal.h>	 /* signal handling */
 #include <termios.h> /* B115200 */
 
-#include "../hcore/hexception.h" /* M_PROLOG, M_EPILOG */
+#include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
 M_CVSID ( "$CVSHeader$" );
-#include "../hcore/hcore.h"
-#include "../hcore/xalloc.h"
-#include "../hcore/rc_file.h"    /* read conf from rc */
-#include "../hcore/hlog.h"       /* log object */
-#include "../hcore/hstring.h"    /* HString class */
+#include "hcore/hcore.h"
+#include "hcore/xalloc.h"
+#include "hcore/rc_file.h"    /* read conf from rc */
+#include "hcore/hlog.h"       /* log object */
+#include "hcore/hstring.h"    /* HString class */
 
 namespace tools
 {

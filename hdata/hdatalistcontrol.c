@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "../config.h"
+#include "config.h"
 
 /* We need ncurses.h here because of KEY_HOME. */
 
@@ -36,7 +36,7 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hdatalistcontrol.h"
 #include "hdatawindow.h"

@@ -26,7 +26,7 @@ Copyright:
 
 #include <unistd.h>
 
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_NCURSES_H
 #	include <ncurses.h>
@@ -36,7 +36,7 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hprocess.h"
 #include "hconsole.h"
@@ -44,7 +44,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "mouse.h"
 
 #ifdef __DEBUGGER_BABUNI__
-#include "../hcore/hlog.h"
+#include "hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
 #define D_CTRLS_COUNT	2

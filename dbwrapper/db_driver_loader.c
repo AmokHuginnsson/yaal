@@ -31,13 +31,13 @@ Copyright:
 #include <stdlib.h>
 #include <libintl.h>
 
-#include "../config.h"
+#include "config.h"
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
-#include "../hcore/xalloc.h"
-#include "../hcore/hstring.h"
-#include "../hcore/hlog.h"
+#include "hcore/xalloc.h"
+#include "hcore/hstring.h"
+#include "hcore/hlog.h"
 #include "db_driver_loader.h"
 #include "dbwrapper.h"
 

@@ -37,7 +37,7 @@ Copyright:
 #endif /* not NULL */
 
 #ifdef __STDHAPI_BUILD__
-#	include "../config.h"
+#	include "config.h"
 #endif /* __STDHAPI_BUILD__ */
 
 #define _(string) gettext (string)

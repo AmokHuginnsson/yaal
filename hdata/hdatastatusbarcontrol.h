@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HDATA_HDATASTATUSBARCONTROL_H
 #define __HDATA_HDATASTATUSBARCONTROL_H
 
-#include "../hconsole/hstatusbarcontrol.h"
+#include "hconsole/hstatusbarcontrol.h"
 #include "hdatawindow.h"
 
 class HDataStatusBarControl : public HStatusBarControl

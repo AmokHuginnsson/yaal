@@ -34,14 +34,14 @@ Copyright:
 #include <string.h>
 #include <stdlib.h>
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
-#include "../hcore/xalloc.h"
-#include "../hcore/htree.h"
+#include "hcore/xalloc.h"
+#include "hcore/htree.h"
 #include "hanalyser.h"
 
 #ifdef __DEBUGGER_BABUNI__
-#include "../hcore/hlog.h"
+#include "hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
 #define D_FUNCTIONS 0

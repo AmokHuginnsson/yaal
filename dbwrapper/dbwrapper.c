@@ -30,15 +30,15 @@ Copyright:
 #include <string.h>
 #include <stdlib.h>
 
-#include "../config.h"
+#include "config.h"
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
-#include "../hcore/xalloc.h"
-#include "../hcore/hlog.h"
-#include "../hcore/hstring.h"
-#include "../hcore/rc_file.h"
-#include "../hcore/hcore.h"
+#include "hcore/xalloc.h"
+#include "hcore/hlog.h"
+#include "hcore/hstring.h"
+#include "hcore/rc_file.h"
+#include "hcore/hcore.h"
 #include "dbwrapper.h"
 #include "db_driver_loader.h"
 

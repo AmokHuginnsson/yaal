@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HCONSOLE_HTIMECONTROL_H
 #define __HCONSOLE_HTIMECONTROL_H
 
-#include "../hcore/htime.h"
+#include "hcore/htime.h"
 #include "hwindow.h"
 
 class HTimeControl : public HTime, public HControl

@@ -26,7 +26,7 @@ Copyright:
 
 #include <libintl.h>
 
-#include "../config.h"
+#include "config.h"
 
 #ifdef HAVE_NCURSES_H
 #	include <ncurses.h>
@@ -36,13 +36,13 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hwindow.h"
 #include "console.h"
 
 #ifdef __DEBUGGER_BABUNI__
-#include "../hcore/hlog.h"
+#include "hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
 HWindow::HWindow ( char const * a_pcTitle )

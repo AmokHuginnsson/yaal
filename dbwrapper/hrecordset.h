@@ -34,10 +34,10 @@ Copyright:
 #define D_MODE_EDITING	2
 #define D_MODE_OPENED		D_MODE_NORMAL
 
-#include "../hcore/hstring.h"
-#include "../hcore/hstringlist.h"
-#include "../hcore/htime.h"
-#include "../hcore/hinfo.h"
+#include "hcore/hstring.h"
+#include "hcore/hstringlist.h"
+#include "hcore/htime.h"
+#include "hcore/hinfo.h"
 #include "hdatabase.h"
 
 class HRecordSet

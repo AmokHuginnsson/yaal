@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HCONSOLE_HSEARCHABLECONTROL_H
 #define __HCONSOLE_HSEARCHABLECONTROL_H
 
-#include "../hcore/hpattern.h"
+#include "hcore/hpattern.h"
 #include "hcontrol.h"
 
 class HSearchableControl : public virtual HControl

@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HCONSOLE_HCONTROLLIST_H
 #define __HCONSOLE_HCONTROLLIST_H
 
-#include "../hcore/hlist.h"
+#include "hcore/hlist.h"
 #include "hcontrol.h"
 
 class HControl;

@@ -27,9 +27,9 @@ Copyright:
 #ifndef __TOOLS_HANALYSER_H
 #define __TOOLS_HANALYSER_H
 
-#include "../hcore/hstring.h"
-#include "../hcore/htree.h"
-#include "../hcore/hpool.h"
+#include "hcore/hstring.h"
+#include "hcore/htree.h"
+#include "hcore/hpool.h"
 
 class HAnalyser : public HTree < HList < double * > >
 	{

@@ -27,7 +27,7 @@ Copyright:
 #ifndef __TOOLS_UTIL_H
 #define __TOOLS_UTIL_H
 
-#include "../hcore/hstring.h"
+#include "hcore/hstring.h"
 
 namespace util
 	{
