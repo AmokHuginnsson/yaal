@@ -46,6 +46,7 @@ int read_rc_line ( HString &, HString &, FILE * );
 FILE * rc_open ( const char *, bool, FILE * = NULL );
 void rc_close ( FILE * );
 void rc_set_variable ( const char *, bool & );
+void rc_set_variable ( const char *, char & );
 void rc_set_variable ( const char *, char ** );
 void rc_set_variable ( const char *, int & );
 

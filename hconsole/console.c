@@ -61,11 +61,15 @@ int n_iFocusedAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
 															+ ( D_FG_BLACK | D_BG_LIGHTGRAY ); 
 /* private: */
 WINDOW * n_psWindow = NULL;
-bool n_bUseMouse = false;
+bool	n_bUseMouse = false;
+char	n_cCommandComposeCharacter = 'x';
+int		n_iCommandComposeDelay = 16;
 
 OVariable n_psVariables [ ] =
 	{
 		{ D_TYPE_BOOL, "use_mouse", & n_bUseMouse },
+		{ D_TYPE_CHAR, "command_compose_character", & n_cCommandComposeCharacter },
+		{ D_TYPE_INT, "command_compose_delay", & n_iCommandComposeDelay },
 		{ 0, NULL, NULL }
 	};
 	
@@ -274,15 +278,16 @@ int get_key( void )
 		if ( l_iKey == ERR )l_iKey = D_KEY_ESC;
 		else l_iKey = D_KEY_META_(l_iKey);
 		}
-	if ( l_iKey == D_KEY_CTRL_('x') )
+	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
 		{
-		c_printf ( console::n_iHeight - 1, -1, D_FG_WHITE, "ctrl-x" );
-		timeout ( 1600 );
+		c_printf ( console::n_iHeight - 1, -1, D_FG_WHITE, "ctrl-%c",
+				n_cCommandComposeCharacter );
+		timeout ( n_iCommandComposeDelay * 100 );
 		l_iKey = getch ( );
 		timeout ( -1 );
 		if ( l_iKey == ERR )
 			{
-			l_iKey = D_KEY_CTRL_('x');
+			l_iKey = D_KEY_CTRL_(n_cCommandComposeCharacter);
 			c_printf ( console::n_iHeight - 1, 0, D_FG_LIGHTGRAY, "      " );
 			}
 		else
@@ -300,7 +305,7 @@ int get_key( void )
 			c_printf ( console::n_iHeight - 1, 6, D_FG_WHITE, " %c", l_iChar );
 			}
 		}
-	echo();
+	echo ( );
 	if ( l_iKey == 347 ) l_iKey = 360;
 	else if ( ( l_iKey == 127 ) || ( l_iKey == 8 ) ) l_iKey = 263;
 	return ( l_iKey );

@@ -4,12 +4,22 @@
 # in most cases option values are case insensitive also
 # syntax for settings is:
 #	^{option}{white}{value1 value2 ... valuen}$
+# we currently distinguish between four kind of value types:
+# bool   - (true|yes|on|false|no|off)
+# char   - [a-z]
+# int    - [0-1]+
+# string - .+
+#
 # example:
 # log_sql true
 
 ### console BEGIN
 
 use_mouse false
+
+command_compose_character x
+
+command_compose_delay 16
 
 ## colors BEGIN
 

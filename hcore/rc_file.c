@@ -63,6 +63,11 @@ int process_rc_file ( const char * a_pcRcName, OVariable * a_psVaraibles,
 							rc_set_variable ( l_oValue, * ( bool * ) a_psVaraibles [ l_iCtr ].f_pvValue );
 							break;
 							}
+						case ( D_TYPE_CHAR ):
+							{
+							rc_set_variable ( l_oValue, * ( char * ) a_psVaraibles [ l_iCtr ].f_pvValue );
+							break;
+							}
 						case ( D_TYPE_INT ):
 							{
 							rc_set_variable ( l_oValue, * ( int * ) a_psVaraibles [ l_iCtr ].f_pvValue );
@@ -276,6 +281,11 @@ void rc_set_variable ( const char * a_pcValue, char ** a_ppcVariable )
 void rc_set_variable ( const char * a_pcValue, int & a_riVariable )
 	{
 	a_riVariable = atoi ( a_pcValue );
+	}
+
+void rc_set_variable ( const char * a_pcValue, char & a_rcVariable )
+	{
+	a_rcVariable = a_pcValue [ 0 ];
 	}
 
 }
