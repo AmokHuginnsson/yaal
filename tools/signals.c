@@ -145,7 +145,6 @@ void install_special ( SIGNAL_HANDLER_t HANDLER, int a_iSignum )
 	if ( l_sOldHandler.sa_handler == SIG_IGN )
 		sigaction ( a_iSignum, & l_sOldHandler, & l_sHandler );
 	else siginterrupt ( a_iSignum, true );
-	M_LOG ( HString ( "created handler for signal: " ) + a_iSignum );
 	return;
 	M_EPILOG
 	}
