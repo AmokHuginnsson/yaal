@@ -172,7 +172,7 @@ HControl::operator HInfo ( void )
 	M_EPILOG
 	}
 
-bool HControl::is_enabled ( void )
+bool HControl::is_searchable ( void )
 	{
 	M_PROLOG
 	return ( false );
