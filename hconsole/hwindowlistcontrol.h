@@ -42,11 +42,11 @@ public:
 	virtual ~HWindowListControl ( void );
 	int process_input ( int );
 	void refresh ( void );
-	virtual HInfoList & add_tail ( HInfoList & );
+	virtual HItem & add_tail ( HItem & );
 	/*}*/
 protected:
 	/*{*/
-	virtual long int empty ( HList < HInfoList > ::HElement * );
+	virtual long int empty ( HList < HItem > ::HElement * );
 	/*}*/
 	};
 

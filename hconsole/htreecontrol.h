@@ -27,13 +27,14 @@ Copyright:
 #ifndef __HTREECONTROL_H
 #define __HTREECONTROL_H
 
-#include "../hcore/hflexibletree.h"
+#include "../hcore/htree.h"
+#include "hitem.h"
 #include "hwindow.h"
 
-class HTreeControl : public HFlexibleTree, public virtual HControl
+class HTreeControl : public HTree < HItem >, public virtual HControl
 	{
 protected:
-	class HNodeControl : public HFlexibleTree::HFlexibleNode
+	class HNodeControl : public HTree < HItem >::HNode
 		{
 	protected:
 		/*{*/

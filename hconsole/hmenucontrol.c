@@ -34,6 +34,8 @@ HMenuControl::HMenuNode::HMenuNode ( HMenuNode * a_poNode )
 						: HTreeControl::HNodeControl ( a_poNode )
 	{
 	M_PROLOG
+	HItem l_oDummy ( 1 );
+	f_tLeaf = l_oDummy;
 	return;
 	M_EPILOG
 	}
@@ -57,7 +59,7 @@ int HMenuControl::HMenuNode::load_sub_menu ( OMenuItem * a_psSubMenu )
 		l_poNode = new HMenuNode ( this );
 		l_oInfo = a_psSubMenu [ l_iCtr ].f_pcLabel;
 		l_oInfo = ( void * ) & a_psSubMenu [ l_iCtr ];
-		l_poNode->f_tLeaf.add_tail ( l_oInfo );
+		l_poNode->f_tLeaf [ 0 ] = l_oInfo;
 		f_oBranch.add_tail ( l_poNode );
 		if ( a_psSubMenu [ l_iCtr ].f_psSubMenu )
 			l_poNode->load_sub_menu ( a_psSubMenu [ l_iCtr ].f_psSubMenu );
@@ -91,6 +93,7 @@ HMenuControl::~HMenuControl ( void )
 void HMenuControl::init ( HProcess * a_poProcess, OMenuItem * a_psMenu )
 	{
 	M_PROLOG
+	HItem l_oDummy ( 0 );
 	HMenuNode * l_poNode = NULL;
 	if ( f_poRoot )
 		throw new HException ( __WHERE__, "menu already initialised", g_iErrNo );
@@ -101,6 +104,7 @@ void HMenuControl::init ( HProcess * a_poProcess, OMenuItem * a_psMenu )
 	if ( a_psMenu )
 		{
 		f_poRoot = l_poNode = new HMenuControl::HMenuNode ( 0 );
+		f_poRoot->get_object ( ) = l_oDummy;
 		l_poNode->load_sub_menu ( a_psMenu );
 		if ( ! f_poSelected && l_poNode->f_oBranch.quantity ( ) )
 			f_poSelected = l_poNode->f_oBranch [ 0 ];

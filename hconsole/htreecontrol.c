@@ -41,7 +41,7 @@ Copyright:
 #include "../hcore/hexception.h"
 
 HTreeControl::HNodeControl::HNodeControl ( HNodeControl * a_poNode )
-						: HFlexibleTree::HFlexibleNode ( a_poNode )
+						: HTree < HItem >::HNode ( a_poNode )
 	{
 	M_PROLOG
 	f_bUnfolded = false;
@@ -126,7 +126,7 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 	int l_iRow = a_iRow;
 	HInfo l_oInfo;
 	l_iCtr = a_poNode->f_oBranch.quantity ( );
-	if ( a_poNode->f_tLeaf.quantity ( ) )
+	if ( a_poNode->f_tLeaf )
 		{ 
 		l_iRow ++;
 		l_oInfo = a_poNode->f_tLeaf [ 0 ];

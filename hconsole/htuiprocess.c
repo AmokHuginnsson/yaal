@@ -63,7 +63,7 @@ HProcess::~HProcess ( void )
 	M_PROLOG
 	HMainWindow * l_poMainWindow = NULL;
 	if ( f_poWindows )
-		l_poMainWindow = ( HMainWindow * )( void * ) f_poWindows->go ( -1 ).head ();
+		l_poMainWindow = ( HMainWindow * )( void * ) f_poWindows->go ( -1 ) [ 0 ];
 	if ( l_poMainWindow )delete l_poMainWindow;
 	f_poWindows = NULL;
 #ifdef __DEBUGGER_BABUNI__
@@ -107,11 +107,11 @@ int HProcess::add_window ( HWindow * a_poWindow, const char * a_pcTitle )
 	{
 	M_PROLOG
 	HInfo l_oInfo;
-	HInfoList l_oInfoList;
+	HItem l_oItem ( 1 );
 	l_oInfo = ( void * ) a_poWindow;
 	l_oInfo = HString ( a_pcTitle );
-	l_oInfoList.add_tail ( l_oInfo );
-	f_poWindows->add_tail ( l_oInfoList );
+	l_oItem [ 0 ] = l_oInfo;
+	f_poWindows->add_tail ( l_oItem );
 	f_poForegroundWindow = a_poWindow;
 	f_poForegroundWindow->init ( );
 	::refresh ( );
@@ -372,11 +372,11 @@ int HProcess::handler_jump_meta_tab ( int a_iCode )
 	if ( f_iIdleCycles < 5 )
 		{
 		f_poWindows->to_tail ( );
-		HInfo & l_oInfo = f_poWindows->present ( ).head ( );
+		HInfo & l_oInfo = f_poWindows->present ( ) [ 0 ];
 		f_poForegroundWindow = ( HWindow * ) ( void * ) l_oInfo;
 		}
 	else f_poForegroundWindow = ( HWindow * )( void * ) f_poWindows->
-																														go ( -1 ).head ( );
+																															go ( -1 ) [ 0 ];
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );
@@ -389,7 +389,7 @@ int HProcess::handler_jump_meta_direct ( int a_iCode )
 	a_iCode = ( a_iCode & 0xff ) - '0';
 	if ( a_iCode >= f_poWindows->quantity ( ) )return ( 0 );
 	f_poForegroundWindow = ( HWindow * ) ( void * ) f_poWindows->
-																										go ( a_iCode - 1 ).head ( );
+																										go ( a_iCode - 1 ) [ 0 ];
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );
@@ -400,7 +400,7 @@ int HProcess::handler_close_window ( int a_iCode )
 	{
 	M_PROLOG
 	f_poWindows->remove_element ( D_EMPTY_IF_NOT_EMPTIED );
-	f_poForegroundWindow = ( HWindow * ) ( void * ) f_poWindows->go ( -1 ).head ( );
+	f_poForegroundWindow = ( HWindow * ) ( void * ) f_poWindows->go ( -1 ) [ 0 ];
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );

@@ -53,10 +53,10 @@ long int HWindowListControl::empty ( HElement* a_poElement )
 	{
 	M_PROLOG
 	HWindow * l_poWindow = NULL;
-	HInfoList * l_poInfoList = & a_poElement->get_object ( );
-	if ( l_poInfoList->quantity ( ) )
+	HItem * l_poItem = & a_poElement->get_object ( );
+	if ( * l_poItem )
 		{
-		l_poWindow = ( HWindow * ) ( void * ) l_poInfoList->head ( );
+		l_poWindow = ( HWindow * ) ( void * ) ( * l_poItem ) [ 0 ];
 		if ( l_poWindow )delete l_poWindow;
 		l_poWindow = NULL;
 		}
@@ -102,10 +102,10 @@ void HWindowListControl::refresh ( void )
 	M_EPILOG
 	}
 
-HInfoList & HWindowListControl::add_tail ( HInfoList & a_roElement )
+HItem & HWindowListControl::add_tail ( HItem & a_roElement )
 	{
 	M_PROLOG
-	HInfoList * l_poInfoList = & HListControl::add_tail ( a_roElement );
+	HItem * l_poItem = & HListControl::add_tail ( a_roElement );
 	if ( f_iQuantity > 1 )
 		{
 		exchange ( - 2, - 1 );
@@ -118,7 +118,7 @@ HInfoList & HWindowListControl::add_tail ( HInfoList & a_roElement )
 		else f_poFirstVisibleRow = f_poHook;
 		go ( - 2 );
 		}
-	return ( * l_poInfoList );
+	return ( * l_poItem );
 	M_EPILOG
 	}
 
