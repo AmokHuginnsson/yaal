@@ -55,7 +55,7 @@ ignore_signal_SIGTSTP true
 
 # select data base driver
 # accepted drivers are:
-# MySQL, PostgreSQL
+# MySQL, PostgreSQL, null, none
 
 #data_base_driver PostgreSQL
 data_base_driver MySQL
