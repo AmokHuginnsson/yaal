@@ -78,7 +78,8 @@ if [ "$ANSWER" ] ; then
 else
 	echo "Remember to add this lines so that libraries could work properly"
 fi
-source ./.shellrc
+source ./shellrc 2>/dev/null
+source ./shellrc.csh 2>/dev/null
 echo "Installation process ends."
 
 exit 0

@@ -270,7 +270,7 @@ nodebug:
 	$(MAKE) -e all)
 
 install: all
-	@./msh
+	@./aux/msh
 
 $(HCORE): $(OBJ4hcore)
 	@$(MAKE) $(HCORE)\' TARGET=$(HCORE)\' NAME=hcore
@@ -316,7 +316,7 @@ $(CACHE):
 	@echo -n "Making environment ... "
 	@/bin/mkdir -p $(TARGETDIR)
 	@echo $(TARGETDIR) > $(TARGETDIR)/ld.so.conf
-	@/bin/cp -f ./mkcache $(TARGETDIR)
+	@/bin/cp -f ./aux/mkcache $(TARGETDIR)
 	@echo "done."
 
 dep: .depend
