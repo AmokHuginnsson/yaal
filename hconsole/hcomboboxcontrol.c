@@ -97,14 +97,15 @@ void HComboboxControl::refresh ( void )
 	if ( f_iMode == D_MODE_EDITCONTROL )
 		{
 /* ripped from HControl::draw_label ( ) */
-		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
+		l_iWidth = ( f_iWidth > 0 ) ? f_iWidth
 			: console::n_iWidth + f_iWidth - f_iColumnRaw;
 /* end of ripped part */
-		::move ( f_iRowRaw, f_iColumnRaw + f_iWidthRaw );
+		HEditControl::refresh ( );
+		::move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 );
 		M_SET_ATTR_LABEL ( );
 		addch ( D_ASCII_DOWN_ARROW );
-		HEditControl::refresh ( );
-		f_iHeightRaw = 1;
+		::move ( f_iRowRaw, f_iColumnRaw + HEditControl::f_iCursorPosition );
+		f_iHeightRaw = 0;
 		}
 	else
 		{
@@ -148,11 +149,7 @@ int HComboboxControl::process_input ( int a_iCode )
 	else
 		{
 		if ( a_iCode != '\r' )return ( HListControl::process_input ( a_iCode ) );
-		f_iMode = D_MODE_EDITCONTROL;
-		if ( f_iQuantity )
-			HEditControl::operator = ( ( HString & ) present ( ) [ 0 ] );
-		console::clrscr ( );
-		f_poParent->refresh ( );
+		close_combo ( );
 		}
 	return ( 0 );
 	M_EPILOG
@@ -162,9 +159,30 @@ int HComboboxControl::click ( mouse::OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	if ( f_iMode == D_MODE_EDITCONTROL )
-		return ( HEditControl::click ( a_rsMouse ) );
-	else return ( HListControl::click ( a_rsMouse ) );
+		{
+		HEditControl::click ( a_rsMouse );
+		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
+			: console::n_iWidth + f_iWidth - f_iColumnRaw;
+		if ( a_rsMouse.f_iColumn == ( f_iColumnRaw + f_iWidthRaw - 1 ) )
+			{
+			f_iMode = D_MODE_LISTCONTROL;
+			refresh ( );
+			}
+		}
+	else if ( HListControl::click ( a_rsMouse ) )
+		close_combo ( );
 	return ( 0 );
 	M_EPILOG
 	}
-
+			
+void HComboboxControl::close_combo ( void )
+	{
+	M_PROLOG
+	f_iMode = D_MODE_EDITCONTROL;
+	if ( f_iQuantity )
+		HEditControl::operator = ( ( HString & ) present ( ) [ 0 ] );
+	console::clrscr ( );
+	f_poParent->refresh ( );
+	return;
+	M_EPILOG
+	}

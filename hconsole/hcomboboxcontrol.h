@@ -72,6 +72,7 @@ public:
 	/*}*/
 protected:
 	/*{*/
+	void close_combo ( void );
 	/*}*/
 	};
 

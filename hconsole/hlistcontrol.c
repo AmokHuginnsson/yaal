@@ -705,11 +705,15 @@ void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 int HListControl::click ( mouse::OMouse & a_rsMouse )
 	{
 	M_PROLOG
-	int l_iRow = 0;
+	int l_iRow = 0, l_iMoved = 0;
 	if ( ! HControl::click ( a_rsMouse ) )return ( 1 );
 	l_iRow = a_rsMouse.f_iRow - f_iRowRaw - ( f_bDrawHeader ? 1 : 0 );
+	if ( l_iRow == f_iCursorPosition )return ( 1 );
 	if ( l_iRow < f_iQuantity )
 		{
+		l_iMoved = f_iCursorPosition - l_iRow;
+		if ( l_iMoved > 0 )to_head ( l_iMoved );
+		else to_tail ( - l_iMoved );
 		f_iCursorPosition = l_iRow;
 		refresh ( );
 		}
