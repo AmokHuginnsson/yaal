@@ -64,6 +64,7 @@ CWARNING_FLAGS =	\
 						-Wcast-align\
 						-Wcast-qual\
 						-Wconversion\
+						-Wendif-labels\
 						-Werror\
 						-Winline\
 						-Wlarger-than-4096\
@@ -81,6 +82,8 @@ CWARNING_FLAGS =	\
 						-Wnested-externs\
 						-Wstrict-prototypes\
 						-Wtraditional\ #C only
+#						-Wmissing-format-attribute\
+						-Wunreachable-code\ # too much warrnings
 #						-Waggregate-return\ # useless for C++
 CXXWARNING_FLAGS =	\
 						-Weffc++\
