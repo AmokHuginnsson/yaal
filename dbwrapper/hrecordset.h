@@ -98,6 +98,7 @@ public:
 	void move_previous ( void );
 	long int open ( const char * = NULL );
 	void close ( void );
+	void free ( void );
 	long int requery ( const char * = NULL );
 	void add_new ( void );
 	void edit ( void );

@@ -93,6 +93,7 @@ void HRecordSet::build_sql ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
+	f_oBuffer = "";
 	switch ( f_iMode )
 		{
 		case ( D_MODE_CLOSED ):
@@ -105,6 +106,7 @@ void HRecordSet::build_sql ( void )
 					( const char * ) m_oFilter );
 			if ( ! f_oBuffer.is_empty ( ) )
 				f_oSQL += ( " WHERE " + f_oBuffer );
+			f_oBuffer = "";
 			if ( f_oSort.is_empty ( ) )f_oBuffer = m_oSort;
 			else if ( m_oSort.is_empty ( ) )f_oBuffer = f_oSort;
 			else f_oBuffer.format ( "%s, %s", ( const char * ) m_oSort,
@@ -167,6 +169,7 @@ long int HRecordSet::open ( const char * a_pcQuery )
 	if ( f_iMode != D_MODE_CLOSED )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	if ( a_pcQuery )f_oSQL = a_pcQuery;
 	else build_sql ( );
+	free ( );
 	f_iSetQuantity = f_poDataBase->query ( f_oSQL );
 	f_pvCoreData = f_poDataBase->get_result ( );
 	f_iFieldCount = dbwrapper::rs_fields_count ( f_pvCoreData );
@@ -190,18 +193,26 @@ void HRecordSet::close ( void )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		throw new HException ( __WHERE__, E_MODE, f_iMode );
+	free ( );
+	f_iMode = D_MODE_CLOSED;
+	M_EPILOG
+	}
+
+void HRecordSet::free ( void )
+	{
+	M_PROLOG
 	if ( f_pvCoreData )
 		dbwrapper::db_unquery ( f_pvCoreData );
 	f_pvCoreData = NULL;
-	f_iMode = D_MODE_CLOSED;
 	M_EPILOG
 	}
 
 long int HRecordSet::requery ( const char * a_pcQuery )
 	{
 	M_PROLOG
-	if ( a_pcQuery )f_oSQL = a_pcQuery;
 	close ( );
+	if ( a_pcQuery )f_oSQL = a_pcQuery;
+	else build_sql ( );
 	return ( open ( f_oSQL ) );
 	M_EPILOG
 	}

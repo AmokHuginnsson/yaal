@@ -289,7 +289,7 @@ int HDataWindow::handler_add_new ( int )
 	{
 	M_PROLOG
 	add_new ( );
-	f_poMainControl->add_new ( );
+	if ( f_poMainControl )f_poMainControl->add_new ( );
 	set_mode ( D_MODE_EDIT );
 	return ( 0 );
 	M_EPILOG
@@ -316,7 +316,7 @@ int HDataWindow::handler_delete ( int )
 int HDataWindow::handler_save ( int )
 	{
 	M_PROLOG
-	update ( );
+	m_id = update ( );
 	set_mode ( D_MODE_VIEW );
 	f_poMainControl->populate ( );
 	return ( 0 );
