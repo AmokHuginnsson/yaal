@@ -97,7 +97,7 @@ void HListControl::refresh ( void )
 	if ( f_iWidthRaw != l_iTmp )recalculate_column_widths ( );
 /* we need to decrement f_iHeightRaw because we have additional row, 
  * the list control header */
-	f_iHeightRaw --;
+	if ( f_bDrawHeader )f_iHeightRaw --;
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	if ( f_iQuantity > 0 )
 		{
@@ -116,7 +116,8 @@ void HListControl::refresh ( void )
 				l_iCurrentColumnWidth = l_lValue & 0x000000ff;
 				if ( l_iCurrentColumnWidth )
 					{
-					::move ( f_iRowRaw + l_iCtr + 1, f_iColumnRaw + l_iColumnOffset );
+					::move ( f_iRowRaw + l_iCtr + ( f_bDrawHeader ? 1 : 0 ),
+							f_iColumnRaw + l_iColumnOffset );
 					f_oVarTmpBuffer [ 0 ] = 0;
 					switch ( l_iFlags & D_TYPE_MASK ) /* 0x0ffff is mask for type */
 						{
@@ -241,14 +242,18 @@ void HListControl::refresh ( void )
 		l_iCurrentColumnWidth = l_lValue & 0x000000ff;
 		if ( l_iCurrentColumnWidth )
 			{
-			f_oVarTmpBuffer = ( HString & ) ( * l_poInfo );
-			::move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset );
-			M_SET_ATTR_LABEL ( );
-			f_oVarTmpBuffer.format ( "%%-%ds", l_iCurrentColumnWidth );
-			cprintf ( f_oVarTmpBuffer, ( char * ) ( ( HString & ) ( * l_poInfo ) ).left ( l_iCurrentColumnWidth ) );
-			::move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset + ( l_lValue >> 16 ) );
-			M_SET_ATTR_SHORTCUT ( );
-			cprintf ( "%c", ( * l_poInfo ) [ l_lValue >> 16 ] );
+			if ( f_bDrawHeader )
+				{
+				f_oVarTmpBuffer = ( HString & ) ( * l_poInfo );
+				::move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset );
+				M_SET_ATTR_LABEL ( );
+				f_oVarTmpBuffer.format ( "%%-%ds", l_iCurrentColumnWidth );
+				cprintf ( f_oVarTmpBuffer, ( char * ) ( ( HString & ) ( * l_poInfo ) ).left ( l_iCurrentColumnWidth ) );
+				::move ( f_iRowRaw,
+						f_iColumnRaw + l_iColumnOffset + ( l_lValue >> 16 ) );
+				M_SET_ATTR_SHORTCUT ( );
+				cprintf ( "%c", ( * l_poInfo ) [ l_lValue >> 16 ] );
+				}
 			l_iColumnOffset += l_iCurrentColumnWidth;
 			if ( l_iCtr < l_iColumns )
 				{
@@ -266,7 +271,8 @@ void HListControl::refresh ( void )
 		{
 		if ( f_iControlOffset )
 			{
-			::move ( f_iRowRaw + 1, f_iColumnRaw + l_iColumnOffset - 1 );
+			::move ( f_iRowRaw + ( f_bDrawHeader ? 1 : 0 ),
+					f_iColumnRaw + l_iColumnOffset - 1 );
 			cprintf ( "^" );
 			}
 		if ( ( f_iQuantity - f_iControlOffset ) > f_iHeightRaw )
