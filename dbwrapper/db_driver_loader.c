@@ -201,8 +201,8 @@ void load_driver ( void )
 		if ( ! g_pvDlHandle )l_iCtr = 1;
 		while ( ! g_pvDlHandle && g_ppcDriver [ l_iCtr ] )
 			{
-			dbwrapper_error ( );
 			if ( ( l_iCtr == dbwrapper::n_iDataBaseDriver ) && l_iCtr ++ )continue;
+			dbwrapper_error ( );
 			g_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ],
 					RTLD_NOW | RTLD_GLOBAL );
 			}
