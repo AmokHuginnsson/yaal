@@ -321,3 +321,5 @@ void tools_init ( void )
 	return;
 	}
 
+HString g_oDummyTOOLS;
+

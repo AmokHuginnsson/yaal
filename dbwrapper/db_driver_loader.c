@@ -401,3 +401,5 @@ void dbwrapper_fini ( void )
 	return;
 	}
 
+HString g_oDummyDBWRAPPER;
+

@@ -442,3 +442,5 @@ void console_init ( void )
 	return;
 	}
 
+HString g_oDummyHCONSOLE;
+
