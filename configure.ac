@@ -66,7 +66,7 @@ AC_CHECK_FILE(
 		[[/etc/debconf.conf]],
 		[AC_DEFINE([[__HOST_OS_TYPE_DEBIAN__]]) _HOST________=['Debian. ---   ']],
 		[AC_CHECK_FILE(
-			[[/etc/poldek.conf]],
+			[[/etc/poldek/poldek.conf]],
 			[AC_DEFINE([[__HOST_OS_TYPE_PLD__]]) _HOST________=['PLD. ---      ']],
 			[AC_CHECK_FILE(
 				[[/etc/random-seed]],
