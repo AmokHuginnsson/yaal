@@ -33,8 +33,8 @@ M_CVSTID ( D_CVSID_HARRAY_H );
 
 const char * g_ppcErrMsgHArray [ 24 ] =
 	{
-/* E_BADSIZE */		_ ( "bad size" ),
-/* E_NOMEM */			_ ( "can not alloc memory with new" ),
-/* E_BADINDEX */	_ ( "index excides array size" )
+/* E_HARRAY_BADSIZE */		_ ( "bad size" ),
+/* E_HARRAY_NOMEM */			_ ( "can not alloc memory with new" ),
+/* E_HARRAY_BADINDEX */	_ ( "index excides array size" )
 	};
 

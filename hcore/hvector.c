@@ -33,6 +33,6 @@ M_CVSTID ( D_CVSID_HVECTOR_H );
 
 const char * g_ppcErrMsgHVector [ 24 ] =
 	{
-/* E_DIMNOTMATCH */	_ ( "dimensions do not match" )
+/* E_HVECTOR_DIMNOTMATCH */	_ ( "dimensions do not match" )
 	};
 

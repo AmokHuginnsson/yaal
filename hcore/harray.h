@@ -31,9 +31,9 @@ Copyright:
 
 #define D_CVSID_HARRAY_H "$CVSHeader$"
 
-#define E_BADSIZE		0
-#define E_NOMEM			1
-#define E_BADINDEX	2
+#define E_HARRAY_BADSIZE		0
+#define E_HARRAY_NOMEM			1
+#define E_HARRAY_BADINDEX	2
 
 extern const char * g_ppcErrMsgHArray [ ];
 
@@ -70,14 +70,14 @@ HArray < tType >::HArray ( int a_iSize )
 	f_iSize = 0;
 	f_ptArray = NULL;
 	if ( a_iSize < 0 )
-		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_BADSIZE ], a_iSize );
+		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
 		f_ptArray = new tType [ f_iSize ];
 		if ( ! f_ptArray )
 			throw new HException ( __WHERE__,
-					g_ppcErrMsgHArray [ E_NOMEM ], a_iSize );
+					g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
 		}
 	return;
 	M_EPILOG
@@ -91,14 +91,14 @@ HArray < tType >::HArray ( const int & a_iSize, tType a_tFillWith )
 	f_iSize = 0;
 	f_ptArray = NULL;
 	if ( a_iSize < 0 )
-		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_BADSIZE ], a_iSize );
+		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
 		f_ptArray = new tType [ f_iSize ];
 		if ( ! f_ptArray )
 			throw new HException ( __WHERE__,
-					g_ppcErrMsgHArray [ E_NOMEM ], a_iSize );
+					g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
 		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 			f_ptArray [ l_iCtr ] = a_tFillWith;
 		}
@@ -148,7 +148,7 @@ HArray < tType > & HArray < tType >::operator = ( const HArray & a_roArray )
 		f_ptArray = new tType [ f_iSize ];
 		if ( ! f_ptArray )
 			throw new HException ( __WHERE__,
-					g_ppcErrMsgHArray [ E_NOMEM ], f_iSize );
+					g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], f_iSize );
 		}
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		f_ptArray [ l_iCtr ] = a_roArray.f_ptArray [ l_iCtr ];
@@ -162,7 +162,7 @@ tType & HArray < tType >::operator [ ] ( int a_iIndex )
 	M_PROLOG
 	if ( a_iIndex < 0 )a_iIndex += f_iSize;
 	if ( ( a_iIndex >= f_iSize ) || ( a_iIndex < 0 ) )
-		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_BADINDEX ], a_iIndex );
+		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_HARRAY_BADINDEX ], a_iIndex );
 	return ( f_ptArray [ a_iIndex ] );
 	M_EPILOG
 	}

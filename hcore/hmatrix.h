@@ -31,37 +31,37 @@ Copyright:
 
 #define D_CVSID_HMATRIX_H "$CVSHeader$"
 
-#define E_BADROWS													0
-#define E_BADCOLUMNS											1
-#define E_NEWRETURNEDNULL									2
-#define E_DIMNOTMATCH_ROWS								3
-#define E_DIMNOTMATCH_COLUMNS							4
-#define E_NOTASQUARE											5
-#define E_ODD															6
-#define E_DIMNOTMATCH_COLUMNSROWS					7
-#define E_DIMNOTMATCH_COLUMNSROWSCOLUMNS	8
-#define E_ROW_OUTOFRANGE									9
-#define E_COLUMN_OUTOFRANGE								10
+#define E_HMATRIX_BADROWS													0
+#define E_HMATRIX_BADCOLUMNS											1
+#define E_HMATRIX_NEWRETURNEDNULL									2
+#define E_HMATRIX_DIMNOTMATCH_ROWS								3
+#define E_HMATRIX_DIMNOTMATCH_COLUMNS							4
+#define E_HMATRIX_NOTASQUARE											5
+#define E_HMATRIX_ODD															6
+#define E_HMATRIX_DIMNOTMATCH_COLUMNSROWS					7
+#define E_HMATRIX_DIMNOTMATCH_COLUMNSROWSCOLUMNS	8
+#define E_HMATRIX_ROW_OUTOFRANGE									9
+#define E_HMATRIX_COLUMN_OUTOFRANGE								10
 
 extern const char * g_ppcErrMsgHMatrix [ ];
 
 #define M_CHECK_DIMENSIONS_ROWS_COLUMNS( ) \
 		{\
 		if ( f_iRows != a_roMatrix.f_iRows )\
-			M_THROW ( g_ppcErrMsgHMatrix [ E_DIMNOTMATCH_ROWS ],\
+			M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_ROWS ],\
 					f_iRows - a_roMatrix.f_iRows );\
 		if ( f_iColumns != a_roMatrix.f_iColumns )\
-			M_THROW ( g_ppcErrMsgHMatrix [ E_DIMNOTMATCH_COLUMNS ],\
+			M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_COLUMNS ],\
 					f_iColumns - a_roMatrix.f_iColumns );\
 		}
 
 #define M_CHECK_DIMENSIONS_SQUARE( ) \
 	if ( f_iRows != f_iColumns )\
-		M_THROW ( g_ppcErrMsgHMatrix [ E_NOTASQUARE ], f_iRows - f_iColumns )
+		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_NOTASQUARE ], f_iRows - f_iColumns )
 
 #define M_CHECK_DIMENSIONS_COLUMNS_ROWS( ) \
 	if ( f_iColumns != a_roMatrix.f_iRows )\
-		M_THROW ( g_ppcErrMsgHMatrix [ E_DIMNOTMATCH_COLUMNSROWS ],\
+		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_COLUMNSROWS ],\
 				f_iColumns - a_roMatrix.f_iRows );
 
 #include "hvector.h"
@@ -126,11 +126,11 @@ HMatrix < tType > ::HMatrix ( const int a_iRows, const int a_iColumns )
 	int l_iCtr = 0;
 	if ( a_iRows < 1 )
 		throw new HException ( __WHERE__,
-				g_ppcErrMsgHMatrix [ E_BADROWS ], a_iRows );
+				g_ppcErrMsgHMatrix [ E_HMATRIX_BADROWS ], a_iRows );
 	else f_iRows = a_iRows;
 	if ( a_iColumns < 1 )
 		throw new HException ( __WHERE__,
-				g_ppcErrMsgHMatrix [ E_BADCOLUMNS ], a_iColumns );
+				g_ppcErrMsgHMatrix [ E_HMATRIX_BADCOLUMNS ], a_iColumns );
 	else f_iColumns = a_iColumns;
 	return ;
 	M_EPILOG
@@ -244,9 +244,9 @@ tType HMatrix < tType > ::M ( const int a_iRow, const int a_iColumn )
 	M_CHECK_DIMENSIONS_SQUARE ( );
 	int l_iCtrRow = 0, l_iCtrColumn = 0, l_iCtrRowVirtual = 0, l_iCtrColumnVirtual = 0;
 	if ( a_iRow >= f_iRows )
-		M_THROW ( g_ppcErrMsgHMatrix [ E_ROW_OUTOFRANGE ], a_iRow - f_iRows );
+		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_ROW_OUTOFRANGE ], a_iRow - f_iRows );
 	if ( a_iColumn >= f_iColumns )
-		M_THROW ( g_ppcErrMsgHMatrix [ E_COLUMN_OUTOFRANGE ], a_iColumn - f_iColumns );
+		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_COLUMN_OUTOFRANGE ], a_iColumn - f_iColumns );
 	if ( f_iRows == 1 )return ( 0 );
 	HMatrix l_oMatrix ( f_iRows - 1, f_iColumns - 1 );
 	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++, l_iCtrColumnVirtual = 0 )
@@ -293,7 +293,7 @@ HMatrix < tType > HMatrix < tType > ::_1 ( void )
 						l_iCtrColumn ) * ( ( ( l_iCtrRow + l_iCtrColumn ) % 2 ) ? -1 : 1 );
 		return ( l_oMatrix.T ( ) / d );
 		}
-	else M_THROW ( g_ppcErrMsgHMatrix [ E_ODD ], 0 );
+	else M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_ODD ], 0 );
 	M_EPILOG
 	}
 	
@@ -425,7 +425,7 @@ HMatrix < tType > & HMatrix < tType > ::operator *= ( const HMatrix & a_roMatrix
 	M_PROLOG
 	M_CHECK_DIMENSIONS_COLUMNS_ROWS ( );
 	if ( a_roMatrix.f_iRows != a_roMatrix.f_iColumns )
-		M_THROW ( g_ppcErrMsgHMatrix [ E_DIMNOTMATCH_COLUMNSROWSCOLUMNS ],
+		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_COLUMNSROWSCOLUMNS ],
 				a_roMatrix.f_iRows - a_roMatrix.f_iColumns );
 	( * this ) = ( * this ) * a_roMatrix;
 	return ( * this );

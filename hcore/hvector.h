@@ -33,13 +33,13 @@ Copyright:
 
 #define D_CVSID_HVECTOR_H "$CVSHeader$"
 
-#define E_DIMNOTMATCH	0
+#define E_HVECTOR_DIMNOTMATCH	0
 
 extern const char * g_ppcErrMsgHVector [ ];
 
 #define M_CHECK_DIMENSIONS( ) \
 	if ( this->f_iSize != a_roVector.f_iSize ) \
-		M_THROW ( g_ppcErrMsgHVector [ E_DIMNOTMATCH ], \
+		M_THROW ( g_ppcErrMsgHVector [ E_HVECTOR_DIMNOTMATCH ], \
 				this->f_iSize - a_roVector.f_iSize )
 
 #include "harray.h"
