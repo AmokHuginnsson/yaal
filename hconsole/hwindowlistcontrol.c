@@ -33,7 +33,7 @@ HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 									:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 											a_iWidth, a_pcLabel ),
 										HListControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-												a_iWidth, a_pcLabel )
+												a_iWidth, a_pcLabel, false, false, false, false )
 	{
 	M_PROLOG
 	return;
