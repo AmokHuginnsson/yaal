@@ -109,7 +109,7 @@ long int HRecordSet::open ( const char * a_pcQuery )
 				l_iCtr );
 		f_oValues.add_tail ( );
 		}
-	sync ( );
+	if ( f_iSetQuantity > 0 )sync ( );
 	return ( f_iSetQuantity );
 	M_EPILOG
 	}
