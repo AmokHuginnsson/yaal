@@ -69,7 +69,7 @@ void HDataListControl::populate ( long int /*a_iId*/ )
 	int l_iCursorPosition = f_iCursorPosition;
 	int l_iControlOffset = f_iControlOffset;
 	HElement * l_poSelected = NULL, * l_poFirstVisibleRow = NULL;
-	HInfoList l_oInfoList ( f_oHeader.quantity ( ) );
+	HItem l_oInfoList ( f_oHeader.quantity ( ) );
 	HDataWindow * l_poParent = ( HDataWindow * ) f_poParent;
 	l_poParent->set_sync_store ( & l_oInfoList );
 	if ( f_poRecordSet->is_open ( ) )f_poRecordSet->requery ( );
@@ -97,7 +97,7 @@ void HDataListControl::populate ( long int /*a_iId*/ )
 long int HDataListControl::get_current_id ( void )
 	{
 	M_PROLOG
-	return ( ( * ( HInfoList * ) & f_poSelected->get_object ( ) ) [ 0 ] );
+	return ( ( * ( HItem * ) & f_poSelected->get_object ( ) ).m_lId );
 	M_EPILOG
 	}
 

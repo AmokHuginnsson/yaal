@@ -279,9 +279,10 @@ void HDataWindow::sync ( void )
 	HRecordSet::sync ( );
 	if ( f_poSyncStore )
 		{
-		l_iCount = f_poSyncStore->quantity ( );
+		l_iCount = f_poSyncStore->get_size ( );
 		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 			( * f_poSyncStore ) [ l_iCtr ] = f_oValues [ l_iCtr ];
+		( * f_poSyncStore ).m_lId = m_id;
 		}
 	else if ( ( f_iMode == D_MODE_ADDING ) || ( f_iMode == D_MODE_EDITING ) )
 		{
@@ -294,9 +295,9 @@ void HDataWindow::sync ( void )
 	M_EPILOG
 	}
 
-void HDataWindow::set_sync_store ( HInfoList * a_poInfoList )
+void HDataWindow::set_sync_store ( HItem * a_poItem )
 	{
-	f_poSyncStore = a_poInfoList;
+	f_poSyncStore = a_poItem;
 	return;
 	}
 
