@@ -41,4 +41,4 @@ void read_colector ( HSerial & );
 	
 	};
 
-#endif /* __COLLECTOR_H */
+#endif /* not __COLLECTOR_H */

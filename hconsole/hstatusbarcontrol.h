@@ -47,4 +47,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HSTATUSBARCONTROL_H */
+#endif /* not __HSTATUSBARCONTROL_H */

@@ -95,4 +95,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HDATAWINDOW_H */
+#endif /* not __HDATAWINDOW_H */

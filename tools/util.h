@@ -36,4 +36,4 @@ HString kwota_slownie ( double );
 
 };
 
-#endif /* __UTIL_H */
+#endif /* not __UTIL_H */

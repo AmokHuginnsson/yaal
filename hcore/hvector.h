@@ -65,4 +65,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HVECTOR_H */
+#endif /* not __HVECTOR_H */

@@ -75,4 +75,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HPROCESS_H */
+#endif /* not __HPROCESS_H */

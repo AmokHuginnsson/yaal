@@ -54,4 +54,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HDATABASE_H */
+#endif /* not __HDATABASE_H */

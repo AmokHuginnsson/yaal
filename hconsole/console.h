@@ -91,4 +91,4 @@ extern int n_iFocusedAttribute;
 
 	};
 
-#endif /* __CONSOLE_H */
+#endif /* not __CONSOLE_H */

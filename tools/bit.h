@@ -35,4 +35,4 @@ unsigned char xxor( unsigned char, unsigned char );
 unsigned short int xxor16( unsigned short int, unsigned short int );
 unsigned long int xxor32( unsigned long int, unsigned long int );
 
-#endif /* __BIT_H */
+#endif /* not __BIT_H */

@@ -78,4 +78,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __TREMINAL_H */
+#endif /* not __TREMINAL_H */

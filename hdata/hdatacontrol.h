@@ -48,4 +48,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HDATACONTROL_H */
+#endif /* not __HDATACONTROL_H */

@@ -68,4 +68,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HEXCEPTION_H */
+#endif /* not __HEXCEPTION_H */

@@ -69,4 +69,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HMENUCONTROL_H */
+#endif /* not __HMENUCONTROL_H */

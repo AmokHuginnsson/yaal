@@ -122,4 +122,4 @@ int operator <= ( const char *, HString & );
 int operator > ( const char *, HString & );
 int operator < ( const char *, HString & );
 
-#endif /* __HSTRING_H */
+#endif /* not __HSTRING_H */

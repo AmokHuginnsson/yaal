@@ -1061,7 +1061,7 @@ void HList < tType >:: sort_by_contents ( int a_iOrder )
 	M_EPILOG
 	}
 
-#endif /* __HLIST_H */
+#endif /* not __HLIST_H */
 
 /*
 #ifdef __DEBUG__

@@ -100,4 +100,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HRECORDSET_H */
+#endif /* not __HRECORDSET_H */

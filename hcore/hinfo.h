@@ -98,4 +98,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HINFO_H */
+#endif /* not __HINFO_H */

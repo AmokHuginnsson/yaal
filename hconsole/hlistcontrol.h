@@ -89,4 +89,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HLISTCONTROL_H */
+#endif /* not __HLISTCONTROL_H */

@@ -50,4 +50,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HMAINWINDOW_H */
+#endif /* not __HMAINWINDOW_H */

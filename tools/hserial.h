@@ -54,4 +54,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HSERIAL_H */
+#endif /* not __HSERIAL_H */

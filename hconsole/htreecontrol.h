@@ -73,4 +73,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HTREECONTROL_H */
+#endif /* not __HTREECONTROL_H */

@@ -123,4 +123,4 @@ HHandler < tType >::operator bool ( void )
 	M_EPILOG
 	}
 
-#endif /* __HHANDLER_H */
+#endif /* not __HHANDLER_H */

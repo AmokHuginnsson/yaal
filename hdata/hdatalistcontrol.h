@@ -47,4 +47,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HDATALISTCONTROL_H */
+#endif /* not __HDATALISTCONTROL_H */

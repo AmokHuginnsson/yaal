@@ -72,4 +72,4 @@ protected:
 
 extern HLog log;
 
-#endif /* __HLOG_H */
+#endif /* not __HLOG_H */

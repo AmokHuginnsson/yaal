@@ -76,4 +76,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HTIME_H */
+#endif /* not __HTIME_H */

@@ -286,5 +286,5 @@ bool HMap<tType, ttType>::remove ( tType a_tKey )
 
 unsigned long int hash ( HString & );
 
-#endif /* __HMAP_H */
+#endif /* not __HMAP_H */
 

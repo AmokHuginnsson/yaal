@@ -34,4 +34,4 @@ void set_handlers ( void );
 
 	}
 
-#endif /* __SIGHAND_H */
+#endif /* not __SIGHAND_H */

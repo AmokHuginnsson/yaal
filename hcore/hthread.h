@@ -42,4 +42,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HTHREAD_H */
+#endif /* not __HTHREAD_H */

@@ -66,4 +66,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HWINDOW_H */
+#endif /* not __HWINDOW_H */

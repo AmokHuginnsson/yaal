@@ -54,4 +54,4 @@ extern char * ( * rs_column_name ) ( void *, int );
 
 	}
 
-#endif /* __DB_DRIVER_LOADER_H */
+#endif /* not __DB_DRIVER_LOADER_H */

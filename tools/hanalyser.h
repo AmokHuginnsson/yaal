@@ -84,4 +84,4 @@ protected:
 	friend class HAnalyserNode;
 	};
 
-#endif /* __HANALYSER_H */
+#endif /* not __HANALYSER_H */

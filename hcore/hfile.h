@@ -42,4 +42,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HFILE_H */
+#endif /* not __HFILE_H */

@@ -44,4 +44,4 @@ void rc_set_variable ( const char *, int & );
 
 	}
 
-#endif /* __RC_FILE_H */
+#endif /* not __RC_FILE_H */

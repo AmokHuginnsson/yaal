@@ -36,4 +36,4 @@ struct OMenuItem
 	const char * f_pcLabel;
 	};
 
-#endif /* __OMENUITEM_H */
+#endif /* not __OMENUITEM_H */

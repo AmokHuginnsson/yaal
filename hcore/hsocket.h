@@ -40,4 +40,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HSOCKET_H */
+#endif /* not __HSOCKET_H */

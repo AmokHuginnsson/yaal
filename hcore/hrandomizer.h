@@ -42,4 +42,4 @@ public:
 	/*}*/
 	};
 	
-#endif /* __HRANDOMIZER_H */
+#endif /* not __HRANDOMIZER_H */

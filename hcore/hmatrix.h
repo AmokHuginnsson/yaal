@@ -77,4 +77,4 @@ public:
 	
 HVector T( HMatrix &, HVector & );
 
-#endif /* __HMATRIX_H */
+#endif /* not __HMATRIX_H */

@@ -51,4 +51,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HCONTROLLIST_H */
+#endif /* not __HCONTROLLIST_H */

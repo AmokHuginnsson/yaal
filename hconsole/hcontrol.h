@@ -87,4 +87,4 @@ public:
 	/*}*/
 	};
 
-#endif /* __HCONTROL_H */
+#endif /* not __HCONTROL_H */

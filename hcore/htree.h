@@ -267,4 +267,4 @@ tttType & HTree < tttType > ::add_node( int )
 	M_EPILOG
 	}
 
-#endif /* __HTREE_H */
+#endif /* not __HTREE_H */

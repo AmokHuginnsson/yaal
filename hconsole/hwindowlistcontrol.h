@@ -50,4 +50,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HWINDOWLISTCONTROL_H */
+#endif /* not __HWINDOWLISTCONTROL_H */
