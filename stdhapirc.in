@@ -87,8 +87,12 @@ ignore_signal_SIGINT true
 # is CTRL-z ignored by process?
 ignore_signal_SIGTSTP true
 
-# default serial port
-serial_port /dev/@SERIAL_PORT@
+# serial port configuration
+# device
+serial_device /dev/@SERIAL_DEVICE@
+# baudrate B115200 | B76800 | B57600 | B38400 | B28800
+#          | B19200| B14400 | B9600 | B7200 | B4800 | B2400
+serial_baudrate B115200
 
 ### tools END
 

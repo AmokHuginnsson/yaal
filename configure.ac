@@ -60,7 +60,7 @@ AC_CHECK_FILE(
 	[[/etc/rc]],
 	[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST________=['FreeBSD. ---  ']
 		AC_SUBST([ADDITIONAL_COMMAND],
-			[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);']]) AC_SUBST([SERIAL_PORT],['cuaa0'])],
+			[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);']]) AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
 	[AC_CHECK_FILE(
 		[[/etc/debconf.conf]],
 		[AC_DEFINE([[__HOST_OS_TYPE_DEBIAN__]]) _HOST________=['Debian. ---   ']],
@@ -73,7 +73,7 @@ AC_CHECK_FILE(
 				[AC_MSG_ERROR([Can not recognize host operating system type!])]
 			)]
 		)]
-	) AC_SUBST([SERIAL_PORT],['ttyS0'])]
+	) AC_SUBST([SERIAL_DEVICE],['ttyS0'])]
 )
 AC_MSG_RESULT([--- Guessed host operating system is $_HOST________     [[62%]]])
 

@@ -24,10 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <string.h>          /* strsignal */
-#include <unistd.h>          /* kill function           */
-#include <stdio.h>		       /* perror function         */
-#include <signal.h>		       /* signal handling         */
+#include <stdlib.h>  /* strtol */
+#include <string.h>  /* strsignal */
+#include <unistd.h>  /* kill function */
+#include <stdio.h>	 /* perror function */
+#include <signal.h>	 /* signal handling */
+#include <termios.h> /* B115200 */
 
 #include "../config.h"
 
@@ -39,16 +41,17 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "../hcore/hexception.h"
+#include "../hcore/hexception.h" /* M_PROLOG, M_EPILOG */
 M_CVSID ( "$CVSHeader$" );
 #include "../hcore/xalloc.h"
-#include "../hcore/rc_file.h"
-#include "../hconsole/console.h"         /* conio (ncurses) ability */
-#include "../hcore/hlog.h"            /* log object */
-#include "../hcore/hstring.h"         /* HString class */
+#include "../hcore/rc_file.h"    /* read conf from rc */
+#include "../hconsole/console.h" /* conio (ncurses) ability */
+#include "../hcore/hlog.h"       /* log object */
+#include "../hcore/hstring.h"    /* HString class */
 #include "signals.h"
 
-char * g_pcSerialPort = NULL;
+char * g_pcSerialDevice = NULL;
+int g_iBaudRate = B115200;
 
 namespace signals
 {
@@ -60,7 +63,7 @@ OVariable n_psVariables [ ] =
 	{
 		{ D_TYPE_BOOL, "ignore_signal_SIGINT", & n_bIgnoreSignalSIGINT },
 		{ D_TYPE_BOOL, "ignore_signal_SIGTSTP", & n_bIgnoreSignalSIGTSTP },
-		{ D_TYPE_CHAR_POINTER, "serial_port", & g_pcSerialPort },
+		{ D_TYPE_CHAR_POINTER, "serial_device", & g_pcSerialDevice },
 		{ 0, NULL, NULL }
 	};
 	
@@ -309,26 +312,48 @@ void set_handlers ( void )
 
 }
 
-/*
-void set_tools_variables ( HString & a_roOption, HString & a_roValue )
+/* return true means error occured, false - every thing ok */
+bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
-	return;
+	int l_iBaudRate = 0;
+	if ( ! strcasecmp ( a_roOption, "serial_baudrate" ) )
+		{
+		if ( a_roValue.get_length ( ) > 1 )
+			{
+			switch ( strtol ( ( ( char * ) a_roValue ) + 1, NULL, 10 ) )
+				{
+				case ( 115200 ): l_iBaudRate = B115200; break;
+				case (  76800 ): l_iBaudRate = B76800;  break;
+				case (  57600 ): l_iBaudRate = B57600;  break;
+				case (  38400 ): l_iBaudRate = B38400;  break;
+				case (  28800 ): l_iBaudRate = B28800;  break;
+				case (  19200 ): l_iBaudRate = B19200;  break;
+				case (  14400 ): l_iBaudRate = B14400;  break;
+				case (   9600 ): l_iBaudRate = B9600;   break;
+				case (   7200 ): l_iBaudRate = B7200;   break;
+				case (   4800 ): l_iBaudRate = B4800;   break;
+				case (   2400 ): l_iBaudRate = B2400;   break;
+				}
+			}
+		}
+	if ( l_iBaudRate )g_iBaudRate = l_iBaudRate;
+	return ( ! l_iBaudRate );
 	}
-*/
 
 void tools_init ( void ); __attribute__ ( ( constructor ) )
 void tools_init ( void )
 	{
 	g_iErrNo = 0;
-	rc_file::process_rc_file ( "stdhapi", "tools", signals::n_psVariables );
+	rc_file::process_rc_file ( "stdhapi", "tools", signals::n_psVariables,
+			set_tools_variables );
 	return;
 	}
 
 void tools_fini ( void ); __attribute__ ( ( destructor ) )
 void tools_fini ( void )
 	{
-	if ( g_pcSerialPort )xfree ( ( void * ) g_pcSerialPort );
-	g_pcSerialPort = NULL;
+	if ( g_pcSerialDevice )xfree ( ( void * ) g_pcSerialDevice );
+	g_pcSerialDevice = NULL;
 	return;
 	}
 

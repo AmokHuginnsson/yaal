@@ -35,16 +35,13 @@ M_CVSID ( "$CVSHeader$" );
 #include "hserial.h"
 #include "signals.h"
 
-/* #define D_BAUDRATE B38400 */
-#define D_BAUDRATE B115200
-
 HSerial::HSerial ( const char * a_pcDevice )
 	{
 	M_PROLOG
 	f_iFileDes = 0;
 	memset ( & f_sTIO, 0, sizeof ( termios ) );
 	if ( a_pcDevice )f_oDevicePath = a_pcDevice;
-	else f_oDevicePath = g_pcSerialPort;
+	else f_oDevicePath = g_pcSerialDevice;
 /*
  *   BAUDRATE: Set bps rate. You could also use cfsetispeed and cfsetospeed.
  *   CRTSCTS : output hardware flow control  ( only used if the cable has
@@ -53,14 +50,14 @@ HSerial::HSerial ( const char * a_pcDevice )
  *             CLOCAL  : local connection,  no modem contol
  *             CREAD   : enable receiving characters
  */
-	f_sTIO.c_cflag = D_BAUDRATE | CRTSCTS | CS8 | CLOCAL | CREAD; 
+	f_sTIO.c_cflag = g_iBaudRate | CRTSCTS | CS8 | CLOCAL | CREAD; 
 /*
  *   statement above is *FALSE*, I can not use cfsetispeed and cfsetospeed,
- *   I *MUST* use it. On newwe systes c_cflag and BAUDRATE simply does not work
- *   newwer interface for setting speed (baudrate)
+ *   I *MUST* use it. On newwer systes c_cflag and BAUDRATE simply does not work.
+ *   Newwer interface for setting speed (baudrate)
  */
-	cfsetispeed ( & f_sTIO, D_BAUDRATE );
-	cfsetospeed ( & f_sTIO, D_BAUDRATE );
+	cfsetispeed ( & f_sTIO, g_iBaudRate );
+	cfsetospeed ( & f_sTIO, g_iBaudRate );
 /*
  *   IGNPAR  : ignore bytes with parity errors
  *   ICRNL   : map CR to NL  ( otherwise a CR input on the other computer

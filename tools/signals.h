@@ -34,6 +34,7 @@ void set_handlers ( void );
 
 	}
 
-extern char * g_pcSerialPort;
+extern char * g_pcSerialDevice;
+extern int g_iBaudRate;
 
 #endif /* not __SIGHAND_H */
