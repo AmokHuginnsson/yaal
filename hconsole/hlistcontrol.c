@@ -780,21 +780,9 @@ bool HListControl::parse_pattern ( void )
 		{
 		switch ( l_pcPattern [ l_iCtr ] )
 			{
-			case ( 'i' ):
-				{
-				f_sSearch.f_bIgnoreCase = true;
-				break;
-				}
-			case ( 'e' ):
-				{
-				f_sSearch.f_bExtended = true;
-				break;
-				}
-			case ( 'f' ):
-				{
-				f_sSearch.f_bFiltered = true;
-				break;
-				}
+			case ( 'i' ):{f_sSearch.f_bIgnoreCase = true;break;}
+			case ( 'e' ):{f_sSearch.f_bExtended = true;break;}
+			case ( 'f' ):{f_sSearch.f_bFiltered = true;break;}
 			default :
 				{
 				f_poParent->status_bar ( )->message ( "bad search option '%c'",
@@ -804,7 +792,6 @@ bool HListControl::parse_pattern ( void )
 			}
 		l_iCtr ++;
 		}
-	log ( "%c\n", l_pcPattern [ l_iCtr ] );
 	return ( false );
 	}
 

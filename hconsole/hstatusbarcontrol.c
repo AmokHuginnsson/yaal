@@ -314,15 +314,16 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 	{
 	M_PROLOG
 	int l_iCode = a_iCode;
+	int l_iMode = f_iMode;
 	a_iCode = 0;
 	switch ( l_iCode )
 		{
 		case ( '\r' ):
 			{
 			end_prompt ( );
-			if ( f_iMode == D_PROMPT_MODE_COMMAND )
+			if ( l_iMode == D_PROMPT_MODE_COMMAND )
 				f_poParent->f_oCommand = f_oString;
-			else if ( f_iMode == D_PROMPT_MODE_SEARCH )
+			else if ( l_iMode == D_PROMPT_MODE_SEARCH )
 				f_poParent->f_poPreviousFocusedChild->search ( f_oString );
 			break;
 			}
@@ -351,7 +352,7 @@ int HStatusBarControl::process_input_menu  ( int a_iCode )
 void HStatusBarControl::end_prompt ( void )
 	{
 	M_PROLOG
-	f_iMode = 0;
+	f_iMode = D_PROMPT_MODE_NORMAL;
 	f_oPrompt = "";
 	f_iPromptLength = 0;
 	f_poParent->f_poFocusedChild = f_poParent->f_poPreviousFocusedChild;
