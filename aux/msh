@@ -43,6 +43,9 @@ echo "setenv LD_LIBRARY_PATH ~/lib"
 echo "#v-"
 echo -n "Do it now ? (yes/[no]) "
 read ANSWER
+if [ -f stdhapirc ] ; then
+	cd aux
+fi
 if [ "$ANSWER" ] ; then
 	if [ $ANSWER = "yes" ] ; then
 		export USER=`whoami`
@@ -80,6 +83,9 @@ else
 fi
 source ./shellrc 2>/dev/null
 source ./shellrc.csh 2>/dev/null
+if [ -f shellrc ] ; then
+	cd ..
+fi
 echo "Installation process ends."
 
 exit 0
