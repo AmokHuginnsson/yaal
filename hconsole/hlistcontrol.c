@@ -62,6 +62,8 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iCursorPosition = 0;
 	f_iSumForOne = 0;
 	f_poFirstVisibleRow = NULL;
+	f_iSortColumn = 0;
+	cmp = ( int ( HList<HItem>::* ) ( HElement *, HElement * ) ) & HListControl::cmpc;
 	refresh ( );
 	return;
 	M_EPILOG
@@ -524,6 +526,20 @@ HItem & HListControl::add_tail ( HItem & a_roItem )
 	if ( ! f_poFirstVisibleRow )f_poFirstVisibleRow = f_poHook;
 	f_poSelected = f_poHook;
 	to_head ( );
+	console::n_bNeedRepaint = true;
+	return ( * l_poDummy );
+	M_EPILOG
+	}
+
+HItem & HListControl::add_orderly ( HItem & a_roItem )
+	{
+	M_PROLOG
+	HItem * l_poDummy = NULL;
+	l_poDummy = & HList < HItem > ::add_orderly ( a_roItem );
+	f_iCursorPosition = 0;
+	f_iControlOffset = 0;
+	f_poFirstVisibleRow = f_poHook;
+	f_poSelected = f_poHook;
 	console::n_bNeedRepaint = true;
 	return ( * l_poDummy );
 	M_EPILOG

@@ -92,6 +92,7 @@ public:
 										HControl * = NULL );					/* control associated */
 	virtual HItem & add_tail ( void );
 	virtual HItem & add_tail ( HItem & );
+	virtual HItem & add_orderly ( HItem & );
 	virtual HItem remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	virtual HItem remove_tail ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	/*}*/
