@@ -48,6 +48,8 @@ M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hstring.h"         /* HString class */
 #include "signals.h"
 
+char * g_pcSerialPort = NULL;
+
 namespace signals
 {
 
@@ -58,6 +60,7 @@ OVariable n_psVariables [ ] =
 	{
 		{ D_TYPE_BOOL, "ignore_signal_SIGINT", & n_bIgnoreSignalSIGINT },
 		{ D_TYPE_BOOL, "ignore_signal_SIGTSTP", & n_bIgnoreSignalSIGTSTP },
+		{ D_TYPE_CHAR_POINTER, "serial_port", & g_pcSerialPort },
 		{ 0, NULL, NULL }
 	};
 	

@@ -33,6 +33,7 @@ Copyright:
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hserial.h"
+#include "signals.h"
 
 /* #define D_BAUDRATE B38400 */
 #define D_BAUDRATE B115200
@@ -42,7 +43,8 @@ HSerial::HSerial ( const char * a_pcDevice )
 	M_PROLOG
 	f_iFileDes = 0;
 	memset ( & f_sTIO, 0, sizeof ( termios ) );
-	f_oDevicePath = a_pcDevice;
+	if ( a_pcDevice )f_oDevicePath = a_pcDevice;
+	else f_oDevicePath = g_pcSerialPort;
 /*
  *   BAUDRATE: Set bps rate. You could also use cfsetispeed and cfsetospeed.
  *   CRTSCTS : output hardware flow control  ( only used if the cable has

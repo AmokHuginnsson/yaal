@@ -34,4 +34,6 @@ void set_handlers ( void );
 
 	}
 
+extern char * g_pcSerialPort;
+
 #endif /* not __SIGHAND_H */

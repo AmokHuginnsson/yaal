@@ -87,6 +87,9 @@ ignore_signal_SIGINT true
 # is CTRL-z ignored by process?
 ignore_signal_SIGTSTP true
 
+# default serial port
+serial_port /dev/@SERIAL_PORT@
+
 ### tools END
 
 ### dbwrapper BEGIN
