@@ -285,7 +285,7 @@ install: all
 	@./aux/msh
 
 $(HCORE): $(OBJ4hcore)
-	@$(MAKE) $(HCORE)\' TARGET=$(HCORE)\' NAME=hcore LIBS="-lintl"
+	@$(MAKE) $(HCORE)\' TARGET=$(HCORE)\' NAME=hcore LIBS="@GETTEXT_LIB@"
 
 $(HCONSOLE): $(HCORE) $(OBJ4hconsole)
 	@$(MAKE) $(HCONSOLE)\' TARGET=$(HCONSOLE)\' NAME=hconsole LIBS="-lncurses -lhcore"

@@ -112,6 +112,17 @@ int main()
 	}
 ]],[AC_SUBST([DLOPEN_IN],[-ldl])],[])
 
+dnl Test if gettext is in libc or in separate library intl.
+dnl This one is silent.
+CXXFLAGS=["-lintl"]
+AC_LINK_IFELSE([[#include <libintl.h>
+int main()
+	{
+	gettext("");
+	return(0);
+	}
+]],[AC_SUBST([GETTEXT_LIB],[-lintl])],[])
+
 DEFAULT_DRIVER=["null"]
 
 dnl Now we can look for all needed libraries.
