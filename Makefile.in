@@ -119,7 +119,6 @@ OBJ4hcore += hlist
 OBJ4hcore += hlog
 OBJ4hcore += hmap
 OBJ4hcore += hmatrix
-OBJ4hcore += hobject
 OBJ4hcore += hpattern
 OBJ4hcore += hpool
 OBJ4hcore += hrandomizer

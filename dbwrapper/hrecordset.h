@@ -34,14 +34,13 @@ Copyright:
 #define D_MODE_EDITING	2
 #define D_MODE_OPENED		D_MODE_NORMAL
 
-#include "../hcore/hobject.h"
 #include "../hcore/hstring.h"
 #include "../hcore/hstringlist.h"
 #include "../hcore/htime.h"
 #include "../hcore/hinfo.h"
 #include "hdatabase.h"
 
-class HRecordSet : public HObject
+class HRecordSet
 	{
 private:
 	/*{*/
@@ -87,7 +86,6 @@ public:
 	/*{*/
 	HRecordSet ( HDataBase * );
 	virtual ~HRecordSet ( void );
-	HObject * clone ( void ) const;
 	HString get ( int );
 	bool is_eof ( void );
 	bool is_bof ( void );

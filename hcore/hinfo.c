@@ -96,16 +96,6 @@ HInfo::HInfo ( const HTime & a_roTime )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( const HObject * a_poObject )
-	{
-	M_PROLOG
-	purge ( );
-	f_iType = D_TYPE_HOBJECT;
-	( * this ) = a_poObject;
-	return;
-	M_EPILOG
-	}
-
 HInfo::HInfo ( const HInfo & a_roInfo, int )
 	{
 	M_PROLOG
@@ -118,11 +108,6 @@ HInfo::HInfo ( const HInfo & a_roInfo, int )
 HInfo::~HInfo ( void )
 	{
 	M_PROLOG
-	if ( f_poObject )
-		{
-		delete f_poObject;
-		f_poObject = NULL;
-		}
 	return;
 	M_EPILOG
 	}
@@ -136,7 +121,6 @@ void HInfo::purge ( void )
 	f_dDouble = 0;
 	f_oString = "";
 	f_oTime = HTime ( );
-	f_poObject = NULL;
 	f_pvPointer = NULL;
 	return;
 	M_EPILOG
@@ -158,15 +142,6 @@ HInfo & HInfo::operator = ( const HInfo & a_roInfo )
 	f_dDouble = a_roInfo.f_dDouble;
 	f_oString = a_roInfo.f_oString;
 	f_oTime = a_roInfo.f_oTime;
-	if ( a_roInfo.f_poObject )
-		{
-		if ( f_poObject )
-			{
-			delete f_poObject;
-			f_poObject = NULL;
-			}
-		f_poObject = a_roInfo.f_poObject->clone ( );
-		}
 	f_pvPointer = a_roInfo.f_pvPointer;
 	return ( * this );
 	M_EPILOG
@@ -208,17 +183,6 @@ void * HInfo::operator = ( void * a_pvPointer )
 	M_EPILOG
 	}
 
-/*
-HString & HInfo::operator = ( const HString & a_roString )
-	{
-	M_PROLOG
-	f_iType |= D_TYPE_HSTRING;
-	f_oString = a_roString;
-	return ( f_oString );
-	M_EPILOG
-	}
-*/
-	
 HString & HInfo::operator = ( const char * a_pcString )
 	{
 	M_PROLOG
@@ -234,22 +198,6 @@ HTime & HInfo::operator = ( const HTime & a_roTime )
 	f_iType |= D_TYPE_HTIME;
 	f_oTime = a_roTime;
 	return ( f_oTime );
-	M_EPILOG
-	}
-
-HObject * HInfo::operator = ( const HObject * a_poObject )
-	{
-	M_PROLOG
-	if ( ! a_poObject )
-		throw new HException ( __WHERE__, "bad casting", g_iErrNo );
-	f_iType |= D_TYPE_HOBJECT;
-	if ( f_poObject )
-		{
-		delete f_poObject;
-		f_poObject = NULL;
-		}
-	f_poObject = a_poObject->clone ( );
-	return ( f_poObject );
 	M_EPILOG
 	}
 
@@ -288,13 +236,6 @@ HInfo::operator HTime & ( void )
 	M_EPILOG
 	}
 
-HInfo::operator HObject & ( void )
-	{
-	M_PROLOG
-	return ( * f_poObject );
-	M_EPILOG
-	}
-
 HInfo::operator void * ( void )
 	{
 	M_PROLOG
@@ -309,28 +250,3 @@ HInfo::operator bool ( void )
 	M_EPILOG
 	}
 
-/*
-long int operator = ( long int & a_rlLongInt, HInfo & a_roInfo )
-	{
-	M_PROLOG
-	a_rlLongInt = a_roInfo.f_lLongInt;
-	return ( a_rlLongInt );
-	M_EPILOG
-	}
-
-double operator = ( double & a_rdDouble, HInfo & a_roInfo )
-	{
-	M_PROLOG
-	a_roInfo = a_roInfo.f_dDouble;
-	return ( a_rdDouble );
-	M_EPILOG
-	}
-
-HString operator = ( HString & a_roString, HInfo & a_roInfo )
-	{
-	M_PROLOG
-	a_roString = a_roInfo.f_oString;
-	return ( a_roString );
-	M_EPILOG
-	}
-*/

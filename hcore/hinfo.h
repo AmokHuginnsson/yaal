@@ -27,7 +27,6 @@ Copyright:
 #ifndef __HINFO_H
 #define __HINFO_H
 
-#include "hobject.h"
 #include "hstring.h"
 #include "htime.h"
 #include "hexception.h" /* types definitions */
@@ -43,7 +42,6 @@ protected:
 	void *		f_pvPointer;
 	HString		f_oString;
 	HTime			f_oTime;
-	HObject * f_poObject;
 	/*}*/
 public:
 	/*{*/
@@ -53,7 +51,6 @@ public:
 	HInfo ( const double & );
 	HInfo ( const char * );
 	HInfo ( const HTime & );
-	HInfo ( const HObject * );
 	HInfo ( void * );
 	HInfo ( const HInfo &, int = 0 );
 	virtual ~HInfo ( void );
@@ -62,26 +59,20 @@ public:
 	int & operator = ( const int & );
 	long int & operator = ( const long int & );
 	double & operator = ( const double & );
-/*	HString & operator = ( const HString & ); */
 	HString & operator = ( const char * );
 	HTime & operator = ( const HTime & );
-	HObject * operator = ( const HObject * );
 	void * operator = ( void * );
 	operator int & ( void );
 	operator long int & ( void );
 	operator double & ( void );
 	operator HString & ( void );
 	operator HTime & ( void );
-	operator HObject & ( void );
 	operator void * ( void );
 	operator bool ( void );
 	/*}*/
 protected:
 	/*{*/
 	void purge ( void );
-/*	friend long int operator = ( long int &, HInfo & );
-	friend double operator = ( double &, HInfo & );
-	friend HString operator = ( HString &, HInfo & ); */
 	/*}*/
 	};
 

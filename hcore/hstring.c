@@ -52,7 +52,7 @@ HString::~HString ( void )
 	M_EPILOG
 	}
 
-HString::HString ( const HString & a_roString ) : HObject ( )
+HString::HString ( const HString & a_roString )
 	{
 	M_PROLOG
 	f_pcBuffer = NULL;
@@ -87,17 +87,6 @@ void HString::hs_realloc ( const size_t a_iSize )
 		memset ( f_pcBuffer + l_iOldLength, 0, f_iSize - l_iOldLength );
 		}
 	return;
-	M_EPILOG
-	}
-
-HObject * HString::clone ( void ) const
-	{
-	M_PROLOG
-	HString * l_poObject = 0;
-	l_poObject = new HString ( * this );
-	if ( ! l_poObject )
-		throw new HException ( __WHERE__, "new returned", ( int ) l_poObject );
-	return ( l_poObject );
 	M_EPILOG
 	}
 

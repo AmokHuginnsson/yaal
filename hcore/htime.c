@@ -41,7 +41,7 @@ HTime::HTime ( const char * a_pcFormat )
 	M_EPILOG
 	}
 
-HTime::HTime ( const HTime & a_roTime, int ) : HObject ( )
+HTime::HTime ( const HTime & a_roTime, int )
 	{
 	M_PROLOG
 	( * this ) = a_roTime;
@@ -63,17 +63,6 @@ HTime::~HTime ( void )
 	{
 	M_PROLOG
 	return;
-	M_EPILOG
-	}
-
-HObject * HTime::clone ( void ) const
-	{
-	M_PROLOG
-	HObject * l_poObject = NULL;
-	l_poObject = new HTime ( * this );
-	if ( ! l_poObject )
-		throw new HException ( __WHERE__, "new returned", ( int ) l_poObject );
-	return ( l_poObject );
 	M_EPILOG
 	}
 

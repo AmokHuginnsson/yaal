@@ -29,9 +29,7 @@ Copyright:
 
 #include <stddef.h>
 
-#include "hobject.h"
-
-class HString : public HObject
+class HString
 	{
 protected:
 	/*{*/
@@ -45,7 +43,6 @@ public:
 	HString ( const size_t ); /* initialize immediately with size */
 	virtual ~HString ( void ) ;
 	void hs_realloc ( const size_t );
-	virtual HObject * clone ( void ) const;
 	HString ( const char * );
 	HString ( char );
 	HString ( int );

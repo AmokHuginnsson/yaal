@@ -61,17 +61,6 @@ HRecordSet::~HRecordSet ( void )
 	M_EPILOG
 	}
 
-HObject * HRecordSet::clone ( void ) const
-	{
-	M_PROLOG
-	HRecordSet * l_poObject = NULL;
-	l_poObject = new HRecordSet ( * this );
-	if ( ! l_poObject )
-		throw new HException ( __WHERE__, "new returned", ( int ) l_poObject );
-	return ( l_poObject );
-	M_EPILOG
-	}
-
 void HRecordSet::sync ( void )
 	{
 	M_PROLOG 

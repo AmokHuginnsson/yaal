@@ -29,12 +29,11 @@ Copyright:
 
 #include <time.h>
 
-#include "hobject.h"
 #include "hstring.h"
 
 #define D_DEFAULT_TIME_FORMAT	"%a, %d %b %Y %T %z"
 
-class HTime : public HObject
+class HTime
 	{
 protected:
 	/*{*/
@@ -50,7 +49,6 @@ public:
 	HTime ( const int, const int, const int, const int = 0, const int = 0,
 			const int = 0 );
 	virtual ~HTime ( void );
-	virtual HObject * clone ( void ) const;
 	void set_now ( void );
 	void format ( const char * = D_DEFAULT_TIME_FORMAT );
 	void set_time ( const int = 0, const int = 0, const int = 0 );
