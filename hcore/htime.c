@@ -26,6 +26,8 @@ Copyright:
 
 #include <string.h>
 
+#include "../config.h"
+
 #include "htime.h"
 
 #include "hexception.h"
@@ -229,10 +231,16 @@ HTime::operator HString & ( void )
 	{
 	M_PROLOG
 	int l_iSize = 0;
+#ifdef __HOST_OS_TYPE_FREEBSD__
+	f_oBuffer.hs_realloc ( 64 ); /* that is pretty dumb hack */
+	l_iSize = strftime ( f_oBuffer, 63, f_oFormat, & f_sBroken ) + 1;
+	if ( l_iSize < 2 )throw new HException ( __WHERE__, "bad format", g_iErrNo );
+#else /* __HOST_OS_TYPE_FREEBSD__ */
 	l_iSize = strftime ( NULL, 1024, f_oFormat, & f_sBroken ) + 1;
 	if ( l_iSize < 2 )throw new HException ( __WHERE__, "bad format", g_iErrNo );
 	f_oBuffer.hs_realloc ( l_iSize );
 	strftime ( f_oBuffer, l_iSize, f_oFormat, & f_sBroken );
+#endif /* not __HOST_OS_TYPE_FREEBSD__ */
 	return ( f_oBuffer );
 	M_EPILOG
 	}
