@@ -649,6 +649,7 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 	{
 	M_PROLOG
+	if ( ! f_bSortable )return;
 	f_iSortColumn = a_iColumn;
 	f_iOrder = a_iOrder;
 	f_lComparedItems = 0;
