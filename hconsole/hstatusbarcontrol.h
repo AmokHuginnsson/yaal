@@ -63,6 +63,8 @@ public:
 	void update_progress ( double = -1, const char * = NULL );
 	void message ( int, const char *, ... );
 	void message ( const char *, ... );
+	void bar ( const char * = NULL );
+	int ask ( const char *, const char * );
 	bool confirm ( const char * );
 	/*}*/
 	};

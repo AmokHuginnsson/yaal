@@ -24,7 +24,6 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
@@ -73,7 +72,9 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 			{
 			l_poWindow = ( HDataWindow * ) ( void * ) f_poWindows->to_tail ( 1,
 					& l_iFlag ) [ 0 ];
-			if ( l_poWindow && l_poWindow->is_modified ( ) )
+			if ( l_poWindow
+					&& ( dynamic_cast < HDataWindow * > ( ( HWindow * ) l_poWindow ) )
+					&& l_poWindow->is_modified ( ) )
 				{
 				f_poForegroundWindow = l_poWindow;
 				handler_refresh ( 0 );
@@ -93,7 +94,9 @@ int HDataProcess::handler_close_window ( int a_iCode, void * )
 	if ( f_poForegroundWindow )
 		{
 		l_poWindow = ( HDataWindow * ) f_poForegroundWindow;
-		if ( l_poWindow->is_modified ( )
+		if ( l_poWindow
+				&& ( dynamic_cast < HDataWindow * > ( ( HWindow * ) l_poWindow ) )
+				&& l_poWindow->is_modified ( )
 				&& ! l_poWindow->status_bar ( )->confirm ( "close window" ) )
 			return ( 0 );
 		}

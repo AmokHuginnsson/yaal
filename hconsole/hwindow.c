@@ -303,8 +303,8 @@ int HWindow::handler_search ( int a_iCode )
 	f_poPreviousFocusedChild = f_poFocusedChild;
 	f_poFocusedChild = f_poStatusBar;
 	f_poPreviousFocusedChild->kill_focus ( );
-	f_poStatusBar->enable ( true );
 	f_poStatusBar->set_focus ( -1 );
+	f_poStatusBar->set_prompt ( "/" );
 	return ( a_iCode );
 	M_EPILOG
 	}

@@ -60,6 +60,7 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 	f_iLastProgress = -1;
 	f_iLastPercent = -1;
 	f_dProgressSize = 1;
+	f_oMessage = ""; /* initialization of this field is required by bar() meth */
 	return;
 	M_EPILOG
 	}
@@ -77,6 +78,7 @@ void HStatusBarControl::draw_label ( void )
 	::move ( console::n_iHeight - 2, 0 );
 	::clrtoeol ( );
 	HControl::draw_label ( );
+	bar ( );
 	f_iColumnRaw += f_iPromptLength;
 	f_iWidthRaw -= f_iPromptLength;
 	::move ( f_iRowRaw, f_iPromptLength );
@@ -172,7 +174,6 @@ void HStatusBarControl::update_progress ( double a_dStep,
 			l_oNow = ( time_t ) ( f_dProgressSize / a_dStep * l_oStoper );
 		l_oLeft = l_oNow - l_oStoper;
 		}
-	if ( a_pcTitle )f_oMessage = a_pcTitle;
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
 	l_iMaxBar = console::n_iWidth - 6 - 10 - 2 - ( f_bEstimate ? 10 : 0 );
 	l_iNextPercent = ( int ) ( 100. * a_dStep / f_dProgressSize );
@@ -187,11 +188,7 @@ void HStatusBarControl::update_progress ( double a_dStep,
 			|| ( f_iLastSecond != l_iNextSecond ))
 		{
 		refresh ( );
-		f_oVarTmpBuffer.format ( " %%-%ds ",
-				console::n_iWidth - f_iLabelLength - ( f_bSingleLine ? 2 : 1 ) );
-		f_oString.format ( f_oVarTmpBuffer, ( const char * ) f_oMessage );
-		::mvprintw ( console::n_iHeight - 2,
-				f_iLabelLength - ( f_bSingleLine ? 0 : 1 ), f_oString );
+		bar ( a_pcTitle );
 		if ( f_bEstimate )
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", l_iMaxBar );
@@ -250,9 +247,37 @@ void HStatusBarControl::message ( const char * a_pcFormat, ... )
 	M_EPILOG
 	}
 
+void HStatusBarControl::bar ( const char * a_pcBar )
+	{
+	M_PROLOG
+	M_SET_ATTR_DATA ( );
+	if ( a_pcBar )
+		{
+		f_oVarTmpBuffer.format ( " %%-%ds ",
+				console::n_iWidth - f_iLabelLength - ( f_bSingleLine ? 2 : 1 ) );
+		f_oMessage.format ( f_oVarTmpBuffer, a_pcBar );
+		}
+	::mvprintw ( console::n_iHeight - 2,
+			f_iLabelLength - ( f_bSingleLine ? 0 : 1 ), f_oMessage );
+	return;
+	M_EPILOG
+	}
+
+int HStatusBarControl::ask ( const char * a_pcQuestion,
+		const char * a_pcPrompt )
+	{
+	M_PROLOG
+	bar ( a_pcQuestion );
+	set_prompt ( a_pcPrompt );
+	return ( 0 );
+	M_EPILOG
+	}
+
 bool HStatusBarControl::confirm ( const char * a_pcQuestion )
 	{
-	message ( a_pcQuestion );
-	return ( true );
+	M_PROLOG
+	ask ( a_pcQuestion, "[yes/no]: " );
+	return ( false );
+	M_EPILOG
 	}
 
