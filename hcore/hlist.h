@@ -350,7 +350,7 @@ tType & HList< tType >::add_head ( tType a_tObject )
 	f_iQuantity ++;
 	if ( a_tObject )f_poHook->put ( a_tObject );
 	else f_poHook->get_object ( ) = a_tObject;
-	f_poIndex = f_poIndex->f_poPrevious;
+	if ( f_poIndex )f_poIndex = f_poIndex->f_poPrevious;
 	return ( f_poHook->f_tObject );
 	M_EPILOG
 	}
@@ -414,7 +414,7 @@ tType & HList< tType >::add_at ( int a_iIndex, tType a_tObject )
 	f_iQuantity ++;
 	if ( a_tObject )l_poElement->put ( a_tObject );
 	else l_poElement->get_object ( ) = a_tObject;
-	if ( a_iIndex <= f_iIndex )f_poIndex = f_poIndex->f_poPrevious;
+	if ( f_poIndex && ( a_iIndex <= f_iIndex ) )f_poIndex = f_poIndex->f_poPrevious;
 	return ( l_poElement->f_tObject );
 	M_EPILOG
 	}
@@ -492,7 +492,7 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag )
 	else throw new HException ( __WHERE__, "list was empty", g_iErrNo );
 	if ( l_poElement == f_poHook ) f_poHook = f_poHook->f_poNext;
 	if ( l_poElement == f_poSelected ) f_poSelected = f_poSelected->f_poNext;
-	if ( a_iIndex <= f_iIndex )f_poIndex = f_poIndex->f_poNext;
+	if ( f_poIndex && ( a_iIndex <= f_iIndex ) )f_poIndex = f_poIndex->f_poNext;
 	delete l_poElement;
 	f_iQuantity--;
 	if ( f_iQuantity == 0 )
@@ -609,7 +609,7 @@ tType HList< tType >::remove_head ( int * a_piFlag )
 		}
 	else throw new HException ( __WHERE__, "list was empty", g_iErrNo );
 	if ( l_poElement == f_poSelected ) f_poSelected = l_poElement->f_poNext;
-	f_poIndex = f_poIndex->f_poNext;
+	if ( f_poIndex )f_poIndex = f_poIndex->f_poNext;
 	delete l_poElement;
 	f_iQuantity--;
 	if ( f_iQuantity == 0 )
