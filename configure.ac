@@ -14,6 +14,8 @@ AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQ
 dnl `
 AC_ARG_WITH([sqlite],[AC_HELP_STRING([--with-sqlite],[Compile with SQLite driver, dafault is `yes' if SQLite can be found.])],[SQLITE=$withval],[SQLITE="auto"])
 dnl `
+AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, dafault is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
+dnl `
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 
@@ -176,6 +178,12 @@ if test ["$SQLITE"] != ["no"] ; then
 											AC_MSG_ERROR([Can not continue without SQLite.])
 										fi;SQLITE=["no"]])
 fi
+if test ["$SQLITE3"] != ["no"] ; then
+	AC_CHECK_LIB([sqlite3],[sqlite3_open],
+								[],[if test ["$SQLITE3"] = ["yes"] ; then
+											AC_MSG_ERROR([Can not continue without SQLite3.])
+										fi;SQLITE3=["no"]])
+fi
 if test ["$MYSQL"] != ["no"] ; then
 	AC_CHECK_LIB([mysqlclient],[mysql_init],[],[
 			CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]
@@ -229,6 +237,14 @@ if test ["$SQLITE"] != ["no"] ; then
 					AC_MSG_ERROR([[Can not continue without SQLite devel(client)!]])
 				fi;SQLITE=["no"]])
 fi
+if test ["$SQLITE3"] != ["no"] ; then
+	AC_CHECK_HEADERS([[sqlite3.h]],
+		[AC_SUBST([TARGET_SQLITE3_DRIVER],["\$(SQLITE3_DRIVER)"])
+			DEFAULT_DRIVER=["SQLite3"]],
+				[if test ["$SQLITE3"] = ["yes"] ; then
+					AC_MSG_ERROR([[Can not continue without SQLite3 devel(client)!]])
+				fi;SQLITE3=["no"]])
+fi
 AC_SUBST([DEFAULT_DRIVER],["$DEFAULT_DRIVER"])
 
 AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
@@ -270,7 +286,7 @@ AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
 AC_CONFIG_COMMANDS_PRE([cd doc/html;
 												ln -sf stdhapi_toc.html index.html;cd ../..])
 
-if test ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a ["$SQLITE"] = ["no"] ; then
+if test ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a ["$SQLITE"] = ["no"] -a ["SQLITE3"] = ["no"] ; then
 	AC_MSG_WARN([stdhapi without any data base driver will be
                     unusable for most professional purpouses.])
 fi

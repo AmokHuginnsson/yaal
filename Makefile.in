@@ -44,6 +44,7 @@ TOOLS = $(TARGETDIR)/libtools.so.$(RELEASE)
 MYSQL_DRIVER = $(TARGETDIR)/libmysql_driver.so.$(RELEASE)
 POSTGRESQL_DRIVER = $(TARGETDIR)/libpostgresql_driver.so.$(RELEASE)
 SQLITE_DRIVER = $(TARGETDIR)/libsqlite_driver.so.$(RELEASE)
+SQLITE3_DRIVER = $(TARGETDIR)/libsqlite3_driver.so.$(RELEASE)
 DBWRAPPER = $(TARGETDIR)/libdbwrapper.so.$(RELEASE)
 HDATA = $(TARGETDIR)/libhdata.so.$(RELEASE)
 HS = .h
@@ -176,6 +177,8 @@ OBJ4postgresql_driver =
 OBJ4postgresql_driver += postgresql_driver
 OBJ4sqlite_driver = 
 OBJ4sqlite_driver += sqlite_driver
+OBJ4sqlite3_driver = 
+OBJ4sqlite3_driver += sqlite3_driver
 OBJ4dbwrapper = 
 OBJ4dbwrapper += db_driver_loader
 OBJ4dbwrapper += dbwrapper
@@ -237,11 +240,16 @@ OBJ4postgresql_driver := $(patsubst %!.o,%.oo, $(OBJ4postgresql_driver))
 OBJ4sqlite_driver := $(strip $(OBJ4sqlite_driver))
 OBJ4sqlite_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite_driver))
 OBJ4sqlite_driver := $(patsubst %!.o,%.oo, $(OBJ4sqlite_driver))
+OBJ4sqlite3_driver := $(strip $(OBJ4sqlite3_driver))
+OBJ4sqlite3_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite3_driver))
+OBJ4sqlite3_driver := $(patsubst %!.o,%.oo, $(OBJ4sqlite3_driver))
 HDR4dbwrapper := $(patsubst %.o,%.h, $(OBJ4dbwrapper))
 SRCS += $(patsubst %.h,%.c, $(HDR4dbwrapper))
 HDR4dbwrapper := $(patsubst %.oo,%.h, $(HDR4dbwrapper))
 SRCS += $(patsubst %.o,%.c, $(OBJ4mysql_driver))
 SRCS += $(patsubst %.o,%.c, $(OBJ4postgresql_driver))
+SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite_driver))
+SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite3_driver))
 
 SRCEXS := $(filter %.oo, $(SRCS))
 SRCS := $(filter-out %.oo, $(SRCS))
@@ -282,7 +290,7 @@ $(TARGET):
 #phony targets
 .PHONY: all nodebug install dep clean tags mrproper purge
 
-all: $(HAPIHDR) .depend $(CACHE) $(HCORE) $(HCONSOLE) $(TOOLS) @TARGET_MYSQL_DRIVER@ @TARGET_POSTGRESQL_DRIVER@ @TARGET_SQLITE_DRIVER@ $(DBWRAPPER) $(HDATA)
+all: $(HAPIHDR) .depend $(CACHE) $(HCORE) $(HCONSOLE) $(TOOLS) @TARGET_MYSQL_DRIVER@ @TARGET_POSTGRESQL_DRIVER@ @TARGET_SQLITE_DRIVER@ @TARGET_SQLITE3_DRIVER@ $(DBWRAPPER) $(HDATA)
 
 nodebug:
 	@( export NODEBUG="yes";\
@@ -312,6 +320,9 @@ $(POSTGRESQL_DRIVER): $(HCORE) $(OBJ4postgresql_driver)
 	
 $(SQLITE_DRIVER): $(HCORE) $(OBJ4sqlite_driver)
 	@$(MAKE) $(SQLITE_DRIVER)\' TARGET=$(SQLITE_DRIVER)\' NAME=sqlite_driver LIBS="-lsqlite -lhcore"
+	
+$(SQLITE3_DRIVER): $(HCORE) $(OBJ4sqlite3_driver)
+	@$(MAKE) $(SQLITE3_DRIVER)\' TARGET=$(SQLITE3_DRIVER)\' NAME=sqlite3_driver LIBS="-lsqlite3 -lhcore"
 # dbwrapper END
 
 $(HDATA): $(HCONSOLE) $(OBJ4hdata)
