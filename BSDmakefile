@@ -5,13 +5,13 @@ all: Makefile
 	@echo "Invoking GNU make (gmake)."
 	@gmake all
 
-Makefile: configure
+Makefile: Makefile.in configure
 	@make banner
 	@echo "Generating \`Makefile' and rest of necessary files."
 	@./configure
 	@echo "Ready for \`make'."
 
-configure:
+configure: configure.ac
 	@make banner
 	@echo -n "Generating \`configure' script ... "
 	-@autoconf 2> /dev/null
