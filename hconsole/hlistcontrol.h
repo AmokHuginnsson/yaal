@@ -120,6 +120,7 @@ public:
 	virtual HItem & add_orderly ( HItem & );
 	virtual HItem * remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	virtual HItem * remove_tail ( int * = D_BLOCK_IF_NOT_EMPTIED );
+	virtual bool is_searchable ( void );
 	virtual int click ( mouse::OMouse & );
 	/*}*/
 protected:

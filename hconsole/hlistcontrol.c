@@ -754,3 +754,8 @@ int HListControl::click ( mouse::OMouse & a_rsMouse )
 	M_EPILOG
 	}
 
+bool HListControl::is_searchable ( void )
+	{
+	return ( f_bSearchable );
+	}
+
