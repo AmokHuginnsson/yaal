@@ -100,8 +100,10 @@ protected:
 	HElement * f_poSelected;	/* local temporary pointer, "cursor" */
 /* for internal use only */
 	int f_iOrder;							/* last-to-current sort order */
-	int f_iIndex;							/* this two fiels will allow boost operator [ ], int holds last */
-	HElement * f_poIndex;			/* index and HElement * holds pointer to this last element */
+	int f_iIndex;							/* this two fiels will allow boost operator [ ],
+															 int holds last */
+	HElement * f_poIndex;			/* index and HElement * holds pointer to this
+															 last element */
 	/*}*/
 public:
 	/*{*/
@@ -120,6 +122,9 @@ public:
 	virtual tType & add_at ( int, tType ); /* adds new element at specified 
 																						position */
 	virtual tType & add_at ( int );
+	virtual tType & add_orderly ( tType, int = D_ASCENDING ); /* adds element in
+																															 the way that
+																															 keeps order */
 	virtual tType remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED, int * = D_TREAT_AS_CLOSED );    
 	/* rmoves element at current cursor position */
 	virtual tType remove_at ( int, int * = D_BLOCK_IF_NOT_EMPTIED, int * = D_TREAT_AS_CLOSED );
@@ -370,7 +375,7 @@ tType & HList< tType >::add_tail ( tType a_tObject )
 	HElement * l_poElement = NULL;
 	if ( f_iQuantity == 0 )
 		f_poHook = l_poElement = f_poSelected =
-			new HElement ( 0, f_iHighestNumber );
+			new HElement ( NULL, f_iHighestNumber );
 	else l_poElement = new HElement ( f_poHook, f_iHighestNumber );
 	f_iHighestNumber ++;
 	f_iQuantity ++;
@@ -424,7 +429,28 @@ tType & HList< tType >::add_at ( int a_iIndex )
 	return ( add_at ( a_iIndex, l_tDummy ) );
 	M_EPILOG
 	}
-	
+
+template < class tType >
+tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
+	{
+	M_PROLOG
+	int l_iIndex = 0, l_iLower = 0, l_iUpper = f_iQuantity - 1;
+	HElement * l_poElement = NULL;
+	while ( l_iUpper >= l_iLower )
+		{
+		l_iIndex = ( l_iLower + l_iUpper ) / 2;
+		l_poElement = element_by_index ( l_iIndex );
+		f_poSelected = l_poElement;
+		if ( ( compare_contents ( l_poElement->f_tObject,
+						a_tObject ) * a_iOrder ) > 0 )
+			l_iLower = l_iIndex + ( l_iIndex == l_iLower ? 1 : 0 );
+		else if ( l_iUpper > l_iIndex )l_iUpper = l_iIndex;
+		else break;
+		}
+	return ( add_element ( a_tObject ) );
+	M_EPILOG
+	}
+
 template < class tType >
 tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat )
 	{
