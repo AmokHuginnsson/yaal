@@ -601,6 +601,14 @@ HItem HListControl::remove_element ( int * a_piFlag )
 	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
 		f_iCursorPosition --;
 	else l_bFlag = false;
+	if ( f_poSelected == f_poFirstVisibleRow )
+		{
+		l_poElement = f_poSelected;
+		f_poSelected = f_poFirstVisibleRow;
+		to_tail ( );
+		f_poFirstVisibleRow = f_poSelected;
+		f_poSelected = l_poElement;
+		}
 	console::n_bNeedRepaint = true;
 	l_oItem = HList < HItem > ::remove_element ( a_piFlag );
 	if ( l_bFlag )to_head ( );
