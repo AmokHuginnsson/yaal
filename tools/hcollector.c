@@ -60,6 +60,7 @@ bool HCollector::test_char ( const char * a_pcBuffer, int a_iIndex )
 
 int HCollector::send_line ( const char * a_pcLine )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
 	int l_iCRC = 0;
 	int l_iLength = strlen ( a_pcLine );
@@ -87,10 +88,12 @@ int HCollector::send_line ( const char * a_pcLine )
 		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
 		}
 	return ( l_iCtr );
+	M_EPILOG
 	}
 
 int HCollector::receive_line ( char * & a_pcLine )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
 	int l_iCRC = 0, l_iPCRC = -1;
 	int l_iLength = 0, l_iPLength = -1;
@@ -119,10 +122,12 @@ int HCollector::receive_line ( char * & a_pcLine )
 	write ( D_PROTO_ACK, strlen ( D_PROTO_ACK ) );
 	f_iLines ++;
 	return ( l_iCtr );
+	M_EPILOG
 	}
 
 int HCollector::establish_connection ( void )
 	{
+	M_PROLOG
 	int l_iErr = -1;
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
@@ -134,10 +139,12 @@ int HCollector::establish_connection ( void )
 		}
 	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (estab)" << endl;
 	return ( l_iErr );
+	M_EPILOG
 	}
 
 int HCollector::wait_for_connection ( void )
 	{
+	M_PROLOG
 	int l_iErr = -1;
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_SYN, strlen ( D_PROTO_SYN ) ) )
@@ -145,10 +152,12 @@ int HCollector::wait_for_connection ( void )
 	write ( D_PROTO_ACK, strlen ( D_PROTO_ACK ) );
 	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (wait)" << endl;
 	return ( l_iErr );
+	M_EPILOG
 	}
 
 void HCollector::read_collector ( void ( * process_line ) ( char *, int ) ) 
 	{
+	M_PROLOG
 	char * l_pcLine = NULL;
 	f_iLines = 0;
 	wait_for_connection ( );
@@ -160,6 +169,7 @@ void HCollector::read_collector ( void ( * process_line ) ( char *, int ) )
 			break;
 		process_line ( l_pcLine, f_iLines );
 		}
+	M_EPILOG
 	return;
 	}
 
