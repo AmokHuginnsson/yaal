@@ -100,7 +100,6 @@ protected:
 	HElement * f_poSelected;	/* local temporary pointer, "cursor" */
 /* for internal use only */
 	int f_iOrder;							/* last-to-current sort order */
-private:
 	int f_iIndex;							/* this two fiels will allow boost operator [ ], int holds last */
 	HElement * f_poIndex;			/* index and HElement * holds pointer to this last element */
 	/*}*/
@@ -803,7 +802,7 @@ and a_iIndex is between f_iIndex and f_iQuantity
 meaning a_iIndex > f_iIndex
 lets take closer look at first case  ( a_iIndex < f_iIndex )
 we have to check if a_iIndex is lowwer or geater than f_iIndex/2
-*/ 
+*/
 	if ( a_iIndex < f_iIndex )
 		{
 		if ( a_iIndex < f_iIndex / 2 )
