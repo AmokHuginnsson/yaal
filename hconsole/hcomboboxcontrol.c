@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <ncurses.h>
+
 #include "hcomboboxcontrol.h"
 
 #include "hexception.h"
@@ -84,8 +86,32 @@ int HComboboxControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
 	if ( f_iMode == D_MODE_EDIT )
-		return ( HEditControl::process_input ( a_iCode ) );
-	return ( HListControl::process_input ( a_iCode ) );
+		{
+		switch ( a_iCode )
+			{
+			case ( KEY_UP ):
+				{
+				f_iMode = D_MODE_LIST;
+				break;
+				}
+			case ( KEY_DOWN ):
+				{
+				f_iMode = D_MODE_LIST;
+				break;
+				}
+			default :
+				{
+				return ( HEditControl::process_input ( a_iCode ) );
+				break;
+				}
+			}
+		}
+	else
+		{
+		if ( a_iCode == '\r' )f_iMode = D_MODE_EDIT;
+		else return ( HListControl::process_input ( a_iCode ) );
+		}
+	return ( 0 );
 	M_EPILOG
 	}
 

@@ -33,7 +33,8 @@ Copyright:
 #define D_MODE_EDIT	0
 #define D_MODE_LIST	1
 
-class HComboboxControl : virtual public HEditControl, virtual public HListControl
+class HComboboxControl : virtual public HEditControl,
+	virtual public HListControl
 	{
 protected:
 	/*{*/
@@ -59,7 +60,7 @@ public:
 	virtual ~HComboboxControl ( void );
 	virtual int process_input ( int );
 	virtual int set_focus ( char = 0 );
-	virtual void refresh ( void ) = 0;
+	virtual void refresh ( void );
 /*	
 	virtual HInfo operator = ( const HInfo & );
 	virtual operator HInfo ( void );
