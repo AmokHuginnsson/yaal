@@ -63,7 +63,7 @@ protected:
 		int f_iNumber;																	/* serial number */
 		int f_iHits;			/* how many times element's object was accessed */
 		int f_iLevel;																		/* self explanary */
-		HBranchList < HNode * > f_oBranch;	/*list of next level nodes*/
+		HBranchList < HNode * > f_oBranch;	/* list of next level nodes */
 		HNode * f_poTrunk;									/* self explanary */
 		HTree * f_poTree;										/* tree that owns node */
 		/*}*/
