@@ -29,6 +29,7 @@ Copyright:
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <libintl.h>
 
 #include "../config.h"
 
@@ -99,69 +100,69 @@ using namespace dbwrapper;
 namespace dbwrapper
 {
 	
-/* Null-dummy driver */
+/* Null driver */
 
-void * dummy_db_connect ( const char *, const char *, const char * )
+void * null_db_connect ( const char *, const char *, const char * )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_connect)" ) << endl;
 	return ( NULL );
 	}
 
-void dummy_db_disconnect ( void * )
+void null_db_disconnect ( void * )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_disconnect)" ) << endl;
 	return;
 	}
 
-int dummy_db_errno ( void * )
+int null_db_errno ( void * )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_errno)" ) << endl;
 	return ( 0 );
 	}
 
-const char * dummy_db_error ( void * )
+const char * null_db_error ( void * )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "db_error)" ) << endl;
 	return ( NULL );
 	}
 
-void * dummy_db_query ( void *, const char * )
+void * null_db_query ( void *, const char * )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_query)" ) << endl;
 	return ( NULL );
 	}
 
-void dummy_db_unquery ( void * )
+void null_db_unquery ( void * )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_unquery)" ) << endl;
 	return;
 	}
 
-char * dummy_rs_get ( void *, int, int )
+char * null_rs_get ( void *, int, int )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_get)" ) << endl;
 	return ( NULL );
 	}
 
-int dummy_rs_fields_count ( void * )
+int null_rs_fields_count ( void * )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_fields_count)" ) << endl;
 	return ( 0 );
 	}
 
-long int dummy_rsdb_records_count ( void *, void * = NULL )
+long int null_rsdb_records_count ( void *, void * = NULL )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rsdb_records_count)" ) << endl;
 	return ( 0 );
 	}
 
-long int dummy_rsdb_id ( void *, void * )
+long int null_rsdb_id ( void *, void * )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rsdb_id)" ) << endl;
 	return ( 0 );
 	}
 
-char * dummy_rs_column_name ( void *, int )
+char * null_rs_column_name ( void *, int )
 	{
 	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_column_name)" ) << endl;
 	return ( NULL );
@@ -187,6 +188,7 @@ void dbwrapper_exit ( void )
 
 void load_driver ( void )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
 	g_iErrNo = 0;
 	fprintf ( stderr, "Loading dynamic database driver ... " );
@@ -234,92 +236,96 @@ void load_driver ( void )
 						"rs_column_name" ) ) )dbwrapper_error ( );
 		else if ( ! ( dbwrapper::db_connect = (dbwrapper::t0) dlsym ( n_pvDlHandle,
 						"db_connect" ) ) )dbwrapper_error ( );
-		if ( dbwrapper::db_connect )fprintf ( stderr, x_tag_g_pcDone );
-		else dbwrapper_exit ( );
+		if ( dbwrapper::db_connect != dbwrapper::autoloader_db_connect )
+			fprintf ( stderr, x_tag_g_pcDone );
+		else
+			M_THROW ( _ ( "can not load database driver" ), n_iDataBaseDriver );
 		}
 	else
 		{
-		dbwrapper::db_connect = dummy_db_connect;
-		dbwrapper::db_disconnect = dummy_db_disconnect;
-		dbwrapper::db_errno = dummy_db_errno;
-		dbwrapper::db_error = dummy_db_error;
-		dbwrapper::db_query = dummy_db_query;
-		dbwrapper::db_unquery = dummy_db_unquery;
-		dbwrapper::rs_get = dummy_rs_get;
-		dbwrapper::rs_fields_count = dummy_rs_fields_count;
-		dbwrapper::rsdb_records_count = dummy_rsdb_records_count;
-		dbwrapper::rsdb_id = dummy_rsdb_id;
-		dbwrapper::rs_column_name = dummy_rs_column_name;
+		dbwrapper::db_connect = null_db_connect;
+		dbwrapper::db_disconnect = null_db_disconnect;
+		dbwrapper::db_errno = null_db_errno;
+		dbwrapper::db_error = null_db_error;
+		dbwrapper::db_query = null_db_query;
+		dbwrapper::db_unquery = null_db_unquery;
+		dbwrapper::rs_get = null_rs_get;
+		dbwrapper::rs_fields_count = null_rs_fields_count;
+		dbwrapper::rsdb_records_count = null_rsdb_records_count;
+		dbwrapper::rsdb_id = null_rsdb_id;
+		dbwrapper::rs_column_name = null_rs_column_name;
 		}
 	return;
+	M_EPILOG
 	}
 
 /* Driver autoloaders ... */
 
-void * null_db_connect ( const char * a_pcDataBase,
+void * autoloader_db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
 	{
 	load_driver ( );
 	return ( db_connect ( a_pcDataBase, a_pcLogin, a_pcPassword ) );
 	}
 
-void null_db_disconnect ( void * a_pvDataBase )
+void autoloader_db_disconnect ( void * a_pvDataBase )
 	{
 	load_driver ( );
 	db_disconnect ( a_pvDataBase );
 	return;
 	}
 
-int null_db_errno ( void * a_pvDataBase )
+int autoloader_db_errno ( void * a_pvDataBase )
 	{
 	load_driver ( );
 	return ( db_errno ( a_pvDataBase ) );
 	}
 
-const char * null_db_error ( void * a_pvDataBase )
+const char * autoloader_db_error ( void * a_pvDataBase )
 	{
 	load_driver ( );
 	return ( db_error ( a_pvDataBase ) );
 	}
 
-void * null_db_query ( void * a_pvDataBase, const char * a_pcQuery )
+void * autoloader_db_query ( void * a_pvDataBase, const char * a_pcQuery )
 	{
 	load_driver ( );
 	return ( db_query ( a_pvDataBase, a_pcQuery ) );
 	}
 
-void null_db_unquery ( void * a_pvDataBase )
+void autoloader_db_unquery ( void * a_pvDataBase )
 	{
 	load_driver ( );
 	db_unquery ( a_pvDataBase );
 	return;
 	}
 
-char * null_rs_get ( void * a_pvResult, int a_iRow, int a_iCol )
+char * autoloader_rs_get ( void * a_pvResult, int a_iRow, int a_iCol )
 	{
 	load_driver ( );
 	return ( rs_get ( a_pvResult, a_iRow, a_iCol ) );
 	}
 
-int null_rs_fields_count ( void * a_pvResult )
+int autoloader_rs_fields_count ( void * a_pvResult )
 	{
 	load_driver ( );
 	return ( rs_fields_count ( a_pvResult ) );
 	}
 
-long int null_rsdb_records_count ( void * a_pvDataBase, void * a_pvResult )
+long int autoloader_rsdb_records_count ( void * a_pvDataBase,
+		void * a_pvResult )
 	{
 	load_driver ( );
 	return ( rsdb_records_count ( a_pvDataBase, a_pvResult ) );
 	}
 
-long int null_rsdb_id ( void * a_pvDataBase, void * a_pvResult )
+long int autoloader_rsdb_id ( void * a_pvDataBase, void * a_pvResult )
 	{
 	load_driver ( );
 	return ( rsdb_id ( a_pvDataBase, a_pvResult ) );
 	}
 
-char * null_rs_column_name ( void * a_pvResult, int a_iColumn )
+char * autoloader_rs_column_name ( void * a_pvResult, int a_iColumn )
 	{
 	load_driver ( );
 	return ( rs_column_name ( a_pvResult, a_iColumn ) );

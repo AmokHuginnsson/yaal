@@ -99,17 +99,17 @@ extern "C"
 void dbwrapper_init ( void ); __attribute__ ( ( constructor ) )
 void dbwrapper_init ( void )
 	{
-	dbwrapper::db_connect = dbwrapper::null_db_connect;
-	dbwrapper::db_disconnect = dbwrapper::null_db_disconnect;
-	dbwrapper::db_errno = dbwrapper::null_db_errno;
-	dbwrapper::db_error = dbwrapper::null_db_error;
-	dbwrapper::db_query = dbwrapper::null_db_query;
-	dbwrapper::db_unquery = dbwrapper::null_db_unquery;
-	dbwrapper::rs_get = dbwrapper::null_rs_get;
-	dbwrapper::rs_fields_count = dbwrapper::null_rs_fields_count;
-	dbwrapper::rsdb_records_count = dbwrapper::null_rsdb_records_count;
-	dbwrapper::rsdb_id = dbwrapper::null_rsdb_id;
-	dbwrapper::rs_column_name = dbwrapper::null_rs_column_name;
+	dbwrapper::db_connect = dbwrapper::autoloader_db_connect;
+	dbwrapper::db_disconnect = dbwrapper::autoloader_db_disconnect;
+	dbwrapper::db_errno = dbwrapper::autoloader_db_errno;
+	dbwrapper::db_error = dbwrapper::autoloader_db_error;
+	dbwrapper::db_query = dbwrapper::autoloader_db_query;
+	dbwrapper::db_unquery = dbwrapper::autoloader_db_unquery;
+	dbwrapper::rs_get = dbwrapper::autoloader_rs_get;
+	dbwrapper::rs_fields_count = dbwrapper::autoloader_rs_fields_count;
+	dbwrapper::rsdb_records_count = dbwrapper::autoloader_rsdb_records_count;
+	dbwrapper::rsdb_id = dbwrapper::autoloader_rsdb_id;
+	dbwrapper::rs_column_name = dbwrapper::autoloader_rs_column_name;
 	rc_file::process_rc_file ( "stdhapi", "dbwrapper",
 			dbwrapper::n_psVariables, set_dbwrapper_variables );
 	return;
