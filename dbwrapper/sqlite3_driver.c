@@ -37,12 +37,17 @@ Copyright:
 #define NULL	0
 #endif /* not NULL */
 
-int g_iErrorCode = 0;
-char * g_pcErrorMessage = NULL;
-
 extern "C"
 {
 
+typedef struct
+	{
+	int f_iErrorCode;
+	char * f_pcErrorMessage;
+	sqlite3 * f_psDB;
+	
+	} sqlite_db;
+	
 typedef struct
 	{
 	int f_iRows;
@@ -50,16 +55,18 @@ typedef struct
 	char * * f_ppcData;
 	} sqlite3_result;
 
+sqlite_db * g_psBrokenDB = NULL;
+
 void * db_connect ( const char * a_pcDataBase,
 		const char *, const char * )
 	{
-	int l_iError = 0;
-	sqlite3 * l_psSQLite = NULL;
-	if ( g_pcErrorMessage )xfree ( g_pcErrorMessage );
-	l_iError = sqlite3_open ( a_pcDataBase, & l_psSQLite );
-	if ( l_iError )
+	sqlite_db * l_psSQLite = ( sqlite_db * ) xcalloc ( sizeof ( sqlite_db ) );
+	l_psSQLite->f_iErrorCode = sqlite3_open ( a_pcDataBase,
+			& l_psSQLite->f_psDB );
+	if ( l_psSQLite->f_iErrorCode )
 		{
-		g_pcErrorMessage = xstrdup ( sqlite3_errmsg ( l_psSQLite ) );
+		l_psSQLite->f_pcErrorMessage = xstrdup ( sqlite3_errmsg ( l_psSQLite->f_psDB ) );
+		g_psBrokenDB = l_psSQLite;
 		l_psSQLite = NULL;
 		}
 	return ( l_psSQLite );
@@ -67,32 +74,52 @@ void * db_connect ( const char * a_pcDataBase,
 
 void db_disconnect ( void * a_pvData )
 	{
-	sqlite3_close ( ( sqlite3 * ) a_pvData );
-	if ( g_pcErrorMessage )xfree ( g_pcErrorMessage );
+	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
+	sqlite3_close ( l_psSQLite->f_psDB );
+	if ( l_psSQLite->f_pcErrorMessage )
+		xfree ( l_psSQLite->f_pcErrorMessage );
+	xfree ( l_psSQLite );
 	return;
 	}
 
-int db_errno ( void * )
+int db_errno ( void * a_pvData )
 	{
-	if ( g_iErrorCode )return ( g_iErrorCode );
+	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
+	if ( ! l_psSQLite )
+		l_psSQLite = g_psBrokenDB;
+	if ( l_psSQLite )
+		if ( l_psSQLite->f_iErrorCode )
+			return ( l_psSQLite->f_iErrorCode );
 	return ( errno );
 	}
 
-const char * db_error  ( void * )
+const char * db_error  ( void * a_pvData )
 	{
-	return ( g_pcErrorMessage );
+	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
+	if ( ! l_psSQLite )
+		l_psSQLite = g_psBrokenDB;
+	if ( l_psSQLite )
+		{
+		if ( l_psSQLite->f_pcErrorMessage )
+			return ( l_psSQLite->f_pcErrorMessage );
+		return ( sqlite3_errmsg ( l_psSQLite->f_psDB ) );
+		}
+	return ( "" );
 	}
 
 void * db_query ( void * a_pvData, const char * a_pcQuery )
 	{
+	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
 	sqlite3_result * l_psResult = NULL;
 	l_psResult = ( sqlite3_result * ) xcalloc ( sizeof ( sqlite3_result ) );
 	l_psResult->f_iColumns = 0;
 	l_psResult->f_iRows = 0;
 	l_psResult->f_ppcData = NULL;
-	if ( g_pcErrorMessage )xfree ( g_pcErrorMessage );
-	g_iErrorCode = sqlite3_get_table ( ( sqlite3 * ) a_pvData, a_pcQuery, & l_psResult->f_ppcData,
-			& l_psResult->f_iRows, & l_psResult->f_iColumns, & g_pcErrorMessage );
+	if ( l_psSQLite->f_pcErrorMessage )
+		xfree ( l_psSQLite->f_pcErrorMessage );
+	l_psSQLite->f_iErrorCode = sqlite3_get_table ( l_psSQLite->f_psDB,
+			a_pcQuery, & l_psResult->f_ppcData, & l_psResult->f_iRows,
+			& l_psResult->f_iColumns, & l_psSQLite->f_pcErrorMessage );
 	return ( l_psResult );
 	}
 

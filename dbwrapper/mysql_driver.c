@@ -45,7 +45,7 @@ Copyright:
 extern "C"
 {
 
-MYSQL * n_psBrokenMySQL = NULL;
+MYSQL * g_psBrokenMySQL = NULL;
 
 void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
@@ -55,10 +55,10 @@ void * db_connect ( const char * a_pcDataBase,
 	if ( l_psMySQL )
 		{
 		if ( mysql_options ( l_psMySQL, MYSQL_OPT_NAMED_PIPE, NULL ) )
-			n_psBrokenMySQL = l_psMySQL, l_psMySQL = NULL;
+			g_psBrokenMySQL = l_psMySQL, l_psMySQL = NULL;
 		else if ( ! mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
 				a_pcDataBase, 0, NULL, CLIENT_IGNORE_SPACE ) )
-			n_psBrokenMySQL = l_psMySQL, l_psMySQL = NULL;
+			g_psBrokenMySQL = l_psMySQL, l_psMySQL = NULL;
 		}
 	return ( l_psMySQL );
 	}
@@ -71,13 +71,13 @@ void db_disconnect ( void * a_pvData )
 
 int db_errno ( void * a_pvData )
 	{
-	if ( ! a_pvData )a_pvData = n_psBrokenMySQL;
+	if ( ! a_pvData )a_pvData = g_psBrokenMySQL;
 	return ( mysql_errno ( ( MYSQL * ) a_pvData ) );
 	}
 
 const char * db_error  ( void * a_pvData )
 	{
-	if ( ! a_pvData )a_pvData = n_psBrokenMySQL;
+	if ( ! a_pvData )a_pvData = g_psBrokenMySQL;
 	return ( mysql_error ( ( MYSQL * ) a_pvData ) );
 	}
 
