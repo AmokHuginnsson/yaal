@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "htimecontrol.h"
-
 #include "hexception.h"
+M_CVSID ( "$CHSHeader" );
+#include "htimecontrol.h"
 
 HTimeControl::HTimeControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 										 int a_iHeight, int a_iWidth, const char * a_pcLabel,
