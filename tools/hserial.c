@@ -28,6 +28,8 @@ Copyright:
 #include <unistd.h>
 #include <string.h>
 
+#include "../config.h"
+
 #include "hserial.h"
 
 #include "../hcore/hexception.h"
@@ -79,7 +81,9 @@ HSerial::HSerial ( const char * a_pcDevice )
 	f_sTIO.c_cc [ VEOF ]     = 4;    /* Ctrl-d */
 	f_sTIO.c_cc [ VTIME ]    = 0;    /* inter-character timer unused */
 	f_sTIO.c_cc [ VMIN ]     = 1;    /* blocking read until 1 character arrives */
+#ifndef __HOST_OS_TYPE_FREEBSD__
 	f_sTIO.c_cc [ VSWTC ]    = 0;    /* '\0' */
+#endif /* not __HOST_OS_TYPE_FREEBSD__ */
 	f_sTIO.c_cc [ VSTART ]   = 0;    /* Ctrl-q */
 	f_sTIO.c_cc [ VSTOP ]    = 0;    /* Ctrl-s */
 	f_sTIO.c_cc [ VSUSP ]    = 0;    /* Ctrl-z */
