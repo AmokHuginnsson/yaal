@@ -52,7 +52,7 @@ HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 											a_bCheckable, a_bSortable, a_bSearchable, false )
 	{
 	M_PROLOG
-	f_iMode = D_MODE_EDIT;
+	f_iMode = D_MODE_EDITCONTROL;
 	f_iDroppedWidth = a_iDroppedWidth;
 	return;
 	M_EPILOG
@@ -68,7 +68,7 @@ HComboboxControl::~HComboboxControl ( void )
 int HComboboxControl::set_focus ( char a_cCode )
 	{
 	M_PROLOG
-	if ( f_iMode == D_MODE_EDIT )
+	if ( f_iMode == D_MODE_EDITCONTROL )
 		return ( HEditControl::set_focus ( a_cCode ) );
 	return ( HListControl::set_focus ( a_cCode ) );
 	M_EPILOG
@@ -77,9 +77,9 @@ int HComboboxControl::set_focus ( char a_cCode )
 int HComboboxControl::kill_focus ( void )
 	{
 	M_PROLOG
-	if ( f_iMode == D_MODE_LIST )
+	if ( f_iMode == D_MODE_LISTCONTROL )
 		{
-		f_iMode = D_MODE_EDIT;
+		f_iMode = D_MODE_EDITCONTROL;
 		console::clrscr ( );
 		f_poParent->refresh ( );
 		}
@@ -92,7 +92,7 @@ void HComboboxControl::refresh ( void )
 	M_PROLOG
 	int l_iWidth = 0;
 	int l_iHeight = 0;
-	if ( f_iMode == D_MODE_EDIT )
+	if ( f_iMode == D_MODE_EDITCONTROL )
 		{
 /* ripped from HControl::draw_label ( ) */
 		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
@@ -120,18 +120,18 @@ void HComboboxControl::refresh ( void )
 int HComboboxControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
-	if ( f_iMode == D_MODE_EDIT )
+	if ( f_iMode == D_MODE_EDITCONTROL )
 		{
 		switch ( a_iCode )
 			{
 			case ( KEY_UP ):
 				{
-				f_iMode = D_MODE_LIST;
+				f_iMode = D_MODE_LISTCONTROL;
 				break;
 				}
 			case ( KEY_DOWN ):
 				{
-				f_iMode = D_MODE_LIST;
+				f_iMode = D_MODE_LISTCONTROL;
 				break;
 				}
 			default :
@@ -145,7 +145,7 @@ int HComboboxControl::process_input ( int a_iCode )
 	else
 		{
 		if ( a_iCode != '\r' )return ( HListControl::process_input ( a_iCode ) );
-		f_iMode = D_MODE_EDIT;
+		f_iMode = D_MODE_EDITCONTROL;
 		console::clrscr ( );
 		f_poParent->refresh ( );
 		}

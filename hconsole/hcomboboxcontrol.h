@@ -30,15 +30,15 @@ Copyright:
 #include "heditcontrol.h"
 #include "hlistcontrol.h"
 
-#define D_MODE_EDIT	0
-#define D_MODE_LIST	1
+#define D_MODE_EDITCONTROL	0
+#define D_MODE_LISTCONTROL	1
 
 class HComboboxControl : virtual public HEditControl,
 	virtual public HListControl
 	{
 protected:
 	/*{*/
-	int f_iMode; 					/* operating mode (D_MODE_EDIT|D_MODE_LIST) */
+	int f_iMode; 					/* operating mode (D_MODE_EDITCONTROL|D_MODE_LISTCONTROL) */
 	int f_iDroppedWidth;	/* width of dropped list */
 	/*}*/
 public:
