@@ -156,7 +156,7 @@ OBJ4hconsole += htimecontrol
 OBJ4hconsole += htreecontrol
 OBJ4hconsole += hwindow!
 OBJ4hconsole += hwindowlistcontrol!
-OBJ4hconsole += mouse
+OBJ4hconsole += mouse!
 OBJ4hconsole += omenuitem
 OBJ4hconsole +=
 

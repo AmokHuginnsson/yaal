@@ -115,7 +115,7 @@ void enter_curses( void )
 	bkgd ( ' ' | M_MAKE_ATTR ( D_FG_LIGHTGRAY | D_BG_BLACK ) | A_INVIS );
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
-	if ( n_bUseMouse )
+	if ( n_bUseMouse && ! getenv ( "STDHAPI_NO_MOUSE" ) )
 		{
 		if ( ::getenv ( "DISPLAY" ) )
 			{

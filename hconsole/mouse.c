@@ -188,7 +188,37 @@ int console_mouse_close ( void )
 	M_EPILOG
 	}
 
-#endif /* HAVE_GPM_H */
+#else /* HAVE_GPM_H */
+
+int console_mouse_open ( void )
+	{
+	M_PROLOG
+	M_THROW ( _ ( "console mouse support not compiled" ), g_iErrNo );
+	return ( 0 );
+	M_EPILOG
+	}
+
+int console_mouse_get ( OMouse & )
+	{
+	M_PROLOG
+	M_THROW ( _ ( "console mouse support not compiled" ), g_iErrNo );
+	return ( 0 );
+	M_EPILOG
+	}
+
+int console_mouse_close ( void )
+	{
+	M_PROLOG
+/*	I can not throw exception here bacause exception was probably
+ *	thrown by console_mouse_open in enter_curses and now this
+ *	function is probably called from leave_curses from exception
+ *	catch block, so new exception would be recursive and would
+ *	overload the stack because of infinite number of exceptions */
+	return ( 0 );
+	M_EPILOG
+	}
+
+#endif /* ! HAVE_GPM_H */
 
 int x_mouse_open ( void )
 	{
