@@ -34,6 +34,7 @@ namespace util
 
 HString kwota_slownie ( double );
 void usun_ogonki ( char * );
+double atof_ex ( const char * );
 
 	}
 

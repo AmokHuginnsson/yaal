@@ -217,5 +217,13 @@ void usun_ogonki ( char * a_pcString )
 	return;
 	}
 
+double atof_ex ( const char * a_pcString )
+	{
+	HString l_oStr = a_pcString;
+	l_oStr.replace ( ",", "." );
+	l_oStr.replace ( " ", "" );
+	return ( atof ( l_oStr ) );
+	}
+
 }
 
