@@ -49,6 +49,7 @@ HWindow::HWindow ( const char * a_pcTitle )
 	{
 	M_PROLOG
 	int l_piCmds [ ] = { ':', D_KEY_COMMAND_( ':' ) };
+	int l_piSearch [ ] = { '/', D_KEY_COMMAND_( '/' ), '?', D_KEY_COMMAND_( '?' ) };
 	if ( ! console::is_enabled ( ) )
 		throw new HException ( __WHERE__, "console not initialised.", g_iErrNo );
 	f_poFocusedChild = NULL;
@@ -57,7 +58,7 @@ HWindow::HWindow ( const char * a_pcTitle )
 	f_oTitle = a_pcTitle;
 	M_REGISTER_POSTPROCESS_HANDLER ( '\t', NULL, HWindow::handler_jump_tab );
 	M_REGISTER_POSTPROCESS_HANDLER ( 2, l_piCmds, HWindow::handler_command );
-	M_REGISTER_POSTPROCESS_HANDLER ( '/', NULL, HWindow::handler_search );
+	M_REGISTER_POSTPROCESS_HANDLER ( 4, l_piSearch, HWindow::handler_search );
 	return;
 	M_EPILOG
 	}
@@ -201,9 +202,13 @@ int HWindow::handler_command ( int a_iCode )
 int HWindow::handler_search ( int a_iCode )
 	{
 	M_PROLOG
-	a_iCode = 0;
+	char l_pcPrompt [ ] = "/\0";
 	if ( ! f_poFocusedChild->is_searchable ( ) )return ( a_iCode );
-	f_poStatusBar->set_prompt ( "/", D_PROMPT_MODE_SEARCH );
+	if ( a_iCode >= D_KEY_COMMAND_BASE )
+		a_iCode -= D_KEY_COMMAND_BASE;
+	l_pcPrompt [ 0 ] = a_iCode;
+	f_poStatusBar->set_prompt ( l_pcPrompt, D_PROMPT_MODE_SEARCH );
+	a_iCode = 0;
 	return ( a_iCode );
 	M_EPILOG
 	}

@@ -46,6 +46,7 @@ HSearchableControl::HSearchableControl ( bool a_bSearchable )
 	M_PROLOG
 	f_bFiltered = false;
 	f_bSearchActived = false;
+	f_bBackwards = false;
 	f_bSearchable = a_bSearchable;
 	return;
 	M_EPILOG
@@ -58,7 +59,7 @@ HSearchableControl::~HSearchableControl ( void )
 	M_EPILOG
 	}
 
-void HSearchableControl::search ( const HString & a_oPattern )
+void HSearchableControl::search ( const HString & a_oPattern, bool a_bBackwards )
 	{
 	M_PROLOG
 	unsigned short int l_hFlag = 'f';
@@ -66,7 +67,11 @@ void HSearchableControl::search ( const HString & a_oPattern )
 	if ( ! f_bSearchActived )
 		f_poParent->status_bar ( )->message ( f_oPattern.error ( ) );
 	else f_bFiltered = ( l_hFlag & 0xff00 ) ? true : false;
-	go_to_match ( );
+	f_bBackwards = a_bBackwards;
+	if ( f_bBackwards )
+		go_to_match_previous ( );
+	else
+		go_to_match ( );
 	refresh ( );
 	return;
 	M_EPILOG

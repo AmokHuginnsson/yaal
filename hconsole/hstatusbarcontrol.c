@@ -314,6 +314,7 @@ bool HStatusBarControl::confirm ( const char * a_pcQuestion )
 int HStatusBarControl::process_input_normal  ( int a_iCode )
 	{
 	M_PROLOG
+	bool l_bBackwards = false;
 	int l_iCode = a_iCode;
 	int l_iMode = f_iMode;
 	HSearchableControl * l_poSearchableControl = NULL;
@@ -322,6 +323,7 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 		{
 		case ( '\r' ):
 			{
+			l_bBackwards = f_oPrompt [ 0 ] == '?';
 			end_prompt ( );
 			if ( l_iMode == D_PROMPT_MODE_COMMAND )
 				f_poParent->f_oCommand = f_oString;
@@ -329,7 +331,7 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 				{
 				l_poSearchableControl = dynamic_cast < HSearchableControl * > ( f_poParent->f_poPreviousFocusedChild );
 				if ( l_poSearchableControl )
-					l_poSearchableControl->search ( f_oString );
+					l_poSearchableControl->search ( f_oString, l_bBackwards );
 				}
 			break;
 			}

@@ -38,18 +38,20 @@ protected:
 	bool			f_bSearchActived;	/* should we highlight last search */
 	bool			f_bFiltered;			/* is content of list filtered
 																 thru pattern */
+	bool			f_bBackwards;			/* last search direction */
 	HPattern	f_oPattern;				/* used for searching */
 	/*}*/
 public:
 	/*{*/
 	HSearchableControl ( bool );
 	virtual ~HSearchableControl ( void );
-	virtual void search ( const HString & );
+	virtual void search ( const HString &, bool );
 	/*}*/
 protected:
 	/*{*/
 	void highlight ( int, int, int, bool );
 	virtual void go_to_match ( void ) = 0;
+	virtual void go_to_match_previous ( void ) = 0;
 	/*}*/
 	};
 

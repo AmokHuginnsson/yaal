@@ -175,3 +175,13 @@ char * HPattern::matches ( const char * a_pcString, int & a_riMatchLength )
 	M_EPILOG
 	}
 
+int HPattern::count ( const char * a_pcString )
+	{
+	M_PROLOG
+	int l_iCtr = 0, l_iDummy = 0;
+	char * l_pcPtr = const_cast < char * > ( a_pcString );
+	while ( ( l_pcPtr = matches ( l_pcPtr, l_iDummy ) ) )
+		l_iCtr ++, l_pcPtr ++;
+	return ( l_iCtr );
+	M_EPILOG
+	}

@@ -57,6 +57,7 @@ public:
 							 int = 0 /* number of additional flags */ );
 	const char * error ( void );
 	char * matches ( const char *, int & );
+	int count ( const char * );
 	/*}*/
 protected:
 	/*{*/

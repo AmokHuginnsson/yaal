@@ -460,7 +460,22 @@ int HListControl::process_input ( int a_iCode )
 		case ( D_KEY_CTRL_( 'n' ) ):
 			{
 			f_poSelected = l_poElement;
-			go_to_match ( );
+			if ( f_bBackwards )
+				go_to_match_previous ( );
+			else
+				go_to_match ( );
+			l_poElement = f_poSelected;
+			f_poSelected = f_poFirstVisibleRow;
+			l_iOldPosition = f_iCursorPosition;
+			break;
+			}
+		case ( D_KEY_CTRL_( 'p' ) ):
+			{
+			f_poSelected = l_poElement;
+			if ( f_bBackwards )
+				go_to_match ( );
+			else
+				go_to_match_previous ( );
 			l_poElement = f_poSelected;
 			f_poSelected = f_poFirstVisibleRow;
 			l_iOldPosition = f_iCursorPosition;
@@ -818,13 +833,96 @@ void HListControl::go_to_match ( void )
 	if ( l_pcHighlightStart )
 		{
 		if ( l_iMoveFirstRow )
+			to_tail ( f_poFirstVisibleRow, l_iMoveFirstRow );
+		f_sMatch.f_iColumnWithMatch = l_iCtr;
+		f_sMatch.f_iMatchNumber = l_iCtrLoc;
+		f_sMatch.f_poCurrentMatch = f_poSelected;
+		}
+	else
+		{
+		f_poSelected = l_poElement;
+		f_poFirstVisibleRow = l_poElementFVR;
+		f_sMatch.f_iMatchNumber = - 1;
+		f_sMatch.f_iColumnWithMatch = 0;
+		f_poParent->status_bar ( )->message ( _ ( "pattern not found" ) );
+		}
+	return;
+	M_EPILOG
+	}
+
+void HListControl::go_to_match_previous ( void )
+	{
+	M_PROLOG
+	int l_iDummy = 0, l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
+	int l_iCount = f_iQuantity + 1, l_iColumns = f_oHeader.quantity ( );
+	char * l_pcHighlightStart = NULL;
+	HItem * l_poItem = NULL;
+	HElement * l_poElement = f_poSelected;
+	HElement * l_poElementFVR = f_poFirstVisibleRow;
+	if ( f_sMatch.f_poCurrentMatch != f_poSelected )
+		f_sMatch.f_iMatchNumber = - 1;
+	f_sMatch.f_poCurrentMatch = f_poSelected;
+	if ( f_bSearchActived )
+		{
+		while ( l_iCount -- )
 			{
-			l_poElement = f_poSelected;
-			f_poSelected = f_poFirstVisibleRow;
-			to_tail ( l_iMoveFirstRow );
-			f_poFirstVisibleRow = f_poSelected;
-			f_poSelected = l_poElement;
+			l_poItem = & f_poSelected->get_object ( );
+			for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
+				{
+				l_pcHighlightStart = ( char * ) ( HString & ) ( * l_poItem ) [ l_iCtr ];
+				l_iCtrLoc = 0;
+				if ( f_sMatch.f_iMatchNumber < 0 )
+					f_sMatch.f_iMatchNumber = f_oPattern.count ( l_pcHighlightStart );
+				while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
+						l_iDummy ) ) )
+					{
+					if ( l_iCtrLoc == ( f_sMatch.f_iMatchNumber - 1 ) )break;
+					if ( l_iCtrLoc >= f_sMatch.f_iMatchNumber )
+						{
+						l_pcHighlightStart = NULL;
+						break;
+						}
+					l_pcHighlightStart ++;
+					l_iCtrLoc ++;
+					}
+				if ( l_pcHighlightStart )break;
+				f_sMatch.f_iMatchNumber = - 1;
+				}
+			if ( l_pcHighlightStart )break;
+			f_sMatch.f_iColumnWithMatch = l_iColumns - 1;
+/* this part is from process_input, but slightly modified */
+			if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
+				{
+				if ( f_iCursorPosition > 0 )f_iCursorPosition --;
+				else if ( f_iControlOffset > 0 )
+					{
+					f_iControlOffset --;
+					l_iMoveFirstRow ++;
+					}
+				to_head ( );
+				}
+			else
+				{
+				if ( f_iQuantity >= f_iHeightRaw )
+					{
+					f_poSelected = f_poHook;
+					to_head ( );
+					f_poFirstVisibleRow = f_poSelected;
+					to_head ( f_poFirstVisibleRow, f_iHeightRaw - 1 );
+					f_iCursorPosition = f_iHeightRaw - 1;
+					f_iControlOffset = f_iQuantity - f_iHeightRaw;
+					}
+				else f_iCursorPosition = f_iQuantity - 1;
+				l_iMoveFirstRow = 0;
+				f_poParent->status_bar ( )->message ( _ ( "search hit TOP, continuing at BOTTOM" ) );
+				}
+/* end od it */
 			}
+		}
+	if ( l_pcHighlightStart )
+		{
+		if ( l_iMoveFirstRow )
+			to_head ( f_poFirstVisibleRow, l_iMoveFirstRow );
 		f_sMatch.f_iColumnWithMatch = l_iCtr;
 		f_sMatch.f_iMatchNumber = l_iCtrLoc;
 		f_sMatch.f_poCurrentMatch = f_poSelected;

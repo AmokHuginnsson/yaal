@@ -128,6 +128,7 @@ protected:
 	void sort_by_contents ( int, int = D_ASCENDING );
 	void recalculate_column_widths ( void );
 	virtual void go_to_match ( void );
+	virtual void go_to_match_previous ( void );
 	/*}*/
 	};
 
