@@ -43,6 +43,7 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 		OVariable * a_psVaraibles,
 		bool ( * set_variables ) ( HString &, HString & ) )
 	{
+	M_PROLOG
 	bool l_pbTFTab [ ] = { false, true }, l_bSection = false, l_bOptionOK;
 	int l_iCtr = 0, l_iCtrOut = 0, l_iLine = 0;
 	FILE * l_psRc = 0;
@@ -127,6 +128,7 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 	l_psRc = NULL;
 	::log << "done." << endl;
 	return ( 0 );
+	M_EPILOG
 	}
 
 /* Reads one line from a_psFile, stores beginning of line in a_roOption, 
@@ -318,7 +320,10 @@ void rc_set_variable ( const char * a_pcValue, char ** a_ppcVariable )
 
 void rc_set_variable ( const char * a_pcValue, int & a_riVariable )
 	{
-	a_riVariable = atoi ( a_pcValue );
+	int l_iBase = 10;
+	if ( ( strlen ( a_pcValue ) > 2 ) && ( a_pcValue [ 1 ] == 'x' ) )
+		l_iBase = 16;
+	a_riVariable = strtol ( a_pcValue, NULL, l_iBase );
 	}
 
 void rc_set_variable ( const char * a_pcValue, char & a_rcVariable )
