@@ -242,7 +242,7 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
 	if ( f_psResourcesArray [ l_iParent ].f_iType == D_CONTROL_LIST )
 		{
-		l_poPDC = reinterpret_cast < HDataListControl * > ( f_oControls [ l_iParent ] );
+		l_poPDC = dynamic_cast < HDataListControl * > ( f_oControls [ l_iParent ] );
 		if ( ! l_poPDC )
 			throw new HException ( __WHERE__, "wrong control resource order",
 					l_iParent );
