@@ -42,31 +42,24 @@ Copyright:
 #define NULL	0
 #endif /* not NULL */
 
-namespace dbwrapper
-	{
-	extern char * n_pcDefaultSockPath;
-	}
-
 extern "C"
 {
+
+MYSQL * n_psBrokenMySQL = NULL;
 
 void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
 	{
-	char * l_pcDataBase = NULL;
-	char * l_pcSockPath = NULL;
 	MYSQL * l_psMySQL = NULL;
-	l_pcDataBase = xstrdup ( a_pcDataBase );
-	l_psMySQL = mysql_init ( 0 );
+	l_psMySQL = mysql_init ( NULL );
 	if ( l_psMySQL )
 		{
-		l_pcSockPath = strchr ( l_pcDataBase, ':' );
-		if ( ! l_pcSockPath )l_pcSockPath = dbwrapper::n_pcDefaultSockPath;
-		else * l_pcSockPath ++ = 0;
-		l_psMySQL = mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
-				l_pcDataBase, 0, l_pcSockPath, CLIENT_IGNORE_SPACE );
+		if ( mysql_options ( l_psMySQL, MYSQL_OPT_NAMED_PIPE, NULL ) )
+			n_psBrokenMySQL = l_psMySQL, l_psMySQL = NULL;
+		else if ( ! mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
+				a_pcDataBase, 0, NULL, CLIENT_IGNORE_SPACE ) )
+			n_psBrokenMySQL = l_psMySQL, l_psMySQL = NULL;
 		}
-	xfree ( l_pcDataBase );
 	return ( l_psMySQL );
 	}
 
@@ -78,11 +71,13 @@ void db_disconnect ( void * a_pvData )
 
 int db_errno ( void * a_pvData )
 	{
+	if ( ! a_pvData )a_pvData = n_psBrokenMySQL;
 	return ( mysql_errno ( ( MYSQL * ) a_pvData ) );
 	}
 
 const char * db_error  ( void * a_pvData )
 	{
+	if ( ! a_pvData )a_pvData = n_psBrokenMySQL;
 	return ( mysql_error ( ( MYSQL * ) a_pvData ) );
 	}
 

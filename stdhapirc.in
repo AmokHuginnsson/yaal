@@ -180,11 +180,5 @@ log_mask LOG_SQL
 # type: string, default: (installation dependent)
 data_base_driver '@DEFAULT_DRIVER@'
 
-# mysql_socket
-# type: string, default: (system dependent)
-# mysql driver realises access to datebase thru socket,
-#	which we have to point to
-mysql_socket '@MYSQL_SOCKET@'
-
 ### dbwrapper END
 

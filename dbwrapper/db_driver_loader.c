@@ -207,8 +207,6 @@ void load_driver ( void )
 		if ( ! n_pvDlHandle )dbwrapper_exit ( );
 		else
 			{
-			if ( ( ( l_iCtr - 1 ) == D_DB_DRIVER_MYSQL ) && ! n_pcDefaultSockPath )
-				n_pcDefaultSockPath = xstrdup ( "/var/run/mysqld/mysqld.sock" );
 			log ( D_LOG_NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
 			log << "] driver." << endl;
 			}

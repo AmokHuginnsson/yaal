@@ -313,7 +313,7 @@ $(DBWRAPPER) : $(HCORE) $(OBJ4dbwrapper)
 	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-rdynamic @DLOPEN_IN@ -lhcore"
 
 $(MYSQL_DRIVER): $(HCORE) $(OBJ4mysql_driver) $(DBWRAPPER)
-	@$(MAKE) $(MYSQL_DRIVER)\' TARGET=$(MYSQL_DRIVER)\' NAME=mysql_driver LIBS="-lmysqlclient -lhcore -ldbwrapper"
+	@$(MAKE) $(MYSQL_DRIVER)\' TARGET=$(MYSQL_DRIVER)\' NAME=mysql_driver LIBS="-lmysqlclient -lhcore"
 
 $(POSTGRESQL_DRIVER): $(HCORE) $(OBJ4postgresql_driver)
 	@$(MAKE) $(POSTGRESQL_DRIVER)\' TARGET=$(POSTGRESQL_DRIVER)\' NAME=postgresql_driver LIBS="-lpq -lhcore"

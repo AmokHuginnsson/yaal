@@ -58,7 +58,8 @@ int HDataBase::login ( const char * a_pcDataBase, const char * a_pcLogin,
 	M_PROLOG
 	f_pvCoreData = dbwrapper::db_connect( a_pcDataBase, a_pcLogin, a_pcPassword );
 	if ( ! f_pvCoreData )
-		throw new HException ( __WHERE__, strerror ( g_iErrNo ), g_iErrNo );
+		throw new HException ( __WHERE__, dbwrapper::db_error ( f_pvCoreData ),
+				dbwrapper::db_errno ( f_pvCoreData ) );
 	return ( 0 );
 	M_EPILOG
 	}

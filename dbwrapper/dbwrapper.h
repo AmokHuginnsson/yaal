@@ -28,16 +28,9 @@ Copyright:
 #ifndef __DBWRAPPER_H
 #define __DBWRAPPER_H
 
-#define D_LOG_SQL 1073741824
-
-#define D_DB_DRIVER_NONE				0
-#define D_DB_DRIVER_MYSQL				1
-#define D_DB_DRIVER_POSTGRESQL	2
-
 namespace dbwrapper
 	{
 
-extern char * n_pcDefaultSockPath;
 extern int	n_iDataBaseDriver;
 
 	}
