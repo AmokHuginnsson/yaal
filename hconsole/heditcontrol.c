@@ -47,7 +47,7 @@ M_CVSID ( "$CVSHeader$" );
 
 HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
-		const char * a_pcLabel, int a_iBufferSize, const char * a_pcValue,
+		const char * a_pcLabel, size_t a_iBufferSize, const char * a_pcValue,
 		const char * a_pcMask, bool a_bReplace, bool a_bRightAligned,
 		bool a_bMultiLine, bool a_bPassword, int a_iMaxHistoryLevel,
 		bool a_bDrawLabel, int a_iDisabledAttribute,
@@ -55,11 +55,11 @@ HEditControl::HEditControl( HWindow * a_poParent,
 					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 							a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
 							a_iEnabledAttribute, a_iFocusedAttribute ),
-					f_oString ( ( unsigned long ) a_iBufferSize )
+					f_oString ( a_iBufferSize )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
-	int l_iLength = 0;
+	size_t l_iLength = 0;
 	char * l_pcBuffer = 0;
 	HString l_oErrorMessage;
 	if ( a_iBufferSize < 1 )
@@ -85,7 +85,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 				"edit-control right aligned and multiline at the same time", 0 );
 	f_bPassword = a_bPassword;
 	f_oString = a_pcValue;
-	f_oHistory.add_tail ( & l_oErrorMessage );
+	f_oHistory.add_tail ( ) = "";
 	if ( ( l_iErrorCode = regcomp ( & f_sMask, a_pcMask,
 					REG_EXTENDED | REG_NOSUB ) ) )
 		{
@@ -113,7 +113,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		: console::n_iWidth + f_iWidth - f_iColumnRaw;
 /* f_iWidthRaw must be set up properly before setting up f_iCursorPosition and
  * f_iControlOffset whose are used in refresh ( ) */
-	if ( l_iLength >= f_iWidthRaw )
+	if ( l_iLength >= ( size_t ) f_iWidthRaw )
 		{
 		f_iCursorPosition = f_iWidthRaw - 1;
 		f_iControlOffset = l_iLength - f_iWidthRaw + 1;
