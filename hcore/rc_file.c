@@ -101,6 +101,11 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 									( char ** ) a_psVaraibles [ l_iCtr ].f_pvValue );
 							break;
 							}
+						case ( D_TYPE_HSTRING ):
+							{
+							( * ( HString * ) a_psVaraibles [ l_iCtr ].f_pvValue ) = l_oValue;
+							break;
+							}
 						default :
 							{
 							throw new HException ( __WHERE__, "unknown type",
