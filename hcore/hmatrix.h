@@ -31,10 +31,11 @@ Copyright:
 
 #define D_CVSID_HMATRIX_H "$CVSHeader$"
 
-extern const char * g_pcErrorMessageRowsLT1;
-extern const char * g_pcErrorMessageColumnsLT1;
-extern const char * g_pcErrorMessageNewReturned;
-extern const char * g_pcErrorMessageNewReturned0;
+#define E_BADROWS					0
+#define E_BADCOLUMNS			1
+#define E_NEWRETURNEDNULL	2
+
+extern const char * g_ppcErrMsgHMatrix [ ];
 
 #include "hvector.h"
 
@@ -97,17 +98,17 @@ HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iRows < 1 )
-		throw new HException ( __WHERE__, g_pcErrorMessageRowsLT1, a_iRows );
+		throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_BADROWS ], a_iRows );
 	else f_iRows = a_iRows;
 	if ( a_iColumns < 1 )
-		throw new HException ( __WHERE__, g_pcErrorMessageColumnsLT1, a_iColumns );
+		throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_BADCOLUMNS ], a_iColumns );
 	else f_iColumns = a_iColumns;
 	if ( ! ( f_ptBody = new HVector < tType > * [ f_iRows ] ) ) 
-		throw new HException ( __WHERE__, g_pcErrorMessageNewReturned, ( int ) f_ptBody );
+		throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_NEWRETURNEDNULL ], g_iErrNo );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
 		{
 		if ( ! ( f_ptBody [ l_iCtr ] = new HVector < tType > ( f_iColumns ) ) )
-			throw new HException ( __WHERE__, g_pcErrorMessageNewReturned0, l_iCtr );
+			throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_NEWRETURNEDNULL ], l_iCtr );
 		}
 	return ;
 	M_EPILOG
@@ -174,18 +175,6 @@ int HMatrix < tType > ::col ( void )
 	{
 	M_PROLOG
 	return ( f_iColumns );
-	M_EPILOG
-	}
-	
-template < class tType >
-HVector < tType > & HMatrix < tType > ::operator [ ] ( int a_iIndex )
-	{
-	M_PROLOG
-	if ( a_iIndex < 0 )
-		throw new HException ( __WHERE__, "negative index value", a_iIndex );
-	if ( a_iIndex >= f_iRows )
-		throw new HException ( __WHERE__, "index excides vector size", a_iIndex );
-	return ( * f_ptBody [ a_iIndex ] );
 	M_EPILOG
 	}
 	

@@ -184,9 +184,9 @@ template < class tType >
 HVector < tType > HVector < tType > ::operator + ( HVector & a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr;
-	HVector l_oVector ( f_iSize );
+	int l_iCtr = 0;
 	M_CHECK_DIMENSIONS ( );
+	HVector l_oVector ( f_iSize );
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ ) 
 		l_oVector.f_ptArray [ l_iCtr ] = f_ptArray [ l_iCtr ] + a_roVector.f_ptArray [ l_iCtr ];
 	return ( l_oVector );
@@ -197,10 +197,8 @@ template < class tType >
 HVector < tType > HVector < tType > ::operator - ( HVector & a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr;
-	if ( f_iSize != a_roVector.f_iSize )
-		throw new HException ( __WHERE__, "dimensions do not match",
-				f_iSize - a_roVector.f_iSize );
+	int l_iCtr = 0;
+	M_CHECK_DIMENSIONS ( );
 	HVector l_oVector ( f_iSize );
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ ) 
 		l_oVector.f_ptArray [ l_iCtr ] = f_ptArray [ l_iCtr ] - a_roVector.f_ptArray [ l_iCtr ];
@@ -212,8 +210,8 @@ template < class tType >
 HVector < tType > HVector < tType > ::operator * ( tType d )
 	{
 	M_PROLOG
+	int l_iCtr = 0;
 	HVector l_oVector ( f_iSize );
-	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ ) 
 		l_oVector.f_ptArray [ l_iCtr ] = f_ptArray [ l_iCtr ] * d;
 	return ( l_oVector );
@@ -224,8 +222,8 @@ template < class tType >
 HVector < tType > HVector < tType > ::operator / ( tType d )
 	{
 	M_PROLOG
+	int l_iCtr = 0;
 	HVector l_oVector ( f_iSize );
-	int l_iCtr;
 	if ( d ) for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		l_oVector.f_ptArray [ l_iCtr ] = f_ptArray [ l_iCtr ] / d;
 	return ( l_oVector );
@@ -236,10 +234,8 @@ template < class tType >
 HVector < tType > & HVector < tType > ::operator += ( HVector & a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr;
-	if ( f_iSize != a_roVector.f_iSize )
-		throw new HException ( __WHERE__, "dimensions do not match",
-				f_iSize - a_roVector.f_iSize );
+	int l_iCtr = 0;
+	M_CHECK_DIMENSIONS ( );
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ ) 
 		f_ptArray [ l_iCtr ] += a_roVector.f_ptArray [ l_iCtr ];
 	return ( *this );
@@ -250,10 +246,8 @@ template < class tType >
 HVector < tType > & HVector < tType > ::operator -= ( HVector & a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr;
-	if ( f_iSize != a_roVector.f_iSize )
-		throw new HException ( __WHERE__, "dimensions do not match",
-				f_iSize - a_roVector.f_iSize );
+	int l_iCtr = 0;
+	M_CHECK_DIMENSIONS ( );
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		f_ptArray [ l_iCtr ] -= a_roVector.f_ptArray [ l_iCtr ];
 	return ( *this );
@@ -264,7 +258,7 @@ template < class tType >
 HVector < tType > & HVector < tType > ::operator *= ( tType d )
 	{
 	M_PROLOG
-	int l_iCtr;
+	int l_iCtr = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		f_ptArray [ l_iCtr ] *= d;
 	return ( *this );
@@ -275,7 +269,7 @@ template < class tType >
 HVector < tType > & HVector < tType > ::operator /= ( tType d )
 	{
 	M_PROLOG
-	int l_iCtr;
+	int l_iCtr = 0;
 	if ( d ) for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		f_ptArray [ l_iCtr ] /= d;
 	return ( *this );
@@ -286,7 +280,7 @@ template < class tType >
 HVector < tType > HVector < tType > ::operator ~ ( void )
 	{
 	M_PROLOG
-	int l_iCtr;
+	int l_iCtr = 0;
 	HVector l_oVector ( f_iSize );
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		l_oVector.f_ptArray [ l_iCtr ] = - f_ptArray [ l_iCtr ];
@@ -299,10 +293,8 @@ tType HVector < tType > ::operator | ( HVector & a_roVector )
 	{
 	M_PROLOG
 	tType d = 0;
-	int l_iCtr;
-	if ( f_iSize != a_roVector.f_iSize )
-		throw new HException ( __WHERE__, "dimensions do not match",
-				f_iSize - a_roVector.f_iSize );
+	int l_iCtr = 0;
+	M_CHECK_DIMENSIONS ( );
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ ) 
 		d += ( f_ptArray [ l_iCtr ] * a_roVector.f_ptArray [ l_iCtr ] );
 	return ( d );
@@ -321,10 +313,8 @@ template < class tType >
 int HVector < tType > ::operator == ( HVector & a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr;
-	if ( f_iSize != a_roVector.f_iSize )
-		throw new HException ( __WHERE__, "dimensions do not match",
-				f_iSize - a_roVector.f_iSize );
+	int l_iCtr = 0;
+	M_CHECK_DIMENSIONS ( );
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ ) 
 		if ( f_ptArray [ l_iCtr ] != a_roVector.f_ptArray [ l_iCtr ] ) return ( 0 );
 	return ( 1 );
@@ -335,7 +325,7 @@ template < class tType >
 int HVector < tType > ::operator != ( HVector & a_roVector )
 	{
 	M_PROLOG
-	return ( 1 - ( *this == a_roVector ) );
+	return ( ! ( * this == a_roVector ) );
 	M_EPILOG
 	}
 
@@ -343,7 +333,7 @@ template < class tType >
 HVector < tType > operator * ( tType d, HVector < tType > & a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr;
+	int l_iCtr = 0;
 	HVector < tType > l_oVector ( a_roVector.f_iSize );
 	for ( l_iCtr = 0; l_iCtr < l_oVector.f_iSize; l_iCtr ++ )
 		l_oVector.f_ptArray [ l_iCtr ] = a_roVector.f_ptArray [ l_iCtr ] * d;

@@ -24,13 +24,17 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hmatrix.h"
 M_CVSTID ( D_CVSID_HMATRIX_H );
 
-const char * g_pcErrorMessageRowsLT1 = "Rows < 1";
-const char * g_pcErrorMessageColumnsLT1 = "Columns < 1";
-const char * g_pcErrorMessageNewReturned = "new returned";
-const char * g_pcErrorMessageNewReturned0 = "new returned 0";
+const char * g_ppcErrMsgHMatrix  [ 24 ] =
+	{
+/* [ E_BADROWS ] = */_ ( "Rows < 1" ),
+/* [ E_BADCOLUMNS ] = */_ ( "Columns < 1" ),
+/* [ E_NEWRETURNEDNULL ] = */_ ( "new returned NULL" )
+	};
 
