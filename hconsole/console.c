@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <unistd.h>
+#include <stdlib.h> /* getenv */
 #include <stdio.h>
 #include <termios.h>
 
@@ -43,6 +44,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
 #include "hconsole.h"
 #include "console.h"
+#include "mouse.h"
 
 #define M_MAKE_ATTR(attr) COLOR_PAIR( ( ( ( attr ) & 112 ) >> 1 ) \
 													| ( attr ) & 7 ) | ( ( attr ) & 8 ? A_BOLD : 0 ) \
@@ -112,9 +114,24 @@ void enter_curses( void )
 	bkgd ( ' ' | M_MAKE_ATTR ( D_FG_LIGHTGRAY | D_BG_BLACK ) | A_INVIS );
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
-	if ( n_bUseMouse
-			&& ! mousemask ( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL ) )
-		throw new HException ( __WHERE__, "mousemask ( ) returned 0", g_iErrNo );
+	if ( n_bUseMouse )
+		{
+		if ( ::getenv ( "DISPLAY" ) )
+			{
+			log ( D_LOG_INFO ) << "using X mouse support" << endl;
+			mouse::mouse_open = mouse::x_mouse_open;
+			mouse::mouse_get = mouse::x_mouse_get;
+			mouse::mouse_close = mouse::x_mouse_close;
+			}
+		else
+			{
+			log ( D_LOG_INFO ) << "using console mouse support" << endl;
+			mouse::mouse_open = mouse::console_mouse_open;
+			mouse::mouse_get = mouse::console_mouse_get;
+			mouse::mouse_close = mouse::console_mouse_close;
+			}
+		mouse::mouse_open ( );
+		}
 	return;
 	M_EPILOG
 	}
@@ -126,6 +143,8 @@ void leave_curses( void )
 		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
 //	if ( ! mousemask ( 0, NULL ) )
 //		throw new HException ( __WHERE__, "mousemask ( ) returned 0", g_iErrNo );
+	if ( n_bUseMouse )
+		mouse::mouse_close ( );
 	bkgd ( ' ' | M_MAKE_ATTR ( ( D_FG_LIGHTGRAY | D_BG_BLACK ) ) );
 	use_default_colors ( );
 	printw ( "" );

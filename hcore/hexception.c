@@ -72,14 +72,22 @@ HException::~HException ( void )
 	}
 
 void HException::set ( char a_cChar, int a_iInt, long a_lLong, double a_dDouble,
-											char * a_pcStr, void * a_pvVoidPtr )
+											 const char * a_pcStr, void * a_pvVoidPtr )
 	{
 	f_cChar = a_cChar;
 	f_iInt = a_iInt;
 	f_lLong = a_lLong;
 	f_dDouble = a_dDouble;
+	if ( f_pcCharPtr )xfree ( f_pcCharPtr );
 	if ( a_pcStr )f_pcCharPtr = xstrdup ( a_pcStr );
 	f_pvVoidPtr = a_pvVoidPtr;
+	return;
+	}
+
+void HException::set ( const char * a_pcStr )
+	{
+	if ( f_pcCharPtr )xfree ( f_pcCharPtr );
+	if ( a_pcStr )f_pcCharPtr = xstrdup ( a_pcStr );
 	return;
 	}
 

@@ -41,6 +41,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hprocess.h"
 #include "hconsole.h"
 #include "hmainwindow.h"
+#include "mouse.h"
 
 #ifdef __DEBUGGER_BABUNI__
 #include "../hcore/hlog.h"
@@ -99,6 +100,9 @@ int HProcess::init ( const char * a_pcProcessName )
 			& HProcess::handler_jump_meta_tab );
 	register_postprocess_handler ( D_KEY_COMMAND_('q'), NULL,
 			& HProcess::handler_close_window );
+	if ( console::n_bUseMouse )
+		register_postprocess_handler ( KEY_MOUSE, NULL,
+				& HProcess::handler_mouse );
 	for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
 		l_piAlts [ l_iCtr ] = D_KEY_META_( '0' + l_iCtr );
 	register_postprocess_handler ( D_ALTS_COUNT, l_piAlts,
@@ -386,6 +390,19 @@ int HProcess::handler_idle ( int a_iCode, void * )
 			l_poStatusBar->refresh ( );
 		}
 	f_iIdleCycles ++;
+	return ( a_iCode );
+	M_EPILOG
+	}
+
+int HProcess::handler_mouse ( int a_iCode, void * )
+	{
+	M_PROLOG
+	a_iCode = 0;
+	mouse::OMouse l_sMouse;
+	mouse::mouse_get ( l_sMouse );
+	console::c_printf ( 0, 0,	D_FG_BLACK | D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
+			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );
+	console::n_bNeedRepaint = true;
 	return ( a_iCode );
 	M_EPILOG
 	}

@@ -69,6 +69,7 @@ protected:
 	int register_postprocess_handler ( int, int *, PROCESS_HANDLER_t );
 	int add_window ( HWindow *, const char * );
 	virtual int handler_idle ( int, void * = NULL );
+	virtual int handler_mouse ( int, void * = NULL );
 	virtual int handler_refresh ( int, void * = NULL );
 	virtual int handler_quit ( int, void * = NULL );
 	virtual int handler_jump_meta_tab ( int, void * = NULL );

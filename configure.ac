@@ -6,8 +6,10 @@ AC_INIT([[stdhapi]],[[0.0.0]],[[amok@frihet.ath.cx]])
 
 AC_MSG_RESULT([--- Welcome to stdhapi configurator ---                  [[0%]]])
 
-AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, dafault is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
+AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, dafault is `yes' if apriopriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
 dnl ` <- this one fixes syntax highlighting in vim.
+AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, dafault is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
+dnl `
 AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, dafault is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
 dnl `
 AC_ARG_WITH([sqlite],[AC_HELP_STRING([--with-sqlite],[Compile with SQLite driver, dafault is `yes' if SQLite can be found.])],[SQLITE=$withval],[SQLITE="auto"])
@@ -190,7 +192,12 @@ CPPFLAGS=$CXXFLAGS_ORIG;
 AC_MSG_RESULT([--- All needed libraries found. ---                     [[76%]]])
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
-AC_CHECK_HEADERS([[sys/consio.h]])
+_CONSOLE_MOUSE=[""];
+AC_CHECK_HEADERS([[sys/consio.h]],_CONSOLE_MOUSE=["moused"])
+AC_CHECK_HEADERS([[gpm.h]],_CONSOLE_MOUSE=["gpm"])
+if test ["$_CONSOLE_MOUSE"] = [""] -a ["$CONSOLE_MOUSE"] = ["yes"] ; then
+	AC_MSG_ERROR([Can not continue without console mouse support.])
+fi
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
 			[AC_MSG_ERROR([Can not continue without ncurses devel!])])])

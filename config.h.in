@@ -26,6 +26,8 @@
 
 #undef HAVE_SYS_CONSIO_H
 
+#undef HAVE_GPM_H
+
 /* MySQL */
 
 #undef HAVE_MYSQL_MYSQL_H
