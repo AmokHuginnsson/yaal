@@ -50,7 +50,7 @@ M_CVSID ( "$CVSHeader$" );
 HLog::HLog ( void )
 	{
 	M_PROLOG
-	pid_t l_iPid = 0;
+	uid_t l_iUid = 0;
 	passwd * l_psPasswd = NULL;
 	f_bRealMode = false;
 	f_psStream = NULL;
@@ -65,13 +65,13 @@ HLog::HLog ( void )
 		throw new HException ( __WHERE__, "tmpfile returned", ( int ) f_psStream );
 	fprintf ( f_psStream, "%-10xProcess started (%d).\n",
 			D_LOG_NOTICE, getpid ( ) );
-	l_iPid = getpid ( );
-	l_psPasswd = getpwuid ( l_iPid );
+	l_iUid = getuid ( );
+	l_psPasswd = getpwuid ( l_iUid );
 	if ( l_psPasswd )f_pcLoginName = xstrdup ( l_psPasswd->pw_name );
 	else
 		{
 		f_pcLoginName = ( char * ) xcalloc ( 8 * sizeof ( char ) );
-		snprintf ( f_pcLoginName, 6, "%d", l_iPid );
+		snprintf ( f_pcLoginName, 6, "%d", l_iUid );
 		}
 	gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 );
 	return;
