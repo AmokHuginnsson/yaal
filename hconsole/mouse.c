@@ -156,6 +156,7 @@ int console_mouse_open ( void )
 	l_sGpm.vc = l_iVC = hunt_tty ( 0 );
 	l_sGpm.eventMask = GPM_SINGLE | GPM_DOWN | GPM_UP;
 	l_sGpm.defaultMask = ~ l_sGpm.eventMask;
+	gpm_zerobased = true;
 	if ( Gpm_Open ( & l_sGpm, l_iVC ) == -1 )
 		{
 		l_oError.format ( "Can't open mouse connection: %s",

@@ -365,7 +365,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_sMouse,
 		{
 		if ( FD_ISSET ( STDIN_FILENO, & l_xFdSet ) )
 			a_iKey = get_key ( ), l_iEventType |= D_EVENT_KEYBOARD;
-		if ( n_iMouseDes && FD_ISSET ( STDIN_FILENO, & l_xFdSet ) )
+		if ( n_iMouseDes && FD_ISSET ( n_iMouseDes, & l_xFdSet ) )
 			mouse::mouse_get ( a_sMouse ), l_iEventType |= D_EVENT_MOUSE;
 		}
 	return ( l_iEventType );
