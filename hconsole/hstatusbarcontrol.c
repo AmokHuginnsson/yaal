@@ -39,6 +39,7 @@ Copyright:
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hstatusbarcontrol.h"
+#include "hwindow.h"
 #include "hconsole.h"
 
 HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
@@ -114,6 +115,10 @@ int HStatusBarControl::process_input ( int a_iCode )
 void HStatusBarControl::set_prompt ( const char * a_pcPrompt )
 	{
 	M_PROLOG
+	f_poParent->f_poPreviousFocusedChild = f_poParent->f_poFocusedChild;
+	f_poParent->f_poFocusedChild = f_poParent->f_poStatusBar;
+	f_poParent->f_poPreviousFocusedChild->kill_focus ( );
+	set_focus ( -1 );
 	if ( a_pcPrompt )
 		{
 		f_oPrompt = a_pcPrompt;

@@ -74,6 +74,7 @@ protected:
 private:
 	/*{*/
 	friend int HControl::set_focus ( char );
+	friend void HStatusBarControl::set_prompt ( const char * );
 	void set_focus ( HControl * );
 	/*}*/
 	};

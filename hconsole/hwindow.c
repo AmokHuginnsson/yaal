@@ -286,10 +286,6 @@ int HWindow::handler_command ( int a_iCode )
 	{
 	M_PROLOG
 	a_iCode = 0;
-	f_poPreviousFocusedChild = f_poFocusedChild;
-	f_poFocusedChild = f_poStatusBar;
-	f_poPreviousFocusedChild->kill_focus ( );
-	f_poStatusBar->set_focus ( -1 );
 	f_poStatusBar->set_prompt ( ":" );
 	return ( a_iCode );
 	M_EPILOG
@@ -300,10 +296,6 @@ int HWindow::handler_search ( int a_iCode )
 	M_PROLOG
 	a_iCode = 0;
 	if ( ! f_poFocusedChild->is_searchable ( ) )return ( a_iCode );
-	f_poPreviousFocusedChild = f_poFocusedChild;
-	f_poFocusedChild = f_poStatusBar;
-	f_poPreviousFocusedChild->kill_focus ( );
-	f_poStatusBar->set_focus ( -1 );
 	f_poStatusBar->set_prompt ( "/" );
 	return ( a_iCode );
 	M_EPILOG
