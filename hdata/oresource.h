@@ -109,6 +109,8 @@ struct OEditControlResource
 struct OListControlResource
 	{
 	bool	f_bCheckable;					/* can control items be checked/unchecked */
+	bool	f_bSortable;					/* is control content sortable */
+	bool	f_bSearchable;				/* can be item searched */
 	};
 
 #endif /* not __ORESOURCE_H */

@@ -137,10 +137,13 @@ int HDataWindow::init ( void )
 			case ( D_CONTROL_LIST ):
 				{
 				l_sListControlResource.f_bCheckable = false;
+				l_sListControlResource.f_bSortable = true;
+				l_sListControlResource.f_bSearchable = true;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psLCR = ( OListControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
 				l_poDataControl = new HDataListControl ( this, this, M_SETUP_STANDART,
-						M_SETUP_ATTRIBUTES, l_psLCR->f_bCheckable );
+						M_SETUP_ATTRIBUTES, l_psLCR->f_bCheckable, l_psLCR->f_bSortable,
+						l_psLCR->f_bSearchable );
 				break;
 				}
 			case ( D_CONTROL_TREE ):

@@ -44,12 +44,14 @@ Copyright:
 HDataListControl::HDataListControl ( HRecordSet * a_poRecordSet,
 		HWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
 		int a_iWidth, const char * a_pcTitle, int a_iAttribute,
-		int a_iEnabledAttribute, int a_iFocusedAttribute, bool a_bCheckable )
+		int a_iEnabledAttribute, int a_iFocusedAttribute, bool a_bCheckable,
+		bool a_bSortable, bool a_bSearchable )
 								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
 										a_iWidth, a_pcTitle, a_iAttribute,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
 								HDataControl ( a_poRecordSet ),
-								HListControl ( NULL, 0, 0, 0, 0, NULL, 0, 0, 0, a_bCheckable )
+								HListControl ( NULL, 0, 0, 0, 0, NULL, 0, 0, 0,
+										a_bCheckable, a_bSortable, a_bSearchable )
 	{
 	M_PROLOG
 	return;
