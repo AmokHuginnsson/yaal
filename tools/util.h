@@ -41,7 +41,8 @@ namespace util
 hcore::HString kwota_slownie ( double );
 void usun_ogonki ( char * );
 double atof_ex ( char const *, bool = false );
-
+bool verify_IBAN ( char const * );
+char const * const get_last_error ( void );
 	}
 
 }
