@@ -27,10 +27,8 @@ Copyright:
 #ifndef __HLISTCONTROL_H
 #define __HLISTCONTROL_H
 
-#include <sys/types.h>	/* why? - because POSIX says so :/ */
-#include <regex.h>			/* this one is obvious */
-
 #include "../hcore/hinfolist.h"
+#include "../hcore/hpattern.h"
 #include "hitem.h"
 #include "hwindow.h"
 
@@ -70,6 +68,9 @@ protected:
 	/*{*/
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
+	bool				f_bSearchable;				/* are items searchable */
+	bool				f_bFiltered;					/* is content of list filtered
+																			 thru pattern */
 	bool				f_bDrawHeader;				/* should be header driven */
 	bool				f_bEditable;					/* is list interactively editable */
 	int					f_iControlOffset;			/* when content is bigger than control
@@ -80,17 +81,7 @@ protected:
 	int					f_iSumForOne;					/* sum of percentage columns width */
 	HList < HColumnInfo >	f_oHeader;	/* list header info */
 	HElement *	f_poFirstVisibleRow;	/* pointer to first visible row */
-	struct
-		{
-		bool			f_bSearchable;				/* are items searchable */
-		bool			f_bIgnoreCase;				/* self explanary */
-		bool			f_bExtended;					/* basic RE or extended RE */
-		bool			f_bFiltered;					/* is content of list filtered
-																			 thru pattern */
-		regex_t 	f_sMask;							/* regular expression for search patterns */
-		HString		f_oPattern;						/* current search pattern */
-		HString		f_oRealPattern;				/* pattern with stripped switches */
-		} f_sSearch;
+	HPattern		f_oPattern;						/* used for searching */
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
 	long int		f_lComparedItems;			/* items already compared during sorting */
