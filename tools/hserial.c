@@ -67,8 +67,7 @@ HSerial::HSerial ( const char * a_pcDevice )
  *             will not terminate input)
  *             otherwise make device raw  ( no other input processing)
  */
-	f_sTIO.c_iflag = IGNPAR | ICRNL;
-	f_sTIO.c_iflag = IGNPAR;
+	f_sTIO.c_iflag = IGNPAR | ICRNL | IGNBRK;
 /*
  *  Raw output.
  */
@@ -110,6 +109,7 @@ HSerial::~HSerial ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDes )close ( );
+	f_iFileDes = 0;
 	return;
 	M_EPILOG
 	}
