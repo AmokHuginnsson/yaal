@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "hitem.h"
-
-#include "hexception.h"
 
 HItem::HItem ( int a_iSize ) : HArray < HInfo > ( a_iSize )
 	{

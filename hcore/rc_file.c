@@ -30,10 +30,10 @@ Copyright:
 
 #include "../config.h"
 
-#include "rc_file.h"
-
-#include "xalloc.h"
 #include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "rc_file.h"
+#include "xalloc.h"
 #include "hlog.h"
 
 namespace rc_file

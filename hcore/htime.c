@@ -28,9 +28,9 @@ Copyright:
 
 #include "../config.h"
 
-#include "htime.h"
-
 #include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "htime.h"
 
 HTime::HTime ( const char * a_pcFormat )
 	{

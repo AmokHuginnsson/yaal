@@ -27,8 +27,9 @@ Copyright:
 #define MULTIPLIER      0x015a4e35L
 #define INCREMENT       1
 
-#include "hrandomizer.h"
 #include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hrandomizer.h"
 
 HRandomizer::HRandomizer( unsigned int a_lSeed )
 	{

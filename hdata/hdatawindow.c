@@ -36,11 +36,11 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
+#include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "hdatawindow.h"
 #include "hdatalistcontrol.h"
 #include "hdatatreecontrol.h"
-
-#include "../hcore/hexception.h"
 
 HDataWindow::HDataWindow ( const char * a_pcTitle, HDataBase * a_poDataBase,
 		OResource * a_psDataControlInfo )

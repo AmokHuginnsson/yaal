@@ -34,11 +34,11 @@ Copyright:
 #include <string.h>
 #include <stdlib.h>
 
-#include "hanalyser.h"
-
-#include "../hcore/xalloc.h"
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "../hcore/xalloc.h"
 #include "../hcore/htree.h"
+#include "hanalyser.h"
 
 #ifdef __DEBUGGER_BABUNI__
 #include "../hcore/hlog.h"

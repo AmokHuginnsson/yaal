@@ -26,17 +26,11 @@ Copyright:
 
 #include <string.h>
 
-
-#include "hdatabase.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
-
+#include "hdatabase.h"
 #include "db_driver_loader.h"
-
-#ifndef NULL
-#define NULL	0
-#endif /* not NULL */
 
 HDataBase::HDataBase ( void )
 	{

@@ -1,3 +1,4 @@
+/* $CVSHeader$ */
 /* Define operating system host type here. */
 
 #ifndef __CONFIG_H

@@ -32,8 +32,8 @@ Copyright:
 #endif /* _STDIO_H */
 
 #include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "xalloc.h"
-
 #include "hlog.h"
 
 HException::HException ( const char * a_pcFileName,

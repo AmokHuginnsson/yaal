@@ -26,8 +26,9 @@ Copyright:
 
 #include <math.h>
 
-#include "hvector.h"
 #include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hvector.h"
 
 HVector::HVector ( int a_iDimension )
 	{

@@ -27,9 +27,10 @@ Copyright:
 #include <string.h>
 #include <stdlib.h>
 
-#include "collector.h"
-
+#include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
+#include "collector.h"
 
 namespace collector
 {

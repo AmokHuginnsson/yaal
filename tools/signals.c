@@ -39,14 +39,14 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "signals.h"
-
+#include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "../hcore/xalloc.h"
 #include "../hcore/rc_file.h"
-#include "../hcore/hexception.h"
 #include "../hconsole/console.h"         /* conio (ncurses) ability */
 #include "../hcore/hlog.h"            /* log object */
 #include "../hcore/hstring.h"         /* HString class */
+#include "signals.h"
 
 namespace signals
 {

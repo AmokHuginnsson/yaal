@@ -26,14 +26,10 @@ Copyright:
 
 #include <stdlib.h>
 
-#include "hrecordset.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hrecordset.h"
 #include "db_driver_loader.h"
-
-#ifndef NULL
-#define NULL 0
-#endif /* not NULL */
 
 char g_pcEMode [ ] = "record set is not in appropriate mode for operation";
 #define E_MODE g_pcEMode

@@ -32,12 +32,12 @@ Copyright:
 
 #include "../config.h"
 
-#include "../hcore/xalloc.h"
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "../hcore/xalloc.h"
 #include "../hcore/hlog.h"
 #include "../hcore/hstring.h"
 #include "../hcore/rc_file.h"
-
 #include "db_driver_loader.h"
 
 const char g_pcDone [ ] = "done.\r\n";

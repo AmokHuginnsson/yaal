@@ -36,9 +36,9 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "hstatusbarcontrol.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hstatusbarcontrol.h"
 
 HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 		const char * a_pcLabel )

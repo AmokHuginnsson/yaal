@@ -1,3 +1,4 @@
+dnl $CVSHeader$
 dnl configure.ac is integral part of stdhapi project.
 
 dnl Initialization data.

@@ -30,9 +30,9 @@ Copyright:
 
 #include "../config.h"
 
-#include "hserial.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hserial.h"
 
 /* #define D_BAUDRATE B38400 */
 #define D_BAUDRATE B115200

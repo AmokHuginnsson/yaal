@@ -24,11 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hmenucontrol.h"
-
 #include "../hcore/hexception.h"
-
+M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
+#include "hmenucontrol.h"
 
 HMenuControl::HMenuNode::HMenuNode ( HMenuNode * a_poNode )
 						: HTreeControl::HNodeControl ( a_poNode )

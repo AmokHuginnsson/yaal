@@ -27,6 +27,9 @@ Copyright:
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+
 unsigned long int g_pulMaskBitSet[] = 
 	{
 	2147483648u, 1073741824, 536870912, 268435456, 134217728, 67108864, 33554432,

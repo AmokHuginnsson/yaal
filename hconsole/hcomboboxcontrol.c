@@ -26,9 +26,9 @@ Copyright:
 
 #include <ncurses.h>
 
-#include "hcomboboxcontrol.h"
-
 #include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hcomboboxcontrol.h"
 
 HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,

@@ -36,9 +36,9 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "htreecontrol.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "htreecontrol.h"
 
 HTreeControl::HNodeControl::HNodeControl ( HNodeControl * a_poNode )
 						: HTree < HItem >::HNode ( a_poNode )

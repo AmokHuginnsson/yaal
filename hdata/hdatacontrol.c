@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hdatacontrol.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hdatacontrol.h"
 
 HDataControl::HDataControl ( HRecordSet * a_poRecordSet )
 						: HControl ( NULL, 0, 0, 0, 0, NULL )

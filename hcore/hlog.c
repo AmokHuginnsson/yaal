@@ -36,10 +36,10 @@ Copyright:
 #	include <libgen.h>
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
 
-#include "hlog.h"
-
-#include "xalloc.h"
 #include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hlog.h"
+#include "xalloc.h"
 
 HLog::HLog ( void )
 	{

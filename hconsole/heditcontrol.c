@@ -39,10 +39,10 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "heditcontrol.h"
-
-#include "../hcore/xalloc.h"
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "../hcore/xalloc.h"
+#include "heditcontrol.h"
 
 HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iWidth, int a_iHeight,

@@ -34,9 +34,9 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "hwindow.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hwindow.h"
 #include "console.h"
 
 #ifdef __DEBUGGER_BABUNI__

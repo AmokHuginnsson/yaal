@@ -37,9 +37,9 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
-#include "hlistcontrol.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hlistcontrol.h"
 
 HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		int a_iHeight, int a_iWidth, const char * a_pcLabel, bool a_bCheckable,

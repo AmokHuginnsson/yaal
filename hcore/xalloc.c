@@ -28,6 +28,9 @@ Copyright:
 #include <stdio.h>
 #include <string.h>
 
+#include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
+
 extern "C"
 {
 

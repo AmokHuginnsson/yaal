@@ -24,9 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "hmatrix.h"
 #include "hvector.h"
-#include "hexception.h"
 
 HMatrix::HMatrix( int a_iRows, int a_iColumns )
 	{

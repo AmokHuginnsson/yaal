@@ -27,6 +27,7 @@ Copyright:
 #ifndef __HEXCEPTION_H
 #define __HEXCEPTION_H
 
+#define M_CVSID(id) static char __CVSID__ [ ] __attribute__((__unused__)) = id
 #define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
 #define M_TRY try{
 #define M_CATCH }catch ( HException * e ){e->log ( __WHERE__ );throw e;}
@@ -39,7 +40,7 @@ Copyright:
 #endif /* not NULL */
 
 /* those types definitions were in hinfo.h but this file (hexception.h)
- * is included into more files, we assume that size of ( int ) is equal 4*/
+ * is included into more files, we assume that sizeof ( int ) >= 4 */
 #define D_TYPE_NONE					0x0000
 #define D_TYPE_BOOL					0x0001
 #define D_TYPE_CHAR					0x0002

@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hwindowlistcontrol.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hwindowlistcontrol.h"
 
 HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 		int a_iColumn, int a_iHeight, int a_iWidth, const char * a_pcLabel )

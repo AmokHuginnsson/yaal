@@ -26,9 +26,9 @@ Copyright:
 
 #include <stdlib.h>
 
-#include "util.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "util.h"
 
 namespace util
 {

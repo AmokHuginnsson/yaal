@@ -29,10 +29,10 @@ Copyright:
 #include <ctype.h>
 #include <stdarg.h>
 
-#include "xalloc.h"
-
-#include "hstring.h"
 #include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hstring.h"
+#include "xalloc.h"
 
 HString::HString ( void )
 	{

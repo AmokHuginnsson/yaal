@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hmainwindow.h"
-
 #include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hmainwindow.h"
 
 HMainWindow::HMainWindow ( void )
 						: HWindow ( "stdhapi" )
