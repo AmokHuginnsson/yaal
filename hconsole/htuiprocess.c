@@ -323,16 +323,26 @@ int HProcess::process_stdin ( int a_iCode )
 
 /* this makro is ripped from unistd.h, I seriously doubt if it is portable */
 
-#define M_STDHAPI_TEMP_FAILURE_RETRY(expression) \
-  (__extension__ \
-    ({ long int __result; \
-       do \
-			 	{ \
-				if ( console::n_bInputWaiting )process_stdin ( STDIN_FILENO ); \
-				__result = (long int) (expression); \
-				} \
-       while (__result == -1L && errno == EINTR); \
-       __result; }))
+#define M_REFRESH( )	if ( console::n_bNeedRepaint )\
+	{\
+	console::n_bNeedRepaint = false;\
+	::refresh ( );\
+	}\
+
+#define M_STDHAPI_TEMP_FAILURE_RETRY(expression)	(__extension__ ( \
+	{ long int __result; \
+	do \
+		{ \
+		if ( console::n_bInputWaiting ) \
+			{ \
+			process_stdin ( STDIN_FILENO ); \
+			M_REFRESH ( ); \
+			} \
+		__result = (long int) (expression); \
+		} \
+	while (__result == -1L && errno == EINTR); \
+	__result; \
+	}))
 
 int HProcess::run ( void )
 	{

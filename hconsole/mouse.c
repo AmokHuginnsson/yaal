@@ -26,6 +26,8 @@ Copyright:
 
 #include <unistd.h>
 #include <libintl.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "../config.h"
 
@@ -41,8 +43,6 @@ Copyright:
 #	include <signal.h>
 #	include <fcntl.h>
 #elif defined ( HAVE_GPM_H )
-#	include <stdlib.h>
-#	include <string.h>
 #	include <gpm.h>
 #endif /* HAVE_GPM_H */
 
@@ -67,7 +67,7 @@ int hunt_tty ( int a_iOffset )
 	int l_iVC = 0;
 	char * l_pcTtyName = NULL;
 	l_pcTtyName = ttyname ( STDIN_FILENO );
-	if ( l_pcTtyName && ! strncmp ( l_pcTtyName, "/dev/tty", 8 ) )
+	if ( l_pcTtyName && ! strncmp ( l_pcTtyName, "/dev/ttyv", 8 + a_iOffset ) )
 		l_iVC = l_pcTtyName [ 8 + a_iOffset ] - '0';
 	else
 		{
@@ -87,17 +87,21 @@ int n_iMouse = 0;
 int console_mouse_open ( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
+	int l_iVC = 0;
 	char l_pcTty [ ] = "/dev/ttyv0";
+	HString l_oError;
 	mouse_info l_sMouse;
 	l_sMouse.operation = MOUSE_MODE;
-	l_sMouse.u.mode.mode = 1;
+	l_sMouse.u.mode.mode = 0;
 	l_sMouse.u.mode.signal = SIGUSR1;
-
-	l_pcTty [ 9 ] = '0' + hunt_tty ( 1 );
+	l_iVC = hunt_tty ( 1 );
+	l_pcTty [ 9 ] = '0' + l_iVC;
 	n_iMouse = open ( l_pcTty, O_RDWR );
 	if ( n_iMouse < 0 )
-		M_THROW ( "can not open mouse", g_iErrNo );
+		{
+		l_oError.format ( _ ( "can not open mouse, %s" ), strerror ( g_iErrNo ) );
+		M_THROW ( l_oError, l_iVC );
+		}
 	if ( ioctl ( n_iMouse, CONS_MOUSECTL, & l_sMouse ) < 0 )
 		{
 		close ( n_iMouse );
