@@ -56,6 +56,7 @@ public:
 	HComplex & operator /= ( const double );
 	HComplex operator + ( const HComplex & );
 	HComplex operator - ( const HComplex & );
+	HComplex operator - ( void );
 	HComplex operator * ( const HComplex & );
 	HComplex operator * ( const double );
 	HComplex operator / ( const HComplex & );

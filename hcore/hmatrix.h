@@ -64,6 +64,7 @@ public:
 	HMatrix & operator = ( tType );
 	HMatrix operator + ( HMatrix & );
 	HMatrix operator - ( HMatrix & );
+	HMatrix operator - ( void );
 	HMatrix operator * ( HMatrix & );
 	HMatrix operator * ( tType );
 	HMatrix operator / ( tType );
@@ -351,6 +352,17 @@ HMatrix < tType > HMatrix < tType > ::operator - ( HMatrix & a_roMatrix )
 		return ( l_oMatrix );
 		}
 	return ( * this );
+	M_EPILOG
+	}
+	
+template < class tType >
+HMatrix < tType > HMatrix < tType > ::operator - ( void )
+	{
+	M_PROLOG
+	HMatrix < tType > l_oMatrix ( f_iRows, f_iColumns );
+	l_oMatrix = 0;
+	l_oMatrix -= ( * this );
+	return ( l_oMatrix );
 	M_EPILOG
 	}
 	

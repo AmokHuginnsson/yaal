@@ -61,6 +61,7 @@ public:
 	HVector & operator = ( tType );
 	HVector operator + ( HVector & );
 	HVector operator - ( HVector & );
+	HVector operator - ( void );
 	HVector operator * ( tType );
 	HVector operator / ( tType );
 	HVector & operator += ( HVector & );
@@ -188,6 +189,17 @@ HVector < tType > HVector < tType > ::operator - ( HVector & a_roVector )
 	HVector l_oVector ( f_iSize );
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ ) 
 		l_oVector.f_ptArray [ l_iCtr ] = f_ptArray [ l_iCtr ] - a_roVector.f_ptArray [ l_iCtr ];
+	return ( l_oVector );
+	M_EPILOG
+	}
+
+template < class tType >
+HVector < tType > HVector < tType > ::operator - ( void )
+	{
+	M_PROLOG
+	HVector l_oVector ( f_iSize );
+	l_oVector = 0;
+	l_oVector -= ( * this );
 	return ( l_oVector );
 	M_EPILOG
 	}

@@ -197,6 +197,15 @@ HComplex HComplex::operator - ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
+HComplex HComplex::operator - ( )
+	{
+	M_PROLOG
+	HComplex l_oComplex ( 0., 0. );
+	l_oComplex -= ( * this );
+	return ( l_oComplex );
+	M_EPILOG
+	}
+
 HComplex HComplex::operator * ( const HComplex & a_roComplex )
 	{
 	M_PROLOG
