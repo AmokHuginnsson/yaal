@@ -33,8 +33,17 @@ class HStatusBarControl : public HEditControl
 	{
 protected:
 	/*{*/
+	bool f_bDone;
+	bool f_bEstimate;
 	int f_iPromptLength;
-	int f_iProgress;
+	double f_dProgressSize;
+	int f_iLastProgress;
+	int f_iLastPercent;
+	int f_iLastMinute;
+	int f_iLastSecond;
+	int f_iLastStep;
+	HString f_oMessage;
+	HTime f_oStart;
 	/*}*/
 public:
 	/*{*/
@@ -42,8 +51,8 @@ public:
 	virtual ~HStatusBarControl ( void );
 	virtual int verify ( void );
 	void setup ( const char *, const char *, int );
-	double init_progress ( const char *, int );
-	void update_progress ( void );
+	void init_progress ( double, const char *, bool = true );
+	void update_progress ( double = -1, const char * = NULL );
 	void display ( const char *, int = -1 );
 	/*}*/
 	};

@@ -332,7 +332,7 @@ int HProcess::handler_idle ( int a_iCode )
 	{
 	M_PROLOG
 #ifdef __DEBUG__
-	HString l_oClock = HTime ( );
+	HString l_oClock ( ( const char * ) HTime ( ) );
 	console::c_printf ( 0, console::n_iWidth - l_oClock.get_length ( ),
 			D_FG_BLACK | D_BG_LIGHTGRAY, l_oClock );
 	console::n_bNeedRepaint = true;
