@@ -92,6 +92,9 @@ int HProcess::init ( const char * a_pcProcessName )
 	f_poWindows = l_poMainWindow->_disclose_window_list ( );
 	add_window ( l_poMainWindow, a_pcProcessName );
 	register_file_descriptor_handler ( STDIN_FILENO, & HProcess::process_stdin );
+	if ( console::n_bUseMouse && console::n_iMouseDes )
+		register_file_descriptor_handler ( console::n_iMouseDes,
+				& HProcess::process_mouse );
 	register_postprocess_handler ( D_CTRLS_COUNT, l_piCtrls,
 			& HProcess::handler_refresh );
 	register_postprocess_handler ( D_KEY_COMMAND_('x'), NULL,
@@ -223,7 +226,7 @@ int HProcess::reconstruct_fdset ( void )
 	while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
 		{
 		l_oHandler = f_oFileDescriptorHandlers.to_tail ( 1, & l_iFlag );
-		FD_SET ( l_oHandler, & f_xFileDescriptorSet );
+		FD_SET ( l_oHandler [ 0 ], & f_xFileDescriptorSet );
 		}
 	return ( 0 );
 	M_EPILOG
@@ -355,7 +358,7 @@ int HProcess::run ( void )
 			while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
 				{
 				l_oHandler = f_oFileDescriptorHandlers.to_tail ( 1, & l_iFlag );
-				if ( FD_ISSET ( l_oHandler, & f_xFileDescriptorSet ) )
+				if ( FD_ISSET ( l_oHandler [ 0 ], & f_xFileDescriptorSet ) )
 					{
 					( this->*( ( PROCESS_HANDLER_FILEDES_t ) l_oHandler ) ) ( l_oHandler [ 0 ] );
 					f_iIdleCycles = 0;
@@ -391,6 +394,14 @@ int HProcess::handler_idle ( int a_iCode, void * )
 		}
 	f_iIdleCycles ++;
 	return ( a_iCode );
+	M_EPILOG
+	}
+
+int HProcess::process_mouse ( int )
+	{
+	M_PROLOG
+	handler_mouse ( 0 );
+	return ( 0 );
 	M_EPILOG
 	}
 
