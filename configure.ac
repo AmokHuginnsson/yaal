@@ -72,7 +72,7 @@ dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[71%]]])
 _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
-CXXFLAGS=["-Wshadow"]
+CXXFLAGS=["-Wshadow -Werror"]
 AC_TRY_COMPILE([#include <pthread.h>],[],
 							[AC_SUBST([SPECIAL_COMPILER_FLAGS],[-Wshadow])
 							_FLAGS=["-Wshadow"]],
@@ -87,7 +87,7 @@ AC_LINK_IFELSE([[extern int errno;void foo(void){errno=0;}]],
 							[AC_SUBST([SPECIAL_LINKER_FLAGS],
 								[[-Wl,--no-undefined]]) _FLAGS=["$_FLAGS -Wl,--no-undefined."]],
 							[AC_MSG_WARN([[Can not use -Wl,--no-undefined!]])])
-if test "$_FLAGS" == "" ; then
+if test ["$_FLAGS"] = [""] ; then
 	_FLAGS='unfortunetely none. ---         [[76%]]'
 fi
 AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
