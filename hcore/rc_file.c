@@ -46,12 +46,11 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 	bool l_pbTFTab [ ] = { false, true }, l_bSection = false, l_bOptionOK;
 	int l_iCtr = 0, l_iCtrOut = 0, l_iLine = 0;
 	FILE * l_psRc = 0;
-	HString l_oOption, l_oValue;
-	log << "process_rc_file ( ): ";
+	HString l_oOption, l_oValue, l_oMessage;
+	::log << "process_rc_file ( ): ";
 	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
 		{
 		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );
-		if ( a_pcSection )::log << "section: " << a_pcSection;
 		if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc, l_iLine ) )
 			{
 			if ( a_pcSection )
@@ -59,7 +58,12 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 				if ( l_oValue.is_empty ( ) )
 					{
 					l_oValue.format ( "[%s]", a_pcSection );
-					if ( ( l_oOption == l_oValue ) && ( l_bSection = true ) )continue;
+					if ( l_oOption == l_oValue )
+							{
+							::log << "section: " << a_pcSection << ", ";
+							l_bSection = true;
+							continue;
+							}
 					else l_bSection = false;
 					}
 				if ( ! l_bSection )continue;
@@ -74,27 +78,32 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 						{
 						case ( D_TYPE_BOOL ):
 							{
-							rc_set_variable ( l_oValue, * ( bool * ) a_psVaraibles [ l_iCtr ].f_pvValue );
+							rc_set_variable ( l_oValue,
+									* ( bool * ) a_psVaraibles [ l_iCtr ].f_pvValue );
 							break;
 							}
 						case ( D_TYPE_CHAR ):
 							{
-							rc_set_variable ( l_oValue, * ( char * ) a_psVaraibles [ l_iCtr ].f_pvValue );
+							rc_set_variable ( l_oValue,
+									* ( char * ) a_psVaraibles [ l_iCtr ].f_pvValue );
 							break;
 							}
 						case ( D_TYPE_INT ):
 							{
-							rc_set_variable ( l_oValue, * ( int * ) a_psVaraibles [ l_iCtr ].f_pvValue );
+							rc_set_variable ( l_oValue,
+									* ( int * ) a_psVaraibles [ l_iCtr ].f_pvValue );
 							break;
 							}
 						case ( D_TYPE_CHAR_POINTER ):
 							{
-							rc_set_variable ( l_oValue, ( char ** ) a_psVaraibles [ l_iCtr ].f_pvValue );
+							rc_set_variable ( l_oValue,
+									( char ** ) a_psVaraibles [ l_iCtr ].f_pvValue );
 							break;
 							}
 						default :
 							{
-							throw new HException ( __WHERE__, "unknown type", a_psVaraibles [ l_iCtr ].f_iType );
+							throw new HException ( __WHERE__, "unknown type",
+									a_psVaraibles [ l_iCtr ].f_iType );
 							break;
 							}
 						}
@@ -102,14 +111,16 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 					}
 				l_iCtr ++;
 				}
-			if ( set_variables )
-				if ( set_variables ( l_oOption, l_oValue ) && ! l_bOptionOK )
-					{
-					::log << "failed." << endl;
-					::log << "Error: unknown option found: `" << l_oOption;
-					::log << "', with value: `" << l_oValue << "'." << endl;
-					throw new HException ( __WHERE__, "unknown option", l_iLine );
-					}
+			if ( set_variables && set_variables ( l_oOption, l_oValue )
+					&& ! l_bOptionOK )
+				{
+				::log << "failed." << endl;
+				l_oMessage.format ( "Error: unknown option found: `%s', "
+						"with value: `%s', on line %d.\n",
+						( const char * ) l_oOption, ( const char * ) l_oValue, l_iLine );
+				::log << l_oMessage;
+				fprintf ( stderr, l_oMessage );
+				}
 			}
 		}
 	if ( l_psRc )rc_close ( l_psRc );
