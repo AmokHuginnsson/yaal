@@ -58,7 +58,8 @@ AC_CHECK_FILE(
 		[AC_CHECK_FILE(
 			[[/etc/rc]],
 			[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST______=['FreeBSD. ---']
-				AC_SUBST([ADDITIONAL_COMMAND],[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION)']])
+				AC_SUBST([ADDITIONAL_COMMAND],
+[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);']])
 				AC_SUBST([EXTRA_LIB_PATHS], [[-L/usr/local/lib/mysql]])
 				CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]],
 			[AC_MSG_ERROR([Can not recognize host operating system type!])]
@@ -69,21 +70,26 @@ AC_MSG_RESULT([--- Guessed host operating system is $_HOST______       [[70%]]])
 
 dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[71%]]])
-_FLAGS='unfortunetely none. ---         [[76%]]'
+_FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
-CXXFLAGS=["--Wshadow"]
-AC_TRY_COMPILE([pthread],[],[AC_SUBST([SPECIAL_COMPILER_FLAGS],[--Wshadow])
-							_FLAGS=["--Wshadow"]],
-							[AC_MSG_WARN([[Can not use --Wshadow!]])])
-CXXFLAGS=["--pedantic-errors"]
-AC_TRY_COMPILE([stdlib],[],[AC_SUBST([SPECIAL_HEAVY_COMPILER_FLAGS],[--pedantic-errors])
-							_FLAGS=["$_FLAGS --pedantic-errors"]],
-							[AC_MSG_WARN([[Can not use --pedantic-errors!]])])
+CXXFLAGS=["-Wshadow"]
+AC_TRY_COMPILE([#include <pthread.h>],[],
+							[AC_SUBST([SPECIAL_COMPILER_FLAGS],[-Wshadow])
+							_FLAGS=["-Wshadow"]],
+							[AC_MSG_WARN([[Can not use -Wshadow!]])])
+CXXFLAGS=["-pedantic-errors"]
+AC_TRY_COMPILE([#include <stdlib.h>],[],
+							[AC_SUBST([SPECIAL_HEAVY_COMPILER_FLAGS],	[-pedantic-errors])
+							_FLAGS=["$_FLAGS -pedantic-errors"]],
+							[AC_MSG_WARN([[Can not use -pedantic-errors!]])])
 CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings -Wl,-soname,conftest"]
 AC_LINK_IFELSE([[extern int errno;void foo(void){errno=0;}]],
 							[AC_SUBST([SPECIAL_LINKER_FLAGS],
-							[[-Wl,--no-undefined]]) _FLAGS=["$_FLAGS -Wl,--no-undefined."]],
+								[[-Wl,--no-undefined]]) _FLAGS=["$_FLAGS -Wl,--no-undefined."]],
 							[AC_MSG_WARN([[Can not use -Wl,--no-undefined!]])])
+if test "$_FLAGS" == "" ; then
+	_FLAGS='unfortunetely none. ---         [[76%]]'
+fi
 AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
 
 dnl Test if dynamic loader is in libc or in separate library dl. This one is silent.

@@ -248,7 +248,7 @@ $(TARGET):
 	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(TARGETDIR)/
 	@/bin/mv -f lib$(NAME).a $(TARGETDIR)/
 	@echo -n "making cache ... "
-	@(cd $(TARGETDIR);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;@ADDITIONAL_COMMAND@;ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so;$(TARGETDIR)/mkcache)
+	@(cd $(TARGETDIR);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;$(TARGETDIR)/mkcache;@ADDITIONAL_COMMAND@ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so)
 	@echo "done."
 
 #-------------------------------------------------------------------
