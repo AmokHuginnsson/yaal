@@ -75,8 +75,10 @@ AC_MSG_RESULT([--- Guessed fetures are $_FLAG____________. ---         [[76%]]])
 
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[77%]]])
-AC_CHECK_LIB([ncurses],[initscr],[],[Can not continue without ncurses.])
-AC_CHECK_LIB([mysqlclient],[mysql_init],[],[Can not continue without MySQL.])
+AC_CHECK_LIB([ncurses],[initscr],
+							[],[AC_MSG_ERROR([Can not continue without ncurses.])])
+AC_CHECK_LIB([mysqlclient],[mysql_init],
+							[],[AC_MSG_ERROR([Can not continue without MySQL.])])
 AC_CHECK_LIB([pq],[PQsetdbLogin],
 							[],[AC_MSG_ERROR([Can not continue without PostgreSQL.])])
 AC_MSG_RESULT([--- All needed libraries found. ---                     [[83%]]])
