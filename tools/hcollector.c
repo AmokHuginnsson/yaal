@@ -102,6 +102,7 @@ int HCollector::receive_line ( char * & a_pcLine )
 	/* P prefix means sender transmission side data */
 	while ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
 		{
+		memset ( f_oLine, 0, D_RECV_BUF_SIZE );
 		read ( f_oLine, D_RECV_BUF_SIZE );
 		a_pcLine = ( ( char * ) f_oLine )
 			+ strlen ( D_PROTO_DTA ) + 2 /* for lenght */ + 2 /* for crc */;
