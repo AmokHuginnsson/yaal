@@ -278,14 +278,14 @@ $(TOOLS): $(HCONSOLE) $(OBJ4tools)
 	@$(MAKE) $(TOOLS)\' TARGET=$(TOOLS)\' NAME=tools LIBS="-Wl,-init,tools_init -Wl,-fini,tools_fini -lncurses -lhcore -lhconsole"
 
 # dbwrapper BEGIN
-$(MYSQL_DRIVER): $(HCORE) $(OBJ4mysql_driver)
-	@$(MAKE) $(MYSQL_DRIVER)\' TARGET=$(MYSQL_DRIVER)\' NAME=mysql_driver LIBS="-lmysqlclient -lhcore"
+$(DBWRAPPER) : $(HCORE) $(OBJ4dbwrapper)
+	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-Wl,-init,dbwrapper_init -Wl,-fini,dbwrapper_fini -rdynamic @DLOPEN_IN@ -lhcore"
+
+$(MYSQL_DRIVER): $(HCORE) $(OBJ4mysql_driver) $(DBWRAPPER)
+	@$(MAKE) $(MYSQL_DRIVER)\' TARGET=$(MYSQL_DRIVER)\' NAME=mysql_driver LIBS="-lmysqlclient -lhcore -ldbwrapper"
 
 $(POSTGRESQL_DRIVER): $(HCORE) $(OBJ4postgresql_driver)
 	@$(MAKE) $(POSTGRESQL_DRIVER)\' TARGET=$(POSTGRESQL_DRIVER)\' NAME=postgresql_driver LIBS="-lpq -lhcore"
-
-$(DBWRAPPER) : $(HCORE) $(OBJ4dbwrapper)
-	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-Wl,-init,dbwrapper_init -Wl,-fini,dbwrapper_fini -rdynamic @DLOPEN_IN@ -lhcore"
 # dbwrapper END
 
 $(HDATA): $(HCONSOLE) $(OBJ4hdata)
