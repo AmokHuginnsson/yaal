@@ -5,6 +5,7 @@
 	- Debian Woody
 	- Debian Sarge
 	- PLD DC/AC
+	- FreeBSD 5.1 RELEASE
 
 If your platform is not on above list was is very likely that stdhapi
 will not compile/link/work.

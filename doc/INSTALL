@@ -24,6 +24,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 	- pray
 	- $ ./configure
 	- pray
-	- $ make
+	- $ make 
+	# $ gmake #in case of FreeBSD.
 	- pray with passion
 
