@@ -321,5 +321,13 @@ void tools_init ( void )
 	return;
 	}
 
+/* older versions of g++ fail to handle __attribute__((constructor))
+   if no static object exists */
+
+#if __GNUC__ < 3 || \
+	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
+
 HString g_oDummyTOOLS;
+
+#endif
 
