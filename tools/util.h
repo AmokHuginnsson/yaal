@@ -30,10 +30,10 @@ Copyright:
 #include "../hcore/hstring.h"
 
 namespace util
-{
+	{
 
 HString kwota_slownie ( double );
 
-};
+	}
 
 #endif /* not __UTIL_H */

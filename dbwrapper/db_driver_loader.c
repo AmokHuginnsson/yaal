@@ -35,17 +35,16 @@ Copyright:
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "../hcore/xalloc.h"
-#include "../hcore/hlog.h"
 #include "../hcore/hstring.h"
-#include "../hcore/rc_file.h"
+#include "../hcore/hlog.h"
 #include "db_driver_loader.h"
+#include "dbwrapper.h"
 
 #define M_DB_ERR(msg) "Error: Data base request ("msg") while no driver loaded."
 
-const char g_pcDone [ ] = "done.\r\n";
+const char x_tag_g_pcDone [ ] = "done.\r\n", * g_pcDone = x_tag_g_pcDone;
 
-char * g_pcDefaultSockPath = NULL;
-const char * g_ppcDriver [ 24 ] =
+static const char * g_ppcDriver [ 24 ] =
 	{
 	NULL,
 	"libmysql_driver.so",
@@ -53,18 +52,10 @@ const char * g_ppcDriver [ 24 ] =
 	NULL
 	};
 
-void * g_pvDlHandle = NULL;
-
 namespace dbwrapper
 	{
-
-int		n_iDataBaseDriver = 0;
-
-OVariable n_psVariables [ ] =
-	{
-		{ D_TYPE_CHAR_POINTER, "mysql_socket", & g_pcDefaultSockPath },
-		{ 0, NULL, NULL }
-	};
+	
+void * n_pvDlHandle = NULL;
 
 typedef void * ( * t0 ) ( const char *, const char *, const char * );
 void * ( * db_connect ) ( const char *, const char *, const char * );
@@ -101,6 +92,9 @@ char * ( * rs_column_name ) ( void *, int );
 
 	}
 
+namespace dbwrapper
+{
+	
 /* Null-dummy driver */
 
 void * dummy_db_connect ( const char *, const char *, const char * )
@@ -197,48 +191,48 @@ void load_driver ( void )
 	if ( dbwrapper::n_iDataBaseDriver )
 		{
 		l_iCtr = dbwrapper::n_iDataBaseDriver;
-		g_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ], RTLD_NOW | RTLD_GLOBAL );
-		if ( ! g_pvDlHandle )l_iCtr = 1;
-		while ( ! g_pvDlHandle && g_ppcDriver [ l_iCtr ] )
+		n_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ], RTLD_NOW | RTLD_GLOBAL );
+		if ( ! n_pvDlHandle )l_iCtr = 1;
+		while ( ! n_pvDlHandle && g_ppcDriver [ l_iCtr ] )
 			{
 			if ( ( l_iCtr == dbwrapper::n_iDataBaseDriver ) && l_iCtr ++ )continue;
 			dbwrapper_error ( );
-			g_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ],
+			n_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ],
 					RTLD_NOW | RTLD_GLOBAL );
 			}
-		if ( ! g_pvDlHandle )dbwrapper_exit ( );
+		if ( ! n_pvDlHandle )dbwrapper_exit ( );
 		else
 			{
-			if ( ( ( l_iCtr - 1 ) == D_DB_DRIVER_MYSQL ) && ! g_pcDefaultSockPath )
-				g_pcDefaultSockPath = xstrdup ( "/var/run/mysqld/mysqld.sock" );
+			if ( ( ( l_iCtr - 1 ) == D_DB_DRIVER_MYSQL ) && ! n_pcDefaultSockPath )
+				n_pcDefaultSockPath = xstrdup ( "/var/run/mysqld/mysqld.sock" );
 			::log ( D_LOG_NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
 			::log << "] driver." << endl;
 			}
-		fprintf ( stderr, g_pcDone );
+		fprintf ( stderr, x_tag_g_pcDone );
 		fprintf ( stderr, "Linking symbols ... " );
-		if ( ! ( dbwrapper::db_disconnect = (dbwrapper::t1) dlsym ( g_pvDlHandle,
+		if ( ! ( dbwrapper::db_disconnect = (dbwrapper::t1) dlsym ( n_pvDlHandle,
 						"db_disconnect" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_errno = (dbwrapper::t2) dlsym ( g_pvDlHandle,
+		else if ( ! ( dbwrapper::db_errno = (dbwrapper::t2) dlsym ( n_pvDlHandle,
 						"db_errno" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_error = (dbwrapper::t3) dlsym ( g_pvDlHandle,
+		else if ( ! ( dbwrapper::db_error = (dbwrapper::t3) dlsym ( n_pvDlHandle,
 						"db_error" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_query = (dbwrapper::t4) dlsym ( g_pvDlHandle,
+		else if ( ! ( dbwrapper::db_query = (dbwrapper::t4) dlsym ( n_pvDlHandle,
 						"db_query" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_unquery = (dbwrapper::t5) dlsym ( g_pvDlHandle,
+		else if ( ! ( dbwrapper::db_unquery = (dbwrapper::t5) dlsym ( n_pvDlHandle,
 						"db_unquery" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::rs_get = (dbwrapper::t6) dlsym ( g_pvDlHandle,
+		else if ( ! ( dbwrapper::rs_get = (dbwrapper::t6) dlsym ( n_pvDlHandle,
 						"rs_get" ) ) )dbwrapper_error ( );
-		else if ( ! ( rs_fields_count = (dbwrapper::t7) dlsym ( g_pvDlHandle,
+		else if ( ! ( rs_fields_count = (dbwrapper::t7) dlsym ( n_pvDlHandle,
 						"rs_fields_count" ) ) )dbwrapper_error ( );
-		else if ( ! ( rsdb_records_count = (dbwrapper::t8) dlsym ( g_pvDlHandle,
+		else if ( ! ( rsdb_records_count = (dbwrapper::t8) dlsym ( n_pvDlHandle,
 						"rsdb_records_count" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::rsdb_id = (dbwrapper::t9) dlsym ( g_pvDlHandle,
+		else if ( ! ( dbwrapper::rsdb_id = (dbwrapper::t9) dlsym ( n_pvDlHandle,
 						"rsdb_id" ) ) )dbwrapper_error ( );
-		else if ( ! ( rs_column_name = ( dbwrapper::tA ) dlsym ( g_pvDlHandle,
+		else if ( ! ( rs_column_name = ( dbwrapper::tA ) dlsym ( n_pvDlHandle,
 						"rs_column_name" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_connect = (dbwrapper::t0) dlsym ( g_pvDlHandle,
+		else if ( ! ( dbwrapper::db_connect = (dbwrapper::t0) dlsym ( n_pvDlHandle,
 						"db_connect" ) ) )dbwrapper_error ( );
-		if ( dbwrapper::db_connect )fprintf ( stderr, g_pcDone );
+		if ( dbwrapper::db_connect )fprintf ( stderr, x_tag_g_pcDone );
 		else dbwrapper_exit ( );
 		}
 	else
@@ -331,82 +325,5 @@ char * null_rs_column_name ( void * a_pvResult, int a_iColumn )
 
 /* end of driver autoloader section */
 
-bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
-	{
-	if ( ! strcasecmp ( a_roOption, "log_mask" ) )
-		{
-		if ( ! strcasecmp ( a_roValue, "LOG_SQL" ) )
-			g_lLogMask |= D_LOG_SQL;
-		else return ( true );
-		}
-	else if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
-		{
-		if ( ! ( strcasecmp ( a_roValue, "none" )
-					&& strcasecmp ( a_roValue, "null" ) ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_NONE;
-		else if ( ! strcmp ( a_roValue, "MySQL" ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_MYSQL;
-		else if ( ! strcmp ( a_roValue, "PostgreSQL" ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_POSTGRESQL;
-		else
-			{
-			::log ( D_LOG_ERROR ) << "Error: `" << a_roValue;
-			::log << "' is unknown driver." << endl;
-			exit ( 1 );
-			}
-		}
-	else return ( true );
-	return ( false );
-	}
-
-void dbwrapper_init ( void ); __attribute__ ( ( constructor ) )
-void dbwrapper_init ( void )
-	{
-	dbwrapper::db_connect = null_db_connect;
-	dbwrapper::db_disconnect = null_db_disconnect;
-	dbwrapper::db_errno = null_db_errno;
-	dbwrapper::db_error = null_db_error;
-	dbwrapper::db_query = null_db_query;
-	dbwrapper::db_unquery = null_db_unquery;
-	dbwrapper::rs_get = null_rs_get;
-	dbwrapper::rs_fields_count = null_rs_fields_count;
-	dbwrapper::rsdb_records_count = null_rsdb_records_count;
-	dbwrapper::rsdb_id = null_rsdb_id;
-	dbwrapper::rs_column_name = null_rs_column_name;
-	rc_file::process_rc_file ( "stdhapi", "dbwrapper",
-			dbwrapper::n_psVariables, set_dbwrapper_variables );
-	return;
-	}
-
-void dbwrapper_fini ( void ); __attribute__ ( ( destructor ) )
-void dbwrapper_fini ( void )
-	{
-	if ( g_pcDefaultSockPath )xfree ( ( void * ) g_pcDefaultSockPath );
-	g_pcDefaultSockPath = NULL;
-	if ( g_pvDlHandle )
-		{
-		fprintf ( stderr, "Unloading dynamic database driver ... " );
-#ifndef __HOST_OS_TYPE_FREEBSD__
-		if ( dlclose ( g_pvDlHandle ) )
-			{
-			dbwrapper_error ( );
-			dbwrapper_exit ( );
-			}
-		else
-#endif /* not __HOST_OS_TYPE_FREEBSD__ */
-			fprintf ( stderr, g_pcDone );
-		}
-	g_pvDlHandle = NULL;
-	return;
-	}
-
-/* older versions of g++ fail to handle __attribute__((constructor))
-   if no static object exists */
-
-#if __GNUC__ < 3 || \
-	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
-
-HString g_oDummyDBWRAPPER;
-
-#endif
+}
 

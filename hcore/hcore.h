@@ -1,7 +1,7 @@
 /*
----          `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	signals.h - this file is integral part of `stdhapi' project.
+	hcore.h - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,15 +24,13 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __SIGHAND_H
-#define __SIGHAND_H
+/* This file holds (except HException class declaration) main #defines,
+	 macros and global variables used acros whole stdhapi */
 
-namespace signals
-	{
-	
-void set_handlers ( void );
+#ifndef __HCORE_H
+#define __HCORE_H
 
-	}
+extern long int g_lLogMask;
 
-#endif /* not __SIGHAND_H */
+#endif /* not __HCORE_H */
 

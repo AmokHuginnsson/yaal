@@ -37,6 +37,7 @@ Copyright:
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcontrol.h"
+#include "hconsole.h"
 #include "hwindow.h"
 
 #ifdef __DEBUGGER_BABUNI__

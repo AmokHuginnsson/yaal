@@ -105,6 +105,7 @@ LINKER_FLAGS = $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 
 #	h-core
 OBJ4hcore =
+OBJ4hcore += hcore!
 OBJ4hcore += hexception!
 OBJ4hcore += harray
 OBJ4hcore += hfile
@@ -134,6 +135,7 @@ OBJ4hcore +=
 OBJ4hconsole =
 OBJ4hconsole += console!
 OBJ4hconsole += hcomboboxcontrol!
+OBJ4hconsole += hconsole!
 OBJ4hconsole += hcontrol!
 OBJ4hconsole += hcontrollist
 OBJ4hconsole += heditcontrol!
@@ -158,6 +160,7 @@ OBJ4tools += hanalyser!
 OBJ4tools += hcollector
 OBJ4tools += hserial
 OBJ4tools += signals!
+OBJ4tools += tools
 OBJ4tools += util!
 OBJ4tools +=
 
@@ -168,6 +171,7 @@ OBJ4postgresql_driver =
 OBJ4postgresql_driver += postgresql_driver
 OBJ4dbwrapper = 
 OBJ4dbwrapper += db_driver_loader
+OBJ4dbwrapper += dbwrapper
 OBJ4dbwrapper += hdatabase
 OBJ4dbwrapper += hrecordset!
 OBJ4dbwrapper += 

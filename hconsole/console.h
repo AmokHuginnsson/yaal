@@ -104,11 +104,8 @@ extern bool n_bNeedRepaint;
 extern bool n_bInputWaiting;
 extern int n_iWidth;
 extern int n_iHeight;
-extern int n_iLatency;
-extern int n_iDisabledAttribute;
-extern int n_iEnabledAttribute;
-extern int n_iFocusedAttribute;
 
-	};
+	}
 
 #endif /* not __CONSOLE_H */
+

@@ -1,7 +1,7 @@
 /*
 ---          `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski           ---
 
-	sighand.c - this file is integral part of `stdhapi' project.
+	signals.c - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,12 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdlib.h>  /* strtol */
 #include <string.h>  /* strsignal */
 #include <unistd.h>  /* kill function */
 #include <stdio.h>	 /* perror function */
 #include <signal.h>	 /* signal handling */
-#include <termios.h> /* B115200 */
 
 #include "../config.h"
 
@@ -44,34 +42,15 @@ Copyright:
 #include "../hcore/hexception.h" /* M_PROLOG, M_EPILOG */
 M_CVSID ( "$CVSHeader$" );
 #include "../hcore/xalloc.h"
-#include "../hcore/rc_file.h"    /* read conf from rc */
 #include "../hconsole/console.h" /* conio (ncurses) ability */
 #include "../hcore/hlog.h"       /* log object */
 #include "../hcore/hstring.h"    /* HString class */
 #include "signals.h"
-
-char * g_pcSerialDevice = NULL;
-int g_iBaudRate = B115200;
-int g_iCollectorConnectionTimeOut = 9999;
+#include "tools.h"                /* tools namespace */
 
 namespace signals
 {
 
-bool n_bIgnoreSignalSIGINT = false;
-bool n_bIgnoreSignalSIGTSTP = false;
-bool n_bIgnoreSignalSIGQUIT = false;
-
-OVariable n_psVariables [ ] =
-	{
-		{ D_TYPE_BOOL, "ignore_signal_SIGINT", & n_bIgnoreSignalSIGINT },
-		{ D_TYPE_BOOL, "ignore_signal_SIGTSTP", & n_bIgnoreSignalSIGTSTP },
-		{ D_TYPE_BOOL, "ignore_signal_SIGQUIT", & n_bIgnoreSignalSIGQUIT },
-		{ D_TYPE_INT, "collector_connection_timeout",
-		& g_iCollectorConnectionTimeOut },
-		{ D_TYPE_CHAR_POINTER, "serial_device", & g_pcSerialDevice },
-		{ 0, NULL, NULL }
-	};
-	
 /* singnal handler definitions */
 	
 void signal_WINCH ( int a_iSignum )
@@ -107,7 +86,7 @@ void signal_INT ( int a_iSignum )
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-	if ( n_bIgnoreSignalSIGINT )
+	if ( tools::n_bIgnoreSignalSIGINT )
 		{
 		if ( signal( SIGINT, signals::signal_INT ) == SIG_IGN )
 			signal( SIGINT, SIG_IGN );
@@ -157,7 +136,7 @@ void signal_QUIT ( int a_iSignum )
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-	if ( n_bIgnoreSignalSIGQUIT )
+	if ( tools::n_bIgnoreSignalSIGQUIT )
 		{
 		if ( signal( SIGQUIT, signals::signal_QUIT ) == SIG_IGN )
 			signal( SIGQUIT, SIG_IGN );
@@ -190,7 +169,7 @@ void signal_TSTP ( int a_iSignum )
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-	if ( n_bIgnoreSignalSIGINT )
+	if ( tools::n_bIgnoreSignalSIGINT )
 		{
 		if ( signal( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
 			signal( SIGTSTP, SIG_IGN );
@@ -326,61 +305,4 @@ void set_handlers ( void )
 	}
 
 }
-
-/* return true means error occured, false - every thing ok */
-bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
-	{
-	int l_iBaudRate = 0;
-	if ( ! strcasecmp ( a_roOption, "serial_baudrate" ) )
-		{
-		if ( a_roValue.get_length ( ) > 1 )
-			{
-			switch ( strtol ( ( ( char * ) a_roValue ) + 1, NULL, 10 ) )
-				{
-#ifdef __HOST_OS_TYPE_FREEBSD__
-				case (  76800 ): l_iBaudRate = B76800;  break;
-				case (  28800 ): l_iBaudRate = B28800;  break;
-				case (  14400 ): l_iBaudRate = B14400;  break;
-				case (   7200 ): l_iBaudRate = B7200;   break;
-#endif /* __HOST_OS_TYPE_FREEBSD__ */
-				case ( 115200 ): l_iBaudRate = B115200; break;
-				case (  57600 ): l_iBaudRate = B57600;  break;
-				case (  38400 ): l_iBaudRate = B38400;  break;
-				case (  19200 ): l_iBaudRate = B19200;  break;
-				case (   9600 ): l_iBaudRate = B9600;   break;
-				case (   4800 ): l_iBaudRate = B4800;   break;
-				case (   2400 ): l_iBaudRate = B2400;   break;
-				}
-			}
-		}
-	if ( l_iBaudRate )g_iBaudRate = l_iBaudRate;
-	return ( ! l_iBaudRate );
-	}
-
-void tools_init ( void ); __attribute__ ( ( constructor ) )
-void tools_init ( void )
-	{
-	g_iErrNo = 0;
-	rc_file::process_rc_file ( "stdhapi", "tools", signals::n_psVariables,
-			set_tools_variables );
-	return;
-	}
-
-void tools_fini ( void ); __attribute__ ( ( destructor ) )
-void tools_fini ( void )
-	{
-	if ( g_pcSerialDevice )xfree ( ( void * ) g_pcSerialDevice );
-	g_pcSerialDevice = NULL;
-	return;
-	}
-
-/* older versions of g++ fail to handle __attribute__((constructor))
-   if no static object exists */
-
-#if __GNUC__ < 3 || \
-	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
-
-HString g_oDummyTOOLS;
-
-#endif
 

@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "../hcore/hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "hdataeditcontrol.h"
-
-#include "hexception.h"
 
 HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iWidth, int a_iHeight,

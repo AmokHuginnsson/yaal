@@ -1,7 +1,7 @@
 /*
 ---          `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	signals.h - this file is integral part of `stdhapi' project.
+	tools.h - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,15 +24,20 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __SIGHAND_H
-#define __SIGHAND_H
+#ifndef __TOOLS_H
+#define __TOOLS_H
 
-namespace signals
+namespace tools
 	{
 	
-void set_handlers ( void );
+extern char * n_pcSerialDevice;
+extern int n_iBaudRate;
+extern int n_iCollectorConnectionTimeOut;
+extern bool n_bIgnoreSignalSIGINT;
+extern bool n_bIgnoreSignalSIGTSTP;
+extern bool n_bIgnoreSignalSIGQUIT;
 
 	}
 
-#endif /* not __SIGHAND_H */
+#endif /* not __TOOLS_H */
 

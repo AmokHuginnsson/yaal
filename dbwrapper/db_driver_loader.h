@@ -41,8 +41,6 @@ Copyright:
 namespace dbwrapper
 	{
 
-extern int	n_iDataBaseDriver;
-
 extern void * ( * db_connect ) ( const char *, const char *, const char * );
 extern void ( * db_disconnect ) ( void * );
 extern int ( * db_errno ) ( void * );
@@ -54,6 +52,18 @@ extern int ( * rs_fields_count ) ( void * );
 extern long int ( * rsdb_records_count ) ( void *, void * = NULL );
 extern long int ( * rsdb_id ) ( void *, void * );
 extern char * ( * rs_column_name ) ( void *, int );
+
+void * null_db_connect ( const char *, const char *, const char * );
+void null_db_disconnect ( void * );
+int null_db_errno ( void * );
+const char * null_db_error ( void * );
+void * null_db_query ( void *, const char * );
+void null_db_unquery ( void * );
+char * null_rs_get ( void *, int, int );
+int null_rs_fields_count ( void * );
+long int null_rsdb_records_count ( void *, void * );
+long int null_rsdb_id ( void *, void * );
+char * null_rs_column_name ( void *, int );
 
 	}
 

@@ -204,4 +204,5 @@ HString kwota_slownie ( double a_dKwota )
 	M_EPILOG
 	}
 
-};
+}
+

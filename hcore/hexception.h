@@ -52,8 +52,6 @@ Copyright:
 #define D_LOG_ERROR			16
 #define D_LOG_CVSHEADER 32
 
-extern long int g_lLogMask;
-
 /* those types definitions were in hinfo.h but this file (hexception.h)
  * is included into more files, we assume that sizeof ( int ) >= 4 */
 #define D_TYPE_NONE					0x0000
@@ -104,3 +102,4 @@ public:
 	};
 
 #endif /* not __HEXCEPTION_H */
+

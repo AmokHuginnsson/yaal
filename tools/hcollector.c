@@ -31,7 +31,7 @@ Copyright:
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
-#include "signals.h"
+#include "tools.h"
 #include "hcollector.h"
 
 HCollector::HCollector ( const char * a_pcDevicePath )
@@ -213,7 +213,7 @@ int HCollector::read_collector ( void ( * process_line ) ( char *, int ) )
 	int l_iError = 0;
 	char * l_pcLine = NULL;
 	f_iLines = 0;
-	l_iError = wait_for_connection ( g_iCollectorConnectionTimeOut );
+	l_iError = wait_for_connection ( tools::n_iCollectorConnectionTimeOut );
 	while ( l_iError >= 0 )
 		{
 		l_iError += receive_line ( l_pcLine );

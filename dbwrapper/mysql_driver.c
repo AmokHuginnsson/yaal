@@ -42,10 +42,13 @@ Copyright:
 #define NULL	0
 #endif /* not NULL */
 
+namespace dbwrapper
+	{
+	extern char * n_pcDefaultSockPath;
+	}
+
 extern "C"
 {
-	
-extern char * g_pcDefaultSockPath;
 
 void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
@@ -58,7 +61,7 @@ void * db_connect ( const char * a_pcDataBase,
 	if ( l_psMySQL )
 		{
 		l_pcSockPath = strchr ( l_pcDataBase, ':' );
-		if ( ! l_pcSockPath )l_pcSockPath = g_pcDefaultSockPath;
+		if ( ! l_pcSockPath )l_pcSockPath = dbwrapper::n_pcDefaultSockPath;
 		else * l_pcSockPath ++ = 0;
 		l_psMySQL = mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
 				l_pcDataBase, 0, l_pcSockPath, CLIENT_IGNORE_SPACE );
