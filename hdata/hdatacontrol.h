@@ -38,8 +38,11 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HDataControl ( HRecordSet *, HWindow *, int, int, int, int, const char *, 
-			int = -1, int = -1, int = -1 );
+	HDataControl ( HRecordSet *,	/* record-set (table) that will be displayed */
+								 HWindow *,			/* parent window */
+								 int, int, int, int, /* coordinates */
+								 const char *,	/* label */
+								 int = -1, int = -1, int = -1 );	/* attributes */
 	virtual ~HDataControl ( void );
 	virtual void populate ( long int = 0 );
 	/*}*/
