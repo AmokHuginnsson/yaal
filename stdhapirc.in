@@ -32,6 +32,10 @@ log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_CVSHEADER
 ### console BEGIN
 [console]
 
+# disable XON(/XOFF) flow control on output,
+# setting this to `true' disables C-s and C-q special handling
+disable_XON true
+
 # force enabling of mouse interface, warning, when this option
 # is enabled and mouse interface is not available stdhapi library
 # will not allow execution of any program that uses hconsole api

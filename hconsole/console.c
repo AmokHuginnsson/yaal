@@ -24,9 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include <termios.h>
 
 #include "../config.h"
 
@@ -63,114 +65,127 @@ int n_iFocusedAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
 WINDOW * n_psWindow = NULL;
 bool	n_bEnabled = false;
 bool	n_bUseMouse = false;
+bool	n_bDisableXON = false;
 char	n_cCommandComposeCharacter = 'x';
 int		n_iCommandComposeDelay = 16;
+termios	g_sTermios;
 
 OVariable n_psVariables [ ] =
 	{
 		{ D_TYPE_BOOL, "use_mouse", & n_bUseMouse },
+		{ D_TYPE_BOOL, "disable_XON", & n_bDisableXON },
 		{ D_TYPE_INT, "latency", & n_iLatency },
 		{ D_TYPE_CHAR, "command_compose_character", & n_cCommandComposeCharacter },
 		{ D_TYPE_INT, "command_compose_delay", & n_iCommandComposeDelay },
 		{ 0, NULL, NULL }
 	};
-	
+
 /* public: */
 void enter_curses( void )
 	{
 	M_PROLOG
+	termios l_sTermios;
 /*	def_shell_mode(); */
 /* this is done automaticly by initscr ( ), read man next time */
+	if ( ! isatty ( STDIN_FILENO ) )
+		throw new HException ( __WHERE__, "stdin in not a tty", 0 );
+	if ( n_bDisableXON )
+		{
+		tcgetattr ( STDIN_FILENO, & g_sTermios );
+		tcgetattr ( STDIN_FILENO, & l_sTermios );
+		l_sTermios.c_iflag &= ~IXON;
+		tcsetattr ( STDIN_FILENO, TCSAFLUSH, & l_sTermios );
+		}
 	use_env ( true );
 	if ( ! n_psWindow )n_psWindow = initscr();
-	cbreak();
-	start_color();
-	standout();
-	nonl();
-	keypad( stdscr, true );
-	intrflush( stdscr, false );
-/*	scrollok( stdscr, true ); */
-	scrollok( stdscr, false );
-	leaveok( stdscr, true );
-	immedok( stdscr, false );
-	fflush( 0 );
-	flushinp();
+	cbreak ( );
+	start_color ( );
+	standout ( );
+	nonl ( );
+	keypad ( stdscr, true );
+	intrflush ( stdscr, false );
+/*	scrollok ( stdscr, true ); */
+	scrollok ( stdscr, false );
+	leaveok ( stdscr, true );
+	immedok ( stdscr, false );
+	fflush ( 0 );
+	flushinp ( );
 	curs_set ( 0 );
-	refresh();
+	refresh ( );
 	/* black background */
 	assume_default_colors ( COLOR_BLACK, COLOR_BLACK );
-	init_pair( COLOR_BLACK * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_BLACK );
-	init_pair( COLOR_BLACK * 8 + COLOR_RED, COLOR_RED, COLOR_BLACK );
-	init_pair( COLOR_BLACK * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_BLACK );
-	init_pair( COLOR_BLACK * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK );
-	init_pair( COLOR_BLACK * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_BLACK );
-	init_pair( COLOR_BLACK * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK );
-	init_pair( COLOR_BLACK * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_BLACK );
-	init_pair( COLOR_BLACK * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_BLACK );
+	init_pair ( COLOR_BLACK * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_BLACK );
+	init_pair ( COLOR_BLACK * 8 + COLOR_RED, COLOR_RED, COLOR_BLACK );
+	init_pair ( COLOR_BLACK * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_BLACK );
+	init_pair ( COLOR_BLACK * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK );
+	init_pair ( COLOR_BLACK * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_BLACK );
+	init_pair ( COLOR_BLACK * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK );
+	init_pair ( COLOR_BLACK * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_BLACK );
+	init_pair ( COLOR_BLACK * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_BLACK );
 	/* red background */
-	init_pair( COLOR_RED * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_RED );
-	init_pair( COLOR_RED * 8 + COLOR_RED, COLOR_RED, COLOR_RED );
-	init_pair( COLOR_RED * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_RED );
-	init_pair( COLOR_RED * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_RED );
-	init_pair( COLOR_RED * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_RED );
-	init_pair( COLOR_RED * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_RED );
-	init_pair( COLOR_RED * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_RED );
-	init_pair( COLOR_RED * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_RED );
+	init_pair ( COLOR_RED * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_RED );
+	init_pair ( COLOR_RED * 8 + COLOR_RED, COLOR_RED, COLOR_RED );
+	init_pair ( COLOR_RED * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_RED );
+	init_pair ( COLOR_RED * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_RED );
+	init_pair ( COLOR_RED * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_RED );
+	init_pair ( COLOR_RED * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_RED );
+	init_pair ( COLOR_RED * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_RED );
+	init_pair ( COLOR_RED * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_RED );
 	/* green background */
-	init_pair( COLOR_GREEN * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_GREEN );
-	init_pair( COLOR_GREEN * 8 + COLOR_RED, COLOR_RED, COLOR_GREEN );
-	init_pair( COLOR_GREEN * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_GREEN );
-	init_pair( COLOR_GREEN * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_GREEN );
-	init_pair( COLOR_GREEN * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_GREEN );
-	init_pair( COLOR_GREEN * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_GREEN );
-	init_pair( COLOR_GREEN * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_GREEN );
-	init_pair( COLOR_GREEN * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_GREEN );
+	init_pair ( COLOR_GREEN * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_GREEN );
+	init_pair ( COLOR_GREEN * 8 + COLOR_RED, COLOR_RED, COLOR_GREEN );
+	init_pair ( COLOR_GREEN * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_GREEN );
+	init_pair ( COLOR_GREEN * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_GREEN );
+	init_pair ( COLOR_GREEN * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_GREEN );
+	init_pair ( COLOR_GREEN * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_GREEN );
+	init_pair ( COLOR_GREEN * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_GREEN );
+	init_pair ( COLOR_GREEN * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_GREEN );
 	/* yellow background */
-	init_pair( COLOR_YELLOW * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_YELLOW );
-	init_pair( COLOR_YELLOW * 8 + COLOR_RED, COLOR_RED, COLOR_YELLOW );
-	init_pair( COLOR_YELLOW * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_YELLOW );
-	init_pair( COLOR_YELLOW * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_YELLOW );
-	init_pair( COLOR_YELLOW * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_YELLOW );
-	init_pair( COLOR_YELLOW * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_YELLOW );
-	init_pair( COLOR_YELLOW * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_YELLOW );
-	init_pair( COLOR_YELLOW * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_YELLOW );
+	init_pair ( COLOR_YELLOW * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_YELLOW );
+	init_pair ( COLOR_YELLOW * 8 + COLOR_RED, COLOR_RED, COLOR_YELLOW );
+	init_pair ( COLOR_YELLOW * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_YELLOW );
+	init_pair ( COLOR_YELLOW * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_YELLOW );
+	init_pair ( COLOR_YELLOW * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_YELLOW );
+	init_pair ( COLOR_YELLOW * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_YELLOW );
+	init_pair ( COLOR_YELLOW * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_YELLOW );
+	init_pair ( COLOR_YELLOW * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_YELLOW );
 	/* blue background */
-	init_pair( COLOR_BLUE * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_BLUE );
-	init_pair( COLOR_BLUE * 8 + COLOR_RED, COLOR_RED, COLOR_BLUE );
-	init_pair( COLOR_BLUE * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_BLUE );
-	init_pair( COLOR_BLUE * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_BLUE );
-	init_pair( COLOR_BLUE * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_BLUE );
-	init_pair( COLOR_BLUE * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLUE );
-	init_pair( COLOR_BLUE * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_BLUE );
-	init_pair( COLOR_BLUE * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_BLUE );
+	init_pair ( COLOR_BLUE * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_BLUE );
+	init_pair ( COLOR_BLUE * 8 + COLOR_RED, COLOR_RED, COLOR_BLUE );
+	init_pair ( COLOR_BLUE * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_BLUE );
+	init_pair ( COLOR_BLUE * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_BLUE );
+	init_pair ( COLOR_BLUE * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_BLUE );
+	init_pair ( COLOR_BLUE * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLUE );
+	init_pair ( COLOR_BLUE * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_BLUE );
+	init_pair ( COLOR_BLUE * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_BLUE );
 	/* magenta background */
-	init_pair( COLOR_MAGENTA * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_MAGENTA );
-	init_pair( COLOR_MAGENTA * 8 + COLOR_RED, COLOR_RED, COLOR_MAGENTA );
-	init_pair( COLOR_MAGENTA * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_MAGENTA );
-	init_pair( COLOR_MAGENTA * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_MAGENTA );
-	init_pair( COLOR_MAGENTA * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_MAGENTA );
-	init_pair( COLOR_MAGENTA * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_MAGENTA );
-	init_pair( COLOR_MAGENTA * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_MAGENTA );
-	init_pair( COLOR_MAGENTA * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_MAGENTA );
+	init_pair ( COLOR_MAGENTA * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_MAGENTA );
+	init_pair ( COLOR_MAGENTA * 8 + COLOR_RED, COLOR_RED, COLOR_MAGENTA );
+	init_pair ( COLOR_MAGENTA * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_MAGENTA );
+	init_pair ( COLOR_MAGENTA * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_MAGENTA );
+	init_pair ( COLOR_MAGENTA * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_MAGENTA );
+	init_pair ( COLOR_MAGENTA * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_MAGENTA );
+	init_pair ( COLOR_MAGENTA * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_MAGENTA );
+	init_pair ( COLOR_MAGENTA * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_MAGENTA );
 	/* cyan background */
-	init_pair( COLOR_CYAN * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_CYAN );
-	init_pair( COLOR_CYAN * 8 + COLOR_RED, COLOR_RED, COLOR_CYAN );
-	init_pair( COLOR_CYAN * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_CYAN );
-	init_pair( COLOR_CYAN * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_CYAN );
-	init_pair( COLOR_CYAN * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_CYAN );
-	init_pair( COLOR_CYAN * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_CYAN );
-	init_pair( COLOR_CYAN * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_CYAN );
-	init_pair( COLOR_CYAN * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_CYAN );
+	init_pair ( COLOR_CYAN * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_CYAN );
+	init_pair ( COLOR_CYAN * 8 + COLOR_RED, COLOR_RED, COLOR_CYAN );
+	init_pair ( COLOR_CYAN * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_CYAN );
+	init_pair ( COLOR_CYAN * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_CYAN );
+	init_pair ( COLOR_CYAN * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_CYAN );
+	init_pair ( COLOR_CYAN * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_CYAN );
+	init_pair ( COLOR_CYAN * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_CYAN );
+	init_pair ( COLOR_CYAN * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_CYAN );
 	/* white background */
-	init_pair( COLOR_WHITE * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_WHITE );
-	init_pair( COLOR_WHITE * 8 + COLOR_RED, COLOR_RED, COLOR_WHITE );
-	init_pair( COLOR_WHITE * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_WHITE );
-	init_pair( COLOR_WHITE * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_WHITE );
-	init_pair( COLOR_WHITE * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_WHITE );
-	init_pair( COLOR_WHITE * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_WHITE );
-	init_pair( COLOR_WHITE * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_WHITE );
-	init_pair( COLOR_WHITE * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_WHITE );
-	attrset( COLOR_PAIR( 7 ) );
+	init_pair ( COLOR_WHITE * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_WHITE );
+	init_pair ( COLOR_WHITE * 8 + COLOR_RED, COLOR_RED, COLOR_WHITE );
+	init_pair ( COLOR_WHITE * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_WHITE );
+	init_pair ( COLOR_WHITE * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_WHITE );
+	init_pair ( COLOR_WHITE * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_WHITE );
+	init_pair ( COLOR_WHITE * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_WHITE );
+	init_pair ( COLOR_WHITE * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_WHITE );
+	init_pair ( COLOR_WHITE * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_WHITE );
+	attrset ( COLOR_PAIR( 7 ) );
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( n_bUseMouse
@@ -207,8 +222,10 @@ void leave_curses( void )
 	n_psWindow = NULL;
 */
 	endwin ( );
+	if ( n_bDisableXON )
+		tcsetattr ( STDIN_FILENO, TCSAFLUSH, & g_sTermios );
 	n_bEnabled = false;
-	return ;
+	return;
 	M_EPILOG
 	}
 	
