@@ -29,6 +29,10 @@ Copyright:
 
 #include <termios.h>
 
+#ifndef NULL
+#	define NULL 0
+#endif /* not NULL */
+
 #include "../hcore/hstring.h"
 
 class HSerial
