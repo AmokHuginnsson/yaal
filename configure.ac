@@ -92,9 +92,14 @@ void foo(){printw("x");}],[AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_ERROR([Can not continue with brain-damaged ncurses.])])
 
-AC_MSG_RESULT([--- All ok, good luck! ---                              [[97%]]])
+AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
+AC_CONFIG_COMMANDS_PRE([cd hcore;ln -sf hlist.h hlist.c;ln -sf htree.h htree.c;
+												cd ..;cd hconsole;ln -sf hhandler.h hhandler.c;
+												ln -sf omenuitem.h omenuitem.c;cd ..])
+
 
 dnl We have to set up proper compiler/linker flags.
 AC_OUTPUT([Makefile])
-AC_MSG_RESULT([[Now you can type \`make'.                               [100%]]])
+AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
+AC_MSG_RESULT([[Now you can type \`make'.]])
 
