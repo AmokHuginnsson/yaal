@@ -30,6 +30,8 @@ Copyright:
 
 #include <mysql/mysql.h>
 
+#include <xalloc.h>
+
 #ifndef NULL
 #define NULL	0
 #endif /* not NULL */
@@ -41,17 +43,20 @@ void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
 	{
 	char l_pcDefaultSockPath [ ] = "/var/run/mysqld/mysqld.sock";
+	char * l_pcDataBase = NULL;
 	char * l_pcSockPath = NULL;
 	MYSQL * l_psMySQL = NULL;
+	l_pcDataBase = xstrdup ( a_pcDataBase );
 	l_psMySQL = mysql_init ( 0 );
 	if ( l_psMySQL )
 		{
-		l_pcSockPath = strchr ( a_pcDataBase, ':' );
+		l_pcSockPath = strchr ( l_pcDataBase, ':' );
 		if ( ! l_pcSockPath )l_pcSockPath = l_pcDefaultSockPath;
 		else * l_pcSockPath ++ = 0;
 		l_psMySQL = mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
-				a_pcDataBase, 0, l_pcSockPath, CLIENT_IGNORE_SPACE );
+				l_pcDataBase, 0, l_pcSockPath, CLIENT_IGNORE_SPACE );
 		}
+	xfree ( ( void * ) l_pcDataBase );
 	return ( l_psMySQL );
 	}
 

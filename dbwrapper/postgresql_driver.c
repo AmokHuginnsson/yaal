@@ -36,6 +36,8 @@ Copyright:
 #	include <postgresql/libpq-fe.h>
 #endif /* not __PLD_HOST__*/
 
+#include <xalloc.h>
+
 #ifndef NULL
 #define NULL	0
 #endif /* not NULL */
@@ -47,16 +49,19 @@ void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
 	{
 	char * l_pcSockPath = NULL;
+	char * l_pcDataBase = NULL;
 	PGconn * l_psConnection = NULL;
-	l_pcSockPath = strchr ( a_pcDataBase, ':' );
+	l_pcDataBase = xstrdup ( a_pcDataBase );
+	l_pcSockPath = strchr ( l_pcDataBase, ':' );
 	if ( l_pcSockPath )* l_pcSockPath = 0;
 	l_psConnection = PQsetdbLogin ( NULL,	/* host */
 																	NULL,					/* port */
 																	NULL,					/* options */
 																	NULL,					/* debugging tty */
-																	a_pcDataBase, 
+																	l_pcDataBase, 
 																	a_pcLogin, 
 																	a_pcPassword );
+	xfree ( ( void * ) l_pcDataBase );
 	return ( l_psConnection );
 	}
 
