@@ -41,6 +41,10 @@ M_CVSID ( "$CVSHeader$" );
 #include "hlog.h"
 #include "xalloc.h"
 
+#define D_BUFFER_SIZE			1024
+#define D_HOSTNAME_SIZE		16
+#define D_TIMESTAMP_SIZE	16
+
 HLog::HLog ( void )
 	{
 	M_PROLOG
