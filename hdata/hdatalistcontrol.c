@@ -24,6 +24,19 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "../config.h"
+
+/* We need ncurses.h here because of KEY_HOME. */
+
+#ifdef HAVE_NCURSES_H
+#	include <ncurses.h>
+#elif defined ( HAVE_NCURSES_NCURSES_H )
+#	include <ncurses/ncurses.h>
+#else /* HAVE_NCURSES_NCURSES_H */
+#	error "No ncurses header available."
+#endif /* not HAVE_NCURSES_NCURSES_H */
+
+#include "hdatawindow.h"
 #include "hdatalistcontrol.h"
 
 #include "../hcore/hexception.h"
@@ -53,14 +66,19 @@ HDataListControl::~HDataListControl ( void )
 void HDataListControl::populate ( long int /*a_iId*/ )
 	{
 	M_PROLOG
-	/*
+	HInfoList l_oInfoList ( f_oHeader.quantity ( ) );
+	HDataWindow * l_poParent = ( HDataWindow * ) f_poParent;
+	l_poParent->set_sync_store ( & l_oInfoList );
 	f_poRecordSet->open ( );
+	flush ( );
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
+		add_tail ( l_oInfoList );
 		f_poRecordSet->move_next ( );
 		}
 	f_poRecordSet->close ( );
-	*/
+	l_poParent->set_sync_store ( );
+	process_input ( KEY_HOME );
 	return;
 	M_EPILOG
 	}

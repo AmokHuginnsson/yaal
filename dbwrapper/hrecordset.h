@@ -51,6 +51,7 @@ private:
 	/*}*/
 protected:
 	/*{*/
+	int f_iIdFieldOffset;	/* number (count from 0) of id column in result record-set */
 	int f_iFieldCount;		/* number of columns returned by last query */
 	int f_iMode;					/* normal(opened), closed, adding, editing */
 	int f_iCursorPosition;/* cursor position in record-set */

@@ -37,6 +37,7 @@ HDataWindow::HDataWindow ( const char * a_pcTitle, HDataBase * a_poDataBase,
 	M_PROLOG
 	f_bModified = false;
 	f_poMainControl = NULL;
+	f_poSyncStore = NULL;
 	f_psResourcesArray = a_psDataControlInfo;
 	register_postprocess_handler ( D_KEY_COMMAND_('n'),
 			( int ( HWindow::* ) ( int ) ) & HDataWindow::handler_add_new );
@@ -149,6 +150,8 @@ int HDataWindow::init ( void )
 			{
 			case ( D_CONTROL_MAIN ):
 				{
+				f_oTable = f_psResourcesArray [ l_iCtr ].f_pcTable;
+				f_oColumns = f_psResourcesArray [ l_iCtr ].f_pcColumns;
 				f_poMainControl = l_poDataControl;
 				f_oViewModeControls.add_tail ( l_poDataControl );
 				l_poDataControl->enable ( true );
@@ -178,6 +181,7 @@ int HDataWindow::init ( void )
 		}
 	f_poMainControl->set_focus ( );
 	if ( f_poMainControl )f_poMainControl->populate ( );
+	refresh ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -250,6 +254,27 @@ void HDataWindow::set_mode ( int a_iMode )
 		}
 	return;
 	M_EPILOG
+	}
+
+void HDataWindow::sync ( void )
+	{
+	M_PROLOG
+	int l_iCtr = 0, l_iCount = 0;
+	HRecordSet::sync ( );
+	if ( f_poSyncStore )
+		{
+		l_iCount = f_poSyncStore->quantity ( );
+		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+			( * f_poSyncStore ) [ l_iCtr ] = f_oValues [ l_iCtr ];
+		}
+	return;
+	M_EPILOG
+	}
+
+void HDataWindow::set_sync_store ( HInfoList * a_poInfoList )
+	{
+	f_poSyncStore = a_poInfoList;
+	return;
 	}
 
 int HDataWindow::handler_add_new ( int )

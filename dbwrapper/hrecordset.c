@@ -48,6 +48,7 @@ HRecordSet::HRecordSet ( HDataBase * a_poDataBase )
 	f_pvCoreData = NULL;
 	f_poDataBase = a_poDataBase;
 	f_oColumns = "*";
+	f_iIdFieldOffset = -1;
 	m_id = 0;
 	return;
 	M_EPILOG
@@ -78,8 +79,11 @@ HObject * HRecordSet::clone ( void ) const
 void HRecordSet::sync ( void )
 	{
 	M_PROLOG 
+	int l_iCtr = 0;
 	if ( f_iMode == D_MODE_CLOSED )throw new HException ( __WHERE__, E_MODE, f_iMode );
-	sync ( 0, m_id );
+	for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
+		sync ( l_iCtr, f_oValues [ l_iCtr ] );
+	sync ( f_iIdFieldOffset, m_id );
 	return;
 	M_EPILOG
 	}
@@ -168,6 +172,7 @@ long int HRecordSet::open ( const char * a_pcQuery )
 		{
 		f_oColumnNames.add_tail ( ) = dbwrapper::rs_column_name ( f_pvCoreData,
 				l_iCtr );
+		if ( f_oColumnNames.tail ( ) == "id" )f_iIdFieldOffset = l_iCtr;
 		f_oValues.add_tail ( );
 		}
 	if ( f_iSetQuantity > 0 )sync ( );

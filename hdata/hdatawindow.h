@@ -44,6 +44,7 @@ protected:
 	bool f_bModified;
 	HDataControl * f_poMainControl;
 	OResource * f_psResourcesArray;
+	HInfoList * f_poSyncStore;
 	HList < HControl * > f_oViewModeControls;
 	HList < HControl * > f_oEditModeControls;
 	/*}*/
@@ -52,11 +53,13 @@ public:
 	HDataWindow ( const char *, HDataBase * = NULL, OResource * = NULL );
 	virtual ~HDataWindow ( void );
 	virtual int init ( void );
+	void set_sync_store ( HInfoList * = NULL );
 	/*}*/
 protected:
 	/*{*/
 	void link ( int, HDataControl * );
 	void set_mode ( int );
+	virtual void sync ( void );
 	void sync ( int, HEditControl & );
 	void sync ( int, HDataListControl & );
 	int handler_add_new ( int );
