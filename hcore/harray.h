@@ -143,7 +143,7 @@ HArray < tType > & HArray < tType >::operator = ( const HArray & a_roArray )
 			}
 		f_iSize = a_roArray.f_iSize;
 		}
-	if ( f_iSize )
+	if ( f_iSize && ! f_ptArray )
 		{
 		f_ptArray = new tType [ f_iSize ];
 		if ( ! f_ptArray )
