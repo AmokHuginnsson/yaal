@@ -37,7 +37,7 @@ protected:
 public:
 	/*{*/
 	HComplex ( void );
-	HComplex ( double, double = 0 );
+	HComplex ( const double, const double = 0 );
 	HComplex ( const HComplex & );
 	virtual ~HComplex ( void );
 	double & re ( void );

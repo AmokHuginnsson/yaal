@@ -43,6 +43,7 @@ Copyright:
 #define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
 #define M_TRY try{
 #define M_CATCH }catch ( HException * e ){e->log ( __WHERE__ );throw e;}
+#define M_THROW( msg, e_no ) throw new HException ( __WHERE__, msg, e_no )
 #define M_PROLOG M_TRY
 #define M_EPILOG M_CATCH
 

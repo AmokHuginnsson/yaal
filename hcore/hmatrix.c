@@ -33,8 +33,16 @@ M_CVSTID ( D_CVSID_HMATRIX_H );
 
 const char * g_ppcErrMsgHMatrix [ 24 ] =
 	{
-/* E_BADROWS */					_ ( "Rows < 1" ),
-/* E_BADCOLUMNS */			_ ( "Columns < 1" ),
-/* E_NEWRETURNEDNULL */	_ ( "new returned NULL" )
+/* E_BADROWS */													_ ( "rows < 1" ),
+/* E_BADCOLUMNS */											_ ( "columns < 1" ),
+/* E_NEWRETURNEDNULL */									_ ( "new returned NULL" ),
+/* E_DIMNOTMATCH_ROWS */								_ ( "rows dimensions do not match" ),
+/* E_DIMNOTMATCH_COLUMNS */							_ ( "columns dimensions do not match" ),
+/* E_NOTASQUARE */											_ ( "matrix is not square" ),
+/* E_ODD */															_ ( "matrix is odd" ),
+/* E_DIMNOTMATCH_COLUMNSROWS */					_ ( "columns does not match rows" ),
+/* E_DIMNOTMATCH_COLUMNSROWSCOLUMNS */	_ ( "columns does not match rows and columns" ),
+/* E_ROW_OUTOFRANGE */									_ ( "row too big for minor" ),
+/* E_COLUMN_OUTOFRANGE */								_ ( "column too big for minor" )
 	};
 

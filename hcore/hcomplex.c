@@ -39,7 +39,7 @@ HComplex::HComplex ( void )
 	M_EPILOG
 	}
 
-HComplex::HComplex ( double a_dReal,  double a_dImaginary )
+HComplex::HComplex ( const double a_dReal,  const double a_dImaginary )
 	{
 	M_PROLOG
 	f_dReal = a_dReal;
@@ -197,7 +197,7 @@ HComplex HComplex::operator - ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
-HComplex HComplex::operator - ( )
+HComplex HComplex::operator - ( void )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( 0., 0. );
