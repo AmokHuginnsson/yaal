@@ -45,10 +45,11 @@ Copyright:
 extern "C"
 {
 	
+extern char * g_pcDefaultSockPath;
+
 void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
 	{
-	char l_pcDefaultSockPath [ ] = "/var/run/mysqld/mysqld.sock";
 	char * l_pcDataBase = NULL;
 	char * l_pcSockPath = NULL;
 	MYSQL * l_psMySQL = NULL;
@@ -57,7 +58,7 @@ void * db_connect ( const char * a_pcDataBase,
 	if ( l_psMySQL )
 		{
 		l_pcSockPath = strchr ( l_pcDataBase, ':' );
-		if ( ! l_pcSockPath )l_pcSockPath = l_pcDefaultSockPath;
+		if ( ! l_pcSockPath )l_pcSockPath = g_pcDefaultSockPath;
 		else * l_pcSockPath ++ = 0;
 		l_psMySQL = mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
 				l_pcDataBase, 0, l_pcSockPath, CLIENT_IGNORE_SPACE );

@@ -32,6 +32,7 @@ Copyright:
 
 #include "../config.h"
 
+#include "../hcore/xalloc.h"
 #include "../hcore/hexception.h"
 #include "../hcore/hlog.h"
 #include "../hcore/hstring.h"
@@ -42,6 +43,8 @@ Copyright:
 #ifndef NULL
 #define NULL	0
 #endif /* not NULL */
+
+char * g_pcDefaultSockPath = NULL;
 
 const char g_pcDone [ ] = "done.\n";
 
@@ -119,14 +122,17 @@ void set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	if ( ! strcasecmp ( a_roOption, "log_sql" ) )
 		rc_file::rc_set_variable ( a_roValue, dbwrapper::n_bLogSQL );
+	else if ( ! strcasecmp ( a_roOption, "mysql_socket" ) )
+		rc_file::rc_set_variable ( a_roValue, & g_pcDefaultSockPath );
 	else if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
 		{
 		if ( ! strcmp ( a_roValue, "MySQL" ) )
 			dbwrapper::n_iDataBaseDriver = D_MYSQL;
 		else if ( ! strcmp ( a_roValue, "PostgreSQL" ) )
 			dbwrapper::n_iDataBaseDriver = D_POSTGRESQL;
-		
 		}
+	if ( ! g_pcDefaultSockPath )
+		g_pcDefaultSockPath = xstrdup ( "/var/run/mysqld/mysqld.sock" );
 	return;
 	}
 

@@ -8,7 +8,7 @@ AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 
 dnl Unique file in project: stdhapirc is sample configuration file.
 AC_MSG_RESULT([--- Finding base directory ... ---                      [[12%]]])
-AC_CONFIG_SRCDIR([[stdhapirc]])
+AC_CONFIG_SRCDIR([[stdhapirc.in]])
 AC_CONFIG_AUX_DIR([aux])
 
 dnl stdhapi is not Free Software.
@@ -135,6 +135,12 @@ void foo(){printw("x");}],[AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_ERROR([Can not continue with brain-damaged ncurses.])])
 
+FILES=["/etc/my.cnf /etc/mysql/my.cnf /usr/local/etc/my.cnf /usr/local/etc/mysql/my.cnf"]
+FILES=["$FILES /etc/mysqld.conf /etc/mysql/mysqld.conf /usr/local/etc/mysqld.conf"]
+FILES=["$FILES /usr/local/etc/mysql/mysqld.conf"]
+MYSQL_SOCKET=[`grep -s "^socket" $FILES|awk '{sub(".*=[ \\t]+","");print;exit}'`]
+AC_SUBST([MYSQL_SOCKET],[$MYSQL_SOCKET])
+
 AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
 AC_CONFIG_COMMANDS_PRE([cd hcore;ln -sf hlist.h hlist.c;ln -sf htree.h htree.c;
 												cd ..;cd hconsole;ln -sf hhandler.h hhandler.c;
@@ -142,7 +148,7 @@ AC_CONFIG_COMMANDS_PRE([cd hcore;ln -sf hlist.h hlist.c;ln -sf htree.h htree.c;
 												ln -sf stdhapi_toc.html index.html;cd ../..])
 
 dnl We have to set up proper compiler/linker flags.
-AC_OUTPUT([Makefile])
+AC_OUTPUT([Makefile stdhapirc])
 AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
 AC_MSG_RESULT([[Now you can type \`make'.]])
 

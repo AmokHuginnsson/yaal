@@ -1,0 +1,58 @@
+# stdhapi library configuration file.
+# comments begin with `#' char and continues until end of line
+# option names are case insensitive
+# in most cases option values are case insensitive also
+# syntax for settings is:
+#	^{option}{white}{value1 value2 ... valuen}$
+# example:
+# log_sql true
+
+### console BEGIN
+
+use_mouse false
+
+## colors BEGIN
+
+# color option syntax is:
+# option foreground-label background-label foreground-data background-data
+# color names are:
+#	BLACK RED GREEN BROWN BLUE MAGENTA CYAN LIGHTGRAY GRAY BRIGHTRED BRIGHTGREEN
+#	YELLOW BRIGHTBLUE BRIGHTMAGENTA BRIGHTCYAN WHITE
+
+# color attributes for disabled control
+disabled_attribute GREEN GRAY LIGHTGRAY GRAY
+
+# color attributes for enabled control
+enabled_attribute BRIGHTGREEN GRAY WHITE GRAY
+
+# color attributes for focused control
+focused_attribute BRIGHTGREEN GRAY BLACK LIGHTGRAY
+
+## colors END
+### console END
+
+### tools BEGIN
+# should CTRL-C typed by user break program ?
+ctrl_c_does_not_break true
+
+### tools END
+
+### dbwrapper BEGIN
+
+# select data base driver
+# accepted drivers are:
+# MySQL, PostgreSQL
+
+#data_base_driver PostgreSQL
+data_base_driver MySQL
+
+# mysql driver realises access to datebase thru socket,
+#	which we have to point to
+
+mysql_socket @MYSQL_SOCKET@
+
+# log SQL queries
+log_sql true
+
+### dbwrapper END
+

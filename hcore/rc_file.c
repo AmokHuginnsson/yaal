@@ -233,7 +233,10 @@ void rc_set_variable ( const char * a_pcValue, bool & a_rbVariable )
 
 void rc_set_variable ( const char * a_pcValue, char ** a_ppcVariable )
 	{
+	if ( * a_ppcVariable )xfree ( ( void * ) * a_ppcVariable );
+	* a_ppcVariable = NULL;
 	* a_ppcVariable = xstrdup ( a_pcValue );
+	return;
 	}
 
 void rc_set_variable ( const char * a_pcValue, int & a_riVariable )

@@ -342,7 +342,7 @@ mrproper: clean
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache configure config.cache config.log config.status configure.lineno
-	/bin/rm -rf Makefile config.h
+	/bin/rm -rf Makefile config.h stdhapirc
 
 ifneq ($(wildcard .depend),)
 include .depend
