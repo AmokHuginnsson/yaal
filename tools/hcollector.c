@@ -36,7 +36,7 @@ M_CVSID ( "$CVSHeader$" );
 
 HCollector::HCollector ( const char * a_pcDevicePath )
 					: HSerial ( a_pcDevicePath ),
-						f_oLine ( ( unsigned long int ) D_RECV_BUF_SIZE )
+						f_oLine ( ( size_t ) D_RECV_BUF_SIZE )
 	{
 	M_PROLOG
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
