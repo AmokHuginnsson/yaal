@@ -280,6 +280,23 @@ void HDataWindow::set_mode ( int a_iMode )
 	M_EPILOG
 	}
 
+void HDataWindow::init_progress ( double a_dSize, const char * a_pcMessage,
+		bool a_bEstimate )
+	{
+	M_PROLOG
+	f_poStatusBar->init_progress ( a_dSize, a_pcMessage, a_bEstimate );
+	return;
+	M_EPILOG
+	}
+
+void HDataWindow::update_progress ( double a_dStep, const char * a_pcMessage )
+	{
+	M_PROLOG
+	f_poStatusBar->update_progress ( a_dSize, a_pcMessage );
+	return;
+	M_EPILOG
+	}
+
 void HDataWindow::sync ( void )
 	{
 	M_PROLOG
