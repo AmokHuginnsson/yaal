@@ -43,3 +43,4 @@ banner:
 	@echo "[1m!!![m It is only a wrapper, use GNU make (gmake). [1m!!![m"
 
 # vim: ft=make
+
