@@ -26,6 +26,7 @@ Copyright:
 
 #include <string.h>
 #include <ctype.h>
+#include <libintl.h>
 
 #include "../config.h"
 
@@ -781,16 +782,19 @@ void HListControl::go_to_match ( void )
 	{
 	M_PROLOG
 	int l_iDummy = 0, l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iCount = f_oHeader.quantity ( );
+	int l_iCount = f_iQuantity + 1, l_iColumns = f_oHeader.quantity ( );
 	char * l_pcHighlightStart = NULL;
 	HItem * l_poItem = NULL;
-	HElement * l_poElement = f_sMatch.f_poCurrentMatch = f_poSelected;
+	HElement * l_poElement = f_poSelected;
+	HElement * l_poElementFVR = f_poFirstVisibleRow;
+	if ( f_sMatch.f_poCurrentMatch != f_poSelected )f_sMatch.f_iMatchNumber = - 1;
+	f_sMatch.f_poCurrentMatch = f_poSelected;
 	if ( f_bSearchActived )
 		{
-		do
+		while ( l_iCount -- )
 			{
 			l_poItem = & f_poSelected->get_object ( );
-			for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iCount; l_iCtr ++ )
+			for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
 				{
 				l_pcHighlightStart = ( char * ) ( HString & ) ( * l_poItem ) [ l_iCtr ];
 				l_iCtrLoc = 0;
@@ -823,10 +827,10 @@ void HListControl::go_to_match ( void )
 				f_poSelected = f_poFirstVisibleRow = f_poHook;
 				f_iControlOffset = f_iCursorPosition = 0;
 				l_iMoveFirstRow = 0;
+				f_poParent->status_bar ( )->message ( _ ( "search hit BOTTOM, continuing at TOP" ) );
 				}
 /* end od it */
 			}
-		while ( l_poElement != f_poSelected );
 		}
 	if ( l_pcHighlightStart )
 		{
@@ -845,9 +849,10 @@ void HListControl::go_to_match ( void )
 	else
 		{
 		f_poSelected = l_poElement;
+		f_poFirstVisibleRow = l_poElementFVR;
 		f_sMatch.f_iMatchNumber = - 1;
 		f_sMatch.f_iColumnWithMatch = 0;
-		putchar ( '\a' );
+		f_poParent->status_bar ( )->message ( _ ( "pattern not found" ) );
 		}
 	return;
 	M_EPILOG
