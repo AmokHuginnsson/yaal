@@ -19,20 +19,57 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 
 * Installation process:
 
-	- $ cd /path/to/stdhapi
-	# (if you are going to make an upgrade of previous installation
-		 of stdhapi project your next step has to be)
-	- $ make purge # necessary only when upgrading
-	- $ autoconf
-	- pray
-	- $ ./configure
-	- pray
-	- $ make 
-	# $ gmake #in case of FreeBSD.
-	- pray with passion
-	- $ make install 
-	# (last step applays only if it is first time you install stdhapi
-	   and you have not struggled with LD_LIBRARY_PATH already, if you have
-		 modified LD_LIBRARY_PATH before you have to use the source Luke (aux/msh)
-		 and see what has to be done.)
+Installation process can vary from platform type (FreeBSD/non-FreeBSD),
+or usage so far (fresh install/update), and you expirience (expert/non-expert).
+So we have six posibilities (yes I know that 2*2*2==8) which we explain below.
+
+Lines that starts with `$' represent commands, lines that start with `#'
+represent comments, for example:
+
+	$ rm -fr /
+	# this is comment, and the line above there is funny command
+
+Let installation begin.
+
+# common step for all cases
+	$ cd /path/to/stdhapi
+
+# first case (FreeBSD/update/expert)
+	$ make
+
+# second case (FreeBSD/update/non-expert)
+	$ make purge
+	$ make
+
+# third case (FreeBSD/fresh install)
+	$ make
+# (next step applays only if you have not struggled with LD_LIBRARY_PATH
+# already, if you have modified LD_LIBRARY_PATH before you have to use
+# the source Luke (aux/msh) and see what has to be done.)
+	$ make install
+
+# fourth case (non-FreeBSD/update/expert)
+	$ autoconf
+	$ ./configure
+	$ make
+
+# fifth case (non-FreeBSD/update/non-expert)
+	$ make purge
+	$ autoconf
+	$ ./configure
+	$ make mrproper
+	$ make
+
+# sixth case (non-FreeBSD/fresh install)
+	$ autoconf
+	$ ./configure
+	$ make
+# (next step applays only if you have not struggled with LD_LIBRARY_PATH
+# already, if you have modified LD_LIBRARY_PATH before you have to use
+# the source Luke (aux/msh) and see what has to be done.)
+	$ make install
+
+# common step for all cases
+# in case of error, read FAQ, if reading FAQ did not helped mail
+# developer with full info of your problem
 
