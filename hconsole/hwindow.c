@@ -24,7 +24,13 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <ncurses.h>
+#include "../config.h"
+
+#ifdef __PLD_HOST__
+#	include <ncurses/ncurses.h>
+#else /* __PLD_HOST__ */
+#	include <ncurses.h>
+#endif /* not __PLD_HOST__ */
 
 #include "hwindow.h"
 

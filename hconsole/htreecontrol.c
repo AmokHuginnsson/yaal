@@ -25,7 +25,16 @@ Copyright:
 */
 
 #include <string.h>
-#include <ncurses.h>
+
+#include "../config.h"
+
+#ifdef __PLD_HOST__
+#	include <ncurses/ncurses.h>
+#else /* __PLD_HOST__ */
+#define NCURSES_CONST const
+#	include <ncurses.h>
+#define NCURSES_CONST const
+#endif /* not __PLD_HOST__ */
 
 #include "htreecontrol.h"
 

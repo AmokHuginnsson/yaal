@@ -24,11 +24,18 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "../config.h"
+
+#ifdef __PLD_HOST__
+#	include <ncurses/ncurses.h>
+#else /* __PLD_HOST__ */
+#	include <ncurses.h>
+#endif /* not __PLD_HOST__ */
 
 #include "heditcontrol.h"
 

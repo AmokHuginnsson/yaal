@@ -24,12 +24,18 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <ncurses.h>
-
 #include <string.h>          /* strsignal */
 #include <unistd.h>          /* kill function           */
 #include <stdio.h>		       /* perror function         */
 #include <signal.h>		       /* signal handling         */
+
+#include "../config.h"
+
+#ifdef __PLD_HOST__
+#	include <ncurses/ncurses.h>
+#else /* __PLD_HOST__ */
+#	include <ncurses.h>
+#endif /* not __PLD_HOST__ */
 
 #include "signals.h"
 
