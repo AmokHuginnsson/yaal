@@ -235,7 +235,7 @@ tType HMatrix < tType > ::M ( int r, int c )
 		for ( j = 0; j < f_iColumns; j++ )
 			{
 			if ( j == c ) continue;
-			l_oMatrix [ ii ] [ jj ] = ( * this->f_ptArray [ l_iCtr ] ) [ j ];
+			l_oMatrix [ ii ] [ jj ] = this->f_ptArray [ l_iCtr ] [ j ];
 			jj++;
 			}
 		ii++;
@@ -251,7 +251,7 @@ HMatrix < tType > HMatrix < tType > ::T ( void )
 	int l_iCtr, j;
 	HMatrix l_oMatrix ( f_iColumns, f_iRows );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) for ( j = 0; j < f_iColumns; j++ ) 
-		l_oMatrix [ j ] [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] ) [ j ];
+		l_oMatrix [ j ] [ l_iCtr ] = this->f_ptArray [ l_iCtr ] [ j ];
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -384,7 +384,7 @@ HMatrix < tType > & HMatrix < tType > ::operator += ( HMatrix & a_roMatrix )
 	if ( ( f_iRows == a_roMatrix.f_iRows ) 
 			&& ( f_iColumns == a_roMatrix.f_iColumns ) ) 
 		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			* this->f_ptArray [ l_iCtr ] += a_roMatrix [ l_iCtr ];
+			this->f_ptArray [ l_iCtr ] += a_roMatrix [ l_iCtr ];
 	return ( * this );
 	M_EPILOG
 	}
