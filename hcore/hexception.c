@@ -103,17 +103,20 @@ void HException::log ( const char * a_pcFileName,
 	return;
 	}
 
+#ifdef _EXECINFO_H
 void HException::dump_call_stack ( int a_iLevel )
+#else /* _EXECINFO_H */
+void HException::dump_call_stack ( int )
+#endif /* not _EXECINFO_H */
 	{
+#ifdef _EXECINFO_H
 	int l_iCtr = 0, l_iSize = 0;
 	char l_pcBuffer [ 4000 ];
 	char ** l_ppcStrings = NULL;
 	void ** l_ppvArray = ( void ** ) & l_pcBuffer;
 
-#ifdef _EXECINFO_H
 	l_iSize = backtrace ( l_ppvArray, 1000 );
 	l_ppcStrings = backtrace_symbols  ( l_ppvArray, l_iSize );
-#endif /* _EXECINFO_H */
 
 	::log << "Obtained " << ( int ) l_iSize << " stack frames." << endl;
 	if ( a_iLevel < l_iSize )l_iSize = a_iLevel;
@@ -121,5 +124,7 @@ void HException::dump_call_stack ( int a_iLevel )
 		::log << l_ppcStrings [ l_iCtr ] << endl;
 
 	xfree ( ( void * ) l_ppcStrings );
+#endif /* _EXECINFO_H */
 	return;
 	}
+
