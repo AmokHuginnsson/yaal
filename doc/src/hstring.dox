@@ -1,0 +1,29 @@
+/*! \class stdhapi::hcore::HString hcore/hstring.h
+ * \brief Easies character string operations.
+ *
+ * This class supports conversions from all major types, moreover
+ * for programmer conviniece this class overloades most commonly used
+ * operators.
+ */
+
+/*! \fn void stdhapi::hcore::HString::hs_realloc ( const size_t a_iSize )
+ * \brief Reallocates memory for string.
+ *
+ * This function supports extending space intended for string,
+ * this function does not support shrinking or removing allocated
+ * buffer. Newly allocated buffer always has size of the power of 2.
+ *
+ * \param a_iSize Minimum size of newly allocated space.
+ */
+
+/*!
+ * \addtogroup HString_helpers HString helper funstions.
+ * \fn HString stdhapi::hcore::operator + ( char const *, const HString & )
+ * 
+ * \fn HString stdhapi::hcore::operator + ( const int, const HString & )
+ * 
+ * \fn HString stdhapi::hcore::operator + ( const void *, const HString & )
+ * 
+ * \fn HString stdhapi::hcore::operator + ( const long int, const HString & )
+ */
+

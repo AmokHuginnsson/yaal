@@ -1,0 +1,68 @@
+/*! \namespace stdhapi
+ * \brief All library API belongs here.
+ *
+ * This namaspace contains all stdhapi library API and code.
+ * Stdhapi code and API is divided into several sections.
+ */
+
+/*! \namespace stdhapi::hcore
+ * \brief Core functionality.
+ * 
+ * This namespace contains core library functionality that is
+ * independent from UI or external software.
+ */
+
+/*! \namespace stdhapi::hcore::rc_file
+ * \brief Reading configuration files.
+ * 
+ * rc_file gives easy to use API for reading configuration files
+ * that are common in Unix world.
+ */
+
+/*! \namespace stdhapi::hconsole
+ * \brief User inteface.
+ * 
+ * This namespace contains library API required to build
+ * terminal based user interface (TUI).
+ */
+
+/*! \namespace stdhapi::hconsole::mouse
+ * \brief Console and X mouse handling.
+ */
+
+/*! \namespace stdhapi::tools
+ * \brief Addtional useful functions.
+ * 
+ * This namespace contains some very cool functions that
+ * easies performing complex tasks.
+ */
+
+/*! \namespace stdhapi::tools::des
+ * \brief Cryptography interface.
+ * 
+ * Small class incorporatins simple cryptography functionality.
+ */
+
+/*! \namespace stdhapi::tools::signals
+ * \brief Unix signals handling.
+ */
+
+/*! \namespace stdhapi::tools::util
+ * \brief Small but useful utils.
+ */
+
+/*! \namespace stdhapi::dbwrapper
+ * \brief Wrapper for standarized database access.
+ * 
+ * The dbwrapper allows its user to transparently access
+ * any kind of relational database that are available for Unix.
+ */
+
+/*! \namespace stdhapi::hdata
+ * \brief Api for rapid database based aplication development.
+ * 
+ * This namspace joins powers of APIs that are found in hconsole
+ * and in dbwrapper. Its user may rapidly create fulfeatured applications
+ * that use console interface, mouse capabilities and database access.
+ */
+
