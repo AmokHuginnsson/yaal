@@ -312,8 +312,9 @@ void HDataWindow::sync ( void )
 	else if ( ( f_iMode == D_MODE_ADDING ) || ( f_iMode == D_MODE_EDITING ) )
 		{
 		l_iCount = f_oEditModeControls.quantity ( );
-		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-			f_oValues [ l_iCtr ] = ( HString & ) ( HInfo ) * ( HControl * ) f_oEditModeControls [ l_iCtr ];
+		if ( f_oValues.quantity ( ) >= l_iCount )
+			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+				f_oValues [ l_iCtr ] = ( HString & ) ( HInfo ) * ( HControl * ) f_oEditModeControls [ l_iCtr ];
 		m_lId = f_poMainControl->get_current_id ( );
 		}
 	return;
