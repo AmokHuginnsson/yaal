@@ -243,27 +243,26 @@ int HEditControl::process_input ( int a_iCode )
 		{
 		case ( KEY_PPAGE ):
 			{
-			f_oHistory.go ( 0 );	
-			f_oHistory.to_tail ( );
+			f_oHistory.go ( 0 );
 			l_iErrorCode = -1;
 			break;
 			}
 		case ( KEY_NPAGE ):
 			{
 			f_oHistory.go ( 0 );	
-			f_oHistory.to_head ( 2 );
+			f_oHistory.to_head ( );
 			l_iErrorCode = -1;
 			break;
 			}
 		case ( KEY_UP ):
 			{
-			f_oHistory.to_head ( );
+			f_oHistory.to_tail ( );
 			l_iErrorCode = -1;
 			break;
 			}
 		case ( KEY_DOWN ):
 			{
-			f_oHistory.to_tail ( );
+			f_oHistory.to_head ( );
 			l_iErrorCode = -1;
 			break;
 			}
@@ -279,12 +278,14 @@ int HEditControl::process_input ( int a_iCode )
 				if ( f_oHistory.to_tail ( ) == f_oString )break;
 			if ( f_oString.get_length ( ) &&  ( ! l_iErrorCode ) )
 				{
-				f_oHistory.add_tail ( & f_oString );
-				while ( f_oHistory.quantity ( ) > ( int ) f_iMaxHistoryLevel )
-					f_oHistory.remove_at ( 1, D_EMPTY_IF_NOT_EMPTIED );
+				f_oHistory.add_head ( & f_oString );
+				l_iErrorCode = f_oHistory.quantity ( );
+				while ( l_iErrorCode -- > ( int ) f_iMaxHistoryLevel )
+					f_oHistory.remove_at ( l_iErrorCode, D_EMPTY_IF_NOT_EMPTIED );
 				f_oHistory.go ( 0 );
 				f_oHistory.to_head ( );
 				}
+			else f_oHistory.to_head ( );
 			l_iErrorCode = a_iCode;
 			break;
 			}
@@ -328,6 +329,13 @@ int HEditControl::process_input ( int a_iCode )
 					}
 				}
 			else putchar ( '\a' );
+			break;
+			}
+		case ( D_KEY_CTRL_( 'u' ) ):
+			{
+			l_iLength = 0;
+			f_iControlOffset = 0;
+			f_iCursorPosition = 0;
 			break;
 			}
 		case ( KEY_DELETE ):
@@ -570,6 +578,16 @@ HString & HEditControl::operator = ( const char * a_pcString )
 		f_iControlOffset = l_iLength - f_iWidthRaw + 1;
 		}
 	else f_iCursorPosition = l_iLength;
+	l_iErrorCode = f_oHistory.quantity ( );
+	while ( l_iErrorCode )
+		{
+		if ( f_oHistory.to_tail ( ) == f_oString )
+			{
+			f_oHistory.to_head ( );
+			break;
+			}
+		l_iErrorCode --;
+		}
 	refresh ( );
 	return ( f_oString );
 	M_EPILOG
