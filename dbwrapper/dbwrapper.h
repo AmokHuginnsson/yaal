@@ -28,12 +28,17 @@ Copyright:
 #ifndef __DBWRAPPER_DBWRAPPER_H
 #define __DBWRAPPER_DBWRAPPER_H
 
+namespace stdhapi
+{
+
 namespace dbwrapper
 	{
 
 extern int	n_iDataBaseDriver;
 
 	}
+
+}
 
 #endif /* not __DBWRAPPER_DBWRAPPER_H */
 

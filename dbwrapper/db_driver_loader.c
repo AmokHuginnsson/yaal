@@ -1,4 +1,3 @@
-
 /*
 ---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
@@ -41,6 +40,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "db_driver_loader.h"
 #include "dbwrapper.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace dbwrapper
+{
+
 #define M_DB_ERR(msg) "Error: Data base request ("msg") while no driver loaded."
 
 char const x_tag_g_pcDone [ ] = "done.\r\n", * g_pcDone = x_tag_g_pcDone;
@@ -55,8 +62,6 @@ static char const * g_ppcDriver [ 24 ] =
 	NULL
 	};
 
-namespace dbwrapper
-	{
 	
 void * n_pvDlHandle = NULL;
 
@@ -93,13 +98,6 @@ long int ( * rsdb_id ) ( void *, void * );
 typedef char * ( * tA ) ( void *, int );
 char * ( * rs_column_name ) ( void *, int );
 
-	}
-
-using namespace dbwrapper;
-
-namespace dbwrapper
-{
-	
 /* Null driver */
 
 void * null_db_connect ( char const *, char const *, char const * )
@@ -330,6 +328,8 @@ char * autoloader_rs_column_name ( void * a_pvResult, int a_iColumn )
 	}
 
 /* end of driver autoloader section */
+
+}
 
 }
 

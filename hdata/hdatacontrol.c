@@ -28,6 +28,16 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hdatacontrol.h"
 
+using namespace stdhapi::hcore;
+using namespace stdhapi::hconsole;
+using namespace stdhapi::dbwrapper;
+
+namespace stdhapi
+{
+
+namespace hdata
+{
+
 HDataControl::HDataControl ( HRecordSet * a_poRecordSet )
 						: HControl ( NULL, 0, 0, 0, 0, NULL )
 	{
@@ -71,4 +81,8 @@ void HDataControl::cancel_new ( void )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -40,6 +40,14 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "htreecontrol.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HTreeControl::HNodeControl::HNodeControl ( HNodeControl * a_poNode )
 						: HTree < HItem >::HNode ( a_poNode )
 	{
@@ -133,7 +141,7 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		else if ( l_iCtr )
 			::mvprintw ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 - 1, "-" );
 		if ( a_poNode == f_poSelected )
-			console::set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
+			set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
 						: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
 		::mvprintw ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2,
 				( HString & ) l_oInfo );
@@ -292,4 +300,8 @@ int HTreeControl::set_focus ( char a_cShorcut )
 	return ( HControl::set_focus ( a_cShorcut ) );
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -30,7 +30,18 @@ Copyright:
 #line 31 "hmap.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 #include <new>
+
+#include "./hcore/xalloc.h"
+#include "./hcore/hexception.h"
+#include "./hcore/hstring.h"
+
+namespace stdhapi
+{
+
+namespace hcore
+{
 
 extern unsigned long const int * const g_pulPrimes;
 
@@ -90,11 +101,6 @@ protected:
 	/*{*/
 	/*}*/
 	};
-
-#include <stdlib.h>
-#include "./hcore/xalloc.h"
-#include "./hcore/hexception.h"
-#include "./hcore/hstring.h"
 
 template < class tType, class ttType >
 HMap<tType, ttType>::HAtom::HAtom ( void )
@@ -296,6 +302,10 @@ bool HMap<tType, ttType>::remove ( const tType & a_rtKey )
 /* Helpers and premaps */
 
 unsigned long int hash ( const HString & );
+
+}
+
+}
 
 #endif /* not __HCORE_HMAP_H */
 

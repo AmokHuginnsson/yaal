@@ -30,7 +30,13 @@ Copyright:
 #include "hconsole/heditcontrol.h"
 #include "hdatawindow.h"
 
-class HDataEditControl : public HDataControl, public virtual HEditControl
+namespace stdhapi
+{
+
+namespace hdata
+{
+
+class HDataEditControl : public HDataControl, public virtual hconsole::HEditControl
 	{
 protected:
 	/*{*/
@@ -61,6 +67,10 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HDATA_HDATAEDITCONTROL_H */
 

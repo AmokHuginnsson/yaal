@@ -27,12 +27,22 @@ Copyright:
 #ifndef __TOOLS_SIGHAND_H
 #define __TOOLS_SIGHAND_H
 
+namespace stdhapi
+{
+
+namespace tools
+{
+
 namespace signals
 	{
 	
 void set_handlers ( void );
 
 	}
+
+}
+
+}
 
 #endif /* not __TOOLS_SIGHAND_H */
 

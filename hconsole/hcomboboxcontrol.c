@@ -38,6 +38,14 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hcomboboxcontrol.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
 		char const * a_pcLabel, int a_iDroppedWidth,
@@ -83,7 +91,7 @@ int HComboboxControl::kill_focus ( void )
 	if ( f_iMode == D_MODE_LISTCONTROL )
 		{
 		f_iMode = D_MODE_EDITCONTROL;
-		console::clrscr ( );
+		clrscr ( );
 		f_poParent->refresh ( );
 		}
 	return ( HControl::kill_focus ( ) );
@@ -99,7 +107,7 @@ void HComboboxControl::refresh ( void )
 		{
 /* ripped from HControl::draw_label ( ) */
 		l_iWidth = ( f_iWidth > 0 ) ? f_iWidth
-			: console::n_iWidth + f_iWidth - f_iColumnRaw;
+			: n_iWidth + f_iWidth - f_iColumnRaw;
 /* end of ripped part */
 		HEditControl::refresh ( );
 		::move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 );
@@ -163,7 +171,7 @@ int HComboboxControl::click ( mouse::OMouse & a_rsMouse )
 		{
 		HEditControl::click ( a_rsMouse );
 		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
-			: console::n_iWidth + f_iWidth - f_iColumnRaw;
+			: n_iWidth + f_iWidth - f_iColumnRaw;
 		if ( a_rsMouse.f_iColumn == ( f_iColumnRaw + f_iWidthRaw - 1 ) )
 			{
 			f_iMode = D_MODE_LISTCONTROL;
@@ -182,8 +190,13 @@ void HComboboxControl::close_combo ( void )
 	f_iMode = D_MODE_EDITCONTROL;
 	if ( f_iQuantity )
 		HEditControl::operator = ( ( HString & ) present ( ) [ 0 ] );
-	console::clrscr ( );
+	clrscr ( );
 	f_poParent->refresh ( );
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
+

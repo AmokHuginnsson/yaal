@@ -44,6 +44,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hlistcontrol.h"
 #include "hconsole.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HListControl::HColumnInfo::HColumnInfo ( void )
 	{
 	M_PROLOG
@@ -253,16 +261,16 @@ void HListControl::refresh ( void )
 					if ( l_iCtr == f_iCursorPosition )
 						{
 						if ( l_oItem.m_bChecked )
-							console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? ~ ( f_iFocusedAttribute >> 8 )
+							set_attr ( ! f_bEnabled ? ( ! f_bFocused ? ~ ( f_iFocusedAttribute >> 8 )
 										: ~ ( f_iEnabledAttribute >> 8 ) ) : ~ ( f_iDisabledAttribute >> 8 ) );
 						else
-							console::set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
+							set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
 										: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
 						}
 					else
 						{
 						if ( l_oItem.m_bChecked )
-							console::set_attr ( f_bEnabled ? ( f_bFocused ? ~ ( f_iFocusedAttribute >> 8 )
+							set_attr ( f_bEnabled ? ( f_bFocused ? ~ ( f_iFocusedAttribute >> 8 )
 										: ~ ( f_iEnabledAttribute >> 8 ) ) : ~ ( f_iDisabledAttribute >> 8 ) );
 						else M_SET_ATTR_DATA ( );
 						}
@@ -310,7 +318,7 @@ void HListControl::refresh ( void )
 			l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
 			if ( l_iCtr < l_iColumns )
 				{
-				console::set_attr ( f_iDisabledAttribute );
+				set_attr ( f_iDisabledAttribute );
 				for ( l_iCtrLoc = 0; l_iCtrLoc < ( f_iHeightRaw + l_iHR ); l_iCtrLoc ++ )
 					{
 					::move ( f_iRowRaw + l_iCtrLoc,	f_iColumnRaw + l_iColumnOffset - 1 );
@@ -319,7 +327,7 @@ void HListControl::refresh ( void )
 				}
 			}
 		}
-	console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute );
+	set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute );
 	if ( f_iQuantity )
 		{
 		if ( f_iControlOffset )
@@ -592,7 +600,7 @@ HItem & HListControl::add_tail ( HItem & a_roItem )
 	if ( ! f_poFirstVisibleRow )f_poFirstVisibleRow = f_poHook;
 	f_poSelected = f_poHook;
 	to_head ( );
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	return ( * l_poDummy );
 	M_EPILOG
 	}
@@ -606,7 +614,7 @@ HItem & HListControl::add_orderly ( HItem & a_roItem )
 	f_iControlOffset = 0;
 	f_poFirstVisibleRow = f_poHook;
 	f_poSelected = f_poHook;
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	return ( * l_poDummy );
 	M_EPILOG
 	}
@@ -662,7 +670,7 @@ int HListControl::remove_element ( int a_iFlag, HItem * * a_ppoItem )
 	else l_bFlag = false;
 	if ( f_poSelected == f_poFirstVisibleRow )
 		to_tail ( f_poFirstVisibleRow );
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	l_iError = HList < HItem > ::remove_element ( a_iFlag, a_ppoItem );
 	if ( l_bFlag )to_head ( );
 	refresh ( );
@@ -687,9 +695,9 @@ int HListControl::remove_tail ( int a_iFlag, HItem * * a_ppoItem )
 		}
 	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
 		f_iCursorPosition --;
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	l_iError = HList < HItem > ::remove_tail ( a_iFlag, a_ppoItem );
-	if ( console::is_enabled ( ) )refresh ( );
+	if ( is_enabled ( ) )refresh ( );
 	return ( l_iError );
 	M_EPILOG
 	}
@@ -944,4 +952,8 @@ void HListControl::go_to_match_previous ( void )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

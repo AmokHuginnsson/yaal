@@ -29,6 +29,15 @@ Copyright:
 
 #line 31
 
+#include "hexception.h"
+#include "hvector.h"
+
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 #define D_CVSID_HMATRIX_H "$CVSHeader$"
 
 #define E_HMATRIX_BADROWS													0
@@ -63,8 +72,6 @@ extern char const * g_ppcErrMsgHMatrix [ ];
 	if ( f_iColumns != a_roMatrix.f_iRows )\
 		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_COLUMNSROWS ],\
 				f_iColumns - a_roMatrix.f_iRows );
-
-#include "hvector.h"
 
 template < class tType >
 class HMatrix : public HArray < HVector < tType > >
@@ -114,8 +121,6 @@ template < class ttType >
 	
 template < class tType >
 HVector < tType > T ( const HMatrix < tType > &, const HVector < tType > & );
-
-#include "hexception.h"
 
 template < class tType >
 HMatrix < tType > ::HMatrix ( const int a_iRows, const int a_iColumns )
@@ -547,6 +552,10 @@ HVector < tType > T ( const HMatrix < tType > & a_roMatrix, const HVector < tTyp
 	return ( a_roVector * l_oMatrix );
 	M_EPILOG
 	}
+
+}
+
+}
 	
 #endif /* not __HCORE_HMATRIX_H */
 

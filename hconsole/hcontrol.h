@@ -31,6 +31,12 @@ Copyright:
 #include "hcore/hstring.h"
 #include "hcore/hinfo.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 class HWindow;
 
 class HControl
@@ -61,8 +67,8 @@ protected:
 																		 to parent window (after repositioning) */
 	int				f_iHeightRaw;					/* self explanary */
 	int				f_iWidthRaw;					/* self explanary */
-	HString 	f_oLabel;							/* control title */
-	HString		f_oVarTmpBuffer;			/* buffer for temporary operations, used
+	hcore::HString 	f_oLabel;							/* control title */
+	hcore::HString		f_oVarTmpBuffer;			/* buffer for temporary operations, used
 																		 to keep memory fragmentation low */
 	HWindow * f_poParent;						/* window that will hold this control */
 /* this is used locally, there is no way to modify this variables explictly */
@@ -82,8 +88,8 @@ public:
 	virtual int set_focus ( char = 0 ); /* focused and shortcut char match */
 	virtual int kill_focus ( void );
 	virtual void refresh ( void ) = 0;
-	virtual HInfo operator = ( const HInfo & );
-	virtual operator HInfo ( void );
+	virtual hcore::HInfo operator = ( const hcore::HInfo & );
+	virtual operator hcore::HInfo ( void );
 	virtual bool is_searchable ( void );
 	virtual void draw_label ( void );
 	virtual int click ( mouse::OMouse & );
@@ -93,11 +99,15 @@ public:
 #define M_ATTR_LABEL( )	f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8
 #define M_ATTR_SHORTCUT( )	! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8
 #define M_ATTR_DATA( )	f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute
-#define M_SET_ATTR_LABEL( )	console::set_attr ( M_ATTR_LABEL ( ) )
-#define M_SET_ATTR_SHORTCUT( )	console::set_attr ( M_ATTR_SHORTCUT ( ) )
-#define M_SET_ATTR_DATA( )	console::set_attr ( M_ATTR_DATA ( ) )
+#define M_SET_ATTR_LABEL( )	set_attr ( M_ATTR_LABEL ( ) )
+#define M_SET_ATTR_SHORTCUT( )	set_attr ( M_ATTR_SHORTCUT ( ) )
+#define M_SET_ATTR_DATA( )	set_attr ( M_ATTR_DATA ( ) )
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HCONTROL_H */
 

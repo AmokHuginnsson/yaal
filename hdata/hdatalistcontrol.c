@@ -41,6 +41,16 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdatalistcontrol.h"
 #include "hdatawindow.h"
 
+using namespace stdhapi::hcore;
+using namespace stdhapi::hconsole;
+using namespace stdhapi::dbwrapper;
+
+namespace stdhapi
+{
+
+namespace hdata
+{
+
 HDataListControl::HDataListControl ( HRecordSet * a_poRecordSet,
 		HDataWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
 		int a_iWidth, char const * a_pcTitle,
@@ -134,4 +144,8 @@ void HDataListControl::cancel_new ( void )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -30,15 +30,21 @@ Copyright:
 #include "dbwrapper/hrecordset.h"
 #include "hconsole/hcontrol.h"
 
-class HDataControl : public virtual HControl
+namespace stdhapi
+{
+
+namespace hdata
+{
+
+class HDataControl : public virtual hconsole::HControl
 	{
 protected:
 	/*{*/
-	HRecordSet * f_poRecordSet;
+	dbwrapper::HRecordSet * f_poRecordSet;
 	/*}*/
 public:
 	/*{*/
-	HDataControl ( HRecordSet * );
+	HDataControl ( dbwrapper::HRecordSet * );
 	virtual ~HDataControl ( void );
 	virtual void load ( long int = 0 );
 	virtual long int get_current_id ( void );
@@ -49,5 +55,9 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HDATA_HDATACONTROL_H */

@@ -31,6 +31,12 @@ Copyright:
 
 #include "./hcore/hmap.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 #define M_REGISTER_PREPROCESS_HANDLER( count, tab, handler ) \
 	register_preprocess_handler ( count, tab, ( HANDLER_t ) & handler )
 #define M_REGISTER_POSTPROCESS_HANDLER( count, tab, handler ) \
@@ -41,12 +47,12 @@ class HHandler
 protected:
 	/*{*/
 	typedef int ( HHandler::* HANDLER_t ) ( int, void * = NULL );
-	typedef HMap < int, HANDLER_t > process_handler_key_map_t;
-	typedef HMap < HString, HANDLER_t > process_handler_command_map_t;
+	typedef hcore::HMap < int, HANDLER_t > process_handler_key_map_t;
+	typedef hcore::HMap < hcore::HString, HANDLER_t > process_handler_command_map_t;
 	process_handler_key_map_t f_oPreprocessHandlers;
 	process_handler_key_map_t f_oPostprocessHandlers;
 	process_handler_command_map_t f_oCommandHandlers;
-	HString f_oCommand;
+	hcore::HString f_oCommand;
 	/*}*/
 public:
 	/*{*/
@@ -56,10 +62,14 @@ public:
 protected:
 	/*{*/
 	int process_input ( int, process_handler_key_map_t & );
-	HString process_command ( void );
+	hcore::HString process_command ( void );
 	int register_preprocess_handler ( int, int *, HANDLER_t );
 	int register_postprocess_handler ( int, int *, HANDLER_t );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HHANDLER_H */

@@ -29,6 +29,12 @@ Copyright:
 
 #include "hrawfile.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 class HSocket : public HRawFile
 	{
 protected:
@@ -40,5 +46,9 @@ public:
 	virtual ~HSocket ( void ) ;
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCORE_HSOCKET_H */

@@ -31,6 +31,16 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdataprocess.h"
 #include "hdatawindow.h"
 
+using namespace stdhapi::hcore;
+using namespace stdhapi::hconsole;
+using namespace stdhapi::dbwrapper;
+
+namespace stdhapi
+{
+
+namespace hdata
+{
+
 HDataProcess::HDataProcess ( void ) : HProcess ( )
 	{
 	M_PROLOG
@@ -100,4 +110,8 @@ int HDataProcess::handler_close_window ( int a_iCode, void * )
 	return ( HProcess::handler_close_window ( a_iCode ) );
 	M_EPILOG
 	}
+
+}
+
+}
 

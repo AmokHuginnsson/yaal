@@ -29,6 +29,12 @@ Copyright:
 
 #include "hdatabase.h"
 
+namespace stdhapi
+{
+
+namespace dbwrapper
+{
+
 class HDataBase
 	{
 private:
@@ -53,5 +59,9 @@ public:
 	long int insert_id ( void * = NULL );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __DBWRAPPER_HDATABASE_H */

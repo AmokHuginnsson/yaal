@@ -45,6 +45,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "heditcontrol.h"
 #include "hwindow.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
 		char const * a_pcLabel, size_t a_iBufferSize, char const * a_pcValue,
@@ -110,7 +118,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
  * f_iWidthRaw until draw_label ( ), which is called from refresh ( )
  * because ... see next comment */
 	f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
-		: console::n_iWidth + f_iWidth - f_iColumnRaw;
+		: n_iWidth + f_iWidth - f_iColumnRaw;
 /* f_iWidthRaw must be set up properly before setting up f_iCursorPosition and
  * f_iControlOffset whose are used in refresh ( ) */
 	if ( l_iLength >= ( size_t ) f_iWidthRaw )
@@ -623,4 +631,8 @@ int HEditControl::click ( mouse::OMouse & a_rsMouse )
 	return ( 0 );
 	M_EPILOG
 	}
+
+}
+
+}
 

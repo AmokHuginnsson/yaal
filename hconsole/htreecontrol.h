@@ -31,12 +31,18 @@ Copyright:
 #include "hitem.h"
 #include "hwindow.h"
 
-class HTreeControl : public HTree < HItem >, public virtual HControl
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
+class HTreeControl : public hcore::HTree < HItem >, public virtual HControl
 	{
 protected:
 	class HNodeControl;
 	friend class HNodeControl;
-	class HNodeControl : public HTree < HItem >::HNode
+	class HNodeControl : public hcore::HTree < HItem >::HNode
 		{
 	protected:
 		/*{*/
@@ -79,5 +85,9 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HTREECONTROL_H */

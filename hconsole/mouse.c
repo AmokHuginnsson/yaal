@@ -53,6 +53,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcore/hstring.h"
 #include "hcore/hlog.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 namespace mouse
 {
 
@@ -271,6 +279,10 @@ int x_mouse_close ( void )
 	{
 	return ( 0 );
 	}
+
+}
+
+}
 
 }
 

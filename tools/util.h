@@ -29,13 +29,23 @@ Copyright:
 
 #include "hcore/hstring.h"
 
+namespace stdhapi
+{
+
+namespace tools
+{
+
 namespace util
 	{
 
-HString kwota_slownie ( double );
+hcore::HString kwota_slownie ( double );
 void usun_ogonki ( char * );
 double atof_ex ( char const *, bool = false );
 
 	}
+
+}
+
+}
 
 #endif /* not __TOOLS_UTIL_H */

@@ -34,6 +34,12 @@ Copyright:
 
 #define D_CVSID_HPOOL_H "$CVSHeader$"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 #define E_HPOOL_BADSIZE				0
 #define E_HPOOL_NOMEM					1
 #define E_HPOOL_REALLOC_FIXED	2
@@ -157,6 +163,10 @@ void HPool < tType >::reset ( void )
 	{
 	f_iTop = 0;
 	}
+
+}
+
+}
 
 #endif /* not __HCORE_HPOOL_H */
 

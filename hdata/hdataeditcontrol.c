@@ -39,6 +39,16 @@ M_CVSID ( "$CVSHeader$" );
 #include "hconsole/console.h"
 #include "hdataeditcontrol.h"
 
+using namespace stdhapi::hcore;
+using namespace stdhapi::hconsole;
+using namespace stdhapi::dbwrapper;
+
+namespace stdhapi
+{
+
+namespace hdata
+{
+
 HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
 		char const * a_pcLabel, int a_iBufferSize, char const * a_pcValue,
@@ -112,4 +122,8 @@ int HDataEditControl::process_input ( int a_iCode )
 	return ( a_iCode );
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -32,6 +32,12 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "htime.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 HTime::HTime ( char const * a_pcFormat )
 	{
 	M_PROLOG
@@ -275,4 +281,8 @@ HTime::operator time_t ( void )
 	{
 	return ( f_xValue );
 	}
+
+}
+
+}
 

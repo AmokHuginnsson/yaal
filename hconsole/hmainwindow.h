@@ -32,6 +32,12 @@ Copyright:
 #include "hmenucontrol.h"
 #include "hwindowlistcontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 class HMainWindow : public HWindow
 	{
 protected:
@@ -49,5 +55,9 @@ public:
 	HWindowListControl * _disclose_window_list ( void );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HMAINWINDOW_H */

@@ -28,6 +28,12 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hmap.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 unsigned long int const x_tag_g_pulPrimes [ 32 ] =
 	{
 	1,					3,					7,					13,					31,					61,					
@@ -50,4 +56,8 @@ unsigned long int hash ( const HString & a_roString )
 		}
 	return ( l_ulHash );
 	}
+
+}
+
+}
 

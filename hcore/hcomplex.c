@@ -30,6 +30,12 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hcomplex.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 HComplex::HComplex ( void )
 	{
 	M_PROLOG
@@ -263,4 +269,8 @@ HComplex operator * ( const double a_dValue, const HComplex & a_roComplex )
 	return ( l_oComplex * a_dValue );
 	M_EPILOG
 	}
+
+}
+
+}
 

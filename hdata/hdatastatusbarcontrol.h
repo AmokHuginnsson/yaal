@@ -30,7 +30,13 @@ Copyright:
 #include "hconsole/hstatusbarcontrol.h"
 #include "hdatawindow.h"
 
-class HDataStatusBarControl : public HStatusBarControl
+namespace stdhapi
+{
+
+namespace hdata
+{
+
+class HDataStatusBarControl : public hconsole::HStatusBarControl
 	{
 protected:
 	/*{*/
@@ -44,6 +50,10 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HDATA_HDATASTATUSBARCONTROL_H */
 

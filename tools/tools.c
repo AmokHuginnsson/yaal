@@ -38,6 +38,11 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcore/hlog.h"       /* log object */
 #include "hcore/hstring.h"    /* HString class */
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
 namespace tools
 {
 
@@ -59,8 +64,6 @@ OVariable n_psVariables [ ] =
 		{ 0, NULL, NULL }
 	};
 	
-}
-
 namespace util
 	{
 extern char n_pcTransTableStripPL [ 256 ];
@@ -142,13 +145,20 @@ void tools_fini ( void )
 	return;
 	}
 
+}
+
+}
+
 /* older versions of g++ fail to handle __attribute__((constructor))
    if no static object exists */
 
 #if __GNUC__ < 3 || \
 	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
 
+namespace
+	{
 HString g_oDummyTOOLS;
+	}
 
 #endif
 

@@ -27,6 +27,12 @@ Copyright:
 #ifndef __HCORE_HRAWFILE_H
 #define __HCORE_HRAWFILE_H
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 typedef int file_descriptor_t;
 
 class HRawFile
@@ -46,6 +52,10 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCORE_HRAWFILE_H */
 

@@ -34,27 +34,33 @@ Copyright:
 #include "hdatalistcontrol.h"
 #include "oresource.h"
 
+namespace stdhapi
+{
+
+namespace hdata
+{
+
 #define D_MODE_VIEW	0
 #define D_MODE_EDIT	1
 
-class HDataWindow : public HWindow, public HRecordSet
+class HDataWindow : public hconsole::HWindow, public dbwrapper::HRecordSet
 	{
 protected:
 	/*{*/
 	bool f_bModified;
 	HDataControl * f_poMainControl;
 	OResource * f_psResourcesArray;
-	HItem * f_poSyncStore;
-	HList < HDataControl * > f_oViewModeControls;
-	HList < HDataControl * > f_oEditModeControls;
+	hconsole::HItem * f_poSyncStore;
+	hcore::HList < HDataControl * > f_oViewModeControls;
+	hcore::HList < HDataControl * > f_oEditModeControls;
 	/*}*/
 public:
 	/*{*/
-	HDataWindow ( char const *, HDataBase * = NULL, OResource * = NULL );
+	HDataWindow ( char const *, dbwrapper::HDataBase * = NULL, OResource * = NULL );
 	virtual ~HDataWindow ( void );
 	virtual int init ( void );
-	virtual HStatusBarControl * init_bar ( char const * );
-	void set_sync_store ( HItem * = NULL );
+	virtual hconsole::HStatusBarControl * init_bar ( char const * );
+	void set_sync_store ( hconsole::HItem * = NULL );
 	bool is_modified ( void );
 	void set_modified ( bool = true );
 	/*}*/
@@ -63,7 +69,7 @@ protected:
 	void link ( int, HDataControl * );
 	void set_mode ( int );
 	virtual void sync ( void );
-	void sync ( int, HEditControl & );
+	void sync ( int, hconsole::HEditControl & );
 	void sync ( int, HDataListControl & );
 	int handler_add_new ( int, void * );
 	int handler_edit ( int, void * );
@@ -73,5 +79,9 @@ protected:
 	int handler_cancel ( int, void * );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HDATA_HDATAWINDOW_H */

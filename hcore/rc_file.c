@@ -36,6 +36,12 @@ M_CVSID ( "$CVSHeader$" );
 #include "xalloc.h"
 #include "hlog.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 namespace rc_file
 {
 
@@ -54,7 +60,7 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );
 		if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc, l_iLine ) )
 			{
-			if ( g_iDebugLevel )
+			if ( n_iDebugLevel )
 				fprintf ( stderr, "option: [%s], value [%s]\n", ( char * ) l_oOption,
 						( char * ) l_oValue );
 			if ( a_pcSection )
@@ -358,6 +364,10 @@ void rc_set_variable ( char const * a_pcValue, char & a_rcVariable )
 	{
 	a_rcVariable = a_pcValue [ 0 ];
 	}
+
+}
+
+}
 
 }
 

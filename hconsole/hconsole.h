@@ -27,7 +27,10 @@ Copyright:
 #ifndef __HCONSOLE_HCONSOLE_H
 #define __HCONSOLE_HCONSOLE_H
 
-namespace console
+namespace stdhapi
+{
+
+namespace hconsole
 	{
 
 extern int	n_iLatency;
@@ -47,6 +50,8 @@ extern char	n_cCommandComposeCharacter;
 extern int	n_iCommandComposeDelay;
 
 	}
+
+}
 
 #endif /* not __HCONSOLE_HCONSOLE_H */
 

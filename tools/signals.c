@@ -50,6 +50,15 @@ M_CVSID ( "$CVSHeader$" );
 #include "signals.h"
 #include "tools.h"                /* tools namespace */
 
+using namespace stdhapi::hcore;
+using namespace stdhapi::hconsole;
+
+namespace stdhapi
+{
+
+namespace tools
+{
+
 namespace signals
 {
 
@@ -156,9 +165,9 @@ void signal_WINCH ( int a_iSignum )
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( console::is_enabled ( ) )
+	if ( is_enabled ( ) )
 		{
-		console::n_bInputWaiting = true;
+		n_bInputWaiting = true;
 		ungetch ( D_KEY_CTRL_('l') );
 		}
 	else fprintf ( stderr, l_oMessage );
@@ -184,7 +193,7 @@ void signal_INT ( int a_iSignum )
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( console::is_enabled ( ) )console::leave_curses();
+	if ( is_enabled ( ) )leave_curses();
 #endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGINT, SIG_DFL );
@@ -206,7 +215,7 @@ void signal_TERM ( int a_iSignum )
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( console::is_enabled ( ) )console::leave_curses();
+	if ( is_enabled ( ) )leave_curses();
 #endif
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGTERM, SIG_DFL );
@@ -223,8 +232,8 @@ void signal_QUIT ( int a_iSignum )
 	if ( tools::n_bIgnoreSignalSIGQUIT )
 		{
 #ifdef __HCONSOLE_CONSOLE_H
-		if ( console::is_enabled ( ) )
-			console::c_printf ( console::n_iHeight - 1, 0, D_FG_BRIGHTRED,
+		if ( is_enabled ( ) )
+			c_printf ( n_iHeight - 1, 0, D_FG_BRIGHTRED,
 					"Hard Quit is disabled by stdhapi configuration." );
 #endif /* __HCONSOLE_CONSOLE_H */
 		return;
@@ -237,7 +246,7 @@ void signal_QUIT ( int a_iSignum )
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( console::is_enabled ( ) )console::leave_curses();
+	if ( is_enabled ( ) )leave_curses();
 #endif
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGQUIT, SIG_DFL );
@@ -254,8 +263,8 @@ void signal_TSTP ( int a_iSignum )
 	if ( tools::n_bIgnoreSignalSIGINT )
 		{
 #ifdef __HCONSOLE_CONSOLE_H
-		if ( console::is_enabled ( ) )
-			console::c_printf ( console::n_iHeight - 1, 0, D_FG_BRIGHTRED,
+		if ( is_enabled ( ) )
+			c_printf ( n_iHeight - 1, 0, D_FG_BRIGHTRED,
 					"Suspend is disabled by stdhapi configuration." );
 #endif /* __HCONSOLE_CONSOLE_H */
 		return;
@@ -268,7 +277,7 @@ void signal_TSTP ( int a_iSignum )
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( console::is_enabled ( ) )console::leave_curses();
+	if ( is_enabled ( ) )leave_curses();
 #endif
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGTSTP, SIG_DFL );
@@ -290,10 +299,10 @@ void signal_CONT ( int a_iSignum )
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( ! console::is_enabled ( ) )console::enter_curses();
-	if ( console::is_enabled ( ) )
+	if ( ! is_enabled ( ) )enter_curses();
+	if ( is_enabled ( ) )
 		{
-		console::n_bInputWaiting = true;
+		n_bInputWaiting = true;
 		ungetch ( D_KEY_CTRL_('l') );
 		}
 #endif /* __HCONSOLE_CONSOLE_H */
@@ -315,7 +324,7 @@ void signal_fatal ( int a_iSignum )
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( console::is_enabled ( ) )console::leave_curses();
+	if ( is_enabled ( ) )leave_curses();
 #endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( a_iSignum, SIG_DFL );
@@ -328,11 +337,11 @@ void signal_USR1 ( int a_iSignum )
 	{
 	M_PROLOG
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( console::n_bUseMouse )
+	if ( n_bUseMouse )
 		{
-		if ( console::is_enabled ( ) )
+		if ( is_enabled ( ) )
 			{
-			console::n_bInputWaiting = true;
+			n_bInputWaiting = true;
 			ungetch ( KEY_MOUSE );
 			return;
 			}
@@ -348,7 +357,7 @@ void signal_USR1 ( int a_iSignum )
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( console::is_enabled ( ) )console::leave_curses();
+	if ( is_enabled ( ) )leave_curses();
 #endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( a_iSignum, SIG_DFL );
@@ -396,6 +405,10 @@ void set_handlers ( void )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 
 }
 

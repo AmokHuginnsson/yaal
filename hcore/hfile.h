@@ -29,6 +29,12 @@ Copyright:
 
 #include <stdio.h>
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 class HFile
 	{
 protected:
@@ -41,5 +47,9 @@ public:
 	virtual ~HFile ( void ) ;
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCORE_HFILE_H */

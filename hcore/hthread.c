@@ -28,6 +28,12 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hthread.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 HThread::HThread ( void )
 	{
 	M_PROLOG
@@ -41,4 +47,8 @@ HThread::~HThread ( void )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

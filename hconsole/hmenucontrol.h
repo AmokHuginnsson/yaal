@@ -30,6 +30,12 @@ Copyright:
 #include "htreecontrol.h"
 #include "omenuitem.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 class HMenuControl : public HTreeControl
 	{
 	class HMenuNode;
@@ -70,5 +76,9 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HMENUCONTROL_H */

@@ -29,6 +29,12 @@ Copyright:
 
 #include "heditcontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 #define D_PROMPT_MODE_NORMAL	0
 #define D_PROMPT_MODE_COMMAND	1
 #define D_PROMPT_MODE_SEARCH	2
@@ -46,7 +52,7 @@ protected:
 	int			f_iPromptLength;
 	int			f_iMode;					/* prompt mode */
 	int			f_iRestrict;			/* prompt restrict mode */
-	HString	f_oPrompt;
+	hcore::HString	f_oPrompt;
 	/* progress bar data */
 	bool		f_bDone;
 	bool		f_bEstimate;			/* was time left count ? */
@@ -56,8 +62,8 @@ protected:
 	int			f_iLastMinute;		/* all last* variables help */
 	int			f_iLastSecond;		/* keep progress bar refresh rate low */
 	int			f_iLastStep;
-	HString	f_oMessage;
-	HTime		f_oStart;
+	hcore::HString	f_oMessage;
+	hcore::HTime		f_oStart;
 	/* end of progress bar data */
 	/*}*/
 public:
@@ -83,6 +89,10 @@ public:
 	bool confirm ( char const * );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HSTATUSBARCONTROL_H */
 

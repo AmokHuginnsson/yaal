@@ -32,11 +32,17 @@ Copyright:
 #include "hwindow.h"
 #include "hsearchablecontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 #define D_ALIGN_LEFT			0x0010000
 #define D_ALIGN_CENTER		0x0020000
 #define D_ALIGN_RIGHT			0x0040000
 
-class HListControl : public HList < HItem >, public virtual HSearchableControl
+class HListControl : public hcore::HList < HItem >, public virtual HSearchableControl
 	{
 	class HColumnInfo
 		{
@@ -48,7 +54,7 @@ class HListControl : public HList < HItem >, public virtual HSearchableControl
 		int f_iAlign;
 		int f_iShortcutIndex;
 		char f_cShortcut;
-		HString f_oName;
+		hcore::HString f_oName;
 		HControl * f_poControl;
 		/*}*/
 	public:
@@ -76,7 +82,7 @@ protected:
 	int					f_iCursorPosition;		/* cursor position relative to control
 																			 begining */
 	int					f_iSumForOne;					/* sum of percentage columns width */
-	HList < HColumnInfo >	f_oHeader;	/* list header info */
+	hcore::HList < HColumnInfo >	f_oHeader;	/* list header info */
 	HElement *	f_poFirstVisibleRow;	/* pointer to first visible row */
 	struct
 		{
@@ -131,5 +137,9 @@ protected:
 	virtual void go_to_match_previous ( void );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HLISTCONTROL_H */

@@ -28,6 +28,14 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "htimecontrol.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HTimeControl::HTimeControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 										 int a_iHeight, int a_iWidth, char const * a_pcLabel,
 										 bool a_bDrawLabel, int a_iDisabledAttribute,
@@ -47,4 +55,8 @@ HTimeControl::~HTimeControl ( void )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

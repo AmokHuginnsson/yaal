@@ -27,6 +27,12 @@ Copyright:
 #ifndef __HDATA_ORESOURCE_H
 #define __HDATA_ORESOURCE_H
 
+namespace stdhapi
+{
+
+namespace hdata
+{
+
 #define D_CVSID_ORESOURCE_H "$CVSHeader$"
 
 /* control flags */
@@ -114,5 +120,9 @@ struct OListControlResource
 	bool	f_bSearchable;				/* can be item searched */
 	bool	f_bDrawHeader;				/* should be header droven */
 	};
+
+}
+
+}
 
 #endif /* not __HDATA_ORESOURCE_H */

@@ -28,6 +28,14 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hcontrollist.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HControlList::HControlList ( void )
 	{
 	M_PROLOG
@@ -95,4 +103,8 @@ void HControlList::select ( HControl * a_poControl )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

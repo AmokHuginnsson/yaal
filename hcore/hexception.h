@@ -40,6 +40,12 @@ Copyright:
 #	include "config.h"
 #endif /* __STDHAPI_BUILD__ */
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 #define _(string) gettext (string)
 
 #define M_CVSID(id) static char __CVSID__ [ ] __attribute__((__unused__)) = id
@@ -87,8 +93,8 @@ Copyright:
 
 #define g_iErrNo errno
 
-extern long int g_lLogMask;
-extern int g_iDebugLevel;
+extern long int n_lLogMask;
+extern int n_iDebugLevel;
 
 class HException
 	{
@@ -117,6 +123,10 @@ public:
 	void log ( char const *, char const *, int );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCORE_HEXCEPTION_H */
 

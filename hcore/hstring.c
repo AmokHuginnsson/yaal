@@ -34,6 +34,12 @@ M_CVSID ( "$CVSHeader$" );
 #include "hstring.h"
 #include "xalloc.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 HString::HString ( void )
 	{
 	M_PROLOG
@@ -697,4 +703,8 @@ bool operator < ( char const * a_pcStr, const HString & a_roString )
 	return ( a_roString > a_pcStr );
 	M_EPILOG
 	}
+
+}
+
+}
 

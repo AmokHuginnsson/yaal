@@ -30,9 +30,15 @@ Copyright:
 #include "hcore/hlist.h"
 #include "hcontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 class HControl;
 
-class HControlList : public HList < HControl * >
+class HControlList : public hcore::HList < HControl * >
 	{
 protected:
 	/*{*/
@@ -48,8 +54,12 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	virtual long int empty ( HList < HControl * > ::HElement * );
+	virtual long int empty ( hcore::HList < HControl * > ::HElement * );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HCONTROLLIST_H */

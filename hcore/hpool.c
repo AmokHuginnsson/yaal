@@ -30,8 +30,13 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hpool.h"
 
-
 M_CVSTID ( D_CVSID_HPOOL_H );
+
+namespace stdhapi
+{
+
+namespace hcore
+{
 
 char const * g_ppcErrMsgHPool [ 24 ] =
 	{
@@ -40,4 +45,8 @@ char const * g_ppcErrMsgHPool [ 24 ] =
 /* E_HPOOL_REALLOC_FIXED */ _ ( "can not realloc fixed size pool" ),
 /* E_HARRAY_BADINDEX */			_ ( "index does not fit into array" )
 	};
+
+}
+
+}
 

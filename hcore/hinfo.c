@@ -28,6 +28,12 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hinfo.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 HInfo::HInfo ( void )
 	{
 	M_PROLOG
@@ -249,4 +255,8 @@ HInfo::operator bool ( void )
 	return ( f_lLongInt || f_dDouble || f_oString );
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -33,6 +33,12 @@ Copyright:
 #include "harray.h"
 #include "hstring.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 class HPattern
 	{
 protected:
@@ -64,6 +70,10 @@ protected:
 	bool set_switch ( char, unsigned short int *, int );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCORE_HPATTERN_H */
 

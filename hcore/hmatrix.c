@@ -31,6 +31,12 @@ M_CVSID ( "$CVSHeader$" );
 #include "hmatrix.h"
 M_CVSTID ( D_CVSID_HMATRIX_H );
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 char const * g_ppcErrMsgHMatrix [ 24 ] =
 	{
 /* E_HMATRIX_BADROWS */													_ ( "rows < 1" ),
@@ -45,4 +51,8 @@ char const * g_ppcErrMsgHMatrix [ 24 ] =
 /* E_HMATRIX_ROW_OUTOFRANGE */									_ ( "row too big for minor" ),
 /* E_HMATRIX_COLUMN_OUTOFRANGE */								_ ( "column too big for minor" )
 	};
+
+}
+
+}
 

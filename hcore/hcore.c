@@ -34,15 +34,17 @@ M_CVSID ( "$CVSHeader$" );
 #include "hstring.h"
 #include "rc_file.h"
 
-long int g_lLogMask = 0;
-int g_iDebugLevel = 0;
+namespace stdhapi
+{
 
-namespace core
-	{
-	HLog log;
-	}
+namespace hcore
+{
 
-OVariable g_psHCoreVariables [ ] =
+long int n_lLogMask = 0;
+int n_iDebugLevel = 0;
+HLog log;
+
+OVariable n_psHCoreVariables [ ] =
 	{
 		{ 0, NULL, NULL }
 	};
@@ -58,17 +60,17 @@ bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
 			{
 			if ( ! strcasecmp ( l_oStr, "LOG_DEBUG" ) )
-				g_lLogMask |= D_LOG_DEBUG;
+				n_lLogMask |= D_LOG_DEBUG;
 			else if ( ! strcasecmp ( l_oStr, "LOG_INFO" ) )
-				g_lLogMask |= D_LOG_INFO;
+				n_lLogMask |= D_LOG_INFO;
 			else if ( ! strcasecmp ( l_oStr, "LOG_NOTICE" ) )
-				g_lLogMask |= D_LOG_NOTICE;
+				n_lLogMask |= D_LOG_NOTICE;
 			else if ( ! strcasecmp ( l_oStr, "LOG_WARNING" ) )
-				g_lLogMask |= D_LOG_WARNING;
+				n_lLogMask |= D_LOG_WARNING;
 			else if ( ! strcasecmp ( l_oStr, "LOG_ERROR" ) )
-				g_lLogMask |= D_LOG_ERROR;
+				n_lLogMask |= D_LOG_ERROR;
 			else if ( ! strcasecmp ( l_oStr, "LOG_CVSHEADER" ) )
-				g_lLogMask |= D_LOG_CVSHEADER;
+				n_lLogMask |= D_LOG_CVSHEADER;
 			else return ( true );
 			}
 		}
@@ -116,11 +118,15 @@ void hcore_init ( void )
 		}
 	l_pcEnv = ::getenv ( "STDHAPI_DEBUG" );
 	if ( l_pcEnv )
-		g_iDebugLevel = strtol ( l_pcEnv, NULL, 10 );
-	rc_file::process_rc_file ( "stdhapi", "core", g_psHCoreVariables,
+		n_iDebugLevel = strtol ( l_pcEnv, NULL, 10 );
+	rc_file::process_rc_file ( "stdhapi", "core", n_psHCoreVariables,
 			set_hcore_variables );
 	return;
 	}
+
+}
+
+}
 
 /* older versions of g++ fail to handle __attribute__((constructor))
    if no static object exists */
@@ -128,7 +134,10 @@ void hcore_init ( void )
 #if __GNUC__ < 3 || \
 	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
 
+namespace
+	{
 HString g_oDummyHCORE;
+	}
 
 #endif
 

@@ -27,6 +27,9 @@ Copyright:
 #ifndef __TOOLS_TOOLS_H
 #define __TOOLS_TOOLS_H
 
+namespace stdhapi
+{
+
 namespace tools
 	{
 	
@@ -38,6 +41,8 @@ extern bool n_bIgnoreSignalSIGTSTP;
 extern bool n_bIgnoreSignalSIGQUIT;
 
 	}
+
+}
 
 #endif /* not __TOOLS_TOOLS_H */
 

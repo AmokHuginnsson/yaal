@@ -32,6 +32,12 @@ Copyright:
 #define NULL 0
 #endif /* not NULL */
 
+namespace stdhapi
+{
+
+namespace dbwrapper
+	{
+
 #define D_LOG_SQL 1073741824
 
 #define D_DB_DRIVER_NONE				0
@@ -39,9 +45,6 @@ Copyright:
 #define D_DB_DRIVER_POSTGRESQL	2
 #define D_DB_DRIVER_SQLITE			3
 #define D_DB_DRIVER_SQLITE3			4
-
-namespace dbwrapper
-	{
 
 extern void * ( * db_connect ) ( char const *, char const *, char const * );
 extern void ( * db_disconnect ) ( void * );
@@ -68,6 +71,8 @@ long int autoloader_rsdb_id ( void *, void * );
 char * autoloader_rs_column_name ( void *, int );
 
 	}
+
+}
 
 #endif /* not __DBWRAPPER_DB_DRIVER_LOADER_H */
 

@@ -27,6 +27,12 @@ Copyright:
 #ifndef __HCONSOLE_MOUSE_H
 #define __HCONSOLE_MOUSE_H
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 namespace mouse
 {
 
@@ -55,6 +61,10 @@ int console_mouse_close ( void );
 int x_mouse_open ( void );
 int x_mouse_get ( OMouse & );
 int x_mouse_close ( void );
+
+}
+
+}
 
 }
 

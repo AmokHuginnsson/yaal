@@ -44,6 +44,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace tools
+{
+
 #define D_FUNCTIONS 0
 #define D_SIN				2
 #define D_SINH			1
@@ -617,4 +625,8 @@ double HAnalyser::count ( void )
 	return ( ( this->* ( l_poRoot->METHOD ) ) ( l_poRoot ) );
 	M_EPILOG
 	}
+
+}
+
+}
 

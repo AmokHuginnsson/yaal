@@ -36,11 +36,17 @@ Copyright:
 #include "hcore/hstring.h"
 #include "hcore/hrawfile.h"
 
-class HSerial : public HRawFile
+namespace stdhapi
+{
+
+namespace tools
+{
+
+class HSerial : public hcore::HRawFile
 	{
 protected:
 	/*{*/
-	HString f_oDevicePath;
+	hcore::HString f_oDevicePath;
 	termios f_sTIO;
 	termios f_sBackUpTIO;
 	/*}*/
@@ -59,6 +65,10 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __TOOLS_HSERIAL_H */
 

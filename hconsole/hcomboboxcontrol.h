@@ -30,6 +30,12 @@ Copyright:
 #include "heditcontrol.h"
 #include "hlistcontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 #define D_MODE_EDITCONTROL	0
 #define D_MODE_LISTCONTROL	1
 
@@ -75,6 +81,10 @@ protected:
 	void close_combo ( void );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HCOMBOBOXCONTROL_H */
 

@@ -47,6 +47,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 #define D_CTRLS_COUNT	2
 #define D_ALTS_COUNT	10
 
@@ -95,8 +103,8 @@ int HProcess::init ( char const * a_pcProcessName )
 	f_poWindows = l_poMainWindow->_disclose_window_list ( );
 	add_window ( l_poMainWindow, a_pcProcessName );
 	register_file_descriptor_handler ( STDIN_FILENO, & HProcess::process_stdin );
-	if ( console::n_bUseMouse && console::n_iMouseDes )
-		register_file_descriptor_handler ( console::n_iMouseDes,
+	if ( n_bUseMouse && n_iMouseDes )
+		register_file_descriptor_handler ( n_iMouseDes,
 				& HProcess::process_mouse );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_CTRLS_COUNT, l_piCtrls,
 			HProcess::handler_refresh );
@@ -106,7 +114,7 @@ int HProcess::init ( char const * a_pcProcessName )
 			HProcess::handler_jump_meta_tab );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,
 			HProcess::handler_close_window );
-	if ( console::n_bUseMouse )
+	if ( n_bUseMouse )
 		M_REGISTER_POSTPROCESS_HANDLER ( KEY_MOUSE, NULL,
 				HProcess::handler_mouse );
 	for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
@@ -156,7 +164,7 @@ int HProcess::reconstruct_fdset ( void )
 	M_PROLOG
 	int l_iFileDes = 0;
 	PROCESS_HANDLER_FILEDES_t DUMMY = NULL;
-	f_sLatency.tv_sec = console::n_iLatency;
+	f_sLatency.tv_sec = n_iLatency;
 	f_sLatency.tv_usec = 0;
 	FD_ZERO ( & f_xFileDescriptorSet );
 	if ( ! f_oFileDescriptorHandlers.quantity ( ) )return ( -1 );
@@ -172,8 +180,8 @@ int HProcess::process_stdin ( int a_iCode )
 	{
 	M_PROLOG
 	HString l_oCommand;
-	console::n_bInputWaiting = false;
-	if ( ! a_iCode )a_iCode = console::get_key ( );
+	n_bInputWaiting = false;
+	if ( ! a_iCode )a_iCode = get_key ( );
 	if ( a_iCode )a_iCode = process_input ( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && f_poForegroundWindow )
 			a_iCode = f_poForegroundWindow->process_input ( a_iCode );
@@ -189,30 +197,30 @@ int HProcess::process_stdin ( int a_iCode )
 					"unknown command: `%s'", ( char * ) l_oCommand );
 		}
 #ifdef __DEBUGGER_BABUNI__
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	if ( a_iCode )
 		{
 		if ( a_iCode > D_KEY_COMMAND_(D_KEY_META_(0)) )
-			console::c_printf ( 0, 0, D_FG_GREEN,
+			c_printf ( 0, 0, D_FG_GREEN,
 					"COMMAND-META-%c: %5d       ",
 					a_iCode - D_KEY_COMMAND_(D_KEY_META_(0)), a_iCode );
 		else if ( a_iCode > D_KEY_COMMAND_(0) )
-			console::c_printf ( 0, 0, D_FG_GREEN,
+			c_printf ( 0, 0, D_FG_GREEN,
 					"     COMMAND-%c: %5d       ",
 					a_iCode - D_KEY_COMMAND_(0), a_iCode );
 		else if ( a_iCode > D_KEY_META_(0) )
-			console::c_printf ( 0, 0, D_FG_GREEN,
+			c_printf ( 0, 0, D_FG_GREEN,
 					"        META-%c: %5d       ",
 					a_iCode - D_KEY_META_(0), a_iCode );
 		else if ( a_iCode < D_KEY_ESC )
-			console::c_printf ( 0, 0, D_FG_GREEN,
+			c_printf ( 0, 0, D_FG_GREEN,
 					"        CTRL-%c: %5d       ",
 					a_iCode + 96, a_iCode);
-		else console::c_printf ( 0, 0, D_FG_GREEN,
+		else c_printf ( 0, 0, D_FG_GREEN,
 					"             %c: %5d       ",
 					a_iCode, a_iCode );
 		}
-	else console::c_printf ( 0, 0, D_FG_GREEN, "                           " );
+	else c_printf ( 0, 0, D_FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( a_iCode && f_poForegroundWindow )
 		f_poForegroundWindow->status_bar ( )->message ( D_FG_RED,
@@ -223,9 +231,9 @@ int HProcess::process_stdin ( int a_iCode )
 
 /* this makro is ripped from unistd.h, I seriously doubt if it is portable */
 
-#define M_REFRESH( )	if ( console::n_bNeedRepaint )\
+#define M_REFRESH( )	if ( n_bNeedRepaint )\
 	{\
-	console::n_bNeedRepaint = false;\
+	n_bNeedRepaint = false;\
 	::refresh ( );\
 	}\
 
@@ -233,7 +241,7 @@ int HProcess::process_stdin ( int a_iCode )
 	{ long int __result; \
 	do \
 		{ \
-		if ( console::n_bInputWaiting ) \
+		if ( n_bInputWaiting ) \
 			{ \
 			process_stdin ( STDIN_FILENO ); \
 			M_REFRESH ( ); \
@@ -273,9 +281,9 @@ int HProcess::run ( void )
 				}
 			}
 		else handler_idle ( 0 );
-		if ( console::n_bNeedRepaint )
+		if ( n_bNeedRepaint )
 			{
-			console::n_bNeedRepaint = false;
+			n_bNeedRepaint = false;
 			::refresh ( );
 			}
 		}
@@ -289,9 +297,9 @@ int HProcess::handler_idle ( int a_iCode, void * )
 	HStatusBarControl * l_poStatusBar = NULL;
 #ifdef __DEBUG__
 	HString l_oClock ( ( char const * ) HTime ( ) );
-	console::c_printf ( 0, console::n_iWidth - l_oClock.get_length ( ),
+	c_printf ( 0, n_iWidth - l_oClock.get_length ( ),
 			D_FG_BLACK | D_BG_LIGHTGRAY, l_oClock );
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 #endif /* __DEBUG__ */
 	if ( f_poForegroundWindow )
 		{
@@ -319,9 +327,9 @@ int HProcess::handler_mouse ( int a_iCode, void * )
 	mouse::OMouse l_sMouse;
 	mouse::mouse_get ( l_sMouse );
 #ifdef __DEBUGGER_BABUNI__
-	console::c_printf ( 0, 0,	D_FG_BLACK | D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
+	c_printf ( 0, 0,	D_FG_BLACK | D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( f_poForegroundWindow )
 		f_poForegroundWindow->click ( l_sMouse );
@@ -333,10 +341,10 @@ int HProcess::handler_refresh ( int, void * )
 	{
 	M_PROLOG
 	::endwin ( );
-	console::n_bNeedRepaint = false;
-	console::clrscr ( ); /* there is ::refresh ( ) call inside */
-	console::kbhit ( ); /* cleans all trash from stdio buffer */
-	getmaxyx ( stdscr, console::n_iHeight, console::n_iWidth );
+	n_bNeedRepaint = false;
+	clrscr ( ); /* there is ::refresh ( ) call inside */
+	kbhit ( ); /* cleans all trash from stdio buffer */
+	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( f_poForegroundWindow )
 		f_poForegroundWindow->refresh ( );
 	::refresh ( );
@@ -348,7 +356,7 @@ int HProcess::handler_quit ( int, void * )
 	{
 	M_PROLOG
 	f_bLoop = false;
-	console::clrscr ( );
+	clrscr ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -393,4 +401,8 @@ int HProcess::handler_close_window ( int a_iCode, void * )
 	return ( a_iCode );
 	M_EPILOG
 	}
+
+}
+
+}
 

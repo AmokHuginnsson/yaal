@@ -31,6 +31,12 @@ M_CVSID ( "$CVSHeader$" );
 #include "harray.h"
 M_CVSTID ( D_CVSID_HARRAY_H );
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 char const * g_ppcErrMsgHArray [ 24 ] =
 	{
 /* E_HARRAY_BADSIZE */		_ ( "bad size" ),
@@ -38,3 +44,6 @@ char const * g_ppcErrMsgHArray [ 24 ] =
 /* E_HARRAY_BADINDEX */		_ ( "index does not fit into array" )
 	};
 
+}
+
+}

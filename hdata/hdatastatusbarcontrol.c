@@ -39,6 +39,15 @@ M_CVSID ( "$CVSHeader$" );
 #include "hconsole/console.h"
 #include "hdatastatusbarcontrol.h"
 
+using namespace stdhapi::hcore;
+using namespace stdhapi::hconsole;
+
+namespace stdhapi
+{
+
+namespace hdata
+{
+
 HDataStatusBarControl::HDataStatusBarControl ( HDataWindow * a_poParent,
 		char const * a_pcLabel, int a_iStatusBarAttribute )
 								 : HControl ( a_poParent, - 2, 0, 255, 0, a_pcLabel ),
@@ -57,10 +66,14 @@ void HDataStatusBarControl::draw_label ( void )
 	if ( ( ( HDataWindow * ) f_poParent )->is_modified ( ) )
 		{
 		M_SET_ATTR_SHORTCUT ( );
-		mvprintw ( console::n_iHeight - 2, f_iLabelLength - 4, "[+]" );
+		mvprintw ( n_iHeight - 2, f_iLabelLength - 4, "[+]" );
 		M_SET_ATTR_DATA ( );
 		}
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

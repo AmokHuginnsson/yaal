@@ -31,6 +31,12 @@ Copyright:
 #include "htime.h"
 #include "hexception.h" /* types definitions */
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 class HInfo
 	{
 protected:
@@ -75,5 +81,9 @@ protected:
 	void purge ( void );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCORE_HINFO_H */

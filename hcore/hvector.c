@@ -31,8 +31,18 @@ M_CVSID ( "$CVSHeader$" );
 #include "hvector.h"
 M_CVSTID ( D_CVSID_HVECTOR_H );
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 char const * g_ppcErrMsgHVector [ 24 ] =
 	{
 /* E_HVECTOR_DIMNOTMATCH */	_ ( "dimensions do not match" )
 	};
+
+}
+
+}
 

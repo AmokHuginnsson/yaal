@@ -31,6 +31,12 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hrandomizer.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 HRandomizer::HRandomizer( unsigned int a_uiSeed )
 	{
 	M_PROLOG
@@ -61,4 +67,8 @@ int HRandomizer::rnd( void )
 	return ( ( int ) ( f_lSeed >> 16 ) & 0x7fff );
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -30,16 +30,22 @@ Copyright:
 #include "hconsole/hlistcontrol.h"
 #include "hdatacontrol.h"
 
+namespace stdhapi
+{
+
+namespace hdata
+{
+
 class HDataWindow;
 
-class HDataListControl : public HDataControl, public virtual HListControl
+class HDataListControl : public HDataControl, public virtual hconsole::HListControl
 	{
 protected:
 	/*{*/
 	/*}*/
 public:
 	/*{*/
-	HDataListControl ( HRecordSet *, HDataWindow *, int, int, int, int, char const *, 
+	HDataListControl ( dbwrapper::HRecordSet *, HDataWindow *, int, int, int, int, char const *, 
 			bool = false, bool = true, bool = true, bool = true,
 			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataListControl ( void );
@@ -52,5 +58,9 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HDATA_HDATALISTCONTROL_H */

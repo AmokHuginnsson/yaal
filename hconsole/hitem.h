@@ -30,7 +30,13 @@ Copyright:
 #include "hcore/harray.h"
 #include "hcore/hinfo.h"
 
-class HItem : public HArray < HInfo >
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
+class HItem : public hcore::HArray < hcore::HInfo >
 	{
 public:
 	/*{*/
@@ -48,5 +54,9 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HITEM_H */

@@ -29,6 +29,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcore/hlog.h"
 #include "hmenucontrol.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HMenuControl::HMenuNode::HMenuNode ( HMenuNode * a_poNode )
 						: HTreeControl::HNodeControl ( a_poNode )
 	{
@@ -129,4 +137,8 @@ int HMenuControl::process_input( int a_iCode )
 	return ( a_iCode );
 	M_EPILOG
 	}
+
+}
+
+}
 

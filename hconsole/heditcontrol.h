@@ -33,6 +33,12 @@ Copyright:
 #include "hcore/hstringlist.h"
 #include "hcontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 #define D_MASK_LETTERS	"^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$"
 #define D_MASK_CIPHERS	"^[0-9]*$"
 #define D_MASK_APLPHA		"^[a-zA-Z0-9]*$"
@@ -60,8 +66,8 @@ protected:
 	regex_t			f_sMask;							/* regular expression describing what
 																			 characters and
 																			 in what way can be entered */
-	HString			f_oString;						/* control content */
-	HStringList f_oHistory; 					/* history of insertions */
+	hcore::HString			f_oString;						/* control content */
+	hcore::HStringList f_oHistory; 					/* history of insertions */
 	/*}*/
 public:
 	/*{*/
@@ -86,14 +92,18 @@ public:
 	virtual ~HEditControl ( void );
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );
-	virtual HInfo operator = ( const HInfo & );
-	virtual operator HInfo ( void );
+	virtual hcore::HInfo operator = ( const hcore::HInfo & );
+	virtual operator hcore::HInfo ( void );
 	void set_flags ( bool = false, bool = false );
 	virtual int process_input( int );
-	HString & operator = ( char const * );
-	operator HString ( );
+	hcore::HString & operator = ( char const * );
+	operator hcore::HString ( );
 	virtual int click ( mouse::OMouse & );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HEDITCONTROL_H */

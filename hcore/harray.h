@@ -31,6 +31,16 @@ Copyright:
 
 #define D_CVSID_HARRAY_H "$CVSHeader$"
 
+#include <new>
+
+#include "hexception.h"
+
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 #define E_HARRAY_BADSIZE		0
 #define E_HARRAY_NOMEM			1
 #define E_HARRAY_BADINDEX		2
@@ -60,10 +70,6 @@ protected:
 	/*{*/
 	/*}*/
 	};
-
-#include <new>
-
-#include "hexception.h"
 
 template < class tType >
 HArray < tType >::HArray ( int a_iSize )
@@ -181,5 +187,9 @@ int HArray < tType > ::get_size ( void )
 	return ( f_iSize );
 	M_EPILOG
 	}
+
+}
+
+}
 
 #endif /* __HCORE_HARRAY_H */

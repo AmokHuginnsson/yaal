@@ -27,6 +27,12 @@ Copyright:
 #ifndef __HCORE_HCOMPLEX_H
 #define __HCORE_HCOMPLEX_H
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 class HComplex
 	{
 protected:
@@ -67,6 +73,10 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCORE_HCOMPLEX_H */
 

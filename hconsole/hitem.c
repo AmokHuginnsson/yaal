@@ -28,6 +28,14 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hitem.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HItem::HItem ( int a_iSize ) : HArray < HInfo > ( a_iSize )
 	{
 	M_PROLOG
@@ -62,3 +70,8 @@ HItem & HItem::operator = ( const HItem & a_roItem )
 	return ( * this );
 	M_EPILOG
 	}
+
+}
+
+}
+

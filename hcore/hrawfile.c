@@ -30,6 +30,12 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hrawfile.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 HRawFile::HRawFile ( void )
 	{
 	M_PROLOG;
@@ -64,4 +70,8 @@ file_descriptor_t HRawFile::get_file_descriptor ( void )
 	return ( f_iFileDescriptor );
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -35,6 +35,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hserial.h"
 #include "tools.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace tools
+{
+
 HSerial::HSerial ( char const * a_pcDevice )
 				: HRawFile ( )
 	{
@@ -193,4 +201,8 @@ void HSerial::wait_for_eot ( void )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

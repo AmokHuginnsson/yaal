@@ -33,10 +33,16 @@ Copyright:
 #include "hwindow.h"
 #include "hwindowlistcontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 class HProcess : public HHandler
 	{
 	typedef int ( HProcess::* PROCESS_HANDLER_FILEDES_t ) ( int );
-	typedef HMap < int, PROCESS_HANDLER_FILEDES_t > process_filedes_map_t;
+	typedef hcore::HMap < int, PROCESS_HANDLER_FILEDES_t > process_filedes_map_t;
 protected:
 	/*{*/
 	bool			f_bInitialised;				/* did process has necessery initialisation */
@@ -73,6 +79,10 @@ protected:
 	virtual int handler_close_window ( int, void * = NULL );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HPROCESS_H */
 

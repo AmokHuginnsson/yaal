@@ -27,6 +27,12 @@ Copyright:
 #ifndef __TOOLS_HDES_H
 #define __TOOLS_HDES_H
 
+namespace stdhapi
+{
+
+namespace tools
+{
+
 #define D_DES_SIDES_COUNT		2
 #define D_DES_IKEY_SIZE			6
 #define D_DES_BLOCK_SIZE		8
@@ -57,6 +63,10 @@ protected:
 	void permutate ( uc_t * /* buffer */, const uc_t * /* tab */, int /* len */ );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __TOOLS_HDES_H */
 

@@ -44,13 +44,21 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 										 int a_iHeight, int a_iWidth, char const * a_pcLabel,
 										 bool a_bDrawLabel, int a_iDisabledAttribute,
 										 int a_iEnabledAttribute, int a_iFocusedAttribute )
 	{
 	M_PROLOG
-	if ( ! console::is_enabled ( ) )
+	if ( ! is_enabled ( ) )
 		M_THROW ( "not in curses mode.", g_iErrNo );
 	if ( ! a_poParent )
 		M_THROW ( "no parent window.", ( int ) a_poParent );
@@ -67,11 +75,11 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iHeightRaw = 0;
 	f_iWidthRaw = 0;
 	if ( a_iDisabledAttribute > 0 )f_iDisabledAttribute = a_iDisabledAttribute;
-	else f_iDisabledAttribute = console::n_iAttributeDisabled;
+	else f_iDisabledAttribute = n_iAttributeDisabled;
 	if ( a_iEnabledAttribute > 0 )f_iEnabledAttribute = a_iEnabledAttribute;
-	else f_iEnabledAttribute = console::n_iAttributeEnabled;
+	else f_iEnabledAttribute = n_iAttributeEnabled;
 	if ( a_iFocusedAttribute > 0 )f_iFocusedAttribute = a_iFocusedAttribute;
-	else f_iFocusedAttribute = console::n_iAttributeFocused;
+	else f_iFocusedAttribute = n_iAttributeFocused;
 	f_oLabel = a_pcLabel;
 	f_iShortcutIndex = f_oLabel.find ( '&' );
 	if ( f_iShortcutIndex > -1 )
@@ -184,15 +192,15 @@ bool HControl::is_searchable ( void )
 void HControl::draw_label ( void )
 	{
 	M_PROLOG
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 /* reposition control acordingly to current parent window size */
-	f_iRowRaw = ( f_iRow >= 0 ) ? f_iRow : console::n_iHeight + f_iRow;
+	f_iRowRaw = ( f_iRow >= 0 ) ? f_iRow : n_iHeight + f_iRow;
 	f_iColumnRaw = ( f_iColumn >= 0 ) ? f_iColumn
-		: console::n_iWidth + f_iColumn;
+		: n_iWidth + f_iColumn;
 	f_iHeightRaw = ( f_iHeight > 0 ) ? f_iHeight 
-		: console::n_iHeight + f_iHeight - f_iRowRaw;
+		: n_iHeight + f_iHeight - f_iRowRaw;
 	f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
-		: console::n_iWidth + f_iWidth - f_iColumnRaw;
+		: n_iWidth + f_iWidth - f_iColumnRaw;
 /* done */
 	if ( ! f_bDrawLabel )
 		{
@@ -256,4 +264,8 @@ bool HControl::hit_test ( int a_iRow, int a_iColumn )
 	return ( true );
 	M_EPILOG
 	}
+
+}
+
+}
 

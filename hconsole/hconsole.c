@@ -44,7 +44,12 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcore/rc_file.h"
 #include "console.h"
 
-namespace console
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
 {
 
 int n_iLatency = 1;
@@ -83,8 +88,6 @@ OVariable n_psVariables [ ] =
 		{ D_TYPE_INT, "command_compose_delay", & n_iCommandComposeDelay },
 		{ 0, NULL, NULL }
 	};
-
-}
 
 void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )
 	{
@@ -138,15 +141,15 @@ bool set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "attribute_disabled" ) )
-		set_color ( a_roValue, console::n_iAttributeDisabled );
+		set_color ( a_roValue, n_iAttributeDisabled );
 	else if ( ! strcasecmp ( a_roOption, "attribute_enabled" ) )
-		set_color ( a_roValue, console::n_iAttributeEnabled );
+		set_color ( a_roValue, n_iAttributeEnabled );
 	else if ( ! strcasecmp ( a_roOption, "attribute_focused" ) )
-		set_color ( a_roValue, console::n_iAttributeFocused );
+		set_color ( a_roValue, n_iAttributeFocused );
 	else if ( ! strcasecmp ( a_roOption, "attribute_statusbar" ) )
-		set_color ( a_roValue, console::n_iAttributeStatusBar );
+		set_color ( a_roValue, n_iAttributeStatusBar );
 	else if ( ! strcasecmp ( a_roOption, "attribute_search_highlight" ) )
-		set_color ( a_roValue, console::n_iAttributeSearchHighlight );
+		set_color ( a_roValue, n_iAttributeSearchHighlight );
 	else return ( true );
 	return ( false );
 	}
@@ -157,9 +160,13 @@ void hconsole_init ( void )
 	{
 	g_iErrNo = 0;
 	rc_file::process_rc_file ( "stdhapi", "console",
-			console::n_psVariables, set_hconsole_variables );
+			n_psVariables, set_hconsole_variables );
 	return;
 	}
+
+}
+
+}
 
 /* older versions of g++ fail to handle __attribute__((constructor))
    if no static object exists */
@@ -167,7 +174,10 @@ void hconsole_init ( void )
 #if __GNUC__ < 3 || \
 	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
 
-HString g_oDummyHCONSOLE;
+namespace
+	{
+HString n_oDummyHCONSOLE;
+	}
 
 #endif
 

@@ -29,6 +29,12 @@ Copyright:
 
 #include <stddef.h>
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 class HString
 	{
 protected:
@@ -107,5 +113,9 @@ bool operator >= ( char const *, const HString & );
 bool operator <= ( char const *, const HString & );
 bool operator > ( char const *, const HString & );
 bool operator < ( char const *, const HString & );
+
+}
+
+}
 
 #endif /* not __HCORE_HSTRING_H */

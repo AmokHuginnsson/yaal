@@ -29,6 +29,12 @@ Copyright:
 
 #include "hserial.h"
 
+namespace stdhapi
+{
+
+namespace tools
+{
+
 #define D_PROTO_SYN						"SYN\n"
 #define D_PROTO_ACK						"ACK\n"
 #define D_PROTO_DTA						"DTA" /* warrning! no endline */
@@ -45,7 +51,7 @@ protected:
 	/*{*/
 	int			f_iLines;
 	char		f_pcReadBuf [ D_PROTO_RECV_BUF_SIZE ];
-	HString	f_oLine;
+	hcore::HString	f_oLine;
 	/*}*/
 public:
 	/*{*/
@@ -61,5 +67,9 @@ protected:
 	bool test_char ( char const *, int );
 	/*}*/
 	};
+
+}
+
+}
 	
 #endif /* not __TOOLS_HCOLLECTOR_H */

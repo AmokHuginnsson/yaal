@@ -46,12 +46,17 @@ M_CVSID ( "$CVSHeader$" );
 #include "hconsole.h"
 #include "console.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 #define M_MAKE_ATTR(attr) COLOR_PAIR( ( ( ( attr ) & 112 ) >> 1 ) \
 													| ( attr ) & 7 ) | ( ( attr ) & 8 ? A_BOLD : 0 ) \
 													| ( ( attr ) & 128 ? A_BLINK : 0 )
-
-namespace console
-{
 
 /* public: */
 bool n_bNeedRepaint = false;
@@ -63,7 +68,7 @@ int n_iMouseDes = 0;
 /* private: */
 WINDOW * n_psWindow = NULL;
 bool	n_bEnabled = false;
-termios	g_sTermios;
+termios	n_sTermios;
 
 /* public: */
 void enter_curses( void )
@@ -79,7 +84,7 @@ void enter_curses( void )
 		M_THROW ( "stdin in not a tty", 0 );
 	if ( n_bDisableXON )
 		{
-		tcgetattr ( STDIN_FILENO, & g_sTermios );
+		tcgetattr ( STDIN_FILENO, & n_sTermios );
 		tcgetattr ( STDIN_FILENO, & l_sTermios );
 		l_sTermios.c_iflag &= ~IXON;
 		if ( n_bLeaveCtrlC )l_sTermios.c_cc [ VINTR ] = 0;
@@ -172,7 +177,7 @@ void leave_curses( void )
 */
 	endwin ( );
 	if ( n_bDisableXON )
-		tcsetattr ( STDIN_FILENO, TCSAFLUSH, & g_sTermios );
+		tcsetattr ( STDIN_FILENO, TCSAFLUSH, & n_sTermios );
 	n_bEnabled = false;
 	return;
 	M_EPILOG
@@ -253,7 +258,7 @@ int get_key( void )
 	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
 		{
 		l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
-		c_printf ( console::n_iHeight - 1, -1, D_FG_WHITE, "ctrl-%c",
+		c_printf ( n_iHeight - 1, -1, D_FG_WHITE, "ctrl-%c",
 				n_cCommandComposeCharacter );
 		timeout ( n_iCommandComposeDelay * 100 );
 		l_iKey = getch ( );
@@ -261,7 +266,7 @@ int get_key( void )
 		if ( l_iKey == ERR )
 			{
 			l_iKey = D_KEY_CTRL_(n_cCommandComposeCharacter);
-			c_printf ( console::n_iHeight - 1, 0, D_FG_LIGHTGRAY, "      " );
+			c_printf ( n_iHeight - 1, 0, D_FG_LIGHTGRAY, "      " );
 			}
 		else
 			{
@@ -275,7 +280,7 @@ int get_key( void )
 				else l_iKey = D_KEY_COMMAND_(D_KEY_META_(l_iChar = l_iKey));
 				}
 			else l_iKey = D_KEY_COMMAND_(l_iChar = l_iKey);
-			c_printf ( console::n_iHeight - 1, 6, D_FG_WHITE, " %c", l_iChar );
+			c_printf ( n_iHeight - 1, 6, D_FG_WHITE, " %c", l_iChar );
 			}
 		curs_set ( l_iOrigCursState );
 		}
@@ -388,6 +393,8 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 		}
 	return ( l_iEventType );
 	}
+
+}
 
 }
 

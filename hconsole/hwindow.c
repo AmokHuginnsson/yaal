@@ -45,12 +45,20 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HWindow::HWindow ( char const * a_pcTitle )
 	{
 	M_PROLOG
 	int l_piCmds [ ] = { ':', D_KEY_COMMAND_( ':' ) };
 	int l_piSearch [ ] = { '/', D_KEY_COMMAND_( '/' ), '?', D_KEY_COMMAND_( '?' ) };
-	if ( ! console::is_enabled ( ) )
+	if ( ! is_enabled ( ) )
 		M_THROW ( "console not initialised.", g_iErrNo );
 	f_poFocusedChild = NULL;
 	f_poPreviousFocusedChild = NULL;
@@ -82,8 +90,8 @@ int HWindow::init ( void )
 	{
 	M_PROLOG
 	HString l_oString;
-	console::clrscr ( );
-	console::n_bNeedRepaint = true;
+	clrscr ( );
+	n_bNeedRepaint = true;
 	l_oString.format ( " [%s]& \n", ( char * ) f_oTitle );
 	f_poStatusBar = init_bar ( l_oString );
 	f_poStatusBar->enable ( true );
@@ -144,7 +152,7 @@ void HWindow::refresh ( void )
 		if ( l_poControl != f_poFocusedChild )l_poControl->refresh ( );
 		}
 	if ( f_poFocusedChild )f_poFocusedChild->refresh ( );
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
 	}
@@ -153,7 +161,7 @@ int HWindow::handler_jump_tab ( int a_iCode )
 	{
 	M_PROLOG
 	f_poFocusedChild = f_oControls.next_enabled ( );
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	a_iCode = 0;
 	return ( a_iCode );
 	M_EPILOG
@@ -172,7 +180,7 @@ int HWindow::handler_jump_direct ( int a_iCode )
 		{
 		f_poFocusedChild = f_oControls.next_enabled ( a_iCode );
 		if ( f_poFocusedChild != l_poControl )a_iCode = 0;
-		console::n_bNeedRepaint = true;
+		n_bNeedRepaint = true;
 		}
 	return ( a_iCode );
 	M_EPILOG
@@ -185,7 +193,7 @@ void HWindow::set_focus ( HControl * a_poControl )
 	f_oControls.select ( a_poControl );
 	f_poFocusedChild->kill_focus ( );
 	f_poFocusedChild = a_poControl;
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
 	}
@@ -245,4 +253,8 @@ HString HWindow::get_command ( void )
 	return ( l_oCommand );
 	M_EPILOG
 	}
+
+}
+
+}
 

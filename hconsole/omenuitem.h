@@ -31,11 +31,21 @@ Copyright:
 
 #include "hprocess.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 struct OMenuItem
 	{
 	OMenuItem * f_psSubMenu;
 	int ( HProcess::* HANDLER ) ( void );
 	char const * f_pcLabel;
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_OMENUITEM_H */

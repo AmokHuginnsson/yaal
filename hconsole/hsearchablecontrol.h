@@ -30,6 +30,12 @@ Copyright:
 #include "hcore/hpattern.h"
 #include "hcontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 class HSearchableControl : public virtual HControl
 	{
 protected:
@@ -39,13 +45,13 @@ protected:
 	bool			f_bFiltered;			/* is content of list filtered
 																 thru pattern */
 	bool			f_bBackwards;			/* last search direction */
-	HPattern	f_oPattern;				/* used for searching */
+	hcore::HPattern	f_oPattern;				/* used for searching */
 	/*}*/
 public:
 	/*{*/
 	HSearchableControl ( bool );
 	virtual ~HSearchableControl ( void );
-	virtual void search ( const HString &, bool );
+	virtual void search ( const hcore::HString &, bool );
 	/*}*/
 protected:
 	/*{*/
@@ -54,6 +60,10 @@ protected:
 	virtual void go_to_match_previous ( void ) = 0;
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HSEARCHABLECONTROL_H */
 

@@ -27,6 +27,12 @@ Copyright:
 #ifndef __HCORE_HRANDOMIZER_H
 #define __HCORE_HRANDOMIZER_H
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 class HRandomizer
 	{
 protected:
@@ -41,5 +47,9 @@ public:
 	int rnd();
 	/*}*/
 	};
+
+}
+
+}
 	
 #endif /* not __HCORE_HRANDOMIZER_H */

@@ -31,6 +31,12 @@ Copyright:
 
 #include "hstring.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 struct OVariable
 	{
 	int f_iType;
@@ -52,5 +58,9 @@ void rc_set_variable ( char const *, char ** );
 void rc_set_variable ( char const *, int & );
 
 	}
+
+}
+
+}
 
 #endif /* not __HCORE_RC_FILE_H */

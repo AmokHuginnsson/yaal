@@ -28,6 +28,14 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hwindowlistcontrol.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 		int a_iColumn, int a_iHeight, int a_iWidth, char const * a_pcLabel )
 									:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
@@ -122,4 +130,8 @@ HItem & HWindowListControl::add_tail ( HItem & a_roElement )
 	return ( * l_poItem );
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -35,7 +35,10 @@ Copyright:
 
 #include "mouse.h"
 
-namespace console
+namespace stdhapi
+{
+
+namespace hconsole
 	{
 
 #ifdef HAVE_ASCII_GRAPHICS
@@ -121,6 +124,8 @@ extern int n_iHeight;
 extern int n_iMouseDes;
 
 	}
+
+}
 
 #endif /* not __HCONSOLE_CONSOLE_H */
 

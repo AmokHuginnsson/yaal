@@ -31,6 +31,12 @@ M_CVSID ( "$CVSHeader$" );
 #include "hlist.h"
 M_CVSTID ( D_CVSID_HLIST_H );
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 char const * g_ppcErrMsgHList [ 24 ] =
 	{
 /* E_HLIST_EMPTYELEMENT */	_ ( "nothing stored yet, so nothing to get" ),
@@ -40,4 +46,8 @@ char const * g_ppcErrMsgHList [ 24 ] =
 /* E_HLIST_BADOFFSET */			_ ( "incorrect offset" ),
 /* E_HLIST_BADNUMBER */			_ ( "wrong number" )
 	};
+
+}
+
+}
 

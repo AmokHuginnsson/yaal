@@ -28,6 +28,14 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hmainwindow.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HMainWindow::HMainWindow ( void )
 						: HWindow ( "stdhapi" )
 	{
@@ -51,13 +59,13 @@ int HMainWindow::init ( void )
 	int l_iError = 0;
 	if ( f_poFocusedChild )return ( 0 );
 	l_iError = HWindow::init ( );
-	f_poMenu = new HMenuControl ( this, 1, 1, - 2,	- console::n_iWidth / 2 - 1,
+	f_poMenu = new HMenuControl ( this, 1, 1, - 2,	- n_iWidth / 2 - 1,
 			" &Menu \n" );
 	f_poMenu->enable ( true );
 	f_poMenu->set_focus ( );
 	f_poFocusedChild = f_poMenu;
 	f_poWindowList = new HWindowListControl ( this, 1,
-			- console::n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n" );
+			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n" );
 	f_poWindowList->add_column ( -1, "&Okno", 1 );
 	f_poWindowList->enable ( true );
 	return ( l_iError );
@@ -86,4 +94,8 @@ int HMainWindow::handler_close ( int a_iCode )
 	return ( a_iCode );
 	M_EPILOG
 	}
+
+}
+
+}
 

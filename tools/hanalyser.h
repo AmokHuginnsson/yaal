@@ -31,11 +31,17 @@ Copyright:
 #include "hcore/htree.h"
 #include "hcore/hpool.h"
 
-class HAnalyser : public HTree < HList < double * > >
+namespace stdhapi
+{
+
+namespace tools
+{
+
+class HAnalyser : public hcore::HTree < hcore::HList < double * > >
 	{
 	class HAnalyserNode;
 	friend class HAnalyserNode;
-	class HAnalyserNode : public HTree < HList < double * > > ::HNode
+	class HAnalyserNode : public hcore::HTree < hcore::HList < double * > > ::HNode
 		{
 		typedef double ( HAnalyser::* METHOD_t ) ( HAnalyserNode * );
 	protected:
@@ -58,8 +64,8 @@ protected:
 	int f_iLength;
 	int f_iError;
 	double	f_pdVariables [ 26 ];
-	HPool < double > f_oConstantsPool;
-	HString	f_oFormula;
+	hcore::HPool < double > f_oConstantsPool;
+	hcore::HString	f_oFormula;
 	/*}*/
 public:
 	/*{*/
@@ -86,5 +92,9 @@ protected:
 	double functions ( HAnalyserNode * );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __TOOLS_HANALYSER_H */

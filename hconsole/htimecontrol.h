@@ -30,7 +30,13 @@ Copyright:
 #include "hcore/htime.h"
 #include "hwindow.h"
 
-class HTimeControl : public HTime, public HControl
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
+class HTimeControl : public hcore::HTime, public HControl
 	{
 protected:
 	/*{*/
@@ -46,5 +52,9 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HTIMECONTROL_H */

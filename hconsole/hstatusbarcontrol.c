@@ -43,6 +43,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hconsole.h"
 #include "hsearchablecontrol.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 		char const * a_pcLabel, int a_iStatusBarAttribute )
 								 : HControl ( a_poParent, - 2, 0, 255, 0, a_pcLabel ),
@@ -52,7 +60,7 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 	int l_iAttribte = 0;
 	if ( a_iStatusBarAttribute > 0 )
 		f_iStatusBarAttribute = a_iStatusBarAttribute;
-	else f_iStatusBarAttribute = console::n_iAttributeStatusBar;
+	else f_iStatusBarAttribute = n_iAttributeStatusBar;
 	l_iAttribte = f_iStatusBarAttribute;
 	l_iAttribte &= 0x00ff;
 	f_iMode = D_PROMPT_MODE_NORMAL;
@@ -79,7 +87,7 @@ HStatusBarControl::~HStatusBarControl ( void )
 void HStatusBarControl::draw_label ( void )
 	{
 	M_PROLOG
-	::move ( console::n_iHeight - 2, 0 );
+	::move ( n_iHeight - 2, 0 );
 	::clrtoeol ( );
 	HControl::draw_label ( );
 	bar ( );
@@ -98,7 +106,7 @@ void HStatusBarControl::refresh ( void )
 	if ( ! f_bFocused )getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	if ( f_iPromptLength )
 		{
-		console::set_attr ( f_iStatusBarAttribute >> 8 );
+		set_attr ( f_iStatusBarAttribute >> 8 );
 		::mvprintw ( f_iRowRaw, 0, f_oPrompt );
 		}
 	HEditControl::refresh ( );
@@ -209,7 +217,7 @@ void HStatusBarControl::update_progress ( double a_dStep,
 		l_oLeft = l_oNow - l_oStoper;
 		}
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
-	l_iMaxBar = console::n_iWidth - 6 - 10 - 2 - ( f_bEstimate ? 10 : 0 );
+	l_iMaxBar = n_iWidth - 6 - 10 - 2 - ( f_bEstimate ? 10 : 0 );
 	l_iNextPercent = ( int ) ( 100. * a_dStep / f_dProgressSize );
 	l_iNextStep = ( int ) ( l_iMaxBar * a_dStep / f_dProgressSize );
 	l_iNextMinute = l_oStoper.get_minute ( );
@@ -237,10 +245,10 @@ void HStatusBarControl::update_progress ( double a_dStep,
 					( char const * ) l_oStoper, l_iNextPercent, "%%" );
 			}
 		if ( f_bDone )
-			strncpy ( ( ( char * ) f_oString ) + console::n_iWidth - 5, "done", 4 );
+			strncpy ( ( ( char * ) f_oString ) + n_iWidth - 5, "done", 4 );
 		::memset ( ( ( char * ) f_oString ) + 1, '-', l_iMaxBar );
 		::memset ( ( ( char * ) f_oString ) + 1, '=', l_iNextStep );
-		mvprintw ( console::n_iHeight - 1, 0, f_oString );
+		mvprintw ( n_iHeight - 1, 0, f_oString );
 		f_oString = "";
 		f_iLastProgress = l_iNextStep;
 		f_iLastPercent = l_iNextPercent;
@@ -259,9 +267,9 @@ void HStatusBarControl::message ( int a_iAttribute,
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
-	console::c_vprintf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
+	c_vprintf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
 	}
@@ -272,9 +280,9 @@ void HStatusBarControl::message ( char const * a_pcFormat, ... )
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
-	console::c_vprintf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
+	c_vprintf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
 	va_end ( l_xAp );
-	console::n_bNeedRepaint = true;
+	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
 	}
@@ -286,10 +294,10 @@ void HStatusBarControl::bar ( char const * a_pcBar )
 	if ( a_pcBar )
 		{
 		f_oVarTmpBuffer.format ( " %%-%ds ",
-				console::n_iWidth - f_iLabelLength - ( f_bSingleLine ? 2 : 1 ) );
+				n_iWidth - f_iLabelLength - ( f_bSingleLine ? 2 : 1 ) );
 		f_oMessage.format ( f_oVarTmpBuffer, a_pcBar );
 		}
-	::mvprintw ( console::n_iHeight - 2,
+	::mvprintw ( n_iHeight - 2,
 			f_iLabelLength - ( f_bSingleLine ? 0 : 1 ), f_oMessage );
 	return;
 	M_EPILOG
@@ -371,4 +379,8 @@ void HStatusBarControl::end_prompt ( void )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

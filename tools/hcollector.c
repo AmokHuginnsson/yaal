@@ -34,6 +34,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "tools.h"
 #include "hcollector.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace tools
+{
+
 HCollector::HCollector ( char const * a_pcDevicePath )
 					: HSerial ( a_pcDevicePath ),
 						f_oLine ( ( size_t ) D_RECV_BUF_SIZE )
@@ -230,4 +238,8 @@ int HCollector::read_collector ( void ( * process_line ) ( char *, int ) )
 	return ( l_iError );
 	M_EPILOG
 	}
+
+}
+
+}
 

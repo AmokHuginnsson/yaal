@@ -46,6 +46,16 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdataeditcontrol.h"
 #include "hdatastatusbarcontrol.h"
 
+using namespace stdhapi::hcore;
+using namespace stdhapi::hconsole;
+using namespace stdhapi::dbwrapper;
+
+namespace stdhapi
+{
+
+namespace hdata
+{
+
 HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
 		OResource * a_psDataControlInfo )
 	: HWindow ( a_pcTitle ), HRecordSet ( a_poDataBase )
@@ -453,4 +463,8 @@ void HDataWindow::set_modified ( bool a_bModified )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

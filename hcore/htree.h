@@ -29,12 +29,19 @@ Copyright:
 
 #line 31
 
+#include "hexception.h"
+#include "hlist.h"
+
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 #define D_CVSID_HTREE_H "$CVSHeader$"
 
 #define D_FILL_NEW_MANUAL	0
 #define D_FILL_NEW_AUTO		1
-
-#include "hlist.h"
 
 template < class tttType >
 class HTree;
@@ -114,8 +121,6 @@ protected:
 	/*}*/
 	friend class HTree < tttType > :: HNode;
 	};
-	
-#include "hexception.h"
 
 /*
  *	*VERY IMPORTANT NOTE*:
@@ -270,5 +275,9 @@ tttType & HTree < tttType > ::add_node( int )
 	return ( l_poNode->f_tLeaf );
 	M_EPILOG
 	}
+
+}
+
+}
 
 #endif /* not __HCORE_HTREE_H */

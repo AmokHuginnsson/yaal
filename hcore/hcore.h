@@ -30,7 +30,17 @@ Copyright:
 #ifndef __HCORE_HCORE_H
 #define __HCORE_HCORE_H
 
+namespace stdhapi
+{
+
+namespace hcore
+	{
+
 void set_env ( char const * );
+
+	}
+
+}
 
 #endif /* not __HCORE_HCORE_H */
 

@@ -32,6 +32,12 @@ Copyright:
 #include "hhandler.h"
 #include "hstatusbarcontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 class HControl;
 class HControlList;
 
@@ -39,7 +45,7 @@ class HWindow : public HHandler
 	{
 protected:
 	/*{*/
-	HString							f_oTitle;					/* title of window */
+	hcore::HString							f_oTitle;					/* title of window */
 	HControl * 					f_poFocusedChild;	/* points to control that has focus */
 	HControl *					f_poPreviousFocusedChild; /* control that had focus before
 																									 focus went to status bar */	
@@ -61,7 +67,7 @@ public:
 	virtual int click ( mouse::OMouse & );
 	int add_control ( HControl *, int );
 	HStatusBarControl * status_bar ( void );
-	HString get_command ( void );
+	hcore::HString get_command ( void );
 	/*}*/
 protected:
 	/*{*/
@@ -75,5 +81,9 @@ private:
 	void set_focus ( HControl * );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HWINDOW_H */

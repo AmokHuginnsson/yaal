@@ -29,6 +29,12 @@ Copyright:
 
 #include <pthread.h>
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 class HThread
 	{
 protected:
@@ -41,5 +47,9 @@ public:
 	virtual ~HThread ( void );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCORE_HTHREAD_H */

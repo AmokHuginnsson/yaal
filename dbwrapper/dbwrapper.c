@@ -1,4 +1,3 @@
-
 /*
 ---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
@@ -42,7 +41,10 @@ M_CVSID ( "$CVSHeader$" );
 #include "dbwrapper.h"
 #include "db_driver_loader.h"
 
-using namespace dbwrapper;
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
 
 namespace dbwrapper
 {
@@ -53,8 +55,6 @@ void dbwrapper_exit ( void ) __attribute__  ((noreturn));
 extern void * n_pvDlHandle;
 
 int		n_iDataBaseDriver = 0;
-
-}
 
 OVariable n_psVariables [ ] =
 	{
@@ -67,7 +67,7 @@ bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
 		{
 		if ( ! strcasecmp ( a_roValue, "LOG_SQL" ) )
-			g_lLogMask |= D_LOG_SQL;
+			n_lLogMask |= D_LOG_SQL;
 		else return ( true );
 		}
 	else if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
@@ -136,13 +136,20 @@ void dbwrapper_fini ( void )
 	return;
 	}
 
+}
+
+}
+
 /* older versions of g++ fail to handle __attribute__((constructor))
    if no static object exists */
 
 #if __GNUC__ < 3 || \
 	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
 
+namespace
+	{
 HString g_oDummyDBWRAPPER;
+	}
 
 #endif
 

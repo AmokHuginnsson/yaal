@@ -30,18 +30,24 @@ Copyright:
 #include "hconsole/hprocess.h"
 #include "dbwrapper/hdatabase.h"
 
-class HDataProcess : public HProcess
+namespace stdhapi
+{
+
+namespace hdata
+{
+
+class HDataProcess : public hconsole::HProcess
 	{
 protected:
 	/*{*/
-	HDataBase f_oDataBase;
+	dbwrapper::HDataBase f_oDataBase;
 	/*}*/
 public:
 	/*{*/
 	HDataProcess ( void );
 	virtual ~HDataProcess ( void );
 	virtual int init ( char const * );
-	HDataBase * data_base ( void );
+	dbwrapper::HDataBase * data_base ( void );
 	/*}*/
 protected:
 	/*{*/
@@ -49,5 +55,9 @@ protected:
 	virtual int handler_close_window ( int, void * = NULL );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HDATA_HDATAPROCESS_H */

@@ -32,6 +32,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdatabase.h"
 #include "db_driver_loader.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace dbwrapper
+{
+
 HDataBase::HDataBase ( void )
 	{
 	M_PROLOG
@@ -72,7 +80,7 @@ long int HDataBase::query ( char const * a_pcQuery )
 				g_iErrNo );
 	if ( ! f_pvCoreData )
 		M_THROW ( "not connected to database", g_iErrNo );
-	if ( g_lLogMask & D_LOG_SQL )log << "SQL: " << a_pcQuery << endl;
+	if ( n_lLogMask & D_LOG_SQL )log << "SQL: " << a_pcQuery << endl;
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
 	if ( ! f_pvLastResult )
 		M_LOG ( dbwrapper::db_error ( f_pvCoreData ) );
@@ -114,4 +122,8 @@ long int HDataBase::insert_id ( void * a_pvResult )
 	else return ( dbwrapper::rsdb_id ( f_pvCoreData, f_pvLastResult ) );
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -27,9 +27,15 @@ Copyright:
 #ifndef __HCORE_HLOG_H
 #define __HCORE_HLOG_H
 
-#define M_LOG(MESG) log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, ( const char * ) ( MESG ) )
-
 #include <stdio.h>
+
+namespace stdhapi
+{
+
+namespace hcore
+{
+
+#define M_LOG(MESG) log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, ( const char * ) ( MESG ) )
 
 class HLog
 	{
@@ -72,11 +78,10 @@ protected:
 	friend HLog & endl ( HLog & );
 	};
 
-namespace core
-	{
-	extern HLog log;
-	}
+extern HLog log;
 
-using namespace core;
+}
+
+}
 
 #endif /* not __HCORE_HLOG_H */

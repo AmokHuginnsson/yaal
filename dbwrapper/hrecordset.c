@@ -31,6 +31,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hrecordset.h"
 #include "db_driver_loader.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace dbwrapper
+{
+
 char g_pcEMode [ ] = "record set is not in appropriate mode for operation";
 #define E_MODE g_pcEMode
 
@@ -456,4 +464,8 @@ void HRecordSet::sync ( int a_iField, HInfo & a_roInfo )
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

@@ -29,6 +29,12 @@ Copyright:
 
 #include "hlistcontrol.h"
 
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 class HWindow;
 
 class HWindowListControl : public HListControl
@@ -46,8 +52,12 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	virtual long int empty ( HList < HItem > ::HElement * );
+	virtual long int empty ( hcore::HList < HItem > ::HElement * );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCONSOLE_HWINDOWLISTCONTROL_H */

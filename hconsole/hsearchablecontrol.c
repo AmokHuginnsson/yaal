@@ -40,6 +40,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hwindow.h"
 #include "hconsole.h"
 
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
 HSearchableControl::HSearchableControl ( bool a_bSearchable )
 									: HControl ( NULL, 0, 0, 0, 0, NULL )
 	{
@@ -93,9 +101,9 @@ void HSearchableControl::highlight ( int a_iRow, int a_iColumn,
 		{
 		if ( ( f_bFocused && ( ( a_iCurrent != l_iCtr ) || ! a_bCurrent ) )
 				|| ( ! f_bFocused && ( a_iCurrent == l_iCtr ) && a_bCurrent ) )
-			console::set_attr ( console::n_iAttributeSearchHighlight >> 8 );
+			set_attr ( n_iAttributeSearchHighlight >> 8 );
 		else
-			console::set_attr ( console::n_iAttributeSearchHighlight );
+			set_attr ( n_iAttributeSearchHighlight );
 		l_cStopChar = l_pcHighlightStart [ l_iHighlightLength ];
 		l_pcHighlightStart [ l_iHighlightLength ] = 0;
 		::mvprintw ( a_iRow, a_iColumn
@@ -108,4 +116,8 @@ void HSearchableControl::highlight ( int a_iRow, int a_iColumn,
 	return;
 	M_EPILOG
 	}
+
+}
+
+}
 

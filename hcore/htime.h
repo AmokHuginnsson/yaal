@@ -31,6 +31,12 @@ Copyright:
 
 #include "hstring.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 #define D_DEFAULT_TIME_FORMAT	"%a, %d %b %Y %T %z"
 
 class HTime
@@ -78,5 +84,9 @@ protected:
 	/*{*/
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __HCORE_HTIME_H */

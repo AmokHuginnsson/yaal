@@ -40,13 +40,19 @@ Copyright:
 #include "hcore/hinfo.h"
 #include "hdatabase.h"
 
+namespace stdhapi
+{
+
+namespace dbwrapper
+{
+
 class HRecordSet
 	{
 private:
 	/*{*/
 	void * f_pvCoreData;	/* very internal for this class used only in base cla */
-	HString f_oSQL;
-	HString f_oBuffer;
+	hcore::HString f_oSQL;
+	hcore::HString f_oBuffer;
 	/*}*/
 protected:
 	/*{*/
@@ -55,18 +61,18 @@ protected:
 	int f_iMode;					/* normal(opened), closed, adding, editing */
 	int f_iCursorPosition;/* cursor position in record-set */
 	int f_iSetQuantity;		/* number of records returned by last query */
-	HString f_oTable;			/* table name */
-	HString f_oColumns;		/* columns that should be returned by next query */
-	HString f_oFilter;		/* additional constant filter (WHERE clause) */
-	HString f_oSort;			/* additional constant sort (ORDER BY clause) */
-	HStringList	f_oColumnNames; /* column names returned by last query */
-	HStringList f_oValues;			/* values returned by last cursor movement */
+	hcore::HString f_oTable;			/* table name */
+	hcore::HString f_oColumns;		/* columns that should be returned by next query */
+	hcore::HString f_oFilter;		/* additional constant filter (WHERE clause) */
+	hcore::HString f_oSort;			/* additional constant sort (ORDER BY clause) */
+	hcore::HStringList	f_oColumnNames; /* column names returned by last query */
+	hcore::HStringList f_oValues;			/* values returned by last cursor movement */
 	HDataBase * f_poDataBase; /* data-base that this record-set belongs to */
 	/*}*/
 public:
 	/*{*/
-	HString m_oFilter;		/* additional variable filter (WHERE clause) */
-	HString m_oSort;			/* additional variable sort (ORDER BY clause) */
+	hcore::HString m_oFilter;		/* additional variable filter (WHERE clause) */
+	hcore::HString m_oSort;			/* additional variable sort (ORDER BY clause) */
 	long int m_lId;
 	/*}*/
 protected:
@@ -78,15 +84,15 @@ protected:
 	void sync ( int, int & );
 	void sync ( int, long int & );
 	void sync ( int, double & );
-	void sync ( int, HString & );
-	void sync ( int, HTime & );
-	void sync ( int, HInfo & );
+	void sync ( int, hcore::HString & );
+	void sync ( int, hcore::HTime & );
+	void sync ( int, hcore::HInfo & );
 	/*}*/
 public:
 	/*{*/
 	HRecordSet ( HDataBase * );
 	virtual ~HRecordSet ( void );
-	HString get ( int );
+	hcore::HString get ( int );
 	bool is_eof ( void );
 	bool is_bof ( void );
 	bool is_open ( void );
@@ -105,5 +111,9 @@ public:
 	void remove ( void );
 	/*}*/
 	};
+
+}
+
+}
 
 #endif /* not __DBWRAPPER_HRECORDSET_H */

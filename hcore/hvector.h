@@ -31,6 +31,15 @@ Copyright:
 
 #include <math.h>
 
+#include "harray.h"
+#include "hexception.h"
+
+namespace stdhapi
+{
+
+namespace hcore
+{
+
 #define D_CVSID_HVECTOR_H "$CVSHeader$"
 
 #define E_HVECTOR_DIMNOTMATCH	0
@@ -41,8 +50,6 @@ extern char const * g_ppcErrMsgHVector [ ];
 	if ( this->f_iSize != a_roVector.f_iSize ) \
 		M_THROW ( g_ppcErrMsgHVector [ E_HVECTOR_DIMNOTMATCH ], \
 				this->f_iSize - a_roVector.f_iSize )
-
-#include "harray.h"
 
 template < class tType >
 class HVector : public HArray < tType >
@@ -78,8 +85,6 @@ template < class ttType >
 	friend HVector < ttType > operator * ( const ttType, const HVector < ttType > & );
 	/*}*/
 	};
-
-#include "hexception.h"
 
 template < class tType >
 HVector < tType > ::HVector ( const int a_iDimension )
@@ -319,5 +324,9 @@ HVector < tType > operator * ( const tType d, const HVector < tType > & a_roVect
 	return ( l_oVector );
 	M_EPILOG
 	}
+
+}
+
+}
 
 #endif /* not __HCORE_HVECTOR_H */
