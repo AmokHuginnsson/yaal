@@ -33,6 +33,8 @@ Copyright:
 #	include "../config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "mouse.h"
+
 namespace console
 	{
 
@@ -93,6 +95,10 @@ namespace console
 #define D_KEY_CTRL_(n)			n - 96
 #define D_KEY_COMMAND_(n)		n + D_KEY_COMMAND_BASE
 
+#define D_EVENT_ERROR			0
+#define D_EVENT_KEYBOARD	1
+#define D_EVENT_MOUSE			2
+
 #define KEY_DELETE KEY_DC
 #define KEY_BS KEY_BACKSPACE
 
@@ -106,6 +112,7 @@ int kbhit( void );
 char get_attr( void );
 void clrscr( void );
 bool is_enabled ( void );
+int wait_for_user_input ( int &, mouse::OMouse &, int = 0, int = 0 );
 
 extern bool n_bNeedRepaint;
 extern bool n_bInputWaiting;

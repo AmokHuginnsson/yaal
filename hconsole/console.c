@@ -45,7 +45,6 @@ M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
 #include "hconsole.h"
 #include "console.h"
-#include "mouse.h"
 
 #define M_MAKE_ATTR(attr) COLOR_PAIR( ( ( ( attr ) & 112 ) >> 1 ) \
 													| ( attr ) & 7 ) | ( ( attr ) & 8 ? A_BOLD : 0 ) \
@@ -333,6 +332,43 @@ bool is_enabled ( void )
 	M_PROLOG
 	return ( n_bEnabled );
 	M_EPILOG
+	}
+
+int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_sMouse,
+		int a_iTimeOutSec, int a_iTimeOutUsec )
+	{
+	int l_iError = - 1, l_iEventType = 0;
+	timeval l_xWait;
+	fd_set l_xFdSet;
+	l_xWait.tv_sec = a_iTimeOutSec;
+	l_xWait.tv_usec = a_iTimeOutUsec;
+	FD_ZERO ( & l_xFdSet );
+	FD_SET ( STDIN_FILENO, & l_xFdSet );
+	if ( n_iMouseDes )
+		FD_SET ( n_iMouseDes, & l_xFdSet );
+	do
+		{
+		if ( n_bInputWaiting )
+			{
+			a_iKey = get_key ( );
+			l_iEventType = D_EVENT_MOUSE;
+			if ( a_iKey == KEY_MOUSE )
+				mouse::mouse_get ( a_sMouse );
+			else l_iEventType = D_EVENT_KEYBOARD;
+			break;
+			}
+		l_iError = select ( FD_SETSIZE, & l_xFdSet, NULL, NULL,
+				( a_iTimeOutSec || a_iTimeOutUsec ) ? & l_xWait : NULL );
+		}
+	while ( ( l_iError == -1 ) && ( g_iErrNo == EINTR ) );
+	if ( l_iError > 0 )
+		{
+		if ( FD_ISSET ( STDIN_FILENO, & l_xFdSet ) )
+			a_iKey = get_key ( ), l_iEventType |= D_EVENT_KEYBOARD;
+		if ( n_iMouseDes && FD_ISSET ( STDIN_FILENO, & l_xFdSet ) )
+			mouse::mouse_get ( a_sMouse ), l_iEventType |= D_EVENT_MOUSE;
+		}
+	return ( l_iEventType );
 	}
 
 }
