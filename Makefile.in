@@ -303,7 +303,7 @@ $(HAPIHDR): $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hda
 	@echo '#ifndef __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
 	@echo '#define __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
 	@echo '' >> $(HEADERSDIR)/stdhapi.h
-	@find $(HEADERSDIR) ! -name 'stdhapi.h' -type f | awk '{printf "#include <%s>\n", substr ($$1,3,99)}' | sort >> $(HEADERSDIR)/stdhapi.h
+	@find $(HEADERSDIR) ! -name 'stdhapi.h' -type f | awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' | sort >> $(HEADERSDIR)/stdhapi.h
 	@echo '' >> $(HEADERSDIR)/stdhapi.h
 	@echo '#endif /* not __STDHAPI_H */' >> $(HEADERSDIR)/stdhapi.h
 	@echo "done."
