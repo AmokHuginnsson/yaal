@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "../config.h"
 
 /* We need ncurses.h here because of KEY_HOME. */
@@ -332,8 +334,8 @@ int HDataWindow::handler_add_new ( int, void * )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->message ( "You can not add new rocord now.",
-				D_FG_BRIGHTRED );
+		f_poStatusBar->message ( D_FG_BRIGHTRED,
+				_ ( "You can not add new rocord now." ) );
 		return ( 0 );
 		}
 	add_new ( );
@@ -348,8 +350,14 @@ int HDataWindow::handler_edit ( int, void * )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->message ( "You can not start editing of this record.",
-				D_FG_BRIGHTRED );
+		f_poStatusBar->message ( D_FG_BRIGHTRED,
+				_ ( "You can not start editing of this record." ) );
+		return ( 0 );
+		}
+	if ( ! f_iSetQuantity )
+		{
+		f_poStatusBar->message ( D_FG_BRIGHTRED,
+				_ ( "There is nothing to edit." ) );
 		return ( 0 );
 		}
 	set_mode ( D_MODE_EDIT );
@@ -363,11 +371,18 @@ int HDataWindow::handler_delete ( int, void * )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->message ( "You can not delete this record.",
-				D_FG_BRIGHTRED );
+		f_poStatusBar->message ( D_FG_BRIGHTRED,
+				_ ( "You can not delete this record." ) );
 		return ( 0 );
 		}
-	if ( f_poMainControl )m_lId = f_poMainControl->get_current_id ( );
+	if ( ! f_iSetQuantity )
+		{
+		f_poStatusBar->message ( D_FG_BRIGHTRED,
+				_ ( "There is nothing to remove." ) );
+		return ( 0 );
+		}
+	if ( f_poMainControl )
+		m_lId = f_poMainControl->get_current_id ( );
 	remove ( );
 	f_poMainControl->load ( );
 	return ( 0 );
@@ -379,8 +394,7 @@ int HDataWindow::handler_save ( int, void * )
 	M_PROLOG
 	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
 		{
-		f_poStatusBar->message ( "There is nothing to save.",
-				D_FG_BRIGHTRED );
+		f_poStatusBar->message ( D_FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( 0 );
 		}
 	m_lId = update ( );
@@ -396,8 +410,8 @@ int HDataWindow::handler_requery ( int, void * )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->message ( "Finish your current operation first.",
-				D_FG_BRIGHTRED );
+		f_poStatusBar->message ( D_FG_BRIGHTRED,
+				_ ( "Finish your current operation first." ) );
 		return ( 0 );
 		}
 	set_mode ( D_MODE_VIEW );
@@ -419,7 +433,7 @@ int HDataWindow::handler_cancel ( int, void * )
 		f_poMainControl->cancel_new ( );
 	f_bModified = false;
 	f_poStatusBar->refresh ( );
-	f_poStatusBar->message ( "Dropping all changes.", D_FG_BRIGHTRED );
+	f_poStatusBar->message ( D_FG_BRIGHTRED, _ ( "Dropping all changes." ) );
 	return ( 0 );
 	M_EPILOG
 	}
