@@ -50,6 +50,7 @@ HDATA = $(TARGETDIR)/libhdata.so.$(RELEASE)
 HS = .h
 SS = .c
 OS = .o
+CTAGS = @CTAGS@
 .SUFFIXES:
 .SUFFIXES: $(SS) $(OS) $(OOS) $(HS)
 CXX = g++
@@ -362,12 +363,12 @@ clean:
 
 tags: $(SRCS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
 	@echo -n "Rehashing tags ... "
-	@ctags --langmap=c++:.c ./hcore/*.[ch] ./hconsole/*.[ch] ./tools/*.[ch] ./dbwrapper/*.[ch] ./hdata/*.[ch]
-	@(cd ./hcore;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
-	@(cd ./hconsole;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
-	@(cd ./tools;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
-	@(cd ./dbwrapper;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
-	@(cd ./hdata;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@$(CTAGS) ./hcore/*.[ch] ./hconsole/*.[ch] ./tools/*.[ch] ./dbwrapper/*.[ch] ./hdata/*.[ch]
+	@(cd ./hcore;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@(cd ./hconsole;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@(cd ./tools;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@(cd ./dbwrapper;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@(cd ./hdata;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
 	@echo "done."
 
 mrproper: clean
