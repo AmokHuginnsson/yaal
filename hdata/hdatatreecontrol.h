@@ -30,14 +30,16 @@ Copyright:
 #include "../hconsole/htreecontrol.h"
 #include "hdatacontrol.h"
 
-class HDataTreeControl : public HDataControl, public HTreeControl
+class HDataWindow;
+
+class HDataTreeControl : public HDataControl, public virtual HTreeControl
 	{
 protected:
 	/*{*/
 	/*}*/
 public:
 	/*{*/
-	HDataTreeControl ( HRecordSet *, HWindow *, int, int, int, int, const char *,
+	HDataTreeControl ( HRecordSet *, HDataWindow *, int, int, int, int, const char *,
 			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataTreeControl ( void );
 	virtual void load ( long int );

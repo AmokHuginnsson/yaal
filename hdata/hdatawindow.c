@@ -41,6 +41,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdatawindow.h"
 #include "hdatalistcontrol.h"
 #include "hdatatreecontrol.h"
+#include "hdataeditcontrol.h"
 
 HDataWindow::HDataWindow ( const char * a_pcTitle, HDataBase * a_poDataBase,
 		OResource * a_psDataControlInfo )
@@ -128,7 +129,7 @@ int HDataWindow::init ( void )
 				l_sEditControlResource.f_iMaxHistoryLevel = 8;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psECR = ( OEditControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
-				l_poDataControl = ( HDataControl * ) new HEditControl ( ( HWindow * ) this,
+				l_poDataControl = ( HDataControl * ) new HDataEditControl ( this,
 						M_SETUP_STANDART, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
 						l_psECR->f_pcMask, l_psECR->f_bReplace, l_psECR->f_bRightAligned,
 						l_psECR->f_bMultiLine, l_psECR->f_bPassword,

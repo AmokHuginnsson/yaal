@@ -30,14 +30,16 @@ Copyright:
 #include "../hconsole/hlistcontrol.h"
 #include "hdatacontrol.h"
 
-class HDataListControl : public HDataControl, public HListControl
+class HDataWindow;
+
+class HDataListControl : public HDataControl, public virtual HListControl
 	{
 protected:
 	/*{*/
 	/*}*/
 public:
 	/*{*/
-	HDataListControl ( HRecordSet *, HWindow *, int, int, int, int, const char *, 
+	HDataListControl ( HRecordSet *, HDataWindow *, int, int, int, int, const char *, 
 			bool = false, bool = true, bool = true, bool = true,
 			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataListControl ( void );
