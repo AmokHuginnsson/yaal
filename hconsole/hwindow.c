@@ -139,7 +139,7 @@ void HWindow::refresh ( void )
 	l_iCtr = f_oControls.quantity ( );
 	while ( l_iCtr -- )
 		{
-		l_poControl = f_oControls.to_tail ( );
+		l_poControl = * f_oControls.to_tail ( );
 		if ( l_poControl != f_poFocusedChild )l_poControl->refresh ( );
 		}
 	if ( f_poFocusedChild )f_poFocusedChild->refresh ( );
@@ -220,7 +220,7 @@ int HWindow::click ( mouse::OMouse & a_rsMouse )
 	l_iCtr = f_oControls.quantity ( );
 	while ( l_iCtr -- )
 		{
-		l_poControl = f_oControls.to_tail ( );
+		l_poControl = * f_oControls.to_tail ( );
 		if ( l_poControl->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
 			{
 			l_poControl->click ( a_rsMouse );

@@ -63,18 +63,15 @@ HDataBase * HDataProcess::data_base ( void )
 int HDataProcess::handler_quit ( int a_iCode, void * )
 	{
 	M_PROLOG
-	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
+	HItem * l_poItem = NULL;
 	HDataWindow * l_poWindow = NULL;
 	if ( f_poWindows->quantity ( ) )
 		{
 		f_poWindows->go ( 0 );
-		while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
+		while ( ( l_poItem = f_poWindows->to_tail ( 1, D_TREAT_AS_OPENED ) ) )
 			{
-			l_poWindow = ( HDataWindow * ) ( void * ) f_poWindows->to_tail ( 1,
-					& l_iFlag ) [ 0 ];
-			if ( l_poWindow
-					&& ( dynamic_cast < HDataWindow * > ( ( HWindow * ) l_poWindow ) )
-					&& l_poWindow->is_modified ( ) )
+			l_poWindow = dynamic_cast < HDataWindow * > ( ( HWindow * ) ( ( void * ) ( * l_poItem ) [ 0 ] ) );
+			if ( l_poWindow && l_poWindow->is_modified ( ) )
 				{
 				f_poForegroundWindow = l_poWindow;
 				handler_refresh ( 0 );

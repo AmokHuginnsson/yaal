@@ -277,7 +277,7 @@ int HEditControl::process_input ( int a_iCode )
 			l_iErrorCode = f_oHistory.quantity ( );
 			l_iErrorCode ++;
 			while ( -- l_iErrorCode )
-				if ( f_oHistory.to_tail ( ) == f_oString )break;
+				if ( ( * f_oHistory.to_tail ( ) ) == f_oString )break;
 			if ( f_oString.get_length ( ) &&  ( ! l_iErrorCode ) )
 				{
 				f_oHistory.add_head ( & f_oString );
@@ -583,7 +583,7 @@ HString & HEditControl::operator = ( const char * a_pcString )
 	l_iErrorCode = f_oHistory.quantity ( );
 	while ( l_iErrorCode )
 		{
-		if ( f_oHistory.to_tail ( ) == f_oString )
+		if ( ( * f_oHistory.to_tail ( ) ) == f_oString )
 			{
 			f_oHistory.to_head ( );
 			break;

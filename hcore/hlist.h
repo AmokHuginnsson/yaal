@@ -138,13 +138,13 @@ public:
 	virtual int remove_head ( int = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
 	virtual int remove_tail ( int = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
 	/* sets cursor at specified index or number */
-	virtual int go ( int, tType * * = NULL, int = D_SEARCH_AFTER_ORDER );
+	virtual tType & go ( int, int = D_SEARCH_AFTER_ORDER );
 	virtual tType & operator [ ] ( int );
 	virtual tType & present ( void );
 	virtual tType & head ( void );
 	virtual tType & tail ( void );
-	virtual bool to_head ( int = 1, int = D_TREAT_AS_CLOSED, tType * * = NULL );
-	virtual bool to_tail ( int = 1, int = D_TREAT_AS_CLOSED, tType * * = NULL );
+	virtual tType * to_head ( int = 1, int = D_TREAT_AS_CLOSED );
+	virtual tType * to_tail ( int = 1, int = D_TREAT_AS_CLOSED );
 	virtual void exchange ( int, int, int = D_SEARCH_AFTER_ORDER );
 	virtual void sort_by_hits ( int = D_ASCENDING );
 	virtual void sort_by_number ( int = D_ASCENDING );
@@ -726,20 +726,19 @@ bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, int a_i
 	}
 
 template < class tType >
-bool HList< tType >::to_head ( int a_iOffset, int a_iFlag, tType * * a_pptObject )
+tType * HList< tType >::to_head ( int a_iOffset, int a_iFlag )
 	{
 	M_PROLOG
 	bool l_bOk = false;
 	tType * l_ptObject = NULL;
-	if ( a_pptObject )
-		l_ptObject = & f_poSelected->get ( );
+	l_ptObject = & f_poSelected->get ( );
 	if ( a_iOffset < 0 )
 		l_bOk = to_tail ( f_poSelected, - a_iOffset, a_iFlag );
 	else
 		l_bOk = to_head ( f_poSelected, a_iOffset, a_iFlag );
-	if ( l_bOk && a_pptObject )
-		( * a_pptObject ) = l_ptObject;
-	return ( l_bOk );
+	if ( ! l_bOk )
+		l_ptObject = NULL;
+	return ( l_ptObject );
 	M_EPILOG
 	}
 
@@ -785,20 +784,19 @@ bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, int a_i
 	}
 
 template < class tType >
-bool HList< tType >::to_tail ( int a_iOffset, int a_iFlag, tType * * a_pptObject )
+tType * HList< tType >::to_tail ( int a_iOffset, int a_iFlag )
 	{
 	M_PROLOG
 	bool l_bOk = false;
 	tType * l_ptObject = NULL;
-	if ( a_pptObject )
-		l_ptObject = & f_poSelected->get ( );
+	l_ptObject = & f_poSelected->get ( );
 	if ( a_iOffset < 0 )
 		l_bOk = to_head ( f_poSelected, - a_iOffset, a_iFlag );
 	else
 		l_bOk = to_tail ( f_poSelected, a_iOffset, a_iFlag );
-	if ( l_bOk && a_pptObject )
-		( * a_pptObject ) = l_ptObject;
-	return ( l_bOk );
+	if ( ! l_bOk )
+		l_ptObject = NULL;
+	return ( l_ptObject );
 	M_EPILOG
 	}
 
@@ -883,7 +881,7 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 	}
 
 template < class tType >
-int HList< tType >::go ( int a_iNumber, tType * * a_pptObject, int a_iFlag )
+tType & HList< tType >::go ( int a_iNumber, int a_iFlag )
 	{
 	M_PROLOG
 	/* Here we have another function with error code returned by reference */
@@ -905,9 +903,7 @@ int HList< tType >::go ( int a_iNumber, tType * * a_pptObject, int a_iFlag )
 			break;
 			}
 		}
-	if ( a_pptObject )
-		( * a_pptObject ) = & f_poSelected->get ( );
-	return ( 0 );
+	return ( f_poSelected->get ( ) );
 	M_EPILOG
 	}
 

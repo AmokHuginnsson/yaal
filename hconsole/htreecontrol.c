@@ -68,12 +68,12 @@ void HTreeControl::HNodeControl::expand ( void )
 void HTreeControl::HNodeControl::collapse ( void )
 	{
 	M_PROLOG
-	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
+	HTreeControl::HNodeControl * * l_ppoNodeControl = NULL;
 	f_bUnfolded = false;
   if  ( ! f_oBranch.quantity ( ) )return;
 	f_oBranch.go ( 0 );
-	while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
-		( ( HTreeControl::HNodeControl * ) f_oBranch.to_tail ( 1, & l_iFlag ) )->collapse ( );
+	while ( ( l_ppoNodeControl = ( HTreeControl::HNodeControl * * ) f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED ) ) )
+		( * l_ppoNodeControl )->collapse ( );
 	return;
 	M_EPILOG
 	}
@@ -142,7 +142,7 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		{
 		a_poNode->f_oBranch.go ( 0 );
 		while ( l_iCtr -- )
-			l_iRow = draw_node ( ( HNodeControl * ) a_poNode->f_oBranch.to_tail ( ),
+			l_iRow = draw_node ( ( HNodeControl * ) * a_poNode->f_oBranch.to_tail ( ),
 					l_iRow );
 		}
 	return ( l_iRow );

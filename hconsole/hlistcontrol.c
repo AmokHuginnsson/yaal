@@ -348,7 +348,6 @@ int HListControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
 	int l_iErrorCode = 0;
 	int l_iOldPosition = 0;
 	HElement * l_poElement = f_poSelected;
@@ -363,7 +362,7 @@ int HListControl::process_input ( int a_iCode )
 				{
 				if ( f_iControlOffset )
 					{
-					to_head ( f_iHeightRaw - 1, & l_iFlag );
+					to_head ( f_iHeightRaw - 1, D_TREAT_AS_OPENED );
 					l_poElement = f_poSelected;
 					f_iControlOffset -= f_iHeightRaw;
 					f_iControlOffset ++;
@@ -393,7 +392,7 @@ int HListControl::process_input ( int a_iCode )
 						}
 					else
 						{
-						to_tail ( f_iHeightRaw - 1, & l_iFlag );
+						to_tail ( f_iHeightRaw - 1, D_TREAT_AS_OPENED );
 						l_iOldPosition -= f_iCursorPosition;
 						}
 					}
@@ -633,55 +632,39 @@ void HListControl::recalculate_column_widths ( void )
 	M_EPILOG
 	}
 
-HItem * HListControl::remove_element ( int * a_piFlag )
+int HListControl::remove_element ( int a_iFlag, HItem * * a_ppoItem )
 	{
 	M_PROLOG
 	bool l_bFlag = true;
-	HElement * l_poElement = NULL;
-	HItem * l_poItem = NULL;
+	int l_iError = 0;
 	if ( f_iControlOffset
 			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_iQuantity ) )
 		{
 		f_iControlOffset --;
-		l_poElement = f_poSelected;
-		f_poSelected = f_poFirstVisibleRow;
-		to_head ( );
-		f_poFirstVisibleRow = f_poSelected;
-		f_poSelected = l_poElement;
+		to_head ( f_poFirstVisibleRow );
 		}
 	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
 		f_iCursorPosition --;
 	else l_bFlag = false;
 	if ( f_poSelected == f_poFirstVisibleRow )
-		{
-		l_poElement = f_poSelected;
-		f_poSelected = f_poFirstVisibleRow;
-		to_tail ( );
-		f_poFirstVisibleRow = f_poSelected;
-		f_poSelected = l_poElement;
-		}
+		to_tail ( f_poFirstVisibleRow );
 	console::n_bNeedRepaint = true;
-	l_poItem = HList < HItem > ::remove_element ( a_piFlag );
+	l_iError = HList < HItem > ::remove_element ( a_iFlag, a_ppoItem );
 	if ( l_bFlag )to_head ( );
 	refresh ( );
-	return ( l_poItem );
+	return ( l_iError );
 	M_EPILOG
 	}
 
-HItem * HListControl::remove_tail ( int * a_piFlag )
+int HListControl::remove_tail ( int a_iFlag, HItem * * a_ppoItem )
 	{
 	M_PROLOG
-	HElement * l_poElement = NULL;
-	HItem * l_poItem = NULL;
+	int l_iError = 0;
 	if ( f_iControlOffset
 			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_iQuantity )  )
 		{
 		f_iControlOffset --;
-		l_poElement = f_poSelected;
-		f_poSelected = f_poFirstVisibleRow;
-		to_head ( );
-		f_poFirstVisibleRow = f_poSelected;
-		f_poSelected = l_poElement;
+		to_head ( f_poFirstVisibleRow );
 		if ( f_iCursorPosition < ( f_iHeightRaw - 1 ) )
 			{
 			f_iCursorPosition ++;
@@ -691,9 +674,9 @@ HItem * HListControl::remove_tail ( int * a_piFlag )
 	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
 		f_iCursorPosition --;
 	console::n_bNeedRepaint = true;
-	l_poItem = HList < HItem > ::remove_tail ( a_piFlag );
+	l_iError = HList < HItem > ::remove_tail ( a_iFlag, a_ppoItem );
 	if ( console::is_enabled ( ) )refresh ( );
-	return ( l_poItem );
+	return ( l_iError );
 	M_EPILOG
 	}
 

@@ -98,7 +98,7 @@ HAnalyser::HAnalyserNode::~HAnalyserNode ( void )
 	int l_iCount = f_tLeaf.quantity ( );
 	while ( l_iCount -- )
 		{
-		l_pdVar = f_tLeaf.to_tail ( );
+		l_pdVar = * f_tLeaf.to_tail ( );
 		if ( ( l_pdVar > ( double * ) 0x20 ) && ( ( l_pdVar < l_pdInternal )
 											|| ( l_pdVar > ( l_pdInternal + 25 ) ) ) )
 			{

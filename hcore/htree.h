@@ -84,7 +84,7 @@ protected:
 		virtual ~HNode ( void );
 		void put ( tttType );
 		tttType get ( void );
-		HNode * previous ( int * = ( int * ) D_TREAT_AS_OPENED );
+		HNode * previous ( int = D_TREAT_AS_OPENED );
 		HNode * next ( void );
 		/*}*/
 		friend class HTree < tttType >;
@@ -193,7 +193,7 @@ tttType HTree < tttType > ::HNode::get( void )
 	}
 
 template < class tttType >
-typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( int * a_piFlag )
+typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( int a_iFlag )
 	{
 	M_PROLOG
 	HNode * l_poNode = NULL;
@@ -205,7 +205,7 @@ typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( int * a
 			f_poTrunk->f_oBranch.to_head ( );
 			l_poNode = f_poTrunk->f_oBranch.present ( );
 			}
-		f_poTrunk->f_oBranch.to_head ( 1, a_piFlag );
+		f_poTrunk->f_oBranch.to_head ( 1, a_iFlag );
 		l_poNode = f_poTrunk->f_oBranch.present ( );
 		}
 	return ( l_poNode );
@@ -220,7 +220,7 @@ typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
 	if ( f_poTrunk )
 		{
 		while ( l_poNode != this )
-			l_poNode = f_poTrunk->f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED );
+			l_poNode = * f_poTrunk->f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED );
 		l_poNode = f_poTrunk->f_oBranch.present ( );
 		}
 	return ( l_poNode );
