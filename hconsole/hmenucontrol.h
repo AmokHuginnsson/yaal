@@ -32,6 +32,8 @@ Copyright:
 
 class HMenuControl : public HTreeControl
 	{
+	class HMenuNode;
+	friend class HMenuNode;
 	class HMenuNode : public HTreeControl::HNodeControl
 		{
 	protected:
