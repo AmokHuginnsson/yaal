@@ -92,12 +92,12 @@ AC_TRY_COMPILE([],[],[AC_SUBST([EXTRA_WARNINGS],[-Wextra])] [RESULT=["yes"]],
 AC_MSG_RESULT([$RESULT])
 CXXFLAGS=["-Wshadow -Werror"]
 AC_TRY_COMPILE([#include <pthread.h>],[],
-							[AC_SUBST([SPECIAL_COMPILER_FLAGS],[-Wshadow])
+							[AC_SUBST([WARN_SHADOW],[-Wshadow])
 							_FLAGS=["-Wshadow"]],
 							[AC_MSG_WARN([[Can not use -Wshadow!]])])
 CXXFLAGS=["-pedantic-errors"]
 AC_TRY_COMPILE([#include <stdlib.h>],[],
-							[AC_SUBST([SPECIAL_HEAVY_COMPILER_FLAGS],	[-pedantic-errors])
+							[AC_SUBST([PEDANTIC_ERRORS],	[-pedantic-errors])
 							_FLAGS=["$_FLAGS -pedantic-errors"]],
 							[AC_MSG_WARN([[Can not use -pedantic-errors!]])])
 CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings -Wl,-soname,conftest"]

@@ -50,16 +50,17 @@ HDATA = $(TARGETDIR)/libhdata.so.$(RELEASE)
 HS = .h
 SS = .c
 OS = .o
-OOS = .oo
 .SUFFIXES:
 .SUFFIXES: $(SS) $(OS) $(OOS) $(HS)
 CXX = g++
 LXX = g++
 ARFLAGS = r
 CXXFLAGS =	\
+						@PEDANTIC_ERRORS@\
 						@EXTRA_WARNINGS@\
 						-Wall\
 						-Wcast-align\
+						-Wcast-qual\
 						-Wconversion\
 						-Werror\
 						-Winline\
@@ -67,7 +68,8 @@ CXXFLAGS =	\
 						-Wlong-long\
 						-Wmissing-noreturn\
 						-Wpointer-arith\
-						@SPECIAL_COMPILER_FLAGS@\
+						-Wredundant-decls\
+						@WARN_SHADOW@\
 						-Wsign-compare\
 						-Wundef\
 						-Wwrite-strings
@@ -78,11 +80,7 @@ CXXFLAGS =	\
 						-Wnested-externs\
 						-Wstrict-prototypes\
 						-Wtraditional\ #C only
-HEAVYCXXFLAGS =	\
-								@SPECIAL_HEAVY_COMPILER_FLAGS@\
-								-Waggregate-return\
-								-Wcast-qual\
-								-Wredundant-decls
+#						-Waggregate-return\ # useless
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
@@ -108,74 +106,74 @@ LINKER_FLAGS = $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 #	h-core
 OBJ4hcore =
 OBJ4hcore += harray
-OBJ4hcore += hcomplex!
-OBJ4hcore += hcore!
-OBJ4hcore += hexception!
+OBJ4hcore += hcomplex
+OBJ4hcore += hcore
+OBJ4hcore += hexception
 OBJ4hcore += hfile
-OBJ4hcore += hflexiblelist!
+OBJ4hcore += hflexiblelist
 OBJ4hcore += hflexibletree
 OBJ4hcore += hinfo
-OBJ4hcore += hinfolist!
+OBJ4hcore += hinfolist
 OBJ4hcore += hlist
-OBJ4hcore += hlog!
+OBJ4hcore += hlog
 OBJ4hcore += hmap
-OBJ4hcore += hmatrix!
+OBJ4hcore += hmatrix
 OBJ4hcore += hobject
-OBJ4hcore += hpattern!
+OBJ4hcore += hpattern
 OBJ4hcore += hrandomizer
 OBJ4hcore += hrawfile
 OBJ4hcore += hsocket
 OBJ4hcore += hstream
-OBJ4hcore += hstring!
-OBJ4hcore += hstringlist!
+OBJ4hcore += hstring
+OBJ4hcore += hstringlist
 OBJ4hcore += hthread
-OBJ4hcore += htime!
+OBJ4hcore += htime
 OBJ4hcore += htree
-OBJ4hcore += hvector!
-OBJ4hcore += rc_file!
+OBJ4hcore += hvector
+OBJ4hcore += rc_file
 OBJ4hcore += xalloc
 OBJ4hcore +=
 
 #	h-console
 OBJ4hconsole =
-OBJ4hconsole += console!
-OBJ4hconsole += hcomboboxcontrol!
-OBJ4hconsole += hconsole!
-OBJ4hconsole += hcontrol!
+OBJ4hconsole += console
+OBJ4hconsole += hcomboboxcontrol
+OBJ4hconsole += hconsole
+OBJ4hconsole += hcontrol
 OBJ4hconsole += hcontrollist
-OBJ4hconsole += heditcontrol!
-OBJ4hconsole += hhandler!
+OBJ4hconsole += heditcontrol
+OBJ4hconsole += hhandler
 OBJ4hconsole += hitem
-OBJ4hconsole += hlistcontrol!
+OBJ4hconsole += hlistcontrol
 OBJ4hconsole += hmainwindow
 OBJ4hconsole += hmenucontrol
-OBJ4hconsole += hprocess!
+OBJ4hconsole += hprocess
 OBJ4hconsole += hsearchablecontrol
-OBJ4hconsole += hstatusbarcontrol!
+OBJ4hconsole += hstatusbarcontrol
 OBJ4hconsole += htimecontrol
 OBJ4hconsole += htreecontrol
-OBJ4hconsole += hwindow!
-OBJ4hconsole += hwindowlistcontrol!
-OBJ4hconsole += mouse!
+OBJ4hconsole += hwindow
+OBJ4hconsole += hwindowlistcontrol
+OBJ4hconsole += mouse
 OBJ4hconsole += omenuitem
 OBJ4hconsole +=
 
 # tools
 OBJ4tools =
 OBJ4tools += bit
-OBJ4tools += hanalyser!
+OBJ4tools += hanalyser
 OBJ4tools += hcollector
 OBJ4tools += hdes
 OBJ4tools += hserial
-OBJ4tools += signals!
+OBJ4tools += signals
 OBJ4tools += tools
-OBJ4tools += util!
+OBJ4tools += util
 OBJ4tools +=
 
 # dbwrapper
 ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
 	OBJ4mysql_driver = 
-	OBJ4mysql_driver += mysql_driver!
+	OBJ4mysql_driver += mysql_driver
 endif # MYSQL_DRIVER
 ifneq ("@TARGET_POSTGRESQL_DRIVER@","") # POSTGRESQL_DRIVER
 	OBJ4postgresql_driver = 
@@ -193,7 +191,7 @@ OBJ4dbwrapper =
 OBJ4dbwrapper += db_driver_loader
 OBJ4dbwrapper += dbwrapper
 OBJ4dbwrapper += hdatabase
-OBJ4dbwrapper += hrecordset!
+OBJ4dbwrapper += hrecordset
 OBJ4dbwrapper += 
 
 #	h-data
@@ -201,10 +199,10 @@ OBJ4hdata =
 OBJ4hdata += hdataprocess
 OBJ4hdata += hdatacontrol
 OBJ4hdata += hdataeditcontrol
-OBJ4hdata += hdatalistcontrol!
+OBJ4hdata += hdatalistcontrol
 OBJ4hdata += hdatastatusbarcontrol
-OBJ4hdata += hdatatreecontrol!
-OBJ4hdata += hdatawindow!
+OBJ4hdata += hdatatreecontrol
+OBJ4hdata += hdatawindow
 OBJ4hdata += oresource
 OBJ4hdata += 
 
@@ -212,58 +210,44 @@ OBJ4hdata +=
 
 OBJ4hcore := $(strip $(OBJ4hcore))
 OBJ4hcore := $(patsubst %,$(HCOREDIR)%.o, $(OBJ4hcore))
-OBJ4hcore := $(patsubst %!.o,%.oo, $(OBJ4hcore))
 HDR4hcore := $(patsubst %.o,%.h, $(OBJ4hcore))
 SRCS := $(patsubst %.h,%.c, $(HDR4hcore))
-HDR4hcore := $(patsubst %.oo,%.h, $(HDR4hcore))
 
 OBJ4hconsole := $(strip $(OBJ4hconsole))
 OBJ4hconsole := $(patsubst %,$(HCONSOLEDIR)%.o, $(OBJ4hconsole))
-OBJ4hconsole := $(patsubst %!.o,%.oo, $(OBJ4hconsole))
 HDR4hconsole := $(patsubst %.o,%.h, $(OBJ4hconsole))
 SRCS += $(patsubst %.h,%.c, $(HDR4hconsole))
-HDR4hconsole := $(patsubst %.oo,%.h, $(HDR4hconsole))
 
 OBJ4tools := $(strip $(OBJ4tools))
 OBJ4tools := $(patsubst %,$(TOOLSDIR)%.o, $(OBJ4tools))
-OBJ4tools := $(patsubst %!.o,%.oo, $(OBJ4tools))
 HDR4tools := $(patsubst %.o,%.h, $(OBJ4tools))
 SRCS += $(patsubst %.h,%.c, $(HDR4tools))
-HDR4tools := $(patsubst %.oo,%.h, $(HDR4tools))
 
 OBJ4hdata := $(strip $(OBJ4hdata))
 OBJ4hdata := $(patsubst %,$(HDATADIR)%.o, $(OBJ4hdata))
-OBJ4hdata := $(patsubst %!.o,%.oo, $(OBJ4hdata))
 HDR4hdata := $(patsubst %.o,%.h, $(OBJ4hdata))
 SRCS += $(patsubst %.h,%.c, $(HDR4hdata))
-HDR4hdata := $(patsubst %.oo,%.h, $(HDR4hdata))
 
 OBJ4dbwrapper := $(strip $(OBJ4dbwrapper))
 OBJ4dbwrapper := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4dbwrapper))
-OBJ4dbwrapper := $(patsubst %!.o,%.oo, $(OBJ4dbwrapper))
 ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
 	OBJ4mysql_driver := $(strip $(OBJ4mysql_driver))
 	OBJ4mysql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4mysql_driver))
-	OBJ4mysql_driver := $(patsubst %!.o,%.oo, $(OBJ4mysql_driver))
 endif # MYSQL_DRIVER
 ifneq ("@TARGET_POSTGRESQL_DRIVER@","") # POSTGRESQL_DRIVER
 	OBJ4postgresql_driver := $(strip $(OBJ4postgresql_driver))
 	OBJ4postgresql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4postgresql_driver))
-	OBJ4postgresql_driver := $(patsubst %!.o,%.oo, $(OBJ4postgresql_driver))
 endif
 ifneq ("@TARGET_SQLITE_DRIVER@","") # SQLITE_DRIVER
 	OBJ4sqlite_driver := $(strip $(OBJ4sqlite_driver))
 	OBJ4sqlite_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite_driver))
-	OBJ4sqlite_driver := $(patsubst %!.o,%.oo, $(OBJ4sqlite_driver))
 endif # SQLITE_DRIVER
 ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
 	OBJ4sqlite3_driver := $(strip $(OBJ4sqlite3_driver))
 	OBJ4sqlite3_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite3_driver))
-	OBJ4sqlite3_driver := $(patsubst %!.o,%.oo, $(OBJ4sqlite3_driver))
 endif # SQLITE3_DRIVER
 HDR4dbwrapper := $(patsubst %.o,%.h, $(OBJ4dbwrapper))
 SRCS += $(patsubst %.h,%.c, $(HDR4dbwrapper))
-HDR4dbwrapper := $(patsubst %.oo,%.h, $(HDR4dbwrapper))
 ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
 	SRCS += $(patsubst %.o,%.c, $(OBJ4mysql_driver))
 endif # MYSQL_DRIVER
@@ -277,24 +261,13 @@ ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
 	SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite3_driver))
 endif # SQLITE3_DRIVER
 
-SRCEXS := $(filter %.oo, $(SRCS))
-SRCS := $(filter-out %.oo, $(SRCS))
-SRCEXS := $(patsubst %.oo, %.c, $(SRCEXS))
-
 # implict pattern rule
 	
 %.o : %.c
 	@echo -n "Compiling \`$@' ... "
-	@$(CXX) $(CXXFLAGS) $(HEAVYCXXFLAGS) $(COMPILER_FLAGS) $< -c -o $@ 2>&1 | tee -a make.log
-	@echo "done."
-
-# this one is for files that use features that breaks ANSI C++
-
-%.oo : %.c
-	@echo -n "Compiling \`$@' ... "
 	@$(CXX) $(CXXFLAGS) $(COMPILER_FLAGS) $< -c -o $@ 2>&1 | tee -a make.log
 	@echo "done."
-	
+
 #	this is "rule" for linking libs
 
 $(TARGET):
@@ -377,10 +350,9 @@ $(CACHE):
 	@echo "done."
 
 dep: .depend
-.depend: $(SRCS) $(SRCEXS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
+.depend: $(SRCS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
 	@echo -n 'Making dependicies ... '
 	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCS) | sed -e "s/^\(.\{1,\}: \)\(\(\.\/\)\{0,1\}[a-z]\{1,\}\)/\2\/\1\2/" > .depend
-	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCEXS) | sed -e "s/^\(.\{1,\}: \)\(\(\.\/\)\{0,1\}[a-z]\{1,\}\)/\2\/\1\2/" -e "s/\.o: /\.oo: /" >> .depend
 	@echo "# vim:ft=make:" >> .depend
 	@echo 'done.'
 
@@ -388,7 +360,7 @@ clean:
 	@/bin/rm -f $(OBJ4hcore) $(OBJ4hconsole) $(OBJ4tools) $(OBJ4dbwrapper) $(OBJ4hdata)
 	@cln .
 
-tags: $(SRCS) $(SRCEXS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
+tags: $(SRCS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
 	@echo -n "Rehashing tags ... "
 	@ctags --langmap=c++:.c ./hcore/*.[ch] ./hconsole/*.[ch] ./tools/*.[ch] ./dbwrapper/*.[ch] ./hdata/*.[ch]
 	@(cd ./hcore;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)

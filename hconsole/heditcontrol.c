@@ -184,7 +184,9 @@ void HEditControl::set_flags ( bool a_bReplace, bool a_bPassword )
 	M_EPILOG
 	}
 
-const char * strrnpbrk ( const char * a_pcBuffer, const char * a_pcStopSet,
+/* all str* and mem* functions takes const pointer as argument and returns
+	 non const pointer */
+char * strrnpbrk ( const char * a_pcBuffer, const char * a_pcStopSet,
 		int a_iIndex )
 	{
 	int l_iCtr = 0;
@@ -192,7 +194,7 @@ const char * strrnpbrk ( const char * a_pcBuffer, const char * a_pcStopSet,
 	while ( a_iIndex -- )
 		for ( l_iCtr = 0; l_iCtr < l_iStopSetSize; l_iCtr ++ )
 			if ( a_pcBuffer [ a_iIndex ] == a_pcStopSet [ l_iCtr ] )
-				return ( a_pcBuffer + a_iIndex );
+				return ( const_cast < char * > ( a_pcBuffer + a_iIndex ) );
 	return ( NULL );
 	}
 
