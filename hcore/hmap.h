@@ -34,7 +34,7 @@ Copyright:
 extern unsigned long const int * const g_pulPrimes;
 
 template < class tType >
-inline unsigned long int hash ( tType & a_rtKey )
+inline unsigned long int hash ( const tType & a_rtKey )
 	{
 	return ( ( unsigned long int ) a_rtKey );
 	}
