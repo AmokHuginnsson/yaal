@@ -107,7 +107,6 @@ void HStatusBarControl::update_progress ( double a_dStep, const char * a_pcTitle
 		l_oLeft = l_oNow - l_oStoper;
 		}
 	if ( a_pcTitle )f_oMessage = a_pcTitle;
-	f_iLastProgress = ( int ) a_dStep;
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
 	l_iMaxBar = console::n_iWidth - 6 - 10 - 2 - ( f_bEstimate ? 10 : 0 );
 	l_iNextPercent = ( int ) ( 100. * a_dStep / f_dProgressSize );
