@@ -84,7 +84,6 @@ protected:
 	double bracket ( HAnalyserNode * );
 	double functions ( HAnalyserNode * );
 	/*}*/
-	friend class HAnalyserNode;
 	};
 
 #endif /* not __HANALYSER_H */
