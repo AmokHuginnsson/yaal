@@ -263,7 +263,7 @@ $(TARGET):
 #phony targets
 .PHONY : all nodebug install dep clean tags mrproper purge
 
-all: .depend $(HAPIHDR) $(CACHE) $(HCORE) $(HCONSOLE) $(TOOLS) $(MYSQL_DRIVER) $(POSTGRESQL_DRIVER) $(DBWRAPPER) $(HDATA)
+all: $(HAPIHDR) .depend $(CACHE) $(HCORE) $(HCONSOLE) $(TOOLS) $(MYSQL_DRIVER) $(POSTGRESQL_DRIVER) $(DBWRAPPER) $(HDATA)
 
 nodebug:
 	@( export NODEBUG="yes";\
