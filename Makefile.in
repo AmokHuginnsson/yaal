@@ -1,0 +1,356 @@
+#
+#---        `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
+#
+#	Makefile - this file is integral part of `stdhapi' project.
+#
+#	i.  You may not make any changes in Copyright information.
+#	ii. You must attach Copyright information to any part of every copy
+#	    of this software.
+#
+#Copyright:
+#
+# You are free to use this program as is, you can redistribute binary
+# package freely but:
+#  1. You can not use any part of sources of this software.
+#  2. You can not redistribute any part of sources of this software.
+#  3. No reverse engineering is allowed.
+#  4. If you want redistribute binary package you can not demand any fees
+#     for this software.
+#     You can not even demand cost of the carrier (CD for example).
+#  5. You can not include it to any commercial enterprise (for example 
+#     as a free add-on to payed software or payed newspaper).
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
+
+VERSION = 0
+SUBVERSION = 0
+EXTRAVERSION = 0
+RELEASE = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
+SHELL = /bin/sh
+TARGETDIR = $(HOME)/lib
+HEADERSDIR = $(HOME)/prog/include
+HAPIHDR = $(HEADERSDIR)/stdhapi.h
+CACHE = $(TARGETDIR)/ld.so.cache
+HCOREDIR = ./hcore/
+HCONSOLEDIR = ./hconsole/
+TOOLSDIR = ./tools/
+DBWRAPPERDIR = ./dbwrapper/
+HDATADIR = ./hdata/
+HCORE = $(TARGETDIR)/libhcore.so.$(RELEASE)
+HCONSOLE = $(TARGETDIR)/libhconsole.so.$(RELEASE)
+TOOLS = $(TARGETDIR)/libtools.so.$(RELEASE)
+MYSQL_DRIVER = $(TARGETDIR)/libmysql_driver.so.$(RELEASE)
+POSTGRESQL_DRIVER = $(TARGETDIR)/libpostgresql_driver.so.$(RELEASE)
+DBWRAPPER = $(TARGETDIR)/libdbwrapper.so.$(RELEASE)
+HDATA = $(TARGETDIR)/libhdata.so.$(RELEASE)
+HS = .h
+SS = .c
+OS = .o
+OOS = .oo
+.SUFFIXES:
+.SUFFIXES: $(SS) $(OS) $(OOS) $(HS)
+CXX = g++
+LXX = g++
+ARFLAGS = r
+CXXFLAGS =	\
+						-W\
+						-Wall\
+						-Wcast-align\
+						-Wconversion\
+						-Werror\
+						-Winline\
+						-Wlarger-than-1024\
+						-Wlong-long\
+						-Wmissing-noreturn\
+						-Wmissing-prototypes\
+						-Wpointer-arith\
+						-Wshadow\
+						-Wsign-compare\
+						-Wstrict-prototypes\
+						-Wundef\
+						-Wwrite-strings
+#						-Wbad-function-cast\
+						-Wid-clash-2\
+						-Wmissing-declarations\
+						-Wnested-externs\
+						-Wtraditional\ #deprecated
+HEAVYCXXFLAGS =	\
+								-pedantic-errors\
+								-Waggregate-return\
+								-Wcast-qual\
+								-Wredundant-decls
+FLAGS2 =
+ifeq ($(HD),1)
+	DB = -D__DEBUGGER_BABUNI__
+endif
+ifdef NODEBUG
+	FLAGS3 = -O3 -fexpensive-optimizations
+	FLAGS4 =
+else
+	FLAGS3 = -g -g3 -ggdb -ggdb3 -pg -D__DEBUG__ $(DB)
+	FLAGS4 =
+endif
+FLAGS5 = -D_GNU_SOURCE -march=i486
+# -fno-external-templates #deprecated
+FLAGS6 = 
+FLAGS7 = -fPIC -I. -I$(HEADERSDIR)
+FLAGS8 =	\
+					-shared\
+					-L$(TARGETDIR)\
+					-Wl,--no-undefined\
+					-Wl,--fatal-warnings\
+					-Wl,--demangle\
+					-Wl,--export-dynamic\
+					-Wl,-soname,
+FLAGS = $(FLAGS1) $(FLAGS3) $(FLAGS5) $(FLAGS7)
+FLAGS0 = $(FLAGS2) $(FLAGS4) $(FLAGS6) $(FLAGS8)
+
+#	h-core
+OBJ4hcore =
+OBJ4hcore += hexception
+OBJ4hcore += hfile
+OBJ4hcore += hflexiblelist!
+OBJ4hcore += hflexibletree
+OBJ4hcore += hinfo
+OBJ4hcore += hinfolist!
+OBJ4hcore += hlist
+OBJ4hcore += hlog!
+OBJ4hcore += hmap
+OBJ4hcore += hmatrix!
+OBJ4hcore += hobject
+OBJ4hcore += hrandomizer
+OBJ4hcore += hsocket
+OBJ4hcore += hstream
+OBJ4hcore += hstring!
+OBJ4hcore += hstringlist!
+OBJ4hcore += hthread
+OBJ4hcore += htime
+OBJ4hcore += htree
+OBJ4hcore += hvector!
+OBJ4hcore += rc_file!
+OBJ4hcore += xalloc
+OBJ4hcore +=
+
+#	h-console
+OBJ4hconsole =
+OBJ4hconsole += console!
+OBJ4hconsole += hcontrol!
+OBJ4hconsole += hcontrollist
+OBJ4hconsole += heditcontrol!
+OBJ4hconsole += hhandler
+OBJ4hconsole += hlistcontrol!
+OBJ4hconsole += hmainwindow
+OBJ4hconsole += hmenucontrol
+OBJ4hconsole += hprocess!
+OBJ4hconsole += hstatusbarcontrol
+OBJ4hconsole += htreecontrol
+OBJ4hconsole += hwindow!
+OBJ4hconsole += hwindowlistcontrol!
+OBJ4hconsole += omenuitem
+OBJ4hconsole +=
+
+# tools
+OBJ4tools =
+OBJ4tools += bit
+OBJ4tools += collector
+OBJ4tools += hanalyser!
+OBJ4tools += hserial
+OBJ4tools += signals!
+OBJ4tools += util!
+OBJ4tools +=
+
+# dbwrapper
+OBJ4mysql_driver = 
+OBJ4mysql_driver += mysql_driver
+OBJ4postgresql_driver = 
+OBJ4postgresql_driver += postgresql_driver
+OBJ4dbwrapper = 
+OBJ4dbwrapper += db_driver_loader
+OBJ4dbwrapper += hdatabase
+OBJ4dbwrapper += hrecordset!
+OBJ4dbwrapper += 
+
+#	h-data
+OBJ4hdata =
+OBJ4hdata += hdataprocess
+OBJ4hdata += hdatacontrol
+OBJ4hdata += hdatalistcontrol!
+OBJ4hdata += hdatawindow
+OBJ4hdata += 
+
+#-------------------------------------------------------------------
+
+OBJ4hcore := $(strip $(OBJ4hcore))
+OBJ4hcore := $(patsubst %,$(HCOREDIR)%.o, $(OBJ4hcore))
+OBJ4hcore := $(patsubst %!.o,%.oo, $(OBJ4hcore))
+HDR4hcore := $(patsubst %.o,%.h, $(OBJ4hcore))
+SRCS := $(patsubst %.h,%.c, $(HDR4hcore))
+HDR4hcore := $(patsubst %.oo,%.h, $(HDR4hcore))
+
+OBJ4hconsole := $(strip $(OBJ4hconsole))
+OBJ4hconsole := $(patsubst %,$(HCONSOLEDIR)%.o, $(OBJ4hconsole))
+OBJ4hconsole := $(patsubst %!.o,%.oo, $(OBJ4hconsole))
+HDR4hconsole := $(patsubst %.o,%.h, $(OBJ4hconsole))
+SRCS += $(patsubst %.h,%.c, $(HDR4hconsole))
+HDR4hconsole := $(patsubst %.oo,%.h, $(HDR4hconsole))
+
+OBJ4tools := $(strip $(OBJ4tools))
+OBJ4tools := $(patsubst %,$(TOOLSDIR)%.o, $(OBJ4tools))
+OBJ4tools := $(patsubst %!.o,%.oo, $(OBJ4tools))
+HDR4tools := $(patsubst %.o,%.h, $(OBJ4tools))
+SRCS += $(patsubst %.h,%.c, $(HDR4tools))
+HDR4tools := $(patsubst %.oo,%.h, $(HDR4tools))
+
+OBJ4hdata := $(strip $(OBJ4hdata))
+OBJ4hdata := $(patsubst %,$(HDATADIR)%.o, $(OBJ4hdata))
+OBJ4hdata := $(patsubst %!.o,%.oo, $(OBJ4hdata))
+HDR4hdata := $(patsubst %.o,%.h, $(OBJ4hdata))
+SRCS += $(patsubst %.h,%.c, $(HDR4hdata))
+HDR4hdata := $(patsubst %.oo,%.h, $(HDR4hdata))
+
+OBJ4dbwrapper := $(strip $(OBJ4dbwrapper))
+OBJ4dbwrapper := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4dbwrapper))
+OBJ4dbwrapper := $(patsubst %!.o,%.oo, $(OBJ4dbwrapper))
+OBJ4mysql_driver := $(strip $(OBJ4mysql_driver))
+OBJ4mysql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4mysql_driver))
+OBJ4mysql_driver := $(patsubst %!.o,%.oo, $(OBJ4mysql_driver))
+OBJ4postgresql_driver := $(strip $(OBJ4postgresql_driver))
+OBJ4postgresql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4postgresql_driver))
+OBJ4postgresql_driver := $(patsubst %!.o,%.oo, $(OBJ4postgresql_driver))
+HDR4dbwrapper := $(patsubst %.o,%.h, $(OBJ4dbwrapper))
+SRCS += $(patsubst %.h,%.c, $(HDR4dbwrapper))
+HDR4dbwrapper := $(patsubst %.oo,%.h, $(HDR4dbwrapper))
+SRCS += $(patsubst %.o,%.c, $(OBJ4mysql_driver))
+SRCS += $(patsubst %.o,%.c, $(OBJ4postgresql_driver))
+
+SRCEXS := $(filter %.oo, $(SRCS))
+SRCS := $(filter-out %.oo, $(SRCS))
+SRCEXS := $(patsubst %.oo, %.c, $(SRCEXS))
+
+# implict pattern rule
+	
+%.o : %.c
+	@echo -n "Compiling \`$@' ... "
+	@$(CXX) $(CXXFLAGS) $(HEAVYCXXFLAGS) $(FLAGS) $< -c -o $@ 2>&1 | tee -a make.log
+	@echo "done."
+
+# this one is for files that use features that breaks ANSI C++
+
+%.oo : %.c
+	@echo -n "Compiling \`$@' ... "
+	@$(CXX) $(CXXFLAGS) $(FLAGS) $< -c -o $@ 2>&1 | tee -a make.log
+	@echo "done."
+	
+#	this is "rule" for linking libs
+
+$(TARGET):
+	@if [ "$(TARGET)" = "" -o "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi
+	@echo -n "Linking \`$@ ... "
+	@$(LXX) $(LIBS) $(FLAGS0)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) $(OBJ4$(NAME)) 2>&1 | tee -a make.log
+	@$(AR) $(ARFLAGS) lib$(NAME).a $(OBJ4$(NAME)) 2>&1 | tee -a make.log
+	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(TARGETDIR)/
+	@/bin/mv -f lib$(NAME).a $(TARGETDIR)/
+	@echo -n "making cache ... "
+	@(cd $(TARGETDIR);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;$(TARGETDIR)/mkcache;ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so)
+	@echo "done."
+
+#-------------------------------------------------------------------
+
+.DEFAULT:
+	@echo "Lack of \`$<'." | tee -a make.log
+
+#phony targets
+.PHONY : all nodebug install dep clean tags mrproper
+
+all: .depend $(HAPIHDR) $(CACHE) $(HCORE) $(HCONSOLE) $(TOOLS) $(MYSQL_DRIVER) $(POSTGRESQL_DRIVER) $(DBWRAPPER) $(HDATA)
+
+nodebug:
+	@( export NODEBUG="yes";\
+	$(MAKE) -e all)
+
+install: all
+	@./msh
+
+$(HCORE): $(OBJ4hcore)
+	@$(MAKE) $(HCORE)\' TARGET=$(HCORE)\' NAME=hcore
+
+$(HCONSOLE): $(HCORE) $(OBJ4hconsole)
+	@$(MAKE) $(HCONSOLE)\' TARGET=$(HCONSOLE)\' NAME=hconsole LIBS="-lncurses -lhcore -Wl,-init,console_init -Wl,-fini,conole_fini"
+	
+$(TOOLS): $(HCONSOLE) $(OBJ4tools)
+	@$(MAKE) $(TOOLS)\' TARGET=$(TOOLS)\' NAME=tools LIBS="-Wl,-init,tools_init -Wl,-fini,tools_fini -lncurses -lhcore -lhconsole"
+
+# dbwrapper BEGIN
+$(MYSQL_DRIVER): $(HCORE) $(OBJ4mysql_driver)
+	@$(MAKE) $(MYSQL_DRIVER)\' TARGET=$(MYSQL_DRIVER)\' NAME=mysql_driver LIBS="-lmysqlclient -lhcore"
+
+$(POSTGRESQL_DRIVER): $(HCORE) $(OBJ4postgresql_driver)
+	@$(MAKE) $(POSTGRESQL_DRIVER)\' TARGET=$(POSTGRESQL_DRIVER)\' NAME=postgresql_driver LIBS="-lpq -lhcore"
+
+$(DBWRAPPER) : $(HCORE) $(OBJ4dbwrapper)
+	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-Wl,-init,dbwrapper_init -Wl,-fini,dbwrapper_fini -rdynamic -ldl -lhcore"
+# dbwrapper END
+
+$(HDATA): $(HCONSOLE) $(OBJ4hdata)
+	@$(MAKE) $(HDATA)\' TARGET=$(HDATA)\' NAME=hdata LIBS="-lncurses -lhcore -lhconsole -ldbwrapper"
+
+$(HAPIHDR): $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
+	@echo -n "Making header dir ... "
+	@/bin/mkdir -p $(HEADERSDIR)
+	@for FILE in $(HDR4hcore); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
+	@for FILE in $(HDR4hconsole); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
+	@for FILE in $(HDR4tools); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
+	@for FILE in $(HDR4dbwrapper); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
+	@for FILE in $(HDR4hdata); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
+	@head -26 $(HEADERSDIR)/bit.h | sed -e s/bit/stdhapi/ > $(HEADERSDIR)/stdhapi.h
+	@echo '#ifndef __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
+	@echo '#define __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
+	@echo '' >> $(HEADERSDIR)/stdhapi.h
+	@find $(HEADERSDIR) ! -name 'stdhapi.h' -type f -printf "#include <%f>\n" | sort >> $(HEADERSDIR)/stdhapi.h
+	@echo '' >> $(HEADERSDIR)/stdhapi.h
+	@echo '#endif /* __STDHAPI_H */' >> $(HEADERSDIR)/stdhapi.h
+	@echo "done."
+
+$(CACHE):
+	@echo -n "Making environment ... "
+	@/bin/mkdir -p $(TARGETDIR)
+	@echo $(TARGETDIR) > $(TARGETDIR)/ld.so.conf
+	@/bin/cp -f ./mkcache $(TARGETDIR)
+	@echo "done."
+
+dep: .depend
+.depend: $(SRCS) $(SRCEXS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
+	@echo -n 'Making dependicies ... '
+	@set -e; $(CXX) -I. -MM $(SRCS) | sed -e s/'^\(.\+: \.\/\)\([a-z]\+\)'/'\2\/\1\2'/ > .depend
+	@set -e; $(CXX) -I. -MM $(SRCEXS) | sed -e s/'^\(.\+: \.\/\)\([a-z]\+\)'/'\2\/\1\2'/ -e s/'\.o\>'/'\.oo'/ >> .depend
+	@echo 'done.'
+
+clean:
+	@/bin/rm -f $(OBJ4hcore) $(OBJ4hconsole) $(OBJ4tools) $(OBJ4dbwrapper) $(OBJ4hdata)
+	@cln .
+
+tags: $(SRCS) $(SRCEXS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
+	@echo -n "Rehashing tags ... "
+	@ctags --langmap=c++:.c ./hcore/*.[ch] ./hconsole/*.[ch] ./tools/*.[ch] ./dbwrapper/*.[ch] ./hdata/*.[ch]
+	@(cd ./hcore;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@(cd ./hconsole;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@(cd ./tools;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@(cd ./dbwrapper;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@(cd ./hdata;ctags --langmap=c++:.c ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@echo "done."
+
+mrproper: clean
+	@echo -n "Purging ... "
+	@/bin/rm -rf $(TARGETDIR) $(HEADERSDIR) make.log
+	@find . -name 'tags' -or -name '.depend' | xargs /bin/rm -f
+	@echo "done."
+
+purge: mrproper
+	/bin/rm -rf configure config.h autom4te.cache config.log config.status
+	/bin/rm -rf Makefile
+
+ifneq ($(wildcard .depend),)
+include .depend
+endif
+

@@ -1,0 +1,9 @@
+/* Define host type here. */
+
+#undef __DEBIAN_HOST__
+
+#undef __PLD_HOST__
+
+#undef __FREEBSD_HOST__
+
+/* End of host type definition. */
