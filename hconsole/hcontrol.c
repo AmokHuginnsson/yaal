@@ -194,7 +194,7 @@ void HControl::draw_label ( void )
 		: console::n_iWidth + f_iWidth - f_iColumnRaw;
 /* done */
 	::move ( f_iRowRaw, f_iColumnRaw );
-	if ( f_bDrawLabel )
+	if ( ! f_bDrawLabel )
 		{
 		M_SET_ATTR_DATA ( );
 		return;
