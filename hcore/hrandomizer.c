@@ -31,18 +31,18 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hrandomizer.h"
 
-HRandomizer::HRandomizer( unsigned int a_lSeed )
+HRandomizer::HRandomizer( unsigned int a_uiSeed )
 	{
 	M_PROLOG
-	f_lSeed = a_lSeed;
+	f_lSeed = a_uiSeed;
 	return ;
 	M_EPILOG
 	}
 	
-void HRandomizer::set( unsigned int a_uVal )
+void HRandomizer::set( unsigned int a_uiVal )
 	{
 	M_PROLOG
-	f_lSeed = a_uVal;
+	f_lSeed = a_uiVal;
 	return ;
 	M_EPILOG
 	}
