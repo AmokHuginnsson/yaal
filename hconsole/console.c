@@ -235,13 +235,13 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	int l_iError = 0;
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
-	l_iError = c_printf ( a_iRow, a_iColumn, a_iAttribute, a_pcFormat, l_xAp );
+	l_iError = c_vprintf ( a_iRow, a_iColumn, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	return ( l_iError );
 	M_EPILOG
 	}
 	
-int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
+int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 							 const char * a_pcFormat, va_list & a_rxAp )
 	{
 	M_PROLOG

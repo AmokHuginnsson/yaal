@@ -242,7 +242,7 @@ void HStatusBarControl::message ( const char * a_pcFormat, ... )
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
-	console::c_printf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
+	console::c_vprintf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	return;
 	M_EPILOG
