@@ -29,29 +29,21 @@ Copyright:
 
 #line 31 "hlist.h"
 
-#define D_ERROR										-1
-#define D_NP_TREAT_AS_CLOSED			1
-#define D_NP_TREAT_AS_OPENED			2
-#define D_NP_SEARCH_AFTER_ORDER   3
-#define D_NP_SEARCH_AFTER_NUMBER  4
-#define D_NP_BLOCK_IF_NOT_EMPTIED	5
-#define D_NP_EMPTY_IF_NOT_EMPTIED	6
-#define D_NP_FORCE_REMOVE_ELEMENT	7
-#define D_TREAT_AS_CLOSED					( int * ) D_NP_TREAT_AS_CLOSED
-#define D_TREAT_AS_OPENED					( int * ) D_NP_TREAT_AS_OPENED
-#define D_SEARCH_AFTER_ORDER  	  ( int * ) D_NP_SEARCH_AFTER_ORDER
-#define D_SEARCH_AFTER_NUMBER   	( int * ) D_NP_SEARCH_AFTER_NUMBER
-#define D_BLOCK_IF_NOT_EMPTIED		( int * ) D_NP_BLOCK_IF_NOT_EMPTIED
-#define D_EMPTY_IF_NOT_EMPTIED		( int * ) D_NP_EMPTY_IF_NOT_EMPTIED
-#define D_FORCE_REMOVE_ELEMENT		( int * ) D_NP_FORCE_REMOVE_ELEMENT
-#define D_UNSORTED								0
-#define D_ASCENDING								8
-#define D_DESCENDING							-8
-#define	D_WAS_EMPTIED							9
-#define	D_WAS_NOT_EMPTIED					10
-#define D_FINAL_REACHED						11
-#define D_NOT_FOUND								12
-#define D_DEFINE_LIMIT						16
+#define D_ERROR									1
+#define D_TREAT_AS_CLOSED				2
+#define D_TREAT_AS_OPENED				4
+#define D_SEARCH_AFTER_ORDER		8
+#define D_SEARCH_AFTER_NUMBER		16
+#define D_BLOCK_IF_NOT_EMPTIED	32
+#define D_EMPTY_IF_NOT_EMPTIED	64
+#define D_FORCE_REMOVE_ELEMENT	128
+#define	D_WAS_EMPTIED						256
+#define	D_WAS_NOT_EMPTIED				512
+#define D_FINAL_REACHED					1024
+#define D_NOT_FOUND							2048
+#define D_UNSORTED							0
+#define D_ASCENDING							8
+#define D_DESCENDING						-8
 
 #ifndef NULL
 #define NULL	0
@@ -62,7 +54,7 @@ Copyright:
 #define E_HLIST_EMPTYELEMENT	0
 #define E_HLIST_BADINDEX			1
 #define E_HLIST_BADFLAG				2
-#define E_HLIST_EMPTY			3
+#define E_HLIST_EMPTY					3
 #define E_HLIST_BADOFFSET			4
 #define E_HLIST_BADNUMBER			5
 
@@ -139,27 +131,29 @@ public:
 	virtual tType & add_orderly ( tType, int = D_ASCENDING ); /* adds element in
 																															 the way that
 																															 keeps order */
-	virtual tType * remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED,
-			int * = D_TREAT_AS_CLOSED );	/* rmoves element at current cursor position */
-	virtual tType * remove_at ( int, int * = D_BLOCK_IF_NOT_EMPTIED,
-			int * = D_TREAT_AS_CLOSED );
-	virtual tType * remove_head ( int * = D_BLOCK_IF_NOT_EMPTIED );
-	virtual tType * remove_tail ( int * = D_BLOCK_IF_NOT_EMPTIED );
+	virtual int remove_element ( int = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
+			tType * * = NULL );	/* rmoves element at current cursor position */
+	virtual int remove_at ( int, int = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
+			tType * * = NULL );
+	virtual int remove_head ( int = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
+	virtual int remove_tail ( int = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
 	/* sets cursor at specified index or number */
-	virtual tType & go ( int, int * = D_SEARCH_AFTER_ORDER );
+	virtual int go ( int, tType * * = NULL, int = D_SEARCH_AFTER_ORDER );
 	virtual tType & operator [ ] ( int );
 	virtual tType & present ( void );
 	virtual tType & head ( void );
 	virtual tType & tail ( void );
-	virtual tType & to_head ( int = 1, int * = D_TREAT_AS_CLOSED );
-	virtual tType & to_tail ( int = 1, int * = D_TREAT_AS_CLOSED );
-	virtual void exchange ( int, int, int * = D_SEARCH_AFTER_ORDER );
+	virtual bool to_head ( int = 1, int = D_TREAT_AS_CLOSED, tType * * = NULL );
+	virtual bool to_tail ( int = 1, int = D_TREAT_AS_CLOSED, tType * * = NULL );
+	virtual void exchange ( int, int, int = D_SEARCH_AFTER_ORDER );
 	virtual void sort_by_hits ( int = D_ASCENDING );
 	virtual void sort_by_number ( int = D_ASCENDING );
 	virtual void sort_by_contents ( int = D_ASCENDING );
 	/*}*/
 protected:
 	/*{*/
+	virtual bool to_head ( HElement * &, int = 1, int = D_TREAT_AS_CLOSED );
+	virtual bool to_tail ( HElement * &, int = 1, int = D_TREAT_AS_CLOSED );
 	virtual HElement * element_by_index ( int );
 	virtual HElement * element_by_number ( int );
 	int ( HList< tType >::*cmp ) ( HElement *, HElement * );	/* not realy a
@@ -203,7 +197,7 @@ HList < tType >::HElement::HElement ( HElement * a_poElement,
 	f_lHits = 0;
 	M_EPILOG
 	}
-	
+
 template < class tType >
 HList< tType >::HElement::~HElement ( void )
 	{
@@ -223,7 +217,7 @@ void HList< tType >::HElement::put ( tType a_tObject )
 	return;
 	M_EPILOG
 	}
-	
+
 template < class tType >
 tType & HList< tType >::HElement::get ( void )
 	{
@@ -232,7 +226,7 @@ tType & HList< tType >::HElement::get ( void )
 	return ( f_tObject );
 	M_EPILOG
 	}
-	
+
 //============================================================================
 
 template < class tType >
@@ -251,7 +245,7 @@ HList< tType >::HList ( int a_iSize )
 	return ;
 	M_EPILOG
 	}
-	
+
 template < class tType >
 HList< tType >::~HList ( void )
 	{
@@ -260,7 +254,7 @@ HList< tType >::~HList ( void )
 	return ;
 	M_EPILOG
 	}
-	
+
 template < class tType >
 void HList < tType >::flush ( void )
 	{
@@ -280,7 +274,7 @@ void HList < tType >::flush ( void )
 	return ;
 	M_EPILOG
 	}
-	
+
 template < class tType >
 long int HList< tType >::empty ( HElement * a_poElement )
 	{
@@ -291,7 +285,7 @@ long int HList< tType >::empty ( HElement * a_poElement )
 	return ( l_lTemp );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 int HList< tType >::quantity ( void )
 	{
@@ -299,7 +293,7 @@ int HList< tType >::quantity ( void )
 	return ( f_iQuantity );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 int HList< tType >::cmph ( HElement * a_poLeft, HElement * a_poRight )
 	{
@@ -307,7 +301,7 @@ int HList< tType >::cmph ( HElement * a_poLeft, HElement * a_poRight )
 	return ( a_poLeft->f_lHits - a_poRight->f_lHits );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 int HList< tType >::cmpn ( HElement * a_poLeft, HElement * a_poRight )	
 	{
@@ -329,7 +323,7 @@ int HList< tType >::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 	return ( compare_contents ( a_poLeft->f_tObject, a_poRight->f_tObject ) );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 tType & HList< tType >::add_element ( tType * a_ptObject )
 	{
@@ -361,7 +355,7 @@ tType & HList< tType >::add_head ( tType * a_ptObject )
 	return ( f_poHook->f_tObject );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 tType & HList< tType >::add_tail ( tType * a_ptObject )
 	{
@@ -444,28 +438,13 @@ tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 	}
 
 template < class tType >
-tType * HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat )
+int HList< tType >::remove_at ( int a_iIndex, int a_iFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
-	/* This one cant be initialised cause we don't know what it is,
-	 * or the other approach is to force all inheritances to be able to
-	 * cast from ( long int ).
-	 * Why do we need this at all?
-	 * We want remove_* functions to return removed element object at the same
-	 * time as error code, hmm we could do this by reference rather then
-	 * with simple return value in which case library user does know if
-	 * there was really error or Object was really -1 :(
-	 * So thats it, I ( Amok ) decided that remove_* functions will return
-	 * error code by reference. */
-	int l_iFlag, * l_piFlag = & l_iFlag;
-	int l_iTreat, * l_piTreat = & l_iTreat;
-	tType * l_ptObject = NULL;
+	int l_iFlag = 0, l_iTreat = 0, l_iError = 0;
 	HElement * l_poElement = NULL;
-	/* watch out, this is sticky ! */
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )l_piFlag = a_piFlag;
-	else * l_piFlag = ( int ) a_piFlag;
-	if ( ( unsigned int ) a_piTreat > D_DEFINE_LIMIT )l_piTreat = a_piTreat;
-	else * l_piTreat = ( int ) a_piTreat;
+	l_iFlag = a_iFlag & ( D_BLOCK_IF_NOT_EMPTIED | D_EMPTY_IF_NOT_EMPTIED | D_FORCE_REMOVE_ELEMENT );
+	l_iTreat = a_iFlag & ( D_TREAT_AS_CLOSED | D_TREAT_AS_OPENED );
 	l_poElement = f_poHook;
 	if ( f_iQuantity > 0 )
 		{
@@ -475,31 +454,31 @@ tType * HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTrea
 			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADINDEX ], a_iIndex );
 			}
 		l_poElement = element_by_index ( a_iIndex );
+		if ( a_pptObject )
+			( * a_pptObject ) = & l_poElement->f_tObject;
 		if ( l_poElement->f_lHits )
 			{
-			switch ( * l_piFlag )
+			switch ( l_iFlag )
 				{
-				case ( D_NP_BLOCK_IF_NOT_EMPTIED ):
+				case ( D_BLOCK_IF_NOT_EMPTIED ):
 					{
-					* l_piFlag = D_ERROR;
-					return ( & l_poElement->f_tObject );
+					return ( D_ERROR );
 					break;
 					}
-				case ( D_NP_EMPTY_IF_NOT_EMPTIED ):
+				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					{
-					* l_piFlag = D_WAS_EMPTIED;
+					l_iError = D_WAS_EMPTIED;
 					empty ( l_poElement );
 					break;
 					}
-				case ( D_NP_FORCE_REMOVE_ELEMENT ):
+				case ( D_FORCE_REMOVE_ELEMENT ):
 					{
-					l_ptObject = & l_poElement->f_tObject;
-					* l_piFlag = D_WAS_NOT_EMPTIED;
+					l_iError = D_WAS_NOT_EMPTIED;
 					break;
 					}
 				default :
 					{
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], l_iFlag );
 					break;
 					}
 				}
@@ -509,7 +488,7 @@ tType * HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTrea
 	if ( l_poElement == f_poHook )f_poHook = f_poHook->f_poNext;
 	if ( l_poElement == f_poSelected )
 		{
-		if ( ( ( * l_piTreat ) == ( ( int ) D_TREAT_AS_OPENED ) )
+		if ( ( l_iTreat == D_TREAT_AS_OPENED )
 				&& ( f_poSelected->f_poNext == f_poHook ) )
 			f_poSelected = f_poSelected->f_poPrevious;
 		else
@@ -525,58 +504,53 @@ tType * HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTrea
 		f_poIndex = NULL;
 		f_iIndex = 0;
 		}
-	return ( l_ptObject );
+	return ( l_iError );
 	M_EPILOG
 	}
 
 template < class tType >
-tType * HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
+int HList< tType >::remove_element ( int a_iFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
-	int l_iFlag, * l_piFlag = & l_iFlag;
-	int l_iTreat, * l_piTreat = & l_iTreat;
-	tType * l_ptObject = NULL;
+	int l_iFlag = 0, l_iTreat = 0, l_iError = 0;
 	HElement * l_poElement = NULL;
-	/* watch out, this is sticky ! */
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )l_piFlag = a_piFlag;
-	else * l_piFlag = ( int ) a_piFlag;
-	if ( ( unsigned int ) a_piTreat > D_DEFINE_LIMIT )l_piTreat = a_piTreat;
-	else * l_piTreat = ( int ) a_piTreat;
+	l_iFlag = a_iFlag & ( D_BLOCK_IF_NOT_EMPTIED | D_EMPTY_IF_NOT_EMPTIED | D_FORCE_REMOVE_ELEMENT );
+	l_iTreat = a_iFlag & ( D_TREAT_AS_CLOSED | D_TREAT_AS_OPENED );
 	l_poElement = f_poSelected;
+	if ( a_pptObject )
+		( * a_pptObject ) = & l_poElement->f_tObject;
 	if ( f_iQuantity > 0 )
 		{
 		if ( l_poElement->f_lHits )
 			{
-			switch ( * l_piFlag )
+			switch ( l_iFlag )
 				{
-				case ( D_NP_BLOCK_IF_NOT_EMPTIED ):
+				case ( D_BLOCK_IF_NOT_EMPTIED ):
 					{
-					* l_piFlag = D_ERROR;
-					return ( & l_poElement->f_tObject );
+					return ( D_ERROR );
 					break;
 					}
-				case ( D_NP_EMPTY_IF_NOT_EMPTIED ):
+				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					{
-					* l_piFlag = D_WAS_EMPTIED;
+					l_iError = D_WAS_EMPTIED;
 					empty ( l_poElement );
 					break;
 					}
-				case ( D_NP_FORCE_REMOVE_ELEMENT ):
+				case ( D_FORCE_REMOVE_ELEMENT ):
 					{
-					l_ptObject = & l_poElement->f_tObject;
-					* l_piFlag = D_WAS_NOT_EMPTIED;
+					l_iError = D_WAS_NOT_EMPTIED;
 					break;
 					}
 				default :
 					{
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], l_iFlag );
 					break;
 					}
 				}
 			}
 		}
 	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
-	if ( ( ( * l_piTreat ) == ( ( int ) D_TREAT_AS_OPENED ) )
+	if ( ( l_iTreat == D_TREAT_AS_OPENED )
 			&& ( f_poSelected->f_poNext == f_poHook ) )
 		f_poSelected = f_poSelected->f_poPrevious;
 	else
@@ -591,49 +565,45 @@ tType * HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
 		}
 	f_iIndex = 0;
 	f_poIndex = NULL;
-	return ( l_ptObject );
+	return ( l_iError );
 	M_EPILOG
 	}
 
 template < class tType >
-tType * HList< tType >::remove_head ( int * a_piFlag )
+int HList< tType >::remove_head ( int a_iFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
-	int l_iFlag, * l_piFlag = & l_iFlag;
-	tType * l_ptObject = NULL;
-	HElement* l_poElement;
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
-		l_piFlag = a_piFlag;							/* watch out ! */
-	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
+	int l_iError = 0;
+	HElement * l_poElement = NULL;
 	l_poElement = f_poHook;
+	if ( a_pptObject )
+		( * a_pptObject ) = & l_poElement->f_tObject;
 	f_poHook = f_poHook->f_poNext;
 	if ( f_iQuantity > 0 )
 		{
 		if ( l_poElement->f_lHits )
 			{
-			switch ( * l_piFlag )
+			switch ( a_iFlag )
 				{
-				case ( D_NP_BLOCK_IF_NOT_EMPTIED ):
+				case ( D_BLOCK_IF_NOT_EMPTIED ):
 					{
-					* l_piFlag = D_ERROR;
-					return ( & l_poElement->f_tObject );
+					return ( D_ERROR );
 					break;
 					}
-				case ( D_NP_EMPTY_IF_NOT_EMPTIED ):
+				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					{
-					* l_piFlag = D_WAS_EMPTIED;
+					l_iError = D_WAS_EMPTIED;
 					empty ( l_poElement );
 					break;
 					}
-				case ( D_NP_FORCE_REMOVE_ELEMENT ):
+				case ( D_FORCE_REMOVE_ELEMENT ):
 					{
-					l_ptObject = & l_poElement->f_tObject;
-					* l_piFlag = D_WAS_NOT_EMPTIED;
+					l_iError = D_WAS_NOT_EMPTIED;
 					break;
 					}
 				default :
 					{
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_iFlag );
 					break;
 					}
 				}
@@ -651,48 +621,44 @@ tType * HList< tType >::remove_head ( int * a_piFlag )
 		f_poIndex = NULL;
 		f_iIndex = 0;
 		}
-	return ( l_ptObject );
+	return ( l_iError );
 	M_EPILOG
 	}
-	
+
 template < class tType >
-tType * HList< tType >::remove_tail ( int * a_piFlag )
+int HList< tType >::remove_tail ( int a_iFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
-	int l_iFlag, * l_piFlag = & l_iFlag;
-	tType * l_ptObject = NULL;
-	HElement* l_poElement;
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
-		l_piFlag = a_piFlag;							/* watch out ! */
-	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
+	int l_iError = 0;
+	HElement * l_poElement = NULL;
 	l_poElement = f_poHook->f_poPrevious;
+	if ( a_pptObject )
+		( * a_pptObject ) = & l_poElement->f_tObject;
 	if ( f_iQuantity > 0 )
 		{
 		if ( l_poElement->f_lHits )
 			{
-			switch ( * l_piFlag )
+			switch ( a_iFlag )
 				{
-				case ( D_NP_BLOCK_IF_NOT_EMPTIED ):
+				case ( D_BLOCK_IF_NOT_EMPTIED ):
 					{
-					* l_piFlag = D_ERROR;
-					return ( & l_poElement->f_tObject );
+					return ( D_ERROR );
 					break;
 					}
-				case ( D_NP_EMPTY_IF_NOT_EMPTIED ):
+				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					{
-					* l_piFlag = D_WAS_EMPTIED;
+					l_iError = D_WAS_EMPTIED;
 					empty ( l_poElement );
 					break;
 					}
-				case ( D_NP_FORCE_REMOVE_ELEMENT ):
+				case ( D_FORCE_REMOVE_ELEMENT ):
 					{
-					l_ptObject = & l_poElement->f_tObject;
-					* l_piFlag = D_WAS_NOT_EMPTIED;
+					l_iError = D_WAS_NOT_EMPTIED;
 					break;
 					}
 				default :
 					{
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_iFlag );
 					break;
 					}
 				}
@@ -714,100 +680,128 @@ tType * HList< tType >::remove_tail ( int * a_piFlag )
 			}
 		}
 	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
-	return ( l_ptObject );
+	return ( l_iError );
 	M_EPILOG
 	}
-	
+
 template < class tType >
-tType & HList< tType >::to_head ( int a_iOffset, int * a_piFlag )
+bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, int a_iFlag )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iFlag = 0, * l_piFlag = & l_iFlag;
-	HElement * l_poElement = NULL;
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
-		l_piFlag = a_piFlag;							/* watch out ! */
-	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
+	bool l_bOk = true;
+	int l_iCtr = 0;
 	if ( ! f_iQuantity )
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	if ( a_iOffset < 1 )
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADOFFSET ], a_iOffset );
-	l_poElement = f_poSelected;
-	switch ( * l_piFlag )
+	switch ( a_iFlag )
 		{
-		case ( D_NP_TREAT_AS_CLOSED ):
+		case ( D_TREAT_AS_CLOSED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
-				f_poSelected = f_poSelected->f_poPrevious;
+				a_rpoElement = a_rpoElement->f_poPrevious;
 			break;
 			}
-		case ( D_NP_TREAT_AS_OPENED ):
+		case ( D_TREAT_AS_OPENED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
 				{
-				if ( f_poSelected == f_poHook )
+				if ( a_rpoElement == f_poHook )
 					{
-					* l_piFlag = D_FINAL_REACHED;
+					l_bOk = false;
 					break;
 					}
-				f_poSelected = f_poSelected->f_poPrevious;
+				a_rpoElement = a_rpoElement->f_poPrevious;
 				}
 			break;
 			}
 		default :
 			{
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_iFlag );
 			break;
 			}
 		}
-	return ( l_poElement->get ( ) );
+	return ( l_bOk );
 	M_EPILOG
 	}
-	
+
 template < class tType >
-tType & HList< tType >::to_tail ( int a_iOffset, int * a_piFlag )
+bool HList< tType >::to_head ( int a_iOffset, int a_iFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iFlag = 0, * l_piFlag = & l_iFlag;
-	HElement * l_poElement = NULL;
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
-		l_piFlag = a_piFlag;							/* watch out ! */
-	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
-	if ( !f_iQuantity )
+	bool l_bOk = false;
+	tType * l_ptObject = NULL;
+	if ( a_pptObject )
+		l_ptObject = & f_poSelected->get ( );
+	if ( a_iOffset < 0 )
+		l_bOk = to_tail ( f_poSelected, - a_iOffset, a_iFlag );
+	else
+		l_bOk = to_head ( f_poSelected, a_iOffset, a_iFlag );
+	if ( l_bOk && a_pptObject )
+		( * a_pptObject ) = l_ptObject;
+	return ( l_bOk );
+	M_EPILOG
+	}
+
+template < class tType >
+bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, int a_iFlag )
+	{
+	M_PROLOG
+	bool l_bOK = true;
+	int l_iCtr = 0;
+	if ( ! f_iQuantity )
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	if ( a_iOffset < 1 )
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADOFFSET ], a_iOffset );
-	l_poElement = f_poSelected;
-	switch ( * l_piFlag )
+	switch ( a_iFlag )
 		{
-		case ( D_NP_TREAT_AS_CLOSED ):
+		case ( D_TREAT_AS_CLOSED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
-				f_poSelected = f_poSelected->f_poNext;
+				a_rpoElement = a_rpoElement->f_poNext;
 			break;
 			}
-		case ( D_NP_TREAT_AS_OPENED ):
+		case ( D_TREAT_AS_OPENED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
 				{
-				if ( f_poSelected->f_poNext == f_poHook )
+				if ( a_rpoElement->f_poNext == f_poHook )
 					{
-					* l_piFlag = D_FINAL_REACHED;
+					l_bOK = false;
 					break;
 					}
-				f_poSelected = f_poSelected->f_poNext;
+				a_rpoElement = a_rpoElement->f_poNext;
 				}
 			break;
 			}
 		default :
 			{
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_iFlag );
 			break;
 			}
 		}
-	return ( l_poElement->get ( ) );
+	return ( l_bOK );
 	M_EPILOG
 	}
-	
+
+template < class tType >
+bool HList< tType >::to_tail ( int a_iOffset, int a_iFlag, tType * * a_pptObject )
+	{
+	M_PROLOG
+	bool l_bOk = false;
+	tType * l_ptObject = NULL;
+	if ( a_pptObject )
+		l_ptObject = & f_poSelected->get ( );
+	if ( a_iOffset < 0 )
+		l_bOk = to_head ( f_poSelected, - a_iOffset, a_iFlag );
+	else
+		l_bOk = to_tail ( f_poSelected, a_iOffset, a_iFlag );
+	if ( l_bOk && a_pptObject )
+		( * a_pptObject ) = l_ptObject;
+	return ( l_bOk );
+	M_EPILOG
+	}
+
 template < class tType >
 tType & HList< tType >::operator [ ] ( int a_iIndex )
 	{
@@ -815,7 +809,7 @@ tType & HList< tType >::operator [ ] ( int a_iIndex )
 	return ( element_by_index ( a_iIndex )->get ( ) );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 typename HList< tType >::HElement * HList < tType >::element_by_index ( int a_iIndex )
 	{
@@ -887,38 +881,36 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 	return ( NULL );
 	M_EPILOG
 	}
-	
+
 template < class tType >
-tType & HList< tType >::go ( int a_iNumber, int * a_piFlag )
+int HList< tType >::go ( int a_iNumber, tType * * a_pptObject, int a_iFlag )
 	{
 	M_PROLOG
 	/* Here we have another function with error code returned by reference */
-	int l_iFlag, * l_piFlag = & l_iFlag;
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
-		l_piFlag = a_piFlag;							/* watch out ! */
-	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
-	switch ( * l_piFlag )
+	switch ( a_iFlag )
 		{
-		case ( D_NP_SEARCH_AFTER_NUMBER ):
+		case ( D_SEARCH_AFTER_NUMBER ):
 			{
 			f_poSelected = element_by_number ( a_iNumber );
 			break;
 			}
-		case ( D_NP_SEARCH_AFTER_ORDER ):
+		case ( D_SEARCH_AFTER_ORDER ):
 			{
 			f_poSelected = element_by_index ( a_iNumber );
 			break;
 			}
 		default :
 			{
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_iFlag );
 			break;
 			}
 		}
-	return ( f_poSelected->get ( ) );
+	if ( a_pptObject )
+		( * a_pptObject ) = & f_poSelected->get ( );
+	return ( 0 );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 void HList< tType >::exchange ( HElement * a_poLeft, HElement * a_poRight )
 	{
@@ -952,22 +944,18 @@ void HList< tType >::exchange ( HElement * a_poLeft, HElement * a_poRight )
 	return;
 	M_EPILOG
 	}
-	
+
 template < class tType >
-void HList< tType >::exchange ( int a_iLeft, int a_iRight, int * a_piFlag )
+void HList< tType >::exchange ( int a_iLeft, int a_iRight, int a_iFlag )
 	{
 	M_PROLOG
-	int l_iFlag, * l_piFlag = & l_iFlag;
 	int l_iCtr = 0;
 	int l_iOther = 0;
-	HElement * l_poLeft, * l_poRight;
+	HElement * l_poLeft = NULL, * l_poRight = NULL;
 	if ( a_iLeft == a_iRight )return;
-	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
-		l_piFlag = a_piFlag;							/* watch out ! */
-	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
-	switch ( * l_piFlag )
+	switch ( a_iFlag )
 		{
-		case ( D_NP_SEARCH_AFTER_NUMBER ):
+		case ( D_SEARCH_AFTER_NUMBER ):
 			{
 			l_poLeft = f_poHook;
 			for ( l_iCtr = 0; l_iCtr < f_iQuantity; l_iCtr++ )
@@ -993,7 +981,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int * a_piFlag )
 				}
 			break;
 			}
-		case ( D_NP_SEARCH_AFTER_ORDER ):
+		case ( D_SEARCH_AFTER_ORDER ):
 			{
 			l_poLeft = element_by_index ( a_iLeft );
 			l_poRight = element_by_index ( a_iRight );
@@ -1001,7 +989,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int * a_piFlag )
 			}
 		default :
 			{
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_iFlag );
 			break;
 			}
 		}
@@ -1009,7 +997,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int * a_piFlag )
 	return;
 	M_EPILOG
 	}
-	
+
 template < class tType >
 tType & HList< tType >::present ( void )
 	{
@@ -1019,7 +1007,7 @@ tType & HList< tType >::present ( void )
 	return ( f_poSelected->get ( ) );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 tType & HList< tType >::head ( void )
 	{
@@ -1029,7 +1017,7 @@ tType & HList< tType >::head ( void )
 	return ( f_poHook->get ( ) );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 tType & HList< tType >::tail ( void )
 	{
@@ -1039,7 +1027,7 @@ tType & HList< tType >::tail ( void )
 	return ( f_poHook->f_poPrevious->get ( ) );
 	M_EPILOG
 	}
-	
+
 template < class tType >
 void HList< tType >::sort ( void )
 	{
@@ -1088,7 +1076,7 @@ void HList< tType >::sort ( void )
 	return;
 	M_EPILOG
 	}
-	
+
 template < class tType >
 void HList< tType >::sub_swap ( HElement * a_poLeft, HElement * a_poCenter,
 		HElement * a_poRight )
@@ -1120,7 +1108,7 @@ void HList< tType >::sub_swap ( HElement * a_poLeft, HElement * a_poCenter,
 	return;
 	M_EPILOG
 	}
-	
+
 template < class tType >
 void HList< tType >::sort_by_hits ( int a_iOrder )
 	{
@@ -1131,7 +1119,7 @@ void HList< tType >::sort_by_hits ( int a_iOrder )
 	return ;
 	M_EPILOG
 	}
-	
+
 template < class tType >
 void HList < tType >:: sort_by_number ( int a_iOrder )
 	{
@@ -1158,14 +1146,8 @@ void HList < tType >:: sort_by_contents ( int a_iOrder )
 
 /*
 #ifdef __DEBUG__
-	/ * log from HLog conflicts with log from math.h in analyser.c:) *
-#ifndef _MATH_H
 #include <hlog.h>
-#endif / * not _MATH_H * /
 #endif / * __DEBUG__ * /
-
-	/ * log from HLog conflicts with log from math.h in analyser.c:) * /
-#ifndef _MATH_H
 	M_LOG ( "one" );
-#endif / * not _MATH_H * /
 */
+
