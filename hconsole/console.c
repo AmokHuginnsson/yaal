@@ -249,6 +249,8 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	int l_iOrigRow = 0;
 	int l_iOrigColumn = 0;
 	int l_iOrigAttribute = 0;
+	if ( ! n_bEnabled )
+		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
 	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	l_iOrigAttribute = get_attr ( );
 #ifdef __DEBUG__
