@@ -118,14 +118,14 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 				l_oMessage.format ( "Error: unknown option found: `%s', "
 						"with value: `%s', on line %d.\n",
 						( const char * ) l_oOption, ( const char * ) l_oValue, l_iLine );
-				::log << l_oMessage;
+				::log ( D_LOG_ERROR ) << l_oMessage;
 				fprintf ( stderr, l_oMessage );
 				}
 			}
 		}
 	if ( l_psRc )rc_close ( l_psRc );
 	l_psRc = NULL;
-	log << "done." << endl;
+	::log << "done." << endl;
 	return ( 0 );
 	}
 
