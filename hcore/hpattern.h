@@ -30,7 +30,8 @@ Copyright:
 #include <sys/types.h>	/* why? - because POSIX says so :/ */
 #include <regex.h>			/* this one is obvious */
 
-class HString;
+#include "harray.h"
+#include "hstring.h"
 
 class HPattern
 	{
@@ -39,7 +40,8 @@ protected:
 	bool		f_bInitialized;				/* is pattern initialized */
 	bool		f_bIgnoreCaseDefault;	/* default value for ignore case switch */
 	bool		f_bIgnoreCase;				/* self explanary */
-	bool		f_bExtended;					/* basic RE or extended RE */
+	bool		f_bExtended;					/* simple strstr or extended RE */
+	int			f_iSimpleMatchLength;	/* length of simple strstr pattern */
 	regex_t	f_sCompiled;					/* compiled regular expression for
 																	 search patterns */
 	HString	f_oPatternInput;			/* current search pattern */
@@ -54,9 +56,11 @@ public:
 							 unsigned short int * = NULL /* additional flags to parse */,
 							 int = 0 /* number of additional flags */ );
 	const char * error ( void );
+	char * matches ( const char *, int & );
 	/*}*/
 protected:
 	/*{*/
+	bool set_switch ( char, unsigned short int *, int );
 	/*}*/
 	};
 

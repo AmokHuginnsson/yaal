@@ -69,6 +69,7 @@ protected:
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
 	bool				f_bSearchable;				/* are items searchable */
+	bool				f_bSearchActived;			/* should we highlight last search */
 	bool				f_bFiltered;					/* is content of list filtered
 																			 thru pattern */
 	bool				f_bDrawHeader;				/* should be header driven */
@@ -127,6 +128,7 @@ protected:
 	int cmpc ( HElement *, HElement * );
 	void sort_by_contents ( int, int = D_ASCENDING );
 	void recalculate_column_widths ( void );
+	void highlight ( int, int );
 	/*}*/
 	};
 

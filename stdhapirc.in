@@ -105,7 +105,7 @@ command_compose_delay 16
 
 ## colors BEGIN
 
-# disabled_attribute, enabled_attribute, focused_attribute
+# attribute_disabled, attribute_enabled, attribute_focused
 # type: special(multi-value), default: (look below)
 # color option syntax is:
 # option foreground-label background-label foreground-data background-data
@@ -116,16 +116,17 @@ command_compose_delay 16
 # colors common to all windows and controls
 
 # color attributes for disabled control
-disabled_attribute GREEN GRAY LIGHTGRAY GRAY
+attribute_disabled GREEN GRAY LIGHTGRAY GRAY
 
 # color attributes for enabled control
-enabled_attribute BRIGHTGREEN GRAY WHITE GRAY
+attribute_enabled BRIGHTGREEN GRAY WHITE GRAY
 
 # color attributes for focused control
-focused_attribute BRIGHTGREEN GRAY BLACK LIGHTGRAY
+attribute_focused BRIGHTGREEN GRAY BLACK LIGHTGRAY
 
 # special colors
-statusbar_attribute WHITE BLACK LIGHTGRAY BLACK
+attribute_statusbar WHITE BLACK LIGHTGRAY BLACK
+attribute_search_highlight BLACK YELLOW BLACK BROWN
 
 ## colors END
 ### console END

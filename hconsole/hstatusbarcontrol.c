@@ -51,7 +51,7 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 	int l_iAttribte = 0;
 	if ( a_iStatusBarAttribute > 0 )
 		f_iStatusBarAttribute = a_iStatusBarAttribute;
-	else f_iStatusBarAttribute = console::n_iStatusBarAttribute;
+	else f_iStatusBarAttribute = console::n_iAttributeStatusBar;
 	l_iAttribte = f_iStatusBarAttribute;
 	l_iAttribte &= 0x00ff;
 	f_iMode = D_PROMPT_MODE_NORMAL;

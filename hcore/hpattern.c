@@ -24,11 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <string.h>
+
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
-#include "hstring.h"
 #include "hpattern.h"
-#include "harray.h"
 
 HPattern::HPattern ( bool a_bIgnoreCase )
 	{
@@ -53,89 +53,68 @@ bool HPattern::parse ( const char * a_pcPattern,
 	M_PROLOG
 	bool l_bError = false;
 	bool l_bLocalCopyIgnoreCase = false, l_bLocalCopyExtended = false;
-	HArray < unsigned short int > l_oLocalCopyFlags ( a_iFlagsCount );
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iBegin = 0, l_iEnd = 0;
+	HArray < unsigned short int > l_oLocalCopyFlags ( a_iFlagsCount );
 	char * l_pcPattern = f_oPatternInput = a_pcPattern;
+	f_oError = "";
+/* making copy of flags */
 	l_bLocalCopyIgnoreCase = f_bIgnoreCase;
 	l_bLocalCopyExtended = f_bExtended;
-	for ( l_iCtr = 0; l_iCtr < a_iFlagsCount; l_iCtr ++ )
-		l_oLocalCopyFlags [ l_iCtr ] = a_puhFlags [ l_iCtr ];
+	for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
+		l_oLocalCopyFlags [ l_iCtrLoc ] = a_puhFlags [ l_iCtrLoc ];
+/* end of copy */
+/* clear all flags */
 	f_bIgnoreCase = f_bIgnoreCaseDefault;
 	f_bExtended = false;
-	for ( l_iCtr = 0; l_iCtr < a_iFlagsCount; l_iCtr ++ )
-		a_puhFlags [ l_iCtr ] &= 0x00ff; /* clear all external flags */
+	for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
+		a_puhFlags [ l_iCtrLoc ] &= 0x00ff;
+/* end of clearing */
+/* look for switches at the beginnig of pattern */
+	l_iCtr = 0;
 	while ( l_pcPattern [ l_iCtr ] == '\\' )
 		{
-		switch ( l_pcPattern [ ++ l_iCtr ] )
+		if ( set_switch ( l_pcPattern [ ++ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
 			{
-			case ( 'i' ):{f_bIgnoreCase = ! f_bIgnoreCase;break;}
-			case ( 'e' ):{f_bExtended = true;break;}
-			case ( 'c' ):{f_bIgnoreCase = true;break;}
-			case ( 'C' ):{f_bIgnoreCase = false;break;}
-			default :
-				{
-				for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
-					if ( l_pcPattern [ l_iCtr ] == ( a_puhFlags [ l_iCtrLoc ] & 0x00ff ) )
-						{
-						a_puhFlags [ l_iCtrLoc ] |= 0x0100;
-						break;
-						}
-				if ( l_iCtrLoc >= a_iFlagsCount )
-					{
-					f_bIgnoreCase = l_bLocalCopyIgnoreCase;
-					f_bExtended = l_bLocalCopyExtended;
-					for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
-						a_puhFlags [ l_iCtrLoc ] = l_oLocalCopyFlags [ l_iCtrLoc ];
-					l_bError = true;
-					f_oError.format ( "bad search option '%c'",
-							l_pcPattern [ l_iCtr ] );
-					return ( l_bError );
-					}
-				break;
-				}
+			f_bIgnoreCase = l_bLocalCopyIgnoreCase;
+			f_bExtended = l_bLocalCopyExtended;
+			for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
+				a_puhFlags [ l_iCtrLoc ] = l_oLocalCopyFlags [ l_iCtrLoc ];
+			l_bError = true;
+			f_oError.format ( "bad search option '%c'", l_pcPattern [ l_iCtr ] );
+			return ( l_bError );
 			}
 		l_iCtr ++;
 		}
 	if ( l_pcPattern [ l_iCtr ] == '/' )l_iCtr ++;
 	l_iBegin = l_iCtr;
-	l_iEnd = l_iCtr = f_oPatternInput.get_length ( ) - 1;
+/* end of looking at begin */
+/* making copy of flags */
 	l_bLocalCopyIgnoreCase = f_bIgnoreCase;
 	l_bLocalCopyExtended = f_bExtended;
-	for ( l_iCtr = 0; l_iCtr < a_iFlagsCount; l_iCtr ++ )
-		l_oLocalCopyFlags [ l_iCtr ] = a_puhFlags [ l_iCtr ];
+	for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
+		l_oLocalCopyFlags [ l_iCtrLoc ] = a_puhFlags [ l_iCtrLoc ];
+/* end of copy */
+/* look for switches at the end of pattern */
+	l_iEnd = l_iCtr = f_oPatternInput.get_length ( ) - 1;
+	if ( l_iEnd < 0 )return ( true );
 	while ( ( l_iCtr > 0 ) && ( l_pcPattern [ l_iCtr ] != '/' ) )
 		{
-		switch ( l_pcPattern [ l_iCtr ] )
+		if ( set_switch ( l_pcPattern [ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
 			{
-			case ( 'i' ):{f_bIgnoreCase = ! f_bIgnoreCase;break;}
-			case ( 'e' ):{f_bExtended = true;break;}
-			case ( 'c' ):{f_bIgnoreCase = true;break;}
-			case ( 'C' ):{f_bIgnoreCase = false;break;}
-			default :
-				{
-				for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
-					if ( l_pcPattern [ l_iCtr ] == ( a_puhFlags [ l_iCtrLoc ] & 0x00ff ) )
-						{
-						a_puhFlags [ l_iCtrLoc ] |= 0x0100;
-						break;
-						}
-				if ( l_iCtrLoc >= a_iFlagsCount )
-					{
-					f_bIgnoreCase = l_bLocalCopyIgnoreCase;
-					f_bExtended = l_bLocalCopyExtended;
-					for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
-						a_puhFlags [ l_iCtrLoc ] = l_oLocalCopyFlags [ l_iCtrLoc ];
-					l_iCtr = 1;
-					}
-				break;
-				}
+			f_bIgnoreCase = l_bLocalCopyIgnoreCase;
+			f_bExtended = l_bLocalCopyExtended;
+			for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
+				a_puhFlags [ l_iCtrLoc ] = l_oLocalCopyFlags [ l_iCtrLoc ];
+			l_iCtr = 1;
 			}
 		l_iCtr --;
 		}
 	if ( l_iCtr )l_iEnd = l_iCtr - 1;
+/* end of looking at end */
 	f_oPatternReal = f_oPatternInput.mid ( l_iBegin,
 			l_iEnd - l_iBegin + 1 );
-
+	f_iSimpleMatchLength = f_oPatternReal.get_length ( );
+	if ( ! f_iSimpleMatchLength )l_bError = true;
 	f_bInitialized = ! l_bError;
 	return ( l_bError );
 	M_EPILOG
@@ -144,5 +123,55 @@ bool HPattern::parse ( const char * a_pcPattern,
 const char * HPattern::error ( void )
 	{
 	return ( f_oError );
+	}
+
+bool HPattern::set_switch ( char a_cSwitch, unsigned short int * a_puhFlags,
+		int a_iFlagsCount )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	switch ( a_cSwitch )
+		{
+		case ( 'i' ):{f_bIgnoreCase = ! f_bIgnoreCase;break;}
+		case ( 'e' ):{f_bExtended = true;break;}
+		case ( 'c' ):{f_bIgnoreCase = true;break;}
+		case ( 'C' ):{f_bIgnoreCase = false;break;}
+		default :
+			{
+			for ( l_iCtr = 0; l_iCtr < a_iFlagsCount; l_iCtr ++ )
+				if ( a_cSwitch == ( a_puhFlags [ l_iCtr ] & 0x00ff ) )
+					{
+					a_puhFlags [ l_iCtr ] |= 0x0100;
+					break;
+					}
+			if ( l_iCtr >= a_iFlagsCount )
+				return ( true );
+			break;
+			}
+		}
+	return ( false );
+	M_EPILOG
+	}
+
+char * HPattern::matches ( const char * a_pcString, int & a_riMatchLength )
+	{
+	M_PROLOG
+	char * l_pcPtr = NULL;
+	if ( f_iSimpleMatchLength )
+		{
+		if ( f_bExtended )
+			{
+		
+			}
+		else
+			{
+			if ( f_bIgnoreCase )
+				l_pcPtr = strcasestr ( a_pcString, f_oPatternReal );
+			else l_pcPtr = strstr ( a_pcString, f_oPatternReal );
+			if ( l_pcPtr )a_riMatchLength = f_iSimpleMatchLength;
+			}
+		}
+	return ( l_pcPtr );
+	M_EPILOG
 	}
 

@@ -31,10 +31,11 @@ namespace console
 	{
 
 extern int	n_iLatency;
-extern int	n_iDisabledAttribute;
-extern int	n_iEnabledAttribute;
-extern int	n_iFocusedAttribute;
-extern int	n_iStatusBarAttribute;
+extern int	n_iAttributeDisabled;
+extern int	n_iAttributeEnabled;
+extern int	n_iAttributeFocused;
+extern int	n_iAttributeStatusBar;
+extern int	n_iAttributeSearchHighlight;
 extern bool	n_bUseMouse;
 extern bool	n_bDisableXON;
 extern bool	n_bLeaveCtrlC;

@@ -48,14 +48,16 @@ namespace console
 {
 
 int n_iLatency = 1;
-int n_iDisabledAttribute = ( D_FG_GREEN | D_BG_BLACK | D_BG_BLINK ) << 8
+int n_iAttributeDisabled = ( D_FG_GREEN | D_BG_BLACK | D_BG_BLINK ) << 8
 															| ( D_FG_LIGHTGRAY | D_BG_BLACK | D_BG_BLINK );
-int n_iEnabledAttribute = ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK ) << 8
+int n_iAttributeEnabled = ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK ) << 8
 															| ( D_FG_WHITE | D_BG_BLACK | D_BG_BLINK );
-int n_iFocusedAttribute = ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK ) << 8
+int n_iAttributeFocused = ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK ) << 8
 															| ( D_FG_BLACK | D_BG_LIGHTGRAY ); 
-int n_iStatusBarAttribute = ( D_FG_WHITE | D_BG_BLACK ) << 8
+int n_iAttributeStatusBar = ( D_FG_WHITE | D_BG_BLACK ) << 8
 															| ( D_FG_LIGHTGRAY | D_BG_BLACK );
+int n_iAttributeSearchHighlight = ( D_FG_BLACK | D_BG_BROWN | D_BG_BLINK ) << 8
+																		| ( D_FG_BLACK | D_BG_BROWN );
 bool	n_bUseMouse = false;
 bool	n_bDisableXON = false;
 bool	n_bLeaveCtrlC = false;
@@ -135,14 +137,16 @@ void set_color ( HString & a_roValue, int & a_riAttribute )
 bool set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )set_env ( a_roValue );
-	else if ( ! strcasecmp ( a_roOption, "disabled_attribute" ) )
-		set_color ( a_roValue, console::n_iDisabledAttribute );
-	else if ( ! strcasecmp ( a_roOption, "enabled_attribute" ) )
-		set_color ( a_roValue, console::n_iEnabledAttribute );
-	else if ( ! strcasecmp ( a_roOption, "focused_attribute" ) )
-		set_color ( a_roValue, console::n_iFocusedAttribute );
-	else if ( ! strcasecmp ( a_roOption, "statusbar_attribute" ) )
-		set_color ( a_roValue, console::n_iStatusBarAttribute );
+	else if ( ! strcasecmp ( a_roOption, "attribute_disabled" ) )
+		set_color ( a_roValue, console::n_iAttributeDisabled );
+	else if ( ! strcasecmp ( a_roOption, "attribute_enabled" ) )
+		set_color ( a_roValue, console::n_iAttributeEnabled );
+	else if ( ! strcasecmp ( a_roOption, "attribute_focused" ) )
+		set_color ( a_roValue, console::n_iAttributeFocused );
+	else if ( ! strcasecmp ( a_roOption, "attribute_statusbar" ) )
+		set_color ( a_roValue, console::n_iAttributeStatusBar );
+	else if ( ! strcasecmp ( a_roOption, "attribute_search_highlight" ) )
+		set_color ( a_roValue, console::n_iAttributeSearchHighlight );
 	else return ( true );
 	return ( false );
 	}

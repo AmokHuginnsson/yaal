@@ -39,8 +39,9 @@ Copyright:
 
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
-#include "hlog.h"
+#include "../hcore/hlog.h"
 #include "hlistcontrol.h"
+#include "hconsole.h"
 
 HListControl::HColumnInfo::HColumnInfo ( void )
 	{
@@ -108,6 +109,7 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	M_PROLOG
 	f_bEditable = false;
 	f_bFiltered = false;
+	f_bSearchActived = false;
 	f_bSearchable = a_bSearchable;
 	f_bCheckable = a_bCheckable;
 	f_bSortable = a_bSortable;
@@ -264,6 +266,9 @@ void HListControl::refresh ( void )
 						}
 					::mvprintw ( f_iRowRaw + l_iCtr + l_iHR,
 							f_iColumnRaw + l_iColumnOffset, f_oVarTmpBuffer	);
+					if ( f_bSearchActived )
+						highlight ( f_iRowRaw + l_iCtr + l_iHR,
+								f_iColumnRaw + l_iColumnOffset );
 					l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
 					}
 				if ( l_iCtr == f_iCursorPosition )
@@ -764,12 +769,37 @@ void HListControl::search ( const HString & a_oPattern )
 	{
 	M_PROLOG
 	unsigned short int l_hFlag = 'f';
-	if ( f_oPattern.parse ( a_oPattern, & l_hFlag, 1 ) )
-		{
+	f_bSearchActived = ! f_oPattern.parse ( a_oPattern, & l_hFlag, 1 );
+	if ( ! f_bSearchActived )
 		f_poParent->status_bar ( )->message ( f_oPattern.error ( ) );
-		return;
+	else f_bFiltered = ( l_hFlag & 0xff00 ) ? true : false;
+	refresh ( );
+	return;
+	M_EPILOG
+	}
+
+void HListControl::highlight ( int a_iRow, int a_iColumn )
+	{
+	M_PROLOG
+	int l_iHighlightLength = 0;
+	char * l_pcHighlightStart = NULL;
+	char l_cStopChar = 0;
+	l_pcHighlightStart = f_oVarTmpBuffer;
+	while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
+			l_iHighlightLength ) ) )
+		{
+		if ( f_bFocused )
+			console::set_attr ( console::n_iAttributeSearchHighlight >> 8 );
+		else
+			console::set_attr ( console::n_iAttributeSearchHighlight );
+		l_cStopChar = l_pcHighlightStart [ l_iHighlightLength ];
+		l_pcHighlightStart [ l_iHighlightLength ] = 0;
+		::mvprintw ( a_iRow, a_iColumn
+				+ ( l_pcHighlightStart - ( char * ) f_oVarTmpBuffer ),
+				l_pcHighlightStart );
+		l_pcHighlightStart [ l_iHighlightLength ] = l_cStopChar;
+		l_pcHighlightStart ++;
 		}
-	f_bFiltered = ( l_hFlag & 0xff00 ) ? true : false;
 	return;
 	M_EPILOG
 	}

@@ -67,11 +67,11 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iHeightRaw = 0;
 	f_iWidthRaw = 0;
 	if ( a_iDisabledAttribute > 0 )f_iDisabledAttribute = a_iDisabledAttribute;
-	else f_iDisabledAttribute = console::n_iDisabledAttribute;
+	else f_iDisabledAttribute = console::n_iAttributeDisabled;
 	if ( a_iEnabledAttribute > 0 )f_iEnabledAttribute = a_iEnabledAttribute;
-	else f_iEnabledAttribute = console::n_iEnabledAttribute;
+	else f_iEnabledAttribute = console::n_iAttributeEnabled;
 	if ( a_iFocusedAttribute > 0 )f_iFocusedAttribute = a_iFocusedAttribute;
-	else f_iFocusedAttribute = console::n_iFocusedAttribute;
+	else f_iFocusedAttribute = console::n_iAttributeFocused;
 	f_oLabel = a_pcLabel;
 	f_iShortcutIndex = f_oLabel.find ( '&' );
 	if ( f_iShortcutIndex > -1 )
