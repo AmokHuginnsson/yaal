@@ -28,8 +28,6 @@ Copyright:
 #include "hdatalistcontrol.h"
 #include "hdatatreecontrol.h"
 
-#include "../hcore/hlog.h"
-
 #include "../hcore/hexception.h"
 
 HDataWindow::HDataWindow ( const char * a_pcTitle, HDataBase * a_poDataBase,
@@ -93,11 +91,9 @@ int HDataWindow::init ( void )
 	l_sAttributes.f_iDisabledAttribute = -1;
 	l_sAttributes.f_iEnabledAttribute = -1;
 	l_sAttributes.f_iFocusedAttribute = -1;
-	::log << "before init" << endl;
 	HWindow::init ( );
 	while ( f_psResourcesArray [ l_iCtr ].f_pcLabel )
 		{
-		::log << "res:" << f_psResourcesArray [ l_iCtr ].f_pcLabel << endl;
 		if ( f_psResourcesArray [ l_iCtr ].f_psAttributes )
 			l_psAttr = f_psResourcesArray [ l_iCtr ].f_psAttributes;
 		switch ( f_psResourcesArray [ l_iCtr ].f_iType )
@@ -113,13 +109,11 @@ int HDataWindow::init ( void )
 				l_sEditControlResource.f_iMaxHistoryLevel = 8;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psECR = ( OEditControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
-				::log << "before HEditControl" << endl;
 				l_poDataControl = ( HDataControl * ) new HEditControl ( ( HWindow * ) this,
 						M_SETUP_STANDART, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
 						l_psECR->f_pcMask, l_psECR->f_bReplace, l_psECR->f_bMultiLine,
 						l_psECR->f_bPassword, l_psECR->f_iMaxHistoryLevel,
 						M_SETUP_ATTRIBUTES );
-				::log << "after HEditControl" << endl;
 				break;
 				}
 			case ( D_CONTROL_LIST ):
@@ -162,9 +156,7 @@ int HDataWindow::init ( void )
 				}
 			case ( D_CONTROL_DATA ):
 				{
-				::log << "before link" << endl;
 				link ( l_iCtr, l_poDataControl );
-				::log << "before add_tail" << endl;
 				f_oEditModeControls.add_tail ( l_poDataControl );
 				break;
 				}
@@ -208,7 +200,8 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 		{
 		l_poPDC = ( HDataListControl * ) f_psResourcesArray [ l_iParent ].f_poDataControl;
 		if ( ! l_poPDC )
-			throw new HException ( __WHERE__, "wrong control resource order", l_iParent );
+			throw new HException ( __WHERE__, "wrong control resource order",
+					l_iParent );
 		if ( f_psResourcesArray [ a_iChild ].f_psColumnInfo )
 			l_psCI = f_psResourcesArray [ a_iChild ].f_psColumnInfo;
 		l_poPDC->add_column ( M_SETUP_COLUMN, a_poDataControl );
