@@ -159,12 +159,12 @@ int HWindow::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
 			l_poHandler = & f_oPreprocessHandlers.to_tail ( 1, & l_iFlag );
 			if ( ( * l_poHandler ) == HANDLER )
 				{
-				( * l_poHandler ).add ( a_iCodeCount, a_piCodes );
+				l_poHandler->add ( a_iCodeCount, a_piCodes );
 				return ( 0 );
 				}
 			}
 		}
-	f_oPreprocessHandlers.add_tail ( l_oNewHandler );
+	f_oPreprocessHandlers.add_tail ( & l_oNewHandler );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -184,12 +184,12 @@ int HWindow::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
 			l_poHandler = & f_oPostprocessHandlers.to_tail ( 1, & l_iFlag );
 			if ( ( * l_poHandler ) == HANDLER )
 				{
-				( * l_poHandler ).add ( a_iCodeCount, a_piCodes );
+				l_poHandler->add ( a_iCodeCount, a_piCodes );
 				return ( 0 );
 				}
 			}
 		}
-	f_oPostprocessHandlers.add_tail ( l_oNewHandler );
+	f_oPostprocessHandlers.add_tail ( & l_oNewHandler );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -210,7 +210,7 @@ int HWindow::add_control ( HControl * a_poControl, int a_iShortCut )
 			}
 		while ( l_iFlag == ( int ) D_TREAT_AS_OPENED );
 		} /* if ( f_oPreprocessHandlers.quantity ( ) ) */
-	f_oControls.add_tail ( a_poControl );
+	f_oControls.add_tail ( & a_poControl );
 	register_postprocess_handler ( a_iShortCut, NULL, & HWindow::handler_jump_direct );
 	f_poFocusedChild = f_oControls.go ( 0 );
 	return ( 0 );

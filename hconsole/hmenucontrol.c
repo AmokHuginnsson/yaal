@@ -59,7 +59,7 @@ int HMenuControl::HMenuNode::load_sub_menu ( OMenuItem * a_psSubMenu )
 		l_oInfo = a_psSubMenu [ l_iCtr ].f_pcLabel;
 		l_oInfo = ( void * ) & a_psSubMenu [ l_iCtr ];
 		l_poNode->f_tLeaf [ 0 ] = l_oInfo;
-		f_oBranch.add_tail ( l_poNode );
+		f_oBranch.add_tail ( ( HTree < HItem >::HNode * * ) & l_poNode );
 		if ( a_psSubMenu [ l_iCtr ].f_psSubMenu )
 			l_poNode->load_sub_menu ( a_psSubMenu [ l_iCtr ].f_psSubMenu );
 		l_iCtr ++;

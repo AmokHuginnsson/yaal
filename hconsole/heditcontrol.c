@@ -85,7 +85,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 				"edit-control right aligned and multiline at the same time", 0 );
 	f_bPassword = a_bPassword;
 	f_oString = a_pcValue;
-	f_oHistory.add_tail ( HString ( "" ) );
+	f_oHistory.add_tail ( & l_oErrorMessage );
 	if ( ( l_iErrorCode = regcomp ( & f_sMask, a_pcMask,
 					REG_EXTENDED | REG_NOSUB ) ) )
 		{
@@ -279,7 +279,7 @@ int HEditControl::process_input ( int a_iCode )
 				if ( f_oHistory.to_tail ( ) == f_oString )break;
 			if ( f_oString.get_length ( ) &&  ( ! l_iErrorCode ) )
 				{
-				f_oHistory.add_tail ( f_oString );
+				f_oHistory.add_tail ( & f_oString );
 				while ( f_oHistory.quantity ( ) > ( int ) f_iMaxHistoryLevel )
 					f_oHistory.remove_at ( 1, D_EMPTY_IF_NOT_EMPTIED );
 				f_oHistory.go ( 0 );

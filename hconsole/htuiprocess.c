@@ -137,7 +137,7 @@ int HProcess::register_file_descriptor_handler ( int a_iFileDescriptor,
 	M_PROLOG
 	HHandler < PROCESS_HANDLER_FILEDES_t > l_oHandler ( a_iFileDescriptor, NULL,
 			HANDLER );
-	f_oFileDescriptorHandlers.add_tail ( l_oHandler );
+	f_oFileDescriptorHandlers.add_tail ( & l_oHandler );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -177,12 +177,12 @@ int HProcess::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
 			l_poHandler = & f_oPreprocessHandlers.to_tail ( 1, & l_iFlag );
 			if ( ( PROCESS_HANDLER_t ) ( * l_poHandler ) == HANDLER )
 				{
-				( * l_poHandler ).add ( a_iCodeCount, a_piCodes );
+				l_poHandler->add ( a_iCodeCount, a_piCodes );
 				return ( 0 );
 				}
 			}
 		}
-	f_oPreprocessHandlers.add_tail ( l_oNewHandler );
+	f_oPreprocessHandlers.add_tail ( & l_oNewHandler );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -202,12 +202,12 @@ int HProcess::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
 			l_poHandler = & f_oPostprocessHandlers.to_tail ( 1, & l_iFlag );
 			if ( ( PROCESS_HANDLER_t ) ( * l_poHandler ) == HANDLER )
 				{
-				( * l_poHandler ).add ( a_iCodeCount, a_piCodes );
+				l_poHandler->add ( a_iCodeCount, a_piCodes );
 				return ( 0 );
 				}
 			}
 		}
-	f_oPostprocessHandlers.add_tail ( l_oNewHandler );
+	f_oPostprocessHandlers.add_tail ( & l_oNewHandler );
 	return ( 0 );
 	M_EPILOG
 	}
