@@ -31,10 +31,10 @@ M_CVSID ( "$CVSHeader$" );
 #include "hmatrix.h"
 M_CVSTID ( D_CVSID_HMATRIX_H );
 
-const char * g_ppcErrMsgHMatrix  [ 24 ] =
+const char * g_ppcErrMsgHMatrix [ 24 ] =
 	{
-/* [ E_BADROWS ] = */_ ( "Rows < 1" ),
-/* [ E_BADCOLUMNS ] = */_ ( "Columns < 1" ),
-/* [ E_NEWRETURNEDNULL ] = */_ ( "new returned NULL" )
+/* E_BADROWS */					_ ( "Rows < 1" ),
+/* E_BADCOLUMNS */			_ ( "Columns < 1" ),
+/* E_NEWRETURNEDNULL */	_ ( "new returned NULL" )
 	};
 

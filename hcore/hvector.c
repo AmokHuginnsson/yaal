@@ -24,10 +24,15 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hvector.h"
 M_CVSTID ( D_CVSID_HVECTOR_H );
 
-const char * g_pcErrorMessageDimensionsDoNotMatch = "dimensions do not match";
+const char * g_ppcErrMsgHVector [ 24 ] =
+	{
+/* E_DIMNOTMATCH */	_ ( "dimensions do not match" )
+	};
 

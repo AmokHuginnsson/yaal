@@ -31,11 +31,13 @@ Copyright:
 
 #define D_CVSID_HVECTOR_H "$CVSHeader$"
 
-extern const char * g_pcErrorMessageDimensionsDoNotMatch;
+#define E_DIMNOTMATCH	0
+
+extern const char * g_ppcErrMsgHVector [ ];
 
 #define M_CHECK_DIMENSIONS( ) \
 	if ( f_iSize != a_roVector.f_iSize ) \
-		throw new HException ( __WHERE__, g_pcErrorMessageDimensionsDoNotMatch, \
+		throw new HException ( __WHERE__, g_ppcErrMsgHVector [ E_DIMNOTMATCH ], \
 				f_iSize - a_roVector.f_iSize )
 
 #include "harray.h"
@@ -149,6 +151,7 @@ HVector < tType > &
 HVector < tType > ::operator = ( const HVector & a_roVector )
 	{
 	M_PROLOG
+	M_CHECK_DIMENSIONS ( );
 	( * this ).HArray < tType > ::operator = ( a_roVector );
 	return ( * this );
 	M_EPILOG
