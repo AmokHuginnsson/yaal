@@ -43,6 +43,7 @@ public:
 	virtual void populate ( long int );
 	virtual long int get_current_id ( void );
 	virtual void add_new ( void );
+	virtual void cancel_new ( void );
 	/*}*/
 protected:
 	/*{*/

@@ -24,6 +24,16 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "../config.h"
+
+#ifdef HAVE_NCURSES_H
+#	include <ncurses.h>
+#elif defined ( HAVE_NCURSES_NCURSES_H )
+#	include <ncurses/ncurses.h>
+#else /* HAVE_NCURSES_NCURSES_H */
+#	error "No ncurses header available."
+#endif /* not HAVE_NCURSES_NCURSES_H */
+
 #include "hstatusbarcontrol.h"
 
 #include "../hcore/hexception.h"
@@ -40,7 +50,7 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 
 HStatusBarControl::~HStatusBarControl ( void )
 	{
-	M_PROLOG/*}*/
+	M_PROLOG
 	return;
 	M_EPILOG
 	}
@@ -50,8 +60,7 @@ int HStatusBarControl::verify ( void )
 	M_PROLOG
 	int l_iLength = 0;
 	bool l_bOk = false;
-	if ( l_iLength < f_iPromptLength )
-		l_bOk = true;
+	if ( l_iLength < f_iPromptLength )l_bOk = true;
 	return ( l_bOk );
 	M_EPILOG
 	}
@@ -69,6 +78,17 @@ double HStatusBarControl::init_progress ( const char * a_pcTitle, int a_iMax )
 void HStatusBarControl::update_progress ( void )
 	{
 	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+void HStatusBarControl::display ( const char * a_pcMessage, int a_iAttribute )
+	{
+	M_PROLOG
+	int l_iAttribute = ( f_bEnabled ?  (  f_bFocused ? f_iFocusedAttribute
+				: f_iEnabledAttribute ) : f_iDisabledAttribute );
+	if ( a_iAttribute > -1 )l_iAttribute = a_iAttribute;
+	console::c_printf ( f_iRowRaw, 0, D_FG_BRIGHTRED, a_pcMessage );
 	return;
 	M_EPILOG
 	}

@@ -78,12 +78,11 @@ void HDataListControl::populate ( long int /*a_iId*/ )
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
 		l_oInfoList [ 0 ] = f_poRecordSet->m_id;
-		if ( ( l_iCursorPosition + l_iControlOffset ) == f_iQuantity )
-			{
-			l_poSelected = f_poSelected;
-			l_poFirstVisibleRow = f_poFirstVisibleRow;
-			}
 		add_tail ( l_oInfoList );
+		if ( l_iControlOffset == ( f_iQuantity - 1 ) )
+			l_poFirstVisibleRow = f_poFirstVisibleRow;
+		if ( ( l_iCursorPosition + l_iControlOffset ) == ( f_iQuantity - 1 ) )
+			l_poSelected = f_poSelected;
 		f_poRecordSet->move_next ( );
 		}
 	l_poParent->set_sync_store ( );
@@ -106,6 +105,16 @@ void HDataListControl::add_new ( void )
 	{
 	M_PROLOG
 	add_tail ( );
+	process_input ( KEY_HOME );
+	process_input ( KEY_END );
+	return;
+	M_EPILOG
+	}
+
+void HDataListControl::cancel_new ( void )
+	{
+	M_PROLOG
+	remove_tail ( D_EMPTY_IF_NOT_EMPTIED );
 	process_input ( KEY_HOME );
 	process_input ( KEY_END );
 	return;

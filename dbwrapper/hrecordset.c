@@ -200,6 +200,16 @@ void HRecordSet::close ( void )
 	M_EPILOG
 	}
 
+void HRecordSet::cancel ( void )
+	{
+	M_PROLOG
+	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
+		throw new HException ( __WHERE__, E_MODE, f_iMode );
+	f_iMode = D_MODE_NORMAL;
+	return;
+	M_EPILOG
+	}
+
 void HRecordSet::free ( void )
 	{
 	M_PROLOG
@@ -334,8 +344,8 @@ void HRecordSet::remove ( void )
 	{
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
-	f_oBuffer.format ( "DELETE FROM %s WHERE id = %ld;",
-			( char * ) f_oTable, m_id );
+	f_oSQL.format ( "DELETE FROM %s WHERE id = %ld;",
+			( const char * ) f_oTable, m_id );
 	f_poDataBase->query ( f_oSQL );
 	f_poDataBase->free_result ( );
 	requery ( );

@@ -44,6 +44,7 @@ public:
 	void setup ( const char *, const char *, int );
 	double init_progress ( const char *, int );
 	void update_progress ( void );
+	void display ( const char *, int = -1 );
 	/*}*/
 	};
 

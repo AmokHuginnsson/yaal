@@ -69,3 +69,10 @@ void HDataControl::add_new ( void )
 	M_EPILOG
 	}
 
+void HDataControl::cancel_new ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
