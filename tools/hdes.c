@@ -26,7 +26,7 @@ Copyright:
 
 #include <string.h>
 
-#include "hexception.h"
+#include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hdes.h"
 #include "bit.h"
