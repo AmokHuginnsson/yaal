@@ -95,6 +95,7 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	return ( ! l_iBaudRate );
 	}
 
+extern "C"
 void tools_init ( void ); __attribute__ ( ( constructor ) )
 void tools_init ( void )
 	{

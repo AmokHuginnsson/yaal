@@ -96,6 +96,8 @@ command_compose_delay 16
 #	BLACK RED GREEN BROWN BLUE MAGENTA CYAN LIGHTGRAY GRAY BRIGHTRED BRIGHTGREEN
 #	YELLOW BRIGHTBLUE BRIGHTMAGENTA BRIGHTCYAN WHITE
 
+# colors common to all windows and controls
+
 # color attributes for disabled control
 disabled_attribute GREEN GRAY LIGHTGRAY GRAY
 
@@ -104,6 +106,9 @@ enabled_attribute BRIGHTGREEN GRAY WHITE GRAY
 
 # color attributes for focused control
 focused_attribute BRIGHTGREEN GRAY BLACK LIGHTGRAY
+
+# special colors
+statusbar_attribute WHITE BLACK LIGHTGRAY BLACK
 
 ## colors END
 ### console END

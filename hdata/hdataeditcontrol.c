@@ -40,7 +40,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdataeditcontrol.h"
 
 HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
-		int a_iRow, int a_iColumn, int a_iWidth, int a_iHeight,
+		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
 		const char * a_pcLabel, int a_iBufferSize, const char * a_pcValue,
 		const char * a_pcMask, bool a_bReplace, bool a_bRightAligned,
 		bool a_bMultiLine, bool a_bPassword, int a_iMaxHistoryLevel,
@@ -50,7 +50,7 @@ HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 										a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
 									HEditControl( a_poParent,
-										a_iRow, a_iColumn, a_iWidth, a_iHeight,
+										a_iRow, a_iColumn, a_iHeight, a_iWidth,
 										a_pcLabel, a_iBufferSize, a_pcValue,
 										a_pcMask, a_bReplace, a_bRightAligned,
 										a_bMultiLine, a_bPassword, a_iMaxHistoryLevel,

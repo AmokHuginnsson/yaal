@@ -67,6 +67,7 @@ bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 	return ( false );
 	}
 
+extern "C"
 void hcore_init ( void ); __attribute__ ( ( constructor ) )
 void hcore_init ( void )
 	{

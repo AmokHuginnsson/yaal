@@ -90,6 +90,7 @@ bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	return ( false );
 	}
 
+extern "C"
 void dbwrapper_init ( void ); __attribute__ ( ( constructor ) )
 void dbwrapper_init ( void )
 	{
