@@ -25,7 +25,6 @@ Copyright:
 */
 
 #include <unistd.h>
-#include <errno.h>
 
 #include "../config.h"
 

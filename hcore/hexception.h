@@ -30,6 +30,8 @@ Copyright:
 #ifndef __HEXCEPTION_H
 #define __HEXCEPTION_H
 
+#include <errno.h>
+
 #ifndef NULL
 #define NULL 0
 #endif /* not NULL */
@@ -71,9 +73,6 @@ extern long int g_lLogMask;
 #define D_TYPE_MASK					0xffff
 
 #define g_iErrNo errno
-#ifndef errno
-extern int errno;
-#endif /* not errno */
 
 class HException
 	{

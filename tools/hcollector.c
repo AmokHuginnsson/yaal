@@ -25,7 +25,6 @@ Copyright:
 */
 
 #include <sys/types.h> /* FD_* macros */
-#include <errno.h>     /* EINTR */
 #include <string.h>
 #include <stdlib.h>
 
