@@ -127,13 +127,15 @@ int HCollector::receive_line ( char * & a_pcLine )
 	M_EPILOG
 	}
 
+/* Not needed any more ...
 #define M_STDHAPI_TEMP_FAILURE_RETRY(expression) \
   (__extension__ \
     ({ long int __result; \
        do __result = (long int) (expression); \
        while (__result == -1L && errno == EINTR); \
        __result; }))
-	
+... damn,  I do not know why. */
+
 int HCollector::establish_connection ( void )
 	{
 	M_PROLOG
@@ -144,13 +146,16 @@ int HCollector::establish_connection ( void )
 	 or initializing part runs before waiting part (here comes the trouble).
 */
 	int l_iError = -1;
-	fd_set		l_xFileDesSet; /* serial port */
-	timeval		l_sWait; /* sleep between re-selects */
+/*
+	fd_set		l_xFileDesSet; / * serial port * /
+	timeval		l_sWait; / * sleep between re-selects * /
+*/
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
 		{
 		write ( D_PROTO_SYN, strlen ( D_PROTO_SYN ) );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+/* I have no idea why this code is not necessary for HCollector functioning.
 		l_sWait.tv_sec = 1;
 		l_sWait.tv_usec = 0;
 		FD_ZERO ( & l_xFileDesSet );
@@ -158,6 +163,7 @@ int HCollector::establish_connection ( void )
 		if ( ( M_STDHAPI_TEMP_FAILURE_RETRY ( select ( FD_SETSIZE,
 							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
 				&& FD_ISSET ( f_iFileDes, & l_xFileDesSet ) )
+*/
 			read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
 		l_iError ++;
 		}
