@@ -110,7 +110,7 @@ int console_mouse_open ( void )
 
 	log ( D_LOG_INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
 
-	return ( n_iMouse );
+	return ( 0 );
 	M_EPILOG
 	}
 
