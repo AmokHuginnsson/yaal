@@ -37,6 +37,7 @@ class HControlList;
 
 class HWindow
 	{
+	typedef int ( HWindow::* WINDOW_HANDLER_t ) ( int );
 protected:
 	/*{*/
 	HString							f_oTitle;					/* title of window */
@@ -67,8 +68,8 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	int register_preprocess_handler ( int, int *, int ( HWindow::* ) ( int ) );
-	int register_postprocess_handler ( int, int *, int ( HWindow::* ) ( int ) );
+	int register_preprocess_handler ( int, int *, WINDOW_HANDLER_t );
+	int register_postprocess_handler ( int, int *, WINDOW_HANDLER_t );
 	/*}*/
 private:
 	/*{*/

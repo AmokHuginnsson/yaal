@@ -35,6 +35,7 @@ Copyright:
 
 class HProcess
 	{
+	typedef int ( HProcess::* PROCESS_HANDLER_t ) ( int, void * );
 protected:
 	/*{*/
 	bool			f_bInitialised;				/* did process has necessery initialisation */
@@ -63,8 +64,8 @@ protected:
 	int postprocess_input ( int );
 	int register_file_descriptor_handler ( int, int ( HProcess::* ) ( int ) );
 	int unregister_file_descriptor_handler ( int );
-	int register_preprocess_handler ( int, int *, int ( HProcess::* ) ( int, void * ) );
-	int register_postprocess_handler ( int, int *, int ( HProcess::* ) ( int, void * ) );
+	int register_preprocess_handler ( int, int *, PROCESS_HANDLER_t );
+	int register_postprocess_handler ( int, int *, PROCESS_HANDLER_t );
 	int add_window ( HWindow *, const char * );
 	virtual int handler_idle ( int, void * = NULL );
 	virtual int handler_refresh ( int, void * = NULL );
