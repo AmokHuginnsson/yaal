@@ -27,6 +27,10 @@ Copyright:
 #include <string.h>
 #include <stdio.h>
 
+#ifdef _STDIO_H
+#include <execinfo.h>
+#endif /* _STDIO_H */
+
 #include "hexception.h"
 #include "xalloc.h"
 
@@ -96,5 +100,26 @@ void HException::log ( const char * a_pcFileName,
 	::log ( "Exception frame %2d: %16s : %4d : %s\n", f_iFrame ++,
 			a_pcFileName + ( l_iLength > 16 ? l_iLength - 16 : 0 ),
 			a_iLine, a_pcFunctionName );
+	return;
+	}
+
+void HException::dump_call_stack ( int a_iLevel )
+	{
+	int l_iCtr = 0, l_iSize = 0;
+	char l_pcBuffer [ 4000 ];
+	char ** l_ppcStrings = NULL;
+	void ** l_ppvArray = ( void ** ) & l_pcBuffer;
+
+#ifdef _EXECINFO_H
+	l_iSize = backtrace ( l_ppvArray, 1000 );
+	l_ppcStrings = backtrace_symbols  ( l_ppvArray, l_iSize );
+#endif /* _EXECINFO_H */
+
+	::log << "Obtained " << ( int ) l_iSize << " stack frames." << endl;
+	if ( a_iLevel < l_iSize )l_iSize = a_iLevel;
+	for  ( l_iCtr = 0; l_iCtr < l_iSize; l_iCtr ++ )
+		::log << l_ppcStrings [ l_iCtr ] << endl;
+
+	xfree ( ( void * ) l_ppcStrings );
 	return;
 	}
