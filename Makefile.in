@@ -343,7 +343,7 @@ tags: $(SRCS) $(SRCEXS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrappe
 mrproper: clean
 	@echo -n "Purging ... "
 	@/bin/rm -rf $(TARGETDIR) $(HEADERSDIR) make.log
-	@find . -name 'tags' -or -name '.depend' | xargs /bin/rm -f
+	@find . -name 'tags' -or -name '.depend' -or -name '*.a'| xargs /bin/rm -f
 	@echo "done."
 
 purge: mrproper

@@ -43,20 +43,29 @@ AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[51%]]])
 AC_HEADER_MAJOR
 
 dnl We need to know what operating system stdhapi will be compiled on.
-AC_MSG_RESULT([--- Guessing host type ... ---                          [[69%]]])
-AC_CHECK_HEADER([[ncurses/ncurses.h]],[AC_DEFINE([[__PLD_HOST__]] _HOST='PLD')],
-	[AC_CHECK_HEADER([[bsd/curses.h]],
-		[AC_DEFINE([[__FREEBSD_HOST__]] _HOST=[FreeBSD])],
-		[AC_DEFINE([[__DEBIAN_HOST__]])] _HOST=[Debian])])
-AC_MSG_RESULT([--- Guessed host type is $_HOST. ---                    [[74%]]])
+AC_MSG_RESULT([--- Guessing host operating system ... ---              [[69%]]])
+AC_CHECK_HEADER(
+	[[ncurses/ncurses.h]],
+	[AC_DEFINE([[__PLD_HOST__]]) _HOST=['PLD. ---    ']],
+	[AC_CHECK_HEADER(
+		[[bsd/curses.h]],
+		[AC_DEFINE([[__FREEBSD_HOST__]]) _HOST=['FreeBSD. ---']],
+		[AC_CHECK_HEADER(
+			[[ncurses.h]],
+			[AC_DEFINE([[__DEBIAN_HOST__]]) _HOST=['Debian. --- ']],
+			[AC_MSG_ERROR([Can not recognize operating system!])]
+		)]
+	)]
+)
+AC_MSG_RESULT([--- Guessed host operating system is $_HOST       [[74%]]])
 
 dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[75%]]])
 _FLAG____________='unfortunetely none'
-CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--export-dynamic -Wl,-soname,conftest"]
-AC_LINK_IFELSE([[#include <errno.h>
-extern int errno;
-void foo(void){errno=0;}]],
+dnl CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings --Wl,--export-dynamic -Wl,-soname,conftest"]
+dnl CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings --Wl,--export-dynamic -Wl,-soname,conftest"]
+CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings -Wl,-soname,conftest"]
+AC_LINK_IFELSE([[extern int errno;void foo(void){errno=0;}]],
 							[AC_SUBST([SPECIAL_LINKER_FLAG],
 							[[-Wl,--no-undefined]])] _FLAG____________=[[-Wl,--no-undefined]],
 							[AC_MSG_WARN([[Can not use -Wl,--no-undefined!]])])
