@@ -242,7 +242,7 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	}
 	
 int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
-							 const char * a_pcFormat, va_list a_xAp )
+							 const char * a_pcFormat, va_list & a_rxAp )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -264,7 +264,7 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 		clrtoeol ( );
 		}
 	else move ( a_iRow, a_iColumn );
-	l_iError = vw_printw ( stdscr, a_pcFormat, a_xAp );
+	l_iError = vw_printw ( stdscr, a_pcFormat, a_rxAp );
 	move ( l_iOrigRow, l_iOrigColumn );
 	set_attr ( l_iOrigAttribute );
 	return ( l_iError );

@@ -98,7 +98,7 @@ void enter_curses( void );
 void leave_curses( void );
 void set_attr( unsigned char attr );
 int c_printf ( int, int, int, const char *, ... );
-int c_printf ( int, int, int, const char *, va_list );
+int c_printf ( int, int, int, const char *, va_list & );
 int get_key( void );
 int kbhit( void );
 char get_attr( void );
