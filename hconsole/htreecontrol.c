@@ -172,10 +172,7 @@ int HTreeControl::process_input ( int a_iCode )
 			{
 			l_poNode = ( HNodeControl * ) f_poRoot;
 			if ( l_poNode->f_oBranch.quantity ( ) )
-				{
-				l_poNode->f_oBranch.go ( 0 );
-				f_poSelected = l_poNode->f_oBranch.to_head ( );
-				}
+				f_poSelected = l_poNode->f_oBranch [ -1 ];
 			break;
 			}
 		case ( KEY_PPAGE ):
