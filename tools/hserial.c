@@ -86,7 +86,7 @@ HSerial::HSerial ( const char * a_pcDevice )
 	f_sTIO.c_cc [ VEOF ]     = 4;    /* Ctrl-d */
 	f_sTIO.c_cc [ VTIME ]    = 0;    /* inter-character timer unused */
 	f_sTIO.c_cc [ VMIN ]     = 1;    /* blocking read until 1 character arrives */
-#ifdef HAVE_DECL_VSWTC
+#if HAVE_DECL_VSWTC
 	f_sTIO.c_cc [ VSWTC ]    = 0;    /* '\0' */
 #endif /* HAVE_DECL_VSWTC */
 	f_sTIO.c_cc [ VSTART ]   = 0;    /* Ctrl-q */
