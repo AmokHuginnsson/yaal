@@ -253,21 +253,18 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
 	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	l_iOrigAttribute = get_attr ( );
-#ifdef __DEBUG__
+	if ( a_iColumn >= n_iWidth )
+		throw new HException ( __WHERE__, "bad column.", a_iColumn );
+	if ( ( a_iRow < 0 ) || ( a_iRow >= n_iHeight ) )
+		throw new HException ( __WHERE__, "bad row.", a_iRow );
+	set_attr ( a_iAttribute );
 	if ( a_iColumn < 0 )
 		{
 		move ( a_iRow, 0 );
 		clrtoeol ( );
 		}
 	else move ( a_iRow, a_iColumn );
-#else /* __DEBUG__ */
-	if ( ( a_iColumn < 0 ) || ( a_iColumn >= n_iWidth ) )
-		throw new HException ( __WHERE__, "bad column.", a_iColumn );
-#endif /* not __DEBUG__ */
-	if ( ( a_iRow < 0 ) || ( a_iRow >= n_iHeight ) )
-		throw new HException ( __WHERE__, "bad row.", a_iRow );
-	set_attr ( a_iAttribute );
-	l_iError = vwprintw ( stdscr, a_pcFormat, a_xAp );
+	l_iError = vw_printw ( stdscr, a_pcFormat, a_xAp );
 	move ( l_iOrigRow, l_iOrigColumn );
 	set_attr ( l_iOrigAttribute );
 	return ( l_iError );
