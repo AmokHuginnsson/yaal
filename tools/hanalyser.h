@@ -29,6 +29,7 @@ Copyright:
 
 #include "../hcore/hstring.h"
 #include "../hcore/htree.h"
+#include "../hcore/hpool.h"
 
 class HAnalyser : public HTree < HList < double * > >
 	{
@@ -47,7 +48,6 @@ class HAnalyser : public HTree < HList < double * > >
 	protected:
 		/*{*/
 		HAnalyserNode ( HAnalyserNode * );
-		virtual ~HAnalyserNode ( void );
 		HAnalyserNode * grow_up_branch ( int = D_FILL_NEW_AUTO );
 		/*}*/
 		friend class HAnalyser;
@@ -58,6 +58,7 @@ protected:
 	int f_iLength;
 	int f_iError;
 	double	f_pdVariables [ 26 ];
+	HPool < double > f_oConstantsPool;
 	HString	f_oFormula;
 	/*}*/
 public:

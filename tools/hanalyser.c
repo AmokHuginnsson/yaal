@@ -90,30 +90,6 @@ HAnalyser::HAnalyserNode::HAnalyserNode ( HAnalyserNode * a_poNode )
 	M_EPILOG
 	}
 
-HAnalyser::HAnalyserNode::~HAnalyserNode ( void )
-	{
-	M_PROLOG
-	double * l_pdVar = NULL;
-	double * l_pdInternal = ( ( HAnalyser * ) f_poTree )->f_pdVariables;
-	int l_iCount = f_tLeaf.quantity ( );
-	while ( l_iCount -- )
-		{
-		l_pdVar = * f_tLeaf.to_tail ( );
-		if ( ( l_pdVar > ( double * ) 0x20 ) && ( ( l_pdVar < l_pdInternal )
-											|| ( l_pdVar > ( l_pdInternal + 25 ) ) ) )
-			{
-#ifdef __DEBUGGER_BABUNI__
-			::log << "deleteing variable: addr(" << l_pdVar << "), val(";
-			::log << * l_pdVar << ")" << endl;
-#endif /* __DEBUGGER_BABUNI__ */
-			delete l_pdVar;
-			f_tLeaf.present ( ) = 0;
-			}
-		}
-	return;
-	M_EPILOG
-	}
-
 HAnalyser::HAnalyserNode * HAnalyser::HAnalyserNode::grow_up_branch ( int a_iFlag )
 	{
 	M_PROLOG
@@ -125,7 +101,7 @@ HAnalyser::HAnalyserNode * HAnalyser::HAnalyserNode::grow_up_branch ( int a_iFla
 	M_EPILOG
 	}
 
-HAnalyser::HAnalyser ( void )
+HAnalyser::HAnalyser ( void ) : f_oConstantsPool ( 0, D_HPOOL_AUTO_GROW )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -567,9 +543,8 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 		}
 	if ( ( f_oFormula [ f_iIndex ] >= '0' ) && ( f_oFormula[ f_iIndex ] <= '9' ) )
 		{
-		int l_iOffset;
-		double * l_pdValue;
-		l_iOffset = f_iIndex;
+		double l_dValue = 0;
+		int l_iOffset = f_iIndex;
 		if ( f_iIndex >= f_iLength )
 			{
 			f_iError++;
@@ -588,9 +563,8 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 			}
 		if ( f_iError == 0 )
 			{
-			l_pdValue = new double;
-			*l_pdValue = atof ( ( ( char * ) f_oFormula ) + l_iOffset );
-			a_poNode->f_tLeaf.add_tail ( & l_pdValue );
+			l_dValue = strtod ( ( ( char * ) f_oFormula ) + l_iOffset, NULL );
+			a_poNode->f_tLeaf.add_tail ( ) = & f_oConstantsPool.add ( l_dValue );
 			}
 		return ;
 		}
@@ -611,6 +585,7 @@ double * HAnalyser::analyse( const char * a_pcFormula )
 	f_oFormula.hs_realloc ( l_iLength + 1 ); /* + 1 for trailing null */
 	if ( translate( a_pcFormula ) > 0 ) return ( NULL );
 	if ( l_poNode ) delete l_poNode;
+	f_oConstantsPool.reset ( );
 	f_poRoot = 0;
 	f_poRoot = l_poNode = new HAnalyserNode ( 0 );
 	l_poNode->f_poTree = this;

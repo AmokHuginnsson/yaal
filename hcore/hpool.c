@@ -37,6 +37,7 @@ const char * g_ppcErrMsgHPool [ 24 ] =
 	{
 /* E_HPOOL_BADSIZE */				_ ( "bad size" ),
 /* E_HPOOL_NOMEM */					_ ( "can not alloc memory with new" ),
-/* E_HPOOL_REALLOC_FIXED */ _ ( "can not realloc fixed size pool" )
+/* E_HPOOL_REALLOC_FIXED */ _ ( "can not realloc fixed size pool" ),
+/* E_HARRAY_BADINDEX */			_ ( "index does not fit into array" )
 	};
 

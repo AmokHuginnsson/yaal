@@ -37,6 +37,7 @@ Copyright:
 #define E_HPOOL_BADSIZE				0
 #define E_HPOOL_NOMEM					1
 #define E_HPOOL_REALLOC_FIXED	2
+#define E_HPOOL_BADINDEX			3
 
 typedef enum
 	{
@@ -54,6 +55,7 @@ private:
 	/*{*/
 	pool_type_t f_ePoolType;
 	size_t f_lPoolSize;	/* size of allocated memory buffer */
+	int f_iTop;
 	/*}*/
 protected:
 	/*{*/
@@ -64,6 +66,9 @@ public:
 	HPool ( size_t, pool_type_t = D_HPOOL_FIXED_SIZE );
 	virtual ~HPool ( void );
 	size_t pool_realloc ( size_t );
+	tType & operator [ ] ( int );
+	tType & add ( tType & );
+	void reset ( void );
 	/*}*/
 	};
 
@@ -76,6 +81,7 @@ HPool < tType >::HPool ( size_t a_lNewSize, pool_type_t a_ePoolType )
 	f_lPoolSize = 0;
 	f_ptPool = NULL;
 	f_ePoolType = a_ePoolType;
+	f_iTop = 0;
 	if ( a_lNewSize )
 		pool_realloc ( a_lNewSize );
 	return;
@@ -123,6 +129,33 @@ size_t HPool < tType >::pool_realloc ( const size_t a_lNewSize )
 		}
 	return ( f_lPoolSize - l_lOldSize );
 	M_EPILOG
+	}
+
+template < class tType >
+tType & HPool < tType >::operator [ ] ( int a_iIndex )
+	{
+	M_PROLOG
+	if ( ( a_iIndex < 0 ) || ( ( size_t ) a_iIndex >= f_lPoolSize ) )
+		M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_BADINDEX ], a_iIndex );
+	return ( f_ptPool [ a_iIndex ] );
+	M_EPILOG
+	}
+
+template < class tType >
+tType & HPool < tType>::add ( tType & a_tPod )
+	{
+	M_PROLOG
+	pool_realloc ( f_iTop + 1 );
+	f_ptPool [ f_iTop ] = a_tPod;
+	f_iTop ++;
+	return ( f_ptPool [ f_iTop - 1 ] );
+	M_EPILOG
+	}
+
+template < class tType >
+void HPool < tType >::reset ( void )
+	{
+	f_iTop = 0;
 	}
 
 #endif /* not __HPOOL_H */
