@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HLOG_H
 #define __HLOG_H
 
-#define M_LOG(MESG) ::log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, MESG )
+#define M_LOG(MESG) log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, MESG )
 
 #include <stdio.h>
 
