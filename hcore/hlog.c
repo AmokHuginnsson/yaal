@@ -107,8 +107,8 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 				fprintf ( a_psStream, f_pcBuffer );
 				continue;
 				}
-			fseek ( f_psStream, f_pcBuffer - l_pcPtr, SEEK_CUR );
-			* l_pcPtr = 0;
+			* ++ l_pcPtr = 0;
+			fseek ( f_psStream, l_pcPtr - f_pcBuffer - l_iLen, SEEK_CUR );
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
 			timestamp ( a_psStream );
 			fprintf ( a_psStream, f_pcBuffer );

@@ -90,8 +90,8 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile )
 #ifdef __HOST_OS_TYPE_FREEBSD__
 		l_pcPtr = ( char * ) memchr ( l_pcBuffer, '\n', l_iReadLen );
 		if ( ! l_pcPtr )continue;
-		fseek ( a_psFile, l_pcBuffer - l_pcPtr, SEEK_CUR );
-		* l_pcPtr = 0;
+		* ++ l_pcPtr = 0;
+		fseek ( a_psFile, l_pcPtr - l_pcBuffer - l_iReadLen, SEEK_CUR );
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
 		for ( l_iIndex = 0; l_iIndex < ( int ) ( l_iBlockSize - 1 ); l_iIndex++ )
 			{
