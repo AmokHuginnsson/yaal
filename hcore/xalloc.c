@@ -28,6 +28,9 @@ Copyright:
 #include <stdio.h>
 #include <string.h>
 
+extern "C"
+{
+
 void * xmalloc ( size_t a_ulSize )
 	{
 	register void * l_pvNewPtr = malloc ( a_ulSize );
@@ -76,3 +79,6 @@ char * xstrdup ( const char * a_pcStr )
 	strcpy ( l_pcNew, a_pcStr );
 	return ( l_pcNew );
 	}
+
+}
+

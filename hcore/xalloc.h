@@ -27,10 +27,15 @@ Copyright:
 #ifndef __XALLOC_H
 #define __XALLOC_H
 
+extern "C"
+{
+
 void * xmalloc ( size_t );
 void * xcalloc ( size_t );
 void * xrealloc ( void *, size_t );
 void xfree ( void * & );
 char * xstrdup ( const char * );
 
-#endif /* __XALLOC_H */
+}
+
+#endif /* not __XALLOC_H */
