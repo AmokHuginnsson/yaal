@@ -80,6 +80,8 @@ bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_MYSQL;
 		else if ( ! strcmp ( a_roValue, "PostgreSQL" ) )
 			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_POSTGRESQL;
+		else if ( ! strcmp ( a_roValue, "SQLite" ) )
+			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_SQLITE;
 		else
 			{
 			::log ( D_LOG_ERROR ) << "Error: `" << a_roValue;

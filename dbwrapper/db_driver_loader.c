@@ -49,6 +49,7 @@ static const char * g_ppcDriver [ 24 ] =
 	NULL,
 	"libmysql_driver.so",
 	"libpostgresql_driver.so",
+	"libsqlite_driver.so",
 	NULL
 	};
 

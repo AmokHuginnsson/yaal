@@ -43,6 +43,7 @@ HCONSOLE = $(TARGETDIR)/libhconsole.so.$(RELEASE)
 TOOLS = $(TARGETDIR)/libtools.so.$(RELEASE)
 MYSQL_DRIVER = $(TARGETDIR)/libmysql_driver.so.$(RELEASE)
 POSTGRESQL_DRIVER = $(TARGETDIR)/libpostgresql_driver.so.$(RELEASE)
+SQLITE_DRIVER = $(TARGETDIR)/libsqlite_driver.so.$(RELEASE)
 DBWRAPPER = $(TARGETDIR)/libdbwrapper.so.$(RELEASE)
 HDATA = $(TARGETDIR)/libhdata.so.$(RELEASE)
 HS = .h
@@ -172,6 +173,8 @@ OBJ4mysql_driver =
 OBJ4mysql_driver += mysql_driver!
 OBJ4postgresql_driver = 
 OBJ4postgresql_driver += postgresql_driver
+OBJ4sqlite_driver = 
+OBJ4sqlite_driver += sqlite_driver
 OBJ4dbwrapper = 
 OBJ4dbwrapper += db_driver_loader
 OBJ4dbwrapper += dbwrapper
@@ -230,6 +233,9 @@ OBJ4mysql_driver := $(patsubst %!.o,%.oo, $(OBJ4mysql_driver))
 OBJ4postgresql_driver := $(strip $(OBJ4postgresql_driver))
 OBJ4postgresql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4postgresql_driver))
 OBJ4postgresql_driver := $(patsubst %!.o,%.oo, $(OBJ4postgresql_driver))
+OBJ4sqlite_driver := $(strip $(OBJ4sqlite_driver))
+OBJ4sqlite_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite_driver))
+OBJ4sqlite_driver := $(patsubst %!.o,%.oo, $(OBJ4sqlite_driver))
 HDR4dbwrapper := $(patsubst %.o,%.h, $(OBJ4dbwrapper))
 SRCS += $(patsubst %.h,%.c, $(HDR4dbwrapper))
 HDR4dbwrapper := $(patsubst %.oo,%.h, $(HDR4dbwrapper))
@@ -275,7 +281,7 @@ $(TARGET):
 #phony targets
 .PHONY: all nodebug install dep clean tags mrproper purge
 
-all: $(HAPIHDR) .depend $(CACHE) $(HCORE) $(HCONSOLE) $(TOOLS) @TARGET_MYSQL_DRIVER@ @TARGET_POSTGRESQL_DRIVER@ $(DBWRAPPER) $(HDATA)
+all: $(HAPIHDR) .depend $(CACHE) $(HCORE) $(HCONSOLE) $(TOOLS) @TARGET_MYSQL_DRIVER@ @TARGET_POSTGRESQL_DRIVER@ @TARGET_SQLITE_DRIVER@ $(DBWRAPPER) $(HDATA)
 
 nodebug:
 	@( export NODEBUG="yes";\
@@ -302,6 +308,9 @@ $(MYSQL_DRIVER): $(HCORE) $(OBJ4mysql_driver) $(DBWRAPPER)
 
 $(POSTGRESQL_DRIVER): $(HCORE) $(OBJ4postgresql_driver)
 	@$(MAKE) $(POSTGRESQL_DRIVER)\' TARGET=$(POSTGRESQL_DRIVER)\' NAME=postgresql_driver LIBS="-lpq -lhcore"
+	
+$(SQLITE_DRIVER): $(HCORE) $(OBJ4sqlite_driver)
+	@$(MAKE) $(SQLITE_DRIVER)\' TARGET=$(SQLITE_DRIVER)\' NAME=sqlite_driver LIBS="-lsqlite -lhcore"
 # dbwrapper END
 
 $(HDATA): $(HCONSOLE) $(OBJ4hdata)

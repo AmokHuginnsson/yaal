@@ -7,10 +7,11 @@ AC_INIT([[stdhapi]],[[0.0.0]],[[amok@frihet.ath.cx]])
 AC_MSG_RESULT([--- Welcome to stdhapi configurator ---                  [[0%]]])
 
 AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, dafault is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
-#` <- this one fixes syntax highlighting in vim.
+dnl ` <- this one fixes syntax highlighting in vim.
 AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, dafault is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
+dnl `
 AC_ARG_WITH([sqlite],[AC_HELP_STRING([--with-sqlite],[Compile with SQLite driver, dafault is `yes' if SQLite can be found.])],[SQLITE=$withval],[SQLITE="auto"])
-#`
+dnl `
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 
@@ -166,6 +167,12 @@ if test ["$POSTGRES"] != ["no"] ; then
 											AC_MSG_ERROR([Can not continue without PostgreSQL.])
 										fi;POSTGRES=["no"]])
 fi
+if test ["$SQLITE"] != ["no"] ; then
+	AC_CHECK_LIB([sqlite],[sqlite_open],
+								[],[if test ["$SQLITE"] = ["yes"] ; then
+											AC_MSG_ERROR([Can not continue without SQLite.])
+										fi;SQLITE=["no"]])
+fi
 if test ["$MYSQL"] != ["no"] ; then
 	AC_CHECK_LIB([mysqlclient],[mysql_init],[],[
 			CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]
@@ -204,6 +211,14 @@ if test ["$MYSQL"] != ["no"] ; then
 				[if test ["$MYSQL"] = ["yes"] ; then
 					AC_MSG_ERROR([[Can not continue without MySQL devel(client)!]])
 				fi;MYSQL=["no"]])
+fi
+if test ["$SQLITE"] != ["no"] ; then
+	AC_CHECK_HEADERS([[sqlite.h]],
+		[AC_SUBST([TARGET_SQLITE_DRIVER],["\$(SQLITE_DRIVER)"])
+			DEFAULT_DRIVER=["SQLite"]],
+				[if test ["$SQLITE"] = ["yes"] ; then
+					AC_MSG_ERROR([[Can not continue without SQLite devel(client)!]])
+				fi;SQLITE=["no"]])
 fi
 AC_SUBST([DEFAULT_DRIVER],["$DEFAULT_DRIVER"])
 

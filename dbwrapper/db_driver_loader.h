@@ -37,6 +37,7 @@ Copyright:
 #define D_DB_DRIVER_NONE				0
 #define D_DB_DRIVER_MYSQL				1
 #define D_DB_DRIVER_POSTGRESQL	2
+#define D_DB_DRIVER_SQLITE			3
 
 namespace dbwrapper
 	{
