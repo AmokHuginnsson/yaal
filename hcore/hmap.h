@@ -30,6 +30,7 @@ Copyright:
 #line 31 "hmap.h"
 
 #include <stddef.h>
+#include <new>
 
 extern unsigned long const int * const g_pulPrimes;
 
@@ -193,9 +194,9 @@ ttType & HMap<tType, ttType>::operator [ ] ( const tType & a_rtKey )
 		l_poAtom = l_poAtom->f_poNext;
 	if ( ! l_poAtom )
 		{
-		l_poAtom = new HAtom ( );
+		l_poAtom = new ( std::nothrow ) HAtom ( );
 		if ( ! l_poAtom )
-			throw new HException ( __WHERE__, "memory allocation error", g_iErrNo );
+			M_THROW ( "memory allocation error", g_iErrNo );
 		f_iQuantity ++;
 		l_poAtom->f_poNext = f_ppoAtomArray [ l_iHash ];
 		f_ppoAtomArray [ l_iHash ] = l_poAtom;

@@ -61,6 +61,8 @@ protected:
 	/*}*/
 	};
 
+#include <new>
+
 #include "hexception.h"
 
 template < class tType >
@@ -74,10 +76,9 @@ HArray < tType >::HArray ( int a_iSize )
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
-		f_ptArray = new tType [ f_iSize ];
+		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
 		if ( ! f_ptArray )
-			throw new HException ( __WHERE__,
-					g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
+			M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
 		}
 	return;
 	M_EPILOG
@@ -95,10 +96,9 @@ HArray < tType >::HArray ( const int & a_iSize, tType a_tFillWith )
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
-		f_ptArray = new tType [ f_iSize ];
+		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
 		if ( ! f_ptArray )
-			throw new HException ( __WHERE__,
-					g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
+			M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
 		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 			f_ptArray [ l_iCtr ] = a_tFillWith;
 		}
@@ -145,10 +145,9 @@ HArray < tType > & HArray < tType >::operator = ( const HArray & a_roArray )
 		}
 	if ( f_iSize && ! f_ptArray )
 		{
-		f_ptArray = new tType [ f_iSize ];
+		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
 		if ( ! f_ptArray )
-			throw new HException ( __WHERE__,
-					g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], f_iSize );
+			M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], f_iSize );
 		}
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		f_ptArray [ l_iCtr ] = a_roArray.f_ptArray [ l_iCtr ];
