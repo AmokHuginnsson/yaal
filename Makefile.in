@@ -93,12 +93,12 @@ else
 endif
 FLAGS5 = -D_GNU_SOURCE -march=i486
 # -fno-external-templates #deprecated
-FLAGS6 = 
+FLAGS6 = -L/usr/local/lib @EXTRA_LIB_PATHS@
 FLAGS7 = -fPIC -I. -I$(HEADERSDIR)
 FLAGS8 =	\
 					-shared\
 					-L$(TARGETDIR)\
-					@SPECIAL_LINKER_FLAG@\
+					@SPECIAL_LINKER_FLAGS@\
 					-Wl,--fatal-warnings\
 					-Wl,--demangle\
 					-Wl,--export-dynamic\
