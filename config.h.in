@@ -40,6 +40,8 @@
 
 #undef HAVE_ASCII_GRAPHICS
 
+#undef HAVE_DECL_VSWTC
+
 /* End of available functions definitions. */
 
 #endif /* not __CONFIG_H */

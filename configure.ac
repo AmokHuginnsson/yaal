@@ -80,7 +80,7 @@ AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[63%]]])
 _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
 CXXFLAGS=["-Wextra"]
-AC_TRY_COMPILE([],[int main(void){return(0);}],[AC_SUBST([EXTRA_WARNINGS],[-Wextra])],
+AC_TRY_COMPILE([],[],[AC_SUBST([EXTRA_WARNINGS],[-Wextra])],
 							[AC_SUBST([EXTRA_WARNINGS],[-W])])
 CXXFLAGS=["-Wshadow -Werror"]
 AC_TRY_COMPILE([#include <pthread.h>],[],
@@ -188,14 +188,14 @@ AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 
 AC_CHECK_FUNCS([getline],[],[])
-AC_CHECK_DECL([VSWTC],[],[],[termios.h])
+AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 
 dnl We need to check if out ncurses devel is not brain-damaged.
 AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
 AC_MSG_CHECKING([if your ncurses-devel is seriously brain-damaged])
-CXXFLAGS=["-W -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
+CXXFLAGS=["$EXTRA_WARNINGS -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
 AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
 [printw("x");],[AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
@@ -206,8 +206,9 @@ AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_WARN([You will not have pretty ascii graphics.])])
 
-FILES=["/etc/my.cnf /etc/mysql/my.cnf /usr/local/etc/my.cnf /usr/local/etc/mysql/my.cnf"]
-FILES=["$FILES /etc/mysqld.conf /etc/mysql/mysqld.conf /usr/local/etc/mysqld.conf"]
+FILES=["/etc/my.cnf /etc/mysql/my.cnf /usr/local/etc/my.cnf"]
+FILES=["$FILES /usr/local/etc/mysql/my.cnf /etc/mysqld.conf"]
+FILES=["$FILES /etc/mysql/mysqld.conf /usr/local/etc/mysqld.conf"]
 FILES=["$FILES /usr/local/etc/mysql/mysqld.conf"]
 MYSQL_SOCKET=[`grep -s "^socket" $FILES|awk '{sub(".*=[ \\t]+","");print;exit}'`]
 AC_SUBST([MYSQL_SOCKET],[$MYSQL_SOCKET])
