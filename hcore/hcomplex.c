@@ -112,6 +112,14 @@ bool HComplex::operator == ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
+bool HComplex::operator != ( const HComplex & a_roComplex )
+	{
+	M_PROLOG
+	return ( ( f_dReal != a_roComplex.f_dReal )
+			|| ( f_dImaginary != a_roComplex.f_dImaginary ) );
+	M_EPILOG
+	}
+
 HComplex & HComplex::operator = ( const double a_dReal )
 	{
 	M_PROLOG

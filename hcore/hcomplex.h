@@ -46,6 +46,7 @@ public:
 	double argument ( void );
 	HComplex & operator = ( const HComplex & );
 	bool operator == ( const HComplex & );
+	bool operator != ( const HComplex & );
 	HComplex & operator = ( const double );
 	HComplex & operator += ( const HComplex & );
 	HComplex & operator -= ( const HComplex & );
