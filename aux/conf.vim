@@ -22,7 +22,7 @@ syn keyword stdhapiColorBlack BLACK
 syn match stdhapiSection	/^\[.*\]$/
 syn match stdhapiValues	/[0-9]/
 syn match stdhapiValues	/B[0-9]\+/
-syn match stdhapiKeyword /\<leave_ctrl_.\=\>/
+syn match stdhapiKeyword /\<leave_ctrl_\([cqsz]\>\|\\\)/
 hi stdhapiValues cterm=NONE ctermfg=magenta gui=NONE guifg=magenta
 hi stdhapiCommand cterm=NONE ctermfg=yellow gui=NONE guifg=yellow
 hi stdhapiKeyword cterm=NONE ctermfg=green gui=NONE guifg=green

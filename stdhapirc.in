@@ -95,7 +95,7 @@ latency 1
 # CTRL-x x
 # note that in this case "exit" command is done by pressing `x'
 # in command mode
-command_compose_character x
+command_compose_character 'x'
 
 # command_compose_delay
 # type: integer, default: 16
