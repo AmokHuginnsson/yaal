@@ -58,12 +58,18 @@ sqlite_db * g_psBrokenDB = NULL;
 
 void * db_query ( void *, const char * );
 void db_unquery ( void * );
+void db_disconnect ( void * );
 
 void * db_connect ( const char * a_pcDataBase,
 		const char *, const char * )
 	{
 	void * l_pvPtr = NULL;
 	sqlite_db * l_psSQLite = ( sqlite_db * ) xcalloc ( sizeof ( sqlite_db ) );
+	if ( g_psBrokenDB )
+		{
+		db_disconnect ( g_psBrokenDB );
+		g_psBrokenDB = NULL;
+		}
 	l_psSQLite->f_psDB = sqlite_open ( a_pcDataBase, 0,
 			& l_psSQLite->f_pcErrorMessage );
 	if ( ! l_psSQLite->f_psDB )

@@ -27,6 +27,7 @@ Copyright:
 
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "../config.h"
 
@@ -47,23 +48,28 @@ Copyright:
 extern "C"
 {
 
+PGconn * g_psBrokenDB = NULL;
+
+void db_disconnect ( void * );
+
 void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
 	{
-	char * l_pcSockPath = NULL;
-	char * l_pcDataBase = NULL;
 	PGconn * l_psConnection = NULL;
-	l_pcDataBase = xstrdup ( a_pcDataBase );
-	l_pcSockPath = strchr ( l_pcDataBase, ':' );
-	if ( l_pcSockPath )* l_pcSockPath = 0;
+	if ( g_psBrokenDB )
+		{
+		db_disconnect ( g_psBrokenDB );
+		g_psBrokenDB = NULL;
+		}
 	l_psConnection = PQsetdbLogin ( NULL,	/* host */
 																	NULL,					/* port */
 																	NULL,					/* options */
 																	NULL,					/* debugging tty */
-																	l_pcDataBase, 
+																	a_pcDataBase, 
 																	a_pcLogin, 
 																	a_pcPassword );
-	xfree ( l_pcDataBase );
+	if ( PQstatus ( l_psConnection ) != CONNECTION_OK )
+		g_psBrokenDB = l_psConnection, l_psConnection = NULL;
 	return ( l_psConnection );
 	}
 
@@ -76,11 +82,12 @@ void db_disconnect ( void * a_pvData )
 
 int db_errno ( void * )
 	{
-	return ( 0 );
+	return ( errno );
 	}
 
 const char * db_error  ( void * a_pvData )
 	{
+	if ( ! a_pvData )a_pvData = g_psBrokenDB;
 	return ( PQerrorMessage ( ( PGconn * ) a_pvData ) );
 	}
 

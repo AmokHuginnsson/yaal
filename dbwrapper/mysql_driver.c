@@ -45,20 +45,27 @@ Copyright:
 extern "C"
 {
 
-MYSQL * g_psBrokenMySQL = NULL;
+MYSQL * g_psBrokenDB = NULL;
+
+void db_disconnect ( void * );
 
 void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
 	{
 	MYSQL * l_psMySQL = NULL;
+	if ( g_psBrokenDB )
+		{
+		db_disconnect ( g_psBrokenDB );
+		g_psBrokenDB = NULL;
+		}
 	l_psMySQL = mysql_init ( NULL );
 	if ( l_psMySQL )
 		{
 		if ( mysql_options ( l_psMySQL, MYSQL_OPT_NAMED_PIPE, NULL ) )
-			g_psBrokenMySQL = l_psMySQL, l_psMySQL = NULL;
+			g_psBrokenDB = l_psMySQL, l_psMySQL = NULL;
 		else if ( ! mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
 				a_pcDataBase, 0, NULL, CLIENT_IGNORE_SPACE ) )
-			g_psBrokenMySQL = l_psMySQL, l_psMySQL = NULL;
+			g_psBrokenDB = l_psMySQL, l_psMySQL = NULL;
 		}
 	return ( l_psMySQL );
 	}
@@ -71,13 +78,13 @@ void db_disconnect ( void * a_pvData )
 
 int db_errno ( void * a_pvData )
 	{
-	if ( ! a_pvData )a_pvData = g_psBrokenMySQL;
+	if ( ! a_pvData )a_pvData = g_psBrokenDB;
 	return ( mysql_errno ( ( MYSQL * ) a_pvData ) );
 	}
 
 const char * db_error  ( void * a_pvData )
 	{
-	if ( ! a_pvData )a_pvData = g_psBrokenMySQL;
+	if ( ! a_pvData )a_pvData = g_psBrokenDB;
 	return ( mysql_error ( ( MYSQL * ) a_pvData ) );
 	}
 
