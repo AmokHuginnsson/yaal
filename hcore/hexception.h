@@ -76,6 +76,9 @@ Copyright:
 
 #define g_iErrNo errno
 
+extern long int g_lLogMask;
+extern int g_iDebugLevel;
+
 class HException
 	{
 protected:

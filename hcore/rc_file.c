@@ -54,6 +54,9 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );
 		if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc, l_iLine ) )
 			{
+			if ( g_iDebugLevel )
+				fprintf ( stderr, "option: [%s], value [%s]\n", ( char * ) l_oOption,
+						( char * ) l_oValue );
 			if ( a_pcSection )
 				{
 				if ( l_oValue.is_empty ( ) )
@@ -144,15 +147,15 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 		int & a_riLine )
 	{
 	M_PROLOG
-	static size_t	l_iBlockSize = 256;
-	static char * l_pcBuffer = 0;
-	int l_iIndex, l_iLenght, l_iSub;
-#ifndef HAVE_GETLINE
-	int l_iReadLen = 0;
+	static size_t	l_iBlockSize = 256; /* size of buffer allocated to read line */
+	static char * l_pcBuffer = 0; /* buffer for read lines */
+	int l_iIndex = 0, l_iLenght = 0, l_iSub = 0;
 	char * l_pcPtr = NULL;
+#ifndef HAVE_GETLINE /* if we do not have getline we need to simulate its beh */
+	int l_iReadLen = 0;
 	if ( ! l_pcBuffer )l_iBlockSize = 256;
 #endif /* not HAVE_GETLINE */
-	if ( ! a_psFile )
+	if ( ! a_psFile ) /* the file is closed, we can deallocate allocated memory */
 		{
 		if ( l_pcBuffer )
 			{
@@ -177,6 +180,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 		* ++ l_pcPtr = 0;
 		fseek ( a_psFile, l_pcPtr - l_pcBuffer - l_iReadLen, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
+		/* we are looking for first non-whitespace on the line */
 		for ( l_iIndex = 0; l_iIndex < ( int ) ( l_iBlockSize - 1 ); l_iIndex++ )
 			{
 			if ( ( l_pcBuffer [ l_iIndex ] == ' ')
@@ -186,17 +190,24 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 				if ( ( l_pcBuffer [ l_iIndex ] == '#' )
 						|| ( l_pcBuffer [ l_iIndex ] == '\r' )
 						|| ( l_pcBuffer [ l_iIndex ] == '\n' ) )l_iIndex = -99;
+				/* this line is empty or has only a comment */
 				break;
 				}
 			}
 		if ( ( l_iIndex > -1 ) && ( l_iIndex < ( int ) ( l_iBlockSize - 1 ) ) )
 			{
+			/* at this point we know we have _some_ option */
+			/* now we look for first whitespace after option */
 			l_iLenght = strchr ( l_pcBuffer + l_iIndex, ' ' ) - l_pcBuffer;
 			l_iSub = strchr ( l_pcBuffer + l_iIndex, '\t' ) - l_pcBuffer;
 			if ( ( l_iLenght < 0 ) && ( l_iSub < 0 ) )
 				{
+				/* we did not found any whitespace, so we have no value at this line */
 				l_iSub = l_iIndex;
 				l_iLenght = strlen ( l_pcBuffer ) - 1;
+				/* strip comment from end of line */
+				if ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) )
+					l_iLenght = l_pcPtr - l_pcBuffer - 1;
 				for ( l_iIndex = l_iLenght; l_iIndex > l_iSub ; l_iIndex-- )
 					if ( ! ( ( l_pcBuffer [ l_iIndex ] == ' ')
 							|| ( l_pcBuffer [ l_iIndex ] == '\t' ) 
@@ -208,13 +219,16 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 				}
 			else
 				{
+				/* we have found a whitespace, so there is probability that */
+				/* have a value :-o */
 				l_iSub = l_iSub > 0 ? l_iSub : ( l_iBlockSize - 1 );
 				l_iLenght = l_iLenght > 0 ? l_iLenght : ( l_iBlockSize - 1 );
 				l_iSub = l_iSub < l_iLenght ? l_iSub : l_iLenght;
 				l_pcBuffer [ l_iSub ] = 0;
 				a_roOption = l_pcBuffer + l_iIndex;
 				l_pcBuffer [ l_iSub ] = ' ';
-				for ( l_iIndex = l_iSub; l_iIndex < ( int ) ( l_iBlockSize - 1 ); l_iIndex++ )
+				for ( l_iIndex = l_iSub; l_iIndex < ( int ) ( l_iBlockSize - 1 );
+						l_iIndex++ )
 					{
 					if ( ( l_pcBuffer [ l_iIndex ] == ' ')
 							|| ( l_pcBuffer [ l_iIndex ] == '\t' ) )continue;
@@ -228,13 +242,22 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 					}
 				if ( ( l_iIndex > -1 ) && ( l_iIndex < ( int ) ( l_iBlockSize - 1 ) ) )
 					{
+					/* we have found a non-whitespace, so there certainly is a value */
 					l_iSub = l_iIndex;
 					l_iLenght = strlen ( l_pcBuffer ) - 1;
+					/* strip comment from end of line */
+					if ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) )
+						l_iLenght = l_pcPtr - l_pcBuffer - 1;
 					for ( l_iIndex = l_iLenght; l_iIndex > l_iSub ; l_iIndex-- )
 						if ( ! ( ( l_pcBuffer [ l_iIndex ] == ' ')
 								|| ( l_pcBuffer [ l_iIndex ] == '\t' ) 
 								|| ( l_pcBuffer [ l_iIndex ] == '\r' )
 								|| ( l_pcBuffer [ l_iIndex ] == '\n' ) ) ) break;
+					/* now we strip apostrophe or quotation marks */
+					if ( ( ( l_pcBuffer [ l_iSub ] == '\'' )
+								|| ( l_pcBuffer [ l_iSub ] == '"' ) )
+							&& ( l_pcBuffer [ l_iSub ] == l_pcBuffer [ l_iIndex ] ) )
+						l_iIndex --, l_iSub ++;
 					l_pcBuffer [ l_iIndex + 1 ] = 0;
 					a_roValue = l_pcBuffer + l_iSub;
 					}

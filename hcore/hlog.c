@@ -40,7 +40,6 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hlog.h"
 #include "xalloc.h"
-#include "hcore.h"
 
 #define D_BUFFER_SIZE			1024
 #define D_HOSTNAME_SIZE		16

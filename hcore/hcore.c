@@ -35,6 +35,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "rc_file.h"
 
 long int g_lLogMask = 0;
+int g_iDebugLevel = 0;
 
 namespace core
 	{
@@ -102,9 +103,10 @@ void set_env ( const char * a_pcVarValue )
 	}
 
 extern "C"
-void hcore_init ( void ); __attribute__ ( ( constructor ) )
+void hcore_init ( void ) __attribute__ ( ( constructor ) );
 void hcore_init ( void )
 	{
+	char * l_pcEnv = NULL;
 	g_iErrNo = 0;
 	if ( sizeof ( int ) < 4 )
 		{
@@ -112,6 +114,9 @@ void hcore_init ( void )
 		::log << endl;
 		exit ( 1 );
 		}
+	l_pcEnv = ::getenv ( "STDHAPI_DEBUG" );
+	if ( l_pcEnv )
+		g_iDebugLevel = strtol ( l_pcEnv, NULL, 10 );
 	rc_file::process_rc_file ( "stdhapi", "core", g_psHCoreVariables,
 			set_hcore_variables );
 	return;
