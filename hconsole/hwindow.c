@@ -49,9 +49,12 @@ HWindow::HWindow ( const char * a_pcTitle )
 	if ( ! console::is_enabled ( ) )
 		throw new HException ( __WHERE__, "console not initialised.", g_iErrNo );
 	f_poFocusedChild = NULL;
+	f_poPreviousFocusedChild = NULL;
 	f_poStatusBar = NULL;
 	f_oTitle = a_pcTitle;
 	register_postprocess_handler ( '\t', & HWindow::handler_jump_tab );
+	register_postprocess_handler ( ':', & HWindow::handler_command );
+	register_postprocess_handler ( '/', & HWindow::handler_search );
 	return;
 	M_EPILOG
 	}
@@ -238,6 +241,34 @@ void HWindow::set_focus ( HControl * a_poControl )
 	f_poFocusedChild = a_poControl;
 	console::n_bNeedRepaint = true;
 	return;
+	M_EPILOG
+	}
+
+int HWindow::handler_command ( int a_iCode )
+	{
+	M_PROLOG
+	a_iCode = 0;
+	f_poPreviousFocusedChild = f_poFocusedChild;
+	f_poFocusedChild = f_poStatusBar;
+	f_poPreviousFocusedChild->kill_focus ( );
+	f_poStatusBar->enable ( true );
+	f_poStatusBar->set_focus ( -1 );
+	f_poStatusBar->set_prompt ( ":" );
+	return ( a_iCode );
+	M_EPILOG
+	}
+
+int HWindow::handler_search ( int a_iCode )
+	{
+	M_PROLOG
+	a_iCode = 0;
+	if ( ! f_poFocusedChild->is_searchable ( ) )return ( a_iCode );
+	f_poPreviousFocusedChild = f_poFocusedChild;
+	f_poFocusedChild = f_poStatusBar;
+	f_poPreviousFocusedChild->kill_focus ( );
+	f_poStatusBar->enable ( true );
+	f_poStatusBar->set_focus ( -1 );
+	return ( a_iCode );
 	M_EPILOG
 	}
 

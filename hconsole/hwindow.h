@@ -41,6 +41,8 @@ protected:
 	/*{*/
 	HString							f_oTitle;					/* title of window */
 	HControl * 					f_poFocusedChild;	/* points to control that has focus */
+	HControl *					f_poPreviousFocusedChild; /* control that had focus before
+																									 focus went to status bar */	
 	HControlList				f_oControls;	/* list of all control inside _this_ wind */
 	HStatusBarControl * f_poStatusBar;
 	HList < HHandler < int ( HWindow::* ) ( int ) > > f_oPreprocessHandlers;
@@ -58,6 +60,8 @@ public:
 	int process_input ( int );
 	virtual int handler_jump_tab ( int ); /* jump thru controlos with tab key */
 	virtual int handler_jump_direct ( int ); /* direct jump to specified cntrl */
+	virtual int handler_command ( int ); /* put window into command awaiting */
+	virtual int handler_search ( int ); /* put window into search pattern scan */
 	int add_control ( HControl *, int );
 	HStatusBarControl * status_bar ( void );
 	/*}*/

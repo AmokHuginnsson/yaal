@@ -39,13 +39,17 @@ Copyright:
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hstatusbarcontrol.h"
+#include "hconsole.h"
 
 HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
-		const char * a_pcLabel )
+		const char * a_pcLabel, int a_iPromptAttribute )
 								 : HControl ( a_poParent, -2, 0, 0, 255, a_pcLabel ),
 									HEditControl ( a_poParent, - 2, 0, 0, 255, a_pcLabel )
 	{
 	M_PROLOG
+	if ( a_iPromptAttribute > 0 )
+		f_iPromptAttribute = a_iPromptAttribute;
+	else f_iPromptAttribute = console::n_iPromptAttribute;
 	f_iPromptLength = 0;
 	f_bDone = false;
 	f_iLastProgress = -1;
@@ -58,6 +62,56 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 HStatusBarControl::~HStatusBarControl ( void )
 	{
 	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+void HStatusBarControl::draw_label ( void )
+	{
+	M_PROLOG
+	HControl::draw_label ( );
+	f_iColumnRaw += f_iPromptLength;
+	f_iWidthRaw -= f_iPromptLength;
+	f_iWidthRaw --;
+	return;
+	M_EPILOG
+	}
+
+void HStatusBarControl::refresh ( void )
+	{
+	M_PROLOG
+	if ( f_iPromptLength )
+		{
+		::move ( f_iRowRaw, 0 );
+		console::set_attr ( f_iPromptAttribute );
+		cprintf ( f_oPrompt );
+		}
+	HEditControl::refresh ( );
+	return;
+	M_EPILOG
+	}
+
+int HStatusBarControl::process_input ( int a_iCode )
+	{
+	M_PROLOG
+	a_iCode = HEditControl::process_input ( a_iCode );
+	return ( a_iCode );
+	M_EPILOG
+	}
+
+void HStatusBarControl::set_prompt ( const char * a_pcPrompt )
+	{
+	M_PROLOG
+	if ( a_pcPrompt )
+		{
+		f_oPrompt = a_pcPrompt;
+		f_iPromptLength = f_oPrompt.get_length ( );
+		}
+	else
+		{
+		f_oPrompt [ 0 ] = 0;
+		f_iPromptLength = 0;
+		}
 	return;
 	M_EPILOG
 	}

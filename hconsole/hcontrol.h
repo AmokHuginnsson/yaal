@@ -85,7 +85,7 @@ public:
 	virtual HInfo operator = ( const HInfo & );
 	virtual operator HInfo ( void );
 	virtual bool is_searchable ( void );
-	void draw_label ( void );
+	virtual void draw_label ( void );
 	void set_attributes ( int, int, int );
 	void move ( int, int, int, int );
 #define M_ATTR_LABEL( )	f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8

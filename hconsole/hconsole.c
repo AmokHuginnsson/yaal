@@ -43,6 +43,7 @@ int n_iEnabledAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
 															+ ( D_FG_WHITE | D_BG_BLACK | D_BG_BLINK );
 int n_iFocusedAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
 															+ ( D_FG_BLACK | D_BG_LIGHTGRAY ); 
+int n_iPromptAttribute = D_FG_WHITE | D_BG_BLACK;
 bool	n_bUseMouse = false;
 bool	n_bDisableXON = false;
 bool	n_bLeaveCtrlC = false;

@@ -33,26 +33,32 @@ class HStatusBarControl : public HEditControl
 	{
 protected:
 	/*{*/
-	int f_iPromptLength;
+	int			f_iPromptAttribute;
+	int			f_iPromptLength;
+	HString	f_oPrompt;
 	/* progress bar data */
-	bool f_bDone;
-	bool f_bEstimate;
-	double f_dProgressSize;
-	int f_iLastProgress;
-	int f_iLastPercent;
-	int f_iLastMinute;
-	int f_iLastSecond;
-	int f_iLastStep;
-	HString f_oMessage;
-	HTime f_oStart;
+	bool		f_bDone;
+	bool		f_bEstimate;			/* was time left count ? */
+	double	f_dProgressSize;	/* number of steps in progess bar */
+	int			f_iLastProgress;	/* last drawed step */
+	int			f_iLastPercent;		/* last writen percent */
+	int			f_iLastMinute;		/* all last* variables help */
+	int			f_iLastSecond;		/* keep progress bar refresh rate low */
+	int			f_iLastStep;
+	HString	f_oMessage;
+	HTime		f_oStart;
 	/* end of progress bar data */
 	/*}*/
 public:
 	/*{*/
-	HStatusBarControl ( HWindow *, const char * );
+	HStatusBarControl ( HWindow *, const char *, int = -1 );
 	virtual ~HStatusBarControl ( void );
+	virtual void draw_label ( void );
+	virtual void refresh ( void );
 	virtual int verify ( void );
+	virtual int process_input( int );
 	void setup ( const char *, const char *, int );
+	void set_prompt ( const char * = NULL );
 	void init_progress ( double, const char *, bool = true );
 	void update_progress ( double = -1, const char * = NULL );
 	void message ( int, const char *, ... );

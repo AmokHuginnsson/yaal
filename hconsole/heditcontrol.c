@@ -139,7 +139,6 @@ void HEditControl::refresh ( void )
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer, ' ', f_iWidthRaw );
-	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	if ( ! f_bPassword )
 		{
 		strcpy ( f_oVarTmpBuffer, ( char * ) f_oString + f_iControlOffset );
