@@ -27,7 +27,13 @@ Copyright:
 
 #include <stdlib.h>
 
-#include <postgresql/libpq-fe.h>
+#include "../config.h"
+
+#ifdef __PLD_HOST__
+#	include <libpq-fe.h>
+#else /* __PLD_HOST__ */
+#	include <postgresql/libpq-fe.h>
+#endif /* not __PLD_HOST__*/
 
 #ifndef NULL
 #define NULL	0
@@ -62,7 +68,7 @@ int db_errno ( void * )
 	return ( 0 );
 	}
 
-char * db_error  ( void * a_pvData )
+const char * db_error  ( void * a_pvData )
 	{
 	return ( PQerrorMessage ( ( PGconn * ) a_pvData ) );
 	}
