@@ -66,8 +66,6 @@ AC_MSG_RESULT([--- Guessed host operating system is $_HOST       [[74%]]])
 dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[75%]]])
 _FLAG____________='unfortunetely none'
-dnl CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings --Wl,--export-dynamic -Wl,-soname,conftest"]
-dnl CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings --Wl,--export-dynamic -Wl,-soname,conftest"]
 CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings -Wl,-soname,conftest"]
 AC_LINK_IFELSE([[extern int errno;void foo(void){errno=0;}]],
 							[AC_SUBST([SPECIAL_LINKER_FLAG],
