@@ -175,62 +175,13 @@ HString::HString ( const void * a_pvPtrVoid )
 HString & HString::operator = ( const HString & a_roString )
 	{
 	M_PROLOG
-	return ( * this = a_roString.f_pcBuffer );
-	M_EPILOG
-	}
-
-HString & HString::operator = ( const char * a_pcStr )
-	{
-	M_PROLOG
 	int l_iLenght = 0;
-	if ( a_pcStr )
+	if ( ( this != & a_roString ) && a_roString.f_pcBuffer )
 		{
-		l_iLenght = strlen ( a_pcStr ) + 1;
+		l_iLenght = strlen ( a_roString.f_pcBuffer ) + 1;
 		hs_realloc ( l_iLenght );
-		strcpy ( f_pcBuffer, a_pcStr );
+		strcpy ( f_pcBuffer, a_roString.f_pcBuffer );
 		}
-	return ( * this );
-	M_EPILOG
-	}
-
-HString & HString::operator = ( const char a_cChar )
-	{
-	M_PROLOG
-	hs_realloc ( 2 );
-	f_pcBuffer [ 0 ] = a_cChar;
-	f_pcBuffer [ 1 ] = 0;
-	return ( * this );
-	M_EPILOG
-	}
-
-HString & HString::operator = ( const int a_iInt )
-	{
-	M_PROLOG
-	this->operator = ( HString ( a_iInt ) );
-	return ( * this );
-	M_EPILOG
-	}
-
-HString & HString::operator = ( const long int a_lLong )
-	{
-	M_PROLOG
-	this->operator = ( HString ( a_lLong ) );
-	return ( * this );
-	M_EPILOG
-	}
-
-HString & HString::operator = ( const double a_dDouble )
-	{
-	M_PROLOG
-	this->operator = ( HString ( a_dDouble ) );
-	return ( * this );
-	M_EPILOG
-	}
-
-HString & HString::operator = ( const void * a_pvVoidPtr )
-	{
-	M_PROLOG
-	this->operator = ( HString ( a_pvVoidPtr ) );
 	return ( * this );
 	M_EPILOG
 	}
@@ -315,48 +266,6 @@ HString & HString::operator += ( const HString & a_roString )
 	{
 	M_PROLOG
 	return ( ( * this ) = ( ( * this ) + a_roString ) );
-	M_EPILOG
-	}
-
-HString & HString::operator += ( const char * a_pcStr )
-	{
-	M_PROLOG
-	return ( ( * this ) = ( ( * this ) + a_pcStr ) );
-	M_EPILOG
-	}
-
-HString & HString::operator += ( const char a_cChar )
-	{
-	M_PROLOG
-	return ( ( * this ) = ( ( * this ) + a_cChar ) );
-	M_EPILOG
-	}
-
-HString & HString::operator += ( const int a_iInt )
-	{
-	M_PROLOG
-	return ( * this = * this + a_iInt );
-	M_EPILOG
-	}
-
-HString & HString::operator += ( const long int a_lLong )
-	{
-	M_PROLOG
-	return ( * this = * this + a_lLong );
-	M_EPILOG
-	}
-
-HString & HString::operator += ( const double a_dDouble )
-	{
-	M_PROLOG
-	return ( * this = * this + a_dDouble );
-	M_EPILOG
-	}
-
-HString & HString::operator += ( const void * a_pvVoidPtr )
-	{
-	M_PROLOG
-	return ( * this = * this + a_pvVoidPtr );
 	M_EPILOG
 	}
 
