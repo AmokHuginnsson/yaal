@@ -42,6 +42,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdatalistcontrol.h"
 #include "hdatatreecontrol.h"
 #include "hdataeditcontrol.h"
+#include "hdatastatusbarcontrol.h"
 
 HDataWindow::HDataWindow ( const char * a_pcTitle, HDataBase * a_poDataBase,
 		OResource * a_psDataControlInfo )
@@ -216,6 +217,13 @@ int HDataWindow::init ( void )
 		}
 	refresh ( );
 	return ( 0 );
+	M_EPILOG
+	}
+
+HStatusBarControl * HDataWindow::init_bar ( const char * a_pcLabel )
+	{
+	M_PROLOG
+	return ( new HDataStatusBarControl ( this, a_pcLabel ) );
 	M_EPILOG
 	}
 
@@ -407,6 +415,8 @@ int HDataWindow::handler_cancel ( int )
 	set_mode ( D_MODE_VIEW );
 	if ( ( l_iMode == D_MODE_ADDING ) && f_poMainControl )
 		f_poMainControl->cancel_new ( );
+	f_bModified = false;
+	f_poStatusBar->refresh ( );
 	f_poStatusBar->message ( "Dropping all changes.", D_FG_BRIGHTRED );
 	return ( 0 );
 	M_EPILOG
@@ -419,7 +429,12 @@ bool HDataWindow::is_modified ( void )
 
 void HDataWindow::set_modified ( bool a_bModified )
 	{
-	f_poStatusBar->message ( "modified!" );
+	M_PROLOG
+	bool l_bModified = f_bModified;
 	f_bModified = a_bModified;
+	if ( ! l_bModified )
+		f_poStatusBar->refresh ( );
+	return;
+	M_EPILOG
 	}
 

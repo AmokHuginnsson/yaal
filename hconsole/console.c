@@ -44,6 +44,10 @@ M_CVSID ( "$CVSHeader$" );
 #include "hconsole.h"
 #include "console.h"
 
+#define M_MAKE_ATTR(attr) COLOR_PAIR( ( ( ( attr ) & 112 ) >> 1 ) \
+													| ( attr ) & 7 ) | ( ( attr ) & 8 ? A_BOLD : 0 ) \
+													| ( ( attr ) & 128 ? A_BLINK : 0 )
+
 namespace console
 {
 
@@ -169,6 +173,7 @@ void enter_curses( void )
 	init_pair ( COLOR_WHITE * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_WHITE );
 	init_pair ( COLOR_WHITE * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_WHITE );
 	attrset ( COLOR_PAIR( 7 ) );
+	bkgd ( ' ' | M_MAKE_ATTR ( D_FG_LIGHTGRAY | D_BG_BLACK ) | A_INVIS );
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( n_bUseMouse
@@ -185,6 +190,7 @@ void leave_curses( void )
 		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
 //	if ( ! mousemask ( 0, NULL ) )
 //		throw new HException ( __WHERE__, "mousemask ( ) returned 0", g_iErrNo );
+	bkgd ( ' ' | M_MAKE_ATTR ( ( D_FG_LIGHTGRAY | D_BG_BLACK ) ) );
 	use_default_colors ( );
 	printw ( "" );
 	fflush ( 0 );
@@ -217,7 +223,7 @@ void set_attr( unsigned char a_ucAttr )
 	M_PROLOG
 	if ( ! n_bEnabled )
 		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
-	attrset ( COLOR_PAIR( ( ( a_ucAttr & 112 ) >> 1 ) | a_ucAttr & 7 ) | ( a_ucAttr & 8 ? A_BOLD : 0 ) | ( a_ucAttr & 128 ? A_BLINK : 0 ) );
+	attrset ( M_MAKE_ATTR ( a_ucAttr ) );
 	return ;
 	M_EPILOG
 	}

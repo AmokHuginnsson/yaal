@@ -74,6 +74,8 @@ HStatusBarControl::~HStatusBarControl ( void )
 void HStatusBarControl::draw_label ( void )
 	{
 	M_PROLOG
+	::move ( console::n_iHeight - 2, 0 );
+	::clrtoeol ( );
 	HControl::draw_label ( );
 	f_iColumnRaw += f_iPromptLength;
 	f_iWidthRaw -= f_iPromptLength;
@@ -85,12 +87,16 @@ void HStatusBarControl::draw_label ( void )
 void HStatusBarControl::refresh ( void )
 	{
 	M_PROLOG
+	int l_iOrigRow = 0;
+	int l_iOrigColumn = 0;
+	if ( ! f_bFocused )getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	if ( f_iPromptLength )
 		{
 		console::set_attr ( f_iStatusBarAttribute >> 8 );
 		::mvprintw ( f_iRowRaw, 0, f_oPrompt );
 		}
 	HEditControl::refresh ( );
+	if ( ! f_bFocused )::move ( l_iOrigRow, l_iOrigColumn );
 	return;
 	M_EPILOG
 	}
@@ -219,11 +225,13 @@ void HStatusBarControl::message ( int a_iAttribute,
 		const char * a_pcFormat, ... )
 	{
 	M_PROLOG
+	int l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
 	console::c_printf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
+	curs_set ( l_iOrigCursState );
 	return;
 	M_EPILOG
 	}
@@ -231,11 +239,13 @@ void HStatusBarControl::message ( int a_iAttribute,
 void HStatusBarControl::message ( const char * a_pcFormat, ... )
 	{
 	M_PROLOG
+	int l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
 	console::c_printf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
 	va_end ( l_xAp );
+	curs_set ( l_iOrigCursState );
 	return;
 	M_EPILOG
 	}

@@ -37,14 +37,14 @@ namespace console
 {
 
 int n_iLatency = 1;
-int n_iDisabledAttribute = 256 * ( D_FG_GREEN | D_BG_BLACK | D_BG_BLINK )
-															+ ( D_FG_LIGHTGRAY | D_BG_BLACK | D_BG_BLINK );
-int n_iEnabledAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
-															+ ( D_FG_WHITE | D_BG_BLACK | D_BG_BLINK );
-int n_iFocusedAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
-															+ ( D_FG_BLACK | D_BG_LIGHTGRAY ); 
-int n_iStatusBarAttribute = 256 * ( D_FG_WHITE | D_BG_BLACK )
-															+ ( D_FG_LIGHTGRAY | D_BG_BLACK );
+int n_iDisabledAttribute = ( D_FG_GREEN | D_BG_BLACK | D_BG_BLINK ) << 8
+															| ( D_FG_LIGHTGRAY | D_BG_BLACK | D_BG_BLINK );
+int n_iEnabledAttribute = ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK ) << 8
+															| ( D_FG_WHITE | D_BG_BLACK | D_BG_BLINK );
+int n_iFocusedAttribute = ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK ) << 8
+															| ( D_FG_BLACK | D_BG_LIGHTGRAY ); 
+int n_iStatusBarAttribute = ( D_FG_WHITE | D_BG_BLACK ) << 8
+															| ( D_FG_LIGHTGRAY | D_BG_BLACK );
 bool	n_bUseMouse = false;
 bool	n_bDisableXON = false;
 bool	n_bLeaveCtrlC = false;
