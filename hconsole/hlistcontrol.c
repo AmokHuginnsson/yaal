@@ -649,6 +649,7 @@ HItem * HListControl::remove_tail ( int * a_piFlag )
 int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 	{
 	M_PROLOG
+	double l_dDifference = 0;
 	HInfo & l_roLeftInfo = a_poLeft->get_object ( ) [ f_iSortColumn ];
 	HInfo & l_roRightInfo = a_poRight->get_object ( ) [ f_iSortColumn ];
 	f_lComparedItems ++;
@@ -663,18 +664,18 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 			}
 		case ( D_TYPE_DOUBLE ):
 			{
-			return ( ( int ) ( ( ( ( double ) l_roLeftInfo ) - ( ( double ) l_roRightInfo ) ) * 100 ) );
+			l_dDifference = ( ( double ) l_roLeftInfo ) - ( ( double ) l_roRightInfo );
 			break;
 			}
 		case ( D_TYPE_HSTRING ):
 			{
-			return ( strcasecmp ( ( HString& ) l_roLeftInfo,
-					( ( HString& ) l_roRightInfo ) ) );
+			return ( strcasecmp ( ( HString & ) l_roLeftInfo,
+					( ( HString & ) l_roRightInfo ) ) );
 			break;
 			}
 		case ( D_TYPE_HTIME ):
 			{
-			return ( ( ( time_t ) ( HTime& ) l_roLeftInfo ) - ( ( time_t ) ( HTime& ) l_roRightInfo ) );
+			l_dDifference = ( ( time_t ) ( HTime & ) l_roLeftInfo ) - ( ( time_t ) ( HTime & ) l_roRightInfo );
 			break;
 			}
 		default :
@@ -682,7 +683,7 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 			break;
 			}
 		}
-	return ( 0 );
+	return ( l_dDifference > 0 ? 1 : ( l_dDifference < 0 ? - 1 : 0 ) );
 	M_EPILOG
 	}
 
