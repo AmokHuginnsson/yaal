@@ -40,13 +40,12 @@ extern const char * g_ppcErrMsgHMatrix [ ];
 #include "hvector.h"
 
 template < class tType >
-class HMatrix : public HArray < tType >
+class HMatrix : public HArray < HVector < tType > * >
 	{
 protected:
 	/* { */
 	int f_iRows;
 	int f_iColumns;
-	HVector < tType > * f_ptBody;
 	/* } */
 public:
 	/* { */
@@ -63,7 +62,6 @@ public:
 	HMatrix _1 ( void );
 	HMatrix & operator = ( const HMatrix & );
 	HMatrix & operator = ( tType );
-	HMatrix & operator <= ( HMatrix & );
 	HMatrix operator + ( HMatrix & );
 	HMatrix operator - ( HMatrix & );
 	HMatrix operator * ( HMatrix & );
@@ -94,6 +92,7 @@ HVector < tType > T ( HMatrix < tType > &, HVector < tType > & );
 
 template < class tType >
 HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
+									:	HArray ( a_iRows )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -103,11 +102,9 @@ HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
 	if ( a_iColumns < 1 )
 		throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_BADCOLUMNS ], a_iColumns );
 	else f_iColumns = a_iColumns;
-	if ( ! ( f_ptBody = new HVector < tType > * [ f_iRows ] ) ) 
-		throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_NEWRETURNEDNULL ], g_iErrNo );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
 		{
-		if ( ! ( f_ptBody [ l_iCtr ] = new HVector < tType > ( f_iColumns ) ) )
+		if ( ! ( f_ptArray [ l_iCtr ] = new HVector < tType > ( f_iColumns ) ) )
 			throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_NEWRETURNEDNULL ], l_iCtr );
 		}
 	return ;
@@ -116,20 +113,12 @@ HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
 	
 template < class tType >
 HMatrix < tType > ::HMatrix ( const HMatrix & a_roMatrix, int )
+									:	HArray ( a_roMatrix.f_iRows )
 	{
 	M_PROLOG
-	int l_iCtr;
-	f_iRows = a_roMatrix.f_iRows;
-	f_iColumns = a_roMatrix.f_iColumns;
-	if ( ! ( f_ptBody = new HVector < tType > * [ f_iRows ] ) )
-			throw new HException ( __WHERE__, "new returned", ( int ) f_ptBody );
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		{
-		if ( ! ( f_ptBody [ l_iCtr ] = new HVector < tType > ( f_iColumns ) ) )
-			throw HException ( __WHERE__, "new returned 0", l_iCtr );
-		 * f_ptBody [ l_iCtr ] = * a_roMatrix.f_ptBody [ l_iCtr ];
-		}
-	return ;
+	f_iColumns = 0;
+	( * this ) = a_roMatrix;
+	return;
 	M_EPILOG
 	}
 	
@@ -137,6 +126,13 @@ template < class tType >
 HMatrix < tType > ::~HMatrix ( void )
 	{
 	M_PROLOG
+	int l_iCtr = 0;
+	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
+		{
+		if ( f_ptArray [ l_iCtr ] )
+			delete f_ptArray [ l_iCtr ];
+		f_ptArray [ l_iCtr ] = NULL;
+		}
 	return;
 	M_EPILOG
 	}
@@ -146,7 +142,8 @@ int HMatrix < tType > ::set ( tType ** d )
 	{
 	M_PROLOG
 	int l_iCtr;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) f_ptBody [ l_iCtr ]->set ( d [ l_iCtr ] );
+	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
+		f_ptArray [ l_iCtr ]->set ( d [ l_iCtr ] );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -157,7 +154,7 @@ int HMatrix < tType > ::set ( HVector < tType > * a_poVector )
 	M_PROLOG
 	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		* f_ptBody [ l_iCtr ] = ( * a_poVector ) [ l_iCtr ];
+		* f_ptArray [ l_iCtr ] = ( * a_poVector ) [ l_iCtr ];
 	return ( 0 );
 	M_EPILOG
 	}
@@ -244,7 +241,7 @@ tType HMatrix < tType > ::M ( int r, int c )
 		for ( j = 0; j < f_iColumns; j++ )
 			{
 			if ( j == c ) continue;
-			l_oMatrix [ ii ] [ jj ] = ( * f_ptBody [ l_iCtr ] ) [ j ];
+			l_oMatrix [ ii ] [ jj ] = ( * f_ptArray [ l_iCtr ] ) [ j ];
 			jj++;
 			}
 		ii++;
@@ -260,7 +257,7 @@ HMatrix < tType > HMatrix < tType > ::T ( void )
 	int l_iCtr, j;
 	HMatrix l_oMatrix ( f_iColumns, f_iRows );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) for ( j = 0; j < f_iColumns; j++ ) 
-		l_oMatrix [ j ] [ l_iCtr ] = ( * f_ptBody [ l_iCtr ] ) [ j ];
+		l_oMatrix [ j ] [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] ) [ j ];
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -287,11 +284,25 @@ template < class tType >
 HMatrix < tType > & HMatrix < tType > ::operator = ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
-	int l_iCtr;
-	if ( ( & a_roMatrix != this ) && ( f_iRows == a_roMatrix.f_iRows ) 
-			&& ( f_iColumns == a_roMatrix.f_iColumns ) ) 
-		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) 
-			 * f_ptBody [ l_iCtr ] = * a_roMatrix.f_ptBody [ l_iCtr ];
+	int l_iCtr = 0;
+	if ( & a_roMatrix != this )return ( * this );
+	
+	if ( ( f_iRows > 0 ) &&  ( f_iRows != a_roMatrix.f_iRows ) )
+		throw new HException ( __WHERE__, g_ppcErrMsgHVector [ E_DIMNOTMATCH ] );
+	if ( ( f_iColumns > 0 ) &&  ( f_iColumns != a_roMatrix.f_iColumns ) )
+		throw new HException ( __WHERE__, g_ppcErrMsgHVector [ E_DIMNOTMATCH ] );
+	
+	if ( ! f_iColumns )
+		{
+		f_iColumns = a_roMatrix.f_iColumns;
+	
+		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
+			if ( ! ( f_ptArray [ l_iCtr ] = new HVector < tType > ( f_iColumns ) ) )
+				throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_NEWRETURNEDNULL ], l_iCtr );
+		}
+	
+	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) 
+		 ( * f_ptArray ) [ l_iCtr ] = ( * a_roMatrix.f_ptArray ) [ l_iCtr ];
 	return ( * this );
 	M_EPILOG
 	}
@@ -301,21 +312,8 @@ HMatrix < tType > & HMatrix < tType > ::operator = ( tType d )
 	{
 	M_PROLOG
 	int l_iCtr;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) * f_ptBody [ l_iCtr ] = d;
-	return ( * this );
-	M_EPILOG
-	}
-	
-template < class tType >
-HMatrix < tType > & HMatrix < tType > ::operator <= ( HMatrix & a_roMatrix )
-	{
-	M_PROLOG
-	int l_iCtr, r;
-	if ( & a_roMatrix != this )
-		{
-		r = ( f_iRows < a_roMatrix.f_iRows ? f_iRows : a_roMatrix.f_iRows );
-		for ( l_iCtr = 0; l_iCtr < r; l_iCtr++ ) * f_ptBody [ l_iCtr ] <= a_roMatrix [ l_iCtr ];
-		}
+	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
+		( * f_ptArray  ) [ l_iCtr ] = d;
 	return ( * this );
 	M_EPILOG
 	}
@@ -330,7 +328,7 @@ HMatrix < tType > HMatrix < tType > ::operator + ( HMatrix & a_roMatrix )
 		{
 		HMatrix l_oMatrix ( f_iRows, f_iColumns );
 		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			l_oMatrix [ l_iCtr ] = ( * f_ptBody [ l_iCtr ] + a_roMatrix [ l_iCtr ] );
+			l_oMatrix [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] + a_roMatrix [ l_iCtr ] );
 		return ( l_oMatrix );
 		}
 	return ( * this );
@@ -348,7 +346,7 @@ HMatrix < tType > HMatrix < tType > ::operator - ( HMatrix & a_roMatrix )
 		HMatrix l_oMatrix ( f_iRows, f_iColumns );
 		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
 			{
-			l_oMatrix [ l_iCtr ] = ( * f_ptBody [ l_iCtr ] - a_roMatrix [ l_iCtr ] );
+			l_oMatrix [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] - a_roMatrix [ l_iCtr ] );
 			}
 		return ( l_oMatrix );
 		}
@@ -370,7 +368,7 @@ HMatrix < tType > HMatrix < tType > ::operator * ( HMatrix & a_roMatrix )
 				{
 				d = 0;
 				for ( k = 0; k < f_iColumns; k++ ) 
-					d += ( ( * ( f_ptBody [ l_iCtr ] ) ) [ k ] * a_roMatrix [ k ] [ j ] );
+					d += ( ( * ( f_ptArray [ l_iCtr ] ) ) [ k ] * a_roMatrix [ k ] [ j ] );
 				l_oMatrix [ l_iCtr ] [ j ] = d;
 				}
 		return ( l_oMatrix );
@@ -386,7 +384,7 @@ HMatrix < tType > HMatrix < tType > ::operator * ( tType d )
 	int l_iCtr;
 	HMatrix l_oMatrix ( f_iRows, f_iColumns );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		l_oMatrix [ l_iCtr ] = ( * f_ptBody [ l_iCtr ] * d );
+		l_oMatrix [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] * d );
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -398,7 +396,7 @@ HMatrix < tType > HMatrix < tType > ::operator / ( tType d )
 	int l_iCtr;
 	HMatrix l_oMatrix ( f_iRows, f_iColumns );
 	if ( d ) for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			l_oMatrix [ l_iCtr ] = ( * f_ptBody [ l_iCtr ] / d );
+			l_oMatrix [ l_iCtr ] = ( * f_ptArray [ l_iCtr ] / d );
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -410,7 +408,7 @@ HMatrix < tType > & HMatrix < tType > ::operator += ( HMatrix & a_roMatrix )
 	int l_iCtr;
 	if ( ( f_iRows == a_roMatrix.f_iRows ) 
 			&& ( f_iColumns == a_roMatrix.f_iColumns ) ) 
-		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) * f_ptBody [ l_iCtr ] += a_roMatrix [ l_iCtr ];
+		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) * f_ptArray [ l_iCtr ] += a_roMatrix [ l_iCtr ];
 	return ( * this );
 	M_EPILOG
 	}
@@ -422,7 +420,7 @@ HMatrix < tType > & HMatrix < tType > ::operator -= ( HMatrix & a_roMatrix )
 	int l_iCtr;
 	if ( ( f_iRows == a_roMatrix.f_iRows ) 
 			&& ( f_iColumns == a_roMatrix.f_iColumns ) ) 
-		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) * f_ptBody [ l_iCtr ] -= a_roMatrix [ l_iCtr ];
+		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) * f_ptArray [ l_iCtr ] -= a_roMatrix [ l_iCtr ];
 	return ( * this );
 	M_EPILOG
 	}
@@ -441,7 +439,7 @@ HMatrix < tType > & HMatrix < tType > ::operator *= ( HMatrix & a_roMatrix )
 				{
 				d = 0;
 				for ( k = 0; k < f_iColumns; k++ ) 
-					d += ( * f_ptBody [ l_iCtr ] ) [ k ] * a_roMatrix [ k ] [ j ];
+					d += ( * f_ptArray [ l_iCtr ] ) [ k ] * a_roMatrix [ k ] [ j ];
 				l_oMatrix [ l_iCtr ] [ j ] = d;
 				}
 		 * this = l_oMatrix;
@@ -455,7 +453,7 @@ HMatrix < tType > & HMatrix < tType > ::operator *= ( tType d )
 	{
 	M_PROLOG
 	int l_iCtr;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) ( * f_ptBody [ l_iCtr ] *= d );
+	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) ( * f_ptArray [ l_iCtr ] *= d );
 	return ( * this );
 	M_EPILOG
 	}
@@ -465,7 +463,7 @@ HMatrix < tType > & HMatrix < tType > ::operator /= ( tType d )
 	{
 	M_PROLOG
 	int l_iCtr;
-	if ( d ) for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) ( * f_ptBody [ l_iCtr ] /= d );
+	if ( d ) for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) ( * f_ptArray [ l_iCtr ] /= d );
 	return ( * this );
 	M_EPILOG
 	}
@@ -478,7 +476,7 @@ HMatrix < tType > HMatrix < tType > ::operator ~ ( void )
 	HMatrix l_oMatrix ( f_iRows, f_iColumns );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
 		{
-		l_oMatrix [ l_iCtr ] = ~ * f_ptBody [ l_iCtr ];
+		l_oMatrix [ l_iCtr ] = ~ * f_ptArray [ l_iCtr ];
 		}
 	return ( l_oMatrix );
 	M_EPILOG
@@ -498,7 +496,7 @@ int HMatrix < tType > ::operator == ( HMatrix & a_roMatrix )
 	M_PROLOG
 	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) 
-		if ( * f_ptBody [ l_iCtr ] != a_roMatrix [ l_iCtr ] ) return ( 0 );
+		if ( * f_ptArray [ l_iCtr ] != a_roMatrix [ l_iCtr ] ) return ( 0 );
 	return ( 1 );
 	M_EPILOG
 	}
