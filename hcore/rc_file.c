@@ -47,7 +47,7 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 	int l_iCtr = 0, l_iCtrOut = 0, l_iLine = 0;
 	FILE * l_psRc = 0;
 	HString l_oOption, l_oValue, l_oMessage;
-	::log << "process_rc_file ( ): ";
+	::log ( D_LOG_INFO ) << "process_rc_file ( ): ";
 	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
 		{
 		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );

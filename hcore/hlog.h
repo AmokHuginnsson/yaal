@@ -39,14 +39,15 @@ class HLog
 	{
 protected:
 	/*{*/
-	bool		f_bRealMode;
-	bool		f_bNewLine;
-	FILE *	f_psStream;
-	char *	f_pcProcessName;
-	char *	f_pcLoginName;
-	char *	f_pcHostName;
-	char *	f_pcBuffer;
-	size_t	f_iBufferSize;
+	bool			f_bRealMode;
+	bool			f_bNewLine;
+	long int	f_lType;
+	FILE *		f_psStream;
+	char *		f_pcProcessName;
+	char *		f_pcLoginName;
+	char *		f_pcHostName;
+	char *		f_pcBuffer;
+	size_t		f_iBufferSize;
 	/*}*/
 public:
 	/*{*/
@@ -54,7 +55,12 @@ public:
 	virtual ~HLog ( void );
 	void rehash ( FILE * = stderr, char * = NULL ); /* already opened file */
 	void rehash ( const char *, char * = NULL ); /* log file name */
-	int operator ( ) ( const char *, ... ); /* log ( "data %d", x ); will look nice */
+	int operator ( ) ( const char *, va_list );
+	int operator ( ) ( const char *, ... ); /* log ( "data %d", x );
+																						 will look nice */
+	int operator ( ) ( long int, const char *, ... ); /* log ( "data %d", x );
+																						 will look nice */
+	HLog & operator ( ) ( long int ); /* sets log type */
 	HLog & operator << ( const char * );
 	HLog & operator << ( const char );
 	HLog & operator << ( const int );

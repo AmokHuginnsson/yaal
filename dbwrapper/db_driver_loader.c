@@ -40,6 +40,8 @@ M_CVSID ( "$CVSHeader$" );
 #include "../hcore/rc_file.h"
 #include "db_driver_loader.h"
 
+#define M_DB_ERR(msg) "Error: Data base request ("msg") while no driver loaded."
+
 const char g_pcDone [ ] = "done.\r\n";
 
 char * g_pcDefaultSockPath = NULL;
@@ -103,76 +105,67 @@ char * ( * rs_column_name ) ( void *, int );
 
 void * dummy_db_connect ( const char *, const char *, const char * )
 	{
-	::log << "Error: Data base request (db_connect) while no driver loaded.";
-	::log << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_connect)" ) << endl;
 	return ( NULL );
 	}
 
 void dummy_db_disconnect ( void * )
 	{
-	::log << "Error: Data base request (db_disconnect) while no driver loaded.";
-	::log << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_disconnect)" ) << endl;
 	return;
 	}
 
 int dummy_db_errno ( void * )
 	{
-	::log << "Error: Data base request (db_errno) while no driver loaded.";
-	::log << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_errno)" ) << endl;
 	return ( 0 );
 	}
 
 const char * dummy_db_error ( void * )
 	{
-	::log << "Error: Data base request (db_error) while no driver loaded.";
-	::log << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "db_error)" ) << endl;
 	return ( NULL );
 	}
 
 void * dummy_db_query ( void *, const char * )
 	{
-	::log << "Error: Data base request (db_query) while no driver loaded.";
-	::log << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_query)" ) << endl;
 	return ( NULL );
 	}
 
 void dummy_db_unquery ( void * )
 	{
-	::log << "Error: Data base request (db_unquery) while no driver loaded.";
-	::log << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_unquery)" ) << endl;
 	return;
 	}
 
 char * dummy_rs_get ( void *, int, int )
 	{
-	::log << "Error: Data base request (rs_get) while no driver loaded." << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_get)" ) << endl;
 	return ( NULL );
 	}
 
 int dummy_rs_fields_count ( void * )
 	{
-	::log << "Error: Data base request (rs_fields_count) while no driver loaded.";
-	::log << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_fields_count)" ) << endl;
 	return ( 0 );
 	}
 
 long int dummy_rsdb_records_count ( void *, void * = NULL )
 	{
-	::log << "Error: Data base request (rsdb_records_count)";
-	::log << " while no driver loaded." << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rsdb_records_count)" ) << endl;
 	return ( 0 );
 	}
 
 long int dummy_rsdb_id ( void *, void * )
 	{
-	::log << "Error: Data base request (rsdb_id) while no driver loaded." << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rsdb_id)" ) << endl;
 	return ( 0 );
 	}
 
 char * dummy_rs_column_name ( void *, int )
 	{
-	::log << "Error: Data base request (rs_column_name) while no driver loaded.";
-	::log << endl;
+	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_column_name)" ) << endl;
 	return ( NULL );
 	}
 
@@ -184,7 +177,7 @@ void dbwrapper_error ( void )
 	{
 	HString l_oMessage;
 	l_oMessage = dlerror ( );
-	::log << l_oMessage << endl;
+	::log ( D_LOG_ERROR ) << l_oMessage << endl;
 	fprintf ( stderr, "(%s), ", ( char * ) l_oMessage );
 	return;
 	}
@@ -218,7 +211,8 @@ void load_driver ( void )
 			{
 			if ( ( ( l_iCtr - 1 ) == D_DB_DRIVER_MYSQL ) && ! g_pcDefaultSockPath )
 				g_pcDefaultSockPath = xstrdup ( "/var/run/mysqld/mysqld.sock" );
-			::log << "Loading [" << g_ppcDriver [ l_iCtr - 1 ] << "] driver." << endl;
+			::log ( D_LOG_NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
+			::log << "] driver." << endl;
 			}
 		fprintf ( stderr, g_pcDone );
 		fprintf ( stderr, "Linking symbols ... " );
@@ -356,7 +350,8 @@ bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_POSTGRESQL;
 		else
 			{
-			::log << "Error: `" << a_roValue << "' is unknown driver." << endl;
+			::log ( D_LOG_ERROR ) << "Error: `" << a_roValue;
+			::log << "' is unknown driver." << endl;
 			exit ( 1 );
 			}
 		}

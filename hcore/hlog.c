@@ -49,12 +49,14 @@ HLog::HLog ( void )
 	f_bNewLine = true;
 	f_pcProcessName = NULL;
 	f_iBufferSize = D_BUFFER_SIZE;
+	f_lType = 0;
 	f_pcBuffer = ( char * ) xcalloc ( f_iBufferSize );
 	f_pcHostName = ( char * ) xcalloc ( D_HOSTNAME_SIZE );
 	f_psStream = tmpfile ( );
 	if ( ! f_psStream )
 		throw new HException ( __WHERE__, "tmpfile returned", ( int ) f_psStream );
-	fprintf ( f_psStream, "Process started (%d).\n", getpid ( ) );
+	fprintf ( f_psStream, "%-10xProcess started (%d).\n",
+			D_LOG_NOTICE, getpid ( ) );
 	f_pcLoginName = getenv ( "LOGNAME" );
 	gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 );
 	return;
@@ -64,8 +66,11 @@ HLog::HLog ( void )
 HLog::~HLog ( void )
 	{
 	M_PROLOG
-	if ( f_bNewLine )timestamp ( );
-	fprintf ( f_psStream, "Process exited normally.\n" );
+	if ( g_lLogMask & D_LOG_NOTICE )
+		{
+		if ( f_bNewLine )timestamp ( );
+		fprintf ( f_psStream, "Process exited normally.\n" );
+		}
 	if ( ( f_psStream != stdout ) && ( f_psStream != stderr ) )
 		fclose ( f_psStream );
 	f_psStream = NULL;
@@ -110,9 +115,14 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 			* ++ l_pcPtr = 0;
 			fseek ( f_psStream, l_pcPtr - f_pcBuffer - l_iLen, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
-			timestamp ( a_psStream );
-			fprintf ( a_psStream, f_pcBuffer );
+			f_lType = strtol ( f_pcBuffer, NULL, 0x10 );
+			if ( ! f_lType || ( f_lType & g_lLogMask ) )
+				{
+				timestamp ( a_psStream );
+				fprintf ( a_psStream, f_pcBuffer + 10 );
+				}
 			}
+		if ( f_pcBuffer [ strlen ( f_pcBuffer ) - 1 ] == '\n' )f_lType = 0;
 		l_psTmpFile = f_psStream;
 		fclose ( l_psTmpFile );
 		}
@@ -138,9 +148,13 @@ void HLog::timestamp ( FILE * a_psStream )
 	int l_iSize = 0;
 	char l_pcBuffer [ D_TIMESTAMP_SIZE ];
 	time_t l_xCurrentTime;
-	if ( ! f_bRealMode )return;
-	tm * l_psBrokenTime = 0;
 	if ( ! a_psStream )a_psStream = f_psStream;
+	if ( ! f_bRealMode )
+		{
+		if ( f_psStream )fprintf ( f_psStream, "%-10x", f_lType );
+		return;
+		}
+	tm * l_psBrokenTime = 0;
 	l_xCurrentTime = time ( NULL );
 	l_psBrokenTime = localtime ( & l_xCurrentTime );
 	memset ( l_pcBuffer, 0, D_TIMESTAMP_SIZE );
@@ -154,23 +168,61 @@ void HLog::timestamp ( FILE * a_psStream )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( const char * a_pcFormat, ... )
+int HLog::operator ( ) ( const char * a_pcFormat, va_list a_xAp )
 	{
 	M_PROLOG
-	va_list l_sAp;
+	int l_iErr = 0;
 	if ( f_bNewLine )timestamp ( );
 	memset ( f_pcBuffer, 0, f_iBufferSize );
-	va_start ( l_sAp, a_pcFormat );
-	vsnprintf ( f_pcBuffer, f_iBufferSize, a_pcFormat, l_sAp );
-	va_end ( l_sAp );
+	l_iErr = vsnprintf ( f_pcBuffer, f_iBufferSize, a_pcFormat, a_xAp );
 	fprintf ( f_psStream, f_pcBuffer );
 	if ( f_pcBuffer [ strlen ( f_pcBuffer ) - 1 ] != '\n' )f_bNewLine = false;
 	else
 		{
+		f_lType = 0;
 		f_bNewLine = true;
 		fflush ( f_psStream );
 		}
-	return ( 0 );
+	return ( l_iErr );
+	M_EPILOG
+	}
+
+int HLog::operator ( ) ( const char * a_pcFormat, ... )
+	{
+	M_PROLOG
+	int l_iErr = 0;
+	va_list l_xAp;
+	if ( ! f_lType || ( f_lType & g_lLogMask ) )
+		{
+		va_start ( l_xAp, a_pcFormat );
+		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
+		va_end ( l_xAp );
+		}
+	return ( l_iErr );
+	M_EPILOG
+	}
+
+int HLog::operator ( ) ( long int a_lType, const char * a_pcFormat, ... )
+	{
+	M_PROLOG
+	int l_iErr = 0;
+	va_list l_xAp;
+	f_lType = a_lType;
+	if ( ! f_lType || ( f_lType & g_lLogMask ) )
+		{
+		va_start ( l_xAp, a_pcFormat );
+		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
+		va_end ( l_xAp );
+		}
+	return ( l_iErr );
+	M_EPILOG
+	}
+
+HLog & HLog::operator ( ) ( long int a_lType )
+	{
+	M_PROLOG
+	f_lType = a_lType;
+	return ( * this );
 	M_EPILOG
 	}
 
@@ -178,13 +230,17 @@ HLog & HLog::operator << ( const char * a_pcString )
 	{
 	M_PROLOG
 	if ( ! a_pcString )return ( * this );
-	if ( f_bNewLine )timestamp ( );
-	fprintf ( f_psStream, a_pcString );
-	if ( a_pcString [ strlen ( a_pcString ) - 1 ] != '\n' )f_bNewLine = false;
-	else
+	if ( ! f_lType || ( f_lType & g_lLogMask ) )
 		{
-		f_bNewLine = true;
-		fflush ( f_psStream );
+		if ( f_bNewLine )timestamp ( );
+		fprintf ( f_psStream, a_pcString );
+		if ( a_pcString [ strlen ( a_pcString ) - 1 ] != '\n' )f_bNewLine = false;
+		else
+			{
+			f_bNewLine = true;
+			f_lType = 0;
+			fflush ( f_psStream );
+			}
 		}
 	return ( * this );
 	M_EPILOG
@@ -193,13 +249,17 @@ HLog & HLog::operator << ( const char * a_pcString )
 HLog & HLog::operator << ( const char a_cChar )
 	{
 	M_PROLOG
-	if ( f_bNewLine )timestamp ( );
-	fprintf ( f_psStream, "%c", a_cChar );
-	if ( a_cChar != '\n' )f_bNewLine = false;
-	else
+	if ( ! f_lType || ( f_lType & g_lLogMask ) )
 		{
-		f_bNewLine = true;
-		fflush ( f_psStream );
+		if ( f_bNewLine )timestamp ( );
+		fprintf ( f_psStream, "%c", a_cChar );
+		if ( a_cChar != '\n' )f_bNewLine = false;
+		else
+			{
+			f_bNewLine = true;
+			f_lType = 0;
+			fflush ( f_psStream );
+			}
 		}
 	return ( * this );
 	M_EPILOG
@@ -216,10 +276,13 @@ HLog & HLog::operator << ( const int a_iInteger )
 HLog & HLog::operator << ( const long int a_lInteger )
 	{
 	M_PROLOG
-	if ( f_bNewLine )timestamp ( );
-	snprintf ( f_pcBuffer, f_iBufferSize, "%ld", a_lInteger );
-	fprintf ( f_psStream, f_pcBuffer );
-	f_bNewLine = false;
+	if ( ! f_lType || ( f_lType & g_lLogMask ) )
+		{
+		if ( f_bNewLine )timestamp ( );
+		snprintf ( f_pcBuffer, f_iBufferSize, "%ld", a_lInteger );
+		fprintf ( f_psStream, f_pcBuffer );
+		f_bNewLine = false;
+		}
 	return ( * this );
 	M_EPILOG
 	}
@@ -227,10 +290,13 @@ HLog & HLog::operator << ( const long int a_lInteger )
 HLog & HLog::operator << ( const double a_dDouble )
 	{
 	M_PROLOG
-	if ( f_bNewLine )timestamp ( );
-	snprintf ( f_pcBuffer, f_iBufferSize, "%f", a_dDouble );
-	fprintf ( f_psStream, f_pcBuffer );
-	f_bNewLine = false;
+	if ( ! f_lType || ( f_lType & g_lLogMask ) )
+		{
+		if ( f_bNewLine )timestamp ( );
+		snprintf ( f_pcBuffer, f_iBufferSize, "%f", a_dDouble );
+		fprintf ( f_psStream, f_pcBuffer );
+		f_bNewLine = false;
+		}
 	return ( * this );
 	M_EPILOG
 	}
@@ -253,7 +319,9 @@ HLog & HLog::operator << ( HLog & ( * x_log ) ( HLog & ) )
 HLog & endl ( HLog & a_roLog )
 	{
 	M_PROLOG
-	a_roLog << '\n';
+	if ( ! a_roLog.f_lType || ( a_roLog.f_lType & g_lLogMask ) )
+		a_roLog << '\n';
+	a_roLog.f_lType = 0;
 	return ( a_roLog );
 	M_EPILOG
 	}

@@ -146,17 +146,17 @@ bool set_core_variables ( HString & a_roOption, HString & a_roValue )
 		{
 		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
 			{
-			if ( ! strcasecmp ( a_roValue, "LOG_DEBUG" ) )
+			if ( ! strcasecmp ( l_oStr, "LOG_DEBUG" ) )
 				g_lLogMask |= D_LOG_DEBUG;
-			if ( ! strcasecmp ( a_roValue, "LOG_INFO" ) )
+			else if ( ! strcasecmp ( l_oStr, "LOG_INFO" ) )
 				g_lLogMask |= D_LOG_INFO;
-			if ( ! strcasecmp ( a_roValue, "LOG_NOTICE" ) )
+			else if ( ! strcasecmp ( l_oStr, "LOG_NOTICE" ) )
 				g_lLogMask |= D_LOG_NOTICE;
-			if ( ! strcasecmp ( a_roValue, "LOG_WARNING" ) )
+			else if ( ! strcasecmp ( l_oStr, "LOG_WARNING" ) )
 				g_lLogMask |= D_LOG_WARNING;
-			if ( ! strcasecmp ( a_roValue, "LOG_ERROR" ) )
+			else if ( ! strcasecmp ( l_oStr, "LOG_ERROR" ) )
 				g_lLogMask |= D_LOG_ERROR;
-			if ( ! strcasecmp ( a_roValue, "LOG_CVSHEADER" ) )
+			else if ( ! strcasecmp ( l_oStr, "LOG_CVSHEADER" ) )
 				g_lLogMask |= D_LOG_CVSHEADER;
 			else return ( true );
 			}
