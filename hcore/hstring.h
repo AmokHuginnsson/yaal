@@ -44,32 +44,32 @@ public:
 	void hs_realloc ( int );
 	virtual HObject * clone ( void ) const;
 	HString ( HString & );
-	HString ( unsigned long ); /* initialize immediately with size */
+	HString ( unsigned long int ); /* initialize immediately with size */
 	HString ( const char * );
 	HString ( char );
 	HString ( int );
-	HString ( long );
+	HString ( long int );
 	HString ( double );
 	HString ( void * );
 	HString & operator = ( const HString & );
 	HString & operator = ( const char * );
 	HString & operator = ( char );
 	HString & operator = ( int );
-	HString & operator = ( long );
+	HString & operator = ( long int );
 	HString & operator = ( double );
 	HString & operator = ( void * );
 	HString & operator += ( HString & );
 	HString & operator += ( const char * );
 	HString & operator += ( char );
 	HString & operator += ( int );
-	HString & operator += ( long );
+	HString & operator += ( long int );
 	HString & operator += ( double );
 	HString & operator += ( void * );
 	HString operator + ( HString & );
 	HString operator + ( const char * );
 	HString operator + ( char );
 	HString operator + ( int );
-	HString operator + ( long );
+	HString operator + ( long int );
 	HString operator + ( double );
 	HString operator + ( void * );
 	char & operator [ ] ( int );
@@ -112,7 +112,7 @@ protected:
 HString operator + ( const char *, HString & );
 HString operator + ( char, HString & );
 HString operator + ( int, HString & );
-HString operator + ( long, HString & );
+HString operator + ( long int, HString & );
 HString operator + ( double, HString & );
 HString operator + ( void *, HString & );
 int operator == ( const char *, HString & );

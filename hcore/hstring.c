@@ -93,7 +93,7 @@ HObject * HString::clone ( void ) const
 	M_EPILOG
 	}
 
-HString::HString ( unsigned long a_lSize )
+HString::HString ( unsigned long int a_lSize )
 	{
 	M_PROLOG
 	f_pcBuffer = 0;
@@ -158,7 +158,7 @@ HString::HString ( int a_iInt )
 	M_EPILOG
 	}
 
-HString::HString ( long a_lLong )
+HString::HString ( long int a_lLong )
 	{
 	M_PROLOG
 	int l_iSize = 0;
@@ -239,7 +239,7 @@ HString & HString::operator = ( int a_iInt )
 	M_EPILOG
 	}
 
-HString & HString::operator = ( long a_lLong )
+HString & HString::operator = ( long int a_lLong )
 	{
 	M_PROLOG
 	( * this ) = HString ( a_lLong );
@@ -306,7 +306,7 @@ HString HString::operator + ( int a_iInt )
 	M_EPILOG
 	}
 
-HString HString::operator + ( long a_lLong )
+HString HString::operator + ( long int a_lLong )
 	{
 	M_PROLOG
 	HString l_oStr;
@@ -367,7 +367,7 @@ HString & HString::operator += ( int a_iInt )
 	M_EPILOG
 	}
 
-HString & HString::operator += ( long a_lLong )
+HString & HString::operator += ( long int a_lLong )
 	{
 	M_PROLOG
 	return ( * this = * this + a_lLong );
@@ -751,7 +751,7 @@ HString operator + ( int a_iInt , HString & a_roString )
 	M_EPILOG
 	}
 
-HString operator + ( long a_lLong, HString & a_roString )
+HString operator + ( long int a_lLong, HString & a_roString )
 	{
 	M_PROLOG
 	return ( HString ( a_lLong ) + a_roString );	
