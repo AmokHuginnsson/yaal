@@ -76,7 +76,7 @@ HInfo::HInfo ( void * a_pvPointer )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( const char * a_pcBuffer )
+HInfo::HInfo ( char const * a_pcBuffer )
 	{
 	M_PROLOG
 	purge ( );
@@ -183,7 +183,7 @@ void * HInfo::operator = ( void * a_pvPointer )
 	M_EPILOG
 	}
 
-HString & HInfo::operator = ( const char * a_pcString )
+HString & HInfo::operator = ( char const * a_pcString )
 	{
 	M_PROLOG
 	f_iType |= D_TYPE_HSTRING;

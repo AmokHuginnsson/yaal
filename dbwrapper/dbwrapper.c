@@ -114,7 +114,7 @@ void dbwrapper_init ( void )
 	return;
 	}
 
-extern const char * g_pcDone;
+extern char const * g_pcDone;
 
 void dbwrapper_fini ( void ); __attribute__ ( ( destructor ) )
 void dbwrapper_fini ( void )

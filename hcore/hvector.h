@@ -35,7 +35,7 @@ Copyright:
 
 #define E_HVECTOR_DIMNOTMATCH	0
 
-extern const char * g_ppcErrMsgHVector [ ];
+extern char const * g_ppcErrMsgHVector [ ];
 
 #define M_CHECK_DIMENSIONS( ) \
 	if ( this->f_iSize != a_roVector.f_iSize ) \

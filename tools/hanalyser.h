@@ -65,13 +65,13 @@ public:
 	/*{*/
 	HAnalyser ( void );
 	virtual ~HAnalyser ( void );
-	double * analyse ( const char * );
+	double * analyse ( char const * );
 	double & operator [ ] ( int );
 	double count ( void );
 	/*}*/
 protected:
 	/*{*/
-	int translate ( const char * );
+	int translate ( char const * );
 	void addition_production ( HAnalyserNode * );
 	void multiplication_production ( HAnalyserNode * );
 	void power_production ( HAnalyserNode * );

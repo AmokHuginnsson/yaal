@@ -30,7 +30,7 @@ Copyright:
 #ifndef __HCORE_HCORE_H
 #define __HCORE_HCORE_H
 
-void set_env ( const char * );
+void set_env ( char const * );
 
 #endif /* not __HCORE_HCORE_H */
 

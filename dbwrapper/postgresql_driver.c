@@ -52,8 +52,8 @@ PGconn * g_psBrokenDB = NULL;
 
 void db_disconnect ( void * );
 
-void * db_connect ( const char * a_pcDataBase,
-		const char * a_pcLogin, const char * a_pcPassword )
+void * db_connect ( char const * a_pcDataBase,
+		char const * a_pcLogin, char const * a_pcPassword )
 	{
 	PGconn * l_psConnection = NULL;
 	if ( g_psBrokenDB )
@@ -85,13 +85,13 @@ int db_errno ( void * )
 	return ( errno );
 	}
 
-const char * db_error  ( void * a_pvData )
+char const * db_error  ( void * a_pvData )
 	{
 	if ( ! a_pvData )a_pvData = g_psBrokenDB;
 	return ( PQerrorMessage ( ( PGconn * ) a_pvData ) );
 	}
 
-void * db_query ( void * a_pvData, const char * a_pcQuery )
+void * db_query ( void * a_pvData, char const * a_pcQuery )
 	{
 	return ( PQexec ( ( PGconn * ) a_pvData, a_pcQuery ) );
 	}

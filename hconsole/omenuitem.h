@@ -35,7 +35,7 @@ struct OMenuItem
 	{
 	OMenuItem * f_psSubMenu;
 	int ( HProcess::* HANDLER ) ( void );
-	const char * f_pcLabel;
+	char const * f_pcLabel;
 	};
 
 #endif /* not __HCONSOLE_OMENUITEM_H */

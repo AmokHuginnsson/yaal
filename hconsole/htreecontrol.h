@@ -64,7 +64,7 @@ public:
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 const char *,	/* label */
+								 char const *,	/* label */
 								 bool = true,		/* draw label */
 								 int = -1, 			/* disabled attribute */
 								 int = -1,			/* enabled attribute */

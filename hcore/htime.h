@@ -45,12 +45,12 @@ protected:
 public:
 	/*{*/
 	HTime ( const HTime &, int = 0 );
-	HTime ( const char * = D_DEFAULT_TIME_FORMAT );
+	HTime ( char const * = D_DEFAULT_TIME_FORMAT );
 	HTime ( const int, const int, const int, const int = 0, const int = 0,
 			const int = 0 );
 	virtual ~HTime ( void );
 	void set_now ( void );
-	void format ( const char * = D_DEFAULT_TIME_FORMAT );
+	void format ( char const * = D_DEFAULT_TIME_FORMAT );
 	void set_time ( const int = 0, const int = 0, const int = 0 );
 	void set_date ( const int, const int = 1, const int = 1 );
 	void set_datetime ( const int, const int = 1, const int = 1,
@@ -63,7 +63,7 @@ public:
 	int get_second ( void );
 	HTime & operator = ( const HTime & );
 	HTime operator - ( const HTime & );
-	const char * operator = ( const char * );
+	char const * operator = ( char const * );
 	time_t operator = ( const time_t & );
 	bool operator == ( const time_t & );
 	bool operator != ( const time_t & );
@@ -71,7 +71,7 @@ public:
 	bool operator >= ( const time_t & );
 	bool operator < ( const time_t & );
 	bool operator > ( const time_t & );
-	operator const char * ( void );
+	operator char const * ( void );
 	operator time_t ( void );
 	/*}*/
 protected:

@@ -43,9 +43,9 @@ M_CVSID ( "$CVSHeader$" );
 
 #define M_DB_ERR(msg) "Error: Data base request ("msg") while no driver loaded."
 
-const char x_tag_g_pcDone [ ] = "done.\r\n", * g_pcDone = x_tag_g_pcDone;
+char const x_tag_g_pcDone [ ] = "done.\r\n", * g_pcDone = x_tag_g_pcDone;
 
-static const char * g_ppcDriver [ 24 ] =
+static char const * g_ppcDriver [ 24 ] =
 	{
 	NULL,
 	"libmysql_driver.so",
@@ -60,8 +60,8 @@ namespace dbwrapper
 	
 void * n_pvDlHandle = NULL;
 
-typedef void * ( * t0 ) ( const char *, const char *, const char * );
-void * ( * db_connect ) ( const char *, const char *, const char * );
+typedef void * ( * t0 ) ( char const *, char const *, char const * );
+void * ( * db_connect ) ( char const *, char const *, char const * );
 
 typedef void ( * t1 ) ( void * );
 void ( * db_disconnect ) ( void * );
@@ -69,11 +69,11 @@ void ( * db_disconnect ) ( void * );
 typedef int ( * t2 ) ( void * );
 int ( * db_errno ) ( void * );
 
-typedef const char * ( * t3 ) ( void * );
-const char * ( * db_error ) ( void * );
+typedef char const * ( * t3 ) ( void * );
+char const * ( * db_error ) ( void * );
 
-typedef void * ( * t4 ) ( void *, const char * );
-void * ( * db_query ) ( void *, const char * );
+typedef void * ( * t4 ) ( void *, char const * );
+void * ( * db_query ) ( void *, char const * );
 
 typedef void ( * t5 ) ( void * );
 void ( * db_unquery ) ( void * );
@@ -102,7 +102,7 @@ namespace dbwrapper
 	
 /* Null driver */
 
-void * null_db_connect ( const char *, const char *, const char * )
+void * null_db_connect ( char const *, char const *, char const * )
 	{
 	log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_connect)" ) << endl;
 	return ( NULL );
@@ -120,13 +120,13 @@ int null_db_errno ( void * )
 	return ( 0 );
 	}
 
-const char * null_db_error ( void * )
+char const * null_db_error ( void * )
 	{
 	log ( D_LOG_ERROR ) << M_DB_ERR ( "db_error)" ) << endl;
 	return ( _ ( "null database driver loaded" ) );
 	}
 
-void * null_db_query ( void *, const char * )
+void * null_db_query ( void *, char const * )
 	{
 	log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_query)" ) << endl;
 	return ( NULL );
@@ -259,8 +259,8 @@ void load_driver ( void )
 
 /* Driver autoloaders ... */
 
-void * autoloader_db_connect ( const char * a_pcDataBase,
-		const char * a_pcLogin, const char * a_pcPassword )
+void * autoloader_db_connect ( char const * a_pcDataBase,
+		char const * a_pcLogin, char const * a_pcPassword )
 	{
 	load_driver ( );
 	return ( db_connect ( a_pcDataBase, a_pcLogin, a_pcPassword ) );
@@ -279,13 +279,13 @@ int autoloader_db_errno ( void * a_pvDataBase )
 	return ( db_errno ( a_pvDataBase ) );
 	}
 
-const char * autoloader_db_error ( void * a_pvDataBase )
+char const * autoloader_db_error ( void * a_pvDataBase )
 	{
 	load_driver ( );
 	return ( db_error ( a_pvDataBase ) );
 	}
 
-void * autoloader_db_query ( void * a_pvDataBase, const char * a_pcQuery )
+void * autoloader_db_query ( void * a_pvDataBase, char const * a_pcQuery )
 	{
 	load_driver ( );
 	return ( db_query ( a_pvDataBase, a_pcQuery ) );

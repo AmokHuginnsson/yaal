@@ -37,7 +37,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HDataStatusBarControl ( HDataWindow *, const char *, int = -1 );
+	HDataStatusBarControl ( HDataWindow *, char const *, int = -1 );
 	virtual void draw_label ( void );
 	/*}*/
 protected:

@@ -48,10 +48,10 @@ public:
 										 int,						/* col */
 										 int,						/* height */
 										 int,						/* width */
-										 const char *,	/* label */
+										 char const *,	/* label */
 										 int = 0, 			/* dropped width */
 										 int = 127,			/* max string length */
-										 const char * = D_MASK_DEFAULT,	/* regexp (mask) */
+										 char const * = D_MASK_DEFAULT,	/* regexp (mask) */
 										 bool = false,	/* checkable */
 										 bool = true,		/* sortable */
 										 bool = true,		/* searchable */

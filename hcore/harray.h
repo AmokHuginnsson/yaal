@@ -35,7 +35,7 @@ Copyright:
 #define E_HARRAY_NOMEM			1
 #define E_HARRAY_BADINDEX		2
 
-extern const char * g_ppcErrMsgHArray [ ];
+extern char const * g_ppcErrMsgHArray [ ];
 
 template < class tType >
 class HArray

@@ -46,7 +46,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdataeditcontrol.h"
 #include "hdatastatusbarcontrol.h"
 
-HDataWindow::HDataWindow ( const char * a_pcTitle, HDataBase * a_poDataBase,
+HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
 		OResource * a_psDataControlInfo )
 	: HWindow ( a_pcTitle ), HRecordSet ( a_poDataBase )
 	{
@@ -221,7 +221,7 @@ int HDataWindow::init ( void )
 	M_EPILOG
 	}
 
-HStatusBarControl * HDataWindow::init_bar ( const char * a_pcLabel )
+HStatusBarControl * HDataWindow::init_bar ( char const * a_pcLabel )
 	{
 	M_PROLOG
 	return ( new HDataStatusBarControl ( this, a_pcLabel ) );

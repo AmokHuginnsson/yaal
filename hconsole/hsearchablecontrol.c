@@ -63,15 +63,19 @@ void HSearchableControl::search ( const HString & a_oPattern, bool a_bBackwards 
 	{
 	M_PROLOG
 	unsigned short int l_hFlag = 'f';
-	f_bSearchActived = ! f_oPattern.parse ( a_oPattern, & l_hFlag, 1 );
+	f_bSearchActived = ! f_oPattern.parse ( a_oPattern, & l_hFlag,
+			sizeof ( l_hFlag ) / sizeof ( unsigned short int ) );
 	if ( ! f_bSearchActived )
 		f_poParent->status_bar ( )->message ( f_oPattern.error ( ) );
-	else f_bFiltered = ( l_hFlag & 0xff00 ) ? true : false;
-	f_bBackwards = a_bBackwards;
-	if ( f_bBackwards )
-		go_to_match_previous ( );
 	else
-		go_to_match ( );
+		{
+		f_bFiltered = ( l_hFlag & 0xff00 ) ? true : false;
+		f_bBackwards = a_bBackwards;
+		if ( f_bBackwards )
+			go_to_match_previous ( );
+		else
+			go_to_match ( );
+		}
 	refresh ( );
 	return;
 	M_EPILOG

@@ -50,10 +50,10 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HDataWindow ( const char *, HDataBase * = NULL, OResource * = NULL );
+	HDataWindow ( char const *, HDataBase * = NULL, OResource * = NULL );
 	virtual ~HDataWindow ( void );
 	virtual int init ( void );
-	virtual HStatusBarControl * init_bar ( const char * );
+	virtual HStatusBarControl * init_bar ( char const * );
 	void set_sync_store ( HItem * = NULL );
 	bool is_modified ( void );
 	void set_modified ( bool = true );

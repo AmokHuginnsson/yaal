@@ -108,13 +108,13 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HException ( const char *, const char *, int, const char *, int = 0 );
+	HException ( char const *, char const *, int, char const *, int = 0 );
 	virtual ~HException ( void ) ;
-	void set ( char = 0, int = 0, long = 0, double = 0, const char * = 0, void * = 0 );
-	void set ( const char * );
+	void set ( char = 0, int = 0, long = 0, double = 0, char const * = 0, void * = 0 );
+	void set ( char const * );
 	void print_error ( bool );
 	static void dump_call_stack ( int );
-	void log ( const char *, const char *, int );
+	void log ( char const *, char const *, int );
 	/*}*/
 	};
 

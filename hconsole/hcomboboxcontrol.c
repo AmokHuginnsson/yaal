@@ -40,8 +40,8 @@ M_CVSID ( "$CVSHeader$" );
 
 HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
-		const char * a_pcLabel, int a_iDroppedWidth,
-		int a_iMaxLength, const char * a_pcMask,
+		char const * a_pcLabel, int a_iDroppedWidth,
+		int a_iMaxLength, char const * a_pcMask,
 		bool a_bCheckable, bool a_bSortable, bool a_bSearchable,
 		bool a_bDrawLabel, int a_iDisabledAttribute,
 		int a_iEnabledAttribute, int a_iFocusedAttribute )

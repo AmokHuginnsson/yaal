@@ -32,7 +32,7 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "htime.h"
 
-HTime::HTime ( const char * a_pcFormat )
+HTime::HTime ( char const * a_pcFormat )
 	{
 	M_PROLOG
 	f_oFormat = a_pcFormat;
@@ -75,7 +75,7 @@ void HTime::set_now ( void )
 	M_EPILOG
 	}
 
-void HTime::format ( const char * a_pcFormat )
+void HTime::format ( char const * a_pcFormat )
 	{
 	M_PROLOG
 	f_oFormat = a_pcFormat;
@@ -190,7 +190,7 @@ HTime HTime::operator - ( const HTime & a_roTime )
 	M_EPILOG
 	}
 
-const char * HTime::operator = ( const char * a_pcStrTime )
+char const * HTime::operator = ( char const * a_pcStrTime )
 	{
 	M_PROLOG
 	char * l_pcErr = strptime ( a_pcStrTime, f_oFormat, & f_sBroken );
@@ -253,7 +253,7 @@ bool HTime::operator > ( const time_t & a_rxTime )
 	M_EPILOG
 	}
 
-HTime::operator const char * ( void )
+HTime::operator char const * ( void )
 	{
 	M_PROLOG
 	int l_iSize = 0;

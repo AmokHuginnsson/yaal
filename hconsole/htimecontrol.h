@@ -37,7 +37,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HTimeControl ( HWindow *, int, int, int, int, const char *,
+	HTimeControl ( HWindow *, int, int, int, int, char const *,
 /* draw label, disabled attribute, enabled-attribute, focused-attribute */
 			bool = true, int = -1, int = -1,	int = -1 );
 	virtual ~HTimeControl ( void );

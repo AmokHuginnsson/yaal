@@ -49,8 +49,8 @@ MYSQL * g_psBrokenDB = NULL;
 
 void db_disconnect ( void * );
 
-void * db_connect ( const char * a_pcDataBase,
-		const char * a_pcLogin, const char * a_pcPassword )
+void * db_connect ( char const * a_pcDataBase,
+		char const * a_pcLogin, char const * a_pcPassword )
 	{
 	MYSQL * l_psMySQL = NULL;
 	if ( g_psBrokenDB )
@@ -82,13 +82,13 @@ int db_errno ( void * a_pvData )
 	return ( mysql_errno ( ( MYSQL * ) a_pvData ) );
 	}
 
-const char * db_error  ( void * a_pvData )
+char const * db_error  ( void * a_pvData )
 	{
 	if ( ! a_pvData )a_pvData = g_psBrokenDB;
 	return ( mysql_error ( ( MYSQL * ) a_pvData ) );
 	}
 
-void * db_query ( void * a_pvData, const char * a_pcQuery )
+void * db_query ( void * a_pvData, char const * a_pcQuery )
 	{
 	mysql_query ( ( MYSQL * ) a_pvData, a_pcQuery );
 	return ( mysql_store_result ( ( MYSQL * ) a_pvData ) );

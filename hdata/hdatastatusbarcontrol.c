@@ -40,7 +40,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdatastatusbarcontrol.h"
 
 HDataStatusBarControl::HDataStatusBarControl ( HDataWindow * a_poParent,
-		const char * a_pcLabel, int a_iStatusBarAttribute )
+		char const * a_pcLabel, int a_iStatusBarAttribute )
 								 : HControl ( a_poParent, - 2, 0, 255, 0, a_pcLabel ),
 									HStatusBarControl ( NULL, NULL, a_iStatusBarAttribute )
 	{

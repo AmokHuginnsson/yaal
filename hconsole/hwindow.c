@@ -45,7 +45,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
-HWindow::HWindow ( const char * a_pcTitle )
+HWindow::HWindow ( char const * a_pcTitle )
 	{
 	M_PROLOG
 	int l_piCmds [ ] = { ':', D_KEY_COMMAND_( ':' ) };
@@ -92,7 +92,7 @@ int HWindow::init ( void )
 	M_EPILOG
 	}
 
-HStatusBarControl * HWindow::init_bar ( const char * a_pcLabel )
+HStatusBarControl * HWindow::init_bar ( char const * a_pcLabel )
 	{
 	M_PROLOG
 	return ( new HStatusBarControl ( this, a_pcLabel ) );

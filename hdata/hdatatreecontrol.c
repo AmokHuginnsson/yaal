@@ -31,7 +31,7 @@ M_CVSID ( "$CVSHeader$" );
 
 HDataTreeControl::HDataTreeControl ( HRecordSet * a_poRecordSet,
 		HDataWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
-		int a_iWidth, const char * a_pcTitle, bool a_bDrawLabel,
+		int a_iWidth, char const * a_pcTitle, bool a_bDrawLabel,
 		int a_iDisabledAttribute, int a_iEnabledAttribute, int a_iFocusedAttribute )
 								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
 										a_iWidth, a_pcTitle, a_bDrawLabel, a_iDisabledAttribute,

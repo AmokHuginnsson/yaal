@@ -36,9 +36,9 @@ M_CVSID ( "$CVSHeader$" );
 #include "xalloc.h"
 #include "hlog.h"
 
-HException::HException ( const char * a_pcFileName,
-												 const char * a_pcFunctionName,
-												 int a_iLine, const char * a_pcMessage, int a_iCode )
+HException::HException ( char const * a_pcFileName,
+												 char const * a_pcFunctionName,
+												 int a_iLine, char const * a_pcMessage, int a_iCode )
 	{
 	f_cChar = 0;
 	f_iInt = 0;
@@ -72,7 +72,7 @@ HException::~HException ( void )
 	}
 
 void HException::set ( char a_cChar, int a_iInt, long a_lLong, double a_dDouble,
-											 const char * a_pcStr, void * a_pvVoidPtr )
+											 char const * a_pcStr, void * a_pvVoidPtr )
 	{
 	f_cChar = a_cChar;
 	f_iInt = a_iInt;
@@ -84,7 +84,7 @@ void HException::set ( char a_cChar, int a_iInt, long a_lLong, double a_dDouble,
 	return;
 	}
 
-void HException::set ( const char * a_pcStr )
+void HException::set ( char const * a_pcStr )
 	{
 	if ( f_pcCharPtr )xfree ( f_pcCharPtr );
 	if ( a_pcStr )f_pcCharPtr = xstrdup ( a_pcStr );
@@ -100,8 +100,8 @@ void HException::print_error ( bool a_bFull )
 	return;
 	}
 
-void HException::log ( const char * a_pcFileName,
-											 const char * a_pcFunctionName, int a_iLine )
+void HException::log ( char const * a_pcFileName,
+											 char const * a_pcFunctionName, int a_iLine )
 	{
 	int l_iLength = strlen ( a_pcFileName );
 	if ( f_iFrame && ! ( strcmp ( f_pcFileName, a_pcFileName ) || strcmp ( f_pcFunctionName, a_pcFunctionName ) ) )return;

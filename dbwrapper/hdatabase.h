@@ -44,10 +44,10 @@ public:
 	/*{*/
 	HDataBase ( void );
 	virtual ~HDataBase ( void );
-	int login ( const char *,		/* database */
-							const char *,		/* login */
-							const char * );	/* password */
-	long int query ( const char * );
+	int login ( char const *,		/* database */
+							char const *,		/* login */
+							char const * );	/* password */
+	long int query ( char const * );
 	void free_result ( void );
 	void * get_result ( void );
 	long int insert_id ( void * = NULL );

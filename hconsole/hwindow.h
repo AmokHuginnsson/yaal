@@ -48,10 +48,10 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HWindow ( const char * ); /* title */
+	HWindow ( char const * ); /* title */
 	virtual ~HWindow ( void );
 	virtual int init ( void );
-	virtual HStatusBarControl * init_bar ( const char * );
+	virtual HStatusBarControl * init_bar ( char const * );
 	void refresh ( void );
 	int process_input ( int );
 	virtual int handler_jump_tab ( int ); /* jump thru controlos with tab key */
@@ -69,7 +69,7 @@ protected:
 private:
 	/*{*/
 	friend int HControl::set_focus ( char );
-	friend void HStatusBarControl::set_prompt ( const char *, int, int );
+	friend void HStatusBarControl::set_prompt ( char const *, int, int );
 	friend void HStatusBarControl::end_prompt ( void );
 	friend int HStatusBarControl::process_input_normal ( int );
 	void set_focus ( HControl * );

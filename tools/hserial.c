@@ -35,7 +35,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hserial.h"
 #include "tools.h"
 
-HSerial::HSerial ( const char * a_pcDevice )
+HSerial::HSerial ( char const * a_pcDevice )
 				: HRawFile ( )
 	{
 	M_PROLOG
@@ -151,7 +151,7 @@ int HSerial::read ( char * a_pcBuffer, int a_iSize )
 	M_EPILOG
 	}
 
-int HSerial::write ( const char * a_pcBuffer, int a_iSize )
+int HSerial::write ( char const * a_pcBuffer, int a_iSize )
 	{
 	M_PROLOG
 	int l_iCnt = 0;

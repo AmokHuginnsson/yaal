@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HCORE_HLOG_H
 #define __HCORE_HLOG_H
 
-#define M_LOG(MESG) log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, MESG )
+#define M_LOG(MESG) log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, ( const char * ) ( MESG ) )
 
 #include <stdio.h>
 
@@ -50,15 +50,15 @@ public:
 	HLog ( void );
 	virtual ~HLog ( void );
 	void rehash ( FILE * = stderr, char * = NULL ); /* already opened file */
-	void rehash ( const char *, char * = NULL ); /* log file name */
-	int operator ( ) ( const char *, va_list );
-	int operator ( ) ( const char *, ... ); /* log ( "data %d", x );
+	void rehash ( char const *, char * = NULL ); /* log file name */
+	int operator ( ) ( char const *, va_list );
+	int operator ( ) ( char const *, ... ); /* log ( "data %d", x );
 																						 will look nice */
-	int operator ( ) ( long int, const char *, ... ); /* log ( "data %d", x );
+	int operator ( ) ( long int, char const *, ... ); /* log ( "data %d", x );
 																						 will look nice */
 	HLog & operator ( ) ( long int ); /* sets log type */
-	HLog & operator << ( const char * );
-	HLog & operator << ( const char );
+	HLog & operator << ( char const * );
+	HLog & operator << ( char const );
 	HLog & operator << ( const int );
 	HLog & operator << ( const long int );
 	HLog & operator << ( const double );

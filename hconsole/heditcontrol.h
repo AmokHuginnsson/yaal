@@ -70,10 +70,10 @@ public:
 								int,								/* left */
 								int,								/* height */
 								int,								/* width */
-								const char * = "",	/* label */
+								char const * = "",	/* label */
 								size_t = 127,					/* maximum string length */
-								const char * = "",	/* initial content */
-								const char * = D_MASK_DEFAULT, /* mask */
+								char const * = "",	/* initial content */
+								char const * = D_MASK_DEFAULT, /* mask */
 								bool = false,				/* replace */
 								bool = false,				/* right alignment */
 								bool = false,				/* multiline */
@@ -90,7 +90,7 @@ public:
 	virtual operator HInfo ( void );
 	void set_flags ( bool = false, bool = false );
 	virtual int process_input( int );
-	HString & operator = ( const char * );
+	HString & operator = ( char const * );
 	operator HString ( );
 	virtual int click ( mouse::OMouse & );
 	/*}*/

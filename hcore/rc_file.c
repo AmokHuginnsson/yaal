@@ -39,7 +39,7 @@ M_CVSID ( "$CVSHeader$" );
 namespace rc_file
 {
 
-int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
+int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 		OVariable * a_psVaraibles,
 		bool ( * set_variables ) ( HString &, HString & ) )
 	{
@@ -126,7 +126,7 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 				log << "failed." << endl;
 				l_oMessage.format ( "Error: unknown option found: `%s', "
 						"with value: `%s', on line %d.\n",
-						( const char * ) l_oOption, ( const char * ) l_oValue, l_iLine );
+						( char const * ) l_oOption, ( char const * ) l_oValue, l_iLine );
 				log ( D_LOG_ERROR ) << l_oMessage;
 				fprintf ( stderr, l_oMessage );
 				}
@@ -269,7 +269,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 	M_EPILOG
 	}
 	
-FILE * rc_open ( const char * a_pcRcName, bool a_bLocal, FILE * a_psFile )
+FILE * rc_open ( char const * a_pcRcName, bool a_bLocal, FILE * a_psFile )
 	{
 	M_PROLOG
 	char * l_pcHomePath = 0;
@@ -318,7 +318,7 @@ void rc_close ( FILE * a_psRc )
 	M_EPILOG
 	}
 
-void rc_set_variable ( const char * a_pcValue, bool & a_rbVariable )
+void rc_set_variable ( char const * a_pcValue, bool & a_rbVariable )
 	{
 	M_PROLOG
 	static HString l_oMessage;
@@ -338,7 +338,7 @@ void rc_set_variable ( const char * a_pcValue, bool & a_rbVariable )
 	return;
 	}
 
-void rc_set_variable ( const char * a_pcValue, char ** a_ppcVariable )
+void rc_set_variable ( char const * a_pcValue, char ** a_ppcVariable )
 	{
 	if ( * a_ppcVariable )xfree ( * a_ppcVariable );
 	* a_ppcVariable = NULL;
@@ -346,7 +346,7 @@ void rc_set_variable ( const char * a_pcValue, char ** a_ppcVariable )
 	return;
 	}
 
-void rc_set_variable ( const char * a_pcValue, int & a_riVariable )
+void rc_set_variable ( char const * a_pcValue, int & a_riVariable )
 	{
 	int l_iBase = 10;
 	if ( ( strlen ( a_pcValue ) > 2 ) && ( a_pcValue [ 1 ] == 'x' ) )
@@ -354,7 +354,7 @@ void rc_set_variable ( const char * a_pcValue, int & a_riVariable )
 	a_riVariable = strtol ( a_pcValue, NULL, l_iBase );
 	}
 
-void rc_set_variable ( const char * a_pcValue, char & a_rcVariable )
+void rc_set_variable ( char const * a_pcValue, char & a_rcVariable )
 	{
 	a_rcVariable = a_pcValue [ 0 ];
 	}

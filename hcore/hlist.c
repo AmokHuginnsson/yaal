@@ -31,7 +31,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hlist.h"
 M_CVSTID ( D_CVSID_HLIST_H );
 
-const char * g_ppcErrMsgHList [ 24 ] =
+char const * g_ppcErrMsgHList [ 24 ] =
 	{
 /* E_HLIST_EMPTYELEMENT */	_ ( "nothing stored yet, so nothing to get" ),
 /* E_HLIST_BADINDEX */			_ ( "index excides list size" ),

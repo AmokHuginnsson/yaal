@@ -84,19 +84,19 @@ void HRecordSet::build_sql ( void )
 		{
 		case ( D_MODE_CLOSED ):
 			{
-			f_oSQL.format ( "SELECT %s FROM %s", ( const char * ) f_oColumns,
-					( const char * ) f_oTable );
+			f_oSQL.format ( "SELECT %s FROM %s", ( char const * ) f_oColumns,
+					( char const * ) f_oTable );
 			if ( f_oFilter.is_empty ( ) )f_oBuffer = m_oFilter;
 			else if ( m_oFilter.is_empty ( ) )f_oBuffer = f_oFilter;
-			else f_oBuffer.format ( "%s AND ( %s )", ( const char * ) f_oFilter,
-					( const char * ) m_oFilter );
+			else f_oBuffer.format ( "%s AND ( %s )", ( char const * ) f_oFilter,
+					( char const * ) m_oFilter );
 			if ( ! f_oBuffer.is_empty ( ) )
 				f_oSQL += ( " WHERE " + f_oBuffer );
 			f_oBuffer = "";
 			if ( f_oSort.is_empty ( ) )f_oBuffer = m_oSort;
 			else if ( m_oSort.is_empty ( ) )f_oBuffer = f_oSort;
-			else f_oBuffer.format ( "%s, %s", ( const char * ) m_oSort,
-					( const char * ) f_oSort );
+			else f_oBuffer.format ( "%s, %s", ( char const * ) m_oSort,
+					( char const * ) f_oSort );
 			if ( ! f_oBuffer.is_empty ( ) )
 				f_oSQL += ( " ORDER BY " + f_oBuffer );
 			f_oSQL += ';';
@@ -149,7 +149,7 @@ void HRecordSet::build_sql ( void )
 	M_EPILOG
 	}
 
-long int HRecordSet::open ( const char * a_pcQuery )
+long int HRecordSet::open ( char const * a_pcQuery )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -205,7 +205,7 @@ void HRecordSet::free ( void )
 	M_EPILOG
 	}
 
-long int HRecordSet::requery ( const char * a_pcQuery )
+long int HRecordSet::requery ( char const * a_pcQuery )
 	{
 	M_PROLOG
 	close ( );
@@ -332,7 +332,7 @@ void HRecordSet::remove ( void )
 	int l_iCursorPosition = f_iCursorPosition;
 	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
 	f_oSQL.format ( "DELETE FROM %s WHERE id = %ld;",
-			( const char * ) f_oTable, m_lId );
+			( char const * ) f_oTable, m_lId );
 	f_poDataBase->query ( f_oSQL );
 	f_poDataBase->free_result ( );
 	requery ( );

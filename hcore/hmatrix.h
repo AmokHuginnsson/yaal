@@ -43,7 +43,7 @@ Copyright:
 #define E_HMATRIX_ROW_OUTOFRANGE									9
 #define E_HMATRIX_COLUMN_OUTOFRANGE								10
 
-extern const char * g_ppcErrMsgHMatrix [ ];
+extern char const * g_ppcErrMsgHMatrix [ ];
 
 #define M_CHECK_DIMENSIONS_ROWS_COLUMNS( ) \
 		{\

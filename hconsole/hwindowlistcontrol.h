@@ -38,7 +38,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HWindowListControl ( HWindow *, int, int, int, int, const char * );
+	HWindowListControl ( HWindow *, int, int, int, int, char const * );
 	virtual ~HWindowListControl ( void );
 	int process_input ( int );
 	void refresh ( void );

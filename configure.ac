@@ -38,9 +38,6 @@ CXXFLAGS=["-L/usr/local/lib -I/usr/local/include"]
 dnl Set up how configure will handle header checks.
 AC_CONFIG_HEADERS([config.h])
 
-dnl We will generate config.h with basic #defines.
-dnl AC_CONFIG_HEADER([config.h])
-
 dnl Cheching for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
 AC_CANONICAL_HOST()
@@ -80,6 +77,7 @@ AC_CHECK_FILE(
 		)]
 	) AC_SUBST([SERIAL_DEVICE],['ttyS0'])]
 )
+
 AC_MSG_RESULT([--- Guessed host operating system is $_HOST________     [[62%]]])
 
 dnl What special compiler flags we can set?

@@ -98,7 +98,7 @@ int HListControl::HColumnInfo::operator - ( const HColumnInfo & )
 	}
 
 HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-		int a_iHeight, int a_iWidth, const char * a_pcLabel, bool a_bCheckable,
+		int a_iHeight, int a_iWidth, char const * a_pcLabel, bool a_bCheckable,
 		bool a_bSortable, bool a_bSearchable, bool a_bDrawHeader, bool a_bDrawLabel,
 		int a_iDisabledAttribute, int a_iEnabledAttribute,
 		int a_iFocudesAttribute )
@@ -508,9 +508,8 @@ int HListControl::process_input ( int a_iCode )
 				l_iErrorCode = 0;
 				sort_by_contents ( l_iCtr,
 						a_iCode == tolower ( a_iCode ) ? D_ASCENDING : D_DESCENDING );
-				l_poElement = f_poSelected = f_poHook;
-				f_iControlOffset = 0;
-				f_iCursorPosition = 0;
+				l_poElement = f_poHook;
+				l_iOldPosition = 0;
 				}
 			else l_iErrorCode = a_iCode;
 			break;
@@ -532,7 +531,7 @@ int HListControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-void HListControl::add_column ( const int & a_riColumn, const char * a_pcName,
+void HListControl::add_column ( const int & a_riColumn, char const * a_pcName,
 		const int & a_riWidth, const int & a_riAlign, const int & a_riType, 
 		HControl * a_poControl )
 	{
@@ -748,6 +747,9 @@ void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 		f_poParent->status_bar ( )->init_progress ( f_iQuantity * f_iQuantity / 2,
 				" Sorting ..." );
 	sort ( );
+	f_iControlOffset = 0;
+	f_iCursorPosition = 0;
+	f_poFirstVisibleRow = f_poSelected = f_poHook;
 	return;
 	M_EPILOG
 	}
@@ -781,54 +783,54 @@ void HListControl::go_to_match ( void )
 	M_PROLOG
 	int l_iDummy = 0, l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
 	int l_iCount = f_iQuantity + 1, l_iColumns = f_oHeader.quantity ( );
+	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char * l_pcHighlightStart = NULL;
 	HItem * l_poItem = NULL;
-	HElement * l_poElement = f_poSelected;
-	HElement * l_poElementFVR = f_poFirstVisibleRow;
+	HElement * l_poSelectedOrig = f_poSelected;
+	HElement * l_poFirstVisibleRowOrig = f_poFirstVisibleRow;
+	if ( ! f_bSearchActived )
+		return;
 	if ( f_sMatch.f_poCurrentMatch != f_poSelected )f_sMatch.f_iMatchNumber = - 1;
 	f_sMatch.f_poCurrentMatch = f_poSelected;
-	if ( f_bSearchActived )
+	while ( l_iCount -- )
 		{
-		while ( l_iCount -- )
+		l_poItem = & f_poSelected->get_object ( );
+		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
 			{
-			l_poItem = & f_poSelected->get_object ( );
-			for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
+			l_pcHighlightStart = ( char * ) ( HString & ) ( * l_poItem ) [ l_iCtr ];
+			l_iCtrLoc = 0;
+			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
+					l_iDummy ) ) )
 				{
-				l_pcHighlightStart = ( char * ) ( HString & ) ( * l_poItem ) [ l_iCtr ];
-				l_iCtrLoc = 0;
-				while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
-						l_iDummy ) ) )
-					{
-					if ( l_iCtrLoc > f_sMatch.f_iMatchNumber )break;
-					l_pcHighlightStart ++;
-					l_iCtrLoc ++;
-					}
-				if ( l_pcHighlightStart )break;
-				f_sMatch.f_iMatchNumber = - 1;
+				if ( l_iCtrLoc > f_sMatch.f_iMatchNumber )break;
+				l_pcHighlightStart ++;
+				l_iCtrLoc ++;
 				}
 			if ( l_pcHighlightStart )break;
-			f_sMatch.f_iColumnWithMatch = 0;
-/* this part is from process_input, but slightly modified */
-			if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_iQuantity - 1 ) )
-				{
-				f_iCursorPosition ++;
-				if ( f_iCursorPosition >= f_iHeightRaw )
-					{
-					f_iCursorPosition = f_iHeightRaw - 1;
-					f_iControlOffset ++;
-					l_iMoveFirstRow ++;
-					}
-				to_tail ( );
-				}
-			else
-				{
-				f_poSelected = f_poFirstVisibleRow = f_poHook;
-				f_iControlOffset = f_iCursorPosition = 0;
-				l_iMoveFirstRow = 0;
-				f_poParent->status_bar ( )->message ( _ ( "search hit BOTTOM, continuing at TOP" ) );
-				}
-/* end od it */
+			f_sMatch.f_iMatchNumber = - 1;
 			}
+		if ( l_pcHighlightStart )break;
+		f_sMatch.f_iColumnWithMatch = 0;
+/* this part is from process_input, but slightly modified */
+		if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_iQuantity - 1 ) )
+			{
+			f_iCursorPosition ++;
+			if ( f_iCursorPosition >= f_iHeightRaw )
+				{
+				f_iCursorPosition = f_iHeightRaw - 1;
+				f_iControlOffset ++;
+				l_iMoveFirstRow ++;
+				}
+			to_tail ( );
+			}
+		else
+			{
+			f_poSelected = f_poFirstVisibleRow = f_poHook;
+			f_iControlOffset = f_iCursorPosition = 0;
+			l_iMoveFirstRow = 0;
+			f_poParent->status_bar ( )->message ( _ ( "search hit BOTTOM, continuing at TOP" ) );
+			}
+/* end od it */
 		}
 	if ( l_pcHighlightStart )
 		{
@@ -840,11 +842,13 @@ void HListControl::go_to_match ( void )
 		}
 	else
 		{
-		f_poSelected = l_poElement;
-		f_poFirstVisibleRow = l_poElementFVR;
+		f_poSelected = l_poSelectedOrig;
+		f_poFirstVisibleRow = l_poFirstVisibleRowOrig;
+		f_iCursorPosition = l_iCursorPositionOrig;
+		f_iControlOffset = l_iControlOffsetOrig;
 		f_sMatch.f_iMatchNumber = - 1;
 		f_sMatch.f_iColumnWithMatch = 0;
-		f_poParent->status_bar ( )->message ( _ ( "pattern not found" ) );
+		f_poParent->status_bar ( )->message ( HString ( _ ( "pattern not found: " ) ) + f_oPattern.error ( ) );
 		}
 	return;
 	M_EPILOG
@@ -855,69 +859,69 @@ void HListControl::go_to_match_previous ( void )
 	M_PROLOG
 	int l_iDummy = 0, l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
 	int l_iCount = f_iQuantity + 1, l_iColumns = f_oHeader.quantity ( );
+	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char * l_pcHighlightStart = NULL;
 	HItem * l_poItem = NULL;
-	HElement * l_poElement = f_poSelected;
-	HElement * l_poElementFVR = f_poFirstVisibleRow;
+	HElement * l_poSelectedOrig = f_poSelected;
+	HElement * l_poFirstVisibleRowOrig = f_poFirstVisibleRow;
+	if ( ! f_bSearchActived )
+		return;
 	if ( f_sMatch.f_poCurrentMatch != f_poSelected )
 		f_sMatch.f_iMatchNumber = - 1;
 	f_sMatch.f_poCurrentMatch = f_poSelected;
-	if ( f_bSearchActived )
+	while ( l_iCount -- )
 		{
-		while ( l_iCount -- )
+		l_poItem = & f_poSelected->get_object ( );
+		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
 			{
-			l_poItem = & f_poSelected->get_object ( );
-			for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
+			l_pcHighlightStart = ( char * ) ( HString & ) ( * l_poItem ) [ l_iCtr ];
+			l_iCtrLoc = 0;
+			if ( f_sMatch.f_iMatchNumber < 0 )
+				f_sMatch.f_iMatchNumber = f_oPattern.count ( l_pcHighlightStart );
+			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
+					l_iDummy ) ) )
 				{
-				l_pcHighlightStart = ( char * ) ( HString & ) ( * l_poItem ) [ l_iCtr ];
-				l_iCtrLoc = 0;
-				if ( f_sMatch.f_iMatchNumber < 0 )
-					f_sMatch.f_iMatchNumber = f_oPattern.count ( l_pcHighlightStart );
-				while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
-						l_iDummy ) ) )
+				if ( l_iCtrLoc == ( f_sMatch.f_iMatchNumber - 1 ) )break;
+				if ( l_iCtrLoc >= f_sMatch.f_iMatchNumber )
 					{
-					if ( l_iCtrLoc == ( f_sMatch.f_iMatchNumber - 1 ) )break;
-					if ( l_iCtrLoc >= f_sMatch.f_iMatchNumber )
-						{
-						l_pcHighlightStart = NULL;
-						break;
-						}
-					l_pcHighlightStart ++;
-					l_iCtrLoc ++;
+					l_pcHighlightStart = NULL;
+					break;
 					}
-				if ( l_pcHighlightStart )break;
-				f_sMatch.f_iMatchNumber = - 1;
+				l_pcHighlightStart ++;
+				l_iCtrLoc ++;
 				}
 			if ( l_pcHighlightStart )break;
-			f_sMatch.f_iColumnWithMatch = l_iColumns - 1;
-/* this part is from process_input, but slightly modified */
-			if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
-				{
-				if ( f_iCursorPosition > 0 )f_iCursorPosition --;
-				else if ( f_iControlOffset > 0 )
-					{
-					f_iControlOffset --;
-					l_iMoveFirstRow ++;
-					}
-				to_head ( );
-				}
-			else
-				{
-				if ( f_iQuantity >= f_iHeightRaw )
-					{
-					f_poSelected = f_poHook;
-					to_head ( );
-					f_poFirstVisibleRow = f_poSelected;
-					to_head ( f_poFirstVisibleRow, f_iHeightRaw - 1 );
-					f_iCursorPosition = f_iHeightRaw - 1;
-					f_iControlOffset = f_iQuantity - f_iHeightRaw;
-					}
-				else f_iCursorPosition = f_iQuantity - 1;
-				l_iMoveFirstRow = 0;
-				f_poParent->status_bar ( )->message ( _ ( "search hit TOP, continuing at BOTTOM" ) );
-				}
-/* end od it */
+			f_sMatch.f_iMatchNumber = - 1;
 			}
+		if ( l_pcHighlightStart )break;
+		f_sMatch.f_iColumnWithMatch = l_iColumns - 1;
+/* this part is from process_input, but slightly modified */
+		if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
+			{
+			if ( f_iCursorPosition > 0 )f_iCursorPosition --;
+			else if ( f_iControlOffset > 0 )
+				{
+				f_iControlOffset --;
+				l_iMoveFirstRow ++;
+				}
+			to_head ( );
+			}
+		else
+			{
+			if ( f_iQuantity >= f_iHeightRaw )
+				{
+				f_poSelected = f_poHook;
+				to_head ( );
+				f_poFirstVisibleRow = f_poSelected;
+				to_head ( f_poFirstVisibleRow, f_iHeightRaw - 1 );
+				f_iCursorPosition = f_iHeightRaw - 1;
+				f_iControlOffset = f_iQuantity - f_iHeightRaw;
+				}
+			else f_iCursorPosition = f_iQuantity - 1;
+			l_iMoveFirstRow = 0;
+			f_poParent->status_bar ( )->message ( _ ( "search hit TOP, continuing at BOTTOM" ) );
+			}
+/* end od it */
 		}
 	if ( l_pcHighlightStart )
 		{
@@ -929,8 +933,10 @@ void HListControl::go_to_match_previous ( void )
 		}
 	else
 		{
-		f_poSelected = l_poElement;
-		f_poFirstVisibleRow = l_poElementFVR;
+		f_poSelected = l_poSelectedOrig;
+		f_poFirstVisibleRow = l_poFirstVisibleRowOrig;
+		f_iCursorPosition = l_iCursorPositionOrig;
+		f_iControlOffset = l_iControlOffsetOrig;
 		f_sMatch.f_iMatchNumber = - 1;
 		f_sMatch.f_iColumnWithMatch = 0;
 		f_poParent->status_bar ( )->message ( _ ( "pattern not found" ) );

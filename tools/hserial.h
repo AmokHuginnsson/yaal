@@ -46,12 +46,12 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HSerial ( const char * = NULL ); /* device */
+	HSerial ( char const * = NULL ); /* device */
 	virtual ~HSerial ( void );
 	bool open ( void );
 	int read ( char *, int );
 	int close ( void );
-	int write ( const char *, int );
+	int write ( char const *, int );
 	void flush ( int );
 	void wait_for_eot ( void );
 	/*}*/

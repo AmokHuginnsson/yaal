@@ -34,22 +34,22 @@ Copyright:
 struct OVariable
 	{
 	int f_iType;
-	const char * f_pcKey;
+	char const * f_pcKey;
 	void * f_pvValue;
 	};
 
 namespace rc_file
 	{
 
-int process_rc_file ( const char *, const char *,
+int process_rc_file ( char const *, char const *,
 		OVariable *, bool ( * ) ( HString &, HString & ) = NULL );
 int read_rc_line ( HString &, HString &, FILE *, int & );
-FILE * rc_open ( const char *, bool, FILE * = NULL );
+FILE * rc_open ( char const *, bool, FILE * = NULL );
 void rc_close ( FILE * );
-void rc_set_variable ( const char *, bool & );
-void rc_set_variable ( const char *, char & );
-void rc_set_variable ( const char *, char ** );
-void rc_set_variable ( const char *, int & );
+void rc_set_variable ( char const *, bool & );
+void rc_set_variable ( char const *, char & );
+void rc_set_variable ( char const *, char ** );
+void rc_set_variable ( char const *, int & );
 
 	}
 

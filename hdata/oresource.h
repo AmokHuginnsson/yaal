@@ -61,7 +61,7 @@ struct OAttributes
 struct OColumnInfo
 	{
 	int f_iPlacement; 			/* what place should this new column take */
-	const char * f_pcName;	/* column name */
+	char const * f_pcName;	/* column name */
 	int f_iWidth;						/* column width */
 	int f_iAlign;						/* column alignment */
 	int f_iType;						/* data type stored in that column */
@@ -72,16 +72,16 @@ class HDataControl;
 struct OResource
 	{
 /* data part */
-	const char *	f_pcTable;			/* name of table in database asociated with contorl */
-	const char *	f_pcColumns;		/* what columns from record-set we are looking for */
-	const char *	f_pcFilter;			/* additional filter for record-set (WHERE clause) */
-	const char *	f_pcSort;				/* additional sort for record-set (ORDER BY clause) */
+	char const *	f_pcTable;			/* name of table in database asociated with contorl */
+	char const *	f_pcColumns;		/* what columns from record-set we are looking for */
+	char const *	f_pcFilter;			/* additional filter for record-set (WHERE clause) */
+	char const *	f_pcSort;				/* additional sort for record-set (ORDER BY clause) */
 /* control part */
 	int			f_iRow;								/* top coordinate of contorl */
 	int			f_iColumn;						/* left coordinate of contorl */
 	int			f_iHeight;						/* height of control */
 	int			f_iWidth;							/* width of control */
-	const char *	f_pcLabel;			/* control label */
+	char const *	f_pcLabel;			/* control label */
 	OAttributes *	f_psAttributes;	/* control's attributes */
 /* relative functionality configuration options */
 	int			f_iFlags;							/* tell how control should be treaded */
@@ -98,8 +98,8 @@ struct OResource
 struct OEditControlResource
 	{
 	int			f_iMaxStringSize;		/* maximum length of contained string */
-	const char *	f_pcValue;		/* initial value for control */
-	const char *	f_pcMask;			/* tell what can be inserted into control */
+	char const *	f_pcValue;		/* initial value for control */
+	char const *	f_pcMask;			/* tell what can be inserted into control */
 	bool		f_bReplace;					/* is control in replace mode? */
 	bool		f_bRightAligned;		/* is control content right aligned */
 	bool		f_bMultiLine;				/* is this contorl a multiline edit? */

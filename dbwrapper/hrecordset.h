@@ -94,11 +94,11 @@ public:
 	void move_last ( void );
 	void move_next ( void );
 	void move_previous ( void );
-	long int open ( const char * = NULL );
+	long int open ( char const * = NULL );
 	void close ( void );
 	void cancel ( void );
 	void free ( void );
-	long int requery ( const char * = NULL );
+	long int requery ( char const * = NULL );
 	void add_new ( void );
 	void edit ( void );
 	long int update ( void );

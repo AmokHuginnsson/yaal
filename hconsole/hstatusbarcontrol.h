@@ -62,7 +62,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HStatusBarControl ( HWindow *, const char *, int = -1 );
+	HStatusBarControl ( HWindow *, char const *, int = -1 );
 	virtual ~HStatusBarControl ( void );
 	virtual void draw_label ( void );
 	virtual void refresh ( void );
@@ -70,17 +70,17 @@ public:
 	virtual int process_input ( int );
 	virtual int process_input_normal ( int );
 	virtual int process_input_menu ( int );
-	void setup ( const char *, const char *, int );
-	void set_prompt ( const char * = NULL, int = D_PROMPT_MODE_NORMAL,
+	void setup ( char const *, char const *, int );
+	void set_prompt ( char const * = NULL, int = D_PROMPT_MODE_NORMAL,
 			int = D_PROMPT_RESTRICT_RELAXED );
 	void end_prompt ( void );
-	void init_progress ( double, const char *, bool = true );
-	void update_progress ( double = -1, const char * = NULL );
-	void message ( int, const char *, ... );
-	void message ( const char *, ... );
-	void bar ( const char * = NULL );
-	int ask ( const char *, const char * );
-	bool confirm ( const char * );
+	void init_progress ( double, char const *, bool = true );
+	void update_progress ( double = -1, char const * = NULL );
+	void message ( int, char const *, ... );
+	void message ( char const *, ... );
+	void bar ( char const * = NULL );
+	int ask ( char const *, char const * );
+	bool confirm ( char const * );
 	/*}*/
 	};
 

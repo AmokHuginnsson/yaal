@@ -42,10 +42,10 @@ public:
 								int,								/* left */
 								int,								/* height */
 								int,								/* width */
-								const char * = "",	/* label */
+								char const * = "",	/* label */
 								int = 127,					/* maximum string length */
-								const char * = "",	/* initial content */
-								const char * = D_MASK_DEFAULT, /* mask */
+								char const * = "",	/* initial content */
+								char const * = D_MASK_DEFAULT, /* mask */
 								bool = false,				/* replace */
 								bool = false,				/* right alignment */
 								bool = false,				/* multiline */

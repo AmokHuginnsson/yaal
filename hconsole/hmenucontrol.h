@@ -61,7 +61,7 @@ public:
 								 int,							/* col */
 								 int,							/* height */
 								 int,							/* width */
-								 const char * );	/* label */
+								 char const * );	/* label */
 	virtual ~HMenuControl ( void );
 	void init ( HProcess *, OMenuItem * );
 	int process_input( int );

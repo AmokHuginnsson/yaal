@@ -52,8 +52,8 @@ HDataBase::~HDataBase ( void )
 	M_EPILOG
 	}
 
-int HDataBase::login ( const char * a_pcDataBase, const char * a_pcLogin,
-		const char * a_pcPassword )
+int HDataBase::login ( char const * a_pcDataBase, char const * a_pcLogin,
+		char const * a_pcPassword )
 	{
 	M_PROLOG
 	f_pvCoreData = dbwrapper::db_connect( a_pcDataBase, a_pcLogin, a_pcPassword );
@@ -64,7 +64,7 @@ int HDataBase::login ( const char * a_pcDataBase, const char * a_pcLogin,
 	M_EPILOG
 	}
 
-long int HDataBase::query ( const char * a_pcQuery )
+long int HDataBase::query ( char const * a_pcQuery )
 	{
 	M_PROLOG
 	if ( f_pvLastResult )

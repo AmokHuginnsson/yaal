@@ -57,7 +57,7 @@ typedef struct
 
 sqlite_db * g_psBrokenDB = NULL;
 
-void * db_query ( void *, const char * );
+void * db_query ( void *, char const * );
 void db_unquery ( void * );
 void db_disconnect ( void * );
 
@@ -65,8 +65,8 @@ void db_disconnect ( void * );
  * .sqlite or .db extension, and this default extension is added
  * to user supplied database name by driver during db_connect. */
 
-void * db_connect ( const char * a_pcDataBase,
-		const char *, const char * )
+void * db_connect ( char const * a_pcDataBase,
+		char const *, char const * )
 	{
 	int l_iNmLnght = 0;
 	void * l_pvPtr = NULL;
@@ -131,7 +131,7 @@ int db_errno ( void * a_pvData )
 	return ( errno );
 	}
 
-const char * db_error  ( void * a_pvData )
+char const * db_error  ( void * a_pvData )
 	{
 	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
 	if ( ! l_psSQLite )
@@ -141,7 +141,7 @@ const char * db_error  ( void * a_pvData )
 	return ( "" );
 	}
 
-void * db_query ( void * a_pvData, const char * a_pcQuery )
+void * db_query ( void * a_pvData, char const * a_pcQuery )
 	{
 	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
 	sqlite_result * l_psResult = NULL;

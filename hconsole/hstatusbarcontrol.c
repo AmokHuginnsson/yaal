@@ -44,7 +44,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hsearchablecontrol.h"
 
 HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
-		const char * a_pcLabel, int a_iStatusBarAttribute )
+		char const * a_pcLabel, int a_iStatusBarAttribute )
 								 : HControl ( a_poParent, - 2, 0, 255, 0, a_pcLabel ),
 									HEditControl ( NULL, 0, 0, 0, 0, NULL, 127, "", D_MASK_LOOSE )
 	{
@@ -143,7 +143,7 @@ int HStatusBarControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-void HStatusBarControl::set_prompt ( const char * a_pcPrompt, int a_iMode,
+void HStatusBarControl::set_prompt ( char const * a_pcPrompt, int a_iMode,
 		int a_iRestrict )
 	{
 	M_PROLOG
@@ -173,7 +173,7 @@ int HStatusBarControl::verify ( void )
 	M_EPILOG
 	}
 
-void HStatusBarControl::init_progress ( double a_dMax, const char * a_pcTitle,
+void HStatusBarControl::init_progress ( double a_dMax, char const * a_pcTitle,
 		bool a_bEstimate )
 	{
 	M_PROLOG
@@ -190,7 +190,7 @@ void HStatusBarControl::init_progress ( double a_dMax, const char * a_pcTitle,
 	}
 
 void HStatusBarControl::update_progress ( double a_dStep,
-		const char * a_pcTitle )
+		char const * a_pcTitle )
 	{
 	M_PROLOG
 	int l_iMaxBar = 0;
@@ -227,14 +227,14 @@ void HStatusBarControl::update_progress ( double a_dStep,
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", l_iMaxBar );
 			f_oString.format ( f_oVarTmpBuffer, "-",
-					( a_dStep ? ( ( const char * ) l_oLeft ) : "(?\?:?\?:?\?)" ),
-					( const char * ) l_oStoper,	l_iNextPercent, "%%" );
+					( a_dStep ? ( ( char const * ) l_oLeft ) : "(?\?:?\?:?\?)" ),
+					( char const * ) l_oStoper,	l_iNextPercent, "%%" );
 			}
 		else
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s[%%3d%%s]", l_iMaxBar );
 			f_oString.format ( f_oVarTmpBuffer, "-",
-					( const char * ) l_oStoper, l_iNextPercent, "%%" );
+					( char const * ) l_oStoper, l_iNextPercent, "%%" );
 			}
 		if ( f_bDone )
 			strncpy ( ( ( char * ) f_oString ) + console::n_iWidth - 5, "done", 4 );
@@ -253,7 +253,7 @@ void HStatusBarControl::update_progress ( double a_dStep,
 	}
 
 void HStatusBarControl::message ( int a_iAttribute,
-		const char * a_pcFormat, ... )
+		char const * a_pcFormat, ... )
 	{
 	M_PROLOG
 	va_list l_xAp;
@@ -266,7 +266,7 @@ void HStatusBarControl::message ( int a_iAttribute,
 	M_EPILOG
 	}
 
-void HStatusBarControl::message ( const char * a_pcFormat, ... )
+void HStatusBarControl::message ( char const * a_pcFormat, ... )
 	{
 	M_PROLOG
 	va_list l_xAp;
@@ -279,7 +279,7 @@ void HStatusBarControl::message ( const char * a_pcFormat, ... )
 	M_EPILOG
 	}
 
-void HStatusBarControl::bar ( const char * a_pcBar )
+void HStatusBarControl::bar ( char const * a_pcBar )
 	{
 	M_PROLOG
 	M_SET_ATTR_DATA ( );
@@ -295,8 +295,8 @@ void HStatusBarControl::bar ( const char * a_pcBar )
 	M_EPILOG
 	}
 
-int HStatusBarControl::ask ( const char * a_pcQuestion,
-		const char * a_pcPrompt )
+int HStatusBarControl::ask ( char const * a_pcQuestion,
+		char const * a_pcPrompt )
 	{
 	M_PROLOG
 	bar ( a_pcQuestion );
@@ -305,7 +305,7 @@ int HStatusBarControl::ask ( const char * a_pcQuestion,
 	M_EPILOG
 	}
 
-bool HStatusBarControl::confirm ( const char * a_pcQuestion )
+bool HStatusBarControl::confirm ( char const * a_pcQuestion )
 	{
 	M_PROLOG
 	ask ( a_pcQuestion, "[yes/no]: " );
@@ -325,7 +325,7 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 		{
 		case ( '\r' ):
 			{
-			l_bBackwards = f_oPrompt [ 0 ] == '?';
+			l_bBackwards = ( f_oPrompt [ 0 ] == '?' );
 			end_prompt ( );
 			if ( l_iMode == D_PROMPT_MODE_COMMAND )
 				f_poParent->f_oCommand = f_oString;

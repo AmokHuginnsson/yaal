@@ -49,8 +49,8 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HCollector ( const char * = NULL ); /* device path */
-	int send_line ( const char * );
+	HCollector ( char const * = NULL ); /* device path */
+	int send_line ( char const * );
 	int receive_line ( char * & );
 	int establish_connection ( int = 9999 );
 	int wait_for_connection ( int = 9999 );
@@ -58,7 +58,7 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	bool test_char ( const char *, int );
+	bool test_char ( char const *, int );
 	/*}*/
 	};
 	

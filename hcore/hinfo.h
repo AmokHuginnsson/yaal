@@ -49,7 +49,7 @@ public:
 	HInfo ( const int & );
 	HInfo ( const long int & );
 	HInfo ( const double & );
-	HInfo ( const char * );
+	HInfo ( char const * );
 	HInfo ( const HTime & );
 	HInfo ( void * );
 	HInfo ( const HInfo &, int = 0 );
@@ -59,7 +59,7 @@ public:
 	int & operator = ( const int & );
 	long int & operator = ( const long int & );
 	double & operator = ( const double & );
-	HString & operator = ( const char * );
+	HString & operator = ( char const * );
 	HTime & operator = ( const HTime & );
 	void * operator = ( void * );
 	operator int & ( void );

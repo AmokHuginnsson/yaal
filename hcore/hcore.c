@@ -77,7 +77,7 @@ bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 	M_EPILOG
 	}
 
-void set_env ( const char * a_pcVarValue )
+void set_env ( char const * a_pcVarValue )
 	{
 	M_PROLOG
 	char * l_pcPtr = NULL;

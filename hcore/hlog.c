@@ -148,7 +148,7 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 	M_EPILOG
 	}
 
-void HLog::rehash ( const char * a_pcLogFileName, char * a_pcProcessName )
+void HLog::rehash ( char const * a_pcLogFileName, char * a_pcProcessName )
 	{
 	M_PROLOG
 	if ( ! a_pcLogFileName )
@@ -165,10 +165,12 @@ void HLog::timestamp ( FILE * a_psStream )
 	int l_iSize = 0;
 	char l_pcBuffer [ D_TIMESTAMP_SIZE ];
 	time_t l_xCurrentTime;
-	if ( ! a_psStream )a_psStream = f_psStream;
+	if ( ! a_psStream )
+		a_psStream = f_psStream;
 	if ( ! f_bRealMode )
 		{
-		if ( f_psStream )fprintf ( f_psStream, "%-10lx", f_lType );
+		if ( f_psStream )
+			fprintf ( f_psStream, "%-10lx", f_lType );
 		return;
 		}
 	tm * l_psBrokenTime = 0;
@@ -177,7 +179,7 @@ void HLog::timestamp ( FILE * a_psStream )
 	memset ( l_pcBuffer, 0, D_TIMESTAMP_SIZE );
 	/* ISO C++ does not support the `%e' strftime format */
 	/* `%e': The day of the month like with `%d', but padded with blank */
-	/* (range ` 1' through `31').) */
+	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
 	l_iSize = strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
@@ -193,7 +195,7 @@ void HLog::timestamp ( FILE * a_psStream )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( const char * a_pcFormat, va_list a_xAp )
+int HLog::operator ( ) ( char const * a_pcFormat, va_list a_xAp )
 	{
 	M_PROLOG
 	int l_iErr = 0;
@@ -212,7 +214,7 @@ int HLog::operator ( ) ( const char * a_pcFormat, va_list a_xAp )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( const char * a_pcFormat, ... )
+int HLog::operator ( ) ( char const * a_pcFormat, ... )
 	{
 	M_PROLOG
 	int l_iErr = 0;
@@ -227,7 +229,7 @@ int HLog::operator ( ) ( const char * a_pcFormat, ... )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( long int a_lType, const char * a_pcFormat, ... )
+int HLog::operator ( ) ( long int a_lType, char const * a_pcFormat, ... )
 	{
 	M_PROLOG
 	int l_iErr = 0;
@@ -251,7 +253,7 @@ HLog & HLog::operator ( ) ( long int a_lType )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( const char * a_pcString )
+HLog & HLog::operator << ( char const * a_pcString )
 	{
 	M_PROLOG
 	if ( ! a_pcString )return ( * this );
@@ -271,7 +273,7 @@ HLog & HLog::operator << ( const char * a_pcString )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( const char a_cChar )
+HLog & HLog::operator << ( char const a_cChar )
 	{
 	M_PROLOG
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & g_lLogMask ) )

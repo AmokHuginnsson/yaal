@@ -189,7 +189,7 @@ void set_attr( unsigned char a_ucAttr )
 	}
 
 int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
-							 const char * a_pcFormat, ... )
+							 char const * a_pcFormat, ... )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -202,7 +202,7 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	}
 	
 int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
-							 const char * a_pcFormat, va_list & a_rxAp )
+							 char const * a_pcFormat, va_list & a_rxAp )
 	{
 	M_PROLOG
 	int l_iError = 0;

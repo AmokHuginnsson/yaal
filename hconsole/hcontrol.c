@@ -45,7 +45,7 @@ M_CVSID ( "$CVSHeader$" );
 #endif /* __DEBUGGER_BABUNI__ */
 
 HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-										 int a_iHeight, int a_iWidth, const char * a_pcLabel,
+										 int a_iHeight, int a_iWidth, char const * a_pcLabel,
 										 bool a_bDrawLabel, int a_iDisabledAttribute,
 										 int a_iEnabledAttribute, int a_iFocusedAttribute )
 	{

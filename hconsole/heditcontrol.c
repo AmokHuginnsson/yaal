@@ -47,8 +47,8 @@ M_CVSID ( "$CVSHeader$" );
 
 HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
-		const char * a_pcLabel, size_t a_iBufferSize, const char * a_pcValue,
-		const char * a_pcMask, bool a_bReplace, bool a_bRightAligned,
+		char const * a_pcLabel, size_t a_iBufferSize, char const * a_pcValue,
+		char const * a_pcMask, bool a_bReplace, bool a_bRightAligned,
 		bool a_bMultiLine, bool a_bPassword, int a_iMaxHistoryLevel,
 		bool a_bDrawLabel, int a_iDisabledAttribute,
 		int a_iEnabledAttribute, int a_iFocusedAttribute )
@@ -186,7 +186,7 @@ void HEditControl::set_flags ( bool a_bReplace, bool a_bPassword )
 
 /* all str* and mem* functions takes const pointer as argument and returns
 	 non const pointer */
-char * strrnpbrk ( const char * a_pcBuffer, const char * a_pcStopSet,
+char * strrnpbrk ( char const * a_pcBuffer, char const * a_pcStopSet,
 		int a_iIndex )
 	{
 	int l_iCtr = 0;
@@ -198,12 +198,12 @@ char * strrnpbrk ( const char * a_pcBuffer, const char * a_pcStopSet,
 	return ( NULL );
 	}
 
-const char * strrpbrk ( const char * a_pcBuffer, const char * a_pcStopSet )
+char const * strrpbrk ( char const * a_pcBuffer, char const * a_pcStopSet )
 	{
 	return ( strrnpbrk ( a_pcBuffer, a_pcStopSet, strlen ( a_pcBuffer ) ) );
 	}
 
-size_t strrnspn ( const char * a_pcBuffer, const char * a_pcSkipSet,
+size_t strrnspn ( char const * a_pcBuffer, char const * a_pcSkipSet,
 		int a_iLenght )
 	{
 	int l_iCtr = 0;
@@ -219,12 +219,12 @@ size_t strrnspn ( const char * a_pcBuffer, const char * a_pcSkipSet,
 	return ( 0 );
 	}
 
-size_t strrspn ( const char * a_pcBuffer, const char * a_pcSkipSet )
+size_t strrspn ( char const * a_pcBuffer, char const * a_pcSkipSet )
 	{
 	return ( strrnspn ( a_pcBuffer, a_pcSkipSet, strlen ( a_pcBuffer ) ) );
 	}
 
-const char g_pcWhiteSpace [ ] = " \t\n()[].,!?;{}+-*/";
+char const g_pcWhiteSpace [ ] = " \t\n()[].,!?;{}+-*/";
 
 int HEditControl::process_input ( int a_iCode )
 	{
@@ -555,7 +555,7 @@ int HEditControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-HString & HEditControl::operator = ( const char * a_pcString )
+HString & HEditControl::operator = ( char const * a_pcString )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;

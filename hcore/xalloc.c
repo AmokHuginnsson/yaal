@@ -75,7 +75,7 @@ void xfree_internal ( void * * a_ppvPtr )
 	return;
 	}
 
-char * xstrdup ( const char * a_pcStr )
+char * xstrdup ( char const * a_pcStr )
 	{
 	char * l_pcNew = 0;
 	l_pcNew = ( char * ) xcalloc ( strlen ( a_pcStr ) + 1 );

@@ -34,7 +34,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "tools.h"
 #include "hcollector.h"
 
-HCollector::HCollector ( const char * a_pcDevicePath )
+HCollector::HCollector ( char const * a_pcDevicePath )
 					: HSerial ( a_pcDevicePath ),
 						f_oLine ( ( size_t ) D_RECV_BUF_SIZE )
 	{
@@ -45,7 +45,7 @@ HCollector::HCollector ( const char * a_pcDevicePath )
 	M_EPILOG
 	}
 
-bool HCollector::test_char ( const char * a_pcBuffer, int a_iIndex )
+bool HCollector::test_char ( char const * a_pcBuffer, int a_iIndex )
 	{
 	return (
 			a_pcBuffer [ a_iIndex ]
@@ -60,7 +60,7 @@ bool HCollector::test_char ( const char * a_pcBuffer, int a_iIndex )
 							);
 	}
 
-int HCollector::send_line ( const char * a_pcLine )
+int HCollector::send_line ( char const * a_pcLine )
 	{
 	M_PROLOG
 	int l_iCtr = 0;

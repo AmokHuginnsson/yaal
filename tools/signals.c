@@ -53,28 +53,93 @@ M_CVSID ( "$CVSHeader$" );
 namespace signals
 {
 
+/* Some notes about signal reinstalling.
+ * Default behavior on BSD and GNU systems is to keep current signal
+ * handler after signal delivery, only SVID systems reinstall SIG_DFL
+ * after signal delivery. So we do not need to be concernd about signal
+ * reinstallation inside our signal handlers, because we support only
+ * BSD and GNU compatibile systems. */
+
 typedef void ( * SIGNAL_HANDLER_t ) ( int );
 
 class HSigStackWrapper
 	{
+protected:
+/*{*/
+	stack_t f_sStack;
+/*}*/
 public:
-	stack_t m_sData;
-	HSigStackWrapper ( void )
-		{
-		m_sData.ss_sp = ( char * ) xmalloc ( SIGSTKSZ );
-		m_sData.ss_size = SIGSTKSZ;
-		m_sData.ss_flags = 0;
-		}
-	virtual ~HSigStackWrapper ( void )
-		{
-		if ( m_sData.ss_sp )
-			{
-			while ( m_sData.ss_flags ); /* we wait til last signal returns */
-			xfree ( m_sData.ss_sp );
-			m_sData.ss_sp = NULL;
-			}
-		}
+/*{*/
+	HSigStackWrapper ( void );
+	virtual ~HSigStackWrapper ( void );
+	void create_stack ( void );
+/*}*/
 	} g_oSigStack;
+
+HSigStackWrapper::HSigStackWrapper ( void )
+	{
+	f_sStack.ss_sp = NULL;
+	f_sStack.ss_size = 0;
+	f_sStack.ss_flags = 0;
+	return;
+	}
+
+HSigStackWrapper::~HSigStackWrapper ( void )
+	{
+	if ( f_sStack.ss_sp )
+		{
+		while ( f_sStack.ss_flags ); /* we wait til last signal returns */
+		xfree ( f_sStack.ss_sp );
+		f_sStack.ss_sp = NULL;
+		}
+	return;
+	}
+
+void HSigStackWrapper::create_stack ( void )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	f_sStack.ss_sp = xmalloc ( SIGSTKSZ );
+	f_sStack.ss_size = SIGSTKSZ;
+	f_sStack.ss_flags = 0;
+	l_iError = sigaltstack ( & f_sStack, NULL );
+	if ( l_iError )
+		M_THROW ( "sigaltstack ( )", l_iError );
+	if ( f_sStack.ss_flags )
+		M_THROW ( "sigaltstack ( ) failed to set stack", g_iErrNo );
+	return;
+	M_EPILOG
+	}
+
+void install_special ( SIGNAL_HANDLER_t HANDLER, int a_iSignum )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	struct sigaction l_sHandler, l_sOldHandler;
+	HString l_oError;
+#if 0 
+/* We need to wait til signal handling with sigaltstack
+ * will be fixed in LinuxThreads environment. */
+	l_sHandler.sa_flags = SA_ONSTACK;
+#else
+	l_sHandler.sa_flags = 0;
+#endif
+	sigemptyset ( & l_sHandler.sa_mask );
+	sigaddset ( & l_sHandler.sa_mask, a_iSignum );
+	l_sHandler.sa_handler = HANDLER;
+	l_iError = sigaction ( a_iSignum, & l_sHandler, & l_sOldHandler );
+	if ( l_iError )
+		{
+		l_oError.format ( "sigaction ( SIG(%d), ... )", a_iSignum );
+		M_THROW ( l_oError, l_iError );
+		}
+	if ( l_sOldHandler.sa_handler == SIG_IGN )
+		sigaction ( a_iSignum, & l_sOldHandler, & l_sHandler );
+	else siginterrupt ( a_iSignum, true );
+	M_LOG ( HString ( "created handler for signal: " ) + a_iSignum );
+	return;
+	M_EPILOG
+	}
 
 /* singnal handler definitions */
 	
@@ -83,25 +148,23 @@ void signal_WINCH ( int a_iSignum )
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-	if ( signal( SIGWINCH, signals::signal_WINCH ) == SIG_IGN )
-		signal( SIGWINCH, SIG_IGN );
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nTerminal size changed: ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
-#ifdef __HLOG_H
+#ifdef __HCORE_HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
-#endif /* __HLOG_H */
-#ifdef __CONSOLE_H
+#endif /* __HCORE_HLOG_H */
+#ifdef __HCONSOLE_CONSOLE_H
 	if ( console::is_enabled ( ) )
 		{
 		console::n_bInputWaiting = true;
 		ungetch ( D_KEY_CTRL_('l') );
 		}
 	else fprintf ( stderr, l_oMessage );
-#else /* __CONSOLE_H */
+#else /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
-#endif /* not __CONSOLE_H */
+#endif /* not __HCONSOLE_CONSOLE_H */
 	return;
 	M_EPILOG
 	}
@@ -109,24 +172,20 @@ void signal_WINCH ( int a_iSignum )
 void signal_INT ( int a_iSignum )
 	{
 	M_PROLOG
+	if ( tools::n_bIgnoreSignalSIGINT )
+		return;
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-	if ( tools::n_bIgnoreSignalSIGINT )
-		{
-		if ( signal( SIGINT, signals::signal_INT ) == SIG_IGN )
-			signal( SIGINT, SIG_IGN );
-		return;
-		}
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nInterrupt signal caught, process broken: ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
-#ifdef __HLOG_H
+#ifdef __HCORE_HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
-#endif /* __HLOG_H */
-#ifdef __CONSOLE_H
+#endif /* __HCORE_HLOG_H */
+#ifdef __HCONSOLE_CONSOLE_H
 	if ( console::is_enabled ( ) )console::leave_curses();
-#endif /* __CONSOLE_H */
+#endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGINT, SIG_DFL );
 	raise ( SIGINT );
@@ -143,10 +202,10 @@ void signal_TERM ( int a_iSignum )
 	l_oMessage = "\nProcess was explictly killed: ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
-#ifdef __HLOG_H
+#ifdef __HCORE_HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
-#endif /* __HLOG_H */
-#ifdef __CONSOLE_H
+#endif /* __HCORE_HLOG_H */
+#ifdef __HCONSOLE_CONSOLE_H
 	if ( console::is_enabled ( ) )console::leave_curses();
 #endif
 	fprintf ( stderr, l_oMessage );
@@ -163,23 +222,21 @@ void signal_QUIT ( int a_iSignum )
 	HString l_oMessage;
 	if ( tools::n_bIgnoreSignalSIGQUIT )
 		{
-		if ( signal( SIGQUIT, signals::signal_QUIT ) == SIG_IGN )
-			signal( SIGQUIT, SIG_IGN );
-#ifdef __CONSOLE_H
+#ifdef __HCONSOLE_CONSOLE_H
 		if ( console::is_enabled ( ) )
 			console::c_printf ( console::n_iHeight - 1, 0, D_FG_BRIGHTRED,
 					"Hard Quit is disabled by stdhapi configuration." );
-#endif /* __CONSOLE_H */
+#endif /* __HCONSOLE_CONSOLE_H */
 		return;
 		}
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nAbnormal program quit forced: ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
-#ifdef __HLOG_H
+#ifdef __HCORE_HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
-#endif /* __HLOG_H */
-#ifdef __CONSOLE_H
+#endif /* __HCORE_HLOG_H */
+#ifdef __HCONSOLE_CONSOLE_H
 	if ( console::is_enabled ( ) )console::leave_curses();
 #endif
 	fprintf ( stderr, l_oMessage );
@@ -196,23 +253,21 @@ void signal_TSTP ( int a_iSignum )
 	HString l_oMessage;
 	if ( tools::n_bIgnoreSignalSIGINT )
 		{
-		if ( signal( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
-			signal( SIGTSTP, SIG_IGN );
-#ifdef __CONSOLE_H
+#ifdef __HCONSOLE_CONSOLE_H
 		if ( console::is_enabled ( ) )
 			console::c_printf ( console::n_iHeight - 1, 0, D_FG_BRIGHTRED,
 					"Suspend is disabled by stdhapi configuration." );
-#endif /* __CONSOLE_H */
+#endif /* __HCONSOLE_CONSOLE_H */
 		return;
 		}
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nStop signal caught, process suspended: ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
-#ifdef __HLOG_H
+#ifdef __HCORE_HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
-#endif /* __HLOG_H */
-#ifdef __CONSOLE_H
+#endif /* __HCORE_HLOG_H */
+#ifdef __HCONSOLE_CONSOLE_H
 	if ( console::is_enabled ( ) )console::leave_curses();
 #endif
 	fprintf ( stderr, l_oMessage );
@@ -227,25 +282,21 @@ void signal_CONT ( int a_iSignum )
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-	if ( signal( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
-		signal( SIGTSTP, SIG_IGN );
-	if ( signal( SIGCONT, signals::signal_CONT ) == SIG_IGN )
-		signal( SIGCONT, SIG_IGN );
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nProcess was resurected: ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
-#ifdef __HLOG_H
+#ifdef __HCORE_HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
-#endif /* __HLOG_H */
-#ifdef __CONSOLE_H
+#endif /* __HCORE_HLOG_H */
+#ifdef __HCONSOLE_CONSOLE_H
 	if ( ! console::is_enabled ( ) )console::enter_curses();
 	if ( console::is_enabled ( ) )
 		{
 		console::n_bInputWaiting = true;
 		ungetch ( D_KEY_CTRL_('l') );
 		}
-#endif /* __CONSOLE_H */
+#endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	return;
 	M_EPILOG
@@ -260,12 +311,12 @@ void signal_fatal ( int a_iSignum )
 	l_oMessage = "\nProcess caused FATAL ERROR: ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += ", bailing out.";
-#ifdef __HLOG_H
+#ifdef __HCORE_HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
-#endif /* __HLOG_H */
-#ifdef __CONSOLE_H
+#endif /* __HCORE_HLOG_H */
+#ifdef __HCONSOLE_CONSOLE_H
 	if ( console::is_enabled ( ) )console::leave_curses();
-#endif /* __CONSOLE_H */
+#endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( a_iSignum, SIG_DFL );
 	raise ( a_iSignum );
@@ -276,7 +327,7 @@ void signal_fatal ( int a_iSignum )
 void signal_USR1 ( int a_iSignum )
 	{
 	M_PROLOG
-#ifdef __CONSOLE_H
+#ifdef __HCONSOLE_CONSOLE_H
 	if ( console::n_bUseMouse )
 		{
 		if ( console::is_enabled ( ) )
@@ -286,21 +337,19 @@ void signal_USR1 ( int a_iSignum )
 			return;
 			}
 		}
-#endif /* __CONSOLE_H */
+#endif /* __HCONSOLE_CONSOLE_H */
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-	if ( signal( SIGUSR1, signals::signal_USR1 ) == SIG_IGN )
-		signal( SIGUSR1, SIG_IGN );
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nDo you play with the mouse under FreeBSD ? ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
-#ifdef __HLOG_H
+#ifdef __HCORE_HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
-#endif /* __HLOG_H */
-#ifdef __CONSOLE_H
+#endif /* __HCORE_HLOG_H */
+#ifdef __HCONSOLE_CONSOLE_H
 	if ( console::is_enabled ( ) )console::leave_curses();
-#endif /* __CONSOLE_H */
+#endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( a_iSignum, SIG_DFL );
 	raise ( a_iSignum );
@@ -310,69 +359,40 @@ void signal_USR1 ( int a_iSignum )
 
 /*  end of signal handler definitions */
 
-void install_special ( SIGNAL_HANDLER_t HANDLER, int a_iSignum )
-	{
-	M_PROLOG
-	int l_iError = 0;
-	sigset_t l_sMask;
-	struct sigaction l_sHandler, l_sOldHandler;
-	HString l_oError;
-	l_sHandler.sa_flags = SA_ONSTACK;
-	sigemptyset ( & l_sMask );
-	sigaddset ( & l_sMask, a_iSignum );
-	l_sHandler.sa_handler = HANDLER;
-	l_sHandler.sa_mask = l_sMask;
-	l_iError = sigaction( a_iSignum, & l_sHandler, & l_sOldHandler );
-	if ( l_iError )
-		{
-		l_oError.format ( "sigaction ( SIG(%d), ... )", a_iSignum );
-		M_THROW ( l_oError, l_iError );
-		}
-	siginterrupt ( a_iSignum, true );
-	if ( l_sOldHandler.sa_handler == SIG_IGN )
-		signal ( a_iSignum, SIG_IGN );
-	return;
-	M_EPILOG
-	}
-
 void set_handlers ( void )
 	{
 	M_PROLOG
-	int l_iError = 0;
-	l_iError = sigaltstack ( & g_oSigStack.m_sData, NULL );
-	if ( l_iError )M_THROW ( "sigaltstack ( )", l_iError );
-/* 	signals handling (defining particular functions) */
+	g_oSigStack.create_stack ( );
 	install_special ( signals::signal_USR1, SIGUSR1 );
 	install_special ( signals::signal_WINCH, SIGWINCH );
-	if ( signal( SIGINT, signals::signal_INT ) == SIG_IGN )
-		signal( SIGINT, SIG_IGN );
-	if ( signal( SIGTERM, signals::signal_TERM ) == SIG_IGN )
-		signal( SIGTERM, SIG_IGN );
-	if ( signal( SIGQUIT, signals::signal_QUIT ) == SIG_IGN )
-		signal( SIGQUIT, SIG_IGN );
-	if ( signal( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
-		signal( SIGTSTP, SIG_IGN );
-	if ( signal( SIGCONT, signals::signal_CONT ) == SIG_IGN )
-		signal( SIGCONT, SIG_IGN );
-	if ( signal( SIGPIPE, signals::signal_fatal ) == SIG_IGN )
-		signal( SIGPIPE, SIG_IGN );
-	if ( signal( SIGFPE, signals::signal_fatal ) == SIG_IGN )
-		signal( SIGFPE, SIG_IGN );
-	if ( signal( SIGILL, signals::signal_fatal ) == SIG_IGN )
-		signal( SIGILL, SIG_IGN );
-	if ( signal( SIGSEGV, signals::signal_fatal ) == SIG_IGN )
-		signal( SIGSEGV, SIG_IGN );
-	if ( signal( SIGBUS, signals::signal_fatal ) == SIG_IGN )
-		signal( SIGBUS, SIG_IGN );
-	if ( signal( SIGABRT, signals::signal_fatal ) == SIG_IGN )
-		signal( SIGABRT, SIG_IGN );
-	if ( signal( SIGIOT, signals::signal_fatal ) == SIG_IGN )
-		signal( SIGIOT, SIG_IGN );
+	if ( signal ( SIGINT, signals::signal_INT ) == SIG_IGN )
+		signal ( SIGINT, SIG_IGN );
+	if ( signal ( SIGTERM, signals::signal_TERM ) == SIG_IGN )
+		signal ( SIGTERM, SIG_IGN );
+	if ( signal ( SIGQUIT, signals::signal_QUIT ) == SIG_IGN )
+		signal ( SIGQUIT, SIG_IGN );
+	if ( signal ( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
+		signal ( SIGTSTP, SIG_IGN );
+	if ( signal ( SIGCONT, signals::signal_CONT ) == SIG_IGN )
+		signal ( SIGCONT, SIG_IGN );
+	if ( signal ( SIGPIPE, signals::signal_fatal ) == SIG_IGN )
+		signal ( SIGPIPE, SIG_IGN );
+	if ( signal ( SIGFPE, signals::signal_fatal ) == SIG_IGN )
+		signal ( SIGFPE, SIG_IGN );
+	if ( signal ( SIGILL, signals::signal_fatal ) == SIG_IGN )
+		signal ( SIGILL, SIG_IGN );
+	if ( signal ( SIGSEGV, signals::signal_fatal ) == SIG_IGN )
+		signal ( SIGSEGV, SIG_IGN );
+	if ( signal ( SIGBUS, signals::signal_fatal ) == SIG_IGN )
+		signal ( SIGBUS, SIG_IGN );
+	if ( signal ( SIGABRT, signals::signal_fatal ) == SIG_IGN )
+		signal ( SIGABRT, SIG_IGN );
+	if ( signal ( SIGIOT, signals::signal_fatal ) == SIG_IGN )
+		signal ( SIGIOT, SIG_IGN );
 	if ( signal( SIGTRAP, signals::signal_fatal ) == SIG_IGN )
-		signal( SIGTRAP, SIG_IGN );
-	if ( signal( SIGSYS, signals::signal_fatal ) == SIG_IGN )
-		signal( SIGSYS, SIG_IGN );
-/*	all signal handler definitions finished	                              */
+		signal ( SIGTRAP, SIG_IGN );
+	if ( signal ( SIGSYS, signals::signal_fatal ) == SIG_IGN )
+		signal ( SIGSYS, SIG_IGN );
 	return;
 	M_EPILOG
 	}

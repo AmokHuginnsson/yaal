@@ -43,7 +43,7 @@ M_CVSID ( "$CVSHeader$" );
 
 HDataListControl::HDataListControl ( HRecordSet * a_poRecordSet,
 		HDataWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
-		int a_iWidth, const char * a_pcTitle,
+		int a_iWidth, char const * a_pcTitle,
 		bool a_bCheckable, bool a_bSortable, bool a_bSearchable,
 		bool a_bDrawHeader, bool a_bDrawLabel, int a_iDisabledAttribute,
 		int a_iEnabledAttribute, int a_iFocusedAttribute )

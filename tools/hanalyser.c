@@ -305,7 +305,7 @@ double HAnalyser::bracket( HAnalyserNode * a_poNode )
 	M_EPILOG
 	}
 
-int HAnalyser::translate( const char * a_pcFormula )
+int HAnalyser::translate( char const * a_pcFormula )
 	{
 	M_PROLOG
 	int l_iError = 0, l_iIndex = 0, l_iRealIndex = 0, l_iCtr = 0, l_iLength = 0;
@@ -573,7 +573,7 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 	M_EPILOG
 	}
 
-double * HAnalyser::analyse( const char * a_pcFormula )
+double * HAnalyser::analyse( char const * a_pcFormula )
 	{
 	M_PROLOG
 	int l_iLength = 0;

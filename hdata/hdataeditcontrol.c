@@ -41,8 +41,8 @@ M_CVSID ( "$CVSHeader$" );
 
 HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
-		const char * a_pcLabel, int a_iBufferSize, const char * a_pcValue,
-		const char * a_pcMask, bool a_bReplace, bool a_bRightAligned,
+		char const * a_pcLabel, int a_iBufferSize, char const * a_pcValue,
+		char const * a_pcMask, bool a_bReplace, bool a_bRightAligned,
 		bool a_bMultiLine, bool a_bPassword, int a_iMaxHistoryLevel,
 		bool a_bDrawLabel, int a_iDisabledAttribute,
 		int a_iEnabledAttribute, int a_iFocusedAttribute )

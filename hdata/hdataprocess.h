@@ -40,7 +40,7 @@ public:
 	/*{*/
 	HDataProcess ( void );
 	virtual ~HDataProcess ( void );
-	virtual int init ( const char * );
+	virtual int init ( char const * );
 	HDataBase * data_base ( void );
 	/*}*/
 protected:

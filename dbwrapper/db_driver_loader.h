@@ -43,11 +43,11 @@ Copyright:
 namespace dbwrapper
 	{
 
-extern void * ( * db_connect ) ( const char *, const char *, const char * );
+extern void * ( * db_connect ) ( char const *, char const *, char const * );
 extern void ( * db_disconnect ) ( void * );
 extern int ( * db_errno ) ( void * );
-extern const char * ( * db_error ) ( void * );
-extern void * ( * db_query ) ( void *, const char * );
+extern char const * ( * db_error ) ( void * );
+extern void * ( * db_query ) ( void *, char const * );
 extern void ( * db_unquery ) ( void * );
 extern char * ( * rs_get ) ( void *, int, int );
 extern int ( * rs_fields_count ) ( void * );
@@ -55,11 +55,11 @@ extern long int ( * rsdb_records_count ) ( void *, void * );
 extern long int ( * rsdb_id ) ( void *, void * );
 extern char * ( * rs_column_name ) ( void *, int );
 
-void * autoloader_db_connect ( const char *, const char *, const char * );
+void * autoloader_db_connect ( char const *, char const *, char const * );
 void autoloader_db_disconnect ( void * );
 int autoloader_db_errno ( void * );
-const char * autoloader_db_error ( void * );
-void * autoloader_db_query ( void *, const char * );
+char const * autoloader_db_error ( void * );
+void * autoloader_db_query ( void *, char const * );
 void autoloader_db_unquery ( void * );
 char * autoloader_rs_get ( void *, int, int );
 int autoloader_rs_fields_count ( void * );

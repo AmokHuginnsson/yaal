@@ -52,12 +52,12 @@ public:
 	/*{*/
 	HPattern ( bool = false /* default ignore case state */ );
 	virtual ~HPattern ( void );
-	bool parse ( const char * /* pattern input */,
+	bool parse ( char const * /* pattern input */,
 							 unsigned short int * = NULL /* additional flags to parse */,
 							 int = 0 /* number of additional flags */ );
-	const char * error ( void );
-	char * matches ( const char *, int & );
-	int count ( const char * );
+	char const * error ( void );
+	char * matches ( char const *, int & );
+	int count ( char const * );
 	/*}*/
 protected:
 	/*{*/

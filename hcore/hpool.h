@@ -46,7 +46,7 @@ typedef enum
 	D_HPOOL_DUMB
 	} pool_type_t;
 
-extern const char * g_ppcErrMsgHPool [ ];
+extern char const * g_ppcErrMsgHPool [ ];
 
 template < class tType >
 class HPool

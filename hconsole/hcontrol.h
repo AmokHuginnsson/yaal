@@ -72,7 +72,7 @@ protected:
 public:
 	/*{*/
 /* parent, row, col, height, width, label */
-	HControl ( HWindow *, int, int, int, int, const char *,
+	HControl ( HWindow *, int, int, int, int, char const *,
 /* draw label, disabled attribute, enabled-attribute, focused-attribute */
 			bool = true, int = -1, int = -1,	int = -1 );
 	virtual ~HControl ( void );

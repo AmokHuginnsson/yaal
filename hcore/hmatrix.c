@@ -31,7 +31,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hmatrix.h"
 M_CVSTID ( D_CVSID_HMATRIX_H );
 
-const char * g_ppcErrMsgHMatrix [ 24 ] =
+char const * g_ppcErrMsgHMatrix [ 24 ] =
 	{
 /* E_HMATRIX_BADROWS */													_ ( "rows < 1" ),
 /* E_HMATRIX_BADCOLUMNS */											_ ( "columns < 1" ),

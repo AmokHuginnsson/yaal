@@ -39,7 +39,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HDataTreeControl ( HRecordSet *, HDataWindow *, int, int, int, int, const char *,
+	HDataTreeControl ( HRecordSet *, HDataWindow *, int, int, int, int, char const *,
 			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataTreeControl ( void );
 	virtual void load ( long int );

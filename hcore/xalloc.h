@@ -35,7 +35,7 @@ void * xcalloc ( size_t );
 void * xrealloc ( void *, size_t );
 #define xfree( ptr ) xfree_internal ( ( void * * ) ( & ptr ) )
 void xfree_internal ( void * * );
-char * xstrdup ( const char * );
+char * xstrdup ( char const * );
 
 }
 

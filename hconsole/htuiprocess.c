@@ -80,7 +80,7 @@ HProcess::~HProcess ( void )
 	M_EPILOG
 	}
 
-int HProcess::init ( const char * a_pcProcessName )
+int HProcess::init ( char const * a_pcProcessName )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -119,7 +119,7 @@ int HProcess::init ( const char * a_pcProcessName )
 	M_EPILOG
 	}
 
-int HProcess::add_window ( HWindow * a_poWindow, const char * a_pcTitle )
+int HProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	{
 	M_PROLOG
 	HInfo l_oInfo;
@@ -288,7 +288,7 @@ int HProcess::handler_idle ( int a_iCode, void * )
 	M_PROLOG
 	HStatusBarControl * l_poStatusBar = NULL;
 #ifdef __DEBUG__
-	HString l_oClock ( ( const char * ) HTime ( ) );
+	HString l_oClock ( ( char const * ) HTime ( ) );
 	console::c_printf ( 0, console::n_iWidth - l_oClock.get_length ( ),
 			D_FG_BLACK | D_BG_LIGHTGRAY, l_oClock );
 	console::n_bNeedRepaint = true;

@@ -52,7 +52,7 @@ public:
 	/*{*/
 	HProcess ( size_t = 8, size_t = 32, size_t = 32 );
 	virtual ~HProcess ( void );
-	virtual int init ( const char * = "" );
+	virtual int init ( char const * = "" );
 	int run ( void );
 	/*}*/
 protected:
@@ -63,7 +63,7 @@ protected:
 	int process_commands ( void );
 	int register_file_descriptor_handler ( int, PROCESS_HANDLER_FILEDES_t );
 	int unregister_file_descriptor_handler ( int );
-	int add_window ( HWindow *, const char * );
+	int add_window ( HWindow *, char const * );
 	virtual int handler_idle ( int, void * = NULL );
 	virtual int handler_mouse ( int, void * = NULL );
 	virtual int handler_refresh ( int, void * = NULL );

@@ -39,7 +39,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HDataListControl ( HRecordSet *, HDataWindow *, int, int, int, int, const char *, 
+	HDataListControl ( HRecordSet *, HDataWindow *, int, int, int, int, char const *, 
 			bool = false, bool = true, bool = true, bool = true,
 			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataListControl ( void );

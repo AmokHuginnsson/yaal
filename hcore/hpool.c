@@ -33,7 +33,7 @@ M_CVSID ( "$CVSHeader$" );
 
 M_CVSTID ( D_CVSID_HPOOL_H );
 
-const char * g_ppcErrMsgHPool [ 24 ] =
+char const * g_ppcErrMsgHPool [ 24 ] =
 	{
 /* E_HPOOL_BADSIZE */				_ ( "bad size" ),
 /* E_HPOOL_NOMEM */					_ ( "can not alloc memory with new" ),

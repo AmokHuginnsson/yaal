@@ -95,7 +95,7 @@ public:
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 const char *,	/* label */
+								 char const *,	/* label */
 								 bool = false,	/* checkable */
 								 bool = true,		/* sortable */
 								 bool = true, 	/* searchable */
@@ -109,7 +109,7 @@ public:
 	virtual int set_focus ( char = 0 );
 	int process_input( int );
 	void add_column ( const int &,									/* at position */
-										const char *,									/* column name */
+										char const *,									/* column name */
 										const int &,									/* width */
 										const int & = D_ALIGN_LEFT,		/* align */
 										const int & = D_TYPE_HSTRING,	/* type */
