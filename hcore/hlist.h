@@ -233,6 +233,7 @@ HList< tType >::HList ( int a_iSize )
 	f_iHighestNumber = 0;
 	f_poHook = 0;
 	f_poSelected = 0;
+	cmp = & HList< tType >::cmpc;
 	while ( a_iSize -- )add_tail ( l_tDummyObject );
 	return ;
 	M_EPILOG
@@ -303,7 +304,7 @@ int HList< tType >::cmpn ( HElement * a_poLeft, HElement * a_poRight )
 	}
 
 template < class tType >
-inline int compare_contents ( tType & a_tLeft, tType a_tRight )
+int compare_contents ( tType & a_tLeft, tType a_tRight )
 	{
 	return ( a_tLeft - a_tRight );
 	}
@@ -323,7 +324,7 @@ tType & HList< tType >::add_element ( tType a_tObject )
 	HElement * l_poElement = NULL;
 	if ( f_iQuantity == 0 )
 		f_poHook = l_poElement = f_poSelected = 
-			new HElement ( 0, f_iHighestNumber );
+			new HElement ( NULL, f_iHighestNumber );
 	else l_poElement = new HElement ( f_poSelected, f_iHighestNumber );
 	f_iQuantity ++;
 	f_iHighestNumber ++;
@@ -434,31 +435,38 @@ template < class tType >
 tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 	{
 	M_PROLOG
-#define M_SWITCH \
-	( compare_contents ( f_poSelected->f_tObject, a_tObject ) * a_iOrder ) < 0
+#define M_SWITCH ( ( this->* cmp ) ( f_poIndex, l_poElement ) * a_iOrder ) < 0
 	bool l_bBefore = false;
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iQuantity;
-	HElement * l_poElement = NULL;
-	tType * l_ptObject = NULL;
+	HElement * l_poElement = new HElement ( NULL, f_iHighestNumber );
+	l_poElement->f_tObject = a_tObject;
 	while ( f_iQuantity && ( l_iOldIndex != l_iIndex ) )
 		{
 		l_iOldIndex = l_iIndex;
 		l_iIndex = ( l_iLower + l_iUpper ) / 2;
-		l_poElement = element_by_index ( l_iIndex );
-		f_poSelected = l_poElement;
+		element_by_index ( l_iIndex );
 		if ( M_SWITCH )l_iLower = l_iIndex;
 		else l_iUpper = l_iIndex;
 		}
-	if ( f_poSelected )
+	if ( f_poIndex )
 		{
-		if ( M_SWITCH )f_poSelected = f_poSelected->f_poNext;
+		if ( M_SWITCH )f_poIndex = f_poIndex->f_poNext;
 		else l_bBefore = true;
-//		if ( M_SWITCH )f_poSelected = f_poSelected->f_poNext;
-//		else l_bBefore = true;
 		}
-	l_ptObject = & add_element ( a_tObject );
+	if ( ! f_iQuantity )f_poHook = f_poIndex = l_poElement;
+	else
+		{
+		l_poElement->f_poNext = f_poIndex;
+		l_poElement->f_poPrevious = f_poIndex->f_poPrevious;
+		f_poIndex->f_poPrevious->f_poNext = l_poElement;
+		f_poIndex->f_poPrevious = l_poElement;
+		}
+	f_iQuantity ++;
+	f_iHighestNumber ++;
+	f_poIndex = NULL;
+	f_iIndex = 0;
 	if ( l_bBefore && ! l_iIndex )f_poHook = f_poHook->f_poPrevious;
-	return ( * l_ptObject );
+	return ( l_poElement->f_tObject );
 	M_EPILOG
 	}
 
