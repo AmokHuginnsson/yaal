@@ -132,6 +132,7 @@ OBJ4hcore +=
 #	h-console
 OBJ4hconsole =
 OBJ4hconsole += console!
+OBJ4hconsole += hcomboboxcontrol!
 OBJ4hconsole += hcontrol!
 OBJ4hconsole += hcontrollist
 OBJ4hconsole += heditcontrol!
