@@ -46,7 +46,7 @@ class HHandler
 	{
 protected:
 	/*{*/
-	typedef int ( HHandler::* HANDLER_t ) ( int, void * = NULL );
+	typedef int ( HHandler::* HANDLER_t ) ( int, void * );
 	typedef hcore::HMap < int, HANDLER_t > process_handler_key_map_t;
 	typedef hcore::HMap < hcore::HString, HANDLER_t > process_handler_command_map_t;
 	process_handler_key_map_t f_oPreprocessHandlers;

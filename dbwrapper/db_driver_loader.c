@@ -50,6 +50,21 @@ namespace dbwrapper
 
 #define M_DB_ERR(msg) "Error: Data base request ("msg") while no driver loaded."
 
+typedef union
+	{
+	typedef void ( * simple_function_ptr_t ) ( void );
+	void * f_pvObjectPointer;
+	simple_function_ptr_t FUNCTION_POINTER;
+	} caster_t;
+
+template < typename tType >
+tType dlsym_wrapper ( void * a_pvSpace, char const * a_pcName )
+	{
+	caster_t l_xCaster;
+	l_xCaster.f_pvObjectPointer = dlsym ( a_pvSpace, a_pcName );
+	return ( reinterpret_cast < tType > ( l_xCaster.FUNCTION_POINTER ) );
+	}
+
 char const x_tag_g_pcDone [ ] = "done.\r\n", * g_pcDone = x_tag_g_pcDone;
 
 static char const * g_ppcDriver [ 24 ] =
@@ -210,29 +225,27 @@ void load_driver ( void )
 			}
 		fprintf ( stderr, x_tag_g_pcDone );
 		fprintf ( stderr, "Linking symbols ... " );
-		/* It is imposible to use -Wold-style-cast and -Werror flags
-		 * and write plugin loader at the same time */
-		if ( ! ( db_disconnect = ( t1 ) dlsym ( n_pvDlHandle, "db_disconnect" ) ) )
+		if ( ! ( db_disconnect = dlsym_wrapper < t1 > ( n_pvDlHandle, "db_disconnect" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( db_errno = ( t2 ) dlsym ( n_pvDlHandle, "db_errno" ) ) )
+		else if ( ! ( db_errno = dlsym_wrapper < t2 > ( n_pvDlHandle, "db_errno" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( db_error = ( t3 ) dlsym ( n_pvDlHandle, "db_error" ) ) )
+		else if ( ! ( db_error = dlsym_wrapper < t3 > ( n_pvDlHandle, "db_error" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( db_query = ( t4 ) dlsym ( n_pvDlHandle, "db_query" ) ) )
+		else if ( ! ( db_query = dlsym_wrapper < t4 > ( n_pvDlHandle, "db_query" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( db_unquery = ( t5 ) dlsym ( n_pvDlHandle, "db_unquery" ) ) )
+		else if ( ! ( db_unquery = dlsym_wrapper < t5 > ( n_pvDlHandle, "db_unquery" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( rs_get = ( t6 ) dlsym ( n_pvDlHandle, "rs_get" ) ) )
+		else if ( ! ( rs_get = dlsym_wrapper < t6 > ( n_pvDlHandle, "rs_get" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( rs_fields_count = ( t7 ) dlsym ( n_pvDlHandle, "rs_fields_count" ) ) )
+		else if ( ! ( rs_fields_count = dlsym_wrapper < t7 > ( n_pvDlHandle, "rs_fields_count" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( rsdb_records_count = ( t8 ) dlsym ( n_pvDlHandle, "rsdb_records_count" ) ) )
+		else if ( ! ( rsdb_records_count = dlsym_wrapper < t8 > ( n_pvDlHandle, "rsdb_records_count" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( rsdb_id = ( t9 ) dlsym ( n_pvDlHandle, "rsdb_id" ) ) )
+		else if ( ! ( rsdb_id = dlsym_wrapper < t9 > ( n_pvDlHandle, "rsdb_id" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( rs_column_name = ( tA ) dlsym ( n_pvDlHandle, "rs_column_name" ) ) )
+		else if ( ! ( rs_column_name = dlsym_wrapper < tA > ( n_pvDlHandle, "rs_column_name" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( db_connect = ( t0 ) dlsym ( n_pvDlHandle, "db_connect" ) ) )
+		else if ( ! ( db_connect = dlsym_wrapper < t0 > ( n_pvDlHandle, "db_connect" ) ) )
 			dbwrapper_error ( );
 		if ( db_connect != autoloader_db_connect )
 			fprintf ( stderr, x_tag_g_pcDone );
