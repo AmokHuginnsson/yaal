@@ -35,7 +35,11 @@ M_CVSID ( "$CVSHeader$" );
 #include "rc_file.h"
 
 long int g_lLogMask = 0;
-HLog log;
+
+namespace core
+	{
+	HLog log;
+	}
 
 OVariable g_psHCoreVariables [ ] =
 	{

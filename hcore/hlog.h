@@ -72,6 +72,11 @@ protected:
 	friend HLog & endl ( HLog & );
 	};
 
-extern HLog log;
+namespace core
+	{
+	extern HLog log;
+	}
+
+using namespace core;
 
 #endif /* not __HLOG_H */
