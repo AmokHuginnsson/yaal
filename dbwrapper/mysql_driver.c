@@ -26,6 +26,7 @@ Copyright:
 */
 
 #include <stdio.h>
+#include <string.h>
 
 #include <mysql/mysql.h>
 
@@ -35,16 +36,22 @@ Copyright:
 
 extern "C"
 {
-
+	
 void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
 	{
+	char l_pcDefaultSockPath [ ] = "/var/run/mysqld/mysqld.sock";
+	char * l_pcSockPath = NULL;
 	MYSQL * l_psMySQL = NULL;
 	l_psMySQL = mysql_init ( 0 );
 	if ( l_psMySQL )
+		{
+		l_pcSockPath = strchr ( a_pcDataBase, ':' );
+		if ( ! l_pcSockPath )l_pcSockPath = l_pcDefaultSockPath;
+		else * l_pcSockPath ++ = 0;
 		l_psMySQL = mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
-				a_pcDataBase, 0, "/var/run/mysqld/mysqld.sock",
-				CLIENT_IGNORE_SPACE );
+				a_pcDataBase, 0, l_pcSockPath, CLIENT_IGNORE_SPACE );
+		}
 	return ( l_psMySQL );
 	}
 

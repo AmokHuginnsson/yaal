@@ -26,6 +26,7 @@ Copyright:
 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "../config.h"
 
@@ -45,7 +46,10 @@ extern "C"
 void * db_connect ( const char * a_pcDataBase,
 		const char * a_pcLogin, const char * a_pcPassword )
 	{
+	char * l_pcSockPath = NULL;
 	PGconn * l_psConnection = NULL;
+	l_pcSockPath = strchr ( a_pcDataBase, ':' );
+	if ( l_pcSockPath )* l_pcSockPath = 0;
 	l_psConnection = PQsetdbLogin ( NULL,	/* host */
 																	NULL,					/* port */
 																	NULL,					/* options */
