@@ -8,7 +8,8 @@
 	- FreeBSD 5.1 RELEASE
 	- FreeBSD 5-CURRENT
 
-If your platform is not on above list was is very likely that stdhapi
+If your platform is not on above list, it is very likely that stdhapi
 will not compile/link/work.
 
 You are welcome to port stdhapi to your platform and send us a patch.
+
