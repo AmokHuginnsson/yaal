@@ -58,6 +58,11 @@ public:
 	void * get_result ( void );
 	long int insert_id ( void * = NULL );
 	/*}*/
+private:
+	/*{*/
+	HDataBase ( const HDataBase & );
+	HDataBase & operator = ( const HDataBase & );
+	/*}*/
 	};
 
 }

@@ -53,17 +53,14 @@ namespace hcore
 #define D_HOSTNAME_SIZE		16
 #define D_TIMESTAMP_SIZE	16
 
-HLog::HLog ( void )
+HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
+	f_lType ( 0 ), f_psStream ( NULL ), f_pcProcessName ( NULL ),
+	f_pcLoginName ( NULL ), f_pcHostName ( NULL ), f_pcBuffer ( NULL ),
+	f_iBufferSize ( D_BUFFER_SIZE )
 	{
 	M_PROLOG
 	uid_t l_iUid = 0;
 	passwd * l_psPasswd = NULL;
-	f_bRealMode = false;
-	f_psStream = NULL;
-	f_bNewLine = true;
-	f_pcProcessName = NULL;
-	f_iBufferSize = D_BUFFER_SIZE;
-	f_lType = 0;
 	f_pcBuffer = xcalloc ( f_iBufferSize, char );
 	f_pcHostName = xcalloc ( D_HOSTNAME_SIZE, char );
 	f_psStream = tmpfile ( );

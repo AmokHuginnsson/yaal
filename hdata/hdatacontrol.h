@@ -51,8 +51,10 @@ public:
 	virtual void add_new ( void );
 	virtual void cancel_new ( void );
 	/*}*/
-protected:
+private:
 	/*{*/
+	HDataControl ( const HDataControl & );
+	HDataControl & operator = ( const HDataControl & );
 	/*}*/
 	};
 

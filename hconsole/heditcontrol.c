@@ -63,7 +63,12 @@ HEditControl::HEditControl( HWindow * a_poParent,
 					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 							a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
 							a_iEnabledAttribute, a_iFocusedAttribute ),
-					f_oString ( a_iBufferSize )
+					f_bReplace ( a_bReplace ),
+					f_bMultiLine ( a_bMultiLine || ( a_iHeight > 1 ) ? true : false ),
+					f_bPassword ( a_bPassword ), f_bRightAligned ( a_bRightAligned ),
+					f_iMaxStringSize ( a_iBufferSize ), f_iCursorPosition ( 0 ),
+					f_iControlOffset ( 0 ), f_iMaxHistoryLevel ( a_iMaxHistoryLevel ),
+					f_sMask ( ), f_oString ( a_iBufferSize ), f_oHistory ( )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
@@ -81,17 +86,9 @@ HEditControl::HEditControl( HWindow * a_poParent,
 					l_iLength - a_iBufferSize );
 		}
 	f_oVarTmpBuffer.hs_realloc ( a_iBufferSize + 1 );
-	f_iControlOffset = 0;
-	f_iCursorPosition = 0;
-	f_iMaxStringSize = a_iBufferSize;
-	f_iMaxHistoryLevel = a_iMaxHistoryLevel;
-	f_bReplace = a_bReplace;
-	f_bMultiLine = ( a_bMultiLine || ( a_iHeight > 1 ) ? true : false );
-	f_bRightAligned = a_bRightAligned;
 	if ( f_bRightAligned && f_bMultiLine )
 		M_THROW (
 				"edit-control right aligned and multiline at the same time", 0 );
-	f_bPassword = a_bPassword;
 	f_oString = a_pcValue;
 	f_oHistory.add_tail ( ) = "";
 	if ( ( l_iErrorCode = regcomp ( & f_sMask, a_pcMask,
@@ -166,13 +163,13 @@ void HEditControl::refresh ( void )
 	M_EPILOG
 	}
 
-HInfo HEditControl::operator = ( const HInfo & a_roInfo )
+HControl & HEditControl::operator = ( const HInfo & a_roInfo )
 	{
 	M_PROLOG
 	HInfo l_oInfo = a_roInfo;
 	HString l_oString = l_oInfo;	
-	( * this ) = l_oString.left ( f_iMaxStringSize );
-	return ( l_oInfo );
+	( * this ) = static_cast < char const * > ( l_oString.left ( f_iMaxStringSize ) );
+	return ( * this );
 	M_EPILOG
 	}
 
@@ -583,7 +580,7 @@ int HEditControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-HString & HEditControl::operator = ( char const * a_pcString )
+HControl & HEditControl::operator = ( char const * a_pcString )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
@@ -620,7 +617,7 @@ HString & HEditControl::operator = ( char const * a_pcString )
 		l_iErrorCode --;
 		}
 	refresh ( );
-	return ( f_oString );
+	return ( * this );
 	M_EPILOG
 	}
 

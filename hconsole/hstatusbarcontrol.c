@@ -54,7 +54,14 @@ namespace hconsole
 HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 		char const * a_pcLabel, int a_iStatusBarAttribute )
 								 : HControl ( a_poParent, - 2, 0, 255, 0, a_pcLabel ),
-									HEditControl ( NULL, 0, 0, 0, 0, NULL, 127, "", D_MASK_LOOSE )
+									HEditControl ( NULL, 0, 0, 0, 0, NULL, 127, "", D_MASK_LOOSE ),
+	f_iStatusBarAttribute ( 0 ), f_iPromptLength ( 0 ),
+	f_iMode ( D_PROMPT_MODE_NORMAL ), f_iRestrict ( D_PROMPT_RESTRICT_RELAXED ),
+	f_oPrompt ( ), f_bDone ( false ), f_bEstimate ( false ), f_dProgressSize ( 1 ),
+	f_iLastProgress ( - 1 ), f_iLastPercent ( - 1 ), f_iLastMinute ( 0 ),
+	f_iLastSecond ( 0 ), f_iLastStep ( 0 ),
+	f_oMessage ( "" ), /* initialization of this field is required by bar() meth */
+	f_oStart ( )
 	{
 	M_PROLOG
 	int l_iAttribte = 0;
@@ -64,16 +71,8 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 		f_iStatusBarAttribute = n_iAttributeStatusBar;
 	l_iAttribte = f_iStatusBarAttribute;
 	l_iAttribte &= 0x00ff;
-	f_iMode = D_PROMPT_MODE_NORMAL;
-	f_iRestrict = D_PROMPT_RESTRICT_RELAXED;
 	f_iFocusedAttribute &= 0xff00;
 	f_iFocusedAttribute |= l_iAttribte;
-	f_iPromptLength = 0;
-	f_bDone = false;
-	f_iLastProgress = -1;
-	f_iLastPercent = -1;
-	f_dProgressSize = 1;
-	f_oMessage = ""; /* initialization of this field is required by bar() meth */
 	return;
 	M_EPILOG
 	}
@@ -210,7 +209,8 @@ void HStatusBarControl::update_progress ( double a_dStep,
 	int l_iNextPercent = 0;
 	int l_iNextMinute = 0;
 	int l_iNextSecond = 0;
-	HTime l_oStoper, l_oNow ( "(%T)" ), l_oLeft;
+	HTime l_oStoper, l_oNow, l_oLeft;
+	l_oNow.format ( "(%T)" );
 	if ( f_bDone )
 		return;
 	if ( a_dStep < 0 )

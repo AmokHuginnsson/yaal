@@ -78,6 +78,11 @@ protected:
 	virtual int handler_jump_meta_direct ( int, void * = NULL );
 	virtual int handler_close_window ( int, void * = NULL );
 	/*}*/
+private:
+	/*{*/
+	HProcess ( const HProcess & );
+	HProcess & operator = ( const HProcess & );
+	/*}*/
 	};
 
 }

@@ -80,6 +80,11 @@ private:
 	friend int HStatusBarControl::process_input_normal ( int );
 	void set_focus ( HControl * );
 	/*}*/
+private:
+	/*{*/
+	HWindow ( const HWindow & );
+	HWindow & operator = ( const HWindow & );
+	/*}*/
 	};
 
 }

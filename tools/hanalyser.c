@@ -92,10 +92,9 @@ int n_piFunctionMnemonicsLength [ 16 ] =
 	};
 
 HAnalyser::HAnalyserNode::HAnalyserNode ( HAnalyserNode * a_poNode )
-				 : HTree < HList < double * > >::HNode ( a_poNode )
+				 : HTree < HList < double * > >::HNode ( a_poNode ), METHOD ( NULL )
 	{
 	M_PROLOG
-	METHOD = NULL;
 	return;
 	M_EPILOG
 	}
@@ -113,13 +112,11 @@ HAnalyser::HAnalyserNode * HAnalyser::HAnalyserNode::grow_up_branch ( int a_iFla
 	M_EPILOG
 	}
 
-HAnalyser::HAnalyser ( void ) : f_oConstantsPool ( 0, D_HPOOL_AUTO_GROW )
+HAnalyser::HAnalyser ( void ) : f_iIndex ( 0 ), f_iLength ( 0 ),
+	f_iError ( 0 ), f_oConstantsPool ( 0, D_HPOOL_AUTO_GROW ), f_oFormula ( )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	f_iError = 0;
-	f_iLength = 0;
-	f_iIndex = 0;
 	for ( l_iCtr = 0; l_iCtr < 26; l_iCtr ++ )
 		f_pdVariables [ l_iCtr ] = 0;
 	return;

@@ -40,11 +40,9 @@ namespace stdhapi
 namespace hcore
 {
 
-HString::HString ( void )
+HString::HString ( void ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
-	f_pcBuffer = 0;
-	f_iSize = 0;
 	return;
 	M_EPILOG
 	}
@@ -58,21 +56,17 @@ HString::~HString ( void )
 	M_EPILOG
 	}
 
-HString::HString ( const HString & a_roString )
+HString::HString ( const HString & a_roString ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
-	f_pcBuffer = NULL;
-	f_iSize = 0;
 	( * this ) = a_roString;
 	return;
 	M_EPILOG
 	}
 
-HString::HString ( const size_t a_lSize )
+HString::HString ( const size_t a_lSize ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
-	f_pcBuffer = 0;
-	f_iSize = 0;
 	hs_realloc ( a_lSize + 1 );
 	memset ( f_pcBuffer, 0, a_lSize + 1 );
 	return;
@@ -97,11 +91,9 @@ void HString::hs_realloc ( const size_t a_iSize )
 	M_EPILOG
 	}
 
-HString::HString ( char const * a_pcStr )
+HString::HString ( char const * a_pcStr ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
-	f_pcBuffer = 0;
-	f_iSize = 0;
 	if ( a_pcStr )
 		{
 		hs_realloc ( strlen ( a_pcStr ) + 1 );
@@ -111,11 +103,9 @@ HString::HString ( char const * a_pcStr )
 	M_EPILOG
 	}
 
-HString::HString ( char a_cChar )
+HString::HString ( char a_cChar ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
-	f_pcBuffer = 0;
-	f_iSize = 0;
 	hs_realloc ( 2 );
 	f_pcBuffer [ 0 ] = a_cChar;
 	f_pcBuffer [ 1 ] = 0;
@@ -123,13 +113,11 @@ HString::HString ( char a_cChar )
 	M_EPILOG
 	}
 
-HString::HString ( int a_iInt )
+HString::HString ( int a_iInt ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
-	f_pcBuffer = 0;
-	f_iSize = 0;
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%d", a_iInt ) + 1;
 	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%d", a_iInt );
@@ -137,13 +125,11 @@ HString::HString ( int a_iInt )
 	M_EPILOG
 	}
 
-HString::HString ( long int a_lLong )
+HString::HString ( long int a_lLong ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
-	f_pcBuffer = 0;
-	f_iSize = 0;
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%ld", a_lLong ) + 1;
 	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%ld", a_lLong );
@@ -151,13 +137,11 @@ HString::HString ( long int a_lLong )
 	M_EPILOG
 	}
 
-HString::HString ( double a_dDouble )
+HString::HString ( double a_dDouble ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
-	f_pcBuffer = 0;
-	f_iSize = 0;
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%f", a_dDouble ) + 1;
 	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%f", a_dDouble );
@@ -165,13 +149,11 @@ HString::HString ( double a_dDouble )
 	M_EPILOG
 	}
 
-HString::HString ( const void * a_pvPtrVoid )
+HString::HString ( const void * a_pvPtrVoid ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
-	f_pcBuffer = 0;
-	f_iSize = 0;
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%p", a_pvPtrVoid ) + 1;
 	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%p", a_pvPtrVoid );

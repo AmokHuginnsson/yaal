@@ -45,20 +45,13 @@ namespace hcore
 HException::HException ( char const * a_pcFileName,
 												 char const * a_pcFunctionName,
 												 int a_iLine, char const * a_pcMessage, int a_iCode )
+	: f_cChar ( 0 ), f_iInt ( 0 ), f_lLong ( 0 ), f_dDouble ( 0 ),
+	f_pcCharPtr ( NULL ), f_pvVoidPtr ( NULL ), f_iFrame ( 0 ),
+	f_pcFileName ( NULL ), f_pcFunctionName ( NULL ),
+	f_iCode ( a_iCode ), f_pcMessage ( NULL )
 	{
-	f_cChar = 0;
-	f_iInt = 0;
-	f_lLong = 0;
-	f_dDouble = 0;
-	f_pcCharPtr = 0;
-	f_pvVoidPtr = 0;
-	f_iFrame = 0;
-	f_iCode = a_iCode;
-	f_pcMessage = 0;
 	f_pcMessage = xstrdup ( a_pcMessage );
-	f_pcFileName = 0;
 	f_pcFileName = xstrdup ( a_pcFileName );
-	f_pcFunctionName = 0;
 	f_pcFunctionName = xstrdup ( a_pcFunctionName );
 	hcore::log << "Exception: " << f_pcMessage << ", code: " << f_iCode;
 	hcore::log << '.' << endl;

@@ -83,6 +83,7 @@ CWARNING_FLAGS =	\
 						-Wtraditional\ #C only
 #						-Waggregate-return\ # useless for C++
 CXXWARNING_FLAGS =	\
+						-Weffc++\
 						-Wsign-promo
 #						-Wold-style-cast\ # lots of warrnings from libc headers
 #						-Woverloaded-virtual\ # too much unecessary warrnings

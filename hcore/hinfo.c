@@ -34,18 +34,22 @@ namespace stdhapi
 namespace hcore
 {
 
+#define M_HINFO_PURGE( ) \
+	f_iType ( D_TYPE_NONE ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ),\
+	f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+
 HInfo::HInfo ( void )
+	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
-	purge ( );
 	return;
 	M_EPILOG
 	}
 
 HInfo::HInfo ( const int & a_riInt )
+	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
-	purge ( );
 	f_iType = D_TYPE_INT;
 	f_iInt = a_riInt;
 	return;
@@ -53,9 +57,9 @@ HInfo::HInfo ( const int & a_riInt )
 	}
 
 HInfo::HInfo ( const long int & a_rlLongInt )
+	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
-	purge ( );
 	f_iType = D_TYPE_LONG_INT;
 	f_lLongInt = a_rlLongInt;
 	return;
@@ -63,9 +67,9 @@ HInfo::HInfo ( const long int & a_rlLongInt )
 	}
 
 HInfo::HInfo ( const double & a_rdDouble )
+	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
-	purge ( );
 	f_iType = D_TYPE_DOUBLE;
 	f_dDouble = a_rdDouble;
 	return;
@@ -73,9 +77,9 @@ HInfo::HInfo ( const double & a_rdDouble )
 	}
 
 HInfo::HInfo ( void * a_pvPointer )
+	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
-	purge ( );
 	f_iType = D_TYPE_POINTER;
 	f_pvPointer = a_pvPointer;
 	return;
@@ -83,19 +87,29 @@ HInfo::HInfo ( void * a_pvPointer )
 	}
 
 HInfo::HInfo ( char const * a_pcBuffer )
+	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
-	purge ( );
 	f_iType = D_TYPE_HSTRING;
 	f_oString = a_pcBuffer;
 	return;
 	M_EPILOG
 	}
 
-HInfo::HInfo ( const HTime & a_roTime )
+HInfo::HInfo ( const HString & a_roString )
+	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
-	purge ( );
+	f_iType = D_TYPE_HSTRING;
+	f_oString = a_roString;
+	return;
+	M_EPILOG
+	}
+
+HInfo::HInfo ( const HTime & a_roTime )
+	: M_HINFO_PURGE ( )
+	{
+	M_PROLOG
 	f_iType = D_TYPE_HTIME;
 	f_oTime = a_roTime;
 	return;
@@ -103,9 +117,9 @@ HInfo::HInfo ( const HTime & a_roTime )
 	}
 
 HInfo::HInfo ( const HInfo & a_roInfo, int )
+	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
-	purge ( );
 	( * this ) = a_roInfo;
 	return;
 	M_EPILOG
@@ -153,57 +167,23 @@ HInfo & HInfo::operator = ( const HInfo & a_roInfo )
 	M_EPILOG
 	}
 
-int & HInfo::operator = ( const int & a_riInt )
+HInfo & HInfo::operator ( ) ( const HInfo & a_roInfo )
 	{
 	M_PROLOG
-	f_iType |= D_TYPE_INT;
-	f_iInt = a_riInt;
-	return ( f_iInt );
-	M_EPILOG
-	}
-
-long int & HInfo::operator = ( const long int & a_rlLongInt )
-	{
-	M_PROLOG
-	f_iType |= D_TYPE_LONG_INT;
-	f_lLongInt = a_rlLongInt;
-	return ( f_lLongInt );
-	M_EPILOG
-	}
-
-double & HInfo::operator = ( const double & a_rdDouble )
-	{
-	M_PROLOG
-	f_iType |= D_TYPE_DOUBLE;
-	f_dDouble = a_rdDouble;
-	return ( f_dDouble );
-	M_EPILOG
-	}
-
-void * HInfo::operator = ( void * a_pvPointer )
-	{
-	M_PROLOG
-	f_iType |= D_TYPE_POINTER;
-	f_pvPointer = a_pvPointer;
-	return ( f_pvPointer );
-	M_EPILOG
-	}
-
-HString & HInfo::operator = ( char const * a_pcString )
-	{
-	M_PROLOG
-	f_iType |= D_TYPE_HSTRING;
-	f_oString = a_pcString;
-	return ( f_oString );
-	M_EPILOG
-	}
-
-HTime & HInfo::operator = ( const HTime & a_roTime )
-	{
-	M_PROLOG
-	f_iType |= D_TYPE_HTIME;
-	f_oTime = a_roTime;
-	return ( f_oTime );
+	if ( a_roInfo.f_iType & D_TYPE_INT )
+		f_iInt = a_roInfo.f_iInt;
+	if ( a_roInfo.f_iType & D_TYPE_LONG_INT )
+		f_lLongInt = a_roInfo.f_lLongInt;
+	if ( a_roInfo.f_iType & D_TYPE_DOUBLE )
+		f_dDouble = a_roInfo.f_dDouble;
+	if ( a_roInfo.f_iType & D_TYPE_HSTRING )
+		f_oString = a_roInfo.f_oString;
+	if ( a_roInfo.f_iType & D_TYPE_HTIME )
+		f_oTime = a_roInfo.f_oTime;
+	if ( a_roInfo.f_iType & D_TYPE_POINTER )
+		f_pvPointer = a_roInfo.f_pvPointer;
+	f_iType |= a_roInfo.f_iType;
+	return ( * this );
 	M_EPILOG
 	}
 
@@ -228,6 +208,13 @@ HInfo::operator double & ( void )
 	M_EPILOG
 	}
 
+HInfo::operator char const * ( void )
+	{
+	M_PROLOG
+	return ( static_cast < char const * > ( f_oString ) );
+	M_EPILOG
+	}
+
 HInfo::operator HString & ( void )
 	{
 	M_PROLOG
@@ -249,7 +236,7 @@ HInfo::operator void * ( void )
 	M_EPILOG
 	}
 
-HInfo::operator bool ( void )
+HInfo::operator bool ( void ) const
 	{
 	M_PROLOG
 	return ( f_lLongInt || f_dDouble || f_oString );

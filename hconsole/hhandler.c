@@ -39,7 +39,8 @@ namespace hconsole
 HHandler::HHandler ( size_t a_iKeyHandlers, size_t a_iCommandHandlers )
 				: f_oPreprocessHandlers ( a_iKeyHandlers ),
 					f_oPostprocessHandlers ( a_iKeyHandlers ),
-					f_oCommandHandlers ( a_iCommandHandlers )
+					f_oCommandHandlers ( a_iCommandHandlers ),
+					f_oCommand ( )
 	{
 	M_PROLOG
 	return;

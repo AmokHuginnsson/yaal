@@ -54,6 +54,11 @@ public:
 	virtual int handler_close ( int, void * ); /* closes window process */
 	HWindowListControl * _disclose_window_list ( void );
 	/*}*/
+private:
+	/*{*/
+	HMainWindow ( const HMainWindow & );
+	HMainWindow & operator = ( const HMainWindow & );
+	/*}*/
 	};
 
 }

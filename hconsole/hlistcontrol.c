@@ -53,15 +53,10 @@ namespace hconsole
 {
 
 HListControl::HColumnInfo::HColumnInfo ( void )
+	: f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iType ( 0 ), f_iAlign ( 0 ), 
+	f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_oName ( ), f_poControl ( NULL )
 	{
 	M_PROLOG
-	f_iWidthRaw = 0;
-	f_iWidth = 0;
-	f_iType = 0;
-	f_iAlign = 0;
-	f_iShortcutIndex = 0;
-	f_cShortcut = 0;
-	f_poControl = NULL;
 	return;
 	M_EPILOG
 	}
@@ -74,6 +69,8 @@ HListControl::HColumnInfo::~HColumnInfo ( void )
 	}
 
 HListControl::HColumnInfo::HColumnInfo ( const HColumnInfo & a_roColumnInfo )
+	: f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iType ( 0 ), f_iAlign ( 0 ), 
+	f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_oName ( ), f_poControl ( NULL )
 	{
 	M_PROLOG
 	( * this ) = a_roColumnInfo;
@@ -114,21 +111,17 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 								a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
 								a_iEnabledAttribute, a_iFocudesAttribute ),
 							HSearchableControl ( a_bSearchable ),
-							HList < HItem > ( )
+							HList < HItem > ( ),
+	f_bCheckable ( a_bCheckable ), f_bSortable ( a_bSortable ),
+	f_bDrawHeader ( a_bDrawHeader ), f_bEditable ( false ),
+	f_iControlOffset ( 0 ), f_iCursorPosition ( 0 ), f_iSumForOne ( 0 ),
+	f_oHeader ( ), f_poFirstVisibleRow ( NULL ), f_sMatch ( ),
+	f_iSortColumn ( 0 ), f_lComparedItems ( 0 )
 	{
 	M_PROLOG
-	f_bEditable = false;
-	f_bCheckable = a_bCheckable;
-	f_bSortable = a_bSortable;
-	f_bDrawHeader = a_bDrawHeader;
-	f_iControlOffset = 0;
-	f_iCursorPosition = 0;
-	f_iSumForOne = 0;
-	f_poFirstVisibleRow = NULL;
 	f_sMatch.f_iColumnWithMatch = 0;
 	f_sMatch.f_iMatchNumber = - 1;
 	f_sMatch.f_poCurrentMatch = NULL;
-	f_iSortColumn = 0;
 	cmp = static_cast < int ( HList<HItem>::* ) ( HElement *, HElement * ) > ( & HListControl::cmpc );
 	refresh ( );
 	return;

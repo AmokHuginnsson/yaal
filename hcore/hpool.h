@@ -76,18 +76,21 @@ public:
 	tType & add ( tType & );
 	void reset ( void );
 	/*}*/
+private:
+	/*{*/
+	HPool ( const HPool & );
+	HPool & operator = ( const HPool & );
+	/*}*/
 	};
 
 #include "xalloc.h"
 
 template < class tType >
 HPool < tType >::HPool ( size_t a_lNewSize, pool_type_t a_ePoolType )
+	: f_ePoolType ( a_ePoolType ), f_lPoolSize ( 0 ), f_iTop ( 0 ),
+	f_ptPool ( NULL )
 	{
 	M_PROLOG
-	f_lPoolSize = 0;
-	f_ptPool = NULL;
-	f_ePoolType = a_ePoolType;
-	f_iTop = 0;
 	if ( a_lNewSize )
 		pool_realloc ( a_lNewSize );
 	return;

@@ -36,11 +36,10 @@ namespace stdhapi
 namespace hconsole
 {
 
-HItem::HItem ( int a_iSize ) : HArray < HInfo > ( a_iSize )
+HItem::HItem ( int a_iSize ) : HArray < HInfo > ( a_iSize ),
+															 m_lId ( 0 ), m_bChecked ( false )
 	{
 	M_PROLOG
-	m_lId = 0;
-	m_bChecked = false;
 	return;
 	M_EPILOG
 	}
@@ -52,11 +51,10 @@ HItem::~HItem ( void )
 	M_EPILOG
 	}
 
-HItem::HItem ( const HItem & a_roItem, int ) : HArray < HInfo > ( a_roItem )
+HItem::HItem ( const HItem & a_roItem, int ) : HArray < HInfo > ( a_roItem ),
+	m_lId ( a_roItem.m_lId ), m_bChecked ( a_roItem.m_bChecked )
 	{
 	M_PROLOG
-	m_lId = a_roItem.m_lId;
-	m_bChecked = a_roItem.m_bChecked;
 	return;
 	M_EPILOG
 	}

@@ -38,16 +38,31 @@ namespace stdhapi
 namespace hcore
 {
 
-HTime::HTime ( char const * a_pcFormat )
+HTime::HTime ( void ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
+	f_oBuffer ( ), f_xValue ( ), f_sBroken ( )
 	{
 	M_PROLOG
-	f_oFormat = a_pcFormat;
 	set_now ( );
 	return;
 	M_EPILOG
 	}
 
-HTime::HTime ( const HTime & a_roTime, int )
+HTime::HTime ( char const * a_pcStrTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
+	f_oBuffer ( ), f_xValue ( ), f_sBroken ( )
+	{
+	M_PROLOG
+	char * l_pcErr = strptime ( a_pcStrTime, f_oFormat, & f_sBroken );
+	if ( ! l_pcErr )
+		l_pcErr = strptime ( a_pcStrTime, "%F %T", & f_sBroken );
+	if ( ! l_pcErr )
+		M_THROW ( strerror ( g_iErrNo ), g_iErrNo );
+	f_xValue = timelocal ( & f_sBroken );
+	return;
+	M_EPILOG
+	}
+
+HTime::HTime ( const HTime & a_roTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
+	f_oBuffer ( ), f_xValue ( ), f_sBroken ( )
 	{
 	M_PROLOG
 	( * this ) = a_roTime;
@@ -55,11 +70,21 @@ HTime::HTime ( const HTime & a_roTime, int )
 	M_EPILOG
 	}
 
-HTime::HTime ( const int a_iYear, const int a_iMonth, const int a_iDay,
-							 const int a_iHour, const int a_iMinute, const int a_iSecond )
+HTime::HTime ( const time_t & a_rxTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
+	f_oBuffer ( ), f_xValue ( a_rxTime ), f_sBroken ( )
 	{
 	M_PROLOG
-	f_oFormat = D_DEFAULT_TIME_FORMAT;
+	localtime_r ( & f_xValue, & f_sBroken );
+	return;
+	M_EPILOG
+	}
+
+HTime::HTime ( const int a_iYear, const int a_iMonth, const int a_iDay,
+							 const int a_iHour, const int a_iMinute, const int a_iSecond )
+	: f_oFormat ( D_DEFAULT_TIME_FORMAT ), f_oBuffer ( ), f_xValue ( ),
+	f_sBroken ( )
+	{
+	M_PROLOG
 	set_datetime ( a_iYear, a_iMonth, a_iDay, a_iHour, a_iMinute, a_iSecond );
 	return;
 	M_EPILOG
@@ -189,32 +214,11 @@ HTime & HTime::operator = ( const HTime & a_roTime )
 HTime HTime::operator - ( const HTime & a_roTime )
 	{
 	M_PROLOG
-	HTime l_oTime ( f_oFormat );
+	HTime l_oTime;
+	l_oTime.format ( f_oFormat );
 	l_oTime.f_xValue = static_cast < time_t > ( difftime ( f_xValue, a_roTime.f_xValue ) );
 	gmtime_r ( & l_oTime.f_xValue, & l_oTime.f_sBroken );
 	return ( l_oTime );
-	M_EPILOG
-	}
-
-char const * HTime::operator = ( char const * a_pcStrTime )
-	{
-	M_PROLOG
-	char * l_pcErr = strptime ( a_pcStrTime, f_oFormat, & f_sBroken );
-	if ( ! l_pcErr )
-		l_pcErr = strptime ( a_pcStrTime, "%F %T", & f_sBroken );
-	if ( ! l_pcErr )
-		M_THROW ( strerror ( g_iErrNo ), g_iErrNo );
-	f_xValue = timelocal ( & f_sBroken );
-	return ( a_pcStrTime );
-	M_EPILOG
-	}
-
-time_t HTime::operator = ( const time_t & a_rxTime )
-	{
-	M_PROLOG
-	f_xValue = a_rxTime;
-	localtime_r ( & f_xValue, & f_sBroken );
-	return ( f_xValue );
 	M_EPILOG
 	}
 

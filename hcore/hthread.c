@@ -34,7 +34,7 @@ namespace stdhapi
 namespace hcore
 {
 
-HThread::HThread ( void )
+HThread::HThread ( void ) : f_sThread ( )
 	{
 	M_PROLOG
 	return;

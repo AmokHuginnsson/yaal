@@ -72,11 +72,9 @@ protected:
 	};
 
 template < class tType >
-HArray < tType >::HArray ( int a_iSize )
+HArray < tType >::HArray ( int a_iSize ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	{
 	M_PROLOG
-	f_iSize = 0;
-	f_ptArray = NULL;
 	if ( a_iSize < 0 )
 		M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
@@ -92,11 +90,10 @@ HArray < tType >::HArray ( int a_iSize )
 
 template < class tType >
 HArray < tType >::HArray ( const int & a_iSize, tType a_tFillWith )
+	: f_iSize ( 0 ), f_ptArray ( NULL )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	f_iSize = 0;
-	f_ptArray = NULL;
 	if ( a_iSize < 0 )
 		M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
@@ -125,11 +122,9 @@ HArray < tType >::~HArray ( void )
 	}
 
 template < class tType >
-HArray < tType >::HArray ( const HArray & a_roArray )
+HArray < tType >::HArray ( const HArray & a_roArray ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	{
 	M_PROLOG
-	f_iSize = 0;
-	f_ptArray = NULL;
 	( * this ) = a_roArray;
 	return;
 	M_EPILOG

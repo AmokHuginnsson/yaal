@@ -50,8 +50,10 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HTime ( const HTime &, int = 0 );
-	HTime ( char const * = D_DEFAULT_TIME_FORMAT );
+	HTime ( void );
+	HTime ( const HTime & );
+	HTime ( char const * );
+	HTime ( const time_t & );
 	HTime ( const int, const int, const int, const int = 0, const int = 0,
 			const int = 0 );
 	virtual ~HTime ( void );
@@ -69,8 +71,6 @@ public:
 	int get_second ( void );
 	HTime & operator = ( const HTime & );
 	HTime operator - ( const HTime & );
-	char const * operator = ( char const * );
-	time_t operator = ( const time_t & );
 	bool operator == ( const time_t & );
 	bool operator != ( const time_t & );
 	bool operator <= ( const time_t & );

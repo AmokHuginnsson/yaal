@@ -43,17 +43,13 @@ char g_pcEMode [ ] = "record set is not in appropriate mode for operation";
 #define E_MODE g_pcEMode
 
 HRecordSet::HRecordSet ( HDataBase * a_poDataBase )
+	: f_pvCoreData ( NULL ), f_oSQL ( ), f_oBuffer ( ), f_iIdFieldOffset ( - 1 ),
+	f_iFieldCount ( 0 ), f_iMode ( D_MODE_CLOSED ), f_iCursorPosition ( 0 ), 
+	f_iSetQuantity ( 0 ), f_oTable ( ), f_oColumns ( "*" ), f_oFilter ( ), 
+	f_oSort ( ), f_oColumnNames ( ), f_oValues ( ), f_poDataBase ( a_poDataBase ), 
+	m_oFilter ( ), m_oSort ( ), m_lId ( 0 )
 	{
 	M_PROLOG
-	f_iFieldCount = 0;
-	f_iMode = D_MODE_CLOSED;
-	f_iSetQuantity = 0;
-	f_iCursorPosition = 0;
-	f_pvCoreData = NULL;
-	f_poDataBase = a_poDataBase;
-	f_oColumns = "*";
-	f_iIdFieldOffset = -1;
-	m_lId = 0;
 	return;
 	M_EPILOG
 	}
@@ -477,7 +473,7 @@ void HRecordSet::sync ( int a_iField, HTime & a_roTime )
 	M_PROLOG
 	HTime l_oTime;
 	if ( f_iMode == D_MODE_NORMAL )
-		a_roTime = get ( a_iField );
+		a_roTime = static_cast < char const * > ( get ( a_iField ) );
 	else
 		{
 		l_oTime = a_roTime;
@@ -495,10 +491,10 @@ void HRecordSet::sync ( int a_iField, HInfo & a_roInfo )
 	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		a_roInfo = atoi ( l_oTmp );
-		a_roInfo = atol ( l_oTmp );
-		a_roInfo = atof ( l_oTmp );
-		a_roInfo = l_oTmp;
+		a_roInfo ( atoi ( l_oTmp ) );
+		a_roInfo ( atol ( l_oTmp ) );
+		a_roInfo ( atof ( l_oTmp ) );
+		a_roInfo ( static_cast < char const * > ( l_oTmp ) );
 		}
 	else
 		f_oValues [ a_iField ] = static_cast < HString & > ( a_roInfo );

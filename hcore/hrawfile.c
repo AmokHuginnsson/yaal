@@ -36,11 +36,11 @@ namespace stdhapi
 namespace hcore
 {
 
-HRawFile::HRawFile ( void )
+HRawFile::HRawFile ( void ) : f_iFileDescriptor ( 0 )
 	{
-	M_PROLOG;
-	f_iFileDescriptor = 0;
-	M_EPILOG;
+	M_PROLOG
+	return;
+	M_EPILOG
 	}
 
 HRawFile::~HRawFile ( void )

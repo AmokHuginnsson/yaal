@@ -44,7 +44,7 @@ namespace tools
 {
 
 HSerial::HSerial ( char const * a_pcDevice )
-				: HRawFile ( )
+				: HRawFile ( ), f_oDevicePath ( ), f_sTIO ( ), f_sBackUpTIO ( )
 	{
 	M_PROLOG
 	memset ( & f_sTIO, 0, sizeof ( termios ) );

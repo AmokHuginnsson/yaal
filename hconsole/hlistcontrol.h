@@ -136,6 +136,11 @@ protected:
 	virtual void go_to_match ( void );
 	virtual void go_to_match_previous ( void );
 	/*}*/
+private:
+	/*{*/
+	HListControl ( const HListControl & );
+	HListControl & operator = ( const HListControl & );
+	/*}*/
 	};
 
 }

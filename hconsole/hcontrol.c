@@ -56,24 +56,19 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 										 int a_iHeight, int a_iWidth, char const * a_pcLabel,
 										 bool a_bDrawLabel, int a_iDisabledAttribute,
 										 int a_iEnabledAttribute, int a_iFocusedAttribute )
+	: f_bEnabled ( false ), f_bFocused ( false ), f_bDrawLabel ( a_bDrawLabel ),
+	f_bSingleLine ( false ), f_iDisabledAttribute ( 0 ), f_iEnabledAttribute ( 0 ),
+	f_iFocusedAttribute ( 0 ), f_iRow ( a_iRow ), f_iColumn ( a_iColumn ),
+	f_iHeight ( a_iHeight ), f_iWidth ( a_iWidth ), f_iRowRaw ( 0 ),
+	f_iColumnRaw ( 0 ), f_iHeightRaw ( 0 ), f_iWidthRaw ( 0 ),
+	f_oLabel ( a_pcLabel ), f_oVarTmpBuffer ( ), f_poParent ( a_poParent ),
+	f_iLabelLength ( 0 ), f_iShortcutIndex ( 0 )
 	{
 	M_PROLOG
 	if ( ! is_enabled ( ) )
 		M_THROW ( "not in curses mode.", g_iErrNo );
 	if ( ! a_poParent )
 		M_THROW ( "no parent window.", reinterpret_cast < int > ( a_poParent ) );
-	f_bEnabled = false;
-	f_bFocused = false;
-	f_bDrawLabel = a_bDrawLabel;
-	f_poParent = a_poParent;
-	f_iRow = a_iRow;
-	f_iColumn = a_iColumn;
-	f_iHeight = a_iHeight;
-	f_iWidth = a_iWidth;
-	f_iRowRaw = 0;
-	f_iColumnRaw = 0;
-	f_iHeightRaw = 0;
-	f_iWidthRaw = 0;
 	if ( a_iDisabledAttribute > 0 )
 		f_iDisabledAttribute = a_iDisabledAttribute;
 	else
@@ -86,7 +81,6 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		f_iFocusedAttribute = a_iFocusedAttribute;
 	else
 		f_iFocusedAttribute = n_iAttributeFocused;
-	f_oLabel = a_pcLabel;
 	f_iShortcutIndex = f_oLabel.find ( '&' );
 	if ( f_iShortcutIndex > -1 )
 		{
@@ -177,13 +171,13 @@ void HControl::refresh ( void )
 	M_EPILOG
 	}
 
-HInfo HControl::operator = ( const HInfo & a_roInfo )
+HControl & HControl::operator = ( const HInfo & a_roInfo )
 	{
 	M_PROLOG
 	HInfo l_oInfo = a_roInfo;
 	if ( & a_roInfo )
 		M_THROW ( "what the fuck?", g_iErrNo );
-	return ( l_oInfo );
+	return ( * this );
 	M_EPILOG
 	}
 

@@ -49,10 +49,9 @@ namespace hconsole
 {
 
 HTreeControl::HNodeControl::HNodeControl ( HNodeControl * a_poNode )
-						: HTree < HItem >::HNode ( a_poNode )
+						: HTree < HItem >::HNode ( a_poNode ), f_bUnfolded ( false )
 	{
 	M_PROLOG
-	f_bUnfolded = false;
 	return;
 	M_EPILOG
 	}

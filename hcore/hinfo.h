@@ -56,25 +56,22 @@ public:
 	HInfo ( const long int & );
 	HInfo ( const double & );
 	HInfo ( char const * );
+	HInfo ( const HString & );
 	HInfo ( const HTime & );
 	HInfo ( void * );
 	HInfo ( const HInfo &, int = 0 );
 	virtual ~HInfo ( void );
 	char & operator [ ] ( int );
 	HInfo & operator = ( const HInfo & );
-	int & operator = ( const int & );
-	long int & operator = ( const long int & );
-	double & operator = ( const double & );
-	HString & operator = ( char const * );
-	HTime & operator = ( const HTime & );
-	void * operator = ( void * );
+	HInfo & operator ( ) ( const HInfo & );
 	operator int & ( void );
 	operator long int & ( void );
 	operator double & ( void );
+	operator char const * ( void );
 	operator HString & ( void );
 	operator HTime & ( void );
 	operator void * ( void );
-	operator bool ( void );
+	operator bool ( void ) const;
 	/*}*/
 protected:
 	/*{*/

@@ -78,6 +78,11 @@ protected:
 	int handler_requery ( int, void * );
 	int handler_cancel ( int, void * );
 	/*}*/
+private:
+	/*{*/
+	HDataWindow ( const HDataWindow & );
+	HDataWindow & operator = ( const HDataWindow & );
+	/*}*/
 	};
 
 }

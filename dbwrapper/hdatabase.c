@@ -40,11 +40,9 @@ namespace stdhapi
 namespace dbwrapper
 {
 
-HDataBase::HDataBase ( void )
+HDataBase::HDataBase ( void ) : f_pvCoreData ( NULL ), f_pvLastResult ( NULL )
 	{
 	M_PROLOG
-	f_pvCoreData = NULL;
-	f_pvLastResult = NULL;
 	return;
 	M_EPILOG
 	}

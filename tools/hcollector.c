@@ -43,12 +43,11 @@ namespace tools
 {
 
 HCollector::HCollector ( char const * a_pcDevicePath )
-					: HSerial ( a_pcDevicePath ),
+					: HSerial ( a_pcDevicePath ), f_iLines ( 0 ),
 						f_oLine ( static_cast < size_t > ( D_RECV_BUF_SIZE ) )
 	{
 	M_PROLOG
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
-	f_iLines = 0;
 	return;
 	M_EPILOG
 	}

@@ -41,7 +41,7 @@ namespace stdhapi
 namespace hdata
 {
 
-HDataProcess::HDataProcess ( void ) : HProcess ( )
+HDataProcess::HDataProcess ( void ) : HProcess ( ), f_oDataBase ( )
 	{
 	M_PROLOG
 	return;

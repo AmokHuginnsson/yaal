@@ -49,13 +49,11 @@ namespace hconsole
 {
 
 HSearchableControl::HSearchableControl ( bool a_bSearchable )
-									: HControl ( NULL, 0, 0, 0, 0, NULL )
+									: HControl ( NULL, 0, 0, 0, 0, NULL ),
+	f_bSearchable ( a_bSearchable ), f_bSearchActived ( false ),
+	f_bFiltered ( false ), f_bBackwards ( false ), f_oPattern ( )
 	{
 	M_PROLOG
-	f_bFiltered = false;
-	f_bSearchActived = false;
-	f_bBackwards = false;
-	f_bSearchable = a_bSearchable;
 	return;
 	M_EPILOG
 	}

@@ -60,11 +60,10 @@ HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 											a_pcMask ),
 									HSearchableControl ( a_bSearchable ),
 									HListControl ( NULL, 0, 0, 0, 0, NULL,
-											a_bCheckable, a_bSortable, a_bSearchable, false )
+											a_bCheckable, a_bSortable, a_bSearchable, false ),
+									f_iMode ( D_MODE_EDITCONTROL ), f_iDroppedWidth ( a_iDroppedWidth )
 	{
 	M_PROLOG
-	f_iMode = D_MODE_EDITCONTROL;
-	f_iDroppedWidth = a_iDroppedWidth;
 	return;
 	M_EPILOG
 	}
@@ -191,7 +190,7 @@ void HComboboxControl::close_combo ( void )
 	M_PROLOG
 	f_iMode = D_MODE_EDITCONTROL;
 	if ( f_iQuantity )
-		HEditControl::operator = ( static_cast < HString & > ( present ( ) [ 0 ] ) );
+		HEditControl::operator = ( static_cast < char const * > ( present ( ) [ 0 ] ) );
 	clrscr ( );
 	f_poParent->refresh ( );
 	return;

@@ -110,6 +110,11 @@ public:
 	long int update ( void );
 	void remove ( void );
 	/*}*/
+private:
+	/*{*/
+	HRecordSet ( const HRecordSet & );
+	HRecordSet & operator = ( const HRecordSet & );
+	/*}*/
 	};
 
 }

@@ -58,13 +58,12 @@ namespace hdata
 
 HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
 		OResource * a_psDataControlInfo )
-	: HWindow ( a_pcTitle ), HRecordSet ( a_poDataBase )
+	: HWindow ( a_pcTitle ), HRecordSet ( a_poDataBase ),
+	f_bModified ( false ), f_poMainControl ( NULL ),
+	f_psResourcesArray ( a_psDataControlInfo ), f_poSyncStore ( NULL ),
+	f_oViewModeControls ( ), f_oEditModeControls ( )
 	{
 	M_PROLOG
-	f_bModified = false;
-	f_poMainControl = NULL;
-	f_poSyncStore = NULL;
-	f_psResourcesArray = a_psDataControlInfo;
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('n'), NULL,
 			HDataWindow::handler_add_new );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('e'), NULL,
@@ -319,7 +318,7 @@ void HDataWindow::sync ( void )
 		l_iCount = f_poSyncStore->get_size ( );
 		if ( f_oValues.quantity ( ) >= l_iCount )
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-				( * f_poSyncStore ) [ l_iCtr ] = f_oValues [ l_iCtr ];
+				( * f_poSyncStore ) [ l_iCtr ] ( static_cast < char const * > ( f_oValues [ l_iCtr ] ) );
 		( * f_poSyncStore ).m_lId = m_lId;
 		}
 	else if ( ( f_iMode == D_MODE_ADDING ) || ( f_iMode == D_MODE_EDITING ) )

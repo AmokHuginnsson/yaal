@@ -46,6 +46,11 @@ public:
 	HFile ( void );
 	virtual ~HFile ( void ) ;
 	/*}*/
+private:
+	/*{*/
+	HFile ( const HFile & );
+	HFile & operator = ( const HFile & );
+	/*}*/
 	};
 
 }

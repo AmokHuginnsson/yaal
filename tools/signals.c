@@ -85,7 +85,7 @@ public:
 /*}*/
 	} g_oSigStack;
 
-HSigStackWrapper::HSigStackWrapper ( void )
+HSigStackWrapper::HSigStackWrapper ( void ) : f_sStack ( )
 	{
 	f_sStack.ss_sp = NULL;
 	f_sStack.ss_size = 0;

@@ -64,8 +64,8 @@ int HMenuControl::HMenuNode::load_sub_menu ( OMenuItem * a_psSubMenu )
 	while ( a_psSubMenu [ l_iCtr ].f_pcLabel )
 		{
 		l_poNode = new HMenuNode ( this );
-		l_oInfo = a_psSubMenu [ l_iCtr ].f_pcLabel;
-		l_oInfo = static_cast < void * > ( & a_psSubMenu [ l_iCtr ] );
+		l_oInfo ( a_psSubMenu [ l_iCtr ].f_pcLabel );
+		l_oInfo ( static_cast < void * > ( & a_psSubMenu [ l_iCtr ] ) );
 		l_poNode->f_tLeaf [ 0 ] = l_oInfo;
 		f_oBranch.add_tail ( reinterpret_cast < HTree < HItem >::HNode * * > ( & l_poNode ) );
 		if ( a_psSubMenu [ l_iCtr ].f_psSubMenu )
@@ -82,10 +82,9 @@ HMenuControl::HMenuControl ( HWindow * a_poParent,
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 								a_iWidth, a_pcLabel ),
 								HTreeControl ( a_poParent, a_iRow, a_iColumn,
-										a_iHeight, a_iWidth, a_pcLabel )
+										a_iHeight, a_iWidth, a_pcLabel ), f_poProcess ( NULL )
 	{
 	M_PROLOG
-	f_poProcess = NULL;
 	return;
 	M_EPILOG
 	}

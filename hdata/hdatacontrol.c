@@ -39,10 +39,9 @@ namespace hdata
 {
 
 HDataControl::HDataControl ( HRecordSet * a_poRecordSet )
-						: HControl ( NULL, 0, 0, 0, 0, NULL )
+						: HControl ( NULL, 0, 0, 0, 0, NULL ), f_poRecordSet ( a_poRecordSet )
 	{
 	M_PROLOG
-	f_poRecordSet = a_poRecordSet;
 	return;
 	M_EPILOG
 	}

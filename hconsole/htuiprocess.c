@@ -61,14 +61,11 @@ namespace hconsole
 HProcess::HProcess ( size_t a_iFileHandlers, size_t a_iKeyHandlers,
 		size_t a_iCommandHandlers )
 				: HHandler ( a_iKeyHandlers, a_iCommandHandlers ),
-				f_oFileDescriptorHandlers ( a_iFileHandlers )
+	f_bInitialised ( false ), f_bLoop ( true ), f_iIdleCycles ( 0 ),
+	f_sLatency ( ), f_xFileDescriptorSet ( ), f_poForegroundWindow ( NULL ),
+	f_poWindows ( NULL ), f_oFileDescriptorHandlers ( a_iFileHandlers )
 	{
 	M_PROLOG
-	f_bInitialised = false;
-	f_bLoop = true;
-	f_iIdleCycles = 0;
-	f_poForegroundWindow = NULL;
-	f_poWindows = NULL;
 	return;
 	M_EPILOG
 	}
@@ -134,7 +131,7 @@ int HProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	HInfo l_oInfo;
 	HItem l_oItem ( 1 );
 	l_oInfo = static_cast < void * > ( a_poWindow );
-	l_oInfo = HString ( a_pcTitle );
+	l_oInfo ( a_pcTitle );
 	l_oItem [ 0 ] = l_oInfo;
 	f_poWindows->add_tail ( l_oItem );
 	f_poForegroundWindow = a_poWindow;

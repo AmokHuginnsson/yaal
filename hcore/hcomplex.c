@@ -36,25 +36,22 @@ namespace stdhapi
 namespace hcore
 {
 
-HComplex::HComplex ( void )
+HComplex::HComplex ( void ) : f_dReal ( 0 ), f_dImaginary ( 0 )
 	{
 	M_PROLOG
-	f_dReal = 0;
-	f_dImaginary = 0;
 	return;
 	M_EPILOG
 	}
 
 HComplex::HComplex ( const double a_dReal,  const double a_dImaginary )
+	: f_dReal ( a_dReal ), f_dImaginary ( a_dImaginary )
 	{
 	M_PROLOG
-	f_dReal = a_dReal;
-	f_dImaginary = a_dImaginary;
 	return;
 	M_EPILOG
 	}
 
-HComplex::HComplex ( const HComplex & a_roComplex )
+HComplex::HComplex ( const HComplex & a_roComplex ) : f_dReal ( 0 ), f_dImaginary ( 0 )
 	{
 	M_PROLOG
 	( * this ) = a_roComplex;

@@ -72,8 +72,10 @@ public:
 	void init ( HProcess *, OMenuItem * );
 	int process_input( int );
 	/*}*/
-protected:
+private:
 	/*{*/
+	HMenuControl ( const HMenuControl & );
+	HMenuControl & operator = ( const HMenuControl & );
 	/*}*/
 	};
 

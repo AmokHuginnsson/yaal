@@ -94,6 +94,11 @@ protected:
 		HNode * previous ( int = D_TREAT_AS_OPENED );
 		HNode * next ( void );
 		/*}*/
+	private:
+		/*{*/
+		HNode ( const HNode & );
+		HNode & operator = ( const HNode & );
+		/*}*/
 		friend class HTree < tttType >;
 		friend class HBranchList < HNode * >;
 		};
@@ -116,8 +121,10 @@ public:
 	tttType & up ( void );
 	void graft ( int, HTree < tttType > * );
 	/*}*/
-protected:
+private:
 	/*{*/
+	HTree ( const HTree & );
+	HTree & operator = ( const HTree & );
 	/*}*/
 	friend class HTree < tttType > :: HNode;
 	};
@@ -150,13 +157,11 @@ long int HBranchList < ttType > ::empty ( typename HList < ttType > ::HElement *
 	}
 
 template < class tttType >
-HTree < tttType > ::HNode::HNode( HNode * a_poNode )
+HTree < tttType > ::HNode::HNode( HNode * a_poNode ) : f_tLeaf ( ),
+	f_iNumber ( 0 ), f_iHits ( 0 ), f_iLevel ( 0 ), f_oBranch ( ),
+	f_poTrunk ( a_poNode ), f_poTree ( NULL )
 	{
 	M_PROLOG
-	f_poTree = 0;
-	f_poTrunk = a_poNode;
-	f_iLevel = 0;
-	f_iNumber = 0;
 	if ( a_poNode )
 		{
 		f_poTree = a_poNode->f_poTree;
@@ -164,7 +169,6 @@ HTree < tttType > ::HNode::HNode( HNode * a_poNode )
 		if ( f_poTree )
 			f_iNumber = f_poTree->f_iHighestNumber ++;
 		}
-	f_iHits = 0;
 	return ;
 	M_EPILOG
 	}
@@ -236,11 +240,10 @@ typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
 
 template < class tttType >
 HTree < tttType >::HTree ( void )
+	: f_poRoot ( NULL ), f_poSelected ( NULL ), f_iHighestNumber ( 0 )
 	{
 	M_PROLOG
-	f_poRoot = NULL;
-	f_poSelected = NULL;
-	f_iHighestNumber = 0;
+	return;
 	M_EPILOG
 	}
 

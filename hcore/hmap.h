@@ -68,8 +68,10 @@ protected:
 		HAtom ( void );
 		virtual ~HAtom ( void );
 		/*}*/
-	protected:
+	private:
 		/*{*/
+		HAtom ( const HAtom & );
+		HAtom & operator = ( const HAtom & );
 		/*}*/
 		friend class HMap < tType, ttType >;
 		};
@@ -97,16 +99,18 @@ public:
 	void flush ( void );
 	int quantity ( void );
 	/*}*/
-protected:
+private:
 	/*{*/
+	HMap ( const HMap & );
+	HMap & operator = ( const HMap & );
 	/*}*/
 	};
 
 template < class tType, class ttType >
-HMap<tType, ttType>::HAtom::HAtom ( void )
+HMap<tType, ttType>::HAtom::HAtom ( void ) : f_tKey ( ), f_tValue ( ),
+																						 f_poNext ( NULL )
 	{
 	M_PROLOG
-	f_poNext = NULL;
 	return;
 	M_EPILOG
 	}
@@ -120,7 +124,8 @@ HMap<tType, ttType>::HAtom::~HAtom ( void )
 	}
 
 template < class tType, class ttType >
-HMap<tType, ttType>::HMap ( size_t a_iSize )
+HMap<tType, ttType>::HMap ( size_t a_iSize ) : f_iIndex ( 0 ), f_iPrime ( a_iSize ),
+	f_iQuantity ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -137,10 +142,6 @@ HMap<tType, ttType>::HMap ( size_t a_iSize )
 	l_oMessage.format ( "map prime = %ld", a_iSize );
 	M_LOG ( ( char * ) l_oMessage );
 #endif /* __DEBUGGER_BABUNI__ */
-	f_iQuantity = 0;
-	f_iIndex = 0;
-	f_poAtomPtr = NULL;
-	f_iPrime = a_iSize;
 	f_ppoAtomArray = xcalloc ( f_iPrime, HAtom * );
 	return;
 	M_EPILOG

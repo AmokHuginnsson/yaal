@@ -122,6 +122,11 @@ public:
 	static void dump_call_stack ( int );
 	void log ( char const *, char const *, int );
 	/*}*/
+private:
+	/*{*/
+	HException ( const HException & );
+	HException & operator = ( const HException & );
+	/*}*/
 	};
 
 }

@@ -37,7 +37,7 @@ namespace hconsole
 {
 
 HMainWindow::HMainWindow ( void )
-						: HWindow ( "stdhapi" )
+						: HWindow ( "stdhapi" ), f_poMenu ( NULL ), f_poWindowList ( NULL )
 	{
 	M_PROLOG
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,

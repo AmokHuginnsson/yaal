@@ -53,17 +53,15 @@ namespace stdhapi
 namespace hconsole
 {
 
-HWindow::HWindow ( char const * a_pcTitle )
+HWindow::HWindow ( char const * a_pcTitle ) : f_oTitle ( a_pcTitle ),
+	f_poFocusedChild ( NULL ), f_poPreviousFocusedChild ( NULL ),
+	f_oControls ( ), f_poStatusBar ( NULL )
 	{
 	M_PROLOG
 	int l_piCmds [ ] = { ':', D_KEY_COMMAND_( ':' ) };
 	int l_piSearch [ ] = { '/', D_KEY_COMMAND_( '/' ), '?', D_KEY_COMMAND_( '?' ) };
 	if ( ! is_enabled ( ) )
 		M_THROW ( "console not initialised.", g_iErrNo );
-	f_poFocusedChild = NULL;
-	f_poPreviousFocusedChild = NULL;
-	f_poStatusBar = NULL;
-	f_oTitle = a_pcTitle;
 	M_REGISTER_POSTPROCESS_HANDLER ( '\t', NULL, HWindow::handler_jump_tab );
 	M_REGISTER_POSTPROCESS_HANDLER ( 2, l_piCmds, HWindow::handler_command );
 	M_REGISTER_POSTPROCESS_HANDLER ( 4, l_piSearch, HWindow::handler_search );

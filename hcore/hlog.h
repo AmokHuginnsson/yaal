@@ -75,6 +75,11 @@ protected:
 	/*{*/
 	void timestamp ( FILE * = NULL );
 	/*}*/
+private:
+	/*{*/
+	HLog ( const HLog & );
+	HLog & operator = ( const HLog & );
+	/*}*/
 	friend HLog & endl ( HLog & );
 	};
 
