@@ -27,6 +27,8 @@ Copyright:
 #ifndef __ORESOURCE_H
 #define __ORESOURCE_H
 
+#define D_CVSID_ORESOURCE_H "$CVSHeader$"
+
 /* control flags */
 
 /* main control of a window, contents of this control holds

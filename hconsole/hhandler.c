@@ -1,7 +1,7 @@
 /*
 ---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	omenuitem.h - this file is integral part of `stdhapi' project.
+	hhandler.c - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,18 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __OMENUITEM_H
-#define __OMENUITEM_H
+#include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
+#include "hhandler.h"
+M_CVSTID ( D_CVSID_HHANDLER_H );
 
-#define D_CVSID_OMENUITEM_H "$CVSHeader$"
-
-#include "hprocess.h"
-
-struct OMenuItem
-	{
-	OMenuItem * f_psSubMenu;
-	int ( HProcess::* HANDLER ) ( void );
-	const char * f_pcLabel;
-	};
-
-#endif /* not __OMENUITEM_H */

@@ -29,6 +29,8 @@ Copyright:
 
 #line 31 "hhandler.h"
 
+#define D_CVSID_HHANDLER_H "$CVSHeader$"
+
 #include <stdlib.h>
 
 template < class tType >
