@@ -66,6 +66,11 @@ WINDOW * n_psWindow = NULL;
 bool	n_bEnabled = false;
 bool	n_bUseMouse = false;
 bool	n_bDisableXON = false;
+bool	n_bLeaveCtrlC = false;
+bool	n_bLeaveCtrlZ = false;
+bool	n_bLeaveCtrlS = false;
+bool	n_bLeaveCtrlQ = false;
+bool	n_bLeaveCtrlBackSlash = false;
 char	n_cCommandComposeCharacter = 'x';
 int		n_iCommandComposeDelay = 16;
 termios	g_sTermios;
@@ -74,6 +79,11 @@ OVariable n_psVariables [ ] =
 	{
 		{ D_TYPE_BOOL, "use_mouse", & n_bUseMouse },
 		{ D_TYPE_BOOL, "disable_XON", & n_bDisableXON },
+		{ D_TYPE_BOOL, "leave_ctrl_c", & n_bLeaveCtrlC },
+		{ D_TYPE_BOOL, "leave_ctrl_z", & n_bLeaveCtrlZ },
+		{ D_TYPE_BOOL, "leave_ctrl_s", & n_bLeaveCtrlS },
+		{ D_TYPE_BOOL, "leave_ctrl_q", & n_bLeaveCtrlQ },
+		{ D_TYPE_BOOL, "leave_ctrl_\\", & n_bLeaveCtrlBackSlash },
 		{ D_TYPE_INT, "latency", & n_iLatency },
 		{ D_TYPE_CHAR, "command_compose_character", & n_cCommandComposeCharacter },
 		{ D_TYPE_INT, "command_compose_delay", & n_iCommandComposeDelay },
@@ -94,6 +104,11 @@ void enter_curses( void )
 		tcgetattr ( STDIN_FILENO, & g_sTermios );
 		tcgetattr ( STDIN_FILENO, & l_sTermios );
 		l_sTermios.c_iflag &= ~IXON;
+		if ( n_bLeaveCtrlC )l_sTermios.c_cc [ VINTR ] = 0;
+		if ( n_bLeaveCtrlZ )l_sTermios.c_cc [ VSUSP ] = 0;
+		if ( n_bLeaveCtrlS )l_sTermios.c_cc [ VSTOP ] = 0;
+		if ( n_bLeaveCtrlQ )l_sTermios.c_cc [ VSTART ] = 0;
+		if ( n_bLeaveCtrlBackSlash )l_sTermios.c_cc [ VQUIT ] = 0;
 		tcsetattr ( STDIN_FILENO, TCSAFLUSH, & l_sTermios );
 		}
 	use_env ( true );

@@ -20,6 +20,8 @@
 ### core BEGIN
 [core]
 
+# log_mask
+# type: special(multi-flag), default: (empty)
 # log_mask decides what types of information will be logged
 # log_mask can occur in all stdhapirc's sections and flag are
 # additive across all sections
@@ -32,19 +34,39 @@ log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_CVSHEADER
 ### console BEGIN
 [console]
 
+# disable_XON
+# type: bool, default: false
 # disable XON(/XOFF) flow control on output,
 # setting this to `true' disables C-s and C-q special handling
 disable_XON true
 
+# leave_ctrl_(c|z|\|q|s)
+# type: bool, default: false
+# this option decides if input routines
+# should treat some key-press combinations special
+# should CTRL-c typed by user be discarded by program ?
+# is CTRL-z ignored by process?
+leave_ctrl_c true
+leave_ctrl_z true
+leave_ctrl_\ true
+leave_ctrl_q true
+leave_ctrl_s true
+
+# use_mouse
+# type: bool, default: true
 # force enabling of mouse interface, warning, when this option
 # is enabled and mouse interface is not available stdhapi library
 # will not allow execution of any program that uses hconsole api
 use_mouse false
 
+# latency
+# type: integer, default: 1
 # how long should aplication wait for user input before running
 # idle-state operation, this value is specified in seconds
 latency 1
 
+# command_compose_character
+# type: char, default: x
 # what character should be used for composing commands,
 # composing commands looks like this:
 # user presses CTRL-`command_compose_character', which puts
@@ -58,12 +80,16 @@ latency 1
 # in command mode
 command_compose_character x
 
+# command_compose_delay
+# type: integer, default: 16
 # how long hconsole-UI waits in `command mode' for user to type
 # in real command
 command_compose_delay 16
 
 ## colors BEGIN
 
+# disabled_attribute, enabled_attribute, focused_attribute
+# type: special(multi-value), default: (look below)
 # color option syntax is:
 # option foreground-label background-label foreground-data background-data
 # color names are:
@@ -85,15 +111,22 @@ focused_attribute BRIGHTGREEN GRAY BLACK LIGHTGRAY
 ### tools BEGIN
 [tools]
 
-# should CTRL-c typed by user be discarded by program ?
+# ignore_signal_(SIGINT|SIGTSTP|SIGQUIT)
+# type: bool, default: false
+# this option tells if process should ignore recievied signal
 ignore_signal_SIGINT true
-
-# is CTRL-z ignored by process?
 ignore_signal_SIGTSTP true
+ignore_signal_SIGQUIT true
 
 # serial port configuration
-# device
+
+# serial_device
+# type: string, default: (system dependent)
+# describes path to device
 serial_device /dev/@SERIAL_DEVICE@
+# serial_baudrate
+# type: string, default: B115200
+# this option sets serial line connection speed (baudrate)
 # baudrate B115200 | B76800 | B57600 | B38400 | B28800
 #          | B19200| B14400 | B9600 | B7200 | B4800 | B2400
 serial_baudrate B115200
@@ -113,8 +146,12 @@ log_mask LOG_SQL
 # it can by useful for programs that does not use databases
 # or for debuging purpouses
 
+# data_base_driver
+# type: string, default: (installation dependent)
 data_base_driver @DEFAULT_DRIVER@
 
+# mysql_socket
+# type: string, default: (system dependent)
 # mysql driver realises access to datebase thru socket,
 #	which we have to point to
 mysql_socket @MYSQL_SOCKET@

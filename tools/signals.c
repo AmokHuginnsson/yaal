@@ -58,23 +58,25 @@ namespace signals
 
 bool n_bIgnoreSignalSIGINT = false;
 bool n_bIgnoreSignalSIGTSTP = false;
+bool n_bIgnoreSignalSIGQUIT = false;
 
 OVariable n_psVariables [ ] =
 	{
 		{ D_TYPE_BOOL, "ignore_signal_SIGINT", & n_bIgnoreSignalSIGINT },
 		{ D_TYPE_BOOL, "ignore_signal_SIGTSTP", & n_bIgnoreSignalSIGTSTP },
+		{ D_TYPE_BOOL, "ignore_signal_SIGQUIT", & n_bIgnoreSignalSIGQUIT },
 		{ D_TYPE_CHAR_POINTER, "serial_device", & g_pcSerialDevice },
 		{ 0, NULL, NULL }
 	};
 	
 /* singnal handler definitions */
 	
-void signal_terminal_size_changed ( int a_iSignum )
+void signal_WINCH ( int a_iSignum )
 	{
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-	if ( signal( SIGWINCH, signals::signal_terminal_size_changed ) == SIG_IGN )
+	if ( signal( SIGWINCH, signals::signal_WINCH ) == SIG_IGN )
 		signal( SIGWINCH, SIG_IGN );
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nTerminal size changed: ";
@@ -97,29 +99,27 @@ void signal_terminal_size_changed ( int a_iSignum )
 	M_EPILOG
 	}
 
-void signal_ctrlc ( int a_iSignum )
+void signal_INT ( int a_iSignum )
 	{
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-#ifdef __CONSOLE_H
-	if ( console::is_enabled ( ) && n_bIgnoreSignalSIGINT )
+	if ( n_bIgnoreSignalSIGINT )
 		{
-		if ( signal( SIGINT, signals::signal_ctrlc ) == SIG_IGN )
+		if ( signal( SIGINT, signals::signal_INT ) == SIG_IGN )
 			signal( SIGINT, SIG_IGN );
-		console::n_bInputWaiting = true;
-		ungetch ( D_KEY_CTRL_('c') );
 		return;
 		}
-	if ( console::is_enabled ( ) )console::leave_curses();
-#endif /* __CONSOLE_H */
 	l_pcSignalMessage = strsignal ( a_iSignum );
-	l_oMessage = "\nUser typed ^C, process broken: ";
+	l_oMessage = "\nInterrupt signal caught, process broken: ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
 #ifdef __HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HLOG_H */
+#ifdef __CONSOLE_H
+	if ( console::is_enabled ( ) )console::leave_curses();
+#endif /* __CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGINT, SIG_DFL );
 	raise ( SIGINT );
@@ -127,7 +127,7 @@ void signal_ctrlc ( int a_iSignum )
 	M_EPILOG
 	}
 	
-void signal_kill ( int a_iSignum )
+void signal_TERM ( int a_iSignum )
 	{
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
@@ -149,11 +149,22 @@ void signal_kill ( int a_iSignum )
 	M_EPILOG
 	}
 	
-void signal_quit ( int a_iSignum )
+void signal_QUIT ( int a_iSignum )
 	{
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
+	if ( n_bIgnoreSignalSIGQUIT )
+		{
+		if ( signal( SIGQUIT, signals::signal_QUIT ) == SIG_IGN )
+			signal( SIGQUIT, SIG_IGN );
+#ifdef __CONSOLE_H
+		if ( console::is_enabled ( ) )
+			console::c_printf ( console::n_iHeight - 1, 0, D_FG_BRIGHTRED,
+					"Hard Quit is disabled by stdhapi configuration." );
+#endif /* __CONSOLE_H */
+		return;
+		}
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nAbnormal program quit forced: ";
 	l_oMessage += l_pcSignalMessage;
@@ -171,31 +182,32 @@ void signal_quit ( int a_iSignum )
 	M_EPILOG
 	}
 
-void signal_stop ( int a_iSignum )
+void signal_TSTP ( int a_iSignum )
 	{
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-#ifdef __CONSOLE_H
-	if ( console::is_enabled ( ) && n_bIgnoreSignalSIGINT )
+	if ( n_bIgnoreSignalSIGINT )
 		{
-		if ( signal( SIGTSTP, signals::signal_stop ) == SIG_IGN )
+		if ( signal( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
 			signal( SIGTSTP, SIG_IGN );
-		console::n_bInputWaiting = true;
-		console::c_printf ( console::n_iHeight - 1, 0, D_FG_BRIGHTRED,
-				"Suspend is disabled by stdhapi configuration." );
-		ungetch ( D_KEY_CTRL_('z') );
+#ifdef __CONSOLE_H
+		if ( console::is_enabled ( ) )
+			console::c_printf ( console::n_iHeight - 1, 0, D_FG_BRIGHTRED,
+					"Suspend is disabled by stdhapi configuration." );
+#endif /* __CONSOLE_H */
 		return;
 		}
-	if ( console::is_enabled ( ) )console::leave_curses();
-#endif /* __CONSOLE_H */
 	l_pcSignalMessage = strsignal ( a_iSignum );
-	l_oMessage = "\nUser typed ^Z, process suspended: ";
+	l_oMessage = "\nStop signal caught, process suspended: ";
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
 #ifdef __HLOG_H
 	log << ( ( char * ) l_oMessage ) + 1 << endl;
 #endif /* __HLOG_H */
+#ifdef __CONSOLE_H
+	if ( console::is_enabled ( ) )console::leave_curses();
+#endif
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGTSTP, SIG_DFL );
 	raise ( SIGTSTP );
@@ -203,14 +215,14 @@ void signal_stop ( int a_iSignum )
 	M_EPILOG
 	}
 
-void signal_continue ( int a_iSignum )
+void signal_CONT ( int a_iSignum )
 	{
 	M_PROLOG
 	char * l_pcSignalMessage = 0;
 	HString l_oMessage;
-	if ( signal( SIGTSTP, signals::signal_stop ) == SIG_IGN )
+	if ( signal( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
 		signal( SIGTSTP, SIG_IGN );
-	if ( signal( SIGCONT, signals::signal_continue ) == SIG_IGN )
+	if ( signal( SIGCONT, signals::signal_CONT ) == SIG_IGN )
 		signal( SIGCONT, SIG_IGN );
 	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nProcess was resurected: ";
@@ -271,23 +283,23 @@ void set_handlers ( void )
 	l_iError = sigaltstack ( & l_sSigStack, NULL );
 	if ( l_iError )throw HException ( __WHERE__, "sigaltstack ( )", l_iError );
 	sigemptyset ( & l_sMask );
-	l_sHandler.sa_handler = signal_ctrlc;
+	l_sHandler.sa_handler = signal_INT;
 	l_sHandler.sa_mask = l_sMask;
 	l_sHandler.sa_flags = SA_RESTART | SA_ONSTACK;
 	l_iError = sigaction( SIGINT, & l_sHandler, NULL );
 	if ( l_iError )throw HException ( __WHERE__, "sigaction ( SIGINT, ... )", l_iError );
 */
-	if ( signal( SIGWINCH, signals::signal_terminal_size_changed ) == SIG_IGN )
+	if ( signal( SIGWINCH, signals::signal_WINCH ) == SIG_IGN )
 		signal( SIGWINCH, SIG_IGN );
-	if ( signal( SIGINT, signals::signal_ctrlc ) == SIG_IGN )
+	if ( signal( SIGINT, signals::signal_INT ) == SIG_IGN )
 		signal( SIGINT, SIG_IGN );
-	if ( signal( SIGTERM, signals::signal_kill ) == SIG_IGN )
+	if ( signal( SIGTERM, signals::signal_TERM ) == SIG_IGN )
 		signal( SIGTERM, SIG_IGN );
-	if ( signal( SIGQUIT, signals::signal_quit ) == SIG_IGN )
+	if ( signal( SIGQUIT, signals::signal_QUIT ) == SIG_IGN )
 		signal( SIGQUIT, SIG_IGN );
-	if ( signal( SIGTSTP, signals::signal_stop ) == SIG_IGN )
+	if ( signal( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
 		signal( SIGTSTP, SIG_IGN );
-	if ( signal( SIGCONT, signals::signal_continue ) == SIG_IGN )
+	if ( signal( SIGCONT, signals::signal_CONT ) == SIG_IGN )
 		signal( SIGCONT, SIG_IGN );
 	if ( signal( SIGFPE, signals::signal_fatal ) == SIG_IGN )
 		signal( SIGFPE, SIG_IGN );
