@@ -63,14 +63,14 @@ public:
 	HString & operator += ( const long int );
 	HString & operator += ( const double );
 	HString & operator += ( const void * );
-	HString operator + ( const HString & );
-	HString operator + ( const char * );
-	HString operator + ( const char );
-	HString operator + ( const int );
-	HString operator + ( const long int );
-	HString operator + ( const double );
-	HString operator + ( const void * );
-	char & operator [ ] ( const int );
+	HString operator + ( const HString & ) const;
+	HString operator + ( const char * ) const;
+	HString operator + ( const char ) const;
+	HString operator + ( const int ) const;
+	HString operator + ( const long int ) const;
+	HString operator + ( const double ) const;
+	HString operator + ( const void * ) const;
+	char & operator [ ] ( const int ) const;
 	bool operator == ( const HString & ) const;
 	bool operator == ( const char * ) const;
 	bool operator != ( const HString & ) const;
@@ -85,22 +85,22 @@ public:
 	bool operator < ( const char * ) const;
 	operator char * ( void ) const; /* add_* functions in HList needs operator
 																		 bool ( ) operator char * works fine here */
-	bool is_empty ( void );
+	bool is_empty ( void ) const;
 	int get_length ( void ) const;
 	HString & format ( const char *, ... );
-	int find ( char, int = 0 );
-	int find ( const char *, int = 0 );
-	int reverse_find ( char, int = 0 );
+	int find ( char, int = 0 ) const;
+	int find ( const char *, int = 0 ) const;
+	int reverse_find ( char, int = 0 ) const;
 	HString & replace ( const char *, const char * );
 	HString & upper ( void );
 	HString & lower ( void );
 	HString & reverse ( void );
-	HString left ( int );
-	HString mid ( int, int = 0 );
-	HString right  ( int );
+	HString left ( int ) const;
+	HString mid ( int, int = 0 ) const;
+	HString right  ( int ) const;
 	HString & trim_left ( const char * = " \t\r\n" );
 	HString & trim_right ( const char * = " \t\r\n" );
-	HString split ( const char *, int );
+	HString split ( const char *, int ) const;
 	/*}*/
 protected:
 	/*{*/
