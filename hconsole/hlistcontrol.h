@@ -70,21 +70,26 @@ protected:
 	/*{*/
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
-	bool				f_bSearchable;				/* are items searchable */
 	bool				f_bDrawHeader;				/* should be header driven */
 	bool				f_bEditable;					/* is list interactively editable */
-	bool				f_bFiltered;					/* is content of list filtered
-																			 thru pattern */
 	int					f_iControlOffset;			/* when content is bigger than control
 																			 size this variable keeps
 																			 offset of first row shown */
 	int					f_iCursorPosition;		/* cursor position relative to control
 																			 begining */
 	int					f_iSumForOne;					/* sum of percentage columns width */
-	regex_t 		f_sMask;							/* regular expression for search patterns */
-	HString			f_oPattern;						/* current search pattern */
-	HElement *	f_poFirstVisibleRow;	/* pointer to first visible row */
 	HList < HColumnInfo >	f_oHeader;	/* list header info */
+	HElement *	f_poFirstVisibleRow;	/* pointer to first visible row */
+	struct
+		{
+		bool			f_bSearchable;				/* are items searchable */
+		bool			f_bIgnoreCase;				/* self explanary */
+		bool			f_bExtended;					/* basic RE or extended RE */
+		bool			f_bFiltered;					/* is content of list filtered
+																			 thru pattern */
+		regex_t 	f_sMask;							/* regular expression for search patterns */
+		HString		f_oPattern;						/* current search pattern */
+		} f_sSearch;
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
 	long int		f_lComparedItems;			/* items already compared during sorting */
@@ -121,6 +126,8 @@ public:
 	virtual HItem * remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	virtual HItem * remove_tail ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	virtual bool is_searchable ( void );
+	virtual void search ( const HString & );
+	bool parse_pattern ( void );
 	virtual int click ( mouse::OMouse & );
 	/*}*/
 protected:

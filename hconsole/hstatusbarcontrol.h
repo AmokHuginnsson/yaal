@@ -29,12 +29,14 @@ Copyright:
 
 #include "heditcontrol.h"
 
-#define D_PROMPT_RELAXED							0
-#define D_PROMPT_ONLY_ENTER_CAT_QUIT	1
-#define D_PROMPT_MUST_CANCEL					2
+#define D_PROMPT_MODE_NORMAL	0
+#define D_PROMPT_MODE_COMMAND	1
+#define D_PROMPT_MODE_SEARCH	2
+#define D_PROMPT_MODE_MENU		3
 
-#define D_MODE_NORMAL	0
-#define D_MODE_MENU		1
+#define D_PROMPT_RESTRICT_RELAXED							0
+#define D_PROMPT_RESTRICT_ONLY_ENTER_CAN_QUIT	1
+#define D_PROMPT_RESTRICT_MUST_CANCEL					2
 
 class HStatusBarControl : public HEditControl
 	{
@@ -42,7 +44,8 @@ protected:
 	/*{*/
 	int			f_iStatusBarAttribute;
 	int			f_iPromptLength;
-	int			f_iMode;					/* prompt locking mode */
+	int			f_iMode;					/* prompt mode */
+	int			f_iRestrict;			/* prompt restrict mode */
 	HString	f_oPrompt;
 	/* progress bar data */
 	bool		f_bDone;
@@ -68,7 +71,8 @@ public:
 	virtual int process_input_normal ( int );
 	virtual int process_input_menu ( int );
 	void setup ( const char *, const char *, int );
-	void set_prompt ( const char * = NULL, int = D_PROMPT_RELAXED );
+	void set_prompt ( const char * = NULL, int = D_PROMPT_MODE_NORMAL,
+			int = D_PROMPT_RESTRICT_RELAXED );
 	void end_prompt ( void );
 	void init_progress ( double, const char *, bool = true );
 	void update_progress ( double = -1, const char * = NULL );

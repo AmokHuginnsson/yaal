@@ -39,6 +39,7 @@ Copyright:
 
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
+#include "hlog.h"
 #include "hlistcontrol.h"
 
 HListControl::HColumnInfo::HColumnInfo ( void )
@@ -106,10 +107,10 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	{
 	M_PROLOG
 	f_bEditable = false;
-	f_bFiltered = false;
+	f_sSearch.f_bFiltered = false;
+	f_sSearch.f_bSearchable = a_bSearchable;
 	f_bCheckable = a_bCheckable;
 	f_bSortable = a_bSortable;
-	f_bSearchable = a_bSearchable;
 	f_bDrawHeader = a_bDrawHeader;
 	f_iControlOffset = 0;
 	f_iCursorPosition = 0;
@@ -756,6 +757,54 @@ int HListControl::click ( mouse::OMouse & a_rsMouse )
 
 bool HListControl::is_searchable ( void )
 	{
-	return ( f_bSearchable );
+	return ( f_sSearch.f_bSearchable );
+	}
+
+void HListControl::search ( const HString & a_oPattern )
+	{
+	M_PROLOG
+	f_sSearch.f_oPattern = a_oPattern;
+	parse_pattern ( );
+	return;
+	M_EPILOG
+	}
+
+bool HListControl::parse_pattern ( void )
+	{
+	int l_iCtr = 0;
+	char * l_pcPattern = f_sSearch.f_oPattern;
+	f_sSearch.f_bIgnoreCase = false;
+	f_sSearch.f_bFiltered = false;
+	f_sSearch.f_bExtended = false;
+	while ( l_pcPattern [ l_iCtr ++ ] == '\\' )
+		{
+		switch ( l_pcPattern [ l_iCtr ] )
+			{
+			case ( 'i' ):
+				{
+				f_sSearch.f_bIgnoreCase = true;
+				break;
+				}
+			case ( 'e' ):
+				{
+				f_sSearch.f_bExtended = true;
+				break;
+				}
+			case ( 'f' ):
+				{
+				f_sSearch.f_bFiltered = true;
+				break;
+				}
+			default :
+				{
+				f_poParent->status_bar ( )->message ( "bad search option '%c'",
+						l_pcPattern [ l_iCtr ] );
+				break;
+				}
+			}
+		l_iCtr ++;
+		}
+	log ( "%c\n", l_pcPattern [ l_iCtr ] );
+	return ( false );
 	}
 

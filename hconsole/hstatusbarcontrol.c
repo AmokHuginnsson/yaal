@@ -45,7 +45,7 @@ M_CVSID ( "$CVSHeader$" );
 HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 		const char * a_pcLabel, int a_iStatusBarAttribute )
 								 : HControl ( a_poParent, - 2, 0, 255, 0, a_pcLabel ),
-									HEditControl ( NULL, 0, 0, 0, 0, NULL )
+									HEditControl ( NULL, 0, 0, 0, 0, NULL, 127, "", D_MASK_LOOSE )
 	{
 	M_PROLOG
 	int l_iAttribte = 0;
@@ -54,7 +54,8 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 	else f_iStatusBarAttribute = console::n_iStatusBarAttribute;
 	l_iAttribte = f_iStatusBarAttribute;
 	l_iAttribte &= 0x00ff;
-	f_iMode = D_PROMPT_RELAXED;
+	f_iMode = D_PROMPT_MODE_NORMAL;
+	f_iRestrict = D_PROMPT_RESTRICT_RELAXED;
 	f_iFocusedAttribute &= 0xff00;
 	f_iFocusedAttribute |= l_iAttribte;
 	f_iPromptLength = 0;
@@ -108,15 +109,26 @@ void HStatusBarControl::refresh ( void )
 int HStatusBarControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
-	a_iCode = HEditControl::process_input ( a_iCode );
+	if ( ( a_iCode == KEY_BACKSPACE )
+			&& ( f_iRestrict == D_PROMPT_RESTRICT_RELAXED )
+			&& ( f_iMode != D_PROMPT_MODE_MENU )
+			&& ! f_oString.get_length ( ) )
+		{
+		end_prompt ( );
+		return ( 0 );
+		}
+	if ( a_iCode != '\t' )
+		a_iCode = HEditControl::process_input ( a_iCode );
 	switch ( f_iMode )
 		{
-		case ( D_MODE_NORMAL ):
+		case ( D_PROMPT_MODE_NORMAL ):
+		case ( D_PROMPT_MODE_COMMAND ):
+		case ( D_PROMPT_MODE_SEARCH ):
 			{
 			a_iCode = process_input_normal ( a_iCode );
 			break;
 			}
-		case ( D_MODE_MENU ):
+		case ( D_PROMPT_MODE_MENU ):
 			{
 			a_iCode = process_input_menu ( a_iCode );
 			break;
@@ -130,10 +142,12 @@ int HStatusBarControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-void HStatusBarControl::set_prompt ( const char * a_pcPrompt, int a_iMode )
+void HStatusBarControl::set_prompt ( const char * a_pcPrompt, int a_iMode,
+		int a_iRestrict )
 	{
 	M_PROLOG
 	f_iMode = a_iMode;
+	f_iRestrict = a_iRestrict;
 	f_poParent->f_poPreviousFocusedChild = f_poParent->f_poFocusedChild;
 	f_poParent->f_poFocusedChild = f_poParent->f_poStatusBar;
 	f_poParent->f_poPreviousFocusedChild->kill_focus ( );
@@ -305,8 +319,16 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 		{
 		case ( '\r' ):
 			{
-			f_poParent->f_oCommand = f_oString;
 			end_prompt ( );
+			if ( f_iMode == D_PROMPT_MODE_COMMAND )
+				f_poParent->f_oCommand = f_oString;
+			else if ( f_iMode == D_PROMPT_MODE_SEARCH )
+				f_poParent->f_poPreviousFocusedChild->search ( f_oString );
+			break;
+			}
+		case ( '\t' ):
+			{
+			putchar ( '\a' );
 			break;
 			}
 		default :

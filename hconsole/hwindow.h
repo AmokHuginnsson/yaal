@@ -69,7 +69,7 @@ protected:
 private:
 	/*{*/
 	friend int HControl::set_focus ( char );
-	friend void HStatusBarControl::set_prompt ( const char *, int );
+	friend void HStatusBarControl::set_prompt ( const char *, int, int );
 	friend void HStatusBarControl::end_prompt ( void );
 	friend int HStatusBarControl::process_input_normal ( int );
 	void set_focus ( HControl * );

@@ -193,7 +193,7 @@ int HWindow::handler_command ( int a_iCode )
 	{
 	M_PROLOG
 	a_iCode = 0;
-	f_poStatusBar->set_prompt ( ":" );
+	f_poStatusBar->set_prompt ( ":", D_PROMPT_MODE_COMMAND );
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -203,7 +203,7 @@ int HWindow::handler_search ( int a_iCode )
 	M_PROLOG
 	a_iCode = 0;
 	if ( ! f_poFocusedChild->is_searchable ( ) )return ( a_iCode );
-	f_poStatusBar->set_prompt ( "/" );
+	f_poStatusBar->set_prompt ( "/", D_PROMPT_MODE_SEARCH );
 	return ( a_iCode );
 	M_EPILOG
 	}

@@ -257,3 +257,10 @@ bool HControl::hit_test ( int a_iRow, int a_iColumn )
 	M_EPILOG
 	}
 
+void HControl::search ( const HString & )
+	{
+	M_PROLOG
+	M_THROW ( "abstract control can not search", g_iErrNo );
+	M_EPILOG
+	}
+
