@@ -87,7 +87,7 @@ COMPILER_PRIME_FLAGS = -fPIC -D_GNU_SOURCE -march=i486
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
-	COMPILER_DEBUG_FLAGS = -g -g3 -ggdb -ggdb3 -pg -D__DEBUG__ $(DB)
+	COMPILER_DEBUG_FLAGS = -g -g3 -ggdb -ggdb3 -gstabs+ -pg -D__DEBUG__ $(DB)
 endif
 COMPILER_PATH_FLAGS = -I. -I$(HEADERSDIR) -I/usr/local/include
 # -fno-external-templates #deprecated
