@@ -140,11 +140,11 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 	static size_t	l_iBlockSize = 256;
 	static char * l_pcBuffer = 0;
 	int l_iIndex, l_iLenght, l_iSub;
-#ifdef __HOST_OS_TYPE_FREEBSD__
+#ifndef HAVE_GETLINE
 	int l_iReadLen = 0;
 	char * l_pcPtr = NULL;
 	if ( ! l_pcBuffer )l_iBlockSize = 256;
-#endif /* __HOST_OS_TYPE_FREEBSD__ */
+#endif /* not HAVE_GETLINE */
 	if ( ! a_psFile )
 		{
 		if ( l_pcBuffer )
@@ -157,19 +157,19 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 		}
 	if ( ! l_pcBuffer )l_pcBuffer = ( char * ) xcalloc ( l_iBlockSize );
 	a_roOption = a_roValue = "";
-#ifdef __HOST_OS_TYPE_FREEBSD__
-	while ( ( l_iReadLen = fread ( l_pcBuffer, sizeof ( char ), l_iBlockSize, a_psFile ) ) )
-#else /* __HOST_OS_TYPE_FREEBSD__ */
+#ifdef HAVE_GETLINE
 	while ( getline ( &l_pcBuffer, &l_iBlockSize, a_psFile ) > 0 )
-#endif /* not __HOST_OS_TYPE_FREEBSD__ */
+#else /* HAVE_GETLINE */
+	while ( ( l_iReadLen = fread ( l_pcBuffer, sizeof ( char ), l_iBlockSize, a_psFile ) ) )
+#endif /* not HAVE_GETLINE */
 		{
 		a_riLine ++;
-#ifdef __HOST_OS_TYPE_FREEBSD__
+#ifndef HAVE_GETLINE
 		l_pcPtr = ( char * ) memchr ( l_pcBuffer, '\n', l_iReadLen );
 		if ( ! l_pcPtr )continue;
 		* ++ l_pcPtr = 0;
 		fseek ( a_psFile, l_pcPtr - l_pcBuffer - l_iReadLen, SEEK_CUR );
-#endif /* __HOST_OS_TYPE_FREEBSD__ */
+#endif /* not HAVE_GETLINE */
 		for ( l_iIndex = 0; l_iIndex < ( int ) ( l_iBlockSize - 1 ); l_iIndex++ )
 			{
 			if ( ( l_pcBuffer [ l_iIndex ] == ' ')

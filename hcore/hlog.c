@@ -82,10 +82,10 @@ HLog::~HLog ( void )
 void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 	{
 	M_PROLOG
-#ifdef __HOST_OS_TYPE_FREEBSD__
+#ifndef HAVE_GETLINE
 	char * l_pcPtr = NULL;
 	int l_iLen = 0;
-#endif /* __HOST_OS_TYPE_FREEBSD__ */
+#endif /* not HAVE_GETLINE */
 	FILE * l_psTmpFile;
 	f_bRealMode = true;
 	if ( a_pcProcessName )f_pcProcessName = basename ( a_pcProcessName );
@@ -94,13 +94,13 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 	if ( f_psStream )
 		{
 		fseek ( f_psStream, 0, SEEK_SET );
-#ifdef __HOST_OS_TYPE_FREEBSD__
-		while ( ( l_iLen = fread ( f_pcBuffer, sizeof ( char ), f_iBufferSize, f_psStream ) ) )
-#else /* __HOST_OS_TYPE_FREEBSD__ */
+#ifdef HAVE_GETLINE 
 		while ( getline ( & f_pcBuffer, & f_iBufferSize, f_psStream ) > 0 )
-#endif /* not __HOST_OS_TYPE_FREEBSD__ */
+#else /* HAVE_GETLINE */
+		while ( ( l_iLen = fread ( f_pcBuffer, sizeof ( char ), f_iBufferSize, f_psStream ) ) )
+#endif /* not HAVE_GETLINE */
 			{
-#ifdef __HOST_OS_TYPE_FREEBSD__
+#ifndef HAVE_GETLINE
 			l_pcPtr = ( char * ) memchr ( f_pcBuffer, '\n', l_iLen );
 			if ( ! l_pcPtr )
 				{
@@ -109,7 +109,7 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 				}
 			* ++ l_pcPtr = 0;
 			fseek ( f_psStream, l_pcPtr - f_pcBuffer - l_iLen, SEEK_CUR );
-#endif /* __HOST_OS_TYPE_FREEBSD__ */
+#endif /* not HAVE_GETLINE */
 			timestamp ( a_psStream );
 			fprintf ( a_psStream, f_pcBuffer );
 			}
