@@ -40,7 +40,7 @@ Copyright:
 
 #include "db_driver_loader.h"
 
-const char g_pcDone [ ] = "done.\n";
+const char g_pcDone [ ] = "done.\r\n";
 
 char * g_pcDefaultSockPath = NULL;
 const char * g_ppcDriver [ 24 ] =
@@ -194,7 +194,7 @@ void dbwrapper_error ( void )
 void dbwrapper_exit ( void ) __attribute__  ((noreturn));
 void dbwrapper_exit ( void )
 	{
-	fprintf ( stderr, "failed.\n" );
+	fprintf ( stderr, "failed.\r\n" );
 	exit ( 1 );
 	}
 
