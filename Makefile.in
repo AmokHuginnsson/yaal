@@ -60,12 +60,12 @@ CXXFLAGS =	\
 						-Wconversion\
 						-Werror\
 						-Winline\
-						-Wlarger-than-1024\
+						-Wlarger-than-4096\
 						-Wlong-long\
 						-Wmissing-noreturn\
 						-Wmissing-prototypes\
 						-Wpointer-arith\
-						-Wshadow\
+						@SPECIAL_COMPILER_FLAGS@\
 						-Wsign-compare\
 						-Wstrict-prototypes\
 						-Wundef\
@@ -76,35 +76,31 @@ CXXFLAGS =	\
 						-Wnested-externs\
 						-Wtraditional\ #deprecated
 HEAVYCXXFLAGS =	\
-								-pedantic-errors\
+								@SPECIAL_HEAVY_COMPILER_FLAGS@\
 								-Waggregate-return\
 								-Wcast-qual\
 								-Wredundant-decls
-FLAGS2 =
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
+COMPILER_PRIME_FLAGS = -fPIC -D_GNU_SOURCE -march=i486
 ifdef NODEBUG
-	FLAGS3 = -O3 -fexpensive-optimizations
-	FLAGS4 =
+	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
-	FLAGS3 = -g -g3 -ggdb -ggdb3 -pg -D__DEBUG__ $(DB)
-	FLAGS4 =
+	COMPILER_DEBUG_FLAGS = -g -g3 -ggdb -ggdb3 -pg -D__DEBUG__ $(DB)
 endif
-FLAGS5 = -D_GNU_SOURCE -march=i486
+COMPILER_PATH_FLAGS = -I. -I$(HEADERSDIR) -I/usr/local/include
 # -fno-external-templates #deprecated
-FLAGS6 = -L/usr/local/lib @EXTRA_LIB_PATHS@
-FLAGS7 = -fPIC -I. -I$(HEADERSDIR)
-FLAGS8 =	\
-					-shared\
-					-L$(TARGETDIR)\
-					@SPECIAL_LINKER_FLAGS@\
-					-Wl,--fatal-warnings\
-					-Wl,--demangle\
-					-Wl,--export-dynamic\
-					-Wl,-soname,
-FLAGS = $(FLAGS1) $(FLAGS3) $(FLAGS5) $(FLAGS7)
-FLAGS0 = $(FLAGS2) $(FLAGS4) $(FLAGS6) $(FLAGS8)
+LINKER_PATH_FLAGS = -L. -L$(TARGETDIR) -L/usr/local/lib @EXTRA_LIB_PATHS@
+LINKER_PRIME_FLAGS =	\
+								-shared\
+								@SPECIAL_LINKER_FLAGS@\
+								-Wl,--fatal-warnings\
+								-Wl,--demangle\
+								-Wl,--export-dynamic\
+								-Wl,-soname,
+COMPILER_FLAGS = $(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) $(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS)
+LINKER_FLAGS = $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 
 #	h-core
 OBJ4hcore =
@@ -232,14 +228,14 @@ SRCEXS := $(patsubst %.oo, %.c, $(SRCEXS))
 	
 %.o : %.c
 	@echo -n "Compiling \`$@' ... "
-	@$(CXX) $(CXXFLAGS) $(HEAVYCXXFLAGS) $(FLAGS) $< -c -o $@ 2>&1 | tee -a make.log
+	@$(CXX) $(CXXFLAGS) $(HEAVYCXXFLAGS) $(COMPILER_FLAGS) $< -c -o $@ 2>&1 | tee -a make.log
 	@echo "done."
 
 # this one is for files that use features that breaks ANSI C++
 
 %.oo : %.c
 	@echo -n "Compiling \`$@' ... "
-	@$(CXX) $(CXXFLAGS) $(FLAGS) $< -c -o $@ 2>&1 | tee -a make.log
+	@$(CXX) $(CXXFLAGS) $(COMPILER_FLAGS) $< -c -o $@ 2>&1 | tee -a make.log
 	@echo "done."
 	
 #	this is "rule" for linking libs
@@ -247,7 +243,7 @@ SRCEXS := $(patsubst %.oo, %.c, $(SRCEXS))
 $(TARGET):
 	@if [ "$(TARGET)" = "" -o "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi
 	@echo -n "Linking \`$@ ... "
-	@$(LXX) $(LIBS) $(FLAGS0)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) $(OBJ4$(NAME)) 2>&1 | tee -a make.log
+	@$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) $(OBJ4$(NAME)) 2>&1 | tee -a make.log
 	@$(AR) $(ARFLAGS) lib$(NAME).a $(OBJ4$(NAME)) 2>&1 | tee -a make.log
 	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(TARGETDIR)/
 	@/bin/mv -f lib$(NAME).a $(TARGETDIR)/
@@ -289,7 +285,7 @@ $(POSTGRESQL_DRIVER): $(HCORE) $(OBJ4postgresql_driver)
 	@$(MAKE) $(POSTGRESQL_DRIVER)\' TARGET=$(POSTGRESQL_DRIVER)\' NAME=postgresql_driver LIBS="-lpq -lhcore"
 
 $(DBWRAPPER) : $(HCORE) $(OBJ4dbwrapper)
-	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-Wl,-init,dbwrapper_init -Wl,-fini,dbwrapper_fini -rdynamic -ldl -lhcore"
+	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-Wl,-init,dbwrapper_init -Wl,-fini,dbwrapper_fini -rdynamic @DLOPEN_IN@ -lhcore"
 # dbwrapper END
 
 $(HDATA): $(HCONSOLE) $(OBJ4hdata)
@@ -307,9 +303,9 @@ $(HAPIHDR): $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hda
 	@echo '#ifndef __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
 	@echo '#define __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
 	@echo '' >> $(HEADERSDIR)/stdhapi.h
-	@find $(HEADERSDIR) ! -name 'stdhapi.h' -type f -printf "#include <%f>\n" | sort >> $(HEADERSDIR)/stdhapi.h
+	@find $(HEADERSDIR) ! -name 'stdhapi.h' -type f | awk '{printf "#include <%s>\n", substr ($$1,3,99)}' | sort >> $(HEADERSDIR)/stdhapi.h
 	@echo '' >> $(HEADERSDIR)/stdhapi.h
-	@echo '#endif /* __STDHAPI_H */' >> $(HEADERSDIR)/stdhapi.h
+	@echo '#endif /* not __STDHAPI_H */' >> $(HEADERSDIR)/stdhapi.h
 	@echo "done."
 
 $(CACHE):
@@ -322,8 +318,8 @@ $(CACHE):
 dep: .depend
 .depend: $(SRCS) $(SRCEXS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
 	@echo -n 'Making dependicies ... '
-	@set -e; $(CXX) -I. -MM $(SRCS) | sed -e s/'^\(.\+: \.\/\)\([a-z]\+\)'/'\2\/\1\2'/ > .depend
-	@set -e; $(CXX) -I. -MM $(SRCEXS) | sed -e s/'^\(.\+: \.\/\)\([a-z]\+\)'/'\2\/\1\2'/ -e s/'\.o\>'/'\.oo'/ >> .depend
+	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCS) | sed -e s/'^\(.\+: \.\/\)\([a-z]\+\)'/'\2\/\1\2'/ > .depend
+	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCEXS) | sed -e s/'^\(.\+: \.\/\)\([a-z]\+\)'/'\2\/\1\2'/ -e s/'\.o\>'/'\.oo'/ >> .depend
 	@echo 'done.'
 
 clean:
@@ -347,7 +343,7 @@ mrproper: clean
 	@echo "done."
 
 purge: mrproper
-	/bin/rm -rf autom4te.cache configure config.cache config.log config.status
+	/bin/rm -rf autom4te.cache configure config.cache config.log config.status configure.lineno
 	/bin/rm -rf Makefile config.h
 
 ifneq ($(wildcard .depend),)
