@@ -38,7 +38,7 @@ Copyright:
 #	error "No libpq-fe.h header available."
 #endif /* not HAVE_LIBPQ_FE_H */
 
-#include <xalloc.h>
+#include "../hcore/xalloc.h"
 
 #ifndef NULL
 #define NULL	0

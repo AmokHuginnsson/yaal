@@ -28,10 +28,9 @@ Copyright:
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-
-#include <xalloc.h>
-
 #include <sqlite3.h>
+
+#include "../hcore/xalloc.h"
 
 #ifndef NULL
 #define NULL	0

@@ -28,7 +28,7 @@ Copyright:
 #include <stdio.h>
 #include <string.h>
 
-#include <xalloc.h>
+#include "../hcore/xalloc.h"
 
 #include "../config.h"
 
