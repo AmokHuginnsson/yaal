@@ -89,6 +89,7 @@ protected:
 																			 thru pattern */
 		regex_t 	f_sMask;							/* regular expression for search patterns */
 		HString		f_oPattern;						/* current search pattern */
+		HString		f_oRealPattern;				/* pattern with stripped switches */
 		} f_sSearch;
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */

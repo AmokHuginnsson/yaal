@@ -771,14 +771,14 @@ void HListControl::search ( const HString & a_oPattern )
 
 bool HListControl::parse_pattern ( void )
 	{
-	int l_iCtr = 0;
+	int l_iCtr = 0, l_iBegin = 0, l_iEnd = 0;
 	char * l_pcPattern = f_sSearch.f_oPattern;
 	f_sSearch.f_bIgnoreCase = false;
 	f_sSearch.f_bFiltered = false;
 	f_sSearch.f_bExtended = false;
-	while ( l_pcPattern [ l_iCtr ++ ] == '\\' )
+	while ( l_pcPattern [ l_iCtr ] == '\\' )
 		{
-		switch ( l_pcPattern [ l_iCtr ] )
+		switch ( l_pcPattern [ ++ l_iCtr ] )
 			{
 			case ( 'i' ):{f_sSearch.f_bIgnoreCase = true;break;}
 			case ( 'e' ):{f_sSearch.f_bExtended = true;break;}
@@ -792,6 +792,27 @@ bool HListControl::parse_pattern ( void )
 			}
 		l_iCtr ++;
 		}
+	if ( l_pcPattern [ l_iCtr ] == '/' )l_iCtr ++;
+	l_iBegin = l_iCtr;
+	l_iEnd = l_iCtr = f_sSearch.f_oPattern.get_length ( ) - 1;
+	while ( ( l_iCtr > 0 ) && ( l_pcPattern [ l_iCtr ] != '/' ) )
+		{
+		switch ( l_pcPattern [ l_iCtr ] )
+			{
+			case ( 'i' ):{f_sSearch.f_bIgnoreCase = true;break;}
+			case ( 'e' ):{f_sSearch.f_bExtended = true;break;}
+			case ( 'f' ):{f_sSearch.f_bFiltered = true;break;}
+			default :
+				{
+				l_iCtr = 1;
+				break;
+				}
+			}
+		l_iCtr --;
+		}
+	if ( l_iCtr )l_iEnd = l_iCtr - 1;
+	f_sSearch.f_oRealPattern = f_sSearch.f_oPattern.mid ( l_iBegin,
+			l_iEnd - l_iBegin + 1 );
 	return ( false );
 	}
 
