@@ -80,8 +80,11 @@ AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[63%]]])
 _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
 CXXFLAGS=["-Wextra"]
-AC_TRY_COMPILE([],[],[AC_SUBST([EXTRA_WARNINGS],[-Wextra])],
+AC_MSG_CHECKING([does gcc support -Wextra])
+RESULT=["no"]
+AC_TRY_COMPILE([],[],[AC_SUBST([EXTRA_WARNINGS],[-Wextra])] [RESULT=["yes"]],
 							[AC_SUBST([EXTRA_WARNINGS],[-W])])
+AC_MSG_RESULT([$RESULT])
 CXXFLAGS=["-Wshadow -Werror"]
 AC_TRY_COMPILE([#include <pthread.h>],[],
 							[AC_SUBST([SPECIAL_COMPILER_FLAGS],[-Wshadow])
@@ -102,12 +105,14 @@ if test ["$_FLAGS"] = [""] ; then
 fi
 AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
 
+AC_MSG_RESULT([--- Additional checks ... ---                           [[67%]]])
 AC_SUBST([SERIAL_DEVICE],['null'])
 AC_CHECK_FILE([[/dev/cuaa0]],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
 	[AC_CHECK_FILE([/dev/ttyS0],[AC_SUBST([SERIAL_DEVICE],['ttyS0'])])])
 
 dnl Test if dynamic loader is in libc or in separate library dl.
-dnl This one is silent.
+AC_MSG_CHECKING([whether dl library is inside libc])
+RESULT=["no"]
 CXXFLAGS=["-ldl"]
 AC_LINK_IFELSE([[#include <dlfcn.h>
 int main()
@@ -115,10 +120,12 @@ int main()
 	dlopen("",0);
 	return(0);
 	}
-]],[AC_SUBST([DLOPEN_IN],[-ldl])],[])
+]],[AC_SUBST([DLOPEN_IN],[-ldl])],[RESULT=["yes"]])
+AC_MSG_RESULT([$RESULT])
 
 dnl Test if gettext is in libc or in separate library intl.
-dnl This one is silent.
+AC_MSG_CHECKING([whether intl(gettext) library is inside libc])
+RESULT=["no"]
 CXXFLAGS=["-lintl"]
 AC_LINK_IFELSE([[#include <libintl.h>
 int main()
@@ -126,7 +133,24 @@ int main()
 	gettext("");
 	return(0);
 	}
-]],[AC_SUBST([GETTEXT_LIB],[-lintl])],[])
+]],[AC_SUBST([GETTEXT_LIB],[-lintl])],[RESULT=["yes"]])
+AC_MSG_RESULT([$RESULT])
+
+CXXFLAGS=$CXXFLAGS_ORIG
+AC_MSG_CHECKING([whether strftime() returns required buffer size])
+RESULT=["no"]
+AC_TRY_RUN([#include <time.h>
+#define NULL	0
+int main ( void )
+	{
+	int size = 0;
+	time_t t = time ( NULL );
+	struct tm broken;
+	localtime_r ( & t, & broken );
+	size = strftime ( NULL, 1024, "%F %T", & broken );
+	return ( ! size );
+	}], [AC_DEFINE([HAVE_SMART_STRFTIME])] [RESULT=["yes"]])
+AC_MSG_RESULT([$RESULT])
 
 DEFAULT_DRIVER=["null"]
 
