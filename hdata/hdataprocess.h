@@ -45,6 +45,8 @@ public:
 	/*}*/
 protected:
 	/*{*/
+	virtual int handler_quit ( int, void * = NULL );
+	virtual int handler_close_window ( int, void * = NULL );
 	/*}*/
 	};
 

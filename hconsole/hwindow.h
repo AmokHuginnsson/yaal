@@ -58,8 +58,7 @@ public:
 	virtual int handler_jump_tab ( int ); /* jump thru controlos with tab key */
 	virtual int handler_jump_direct ( int ); /* direct jump to specified cntrl */
 	int add_control ( HControl *, int );
-	void init_progress ( double, const char *, bool = true );
-	void update_progress ( double = -1, const char * = NULL );
+	HStatusBarControl * status_bar ( void );
 	/*}*/
 protected:
 	/*{*/

@@ -54,6 +54,7 @@ public:
 	virtual ~HDataWindow ( void );
 	virtual int init ( void );
 	void set_sync_store ( HItem * = NULL );
+	bool is_modified ( void );
 	/*}*/
 protected:
 	/*{*/

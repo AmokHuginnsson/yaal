@@ -66,7 +66,7 @@ HDataListControl::~HDataListControl ( void )
 	M_EPILOG
 	}
 
-void HDataListControl::populate ( long int /*a_iId*/ )
+void HDataListControl::load ( long int /*a_iId*/ )
 	{
 	M_PROLOG
 	int l_iCount = 0, l_iCtr = 0, l_iQuantity = f_iQuantity;
@@ -79,11 +79,11 @@ void HDataListControl::populate ( long int /*a_iId*/ )
 	l_poParent->set_sync_store ( & l_oItem );
 	if ( f_poRecordSet->is_open ( ) )l_iCount = f_poRecordSet->requery ( );
 	else l_iCount = f_poRecordSet->open ( );
-	l_poParent->init_progress ( l_iCount, "Collecting ..." );
+	l_poParent->status_bar ( )->init_progress ( l_iCount, "Collecting ..." );
 	if ( f_iQuantity )go ( 0 );
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
-		l_poParent->update_progress ( );
+		l_poParent->status_bar ( )->update_progress ( );
 		if ( l_iCtr ++ < l_iQuantity )
 			{	
 			f_poSelected->get_object ( ) = l_oItem;

@@ -45,8 +45,8 @@ protected:
 	HWindow *	f_poForegroundWindow; /* sefl explanary */
 	HWindowListControl * f_poWindows;			/* current existing windows */
 	HList < HHandler < int ( HProcess::* ) ( int ) > > f_oFileDescriptorHandlers;
-	HList < HHandler < int ( HProcess::* ) ( int ) > > f_oPreprocessHandlers;
-	HList < HHandler < int ( HProcess::* ) ( int ) > > f_oPostprocessHandlers;
+	HList < HHandler < int ( HProcess::* ) ( int, void * = NULL ) > > f_oPreprocessHandlers;
+	HList < HHandler < int ( HProcess::* ) ( int, void * = NULL ) > > f_oPostprocessHandlers;
 	/*}*/
 public:
 	/*{*/
@@ -63,15 +63,15 @@ protected:
 	int postprocess_input ( int );
 	int register_file_descriptor_handler ( int, int ( HProcess::* ) ( int ) );
 	int unregister_file_descriptor_handler ( int );
-	int register_preprocess_handler ( int, int ( HProcess::* ) ( int ) );
-	int register_postprocess_handler ( int, int ( HProcess::* ) ( int ) );
+	int register_preprocess_handler ( int, int ( HProcess::* ) ( int, void * ) );
+	int register_postprocess_handler ( int, int ( HProcess::* ) ( int, void * ) );
 	int add_window ( HWindow *, const char * );
-	virtual int handler_idle ( int );
-	virtual int handler_refresh ( int );
-	virtual int handler_quit ( int );
-	virtual int handler_jump_meta_tab ( int );
-	virtual int handler_jump_meta_direct ( int );
-	virtual int handler_close_window ( int );
+	virtual int handler_idle ( int, void * = NULL );
+	virtual int handler_refresh ( int, void * = NULL );
+	virtual int handler_quit ( int, void * = NULL );
+	virtual int handler_jump_meta_tab ( int, void * = NULL );
+	virtual int handler_jump_meta_direct ( int, void * = NULL );
+	virtual int handler_close_window ( int, void * = NULL );
 	/*}*/
 	};
 

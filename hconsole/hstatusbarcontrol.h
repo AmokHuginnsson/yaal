@@ -53,7 +53,9 @@ public:
 	void setup ( const char *, const char *, int );
 	void init_progress ( double, const char *, bool = true );
 	void update_progress ( double = -1, const char * = NULL );
-	void display ( const char *, int = -1 );
+	void message ( int, const char *, ... );
+	void message ( const char *, ... );
+	bool confirm ( const char * );
 	/*}*/
 	};
 

@@ -44,7 +44,7 @@ HDataControl::~HDataControl ( void )
 	M_EPILOG
 	}
 
-void HDataControl::populate ( long int )
+void HDataControl::load ( long int )
 	{
 	M_PROLOG
 	return;

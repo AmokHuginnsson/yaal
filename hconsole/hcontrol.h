@@ -88,9 +88,12 @@ public:
 	void draw_label ( void );
 	void set_attributes ( int, int, int );
 	void move ( int, int, int, int );
-#define M_SET_ATTR_LABEL( )	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 )
-#define M_SET_ATTR_SHORTCUT( )	console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 )
-#define M_SET_ATTR_DATA( )	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute )
+#define M_ATTR_LABEL( )	f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8
+#define M_ATTR_SHORTCUT( )	! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8
+#define M_ATTR_DATA( )	f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute
+#define M_SET_ATTR_LABEL( )	console::set_attr ( M_ATTR_LABEL ( ) )
+#define M_SET_ATTR_SHORTCUT( )	console::set_attr ( M_ATTR_SHORTCUT ( ) )
+#define M_SET_ATTR_DATA( )	console::set_attr ( M_ATTR_DATA ( ) )
 	/*}*/
 	};
 

@@ -239,9 +239,22 @@ void set_attr( unsigned char a_ucAttr )
 	return ;
 	M_EPILOG
 	}
-	
+
 int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 							 const char * a_pcFormat, ... )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	va_list l_xAp;
+	va_start ( l_xAp, a_pcFormat );
+	l_iError = c_printf ( a_iRow, a_iColumn, a_iAttribute, a_pcFormat, l_xAp );
+	va_end ( l_xAp );
+	return ( l_iError );
+	M_EPILOG
+	}
+	
+int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
+							 const char * a_pcFormat, va_list a_xAp )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -249,7 +262,6 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	int l_iOrigColumn = 0;
 	int l_iOrigAttribute = 0;
 	int l_iOrigCursState = 0;
-	va_list l_sAp;
 	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	l_iOrigAttribute = get_attr ( );
 	leaveok ( stdscr, true );
@@ -268,9 +280,7 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	if ( ( a_iRow < 0 ) || ( a_iRow >= n_iHeight ) )
 		throw new HException ( __WHERE__, "bad row.", a_iRow );
 	set_attr ( a_iAttribute );
-	va_start ( l_sAp, a_pcFormat );
-	vwprintw ( stdscr, a_pcFormat, l_sAp );
-	va_end ( l_sAp );
+	vwprintw ( stdscr, a_pcFormat, a_xAp );
 	move ( l_iOrigRow, l_iOrigColumn );
 	curs_set ( l_iOrigCursState );
 	leaveok ( stdscr, false );

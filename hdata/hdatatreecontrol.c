@@ -50,7 +50,7 @@ HDataTreeControl::~HDataTreeControl ( void )
 	M_EPILOG
 	}
 
-void HDataTreeControl::populate ( long int /*a_iId*/ )
+void HDataTreeControl::load ( long int /*a_iId*/ )
 	{
 	M_PROLOG
 	f_poRecordSet->open ( );

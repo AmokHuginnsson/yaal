@@ -40,7 +40,7 @@ public:
 	HDataTreeControl ( HRecordSet *, HWindow *, int, int, int, int, const char *,
 			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataTreeControl ( void );
-	virtual void populate ( long int );
+	virtual void load ( long int );
 	/*}*/
 protected:
 	/*{*/

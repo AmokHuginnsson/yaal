@@ -40,7 +40,7 @@ public:
 	/*{*/
 	HDataControl ( HRecordSet * );
 	virtual ~HDataControl ( void );
-	virtual void populate ( long int = 0 );
+	virtual void load ( long int = 0 );
 	virtual long int get_current_id ( void );
 	virtual void add_new ( void );
 	virtual void cancel_new ( void );

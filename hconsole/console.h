@@ -27,6 +27,8 @@ Copyright:
 #ifndef __CONSOLE_H
 #define __CONSOLE_H
 
+#include <stdarg.h>
+
 #ifdef HAVE_CONFIG_H
 #	include "../config.h"
 #endif /* HAVE_CONFIG_H */
@@ -91,6 +93,7 @@ void enter_curses( void );
 void leave_curses( void );
 void set_attr( unsigned char attr );
 int c_printf ( int, int, int, const char *, ... );
+int c_printf ( int, int, int, const char *, va_list );
 int get_key( void );
 int kbhit( void );
 char get_attr( void );

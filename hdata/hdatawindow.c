@@ -210,7 +210,7 @@ int HDataWindow::init ( void )
 	f_poMainControl->set_focus ( );
 	if ( f_poMainControl )
 		{
-		f_poMainControl->populate ( );
+		f_poMainControl->load ( );
 		f_poMainControl->process_input ( KEY_HOME );
 		}
 	refresh ( );
@@ -322,7 +322,7 @@ int HDataWindow::handler_add_new ( int )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->display ( "You can not add new rocord now.",
+		f_poStatusBar->message ( "You can not add new rocord now.",
 				D_FG_BRIGHTRED );
 		return ( 0 );
 		}
@@ -338,7 +338,7 @@ int HDataWindow::handler_edit ( int )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->display ( "You can not start editing of this record.",
+		f_poStatusBar->message ( "You can not start editing of this record.",
 				D_FG_BRIGHTRED );
 		return ( 0 );
 		}
@@ -353,13 +353,13 @@ int HDataWindow::handler_delete ( int )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->display ( "You can not delete this record.",
+		f_poStatusBar->message ( "You can not delete this record.",
 				D_FG_BRIGHTRED );
 		return ( 0 );
 		}
 	if ( f_poMainControl )m_lId = f_poMainControl->get_current_id ( );
 	remove ( );
-	f_poMainControl->populate ( );
+	f_poMainControl->load ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -369,13 +369,13 @@ int HDataWindow::handler_save ( int )
 	M_PROLOG
 	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
 		{
-		f_poStatusBar->display ( "There is nothing to save.",
+		f_poStatusBar->message ( "There is nothing to save.",
 				D_FG_BRIGHTRED );
 		return ( 0 );
 		}
 	m_lId = update ( );
 	set_mode ( D_MODE_VIEW );
-	f_poMainControl->populate ( );
+	f_poMainControl->load ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -385,12 +385,12 @@ int HDataWindow::handler_requery ( int )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->display ( "Finish your current operation first.",
+		f_poStatusBar->message ( "Finish your current operation first.",
 				D_FG_BRIGHTRED );
 		return ( 0 );
 		}
 	set_mode ( D_MODE_VIEW );
-	f_poMainControl->populate ( );
+	f_poMainControl->load ( );
 	refresh ( );
 	return ( 0 );
 	M_EPILOG
@@ -406,8 +406,12 @@ int HDataWindow::handler_cancel ( int )
 	set_mode ( D_MODE_VIEW );
 	if ( ( l_iMode == D_MODE_ADDING ) && f_poMainControl )
 		f_poMainControl->cancel_new ( );
-	f_poStatusBar->display ( "Dropping all changes.", D_FG_BRIGHTRED );
+	f_poStatusBar->message ( "Dropping all changes.", D_FG_BRIGHTRED );
 	return ( 0 );
 	M_EPILOG
 	}
 
+bool HDataWindow::is_modified ( void )
+	{
+	return ( f_bModified );
+	}

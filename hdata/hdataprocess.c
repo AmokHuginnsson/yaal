@@ -30,6 +30,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
 #include "../dbwrapper/db_driver_loader.h"
 #include "hdataprocess.h"
+#include "hdatawindow.h"
 
 HDataProcess::HDataProcess ( void ) : HProcess ( )
 	{
@@ -60,3 +61,32 @@ HDataBase * HDataProcess::data_base ( void )
 	return ( & f_oDataBase );
 	}
 
+int HDataProcess::handler_quit ( int a_iCode, void * )
+	{
+	M_PROLOG
+	HDataWindow * l_poWindow = NULL;
+	if ( f_poForegroundWindow )
+		{
+		l_poWindow = ( HDataWindow * ) f_poForegroundWindow;
+		if ( ! l_poWindow->is_modified ( )
+				|| l_poWindow->status_bar ( )->confirm ( "exit program" ) )
+			return ( HProcess::handler_quit ( a_iCode ) );
+		}
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HDataProcess::handler_close_window ( int a_iCode, void * )
+	{
+	M_PROLOG
+	HDataWindow * l_poWindow = NULL;
+	if ( f_poForegroundWindow )
+		{
+		l_poWindow = ( HDataWindow * ) f_poForegroundWindow;
+		if ( ! l_poWindow->is_modified ( )
+				|| l_poWindow->status_bar ( )->confirm ( "close window" ) )
+			return ( HProcess::handler_close_window ( a_iCode ) );
+		}
+	return ( 0 );
+	M_EPILOG
+	}

@@ -650,7 +650,7 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 	HInfo & l_roRightInfo = a_poRight->get_object ( ) [ f_iSortColumn ];
 	f_lComparedItems ++;
 	if ( ( f_iQuantity > 1024 ) && ! ( f_lComparedItems % 1024 ) )
-		f_poParent->update_progress ( f_lComparedItems );
+		f_poParent->status_bar ( )->update_progress ( f_lComparedItems );
 	switch ( ( ( int ) f_oHeader [ f_iSortColumn ] ) & D_TYPE_MASK )
 		{
 		case ( D_TYPE_LONG_INT ):
@@ -692,7 +692,8 @@ void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 	f_lComparedItems = 0;
 	cmp = ( int ( HList<HItem>::* ) ( HElement *, HElement * ) ) & HListControl::cmpc;
 	if ( f_iQuantity > 128 )
-		f_poParent->init_progress ( f_iQuantity * f_iQuantity / 2, " Sorting ..." );
+		f_poParent->status_bar ( )->init_progress ( f_iQuantity * f_iQuantity / 2,
+				" Sorting ..." );
 	sort ( );
 	return;
 	M_EPILOG

@@ -36,6 +36,8 @@ Copyright:
 #define NULL 0
 #endif /* not NULL */
 
+#define _(string) gettext (string)
+
 #define M_CVSID(id) static char __CVSID__ [ ] __attribute__((__unused__)) = id
 #define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
 #define M_TRY try{
