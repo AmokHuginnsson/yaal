@@ -60,7 +60,8 @@ HArray < tType >::HArray ( int a_iSize )
 	M_PROLOG
 	f_iSize = 0;
 	f_ptArray = NULL;
-	if ( a_iSize < 0 )throw new HException ( __WHERE__, "bad size", a_iSize );
+	if ( a_iSize < 0 )
+		throw new HException ( __WHERE__, "bad size", a_iSize );
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{

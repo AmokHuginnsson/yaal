@@ -196,11 +196,7 @@ MYSQL_SOCKET=[`grep -s "^socket" $FILES|awk '{sub(".*=[ \\t]+","");print;exit}'`
 AC_SUBST([MYSQL_SOCKET],[$MYSQL_SOCKET])
 
 AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
-AC_CONFIG_COMMANDS_PRE([cd hcore;ln -sf harray.h harray.c;
-												ln -sf hlist.h hlist.c;ln -sf htree.h htree.c;cd ..;
-												cd hconsole;ln -sf hhandler.h hhandler.c;
-												ln -sf omenuitem.h omenuitem.c;cd ..;cd hdata;
-												ln -sf oresource.h oresource.c;cd ..;cd doc/html;
+AC_CONFIG_COMMANDS_PRE([cd doc/html;
 												ln -sf stdhapi_toc.html index.html;cd ../..])
 
 if test ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] ; then

@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "hmap.h"
 
 unsigned long int const x_tag_g_pulPrimes [ 32 ] =
