@@ -129,7 +129,7 @@ void HRecordSet::build_sql ( void )
 			}
 		case ( D_MODE_ADDING ):
 			{
-			f_oSQL = "INSERT " + f_oTable + " ( ";
+			f_oSQL = "INSERT INTO " + f_oTable + " ( ";
 			for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 				{
 				if ( l_iCtr == f_iIdFieldOffset )continue;
