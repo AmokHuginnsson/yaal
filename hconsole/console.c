@@ -54,9 +54,20 @@ namespace stdhapi
 namespace hconsole
 {
 
-#define M_MAKE_ATTR(attr) COLOR_PAIR( ( ( ( attr ) & 112 ) >> 1 ) \
-													| ( attr ) & 7 ) | ( ( attr ) & 8 ? A_BOLD : 0 ) \
-													| ( ( attr ) & 128 ? A_BLINK : 0 )
+/* Bbbbffff
+ * B - blink
+ * b - background color bits
+ * f - foreground color bits
+ * 112 - 01110000
+ * 7   - 00000111
+ * 8   - 00001000
+ * 128 - 10000000
+ */
+#define M_MAKE_ATTR(attr) COLOR_PAIR( \
+		( ( ( attr ) & 112 ) >> 1 ) 				/* background */ \
+			| ( attr ) & 7 ) 									/* foreground */ \
+	| ( ( ( attr ) & 8 ) ? A_BOLD : 0 ) 	/* brighter foreground */ \
+		| ( ( attr ) & 128 ? A_BLINK : 0 )	/* brighter background */
 
 /* public: */
 bool n_bNeedRepaint = false;
@@ -114,8 +125,7 @@ void enter_curses( void )
 	assume_default_colors ( COLOR_BLACK, COLOR_BLACK );
 	for ( l_iBg = 0; l_iBg < 8; l_iBg ++ )
 		for ( l_iFg = 0; l_iFg < 8; l_iFg ++ )
-			init_pair ( l_piColors [ l_iBg ] * 8 + l_piColors [ l_iFg ],
-					l_piColors [ l_iFg ], l_iBg );
+			init_pair ( l_iBg * 8 + l_iFg, l_piColors [ l_iFg ], l_piColors [ l_iBg ] );
 	attrset ( COLOR_PAIR( 7 ) );
 	bkgd ( ' ' | M_MAKE_ATTR ( D_FG_LIGHTGRAY | D_BG_BLACK ) | A_INVIS );
 	n_bEnabled = true;
