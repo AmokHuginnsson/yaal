@@ -50,7 +50,7 @@ namespace console
 #define D_CURSOR_VISIBLE			1
 #define D_CURSOR_VERY_VISIBLE	2
 
-#define D_ATTR_DEFAULT			-1
+#define D_ATTR_DEFAULT				-1
 
 #define D_FG_BLACK					0
 #define D_FG_RED						1
@@ -80,9 +80,11 @@ namespace console
 
 #define D_BG_BLINK					128
 
+#define D_ATTR_NORMAL				( D_FG_LIGHTGRAY | D_BG_BLACK )
+
 #define D_KEY_ESC						27
-#define D_KEY_REFRESH	D_KEY_CTRL_L
-#define D_KEY_RESIZE	D_KEY_CTRL_L
+#define D_KEY_REFRESH				D_KEY_CTRL_L
+#define D_KEY_RESIZE				D_KEY_CTRL_L
 
 #define D_KEY_META_BASE			0x04000
 #define D_KEY_COMMAND_BASE	0x08000
