@@ -118,16 +118,17 @@ void HRecordSet::build_sql ( void )
 			}
 		case ( D_MODE_EDITING ):
 			{
-			f_oBuffer = "UPDATE " + f_oTable + " SET ";
-			for ( l_iCtr = 1; l_iCtr < f_iFieldCount; l_iCtr ++ )
+			f_oSQL = "UPDATE " + f_oTable + " SET ";
+			for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 				{
-				if ( l_iCtr > 1 )f_oBuffer += ", ";
+				if ( l_iCtr == f_iIdFieldOffset )continue;
+				if ( ! f_oBuffer.is_empty ( ) )f_oBuffer += ", ";
 				f_oBuffer += f_oColumnNames [ l_iCtr ] + " = '" + f_oValues [ l_iCtr ] + '\'';
 				}
 			f_oBuffer += " WHERE id = ";
-			f_oBuffer += m_id;
-			f_oBuffer += ';';
-			f_oSQL = f_oBuffer;
+			f_oSQL += f_oBuffer;
+			f_oBuffer.format ( "%ld;", m_id );
+			f_oSQL += f_oBuffer;
 			break;
 			}
 		case ( D_MODE_ADDING ):
@@ -170,6 +171,7 @@ long int HRecordSet::open ( const char * a_pcQuery )
 	if ( a_pcQuery )f_oSQL = a_pcQuery;
 	else build_sql ( );
 	free ( );
+	f_iCursorPosition = 0;
 	f_iSetQuantity = f_poDataBase->query ( f_oSQL );
 	f_pvCoreData = f_poDataBase->get_result ( );
 	f_iFieldCount = dbwrapper::rs_fields_count ( f_pvCoreData );

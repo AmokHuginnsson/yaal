@@ -81,6 +81,7 @@ void HListControl::refresh ( void )
 	int l_iTmp = 0;
 	long int l_lValue = 0;
 	double l_dScaled = 0;
+	HElement * l_poElement = f_poSelected;
 	HInfo l_oInfo;
 	l_iTmp = f_iWidthRaw;
 	draw_label ( );
@@ -259,6 +260,7 @@ void HListControl::refresh ( void )
 		cprintf ( "#" );
 		}
 	curs_set ( 0 );
+	f_poSelected = l_poElement;
 	return;
 	M_EPILOG
 	}

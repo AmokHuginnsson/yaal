@@ -24,6 +24,18 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "../config.h"
+
+/* We need ncurses.h here because of KEY_HOME. */
+
+#ifdef HAVE_NCURSES_H
+#	include <ncurses.h>
+#elif defined ( HAVE_NCURSES_NCURSES_H )
+#	include <ncurses/ncurses.h>
+#else /* HAVE_NCURSES_NCURSES_H */
+#	error "No ncurses header available."
+#endif /* not HAVE_NCURSES_NCURSES_H */
+
 #include "hdatawindow.h"
 #include "hdatalistcontrol.h"
 #include "hdatatreecontrol.h"
@@ -180,8 +192,11 @@ int HDataWindow::init ( void )
 		l_iCtr ++;
 		}
 	f_poMainControl->set_focus ( );
-	open ( );
-	if ( f_poMainControl )f_poMainControl->populate ( );
+	if ( f_poMainControl )
+		{
+		f_poMainControl->populate ( );
+		f_poMainControl->process_input ( KEY_HOME );
+		}
 	refresh ( );
 	return ( 0 );
 	M_EPILOG
@@ -268,7 +283,7 @@ void HDataWindow::sync ( void )
 		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 			( * f_poSyncStore ) [ l_iCtr ] = f_oValues [ l_iCtr ];
 		}
-	else if ( ( f_iMode == D_MODE_ADDING ) || ( f_iMode == D_MODE_EDIT ) )
+	else if ( ( f_iMode == D_MODE_ADDING ) || ( f_iMode == D_MODE_EDITING ) )
 		{
 		l_iCount = f_oEditModeControls.quantity ( );
 		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
