@@ -1,9 +1,12 @@
 # stdhapi library configuration file.
 # comments begin with `#' char and continues until end of line
+# configuration file is divided into sections, each section
+# begins with [secttion_name] mark, each option may be placed
+# only in section it belongs to.
 # option names are case insensitive
 # in most cases option values are case insensitive also
 # syntax for settings is:
-#	^{option}{white}{value1 value2 ... valuen}$
+# ^{option}{white}{value1 value2 ... valuen}$
 # we currently distinguish between four kind of value types:
 # bool   - (true|yes|on|false|no|off)
 # char   - [a-z]
@@ -16,12 +19,30 @@
 ### console BEGIN
 [console]
 
+# force enabling of mouse interface, warning, when this option
+# is enabled and mouse interface is not available stdhapi library
+# will not allow execution of any program that uses hconsole api
 use_mouse false
 
+# how long should aplication wait for user input before running
+# idle-state operation, this value is specified in seconds
 latency 1
 
+# what character should be used for composing commands,
+# composing commands looks like this:
+# user presses CTRL-`command_compose_character', which puts
+# process into `command mode' and then
+# before `command_compose_delay' passes user should
+# press real command character, for example,
+# if `command_compose_character' is x,
+# then "program exit" command would look like:
+# CTRL-x x
+# note that in this case "exit" command is done by pressing `x'
+# in command mode
 command_compose_character x
 
+# how long hconsole-UI waits in `command mode' for user to type
+# in real command
 command_compose_delay 16
 
 ## colors BEGIN
@@ -49,6 +70,7 @@ focused_attribute BRIGHTGREEN GRAY BLACK LIGHTGRAY
 
 # should CTRL-c typed by user be discarded by program ?
 ignore_signal_SIGINT true
+
 # is CTRL-z ignored by process?
 ignore_signal_SIGTSTP true
 
@@ -60,13 +82,15 @@ ignore_signal_SIGTSTP true
 # select data base driver
 # accepted drivers are:
 # MySQL, PostgreSQL, null, none
+# last two drivers disables database interface completly,
+# it can by useful for programs that does not use databases
+# or for debuging purpouses
 
 #data_base_driver PostgreSQL
 data_base_driver MySQL
 
 # mysql driver realises access to datebase thru socket,
 #	which we have to point to
-
 mysql_socket @MYSQL_SOCKET@
 
 # log SQL queries
