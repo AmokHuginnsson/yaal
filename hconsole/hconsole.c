@@ -43,7 +43,8 @@ int n_iEnabledAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
 															+ ( D_FG_WHITE | D_BG_BLACK | D_BG_BLINK );
 int n_iFocusedAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
 															+ ( D_FG_BLACK | D_BG_LIGHTGRAY ); 
-int n_iPromptAttribute = D_FG_WHITE | D_BG_BLACK;
+int n_iStatusBarAttribute = 256 * ( D_FG_WHITE | D_BG_BLACK )
+															+ ( D_FG_LIGHTGRAY | D_BG_BLACK );
 bool	n_bUseMouse = false;
 bool	n_bDisableXON = false;
 bool	n_bLeaveCtrlC = false;
@@ -127,10 +128,13 @@ bool set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
 		set_color ( a_roValue, console::n_iEnabledAttribute );
 	else if ( ! strcasecmp ( a_roOption, "focused_attribute" ) )
 		set_color ( a_roValue, console::n_iFocusedAttribute );
+	else if ( ! strcasecmp ( a_roOption, "statusbar_attribute" ) )
+		set_color ( a_roValue, console::n_iStatusBarAttribute );
 	else return ( true );
 	return ( false );
 	}
 
+extern "C"
 void hconsole_init ( void ); __attribute__ ( ( constructor ) )
 void hconsole_init ( void )
 	{

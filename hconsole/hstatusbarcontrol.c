@@ -42,14 +42,19 @@ M_CVSID ( "$CVSHeader$" );
 #include "hconsole.h"
 
 HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
-		const char * a_pcLabel, int a_iPromptAttribute )
-								 : HControl ( a_poParent, -2, 0, 0, 255, a_pcLabel ),
-									HEditControl ( a_poParent, - 2, 0, 0, 255, a_pcLabel )
+		const char * a_pcLabel, int a_iStatusBarAttribute )
+								 : HControl ( a_poParent, - 2, 0, 255, 0, a_pcLabel ),
+									HEditControl ( NULL, 0, 0, 0, 0, NULL )
 	{
 	M_PROLOG
-	if ( a_iPromptAttribute > 0 )
-		f_iPromptAttribute = a_iPromptAttribute;
-	else f_iPromptAttribute = console::n_iPromptAttribute;
+	int l_iAttribte = 0;
+	if ( a_iStatusBarAttribute > 0 )
+		f_iStatusBarAttribute = a_iStatusBarAttribute;
+	else f_iStatusBarAttribute = console::n_iStatusBarAttribute;
+	l_iAttribte = f_iStatusBarAttribute;
+	l_iAttribte &= 0x00ff;
+	f_iFocusedAttribute &= 0xff00;
+	f_iFocusedAttribute |= l_iAttribte;
 	f_iPromptLength = 0;
 	f_bDone = false;
 	f_iLastProgress = -1;
@@ -72,7 +77,7 @@ void HStatusBarControl::draw_label ( void )
 	HControl::draw_label ( );
 	f_iColumnRaw += f_iPromptLength;
 	f_iWidthRaw -= f_iPromptLength;
-	f_iWidthRaw --;
+	::move ( f_iRowRaw, f_iPromptLength );
 	return;
 	M_EPILOG
 	}
@@ -82,9 +87,8 @@ void HStatusBarControl::refresh ( void )
 	M_PROLOG
 	if ( f_iPromptLength )
 		{
-		::move ( f_iRowRaw, 0 );
-		console::set_attr ( f_iPromptAttribute );
-		cprintf ( f_oPrompt );
+		console::set_attr ( f_iStatusBarAttribute >> 8 );
+		::mvprintw ( f_iRowRaw, 0, f_oPrompt );
 		}
 	HEditControl::refresh ( );
 	return;
@@ -112,6 +116,7 @@ void HStatusBarControl::set_prompt ( const char * a_pcPrompt )
 		f_oPrompt [ 0 ] = 0;
 		f_iPromptLength = 0;
 		}
+	HEditControl::operator = ( "" ); /* refresh() call inside */
 	return;
 	M_EPILOG
 	}
@@ -142,7 +147,8 @@ void HStatusBarControl::init_progress ( double a_dMax, const char * a_pcTitle,
 	M_EPILOG
 	}
 
-void HStatusBarControl::update_progress ( double a_dStep, const char * a_pcTitle )
+void HStatusBarControl::update_progress ( double a_dStep,
+		const char * a_pcTitle )
 	{
 	M_PROLOG
 	int l_iMaxBar = 0;
@@ -175,12 +181,11 @@ void HStatusBarControl::update_progress ( double a_dStep, const char * a_pcTitle
 			|| ( f_iLastSecond != l_iNextSecond ))
 		{
 		refresh ( );
-		::move ( console::n_iHeight - 2,
-				f_iLabelLength - ( f_bSingleLine ? 0 : 1 ) );
 		f_oVarTmpBuffer.format ( " %%-%ds ",
 				console::n_iWidth - f_iLabelLength - ( f_bSingleLine ? 2 : 1 ) );
 		f_oString.format ( f_oVarTmpBuffer, ( const char * ) f_oMessage );
-		cprintf ( f_oString );
+		::mvprintw ( console::n_iHeight - 2,
+				f_iLabelLength - ( f_bSingleLine ? 0 : 1 ), f_oString );
 		if ( f_bEstimate )
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", l_iMaxBar );
@@ -198,7 +203,7 @@ void HStatusBarControl::update_progress ( double a_dStep, const char * a_pcTitle
 			strncpy ( ( ( char * ) f_oString ) + console::n_iWidth - 5, "done", 4 );
 		::memset ( ( ( char * ) f_oString ) + 1, '-', l_iMaxBar );
 		::memset ( ( ( char * ) f_oString ) + 1, '=', l_iNextStep );
-		cprintf ( f_oString );
+		mvprintw ( console::n_iHeight - 1, 0, f_oString );
 		f_oString = "";
 		f_iLastProgress = l_iNextStep;
 		f_iLastPercent = l_iNextPercent;
@@ -210,7 +215,8 @@ void HStatusBarControl::update_progress ( double a_dStep, const char * a_pcTitle
 	M_EPILOG
 	}
 
-void HStatusBarControl::message ( int a_iAttribute, const char * a_pcFormat, ... )
+void HStatusBarControl::message ( int a_iAttribute,
+		const char * a_pcFormat, ... )
 	{
 	M_PROLOG
 	va_list l_xAp;

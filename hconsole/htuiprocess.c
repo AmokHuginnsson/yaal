@@ -372,12 +372,19 @@ int HProcess::run ( void )
 int HProcess::handler_idle ( int a_iCode, void * )
 	{
 	M_PROLOG
+	HStatusBarControl * l_poStatusBar = NULL;
 #ifdef __DEBUG__
 	HString l_oClock ( ( const char * ) HTime ( ) );
 	console::c_printf ( 0, console::n_iWidth - l_oClock.get_length ( ),
 			D_FG_BLACK | D_BG_LIGHTGRAY, l_oClock );
 	console::n_bNeedRepaint = true;
 #endif /* __DEBUG__ */
+	if ( f_poForegroundWindow )
+		{
+		l_poStatusBar = f_poForegroundWindow->status_bar ( );
+		if ( l_poStatusBar )
+			l_poStatusBar->refresh ( );
+		}
 	f_iIdleCycles ++;
 	return ( a_iCode );
 	M_EPILOG

@@ -95,6 +95,7 @@ void HListControl::refresh ( void )
 	HItem l_oItem ( l_iColumns );
 	HInfo * l_poInfo = NULL;
 	l_iTmp = f_iWidthRaw;
+	curs_set ( D_CURSOR_INVISIBLE );
 	draw_label ( );
 	if ( ! f_iSumForOne )return;
 	if ( f_iWidthRaw != l_iTmp )recalculate_column_widths ( );
@@ -119,7 +120,6 @@ void HListControl::refresh ( void )
 				l_iCurrentColumnWidth = l_lValue & 0x000000ff;
 				if ( l_iCurrentColumnWidth )
 					{
-					::move ( f_iRowRaw + l_iCtr + l_iHR, f_iColumnRaw + l_iColumnOffset );
 					f_oVarTmpBuffer [ 0 ] = 0;
 					switch ( l_iFlags & D_TYPE_MASK ) /* 0x0ffff is mask for type */
 						{
@@ -215,7 +215,8 @@ void HListControl::refresh ( void )
 										: ~ ( f_iEnabledAttribute >> 8 ) ) : ~ ( f_iDisabledAttribute >> 8 ) );
 						else M_SET_ATTR_DATA ( );
 						}
-					cprintf ( f_oVarTmpBuffer	);
+					::mvprintw ( f_iRowRaw + l_iCtr + l_iHR,
+							f_iColumnRaw + l_iColumnOffset, f_oVarTmpBuffer	);
 					l_iColumnOffset += l_iCurrentColumnWidth;
 					}
 				if ( l_iCtr == f_iCursorPosition )
@@ -233,10 +234,7 @@ void HListControl::refresh ( void )
 	memset ( f_oVarTmpBuffer, '.', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		{
-		::move ( f_iRowRaw + l_iCtr + l_iHR,	f_iColumnRaw );
-		cprintf ( f_oVarTmpBuffer );
-		}
+		::mvprintw ( f_iRowRaw + l_iCtr + l_iHR,	f_iColumnRaw, f_oVarTmpBuffer );
 	for ( l_iCtr = 0; l_iCtr < l_iColumns; l_iCtr ++ )
 		{
 		l_poInfo = & f_oHeader [ l_iCtr ];
@@ -247,14 +245,14 @@ void HListControl::refresh ( void )
 			if ( f_bDrawHeader )
 				{
 				f_oVarTmpBuffer = ( HString & ) ( * l_poInfo );
-				::move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset );
 				M_SET_ATTR_LABEL ( );
 				f_oVarTmpBuffer.format ( "%%-%ds", l_iCurrentColumnWidth );
-				cprintf ( f_oVarTmpBuffer, ( char * ) ( ( HString & ) ( * l_poInfo ) ).left ( l_iCurrentColumnWidth ) );
-				::move ( f_iRowRaw,
-						f_iColumnRaw + l_iColumnOffset + ( l_lValue >> 16 ) );
+				::mvprintw ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset, f_oVarTmpBuffer,
+	( char * ) ( ( HString & ) ( * l_poInfo ) ).left ( l_iCurrentColumnWidth ) );
 				M_SET_ATTR_SHORTCUT ( );
-				cprintf ( "%c", ( * l_poInfo ) [ l_lValue >> 16 ] );
+				::mvprintw ( f_iRowRaw,
+						f_iColumnRaw + l_iColumnOffset + ( l_lValue >> 16 ),
+						"%c", ( * l_poInfo ) [ l_lValue >> 16 ] );
 				}
 			l_iColumnOffset += l_iCurrentColumnWidth;
 			if ( l_iCtr < l_iColumns )
@@ -285,11 +283,9 @@ void HListControl::refresh ( void )
 		l_dScaled = f_iHeightRaw - 3;
 		l_dScaled *= ( double ) ( f_iControlOffset + f_iCursorPosition );
 		l_dScaled /= ( double )f_iQuantity;
-		::move ( f_iRowRaw + ( int ) ( l_dScaled + 1.5 + l_iHR ),
-				f_iColumnRaw + l_iColumnOffset - 1 );
-		cprintf ( "#" );
+		::mvprintw ( f_iRowRaw + ( int ) ( l_dScaled + 1.5 + l_iHR ),
+				f_iColumnRaw + l_iColumnOffset - 1, "#" );
 		}
-	curs_set ( 0 );
 	f_poSelected = l_poElement;
 	return;
 	M_EPILOG
@@ -548,7 +544,7 @@ HItem & HListControl::add_orderly ( HItem & a_roItem )
 int HListControl::set_focus ( char a_cShorcut )
 	{
 	M_PROLOG
-	curs_set ( 0 );
+	curs_set ( D_CURSOR_INVISIBLE );
 	return ( HControl::set_focus ( a_cShorcut ) );
 	M_EPILOG
 	}

@@ -34,7 +34,7 @@ extern int	n_iLatency;
 extern int	n_iDisabledAttribute;
 extern int	n_iEnabledAttribute;
 extern int	n_iFocusedAttribute;
-extern int	n_iPromptAttribute;
+extern int	n_iStatusBarAttribute;
 extern bool	n_bUseMouse;
 extern bool	n_bDisableXON;
 extern bool	n_bLeaveCtrlC;

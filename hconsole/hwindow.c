@@ -82,6 +82,7 @@ int HWindow::init ( void )
 	console::n_bNeedRepaint = true;
 	l_oString.format ( " [%s]& \n", ( char * ) f_oTitle );
 	f_poStatusBar = init_bar ( l_oString );
+	f_poStatusBar->enable ( true );
 	f_oControls.remove_head ( D_FORCE_REMOVE_ELEMENT );
 	return ( 0 );
 	M_EPILOG
@@ -226,7 +227,8 @@ void HWindow::refresh ( void )
 	M_PROLOG
 	int l_iCtr = 0;
 	HControl * l_poControl = NULL;
-	if ( f_poStatusBar )f_poStatusBar->refresh ( );
+	if ( f_poStatusBar && ( f_poStatusBar != f_poFocusedChild ) )
+		f_poStatusBar->refresh ( );
 	l_iCtr = f_oControls.quantity ( );
 	while ( l_iCtr -- )
 		{
@@ -287,7 +289,6 @@ int HWindow::handler_command ( int a_iCode )
 	f_poPreviousFocusedChild = f_poFocusedChild;
 	f_poFocusedChild = f_poStatusBar;
 	f_poPreviousFocusedChild->kill_focus ( );
-	f_poStatusBar->enable ( true );
 	f_poStatusBar->set_focus ( -1 );
 	f_poStatusBar->set_prompt ( ":" );
 	return ( a_iCode );

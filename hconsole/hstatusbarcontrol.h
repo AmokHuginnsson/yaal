@@ -33,7 +33,7 @@ class HStatusBarControl : public HEditControl
 	{
 protected:
 	/*{*/
-	int			f_iPromptAttribute;
+	int			f_iStatusBarAttribute;
 	int			f_iPromptLength;
 	HString	f_oPrompt;
 	/* progress bar data */

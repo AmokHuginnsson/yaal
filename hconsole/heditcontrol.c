@@ -45,7 +45,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "heditcontrol.h"
 
 HEditControl::HEditControl( HWindow * a_poParent,
-		int a_iRow, int a_iColumn, int a_iWidth, int a_iHeight,
+		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
 		const char * a_pcLabel, int a_iBufferSize, const char * a_pcValue,
 		const char * a_pcMask, bool a_bReplace, bool a_bRightAligned,
 		bool a_bMultiLine, bool a_bPassword, int a_iMaxHistoryLevel,
@@ -145,9 +145,13 @@ void HEditControl::refresh ( void )
 		f_oVarTmpBuffer [ f_oVarTmpBuffer.get_length ( ) ] = ' ';
 		}
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
-	cprintf ( f_oVarTmpBuffer );
-	::move ( f_iRowRaw,	f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) );
-	curs_set ( 1 );
+	::mvprintw ( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer );
+	if ( f_bFocused )
+		{
+		::move ( f_iRowRaw,
+				f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) );
+		curs_set ( D_CURSOR_VISIBLE );
+		}
 	return;
 	M_EPILOG
 	}
@@ -522,8 +526,8 @@ int HEditControl::process_input ( int a_iCode )
 	if ( ! l_iErrorCode )
 		{
 		f_oString = f_oVarTmpBuffer;
-		refresh ( );
 		console::c_printf ( console::n_iHeight - 1, -1, D_FG_LIGHTGRAY, "" );
+		refresh ( );
 		}
 	else
 		{
@@ -540,15 +544,14 @@ int HEditControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-HString & HEditControl::operator = ( const HString & a_roString )
+HString & HEditControl::operator = ( const char * a_pcString )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
 	int l_iLength = 0;
 	char * l_pcBuffer = 0;
 	HString l_oErrorMessage;
-	if ( ( l_iErrorCode = regexec ( & f_sMask, ( HString & ) a_roString,
-					0, NULL, 0 ) ) )
+	if ( ( l_iErrorCode = regexec ( & f_sMask, a_pcString, 0, NULL, 0 ) ) )
 		{
 		l_iLength = regerror ( l_iErrorCode, & f_sMask, NULL, 0 );
 		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
@@ -557,7 +560,7 @@ HString & HEditControl::operator = ( const HString & a_roString )
 		xfree ( ( void * ) l_pcBuffer );
 		throw new HException ( __WHERE__, l_oErrorMessage, l_iErrorCode );
 		}
-	f_oString = a_roString;
+	f_oString = a_pcString;
 	l_iLength = f_oString.get_length ( );
 	f_iControlOffset = 0;
 	if ( l_iLength >= f_iWidthRaw )

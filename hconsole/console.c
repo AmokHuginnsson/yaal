@@ -89,11 +89,11 @@ void enter_curses( void )
 	intrflush ( stdscr, false );
 /*	scrollok ( stdscr, true ); */
 	scrollok ( stdscr, false );
-	leaveok ( stdscr, true );
+	leaveok ( stdscr, false );
 	immedok ( stdscr, false );
 	fflush ( 0 );
 	flushinp ( );
-	curs_set ( 0 );
+	curs_set ( D_CURSOR_INVISIBLE );
 	refresh ( );
 	/* black background */
 	assume_default_colors ( COLOR_BLACK, COLOR_BLACK );
@@ -197,7 +197,7 @@ void leave_curses( void )
 	standend ( );
 	keypad ( stdscr, false );
 	nocbreak ( );
-	curs_set ( 1 );
+	curs_set ( D_CURSOR_VISIBLE );
 /*	reset_shell_mode ( ); */
 /* see comment near def_shell_mode ( ), ( automagicly by endwin ( ) ) */
 /*
@@ -217,7 +217,6 @@ void set_attr( unsigned char a_ucAttr )
 	M_PROLOG
 	if ( ! n_bEnabled )
 		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
-	
 	attrset ( COLOR_PAIR( ( ( a_ucAttr & 112 ) >> 1 ) | a_ucAttr & 7 ) | ( a_ucAttr & 8 ? A_BOLD : 0 ) | ( a_ucAttr & 128 ? A_BLINK : 0 ) );
 	return ;
 	M_EPILOG
@@ -247,8 +246,7 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	int l_iOrigCursState = 0;
 	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	l_iOrigAttribute = get_attr ( );
-	leaveok ( stdscr, true );
-	l_iOrigCursState = curs_set ( 0 );
+	l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
 #ifdef __DEBUG__
 	if ( a_iColumn < 0 )
 		{
@@ -266,7 +264,6 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	vwprintw ( stdscr, a_pcFormat, a_xAp );
 	move ( l_iOrigRow, l_iOrigColumn );
 	curs_set ( l_iOrigCursState );
-	leaveok ( stdscr, false );
 	set_attr ( l_iOrigAttribute );
 	return ( l_iError );
 	M_EPILOG
@@ -360,11 +357,9 @@ void clrscr()
 	M_PROLOG
 	if ( ! n_bEnabled )
 		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
-	leaveok( stdscr, false );
-	clear();
-	refresh();
-	leaveok( stdscr, true );
-	return ;
+	clear ( );
+	refresh ( );
+	return;
 	M_EPILOG
 	}
 

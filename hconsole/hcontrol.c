@@ -194,29 +194,26 @@ void HControl::draw_label ( void )
 	f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
 		: console::n_iWidth + f_iWidth - f_iColumnRaw;
 /* done */
-	::move ( f_iRowRaw, f_iColumnRaw );
 	if ( ! f_bDrawLabel )
 		{
 		M_SET_ATTR_DATA ( );
 		return;
 		}
 	M_SET_ATTR_LABEL ( );
-	cprintf ( f_oLabel );
-	::move ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex );
+	::mvprintw ( f_iRowRaw, f_iColumnRaw, f_oLabel );
 	M_SET_ATTR_SHORTCUT ( );
-	cprintf ( "%c", f_oLabel [ f_iShortcutIndex ] );
-	::move ( f_iRowRaw, f_iColumnRaw + f_iLabelLength );
+	::mvprintw( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
+			"%c", f_oLabel [ f_iShortcutIndex ] );
 	M_SET_ATTR_DATA ( );
 	if ( f_bSingleLine )
 		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;
 	else f_iRowRaw ++, f_iHeightRaw --;
-	::move ( f_iRowRaw, f_iColumnRaw );
 	return;
 	M_EPILOG
 	}
 
-void HControl::set_attributes ( int a_iDisabledAttribute, int a_iEnabledAttribute, 
-		int a_iFocusedAttribute )
+void HControl::set_attributes ( int a_iDisabledAttribute,
+		int a_iEnabledAttribute, int a_iFocusedAttribute )
 	{
 	M_PROLOG
 	f_iDisabledAttribute = a_iDisabledAttribute;

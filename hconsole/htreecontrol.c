@@ -108,10 +108,7 @@ void HTreeControl::refresh ( void )
 	memset ( f_oVarTmpBuffer, '_', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		{
-		::move ( f_iRowRaw + l_iCtr, f_iColumnRaw );
-		cprintf ( f_oVarTmpBuffer );
-		}
+		::mvprintw ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
 	if ( f_poRoot )
 		draw_node ( ( HNodeControl * ) f_poRoot, f_iRowRaw );
 	curs_set ( 0 );
@@ -130,16 +127,16 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		{ 
 		l_iRow ++;
 		l_oInfo = a_poNode->f_tLeaf [ 0 ];
-		::move ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 - 1 );
 		M_SET_ATTR_DATA ( );
 		if ( ! a_poNode->f_bUnfolded && l_iCtr )
-			cprintf ( "+" );
-		else if ( l_iCtr )cprintf ( "-" );
+			::mvprintw ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 - 1, "+" );
+		else if ( l_iCtr )
+			::mvprintw ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 - 1, "-" );
 		if ( a_poNode == f_poSelected )
 			console::set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
 						: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
-		::move ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 );
-		cprintf ( ( HString & ) l_oInfo );
+		::mvprintw ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2,
+				( HString & ) l_oInfo );
 		}
 	if ( l_iCtr && ( a_poNode->f_bUnfolded || ! a_poNode->f_iLevel ) )
 		{

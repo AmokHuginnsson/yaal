@@ -46,6 +46,10 @@ namespace console
 # define D_ASCII_VERTICAL_LINE	'|'
 #endif /* not HAVE_ASCII_GRAPHICS */
 
+#define D_CURSOR_INVISIBLE		0
+#define D_CURSOR_VISIBLE			1
+#define D_CURSOR_VERY_VISIBLE	2
+
 #define D_ATTR_DEFAULT			-1
 
 #define D_FG_BLACK					0
@@ -87,8 +91,6 @@ namespace console
 #define D_KEY_CTRL_(n)			n - 96
 #define D_KEY_COMMAND_(n)		n + D_KEY_COMMAND_BASE
 
-#define cprintf printw
-#define cputc addch
 #define KEY_DELETE KEY_DC
 #define KEY_BS KEY_BACKSPACE
 
