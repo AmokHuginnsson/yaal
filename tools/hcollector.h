@@ -29,23 +29,36 @@ Copyright:
 
 #include "hserial.h"
 
+#define D_PROTO_SYN						"SYN\n"
+#define D_PROTO_ACK						"ACK\n"
+#define D_PROTO_DTA						"DTA" /* warrning! no endline */
+#define D_PROTO_FIN						"FIN" /* warrning! no endline, but \0 at end,
+																			 so sizeof ( ) retruns 4 */
+#define D_PROTO_ERR						"ERR\n"
+
+#define D_PROTO_RECV_BUF_SIZE	8 /* 5 should be enought but you never know */
+#define D_RECV_BUF_SIZE				256
+
 class HCollector : public HSerial
 	{
 protected:
 	/*{*/
+	int			f_iLines;
+	char		f_pcReadBuf [ D_PROTO_RECV_BUF_SIZE ];
+	HString	f_oLine;
 	/*}*/
 public:
 	/*{*/
 	HCollector ( const char * = NULL ); /* device path */
+	int send_line ( const char * );
+	int receive_line ( char * & );
+	int establish_connection ( void );
+	int wait_for_connection ( void );
+	void read_colector ( void ( * ) ( char *, int ) );
 	/*}*/
 protected:
 	/*{*/
 	bool test_char ( const char *, int );
-	int send ( char *, int );
-	int receive ( char * const );
-	int establish_connection ( void );
-	int wait_for_connection ( void );
-	void read_colector ( void );
 	/*}*/
 	};
 	

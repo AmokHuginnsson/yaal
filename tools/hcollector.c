@@ -33,9 +33,12 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcollector.h"
 
 HCollector::HCollector ( const char * a_pcDevicePath )
-					: HSerial ( a_pcDevicePath )
+					: HSerial ( a_pcDevicePath ),
+						f_oLine ( ( unsigned long int ) D_RECV_BUF_SIZE )
 	{
 	M_PROLOG
+	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+	f_iLines = 0;
 	return;
 	M_EPILOG
 	}
@@ -55,165 +58,107 @@ bool HCollector::test_char ( const char * a_pcBuffer, int a_iIndex )
 							);
 	}
 
-int HCollector::send ( char * a_pcBuffer, int a_iLength )
+int HCollector::send_line ( const char * a_pcLine )
 	{
-	int l_iCnt = 0;
-	char l_cCRC = 0;
-	char l_pcReadBuf [ 32 ];
-	for ( l_iCnt = 0; l_iCnt < a_iLength; l_iCnt++ )
-		l_cCRC += a_pcBuffer [ l_iCnt ];
-	for ( l_iCnt = 0; l_iCnt < 32; l_iCnt++ )l_pcReadBuf [ l_iCnt ] = 0;
-	l_iCnt = 0;
-	while ( 1 )
+	int l_iCtr = 0;
+	int l_iCRC = 0;
+	int l_iLength = strlen ( a_pcLine );
+	char * l_pcSpeedUp = NULL;
+	HString l_oLine, l_oLocalCopy;
+	if ( l_iLength < 1 )return ( 0 );
+	l_oLocalCopy = a_pcLine;
+	l_pcSpeedUp = ( char * ) l_oLocalCopy;
+	if ( a_pcLine [ l_iLength - 1 ] == '\n' )
 		{
-		write ( a_pcBuffer, a_iLength );
-		read ( l_pcReadBuf, 1 );
-		if ( l_pcReadBuf [ 0 ] == l_cCRC )break;
-		l_iCnt ++;
+		l_iLength --;
+		l_pcSpeedUp [ l_iLength ] = 0;
 		}
-	write ( "OK\r\n", 4 );
-	return ( l_iCnt );
+	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
+		l_iCRC += l_pcSpeedUp [ l_iCtr ];
+	l_oLine.format ( "%s%02x%02x%s\n", D_PROTO_DTA,
+			l_iLength & 0x0ff, l_iCRC & 0x0ff, l_pcSpeedUp );
+	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
+		{
+		l_iCtr = write ( l_oLine,
+				strlen ( D_PROTO_DTA ) + 2 /* for lenght */ + 2 /* for crc */
+				+ l_iLength + 1 /* for newline */ );
+		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
+		}
+	return ( l_iCtr );
 	}
 
-int HCollector::receive ( char * const a_pcBuffer )
+int HCollector::receive_line ( char * & a_pcLine )
 	{
-	int l_iErr = 0;
-	int l_iLen = 0;
-	int l_iCnt = 0;
-	char l_cCRC = 0;
-	char l_pcReadBuf [ 64 ];
-	char l_pcBuffer [ 64 ];
-	do
+	int l_iCtr = 0;
+	int l_iCRC = 0, l_iPCRC = -1;
+	int l_iLength = 0, l_iPLength = -1;
+	/* P prefix means sender transmission side data */
+	while ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
 		{
-		memset ( l_pcReadBuf, 0, 64 );
-		memset ( l_pcBuffer, 0, 64 );
-		l_iCnt = 0;
-		l_iLen = 0;
-		while ( l_iCnt < 64 )
-			{
-			if( read ( l_pcReadBuf + l_iCnt, 1 ) )
-				if ( test_char ( l_pcReadBuf, l_iCnt ) )l_iCnt ++;
-			if ( l_iCnt && ( l_pcReadBuf [ l_iCnt - 1 ] == '\n' ) )break;
-/*			if ( console::kbhit ( ) == 'q' )return ( -1 ); */ /* FIXME */
-			}
-		do
-			{
-			l_iLen = l_iCnt;
-			l_cCRC = 0;
-			for ( l_iCnt = 0; l_iCnt < 64; l_iCnt++ )l_cCRC += l_pcReadBuf [ l_iCnt ];
-			l_pcBuffer [ 0 ] = l_cCRC;
-			write ( l_pcBuffer, 1 );
-			l_iCnt = 0;
-			l_iLen = 0;
-			memset ( l_pcBuffer, 0, 64 );
-			while ( l_iCnt < 64 )
-				{
-				if( read ( l_pcBuffer + l_iCnt, 1 ) )
-					if ( test_char ( l_pcReadBuf, l_iCnt ) )l_iCnt ++;
-				if ( l_iCnt && ( l_pcBuffer [ l_iCnt - 1 ] == '\n' ) )break;
-/*				if ( console::kbhit ( ) == 'q' )return ( -1 ); */ /* FIXME */
-				}
-			if ( strncmp ( l_pcBuffer, "OK\r\n", 4 ) )
-				{
-				memset ( l_pcReadBuf, 0, 64 );
-				strncpy ( l_pcReadBuf, l_pcBuffer, 64 );
-				l_iErr ++;
-				}
-			}
-		while ( strncmp ( l_pcBuffer, "OK\r\n", 4 ) );
+		read ( f_oLine, D_RECV_BUF_SIZE );
+		a_pcLine = ( ( char * ) f_oLine )
+			+ strlen ( D_PROTO_DTA ) + 2 /* for lenght */ + 2 /* for crc */;
+		l_iLength = strlen ( a_pcLine ) - 1;
+		a_pcLine [ l_iLength ] = 0;
+		for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
+			l_iCRC += a_pcLine [ l_iCtr ];
+		l_iLength &= 0x0ff;
+		l_iCRC &= 0x0ff;
+		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+		strncpy ( f_pcReadBuf, ( ( char * ) f_oLine ) + strlen ( D_PROTO_DTA ), 2 );
+		l_iPLength = strtol ( f_pcReadBuf, NULL, 0x10 );
+		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+		strncpy ( f_pcReadBuf, ( ( char * ) f_oLine )
+				+ strlen ( D_PROTO_DTA ) + 2 /* for Plength */, 2 );
+		l_iPCRC = strtol ( f_pcReadBuf, NULL, 0x10 );
+		if ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
+			write ( D_PROTO_ERR, strlen ( D_PROTO_ERR ) );
 		}
-	while ( strncmp ( l_pcBuffer, "OK\r\n", 4 ) );
-	l_iLen = strlen ( l_pcReadBuf );
-	strncpy ( a_pcBuffer, l_pcReadBuf, l_iLen );
-	return ( l_iErr );
+	write ( D_PROTO_ACK, strlen ( D_PROTO_ACK ) );
+	f_iLines ++;
+	return ( l_iCtr );
 	}
 
 int HCollector::establish_connection ( void )
 	{
-	int l_iErr = 0;
-	int l_iCnt = 0;
-	char l_pcReadBuf [ 8 ];
-	memset ( l_pcReadBuf, 0, 8 );
-	while ( 1 )
+	int l_iErr = -1;
+	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
 		{
-		strncpy ( l_pcReadBuf, "KO?\r\n", 5 );
-		for ( l_iCnt = 0; l_iCnt < 5; l_iCnt ++ )
-			write ( l_pcReadBuf + l_iCnt, 1 );
-		memset ( l_pcReadBuf, 0, 8 );
-		l_iCnt = 0;
-		while ( l_iCnt < 64 )
-			{
-			if ( read ( l_pcReadBuf + l_iCnt, 1 ) )
-				if ( test_char ( l_pcReadBuf, l_iCnt ) )l_iCnt ++;
-			if ( l_iCnt && ( l_pcReadBuf [ l_iCnt - 1 ] == '\n' ) )break;
-/*			if ( console::kbhit ( ) == 'q' )return ( -1 ); */ /* FIXME */
-			}
-		if ( ! strncmp ( l_pcReadBuf, "OK\r\n", 4 ) )break;
+		write ( D_PROTO_SYN, strlen ( D_PROTO_SYN ) );
+		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
 		l_iErr ++;
 		}
+	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (estab)" << endl;
 	return ( l_iErr );
 	}
 
 int HCollector::wait_for_connection ( void )
 	{
-	int l_iErr = 0;
-	int l_iCnt = 0;
-	char l_pcReadBuf [ 8 ];
-	memset ( l_pcReadBuf, 0, 8 );
-	while ( 1 )
-		{
-		l_iCnt = 0;
-		while ( l_iCnt < 64 )
-			{
-			if ( read ( l_pcReadBuf + l_iCnt, 1 ) )
-				if ( test_char ( l_pcReadBuf, l_iCnt ) )l_iCnt ++;
-			if ( l_iCnt && ( l_pcReadBuf [ l_iCnt - 1 ] == '\n' ) )break;
-/*			if ( console::kbhit ( ) == 'q' )return ( -1 ); */ /* FIXME */
-			}
-		if ( ! strncmp ( l_pcReadBuf, "KO?\r\n", 5 ) )
-			{
-			strncpy ( l_pcReadBuf, "OK\r\n", 4 );
-			for ( l_iCnt = 0; l_iCnt < 4; l_iCnt ++ )
-				write ( l_pcReadBuf + l_iCnt, 1 );
-			break;
-			}
-		l_iErr ++;
-		}
-	M_LOG ( "Collector: Connected !" );
-	return ( 0 );
+	int l_iErr = -1;
+	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+	while ( strncmp ( f_pcReadBuf, D_PROTO_SYN, strlen ( D_PROTO_SYN ) ) )
+		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE ), l_iErr ++;
+	write ( D_PROTO_ACK, strlen ( D_PROTO_ACK ) );
+	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (wait)" << endl;
+	return ( l_iErr );
 	}
 
-void HCollector::read_colector ( void ) 
+void HCollector::read_colector ( void ( * process_line ) ( char *, int ) ) 
 	{
-	int l_iErr = 0;
-	int l_iRet = 0;
-	int l_iCtr = 0;
-	int l_iCount = 0;
-	char l_pcBuffer [ 64 ];
-	HString l_oErr;
-	if ( ! open ( )	&& ( wait_for_connection ( ) >= 0 ) )
+	char * l_pcLine = NULL;
+	f_iLines = 0;
+	wait_for_connection ( );
+	while ( 1 )
 		{
-		memset ( l_pcBuffer, 0, 64 );
-		while ( strncmp ( l_pcBuffer, "QNTT", 4 ) && ( l_iRet >= 0 ) )
-			l_iRet = receive ( l_pcBuffer );
-		l_iCount = atoi ( l_pcBuffer + 4 );
-		l_oErr.format ( "Collector: transmission size = %d line(s).", l_iCount );
-		M_LOG ( ( char * ) l_oErr );
-		if ( l_iRet < 0 )l_iCount = 0;
-		while ( l_iCtr ++ < l_iCount )
-			{
-			memset ( l_pcBuffer, 0, 64 );
-			l_iErr += receive ( l_pcBuffer );
-			if ( l_iRet < 0 )
-				{
-				l_iErr -= l_iRet;
-				break;
-				}
-			if ( ! ( strncmp ( l_pcBuffer, "END\r\n", 5 )
-						&& strncmp ( l_pcBuffer, "BRK\r\n", 5 ) ) )break;
-/*			external_helper_handler ( l_pcBuffer ); */ /* FIXME */
-			}
-		l_oErr.format ( "Collector: line(s) read = %d.", l_iCtr );
+		receive_line ( l_pcLine );
+		/* '\n' is stripped from each line so we need to FIN treat special */
+		if ( ! strncmp ( l_pcLine, D_PROTO_FIN, sizeof ( D_PROTO_FIN ) ) )
+			break;
+		process_line ( l_pcLine, f_iLines );
 		}
 	return;
 	}
