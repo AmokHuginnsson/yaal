@@ -84,7 +84,7 @@ public:
 	virtual HInfo operator = ( const HInfo & );
 	virtual operator HInfo ( void );
 	void set_flags ( bool = false, bool = false );
-	int process_input( int );
+	virtual int process_input( int );
 	HString & operator = ( const HString & );
 	operator HString ( );
 	/*}*/

@@ -121,7 +121,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 #ifdef __DEBUG__
 #endif /* __DEBUG__ */
 	refresh ( );
-	return ;
+	return;
 	M_EPILOG
 	}
 	
