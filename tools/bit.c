@@ -52,15 +52,15 @@ unsigned char g_pcMaskBitClear[] = {127, 191, 223, 239, 247, 251, 253, 254};
 
 int getbit ( void * a_pvAddress, unsigned long int a_ulNumber )
 	{
-	short int l_iState = 0, l_iOffset;
+	short int l_hState = 0, l_iOffset;
 	char * l_pcAddress;
 	unsigned long int l_ulDword;
 	l_pcAddress = ( char * ) a_pvAddress;
 	l_ulDword = a_ulNumber >> 3;
-	l_iOffset = a_ulNumber & 7;
-	l_iState = * ( l_pcAddress + l_ulDword ) & g_pcMaskBitSet [ l_iOffset ];
-	if ( l_iState ) l_iState = 1;
-	return ( l_iState );
+	l_iOffset = ( short ) a_ulNumber & 7;
+	l_hState = * ( l_pcAddress + l_ulDword ) & g_pcMaskBitSet [ l_iOffset ];
+	if ( l_hState ) l_hState = 1;
+	return ( l_hState );
 	}
 	
 void setbit( void * a_pvAddress, unsigned long int a_ulNumber, int a_iState )
