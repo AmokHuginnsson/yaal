@@ -292,7 +292,7 @@ void HDataWindow::init_progress ( double a_dSize, const char * a_pcMessage,
 void HDataWindow::update_progress ( double a_dStep, const char * a_pcMessage )
 	{
 	M_PROLOG
-	f_poStatusBar->update_progress ( a_dSize, a_pcMessage );
+	f_poStatusBar->update_progress ( a_dStep, a_pcMessage );
 	return;
 	M_EPILOG
 	}
