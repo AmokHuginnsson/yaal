@@ -117,7 +117,7 @@ void dbwrapper_fini ( void ); __attribute__ ( ( destructor ) )
 void dbwrapper_fini ( void )
 	{
 	if ( dbwrapper::n_pcDefaultSockPath )
-		xfree ( ( void * ) dbwrapper::n_pcDefaultSockPath );
+		xfree ( dbwrapper::n_pcDefaultSockPath );
 	dbwrapper::n_pcDefaultSockPath = NULL;
 	if ( dbwrapper::n_pvDlHandle )
 		{

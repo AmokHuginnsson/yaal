@@ -131,7 +131,7 @@ void tools_init ( void )
 void tools_fini ( void ); __attribute__ ( ( destructor ) )
 void tools_fini ( void )
 	{
-	if ( tools::n_pcSerialDevice )xfree ( ( void * ) tools::n_pcSerialDevice );
+	if ( tools::n_pcSerialDevice )xfree ( tools::n_pcSerialDevice );
 	tools::n_pcSerialDevice = NULL;
 	return;
 	}

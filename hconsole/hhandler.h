@@ -103,7 +103,7 @@ template < class tType >
 HHandler < tType >::~HHandler ( void )
 	{
 	M_PROLOG
-	if ( f_piCodes )xfree ( ( void * ) f_piCodes );
+	if ( f_piCodes )xfree ( f_piCodes );
 	f_piCodes = NULL;
 	return;
 	M_EPILOG

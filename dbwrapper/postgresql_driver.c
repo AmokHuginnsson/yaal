@@ -63,7 +63,7 @@ void * db_connect ( const char * a_pcDataBase,
 																	l_pcDataBase, 
 																	a_pcLogin, 
 																	a_pcPassword );
-	xfree ( ( void * ) l_pcDataBase );
+	xfree ( l_pcDataBase );
 	return ( l_psConnection );
 	}
 

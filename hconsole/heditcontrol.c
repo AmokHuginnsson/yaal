@@ -93,7 +93,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		l_oErrorMessage = l_pcBuffer;
-		xfree ( ( void * ) l_pcBuffer );
+		xfree ( l_pcBuffer );
 		throw new HException ( __WHERE__, l_oErrorMessage, l_iErrorCode );
 		}
 	if ( ( l_iErrorCode = regexec ( & f_sMask, a_pcValue, 0, NULL, 0 ) ) )
@@ -102,7 +102,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		l_oErrorMessage = l_pcBuffer;
-		xfree ( ( void * ) l_pcBuffer );
+		xfree ( l_pcBuffer );
 		throw new HException ( __WHERE__, l_oErrorMessage, l_iErrorCode );
 		}
 	l_iLength = f_oString.get_length ( );
@@ -539,7 +539,7 @@ int HEditControl::process_input ( int a_iCode )
 		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		f_poParent->status_bar ( )->message ( D_BG_BROWN, l_pcBuffer );
-		xfree ( ( void * ) l_pcBuffer );
+		xfree ( l_pcBuffer );
 		}
 	return ( a_iCode );
 	M_EPILOG
@@ -558,7 +558,7 @@ HString & HEditControl::operator = ( const char * a_pcString )
 		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		l_oErrorMessage = l_pcBuffer;
-		xfree ( ( void * ) l_pcBuffer );
+		xfree ( l_pcBuffer );
 		throw new HException ( __WHERE__, l_oErrorMessage, l_iErrorCode );
 		}
 	f_oString = a_pcString;

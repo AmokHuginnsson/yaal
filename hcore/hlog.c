@@ -80,10 +80,10 @@ HLog::~HLog ( void )
 		fclose ( f_psStream );
 	f_psStream = NULL;
 	if ( f_pcHostName )
-		xfree ( ( void * ) f_pcHostName );
+		xfree ( f_pcHostName );
 	f_pcHostName = NULL;
 	if ( f_pcBuffer )
-		xfree ( ( void * ) f_pcBuffer );
+		xfree ( f_pcBuffer );
 	f_pcBuffer = NULL;
 	return;
 	M_EPILOG

@@ -66,7 +66,7 @@ void * db_connect ( const char * a_pcDataBase,
 		l_psMySQL = mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
 				l_pcDataBase, 0, l_pcSockPath, CLIENT_IGNORE_SPACE );
 		}
-	xfree ( ( void * ) l_pcDataBase );
+	xfree ( l_pcDataBase );
 	return ( l_psMySQL );
 	}
 

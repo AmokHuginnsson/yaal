@@ -151,7 +151,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 		{
 		if ( l_pcBuffer )
 			{
-			xfree ( ( void * ) l_pcBuffer );
+			xfree ( l_pcBuffer );
 			l_pcBuffer = 0;
 			l_iBlockSize = 0;
 			}
@@ -312,7 +312,7 @@ void rc_set_variable ( const char * a_pcValue, bool & a_rbVariable )
 
 void rc_set_variable ( const char * a_pcValue, char ** a_ppcVariable )
 	{
-	if ( * a_ppcVariable )xfree ( ( void * ) * a_ppcVariable );
+	if ( * a_ppcVariable )xfree ( * a_ppcVariable );
 	* a_ppcVariable = NULL;
 	* a_ppcVariable = xstrdup ( a_pcValue );
 	return;

@@ -63,15 +63,15 @@ void * xrealloc ( void * a_pvPtr, size_t a_ulSize )
 	return ( l_pvNewPtr );
 	}
 
-void xfree ( void * & a_rpvPtr )
+void xfree_internal ( void * * a_ppvPtr )
 	{
-	if ( a_rpvPtr == 0 )
+	if ( ( * a_ppvPtr ) == NULL )
 		{
 		perror ( "xfree" );
 		abort ( );
 		}
-	free ( a_rpvPtr );
-	a_rpvPtr = 0;
+	free ( ( * a_ppvPtr ) );
+	( * a_ppvPtr ) = NULL;
 	return;
 	}
 

@@ -64,10 +64,10 @@ HException::~HException ( void )
 	{
 	::log ( "Exception registers: c:%d i:%d l:%ld d:%f pv:%p pc:%s\n",
 			f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
-	if ( f_pcCharPtr )xfree ( ( void * ) f_pcCharPtr );
-	if ( f_pcFunctionName )xfree ( ( void * ) f_pcFunctionName );
-	if ( f_pcFileName )xfree ( ( void * ) f_pcFileName );
-	if ( f_pcMessage )xfree ( ( void * ) f_pcMessage );
+	if ( f_pcCharPtr )xfree ( f_pcCharPtr );
+	if ( f_pcFunctionName )xfree ( f_pcFunctionName );
+	if ( f_pcFileName )xfree ( f_pcFileName );
+	if ( f_pcMessage )xfree ( f_pcMessage );
 	return;
 	}
 
@@ -123,7 +123,7 @@ void HException::dump_call_stack ( int )
 	for  ( l_iCtr = 0; l_iCtr < l_iSize; l_iCtr ++ )
 		::log << l_ppcStrings [ l_iCtr ] << endl;
 
-	xfree ( ( void * ) l_ppcStrings );
+	xfree ( l_ppcStrings );
 #endif /* _EXECINFO_H */
 	return;
 	}

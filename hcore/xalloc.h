@@ -33,7 +33,8 @@ extern "C"
 void * xmalloc ( size_t );
 void * xcalloc ( size_t );
 void * xrealloc ( void *, size_t );
-void xfree ( void * & );
+#define xfree( ptr ) xfree_internal ( ( void * * ) ( & ptr ) )
+void xfree_internal ( void * * );
 char * xstrdup ( const char * );
 
 }

@@ -47,7 +47,7 @@ HString::~HString ( void )
 	{
 	M_PROLOG
 	if ( f_pcBuffer )
-		xfree ( ( void * ) f_pcBuffer );
+		xfree ( f_pcBuffer );
 	return;
 	M_EPILOG
 	}
@@ -602,7 +602,7 @@ HString & HString::replace ( const char * a_pcPattern, char * a_pcWith )
 	l_pcStr [ l_iLenNew ] = 0;
 	l_pcTmp = f_pcBuffer;
 	f_pcBuffer = l_pcStr;
-	xfree ( ( void * ) l_pcTmp );
+	xfree ( l_pcTmp );
 	return ( * this );
 	M_EPILOG
 	}
