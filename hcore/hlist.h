@@ -1085,26 +1085,39 @@ void HList< tType >::sort ( void )
 	M_PROLOG
 	int l_iCtr = f_iQuantity;
 	int l_iCtrLoc = 0;
-	HElement * l_poBase = f_poHook;
-	HElement * l_poExtream = NULL;
+	HElement * l_poBaseLower = f_poHook;
+	HElement * l_poBaseUpper = f_poHook->f_poPrevious;
+	HElement * l_poExtreamLower = NULL;
+	HElement * l_poExtreamUpper = NULL;
 	HElement * l_poPointer = NULL;
-	while ( l_iCtr -- )
+	while ( l_iCtr -= 2 )
 		{
 		l_iCtrLoc = l_iCtr;
-		l_poExtream = l_poBase;
-		l_poPointer = l_poExtream->f_poNext;
+		l_poExtreamLower = l_poBaseLower;
+		l_poExtreamUpper = l_poBaseUpper;
+		l_poPointer = l_poBaseLower->f_poNext;
 		while ( l_iCtrLoc -- )
 			{
-			if ( ( ( this->* cmp ) ( l_poExtream, l_poPointer ) * f_iOrder ) > 0 )
-				l_poExtream = l_poPointer;
+			if ( ( ( this->* cmp ) ( l_poExtreamLower,
+							l_poPointer ) * f_iOrder ) > 0 )
+				l_poExtreamLower = l_poPointer;
+			if ( ( ( this->* cmp ) ( l_poExtreamUpper,
+							l_poPointer ) * f_iOrder ) < 0 )
+				l_poExtreamUpper = l_poPointer;
 			l_poPointer = l_poPointer->f_poNext;
 			}
-		if ( l_poBase != l_poExtream )
+		if ( l_poBaseLower != l_poExtreamLower )
 			{
-			exchange ( l_poBase, l_poExtream );
-			l_poBase = l_poExtream;
+			exchange ( l_poBaseLower, l_poExtreamLower );
+			l_poBaseLower = l_poExtreamLower;
 			}
-		l_poBase = l_poBase->f_poNext;
+		if ( l_poBaseUpper != l_poExtreamUpper )
+			{
+			exchange ( l_poBaseUpper, l_poExtreamUpper );
+			l_poBaseUpper = l_poExtreamUpper;
+			}
+		l_poBaseLower = l_poBaseLower->f_poNext;
+		l_poBaseUpper = l_poBaseUpper->f_poPrevious;
 		}
 	return;
 	M_EPILOG
