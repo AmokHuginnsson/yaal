@@ -272,13 +272,13 @@ void HListControl::refresh ( void )
 		if ( f_iControlOffset )
 			{
 			::move ( f_iRowRaw + l_iHR, f_iColumnRaw + l_iColumnOffset - 1 );
-			cprintf ( "^" );
+			addch ( ACS_UARROW );
 			}
 		if ( ( f_iQuantity - f_iControlOffset ) > f_iHeightRaw )
 			{
 			::move ( f_iRowRaw + f_iHeightRaw - ( 1 - l_iHR ),
 					f_iColumnRaw + l_iColumnOffset - 1 );
-			cprintf ( "v" );
+			addch ( ACS_DARROW );
 			}
 		l_dScaled = f_iHeightRaw - 3;
 		l_dScaled *= ( double ) ( f_iControlOffset + f_iCursorPosition );
