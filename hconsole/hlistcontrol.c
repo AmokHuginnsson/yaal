@@ -483,7 +483,7 @@ int HListControl::process_input ( int a_iCode )
 			}
 		case ( ' ' ):
 			{
-			if ( f_bCheckable )
+			if ( f_bCheckable && f_iQuantity )
 				l_poElement->get_object ( ).m_bChecked = ! l_poElement->get_object ( ).m_bChecked;
 			break;
 			}
