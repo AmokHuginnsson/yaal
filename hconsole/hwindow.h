@@ -63,6 +63,7 @@ public:
 	virtual int handler_jump_direct ( int ); /* direct jump to specified cntrl */
 	virtual int handler_command ( int ); /* put window into command awaiting */
 	virtual int handler_search ( int ); /* put window into search pattern scan */
+	virtual int click ( mouse::OMouse & );
 	int add_control ( HControl *, int );
 	HStatusBarControl * status_bar ( void );
 	/*}*/

@@ -421,9 +421,13 @@ int HProcess::handler_mouse ( int a_iCode, void * )
 	a_iCode = 0;
 	mouse::OMouse l_sMouse;
 	mouse::mouse_get ( l_sMouse );
+#ifdef __DEBUGGER_BABUNI__
 	console::c_printf ( 0, 0,	D_FG_BLACK | D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );
 	console::n_bNeedRepaint = true;
+#endif /* __DEBUGGER_BABUNI__ */
+	if ( f_poForegroundWindow )
+		f_poForegroundWindow->click ( l_sMouse );
 	return ( a_iCode );
 	M_EPILOG
 	}

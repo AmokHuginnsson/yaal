@@ -301,3 +301,21 @@ int HWindow::handler_search ( int a_iCode )
 	M_EPILOG
 	}
 
+int HWindow::click ( mouse::OMouse & a_rsMouse )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	HControl * l_poControl = NULL;
+	if ( f_poStatusBar && ( f_poStatusBar != f_poFocusedChild ) )
+		f_poStatusBar->click ( a_rsMouse );
+	l_iCtr = f_oControls.quantity ( );
+	while ( l_iCtr -- )
+		{
+		l_poControl = f_oControls.to_tail ( );
+		if ( l_poControl != f_poFocusedChild )l_poControl->click ( a_rsMouse );
+		}
+	if ( f_poFocusedChild )f_poFocusedChild->click ( a_rsMouse );
+	return ( 0 );
+	M_EPILOG
+	}
+

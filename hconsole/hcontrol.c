@@ -241,9 +241,22 @@ int HControl::click ( mouse::OMouse & a_rsMouse )
 	M_PROLOG
 	if ( a_rsMouse.f_iButtons )
 		{
-
+		if ( hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
+			set_focus ( );
 		}
 	return ( 0 );
+	M_EPILOG
+	}
+
+bool HControl::hit_test ( int a_iRow, int a_iColumn )
+	{
+	M_PROLOG
+	if ( ( a_iRow < f_iRowRaw ) || ( a_iRow > ( f_iRowRaw + f_iHeight ) ) )
+		return ( false );
+	if ( ( a_iColumn < f_iColumn )
+			|| ( a_iColumn > ( f_iColumnRaw + f_iWidth ) ) )
+		return ( false );
+	return ( true );
 	M_EPILOG
 	}
 
