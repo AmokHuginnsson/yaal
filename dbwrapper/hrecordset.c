@@ -80,7 +80,8 @@ void HRecordSet::sync ( void )
 		throw new HException ( __WHERE__, E_MODE, f_iMode );
 	for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 		sync ( l_iCtr, f_oValues [ l_iCtr ] );
-	sync ( f_iIdFieldOffset, m_lId );
+	if ( f_iFieldCount > 0 )
+		sync ( f_iIdFieldOffset, m_lId );
 	return;
 	M_EPILOG
 	}
