@@ -162,6 +162,14 @@ HInfo HControl::operator = ( const HInfo & a_roInfo )
 	M_EPILOG
 	}
 
+HControl::operator HInfo ( void )
+	{
+	M_PROLOG
+	HInfo l_oInfo;
+	return ( l_oInfo );
+	M_EPILOG
+	}
+
 void HControl::draw_label ( void )
 	{
 	M_PROLOG

@@ -55,3 +55,17 @@ void HDataControl::populate ( long int )
 	M_EPILOG
 	}
 
+long int HDataControl::get_current_id ( void )
+	{
+	M_PROLOG
+	return ( -1 );
+	M_EPILOG
+	}
+
+void HDataControl::add_new ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+

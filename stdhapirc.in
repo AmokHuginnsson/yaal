@@ -17,6 +17,8 @@
 
 use_mouse false
 
+latency 1
+
 command_compose_character x
 
 command_compose_delay 16

@@ -45,6 +45,8 @@ public:
 								 int = -1, int = -1, int = -1 );	/* attributes */
 	virtual ~HDataControl ( void );
 	virtual void populate ( long int = 0 );
+	virtual long int get_current_id ( void );
+	virtual void add_new ( void );
 	/*}*/
 protected:
 	/*{*/

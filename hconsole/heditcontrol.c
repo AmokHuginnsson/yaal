@@ -160,6 +160,14 @@ HInfo HEditControl::operator = ( const HInfo & a_roInfo )
 	M_EPILOG
 	}
 
+HEditControl::operator HInfo ( void )
+	{
+	M_PROLOG
+	HInfo l_oInfo ( f_oString );
+	return ( l_oInfo );
+	M_EPILOG
+	}
+
 void HEditControl::set_flags ( bool a_bReplace, bool a_bPassword )
 	{
 	M_PROLOG

@@ -82,6 +82,7 @@ public:
 	virtual int kill_focus ( void );
 	virtual void refresh ( void ) = 0;
 	virtual HInfo operator = ( const HInfo & );
+	virtual operator HInfo ( void );
 	void draw_label ( void );
 	void set_attributes ( int, int, int );
 	void move ( int, int, int, int );

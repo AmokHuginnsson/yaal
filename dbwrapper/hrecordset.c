@@ -80,7 +80,8 @@ void HRecordSet::sync ( void )
 	{
 	M_PROLOG 
 	int l_iCtr = 0;
-	if ( f_iMode == D_MODE_CLOSED )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode == D_MODE_CLOSED )
+		throw new HException ( __WHERE__, E_MODE, f_iMode );
 	for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 		sync ( l_iCtr, f_oValues [ l_iCtr ] );
 	sync ( f_iIdFieldOffset, m_id );
@@ -92,25 +93,23 @@ void HRecordSet::build_sql ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	HString l_oFilter;
-	HString l_oSort;
 	switch ( f_iMode )
 		{
 		case ( D_MODE_CLOSED ):
 			{
 			f_oSQL.format ( "SELECT %s FROM %s", ( const char * ) f_oColumns,
 					( const char * ) f_oTable );
-			if ( f_oFilter.is_empty ( ) )l_oFilter = m_oFilter;
-			else if ( m_oFilter.is_empty ( ) )l_oFilter = f_oFilter;
-			else l_oFilter.format ( "%s AND ( %s )", ( const char * ) f_oFilter,
+			if ( f_oFilter.is_empty ( ) )f_oBuffer = m_oFilter;
+			else if ( m_oFilter.is_empty ( ) )f_oBuffer = f_oFilter;
+			else f_oBuffer.format ( "%s AND ( %s )", ( const char * ) f_oFilter,
 					( const char * ) m_oFilter );
-			if ( ! l_oFilter.is_empty ( ) )
-				f_oSQL += ( " WHERE " + l_oFilter );
-			if ( f_oSort.is_empty ( ) )l_oSort = m_oSort;
-			else if ( m_oSort.is_empty ( ) )l_oSort = f_oSort;
-			else l_oSort.format ( "%s, %s", ( const char * ) m_oSort,
+			if ( ! f_oBuffer.is_empty ( ) )
+				f_oSQL += ( " WHERE " + f_oBuffer );
+			if ( f_oSort.is_empty ( ) )f_oBuffer = m_oSort;
+			else if ( m_oSort.is_empty ( ) )f_oBuffer = f_oSort;
+			else f_oBuffer.format ( "%s, %s", ( const char * ) m_oSort,
 					( const char * ) f_oSort );
-			if ( ! l_oSort.is_empty ( ) )
+			if ( ! f_oBuffer.is_empty ( ) )
 				f_oSQL += ( " ORDER BY " + m_oSort );
 			f_oSQL += ';';
 			break;
@@ -126,23 +125,29 @@ void HRecordSet::build_sql ( void )
 			f_oBuffer += " WHERE id = ";
 			f_oBuffer += m_id;
 			f_oBuffer += ';';
+			f_oSQL = f_oBuffer;
 			break;
 			}
 		case ( D_MODE_ADDING ):
 			{
-			f_oBuffer = "INSERT " + f_oTable + " ( ";
-			for ( l_iCtr = 1; l_iCtr < f_iFieldCount; l_iCtr ++ )
+			f_oSQL = "INSERT " + f_oTable + " ( ";
+			for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 				{
-				if ( l_iCtr > 1 )f_oBuffer += ", ";
+				if ( l_iCtr == f_iIdFieldOffset )continue;
+				if ( ! f_oBuffer.is_empty ( ) )f_oBuffer += ", ";
 				f_oBuffer += f_oColumnNames [ l_iCtr ];
 				}
 			f_oBuffer += " ) VALUES ( ";
-			for ( l_iCtr = 1; l_iCtr < f_iFieldCount; l_iCtr ++ )
+			f_oSQL += f_oBuffer;
+			f_oBuffer = "";
+			for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 				{
-				if ( l_iCtr > 1 )f_oBuffer += ", ";
+				if ( l_iCtr == f_iIdFieldOffset )continue;
+				if ( ! f_oBuffer.is_empty ( ) )f_oBuffer += ", ";
 				f_oBuffer += '\'' + f_oValues [ l_iCtr ] + '\'';
 				}
-			f_oBuffer += " )";
+			f_oBuffer += " );";
+			f_oSQL += f_oBuffer;
 			break;
 			}
 		default :
@@ -183,7 +188,8 @@ long int HRecordSet::open ( const char * a_pcQuery )
 void HRecordSet::close ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )
+		throw new HException ( __WHERE__, E_MODE, f_iMode );
 	if ( f_pvCoreData )
 		dbwrapper::db_unquery ( f_pvCoreData );
 	f_pvCoreData = NULL;
@@ -276,7 +282,8 @@ HString HRecordSet::get ( int a_iField )
 void HRecordSet::add_new ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )
+		throw new HException ( __WHERE__, E_MODE, f_iMode );
 	f_iMode = D_MODE_ADDING;
 	return;
 	M_EPILOG
@@ -285,7 +292,8 @@ void HRecordSet::add_new ( void )
 void HRecordSet::edit ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )
+		throw new HException ( __WHERE__, E_MODE, f_iMode );
 	f_iMode = D_MODE_EDITING;
 	return;
 	M_EPILOG

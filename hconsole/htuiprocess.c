@@ -175,7 +175,7 @@ int HProcess::reconstruct_fdset ( void )
 	M_PROLOG
 	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
 	HHandler < int ( HProcess::* ) ( int ) > l_oHandler;
-	f_sLatency.tv_sec = 1;
+	f_sLatency.tv_sec = console::n_iLatency;
 	f_sLatency.tv_usec = 0;
 	FD_ZERO ( & f_xFileDescriptorSet );
 	if ( ! f_oFileDescriptorHandlers.quantity ( ) )return ( -1 );

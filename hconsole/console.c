@@ -53,6 +53,7 @@ bool n_bNeedRepaint = false;
 bool n_bInputWaiting = false;
 int n_iWidth = 0;
 int n_iHeight = 0;
+int n_iLatency = 1;
 int n_iDisabledAttribute = 256 * ( D_FG_GREEN | D_BG_BLACK | D_BG_BLINK )
 															+ ( D_FG_LIGHTGRAY | D_BG_BLACK | D_BG_BLINK );
 int n_iEnabledAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
@@ -68,6 +69,7 @@ int		n_iCommandComposeDelay = 16;
 OVariable n_psVariables [ ] =
 	{
 		{ D_TYPE_BOOL, "use_mouse", & n_bUseMouse },
+		{ D_TYPE_INT, "latency", & n_iLatency },
 		{ D_TYPE_CHAR, "command_compose_character", & n_cCommandComposeCharacter },
 		{ D_TYPE_INT, "command_compose_delay", & n_iCommandComposeDelay },
 		{ 0, NULL, NULL }

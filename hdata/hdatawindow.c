@@ -180,6 +180,7 @@ int HDataWindow::init ( void )
 		l_iCtr ++;
 		}
 	f_poMainControl->set_focus ( );
+	open ( );
 	if ( f_poMainControl )f_poMainControl->populate ( );
 	refresh ( );
 	return ( 0 );
@@ -267,6 +268,13 @@ void HDataWindow::sync ( void )
 		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 			( * f_poSyncStore ) [ l_iCtr ] = f_oValues [ l_iCtr ];
 		}
+	else if ( ( f_iMode == D_MODE_ADDING ) || ( f_iMode == D_MODE_EDIT ) )
+		{
+		l_iCount = f_oEditModeControls.quantity ( );
+		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+			f_oValues [ l_iCtr ] = ( HString & ) ( HInfo ) * ( HControl * ) f_oEditModeControls [ l_iCtr ];
+		m_id = f_poMainControl->get_current_id ( );
+		}
 	return;
 	M_EPILOG
 	}
@@ -280,6 +288,9 @@ void HDataWindow::set_sync_store ( HInfoList * a_poInfoList )
 int HDataWindow::handler_add_new ( int )
 	{
 	M_PROLOG
+	add_new ( );
+	f_poMainControl->add_new ( );
+	set_mode ( D_MODE_EDIT );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -288,6 +299,7 @@ int HDataWindow::handler_edit ( int )
 	{
 	M_PROLOG
 	set_mode ( D_MODE_EDIT );
+	edit ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -295,6 +307,8 @@ int HDataWindow::handler_edit ( int )
 int HDataWindow::handler_delete ( int )
 	{
 	M_PROLOG
+	remove ( );
+	f_poMainControl->populate ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -302,6 +316,9 @@ int HDataWindow::handler_delete ( int )
 int HDataWindow::handler_save ( int )
 	{
 	M_PROLOG
+	update ( );
+	set_mode ( D_MODE_VIEW );
+	f_poMainControl->populate ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -309,6 +326,8 @@ int HDataWindow::handler_save ( int )
 int HDataWindow::handler_requery ( int )
 	{
 	M_PROLOG
+	set_mode ( D_MODE_VIEW );
+	f_poMainControl->populate ( );
 	return ( 0 );
 	M_EPILOG
 	}

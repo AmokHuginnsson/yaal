@@ -69,16 +69,33 @@ void HDataListControl::populate ( long int /*a_iId*/ )
 	HInfoList l_oInfoList ( f_oHeader.quantity ( ) );
 	HDataWindow * l_poParent = ( HDataWindow * ) f_poParent;
 	l_poParent->set_sync_store ( & l_oInfoList );
-	f_poRecordSet->open ( );
+	f_poRecordSet->requery ( );
 	flush ( );
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
+		l_oInfoList [ 0 ] = f_poRecordSet->m_id;
 		add_tail ( l_oInfoList );
 		f_poRecordSet->move_next ( );
 		}
-	f_poRecordSet->close ( );
 	l_poParent->set_sync_store ( );
 	process_input ( KEY_HOME );
+	return;
+	M_EPILOG
+	}
+
+long int HDataListControl::get_current_id ( void )
+	{
+	M_PROLOG
+	return ( ( * ( HInfoList * ) & f_poSelected->get_object ( ) ) [ 0 ] );
+	M_EPILOG
+	}
+
+void HDataListControl::add_new ( void )
+	{
+	M_PROLOG
+	add_tail ( );
+	process_input ( KEY_HOME );
+	process_input ( KEY_END );
 	return;
 	M_EPILOG
 	}
