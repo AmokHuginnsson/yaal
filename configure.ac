@@ -54,7 +54,7 @@ AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])
 AC_HEADER_MAJOR
 
 dnl We need to know what operating system stdhapi will be compiled on.
-AC_MSG_RESULT([--- Guessing host operating system ... ---              [[64%]]])
+AC_MSG_RESULT([--- Guessing host operating system ... ---              [[58%]]])
 AC_CHECK_FILE(
 	[[/etc/rc]],
 	[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST________=['FreeBSD. ---  ']
@@ -74,10 +74,10 @@ AC_CHECK_FILE(
 		)]
 	)]
 )
-AC_MSG_RESULT([--- Guessed host operating system is $_HOST________     [[70%]]])
+AC_MSG_RESULT([--- Guessed host operating system is $_HOST________     [[62%]]])
 
 dnl What special compiler flags we can set?
-AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[71%]]])
+AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[63%]]])
 _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
 CXXFLAGS=["-Wshadow -Werror"]
@@ -96,7 +96,7 @@ AC_LINK_IFELSE([[extern int errno;void foo(void){errno=0;}]],
 								[[-Wl,--no-undefined]]) _FLAGS=["$_FLAGS -Wl,--no-undefined."]],
 							[AC_MSG_WARN([[Can not use -Wl,--no-undefined!]])])
 if test ["$_FLAGS"] = [""] ; then
-	_FLAGS='unfortunetely none. ---         [[76%]]'
+	_FLAGS='unfortunetely none. ---         [[68%]]'
 fi
 AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
 
@@ -114,7 +114,7 @@ int main()
 DEFAULT_DRIVER=["null"]
 
 dnl Now we can look for all needed libraries.
-AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[77%]]])
+AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[70%]]])
 CXXFLAGS=$CXXFLAGS_ORIG;
 CPPFLAGS=$CXXFLAGS_ORIG;
 AC_CHECK_LIB([ncurses],[initscr],
@@ -139,28 +139,40 @@ fi
 CXXFLAGS=$CXXFLAGS_ORIG;
 CPPFLAGS=$CXXFLAGS_ORIG;
 
-AC_MSG_RESULT([--- All needed libraries found. ---                     [[83%]]])
+AC_MSG_RESULT([--- All needed libraries found. ---                     [[76%]]])
 
-AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[84%]]])
+AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
 			[AC_MSG_ERROR([Can not continue without ncurses devel!])])])
 if test ["$POSTGRES"] != ["no"] ; then
-	AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],[DEFAULT_DRIVER=["PostgreSQL"]],
-		[AC_CHECK_HEADERS([[libpq-fe.h]],[DEFAULT_DRIVER=["PostgreSQL"]],
+	AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],
+		[AC_SUBST([TARGET_POSTGRESQL_DRIVER],["\$(POSTGRESQL_DRIVER)"])
+			DEFAULT_DRIVER=["PostgreSQL"]],
+		[AC_CHECK_HEADERS([[libpq-fe.h]],
+			[AC_SUBST([TARGET_POSTGRESQL_DRIVER],["\$(POSTGRESQL_DRIVER)"])
+			DEFAULT_DRIVER=["PostgreSQL"]],
 				[if test ["$POSTGRES"] = ["yes"] ; then
 					AC_MSG_ERROR([[Can not continue without PostgreSQL devel(client)!]])
 				fi;POSTGRES=["no"]])])
 fi
 if test ["$MYSQL"] != ["no"] ; then
-	AC_CHECK_HEADERS([[mysql/mysql.h]],[DEFAULT_DRIVER=["MySQL"]],
+	AC_CHECK_HEADERS([[mysql/mysql.h]],
+		[AC_SUBST([TARGET_MYSQL_DRIVER],["\$(MYSQL_DRIVER)"])
+			DEFAULT_DRIVER=["MySQL"]],
 				[if test ["$MYSQL"] = ["yes"] ; then
 					AC_MSG_ERROR([[Can not continue without MySQL devel(client)!]])
 				fi;MYSQL=["no"]])
 fi
 AC_SUBST([DEFAULT_DRIVER],["$DEFAULT_DRIVER"])
 
-AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[92%]]])
+AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
+
+AC_MSG_RESULT([--- Looking for useful functions ... ---                [[83%]]])
+
+AC_CHECK_FUNCS([getline],[],[])
+
+AC_MSG_RESULT([--- Done looking for useful functions. ---              [[92%]]])
 
 dnl We need to check if out ncurses devel is not brain-damaged.
 AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])

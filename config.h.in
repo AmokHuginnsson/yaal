@@ -10,7 +10,7 @@
 
 /* End of operating system host type definition. */
 
-/* Define available headers */
+/* Defines for available headers */
 
 /* ncurses */
 
@@ -29,3 +29,10 @@
 #undef HAVE_LIBPQ_FE_H
 
 /* End of available headers definitions. */
+
+/* Defines for available functions */
+
+#undef HAVE_GETLINE
+
+/* End of available functions definitions. */
+
