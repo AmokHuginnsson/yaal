@@ -12,7 +12,7 @@ AC_CONFIG_SRCDIR([[stdhapirc.in]])
 AC_CONFIG_AUX_DIR([aux])
 
 dnl stdhapi is not Free Software.
-AC_COPYRIGHT([[stdhapi (c) 2003 All rights reserved.]])
+AC_COPYRIGHT([[stdhapi (c) 2004 All rights reserved.]])
 
 dnl stdhapi is still in alpha stage.
 AC_REVISION([[$ Revision: 0.0.0 $]])
@@ -142,10 +142,11 @@ MYSQL_SOCKET=[`grep -s "^socket" $FILES|awk '{sub(".*=[ \\t]+","");print;exit}'`
 AC_SUBST([MYSQL_SOCKET],[$MYSQL_SOCKET])
 
 AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
-AC_CONFIG_COMMANDS_PRE([cd hcore;ln -sf harray.h harray.c;ln -sf hlist.h hlist.c;
-												ln -sf htree.h htree.c;cd ..;cd hconsole;
-												ln -sf hhandler.h hhandler.c;ln -sf omenuitem.h omenuitem.c;
-												cd ..;cd hdata;ln -sf oresource.h oresource.c;cd ..;cd doc/html;
+AC_CONFIG_COMMANDS_PRE([cd hcore;ln -sf harray.h harray.c;
+												ln -sf hlist.h hlist.c;ln -sf htree.h htree.c;cd ..;
+												cd hconsole;ln -sf hhandler.h hhandler.c;
+												ln -sf omenuitem.h omenuitem.c;cd ..;cd hdata;
+												ln -sf oresource.h oresource.c;cd ..;cd doc/html;
 												ln -sf stdhapi_toc.html index.html;cd ../..])
 
 dnl We have to set up proper compiler/linker flags.
