@@ -168,7 +168,7 @@ int HProcess::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
 		while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
 			{
 			l_poHandler = & f_oPreprocessHandlers.to_tail ( 1, & l_iFlag );
-			if ( ( * l_poHandler ) == HANDLER )
+			if ( ( PROCESS_HANDLER_t ) ( * l_poHandler ) == HANDLER )
 				{
 				( * l_poHandler ).add ( a_iCodeCount, a_piCodes );
 				return ( 0 );
@@ -193,7 +193,7 @@ int HProcess::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
 		while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
 			{
 			l_poHandler = & f_oPostprocessHandlers.to_tail ( 1, & l_iFlag );
-			if ( ( * l_poHandler ) == HANDLER )
+			if ( ( PROCESS_HANDLER_t ) ( * l_poHandler ) == HANDLER )
 				{
 				( * l_poHandler ).add ( a_iCodeCount, a_piCodes );
 				return ( 0 );
