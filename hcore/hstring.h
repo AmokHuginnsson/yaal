@@ -93,7 +93,7 @@ public:
 	int find ( char, int = 0 );
 	int find ( const char *, int = 0 );
 	int reverse_find ( char, int = 0 );
-	HString & replace ( const char *, char * );
+	HString & replace ( const char *, const char * );
 	HString & upper ( void );
 	HString & lower ( void );
 	HString & reverse ( void );

@@ -569,7 +569,7 @@ int HString::reverse_find ( char a_cChar, int a_iBefore )
 	M_EPILOG
 	}
 
-HString & HString::replace ( const char * a_pcPattern, char * a_pcWith )
+HString & HString::replace ( const char * a_pcPattern, const char * a_pcWith )
 	{
 	M_PROLOG
 	char * l_pcTmp = 0, * l_pcStr;
