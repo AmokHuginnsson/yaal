@@ -332,7 +332,7 @@ void rc_set_variable ( const char * a_pcValue, bool & a_rbVariable )
 		{
 		l_oMessage = "bad value: ";
 		l_oMessage += a_pcValue;
-		M_THROW ( ( char * ) l_oMessage, a_rbVariable );
+		M_THROW ( l_oMessage, a_rbVariable );
 		}
 	M_EPILOG
 	return;
