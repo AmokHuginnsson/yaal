@@ -65,6 +65,7 @@ int HCollector::send_line ( const char * a_pcLine )
 	M_PROLOG
 	int l_iCtr = 0;
 	int l_iCRC = 0;
+	int l_iError = -1;
 	int l_iLength = strlen ( a_pcLine );
 	char * l_pcSpeedUp = NULL;
 	HString l_oLine, l_oLocalCopy;
@@ -85,11 +86,18 @@ int HCollector::send_line ( const char * a_pcLine )
 	l_iLength += ( 2 /* for lenght */ + 2 /* for crc */ + 1 /* for newline */ );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
 		{
+		if ( tcflush ( f_iFileDes, TCOFLUSH ) )
+			throw new HException ( __WHERE__, "tcflush ( TCOFLUSH )", g_iErrNo );
 		l_iCtr = write ( l_oLine, l_iLength );
+		if ( tcdrain ( f_iFileDes ) )
+			throw new HException ( __WHERE__, "tcdrain", g_iErrNo );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
+		if ( tcflush ( f_iFileDes, TCIFLUSH ) )
+			throw new HException ( __WHERE__, "tcflush ( TCIFLUSH )", g_iErrNo );
+		l_iError ++;
 		}
-	return ( l_iLength - l_iCtr );
+	return ( l_iError + l_iLength - l_iCtr );
 	M_EPILOG
 	}
 
@@ -107,6 +115,8 @@ int HCollector::receive_line ( char * & a_pcLine )
 		{
 		memset ( f_oLine, 0, D_RECV_BUF_SIZE );
 		read ( f_oLine, D_RECV_BUF_SIZE );
+		if ( tcflush ( f_iFileDes, TCIFLUSH ) )
+			throw new HException ( __WHERE__, "tcflush ( TCIFLUSH )", g_iErrNo );
 		a_pcLine = ( ( char * ) f_oLine )
 			+ strlen ( D_PROTO_DTA ) + 2 /* for lenght */ + 2 /* for crc */;
 		l_iLength = strlen ( a_pcLine ) - 1;
@@ -126,7 +136,11 @@ int HCollector::receive_line ( char * & a_pcLine )
 			l_iError += ( l_iErrLenght - write ( D_PROTO_ERR, l_iErrLenght ) );
 		l_iError ++;
 		}
+	if ( tcflush ( f_iFileDes, TCOFLUSH ) )
+		throw new HException ( __WHERE__, "tcflush ( TCOFLUSH )", g_iErrNo );
 	l_iError += ( l_iAckLenght - write ( D_PROTO_ACK, l_iAckLenght ) );
+	if ( tcdrain ( f_iFileDes ) )
+		throw new HException ( __WHERE__, "tcdrain", g_iErrNo );
 	f_iLines ++;
 	return ( l_iError );
 	M_EPILOG
