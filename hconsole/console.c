@@ -280,8 +280,20 @@ int get_key( void )
 		curs_set ( l_iOrigCursState );
 		}
 	echo ( );
-	if ( l_iKey == 347 ) l_iKey = 360;
-	else if ( ( l_iKey == 127 ) || ( l_iKey == 8 ) ) l_iKey = 263;
+	switch ( l_iKey )
+		{
+		case ( 347 ):
+			{
+			l_iKey = KEY_END;
+			break;
+			}
+		case ( 8 ):
+		case ( 127 ):
+			{
+			l_iKey = KEY_BACKSPACE;
+			break;
+			}
+		}
 	return ( l_iKey );
 	M_EPILOG
 	}
