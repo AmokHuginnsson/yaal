@@ -31,42 +31,7 @@ Copyright:
 #include "../hconsole/hwindow.h"
 #include "../hconsole/hlistcontrol.h"
 #include "hdatacontrol.h"
-
-/* control flags */
-#define D_CONTROL_MAIN		1
-#define D_CONTROL_FILTER	2
-#define D_CONTROL_DATA		4
-
-/* control types */
-#define D_CONTROL_EDIT	1
-#define D_CONTROL_LIST	2
-#define D_CONTROL_TREE	3
-#define D_CONTROL_COMBO	4
-#define D_CONTROL_DATE	5
-#define D_CONTROL_CHECK	6
-
-struct ODataControlInfo
-	{
-	char *	f_pcTable;
-	int			f_iRow;
-	int			f_iColumn;
-	int			f_iHeight;
-	int			f_iWidth;
-	char *	f_pcLabel;
-	int			f_iAttribute;
-	int			f_iEnabledAttribute;
-	int			f_iFocusedAttribute;
-	int			f_iFlags;
-	int			f_iType;
-/* control type specific */
-	char *	f_pcValue;
-	char *	f_pcMask;
-	bool		f_bMultiLine;
-	bool		f_bReplace;
-	bool		f_bPassword;
-	int			f_iMaxHistoryLevel;
-/* end */
-	};
+#include "oresource.h"
 
 class HDataWindow : public HWindow, public HRecordSet
 	{
@@ -74,13 +39,13 @@ protected:
 	/*{*/
 	bool f_bModified;
 	HDataControl * f_poMainControl;
-	ODataControlInfo * f_psDataControlInfo;
+	OResource * f_psResourcesArray;
 	HList < HControl * > f_oViewModeControls;
 	HList < HControl * > f_oEditModeControls;
 	/*}*/
 public:
 	/*{*/
-	HDataWindow ( const char *, HDataBase * = NULL, ODataControlInfo * = NULL );
+	HDataWindow ( const char *, HDataBase * = NULL, OResource * = NULL );
 	virtual ~HDataWindow ( void );
 	virtual int init ( void );
 	/*}*/

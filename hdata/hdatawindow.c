@@ -25,17 +25,18 @@ Copyright:
 */
 
 #include "hdatawindow.h"
+#include "hdatalistcontrol.h"
 
 #include "../hcore/hexception.h"
 
 HDataWindow::HDataWindow ( const char * a_pcTitle, HDataBase * a_poDataBase,
-		ODataControlInfo * a_psDataControlInfo )
+		OResource * a_psDataControlInfo )
 	: HWindow ( a_pcTitle ), HRecordSet ( a_poDataBase )
 	{
 	M_PROLOG
 	f_bModified = false;
 	f_poMainControl = NULL;
-	f_psDataControlInfo = a_psDataControlInfo;
+	f_psResourcesArray = a_psDataControlInfo;
 	register_postprocess_handler ( D_KEY_COMMAND_('n'),
 			( int ( HWindow::* ) ( int ) ) & HDataWindow::handler_add_new );
 	register_postprocess_handler ( D_KEY_COMMAND_('e'),
@@ -63,9 +64,50 @@ int HDataWindow::init ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
+	HDataControl * l_poDataControl = NULL;
 	HWindow::init ( );
-	while ( f_psDataControlInfo [ l_iCtr ].f_pcLabel )
+	while ( f_psResourcesArray [ l_iCtr ].f_pcLabel )
 		{
+		switch ( f_psResourcesArray [ l_iCtr ].f_iType )
+			{
+			case ( D_CONTROL_EDIT ):
+				{
+				break;
+				}
+			case ( D_CONTROL_LIST ):
+				{
+				l_poDataControl = new HDataListControl ( this, this,
+						f_psResourcesArray [ l_iCtr ].f_iRow,
+						f_psResourcesArray [ l_iCtr ].f_iColumn,
+						f_psResourcesArray [ l_iCtr ].f_iHeight,
+						f_psResourcesArray [ l_iCtr ].f_iWidth,
+						f_psResourcesArray [ l_iCtr ].f_pcLabel,
+						f_psResourcesArray [ l_iCtr ].f_iAttribute,
+						f_psResourcesArray [ l_iCtr ].f_iEnabledAttribute,
+						f_psResourcesArray [ l_iCtr ].f_iFocusedAttribute );
+				break;
+				}
+			case ( D_CONTROL_TREE ):
+				{
+				break;
+				}
+			case ( D_CONTROL_COMBO ):
+				{
+				break;
+				}
+			case ( D_CONTROL_DATE ):
+				{
+				break;
+				}
+			case ( D_CONTROL_CHECK ):
+				{
+				break;
+				}
+			default :
+				{
+				break;
+				}
+			}
 		l_iCtr ++;
 		}
 	f_poMainControl->populate ( );

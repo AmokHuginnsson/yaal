@@ -144,7 +144,8 @@ AC_SUBST([MYSQL_SOCKET],[$MYSQL_SOCKET])
 AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
 AC_CONFIG_COMMANDS_PRE([cd hcore;ln -sf hlist.h hlist.c;ln -sf htree.h htree.c;
 												cd ..;cd hconsole;ln -sf hhandler.h hhandler.c;
-												ln -sf omenuitem.h omenuitem.c;cd ..;cd doc/html;
+												ln -sf omenuitem.h omenuitem.c;cd ..;cd hdata;
+												ln -sf oresource.h oresource.c;cd ..;cd doc/html;
 												ln -sf stdhapi_toc.html index.html;cd ../..])
 
 dnl We have to set up proper compiler/linker flags.
