@@ -247,7 +247,6 @@ HList< tType >::HList ( int a_iSize )
 	f_iHighestNumber = 0;
 	f_poHook = 0;
 	f_poSelected = 0;
-	cmp = & HList< tType >::cmpc;
 	while ( a_iSize -- )add_tail ( );
 	return ;
 	M_EPILOG
@@ -409,7 +408,7 @@ template < class tType >
 tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 	{
 	M_PROLOG
-#define M_SWITCH ( ( this->* cmp ) ( f_poIndex, l_poElement ) * a_iOrder ) < 0
+#define M_SWITCH ( cmpc ( f_poIndex, l_poElement ) * a_iOrder ) < 0
 	bool l_bBefore = false;
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iQuantity;
 	HElement * l_poElement = new HElement ( NULL, f_iHighestNumber );

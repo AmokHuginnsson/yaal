@@ -61,6 +61,7 @@ public:
 	virtual int click ( mouse::OMouse & );
 	int add_control ( HControl *, int );
 	HStatusBarControl * status_bar ( void );
+	HString get_command ( void );
 	/*}*/
 protected:
 	/*{*/
@@ -69,6 +70,7 @@ private:
 	/*{*/
 	friend int HControl::set_focus ( char );
 	friend void HStatusBarControl::set_prompt ( const char *, int );
+	friend int HStatusBarControl::process_input_normal ( int );
 	void set_focus ( HControl * );
 	/*}*/
 	};

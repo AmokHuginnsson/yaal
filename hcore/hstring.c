@@ -702,14 +702,17 @@ HString HString::split ( const char * a_pcAt, int a_iPart )
 	int l_iBegining = 0;
 	int l_iSize = 0;
 	int l_iCtr = 0;
-	for ( ;	f_pcBuffer [ l_iBegining ] &&	( l_iCtr < a_iPart );	l_iCtr ++ )
-		l_iBegining += strcspn ( f_pcBuffer + l_iBegining, a_pcAt ) + 1;
-	if ( f_pcBuffer [ l_iBegining ] )
+	if ( f_iSize )
 		{
-		l_iSize = strcspn ( f_pcBuffer + l_iBegining, a_pcAt );
-		return ( mid ( l_iBegining, l_iSize ) );
+		for ( ;	f_pcBuffer [ l_iBegining ] &&	( l_iCtr < a_iPart );	l_iCtr ++ )
+			l_iBegining += strcspn ( f_pcBuffer + l_iBegining, a_pcAt ) + 1;
+		if ( f_pcBuffer [ l_iBegining ] )
+			{
+			l_iSize = strcspn ( f_pcBuffer + l_iBegining, a_pcAt );
+			return ( mid ( l_iBegining, l_iSize ) );
+			}
 		}
-	else return ( "" );;
+	return ( "" );;
 	M_EPILOG
 	}
 

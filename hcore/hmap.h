@@ -294,7 +294,7 @@ bool HMap<tType, ttType>::remove ( const tType & a_rtKey )
 
 /* Helpers and premaps */
 
-unsigned long int hash ( HString & );
+unsigned long int hash ( const HString & );
 
 #endif /* not __HMAP_H */
 

@@ -81,3 +81,21 @@ int HHandler::process_input ( int a_iCode, process_handler_key_map_t & a_oMap )
 	M_EPILOG
 	}
 
+HString HHandler::process_command ( void )
+	{
+	M_PROLOG
+	HANDLER_t HANDLER = NULL;
+	HString l_oCommand;
+	if ( f_oCommand )
+		{
+		l_oCommand = f_oCommand.split ( " \t", 0 );
+		if ( f_oCommandHandlers.get ( l_oCommand, HANDLER ) )
+			{
+			( this->*HANDLER ) ( 0, ( char * ) f_oCommand );
+			f_oCommand = "";
+			}
+		}
+	return ( f_oCommand );
+	M_EPILOG
+	}
+

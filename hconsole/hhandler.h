@@ -46,6 +46,7 @@ protected:
 	process_handler_key_map_t f_oPreprocessHandlers;
 	process_handler_key_map_t f_oPostprocessHandlers;
 	process_handler_command_map_t f_oCommandHandlers;
+	HString f_oCommand;
 	/*}*/
 public:
 	/*{*/
@@ -55,7 +56,7 @@ public:
 protected:
 	/*{*/
 	int process_input ( int, process_handler_key_map_t & );
-	int process_commands ( void );
+	HString process_command ( void );
 	int register_preprocess_handler ( int, int *, HANDLER_t );
 	int register_postprocess_handler ( int, int *, HANDLER_t );
 	/*}*/

@@ -109,6 +109,23 @@ int HStatusBarControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
 	a_iCode = HEditControl::process_input ( a_iCode );
+	switch ( f_iMode )
+		{
+		case ( D_MODE_NORMAL ):
+			{
+			a_iCode = process_input_normal ( a_iCode );
+			break;
+			}
+		case ( D_MODE_MENU ):
+			{
+			a_iCode = process_input_menu ( a_iCode );
+			break;
+			}
+		default :
+			{
+			break;
+			}
+		}
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -281,6 +298,35 @@ bool HStatusBarControl::confirm ( const char * a_pcQuestion )
 	M_PROLOG
 	ask ( a_pcQuestion, "[yes/no]: " );
 	return ( false );
+	M_EPILOG
+	}
+
+int HStatusBarControl::process_input_normal  ( int a_iCode )
+	{
+	M_PROLOG
+	int l_iCode = a_iCode;
+	a_iCode = 0;
+	switch ( l_iCode )
+		{
+		case ( '\r' ):
+			{
+			f_poParent->f_oCommand = f_oString;
+			break;
+			}
+		default :
+			{
+			a_iCode = l_iCode;
+			break;
+			}
+		}
+	return ( a_iCode );
+	M_EPILOG
+	}
+
+int HStatusBarControl::process_input_menu  ( int a_iCode )
+	{
+	M_PROLOG
+	return ( a_iCode );
 	M_EPILOG
 	}
 

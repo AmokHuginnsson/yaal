@@ -33,6 +33,9 @@ Copyright:
 #define D_PROMPT_ONLY_ENTER_CAT_QUIT	1
 #define D_PROMPT_MUST_CANCEL					2
 
+#define D_MODE_NORMAL	0
+#define D_MODE_MENU		1
+
 class HStatusBarControl : public HEditControl
 	{
 protected:
@@ -61,7 +64,9 @@ public:
 	virtual void draw_label ( void );
 	virtual void refresh ( void );
 	virtual int verify ( void );
-	virtual int process_input( int );
+	virtual int process_input ( int );
+	virtual int process_input_normal ( int );
+	virtual int process_input_menu ( int );
 	void setup ( const char *, const char *, int );
 	void set_prompt ( const char * = NULL, int = D_PROMPT_RELAXED );
 	void init_progress ( double, const char *, bool = true );

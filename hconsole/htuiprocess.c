@@ -113,6 +113,7 @@ int HProcess::init ( const char * a_pcProcessName )
 		l_piAlts [ l_iCtr ] = D_KEY_META_( '0' + l_iCtr );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_ALTS_COUNT, l_piAlts,
 			HProcess::handler_jump_meta_direct );
+	f_oCommandHandlers [ "quit" ] = ( HANDLER_t ) & HProcess::handler_quit;
 	handler_refresh ( 0 );
 	return ( 1 );
 	M_EPILOG
@@ -170,12 +171,23 @@ int HProcess::reconstruct_fdset ( void )
 int HProcess::process_stdin ( int a_iCode )
 	{
 	M_PROLOG
+	HString l_oCommand;
 	console::n_bInputWaiting = false;
 	if ( ! a_iCode )a_iCode = console::get_key ( );
 	if ( a_iCode )a_iCode = process_input ( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && f_poForegroundWindow )
 			a_iCode = f_poForegroundWindow->process_input ( a_iCode );
 	if ( a_iCode )a_iCode = process_input ( a_iCode, f_oPostprocessHandlers );
+	if ( ! a_iCode )
+		{
+		if ( f_poForegroundWindow )
+			f_oCommand = f_poForegroundWindow->get_command ( );
+		if ( f_oCommand )
+			l_oCommand = process_command ( );
+		if ( l_oCommand && f_poForegroundWindow )
+			f_poForegroundWindow->status_bar ( )->message ( D_FG_RED,
+					"unknown command: `%s'", ( char * ) l_oCommand );
+		}
 #ifdef __DEBUGGER_BABUNI__
 	console::n_bNeedRepaint = true;
 	if ( a_iCode )
