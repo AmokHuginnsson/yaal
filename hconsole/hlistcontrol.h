@@ -37,10 +37,35 @@ Copyright:
 #define D_ALIGN_LEFT			0x0010000
 #define D_ALIGN_CENTER		0x0020000
 #define D_ALIGN_RIGHT			0x0040000
-#define D_ALIGN_MASK			0x0ff0000
 
 class HListControl : public HList < HItem >, public virtual HControl
 	{
+	class HColumnInfo
+		{
+	protected:
+		/*{*/
+		int f_iWidthRaw;
+		int f_iWidth;
+		int f_iType;
+		int f_iAlign;
+		int f_iShortcutIndex;
+		char f_cShortcut;
+		HString f_oName;
+		HControl * f_poControl;
+		/*}*/
+	public:
+		/*{*/
+		HColumnInfo ( void );
+		virtual ~HColumnInfo ( void );
+		HColumnInfo ( const HColumnInfo & );
+		HColumnInfo & operator = ( const HColumnInfo & );
+		int operator - ( const HColumnInfo & );
+		/*}*/
+	protected:
+		/*{*/
+		/*}*/
+		friend class HListControl;
+		};
 protected:
 	/*{*/
 	bool				f_bCheckable;					/* can items be checked/unchecked */
@@ -59,7 +84,7 @@ protected:
 	regex_t 		f_sMask;							/* regular expression for search patterns */
 	HString			f_oPattern;						/* current search pattern */
 	HElement *	f_poFirstVisibleRow;	/* pointer to first visible row */
-	HInfoList 	f_oHeader;						/* list header info */
+	HList < HColumnInfo >	f_oHeader;	/* list header info */
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
 	long int		f_lComparedItems;			/* items already compared during sorting */
