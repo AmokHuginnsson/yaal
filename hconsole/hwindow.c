@@ -191,9 +191,15 @@ void HWindow::refresh ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
+	HControl * l_poControl = NULL;
 	if ( f_poStatusBar )f_poStatusBar->refresh ( );
 	l_iCtr = f_oControls.quantity ( );
-	while ( l_iCtr -- )f_oControls.to_tail ( )->refresh ( );
+	while ( l_iCtr -- )
+		{
+		l_poControl = f_oControls.to_tail ( );
+		if ( l_poControl != f_poFocusedChild )l_poControl->refresh ( );
+		}
+	if ( f_poFocusedChild )f_poFocusedChild->refresh ( );
 	console::n_bNeedRepaint = true;
 	return;
 	M_EPILOG
