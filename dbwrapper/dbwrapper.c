@@ -25,6 +25,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <dlfcn.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -40,6 +41,9 @@ M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hcore.h"
 #include "dbwrapper.h"
 #include "db_driver_loader.h"
+
+void dbwrapper_error ( void );
+void dbwrapper_exit ( void ) __attribute__  ((noreturn));
 
 namespace dbwrapper
 	{
