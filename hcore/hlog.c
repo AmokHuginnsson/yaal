@@ -151,7 +151,7 @@ void HLog::timestamp ( FILE * a_psStream )
 	if ( ! a_psStream )a_psStream = f_psStream;
 	if ( ! f_bRealMode )
 		{
-		if ( f_psStream )fprintf ( f_psStream, "%-10x", f_lType );
+		if ( f_psStream )fprintf ( f_psStream, "%-10lx", f_lType );
 		return;
 		}
 	tm * l_psBrokenTime = 0;
