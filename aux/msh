@@ -1,0 +1,85 @@
+#!/bin/sh
+#
+#---        `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
+#
+# msh - this file is integral part of `stdhapi' project.
+#
+#	i.  You may not make any changes in Copyright information.
+#	ii. You must attach Copyright information to any part of every copy
+#	    of this software.
+#
+#Copyright:
+#
+# You are free to use this program as is, you can redistribute binary
+# package freely but:
+#  1. You can not use any part of sources of this software.
+#  2. You can not redistribute any part of sources of this software.
+#  3. No reverse engineering is allowed.
+#  4. If you want redistribute binary package you can not demand any fees
+#     for this software.
+#     You can not even demand cost of the carrier (CD for example).
+#  5. You can not include it to any commercial enterprise (for example 
+#     as a free add-on to payed software or payed newspaper).
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
+
+echo "Compilation have been finished !"
+echo "It is need to be added seweral lines to your .SHELLrc file :"
+echo "#v+"
+echo "set LIBRARY_PATH=~/lib"
+echo "set C_INCLUDE_PATH=~/prog/include"
+echo "set CPLUS_INCLUDE_PATH=~/prog/include"
+echo "set OBJC_INCLUDE_PATH=~/prog/include"
+echo "set LD_LIBRARY_PATH=~/lib"
+echo "#v-"
+echo "or for C shell :"
+echo "#v+"
+echo "setenv LIBRARY_PATH ~/lib"
+echo "setenv C_INCLUDE_PATH ~/prog/include"
+echo "setenv CPLUS_INCLUDE_PATH ~/prog/include"
+echo "setenv OBJC_INCLUDE_PATH ~/prog/include"
+echo "setenv LD_LIBRARY_PATH ~/lib"
+echo "#v-"
+echo -n "Do it now ? (yes/[no]) "
+read ANSWER
+if [ "$ANSWER" ] ; then
+	if [ $ANSWER = "yes" ] ; then
+		export USER=`whoami`
+		export SH=`grep $USER /etc/passwd | tr \/ '\n'|tail -1`
+		case "$SH" in
+			sh)
+				cat shellrc >> ~/.profile
+				;;
+			zsh)
+				if [ -f ~/.zsh/zshrc ] ; then
+					cat shellrc >> ~/.zsh/zshrc
+				elif [ -f ~/.zshrc ] ; then
+					cat shellrc >> ~/.zshrc
+				fi
+				;;
+			bash)
+				if [ -f ~/.bashrc -a -f .bash_profile -a !'grep "source \~/\.bashrc" .bash_profile' ] ; then
+					cat shellrc >> ~/.bashrc
+				else
+					cat shellrc >> ~/.bash_profile
+				fi
+				;;
+			csh)
+				cat shellrc.csh >> ~/.cshrc
+				;;
+			tcsh)
+				cat shellrc.csh >> ~/.tcshrc
+				;;
+		esac
+	else
+		echo "Remember to add this lines so that libraries could work properly"
+	fi
+else
+	echo "Remember to add this lines so that libraries could work properly"
+fi
+source ./.shellrc
+echo "Installation process ends."
+
+exit 0
+

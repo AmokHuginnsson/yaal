@@ -1,0 +1,5 @@
+export LIBRARY_PATH=~/lib
+export C_INCLUDE_PATH=~/prog/include
+export CPLUS_INCLUDE_PATH=~/prog/include
+export OBJC_INCLUDE_PATH=~/prog/include
+export LD_LIBRARY_PATH=~/lib

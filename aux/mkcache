@@ -1,0 +1,3 @@
+#!/bin/sh
+/bin/rm -f ~/lib/ld.so.cache
+/sbin/ldconfig -f ~/lib/ld.so.conf -C ~/lib/ld.so.cache ~/lib
