@@ -30,6 +30,12 @@ Copyright:
 #include <stdarg.h>
 #include <time.h>
 
+#include "../config.h"
+
+#ifdef __HOST_OS_TYPE_FREEBSD__
+#	include <libgen.h>
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
+
 #include "hlog.h"
 
 #include "xalloc.h"
@@ -76,6 +82,10 @@ HLog::~HLog ( void )
 void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 	{
 	M_PROLOG
+#ifdef __HOST_OS_TYPE_FREEBSD__
+	char * l_pcPtr = NULL;
+	int l_iLen = 0;
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
 	FILE * l_psTmpFile;
 	f_bRealMode = true;
 	if ( a_pcProcessName )f_pcProcessName = basename ( a_pcProcessName );
@@ -84,8 +94,22 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 	if ( f_psStream )
 		{
 		fseek ( f_psStream, 0, SEEK_SET );
+#ifdef __HOST_OS_TYPE_FREEBSD__
+		while ( ( l_iLen = fread ( f_pcBuffer, sizeof ( char ), f_iBufferSize, f_psStream ) ) )
+#else /* __HOST_OS_TYPE_FREEBSD__ */
 		while ( getline ( & f_pcBuffer, & f_iBufferSize, f_psStream ) > 0 )
+#endif /* not __HOST_OS_TYPE_FREEBSD__ */
 			{
+#ifdef __HOST_OS_TYPE_FREEBSD__
+			l_pcPtr = ( char * ) memchr ( f_pcBuffer, '\n', l_iLen );
+			if ( ! l_pcPtr )
+				{
+				fprintf ( a_psStream, f_pcBuffer );
+				continue;
+				}
+			fseek ( f_psStream, f_pcBuffer - l_pcPtr, SEEK_CUR );
+			* l_pcPtr = 0;
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
 			timestamp ( a_psStream );
 			fprintf ( a_psStream, f_pcBuffer );
 			}
