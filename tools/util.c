@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
@@ -168,6 +169,9 @@ HString kwota_slownie ( double a_dKwota )
 			{
 			l_iSub = ( ( l_iLength - l_iCtr ) > 1 ? 2 : 1 );
 			l_iForma = atoi ( l_oString.mid ( l_iLength - l_iCtr - l_iSub, l_iSub ) );
+			if ( ( l_iCtr > 5 ) && ( ( l_iLength - l_iCtr ) > 2 ) &&
+					! strncmp ( ( ( char * ) l_oString ) + l_iLength - l_iCtr - 3, "000", 3 ) )
+				continue;
 			}
 		if ( l_iCtr == 2 )continue;
 		l_cCyfra = l_oString [ l_iLength - l_iCtr - 1 ] - '0';
@@ -177,7 +181,9 @@ HString kwota_slownie ( double a_dKwota )
 				{
 				l_oPrzypadek = n_ppcTemat [ l_iCtr / 3 ];
 				if ( l_iForma == 1 )l_oPrzypadek += n_pppcKoncowka [ l_iCtr / 3 ] [ 0 ];
-				else if ( ( ( ( l_iForma % 10 ) > 1 ) && ( ( l_iForma % 10 ) < 5 ) ) && ( ( l_iForma < 10 ) || ( l_iForma > 20 ) ) )l_oPrzypadek += n_pppcKoncowka [ l_iCtr / 3 ] [ 1 ];
+				else if ( ( ( ( l_iForma % 10 ) > 1 ) && ( ( l_iForma % 10 ) < 5 ) )
+						&& ( ( l_iForma < 10 ) || ( l_iForma > 20 ) ) )
+					l_oPrzypadek += n_pppcKoncowka [ l_iCtr / 3 ] [ 1 ];
 				else l_oPrzypadek += n_pppcKoncowka [ l_iCtr / 3 ] [ 2 ];
 				l_oSlownie = l_oPrzypadek + l_oSlownie;
 				if ( ( l_iForma < 20 ) &&  ( l_iForma > 9 ) )
