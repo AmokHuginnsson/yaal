@@ -123,7 +123,7 @@ int null_db_errno ( void * )
 const char * null_db_error ( void * )
 	{
 	log ( D_LOG_ERROR ) << M_DB_ERR ( "db_error)" ) << endl;
-	return ( NULL );
+	return ( _ ( "null database driver loaded" ) );
 	}
 
 void * null_db_query ( void *, const char * )
