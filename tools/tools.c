@@ -32,6 +32,7 @@ Copyright:
 
 #include "../hcore/hexception.h" /* M_PROLOG, M_EPILOG */
 M_CVSID ( "$CVSHeader$" );
+#include "../hcore/hcore.h"
 #include "../hcore/xalloc.h"
 #include "../hcore/rc_file.h"    /* read conf from rc */
 #include "../hcore/hlog.h"       /* log object */
@@ -69,7 +70,8 @@ extern char n_pcTransTableStripPL [ 256 ];
 bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	int l_iBaudRate = 0;
-	if ( ! strcasecmp ( a_roOption, "serial_baudrate" ) )
+	if ( ! strcasecmp ( a_roOption, "set_env" ) )set_env ( a_roValue );
+	else if ( ! strcasecmp ( a_roOption, "serial_baudrate" ) )
 		{
 		if ( ( a_roValue.get_length ( ) > 1 ) && ( a_roValue [ 0 ] == 'B' ) )
 			{

@@ -29,6 +29,7 @@ Copyright:
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
+#include "hcore.h"
 #include "hlog.h"
 #include "hstring.h"
 #include "rc_file.h"
@@ -43,9 +44,11 @@ OVariable g_psHCoreVariables [ ] =
 
 bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
 	HString l_oStr;
-	if ( ! strcasecmp ( a_roOption, "log_mask" ) )
+	if ( ! strcasecmp ( a_roOption, "set_env" ) )set_env ( a_roValue );
+	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
 		{
 		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
 			{
@@ -66,6 +69,32 @@ bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 		}
 	else return ( true );
 	return ( false );
+	M_EPILOG
+	}
+
+void set_env ( const char * a_pcVarValue )
+	{
+	M_PROLOG
+	char * l_pcPtr = NULL;
+	if ( ( strlen ( a_pcVarValue ) < 3 )
+			|| ( ( ! ( l_pcPtr = strchr ( a_pcVarValue, ' ' ) ) )
+				&& ( ! ( l_pcPtr = strchr ( a_pcVarValue, '\t' ) ) ) ) )
+		{
+		::log ( D_LOG_ERROR ) << "bad set_env argument: `";
+		::log << a_pcVarValue << '\'' << endl;
+		return;
+		}
+	* l_pcPtr ++ = 0;
+	while ( ( * l_pcPtr == ' ' ) || ( * l_pcPtr == '\t' ) )l_pcPtr ++;
+	if ( ! ( * l_pcPtr ) )
+		{
+		::log ( D_LOG_ERROR ) << "no value for environment variable in set_env: `";
+		::log << a_pcVarValue << '\'' << endl;
+		return;
+		}
+	setenv ( a_pcVarValue, l_pcPtr, true );
+	return;
+	M_EPILOG
 	}
 
 extern "C"

@@ -31,6 +31,7 @@ Copyright:
 #define __HCORE_H
 
 extern long int g_lLogMask;
+void set_env ( const char * );
 
 #endif /* not __HCORE_H */
 

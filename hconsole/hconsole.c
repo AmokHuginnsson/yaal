@@ -26,9 +26,11 @@ Copyright:
 
 #include <stdlib.h>
 #include <string.h>
+#include <ncurses.h>
 
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
+#include "../hcore/hcore.h"
 #include "../hcore/hlog.h"
 #include "../hcore/rc_file.h"
 #include "console.h"
@@ -64,6 +66,7 @@ OVariable n_psVariables [ ] =
 		{ D_TYPE_BOOL, "leave_ctrl_s", & n_bLeaveCtrlS },
 		{ D_TYPE_BOOL, "leave_ctrl_q", & n_bLeaveCtrlQ },
 		{ D_TYPE_BOOL, "leave_ctrl_\\", & n_bLeaveCtrlBackSlash },
+		{ D_TYPE_INT, "esc_delay", & ESCDELAY }, /* defined inside ncurses lib */
 		{ D_TYPE_INT, "latency", & n_iLatency },
 		{ D_TYPE_CHAR, "command_compose_character", & n_cCommandComposeCharacter },
 		{ D_TYPE_INT, "command_compose_delay", & n_iCommandComposeDelay },
@@ -122,7 +125,8 @@ void set_color ( HString & a_roValue, int & a_riAttribute )
 
 bool set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
 	{
-	if ( ! strcasecmp ( a_roOption, "disabled_attribute" ) )
+	if ( ! strcasecmp ( a_roOption, "set_env" ) )set_env ( a_roValue );
+	else if ( ! strcasecmp ( a_roOption, "disabled_attribute" ) )
 		set_color ( a_roValue, console::n_iDisabledAttribute );
 	else if ( ! strcasecmp ( a_roOption, "enabled_attribute" ) )
 		set_color ( a_roValue, console::n_iEnabledAttribute );

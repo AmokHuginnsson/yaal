@@ -151,7 +151,7 @@ void HEditControl::refresh ( void )
 		{
 		::move ( f_iRowRaw,
 				f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) );
-		curs_set ( D_CURSOR_VISIBLE );
+		curs_set ( f_bReplace ? D_CURSOR_VERY_VISIBLE : D_CURSOR_VISIBLE );
 		}
 	return;
 	M_EPILOG
@@ -585,7 +585,6 @@ HEditControl::operator HString ( )
 int HEditControl::set_focus ( char a_cShorcut )
 	{
 	M_PROLOG
-	curs_set ( 1 );
 	return ( HControl::set_focus ( a_cShorcut ) );
 	M_EPILOG
 	}

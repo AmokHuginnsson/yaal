@@ -20,6 +20,11 @@
 ### core BEGIN
 [core]
 
+# set_env
+# type: command, default: N/A
+# with set_env configuration command one can preset any environment
+# variable, set_env can be used in all sections
+
 # log_mask
 # type: special(multi-flag), default: (empty)
 # log_mask decides what types of information will be logged
@@ -33,6 +38,16 @@ log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_CVSHEADER
 
 ### console BEGIN
 [console]
+
+# esc_delay
+# type: integer, default: 1000
+# ESC key code is used to compose escape sequences
+# terminal must distinguish if following codes make sequence
+# or are separate key presses, to do that ncurses uses esc_delay
+# environment variable which holds delay (miliseconds),
+# after this time elapses next code is treated as separate character
+
+esc_delay 0
 
 # disable_XON
 # type: bool, default: false
