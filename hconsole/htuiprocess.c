@@ -31,7 +31,7 @@ Copyright:
 
 #ifdef HAVE_NCURSES_H
 #	include <ncurses.h>
-#elif HAVE_NCURSES_NCURSES_H
+#elif defined ( HAVE_NCURSES_NCURSES_H )
 #	include <ncurses/ncurses.h>
 #else /* HAVE_NCURSES_NCURSES_H */
 #	error "No ncurses header available."

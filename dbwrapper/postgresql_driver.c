@@ -32,7 +32,7 @@ Copyright:
 
 #ifdef HAVE_POSTGRESQL_LIBPQ_FE_H
 #	include <postgresql/libpq-fe.h>
-#elif HAVE_LIBPQ_FE_H
+#elif defined ( HAVE_LIBPQ_FE_H )
 #	include <libpq-fe.h>
 #else /* HAVE_LIBPQ_FE_H */
 #	error "No libpq-fe.h header available."
