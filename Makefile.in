@@ -98,7 +98,7 @@ FLAGS7 = -fPIC -I. -I$(HEADERSDIR)
 FLAGS8 =	\
 					-shared\
 					-L$(TARGETDIR)\
-					-Wl,--no-undefined\
+					@SPECIAL_LINKER_FLAG@\
 					-Wl,--fatal-warnings\
 					-Wl,--demangle\
 					-Wl,--export-dynamic\
