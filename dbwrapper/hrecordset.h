@@ -28,10 +28,11 @@ Copyright:
 #define __HRECORDSET_H
 
 /* modes */
-#define D_CLOSED	-	1
-#define D_NORMAL		0
-#define D_ADDING		1
-#define D_EDITING		2
+#define D_MODE_CLOSED	-	1
+#define D_MODE_NORMAL		0
+#define D_MODE_ADDING		1
+#define D_MODE_EDITING	2
+#define D_MODE_OPENED		D_MODE_NORMAL
 
 #include "../hcore/hobject.h"
 #include "../hcore/hstring.h"
@@ -50,23 +51,27 @@ private:
 	/*}*/
 protected:
 	/*{*/
-	int f_iFieldCount;
+	int f_iFieldCount;		/* number of columns returned by last query */
 	int f_iMode;					/* normal(opened), closed, adding, editing */
-	int f_iCursorPosition;
-	int f_iSetQuantity;
-	HString f_oTable;
-	HStringList	f_oColumnNames;
-	HStringList f_oValues;
-	HDataBase * f_poDataBase;
+	int f_iCursorPosition;/* cursor position in record-set */
+	int f_iSetQuantity;		/* number of records returned by last query */
+	HString f_oTable;			/* table name */
+	HString f_oColumns;		/* columns that should be returned by next query */
+	HString f_oFilter;		/* additional constant filter (WHERE clause) */
+	HString f_oSort;			/* additional constant sort (ORDER BY clause) */
+	HStringList	f_oColumnNames; /* column names returned by last query */
+	HStringList f_oValues;			/* values returned by last cursor movement */
+	HDataBase * f_poDataBase; /* data-base that this record-set belongs to */
 	/*}*/
 public:
 	/*{*/
-	HString m_oFilter;
-	HString m_oSort;
+	HString m_oFilter;		/* additional variable filter (WHERE clause) */
+	HString m_oSort;			/* additional variable sort (ORDER BY clause) */
 	long int m_id;
 	/*}*/
 protected:
 	/*{*/
+	void build_sql ( void );
 	virtual void sync ( void );
 	void sync ( int, char & );
 	void sync ( int, short & );

@@ -103,7 +103,12 @@ char * rs_get ( void * a_pvData, int a_iRow,  int a_iColumn )
 	return ( l_ppcRow [ a_iColumn ] );
 	}
 
-long int rsdb_count ( void * a_pvDataR, void * a_pvDataB = NULL )
+int rs_fields_count ( void * a_pvData )
+	{
+	return ( mysql_num_fields ( ( MYSQL_RES * ) a_pvData ) );
+	}
+
+long int rsdb_records_count ( void * a_pvDataR, void * a_pvDataB = NULL )
 	{
 	if ( a_pvDataR )
 		return ( mysql_num_rows ( ( MYSQL_RES * ) a_pvDataR ) );

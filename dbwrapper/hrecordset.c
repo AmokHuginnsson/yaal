@@ -42,11 +42,12 @@ HRecordSet::HRecordSet ( HDataBase * a_poDataBase )
 	{
 	M_PROLOG
 	f_iFieldCount = 0;
-	f_iMode = D_CLOSED;
+	f_iMode = D_MODE_CLOSED;
 	f_iSetQuantity = 0;
 	f_iCursorPosition = 0;
 	f_pvCoreData = NULL;
 	f_poDataBase = a_poDataBase;
+	f_oColumns = "*";
 	m_id = 0;
 	return;
 	M_EPILOG
@@ -77,8 +78,75 @@ HObject * HRecordSet::clone ( void ) const
 void HRecordSet::sync ( void )
 	{
 	M_PROLOG 
-	if ( f_iMode == D_CLOSED )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode == D_MODE_CLOSED )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	sync ( 0, m_id );
+	return;
+	M_EPILOG
+	}
+
+void HRecordSet::build_sql ( void )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	HString l_oFilter;
+	HString l_oSort;
+	switch ( f_iMode )
+		{
+		case ( D_MODE_CLOSED ):
+			{
+			f_oSQL.format ( "SELECT %s FROM %s", ( const char * ) f_oColumns,
+					( const char * ) f_oTable );
+			if ( f_oFilter.is_empty ( ) )l_oFilter = m_oFilter;
+			else if ( m_oFilter.is_empty ( ) )l_oFilter = f_oFilter;
+			else l_oFilter.format ( "%s AND ( %s )", ( const char * ) f_oFilter,
+					( const char * ) m_oFilter );
+			if ( ! l_oFilter.is_empty ( ) )
+				f_oSQL += ( " WHERE " + l_oFilter );
+			if ( f_oSort.is_empty ( ) )l_oSort = m_oSort;
+			else if ( m_oSort.is_empty ( ) )l_oSort = f_oSort;
+			else l_oSort.format ( "%s, %s", ( const char * ) m_oSort,
+					( const char * ) f_oSort );
+			if ( ! l_oSort.is_empty ( ) )
+				f_oSQL += ( " ORDER BY " + m_oSort );
+			f_oSQL += ';';
+			break;
+			}
+		case ( D_MODE_EDITING ):
+			{
+			f_oBuffer = "UPDATE " + f_oTable + " SET ";
+			for ( l_iCtr = 1; l_iCtr < f_iFieldCount; l_iCtr ++ )
+				{
+				if ( l_iCtr > 1 )f_oBuffer += ", ";
+				f_oBuffer += f_oColumnNames [ l_iCtr ] + " = '" + f_oValues [ l_iCtr ] + '\'';
+				}
+			f_oBuffer += " WHERE id = ";
+			f_oBuffer += m_id;
+			f_oBuffer += ';';
+			break;
+			}
+		case ( D_MODE_ADDING ):
+			{
+			f_oBuffer = "INSERT " + f_oTable + " ( ";
+			for ( l_iCtr = 1; l_iCtr < f_iFieldCount; l_iCtr ++ )
+				{
+				if ( l_iCtr > 1 )f_oBuffer += ", ";
+				f_oBuffer += f_oColumnNames [ l_iCtr ];
+				}
+			f_oBuffer += " ) VALUES ( ";
+			for ( l_iCtr = 1; l_iCtr < f_iFieldCount; l_iCtr ++ )
+				{
+				if ( l_iCtr > 1 )f_oBuffer += ", ";
+				f_oBuffer += '\'' + f_oValues [ l_iCtr ] + '\'';
+				}
+			f_oBuffer += " )";
+			break;
+			}
+		default :
+			{
+			throw new HException ( __WHERE__, E_MODE, f_iMode );
+			break;
+			}
+		}
 	return;
 	M_EPILOG
 	}
@@ -87,20 +155,13 @@ long int HRecordSet::open ( const char * a_pcQuery )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( f_iMode != D_CLOSED )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_CLOSED )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	if ( a_pcQuery )f_oSQL = a_pcQuery;
-	else
-		{
-		f_oSQL = "SELECT * FROM " + f_oTable;
-		if ( ! m_oFilter.is_empty ( ) )
-			f_oSQL += ( " WHERE " + m_oFilter );
-		if ( ! m_oSort.is_empty ( ) )
-			f_oSQL += ( " ORDER BY " + m_oSort );
-		f_oSQL += ';';
-		}
+	else build_sql ( );
 	f_iSetQuantity = f_poDataBase->query ( f_oSQL );
 	f_pvCoreData = f_poDataBase->get_result ( );
-	f_iMode = D_NORMAL;
+	f_iFieldCount = dbwrapper::rs_fields_count ( f_pvCoreData );
+	f_iMode = D_MODE_NORMAL;
 	f_oColumnNames.flush ( );
 	f_oValues.flush ( );
 	for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
@@ -117,11 +178,11 @@ long int HRecordSet::open ( const char * a_pcQuery )
 void HRecordSet::close ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	if ( f_pvCoreData )
 		dbwrapper::db_unquery ( f_pvCoreData );
 	f_pvCoreData = NULL;
-	f_iMode = D_CLOSED;
+	f_iMode = D_MODE_CLOSED;
 	M_EPILOG
 	}
 
@@ -136,7 +197,7 @@ long int HRecordSet::requery ( const char * a_pcQuery )
 
 bool HRecordSet::is_open ( void )
 	{
-	return ( f_iMode != D_CLOSED );
+	return ( f_iMode != D_MODE_CLOSED );
 	}
 
 bool HRecordSet::is_eof ( void )
@@ -156,7 +217,7 @@ bool HRecordSet::is_bof ( void )
 void HRecordSet::move_next ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	f_iCursorPosition ++;
 	if ( f_iCursorPosition > f_iSetQuantity )
 		throw new HException ( __WHERE__, "end of set reached", f_iCursorPosition );
@@ -168,7 +229,7 @@ void HRecordSet::move_next ( void )
 void HRecordSet::move_previous ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	f_iCursorPosition --;
 	if ( f_iCursorPosition < -1 )
 		throw new HException ( __WHERE__, "beginning of set reached",
@@ -181,7 +242,7 @@ void HRecordSet::move_previous ( void )
 void HRecordSet::move_first ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	f_iCursorPosition = 0;
 	sync ( );
 	return;
@@ -191,7 +252,7 @@ void HRecordSet::move_first ( void )
 void HRecordSet::move_last ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	f_iCursorPosition = f_iSetQuantity - 1;
 	sync ( );
 	return;
@@ -210,8 +271,8 @@ HString HRecordSet::get ( int a_iField )
 void HRecordSet::add_new ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
-	f_iMode = D_ADDING;
+	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	f_iMode = D_MODE_ADDING;
 	return;
 	M_EPILOG
 	}
@@ -219,8 +280,8 @@ void HRecordSet::add_new ( void )
 void HRecordSet::edit ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
-	f_iMode = D_EDITING;
+	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	f_iMode = D_MODE_EDITING;
 	return;
 	M_EPILOG
 	}
@@ -228,44 +289,16 @@ void HRecordSet::edit ( void )
 long int HRecordSet::update ( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	long int l_iRetVal = 0;
-	if ( ( f_iMode != D_ADDING ) && ( f_iMode != D_EDITING ) )
+	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
 		throw new HException ( __WHERE__, E_MODE, f_iMode );
 	sync ( );
-	if ( f_iMode == D_ADDING )
-		{
-		f_oBuffer = "INSERT " + f_oTable + " ( ";
-		for ( l_iCtr = 1; l_iCtr < f_iFieldCount; l_iCtr ++ )
-			{
-			if ( l_iCtr > 1 )f_oBuffer += ", ";
-			f_oBuffer += f_oColumnNames [ l_iCtr ];
-			}
-		f_oBuffer += " ) VALUES ( ";
-		for ( l_iCtr = 1; l_iCtr < f_iFieldCount; l_iCtr ++ )
-			{
-			if ( l_iCtr > 1 )f_oBuffer += ", ";
-			f_oBuffer += '\'' + f_oValues [ l_iCtr ] + '\'';
-			}
-		f_oBuffer += " )";
-		}
-	else
-		{
-		f_oBuffer = "UPDATE " + f_oTable + " SET ";
-		for ( l_iCtr = 1; l_iCtr < f_iFieldCount; l_iCtr ++ )
-			{
-			if ( l_iCtr > 1 )f_oBuffer += ", ";
-			f_oBuffer += f_oColumnNames [ l_iCtr ] + " = '" + f_oValues [ l_iCtr ] + '\'';
-			}
-		f_oBuffer += " WHERE id = ";
-		f_oBuffer += m_id;
-		f_oBuffer += ';';
-		}
+	build_sql ( );
 	f_poDataBase->query ( f_oSQL );
-	if ( f_iMode == D_ADDING )
+	if ( f_iMode == D_MODE_ADDING )
 		l_iRetVal = f_poDataBase->insert_id ( );
 	f_poDataBase->free_result ( );
-	f_iMode = D_NORMAL;
+	f_iMode = D_MODE_NORMAL;
 	requery ( );
 	return ( l_iRetVal );
 	M_EPILOG
@@ -274,7 +307,7 @@ long int HRecordSet::update ( void )
 void HRecordSet::remove ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
 	f_oBuffer.format ( "DELETE FROM %s WHERE id = %ld;",
 			( char * ) f_oTable, m_id );
 	f_poDataBase->query ( f_oSQL );
@@ -288,7 +321,7 @@ void HRecordSet::sync ( int a_iField, char & a_rcChar )
 	{
 	M_PROLOG
 	HString l_oTmp;
-	if ( f_iMode == D_NORMAL )
+	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
 		if ( ! l_oTmp.is_empty ( ) )a_rcChar = l_oTmp [ 0 ];
@@ -302,7 +335,7 @@ void HRecordSet::sync ( int a_iField, short & a_rhShort )
 	{
 	M_PROLOG
 	HString l_oTmp;
-	if ( f_iMode == D_NORMAL )
+	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
 		if ( ! l_oTmp.is_empty ( ) )a_rhShort = atoi ( l_oTmp );
@@ -316,7 +349,7 @@ void HRecordSet::sync ( int a_iField, int & a_riInt )
 	{
 	M_PROLOG
 	HString l_oTmp;
-	if ( f_iMode == D_NORMAL )
+	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
 		if ( ! l_oTmp.is_empty ( ) )a_riInt = atoi ( l_oTmp );
@@ -330,7 +363,7 @@ void HRecordSet::sync ( int a_iField, long int & a_rlLongInt )
 	{
 	M_PROLOG
 	HString l_oTmp;
-	if ( f_iMode == D_NORMAL )
+	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
 		if ( ! l_oTmp.is_empty ( ) )a_rlLongInt = atol ( l_oTmp );
@@ -344,7 +377,7 @@ void HRecordSet::sync ( int a_iField, double & a_rdDouble )
 	{
 	M_PROLOG
 	HString l_oTmp;
-	if ( f_iMode == D_NORMAL )
+	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
 		if ( ! l_oTmp.is_empty ( ) )a_rdDouble = atof ( l_oTmp );
@@ -357,7 +390,7 @@ void HRecordSet::sync ( int a_iField, double & a_rdDouble )
 void HRecordSet::sync ( int a_iField, HString & a_roString )
 	{
 	M_PROLOG
-	if ( f_iMode == D_NORMAL )a_roString = get ( a_iField );
+	if ( f_iMode == D_MODE_NORMAL )a_roString = get ( a_iField );
 	else f_oValues [ a_iField ] = a_roString;
 	return;
 	M_EPILOG
@@ -367,7 +400,7 @@ void HRecordSet::sync ( int a_iField, HTime & a_roTime )
 	{
 	M_PROLOG
 	HTime l_oTime;
-	if ( f_iMode == D_NORMAL )a_roTime = get ( a_iField );
+	if ( f_iMode == D_MODE_NORMAL )a_roTime = get ( a_iField );
 	else
 		{
 		l_oTime = a_roTime;
@@ -382,7 +415,7 @@ void HRecordSet::sync ( int a_iField, HInfo & a_roInfo )
 	{
 	M_PROLOG
 	HString l_oTmp;
-	if ( f_iMode == D_NORMAL )
+	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
 		a_roInfo = atoi ( l_oTmp );

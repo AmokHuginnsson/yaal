@@ -86,13 +86,16 @@ void ( * db_unquery ) ( void * );
 typedef char * ( * t6 ) ( void *, int, int );
 char * ( * rs_get ) ( void *, int, int );
 
-typedef long int ( * t7 ) ( void *, void * = NULL );
-long int ( * rsdb_count ) ( void *, void * = NULL );
+typedef int ( * t7 ) ( void * );
+int ( * rs_fields_count ) ( void * );
 
-typedef long int ( * t8 ) ( void *, void * );
+typedef long int ( * t8 ) ( void *, void * = NULL );
+long int ( * rsdb_records_count ) ( void *, void * = NULL );
+
+typedef long int ( * t9 ) ( void *, void * );
 long int ( * rsdb_id ) ( void *, void * );
 
-typedef char * ( * t9 ) ( void *, int );
+typedef char * ( * tA ) ( void *, int );
 char * ( * rs_column_name ) ( void *, int );
 
 	}
@@ -145,7 +148,8 @@ void dbwrapper_init ( void )
 	dbwrapper::db_query = NULL;
 	dbwrapper::db_unquery = NULL;
 	dbwrapper::rs_get = NULL;
-	dbwrapper::rsdb_count = NULL;
+	dbwrapper::rs_fields_count = NULL;
+	dbwrapper::rsdb_records_count = NULL;
 	dbwrapper::rsdb_id = NULL;
 	dbwrapper::rs_column_name = NULL;
 	fprintf ( stderr, "Loading dynamic database driver ... " );
@@ -173,6 +177,7 @@ void dbwrapper_init ( void )
 		::log << "Loading [" << g_ppcDriver [ l_iCtr - 1 ] << "] driver." << endl;
 	fprintf ( stderr, g_pcDone );
 	fprintf ( stderr, "Linking symbols ... " );
+	using namespace dbwrapper;
 	if ( ! ( dbwrapper::db_disconnect = (dbwrapper::t1) dlsym ( g_pvDlHandle,
 					"db_disconnect" ) ) )dbwrapper_error ( );
 	else if ( ! ( dbwrapper::db_errno = (dbwrapper::t2) dlsym ( g_pvDlHandle,
@@ -185,11 +190,13 @@ void dbwrapper_init ( void )
 					"db_unquery" ) ) )dbwrapper_error ( );
 	else if ( ! ( dbwrapper::rs_get = (dbwrapper::t6) dlsym ( g_pvDlHandle,
 					"rs_get" ) ) )dbwrapper_error ( );
-	else if ( ! ( dbwrapper::rsdb_count = (dbwrapper::t7) dlsym ( g_pvDlHandle,
-					"rsdb_count" ) ) )dbwrapper_error ( );
-	else if ( ! ( dbwrapper::rsdb_id = (dbwrapper::t8) dlsym ( g_pvDlHandle,
+	else if ( ! ( rs_fields_count = (dbwrapper::t7) dlsym ( g_pvDlHandle,
+					"rs_fields_count" ) ) )dbwrapper_error ( );
+	else if ( ! ( rsdb_records_count = (dbwrapper::t8) dlsym ( g_pvDlHandle,
+					"rsdb_records_count" ) ) )dbwrapper_error ( );
+	else if ( ! ( dbwrapper::rsdb_id = (dbwrapper::t9) dlsym ( g_pvDlHandle,
 					"rsdb_id" ) ) )dbwrapper_error ( );
-	else if ( ! ( dbwrapper::rs_column_name = (dbwrapper::t9)dlsym ( g_pvDlHandle,
+	else if ( ! ( dbwrapper::rs_column_name = (dbwrapper::tA)dlsym ( g_pvDlHandle,
 					"rs_column_name" ) ) )dbwrapper_error ( );
 	else if ( ! ( dbwrapper::db_connect = (dbwrapper::t0) dlsym ( g_pvDlHandle,
 					"db_connect" ) ) )dbwrapper_error ( );

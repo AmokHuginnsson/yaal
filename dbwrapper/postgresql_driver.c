@@ -100,7 +100,12 @@ char * rs_get ( void * a_pvData, int a_iRow,  int a_iColumn )
 	return ( PQgetvalue ( ( PGresult * ) a_pvData, a_iRow, a_iColumn ) );
 	}
 
-long int rsdb_count ( void * a_pvDataR, void * = NULL )
+int rs_fields_count ( void * a_pvData )
+	{
+	return ( PQnfields ( ( PGresult * ) a_pvData ) );
+	}
+
+long int rsdb_records_count ( void * a_pvDataR, void * = NULL )
 	{
 	char * l_pcTmp = PQcmdTuples ( ( PGresult * ) a_pvDataR );
 	if ( l_pcTmp && l_pcTmp [ 0 ] )return ( strtol ( l_pcTmp, NULL, 10 ) );
