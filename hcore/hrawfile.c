@@ -1,7 +1,7 @@
 /*
----             `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski              ---
+---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hsocket.h - this file is integral part of `stdhapi' project.
+	hrawfile.c - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,21 +24,44 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HSOCKET_H
-#define __HSOCKET_H
+#include <unistd.h>
 
+#include "hexception.h"
+M_CVSID ( "$CVSHeader$" );
 #include "hrawfile.h"
 
-class HSocket : public HRawFile
+HRawFile::HRawFile ( void )
 	{
-protected:
-	/*{*/
-	/*}*/
-public:
-	/*{*/
-	HSocket ( void );
-	virtual ~HSocket ( void ) ;
-	/*}*/
-	};
+	M_PROLOG;
+	f_iFileDescriptor = 0;
+	M_EPILOG;
+	}
 
-#endif /* not __HSOCKET_H */
+HRawFile::~HRawFile ( void )
+	{
+	M_PROLOG
+	if ( f_iFileDescriptor )
+		close ( );
+	M_EPILOG
+	}
+
+int HRawFile::close ( void )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	if ( f_iFileDescriptor )
+		l_iError = ::close ( f_iFileDescriptor );
+	else
+		throw new HException ( __WHERE__, "file is not opened", g_iErrNo );
+	f_iFileDescriptor = 0;
+	return ( l_iError );
+	M_EPILOG
+	}
+
+file_descriptor_t HRawFile::get_file_descriptor ( void )
+	{
+	M_PROLOG
+	return ( f_iFileDescriptor );
+	M_EPILOG
+	}
+

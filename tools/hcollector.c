@@ -166,16 +166,16 @@ int HCollector::establish_connection ( int a_iTimeOut )
 		if ( write ( D_PROTO_SYN, l_iLenght ) != l_iLenght )
 			throw new HException ( __WHERE__, "write", l_iLenght );
 		wait_for_eot ( );
-		if ( tcsendbreak ( f_iFileDes, 0 ) )
+		if ( tcsendbreak ( f_iFileDescriptor, 0 ) )
 			throw new HException ( __WHERE__, "tcsendbreak", g_iErrNo );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 		l_sWait.tv_sec = 1;
 		l_sWait.tv_usec = 0;
 		FD_ZERO ( & l_xFileDesSet );
-		FD_SET ( f_iFileDes, & l_xFileDesSet );
+		FD_SET ( f_iFileDescriptor, & l_xFileDesSet );
 		if ( ( M_STDHAPI_TEMP_FAILURE_RETRY ( select ( FD_SETSIZE,
 							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
-				&& FD_ISSET ( f_iFileDes, & l_xFileDesSet ) )
+				&& FD_ISSET ( f_iFileDescriptor, & l_xFileDesSet ) )
 			read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
 		flush ( TCIFLUSH );
 		l_iError ++;
@@ -199,10 +199,10 @@ int HCollector::wait_for_connection ( int a_iTimeOut )
 		l_sWait.tv_sec = a_iTimeOut;
 		l_sWait.tv_usec = 0;
 		FD_ZERO ( & l_xFileDesSet );
-		FD_SET ( f_iFileDes, & l_xFileDesSet );
+		FD_SET ( f_iFileDescriptor, & l_xFileDesSet );
 		if ( ( M_STDHAPI_TEMP_FAILURE_RETRY ( select ( FD_SETSIZE,
 							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
-				&& FD_ISSET ( f_iFileDes, & l_xFileDesSet ) )
+				&& FD_ISSET ( f_iFileDescriptor, & l_xFileDesSet ) )
 			read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE ), l_iError ++;
 		else return ( -1 );
 		}

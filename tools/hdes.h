@@ -1,7 +1,7 @@
 /*
----             `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski              ---
+---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hsocket.h - this file is integral part of `stdhapi' project.
+	hdes.h - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,21 +24,39 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HSOCKET_H
-#define __HSOCKET_H
+#ifndef __HDES_H
+#define __HDES_H
 
-#include "hrawfile.h"
+#define D_DES_SIDES_COUNT		2
+#define D_DES_IKEY_SIZE			6
+#define D_DES_BLOCK_SIZE		8
+#define D_DES_IKEYS_COUNT		16
+#define D_DES_PASSWORD_SIZE	16
 
-class HSocket : public HRawFile
+typedef unsigned char uc_t;
+
+class HDes
 	{
 protected:
 	/*{*/
+	uc_t f_pppcIKeys [ D_DES_SIDES_COUNT ]
+		[ D_DES_IKEYS_COUNT ] [ D_DES_IKEY_SIZE ];
 	/*}*/
 public:
 	/*{*/
-	HSocket ( void );
-	virtual ~HSocket ( void ) ;
+	HDes ( void );
+	virtual ~HDes ( void );
+	void crypt ( uc_t *, int, int );
+	void generate_keys ( uc_t * );
+	void flush_keys ( void );
+	/*}*/
+protected:
+	/*{*/
+	void _des ( uc_t * /* block */, int /* side */, int /* part */ );
+	void _3des ( uc_t * /* block */, int /* side */ );
+	void permutate ( uc_t * /* buffer */, const uc_t * /* tab */, int /* len */ );
 	/*}*/
 	};
 
-#endif /* not __HSOCKET_H */
+#endif /* not __HDES_H */
+

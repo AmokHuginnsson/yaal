@@ -36,9 +36,9 @@ M_CVSID ( "$CVSHeader$" );
 #include "tools.h"
 
 HSerial::HSerial ( const char * a_pcDevice )
+				: HRawFile ( )
 	{
 	M_PROLOG
-	f_iFileDes = 0;
 	memset ( & f_sTIO, 0, sizeof ( termios ) );
 	if ( a_pcDevice )f_oDevicePath = a_pcDevice;
 	else f_oDevicePath = tools::n_pcSerialDevice;
@@ -105,8 +105,8 @@ HSerial::HSerial ( const char * a_pcDevice )
 HSerial::~HSerial ( void )
 	{
 	M_PROLOG
-	if ( f_iFileDes )close ( );
-	f_iFileDes = 0;
+	if ( f_iFileDescriptor )close ( );
+	f_iFileDescriptor = 0;
 	return;
 	M_EPILOG
 	}
@@ -114,32 +114,29 @@ HSerial::~HSerial ( void )
 bool HSerial::open ( void )
 	{
 	M_PROLOG
-	if ( f_iFileDes )
+	if ( f_iFileDescriptor )
 		throw new HException ( __WHERE__, "serial port already openend", g_iErrNo );
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
-	f_iFileDes = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
-	if ( ! f_iFileDes )
+	f_iFileDescriptor = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
+	if ( ! f_iFileDescriptor )
 		throw new HException ( __WHERE__, strerror ( g_iErrNo ), g_iErrNo );
-	if ( ! isatty ( f_iFileDes ) )
-		throw new HException ( __WHERE__, "not a tty", f_iFileDes );
-	tcgetattr ( f_iFileDes, & f_sBackUpTIO );
-	fcntl ( f_iFileDes, F_SETFD, 0 );
-	fcntl ( f_iFileDes, F_SETFL, 0 );
-	tcflush ( f_iFileDes, TCIOFLUSH );
-	tcsetattr ( f_iFileDes, TCSANOW, & f_sTIO );
+	if ( ! isatty ( f_iFileDescriptor ) )
+		throw new HException ( __WHERE__, "not a tty", f_iFileDescriptor );
+	tcgetattr ( f_iFileDescriptor, & f_sBackUpTIO );
+	fcntl ( f_iFileDescriptor, F_SETFD, 0 );
+	fcntl ( f_iFileDescriptor, F_SETFL, 0 );
+	tcflush ( f_iFileDescriptor, TCIOFLUSH );
+	tcsetattr ( f_iFileDescriptor, TCSANOW, & f_sTIO );
 	return ( false );
 	M_EPILOG
 	}
 
-void HSerial::close ( void )
+int HSerial::close ( void )
 	{
 	M_PROLOG
-	if ( ! f_iFileDes )
-		throw new HException ( __WHERE__, "serial port not opened", g_iErrNo );
-	tcsetattr ( f_iFileDes, TCSANOW, & f_sBackUpTIO );
-	::close ( f_iFileDes );
-	f_iFileDes = 0;
-	return;
+	if ( f_iFileDescriptor )
+		tcsetattr ( f_iFileDescriptor, TCSANOW, & f_sBackUpTIO );
+	return ( HRawFile::close ( ) );
 	M_EPILOG
 	}
 
@@ -147,9 +144,9 @@ int HSerial::read ( char * a_pcBuffer, int a_iSize )
 	{
 	M_PROLOG
 	int l_iCnt = 0;
-	if ( ! f_iFileDes )
+	if ( ! f_iFileDescriptor )
 		throw new HException ( __WHERE__, "serial port not opened", g_iErrNo );
-	l_iCnt = ::read ( f_iFileDes, a_pcBuffer, a_iSize );
+	l_iCnt = ::read ( f_iFileDescriptor, a_pcBuffer, a_iSize );
 	return ( l_iCnt );
 	M_EPILOG
 	}
@@ -158,9 +155,9 @@ int HSerial::write ( const char * a_pcBuffer, int a_iSize )
 	{
 	M_PROLOG
 	int l_iCnt = 0;
-	if ( ! f_iFileDes )
+	if ( ! f_iFileDescriptor )
 		throw new HException ( __WHERE__, "serial port not opened", g_iErrNo );
-	l_iCnt = ::write ( f_iFileDes, a_pcBuffer, a_iSize );
+	l_iCnt = ::write ( f_iFileDescriptor, a_pcBuffer, a_iSize );
 	return ( l_iCnt );
 	M_EPILOG
 	}
@@ -169,7 +166,7 @@ void HSerial::flush ( int a_iType )
 	{
 	M_PROLOG
 	HString l_oErrMsg;
-	if ( tcflush ( f_iFileDes, a_iType ) )
+	if ( tcflush ( f_iFileDescriptor, a_iType ) )
 		switch ( a_iType )
 			{
 			case ( TCIFLUSH ):
@@ -191,7 +188,7 @@ void HSerial::flush ( int a_iType )
 void HSerial::wait_for_eot ( void )
 	{
 	M_PROLOG
-	if ( tcdrain ( f_iFileDes ) )
+	if ( tcdrain ( f_iFileDescriptor ) )
 		throw new HException ( __WHERE__, "tcdrain", g_iErrNo );
 	return;
 	M_EPILOG

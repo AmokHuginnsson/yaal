@@ -34,12 +34,12 @@ Copyright:
 #endif /* not NULL */
 
 #include "../hcore/hstring.h"
+#include "../hcore/hrawfile.h"
 
-class HSerial
+class HSerial : public HRawFile
 	{
 protected:
 	/*{*/
-	int f_iFileDes; /* serial device file descriptor */
 	HString f_oDevicePath;
 	termios f_sTIO;
 	termios f_sBackUpTIO;
@@ -49,8 +49,8 @@ public:
 	HSerial ( const char * = NULL ); /* device */
 	virtual ~HSerial ( void );
 	bool open ( void );
-	void close ( void );
 	int read ( char *, int );
+	int close ( void );
 	int write ( const char *, int );
 	void flush ( int );
 	void wait_for_eot ( void );
@@ -61,3 +61,4 @@ protected:
 	};
 
 #endif /* not __HSERIAL_H */
+

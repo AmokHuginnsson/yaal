@@ -1,7 +1,7 @@
 /*
----             `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski              ---
+---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hsocket.h - this file is integral part of `stdhapi' project.
+	hrawfile.h - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,21 +24,28 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HSOCKET_H
-#define __HSOCKET_H
+#ifndef __HRAWFILE_H
+#define __HRAWFILE_H
 
-#include "hrawfile.h"
+typedef int file_descriptor_t;
 
-class HSocket : public HRawFile
+class HRawFile
 	{
 protected:
 	/*{*/
+	file_descriptor_t f_iFileDescriptor; /* raw file descriptor of the file */
 	/*}*/
 public:
 	/*{*/
-	HSocket ( void );
-	virtual ~HSocket ( void ) ;
+	HRawFile ( void );
+	virtual ~HRawFile ( void );
+	int close ( void );
+	file_descriptor_t get_file_descriptor ( void );
+	/*}*/
+protected:
+	/*{*/
 	/*}*/
 	};
 
-#endif /* not __HSOCKET_H */
+#endif /* not __HRAWFILE_H */
+
