@@ -32,11 +32,14 @@ Copyright:
 
 class HAnalyser : public HTree < HList < double * > >
 	{
+	class HAnalyserNode;
+	friend class HAnalyserNode;
 	class HAnalyserNode : public HTree < HList < double * > > ::HNode
 		{
+		typedef double ( HAnalyser::* METHOD_t ) ( HAnalyserNode * );
 	protected:
 		/*{*/
-		double ( HAnalyser::* METHOD ) ( HAnalyser::HAnalyserNode * );
+		METHOD_t METHOD;
 		/*}*/
 	public:
 		/*{*/
@@ -45,7 +48,7 @@ class HAnalyser : public HTree < HList < double * > >
 		/*{*/
 		HAnalyserNode ( HAnalyserNode * );
 		virtual ~HAnalyserNode ( void );
-		HAnalyser::HAnalyserNode * grow_up_branch ( int = D_FILL_NEW_AUTO );
+		HAnalyserNode * grow_up_branch ( int = D_FILL_NEW_AUTO );
 		/*}*/
 		friend class HAnalyser;
 		};
