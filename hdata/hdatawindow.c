@@ -416,3 +416,10 @@ bool HDataWindow::is_modified ( void )
 	{
 	return ( f_bModified );
 	}
+
+void HDataWindow::set_modified ( bool a_bModified )
+	{
+	f_poStatusBar->message ( "modified!" );
+	f_bModified = a_bModified;
+	}
+

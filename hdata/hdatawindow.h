@@ -55,6 +55,7 @@ public:
 	virtual int init ( void );
 	void set_sync_store ( HItem * = NULL );
 	bool is_modified ( void );
+	void set_modified ( bool = true );
 	/*}*/
 protected:
 	/*{*/

@@ -78,9 +78,16 @@ int HWindow::init ( void )
 	console::clrscr ( );
 	console::n_bNeedRepaint = true;
 	l_oString.format ( " [%s]& \n", ( char * ) f_oTitle );
-	f_poStatusBar = new HStatusBarControl ( this, l_oString );
+	f_poStatusBar = init_bar ( l_oString );
 	f_oControls.remove_head ( D_FORCE_REMOVE_ELEMENT );
 	return ( 0 );
+	M_EPILOG
+	}
+
+HStatusBarControl * HWindow::init_bar ( const char * a_pcLabel )
+	{
+	M_PROLOG
+	return ( new HStatusBarControl ( this, a_pcLabel ) );
 	M_EPILOG
 	}
 

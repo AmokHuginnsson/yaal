@@ -33,9 +33,10 @@ class HStatusBarControl : public HEditControl
 	{
 protected:
 	/*{*/
+	int f_iPromptLength;
+	/* progress bar data */
 	bool f_bDone;
 	bool f_bEstimate;
-	int f_iPromptLength;
 	double f_dProgressSize;
 	int f_iLastProgress;
 	int f_iLastPercent;
@@ -44,6 +45,7 @@ protected:
 	int f_iLastStep;
 	HString f_oMessage;
 	HTime f_oStart;
+	/* end of progress bar data */
 	/*}*/
 public:
 	/*{*/
@@ -60,3 +62,4 @@ public:
 	};
 
 #endif /* not __HSTATUSBARCONTROL_H */
+

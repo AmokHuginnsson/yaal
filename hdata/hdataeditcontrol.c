@@ -24,8 +24,19 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "../config.h"
+
+#ifdef HAVE_NCURSES_H
+#	include <ncurses.h>
+#elif defined ( HAVE_NCURSES_NCURSES_H )
+#	include <ncurses/ncurses.h>
+#else /* HAVE_NCURSES_NCURSES_H */
+#	error "No ncurses header available."
+#endif /* not HAVE_NCURSES_NCURSES_H */
+
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
+#include "../hconsole/console.h"
 #include "hdataeditcontrol.h"
 
 HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
@@ -54,7 +65,49 @@ HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 int HDataEditControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
+	bool l_bNoChange = false;
+	switch ( a_iCode )
+		{
+		case ( '\t' ):
+		case ( '\r' ):
+		case ( KEY_LEFT ):
+		case ( KEY_RIGHT ):
+		case ( D_KEY_CTRL_('a') ):
+		case ( KEY_HOME ):
+		case ( D_KEY_CTRL_('e') ):
+		case ( KEY_END ):
+		case ( KEY_IC ):
+		case ( D_KEY_META_('f') ):
+		case ( D_KEY_META_('b') ):
+			{
+			l_bNoChange = true;
+			break;
+			}
+		case ( KEY_PPAGE ):
+		case ( KEY_NPAGE ):
+		case ( KEY_UP ):
+		case ( KEY_DOWN ):
+			{
+			if ( f_bMultiLine )
+				l_bNoChange = true;
+			break;
+			}
+		case ( KEY_BS ):
+			{
+			if ( ! ( f_iControlOffset + f_iCursorPosition ) )
+				l_bNoChange = true;
+			break;
+			}
+		case ( KEY_DELETE ):
+			{
+			if ( ! ( ( char * ) f_oString ) [ 0 ] )
+				l_bNoChange = true;
+			break;
+			}
+		}
 	a_iCode = HEditControl::process_input ( a_iCode );
+	if ( ! ( a_iCode || l_bNoChange ) )
+		( ( HDataWindow * ) f_poParent )->set_modified ( );
 	return ( a_iCode );
 	M_EPILOG
 	}

@@ -51,6 +51,7 @@ public:
 	HWindow ( const char * ); /* title */
 	virtual ~HWindow ( void );
 	virtual int init ( void );
+	virtual HStatusBarControl * init_bar ( const char * );
 	void refresh ( void );
 	int preprocess_input ( int );
 	int postprocess_input ( int );
