@@ -74,18 +74,18 @@ public:
 	HString operator + ( const double );
 	HString operator + ( const void * );
 	char & operator [ ] ( const int );
-	int operator == ( const HString & );
-	int operator == ( const char * );
-	int operator != ( const HString & );
-	int operator != ( const char * );
-	int operator >= ( const HString & );
-	int operator >= ( const char * );
-	int operator <= ( const HString & );
-	int operator <= ( const char * );
-	int operator > ( const HString & );
-	int operator > ( const char * );
-	int operator < ( const HString & );
-	int operator < ( const char * );
+	bool operator == ( const HString & ) const;
+	bool operator == ( const char * ) const;
+	bool operator != ( const HString & ) const;
+	bool operator != ( const char * ) const;
+	bool operator >= ( const HString & ) const;
+	bool operator >= ( const char * ) const;
+	bool operator <= ( const HString & ) const;
+	bool operator <= ( const char * ) const;
+	bool operator > ( const HString & ) const;
+	bool operator > ( const char * ) const;
+	bool operator < ( const HString & ) const;
+	bool operator < ( const char * ) const;
 	operator char * ( void ) const; /* add_* functions in HList needs operator
 																		 bool ( ) operator char * works fine here */
 	bool is_empty ( void );
@@ -116,11 +116,11 @@ HString operator + ( const int, const HString & );
 HString operator + ( const long int, const HString & );
 HString operator + ( const double, const HString & );
 HString operator + ( const void *, const HString & );
-int operator == ( const char *, const HString & );
-int operator != ( const char *, const HString & );
-int operator >= ( const char *, const HString & );
-int operator <= ( const char *, const HString & );
-int operator > ( const char *, const HString & );
-int operator < ( const char *, const HString & );
+bool operator == ( const char *, const HString & );
+bool operator != ( const char *, const HString & );
+bool operator >= ( const char *, const HString & );
+bool operator <= ( const char *, const HString & );
+bool operator > ( const char *, const HString & );
+bool operator < ( const char *, const HString & );
 
 #endif /* not __HSTRING_H */
