@@ -28,6 +28,7 @@ Copyright:
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sqlite3.h>
 
 #include "../hcore/xalloc.h"
@@ -60,18 +61,43 @@ void * db_query ( void *, const char * );
 void db_unquery ( void * );
 void db_disconnect ( void * );
 
+/* sqlite3 driver uses convention that database file name should have
+ * .sqlite3 or .db3 extension, and this default extension is added
+ * to user supplied database name by driver during db_connect. */
+
 void * db_connect ( const char * a_pcDataBase,
 		const char *, const char * )
 	{
+	int l_iNmLnght = 0;
 	void * l_pvPtr = NULL;
-	sqlite_db * l_psSQLite = ( sqlite_db * ) xcalloc ( sizeof ( sqlite_db ) );
+	char * l_pcDataBase = NULL;
+	struct stat l_sStat;
+	sqlite_db * l_psSQLite = NULL;
 	if ( g_psBrokenDB )
 		{
 		db_disconnect ( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psSQLite->f_iErrorCode = sqlite3_open ( a_pcDataBase,
+	l_psSQLite = ( sqlite_db * ) xcalloc ( sizeof ( sqlite_db ) );
+	l_iNmLnght = strlen ( a_pcDataBase );
+	l_pcDataBase = ( char * ) xcalloc ( l_iNmLnght + strlen ( ".sqlite3" + 1 ) );
+	strcpy ( l_pcDataBase, a_pcDataBase );
+	strcat ( l_pcDataBase, ".sqlite3" );
+	if ( stat ( l_pcDataBase, & l_sStat ) )
+		{
+		strcpy ( l_pcDataBase + l_iNmLnght, ".db3" );
+		if ( stat ( l_pcDataBase, & l_sStat ) )
+			{
+			asprintf ( & l_psSQLite->f_pcErrorMessage,
+					"Database file `%s' does not exists.", l_pcDataBase );
+			xfree ( l_pcDataBase );
+			g_psBrokenDB = l_psSQLite;
+			return ( NULL );
+			}
+		}
+	l_psSQLite->f_iErrorCode = sqlite3_open ( l_pcDataBase,
 			& l_psSQLite->f_psDB );
+	xfree ( l_pcDataBase );
 	if ( l_psSQLite->f_iErrorCode )
 		{
 		l_psSQLite->f_pcErrorMessage = xstrdup ( sqlite3_errmsg ( l_psSQLite->f_psDB ) );
@@ -91,7 +117,8 @@ void * db_connect ( const char * a_pcDataBase,
 void db_disconnect ( void * a_pvData )
 	{
 	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
-	sqlite3_close ( l_psSQLite->f_psDB );
+	if ( l_psSQLite->f_psDB )
+		sqlite3_close ( l_psSQLite->f_psDB );
 	if ( l_psSQLite->f_pcErrorMessage )
 		xfree ( l_psSQLite->f_pcErrorMessage );
 	xfree ( l_psSQLite );

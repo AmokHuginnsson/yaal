@@ -28,6 +28,7 @@ Copyright:
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sqlite.h>
 
 #include "../hcore/xalloc.h"
@@ -60,18 +61,43 @@ void * db_query ( void *, const char * );
 void db_unquery ( void * );
 void db_disconnect ( void * );
 
+/* sqlite driver uses convention that database file name should have
+ * .sqlite or .db extension, and this default extension is added
+ * to user supplied database name by driver during db_connect. */
+
 void * db_connect ( const char * a_pcDataBase,
 		const char *, const char * )
 	{
+	int l_iNmLnght = 0;
 	void * l_pvPtr = NULL;
-	sqlite_db * l_psSQLite = ( sqlite_db * ) xcalloc ( sizeof ( sqlite_db ) );
+	char * l_pcDataBase = NULL;
+	struct stat l_sStat;
+	sqlite_db * l_psSQLite = NULL;
 	if ( g_psBrokenDB )
 		{
 		db_disconnect ( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psSQLite->f_psDB = sqlite_open ( a_pcDataBase, 0,
+	l_psSQLite = ( sqlite_db * ) xcalloc ( sizeof ( sqlite_db ) );
+	l_iNmLnght = strlen ( a_pcDataBase );
+	l_pcDataBase = ( char * ) xcalloc ( l_iNmLnght + strlen ( ".sqlite" + 1 ) );
+	strcpy ( l_pcDataBase, a_pcDataBase );
+	strcat ( l_pcDataBase, ".sqlite" );
+	if ( stat ( l_pcDataBase, & l_sStat ) )
+		{
+		strcpy ( l_pcDataBase + l_iNmLnght, ".db" );
+		if ( stat ( l_pcDataBase, & l_sStat ) )
+			{
+			asprintf ( & l_psSQLite->f_pcErrorMessage,
+					"Database file `%s' does not exists.", l_pcDataBase );
+			xfree ( l_pcDataBase );
+			g_psBrokenDB = l_psSQLite;
+			return ( NULL );
+			}
+		}
+	l_psSQLite->f_psDB = sqlite_open ( l_pcDataBase, 0,
 			& l_psSQLite->f_pcErrorMessage );
+	xfree ( l_pcDataBase );
 	if ( ! l_psSQLite->f_psDB )
 		g_psBrokenDB = l_psSQLite, l_psSQLite = NULL;
 	else
