@@ -158,7 +158,7 @@ OBJ4tools +=
 
 # dbwrapper
 OBJ4mysql_driver = 
-OBJ4mysql_driver += mysql_driver
+OBJ4mysql_driver += mysql_driver!
 OBJ4postgresql_driver = 
 OBJ4postgresql_driver += postgresql_driver
 OBJ4dbwrapper = 
