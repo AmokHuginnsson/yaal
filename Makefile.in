@@ -141,6 +141,7 @@ OBJ4hconsole += hconsole!
 OBJ4hconsole += hcontrol!
 OBJ4hconsole += hcontrollist
 OBJ4hconsole += heditcontrol!
+OBJ4hconsole += hhandler
 OBJ4hconsole += hitem
 OBJ4hconsole += hlistcontrol!
 OBJ4hconsole += hmainwindow

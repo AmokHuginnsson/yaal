@@ -78,8 +78,6 @@ template < class ttType >
 	/*}*/
 	};
 
-#include <math.h>
-
 #include "hexception.h"
 
 template < class tType >
