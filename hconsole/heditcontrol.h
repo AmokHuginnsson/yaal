@@ -33,40 +33,46 @@ Copyright:
 #include "../hcore/hstringlist.h"
 #include "hcontrol.h"
 
+#define D_DEFAULT_MASK "^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$"
+
 class HEditControl : public virtual HControl
 	{
 protected:
 	/*{*/
-	bool				f_bReplace;					/* current edit mode */
-	bool				f_bMultiLine;				/* is control multiline */
-	bool				f_bPassword;				/* should be entered text visible */
-	int					f_iMaxStringSize;		/* self explenary */
-	int					f_iCursorPosition;	/* cursor position relative to control
-																		 begining */
-	int					f_iControlOffset;		/* when content is bigger than control size
-																		 this variable keeps offset of first
-																		 character shown */
-	int					f_iMaxHistoryLevel;	/* how many instertions should history keep */
-	regex_t			f_sMask;						/* regular expression describing what
-																		 characters and
-																		 in what way can be entered */
-	HString			f_oString;					/* control content */
-	HStringList f_oHistory; 				/* history of insertions */
+	bool				f_bReplace;						/* current edit mode */
+	bool				f_bMultiLine;					/* is control multiline */
+	bool				f_bPassword;					/* should be entered text visible */
+	int					f_iMaxStringSize;			/* self explenary */
+	int					f_iCursorPosition;		/* cursor position relative to control
+																			 begining */
+	int					f_iControlOffset;			/* when content is bigger than control size
+																			 this variable keeps offset of first
+																			 character shown */
+	int					f_iMaxHistoryLevel;		/* how many instertions should history keep */
+	regex_t			f_sMask;							/* regular expression describing what
+																			 characters and
+																			 in what way can be entered */
+	HString			f_oString;						/* control content */
+	HStringList f_oHistory; 					/* history of insertions */
 	/*}*/
 public:
 	/*{*/
-	HEditControl ( HWindow *,				/* parent */
-								int,							/* top ( parent relative ) */
-								int,							/* left */
-								int,							/* width */ 
-								int = 128,				/* maximum string length */
+	HEditControl ( HWindow *,					/* parent */
+								int,								/* top ( parent relative ) */
+								int,								/* left */
+								int,								/* height */
+								int,								/* width */
 								const char * = "",	/* label */
-								const char * = "", /* initial content */
-								const char * = "^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$", /* mask */
-								bool = false,			/* replace */
-								bool = false,			/* multiline */
-								bool = false,			/* password */
-								int = 8 );				/* max history level */
+								int = 128,					/* maximum string length */
+								const char * = "",	/* initial content */
+								const char * = D_DEFAULT_MASK, /* mask */
+								bool = false,				/* replace */
+								bool = false,				/* multiline */
+								bool = false,				/* password */
+								int = 8,						/* max history level */
+								int = -1, 					/* disabled attribute */
+								int = -1,						/* enabled attribute */
+								int = -1 );					/* focused attribute */
 	virtual ~HEditControl ( void );
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );

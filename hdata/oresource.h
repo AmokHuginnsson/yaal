@@ -48,6 +48,13 @@ Copyright:
 #define D_CONTROL_DATE	5
 #define D_CONTROL_CHECK	6
 
+struct OAttributes
+	{
+	int	f_iDisabledAttribute;					/* attribute of control in disabled state */
+	int	f_iEnabledAttribute;	/* attribute of control in enabled state */
+	int	f_iFocusedAttribute;	/* attribute of control in focused state */
+	};
+
 struct OResource
 	{
 /* data part */
@@ -61,12 +68,10 @@ struct OResource
 	int			f_iHeight;						/* height of control */
 	int			f_iWidth;							/* width of control */
 	char *	f_pcLabel;						/* control label */
-	int			f_iAttribute;					/* attribute of control in disabled state */
-	int			f_iEnabledAttribute;	/* attribute of control in enabled state */
-	int			f_iFocusedAttribute;	/* attribute of control in focused state */
 	int			f_iFlags;							/* tell how control should be treaded */
 	int			f_iType;							/* predefined type of control */
 	int			f_iControlParent;			/* index of parent control (tree data structure) */
+	OAttributes *	f_psAttributes;	/* control's attributes */
 	void *	f_pvControlSpecific;	/* additional initialization values control
 																	 specific */
 	};
@@ -74,10 +79,11 @@ struct OResource
 /* control type specific */
 struct OEditControlResource
 	{
+	int			f_iMaxStringSize;			/* maximum length of contained string */
 	char *	f_pcValue;						/* initial value for control */
 	char *	f_pcMask;							/* tell what can be inserted into control */
-	bool		f_bMultiLine;					/* is this contorl a multiline edit? */
 	bool		f_bReplace;						/* is control in replace mode? */
+	bool		f_bMultiLine;					/* is this contorl a multiline edit? */
 	bool		f_bPassword;					/* is control in password mode? (no echo) */
 	int			f_iMaxHistoryLevel;		/* history buffer size */
 	};

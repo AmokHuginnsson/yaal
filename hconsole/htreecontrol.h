@@ -37,7 +37,7 @@ protected:
 		{
 	protected:
 		/*{*/
-		bool f_bUnfolded;
+		bool f_bUnfolded;	/* is this branch folded? */
 		/*}*/
 	public:
 		/*{*/
@@ -56,12 +56,15 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HTreeControl ( HWindow *,				/* parent */
-								 int,							/* row */
-								 int,							/* col */
-								 int,							/* height */
-								 int,							/* width */
-								 const char * );	/* label */
+	HTreeControl ( HWindow *,			/* parent */
+								 int,						/* row */
+								 int,						/* col */
+								 int,						/* height */
+								 int,						/* width */
+								 const char *,	/* label */
+								 int = -1, 			/* disabled attribute */
+								 int = -1,			/* enabled attribute */
+								 int = -1 );		/* focused attribute */
 	virtual ~HTreeControl ( void );
 	virtual void refresh ( void );
 	int draw_node ( HNodeControl *, int );

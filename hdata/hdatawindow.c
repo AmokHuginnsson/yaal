@@ -26,6 +26,7 @@ Copyright:
 
 #include "hdatawindow.h"
 #include "hdatalistcontrol.h"
+#include "hdatatreecontrol.h"
 
 #include "../hcore/hexception.h"
 
@@ -64,32 +65,60 @@ HDataWindow::~HDataWindow ( void )
 						f_psResourcesArray [ l_iCtr ].f_iColumn,\
 						f_psResourcesArray [ l_iCtr ].f_iHeight,\
 						f_psResourcesArray [ l_iCtr ].f_iWidth,\
-						f_psResourcesArray [ l_iCtr ].f_pcLabel,\
-						f_psResourcesArray [ l_iCtr ].f_iAttribute,\
-						f_psResourcesArray [ l_iCtr ].f_iEnabledAttribute,\
-						f_psResourcesArray [ l_iCtr ].f_iFocusedAttribute
+						f_psResourcesArray [ l_iCtr ].f_pcLabel
+
+#define M_ATTRIBUTES_SETUP l_psAttr->f_iDisabledAttribute,\
+						l_psAttr->f_iEnabledAttribute,\
+						l_psAttr->f_iFocusedAttribute
 						
 int HDataWindow::init ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
+	char l_pcValue [ ] = "";
+	char l_pcMask [ ] = D_DEFAULT_MASK;
 	HDataControl * l_poDataControl = NULL;
+	OAttributes l_sAttributes, * l_psAttr = & l_sAttributes;
+	OEditControlResource l_sEditControlResource;
+	OEditControlResource * l_psECR = & l_sEditControlResource;
+	l_sAttributes.f_iDisabledAttribute = -1;
+	l_sAttributes.f_iEnabledAttribute = -1;
+	l_sAttributes.f_iFocusedAttribute = -1;
 	HWindow::init ( );
 	while ( f_psResourcesArray [ l_iCtr ].f_pcLabel )
 		{
+		if ( f_psResourcesArray [ l_iCtr ].f_psAttributes )
+			l_psAttr = f_psResourcesArray [ l_iCtr ].f_psAttributes;
 		switch ( f_psResourcesArray [ l_iCtr ].f_iType )
 			{
 			case ( D_CONTROL_EDIT ):
 				{
+				l_sEditControlResource.f_iMaxStringSize = 128;
+				l_sEditControlResource.f_pcValue = l_pcValue;
+				l_sEditControlResource.f_pcMask = l_pcMask;
+				l_sEditControlResource.f_bReplace = false;
+				l_sEditControlResource.f_bMultiLine = false;
+				l_sEditControlResource.f_bPassword = false;
+				l_sEditControlResource.f_iMaxHistoryLevel = 8;
+				if ( f_psResourcesArray [ l_iCtr ].f_pvControlSpecific )
+					l_psECR = ( OEditControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvControlSpecific;
+				l_poDataControl = ( HDataControl * ) new HEditControl ( ( HWindow * ) this,
+						M_STANDART_SETUP, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
+						l_psECR->f_pcMask, l_psECR->f_bReplace, l_psECR->f_bMultiLine,
+						l_psECR->f_bPassword, l_psECR->f_iMaxHistoryLevel,
+						M_ATTRIBUTES_SETUP );
 				break;
 				}
 			case ( D_CONTROL_LIST ):
 				{
-				l_poDataControl = new HDataListControl ( this, this, M_STANDART_SETUP	);
+				l_poDataControl = new HDataListControl ( this, this, M_STANDART_SETUP,
+						M_ATTRIBUTES_SETUP );
 				break;
 				}
 			case ( D_CONTROL_TREE ):
 				{
+				l_poDataControl = new HDataTreeControl ( this, this, M_STANDART_SETUP,
+						M_ATTRIBUTES_SETUP );
 				break;
 				}
 			case ( D_CONTROL_COMBO ):
@@ -109,9 +138,11 @@ int HDataWindow::init ( void )
 				break;
 				}
 			}
+		if ( f_psResourcesArray [ l_iCtr ].f_iFlags == D_CONTROL_MAIN )
+			f_poMainControl = l_poDataControl;
 		l_iCtr ++;
 		}
-	f_poMainControl->populate ( );
+	if ( f_poMainControl )f_poMainControl->populate ( );
 	return ( 0 );
 	M_EPILOG
 	}

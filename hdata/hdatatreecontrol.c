@@ -27,3 +27,39 @@ Copyright:
 #include "hdatatreecontrol.h"
 
 #include "hexception.h"
+
+HDataTreeControl::HDataTreeControl ( HRecordSet * a_poRecordSet,
+		HWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
+		int a_iWidth, const char * a_pcTitle, int a_iAttribute,
+		int a_iEnabledAttribute, int a_iFocusedAttribute )
+								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
+										a_iWidth, a_pcTitle, a_iAttribute,
+										a_iEnabledAttribute, a_iFocusedAttribute ),
+								HDataControl ( a_poRecordSet, NULL, 0, 0, 0, 0, NULL, 0, 0, 0 ),
+								HTreeControl ( NULL, 0, 0, 0, 0, NULL )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+HDataTreeControl::~HDataTreeControl ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+void HDataTreeControl::populate ( long int /*a_iId*/ )
+	{
+	M_PROLOG
+	f_poRecordSet->open ( );
+	while ( ! f_poRecordSet->is_eof ( ) )
+		{
+		f_poRecordSet->move_next ( );
+		}
+	f_poRecordSet->close ( );
+	return;
+	M_EPILOG
+	}
+

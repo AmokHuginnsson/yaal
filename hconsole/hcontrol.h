@@ -37,36 +37,36 @@ class HControl
 	{
 protected:
 	/*{*/
-	bool			f_bEnabled;					/* is cotrol enabled, focus can go 
-																	 only to enabled control */
-	bool			f_bFocused;					/* has control focus */
-	bool 			f_bSingleLine;			/* is label in the same line as top of
-																	 control */
-	int				f_iAttribute;				/* attribute of disabled cotrol */
-	int				f_iEnabledAttribute;/* attribute of enabled cotrol */	
-	int				f_iFocusedAttribute;/* attribute of focused cotrol */
-																/* high byte of attribute in all
-																	 three cases keeps label (control title)
-																 	 color, low byte keeps work place color */
-	int				f_iRow;							/* control top coordinate relative
-																	 to parent window (top or bottom border) */
-	int				f_iColumn;					/* control left coordinate relative
-																	 to parent window (left or right border) */
-	int				f_iHeight;					/* height or coorinate of bottom of control */
-	int				f_iWidth;						/* width or coorinate of right of control */
-	int				f_iRowRaw;					/* control top coordinate relative
-																	 to parent window (after repositioning) */
-	int				f_iColumnRaw;				/* control left coordinate relative
-																	 to parent window (after repositioning) */
-	int				f_iHeightRaw;				/* self explanary */
-	int				f_iWidthRaw;				/* self explanary */
-	HString 	f_oLabel;						/* control title */
-	HString		f_oVarTmpBuffer;		/* buffer for temporary operations, used
-																	 to keep memory fragmentation low */
-	HWindow * f_poParent;					/* window that will hold this control */
+	bool			f_bEnabled;						/* is cotrol enabled, focus can go 
+																		 only to enabled control */
+	bool			f_bFocused;						/* has control focus */
+	bool 			f_bSingleLine;				/* is label in the same line as top of
+																		 control */
+	int				f_iDisabledAttribute;	/* attribute of disabled cotrol */
+	int				f_iEnabledAttribute;	/* attribute of enabled cotrol */	
+	int				f_iFocusedAttribute;	/* attribute of focused cotrol */
+																	/* high byte of attribute in all
+																		 three cases keeps label (control title)
+																 		 color, low byte keeps work place color */
+	int				f_iRow;								/* control top coordinate relative
+																		 to parent window (top or bottom border) */
+	int				f_iColumn;						/* control left coordinate relative
+																		 to parent window (left or right border) */
+	int				f_iHeight;						/* height or coorinate of bottom of control */
+	int				f_iWidth;							/* width or coorinate of right of control */
+	int				f_iRowRaw;						/* control top coordinate relative
+																		 to parent window (after repositioning) */
+	int				f_iColumnRaw;					/* control left coordinate relative
+																		 to parent window (after repositioning) */
+	int				f_iHeightRaw;					/* self explanary */
+	int				f_iWidthRaw;					/* self explanary */
+	HString 	f_oLabel;							/* control title */
+	HString		f_oVarTmpBuffer;			/* buffer for temporary operations, used
+																		 to keep memory fragmentation low */
+	HWindow * f_poParent;						/* window that will hold this control */
 /* this is used locally, there is no way to modify this variables explictly */
-	int				f_iLabelLength; 		/* lenght of the label */
-	int				f_iShortcutIndex;		/* index of shortcut char in label */
+	int				f_iLabelLength;	 			/* lenght of the label */
+	int				f_iShortcutIndex;			/* index of shortcut char in label */
 	/*}*/
 public:
 	/*{*/
@@ -84,6 +84,7 @@ public:
 	virtual HInfo operator = ( const HInfo & );
 	void draw_label ( void );
 	void set_attributes ( int, int, int );
+	void move ( int, int, int, int );
 	/*}*/
 	};
 

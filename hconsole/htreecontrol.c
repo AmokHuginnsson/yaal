@@ -79,10 +79,12 @@ void HTreeControl::HNodeControl::collapse ( void )
 	}
 
 HTreeControl::HTreeControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-														 int a_iHeight, int a_iWidth,
-														 const char * a_pcLabel )
+														 int a_iHeight, int a_iWidth, const char * a_pcLabel,
+														 int a_iDisabledAttribute, int a_iEnabledAttribute,
+														 int a_iFocusedAttribute )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
-												 a_pcLabel )
+												 a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
+												 a_iFocusedAttribute )
 	{
 	M_PROLOG
 	refresh ( );
@@ -106,10 +108,10 @@ void HTreeControl::refresh ( void )
 	memset ( f_oVarTmpBuffer, '_', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-				: f_iEnabledAttribute ) : f_iAttribute );
+				: f_iEnabledAttribute ) : f_iDisabledAttribute );
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		{
-		move ( f_iRowRaw + l_iCtr, f_iColumnRaw );
+		::move ( f_iRowRaw + l_iCtr, f_iColumnRaw );
 		cprintf ( f_oVarTmpBuffer );
 		}
 	if ( f_poRoot )
@@ -130,19 +132,19 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		{ 
 		l_iRow ++;
 		l_oInfo = a_poNode->f_tLeaf [ 0 ];
-		move ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 - 1 );
+		::move ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 - 1 );
 		console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-					: f_iEnabledAttribute ) : f_iAttribute );
+					: f_iEnabledAttribute ) : f_iDisabledAttribute );
 		if ( ! a_poNode->f_bUnfolded && l_iCtr )
 			cprintf ( "+" );
 		else if ( l_iCtr )cprintf ( "-" );
 		if ( a_poNode == f_poSelected )
 			console::set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
-						: ~ f_iEnabledAttribute ) : ~ f_iAttribute );
+						: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
 		else
 			console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-						: f_iEnabledAttribute ) : f_iAttribute );
-		move ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 );
+						: f_iEnabledAttribute ) : f_iDisabledAttribute );
+		::move ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 );
 		cprintf ( ( HString & ) l_oInfo );
 		}
 	if ( l_iCtr && ( a_poNode->f_bUnfolded || ! a_poNode->f_iLevel ) )

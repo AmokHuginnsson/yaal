@@ -20,6 +20,9 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 * Installation process:
 
 	- $ cd /path/to/stdhapi
+	# (if you are going to make an upgrade of previous installation
+		 of stdhapi project your next step has to be)
+	- $ make purge # necessary only when upgrading
 	- $ autoconf
 	- pray
 	- $ ./configure

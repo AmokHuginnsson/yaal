@@ -61,12 +61,15 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HListControl ( HWindow *,		 		/* parent */
-								 int,							/* row */
-								 int,							/* col */
-								 int,							/* height */
-								 int,							/* width */
-								 const char * );	/* label */
+	HListControl ( HWindow *,		 	/* parent */
+								 int,						/* row */
+								 int,						/* col */
+								 int,						/* height */
+								 int,						/* width */
+								 const char *,	/* label */
+								 int = -1, 			/* disabled attribute */
+								 int = -1,			/* enabled attribute */
+								 int = -1 );		/* focused attribute */
 	virtual ~HListControl ( void );
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );

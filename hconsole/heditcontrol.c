@@ -44,13 +44,15 @@ Copyright:
 #include "../hcore/xalloc.h"
 #include "../hcore/hexception.h"
 
-HEditControl::HEditControl( HWindow * a_poParent, 
-		int a_iRow, int a_iColumn, int a_iWidth, int a_iBufferSize,
-		const char * a_pcLabel, const char * a_pcValue, const char * a_pcMask,
-		bool a_bReplace, bool a_bMultiLine,	bool a_bPassword, 
-		int a_iMaxHistoryLevel )
-					: HControl ( a_poParent, a_iRow, a_iColumn, 1, a_iWidth, a_pcLabel ),
-							f_oString ( ( unsigned long ) a_iBufferSize )
+HEditControl::HEditControl( HWindow * a_poParent,
+		int a_iRow, int a_iColumn, int a_iWidth, int a_iHeight,
+		const char * a_pcLabel, int a_iBufferSize, const char * a_pcValue,
+		const char * a_pcMask, bool a_bReplace, bool a_bMultiLine,	bool a_bPassword,
+		int a_iMaxHistoryLevel, int a_iDisabledAttribute, int a_iEnabledAttribute,
+		int a_iFocusedAttribute )
+					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
+							a_iWidth, a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
+							a_iFocusedAttribute ), f_oString ( ( unsigned long ) a_iBufferSize )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
@@ -75,11 +77,12 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	f_iMaxStringSize = a_iBufferSize;
 	f_iMaxHistoryLevel = a_iMaxHistoryLevel;
 	f_bReplace = a_bReplace;
-	f_bMultiLine = a_bMultiLine;
+	f_bMultiLine = ( a_bMultiLine || ( a_iHeight > 1 ) ? true : false );
 	f_bPassword = a_bPassword;
 	f_oString = a_pcValue;
 	f_oHistory.add_tail ( HString ( "" ) );
-	if ( ( l_iErrorCode = regcomp ( & f_sMask, a_pcMask, REG_EXTENDED | REG_NOSUB ) ) )
+	if ( ( l_iErrorCode = regcomp ( & f_sMask, a_pcMask,
+					REG_EXTENDED | REG_NOSUB ) ) )
 		{
 		l_iLength = regerror ( l_iErrorCode, & f_sMask, NULL, 0 );
 		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
@@ -140,7 +143,7 @@ void HEditControl::refresh ( void )
 		}
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	cprintf ( f_oVarTmpBuffer );
-	move ( f_iRowRaw,	f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) );
+	::move ( f_iRowRaw,	f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) );
 	curs_set ( 1 );
 	return;
 	M_EPILOG

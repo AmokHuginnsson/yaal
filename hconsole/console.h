@@ -30,6 +30,8 @@ Copyright:
 namespace console
 	{
 
+#define D_ATTR_DEFAULT			-1
+
 #define D_FG_BLACK					0
 #define D_FG_RED						1
 #define D_FG_GREEN					2

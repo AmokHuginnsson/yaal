@@ -62,8 +62,8 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iColumnRaw = 0;
 	f_iHeightRaw = 0;
 	f_iWidthRaw = 0;
-	if ( a_iAttribute > 0 )f_iAttribute = a_iAttribute;
-	else f_iAttribute = console::n_iDisabledAttribute;
+	if ( a_iAttribute > 0 )f_iDisabledAttribute = a_iAttribute;
+	else f_iDisabledAttribute = console::n_iDisabledAttribute;
 	if ( a_iEnabledAttribute > 0 )f_iEnabledAttribute = a_iEnabledAttribute;
 	else f_iEnabledAttribute = console::n_iEnabledAttribute;
 	if ( a_iFocusedAttribute > 0 )f_iFocusedAttribute = a_iFocusedAttribute;
@@ -173,18 +173,18 @@ void HControl::draw_label ( void )
 	f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
 		: console::n_iWidth + f_iWidth - f_iColumnRaw;
 /* done */
-	move ( f_iRowRaw, f_iColumnRaw );
-	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iAttribute >> 8 );
+	::move ( f_iRowRaw, f_iColumnRaw );
+	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 );
 	cprintf ( f_oLabel );
-	move ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex );
-	console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iAttribute >> 8 );
+	::move ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex );
+	console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 );
 	cprintf ( "%c", f_oLabel [ f_iShortcutIndex ] );
-	move ( f_iRowRaw, f_iColumnRaw + f_iLabelLength );
-	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iAttribute );
+	::move ( f_iRowRaw, f_iColumnRaw + f_iLabelLength );
+	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute );
 	if ( f_bSingleLine )
 		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;
 	else f_iRowRaw ++, f_iHeightRaw --;
-	move ( f_iRowRaw, f_iColumnRaw );
+	::move ( f_iRowRaw, f_iColumnRaw );
 	return;
 	M_EPILOG
 	}
@@ -193,9 +193,22 @@ void HControl::set_attributes ( int a_iAttribute, int a_iEnabledAttribute,
 		int a_iFocusedAttribute )
 	{
 	M_PROLOG
-	f_iAttribute = a_iAttribute;
+	f_iDisabledAttribute = a_iAttribute;
 	f_iEnabledAttribute = a_iEnabledAttribute;
 	f_iFocusedAttribute = a_iFocusedAttribute;
+	refresh ( );
+	return;
+	M_EPILOG
+	}
+
+void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
+	{
+	M_PROLOG
+	f_iRow = a_iRow;
+	f_iColumn = a_iColumn;
+	f_iHeight = a_iHeight;
+	f_iWidth = a_iWidth;
+	refresh ( );
 	return;
 	M_EPILOG
 	}

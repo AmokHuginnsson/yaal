@@ -42,10 +42,12 @@ Copyright:
 #include "../hcore/hexception.h"
 
 HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-														 int a_iHeight, int a_iWidth,
-														 const char * a_pcLabel )
+														 int a_iHeight, int a_iWidth, const char * a_pcLabel,
+														 int a_iDisabledAttribute, int a_iEnabledAttribute,
+														 int a_iFocudesAttribute )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
-												 a_pcLabel ), HFlexibleList ( )
+												 a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
+												 a_iFocudesAttribute ), HFlexibleList ( )
 	{
 	M_PROLOG
 	f_bEditable = false;
@@ -105,7 +107,7 @@ void HListControl::refresh ( void )
 				l_iCurrentColumnWidth = l_lValue & 0x000000ff;
 				if ( l_iCurrentColumnWidth )
 					{
-					move ( f_iRowRaw + l_iCtr + 1, f_iColumnRaw + l_iColumnOffset );
+					::move ( f_iRowRaw + l_iCtr + 1, f_iColumnRaw + l_iColumnOffset );
 					f_oVarTmpBuffer [ 0 ] = 0;
 					switch ( l_iFlags & D_TYPE_MASK ) /* 0x0ffff is mask for type */
 						{
@@ -191,10 +193,10 @@ void HListControl::refresh ( void )
 						}
 					if ( l_iCtr == f_iCursorPosition )
 						console::set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
-									: ~ f_iEnabledAttribute ) : ~ f_iAttribute );
+									: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
 					else
 						console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-									: f_iEnabledAttribute ) : f_iAttribute );
+									: f_iEnabledAttribute ) : f_iDisabledAttribute );
 					cprintf ( f_oVarTmpBuffer	);
 					l_iColumnOffset += l_iCurrentColumnWidth;
 					}
@@ -204,12 +206,12 @@ void HListControl::refresh ( void )
 		}
 	l_iColumnOffset = 0;
 	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-				: f_iEnabledAttribute ) : f_iAttribute );
+				: f_iEnabledAttribute ) : f_iDisabledAttribute );
 	memset ( f_oVarTmpBuffer, '.', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		{
-		move ( f_iRowRaw + l_iCtr + 1,	f_iColumnRaw );
+		::move ( f_iRowRaw + l_iCtr + 1,	f_iColumnRaw );
 		cprintf ( f_oVarTmpBuffer );
 		}
 	for ( l_iCtr = 0; l_iCtr < l_iColumns; l_iCtr ++ )
@@ -220,42 +222,42 @@ void HListControl::refresh ( void )
 		if ( l_iCurrentColumnWidth )
 			{
 			f_oVarTmpBuffer = ( HString & ) l_oInfo;
-			move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset );
-			console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iAttribute >> 8 );
+			::move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset );
+			console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 );
 			f_oVarTmpBuffer.format ( "%%-%ds", l_iCurrentColumnWidth );
 			cprintf ( f_oVarTmpBuffer, ( char * ) ( ( HString & ) l_oInfo ).left ( l_iCurrentColumnWidth ) );
-			move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset + ( l_lValue >> 16 ) );
-			console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iAttribute >> 8 );
+			::move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset + ( l_lValue >> 16 ) );
+			console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 );
 			cprintf ( "%c", l_oInfo [ l_lValue >> 16 ] );
 			l_iColumnOffset += l_iCurrentColumnWidth;
 			if ( l_iCtr < l_iColumns )
 				{
-				console::set_attr ( f_iAttribute );
+				console::set_attr ( f_iDisabledAttribute );
 				for ( l_iCtrLoc = 0; l_iCtrLoc <= f_iHeightRaw; l_iCtrLoc ++ )
 					{
-					move ( f_iRowRaw + l_iCtrLoc,	f_iColumnRaw + l_iColumnOffset - 1 );
+					::move ( f_iRowRaw + l_iCtrLoc,	f_iColumnRaw + l_iColumnOffset - 1 );
 					cprintf ( "|" );
 					}
 				}
 			}
 		}
-	console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iAttribute );
+	console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute );
 	if ( f_iQuantity )
 		{
 		if ( f_iControlOffset )
 			{
-			move ( f_iRowRaw + 1, f_iColumnRaw + l_iColumnOffset - 1 );
+			::move ( f_iRowRaw + 1, f_iColumnRaw + l_iColumnOffset - 1 );
 			cprintf ( "^" );
 			}
 		if ( ( f_iQuantity - f_iControlOffset ) > f_iHeightRaw )
 			{
-			move ( f_iRowRaw + f_iHeightRaw, f_iColumnRaw + l_iColumnOffset - 1 );
+			::move ( f_iRowRaw + f_iHeightRaw, f_iColumnRaw + l_iColumnOffset - 1 );
 			cprintf ( "v" );
 			}
 		l_dScaled = f_iHeightRaw - 3;
 		l_dScaled *= ( double ) ( f_iControlOffset + f_iCursorPosition );
 		l_dScaled /= ( double )f_iQuantity;
-		move ( f_iRowRaw + ( int ) ( l_dScaled + 2.5 ),
+		::move ( f_iRowRaw + ( int ) ( l_dScaled + 2.5 ),
 				f_iColumnRaw + l_iColumnOffset - 1 );
 		cprintf ( "#" );
 		}
