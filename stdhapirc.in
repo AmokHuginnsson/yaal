@@ -86,8 +86,7 @@ ignore_signal_SIGTSTP true
 # it can by useful for programs that does not use databases
 # or for debuging purpouses
 
-#data_base_driver PostgreSQL
-data_base_driver MySQL
+data_base_driver @DEFAULT_DRIVER@
 
 # mysql driver realises access to datebase thru socket,
 #	which we have to point to

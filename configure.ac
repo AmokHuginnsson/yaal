@@ -4,6 +4,12 @@ dnl Initialization data.
 AC_INIT([[stdhapi]],[[0.0.0]],[[amok@frihet.ath.cx]])
 
 AC_MSG_RESULT([--- Welcome to stdhapi configurator ---                  [[0%]]])
+
+AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, dafault is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
+#` <- this one fixes syntax highlighting in vim.
+AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, dafault is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
+#`
+
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 
 dnl Unique file in project: stdhapirc is sample configuration file.
@@ -53,9 +59,7 @@ AC_CHECK_FILE(
 	[[/etc/rc]],
 	[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST________=['FreeBSD. ---  ']
 		AC_SUBST([ADDITIONAL_COMMAND],
-			[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);']])
-		AC_SUBST([EXTRA_LIB_PATHS], [[-L/usr/local/lib/mysql]])
-		CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]],
+			[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);']])],
 	[AC_CHECK_FILE(
 		[[/etc/debconf.conf]],
 		[AC_DEFINE([[__HOST_OS_TYPE_DEBIAN__]]) _HOST________=['Debian. ---   ']],
@@ -107,27 +111,55 @@ int main()
 	}
 ]],[AC_SUBST([DLOPEN_IN],[-ldl])],[])
 
+DEFAULT_DRIVER=["null"]
+
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[77%]]])
 CXXFLAGS=$CXXFLAGS_ORIG;
 CPPFLAGS=$CXXFLAGS_ORIG;
 AC_CHECK_LIB([ncurses],[initscr],
 							[],[AC_MSG_ERROR([Can not continue without ncurses.])])
-AC_CHECK_LIB([mysqlclient],[mysql_init],
-							[],[AC_MSG_ERROR([Can not continue without MySQL.])])
-AC_CHECK_LIB([pq],[PQsetdbLogin],
-							[],[AC_MSG_ERROR([Can not continue without PostgreSQL.])])
+if test ["$POSTGRES"] != ["no"] ; then
+	AC_CHECK_LIB([pq],[PQsetdbLogin],
+								[],[if test ["$POSTGRES"] = ["yes"] ; then
+											AC_MSG_ERROR([Can not continue without PostgreSQL.])
+										fi;POSTGRES=["no"]])
+fi
+if test ["$MYSQL"] != ["no"] ; then
+	AC_CHECK_LIB([mysqlclient],[mysql_init],[],[
+			CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]
+			unset ac_cv_lib_mysqlclient_mysql_init
+			AC_CHECK_LIB([mysqlclient],[mysql_init],[
+				AC_SUBST([EXTRA_LIB_PATHS], [[-L/usr/local/lib/mysql]])],
+				[if test ["$MYSQL"] = ["yes"] ; then
+					AC_MSG_ERROR([Can not continue without MySQL.])
+				fi;MYSQL=["no"]])])
+fi
+
+CXXFLAGS=$CXXFLAGS_ORIG;
+CPPFLAGS=$CXXFLAGS_ORIG;
+
 AC_MSG_RESULT([--- All needed libraries found. ---                     [[83%]]])
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[84%]]])
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
 			[AC_MSG_ERROR([Can not continue without ncurses devel!])])])
-AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],,
-	[AC_CHECK_HEADERS([[libpq-fe.h]],,
-			[AC_MSG_ERROR([[Can not continue without PostgreSQL devel(client)!]])])])
-AC_CHECK_HEADERS([[mysql/mysql.h]],,
-			[AC_MSG_ERROR([[Can not continue without MySQL devel(client)!]])])
+if test ["$POSTGRES"] != ["no"] ; then
+	AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],[DEFAULT_DRIVER=["PostgreSQL"]],
+		[AC_CHECK_HEADERS([[libpq-fe.h]],[DEFAULT_DRIVER=["PostgreSQL"]],
+				[if test ["$POSTGRES"] = ["yes"] ; then
+					AC_MSG_ERROR([[Can not continue without PostgreSQL devel(client)!]])
+				fi;POSTGRES=["no"]])])
+fi
+if test ["$MYSQL"] != ["no"] ; then
+	AC_CHECK_HEADERS([[mysql/mysql.h]],[DEFAULT_DRIVER=["MySQL"]],
+				[if test ["$MYSQL"] = ["yes"] ; then
+					AC_MSG_ERROR([[Can not continue without MySQL devel(client)!]])
+				fi;MYSQL=["no"]])
+fi
+AC_SUBST([DEFAULT_DRIVER],["$DEFAULT_DRIVER"])
+
 AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[92%]]])
 
 dnl We need to check if out ncurses devel is not brain-damaged.
@@ -152,6 +184,11 @@ AC_CONFIG_COMMANDS_PRE([cd hcore;ln -sf harray.h harray.c;
 												ln -sf omenuitem.h omenuitem.c;cd ..;cd hdata;
 												ln -sf oresource.h oresource.c;cd ..;cd doc/html;
 												ln -sf stdhapi_toc.html index.html;cd ../..])
+
+if test ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] ; then
+	AC_MSG_WARN([stdhapi without any data base driver will be
+                    unusable for most professional purpouses.])
+fi
 
 dnl We have to set up proper compiler/linker flags.
 AC_OUTPUT([Makefile stdhapirc])
