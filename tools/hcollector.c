@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <sys/types.h> /* FD_* macros */
+#include <errno.h>     /* EINTR */
 #include <string.h>
 #include <stdlib.h>
 
@@ -125,33 +127,55 @@ int HCollector::receive_line ( char * & a_pcLine )
 	M_EPILOG
 	}
 
+#define M_STDHAPI_TEMP_FAILURE_RETRY(expression) \
+  (__extension__ \
+    ({ long int __result; \
+       do __result = (long int) (expression); \
+       while (__result == -1L && errno == EINTR); \
+       __result; }))
+	
 int HCollector::establish_connection ( void )
 	{
 	M_PROLOG
-	int l_iErr = -1;
+/*
+	 We have small problem here.
+	 There are two ways that communication can start.
+	 Ether waiting part runs before initializing part (the easy case),
+	 or initializing part runs before waiting part (here comes the trouble).
+*/
+	int l_iError = -1;
+	fd_set		l_xFileDesSet; /* serial port */
+	timeval		l_sWait; /* sleep between re-selects */
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
 		{
 		write ( D_PROTO_SYN, strlen ( D_PROTO_SYN ) );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
-		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
-		l_iErr ++;
+		l_sWait.tv_sec = 1;
+		l_sWait.tv_usec = 0;
+		FD_ZERO ( & l_xFileDesSet );
+		FD_SET ( f_iFileDes, & l_xFileDesSet );
+		if ( ( M_STDHAPI_TEMP_FAILURE_RETRY ( select ( FD_SETSIZE,
+							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
+				&& FD_ISSET ( f_iFileDes, & l_xFileDesSet ) )
+			read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
+		l_iError ++;
 		}
 	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (estab)" << endl;
-	return ( l_iErr );
+	return ( l_iError );
 	M_EPILOG
 	}
 
 int HCollector::wait_for_connection ( void )
 	{
 	M_PROLOG
-	int l_iErr = -1;
+	int l_iError = -1;
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_SYN, strlen ( D_PROTO_SYN ) ) )
-		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE ), l_iErr ++;
+		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE ), l_iError ++;
 	write ( D_PROTO_ACK, strlen ( D_PROTO_ACK ) );
 	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (wait)" << endl;
-	return ( l_iErr );
+	return ( l_iError );
 	M_EPILOG
 	}
 
