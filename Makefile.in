@@ -294,11 +294,9 @@ $(HDATA): $(HCONSOLE) $(OBJ4hdata)
 $(HAPIHDR): $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
 	@echo -n "Making header dir ... "
 	@/bin/mkdir -p $(HEADERSDIR)
-	@for FILE in $(HDR4hcore); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
-	@for FILE in $(HDR4hconsole); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
-	@for FILE in $(HDR4tools); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
-	@for FILE in $(HDR4dbwrapper); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
-	@for FILE in $(HDR4hdata); do sed -e s/'\(#include \)"\(\.\.\?\/.\+\/\)\?\([a-z]\+\.h\)"'/'\1<\3>'/ $$FILE > $(HEADERSDIR)/`basename $$FILE` ; done
+	@for FILE in $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata); do \
+		awk '/^#include/ {match($$0,"[a-z_]+\\.h"); printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };!/^#include/' $$FILE > $(HEADERSDIR)/`basename $$FILE`;\
+	done
 	@head -26 $(HEADERSDIR)/bit.h | sed -e s/bit/stdhapi/ > $(HEADERSDIR)/stdhapi.h
 	@echo '#ifndef __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
 	@echo '#define __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
