@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HTIMECONTROL_H
-#define __HTIMECONTROL_H
+#ifndef __HCONSOLE_HTIMECONTROL_H
+#define __HCONSOLE_HTIMECONTROL_H
 
 #include "../hcore/htime.h"
 #include "hwindow.h"
@@ -47,4 +47,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HTIMECONTROL_H */
+#endif /* not __HCONSOLE_HTIMECONTROL_H */

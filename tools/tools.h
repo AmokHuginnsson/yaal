@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __TOOLS_H
-#define __TOOLS_H
+#ifndef __TOOLS_TOOLS_H
+#define __TOOLS_TOOLS_H
 
 namespace tools
 	{
@@ -39,5 +39,5 @@ extern bool n_bIgnoreSignalSIGQUIT;
 
 	}
 
-#endif /* not __TOOLS_H */
+#endif /* not __TOOLS_TOOLS_H */
 

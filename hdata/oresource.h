@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __ORESOURCE_H
-#define __ORESOURCE_H
+#ifndef __HDATA_ORESOURCE_H
+#define __HDATA_ORESOURCE_H
 
 #define D_CVSID_ORESOURCE_H "$CVSHeader$"
 
@@ -115,4 +115,4 @@ struct OListControlResource
 	bool	f_bDrawHeader;				/* should be header droven */
 	};
 
-#endif /* not __ORESOURCE_H */
+#endif /* not __HDATA_ORESOURCE_H */

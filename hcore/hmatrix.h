@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HMATRIX_H
-#define __HMATRIX_H
+#ifndef __HCORE_HMATRIX_H
+#define __HCORE_HMATRIX_H
 
 #line 31
 
@@ -548,5 +548,5 @@ HVector < tType > T ( const HMatrix < tType > & a_roMatrix, const HVector < tTyp
 	M_EPILOG
 	}
 	
-#endif /* not __HMATRIX_H */
+#endif /* not __HCORE_HMATRIX_H */
 

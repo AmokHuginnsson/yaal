@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_H
-#define __HCONSOLE_H
+#ifndef __HCONSOLE_HCONSOLE_H
+#define __HCONSOLE_HCONSOLE_H
 
 namespace console
 	{
@@ -48,5 +48,5 @@ extern int	n_iCommandComposeDelay;
 
 	}
 
-#endif /* not __HCONSOLE_H */
+#endif /* not __HCONSOLE_HCONSOLE_H */
 

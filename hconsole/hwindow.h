@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HWINDOW_H
-#define __HWINDOW_H
+#ifndef __HCONSOLE_HWINDOW_H
+#define __HCONSOLE_HWINDOW_H
 
 #include "hcontrol.h"
 #include "hcontrollist.h"
@@ -76,4 +76,4 @@ private:
 	/*}*/
 	};
 
-#endif /* not __HWINDOW_H */
+#endif /* not __HCONSOLE_HWINDOW_H */

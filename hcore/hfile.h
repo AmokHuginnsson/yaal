@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HFILE_H
-#define __HFILE_H
+#ifndef __HCORE_HFILE_H
+#define __HCORE_HFILE_H
 
 #include <stdio.h>
 
@@ -42,4 +42,4 @@ public:
 	/*}*/
 	};
 
-#endif /* not __HFILE_H */
+#endif /* not __HCORE_HFILE_H */

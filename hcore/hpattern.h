@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HPATTERN_H
-#define __HPATTERN_H
+#ifndef __HCORE_HPATTERN_H
+#define __HCORE_HPATTERN_H
 
 #include <sys/types.h>	/* why? - because POSIX says so :/ */
 #include <regex.h>			/* this one is obvious */
@@ -65,5 +65,5 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HPATTERN_H */
+#endif /* not __HCORE_HPATTERN_H */
 

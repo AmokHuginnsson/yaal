@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HTIME_H
-#define __HTIME_H
+#ifndef __HCORE_HTIME_H
+#define __HCORE_HTIME_H
 
 #include <time.h>
 
@@ -79,4 +79,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HTIME_H */
+#endif /* not __HCORE_HTIME_H */

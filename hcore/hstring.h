@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HSTRING_H
-#define __HSTRING_H
+#ifndef __HCORE_HSTRING_H
+#define __HCORE_HSTRING_H
 
 #include <stddef.h>
 
@@ -108,4 +108,4 @@ bool operator <= ( const char *, const HString & );
 bool operator > ( const char *, const HString & );
 bool operator < ( const char *, const HString & );
 
-#endif /* not __HSTRING_H */
+#endif /* not __HCORE_HSTRING_H */

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HDATABASE_H
-#define __HDATABASE_H
+#ifndef __DBWRAPPER_HDATABASE_H
+#define __DBWRAPPER_HDATABASE_H
 
 #include "hdatabase.h"
 
@@ -54,4 +54,4 @@ public:
 	/*}*/
 	};
 
-#endif /* not __HDATABASE_H */
+#endif /* not __DBWRAPPER_HDATABASE_H */

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HLOG_H
-#define __HLOG_H
+#ifndef __HCORE_HLOG_H
+#define __HCORE_HLOG_H
 
 #define M_LOG(MESG) log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, MESG )
 
@@ -79,4 +79,4 @@ namespace core
 
 using namespace core;
 
-#endif /* not __HLOG_H */
+#endif /* not __HCORE_HLOG_H */

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HRECORDSET_H
-#define __HRECORDSET_H
+#ifndef __DBWRAPPER_HRECORDSET_H
+#define __DBWRAPPER_HRECORDSET_H
 
 /* modes */
 #define D_MODE_CLOSED	-	1
@@ -106,4 +106,4 @@ public:
 	/*}*/
 	};
 
-#endif /* not __HRECORDSET_H */
+#endif /* not __DBWRAPPER_HRECORDSET_H */

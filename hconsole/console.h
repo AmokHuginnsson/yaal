@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __CONSOLE_H
-#define __CONSOLE_H
+#ifndef __HCONSOLE_CONSOLE_H
+#define __HCONSOLE_CONSOLE_H
 
 #include <stdarg.h>
 
@@ -122,5 +122,5 @@ extern int n_iMouseDes;
 
 	}
 
-#endif /* not __CONSOLE_H */
+#endif /* not __HCONSOLE_CONSOLE_H */
 

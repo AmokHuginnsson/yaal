@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HHANDLER_H
-#define __HHANDLER_H
+#ifndef __HCONSOLE_HHANDLER_H
+#define __HCONSOLE_HHANDLER_H
 
 #include <sys/types.h>
 
@@ -62,4 +62,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HHANDLER_H */
+#endif /* not __HCONSOLE_HHANDLER_H */

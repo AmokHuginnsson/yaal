@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HRAWFILE_H
-#define __HRAWFILE_H
+#ifndef __HCORE_HRAWFILE_H
+#define __HCORE_HRAWFILE_H
 
 typedef int file_descriptor_t;
 
@@ -47,5 +47,5 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HRAWFILE_H */
+#endif /* not __HCORE_HRAWFILE_H */
 

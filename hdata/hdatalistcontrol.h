@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HDATALISTCONTROL_H
-#define __HDATALISTCONTROL_H
+#ifndef __HDATA_HDATALISTCONTROL_H
+#define __HDATA_HDATALISTCONTROL_H
 
 #include "../hconsole/hlistcontrol.h"
 #include "hdatacontrol.h"
@@ -53,4 +53,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HDATALISTCONTROL_H */
+#endif /* not __HDATA_HDATALISTCONTROL_H */

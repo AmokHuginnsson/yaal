@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HTREE_H
-#define __HTREE_H
+#ifndef __HCORE_HTREE_H
+#define __HCORE_HTREE_H
 
 #line 31
 
@@ -271,4 +271,4 @@ tttType & HTree < tttType > ::add_node( int )
 	M_EPILOG
 	}
 
-#endif /* not __HTREE_H */
+#endif /* not __HCORE_HTREE_H */

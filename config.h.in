@@ -1,8 +1,15 @@
 /* $CVSHeader$ */
-/* Define operating system host type here. */
 
-#ifndef __CONFIG_H
-#define __CONFIG_H
+#ifndef __STDHAPI_CONFIG_H
+#define __STDHAPI_CONFIG_H
+
+/* Define core behavior here. */
+
+#undef __EXCEPTIONS_BY_REFERENCE__
+
+/* End of core behavior definitions. */
+
+/* Define operating system host type here. */
 
 #undef __HOST_OS_TYPE_FREEBSD__
 
@@ -59,5 +66,5 @@
 
 /* End of available functions definitions. */
 
-#endif /* not __CONFIG_H */
+#endif /* not __STDHAPI_CONFIG_H */
 

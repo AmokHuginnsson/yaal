@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HDATAWINDOW_H
-#define __HDATAWINDOW_H
+#ifndef __HDATA_HDATAWINDOW_H
+#define __HDATA_HDATAWINDOW_H
 
 #include "../dbwrapper/hrecordset.h"
 #include "../hconsole/hwindow.h"
@@ -74,4 +74,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HDATAWINDOW_H */
+#endif /* not __HDATA_HDATAWINDOW_H */

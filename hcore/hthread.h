@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HTHREAD_H
-#define __HTHREAD_H
+#ifndef __HCORE_HTHREAD_H
+#define __HCORE_HTHREAD_H
 
 #include <pthread.h>
 
@@ -42,4 +42,4 @@ public:
 	/*}*/
 	};
 
-#endif /* not __HTHREAD_H */
+#endif /* not __HCORE_HTHREAD_H */

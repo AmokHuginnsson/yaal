@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HRANDOMIZER_H
-#define __HRANDOMIZER_H
+#ifndef __HCORE_HRANDOMIZER_H
+#define __HCORE_HRANDOMIZER_H
 
 class HRandomizer
 	{
@@ -42,4 +42,4 @@ public:
 	/*}*/
 	};
 	
-#endif /* not __HRANDOMIZER_H */
+#endif /* not __HCORE_HRANDOMIZER_H */

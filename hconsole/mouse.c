@@ -230,15 +230,22 @@ int x_mouse_open ( void )
 		M_THROW ( "mousemask ( ) returned 0", g_iErrNo );
 	else if ( ( l_xMouseMask & l_xDesiredMouseMask ) < l_xDesiredMouseMask )
 		{
-		HException * l_poException = NULL;
 		HString l_oError;
-		l_poException = new HException ( __WHERE__,
-				"could not set up apropriate mask", l_xMouseMask );
 		l_oError.format ( "1 = %d, 2 = %d, 3 = %d",
 				l_xMouseMask & BUTTON1_CLICKED, l_xMouseMask & BUTTON2_CLICKED,
 				l_xMouseMask & BUTTON3_CLICKED );
+#ifdef __EXCEPTIONS_BY_REFERENCE__
+		HException l_oException ( __WHERE__, "could not set up apropriate mask",
+				l_xMouseMask );
+		l_oException.set ( l_oError );
+		throw ( l_oException );
+#else /* __EXCEPTIONS_BY_REFERENCE__ */
+		HException * l_poException = NULL;
+		l_poException = new HException ( __WHERE__,
+				"could not set up apropriate mask", l_xMouseMask );
 		l_poException->set ( l_oError );
 		throw ( l_poException );
+#endif /* not __EXCEPTIONS_BY_REFERENCE__ */
 		}
 	return ( 0 );
 	M_EPILOG

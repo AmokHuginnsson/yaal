@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HEDITCONTROL_H
-#define __HEDITCONTROL_H
+#ifndef __HCONSOLE_HEDITCONTROL_H
+#define __HCONSOLE_HEDITCONTROL_H
 
 #include <sys/types.h>	/* why? - because POSIX says so :/ */
 #include <regex.h>			/* this one is obvious */
@@ -96,4 +96,4 @@ public:
 	/*}*/
 	};
 
-#endif /* not __TREMINAL_H */
+#endif /* not __HCONSOLE_HEDITCONTROL_H */

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __UTIL_H
-#define __UTIL_H
+#ifndef __TOOLS_UTIL_H
+#define __TOOLS_UTIL_H
 
 #include "../hcore/hstring.h"
 
@@ -38,4 +38,4 @@ double atof_ex ( const char *, bool = false );
 
 	}
 
-#endif /* not __UTIL_H */
+#endif /* not __TOOLS_UTIL_H */

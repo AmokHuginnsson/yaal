@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __RC_FILE_H
-#define __RC_FILE_H
+#ifndef __HCORE_RC_FILE_H
+#define __HCORE_RC_FILE_H
 
 #include <stdio.h>
 
@@ -53,4 +53,4 @@ void rc_set_variable ( const char *, int & );
 
 	}
 
-#endif /* not __RC_FILE_H */
+#endif /* not __HCORE_RC_FILE_H */

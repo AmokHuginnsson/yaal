@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONTROL_H
-#define __HCONTROL_H
+#ifndef __HCONSOLE_HCONTROL_H
+#define __HCONSOLE_HCONTROL_H
 
 #include "console.h"
 #include "../hcore/hstring.h"
@@ -99,5 +99,5 @@ public:
 	/*}*/
 	};
 
-#endif /* not __HCONTROL_H */
+#endif /* not __HCONSOLE_HCONTROL_H */
 

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONTROLLIST_H
-#define __HCONTROLLIST_H
+#ifndef __HCONSOLE_HCONTROLLIST_H
+#define __HCONSOLE_HCONTROLLIST_H
 
 #include "../hcore/hlist.h"
 #include "hcontrol.h"
@@ -52,4 +52,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HCONTROLLIST_H */
+#endif /* not __HCONSOLE_HCONTROLLIST_H */

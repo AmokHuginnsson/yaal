@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HVECTOR_H
-#define __HVECTOR_H
+#ifndef __HCORE_HVECTOR_H
+#define __HCORE_HVECTOR_H
 
 #line 31
 
@@ -320,4 +320,4 @@ HVector < tType > operator * ( const tType d, const HVector < tType > & a_roVect
 	M_EPILOG
 	}
 
-#endif /* not __HVECTOR_H */
+#endif /* not __HCORE_HVECTOR_H */

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCOLLECTOR_H
-#define __HCOLLECTOR_H
+#ifndef __TOOLS_HCOLLECTOR_H
+#define __TOOLS_HCOLLECTOR_H
 
 #include "hserial.h"
 
@@ -62,4 +62,4 @@ protected:
 	/*}*/
 	};
 	
-#endif /* not __HCOLLECTOR_H */
+#endif /* not __TOOLS_HCOLLECTOR_H */

@@ -85,7 +85,7 @@ CXXFLAGS =	\
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
-COMPILER_PRIME_FLAGS = -std=gnu++98 -pipe -fPIC -D_GNU_SOURCE @DEFS@ -march=i486
+COMPILER_PRIME_FLAGS = -std=gnu++98 -pipe -fPIC -D__STDHAPI_BUILD__ -D_GNU_SOURCE @DEFS@ -march=i486
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
@@ -338,6 +338,7 @@ $(HAPIHDR): $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hda
 	@echo '#ifndef __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
 	@echo '#define __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
 	@echo '' >> $(HEADERSDIR)/stdhapi.h
+	@cat config.h >> $(HEADERSDIR)/stdhapi.h
 	@find $(HEADERSDIR) ! -name 'stdhapi.h' -type f | awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' | sort >> $(HEADERSDIR)/stdhapi.h
 	@echo '' >> $(HEADERSDIR)/stdhapi.h
 	@echo '#endif /* not __STDHAPI_H */' >> $(HEADERSDIR)/stdhapi.h

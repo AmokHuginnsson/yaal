@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HDATASTATUSBARCONTROL_H
-#define __HDATASTATUSBARCONTROL_H
+#ifndef __HDATA_HDATASTATUSBARCONTROL_H
+#define __HDATA_HDATASTATUSBARCONTROL_H
 
 #include "../hconsole/hstatusbarcontrol.h"
 #include "hdatawindow.h"
@@ -45,5 +45,5 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HDATASTATUSBARCONTROL_H */
+#endif /* not __HDATA_HDATASTATUSBARCONTROL_H */
 

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __MOUSE_H
-#define __MOUSE_H
+#ifndef __HCONSOLE_MOUSE_H
+#define __HCONSOLE_MOUSE_H
 
 namespace mouse
 {
@@ -58,5 +58,5 @@ int x_mouse_close ( void );
 
 }
 
-#endif /* not __MOUSE_H */
+#endif /* not __HCONSOLE_MOUSE_H */
 

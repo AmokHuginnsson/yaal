@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HDATATREECONTROL_H
-#define __HDATATREECONTROL_H
+#ifndef __HDATA_HDATATREECONTROL_H
+#define __HDATA_HDATATREECONTROL_H
 
 #include "../hconsole/htreecontrol.h"
 #include "hdatacontrol.h"
@@ -49,4 +49,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* __HDATATREECONTROL_H */
+#endif /* not __HDATA_HDATATREECONTROL_H */

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HLISTCONTROL_H
-#define __HLISTCONTROL_H
+#ifndef __HCONSOLE_HLISTCONTROL_H
+#define __HCONSOLE_HLISTCONTROL_H
 
 #include "../hcore/hinfolist.h"
 #include "hitem.h"
@@ -132,4 +132,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HLISTCONTROL_H */
+#endif /* not __HCONSOLE_HLISTCONTROL_H */

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HSERIAL_H
-#define __HSERIAL_H
+#ifndef __TOOLS_HSERIAL_H
+#define __TOOLS_HSERIAL_H
 
 #include <termios.h>
 
@@ -60,5 +60,5 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HSERIAL_H */
+#endif /* not __TOOLS_HSERIAL_H */
 

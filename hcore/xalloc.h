@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __XALLOC_H
-#define __XALLOC_H
+#ifndef __HCORE_XALLOC_H
+#define __HCORE_XALLOC_H
 
 extern "C"
 {
@@ -39,4 +39,4 @@ char * xstrdup ( const char * );
 
 }
 
-#endif /* not __XALLOC_H */
+#endif /* not __HCORE_XALLOC_H */

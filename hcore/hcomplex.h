@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCOMPLEY_H
-#define __HCOMPLEY_H
+#ifndef __HCORE_HCOMPLEX_H
+#define __HCORE_HCOMPLEX_H
 
 class HComplex
 	{
@@ -68,5 +68,5 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HCOMPLEY_H */
+#endif /* not __HCORE_HCOMPLEX_H */
 

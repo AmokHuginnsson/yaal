@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HMAP_H
-#define __HMAP_H
+#ifndef __HCORE_HMAP_H
+#define __HCORE_HMAP_H
 
 #line 31 "hmap.h"
 
@@ -297,5 +297,5 @@ bool HMap<tType, ttType>::remove ( const tType & a_rtKey )
 
 unsigned long int hash ( const HString & );
 
-#endif /* not __HMAP_H */
+#endif /* not __HCORE_HMAP_H */
 

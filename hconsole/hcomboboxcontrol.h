@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCOMBOBOXCONTROL_H
-#define __HCOMBOBOXCONTROL_H
+#ifndef __HCONSOLE_HCOMBOBOXCONTROL_H
+#define __HCONSOLE_HCOMBOBOXCONTROL_H
 
 #include "heditcontrol.h"
 #include "hlistcontrol.h"
@@ -76,5 +76,5 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HCOMBOBOXCONTROL_H */
+#endif /* not __HCONSOLE_HCOMBOBOXCONTROL_H */
 

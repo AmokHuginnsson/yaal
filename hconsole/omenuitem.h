@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __OMENUITEM_H
-#define __OMENUITEM_H
+#ifndef __HCONSOLE_OMENUITEM_H
+#define __HCONSOLE_OMENUITEM_H
 
 #define D_CVSID_OMENUITEM_H "$CVSHeader$"
 
@@ -38,4 +38,4 @@ struct OMenuItem
 	const char * f_pcLabel;
 	};
 
-#endif /* not __OMENUITEM_H */
+#endif /* not __HCONSOLE_OMENUITEM_H */

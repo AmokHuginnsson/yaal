@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HDES_H
-#define __HDES_H
+#ifndef __TOOLS_HDES_H
+#define __TOOLS_HDES_H
 
 #define D_DES_SIDES_COUNT		2
 #define D_DES_IKEY_SIZE			6
@@ -58,5 +58,5 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HDES_H */
+#endif /* not __TOOLS_HDES_H */
 

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __SIGHAND_H
-#define __SIGHAND_H
+#ifndef __TOOLS_SIGHAND_H
+#define __TOOLS_SIGHAND_H
 
 namespace signals
 	{
@@ -34,5 +34,5 @@ void set_handlers ( void );
 
 	}
 
-#endif /* not __SIGHAND_H */
+#endif /* not __TOOLS_SIGHAND_H */
 

@@ -6,15 +6,16 @@ AC_INIT([[stdhapi]],[[0.0.0]],[[amok@frihet.ath.cx]])
 
 AC_MSG_RESULT([--- Welcome to stdhapi configurator ---                  [[0%]]])
 
-AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, dafault is `yes' if apriopriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
+AC_ARG_ENABLE([[exceptions-by-reference]],[AC_HELP_STRING([exceptions-by-reference],[exceptions should be thrown, and catched by reference])],[AC_DEFINE(__EXCEPTIONS_BY_REFERENCE__)])
+AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, default is `yes' if apriopriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
 dnl ` <- this one fixes syntax highlighting in vim.
-AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, dafault is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
+AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, default is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
 dnl `
-AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, dafault is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
+AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, default is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
 dnl `
-AC_ARG_WITH([sqlite],[AC_HELP_STRING([--with-sqlite],[Compile with SQLite driver, dafault is `yes' if SQLite can be found.])],[SQLITE=$withval],[SQLITE="auto"])
+AC_ARG_WITH([sqlite],[AC_HELP_STRING([--with-sqlite],[Compile with SQLite driver, default is `yes' if SQLite can be found.])],[SQLITE=$withval],[SQLITE="auto"])
 dnl `
-AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, dafault is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
+AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, default is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
 dnl `
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
@@ -255,10 +256,7 @@ AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 AC_CHECK_FUNCS([getline],[],[])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASE_NAME_IN_LIBGEN])],[#include <string.h>])
-AC_CHECK_DECLS([B76800],[],[],[#include <termios.h>])
-AC_CHECK_DECLS([B28800],[],[],[#include <termios.h>])
-AC_CHECK_DECLS([B14400],[],[],[#include <termios.h>])
-AC_CHECK_DECLS([B7200],[],[],[#include <termios.h>])
+AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 

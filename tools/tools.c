@@ -78,20 +78,20 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 			switch ( strtol ( ( ( char * ) a_roValue ) + 1, NULL, 10 ) )
 				{
 				case ( 115200 ): l_iBaudRate = B115200; break;
-#ifdef HAVE_DECL_B76800
+#if ( HAVE_DECL_B76800 )
 				case (  76800 ): l_iBaudRate = B76800;  break;
 #endif /* HAVE_DECL_B76800 */
 				case (  57600 ): l_iBaudRate = B57600;  break;
 				case (  38400 ): l_iBaudRate = B38400;  break;
-#ifdef HAVE_DECL_B28800
+#if ( HAVE_DECL_B28800 )
 				case (  28800 ): l_iBaudRate = B28800;  break;
 #endif /* HAVE_DECL_B28800 */
 				case (  19200 ): l_iBaudRate = B19200;  break;
-#ifdef HAVE_DECL_B14400
+#if ( HAVE_DECL_B14400 )
 				case (  14400 ): l_iBaudRate = B14400;  break;
 #endif /* HAVE_DECL_B14400 */
 				case (   9600 ): l_iBaudRate = B9600;   break;
-#ifdef HAVE_DECL_B7200
+#if ( HAVE_DECL_B7200 )
 				case (   7200 ): l_iBaudRate = B7200;   break;
 #endif /* HAVE_DECL_B7200 */
 				case (   4800 ): l_iBaudRate = B4800;   break;

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HPROCESS_H
-#define __HPROCESS_H
+#ifndef __HCONSOLE_HPROCESS_H
+#define __HCONSOLE_HPROCESS_H
 
 #include <sys/types.h>
 
@@ -74,5 +74,5 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HPROCESS_H */
+#endif /* not __HCONSOLE_HPROCESS_H */
 

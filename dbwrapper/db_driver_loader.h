@@ -25,8 +25,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __DB_DRIVER_LOADER_H
-#define __DB_DRIVER_LOADER_H
+#ifndef __DBWRAPPER_DB_DRIVER_LOADER_H
+#define __DBWRAPPER_DB_DRIVER_LOADER_H
 
 #ifndef NULL
 #define NULL 0
@@ -69,5 +69,5 @@ char * autoloader_rs_column_name ( void *, int );
 
 	}
 
-#endif /* not __DB_DRIVER_LOADER_H */
+#endif /* not __DBWRAPPER_DB_DRIVER_LOADER_H */
 

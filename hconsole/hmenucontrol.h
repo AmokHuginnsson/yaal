@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HMENUCONTROL_H
-#define __HMENUCONTROL_H
+#ifndef __HCONSOLE_HMENUCONTROL_H
+#define __HCONSOLE_HMENUCONTROL_H
 
 #include "htreecontrol.h"
 #include "omenuitem.h"
@@ -71,4 +71,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HMENUCONTROL_H */
+#endif /* not __HCONSOLE_HMENUCONTROL_H */

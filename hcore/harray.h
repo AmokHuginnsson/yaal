@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HARRAY_H
-#define __HARRAY_H
+#ifndef __HCORE_HARRAY_H
+#define __HCORE_HARRAY_H
 
 #line 31
 
@@ -182,4 +182,4 @@ int HArray < tType > ::get_size ( void )
 	M_EPILOG
 	}
 
-#endif /* __HARRAY_H */
+#endif /* __HCORE_HARRAY_H */

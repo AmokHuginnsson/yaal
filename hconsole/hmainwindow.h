@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HMAINWINDOW_H
-#define __HMAINWINDOW_H
+#ifndef __HCONSOLE_HMAINWINDOW_H
+#define __HCONSOLE_HMAINWINDOW_H
 
 #include "hwindow.h"
 #include "omenuitem.h"
@@ -50,4 +50,4 @@ public:
 	/*}*/
 	};
 
-#endif /* not __HMAINWINDOW_H */
+#endif /* not __HCONSOLE_HMAINWINDOW_H */

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HANALYSER_H
-#define __HANALYSER_H
+#ifndef __TOOLS_HANALYSER_H
+#define __TOOLS_HANALYSER_H
 
 #include "../hcore/hstring.h"
 #include "../hcore/htree.h"
@@ -87,4 +87,4 @@ protected:
 	/*}*/
 	};
 
-#endif /* not __HANALYSER_H */
+#endif /* not __TOOLS_HANALYSER_H */

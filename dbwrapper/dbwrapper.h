@@ -25,8 +25,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __DBWRAPPER_H
-#define __DBWRAPPER_H
+#ifndef __DBWRAPPER_DBWRAPPER_H
+#define __DBWRAPPER_DBWRAPPER_H
 
 namespace dbwrapper
 	{
@@ -35,5 +35,5 @@ extern int	n_iDataBaseDriver;
 
 	}
 
-#endif /* not __DBWRAPPER_H */
+#endif /* not __DBWRAPPER_DBWRAPPER_H */
 

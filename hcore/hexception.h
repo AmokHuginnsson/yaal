@@ -27,8 +27,8 @@ Copyright:
 /* This file holds (except HException class declaration) main #defines,
 	 macros and global variables used acros whole stdhapi */
 
-#ifndef __HEXCEPTION_H
-#define __HEXCEPTION_H
+#ifndef __HCORE_HEXCEPTION_H
+#define __HCORE_HEXCEPTION_H
 
 #include <errno.h>
 
@@ -36,14 +36,25 @@ Copyright:
 #define NULL 0
 #endif /* not NULL */
 
+#ifdef __STDHAPI_BUILD__
+#	include "../config.h"
+#endif /* __STDHAPI_BUILD__ */
+
 #define _(string) gettext (string)
 
 #define M_CVSID(id) static char __CVSID__ [ ] __attribute__((__unused__)) = id
 #define M_CVSTID(id) static char __CVSTID__ [ ] __attribute__((__unused__)) = id
 #define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
 #define M_TRY try{
-#define M_CATCH }catch ( HException * e ){e->log ( __WHERE__ );throw e;}
-#define M_THROW( msg, e_no ) throw new HException ( __WHERE__, msg, e_no )
+#ifdef __EXCEPTIONS_BY_REFERENCE__
+#	define M_CATCH }catch ( HException & e ){e.log ( __WHERE__ );throw;}
+#	define M_THROW( msg, e_no ) throw HException ( __WHERE__, msg, e_no )
+# define M_FINAL }catch ( HException & e ){e.log ( __WHERE__ );e->print_error ( true );}
+#else /* __EXCEPTIONS_BY_REFERENCE__ */
+#	define M_CATCH }catch ( HException * e ){e->log ( __WHERE__ );throw;}
+#	define M_THROW( msg, e_no ) throw new HException ( __WHERE__, msg, e_no )
+#	define M_FINAL }catch ( HException * e ){e->log ( __WHERE__ );e->print_error ( true );delete e;}
+#endif /* not __EXCEPTIONS_BY_REFERENCE__ */
 #define M_PROLOG M_TRY
 #define M_EPILOG M_CATCH
 
@@ -107,5 +118,5 @@ public:
 	/*}*/
 	};
 
-#endif /* not __HEXCEPTION_H */
+#endif /* not __HCORE_HEXCEPTION_H */
 

@@ -27,10 +27,10 @@ Copyright:
 /* This file holds (except HException class declaration) main #defines,
 	 macros and global variables used acros whole stdhapi */
 
-#ifndef __HCORE_H
-#define __HCORE_H
+#ifndef __HCORE_HCORE_H
+#define __HCORE_HCORE_H
 
 void set_env ( const char * );
 
-#endif /* not __HCORE_H */
+#endif /* not __HCORE_HCORE_H */
 
