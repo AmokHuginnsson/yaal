@@ -38,7 +38,7 @@ HString::HString ( void )
 	{
 	M_PROLOG
 	f_pcBuffer = 0;
-	f_iLength = 0;
+	f_iSize = 0;
 	return;
 	M_EPILOG
 	}
@@ -56,24 +56,35 @@ HString::HString ( const HString & a_roString ) : HObject ( )
 	{
 	M_PROLOG
 	f_pcBuffer = NULL;
-	f_iLength = 0;
-	*this = a_roString;
+	f_iSize = 0;
+	( * this ) = a_roString;
 	return;
 	M_EPILOG
 	}
 
-void HString::hs_realloc ( int a_iSize )
+HString::HString ( const size_t a_lSize )
+	{
+	M_PROLOG
+	f_pcBuffer = 0;
+	f_iSize = 0;
+	hs_realloc ( a_lSize + 1 );
+	memset ( f_pcBuffer, 0, a_lSize + 1 );
+	return;
+	M_EPILOG
+	}
+
+void HString::hs_realloc ( const size_t a_iSize )
 	{
 	M_PROLOG
 	int l_iOldLength = 0;
 	if ( a_iSize < 1 )throw new HException ( __WHERE__, "bad new size", a_iSize );
-	if ( a_iSize > f_iLength )
+	if ( a_iSize > f_iSize )
 		{
-		l_iOldLength = f_iLength;
-		f_iLength = 1;
-		while ( f_iLength < a_iSize )f_iLength <<= 1;
-		f_pcBuffer = ( char * ) xrealloc ( f_pcBuffer, f_iLength );
-		memset ( f_pcBuffer + l_iOldLength, 0, f_iLength - l_iOldLength );
+		l_iOldLength = f_iSize;
+		f_iSize = 1;
+		while ( f_iSize < a_iSize )f_iSize <<= 1;
+		f_pcBuffer = ( char * ) xrealloc ( f_pcBuffer, f_iSize );
+		memset ( f_pcBuffer + l_iOldLength, 0, f_iSize - l_iOldLength );
 		}
 	return;
 	M_EPILOG
@@ -90,36 +101,11 @@ HObject * HString::clone ( void ) const
 	M_EPILOG
 	}
 
-HString::HString ( size_t a_lSize )
-	{
-	M_PROLOG
-	f_pcBuffer = 0;
-	f_iLength = 0;
-	hs_realloc ( a_lSize + 1 );
-	memset ( f_pcBuffer, 0, a_lSize + 1 );
-	return;
-	M_EPILOG
-	}
-
-HString::HString ( HString & a_roString ) : HObject ( )
-	{
-	M_PROLOG
-	f_pcBuffer = 0;
-	f_iLength = 0;
-	if ( a_roString.f_pcBuffer )
-		{
-		hs_realloc ( strlen ( a_roString.f_pcBuffer ) + 1 );
-		strcpy ( f_pcBuffer, a_roString.f_pcBuffer );
-		}
-	return;
-	M_EPILOG
-	}
-
 HString::HString ( const char * a_pcStr )
 	{
 	M_PROLOG
 	f_pcBuffer = 0;
-	f_iLength = 0;
+	f_iSize = 0;
 	if ( a_pcStr )
 		{
 		hs_realloc ( strlen ( a_pcStr ) + 1 );
@@ -133,7 +119,7 @@ HString::HString ( char a_cChar )
 	{
 	M_PROLOG
 	f_pcBuffer = 0;
-	f_iLength = 0;
+	f_iSize = 0;
 	hs_realloc ( 2 );
 	f_pcBuffer [ 0 ] = a_cChar;
 	f_pcBuffer [ 1 ] = 0;
@@ -147,7 +133,7 @@ HString::HString ( int a_iInt )
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	f_pcBuffer = 0;
-	f_iLength = 0;
+	f_iSize = 0;
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%d", a_iInt ) + 1;
 	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%d", a_iInt );
@@ -161,7 +147,7 @@ HString::HString ( long int a_lLong )
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	f_pcBuffer = 0;
-	f_iLength = 0;
+	f_iSize = 0;
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%ld", a_lLong ) + 1;
 	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%ld", a_lLong );
@@ -175,7 +161,7 @@ HString::HString ( double a_dDouble )
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	f_pcBuffer = 0;
-	f_iLength = 0;
+	f_iSize = 0;
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%f", a_dDouble ) + 1;
 	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%f", a_dDouble );
@@ -183,13 +169,13 @@ HString::HString ( double a_dDouble )
 	M_EPILOG
 	}
 
-HString::HString ( void * a_pvPtrVoid )
+HString::HString ( const void * a_pvPtrVoid )
 	{
 	M_PROLOG
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	f_pcBuffer = 0;
-	f_iLength = 0;
+	f_iSize = 0;
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%p", a_pvPtrVoid ) + 1;
 	hs_realloc ( l_iSize );
 	snprintf ( f_pcBuffer, l_iSize, "%p", a_pvPtrVoid );
@@ -218,7 +204,7 @@ HString & HString::operator = ( const char * a_pcStr )
 	M_EPILOG
 	}
 
-HString & HString::operator = ( char a_cChar )
+HString & HString::operator = ( const char a_cChar )
 	{
 	M_PROLOG
 	hs_realloc ( 2 );
@@ -228,7 +214,7 @@ HString & HString::operator = ( char a_cChar )
 	M_EPILOG
 	}
 
-HString & HString::operator = ( int a_iInt )
+HString & HString::operator = ( const int a_iInt )
 	{
 	M_PROLOG
 	( * this ) = HString ( a_iInt );
@@ -236,7 +222,7 @@ HString & HString::operator = ( int a_iInt )
 	M_EPILOG
 	}
 
-HString & HString::operator = ( long int a_lLong )
+HString & HString::operator = ( const long int a_lLong )
 	{
 	M_PROLOG
 	( * this ) = HString ( a_lLong );
@@ -244,7 +230,7 @@ HString & HString::operator = ( long int a_lLong )
 	M_EPILOG
 	}
 
-HString & HString::operator = ( double a_dDouble )
+HString & HString::operator = ( const double a_dDouble )
 	{
 	M_PROLOG
 	( * this ) = HString ( a_dDouble );
@@ -252,7 +238,7 @@ HString & HString::operator = ( double a_dDouble )
 	M_EPILOG
 	}
 
-HString & HString::operator = ( void * a_pvVoidPtr )
+HString & HString::operator = ( const void * a_pvVoidPtr )
 	{
 	M_PROLOG
 	( * this ) = HString ( a_pvVoidPtr );
@@ -260,7 +246,7 @@ HString & HString::operator = ( void * a_pvVoidPtr )
 	M_EPILOG
 	}
 
-HString HString::operator + ( HString & a_roString )
+HString HString::operator + ( const HString & a_roString )
 	{
 	M_PROLOG
 	return ( ( * this ) + ( const char * ) a_roString );
@@ -283,7 +269,7 @@ HString HString::operator + ( const char * a_pcStr )
 	M_EPILOG
 	}
 
-HString HString::operator + ( char a_cChar )
+HString HString::operator + ( const char a_cChar )
 	{
 	M_PROLOG
 	int len = 0;
@@ -296,14 +282,14 @@ HString HString::operator + ( char a_cChar )
 	M_EPILOG
 	}
 
-HString HString::operator + ( int a_iInt )
+HString HString::operator + ( const int a_iInt )
 	{
 	M_PROLOG
 	return ( * this + ( long ) a_iInt );
 	M_EPILOG
 	}
 
-HString HString::operator + ( long int a_lLong )
+HString HString::operator + ( const long int a_lLong )
 	{
 	M_PROLOG
 	HString l_oStr;
@@ -314,7 +300,7 @@ HString HString::operator + ( long int a_lLong )
 	M_EPILOG
 	}
 
-HString HString::operator + ( double a_dDouble )
+HString HString::operator + ( const double a_dDouble )
 	{
 	M_PROLOG
 	HString l_oStr;
@@ -325,7 +311,7 @@ HString HString::operator + ( double a_dDouble )
 	M_EPILOG
 	}
 
-HString HString::operator + ( void * a_pvVoidPtr )
+HString HString::operator + ( const void * a_pvVoidPtr )
 	{
 	M_PROLOG
 	HString l_oStr;
@@ -336,7 +322,7 @@ HString HString::operator + ( void * a_pvVoidPtr )
 	M_EPILOG
 	}
 
-HString & HString::operator += ( HString & a_roString )
+HString & HString::operator += ( const HString & a_roString )
 	{
 	M_PROLOG
 	return ( ( * this ) = ( ( * this ) + a_roString ) );
@@ -350,52 +336,52 @@ HString & HString::operator += ( const char * a_pcStr )
 	M_EPILOG
 	}
 
-HString & HString::operator += ( char a_cChar )
+HString & HString::operator += ( const char a_cChar )
 	{
 	M_PROLOG
 	return ( ( * this ) = ( ( * this ) + a_cChar ) );
 	M_EPILOG
 	}
 
-HString & HString::operator += ( int a_iInt )
+HString & HString::operator += ( const int a_iInt )
 	{
 	M_PROLOG
 	return ( * this = * this + a_iInt );
 	M_EPILOG
 	}
 
-HString & HString::operator += ( long int a_lLong )
+HString & HString::operator += ( const long int a_lLong )
 	{
 	M_PROLOG
 	return ( * this = * this + a_lLong );
 	M_EPILOG
 	}
 
-HString & HString::operator += ( double a_dDouble )
+HString & HString::operator += ( const double a_dDouble )
 	{
 	M_PROLOG
 	return ( * this = * this + a_dDouble );
 	M_EPILOG
 	}
 
-HString & HString::operator += ( void * a_pvVoidPtr )
+HString & HString::operator += ( const void * a_pvVoidPtr )
 	{
 	M_PROLOG
 	return ( * this = * this + a_pvVoidPtr );
 	M_EPILOG
 	}
 
-char & HString::operator [ ] ( int a_iIndex )
+char & HString::operator [ ] ( const int a_iIndex )
 	{
 	M_PROLOG
 	int l_iLength = get_length ( );
-	if  ( ( a_iIndex >= f_iLength ) || ( a_iIndex > l_iLength ) )
+	if  ( ( ( size_t ) a_iIndex >= f_iSize ) || ( a_iIndex > l_iLength ) )
 		throw new HException ( __WHERE__, "index out of bound", a_iIndex );
 	return ( f_pcBuffer [ a_iIndex ] );
 	M_EPILOG
 	}
 
-int HString::operator == ( HString & a_roString )
+int HString::operator == ( const HString & a_roString )
 	{
 	M_PROLOG
 	return ( * this == ( const char * ) a_roString );
@@ -409,7 +395,7 @@ int HString::operator == ( const char * a_pcStr )
 	M_EPILOG
 	}
 
-int HString::operator != ( HString & a_roString )
+int HString::operator != ( const HString & a_roString )
 	{
 	M_PROLOG
 	return ( * this != ( const char * ) a_roString );
@@ -423,7 +409,7 @@ int HString::operator != ( const char * a_pcStr )
 	M_EPILOG
 	}
 
-int HString::operator >= ( HString & a_roString )
+int HString::operator >= ( const HString & a_roString )
 	{
 	M_PROLOG
 	return ( * this >= ( const char * ) a_roString );
@@ -439,7 +425,7 @@ int HString::operator >= ( const char * a_pcStr )
 	M_EPILOG
 	}
 
-int HString::operator <= ( HString & a_roString )
+int HString::operator <= ( const HString & a_roString )
 	{
 	M_PROLOG
 	return ( * this <= ( const char * ) a_roString );
@@ -455,7 +441,7 @@ int HString::operator <= ( const char * a_pcStr )
 	M_EPILOG
 	}
 
-int HString::operator > ( HString & a_roString )
+int HString::operator > ( const HString & a_roString )
 	{
 	M_PROLOG
 	return ( * this > ( const char * ) a_roString );
@@ -471,7 +457,7 @@ int HString::operator > ( const char * a_pcStr )
 	M_EPILOG
 	}
 
-int HString::operator < ( HString & a_roString )
+int HString::operator < ( const HString & a_roString )
 	{
 	M_PROLOG
 	return ( * this < ( const char * ) a_roString );
@@ -487,7 +473,7 @@ int HString::operator < ( const char * a_pcStr )
 	M_EPILOG
 	}
 
-HString::operator char * ( void )
+HString::operator char * ( void ) const
 	{
 	M_PROLOG
 	return ( f_pcBuffer );
@@ -499,14 +485,14 @@ bool HString::is_empty ( void )
 	return ( ! ( f_pcBuffer && f_pcBuffer [ 0 ] ) );
 	}
 
-int HString::get_length ( void )
+int HString::get_length ( void ) const
 	{
 	M_PROLOG
 	int l_iLength = 0;
 	if ( ! f_pcBuffer )
 		throw new HException ( __WHERE__, "no buffer.", ( int ) f_pcBuffer );
 	l_iLength = strlen ( f_pcBuffer );
-	if ( l_iLength > f_iLength )
+	if ( ( size_t ) l_iLength > f_iSize )
 		throw new HException ( __WHERE__, "no terminating null!", l_iLength );
 	return ( l_iLength );
 	M_EPILOG
@@ -727,84 +713,84 @@ HString HString::split ( const char * a_pcAt, int a_iPart )
 	M_EPILOG
 	}
 
-HString operator + ( const char * a_pcStr, HString & a_roString )
+HString operator + ( const char * a_pcStr, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( HString ( a_pcStr ) + a_roString );
 	M_EPILOG
 	}
 
-HString operator + ( char a_cChar, HString & a_roString )
+HString operator + ( const char a_cChar, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( HString ( a_cChar ) + a_roString );
 	M_EPILOG
 	}
 
-HString operator + ( int a_iInt , HString & a_roString )
+HString operator + ( const int a_iInt , const HString & a_roString )
 	{
 	M_PROLOG
 	return ( HString ( a_iInt ) + a_roString );
 	M_EPILOG
 	}
 
-HString operator + ( long int a_lLong, HString & a_roString )
+HString operator + ( const long int a_lLong, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( HString ( a_lLong ) + a_roString );	
 	M_EPILOG
 	}
 
-HString operator + ( double a_dDouble, HString & a_roString )
+HString operator + ( const double a_dDouble, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( HString ( a_dDouble ) + a_roString );
 	M_EPILOG
 	}
 
-HString operator + ( void * a_pvVoidPtr, HString & a_roString )
+HString operator + ( const void * a_pvVoidPtr, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( HString ( a_pvVoidPtr ) + a_roString );
 	M_EPILOG
 	}
 
-int operator == ( const char * a_pcStr, HString & a_roString )
+int operator == ( const char * a_pcStr, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( a_roString == a_pcStr );
 	M_EPILOG
 	}
 
-int operator != ( const char * a_pcStr, HString & a_roString )
+int operator != ( const char * a_pcStr, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( a_roString != a_pcStr );
 	M_EPILOG
 	}
 
-int operator >= ( const char * a_pcStr, HString & a_roString )
+int operator >= ( const char * a_pcStr, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( a_roString <= a_pcStr );
 	M_EPILOG
 	}
 
-int operator <= ( const char * a_pcStr, HString & a_roString )
+int operator <= ( const char * a_pcStr, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( a_roString >= a_pcStr );
 	M_EPILOG
 	}
 
-int operator > ( const char * a_pcStr, HString & a_roString )
+int operator > ( const char * a_pcStr, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( a_roString < a_pcStr );
 	M_EPILOG
 	}
 
-int operator < ( const char * a_pcStr, HString & a_roString )
+int operator < ( const char * a_pcStr, const HString & a_roString )
 	{
 	M_PROLOG
 	return ( a_roString > a_pcStr );

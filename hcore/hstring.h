@@ -36,61 +36,60 @@ class HString : public HObject
 protected:
 	/*{*/
 	char *	f_pcBuffer;
-	int			f_iLength;
+	size_t	f_iSize;
 	/*}*/
 public:
 	/*{*/
 	HString ( void );
 	HString ( const HString & );
+	HString ( const size_t ); /* initialize immediately with size */
 	virtual ~HString ( void ) ;
-	void hs_realloc ( int );
+	void hs_realloc ( const size_t );
 	virtual HObject * clone ( void ) const;
-	HString ( HString & );
-	HString ( size_t ); /* initialize immediately with size */
 	HString ( const char * );
 	HString ( char );
 	HString ( int );
 	HString ( long int );
 	HString ( double );
-	HString ( void * );
+	HString ( const void * );
 	HString & operator = ( const HString & );
 	HString & operator = ( const char * );
-	HString & operator = ( char );
-	HString & operator = ( int );
-	HString & operator = ( long int );
-	HString & operator = ( double );
-	HString & operator = ( void * );
-	HString & operator += ( HString & );
+	HString & operator = ( const char );
+	HString & operator = ( const int );
+	HString & operator = ( const long int );
+	HString & operator = ( const double );
+	HString & operator = ( const void * );
+	HString & operator += ( const HString & );
 	HString & operator += ( const char * );
-	HString & operator += ( char );
-	HString & operator += ( int );
-	HString & operator += ( long int );
-	HString & operator += ( double );
-	HString & operator += ( void * );
-	HString operator + ( HString & );
+	HString & operator += ( const char );
+	HString & operator += ( const int );
+	HString & operator += ( const long int );
+	HString & operator += ( const double );
+	HString & operator += ( const void * );
+	HString operator + ( const HString & );
 	HString operator + ( const char * );
-	HString operator + ( char );
-	HString operator + ( int );
-	HString operator + ( long int );
-	HString operator + ( double );
-	HString operator + ( void * );
-	char & operator [ ] ( int );
-	int operator == ( HString & );
+	HString operator + ( const char );
+	HString operator + ( const int );
+	HString operator + ( const long int );
+	HString operator + ( const double );
+	HString operator + ( const void * );
+	char & operator [ ] ( const int );
+	int operator == ( const HString & );
 	int operator == ( const char * );
-	int operator != ( HString & );
+	int operator != ( const HString & );
 	int operator != ( const char * );
-	int operator >= ( HString & );
+	int operator >= ( const HString & );
 	int operator >= ( const char * );
-	int operator <= ( HString & );
+	int operator <= ( const HString & );
 	int operator <= ( const char * );
-	int operator > ( HString & );
+	int operator > ( const HString & );
 	int operator > ( const char * );
-	int operator < ( HString & );
+	int operator < ( const HString & );
 	int operator < ( const char * );
-	operator char * ( void ); /* add_* functions in HList needs operator bool ( )
-															 operator char * works fine here */
+	operator char * ( void ) const; /* add_* functions in HList needs operator
+																		 bool ( ) operator char * works fine here */
 	bool is_empty ( void );
-	int get_length ( void );
+	int get_length ( void ) const;
 	HString & format ( const char *, ... );
 	int find ( char, int = 0 );
 	int find ( const char *, int = 0 );
@@ -111,17 +110,17 @@ protected:
 	/*}*/
 	};
 
-HString operator + ( const char *, HString & );
-HString operator + ( char, HString & );
-HString operator + ( int, HString & );
-HString operator + ( long int, HString & );
-HString operator + ( double, HString & );
-HString operator + ( void *, HString & );
-int operator == ( const char *, HString & );
-int operator != ( const char *, HString & );
-int operator >= ( const char *, HString & );
-int operator <= ( const char *, HString & );
-int operator > ( const char *, HString & );
-int operator < ( const char *, HString & );
+HString operator + ( const char *, const HString & );
+HString operator + ( const char, const HString & );
+HString operator + ( const int, const HString & );
+HString operator + ( const long int, const HString & );
+HString operator + ( const double, const HString & );
+HString operator + ( const void *, const HString & );
+int operator == ( const char *, const HString & );
+int operator != ( const char *, const HString & );
+int operator >= ( const char *, const HString & );
+int operator <= ( const char *, const HString & );
+int operator > ( const char *, const HString & );
+int operator < ( const char *, const HString & );
 
 #endif /* not __HSTRING_H */
