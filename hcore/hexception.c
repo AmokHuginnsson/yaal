@@ -62,7 +62,7 @@ HException::HException ( const char * a_pcFileName,
 
 HException::~HException ( void )
 	{
-	::log ( "Exception registers: c:%d d:%d ld:%ld f:%f p:%p s:%s\n",
+	::log ( "Exception registers: c:%d i:%d l:%ld d:%f pv:%p pc:%s\n",
 			f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
 	if ( f_pcCharPtr )xfree ( ( void * ) f_pcCharPtr );
 	if ( f_pcFunctionName )xfree ( ( void * ) f_pcFunctionName );
@@ -87,7 +87,7 @@ void HException::print_error ( bool a_bFull )
 	{
 	fprintf ( stderr, "\nException: %s, %d.\n", f_pcMessage, f_iCode );
 	if ( a_bFull )fprintf ( stderr,
-			"Exception registers:\nc:%c\td:%d\tld:%ld\tf:%f\tp:%p\ns:%s\n",
+			"Exception registers:\nc:%c\ti:%d\tl:%ld\td:%f\tpv:%p\npc:%s\n",
 			f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
 	return;
 	}
