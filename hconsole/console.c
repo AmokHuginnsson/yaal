@@ -66,6 +66,9 @@ termios	g_sTermios;
 void enter_curses( void )
 	{
 	M_PROLOG
+	short l_piColors [ ] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
+	int l_iFg = 0, l_iBg = 0;
 	termios l_sTermios;
 /*	def_shell_mode(); */
 /* this is done automaticly by initscr ( ), read man next time */
@@ -99,79 +102,12 @@ void enter_curses( void )
 	flushinp ( );
 	curs_set ( D_CURSOR_INVISIBLE );
 	refresh ( );
-	/* black background */
+	/* init color pairs */
 	assume_default_colors ( COLOR_BLACK, COLOR_BLACK );
-	init_pair ( COLOR_BLACK * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_BLACK );
-	init_pair ( COLOR_BLACK * 8 + COLOR_RED, COLOR_RED, COLOR_BLACK );
-	init_pair ( COLOR_BLACK * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_BLACK );
-	init_pair ( COLOR_BLACK * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK );
-	init_pair ( COLOR_BLACK * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_BLACK );
-	init_pair ( COLOR_BLACK * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK );
-	init_pair ( COLOR_BLACK * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_BLACK );
-	init_pair ( COLOR_BLACK * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_BLACK );
-	/* red background */
-	init_pair ( COLOR_RED * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_RED );
-	init_pair ( COLOR_RED * 8 + COLOR_RED, COLOR_RED, COLOR_RED );
-	init_pair ( COLOR_RED * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_RED );
-	init_pair ( COLOR_RED * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_RED );
-	init_pair ( COLOR_RED * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_RED );
-	init_pair ( COLOR_RED * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_RED );
-	init_pair ( COLOR_RED * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_RED );
-	init_pair ( COLOR_RED * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_RED );
-	/* green background */
-	init_pair ( COLOR_GREEN * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_GREEN );
-	init_pair ( COLOR_GREEN * 8 + COLOR_RED, COLOR_RED, COLOR_GREEN );
-	init_pair ( COLOR_GREEN * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_GREEN );
-	init_pair ( COLOR_GREEN * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_GREEN );
-	init_pair ( COLOR_GREEN * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_GREEN );
-	init_pair ( COLOR_GREEN * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_GREEN );
-	init_pair ( COLOR_GREEN * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_GREEN );
-	init_pair ( COLOR_GREEN * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_GREEN );
-	/* yellow background */
-	init_pair ( COLOR_YELLOW * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_YELLOW );
-	init_pair ( COLOR_YELLOW * 8 + COLOR_RED, COLOR_RED, COLOR_YELLOW );
-	init_pair ( COLOR_YELLOW * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_YELLOW );
-	init_pair ( COLOR_YELLOW * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_YELLOW );
-	init_pair ( COLOR_YELLOW * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_YELLOW );
-	init_pair ( COLOR_YELLOW * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_YELLOW );
-	init_pair ( COLOR_YELLOW * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_YELLOW );
-	init_pair ( COLOR_YELLOW * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_YELLOW );
-	/* blue background */
-	init_pair ( COLOR_BLUE * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_BLUE );
-	init_pair ( COLOR_BLUE * 8 + COLOR_RED, COLOR_RED, COLOR_BLUE );
-	init_pair ( COLOR_BLUE * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_BLUE );
-	init_pair ( COLOR_BLUE * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_BLUE );
-	init_pair ( COLOR_BLUE * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_BLUE );
-	init_pair ( COLOR_BLUE * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLUE );
-	init_pair ( COLOR_BLUE * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_BLUE );
-	init_pair ( COLOR_BLUE * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_BLUE );
-	/* magenta background */
-	init_pair ( COLOR_MAGENTA * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_MAGENTA );
-	init_pair ( COLOR_MAGENTA * 8 + COLOR_RED, COLOR_RED, COLOR_MAGENTA );
-	init_pair ( COLOR_MAGENTA * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_MAGENTA );
-	init_pair ( COLOR_MAGENTA * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_MAGENTA );
-	init_pair ( COLOR_MAGENTA * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_MAGENTA );
-	init_pair ( COLOR_MAGENTA * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_MAGENTA );
-	init_pair ( COLOR_MAGENTA * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_MAGENTA );
-	init_pair ( COLOR_MAGENTA * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_MAGENTA );
-	/* cyan background */
-	init_pair ( COLOR_CYAN * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_CYAN );
-	init_pair ( COLOR_CYAN * 8 + COLOR_RED, COLOR_RED, COLOR_CYAN );
-	init_pair ( COLOR_CYAN * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_CYAN );
-	init_pair ( COLOR_CYAN * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_CYAN );
-	init_pair ( COLOR_CYAN * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_CYAN );
-	init_pair ( COLOR_CYAN * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_CYAN );
-	init_pair ( COLOR_CYAN * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_CYAN );
-	init_pair ( COLOR_CYAN * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_CYAN );
-	/* white background */
-	init_pair ( COLOR_WHITE * 8 + COLOR_BLACK, COLOR_BLACK, COLOR_WHITE );
-	init_pair ( COLOR_WHITE * 8 + COLOR_RED, COLOR_RED, COLOR_WHITE );
-	init_pair ( COLOR_WHITE * 8 + COLOR_GREEN, COLOR_GREEN, COLOR_WHITE );
-	init_pair ( COLOR_WHITE * 8 + COLOR_YELLOW, COLOR_YELLOW, COLOR_WHITE );
-	init_pair ( COLOR_WHITE * 8 + COLOR_BLUE, COLOR_BLUE, COLOR_WHITE );
-	init_pair ( COLOR_WHITE * 8 + COLOR_MAGENTA, COLOR_MAGENTA, COLOR_WHITE );
-	init_pair ( COLOR_WHITE * 8 + COLOR_CYAN, COLOR_CYAN, COLOR_WHITE );
-	init_pair ( COLOR_WHITE * 8 + COLOR_WHITE, COLOR_WHITE, COLOR_WHITE );
+	for ( l_iBg = 0; l_iBg < 8; l_iBg ++ )
+		for ( l_iFg = 0; l_iFg < 8; l_iFg ++ )
+			init_pair ( l_piColors [ l_iBg ] * 8 + l_piColors [ l_iFg ],
+					l_piColors [ l_iFg ], l_iBg );
 	attrset ( COLOR_PAIR( 7 ) );
 	bkgd ( ' ' | M_MAKE_ATTR ( D_FG_LIGHTGRAY | D_BG_BLACK ) | A_INVIS );
 	n_bEnabled = true;
