@@ -24,6 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <unistd.h>
+#include <libintl.h>
+
 #include "../config.h"
 
 #ifdef HAVE_NCURSES_H
@@ -37,12 +40,16 @@ Copyright:
 #	include <sys/consio.h>
 #	include <signal.h>
 #	include <fcntl.h>
-#	include <unistd.h>
-#endif /* HAVE_SYS_CONSIO_H */
+#elif defined ( HAVE_GPM_H )
+#	include <stdlib.h>
+#	include <string.h>
+#	include <gpm.h>
+#endif /* HAVE_GPM_H */
 
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "mouse.h"
+#include "console.h"
 #include "../hcore/hstring.h"
 #include "../hcore/hlog.h"
 
@@ -52,6 +59,25 @@ namespace mouse
 fun_console_mouse_open_t mouse_open = NULL;
 fun_console_mouse_get_t mouse_get = NULL;
 fun_console_mouse_close_t mouse_close = NULL;
+
+int hunt_tty ( int a_iOffset )
+	{
+	M_PROLOG
+	int l_iVC = 0;
+	char * l_pcTtyName = NULL;
+	l_pcTtyName = ttyname ( STDIN_FILENO );
+	if ( l_pcTtyName && ! strncmp ( l_pcTtyName, "/dev/tty", 8 ) )
+		l_iVC = l_pcTtyName [ 8 + a_iOffset ] - '0';
+	else
+		{
+		l_pcTtyName = ::getenv ( "STY" );
+		if ( l_pcTtyName && ( l_pcTtyName = strstr ( l_pcTtyName, ".tty" ) ) )
+			l_iVC = l_pcTtyName [ 4 + a_iOffset ] - '0';
+		else M_THROW ( "can not find controling virtual console", g_iErrNo );
+		}
+	return ( l_iVC );
+	M_EPILOG
+	}
 
 #ifdef HAVE_SYS_CONSIO_H
 
@@ -69,18 +95,15 @@ int console_mouse_open ( void )
 	
 	/* this hack allows to guess current controling virtual terminal screen */
 
-	while ( l_iCtr < 12 )
-		{
-		l_pcTty [ 9 ] = '0' + l_iCtr ++;
-		n_iMouse = open ( l_pcTty, O_RDWR );
-		if ( n_iMouse < 0 )continue;
-		if ( ioctl ( n_iMouse, CONS_MOUSECTL, & l_sMouse ) >= 0 )break;
-		close ( n_iMouse );
-		n_iMouse = -1;
-		}
-
+	l_pcTty [ 9 ] = '0' + hunt_tty ( 1 );
+	n_iMouse = open ( l_pcTty, O_RDWR );
 	if ( n_iMouse < 0 )
 		M_THROW ( "can not open mouse", g_iErrNo );
+	if ( ioctl ( n_iMouse, CONS_MOUSECTL, & l_sMouse ) < 0 )
+		{
+		close ( n_iMouse );
+		M_THROW ( _ ( "can not setup mouse mode" ), g_iErrNo );
+		}
 
 	log ( D_LOG_INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
 
@@ -121,16 +144,34 @@ int console_mouse_close ( void )
 int console_mouse_open ( void )
 	{
 	M_PROLOG
-	return ( 0 );
+	int l_iVC = 0;
+	HString l_oError;
+	Gpm_Connect l_sGpm;
+	l_sGpm.minMod = 0;
+	l_sGpm.maxMod = 0;
+	l_sGpm.pid = ::getpid ( );
+	l_sGpm.vc = l_iVC = hunt_tty ( 0 );
+	l_sGpm.eventMask = GPM_SINGLE | GPM_DOWN | GPM_UP;
+	l_sGpm.defaultMask = ~ l_sGpm.eventMask;
+	if ( Gpm_Open ( & l_sGpm, l_iVC ) == -1 )
+		{
+		l_oError.format ( "Can't open mouse connection: %s",
+				strerror ( g_iErrNo ) );
+		M_THROW ( l_oError, l_iVC );
+		}
+	return ( gpm_fd );
 	M_EPILOG
 	}
 
 int console_mouse_get ( OMouse & a_sMouse )
 	{
 	M_PROLOG
-	a_sMouse.f_iButtons = 0;
-	a_sMouse.f_iRow = 0;
-	a_sMouse.f_iColumn = 0;
+	Gpm_Event l_sEvent;
+	if ( Gpm_GetEvent ( & l_sEvent ) != 1 )
+		M_THROW ( _ ( "can not retrieve event") , g_iErrNo );
+	a_sMouse.f_iButtons = l_sEvent.buttons;
+	a_sMouse.f_iRow = l_sEvent.y;
+	a_sMouse.f_iColumn = l_sEvent.x;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -138,6 +179,7 @@ int console_mouse_get ( OMouse & a_sMouse )
 int console_mouse_close ( void )
 	{
 	M_PROLOG
+	while ( Gpm_Close ( ) );
 	return ( 0 );
 	M_EPILOG
 	}

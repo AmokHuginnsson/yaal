@@ -61,6 +61,7 @@ protected:
 	/*{*/
 	virtual int reconstruct_fdset ( void );
 	int process_stdin ( int );
+	int process_mouse ( int );
 	int preprocess_input ( int );
 	int postprocess_input ( int );
 	int register_file_descriptor_handler ( int, PROCESS_HANDLER_FILEDES_t );

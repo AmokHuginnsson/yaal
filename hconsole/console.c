@@ -28,6 +28,7 @@ Copyright:
 #include <stdlib.h> /* getenv */
 #include <stdio.h>
 #include <termios.h>
+#include <libintl.h>
 
 #include "../config.h"
 
@@ -58,6 +59,7 @@ bool n_bNeedRepaint = false;
 bool n_bInputWaiting = false;
 int n_iWidth = 0;
 int n_iHeight = 0;
+int n_iMouseDes = 0;
 
 /* private: */
 WINDOW * n_psWindow = NULL;
@@ -118,19 +120,21 @@ void enter_curses( void )
 		{
 		if ( ::getenv ( "DISPLAY" ) )
 			{
-			log ( D_LOG_INFO ) << "using X mouse support" << endl;
+			log ( D_LOG_INFO ) << _ ( "using X mouse support" ) << endl;
 			mouse::mouse_open = mouse::x_mouse_open;
 			mouse::mouse_get = mouse::x_mouse_get;
 			mouse::mouse_close = mouse::x_mouse_close;
 			}
 		else
 			{
-			log ( D_LOG_INFO ) << "using console mouse support" << endl;
+			log ( D_LOG_INFO ) << _ ( "using console mouse support" ) << endl;
 			mouse::mouse_open = mouse::console_mouse_open;
 			mouse::mouse_get = mouse::console_mouse_get;
 			mouse::mouse_close = mouse::console_mouse_close;
 			}
-		mouse::mouse_open ( );
+		if ( ( n_iMouseDes = mouse::mouse_open ( ) ) < 0 )
+			M_THROW ( _ ( "mouse is console type"
+						" and we did not recived file descriptor" ), g_iErrNo );
 		}
 	return;
 	M_EPILOG

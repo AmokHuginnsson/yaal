@@ -163,6 +163,7 @@ CXXFLAGS=$CXXFLAGS_ORIG;
 CPPFLAGS=$CXXFLAGS_ORIG;
 AC_CHECK_LIB([ncurses],[initscr],
 							[],[AC_MSG_ERROR([Can not continue without ncurses.])])
+AC_CHECK_LIB([gpm],[Gpm_Open],[AC_SUBST([MOUSE_LIB],[-lgpm])])
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_LIB([pq],[PQsetdbLogin],
 								[],[if test ["$POSTGRES"] = ["yes"] ; then

@@ -111,6 +111,7 @@ extern bool n_bNeedRepaint;
 extern bool n_bInputWaiting;
 extern int n_iWidth;
 extern int n_iHeight;
+extern int n_iMouseDes;
 
 	}
 
