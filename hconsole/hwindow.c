@@ -105,7 +105,7 @@ int HWindow::process_input ( int a_iCode )
 	if ( a_iCode && f_poFocusedChild )
 		a_iCode = f_poFocusedChild->process_input ( a_iCode );
 	if ( a_iCode )a_iCode = HHandler::process_input ( a_iCode, f_oPostprocessHandlers );
-	if ( f_oCommand )
+	if ( f_oCommand && ( ( char * ) f_oCommand ) [ 0 ] )
 		process_command ( );
 	return ( a_iCode );
 	M_EPILOG
@@ -233,6 +233,11 @@ int HWindow::click ( mouse::OMouse & a_rsMouse )
 
 HString HWindow::get_command ( void )
 	{
-	return ( f_oCommand );
+	M_PROLOG
+	HString l_oCommand;
+	l_oCommand = f_oCommand;
+	f_oCommand = "";
+	return ( l_oCommand );
+	M_EPILOG
 	}
 

@@ -182,9 +182,9 @@ int HProcess::process_stdin ( int a_iCode )
 		{
 		if ( f_poForegroundWindow )
 			f_oCommand = f_poForegroundWindow->get_command ( );
-		if ( f_oCommand )
+		if ( f_oCommand && ( ( char * ) f_oCommand ) [ 0 ] )
 			l_oCommand = process_command ( );
-		if ( l_oCommand && f_poForegroundWindow )
+		if ( l_oCommand && ( ( char * ) l_oCommand ) [ 0 ] && f_poForegroundWindow )
 			f_poForegroundWindow->status_bar ( )->message ( D_FG_RED,
 					"unknown command: `%s'", ( char * ) l_oCommand );
 		}
@@ -345,10 +345,10 @@ int HProcess::handler_refresh ( int, void * )
 	M_EPILOG
 	}
 
-int HProcess::handler_quit ( int a_iCode, void * )
+int HProcess::handler_quit ( int, void * )
 	{
 	M_PROLOG
-	if ( a_iCode == D_KEY_COMMAND_('x') )f_bLoop = false;
+	f_bLoop = false;
 	console::clrscr ( );
 	return ( 0 );
 	M_EPILOG

@@ -69,6 +69,7 @@ public:
 	virtual int process_input_menu ( int );
 	void setup ( const char *, const char *, int );
 	void set_prompt ( const char * = NULL, int = D_PROMPT_RELAXED );
+	void end_prompt ( void );
 	void init_progress ( double, const char *, bool = true );
 	void update_progress ( double = -1, const char * = NULL );
 	void message ( int, const char *, ... );

@@ -143,11 +143,6 @@ void HStatusBarControl::set_prompt ( const char * a_pcPrompt, int a_iMode )
 		f_oPrompt = a_pcPrompt;
 		f_iPromptLength = f_oPrompt.get_length ( );
 		}
-	else
-		{
-		f_oPrompt [ 0 ] = 0;
-		f_iPromptLength = 0;
-		}
 	HEditControl::operator = ( "" ); /* refresh() call inside */
 	return;
 	M_EPILOG
@@ -249,7 +244,7 @@ void HStatusBarControl::message ( int a_iAttribute,
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
-	console::c_printf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
+	console::c_vprintf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	return;
 	M_EPILOG
@@ -311,6 +306,7 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 		case ( '\r' ):
 			{
 			f_poParent->f_oCommand = f_oString;
+			end_prompt ( );
 			break;
 			}
 		default :
@@ -327,6 +323,19 @@ int HStatusBarControl::process_input_menu  ( int a_iCode )
 	{
 	M_PROLOG
 	return ( a_iCode );
+	M_EPILOG
+	}
+
+void HStatusBarControl::end_prompt ( void )
+	{
+	M_PROLOG
+	f_iMode = 0;
+	f_oPrompt = "";
+	f_iPromptLength = 0;
+	f_poParent->f_poFocusedChild = f_poParent->f_poPreviousFocusedChild;
+	f_poParent->f_poStatusBar->kill_focus ( );
+	f_poParent->f_poFocusedChild->set_focus ( -1 );
+	return;
 	M_EPILOG
 	}
 
