@@ -25,7 +25,7 @@ Copyright:
 */
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader" );
+M_CVSID ( "$CVSHeader$" );
 #include "htimecontrol.h"
 
 HTimeControl::HTimeControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
