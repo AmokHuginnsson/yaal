@@ -78,8 +78,9 @@ HProcess::~HProcess ( void )
 	M_PROLOG
 	HMainWindow * l_poMainWindow = NULL;
 	if ( f_poWindows )
-		l_poMainWindow = ( HMainWindow * )( void * ) f_poWindows->go ( -1 ) [ 0 ];
-	if ( l_poMainWindow )delete l_poMainWindow;
+		l_poMainWindow = static_cast < HMainWindow * > ( static_cast < void * > ( f_poWindows->go ( -1 ) [ 0 ] ) );
+	if ( l_poMainWindow )
+		delete l_poMainWindow;
 	f_poWindows = NULL;
 #ifdef __DEBUGGER_BABUNI__
 	M_LOG ( "ok!" );
@@ -121,7 +122,7 @@ int HProcess::init ( char const * a_pcProcessName )
 		l_piAlts [ l_iCtr ] = D_KEY_META_( '0' + l_iCtr );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_ALTS_COUNT, l_piAlts,
 			HProcess::handler_jump_meta_direct );
-	f_oCommandHandlers [ "quit" ] = ( HANDLER_t ) & HProcess::handler_quit;
+	f_oCommandHandlers [ "quit" ] = static_cast < HANDLER_t > ( & HProcess::handler_quit );
 	handler_refresh ( 0 );
 	return ( 1 );
 	M_EPILOG
@@ -132,7 +133,7 @@ int HProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	M_PROLOG
 	HInfo l_oInfo;
 	HItem l_oItem ( 1 );
-	l_oInfo = ( void * ) a_poWindow;
+	l_oInfo = static_cast < void * > ( a_poWindow );
 	l_oInfo = HString ( a_pcTitle );
 	l_oItem [ 0 ] = l_oInfo;
 	f_poWindows->add_tail ( l_oItem );
@@ -190,11 +191,11 @@ int HProcess::process_stdin ( int a_iCode )
 		{
 		if ( f_poForegroundWindow )
 			f_oCommand = f_poForegroundWindow->get_command ( );
-		if ( f_oCommand && ( ( char * ) f_oCommand ) [ 0 ] )
+		if ( f_oCommand && static_cast < char * > ( f_oCommand ) [ 0 ] )
 			l_oCommand = process_command ( );
-		if ( l_oCommand && ( ( char * ) l_oCommand ) [ 0 ] && f_poForegroundWindow )
+		if ( l_oCommand && static_cast < char * > ( l_oCommand ) [ 0 ] && f_poForegroundWindow )
 			f_poForegroundWindow->status_bar ( )->message ( D_FG_RED,
-					"unknown command: `%s'", ( char * ) l_oCommand );
+					"unknown command: `%s'", static_cast < char * > ( l_oCommand ) );
 		}
 #ifdef __DEBUGGER_BABUNI__
 	n_bNeedRepaint = true;
@@ -296,7 +297,7 @@ int HProcess::handler_idle ( int a_iCode, void * )
 	M_PROLOG
 	HStatusBarControl * l_poStatusBar = NULL;
 #ifdef __DEBUG__
-	HString l_oClock ( ( char const * ) HTime ( ) );
+	HString l_oClock ( static_cast < char const * > ( HTime ( ) ) );
 	c_printf ( 0, n_iWidth - l_oClock.get_length ( ),
 			D_FG_BLACK | D_BG_LIGHTGRAY, l_oClock );
 	n_bNeedRepaint = true;
@@ -368,10 +369,9 @@ int HProcess::handler_jump_meta_tab ( int a_iCode, void * )
 		{
 		f_poWindows->to_tail ( );
 		HInfo & l_oInfo = f_poWindows->present ( ) [ 0 ];
-		f_poForegroundWindow = ( HWindow * ) ( void * ) l_oInfo;
+		f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( l_oInfo ) );
 		}
-	else f_poForegroundWindow = ( HWindow * )( void * ) f_poWindows->
-																															go ( -1 ) [ 0 ];
+	else f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( f_poWindows->go ( -1 ) [ 0 ] ) );
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );
@@ -382,9 +382,9 @@ int HProcess::handler_jump_meta_direct ( int a_iCode, void * )
 	{
 	M_PROLOG
 	a_iCode = ( a_iCode & 0xff ) - '0';
-	if ( a_iCode >= f_poWindows->quantity ( ) )return ( 0 );
-	f_poForegroundWindow = ( HWindow * ) ( void * ) f_poWindows->
-																										go ( a_iCode - 1 ) [ 0 ];
+	if ( a_iCode >= f_poWindows->quantity ( ) )
+		return ( 0 );
+	f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( f_poWindows->go ( a_iCode - 1 ) [ 0 ] ) );
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );
@@ -395,7 +395,7 @@ int HProcess::handler_close_window ( int a_iCode, void * )
 	{
 	M_PROLOG
 	f_poWindows->remove_element ( D_EMPTY_IF_NOT_EMPTIED );
-	f_poForegroundWindow = ( HWindow * ) ( void * ) f_poWindows->go ( -1 ) [ 0 ];
+	f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( f_poWindows->go ( -1 ) [ 0 ] ) );
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );

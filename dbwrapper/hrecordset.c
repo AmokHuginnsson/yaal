@@ -92,19 +92,23 @@ void HRecordSet::build_sql ( void )
 		{
 		case ( D_MODE_CLOSED ):
 			{
-			f_oSQL.format ( "SELECT %s FROM %s", ( char const * ) f_oColumns,
-					( char const * ) f_oTable );
-			if ( f_oFilter.is_empty ( ) )f_oBuffer = m_oFilter;
-			else if ( m_oFilter.is_empty ( ) )f_oBuffer = f_oFilter;
-			else f_oBuffer.format ( "%s AND ( %s )", ( char const * ) f_oFilter,
-					( char const * ) m_oFilter );
+			f_oSQL.format ( "SELECT %s FROM %s", static_cast < char const * > ( f_oColumns ),
+					static_cast < char const * > ( f_oTable ) );
+			if ( f_oFilter.is_empty ( ) )
+				f_oBuffer = m_oFilter;
+			else if ( m_oFilter.is_empty ( ) )
+				f_oBuffer = f_oFilter;
+			else f_oBuffer.format ( "%s AND ( %s )", static_cast < char const * > ( f_oFilter ),
+					static_cast < char const * > ( m_oFilter ) );
 			if ( ! f_oBuffer.is_empty ( ) )
 				f_oSQL += ( " WHERE " + f_oBuffer );
 			f_oBuffer = "";
-			if ( f_oSort.is_empty ( ) )f_oBuffer = m_oSort;
-			else if ( m_oSort.is_empty ( ) )f_oBuffer = f_oSort;
-			else f_oBuffer.format ( "%s, %s", ( char const * ) m_oSort,
-					( char const * ) f_oSort );
+			if ( f_oSort.is_empty ( ) )
+				f_oBuffer = m_oSort;
+			else if ( m_oSort.is_empty ( ) )
+				f_oBuffer = f_oSort;
+			else f_oBuffer.format ( "%s, %s", static_cast < char const * > ( m_oSort ),
+					static_cast < char const * > ( f_oSort ) );
 			if ( ! f_oBuffer.is_empty ( ) )
 				f_oSQL += ( " ORDER BY " + f_oBuffer );
 			f_oSQL += ';';
@@ -115,7 +119,8 @@ void HRecordSet::build_sql ( void )
 			f_oSQL = "UPDATE " + f_oTable + " SET ";
 			for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 				{
-				if ( l_iCtr == f_iIdFieldOffset )continue;
+				if ( l_iCtr == f_iIdFieldOffset )
+					continue;
 				if ( ! f_oBuffer.is_empty ( ) )f_oBuffer += ", ";
 				f_oBuffer += f_oColumnNames [ l_iCtr ] + " = '" + f_oValues [ l_iCtr ] + '\'';
 				}
@@ -340,7 +345,7 @@ void HRecordSet::remove ( void )
 	int l_iCursorPosition = f_iCursorPosition;
 	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
 	f_oSQL.format ( "DELETE FROM %s WHERE id = %ld;",
-			( char const * ) f_oTable, m_lId );
+			static_cast < char const * > ( f_oTable ), m_lId );
 	f_poDataBase->query ( f_oSQL );
 	f_poDataBase->free_result ( );
 	requery ( );
@@ -442,7 +447,7 @@ void HRecordSet::sync ( int a_iField, HTime & a_roTime )
 		{
 		l_oTime = a_roTime;
 		l_oTime.format ( "%F %T" );
-		f_oValues [ a_iField ] = ( HString & ) l_oTime;
+		f_oValues [ a_iField ] = static_cast < char const * > ( l_oTime );
 		}
 	return;
 	M_EPILOG
@@ -460,7 +465,7 @@ void HRecordSet::sync ( int a_iField, HInfo & a_roInfo )
 		a_roInfo = atof ( l_oTmp );
 		a_roInfo = l_oTmp;
 		}
-	else f_oValues [ a_iField ] = ( HString & ) a_roInfo;
+	else f_oValues [ a_iField ] = static_cast < HString & > ( a_roInfo );
 	return;
 	M_EPILOG
 	}

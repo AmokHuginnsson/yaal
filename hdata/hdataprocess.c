@@ -80,7 +80,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 		f_poWindows->go ( 0 );
 		while ( ( l_poItem = f_poWindows->to_tail ( 1, D_TREAT_AS_OPENED ) ) )
 			{
-			l_poWindow = dynamic_cast < HDataWindow * > ( ( HWindow * ) ( ( void * ) ( * l_poItem ) [ 0 ] ) );
+			l_poWindow = dynamic_cast < HDataWindow * > ( static_cast < HWindow * > ( static_cast < void * > ( ( * l_poItem ) [ 0 ] ) ) );
 			if ( l_poWindow && l_poWindow->is_modified ( ) )
 				{
 				f_poForegroundWindow = l_poWindow;
@@ -100,9 +100,8 @@ int HDataProcess::handler_close_window ( int a_iCode, void * )
 	HDataWindow * l_poWindow = NULL;
 	if ( f_poForegroundWindow )
 		{
-		l_poWindow = ( HDataWindow * ) f_poForegroundWindow;
+		l_poWindow = dynamic_cast < HDataWindow * > ( f_poForegroundWindow );
 		if ( l_poWindow
-				&& ( dynamic_cast < HDataWindow * > ( ( HWindow * ) l_poWindow ) )
 				&& l_poWindow->is_modified ( )
 				&& ! l_poWindow->status_bar ( )->confirm ( "close window" ) )
 			return ( 0 );

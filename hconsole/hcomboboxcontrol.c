@@ -189,7 +189,7 @@ void HComboboxControl::close_combo ( void )
 	M_PROLOG
 	f_iMode = D_MODE_EDITCONTROL;
 	if ( f_iQuantity )
-		HEditControl::operator = ( ( HString & ) present ( ) [ 0 ] );
+		HEditControl::operator = ( static_cast < HString & > ( present ( ) [ 0 ] ) );
 	clrscr ( );
 	f_poParent->refresh ( );
 	return;

@@ -64,7 +64,7 @@ int HRandomizer::rnd( void )
 	{
 	M_PROLOG
 	f_lSeed = MULTIPLIER * f_lSeed + INCREMENT;
-	return ( ( int ) ( f_lSeed >> 16 ) & 0x7fff );
+	return ( static_cast < int > ( ( f_lSeed >> 16 ) & 0x7fff ) );
 	M_EPILOG
 	}
 

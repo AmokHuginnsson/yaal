@@ -108,7 +108,7 @@ void HSigStackWrapper::create_stack ( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	f_sStack.ss_sp = xmalloc ( SIGSTKSZ );
+	f_sStack.ss_sp = xmalloc ( SIGSTKSZ, char );
 	f_sStack.ss_size = SIGSTKSZ;
 	f_sStack.ss_flags = 0;
 	l_iError = sigaltstack ( & f_sStack, NULL );
@@ -161,7 +161,7 @@ void signal_WINCH ( int a_iSignum )
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
 #ifdef __HCORE_HLOG_H
-	log << ( ( char * ) l_oMessage ) + 1 << endl;
+	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
@@ -189,10 +189,11 @@ void signal_INT ( int a_iSignum )
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
 #ifdef __HCORE_HLOG_H
-	log << ( ( char * ) l_oMessage ) + 1 << endl;
+	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )leave_curses();
+	if ( is_enabled ( ) )
+		leave_curses();
 #endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGINT, SIG_DFL );
@@ -211,10 +212,11 @@ void signal_TERM ( int a_iSignum )
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
 #ifdef __HCORE_HLOG_H
-	log << ( ( char * ) l_oMessage ) + 1 << endl;
+	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )leave_curses();
+	if ( is_enabled ( ) )
+		leave_curses();
 #endif
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGTERM, SIG_DFL );
@@ -242,10 +244,11 @@ void signal_QUIT ( int a_iSignum )
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
 #ifdef __HCORE_HLOG_H
-	log << ( ( char * ) l_oMessage ) + 1 << endl;
+	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )leave_curses();
+	if ( is_enabled ( ) )
+		leave_curses();
 #endif
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGQUIT, SIG_DFL );
@@ -273,10 +276,11 @@ void signal_TSTP ( int a_iSignum )
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
 #ifdef __HCORE_HLOG_H
-	log << ( ( char * ) l_oMessage ) + 1 << endl;
+	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )leave_curses();
+	if ( is_enabled ( ) )
+		leave_curses();
 #endif
 	fprintf ( stderr, l_oMessage );
 	signal ( SIGTSTP, SIG_DFL );
@@ -295,10 +299,11 @@ void signal_CONT ( int a_iSignum )
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
 #ifdef __HCORE_HLOG_H
-	log << ( ( char * ) l_oMessage ) + 1 << endl;
+	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( ! is_enabled ( ) )enter_curses();
+	if ( ! is_enabled ( ) )
+		enter_curses();
 	if ( is_enabled ( ) )
 		{
 		n_bInputWaiting = true;
@@ -320,10 +325,11 @@ void signal_fatal ( int a_iSignum )
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += ", bailing out.";
 #ifdef __HCORE_HLOG_H
-	log << ( ( char * ) l_oMessage ) + 1 << endl;
+	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )leave_curses();
+	if ( is_enabled ( ) )
+		leave_curses();
 #endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( a_iSignum, SIG_DFL );
@@ -353,10 +359,11 @@ void signal_USR1 ( int a_iSignum )
 	l_oMessage += l_pcSignalMessage;
 	l_oMessage += '.';
 #ifdef __HCORE_HLOG_H
-	log << ( ( char * ) l_oMessage ) + 1 << endl;
+	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )leave_curses();
+	if ( is_enabled ( ) )
+		leave_curses();
 #endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 	signal ( a_iSignum, SIG_DFL );

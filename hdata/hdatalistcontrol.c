@@ -86,7 +86,7 @@ void HDataListControl::load ( long int /*a_iId*/ )
 	HElement * l_poSelected = f_poSelected;
 	HElement * l_poFirstVisibleRow = f_poFirstVisibleRow;
 	HItem l_oItem ( f_oHeader.quantity ( ) );
-	HDataWindow * l_poParent = ( HDataWindow * ) f_poParent;
+	HDataWindow * l_poParent = static_cast < HDataWindow * > ( f_poParent );
 	l_poParent->set_sync_store ( & l_oItem );
 	if ( f_poRecordSet->is_open ( ) )l_iCount = f_poRecordSet->requery ( );
 	else l_iCount = f_poRecordSet->open ( );
@@ -118,7 +118,7 @@ void HDataListControl::load ( long int /*a_iId*/ )
 long int HDataListControl::get_current_id ( void )
 	{
 	M_PROLOG
-	return ( ( * ( HItem * ) & f_poSelected->get_object ( ) ).m_lId );
+	return ( static_cast < HItem * > ( & f_poSelected->get_object ( ) )->m_lId );
 	M_EPILOG
 	}
 

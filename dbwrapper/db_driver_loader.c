@@ -173,7 +173,7 @@ void dbwrapper_error ( void )
 	HString l_oMessage;
 	l_oMessage = dlerror ( );
 	log ( D_LOG_ERROR ) << l_oMessage << endl;
-	fprintf ( stderr, "(%s), ", ( char * ) l_oMessage );
+	fprintf ( stderr, "(%s), ", static_cast < char * > ( l_oMessage ) );
 	return;
 	}
 
@@ -210,46 +210,48 @@ void load_driver ( void )
 			}
 		fprintf ( stderr, x_tag_g_pcDone );
 		fprintf ( stderr, "Linking symbols ... " );
-		if ( ! ( dbwrapper::db_disconnect = (dbwrapper::t1) dlsym ( n_pvDlHandle,
-						"db_disconnect" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_errno = (dbwrapper::t2) dlsym ( n_pvDlHandle,
-						"db_errno" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_error = (dbwrapper::t3) dlsym ( n_pvDlHandle,
-						"db_error" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_query = (dbwrapper::t4) dlsym ( n_pvDlHandle,
-						"db_query" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_unquery = (dbwrapper::t5) dlsym ( n_pvDlHandle,
-						"db_unquery" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::rs_get = (dbwrapper::t6) dlsym ( n_pvDlHandle,
-						"rs_get" ) ) )dbwrapper_error ( );
-		else if ( ! ( rs_fields_count = (dbwrapper::t7) dlsym ( n_pvDlHandle,
-						"rs_fields_count" ) ) )dbwrapper_error ( );
-		else if ( ! ( rsdb_records_count = (dbwrapper::t8) dlsym ( n_pvDlHandle,
-						"rsdb_records_count" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::rsdb_id = (dbwrapper::t9) dlsym ( n_pvDlHandle,
-						"rsdb_id" ) ) )dbwrapper_error ( );
-		else if ( ! ( rs_column_name = ( dbwrapper::tA ) dlsym ( n_pvDlHandle,
-						"rs_column_name" ) ) )dbwrapper_error ( );
-		else if ( ! ( dbwrapper::db_connect = (dbwrapper::t0) dlsym ( n_pvDlHandle,
-						"db_connect" ) ) )dbwrapper_error ( );
-		if ( dbwrapper::db_connect != dbwrapper::autoloader_db_connect )
+		/* It is imposible to use -Wold-style-cast and -Werror flags
+		 * and write plugin loader at the same time */
+		if ( ! ( db_disconnect = ( t1 ) dlsym ( n_pvDlHandle, "db_disconnect" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( db_errno = ( t2 ) dlsym ( n_pvDlHandle, "db_errno" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( db_error = ( t3 ) dlsym ( n_pvDlHandle, "db_error" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( db_query = ( t4 ) dlsym ( n_pvDlHandle, "db_query" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( db_unquery = ( t5 ) dlsym ( n_pvDlHandle, "db_unquery" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( rs_get = ( t6 ) dlsym ( n_pvDlHandle, "rs_get" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( rs_fields_count = ( t7 ) dlsym ( n_pvDlHandle, "rs_fields_count" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( rsdb_records_count = ( t8 ) dlsym ( n_pvDlHandle, "rsdb_records_count" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( rsdb_id = ( t9 ) dlsym ( n_pvDlHandle, "rsdb_id" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( rs_column_name = ( tA ) dlsym ( n_pvDlHandle, "rs_column_name" ) ) )
+			dbwrapper_error ( );
+		else if ( ! ( db_connect = ( t0 ) dlsym ( n_pvDlHandle, "db_connect" ) ) )
+			dbwrapper_error ( );
+		if ( db_connect != autoloader_db_connect )
 			fprintf ( stderr, x_tag_g_pcDone );
 		else
 			M_THROW ( _ ( "can not load database driver" ), n_iDataBaseDriver );
 		}
 	else
 		{
-		dbwrapper::db_connect = null_db_connect;
-		dbwrapper::db_disconnect = null_db_disconnect;
-		dbwrapper::db_errno = null_db_errno;
-		dbwrapper::db_error = null_db_error;
-		dbwrapper::db_query = null_db_query;
-		dbwrapper::db_unquery = null_db_unquery;
-		dbwrapper::rs_get = null_rs_get;
-		dbwrapper::rs_fields_count = null_rs_fields_count;
-		dbwrapper::rsdb_records_count = null_rsdb_records_count;
-		dbwrapper::rsdb_id = null_rsdb_id;
-		dbwrapper::rs_column_name = null_rs_column_name;
+		db_connect = null_db_connect;
+		db_disconnect = null_db_disconnect;
+		db_errno = null_db_errno;
+		db_error = null_db_error;
+		db_query = null_db_query;
+		db_unquery = null_db_unquery;
+		rs_get = null_rs_get;
+		rs_fields_count = null_rs_fields_count;
+		rsdb_records_count = null_rsdb_records_count;
+		rsdb_id = null_rsdb_id;
+		rs_column_name = null_rs_column_name;
 		}
 	return;
 	M_EPILOG
@@ -329,7 +331,7 @@ char * autoloader_rs_column_name ( void * a_pvResult, int a_iColumn )
 
 /* end of driver autoloader section */
 
-}
+} /* namespace dbwrapper */
 
-}
+} /* namespace stdhapi */
 

@@ -213,13 +213,13 @@ void HStatusBarControl::update_progress ( double a_dStep,
 	if ( f_bEstimate )
 		{
 		if ( a_dStep )
-			l_oNow = ( time_t ) ( f_dProgressSize / a_dStep * l_oStoper );
+			l_oNow = static_cast < time_t > ( ( f_dProgressSize / a_dStep * l_oStoper ) );
 		l_oLeft = l_oNow - l_oStoper;
 		}
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
 	l_iMaxBar = n_iWidth - 6 - 10 - 2 - ( f_bEstimate ? 10 : 0 );
-	l_iNextPercent = ( int ) ( 100. * a_dStep / f_dProgressSize );
-	l_iNextStep = ( int ) ( l_iMaxBar * a_dStep / f_dProgressSize );
+	l_iNextPercent = static_cast < int > ( ( 100. * a_dStep / f_dProgressSize ) );
+	l_iNextStep = static_cast < int > ( ( l_iMaxBar * a_dStep / f_dProgressSize ) );
 	l_iNextMinute = l_oStoper.get_minute ( );
 	l_iNextSecond = l_oStoper.get_second ( );
 	if ( l_iNextStep >= l_iMaxBar )l_iNextStep = l_iMaxBar, f_bDone = true;
@@ -235,19 +235,19 @@ void HStatusBarControl::update_progress ( double a_dStep,
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", l_iMaxBar );
 			f_oString.format ( f_oVarTmpBuffer, "-",
-					( a_dStep ? ( ( char const * ) l_oLeft ) : "(?\?:?\?:?\?)" ),
-					( char const * ) l_oStoper,	l_iNextPercent, "%%" );
+					( a_dStep ? ( static_cast < char const * > ( l_oLeft ) ) : "(?\?:?\?:?\?)" ),
+					static_cast < char const * > ( l_oStoper ),	l_iNextPercent, "%%" );
 			}
 		else
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s[%%3d%%s]", l_iMaxBar );
 			f_oString.format ( f_oVarTmpBuffer, "-",
-					( char const * ) l_oStoper, l_iNextPercent, "%%" );
+					static_cast < char const * > ( l_oStoper ), l_iNextPercent, "%%" );
 			}
 		if ( f_bDone )
-			strncpy ( ( ( char * ) f_oString ) + n_iWidth - 5, "done", 4 );
-		::memset ( ( ( char * ) f_oString ) + 1, '-', l_iMaxBar );
-		::memset ( ( ( char * ) f_oString ) + 1, '=', l_iNextStep );
+			strncpy ( static_cast < char * > ( f_oString ) + n_iWidth - 5, "done", 4 );
+		::memset ( static_cast < char * > ( f_oString ) + 1, '-', l_iMaxBar );
+		::memset ( static_cast < char * > ( f_oString ) + 1, '=', l_iNextStep );
 		mvprintw ( n_iHeight - 1, 0, f_oString );
 		f_oString = "";
 		f_iLastProgress = l_iNextStep;

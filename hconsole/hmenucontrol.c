@@ -65,9 +65,9 @@ int HMenuControl::HMenuNode::load_sub_menu ( OMenuItem * a_psSubMenu )
 		{
 		l_poNode = new HMenuNode ( this );
 		l_oInfo = a_psSubMenu [ l_iCtr ].f_pcLabel;
-		l_oInfo = ( void * ) & a_psSubMenu [ l_iCtr ];
+		l_oInfo = static_cast < void * > ( & a_psSubMenu [ l_iCtr ] );
 		l_poNode->f_tLeaf [ 0 ] = l_oInfo;
-		f_oBranch.add_tail ( ( HTree < HItem >::HNode * * ) & l_poNode );
+		f_oBranch.add_tail ( reinterpret_cast < HTree < HItem >::HNode * * > ( & l_poNode ) );
 		if ( a_psSubMenu [ l_iCtr ].f_psSubMenu )
 			l_poNode->load_sub_menu ( a_psSubMenu [ l_iCtr ].f_psSubMenu );
 		l_iCtr ++;
@@ -128,8 +128,7 @@ int HMenuControl::process_input( int a_iCode )
 	a_iCode = HTreeControl::process_input ( a_iCode );
 	if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
 		{
-		l_psMenu = ( OMenuItem * ) ( ( void * ) ( ( ( HMenuNode * ) f_poSelected )
-																														->f_tLeaf [ 0 ] ) );
+		l_psMenu = static_cast < OMenuItem * > ( static_cast < void * > ( static_cast < HMenuNode * > ( f_poSelected )->f_tLeaf [ 0 ] ) );
 		if ( l_psMenu->HANDLER )
 			( f_poProcess->* ( l_psMenu->HANDLER ) )( );
 		a_iCode = 0;

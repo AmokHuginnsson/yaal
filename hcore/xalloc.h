@@ -30,10 +30,13 @@ Copyright:
 extern "C"
 {
 
-void * xmalloc ( size_t );
-void * xcalloc ( size_t );
-void * xrealloc ( void *, size_t );
-#define xfree( ptr ) xfree_internal ( ( void * * ) ( & ptr ) )
+#define xmalloc( size, type ) static_cast < type * > ( xmalloc_internal ( ( size ) * sizeof ( type ) ) )
+void * xmalloc_internal ( size_t );
+#define xcalloc( size, type ) static_cast < type * > ( xcalloc_internal ( ( size ) * sizeof ( type ) ) )
+void * xcalloc_internal ( size_t );
+#define xrealloc( pointer, size, type ) static_cast < type * > ( xrealloc_internal ( pointer, ( size ) * sizeof ( type ) ) )
+void * xrealloc_internal ( void *, size_t );
+#define xfree( ptr ) xfree_internal ( reinterpret_cast < void * * > ( & ptr ) )
 void xfree_internal ( void * * );
 char * xstrdup ( char const * );
 

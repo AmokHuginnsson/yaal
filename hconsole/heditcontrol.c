@@ -98,7 +98,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 					REG_EXTENDED | REG_NOSUB ) ) )
 		{
 		l_iLength = regerror ( l_iErrorCode, & f_sMask, NULL, 0 );
-		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
+		l_pcBuffer = xmalloc ( l_iLength, char );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		l_oErrorMessage = l_pcBuffer;
 		xfree ( l_pcBuffer );
@@ -107,7 +107,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	if ( ( l_iErrorCode = regexec ( & f_sMask, a_pcValue, 0, NULL, 0 ) ) )
 		{
 		l_iLength = regerror ( l_iErrorCode, & f_sMask, NULL, 0 );
-		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
+		l_pcBuffer = xmalloc ( l_iLength, char );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		l_oErrorMessage.format ( "%s: %s", l_pcBuffer, a_pcValue );
 		xfree ( l_pcBuffer );
@@ -121,7 +121,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		: n_iWidth + f_iWidth - f_iColumnRaw;
 /* f_iWidthRaw must be set up properly before setting up f_iCursorPosition and
  * f_iControlOffset whose are used in refresh ( ) */
-	if ( l_iLength >= ( size_t ) f_iWidthRaw )
+	if ( l_iLength >= static_cast < size_t > ( f_iWidthRaw ) )
 		{
 		f_iCursorPosition = f_iWidthRaw - 1;
 		f_iControlOffset = l_iLength - f_iWidthRaw + 1;
@@ -150,7 +150,7 @@ void HEditControl::refresh ( void )
 	memset ( f_oVarTmpBuffer, ' ', f_iWidthRaw );
 	if ( ! f_bPassword )
 		{
-		strcpy ( f_oVarTmpBuffer, ( char * ) f_oString + f_iControlOffset );
+		strcpy ( f_oVarTmpBuffer, static_cast < char * > ( f_oString ) + f_iControlOffset );
 		f_oVarTmpBuffer [ f_oVarTmpBuffer.get_length ( ) ] = ' ';
 		}
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
@@ -243,7 +243,7 @@ int HEditControl::process_input ( int a_iCode )
 	int l_iOldCursorPosition = 0;
 	char * l_pcBuffer = 0;
 	a_iCode = HControl::process_input ( a_iCode );
-	l_pcBuffer = ( char * ) f_oVarTmpBuffer;
+	l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
 	memset ( l_pcBuffer, 0, f_iMaxStringSize );
 	f_oVarTmpBuffer = f_oString;
 	l_iOldControlOffset = f_iControlOffset;
@@ -290,7 +290,7 @@ int HEditControl::process_input ( int a_iCode )
 				{
 				f_oHistory.add_head ( & f_oString );
 				l_iErrorCode = f_oHistory.quantity ( );
-				while ( l_iErrorCode -- > ( int ) f_iMaxHistoryLevel )
+				while ( l_iErrorCode -- > static_cast < int > ( f_iMaxHistoryLevel ) )
 					f_oHistory.remove_at ( l_iErrorCode, D_EMPTY_IF_NOT_EMPTIED );
 				f_oHistory.go ( 0 );
 				f_oHistory.to_head ( );
@@ -400,7 +400,7 @@ int HEditControl::process_input ( int a_iCode )
 				f_iControlOffset += f_iCursorPosition - f_iWidthRaw + 1;
 				f_iCursorPosition = f_iWidthRaw - 1;
 				}
-			l_pcBuffer = ( char * ) f_oVarTmpBuffer;
+			l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
 			l_iErrorCode = 0;
 			if ( ( l_iOldCursorPosition == f_iCursorPosition )
 				&& ( l_iOldControlOffset == f_iControlOffset ) )
@@ -413,12 +413,12 @@ int HEditControl::process_input ( int a_iCode )
 				{
 				l_iErrorCode = strrnspn ( l_pcBuffer, g_pcWhiteSpace,
 						f_iControlOffset + f_iCursorPosition );
-				l_pcBuffer = ( char * ) strrnpbrk ( l_pcBuffer, g_pcWhiteSpace,
+				l_pcBuffer = strrnpbrk ( l_pcBuffer, g_pcWhiteSpace,
 						f_iControlOffset + f_iCursorPosition - l_iErrorCode );
 				if ( l_pcBuffer )
 					{
 					f_iCursorPosition = 1 - f_iControlOffset + l_pcBuffer
-						- ( char * ) f_oVarTmpBuffer;
+						- static_cast < char * > ( f_oVarTmpBuffer );
 					if ( f_iCursorPosition < 0 )
 						{
 						f_iControlOffset += f_iCursorPosition;
@@ -430,7 +430,7 @@ int HEditControl::process_input ( int a_iCode )
 					f_iControlOffset = 0;
 					f_iCursorPosition = 0;
 					}
-				l_pcBuffer = ( char * ) f_oVarTmpBuffer;
+				l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
 				l_iErrorCode = 0;
 				}
 			else putchar ( '\a' );
@@ -453,7 +453,7 @@ int HEditControl::process_input ( int a_iCode )
 					l_iErrorCode += strspn ( l_pcBuffer + l_iErrorCode, g_pcWhiteSpace );
 				else
 					l_iErrorCode = l_iLength - ( f_iControlOffset + f_iCursorPosition );
-				l_pcBuffer = ( char * ) f_oVarTmpBuffer;
+				l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
 				l_iLength -= l_iErrorCode;
 				memmove ( l_pcBuffer + f_iControlOffset + f_iCursorPosition,
 						l_pcBuffer + f_iControlOffset + f_iCursorPosition + l_iErrorCode,
@@ -471,12 +471,12 @@ int HEditControl::process_input ( int a_iCode )
 					{
 					l_iErrorCode = strrnspn ( l_pcBuffer, g_pcWhiteSpace,
 							f_iControlOffset + f_iCursorPosition );
-					l_pcBuffer = ( char * ) strrnpbrk ( l_pcBuffer, g_pcWhiteSpace,
+					l_pcBuffer = strrnpbrk ( l_pcBuffer, g_pcWhiteSpace,
 							f_iControlOffset + f_iCursorPosition - l_iErrorCode );
 					if ( l_pcBuffer )
 						{
 						f_iCursorPosition = 1 - f_iControlOffset + l_pcBuffer
-							- ( char * ) f_oVarTmpBuffer;
+							- static_cast < char * > ( f_oVarTmpBuffer );
 						if ( f_iCursorPosition < 0 )
 							{
 							f_iControlOffset += f_iCursorPosition;
@@ -488,7 +488,7 @@ int HEditControl::process_input ( int a_iCode )
 						f_iControlOffset = 0;
 						f_iCursorPosition = 0;
 						}
-					l_pcBuffer = ( char * ) f_oVarTmpBuffer;
+					l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
 					l_iErrorCode = 0;
 					}
 				memmove ( l_pcBuffer + f_iControlOffset + f_iCursorPosition,
@@ -554,7 +554,7 @@ int HEditControl::process_input ( int a_iCode )
 		f_iCursorPosition = l_iOldCursorPosition;
 		putchar ( '\a' );
 		l_iLength = regerror ( l_iErrorCode, & f_sMask, NULL, 0 );
-		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
+		l_pcBuffer = xmalloc ( l_iLength, char );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		f_poParent->status_bar ( )->message ( D_BG_BROWN, l_pcBuffer );
 		xfree ( l_pcBuffer );
@@ -573,7 +573,7 @@ HString & HEditControl::operator = ( char const * a_pcString )
 	if ( ( l_iErrorCode = regexec ( & f_sMask, a_pcString, 0, NULL, 0 ) ) )
 		{
 		l_iLength = regerror ( l_iErrorCode, & f_sMask, NULL, 0 );
-		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
+		l_pcBuffer = xmalloc ( l_iLength, char );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		l_oErrorMessage.format ( "%s: %s", l_pcBuffer, a_pcString );
 		xfree ( l_pcBuffer );

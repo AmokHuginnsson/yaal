@@ -190,7 +190,7 @@ HTime HTime::operator - ( const HTime & a_roTime )
 	{
 	M_PROLOG
 	HTime l_oTime ( f_oFormat );
-	l_oTime.f_xValue = ( time_t ) difftime ( f_xValue, a_roTime.f_xValue );
+	l_oTime.f_xValue = static_cast < time_t > ( difftime ( f_xValue, a_roTime.f_xValue ) );
 	gmtime_r ( & l_oTime.f_xValue, & l_oTime.f_sBroken );
 	return ( l_oTime );
 	M_EPILOG

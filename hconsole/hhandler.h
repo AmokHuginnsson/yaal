@@ -38,9 +38,9 @@ namespace hconsole
 {
 
 #define M_REGISTER_PREPROCESS_HANDLER( count, tab, handler ) \
-	register_preprocess_handler ( count, tab, ( HANDLER_t ) & handler )
+	register_preprocess_handler ( count, tab, static_cast < HANDLER_t > ( & handler ) )
 #define M_REGISTER_POSTPROCESS_HANDLER( count, tab, handler ) \
-	register_postprocess_handler ( count, tab, ( HANDLER_t ) & handler )
+	register_postprocess_handler ( count, tab, static_cast < HANDLER_t > ( & handler ) )
 
 class HHandler
 	{

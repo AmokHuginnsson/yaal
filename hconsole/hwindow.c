@@ -92,7 +92,7 @@ int HWindow::init ( void )
 	HString l_oString;
 	clrscr ( );
 	n_bNeedRepaint = true;
-	l_oString.format ( " [%s]& \n", ( char * ) f_oTitle );
+	l_oString.format ( " [%s]& \n", static_cast < char * > ( f_oTitle ) );
 	f_poStatusBar = init_bar ( l_oString );
 	f_poStatusBar->enable ( true );
 	f_oControls.remove_head ( D_FORCE_REMOVE_ELEMENT );
@@ -114,7 +114,7 @@ int HWindow::process_input ( int a_iCode )
 	if ( a_iCode && f_poFocusedChild )
 		a_iCode = f_poFocusedChild->process_input ( a_iCode );
 	if ( a_iCode )a_iCode = HHandler::process_input ( a_iCode, f_oPostprocessHandlers );
-	if ( f_oCommand && ( ( char * ) f_oCommand ) [ 0 ] )
+	if ( f_oCommand && static_cast < char * > ( f_oCommand ) [ 0 ] )
 		process_command ( );
 	return ( a_iCode );
 	M_EPILOG
@@ -157,7 +157,7 @@ void HWindow::refresh ( void )
 	M_EPILOG
 	}
 
-int HWindow::handler_jump_tab ( int a_iCode )
+int HWindow::handler_jump_tab ( int a_iCode, void * )
 	{
 	M_PROLOG
 	f_poFocusedChild = f_oControls.next_enabled ( );
@@ -167,7 +167,7 @@ int HWindow::handler_jump_tab ( int a_iCode )
 	M_EPILOG
 	}
 
-int HWindow::handler_jump_direct ( int a_iCode )
+int HWindow::handler_jump_direct ( int a_iCode, void * )
 	{
 	M_PROLOG
 	HControl * l_poControl = NULL;
@@ -198,7 +198,7 @@ void HWindow::set_focus ( HControl * a_poControl )
 	M_EPILOG
 	}
 
-int HWindow::handler_command ( int a_iCode )
+int HWindow::handler_command ( int a_iCode, void * )
 	{
 	M_PROLOG
 	a_iCode = 0;
@@ -207,7 +207,7 @@ int HWindow::handler_command ( int a_iCode )
 	M_EPILOG
 	}
 
-int HWindow::handler_search ( int a_iCode )
+int HWindow::handler_search ( int a_iCode, void * )
 	{
 	M_PROLOG
 	char l_pcPrompt [ ] = "/\0";

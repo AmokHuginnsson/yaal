@@ -64,11 +64,11 @@ HLog::HLog ( void )
 	f_pcProcessName = NULL;
 	f_iBufferSize = D_BUFFER_SIZE;
 	f_lType = 0;
-	f_pcBuffer = ( char * ) xcalloc ( f_iBufferSize );
-	f_pcHostName = ( char * ) xcalloc ( D_HOSTNAME_SIZE );
+	f_pcBuffer = xcalloc ( f_iBufferSize, char );
+	f_pcHostName = xcalloc ( D_HOSTNAME_SIZE, char );
 	f_psStream = tmpfile ( );
 	if ( ! f_psStream )
-		M_THROW ( "tmpfile returned", ( int ) f_psStream );
+		M_THROW ( "tmpfile returned", reinterpret_cast < int > ( f_psStream ) );
 	fprintf ( f_psStream, "%-10xProcess started (%d).\n",
 			D_LOG_NOTICE, getpid ( ) );
 	l_iUid = getuid ( );
@@ -76,7 +76,7 @@ HLog::HLog ( void )
 	if ( l_psPasswd )f_pcLoginName = xstrdup ( l_psPasswd->pw_name );
 	else
 		{
-		f_pcLoginName = ( char * ) xcalloc ( 8 * sizeof ( char ) );
+		f_pcLoginName = xcalloc ( 8, char );
 		snprintf ( f_pcLoginName, 6, "%d", l_iUid );
 		}
 	gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 );
@@ -118,7 +118,7 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 	f_bRealMode = true;
 	if ( a_pcProcessName )f_pcProcessName = basename ( a_pcProcessName );
 	if ( ! a_psStream )
-		M_THROW ( "file parameter is", ( int ) a_psStream );
+		M_THROW ( "file parameter is", reinterpret_cast < int > ( a_psStream ) );
 	if ( f_psStream )
 		{
 		fseek ( f_psStream, 0, SEEK_SET );
@@ -159,7 +159,7 @@ void HLog::rehash ( char const * a_pcLogFileName, char * a_pcProcessName )
 	M_PROLOG
 	if ( ! a_pcLogFileName )
 		M_THROW ( "new file name argument is",
-				( int ) a_pcLogFileName );
+				reinterpret_cast < int > ( a_pcLogFileName ) );
 	rehash ( fopen ( a_pcLogFileName, "a" ), a_pcProcessName );
 	return;
 	M_EPILOG

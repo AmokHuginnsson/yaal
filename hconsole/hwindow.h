@@ -60,10 +60,10 @@ public:
 	virtual HStatusBarControl * init_bar ( char const * );
 	void refresh ( void );
 	int process_input ( int );
-	virtual int handler_jump_tab ( int ); /* jump thru controlos with tab key */
-	virtual int handler_jump_direct ( int ); /* direct jump to specified cntrl */
-	virtual int handler_command ( int ); /* put window into command awaiting */
-	virtual int handler_search ( int ); /* put window into search pattern scan */
+	virtual int handler_jump_tab ( int, void * ); /* jump thru controlos with tab key */
+	virtual int handler_jump_direct ( int, void * ); /* direct jump to specified cntrl */
+	virtual int handler_command ( int, void * ); /* put window into command awaiting */
+	virtual int handler_search ( int, void * ); /* put window into search pattern scan */
 	virtual int click ( mouse::OMouse & );
 	int add_control ( HControl *, int );
 	HStatusBarControl * status_bar ( void );

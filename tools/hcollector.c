@@ -44,7 +44,7 @@ namespace tools
 
 HCollector::HCollector ( char const * a_pcDevicePath )
 					: HSerial ( a_pcDevicePath ),
-						f_oLine ( ( size_t ) D_RECV_BUF_SIZE )
+						f_oLine ( static_cast < size_t > ( D_RECV_BUF_SIZE ) )
 	{
 	M_PROLOG
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
@@ -79,7 +79,7 @@ int HCollector::send_line ( char const * a_pcLine )
 	HString l_oLine, l_oLocalCopy;
 	if ( l_iLength < 1 )return ( 0 );
 	l_oLocalCopy = a_pcLine;
-	l_pcSpeedUp = ( char * ) l_oLocalCopy;
+	l_pcSpeedUp = static_cast < char * > ( l_oLocalCopy );
 	if ( a_pcLine [ l_iLength - 1 ] == '\n' )
 		{
 		l_iLength --;
@@ -121,7 +121,7 @@ int HCollector::receive_line ( char * & a_pcLine )
 		memset ( f_oLine, 0, D_RECV_BUF_SIZE );
 		read ( f_oLine, D_RECV_BUF_SIZE );
 		flush ( TCIFLUSH );
-		a_pcLine = ( ( char * ) f_oLine )
+		a_pcLine = ( static_cast < char * > ( f_oLine ) )
 			+ strlen ( D_PROTO_DTA ) + 2 /* for lenght */ + 2 /* for crc */;
 		l_iLength = strlen ( a_pcLine ) - 1;
 		a_pcLine [ l_iLength ] = 0;
@@ -130,10 +130,10 @@ int HCollector::receive_line ( char * & a_pcLine )
 		l_iLength &= 0x0ff;
 		l_iCRC &= 0x0ff;
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
-		strncpy ( f_pcReadBuf, ( ( char * ) f_oLine ) + strlen ( D_PROTO_DTA ), 2 );
+		strncpy ( f_pcReadBuf, static_cast < char * > ( f_oLine ) + strlen ( D_PROTO_DTA ), 2 );
 		l_iPLength = strtol ( f_pcReadBuf, NULL, 0x10 );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
-		strncpy ( f_pcReadBuf, ( ( char * ) f_oLine )
+		strncpy ( f_pcReadBuf, static_cast < char * > ( f_oLine )
 				+ strlen ( D_PROTO_DTA ) + 2 /* for Plength */, 2 );
 		l_iPCRC = strtol ( f_pcReadBuf, NULL, 0x10 );
 		if ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
@@ -151,7 +151,7 @@ int HCollector::receive_line ( char * & a_pcLine )
 #define M_STDHAPI_TEMP_FAILURE_RETRY(expression) \
   (__extension__ \
     ({ long int __result; \
-       do __result = (long int) (expression); \
+       do __result = static_cast <long int> ( expression ); \
        while (__result == -1L && errno == EINTR); \
        __result; }))
 

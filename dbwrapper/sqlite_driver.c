@@ -1,4 +1,3 @@
-
 /*
 ---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
@@ -78,9 +77,9 @@ void * db_connect ( char const * a_pcDataBase,
 		db_disconnect ( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psSQLite = ( sqlite_db * ) xcalloc ( sizeof ( sqlite_db ) );
+	l_psSQLite = xcalloc ( 1, sqlite_db );
 	l_iNmLnght = strlen ( a_pcDataBase );
-	l_pcDataBase = ( char * ) xcalloc ( l_iNmLnght + strlen ( ".sqlite" + 1 ) );
+	l_pcDataBase = xcalloc ( l_iNmLnght + strlen ( ".sqlite" + 1 ), char );
 	strcpy ( l_pcDataBase, a_pcDataBase );
 	strcat ( l_pcDataBase, ".sqlite" );
 	if ( stat ( l_pcDataBase, & l_sStat ) )
@@ -145,7 +144,7 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 	{
 	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
 	sqlite_result * l_psResult = NULL;
-	l_psResult = ( sqlite_result * ) xcalloc ( sizeof ( sqlite_result ) );
+	l_psResult = xcalloc ( 1, sqlite_result );
 	l_psResult->f_iColumns = 0;
 	l_psResult->f_iRows = 0;
 	l_psResult->f_ppcData = NULL;

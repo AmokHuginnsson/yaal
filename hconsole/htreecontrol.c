@@ -68,7 +68,8 @@ void HTreeControl::HNodeControl::expand ( void )
 	{
 	M_PROLOG
 	f_bUnfolded = true;
-	if ( f_poTrunk ) ( ( HTreeControl::HNodeControl * ) f_poTrunk )->expand ( );
+	if ( f_poTrunk )
+		static_cast < HTreeControl::HNodeControl * > ( f_poTrunk )->expand ( );
 	return;
 	M_EPILOG
 	}
@@ -80,7 +81,7 @@ void HTreeControl::HNodeControl::collapse ( void )
 	f_bUnfolded = false;
   if  ( ! f_oBranch.quantity ( ) )return;
 	f_oBranch.go ( 0 );
-	while ( ( l_ppoNodeControl = ( HTreeControl::HNodeControl * * ) f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED ) ) )
+	while ( ( l_ppoNodeControl = reinterpret_cast < HTreeControl::HNodeControl * * > ( f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED ) ) ) )
 		( * l_ppoNodeControl )->collapse ( );
 	return;
 	M_EPILOG
@@ -119,7 +120,7 @@ void HTreeControl::refresh ( void )
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		::mvprintw ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
 	if ( f_poRoot )
-		draw_node ( ( HNodeControl * ) f_poRoot, f_iRowRaw );
+		draw_node ( static_cast < HNodeControl * > ( f_poRoot ), f_iRowRaw );
 	return;
 	M_EPILOG
 	}
@@ -144,13 +145,13 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 			set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
 						: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
 		::mvprintw ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2,
-				( HString & ) l_oInfo );
+				static_cast < HString & > ( l_oInfo ) );
 		}
 	if ( l_iCtr && ( a_poNode->f_bUnfolded || ! a_poNode->f_iLevel ) )
 		{
 		a_poNode->f_oBranch.go ( 0 );
 		while ( l_iCtr -- )
-			l_iRow = draw_node ( ( HNodeControl * ) * a_poNode->f_oBranch.to_tail ( ),
+			l_iRow = draw_node ( static_cast < HNodeControl * > ( * a_poNode->f_oBranch.to_tail ( ) ),
 					l_iRow );
 		}
 	return ( l_iRow );
@@ -163,19 +164,19 @@ int HTreeControl::process_input ( int a_iCode )
 	int l_iErrorCode = 0;
 	HNodeControl * l_poNode = NULL;
 	a_iCode = HControl::process_input ( a_iCode );
-	l_poNode = ( HNodeControl * ) f_poSelected;
+	l_poNode = static_cast < HNodeControl * > ( f_poSelected );
 	switch ( a_iCode )
 		{
 		case ( KEY_HOME ):
 			{
-			l_poNode = ( HNodeControl * ) f_poRoot;
+			l_poNode = static_cast < HNodeControl * > ( f_poRoot );
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				f_poSelected = l_poNode->f_oBranch [ 0 ];
 			break;
 			}
 		case ( KEY_END ):
 			{
-			l_poNode = ( HNodeControl * ) f_poRoot;
+			l_poNode = static_cast < HNodeControl * > ( f_poRoot );
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				f_poSelected = l_poNode->f_oBranch [ -1 ];
 			break;
@@ -198,15 +199,15 @@ int HTreeControl::process_input ( int a_iCode )
 				}
 			else
 				{
-				l_poNode = ( HNodeControl * ) f_poSelected;
+				l_poNode = static_cast < HNodeControl * > ( f_poSelected );
 				while ( l_poNode->f_bUnfolded )
 					{
 					if ( l_poNode->f_oBranch.quantity ( ) )
 						{
 						f_poSelected = l_poNode->f_oBranch [ 0 ];
-						l_poNode = ( HNodeControl * ) f_poSelected;
+						l_poNode = static_cast < HNodeControl * > ( f_poSelected );
 						f_poSelected = l_poNode->previous ( D_TREAT_AS_CLOSED );
-						l_poNode = ( HNodeControl * ) f_poSelected;
+						l_poNode = static_cast < HNodeControl * > ( f_poSelected );
 						}
 					}
 				}
@@ -225,8 +226,8 @@ int HTreeControl::process_input ( int a_iCode )
 				while ( l_poNode->f_iLevel > 1 )
 					if ( f_poSelected == l_poNode ) 
 						{
-						f_poSelected = ( ( HNodeControl * ) l_poNode->f_poTrunk )->next ( );
-						l_poNode = ( HNodeControl * )f_poSelected;
+						f_poSelected = static_cast < HNodeControl * > ( l_poNode->f_poTrunk )->next ( );
+						l_poNode = static_cast < HNodeControl * > (f_poSelected );
 						}
 					else break;
 				}
@@ -258,8 +259,8 @@ int HTreeControl::process_input ( int a_iCode )
 				while ( l_poNode->f_iLevel > 1 )
 					if ( f_poSelected == l_poNode ) 
 						{
-						f_poSelected = ( ( HNodeControl * ) l_poNode->f_poTrunk )->next ( );
-						l_poNode = ( HNodeControl * )f_poSelected;
+						f_poSelected = static_cast < HNodeControl * > ( l_poNode->f_poTrunk )->next ( );
+						l_poNode = static_cast < HNodeControl * > (f_poSelected );
 						}
 					else break;
 				}

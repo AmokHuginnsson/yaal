@@ -51,7 +51,7 @@ public:
 	virtual ~HMainWindow ( void );
 	virtual int init ( void );
 	void init_menu ( HProcess *, OMenuItem * );
-	virtual int handler_close ( int ); /* closes window process */
+	virtual int handler_close ( int, void * ); /* closes window process */
 	HWindowListControl * _disclose_window_list ( void );
 	/*}*/
 	};

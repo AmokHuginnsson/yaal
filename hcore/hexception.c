@@ -127,12 +127,12 @@ void HException::dump_call_stack ( int )
 	int l_iCtr = 0, l_iSize = 0;
 	char l_pcBuffer [ 4000 ];
 	char ** l_ppcStrings = NULL;
-	void ** l_ppvArray = ( void ** ) & l_pcBuffer;
+	void ** l_ppvArray = reinterpret_cast < void * * > ( & l_pcBuffer );
 
 	l_iSize = backtrace ( l_ppvArray, 1000 );
 	l_ppcStrings = backtrace_symbols  ( l_ppvArray, l_iSize );
 
-	hcore::log << "Obtained " << ( int ) l_iSize << " stack frames." << endl;
+	hcore::log << "Obtained " << static_cast < int > ( l_iSize ) << " stack frames." << endl;
 	if ( a_iLevel < l_iSize )l_iSize = a_iLevel;
 	for  ( l_iCtr = 0; l_iCtr < l_iSize; l_iCtr ++ )
 		hcore::log << l_ppcStrings [ l_iCtr ] << endl;

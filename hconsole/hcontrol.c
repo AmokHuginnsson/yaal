@@ -61,7 +61,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	if ( ! is_enabled ( ) )
 		M_THROW ( "not in curses mode.", g_iErrNo );
 	if ( ! a_poParent )
-		M_THROW ( "no parent window.", ( int ) a_poParent );
+		M_THROW ( "no parent window.", reinterpret_cast < int > ( a_poParent ) );
 	f_bEnabled = false;
 	f_bFocused = false;
 	f_bDrawLabel = a_bDrawLabel;

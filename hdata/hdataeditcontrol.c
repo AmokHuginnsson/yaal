@@ -111,14 +111,14 @@ int HDataEditControl::process_input ( int a_iCode )
 			}
 		case ( KEY_DELETE ):
 			{
-			if ( ! ( ( char * ) f_oString ) [ 0 ] )
+			if ( ! static_cast < char * > ( f_oString ) [ 0 ] )
 				l_bNoChange = true;
 			break;
 			}
 		}
 	a_iCode = HEditControl::process_input ( a_iCode );
 	if ( ! ( a_iCode || l_bNoChange ) )
-		( ( HDataWindow * ) f_poParent )->set_modified ( );
+		static_cast < HDataWindow * > ( f_poParent )->set_modified ( );
 	return ( a_iCode );
 	M_EPILOG
 	}

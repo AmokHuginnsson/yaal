@@ -30,11 +30,12 @@ Copyright:
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
+#include "xalloc.h"
 
 extern "C"
 {
 
-void * xmalloc ( size_t a_ulSize )
+void * xmalloc_internal ( size_t a_ulSize )
 	{
 	register void * l_pvNewPtr = malloc ( a_ulSize );
 	if ( l_pvNewPtr == 0 )
@@ -45,14 +46,14 @@ void * xmalloc ( size_t a_ulSize )
 	return ( l_pvNewPtr );
 	}
 
-void * xcalloc ( size_t a_ulSize )
+void * xcalloc_internal ( size_t a_ulSize )
 	{
-	register void * l_pvNewPtr = xmalloc ( a_ulSize );
+	register void * l_pvNewPtr = xmalloc_internal ( a_ulSize );
 	memset ( l_pvNewPtr, 0, a_ulSize );
 	return ( l_pvNewPtr );
 	}
 
-void * xrealloc ( void * a_pvPtr, size_t a_ulSize )
+void * xrealloc_internal ( void * a_pvPtr, size_t a_ulSize )
 	{
 	register void * l_pvNewPtr = realloc ( a_pvPtr, a_ulSize );
 	if ( l_pvNewPtr == 0 )
@@ -78,7 +79,7 @@ void xfree_internal ( void * * a_ppvPtr )
 char * xstrdup ( char const * a_pcStr )
 	{
 	char * l_pcNew = 0;
-	l_pcNew = ( char * ) xcalloc ( strlen ( a_pcStr ) + 1 );
+	l_pcNew = xcalloc ( strlen ( a_pcStr ) + 1, char );
 	strcpy ( l_pcNew, a_pcStr );
 	return ( l_pcNew );
 	}

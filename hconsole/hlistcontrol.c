@@ -129,7 +129,7 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_sMatch.f_iMatchNumber = - 1;
 	f_sMatch.f_poCurrentMatch = NULL;
 	f_iSortColumn = 0;
-	cmp = ( int ( HList<HItem>::* ) ( HElement *, HElement * ) ) & HListControl::cmpc;
+	cmp = static_cast < int ( HList<HItem>::* ) ( HElement *, HElement * ) > ( & HListControl::cmpc );
 	refresh ( );
 	return;
 	M_EPILOG
@@ -184,22 +184,22 @@ void HListControl::refresh ( void )
 						{
 						case ( D_TYPE_LONG_INT ):
 							{
-							f_oVarTmpBuffer = ( long int & ) l_oItem [ l_iCtrLoc ];
+							f_oVarTmpBuffer = static_cast < long int & > ( l_oItem [ l_iCtrLoc ] );
 							break;
 							}
 						case ( D_TYPE_DOUBLE ):
 							{
-							f_oVarTmpBuffer = ( double & ) l_oItem [ l_iCtrLoc ];
+							f_oVarTmpBuffer = static_cast < double & > ( l_oItem [ l_iCtrLoc ] );
 							break;
 							}
 						case ( D_TYPE_HSTRING ):
 							{
-							f_oVarTmpBuffer = ( HString & ) l_oItem [ l_iCtrLoc ];
+							f_oVarTmpBuffer = static_cast < HString & > ( l_oItem [ l_iCtrLoc ] );
 							break;
 							}
 						case ( D_TYPE_HTIME ):
 							{
-							f_oVarTmpBuffer = ( HString & ) ( HTime & ) l_oItem [ l_iCtrLoc ];
+							f_oVarTmpBuffer = static_cast < char const * > ( static_cast < HTime & > ( l_oItem [ l_iCtrLoc ] ) );
 							break;
 							}
 						default :
@@ -216,7 +216,7 @@ void HListControl::refresh ( void )
 							{
 							if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
 								{
-								memset ( ( char * ) f_oVarTmpBuffer + l_iTmp, '_',
+								memset ( static_cast < char * > ( f_oVarTmpBuffer ) + l_iTmp, '_',
 										l_poColumnInfo->f_iWidthRaw - l_iTmp );
 								}
 							f_oVarTmpBuffer [ l_poColumnInfo->f_iWidthRaw ] = 0;
@@ -228,12 +228,12 @@ void HListControl::refresh ( void )
 								f_oVarTmpBuffer = f_oVarTmpBuffer.right ( l_poColumnInfo->f_iWidthRaw );
 							else if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
 								{
-								memmove ( ( char * ) f_oVarTmpBuffer 
+								memmove ( static_cast < char * > ( f_oVarTmpBuffer ) 
 										+ ( l_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2, 
 										f_oVarTmpBuffer, l_iTmp + 1 );
 								memset ( f_oVarTmpBuffer, '_', ( l_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
 								l_iTmp = f_oVarTmpBuffer.get_length ( );
-								memset ( ( char * ) f_oVarTmpBuffer + l_iTmp, '_',
+								memset ( static_cast < char * > ( f_oVarTmpBuffer ) + l_iTmp, '_',
 										l_poColumnInfo->f_iWidthRaw - l_iTmp );
 								f_oVarTmpBuffer [ l_poColumnInfo->f_iWidthRaw ] = 0;
 								}
@@ -245,7 +245,7 @@ void HListControl::refresh ( void )
 								f_oVarTmpBuffer = f_oVarTmpBuffer.right ( l_poColumnInfo->f_iWidthRaw );
 							else if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
 								{
-								memmove ( ( char * ) f_oVarTmpBuffer + l_poColumnInfo->f_iWidthRaw - l_iTmp, 
+								memmove ( static_cast < char * > ( f_oVarTmpBuffer ) + l_poColumnInfo->f_iWidthRaw - l_iTmp, 
 										f_oVarTmpBuffer, l_iTmp + 1 );
 								memset ( f_oVarTmpBuffer, '_', l_poColumnInfo->f_iWidthRaw - l_iTmp );
 								}
@@ -309,7 +309,7 @@ void HListControl::refresh ( void )
 				M_SET_ATTR_LABEL ( );
 				f_oVarTmpBuffer.format ( "%%-%ds", l_poColumnInfo->f_iWidthRaw );
 				::mvprintw ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset, f_oVarTmpBuffer,
-	( char * ) ( l_poColumnInfo->f_oName.left ( l_poColumnInfo->f_iWidthRaw ) ) );
+	static_cast < char * > ( l_poColumnInfo->f_oName.left ( l_poColumnInfo->f_iWidthRaw ) ) );
 				M_SET_ATTR_SHORTCUT ( );
 				::mvprintw ( f_iRowRaw,
 						f_iColumnRaw + l_iColumnOffset + l_poColumnInfo->f_iShortcutIndex,
@@ -342,9 +342,9 @@ void HListControl::refresh ( void )
 			addch ( D_ASCII_DOWN_ARROW );
 			}
 		l_dScaled = f_iHeightRaw - 3;
-		l_dScaled *= ( double ) ( f_iControlOffset + f_iCursorPosition );
-		l_dScaled /= ( double )f_iQuantity;
-		::mvprintw ( f_iRowRaw + ( int ) ( l_dScaled + 1.5 + l_iHR ),
+		l_dScaled *= static_cast < double > ( f_iControlOffset + f_iCursorPosition );
+		l_dScaled /= static_cast < double > (f_iQuantity );
+		::mvprintw ( f_iRowRaw + static_cast < int > ( l_dScaled + 1.5 + l_iHR ),
 				f_iColumnRaw + l_iColumnOffset - 1, "#" );
 		}
 	f_poSelected = l_poElement;
@@ -715,23 +715,23 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 		{
 		case ( D_TYPE_LONG_INT ):
 			{
-			return ( ( ( long ) l_roLeftInfo ) - ( ( long ) l_roRightInfo ) );
+			return ( static_cast < long > ( l_roLeftInfo ) - static_cast < long > ( l_roRightInfo ) );
 			break;
 			}
 		case ( D_TYPE_DOUBLE ):
 			{
-			l_dDifference = ( ( double ) l_roLeftInfo ) - ( ( double ) l_roRightInfo );
+			l_dDifference = static_cast < double > ( l_roLeftInfo ) - static_cast < double > ( l_roRightInfo );
 			break;
 			}
 		case ( D_TYPE_HSTRING ):
 			{
-			return ( strcasecmp ( ( HString & ) l_roLeftInfo,
-					( ( HString & ) l_roRightInfo ) ) );
+			return ( strcasecmp ( static_cast < HString & > ( l_roLeftInfo ),
+					static_cast < HString & > ( l_roRightInfo ) ) );
 			break;
 			}
 		case ( D_TYPE_HTIME ):
 			{
-			l_dDifference = ( ( time_t ) ( HTime & ) l_roLeftInfo ) - ( ( time_t ) ( HTime & ) l_roRightInfo );
+			l_dDifference = static_cast < time_t > ( static_cast < HTime & > ( l_roLeftInfo ) ) - static_cast < time_t > ( static_cast < HTime & > ( l_roRightInfo ) );
 			break;
 			}
 		default :
@@ -750,7 +750,7 @@ void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 	f_iSortColumn = a_iColumn;
 	f_iOrder = a_iOrder;
 	f_lComparedItems = 0;
-	cmp = ( int ( HList<HItem>::* ) ( HElement *, HElement * ) ) & HListControl::cmpc;
+	cmp = static_cast < int ( HList<HItem>::* ) ( HElement *, HElement * ) > ( & HListControl::cmpc );
 	if ( f_iQuantity > 128 )
 		f_poParent->status_bar ( )->init_progress ( f_iQuantity * f_iQuantity / 2,
 				" Sorting ..." );
@@ -805,7 +805,7 @@ void HListControl::go_to_match ( void )
 		l_poItem = & f_poSelected->get_object ( );
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
 			{
-			l_pcHighlightStart = ( char * ) ( HString & ) ( * l_poItem ) [ l_iCtr ];
+			l_pcHighlightStart = static_cast < HString & > ( ( * l_poItem ) [ l_iCtr ] );
 			l_iCtrLoc = 0;
 			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
 					l_iDummy ) ) )
@@ -882,7 +882,7 @@ void HListControl::go_to_match_previous ( void )
 		l_poItem = & f_poSelected->get_object ( );
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
 			{
-			l_pcHighlightStart = ( char * ) ( HString & ) ( * l_poItem ) [ l_iCtr ];
+			l_pcHighlightStart = static_cast < HString & > ( ( * l_poItem ) [ l_iCtr ] );
 			l_iCtrLoc = 0;
 			if ( f_sMatch.f_iMatchNumber < 0 )
 				f_sMatch.f_iMatchNumber = f_oPattern.count ( l_pcHighlightStart );

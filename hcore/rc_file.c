@@ -61,8 +61,8 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 		if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc, l_iLine ) )
 			{
 			if ( n_iDebugLevel )
-				fprintf ( stderr, "option: [%s], value [%s]\n", ( char * ) l_oOption,
-						( char * ) l_oValue );
+				fprintf ( stderr, "option: [%s], value [%s]\n", static_cast < char * > ( l_oOption ),
+						static_cast < char * > ( l_oValue ) );
 			if ( a_pcSection )
 				{
 				if ( l_oValue.is_empty ( ) )
@@ -89,30 +89,30 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 						case ( D_TYPE_BOOL ):
 							{
 							rc_set_variable ( l_oValue,
-									* ( bool * ) a_psVaraibles [ l_iCtr ].f_pvValue );
+									* static_cast < bool * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
 							break;
 							}
 						case ( D_TYPE_CHAR ):
 							{
 							rc_set_variable ( l_oValue,
-									* ( char * ) a_psVaraibles [ l_iCtr ].f_pvValue );
+									* static_cast < char * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
 							break;
 							}
 						case ( D_TYPE_INT ):
 							{
 							rc_set_variable ( l_oValue,
-									* ( int * ) a_psVaraibles [ l_iCtr ].f_pvValue );
+									* static_cast < int * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
 							break;
 							}
 						case ( D_TYPE_CHAR_POINTER ):
 							{
 							rc_set_variable ( l_oValue,
-									( char ** ) a_psVaraibles [ l_iCtr ].f_pvValue );
+									static_cast < char ** > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
 							break;
 							}
 						case ( D_TYPE_HSTRING ):
 							{
-							( * ( HString * ) a_psVaraibles [ l_iCtr ].f_pvValue ) = l_oValue;
+							( * static_cast < HString * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) ) = l_oValue;
 							break;
 							}
 						default :
@@ -132,7 +132,7 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 				log << "failed." << endl;
 				l_oMessage.format ( "Error: unknown option found: `%s', "
 						"with value: `%s', on line %d.\n",
-						( char const * ) l_oOption, ( char const * ) l_oValue, l_iLine );
+						static_cast < char const * > ( l_oOption ), static_cast < char const * > ( l_oValue ), l_iLine );
 				log ( D_LOG_ERROR ) << l_oMessage;
 				fprintf ( stderr, l_oMessage );
 				}
@@ -171,7 +171,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 			}
 		return ( 0 );
 		}
-	if ( ! l_pcBuffer )l_pcBuffer = ( char * ) xcalloc ( l_iBlockSize );
+	if ( ! l_pcBuffer )l_pcBuffer = xcalloc ( l_iBlockSize, char );
 	a_roOption = a_roValue = "";
 #ifdef HAVE_GETLINE
 	while ( getline ( &l_pcBuffer, &l_iBlockSize, a_psFile ) > 0 )
@@ -187,7 +187,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 		fseek ( a_psFile, l_pcPtr - l_pcBuffer - l_iReadLen, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
 		/* we are looking for first non-whitespace on the line */
-		for ( l_iIndex = 0; l_iIndex < ( int ) ( l_iBlockSize - 1 ); l_iIndex++ )
+		for ( l_iIndex = 0; l_iIndex < static_cast < int > ( l_iBlockSize - 1 ); l_iIndex++ )
 			{
 			if ( ( l_pcBuffer [ l_iIndex ] == ' ')
 					|| ( l_pcBuffer [ l_iIndex ] == '\t' ) )continue;
@@ -200,7 +200,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 				break;
 				}
 			}
-		if ( ( l_iIndex > -1 ) && ( l_iIndex < ( int ) ( l_iBlockSize - 1 ) ) )
+		if ( ( l_iIndex > -1 ) && ( l_iIndex < static_cast < int > ( l_iBlockSize - 1 ) ) )
 			{
 			/* at this point we know we have _some_ option */
 			/* now we look for first whitespace after option */
@@ -233,7 +233,8 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 				l_pcBuffer [ l_iSub ] = 0;
 				a_roOption = l_pcBuffer + l_iIndex;
 				l_pcBuffer [ l_iSub ] = ' ';
-				for ( l_iIndex = l_iSub; l_iIndex < ( int ) ( l_iBlockSize - 1 );
+				for ( l_iIndex = l_iSub;
+						l_iIndex < static_cast < int > ( l_iBlockSize - 1 );
 						l_iIndex++ )
 					{
 					if ( ( l_pcBuffer [ l_iIndex ] == ' ')
@@ -242,11 +243,11 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 						{
 						if ( ( l_pcBuffer [ l_iIndex ] == '#' )
 								|| ( l_pcBuffer [ l_iIndex ] == '\r' )
-								|| ( l_pcBuffer [ l_iIndex ] == '\n' ) )l_iIndex = -99;
+								|| ( l_pcBuffer [ l_iIndex ] == '\n' ) )l_iIndex = - 99;
 						break;
 						}
 					}
-				if ( ( l_iIndex > -1 ) && ( l_iIndex < ( int ) ( l_iBlockSize - 1 ) ) )
+				if ( ( l_iIndex > - 1 ) && ( l_iIndex < static_cast < int > ( l_iBlockSize - 1 ) ) )
 					{
 					/* we have found a non-whitespace, so there certainly is a value */
 					l_iSub = l_iIndex;

@@ -119,8 +119,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_lNewSize )
 			f_lPoolSize = 1;
 			while ( f_lPoolSize < a_lNewSize )
 				f_lPoolSize <<= 1;
-			f_ptPool = ( tType * ) xrealloc ( f_ptPool,
-					f_lPoolSize * sizeof ( tType ) );
+			f_ptPool = xrealloc ( f_ptPool, f_lPoolSize, tType );
 			memset ( f_ptPool + l_lOldSize, 0,
 					( f_lPoolSize - l_lOldSize ) * sizeof ( tType ) );
 			}
@@ -130,8 +129,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_lNewSize )
 		if ( f_ptPool && ( f_ePoolType == D_HPOOL_FIXED_SIZE ) )
 			M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_REALLOC_FIXED ], f_lPoolSize );
 		f_lPoolSize = a_lNewSize;
-		f_ptPool = ( tType * ) xrealloc ( f_ptPool,
-				f_lPoolSize * sizeof ( tType ) );
+		f_ptPool = xrealloc ( f_ptPool, f_lPoolSize, tType );
 		}
 	return ( f_lPoolSize - l_lOldSize );
 	M_EPILOG
@@ -141,7 +139,7 @@ template < class tType >
 tType & HPool < tType >::operator [ ] ( int a_iIndex )
 	{
 	M_PROLOG
-	if ( ( a_iIndex < 0 ) || ( ( size_t ) a_iIndex >= f_lPoolSize ) )
+	if ( ( a_iIndex < 0 ) || ( static_cast < size_t > ( a_iIndex ) >= f_lPoolSize ) )
 		M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_BADINDEX ], a_iIndex );
 	return ( f_ptPool [ a_iIndex ] );
 	M_EPILOG

@@ -65,7 +65,7 @@ long int HWindowListControl::empty ( HElement* a_poElement )
 	HItem * l_poItem = & a_poElement->get_object ( );
 	if ( * l_poItem )
 		{
-		l_poWindow = ( HWindow * ) ( void * ) ( * l_poItem ) [ 0 ];
+		l_poWindow = static_cast < HWindow * > ( static_cast < void * > ( ( * l_poItem ) [ 0 ] ) );
 		if ( l_poWindow )delete l_poWindow;
 		l_poWindow = NULL;
 		}

@@ -107,7 +107,7 @@ void HSearchableControl::highlight ( int a_iRow, int a_iColumn,
 		l_cStopChar = l_pcHighlightStart [ l_iHighlightLength ];
 		l_pcHighlightStart [ l_iHighlightLength ] = 0;
 		::mvprintw ( a_iRow, a_iColumn
-				+ ( l_pcHighlightStart - ( char * ) f_oVarTmpBuffer ),
+				+ ( l_pcHighlightStart - static_cast < char * > ( f_oVarTmpBuffer ) ),
 				l_pcHighlightStart );
 		l_pcHighlightStart [ l_iHighlightLength ] = l_cStopChar;
 		l_pcHighlightStart ++;

@@ -99,7 +99,7 @@ HString HHandler::process_command ( void )
 		l_oCommand = f_oCommand.split ( " \t", 0 );
 		if ( f_oCommandHandlers.get ( l_oCommand, HANDLER ) )
 			{
-			( this->*HANDLER ) ( 0, ( char * ) f_oCommand );
+			( this->*HANDLER ) ( 0, static_cast < char * > ( f_oCommand ) );
 			f_oCommand = "";
 			}
 		}

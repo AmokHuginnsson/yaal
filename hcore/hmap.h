@@ -48,7 +48,7 @@ extern unsigned long const int * const g_pulPrimes;
 template < class tType >
 inline unsigned long int hash ( const tType & a_rtKey )
 	{
-	return ( ( unsigned long int ) a_rtKey );
+	return ( static_cast < unsigned long int > ( a_rtKey ) );
 	}
 
 template < class tType, class ttType >
@@ -141,7 +141,7 @@ HMap<tType, ttType>::HMap ( size_t a_iSize )
 	f_iIndex = 0;
 	f_poAtomPtr = NULL;
 	f_iPrime = a_iSize;
-	f_ppoAtomArray = ( HAtom ** ) xcalloc ( f_iPrime * sizeof ( HAtom * ) );
+	f_ppoAtomArray = xcalloc ( f_iPrime, HAtom * );
 	return;
 	M_EPILOG
 	}
@@ -151,7 +151,8 @@ HMap<tType, ttType>::~HMap ( void )
 	{
 	M_PROLOG
 	flush ( );
-	if ( f_ppoAtomArray )xfree ( f_ppoAtomArray );
+	if ( f_ppoAtomArray )
+		xfree ( f_ppoAtomArray );
 	f_ppoAtomArray = NULL;
 	return;
 	M_EPILOG

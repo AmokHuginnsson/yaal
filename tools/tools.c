@@ -78,7 +78,7 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		{
 		if ( ( a_roValue.get_length ( ) > 1 ) && ( a_roValue [ 0 ] == 'B' ) )
 			{
-			switch ( strtol ( ( ( char * ) a_roValue ) + 1, NULL, 10 ) )
+			switch ( strtol ( static_cast < char * > ( a_roValue ) + 1, NULL, 10 ) )
 				{
 				case ( 115200 ): l_iBaudRate = B115200; break;
 #if ( HAVE_DECL_B76800 )
@@ -116,24 +116,24 @@ void tools_init ( void )
 			set_tools_variables );
 	for ( l_iCtr = 0; l_iCtr < 256; l_iCtr ++ )
 		util::n_pcTransTableStripPL [ l_iCtr ] = l_iCtr;
-	util::n_pcTransTableStripPL [ ( unsigned char ) '±' ] = 'a';
-	util::n_pcTransTableStripPL [ ( unsigned char ) '¡' ] = 'A';
-	util::n_pcTransTableStripPL [ ( unsigned char ) 'æ' ] = 'c';
-	util::n_pcTransTableStripPL [ ( unsigned char ) 'Æ' ] = 'C';
-	util::n_pcTransTableStripPL [ ( unsigned char ) 'ê' ] = 'e';
-	util::n_pcTransTableStripPL [ ( unsigned char ) 'Ê' ] = 'E';
-	util::n_pcTransTableStripPL [ ( unsigned char ) '³' ] = 'l';
-	util::n_pcTransTableStripPL [ ( unsigned char ) '£' ] = 'L';
-	util::n_pcTransTableStripPL [ ( unsigned char ) 'ñ' ] = 'n';
-	util::n_pcTransTableStripPL [ ( unsigned char ) 'Ñ' ] = 'N';
-	util::n_pcTransTableStripPL [ ( unsigned char ) 'ó' ] = 'o';
-	util::n_pcTransTableStripPL [ ( unsigned char ) 'Ó' ] = 'O';
-	util::n_pcTransTableStripPL [ ( unsigned char ) '¶' ] = 's';
-	util::n_pcTransTableStripPL [ ( unsigned char ) '¦' ] = 'S';
-	util::n_pcTransTableStripPL [ ( unsigned char ) '¼' ] = 'z';
-	util::n_pcTransTableStripPL [ ( unsigned char ) '¬' ] = 'Z';
-	util::n_pcTransTableStripPL [ ( unsigned char ) '¿' ] = 'z';
-	util::n_pcTransTableStripPL [ ( unsigned char ) '¯' ] = 'Z';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '±' ) ] = 'a';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '¡' ) ] = 'A';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( 'æ' ) ] = 'c';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( 'Æ' ) ] = 'C';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( 'ê' ) ] = 'e';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( 'Ê' ) ] = 'E';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '³' ) ] = 'l';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '£' ) ] = 'L';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( 'ñ' ) ] = 'n';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( 'Ñ' ) ] = 'N';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( 'ó' ) ] = 'o';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( 'Ó' ) ] = 'O';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '¶' ) ] = 's';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '¦' ) ] = 'S';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '¼' ) ] = 'z';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '¬' ) ] = 'Z';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '¿' ) ] = 'z';
+	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '¯' ) ] = 'Z';
 	return;
 	}
 

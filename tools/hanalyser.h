@@ -39,6 +39,7 @@ namespace tools
 
 class HAnalyser : public hcore::HTree < hcore::HList < double * > >
 	{
+	typedef hcore::HTree < hcore::HList < double * > >::HNode * ANALYZER_NODE_PTR_t;
 	class HAnalyserNode;
 	friend class HAnalyserNode;
 	class HAnalyserNode : public hcore::HTree < hcore::HList < double * > > ::HNode

@@ -51,12 +51,13 @@ HS = .h
 SS = .c
 OS = .o
 CTAGS = @CTAGS@
+FIND = find
 .SUFFIXES:
 .SUFFIXES: $(SS) $(OS) $(OOS) $(HS)
 CXX = g++
 LXX = g++
 ARFLAGS = r
-WARNING_FLAGS =	\
+CWARNING_FLAGS =	\
 						@PEDANTIC_ERRORS@\
 						@EXTRA_WARNINGS@\
 						-Wall\
@@ -74,18 +75,21 @@ WARNING_FLAGS =	\
 						-Wsign-compare\
 						-Wundef\
 						-Wwrite-strings
-#						-Wid-clash-2\ #deprecated
 #						-Wbad-function-cast\
 						-Wmissing-declarations\
 						-Wmissing-prototypes\
 						-Wnested-externs\
 						-Wstrict-prototypes\
 						-Wtraditional\ #C only
-#						-Waggregate-return\ # useless
+#						-Waggregate-return\ # useless for C++
+CXXWARNING_FLAGS =	\
+						-Wsign-promo
+#						-Wold-style-cast\ # lots of warrnings from libc headers
+#						-Woverloaded-virtual\ # too much unecessary warrnings
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
-COMPILER_PRIME_FLAGS = -std=gnu++98 -pipe -fPIC -D__STDHAPI_BUILD__ -D_GNU_SOURCE @DEFS@ -march=i486
+COMPILER_PRIME_FLAGS = -fmessage-length=0 -std=gnu++98 -pipe -fPIC -D__STDHAPI_BUILD__ -D_GNU_SOURCE @DEFS@ -march=i486
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
@@ -101,77 +105,32 @@ LINKER_PRIME_FLAGS =	\
 								-Wl,--demangle\
 								-Wl,--export-dynamic\
 								-Wl,-soname,
-CXXFLAGS = $(WARNING_FLAGS) $(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) $(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS)
+CXXFLAGS = $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) $(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) $(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS)
 LINKER_FLAGS = $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 
 #	h-core
-OBJ4hcore =
-OBJ4hcore += harray
-OBJ4hcore += hcomplex
-OBJ4hcore += hcore
-OBJ4hcore += hexception
-OBJ4hcore += hfile
-OBJ4hcore += hflexiblelist
-OBJ4hcore += hflexibletree
-OBJ4hcore += hinfo
-OBJ4hcore += hinfolist
-OBJ4hcore += hlist
-OBJ4hcore += hlog
-OBJ4hcore += hmap
-OBJ4hcore += hmatrix
-OBJ4hcore += hpattern
-OBJ4hcore += hpool
-OBJ4hcore += hrandomizer
-OBJ4hcore += hrawfile
-OBJ4hcore += hsocket
-OBJ4hcore += hstream
-OBJ4hcore += hstring
-OBJ4hcore += hstringlist
-OBJ4hcore += hthread
-OBJ4hcore += htime
-OBJ4hcore += htree
-OBJ4hcore += hvector
-OBJ4hcore += rc_file
-OBJ4hcore += xalloc
-OBJ4hcore +=
+SRC4hcore = $(strip $(sort $(shell $(FIND) $(HCOREDIR) -name '*.c')))
+HDR4hcore = $(strip $(sort $(shell $(FIND) $(HCOREDIR) -name '*.h')))
+OBJ4hcore := $(SRC4hcore:.c=.o)
+SRCS := $(SRC4hcore)
 
 #	h-console
-OBJ4hconsole =
-OBJ4hconsole += console
-OBJ4hconsole += hcomboboxcontrol
-OBJ4hconsole += hconsole
-OBJ4hconsole += hcontrol
-OBJ4hconsole += hcontrollist
-OBJ4hconsole += heditcontrol
-OBJ4hconsole += hhandler
-OBJ4hconsole += hitem
-OBJ4hconsole += hlistcontrol
-OBJ4hconsole += hmainwindow
-OBJ4hconsole += hmenucontrol
-OBJ4hconsole += hprocess
-OBJ4hconsole += hsearchablecontrol
-OBJ4hconsole += hstatusbarcontrol
-OBJ4hconsole += htimecontrol
-OBJ4hconsole += htreecontrol
-OBJ4hconsole += hwindow
-OBJ4hconsole += hwindowlistcontrol
-OBJ4hconsole += mouse
-OBJ4hconsole += omenuitem
-OBJ4hconsole +=
+SRC4hconsole = $(strip $(sort $(shell $(FIND) $(HCONSOLEDIR) -name '*.c')))
+HDR4hconsole = $(strip $(sort $(shell $(FIND) $(HCONSOLEDIR) -name '*.h')))
+OBJ4hconsole := $(SRC4hconsole:.c=.o)
+SRCS += $(SRC4hconsole)
 
 # tools
-OBJ4tools =
-OBJ4tools += bit
-OBJ4tools += hanalyser
-OBJ4tools += hcollector
-OBJ4tools += hdes
-OBJ4tools += hserial
-OBJ4tools += signals
-OBJ4tools += tools
-OBJ4tools += util
-OBJ4tools +=
+SRC4tools = $(strip $(sort $(shell $(FIND) $(TOOLSDIR) -name '*.c')))
+HDR4tools = $(strip $(sort $(shell $(FIND) $(TOOLSDIR) -name '*.h')))
+OBJ4tools := $(SRC4tools:.c=.o)
+SRCS += $(SRC4tools)
 
 # dbwrapper
+SRC4dbwrapper = $(strip $(sort $(shell $(FIND) $(DBWRAPPERDIR) -name '*.c' -a ! -name '*_driver.c')))
+HDR4dbwrapper = $(strip $(sort $(shell $(FIND) $(DBWRAPPERDIR) -name '*.h')))
+OBJ4dbwrapper := $(SRC4dbwrapper:.c=.o)
+SRCS += $(SRC4dbwrapper)
 ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
 	OBJ4mysql_driver = 
 	OBJ4mysql_driver += mysql_driver
@@ -188,49 +147,13 @@ ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
 	OBJ4sqlite3_driver = 
 	OBJ4sqlite3_driver += sqlite3_driver
 endif # SQLITE3_DRIVER
-OBJ4dbwrapper = 
-OBJ4dbwrapper += db_driver_loader
-OBJ4dbwrapper += dbwrapper
-OBJ4dbwrapper += hdatabase
-OBJ4dbwrapper += hrecordset
-OBJ4dbwrapper += 
 
 #	h-data
-OBJ4hdata =
-OBJ4hdata += hdataprocess
-OBJ4hdata += hdatacontrol
-OBJ4hdata += hdataeditcontrol
-OBJ4hdata += hdatalistcontrol
-OBJ4hdata += hdatastatusbarcontrol
-OBJ4hdata += hdatatreecontrol
-OBJ4hdata += hdatawindow
-OBJ4hdata += oresource
-OBJ4hdata += 
+SRC4hdata = $(strip $(sort $(shell $(FIND) $(HDATADIR) -name '*.c')))
+HDR4hdata = $(strip $(sort $(shell $(FIND) $(HDATADIR) -name '*.h')))
+OBJ4hdata := $(SRC4hdata:.c=.o)
+SRCS += $(SRC4hdata)
 
-#-------------------------------------------------------------------
-
-OBJ4hcore := $(strip $(OBJ4hcore))
-OBJ4hcore := $(patsubst %,$(HCOREDIR)%.o, $(OBJ4hcore))
-HDR4hcore := $(patsubst %.o,%.h, $(OBJ4hcore))
-SRCS := $(patsubst %.h,%.c, $(HDR4hcore))
-
-OBJ4hconsole := $(strip $(OBJ4hconsole))
-OBJ4hconsole := $(patsubst %,$(HCONSOLEDIR)%.o, $(OBJ4hconsole))
-HDR4hconsole := $(patsubst %.o,%.h, $(OBJ4hconsole))
-SRCS += $(patsubst %.h,%.c, $(HDR4hconsole))
-
-OBJ4tools := $(strip $(OBJ4tools))
-OBJ4tools := $(patsubst %,$(TOOLSDIR)%.o, $(OBJ4tools))
-HDR4tools := $(patsubst %.o,%.h, $(OBJ4tools))
-SRCS += $(patsubst %.h,%.c, $(HDR4tools))
-
-OBJ4hdata := $(strip $(OBJ4hdata))
-OBJ4hdata := $(patsubst %,$(HDATADIR)%.o, $(OBJ4hdata))
-HDR4hdata := $(patsubst %.o,%.h, $(OBJ4hdata))
-SRCS += $(patsubst %.h,%.c, $(HDR4hdata))
-
-OBJ4dbwrapper := $(strip $(OBJ4dbwrapper))
-OBJ4dbwrapper := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4dbwrapper))
 ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
 	OBJ4mysql_driver := $(strip $(OBJ4mysql_driver))
 	OBJ4mysql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4mysql_driver))
@@ -247,8 +170,7 @@ ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
 	OBJ4sqlite3_driver := $(strip $(OBJ4sqlite3_driver))
 	OBJ4sqlite3_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite3_driver))
 endif # SQLITE3_DRIVER
-HDR4dbwrapper := $(patsubst %.o,%.h, $(OBJ4dbwrapper))
-SRCS += $(patsubst %.h,%.c, $(HDR4dbwrapper))
+
 ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
 	SRCS += $(patsubst %.o,%.c, $(OBJ4mysql_driver))
 endif # MYSQL_DRIVER
@@ -261,6 +183,8 @@ endif # SQLITE_DRIVER
 ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
 	SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite3_driver))
 endif # SQLITE3_DRIVER
+
+#-------------------------------------------------------------------
 
 DEPS=$(subst ~, -MT ,$(join $(patsubst %.c,"%.c~", $(sort $(SRCS))),$(sort $(patsubst %.c,%.o,$(SRCS)))))
 
@@ -358,6 +282,7 @@ dep: .depend
 	@echo -n 'Making dependicies ... '
 	@set -e; for DEP in $(DEPS); do $(CXX) $(CXXFLAGS) -MM $${DEP} ; done > .depend
 	@echo "# vim:ft=make:" >> .depend
+	@/bin/rm -f make.log
 	@echo 'done.'
 
 clean:

@@ -87,7 +87,7 @@ void HMainWindow::init_menu ( HProcess * a_psProcess, OMenuItem * a_psMenu )
 	M_EPILOG
 	}
 
-int HMainWindow::handler_close ( int a_iCode )
+int HMainWindow::handler_close ( int a_iCode, void * )
 	{
 	M_PROLOG
 	a_iCode = D_KEY_COMMAND_('x');

@@ -89,7 +89,7 @@ void HString::hs_realloc ( const size_t a_iSize )
 		l_iOldLength = f_iSize;
 		f_iSize = 1;
 		while ( f_iSize < a_iSize )f_iSize <<= 1;
-		f_pcBuffer = ( char * ) xrealloc ( f_pcBuffer, f_iSize );
+		f_pcBuffer = xrealloc ( f_pcBuffer, f_iSize, char );
 		memset ( f_pcBuffer + l_iOldLength, 0, f_iSize - l_iOldLength );
 		}
 	return;
@@ -195,7 +195,7 @@ HString & HString::operator = ( const HString & a_roString )
 HString HString::operator + ( const HString & a_roString ) const
 	{
 	M_PROLOG
-	return ( ( * this ) + ( char const * ) a_roString );
+	return ( ( * this ) + static_cast < char const * > ( a_roString ) );
 	M_EPILOG
 	}
 
@@ -231,7 +231,7 @@ HString HString::operator + ( char const a_cChar ) const
 HString HString::operator + ( const int a_iInt ) const
 	{
 	M_PROLOG
-	return ( * this + ( long ) a_iInt );
+	return ( * this + static_cast < long > ( a_iInt ) );
 	M_EPILOG
 	}
 
@@ -240,7 +240,7 @@ HString HString::operator + ( const long int a_lLong ) const
 	M_PROLOG
 	HString l_oStr;
 	HString l_oLong;
-	l_oStr = ( f_pcBuffer ? ( char const * ) * this : "" );
+	l_oStr = ( f_pcBuffer ? static_cast < char const * > ( * this ) : "" );
 	l_oLong = a_lLong;
 	return ( l_oStr + l_oLong );
 	M_EPILOG
@@ -251,7 +251,7 @@ HString HString::operator + ( const double a_dDouble ) const
 	M_PROLOG
 	HString l_oStr;
 	HString l_oDouble;
-	l_oStr = ( f_pcBuffer ? ( char const * ) * this : "" );
+	l_oStr = ( f_pcBuffer ? static_cast < char const * > ( * this ) : "" );
 	l_oDouble = a_dDouble;
 	return ( l_oStr + l_oDouble );
 	M_EPILOG
@@ -262,7 +262,7 @@ HString HString::operator + ( const void * a_pvVoidPtr ) const
 	M_PROLOG
 	HString l_oStr;
 	HString l_oVoidPtr;
-	l_oStr = ( f_pcBuffer ? ( char const * ) * this : "" );
+	l_oStr = ( f_pcBuffer ? static_cast < char const * > ( * this ) : "" );
 	l_oVoidPtr = a_pvVoidPtr;
 	return ( l_oStr + l_oVoidPtr );
 	M_EPILOG
@@ -279,7 +279,7 @@ char & HString::operator [ ] ( const int a_iIndex ) const
 	{
 	M_PROLOG
 	int l_iLength = get_length ( );
-	if  ( ( ( size_t ) a_iIndex >= f_iSize ) || ( a_iIndex > l_iLength ) )
+	if  ( ( static_cast < size_t > ( a_iIndex ) >= f_iSize ) || ( a_iIndex > l_iLength ) )
 		M_THROW ( "index out of bound", a_iIndex );
 	return ( f_pcBuffer [ a_iIndex ] );
 	M_EPILOG
@@ -288,7 +288,7 @@ char & HString::operator [ ] ( const int a_iIndex ) const
 bool HString::operator == ( const HString & a_roString ) const
 	{
 	M_PROLOG
-	return ( * this == ( char const * ) a_roString );
+	return ( * this == static_cast < char const * > ( a_roString ) );
 	M_EPILOG
 	}
 
@@ -302,7 +302,7 @@ bool HString::operator == ( char const * a_pcStr ) const
 bool HString::operator != ( const HString & a_roString ) const
 	{
 	M_PROLOG
-	return ( * this != ( char const * ) a_roString );
+	return ( * this != static_cast < char const * > ( a_roString ) );
 	M_EPILOG
 	}
 
@@ -316,7 +316,7 @@ bool HString::operator != ( char const * a_pcStr ) const
 bool HString::operator >= ( const HString & a_roString ) const
 	{
 	M_PROLOG
-	return ( * this >= ( char const * ) a_roString );
+	return ( * this >= static_cast < char const * > ( a_roString ) );
 	M_EPILOG
 	}
 
@@ -332,7 +332,7 @@ bool HString::operator >= ( char const * a_pcStr ) const
 bool HString::operator <= ( const HString & a_roString ) const
 	{
 	M_PROLOG
-	return ( * this <= ( char const * ) a_roString );
+	return ( * this <= static_cast < char const * > ( a_roString ) );
 	M_EPILOG
 	}
 
@@ -348,7 +348,7 @@ bool HString::operator <= ( char const * a_pcStr ) const
 bool HString::operator > ( const HString & a_roString ) const
 	{
 	M_PROLOG
-	return ( * this > ( char const * ) a_roString );
+	return ( * this > static_cast < char const * > ( a_roString ) );
 	M_EPILOG
 	}
 
@@ -364,7 +364,7 @@ bool HString::operator > ( char const * a_pcStr ) const
 bool HString::operator < ( const HString & a_roString ) const
 	{
 	M_PROLOG
-	return ( * this < ( char const * ) a_roString );
+	return ( * this < static_cast < char const * > ( a_roString ) );
 	M_EPILOG
 	}
 
@@ -394,9 +394,9 @@ int HString::get_length ( void ) const
 	M_PROLOG
 	int l_iLength = 0;
 	if ( ! f_pcBuffer )
-		M_THROW ( "no buffer.", ( int ) f_pcBuffer );
+		M_THROW ( "no buffer.", reinterpret_cast < int > ( f_pcBuffer ) );
 	l_iLength = strlen ( f_pcBuffer );
-	if ( ( size_t ) l_iLength > f_iSize )
+	if ( static_cast < size_t > ( l_iLength ) > f_iSize )
 		M_THROW ( "no terminating null!", l_iLength );
 	return ( l_iLength );
 	M_EPILOG
@@ -424,10 +424,11 @@ HString & HString::format ( char const * a_pcFormat, ... )
 int HString::find ( char a_cChar, int a_iAfter ) const
 	{
 	M_PROLOG
-	if ( ( a_iAfter < 0 ) || ( a_iAfter >= ( int ) strlen ( f_pcBuffer ) ) ) return ( -1 );
+	if ( ( a_iAfter < 0 ) || ( a_iAfter >= static_cast < int > ( strlen ( f_pcBuffer ) ) ) )
+		return ( -1 );
 	char * l_pcStr = strchr ( f_pcBuffer + a_iAfter, a_cChar );
-	if ( ! l_pcStr )return ( -1 );
-	return ( ( int ) ( l_pcStr - f_pcBuffer ) );
+	if ( ! l_pcStr )return ( - 1 );
+	return ( static_cast < int > ( ( l_pcStr - f_pcBuffer ) ) );
 	M_EPILOG
 	}
 
@@ -435,10 +436,12 @@ int HString::find ( char const * a_pcPattern, int a_iAfter ) const
 	{
 	M_PROLOG
 	if ( ( ! a_pcPattern ) || ( a_iAfter < 0 ) ) return ( -1 );
-	if ( ( ! strlen ( a_pcPattern ) ) || ( ( int ) strlen ( f_pcBuffer ) <= a_iAfter ) )return ( -1 );
+	if ( ( ! strlen ( a_pcPattern ) )
+			|| ( static_cast < int > ( strlen ( f_pcBuffer ) ) <= a_iAfter ) )
+		return ( -1 );
 	char * l_pcStr = strstr ( f_pcBuffer + a_iAfter, a_pcPattern );
 	if ( ! l_pcStr )return ( -1 );
-	return ( ( int ) ( l_pcStr - f_pcBuffer ) );
+	return ( static_cast < int > ( ( l_pcStr - f_pcBuffer ) ) );
 	M_EPILOG
 	}
 
@@ -446,13 +449,15 @@ int HString::reverse_find ( char a_cChar, int a_iBefore ) const
 	{
 	M_PROLOG
 	
-	if ( ( a_iBefore < 0 ) || ( a_iBefore >= ( int ) strlen ( f_pcBuffer ) ) ) return ( -1 );
+	if ( ( a_iBefore < 0 )
+			|| ( a_iBefore >= static_cast < int > ( strlen ( f_pcBuffer ) ) ) )
+		return ( - 1 );
 	char l_cTmp = * ( f_pcBuffer + a_iBefore );
 	* ( f_pcBuffer + a_iBefore ) = 0;
 	char * l_pcStr = strchr ( f_pcBuffer, a_cChar );
 	* ( f_pcBuffer + a_iBefore ) = l_cTmp;
 	if ( ! l_pcStr )return ( -1 );
-	return ( ( int ) ( l_pcStr - f_pcBuffer ) );
+	return ( static_cast < int > ( ( l_pcStr - f_pcBuffer ) ) );
 	M_EPILOG
 	}
 

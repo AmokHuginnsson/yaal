@@ -141,8 +141,8 @@ int HDataWindow::init ( void )
 				l_sEditControlResource.f_bPassword = false;
 				l_sEditControlResource.f_iMaxHistoryLevel = 8;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
-					l_psECR = ( OEditControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
-				l_poDataControl = ( HDataControl * ) new HDataEditControl ( this,
+					l_psECR = static_cast < OEditControlResource * > ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
+				l_poDataControl = new HDataEditControl ( this,
 						M_SETUP_STANDART, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
 						l_psECR->f_pcMask, l_psECR->f_bReplace, l_psECR->f_bRightAligned,
 						l_psECR->f_bMultiLine, l_psECR->f_bPassword,
@@ -157,7 +157,7 @@ int HDataWindow::init ( void )
 				l_sListControlResource.f_bSearchable = true;
 				l_sListControlResource.f_bDrawHeader = true;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
-					l_psLCR = ( OListControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
+					l_psLCR = static_cast < OListControlResource * > ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				l_poDataControl = new HDataListControl ( this, this, M_SETUP_STANDART,
 						l_psLCR->f_bCheckable, l_psLCR->f_bSortable, l_psLCR->f_bSearchable,
 						l_psLCR->f_bDrawHeader, M_SETUP_ATTRIBUTES );
@@ -326,7 +326,7 @@ void HDataWindow::sync ( void )
 		l_iCount = f_oEditModeControls.quantity ( );
 		if ( f_oValues.quantity ( ) >= l_iCount )
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-				f_oValues [ l_iCtr ] = ( HString & ) ( HInfo ) * ( HControl * ) f_oEditModeControls [ l_iCtr ];
+				f_oValues [ l_iCtr ] = static_cast < HInfo > ( * static_cast < HControl * > ( f_oEditModeControls [ l_iCtr ] ) );
 		m_lId = f_poMainControl->get_current_id ( );
 		}
 	return;
