@@ -236,3 +236,14 @@ void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 	M_EPILOG
 	}
 
+int HControl::click ( mouse::OMouse & a_rsMouse )
+	{
+	M_PROLOG
+	if ( a_rsMouse.f_iButtons )
+		{
+
+		}
+	return ( 0 );
+	M_EPILOG
+	}
+
