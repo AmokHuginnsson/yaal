@@ -134,9 +134,9 @@ statusbar_attribute WHITE BLACK LIGHTGRAY BLACK
 # ignore_signal_(SIGINT|SIGTSTP|SIGQUIT)
 # type: bool, default: false
 # this option tells if process should ignore recievied signal
-ignore_signal_SIGINT true
-ignore_signal_SIGTSTP true
-ignore_signal_SIGQUIT true
+ignore_signal_SIGINT false
+ignore_signal_SIGTSTP false
+ignore_signal_SIGQUIT false
 
 # serial port configuration
 
