@@ -125,11 +125,12 @@ public:
 	virtual tType & add_orderly ( tType, int = D_ASCENDING ); /* adds element in
 																															 the way that
 																															 keeps order */
-	virtual tType remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED, int * = D_TREAT_AS_CLOSED );    
-	/* rmoves element at current cursor position */
-	virtual tType remove_at ( int, int * = D_BLOCK_IF_NOT_EMPTIED, int * = D_TREAT_AS_CLOSED );
-	virtual tType remove_head ( int * = D_BLOCK_IF_NOT_EMPTIED );
-	virtual tType remove_tail ( int * = D_BLOCK_IF_NOT_EMPTIED );
+	virtual tType * remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED,
+			int * = D_TREAT_AS_CLOSED );	/* rmoves element at current cursor position */
+	virtual tType * remove_at ( int, int * = D_BLOCK_IF_NOT_EMPTIED,
+			int * = D_TREAT_AS_CLOSED );
+	virtual tType * remove_head ( int * = D_BLOCK_IF_NOT_EMPTIED );
+	virtual tType * remove_tail ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	/* sets cursor at specified index or number */
 	virtual tType & go ( int, int * = D_SEARCH_AFTER_ORDER );
 	virtual tType & operator [ ] ( int );
@@ -471,7 +472,7 @@ tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 	}
 
 template < class tType >
-tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat )
+tType * HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat )
 	{
 	M_PROLOG
 	/* This one cant be initialised cause we don't know what it is,
@@ -486,7 +487,7 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat 
 	 * error code by reference. */
 	int l_iFlag, * l_piFlag = & l_iFlag;
 	int l_iTreat, * l_piTreat = & l_iTreat;
-	tType l_oObject;
+	tType * l_ptObject = NULL;
 	HElement * l_poElement = NULL;
 	/* watch out, this is sticky ! */
 	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )l_piFlag = a_piFlag;
@@ -509,7 +510,7 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat 
 				case ( ( int ) D_BLOCK_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_ERROR;
-					return ( l_poElement->f_tObject );
+					return ( & l_poElement->f_tObject );
 					break;
 					}
 				case ( ( int ) D_EMPTY_IF_NOT_EMPTIED ):
@@ -520,7 +521,7 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat 
 					}
 				case ( ( int ) D_FORCE_REMOVE_ELEMENT ):
 					{
-					l_oObject = l_poElement->f_tObject;
+					l_ptObject = & l_poElement->f_tObject;
 					* l_piFlag = D_WAS_NOT_EMPTIED;
 					break;
 					}
@@ -552,17 +553,17 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat 
 		f_poIndex = NULL;
 		f_iIndex = 0;
 		}
-	return ( l_oObject );
+	return ( l_ptObject );
 	M_EPILOG
 	}
 
 template < class tType >
-tType HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
+tType * HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
 	{
 	M_PROLOG
 	int l_iFlag, * l_piFlag = & l_iFlag;
 	int l_iTreat, * l_piTreat = & l_iTreat;
-	tType l_oObject; 
+	tType * l_ptObject = NULL;
 	HElement * l_poElement = NULL;
 	/* watch out, this is sticky ! */
 	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )l_piFlag = a_piFlag;
@@ -579,7 +580,7 @@ tType HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
 				case ( ( int ) D_BLOCK_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_ERROR;
-					return ( l_poElement->f_tObject );
+					return ( & l_poElement->f_tObject );
 					break;
 					}
 				case ( ( int ) D_EMPTY_IF_NOT_EMPTIED ):
@@ -590,7 +591,7 @@ tType HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
 					}
 				case ( ( int ) D_FORCE_REMOVE_ELEMENT ):
 					{
-					l_oObject = l_poElement->f_tObject;
+					l_ptObject = & l_poElement->f_tObject;
 					* l_piFlag = D_WAS_NOT_EMPTIED;
 					break;
 					}
@@ -618,16 +619,16 @@ tType HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
 		}
 	f_iIndex = 0;
 	f_poIndex = NULL;
-	return ( l_oObject );
+	return ( l_ptObject );
 	M_EPILOG
 	}
 
 template < class tType >
-tType HList< tType >::remove_head ( int * a_piFlag )
+tType * HList< tType >::remove_head ( int * a_piFlag )
 	{
 	M_PROLOG
 	int l_iFlag, * l_piFlag = & l_iFlag;
-	tType l_oObject;
+	tType * l_ptObject = NULL;
 	HElement* l_poElement;
 	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
 		l_piFlag = a_piFlag;							/* watch out ! */
@@ -643,7 +644,7 @@ tType HList< tType >::remove_head ( int * a_piFlag )
 				case ( ( int ) D_BLOCK_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_ERROR;
-					return ( l_poElement->f_tObject );
+					return ( & l_poElement->f_tObject );
 					break;
 					}
 				case ( ( int ) D_EMPTY_IF_NOT_EMPTIED ):
@@ -654,7 +655,7 @@ tType HList< tType >::remove_head ( int * a_piFlag )
 					}
 				case ( ( int ) D_FORCE_REMOVE_ELEMENT ):
 					{
-					l_oObject = l_poElement->f_tObject;
+					l_ptObject = & l_poElement->f_tObject;
 					* l_piFlag = D_WAS_NOT_EMPTIED;
 					break;
 					}
@@ -678,16 +679,16 @@ tType HList< tType >::remove_head ( int * a_piFlag )
 		f_poIndex = NULL;
 		f_iIndex = 0;
 		}
-	return ( l_oObject );
+	return ( l_ptObject );
 	M_EPILOG
 	}
 	
 template < class tType >
-tType HList< tType >::remove_tail ( int * a_piFlag )
+tType * HList< tType >::remove_tail ( int * a_piFlag )
 	{
 	M_PROLOG
 	int l_iFlag, * l_piFlag = & l_iFlag;
-	tType l_oObject;
+	tType * l_ptObject = NULL;
 	HElement* l_poElement;
 	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
 		l_piFlag = a_piFlag;							/* watch out ! */
@@ -702,7 +703,7 @@ tType HList< tType >::remove_tail ( int * a_piFlag )
 				case ( ( int ) D_BLOCK_IF_NOT_EMPTIED ):
 					{
 					* l_piFlag = D_ERROR;
-					return ( l_poElement->f_tObject );
+					return ( & l_poElement->f_tObject );
 					break;
 					}
 				case ( ( int ) D_EMPTY_IF_NOT_EMPTIED ):
@@ -713,7 +714,7 @@ tType HList< tType >::remove_tail ( int * a_piFlag )
 					}
 				case ( ( int ) D_FORCE_REMOVE_ELEMENT ):
 					{
-					l_oObject = l_poElement->f_tObject;
+					l_ptObject = & l_poElement->f_tObject;
 					* l_piFlag = D_WAS_NOT_EMPTIED;
 					break;
 					}
@@ -741,7 +742,7 @@ tType HList< tType >::remove_tail ( int * a_piFlag )
 			}
 		}
 	else throw new HException ( __WHERE__, "list was empty.", g_iErrNo );
-	return ( l_oObject );
+	return ( l_ptObject );
 	M_EPILOG
 	}
 	

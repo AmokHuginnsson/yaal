@@ -582,12 +582,12 @@ void HListControl::recalculate_column_widths ( void )
 	M_EPILOG
 	}
 
-HItem HListControl::remove_element ( int * a_piFlag )
+HItem * HListControl::remove_element ( int * a_piFlag )
 	{
 	M_PROLOG
 	bool l_bFlag = true;
 	HElement * l_poElement = NULL;
-	HItem l_oItem;
+	HItem * l_poItem = NULL;
 	if ( f_iControlOffset
 			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_iQuantity ) )
 		{
@@ -610,18 +610,18 @@ HItem HListControl::remove_element ( int * a_piFlag )
 		f_poSelected = l_poElement;
 		}
 	console::n_bNeedRepaint = true;
-	l_oItem = HList < HItem > ::remove_element ( a_piFlag );
+	l_poItem = HList < HItem > ::remove_element ( a_piFlag );
 	if ( l_bFlag )to_head ( );
 	refresh ( );
-	return ( l_oItem );
+	return ( l_poItem );
 	M_EPILOG
 	}
 
-HItem HListControl::remove_tail ( int * a_piFlag )
+HItem * HListControl::remove_tail ( int * a_piFlag )
 	{
 	M_PROLOG
 	HElement * l_poElement = NULL;
-	HItem l_oItem;
+	HItem * l_poItem = NULL;
 	if ( f_iControlOffset
 			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_iQuantity )  )
 		{
@@ -640,9 +640,9 @@ HItem HListControl::remove_tail ( int * a_piFlag )
 	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
 		f_iCursorPosition --;
 	console::n_bNeedRepaint = true;
-	l_oItem = HList < HItem > ::remove_tail ( a_piFlag );
+	l_poItem = HList < HItem > ::remove_tail ( a_piFlag );
 	if ( console::is_enabled ( ) )refresh ( );
-	return ( l_oItem );
+	return ( l_poItem );
 	M_EPILOG
 	}
 
