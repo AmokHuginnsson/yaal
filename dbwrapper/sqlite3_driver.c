@@ -56,9 +56,13 @@ typedef struct
 
 sqlite_db * g_psBrokenDB = NULL;
 
+void * db_query ( void *, const char * );
+void db_unquery ( void * );
+
 void * db_connect ( const char * a_pcDataBase,
 		const char *, const char * )
 	{
+	void * l_pvPtr = NULL;
 	sqlite_db * l_psSQLite = ( sqlite_db * ) xcalloc ( sizeof ( sqlite_db ) );
 	l_psSQLite->f_iErrorCode = sqlite3_open ( a_pcDataBase,
 			& l_psSQLite->f_psDB );
@@ -67,6 +71,13 @@ void * db_connect ( const char * a_pcDataBase,
 		l_psSQLite->f_pcErrorMessage = xstrdup ( sqlite3_errmsg ( l_psSQLite->f_psDB ) );
 		g_psBrokenDB = l_psSQLite;
 		l_psSQLite = NULL;
+		}
+	else
+		{
+		l_pvPtr = db_query ( l_psSQLite, "PRAGMA empty_result_callbacks = ON;" );
+		if ( l_pvPtr )
+			db_unquery ( l_pvPtr );
+		else g_psBrokenDB = l_psSQLite, l_psSQLite = NULL;
 		}
 	return ( l_psSQLite );
 	}
