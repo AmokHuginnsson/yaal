@@ -147,7 +147,7 @@ int HCollector::wait_for_connection ( void )
 	return ( l_iErr );
 	}
 
-void HCollector::read_colector ( void ( * process_line ) ( char *, int ) ) 
+void HCollector::read_collector ( void ( * process_line ) ( char *, int ) ) 
 	{
 	char * l_pcLine = NULL;
 	f_iLines = 0;

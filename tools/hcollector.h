@@ -54,7 +54,7 @@ public:
 	int receive_line ( char * & );
 	int establish_connection ( void );
 	int wait_for_connection ( void );
-	void read_colector ( void ( * ) ( char *, int ) );
+	void read_collector ( void ( * ) ( char *, int ) );
 	/*}*/
 protected:
 	/*{*/
