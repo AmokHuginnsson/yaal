@@ -86,8 +86,8 @@ bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_SQLITE3;
 		else
 			{
-			::log ( D_LOG_ERROR ) << "Error: `" << a_roValue;
-			::log << "' is unknown driver." << endl;
+			log ( D_LOG_ERROR ) << "Error: `" << a_roValue;
+			log << "' is unknown driver." << endl;
 			exit ( 1 );
 			}
 		}

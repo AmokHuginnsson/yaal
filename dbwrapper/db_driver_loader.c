@@ -104,67 +104,67 @@ namespace dbwrapper
 
 void * null_db_connect ( const char *, const char *, const char * )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_connect)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_connect)" ) << endl;
 	return ( NULL );
 	}
 
 void null_db_disconnect ( void * )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_disconnect)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_disconnect)" ) << endl;
 	return;
 	}
 
 int null_db_errno ( void * )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_errno)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_errno)" ) << endl;
 	return ( 0 );
 	}
 
 const char * null_db_error ( void * )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "db_error)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "db_error)" ) << endl;
 	return ( NULL );
 	}
 
 void * null_db_query ( void *, const char * )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_query)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_query)" ) << endl;
 	return ( NULL );
 	}
 
 void null_db_unquery ( void * )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_unquery)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_unquery)" ) << endl;
 	return;
 	}
 
 char * null_rs_get ( void *, int, int )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_get)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_get)" ) << endl;
 	return ( NULL );
 	}
 
 int null_rs_fields_count ( void * )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_fields_count)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_fields_count)" ) << endl;
 	return ( 0 );
 	}
 
 long int null_rsdb_records_count ( void *, void * = NULL )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rsdb_records_count)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(rsdb_records_count)" ) << endl;
 	return ( 0 );
 	}
 
 long int null_rsdb_id ( void *, void * )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rsdb_id)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(rsdb_id)" ) << endl;
 	return ( 0 );
 	}
 
 char * null_rs_column_name ( void *, int )
 	{
-	::log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_column_name)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(rs_column_name)" ) << endl;
 	return ( NULL );
 	}
 
@@ -174,7 +174,7 @@ void dbwrapper_error ( void )
 	{
 	HString l_oMessage;
 	l_oMessage = dlerror ( );
-	::log ( D_LOG_ERROR ) << l_oMessage << endl;
+	log ( D_LOG_ERROR ) << l_oMessage << endl;
 	fprintf ( stderr, "(%s), ", ( char * ) l_oMessage );
 	return;
 	}
@@ -209,8 +209,8 @@ void load_driver ( void )
 			{
 			if ( ( ( l_iCtr - 1 ) == D_DB_DRIVER_MYSQL ) && ! n_pcDefaultSockPath )
 				n_pcDefaultSockPath = xstrdup ( "/var/run/mysqld/mysqld.sock" );
-			::log ( D_LOG_NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
-			::log << "] driver." << endl;
+			log ( D_LOG_NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
+			log << "] driver." << endl;
 			}
 		fprintf ( stderr, x_tag_g_pcDone );
 		fprintf ( stderr, "Linking symbols ... " );
