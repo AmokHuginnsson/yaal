@@ -40,7 +40,7 @@ extern const char * g_ppcErrMsgHMatrix [ ];
 #include "hvector.h"
 
 template < class tType >
-class HMatrix : public HArray < HVector < tType > * >
+class HMatrix : public HArray < HVector < tType > >
 	{
 protected:
 	/* { */
@@ -53,7 +53,7 @@ public:
 	HMatrix ( const HMatrix &, int = 0 );
 	virtual ~HMatrix ( void );
 	int set ( tType * * );
-	int set ( HVector < tType > * );
+	int set ( HVector < tType > );
 	int row ( void );
 	int col ( void );
 	tType det ( void );
@@ -93,7 +93,8 @@ HVector < tType > T ( HMatrix < tType > &, HVector < tType > & );
 
 template < class tType >
 HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
-									:	HArray < HVector < tType > * > ( a_iRows )
+									:	HArray < HVector < tType > > ( a_iRows,
+											HVector < tType > ( a_iColumns ) )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -103,18 +104,14 @@ HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
 	if ( a_iColumns < 1 )
 		throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_BADCOLUMNS ], a_iColumns );
 	else f_iColumns = a_iColumns;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		{
-		if ( ! ( f_ptArray [ l_iCtr ] = new HVector < tType > ( f_iColumns ) ) )
-			throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_NEWRETURNEDNULL ], l_iCtr );
-		}
 	return ;
 	M_EPILOG
 	}
 	
 template < class tType >
 HMatrix < tType > ::HMatrix ( const HMatrix & a_roMatrix, int )
-									:	HArray < HVector < tType > * > ( a_roMatrix.f_iRows )
+									:	HArray < HVector < tType > > ( a_roMatrix.f_iRows,
+											HVector < tType > ( a_roMatrix.f_iColumns ) )
 	{
 	M_PROLOG
 	f_iColumns = 0;
@@ -124,16 +121,9 @@ HMatrix < tType > ::HMatrix ( const HMatrix & a_roMatrix, int )
 	}
 	
 template < class tType >
-HMatrix < tType > ::~HMatrix ( void )
+HMatrix < tType > :: ~ HMatrix ( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		{
-		if ( f_ptArray [ l_iCtr ] )
-			delete f_ptArray [ l_iCtr ];
-		f_ptArray [ l_iCtr ] = NULL;
-		}
 	return;
 	M_EPILOG
 	}
@@ -150,7 +140,7 @@ int HMatrix < tType > ::set ( tType ** d )
 	}
 	
 template < class tType >
-int HMatrix < tType > ::set ( HVector < tType > * a_poVector )
+int HMatrix < tType > ::set ( HVector < tType > a_poVector )
 	{
 	M_PROLOG
 	int l_iCtr;
@@ -286,24 +276,13 @@ HMatrix < tType > & HMatrix < tType > ::operator = ( const HMatrix & a_roMatrix 
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( & a_roMatrix != this )return ( * this );
+	if ( & a_roMatrix == this )return ( * this );
 	
 	if ( ( f_iRows > 0 ) &&  ( f_iRows != a_roMatrix.f_iRows ) )
 		throw new HException ( __WHERE__, g_ppcErrMsgHVector [ E_DIMNOTMATCH ] );
 	if ( ( f_iColumns > 0 ) &&  ( f_iColumns != a_roMatrix.f_iColumns ) )
 		throw new HException ( __WHERE__, g_ppcErrMsgHVector [ E_DIMNOTMATCH ] );
 	
-	if ( ! f_iColumns )
-		{
-		f_iColumns = a_roMatrix.f_iColumns;
-	
-		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			if ( ! ( f_ptArray [ l_iCtr ] = new HVector < tType > ( f_iColumns ) ) )
-				throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_NEWRETURNEDNULL ], l_iCtr );
-		}
-	
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) 
-		 ( * f_ptArray ) [ l_iCtr ] = ( * a_roMatrix.f_ptArray ) [ l_iCtr ];
 	return ( * this );
 	M_EPILOG
 	}

@@ -47,7 +47,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HArray ( int );
+	HArray ( int, tType * = NULL );
 	virtual ~HArray ( void );
 	HArray ( const HArray &, int = 0 );
 	HArray & operator = ( const HArray & );
@@ -63,9 +63,10 @@ protected:
 #include "hexception.h"
 
 template < class tType >
-HArray < tType >::HArray ( int a_iSize )
+HArray < tType >::HArray ( int a_iSize, tType * a_ptFillWith )
 	{
 	M_PROLOG
+	int l_iCtr = 0;
 	f_iSize = 0;
 	f_ptArray = NULL;
 	if ( a_iSize < 0 )
@@ -76,6 +77,11 @@ HArray < tType >::HArray ( int a_iSize )
 		f_ptArray = new tType [ f_iSize ];
 		if ( ! f_ptArray )
 			throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_NOMEM ], a_iSize );
+		if ( a_ptFillWith )
+			{
+			for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
+				f_ptArray [ l_iCtr ] = * a_ptFillWith;
+			}
 		}
 	return;
 	M_EPILOG

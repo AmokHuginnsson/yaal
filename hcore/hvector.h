@@ -50,7 +50,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HVector ( int );
+	HVector ( int = 0 );
 	HVector ( const HVector &, int = 0 );
 	virtual ~HVector ( void );
 	int dim ( void );
@@ -68,7 +68,6 @@ public:
 	HVector & operator -= ( HVector & );
 	HVector & operator *= ( tType );
 	HVector & operator /= ( tType );
-	HVector operator ~ ( void );
 	tType operator | ( HVector & );
 	tType operator ! ( void );
 	int operator == ( HVector & );
@@ -271,18 +270,6 @@ HVector < tType > & HVector < tType > ::operator /= ( tType d )
 	if ( d ) for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		f_ptArray [ l_iCtr ] /= d;
 	return ( *this );
-	M_EPILOG
-	}
-
-template < class tType >
-HVector < tType > HVector < tType > ::operator ~ ( void )
-	{
-	M_PROLOG
-	int l_iCtr = 0;
-	HVector l_oVector ( f_iSize );
-	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
-		l_oVector.f_ptArray [ l_iCtr ] = - f_ptArray [ l_iCtr ];
-	return ( l_oVector );
 	M_EPILOG
 	}
 
