@@ -29,7 +29,7 @@ Copyright:
 
 #line 31 "hmap.h"
 
-extern unsigned long int * g_pulPrimes;
+extern unsigned long const int * const g_pulPrimes;
 
 template < class tType >
 inline unsigned long int hash ( tType & a_rtKey )
@@ -186,11 +186,8 @@ ttType & HMap<tType, ttType>::operator [ ] ( tType a_tKey )
 	M_LOG ( ( char * ) l_oMessage );
 #endif /* __DEBUGGER_BABUNI__ */
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom )
-		{
-		if ( l_poAtom->f_tKey == a_tKey )break;
+	while ( l_poAtom && ( l_poAtom->f_tKey != a_tKey ) )
 		l_poAtom = l_poAtom->f_poNext;
-		}
 	if ( ! l_poAtom )
 		{
 		l_poAtom = new HAtom ( );
@@ -247,11 +244,8 @@ bool HMap<tType, ttType>::get ( tType a_tKey, ttType & a_rtValue )
 	HAtom * l_poAtom = NULL;
 	l_iHash = hash ( a_tKey ) % f_iPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom )
-		{
-		if ( l_poAtom->f_tKey == a_tKey )break;
+	while ( l_poAtom && ( l_poAtom->f_tKey != a_tKey ) )
 		l_poAtom = l_poAtom->f_poNext;
-		}
 	if ( l_poAtom )a_rtValue = l_poAtom->f_tValue;
 	return ( l_poAtom ? true : false );
 	M_EPILOG
@@ -265,9 +259,8 @@ bool HMap<tType, ttType>::remove ( tType a_tKey )
 	HAtom * l_poAtom = NULL, * l_poAncestor = NULL;
 	l_iHash = hash ( a_tKey ) % f_iPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom )
+	while ( l_poAtom && ( l_poAtom->f_tKey != a_tKey ) )
 		{
-		if ( l_poAtom->f_tKey == a_tKey )break;
 		l_poAncestor = l_poAtom;
 		l_poAtom = l_poAtom->f_poNext;
 		}
