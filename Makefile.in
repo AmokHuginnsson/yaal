@@ -295,7 +295,7 @@ $(HAPIHDR): $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hda
 	@echo -n "Making header dir ... "
 	@/bin/mkdir -p $(HEADERSDIR)
 	@for FILE in $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata); do \
-		awk '/^#include/ {match($$0,"[a-z_]+\\.h"); printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };!/^#include/' $$FILE > $(HEADERSDIR)/`basename $$FILE`;\
+		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };!/^#include "/' $$FILE > $(HEADERSDIR)/`basename $$FILE`;\
 	done
 	@head -26 $(HEADERSDIR)/bit.h | sed -e s/bit/stdhapi/ > $(HEADERSDIR)/stdhapi.h
 	@echo '#ifndef __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
