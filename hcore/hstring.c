@@ -659,8 +659,10 @@ HString HString::mid ( int a_iFrom, int a_iLenght )
 	M_PROLOG
 	int l_iLenOrig = strlen ( f_pcBuffer );
 	HString l_oStr;
-	if ( ( a_iLenght < 0 ) || ( a_iFrom < 0 ) || ( a_iFrom >= l_iLenOrig ) )return ( l_oStr );
-	if ( ( a_iLenght == 0 ) || ( ( a_iLenght + a_iFrom ) > l_iLenOrig ) )a_iLenght = l_iLenOrig - a_iFrom;
+	if ( ( a_iLenght < 0 ) || ( a_iFrom < 0 ) || ( a_iFrom >= l_iLenOrig ) )
+		return ( "" );
+	if ( ( a_iLenght == 0 ) || ( ( a_iLenght + a_iFrom ) > l_iLenOrig ) )
+		a_iLenght = l_iLenOrig - a_iFrom;
 	l_oStr.hs_realloc ( a_iLenght + 1 );
 	strncpy ( l_oStr.f_pcBuffer, f_pcBuffer + a_iFrom, a_iLenght );
 	l_oStr.f_pcBuffer [ a_iLenght ] = 0;
@@ -716,10 +718,15 @@ HString HString::split ( const char * a_pcAt, int a_iPart )
 	M_PROLOG
 	int l_iBegining = 0;
 	int l_iSize = 0;
-	for ( l_iSize = 0; l_iSize < a_iPart; l_iSize ++ )
+	int l_iCtr = 0;
+	for ( ;	f_pcBuffer [ l_iBegining ] &&	( l_iCtr < a_iPart );	l_iCtr ++ )
 		l_iBegining += strcspn ( f_pcBuffer + l_iBegining, a_pcAt ) + 1;
-	l_iSize = strcspn ( f_pcBuffer + l_iBegining, a_pcAt );
-	return ( mid ( l_iBegining, l_iSize ) );
+	if ( f_pcBuffer [ l_iBegining ] )
+		{
+		l_iSize = strcspn ( f_pcBuffer + l_iBegining, a_pcAt );
+		return ( mid ( l_iBegining, l_iSize ) );
+		}
+	else return ( "" );;
 	M_EPILOG
 	}
 
