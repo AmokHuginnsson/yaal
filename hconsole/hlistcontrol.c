@@ -619,6 +619,9 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 	M_PROLOG
 	HInfo & l_roLeftInfo = a_poLeft->get_object ( ) [ f_iSortColumn ];
 	HInfo & l_roRightInfo = a_poRight->get_object ( ) [ f_iSortColumn ];
+	f_lComparedItems ++;
+	if ( ( f_iQuantity > 1024 ) && ! ( f_lComparedItems % 1024 ) )
+		f_poParent->update_progress ( f_lComparedItems );
 	switch ( ( ( int ) f_oHeader [ f_iSortColumn ] ) & D_TYPE_MASK )
 		{
 		case ( D_TYPE_LONG_INT ):
@@ -647,9 +650,6 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 			break;
 			}
 		}
-	f_lComparedItems ++;
-	if ( ( f_iQuantity > 128 ) && ! ( f_lComparedItems % 64 ) )
-		f_poParent->update_progress ( f_lComparedItems );
 	return ( 0 );
 	M_EPILOG
 	}
