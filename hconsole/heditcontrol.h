@@ -42,6 +42,9 @@ protected:
 	bool				f_bReplace;						/* current edit mode */
 	bool				f_bMultiLine;					/* is control multiline */
 	bool				f_bPassword;					/* should be entered text visible */
+	bool				f_bRightAligned;			/* is control content right aligned,
+																			 control content can be right aligned
+																			 only in single line mode */
 	int					f_iMaxStringSize;			/* self explenary */
 	int					f_iCursorPosition;		/* cursor position relative to control
 																			 begining */
@@ -67,6 +70,7 @@ public:
 								const char * = "",	/* initial content */
 								const char * = D_DEFAULT_MASK, /* mask */
 								bool = false,				/* replace */
+								bool = false,				/* right alignment */
 								bool = false,				/* multiline */
 								bool = false,				/* password */
 								int = 8,						/* max history level */

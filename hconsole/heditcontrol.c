@@ -47,9 +47,9 @@ Copyright:
 HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iWidth, int a_iHeight,
 		const char * a_pcLabel, int a_iBufferSize, const char * a_pcValue,
-		const char * a_pcMask, bool a_bReplace, bool a_bMultiLine, bool a_bPassword,
-		int a_iMaxHistoryLevel, int a_iDisabledAttribute, int a_iEnabledAttribute,
-		int a_iFocusedAttribute )
+		const char * a_pcMask, bool a_bReplace, bool a_bRightAligned,
+		bool a_bMultiLine, bool a_bPassword, int a_iMaxHistoryLevel,
+		int a_iDisabledAttribute, int a_iEnabledAttribute, int a_iFocusedAttribute )
 					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 							a_iWidth, a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
 							a_iFocusedAttribute ),
@@ -77,6 +77,10 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	f_iMaxHistoryLevel = a_iMaxHistoryLevel;
 	f_bReplace = a_bReplace;
 	f_bMultiLine = ( a_bMultiLine || ( a_iHeight > 1 ) ? true : false );
+	f_bRightAligned = a_bRightAligned;
+	if ( f_bRightAligned && f_bMultiLine )
+		throw new HException ( __WHERE__,
+				"edit-control right aligned and multiline at the same time", 0 );
 	f_bPassword = a_bPassword;
 	f_oString = a_pcValue;
 	f_oHistory.add_tail ( HString ( "" ) );
