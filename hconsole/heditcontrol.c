@@ -60,8 +60,6 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	int l_iLength = 0;
 	char * l_pcBuffer = 0;
 	HString l_oErrorMessage;
-	if ( ! console::is_enabled ( ) )
-		throw new HException ( __WHERE__, "not in curses mode.", g_iErrNo );
 	if ( a_iBufferSize < 1 )
 		throw new HException ( __WHERE__, "buffer size is ridiculously low",
 				a_iBufferSize );

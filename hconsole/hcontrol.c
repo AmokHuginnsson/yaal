@@ -49,6 +49,8 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 										 int a_iFocusedAttribute )
 	{
 	M_PROLOG
+	if ( ! console::is_enabled ( ) )
+		throw new HException ( __WHERE__, "not in curses mode.", g_iErrNo );
 	if ( ! a_poParent )
 		throw new HException ( __WHERE__, "no parent window.", ( int ) a_poParent );
 	f_bEnabled = false;
