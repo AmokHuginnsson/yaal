@@ -38,7 +38,7 @@ public:
 	/*{*/
 	HComplex ( void );
 	HComplex ( double, double = 0 );
-	HComplex ( const HComplex &, int = 0 );
+	HComplex ( const HComplex & );
 	virtual ~HComplex ( void );
 	double & re ( void );
 	double & im ( void );

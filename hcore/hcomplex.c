@@ -48,7 +48,7 @@ HComplex::HComplex ( double a_dReal,  double a_dImaginary )
 	M_EPILOG
 	}
 
-HComplex::HComplex ( const HComplex & a_roComplex, int )
+HComplex::HComplex ( const HComplex & a_roComplex )
 	{
 	M_PROLOG
 	( * this ) = a_roComplex;

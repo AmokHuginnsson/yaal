@@ -50,7 +50,7 @@ protected:
 public:
 	/* { */
 	HMatrix ( int, int );
-	HMatrix ( const HMatrix &, int = 0 );
+	HMatrix ( const HMatrix & );
 	virtual ~HMatrix ( void );
 	int set ( tType * * );
 	int set ( HVector < tType > );
@@ -75,8 +75,8 @@ public:
 	HMatrix & operator /= ( tType );
 	HMatrix operator ~ ( void );
 	tType operator ! ( void );
-	int operator == ( HMatrix & );
-	int operator != ( HMatrix & );
+	bool operator == ( HMatrix & );
+	bool operator != ( HMatrix & );
 template < class ttType >
 	friend HVector < ttType > operator * ( HVector < ttType > &, HMatrix & );
 template < class ttType >
@@ -99,22 +99,25 @@ HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iRows < 1 )
-		throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_BADROWS ], a_iRows );
+		throw new HException ( __WHERE__,
+				g_ppcErrMsgHMatrix [ E_BADROWS ], a_iRows );
 	else f_iRows = a_iRows;
 	if ( a_iColumns < 1 )
-		throw new HException ( __WHERE__, g_ppcErrMsgHMatrix [ E_BADCOLUMNS ], a_iColumns );
+		throw new HException ( __WHERE__,
+				g_ppcErrMsgHMatrix [ E_BADCOLUMNS ], a_iColumns );
 	else f_iColumns = a_iColumns;
 	return ;
 	M_EPILOG
 	}
 	
 template < class tType >
-HMatrix < tType > ::HMatrix ( const HMatrix & a_roMatrix, int )
+HMatrix < tType > ::HMatrix ( const HMatrix & a_roMatrix )
 									:	HArray < HVector < tType > > ( a_roMatrix.f_iRows,
 											HVector < tType > ( a_roMatrix.f_iColumns ) )
 	{
 	M_PROLOG
-	f_iColumns = 0;
+	f_iRows = a_roMatrix.f_iRows;
+	f_iColumns = a_roMatrix.f_iColumns;
 	( * this ) = a_roMatrix;
 	return;
 	M_EPILOG
@@ -283,6 +286,7 @@ HMatrix < tType > & HMatrix < tType > ::operator = ( const HMatrix & a_roMatrix 
 	if ( ( f_iColumns > 0 ) &&  ( f_iColumns != a_roMatrix.f_iColumns ) )
 		throw new HException ( __WHERE__, g_ppcErrMsgHVector [ E_DIMNOTMATCH ] );
 	
+	( * this ).HArray < HVector < tType > > ::operator = ( a_roMatrix );
 	return ( * this );
 	M_EPILOG
 	}
@@ -302,16 +306,9 @@ template < class tType >
 HMatrix < tType > HMatrix < tType > ::operator + ( HMatrix & a_roMatrix )
 	{
 	M_PROLOG
-	int l_iCtr;
-	if ( ( f_iRows == a_roMatrix.f_iRows )
-			&& ( f_iColumns == a_roMatrix.f_iColumns ) )
-		{
-		HMatrix l_oMatrix ( f_iRows, f_iColumns );
-		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			l_oMatrix [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] + a_roMatrix [ l_iCtr ] );
-		return ( l_oMatrix );
-		}
-	return ( * this );
+	HMatrix l_oMatrix ( * this );
+	l_oMatrix += a_roMatrix;
+	return ( l_oMatrix );
 	M_EPILOG
 	}
 	
@@ -319,18 +316,9 @@ template < class tType >
 HMatrix < tType > HMatrix < tType > ::operator - ( HMatrix & a_roMatrix )
 	{
 	M_PROLOG
-	int l_iCtr;
-	if ( ( f_iRows == a_roMatrix.f_iRows )
-			&& ( f_iColumns == a_roMatrix.f_iColumns ) )
-		{
-		HMatrix l_oMatrix ( f_iRows, f_iColumns );
-		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			{
-			l_oMatrix [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] - a_roMatrix [ l_iCtr ] );
-			}
-		return ( l_oMatrix );
-		}
-	return ( * this );
+	HMatrix l_oMatrix ( * this );
+	l_oMatrix -= a_roMatrix;
+	return ( l_oMatrix );
 	M_EPILOG
 	}
 	
@@ -372,10 +360,8 @@ template < class tType >
 HMatrix < tType > HMatrix < tType > ::operator * ( tType d )
 	{
 	M_PROLOG
-	int l_iCtr;
-	HMatrix l_oMatrix ( f_iRows, f_iColumns );
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		l_oMatrix [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] * d );
+	HMatrix l_oMatrix ( * this );
+	l_oMatrix *= d;
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -384,10 +370,8 @@ template < class tType >
 HMatrix < tType > HMatrix < tType > ::operator / ( tType d )
 	{
 	M_PROLOG
-	int l_iCtr;
-	HMatrix l_oMatrix ( f_iRows, f_iColumns );
-	if ( d ) for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			l_oMatrix [ l_iCtr ] = ( * this->f_ptArray [ l_iCtr ] / d );
+	HMatrix l_oMatrix ( * this );
+	l_oMatrix /= d;
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -432,7 +416,7 @@ HMatrix < tType > & HMatrix < tType > ::operator *= ( HMatrix & a_roMatrix )
 				{
 				d = 0;
 				for ( k = 0; k < f_iColumns; k++ ) 
-					d += ( * this->f_ptArray [ l_iCtr ] ) [ k ] * a_roMatrix [ k ] [ j ];
+					d += this->f_ptArray [ l_iCtr ] [ k ] * a_roMatrix [ k ] [ j ];
 				l_oMatrix [ l_iCtr ] [ j ] = d;
 				}
 		 * this = l_oMatrix;
@@ -447,7 +431,7 @@ HMatrix < tType > & HMatrix < tType > ::operator *= ( tType d )
 	M_PROLOG
 	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		( * this->f_ptArray [ l_iCtr ] *= d );
+		this->f_ptArray [ l_iCtr ] *= d;
 	return ( * this );
 	M_EPILOG
 	}
@@ -459,7 +443,7 @@ HMatrix < tType > & HMatrix < tType > ::operator /= ( tType d )
 	int l_iCtr;
 	if ( d )
 		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			( * this->f_ptArray [ l_iCtr ] /= d );
+			this->f_ptArray [ l_iCtr ] /= d;
 	return ( * this );
 	M_EPILOG
 	}
@@ -471,9 +455,7 @@ HMatrix < tType > HMatrix < tType > ::operator ~ ( void )
 	int l_iCtr;
 	HMatrix l_oMatrix ( f_iRows, f_iColumns );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		{
-		l_oMatrix [ l_iCtr ] = ~ * this->f_ptArray [ l_iCtr ];
-		}
+		l_oMatrix [ l_iCtr ] = ~ this->f_ptArray [ l_iCtr ];
 	return ( l_oMatrix );
 	M_EPILOG
 	}
@@ -487,21 +469,22 @@ tType HMatrix < tType > ::operator ! ( void )
 	}
 	
 template < class tType >
-int HMatrix < tType > ::operator == ( HMatrix & a_roMatrix )
+bool HMatrix < tType > ::operator == ( HMatrix & a_roMatrix )
 	{
 	M_PROLOG
 	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) 
-		if ( * this->f_ptArray [ l_iCtr ] != a_roMatrix [ l_iCtr ] ) return ( 0 );
-	return ( 1 );
+		if ( this->f_ptArray [ l_iCtr ] != a_roMatrix [ l_iCtr ] )
+			return ( false );
+	return ( true );
 	M_EPILOG
 	}
 	
 template < class tType >
-int HMatrix < tType > ::operator != ( HMatrix & a_roMatrix )
+bool HMatrix < tType > ::operator != ( HMatrix & a_roMatrix )
 	{
 	M_PROLOG
-	return ( 1 - ( * this == a_roMatrix ) );
+	return ( ! ( * this == a_roMatrix ) );
 	M_EPILOG
 	}
 	

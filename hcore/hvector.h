@@ -53,7 +53,7 @@ protected:
 public:
 	/*{*/
 	HVector ( int = 0 );
-	HVector ( const HVector &, int = 0 );
+	HVector ( const HVector & );
 	virtual ~HVector ( void );
 	int dim ( void );
 	int set ( tType * );
@@ -72,8 +72,8 @@ public:
 	HVector & operator /= ( tType );
 	tType operator | ( HVector & );
 	tType operator ! ( void );
-	int operator == ( HVector & );
-	int operator != ( HVector & );
+	bool operator == ( HVector & );
+	bool operator != ( HVector & );
 template < class ttType >
 	friend HVector < ttType > operator * ( ttType, HVector < ttType > & );
 	/*}*/
@@ -102,7 +102,7 @@ HVector < tType > ::~HVector ( void )
 	}
 
 template < class tType >
-HVector < tType > ::HVector ( const HVector & a_roVector, int )
+HVector < tType > ::HVector ( const HVector & a_roVector )
 				: HArray < tType > ( a_roVector )
 	{
 	M_PROLOG
@@ -151,7 +151,8 @@ HVector < tType > &
 HVector < tType > ::operator = ( const HVector & a_roVector )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS ( );
+	if ( this->f_iSize )
+		M_CHECK_DIMENSIONS ( );
 	( * this ).HArray < tType > ::operator = ( a_roVector );
 	return ( * this );
 	M_EPILOG
@@ -172,11 +173,9 @@ template < class tType >
 HVector < tType > HVector < tType > ::operator + ( HVector & a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	M_CHECK_DIMENSIONS ( );
-	HVector l_oVector ( this->f_iSize );
-	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ ) 
-		l_oVector.f_ptArray [ l_iCtr ] = this->f_ptArray [ l_iCtr ] + a_roVector.f_ptArray [ l_iCtr ];
+	HVector l_oVector ( * this );
+	l_oVector += a_roVector;
 	return ( l_oVector );
 	M_EPILOG
 	}
@@ -185,11 +184,9 @@ template < class tType >
 HVector < tType > HVector < tType > ::operator - ( HVector & a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	M_CHECK_DIMENSIONS ( );
-	HVector l_oVector ( this->f_iSize );
-	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ ) 
-		l_oVector.f_ptArray [ l_iCtr ] = this->f_ptArray [ l_iCtr ] - a_roVector.f_ptArray [ l_iCtr ];
+	HVector l_oVector ( * this );
+	l_oVector -= a_roVector;
 	return ( l_oVector );
 	M_EPILOG
 	}
@@ -209,10 +206,8 @@ template < class tType >
 HVector < tType > HVector < tType > ::operator * ( tType d )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	HVector l_oVector ( this->f_iSize );
-	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ ) 
-		l_oVector.f_ptArray [ l_iCtr ] = this->f_ptArray [ l_iCtr ] * d;
+	HVector l_oVector ( * this );
+	l_oVector *= d;
 	return ( l_oVector );
 	M_EPILOG
 	}
@@ -221,10 +216,8 @@ template < class tType >
 HVector < tType > HVector < tType > ::operator / ( tType d )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	HVector l_oVector ( this->f_iSize );
-	if ( d ) for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ )
-		l_oVector.f_ptArray [ l_iCtr ] = this->f_ptArray [ l_iCtr ] / d;
+	HVector l_oVector ( * this );
+	l_oVector /= d;
 	return ( l_oVector );
 	M_EPILOG
 	}
@@ -297,20 +290,20 @@ tType HVector < tType > ::operator ! ( void )
 	}
 
 template < class tType >
-int HVector < tType > ::operator == ( HVector & a_roVector )
+bool HVector < tType > ::operator == ( HVector & a_roVector )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	M_CHECK_DIMENSIONS ( );
 	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ ) 
 		if ( this->f_ptArray [ l_iCtr ] != a_roVector.f_ptArray [ l_iCtr ] )
-			return ( 0 );
-	return ( 1 );
+			return ( false );
+	return ( true );
 	M_EPILOG
 	}
 
 template < class tType >
-int HVector < tType > ::operator != ( HVector & a_roVector )
+bool HVector < tType > ::operator != ( HVector & a_roVector )
 	{
 	M_PROLOG
 	return ( ! ( * this == a_roVector ) );
@@ -321,10 +314,8 @@ template < class tType >
 HVector < tType > operator * ( tType d, HVector < tType > & a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	HVector < tType > l_oVector ( a_roVector.f_iSize );
-	for ( l_iCtr = 0; l_iCtr < l_oVector.f_iSize; l_iCtr ++ )
-		l_oVector.f_ptArray [ l_iCtr ] = a_roVector.f_ptArray [ l_iCtr ] * d;
+	HVector < tType > l_oVector ( a_roVector );
+	l_oVector *= d;
 	return ( l_oVector );
 	M_EPILOG
 	}

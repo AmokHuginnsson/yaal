@@ -47,9 +47,10 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HArray ( int, tType * = NULL );
+	HArray ( int );
+	HArray ( const int &, tType );
 	virtual ~HArray ( void );
-	HArray ( const HArray &, int = 0 );
+	HArray ( const HArray & );
 	HArray & operator = ( const HArray & );
 	tType & operator [ ] ( int );
 	int get_size ( void );
@@ -63,7 +64,27 @@ protected:
 #include "hexception.h"
 
 template < class tType >
-HArray < tType >::HArray ( int a_iSize, tType * a_ptFillWith )
+HArray < tType >::HArray ( int a_iSize )
+	{
+	M_PROLOG
+	f_iSize = 0;
+	f_ptArray = NULL;
+	if ( a_iSize < 0 )
+		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_BADSIZE ], a_iSize );
+	f_iSize = a_iSize;
+	if ( a_iSize )
+		{
+		f_ptArray = new tType [ f_iSize ];
+		if ( ! f_ptArray )
+			throw new HException ( __WHERE__,
+					g_ppcErrMsgHArray [ E_NOMEM ], a_iSize );
+		}
+	return;
+	M_EPILOG
+	}
+
+template < class tType >
+HArray < tType >::HArray ( const int & a_iSize, tType a_tFillWith )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -76,12 +97,10 @@ HArray < tType >::HArray ( int a_iSize, tType * a_ptFillWith )
 		{
 		f_ptArray = new tType [ f_iSize ];
 		if ( ! f_ptArray )
-			throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_NOMEM ], a_iSize );
-		if ( a_ptFillWith )
-			{
-			for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
-				f_ptArray [ l_iCtr ] = * a_ptFillWith;
-			}
+			throw new HException ( __WHERE__,
+					g_ppcErrMsgHArray [ E_NOMEM ], a_iSize );
+		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
+			f_ptArray [ l_iCtr ] = a_tFillWith;
 		}
 	return;
 	M_EPILOG
@@ -99,7 +118,7 @@ HArray < tType >::~HArray ( void )
 	}
 
 template < class tType >
-HArray < tType >::HArray ( const HArray & a_roArray, int )
+HArray < tType >::HArray ( const HArray & a_roArray )
 	{
 	M_PROLOG
 	f_iSize = 0;
@@ -128,7 +147,8 @@ HArray < tType > & HArray < tType >::operator = ( const HArray & a_roArray )
 		{
 		f_ptArray = new tType [ f_iSize ];
 		if ( ! f_ptArray )
-			throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_NOMEM ], f_iSize );
+			throw new HException ( __WHERE__,
+					g_ppcErrMsgHArray [ E_NOMEM ], f_iSize );
 		}
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		f_ptArray [ l_iCtr ] = a_roArray.f_ptArray [ l_iCtr ];
