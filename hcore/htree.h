@@ -216,14 +216,14 @@ template < class tttType >
 typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
 	{
 	M_PROLOG
-	HNode * l_poNode = NULL;
+	HNode * * l_ppoNode = NULL;
 	if ( f_poTrunk )
 		{
-		while ( l_poNode != this )
-			l_poNode = * f_poTrunk->f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED );
-		l_poNode = f_poTrunk->f_oBranch.present ( );
+		while ( ( l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED ) ) )
+			if ( ( * l_ppoNode ) == this )break;
+		l_ppoNode = & f_poTrunk->f_oBranch.present ( );
 		}
-	return ( l_poNode );
+	return ( * l_ppoNode );
 	M_EPILOG
 	}
 
