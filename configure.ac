@@ -58,6 +58,7 @@ AC_CHECK_FILE(
 		[AC_CHECK_FILE(
 			[[/etc/rc]],
 			[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST______=['FreeBSD. ---']
+				AC_SUBST([ADDITIONAL_COMMAND],[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION)']])
 				AC_SUBST([EXTRA_LIB_PATHS], [[-L/usr/local/lib/mysql]])
 				CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]],
 			[AC_MSG_ERROR([Can not recognize host operating system type!])]
