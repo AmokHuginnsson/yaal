@@ -28,6 +28,8 @@ Copyright:
 #include "hdatalistcontrol.h"
 #include "hdatatreecontrol.h"
 
+#include "../hcore/hlog.h"
+
 #include "../hcore/hexception.h"
 
 HDataWindow::HDataWindow ( const char * a_pcTitle, HDataBase * a_poDataBase,
@@ -61,17 +63,17 @@ HDataWindow::~HDataWindow ( void )
 	M_EPILOG
 	}
 
-#define M_STANDART_SETUP	f_psResourcesArray [ l_iCtr ].f_iRow,\
+#define M_SETUP_STANDART	f_psResourcesArray [ l_iCtr ].f_iRow,\
 						f_psResourcesArray [ l_iCtr ].f_iColumn,\
 						f_psResourcesArray [ l_iCtr ].f_iHeight,\
 						f_psResourcesArray [ l_iCtr ].f_iWidth,\
 						f_psResourcesArray [ l_iCtr ].f_pcLabel
 
-#define M_ATTRIBUTES_SETUP l_psAttr->f_iDisabledAttribute,\
+#define M_SETUP_ATTRIBUTES l_psAttr->f_iDisabledAttribute,\
 						l_psAttr->f_iEnabledAttribute,\
 						l_psAttr->f_iFocusedAttribute
 
-#define M_COLUMN_SETUP l_psCI->f_iPlacement,\
+#define M_SETUP_COLUMN l_psCI->f_iPlacement,\
 						l_psCI->f_pcName,\
 						l_psCI->f_iWidth,\
 						l_psCI->f_iAlign,\
@@ -91,9 +93,11 @@ int HDataWindow::init ( void )
 	l_sAttributes.f_iDisabledAttribute = -1;
 	l_sAttributes.f_iEnabledAttribute = -1;
 	l_sAttributes.f_iFocusedAttribute = -1;
+	::log << "before init" << endl;
 	HWindow::init ( );
 	while ( f_psResourcesArray [ l_iCtr ].f_pcLabel )
 		{
+		::log << "res:" << f_psResourcesArray [ l_iCtr ].f_pcLabel << endl;
 		if ( f_psResourcesArray [ l_iCtr ].f_psAttributes )
 			l_psAttr = f_psResourcesArray [ l_iCtr ].f_psAttributes;
 		switch ( f_psResourcesArray [ l_iCtr ].f_iType )
@@ -109,23 +113,25 @@ int HDataWindow::init ( void )
 				l_sEditControlResource.f_iMaxHistoryLevel = 8;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psECR = ( OEditControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
+				::log << "before HEditControl" << endl;
 				l_poDataControl = ( HDataControl * ) new HEditControl ( ( HWindow * ) this,
-						M_STANDART_SETUP, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
+						M_SETUP_STANDART, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
 						l_psECR->f_pcMask, l_psECR->f_bReplace, l_psECR->f_bMultiLine,
 						l_psECR->f_bPassword, l_psECR->f_iMaxHistoryLevel,
-						M_ATTRIBUTES_SETUP );
+						M_SETUP_ATTRIBUTES );
+				::log << "after HEditControl" << endl;
 				break;
 				}
 			case ( D_CONTROL_LIST ):
 				{
-				l_poDataControl = new HDataListControl ( this, this, M_STANDART_SETUP,
-						M_ATTRIBUTES_SETUP );
+				l_poDataControl = new HDataListControl ( this, this, M_SETUP_STANDART,
+						M_SETUP_ATTRIBUTES );
 				break;
 				}
 			case ( D_CONTROL_TREE ):
 				{
-				l_poDataControl = new HDataTreeControl ( this, this, M_STANDART_SETUP,
-						M_ATTRIBUTES_SETUP );
+				l_poDataControl = new HDataTreeControl ( this, this, M_SETUP_STANDART,
+						M_SETUP_ATTRIBUTES );
 				break;
 				}
 			case ( D_CONTROL_COMBO ):
@@ -156,7 +162,9 @@ int HDataWindow::init ( void )
 				}
 			case ( D_CONTROL_DATA ):
 				{
+				::log << "before link" << endl;
 				link ( l_iCtr, l_poDataControl );
+				::log << "before add_tail" << endl;
 				f_oEditModeControls.add_tail ( l_poDataControl );
 				break;
 				}
@@ -203,7 +211,7 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 			throw new HException ( __WHERE__, "wrong control resource order", l_iParent );
 		if ( f_psResourcesArray [ a_iChild ].f_psColumnInfo )
 			l_psCI = f_psResourcesArray [ a_iChild ].f_psColumnInfo;
-		l_poPDC->add_column ( M_COLUMN_SETUP, a_poDataControl );
+		l_poPDC->add_column ( M_SETUP_COLUMN, a_poDataControl );
 		}
 	else throw new HException ( __WHERE__, "unknown parent type",
 			f_psResourcesArray [ l_iParent ].f_iType );

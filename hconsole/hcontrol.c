@@ -176,13 +176,13 @@ void HControl::draw_label ( void )
 		: console::n_iWidth + f_iWidth - f_iColumnRaw;
 /* done */
 	::move ( f_iRowRaw, f_iColumnRaw );
-	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 );
+	M_SET_ATTR_LABEL ( );
 	cprintf ( f_oLabel );
 	::move ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex );
-	console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 );
+	M_SET_ATTR_SHORTCUT ( );
 	cprintf ( "%c", f_oLabel [ f_iShortcutIndex ] );
 	::move ( f_iRowRaw, f_iColumnRaw + f_iLabelLength );
-	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute );
+	M_SET_ATTR_DATA ( );
 	if ( f_bSingleLine )
 		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;
 	else f_iRowRaw ++, f_iHeightRaw --;

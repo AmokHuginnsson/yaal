@@ -107,8 +107,6 @@ void HTreeControl::refresh ( void )
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer, '_', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
-	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-				: f_iEnabledAttribute ) : f_iDisabledAttribute );
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		{
 		::move ( f_iRowRaw + l_iCtr, f_iColumnRaw );
@@ -133,17 +131,13 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		l_iRow ++;
 		l_oInfo = a_poNode->f_tLeaf [ 0 ];
 		::move ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 - 1 );
-		console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-					: f_iEnabledAttribute ) : f_iDisabledAttribute );
+		M_SET_ATTR_DATA ( );
 		if ( ! a_poNode->f_bUnfolded && l_iCtr )
 			cprintf ( "+" );
 		else if ( l_iCtr )cprintf ( "-" );
 		if ( a_poNode == f_poSelected )
 			console::set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
 						: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
-		else
-			console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-						: f_iEnabledAttribute ) : f_iDisabledAttribute );
 		::move ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 );
 		cprintf ( ( HString & ) l_oInfo );
 		}

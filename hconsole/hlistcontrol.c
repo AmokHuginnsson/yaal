@@ -194,9 +194,7 @@ void HListControl::refresh ( void )
 					if ( l_iCtr == f_iCursorPosition )
 						console::set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
 									: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
-					else
-						console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-									: f_iEnabledAttribute ) : f_iDisabledAttribute );
+					else M_SET_ATTR_DATA ( );
 					cprintf ( f_oVarTmpBuffer	);
 					l_iColumnOffset += l_iCurrentColumnWidth;
 					}
@@ -205,8 +203,7 @@ void HListControl::refresh ( void )
 			}
 		}
 	l_iColumnOffset = 0;
-	console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute
-				: f_iEnabledAttribute ) : f_iDisabledAttribute );
+	M_SET_ATTR_DATA ( );
 	memset ( f_oVarTmpBuffer, '.', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
@@ -223,11 +220,11 @@ void HListControl::refresh ( void )
 			{
 			f_oVarTmpBuffer = ( HString & ) l_oInfo;
 			::move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset );
-			console::set_attr ( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 );
+			M_SET_ATTR_LABEL ( );
 			f_oVarTmpBuffer.format ( "%%-%ds", l_iCurrentColumnWidth );
 			cprintf ( f_oVarTmpBuffer, ( char * ) ( ( HString & ) l_oInfo ).left ( l_iCurrentColumnWidth ) );
 			::move ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset + ( l_lValue >> 16 ) );
-			console::set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 );
+			M_SET_ATTR_SHORTCUT ( );
 			cprintf ( "%c", l_oInfo [ l_lValue >> 16 ] );
 			l_iColumnOffset += l_iCurrentColumnWidth;
 			if ( l_iCtr < l_iColumns )
