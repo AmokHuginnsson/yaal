@@ -120,7 +120,7 @@ HAnalyser::HAnalyserNode * HAnalyser::HAnalyserNode::grow_up_branch ( int a_iFla
 	HAnalyserNode * l_poNode = NULL;
 	if ( a_iFlag ) l_poNode = new HAnalyserNode ( this );
 	else l_poNode = 0;
-	f_oBranch.add_tail ( l_poNode );
+	f_oBranch.add_tail ( ( HTree < HList < double * > >::HNode * * ) & l_poNode );
 	return ( l_poNode );
 	M_EPILOG
 	}
@@ -332,7 +332,7 @@ double HAnalyser::bracket( HAnalyserNode * a_poNode )
 int HAnalyser::translate( const char * a_pcFormula )
 	{
 	M_PROLOG
-	int l_iError = 0, l_iIndex = 0, l_iRealIndex = 0, l_iCtr, l_iLength;
+	int l_iError = 0, l_iIndex = 0, l_iRealIndex = 0, l_iCtr = 0, l_iLength = 0;
 	l_iLength = strlen ( a_pcFormula );
 	while ( l_iIndex < l_iLength )
 		{
@@ -347,32 +347,36 @@ int HAnalyser::translate( const char * a_pcFormula )
 				f_oFormula [ l_iRealIndex ] = l_iCtr + 1;
 				break;
 				}
-			if ( l_iCtr == 16 )
+			if ( l_iCtr < 16 )
 				{
-				l_iError++;
-				l_iCtr = 1;
+				l_iIndex += n_piFunctionMnemonicsLength [ l_iCtr ];
+				l_iRealIndex ++;
 				}
-			l_iIndex += n_piFunctionMnemonicsLength [ l_iCtr ];
-			l_iRealIndex++;
+			else
+				{
+				l_iError ++;
+				l_iIndex ++;
+				}
 			}
 		else
 			{
 			f_oFormula [ l_iRealIndex ] = a_pcFormula [ l_iIndex ];
-			l_iIndex++;
-			l_iRealIndex++;
+			l_iIndex ++;
+			l_iRealIndex ++;
 			}
 		f_iLength = l_iRealIndex;
 		}
 	f_oFormula [ l_iRealIndex ] = 0;
+	f_iError += l_iError;
 	return ( l_iError );
 	M_EPILOG
 	}
 
-void HAnalyser::addition_production( HAnalyserNode * a_poNode )
+void HAnalyser::addition_production ( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	HAnalyserNode * l_poTrunk;
+	HAnalyserNode * l_poTrunk = NULL;
 	multiplication_production ( a_poNode->grow_up_branch ( ) );
 	if ( f_iIndex > f_iLength )
 		{
@@ -403,23 +407,23 @@ void HAnalyser::addition_production( HAnalyserNode * a_poNode )
 			|| ( f_oFormula [ f_iIndex ] == '-' ) )
 		{
 		l_iCtr = ( f_oFormula [ f_iIndex ++ ] == '+' ) ? 0 : 1;
-		a_poNode->f_tLeaf.add_tail ( ( double * ) l_iCtr );
-		multiplication_production( a_poNode->grow_up_branch ( ) );
+		a_poNode->f_tLeaf.add_tail ( ) = ( double * ) l_iCtr;
+		multiplication_production ( a_poNode->grow_up_branch ( ) );
 		}
-	return ;
+	return;
 	M_EPILOG
 	}
 
-void HAnalyser::multiplication_production( HAnalyserNode * a_poNode )
+void HAnalyser::multiplication_production ( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	HAnalyserNode * l_poTrunk;
-	power_production( ( HAnalyserNode * ) a_poNode->grow_up_branch() );
+	HAnalyserNode * l_poTrunk = NULL;
+	power_production ( ( HAnalyserNode * ) a_poNode->grow_up_branch ( ) );
 	if ( f_iIndex > f_iLength )
 		{
-		f_iError++;
-		return ;
+		f_iError ++;
+		return;
 		}
 	a_poNode->METHOD = & HAnalyser::multiplication;
 	if ( ( f_oFormula [ f_iIndex ] != '*' ) && ( f_oFormula[ f_iIndex ] != '/' ) )
@@ -445,7 +449,7 @@ void HAnalyser::multiplication_production( HAnalyserNode * a_poNode )
 			|| ( f_oFormula [ f_iIndex ] == '/' ) )
 		{
 		l_iCtr = ( f_oFormula [ f_iIndex ++ ] == '*' ) ? 0 : 1;
-		a_poNode->f_tLeaf.add_tail ( ( double * ) l_iCtr );
+		a_poNode->f_tLeaf.add_tail ( ) = ( double * ) l_iCtr;
 		power_production( a_poNode->grow_up_branch ( ) );
 		}
 	return ;
@@ -534,7 +538,7 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 			f_iIndex++;
 			addition_production ( a_poNode->grow_up_branch ( ) );
 			a_poNode->METHOD = & HAnalyser::functions;
-			a_poNode->f_tLeaf.add_tail ( ( double * ) D_ABS );
+			a_poNode->f_tLeaf.add_tail ( ) = ( double * ) D_ABS;
 			if ( f_oFormula [ f_iIndex ] != '|' ) f_iError++;
 			else f_iIndex++;
 			return ;
@@ -542,7 +546,7 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 		}
 	if ( ( f_oFormula[ f_iIndex ] >= 'A' ) && ( f_oFormula[ f_iIndex ] <= 'Z' ) )
 		{
-		a_poNode->f_tLeaf.add_tail( f_pdVariables + f_oFormula[ f_iIndex++] - 'A' );
+		a_poNode->f_tLeaf.add_tail ( ) = f_pdVariables + f_oFormula[ f_iIndex++] - 'A';
 		return;
 		}
 	if ( ( f_oFormula [ f_iIndex ] > D_FUNCTIONS )
@@ -553,7 +557,7 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 			{
 			f_iIndex++;
 			a_poNode->METHOD = & HAnalyser::functions;
-			a_poNode->f_tLeaf.add_tail ( ( double * ) ( void * ) ( int ) f_oFormula [ f_iIndex - 2 ] );
+			a_poNode->f_tLeaf.add_tail ( ) = ( double * ) ( void * ) ( int ) f_oFormula [ f_iIndex - 2 ];
 			addition_production ( a_poNode->grow_up_branch ( ) );
 			if ( f_oFormula [ f_iIndex ] != ')' ) f_iError++;
 			else f_iIndex++;
@@ -586,7 +590,7 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 			{
 			l_pdValue = new double;
 			*l_pdValue = atof ( ( ( char * ) f_oFormula ) + l_iOffset );
-			a_poNode->f_tLeaf.add_tail ( l_pdValue );
+			a_poNode->f_tLeaf.add_tail ( & l_pdValue );
 			}
 		return ;
 		}
@@ -620,6 +624,8 @@ double * HAnalyser::analyse( const char * a_pcFormula )
 double & HAnalyser::operator [ ] ( int a_iIndex )
 	{
 	M_PROLOG
+	if ( ( a_iIndex >= 'a' ) && ( a_iIndex <= 'a' ) )
+		a_iIndex = a_iIndex - 'a' + 'A';
 	if ( ( a_iIndex >= 0 ) && ( a_iIndex < 26 ) )
 		return ( f_pdVariables [ a_iIndex ] );
 	else if ( ( a_iIndex >= 'A' ) && ( a_iIndex <= 'Z' ) )
@@ -632,6 +638,7 @@ double HAnalyser::count ( void )
 	{
 	M_PROLOG
 	HAnalyserNode * l_poRoot = ( HAnalyserNode * ) f_poRoot;
+	if ( ! l_poRoot )M_THROW ( "logic tree is not compiled", f_iError );
 	return ( ( this->* ( l_poRoot->METHOD ) ) ( l_poRoot ) );
 	M_EPILOG
 	}
