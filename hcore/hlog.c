@@ -331,5 +331,3 @@ HLog & endl ( HLog & a_roLog )
 	M_EPILOG
 	}
 
-HLog log;
-
