@@ -70,7 +70,13 @@ HDataWindow::~HDataWindow ( void )
 #define M_ATTRIBUTES_SETUP l_psAttr->f_iDisabledAttribute,\
 						l_psAttr->f_iEnabledAttribute,\
 						l_psAttr->f_iFocusedAttribute
-						
+
+#define M_COLUMN_SETUP l_psCI->f_iPlacement,\
+						l_psCI->f_pcName,\
+						l_psCI->f_iWidth,\
+						l_psCI->f_iAlign,\
+						l_psCI->f_iType
+
 int HDataWindow::init ( void )
 	{
 	M_PROLOG
@@ -80,6 +86,7 @@ int HDataWindow::init ( void )
 	HDataControl * l_poDataControl = NULL;
 	OAttributes l_sAttributes, * l_psAttr = & l_sAttributes;
 	OEditControlResource l_sEditControlResource;
+/* ECR stands for EditControlResource */
 	OEditControlResource * l_psECR = & l_sEditControlResource;
 	l_sAttributes.f_iDisabledAttribute = -1;
 	l_sAttributes.f_iEnabledAttribute = -1;
@@ -100,8 +107,8 @@ int HDataWindow::init ( void )
 				l_sEditControlResource.f_bMultiLine = false;
 				l_sEditControlResource.f_bPassword = false;
 				l_sEditControlResource.f_iMaxHistoryLevel = 8;
-				if ( f_psResourcesArray [ l_iCtr ].f_pvControlSpecific )
-					l_psECR = ( OEditControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvControlSpecific;
+				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
+					l_psECR = ( OEditControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
 				l_poDataControl = ( HDataControl * ) new HEditControl ( ( HWindow * ) this,
 						M_STANDART_SETUP, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
 						l_psECR->f_pcMask, l_psECR->f_bReplace, l_psECR->f_bMultiLine,
@@ -138,12 +145,69 @@ int HDataWindow::init ( void )
 				break;
 				}
 			}
-		if ( f_psResourcesArray [ l_iCtr ].f_iFlags == D_CONTROL_MAIN )
-			f_poMainControl = l_poDataControl;
+		switch ( f_psResourcesArray [ l_iCtr ].f_iFlags )
+			{
+			case ( D_CONTROL_MAIN ):
+				{
+				f_poMainControl = l_poDataControl;
+				f_oViewModeControls.add_tail ( l_poDataControl );
+				l_poDataControl->enable ( true );
+				break;
+				}
+			case ( D_CONTROL_DATA ):
+				{
+				link ( l_iCtr, l_poDataControl );
+				f_oEditModeControls.add_tail ( l_poDataControl );
+				break;
+				}
+			case ( D_CONTROL_FILTER ):
+				{
+				l_poDataControl->enable ( true );
+				f_oViewModeControls.add_tail ( l_poDataControl );
+				break;
+				}
+			default :
+				{
+				throw new HException ( __WHERE__, "unknown resource purpouse",
+						f_psResourcesArray [ l_iCtr ].f_iFlags );
+				break;
+				}
+			}
+		f_psResourcesArray [ l_iCtr ].f_poDataControl = l_poDataControl;
 		l_iCtr ++;
 		}
+	f_poMainControl->set_focus ( );
 	if ( f_poMainControl )f_poMainControl->populate ( );
 	return ( 0 );
+	M_EPILOG
+	}
+
+void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
+	{
+	M_PROLOG
+	int l_iParent = 0;
+	char l_pcName [ ] = "";
+	HDataListControl * l_poPDC = NULL; /* PDC stands for ParentDataControl */
+/* CI stands for ColumnInfo */
+	OColumnInfo l_sColumnInfo, * l_psCI = & l_sColumnInfo;
+	l_psCI->f_iPlacement = -1;		/* -1 means add at the end */
+	l_psCI->f_pcName = l_pcName;
+	l_psCI->f_iWidth = 1; 				/* width is awlays proportional */
+	l_psCI->f_iAlign = D_ALIGN_LEFT;
+	l_psCI->f_iType = D_TYPE_HSTRING;
+	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
+	if ( f_psResourcesArray [ l_iParent ].f_iType == D_CONTROL_LIST )
+		{
+		l_poPDC = ( HDataListControl * ) f_psResourcesArray [ l_iParent ].f_poDataControl;
+		if ( ! l_poPDC )
+			throw new HException ( __WHERE__, "wrong control resource order", l_iParent );
+		if ( f_psResourcesArray [ l_iParent ].f_psColumnInfo )
+			l_psCI = f_psResourcesArray [ l_iParent ].f_psColumnInfo;
+		l_poPDC->add_column ( M_COLUMN_SETUP, a_poDataControl );
+		}
+	else throw new HException ( __WHERE__, "unknown parent type",
+			f_psResourcesArray [ l_iParent ].f_iType );
+	return;
 	M_EPILOG
 	}
 

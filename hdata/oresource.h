@@ -55,37 +55,54 @@ struct OAttributes
 	int	f_iFocusedAttribute;	/* attribute of control in focused state */
 	};
 
+struct OColumnInfo
+	{
+	int f_iPlacement; 			/* what place should this new column take */
+	const char * f_pcName;	/* column name */
+	int f_iWidth;						/* column width */
+	int f_iAlign;						/* column alignment */
+	int f_iType;						/* data type stored in that column */
+	};
+
+class HDataControl;
+
 struct OResource
 	{
 /* data part */
-	char *	f_pcTable;						/* name of table in database asociated with contorl */
-	char *	f_pcSQL;							/* general SQL quarey for contorl (read-only mode) */
-	char *	f_pcFilter;						/* additional filter for record-set (WHERE clause) */
-	char *	f_pcSort;							/* additional sort for record-set (ORDER BY clause) */
+	const char *	f_pcTable;			/* name of table in database asociated with contorl */
+	const char *	f_pcColumns;		/* what columns from record-set we are looking for */
+	const char *	f_pcFilter;			/* additional filter for record-set (WHERE clause) */
+	const char *	f_pcSort;				/* additional sort for record-set (ORDER BY clause) */
 /* control part */
 	int			f_iRow;								/* top coordinate of contorl */
 	int			f_iColumn;						/* left coordinate of contorl */
 	int			f_iHeight;						/* height of control */
 	int			f_iWidth;							/* width of control */
-	char *	f_pcLabel;						/* control label */
+	const char *	f_pcLabel;			/* control label */
+	OAttributes *	f_psAttributes;	/* control's attributes */
+/* relative functionality configuration options */
 	int			f_iFlags;							/* tell how control should be treaded */
 	int			f_iType;							/* predefined type of control */
-	int			f_iControlParent;			/* index of parent control (tree data structure) */
-	OAttributes *	f_psAttributes;	/* control's attributes */
-	void *	f_pvControlSpecific;	/* additional initialization values control
-																	 specific */
+	void *	f_pvTypeSpecific;			/* additional initialization values control
+																	 type specific */
+	OColumnInfo * f_psColumnInfo;	/* if this control is a child control this field
+																	 holds initialization information about
+																	 parent's record's field-column */
+	int			f_iParent;						/* index of parent control (tree data structure) */
+	HDataControl * f_poDataControl;	/* after initialising any control from resource 
+																		 this field hosts pointer to it */
 	};
 
 /* control type specific */
 struct OEditControlResource
 	{
-	int			f_iMaxStringSize;			/* maximum length of contained string */
-	char *	f_pcValue;						/* initial value for control */
-	char *	f_pcMask;							/* tell what can be inserted into control */
-	bool		f_bReplace;						/* is control in replace mode? */
-	bool		f_bMultiLine;					/* is this contorl a multiline edit? */
-	bool		f_bPassword;					/* is control in password mode? (no echo) */
-	int			f_iMaxHistoryLevel;		/* history buffer size */
+	int			f_iMaxStringSize;		/* maximum length of contained string */
+	const char *	f_pcValue;		/* initial value for control */
+	const char *	f_pcMask;			/* tell what can be inserted into control */
+	bool		f_bReplace;					/* is control in replace mode? */
+	bool		f_bMultiLine;				/* is this contorl a multiline edit? */
+	bool		f_bPassword;				/* is control in password mode? (no echo) */
+	int			f_iMaxHistoryLevel;	/* history buffer size */
 	};
 
 #endif /* not __ORESOURCE_H */

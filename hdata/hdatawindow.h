@@ -31,6 +31,7 @@ Copyright:
 #include "../hconsole/hwindow.h"
 #include "../hconsole/hlistcontrol.h"
 #include "hdatacontrol.h"
+#include "hdatalistcontrol.h"
 #include "oresource.h"
 
 class HDataWindow : public HWindow, public HRecordSet
@@ -51,8 +52,9 @@ public:
 	/*}*/
 protected:
 	/*{*/
+	void link ( int, HDataControl * );
 	void sync ( int, HEditControl & );
-	void sync ( int, HListControl & );
+	void sync ( int, HDataListControl & );
 	int handler_add_new ( int );
 	int handler_edit ( int );
 	int handler_delete ( int );
