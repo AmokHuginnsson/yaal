@@ -45,8 +45,8 @@ Copyright:
 
 HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 										 int a_iHeight, int a_iWidth, const char * a_pcLabel,
-										 int a_iAttribute, int a_iEnabledAttribute,
-										 int a_iFocusedAttribute )
+										 bool a_bDrawLabel, int a_iDisabledAttribute,
+										 int a_iEnabledAttribute, int a_iFocusedAttribute )
 	{
 	M_PROLOG
 	if ( ! console::is_enabled ( ) )
@@ -55,6 +55,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		throw new HException ( __WHERE__, "no parent window.", ( int ) a_poParent );
 	f_bEnabled = false;
 	f_bFocused = false;
+	f_bDrawLabel = a_bDrawLabel;
 	f_poParent = a_poParent;
 	f_iRow = a_iRow;
 	f_iColumn = a_iColumn;
@@ -64,7 +65,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iColumnRaw = 0;
 	f_iHeightRaw = 0;
 	f_iWidthRaw = 0;
-	if ( a_iAttribute > 0 )f_iDisabledAttribute = a_iAttribute;
+	if ( a_iDisabledAttribute > 0 )f_iDisabledAttribute = a_iDisabledAttribute;
 	else f_iDisabledAttribute = console::n_iDisabledAttribute;
 	if ( a_iEnabledAttribute > 0 )f_iEnabledAttribute = a_iEnabledAttribute;
 	else f_iEnabledAttribute = console::n_iEnabledAttribute;
@@ -193,6 +194,11 @@ void HControl::draw_label ( void )
 		: console::n_iWidth + f_iWidth - f_iColumnRaw;
 /* done */
 	::move ( f_iRowRaw, f_iColumnRaw );
+	if ( f_bDrawLabel )
+		{
+		M_SET_ATTR_DATA ( );
+		return;
+		}
 	M_SET_ATTR_LABEL ( );
 	cprintf ( f_oLabel );
 	::move ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex );
@@ -208,11 +214,11 @@ void HControl::draw_label ( void )
 	M_EPILOG
 	}
 
-void HControl::set_attributes ( int a_iAttribute, int a_iEnabledAttribute, 
+void HControl::set_attributes ( int a_iDisabledAttribute, int a_iEnabledAttribute, 
 		int a_iFocusedAttribute )
 	{
 	M_PROLOG
-	f_iDisabledAttribute = a_iAttribute;
+	f_iDisabledAttribute = a_iDisabledAttribute;
 	f_iEnabledAttribute = a_iEnabledAttribute;
 	f_iFocusedAttribute = a_iFocusedAttribute;
 	refresh ( );

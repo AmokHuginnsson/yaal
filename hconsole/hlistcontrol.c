@@ -42,14 +42,14 @@ Copyright:
 #include "../hcore/hexception.h"
 
 HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-														 int a_iHeight, int a_iWidth,
-														 const char * a_pcLabel, int a_iDisabledAttribute,
-														 int a_iEnabledAttribute, int a_iFocudesAttribute,
-														 bool a_bCheckable, bool a_bSortable,
-														 bool a_bSearchable )
+		int a_iHeight, int a_iWidth, const char * a_pcLabel, bool a_bCheckable,
+		bool a_bSortable, bool a_bSearchable, bool a_bDrawLabel,
+		int a_iDisabledAttribute, int a_iEnabledAttribute,
+		int a_iFocudesAttribute )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
-												 a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
-												 a_iFocudesAttribute ), HList < HItem > ( )
+								a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
+								a_iEnabledAttribute, a_iFocudesAttribute ),
+							HList < HItem > ( )
 	{
 	M_PROLOG
 	f_bEditable = false;

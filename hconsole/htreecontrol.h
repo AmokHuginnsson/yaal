@@ -63,6 +63,7 @@ public:
 								 int,						/* height */
 								 int,						/* width */
 								 const char *,	/* label */
+								 bool = true,		/* draw label */
 								 int = -1, 			/* disabled attribute */
 								 int = -1,			/* enabled attribute */
 								 int = -1 );		/* focused attribute */

@@ -49,10 +49,11 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		const char * a_pcLabel, int a_iBufferSize, const char * a_pcValue,
 		const char * a_pcMask, bool a_bReplace, bool a_bRightAligned,
 		bool a_bMultiLine, bool a_bPassword, int a_iMaxHistoryLevel,
-		int a_iDisabledAttribute, int a_iEnabledAttribute, int a_iFocusedAttribute )
+		bool a_bDrawLabel, int a_iDisabledAttribute,
+		int a_iEnabledAttribute, int a_iFocusedAttribute )
 					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-							a_iWidth, a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
-							a_iFocusedAttribute ),
+							a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
+							a_iEnabledAttribute, a_iFocusedAttribute ),
 					f_oString ( ( unsigned long ) a_iBufferSize )
 	{
 	M_PROLOG

@@ -28,12 +28,12 @@ Copyright:
 
 #include "../hcore/hexception.h"
 
-HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-		int a_iHeight, int a_iWidth, const char * a_pcLabel )
-						:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
-								a_pcLabel ),
-								HListControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-										a_iWidth, a_pcLabel )
+HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
+		int a_iColumn, int a_iHeight, int a_iWidth, const char * a_pcLabel )
+									:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
+											a_iWidth, a_pcLabel ),
+										HListControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
+												a_iWidth, a_pcLabel )
 	{
 	M_PROLOG
 	return;

@@ -30,16 +30,19 @@ Copyright:
 
 HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
-		const char * a_pcLabel, int a_iDroppedWidth, int a_iDisabledAttribute,
-		int a_iEnabledAttribute, int a_iFocusedAttribute, bool a_bCheckable )
-								: HControl ( a_poParent, a_iRow, a_iColumn,
-										a_iHeight, a_iWidth, a_pcLabel, a_iDisabledAttribute,
+		const char * a_pcLabel, int a_iDroppedWidth,
+		bool a_bCheckable, bool a_bSortable, bool a_bSearchable,
+		bool a_bDrawLabel, int a_iDisabledAttribute,
+		int a_iEnabledAttribute, int a_iFocusedAttribute )
+								: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
+										a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
 									HEditControl ( NULL, 0, 0, 0, 0, NULL ),
-									HListControl ( NULL, 0, 0, 0, 0, NULL, 0, 0, 0, a_bCheckable )
+									HListControl ( NULL, 0, 0, 0, 0, NULL,
+											a_bCheckable, a_bSortable, a_bSearchable )
 	{
 	M_PROLOG
-	f_iMode = D_MODE_LIST;
+	f_iMode = D_MODE_EDIT;
 	f_iDroppedWidth = a_iDroppedWidth;
 	return;
 	M_EPILOG
@@ -64,10 +67,15 @@ int HComboboxControl::set_focus ( char a_cCode )
 void HComboboxControl::refresh ( void )
 	{
 	M_PROLOG
+	bool l_bOldDrawLabel = f_bDrawLabel;
 	if ( f_iMode == D_MODE_EDIT )
 		HEditControl::refresh ( );
 	else
+		{
+		f_bDrawLabel = false;
 		HListControl::refresh ( );
+		}
+	f_bDrawLabel = l_bOldDrawLabel;
 	return;
 	M_EPILOG
 	}

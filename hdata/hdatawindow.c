@@ -80,7 +80,8 @@ HDataWindow::~HDataWindow ( void )
 						f_psResourcesArray [ l_iCtr ].f_iWidth,\
 						f_psResourcesArray [ l_iCtr ].f_pcLabel
 
-#define M_SETUP_ATTRIBUTES l_psAttr->f_iDisabledAttribute,\
+#define M_SETUP_ATTRIBUTES l_psAttr->f_bDrawLabel,\
+						l_psAttr->f_iDisabledAttribute,\
 						l_psAttr->f_iEnabledAttribute,\
 						l_psAttr->f_iFocusedAttribute
 
@@ -104,6 +105,7 @@ int HDataWindow::init ( void )
 	OEditControlResource * l_psECR = & l_sEditControlResource;
 /* LCR stands for ListControlResource */
 	OListControlResource * l_psLCR = & l_sListControlResource;
+	l_sAttributes.f_bDrawLabel = true;
 	l_sAttributes.f_iDisabledAttribute = -1;
 	l_sAttributes.f_iEnabledAttribute = -1;
 	l_sAttributes.f_iFocusedAttribute = -1;
@@ -142,8 +144,8 @@ int HDataWindow::init ( void )
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psLCR = ( OListControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
 				l_poDataControl = new HDataListControl ( this, this, M_SETUP_STANDART,
-						M_SETUP_ATTRIBUTES, l_psLCR->f_bCheckable, l_psLCR->f_bSortable,
-						l_psLCR->f_bSearchable );
+						l_psLCR->f_bCheckable, l_psLCR->f_bSortable, l_psLCR->f_bSearchable,
+						M_SETUP_ATTRIBUTES );
 				break;
 				}
 			case ( D_CONTROL_TREE ):

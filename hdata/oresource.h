@@ -50,9 +50,10 @@ Copyright:
 
 struct OAttributes
 	{
-	int	f_iDisabledAttribute;					/* attribute of control in disabled state */
-	int	f_iEnabledAttribute;	/* attribute of control in enabled state */
-	int	f_iFocusedAttribute;	/* attribute of control in focused state */
+	bool	f_bDrawLabel;				/* should be label driven */
+	int		f_iDisabledAttribute;	/* attribute of control in disabled state */
+	int		f_iEnabledAttribute;	/* attribute of control in enabled state */
+	int		f_iFocusedAttribute;	/* attribute of control in focused state */
 	};
 
 struct OColumnInfo

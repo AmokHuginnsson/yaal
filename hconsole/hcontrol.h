@@ -40,6 +40,7 @@ protected:
 	bool			f_bEnabled;						/* is cotrol enabled, focus can go 
 																		 only to enabled control */
 	bool			f_bFocused;						/* has control focus */
+	bool			f_bDrawLabel;					/* will be label driven */
 	bool 			f_bSingleLine;				/* is label in the same line as top of
 																		 control */
 	int				f_iDisabledAttribute;	/* attribute of disabled cotrol */
@@ -72,8 +73,8 @@ public:
 	/*{*/
 /* parent, row, col, height, width, label */
 	HControl ( HWindow *, int, int, int, int, const char *,
-/* disabled attribute, enabled-attribute, focused-attribute */
-			int = -1, int = -1,	int = -1 );
+/* draw label, disabled attribute, enabled-attribute, focused-attribute */
+			bool = true, int = -1, int = -1,	int = -1 );
 	virtual ~HControl ( void );
 	void enable ( bool );
 	virtual int process_input ( int );

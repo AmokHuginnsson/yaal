@@ -74,6 +74,7 @@ public:
 								bool = false,				/* multiline */
 								bool = false,				/* password */
 								int = 8,						/* max history level */
+								bool = true,				/* draw label */
 								int = -1, 					/* disabled attribute */
 								int = -1,						/* enabled attribute */
 								int = -1 );					/* focused attribute */

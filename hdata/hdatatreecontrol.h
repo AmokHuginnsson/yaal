@@ -38,7 +38,7 @@ protected:
 public:
 	/*{*/
 	HDataTreeControl ( HRecordSet *, HWindow *, int, int, int, int, const char *,
-			int = -1, int = -1, int = -1 );
+			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataTreeControl ( void );
 	virtual void populate ( long int );
 	/*}*/

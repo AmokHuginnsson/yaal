@@ -30,10 +30,10 @@ Copyright:
 
 HDataTreeControl::HDataTreeControl ( HRecordSet * a_poRecordSet,
 		HWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
-		int a_iWidth, const char * a_pcTitle, int a_iAttribute,
-		int a_iEnabledAttribute, int a_iFocusedAttribute )
+		int a_iWidth, const char * a_pcTitle, bool a_bDrawLabel,
+		int a_iDisabledAttribute, int a_iEnabledAttribute, int a_iFocusedAttribute )
 								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
-										a_iWidth, a_pcTitle, a_iAttribute,
+										a_iWidth, a_pcTitle, a_bDrawLabel, a_iDisabledAttribute,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
 								HDataControl ( a_poRecordSet ),
 								HTreeControl ( NULL, 0, 0, 0, 0, NULL )

@@ -79,12 +79,12 @@ void HTreeControl::HNodeControl::collapse ( void )
 	}
 
 HTreeControl::HTreeControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-														 int a_iHeight, int a_iWidth, const char * a_pcLabel,
-														 int a_iDisabledAttribute, int a_iEnabledAttribute,
-														 int a_iFocusedAttribute )
+		int a_iHeight, int a_iWidth, const char * a_pcLabel, bool a_bDrawLabel,
+		int a_iDisabledAttribute, int a_iEnabledAttribute,
+		int a_iFocusedAttribute )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
-												 a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
-												 a_iFocusedAttribute )
+								a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
+								a_iEnabledAttribute, a_iFocusedAttribute )
 	{
 	M_PROLOG
 	refresh ( );
