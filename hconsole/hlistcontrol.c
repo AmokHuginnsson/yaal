@@ -42,9 +42,10 @@ Copyright:
 #include "../hcore/hexception.h"
 
 HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-														 int a_iHeight, int a_iWidth, const char * a_pcLabel,
-														 int a_iDisabledAttribute, int a_iEnabledAttribute,
-														 int a_iFocudesAttribute, bool a_bCheckable )
+														 int a_iHeight, int a_iWidth,
+														 const char * a_pcLabel, int a_iDisabledAttribute,
+														 int a_iEnabledAttribute, int a_iFocudesAttribute,
+														 bool a_bCheckable )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
 												 a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
 												 a_iFocudesAttribute ), HList < HItem > ( )
@@ -491,28 +492,25 @@ HItem & HListControl::add_tail ( void )
 HItem & HListControl::add_tail ( HItem & a_roItem )
 	{
 	M_PROLOG
-	HElement * l_poElement = NULL;
-	HItem * l_oDummy = NULL;
-	if ( f_iQuantity >= f_iHeightRaw )
+	HItem * l_poDummy = NULL;
+	l_poDummy = & HList < HItem > ::add_tail ( a_roItem );
+	if ( f_iQuantity > f_iHeightRaw )
 		{
 		f_iCursorPosition = f_iHeightRaw - 1;
-		f_iControlOffset = f_iQuantity - f_iHeightRaw + 1;
+		f_iControlOffset = f_iQuantity - f_iHeightRaw;
 		if ( f_poFirstVisibleRow )
 			{
-			l_poElement = f_poSelected;
 			f_poSelected = f_poFirstVisibleRow;
 			to_tail ( );
 			f_poFirstVisibleRow = f_poSelected;
-			f_poSelected = l_poElement;
 			}
 		}
-	else f_iCursorPosition = f_iQuantity;
-	l_oDummy = & HList < HItem > ::add_tail ( a_roItem );
+	else f_iCursorPosition = f_iQuantity - 1;
 	if ( ! f_poFirstVisibleRow )f_poFirstVisibleRow = f_poHook;
 	f_poSelected = f_poHook;
 	to_head ( );
 	console::n_bNeedRepaint = true;
-	return ( * l_oDummy );
+	return ( * l_poDummy );
 	M_EPILOG
 	}
 
