@@ -55,6 +55,13 @@ HSerial::HSerial ( const char * a_pcDevice )
  */
 	f_sTIO.c_cflag = D_BAUDRATE | CRTSCTS | CS8 | CLOCAL | CREAD; 
 /*
+ *   statement above is *FALSE*, I can not use cfsetispeed and cfsetospeed,
+ *   I *MUST* use it. On newwe systes c_cflag and BAUDRATE simply does not work
+ *   newwer interface for setting speed (baudrate)
+ */
+	cfsetispeed ( & f_sTIO, D_BAUDRATE );
+	cfsetospeed ( & f_sTIO, D_BAUDRATE );
+/*
  *   IGNPAR  : ignore bytes with parity errors
  *   ICRNL   : map CR to NL  ( otherwise a CR input on the other computer
  *             will not terminate input)
@@ -95,9 +102,6 @@ HSerial::HSerial ( const char * a_pcDevice )
 	f_sTIO.c_cc [ VWERASE ]  = 0;    /* Ctrl-w */
 	f_sTIO.c_cc [ VLNEXT ]   = 0;    /* Ctrl-v */
 	f_sTIO.c_cc [ VEOL2 ]    = 0;    /* '\0' */
-/*
- *   now clean the modem line and activate the settings for the port
- */
 	return;
 	M_EPILOG
 	}
@@ -115,9 +119,10 @@ bool HSerial::open ( void )
 	M_PROLOG
 	if ( f_iFileDes )
 		throw new HException ( __WHERE__, "serial port already openend", g_iErrNo );
-	f_iFileDes = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY );
+	f_iFileDes = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NDELAY );
 	if ( ! f_iFileDes )
 		throw new HException ( __WHERE__, strerror ( g_iErrNo ), g_iErrNo );
+	fcntl ( f_iFileDes, F_SETFL, 0 );
 	tcgetattr ( f_iFileDes, & f_sBackUpTIO );
 	tcflush ( f_iFileDes, TCIFLUSH );
 	tcsetattr ( f_iFileDes, TCSANOW, & f_sTIO );
