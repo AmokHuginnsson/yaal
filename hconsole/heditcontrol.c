@@ -47,12 +47,13 @@ Copyright:
 HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iWidth, int a_iHeight,
 		const char * a_pcLabel, int a_iBufferSize, const char * a_pcValue,
-		const char * a_pcMask, bool a_bReplace, bool a_bMultiLine,	bool a_bPassword,
+		const char * a_pcMask, bool a_bReplace, bool a_bMultiLine, bool a_bPassword,
 		int a_iMaxHistoryLevel, int a_iDisabledAttribute, int a_iEnabledAttribute,
 		int a_iFocusedAttribute )
 					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 							a_iWidth, a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
-							a_iFocusedAttribute ), f_oString ( ( unsigned long ) a_iBufferSize )
+							a_iFocusedAttribute ),
+					f_oString ( ( unsigned long ) a_iBufferSize )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
