@@ -31,10 +31,17 @@ Copyright:
 
 #include "hstring.h"
 
+struct OVariable
+	{
+	int f_iType;
+	const char * f_pcKey;
+	void * f_pvValue;
+	};
+
 namespace rc_file
 	{
 
-int process_rc_file ( const char *, void ( * ) ( HString &, HString & ) );
+int process_rc_file ( const char *, OVariable *, void ( * ) ( HString &, HString & ) = NULL );
 int read_rc_line ( HString &, HString &, FILE * );
 FILE * rc_open ( const char *, bool, FILE * = NULL );
 void rc_close ( FILE * );

@@ -63,6 +63,12 @@ int n_iFocusedAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
 WINDOW * n_psWindow = NULL;
 bool n_bUseMouse = false;
 
+OVariable n_psVariables [ ] =
+	{
+		{ D_TYPE_BOOL, "use_mouse", & n_bUseMouse },
+		{ 0, NULL, NULL }
+	};
+	
 /* public: */
 void enter_curses( void )
 	{
@@ -416,8 +422,6 @@ void set_console_variables ( HString & a_roOption, HString & a_roValue )
 		set_color ( a_roValue, console::n_iEnabledAttribute );
 	else if ( ! strcasecmp ( a_roOption, "focused_attribute" ) )
 		set_color ( a_roValue, console::n_iFocusedAttribute );
-	else if ( ! strcasecmp ( a_roOption, "use_mouse" ) )
-		rc_file::rc_set_variable ( a_roValue, console::n_bUseMouse );
 	}
 
 void console_init ( void )
@@ -426,7 +430,12 @@ void console_init ( void )
  * process hangs just before dbwrapper_fini ( ) */
 /*	_init ( ); */
 	g_iErrNo = 0;
-	rc_file::process_rc_file ( "stdhapi", set_console_variables );
+	if ( sizeof ( int ) < 4 )
+		{
+		::log << "Your CPU or compiler does not support proper size of int." << endl;
+		exit ( 0 );
+		}
+	rc_file::process_rc_file ( "stdhapi", console::n_psVariables, set_console_variables );
 	return;
 	}
 

@@ -52,6 +52,12 @@ namespace signals
 {
 
 bool n_bCtrlCDoesNotBreak = false;
+
+OVariable n_psVariables [ ] =
+	{
+		{ D_TYPE_BOOL, "ctrl_c_does_not_break", & n_bCtrlCDoesNotBreak },
+		{ 0, NULL, NULL }
+	};
 	
 /* singnal handler definitions */
 	
@@ -294,11 +300,12 @@ extern "C"
 extern void _init ( void );
 extern void _fini ( void );
 
+/*
 void set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
-	if ( ! strcasecmp ( a_roOption, "ctrl_c_does_not_break" ) )
-		rc_file::rc_set_variable ( a_roValue, signals::n_bCtrlCDoesNotBreak );
+	return;
 	}
+*/
 
 void tools_init ( void )
 	{
@@ -306,7 +313,7 @@ void tools_init ( void )
  * process hangs just before dbwrapper_fini ( ) */
 /*	_init ( ); */
 	g_iErrNo = 0;
-	rc_file::process_rc_file ( "stdhapi", set_tools_variables );
+	rc_file::process_rc_file ( "stdhapi", signals::n_psVariables );
 	return;
 	}
 

@@ -107,7 +107,7 @@ void HListControl::refresh ( void )
 					{
 					move ( f_iRowRaw + l_iCtr + 1, f_iColumnRaw + l_iColumnOffset );
 					f_oVarTmpBuffer [ 0 ] = 0;
-					switch ( l_iFlags & D_TYPE_MASK ) /* 0x0f000 is mask for type */
+					switch ( l_iFlags & D_TYPE_MASK ) /* 0x0ffff is mask for type */
 						{
 						case ( D_TYPE_LONG_INT ):
 							{

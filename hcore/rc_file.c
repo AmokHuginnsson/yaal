@@ -39,19 +39,53 @@ Copyright:
 namespace rc_file
 {
 
-int process_rc_file ( const char * a_pcRcName,
+int process_rc_file ( const char * a_pcRcName, OVariable * a_psVaraibles,
 		void ( * set_variables ) ( HString &, HString & ) )
 	{
+	bool l_pbTFTab [ ] = { false, true };
+	int l_iCtr = 0, l_iCtrOut = 0;
 	FILE * l_psRc = 0;
 	HString l_oOption, l_oValue;
 	log << "process_rc_file ( ): ";
-	l_psRc = rc_open ( a_pcRcName, false );
-	if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc ) )
-		set_variables ( l_oOption, l_oValue );
-	l_psRc = rc_open ( a_pcRcName, true, l_psRc );
-	if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc ) )
-		set_variables ( l_oOption, l_oValue );
-	rc_close ( l_psRc );
+	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
+		{
+		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );
+		if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc ) )
+			{
+			l_iCtr = 0;
+			while ( a_psVaraibles [ l_iCtr ].f_pcKey )
+				{
+				if ( ! strcasecmp ( l_oOption, a_psVaraibles [ l_iCtr ].f_pcKey ) )
+					switch ( a_psVaraibles [ l_iCtr ].f_iType )
+						{
+						case ( D_TYPE_BOOL ):
+							{
+							rc_set_variable ( l_oValue, * ( bool * ) a_psVaraibles [ l_iCtr ].f_pvValue );
+							break;
+							}
+						case ( D_TYPE_INT ):
+							{
+							rc_set_variable ( l_oValue, * ( int * ) a_psVaraibles [ l_iCtr ].f_pvValue );
+							break;
+							}
+						case ( D_TYPE_CHAR_POINTER ):
+							{
+							rc_set_variable ( l_oValue, ( char ** ) a_psVaraibles [ l_iCtr ].f_pvValue );
+							break;
+							}
+						default :
+							{
+							throw new HException ( __WHERE__, "unknown type", a_psVaraibles [ l_iCtr ].f_iType );
+							break;
+							}
+					}
+				if ( set_variables )set_variables ( l_oOption, l_oValue );
+				l_iCtr ++;
+				}
+			}
+		}
+	if ( l_psRc )rc_close ( l_psRc );
+	l_psRc = NULL;
 	log << "done." << endl;
 	return ( 0 );
 	}

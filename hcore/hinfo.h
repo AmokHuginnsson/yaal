@@ -30,20 +30,7 @@ Copyright:
 #include "hobject.h"
 #include "hstring.h"
 #include "htime.h"
-
-#ifndef NULL
-#define NULL 0
-#endif /* NULL */
-
-#define D_TYPE_NONE			0x0000
-#define D_TYPE_INT			0x0001
-#define	D_TYPE_LONG_INT	0x0002
-#define D_TYPE_DOUBLE		0x0004
-#define D_TYPE_POINTER	0x0008
-#define D_TYPE_HSTRING	0x0010
-#define D_TYPE_HTIME		0x0020
-#define D_TYPE_HOBJECT	0x0040
-#define D_TYPE_MASK			0x00ff
+#include "hexception.h" /* types definitions */
 
 class HInfo
 	{

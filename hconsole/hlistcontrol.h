@@ -34,10 +34,10 @@ Copyright:
 #include "../hcore/hflexiblelist.h"
 #include "hwindow.h"
 
-#define D_ALIGN_LEFT			0x0100
-#define D_ALIGN_CENTER		0x0200
-#define D_ALIGN_RIGHT			0x0400
-#define D_ALIGN_MASK			0xff00
+#define D_ALIGN_LEFT			0x0010000
+#define D_ALIGN_CENTER		0x0020000
+#define D_ALIGN_RIGHT			0x0040000
+#define D_ALIGN_MASK			0x0ff0000
 
 class HListControl : public HFlexibleList, public virtual HControl
 	{

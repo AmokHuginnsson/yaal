@@ -40,14 +40,9 @@ Copyright:
 
 #include "db_driver_loader.h"
 
-#ifndef NULL
-#define NULL	0
-#endif /* not NULL */
-
-char * g_pcDefaultSockPath = NULL;
-
 const char g_pcDone [ ] = "done.\n";
 
+char * g_pcDefaultSockPath = NULL;
 const char * g_ppcDriver [ 24 ] =
 	{
 	"libmysql_driver.so",
@@ -57,12 +52,18 @@ const char * g_ppcDriver [ 24 ] =
 
 void * g_pvDlHandle = NULL;
 
-
 namespace dbwrapper
 	{
 
 bool	n_bLogSQL = false;
 int		n_iDataBaseDriver = 0;
+
+OVariable n_psVariables [ ] =
+	{
+		{ D_TYPE_BOOL, "log_sql", & n_bLogSQL },
+		{ D_TYPE_CHAR_POINTER, "mysql_socket", & g_pcDefaultSockPath },
+		{ 0, NULL, NULL }
+	};
 
 typedef void * ( * t0 ) ( const char *, const char *, const char * );
 void * ( * db_connect ) ( const char *, const char *, const char * );
@@ -120,19 +121,13 @@ void dbwrapper_exit ( void )
 
 void set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	{
-	if ( ! strcasecmp ( a_roOption, "log_sql" ) )
-		rc_file::rc_set_variable ( a_roValue, dbwrapper::n_bLogSQL );
-	else if ( ! strcasecmp ( a_roOption, "mysql_socket" ) )
-		rc_file::rc_set_variable ( a_roValue, & g_pcDefaultSockPath );
-	else if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
+	if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
 		{
 		if ( ! strcmp ( a_roValue, "MySQL" ) )
 			dbwrapper::n_iDataBaseDriver = D_MYSQL;
 		else if ( ! strcmp ( a_roValue, "PostgreSQL" ) )
 			dbwrapper::n_iDataBaseDriver = D_POSTGRESQL;
 		}
-	if ( ! g_pcDefaultSockPath )
-		g_pcDefaultSockPath = xstrdup ( "/var/run/mysqld/mysqld.sock" );
 	return;
 	}
 
@@ -154,7 +149,9 @@ void dbwrapper_init ( void )
 	dbwrapper::rsdb_id = NULL;
 	dbwrapper::rs_column_name = NULL;
 	fprintf ( stderr, "Loading dynamic database driver ... " );
-	rc_file::process_rc_file ( "stdhapi", set_dbwrapper_variables );
+	rc_file::process_rc_file ( "stdhapi", dbwrapper::n_psVariables, set_dbwrapper_variables );
+	if ( ! g_pcDefaultSockPath )
+		g_pcDefaultSockPath = xstrdup ( "/var/run/mysqld/mysqld.sock" );
 	if ( dbwrapper::n_iDataBaseDriver )
 		{
 		l_iCtr = dbwrapper::n_iDataBaseDriver - 1;
@@ -203,6 +200,8 @@ void dbwrapper_init ( void )
 
 void dbwrapper_fini ( void )
 	{
+	if ( g_pcDefaultSockPath )
+		xfree ( ( void * ) g_pcDefaultSockPath );
 	if ( g_pvDlHandle )
 		{
 		fprintf ( stderr, "Unloading dynamic database driver ... " );

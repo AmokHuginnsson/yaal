@@ -38,6 +38,26 @@ Copyright:
 #define NULL 0
 #endif /* not NULL */
 
+/* those types definitions were in hinfo.h but this file (hexception.h)
+ * is included into more files, we assume that size of ( int ) is equal 4*/
+#define D_TYPE_NONE					0x0000
+#define D_TYPE_BOOL					0x0001
+#define D_TYPE_CHAR					0x0002
+#define D_TYPE_SHORT				0x0004
+#define D_TYPE_INT					0x0008
+#define	D_TYPE_LONG					0x0010
+#define	D_TYPE_LONG_INT			0x0020
+#define D_TYPE_DOUBLE				0x0040
+#define D_TYPE_POINTER			0x0080
+#define D_TYPE_CHAR_POINTER	0x0100
+#define D_TYPE_HOBJECT			0x0200
+#define D_TYPE_HSTRING			0x0400
+#define D_TYPE_HINFO				0x0800
+#define D_TYPE_HMAP					0x1000
+#define D_TYPE_HLIST				0x2000
+#define D_TYPE_HTIME				0x4000
+#define D_TYPE_MASK					0xffff
+
 #ifndef errno
 extern int errno;
 #endif /* not errno */
