@@ -29,6 +29,8 @@ Copyright:
 
 #line 31 "hmap.h"
 
+#include <stddef.h>
+
 extern unsigned long const int * const g_pulPrimes;
 
 template < class tType >
@@ -72,13 +74,14 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HMap ( int ); /* Lower bound of size of map's table */
+	HMap ( size_t ); /* Lower bound of size of map's table */
 	virtual ~HMap ( void );
-	ttType & operator [ ] ( tType );
+	ttType & operator [ ] ( const tType & );
 	void rewind ( void );
 	bool iterate ( tType &, ttType & );
-	bool get ( tType, ttType & );
-	bool remove ( tType );
+	bool has_key ( const tType & );
+	bool get ( const tType &, ttType & );
+	bool remove ( const tType & );
 	void flush ( void );
 	int quantity ( void );
 	/*}*/
@@ -110,7 +113,7 @@ HMap<tType, ttType>::HAtom::~HAtom ( void )
 	}
 
 template < class tType, class ttType >
-HMap<tType, ttType>::HMap ( int a_iSize )
+HMap<tType, ttType>::HMap ( size_t a_iSize )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -174,19 +177,19 @@ int HMap < tType, ttType >::quantity ( )
 	}
 
 template < class tType, class ttType >
-ttType & HMap<tType, ttType>::operator [ ] ( tType a_tKey )
+ttType & HMap<tType, ttType>::operator [ ] ( const tType & a_rtKey )
 	{
 	M_PROLOG
 	int l_iHash = -1;
 	HAtom * l_poAtom = NULL;
-	l_iHash = hash ( a_tKey ) % f_iPrime;
+	l_iHash = hash ( a_rtKey ) % f_iPrime;
 #ifdef __DEBUGGER_BABUNI__
 	HString l_oMessage;
 	l_oMessage.format ( "hash = %d", l_iHash );
 	M_LOG ( ( char * ) l_oMessage );
 #endif /* __DEBUGGER_BABUNI__ */
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom && ( l_poAtom->f_tKey != a_tKey ) )
+	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		l_poAtom = l_poAtom->f_poNext;
 	if ( ! l_poAtom )
 		{
@@ -196,7 +199,7 @@ ttType & HMap<tType, ttType>::operator [ ] ( tType a_tKey )
 		f_iQuantity ++;
 		l_poAtom->f_poNext = f_ppoAtomArray [ l_iHash ];
 		f_ppoAtomArray [ l_iHash ] = l_poAtom;
-		l_poAtom->f_tKey = a_tKey;
+		l_poAtom->f_tKey = a_rtKey;
 		}
 	return ( l_poAtom->f_tValue );
 	M_EPILOG
@@ -223,7 +226,7 @@ bool HMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 		}
 	if ( ! f_poAtomPtr )
 		{
-		while ( ! f_ppoAtomArray [ f_iIndex ] && ( f_iIndex < f_iPrime ) )
+		while ( ( f_iIndex < f_iPrime ) && ! f_ppoAtomArray [ f_iIndex ] )
 			f_iIndex ++;
 		if ( f_iIndex < f_iPrime )f_poAtomPtr = f_ppoAtomArray [ f_iIndex ];
 		}
@@ -237,14 +240,28 @@ bool HMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 	}
 
 template < class tType, class ttType >
-bool HMap<tType, ttType>::get ( tType a_tKey, ttType & a_rtValue )
+bool HMap<tType, ttType>::has_key ( const tType & a_rtKey )
 	{
 	M_PROLOG
 	int l_iHash = -1;
 	HAtom * l_poAtom = NULL;
-	l_iHash = hash ( a_tKey ) % f_iPrime;
+	l_iHash = hash ( a_rtKey ) % f_iPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom && ( l_poAtom->f_tKey != a_tKey ) )
+	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
+		l_poAtom = l_poAtom->f_poNext;
+	return ( l_poAtom ? true : false );
+	M_EPILOG
+	}
+
+template < class tType, class ttType >
+bool HMap<tType, ttType>::get ( const tType & a_rtKey, ttType & a_rtValue )
+	{
+	M_PROLOG
+	int l_iHash = -1;
+	HAtom * l_poAtom = NULL;
+	l_iHash = hash ( a_rtKey ) % f_iPrime;
+	l_poAtom = f_ppoAtomArray [ l_iHash ];
+	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		l_poAtom = l_poAtom->f_poNext;
 	if ( l_poAtom )a_rtValue = l_poAtom->f_tValue;
 	return ( l_poAtom ? true : false );
@@ -252,14 +269,14 @@ bool HMap<tType, ttType>::get ( tType a_tKey, ttType & a_rtValue )
 	}
 
 template < class tType, class ttType >
-bool HMap<tType, ttType>::remove ( tType a_tKey )
+bool HMap<tType, ttType>::remove ( const tType & a_rtKey )
 	{
 	M_PROLOG
 	int l_iHash = -1;
 	HAtom * l_poAtom = NULL, * l_poAncestor = NULL;
-	l_iHash = hash ( a_tKey ) % f_iPrime;
+	l_iHash = hash ( a_rtKey ) % f_iPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom && ( l_poAtom->f_tKey != a_tKey ) )
+	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		{
 		l_poAncestor = l_poAtom;
 		l_poAtom = l_poAtom->f_poNext;
