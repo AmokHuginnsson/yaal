@@ -54,15 +54,15 @@ HException::HException ( const char * a_pcFileName,
 	f_pcFileName = xstrdup ( a_pcFileName );
 	f_pcFunctionName = 0;
 	f_pcFunctionName = xstrdup ( a_pcFunctionName );
-	::log << "Exception: " << f_pcMessage << ", code: " << f_iCode;
-	::log << '.' << endl;
+	core::log << "Exception: " << f_pcMessage << ", code: " << f_iCode;
+	core::log << '.' << endl;
 	log ( a_pcFileName, a_pcFunctionName, a_iLine );
 	return;
 	}
 
 HException::~HException ( void )
 	{
-	::log ( "Exception registers: c:0x%02x i:%d l:%ld d:%f pv:%p pc:%s\n",
+	core::log ( "Exception registers: c:0x%02x i:%d l:%ld d:%f pv:%p pc:%s\n",
 			f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
 	if ( f_pcCharPtr )xfree ( f_pcCharPtr );
 	if ( f_pcFunctionName )xfree ( f_pcFunctionName );
@@ -97,7 +97,7 @@ void HException::log ( const char * a_pcFileName,
 	{
 	int l_iLength = strlen ( a_pcFileName );
 	if ( f_iFrame && ! ( strcmp ( f_pcFileName, a_pcFileName ) || strcmp ( f_pcFunctionName, a_pcFunctionName ) ) )return;
-	::log ( "Exception frame %2d: %16s : %4d : %s\n", f_iFrame ++,
+	core::log ( "Exception frame %2d: %16s : %4d : %s\n", f_iFrame ++,
 			a_pcFileName + ( l_iLength > 16 ? l_iLength - 16 : 0 ),
 			a_iLine, a_pcFunctionName );
 	return;
@@ -118,10 +118,10 @@ void HException::dump_call_stack ( int )
 	l_iSize = backtrace ( l_ppvArray, 1000 );
 	l_ppcStrings = backtrace_symbols  ( l_ppvArray, l_iSize );
 
-	::log << "Obtained " << ( int ) l_iSize << " stack frames." << endl;
+	log << "Obtained " << ( int ) l_iSize << " stack frames." << endl;
 	if ( a_iLevel < l_iSize )l_iSize = a_iLevel;
 	for  ( l_iCtr = 0; l_iCtr < l_iSize; l_iCtr ++ )
-		::log << l_ppcStrings [ l_iCtr ] << endl;
+		log << l_ppcStrings [ l_iCtr ] << endl;
 
 	xfree ( l_ppcStrings );
 #endif /* _EXECINFO_H */

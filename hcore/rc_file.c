@@ -48,7 +48,7 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 	int l_iCtr = 0, l_iCtrOut = 0, l_iLine = 0;
 	FILE * l_psRc = 0;
 	HString l_oOption, l_oValue, l_oMessage;
-	::log ( D_LOG_INFO ) << "process_rc_file ( ): ";
+	log ( D_LOG_INFO ) << "process_rc_file ( ): ";
 	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
 		{
 		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );
@@ -61,7 +61,7 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 					l_oValue.format ( "[%s]", a_pcSection );
 					if ( l_oOption == l_oValue )
 							{
-							::log << "section: " << a_pcSection << ", ";
+							log << "section: " << a_pcSection << ", ";
 							l_bSection = true;
 							continue;
 							}
@@ -115,18 +115,18 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 			if ( set_variables && set_variables ( l_oOption, l_oValue )
 					&& ! l_bOptionOK )
 				{
-				::log << "failed." << endl;
+				log << "failed." << endl;
 				l_oMessage.format ( "Error: unknown option found: `%s', "
 						"with value: `%s', on line %d.\n",
 						( const char * ) l_oOption, ( const char * ) l_oValue, l_iLine );
-				::log ( D_LOG_ERROR ) << l_oMessage;
+				log ( D_LOG_ERROR ) << l_oMessage;
 				fprintf ( stderr, l_oMessage );
 				}
 			}
 		}
 	if ( l_psRc )rc_close ( l_psRc );
 	l_psRc = NULL;
-	::log << "done." << endl;
+	log << "done." << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -274,7 +274,7 @@ FILE * rc_open ( const char * a_pcRcName, bool a_bLocal, FILE * a_psFile )
 		l_oRcPath = "config read from: " + l_oRcPath;
 		l_oRcPath += ", ";
 		}
-	::log << l_oRcPath;
+	log << l_oRcPath;
 	return ( l_psRc );
 	M_EPILOG
 	}
