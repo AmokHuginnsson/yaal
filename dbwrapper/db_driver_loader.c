@@ -370,7 +370,7 @@ void dbwrapper_init ( void )
 	{
 /* I do not know why but when _init ( ) is called explictly, like here would,
  * process hangs just before dbwrapper_fini ( ) */
-/*	_init ( ); */
+	_init ( );
 	dbwrapper::db_connect = null_db_connect;
 	dbwrapper::db_disconnect = null_db_disconnect;
 	dbwrapper::db_errno = null_db_errno;

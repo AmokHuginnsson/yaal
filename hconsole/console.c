@@ -437,12 +437,13 @@ void console_init ( void )
 	{
 /* I do not know why but when _init ( ) is called explictly, like here would,
  * process hangs just before dbwrapper_fini ( ) */
-/*	_init ( ); */
+	_init ( );
 	g_iErrNo = 0;
 	if ( sizeof ( int ) < 4 )
 		{
-		::log << "Your CPU or compiler does not support proper size of int." << endl;
-		exit ( 0 );
+		::log << "Your CPU or compiler does not support required size of int.";
+		::log << endl;
+		exit ( 1 );
 		}
 	rc_file::process_rc_file ( "stdhapi", "console",
 			console::n_psVariables, set_console_variables );

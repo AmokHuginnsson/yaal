@@ -323,7 +323,7 @@ void tools_init ( void )
 	{
 /* I do not know why but when _init ( ) is called explictly, like here would,
  * process hangs just before dbwrapper_fini ( ) */
-/*	_init ( ); */
+	_init ( );
 	g_iErrNo = 0;
 	rc_file::process_rc_file ( "stdhapi", "tools", signals::n_psVariables );
 	return;
