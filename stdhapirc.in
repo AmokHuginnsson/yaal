@@ -70,11 +70,11 @@ leave_ctrl_q true
 leave_ctrl_s true
 
 # use_mouse
-# type: bool, default: true
+# type: bool, default: false
 # force enabling of mouse interface, warning, when this option
 # is enabled and mouse interface is not available stdhapi library
 # will not allow execution of any program that uses hconsole api
-use_mouse false
+use_mouse true
 
 # latency
 # type: integer, default: 1

@@ -44,6 +44,7 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "mouse.h"
 #include "../hcore/hstring.h"
+#include "../hcore/hlog.h"
 
 namespace mouse
 {
@@ -71,7 +72,7 @@ int console_mouse_open ( void )
 	while ( l_iCtr < 12 )
 		{
 		l_pcTty [ 9 ] = '0' + l_iCtr ++;
-		n_iMouse = open ( l_pcTty, O_RDONLY );
+		n_iMouse = open ( l_pcTty, O_RDWR );
 		if ( n_iMouse < 0 )continue;
 		if ( ioctl ( n_iMouse, CONS_MOUSECTL, & l_sMouse ) >= 0 )break;
 		close ( n_iMouse );
@@ -81,6 +82,8 @@ int console_mouse_open ( void )
 	if ( n_iMouse < 0 )
 		M_THROW ( "can not open mouse", g_iErrNo );
 
+	log ( D_LOG_INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
+
 	return ( n_iMouse );
 	M_EPILOG
 	}
@@ -89,6 +92,7 @@ int console_mouse_get ( OMouse & a_sMouse )
 	{
 	M_PROLOG
 	mouse_info l_sMouse;
+	l_sMouse.operation = MOUSE_GETINFO;
 	if ( ioctl ( n_iMouse, CONS_MOUSECTL, & l_sMouse ) < 0 )
 		M_THROW ( "can not get mouse data", g_iErrNo );
 	else

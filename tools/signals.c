@@ -43,6 +43,7 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "../hcore/xalloc.h"
 #include "../hconsole/console.h" /* conio (ncurses) ability */
+#include "../hconsole/hconsole.h" /* n_bUseMouse */
 #include "../hcore/hlog.h"       /* log object */
 #include "../hcore/hstring.h"    /* HString class */
 #include "signals.h"
@@ -248,6 +249,41 @@ void signal_fatal ( int a_iSignum )
 	M_EPILOG
 	}
 
+void signal_USR1 ( int a_iSignum )
+	{
+	M_PROLOG
+#ifdef __CONSOLE_H
+	if ( console::n_bUseMouse )
+		{
+		if ( console::is_enabled ( ) )
+			{
+			console::n_bInputWaiting = true;
+			ungetch ( KEY_MOUSE );
+			return;
+			}
+		}
+#endif /* __CONSOLE_H */
+	char * l_pcSignalMessage = 0;
+	HString l_oMessage;
+	if ( signal( SIGUSR1, signals::signal_USR1 ) == SIG_IGN )
+		signal( SIGUSR1, SIG_IGN );
+	l_pcSignalMessage = strsignal ( a_iSignum );
+	l_oMessage = "\nDo you play with the mouse under FreeBSD ? ";
+	l_oMessage += l_pcSignalMessage;
+	l_oMessage += '.';
+#ifdef __HLOG_H
+	log << ( ( char * ) l_oMessage ) + 1 << endl;
+#endif /* __HLOG_H */
+#ifdef __CONSOLE_H
+	if ( console::is_enabled ( ) )console::leave_curses();
+#endif /* __CONSOLE_H */
+	fprintf ( stderr, l_oMessage );
+	signal ( a_iSignum, SIG_DFL );
+	raise ( a_iSignum );
+	return;
+	M_EPILOG
+	}
+
 /*  end of signal handler definitions */
 
 void set_handlers ( void )
@@ -273,6 +309,8 @@ void set_handlers ( void )
 */
 	if ( signal( SIGWINCH, signals::signal_WINCH ) == SIG_IGN )
 		signal( SIGWINCH, SIG_IGN );
+	if ( signal( SIGUSR1, signals::signal_USR1 ) == SIG_IGN )
+		signal( SIGUSR1, SIG_IGN );
 	if ( signal( SIGINT, signals::signal_INT ) == SIG_IGN )
 		signal( SIGINT, SIG_IGN );
 	if ( signal( SIGTERM, signals::signal_TERM ) == SIG_IGN )
