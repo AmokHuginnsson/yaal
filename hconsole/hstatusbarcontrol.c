@@ -41,6 +41,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hstatusbarcontrol.h"
 #include "hwindow.h"
 #include "hconsole.h"
+#include "hsearchablecontrol.h"
 
 HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 		const char * a_pcLabel, int a_iStatusBarAttribute )
@@ -315,6 +316,7 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 	M_PROLOG
 	int l_iCode = a_iCode;
 	int l_iMode = f_iMode;
+	HSearchableControl * l_poSearchableControl = NULL;
 	a_iCode = 0;
 	switch ( l_iCode )
 		{
@@ -324,7 +326,11 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 			if ( l_iMode == D_PROMPT_MODE_COMMAND )
 				f_poParent->f_oCommand = f_oString;
 			else if ( l_iMode == D_PROMPT_MODE_SEARCH )
-				f_poParent->f_poPreviousFocusedChild->search ( f_oString );
+				{
+				l_poSearchableControl = dynamic_cast < HSearchableControl * > ( f_poParent->f_poPreviousFocusedChild );
+				if ( l_poSearchableControl )
+					l_poSearchableControl->search ( f_oString );
+				}
 			break;
 			}
 		case ( '\t' ):

@@ -150,6 +150,7 @@ OBJ4hconsole += hlistcontrol!
 OBJ4hconsole += hmainwindow
 OBJ4hconsole += hmenucontrol
 OBJ4hconsole += hprocess!
+OBJ4hconsole += hsearchablecontrol
 OBJ4hconsole += hstatusbarcontrol!
 OBJ4hconsole += htimecontrol
 OBJ4hconsole += htreecontrol

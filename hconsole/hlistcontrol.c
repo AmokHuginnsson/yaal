@@ -104,13 +104,11 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
 								a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
 								a_iEnabledAttribute, a_iFocudesAttribute ),
+							HSearchableControl ( a_bSearchable ),
 							HList < HItem > ( )
 	{
 	M_PROLOG
 	f_bEditable = false;
-	f_bFiltered = false;
-	f_bSearchActived = false;
-	f_bSearchable = a_bSearchable;
 	f_bCheckable = a_bCheckable;
 	f_bSortable = a_bSortable;
 	f_bDrawHeader = a_bDrawHeader;
@@ -118,6 +116,9 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iCursorPosition = 0;
 	f_iSumForOne = 0;
 	f_poFirstVisibleRow = NULL;
+	f_sMatch.f_iColumnWithMatch = 0;
+	f_sMatch.f_iMatchNumber = - 1;
+	f_sMatch.f_poCurrentMatch = NULL;
 	f_iSortColumn = 0;
 	cmp = ( int ( HList<HItem>::* ) ( HElement *, HElement * ) ) & HListControl::cmpc;
 	refresh ( );
@@ -268,7 +269,9 @@ void HListControl::refresh ( void )
 							f_iColumnRaw + l_iColumnOffset, f_oVarTmpBuffer	);
 					if ( f_bSearchActived )
 						highlight ( f_iRowRaw + l_iCtr + l_iHR,
-								f_iColumnRaw + l_iColumnOffset );
+								f_iColumnRaw + l_iColumnOffset, f_sMatch.f_iMatchNumber,
+								( f_poSelected == f_sMatch.f_poCurrentMatch ) &&
+								( l_iCtrLoc == f_sMatch.f_iColumnWithMatch ) );
 					l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
 					}
 				if ( l_iCtr == f_iCursorPosition )
@@ -452,6 +455,15 @@ int HListControl::process_input ( int a_iCode )
 					}
 				}
 			else putchar ( '\a' );
+			break;
+			}
+		case ( D_KEY_CTRL_( 'n' ) ):
+			{
+			f_poSelected = l_poElement;
+			go_to_match ( );
+			l_poElement = f_poSelected;
+			f_poSelected = f_poFirstVisibleRow;
+			l_iOldPosition = f_iCursorPosition;
 			break;
 			}
 		case ( ' ' ):
@@ -765,40 +777,77 @@ bool HListControl::is_searchable ( void )
 	return ( f_bSearchable );
 	}
 
-void HListControl::search ( const HString & a_oPattern )
+void HListControl::go_to_match ( void )
 	{
 	M_PROLOG
-	unsigned short int l_hFlag = 'f';
-	f_bSearchActived = ! f_oPattern.parse ( a_oPattern, & l_hFlag, 1 );
-	if ( ! f_bSearchActived )
-		f_poParent->status_bar ( )->message ( f_oPattern.error ( ) );
-	else f_bFiltered = ( l_hFlag & 0xff00 ) ? true : false;
-	refresh ( );
-	return;
-	M_EPILOG
-	}
-
-void HListControl::highlight ( int a_iRow, int a_iColumn )
-	{
-	M_PROLOG
-	int l_iHighlightLength = 0;
+	int l_iDummy = 0, l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
+	int l_iCount = f_oHeader.quantity ( );
 	char * l_pcHighlightStart = NULL;
-	char l_cStopChar = 0;
-	l_pcHighlightStart = f_oVarTmpBuffer;
-	while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
-			l_iHighlightLength ) ) )
+	HItem * l_poItem = NULL;
+	HElement * l_poElement = f_sMatch.f_poCurrentMatch = f_poSelected;
+	if ( f_bSearchActived )
 		{
-		if ( f_bFocused )
-			console::set_attr ( console::n_iAttributeSearchHighlight >> 8 );
-		else
-			console::set_attr ( console::n_iAttributeSearchHighlight );
-		l_cStopChar = l_pcHighlightStart [ l_iHighlightLength ];
-		l_pcHighlightStart [ l_iHighlightLength ] = 0;
-		::mvprintw ( a_iRow, a_iColumn
-				+ ( l_pcHighlightStart - ( char * ) f_oVarTmpBuffer ),
-				l_pcHighlightStart );
-		l_pcHighlightStart [ l_iHighlightLength ] = l_cStopChar;
-		l_pcHighlightStart ++;
+		do
+			{
+			l_poItem = & f_poSelected->get_object ( );
+			for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iCount; l_iCtr ++ )
+				{
+				l_pcHighlightStart = ( char * ) ( HString & ) ( * l_poItem ) [ l_iCtr ];
+				l_iCtrLoc = 0;
+				while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
+						l_iDummy ) ) )
+					{
+					if ( l_iCtrLoc > f_sMatch.f_iMatchNumber )break;
+					l_pcHighlightStart ++;
+					l_iCtrLoc ++;
+					}
+				if ( l_pcHighlightStart )break;
+				f_sMatch.f_iMatchNumber = - 1;
+				}
+			if ( l_pcHighlightStart )break;
+			f_sMatch.f_iColumnWithMatch = 0;
+/* this part is from process_input, but slightly modified */
+			if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_iQuantity - 1 ) )
+				{
+				f_iCursorPosition ++;
+				if ( f_iCursorPosition >= f_iHeightRaw )
+					{
+					f_iCursorPosition = f_iHeightRaw - 1;
+					f_iControlOffset ++;
+					l_iMoveFirstRow ++;
+					}
+				to_tail ( );
+				}
+			else
+				{
+				f_poSelected = f_poFirstVisibleRow = f_poHook;
+				f_iControlOffset = f_iCursorPosition = 0;
+				l_iMoveFirstRow = 0;
+				}
+/* end od it */
+			}
+		while ( l_poElement != f_poSelected );
+		}
+	if ( l_pcHighlightStart )
+		{
+		if ( l_iMoveFirstRow )
+			{
+			l_poElement = f_poSelected;
+			f_poSelected = f_poFirstVisibleRow;
+			to_tail ( l_iMoveFirstRow );
+			f_poFirstVisibleRow = f_poSelected;
+			f_poSelected = l_poElement;
+			}
+		f_sMatch.f_iColumnWithMatch = l_iCtr;
+		f_sMatch.f_iMatchNumber = l_iCtrLoc;
+		f_sMatch.f_poCurrentMatch = f_poSelected;
+		}
+	else
+		{
+		f_poSelected = l_poElement;
+		f_sMatch.f_iMatchNumber = - 1;
+		f_sMatch.f_iColumnWithMatch = 0;
+		putchar ( '\a' );
 		}
 	return;
 	M_EPILOG

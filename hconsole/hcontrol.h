@@ -85,7 +85,6 @@ public:
 	virtual HInfo operator = ( const HInfo & );
 	virtual operator HInfo ( void );
 	virtual bool is_searchable ( void );
-	virtual void search ( const HString & ) __attribute__((__noreturn__));
 	virtual void draw_label ( void );
 	virtual int click ( mouse::OMouse & );
 	bool hit_test ( int, int );

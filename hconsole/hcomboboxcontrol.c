@@ -50,6 +50,7 @@ HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
 									HEditControl ( NULL, 0, 0, 0, 0, NULL, a_iMaxLength, "",
 											a_pcMask ),
+									HSearchableControl ( a_bSearchable ),
 									HListControl ( NULL, 0, 0, 0, 0, NULL,
 											a_bCheckable, a_bSortable, a_bSearchable, false )
 	{

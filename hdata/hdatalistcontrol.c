@@ -50,8 +50,9 @@ HDataListControl::HDataListControl ( HRecordSet * a_poRecordSet,
 								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
 										a_iWidth, a_pcTitle, a_bDrawLabel, a_iDisabledAttribute,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
+								HSearchableControl ( a_bSearchable ),
 								HListControl ( NULL, 0, 0, 0, 0, NULL,
-										a_bCheckable, a_bSortable, a_bSearchable, a_bDrawHeader ),
+										a_bCheckable, a_bSortable, false, a_bDrawHeader ),
 								HDataControl ( a_poRecordSet )
 	{
 	M_PROLOG

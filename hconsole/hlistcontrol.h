@@ -28,15 +28,15 @@ Copyright:
 #define __HLISTCONTROL_H
 
 #include "../hcore/hinfolist.h"
-#include "../hcore/hpattern.h"
 #include "hitem.h"
 #include "hwindow.h"
+#include "hsearchablecontrol.h"
 
 #define D_ALIGN_LEFT			0x0010000
 #define D_ALIGN_CENTER		0x0020000
 #define D_ALIGN_RIGHT			0x0040000
 
-class HListControl : public HList < HItem >, public virtual HControl
+class HListControl : public HList < HItem >, public virtual HSearchableControl
 	{
 	class HColumnInfo
 		{
@@ -68,10 +68,6 @@ protected:
 	/*{*/
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
-	bool				f_bSearchable;				/* are items searchable */
-	bool				f_bSearchActived;			/* should we highlight last search */
-	bool				f_bFiltered;					/* is content of list filtered
-																			 thru pattern */
 	bool				f_bDrawHeader;				/* should be header driven */
 	bool				f_bEditable;					/* is list interactively editable */
 	int					f_iControlOffset;			/* when content is bigger than control
@@ -82,7 +78,12 @@ protected:
 	int					f_iSumForOne;					/* sum of percentage columns width */
 	HList < HColumnInfo >	f_oHeader;	/* list header info */
 	HElement *	f_poFirstVisibleRow;	/* pointer to first visible row */
-	HPattern		f_oPattern;						/* used for searching */
+	struct
+		{
+		int f_iColumnWithMatch;
+		int f_iMatchNumber;
+		HElement *	f_poCurrentMatch;		/* row that has current pattern match */
+		} f_sMatch;
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
 	long int		f_lComparedItems;			/* items already compared during sorting */
@@ -119,8 +120,6 @@ public:
 	virtual HItem * remove_element ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	virtual HItem * remove_tail ( int * = D_BLOCK_IF_NOT_EMPTIED );
 	virtual bool is_searchable ( void );
-	virtual void search ( const HString & );
-	bool parse_pattern ( void );
 	virtual int click ( mouse::OMouse & );
 	/*}*/
 protected:
@@ -128,7 +127,7 @@ protected:
 	int cmpc ( HElement *, HElement * );
 	void sort_by_contents ( int, int = D_ASCENDING );
 	void recalculate_column_widths ( void );
-	void highlight ( int, int );
+	virtual void go_to_match ( void );
 	/*}*/
 	};
 
