@@ -194,7 +194,7 @@ int x_mouse_open ( void )
 	M_PROLOG
 	mmask_t l_xMouseMask, l_xDesiredMouseMask;
 	l_xDesiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED;
-	l_xMouseMask = mousemask ( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL );
+	l_xMouseMask = mousemask ( l_xDesiredMouseMask, NULL );
 	if ( ! l_xMouseMask )
 		M_THROW ( "mousemask ( ) returned 0", g_iErrNo );
 	else if ( ( l_xMouseMask & l_xDesiredMouseMask ) < l_xDesiredMouseMask )
