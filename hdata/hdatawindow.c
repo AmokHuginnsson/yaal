@@ -183,20 +183,20 @@ int HDataWindow::init ( void )
 				f_oFilter = f_psResourcesArray [ l_iCtr ].f_pcFilter;
 				f_oSort = f_psResourcesArray [ l_iCtr ].f_pcSort;
 				f_poMainControl = l_poDataControl;
-				f_oViewModeControls.add_tail ( ( HControl * * ) & l_poDataControl );
+				f_oViewModeControls.add_tail ( & l_poDataControl );
 				l_poDataControl->enable ( true );
 				break;
 				}
 			case ( D_CONTROL_DATA ):
 				{
 				link ( l_iCtr, l_poDataControl );
-				f_oEditModeControls.add_tail ( ( HControl * * ) & l_poDataControl );
+				f_oEditModeControls.add_tail ( & l_poDataControl );
 				break;
 				}
 			case ( D_CONTROL_FILTER ):
 				{
 				l_poDataControl->enable ( true );
-				f_oViewModeControls.add_tail ( ( HControl * * ) & l_poDataControl );
+				f_oViewModeControls.add_tail ( & l_poDataControl );
 				break;
 				}
 			default :
@@ -382,8 +382,9 @@ int HDataWindow::handler_save ( int )
 		return ( 0 );
 		}
 	m_lId = update ( );
-	set_mode ( D_MODE_VIEW );
+	f_bModified = false;
 	f_poMainControl->load ( );
+	set_mode ( D_MODE_VIEW );
 	return ( 0 );
 	M_EPILOG
 	}

@@ -45,8 +45,8 @@ protected:
 	HDataControl * f_poMainControl;
 	OResource * f_psResourcesArray;
 	HItem * f_poSyncStore;
-	HList < HControl * > f_oViewModeControls;
-	HList < HControl * > f_oEditModeControls;
+	HList < HDataControl * > f_oViewModeControls;
+	HList < HDataControl * > f_oEditModeControls;
 	/*}*/
 public:
 	/*{*/

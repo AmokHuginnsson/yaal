@@ -30,7 +30,7 @@ Copyright:
 #include "../hconsole/heditcontrol.h"
 #include "hdatawindow.h"
 
-class HDataEditControl : public HEditControl
+class HDataEditControl : public HDataControl, public virtual HEditControl
 	{
 protected:
 	/*{*/

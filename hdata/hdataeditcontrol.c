@@ -55,7 +55,8 @@ HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 										a_pcMask, a_bReplace, a_bRightAligned,
 										a_bMultiLine, a_bPassword, a_iMaxHistoryLevel,
 										a_bDrawLabel, a_iDisabledAttribute,
-										a_iEnabledAttribute, a_iFocusedAttribute )
+										a_iEnabledAttribute, a_iFocusedAttribute ),
+									HDataControl ( NULL )
 	{
 	M_PROLOG
 	return;
