@@ -172,6 +172,7 @@ OBJ4hdata =
 OBJ4hdata += hdataprocess
 OBJ4hdata += hdatacontrol
 OBJ4hdata += hdatalistcontrol!
+OBJ4hdata += hdatatreecontrol!
 OBJ4hdata += hdatawindow
 OBJ4hdata += oresource
 OBJ4hdata += 
