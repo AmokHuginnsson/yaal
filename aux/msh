@@ -24,6 +24,12 @@
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 
+line=`grep -s LD_LIBRARY_PATH ~/.profile ~/.bashrc ~/.bash_profile ~/.cshrc ~/.tcshrc ~/.login ~/.zshrc ~/.zlogin ~/.zshenv ~/.zsh/zlogin ~/.zsh/zshrc ~/.zsh/zshenv`
+if [ "x$line" != "x" ] ; then
+	echo "Environment have been already set."
+	exit 1
+fi
+
 echo "Compilation have been finished !"
 echo "It is need to be added seweral lines to your .SHELLrc file :"
 echo "#v+"
