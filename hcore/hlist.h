@@ -434,8 +434,9 @@ template < class tType >
 tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 	{
 	M_PROLOG
-	int l_iIndex = 0, l_iLower = 0, l_iUpper = f_iQuantity - 1;
+	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iQuantity - 1;
 	HElement * l_poElement = NULL;
+	tType * l_ptObject = NULL;
 	while ( l_iUpper >= l_iLower )
 		{
 		l_iIndex = ( l_iLower + l_iUpper ) / 2;
@@ -443,11 +444,17 @@ tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 		f_poSelected = l_poElement;
 		if ( ( compare_contents ( l_poElement->f_tObject,
 						a_tObject ) * a_iOrder ) > 0 )
-			l_iLower = l_iIndex + ( l_iIndex == l_iLower ? 1 : 0 );
-		else if ( l_iUpper > l_iIndex )l_iUpper = l_iIndex;
-		else break;
+			l_iLower = l_iIndex;
+		else l_iUpper = l_iIndex;
+		if ( l_iOldIndex == l_iIndex )break;
+		l_iOldIndex = l_iIndex;
 		}
-	return ( add_element ( a_tObject ) );
+	if ( ( ( compare_contents ( l_poElement->f_tObject,
+					a_tObject ) * a_iOrder ) < 0 ) && f_poSelected )
+						f_poSelected = f_poSelected->f_poNext;
+	l_ptObject = & add_element ( a_tObject );
+	if ( l_poElement == f_poHook )f_poHook = f_poSelected;
+	return ( * l_ptObject );
 	M_EPILOG
 	}
 
