@@ -314,7 +314,7 @@ int HList< tType >::cmpn ( HElement * a_poLeft, HElement * a_poRight )
 	}
 
 template < class tType >
-int compare_contents ( tType & a_tLeft, tType a_tRight )
+int compare_contents ( tType & a_tLeft, tType & a_tRight )
 	{
 	return ( a_tLeft - a_tRight );
 	}
