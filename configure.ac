@@ -178,10 +178,15 @@ dnl We need to check if out ncurses devel is not brain-damaged.
 AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
 AC_MSG_CHECKING([if your ncurses-devel is brain-damaged])
 CXXFLAGS=["-W -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
-AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
-void foo(){printw("x");}],[AC_MSG_RESULT([[no :)]])],
+AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
+[printw("x");],[AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_ERROR([Can not continue with brain-damaged ncurses.])])
+AC_MSG_CHECKING([if your compiler is touchy on char-subscripts in ncurses (acs_map)])
+AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
+[addch(ACS_DARROW);],[AC_DEFINE([HAVE_ASCII_GRAPHICS]) AC_MSG_RESULT([[no :)]])],
+	[AC_MSG_RESULT([[yes :(]])
+		AC_MSG_WARN([You will not have pretty ascii graphics.])])
 
 FILES=["/etc/my.cnf /etc/mysql/my.cnf /usr/local/etc/my.cnf /usr/local/etc/mysql/my.cnf"]
 FILES=["$FILES /etc/mysqld.conf /etc/mysql/mysqld.conf /usr/local/etc/mysqld.conf"]

@@ -1,5 +1,8 @@
 /* Define operating system host type here. */
 
+#ifndef __CONFIG_H
+#define __CONFIG_H
+
 #undef __HOST_OS_TYPE_FREEBSD__
 
 #undef __HOST_OS_TYPE_DEBIAN__
@@ -30,9 +33,13 @@
 
 /* End of available headers definitions. */
 
-/* Defines for available functions */
+/* Defines for available data structures, functions and features */
 
 #undef HAVE_GETLINE
 
+#undef HAVE_ASCII_GRAPHICS
+
 /* End of available functions definitions. */
+
+#endif /* not __CONFIG_H */
 

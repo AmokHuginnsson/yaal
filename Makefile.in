@@ -83,7 +83,7 @@ HEAVYCXXFLAGS =	\
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
-COMPILER_PRIME_FLAGS = -fPIC -D_GNU_SOURCE -march=i486
+COMPILER_PRIME_FLAGS = -pipe -fPIC -D_GNU_SOURCE @DEFS@ -march=i486
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else

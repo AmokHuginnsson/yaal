@@ -92,7 +92,7 @@ void HComboboxControl::refresh ( void )
 /* end of ripped part */
 		::move ( f_iRowRaw, f_iColumnRaw + f_iWidthRaw );
 		M_SET_ATTR_LABEL ( );
-		addch ( ACS_DARROW );
+		addch ( D_ASCII_DOWN_ARROW );
 		HEditControl::refresh ( );
 		}
 	else

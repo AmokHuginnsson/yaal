@@ -27,8 +27,22 @@ Copyright:
 #ifndef __CONSOLE_H
 #define __CONSOLE_H
 
+#ifdef HAVE_CONFIG_H
+#	include "../config.h"
+#endif /* HAVE_CONFIG_H */
+
 namespace console
 	{
+
+#ifdef HAVE_ASCII_GRAPHICS
+#	define D_ASCII_DOWN_ARROW			ACS_DARROW
+#	define D_ASCII_UP_ARROW				ACS_UARROW
+# define D_ASCII_VERTICAL_LINE	ACS_VLINE
+#else
+#	define D_ASCII_DOWN_ARROW			'v'
+#	define D_ASCII_UP_ARROW				'^'
+# define D_ASCII_VERTICAL_LINE	'|'
+#endif /* not HAVE_ASCII_GRAPHICS */
 
 #define D_ATTR_DEFAULT			-1
 

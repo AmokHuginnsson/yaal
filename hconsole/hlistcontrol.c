@@ -261,7 +261,7 @@ void HListControl::refresh ( void )
 				for ( l_iCtrLoc = 0; l_iCtrLoc < ( f_iHeightRaw + l_iHR ); l_iCtrLoc ++ )
 					{
 					::move ( f_iRowRaw + l_iCtrLoc,	f_iColumnRaw + l_iColumnOffset - 1 );
-					addch ( ACS_VLINE );
+					addch ( D_ASCII_VERTICAL_LINE );
 					}
 				}
 			}
@@ -272,13 +272,13 @@ void HListControl::refresh ( void )
 		if ( f_iControlOffset )
 			{
 			::move ( f_iRowRaw + l_iHR, f_iColumnRaw + l_iColumnOffset - 1 );
-			addch ( ACS_UARROW );
+			addch ( D_ASCII_UP_ARROW );
 			}
 		if ( ( f_iQuantity - f_iControlOffset ) > f_iHeightRaw )
 			{
 			::move ( f_iRowRaw + f_iHeightRaw - ( 1 - l_iHR ),
 					f_iColumnRaw + l_iColumnOffset - 1 );
-			addch ( ACS_DARROW );
+			addch ( D_ASCII_DOWN_ARROW );
 			}
 		l_dScaled = f_iHeightRaw - 3;
 		l_dScaled *= ( double ) ( f_iControlOffset + f_iCursorPosition );
