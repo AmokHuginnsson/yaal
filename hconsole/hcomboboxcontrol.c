@@ -102,6 +102,7 @@ void HComboboxControl::refresh ( void )
 		M_SET_ATTR_LABEL ( );
 		addch ( D_ASCII_DOWN_ARROW );
 		HEditControl::refresh ( );
+		f_iHeightRaw = 1;
 		}
 	else
 		{

@@ -114,7 +114,7 @@ int console_mouse_open ( void )
 	M_EPILOG
 	}
 
-int console_mouse_get ( OMouse & a_sMouse )
+int console_mouse_get ( OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	mouse_info l_sMouse;
@@ -123,9 +123,9 @@ int console_mouse_get ( OMouse & a_sMouse )
 		M_THROW ( "can not get mouse data", g_iErrNo );
 	else
 		{
-		a_sMouse.f_iButtons = l_sMouse.u.data.buttons;
-		a_sMouse.f_iRow = l_sMouse.u.data.y / 16;
-		a_sMouse.f_iColumn = l_sMouse.u.data.x / 8;
+		a_rsMouse.f_iButtons = l_sMouse.u.data.buttons;
+		a_rsMouse.f_iRow = l_sMouse.u.data.y / 16;
+		a_rsMouse.f_iColumn = l_sMouse.u.data.x / 8;
 		}
 	return ( 0 );
 	M_EPILOG
@@ -167,15 +167,15 @@ int console_mouse_open ( void )
 	M_EPILOG
 	}
 
-int console_mouse_get ( OMouse & a_sMouse )
+int console_mouse_get ( OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	Gpm_Event l_sEvent;
 	if ( Gpm_GetEvent ( & l_sEvent ) != 1 )
 		M_THROW ( _ ( "can not retrieve event") , g_iErrNo );
-	a_sMouse.f_iButtons = l_sEvent.buttons;
-	a_sMouse.f_iRow = l_sEvent.y;
-	a_sMouse.f_iColumn = l_sEvent.x;
+	a_rsMouse.f_iButtons = l_sEvent.buttons;
+	a_rsMouse.f_iRow = l_sEvent.y;
+	a_rsMouse.f_iColumn = l_sEvent.x;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -214,7 +214,7 @@ int x_mouse_open ( void )
 	M_EPILOG
 	}
 
-int x_mouse_get ( OMouse & a_sMouse )
+int x_mouse_get ( OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	MEVENT l_sMouse;
@@ -222,9 +222,9 @@ int x_mouse_get ( OMouse & a_sMouse )
 		M_THROW ( "can not get mouse data", g_iErrNo );
 	else
 		{
-		a_sMouse.f_iButtons = l_sMouse.bstate;
-		a_sMouse.f_iRow = l_sMouse.y;
-		a_sMouse.f_iColumn = l_sMouse.x;
+		a_rsMouse.f_iButtons = l_sMouse.bstate;
+		a_rsMouse.f_iRow = l_sMouse.y;
+		a_rsMouse.f_iColumn = l_sMouse.x;
 		}
 	return ( 0 );
 	M_EPILOG

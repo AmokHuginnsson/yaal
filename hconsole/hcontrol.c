@@ -236,14 +236,10 @@ void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 	M_EPILOG
 	}
 
-int HControl::click ( mouse::OMouse & a_rsMouse )
+int HControl::click ( mouse::OMouse & )
 	{
 	M_PROLOG
-	if ( a_rsMouse.f_iButtons )
-		{
-		if ( hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
-			set_focus ( );
-		}
+	set_focus ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -251,10 +247,10 @@ int HControl::click ( mouse::OMouse & a_rsMouse )
 bool HControl::hit_test ( int a_iRow, int a_iColumn )
 	{
 	M_PROLOG
-	if ( ( a_iRow < f_iRowRaw ) || ( a_iRow > ( f_iRowRaw + f_iHeight ) ) )
+	if ( ( a_iRow < f_iRowRaw ) || ( a_iRow > ( f_iRowRaw + f_iHeightRaw ) ) )
 		return ( false );
-	if ( ( a_iColumn < f_iColumn )
-			|| ( a_iColumn > ( f_iColumnRaw + f_iWidth ) ) )
+	if ( ( a_iColumn < f_iColumnRaw )
+			|| ( a_iColumn >= ( f_iColumnRaw + f_iWidthRaw ) ) )
 		return ( false );
 	return ( true );
 	M_EPILOG

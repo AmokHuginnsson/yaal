@@ -334,7 +334,7 @@ bool is_enabled ( void )
 	M_EPILOG
 	}
 
-int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_sMouse,
+int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 		int a_iTimeOutSec, int a_iTimeOutUsec )
 	{
 	int l_iError = - 1, l_iEventType = 0;
@@ -353,7 +353,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_sMouse,
 			a_iKey = get_key ( );
 			l_iEventType = D_EVENT_MOUSE;
 			if ( a_iKey == KEY_MOUSE )
-				mouse::mouse_get ( a_sMouse );
+				mouse::mouse_get ( a_rsMouse );
 			else l_iEventType = D_EVENT_KEYBOARD;
 			break;
 			}
@@ -370,7 +370,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_sMouse,
 			}
 		if ( ( a_iKey == KEY_MOUSE )
 				|| ( n_iMouseDes && FD_ISSET ( n_iMouseDes, & l_xFdSet ) ) )
-			mouse::mouse_get ( a_sMouse ), l_iEventType |= D_EVENT_MOUSE;
+			mouse::mouse_get ( a_rsMouse ), l_iEventType |= D_EVENT_MOUSE;
 		}
 	return ( l_iEventType );
 	}

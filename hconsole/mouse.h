@@ -42,7 +42,7 @@ typedef struct
 	} OMouse;
 
 typedef int ( * fun_console_mouse_open_t ) ( void );
-typedef int ( * fun_console_mouse_get_t ) ( OMouse & a_sMouse );
+typedef int ( * fun_console_mouse_get_t ) ( OMouse & );
 typedef int ( * fun_console_mouse_close_t ) ( void );
 
 extern fun_console_mouse_open_t mouse_open;

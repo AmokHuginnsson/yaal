@@ -306,15 +306,18 @@ int HWindow::click ( mouse::OMouse & a_rsMouse )
 	M_PROLOG
 	int l_iCtr = 0;
 	HControl * l_poControl = NULL;
-	if ( f_poStatusBar && ( f_poStatusBar != f_poFocusedChild ) )
-		f_poStatusBar->click ( a_rsMouse );
+	if ( ! a_rsMouse.f_iButtons )return ( 1 );
+	if ( f_poFocusedChild == f_poStatusBar )return ( 1 );
 	l_iCtr = f_oControls.quantity ( );
 	while ( l_iCtr -- )
 		{
 		l_poControl = f_oControls.to_tail ( );
-		if ( l_poControl != f_poFocusedChild )l_poControl->click ( a_rsMouse );
+		if ( l_poControl->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
+			{
+			l_poControl->click ( a_rsMouse );
+			break;
+			}
 		}
-	if ( f_poFocusedChild )f_poFocusedChild->click ( a_rsMouse );
 	return ( 0 );
 	M_EPILOG
 	}
