@@ -26,7 +26,6 @@ Copyright:
 
 #include <stdlib.h>  /* strtol */
 #include <string.h>  /* strsignal */
-#include <unistd.h>  /* kill function */
 #include <stdio.h>	 /* perror function */
 #include <signal.h>	 /* signal handling */
 #include <termios.h> /* B115200 */
