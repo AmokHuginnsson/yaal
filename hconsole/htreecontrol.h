@@ -34,6 +34,8 @@ Copyright:
 class HTreeControl : public HTree < HItem >, public virtual HControl
 	{
 protected:
+	class HNodeControl;
+	friend class HNodeControl;
 	class HNodeControl : public HTree < HItem >::HNode
 		{
 	protected:
