@@ -91,7 +91,7 @@ ifdef NODEBUG
 else
 	COMPILER_DEBUG_FLAGS = -g -g3 -ggdb -ggdb3 -gstabs+ -pg -D__DEBUG__ $(DB)
 endif
-COMPILER_PATH_FLAGS = -I. -I$(HEADERSDIR) -I/usr/local/include
+COMPILER_PATH_FLAGS = -I. -I/usr/local/include
 # -fno-external-templates #deprecated
 LINKER_PATH_FLAGS = -L. -L$(TARGETDIR) -L/usr/local/lib @EXTRA_LIB_PATHS@
 LINKER_PRIME_FLAGS =	\
@@ -343,7 +343,7 @@ dep: .depend
 .depend: $(SRCS) $(SRCEXS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
 	@echo -n 'Making dependicies ... '
 	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCS) | sed -e "s/^\(.\{1,\}: \)\(\(\.\/\)\{0,1\}[a-z]\{1,\}\)/\2\/\1\2/" > .depend
-	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCEXS) | sed -e "s/^\(.\{1,\}: \)\(\(\.\/\)\{0,1\}[a-z]\{1,\}\)/\2\/\1\2/" -e "s/\.o\>/\.oo/" >> .depend
+	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCEXS) | sed -e "s/^\(.\{1,\}: \)\(\(\.\/\)\{0,1\}[a-z]\{1,\}\)/\2\/\1\2/" -e "s/\.o: /\.oo: /" >> .depend
 	@echo "# vim:ft=make:" >> .depend
 	@echo 'done.'
 
