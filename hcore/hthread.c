@@ -28,3 +28,17 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hthread.h"
 
+HThread::HThread ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+HThread::~HThread ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
