@@ -141,7 +141,7 @@ HMap<tType, ttType>::~HMap ( void )
 	{
 	M_PROLOG
 	flush ( );
-	if ( f_ppoAtomArray )xfree ( ( void * ) f_ppoAtomArray );
+	if ( f_ppoAtomArray )xfree ( f_ppoAtomArray );
 	f_ppoAtomArray = NULL;
 	return;
 	M_EPILOG
