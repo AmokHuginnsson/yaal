@@ -206,7 +206,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 				l_iSub = l_iIndex;
 				l_iLenght = strlen ( l_pcBuffer ) - 1;
 				/* strip comment from end of line */
-				if ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) )
+				if ( ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) ) )
 					l_iLenght = l_pcPtr - l_pcBuffer - 1;
 				for ( l_iIndex = l_iLenght; l_iIndex > l_iSub ; l_iIndex-- )
 					if ( ! ( ( l_pcBuffer [ l_iIndex ] == ' ')
@@ -246,7 +246,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 					l_iSub = l_iIndex;
 					l_iLenght = strlen ( l_pcBuffer ) - 1;
 					/* strip comment from end of line */
-					if ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) )
+					if ( ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) ) )
 						l_iLenght = l_pcPtr - l_pcBuffer - 1;
 					for ( l_iIndex = l_iLenght; l_iIndex > l_iSub ; l_iIndex-- )
 						if ( ! ( ( l_pcBuffer [ l_iIndex ] == ' ')
