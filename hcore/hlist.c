@@ -24,8 +24,20 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hlist.h"
 M_CVSTID ( D_CVSID_HLIST_H );
+
+const char * g_ppcErrMsgHList [ 24 ] =
+	{
+/* E_HLIST_EMPTYELEMENT */	_ ( "nothing stored yet, so nothing to get" ),
+/* E_HLIST_BADINDEX */			_ ( "index excides list size" ),
+/* E_HLIST_BADFLAG */				_ ( "unknown flag" ),
+/* E_HLIST_EMPTY */			_ ( "list was empty" ),
+/* E_HLIST_BADOFFSET */			_ ( "incorrect offset" ),
+/* E_HLIST_BADNUMBER */			_ ( "wrong number" )
+	};
 
