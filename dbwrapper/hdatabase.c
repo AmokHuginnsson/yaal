@@ -81,7 +81,7 @@ long int HDataBase::query ( const char * a_pcQuery )
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
 	if ( ! f_pvLastResult )
 		M_LOG ( dbwrapper::db_error ( f_pvCoreData ) );
-	return ( dbwrapper::rsdb_records_count ( f_pvLastResult, f_pvCoreData ) );
+	return ( dbwrapper::rsdb_records_count ( f_pvCoreData, f_pvLastResult ) );
 	M_EPILOG
 	}
 
@@ -90,9 +90,7 @@ void HDataBase::free_result ( void )
 	M_PROLOG
 	if ( ! f_pvCoreData )
 		throw new HException ( __WHERE__, "not connected to database", g_iErrNo );
-	if ( ! f_pvLastResult )
-		throw new HException ( __WHERE__, "no result", g_iErrNo );
-	dbwrapper::db_unquery ( f_pvLastResult );
+	if ( f_pvLastResult )dbwrapper::db_unquery ( f_pvLastResult );
 	f_pvLastResult = NULL;
 	return;
 	M_EPILOG
@@ -115,8 +113,8 @@ void * HDataBase::get_result ( void )
 long int HDataBase::insert_id ( void * a_pvResult )
 	{
 	M_PROLOG
-	if ( ! ( f_pvLastResult || a_pvResult ) )
-		throw new HException ( __WHERE__, "no result to find last insert id" );
+	if ( ! f_pvCoreData )
+		throw new HException ( __WHERE__, "not connected to database", g_iErrNo );
 	if ( a_pvResult )return ( dbwrapper::rsdb_id ( f_pvCoreData, a_pvResult ) );
 	else return ( dbwrapper::rsdb_id ( f_pvCoreData, f_pvLastResult ) );
 	M_EPILOG

@@ -105,14 +105,14 @@ int rs_fields_count ( void * a_pvData )
 	return ( PQnfields ( ( PGresult * ) a_pvData ) );
 	}
 
-long int rsdb_records_count ( void * a_pvDataR, void * = NULL )
+long int rsdb_records_count ( void *, void * a_pvDataR )
 	{
 	char * l_pcTmp = PQcmdTuples ( ( PGresult * ) a_pvDataR );
 	if ( l_pcTmp && l_pcTmp [ 0 ] )return ( strtol ( l_pcTmp, NULL, 10 ) );
 	else return ( PQntuples ( ( PGresult * ) a_pvDataR ) );
 	}
 
-long int rsdb_id ( void * a_pvDataR, void * )
+long int rsdb_id ( void *, void * a_pvDataR )
 	{
 	return ( PQoidValue ( ( PGresult * ) a_pvDataR ) );
 	}
