@@ -324,6 +324,14 @@ void tools_init ( void )
 	return;
 	}
 
+void tools_fini ( void ); __attribute__ ( ( destructor ) )
+void tools_fini ( void )
+	{
+	if ( g_pcSerialPort )xfree ( ( void * ) g_pcSerialPort );
+	g_pcSerialPort = NULL;
+	return;
+	}
+
 /* older versions of g++ fail to handle __attribute__((constructor))
    if no static object exists */
 

@@ -381,8 +381,8 @@ void dbwrapper_init ( void )
 void dbwrapper_fini ( void ); __attribute__ ( ( destructor ) )
 void dbwrapper_fini ( void )
 	{
-	if ( g_pcDefaultSockPath )
-		xfree ( ( void * ) g_pcDefaultSockPath );
+	if ( g_pcDefaultSockPath )xfree ( ( void * ) g_pcDefaultSockPath );
+	g_pcDefaultSockPath = NULL;
 	if ( g_pvDlHandle )
 		{
 		fprintf ( stderr, "Unloading dynamic database driver ... " );
