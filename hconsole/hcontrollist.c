@@ -70,7 +70,7 @@ HControl * HControlList::next_enabled ( char a_cShorcut )
 	if ( l_poControlNew != l_poControlOld )
 		{
 		l_poControlOld->kill_focus ( );
-		l_poControlNew->set_focus ( );
+		l_poControlNew->set_focus ( -1 );
 		}
 	return ( l_poControlNew );
 	M_EPILOG
@@ -81,10 +81,15 @@ void HControlList::select ( HControl * a_poControl )
 	M_PROLOG
 	int l_iCtr = 0;
 	HElement * l_poElement = NULL;
+	if ( f_poSelected->get_object ( ) == a_poControl )return;
 	l_poElement = f_poSelected;
 	f_poSelected = f_poHook;
 	while ( l_iCtr ++ < f_iQuantity )
-		if ( to_tail ( ) == a_poControl )return;
+		if ( to_tail ( ) == a_poControl )
+			{
+			to_head ( );
+			return;
+			}
 	f_poSelected = l_poElement;
 	throw new HException ( __WHERE__, "bogus object", ( int ) a_poControl );
 	return;

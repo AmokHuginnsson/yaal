@@ -125,11 +125,12 @@ int HControl::set_focus ( char a_cShortCut )
 	{
 	M_PROLOG
 	if ( ! f_bEnabled )return ( 1 );
-	if ( a_cShortCut && ( f_oLabel [ f_iShortcutIndex ] != a_cShortCut ) )
+	if ( ( a_cShortCut > 0 ) && ( f_oLabel [ f_iShortcutIndex ] != a_cShortCut ) )
 		return ( 1 );
 	f_bFocused = true;
-//	f_poParent->set_focus ( this );
-	if ( ! a_cShortCut )refresh ( );
+	if ( ! a_cShortCut )
+		f_poParent->set_focus ( this );
+	if ( a_cShortCut <= 0 )refresh ( );
 	return ( 0 );
 	M_EPILOG
 	}
