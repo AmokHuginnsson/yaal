@@ -43,6 +43,7 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "../hcore/xalloc.h"
 #include "heditcontrol.h"
+#include "hwindow.h"
 
 HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
@@ -526,7 +527,7 @@ int HEditControl::process_input ( int a_iCode )
 	if ( ! l_iErrorCode )
 		{
 		f_oString = f_oVarTmpBuffer;
-		console::c_printf ( console::n_iHeight - 1, -1, D_FG_LIGHTGRAY, "" );
+		f_poParent->status_bar ( )->message ( D_FG_LIGHTGRAY, "" );
 		refresh ( );
 		}
 	else
@@ -537,7 +538,7 @@ int HEditControl::process_input ( int a_iCode )
 		l_iLength = regerror ( l_iErrorCode, & f_sMask, NULL, 0 );
 		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
-		console::c_printf ( console::n_iHeight - 1, -1, D_BG_BROWN, l_pcBuffer );
+		f_poParent->status_bar ( )->message ( D_BG_BROWN, l_pcBuffer );
 		xfree ( ( void * ) l_pcBuffer );
 		}
 	return ( a_iCode );
@@ -588,3 +589,4 @@ int HEditControl::set_focus ( char a_cShorcut )
 	return ( HControl::set_focus ( a_cShorcut ) );
 	M_EPILOG
 	}
+

@@ -221,8 +221,8 @@ void HStatusBarControl::message ( int a_iAttribute,
 	M_PROLOG
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
-	putchar ( '\a' );
-	console::c_printf ( f_iRowRaw, 0, a_iAttribute, a_pcFormat, l_xAp );
+	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
+	console::c_printf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	return;
 	M_EPILOG
@@ -233,8 +233,8 @@ void HStatusBarControl::message ( const char * a_pcFormat, ... )
 	M_PROLOG
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
-	putchar ( '\a' );
-	console::c_printf ( f_iRowRaw, 0, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
+	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
+	console::c_printf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	return;
 	M_EPILOG

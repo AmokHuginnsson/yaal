@@ -307,8 +307,8 @@ int HProcess::process_stdin ( int a_iCode )
 		}
 	else console::c_printf ( 0, 0, D_FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( a_iCode )
-		console::c_printf ( console::n_iHeight - 1, -1, D_FG_RED,
+	if ( a_iCode && f_poForegroundWindow )
+		f_poForegroundWindow->status_bar ( )->message ( D_FG_RED,
 				"unknown function, err code(%d)", a_iCode );
 	return ( a_iCode );
 	M_EPILOG

@@ -274,6 +274,7 @@ int get_key( void )
 	M_PROLOG
 	int l_iKey = 0;
 	int l_iChar = 0;
+	int l_iOrigCursState = D_CURSOR_INVISIBLE;
 	if ( ! n_bEnabled )
 		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
 	noecho();
@@ -289,6 +290,7 @@ int get_key( void )
 		}
 	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
 		{
+		l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
 		c_printf ( console::n_iHeight - 1, -1, D_FG_WHITE, "ctrl-%c",
 				n_cCommandComposeCharacter );
 		timeout ( n_iCommandComposeDelay * 100 );
@@ -313,6 +315,7 @@ int get_key( void )
 			else l_iKey = D_KEY_COMMAND_(l_iChar = l_iKey);
 			c_printf ( console::n_iHeight - 1, 6, D_FG_WHITE, " %c", l_iChar );
 			}
+		curs_set ( l_iOrigCursState );
 		}
 	echo ( );
 	if ( l_iKey == 347 ) l_iKey = 360;

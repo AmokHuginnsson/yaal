@@ -454,7 +454,7 @@ int HListControl::process_input ( int a_iCode )
 	if ( ! l_iErrorCode )
 		{
 		refresh ( );
-		console::c_printf ( console::n_iHeight - 1, -1, 7, "" );
+		f_poParent->status_bar ( )->message ( D_FG_LIGHTGRAY, "" );
 		}
 	return ( a_iCode );
 	M_EPILOG
