@@ -92,7 +92,8 @@ if test "$_FLAGS" == "" ; then
 fi
 AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
 
-dnl Test if dynamic loader is in libc or in separate library dl. This one is silent.
+dnl Test if dynamic loader is in libc or in separate library dl.
+dnl This one is silent.
 CXXFLAGS=["-ldl"]
 AC_LINK_IFELSE([[#include <dlfcn.h>
 int main()
