@@ -59,7 +59,6 @@ public:
 	tType norm ( );
 	HVector & operator = ( const HVector & );
 	HVector & operator = ( tType );
-	HVector & operator <= ( HVector & );
 	HVector operator + ( HVector & );
 	HVector operator - ( HVector & );
 	HVector operator * ( tType );
@@ -74,7 +73,7 @@ public:
 	int operator == ( HVector & );
 	int operator != ( HVector & );
 template < class ttType >
-	friend HVector operator * ( ttType, HVector & );
+	friend HVector < ttType > operator * ( ttType, HVector < ttType > & );
 	/*}*/
 	};
 
@@ -85,6 +84,7 @@ HVector < tType > ::HVector ( int a_iDimension )
 				: HArray < tType > ( a_iDimension )
 	{
 	M_PROLOG
+	int l_iCtr = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		f_ptArray [ l_iCtr ] = 0;
 	return ;
@@ -162,21 +162,6 @@ HVector < tType > & HVector < tType > ::operator = ( tType d )
 	int l_iCtr;
 	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 		f_ptArray [ l_iCtr ] = d;
-	return ( *this );
-	M_EPILOG
-	}
-
-template < class tType >
-HVector < tType > & HVector < tType > ::operator <= ( HVector & a_roVector )
-	{
-	M_PROLOG
-	int l_iCtr, k;
-	if ( this != & a_roVector )
-		{
-		k = ( f_iSize < a_roVector.f_iSize ? f_iSize : a_roVector.f_iSize );
-		for ( l_iCtr = 0; l_iCtr < k; l_iCtr ++ )
-			f_ptArray [ l_iCtr ] = a_roVector.f_ptArray [ l_iCtr ];
-		}
 	return ( *this );
 	M_EPILOG
 	}
