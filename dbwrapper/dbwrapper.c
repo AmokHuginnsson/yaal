@@ -42,11 +42,12 @@ M_CVSID ( "$CVSHeader$" );
 #include "dbwrapper.h"
 #include "db_driver_loader.h"
 
-void dbwrapper_error ( void );
-void dbwrapper_exit ( void ) __attribute__  ((noreturn));
+using namespace dbwrapper;
 
 namespace dbwrapper
 	{
+void dbwrapper_error ( void );
+void dbwrapper_exit ( void ) __attribute__  ((noreturn));
 
 extern void * n_pvDlHandle;
 

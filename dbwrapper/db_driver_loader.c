@@ -92,6 +92,8 @@ char * ( * rs_column_name ) ( void *, int );
 
 	}
 
+using namespace dbwrapper;
+
 namespace dbwrapper
 {
 	
@@ -164,8 +166,6 @@ char * dummy_rs_column_name ( void *, int )
 	}
 
 /* end of null-dummy driver */
-
-using namespace dbwrapper;
 
 void dbwrapper_error ( void )
 	{
