@@ -322,15 +322,17 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 			{
 			switch ( strtol ( ( ( char * ) a_roValue ) + 1, NULL, 10 ) )
 				{
-				case ( 115200 ): l_iBaudRate = B115200; break;
+#ifdef __HOST_OS_TYPE_FREEBSD__
 				case (  76800 ): l_iBaudRate = B76800;  break;
+				case (  28800 ): l_iBaudRate = B28800;  break;
+				case (  14400 ): l_iBaudRate = B14400;  break;
+				case (   7200 ): l_iBaudRate = B7200;   break;
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
+				case ( 115200 ): l_iBaudRate = B115200; break;
 				case (  57600 ): l_iBaudRate = B57600;  break;
 				case (  38400 ): l_iBaudRate = B38400;  break;
-				case (  28800 ): l_iBaudRate = B28800;  break;
 				case (  19200 ): l_iBaudRate = B19200;  break;
-				case (  14400 ): l_iBaudRate = B14400;  break;
 				case (   9600 ): l_iBaudRate = B9600;   break;
-				case (   7200 ): l_iBaudRate = B7200;   break;
 				case (   4800 ): l_iBaudRate = B4800;   break;
 				case (   2400 ): l_iBaudRate = B2400;   break;
 				}
