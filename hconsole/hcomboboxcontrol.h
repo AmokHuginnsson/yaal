@@ -50,6 +50,8 @@ public:
 										 int,						/* width */
 										 const char *,	/* label */
 										 int = 0, 			/* dropped width */
+										 int = 128,			/* max string length */
+										 const char * = D_MASK_DEFAULT,	/* regexp (mask) */
 										 bool = false,	/* checkable */
 										 bool = true,		/* sortable */
 										 bool = true,		/* searchable */
@@ -62,6 +64,7 @@ public:
 	virtual int set_focus ( char = 0 );
 	virtual int kill_focus ( void ); /* this one will be used here */
 	virtual void refresh ( void );
+	virtual int click ( mouse::OMouse & );
 /*	
 	virtual HInfo operator = ( const HInfo & );
 	virtual operator HInfo ( void );

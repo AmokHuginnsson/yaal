@@ -101,7 +101,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		l_iLength = regerror ( l_iErrorCode, & f_sMask, NULL, 0 );
 		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
-		l_oErrorMessage = l_pcBuffer;
+		l_oErrorMessage.format ( "%s: %s", l_pcBuffer, a_pcValue );
 		xfree ( l_pcBuffer );
 		throw new HException ( __WHERE__, l_oErrorMessage, l_iErrorCode );
 		}
@@ -557,7 +557,7 @@ HString & HEditControl::operator = ( const char * a_pcString )
 		l_iLength = regerror ( l_iErrorCode, & f_sMask, NULL, 0 );
 		l_pcBuffer = ( char * ) xmalloc ( l_iLength );
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
-		l_oErrorMessage = l_pcBuffer;
+		l_oErrorMessage.format ( "%s: %s", l_pcBuffer, a_pcString );
 		xfree ( l_pcBuffer );
 		throw new HException ( __WHERE__, l_oErrorMessage, l_iErrorCode );
 		}
@@ -586,6 +586,21 @@ int HEditControl::set_focus ( char a_cShorcut )
 	{
 	M_PROLOG
 	return ( HControl::set_focus ( a_cShorcut ) );
+	M_EPILOG
+	}
+
+int HEditControl::click ( mouse::OMouse & a_rsMouse )
+	{
+	M_PROLOG
+	int l_iPosition = 0;
+	if ( ! HControl::click ( a_rsMouse ) )return ( 1 );
+	l_iPosition = a_rsMouse.f_iColumn - f_iColumnRaw;
+	if ( l_iPosition < f_oString.get_length ( ) )
+		{
+		f_iCursorPosition = l_iPosition;
+		refresh ( );
+		}
+	return ( 0 );
 	M_EPILOG
 	}
 

@@ -41,13 +41,15 @@ M_CVSID ( "$CVSHeader$" );
 HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
 		const char * a_pcLabel, int a_iDroppedWidth,
+		int a_iMaxLength, const char * a_pcMask,
 		bool a_bCheckable, bool a_bSortable, bool a_bSearchable,
 		bool a_bDrawLabel, int a_iDisabledAttribute,
 		int a_iEnabledAttribute, int a_iFocusedAttribute )
 								: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 										a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
-									HEditControl ( NULL, 0, 0, 0, 0, NULL ),
+									HEditControl ( NULL, 0, 0, 0, 0, NULL, a_iMaxLength, "",
+											a_pcMask ),
 									HListControl ( NULL, 0, 0, 0, 0, NULL,
 											a_bCheckable, a_bSortable, a_bSearchable, false )
 	{
@@ -147,9 +149,21 @@ int HComboboxControl::process_input ( int a_iCode )
 		{
 		if ( a_iCode != '\r' )return ( HListControl::process_input ( a_iCode ) );
 		f_iMode = D_MODE_EDITCONTROL;
+		if ( f_iQuantity )
+			HEditControl::operator = ( ( HString & ) present ( ) [ 0 ] );
 		console::clrscr ( );
 		f_poParent->refresh ( );
 		}
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HComboboxControl::click ( mouse::OMouse & a_rsMouse )
+	{
+	M_PROLOG
+	if ( f_iMode == D_MODE_EDITCONTROL )
+		return ( HEditControl::click ( a_rsMouse ) );
+	else return ( HListControl::click ( a_rsMouse ) );
 	return ( 0 );
 	M_EPILOG
 	}

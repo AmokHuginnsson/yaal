@@ -45,7 +45,7 @@ public:
 								const char * = "",	/* label */
 								int = 128,					/* maximum string length */
 								const char * = "",	/* initial content */
-								const char * = D_DEFAULT_MASK, /* mask */
+								const char * = D_MASK_DEFAULT, /* mask */
 								bool = false,				/* replace */
 								bool = false,				/* right alignment */
 								bool = false,				/* multiline */

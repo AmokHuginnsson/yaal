@@ -239,6 +239,7 @@ void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 int HControl::click ( mouse::OMouse & )
 	{
 	M_PROLOG
+	if ( f_bFocused )return ( 1 );
 	set_focus ( );
 	return ( 0 );
 	M_EPILOG

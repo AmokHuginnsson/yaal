@@ -308,6 +308,8 @@ int HWindow::click ( mouse::OMouse & a_rsMouse )
 	HControl * l_poControl = NULL;
 	if ( ! a_rsMouse.f_iButtons )return ( 1 );
 	if ( f_poFocusedChild == f_poStatusBar )return ( 1 );
+	if ( f_poFocusedChild->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
+		return ( f_poFocusedChild->click ( a_rsMouse ) );
 	l_iCtr = f_oControls.quantity ( );
 	while ( l_iCtr -- )
 		{

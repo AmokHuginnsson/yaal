@@ -33,7 +33,12 @@ Copyright:
 #include "../hcore/hstringlist.h"
 #include "hcontrol.h"
 
-#define D_DEFAULT_MASK "^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$"
+#define D_MASK_LETTERS	"^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$"
+#define D_MASK_CIPHERS	"^[0-9]*$"
+#define D_MASK_APLPHA		"^[a-zA-Z0-9]*$"
+#define D_MASK_EXTENDED	"^[0-9a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ\\.\\(\\) -]*$"
+#define D_MASK_LOOSE		".*"
+#define D_MASK_DEFAULT	D_MASK_LETTERS
 
 class HEditControl : public virtual HControl
 	{
@@ -68,7 +73,7 @@ public:
 								const char * = "",	/* label */
 								int = 128,					/* maximum string length */
 								const char * = "",	/* initial content */
-								const char * = D_DEFAULT_MASK, /* mask */
+								const char * = D_MASK_DEFAULT, /* mask */
 								bool = false,				/* replace */
 								bool = false,				/* right alignment */
 								bool = false,				/* multiline */
@@ -87,6 +92,7 @@ public:
 	virtual int process_input( int );
 	HString & operator = ( const char * );
 	operator HString ( );
+	virtual int click ( mouse::OMouse & );
 	/*}*/
 	};
 

@@ -702,3 +702,18 @@ void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 	M_EPILOG
 	}
 
+int HListControl::click ( mouse::OMouse & a_rsMouse )
+	{
+	M_PROLOG
+	int l_iRow = 0;
+	if ( ! HControl::click ( a_rsMouse ) )return ( 1 );
+	l_iRow = a_rsMouse.f_iRow - f_iRowRaw - ( f_bDrawHeader ? 1 : 0 );
+	if ( l_iRow < f_iQuantity )
+		{
+		f_iCursorPosition = l_iRow;
+		refresh ( );
+		}
+	return ( 0 );
+	M_EPILOG
+	}
+
