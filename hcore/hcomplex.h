@@ -40,6 +40,10 @@ public:
 	HComplex ( double, double = 0 );
 	HComplex ( const HComplex &, int = 0 );
 	virtual ~HComplex ( void );
+	double & re ( void );
+	double & im ( void );
+	double modulus ( void );
+	double argument ( void );
 	HComplex & operator = ( const HComplex & );
 	bool operator == ( const HComplex & );
 	HComplex & operator = ( const double );
@@ -55,6 +59,7 @@ public:
 	HComplex operator * ( const double );
 	HComplex operator / ( const HComplex & );
 	HComplex operator / ( const double );
+	friend HComplex operator * ( const double, const HComplex & );
 	/*}*/
 protected:
 	/*{*/

@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <math.h>
+
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcomplex.h"
@@ -60,11 +62,46 @@ HComplex::~HComplex ( void )
 	M_EPILOG
 	}
 
+double & HComplex::re ( void )
+	{
+	M_PROLOG
+	return ( f_dReal );
+	M_EPILOG
+	}
+
+double & HComplex::im ( void )
+	{
+	M_PROLOG
+	return ( f_dImaginary );
+	M_EPILOG
+	}
+
+double HComplex::modulus ( void )
+	{
+	M_PROLOG
+	if ( ! f_dImaginary )
+		return ( f_dReal );
+	return ( sqrt ( f_dReal * f_dReal + f_dImaginary * f_dImaginary ) );
+	M_EPILOG
+	}
+
+double HComplex::argument ( void )
+	{
+	M_PROLOG
+	if ( ! f_dReal )
+		throw new HException ( __WHERE__,
+				"I can not count complex argument, real part equals 0.", g_iErrNo );
+	return ( atan ( f_dImaginary  / f_dReal ) );
+	M_EPILOG
+	}
+
 HComplex & HComplex::operator = ( const HComplex & a_roComplex )
 	{
+	M_PROLOG
 	f_dReal = a_roComplex.f_dReal;
 	f_dImaginary = a_roComplex.f_dImaginary;
 	return ( * this );
+	M_EPILOG
 	}
 
 bool HComplex::operator == ( const HComplex & a_roComplex )
@@ -156,8 +193,10 @@ HComplex HComplex::operator * ( const HComplex & a_roComplex )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
-	l_oComplex.f_dReal *= a_roComplex.f_dReal - f_dImaginary * a_roComplex.f_dImaginary;
-	l_oComplex.f_dImaginary *= a_roComplex.f_dReal + f_dReal * a_roComplex.f_dImaginary;
+	l_oComplex.f_dReal = f_dReal * a_roComplex.f_dReal
+		- f_dImaginary * a_roComplex.f_dImaginary;
+	l_oComplex.f_dImaginary = f_dImaginary * a_roComplex.f_dReal
+		+ f_dReal * a_roComplex.f_dImaginary;
 	return ( l_oComplex );
 	M_EPILOG
 	}
@@ -178,6 +217,8 @@ HComplex HComplex::operator / ( const HComplex & a_roComplex )
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
 	double l_dDenominator = a_roComplex.f_dReal * a_roComplex.f_dReal
 													+ a_roComplex.f_dImaginary * a_roComplex.f_dImaginary;
+	if ( ! l_dDenominator )
+		throw new HException ( __WHERE__, "denominator equals 0" );
 	l_oComplex.f_dReal = ( f_dReal * a_roComplex.f_dReal
 			+ f_dImaginary * a_roComplex.f_dImaginary ) / l_dDenominator;
 	l_oComplex.f_dImaginary = ( a_roComplex.f_dReal * f_dImaginary
@@ -190,9 +231,19 @@ HComplex HComplex::operator / ( const double a_dValue )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
+	if ( ! a_dValue )
+		throw new HException ( __WHERE__, "denominator equals 0", g_iErrNo );
 	l_oComplex.f_dReal /= a_dValue;
 	l_oComplex.f_dImaginary /= a_dValue;
-	return ( * this );
+	return ( l_oComplex );
+	M_EPILOG
+	}
+
+HComplex operator * ( const double a_dValue, const HComplex & a_roComplex )
+	{
+	M_PROLOG
+	HComplex l_oComplex ( a_roComplex.f_dReal, a_roComplex.f_dImaginary );
+	return ( l_oComplex * a_dValue );
 	M_EPILOG
 	}
 
