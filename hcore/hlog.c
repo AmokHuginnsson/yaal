@@ -32,9 +32,9 @@ Copyright:
 
 #include "../config.h"
 
-#ifdef __HOST_OS_TYPE_FREEBSD__
+#ifdef HAVE_BASE_NAME_IN_LIBGEN
 #	include <libgen.h>
-#endif /* __HOST_OS_TYPE_FREEBSD__ */
+#endif /* HAVE_BASE_NAME_IN_LIBGEN */
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );

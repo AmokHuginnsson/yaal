@@ -189,6 +189,11 @@ AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 
 AC_CHECK_FUNCS([getline],[],[])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
+AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASE_NAME_IN_LIBGEN])],[#include <string.h>])
+AC_CHECK_DECLS([B76800],[],[],[#include <termios.h>])
+AC_CHECK_DECLS([B28800],[],[],[#include <termios.h>])
+AC_CHECK_DECLS([B14400],[],[],[#include <termios.h>])
+AC_CHECK_DECLS([B7200],[],[],[#include <termios.h>])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 

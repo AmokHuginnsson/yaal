@@ -42,6 +42,13 @@
 
 #undef HAVE_DECL_VSWTC
 
+#undef HAVE_BASE_NAME_IN_LIBGEN
+
+#undef HAVE_DECL_B76800
+#undef HAVE_DECL_B28800
+#undef HAVE_DECL_B14400
+#undef HAVE_DECL_B7200
+
 /* End of available functions definitions. */
 
 #endif /* not __CONFIG_H */
