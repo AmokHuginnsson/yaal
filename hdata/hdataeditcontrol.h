@@ -43,7 +43,7 @@ public:
 								int,								/* height */
 								int,								/* width */
 								const char * = "",	/* label */
-								int = 128,					/* maximum string length */
+								int = 127,					/* maximum string length */
 								const char * = "",	/* initial content */
 								const char * = D_MASK_DEFAULT, /* mask */
 								bool = false,				/* replace */

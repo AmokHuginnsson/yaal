@@ -120,7 +120,7 @@ int HDataWindow::init ( void )
 			{
 			case ( D_CONTROL_EDIT ):
 				{
-				l_sEditControlResource.f_iMaxStringSize = 128;
+				l_sEditControlResource.f_iMaxStringSize = 127;
 				l_sEditControlResource.f_pcValue = l_pcValue;
 				l_sEditControlResource.f_pcMask = l_pcMask;
 				l_sEditControlResource.f_bReplace = false;
