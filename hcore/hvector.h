@@ -144,7 +144,8 @@ int HVector < tType > ::normalize ( )
 	int l_iCtr;
 	tType l_tLenght;
 	l_tLenght = norm ( );
-	if ( ! l_tLenght ) return ( 1 );
+	if ( ! l_tLenght )
+		return ( 1 );
 	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ )
 		this->f_ptArray [ l_iCtr ] /= l_tLenght;
 	return ( 0 );
@@ -267,8 +268,9 @@ HVector < tType > & HVector < tType > ::operator /= ( const tType d )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( d ) for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ )
-		this->f_ptArray [ l_iCtr ] /= d;
+	if ( d )
+		for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ )
+			this->f_ptArray [ l_iCtr ] /= d;
 	return ( *this );
 	M_EPILOG
 	}

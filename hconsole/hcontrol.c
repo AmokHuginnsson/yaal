@@ -74,12 +74,18 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iColumnRaw = 0;
 	f_iHeightRaw = 0;
 	f_iWidthRaw = 0;
-	if ( a_iDisabledAttribute > 0 )f_iDisabledAttribute = a_iDisabledAttribute;
-	else f_iDisabledAttribute = n_iAttributeDisabled;
-	if ( a_iEnabledAttribute > 0 )f_iEnabledAttribute = a_iEnabledAttribute;
-	else f_iEnabledAttribute = n_iAttributeEnabled;
-	if ( a_iFocusedAttribute > 0 )f_iFocusedAttribute = a_iFocusedAttribute;
-	else f_iFocusedAttribute = n_iAttributeFocused;
+	if ( a_iDisabledAttribute > 0 )
+		f_iDisabledAttribute = a_iDisabledAttribute;
+	else
+		f_iDisabledAttribute = n_iAttributeDisabled;
+	if ( a_iEnabledAttribute > 0 )
+		f_iEnabledAttribute = a_iEnabledAttribute;
+	else
+		f_iEnabledAttribute = n_iAttributeEnabled;
+	if ( a_iFocusedAttribute > 0 )
+		f_iFocusedAttribute = a_iFocusedAttribute;
+	else
+		f_iFocusedAttribute = n_iAttributeFocused;
 	f_oLabel = a_pcLabel;
 	f_iShortcutIndex = f_oLabel.find ( '&' );
 	if ( f_iShortcutIndex > -1 )
@@ -87,18 +93,21 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		f_oLabel [ f_iShortcutIndex ] = 0;
 		f_oLabel += a_pcLabel + f_iShortcutIndex + 1;
 		}
-	else f_iShortcutIndex = 0;
+	else
+		f_iShortcutIndex = 0;
 	f_iLabelLength = a_pcLabel ? f_oLabel.get_length ( ) : 0;
 	if ( f_iLabelLength )
 		{
-		if ( f_oLabel [ f_iLabelLength - 1 ] != '\n' )f_bSingleLine = true;
+		if ( f_oLabel [ f_iLabelLength - 1 ] != '\n' )
+			f_bSingleLine = true;
 		else
 			{
 			f_bSingleLine = false;
 			f_oLabel [ f_iLabelLength - 1 ] = 0;
 			}
 		}
-	else f_bSingleLine = true;
+	else
+		f_bSingleLine = true;
 	f_poParent->add_control ( this, D_KEY_META_(f_oLabel [ f_iShortcutIndex ]) );
 	return;
 	M_EPILOG
@@ -118,7 +127,8 @@ void HControl::enable ( bool a_bEnable )
 	{
 	M_PROLOG
 	f_bEnabled = a_bEnable;
-	if ( ! f_bEnabled )f_bFocused = false;
+	if ( ! f_bEnabled )
+		f_bFocused = false;
 	refresh ( );
 	return;
 	M_EPILOG
@@ -127,8 +137,8 @@ void HControl::enable ( bool a_bEnable )
 int HControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
-	if ( ! f_bFocused )M_THROW (
-			"input in widow without focus", a_iCode );
+	if ( ! f_bFocused )
+		M_THROW ( "input in widow without focus", a_iCode );
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -136,13 +146,15 @@ int HControl::process_input ( int a_iCode )
 int HControl::set_focus ( char a_cShortCut )
 	{
 	M_PROLOG
-	if ( ! f_bEnabled )return ( 1 );
+	if ( ! f_bEnabled )
+		return ( 1 );
 	if ( ( a_cShortCut > 0 ) && ( f_oLabel [ f_iShortcutIndex ] != a_cShortCut ) )
 		return ( 1 );
 	f_bFocused = true;
 	if ( ! a_cShortCut )
 		f_poParent->set_focus ( this );
-	if ( a_cShortCut <= 0 )refresh ( );
+	if ( a_cShortCut <= 0 )
+		refresh ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -150,7 +162,8 @@ int HControl::set_focus ( char a_cShortCut )
 int HControl::kill_focus ( void )
 	{
 	M_PROLOG
-	if ( ! f_bFocused )return ( 1 );
+	if ( ! f_bFocused )
+		return ( 1 );
 	f_bFocused = false;
 	refresh ( );
 	return ( 0 );
@@ -215,7 +228,8 @@ void HControl::draw_label ( void )
 	M_SET_ATTR_DATA ( );
 	if ( f_bSingleLine )
 		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;
-	else f_iRowRaw ++, f_iHeightRaw --;
+	else
+		f_iRowRaw ++, f_iHeightRaw --;
 	return;
 	M_EPILOG
 	}
@@ -247,7 +261,8 @@ void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 int HControl::click ( mouse::OMouse & )
 	{
 	M_PROLOG
-	if ( f_bFocused )return ( 1 );
+	if ( f_bFocused )
+		return ( 1 );
 	set_focus ( );
 	return ( 0 );
 	M_EPILOG

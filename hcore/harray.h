@@ -116,7 +116,8 @@ template < class tType >
 HArray < tType >::~HArray ( void )
 	{
 	M_PROLOG
-	if ( f_ptArray )delete [ ] f_ptArray;
+	if ( f_ptArray )
+		delete [ ] f_ptArray;
 	f_iSize = 0;
 	f_ptArray = NULL;
 	return;
@@ -165,7 +166,8 @@ template < class tType >
 tType & HArray < tType >::operator [ ] ( int a_iIndex )
 	{
 	M_PROLOG
-	if ( a_iIndex < 0 )a_iIndex += f_iSize;
+	if ( a_iIndex < 0 )
+		a_iIndex += f_iSize;
 	if ( ( a_iIndex >= f_iSize ) || ( a_iIndex < 0 ) )
 		M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_BADINDEX ], a_iIndex );
 	return ( f_ptArray [ a_iIndex ] );

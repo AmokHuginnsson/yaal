@@ -73,7 +73,8 @@ extern char n_pcTransTableStripPL [ 256 ];
 bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	int l_iBaudRate = 0;
-	if ( ! strcasecmp ( a_roOption, "set_env" ) )set_env ( a_roValue );
+	if ( ! strcasecmp ( a_roOption, "set_env" ) )
+		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "serial_baudrate" ) )
 		{
 		if ( ( a_roValue.get_length ( ) > 1 ) && ( a_roValue [ 0 ] == 'B' ) )
@@ -102,7 +103,8 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 				}
 			}
 		}
-	if ( l_iBaudRate )tools::n_iBaudRate = l_iBaudRate;
+	if ( l_iBaudRate )
+		tools::n_iBaudRate = l_iBaudRate;
 	return ( ! l_iBaudRate );
 	}
 
@@ -140,7 +142,8 @@ void tools_init ( void )
 void tools_fini ( void ); __attribute__ ( ( destructor ) )
 void tools_fini ( void )
 	{
-	if ( tools::n_pcSerialDevice )xfree ( tools::n_pcSerialDevice );
+	if ( tools::n_pcSerialDevice )
+		xfree ( tools::n_pcSerialDevice );
 	tools::n_pcSerialDevice = NULL;
 	return;
 	}

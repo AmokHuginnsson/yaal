@@ -78,13 +78,15 @@ void db_disconnect ( void * a_pvData )
 
 int db_errno ( void * a_pvData )
 	{
-	if ( ! a_pvData )a_pvData = g_psBrokenDB;
+	if ( ! a_pvData )
+		a_pvData = g_psBrokenDB;
 	return ( mysql_errno ( ( MYSQL * ) a_pvData ) );
 	}
 
 char const * db_error  ( void * a_pvData )
 	{
-	if ( ! a_pvData )a_pvData = g_psBrokenDB;
+	if ( ! a_pvData )
+		a_pvData = g_psBrokenDB;
 	return ( mysql_error ( ( MYSQL * ) a_pvData ) );
 	}
 

@@ -52,9 +52,11 @@ HDataBase::HDataBase ( void )
 HDataBase::~HDataBase ( void )
 	{
 	M_PROLOG
-	if ( f_pvLastResult )dbwrapper::db_unquery ( f_pvLastResult );
+	if ( f_pvLastResult )
+		dbwrapper::db_unquery ( f_pvLastResult );
 	f_pvLastResult = NULL;
-	if ( f_pvCoreData )dbwrapper::db_disconnect ( f_pvCoreData );
+	if ( f_pvCoreData )
+		dbwrapper::db_disconnect ( f_pvCoreData );
 	f_pvCoreData = NULL;
 	return;
 	M_EPILOG
@@ -80,7 +82,8 @@ long int HDataBase::query ( char const * a_pcQuery )
 				g_iErrNo );
 	if ( ! f_pvCoreData )
 		M_THROW ( "not connected to database", g_iErrNo );
-	if ( n_lLogMask & D_LOG_SQL )log << "SQL: " << a_pcQuery << endl;
+	if ( n_lLogMask & D_LOG_SQL )
+		log << "SQL: " << a_pcQuery << endl;
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
 	if ( ! f_pvLastResult )
 		M_LOG ( dbwrapper::db_error ( f_pvCoreData ) );
@@ -93,7 +96,8 @@ void HDataBase::free_result ( void )
 	M_PROLOG
 	if ( ! f_pvCoreData )
 		M_THROW ( "not connected to database", g_iErrNo );
-	if ( f_pvLastResult )dbwrapper::db_unquery ( f_pvLastResult );
+	if ( f_pvLastResult )
+		dbwrapper::db_unquery ( f_pvLastResult );
 	f_pvLastResult = NULL;
 	return;
 	M_EPILOG
@@ -118,8 +122,10 @@ long int HDataBase::insert_id ( void * a_pvResult )
 	M_PROLOG
 	if ( ! f_pvCoreData )
 		M_THROW ( "not connected to database", g_iErrNo );
-	if ( a_pvResult )return ( dbwrapper::rsdb_id ( f_pvCoreData, a_pvResult ) );
-	else return ( dbwrapper::rsdb_id ( f_pvCoreData, f_pvLastResult ) );
+	if ( a_pvResult )
+		return ( dbwrapper::rsdb_id ( f_pvCoreData, a_pvResult ) );
+	else
+		return ( dbwrapper::rsdb_id ( f_pvCoreData, f_pvLastResult ) );
 	M_EPILOG
 	}
 

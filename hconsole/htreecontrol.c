@@ -79,7 +79,8 @@ void HTreeControl::HNodeControl::collapse ( void )
 	M_PROLOG
 	HTreeControl::HNodeControl * * l_ppoNodeControl = NULL;
 	f_bUnfolded = false;
-  if  ( ! f_oBranch.quantity ( ) )return;
+  if  ( ! f_oBranch.quantity ( ) )
+		return;
 	f_oBranch.go ( 0 );
 	while ( ( l_ppoNodeControl = reinterpret_cast < HTreeControl::HNodeControl * * > ( f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED ) ) ) )
 		( * l_ppoNodeControl )->collapse ( );
@@ -112,7 +113,8 @@ void HTreeControl::refresh ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( f_bFocused )curs_set ( D_CURSOR_INVISIBLE );
+	if ( f_bFocused )
+		curs_set ( D_CURSOR_INVISIBLE );
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer, '_', f_iWidthRaw );
@@ -229,7 +231,8 @@ int HTreeControl::process_input ( int a_iCode )
 						f_poSelected = static_cast < HNodeControl * > ( l_poNode->f_poTrunk )->next ( );
 						l_poNode = static_cast < HNodeControl * > (f_poSelected );
 						}
-					else break;
+					else
+						break;
 				}
 			break;
 			}
@@ -262,7 +265,8 @@ int HTreeControl::process_input ( int a_iCode )
 						f_poSelected = static_cast < HNodeControl * > ( l_poNode->f_poTrunk )->next ( );
 						l_poNode = static_cast < HNodeControl * > (f_poSelected );
 						}
-					else break;
+					else
+						break;
 				}
 			break;
 			}
@@ -271,7 +275,8 @@ int HTreeControl::process_input ( int a_iCode )
 			{
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				l_poNode->f_bUnfolded = ! l_poNode->f_bUnfolded;
-			else l_iErrorCode = a_iCode;
+			else
+				l_iErrorCode = a_iCode;
 			break; /* I have to think about it more. */
 			}
 		case ( '\t' ):

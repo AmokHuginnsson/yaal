@@ -106,24 +106,40 @@ void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )
 int get_color_bits ( HString & a_roValue, int a_iWhat )
 	{
 	HString l_oStr = a_roValue.split ( " \t", a_iWhat );
-	if ( l_oStr.is_empty ( ) )return ( 0 );
-	if ( ! strcasecmp ( l_oStr, "BLACK" ) )return ( D_FG_BLACK );
-	else if ( ! strcasecmp ( l_oStr, "RED" ) )return ( D_FG_RED );
-	else if ( ! strcasecmp ( l_oStr, "GREEN" ) )return ( D_FG_GREEN );
-	else if ( ! strcasecmp ( l_oStr, "BROWN" ) )return ( D_FG_BROWN );
-	else if ( ! strcasecmp ( l_oStr, "BLUE" ) )return ( D_FG_BLUE );
-	else if ( ! strcasecmp ( l_oStr, "MAGENTA" ) )return ( D_FG_MAGENTA );
-	else if ( ! strcasecmp ( l_oStr, "CYAN" ) )return ( D_FG_CYAN );
-	else if ( ! strcasecmp ( l_oStr, "LIGHTGRAY" ) )return ( D_FG_LIGHTGRAY );
-	else if ( ! strcasecmp ( l_oStr, "GRAY" ) )return ( D_FG_GRAY );
-	else if ( ! strcasecmp ( l_oStr, "BRGIHTRED" ) )return ( D_FG_BRIGHTRED );
-	else if ( ! strcasecmp ( l_oStr, "BRIGHTGREEN" ) )return ( D_FG_BRIGHTGREEN );
-	else if ( ! strcasecmp ( l_oStr, "YELLOW" ) )return ( D_FG_YELLOW );
-	else if ( ! strcasecmp ( l_oStr, "BRIGHTBLUE" ) )return ( D_FG_BRIGHTBLUE );
+	if ( l_oStr.is_empty ( ) )
+		return ( 0 );
+	if ( ! strcasecmp ( l_oStr, "BLACK" ) )
+		return ( D_FG_BLACK );
+	else if ( ! strcasecmp ( l_oStr, "RED" ) )
+		return ( D_FG_RED );
+	else if ( ! strcasecmp ( l_oStr, "GREEN" ) )
+		return ( D_FG_GREEN );
+	else if ( ! strcasecmp ( l_oStr, "BROWN" ) )
+		return ( D_FG_BROWN );
+	else if ( ! strcasecmp ( l_oStr, "BLUE" ) )
+		return ( D_FG_BLUE );
+	else if ( ! strcasecmp ( l_oStr, "MAGENTA" ) )
+		return ( D_FG_MAGENTA );
+	else if ( ! strcasecmp ( l_oStr, "CYAN" ) )
+		return ( D_FG_CYAN );
+	else if ( ! strcasecmp ( l_oStr, "LIGHTGRAY" ) )
+		return ( D_FG_LIGHTGRAY );
+	else if ( ! strcasecmp ( l_oStr, "GRAY" ) )
+		return ( D_FG_GRAY );
+	else if ( ! strcasecmp ( l_oStr, "BRGIHTRED" ) )
+		return ( D_FG_BRIGHTRED );
+	else if ( ! strcasecmp ( l_oStr, "BRIGHTGREEN" ) )
+		return ( D_FG_BRIGHTGREEN );
+	else if ( ! strcasecmp ( l_oStr, "YELLOW" ) )
+		return ( D_FG_YELLOW );
+	else if ( ! strcasecmp ( l_oStr, "BRIGHTBLUE" ) )
+		return ( D_FG_BRIGHTBLUE );
 	else if ( ! strcasecmp ( l_oStr, "BRIGHTMAGENTA" ) )
 		return ( D_FG_BRIGHTMAGENTA );
-	else if ( ! strcasecmp ( l_oStr, "BRIGHTCYAN" ) )return ( D_FG_BRIGHTCYAN );
-	else if ( ! strcasecmp ( l_oStr, "WHITE" ) )return ( D_FG_WHITE );
+	else if ( ! strcasecmp ( l_oStr, "BRIGHTCYAN" ) )
+		return ( D_FG_BRIGHTCYAN );
+	else if ( ! strcasecmp ( l_oStr, "WHITE" ) )
+		return ( D_FG_WHITE );
 	return ( 0 );
 	}
 
@@ -139,7 +155,8 @@ void set_color ( HString & a_roValue, int & a_riAttribute )
 
 bool set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
 	{
-	if ( ! strcasecmp ( a_roOption, "set_env" ) )set_env ( a_roValue );
+	if ( ! strcasecmp ( a_roOption, "set_env" ) )
+		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "attribute_disabled" ) )
 		set_color ( a_roValue, n_iAttributeDisabled );
 	else if ( ! strcasecmp ( a_roOption, "attribute_enabled" ) )
@@ -150,7 +167,8 @@ bool set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
 		set_color ( a_roValue, n_iAttributeStatusBar );
 	else if ( ! strcasecmp ( a_roOption, "attribute_search_highlight" ) )
 		set_color ( a_roValue, n_iAttributeSearchHighlight );
-	else return ( true );
+	else
+		return ( true );
 	return ( false );
 	}
 

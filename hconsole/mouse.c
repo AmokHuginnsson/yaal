@@ -82,7 +82,8 @@ int hunt_tty ( int a_iOffset )
 		l_pcTtyName = ::getenv ( "STY" );
 		if ( l_pcTtyName && ( l_pcTtyName = strstr ( l_pcTtyName, ".tty" ) ) )
 			l_iVC = l_pcTtyName [ 4 + a_iOffset ] - '0';
-		else M_THROW ( "can not find controling virtual console", g_iErrNo );
+		else
+			M_THROW ( "can not find controling virtual console", g_iErrNo );
 		}
 	return ( l_iVC );
 	M_EPILOG

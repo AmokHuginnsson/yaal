@@ -63,12 +63,14 @@ OVariable n_psVariables [ ] =
 
 bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	{
-	if ( ! strcasecmp ( a_roOption, "set_env" ) )set_env ( a_roValue );
+	if ( ! strcasecmp ( a_roOption, "set_env" ) )
+		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
 		{
 		if ( ! strcasecmp ( a_roValue, "LOG_SQL" ) )
 			n_lLogMask |= D_LOG_SQL;
-		else return ( true );
+		else
+			return ( true );
 		}
 	else if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
 		{
@@ -90,7 +92,8 @@ bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 			exit ( 1 );
 			}
 		}
-	else return ( true );
+	else
+		return ( true );
 	return ( false );
 	}
 

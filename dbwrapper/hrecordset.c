@@ -98,7 +98,8 @@ void HRecordSet::build_sql ( void )
 				f_oBuffer = m_oFilter;
 			else if ( m_oFilter.is_empty ( ) )
 				f_oBuffer = f_oFilter;
-			else f_oBuffer.format ( "%s AND ( %s )", static_cast < char const * > ( f_oFilter ),
+			else
+				f_oBuffer.format ( "%s AND ( %s )", static_cast < char const * > ( f_oFilter ),
 					static_cast < char const * > ( m_oFilter ) );
 			if ( ! f_oBuffer.is_empty ( ) )
 				f_oSQL += ( " WHERE " + f_oBuffer );
@@ -107,7 +108,8 @@ void HRecordSet::build_sql ( void )
 				f_oBuffer = m_oSort;
 			else if ( m_oSort.is_empty ( ) )
 				f_oBuffer = f_oSort;
-			else f_oBuffer.format ( "%s, %s", static_cast < char const * > ( m_oSort ),
+			else
+				f_oBuffer.format ( "%s, %s", static_cast < char const * > ( m_oSort ),
 					static_cast < char const * > ( f_oSort ) );
 			if ( ! f_oBuffer.is_empty ( ) )
 				f_oSQL += ( " ORDER BY " + f_oBuffer );
@@ -121,7 +123,8 @@ void HRecordSet::build_sql ( void )
 				{
 				if ( l_iCtr == f_iIdFieldOffset )
 					continue;
-				if ( ! f_oBuffer.is_empty ( ) )f_oBuffer += ", ";
+				if ( ! f_oBuffer.is_empty ( ) )
+					f_oBuffer += ", ";
 				f_oBuffer += f_oColumnNames [ l_iCtr ] + " = '" + f_oValues [ l_iCtr ] + '\'';
 				}
 			f_oBuffer += " WHERE id = ";
@@ -135,8 +138,10 @@ void HRecordSet::build_sql ( void )
 			f_oSQL = "INSERT INTO " + f_oTable + " ( ";
 			for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 				{
-				if ( l_iCtr == f_iIdFieldOffset )continue;
-				if ( ! f_oBuffer.is_empty ( ) )f_oBuffer += ", ";
+				if ( l_iCtr == f_iIdFieldOffset )
+					continue;
+				if ( ! f_oBuffer.is_empty ( ) )
+					f_oBuffer += ", ";
 				f_oBuffer += f_oColumnNames [ l_iCtr ];
 				}
 			f_oBuffer += " ) VALUES ( ";
@@ -144,8 +149,10 @@ void HRecordSet::build_sql ( void )
 			f_oBuffer = "";
 			for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 				{
-				if ( l_iCtr == f_iIdFieldOffset )continue;
-				if ( ! f_oBuffer.is_empty ( ) )f_oBuffer += ", ";
+				if ( l_iCtr == f_iIdFieldOffset )
+					continue;
+				if ( ! f_oBuffer.is_empty ( ) )
+					f_oBuffer += ", ";
 				f_oBuffer += '\'' + f_oValues [ l_iCtr ] + '\'';
 				}
 			f_oBuffer += " );";
@@ -166,9 +173,12 @@ long int HRecordSet::open ( char const * a_pcQuery )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( f_iMode != D_MODE_CLOSED )M_THROW ( E_MODE, f_iMode );
-	if ( a_pcQuery )f_oSQL = a_pcQuery;
-	else build_sql ( );
+	if ( f_iMode != D_MODE_CLOSED )
+		M_THROW ( E_MODE, f_iMode );
+	if ( a_pcQuery )
+		f_oSQL = a_pcQuery;
+	else
+		build_sql ( );
 	free ( );
 	f_iCursorPosition = 0;
 	f_iSetQuantity = f_poDataBase->query ( f_oSQL );
@@ -181,10 +191,12 @@ long int HRecordSet::open ( char const * a_pcQuery )
 		{
 		f_oColumnNames.add_tail ( ) = dbwrapper::rs_column_name ( f_pvCoreData,
 				l_iCtr );
-		if ( f_oColumnNames.tail ( ) == "id" )f_iIdFieldOffset = l_iCtr;
+		if ( f_oColumnNames.tail ( ) == "id" )
+			f_iIdFieldOffset = l_iCtr;
 		f_oValues.add_tail ( );
 		}
-	if ( f_iSetQuantity > 0 )sync ( );
+	if ( f_iSetQuantity > 0 )
+		sync ( );
 	return ( f_iSetQuantity );
 	M_EPILOG
 	}
@@ -222,8 +234,10 @@ long int HRecordSet::requery ( char const * a_pcQuery )
 	{
 	M_PROLOG
 	close ( );
-	if ( a_pcQuery )f_oSQL = a_pcQuery;
-	else build_sql ( );
+	if ( a_pcQuery )
+		f_oSQL = a_pcQuery;
+	else
+		build_sql ( );
 	return ( open ( f_oSQL ) );
 	M_EPILOG
 	}
@@ -250,11 +264,13 @@ bool HRecordSet::is_bof ( void )
 void HRecordSet::move_next ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )
+		M_THROW ( E_MODE, f_iMode );
 	f_iCursorPosition ++;
 	if ( f_iCursorPosition > f_iSetQuantity )
 		M_THROW ( "end of set reached", f_iCursorPosition );
-	if ( f_iCursorPosition < f_iSetQuantity )sync ( );
+	if ( f_iCursorPosition < f_iSetQuantity )
+		sync ( );
 	return;
 	M_EPILOG
 	}
@@ -262,12 +278,14 @@ void HRecordSet::move_next ( void )
 void HRecordSet::move_previous ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )
+		M_THROW ( E_MODE, f_iMode );
 	f_iCursorPosition --;
 	if ( f_iCursorPosition < -1 )
 		M_THROW ( "beginning of set reached",
 				f_iCursorPosition );
-	if ( f_iCursorPosition >= 0 )sync ( );
+	if ( f_iCursorPosition >= 0 )
+		sync ( );
 	return;
 	M_EPILOG
 	}
@@ -275,7 +293,8 @@ void HRecordSet::move_previous ( void )
 void HRecordSet::move_first ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )
+		M_THROW ( E_MODE, f_iMode );
 	f_iCursorPosition = 0;
 	sync ( );
 	return;
@@ -285,7 +304,8 @@ void HRecordSet::move_first ( void )
 void HRecordSet::move_last ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )
+		M_THROW ( E_MODE, f_iMode );
 	f_iCursorPosition = f_iSetQuantity - 1;
 	sync ( );
 	return;
@@ -343,7 +363,8 @@ void HRecordSet::remove ( void )
 	{
 	M_PROLOG
 	int l_iCursorPosition = f_iCursorPosition;
-	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )
+		M_THROW ( E_MODE, f_iMode );
 	f_oSQL.format ( "DELETE FROM %s WHERE id = %ld;",
 			static_cast < char const * > ( f_oTable ), m_lId );
 	f_poDataBase->query ( f_oSQL );
@@ -353,7 +374,8 @@ void HRecordSet::remove ( void )
 		{
 		if ( l_iCursorPosition >= f_iSetQuantity )
 			f_iCursorPosition = f_iSetQuantity - 1;
-		else f_iCursorPosition = l_iCursorPosition;
+		else
+			f_iCursorPosition = l_iCursorPosition;
 		}
 	return;
 	M_EPILOG
@@ -366,9 +388,11 @@ void HRecordSet::sync ( int a_iField, char & a_rcChar )
 	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )a_rcChar = l_oTmp [ 0 ];
+		if ( ! l_oTmp.is_empty ( ) )
+			a_rcChar = l_oTmp [ 0 ];
 		}
-	else f_oValues [ a_iField ] = a_rcChar;
+	else
+		f_oValues [ a_iField ] = a_rcChar;
 	return;
 	M_EPILOG
 	}
@@ -380,9 +404,11 @@ void HRecordSet::sync ( int a_iField, short & a_rhShort )
 	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )a_rhShort = atoi ( l_oTmp );
+		if ( ! l_oTmp.is_empty ( ) )
+			a_rhShort = atoi ( l_oTmp );
 		}
-	else f_oValues [ a_iField ] = a_rhShort;
+	else
+		f_oValues [ a_iField ] = a_rhShort;
 	return;
 	M_EPILOG
 	}
@@ -394,9 +420,11 @@ void HRecordSet::sync ( int a_iField, int & a_riInt )
 	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )a_riInt = atoi ( l_oTmp );
+		if ( ! l_oTmp.is_empty ( ) )
+			a_riInt = atoi ( l_oTmp );
 		}
-	else f_oValues [ a_iField ] = a_riInt;
+	else
+		f_oValues [ a_iField ] = a_riInt;
 	return;
 	M_EPILOG
 	}
@@ -408,9 +436,11 @@ void HRecordSet::sync ( int a_iField, long int & a_rlLongInt )
 	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )a_rlLongInt = atol ( l_oTmp );
+		if ( ! l_oTmp.is_empty ( ) )
+			a_rlLongInt = atol ( l_oTmp );
 		}
-	else f_oValues [ a_iField ] = a_rlLongInt;
+	else
+		f_oValues [ a_iField ] = a_rlLongInt;
 	return;
 	M_EPILOG
 	}
@@ -422,9 +452,11 @@ void HRecordSet::sync ( int a_iField, double & a_rdDouble )
 	if ( f_iMode == D_MODE_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )a_rdDouble = atof ( l_oTmp );
+		if ( ! l_oTmp.is_empty ( ) )
+			a_rdDouble = atof ( l_oTmp );
 		}
-	else f_oValues [ a_iField ] = a_rdDouble;
+	else
+		f_oValues [ a_iField ] = a_rdDouble;
 	return;
 	M_EPILOG
 	}
@@ -432,8 +464,10 @@ void HRecordSet::sync ( int a_iField, double & a_rdDouble )
 void HRecordSet::sync ( int a_iField, HString & a_roString )
 	{
 	M_PROLOG
-	if ( f_iMode == D_MODE_NORMAL )a_roString = get ( a_iField );
-	else f_oValues [ a_iField ] = a_roString;
+	if ( f_iMode == D_MODE_NORMAL )
+		a_roString = get ( a_iField );
+	else
+		f_oValues [ a_iField ] = a_roString;
 	return;
 	M_EPILOG
 	}
@@ -442,7 +476,8 @@ void HRecordSet::sync ( int a_iField, HTime & a_roTime )
 	{
 	M_PROLOG
 	HTime l_oTime;
-	if ( f_iMode == D_MODE_NORMAL )a_roTime = get ( a_iField );
+	if ( f_iMode == D_MODE_NORMAL )
+		a_roTime = get ( a_iField );
 	else
 		{
 		l_oTime = a_roTime;
@@ -465,7 +500,8 @@ void HRecordSet::sync ( int a_iField, HInfo & a_roInfo )
 		a_roInfo = atof ( l_oTmp );
 		a_roInfo = l_oTmp;
 		}
-	else f_oValues [ a_iField ] = static_cast < HString & > ( a_roInfo );
+	else
+		f_oValues [ a_iField ] = static_cast < HString & > ( a_roInfo );
 	return;
 	M_EPILOG
 	}

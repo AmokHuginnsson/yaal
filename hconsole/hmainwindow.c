@@ -57,7 +57,8 @@ int HMainWindow::init ( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	if ( f_poFocusedChild )return ( 0 );
+	if ( f_poFocusedChild )
+		return ( 0 );
 	l_iError = HWindow::init ( );
 	f_poMenu = new HMenuControl ( this, 1, 1, - 2,	- n_iWidth / 2 - 1,
 			" &Menu \n" );

@@ -121,7 +121,8 @@ void HComboboxControl::refresh ( void )
 		l_iHeight = f_iHeight;
 		l_iWidth = f_iWidth;
 		f_iWidth = f_iDroppedWidth;
-		if ( f_iQuantity < f_iHeight )f_iHeight = f_iQuantity + 1;
+		if ( f_iQuantity < f_iHeight )
+			f_iHeight = f_iQuantity + 1;
 		HListControl::refresh ( );
 		f_iHeight = l_iHeight;
 		f_iWidth = l_iWidth;
@@ -157,7 +158,8 @@ int HComboboxControl::process_input ( int a_iCode )
 		}
 	else
 		{
-		if ( a_iCode != '\r' )return ( HListControl::process_input ( a_iCode ) );
+		if ( a_iCode != '\r' )
+			return ( HListControl::process_input ( a_iCode ) );
 		close_combo ( );
 		}
 	return ( 0 );

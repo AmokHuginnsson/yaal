@@ -291,7 +291,8 @@ double HAnalyser::multiplication( HAnalyserNode * a_poNode )
 				}
 			case 1 :
 				{
-				if ( l_dRightValue ) l_dLeftValue /= l_dRightValue;
+				if ( l_dRightValue )
+					l_dLeftValue /= l_dRightValue;
 				break;
 				}
 			}
@@ -389,7 +390,8 @@ void HAnalyser::addition_production ( HAnalyserNode * a_poNode )
 	if ( ( f_oFormula [ f_iIndex ] != '+' ) && ( f_oFormula[ f_iIndex ] != '-' ) )
 		{
 		l_poTrunk = static_cast < HAnalyserNode * > ( a_poNode->f_poTrunk );
-		if ( ! l_poTrunk ) return ;
+		if ( ! l_poTrunk )
+			return ;
 		while ( 1 )
 			{
 			if ( l_poTrunk->f_oBranch [ l_iCtr ] == a_poNode )
@@ -402,7 +404,8 @@ void HAnalyser::addition_production ( HAnalyserNode * a_poNode )
 		a_poNode->f_oBranch [ 0 ] = 0;
 		if ( a_poNode->f_oBranch.quantity ( ) > 1 )
 			a_poNode->f_oBranch [ 1 ] = 0;
-		if ( a_poNode ) delete a_poNode;
+		if ( a_poNode )
+			delete a_poNode;
 		return ;
 		}
 	while ( ( f_oFormula [ f_iIndex ] == '+' )
@@ -431,7 +434,8 @@ void HAnalyser::multiplication_production ( HAnalyserNode * a_poNode )
 	if ( ( f_oFormula [ f_iIndex ] != '*' ) && ( f_oFormula[ f_iIndex ] != '/' ) )
 		{
 		l_poTrunk = static_cast < HAnalyserNode * > ( a_poNode->f_poTrunk );
-		if ( ! l_poTrunk ) return ;
+		if ( ! l_poTrunk )
+			return ;
 		while ( 1 )
 			{
 			if ( l_poTrunk->f_oBranch [ l_iCtr ] == a_poNode )
@@ -515,7 +519,8 @@ void HAnalyser::signum_production( HAnalyserNode * a_poNode )
 		terminal_production ( a_poNode->grow_up_branch ( ) );
 		a_poNode->METHOD = & HAnalyser::signum;
 		}
-	else terminal_production ( a_poNode );
+	else
+		terminal_production ( a_poNode );
 	return ;
 	M_EPILOG
 	}
@@ -534,8 +539,10 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 			{
 			f_iIndex++;
 			addition_production ( a_poNode );
-			if ( f_oFormula [ f_iIndex ] != ')' ) f_iError++;
-			else f_iIndex++;
+			if ( f_oFormula [ f_iIndex ] != ')' )
+				f_iError++;
+			else
+				f_iIndex++;
 			return ;
 			}
 		case '|' :
@@ -544,8 +551,10 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 			addition_production ( a_poNode->grow_up_branch ( ) );
 			a_poNode->METHOD = & HAnalyser::functions;
 			a_poNode->f_tLeaf.add_tail ( ) = reinterpret_cast < double * > ( D_ABS );
-			if ( f_oFormula [ f_iIndex ] != '|' ) f_iError++;
-			else f_iIndex++;
+			if ( f_oFormula [ f_iIndex ] != '|' )
+				f_iError++;
+			else
+				f_iIndex++;
 			return ;
 			}
 		}
@@ -564,10 +573,13 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 			a_poNode->METHOD = & HAnalyser::functions;
 			a_poNode->f_tLeaf.add_tail ( ) = reinterpret_cast < double * > ( static_cast < int > ( f_oFormula [ f_iIndex - 2 ] ) );
 			addition_production ( a_poNode->grow_up_branch ( ) );
-			if ( f_oFormula [ f_iIndex ] != ')' ) f_iError++;
-			else f_iIndex++;
+			if ( f_oFormula [ f_iIndex ] != ')' )
+				f_iError++;
+			else
+				f_iIndex++;
 			}
-		else f_iError++;
+		else
+			f_iError++;
 		return ;
 		}
 	if ( ( f_oFormula [ f_iIndex ] >= '0' ) && ( f_oFormula[ f_iIndex ] <= '9' ) )
@@ -588,7 +600,8 @@ void HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 					&& ( f_oFormula [ f_iIndex ] <= '9' ) )
 				while ( ( f_oFormula [ f_iIndex ] >= '0' )
 						&& ( f_oFormula [ f_iIndex ] <= '9' ) ) f_iIndex++;
-			else f_iError++;
+			else
+				f_iError++;
 			}
 		if ( f_iError == 0 )
 			{
@@ -615,7 +628,8 @@ double * HAnalyser::analyse( char const * a_pcFormula )
 	f_oFormula.hs_realloc ( l_iLength + 1 ); /* + 1 for trailing null */
 	if ( translate ( a_pcFormula ) > 0 )
 		return ( NULL );
-	if ( l_poNode ) delete l_poNode;
+	if ( l_poNode )
+		delete l_poNode;
 	f_oConstantsPool.reset ( );
 	f_poRoot = 0;
 	f_poRoot = l_poNode = new HAnalyserNode ( 0 );
@@ -638,7 +652,8 @@ double & HAnalyser::operator [ ] ( int a_iIndex )
 		return ( f_pdVariables [ a_iIndex ] );
 	else if ( ( a_iIndex >= 'A' ) && ( a_iIndex <= 'Z' ) )
 		return ( f_pdVariables [ a_iIndex - 'A' ] );
-	else M_THROW ( "index out of range", a_iIndex );
+	else
+		M_THROW ( "index out of range", a_iIndex );
 	M_EPILOG
 	}
 
@@ -646,7 +661,8 @@ double HAnalyser::count ( void )
 	{
 	M_PROLOG
 	HAnalyserNode * l_poRoot = static_cast < HAnalyserNode * > ( f_poRoot );
-	if ( ! l_poRoot )M_THROW ( "logic tree is not compiled", f_iError );
+	if ( ! l_poRoot )
+		M_THROW ( "logic tree is not compiled", f_iError );
 	return ( ( this->* ( l_poRoot->METHOD ) ) ( l_poRoot ) );
 	M_EPILOG
 	}

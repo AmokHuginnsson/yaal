@@ -230,13 +230,15 @@ bool HMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 	if ( f_poAtomPtr )
 		{
 		f_poAtomPtr = f_poAtomPtr->f_poNext;
-		if ( ! f_poAtomPtr )f_iIndex ++;
+		if ( ! f_poAtomPtr )
+			f_iIndex ++;
 		}
 	if ( ! f_poAtomPtr )
 		{
 		while ( ( f_iIndex < f_iPrime ) && ! f_ppoAtomArray [ f_iIndex ] )
 			f_iIndex ++;
-		if ( f_iIndex < f_iPrime )f_poAtomPtr = f_ppoAtomArray [ f_iIndex ];
+		if ( f_iIndex < f_iPrime )
+			f_poAtomPtr = f_ppoAtomArray [ f_iIndex ];
 		}
 	if ( f_poAtomPtr )
 		{
@@ -271,7 +273,8 @@ bool HMap<tType, ttType>::get ( const tType & a_rtKey, ttType & a_rtValue )
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
 	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		l_poAtom = l_poAtom->f_poNext;
-	if ( l_poAtom )a_rtValue = l_poAtom->f_tValue;
+	if ( l_poAtom )
+		a_rtValue = l_poAtom->f_tValue;
 	return ( l_poAtom ? true : false );
 	M_EPILOG
 	}
@@ -291,8 +294,10 @@ bool HMap<tType, ttType>::remove ( const tType & a_rtKey )
 		}
 	if ( l_poAtom )
 		{
-		if ( l_poAncestor )l_poAncestor->f_poNext = l_poAtom->f_poNext;
-		else f_ppoAtomArray [ l_iHash ] = NULL;
+		if ( l_poAncestor )
+			l_poAncestor->f_poNext = l_poAtom->f_poNext;
+		else
+			f_ppoAtomArray [ l_iHash ] = NULL;
 		delete l_poAtom;
 		f_iQuantity --;
 		}

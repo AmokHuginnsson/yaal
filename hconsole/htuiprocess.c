@@ -168,7 +168,8 @@ int HProcess::reconstruct_fdset ( void )
 	f_sLatency.tv_sec = n_iLatency;
 	f_sLatency.tv_usec = 0;
 	FD_ZERO ( & f_xFileDescriptorSet );
-	if ( ! f_oFileDescriptorHandlers.quantity ( ) )return ( -1 );
+	if ( ! f_oFileDescriptorHandlers.quantity ( ) )
+		return ( -1 );
 	f_oFileDescriptorHandlers.rewind ( );
 /* FD_SET is a macro and first argument is evaluated twice ! */
 	while ( f_oFileDescriptorHandlers.iterate ( l_iFileDes, DUMMY ) )
@@ -182,11 +183,14 @@ int HProcess::process_stdin ( int a_iCode )
 	M_PROLOG
 	HString l_oCommand;
 	n_bInputWaiting = false;
-	if ( ! a_iCode )a_iCode = get_key ( );
-	if ( a_iCode )a_iCode = process_input ( a_iCode, f_oPreprocessHandlers );
+	if ( ! a_iCode )
+		a_iCode = get_key ( );
+	if ( a_iCode )
+		a_iCode = process_input ( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && f_poForegroundWindow )
 			a_iCode = f_poForegroundWindow->process_input ( a_iCode );
-	if ( a_iCode )a_iCode = process_input ( a_iCode, f_oPostprocessHandlers );
+	if ( a_iCode )
+		a_iCode = process_input ( a_iCode, f_oPostprocessHandlers );
 	if ( ! a_iCode )
 		{
 		if ( f_poForegroundWindow )
@@ -217,11 +221,13 @@ int HProcess::process_stdin ( int a_iCode )
 			c_printf ( 0, 0, D_FG_GREEN,
 					"        CTRL-%c: %5d       ",
 					a_iCode + 96, a_iCode);
-		else c_printf ( 0, 0, D_FG_GREEN,
+		else
+			c_printf ( 0, 0, D_FG_GREEN,
 					"             %c: %5d       ",
 					a_iCode, a_iCode );
 		}
-	else c_printf ( 0, 0, D_FG_GREEN, "                           " );
+	else
+		c_printf ( 0, 0, D_FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( a_iCode && f_poForegroundWindow )
 		f_poForegroundWindow->status_bar ( )->message ( D_FG_RED,
@@ -270,7 +276,8 @@ int HProcess::run ( void )
 			{
 			if ( l_iError < 0 )
 				M_THROW ( "select ( ) returned", l_iError );
-			if ( ! f_oFileDescriptorHandlers.quantity ( ) )return ( -1 );
+			if ( ! f_oFileDescriptorHandlers.quantity ( ) )
+				return ( -1 );
 			f_oFileDescriptorHandlers.rewind ( );
 			while ( f_oFileDescriptorHandlers.iterate ( l_iFileDes, HANDLER ) )
 				{
@@ -281,7 +288,8 @@ int HProcess::run ( void )
 					}
 				}
 			}
-		else handler_idle ( 0 );
+		else
+			handler_idle ( 0 );
 		if ( n_bNeedRepaint )
 			{
 			n_bNeedRepaint = false;
@@ -371,7 +379,8 @@ int HProcess::handler_jump_meta_tab ( int a_iCode, void * )
 		HInfo & l_oInfo = f_poWindows->present ( ) [ 0 ];
 		f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( l_oInfo ) );
 		}
-	else f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( f_poWindows->go ( -1 ) [ 0 ] ) );
+	else
+		f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( f_poWindows->go ( -1 ) [ 0 ] ) );
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );

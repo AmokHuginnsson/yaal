@@ -48,8 +48,10 @@ HSerial::HSerial ( char const * a_pcDevice )
 	{
 	M_PROLOG
 	memset ( & f_sTIO, 0, sizeof ( termios ) );
-	if ( a_pcDevice )f_oDevicePath = a_pcDevice;
-	else f_oDevicePath = tools::n_pcSerialDevice;
+	if ( a_pcDevice )
+		f_oDevicePath = a_pcDevice;
+	else
+		f_oDevicePath = tools::n_pcSerialDevice;
 /*
  *   BAUDRATE: Set bps rate. You could also use cfsetispeed and cfsetospeed.
  *   CRTSCTS : output hardware flow control  ( only used if the cable has
@@ -113,7 +115,8 @@ HSerial::HSerial ( char const * a_pcDevice )
 HSerial::~HSerial ( void )
 	{
 	M_PROLOG
-	if ( f_iFileDescriptor )close ( );
+	if ( f_iFileDescriptor )
+		close ( );
 	f_iFileDescriptor = 0;
 	return;
 	M_EPILOG

@@ -55,7 +55,8 @@ long int HControlList::empty ( HList < HControl * > ::HElement* a_poElement )
 	{
 	M_PROLOG
 	HControl * l_poControl = a_poElement->get_object ( );
-	if ( l_poControl )delete l_poControl;
+	if ( l_poControl )
+		delete l_poControl;
 	l_poControl = 0;
 	return ( HList < HControl * > ::empty ( a_poElement ) );
 	M_EPILOG
@@ -72,7 +73,8 @@ HControl * HControlList::next_enabled ( char a_cShorcut )
 		to_tail ( );
 		l_poControlNew = f_poSelected->get_object ( );
 		l_bLoop = l_poControlNew->set_focus ( a_cShorcut );
-		if ( l_poControlOld == l_poControlNew )l_bLoop = false;
+		if ( l_poControlOld == l_poControlNew )
+			l_bLoop = false;
 		}
 	while ( l_bLoop );
 	if ( l_poControlNew != l_poControlOld )
@@ -89,7 +91,8 @@ void HControlList::select ( HControl * a_poControl )
 	M_PROLOG
 	int l_iCtr = 0;
 	HElement * l_poElement = NULL;
-	if ( f_poSelected->get_object ( ) == a_poControl )return;
+	if ( f_poSelected->get_object ( ) == a_poControl )
+		return;
 	l_poElement = f_poSelected;
 	f_poSelected = f_poHook;
 	while ( l_iCtr ++ < f_iQuantity )

@@ -161,7 +161,8 @@ HTree < tttType > ::HNode::HNode( HNode * a_poNode )
 		{
 		f_poTree = a_poNode->f_poTree;
 		f_iLevel = a_poNode->f_iLevel + 1;
-		if ( f_poTree )f_iNumber = f_poTree->f_iHighestNumber ++;
+		if ( f_poTree )
+			f_iNumber = f_poTree->f_iHighestNumber ++;
 		}
 	f_iHits = 0;
 	return ;
@@ -225,7 +226,8 @@ typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
 	if ( f_poTrunk )
 		{
 		while ( ( l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED ) ) )
-			if ( ( * l_ppoNode ) == this )break;
+			if ( ( * l_ppoNode ) == this )
+				break;
 		l_ppoNode = & f_poTrunk->f_oBranch.present ( );
 		}
 	return ( * l_ppoNode );
@@ -255,7 +257,8 @@ template < class tttType >
 void HTree < tttType > ::flush ( void )
 	{
 	M_PROLOG
-	if ( f_poRoot )delete f_poRoot;
+	if ( f_poRoot )
+		delete f_poRoot;
 	f_poRoot = NULL;
 	M_EPILOG
 	}

@@ -60,7 +60,8 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 	int l_iAttribte = 0;
 	if ( a_iStatusBarAttribute > 0 )
 		f_iStatusBarAttribute = a_iStatusBarAttribute;
-	else f_iStatusBarAttribute = n_iAttributeStatusBar;
+	else
+		f_iStatusBarAttribute = n_iAttributeStatusBar;
 	l_iAttribte = f_iStatusBarAttribute;
 	l_iAttribte &= 0x00ff;
 	f_iMode = D_PROMPT_MODE_NORMAL;
@@ -103,14 +104,16 @@ void HStatusBarControl::refresh ( void )
 	M_PROLOG
 	int l_iOrigRow = 0;
 	int l_iOrigColumn = 0;
-	if ( ! f_bFocused )getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
+	if ( ! f_bFocused )
+		getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	if ( f_iPromptLength )
 		{
 		set_attr ( f_iStatusBarAttribute >> 8 );
 		::mvprintw ( f_iRowRaw, 0, f_oPrompt );
 		}
 	HEditControl::refresh ( );
-	if ( ! f_bFocused )::move ( l_iOrigRow, l_iOrigColumn );
+	if ( ! f_bFocused )
+		::move ( l_iOrigRow, l_iOrigColumn );
 	return;
 	M_EPILOG
 	}
@@ -176,7 +179,8 @@ int HStatusBarControl::verify ( void )
 	M_PROLOG
 	int l_iLength = 0;
 	bool l_bOk = false;
-	if ( l_iLength < f_iPromptLength )l_bOk = true;
+	if ( l_iLength < f_iPromptLength )
+		l_bOk = true;
 	return ( l_bOk );
 	M_EPILOG
 	}
@@ -207,8 +211,10 @@ void HStatusBarControl::update_progress ( double a_dStep,
 	int l_iNextMinute = 0;
 	int l_iNextSecond = 0;
 	HTime l_oStoper, l_oNow ( "(%T)" ), l_oLeft;
-	if ( f_bDone )return;
-	if ( a_dStep < 0 )a_dStep = f_iLastStep ++;
+	if ( f_bDone )
+		return;
+	if ( a_dStep < 0 )
+		a_dStep = f_iLastStep ++;
 	l_oStoper = l_oNow - f_oStart;
 	if ( f_bEstimate )
 		{
@@ -222,8 +228,10 @@ void HStatusBarControl::update_progress ( double a_dStep,
 	l_iNextStep = static_cast < int > ( ( l_iMaxBar * a_dStep / f_dProgressSize ) );
 	l_iNextMinute = l_oStoper.get_minute ( );
 	l_iNextSecond = l_oStoper.get_second ( );
-	if ( l_iNextStep >= l_iMaxBar )l_iNextStep = l_iMaxBar, f_bDone = true;
-	if ( l_iNextPercent >= 100 )l_iNextPercent = 100, f_bDone = true;
+	if ( l_iNextStep >= l_iMaxBar )
+		l_iNextStep = l_iMaxBar, f_bDone = true;
+	if ( l_iNextPercent >= 100 )
+		l_iNextPercent = 100, f_bDone = true;
 	if ( a_pcTitle || ( f_iLastProgress != l_iNextStep )
 			|| ( f_iLastPercent != l_iNextPercent )
 			|| ( f_iLastMinute != l_iNextMinute )
@@ -266,7 +274,8 @@ void HStatusBarControl::message ( int a_iAttribute,
 	M_PROLOG
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
-	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
+	if ( a_pcFormat && a_pcFormat [ 0 ] )
+		putchar ( '\a' );
 	c_vprintf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	n_bNeedRepaint = true;
@@ -279,7 +288,8 @@ void HStatusBarControl::message ( char const * a_pcFormat, ... )
 	M_PROLOG
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
-	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
+	if ( a_pcFormat && a_pcFormat [ 0 ] )
+		putchar ( '\a' );
 	c_vprintf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	n_bNeedRepaint = true;

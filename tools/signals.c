@@ -144,7 +144,8 @@ void install_special ( SIGNAL_HANDLER_t HANDLER, int a_iSignum )
 		}
 	if ( l_sOldHandler.sa_handler == SIG_IGN )
 		sigaction ( a_iSignum, & l_sOldHandler, & l_sHandler );
-	else siginterrupt ( a_iSignum, true );
+	else
+		siginterrupt ( a_iSignum, true );
 	return;
 	M_EPILOG
 	}
@@ -169,7 +170,8 @@ void signal_WINCH ( int a_iSignum )
 		n_bInputWaiting = true;
 		ungetch ( D_KEY_CTRL_('l') );
 		}
-	else fprintf ( stderr, l_oMessage );
+	else
+		fprintf ( stderr, l_oMessage );
 #else /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, l_oMessage );
 #endif /* not __HCONSOLE_CONSOLE_H */

@@ -98,15 +98,21 @@ void enter_curses( void )
 		tcgetattr ( STDIN_FILENO, & n_sTermios );
 		tcgetattr ( STDIN_FILENO, & l_sTermios );
 		l_sTermios.c_iflag &= ~IXON;
-		if ( n_bLeaveCtrlC )l_sTermios.c_cc [ VINTR ] = 0;
-		if ( n_bLeaveCtrlZ )l_sTermios.c_cc [ VSUSP ] = 0;
-		if ( n_bLeaveCtrlS )l_sTermios.c_cc [ VSTOP ] = 0;
-		if ( n_bLeaveCtrlQ )l_sTermios.c_cc [ VSTART ] = 0;
-		if ( n_bLeaveCtrlBackSlash )l_sTermios.c_cc [ VQUIT ] = 0;
+		if ( n_bLeaveCtrlC )
+			l_sTermios.c_cc [ VINTR ] = 0;
+		if ( n_bLeaveCtrlZ )
+			l_sTermios.c_cc [ VSUSP ] = 0;
+		if ( n_bLeaveCtrlS )
+			l_sTermios.c_cc [ VSTOP ] = 0;
+		if ( n_bLeaveCtrlQ )
+			l_sTermios.c_cc [ VSTART ] = 0;
+		if ( n_bLeaveCtrlBackSlash )
+			l_sTermios.c_cc [ VQUIT ] = 0;
 		tcsetattr ( STDIN_FILENO, TCSAFLUSH, & l_sTermios );
 		}
 	use_env ( true );
-	if ( ! n_psWindow )n_psWindow = initscr();
+	if ( ! n_psWindow )
+		n_psWindow = initscr();
 	cbreak ( );
 	start_color ( );
 	standout ( );
@@ -182,7 +188,8 @@ void leave_curses( void )
 /*	reset_shell_mode ( ); */
 /* see comment near def_shell_mode ( ), ( automagicly by endwin ( ) ) */
 /*
-	if ( n_psWindow )delwin ( n_psWindow );
+	if ( n_psWindow )
+	delwin ( n_psWindow );
 	n_psWindow = NULL;
 */
 	endwin ( );
@@ -238,7 +245,8 @@ int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 		move ( a_iRow, 0 );
 		clrtoeol ( );
 		}
-	else move ( a_iRow, a_iColumn );
+	else
+		move ( a_iRow, a_iColumn );
 	l_iError = vw_printw ( stdscr, a_pcFormat, a_rxAp );
 	move ( l_iOrigRow, l_iOrigColumn );
 	set_attr ( l_iOrigAttribute );
@@ -262,8 +270,10 @@ int get_key( void )
 		nodelay ( stdscr, true );
 		l_iKey = getch ( );
 		nodelay ( stdscr, false );
-		if ( l_iKey == ERR )l_iKey = D_KEY_ESC;
-		else l_iKey = D_KEY_META_(l_iKey);
+		if ( l_iKey == ERR )
+			l_iKey = D_KEY_ESC;
+		else
+			l_iKey = D_KEY_META_(l_iKey);
 		}
 	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
 		{
@@ -280,16 +290,20 @@ int get_key( void )
 			}
 		else
 			{
-			if ( l_iKey < D_KEY_ESC )l_iKey = D_KEY_COMMAND_( l_iChar = l_iKey + 96 );
+			if ( l_iKey < D_KEY_ESC )
+				l_iKey = D_KEY_COMMAND_( l_iChar = l_iKey + 96 );
 			else if ( l_iKey == D_KEY_ESC )
 				{
 				nodelay ( stdscr, true );
 				l_iKey = getch ( );
 				nodelay ( stdscr, false );
-				if ( l_iKey == ERR )l_iKey = D_KEY_COMMAND_(l_iChar = D_KEY_ESC);
-				else l_iKey = D_KEY_COMMAND_(D_KEY_META_(l_iChar = l_iKey));
+				if ( l_iKey == ERR )
+					l_iKey = D_KEY_COMMAND_(l_iChar = D_KEY_ESC);
+				else
+					l_iKey = D_KEY_COMMAND_(D_KEY_META_(l_iChar = l_iKey));
 				}
-			else l_iKey = D_KEY_COMMAND_(l_iChar = l_iKey);
+			else
+				l_iKey = D_KEY_COMMAND_(l_iChar = l_iKey);
 			c_printf ( n_iHeight - 1, 6, D_FG_WHITE, " %c", l_iChar );
 			}
 		curs_set ( l_iOrigCursState );
@@ -322,7 +336,8 @@ int kbhit()
 	nodelay( stdscr, true );
 	l_iKey = get_key ( );
 	nodelay( stdscr, false );
-	if ( l_iKey == ERR ) return ( 0 );
+	if ( l_iKey == ERR )
+		return ( 0 );
 	return ( l_iKey );
 	M_EPILOG
 	}
@@ -339,8 +354,10 @@ char get_attr( void )
 	l_iError = attr_get ( & l_xAttr, & l_hColor, NULL );
 	l_iAttribute = ( l_hColor << 1 ) & 56;
 	l_iAttribute |= ( l_hColor & 7 );
-	if ( l_xAttr & A_BOLD )l_iAttribute |= 8;
-	if ( l_xAttr & A_BLINK )l_iAttribute |= 128;
+	if ( l_xAttr & A_BOLD )
+		l_iAttribute |= 8;
+	if ( l_xAttr & A_BLINK )
+		l_iAttribute |= 128;
 	return ( l_iAttribute );
 	M_EPILOG
 	}
@@ -383,7 +400,8 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 			l_iEventType = D_EVENT_MOUSE;
 			if ( a_iKey == KEY_MOUSE )
 				mouse::mouse_get ( a_rsMouse );
-			else l_iEventType = D_EVENT_KEYBOARD;
+			else
+				l_iEventType = D_EVENT_KEYBOARD;
 			break;
 			}
 		l_iError = select ( FD_SETSIZE, & l_xFdSet, NULL, NULL,
@@ -395,7 +413,8 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 		if ( FD_ISSET ( STDIN_FILENO, & l_xFdSet ) )
 			{
 			a_iKey = get_key ( ), l_iEventType = D_EVENT_KEYBOARD;
-			if ( a_iKey == KEY_MOUSE )l_iEventType = 0;
+			if ( a_iKey == KEY_MOUSE )
+				l_iEventType = 0;
 			}
 		if ( ( a_iKey == KEY_MOUSE )
 				|| ( n_iMouseDes && FD_ISSET ( n_iMouseDes, & l_xFdSet ) ) )

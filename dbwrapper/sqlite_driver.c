@@ -104,7 +104,8 @@ void * db_connect ( char const * a_pcDataBase,
 		l_pvPtr = db_query ( l_psSQLite, "PRAGMA empty_result_callbacks = ON;" );
 		if ( l_pvPtr )
 			db_unquery ( l_pvPtr );
-		else g_psBrokenDB = l_psSQLite, l_psSQLite = NULL;
+		else
+			g_psBrokenDB = l_psSQLite, l_psSQLite = NULL;
 		}
 	return ( l_psSQLite );
 	}

@@ -74,9 +74,11 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 							l_bSection = true;
 							continue;
 							}
-					else l_bSection = false;
+					else
+						l_bSection = false;
 					}
-				if ( ! l_bSection )continue;
+				if ( ! l_bSection )
+					continue;
 				}
 			l_iCtr = 0;
 			l_bOptionOK = false;
@@ -138,7 +140,8 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 				}
 			}
 		}
-	if ( l_psRc )rc_close ( l_psRc );
+	if ( l_psRc )
+		rc_close ( l_psRc );
 	l_psRc = NULL;
 	log << "done." << endl;
 	return ( 0 );
@@ -159,7 +162,8 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 	char * l_pcPtr = NULL;
 #ifndef HAVE_GETLINE /* if we do not have getline we need to simulate its beh */
 	int l_iReadLen = 0;
-	if ( ! l_pcBuffer )l_iBlockSize = 256;
+	if ( ! l_pcBuffer )
+		l_iBlockSize = 256;
 #endif /* not HAVE_GETLINE */
 	if ( ! a_psFile ) /* the file is closed, we can deallocate allocated memory */
 		{
@@ -171,7 +175,8 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 			}
 		return ( 0 );
 		}
-	if ( ! l_pcBuffer )l_pcBuffer = xcalloc ( l_iBlockSize, char );
+	if ( ! l_pcBuffer )
+		l_pcBuffer = xcalloc ( l_iBlockSize, char );
 	a_roOption = a_roValue = "";
 #ifdef HAVE_GETLINE
 	while ( getline ( &l_pcBuffer, &l_iBlockSize, a_psFile ) > 0 )
@@ -182,7 +187,8 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 		a_riLine ++;
 #ifndef HAVE_GETLINE
 		l_pcPtr = ( char * ) memchr ( l_pcBuffer, '\n', l_iReadLen );
-		if ( ! l_pcPtr )continue;
+		if ( ! l_pcPtr )
+			continue;
 		* ++ l_pcPtr = 0;
 		fseek ( a_psFile, l_pcPtr - l_pcBuffer - l_iReadLen, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
@@ -191,7 +197,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 			{
 			if ( ( l_pcBuffer [ l_iIndex ] == ' ')
 					|| ( l_pcBuffer [ l_iIndex ] == '\t' ) )continue;
-			else 
+			else
 				{
 				if ( ( l_pcBuffer [ l_iIndex ] == '#' )
 						|| ( l_pcBuffer [ l_iIndex ] == '\r' )
@@ -239,7 +245,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 					{
 					if ( ( l_pcBuffer [ l_iIndex ] == ' ')
 							|| ( l_pcBuffer [ l_iIndex ] == '\t' ) )continue;
-					else 
+					else
 						{
 						if ( ( l_pcBuffer [ l_iIndex ] == '#' )
 								|| ( l_pcBuffer [ l_iIndex ] == '\r' )
@@ -282,7 +288,8 @@ FILE * rc_open ( char const * a_pcRcName, bool a_bLocal, FILE * a_psFile )
 	char * l_pcHomePath = 0;
 	FILE * l_psRc = 0;
 	HString l_oRcPath;
-	if ( a_psFile )fclose ( a_psFile );
+	if ( a_psFile )
+		fclose ( a_psFile );
 	if ( a_bLocal )
 		{
 		l_pcHomePath = getenv( "HOME" );
@@ -303,7 +310,8 @@ FILE * rc_open ( char const * a_pcRcName, bool a_bLocal, FILE * a_psFile )
 		l_oRcPath += "rc";
 		}
 	l_psRc = fopen ( l_oRcPath, "r" );
-	if ( ! l_psRc )l_oRcPath +=	" not found, ";
+	if ( ! l_psRc )
+		l_oRcPath +=	" not found, ";
 	else
 		{
 		l_oRcPath = "config read from: " + l_oRcPath;
@@ -320,7 +328,8 @@ void rc_close ( FILE * a_psRc )
 	int l_iDummy = 0;
 	HString l_oTmp;
 	read_rc_line ( l_oTmp, l_oTmp, 0, l_iDummy );
-	if ( a_psRc )fclose ( a_psRc );
+	if ( a_psRc )
+		fclose ( a_psRc );
 	return;
 	M_EPILOG
 	}
@@ -329,13 +338,19 @@ void rc_set_variable ( char const * a_pcValue, bool & a_rbVariable )
 	{
 	M_PROLOG
 	static HString l_oMessage;
-	if ( ! strcasecmp ( a_pcValue, "yes" ) )a_rbVariable = true;
-	else if ( ! strcasecmp ( a_pcValue, "no" ) )a_rbVariable = false;
-	else if ( ! strcasecmp ( a_pcValue, "true" ) )a_rbVariable = true;
-	else if ( ! strcasecmp ( a_pcValue, "false" ) )a_rbVariable = false;
-	else if ( ! strcasecmp ( a_pcValue, "on" ) )a_rbVariable = true;
-	else if ( ! strcasecmp ( a_pcValue, "off" ) )a_rbVariable = false;
-	else 
+	if ( ! strcasecmp ( a_pcValue, "yes" ) )
+		a_rbVariable = true;
+	else if ( ! strcasecmp ( a_pcValue, "no" ) )
+		a_rbVariable = false;
+	else if ( ! strcasecmp ( a_pcValue, "true" ) )
+		a_rbVariable = true;
+	else if ( ! strcasecmp ( a_pcValue, "false" ) )
+		a_rbVariable = false;
+	else if ( ! strcasecmp ( a_pcValue, "on" ) )
+		a_rbVariable = true;
+	else if ( ! strcasecmp ( a_pcValue, "off" ) )
+		a_rbVariable = false;
+	else
 		{
 		l_oMessage = "bad value: ";
 		l_oMessage += a_pcValue;
@@ -347,7 +362,8 @@ void rc_set_variable ( char const * a_pcValue, bool & a_rbVariable )
 
 void rc_set_variable ( char const * a_pcValue, char ** a_ppcVariable )
 	{
-	if ( * a_ppcVariable )xfree ( * a_ppcVariable );
+	if ( * a_ppcVariable )
+		xfree ( * a_ppcVariable );
 	* a_ppcVariable = NULL;
 	* a_ppcVariable = xstrdup ( a_pcValue );
 	return;

@@ -88,10 +88,13 @@ void HDataListControl::load ( long int /*a_iId*/ )
 	HItem l_oItem ( f_oHeader.quantity ( ) );
 	HDataWindow * l_poParent = static_cast < HDataWindow * > ( f_poParent );
 	l_poParent->set_sync_store ( & l_oItem );
-	if ( f_poRecordSet->is_open ( ) )l_iCount = f_poRecordSet->requery ( );
-	else l_iCount = f_poRecordSet->open ( );
+	if ( f_poRecordSet->is_open ( ) )
+		l_iCount = f_poRecordSet->requery ( );
+	else
+		l_iCount = f_poRecordSet->open ( );
 	l_poParent->status_bar ( )->init_progress ( l_iCount, "Collecting ..." );
-	if ( f_iQuantity )go ( 0 );
+	if ( f_iQuantity )
+		go ( 0 );
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
 		l_poParent->status_bar ( )->update_progress ( );
@@ -100,13 +103,18 @@ void HDataListControl::load ( long int /*a_iId*/ )
 			f_poSelected->get_object ( ) = l_oItem;
 			to_tail ( );
 			}
-		else add_tail ( l_oItem );
+		else
+			add_tail ( l_oItem );
 		f_poRecordSet->move_next ( );
 		}
-	if ( l_poSelected )f_poSelected = l_poSelected;
-	else f_poSelected = f_poHook;
-	if ( l_poFirstVisibleRow )f_poFirstVisibleRow = l_poFirstVisibleRow;
-	else f_poFirstVisibleRow = f_poHook;
+	if ( l_poSelected )
+		f_poSelected = l_poSelected;
+	else
+		f_poSelected = f_poHook;
+	if ( l_poFirstVisibleRow )
+		f_poFirstVisibleRow = l_poFirstVisibleRow;
+	else
+		f_poFirstVisibleRow = f_poHook;
 	f_iCursorPosition = l_iCursorPosition;
 	f_iControlOffset = l_iControlOffset;
 	while ( l_iCtr ++ < l_iQuantity )remove_tail ( D_EMPTY_IF_NOT_EMPTIED );

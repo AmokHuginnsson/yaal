@@ -54,7 +54,8 @@ bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 	M_PROLOG
 	int l_iCtr = 0;
 	HString l_oStr;
-	if ( ! strcasecmp ( a_roOption, "set_env" ) )set_env ( a_roValue );
+	if ( ! strcasecmp ( a_roOption, "set_env" ) )
+		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
 		{
 		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
@@ -71,10 +72,12 @@ bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 				n_lLogMask |= D_LOG_ERROR;
 			else if ( ! strcasecmp ( l_oStr, "LOG_CVSHEADER" ) )
 				n_lLogMask |= D_LOG_CVSHEADER;
-			else return ( true );
+			else
+				return ( true );
 			}
 		}
-	else return ( true );
+	else
+		return ( true );
 	return ( false );
 	M_EPILOG
 	}

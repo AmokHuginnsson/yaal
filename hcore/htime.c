@@ -200,7 +200,8 @@ char const * HTime::operator = ( char const * a_pcStrTime )
 	{
 	M_PROLOG
 	char * l_pcErr = strptime ( a_pcStrTime, f_oFormat, & f_sBroken );
-	if ( ! l_pcErr )l_pcErr = strptime ( a_pcStrTime, "%F %T", & f_sBroken );
+	if ( ! l_pcErr )
+		l_pcErr = strptime ( a_pcStrTime, "%F %T", & f_sBroken );
 	if ( ! l_pcErr )
 		M_THROW ( strerror ( g_iErrNo ), g_iErrNo );
 	f_xValue = timelocal ( & f_sBroken );
@@ -265,13 +266,15 @@ HTime::operator char const * ( void )
 	int l_iSize = 0;
 #ifdef HAVE_SMART_STRFTIME
 	l_iSize = strftime ( NULL, 1024, f_oFormat, & f_sBroken ) + 1;
-	if ( l_iSize < 2 )M_THROW ( "bad format", g_iErrNo );
+	if ( l_iSize < 2 )
+		M_THROW ( "bad format", g_iErrNo );
 	f_oBuffer.hs_realloc ( l_iSize );
 	strftime ( f_oBuffer, l_iSize, f_oFormat, & f_sBroken );
 #else /* HAVE_SMART_STRFTIME */
 	f_oBuffer.hs_realloc ( 64 ); /* FIXME that is pretty dumb hack */
 	l_iSize = strftime ( f_oBuffer, 63, f_oFormat, & f_sBroken ) + 1;
-	if ( l_iSize < 2 )M_THROW ( "bad format", g_iErrNo );
+	if ( l_iSize < 2 )
+		M_THROW ( "bad format", g_iErrNo );
 #endif /* not HAVE_SMART_STRFTIME */
 	return ( f_oBuffer );
 	M_EPILOG

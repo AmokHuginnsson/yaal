@@ -209,15 +209,18 @@ void load_driver ( void )
 		{
 		l_iCtr = dbwrapper::n_iDataBaseDriver;
 		n_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ], RTLD_NOW | RTLD_GLOBAL );
-		if ( ! n_pvDlHandle )l_iCtr = 1;
+		if ( ! n_pvDlHandle )
+			l_iCtr = 1;
 		while ( ! n_pvDlHandle && g_ppcDriver [ l_iCtr ] )
 			{
-			if ( ( l_iCtr == dbwrapper::n_iDataBaseDriver ) && l_iCtr ++ )continue;
+			if ( ( l_iCtr == dbwrapper::n_iDataBaseDriver ) && l_iCtr ++ )
+				continue;
 			dbwrapper_error ( );
 			n_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ],
 					RTLD_NOW | RTLD_GLOBAL );
 			}
-		if ( ! n_pvDlHandle )dbwrapper_exit ( );
+		if ( ! n_pvDlHandle )
+			dbwrapper_exit ( );
 		else
 			{
 			log ( D_LOG_NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];

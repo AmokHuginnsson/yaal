@@ -77,7 +77,8 @@ int HCollector::send_line ( char const * a_pcLine )
 	int l_iLength = strlen ( a_pcLine );
 	char * l_pcSpeedUp = NULL;
 	HString l_oLine, l_oLocalCopy;
-	if ( l_iLength < 1 )return ( 0 );
+	if ( l_iLength < 1 )
+		return ( 0 );
 	l_oLocalCopy = a_pcLine;
 	l_pcSpeedUp = static_cast < char * > ( l_oLocalCopy );
 	if ( a_pcLine [ l_iLength - 1 ] == '\n' )
@@ -187,7 +188,8 @@ int HCollector::establish_connection ( int a_iTimeOut )
 			read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
 		flush ( TCIFLUSH );
 		l_iError ++;
-		if ( l_iError > a_iTimeOut )return ( -1 );
+		if ( l_iError > a_iTimeOut )
+			return ( -1 );
 		}
 	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (estab)" << endl;
 	return ( l_iError );
@@ -212,7 +214,8 @@ int HCollector::wait_for_connection ( int a_iTimeOut )
 							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
 				&& FD_ISSET ( f_iFileDescriptor, & l_xFileDesSet ) )
 			read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE ), l_iError ++;
-		else return ( -1 );
+		else
+			return ( -1 );
 		}
 	l_iError += ( l_iLenght - write ( D_PROTO_ACK, l_iLenght ) );
 	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (wait)" << endl;

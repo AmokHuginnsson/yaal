@@ -70,10 +70,14 @@ HException::~HException ( void )
 	{
 	hcore::log ( "Exception registers: c:0x%02x i:%d l:%ld d:%f pv:%p pc:%s\n",
 			f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
-	if ( f_pcCharPtr )xfree ( f_pcCharPtr );
-	if ( f_pcFunctionName )xfree ( f_pcFunctionName );
-	if ( f_pcFileName )xfree ( f_pcFileName );
-	if ( f_pcMessage )xfree ( f_pcMessage );
+	if ( f_pcCharPtr )
+		xfree ( f_pcCharPtr );
+	if ( f_pcFunctionName )
+		xfree ( f_pcFunctionName );
+	if ( f_pcFileName )
+		xfree ( f_pcFileName );
+	if ( f_pcMessage )
+		xfree ( f_pcMessage );
 	return;
 	}
 
@@ -84,16 +88,20 @@ void HException::set ( char a_cChar, int a_iInt, long a_lLong, double a_dDouble,
 	f_iInt = a_iInt;
 	f_lLong = a_lLong;
 	f_dDouble = a_dDouble;
-	if ( f_pcCharPtr )xfree ( f_pcCharPtr );
-	if ( a_pcStr )f_pcCharPtr = xstrdup ( a_pcStr );
+	if ( f_pcCharPtr )
+		xfree ( f_pcCharPtr );
+	if ( a_pcStr )
+		f_pcCharPtr = xstrdup ( a_pcStr );
 	f_pvVoidPtr = a_pvVoidPtr;
 	return;
 	}
 
 void HException::set ( char const * a_pcStr )
 	{
-	if ( f_pcCharPtr )xfree ( f_pcCharPtr );
-	if ( a_pcStr )f_pcCharPtr = xstrdup ( a_pcStr );
+	if ( f_pcCharPtr )
+		xfree ( f_pcCharPtr );
+	if ( a_pcStr )
+		f_pcCharPtr = xstrdup ( a_pcStr );
 	return;
 	}
 
@@ -110,7 +118,8 @@ void HException::log ( char const * a_pcFileName,
 											 char const * a_pcFunctionName, int a_iLine )
 	{
 	int l_iLength = strlen ( a_pcFileName );
-	if ( f_iFrame && ! ( strcmp ( f_pcFileName, a_pcFileName ) || strcmp ( f_pcFunctionName, a_pcFunctionName ) ) )return;
+	if ( f_iFrame && ! ( strcmp ( f_pcFileName, a_pcFileName ) || strcmp ( f_pcFunctionName, a_pcFunctionName ) ) )
+		return;
 	hcore::log ( "Exception frame %2d: %16s : %4d : %s\n", f_iFrame ++,
 			a_pcFileName + ( l_iLength > 16 ? l_iLength - 16 : 0 ),
 			a_iLine, a_pcFunctionName );
@@ -133,7 +142,8 @@ void HException::dump_call_stack ( int )
 	l_ppcStrings = backtrace_symbols  ( l_ppvArray, l_iSize );
 
 	hcore::log << "Obtained " << static_cast < int > ( l_iSize ) << " stack frames." << endl;
-	if ( a_iLevel < l_iSize )l_iSize = a_iLevel;
+	if ( a_iLevel < l_iSize )
+		l_iSize = a_iLevel;
 	for  ( l_iCtr = 0; l_iCtr < l_iSize; l_iCtr ++ )
 		hcore::log << l_ppcStrings [ l_iCtr ] << endl;
 

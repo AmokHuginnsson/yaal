@@ -262,7 +262,8 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 			l_psCI = f_psResourcesArray [ a_iChild ].f_psColumnInfo;
 		l_poPDC->add_column ( M_SETUP_COLUMN, a_poDataControl );
 		}
-	else M_THROW ( "unknown parent type",
+	else
+		M_THROW ( "unknown parent type",
 			f_psResourcesArray [ l_iParent ].f_iType );
 	return;
 	M_EPILOG
@@ -349,7 +350,8 @@ int HDataWindow::handler_add_new ( int, void * )
 		return ( 0 );
 		}
 	add_new ( );
-	if ( f_poMainControl )f_poMainControl->add_new ( );
+	if ( f_poMainControl )
+		f_poMainControl->add_new ( );
 	set_mode ( D_MODE_EDIT );
 	return ( 0 );
 	M_EPILOG

@@ -61,7 +61,8 @@ int HHandler::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
 	if ( a_piCodes )
 		for ( l_iCtr = 0; l_iCtr < a_iCodeCount; l_iCtr ++ )
 			f_oPreprocessHandlers [ a_piCodes [ l_iCtr ] ] = HANDLER;
-	else f_oPreprocessHandlers [ a_iCodeCount ] = HANDLER;
+	else
+		f_oPreprocessHandlers [ a_iCodeCount ] = HANDLER;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -74,7 +75,8 @@ int HHandler::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
 	if ( a_piCodes )
 		for ( l_iCtr = 0; l_iCtr < a_iCodeCount; l_iCtr ++ )
 			f_oPostprocessHandlers [ a_piCodes [ l_iCtr ] ] = HANDLER;
-	else f_oPostprocessHandlers [ a_iCodeCount ] = HANDLER;
+	else
+		f_oPostprocessHandlers [ a_iCodeCount ] = HANDLER;
 	return ( 0 );
 	M_EPILOG
 	}

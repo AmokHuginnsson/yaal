@@ -110,10 +110,12 @@ HStatusBarControl * HWindow::init_bar ( char const * a_pcLabel )
 int HWindow::process_input ( int a_iCode )
 	{
 	M_PROLOG
-	if ( a_iCode )a_iCode = HHandler::process_input ( a_iCode, f_oPreprocessHandlers );
+	if ( a_iCode )
+		a_iCode = HHandler::process_input ( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && f_poFocusedChild )
 		a_iCode = f_poFocusedChild->process_input ( a_iCode );
-	if ( a_iCode )a_iCode = HHandler::process_input ( a_iCode, f_oPostprocessHandlers );
+	if ( a_iCode )
+		a_iCode = HHandler::process_input ( a_iCode, f_oPostprocessHandlers );
 	if ( f_oCommand && static_cast < char * > ( f_oCommand ) [ 0 ] )
 		process_command ( );
 	return ( a_iCode );
@@ -149,9 +151,11 @@ void HWindow::refresh ( void )
 	while ( l_iCtr -- )
 		{
 		l_poControl = * f_oControls.to_tail ( );
-		if ( l_poControl != f_poFocusedChild )l_poControl->refresh ( );
+		if ( l_poControl != f_poFocusedChild )
+			l_poControl->refresh ( );
 		}
-	if ( f_poFocusedChild )f_poFocusedChild->refresh ( );
+	if ( f_poFocusedChild )
+		f_poFocusedChild->refresh ( );
 	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
@@ -179,7 +183,8 @@ int HWindow::handler_jump_direct ( int a_iCode, void * )
 	if ( a_iCode & 0x0ff00 )
 		{
 		f_poFocusedChild = f_oControls.next_enabled ( a_iCode );
-		if ( f_poFocusedChild != l_poControl )a_iCode = 0;
+		if ( f_poFocusedChild != l_poControl )
+			a_iCode = 0;
 		n_bNeedRepaint = true;
 		}
 	return ( a_iCode );
@@ -189,7 +194,8 @@ int HWindow::handler_jump_direct ( int a_iCode, void * )
 void HWindow::set_focus ( HControl * a_poControl )
 	{
 	M_PROLOG
-	if ( f_poFocusedChild == a_poControl )return;
+	if ( f_poFocusedChild == a_poControl )
+		return;
 	f_oControls.select ( a_poControl );
 	f_poFocusedChild->kill_focus ( );
 	f_poFocusedChild = a_poControl;
@@ -211,7 +217,8 @@ int HWindow::handler_search ( int a_iCode, void * )
 	{
 	M_PROLOG
 	char l_pcPrompt [ ] = "/\0";
-	if ( ! f_poFocusedChild->is_searchable ( ) )return ( a_iCode );
+	if ( ! f_poFocusedChild->is_searchable ( ) )
+		return ( a_iCode );
 	if ( a_iCode >= D_KEY_COMMAND_BASE )
 		a_iCode -= D_KEY_COMMAND_BASE;
 	l_pcPrompt [ 0 ] = a_iCode;
@@ -226,8 +233,10 @@ int HWindow::click ( mouse::OMouse & a_rsMouse )
 	M_PROLOG
 	int l_iCtr = 0;
 	HControl * l_poControl = NULL;
-	if ( ! a_rsMouse.f_iButtons )return ( 1 );
-	if ( f_poFocusedChild == f_poStatusBar )return ( 1 );
+	if ( ! a_rsMouse.f_iButtons )
+		return ( 1 );
+	if ( f_poFocusedChild == f_poStatusBar )
+		return ( 1 );
 	if ( f_poFocusedChild->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
 		return ( f_poFocusedChild->click ( a_rsMouse ) );
 	l_iCtr = f_oControls.quantity ( );

@@ -131,10 +131,12 @@ HMatrix < tType > ::HMatrix ( const int a_iRows, const int a_iColumns )
 	int l_iCtr = 0;
 	if ( a_iRows < 1 )
 		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_BADROWS ], a_iRows );
-	else f_iRows = a_iRows;
+	else
+		f_iRows = a_iRows;
 	if ( a_iColumns < 1 )
 		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_BADCOLUMNS ], a_iColumns );
-	else f_iColumns = a_iColumns;
+	else
+		f_iColumns = a_iColumns;
 	return ;
 	M_EPILOG
 	}
@@ -198,7 +200,8 @@ tType HMatrix < tType > ::det ( void )
 	HVector < tType > l_oVector ( f_iColumns );
 	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
 		{
-		if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ] != 0 ) continue;
+		if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ] != 0 )
+			continue;
 		for ( l_iCtrLocRow = 0; l_iCtrLocRow < l_iCtrRow; l_iCtrLocRow ++ )
 			if ( ( l_oMatrix [ l_iCtrRow ] [ l_iCtrLocRow ] != 0 )
 					&& ( l_oMatrix [ l_iCtrLocRow ] [ l_iCtrRow ] != 0 ) )
@@ -221,10 +224,12 @@ tType HMatrix < tType > ::det ( void )
 					}
 		}
 	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
-		if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ] == 0 )return ( 0 );
+		if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ] == 0 )
+			return ( 0 );
 	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
 		{
-		if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ] == 0 ) return ( 0 );
+		if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ] == 0 )
+			return ( 0 );
 		for ( l_iCtrLocRow = l_iCtrRow + 1; l_iCtrLocRow < f_iRows; l_iCtrLocRow ++ )
 			{
 			d = -l_oMatrix [ l_iCtrLocRow ] [ l_iCtrRow ] / l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ];
@@ -235,7 +240,8 @@ tType HMatrix < tType > ::det ( void )
 	d = 1;
 	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
 		d *= l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ];
-	if ( l_iExchanges % 2 ) d = -d;
+	if ( l_iExchanges % 2 )
+		d = -d;
 	return ( d );
 	M_EPILOG
 	}
@@ -250,14 +256,17 @@ tType HMatrix < tType > ::M ( const int a_iRow, const int a_iColumn )
 		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_ROW_OUTOFRANGE ], a_iRow - f_iRows );
 	if ( a_iColumn >= f_iColumns )
 		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_COLUMN_OUTOFRANGE ], a_iColumn - f_iColumns );
-	if ( f_iRows == 1 )return ( 0 );
+	if ( f_iRows == 1 )
+		return ( 0 );
 	HMatrix l_oMatrix ( f_iRows - 1, f_iColumns - 1 );
 	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++, l_iCtrColumnVirtual = 0 )
 		{
-		if ( l_iCtrRow == a_iRow ) continue;
+		if ( l_iCtrRow == a_iRow )
+			continue;
 		for ( l_iCtrColumn = 0; l_iCtrColumn < f_iColumns; l_iCtrColumn ++ )
 			{
-			if ( l_iCtrColumn == a_iColumn ) continue;
+			if ( l_iCtrColumn == a_iColumn )
+				continue;
 			l_oMatrix.f_ptArray [ l_iCtrRowVirtual ] [ l_iCtrColumnVirtual ] = this->f_ptArray [ l_iCtrRow ] [ l_iCtrColumn ];
 			l_iCtrColumnVirtual ++;
 			}
@@ -296,7 +305,8 @@ HMatrix < tType > HMatrix < tType > ::_1 ( void )
 						l_iCtrColumn ) * ( ( ( l_iCtrRow + l_iCtrColumn ) % 2 ) ? -1 : 1 );
 		return ( l_oMatrix.T ( ) / d );
 		}
-	else M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_ODD ], 0 );
+	else
+		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_ODD ], 0 );
 	M_EPILOG
 	}
 	
@@ -305,11 +315,10 @@ HMatrix < tType > & HMatrix < tType > ::operator = ( const HMatrix & a_roMatrix 
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( & a_roMatrix == this )return ( * this );
-	
+	if ( & a_roMatrix == this )
+		return ( * this );
 	if ( ( f_iRows > 0 ) || ( f_iColumns > 0 ) )
 		M_CHECK_DIMENSIONS_ROWS_COLUMNS ( );
-	
 	( * this ).HArray < HVector < tType > > ::operator = ( a_roMatrix );
 	return ( * this );
 	M_EPILOG
