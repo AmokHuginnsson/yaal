@@ -214,13 +214,13 @@ void HListControl::refresh ( void )
 						else M_SET_ATTR_DATA ( );
 						}
 					cprintf ( f_oVarTmpBuffer	);
-					if ( l_iCtr == f_iCursorPosition )
-						{
-						l_pvPointer = ( * l_poInfo );
-						if ( l_pvPointer )
-							( * ( HControl * ) l_pvPointer ) = l_oItem [ l_iCtrLoc ];
-						}
 					l_iColumnOffset += l_iCurrentColumnWidth;
+					}
+				if ( l_iCtr == f_iCursorPosition )
+					{
+					l_pvPointer = ( * l_poInfo );
+					if ( l_pvPointer )
+						( * ( HControl * ) l_pvPointer ) = l_oItem [ l_iCtrLoc ];
 					}
 				}
 			to_tail ( );
