@@ -59,6 +59,15 @@ Copyright:
 
 #define D_CVSID_HLIST_H "$CVSHeader$"
 
+#define E_HLIST_EMPTYELEMENT	0
+#define E_HLIST_BADINDEX			1
+#define E_HLIST_BADFLAG				2
+#define E_HLIST_EMPTY			3
+#define E_HLIST_BADOFFSET			4
+#define E_HLIST_BADNUMBER			5
+
+extern const char * g_ppcErrMsgHList [ ];
+
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++ general list declaration ++++++++++++++++++++++++*/
@@ -120,17 +129,13 @@ public:
 	virtual ~HList ( void );
 	virtual void flush ( void );
 	virtual int quantity ( void );
-	virtual tType & add_element ( tType ); /* adds new element at current cursor 
+	virtual tType & add_element ( tType * = NULL ); /* adds new element at current cursor 
 																						position */
-	virtual tType & add_element ( void );
-	virtual tType & add_head ( tType );    /* adds new element at beggining of 
+	virtual tType & add_head ( tType * = NULL );    /* adds new element at beggining of 
 																						the list */
-	virtual tType & add_head ( void );
-	virtual tType & add_tail ( tType );	/* adds new element at end of the list */
-	virtual tType & add_tail ( void );
-	virtual tType & add_at ( int, tType ); /* adds new element at specified 
+	virtual tType & add_tail ( tType * = NULL );	/* adds new element at end of the list */
+	virtual tType & add_at ( int, tType * = NULL ); /* adds new element at specified 
 																						position */
-	virtual tType & add_at ( int );
 	virtual tType & add_orderly ( tType, int = D_ASCENDING ); /* adds element in
 																															 the way that
 																															 keeps order */
@@ -213,9 +218,9 @@ template < class tType >
 void HList< tType >::HElement::put ( tType a_tObject )
 	{
 	M_PROLOG
-	f_lHits++;
+	f_lHits ++;
 	f_tObject = a_tObject;
-	return ;
+	return;
 	M_EPILOG
 	}
 	
@@ -223,7 +228,7 @@ template < class tType >
 tType & HList< tType >::HElement::get ( void )
 	{
 	M_PROLOG
-	f_lHits++;
+	f_lHits ++;
 	return ( f_tObject );
 	M_EPILOG
 	}
@@ -234,7 +239,6 @@ template < class tType >
 HList< tType >::HList ( int a_iSize )
 	{
 	M_PROLOG
-	tType l_tDummyObject;
 	f_iOrder = D_UNSORTED;
 	f_iIndex = 0;
 	f_poIndex = NULL;
@@ -244,7 +248,7 @@ HList< tType >::HList ( int a_iSize )
 	f_poHook = 0;
 	f_poSelected = 0;
 	cmp = & HList< tType >::cmpc;
-	while ( a_iSize -- )add_tail ( l_tDummyObject );
+	while ( a_iSize -- )add_tail ( );
 	return ;
 	M_EPILOG
 	}
@@ -328,7 +332,7 @@ int HList< tType >::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 	}
 	
 template < class tType >
-tType & HList< tType >::add_element ( tType a_tObject )
+tType & HList< tType >::add_element ( tType * a_ptObject )
 	{
 	M_PROLOG
 	HElement * l_poElement = NULL;
@@ -338,8 +342,7 @@ tType & HList< tType >::add_element ( tType a_tObject )
 	else l_poElement = new HElement ( f_poSelected, f_iHighestNumber );
 	f_iQuantity ++;
 	f_iHighestNumber ++;
-	if ( a_tObject )l_poElement->put ( a_tObject );
-	else l_poElement->get_object ( ) = a_tObject;
+	if ( a_ptObject )l_poElement->put ( * a_ptObject );
 	f_iIndex = 0;
 	f_poIndex = NULL;
 	return ( l_poElement->f_tObject );
@@ -347,40 +350,21 @@ tType & HList< tType >::add_element ( tType a_tObject )
 	}
 
 template < class tType >
-tType & HList< tType >::add_element ( void )
-	{
-	M_PROLOG
-	tType l_tDummy;
-	return ( add_element ( l_tDummy ) );
-	M_EPILOG
-	}
-	
-template < class tType >
-tType & HList< tType >::add_head ( tType a_tObject )
+tType & HList< tType >::add_head ( tType * a_ptObject )
 	{
 	M_PROLOG
 	f_poHook = new HElement ( f_poHook, f_iHighestNumber );
 	if ( f_iQuantity == 0 ) f_poSelected = f_poHook;
 	f_iHighestNumber ++;
 	f_iQuantity ++;
-	if ( a_tObject )f_poHook->put ( a_tObject );
-	else f_poHook->get_object ( ) = a_tObject;
+	if ( a_ptObject )f_poHook->put ( * a_ptObject );
 	if ( f_poIndex )f_poIndex = f_poIndex->f_poPrevious;
 	return ( f_poHook->f_tObject );
 	M_EPILOG
 	}
 	
 template < class tType >
-tType & HList< tType >::add_head ( void )
-	{
-	M_PROLOG
-	tType l_tDummy;
-	return ( add_head ( l_tDummy ) );
-	M_EPILOG
-	}
-	
-template < class tType >
-tType & HList< tType >::add_tail ( tType a_tObject )
+tType & HList< tType >::add_tail ( tType * a_ptObject )
 	{
 	M_PROLOG
 	HElement * l_poElement = NULL;
@@ -390,28 +374,18 @@ tType & HList< tType >::add_tail ( tType a_tObject )
 	else l_poElement = new HElement ( f_poHook, f_iHighestNumber );
 	f_iHighestNumber ++;
 	f_iQuantity ++;
-	if ( a_tObject )l_poElement->put ( a_tObject );
-	else l_poElement->get_object ( ) = a_tObject;
+	if ( a_ptObject )l_poElement->put ( * a_ptObject );
 	return ( l_poElement->f_tObject );
 	M_EPILOG
 	}
 
 template < class tType >
-tType & HList< tType >::add_tail ( void )
-	{
-	M_PROLOG
-	tType l_tDummy;
-	return ( add_tail ( l_tDummy ) );
-	M_EPILOG
-	}
-	
-template < class tType >
-tType & HList< tType >::add_at ( int a_iIndex, tType a_tObject )
+tType & HList< tType >::add_at ( int a_iIndex, tType * a_ptObject )
 	{
 	M_PROLOG
 	HElement * l_poElement = NULL;
 	if ( a_iIndex > f_iQuantity )
-		throw new HException ( __WHERE__, "index excides list size", a_iIndex );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADINDEX ], a_iIndex );
 	if ( f_iQuantity == 0 )
 		f_poHook = l_poElement = f_poSelected =
 			new HElement ( NULL, f_iHighestNumber );
@@ -424,20 +398,10 @@ tType & HList< tType >::add_at ( int a_iIndex, tType a_tObject )
 		}
 	f_iHighestNumber ++;
 	f_iQuantity ++;
-	if ( a_tObject )l_poElement->put ( a_tObject );
-	else l_poElement->get_object ( ) = a_tObject;
+	if ( a_ptObject )l_poElement->put ( * a_ptObject );
 	if ( f_poIndex &&  ( a_iIndex >= 0 ) && ( a_iIndex <= f_iIndex ) )
 		f_poIndex = f_poIndex->f_poPrevious;
 	return ( l_poElement->f_tObject );
-	M_EPILOG
-	}
-
-template < class tType >
-tType & HList< tType >::add_at ( int a_iIndex )
-	{
-	M_PROLOG
-	tType l_tDummy;
-	return ( add_at ( a_iIndex, l_tDummy ) );
 	M_EPILOG
 	}
 
@@ -449,7 +413,7 @@ tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 	bool l_bBefore = false;
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iQuantity;
 	HElement * l_poElement = new HElement ( NULL, f_iHighestNumber );
-	l_poElement->f_tObject = a_tObject;
+	l_poElement->put ( a_tObject );
 	while ( f_iQuantity && ( l_iOldIndex != l_iIndex ) )
 		{
 		l_iOldIndex = l_iIndex;
@@ -509,7 +473,7 @@ tType * HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTrea
 		if ( a_iIndex >= f_iQuantity )
 			{
 			f_iError++;
-			throw new HException ( __WHERE__, "index excides list size", a_iIndex );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADINDEX ], a_iIndex );
 			}
 		l_poElement = element_by_index ( a_iIndex );
 		if ( l_poElement->f_lHits )
@@ -536,13 +500,13 @@ tType * HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTrea
 					}
 				default :
 					{
-					throw new HException ( __WHERE__, "unknown flag", * l_piFlag );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
 					break;
 					}
 				}
 			}
 		}
-	else throw new HException ( __WHERE__, "list was empty", g_iErrNo );
+	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	if ( l_poElement == f_poHook )f_poHook = f_poHook->f_poNext;
 	if ( l_poElement == f_poSelected )
 		{
@@ -606,13 +570,13 @@ tType * HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
 					}
 				default :
 					{
-					throw new HException ( __WHERE__, "unknown flag", * l_piFlag );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
 					break;
 					}
 				}
 			}
 		}
-	else throw new HException ( __WHERE__, "list was empty", g_iErrNo );
+	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	if ( ( ( * l_piTreat ) == ( ( int ) D_TREAT_AS_OPENED ) )
 			&& ( f_poSelected->f_poNext == f_poHook ) )
 		f_poSelected = f_poSelected->f_poPrevious;
@@ -670,13 +634,13 @@ tType * HList< tType >::remove_head ( int * a_piFlag )
 					}
 				default :
 					{
-					throw new HException ( __WHERE__, "unknown flag", * l_piFlag );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
 					break;
 					}
 				}
 			}
 		}
-	else throw new HException ( __WHERE__, "list was empty", g_iErrNo );
+	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	if ( l_poElement == f_poSelected ) f_poSelected = l_poElement->f_poNext;
 	if ( f_poIndex )f_poIndex = f_poIndex->f_poNext;
 	delete l_poElement;
@@ -729,7 +693,7 @@ tType * HList< tType >::remove_tail ( int * a_piFlag )
 					}
 				default :
 					{
-					throw new HException ( __WHERE__, "unknown flag.", * l_piFlag );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
 					break;
 					}
 				}
@@ -750,7 +714,7 @@ tType * HList< tType >::remove_tail ( int * a_piFlag )
 			f_iIndex = 0;
 			}
 		}
-	else throw new HException ( __WHERE__, "list was empty.", g_iErrNo );
+	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	return ( l_ptObject );
 	M_EPILOG
 	}
@@ -764,10 +728,10 @@ tType & HList< tType >::to_head ( int a_iOffset, int * a_piFlag )
 	if ( ( unsigned int ) a_piFlag > D_DEFINE_LIMIT )
 		l_piFlag = a_piFlag;							/* watch out ! */
 	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
-	if ( !f_iQuantity )
-		throw new HException ( __WHERE__, "list is empty.", g_iErrNo );
+	if ( ! f_iQuantity )
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	if ( a_iOffset < 1 )
-		throw new HException ( __WHERE__, "incorrect offset.", a_iOffset );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADOFFSET ], a_iOffset );
 	l_poElement = f_poSelected;
 	switch ( * l_piFlag )
 		{
@@ -792,8 +756,7 @@ tType & HList< tType >::to_head ( int a_iOffset, int * a_piFlag )
 			}
 		default :
 			{
-			throw new HException ( __WHERE__,
-					"HList< tType >::to_head ( ), unknown flag.", * l_piFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
 			break;
 			}
 		}
@@ -811,9 +774,9 @@ tType & HList< tType >::to_tail ( int a_iOffset, int * a_piFlag )
 		l_piFlag = a_piFlag;							/* watch out ! */
 	else * l_piFlag = ( int ) a_piFlag;	/* this is sticky ! */
 	if ( !f_iQuantity )
-		throw new HException ( __WHERE__, "list is empty.", g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	if ( a_iOffset < 1 )
-		throw new HException ( __WHERE__, "incorrect offset.", a_iOffset );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADOFFSET ], a_iOffset );
 	l_poElement = f_poSelected;
 	switch ( * l_piFlag )
 		{
@@ -838,8 +801,7 @@ tType & HList< tType >::to_tail ( int a_iOffset, int * a_piFlag )
 			}
 		default :
 			{
-			throw new HException ( __WHERE__,
-					"HList< tType >::to_tail ( ), unknown flag.", * l_piFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
 			break;
 			}
 		}
@@ -862,13 +824,13 @@ typename HList< tType >::HElement * HList < tType >::element_by_index ( int a_iI
 	if ( f_iQuantity == 0 )
 		{
 		f_iError ++;
-		throw new HException ( __WHERE__, "list is empty", g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 		}
 	if ( a_iIndex < 0 )a_iIndex += f_iQuantity;
 	if ( ( a_iIndex >= f_iQuantity ) || ( a_iIndex < 0 ) )
 		{
 		f_iError ++;
-		throw new HException ( __WHERE__, "bad index", a_iIndex );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADINDEX ], a_iIndex );
 		}
 	if ( ! f_poIndex )f_poIndex = f_poHook;
 /*
@@ -914,7 +876,7 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 	if ( f_iQuantity == 0 )
 		{
 		f_iError ++;
-		throw new HException ( __WHERE__, "list is empty", g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 		}
 	l_poElement = f_poHook;
 	for ( l_iCtr = 0; l_iCtr < f_iQuantity; l_iCtr++ )
@@ -922,7 +884,7 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 		if ( l_poElement->f_iNumber == a_iNumber ) return ( l_poElement );
 		l_poElement = l_poElement->f_poNext;
 		}
-	throw new HException ( __WHERE__, "wrong number", a_iNumber );
+	M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADNUMBER ], a_iNumber );
 	return ( NULL );
 	M_EPILOG
 	}
@@ -950,7 +912,7 @@ tType & HList< tType >::go ( int a_iNumber, int * a_piFlag )
 			}
 		default :
 			{
-			throw new HException ( __WHERE__, "unknown flag", * l_piFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
 			break;
 			}
 		}
@@ -1040,7 +1002,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int * a_piFlag )
 			}
 		default :
 			{
-			throw new HException ( __WHERE__, "unknown flag", * l_piFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], * l_piFlag );
 			break;
 			}
 		}
@@ -1054,7 +1016,7 @@ tType & HList< tType >::present ( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		throw new HException ( __WHERE__, "list is empty", g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	return ( f_poSelected->get ( ) );
 	M_EPILOG
 	}
@@ -1064,7 +1026,7 @@ tType & HList< tType >::head ( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		throw new HException ( __WHERE__, "list is empty", g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	return ( f_poHook->get ( ) );
 	M_EPILOG
 	}
@@ -1074,7 +1036,7 @@ tType & HList< tType >::tail ( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		throw new HException ( __WHERE__, "list is empty", g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	return ( f_poHook->f_poPrevious->get ( ) );
 	M_EPILOG
 	}
