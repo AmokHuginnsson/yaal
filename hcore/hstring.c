@@ -275,6 +275,23 @@ HString & HString::operator += ( const HString & a_roString )
 	M_EPILOG
 	}
 
+HString & HString::operator <<= ( const int a_iShift )
+	{
+	int l_iCtr = 0;
+	if ( a_iShift < 0 )
+		M_THROW ( "bad shift lenght", a_iShift );
+	if ( a_iShift )
+		{
+		while ( f_pcBuffer [ l_iCtr + a_iShift ] )
+			{
+			f_pcBuffer [ l_iCtr ] = f_pcBuffer [ l_iCtr + a_iShift ];
+			l_iCtr ++;
+			}
+		f_pcBuffer [ l_iCtr ] = 0;
+		}
+	return ( * this );
+	}
+
 char & HString::operator [ ] ( const int a_iIndex ) const
 	{
 	M_PROLOG
@@ -456,7 +473,8 @@ int HString::reverse_find ( char a_cChar, int a_iBefore ) const
 	* ( f_pcBuffer + a_iBefore ) = 0;
 	char * l_pcStr = strchr ( f_pcBuffer, a_cChar );
 	* ( f_pcBuffer + a_iBefore ) = l_cTmp;
-	if ( ! l_pcStr )return ( -1 );
+	if ( ! l_pcStr )
+		return ( -1 );
 	return ( static_cast < int > ( ( l_pcStr - f_pcBuffer ) ) );
 	M_EPILOG
 	}
@@ -503,7 +521,8 @@ HString & HString::upper ( void )
 	{
 	M_PROLOG
 	int l_iCtr, l_iLenght = strlen ( f_pcBuffer );
-	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr++ )f_pcBuffer [ l_iCtr ] = toupper ( f_pcBuffer [ l_iCtr ] );
+	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr++ )
+		f_pcBuffer [ l_iCtr ] = toupper ( f_pcBuffer [ l_iCtr ] );
 	return ( * this );
 	M_EPILOG
 	}
@@ -512,7 +531,8 @@ HString & HString::lower ( void )
 	{
 	M_PROLOG
 	int l_iCtr, l_iLenght = strlen ( f_pcBuffer );
-	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr++ )f_pcBuffer [ l_iCtr ] = tolower ( f_pcBuffer [ l_iCtr ] );
+	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr++ )
+		f_pcBuffer [ l_iCtr ] = tolower ( f_pcBuffer [ l_iCtr ] );
 	return ( * this );
 	M_EPILOG
 	}
@@ -525,7 +545,8 @@ HString & HString::reverse ( void )
 	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr++ )
 		{
 		a_cChar = toupper ( f_pcBuffer [ l_iCtr ] );
-		if ( a_cChar == f_pcBuffer [ l_iCtr ] )f_pcBuffer [ l_iCtr ] = tolower ( f_pcBuffer [ l_iCtr ] );
+		if ( a_cChar == f_pcBuffer [ l_iCtr ] )
+			f_pcBuffer [ l_iCtr ] = tolower ( f_pcBuffer [ l_iCtr ] );
 		else f_pcBuffer [ l_iCtr ] = a_cChar;
 		}
 	return ( * this );

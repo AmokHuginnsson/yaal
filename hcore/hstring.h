@@ -57,6 +57,7 @@ public:
 	HString ( const void * );
 	HString & operator = ( const HString & );
 	HString & operator += ( const HString & );
+	HString & operator <<= ( const int );
 	HString operator + ( const HString & ) const;
 	HString operator + ( char const * ) const;
 	HString operator + ( char const ) const;
