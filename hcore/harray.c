@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "harray.h"

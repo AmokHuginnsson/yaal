@@ -92,7 +92,7 @@ HVector < tType > T ( HMatrix < tType > &, HVector < tType > & );
 
 template < class tType >
 HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
-									:	HArray ( a_iRows )
+									:	HArray < HVector < tType > * > ( a_iRows )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -113,7 +113,7 @@ HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
 	
 template < class tType >
 HMatrix < tType > ::HMatrix ( const HMatrix & a_roMatrix, int )
-									:	HArray ( a_roMatrix.f_iRows )
+									:	HArray < HVector < tType > * > ( a_roMatrix.f_iRows )
 	{
 	M_PROLOG
 	f_iColumns = 0;
