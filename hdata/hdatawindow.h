@@ -75,6 +75,8 @@ protected:
 	bool f_bModified;
 	HDataControl * f_poMainControl;
 	ODataControlInfo * f_psDataControlInfo;
+	HList < HControl * > f_oViewModeControls;
+	HList < HControl * > f_oEditModeControls;
 	/*}*/
 public:
 	/*{*/
