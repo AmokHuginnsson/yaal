@@ -44,6 +44,8 @@ class HListControl : public HList < HItem >, public virtual HControl
 protected:
 	/*{*/
 	bool				f_bCheckable;					/* can items be checked/unchecked */
+	bool        f_bSortable;					/* can control content be sorted */
+	bool				f_bSearchable;				/* are items searchable */
 	bool				f_bEditable;					/* is list interactively editable */
 	bool				f_bFiltered;					/* is content of list filtered
 																			 thru pattern */
@@ -63,16 +65,18 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HListControl ( HWindow *,		 		/* parent */
-								 int,							/* row */
-								 int,							/* col */
-								 int,							/* height */
-								 int,							/* width */
-								 const char *,		/* label */
-								 int = -1, 				/* disabled attribute */
-								 int = -1,				/* enabled attribute */
-								 int = -1,				/* focused attribute */
-								 bool = false );	/* checkable */
+	HListControl ( HWindow *,		 	/* parent */
+								 int,						/* row */
+								 int,						/* col */
+								 int,						/* height */
+								 int,						/* width */
+								 const char *,	/* label */
+								 int = -1, 			/* disabled attribute */
+								 int = -1,			/* enabled attribute */
+								 int = -1,			/* focused attribute */
+								 bool = false,	/* checkable */
+								 bool = true,		/* sortable */
+								 bool = true );	/* searchable */
 	virtual ~HListControl ( void );
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );

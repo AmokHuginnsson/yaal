@@ -45,7 +45,8 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 														 int a_iHeight, int a_iWidth,
 														 const char * a_pcLabel, int a_iDisabledAttribute,
 														 int a_iEnabledAttribute, int a_iFocudesAttribute,
-														 bool a_bCheckable )
+														 bool a_bCheckable, bool a_bSortable,
+														 bool a_bSearchable )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
 												 a_pcLabel, a_iDisabledAttribute, a_iEnabledAttribute,
 												 a_iFocudesAttribute ), HList < HItem > ( )
@@ -54,6 +55,8 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_bEditable = false;
 	f_bFiltered = false;
 	f_bCheckable = a_bCheckable;
+	f_bSortable = a_bSortable;
+	f_bSearchable = a_bSearchable;
 	f_iControlOffset = 0;
 	f_iCursorPosition = 0;
 	f_iSumForOne = 0;
