@@ -88,8 +88,11 @@ int db_errno ( void * a_pvData )
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
 	if ( l_psSQLite )
+		{
 		if ( l_psSQLite->f_iErrorCode )
 			return ( l_psSQLite->f_iErrorCode );
+		return ( sqlite3_errcode ( l_psSQLite->f_psDB ) );
+		}
 	return ( errno );
 	}
 
