@@ -261,7 +261,7 @@ void HListControl::refresh ( void )
 				for ( l_iCtrLoc = 0; l_iCtrLoc < ( f_iHeightRaw + l_iHR ); l_iCtrLoc ++ )
 					{
 					::move ( f_iRowRaw + l_iCtrLoc,	f_iColumnRaw + l_iColumnOffset - 1 );
-					cprintf ( "|" );
+					addch ( ACS_VLINE );
 					}
 				}
 			}
