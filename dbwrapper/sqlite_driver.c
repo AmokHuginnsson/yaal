@@ -109,7 +109,7 @@ void * db_query ( void * a_pvData, const char * a_pcQuery )
 	l_psResult->f_ppcData = NULL;
 	if ( l_psSQLite->f_pcErrorMessage )
 		xfree ( l_psSQLite->f_pcErrorMessage );
-	l_psSQLite->f_iErrorCode = sqlite_get_table ( l_psSQLite, a_pcQuery,
+	l_psSQLite->f_iErrorCode = sqlite_get_table ( l_psSQLite->f_psDB, a_pcQuery,
 			& l_psResult->f_ppcData, & l_psResult->f_iRows,
 			& l_psResult->f_iColumns, & l_psSQLite->f_pcErrorMessage );
 	return ( l_psResult );
