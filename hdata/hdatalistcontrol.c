@@ -126,8 +126,11 @@ void HDataListControl::cancel_new ( void )
 	{
 	M_PROLOG
 	remove_tail ( D_EMPTY_IF_NOT_EMPTIED );
-	process_input ( KEY_HOME );
-	process_input ( KEY_END );
+	if ( f_iQuantity )
+		{
+		process_input ( KEY_HOME );
+		process_input ( KEY_END );
+		}
 	return;
 	M_EPILOG
 	}
