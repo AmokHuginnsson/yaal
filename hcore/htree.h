@@ -27,6 +27,10 @@ Copyright:
 #ifndef __HTREE_H
 #define __HTREE_H
 
+#line 31
+
+#define D_CVSID_HTREE_H "$CVSHeader$"
+
 #define D_FILL_NEW_MANUAL	0
 #define D_FILL_NEW_AUTO		1
 

@@ -27,6 +27,8 @@ Copyright:
 #ifndef __HVECTOR_H
 #define __HVECTOR_H
 
+#line 31
+
 #define D_CVSID_HVECTOR_H "$CVSHeader$"
 
 extern const char * g_pcErrorMessageDimensionsDoNotMatch;

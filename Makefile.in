@@ -126,6 +126,7 @@ OBJ4hcore += hstring!
 OBJ4hcore += hstringlist!
 OBJ4hcore += hthread
 OBJ4hcore += htime!
+OBJ4hcore += htree
 OBJ4hcore += hvector!
 OBJ4hcore += rc_file!
 OBJ4hcore += xalloc
