@@ -60,6 +60,7 @@ public:
 	virtual ~HComboboxControl ( void );
 	virtual int process_input ( int );
 	virtual int set_focus ( char = 0 );
+	virtual int kill_focus ( void ); /* this one will be used here */
 	virtual void refresh ( void );
 /*	
 	virtual HInfo operator = ( const HInfo & );

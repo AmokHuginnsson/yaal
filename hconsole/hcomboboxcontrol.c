@@ -41,7 +41,7 @@ HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 										a_iEnabledAttribute, a_iFocusedAttribute ),
 									HEditControl ( NULL, 0, 0, 0, 0, NULL ),
 									HListControl ( NULL, 0, 0, 0, 0, NULL,
-											a_bCheckable, a_bSortable, a_bSearchable )
+											a_bCheckable, a_bSortable, a_bSearchable, false )
 	{
 	M_PROLOG
 	f_iMode = D_MODE_EDIT;
@@ -66,18 +66,45 @@ int HComboboxControl::set_focus ( char a_cCode )
 	M_EPILOG
 	}
 
+int HComboboxControl::kill_focus ( void )
+	{
+	M_PROLOG
+	if ( f_iMode == D_MODE_LIST )
+		{
+		f_iMode = D_MODE_EDIT;
+		console::clrscr ( );
+		f_poParent->refresh ( );
+		}
+	return ( HControl::kill_focus ( ) );
+	M_EPILOG
+	}
+
 void HComboboxControl::refresh ( void )
 	{
 	M_PROLOG
-	bool l_bOldDrawLabel = f_bDrawLabel;
+	int l_iWidth = 0;
+	int l_iHeight = 0;
 	if ( f_iMode == D_MODE_EDIT )
+		{
+/* ripped from HControl::draw_label ( ) */
+		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
+			: console::n_iWidth + f_iWidth - f_iColumnRaw;
+/* end of ripped part */
+		::move ( f_iRowRaw, f_iColumnRaw + f_iWidthRaw );
+		M_SET_ATTR_LABEL ( );
+		cprintf ( "V" );
 		HEditControl::refresh ( );
+		}
 	else
 		{
-		f_bDrawLabel = false;
+		l_iHeight = f_iHeight;
+		l_iWidth = f_iWidth;
+		f_iWidth = f_iDroppedWidth;
+		if ( f_iQuantity < f_iHeight )f_iHeight = f_iQuantity + 1;
 		HListControl::refresh ( );
+		f_iHeight = l_iHeight;
+		f_iWidth = l_iWidth;
 		}
-	f_bDrawLabel = l_bOldDrawLabel;
 	return;
 	M_EPILOG
 	}
@@ -105,11 +132,14 @@ int HComboboxControl::process_input ( int a_iCode )
 				break;
 				}
 			}
+		refresh ( );
 		}
 	else
 		{
-		if ( a_iCode == '\r' )f_iMode = D_MODE_EDIT;
-		else return ( HListControl::process_input ( a_iCode ) );
+		if ( a_iCode != '\r' )return ( HListControl::process_input ( a_iCode ) );
+		f_iMode = D_MODE_EDIT;
+		console::clrscr ( );
+		f_poParent->refresh ( );
 		}
 	return ( 0 );
 	M_EPILOG
