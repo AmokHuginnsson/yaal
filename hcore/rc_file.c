@@ -63,13 +63,14 @@ int process_rc_file ( const char * a_pcRcName,
 int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile )
 	{
 	M_PROLOG
+	static size_t	l_iBlockSize = 256;
+	static char * l_pcBuffer = 0;
+	int l_iIndex, l_iLenght, l_iSub;
 #ifdef __HOST_OS_TYPE_FREEBSD__
 	int l_iReadLen = 0;
 	char * l_pcPtr = NULL;
+	if ( ! l_pcBuffer )l_iBlockSize = 256;
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
-	int l_iIndex, l_iLenght, l_iSub;
-	static size_t	l_iBlockSize = 256;
-	static char * l_pcBuffer = 0;
 	if ( ! a_psFile )
 		{
 		if ( l_pcBuffer )
