@@ -22,6 +22,10 @@
 
 #undef HAVE_NCURSES_NCURSES_H
 
+/* mouse */
+
+#undef HAVE_SYS_CONSIO_H
+
 /* MySQL */
 
 #undef HAVE_MYSQL_MYSQL_H

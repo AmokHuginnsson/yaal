@@ -190,6 +190,7 @@ CPPFLAGS=$CXXFLAGS_ORIG;
 AC_MSG_RESULT([--- All needed libraries found. ---                     [[76%]]])
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
+AC_CHECK_HEADERS([[sys/consio.h]])
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
 			[AC_MSG_ERROR([Can not continue without ncurses devel!])])])
@@ -261,7 +262,7 @@ AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
 AC_CONFIG_COMMANDS_PRE([cd doc/html;
 												ln -sf stdhapi_toc.html index.html;cd ../..])
 
-if test ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] ; then
+if test ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a ["$SQLITE"] = ["no"] ; then
 	AC_MSG_WARN([stdhapi without any data base driver will be
                     unusable for most professional purpouses.])
 fi
