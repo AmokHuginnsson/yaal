@@ -46,6 +46,7 @@ protected:
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
 	bool				f_bSearchable;				/* are items searchable */
+	bool				f_bDrawHeader;				/* should be header driven */
 	bool				f_bEditable;					/* is list interactively editable */
 	bool				f_bFiltered;					/* is content of list filtered
 																			 thru pattern */
@@ -74,6 +75,7 @@ public:
 								 bool = false,	/* checkable */
 								 bool = true,		/* sortable */
 								 bool = true, 	/* searchable */
+								 bool = true,		/* draw header */
 								 bool = true,		/* draw label */
 								 int = -1, 			/* disabled attribute */
 								 int = -1,			/* enabled attribute */

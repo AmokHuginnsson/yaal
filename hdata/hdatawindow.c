@@ -141,11 +141,12 @@ int HDataWindow::init ( void )
 				l_sListControlResource.f_bCheckable = false;
 				l_sListControlResource.f_bSortable = true;
 				l_sListControlResource.f_bSearchable = true;
+				l_sListControlResource.f_bDrawHeader = true;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psLCR = ( OListControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
 				l_poDataControl = new HDataListControl ( this, this, M_SETUP_STANDART,
 						l_psLCR->f_bCheckable, l_psLCR->f_bSortable, l_psLCR->f_bSearchable,
-						M_SETUP_ATTRIBUTES );
+						l_psLCR->f_bDrawHeader, M_SETUP_ATTRIBUTES );
 				break;
 				}
 			case ( D_CONTROL_TREE ):

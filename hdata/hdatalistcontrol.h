@@ -38,7 +38,7 @@ protected:
 public:
 	/*{*/
 	HDataListControl ( HRecordSet *, HWindow *, int, int, int, int, const char *, 
-			bool = false, bool = true, bool = true,
+			bool = false, bool = true, bool = true, bool = true,
 			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataListControl ( void );
 	virtual void populate ( long int );

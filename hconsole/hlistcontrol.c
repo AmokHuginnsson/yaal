@@ -43,7 +43,7 @@ Copyright:
 
 HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		int a_iHeight, int a_iWidth, const char * a_pcLabel, bool a_bCheckable,
-		bool a_bSortable, bool a_bSearchable, bool a_bDrawLabel,
+		bool a_bSortable, bool a_bSearchable, bool a_bDrawHeader, bool a_bDrawLabel,
 		int a_iDisabledAttribute, int a_iEnabledAttribute,
 		int a_iFocudesAttribute )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
@@ -57,6 +57,7 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_bCheckable = a_bCheckable;
 	f_bSortable = a_bSortable;
 	f_bSearchable = a_bSearchable;
+	f_bDrawHeader = a_bDrawHeader;
 	f_iControlOffset = 0;
 	f_iCursorPosition = 0;
 	f_iSumForOne = 0;
