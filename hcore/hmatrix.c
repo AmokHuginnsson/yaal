@@ -29,3 +29,8 @@ M_CVSID ( "$CVSHeader$" );
 #include "hmatrix.h"
 M_CVSTID ( D_CVSID_HMATRIX_H );
 
+const char * g_pcErrorMessageRowsLT1 = "Rows < 1";
+const char * g_pcErrorMessageColumnsLT1 = "Columns < 1";
+const char * g_pcErrorMessageNewReturned = "new returned";
+const char * g_pcErrorMessageNewReturned0 = "new returned 0";
+

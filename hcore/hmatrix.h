@@ -27,12 +27,19 @@ Copyright:
 #ifndef __HMATRIX_H
 #define __HMATRIX_H
 
+#line 31
+
 #define D_CVSID_HMATRIX_H "$CVSHeader$"
+
+extern const char * g_pcErrorMessageRowsLT1;
+extern const char * g_pcErrorMessageColumnsLT1;
+extern const char * g_pcErrorMessageNewReturned;
+extern const char * g_pcErrorMessageNewReturned0;
 
 #include "hvector.h"
 
 template < class tType >
-class HMatrix
+class HMatrix : public HArray < tType >
 	{
 protected:
 	/* { */
@@ -49,8 +56,6 @@ public:
 	int set ( HVector < tType > * );
 	int row ( void );
 	int col ( void );
-	int change_space ( int, int );
-	HVector < tType > & operator [ ] ( int );
 	tType det ( void );
 	tType M ( int, int );
 	HMatrix T ( void );
@@ -90,19 +95,19 @@ template < class tType >
 HMatrix < tType > ::HMatrix ( int a_iRows, int a_iColumns )
 	{
 	M_PROLOG
-	int l_iCtr;
+	int l_iCtr = 0;
 	if ( a_iRows < 1 )
-		throw new HException ( __WHERE__, "Rows < 1", a_iRows );
+		throw new HException ( __WHERE__, g_pcErrorMessageRowsLT1, a_iRows );
 	else f_iRows = a_iRows;
 	if ( a_iColumns < 1 )
-		throw new HException ( __WHERE__, "Columns < 1", a_iColumns );
+		throw new HException ( __WHERE__, g_pcErrorMessageColumnsLT1, a_iColumns );
 	else f_iColumns = a_iColumns;
 	if ( ! ( f_ptBody = new HVector < tType > * [ f_iRows ] ) ) 
-		throw new HException ( __WHERE__, "new returned", ( int ) f_ptBody );
+		throw new HException ( __WHERE__, g_pcErrorMessageNewReturned, ( int ) f_ptBody );
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
 		{
 		if ( ! ( f_ptBody [ l_iCtr ] = new HVector < tType > ( f_iColumns ) ) )
-			throw new HException ( __WHERE__, "new returned 0", l_iCtr );
+			throw new HException ( __WHERE__, g_pcErrorMessageNewReturned0, l_iCtr );
 		}
 	return ;
 	M_EPILOG
@@ -131,15 +136,12 @@ template < class tType >
 HMatrix < tType > ::~HMatrix ( void )
 	{
 	M_PROLOG
-	int l_iCtr;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) delete f_ptBody [ l_iCtr ];
-	delete [ ] f_ptBody;
-	return ;
+	return;
 	M_EPILOG
 	}
 	
 template < class tType >
-int HMatrix < tType > ::set ( tType * * d )
+int HMatrix < tType > ::set ( tType ** d )
 	{
 	M_PROLOG
 	int l_iCtr;
@@ -153,7 +155,8 @@ int HMatrix < tType > ::set ( HVector < tType > * a_poVector )
 	{
 	M_PROLOG
 	int l_iCtr;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) * f_ptBody [ l_iCtr ] = ( * a_poVector ) [ l_iCtr ];
+	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
+		* f_ptBody [ l_iCtr ] = ( * a_poVector ) [ l_iCtr ];
 	return ( 0 );
 	M_EPILOG
 	}
@@ -171,39 +174,6 @@ int HMatrix < tType > ::col ( void )
 	{
 	M_PROLOG
 	return ( f_iColumns );
-	M_EPILOG
-	}
-	
-template < class tType >
-int HMatrix < tType > ::change_space ( int a_iRows, int a_iColumns )
-	{
-	M_PROLOG
-/* #warning FIXME */
-	int l_iCtr, j, bakrow, bakcol, r, c;
-	HVector < tType > * * l_ppoTmp;
-	bakrow = f_iRows;
-	bakcol = f_iColumns;
-	l_ppoTmp = f_ptBody;
-	r = ( f_iRows < bakrow ? f_iRows : bakrow );
-	c = ( f_iColumns < bakcol ? f_iColumns : bakcol );
-	if ( a_iRows < 1 )
-		throw new HException ( __WHERE__, "Rows < 1", a_iRows );
-	else f_iRows = a_iRows;
-	if ( a_iColumns < 1 )
-		throw new HException ( __WHERE__, "Columns < 1", a_iColumns );
-	else f_iColumns = a_iColumns;
-	if ( ! ( f_ptBody = new HVector < tType > * [ f_iRows ] ) )
-		throw new HException ( __WHERE__, "new returned", ( int ) f_ptBody );
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		{
-		if ( ! ( f_ptBody [ l_iCtr ] = new HVector < tType > ( f_iColumns ) ) )
-			throw new HException ( __WHERE__, "new returned 0", l_iCtr );
-		}
-	for ( l_iCtr = 0; l_iCtr < r; l_iCtr++ )
-		for ( j = 0; j < c; j++ )
-			 ( * f_ptBody [ l_iCtr ] ) [ j ] = ( * l_ppoTmp [ l_iCtr ] ) [ j ];
-	delete [ ] l_ppoTmp;
-	return ( 0 );
 	M_EPILOG
 	}
 	
