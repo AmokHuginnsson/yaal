@@ -1,10 +1,12 @@
 /* Define operating system host type here. */
 
+#undef __HOST_OS_TYPE_FREEBSD__
+
 #undef __HOST_OS_TYPE_DEBIAN__
 
 #undef __HOST_OS_TYPE_PLD__
 
-#undef __HOST_OS_TYPE_FREEBSD__
+#undef __HOST_OS_TYPE_SLACKWARE__
 
 /* End of operating system host type definition. */
 

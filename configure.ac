@@ -50,23 +50,27 @@ AC_HEADER_MAJOR
 dnl We need to know what operating system stdhapi will be compiled on.
 AC_MSG_RESULT([--- Guessing host operating system ... ---              [[64%]]])
 AC_CHECK_FILE(
-	[[/etc/debconf.conf]],
-	[AC_DEFINE([[__HOST_OS_TYPE_DEBIAN__]]) _HOST______=['Debian. --- ']],
+	[[/etc/rc]],
+	[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST________=['FreeBSD. ---  ']
+		AC_SUBST([ADDITIONAL_COMMAND],
+			[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);']])
+		AC_SUBST([EXTRA_LIB_PATHS], [[-L/usr/local/lib/mysql]])
+		CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]],
 	[AC_CHECK_FILE(
-		[[/etc/poldek.conf]],
-		[AC_DEFINE([[__HOST_OS_TYPE_PLD__]]) _HOST______=['PLD. ---    ']],
+		[[/etc/debconf.conf]],
+		[AC_DEFINE([[__HOST_OS_TYPE_DEBIAN__]]) _HOST________=['Debian. ---   ']],
 		[AC_CHECK_FILE(
-			[[/etc/rc]],
-			[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST______=['FreeBSD. ---']
-				AC_SUBST([ADDITIONAL_COMMAND],
-[['ln -s lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);']])
-				AC_SUBST([EXTRA_LIB_PATHS], [[-L/usr/local/lib/mysql]])
-				CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]],
-			[AC_MSG_ERROR([Can not recognize host operating system type!])]
+			[[/etc/poldek.conf]],
+			[AC_DEFINE([[__HOST_OS_TYPE_PLD__]]) _HOST________=['PLD. ---      ']],
+			[AC_CHECK_FILE(
+				[[/etc/random-seed]],
+				[AC_DEFINE([[__HOST_OS_TYPE_SLACKWARE__]]) _HOST________=['Slackware. ---']],
+				[AC_MSG_ERROR([Can not recognize host operating system type!])]
+			)]
 		)]
 	)]
 )
-AC_MSG_RESULT([--- Guessed host operating system is $_HOST______       [[70%]]])
+AC_MSG_RESULT([--- Guessed host operating system is $_HOST________     [[70%]]])
 
 dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[71%]]])
