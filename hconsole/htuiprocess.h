@@ -33,10 +33,10 @@ Copyright:
 #include "hwindow.h"
 #include "hwindowlistcontrol.h"
 
-class HProcess
+class HProcess : public HHandler
 	{
-	typedef int ( HProcess::* PROCESS_HANDLER_t ) ( int, void * = NULL );
 	typedef int ( HProcess::* PROCESS_HANDLER_FILEDES_t ) ( int );
+	typedef HMap < int, PROCESS_HANDLER_FILEDES_t > process_filedes_map_t;
 protected:
 	/*{*/
 	bool			f_bInitialised;				/* did process has necessery initialisation */
@@ -46,13 +46,11 @@ protected:
 	fd_set		f_xFileDescriptorSet; /* keyboard and eventual sockets */
 	HWindow *	f_poForegroundWindow; /* sefl explanary */
 	HWindowListControl * f_poWindows;			/* current existing windows */
-	HList < HHandler < PROCESS_HANDLER_FILEDES_t > > f_oFileDescriptorHandlers;
-	HList < HHandler < PROCESS_HANDLER_t > > f_oPreprocessHandlers;
-	HList < HHandler < PROCESS_HANDLER_t > > f_oPostprocessHandlers;
+	process_filedes_map_t f_oFileDescriptorHandlers;
 	/*}*/
 public:
 	/*{*/
-	HProcess ( void );
+	HProcess ( size_t = 8, size_t = 32, size_t = 32 );
 	virtual ~HProcess ( void );
 	virtual int init ( const char * = "" );
 	int run ( void );
@@ -62,12 +60,9 @@ protected:
 	virtual int reconstruct_fdset ( void );
 	int process_stdin ( int );
 	int process_mouse ( int );
-	int preprocess_input ( int );
-	int postprocess_input ( int );
+	int process_commands ( void );
 	int register_file_descriptor_handler ( int, PROCESS_HANDLER_FILEDES_t );
 	int unregister_file_descriptor_handler ( int );
-	int register_preprocess_handler ( int, int *, PROCESS_HANDLER_t );
-	int register_postprocess_handler ( int, int *, PROCESS_HANDLER_t );
 	int add_window ( HWindow *, const char * );
 	virtual int handler_idle ( int, void * = NULL );
 	virtual int handler_mouse ( int, void * = NULL );
@@ -80,3 +75,4 @@ protected:
 	};
 
 #endif /* not __HPROCESS_H */
+

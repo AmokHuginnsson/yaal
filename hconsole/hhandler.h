@@ -27,165 +27,38 @@ Copyright:
 #ifndef __HHANDLER_H
 #define __HHANDLER_H
 
-#line 31 "hhandler.h"
+#include <sys/types.h>
 
-#define D_CVSID_HHANDLER_H "$CVSHeader$"
+#include "./hcore/hmap.h"
 
-#include <stdlib.h>
+#define M_REGISTER_PREPROCESS_HANDLER( count, tab, handler ) \
+	register_preprocess_handler ( count, tab, ( HANDLER_t ) & handler )
+#define M_REGISTER_POSTPROCESS_HANDLER( count, tab, handler ) \
+	register_postprocess_handler ( count, tab, ( HANDLER_t ) & handler )
 
-template < class tType >
 class HHandler
 	{
 protected:
 	/*{*/
-	int		f_iCodeCount;	/* number of event codes */
-	int *	f_piCodes;			/* event codes for that causes handler to run */
-	tType	f_tHandler;		/* caller itself */
+	typedef int ( HHandler::* HANDLER_t ) ( int, void * = NULL );
+	typedef HMap < int, HANDLER_t > process_handler_key_map_t;
+	typedef HMap < HString, HANDLER_t > process_handler_command_map_t;
+	process_handler_key_map_t f_oPreprocessHandlers;
+	process_handler_key_map_t f_oPostprocessHandlers;
+	process_handler_command_map_t f_oCommandHandlers;
 	/*}*/
 public:
 	/*{*/
-	HHandler ( void );
-	HHandler ( int, int *, tType );
-	HHandler ( const HHandler &, int = 0 );
+	HHandler ( size_t = 32, size_t = 32 );
 	virtual ~HHandler ( void );
-	HHandler & operator = ( const HHandler & );
-	int operator [ ] ( int );
-	operator const tType ( void );
-	void add ( int, int * = NULL );
-	operator bool ( void );
+	/*}*/
+protected:
+	/*{*/
+	int process_input ( int, process_handler_key_map_t & );
+	int process_commands ( void );
+	int register_preprocess_handler ( int, int *, HANDLER_t );
+	int register_postprocess_handler ( int, int *, HANDLER_t );
 	/*}*/
 	};
 
-#include "./hcore/hexception.h"
-#include "./hcore/xalloc.h"
-
-template < class tType >
-HHandler < tType >::HHandler ( void )
-	{
-	M_PROLOG
-	f_piCodes = NULL;
-	f_iCodeCount = 0;
-	f_tHandler = NULL;
-	return;
-	M_EPILOG
-	}
-
-template < class tType >
-HHandler < tType >::HHandler ( const HHandler & a_roHandler, int )
-	{
-	M_PROLOG
-	f_piCodes = NULL;
-	( * this ) = a_roHandler;
-	return;
-	M_EPILOG
-	}
-
-template < class tType >
-HHandler < tType >::HHandler ( int a_iCodeCount, int * a_piCodes, tType a_tHandler )
-	{
-	M_PROLOG
-	int l_iCtr = 0;
-	f_piCodes = NULL;
-	f_iCodeCount = a_iCodeCount + ( a_piCodes ? 1 : 0 ); /* 1 is for terminating 0 */
-	if ( a_piCodes )
-		{
-		f_piCodes = ( int * ) xcalloc ( f_iCodeCount * sizeof ( int ) );
-		for ( l_iCtr = 0; l_iCtr < a_iCodeCount; l_iCtr ++ )
-			f_piCodes [ l_iCtr ] = a_piCodes [ l_iCtr ];
-		f_piCodes [ a_iCodeCount ] = 0;
-		}
-	f_tHandler= a_tHandler;
-	return;
-	M_EPILOG
-	}
-
-template < class tType >
-HHandler < tType >::~HHandler ( void )
-	{
-	M_PROLOG
-	if ( f_piCodes )xfree ( f_piCodes );
-	f_piCodes = NULL;
-	return;
-	M_EPILOG
-	}
-
-template < class tType >
-HHandler<tType> & HHandler <tType>::operator = ( const HHandler & a_roHandler )
-	{
-	M_PROLOG
-	int l_iCtr = 0;
-	f_iCodeCount = a_roHandler.f_iCodeCount;
-	if ( a_roHandler.f_piCodes )
-		{
-		f_piCodes = ( int * ) xrealloc ( f_piCodes, f_iCodeCount * sizeof ( int ) );
-		for ( l_iCtr = 0; l_iCtr < f_iCodeCount; l_iCtr ++ )
-			f_piCodes [ l_iCtr ] = a_roHandler.f_piCodes [ l_iCtr ];
-		}
-	f_tHandler = a_roHandler.f_tHandler;
-	return ( * this );
-	M_EPILOG
-	}
-
-template < class tType >
-int HHandler < tType >::operator [ ] ( int a_iIndex )
-	{
-	M_PROLOG
-	if ( f_piCodes && ( a_iIndex >= 0 ) && ( a_iIndex < f_iCodeCount ) )
-		return ( f_piCodes [ a_iIndex ] );
-	if ( a_iIndex == 0 )return ( f_iCodeCount );
-	return ( 0 );
-	M_EPILOG
-	}
-
-template < class tType >
-HHandler < tType >::operator const tType ( void )
-	{
-	M_PROLOG
-	return ( f_tHandler );
-	M_EPILOG
-	}
-
-template < class tType >
-void HHandler < tType >::add ( int a_iCodeCount, int * a_piCodes )
-	{
-	M_PROLOG
-	int l_iCtr = 0;
-	int l_iCodeCount = 0;
-	int * l_piCodes = NULL;
-	if ( f_piCodes && a_piCodes )
-		{
-		l_iCodeCount = f_iCodeCount + a_iCodeCount;
-		f_iCodeCount -= 2;
-		}
-	else if ( ! ( f_piCodes || a_piCodes ) )
-		l_iCodeCount = 2 + ( f_iCodeCount > 0 ? 1 : 0 );
-	else if ( f_piCodes && ! a_piCodes )
-		l_iCodeCount = f_iCodeCount + 1;
-	else if ( ! f_piCodes && a_piCodes )l_iCodeCount = a_iCodeCount + 2;
-	l_piCodes = f_piCodes;
-	f_piCodes = ( int * ) xrealloc ( f_piCodes, l_iCodeCount * sizeof ( int ) );
-	if ( ! l_piCodes )
-		{
-		f_piCodes [ 0 ] = f_iCodeCount;
-		f_iCodeCount = 0;
-		}
-	if ( a_piCodes )
-		for ( l_iCtr = f_iCodeCount; l_iCtr < ( l_iCodeCount - 1 ); l_iCtr ++ )
-			f_piCodes [ l_iCtr ] = a_piCodes [ l_iCtr - f_iCodeCount ];
-	else f_piCodes [ l_iCodeCount - 2 ] = a_iCodeCount;
-	f_iCodeCount = l_iCodeCount;
-	f_piCodes [ f_iCodeCount - 1 ] = 0;
-	return;
-	M_EPILOG
-	}
-
-template < class tType >
-HHandler < tType >::operator bool ( void )
-	{
-	M_PROLOG
-	return ( f_iCodeCount && f_piCodes && f_tHandler );
-	M_EPILOG
-	}
-
 #endif /* not __HHANDLER_H */
-

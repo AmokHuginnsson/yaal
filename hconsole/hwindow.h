@@ -35,9 +35,8 @@ Copyright:
 class HControl;
 class HControlList;
 
-class HWindow
+class HWindow : public HHandler
 	{
-	typedef int ( HWindow::* WINDOW_HANDLER_t ) ( int );
 protected:
 	/*{*/
 	HString							f_oTitle;					/* title of window */
@@ -46,8 +45,6 @@ protected:
 																									 focus went to status bar */	
 	HControlList				f_oControls;	/* list of all control inside _this_ wind */
 	HStatusBarControl * f_poStatusBar;
-	HList < HHandler < int ( HWindow::* ) ( int ) > > f_oPreprocessHandlers;
-	HList < HHandler < int ( HWindow::* ) ( int ) > > f_oPostprocessHandlers;
 	/*}*/
 public:
 	/*{*/
@@ -56,8 +53,6 @@ public:
 	virtual int init ( void );
 	virtual HStatusBarControl * init_bar ( const char * );
 	void refresh ( void );
-	int preprocess_input ( int );
-	int postprocess_input ( int );
 	int process_input ( int );
 	virtual int handler_jump_tab ( int ); /* jump thru controlos with tab key */
 	virtual int handler_jump_direct ( int ); /* direct jump to specified cntrl */
@@ -69,13 +64,11 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	int register_preprocess_handler ( int, int *, WINDOW_HANDLER_t );
-	int register_postprocess_handler ( int, int *, WINDOW_HANDLER_t );
 	/*}*/
 private:
 	/*{*/
 	friend int HControl::set_focus ( char );
-	friend void HStatusBarControl::set_prompt ( const char * );
+	friend void HStatusBarControl::set_prompt ( const char *, int );
 	void set_focus ( HControl * );
 	/*}*/
 	};

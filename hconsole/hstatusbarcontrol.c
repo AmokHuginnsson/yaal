@@ -54,6 +54,7 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 	else f_iStatusBarAttribute = console::n_iStatusBarAttribute;
 	l_iAttribte = f_iStatusBarAttribute;
 	l_iAttribte &= 0x00ff;
+	f_iMode = D_PROMPT_RELAXED;
 	f_iFocusedAttribute &= 0xff00;
 	f_iFocusedAttribute |= l_iAttribte;
 	f_iPromptLength = 0;
@@ -112,9 +113,10 @@ int HStatusBarControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-void HStatusBarControl::set_prompt ( const char * a_pcPrompt )
+void HStatusBarControl::set_prompt ( const char * a_pcPrompt, int a_iMode )
 	{
 	M_PROLOG
+	f_iMode = a_iMode;
 	f_poParent->f_poPreviousFocusedChild = f_poParent->f_poFocusedChild;
 	f_poParent->f_poFocusedChild = f_poParent->f_poStatusBar;
 	f_poParent->f_poPreviousFocusedChild->kill_focus ( );

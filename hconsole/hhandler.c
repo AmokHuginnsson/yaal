@@ -24,8 +24,60 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hexception.h"
+#include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hhandler.h"
-M_CVSTID ( D_CVSID_HHANDLER_H );
+
+HHandler::HHandler ( size_t a_iKeyHandlers, size_t a_iCommandHandlers )
+				: f_oPreprocessHandlers ( a_iKeyHandlers ),
+					f_oPostprocessHandlers ( a_iKeyHandlers ),
+					f_oCommandHandlers ( a_iCommandHandlers )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+HHandler::~HHandler ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+int HHandler::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
+		HANDLER_t HANDLER )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	if ( a_piCodes )
+		for ( l_iCtr = 0; l_iCtr < a_iCodeCount; l_iCtr ++ )
+			f_oPreprocessHandlers [ a_piCodes [ l_iCtr ] ] = HANDLER;
+	else f_oPreprocessHandlers [ a_iCodeCount ] = HANDLER;
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HHandler::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
+		HANDLER_t HANDLER )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	if ( a_piCodes )
+		for ( l_iCtr = 0; l_iCtr < a_iCodeCount; l_iCtr ++ )
+			f_oPostprocessHandlers [ a_piCodes [ l_iCtr ] ] = HANDLER;
+	else f_oPostprocessHandlers [ a_iCodeCount ] = HANDLER;
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HHandler::process_input ( int a_iCode, process_handler_key_map_t & a_oMap )
+	{
+	M_PROLOG
+	HANDLER_t HANDLER = NULL;
+	if ( a_oMap.get ( a_iCode, HANDLER ) )
+		a_iCode = ( this->*HANDLER ) ( a_iCode, NULL );
+	return ( a_iCode );
+	M_EPILOG
+	}
 
