@@ -103,6 +103,7 @@ void HTreeControl::refresh ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
+	if ( f_bFocused )curs_set ( D_CURSOR_INVISIBLE );
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer, '_', f_iWidthRaw );
@@ -111,7 +112,6 @@ void HTreeControl::refresh ( void )
 		::mvprintw ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
 	if ( f_poRoot )
 		draw_node ( ( HNodeControl * ) f_poRoot, f_iRowRaw );
-	curs_set ( 0 );
 	return;
 	M_EPILOG
 	}
@@ -289,7 +289,6 @@ int HTreeControl::process_input ( int a_iCode )
 int HTreeControl::set_focus ( char a_cShorcut )
 	{
 	M_PROLOG
-	curs_set ( 0 );
 	return ( HControl::set_focus ( a_cShorcut ) );
 	M_EPILOG
 	}

@@ -222,13 +222,11 @@ void HStatusBarControl::message ( int a_iAttribute,
 		const char * a_pcFormat, ... )
 	{
 	M_PROLOG
-	int l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
 	console::c_printf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
-	curs_set ( l_iOrigCursState );
 	return;
 	M_EPILOG
 	}
@@ -236,13 +234,11 @@ void HStatusBarControl::message ( int a_iAttribute,
 void HStatusBarControl::message ( const char * a_pcFormat, ... )
 	{
 	M_PROLOG
-	int l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )putchar ( '\a' );
 	console::c_printf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
 	va_end ( l_xAp );
-	curs_set ( l_iOrigCursState );
 	return;
 	M_EPILOG
 	}

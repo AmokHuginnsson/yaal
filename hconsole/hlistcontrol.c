@@ -95,7 +95,7 @@ void HListControl::refresh ( void )
 	HItem l_oItem ( l_iColumns );
 	HInfo * l_poInfo = NULL;
 	l_iTmp = f_iWidthRaw;
-	curs_set ( D_CURSOR_INVISIBLE );
+	if ( f_bFocused )curs_set ( D_CURSOR_INVISIBLE );
 	draw_label ( );
 	if ( ! f_iSumForOne )return;
 	if ( f_iWidthRaw != l_iTmp )recalculate_column_widths ( );
@@ -544,7 +544,6 @@ HItem & HListControl::add_orderly ( HItem & a_roItem )
 int HListControl::set_focus ( char a_cShorcut )
 	{
 	M_PROLOG
-	curs_set ( D_CURSOR_INVISIBLE );
 	return ( HControl::set_focus ( a_cShorcut ) );
 	M_EPILOG
 	}

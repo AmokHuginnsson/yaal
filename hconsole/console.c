@@ -249,10 +249,8 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	int l_iOrigRow = 0;
 	int l_iOrigColumn = 0;
 	int l_iOrigAttribute = 0;
-	int l_iOrigCursState = 0;
 	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	l_iOrigAttribute = get_attr ( );
-	l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
 #ifdef __DEBUG__
 	if ( a_iColumn < 0 )
 		{
@@ -267,9 +265,8 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	if ( ( a_iRow < 0 ) || ( a_iRow >= n_iHeight ) )
 		throw new HException ( __WHERE__, "bad row.", a_iRow );
 	set_attr ( a_iAttribute );
-	vwprintw ( stdscr, a_pcFormat, a_xAp );
+	l_iError = vwprintw ( stdscr, a_pcFormat, a_xAp );
 	move ( l_iOrigRow, l_iOrigColumn );
-	curs_set ( l_iOrigCursState );
 	set_attr ( l_iOrigAttribute );
 	return ( l_iError );
 	M_EPILOG
