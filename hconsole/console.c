@@ -48,7 +48,6 @@ namespace console
 {
 
 /* public: */
-bool n_bEnabled = false;
 bool n_bNeedRepaint = false;
 bool n_bInputWaiting = false;
 int n_iWidth = 0;
@@ -62,6 +61,7 @@ int n_iFocusedAttribute = 256 * ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK )
 															+ ( D_FG_BLACK | D_BG_LIGHTGRAY ); 
 /* private: */
 WINDOW * n_psWindow = NULL;
+bool	n_bEnabled = false;
 bool	n_bUseMouse = false;
 char	n_cCommandComposeCharacter = 'x';
 int		n_iCommandComposeDelay = 16;

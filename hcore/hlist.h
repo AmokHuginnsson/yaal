@@ -502,8 +502,10 @@ tType HList< tType >::remove_at ( int a_iIndex, int * a_piFlag, int * a_piTreat 
 	f_iQuantity--;
 	if ( f_iQuantity == 0 )
 		{
-		f_poHook = 0;
-		f_poSelected = 0;
+		f_poHook = NULL;
+		f_poSelected = NULL;
+		f_poIndex = NULL;
+		f_iIndex = 0;
 		}
 	return ( l_oObject );
 	M_EPILOG
@@ -566,8 +568,8 @@ tType HList< tType >::remove_element ( int * a_piFlag, int * a_piTreat )
 	f_iQuantity--;
 	if ( f_iQuantity == 0 )
 		{
-		f_poHook = 0;
-		f_poSelected = 0;
+		f_poHook = NULL;
+		f_poSelected = NULL;
 		}
 	f_iIndex = 0;
 	f_poIndex = NULL;
@@ -626,8 +628,10 @@ tType HList< tType >::remove_head ( int * a_piFlag )
 	f_iQuantity--;
 	if ( f_iQuantity == 0 )
 		{
-		f_poHook = 0;
-		f_poSelected = 0;
+		f_poHook = NULL;
+		f_poSelected = NULL;
+		f_poIndex = NULL;
+		f_iIndex = 0;
 		}
 	return ( l_oObject );
 	M_EPILOG
@@ -675,13 +679,20 @@ tType HList< tType >::remove_tail ( int * a_piFlag )
 					}
 				}
 			}
-		if ( l_poElement == f_poSelected ) f_poSelected = f_poHook;
+		if ( l_poElement == f_poSelected )f_poSelected = l_poElement->f_poPrevious;
+		if ( l_poElement == f_poIndex )
+			{
+			f_poIndex = l_poElement->f_poPrevious;
+			f_iIndex --;
+			}
 		delete l_poElement;
 		f_iQuantity--;
 		if ( f_iQuantity == 0 )
 			{
-			f_poHook = 0;
-			f_poSelected = 0;
+			f_poHook = NULL;
+			f_poSelected = NULL;
+			f_poIndex = NULL;
+			f_iIndex = 0;
 			}
 		}
 	else throw new HException ( __WHERE__, "list was empty.", g_iErrNo );

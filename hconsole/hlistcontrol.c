@@ -588,7 +588,29 @@ HItem HListControl::remove_element ( int * a_piFlag )
 HItem HListControl::remove_tail ( int * a_piFlag )
 	{
 	M_PROLOG
-	return ( HList < HItem > ::remove_tail ( a_piFlag ) );
+	HElement * l_poElement = NULL;
+	HItem l_oItem;
+	if ( f_iControlOffset
+			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_iQuantity )  )
+		{
+		f_iControlOffset --;
+		l_poElement = f_poSelected;
+		f_poSelected = f_poFirstVisibleRow;
+		to_head ( );
+		f_poFirstVisibleRow = f_poSelected;
+		f_poSelected = l_poElement;
+		if ( f_iCursorPosition < ( f_iHeightRaw - 1 ) )
+			{
+			f_iCursorPosition ++;
+			to_tail ( );
+			}
+		}
+	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
+		f_iCursorPosition --;
+	console::n_bNeedRepaint = true;
+	l_oItem = HList < HItem > ::remove_tail ( a_piFlag );
+	if ( console::is_enabled ( ) )refresh ( );
+	return ( l_oItem );
 	M_EPILOG
 	}
 
