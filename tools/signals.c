@@ -28,6 +28,7 @@ Copyright:
 #include <unistd.h>  /* kill function */
 #include <stdio.h>	 /* perror function */
 #include <signal.h>	 /* signal handling */
+#include <libintl.h>
 
 #include "../config.h"
 
@@ -51,6 +52,29 @@ M_CVSID ( "$CVSHeader$" );
 
 namespace signals
 {
+
+typedef void ( * SIGNAL_HANDLER_t ) ( int );
+
+class HSigStackWrapper
+	{
+public:
+	stack_t m_sData;
+	HSigStackWrapper ( void )
+		{
+		m_sData.ss_sp = ( char * ) xmalloc ( SIGSTKSZ );
+		m_sData.ss_size = SIGSTKSZ;
+		m_sData.ss_flags = 0;
+		}
+	virtual ~HSigStackWrapper ( void )
+		{
+		if ( m_sData.ss_sp )
+			{
+			while ( m_sData.ss_flags ); /* we wait til last signal returns */
+			xfree ( m_sData.ss_sp );
+			m_sData.ss_sp = NULL;
+			}
+		}
+	} g_oSigStack;
 
 /* singnal handler definitions */
 	
@@ -286,31 +310,40 @@ void signal_USR1 ( int a_iSignum )
 
 /*  end of signal handler definitions */
 
+void install_special ( SIGNAL_HANDLER_t HANDLER, int a_iSignum )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	sigset_t l_sMask;
+	struct sigaction l_sHandler, l_sOldHandler;
+	HString l_oError;
+	l_sHandler.sa_flags = SA_ONSTACK;
+	sigemptyset ( & l_sMask );
+	sigaddset ( & l_sMask, a_iSignum );
+	l_sHandler.sa_handler = HANDLER;
+	l_sHandler.sa_mask = l_sMask;
+	l_iError = sigaction( a_iSignum, & l_sHandler, & l_sOldHandler );
+	if ( l_iError )
+		{
+		l_oError.format ( "sigaction ( SIG(%d), ... )", a_iSignum );
+		M_THROW ( l_oError, l_iError );
+		}
+	siginterrupt ( a_iSignum, true );
+	if ( l_sOldHandler.sa_handler == SIG_IGN )
+		signal ( a_iSignum, SIG_IGN );
+	return;
+	M_EPILOG
+	}
+
 void set_handlers ( void )
 	{
 	M_PROLOG
-/* 	signals handling (defining particular functions) */
-/*
 	int l_iError = 0;
-	sigset_t l_sMask;
-	static stack_t l_sSigStack;
-	struct sigaction l_sHandler;
-	l_sSigStack.ss_sp = xmalloc ( SIGSTKSZ );
-	l_sSigStack.ss_size = SIGSTKSZ;
-	l_sSigStack.ss_flags = 0;
-	l_iError = sigaltstack ( & l_sSigStack, NULL );
-	if ( l_iError )throw HException ( __WHERE__, "sigaltstack ( )", l_iError );
-	sigemptyset ( & l_sMask );
-	l_sHandler.sa_handler = signal_INT;
-	l_sHandler.sa_mask = l_sMask;
-	l_sHandler.sa_flags = SA_RESTART | SA_ONSTACK;
-	l_iError = sigaction( SIGINT, & l_sHandler, NULL );
-	if ( l_iError )throw HException ( __WHERE__, "sigaction ( SIGINT, ... )", l_iError );
-*/
-	if ( signal( SIGWINCH, signals::signal_WINCH ) == SIG_IGN )
-		signal( SIGWINCH, SIG_IGN );
-	if ( signal( SIGUSR1, signals::signal_USR1 ) == SIG_IGN )
-		signal( SIGUSR1, SIG_IGN );
+	l_iError = sigaltstack ( & g_oSigStack.m_sData, NULL );
+	if ( l_iError )M_THROW ( "sigaltstack ( )", l_iError );
+/* 	signals handling (defining particular functions) */
+	install_special ( signals::signal_USR1, SIGUSR1 );
+	install_special ( signals::signal_WINCH, SIGWINCH );
 	if ( signal( SIGINT, signals::signal_INT ) == SIG_IGN )
 		signal( SIGINT, SIG_IGN );
 	if ( signal( SIGTERM, signals::signal_TERM ) == SIG_IGN )
