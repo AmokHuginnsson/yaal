@@ -255,7 +255,7 @@ SRCEXS := $(patsubst %.oo, %.c, $(SRCEXS))
 $(TARGET):
 	@if [ "$(TARGET)" = "" -o "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi
 	@echo -n "Linking \`$@ ... "
-	@$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) $(OBJ4$(NAME)) 2>&1 | tee -a make.log
+	@$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,-\( $(OBJ4$(NAME)) -Wl,-\) 2>&1 | tee -a make.log
 	@$(AR) $(ARFLAGS) lib$(NAME).a $(OBJ4$(NAME)) 2>&1 | tee -a make.log
 	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(TARGETDIR)/
 	@/bin/mv -f lib$(NAME).a $(TARGETDIR)/
