@@ -59,7 +59,7 @@ protected:
 	protected:
 		/*{*/
 		/*}*/
-		friend class HMap;
+		friend class HMap < tType, ttType >;
 		};
 protected:
 	/*{*/
