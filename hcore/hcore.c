@@ -85,16 +85,16 @@ void set_env ( const char * a_pcVarValue )
 			|| ( ( ! ( l_pcPtr = strchr ( a_pcVarValue, ' ' ) ) )
 				&& ( ! ( l_pcPtr = strchr ( a_pcVarValue, '\t' ) ) ) ) )
 		{
-		::log ( D_LOG_ERROR ) << "bad set_env argument: `";
-		::log << a_pcVarValue << '\'' << endl;
+		log ( D_LOG_ERROR ) << "bad set_env argument: `";
+		log << a_pcVarValue << '\'' << endl;
 		return;
 		}
 	* l_pcPtr ++ = 0;
 	while ( ( * l_pcPtr == ' ' ) || ( * l_pcPtr == '\t' ) )l_pcPtr ++;
 	if ( ! ( * l_pcPtr ) )
 		{
-		::log ( D_LOG_ERROR ) << "no value for environment variable in set_env: `";
-		::log << a_pcVarValue << '\'' << endl;
+		log ( D_LOG_ERROR ) << "no value for environment variable in set_env: `";
+		log << a_pcVarValue << '\'' << endl;
 		return;
 		}
 	setenv ( a_pcVarValue, l_pcPtr, true );
@@ -110,8 +110,8 @@ void hcore_init ( void )
 	g_iErrNo = 0;
 	if ( sizeof ( int ) < 4 )
 		{
-		::log << "Your CPU or compiler does not support required size of int.";
-		::log << endl;
+		log << "Your CPU or compiler does not support required size of int.";
+		log << endl;
 		exit ( 1 );
 		}
 	l_pcEnv = ::getenv ( "STDHAPI_DEBUG" );
