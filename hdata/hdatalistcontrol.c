@@ -89,8 +89,10 @@ void HDataListControl::populate ( long int /*a_iId*/ )
 		else add_tail ( l_oItem );
 		f_poRecordSet->move_next ( );
 		}
-	f_poSelected = l_poSelected;
-	f_poFirstVisibleRow = l_poFirstVisibleRow;
+	if ( l_poSelected )f_poSelected = l_poSelected;
+	else f_poSelected = f_poHook;
+	if ( l_poFirstVisibleRow )f_poFirstVisibleRow = l_poFirstVisibleRow;
+	else f_poFirstVisibleRow = f_poHook;
 	f_iCursorPosition = l_iCursorPosition;
 	f_iControlOffset = l_iControlOffset;
 	while ( l_iCtr ++ < l_iQuantity )remove_tail ( D_EMPTY_IF_NOT_EMPTIED );
