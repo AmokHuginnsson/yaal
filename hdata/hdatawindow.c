@@ -120,6 +120,7 @@ int HDataWindow::init ( void )
 				l_sEditControlResource.f_pcValue = l_pcValue;
 				l_sEditControlResource.f_pcMask = l_pcMask;
 				l_sEditControlResource.f_bReplace = false;
+				l_sEditControlResource.f_bRightAligned = false;
 				l_sEditControlResource.f_bMultiLine = false;
 				l_sEditControlResource.f_bPassword = false;
 				l_sEditControlResource.f_iMaxHistoryLevel = 8;
@@ -127,8 +128,9 @@ int HDataWindow::init ( void )
 					l_psECR = ( OEditControlResource * ) f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific;
 				l_poDataControl = ( HDataControl * ) new HEditControl ( ( HWindow * ) this,
 						M_SETUP_STANDART, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
-						l_psECR->f_pcMask, l_psECR->f_bReplace, l_psECR->f_bMultiLine,
-						l_psECR->f_bPassword, l_psECR->f_iMaxHistoryLevel,
+						l_psECR->f_pcMask, l_psECR->f_bReplace, l_psECR->f_bRightAligned,
+						l_psECR->f_bMultiLine, l_psECR->f_bPassword,
+						l_psECR->f_iMaxHistoryLevel,
 						M_SETUP_ATTRIBUTES );
 				break;
 				}

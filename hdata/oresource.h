@@ -100,6 +100,7 @@ struct OEditControlResource
 	const char *	f_pcValue;		/* initial value for control */
 	const char *	f_pcMask;			/* tell what can be inserted into control */
 	bool		f_bReplace;					/* is control in replace mode? */
+	bool		f_bRightAligned;		/* is control content right aligned */
 	bool		f_bMultiLine;				/* is this contorl a multiline edit? */
 	bool		f_bPassword;				/* is control in password mode? (no echo) */
 	int			f_iMaxHistoryLevel;	/* history buffer size */
