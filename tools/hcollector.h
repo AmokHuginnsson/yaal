@@ -1,7 +1,7 @@
 /*
 ---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	collector.h - this file is integral part of `stdhapi' project.
+	hcollector.h - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,21 +24,29 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __COLLECTOR_H
-#define __COLLECTOR_H
+#ifndef __HCOLLECTOR_H
+#define __HCOLLECTOR_H
 
 #include "hserial.h"
 
-namespace collector
+class HCollector : public HSerial
 	{
-
-bool test_char ( const char *, int );
-int send ( HSerial &, char *, int );
-int receive ( HSerial &, char * const );
-int establish_connection ( HSerial & );
-int wait_for_connection ( HSerial & );
-void read_colector ( HSerial & ); 
-	
+protected:
+	/*{*/
+	/*}*/
+public:
+	/*{*/
+	HCollector ( const char * = NULL ); /* device path */
+	/*}*/
+protected:
+	/*{*/
+	bool test_char ( const char *, int );
+	int send ( char *, int );
+	int receive ( char * const );
+	int establish_connection ( void );
+	int wait_for_connection ( void );
+	void read_colector ( void );
+	/*}*/
 	};
-
-#endif /* not __COLLECTOR_H */
+	
+#endif /* not __HCOLLECTOR_H */

@@ -1,7 +1,7 @@
 /*
 ---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	collector.c - this file is integral part of `stdhapi' project.
+	hcollector.c - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -30,12 +30,17 @@ Copyright:
 #include "../hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
-#include "collector.h"
+#include "hcollector.h"
 
-namespace collector
-{
+HCollector::HCollector ( const char * a_pcDevicePath )
+					: HSerial ( a_pcDevicePath )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
 
-bool test_char ( const char * a_pcBuffer, int a_iIndex )
+bool HCollector::test_char ( const char * a_pcBuffer, int a_iIndex )
 	{
 	return (
 			a_pcBuffer [ a_iIndex ]
@@ -50,7 +55,7 @@ bool test_char ( const char * a_pcBuffer, int a_iIndex )
 							);
 	}
 
-int send ( HSerial & a_roPort, char * a_pcBuffer, int a_iLength )
+int HCollector::send ( char * a_pcBuffer, int a_iLength )
 	{
 	int l_iCnt = 0;
 	char l_cCRC = 0;
@@ -61,16 +66,16 @@ int send ( HSerial & a_roPort, char * a_pcBuffer, int a_iLength )
 	l_iCnt = 0;
 	while ( 1 )
 		{
-		a_roPort.write ( a_pcBuffer, a_iLength );
-		a_roPort.read ( l_pcReadBuf, 1 );
+		write ( a_pcBuffer, a_iLength );
+		read ( l_pcReadBuf, 1 );
 		if ( l_pcReadBuf [ 0 ] == l_cCRC )break;
 		l_iCnt ++;
 		}
-	a_roPort.write ( "OK\r\n", 4 );
+	write ( "OK\r\n", 4 );
 	return ( l_iCnt );
 	}
 
-int receive ( HSerial & a_roPort, char * const a_pcBuffer )
+int HCollector::receive ( char * const a_pcBuffer )
 	{
 	int l_iErr = 0;
 	int l_iLen = 0;
@@ -86,7 +91,7 @@ int receive ( HSerial & a_roPort, char * const a_pcBuffer )
 		l_iLen = 0;
 		while ( l_iCnt < 64 )
 			{
-			if( a_roPort.read ( l_pcReadBuf + l_iCnt, 1 ) )
+			if( read ( l_pcReadBuf + l_iCnt, 1 ) )
 				if ( test_char ( l_pcReadBuf, l_iCnt ) )l_iCnt ++;
 			if ( l_iCnt && ( l_pcReadBuf [ l_iCnt - 1 ] == '\n' ) )break;
 /*			if ( console::kbhit ( ) == 'q' )return ( -1 ); */ /* FIXME */
@@ -97,13 +102,13 @@ int receive ( HSerial & a_roPort, char * const a_pcBuffer )
 			l_cCRC = 0;
 			for ( l_iCnt = 0; l_iCnt < 64; l_iCnt++ )l_cCRC += l_pcReadBuf [ l_iCnt ];
 			l_pcBuffer [ 0 ] = l_cCRC;
-			a_roPort.write ( l_pcBuffer, 1 );
+			write ( l_pcBuffer, 1 );
 			l_iCnt = 0;
 			l_iLen = 0;
 			memset ( l_pcBuffer, 0, 64 );
 			while ( l_iCnt < 64 )
 				{
-				if( a_roPort.read ( l_pcBuffer + l_iCnt, 1 ) )
+				if( read ( l_pcBuffer + l_iCnt, 1 ) )
 					if ( test_char ( l_pcReadBuf, l_iCnt ) )l_iCnt ++;
 				if ( l_iCnt && ( l_pcBuffer [ l_iCnt - 1 ] == '\n' ) )break;
 /*				if ( console::kbhit ( ) == 'q' )return ( -1 ); */ /* FIXME */
@@ -123,7 +128,7 @@ int receive ( HSerial & a_roPort, char * const a_pcBuffer )
 	return ( l_iErr );
 	}
 
-int establish_connection ( HSerial & a_roPort )
+int HCollector::establish_connection ( void )
 	{
 	int l_iErr = 0;
 	int l_iCnt = 0;
@@ -133,12 +138,12 @@ int establish_connection ( HSerial & a_roPort )
 		{
 		strncpy ( l_pcReadBuf, "KO?\r\n", 5 );
 		for ( l_iCnt = 0; l_iCnt < 5; l_iCnt ++ )
-			a_roPort.write ( l_pcReadBuf + l_iCnt, 1 );
+			write ( l_pcReadBuf + l_iCnt, 1 );
 		memset ( l_pcReadBuf, 0, 8 );
 		l_iCnt = 0;
 		while ( l_iCnt < 64 )
 			{
-			if ( a_roPort.read ( l_pcReadBuf + l_iCnt, 1 ) )
+			if ( read ( l_pcReadBuf + l_iCnt, 1 ) )
 				if ( test_char ( l_pcReadBuf, l_iCnt ) )l_iCnt ++;
 			if ( l_iCnt && ( l_pcReadBuf [ l_iCnt - 1 ] == '\n' ) )break;
 /*			if ( console::kbhit ( ) == 'q' )return ( -1 ); */ /* FIXME */
@@ -149,7 +154,7 @@ int establish_connection ( HSerial & a_roPort )
 	return ( l_iErr );
 	}
 
-int wait_for_connection ( HSerial & a_roPort )
+int HCollector::wait_for_connection ( void )
 	{
 	int l_iErr = 0;
 	int l_iCnt = 0;
@@ -160,7 +165,7 @@ int wait_for_connection ( HSerial & a_roPort )
 		l_iCnt = 0;
 		while ( l_iCnt < 64 )
 			{
-			if ( a_roPort.read ( l_pcReadBuf + l_iCnt, 1 ) )
+			if ( read ( l_pcReadBuf + l_iCnt, 1 ) )
 				if ( test_char ( l_pcReadBuf, l_iCnt ) )l_iCnt ++;
 			if ( l_iCnt && ( l_pcReadBuf [ l_iCnt - 1 ] == '\n' ) )break;
 /*			if ( console::kbhit ( ) == 'q' )return ( -1 ); */ /* FIXME */
@@ -169,7 +174,7 @@ int wait_for_connection ( HSerial & a_roPort )
 			{
 			strncpy ( l_pcReadBuf, "OK\r\n", 4 );
 			for ( l_iCnt = 0; l_iCnt < 4; l_iCnt ++ )
-				a_roPort.write ( l_pcReadBuf + l_iCnt, 1 );
+				write ( l_pcReadBuf + l_iCnt, 1 );
 			break;
 			}
 		l_iErr ++;
@@ -178,7 +183,7 @@ int wait_for_connection ( HSerial & a_roPort )
 	return ( 0 );
 	}
 
-void read_colector ( HSerial & a_roPort ) 
+void HCollector::read_colector ( void ) 
 	{
 	int l_iErr = 0;
 	int l_iRet = 0;
@@ -186,11 +191,11 @@ void read_colector ( HSerial & a_roPort )
 	int l_iCount = 0;
 	char l_pcBuffer [ 64 ];
 	HString l_oErr;
-	if ( ! a_roPort.open ( )	&& ( wait_for_connection ( a_roPort ) >= 0 ) )
+	if ( ! open ( )	&& ( wait_for_connection ( ) >= 0 ) )
 		{
 		memset ( l_pcBuffer, 0, 64 );
 		while ( strncmp ( l_pcBuffer, "QNTT", 4 ) && ( l_iRet >= 0 ) )
-			l_iRet = receive ( a_roPort, l_pcBuffer );
+			l_iRet = receive ( l_pcBuffer );
 		l_iCount = atoi ( l_pcBuffer + 4 );
 		l_oErr.format ( "Collector: transmission size = %d line(s).", l_iCount );
 		M_LOG ( ( char * ) l_oErr );
@@ -198,7 +203,7 @@ void read_colector ( HSerial & a_roPort )
 		while ( l_iCtr ++ < l_iCount )
 			{
 			memset ( l_pcBuffer, 0, 64 );
-			l_iErr += receive ( a_roPort, l_pcBuffer );
+			l_iErr += receive ( l_pcBuffer );
 			if ( l_iRet < 0 )
 				{
 				l_iErr -= l_iRet;
@@ -212,6 +217,4 @@ void read_colector ( HSerial & a_roPort )
 		}
 	return;
 	}
-
-}
 

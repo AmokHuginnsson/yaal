@@ -154,8 +154,8 @@ OBJ4hconsole +=
 # tools
 OBJ4tools =
 OBJ4tools += bit
-OBJ4tools += collector
 OBJ4tools += hanalyser!
+OBJ4tools += hcollector
 OBJ4tools += hserial
 OBJ4tools += signals!
 OBJ4tools += util!
