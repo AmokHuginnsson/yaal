@@ -318,6 +318,7 @@ dep: .depend
 	@echo -n 'Making dependicies ... '
 	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCS) | sed -e s/'^\(.\+: \.\/\)\([a-z]\+\)'/'\2\/\1\2'/ > .depend
 	@set -e; $(CXX) $(COMPILER_FLAGS) -MM $(SRCEXS) | sed -e s/'^\(.\+: \.\/\)\([a-z]\+\)'/'\2\/\1\2'/ -e s/'\.o\>'/'\.oo'/ >> .depend
+	@echo "# vim:set ft=make" >> .depend
 	@echo 'done.'
 
 clean:
