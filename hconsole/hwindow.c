@@ -145,7 +145,7 @@ int HWindow::process_input ( int a_iCode )
 	}
 
 int HWindow::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
-		int ( HWindow::* HANDLER ) ( int ) )
+		WINDOW_HANDLER_t HANDLER )
 	{
 	M_PROLOG
 	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
@@ -170,7 +170,7 @@ int HWindow::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
 	}
 
 int HWindow::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
-		int ( HWindow::* HANDLER ) ( int ) )
+		WINDOW_HANDLER_t HANDLER )
 	{
 	M_PROLOG
 	int l_iFlag = ( int ) D_TREAT_AS_OPENED;

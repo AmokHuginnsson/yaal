@@ -35,7 +35,8 @@ Copyright:
 
 class HProcess
 	{
-	typedef int ( HProcess::* PROCESS_HANDLER_t ) ( int, void * );
+	typedef int ( HProcess::* PROCESS_HANDLER_t ) ( int, void * = NULL );
+	typedef int ( HProcess::* PROCESS_HANDLER_FILEDES_t ) ( int );
 protected:
 	/*{*/
 	bool			f_bInitialised;				/* did process has necessery initialisation */
@@ -45,9 +46,9 @@ protected:
 	fd_set		f_xFileDescriptorSet; /* keyboard and eventual sockets */
 	HWindow *	f_poForegroundWindow; /* sefl explanary */
 	HWindowListControl * f_poWindows;			/* current existing windows */
-	HList < HHandler < int ( HProcess::* ) ( int ) > > f_oFileDescriptorHandlers;
-	HList < HHandler < int ( HProcess::* ) ( int, void * = NULL ) > > f_oPreprocessHandlers;
-	HList < HHandler < int ( HProcess::* ) ( int, void * = NULL ) > > f_oPostprocessHandlers;
+	HList < HHandler < PROCESS_HANDLER_FILEDES_t > > f_oFileDescriptorHandlers;
+	HList < HHandler < PROCESS_HANDLER_t > > f_oPreprocessHandlers;
+	HList < HHandler < PROCESS_HANDLER_t > > f_oPostprocessHandlers;
 	/*}*/
 public:
 	/*{*/
@@ -62,7 +63,7 @@ protected:
 	int process_stdin ( int );
 	int preprocess_input ( int );
 	int postprocess_input ( int );
-	int register_file_descriptor_handler ( int, int ( HProcess::* ) ( int ) );
+	int register_file_descriptor_handler ( int, PROCESS_HANDLER_FILEDES_t );
 	int unregister_file_descriptor_handler ( int );
 	int register_preprocess_handler ( int, int *, PROCESS_HANDLER_t );
 	int register_postprocess_handler ( int, int *, PROCESS_HANDLER_t );

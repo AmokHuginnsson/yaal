@@ -125,10 +125,10 @@ int HProcess::add_window ( HWindow * a_poWindow, const char * a_pcTitle )
 	}
 
 int HProcess::register_file_descriptor_handler ( int a_iFileDescriptor,
-		int ( HProcess::* HANDLER ) ( int ) )
+		PROCESS_HANDLER_FILEDES_t HANDLER )
 	{
 	M_PROLOG
-	HHandler < int ( HProcess::* ) ( int ) > l_oHandler ( a_iFileDescriptor, NULL,
+	HHandler < PROCESS_HANDLER_FILEDES_t > l_oHandler ( a_iFileDescriptor, NULL,
 			HANDLER );
 	f_oFileDescriptorHandlers.add_tail ( l_oHandler );
 	return ( 0 );
@@ -139,7 +139,7 @@ int HProcess::unregister_file_descriptor_handler ( int a_iFileDescriptor )
 	{
 	M_PROLOG
 	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
-	HHandler < int ( HProcess::* ) ( int ) > l_oHandler;
+	HHandler < PROCESS_HANDLER_FILEDES_t > l_oHandler;
 	if ( ! f_oFileDescriptorHandlers.quantity ( ) )return ( -1 );
 	f_oFileDescriptorHandlers.go ( 0 );
 	while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
@@ -156,7 +156,7 @@ int HProcess::unregister_file_descriptor_handler ( int a_iFileDescriptor )
 	}
 
 int HProcess::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
-		int ( HProcess::* HANDLER ) ( int, void * ) )
+		PROCESS_HANDLER_t HANDLER )
 	{
 	M_PROLOG
 	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
@@ -181,7 +181,7 @@ int HProcess::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
 	}
 
 int HProcess::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
-		int ( HProcess::* HANDLER ) ( int, void * ) )
+		PROCESS_HANDLER_t HANDLER )
 	{
 	M_PROLOG
 	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
@@ -332,7 +332,7 @@ int HProcess::run ( void )
 	M_PROLOG
 	int l_iError = 0;
 	int l_iFlag = 0;
-	HHandler < int ( HProcess::* ) ( int ) > l_oHandler;
+	HHandler < PROCESS_HANDLER_FILEDES_t > l_oHandler;
 	if ( ! f_bInitialised )
 		throw new HException ( __WHERE__,
 				"you have to call HProcess::init ( ) first, dumbass", g_iErrNo );
@@ -353,7 +353,7 @@ int HProcess::run ( void )
 				l_oHandler = f_oFileDescriptorHandlers.to_tail ( 1, & l_iFlag );
 				if ( FD_ISSET ( l_oHandler, & f_xFileDescriptorSet ) )
 					{
-					( this->*( ( int ( HProcess::* ) ( int ) ) l_oHandler ) ) ( l_oHandler [ 0 ] );
+					( this->*( ( PROCESS_HANDLER_FILEDES_t ) l_oHandler ) ) ( l_oHandler [ 0 ] );
 					f_iIdleCycles = 0;
 					}
 				}
