@@ -52,7 +52,7 @@ HString::~HString ( void )
 	M_EPILOG
 	}
 
-HString::HString ( const HString & a_roString, int ) : HObject ( )
+HString::HString ( const HString & a_roString ) : HObject ( )
 	{
 	M_PROLOG
 	f_pcBuffer = NULL;
@@ -65,16 +65,13 @@ HString::HString ( const HString & a_roString, int ) : HObject ( )
 void HString::hs_realloc ( int a_iSize )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	int l_iOldLength = 0;
 	if ( a_iSize < 1 )throw new HException ( __WHERE__, "bad new size", a_iSize );
 	if ( a_iSize > f_iLength )
 		{
-		while ( a_iSize >>= 1 )l_iCtr ++;
-		l_iCtr ++;
 		l_iOldLength = f_iLength;
 		f_iLength = 1;
-		while ( l_iCtr -- )f_iLength <<= 1;
+		while ( f_iLength < a_iSize )f_iLength <<= 1;
 		f_pcBuffer = ( char * ) xrealloc ( f_pcBuffer, f_iLength );
 		memset ( f_pcBuffer + l_iOldLength, 0, f_iLength - l_iOldLength );
 		}
@@ -93,7 +90,7 @@ HObject * HString::clone ( void ) const
 	M_EPILOG
 	}
 
-HString::HString ( unsigned long int a_lSize )
+HString::HString ( size_t a_lSize )
 	{
 	M_PROLOG
 	f_pcBuffer = 0;

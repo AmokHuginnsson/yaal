@@ -27,6 +27,8 @@ Copyright:
 #ifndef __HSTRING_H
 #define __HSTRING_H
 
+#include <stddef.h>
+
 #include "hobject.h"
 
 class HString : public HObject
@@ -39,12 +41,12 @@ protected:
 public:
 	/*{*/
 	HString ( void );
-	HString ( const HString &, int = 0 );
+	HString ( const HString & );
 	virtual ~HString ( void ) ;
 	void hs_realloc ( int );
 	virtual HObject * clone ( void ) const;
 	HString ( HString & );
-	HString ( unsigned long int ); /* initialize immediately with size */
+	HString ( size_t ); /* initialize immediately with size */
 	HString ( const char * );
 	HString ( char );
 	HString ( int );
