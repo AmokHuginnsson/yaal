@@ -358,7 +358,7 @@ bool is_enabled ( void )
 	M_EPILOG
 	}
 
-};
+}
 
 extern "C"
 {

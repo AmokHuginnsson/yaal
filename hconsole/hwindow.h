@@ -64,6 +64,11 @@ protected:
 	int register_preprocess_handler ( int, int ( HWindow::* ) ( int ) );
 	int register_postprocess_handler ( int, int ( HWindow::* ) ( int ) );
 	/*}*/
+private:
+	/*{*/
+	friend int HControl::set_focus ( char );
+	void set_focus ( HControl * );
+	/*}*/
 	};
 
 #endif /* not __HWINDOW_H */

@@ -53,12 +53,14 @@ HDataListControl::~HDataListControl ( void )
 void HDataListControl::populate ( long int /*a_iId*/ )
 	{
 	M_PROLOG
+	/*
 	f_poRecordSet->open ( );
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
 		f_poRecordSet->move_next ( );
 		}
 	f_poRecordSet->close ( );
+	*/
 	return;
 	M_EPILOG
 	}

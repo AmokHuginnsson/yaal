@@ -211,3 +211,13 @@ int HWindow::handler_jump_direct ( int a_iCode )
 	M_EPILOG
 	}
 
+void HWindow::set_focus ( HControl * a_poControl )
+	{
+	M_PROLOG
+	if ( f_poFocusedChild == a_poControl )return;
+	f_oControls.select ( a_poControl );
+	f_poFocusedChild = a_poControl;
+//	f_poFocusedChild->kill_focus ( );
+	return;
+	M_EPILOG
+	}

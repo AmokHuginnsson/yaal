@@ -201,12 +201,52 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 		l_poPDC = ( HDataListControl * ) f_psResourcesArray [ l_iParent ].f_poDataControl;
 		if ( ! l_poPDC )
 			throw new HException ( __WHERE__, "wrong control resource order", l_iParent );
-		if ( f_psResourcesArray [ l_iParent ].f_psColumnInfo )
-			l_psCI = f_psResourcesArray [ l_iParent ].f_psColumnInfo;
+		if ( f_psResourcesArray [ a_iChild ].f_psColumnInfo )
+			l_psCI = f_psResourcesArray [ a_iChild ].f_psColumnInfo;
 		l_poPDC->add_column ( M_COLUMN_SETUP, a_poDataControl );
 		}
 	else throw new HException ( __WHERE__, "unknown parent type",
 			f_psResourcesArray [ l_iParent ].f_iType );
+	return;
+	M_EPILOG
+	}
+
+void HDataWindow::set_mode ( int a_iMode )
+	{
+	M_PROLOG
+	int l_iCtr = 0, l_iCount = 0;
+	switch ( a_iMode )
+		{
+		case ( D_MODE_VIEW ):
+			{
+			l_iCount = f_oEditModeControls.quantity ( );
+			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+				f_oEditModeControls [ l_iCtr ]->enable ( false );
+			l_iCount = f_oViewModeControls.quantity ( );
+			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+				f_oViewModeControls [ l_iCtr ]->enable ( true );
+			if ( l_iCount )
+				f_oViewModeControls [ 0 ]->set_focus ( );
+			break;
+			}
+		case ( D_MODE_EDIT ):
+			{
+			l_iCount = f_oViewModeControls.quantity ( );
+			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+				f_oViewModeControls [ l_iCtr ]->enable ( false );
+			l_iCount = f_oEditModeControls.quantity ( );
+			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+				f_oEditModeControls [ l_iCtr ]->enable ( true );
+			if ( l_iCount )
+				f_oEditModeControls [ 0 ]->set_focus ( );
+			break;
+			}
+		default :
+			{
+			throw new HException ( __WHERE__, "unknown window mode", a_iMode );
+			break;
+			}
+		}
 	return;
 	M_EPILOG
 	}
@@ -221,6 +261,7 @@ int HDataWindow::handler_add_new ( int )
 int HDataWindow::handler_edit ( int )
 	{
 	M_PROLOG
+	set_mode ( D_MODE_EDIT );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -249,6 +290,7 @@ int HDataWindow::handler_requery ( int )
 int HDataWindow::handler_cancel ( int )
 	{
 	M_PROLOG
+	set_mode ( D_MODE_VIEW );
 	return ( 0 );
 	M_EPILOG
 	}

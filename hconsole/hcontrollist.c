@@ -76,3 +76,18 @@ HControl * HControlList::next_enabled ( char a_cShorcut )
 	M_EPILOG
 	}
 
+void HControlList::select ( HControl * a_poControl )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	HElement * l_poElement = NULL;
+	l_poElement = f_poSelected;
+	f_poSelected = f_poHook;
+	while ( l_iCtr ++ < f_iQuantity )
+		if ( to_tail ( ) == a_poControl )return;
+	f_poSelected = l_poElement;
+	throw new HException ( __WHERE__, "bogus object", ( int ) a_poControl );
+	return;
+	M_EPILOG
+	}
+

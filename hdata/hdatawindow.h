@@ -34,6 +34,9 @@ Copyright:
 #include "hdatalistcontrol.h"
 #include "oresource.h"
 
+#define D_MODE_VIEW	0
+#define D_MODE_EDIT	1
+
 class HDataWindow : public HWindow, public HRecordSet
 	{
 protected:
@@ -53,6 +56,7 @@ public:
 protected:
 	/*{*/
 	void link ( int, HDataControl * );
+	void set_mode ( int );
 	void sync ( int, HEditControl & );
 	void sync ( int, HDataListControl & );
 	int handler_add_new ( int );

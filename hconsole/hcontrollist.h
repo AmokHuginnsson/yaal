@@ -44,6 +44,7 @@ public:
 	virtual ~HControlList ( void );
 	/* find next enabled control in window, if short cut char is specified */
 	HControl * next_enabled ( char = 0 ); /* enabled and match shortcut char */
+	void select ( HControl * );						/* this one should be private :( */
 	/*}*/
 protected:
 	/*{*/
