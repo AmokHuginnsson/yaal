@@ -52,17 +52,17 @@ HDataWindow::HDataWindow ( const char * a_pcTitle, HDataBase * a_poDataBase,
 	f_poMainControl = NULL;
 	f_poSyncStore = NULL;
 	f_psResourcesArray = a_psDataControlInfo;
-	register_postprocess_handler ( D_KEY_COMMAND_('n'),
+	register_postprocess_handler ( D_KEY_COMMAND_('n'), NULL,
 			( int ( HWindow::* ) ( int ) ) & HDataWindow::handler_add_new );
-	register_postprocess_handler ( D_KEY_COMMAND_('e'),
+	register_postprocess_handler ( D_KEY_COMMAND_('e'), NULL,
 			( int ( HWindow::* ) ( int ) ) & HDataWindow::handler_edit );
-	register_postprocess_handler ( D_KEY_COMMAND_('d'),
+	register_postprocess_handler ( D_KEY_COMMAND_('d'), NULL,
 			( int ( HWindow::* ) ( int ) ) & HDataWindow::handler_delete );
-	register_postprocess_handler ( D_KEY_COMMAND_('w'),
+	register_postprocess_handler ( D_KEY_COMMAND_('w'), NULL,
 			( int ( HWindow::* ) ( int ) ) & HDataWindow::handler_save );
-	register_postprocess_handler ( D_KEY_CTRL_('r'),
+	register_postprocess_handler ( D_KEY_CTRL_('r'), NULL,
 			( int ( HWindow::* ) ( int ) ) & HDataWindow::handler_requery );
-	register_postprocess_handler ( D_KEY_ESC,
+	register_postprocess_handler ( D_KEY_ESC, NULL,
 			( int ( HWindow::* ) ( int ) ) & HDataWindow::handler_cancel );
 	return;
 	M_EPILOG

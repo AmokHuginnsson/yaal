@@ -58,13 +58,13 @@ public:
 protected:
 	/*{*/
 	virtual int reconstruct_fdset ( void );
-	int process_stdio ( int );
+	int process_stdin ( int );
 	int preprocess_input ( int );
 	int postprocess_input ( int );
 	int register_file_descriptor_handler ( int, int ( HProcess::* ) ( int ) );
 	int unregister_file_descriptor_handler ( int );
-	int register_preprocess_handler ( int, int ( HProcess::* ) ( int, void * ) );
-	int register_postprocess_handler ( int, int ( HProcess::* ) ( int, void * ) );
+	int register_preprocess_handler ( int, int *, int ( HProcess::* ) ( int, void * ) );
+	int register_postprocess_handler ( int, int *, int ( HProcess::* ) ( int, void * ) );
 	int add_window ( HWindow *, const char * );
 	virtual int handler_idle ( int, void * = NULL );
 	virtual int handler_refresh ( int, void * = NULL );

@@ -32,7 +32,7 @@ HMainWindow::HMainWindow ( void )
 						: HWindow ( "stdhapi" )
 	{
 	M_PROLOG
-	register_postprocess_handler ( D_KEY_COMMAND_('q'),
+	register_postprocess_handler ( D_KEY_COMMAND_('q'), NULL,
 			( int ( HWindow::* ) ( int ) ) & HMainWindow::handler_close );
 	return;
 	M_EPILOG

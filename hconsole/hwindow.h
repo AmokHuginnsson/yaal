@@ -67,8 +67,8 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	int register_preprocess_handler ( int, int ( HWindow::* ) ( int ) );
-	int register_postprocess_handler ( int, int ( HWindow::* ) ( int ) );
+	int register_preprocess_handler ( int, int *, int ( HWindow::* ) ( int ) );
+	int register_postprocess_handler ( int, int *, int ( HWindow::* ) ( int ) );
 	/*}*/
 private:
 	/*{*/

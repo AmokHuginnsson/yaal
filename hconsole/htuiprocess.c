@@ -46,6 +46,9 @@ M_CVSID ( "$CVSHeader$" );
 #include "../hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
+#define D_CTRLS_COUNT	2
+#define D_ALTS_COUNT	10
+
 HProcess::HProcess ( void )
 	{
 	M_PROLOG
@@ -77,6 +80,7 @@ int HProcess::init ( const char * a_pcProcessName )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
+	int l_piAlts [ D_ALTS_COUNT ], l_piCtrls [ ] = { D_KEY_CTRL_('l'), D_KEY_CTRL_('x') };
 	HMainWindow * l_poMainWindow = NULL;
 	if ( f_bInitialised )
 		throw new HException ( __WHERE__,
@@ -86,18 +90,19 @@ int HProcess::init ( const char * a_pcProcessName )
 	l_poMainWindow->init ( );
 	f_poWindows = l_poMainWindow->_disclose_window_list ( );
 	add_window ( l_poMainWindow, a_pcProcessName );
-	register_file_descriptor_handler ( STDIN_FILENO, & HProcess::process_stdio );
-	register_postprocess_handler ( D_KEY_CTRL_('l'),
+	register_file_descriptor_handler ( STDIN_FILENO, & HProcess::process_stdin );
+	register_postprocess_handler ( D_CTRLS_COUNT, l_piCtrls,
 			& HProcess::handler_refresh );
-	register_postprocess_handler ( D_KEY_COMMAND_('x'),
+	register_postprocess_handler ( D_KEY_COMMAND_('x'), NULL,
 			& HProcess::handler_quit );
-	register_postprocess_handler ( D_KEY_META_( '\t' ),
+	register_postprocess_handler ( D_KEY_META_( '\t' ), NULL,
 			& HProcess::handler_jump_meta_tab );
-	register_postprocess_handler ( D_KEY_COMMAND_('q'),
+	register_postprocess_handler ( D_KEY_COMMAND_('q'), NULL,
 			& HProcess::handler_close_window );
-	for ( l_iCtr = 0; l_iCtr < 10; l_iCtr ++ )
-		register_postprocess_handler ( D_KEY_META_( '0' + l_iCtr ),
-				& HProcess::handler_jump_meta_direct );
+	for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
+		l_piAlts [ l_iCtr ] = D_KEY_META_( '0' + l_iCtr );
+	register_postprocess_handler ( D_ALTS_COUNT, l_piAlts,
+			& HProcess::handler_jump_meta_direct );
 	handler_refresh ( 0 );
 	return ( 1 );
 	M_EPILOG
@@ -123,7 +128,7 @@ int HProcess::register_file_descriptor_handler ( int a_iFileDescriptor,
 		int ( HProcess::* HANDLER ) ( int ) )
 	{
 	M_PROLOG
-	HHandler < int ( HProcess::* ) ( int ) > l_oHandler ( a_iFileDescriptor,
+	HHandler < int ( HProcess::* ) ( int ) > l_oHandler ( a_iFileDescriptor, NULL,
 			HANDLER );
 	f_oFileDescriptorHandlers.add_tail ( l_oHandler );
 	return ( 0 );
@@ -150,22 +155,52 @@ int HProcess::unregister_file_descriptor_handler ( int a_iFileDescriptor )
 	M_EPILOG
 	}
 
-int HProcess::register_preprocess_handler ( int a_iCode,
+int HProcess::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
 		int ( HProcess::* HANDLER ) ( int, void * ) )
 	{
 	M_PROLOG
-	HHandler < int ( HProcess::* ) ( int, void * ) > l_oHandler ( a_iCode, HANDLER );
-	f_oPreprocessHandlers.add_tail ( l_oHandler );
+	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
+	HHandler < int ( HProcess::* ) ( int, void * ) > l_oNewHandler ( a_iCodeCount, a_piCodes, HANDLER );
+	HHandler < int ( HProcess::* ) ( int, void * ) > * l_poHandler, & l_oHandler = * l_poHandler;
+	if ( f_oPreprocessHandlers.quantity ( ) )
+		{
+		f_oPreprocessHandlers.go ( 0 );
+		while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
+			{
+			l_poHandler = & f_oPreprocessHandlers.to_tail ( 1, & l_iFlag );
+			if ( l_oHandler == HANDLER )
+				{
+				l_oHandler.add ( a_iCodeCount, a_piCodes );
+				return ( 0 );
+				}
+			}
+		}
+	f_oPreprocessHandlers.add_tail ( l_oNewHandler );
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HProcess::register_postprocess_handler ( int a_iCode,
+int HProcess::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
 		int ( HProcess::* HANDLER ) ( int, void * ) )
 	{
 	M_PROLOG
-	HHandler < int ( HProcess::* ) ( int, void * ) > l_oHandler ( a_iCode, HANDLER );
-	f_oPostprocessHandlers.add_tail ( l_oHandler );
+	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
+	HHandler < int ( HProcess::* ) ( int, void * ) > l_oNewHandler ( a_iCodeCount, a_piCodes, HANDLER );
+	HHandler < int ( HProcess::* ) ( int, void * ) > * l_poHandler, & l_oHandler = * l_poHandler;
+	if ( f_oPostprocessHandlers.quantity ( ) )
+		{
+		f_oPostprocessHandlers.go ( 0 );
+		while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
+			{
+			l_poHandler = & f_oPostprocessHandlers.to_tail ( 1, & l_iFlag );
+			if ( l_oHandler == HANDLER )
+				{
+				l_oHandler.add ( a_iCodeCount, a_piCodes );
+				return ( 0 );
+				}
+			}
+		}
+	f_oPostprocessHandlers.add_tail ( l_oNewHandler );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -193,6 +228,7 @@ int HProcess::reconstruct_fdset ( void )
 int HProcess::preprocess_input ( int a_iCode )
 	{
 	M_PROLOG
+	int l_iCtr = 0, l_iCode = 0;
 	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
 	HHandler < int ( HProcess::* ) ( int, void * ) > l_oHandler;
 	if ( ! f_oPreprocessHandlers.quantity ( ) )return ( a_iCode );
@@ -200,8 +236,10 @@ int HProcess::preprocess_input ( int a_iCode )
 	while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
 		{
 		l_oHandler = f_oPreprocessHandlers.to_tail ( 1, & l_iFlag );
-		if ( l_oHandler == a_iCode )
-			a_iCode = ( this->*( ( int ( HProcess::* ) ( int, void * ) ) l_oHandler ) ) ( a_iCode );
+		l_iCtr = 0;
+		while ( ( l_iCode = l_oHandler [ l_iCtr ++ ] ) )
+			if ( l_iCode == a_iCode )
+				a_iCode = ( this->*( ( int ( HProcess::* ) ( int, void * ) ) l_oHandler ) ) ( a_iCode );
 		}
 	return ( a_iCode );
 	M_EPILOG
@@ -210,6 +248,7 @@ int HProcess::preprocess_input ( int a_iCode )
 int HProcess::postprocess_input ( int a_iCode )
 	{
 	M_PROLOG
+	int l_iCtr = 0, l_iCode = 0;
 	int l_iFlag = ( int ) D_TREAT_AS_OPENED;
 	HHandler < int ( HProcess::* ) ( int, void * ) > l_oHandler;
 	if ( ! f_oPostprocessHandlers.quantity ( ) )return ( a_iCode );
@@ -217,14 +256,16 @@ int HProcess::postprocess_input ( int a_iCode )
 	while ( l_iFlag == ( int ) D_TREAT_AS_OPENED )
 		{
 		l_oHandler = f_oPostprocessHandlers.to_tail ( 1, & l_iFlag );
-		if ( l_oHandler == a_iCode )
-			a_iCode = ( this->*( ( int ( HProcess::* ) ( int, void * ) ) l_oHandler ) ) ( a_iCode );
+		l_iCtr = 0;
+		while ( ( l_iCode = l_oHandler [ l_iCtr ++ ] ) )
+			if ( l_iCode == a_iCode )
+				a_iCode = ( this->*( ( int ( HProcess::* ) ( int, void * ) ) l_oHandler ) ) ( a_iCode );
 		}
 	return ( a_iCode );
 	M_EPILOG
 	}
 
-int HProcess::process_stdio ( int a_iCode )
+int HProcess::process_stdin ( int a_iCode )
 	{
 	M_PROLOG
 	console::n_bInputWaiting = false;
@@ -280,7 +321,7 @@ int HProcess::process_stdio ( int a_iCode )
     ({ long int __result; \
        do \
 			 	{ \
-				if ( console::n_bInputWaiting )process_stdio ( STDIN_FILENO ); \
+				if ( console::n_bInputWaiting )process_stdin ( STDIN_FILENO ); \
 				__result = (long int) (expression); \
 				} \
        while (__result == -1L && errno == EINTR); \
@@ -312,7 +353,7 @@ int HProcess::run ( void )
 				l_oHandler = f_oFileDescriptorHandlers.to_tail ( 1, & l_iFlag );
 				if ( FD_ISSET ( l_oHandler, & f_xFileDescriptorSet ) )
 					{
-					( this->*( ( int ( HProcess::* ) ( int ) ) l_oHandler ) ) ( l_oHandler );
+					( this->*( ( int ( HProcess::* ) ( int ) ) l_oHandler ) ) ( l_oHandler [ 0 ] );
 					f_iIdleCycles = 0;
 					}
 				}

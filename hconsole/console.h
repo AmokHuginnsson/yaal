@@ -80,9 +80,12 @@ namespace console
 #define D_KEY_REFRESH	D_KEY_CTRL_L
 #define D_KEY_RESIZE	D_KEY_CTRL_L
 
-#define	D_KEY_META_(n)			n + 0x04000
+#define D_KEY_META_BASE			0x04000
+#define D_KEY_COMMAND_BASE	0x08000
+	
+#define	D_KEY_META_(n)			n + D_KEY_META_BASE
 #define D_KEY_CTRL_(n)			n - 96
-#define D_KEY_COMMAND_(n)		n + 0x08000
+#define D_KEY_COMMAND_(n)		n + D_KEY_COMMAND_BASE
 
 #define cprintf printw
 #define cputc addch
