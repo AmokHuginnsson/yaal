@@ -51,7 +51,7 @@ HWindow::HWindow ( const char * a_pcTitle )
 	int l_piCmds [ ] = { ':', D_KEY_COMMAND_( ':' ) };
 	int l_piSearch [ ] = { '/', D_KEY_COMMAND_( '/' ), '?', D_KEY_COMMAND_( '?' ) };
 	if ( ! console::is_enabled ( ) )
-		throw new HException ( __WHERE__, "console not initialised.", g_iErrNo );
+		M_THROW ( "console not initialised.", g_iErrNo );
 	f_poFocusedChild = NULL;
 	f_poPreviousFocusedChild = NULL;
 	f_poStatusBar = NULL;

@@ -52,7 +52,7 @@ int HRawFile::close ( void )
 	if ( f_iFileDescriptor )
 		l_iError = ::close ( f_iFileDescriptor );
 	else
-		throw new HException ( __WHERE__, "file is not opened", g_iErrNo );
+		M_THROW ( "file is not opened", g_iErrNo );
 	f_iFileDescriptor = 0;
 	return ( l_iError );
 	M_EPILOG

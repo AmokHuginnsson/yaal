@@ -95,10 +95,10 @@ void HMenuControl::init ( HProcess * a_poProcess, OMenuItem * a_psMenu )
 	HItem l_oDummy ( 0 );
 	HMenuNode * l_poNode = NULL;
 	if ( f_poRoot )
-		throw new HException ( __WHERE__, "menu already initialised", g_iErrNo );
+		M_THROW ( "menu already initialised", g_iErrNo );
 	if ( ! ( a_poProcess && a_psMenu ) )
-		throw new HException ( __WHERE__,
-				"process can not run without core data ( process, menu )", g_iErrNo );
+		M_THROW ( "process can not run without core data ( process, menu )",
+				g_iErrNo );
 	f_poProcess = a_poProcess;
 	if ( a_psMenu )
 		{

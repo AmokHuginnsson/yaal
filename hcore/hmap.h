@@ -119,7 +119,7 @@ HMap<tType, ttType>::HMap ( size_t a_iSize )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iSize < 1 )
-		throw new HException ( __WHERE__, "bad map size", a_iSize );
+		M_THROW ( "bad map size", a_iSize );
 	while ( a_iSize )
 		{
 		a_iSize >>= 1;

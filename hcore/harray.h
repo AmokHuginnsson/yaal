@@ -72,7 +72,7 @@ HArray < tType >::HArray ( int a_iSize )
 	f_iSize = 0;
 	f_ptArray = NULL;
 	if ( a_iSize < 0 )
-		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
+		M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
@@ -92,7 +92,7 @@ HArray < tType >::HArray ( const int & a_iSize, tType a_tFillWith )
 	f_iSize = 0;
 	f_ptArray = NULL;
 	if ( a_iSize < 0 )
-		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
+		M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
@@ -161,7 +161,7 @@ tType & HArray < tType >::operator [ ] ( int a_iIndex )
 	M_PROLOG
 	if ( a_iIndex < 0 )a_iIndex += f_iSize;
 	if ( ( a_iIndex >= f_iSize ) || ( a_iIndex < 0 ) )
-		throw new HException ( __WHERE__, g_ppcErrMsgHArray [ E_HARRAY_BADINDEX ], a_iIndex );
+		M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_BADINDEX ], a_iIndex );
 	return ( f_ptArray [ a_iIndex ] );
 	M_EPILOG
 	}

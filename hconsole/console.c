@@ -76,7 +76,7 @@ void enter_curses( void )
 /*	def_shell_mode(); */
 /* this is done automaticly by initscr ( ), read man next time */
 	if ( ! isatty ( STDIN_FILENO ) )
-		throw new HException ( __WHERE__, "stdin in not a tty", 0 );
+		M_THROW ( "stdin in not a tty", 0 );
 	if ( n_bDisableXON )
 		{
 		tcgetattr ( STDIN_FILENO, & g_sTermios );
@@ -145,9 +145,9 @@ void leave_curses( void )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
-		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", g_iErrNo );
 //	if ( ! mousemask ( 0, NULL ) )
-//		throw new HException ( __WHERE__, "mousemask ( ) returned 0", g_iErrNo );
+//		M_THROW ( "mousemask ( ) returned 0", g_iErrNo );
 	if ( n_bUseMouse )
 		mouse::mouse_close ( );
 	bkgd ( ' ' | M_MAKE_ATTR ( ( D_FG_LIGHTGRAY | D_BG_BLACK ) ) );
@@ -182,7 +182,7 @@ void set_attr( unsigned char a_ucAttr )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
-		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", g_iErrNo );
 	attrset ( M_MAKE_ATTR ( a_ucAttr ) );
 	return ;
 	M_EPILOG
@@ -210,13 +210,13 @@ int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	int l_iOrigColumn = 0;
 	int l_iOrigAttribute = 0;
 	if ( ! n_bEnabled )
-		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", g_iErrNo );
 	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	l_iOrigAttribute = get_attr ( );
 	if ( a_iColumn >= n_iWidth )
-		throw new HException ( __WHERE__, "bad column.", a_iColumn );
+		M_THROW ( "bad column.", a_iColumn );
 	if ( ( a_iRow < 0 ) || ( a_iRow >= n_iHeight ) )
-		throw new HException ( __WHERE__, "bad row.", a_iRow );
+		M_THROW ( "bad row.", a_iRow );
 	set_attr ( a_iAttribute );
 	if ( a_iColumn < 0 )
 		{
@@ -238,7 +238,7 @@ int get_key( void )
 	int l_iChar = 0;
 	int l_iOrigCursState = D_CURSOR_INVISIBLE;
 	if ( ! n_bEnabled )
-		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", g_iErrNo );
 	noecho();
 	fflush( 0 );
 	l_iKey = getch ( );
@@ -303,7 +303,7 @@ int kbhit()
 	M_PROLOG
 	int l_iKey;
 	if ( ! n_bEnabled )
-		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", g_iErrNo );
 	nodelay( stdscr, true );
 	l_iKey = get_key ( );
 	nodelay( stdscr, false );
@@ -316,7 +316,7 @@ char get_attr( void )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
-		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", g_iErrNo );
 	attr_t l_xAttr;
 	short l_hColor = 0;
 	int l_iAttribute = 0;
@@ -334,7 +334,7 @@ void clrscr()
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
-		throw new HException ( __WHERE__, "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", g_iErrNo );
 	clear ( );
 	refresh ( );
 	return;

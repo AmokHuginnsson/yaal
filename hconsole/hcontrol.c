@@ -51,9 +51,9 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	{
 	M_PROLOG
 	if ( ! console::is_enabled ( ) )
-		throw new HException ( __WHERE__, "not in curses mode.", g_iErrNo );
+		M_THROW ( "not in curses mode.", g_iErrNo );
 	if ( ! a_poParent )
-		throw new HException ( __WHERE__, "no parent window.", ( int ) a_poParent );
+		M_THROW ( "no parent window.", ( int ) a_poParent );
 	f_bEnabled = false;
 	f_bFocused = false;
 	f_bDrawLabel = a_bDrawLabel;
@@ -119,7 +119,7 @@ void HControl::enable ( bool a_bEnable )
 int HControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
-	if ( ! f_bFocused )throw new HException ( __WHERE__,
+	if ( ! f_bFocused )M_THROW (
 			"input in widow without focus", a_iCode );
 	return ( a_iCode );
 	M_EPILOG
@@ -161,7 +161,7 @@ HInfo HControl::operator = ( const HInfo & a_roInfo )
 	M_PROLOG
 	HInfo l_oInfo = a_roInfo;
 	if ( & a_roInfo )
-		throw new HException ( __WHERE__, "what the fuck?", g_iErrNo );
+		M_THROW ( "what the fuck?", g_iErrNo );
 	return ( l_oInfo );
 	M_EPILOG
 	}

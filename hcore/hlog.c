@@ -62,7 +62,7 @@ HLog::HLog ( void )
 	f_pcHostName = ( char * ) xcalloc ( D_HOSTNAME_SIZE );
 	f_psStream = tmpfile ( );
 	if ( ! f_psStream )
-		throw new HException ( __WHERE__, "tmpfile returned", ( int ) f_psStream );
+		M_THROW ( "tmpfile returned", ( int ) f_psStream );
 	fprintf ( f_psStream, "%-10xProcess started (%d).\n",
 			D_LOG_NOTICE, getpid ( ) );
 	l_iUid = getuid ( );
@@ -112,7 +112,7 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 	f_bRealMode = true;
 	if ( a_pcProcessName )f_pcProcessName = basename ( a_pcProcessName );
 	if ( ! a_psStream )
-		throw new HException ( __WHERE__, "file parameter is", ( int ) a_psStream );
+		M_THROW ( "file parameter is", ( int ) a_psStream );
 	if ( f_psStream )
 		{
 		fseek ( f_psStream, 0, SEEK_SET );
@@ -152,7 +152,7 @@ void HLog::rehash ( const char * a_pcLogFileName, char * a_pcProcessName )
 	{
 	M_PROLOG
 	if ( ! a_pcLogFileName )
-		throw new HException ( __WHERE__, "new file name argument is",
+		M_THROW ( "new file name argument is",
 				( int ) a_pcLogFileName );
 	rehash ( fopen ( a_pcLogFileName, "a" ), a_pcProcessName );
 	return;

@@ -111,7 +111,7 @@ int process_rc_file ( const char * a_pcRcName, const char * a_pcSection,
 							}
 						default :
 							{
-							throw new HException ( __WHERE__, "unknown type",
+							M_THROW ( "unknown type",
 									a_psVaraibles [ l_iCtr ].f_iType );
 							break;
 							}
@@ -332,7 +332,7 @@ void rc_set_variable ( const char * a_pcValue, bool & a_rbVariable )
 		{
 		l_oMessage = "bad value: ";
 		l_oMessage += a_pcValue;
-		throw new HException ( __WHERE__, ( char * ) l_oMessage, a_rbVariable );
+		M_THROW ( ( char * ) l_oMessage, a_rbVariable );
 		}
 	M_EPILOG
 	return;

@@ -50,7 +50,7 @@ int HDataProcess::init ( const char * a_pcProcessName )
 	M_PROLOG
 	int l_iError = HProcess::init ( a_pcProcessName );
 	if ( ! dbwrapper::db_connect )
-		throw new HException ( __WHERE__, "no database driver loaded", g_iErrNo );
+		M_THROW ( "no database driver loaded", g_iErrNo );
 	return ( l_iError );
 	M_EPILOG
 	}

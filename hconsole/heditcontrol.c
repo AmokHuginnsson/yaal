@@ -63,13 +63,13 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	char * l_pcBuffer = 0;
 	HString l_oErrorMessage;
 	if ( a_iBufferSize < 1 )
-		throw new HException ( __WHERE__, "buffer size is ridiculously low",
+		M_THROW ( "buffer size is ridiculously low",
 				a_iBufferSize );
 	if ( a_pcValue )
 		{
 		l_iLength = strlen ( a_pcValue );
 		if ( l_iLength > a_iBufferSize )
-			throw new HException ( __WHERE__, "initial value too big",
+			M_THROW ( "initial value too big",
 					l_iLength - a_iBufferSize );
 		}
 	f_oVarTmpBuffer.hs_realloc ( a_iBufferSize + 1 );
@@ -81,7 +81,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	f_bMultiLine = ( a_bMultiLine || ( a_iHeight > 1 ) ? true : false );
 	f_bRightAligned = a_bRightAligned;
 	if ( f_bRightAligned && f_bMultiLine )
-		throw new HException ( __WHERE__,
+		M_THROW (
 				"edit-control right aligned and multiline at the same time", 0 );
 	f_bPassword = a_bPassword;
 	f_oString = a_pcValue;
@@ -94,7 +94,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		l_oErrorMessage = l_pcBuffer;
 		xfree ( l_pcBuffer );
-		throw new HException ( __WHERE__, l_oErrorMessage, l_iErrorCode );
+		M_THROW ( l_oErrorMessage, l_iErrorCode );
 		}
 	if ( ( l_iErrorCode = regexec ( & f_sMask, a_pcValue, 0, NULL, 0 ) ) )
 		{
@@ -103,7 +103,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		l_oErrorMessage.format ( "%s: %s", l_pcBuffer, a_pcValue );
 		xfree ( l_pcBuffer );
-		throw new HException ( __WHERE__, l_oErrorMessage, l_iErrorCode );
+		M_THROW ( l_oErrorMessage, l_iErrorCode );
 		}
 	l_iLength = f_oString.get_length ( );
 /* this is part of draw_label ( ) method, we can not wait with setting up
@@ -569,7 +569,7 @@ HString & HEditControl::operator = ( const char * a_pcString )
 		regerror ( l_iErrorCode, & f_sMask, l_pcBuffer, l_iLength );
 		l_oErrorMessage.format ( "%s: %s", l_pcBuffer, a_pcString );
 		xfree ( l_pcBuffer );
-		throw new HException ( __WHERE__, l_oErrorMessage, l_iErrorCode );
+		M_THROW ( l_oErrorMessage, l_iErrorCode );
 		}
 	f_oString = a_pcString;
 	l_iLength = f_oString.get_length ( );

@@ -203,7 +203,7 @@ int HDataWindow::init ( void )
 				}
 			default :
 				{
-				throw new HException ( __WHERE__, "unknown resource purpouse",
+				M_THROW ( "unknown resource purpouse",
 						f_psResourcesArray [ l_iCtr ].f_iFlags );
 				break;
 				}
@@ -246,13 +246,13 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 		{
 		l_poPDC = dynamic_cast < HDataListControl * > ( f_oControls [ l_iParent ] );
 		if ( ! l_poPDC )
-			throw new HException ( __WHERE__, "wrong control resource order",
+			M_THROW ( "wrong control resource order",
 					l_iParent );
 		if ( f_psResourcesArray [ a_iChild ].f_psColumnInfo )
 			l_psCI = f_psResourcesArray [ a_iChild ].f_psColumnInfo;
 		l_poPDC->add_column ( M_SETUP_COLUMN, a_poDataControl );
 		}
-	else throw new HException ( __WHERE__, "unknown parent type",
+	else M_THROW ( "unknown parent type",
 			f_psResourcesArray [ l_iParent ].f_iType );
 	return;
 	M_EPILOG
@@ -290,7 +290,7 @@ void HDataWindow::set_mode ( int a_iMode )
 			}
 		default :
 			{
-			throw new HException ( __WHERE__, "unknown window mode", a_iMode );
+			M_THROW ( "unknown window mode", a_iMode );
 			break;
 			}
 		}

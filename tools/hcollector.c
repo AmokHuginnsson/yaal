@@ -164,10 +164,10 @@ int HCollector::establish_connection ( int a_iTimeOut )
 		{
 		flush ( TCOFLUSH );
 		if ( write ( D_PROTO_SYN, l_iLenght ) != l_iLenght )
-			throw new HException ( __WHERE__, "write", l_iLenght );
+			M_THROW ( "write", l_iLenght );
 		wait_for_eot ( );
 		if ( tcsendbreak ( f_iFileDescriptor, 0 ) )
-			throw new HException ( __WHERE__, "tcsendbreak", g_iErrNo );
+			M_THROW ( "tcsendbreak", g_iErrNo );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 		l_sWait.tv_sec = 1;
 		l_sWait.tv_usec = 0;

@@ -115,13 +115,13 @@ bool HSerial::open ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor )
-		throw new HException ( __WHERE__, "serial port already openend", g_iErrNo );
+		M_THROW ( "serial port already openend", g_iErrNo );
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	f_iFileDescriptor = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
 	if ( ! f_iFileDescriptor )
-		throw new HException ( __WHERE__, strerror ( g_iErrNo ), g_iErrNo );
+		M_THROW ( strerror ( g_iErrNo ), g_iErrNo );
 	if ( ! isatty ( f_iFileDescriptor ) )
-		throw new HException ( __WHERE__, "not a tty", f_iFileDescriptor );
+		M_THROW ( "not a tty", f_iFileDescriptor );
 	tcgetattr ( f_iFileDescriptor, & f_sBackUpTIO );
 	fcntl ( f_iFileDescriptor, F_SETFD, 0 );
 	fcntl ( f_iFileDescriptor, F_SETFL, 0 );
@@ -145,7 +145,7 @@ int HSerial::read ( char * a_pcBuffer, int a_iSize )
 	M_PROLOG
 	int l_iCnt = 0;
 	if ( ! f_iFileDescriptor )
-		throw new HException ( __WHERE__, "serial port not opened", g_iErrNo );
+		M_THROW ( "serial port not opened", g_iErrNo );
 	l_iCnt = ::read ( f_iFileDescriptor, a_pcBuffer, a_iSize );
 	return ( l_iCnt );
 	M_EPILOG
@@ -156,7 +156,7 @@ int HSerial::write ( const char * a_pcBuffer, int a_iSize )
 	M_PROLOG
 	int l_iCnt = 0;
 	if ( ! f_iFileDescriptor )
-		throw new HException ( __WHERE__, "serial port not opened", g_iErrNo );
+		M_THROW ( "serial port not opened", g_iErrNo );
 	l_iCnt = ::write ( f_iFileDescriptor, a_pcBuffer, a_iSize );
 	return ( l_iCnt );
 	M_EPILOG
@@ -170,15 +170,15 @@ void HSerial::flush ( int a_iType )
 		switch ( a_iType )
 			{
 			case ( TCIFLUSH ):
-				throw new HException ( __WHERE__, "tcflush ( TCIFLUSH )", g_iErrNo );
+				M_THROW ( "tcflush ( TCIFLUSH )", g_iErrNo );
 			case ( TCOFLUSH ):
-				throw new HException ( __WHERE__, "tcflush ( TCOFLUSH )", g_iErrNo );
+				M_THROW ( "tcflush ( TCOFLUSH )", g_iErrNo );
 			case ( TCIOFLUSH ):
-				throw new HException ( __WHERE__, "tcflush ( TCIOFLUSH )", g_iErrNo );
+				M_THROW ( "tcflush ( TCIOFLUSH )", g_iErrNo );
 			default :
 				{
 				l_oErrMsg.format ( "tcflush ( %d )", a_iType );
-				throw new HException ( __WHERE__, l_oErrMsg, g_iErrNo );
+				M_THROW ( l_oErrMsg, g_iErrNo );
 				}
 			}
 	return;
@@ -189,7 +189,7 @@ void HSerial::wait_for_eot ( void )
 	{
 	M_PROLOG
 	if ( tcdrain ( f_iFileDescriptor ) )
-		throw new HException ( __WHERE__, "tcdrain", g_iErrNo );
+		M_THROW ( "tcdrain", g_iErrNo );
 	return;
 	M_EPILOG
 	}

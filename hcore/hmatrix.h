@@ -125,12 +125,10 @@ HMatrix < tType > ::HMatrix ( const int a_iRows, const int a_iColumns )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iRows < 1 )
-		throw new HException ( __WHERE__,
-				g_ppcErrMsgHMatrix [ E_HMATRIX_BADROWS ], a_iRows );
+		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_BADROWS ], a_iRows );
 	else f_iRows = a_iRows;
 	if ( a_iColumns < 1 )
-		throw new HException ( __WHERE__,
-				g_ppcErrMsgHMatrix [ E_HMATRIX_BADCOLUMNS ], a_iColumns );
+		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_BADCOLUMNS ], a_iColumns );
 	else f_iColumns = a_iColumns;
 	return ;
 	M_EPILOG

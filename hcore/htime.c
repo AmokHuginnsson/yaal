@@ -88,13 +88,13 @@ void HTime::set_time ( const int a_iHour, const int a_iMinute,
 	{
 	M_PROLOG
 	if ( ( a_iHour < 0 ) || ( a_iHour > 23 ) )
-		throw new HException ( __WHERE__, "bad hour", a_iHour );
+		M_THROW ( "bad hour", a_iHour );
 	f_sBroken.tm_hour = a_iHour;
 	if ( ( a_iMinute < 0 ) || ( a_iMinute > 59 ) )
-		throw new HException ( __WHERE__, "bad minute", a_iMinute );
+		M_THROW ( "bad minute", a_iMinute );
 	f_sBroken.tm_min = a_iMinute;
 	if ( ( a_iSecond < 0 ) || ( a_iSecond > 59 ) )
-		throw new HException ( __WHERE__, "bad second", a_iSecond );
+		M_THROW ( "bad second", a_iSecond );
 	f_sBroken.tm_sec = a_iSecond;
 	f_xValue = mktime ( & f_sBroken );
 	return;
@@ -107,10 +107,10 @@ void HTime::set_date ( const int a_iYear, const int a_iMonth,
 	M_PROLOG
 	f_sBroken.tm_year = a_iYear - 1900;
 	if ( ( a_iMonth < 1 ) || ( a_iMonth > 12 ) )
-		throw new HException ( __WHERE__, "bad month in year", a_iMonth );
+		M_THROW ( "bad month in year", a_iMonth );
 	f_sBroken.tm_mon = a_iMonth - 1;
 	if ( ( a_iDay < 1 ) || ( a_iDay > 31 ) )
-		throw new HException ( __WHERE__, "bad day of month", a_iDay );
+		M_THROW ( "bad day of month", a_iDay );
 	f_sBroken.tm_mday = a_iDay;
 	f_xValue = mktime ( & f_sBroken );
 	return;
@@ -196,7 +196,7 @@ const char * HTime::operator = ( const char * a_pcStrTime )
 	char * l_pcErr = strptime ( a_pcStrTime, f_oFormat, & f_sBroken );
 	if ( ! l_pcErr )l_pcErr = strptime ( a_pcStrTime, "%F %T", & f_sBroken );
 	if ( ! l_pcErr )
-		throw new HException ( __WHERE__, strerror ( g_iErrNo ), g_iErrNo );
+		M_THROW ( strerror ( g_iErrNo ), g_iErrNo );
 	f_xValue = timelocal ( & f_sBroken );
 	return ( a_pcStrTime );
 	M_EPILOG
@@ -259,13 +259,13 @@ HTime::operator const char * ( void )
 	int l_iSize = 0;
 #ifdef HAVE_SMART_STRFTIME
 	l_iSize = strftime ( NULL, 1024, f_oFormat, & f_sBroken ) + 1;
-	if ( l_iSize < 2 )throw new HException ( __WHERE__, "bad format", g_iErrNo );
+	if ( l_iSize < 2 )M_THROW ( "bad format", g_iErrNo );
 	f_oBuffer.hs_realloc ( l_iSize );
 	strftime ( f_oBuffer, l_iSize, f_oFormat, & f_sBroken );
 #else /* HAVE_SMART_STRFTIME */
 	f_oBuffer.hs_realloc ( 64 ); /* FIXME that is pretty dumb hack */
 	l_iSize = strftime ( f_oBuffer, 63, f_oFormat, & f_sBroken ) + 1;
-	if ( l_iSize < 2 )throw new HException ( __WHERE__, "bad format", g_iErrNo );
+	if ( l_iSize < 2 )M_THROW ( "bad format", g_iErrNo );
 #endif /* not HAVE_SMART_STRFTIME */
 	return ( f_oBuffer );
 	M_EPILOG

@@ -87,8 +87,8 @@ int HProcess::init ( const char * a_pcProcessName )
 	int l_piAlts [ D_ALTS_COUNT ], l_piCtrls [ ] = { D_KEY_CTRL_('l'), D_KEY_CTRL_('x') };
 	HMainWindow * l_poMainWindow = NULL;
 	if ( f_bInitialised )
-		throw new HException ( __WHERE__,
-				"you can initialise your main process only once, dumbass", g_iErrNo );
+		M_THROW ( "you can initialise your main process only once, dumbass",
+				g_iErrNo );
 	f_bInitialised = true;
 	l_poMainWindow = new HMainWindow ( );
 	l_poMainWindow->init ( );
@@ -251,8 +251,7 @@ int HProcess::run ( void )
 	int l_iFileDes = 0;
 	PROCESS_HANDLER_FILEDES_t HANDLER = NULL;
 	if ( ! f_bInitialised )
-		throw new HException ( __WHERE__,
-				"you have to call HProcess::init ( ) first, dumbass", g_iErrNo );
+		M_THROW ( "you have to call HProcess::init ( ) first, dumbass", g_iErrNo );
 	::refresh ( );
 	while ( f_bLoop )
 		{
@@ -261,7 +260,7 @@ int HProcess::run ( void )
 							& f_xFileDescriptorSet,	NULL, NULL, & f_sLatency ) ) ) )
 			{
 			if ( l_iError < 0 )
-				throw new HException ( __WHERE__, "select ( ) returned", l_iError );
+				M_THROW ( "select ( ) returned", l_iError );
 			if ( ! f_oFileDescriptorHandlers.quantity ( ) )return ( -1 );
 			f_oFileDescriptorHandlers.rewind ( );
 			while ( f_oFileDescriptorHandlers.iterate ( l_iFileDes, HANDLER ) )

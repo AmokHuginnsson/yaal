@@ -196,7 +196,7 @@ void HListControl::refresh ( void )
 							}
 						default :
 							{
-							throw new HException ( __WHERE__, "unknown type",
+							M_THROW ( "unknown type",
 									l_poColumnInfo->f_iType );
 							break;
 							}
@@ -245,7 +245,7 @@ void HListControl::refresh ( void )
 							}
 						default :
 							{
-							throw new HException ( __WHERE__, "unknown align",
+							M_THROW ( "unknown align",
 									l_poColumnInfo->f_iAlign );
 							break;
 							}
@@ -540,7 +540,7 @@ void HListControl::add_column ( const int & a_riColumn, const char * a_pcName,
 	int l_iShortcutIndex = 0;
 	HColumnInfo l_oColumnInfo;
 	if ( f_iQuantity )
-		throw new HException ( __WHERE__,
+		M_THROW (
 				"can not add new column when list not empty", f_iQuantity );
 	f_oVarTmpBuffer = a_pcName;
 	l_iShortcutIndex = f_oVarTmpBuffer.find ( '&' );

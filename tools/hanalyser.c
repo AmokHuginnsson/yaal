@@ -630,7 +630,7 @@ double & HAnalyser::operator [ ] ( int a_iIndex )
 		return ( f_pdVariables [ a_iIndex ] );
 	else if ( ( a_iIndex >= 'A' ) && ( a_iIndex <= 'Z' ) )
 		return ( f_pdVariables [ a_iIndex - 'A' ] );
-	else throw new HException ( __WHERE__, "index out of range", a_iIndex );
+	else M_THROW ( "index out of range", a_iIndex );
 	M_EPILOG
 	}
 

@@ -77,7 +77,7 @@ void HString::hs_realloc ( const size_t a_iSize )
 	{
 	M_PROLOG
 	int l_iOldLength = 0;
-	if ( a_iSize < 1 )throw new HException ( __WHERE__, "bad new size", a_iSize );
+	if ( a_iSize < 1 )M_THROW ( "bad new size", a_iSize );
 	if ( a_iSize > f_iSize )
 		{
 		l_iOldLength = f_iSize;
@@ -365,7 +365,7 @@ char & HString::operator [ ] ( const int a_iIndex )
 	M_PROLOG
 	int l_iLength = get_length ( );
 	if  ( ( ( size_t ) a_iIndex >= f_iSize ) || ( a_iIndex > l_iLength ) )
-		throw new HException ( __WHERE__, "index out of bound", a_iIndex );
+		M_THROW ( "index out of bound", a_iIndex );
 	return ( f_pcBuffer [ a_iIndex ] );
 	M_EPILOG
 	}
@@ -479,10 +479,10 @@ int HString::get_length ( void ) const
 	M_PROLOG
 	int l_iLength = 0;
 	if ( ! f_pcBuffer )
-		throw new HException ( __WHERE__, "no buffer.", ( int ) f_pcBuffer );
+		M_THROW ( "no buffer.", ( int ) f_pcBuffer );
 	l_iLength = strlen ( f_pcBuffer );
 	if ( ( size_t ) l_iLength > f_iSize )
-		throw new HException ( __WHERE__, "no terminating null!", l_iLength );
+		M_THROW ( "no terminating null!", l_iLength );
 	return ( l_iLength );
 	M_EPILOG
 	}

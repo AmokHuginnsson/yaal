@@ -66,7 +66,7 @@ void HRecordSet::sync ( void )
 	M_PROLOG 
 	int l_iCtr = 0;
 	if ( f_iMode == D_MODE_CLOSED )
-		throw new HException ( __WHERE__, E_MODE, f_iMode );
+		M_THROW ( E_MODE, f_iMode );
 	for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 		sync ( l_iCtr, f_oValues [ l_iCtr ] );
 	if ( f_iFieldCount > 0 )
@@ -141,7 +141,7 @@ void HRecordSet::build_sql ( void )
 			}
 		default :
 			{
-			throw new HException ( __WHERE__, E_MODE, f_iMode );
+			M_THROW ( E_MODE, f_iMode );
 			break;
 			}
 		}
@@ -153,7 +153,7 @@ long int HRecordSet::open ( const char * a_pcQuery )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( f_iMode != D_MODE_CLOSED )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_CLOSED )M_THROW ( E_MODE, f_iMode );
 	if ( a_pcQuery )f_oSQL = a_pcQuery;
 	else build_sql ( );
 	free ( );
@@ -180,7 +180,7 @@ void HRecordSet::close ( void )
 	{
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
-		throw new HException ( __WHERE__, E_MODE, f_iMode );
+		M_THROW ( E_MODE, f_iMode );
 	free ( );
 	f_iMode = D_MODE_CLOSED;
 	M_EPILOG
@@ -190,7 +190,7 @@ void HRecordSet::cancel ( void )
 	{
 	M_PROLOG
 	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
-		throw new HException ( __WHERE__, E_MODE, f_iMode );
+		M_THROW ( E_MODE, f_iMode );
 	f_iMode = D_MODE_NORMAL;
 	return;
 	M_EPILOG
@@ -237,10 +237,10 @@ bool HRecordSet::is_bof ( void )
 void HRecordSet::move_next ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
 	f_iCursorPosition ++;
 	if ( f_iCursorPosition > f_iSetQuantity )
-		throw new HException ( __WHERE__, "end of set reached", f_iCursorPosition );
+		M_THROW ( "end of set reached", f_iCursorPosition );
 	if ( f_iCursorPosition < f_iSetQuantity )sync ( );
 	return;
 	M_EPILOG
@@ -249,10 +249,10 @@ void HRecordSet::move_next ( void )
 void HRecordSet::move_previous ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
 	f_iCursorPosition --;
 	if ( f_iCursorPosition < -1 )
-		throw new HException ( __WHERE__, "beginning of set reached",
+		M_THROW ( "beginning of set reached",
 				f_iCursorPosition );
 	if ( f_iCursorPosition >= 0 )sync ( );
 	return;
@@ -262,7 +262,7 @@ void HRecordSet::move_previous ( void )
 void HRecordSet::move_first ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
 	f_iCursorPosition = 0;
 	sync ( );
 	return;
@@ -272,7 +272,7 @@ void HRecordSet::move_first ( void )
 void HRecordSet::move_last ( void )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
 	f_iCursorPosition = f_iSetQuantity - 1;
 	sync ( );
 	return;
@@ -292,7 +292,7 @@ void HRecordSet::add_new ( void )
 	{
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
-		throw new HException ( __WHERE__, E_MODE, f_iMode );
+		M_THROW ( E_MODE, f_iMode );
 	f_iMode = D_MODE_ADDING;
 	return;
 	M_EPILOG
@@ -302,7 +302,7 @@ void HRecordSet::edit ( void )
 	{
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
-		throw new HException ( __WHERE__, E_MODE, f_iMode );
+		M_THROW ( E_MODE, f_iMode );
 	f_iMode = D_MODE_EDITING;
 	return;
 	M_EPILOG
@@ -313,7 +313,7 @@ long int HRecordSet::update ( void )
 	M_PROLOG
 	long int l_iRetVal = 0;
 	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
-		throw new HException ( __WHERE__, E_MODE, f_iMode );
+		M_THROW ( E_MODE, f_iMode );
 	sync ( );
 	build_sql ( );
 	f_poDataBase->query ( f_oSQL );
@@ -330,7 +330,7 @@ void HRecordSet::remove ( void )
 	{
 	M_PROLOG
 	int l_iCursorPosition = f_iCursorPosition;
-	if ( f_iMode != D_MODE_NORMAL )throw new HException ( __WHERE__, E_MODE, f_iMode );
+	if ( f_iMode != D_MODE_NORMAL )M_THROW ( E_MODE, f_iMode );
 	f_oSQL.format ( "DELETE FROM %s WHERE id = %ld;",
 			( const char * ) f_oTable, m_lId );
 	f_poDataBase->query ( f_oSQL );

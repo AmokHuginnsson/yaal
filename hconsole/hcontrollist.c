@@ -91,7 +91,7 @@ void HControlList::select ( HControl * a_poControl )
 			return;
 			}
 	f_poSelected = l_poElement;
-	throw new HException ( __WHERE__, "bogus object", ( int ) a_poControl );
+	M_THROW ( "bogus object", ( int ) a_poControl );
 	return;
 	M_EPILOG
 	}

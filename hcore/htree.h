@@ -186,7 +186,7 @@ tttType HTree < tttType > ::HNode::get( void )
 	{
 	M_PROLOG
 	if ( ! f_iHits ) 
-		throw new HException ( __WHERE__, "no leaf to get from.", g_iErrNo );
+		M_THROW ( "no leaf to get from.", g_iErrNo );
 	f_iHits ++;
 	return ( f_tLeaf );
 	M_EPILOG
