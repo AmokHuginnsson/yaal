@@ -36,5 +36,7 @@ void set_handlers ( void );
 
 extern char * g_pcSerialDevice;
 extern int g_iBaudRate;
+extern int g_iCollectorConnectionTimeOut;
 
 #endif /* not __SIGHAND_H */
+

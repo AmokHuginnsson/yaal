@@ -47,13 +47,13 @@ HSerial::HSerial ( const char * a_pcDevice )
  *   CRTSCTS : output hardware flow control  ( only used if the cable has
  *             all necessary lines. See sect. 7 of Serial-HOWTO)
  *             CS8     : 8n1  ( 8bit, no parity, 1 stopbit)
- *             CLOCAL  : local connection,  no modem contol
+ *             CLOCAL  : local connection, no modem contol
  *             CREAD   : enable receiving characters
  */
-	f_sTIO.c_cflag = g_iBaudRate | CRTSCTS | CS8 | CLOCAL | CREAD; 
+	f_sTIO.c_cflag = g_iBaudRate | CRTSCTS | CS8 | CREAD/* | CLOCAL */;
 /*
  *   statement above is *FALSE*, I can not use cfsetispeed and cfsetospeed,
- *   I *MUST* use it. On newwer systes c_cflag and BAUDRATE simply does not work.
+ *   i *MUST* use it. On newer systes c_cflag and BAUDRATE simply does not work.
  *   Newwer interface for setting speed (baudrate)
  */
 	cfsetispeed ( & f_sTIO, g_iBaudRate );
@@ -64,7 +64,7 @@ HSerial::HSerial ( const char * a_pcDevice )
  *             will not terminate input)
  *             otherwise make device raw  ( no other input processing)
  */
-	f_sTIO.c_iflag = IGNPAR | ICRNL | IGNBRK;
+	f_sTIO.c_iflag = IGNPAR | ICRNL | IGNBRK | IXANY;
 /*
  *  Raw output.
  */
@@ -73,7 +73,7 @@ HSerial::HSerial ( const char * a_pcDevice )
  *   ICANON  : enable canonical input disable all echo functionality,
  *             and don't send signals to calling program
  */
-	f_sTIO.c_lflag = ICANON;
+	f_sTIO.c_lflag = ICANON | IEXTEN;
 /*
  *   initialize all control characters
  *   default values can be found in /usr/include/termios.h,  and are given
@@ -116,12 +116,16 @@ bool HSerial::open ( void )
 	M_PROLOG
 	if ( f_iFileDes )
 		throw new HException ( __WHERE__, "serial port already openend", g_iErrNo );
-	f_iFileDes = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NDELAY );
+	/* O_NONBLOCK allow open device even if nothing seats on other side */
+	f_iFileDes = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
 	if ( ! f_iFileDes )
 		throw new HException ( __WHERE__, strerror ( g_iErrNo ), g_iErrNo );
-	fcntl ( f_iFileDes, F_SETFL, 0 );
+	if ( ! isatty ( f_iFileDes ) )
+		throw new HException ( __WHERE__, "not a tty", f_iFileDes );
 	tcgetattr ( f_iFileDes, & f_sBackUpTIO );
-	tcflush ( f_iFileDes, TCIFLUSH );
+	fcntl ( f_iFileDes, F_SETFD, 0 );
+	fcntl ( f_iFileDes, F_SETFL, 0 );
+	tcflush ( f_iFileDes, TCIOFLUSH );
 	tcsetattr ( f_iFileDes, TCSANOW, & f_sTIO );
 	return ( false );
 	M_EPILOG

@@ -124,12 +124,19 @@ ignore_signal_SIGQUIT true
 # type: string, default: (system dependent)
 # describes path to device
 serial_device /dev/@SERIAL_DEVICE@
+
 # serial_baudrate
 # type: string, default: B115200
 # this option sets serial line connection speed (baudrate)
 # baudrate B115200 | B76800 | B57600 | B38400 | B28800
 #          | B19200| B14400 | B9600 | B7200 | B4800 | B2400
 serial_baudrate B115200
+
+# collector_connection_timeout
+# type: integer, default: 9999
+# time in seconds, after this time elapses process gives up connection
+# to collector atempt
+collector_connection_timeout 8
 
 ### tools END
 

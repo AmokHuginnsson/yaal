@@ -52,9 +52,9 @@ public:
 	HCollector ( const char * = NULL ); /* device path */
 	int send_line ( const char * );
 	int receive_line ( char * & );
-	int establish_connection ( void );
-	int wait_for_connection ( void );
-	void read_collector ( void ( * ) ( char *, int ) );
+	int establish_connection ( int = 9999 );
+	int wait_for_connection ( int = 9999 );
+	int read_collector ( void ( * ) ( char *, int ) );
 	/*}*/
 protected:
 	/*{*/

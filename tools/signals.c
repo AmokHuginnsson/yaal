@@ -52,6 +52,7 @@ M_CVSID ( "$CVSHeader$" );
 
 char * g_pcSerialDevice = NULL;
 int g_iBaudRate = B115200;
+int g_iCollectorConnectionTimeOut = 9999;
 
 namespace signals
 {
@@ -65,6 +66,8 @@ OVariable n_psVariables [ ] =
 		{ D_TYPE_BOOL, "ignore_signal_SIGINT", & n_bIgnoreSignalSIGINT },
 		{ D_TYPE_BOOL, "ignore_signal_SIGTSTP", & n_bIgnoreSignalSIGTSTP },
 		{ D_TYPE_BOOL, "ignore_signal_SIGQUIT", & n_bIgnoreSignalSIGQUIT },
+		{ D_TYPE_INT, "collector_connection_timeout",
+		& g_iCollectorConnectionTimeOut },
 		{ D_TYPE_CHAR_POINTER, "serial_device", & g_pcSerialDevice },
 		{ 0, NULL, NULL }
 	};
