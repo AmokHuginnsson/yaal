@@ -295,12 +295,7 @@ clean:
 
 tags: $(SRCS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
 	@echo -n "Rehashing tags ... "
-	@$(CTAGS) ./hcore/*.[ch] ./hconsole/*.[ch] ./tools/*.[ch] ./dbwrapper/*.[ch] ./hdata/*.[ch]
-	@(cd ./hcore;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
-	@(cd ./hconsole;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
-	@(cd ./tools;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
-	@(cd ./dbwrapper;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
-	@(cd ./hdata;$(CTAGS) ../hcore/*.[ch] ../hconsole/*.[ch] ../tools/*.[ch] ../dbwrapper/*.[ch] ../hdata/*.[ch];cd ..)
+	@$(CTAGS) -R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" --c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" --extra="+f+q"
 	@echo "done."
 
 mrproper: clean
