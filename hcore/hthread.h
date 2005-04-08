@@ -46,6 +46,9 @@ public:
 	HThread ( void );
 	virtual ~HThread ( void );
 	/*}*/
+private:
+	HThread ( const HThread & );
+	HThread & operator = ( const HThread & );
 	};
 
 }
