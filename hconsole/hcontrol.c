@@ -171,21 +171,20 @@ void HControl::refresh ( void )
 	M_EPILOG
 	}
 
-HControl & HControl::operator = ( const HInfo & a_roInfo )
+void HControl::set ( const HInfo & a_roInfo )
 	{
 	M_PROLOG
 	HInfo l_oInfo = a_roInfo;
 	if ( & a_roInfo )
 		M_THROW ( "what the fuck?", g_iErrNo );
-	return ( * this );
+	return;
 	M_EPILOG
 	}
 
-HControl::operator HInfo ( void )
+HInfo HControl::get ( void )
 	{
 	M_PROLOG
-	HInfo l_oInfo;
-	return ( l_oInfo );
+	return ( HInfo ( ) );
 	M_EPILOG
 	}
 

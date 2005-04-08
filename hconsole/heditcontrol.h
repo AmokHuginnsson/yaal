@@ -92,12 +92,11 @@ public:
 	virtual ~HEditControl ( void );
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );
-	virtual HControl & operator = ( const hcore::HInfo & );
-	virtual operator hcore::HInfo ( void );
+	virtual void set ( const hcore::HInfo & );
+	virtual hcore::HInfo get ( void );
 	void set_flags ( bool = false, bool = false );
 	virtual int process_input( int );
-	HControl & operator = ( char const * );
-	operator hcore::HString ( );
+	void set ( char const * );
 	virtual int click ( mouse::OMouse & );
 	/*}*/
 	};

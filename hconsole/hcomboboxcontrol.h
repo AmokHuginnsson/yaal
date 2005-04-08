@@ -71,10 +71,6 @@ public:
 	virtual int kill_focus ( void ); /* this one will be used here */
 	virtual void refresh ( void );
 	virtual int click ( mouse::OMouse & );
-/*	
-	virtual HInfo operator = ( const HInfo & );
-	virtual operator HInfo ( void );
-*/
 	/*}*/
 protected:
 	/*{*/

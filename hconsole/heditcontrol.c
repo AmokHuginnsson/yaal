@@ -163,21 +163,20 @@ void HEditControl::refresh ( void )
 	M_EPILOG
 	}
 
-HControl & HEditControl::operator = ( const HInfo & a_roInfo )
+void HEditControl::set ( const HInfo & a_roInfo )
 	{
 	M_PROLOG
 	HInfo l_oInfo = a_roInfo;
 	HString l_oString = l_oInfo;	
-	( * this ) = static_cast < char const * > ( l_oString.left ( f_iMaxStringSize ) );
-	return ( * this );
+	set ( static_cast < char const * > ( l_oString.left ( f_iMaxStringSize ) ) );
+	return;
 	M_EPILOG
 	}
 
-HEditControl::operator HInfo ( void )
+HInfo HEditControl::get ( void )
 	{
 	M_PROLOG
-	HInfo l_oInfo ( f_oString );
-	return ( l_oInfo );
+	return ( HInfo ( f_oString ) );
 	M_EPILOG
 	}
 
@@ -580,7 +579,7 @@ int HEditControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-HControl & HEditControl::operator = ( char const * a_pcString )
+void HEditControl::set ( char const * a_pcString )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
@@ -617,14 +616,7 @@ HControl & HEditControl::operator = ( char const * a_pcString )
 		l_iErrorCode --;
 		}
 	refresh ( );
-	return ( * this );
-	M_EPILOG
-	}
-
-HEditControl::operator HString ( )
-	{
-	M_PROLOG
-	return ( f_oString );
+	return;
 	M_EPILOG
 	}
 

@@ -284,7 +284,7 @@ void HListControl::refresh ( void )
 				if ( l_iCtr == f_iCursorPosition )
 					{
 					if ( l_poColumnInfo->f_poControl )
-						( * l_poColumnInfo->f_poControl ) = l_oItem [ l_iCtrLoc ];
+						l_poColumnInfo->f_poControl->set ( l_oItem [ l_iCtrLoc ] );
 					}
 				}
 			to_tail ( );

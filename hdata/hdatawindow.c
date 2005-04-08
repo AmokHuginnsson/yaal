@@ -326,7 +326,7 @@ void HDataWindow::sync ( void )
 		l_iCount = f_oEditModeControls.quantity ( );
 		if ( f_oValues.quantity ( ) >= l_iCount )
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-				f_oValues [ l_iCtr ] = static_cast < HInfo > ( * static_cast < HControl * > ( f_oEditModeControls [ l_iCtr ] ) );
+				f_oValues [ l_iCtr ] = f_oEditModeControls [ l_iCtr ]->get ( );
 		m_lId = f_poMainControl->get_current_id ( );
 		}
 	return;

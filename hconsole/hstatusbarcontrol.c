@@ -168,7 +168,7 @@ void HStatusBarControl::set_prompt ( char const * a_pcPrompt, int a_iMode,
 		f_oPrompt = a_pcPrompt;
 		f_iPromptLength = f_oPrompt.get_length ( );
 		}
-	HEditControl::operator = ( "" ); /* refresh() call inside */
+	HEditControl::set ( "" ); /* refresh() call inside */
 	return;
 	M_EPILOG
 	}
