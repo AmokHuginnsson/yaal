@@ -76,12 +76,12 @@ int hunt_tty ( int a_iOffset )
 	char * l_pcTtyName = NULL;
 	l_pcTtyName = ttyname ( STDIN_FILENO );
 	if ( l_pcTtyName && ! strncmp ( l_pcTtyName, "/dev/ttyv", 8 + a_iOffset ) )
-		l_iVC = l_pcTtyName [ 8 + a_iOffset ] - '0';
+		l_iVC = strtol ( l_pcTtyName + 8 + a_iOffset, NULL, 10 );
 	else
 		{
 		l_pcTtyName = ::getenv ( "STY" );
 		if ( l_pcTtyName && ( l_pcTtyName = strstr ( l_pcTtyName, ".tty" ) ) )
-			l_iVC = l_pcTtyName [ 4 + a_iOffset ] - '0';
+			l_iVC = strtol ( l_pcTtyName + 4 + a_iOffset, NULL, 10 );
 		else
 			M_THROW ( "can not find controling virtual console", g_iErrNo );
 		}
@@ -172,6 +172,7 @@ int console_mouse_open ( void )
 				strerror ( g_iErrNo ) );
 		M_THROW ( l_oError, l_iVC );
 		}
+	log ( D_LOG_INFO ) << "i have opened device: `" << l_iVC << '\'' << endl;
 	return ( gpm_fd );
 	M_EPILOG
 	}
