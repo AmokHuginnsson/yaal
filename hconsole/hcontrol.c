@@ -184,7 +184,8 @@ void HControl::set ( const HInfo & a_roInfo )
 HInfo HControl::get ( void )
 	{
 	M_PROLOG
-	return ( HInfo ( ) );
+	HInfo l_oInfo;
+	return ( l_oInfo );
 	M_EPILOG
 	}
 
