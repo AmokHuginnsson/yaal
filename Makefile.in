@@ -53,7 +53,7 @@ OS = .o
 CTAGS = @CTAGS@
 FIND = find
 .SUFFIXES:
-.SUFFIXES: $(SS) $(OS) $(OOS) $(HS)
+.SUFFIXES: $(SS) $(OS) $(HS)
 CXX = g++
 LXX = g++
 ARFLAGS = r
