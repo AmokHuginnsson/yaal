@@ -47,6 +47,9 @@ protected:
 	protected:
 		/*{*/
 		bool f_bUnfolded;	/* is this branch folded? */
+		int f_iRowRaw;
+		int	f_iColumnRaw;
+		int f_iWidthRaw;
 		/*}*/
 	public:
 		/*{*/
@@ -57,6 +60,8 @@ protected:
 		virtual ~HNodeControl ( void );
 		void expand ( void );
 		void collapse ( void );
+		bool hit_test ( int, int );
+		void click ( int );
 		/*}*/
 		friend class HTreeControl;
 		};
@@ -79,10 +84,12 @@ public:
 	virtual void refresh ( void );
 	int draw_node ( HNodeControl *, int );
 	virtual int set_focus ( char = 0 );
-	int process_input( int );
+	virtual int process_input( int );
+	virtual int click ( mouse::OMouse & );
 	/*}*/
 protected:
 	/*{*/
+	bool do_click ( HNodeControl *, mouse::OMouse & );
 	/*}*/
 	};
 

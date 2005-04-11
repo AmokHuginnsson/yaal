@@ -41,6 +41,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "htreecontrol.h"
 
 using namespace stdhapi::hcore;
+using namespace stdhapi::hconsole::mouse;
 
 namespace stdhapi
 {
@@ -49,7 +50,8 @@ namespace hconsole
 {
 
 HTreeControl::HNodeControl::HNodeControl ( HNodeControl * a_poNode )
-						: HTree < HItem >::HNode ( a_poNode ), f_bUnfolded ( false )
+						: HTree < HItem >::HNode ( a_poNode ), f_bUnfolded ( false ),
+						f_iRowRaw ( 0 ), f_iColumnRaw ( 0 ), f_iWidthRaw ( 0 )
 	{
 	M_PROLOG
 	return;
@@ -83,6 +85,30 @@ void HTreeControl::HNodeControl::collapse ( void )
 	f_oBranch.go ( 0 );
 	while ( ( l_ppoNodeControl = reinterpret_cast < HTreeControl::HNodeControl * * > ( f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED ) ) ) )
 		( * l_ppoNodeControl )->collapse ( );
+	return;
+	M_EPILOG
+	}
+
+bool HTreeControl::HNodeControl::hit_test ( int a_iRow, int a_iColumn )
+	{
+	M_PROLOG
+	if ( f_iRowRaw == a_iRow )
+		{
+		if ( a_iColumn >= f_iColumnRaw )
+			{
+			if ( a_iColumn < ( f_iColumnRaw + f_iWidthRaw - 1 ) )
+				return ( true );
+			}
+		}
+	return ( false );
+	M_EPILOG
+	}
+
+void HTreeControl::HNodeControl::click ( int a_iColumn )
+	{
+	M_PROLOG
+	if ( a_iColumn == f_iColumnRaw )
+		f_bUnfolded = ! f_bUnfolded;
 	return;
 	M_EPILOG
 	}
@@ -131,22 +157,26 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 	M_PROLOG
 	int l_iCtr = 0;
 	int l_iRow = a_iRow;
-	HInfo l_oInfo;
+	HString * l_poString = NULL;
+	HInfo * l_poInfo = NULL;
 	l_iCtr = a_poNode->f_oBranch.quantity ( );
 	if ( a_poNode->f_tLeaf )
-		{ 
+		{
 		l_iRow ++;
-		l_oInfo = a_poNode->f_tLeaf [ 0 ];
+		l_poInfo = & a_poNode->f_tLeaf [ 0 ];
+		l_poString = & static_cast < HString & > ( * l_poInfo );
+		a_poNode->f_iRowRaw = l_iRow;
+		a_poNode->f_iColumnRaw = f_iColumnRaw + a_poNode->f_iLevel * 2 - 1; 
+		a_poNode->f_iWidthRaw = l_poString->get_length ( ) + 2;
 		M_SET_ATTR_DATA ( );
 		if ( ! a_poNode->f_bUnfolded && l_iCtr )
-			::mvprintw ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 - 1, "+" );
+			::mvprintw ( l_iRow, a_poNode->f_iColumnRaw, "+" );
 		else if ( l_iCtr )
-			::mvprintw ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2 - 1, "-" );
+			::mvprintw ( l_iRow, a_poNode->f_iColumnRaw, "-" );
 		if ( a_poNode == f_poSelected )
 			set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
 						: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
-		::mvprintw ( l_iRow, f_iColumnRaw + a_poNode->f_iLevel * 2,
-				static_cast < HString & > ( l_oInfo ) );
+		::mvprintw ( l_iRow, a_poNode->f_iColumnRaw + 1, * l_poString );
 		}
 	if ( l_iCtr && ( a_poNode->f_bUnfolded || ! a_poNode->f_iLevel ) )
 		{
@@ -303,6 +333,39 @@ int HTreeControl::set_focus ( char a_cShorcut )
 	{
 	M_PROLOG
 	return ( HControl::set_focus ( a_cShorcut ) );
+	M_EPILOG
+	}
+
+int HTreeControl::click ( OMouse & a_rsMouse )
+	{
+	M_PROLOG
+	if ( ! HControl::click ( a_rsMouse ) )
+		return ( 1 );
+	if ( do_click ( static_cast < HNodeControl * > ( f_poRoot ), a_rsMouse ) )
+		refresh ( );
+	return ( 0 );
+	M_EPILOG
+	}
+
+bool HTreeControl::do_click ( HNodeControl * a_poNode, OMouse & a_rsMouse )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	l_iCtr = a_poNode->f_oBranch.quantity ( );
+	if ( a_poNode->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
+		{
+		a_poNode->click ( a_rsMouse.f_iColumn );
+		f_poSelected = a_poNode;
+		return ( true );
+		}
+	if ( l_iCtr && ( a_poNode->f_bUnfolded || ! a_poNode->f_iLevel ) )
+		{
+		a_poNode->f_oBranch.go ( 0 );
+		while ( l_iCtr -- )
+			if ( do_click ( static_cast < HNodeControl * > ( * a_poNode->f_oBranch.to_tail ( ) ), a_rsMouse ) )
+				return ( true );
+		}
+	return ( false );
 	M_EPILOG
 	}
 
