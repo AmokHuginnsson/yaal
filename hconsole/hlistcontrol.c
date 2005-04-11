@@ -53,8 +53,9 @@ namespace hconsole
 {
 
 HListControl::HColumnInfo::HColumnInfo ( void )
-	: f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iType ( 0 ), f_iAlign ( 0 ), 
-	f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_oName ( ), f_poControl ( NULL )
+	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iType ( 0 ),
+	f_iAlign ( 0 ), f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_oName ( ),
+	f_poControl ( NULL )
 	{
 	M_PROLOG
 	return;
@@ -69,8 +70,9 @@ HListControl::HColumnInfo::~HColumnInfo ( void )
 	}
 
 HListControl::HColumnInfo::HColumnInfo ( const HColumnInfo & a_roColumnInfo )
-	: f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iType ( 0 ), f_iAlign ( 0 ), 
-	f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_oName ( ), f_poControl ( NULL )
+	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iType ( 0 ),
+	f_iAlign ( 0 ), f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_oName ( ),
+	f_poControl ( NULL )
 	{
 	M_PROLOG
 	( * this ) = a_roColumnInfo;
@@ -764,6 +766,7 @@ void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 		return;
 	f_iSortColumn = a_iColumn;
 	f_iOrder = a_iOrder;
+	f_oHeader [ a_iColumn ].f_bDescending = ! ( a_iOrder > 0 );
 	f_lComparedItems = 0;
 	cmp = static_cast < int ( HList<HItem>::* ) ( HElement *, HElement * ) > ( & HListControl::cmpc );
 	if ( f_iQuantity > 128 )
@@ -780,13 +783,33 @@ void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
 int HListControl::click ( mouse::OMouse & a_rsMouse )
 	{
 	M_PROLOG
-	int l_iRow = 0, l_iMoved = 0;
+	int l_iRow = 0, l_iColumn = 0, l_iMoved = 0, l_iCtr = 0;
+	int l_iWidth = 0, l_iColumns = f_oHeader.quantity ( );
+	HColumnInfo * l_poColumnInfo = NULL;
 	if ( ! HControl::click ( a_rsMouse ) )
 		return ( 1 );
 	l_iRow = a_rsMouse.f_iRow - f_iRowRaw - ( f_bDrawHeader ? 1 : 0 );
 	if ( l_iRow == f_iCursorPosition )
 		return ( 1 );
-	if ( l_iRow < f_iQuantity )
+	if ( l_iRow < 0 ) /* header clicked */
+		{
+		l_iColumn = a_rsMouse.f_iColumn + f_iColumnRaw - 1;
+		for ( l_iCtr = 0; l_iCtr < l_iColumns; l_iCtr ++ )
+			{
+			l_poColumnInfo = & f_oHeader [ l_iCtr ];
+			l_iWidth += l_poColumnInfo->f_iWidthRaw;
+			if ( l_iColumn <= l_iWidth )
+				{
+				sort_by_contents ( l_iCtr,
+						l_poColumnInfo->f_bDescending ? D_ASCENDING : D_DESCENDING );
+				f_poFirstVisibleRow = f_poSelected = f_poHook;
+				f_iControlOffset = f_iCursorPosition = 0;
+				refresh ( );
+				break;
+				}
+			}
+		}
+	else if ( l_iRow < f_iQuantity )
 		{
 		l_iMoved = f_iCursorPosition - l_iRow;
 		if ( l_iMoved > 0 )

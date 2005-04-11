@@ -48,6 +48,7 @@ class HListControl : public hcore::HList < HItem >, public virtual HSearchableCo
 		{
 	protected:
 		/*{*/
+		bool f_bDescending;
 		int f_iWidthRaw;
 		int f_iWidth;
 		int f_iType;
