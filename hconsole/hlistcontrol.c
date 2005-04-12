@@ -118,7 +118,7 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_bDrawHeader ( a_bDrawHeader ), f_bEditable ( false ),
 	f_iControlOffset ( 0 ), f_iCursorPosition ( 0 ), f_iSumForOne ( 0 ),
 	f_oHeader ( ), f_poFirstVisibleRow ( NULL ), f_sMatch ( ),
-	f_iSortColumn ( 0 ), f_lComparedItems ( 0 )
+	f_iSortColumn ( - 1 ), f_lComparedItems ( 0 )
 	{
 	M_PROLOG
 	f_sMatch.f_iColumnWithMatch = 0;
@@ -314,6 +314,10 @@ void HListControl::refresh ( void )
 				::mvprintw ( f_iRowRaw,
 						f_iColumnRaw + l_iColumnOffset + l_poColumnInfo->f_iShortcutIndex,
 						"%c", l_poColumnInfo->f_cShortcut );
+				if ( f_iSortColumn == l_iCtr )
+					::mvprintw ( f_iRowRaw,
+							f_iColumnRaw + l_iColumnOffset + l_poColumnInfo->f_iWidthRaw - 2,
+							"%c", l_poColumnInfo->f_bDescending ? '^' : 'v' );
 				}
 			l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
 			if ( l_iCtr < l_iColumns )
