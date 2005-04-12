@@ -9,7 +9,7 @@
 # syntax for settings is:
 # ^{option}{white}(['"]){value1 value2 ... valuen}\1{white}# comment$
 # value may be surrounded by apostrophes or quotation marks
-# one lever of this surrounding is stripped
+# one level of this surrounding is stripped
 # we currently distinguish between four kind of value types:
 # bool   - (true|yes|on|false|no|off)
 # char   - [a-z]
