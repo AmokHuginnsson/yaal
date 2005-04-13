@@ -58,85 +58,88 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
 		{
 		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );
-		if ( l_psRc )while ( read_rc_line ( l_oOption, l_oValue, l_psRc, l_iLine ) )
+		if ( l_psRc )
 			{
-			if ( n_iDebugLevel )
-				fprintf ( stderr, "option: [%s], value [%s]\n", static_cast < char * > ( l_oOption ),
-						static_cast < char * > ( l_oValue ) );
-			if ( a_pcSection )
+			while ( read_rc_line ( l_oOption, l_oValue, l_psRc, l_iLine ) )
 				{
-				if ( l_oValue.is_empty ( ) )
+				if ( n_iDebugLevel )
+					fprintf ( stderr, "option: [%s], value [%s]\n", static_cast < char * > ( l_oOption ),
+							static_cast < char * > ( l_oValue ) );
+				if ( a_pcSection )
 					{
-					l_oValue.format ( "[%s]", a_pcSection );
-					if ( l_oOption == l_oValue )
-							{
-							log << "section: " << a_pcSection << ", ";
-							l_bSection = true;
-							continue;
-							}
-					else
-						l_bSection = false;
-					}
-				if ( ! l_bSection )
-					continue;
-				}
-			l_iCtr = 0;
-			l_bOptionOK = false;
-			while ( a_psVaraibles [ l_iCtr ].f_pcKey )
-				{
-				if ( ! strcasecmp ( l_oOption, a_psVaraibles [ l_iCtr ].f_pcKey ) )
-					{
-					switch ( a_psVaraibles [ l_iCtr ].f_iType )
+					if ( l_oValue.is_empty ( ) )
 						{
-						case ( D_TYPE_BOOL ):
-							{
-							rc_set_variable ( l_oValue,
-									* static_cast < bool * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-							break;
-							}
-						case ( D_TYPE_CHAR ):
-							{
-							rc_set_variable ( l_oValue,
-									* static_cast < char * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-							break;
-							}
-						case ( D_TYPE_INT ):
-							{
-							rc_set_variable ( l_oValue,
-									* static_cast < int * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-							break;
-							}
-						case ( D_TYPE_CHAR_POINTER ):
-							{
-							rc_set_variable ( l_oValue,
-									static_cast < char ** > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-							break;
-							}
-						case ( D_TYPE_HSTRING ):
-							{
-							( * static_cast < HString * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) ) = l_oValue;
-							break;
-							}
-						default :
-							{
-							M_THROW ( "unknown type",
-									a_psVaraibles [ l_iCtr ].f_iType );
-							break;
-							}
+						l_oValue.format ( "[%s]", a_pcSection );
+						if ( l_oOption == l_oValue )
+								{
+								log << "section: " << a_pcSection << ", ";
+								l_bSection = true;
+								continue;
+								}
+						else
+							l_bSection = false;
 						}
-					l_bOptionOK = true;
+					if ( ! l_bSection )
+						continue;
 					}
-				l_iCtr ++;
-				}
-			if ( set_variables && set_variables ( l_oOption, l_oValue )
-					&& ! l_bOptionOK )
-				{
-				log << "failed." << endl;
-				l_oMessage.format ( "Error: unknown option found: `%s', "
-						"with value: `%s', on line %d.\n",
-						static_cast < char const * > ( l_oOption ), static_cast < char const * > ( l_oValue ), l_iLine );
-				log ( D_LOG_ERROR ) << l_oMessage;
-				fprintf ( stderr, l_oMessage );
+				l_iCtr = 0;
+				l_bOptionOK = false;
+				while ( a_psVaraibles [ l_iCtr ].f_pcKey )
+					{
+					if ( ! strcasecmp ( l_oOption, a_psVaraibles [ l_iCtr ].f_pcKey ) )
+						{
+						switch ( a_psVaraibles [ l_iCtr ].f_iType )
+							{
+							case ( D_TYPE_BOOL ):
+								{
+								rc_set_variable ( l_oValue,
+										* static_cast < bool * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
+								break;
+								}
+							case ( D_TYPE_CHAR ):
+								{
+								rc_set_variable ( l_oValue,
+										* static_cast < char * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
+								break;
+								}
+							case ( D_TYPE_INT ):
+								{
+								rc_set_variable ( l_oValue,
+										* static_cast < int * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
+								break;
+								}
+							case ( D_TYPE_CHAR_POINTER ):
+								{
+								rc_set_variable ( l_oValue,
+										static_cast < char ** > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
+								break;
+								}
+							case ( D_TYPE_HSTRING ):
+								{
+								( * static_cast < HString * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) ) = l_oValue;
+								break;
+								}
+							default :
+								{
+								M_THROW ( "unknown type",
+										a_psVaraibles [ l_iCtr ].f_iType );
+								break;
+								}
+							}
+						l_bOptionOK = true;
+						}
+					l_iCtr ++;
+					}
+				if ( set_variables && set_variables ( l_oOption, l_oValue )
+						&& ! l_bOptionOK )
+					{
+					log << "failed." << endl;
+					l_oMessage.format ( "Error: unknown option found: `%s', "
+							"with value: `%s', on line %d.\n",
+							static_cast < char const * > ( l_oOption ), static_cast < char const * > ( l_oValue ), l_iLine );
+					log ( D_LOG_ERROR ) << l_oMessage;
+					fprintf ( stderr, l_oMessage );
+					}
 				}
 			}
 		}
@@ -210,9 +213,8 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 			{
 			/* at this point we know we have _some_ option */
 			/* now we look for first whitespace after option */
-			l_iLenght = strchr ( l_pcBuffer + l_iIndex, ' ' ) - l_pcBuffer;
-			l_iSub = strchr ( l_pcBuffer + l_iIndex, '\t' ) - l_pcBuffer;
-			if ( ( l_iLenght < 0 ) && ( l_iSub < 0 ) )
+			l_pcPtr = strpbrk ( l_pcBuffer + l_iIndex, " \t" );
+			if ( ! l_pcPtr )
 				{
 				/* we did not found any whitespace, so we have no value at this line */
 				l_iSub = l_iIndex;
@@ -224,18 +226,16 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 					if ( ! ( ( l_pcBuffer [ l_iIndex ] == ' ')
 							|| ( l_pcBuffer [ l_iIndex ] == '\t' ) 
 							|| ( l_pcBuffer [ l_iIndex ] == '\r' )
-							|| ( l_pcBuffer [ l_iIndex ] == '\n' ) ) ) break;
+							|| ( l_pcBuffer [ l_iIndex ] == '\n' ) ) )
+						break;
 				l_pcBuffer [ l_iIndex + 1 ] = 0;
 				a_roOption = l_pcBuffer + l_iSub;
-				l_pcBuffer [ l_iIndex + 1 ] = ' ';
 				}
 			else
 				{
 				/* we have found a whitespace, so there is probability that */
 				/* have a value :-o */
-				l_iSub = l_iSub > 0 ? l_iSub : ( l_iBlockSize - 1 );
-				l_iLenght = l_iLenght > 0 ? l_iLenght : ( l_iBlockSize - 1 );
-				l_iSub = l_iSub < l_iLenght ? l_iSub : l_iLenght;
+				l_iSub = l_pcPtr - l_pcBuffer;
 				l_pcBuffer [ l_iSub ] = 0;
 				a_roOption = l_pcBuffer + l_iIndex;
 				l_pcBuffer [ l_iSub ] = ' ';
