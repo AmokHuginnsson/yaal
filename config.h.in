@@ -19,6 +19,8 @@
 
 #undef __HOST_OS_TYPE_SLACKWARE__
 
+#undef __DYNAMIC_LINKER__
+
 /* End of operating system host type definition. */
 
 /* Defines for available headers */

@@ -41,6 +41,14 @@ AC_CONFIG_HEADERS([config.h])
 dnl Cheching for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
 AC_CANONICAL_HOST()
+AC_MSG_CHECKING([host dynamic linker])
+DYNAMIC_LINKER=`ldd /sbin/init | awk '/ld-linux/{print $1}'`
+if test [$DYNAMIC_LINKER] = [""] ; then
+	AC_MSG_ERROR([not found])
+else
+	AC_MSG_RESULT([$DYNAMIC_LINKER])
+	AC_DEFINE_UNQUOTED([__DYNAMIC_LINKER__],["$DYNAMIC_LINKER"])
+fi
 
 dnl Testing presence of c compiler
 AC_MSG_RESULT([--- Testing presence of c compiler ... ---              [[19%]]])

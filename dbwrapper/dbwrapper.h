@@ -35,6 +35,7 @@ namespace dbwrapper
 	{
 
 extern int	n_iDataBaseDriver;
+void stdhapi_dbwrapper_banner ( void )
 
 	}
 

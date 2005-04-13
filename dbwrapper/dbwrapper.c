@@ -38,10 +38,14 @@ M_CVSID ( "$CVSHeader$" );
 #include "hcore/hstring.h"
 #include "hcore/rc_file.h"
 #include "hcore/hcore.h"
+#include "hconsole/hconsole.h"
+#include "tools/tools.h"
 #include "dbwrapper.h"
 #include "db_driver_loader.h"
 
 using namespace stdhapi::hcore;
+using namespace stdhapi::hconsole;
+using namespace stdhapi::tools;
 
 namespace stdhapi
 {
@@ -137,6 +141,25 @@ void dbwrapper_fini ( void )
 		}
 	dbwrapper::n_pvDlHandle = NULL;
 	return;
+	}
+
+static char const g_pcDynamicLinkerPath [ ] __attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
+
+void stdhapi_dbwrapper_banner ( void )
+	{
+	fprintf ( stderr, "\tdbwrapper\n" );
+	return;
+	}
+
+extern "C"
+void stdhapi_dbwrapper_main ( void ) __attribute__(( __noreturn__ ));
+void stdhapi_dbwrapper_main ( void )
+	{
+	stdhapi_hcore_banner ( );
+	stdhapi_hconsole_banner ( );
+	stdhapi_tools_banner ( );
+	stdhapi_dbwrapper_banner ( );
+	exit ( 0 );
 	}
 
 }

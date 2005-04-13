@@ -39,6 +39,7 @@ extern int n_iCollectorConnectionTimeOut;
 extern bool n_bIgnoreSignalSIGINT;
 extern bool n_bIgnoreSignalSIGTSTP;
 extern bool n_bIgnoreSignalSIGQUIT;
+void stdhapi_tools_banner ( void );
 
 	}
 

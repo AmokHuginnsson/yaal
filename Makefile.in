@@ -204,7 +204,7 @@ DEPS=$(subst ~, -MT ,$(join $(patsubst %.c,"%.c~", $(sort $(SRCS))),$(sort $(pat
 $(TARGET):
 	@if [ "$(TARGET)" = "" -o "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi
 	@echo -n "Linking \`$@ ... "
-	@$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,-\( $(OBJ4$(NAME)) -Wl,-\) 2>&1 | tee -a make.log
+	@$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,--entry="stdhapi_$(NAME)_main" -Wl,-\( $(OBJ4$(NAME)) -Wl,-\) 2>&1 | tee -a make.log
 	@$(AR) $(ARFLAGS) lib$(NAME).a $(OBJ4$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log
 	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(TARGETDIR)/
 	@/bin/mv -f lib$(NAME).a $(TARGETDIR)/
@@ -240,7 +240,7 @@ $(TOOLS): $(HCONSOLE) $(OBJ4tools)
 
 # dbwrapper BEGIN
 $(DBWRAPPER) : $(HCORE) $(OBJ4dbwrapper)
-	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-rdynamic @DLOPEN_IN@ -lhcore"
+	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-rdynamic @DLOPEN_IN@ -lhcore -lhconsole -ltools"
 
 $(MYSQL_DRIVER): $(HCORE) $(OBJ4mysql_driver) $(DBWRAPPER)
 	@$(MAKE) $(MYSQL_DRIVER)\' TARGET=$(MYSQL_DRIVER)\' NAME=mysql_driver LIBS="-lmysqlclient -lhcore"

@@ -48,6 +48,7 @@ extern bool	n_bLeaveCtrlQ;
 extern bool	n_bLeaveCtrlBackSlash;
 extern char	n_cCommandComposeCharacter;
 extern int	n_iCommandComposeDelay;
+void stdhapi_hconsole_banner ( void );
 
 	}
 

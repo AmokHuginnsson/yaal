@@ -182,6 +182,23 @@ void hconsole_init ( void )
 	return;
 	}
 
+static char const g_pcDynamicLinkerPath [ ] __attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
+
+void stdhapi_hconsole_banner ( void )
+	{
+	fprintf ( stderr, "\thconsole\n" );
+	return;
+	}
+
+extern "C"
+void stdhapi_hconsole_main ( void ) __attribute__(( __noreturn__ ));
+void stdhapi_hconsole_main ( void )
+	{
+	stdhapi_hcore_banner ( );
+	stdhapi_hconsole_banner ( );
+	exit ( 0 );
+	}
+
 }
 
 }
