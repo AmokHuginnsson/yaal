@@ -42,8 +42,8 @@ dnl Cheching for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
 AC_CANONICAL_HOST()
 AC_MSG_CHECKING([host dynamic linker])
-DYNAMIC_LINKER=`ldd /sbin/init | awk '/ld-linux/{print $1}'`
-if test [$DYNAMIC_LINKER] = [""] ; then
+DYNAMIC_LINKER=`readelf -l /usr/bin/readelf | awk 'BEGIN{FS=":"};/program interp/{gsub("[[]] ]","",$2);print $2}'`
+if test ["$DYNAMIC_LINKER"] = [""] ; then
 	AC_MSG_ERROR([not found])
 else
 	AC_MSG_RESULT([$DYNAMIC_LINKER])
