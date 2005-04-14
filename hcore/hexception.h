@@ -51,18 +51,22 @@ namespace hcore
 #define M_CVSID(id) static char __CVSID__ [ ] __attribute__((__unused__)) = id
 #define M_CVSTID(id) static char __CVSTID__ [ ] __attribute__((__unused__)) = id
 #define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
-#define M_TRY try{
 #ifdef __EXCEPTIONS_BY_REFERENCE__
-#	define M_CATCH }catch ( HException & e ){e.log ( __WHERE__ );throw;}
-#	define M_THROW( msg, e_no ) throw HException ( __WHERE__, msg, e_no )
-# define M_FINAL }catch ( HException & e ){e.log ( __WHERE__ );e->print_error ( true );}
+# define D_EXCEPTION_BY &
+# define M_EXCEPTION_CREATE( e, msg, e_no ) HException e ( __WHERE__, msg, e_no )
+# define M_EXCEPTION_RELEASE( e ) /**/
+# define M_THROW( msg, e_no ) throw ( HException ( __WHERE__, msg, e_no ) )
 #else /* __EXCEPTIONS_BY_REFERENCE__ */
-#	define M_CATCH }catch ( HException * e ){e->log ( __WHERE__ );throw;}
-#	define M_THROW( msg, e_no ) throw new HException ( __WHERE__, msg, e_no )
-#	define M_FINAL }catch ( HException * e ){e->log ( __WHERE__ );e->print_error ( true );delete e;}
+# define D_EXCEPTION_BY *
+# define M_EXCEPTION_CREATE( e, msg, e_no ) HException * e = new HException ( __WHERE__, msg, e_no )
+# define M_EXCEPTION_RELEASE( e ) delete e;
+# define M_THROW( msg, e_no ) throw ( new HException ( __WHERE__, msg, e_no ) )
 #endif /* not __EXCEPTIONS_BY_REFERENCE__ */
+#define M_TRY try{
+#define M_CATCH( e ) }catch ( HException D_EXCEPTION_BY e )
 #define M_PROLOG M_TRY
-#define M_EPILOG M_CATCH
+#define M_EPILOG M_CATCH ( e ){e->log ( __WHERE__ );throw;}
+#define M_FINAL M_CATCH ( e ){e->log ( __WHERE__ );e->print_error ( true );M_EXCEPTION_RELEASE ( e );}
 
 #define D_LOG_DEBUG			1
 #define D_LOG_INFO			2
@@ -115,16 +119,17 @@ protected:
 public:
 	/*{*/
 	HException ( char const *, char const *, int, char const *, int = 0 );
+	HException ( const HException & );
 	virtual ~HException ( void ) ;
 	void set ( char = 0, int = 0, long = 0, double = 0, char const * = 0, void * = 0 );
 	void set ( char const * );
-	void print_error ( bool );
+	void print_error ( bool ) const;
 	static void dump_call_stack ( int );
 	void log ( char const *, char const *, int );
+	HException * operator-> ( void );
 	/*}*/
 private:
 	/*{*/
-	HException ( const HException & );
 	HException & operator = ( const HException & );
 	/*}*/
 	};

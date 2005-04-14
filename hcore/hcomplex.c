@@ -92,7 +92,7 @@ double HComplex::argument ( void )
 	{
 	M_PROLOG
 	if ( ! f_dReal )
-		M_THROW ( "I can not count complex argument, real part equals 0.",
+		M_THROW ( "I cannot count complex argument, real part equals to 0.",
 				g_iErrNo );
 	return ( atan ( f_dImaginary  / f_dReal ) );
 	M_EPILOG
