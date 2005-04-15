@@ -223,7 +223,10 @@ $(TARGET):
 #-------------------------------------------------------------------
 
 .DEFAULT:
+	@tput bold
+	@tput setaf 1
 	@echo "Lack of \`$<'." | tee -a make.log
+	@tput sgr0
 
 #phony targets
 .PHONY: all nodebug install dep clean tags mrproper purge
