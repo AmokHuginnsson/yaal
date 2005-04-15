@@ -196,21 +196,29 @@ DEPS=$(subst ~, -MT ,$(join $(patsubst %.c,"%.c~", $(sort $(SRCS))),$(sort $(pat
 	
 %.o : %.c
 	@echo -n "Compiling \`$@' ... "
+	@tput bold
+	@tput setaf 1
 	@$(CXX) $(CXXFLAGS) $< -c -o $@ 2>&1 | tee -a make.log
-	@echo "done."
+	@tput sgr0
+	@echo -ne "done.\r"
+	@tput el
 
 #	this is "rule" for linking libs
 
 $(TARGET):
 	@if [ "$(TARGET)" = "" -o "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi
 	@echo -n "Linking \`$@ ... "
+	@tput bold
+	@tput setaf 1
 	@$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,--entry="stdhapi_$(NAME)_main" -Wl,-\( $(OBJ4$(NAME)) -Wl,-\) 2>&1 | tee -a make.log
+	@tput sgr0
 	@$(AR) $(ARFLAGS) lib$(NAME).a $(OBJ4$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log
 	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(TARGETDIR)/
 	@/bin/mv -f lib$(NAME).a $(TARGETDIR)/
 	@echo -n "making cache ... "
 	@(cd $(TARGETDIR);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;$(TARGETDIR)/mkcache;ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so)
-	@echo "done."
+	@echo -ne "done.\r"
+	@tput el
 
 #-------------------------------------------------------------------
 
