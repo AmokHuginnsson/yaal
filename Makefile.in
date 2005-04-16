@@ -54,8 +54,9 @@ CTAGS = @CTAGS@
 FIND = find
 .SUFFIXES:
 .SUFFIXES: $(SS) $(OS) $(HS)
-CXX = g++
-LXX = g++
+CXX ?= g++
+CXX := $(subst -x c++ -x c++,-x c++,$(subst colorgcc,colorgcc -x c++,$(CXX)))
+LXX ?= g++
 ARFLAGS = r
 CWARNING_FLAGS =	\
 						@PEDANTIC_ERRORS@\
@@ -196,10 +197,7 @@ DEPS=$(subst ~, -MT ,$(join $(patsubst %.c,"%.c~", $(sort $(SRCS))),$(sort $(pat
 	
 %.o : %.c
 	@echo -n "Compiling \`$@' ... "
-	@tput bold
-	@tput setaf 1
 	@$(CXX) $(CXXFLAGS) $< -c -o $@ 2>&1 | tee -a make.log
-	@tput sgr0
 	@echo -ne "done.\r"
 	@tput el
 
