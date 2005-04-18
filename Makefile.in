@@ -24,34 +24,26 @@
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 
-VERSION = 0
-SUBVERSION = 0
-EXTRAVERSION = 0
-RELEASE = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
-SHELL = /bin/sh
-TARGETDIR = $(HOME)/lib
-HEADERSDIR = $(HOME)/prog/include
-HAPIHDR = $(HEADERSDIR)/stdhapi.h
-CACHE = $(TARGETDIR)/ld.so.cache
-HCOREDIR = ./hcore/
-HCONSOLEDIR = ./hconsole/
-TOOLSDIR = ./tools/
-DBWRAPPERDIR = ./dbwrapper/
-HDATADIR = ./hdata/
-HCORE = $(TARGETDIR)/libhcore.so.$(RELEASE)
-HCONSOLE = $(TARGETDIR)/libhconsole.so.$(RELEASE)
-TOOLS = $(TARGETDIR)/libtools.so.$(RELEASE)
-MYSQL_DRIVER = $(TARGETDIR)/libmysql_driver.so.$(RELEASE)
-POSTGRESQL_DRIVER = $(TARGETDIR)/libpostgresql_driver.so.$(RELEASE)
-SQLITE_DRIVER = $(TARGETDIR)/libsqlite_driver.so.$(RELEASE)
-SQLITE3_DRIVER = $(TARGETDIR)/libsqlite3_driver.so.$(RELEASE)
-DBWRAPPER = $(TARGETDIR)/libdbwrapper.so.$(RELEASE)
-HDATA = $(TARGETDIR)/libhdata.so.$(RELEASE)
+SHELL					= /bin/sh
+VERSION				= 0
+SUBVERSION		= 0
+EXTRAVERSION	= 0
+RELEASE				= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
+COMPONENTS		= hcore hconsole tools dbwrapper hdata
+DIR_TARGET		= $(HOME)/lib
+DIR_HEADERS		= $(HOME)/prog/include
+DIR_BUILD			= ./build/
+HAPI_HEADER		= $(DIR_HEADERS)/stdhapi.h
+LD_CACHE			= $(DIR_TARGET)/ld.so.cache
+MYSQL_DRIVER			= $(DIR_TARGET)/libmysql_driver.so.$(RELEASE)
+POSTGRESQL_DRIVER	= $(DIR_TARGET)/libpostgresql_driver.so.$(RELEASE)
+SQLITE_DRIVER			= $(DIR_TARGET)/libsqlite_driver.so.$(RELEASE)
+SQLITE3_DRIVER		= $(DIR_TARGET)/libsqlite3_driver.so.$(RELEASE)
 HS = .h
 SS = .c
 OS = .o
-CTAGS = @CTAGS@
-FIND = find
+CTAGS	= @CTAGS@
+FIND	= find
 .SUFFIXES:
 .SUFFIXES: $(SS) $(OS) $(HS)
 CXX ?= g++
@@ -88,7 +80,7 @@ CWARNING_FLAGS =	\
 #						-Wmissing-format-attribute\
 						-Wunreachable-code\ # too much warrnings
 #						-Waggregate-return\ # useless for C++
-CXXWARNING_FLAGS =	\
+CXXWARNING_FLAGS		=	\
 						-Weffc++\
 						-Wsign-promo
 #						-Wold-style-cast\ # lots of warrnings from libc headers
@@ -96,108 +88,77 @@ CXXWARNING_FLAGS =	\
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
-COMPILER_PRIME_FLAGS = -fmessage-length=0 -std=gnu++98 -pipe -fPIC -D__STDHAPI_BUILD__ -D_GNU_SOURCE @DEFS@ -march=i486
+COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe -fPIC \
+																-D__STDHAPI_BUILD__ -D_GNU_SOURCE @DEFS@ \
+																-march=i486
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
-	COMPILER_DEBUG_FLAGS = -g -g3 -ggdb -ggdb3 -gstabs+ -pg -fno-inline -D__DEBUG__ $(DB)
+	COMPILER_DEBUG_FLAGS				= -g -g3 -ggdb -ggdb3 -gstabs+ -pg -fno-inline \
+																-D__DEBUG__ $(DB)
 endif
-COMPILER_PATH_FLAGS = -I. -I/usr/local/include
+COMPILER_PATH_FLAGS						= -I. -I/usr/local/include
 # -fno-external-templates #deprecated
-LINKER_PATH_FLAGS = -L. -L$(TARGETDIR) -L/usr/local/lib @EXTRA_LIB_PATHS@
-LINKER_PRIME_FLAGS =	\
+LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \
+																@EXTRA_LIB_PATHS@
+LINKER_PRIME_FLAGS						=	\
 								-shared\
 								@SPECIAL_LINKER_FLAGS@\
 								-Wl,--fatal-warnings\
 								-Wl,--demangle\
 								-Wl,--export-dynamic\
 								-Wl,-soname,
-CXXFLAGS = $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) $(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) $(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS)
-LINKER_FLAGS = $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
+CXXFLAGS			= $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
+								$(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) \
+								$(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS)
+LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 
-#	h-core
-SRC4hcore = $(strip $(sort $(shell $(FIND) $(HCOREDIR) -name '*.c')))
-HDR4hcore = $(strip $(sort $(shell $(FIND) $(HCOREDIR) -name '*.h')))
-OBJ4hcore := $(SRC4hcore:.c=.o)
-SRCS := $(SRC4hcore)
+define PREPARE_VARIABLES
+	DIR_$(1) := ./$(1)/
+	TARGET_$(1) := $$(DIR_TARGET)/lib$(1).so.$$(RELEASE)
+	SRC_$(1) = $$(strip $$(sort $$(shell $$(FIND) $$(DIR_$(1)) -name "*.c")))
+	HDRS += $$(strip $$(sort $$(shell $$(FIND) $$(DIR_$(1)) -name "*.h")))
+	OBJS_$(1) := $$(patsubst %.c,$$(DIR_BUILD)/%.o,$$(SRC_$(1)))
+	SRCS += $$(SRC_$(1))
+endef
 
-#	h-console
-SRC4hconsole = $(strip $(sort $(shell $(FIND) $(HCONSOLEDIR) -name '*.c')))
-HDR4hconsole = $(strip $(sort $(shell $(FIND) $(HCONSOLEDIR) -name '*.h')))
-OBJ4hconsole := $(SRC4hconsole:.c=.o)
-SRCS += $(SRC4hconsole)
+define BUILD_TARGET
+$$(TARGET_$(1)): $$(OBJS_$(1)) $(2)
+	@$$(MAKE) $$(TARGET_$(1))\' TARGET=$$(TARGET_$(1))\' NAME=$(1) LIBS=$(3)
+endef
 
-# tools
-SRC4tools = $(strip $(sort $(shell $(FIND) $(TOOLSDIR) -name '*.c')))
-HDR4tools = $(strip $(sort $(shell $(FIND) $(TOOLSDIR) -name '*.h')))
-OBJ4tools := $(SRC4tools:.c=.o)
-SRCS += $(SRC4tools)
+$(foreach COMPONENT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(COMPONENT))))
+SRCS := $(filter-out %_driver.c,$(SRCS))
+OBJS_dbwrapper := $(filter-out %_driver.o,$(OBJS_dbwrapper))
 
-# dbwrapper
-SRC4dbwrapper = $(strip $(sort $(shell $(FIND) $(DBWRAPPERDIR) -name '*.c' -a ! -name '*_driver.c')))
-HDR4dbwrapper = $(strip $(sort $(shell $(FIND) $(DBWRAPPERDIR) -name '*.h')))
-OBJ4dbwrapper := $(SRC4dbwrapper:.c=.o)
-SRCS += $(SRC4dbwrapper)
 ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
-	OBJ4mysql_driver = 
-	OBJ4mysql_driver += mysql_driver
+	OBJS_MYSQL_DRIVER := mysql_driver
+	OBJS_MYSQL_DRIVER := $(patsubst %,$(DIR_dbwrapper)%.o, $(OBJS_MYSQL_DRIVER))
+	SRCS += $(patsubst %.o,%.c, $(OBJS_MYSQL_DRIVER))
 endif # MYSQL_DRIVER
 ifneq ("@TARGET_POSTGRESQL_DRIVER@","") # POSTGRESQL_DRIVER
-	OBJ4postgresql_driver = 
-	OBJ4postgresql_driver += postgresql_driver
+	OBJS_POSTGRESQL_DRIVER := postgresql_driver
+	OBJS_POSTGRESQL_DRIVER := $(patsubst %,$(DIR_DBWRAPPER)%.o, $(OBJS_POSTGRESQL_DRIVER))
+	SRCS += $(patsubst %.o,%.c, $(OBJS_POSTGRESQL_DRIVER))
 endif # POSTGRESQL_DRIVER
 ifneq ("@TARGET_SQLITE_DRIVER@","") # SQLITE_DRIVER
-	OBJ4sqlite_driver = 
-	OBJ4sqlite_driver += sqlite_driver
+	OBJS_SQLITE_DRIVER := sqlite_driver
+	OBJS_SQLITE_DRIVER := $(patsubst %,$(DIR_dbwrapper)%.o, $(OBJS_SQLITE_DRIVER))
+	SRCS += $(patsubst %.o,%.c, $(OBJS_SQLITE_DRIVER))
 endif # SQLITE_DRIVER
 ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
-	OBJ4sqlite3_driver = 
-	OBJ4sqlite3_driver += sqlite3_driver
+	OBJS_sqlite3_driver := sqlite3_driver
+	OBJS_sqlite3_driver := $(patsubst %,$(DIR_dbwrapper)%.o, $(OBJS_sqlite3_driver))
+	SRCS += $(patsubst %.o,%.c, $(OBJS_sqlite3_driver))
 endif # SQLITE3_DRIVER
 
-#	h-data
-SRC4hdata = $(strip $(sort $(shell $(FIND) $(HDATADIR) -name '*.c')))
-HDR4hdata = $(strip $(sort $(shell $(FIND) $(HDATADIR) -name '*.h')))
-OBJ4hdata := $(SRC4hdata:.c=.o)
-SRCS += $(SRC4hdata)
-
-ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
-	OBJ4mysql_driver := $(strip $(OBJ4mysql_driver))
-	OBJ4mysql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4mysql_driver))
-endif # MYSQL_DRIVER
-ifneq ("@TARGET_POSTGRESQL_DRIVER@","") # POSTGRESQL_DRIVER
-	OBJ4postgresql_driver := $(strip $(OBJ4postgresql_driver))
-	OBJ4postgresql_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4postgresql_driver))
-endif
-ifneq ("@TARGET_SQLITE_DRIVER@","") # SQLITE_DRIVER
-	OBJ4sqlite_driver := $(strip $(OBJ4sqlite_driver))
-	OBJ4sqlite_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite_driver))
-endif # SQLITE_DRIVER
-ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
-	OBJ4sqlite3_driver := $(strip $(OBJ4sqlite3_driver))
-	OBJ4sqlite3_driver := $(patsubst %,$(DBWRAPPERDIR)%.o, $(OBJ4sqlite3_driver))
-endif # SQLITE3_DRIVER
-
-ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
-	SRCS += $(patsubst %.o,%.c, $(OBJ4mysql_driver))
-endif # MYSQL_DRIVER
-ifneq ("@TARGET_POSTGRESQL_DRIVER@","") # POSTGRESQL_DRIVER
-	SRCS += $(patsubst %.o,%.c, $(OBJ4postgresql_driver))
-endif # POSTGRESQL_DRIVER
-ifneq ("@TARGET_SQLITE_DRIVER@","") # SQLITE_DRIVER
-	SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite_driver))
-endif # SQLITE_DRIVER
-ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
-	SRCS += $(patsubst %.o,%.c, $(OBJ4sqlite3_driver))
-endif # SQLITE3_DRIVER
+DEPS=$(subst ~, -MT ,$(join $(patsubst %.c,"%.c~", $(sort $(SRCS))),$(sort $(patsubst %.c,$(DIR_BUILD)/%.o,$(SRCS)))))
 
 #-------------------------------------------------------------------
 
-DEPS=$(subst ~, -MT ,$(join $(patsubst %.c,"%.c~", $(sort $(SRCS))),$(sort $(patsubst %.c,%.o,$(SRCS)))))
-
 # implict pattern rule
 	
-%.o : %.c
+$(DIR_BUILD)/%.o %.o: %.c $(DIR_BUILD)
 	@echo -n "Compiling \`$@' ... "
 	@$(CXX) $(CXXFLAGS) $< -c -o $@ 2>&1 | tee -a make.log
 	@echo -ne "done.\r"
@@ -210,15 +171,15 @@ $(TARGET):
 	@echo -n "Linking \`$@ ... "
 	@tput bold
 	@tput setaf 1
-	@$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,--entry="stdhapi_$(NAME)_main" -Wl,-\( $(OBJ4$(NAME)) -Wl,-\) 2>&1 | tee -a make.log
+	@$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,--entry="stdhapi_$(NAME)_main" -Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log
 	@tput sgr0
-	@$(AR) $(ARFLAGS) lib$(NAME).a $(OBJ4$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log
-	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(TARGETDIR)/
-	@/bin/mv -f lib$(NAME).a $(TARGETDIR)/
+	@$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log
+	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(DIR_TARGET)/
+	@/bin/mv -f lib$(NAME).a $(DIR_TARGET)/
 	@echo -n "making cache ... "
-	@(cd $(TARGETDIR);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;$(TARGETDIR)/mkcache;ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so)
+	@(cd $(DIR_TARGET);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;$(DIR_TARGET)/mkcache;ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so)
 	@echo -ne "done.\r"
-	@tput el
+#	@tput el
 
 #-------------------------------------------------------------------
 
@@ -229,9 +190,16 @@ $(TARGET):
 	@tput sgr0
 
 #phony targets
-.PHONY: all nodebug install dep clean tags mrproper purge
+.PHONY: all nodebug install dep clean tags mrproper purge environment
 
-all: $(HAPIHDR) .depend $(CACHE) $(HCORE) $(HCONSOLE) $(TOOLS) @TARGET_MYSQL_DRIVER@ @TARGET_POSTGRESQL_DRIVER@ @TARGET_SQLITE_DRIVER@ @TARGET_SQLITE3_DRIVER@ $(DBWRAPPER) $(HDATA)
+all: .depend $(LD_CACHE) $(TARGET_hcore) $(TARGET_hconsole) $(TARGET_tools) @TARGET_MYSQL_DRIVER@ @TARGET_POSTGRESQL_DRIVER@ @TARGET_SQLITE_DRIVER@ @TARGET_SQLITE3_DRIVER@ $(TARGET_dbwrapper) $(TARGET_hdata) $(HAPI_HEADER)
+
+$(DIR_HEADERS):
+	@/bin/mkdir -p $(DIR_HEADERS)
+
+$(DIR_BUILD):
+	@/bin/mkdir -p $(DIR_BUILD)
+	@/bin/mkdir -p $(DIR_BUILD)/$(DIR_hcore) $(DIR_BUILD)/$(DIR_hconsole) $(DIR_BUILD)/$(DIR_tools) $(DIR_BUILD)/$(DIR_dbwrapper) $(DIR_BUILD)/$(DIR_hdata)
 
 nodebug:
 	@( export NODEBUG="yes";\
@@ -240,78 +208,72 @@ nodebug:
 install: all
 	@./aux/msh
 
-$(HCORE): $(OBJ4hcore)
-	@$(MAKE) $(HCORE)\' TARGET=$(HCORE)\' NAME=hcore LIBS="@GETTEXT_LIB@"
+$(eval $(call BUILD_TARGET,hcore,,@GETTEXT_LIB@))
+$(eval $(call BUILD_TARGET,hconsole,$(TARGET_hcore),"-lncurses @MOUSE_LIB@ -lhcore"))
+$(eval $(call BUILD_TARGET,tools,$(TARGET_hconsole),"-lncurses -lhcore -lhconsole"))
+$(eval $(call BUILD_TARGET,dbwrapper,$(TARGET_hcore),"-rdynamic @DLOPEN_IN@ -lhcore -lhconsole -ltools"))
+$(eval $(call BUILD_TARGET,hdata,$(TARGET_dbwrapper) $(TARGET_hconsole),"-lncurses -lhcore -lhconsole -ldbwrapper"))
 
-$(HCONSOLE): $(HCORE) $(OBJ4hconsole)
-	@$(MAKE) $(HCONSOLE)\' TARGET=$(HCONSOLE)\' NAME=hconsole LIBS="-lncurses @MOUSE_LIB@ -lhcore"
-	
-$(TOOLS): $(HCONSOLE) $(OBJ4tools)
-	@$(MAKE) $(TOOLS)\' TARGET=$(TOOLS)\' NAME=tools LIBS="-lncurses -lhcore -lhconsole"
-
-# dbwrapper BEGIN
-$(DBWRAPPER) : $(HCORE) $(OBJ4dbwrapper)
-	@$(MAKE) $(DBWRAPPER)\' TARGET=$(DBWRAPPER)\' NAME=dbwrapper LIBS="-rdynamic @DLOPEN_IN@ -lhcore -lhconsole -ltools"
-
-$(MYSQL_DRIVER): $(HCORE) $(OBJ4mysql_driver) $(DBWRAPPER)
+# drivers BEGIN
+$(MYSQL_DRIVER): $(HCORE) $(OBJ_MYSQL_DRIVER)
 	@$(MAKE) $(MYSQL_DRIVER)\' TARGET=$(MYSQL_DRIVER)\' NAME=mysql_driver LIBS="-lmysqlclient -lhcore"
 
-$(POSTGRESQL_DRIVER): $(HCORE) $(OBJ4postgresql_driver)
+$(POSTGRESQL_DRIVER): $(HCORE) $(OBJ_POSTGRESQL_DRIVER)
 	@$(MAKE) $(POSTGRESQL_DRIVER)\' TARGET=$(POSTGRESQL_DRIVER)\' NAME=postgresql_driver LIBS="-lpq -lhcore"
 	
-$(SQLITE_DRIVER): $(HCORE) $(OBJ4sqlite_driver)
+$(SQLITE_DRIVER): $(HCORE) $(OBJ_SQLITE_DRIVER)
 	@$(MAKE) $(SQLITE_DRIVER)\' TARGET=$(SQLITE_DRIVER)\' NAME=sqlite_driver LIBS="-lsqlite -lhcore"
 
-$(SQLITE3_DRIVER): $(HCORE) $(OBJ4sqlite3_driver)
+$(SQLITE3_DRIVER): $(HCORE) $(OBJS_sqlite3_driver)
 	@$(MAKE) $(SQLITE3_DRIVER)\' TARGET=$(SQLITE3_DRIVER)\' NAME=sqlite3_driver LIBS="-lsqlite3 -lhcore"
-# dbwrapper END
+# drivers END
 
-$(HDATA): $(HCONSOLE) $(OBJ4hdata)
-	@$(MAKE) $(HDATA)\' TARGET=$(HDATA)\' NAME=hdata LIBS="-lncurses -lhcore -lhconsole -ldbwrapper"
 
-$(HAPIHDR): $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
-	@echo -n "Making header dir ... "
-	@/bin/mkdir -p $(HEADERSDIR)
-	@for FILE in $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata); do \
-		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };!/^#include "/' $$FILE > $(HEADERSDIR)/`basename $$FILE`;\
+$(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
+	@echo -n "Making headers ... "
+	@for FILE in $(HDRS); do \
+		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`;\
 	done
-	@head -26 $(HEADERSDIR)/bit.h | sed -e s/bit/stdhapi/ > $(HEADERSDIR)/stdhapi.h
-	@echo '#ifndef __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
-	@echo '#define __STDHAPI_H' >> $(HEADERSDIR)/stdhapi.h
-	@echo '' >> $(HEADERSDIR)/stdhapi.h
-	@cat config.h >> $(HEADERSDIR)/stdhapi.h
-	@find $(HEADERSDIR) ! -name 'stdhapi.h' -type f | awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' | sort >> $(HEADERSDIR)/stdhapi.h
-	@echo '' >> $(HEADERSDIR)/stdhapi.h
-	@echo '#endif /* not __STDHAPI_H */' >> $(HEADERSDIR)/stdhapi.h
+	@head -26 $(DIR_HEADERS)/bit.h | sed -e s/bit/stdhapi/ > $(DIR_HEADERS)/stdhapi.h
+	@echo '#ifndef __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h
+	@echo '#define __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h
+	@echo '' >> $(DIR_HEADERS)/stdhapi.h
+	@cat config.h >> $(DIR_HEADERS)/stdhapi.h
+	@find $(DIR_HEADERS) ! -name 'stdhapi.h' -type f | awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' | sort >> $(DIR_HEADERS)/stdhapi.h
+	@echo '' >> $(DIR_HEADERS)/stdhapi.h
+	@echo '#endif /* not __STDHAPI_H */' >> $(DIR_HEADERS)/stdhapi.h
 	@echo "done."
+	@tput bold
+	@echo "All OK!"
+	@tput sgr0
 
-$(CACHE):
+$(LD_CACHE):
 	@echo -n "Making environment ... "
-	@/bin/mkdir -p $(TARGETDIR)
-	@echo $(TARGETDIR) > $(TARGETDIR)/ld.so.conf
-	@/bin/cp -f ./aux/mkcache $(TARGETDIR)
+	@/bin/mkdir -p $(DIR_TARGET)
+	@echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf
+	@/bin/cp -f ./aux/mkcache $(DIR_TARGET)
 	@echo "done."
 
 dep: .depend
-.depend: $(SRCS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
-	@echo -n 'Making dependicies ... '
+.depend: $(SRCS) $(HDRS)
+	@echo -n 'Making dependencies ... '
 	@set -e; for DEP in $(DEPS); do $(DXX) $(CXXFLAGS) -MM $${DEP} ; done > .depend
 	@echo "# vim:ft=make:" >> .depend
 	@/bin/rm -f make.log
 	@echo 'done.'
 
 clean:
-	@/bin/rm -f $(OBJ4hcore) $(OBJ4hconsole) $(OBJ4tools) $(OBJ4dbwrapper) $(OBJ4hdata)
+	@/bin/rm -f $(OBJS_HCORE) $(OBJS_HCONSOLE) $(OBJS_TOOLS) $(OBJS_DBWRAPPER) $(OBJS_HDATA)
 	@cln .
 
-tags: $(SRCS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
+tags: $(SRCS) $(HDRS)
 	@echo -n "Rehashing tags ... "
 	@$(CTAGS) -R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" --c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" --extra="+f+q"
 	@echo "done."
 
 mrproper: clean
 	@echo -n "Purging ... "
-	@/bin/rm -rf $(TARGETDIR) $(HEADERSDIR) make.log
+	@/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD) make.log
 	@find . -name 'tags' -or -name '.depend' -or -name '*.a'| xargs /bin/rm -f
 	@echo "done."
 
@@ -323,3 +285,4 @@ ifneq ($(wildcard .depend),)
 include .depend
 endif
 
+# vim:ts=2
