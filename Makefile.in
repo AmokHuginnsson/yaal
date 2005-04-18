@@ -56,6 +56,8 @@ FIND = find
 .SUFFIXES: $(SS) $(OS) $(HS)
 CXX ?= g++
 CXX := $(subst -x c++ -x c++,-x c++,$(subst colorgcc,colorgcc -x c++,$(CXX)))
+DXX ?= $(CXX)
+DXX := $(subst colorgcc -x c++,g++,$(DXX))
 LXX ?= g++
 ARFLAGS = r
 CWARNING_FLAGS =	\
@@ -293,7 +295,7 @@ $(CACHE):
 dep: .depend
 .depend: $(SRCS) $(HDR4hcore) $(HDR4hconsole) $(HDR4tools) $(HDR4dbwrapper) $(HDR4hdata)
 	@echo -n 'Making dependicies ... '
-	@set -e; for DEP in $(DEPS); do $(CXX) $(CXXFLAGS) -MM $${DEP} ; done > .depend
+	@set -e; for DEP in $(DEPS); do $(DXX) $(CXXFLAGS) -MM $${DEP} ; done > .depend
 	@echo "# vim:ft=make:" >> .depend
 	@/bin/rm -f make.log
 	@echo 'done.'
