@@ -30,15 +30,12 @@ SUBVERSION		= 0
 EXTRAVERSION	= 0
 RELEASE				= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 COMPONENTS		= hcore hconsole tools dbwrapper hdata
+DRIVERS				= @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE_DRIVER@ @DO_SQLITE3_DRIVER@
 DIR_TARGET		= $(HOME)/lib
 DIR_HEADERS		= $(HOME)/prog/include
 DIR_BUILD			= ./build/
 HAPI_HEADER		= $(DIR_HEADERS)/stdhapi.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
-MYSQL_DRIVER			= $(DIR_TARGET)/libmysql_driver.so.$(RELEASE)
-POSTGRESQL_DRIVER	= $(DIR_TARGET)/libpostgresql_driver.so.$(RELEASE)
-SQLITE_DRIVER			= $(DIR_TARGET)/libsqlite_driver.so.$(RELEASE)
-SQLITE3_DRIVER		= $(DIR_TARGET)/libsqlite3_driver.so.$(RELEASE)
 HS = .h
 SS = .c
 OS = .o
@@ -116,6 +113,7 @@ LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 define PREPARE_VARIABLES
 	DIR_$(1) := ./$(1)/
 	TARGET_$(1) := $$(DIR_TARGET)/lib$(1).so.$$(RELEASE)
+	TARGETS += $$(TARGET_$(1))
 	SRC_$(1) = $$(strip $$(sort $$(shell $$(FIND) $$(DIR_$(1)) -name "*.c")))
 	HDRS += $$(strip $$(sort $$(shell $$(FIND) $$(DIR_$(1)) -name "*.h")))
 	OBJS_$(1) := $$(patsubst %.c,$$(DIR_BUILD)/%.o,$$(SRC_$(1)))
@@ -127,32 +125,38 @@ $$(TARGET_$(1)): $$(OBJS_$(1)) $(2)
 	@$$(MAKE) $$(TARGET_$(1))\' TARGET=$$(TARGET_$(1))\' NAME=$(1) LIBS=$(3)
 endef
 
+define CONFIGURE_DRIVER
+	TARGET_$(1)_driver := $$(DIR_TARGET)/lib$(1)_driver.so.$$(RELEASE)
+	TARGETS += $$(TARGET_$(1)_driver)
+	OBJS_$(1)_driver := $(1)_driver
+	SRCS += $$(patsubst %,$$(DIR_dbwrapper)/%.c,$$(OBJS_$(1)_driver))
+	OBJS_$(1)_driver := $$(patsubst %,$$(DIR_BUILD)/$$(DIR_dbwrapper)%.o, $$(OBJS_$(1)_driver))
+endef
+
 $(foreach COMPONENT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(COMPONENT))))
 SRCS := $(filter-out %_driver.c,$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.o,$(OBJS_dbwrapper))
-
-ifneq ("@TARGET_MYSQL_DRIVER@","") # MYSQL_DRIVER
-	OBJS_MYSQL_DRIVER := mysql_driver
-	OBJS_MYSQL_DRIVER := $(patsubst %,$(DIR_dbwrapper)%.o, $(OBJS_MYSQL_DRIVER))
-	SRCS += $(patsubst %.o,%.c, $(OBJS_MYSQL_DRIVER))
-endif # MYSQL_DRIVER
-ifneq ("@TARGET_POSTGRESQL_DRIVER@","") # POSTGRESQL_DRIVER
-	OBJS_POSTGRESQL_DRIVER := postgresql_driver
-	OBJS_POSTGRESQL_DRIVER := $(patsubst %,$(DIR_DBWRAPPER)%.o, $(OBJS_POSTGRESQL_DRIVER))
-	SRCS += $(patsubst %.o,%.c, $(OBJS_POSTGRESQL_DRIVER))
-endif # POSTGRESQL_DRIVER
-ifneq ("@TARGET_SQLITE_DRIVER@","") # SQLITE_DRIVER
-	OBJS_SQLITE_DRIVER := sqlite_driver
-	OBJS_SQLITE_DRIVER := $(patsubst %,$(DIR_dbwrapper)%.o, $(OBJS_SQLITE_DRIVER))
-	SRCS += $(patsubst %.o,%.c, $(OBJS_SQLITE_DRIVER))
-endif # SQLITE_DRIVER
-ifneq ("@TARGET_SQLITE3_DRIVER@","") # SQLITE3_DRIVER
-	OBJS_sqlite3_driver := sqlite3_driver
-	OBJS_sqlite3_driver := $(patsubst %,$(DIR_dbwrapper)%.o, $(OBJS_sqlite3_driver))
-	SRCS += $(patsubst %.o,%.c, $(OBJS_sqlite3_driver))
-endif # SQLITE3_DRIVER
-
+$(foreach DRIVER,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(DRIVER))))
 DEPS=$(subst ~, -MT ,$(join $(patsubst %.c,"%.c~", $(sort $(SRCS))),$(sort $(patsubst %.c,$(DIR_BUILD)/%.o,$(SRCS)))))
+
+LIBS_hcore			=	@GETTEXT_LIB@
+DEPS_hconsole		= $(TARGET_hcore)
+LIBS_hconsole		= "-lncurses @MOUSE_LIB@ -lhcore"
+DEPS_tools			= $(TARGET_hconsole)
+LIBS_tools			= "-lncurses -lhcore -lhconsole"
+DEPS_dbwrapper	= $(TARGET_hcore)
+LIBS_dbwrapper	= "-rdynamic @DLOPEN_IN@ -lhcore -lhconsole -ltools"
+DEPS_hdata			= $(TARGET_dbwrapper) $(TARGET_hconsole)
+LIBS_hdata			= "-lncurses -lhcore -lhconsole -ldbwrapper"
+
+DEPS_mysql			= $(TARGET_hcore)
+LIBS_mysql			= "-lmysqlclient -lhcore"
+DEPS_postgresql	= $(TARGET_hcore)
+LIBS_postgresql	= "-lpq -lhcore"
+DEPS_sqlite			= $(TARGET_hcore)
+LIBS_sqlite			= "-lsqlite -lhcore"
+DEPS_sqlite3		= $(TARGET_hcore)
+LIBS_sqlite3		= "-lsqlite3 -lhcore"
 
 #-------------------------------------------------------------------
 
@@ -179,7 +183,7 @@ $(TARGET):
 	@echo -n "making cache ... "
 	@(cd $(DIR_TARGET);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;$(DIR_TARGET)/mkcache;ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so)
 	@echo -ne "done.\r"
-#	@tput el
+	@tput el
 
 #-------------------------------------------------------------------
 
@@ -192,7 +196,7 @@ $(TARGET):
 #phony targets
 .PHONY: all nodebug install dep clean tags mrproper purge environment
 
-all: .depend $(LD_CACHE) $(TARGET_hcore) $(TARGET_hconsole) $(TARGET_tools) @TARGET_MYSQL_DRIVER@ @TARGET_POSTGRESQL_DRIVER@ @TARGET_SQLITE_DRIVER@ @TARGET_SQLITE3_DRIVER@ $(TARGET_dbwrapper) $(TARGET_hdata) $(HAPI_HEADER)
+all: .depend $(LD_CACHE) $(TARGETS) $(HAPI_HEADER)
 
 $(DIR_HEADERS):
 	@/bin/mkdir -p $(DIR_HEADERS)
@@ -208,26 +212,8 @@ nodebug:
 install: all
 	@./aux/msh
 
-$(eval $(call BUILD_TARGET,hcore,,@GETTEXT_LIB@))
-$(eval $(call BUILD_TARGET,hconsole,$(TARGET_hcore),"-lncurses @MOUSE_LIB@ -lhcore"))
-$(eval $(call BUILD_TARGET,tools,$(TARGET_hconsole),"-lncurses -lhcore -lhconsole"))
-$(eval $(call BUILD_TARGET,dbwrapper,$(TARGET_hcore),"-rdynamic @DLOPEN_IN@ -lhcore -lhconsole -ltools"))
-$(eval $(call BUILD_TARGET,hdata,$(TARGET_dbwrapper) $(TARGET_hconsole),"-lncurses -lhcore -lhconsole -ldbwrapper"))
-
-# drivers BEGIN
-$(MYSQL_DRIVER): $(HCORE) $(OBJ_MYSQL_DRIVER)
-	@$(MAKE) $(MYSQL_DRIVER)\' TARGET=$(MYSQL_DRIVER)\' NAME=mysql_driver LIBS="-lmysqlclient -lhcore"
-
-$(POSTGRESQL_DRIVER): $(HCORE) $(OBJ_POSTGRESQL_DRIVER)
-	@$(MAKE) $(POSTGRESQL_DRIVER)\' TARGET=$(POSTGRESQL_DRIVER)\' NAME=postgresql_driver LIBS="-lpq -lhcore"
-	
-$(SQLITE_DRIVER): $(HCORE) $(OBJ_SQLITE_DRIVER)
-	@$(MAKE) $(SQLITE_DRIVER)\' TARGET=$(SQLITE_DRIVER)\' NAME=sqlite_driver LIBS="-lsqlite -lhcore"
-
-$(SQLITE3_DRIVER): $(HCORE) $(OBJS_sqlite3_driver)
-	@$(MAKE) $(SQLITE3_DRIVER)\' TARGET=$(SQLITE3_DRIVER)\' NAME=sqlite3_driver LIBS="-lsqlite3 -lhcore"
-# drivers END
-
+$(foreach COMPONENT,$(COMPONENTS),$(eval $(call BUILD_TARGET,$(COMPONENT),$(DEPS_$(COMPONENT)),$(LIBS_$(COMPONENT)))))
+$(foreach DRIVER,$(DRIVERS),$(eval $(call BUILD_TARGET,$(DRIVER)_driver,$(DEPS_$(DRIVER)),$(LIBS_$(DRIVER)))))
 
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	@echo -n "Making headers ... "

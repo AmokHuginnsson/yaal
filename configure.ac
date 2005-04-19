@@ -223,10 +223,10 @@ AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 			[AC_MSG_ERROR([Can not continue without ncurses devel!])])])
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],
-		[AC_SUBST([TARGET_POSTGRESQL_DRIVER],["\$(POSTGRESQL_DRIVER)"])
+		[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql)"])
 			DEFAULT_DRIVER=["PostgreSQL"]],
 		[AC_CHECK_HEADERS([[libpq-fe.h]],
-			[AC_SUBST([TARGET_POSTGRESQL_DRIVER],["\$(POSTGRESQL_DRIVER)"])
+			[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql)"])
 			DEFAULT_DRIVER=["PostgreSQL"]],
 				[if test ["$POSTGRES"] = ["yes"] ; then
 					AC_MSG_ERROR([[Can not continue without PostgreSQL devel(client)!]])
@@ -234,7 +234,7 @@ if test ["$POSTGRES"] != ["no"] ; then
 fi
 if test ["$MYSQL"] != ["no"] ; then
 	AC_CHECK_HEADERS([[mysql/mysql.h]],
-		[AC_SUBST([TARGET_MYSQL_DRIVER],["\$(MYSQL_DRIVER)"])
+		[AC_SUBST([DO_MYSQL_DRIVER],["mysql"])
 			DEFAULT_DRIVER=["MySQL"]],
 				[if test ["$MYSQL"] = ["yes"] ; then
 					AC_MSG_ERROR([[Can not continue without MySQL devel(client)!]])
@@ -242,7 +242,7 @@ if test ["$MYSQL"] != ["no"] ; then
 fi
 if test ["$SQLITE"] != ["no"] ; then
 	AC_CHECK_HEADERS([[sqlite.h]],
-		[AC_SUBST([TARGET_SQLITE_DRIVER],["\$(SQLITE_DRIVER)"])
+		[AC_SUBST([DO_SQLITE_DRIVER],["sqlite"])
 			DEFAULT_DRIVER=["SQLite"]],
 				[if test ["$SQLITE"] = ["yes"] ; then
 					AC_MSG_ERROR([[Can not continue without SQLite devel(client)!]])
@@ -250,7 +250,7 @@ if test ["$SQLITE"] != ["no"] ; then
 fi
 if test ["$SQLITE3"] != ["no"] ; then
 	AC_CHECK_HEADERS([[sqlite3.h]],
-		[AC_SUBST([TARGET_SQLITE3_DRIVER],["\$(SQLITE3_DRIVER)"])
+		[AC_SUBST([DO_SQLITE3_DRIVER],["sqlite3"])
 			DEFAULT_DRIVER=["SQLite3"]],
 				[if test ["$SQLITE3"] = ["yes"] ; then
 					AC_MSG_ERROR([[Can not continue without SQLite3 devel(client)!]])
