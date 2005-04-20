@@ -31,12 +31,15 @@ EXTRAVERSION	= 0
 RELEASE				= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 COMPONENTS		= hcore hconsole tools dbwrapper hdata
 DRIVERS				= @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE_DRIVER@ @DO_SQLITE3_DRIVER@
+export DIR_ROOT	?= $(CURDIR)
 DIR_TARGET		= $(HOME)/lib
 DIR_HEADERS		= $(HOME)/prog/include
-DIR_BUILD			= ./build/
+DIR_BUILD			= $(DIR_ROOT)/build
+VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/stdhapi.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
+n=0
 HS = .h
 SS = .c
 OS = .o
@@ -95,7 +98,7 @@ else
 	COMPILER_DEBUG_FLAGS				= -g -g3 -ggdb -ggdb3 -gstabs+ -pg -fno-inline \
 																-D__DEBUG__ $(DB)
 endif
-COMPILER_PATH_FLAGS						= -I. -I/usr/local/include
+COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I/usr/local/include
 # -fno-external-templates #deprecated
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \
 																@EXTRA_LIB_PATHS@
@@ -114,12 +117,24 @@ LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 define PREPARE_VARIABLES
 	DIR_$(1) := ./$(1)/
 	DIRS += $$(DIR_BUILD)/$$(DIR_$(1))
+ifeq ($(CURDIR),$(DIR_BUILD))
 	TARGET_$(1) := $$(DIR_TARGET)/lib$(1).so.$$(RELEASE)
 	TARGETS += $$(TARGET_$(1))
-	SRC_$(1) = $$(strip $$(sort $$(shell $$(FIND) $$(DIR_$(1)) -name "*.c")))
-	HDRS += $$(strip $$(sort $$(shell $$(FIND) $$(DIR_$(1)) -name "*.h")))
-	OBJS_$(1) := $$(patsubst %.c,$$(DIR_BUILD)/%.o,$$(SRC_$(1)))
+	HDRS += $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) $$(DIR_$(1)) -name "*.h")))
+	SRC_$(1) = $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) $$(DIR_$(1)) -name "*.c")))
 	SRCS += $$(SRC_$(1))
+	OBJS_$(1) := $$(patsubst %.c,%.o,$$(SRC_$(1)))
+	OBJS += $$(OBJS_$(1))
+endif
+endef
+
+define CONFIGURE_DRIVER
+	TARGET_$(1)_driver := $$(DIR_TARGET)/lib$(1)_driver.so.$$(RELEASE)
+	TARGETS += $$(TARGET_$(1)_driver)
+	OBJS_$(1)_driver := $(1)_driver
+	SRCS += $$(patsubst %,$$(DIR_ROOT)/$$(DIR_dbwrapper)/%.c,$$(OBJS_$(1)_driver))
+	OBJS_$(1)_driver := $$(patsubst %,$$(DIR_dbwrapper)%.o, $$(OBJS_$(1)_driver))
+	OBJS += $$(OBJS_$(1))
 endef
 
 define MAKE_DIR
@@ -129,22 +144,13 @@ endef
 
 define BUILD_TARGET
 $$(TARGET_$(1)): $$(OBJS_$(1)) $(2)
-	@$$(MAKE) --no-print-directory $$(TARGET_$(1))\' TARGET=$$(TARGET_$(1))\' NAME=$(1) LIBS=$(3)
-endef
-
-define CONFIGURE_DRIVER
-	TARGET_$(1)_driver := $$(DIR_TARGET)/lib$(1)_driver.so.$$(RELEASE)
-	TARGETS += $$(TARGET_$(1)_driver)
-	OBJS_$(1)_driver := $(1)_driver
-	SRCS += $$(patsubst %,$$(DIR_dbwrapper)/%.c,$$(OBJS_$(1)_driver))
-	OBJS_$(1)_driver := $$(patsubst %,$$(DIR_BUILD)/$$(DIR_dbwrapper)%.o, $$(OBJS_$(1)_driver))
+	@$$(MAKE) -f ../Makefile --no-print-directory $$(TARGET_$(1))\' TARGET=$$(TARGET_$(1))\' NAME=$(1) LIBS=$(3)
 endef
 
 $(foreach COMPONENT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(COMPONENT))))
 SRCS := $(filter-out %_driver.c,$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.o,$(OBJS_dbwrapper))
 $(foreach DRIVER,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(DRIVER))))
-DEPS=$(subst ~, -MT ,$(join $(patsubst %.c,"%.c~", $(sort $(SRCS))),$(sort $(patsubst %.c,$(DIR_BUILD)/%.o,$(SRCS)))))
 
 LIBS_hcore			=	@GETTEXT_LIB@
 DEPS_hconsole		= $(TARGET_hcore)
@@ -169,19 +175,19 @@ LIBS_sqlite3		= "-lsqlite3 -lhcore"
 
 # implict pattern rule
 	
-$(DIR_BUILD)/%.o %.o: %.c
-	@echo -n "Compiling $(n) \`$@' ... "; \
-	$(CXX) $(CXXFLAGS) $< -c -o $@ 2>&1 | tee -a make.log; \
-	echo -ne "done.\r"; \
-	tput el
+%.o: %.c
+	@echo -n "Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... "; \
+	echo -n "$(@:.o=.d) " > $(@:.o=.d); \
+	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) >> $(@:.o=.d); \
+	$(CXX) $(CXXFLAGS) $(<) -c -o $(@) 2>&1 | tee -a make.log; \
+	echo -ne "done.\r"; tput el
 
 #	this is "rule" for linking libs
 
 $(TARGET):
 	@if [ "$(TARGET)" = "" -o "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
-	echo -n "Linking \`$@ ... "; \
-	tput bold; \
-	tput setaf 1; \
+	echo -n "Linking \`$(@) ... "; \
+	tput bold; tput setaf 1; \
 	$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,--entry="stdhapi_$(NAME)_main" -Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; \
 	tput sgr0; \
 	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log; \
@@ -194,21 +200,25 @@ $(TARGET):
 	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION); \
 	ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
 	ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so; \
-	echo -ne "done.\r"; \
-	tput el
+	echo -ne "done.\r"; tput el
 
 #-------------------------------------------------------------------
 
 .DEFAULT:
-	@tput bold; \
-	tput setaf 1; \
-	echo "Lack of \`$<'." | tee -a make.log; \
-	tput sgr0
+	@if [ "$(suffix $(<))" != ".d" ] ; then \
+	tput bold; tput setaf 1; \
+	echo "Lack of \`$(<)'." | tee -a make.log; \
+	tput sgr0; fi
 
 #phony targets
 .PHONY: all nodebug install dep clean tags mrproper purge environment
 
-all: environment .depend $(TARGETS) $(HAPI_HEADER)
+ifneq ($(CURDIR),$(DIR_BUILD))
+all: environment
+	@$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile
+else
+all: $(TARGETS) $(HAPI_HEADER)
+endif
 
 $(foreach COMPONENT,$(COMPONENTS),$(eval $(call BUILD_TARGET,$(COMPONENT),$(DEPS_$(COMPONENT)),$(LIBS_$(COMPONENT)))))
 $(foreach DRIVER,$(DRIVERS),$(eval $(call BUILD_TARGET,$(DRIVER)_driver,$(DEPS_$(DRIVER)),$(LIBS_$(DRIVER)))))
@@ -224,7 +234,7 @@ install: all
 	@./aux/msh
 
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
-	@echo -n "Making headers ... "; \
+	@cd $(DIR_ROOT); echo -n "Making headers ... "; \
 	for FILE in $(HDRS); do \
 		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`;\
 	done; \
@@ -237,48 +247,40 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	echo '' >> $(DIR_HEADERS)/stdhapi.h; \
 	echo '#endif /* not __STDHAPI_H */' >> $(DIR_HEADERS)/stdhapi.h; \
 	echo -ne 'done.\r'; \
-	tput el; \
-	tput bold; \
-	echo "All OK!"; \
-	tput sgr0
+	tput el; tput bold; \
+	echo "All OK!"; tput sgr0
 
 $(LD_CACHE):
 	@echo -n "Making environment ... "; \
 	echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf; \
 	/bin/cp -f ./aux/mkcache $(DIR_TARGET); \
-	echo -ne "done.\r"; \
-	tput el
+	echo -ne "done.\r"; tput el
 
-dep: .depend
-.depend: $(SRCS) $(HDRS)
-	@echo -n 'Making dependencies ... '; \
-	set -e; for DEP in $(DEPS); do $(DXX) $(CXXFLAGS) -MM $${DEP} ; done > .depend; \
-	echo "# vim:ft=make:" >> .depend; \
-	/bin/rm -f make.log; \
-	echo -ne 'done.\r'; \
-	tput el
+clean-dep:
+	@$(FIND) . -name '*.d' | xargs /bin/rm -f
 
-clean:
+clean: clean-dep
 	@/bin/rm -f $(OBJS_HCORE) $(OBJS_HCONSOLE) $(OBJS_TOOLS) $(OBJS_DBWRAPPER) $(OBJS_HDATA); \
 	cln .
-
-tags: $(SRCS) $(HDRS)
-	@echo -n "Rehashing tags ... "; \
-	$(CTAGS) -R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" --c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" --extra="+f+q"; \
-	echo "done."
 
 mrproper: clean
 	@echo -n "Purging ... "; \
 	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD) make.log; \
-	find . -name 'tags' -or -name '.depend' -or -name '*.a'| xargs /bin/rm -f; \
+	$(FIND) . -name 'tags' -or -name '.depend' -or -name '*.a'| xargs /bin/rm -f; \
 	echo "done."; \
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache configure config.cache config.log config.status configure.lineno; \
 	/bin/rm -rf Makefile config.h stdhapirc
 
-ifneq ($(wildcard .depend),)
-include .depend
+tags: $(SRCS) $(HDRS)
+	@echo -n "Rehashing tags ... "; \
+	$(CTAGS)	-R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" \
+						--c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" --extra="+f+q"; \
+	echo "done."
+
+ifeq ($(CURDIR),$(DIR_BUILD))
+-include $(OBJS:.o=.d)
 endif
 
 # vim:ts=2
