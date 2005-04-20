@@ -34,6 +34,7 @@ DRIVERS				= @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE_DRIVER@ @DO_SQL
 DIR_TARGET		= $(HOME)/lib
 DIR_HEADERS		= $(HOME)/prog/include
 DIR_BUILD			= ./build/
+DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/stdhapi.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
 HS = .h
@@ -112,6 +113,7 @@ LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
 
 define PREPARE_VARIABLES
 	DIR_$(1) := ./$(1)/
+	DIRS += $$(DIR_BUILD)/$$(DIR_$(1))
 	TARGET_$(1) := $$(DIR_TARGET)/lib$(1).so.$$(RELEASE)
 	TARGETS += $$(TARGET_$(1))
 	SRC_$(1) = $$(strip $$(sort $$(shell $$(FIND) $$(DIR_$(1)) -name "*.c")))
@@ -120,9 +122,14 @@ define PREPARE_VARIABLES
 	SRCS += $$(SRC_$(1))
 endef
 
+define MAKE_DIR
+$(1):
+	@/bin/mkdir -p $(1)
+endef
+
 define BUILD_TARGET
 $$(TARGET_$(1)): $$(OBJS_$(1)) $(2)
-	@$$(MAKE) $$(TARGET_$(1))\' TARGET=$$(TARGET_$(1))\' NAME=$(1) LIBS=$(3)
+	@$$(MAKE) --no-print-directory $$(TARGET_$(1))\' TARGET=$$(TARGET_$(1))\' NAME=$(1) LIBS=$(3)
 endef
 
 define CONFIGURE_DRIVER
@@ -162,109 +169,112 @@ LIBS_sqlite3		= "-lsqlite3 -lhcore"
 
 # implict pattern rule
 	
-$(DIR_BUILD)/%.o %.o: %.c $(DIR_BUILD)
-	@echo -n "Compiling \`$@' ... "
-	@$(CXX) $(CXXFLAGS) $< -c -o $@ 2>&1 | tee -a make.log
-	@echo -ne "done.\r"
-	@tput el
+$(DIR_BUILD)/%.o %.o: %.c
+	@echo -n "Compiling $(n) \`$@' ... "; \
+	$(CXX) $(CXXFLAGS) $< -c -o $@ 2>&1 | tee -a make.log; \
+	echo -ne "done.\r"; \
+	tput el
 
 #	this is "rule" for linking libs
 
 $(TARGET):
-	@if [ "$(TARGET)" = "" -o "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi
-	@echo -n "Linking \`$@ ... "
-	@tput bold
-	@tput setaf 1
-	@$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,--entry="stdhapi_$(NAME)_main" -Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log
-	@tput sgr0
-	@$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log
-	@/bin/mv -f lib$(NAME).so.$(RELEASE) $(DIR_TARGET)/
-	@/bin/mv -f lib$(NAME).a $(DIR_TARGET)/
-	@echo -n "making cache ... "
-	@(cd $(DIR_TARGET);/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so;$(DIR_TARGET)/mkcache;ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION);ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION);ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so)
-	@echo -ne "done.\r"
-	@tput el
+	@if [ "$(TARGET)" = "" -o "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
+	echo -n "Linking \`$@ ... "; \
+	tput bold; \
+	tput setaf 1; \
+	$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,--entry="stdhapi_$(NAME)_main" -Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; \
+	tput sgr0; \
+	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log; \
+	/bin/mv -f lib$(NAME).so.$(RELEASE) $(DIR_TARGET)/; \
+	/bin/mv -f lib$(NAME).a $(DIR_TARGET)/; \
+	echo -n "making cache ... "; \
+	cd $(DIR_TARGET); \
+	/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so; \
+	$(DIR_TARGET)/mkcache; \
+	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION); \
+	ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
+	ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so; \
+	echo -ne "done.\r"; \
+	tput el
 
 #-------------------------------------------------------------------
 
 .DEFAULT:
-	@tput bold
-	@tput setaf 1
-	@echo "Lack of \`$<'." | tee -a make.log
-	@tput sgr0
+	@tput bold; \
+	tput setaf 1; \
+	echo "Lack of \`$<'." | tee -a make.log; \
+	tput sgr0
 
 #phony targets
 .PHONY: all nodebug install dep clean tags mrproper purge environment
 
-all: .depend $(LD_CACHE) $(TARGETS) $(HAPI_HEADER)
+all: environment .depend $(TARGETS) $(HAPI_HEADER)
 
-$(DIR_HEADERS):
-	@/bin/mkdir -p $(DIR_HEADERS)
+$(foreach COMPONENT,$(COMPONENTS),$(eval $(call BUILD_TARGET,$(COMPONENT),$(DEPS_$(COMPONENT)),$(LIBS_$(COMPONENT)))))
+$(foreach DRIVER,$(DRIVERS),$(eval $(call BUILD_TARGET,$(DRIVER)_driver,$(DEPS_$(DRIVER)),$(LIBS_$(DRIVER)))))
+$(foreach DIR,$(DIRS),$(eval $(call MAKE_DIR,$(DIR))))
 
-$(DIR_BUILD):
-	@/bin/mkdir -p $(DIR_BUILD)
-	@/bin/mkdir -p $(DIR_BUILD)/$(DIR_hcore) $(DIR_BUILD)/$(DIR_hconsole) $(DIR_BUILD)/$(DIR_tools) $(DIR_BUILD)/$(DIR_dbwrapper) $(DIR_BUILD)/$(DIR_hdata)
+environment: $(DIRS) $(LD_CACHE)
 
 nodebug:
-	@( export NODEBUG="yes";\
-	$(MAKE) -e all)
+	export NODEBUG="yes"; \
+	$(MAKE) -e all
 
 install: all
 	@./aux/msh
 
-$(foreach COMPONENT,$(COMPONENTS),$(eval $(call BUILD_TARGET,$(COMPONENT),$(DEPS_$(COMPONENT)),$(LIBS_$(COMPONENT)))))
-$(foreach DRIVER,$(DRIVERS),$(eval $(call BUILD_TARGET,$(DRIVER)_driver,$(DEPS_$(DRIVER)),$(LIBS_$(DRIVER)))))
-
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
-	@echo -n "Making headers ... "
-	@for FILE in $(HDRS); do \
+	@echo -n "Making headers ... "; \
+	for FILE in $(HDRS); do \
 		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`;\
-	done
-	@head -26 $(DIR_HEADERS)/bit.h | sed -e s/bit/stdhapi/ > $(DIR_HEADERS)/stdhapi.h
-	@echo '#ifndef __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h
-	@echo '#define __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h
-	@echo '' >> $(DIR_HEADERS)/stdhapi.h
-	@cat config.h >> $(DIR_HEADERS)/stdhapi.h
-	@find $(DIR_HEADERS) ! -name 'stdhapi.h' -type f | awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' | sort >> $(DIR_HEADERS)/stdhapi.h
-	@echo '' >> $(DIR_HEADERS)/stdhapi.h
-	@echo '#endif /* not __STDHAPI_H */' >> $(DIR_HEADERS)/stdhapi.h
-	@echo "done."
-	@tput bold
-	@echo "All OK!"
-	@tput sgr0
+	done; \
+	head -26 $(DIR_HEADERS)/bit.h | sed -e s/bit/stdhapi/ > $(DIR_HEADERS)/stdhapi.h; \
+	echo '#ifndef __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h; \
+	echo '#define __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h; \
+	echo '' >> $(DIR_HEADERS)/stdhapi.h; \
+	cat config.h >> $(DIR_HEADERS)/stdhapi.h; \
+	find $(DIR_HEADERS) ! -name 'stdhapi.h' -type f | awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' | sort >> $(DIR_HEADERS)/stdhapi.h; \
+	echo '' >> $(DIR_HEADERS)/stdhapi.h; \
+	echo '#endif /* not __STDHAPI_H */' >> $(DIR_HEADERS)/stdhapi.h; \
+	echo -ne 'done.\r'; \
+	tput el; \
+	tput bold; \
+	echo "All OK!"; \
+	tput sgr0
 
 $(LD_CACHE):
-	@echo -n "Making environment ... "
-	@/bin/mkdir -p $(DIR_TARGET)
-	@echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf
-	@/bin/cp -f ./aux/mkcache $(DIR_TARGET)
-	@echo "done."
+	@echo -n "Making environment ... "; \
+	echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf; \
+	/bin/cp -f ./aux/mkcache $(DIR_TARGET); \
+	echo -ne "done.\r"; \
+	tput el
 
 dep: .depend
 .depend: $(SRCS) $(HDRS)
-	@echo -n 'Making dependencies ... '
-	@set -e; for DEP in $(DEPS); do $(DXX) $(CXXFLAGS) -MM $${DEP} ; done > .depend
-	@echo "# vim:ft=make:" >> .depend
-	@/bin/rm -f make.log
-	@echo 'done.'
+	@echo -n 'Making dependencies ... '; \
+	set -e; for DEP in $(DEPS); do $(DXX) $(CXXFLAGS) -MM $${DEP} ; done > .depend; \
+	echo "# vim:ft=make:" >> .depend; \
+	/bin/rm -f make.log; \
+	echo -ne 'done.\r'; \
+	tput el
 
 clean:
-	@/bin/rm -f $(OBJS_HCORE) $(OBJS_HCONSOLE) $(OBJS_TOOLS) $(OBJS_DBWRAPPER) $(OBJS_HDATA)
-	@cln .
+	@/bin/rm -f $(OBJS_HCORE) $(OBJS_HCONSOLE) $(OBJS_TOOLS) $(OBJS_DBWRAPPER) $(OBJS_HDATA); \
+	cln .
 
 tags: $(SRCS) $(HDRS)
-	@echo -n "Rehashing tags ... "
-	@$(CTAGS) -R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" --c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" --extra="+f+q"
-	@echo "done."
+	@echo -n "Rehashing tags ... "; \
+	$(CTAGS) -R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" --c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" --extra="+f+q"; \
+	echo "done."
 
 mrproper: clean
-	@echo -n "Purging ... "
-	@/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD) make.log
-	@find . -name 'tags' -or -name '.depend' -or -name '*.a'| xargs /bin/rm -f
-	@echo "done."
+	@echo -n "Purging ... "; \
+	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD) make.log; \
+	find . -name 'tags' -or -name '.depend' -or -name '*.a'| xargs /bin/rm -f; \
+	echo "done."; \
 
 purge: mrproper
-	/bin/rm -rf autom4te.cache configure config.cache config.log config.status configure.lineno
+	/bin/rm -rf autom4te.cache configure config.cache config.log config.status configure.lineno; \
 	/bin/rm -rf Makefile config.h stdhapirc
 
 ifneq ($(wildcard .depend),)
