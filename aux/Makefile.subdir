@@ -1,0 +1,2 @@
+all:
+	@$(MAKE) --no-print-directory -s -C ..

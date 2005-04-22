@@ -189,7 +189,7 @@ $(TARGET):
 	echo -n "Linking \`$(@) ... "; \
 	tput bold; tput setaf 1; \
 	$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,--entry="stdhapi_$(NAME)_main" -Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; \
-	tput sgr0; \
+	if [ $(?) ] ; then \
 	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log; \
 	/bin/mv -f lib$(NAME).so.$(RELEASE) $(DIR_TARGET)/; \
 	/bin/mv -f lib$(NAME).a $(DIR_TARGET)/; \
@@ -200,7 +200,7 @@ $(TARGET):
 	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION); \
 	ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
 	ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so; \
-	echo -ne "done.\r"; tput el
+	fi; tput sgr0; echo -ne "done.\r"; tput el
 
 #-------------------------------------------------------------------
 
