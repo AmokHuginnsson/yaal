@@ -199,7 +199,7 @@ lib%.so.$(RELEASE):
 	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION); \
 	ln -sf lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so; \
-	else exit 1; fi; echo -ne "done.\r";#tput el
+	else exit 1; fi; echo -ne "done.\r"; tput el
 
 #-------------------------------------------------------------------
 
