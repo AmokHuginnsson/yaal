@@ -39,14 +39,19 @@ class HThread
 	{
 protected:
 	/*{*/
-	pthread_t f_sThread;
+	pthread_attr_t f_sAttributes;
+	pthread_t f_xThread;
 	/*}*/
 public:
 	/*{*/
 	HThread ( void );
 	virtual ~HThread ( void );
+	int spawn ( void );
+	int finish ( void );
 	/*}*/
 private:
+	virtual int run ( void ) = 0;
+	static void * SPAWN ( void * );
 	HThread ( const HThread & );
 	HThread & operator = ( const HThread & );
 	};

@@ -34,9 +34,12 @@ namespace stdhapi
 namespace hcore
 {
 
-HThread::HThread ( void ) : f_sThread ( )
+HThread::HThread ( void ) : f_sAttributes ( ), f_xThread ( )
 	{
 	M_PROLOG
+	pthread_attr_init ( & f_sAttributes );
+	pthread_attr_setdetachstate ( & f_sAttributes, PTHREAD_CREATE_JOINABLE );
+	pthread_attr_setinheritsched ( & f_sAttributes, PTHREAD_INHERIT_SCHED );
 	return;
 	M_EPILOG
 	}
@@ -44,7 +47,38 @@ HThread::HThread ( void ) : f_sThread ( )
 HThread::~HThread ( void )
 	{
 	M_PROLOG
+	finish ( );
+	pthread_attr_destroy ( & f_sAttributes );
 	return;
+	M_EPILOG
+	}
+
+int HThread::spawn ( void )
+	{
+	M_PROLOG
+	pthread_create ( & f_xThread, & f_sAttributes, SPAWN, this );
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HThread::finish ( void )
+	{
+	M_PROLOG
+	void * l_pvReturn = NULL;
+	pthread_cancel ( f_xThread );
+	pthread_join ( f_xThread, & l_pvReturn );
+	return ( 0 );
+	M_EPILOG
+	}
+
+void * HThread::SPAWN ( void * a_pvThread )
+	{
+	M_PROLOG
+	HThread * l_poThread = reinterpret_cast < HThread * > ( a_pvThread );
+	pthread_setcancelstate ( PTHREAD_CANCEL_ENABLE, NULL );
+	pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL );
+	l_poThread->run ( );
+	return ( NULL );
 	M_EPILOG
 	}
 
