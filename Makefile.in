@@ -118,6 +118,7 @@ define PREPARE_VARIABLES
 	DIR_$(1) := ./$(1)/
 	DIRS += $$(DIR_BUILD)/$$(DIR_$(1))
 ifeq ($(CURDIR),$(DIR_BUILD))
+	SONAME_$(1) := lib$(1).so.$$(VERSION).$$(SUBVERSION)
 	TARGET_$(1) := $$(DIR_TARGET)/lib$(1).so.$$(RELEASE)
 	TARGETS += $$(TARGET_$(1))
 	HDRS += $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) $$(DIR_$(1)) -name "*.h")))
@@ -129,6 +130,7 @@ endif
 endef
 
 define CONFIGURE_DRIVER
+	SONAME_$(1) := lib$(1)_driver.so.$$(VERSION).$$(SUBVERSION)
 	TARGET_$(1)_driver := $$(DIR_TARGET)/lib$(1)_driver.so.$$(RELEASE)
 	TARGETS += $$(TARGET_$(1)_driver)
 	OBJS_$(1)_driver := $(1)_driver
@@ -144,7 +146,7 @@ endef
 
 define BUILD_TARGET
 $$(TARGET_$(1)): $$(OBJS_$(1)) $(2)
-	@$$(MAKE) -f ../Makefile --no-print-directory $$(TARGET_$(1))\' TARGET=$$(TARGET_$(1))\' NAME=$(1) LIBS=$(3)
+	@$$(MAKE) -f ../Makefile --no-print-directory lib$(1).so.$$(RELEASE) NAME=$(1) LIBS=$(3)
 endef
 
 $(foreach COMPONENT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(COMPONENT))))
@@ -152,7 +154,7 @@ SRCS := $(filter-out %_driver.c,$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.o,$(OBJS_dbwrapper))
 $(foreach DRIVER,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(DRIVER))))
 
-LIBS_hcore			=	@GETTEXT_LIB@
+LIBS_hcore			=	"-lpthread @GETTEXT_LIB@"
 DEPS_hconsole		= $(TARGET_hcore)
 LIBS_hconsole		= "-lncurses @MOUSE_LIB@ -lhcore"
 DEPS_tools			= $(TARGET_hconsole)
@@ -184,23 +186,20 @@ LIBS_sqlite3		= "-lsqlite3 -lhcore"
 
 #	this is "rule" for linking libs
 
-$(TARGET):
-	@if [ "$(TARGET)" = "" -o "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
-	echo -n "Linking \`$(@) ... "; \
-	tput bold; tput setaf 1; \
-	$(LXX) $(LIBS) $(LINKER_FLAGS)lib$(NAME).so.$(VERSION).$(SUBVERSION) -o lib$(NAME).so.$(RELEASE) -Wl,--entry="stdhapi_$(NAME)_main" -Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; \
-	if [ $(?) ] ; then \
+lib%.so.$(RELEASE):
+	@if [ "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
+	echo -n "Linking \`$(@) ... "; tput bold; tput setaf 1; \
+	$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
+			-Wl,--entry="stdhapi_$(NAME)_main" \
+			-Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; tput sgr0; \
+	if [ -f $(@) ] ; then \
 	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log; \
-	/bin/mv -f lib$(NAME).so.$(RELEASE) $(DIR_TARGET)/; \
-	/bin/mv -f lib$(NAME).a $(DIR_TARGET)/; \
-	echo -n "making cache ... "; \
-	cd $(DIR_TARGET); \
-	/bin/rm -f lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) lib$(NAME).so; \
-	$(DIR_TARGET)/mkcache; \
+	/bin/mv -f $(@) lib$(NAME).a $(DIR_TARGET)/; echo -n "making cache ... "; \
+	cd $(DIR_TARGET); $(DIR_TARGET)/mkcache; \
 	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION); \
-	ln -s lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
-	ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so; \
-	fi; tput sgr0; echo -ne "done.\r"; tput el
+	ln -sf lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
+	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so; \
+	else exit 1; fi; echo -ne "done.\r";#tput el
 
 #-------------------------------------------------------------------
 
