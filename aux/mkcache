@@ -5,7 +5,7 @@ HOST_OS_TYPE=`uname`
 if [ "$HOST_OS_TYPE" = "FreeBSD" ] ; then
 	/sbin/ldconfig -i -f ~/lib/ld.so.cache ~/lib
 elif [ "$HOST_OS_TYPE" = "Linux" ] ; then
-	/sbin/ldconfig -f ~/lib/ld.so.conf -C ~/lib/ld.so.cache ~/lib
+	/sbin/ldconfig -f ~/lib/ld.so.conf -C ~/lib/ld.so.cache ~/lib 2&>1 | cat > /dev/null
 else
 	echo "Unknown host operating system type!"
 	exit 1
