@@ -143,7 +143,8 @@ void dbwrapper_fini ( void )
 	return;
 	}
 
-static char const g_pcDynamicLinkerPath [ ] __attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
+static char const g_pcDynamicLinkerPath [ ] __attribute__(( __unused__,
+			__section__(".interp") )) = __DYNAMIC_LINKER__;
 
 void stdhapi_dbwrapper_banner ( void )
 	{
