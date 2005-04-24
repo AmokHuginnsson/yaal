@@ -150,8 +150,8 @@ void tools_fini ( void )
 	return;
 	}
 
-static char const g_pcDynamicLinkerPath [ ] __attribute__(( __unused__,
-			__section__(".interp") )) = __DYNAMIC_LINKER__;
+static char const g_pcDynamicLinkerPath [ ]
+	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 void stdhapi_tools_banner ( void )
 	{
@@ -163,9 +163,12 @@ extern "C"
 void stdhapi_tools_main ( void ) __attribute__(( __noreturn__ ));
 void stdhapi_tools_main ( void )
 	{
-	stdhapi_hcore_banner ( );
-	stdhapi_hconsole_banner ( );
-	stdhapi_tools_banner ( );
+	if ( g_pcDynamicLinkerPath [ 0 ] )
+		{
+		stdhapi_hcore_banner ( );
+		stdhapi_hconsole_banner ( );
+		stdhapi_tools_banner ( );
+		}
 	exit ( 0 );
 	}
 

@@ -156,10 +156,13 @@ extern "C"
 void stdhapi_dbwrapper_main ( void ) __attribute__(( __noreturn__ ));
 void stdhapi_dbwrapper_main ( void )
 	{
-	stdhapi_hcore_banner ( );
-	stdhapi_hconsole_banner ( );
-	stdhapi_tools_banner ( );
-	stdhapi_dbwrapper_banner ( );
+	if ( g_pcDynamicLinkerPath [ 0 ] )
+		{
+		stdhapi_hcore_banner ( );
+		stdhapi_hconsole_banner ( );
+		stdhapi_tools_banner ( );
+		stdhapi_dbwrapper_banner ( );
+		}
 	exit ( 0 );
 	}
 
