@@ -237,8 +237,8 @@ install: all
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	@cd $(DIR_ROOT); echo -n "Making headers ... "; \
 	for FILE in $(HDRS); do \
-		awk '/^#include "/ {match($$0,"[a-z_]+\\.h");
-		printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };
+		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); \
+		printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) }; \
 		!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`;\
 	done; \
 	head -26 $(DIR_HEADERS)/bit.h \
