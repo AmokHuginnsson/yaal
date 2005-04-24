@@ -223,10 +223,10 @@ AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 			[AC_MSG_ERROR([Can not continue without ncurses devel!])])])
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],
-		[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql)"])
+		[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
 			DEFAULT_DRIVER=["PostgreSQL"]],
 		[AC_CHECK_HEADERS([[libpq-fe.h]],
-			[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql)"])
+			[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
 			DEFAULT_DRIVER=["PostgreSQL"]],
 				[if test ["$POSTGRES"] = ["yes"] ; then
 					AC_MSG_ERROR([[Can not continue without PostgreSQL devel(client)!]])

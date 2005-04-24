@@ -39,7 +39,8 @@ VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/stdhapi.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
-n=0
+CL						:= $(shell tput cr;tput dl1)
+HL						:= $(shell tput bold; tput setaf 1)
 HS = .h
 SS = .c
 OS = .o
@@ -182,30 +183,31 @@ LIBS_sqlite3		= "-lsqlite3 -lhcore"
 	echo -n "$(@:.o=.d) " > $(@:.o=.d); \
 	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) >> $(@:.o=.d); \
 	$(CXX) $(CXXFLAGS) $(<) -c -o $(@) 2>&1 | tee -a make.log; \
-	echo -ne "done.\r"; tput el
+	echo -n "done.$(CL)"
 
 #	this is "rule" for linking libs
 
 lib%.so.$(RELEASE):
 	@if [ "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
-	echo -n "Linking \`$(@) ... "; tput bold; tput setaf 1; \
+	echo -n "Linking \`$(@) ... $(HL)"; \
 	$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
 			-Wl,--entry="stdhapi_$(NAME)_main" \
 			-Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; tput sgr0; \
 	if [ -f $(@) ] ; then \
-	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log; \
+	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 \
+| grep -v '^ar: creating ' | tee -a make.log; \
 	/bin/mv -f $(@) lib$(NAME).a $(DIR_TARGET)/; echo -n "making cache ... "; \
 	cd $(DIR_TARGET); $(DIR_TARGET)/mkcache; \
 	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION); \
 	ln -sf lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so; \
-	else exit 1; fi; echo -ne "done.\r"; tput el
+	else exit 1; fi; echo -n "done.$(CL)"
 
 #-------------------------------------------------------------------
 
 .DEFAULT:
 	@if [ "$(suffix $(<))" != ".d" ] ; then \
-	tput bold; tput setaf 1; \
+	echo -n "$(HL)"; \
 	echo "Lack of \`$(<)'." | tee -a make.log; \
 	tput sgr0; fi
 
@@ -235,47 +237,53 @@ install: all
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	@cd $(DIR_ROOT); echo -n "Making headers ... "; \
 	for FILE in $(HDRS); do \
-		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`;\
+		awk '/^#include "/ {match($$0,"[a-z_]+\\.h");
+		printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) };
+		!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`;\
 	done; \
-	head -26 $(DIR_HEADERS)/bit.h | sed -e s/bit/stdhapi/ > $(DIR_HEADERS)/stdhapi.h; \
+	head -26 $(DIR_HEADERS)/bit.h \
+| sed -e s/bit/stdhapi/ > $(DIR_HEADERS)/stdhapi.h; \
 	echo '#ifndef __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h; \
 	echo '#define __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h; \
 	echo '' >> $(DIR_HEADERS)/stdhapi.h; \
 	cat config.h >> $(DIR_HEADERS)/stdhapi.h; \
-	find $(DIR_HEADERS) ! -name 'stdhapi.h' -type f | awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' | sort >> $(DIR_HEADERS)/stdhapi.h; \
+	find $(DIR_HEADERS) ! -name 'stdhapi.h' -type f \
+| awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' \
+| sort >> $(DIR_HEADERS)/stdhapi.h; \
 	echo '' >> $(DIR_HEADERS)/stdhapi.h; \
 	echo '#endif /* not __STDHAPI_H */' >> $(DIR_HEADERS)/stdhapi.h; \
-	echo -ne 'done.\r'; \
-	tput el; tput bold; \
+	echo -n 'done.$(CL)'; tput bold; \
 	echo "All OK!"; tput sgr0
 
 $(LD_CACHE):
 	@echo -n "Making environment ... "; \
 	echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf; \
 	/bin/cp -f ./aux/mkcache $(DIR_TARGET); \
-	echo -ne "done.\r"; tput el
+	echo -n "done.$(CL)"
 
 clean-dep:
 	@$(FIND) . -name '*.d' | xargs /bin/rm -f
 
 clean: clean-dep
-	@/bin/rm -f $(OBJS_HCORE) $(OBJS_HCONSOLE) $(OBJS_TOOLS) $(OBJS_DBWRAPPER) $(OBJS_HDATA); \
+	@/bin/rm -f $(OBJS); \
 	cln .
 
 mrproper: clean
 	@echo -n "Purging ... "; \
 	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD) make.log; \
-	$(FIND) . -name 'tags' -or -name '.depend' -or -name '*.a'| xargs /bin/rm -f; \
+	$(FIND) . -name 'tags' -or -name '.depend' -or -name '*.a' \
+| xargs /bin/rm -f; \
 	echo "done."; \
 
 purge: mrproper
-	/bin/rm -rf autom4te.cache configure config.cache config.log config.status configure.lineno; \
-	/bin/rm -rf Makefile config.h stdhapirc
+	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
+	/bin/rm -rf configure Makefile config.h stdhapirc config.log
 
 tags: $(SRCS) $(HDRS)
 	@echo -n "Rehashing tags ... "; \
 	$(CTAGS)	-R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" \
-						--c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" --extra="+f+q"; \
+						--c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" \
+						--extra="+f+q"; \
 	echo "done."
 
 ifeq ($(CURDIR),$(DIR_BUILD))
