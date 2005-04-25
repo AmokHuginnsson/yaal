@@ -51,6 +51,12 @@ else
 fi
 
 dnl Testing presence of c compiler
+if test ["$CXX"] = ["colorgcc"] ; then
+	CXX=["g++"]
+fi
+if test ["$CC"] = ["colorgcc"] ; then
+	CC=["gcc"]
+fi
 AC_MSG_RESULT([--- Testing presence of c compiler ... ---              [[19%]]])
 AC_PROG_CC
 dnl and for c++ compiler
@@ -61,9 +67,6 @@ AC_MSG_RESULT([--- Looking standrad development software ... ---       [[33%]]])
 AC_PROG_CPP
 AC_PROG_CXXCPP
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
-if test ["$CXX"] = ["colorgcc"] ; then
-	CXX=["g++"]
-fi
 
 dnl Looking for main libc headers
 AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])
