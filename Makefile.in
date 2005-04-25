@@ -273,7 +273,7 @@ mrproper: clean
 	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD) make.log; \
 	$(FIND) . -name 'tags' -or -name '.depend' -or -name '*.a' \
 | xargs /bin/rm -f; \
-	echo "done."; \
+	echo "done."
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
