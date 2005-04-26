@@ -24,15 +24,22 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __BIT_H
-#define __BIT_H
+#ifndef __TOOLS_BIT_H
+#define __TOOLS_BIT_H
+
+namespace stdhapi
+{
+
+namespace tools
+	{
 
 int getbit( void *, unsigned long int );
 void setbit( void *, unsigned long int, int );
 void ror( unsigned char *, int, int, int );
 void rol( unsigned char *, int, int, int );
-unsigned char xxor( unsigned char, unsigned char );
-unsigned short int xxor16( unsigned short int, unsigned short int );
-unsigned long int xxor32( unsigned long int, unsigned long int );
 
-#endif /* not __BIT_H */
+	}
+
+}
+
+#endif /* not __TOOLS_BIT_H */

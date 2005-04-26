@@ -30,12 +30,18 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hpattern.h"
 
-HPattern::HPattern ( bool a_bIgnoreCase )
+namespace stdhapi
+{
+
+namespace hcore
+{
+
+HPattern::HPattern ( bool a_bIgnoreCase ) : f_bInitialized ( false ),
+	f_bIgnoreCaseDefault ( a_bIgnoreCase ), f_bIgnoreCase ( false ),
+	f_bExtended ( false ), f_iSimpleMatchLength ( 0 ), f_sCompiled ( ),
+	f_oPatternInput ( ), f_oPatternReal ( ), f_oError ( )
 	{
 	M_PROLOG
-	f_bInitialized = false;
-	f_bIgnoreCaseDefault = a_bIgnoreCase;
-	f_bExtended = false;
 	return;
 	M_EPILOG
 	}
@@ -43,11 +49,12 @@ HPattern::HPattern ( bool a_bIgnoreCase )
 HPattern::~HPattern ( void )
 	{
 	M_PROLOG
+	regfree ( & f_sCompiled );
 	return;
 	M_EPILOG
 	}
 
-bool HPattern::parse ( const char * a_pcPattern,
+bool HPattern::parse ( char const * a_pcPattern,
 		unsigned short int * a_puhFlags, int a_iFlagsCount )
 	{
 	M_PROLOG
@@ -85,7 +92,8 @@ bool HPattern::parse ( const char * a_pcPattern,
 			}
 		l_iCtr ++;
 		}
-	if ( l_pcPattern [ l_iCtr ] == '/' )l_iCtr ++;
+	if ( l_pcPattern [ l_iCtr ] == '/' )
+		l_iCtr ++;
 	l_iBegin = l_iCtr;
 /* end of looking at begin */
 /* making copy of flags */
@@ -96,7 +104,8 @@ bool HPattern::parse ( const char * a_pcPattern,
 /* end of copy */
 /* look for switches at the end of pattern */
 	l_iEnd = l_iCtr = f_oPatternInput.get_length ( ) - 1;
-	if ( l_iEnd < 0 )return ( true );
+	if ( l_iEnd < 0 )
+		return ( true );
 	while ( ( l_iCtr > 0 ) && ( l_pcPattern [ l_iCtr ] != '/' ) )
 		{
 		if ( set_switch ( l_pcPattern [ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
@@ -109,18 +118,34 @@ bool HPattern::parse ( const char * a_pcPattern,
 			}
 		l_iCtr --;
 		}
-	if ( l_iCtr )l_iEnd = l_iCtr - 1;
+	if ( l_iCtr )
+		l_iEnd = l_iCtr - 1;
 /* end of looking at end */
-	f_oPatternReal = f_oPatternInput.mid ( l_iBegin,
+	f_oError = f_oPatternReal = f_oPatternInput.mid ( l_iBegin,
 			l_iEnd - l_iBegin + 1 );
 	f_iSimpleMatchLength = f_oPatternReal.get_length ( );
-	if ( ! f_iSimpleMatchLength )l_bError = true;
+	if ( ! f_iSimpleMatchLength )
+		l_bError = true;
 	f_bInitialized = ! l_bError;
+	if ( f_bInitialized && f_bExtended )
+		{
+		regfree ( & f_sCompiled );
+		if ( ( l_iEnd = regcomp ( & f_sCompiled, f_oPatternReal, f_bIgnoreCase ? REG_ICASE : 0 ) ) )
+			{
+			f_oError.hs_realloc ( ( l_iCtr = regerror ( l_iEnd, & f_sCompiled, NULL, 0 ) ) + 1 );
+			regerror ( l_iEnd, & f_sCompiled, f_oError, l_iCtr );
+			f_oError += ": `";
+			f_oError += f_oPatternReal;
+			f_oError += "'";
+			f_bInitialized = false;
+			l_bError = true;
+			}
+		}
 	return ( l_bError );
 	M_EPILOG
 	}
 
-const char * HPattern::error ( void )
+char const * HPattern::error ( void )
 	{
 	return ( f_oError );
 	}
@@ -153,29 +178,46 @@ bool HPattern::set_switch ( char a_cSwitch, unsigned short int * a_puhFlags,
 	M_EPILOG
 	}
 
-char * HPattern::matches ( const char * a_pcString, int & a_riMatchLength )
+char * HPattern::matches ( char const * a_pcString, int & a_riMatchLength )
 	{
 	M_PROLOG
 	char * l_pcPtr = NULL;
+	int l_iCtr = 0, l_iError = 0;
 	if ( f_iSimpleMatchLength )
 		{
 		if ( f_bExtended )
 			{
-		
+			regmatch_t l_sMatch;
+			if ( ! ( l_iError = regexec ( & f_sCompiled, a_pcString, 1, & l_sMatch, 0 ) ) )
+				{
+				a_riMatchLength = l_sMatch.rm_eo - l_sMatch.rm_so;
+				if ( a_riMatchLength > 0 )
+					l_pcPtr = const_cast < char * > ( a_pcString ) + l_sMatch.rm_so;
+				}
+			else
+				{
+				f_oError.hs_realloc ( ( l_iCtr = regerror ( l_iError, & f_sCompiled, NULL, 0 ) ) + 1 );
+				regerror ( l_iError, & f_sCompiled, f_oError, l_iCtr );
+				f_oError += ": `";
+				f_oError += f_oPatternReal;
+				f_oError += "'";
+				}
 			}
 		else
 			{
 			if ( f_bIgnoreCase )
 				l_pcPtr = strcasestr ( a_pcString, f_oPatternReal );
-			else l_pcPtr = strstr ( a_pcString, f_oPatternReal );
-			if ( l_pcPtr )a_riMatchLength = f_iSimpleMatchLength;
+			else
+				l_pcPtr = strstr ( a_pcString, f_oPatternReal );
+			if ( l_pcPtr )
+				a_riMatchLength = f_iSimpleMatchLength;
 			}
 		}
 	return ( l_pcPtr );
 	M_EPILOG
 	}
 
-int HPattern::count ( const char * a_pcString )
+int HPattern::count ( char const * a_pcString )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iDummy = 0;
@@ -185,3 +227,8 @@ int HPattern::count ( const char * a_pcString )
 	return ( l_iCtr );
 	M_EPILOG
 	}
+
+}
+
+}
+

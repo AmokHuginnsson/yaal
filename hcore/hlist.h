@@ -24,10 +24,20 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HLIST_H
-#define __HLIST_H
+#ifndef __HCORE_HLIST_H
+#define __HCORE_HLIST_H
 
 #line 31 "hlist.h"
+
+#include "./hcore/hexception.h"
+
+namespace stdhapi
+{
+
+namespace hcore
+{
+
+#define D_CVSID_HLIST_H "$CVSHeader$"
 
 #define D_ERROR									1
 #define D_TREAT_AS_CLOSED				2
@@ -49,8 +59,6 @@ Copyright:
 #define NULL	0
 #endif /* NULL */
 
-#define D_CVSID_HLIST_H "$CVSHeader$"
-
 #define E_HLIST_EMPTYELEMENT	0
 #define E_HLIST_BADINDEX			1
 #define E_HLIST_BADFLAG				2
@@ -58,7 +66,7 @@ Copyright:
 #define E_HLIST_BADOFFSET			4
 #define E_HLIST_BADNUMBER			5
 
-extern const char * g_ppcErrMsgHList [ ];
+extern char const * g_ppcErrMsgHList [ ];
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/
@@ -98,6 +106,11 @@ protected:
 		virtual ~HElement ();
 		void put ( tType );
 		tType& get ( void );
+		/*}*/
+	private:
+		/*{*/
+		HElement ( const HElement & );
+		HElement & operator = ( const HElement & );
 		/*}*/
 		friend class HList< tType >;
 		};
@@ -166,9 +179,12 @@ protected:
 	virtual int cmpc ( HElement *, HElement * );
 	virtual void sort ( );
 	/*}*/
+private:
+	/*{*/
+	HList ( const HList & );
+	HList & operator = ( const HList & );
+	/*}*/
 	};
-
-#include "./hcore/hexception.h"
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /*++++++++++++++++++++++                             ++++++++++++++++++++++*/
@@ -178,7 +194,8 @@ protected:
 
 template < class tType >
 HList < tType >::HElement::HElement ( HElement * a_poElement,
-		int a_iNumber )
+		int a_iNumber ) : f_poPrevious ( NULL ), f_tObject ( ), f_poNext ( NULL ),
+											f_iNumber ( a_iNumber ), f_lHits ( 0 )
 	{
 	M_PROLOG
 	if ( a_poElement == 0 )
@@ -193,8 +210,6 @@ HList < tType >::HElement::HElement ( HElement * a_poElement,
 		a_poElement->f_poPrevious = this;
 		f_poPrevious->f_poNext = this;
 		}
-	f_iNumber = a_iNumber;
-	f_lHits = 0;
 	M_EPILOG
 	}
 
@@ -231,17 +246,13 @@ tType & HList< tType >::HElement::get ( void )
 
 template < class tType >
 HList< tType >::HList ( int a_iSize )
+	: f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
+	f_poHook ( NULL ), f_poSelected ( NULL ), f_iOrder ( D_UNSORTED ),
+	f_iIndex ( 0 ), f_poIndex ( NULL ), cmp ( NULL )
 	{
 	M_PROLOG
-	f_iOrder = D_UNSORTED;
-	f_iIndex = 0;
-	f_poIndex = NULL;
-	f_iError = 0;
-	f_iQuantity = 0;
-	f_iHighestNumber = 0;
-	f_poHook = 0;
-	f_poSelected = 0;
-	while ( a_iSize -- )add_tail ( );
+	while ( a_iSize -- )
+		add_tail ( );
 	return ;
 	M_EPILOG
 	}
@@ -332,10 +343,12 @@ tType & HList< tType >::add_element ( tType * a_ptObject )
 	if ( f_iQuantity == 0 )
 		f_poHook = l_poElement = f_poSelected = 
 			new HElement ( NULL, f_iHighestNumber );
-	else l_poElement = new HElement ( f_poSelected, f_iHighestNumber );
+	else
+		l_poElement = new HElement ( f_poSelected, f_iHighestNumber );
 	f_iQuantity ++;
 	f_iHighestNumber ++;
-	if ( a_ptObject )l_poElement->put ( * a_ptObject );
+	if ( a_ptObject )
+		l_poElement->put ( * a_ptObject );
 	f_iIndex = 0;
 	f_poIndex = NULL;
 	return ( l_poElement->f_tObject );
@@ -347,11 +360,14 @@ tType & HList< tType >::add_head ( tType * a_ptObject )
 	{
 	M_PROLOG
 	f_poHook = new HElement ( f_poHook, f_iHighestNumber );
-	if ( f_iQuantity == 0 ) f_poSelected = f_poHook;
+	if ( f_iQuantity == 0 )
+		f_poSelected = f_poHook;
 	f_iHighestNumber ++;
 	f_iQuantity ++;
-	if ( a_ptObject )f_poHook->put ( * a_ptObject );
-	if ( f_poIndex )f_poIndex = f_poIndex->f_poPrevious;
+	if ( a_ptObject )
+		f_poHook->put ( * a_ptObject );
+	if ( f_poIndex )
+		f_poIndex = f_poIndex->f_poPrevious;
 	return ( f_poHook->f_tObject );
 	M_EPILOG
 	}
@@ -364,10 +380,12 @@ tType & HList< tType >::add_tail ( tType * a_ptObject )
 	if ( f_iQuantity == 0 )
 		f_poHook = l_poElement = f_poSelected =
 			new HElement ( NULL, f_iHighestNumber );
-	else l_poElement = new HElement ( f_poHook, f_iHighestNumber );
+	else
+		l_poElement = new HElement ( f_poHook, f_iHighestNumber );
 	f_iHighestNumber ++;
 	f_iQuantity ++;
-	if ( a_ptObject )l_poElement->put ( * a_ptObject );
+	if ( a_ptObject )
+		l_poElement->put ( * a_ptObject );
 	return ( l_poElement->f_tObject );
 	M_EPILOG
 	}
@@ -384,14 +402,18 @@ tType & HList< tType >::add_at ( int a_iIndex, tType * a_ptObject )
 			new HElement ( NULL, f_iHighestNumber );
 	else
 		{
-		if ( a_iIndex < 0 )l_poElement = f_poHook;
-		else l_poElement = element_by_index ( a_iIndex );
+		if ( a_iIndex < 0 )
+			l_poElement = f_poHook;
+		else
+			l_poElement = element_by_index ( a_iIndex );
 		l_poElement = new HElement ( l_poElement, f_iHighestNumber );
-		if ( ! a_iIndex )f_poHook = l_poElement;
+		if ( ! a_iIndex )
+			f_poHook = l_poElement;
 		}
 	f_iHighestNumber ++;
 	f_iQuantity ++;
-	if ( a_ptObject )l_poElement->put ( * a_ptObject );
+	if ( a_ptObject )
+		l_poElement->put ( * a_ptObject );
 	if ( f_poIndex &&  ( a_iIndex >= 0 ) && ( a_iIndex <= f_iIndex ) )
 		f_poIndex = f_poIndex->f_poPrevious;
 	return ( l_poElement->f_tObject );
@@ -412,15 +434,20 @@ tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 		l_iOldIndex = l_iIndex;
 		l_iIndex = ( l_iLower + l_iUpper ) / 2;
 		element_by_index ( l_iIndex );
-		if ( M_SWITCH )l_iLower = l_iIndex;
-		else l_iUpper = l_iIndex;
+		if ( M_SWITCH )
+			l_iLower = l_iIndex;
+		else
+			l_iUpper = l_iIndex;
 		}
 	if ( f_poIndex )
 		{
-		if ( M_SWITCH )f_poIndex = f_poIndex->f_poNext;
-		else l_bBefore = true;
+		if ( M_SWITCH )
+			f_poIndex = f_poIndex->f_poNext;
+		else
+			l_bBefore = true;
 		}
-	if ( ! f_iQuantity )f_poHook = f_poIndex = l_poElement;
+	if ( ! f_iQuantity )
+		f_poHook = f_poIndex = l_poElement;
 	else
 		{
 		l_poElement->f_poNext = f_poIndex;
@@ -432,7 +459,8 @@ tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 	f_iHighestNumber ++;
 	f_poIndex = NULL;
 	f_iIndex = 0;
-	if ( l_bBefore && ! l_iIndex )f_poHook = f_poHook->f_poPrevious;
+	if ( l_bBefore && ! l_iIndex )
+		f_poHook = f_poHook->f_poPrevious;
 	return ( l_poElement->f_tObject );
 	M_EPILOG
 	}
@@ -484,8 +512,10 @@ int HList< tType >::remove_at ( int a_iIndex, int a_iFlag, tType * * a_pptObject
 				}
 			}
 		}
-	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
-	if ( l_poElement == f_poHook )f_poHook = f_poHook->f_poNext;
+	else
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+	if ( l_poElement == f_poHook )
+		f_poHook = f_poHook->f_poNext;
 	if ( l_poElement == f_poSelected )
 		{
 		if ( ( l_iTreat == D_TREAT_AS_OPENED )
@@ -494,7 +524,8 @@ int HList< tType >::remove_at ( int a_iIndex, int a_iFlag, tType * * a_pptObject
 		else
 			f_poSelected = f_poSelected->f_poNext;
 		}
-	if ( f_poIndex && ( a_iIndex <= f_iIndex ) )f_poIndex = f_poIndex->f_poNext;
+	if ( f_poIndex && ( a_iIndex <= f_iIndex ) )
+		f_poIndex = f_poIndex->f_poNext;
 	delete l_poElement;
 	f_iQuantity--;
 	if ( f_iQuantity == 0 )
@@ -549,13 +580,15 @@ int HList< tType >::remove_element ( int a_iFlag, tType * * a_pptObject )
 				}
 			}
 		}
-	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+	else
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	if ( ( l_iTreat == D_TREAT_AS_OPENED )
 			&& ( f_poSelected->f_poNext == f_poHook ) )
 		f_poSelected = f_poSelected->f_poPrevious;
 	else
 		f_poSelected = f_poSelected->f_poNext;
-	if ( l_poElement == f_poHook )f_poHook = f_poHook->f_poNext;
+	if ( l_poElement == f_poHook )
+		f_poHook = f_poHook->f_poNext;
 	delete l_poElement;
 	f_iQuantity--;
 	if ( f_iQuantity == 0 )
@@ -609,9 +642,12 @@ int HList< tType >::remove_head ( int a_iFlag, tType * * a_pptObject )
 				}
 			}
 		}
-	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
-	if ( l_poElement == f_poSelected ) f_poSelected = l_poElement->f_poNext;
-	if ( f_poIndex )f_poIndex = f_poIndex->f_poNext;
+	else
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+	if ( l_poElement == f_poSelected )
+		f_poSelected = l_poElement->f_poNext;
+	if ( f_poIndex )
+		f_poIndex = f_poIndex->f_poNext;
 	delete l_poElement;
 	f_iQuantity--;
 	if ( f_iQuantity == 0 )
@@ -663,7 +699,8 @@ int HList< tType >::remove_tail ( int a_iFlag, tType * * a_pptObject )
 					}
 				}
 			}
-		if ( l_poElement == f_poSelected )f_poSelected = l_poElement->f_poPrevious;
+		if ( l_poElement == f_poSelected )
+			f_poSelected = l_poElement->f_poPrevious;
 		if ( l_poElement == f_poIndex )
 			{
 			f_poIndex = l_poElement->f_poPrevious;
@@ -679,7 +716,8 @@ int HList< tType >::remove_tail ( int a_iFlag, tType * * a_pptObject )
 			f_iIndex = 0;
 			}
 		}
-	else M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+	else
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	return ( l_iError );
 	M_EPILOG
 	}
@@ -817,13 +855,15 @@ typename HList< tType >::HElement * HList < tType >::element_by_index ( int a_iI
 		f_iError ++;
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 		}
-	if ( a_iIndex < 0 )a_iIndex += f_iQuantity;
+	if ( a_iIndex < 0 )
+		a_iIndex += f_iQuantity;
 	if ( ( a_iIndex >= f_iQuantity ) || ( a_iIndex < 0 ) )
 		{
 		f_iError ++;
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADINDEX ], a_iIndex );
 		}
-	if ( ! f_poIndex )f_poIndex = f_poHook;
+	if ( ! f_poIndex )
+		f_poIndex = f_poHook;
 /*
 we are looking for the smallest distance between a_iIndex and 0, f_iIndex, f_iQuantity.
 we have two cases, a_iIndex is between 0 and f_iIndex:
@@ -872,7 +912,8 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 	l_poElement = f_poHook;
 	for ( l_iCtr = 0; l_iCtr < f_iQuantity; l_iCtr++ )
 		{
-		if ( l_poElement->f_iNumber == a_iNumber ) return ( l_poElement );
+		if ( l_poElement->f_iNumber == a_iNumber )
+			return ( l_poElement );
 		l_poElement = l_poElement->f_poNext;
 		}
 	M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADNUMBER ], a_iNumber );
@@ -912,13 +953,20 @@ void HList< tType >::exchange ( HElement * a_poLeft, HElement * a_poRight )
 	{
 	M_PROLOG
 	HElement * l_poNext = NULL, * l_poPrevious = NULL;
-	if ( a_poLeft == a_poRight )return;
-	if ( a_poLeft == f_poHook )f_poHook = a_poRight;
-	else if ( a_poRight == f_poHook )f_poHook = a_poLeft;
-	if ( a_poLeft == f_poSelected )f_poSelected = a_poRight;
-	else if ( a_poRight == f_poSelected )f_poSelected = a_poLeft;
-	if ( a_poLeft == f_poIndex )f_poIndex = a_poRight;
-	else if ( a_poRight == f_poIndex )f_poIndex = a_poLeft;
+	if ( a_poLeft == a_poRight )
+		return;
+	if ( a_poLeft == f_poHook )
+		f_poHook = a_poRight;
+	else if ( a_poRight == f_poHook )
+		f_poHook = a_poLeft;
+	if ( a_poLeft == f_poSelected )
+		f_poSelected = a_poRight;
+	else if ( a_poRight == f_poSelected )
+		f_poSelected = a_poLeft;
+	if ( a_poLeft == f_poIndex )
+		f_poIndex = a_poRight;
+	else if ( a_poRight == f_poIndex )
+		f_poIndex = a_poLeft;
 /*
  *                         ( p L n )
  *          ( p R n ) <------+   +------> ( p R n )
@@ -948,7 +996,8 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int a_iFlag )
 	int l_iCtr = 0;
 	int l_iOther = 0;
 	HElement * l_poLeft = NULL, * l_poRight = NULL;
-	if ( a_iLeft == a_iRight )return;
+	if ( a_iLeft == a_iRight )
+		return;
 	switch ( a_iFlag )
 		{
 		case ( D_SEARCH_AFTER_NUMBER ):
@@ -962,8 +1011,10 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int a_iFlag )
 				l_poLeft = l_poLeft->f_poNext;
 				}
 			l_poRight = l_poLeft;
-			if ( l_poLeft->f_iNumber == a_iLeft )l_iOther = a_iRight;
-			else l_iOther = a_iLeft;
+			if ( l_poLeft->f_iNumber == a_iLeft )
+				l_iOther = a_iRight;
+			else
+				l_iOther = a_iLeft;
 			for ( ; l_iCtr < f_iQuantity; l_iCtr++ )
 				{
 				if ( l_poRight->f_iNumber == l_iOther )
@@ -1080,12 +1131,18 @@ void HList< tType >::sub_swap ( HElement * a_poLeft, HElement * a_poCenter,
 	M_PROLOG
 	HElement * l_poCenterPrevious = NULL, * l_poRightNext = NULL;
 	HElement * l_poLeftPrevious = NULL;
-	if ( a_poLeft == a_poCenter )return;
-	if ( a_poLeft == f_poHook )f_poHook = a_poCenter;
-	else if ( a_poCenter == f_poHook )f_poHook = a_poLeft;
-	if ( a_poLeft == f_poSelected )f_poSelected = a_poCenter;
-	else if ( a_poCenter == f_poSelected )f_poSelected = a_poLeft;
-	if ( a_poLeft->f_poPrevious == a_poRight )return;
+	if ( a_poLeft == a_poCenter )
+		return;
+	if ( a_poLeft == f_poHook )
+		f_poHook = a_poCenter;
+	else if ( a_poCenter == f_poHook )
+		f_poHook = a_poLeft;
+	if ( a_poLeft == f_poSelected )
+		f_poSelected = a_poCenter;
+	else if ( a_poCenter == f_poSelected )
+		f_poSelected = a_poLeft;
+	if ( a_poLeft->f_poPrevious == a_poRight )
+		return;
 /*
  *   wwwwq lxxxxxx cyyyyyyr pwwww -> wwwwq cyyyyyyr lxxxxxx pwwww
  */
@@ -1138,7 +1195,11 @@ void HList < tType >:: sort_by_contents ( int a_iOrder )
 	M_EPILOG
 	}
 
-#endif /* not __HLIST_H */
+}
+
+}
+
+#endif /* not __HCORE_HLIST_H */
 
 /*
 #ifdef __DEBUG__

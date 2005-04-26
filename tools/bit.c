@@ -27,8 +27,15 @@ Copyright:
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../hcore/hexception.h"
+#include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
+#include "hcore/xalloc.h"
+
+namespace stdhapi
+{
+
+namespace tools
+{
 
 unsigned long int g_pulMaskBitSet[] = 
 	{
@@ -55,11 +62,12 @@ int getbit ( void * a_pvAddress, unsigned long int a_ulNumber )
 	short int l_hState = 0, l_iOffset;
 	char * l_pcAddress;
 	unsigned long int l_ulDword;
-	l_pcAddress = ( char * ) a_pvAddress;
+	l_pcAddress = static_cast < char * > ( a_pvAddress );
 	l_ulDword = a_ulNumber >> 3;
-	l_iOffset = ( short ) a_ulNumber & 7;
+	l_iOffset = static_cast < short > ( a_ulNumber ) & 7;
 	l_hState = * ( l_pcAddress + l_ulDword ) & g_pcMaskBitSet [ l_iOffset ];
-	if ( l_hState ) l_hState = 1;
+	if ( l_hState )
+		l_hState = 1;
 	return ( l_hState );
 	}
 	
@@ -68,11 +76,13 @@ void setbit( void * a_pvAddress, unsigned long int a_ulNumber, int a_iState )
 	int l_iOffset;
 	char * l_pcAddress;
 	unsigned long int l_ulDword;
-	l_pcAddress = ( char * ) a_pvAddress;
+	l_pcAddress = static_cast < char * > ( a_pvAddress );
 	l_ulDword = a_ulNumber >> 3;
 	l_iOffset = a_ulNumber & 7;
-	if ( a_iState ) * ( l_pcAddress + l_ulDword ) |= g_pcMaskBitSet [ l_iOffset ];
-	else * ( l_pcAddress + l_ulDword ) &= g_pcMaskBitClear [ l_iOffset ];
+	if ( a_iState )
+		* ( l_pcAddress + l_ulDword ) |= g_pcMaskBitSet [ l_iOffset ];
+	else
+		* ( l_pcAddress + l_ulDword ) &= g_pcMaskBitClear [ l_iOffset ];
 	return ;
 	}
 	
@@ -86,16 +96,14 @@ void ror( unsigned char * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 		exit( 1 );
 		}
 	l_iSize = ( a_iLen + a_iStart ) / 8;
-	if ( ( a_iLen + a_iStart ) % 8 ) l_iSize++;
-	l_pucTmp = ( unsigned char * )malloc ( l_iSize );
-	if ( ! l_pucTmp )
-		{
-		perror( "e: memory allocation problem" );
-		return ;
-		}
-	for ( l_i = 0; l_i < l_iSize; l_i++ ) l_pucTmp[ l_i ] = a_pucTmpBuf[ l_i ];
-	for ( l_i = 0; l_i < a_iLen; l_i++ ) setbit( a_pucTmpBuf, a_iStart + l_i, getbit( l_pucTmp, a_iStart + ( l_i + a_iVal ) % a_iLen ) );
-	free ( l_pucTmp );
+	if ( ( a_iLen + a_iStart ) % 8 )
+		l_iSize++;
+	l_pucTmp = xmalloc ( l_iSize, unsigned char );
+	for ( l_i = 0; l_i < l_iSize; l_i++ )
+		l_pucTmp[ l_i ] = a_pucTmpBuf[ l_i ];
+	for ( l_i = 0; l_i < a_iLen; l_i++ )
+		setbit( a_pucTmpBuf, a_iStart + l_i, getbit( l_pucTmp, a_iStart + ( l_i + a_iVal ) % a_iLen ) );
+	xfree ( l_pucTmp );
 	return ;
 	}
 	
@@ -109,32 +117,18 @@ void rol( unsigned char * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 		exit( 1 );
 		}
 	l_iSize = ( a_iLen + a_iStart ) / 8;
-	if ( ( a_iLen + a_iStart ) % 8 ) l_iSize++;
-	l_pucTmp = ( unsigned char * )malloc ( l_iSize );
-	if ( ! l_pucTmp )
-		{
-		perror( "e: memory allocation problem" );
-		return ;
-		}
-	for ( l_i = 0; l_i < l_iSize; l_i++ ) l_pucTmp[ l_i ] = a_pucTmpBuf[ l_i ];
-	for ( l_i = 0; l_i < a_iLen; l_i++ ) setbit( a_pucTmpBuf, a_iStart + ( l_i + a_iVal ) % a_iLen, getbit( l_pucTmp, a_iStart + l_i ) );
-	if ( l_pucTmp )free ( l_pucTmp );
-	l_pucTmp = 0;
+	if ( ( a_iLen + a_iStart ) % 8 )
+		l_iSize++;
+	l_pucTmp = xmalloc ( l_iSize, unsigned char );
+	for ( l_i = 0; l_i < l_iSize; l_i++ )
+		l_pucTmp[ l_i ] = a_pucTmpBuf[ l_i ];
+	for ( l_i = 0; l_i < a_iLen; l_i++ )
+		setbit( a_pucTmpBuf, a_iStart + ( l_i + a_iVal ) % a_iLen, getbit( l_pucTmp, a_iStart + l_i ) );
+	xfree ( l_pucTmp );
 	return ;
 	}
 	
-unsigned char xxor( unsigned char a_ucA, unsigned char a_ucB )
-	{
-	return ( ( a_ucA | a_ucB ) & ( ~a_ucA | ~a_ucB ) );
-	}
-	
-unsigned short int xxor16( unsigned short int a_usA, unsigned short int a_usB )
-	{
-	return ( ( a_usA | a_usB ) & ( ~a_usA | ~a_usB ) );
-	}
-	
-unsigned long int xxor32( unsigned long int a_ulA, unsigned long int a_ulB )
-	{
-	return ( ( a_ulA | a_ulB ) & ( ~a_ulA | ~a_ulB ) );
-	}
+}
+
+}
 
