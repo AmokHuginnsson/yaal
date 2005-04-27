@@ -67,6 +67,7 @@ namespace hcore
 #define M_PROLOG M_TRY
 #define M_EPILOG M_CATCH ( e ){e->log ( __WHERE__ );throw;}
 #define M_FINAL M_CATCH ( e ){e->log ( __WHERE__ );e->print_error ( true );M_EXCEPTION_RELEASE ( e );}
+#define M_ENSURE( condition ) if ( ! ( condition ) )M_THROW ( strerror ( errno ), errno )
 
 #define D_LOG_DEBUG			1
 #define D_LOG_INFO			2

@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <string.h>
+
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hthread.h"
@@ -37,9 +39,11 @@ namespace hcore
 HThread::HThread ( void ) : f_sAttributes ( ), f_xThread ( )
 	{
 	M_PROLOG
-	pthread_attr_init ( & f_sAttributes );
-	pthread_attr_setdetachstate ( & f_sAttributes, PTHREAD_CREATE_JOINABLE );
-	pthread_attr_setinheritsched ( & f_sAttributes, PTHREAD_INHERIT_SCHED );
+	M_ENSURE ( pthread_attr_init ( & f_sAttributes ) == 0 );
+	M_ENSURE ( pthread_attr_setdetachstate ( & f_sAttributes,
+				PTHREAD_CREATE_JOINABLE ) == 0 );
+	M_ENSURE ( pthread_attr_setinheritsched ( & f_sAttributes,
+				PTHREAD_INHERIT_SCHED ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -48,7 +52,7 @@ HThread::~HThread ( void )
 	{
 	M_PROLOG
 	finish ( );
-	pthread_attr_destroy ( & f_sAttributes );
+	M_ENSURE ( pthread_attr_destroy ( & f_sAttributes ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -56,7 +60,8 @@ HThread::~HThread ( void )
 int HThread::spawn ( void )
 	{
 	M_PROLOG
-	pthread_create ( & f_xThread, & f_sAttributes, SPAWN, this );
+	M_ENSURE ( pthread_create ( & f_xThread,
+				& f_sAttributes, SPAWN, this ) == 0 );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -65,7 +70,7 @@ int HThread::finish ( void )
 	{
 	M_PROLOG
 	void * l_pvReturn = NULL;
-	pthread_cancel ( f_xThread );
+	M_ENSURE ( pthread_cancel ( f_xThread ) == 0 );
 	pthread_join ( f_xThread, & l_pvReturn );
 	return ( 0 );
 	M_EPILOG
@@ -75,8 +80,8 @@ void * HThread::SPAWN ( void * a_pvThread )
 	{
 	M_PROLOG
 	HThread * l_poThread = reinterpret_cast < HThread * > ( a_pvThread );
-	pthread_setcancelstate ( PTHREAD_CANCEL_ENABLE, NULL );
-	pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL );
+	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
+	M_ENSURE ( pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
 	l_poThread->run ( );
 	return ( NULL );
 	M_EPILOG
