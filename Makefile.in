@@ -40,7 +40,8 @@ DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/stdhapi.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
 CL						:= $(shell tput cr;tput dl1)
-HL						:= $(shell tput bold; tput setaf 1)
+HL						:= $(shell tput bold || tput md; tput setaf 1 || tput AF 1)
+RS						:= $(shell tput sgr0 || tput me)
 HS = .h
 SS = .c
 OS = .o
@@ -192,7 +193,7 @@ lib%.so.$(RELEASE):
 	echo -n "Linking \`$(@) ... $(HL)"; \
 	$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
 			-Wl,--entry="stdhapi_$(NAME)_main" \
-			-Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; tput sgr0; \
+			-Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; echo -n $(RS); \
 	if [ -f $(@) ] ; then \
 	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 \
 | grep -v '^ar: creating ' | tee -a make.log; \
@@ -209,7 +210,7 @@ lib%.so.$(RELEASE):
 	@if [ "$(suffix $(<))" != ".d" ] ; then \
 	echo -n "$(HL)"; \
 	echo "Lack of \`$(<)'." | tee -a make.log; \
-	tput sgr0; fi
+	echo -n $(RS); fi
 
 #phony targets
 .PHONY: all nodebug install dep clean tags mrproper purge environment
@@ -239,7 +240,7 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	for FILE in $(HDRS); do \
 		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); \
 		printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) }; \
-		!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`;\
+		!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`; \
 	done; \
 	head -26 $(DIR_HEADERS)/bit.h \
 | sed -e s/bit/stdhapi/ > $(DIR_HEADERS)/stdhapi.h; \
@@ -252,8 +253,8 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 | sort >> $(DIR_HEADERS)/stdhapi.h; \
 	echo '' >> $(DIR_HEADERS)/stdhapi.h; \
 	echo '#endif /* not __STDHAPI_H */' >> $(DIR_HEADERS)/stdhapi.h; \
-	echo -n 'done.$(CL)'; tput bold; \
-	echo "All OK!"; tput sgr0
+	echo -n 'done.$(CL)'; tput bold || tput md; \
+	echo "All OK!$(RS)";
 
 $(LD_CACHE):
 	@echo -n "Making environment ... "; \
