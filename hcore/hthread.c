@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <string.h>
+#include <libintl.h>
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
@@ -36,7 +37,8 @@ namespace stdhapi
 namespace hcore
 {
 
-HThread::HThread ( void ) : f_sAttributes ( ), f_xThread ( )
+HThread::HThread ( void )
+	: f_bAlive ( false ), f_sAttributes ( ), f_xThread ( )
 	{
 	M_PROLOG
 	M_ENSURE ( pthread_attr_init ( & f_sAttributes ) == 0 );
@@ -60,6 +62,9 @@ HThread::~HThread ( void )
 int HThread::spawn ( void )
 	{
 	M_PROLOG
+	if ( f_bAlive )
+		M_THROW ( _ ( "thread is already running" ), g_iErrNo );
+	f_bAlive = true;
 	M_ENSURE ( pthread_create ( & f_xThread,
 				& f_sAttributes, SPAWN, this ) == 0 );
 	return ( 0 );
@@ -70,8 +75,9 @@ int HThread::finish ( void )
 	{
 	M_PROLOG
 	void * l_pvReturn = NULL;
-	M_ENSURE ( pthread_cancel ( f_xThread ) == 0 );
-	pthread_join ( f_xThread, & l_pvReturn );
+	if ( f_bAlive )
+		M_ENSURE ( pthread_cancel ( f_xThread ) == 0 );
+	M_ENSURE ( pthread_join ( f_xThread, & l_pvReturn ) == 0 );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -80,10 +86,21 @@ void * HThread::SPAWN ( void * a_pvThread )
 	{
 	M_PROLOG
 	HThread * l_poThread = reinterpret_cast < HThread * > ( a_pvThread );
-	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
+	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
 	M_ENSURE ( pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
 	l_poThread->run ( );
+	l_poThread->f_bAlive = false;
 	return ( NULL );
+	M_EPILOG
+	}
+
+void HThread::listen ( void )
+	{
+	M_PROLOG
+	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
+	pthread_testcancel ( );
+	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
+	return;
 	M_EPILOG
 	}
 

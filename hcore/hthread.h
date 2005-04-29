@@ -39,8 +39,9 @@ class HThread
 	{
 protected:
 	/*{*/
-	pthread_attr_t f_sAttributes;
-	pthread_t f_xThread;
+	bool						f_bAlive;
+	pthread_attr_t	f_sAttributes;
+	pthread_t				f_xThread;
 	/*}*/
 public:
 	/*{*/
@@ -48,6 +49,7 @@ public:
 	virtual ~HThread ( void );
 	int spawn ( void );
 	int finish ( void );
+	void listen ( void );
 	/*}*/
 private:
 	virtual int run ( void ) = 0;
