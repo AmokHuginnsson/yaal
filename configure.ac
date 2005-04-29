@@ -86,7 +86,7 @@ AC_CHECK_FILE(
 			[AC_CHECK_FILE(
 				[[/etc/random-seed]],
 				[AC_DEFINE([[__HOST_OS_TYPE_SLACKWARE__]]) _HOST________=['Slackware. ---']],
-				[AC_MSG_ERROR([Can not recognize host operating system type!])]
+				[AC_MSG_ERROR([Cannot recognize host operating system type!])]
 			)]
 		)]
 	) AC_SUBST([SERIAL_DEVICE],['ttyS0'])]
@@ -108,17 +108,17 @@ CXXFLAGS=["-Wshadow -Werror"]
 AC_TRY_COMPILE([#include <pthread.h>],[],
 							[AC_SUBST([WARN_SHADOW],[-Wshadow])
 							_FLAGS=["-Wshadow"]],
-							[AC_MSG_WARN([[Can not use -Wshadow!]])])
+							[AC_MSG_WARN([[Cannot use -Wshadow!]])])
 CXXFLAGS=["-pedantic-errors"]
 AC_TRY_COMPILE([#include <stdlib.h>],[],
 							[AC_SUBST([PEDANTIC_ERRORS],	[-pedantic-errors])
 							_FLAGS=["$_FLAGS -pedantic-errors"]],
-							[AC_MSG_WARN([[Can not use -pedantic-errors!]])])
+							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
 CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings -Wl,-soname,conftest"]
 AC_LINK_IFELSE([[extern int errno;void foo(void){errno=0;}]],
 							[AC_SUBST([SPECIAL_LINKER_FLAGS],
 								[[-Wl,--no-undefined]]) _FLAGS=["$_FLAGS -Wl,--no-undefined."]],
-							[AC_MSG_WARN([[Can not use -Wl,--no-undefined!]])])
+							[AC_MSG_WARN([[Cannot use -Wl,--no-undefined!]])])
 if test ["$_FLAGS"] = [""] ; then
 	_FLAGS='unfortunetely none. ---         [[68%]]'
 fi
@@ -177,25 +177,28 @@ dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[70%]]])
 CXXFLAGS=$CXXFLAGS_ORIG;
 CPPFLAGS=$CXXFLAGS_ORIG;
+AC_CHECK_LIB([thr],[pthread_create],[AC_SUBST([THREADING_LIBRARY],[thr])],
+	[AC_CHECK_LIB([pthread],[pthread_create],[AC_SUBST([THREADING_LIBRARY],[pthread])],
+		[AC_MSG_ERROR([Cannot build woithout threading library.])])])
 AC_CHECK_LIB([ncurses],[initscr],
-							[],[AC_MSG_ERROR([Can not continue without ncurses.])])
+							[],[AC_MSG_ERROR([Cannot continue without ncurses.])])
 AC_CHECK_LIB([gpm],[Gpm_Open],[AC_SUBST([MOUSE_LIB],[-lgpm])])
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_LIB([pq],[PQsetdbLogin],
 								[],[if test ["$POSTGRES"] = ["yes"] ; then
-											AC_MSG_ERROR([Can not continue without PostgreSQL.])
+											AC_MSG_ERROR([Cannot continue without PostgreSQL.])
 										fi;POSTGRES=["no"]])
 fi
 if test ["$SQLITE"] != ["no"] ; then
 	AC_CHECK_LIB([sqlite],[sqlite_open],
 								[],[if test ["$SQLITE"] = ["yes"] ; then
-											AC_MSG_ERROR([Can not continue without SQLite.])
+											AC_MSG_ERROR([Cannot continue without SQLite.])
 										fi;SQLITE=["no"]])
 fi
 if test ["$SQLITE3"] != ["no"] ; then
 	AC_CHECK_LIB([sqlite3],[sqlite3_open],
 								[],[if test ["$SQLITE3"] = ["yes"] ; then
-											AC_MSG_ERROR([Can not continue without SQLite3.])
+											AC_MSG_ERROR([Cannot continue without SQLite3.])
 										fi;SQLITE3=["no"]])
 fi
 if test ["$MYSQL"] != ["no"] ; then
@@ -205,7 +208,7 @@ if test ["$MYSQL"] != ["no"] ; then
 			AC_CHECK_LIB([mysqlclient],[mysql_init],[
 				AC_SUBST([EXTRA_LIB_PATHS], [[-L/usr/local/lib/mysql]])],
 				[if test ["$MYSQL"] = ["yes"] ; then
-					AC_MSG_ERROR([Can not continue without MySQL.])
+					AC_MSG_ERROR([Cannot continue without MySQL.])
 				fi;MYSQL=["no"]])])
 fi
 
@@ -219,11 +222,11 @@ _CONSOLE_MOUSE=[""];
 AC_CHECK_HEADERS([[sys/consio.h]],_CONSOLE_MOUSE=["moused"])
 AC_CHECK_HEADERS([[gpm.h]],_CONSOLE_MOUSE=["gpm"])
 if test ["$_CONSOLE_MOUSE"] = [""] -a ["$CONSOLE_MOUSE"] = ["yes"] ; then
-	AC_MSG_ERROR([Can not continue without console mouse support.])
+	AC_MSG_ERROR([Cannot continue without console mouse support.])
 fi
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
-			[AC_MSG_ERROR([Can not continue without ncurses devel!])])])
+			[AC_MSG_ERROR([Cannot continue without ncurses devel!])])])
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],
 		[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
@@ -232,7 +235,7 @@ if test ["$POSTGRES"] != ["no"] ; then
 			[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
 			DEFAULT_DRIVER=["PostgreSQL"]],
 				[if test ["$POSTGRES"] = ["yes"] ; then
-					AC_MSG_ERROR([[Can not continue without PostgreSQL devel(client)!]])
+					AC_MSG_ERROR([[Cannot continue without PostgreSQL devel(client)!]])
 				fi;POSTGRES=["no"]])])
 fi
 if test ["$MYSQL"] != ["no"] ; then
@@ -240,7 +243,7 @@ if test ["$MYSQL"] != ["no"] ; then
 		[AC_SUBST([DO_MYSQL_DRIVER],["mysql"])
 			DEFAULT_DRIVER=["MySQL"]],
 				[if test ["$MYSQL"] = ["yes"] ; then
-					AC_MSG_ERROR([[Can not continue without MySQL devel(client)!]])
+					AC_MSG_ERROR([[Cannot continue without MySQL devel(client)!]])
 				fi;MYSQL=["no"]])
 fi
 if test ["$SQLITE"] != ["no"] ; then
@@ -248,7 +251,7 @@ if test ["$SQLITE"] != ["no"] ; then
 		[AC_SUBST([DO_SQLITE_DRIVER],["sqlite"])
 			DEFAULT_DRIVER=["SQLite"]],
 				[if test ["$SQLITE"] = ["yes"] ; then
-					AC_MSG_ERROR([[Can not continue without SQLite devel(client)!]])
+					AC_MSG_ERROR([[Cannot continue without SQLite devel(client)!]])
 				fi;SQLITE=["no"]])
 fi
 if test ["$SQLITE3"] != ["no"] ; then
@@ -256,7 +259,7 @@ if test ["$SQLITE3"] != ["no"] ; then
 		[AC_SUBST([DO_SQLITE3_DRIVER],["sqlite3"])
 			DEFAULT_DRIVER=["SQLite3"]],
 				[if test ["$SQLITE3"] = ["yes"] ; then
-					AC_MSG_ERROR([[Can not continue without SQLite3 devel(client)!]])
+					AC_MSG_ERROR([[Cannot continue without SQLite3 devel(client)!]])
 				fi;SQLITE3=["no"]])
 fi
 AC_SUBST([DEFAULT_DRIVER],["$DEFAULT_DRIVER"])
@@ -279,7 +282,7 @@ CXXFLAGS=["$EXTRA_WARNINGS -Wall -Werror -Wcast-align -Wconversion -Wwrite-strin
 AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
 [printw("x");],[AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
-		AC_MSG_ERROR([Can not continue with seriously brain-damaged ncurses.])])
+		AC_MSG_ERROR([Cannot continue with seriously brain-damaged ncurses.])])
 AC_MSG_CHECKING([if your ncurses is damaged about char-subscripts in ncurses (acs_map)])
 AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
 [addch(ACS_DARROW);],[AC_DEFINE([HAVE_ASCII_GRAPHICS]) AC_MSG_RESULT([[no :)]])],
