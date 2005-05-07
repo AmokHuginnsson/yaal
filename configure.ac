@@ -51,7 +51,7 @@ else
 fi
 
 dnl Testing presence of c compiler
-if test ["$CXX"] = ["colorgcc"] ; then
+if test ["$CXX"] = ["colorgcc"] -o ["$CXX"] = ["colorg++"] ; then
 	CXX=["g++"]
 fi
 if test ["$CC"] = ["colorgcc"] ; then
