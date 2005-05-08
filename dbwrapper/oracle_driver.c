@@ -29,6 +29,7 @@ Copyright:
 #include <string.h>
 #include <sys/stat.h>
 
+#define __STRICT_ANSI__
 #include <oci.h>
 
 #include "hcore/xalloc.h"

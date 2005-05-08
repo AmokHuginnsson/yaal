@@ -129,7 +129,7 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 #endif /* not HAVE_GETLINE */
 			{
 #ifndef HAVE_GETLINE
-			l_pcPtr = ( char * ) memchr ( f_pcBuffer, '\n', l_iLen );
+			l_pcPtr = static_cast < char * > ( memchr ( f_pcBuffer, '\n', l_iLen ) );
 			if ( ! l_pcPtr )
 				{
 				fprintf ( a_psStream, f_pcBuffer );

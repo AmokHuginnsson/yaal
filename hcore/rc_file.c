@@ -189,7 +189,8 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 		{
 		a_riLine ++;
 #ifndef HAVE_GETLINE
-		l_pcPtr = ( char * ) memchr ( l_pcBuffer, '\n', l_iReadLen );
+		l_pcPtr = static_cast < char * > ( memchr ( l_pcBuffer,
+					'\n', l_iReadLen ) );
 		if ( ! l_pcPtr )
 			continue;
 		* ++ l_pcPtr = 0;
