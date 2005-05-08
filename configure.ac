@@ -100,6 +100,8 @@ dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[63%]]])
 _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
+CPPFLAGS_ORIG=$CPPFLAGS;
+
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])
 RESULT=["no"]
@@ -111,11 +113,13 @@ AC_TRY_COMPILE([#include <pthread.h>],[],
 							[AC_SUBST([WARN_SHADOW],[-Wshadow])
 							_FLAGS=["-Wshadow"]],
 							[AC_MSG_WARN([[Cannot use -Wshadow!]])])
+CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["-pedantic-errors"]
 AC_TRY_COMPILE([#include <stdlib.h>],[],
 							[AC_SUBST([PEDANTIC_ERRORS],	[-pedantic-errors])
 							_FLAGS=["$_FLAGS -pedantic-errors"]],
 							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
+CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings -Wl,-soname,conftest"]
 AC_LINK_IFELSE([[extern int errno;void foo(void){errno=0;}]],
 							[AC_SUBST([SPECIAL_LINKER_FLAGS],
@@ -134,6 +138,7 @@ AC_CHECK_FILE([[/dev/cuaa0]],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
 dnl Test if dynamic loader is in libc or in separate library dl.
 AC_MSG_CHECKING([whether dl library is inside libc])
 RESULT=["no"]
+CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["-ldl"]
 AC_LINK_IFELSE([[#include <dlfcn.h>
 int main()
@@ -147,6 +152,7 @@ AC_MSG_RESULT([$RESULT])
 dnl Test if gettext is in libc or in separate library intl.
 AC_MSG_CHECKING([whether intl(gettext) library is inside libc])
 RESULT=["no"]
+CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["-lintl"]
 AC_LINK_IFELSE([[#include <libintl.h>
 int main()
@@ -182,26 +188,32 @@ CPPFLAGS=$CXXFLAGS_ORIG;
 AC_CHECK_LIB([thr],[pthread_create],[AC_SUBST([THREADING_LIBRARY],[thr])],
 	[AC_CHECK_LIB([pthread],[pthread_create],[AC_SUBST([THREADING_LIBRARY],[pthread])],
 		[AC_MSG_ERROR([Cannot build woithout threading library.])])])
+LIBS=""
 AC_CHECK_LIB([ncurses],[initscr],
 							[],[AC_MSG_ERROR([Cannot continue without ncurses.])])
+LIBS=""
 AC_CHECK_LIB([gpm],[Gpm_Open],[AC_SUBST([MOUSE_LIB],[-lgpm])])
+LIBS=""
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_LIB([pq],[PQsetdbLogin],
 								[],[if test ["$POSTGRES"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without PostgreSQL.])
 										fi;POSTGRES=["no"]])
+	LIBS=""
 fi
 if test ["$SQLITE"] != ["no"] ; then
 	AC_CHECK_LIB([sqlite],[sqlite_open],
 								[],[if test ["$SQLITE"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without SQLite.])
 										fi;SQLITE=["no"]])
+	LIBS=""
 fi
 if test ["$SQLITE3"] != ["no"] ; then
 	AC_CHECK_LIB([sqlite3],[sqlite3_open],
 								[],[if test ["$SQLITE3"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without SQLite3.])
 										fi;SQLITE3=["no"]])
+	LIBS=""
 fi
 if test ["$ORACLE"] != ["no"] ; then
 	CXXFLAGS=["$CXXFLAGS -L$ORACLE_HOME/lib"]
@@ -209,6 +221,8 @@ if test ["$ORACLE"] != ["no"] ; then
 								[],[if test ["$ORACLE"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without Oracle.])
 										fi;ORACLE=["no"]])
+	CXXFLAGS=$CXXFLAGS_ORIG
+	LIBS=""
 fi
 if test ["$MYSQL"] != ["no"] ; then
 	AC_CHECK_LIB([mysqlclient],[mysql_init],[],[
@@ -219,10 +233,9 @@ if test ["$MYSQL"] != ["no"] ; then
 				[if test ["$MYSQL"] = ["yes"] ; then
 					AC_MSG_ERROR([Cannot continue without MySQL.])
 				fi;MYSQL=["no"]])])
+	CXXFLAGS=$CXXFLAGS_ORIG
+	LIBS=""
 fi
-
-CXXFLAGS=$CXXFLAGS_ORIG;
-CPPFLAGS=$CXXFLAGS_ORIG;
 
 AC_MSG_RESULT([--- All needed libraries found. ---                     [[76%]]])
 
@@ -246,6 +259,8 @@ if test ["$ORACLE"] != ["no"] ; then
 				[if test ["$ORACLE"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without Oracle devel(client)!]])
 				fi;ORACLE=["no"]])
+	CXXFLAGS=$CXXFLAGS_ORIG
+	CPPFLAGS=$CPPFLAGS_ORIG
 fi
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],
@@ -297,6 +312,7 @@ AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 dnl We need to check if out ncurses devel is not brain-damaged.
 AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
 AC_MSG_CHECKING([if your ncurses-devel is seriously brain-damaged])
+CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["$EXTRA_WARNINGS -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
 AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
 [printw("x");],[AC_MSG_RESULT([[no :)]])],
