@@ -43,9 +43,19 @@ extern "C"
 
 void db_disconnect ( void * );
 
-void * db_connect ( char const * /*a_pcDataBase*/,
-		char const * /*a_pcLogin*/, char const * /*a_pcPassword*/ )
+void * db_connect ( char const * /* In Oracle user name is name of schema. */,
+		char const * a_pcLogin, char const * a_pcPassword )
 	{
+	OCIEnv * l_psEnvironment = NULL;
+	OCIError * l_psError = NULL;
+	OCISvcCtx * l_psServiceContext = NULL;
+	if ( OCILogon ( l_psEnvironment, l_psError, & l_psServiceContext,
+				reinterpret_cast < const OraText * > ( a_pcLogin ),
+				strlen ( a_pcLogin ),
+				reinterpret_cast < const OraText * > ( a_pcPassword ),
+				strlen ( a_pcPassword ),
+				reinterpret_cast < const OraText * > ( "SPOON" ),
+				strlen ( "SPOON" ) ) );
 	return ( NULL );
 	}
 
