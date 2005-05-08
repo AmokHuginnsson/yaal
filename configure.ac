@@ -17,6 +17,8 @@ AC_ARG_WITH([sqlite],[AC_HELP_STRING([--with-sqlite],[Compile with SQLite driver
 dnl `
 AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, default is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
 dnl `
+AC_ARG_WITH([oracle],[AC_HELP_STRING([--with-oracle],[Compile with Oralce driver, default is `yes' if Oracle can be found.])],[ORACLE=$withval],[ORACLE="auto"])
+dnl `
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 
@@ -201,12 +203,19 @@ if test ["$SQLITE3"] != ["no"] ; then
 											AC_MSG_ERROR([Cannot continue without SQLite3.])
 										fi;SQLITE3=["no"]])
 fi
+if test ["$ORACLE"] != ["no"] ; then
+	CXXFLAGS=["$CXXFLAGS -L$ORACLE_HOME/lib"]
+	AC_CHECK_LIB([clntsh],[OCIEnvCreate],
+								[],[if test ["$ORACLE"] = ["yes"] ; then
+											AC_MSG_ERROR([Cannot continue without Oracle.])
+										fi;ORACLE=["no"]])
+fi
 if test ["$MYSQL"] != ["no"] ; then
 	AC_CHECK_LIB([mysqlclient],[mysql_init],[],[
 			CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]
 			unset ac_cv_lib_mysqlclient_mysql_init
 			AC_CHECK_LIB([mysqlclient],[mysql_init],[
-				AC_SUBST([EXTRA_LIB_PATHS], [[-L/usr/local/lib/mysql]])],
+				EXTRA_LIB_PATHS="-L/usr/local/lib/mysql"],
 				[if test ["$MYSQL"] = ["yes"] ; then
 					AC_MSG_ERROR([Cannot continue without MySQL.])
 				fi;MYSQL=["no"]])])
@@ -227,6 +236,17 @@ fi
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
 			[AC_MSG_ERROR([Cannot continue without ncurses devel!])])])
+if test ["$ORACLE"] != ["no"] ; then
+	CXXFLAGS=["$CXXFLAGS -I$ORACLE_HOME/rdbms/public"]
+	CPPFLAGS=["$CXXFLAGS"]
+	AC_CHECK_HEADERS([[oci.h]],
+		[AC_SUBST([DO_ORACLE_DRIVER],["oracle"])
+			EXTRA_INCLUDE_PATHS=["-I\$(ORACLE_HOME)/rdbms/public"]
+			DEFAULT_DRIVER=["Oracle"]],
+				[if test ["$ORACLE"] = ["yes"] ; then
+					AC_MSG_ERROR([[Cannot continue without Oracle devel(client)!]])
+				fi;ORACLE=["no"]])
+fi
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],
 		[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
@@ -262,7 +282,6 @@ if test ["$SQLITE3"] != ["no"] ; then
 					AC_MSG_ERROR([[Cannot continue without SQLite3 devel(client)!]])
 				fi;SQLITE3=["no"]])
 fi
-AC_SUBST([DEFAULT_DRIVER],["$DEFAULT_DRIVER"])
 
 AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 
@@ -294,16 +313,20 @@ FILES=["$FILES /usr/local/etc/mysql/my.cnf /etc/mysqld.conf"]
 FILES=["$FILES /etc/mysql/mysqld.conf /usr/local/etc/mysqld.conf"]
 FILES=["$FILES /usr/local/etc/mysql/mysqld.conf"]
 MYSQL_SOCKET=[`grep -s "^socket" $FILES|awk '{sub(".*=[ \\t]+","");print;exit}'`]
-AC_SUBST([MYSQL_SOCKET],[$MYSQL_SOCKET])
 
 AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
 AC_CONFIG_COMMANDS_PRE([cd doc/html;
 												ln -sf stdhapi_toc.html index.html;cd ../..])
 
-if test ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a ["$SQLITE"] = ["no"] -a ["SQLITE3"] = ["no"] ; then
+if test ["$ORACLE"] = ["no"] -a ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a ["$SQLITE"] = ["no"] -a ["SQLITE3"] = ["no"] ; then
 	AC_MSG_WARN([stdhapi without any data base driver will be
                     unusable for most professional purpouses.])
 fi
+
+AC_SUBST([EXTRA_LIB_PATHS], ["$EXTRA_LIB_PATHS"])
+AC_SUBST([EXTRA_INCLUDE_PATHS], ["$EXTRA_INCLUDE_PATHS"])
+AC_SUBST([DEFAULT_DRIVER], ["$DEFAULT_DRIVER"])
+AC_SUBST([MYSQL_SOCKET],["$MYSQL_SOCKET"])
 
 dnl We have to set up proper compiler/linker flags.
 AC_OUTPUT([Makefile stdhapirc])

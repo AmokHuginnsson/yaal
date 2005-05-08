@@ -30,7 +30,7 @@ SUBVERSION		= 0
 EXTRAVERSION	= 0
 RELEASE				= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 COMPONENTS		= hcore hconsole tools dbwrapper hdata
-DRIVERS				= @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE_DRIVER@ @DO_SQLITE3_DRIVER@
+DRIVERS				= @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE_DRIVER@ @DO_SQLITE3_DRIVER@
 export DIR_ROOT	?= $(CURDIR)
 DIR_TARGET		= $(HOME)/lib
 DIR_HEADERS		= $(HOME)/prog/include
@@ -100,7 +100,8 @@ else
 	COMPILER_DEBUG_FLAGS				= -g -g3 -ggdb -ggdb3 -gstabs+ -pg -fno-inline \
 																-D__DEBUG__ $(DB)
 endif
-COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I/usr/local/include
+COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I/usr/local/include \
+																@EXTRA_INCLUDE_PATHS@
 # -fno-external-templates #deprecated
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \
 																@EXTRA_LIB_PATHS@
