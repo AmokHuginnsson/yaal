@@ -44,7 +44,6 @@ typedef struct
 	int f_iErrorCode;
 	char * f_pcErrorMessage;
 	sqlite3 * f_psDB;
-	
 	} sqlite_db;
 	
 typedef struct
