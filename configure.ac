@@ -186,8 +186,12 @@ AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[70%]]])
 CXXFLAGS=$CXXFLAGS_ORIG;
 CPPFLAGS=$CXXFLAGS_ORIG;
 AC_CHECK_LIB([thr],[pthread_create],[AC_SUBST([THREADING_LIBRARY],[thr])],
-	[AC_CHECK_LIB([pthread],[pthread_create],[AC_SUBST([THREADING_LIBRARY],[pthread])],
+	[AC_CHECK_LIB([pthread],[pthread_create],
+								[AC_SUBST([THREADING_LIBRARY],[pthread])],
 		[AC_MSG_ERROR([Cannot build woithout threading library.])])])
+LIBS=""
+AC_CHECK_LIB([xml2],[xmlParseFile],
+							[],[AC_MSG_ERROR([Cannot continue without XML library.])])
 LIBS=""
 AC_CHECK_LIB([ncurses],[initscr],
 							[],[AC_MSG_ERROR([Cannot continue without ncurses.])])
@@ -246,6 +250,13 @@ AC_CHECK_HEADERS([[gpm.h]],_CONSOLE_MOUSE=["gpm"])
 if test ["$_CONSOLE_MOUSE"] = [""] -a ["$CONSOLE_MOUSE"] = ["yes"] ; then
 	AC_MSG_ERROR([Cannot continue without console mouse support.])
 fi
+CXXFLAGS=["$CXXFLAGS -I/usr/include/libxml2"]
+CPPFLAGS=["$CPPFLAGS -I/usr/include/libxml2"]
+AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
+	EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/include/libxml2"],
+	[AC_MSG_ERROR([Cannot continue without XML development files.])])
+CXXFLAGS=$CXXFLAGS_ORIG
+CPPFLAGS=$CPPFLAGS_ORIG
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
 			[AC_MSG_ERROR([Cannot continue without ncurses devel!])])])
@@ -254,7 +265,7 @@ if test ["$ORACLE"] != ["no"] ; then
 	CPPFLAGS=["$CXXFLAGS"]
 	AC_CHECK_HEADERS([[oci.h]],
 		[AC_SUBST([DO_ORACLE_DRIVER],["oracle"])
-			EXTRA_INCLUDE_PATHS=["-I\$(ORACLE_HOME)/rdbms/public"]
+			EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I\$(ORACLE_HOME)/rdbms/public"]
 			DEFAULT_DRIVER=["Oracle"]],
 				[if test ["$ORACLE"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without Oracle devel(client)!]])
