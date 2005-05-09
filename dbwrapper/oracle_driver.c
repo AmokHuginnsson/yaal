@@ -52,6 +52,13 @@ typedef struct
 	OCISvcCtx * f_psServiceContext;
 	} OOracle;
 
+typedef struct
+	{
+	int f_iStatus;
+	OCIError * f_psError;
+	OCIStmt * f_psStatement;
+	} OQuery;
+
 OOracle * g_psBrokenDB = NULL;
 
 void db_disconnect ( void * );
@@ -184,8 +191,11 @@ void * db_query ( void * /*a_pvData*/, char const * /*a_pcQuery*/ )
 	return ( NULL );
 	}
 
-void db_unquery ( void * /*a_pvData*/ )
+void db_unquery ( void * a_pvData )
 	{
+	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvData );
+	l_psQuery->f_iStatus = OCIStmtRelease ( l_psQuery->f_psStatement,
+			l_psQuery->f_psError, NULL, 0, OCI_DEFAULT );
 	return;
 	}
 
