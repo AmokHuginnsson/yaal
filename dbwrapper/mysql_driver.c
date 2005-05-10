@@ -76,14 +76,14 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno ( void * a_pvData )
+int dbrs_errno ( void * a_pvData, void * )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
 	return ( mysql_errno ( ( MYSQL * ) a_pvData ) );
 	}
 
-char const * db_error  ( void * a_pvData )
+char const * dbrs_error  ( void * a_pvData, void * )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
@@ -115,7 +115,7 @@ int rs_fields_count ( void * a_pvData )
 	return ( mysql_num_fields ( ( MYSQL_RES * ) a_pvData ) );
 	}
 
-long int rsdb_records_count ( void * a_pvDataB, void * a_pvDataR )
+long int dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
 	{
 	if ( a_pvDataR )
 		return ( mysql_num_rows ( ( MYSQL_RES * ) a_pvDataR ) );
@@ -123,7 +123,7 @@ long int rsdb_records_count ( void * a_pvDataB, void * a_pvDataR )
 		return ( mysql_affected_rows ( ( MYSQL * ) a_pvDataB ) );
 	}
 
-long int rsdb_id ( void * a_pvDataB, void * )
+long int dbrs_id ( void * a_pvDataB, void * )
 	{
 	return ( mysql_insert_id ( ( MYSQL * ) a_pvDataB ) );
 	}

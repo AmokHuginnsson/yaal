@@ -119,7 +119,7 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno ( void * a_pvData )
+int dbrs_errno ( void * a_pvData, void * )
 	{
 	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
 	if ( ! l_psSQLite )
@@ -130,7 +130,7 @@ int db_errno ( void * a_pvData )
 	return ( errno );
 	}
 
-char const * db_error  ( void * a_pvData )
+char const * dbrs_error  ( void * a_pvData, void * )
 	{
 	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
 	if ( ! l_psSQLite )
@@ -176,7 +176,7 @@ int rs_fields_count ( void * a_pvData )
 	return ( ( ( sqlite_result * ) a_pvData )->f_iColumns );
 	}
 
-long int rsdb_records_count ( void * a_pvDataB, void * a_pvDataR )
+long int dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
 	{
 	if ( a_pvDataR )
 		return ( ( ( sqlite_result * ) a_pvDataR )->f_iRows );
@@ -184,7 +184,7 @@ long int rsdb_records_count ( void * a_pvDataB, void * a_pvDataR )
 		return ( sqlite_changes ( ( sqlite * ) a_pvDataB ) );
 	}
 
-long int rsdb_id ( void * a_pvDataB, void * )
+long int dbrs_id ( void * a_pvDataB, void * )
 	{
 	return ( sqlite_last_insert_rowid ( ( sqlite * ) a_pvDataB ) );
 	}

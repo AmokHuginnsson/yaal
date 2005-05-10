@@ -126,10 +126,13 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno ( void * a_pvData )
+int dbrs_errno ( void * a_pvDataB, void * /*a_pvDataR*/ )
 	{
 	int l_iError = 0;
-	OOracle * l_psOracle = static_cast < OOracle * > ( a_pvData );
+	OOracle * l_psOracle = NULL;
+	if ( ! a_pvDataB )
+		a_pvDataB = g_psBrokenDB;
+	l_psOracle = static_cast < OOracle * > ( a_pvDataB );
 	if ( ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO )
 			&& ( l_psOracle->f_iStatus != OCI_ERROR ) )
 		return ( l_psOracle->f_iStatus );
@@ -138,9 +141,12 @@ int db_errno ( void * a_pvData )
 	return ( l_iError );
 	}
 
-char const * db_error  ( void * a_pvData )
+char const * dbrs_error  ( void * a_pvDataB, void * /*a_pvDataR*/ )
 	{
-	OOracle * l_psOracle = static_cast < OOracle * > ( a_pvData );
+	OOracle * l_psOracle = NULL;
+	if ( ! a_pvDataB )
+		a_pvDataB = g_psBrokenDB;
+	l_psOracle = static_cast < OOracle * > ( a_pvDataB );
 	switch ( l_psOracle->f_iStatus )
 		{
 		case ( OCI_SUCCESS_WITH_INFO ):
@@ -209,12 +215,12 @@ int rs_fields_count ( void * /*a_pvData*/ )
 	return ( 0 );
 	}
 
-long int rsdb_records_count ( void * /*a_pvDataB*/, void * /*a_pvDataR*/ )
+long int dbrs_records_count ( void * /*a_pvDataB*/, void * /*a_pvDataR*/ )
 	{
 	return ( 0 );
 	}
 
-long int rsdb_id ( void * /*a_pvDataB*/, void * )
+long int dbrs_id ( void * /*a_pvDataB*/, void * )
 	{
 	return ( 0 );
 	}

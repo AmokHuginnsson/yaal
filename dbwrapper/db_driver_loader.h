@@ -48,26 +48,26 @@ namespace dbwrapper
 
 extern void * ( * db_connect ) ( char const *, char const *, char const * );
 extern void ( * db_disconnect ) ( void * );
-extern int ( * db_errno ) ( void * );
-extern char const * ( * db_error ) ( void * );
+extern int ( * dbrs_errno ) ( void *, void * );
+extern char const * ( * dbrs_error ) ( void *, void * );
 extern void * ( * db_query ) ( void *, char const * );
 extern void ( * db_unquery ) ( void * );
 extern char * ( * rs_get ) ( void *, int, int );
 extern int ( * rs_fields_count ) ( void * );
-extern long int ( * rsdb_records_count ) ( void *, void * );
-extern long int ( * rsdb_id ) ( void *, void * );
+extern long int ( * dbrs_records_count ) ( void *, void * );
+extern long int ( * dbrs_id ) ( void *, void * );
 extern char * ( * rs_column_name ) ( void *, int );
 
 void * autoloader_db_connect ( char const *, char const *, char const * );
 void autoloader_db_disconnect ( void * );
-int autoloader_db_errno ( void * );
-char const * autoloader_db_error ( void * );
+int autoloader_dbrs_errno ( void *, void * );
+char const * autoloader_dbrs_error ( void *, void * );
 void * autoloader_db_query ( void *, char const * );
 void autoloader_db_unquery ( void * );
 char * autoloader_rs_get ( void *, int, int );
 int autoloader_rs_fields_count ( void * );
-long int autoloader_rsdb_records_count ( void *, void * );
-long int autoloader_rsdb_id ( void *, void * );
+long int autoloader_dbrs_records_count ( void *, void * );
+long int autoloader_dbrs_id ( void *, void * );
 char * autoloader_rs_column_name ( void *, int );
 
 	}

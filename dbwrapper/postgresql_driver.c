@@ -80,12 +80,12 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno ( void * )
+int dbrs_errno ( void *, void * )
 	{
 	return ( errno );
 	}
 
-char const * db_error  ( void * a_pvData )
+char const * dbrs_error  ( void * a_pvData, void * )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
@@ -113,7 +113,7 @@ int rs_fields_count ( void * a_pvData )
 	return ( PQnfields ( ( PGresult * ) a_pvData ) );
 	}
 
-long int rsdb_records_count ( void *, void * a_pvDataR )
+long int dbrs_records_count ( void *, void * a_pvDataR )
 	{
 	char * l_pcTmp = PQcmdTuples ( ( PGresult * ) a_pvDataR );
 	if ( l_pcTmp && l_pcTmp [ 0 ] )
@@ -122,7 +122,7 @@ long int rsdb_records_count ( void *, void * a_pvDataR )
 		return ( PQntuples ( ( PGresult * ) a_pvDataR ) );
 	}
 
-long int rsdb_id ( void *, void * a_pvDataR )
+long int dbrs_id ( void *, void * a_pvDataR )
 	{
 	return ( PQoidValue ( ( PGresult * ) a_pvDataR ) );
 	}

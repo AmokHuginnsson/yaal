@@ -27,8 +27,6 @@ Copyright:
 #ifndef __DBWRAPPER_HDATABASE_H
 #define __DBWRAPPER_HDATABASE_H
 
-#include "hdatabase.h"
-
 namespace stdhapi
 {
 
@@ -56,7 +54,11 @@ public:
 	long int query ( char const * );
 	void free_result ( void );
 	void * get_result ( void );
-	long int insert_id ( void * = NULL );
+	/*}*/
+/* FIXME next member should be at least protected */
+	long int insert_id ( void * );
+protected:
+	/*{*/
 	/*}*/
 private:
 	/*{*/

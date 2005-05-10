@@ -66,8 +66,8 @@ int HDataBase::login ( char const * a_pcDataBase, char const * a_pcLogin,
 	M_PROLOG
 	f_pvCoreData = dbwrapper::db_connect( a_pcDataBase, a_pcLogin, a_pcPassword );
 	if ( ! f_pvCoreData )
-		M_THROW ( dbwrapper::db_error ( f_pvCoreData ),
-				dbwrapper::db_errno ( f_pvCoreData ) );
+		M_THROW ( dbwrapper::dbrs_error ( f_pvCoreData, NULL ),
+				dbwrapper::dbrs_errno ( f_pvCoreData, NULL ) );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -84,8 +84,8 @@ long int HDataBase::query ( char const * a_pcQuery )
 		log << "SQL: " << a_pcQuery << endl;
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
 	if ( ! f_pvLastResult )
-		M_LOG ( dbwrapper::db_error ( f_pvCoreData ) );
-	return ( dbwrapper::rsdb_records_count ( f_pvCoreData, f_pvLastResult ) );
+		M_LOG ( dbwrapper::dbrs_error ( f_pvCoreData, f_pvLastResult ) );
+	return ( dbwrapper::dbrs_records_count ( f_pvCoreData, f_pvLastResult ) );
 	M_EPILOG
 	}
 
@@ -120,10 +120,7 @@ long int HDataBase::insert_id ( void * a_pvResult )
 	M_PROLOG
 	if ( ! f_pvCoreData )
 		M_THROW ( "not connected to database", g_iErrNo );
-	if ( a_pvResult )
-		return ( dbwrapper::rsdb_id ( f_pvCoreData, a_pvResult ) );
-	else
-		return ( dbwrapper::rsdb_id ( f_pvCoreData, f_pvLastResult ) );
+	return ( dbwrapper::dbrs_id ( f_pvCoreData, a_pvResult ) );
 	M_EPILOG
 	}
 
