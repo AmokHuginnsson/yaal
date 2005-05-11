@@ -232,11 +232,3 @@ void HXml::init ( const char * a_pcFileName )
 	M_EPILOG
 	}
 
-bool is_alpha ( char ch )
-	{
-	if ( ( ch >= '0' ) && ( ch <= '9' ) )return ( true );
-	if ( ( ch >= 'a' ) && ( ch <= 'z' ) )return ( true );
-	if ( ( ch >= 'A' ) && ( ch <= 'Z' ) )return ( true );
-	return ( false );
-	}
-
