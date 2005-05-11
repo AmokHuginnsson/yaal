@@ -46,7 +46,6 @@ extern "C"
 typedef struct
 	{
 	int f_iStatus;
-	char * f_pcTextBuffer;
 	OCIEnv * f_psEnvironment;
 	OCIError * f_psError;
 	OCISvcCtx * f_psServiceContext;
@@ -73,7 +72,6 @@ void * db_connect ( char const * /* In Oracle user name is name of schema. */,
 		g_psBrokenDB = NULL;
 		}
 	l_psOracle = xcalloc ( 1, OOracle );
-	l_psOracle->f_pcTextBuffer = xcalloc ( D_TEXT_BUFFER_SIZE, char );
 	if ( ( l_psOracle->f_iStatus = OCIEnvCreate ( & l_psOracle->f_psEnvironment,
 				OCI_DEFAULT | OCI_THREADED, NULL, NULL, NULL, NULL, 0,
 				NULL ) ) != OCI_SUCCESS )
@@ -119,42 +117,61 @@ void db_disconnect ( void * a_pvData )
 		if ( l_psOracle->f_psEnvironment )
 			OCIHandleFree ( l_psOracle->f_psEnvironment, OCI_HTYPE_ENV );
 		l_psOracle->f_psEnvironment = NULL;
-		if ( l_psOracle->f_pcTextBuffer )
-			xfree ( l_psOracle->f_pcTextBuffer );
 		xfree ( l_psOracle );
 		}
 	return;
 	}
 
-int dbrs_errno ( void * a_pvDataB, void * /*a_pvDataR*/ )
+int dbrs_errno ( void * a_pvDataB, void * a_pvDataR )
 	{
 	int l_iError = 0;
-	OOracle * l_psOracle = NULL;
-	if ( ! a_pvDataB )
-		a_pvDataB = g_psBrokenDB;
-	l_psOracle = static_cast < OOracle * > ( a_pvDataB );
-	if ( ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO )
-			&& ( l_psOracle->f_iStatus != OCI_ERROR ) )
-		return ( l_psOracle->f_iStatus );
-	OCIErrorGet ( l_psOracle->f_psError, 1, NULL, & l_iError, NULL, 0,
+	int l_iStatus = 0;
+	OCIError * l_psError = NULL;
+	if ( a_pvDataR )
+		{
+		l_iStatus = static_cast < OQuery * > ( a_pvDataR )->f_iStatus;
+		l_psError = static_cast < OQuery * > ( a_pvDataR )->f_psError;
+		}
+	else
+		{
+		if ( ! a_pvDataB )
+			a_pvDataB = g_psBrokenDB;
+		l_iStatus = static_cast < OOracle * > ( a_pvDataB )->f_iStatus;
+		l_psError = static_cast < OOracle * > ( a_pvDataB )->f_psError;
+		}
+	if ( ( l_iStatus != OCI_SUCCESS_WITH_INFO )
+			&& ( l_iStatus != OCI_ERROR ) )
+		return ( l_iStatus );
+	OCIErrorGet ( l_psError, 1, NULL, & l_iError, NULL, 0,
 			OCI_HTYPE_ERROR );
 	return ( l_iError );
 	}
 
 char const * dbrs_error  ( void * a_pvDataB, void * /*a_pvDataR*/ )
 	{
-	OOracle * l_psOracle = NULL;
-	if ( ! a_pvDataB )
-		a_pvDataB = g_psBrokenDB;
-	l_psOracle = static_cast < OOracle * > ( a_pvDataB );
-	switch ( l_psOracle->f_iStatus )
+	int l_iStatus = 0;
+	static char l_pcTextBuffer [ D_TEXT_BUFFER_SIZE ];
+	OCIError * l_psError = NULL;
+	if ( a_pvDataR )
+		{
+		l_iStatus = static_cast < OQuery * > ( a_pvDataR )->f_iStatus;
+		l_psError = static_cast < OQuery * > ( a_pvDataR )->f_psError;
+		}
+	else
+		{
+		if ( ! a_pvDataB )
+			a_pvDataB = g_psBrokenDB;
+		l_iStatus = static_cast < OOracle * > ( a_pvDataB )->f_iStatus;
+		l_psError = static_cast < OOracle * > ( a_pvDataB )->f_psError;
+		}
+	switch ( l_iStatus )
 		{
 		case ( OCI_SUCCESS_WITH_INFO ):
 		case ( OCI_ERROR ):
 			{
-			OCIErrorGet ( l_psOracle->f_psError, 1, NULL, NULL,
-					reinterpret_cast < OraText * > ( l_psOracle->f_pcTextBuffer ),
-					D_TEXT_BUFFER_SIZE, OCI_HTYPE_ERROR );
+			OCIErrorGet ( l_psError, 1, NULL, NULL,
+					reinterpret_cast < OraText * > ( l_pcTextBuffer ),
+					D_TEXT_BUFFER_SIZE - 2, OCI_HTYPE_ERROR );
 			break;
 			}
 		case ( OCI_NEED_DATA ):
@@ -184,12 +201,12 @@ char const * dbrs_error  ( void * a_pvDataB, void * /*a_pvDataR*/ )
 			}
 		default :
 			{
-			snprintf ( l_psOracle->f_pcTextBuffer, D_TEXT_BUFFER_SIZE - 2,
-					"Error - %d", l_psOracle->f_iStatus );
+			snprintf ( l_pcTextBuffer, D_TEXT_BUFFER_SIZE - 2,
+					"Error - %d", l_iStatus );
 			break;
 			}
 		}
-	return ( l_psOracle->f_pcTextBuffer );
+	return ( l_pcTextBuffer );
 	}
 
 void * db_query ( void * /*a_pvData*/, char const * /*a_pcQuery*/ )
