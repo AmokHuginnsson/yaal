@@ -1,2 +1,5 @@
-all:
+.DEFAULT:
+	@$(MAKE) --no-print-directory -s -C .. $(@)
+
+default:
 	@$(MAKE) --no-print-directory -s -C ..
