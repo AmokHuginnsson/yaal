@@ -119,7 +119,7 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int dbrs_errno ( void * a_pvData, void * )
+int db_errno ( void * a_pvData )
 	{
 	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
 	if ( ! l_psSQLite )
@@ -130,7 +130,7 @@ int dbrs_errno ( void * a_pvData, void * )
 	return ( errno );
 	}
 
-char const * dbrs_error  ( void * a_pvData, void * )
+char const * db_error  ( void * a_pvData )
 	{
 	sqlite_db * l_psSQLite = ( sqlite_db * ) a_pvData;
 	if ( ! l_psSQLite )

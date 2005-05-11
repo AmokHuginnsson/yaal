@@ -48,8 +48,8 @@ namespace dbwrapper
 
 extern void * ( * db_connect ) ( char const *, char const *, char const * );
 extern void ( * db_disconnect ) ( void * );
-extern int ( * dbrs_errno ) ( void *, void * );
-extern char const * ( * dbrs_error ) ( void *, void * );
+extern int ( * db_errno ) ( void * );
+extern char const * ( * db_error ) ( void * );
 extern void * ( * db_query ) ( void *, char const * );
 extern void ( * db_unquery ) ( void * );
 extern char * ( * rs_get ) ( void *, int, int );
@@ -60,8 +60,8 @@ extern char * ( * rs_column_name ) ( void *, int );
 
 void * autoloader_db_connect ( char const *, char const *, char const * );
 void autoloader_db_disconnect ( void * );
-int autoloader_dbrs_errno ( void *, void * );
-char const * autoloader_dbrs_error ( void *, void * );
+int autoloader_db_errno ( void * );
+char const * autoloader_db_error ( void * );
 void * autoloader_db_query ( void *, char const * );
 void autoloader_db_unquery ( void * );
 char * autoloader_rs_get ( void *, int, int );

@@ -107,8 +107,8 @@ void dbwrapper_init ( void )
 	{
 	dbwrapper::db_connect = dbwrapper::autoloader_db_connect;
 	dbwrapper::db_disconnect = dbwrapper::autoloader_db_disconnect;
-	dbwrapper::dbrs_errno = dbwrapper::autoloader_dbrs_errno;
-	dbwrapper::dbrs_error = dbwrapper::autoloader_dbrs_error;
+	dbwrapper::db_errno = dbwrapper::autoloader_db_errno;
+	dbwrapper::db_error = dbwrapper::autoloader_db_error;
 	dbwrapper::db_query = dbwrapper::autoloader_db_query;
 	dbwrapper::db_unquery = dbwrapper::autoloader_db_unquery;
 	dbwrapper::rs_get = dbwrapper::autoloader_rs_get;

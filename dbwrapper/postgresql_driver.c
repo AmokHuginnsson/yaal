@@ -80,12 +80,12 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int dbrs_errno ( void *, void * )
+int db_errno ( void * )
 	{
 	return ( errno );
 	}
 
-char const * dbrs_error  ( void * a_pvData, void * )
+char const * db_error  ( void * a_pvData )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;

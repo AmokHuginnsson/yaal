@@ -46,12 +46,12 @@ void * db_connect ( char const * /*a_pcDataBase*/
 	return ( NULL );
 	}
 
-void db_disconnect ( void * /*a_pvData*/)
+void db_disconnect ( void * /*a_pvData*/ )
 	{
 	return;
 	}
 
-int db_errno ( void * /*a_pvDataB*/ void * /*a_pvDataR*/)
+int db_errno ( void * /*a_pvData*/ )
 	{
 	return ( errno );
 	}

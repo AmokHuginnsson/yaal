@@ -53,7 +53,7 @@ typedef struct
 
 typedef struct
 	{
-	int f_iStatus;
+	int * f_piStatus;
 	OCIError * f_psError;
 	OCIStmt * f_psStatement;
 	} OQuery;
@@ -122,54 +122,34 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int dbrs_errno ( void * a_pvDataB, void * a_pvDataR )
+int db_errno ( void * a_pvData )
 	{
 	int l_iError = 0;
-	int l_iStatus = 0;
-	OCIError * l_psError = NULL;
-	if ( a_pvDataR )
-		{
-		l_iStatus = static_cast < OQuery * > ( a_pvDataR )->f_iStatus;
-		l_psError = static_cast < OQuery * > ( a_pvDataR )->f_psError;
-		}
-	else
-		{
-		if ( ! a_pvDataB )
-			a_pvDataB = g_psBrokenDB;
-		l_iStatus = static_cast < OOracle * > ( a_pvDataB )->f_iStatus;
-		l_psError = static_cast < OOracle * > ( a_pvDataB )->f_psError;
-		}
-	if ( ( l_iStatus != OCI_SUCCESS_WITH_INFO )
+	OOracle * l_psOracle = NULL;
+	if ( ! a_pvData )
+		a_pvData = g_psBrokenDB;
+	l_psOracle = static_cast < OOracle * > ( a_pvData );
+	if ( ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO )
 			&& ( l_iStatus != OCI_ERROR ) )
 		return ( l_iStatus );
-	OCIErrorGet ( l_psError, 1, NULL, & l_iError, NULL, 0,
+	OCIErrorGet ( l_psOracle->f_psError, 1, NULL, & l_iError, NULL, 0,
 			OCI_HTYPE_ERROR );
 	return ( l_iError );
 	}
 
-char const * dbrs_error  ( void * a_pvDataB, void * /*a_pvDataR*/ )
+char const * db_error  ( void * a_pvData )
 	{
-	int l_iStatus = 0;
 	static char l_pcTextBuffer [ D_TEXT_BUFFER_SIZE ];
-	OCIError * l_psError = NULL;
-	if ( a_pvDataR )
-		{
-		l_iStatus = static_cast < OQuery * > ( a_pvDataR )->f_iStatus;
-		l_psError = static_cast < OQuery * > ( a_pvDataR )->f_psError;
-		}
-	else
-		{
-		if ( ! a_pvDataB )
-			a_pvDataB = g_psBrokenDB;
-		l_iStatus = static_cast < OOracle * > ( a_pvDataB )->f_iStatus;
-		l_psError = static_cast < OOracle * > ( a_pvDataB )->f_psError;
-		}
-	switch ( l_iStatus )
+	OOracle * l_psOracle = NULL;
+	if ( ! a_pvData )
+		a_pvData = g_psBrokenDB;
+	l_psOracle = static_cast < OOracle * > ( a_pvData );
+	switch ( l_psOracle->f_iStatus )
 		{
 		case ( OCI_SUCCESS_WITH_INFO ):
 		case ( OCI_ERROR ):
 			{
-			OCIErrorGet ( l_psError, 1, NULL, NULL,
+			OCIErrorGet ( l_psOracle->f_psError, 1, NULL, NULL,
 					reinterpret_cast < OraText * > ( l_pcTextBuffer ),
 					D_TEXT_BUFFER_SIZE - 2, OCI_HTYPE_ERROR );
 			break;
@@ -202,7 +182,7 @@ char const * dbrs_error  ( void * a_pvDataB, void * /*a_pvDataR*/ )
 		default :
 			{
 			snprintf ( l_pcTextBuffer, D_TEXT_BUFFER_SIZE - 2,
-					"Error - %d", l_iStatus );
+					"Error - %d", l_psOracle->f_iStatus );
 			break;
 			}
 		}
@@ -217,7 +197,7 @@ void * db_query ( void * /*a_pvData*/, char const * /*a_pcQuery*/ )
 void db_unquery ( void * a_pvData )
 	{
 	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvData );
-	l_psQuery->f_iStatus = OCIStmtRelease ( l_psQuery->f_psStatement,
+	( * l_psQuery->f_piStatus ) = OCIStmtRelease ( l_psQuery->f_psStatement,
 			l_psQuery->f_psError, NULL, 0, OCI_DEFAULT );
 	return;
 	}

@@ -76,14 +76,14 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int dbrs_errno ( void * a_pvData, void * )
+int db_errno ( void * a_pvData )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
 	return ( mysql_errno ( ( MYSQL * ) a_pvData ) );
 	}
 
-char const * dbrs_error  ( void * a_pvData, void * )
+char const * db_error  ( void * a_pvData )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;

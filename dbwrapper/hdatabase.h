@@ -54,9 +54,8 @@ public:
 	long int query ( char const * );
 	void free_result ( void );
 	void * get_result ( void );
+	long int insert_id ( void );
 	/*}*/
-/* FIXME next member should be at least protected */
-	long int insert_id ( void * );
 protected:
 	/*{*/
 	/*}*/

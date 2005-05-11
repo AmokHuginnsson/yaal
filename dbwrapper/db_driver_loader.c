@@ -86,11 +86,11 @@ void * ( * db_connect ) ( char const *, char const *, char const * );
 typedef void ( * t1 ) ( void * );
 void ( * db_disconnect ) ( void * );
 
-typedef int ( * t2 ) ( void *, void * );
-int ( * dbrs_errno ) ( void *, void * );
+typedef int ( * t2 ) ( void * );
+int ( * db_errno ) ( void * );
 
-typedef char const * ( * t3 ) ( void *, void * );
-char const * ( * dbrs_error ) ( void *, void * );
+typedef char const * ( * t3 ) ( void * );
+char const * ( * db_error ) ( void * );
 
 typedef void * ( * t4 ) ( void *, char const * );
 void * ( * db_query ) ( void *, char const * );
@@ -127,15 +127,15 @@ void null_db_disconnect ( void * )
 	return;
 	}
 
-int null_dbrs_errno ( void *, void * )
+int null_db_errno ( void * )
 	{
-	log ( D_LOG_ERROR ) << M_DB_ERR ( "(dbrs_errno)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "(db_errno)" ) << endl;
 	return ( 0 );
 	}
 
-char const * null_dbrs_error ( void *, void * )
+char const * null_db_error ( void * )
 	{
-	log ( D_LOG_ERROR ) << M_DB_ERR ( "dbrs_error)" ) << endl;
+	log ( D_LOG_ERROR ) << M_DB_ERR ( "db_error)" ) << endl;
 	return ( _ ( "null database driver loaded" ) );
 	}
 
@@ -231,11 +231,11 @@ void load_driver ( void )
 		if ( ! ( db_disconnect = dlsym_wrapper < t1 > ( n_pvDlHandle,
 						"db_disconnect" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( dbrs_errno = dlsym_wrapper < t2 > ( n_pvDlHandle,
-						"dbrs_errno" ) ) )
+		else if ( ! ( db_errno = dlsym_wrapper < t2 > ( n_pvDlHandle,
+						"db_errno" ) ) )
 			dbwrapper_error ( );
-		else if ( ! ( dbrs_error = dlsym_wrapper < t3 > ( n_pvDlHandle,
-						"dbrs_error" ) ) )
+		else if ( ! ( db_error = dlsym_wrapper < t3 > ( n_pvDlHandle,
+						"db_error" ) ) )
 			dbwrapper_error ( );
 		else if ( ! ( db_query = dlsym_wrapper < t4 > ( n_pvDlHandle,
 						"db_query" ) ) )
@@ -268,8 +268,8 @@ void load_driver ( void )
 		{
 		db_connect = null_db_connect;
 		db_disconnect = null_db_disconnect;
-		dbrs_errno = null_dbrs_errno;
-		dbrs_error = null_dbrs_error;
+		db_errno = null_db_errno;
+		db_error = null_db_error;
 		db_query = null_db_query;
 		db_unquery = null_db_unquery;
 		rs_get = null_rs_get;
@@ -298,16 +298,16 @@ void autoloader_db_disconnect ( void * a_pvDataBase )
 	return;
 	}
 
-int autoloader_dbrs_errno ( void * a_pvDataBase, void * a_pvResult )
+int autoloader_db_errno ( void * a_pvDataBase )
 	{
 	load_driver ( );
-	return ( dbrs_errno ( a_pvDataBase, a_pvResult ) );
+	return ( db_errno ( a_pvDataBase ) );
 	}
 
-char const * autoloader_dbrs_error ( void * a_pvDataBase, void * a_pvResult )
+char const * autoloader_db_error ( void * a_pvDataBase )
 	{
 	load_driver ( );
-	return ( dbrs_error ( a_pvDataBase, a_pvResult ) );
+	return ( db_error ( a_pvDataBase ) );
 	}
 
 void * autoloader_db_query ( void * a_pvDataBase, char const * a_pcQuery )

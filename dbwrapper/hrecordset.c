@@ -347,7 +347,7 @@ long int HRecordSet::update ( void )
 	build_sql ( );
 	f_poDataBase->query ( f_oSQL );
 	if ( f_iMode == D_MODE_ADDING )
-		l_iRetVal = f_poDataBase->insert_id ( f_pvCoreData );
+		l_iRetVal = f_poDataBase->insert_id ( );
 	f_poDataBase->free_result ( );
 	f_iMode = D_MODE_NORMAL;
 	requery ( );
