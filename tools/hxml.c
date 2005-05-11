@@ -120,7 +120,7 @@ void HXml::xmlfree ( xmlXPathObjectPtr & a_rpsObject )
 char * HXml::convert ( const xmlChar * a_pxData, way_t a_eWay )
 	{
 	M_PROLOG
-	return ( convert ( ( char * ) a_pxData, a_eWay ) );
+	return ( convert ( a_pxData, a_eWay ) );
 	M_EPILOG
 	}
 	
@@ -165,7 +165,7 @@ char * HXml::get_leaf_by_name ( xmlNodePtr a_psNode, const char * a_pcName )
 	xmlNodePtr l_psNode = a_psNode;
 	while ( l_psNode )
 		{
-		if ( ! xmlStrcasecmp ( l_psNode->name, ( xmlChar * ) a_pcName ) )
+		if ( ! xmlStrcasecmp ( l_psNode->name, reinterpret_cast < const xmlChar * > ( a_pcName ) ) )
 			return ( convert ( l_psNode->children->content ) );
 		l_psNode = l_psNode->next;
 		}
@@ -187,7 +187,7 @@ xmlNodeSetPtr HXml::get_node_set_by_path ( const char * a_pcPath )
 	if ( f_psObject )xmlfree ( f_psObject );
 	if ( f_psContext )xmlfree ( f_psContext );
 	f_psContext = xmlXPathNewContext ( f_psDoc );
-	f_psObject = xmlXPathEvalExpression ( ( xmlChar * ) a_pcPath, f_psContext );
+	f_psObject = xmlXPathEvalExpression ( reinterpret_cast < const xmlChar * > ( a_pcPath ), f_psContext );
 	return ( f_psObject->nodesetval );
 	M_EPILOG
 	}
@@ -215,7 +215,7 @@ void HXml::init ( const char * a_pcFileName )
 		l_oError.format ( "WARRNING: no encoding declared in `%s'.", a_pcFileName );
 		M_LOG ( l_oError );
 		}
-	else l_pxHnd = xmlFindCharEncodingHandler ( ( char * ) f_psDoc->encoding );
+	else l_pxHnd = xmlFindCharEncodingHandler ( reinterpret_cast < const char * > ( f_psDoc->encoding ) );
 	if ( ! l_pxHnd )
 		{
 		l_xEncoding = xmlDetectCharEncoding ( f_psRoot->name,
