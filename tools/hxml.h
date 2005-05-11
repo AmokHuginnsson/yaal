@@ -28,13 +28,6 @@ Copyright:
 #define __TOOLS_HXML_H
 
 #include <iconv.h>
-#include <libxml/xmlversion.h>
-#include <libxml/xmlstring.h>
-#include <libxml/xmlmemory.h>
-#include <libxml/encoding.h>
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
-#include <libxml/xmlreader.h>
 
 #include "hcore/hstring.h"
 
@@ -44,20 +37,20 @@ namespace stdhapi
 namespace tools
 {
 
+class HXmlData;
+
 class HXml
 	{
 protected:
 	/*{*/
+	typedef void * xml_node_ptr_t;
+	typedef void * xml_node_set_ptr_t;
 	typedef enum { D_IN, D_OUT } way_t;
 	iconv_t									f_xIconvIn;
 	iconv_t									f_xIconvOut;
 	stdhapi::hcore::HString	f_oConvertedString;
-	xmlDocPtr								f_psDoc;
-	xmlNodePtr							f_psRoot;
-	xmlNodePtr							f_psNode;
-	xmlXPathContextPtr			f_psContext;
-	xmlXPathObjectPtr				f_psObject;
-	xmlNodeSetPtr						f_psNodeSet;
+	stdhapi::hcore::HString	f_oTmpBuffer;
+	HXmlData *							f_poXml;
 	/*}*/
 public:
 	/*{*/
@@ -66,17 +59,11 @@ public:
 	void init ( const char * );
 	virtual void * parse ( void * ) = 0;
 	char * convert ( const char *, way_t = D_OUT );
-	char * convert ( const xmlChar *, way_t = D_OUT );
-	char * get_leaf_by_name ( xmlNodePtr, const char * );
-	xmlNodeSetPtr get_node_set_by_path ( const char * );
+	char * get_leaf_by_name ( xml_node_ptr_t, const char * );
+	xml_node_set_ptr_t get_node_set_by_path ( const char * );
 	/*}*/
 protected:
 	/*{*/
-	void xmlfree ( xmlDocPtr & );
-	void xmlfree ( xmlNodePtr & );
-	void xmlfree ( xmlNodeSetPtr & );
-	void xmlfree ( xmlXPathContextPtr & );
-	void xmlfree ( xmlXPathObjectPtr & );
 	/*}*/
 private:
 	/*{*/

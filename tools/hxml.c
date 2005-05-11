@@ -26,6 +26,15 @@ Copyright:
 
 #include <stdio.h>
 #include <string.h>
+#include <new>
+
+#include <libxml/xmlversion.h>
+#include <libxml/xmlstring.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/encoding.h>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xmlreader.h>
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
@@ -38,31 +47,85 @@ using namespace stdhapi::tools;
 char free_err [ ] = "trying to free NULL pointer";
 char schema_err [ ] = "bad xml schema";
 
-HXml::HXml ( void )
-	: f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
-	f_xIconvOut ( static_cast < iconv_t > ( 0 ) ),
-	f_oConvertedString ( ),
-	f_psDoc ( NULL ), f_psRoot ( NULL ), f_psNode ( NULL ),
-	f_psContext ( NULL ), f_psObject ( NULL ), f_psNodeSet ( NULL )
+namespace stdhapi
+{
+
+namespace tools
+{
+	
+class HXmlData
+	{
+private:
+	/*{*/
+	friend class HXml;
+	xmlDocPtr						f_psDoc;
+	xmlNodePtr					f_psRoot;
+	xmlNodePtr					f_psNode;
+	xmlXPathContextPtr	f_psContext;
+	xmlXPathObjectPtr		f_psObject;
+	xmlNodeSetPtr				f_psNodeSet;
+	/*}*/
+private:
+	/*{*/
+	HXmlData ( void );
+	virtual ~HXmlData ( void );
+	HXmlData ( const HXmlData & ) __attribute__(( __noreturn__ ));
+	HXmlData & operator = ( const HXmlData & ) __attribute__(( __noreturn__ ));
+	void xmlfree ( xmlDocPtr & );
+	void xmlfree ( xmlNodePtr & );
+	void xmlfree ( xmlNodeSetPtr & );
+	void xmlfree ( xmlXPathContextPtr & );
+	void xmlfree ( xmlXPathObjectPtr & );
+	/*}*/
+	};
+
+}
+
+}
+
+HXmlData::HXmlData ( void ) : f_psDoc ( NULL ), f_psRoot ( NULL ), f_psNode ( NULL ),
+										f_psContext ( NULL ), f_psObject ( NULL ),
+										f_psNodeSet ( NULL )
 	{
 	M_PROLOG
-	M_EPILOG
 	return;
+	M_EPILOG
 	}
 
-HXml::~HXml ( void )
+HXmlData::~HXmlData ( void )
 	{
 	M_PROLOG
-	if ( f_psContext )xmlfree ( f_psContext );
-	if ( f_psNodeSet )xmlfree ( f_psNodeSet );
-	if ( f_psObject )xmlfree ( f_psObject );
-	if ( f_psNode )xmlfree ( f_psNode );
-	if ( f_psDoc )xmlfree ( f_psDoc );
-	M_EPILOG
+	if ( f_psContext )
+		xmlfree ( f_psContext );
+	if ( f_psNodeSet )
+		xmlfree ( f_psNodeSet );
+	if ( f_psObject )
+		xmlfree ( f_psObject );
+	if ( f_psNode )
+		xmlfree ( f_psNode );
+	if ( f_psDoc )
+		xmlfree ( f_psDoc );
 	return;
+	M_EPILOG
 	}
 
-void HXml::xmlfree ( xmlDocPtr & a_rpsDoc )
+HXmlData::HXmlData ( const HXmlData & a_roXml ) : f_psDoc ( NULL ), f_psRoot ( NULL ), f_psNode ( NULL ),
+										f_psContext ( NULL ), f_psObject ( NULL ),
+										f_psNodeSet ( NULL )
+	{
+	M_PROLOG
+	this->operator = ( a_roXml );
+	M_EPILOG
+	}
+
+HXmlData & HXmlData::operator = ( const HXmlData & )
+	{
+	M_PROLOG
+	M_THROW ( "This method should not be called.", g_iErrNo );
+	M_EPILOG
+	}
+
+void HXmlData::xmlfree ( xmlDocPtr & a_rpsDoc )
 	{
 	M_PROLOG
 	if ( ! a_rpsDoc )
@@ -73,7 +136,7 @@ void HXml::xmlfree ( xmlDocPtr & a_rpsDoc )
 	M_EPILOG
 	}
 
-void HXml::xmlfree ( xmlNodePtr & a_rpsNode )
+void HXmlData::xmlfree ( xmlNodePtr & a_rpsNode )
 	{
 	M_PROLOG
 	if ( ! a_rpsNode )
@@ -84,7 +147,7 @@ void HXml::xmlfree ( xmlNodePtr & a_rpsNode )
 	M_EPILOG
 	}
 
-void HXml::xmlfree ( xmlNodeSetPtr & a_rpsNodeSet )
+void HXmlData::xmlfree ( xmlNodeSetPtr & a_rpsNodeSet )
 	{
 	M_PROLOG
 	if ( ! a_rpsNodeSet )
@@ -95,7 +158,7 @@ void HXml::xmlfree ( xmlNodeSetPtr & a_rpsNodeSet )
 	M_EPILOG
 	}
 
-void HXml::xmlfree ( xmlXPathContextPtr & a_rpsContext )
+void HXmlData::xmlfree ( xmlXPathContextPtr & a_rpsContext )
 	{
 	M_PROLOG
 	if ( ! a_rpsContext )
@@ -106,7 +169,7 @@ void HXml::xmlfree ( xmlXPathContextPtr & a_rpsContext )
 	M_EPILOG
 	}
 
-void HXml::xmlfree ( xmlXPathObjectPtr & a_rpsObject )
+void HXmlData::xmlfree ( xmlXPathObjectPtr & a_rpsObject )
 	{
 	M_PROLOG
 	if ( ! a_rpsObject )
@@ -116,14 +179,29 @@ void HXml::xmlfree ( xmlXPathObjectPtr & a_rpsObject )
 	return;
 	M_EPILOG
 	}
-
-char * HXml::convert ( const xmlChar * a_pxData, way_t a_eWay )
+	
+HXml::HXml ( void )
+	: f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
+	f_xIconvOut ( static_cast < iconv_t > ( 0 ) ),
+	f_oConvertedString ( ), f_oTmpBuffer ( ), f_poXml ( NULL )
 	{
 	M_PROLOG
-	return ( convert ( a_pxData, a_eWay ) );
+	f_poXml = new ( std::nothrow ) HXmlData ( );
+	M_ENSURE ( f_poXml );
+	M_EPILOG
+	return;
+	}
+
+HXml::~HXml ( void )
+	{
+	M_PROLOG
+	if ( f_poXml )
+		delete f_poXml;
+	f_poXml = NULL;
+	return;
 	M_EPILOG
 	}
-	
+
 char * HXml::convert ( const char * a_pcData, way_t a_eWay )
 	{
 	M_PROLOG
@@ -158,18 +236,18 @@ char * HXml::convert ( const char * a_pcData, way_t a_eWay )
 	M_EPILOG
 	}
 
-char * HXml::get_leaf_by_name ( xmlNodePtr a_psNode, const char * a_pcName )
+char * HXml::get_leaf_by_name ( xml_node_ptr_t a_psNode, const char * a_pcName )
 	{
 	M_PROLOG
 	char * l_pcData = NULL;
-	xmlNodePtr l_psNode = a_psNode;
+	xmlNodePtr l_psNode = reinterpret_cast < xmlNodePtr > ( a_psNode );
 	while ( l_psNode )
 		{
 		if ( ! xmlStrcasecmp ( l_psNode->name, reinterpret_cast < const xmlChar * > ( a_pcName ) ) )
-			return ( convert ( l_psNode->children->content ) );
+			return ( convert ( reinterpret_cast < const char * > ( l_psNode->children->content ) ) );
 		l_psNode = l_psNode->next;
 		}
-	l_psNode = a_psNode;
+	l_psNode = reinterpret_cast < xmlNodePtr > ( a_psNode );
 	while ( l_psNode )
 		{
 		if ( l_psNode->children
@@ -181,45 +259,66 @@ char * HXml::get_leaf_by_name ( xmlNodePtr a_psNode, const char * a_pcName )
 	M_EPILOG
 	}
 
-xmlNodeSetPtr HXml::get_node_set_by_path ( const char * a_pcPath )
+HXml::xml_node_set_ptr_t HXml::get_node_set_by_path ( const char * a_pcPath )
 	{
 	M_PROLOG
-	if ( f_psObject )xmlfree ( f_psObject );
-	if ( f_psContext )xmlfree ( f_psContext );
-	f_psContext = xmlXPathNewContext ( f_psDoc );
-	f_psObject = xmlXPathEvalExpression ( reinterpret_cast < const xmlChar * > ( a_pcPath ), f_psContext );
-	return ( f_psObject->nodesetval );
+	int l_iLength = 0;
+	char * l_pcPtr = NULL;
+	f_oTmpBuffer = a_pcPath;
+	l_pcPtr = f_oTmpBuffer;
+	l_iLength = f_oTmpBuffer.get_length ( ) - 1;
+	if ( f_poXml->f_psObject )
+		f_poXml->xmlfree ( f_poXml->f_psObject );
+	if ( f_poXml->f_psContext )
+		f_poXml->xmlfree ( f_poXml->f_psContext );
+	f_poXml->f_psContext = xmlXPathNewContext ( f_poXml->f_psDoc );
+	if ( f_poXml->f_psContext )
+		{
+		while ( l_pcPtr [ 0 ] )
+			{
+			f_poXml->f_psObject = xmlXPathEvalExpression (
+					reinterpret_cast < const xmlChar * > ( l_pcPtr ),
+					f_poXml->f_psContext );
+			M_LOG ( l_pcPtr );
+			if ( f_poXml->f_psObject )
+				break;
+			l_pcPtr [ l_iLength -- ] = 0;
+			}
+		if ( f_poXml->f_psObject )
+			return ( f_poXml->f_psObject->nodesetval->nodeTab [ 0 ] );
+		}
+	return ( NULL );
 	M_EPILOG
 	}
 
 void HXml::init ( const char * a_pcFileName )
 	{
 	M_PROLOG
-	xmlCharEncoding l_xEncoding = ( xmlCharEncoding ) 0;
+	xmlCharEncoding l_xEncoding = static_cast < xmlCharEncoding > ( 0 );
 	xmlCharEncodingHandlerPtr l_pxHnd = NULL;
 	HString l_oError;
-	f_psDoc = xmlParseFile ( a_pcFileName );
-	if ( ! f_psDoc )
+	f_poXml->f_psDoc = xmlParseFile ( a_pcFileName );
+	if ( ! f_poXml->f_psDoc )
 		{
 		l_oError.format ( "can not parse `%s'", a_pcFileName );
 		M_THROW ( l_oError, g_iErrNo );
 		}
-	f_psRoot = xmlDocGetRootElement ( f_psDoc );
-	if ( ! f_psRoot )
+	f_poXml->f_psRoot = xmlDocGetRootElement ( f_poXml->f_psDoc );
+	if ( ! f_poXml->f_psRoot )
 		M_THROW ( "empty doc", g_iErrNo );
 #ifdef __DEBUGGER_BABUNI__
-	fprintf ( stdout, "%s\n", f_psRoot->name );
+	fprintf ( stdout, "%s\n", f_poXml->f_psRoot->name );
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( ! f_psDoc->encoding )
+	if ( ! f_poXml->f_psDoc->encoding )
 		{
 		l_oError.format ( "WARRNING: no encoding declared in `%s'.", a_pcFileName );
 		M_LOG ( l_oError );
 		}
-	else l_pxHnd = xmlFindCharEncodingHandler ( reinterpret_cast < const char * > ( f_psDoc->encoding ) );
+	else l_pxHnd = xmlFindCharEncodingHandler ( reinterpret_cast < const char * > ( f_poXml->f_psDoc->encoding ) );
 	if ( ! l_pxHnd )
 		{
-		l_xEncoding = xmlDetectCharEncoding ( f_psRoot->name,
-				xmlStrlen ( f_psRoot->name ) );
+		l_xEncoding = xmlDetectCharEncoding ( f_poXml->f_psRoot->name,
+				xmlStrlen ( f_poXml->f_psRoot->name ) );
 		if ( ! l_xEncoding )
 			M_THROW ( "can not detect character encoding", g_iErrNo );
 		l_pxHnd = xmlGetCharEncodingHandler ( l_xEncoding );
