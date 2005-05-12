@@ -44,26 +44,30 @@ class HXml
 protected:
 	/*{*/
 	typedef void * xml_node_ptr_t;
-	typedef void * xml_node_set_ptr_t;
 	typedef enum { D_IN, D_OUT } way_t;
+	int											f_iIndex; /* index of last accessed node in nodeset */
 	iconv_t									f_xIconvIn;
 	iconv_t									f_xIconvOut;
 	stdhapi::hcore::HString	f_oConvertedString;
 	stdhapi::hcore::HString	f_oTmpBuffer;
+	stdhapi::hcore::HString	f_oPath;
 	HXmlData *							f_poXml;
 	/*}*/
 public:
 	/*{*/
 	HXml ( void );
 	virtual ~ HXml ( void );
-	void init ( const char * );
+	void init ( char const * );
 	virtual void * parse ( void * ) = 0;
-	char * convert ( const char *, way_t = D_OUT );
-	char * get_leaf_by_name ( xml_node_ptr_t, const char * );
-	xml_node_set_ptr_t get_node_set_by_path ( const char * );
+	char const * iterate ( stdhapi::hcore::HString &, char const * );
 	/*}*/
 protected:
 	/*{*/
+	char const * iterate ( stdhapi::hcore::HString & );
+	char * convert ( char const *, way_t = D_OUT );
+	char * get_leaf_by_name ( int, char const * );
+	char * get_leaf_by_name ( xml_node_ptr_t, char const * );
+	int get_node_set_by_path ( char const * );
 	/*}*/
 private:
 	/*{*/

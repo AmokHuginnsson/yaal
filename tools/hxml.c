@@ -64,6 +64,7 @@ private:
 	xmlXPathContextPtr	f_psContext;
 	xmlXPathObjectPtr		f_psObject;
 	xmlNodeSetPtr				f_psNodeSet;
+	xmlNodePtr					f_psStartNode;
 	/*}*/
 private:
 	/*{*/
@@ -71,11 +72,12 @@ private:
 	virtual ~HXmlData ( void );
 	HXmlData ( const HXmlData & ) __attribute__(( __noreturn__ ));
 	HXmlData & operator = ( const HXmlData & ) __attribute__(( __noreturn__ ));
-	void xmlfree ( xmlDocPtr & );
-	void xmlfree ( xmlNodePtr & );
-	void xmlfree ( xmlNodeSetPtr & );
-	void xmlfree ( xmlXPathContextPtr & );
-	void xmlfree ( xmlXPathObjectPtr & );
+	void xml_free ( xmlDocPtr & );
+/*	void xml_free ( xmlNodePtr & ); */
+/*	void xml_free ( xmlNodeSetPtr & ); */
+	void xml_free ( xmlXPathContextPtr & );
+	void xml_free ( xmlXPathObjectPtr & );
+	void reset ( void );
 	/*}*/
 	};
 
@@ -85,7 +87,7 @@ private:
 
 HXmlData::HXmlData ( void ) : f_psDoc ( NULL ), f_psRoot ( NULL ), f_psNode ( NULL ),
 										f_psContext ( NULL ), f_psObject ( NULL ),
-										f_psNodeSet ( NULL )
+										f_psNodeSet ( NULL ), f_psStartNode ( NULL )
 	{
 	M_PROLOG
 	return;
@@ -96,22 +98,29 @@ HXmlData::~HXmlData ( void )
 	{
 	M_PROLOG
 	if ( f_psContext )
-		xmlfree ( f_psContext );
-	if ( f_psNodeSet )
-		xmlfree ( f_psNodeSet );
+		xml_free ( f_psContext );
 	if ( f_psObject )
-		xmlfree ( f_psObject );
-	if ( f_psNode )
-		xmlfree ( f_psNode );
+		xml_free ( f_psObject );
 	if ( f_psDoc )
-		xmlfree ( f_psDoc );
+		xml_free ( f_psDoc );
 	return;
 	M_EPILOG
 	}
 
-HXmlData::HXmlData ( const HXmlData & a_roXml ) : f_psDoc ( NULL ), f_psRoot ( NULL ), f_psNode ( NULL ),
+void HXmlData::reset ( void )
+	{
+	M_PROLOG
+	f_psNode = NULL;
+	f_psNodeSet = NULL;
+	f_psStartNode = NULL;
+	return;
+	M_EPILOG
+	}
+
+HXmlData::HXmlData ( const HXmlData & a_roXml ) : f_psDoc ( NULL ),
+										f_psRoot ( NULL ), f_psNode ( NULL ),
 										f_psContext ( NULL ), f_psObject ( NULL ),
-										f_psNodeSet ( NULL )
+										f_psNodeSet ( NULL ), f_psStartNode ( NULL )
 	{
 	M_PROLOG
 	this->operator = ( a_roXml );
@@ -125,7 +134,7 @@ HXmlData & HXmlData::operator = ( const HXmlData & )
 	M_EPILOG
 	}
 
-void HXmlData::xmlfree ( xmlDocPtr & a_rpsDoc )
+void HXmlData::xml_free ( xmlDocPtr & a_rpsDoc )
 	{
 	M_PROLOG
 	if ( ! a_rpsDoc )
@@ -136,7 +145,8 @@ void HXmlData::xmlfree ( xmlDocPtr & a_rpsDoc )
 	M_EPILOG
 	}
 
-void HXmlData::xmlfree ( xmlNodePtr & a_rpsNode )
+/*
+void HXmlData::xml_free ( xmlNodePtr & a_rpsNode )
 	{
 	M_PROLOG
 	if ( ! a_rpsNode )
@@ -147,7 +157,7 @@ void HXmlData::xmlfree ( xmlNodePtr & a_rpsNode )
 	M_EPILOG
 	}
 
-void HXmlData::xmlfree ( xmlNodeSetPtr & a_rpsNodeSet )
+void HXmlData::xml_free ( xmlNodeSetPtr & a_rpsNodeSet )
 	{
 	M_PROLOG
 	if ( ! a_rpsNodeSet )
@@ -157,8 +167,9 @@ void HXmlData::xmlfree ( xmlNodeSetPtr & a_rpsNodeSet )
 	return;
 	M_EPILOG
 	}
-
-void HXmlData::xmlfree ( xmlXPathContextPtr & a_rpsContext )
+*/
+	
+void HXmlData::xml_free ( xmlXPathContextPtr & a_rpsContext )
 	{
 	M_PROLOG
 	if ( ! a_rpsContext )
@@ -169,7 +180,7 @@ void HXmlData::xmlfree ( xmlXPathContextPtr & a_rpsContext )
 	M_EPILOG
 	}
 
-void HXmlData::xmlfree ( xmlXPathObjectPtr & a_rpsObject )
+void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject )
 	{
 	M_PROLOG
 	if ( ! a_rpsObject )
@@ -181,9 +192,9 @@ void HXmlData::xmlfree ( xmlXPathObjectPtr & a_rpsObject )
 	}
 	
 HXml::HXml ( void )
-	: f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
+	: f_iIndex ( 0 ), f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
 	f_xIconvOut ( static_cast < iconv_t > ( 0 ) ),
-	f_oConvertedString ( ), f_oTmpBuffer ( ), f_poXml ( NULL )
+	f_oConvertedString ( ), f_oTmpBuffer ( ), f_oPath ( ), f_poXml ( NULL )
 	{
 	M_PROLOG
 	f_poXml = new ( std::nothrow ) HXmlData ( );
@@ -236,6 +247,17 @@ char * HXml::convert ( const char * a_pcData, way_t a_eWay )
 	M_EPILOG
 	}
 
+char * HXml::get_leaf_by_name ( int a_iIndex, char const * a_pcName )
+	{
+	M_PROLOG
+	if ( f_poXml->f_psNodeSet )
+		return ( get_leaf_by_name (
+					static_cast < xml_node_ptr_t > (
+						f_poXml->f_psNodeSet->nodeTab [ a_iIndex ] ), a_pcName ) );
+	return ( NULL );
+	M_EPILOG
+	}
+
 char * HXml::get_leaf_by_name ( xml_node_ptr_t a_psNode, const char * a_pcName )
 	{
 	M_PROLOG
@@ -259,7 +281,7 @@ char * HXml::get_leaf_by_name ( xml_node_ptr_t a_psNode, const char * a_pcName )
 	M_EPILOG
 	}
 
-HXml::xml_node_set_ptr_t HXml::get_node_set_by_path ( const char * a_pcPath )
+int HXml::get_node_set_by_path ( const char * a_pcPath )
 	{
 	M_PROLOG
 	int l_iLength = 0;
@@ -268,9 +290,10 @@ HXml::xml_node_set_ptr_t HXml::get_node_set_by_path ( const char * a_pcPath )
 	l_pcPtr = f_oTmpBuffer;
 	l_iLength = f_oTmpBuffer.get_length ( ) - 1;
 	if ( f_poXml->f_psObject )
-		f_poXml->xmlfree ( f_poXml->f_psObject );
+		f_poXml->xml_free ( f_poXml->f_psObject );
 	if ( f_poXml->f_psContext )
-		f_poXml->xmlfree ( f_poXml->f_psContext );
+		f_poXml->xml_free ( f_poXml->f_psContext );
+	f_poXml->reset ( );
 	f_poXml->f_psContext = xmlXPathNewContext ( f_poXml->f_psDoc );
 	if ( f_poXml->f_psContext )
 		{
@@ -285,9 +308,12 @@ HXml::xml_node_set_ptr_t HXml::get_node_set_by_path ( const char * a_pcPath )
 			l_pcPtr [ l_iLength -- ] = 0;
 			}
 		if ( f_poXml->f_psObject )
-			return ( f_poXml->f_psObject->nodesetval->nodeTab [ 0 ] );
+			{
+			f_poXml->f_psNodeSet = f_poXml->f_psObject->nodesetval;
+			return ( f_poXml->f_psNodeSet->nodeNr );
+			}
 		}
-	return ( NULL );
+	return ( 0 );
 	M_EPILOG
 	}
 
@@ -297,6 +323,9 @@ void HXml::init ( const char * a_pcFileName )
 	xmlCharEncoding l_xEncoding = static_cast < xmlCharEncoding > ( 0 );
 	xmlCharEncodingHandlerPtr l_pxHnd = NULL;
 	HString l_oError;
+	if ( f_poXml->f_psDoc )
+		f_poXml->xml_free ( f_poXml->f_psDoc );
+	f_poXml->reset ( );
 	f_poXml->f_psDoc = xmlParseFile ( a_pcFileName );
 	if ( ! f_poXml->f_psDoc )
 		{
@@ -330,4 +359,47 @@ void HXml::init ( const char * a_pcFileName )
 	return;
 	M_EPILOG
 	}
+
+char const * HXml::iterate ( HString & a_roValue, char const * a_pcPath )
+	{
+	M_PROLOG
+	char const * l_pcName = NULL;
+	if ( ! f_poXml->f_psNodeSet || ( a_pcPath != f_oTmpBuffer ) )
+		{
+		if ( f_poXml->f_psContext )
+			f_poXml->xml_free ( f_poXml->f_psContext );
+		get_node_set_by_path ( a_pcPath );
+		f_iIndex = 0;
+		}
+	while ( ! l_pcName && ( f_poXml->f_psNodeSet && ( f_iIndex < f_poXml->f_psNodeSet->nodeNr ) ) )
+		{
+		f_poXml->f_psStartNode = f_poXml->f_psNode = f_poXml->f_psNodeSet->nodeTab [ f_iIndex ];
+		l_pcName = iterate ( a_roValue );
+		f_iIndex ++;
+		}
+	return ( l_pcName );
+	M_EPILOG
+	}
+
+char const * HXml::iterate ( HString & a_roValue )
+	{
+	M_PROLOG
+	char const * l_pcName = NULL;
+	if ( f_poXml->f_psNode )
+		{
+		l_pcName = reinterpret_cast < char const * > ( f_poXml->f_psNode->name );
+		a_roValue = f_poXml->f_psNode->content;
+		f_poXml->f_psNode = f_poXml->f_psNode->children;
+		}
+	else
+		{
+		if ( f_poXml->f_psNode->parent && ( f_poXml->f_psNode->parent != f_poXml->f_psStartNode ) )
+			{
+			f_poXml->f_psNode = f_poXml->f_psNode->parent->next;
+			l_pcName = iterate ( a_roValue );
+			}
+		}
+	return ( l_pcName );
+	M_EPILOG
+	}	
 
