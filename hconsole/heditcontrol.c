@@ -189,47 +189,6 @@ void HEditControl::set_flags ( bool a_bReplace, bool a_bPassword )
 	M_EPILOG
 	}
 
-/* all str* and mem* functions takes const pointer as argument and returns
-	 non const pointer */
-char * strrnpbrk ( char const * a_pcBuffer, char const * a_pcStopSet,
-		int a_iIndex )
-	{
-	int l_iCtr = 0;
-	int l_iStopSetSize = strlen ( a_pcStopSet );
-	while ( a_iIndex -- )
-		for ( l_iCtr = 0; l_iCtr < l_iStopSetSize; l_iCtr ++ )
-			if ( a_pcBuffer [ a_iIndex ] == a_pcStopSet [ l_iCtr ] )
-				return ( const_cast < char * > ( a_pcBuffer + a_iIndex ) );
-	return ( NULL );
-	}
-
-char const * strrpbrk ( char const * a_pcBuffer, char const * a_pcStopSet )
-	{
-	return ( strrnpbrk ( a_pcBuffer, a_pcStopSet, strlen ( a_pcBuffer ) ) );
-	}
-
-size_t strrnspn ( char const * a_pcBuffer, char const * a_pcSkipSet,
-		int a_iLenght )
-	{
-	int l_iCtr = 0;
-	int l_iSkipSetSize = strlen ( a_pcSkipSet );
-	int l_iIndex = a_iLenght;
-	while ( l_iIndex -- )
-		{
-		for ( l_iCtr = 0; l_iCtr < l_iSkipSetSize; l_iCtr ++ )
-			if ( a_pcBuffer [ l_iIndex ] == a_pcSkipSet [ l_iCtr ] )
-				break;
-		if ( l_iCtr >= l_iSkipSetSize )
-			return ( a_iLenght - l_iIndex );
-		}
-	return ( 0 );
-	}
-
-size_t strrspn ( char const * a_pcBuffer, char const * a_pcSkipSet )
-	{
-	return ( strrnspn ( a_pcBuffer, a_pcSkipSet, strlen ( a_pcBuffer ) ) );
-	}
-
 char const g_pcWhiteSpace [ ] = " \t\n()[].,!?;{}+-*/";
 
 int HEditControl::process_input ( int a_iCode )

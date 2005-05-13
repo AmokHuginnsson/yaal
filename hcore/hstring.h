@@ -115,6 +115,12 @@ bool operator <= ( char const *, const HString & );
 bool operator > ( char const *, const HString & );
 bool operator < ( char const *, const HString & );
 
+/* Useful helpers */
+char * strrnpbrk ( char const *, char const *, int );
+char const * strrpbrk ( char const *, char const * );
+size_t strrnspn ( char const *, char const *, int );
+size_t strrspn ( char const *, char const * );
+
 }
 
 }
