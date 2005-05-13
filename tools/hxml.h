@@ -59,7 +59,7 @@ public:
 	virtual ~ HXml ( void );
 	void init ( char const * );
 	virtual void * parse ( void * ) = 0;
-	char const * iterate ( stdhapi::hcore::HString &, char const * );
+	char const * iterate ( stdhapi::hcore::HString &, char const *, bool = true );
 	/*}*/
 protected:
 	/*{*/
