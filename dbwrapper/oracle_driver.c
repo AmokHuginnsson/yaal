@@ -243,9 +243,15 @@ char * rs_get ( void * a_pvData, int a_iRow, int /*a_iColumn*/ )
 	return ( NULL );
 	}
 
-int rs_fields_count ( void * /*a_pvData*/ )
+int rs_fields_count ( void * a_pvData )
 	{
-	return ( 0 );
+	int l_iFields = 0;
+	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvData );
+	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
+					OCI_HTYPE_STMT, & l_iFields, 0, OCI_ATTR_PARAM_COUNT,
+					l_psQuery->f_psError ) ) != OCI_SUCCESS )
+		l_iFields = - 1;
+	return ( l_iFields );
 	}
 
 long int dbrs_records_count ( void * /*a_pvDataB*/, void * /*a_pvDataR*/ )
@@ -258,8 +264,25 @@ long int dbrs_id ( void * /*a_pvDataB*/, void * )
 	return ( 0 );
 	}
 
-char * rs_column_name ( void * /*a_pvDataR*/, int /*a_iField*/ )
+char * rs_column_name ( void * a_pvDataR, int a_iField )
 	{
+	int l_iNameLength = 0;
+	text * l_pcName = NULL;
+	OCIParam * l_psParameter = NULL;
+	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvData );
+	if ( ( ( * l_psQuery->f_piStatus ) = OCIParamGet ( l_psQuery->f_psStatement,
+					OCI_HTYPE_STMT, l_psQuery->f_psError,
+					& l_psParameter, a_iField + 1 ) ) == OCI_SUCCESS )
+		{
+		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psParameter,
+						OCI_DTYPE_PARAM, & l_pcName, & l_iNameLength,
+						OCI_ATTR_NAME, l_psQuery->f_psError ) ) == OCI_SUCCESS )
+			{
+			if ( l_iNameLength >= 0 )
+				l_pcName [ l_iNameLength ] = 0;
+			return ( reinterpret_cast < char * > ( l_pcName ) );
+			}
+		}
 	return ( NULL );
 	}
 
