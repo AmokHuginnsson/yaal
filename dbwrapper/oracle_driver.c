@@ -33,12 +33,15 @@ Copyright:
 #include <oci.h>
 
 #include "hcore/xalloc.h"
+#include "hcore/hstring.h"
 
 #ifndef NULL
 #define NULL	0
 #endif /* not NULL */
 
 #define D_TEXT_BUFFER_SIZE	512
+
+using namespace stdhapi::hcore;
 
 extern "C"
 {
@@ -254,13 +257,41 @@ int rs_fields_count ( void * a_pvData )
 	return ( l_iFields );
 	}
 
-long int dbrs_records_count ( void * /*a_pvDataB*/, void * /*a_pvDataR*/ )
+long int dbrs_records_count ( void * a_pvDataB, void * /*a_pvDataR*/ )
 	{
-	return ( 0 );
+	int l_iRows = 0;
+	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvDataB );
+	( * l_psQuery->f_piStatus ) = OCIStmtFetch2 ( l_psQuery->f_psStatement,
+																								 l_psQuery->f_psError, 1,
+																								 OCI_FETCH_LAST, 0,
+																								 OCI_DEFAULT );
+	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
+					OCI_HTYPE_STMT, & l_iRows, 0, OCI_ATTR_CURRENT_POSITION,
+					l_psQuery->f_psError ) ) != OCI_SUCCESS )
+		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
+						OCI_HTYPE_STMT, & l_iRows, 0, OCI_ATTR_ROW_COUNT,
+						l_psQuery->f_psError ) ) != OCI_SUCCESS )
+			l_iRows = - 1;
+	return ( l_iRows );
 	}
 
-long int dbrs_id ( void * /*a_pvDataB*/, void * )
+long int dbrs_id ( void * a_pvDataB, void * a_pvDataR )
 	{
+	int l_iNameLength = 0;
+	HString l_oSQL;
+	text * l_pcName = NULL;
+	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvDataR );
+	OQuery * l_psAutonumber = NULL;
+	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
+					OCI_HTYPE_STMT, & l_pcName, & l_iNameLength,
+					l_psQuery->f_psError ) ) == OCI_SUCCESS )
+		{
+		l_pcName [ l_iNameLength ] = 0;
+		l_oSQL.format ( "SELECT %s_sequence.currval FROM dual;", reinterpret_cast < char * > ( l_pcName ) );
+		l_psAutonumber = db_query ( a_pvDataB, l_oSQL );
+		/* TODO */
+		db_unquery ( l_psAutonumber );
+		}
 	return ( 0 );
 	}
 
