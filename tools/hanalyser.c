@@ -389,15 +389,9 @@ void HAnalyser::addition_production ( HAnalyserNode * a_poNode )
 		l_poTrunk = static_cast < HAnalyserNode * > ( a_poNode->f_poTrunk );
 		if ( ! l_poTrunk )
 			return ;
-		while ( 1 )
-			{
-			if ( l_poTrunk->f_oBranch [ l_iCtr ] == a_poNode )
-				{
-				l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
-				break;
-				}
-			l_iCtr++;
-			}
+		while ( l_poTrunk->f_oBranch [ l_iCtr ] != a_poNode )
+			l_iCtr ++;
+		l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
 		a_poNode->f_oBranch [ 0 ] = 0;
 		if ( a_poNode->f_oBranch.quantity ( ) > 1 )
 			a_poNode->f_oBranch [ 1 ] = 0;
@@ -433,15 +427,9 @@ void HAnalyser::multiplication_production ( HAnalyserNode * a_poNode )
 		l_poTrunk = static_cast < HAnalyserNode * > ( a_poNode->f_poTrunk );
 		if ( ! l_poTrunk )
 			return ;
-		while ( 1 )
-			{
-			if ( l_poTrunk->f_oBranch [ l_iCtr ] == a_poNode )
-				{
-				l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
-				break;
-				}
-			l_iCtr++;
-			}
+		while ( l_poTrunk->f_oBranch [ l_iCtr ] != a_poNode )
+			l_iCtr ++;
+		l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
 		a_poNode->f_oBranch [ 0 ] = 0;
 		if ( a_poNode->f_oBranch.quantity ( ) > 1 )
 			a_poNode->f_oBranch [ 1 ] = 0;
@@ -483,15 +471,9 @@ void HAnalyser::power_production( HAnalyserNode * a_poNode )
 		l_poTrunk = static_cast < HAnalyserNode * > ( a_poNode->f_poTrunk );
 		if ( ! l_poTrunk )
 			return;
-		while ( 1 )
-			{
-			if ( l_poTrunk->f_oBranch [ l_iCtr ] == a_poNode )
-				{
-				l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
-				break;
-				}
-			l_iCtr++;
-			}
+		while ( l_poTrunk->f_oBranch [ l_iCtr ] != a_poNode )
+			l_iCtr ++;
+		l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
 		a_poNode->f_oBranch [ 0 ] = 0;
 		if ( a_poNode->f_oBranch.quantity ( ) > 1 )
 			a_poNode->f_oBranch [ 1 ] = 0;
