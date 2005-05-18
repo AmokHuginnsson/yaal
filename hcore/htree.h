@@ -102,6 +102,7 @@ protected:
 		friend class HTree < tttType >;
 		friend class HBranchList < HNode * >;
 		};
+private:
 protected:
 	/*{*/
 	HNode * f_poRoot;			/* self explanary */
@@ -251,7 +252,7 @@ template < class tttType >
 HTree < tttType > ::~HTree( void )
 	{
 	M_PROLOG
-	flush ( );
+	HTree::flush ( );
 	return ;
 	M_EPILOG
 	}

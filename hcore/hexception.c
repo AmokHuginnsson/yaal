@@ -26,6 +26,7 @@ Copyright:
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef _STDIO_H
 #include <execinfo.h>
@@ -76,8 +77,14 @@ HException::HException ( const HException & a_roException )
 
 HException::~HException ( void )
 	{
-	hcore::log ( "Exception registers: c:0x%02x i:%d l:%ld d:%f pv:%p pc:%s\n",
-			f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
+	try
+		{
+		hcore::log ( "Exception registers: c:0x%02x i:%d l:%ld d:%f pv:%p pc:%s\n",
+				f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
+		}
+	catch ( ... )
+		{
+		}
 	if ( f_pcCharPtr )
 		xfree ( f_pcCharPtr );
 	if ( f_pcFunctionName )
@@ -125,7 +132,7 @@ void HException::print_error ( bool a_bFull ) const
 void HException::log ( char const * a_pcFileName,
 											 char const * a_pcFunctionName, int a_iLine )
 	{
-	int l_iLength = strlen ( a_pcFileName );
+	size_t l_iLength = strlen ( a_pcFileName );
 	if ( f_iFrame && ! ( strcmp ( f_pcFileName, a_pcFileName ) || strcmp ( f_pcFunctionName, a_pcFunctionName ) ) )
 		return;
 	hcore::log ( "Exception frame %2d: %16s : %4d : %s\n", f_iFrame ++,
@@ -142,12 +149,13 @@ void HException::dump_call_stack ( int )
 	{
 #ifdef _EXECINFO_H
 	int l_iCtr = 0, l_iSize = 0;
-	char l_pcBuffer [ 4000 ];
-	char ** l_ppcStrings = NULL;
-	void ** l_ppvArray = reinterpret_cast < void * * > ( & l_pcBuffer );
+	char * l_pcBuffer = NULL;
+	char * * l_ppcStrings = NULL;
+	void * * l_ppvPointer =	reinterpret_cast < void * * > ( & l_pcBuffer );
 
-	l_iSize = backtrace ( l_ppvArray, 1000 );
-	l_ppcStrings = backtrace_symbols  ( l_ppvArray, l_iSize );
+	l_pcBuffer = xcalloc ( 4000, char );
+	l_iSize = backtrace ( l_ppvPointer, 1000 );
+	l_ppcStrings = backtrace_symbols  ( l_ppvPointer, l_iSize );
 
 	hcore::log << "Obtained " << static_cast < int > ( l_iSize ) << " stack frames." << endl;
 	if ( a_iLevel < l_iSize )
@@ -156,6 +164,7 @@ void HException::dump_call_stack ( int )
 		hcore::log << l_ppcStrings [ l_iCtr ] << endl;
 
 	xfree ( l_ppcStrings );
+	xfree ( l_pcBuffer );
 #endif /* _EXECINFO_H */
 	return;
 	}
@@ -163,6 +172,18 @@ void HException::dump_call_stack ( int )
 HException * HException::operator-> ( void )
 	{
 	return ( this );
+	}
+
+void HException::failed_assert ( char const * a_pcFileName,
+		char const * a_pcFunctionName, int a_iLine, char const * a_pcMessage )
+	{
+	M_PROLOG
+	fprintf ( stderr, "Failed assertion: `%s' at: %s: %4d: %s\n",
+			a_pcMessage, a_pcFileName, a_iLine, a_pcFunctionName );
+	if ( ! g_iErrNo )
+		g_iErrNo ++;
+	exit ( g_iErrNo );
+	M_EPILOG
 	}
 
 }

@@ -28,3 +28,30 @@ Copyright:
 M_CVSID ( "$CVSHeader$" );
 #include "hfile.h"
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
+HFile::HFile ( void ) : f_psStream ( NULL )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+HFile::~HFile ( void )
+	{
+	M_PROLOG
+	if ( f_psStream )
+		fclose ( f_psStream );
+	f_psStream = NULL;
+	return;
+	M_EPILOG
+	}
+
+}
+
+}
+

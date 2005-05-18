@@ -70,7 +70,8 @@ public:
 	int get_minute ( void );
 	int get_second ( void );
 	HTime & operator = ( const HTime & );
-	HTime operator - ( const HTime & );
+	HTime operator - ( const HTime & ) const;
+	HTime & operator -= ( const HTime & );
 	bool operator == ( const time_t & );
 	bool operator != ( const time_t & );
 	bool operator <= ( const time_t & );

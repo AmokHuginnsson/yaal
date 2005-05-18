@@ -128,6 +128,7 @@ HInfo::HInfo ( const HInfo & a_roInfo, int )
 HInfo::~HInfo ( void )
 	{
 	M_PROLOG
+	purge ( );
 	return;
 	M_EPILOG
 	}
@@ -156,13 +157,16 @@ char & HInfo::operator [ ] ( int a_iIndex )
 HInfo & HInfo::operator = ( const HInfo & a_roInfo )
 	{
 	M_PROLOG
-	f_iType = a_roInfo.f_iType;
-	f_iInt = a_roInfo.f_iInt;
-	f_lLongInt = a_roInfo.f_lLongInt;
-	f_dDouble = a_roInfo.f_dDouble;
-	f_oString = a_roInfo.f_oString;
-	f_oTime = a_roInfo.f_oTime;
-	f_pvPointer = a_roInfo.f_pvPointer;
+	if ( this != & a_roInfo )
+		{
+		f_iType = a_roInfo.f_iType;
+		f_iInt = a_roInfo.f_iInt;
+		f_lLongInt = a_roInfo.f_lLongInt;
+		f_dDouble = a_roInfo.f_dDouble;
+		f_oString = a_roInfo.f_oString;
+		f_oTime = a_roInfo.f_oTime;
+		f_pvPointer = a_roInfo.f_pvPointer;
+		}
 	return ( * this );
 	M_EPILOG
 	}

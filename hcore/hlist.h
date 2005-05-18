@@ -114,6 +114,7 @@ protected:
 		/*}*/
 		friend class HList< tType >;
 		};
+private:
 protected:
 	/*{*/
 	int f_iQuantity;					/* how many elements this list contains */
@@ -252,7 +253,7 @@ HList< tType >::HList ( int a_iSize )
 	{
 	M_PROLOG
 	while ( a_iSize -- )
-		add_tail ( );
+		M_IRV ( HList::add_tail ( ) );
 	return ;
 	M_EPILOG
 	}
@@ -261,7 +262,7 @@ template < class tType >
 HList< tType >::~HList ( void )
 	{
 	M_PROLOG
-	flush ();
+	HList::flush ();
 	return ;
 	M_EPILOG
 	}
@@ -272,7 +273,7 @@ void HList < tType >::flush ( void )
 	M_PROLOG
 	while ( f_iQuantity -- )
 		{
-		empty ( f_poHook->f_poNext );
+		M_IRV ( empty ( f_poHook->f_poNext ) );
 		delete f_poHook->f_poNext;
 		}
 	f_iIndex = 0;
@@ -290,7 +291,7 @@ template < class tType >
 long int HList< tType >::empty ( HElement * a_poElement )
 	{
 	M_PROLOG
-	long int l_lTemp;
+	long int l_lTemp = 0;
 	l_lTemp = a_poElement->f_lHits;
 	a_poElement->f_lHits = 0;
 	return ( l_lTemp );
@@ -424,7 +425,7 @@ template < class tType >
 tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 	{
 	M_PROLOG
-#define M_SWITCH ( cmpc ( f_poIndex, l_poElement ) * a_iOrder ) < 0
+#define M_SWITCH ( ( cmpc ( f_poIndex, l_poElement ) * a_iOrder ) < 0 )
 	bool l_bBefore = false;
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iQuantity;
 	HElement * l_poElement = new HElement ( NULL, f_iHighestNumber );
@@ -433,7 +434,7 @@ tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
 		{
 		l_iOldIndex = l_iIndex;
 		l_iIndex = ( l_iLower + l_iUpper ) / 2;
-		element_by_index ( l_iIndex );
+		M_IRV ( element_by_index ( l_iIndex ) );
 		if ( M_SWITCH )
 			l_iLower = l_iIndex;
 		else
@@ -489,14 +490,11 @@ int HList< tType >::remove_at ( int a_iIndex, int a_iFlag, tType * * a_pptObject
 			switch ( l_iFlag )
 				{
 				case ( D_BLOCK_IF_NOT_EMPTIED ):
-					{
 					return ( D_ERROR );
-					break;
-					}
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					{
 					l_iError = D_WAS_EMPTIED;
-					empty ( l_poElement );
+					M_IRV ( empty ( l_poElement ) );
 					break;
 					}
 				case ( D_FORCE_REMOVE_ELEMENT ):
@@ -545,26 +543,23 @@ int HList< tType >::remove_element ( int a_iFlag, tType * * a_pptObject )
 	M_PROLOG
 	int l_iFlag = 0, l_iTreat = 0, l_iError = 0;
 	HElement * l_poElement = NULL;
-	l_iFlag = a_iFlag & ( D_BLOCK_IF_NOT_EMPTIED | D_EMPTY_IF_NOT_EMPTIED | D_FORCE_REMOVE_ELEMENT );
-	l_iTreat = a_iFlag & ( D_TREAT_AS_CLOSED | D_TREAT_AS_OPENED );
-	l_poElement = f_poSelected;
-	if ( a_pptObject )
-		( * a_pptObject ) = & l_poElement->f_tObject;
 	if ( f_iQuantity > 0 )
 		{
+		l_iFlag = a_iFlag & ( D_BLOCK_IF_NOT_EMPTIED | D_EMPTY_IF_NOT_EMPTIED | D_FORCE_REMOVE_ELEMENT );
+		l_iTreat = a_iFlag & ( D_TREAT_AS_CLOSED | D_TREAT_AS_OPENED );
+		l_poElement = f_poSelected;
+		if ( a_pptObject )
+			( * a_pptObject ) = & l_poElement->f_tObject;
 		if ( l_poElement->f_lHits )
 			{
 			switch ( l_iFlag )
 				{
 				case ( D_BLOCK_IF_NOT_EMPTIED ):
-					{
 					return ( D_ERROR );
-					break;
-					}
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					{
 					l_iError = D_WAS_EMPTIED;
-					empty ( l_poElement );
+					M_IRV ( empty ( l_poElement ) );
 					break;
 					}
 				case ( D_FORCE_REMOVE_ELEMENT ):
@@ -608,25 +603,22 @@ int HList< tType >::remove_head ( int a_iFlag, tType * * a_pptObject )
 	M_PROLOG
 	int l_iError = 0;
 	HElement * l_poElement = NULL;
-	l_poElement = f_poHook;
-	if ( a_pptObject )
-		( * a_pptObject ) = & l_poElement->f_tObject;
-	f_poHook = f_poHook->f_poNext;
 	if ( f_iQuantity > 0 )
 		{
+		l_poElement = f_poHook;
+		if ( a_pptObject )
+			( * a_pptObject ) = & l_poElement->f_tObject;
+		f_poHook = f_poHook->f_poNext;
 		if ( l_poElement->f_lHits )
 			{
 			switch ( a_iFlag )
 				{
 				case ( D_BLOCK_IF_NOT_EMPTIED ):
-					{
 					return ( D_ERROR );
-					break;
-					}
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					{
 					l_iError = D_WAS_EMPTIED;
-					empty ( l_poElement );
+					M_IRV ( empty ( l_poElement ) );
 					break;
 					}
 				case ( D_FORCE_REMOVE_ELEMENT ):
@@ -667,24 +659,21 @@ int HList< tType >::remove_tail ( int a_iFlag, tType * * a_pptObject )
 	M_PROLOG
 	int l_iError = 0;
 	HElement * l_poElement = NULL;
-	l_poElement = f_poHook->f_poPrevious;
-	if ( a_pptObject )
-		( * a_pptObject ) = & l_poElement->f_tObject;
 	if ( f_iQuantity > 0 )
 		{
+		l_poElement = f_poHook->f_poPrevious;
+		if ( a_pptObject )
+			( * a_pptObject ) = & l_poElement->f_tObject;
 		if ( l_poElement->f_lHits )
 			{
 			switch ( a_iFlag )
 				{
 				case ( D_BLOCK_IF_NOT_EMPTIED ):
-					{
 					return ( D_ERROR );
-					break;
-					}
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					{
 					l_iError = D_WAS_EMPTIED;
-					empty ( l_poElement );
+					M_IRV ( empty ( l_poElement ) );
 					break;
 					}
 				case ( D_FORCE_REMOVE_ELEMENT ):
@@ -917,7 +906,6 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 		l_poElement = l_poElement->f_poNext;
 		}
 	M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADNUMBER ], a_iNumber );
-	return ( NULL );
 	M_EPILOG
 	}
 

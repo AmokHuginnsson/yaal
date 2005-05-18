@@ -68,6 +68,8 @@ namespace hcore
 #define M_EPILOG M_CATCH ( e ){e->log ( __WHERE__ );throw;}
 #define M_FINAL M_CATCH ( e ){e->log ( __WHERE__ );e->print_error ( true );M_EXCEPTION_RELEASE ( e );}
 #define M_ENSURE( condition ) if ( ! ( condition ) )M_THROW ( strerror ( errno ), errno )
+#define M_IRV( expression )	static_cast < void > ( expression )
+#define M_ASSERT( condition ) if ( ! ( condition ) )HException::failed_assert ( __WHERE__, #condition )
 
 #define D_LOG_DEBUG			1
 #define D_LOG_INFO			2
@@ -128,6 +130,7 @@ public:
 	static void dump_call_stack ( int );
 	void log ( char const *, char const *, int );
 	HException * operator-> ( void );
+	static void failed_assert ( char const *, char const *, int, char const * ) __attribute__(( __noreturn__ ));
 	/*}*/
 private:
 	/*{*/

@@ -87,8 +87,7 @@ void set_env ( char const * a_pcVarValue )
 	M_PROLOG
 	char * l_pcPtr = NULL;
 	if ( ( strlen ( a_pcVarValue ) < 3 )
-			|| ( ( ! ( l_pcPtr = strchr ( a_pcVarValue, ' ' ) ) )
-				&& ( ! ( l_pcPtr = strchr ( a_pcVarValue, '\t' ) ) ) ) )
+			|| ( ( ! ( l_pcPtr = const_cast < char * > ( strpbrk ( a_pcVarValue, " \t" ) ) ) ) ) )
 		{
 		log ( D_LOG_ERROR ) << "bad set_env argument: `";
 		log << a_pcVarValue << '\'' << endl;
@@ -102,7 +101,7 @@ void set_env ( char const * a_pcVarValue )
 		log << a_pcVarValue << '\'' << endl;
 		return;
 		}
-	setenv ( a_pcVarValue, l_pcPtr, true );
+	M_IRV ( setenv ( a_pcVarValue, l_pcPtr, true ) );
 	return;
 	M_EPILOG
 	}
@@ -112,18 +111,19 @@ void hcore_init ( void ) __attribute__ ( ( constructor ) );
 void hcore_init ( void )
 	{
 	char * l_pcEnv = NULL;
-	g_iErrNo = 0;
-	if ( sizeof ( int ) < 4 )
+	g_iErrNo = sizeof ( int );
+	if ( g_iErrNo < 4 )
 		{
 		log << "Your CPU or compiler does not support required size of int.";
 		log << endl;
-		exit ( 1 );
+		exit ( g_iErrNo );
 		}
+	g_iErrNo = 0;
 	l_pcEnv = ::getenv ( "STDHAPI_DEBUG" );
 	if ( l_pcEnv )
 		n_iDebugLevel = strtol ( l_pcEnv, NULL, 10 );
-	rc_file::process_rc_file ( "stdhapi", "core", n_psHCoreVariables,
-			set_hcore_variables );
+	M_IRV ( rc_file::process_rc_file ( "stdhapi", "core",
+				n_psHCoreVariables, set_hcore_variables ) );
 	return;
 	}
 
@@ -150,17 +150,4 @@ void stdhapi_hcore_main ( void )
 }
 
 }
-
-/* older versions of g++ fail to handle __attribute__((constructor))
-   if no static object exists */
-
-#if __GNUC__ < 3 || \
-	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
-
-namespace
-	{
-HString g_oDummyHCORE;
-	}
-
-#endif
 

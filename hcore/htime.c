@@ -211,7 +211,7 @@ HTime & HTime::operator = ( const HTime & a_roTime )
 	M_EPILOG
 	}
 
-HTime HTime::operator - ( const HTime & a_roTime )
+HTime HTime::operator - ( const HTime & a_roTime ) const
 	{
 	M_PROLOG
 	HTime l_oTime;
@@ -219,6 +219,14 @@ HTime HTime::operator - ( const HTime & a_roTime )
 	l_oTime.f_xValue = static_cast < time_t > ( difftime ( f_xValue, a_roTime.f_xValue ) );
 	gmtime_r ( & l_oTime.f_xValue, & l_oTime.f_sBroken );
 	return ( l_oTime );
+	M_EPILOG
+	}
+
+HTime & HTime::operator -= ( const HTime & a_roTime )
+	{
+	M_PROLOG
+	( * this ) = ( * this ) - a_roTime;
+	return ( * this );
 	M_EPILOG
 	}
 
