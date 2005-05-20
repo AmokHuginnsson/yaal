@@ -54,7 +54,7 @@ inline unsigned long int hash ( const tType & a_rtKey )
 template < class tType, class ttType >
 class HMap
 	{
-protected:
+private:
 	class HAtom
 		{
 	protected:
@@ -82,9 +82,6 @@ protected:
 	int f_iQuantity;
 	HAtom * f_poAtomPtr;
 	HAtom ** f_ppoAtomArray;
-	/*}*/
-protected:
-	/*{*/
 	/*}*/
 public:
 	/*{*/

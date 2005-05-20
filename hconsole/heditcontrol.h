@@ -77,7 +77,7 @@ public:
 								int,								/* height */
 								int,								/* width */
 								char const * = "",	/* label */
-								size_t = 127,					/* maximum string length */
+								int = 127,					/* maximum string length */
 								char const * = "",	/* initial content */
 								char const * = D_MASK_DEFAULT, /* mask */
 								bool = false,				/* replace */

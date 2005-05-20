@@ -114,7 +114,6 @@ public:
 	HTree ( void );
 	virtual ~HTree ( );
 	virtual void flush ( void );
-	tttType & add_node ( int = D_FILL_NEW_AUTO );
 	tttType & remove_node ( void );
 	tttType cut_branch ( int );
 	tttType cut_leaf ( int );
@@ -264,22 +263,6 @@ void HTree < tttType > ::flush ( void )
 	if ( f_poRoot )
 		delete f_poRoot;
 	f_poRoot = NULL;
-	M_EPILOG
-	}
-
-template < class tttType >
-tttType & HTree < tttType > ::add_node( int )
-	{
-	M_PROLOG
-	HNode * l_poNode = NULL;
-	l_poNode = new HNode ( f_poSelected, f_iHighestNumber ++ );
-	if ( ! f_poRoot )
-		{
-		f_poRoot = l_poNode;
-		f_poSelected = l_poNode;
-		}
-	f_poSelected->f_oBranch.add_tail ( l_poNode );
-	return ( l_poNode->f_tLeaf );
 	M_EPILOG
 	}
 

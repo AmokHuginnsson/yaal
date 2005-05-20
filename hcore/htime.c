@@ -272,7 +272,7 @@ bool HTime::operator > ( const time_t & a_rxTime )
 	M_EPILOG
 	}
 
-HTime::operator char const * ( void )
+HTime::operator char const * ( void ) const
 	{
 	M_PROLOG
 	int l_iSize = 0;
@@ -292,7 +292,7 @@ HTime::operator char const * ( void )
 	M_EPILOG
 	}
 
-HTime::operator time_t ( void )
+HTime::operator time_t ( void ) const
 	{
 	return ( f_xValue );
 	}

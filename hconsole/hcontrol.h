@@ -67,9 +67,9 @@ protected:
 																		 to parent window (after repositioning) */
 	int				f_iHeightRaw;					/* self explanary */
 	int				f_iWidthRaw;					/* self explanary */
-	hcore::HString 	f_oLabel;							/* control title */
-	hcore::HString		f_oVarTmpBuffer;			/* buffer for temporary operations, used
-																		 to keep memory fragmentation low */
+	hcore::HString	f_oLabel;					/* control title */
+	hcore::HString	f_oVarTmpBuffer;	/* buffer for temporary operations, used
+																			 to keep memory fragmentation low */
 	HWindow * f_poParent;						/* window that will hold this control */
 /* this is used locally, there is no way to modify this variables explictly */
 	int				f_iLabelLength;	 			/* lenght of the label */

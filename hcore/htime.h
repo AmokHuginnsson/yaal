@@ -44,7 +44,7 @@ class HTime
 protected:
 	/*{*/
 	HString	f_oFormat;
-	HString	f_oBuffer;
+	mutable HString	f_oBuffer;
 	time_t	f_xValue;
 	tm			f_sBroken;
 	/*}*/
@@ -78,8 +78,8 @@ public:
 	bool operator >= ( const time_t & );
 	bool operator < ( const time_t & );
 	bool operator > ( const time_t & );
-	operator char const * ( void );
-	operator time_t ( void );
+	operator char const * ( void ) const;
+	operator time_t ( void ) const;
 	/*}*/
 protected:
 	/*{*/

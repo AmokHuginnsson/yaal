@@ -191,52 +191,60 @@ HInfo & HInfo::operator ( ) ( const HInfo & a_roInfo )
 	M_EPILOG
 	}
 
-HInfo::operator int & ( void )
+template < >
+int HInfo::get < int > ( void ) const
 	{
 	M_PROLOG
 	return ( f_iInt );
 	M_EPILOG
 	}
 
-HInfo::operator long int & ( void )
+template < >
+long int HInfo::get < long int > ( void ) const
 	{
 	M_PROLOG
 	return ( f_lLongInt );
 	M_EPILOG
 	}
 
-HInfo::operator double & ( void )
+template < >
+double HInfo::get < double > ( void ) const
 	{
 	M_PROLOG
 	return ( f_dDouble );
 	M_EPILOG
 	}
 
-HInfo::operator char const * ( void )
+template < >
+char const * HInfo::get < char const * > ( void ) const
 	{
 	M_PROLOG
 	return ( static_cast < char const * > ( f_oString ) );
 	M_EPILOG
 	}
 
-HInfo::operator HString & ( void )
+template < >
+const HString & HInfo::get < const HString & > ( void ) const
 	{
 	M_PROLOG
 	return ( f_oString );
 	M_EPILOG
 	}
 
-HInfo::operator HTime & ( void )
+template < >
+const HTime & HInfo::get < const HTime & > ( void ) const
 	{
 	M_PROLOG
 	return ( f_oTime );
 	M_EPILOG
 	}
 
-HInfo::operator void * ( void )
+template < >
+void * HInfo::get < void * > ( void ) const
 	{
 	M_PROLOG
-	return ( f_pvPointer );
+	void * l_pvTmp = f_pvPointer;
+	return ( l_pvTmp );
 	M_EPILOG
 	}
 

@@ -64,13 +64,8 @@ public:
 	char & operator [ ] ( int );
 	HInfo & operator = ( const HInfo & );
 	HInfo & operator ( ) ( const HInfo & );
-	operator int & ( void );
-	operator long int & ( void );
-	operator double & ( void );
-	operator char const * ( void );
-	operator HString & ( void );
-	operator HTime & ( void );
-	operator void * ( void );
+	template < typename tType >
+	tType get ( void ) const;
 	operator bool ( void ) const;
 	/*}*/
 protected:

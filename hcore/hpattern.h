@@ -61,12 +61,13 @@ public:
 	bool parse ( char const * /* pattern input */,
 							 unsigned short int * = NULL /* additional flags to parse */,
 							 int = 0 /* number of additional flags */ );
-	char const * error ( void );
-	char * matches ( char const *, int & );
+	char const * error ( void ) const;
+	char const * matches ( char const *, int & );
 	int count ( char const * );
 	/*}*/
 protected:
 	/*{*/
+	void prepare_error_message ( int );
 	bool set_switch ( char, unsigned short int *, int );
 	/*}*/
 	};

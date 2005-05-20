@@ -133,6 +133,8 @@ public:
 	/*{*/
 	HList ( int = 0 );                 /* Creates list, with specified size */
 	virtual ~HList ( void );
+	HList ( const HList & );
+	HList & operator = ( const HList & );
 	virtual void flush ( void );
 	virtual int quantity ( void );
 	virtual tType & add_element ( tType * = NULL ); /* adds new element at current cursor 
@@ -163,6 +165,7 @@ public:
 	virtual void sort_by_hits ( int = D_ASCENDING );
 	virtual void sort_by_number ( int = D_ASCENDING );
 	virtual void sort_by_contents ( int = D_ASCENDING );
+	operator bool ( void );
 	/*}*/
 protected:
 	/*{*/
@@ -179,11 +182,6 @@ protected:
 	virtual int cmpn ( HElement *, HElement * );
 	virtual int cmpc ( HElement *, HElement * );
 	virtual void sort ( );
-	/*}*/
-private:
-	/*{*/
-	HList ( const HList & );
-	HList & operator = ( const HList & );
 	/*}*/
 	};
 
@@ -268,6 +266,67 @@ HList< tType >::~HList ( void )
 	}
 
 template < class tType >
+HList< tType >::HList ( const HList< tType > & a_roList )
+	: f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
+	f_poHook ( NULL ), f_poSelected ( NULL ), f_iOrder ( D_UNSORTED ),
+	f_iIndex ( 0 ), f_poIndex ( NULL ), cmp ( NULL )
+	{
+	M_PROLOG
+	( * this ) = a_roList;
+	return;
+	M_EPILOG
+	}
+
+template < class tType >
+HList< tType > & HList< tType >::operator = ( const HList< tType > & a_roList )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	int l_iCount = f_iQuantity < a_roList.f_iQuantity ? f_iQuantity
+																											: a_roList.f_iQuantity;
+	HList * l_poList = const_cast < HList * > ( & a_roList );
+	/* I have to do this cast because to_tail modifies f_poSelected and
+	 * declaring it (to_tail) const would be false, but after full loop
+	 * of to_tail(s) obejct is unmofifiad */
+	if ( l_iCount )
+		{
+		go ( 0 );
+		l_poList->go ( 0 );
+		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )	
+			{
+			( * to_tail ( ) ) = ( * l_poList->to_tail ( ) );
+			if ( a_roList.f_poHook == a_roList.f_poSelected )
+				f_poHook = f_poSelected;
+			if ( a_roList.f_poIndex == a_roList.f_poSelected )
+				f_poIndex = f_poSelected;
+			}
+		}
+	if ( f_iQuantity > a_roList.f_iQuantity )
+		{
+		l_iCount = f_iQuantity - a_roList.f_iQuantity;
+		while ( l_iCount -- )remove_tail ( D_FORCE_REMOVE_ELEMENT );
+		}
+	else if ( f_iQuantity < a_roList.f_iQuantity )
+		{
+		for ( ; l_iCtr < a_roList.f_iQuantity; l_iCtr ++ )	
+			{
+			add_tail ( l_poList->to_tail ( ) );
+			if ( a_roList.f_poHook == a_roList.f_poSelected )
+				f_poHook = f_poSelected;
+			if ( a_roList.f_poIndex == a_roList.f_poSelected )
+				f_poIndex = f_poSelected;
+			}
+		}
+	f_iOrder = a_roList.f_iOrder;
+	f_iIndex = a_roList.f_iIndex;
+	f_iQuantity = a_roList.f_iQuantity;
+	f_iHighestNumber = a_roList.f_iHighestNumber;
+	f_iError = a_roList.f_iError;
+	return ( * this );
+	M_EPILOG
+	}
+
+template < class tType >
 void HList < tType >::flush ( void )
 	{
 	M_PROLOG
@@ -323,7 +382,7 @@ int HList< tType >::cmpn ( HElement * a_poLeft, HElement * a_poRight )
 	}
 
 template < class tType >
-int compare_contents ( tType & a_tLeft, tType & a_tRight )
+const int compare_contents ( const tType & a_tLeft, const tType & a_tRight )
 	{
 	return ( a_tLeft - a_tRight );
 	}
@@ -1180,6 +1239,14 @@ void HList < tType >:: sort_by_contents ( int a_iOrder )
 	cmp = & HList< tType >::cmpc;
 	sort ( );
 	return ;
+	M_EPILOG
+	}
+
+template < class tType >
+HList< tType >::operator bool ( void )
+	{
+	M_PROLOG
+	return ( f_iQuantity ? true : false );
 	M_EPILOG
 	}
 

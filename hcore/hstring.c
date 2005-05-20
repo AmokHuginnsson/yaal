@@ -28,6 +28,7 @@ Copyright:
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <libintl.h>
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
@@ -64,21 +65,21 @@ HString::HString ( const HString & a_roString ) : f_pcBuffer ( NULL ), f_iSize (
 	M_EPILOG
 	}
 
-HString::HString ( const size_t a_lSize ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
+HString::HString ( const int a_iSize, bool ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
-	hs_realloc ( a_lSize + 1 );
-	memset ( f_pcBuffer, 0, a_lSize + 1 );
+	hs_realloc ( a_iSize + 1 );
+	memset ( f_pcBuffer, 0, a_iSize + 1 );
 	return;
 	M_EPILOG
 	}
 
-void HString::hs_realloc ( const size_t a_iSize )
+void HString::hs_realloc ( const int a_iSize )
 	{
 	M_PROLOG
 	int l_iOldLength = 0;
 	if ( a_iSize < 1 )
-		M_THROW ( "bad new size", a_iSize );
+		M_THROW ( _ ( "bad new buffer size requested" ), a_iSize );
 	if ( a_iSize > f_iSize )
 		{
 		l_iOldLength = f_iSize;
@@ -278,11 +279,11 @@ HString & HString::operator <<= ( const int a_iShift )
 	return ( * this );
 	}
 
-char & HString::operator [ ] ( const int a_iIndex ) const
+char & HString::operator [ ] ( const int a_iIndex )
 	{
 	M_PROLOG
 	int l_iLength = get_length ( );
-	if  ( ( static_cast < size_t > ( a_iIndex ) >= f_iSize ) || ( a_iIndex > l_iLength ) )
+	if  ( ( a_iIndex >= f_iSize ) || ( a_iIndex > l_iLength ) )
 		M_THROW ( "index out of bound", a_iIndex );
 	return ( f_pcBuffer [ a_iIndex ] );
 	M_EPILOG
@@ -407,7 +408,7 @@ int HString::get_length ( void ) const
 	if ( ! f_pcBuffer )
 		M_THROW ( "no buffer.", reinterpret_cast < int > ( f_pcBuffer ) );
 	l_iLength = strlen ( f_pcBuffer );
-	if ( static_cast < size_t > ( l_iLength ) > f_iSize )
+	if ( l_iLength > f_iSize )
 		M_THROW ( "no terminating null!", l_iLength );
 	return ( l_iLength );
 	M_EPILOG
@@ -752,7 +753,7 @@ char const * strrpbrk ( char const * a_pcBuffer, char const * a_pcStopSet )
 	return ( strrnpbrk ( a_pcBuffer, a_pcStopSet, strlen ( a_pcBuffer ) ) );
 	}
 
-size_t strrnspn ( char const * a_pcBuffer, char const * a_pcSkipSet,
+int strrnspn ( char const * a_pcBuffer, char const * a_pcSkipSet,
 		int a_iLenght )
 	{
 	int l_iCtr = 0;
@@ -769,7 +770,7 @@ size_t strrnspn ( char const * a_pcBuffer, char const * a_pcSkipSet,
 	return ( 0 );
 	}
 
-size_t strrspn ( char const * a_pcBuffer, char const * a_pcSkipSet )
+int strrspn ( char const * a_pcBuffer, char const * a_pcSkipSet )
 	{
 	return ( strrnspn ( a_pcBuffer, a_pcSkipSet, strlen ( a_pcBuffer ) ) );
 	}

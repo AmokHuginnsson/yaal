@@ -95,7 +95,7 @@ HListControl::HColumnInfo & HListControl::HColumnInfo::operator = ( const HColum
 	M_EPILOG
 	}
 
-int HListControl::HColumnInfo::operator - ( const HColumnInfo & )
+const int HListControl::HColumnInfo::operator - ( const HColumnInfo & ) const
 	{
 	M_PROLOG
 	if ( g_iErrNo || ! g_iErrNo )
@@ -183,22 +183,22 @@ void HListControl::refresh ( void )
 						{
 						case ( D_TYPE_LONG_INT ):
 							{
-							f_oVarTmpBuffer = static_cast < long int & > ( l_oItem [ l_iCtrLoc ] );
+							f_oVarTmpBuffer = l_oItem [ l_iCtrLoc ].get < long int > ( );
 							break;
 							}
 						case ( D_TYPE_DOUBLE ):
 							{
-							f_oVarTmpBuffer = static_cast < double & > ( l_oItem [ l_iCtrLoc ] );
+							f_oVarTmpBuffer = l_oItem [ l_iCtrLoc ].get < double > ( );
 							break;
 							}
 						case ( D_TYPE_HSTRING ):
 							{
-							f_oVarTmpBuffer = static_cast < HString & > ( l_oItem [ l_iCtrLoc ] );
+							f_oVarTmpBuffer = l_oItem [ l_iCtrLoc ].get < const HString & > ( );
 							break;
 							}
 						case ( D_TYPE_HTIME ):
 							{
-							f_oVarTmpBuffer = static_cast < char const * > ( static_cast < HTime & > ( l_oItem [ l_iCtrLoc ] ) );
+							f_oVarTmpBuffer = static_cast < char const * > ( l_oItem [ l_iCtrLoc ].get < const HTime & > ( ) );
 							break;
 							}
 						default :
@@ -745,13 +745,13 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 			}
 		case ( D_TYPE_HSTRING ):
 			{
-			return ( strcasecmp ( static_cast < HString & > ( l_roLeftInfo ),
-					static_cast < HString & > ( l_roRightInfo ) ) );
+			return ( strcasecmp ( l_roLeftInfo.get < const HString & > ( ),
+					 l_roRightInfo.get < const HString & > ( ) ) );
 			break;
 			}
 		case ( D_TYPE_HTIME ):
 			{
-			l_dDifference = static_cast < time_t > ( static_cast < HTime & > ( l_roLeftInfo ) ) - static_cast < time_t > ( static_cast < HTime & > ( l_roRightInfo ) );
+			l_dDifference = static_cast < time_t > ( l_roLeftInfo.get < const HTime & > ( ) ) - static_cast < time_t > ( l_roRightInfo.get < const HTime & > ( ) );
 			break;
 			}
 		default :
@@ -838,7 +838,7 @@ void HListControl::go_to_match ( void )
 	int l_iDummy = 0, l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
 	int l_iCount = f_iQuantity + 1, l_iColumns = f_oHeader.quantity ( );
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
-	char * l_pcHighlightStart = NULL;
+	char const * l_pcHighlightStart = NULL;
 	HItem * l_poItem = NULL;
 	HElement * l_poSelectedOrig = f_poSelected;
 	HElement * l_poFirstVisibleRowOrig = f_poFirstVisibleRow;
@@ -852,7 +852,7 @@ void HListControl::go_to_match ( void )
 		l_poItem = & f_poSelected->get_object ( );
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
 			{
-			l_pcHighlightStart = static_cast < HString & > ( ( * l_poItem ) [ l_iCtr ] );
+			l_pcHighlightStart = ( * l_poItem ) [ l_iCtr ].get < const HString & > ( );
 			l_iCtrLoc = 0;
 			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
 					l_iDummy ) ) )
@@ -918,7 +918,7 @@ void HListControl::go_to_match_previous ( void )
 	int l_iDummy = 0, l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
 	int l_iCount = f_iQuantity + 1, l_iColumns = f_oHeader.quantity ( );
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
-	char * l_pcHighlightStart = NULL;
+	char const * l_pcHighlightStart = NULL;
 	HItem * l_poItem = NULL;
 	HElement * l_poSelectedOrig = f_poSelected;
 	HElement * l_poFirstVisibleRowOrig = f_poFirstVisibleRow;
@@ -932,7 +932,7 @@ void HListControl::go_to_match_previous ( void )
 		l_poItem = & f_poSelected->get_object ( );
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
 			{
-			l_pcHighlightStart = static_cast < HString & > ( ( * l_poItem ) [ l_iCtr ] );
+			l_pcHighlightStart = ( * l_poItem ) [ l_iCtr ].get < const HString & > ( );
 			l_iCtrLoc = 0;
 			if ( f_sMatch.f_iMatchNumber < 0 )
 				f_sMatch.f_iMatchNumber = f_oPattern.count ( l_pcHighlightStart );
@@ -1006,6 +1006,11 @@ void HListControl::go_to_match_previous ( void )
 		}
 	return;
 	M_EPILOG
+	}
+
+const int compare_contents ( const HItem &, const HItem & )
+	{
+	return ( 0 );
 	}
 
 }

@@ -80,7 +80,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 		f_poWindows->go ( 0 );
 		while ( ( l_poItem = f_poWindows->to_tail ( 1, D_TREAT_AS_OPENED ) ) )
 			{
-			l_poWindow = dynamic_cast < HDataWindow * > ( static_cast < HWindow * > ( static_cast < void * > ( ( * l_poItem ) [ 0 ] ) ) );
+			l_poWindow = dynamic_cast < HDataWindow * > ( static_cast < HWindow * > ( ( * l_poItem ) [ 0 ].get < void * > ( ) ) );
 			if ( l_poWindow && l_poWindow->is_modified ( ) )
 				{
 				f_poForegroundWindow = l_poWindow;

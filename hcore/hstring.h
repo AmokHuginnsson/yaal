@@ -27,8 +27,6 @@ Copyright:
 #ifndef __HCORE_HSTRING_H
 #define __HCORE_HSTRING_H
 
-#include <stddef.h>
-
 namespace stdhapi
 {
 
@@ -40,15 +38,15 @@ class HString
 protected:
 	/*{*/
 	char *	f_pcBuffer;
-	size_t	f_iSize;
+	int	f_iSize;
 	/*}*/
 public:
 	/*{*/
 	HString ( void );
 	HString ( const HString & );
-	HString ( const size_t ); /* initialize immediately with size */
+	HString ( const int, bool ); /* initialize immediately with size */
 	virtual ~HString ( void ) ;
-	void hs_realloc ( const size_t );
+	void hs_realloc ( const int );
 	HString ( char const * );
 	HString ( char );
 	HString ( int );
@@ -65,7 +63,7 @@ public:
 	HString operator + ( const long int ) const;
 	HString operator + ( const double ) const;
 	HString operator + ( const void * ) const;
-	char & operator [ ] ( const int ) const;
+	char & operator [ ] ( const int );
 	bool operator == ( const HString & ) const;
 	bool operator == ( char const * ) const;
 	bool operator != ( const HString & ) const;
@@ -118,8 +116,8 @@ bool operator < ( char const *, const HString & );
 /* Useful helpers */
 char * strrnpbrk ( char const *, char const *, int );
 char const * strrpbrk ( char const *, char const * );
-size_t strrnspn ( char const *, char const *, int );
-size_t strrspn ( char const *, char const * );
+int strrnspn ( char const *, char const *, int );
+int strrspn ( char const *, char const * );
 
 }
 

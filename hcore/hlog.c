@@ -61,7 +61,7 @@ HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 	M_PROLOG
 	uid_t l_iUid = 0;
 	passwd * l_psPasswd = NULL;
-	f_pcBuffer = xcalloc ( f_iBufferSize, char );
+	f_pcBuffer = xcalloc ( static_cast < int > ( f_iBufferSize ), char );
 	f_pcHostName = xcalloc ( D_HOSTNAME_SIZE, char );
 	f_psStream = tmpfile ( );
 	if ( ! f_psStream )
@@ -75,9 +75,9 @@ HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 	else
 		{
 		f_pcLoginName = xcalloc ( 8, char );
-		snprintf ( f_pcLoginName, 6, "%d", l_iUid );
+		M_IRV ( snprintf ( f_pcLoginName, 6, "%d", l_iUid ) );
 		}
-	gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 );
+	M_IRV ( gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 ) );
 	return;
 	M_EPILOG
 	}
@@ -106,7 +106,7 @@ HLog::~HLog ( void )
 	M_EPILOG
 	}
 
-void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
+void HLog::rehash ( FILE * a_psStream, char const * a_pcProcessName )
 	{
 	M_PROLOG
 #ifndef HAVE_GETLINE
@@ -155,7 +155,7 @@ void HLog::rehash ( FILE * a_psStream, char * a_pcProcessName )
 	M_EPILOG
 	}
 
-void HLog::rehash ( char const * a_pcLogFileName, char * a_pcProcessName )
+void HLog::rehash ( char const * a_pcLogFileName, char const * a_pcProcessName )
 	{
 	M_PROLOG
 	if ( ! a_pcLogFileName )
@@ -189,8 +189,8 @@ void HLog::timestamp ( FILE * a_psStream )
 	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
-	l_iSize = strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
-			l_psBrokenTime );
+	l_iSize = static_cast < int > ( strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
+			l_psBrokenTime ) );
 	if ( l_iSize > D_TIMESTAMP_SIZE )
 		M_THROW ( _ ( "strftime returned more than D_TIMESTAMP_SIZE" ), l_iSize );
 	if ( f_pcProcessName )
@@ -218,7 +218,7 @@ int HLog::operator ( ) ( char const * a_pcFormat, va_list a_xAp )
 		{
 		f_lType = 0;
 		f_bNewLine = true;
-		fflush ( f_psStream );
+		M_IRV ( fflush ( f_psStream ) );
 		}
 	return ( l_iErr );
 	M_EPILOG
@@ -231,7 +231,7 @@ int HLog::operator ( ) ( char const * a_pcFormat, ... )
 	va_list l_xAp;
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
-		va_start ( l_xAp, a_pcFormat );
+		M_IRV ( va_start ( l_xAp, a_pcFormat ) );
 		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
 		va_end ( l_xAp );
 		}
@@ -247,7 +247,7 @@ int HLog::operator ( ) ( long int a_lType, char const * a_pcFormat, ... )
 	f_lType = a_lType;
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
-		va_start ( l_xAp, a_pcFormat );
+		M_IRV ( va_start ( l_xAp, a_pcFormat ) );
 		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
 		va_end ( l_xAp );
 		}
@@ -279,7 +279,7 @@ HLog & HLog::operator << ( char const * a_pcString )
 			{
 			f_bNewLine = true;
 			f_lType = 0;
-			fflush ( f_psStream );
+			M_IRV ( fflush ( f_psStream ) );
 			}
 		}
 	return ( * this );
@@ -300,7 +300,7 @@ HLog & HLog::operator << ( char const a_cChar )
 			{
 			f_bNewLine = true;
 			f_lType = 0;
-			fflush ( f_psStream );
+			M_IRV ( fflush ( f_psStream ) );
 			}
 		}
 	return ( * this );
@@ -322,7 +322,7 @@ HLog & HLog::operator << ( const long int a_lInteger )
 		{
 		if ( f_bNewLine )
 			timestamp ( );
-		snprintf ( f_pcBuffer, f_iBufferSize, "%ld", a_lInteger );
+		M_IRV ( snprintf ( f_pcBuffer, f_iBufferSize, "%ld", a_lInteger ) );
 		fprintf ( f_psStream, f_pcBuffer );
 		f_bNewLine = false;
 		}
@@ -337,7 +337,7 @@ HLog & HLog::operator << ( const double a_dDouble )
 		{
 		if ( f_bNewLine )
 			timestamp ( );
-		snprintf ( f_pcBuffer, f_iBufferSize, "%f", a_dDouble );
+		M_IRV ( snprintf ( f_pcBuffer, f_iBufferSize, "%f", a_dDouble ) );
 		fprintf ( f_psStream, f_pcBuffer );
 		f_bNewLine = false;
 		}

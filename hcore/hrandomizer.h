@@ -37,13 +37,12 @@ class HRandomizer
 	{
 protected:
 	/*{*/
-	long int f_lSeed;
+	unsigned long int f_lSeed;
 	/*}*/
 public:
 	/*{*/
-	HRandomizer( unsigned int = 1 );
-	void set( unsigned int );
-	long int get( void );
+	HRandomizer( unsigned long int = 1 );
+	void set( unsigned long int );
 	int rnd();
 	/*}*/
 	};

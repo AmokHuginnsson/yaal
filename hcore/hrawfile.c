@@ -47,7 +47,7 @@ HRawFile::~HRawFile ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor )
-		close ( );
+		M_IRV ( close ( ) );
 	M_EPILOG
 	}
 
@@ -64,7 +64,7 @@ int HRawFile::close ( void )
 	M_EPILOG
 	}
 
-file_descriptor_t HRawFile::get_file_descriptor ( void )
+file_descriptor_t HRawFile::get_file_descriptor ( void ) const
 	{
 	M_PROLOG
 	return ( f_iFileDescriptor );

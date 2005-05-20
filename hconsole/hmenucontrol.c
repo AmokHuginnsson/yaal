@@ -123,11 +123,11 @@ void HMenuControl::init ( HProcess * a_poProcess, OMenuItem * a_psMenu )
 int HMenuControl::process_input( int a_iCode )
 	{
 	M_PROLOG
-	OMenuItem * l_psMenu = NULL;
+	OMenuItem const * l_psMenu = NULL;
 	a_iCode = HTreeControl::process_input ( a_iCode );
 	if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
 		{
-		l_psMenu = static_cast < OMenuItem * > ( static_cast < void * > ( static_cast < HMenuNode * > ( f_poSelected )->f_tLeaf [ 0 ] ) );
+		l_psMenu = static_cast < OMenuItem * > ( static_cast < HMenuNode * > ( f_poSelected )->f_tLeaf [ 0 ].get < void * > ( ) );
 		if ( l_psMenu->HANDLER )
 			( f_poProcess->* ( l_psMenu->HANDLER ) )( );
 		a_iCode = 0;

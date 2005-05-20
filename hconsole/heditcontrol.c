@@ -55,7 +55,7 @@ namespace hconsole
 
 HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
-		char const * a_pcLabel, size_t a_iBufferSize, char const * a_pcValue,
+		char const * a_pcLabel, int a_iBufferSize, char const * a_pcValue,
 		char const * a_pcMask, bool a_bReplace, bool a_bRightAligned,
 		bool a_bMultiLine, bool a_bPassword, int a_iMaxHistoryLevel,
 		bool a_bDrawLabel, int a_iDisabledAttribute,
@@ -68,11 +68,11 @@ HEditControl::HEditControl( HWindow * a_poParent,
 					f_bPassword ( a_bPassword ), f_bRightAligned ( a_bRightAligned ),
 					f_iMaxStringSize ( a_iBufferSize ), f_iCursorPosition ( 0 ),
 					f_iControlOffset ( 0 ), f_iMaxHistoryLevel ( a_iMaxHistoryLevel ),
-					f_sMask ( ), f_oString ( a_iBufferSize ), f_oHistory ( )
+					f_sMask ( ), f_oString ( a_iBufferSize, true ), f_oHistory ( )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
-	size_t l_iLength = 0;
+	int l_iLength = 0;
 	char * l_pcBuffer = 0;
 	HString l_oErrorMessage;
 	if ( a_iBufferSize < 1 )
@@ -118,7 +118,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		: n_iWidth + f_iWidth - f_iColumnRaw;
 /* f_iWidthRaw must be set up properly before setting up f_iCursorPosition and
  * f_iControlOffset whose are used in refresh ( ) */
-	if ( l_iLength >= static_cast < size_t > ( f_iWidthRaw ) )
+	if ( l_iLength >= f_iWidthRaw )
 		{
 		f_iCursorPosition = f_iWidthRaw - 1;
 		f_iControlOffset = l_iLength - f_iWidthRaw + 1;
@@ -167,7 +167,7 @@ void HEditControl::set ( const HInfo & a_roInfo )
 	{
 	M_PROLOG
 	HInfo l_oInfo = a_roInfo;
-	HString l_oString = l_oInfo;	
+	HString l_oString = l_oInfo.get < const HString & > ( );
 	set ( static_cast < char const * > ( l_oString.left ( f_iMaxStringSize ) ) );
 	return;
 	M_EPILOG

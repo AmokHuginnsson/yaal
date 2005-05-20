@@ -27,6 +27,7 @@ Copyright:
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <libintl.h>
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
@@ -35,30 +36,42 @@ M_CVSID ( "$CVSHeader$" );
 extern "C"
 {
 
-void * xmalloc_internal ( size_t a_ulSize )
+void * xmalloc_internal ( const long int a_lSize )
 	{
-	register void * l_pvNewPtr = malloc ( a_ulSize );
+	register void * l_pvNewPtr = NULL;
+	if ( a_lSize < 0 )
+		{
+		perror ( _ ( "xmalloc_internal: requested size lower than 0" ) );
+		abort ( );
+		}
+	l_pvNewPtr = malloc ( a_lSize );
 	if ( l_pvNewPtr == 0 )
 		{
-		perror ( "xmalloc" );
+		perror ( _ ( "xmalloc_internal: malloc returned NULL" ) );
 		abort ( );
 		}
 	return ( l_pvNewPtr );
 	}
 
-void * xcalloc_internal ( size_t a_ulSize )
+void * xcalloc_internal ( long int a_lSize )
 	{
-	register void * l_pvNewPtr = xmalloc_internal ( a_ulSize );
-	memset ( l_pvNewPtr, 0, a_ulSize );
+	register void * l_pvNewPtr = xmalloc_internal ( a_lSize );
+	memset ( l_pvNewPtr, 0, a_lSize );
 	return ( l_pvNewPtr );
 	}
 
-void * xrealloc_internal ( void * a_pvPtr, size_t a_ulSize )
+void * xrealloc_internal ( void * a_pvPtr, long int a_lSize )
 	{
-	register void * l_pvNewPtr = realloc ( a_pvPtr, a_ulSize );
+	register void * l_pvNewPtr = NULL;
+	if ( a_lSize < 0 )
+		{
+		perror ( _ ( "xrealloc_internal: requested size lower than 0" ) );
+		abort ( );
+		}
+	l_pvNewPtr = realloc ( a_pvPtr, a_lSize );
 	if ( l_pvNewPtr == 0 )
 		{
-		perror ( "xrealloc" );
+		perror ( _ ( "xrealloc_internal: realloc returned NULL" ) );
 		abort ( );
 		}
 	return ( l_pvNewPtr );
@@ -68,7 +81,7 @@ void xfree_internal ( void * * a_ppvPtr )
 	{
 	if ( ( * a_ppvPtr ) == NULL )
 		{
-		perror ( "xfree" );
+		perror ( "xfree_internal: request to free NULL pointer" );
 		abort ( );
 		}
 	free ( ( * a_ppvPtr ) );
@@ -79,6 +92,11 @@ void xfree_internal ( void * * a_ppvPtr )
 char * xstrdup ( char const * a_pcStr )
 	{
 	char * l_pcNew = 0;
+	if ( ! a_pcStr )
+		{
+		perror ( "xstrdup: request to duplicate NULL pointer string" );
+		abort ( );
+		}
 	l_pcNew = xcalloc ( strlen ( a_pcStr ) + 1, char );
 	strcpy ( l_pcNew, a_pcStr );
 	return ( l_pcNew );

@@ -35,7 +35,7 @@ namespace stdhapi
 namespace hcore
 {
 
-#define M_LOG(MESG) log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, static_cast < const char * > ( ( MESG ) ) )
+#define M_LOG(MESG) log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, static_cast < char const * > ( ( MESG ) ) )
 
 class HLog
 	{
@@ -55,8 +55,8 @@ public:
 	/*{*/
 	HLog ( void );
 	virtual ~HLog ( void );
-	void rehash ( FILE * = stderr, char * = NULL ); /* already opened file */
-	void rehash ( char const *, char * = NULL ); /* log file name */
+	void rehash ( FILE * = stderr, char const * = NULL ); /* already opened file */
+	void rehash ( char const *, char const * = NULL ); /* log file name */
 	int operator ( ) ( char const *, va_list );
 	int operator ( ) ( char const *, ... ); /* log ( "data %d", x );
 																						 will look nice */

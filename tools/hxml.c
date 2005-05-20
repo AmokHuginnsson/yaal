@@ -230,7 +230,7 @@ HXml::~HXml ( void )
 	M_EPILOG
 	}
 
-char * HXml::convert ( const char * a_pcData, way_t a_eWay )
+char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 	{
 	M_PROLOG
 	size_t l_iSizeIn = 0, l_iSizeOut = 0, l_iOrigSize = 0, l_iTmp = 0;
@@ -275,7 +275,7 @@ char * HXml::get_leaf_by_name ( int a_iIndex, char const * a_pcName )
 	M_EPILOG
 	}
 
-char * HXml::get_leaf_by_name ( xml_node_ptr_t a_psNode, const char * a_pcName )
+char * HXml::get_leaf_by_name ( xml_node_ptr_t a_psNode, char const * a_pcName )
 	{
 	M_PROLOG
 	char * l_pcData = NULL;
@@ -283,7 +283,7 @@ char * HXml::get_leaf_by_name ( xml_node_ptr_t a_psNode, const char * a_pcName )
 	while ( l_psNode )
 		{
 		if ( ! xmlStrcasecmp ( l_psNode->name, reinterpret_cast < const xmlChar * > ( a_pcName ) ) )
-			return ( convert ( reinterpret_cast < const char * > ( l_psNode->children->content ) ) );
+			return ( convert ( reinterpret_cast < char const * > ( l_psNode->children->content ) ) );
 		l_psNode = l_psNode->next;
 		}
 	l_psNode = reinterpret_cast < xmlNodePtr > ( a_psNode );
@@ -298,7 +298,7 @@ char * HXml::get_leaf_by_name ( xml_node_ptr_t a_psNode, const char * a_pcName )
 	M_EPILOG
 	}
 
-int HXml::get_node_set_by_path ( const char * a_pcPath )
+int HXml::get_node_set_by_path ( char const * a_pcPath )
 	{
 	M_PROLOG
 	int l_iLength = 0;
@@ -333,7 +333,7 @@ int HXml::get_node_set_by_path ( const char * a_pcPath )
 	M_EPILOG
 	}
 
-void HXml::init ( const char * a_pcFileName )
+void HXml::init ( char const * a_pcFileName )
 	{
 	M_PROLOG
 	xmlCharEncoding l_xEncoding = static_cast < xmlCharEncoding > ( 0 );
@@ -359,7 +359,7 @@ void HXml::init ( const char * a_pcFileName )
 		l_oError.format ( "WARRNING: no encoding declared in `%s'.", a_pcFileName );
 		M_LOG ( l_oError );
 		}
-	else l_pxHnd = xmlFindCharEncodingHandler ( reinterpret_cast < const char * > ( f_poXml->f_psDoc->encoding ) );
+	else l_pxHnd = xmlFindCharEncodingHandler ( reinterpret_cast < char const * > ( f_poXml->f_psDoc->encoding ) );
 	if ( ! l_pxHnd )
 		{
 		l_xEncoding = xmlDetectCharEncoding ( f_poXml->f_psRoot->name,

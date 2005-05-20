@@ -51,7 +51,7 @@ unsigned long int hash ( const HString & a_roString )
 	unsigned long int l_ulHash = 0;
 	while ( l_iSize -- )
 		{
-		l_ulHash += l_pcBuffer [ l_iSize ];
+		l_ulHash += static_cast < unsigned char > ( l_pcBuffer [ l_iSize ] );
 		l_ulHash <<= 3;
 		}
 	return ( l_ulHash );

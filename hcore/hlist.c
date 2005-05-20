@@ -37,12 +37,12 @@ namespace stdhapi
 namespace hcore
 {
 
-char const * g_ppcErrMsgHList [ 24 ] =
+char const * g_ppcErrMsgHList [ 6 ] =
 	{
 /* E_HLIST_EMPTYELEMENT */	_ ( "nothing stored yet, so nothing to get" ),
 /* E_HLIST_BADINDEX */			_ ( "index excides list size" ),
 /* E_HLIST_BADFLAG */				_ ( "unknown flag" ),
-/* E_HLIST_EMPTY */			_ ( "list was empty" ),
+/* E_HLIST_EMPTY */					_ ( "list was empty" ),
 /* E_HLIST_BADOFFSET */			_ ( "incorrect offset" ),
 /* E_HLIST_BADNUMBER */			_ ( "wrong number" )
 	};

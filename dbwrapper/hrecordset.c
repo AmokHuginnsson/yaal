@@ -497,7 +497,7 @@ void HRecordSet::sync ( int a_iField, HInfo & a_roInfo )
 		a_roInfo ( static_cast < char const * > ( l_oTmp ) );
 		}
 	else
-		f_oValues [ a_iField ] = static_cast < HString & > ( a_roInfo );
+		f_oValues [ a_iField ] = a_roInfo.get < const HString & > ( );
 	return;
 	M_EPILOG
 	}

@@ -46,7 +46,7 @@ public:
 	HRawFile ( void );
 	virtual ~HRawFile ( void );
 	int close ( void );
-	file_descriptor_t get_file_descriptor ( void );
+	file_descriptor_t get_file_descriptor ( void ) const;
 	/*}*/
 protected:
 	/*{*/

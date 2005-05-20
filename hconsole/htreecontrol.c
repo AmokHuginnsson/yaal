@@ -157,14 +157,14 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 	M_PROLOG
 	int l_iCtr = 0;
 	int l_iRow = a_iRow;
-	HString * l_poString = NULL;
+	HString const * l_poString = NULL;
 	HInfo * l_poInfo = NULL;
 	l_iCtr = a_poNode->f_oBranch.quantity ( );
 	if ( a_poNode->f_tLeaf )
 		{
 		l_iRow ++;
 		l_poInfo = & a_poNode->f_tLeaf [ 0 ];
-		l_poString = & static_cast < HString & > ( * l_poInfo );
+		l_poString = & l_poInfo->get < const HString & > ( );
 		a_poNode->f_iRowRaw = l_iRow;
 		a_poNode->f_iColumnRaw = f_iColumnRaw + a_poNode->f_iLevel * 2 - 1; 
 		a_poNode->f_iWidthRaw = l_poString->get_length ( ) + 2;

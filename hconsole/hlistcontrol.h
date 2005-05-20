@@ -27,7 +27,6 @@ Copyright:
 #ifndef __HCONSOLE_HLISTCONTROL_H
 #define __HCONSOLE_HLISTCONTROL_H
 
-#include "hcore/hinfolist.h"
 #include "hitem.h"
 #include "hwindow.h"
 #include "hsearchablecontrol.h"
@@ -64,7 +63,7 @@ class HListControl : public hcore::HList < HItem >, public virtual HSearchableCo
 		virtual ~HColumnInfo ( void );
 		HColumnInfo ( const HColumnInfo & );
 		HColumnInfo & operator = ( const HColumnInfo & );
-		int operator - ( const HColumnInfo & );
+		const int operator - ( const HColumnInfo & ) const;
 		/*}*/
 	protected:
 		/*{*/
@@ -143,6 +142,8 @@ private:
 	HListControl & operator = ( const HListControl & );
 	/*}*/
 	};
+
+const int compare_contents ( const HItem &, const HItem & );
 
 }
 

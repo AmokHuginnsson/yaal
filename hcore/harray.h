@@ -63,8 +63,8 @@ public:
 	HArray ( const HArray & );
 	HArray & operator = ( const HArray & );
 	tType & operator [ ] ( int );
-	int get_size ( void );
-	operator bool ( void );
+	int get_size ( void ) const;
+	operator bool ( void ) const;
 	/*}*/
 protected:
 	/*{*/
@@ -80,7 +80,7 @@ HArray < tType >::HArray ( int a_iSize ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
-		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
+		f_ptArray = new ( std::nothrow ) tType [ static_cast < unsigned int > ( f_iSize ) ];
 		if ( ! f_ptArray )
 			M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
 		}
@@ -99,7 +99,7 @@ HArray < tType >::HArray ( const int & a_iSize, tType a_tFillWith )
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
-		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
+		f_ptArray = new ( std::nothrow ) tType [ static_cast < unsigned int > ( f_iSize ) ];
 		if ( ! f_ptArray )
 			M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
 		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
@@ -135,24 +135,27 @@ HArray < tType > & HArray < tType >::operator = ( const HArray & a_roArray )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( a_roArray.f_iSize != f_iSize )
+	if ( this != & a_roArray )
 		{
-		if ( f_ptArray )
+		if ( a_roArray.f_iSize != f_iSize )
 			{
-			delete [ ] f_ptArray;
-			f_ptArray = NULL;
-			f_iSize = 0;
+			if ( f_ptArray )
+				{
+				delete [ ] f_ptArray;
+				f_ptArray = NULL;
+				f_iSize = 0;
+				}
+			f_iSize = a_roArray.f_iSize;
 			}
-		f_iSize = a_roArray.f_iSize;
+		if ( f_iSize && ! f_ptArray )
+			{
+			f_ptArray = new ( std::nothrow ) tType [ static_cast < unsigned int > ( f_iSize ) ];
+			if ( ! f_ptArray )
+				M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], f_iSize );
+			}
+		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
+			f_ptArray [ l_iCtr ] = a_roArray.f_ptArray [ l_iCtr ];
 		}
-	if ( f_iSize && ! f_ptArray )
-		{
-		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
-		if ( ! f_ptArray )
-			M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], f_iSize );
-		}
-	for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
-		f_ptArray [ l_iCtr ] = a_roArray.f_ptArray [ l_iCtr ];
 	return ( * this );
 	M_EPILOG
 	}
@@ -170,7 +173,7 @@ tType & HArray < tType >::operator [ ] ( int a_iIndex )
 	}
 
 template < class tType >
-HArray < tType > ::operator bool ( void )
+HArray < tType > ::operator bool ( void ) const
 	{
 	M_PROLOG
 	return ( f_iSize ? true : false );
@@ -178,7 +181,7 @@ HArray < tType > ::operator bool ( void )
 	}
 
 template < class tType >
-int HArray < tType > ::get_size ( void )
+int HArray < tType > ::get_size ( void ) const
 	{
 	M_PROLOG
 	return ( f_iSize );

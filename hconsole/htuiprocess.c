@@ -75,7 +75,7 @@ HProcess::~HProcess ( void )
 	M_PROLOG
 	HMainWindow * l_poMainWindow = NULL;
 	if ( f_poWindows )
-		l_poMainWindow = static_cast < HMainWindow * > ( static_cast < void * > ( f_poWindows->go ( -1 ) [ 0 ] ) );
+		l_poMainWindow = static_cast < HMainWindow * > ( f_poWindows->go ( -1 ) [ 0 ].get < void * > ( ) );
 	if ( l_poMainWindow )
 		delete l_poMainWindow;
 	f_poWindows = NULL;
@@ -374,10 +374,10 @@ int HProcess::handler_jump_meta_tab ( int a_iCode, void * )
 		{
 		f_poWindows->to_tail ( );
 		HInfo & l_oInfo = f_poWindows->present ( ) [ 0 ];
-		f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( l_oInfo ) );
+		f_poForegroundWindow = static_cast < HWindow * > ( l_oInfo.get < void * > ( ) );
 		}
 	else
-		f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( f_poWindows->go ( -1 ) [ 0 ] ) );
+		f_poForegroundWindow = static_cast < HWindow * > ( f_poWindows->go ( -1 ) [ 0 ].get < void * > ( ) );
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );
@@ -390,7 +390,7 @@ int HProcess::handler_jump_meta_direct ( int a_iCode, void * )
 	a_iCode = ( a_iCode & 0xff ) - '0';
 	if ( a_iCode >= f_poWindows->quantity ( ) )
 		return ( 0 );
-	f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( f_poWindows->go ( a_iCode - 1 ) [ 0 ] ) );
+	f_poForegroundWindow = static_cast < HWindow * > ( f_poWindows->go ( a_iCode - 1 ) [ 0 ].get < void * > ( ) );
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );
@@ -401,7 +401,7 @@ int HProcess::handler_close_window ( int a_iCode, void * )
 	{
 	M_PROLOG
 	f_poWindows->remove_element ( D_EMPTY_IF_NOT_EMPTIED );
-	f_poForegroundWindow = static_cast < HWindow * > ( static_cast < void * > ( f_poWindows->go ( -1 ) [ 0 ] ) );
+	f_poForegroundWindow = static_cast < HWindow * > ( f_poWindows->go ( -1 ) [ 0 ].get < void * > ( ) );
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );
