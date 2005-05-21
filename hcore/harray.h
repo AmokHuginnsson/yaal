@@ -41,9 +41,9 @@ namespace stdhapi
 namespace hcore
 {
 
-#define E_HARRAY_BADSIZE		0
-#define E_HARRAY_NOMEM			1
-#define E_HARRAY_BADINDEX		2
+#define E_HARRAY_BADSIZE		1
+#define E_HARRAY_NOMEM			2
+#define E_HARRAY_BADINDEX		3
 
 extern char const * g_ppcErrMsgHArray [ ];
 

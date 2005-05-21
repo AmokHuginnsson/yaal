@@ -40,17 +40,17 @@ namespace hcore
 
 #define D_CVSID_HMATRIX_H "$CVSHeader$"
 
-#define E_HMATRIX_BADROWS													0
-#define E_HMATRIX_BADCOLUMNS											1
-#define E_HMATRIX_NEWRETURNEDNULL									2
-#define E_HMATRIX_DIMNOTMATCH_ROWS								3
-#define E_HMATRIX_DIMNOTMATCH_COLUMNS							4
-#define E_HMATRIX_NOTASQUARE											5
-#define E_HMATRIX_ODD															6
-#define E_HMATRIX_DIMNOTMATCH_COLUMNSROWS					7
-#define E_HMATRIX_DIMNOTMATCH_COLUMNSROWSCOLUMNS	8
-#define E_HMATRIX_ROW_OUTOFRANGE									9
-#define E_HMATRIX_COLUMN_OUTOFRANGE								10
+#define E_HMATRIX_BADROWS													1
+#define E_HMATRIX_BADCOLUMNS											2
+#define E_HMATRIX_NEWRETURNEDNULL									3
+#define E_HMATRIX_DIMNOTMATCH_ROWS								4
+#define E_HMATRIX_DIMNOTMATCH_COLUMNS							5
+#define E_HMATRIX_NOTASQUARE											6
+#define E_HMATRIX_ODD															7
+#define E_HMATRIX_DIMNOTMATCH_COLUMNSROWS					8
+#define E_HMATRIX_DIMNOTMATCH_COLUMNSROWSCOLUMNS	9
+#define E_HMATRIX_ROW_OUTOFRANGE									10
+#define E_HMATRIX_COLUMN_OUTOFRANGE								11
 
 extern char const * g_ppcErrMsgHMatrix [ ];
 

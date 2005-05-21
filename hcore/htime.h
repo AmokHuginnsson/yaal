@@ -63,21 +63,21 @@ public:
 	void set_date ( const int, const int = 1, const int = 1 );
 	void set_datetime ( const int, const int = 1, const int = 1,
 						 const int = 0, const int = 0, const int = 0 );
-	int get_year ( void );
-	int get_month ( void );
-	int get_day ( void );
-	int get_hour ( void );
-	int get_minute ( void );
-	int get_second ( void );
+	int get_year ( void ) const;
+	int get_month ( void ) const;
+	int get_day ( void ) const;
+	int get_hour ( void ) const;
+	int get_minute ( void ) const;
+	int get_second ( void ) const;
 	HTime & operator = ( const HTime & );
 	HTime operator - ( const HTime & ) const;
 	HTime & operator -= ( const HTime & );
-	bool operator == ( const time_t & );
-	bool operator != ( const time_t & );
-	bool operator <= ( const time_t & );
-	bool operator >= ( const time_t & );
-	bool operator < ( const time_t & );
-	bool operator > ( const time_t & );
+	bool operator == ( const time_t & ) const;
+	bool operator != ( const time_t & ) const;
+	bool operator <= ( const time_t & ) const;
+	bool operator >= ( const time_t & ) const;
+	bool operator < ( const time_t & ) const;
+	bool operator > ( const time_t & ) const;
 	operator char const * ( void ) const;
 	operator time_t ( void ) const;
 	/*}*/

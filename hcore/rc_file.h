@@ -48,7 +48,7 @@ namespace rc_file
 	{
 
 int process_rc_file ( char const *, char const *,
-		OVariable *, bool ( * ) ( HString &, HString & ) = NULL );
+		OVariable const *, bool ( * ) ( HString &, HString & ) = NULL );
 int read_rc_line ( HString &, HString &, FILE *, int & );
 FILE * rc_open ( char const *, bool, FILE * = NULL );
 void rc_close ( FILE * );

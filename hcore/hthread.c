@@ -53,7 +53,7 @@ HThread::HThread ( void )
 HThread::~HThread ( void )
 	{
 	M_PROLOG
-	finish ( );
+	M_IRV ( finish ( ) );
 	M_ENSURE ( pthread_attr_destroy ( & f_sAttributes ) == 0 );
 	return;
 	M_EPILOG
@@ -85,16 +85,17 @@ int HThread::finish ( void )
 void * HThread::SPAWN ( void * a_pvThread )
 	{
 	M_PROLOG
+	void * l_pvReturn = NULL;
 	HThread * l_poThread = reinterpret_cast < HThread * > ( a_pvThread );
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
 	M_ENSURE ( pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
-	l_poThread->run ( );
+	l_pvReturn = reinterpret_cast < void * > ( l_poThread->run ( ) );
 	l_poThread->f_bAlive = false;
-	return ( NULL );
+	return ( l_pvReturn );
 	M_EPILOG
 	}
 
-void HThread::listen ( void )
+void HThread::listen ( void ) const
 	{
 	M_PROLOG
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );

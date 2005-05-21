@@ -49,7 +49,7 @@ public:
 	virtual ~HThread ( void );
 	int spawn ( void );
 	int finish ( void );
-	void listen ( void );
+	void listen ( void ) const;
 	/*}*/
 private:
 	virtual int run ( void ) = 0;

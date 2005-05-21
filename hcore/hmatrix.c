@@ -37,8 +37,9 @@ namespace stdhapi
 namespace hcore
 {
 
-char const * g_ppcErrMsgHMatrix [ 11 ] =
+char const * g_ppcErrMsgHMatrix [ 12 ] =
 	{
+	_ ( "ok" ),
 /* E_HMATRIX_BADROWS */													_ ( "rows < 1" ),
 /* E_HMATRIX_BADCOLUMNS */											_ ( "columns < 1" ),
 /* E_HMATRIX_NEWRETURNEDNULL */									_ ( "new returned NULL" ),

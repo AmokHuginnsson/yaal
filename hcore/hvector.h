@@ -42,7 +42,7 @@ namespace hcore
 
 #define D_CVSID_HVECTOR_H "$CVSHeader$"
 
-#define E_HVECTOR_DIMNOTMATCH	0
+#define E_HVECTOR_DIMNOTMATCH	1
 
 extern char const * g_ppcErrMsgHVector [ ];
 

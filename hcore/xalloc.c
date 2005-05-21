@@ -44,7 +44,7 @@ void * xmalloc_internal ( const long int a_lSize )
 		perror ( _ ( "xmalloc_internal: requested size lower than 0" ) );
 		abort ( );
 		}
-	l_pvNewPtr = malloc ( a_lSize );
+	l_pvNewPtr = malloc ( static_cast < size_t > ( a_lSize ) );
 	if ( l_pvNewPtr == 0 )
 		{
 		perror ( _ ( "xmalloc_internal: malloc returned NULL" ) );
@@ -56,7 +56,7 @@ void * xmalloc_internal ( const long int a_lSize )
 void * xcalloc_internal ( long int a_lSize )
 	{
 	register void * l_pvNewPtr = xmalloc_internal ( a_lSize );
-	memset ( l_pvNewPtr, 0, a_lSize );
+	memset ( l_pvNewPtr, 0, static_cast < size_t > ( a_lSize ) );
 	return ( l_pvNewPtr );
 	}
 
@@ -68,7 +68,7 @@ void * xrealloc_internal ( void * a_pvPtr, long int a_lSize )
 		perror ( _ ( "xrealloc_internal: requested size lower than 0" ) );
 		abort ( );
 		}
-	l_pvNewPtr = realloc ( a_pvPtr, a_lSize );
+	l_pvNewPtr = realloc ( a_pvPtr, static_cast < size_t > ( a_lSize ) );
 	if ( l_pvNewPtr == 0 )
 		{
 		perror ( _ ( "xrealloc_internal: realloc returned NULL" ) );

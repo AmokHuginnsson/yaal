@@ -46,7 +46,7 @@ namespace rc_file
 {
 
 int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
-		OVariable * a_psVaraibles,
+		OVariable const * a_psVaraibles,
 		bool ( * set_variables ) ( HString &, HString & ) )
 	{
 	M_PROLOG
@@ -69,7 +69,7 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 					{
 					if ( l_oValue.is_empty ( ) )
 						{
-						l_oValue.format ( "[%s]", a_pcSection );
+						M_IRV ( l_oValue.format ( "[%s]", a_pcSection ) );
 						if ( l_oOption == l_oValue )
 								{
 								log << "section: " << a_pcSection << ", ";
@@ -134,9 +134,10 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 						&& ! l_bOptionOK )
 					{
 					log << "failed." << endl;
-					l_oMessage.format ( "Error: unknown option found: `%s', "
-							"with value: `%s', on line %d.\n",
-							static_cast < char const * > ( l_oOption ), static_cast < char const * > ( l_oValue ), l_iLine );
+					M_IRV ( l_oMessage.format ( "Error: unknown option found: `%s', "
+								"with value: `%s', on line %d.\n",
+								static_cast < char const * > ( l_oOption ),
+								static_cast < char const * > ( l_oValue ), l_iLine ) );
 					log ( D_LOG_ERROR ) << l_oMessage;
 					fprintf ( stderr, l_oMessage );
 					}
@@ -219,10 +220,10 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 				{
 				/* we did not found any whitespace, so we have no value at this line */
 				l_iSub = l_iIndex;
-				l_iLenght = strlen ( l_pcBuffer ) - 1;
+				l_iLenght = static_cast < int > ( strlen ( l_pcBuffer ) ) - 1;
 				/* strip comment from end of line */
 				if ( ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) ) )
-					l_iLenght = l_pcPtr - l_pcBuffer - 1;
+					l_iLenght = ( l_pcPtr - l_pcBuffer ) - 1;
 				for ( l_iIndex = l_iLenght; l_iIndex > l_iSub ; l_iIndex-- )
 					if ( ! ( ( l_pcBuffer [ l_iIndex ] == ' ')
 							|| ( l_pcBuffer [ l_iIndex ] == '\t' ) 
@@ -258,10 +259,10 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 					{
 					/* we have found a non-whitespace, so there certainly is a value */
 					l_iSub = l_iIndex;
-					l_iLenght = strlen ( l_pcBuffer ) - 1;
+					l_iLenght = static_cast < int > ( strlen ( l_pcBuffer ) ) - 1;
 					/* strip comment from end of line */
 					if ( ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) ) )
-						l_iLenght = l_pcPtr - l_pcBuffer - 1;
+						l_iLenght = ( l_pcPtr - l_pcBuffer ) - 1;
 					for ( l_iIndex = l_iLenght; l_iIndex > l_iSub ; l_iIndex-- )
 						if ( ! ( ( l_pcBuffer [ l_iIndex ] == ' ')
 								|| ( l_pcBuffer [ l_iIndex ] == '\t' ) 
@@ -328,7 +329,7 @@ void rc_close ( FILE * a_psRc )
 	M_PROLOG
 	int l_iDummy = 0;
 	HString l_oTmp;
-	read_rc_line ( l_oTmp, l_oTmp, 0, l_iDummy );
+	M_IRV ( read_rc_line ( l_oTmp, l_oTmp, 0, l_iDummy ) );
 	if ( a_psRc )
 		fclose ( a_psRc );
 	return;

@@ -37,8 +37,9 @@ namespace stdhapi
 namespace hcore
 {
 
-char const * g_ppcErrMsgHVector [ 24 ] =
+char const * g_ppcErrMsgHVector [ 2 ] =
 	{
+	_ ( "ok" ),
 /* E_HVECTOR_DIMNOTMATCH */	_ ( "dimensions do not match" )
 	};
 

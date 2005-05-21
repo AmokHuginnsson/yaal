@@ -74,7 +74,7 @@ HTime::HTime ( const time_t & a_rxTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
 	f_oBuffer ( ), f_xValue ( a_rxTime ), f_sBroken ( )
 	{
 	M_PROLOG
-	localtime_r ( & f_xValue, & f_sBroken );
+	M_IRV ( localtime_r ( & f_xValue, & f_sBroken ) );
 	return;
 	M_EPILOG
 	}
@@ -101,7 +101,7 @@ void HTime::set_now ( void )
 	{
 	M_PROLOG
 	f_xValue = time ( NULL );
-	localtime_r ( & f_xValue, & f_sBroken );
+	M_IRV ( localtime_r ( & f_xValue, & f_sBroken ) );
 	return;
 	M_EPILOG
 	}
@@ -159,42 +159,42 @@ void HTime::set_datetime ( const int a_iYear, const int a_iMonth,
 	M_EPILOG
 	}
 
-int HTime::get_year ( void )
+int HTime::get_year ( void ) const
 	{
 	M_PROLOG
 	return ( f_sBroken.tm_year + 1900 );
 	M_EPILOG
 	}
 
-int HTime::get_month ( void )
+int HTime::get_month ( void ) const
 	{
 	M_PROLOG
 	return ( f_sBroken.tm_mon + 1 );
 	M_EPILOG
 	}
 
-int HTime::get_day ( void )
+int HTime::get_day ( void ) const
 	{
 	M_PROLOG
 	return ( f_sBroken.tm_mday );
 	M_EPILOG
 	}
 
-int HTime::get_hour ( void )
+int HTime::get_hour ( void ) const
 	{
 	M_PROLOG
 	return ( f_sBroken.tm_hour );
 	M_EPILOG
 	}
 
-int HTime::get_minute ( void )
+int HTime::get_minute ( void ) const
 	{
 	M_PROLOG
 	return ( f_sBroken.tm_min );
 	M_EPILOG
 	}
 
-int HTime::get_second ( void )
+int HTime::get_second ( void ) const
 	{
 	M_PROLOG
 	return ( f_sBroken.tm_sec );
@@ -204,9 +204,13 @@ int HTime::get_second ( void )
 HTime & HTime::operator = ( const HTime & a_roTime )
 	{
 	M_PROLOG
-	f_oFormat = a_roTime.f_oFormat;
-	f_xValue = a_roTime.f_xValue;
-	memcpy ( & f_sBroken, & a_roTime.f_sBroken, sizeof ( tm ) );
+	if ( this != & a_roTime )
+		{
+		f_oFormat = a_roTime.f_oFormat;
+		f_xValue = a_roTime.f_xValue;
+		f_oBuffer = a_roTime.f_oBuffer;
+		memcpy ( & f_sBroken, & a_roTime.f_sBroken, sizeof ( tm ) );
+		}
 	return ( * this );
 	M_EPILOG
 	}
@@ -217,7 +221,7 @@ HTime HTime::operator - ( const HTime & a_roTime ) const
 	HTime l_oTime;
 	l_oTime.format ( f_oFormat );
 	l_oTime.f_xValue = static_cast < time_t > ( difftime ( f_xValue, a_roTime.f_xValue ) );
-	gmtime_r ( & l_oTime.f_xValue, & l_oTime.f_sBroken );
+	M_IRV ( gmtime_r ( & l_oTime.f_xValue, & l_oTime.f_sBroken ) );
 	return ( l_oTime );
 	M_EPILOG
 	}
@@ -230,42 +234,42 @@ HTime & HTime::operator -= ( const HTime & a_roTime )
 	M_EPILOG
 	}
 
-bool HTime::operator == ( const time_t & a_rxTime )
+bool HTime::operator == ( const time_t & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue == a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator != ( const time_t & a_rxTime )
+bool HTime::operator != ( const time_t & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue != a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator <= ( const time_t & a_rxTime )
+bool HTime::operator <= ( const time_t & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue <= a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator >= ( const time_t & a_rxTime )
+bool HTime::operator >= ( const time_t & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue >= a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator < ( const time_t & a_rxTime )
+bool HTime::operator < ( const time_t & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue < a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator > ( const time_t & a_rxTime )
+bool HTime::operator > ( const time_t & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue > a_rxTime );
@@ -277,11 +281,12 @@ HTime::operator char const * ( void ) const
 	M_PROLOG
 	int l_iSize = 0;
 #ifdef HAVE_SMART_STRFTIME
-	l_iSize = strftime ( NULL, 1024, f_oFormat, & f_sBroken ) + 1;
+	l_iSize = static_cast < int > ( strftime ( NULL, 1024, f_oFormat, & f_sBroken ) + 1 );
 	if ( l_iSize < 2 )
 		M_THROW ( "bad format", g_iErrNo );
 	f_oBuffer.hs_realloc ( l_iSize );
-	strftime ( f_oBuffer, l_iSize, f_oFormat, & f_sBroken );
+	M_IRV ( strftime ( f_oBuffer, static_cast < unsigned int > ( l_iSize ),
+			f_oFormat, & f_sBroken ) );
 #else /* HAVE_SMART_STRFTIME */
 	f_oBuffer.hs_realloc ( 64 ); /* FIXME that is pretty dumb hack */
 	l_iSize = strftime ( f_oBuffer, 63, f_oFormat, & f_sBroken ) + 1;

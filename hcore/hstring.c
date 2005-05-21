@@ -41,6 +41,16 @@ namespace stdhapi
 namespace hcore
 {
 
+#define E_HSTRING_NULL_PTR			1
+#define E_HSTRING_UNINITIALIZED	2
+
+char const * n_ppcErrMsgHString [ 3 ] =
+	{
+	_ ( "ok" ),
+	_ ( "NULL pointer used for string operations" ),
+	_ ( "use of uninitialized string" )
+	};
+
 HString::HString ( void ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
@@ -69,7 +79,7 @@ HString::HString ( const int a_iSize, bool ) : f_pcBuffer ( NULL ), f_iSize ( 0 
 	{
 	M_PROLOG
 	hs_realloc ( a_iSize + 1 );
-	memset ( f_pcBuffer, 0, a_iSize + 1 );
+	memset ( f_pcBuffer, 0, static_cast < unsigned int > ( a_iSize + 1 ) );
 	return;
 	M_EPILOG
 	}
@@ -84,9 +94,10 @@ void HString::hs_realloc ( const int a_iSize )
 		{
 		l_iOldLength = f_iSize;
 		f_iSize = 1;
-		while ( f_iSize < a_iSize )f_iSize <<= 1;
+		while ( f_iSize < a_iSize )
+			f_iSize <<= 1;
 		f_pcBuffer = xrealloc ( f_pcBuffer, f_iSize, char );
-		memset ( f_pcBuffer + l_iOldLength, 0, f_iSize - l_iOldLength );
+		memset ( f_pcBuffer + l_iOldLength, 0, static_cast < unsigned int > ( f_iSize - l_iOldLength ) );
 		}
 	return;
 	M_EPILOG
@@ -97,7 +108,7 @@ HString::HString ( char const * a_pcStr ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	M_PROLOG
 	if ( a_pcStr )
 		{
-		hs_realloc ( strlen ( a_pcStr ) + 1 );
+		hs_realloc ( static_cast < int > ( strlen ( a_pcStr ) + 1 ) );
 		strcpy ( f_pcBuffer, a_pcStr );
 		}
 	return;
@@ -121,7 +132,8 @@ HString::HString ( int a_iInt ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%d", a_iInt ) + 1;
 	hs_realloc ( l_iSize );
-	snprintf ( f_pcBuffer, l_iSize, "%d", a_iInt );
+	M_IRV ( snprintf ( f_pcBuffer,
+				static_cast < unsigned int > ( l_iSize ), "%d", a_iInt ) );
 	return;
 	M_EPILOG
 	}
@@ -133,7 +145,8 @@ HString::HString ( long int a_lLong ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%ld", a_lLong ) + 1;
 	hs_realloc ( l_iSize );
-	snprintf ( f_pcBuffer, l_iSize, "%ld", a_lLong );
+	M_IRV ( snprintf ( f_pcBuffer,
+				static_cast < unsigned int > ( l_iSize ), "%ld", a_lLong ) );
 	return;
 	M_EPILOG
 	}
@@ -145,7 +158,8 @@ HString::HString ( double a_dDouble ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%f", a_dDouble ) + 1;
 	hs_realloc ( l_iSize );
-	snprintf ( f_pcBuffer, l_iSize, "%f", a_dDouble );
+	M_IRV ( snprintf ( f_pcBuffer,
+				static_cast < unsigned int > ( l_iSize ), "%f", a_dDouble ) );
 	return;
 	M_EPILOG
 	}
@@ -157,7 +171,8 @@ HString::HString ( const void * a_pvPtrVoid ) : f_pcBuffer ( NULL ), f_iSize ( 0
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%p", a_pvPtrVoid ) + 1;
 	hs_realloc ( l_iSize );
-	snprintf ( f_pcBuffer, l_iSize, "%p", a_pvPtrVoid );
+	M_IRV ( snprintf ( f_pcBuffer,
+				static_cast < unsigned int > ( l_iSize ), "%p", a_pvPtrVoid ) );
 	return;
 	M_EPILOG
 	}
@@ -165,11 +180,11 @@ HString::HString ( const void * a_pvPtrVoid ) : f_pcBuffer ( NULL ), f_iSize ( 0
 HString & HString::operator = ( const HString & a_roString )
 	{
 	M_PROLOG
-	int l_iLenght = 0;
-	if ( ( this != & a_roString ) && a_roString.f_pcBuffer )
+	if ( ! a_roString.f_pcBuffer )
+		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_UNINITIALIZED ], g_iErrNo );
+	if ( this != & a_roString )
 		{
-		l_iLenght = strlen ( a_roString.f_pcBuffer ) + 1;
-		hs_realloc ( l_iLenght );
+		hs_realloc ( static_cast < int > ( strlen ( a_roString.f_pcBuffer ) + 1 ) );
 		strcpy ( f_pcBuffer, a_roString.f_pcBuffer );
 		}
 	return ( * this );
@@ -188,16 +203,17 @@ HString HString::operator + ( char const * a_pcStr ) const
 	M_PROLOG
 	int l_iLength = 0;
 	HString str;
+	if ( ! a_pcStr )
+		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
 	l_iLength =	( f_pcBuffer ? get_length () : 0 ) 
-							+ ( a_pcStr ? strlen ( a_pcStr ) : 0 );
+							+ static_cast < int > ( a_pcStr ? strlen ( a_pcStr ) : 0 );
 	if ( ! l_iLength )
 		return ( str = "" );
 	str.hs_realloc ( l_iLength + 1 );
 	str.f_pcBuffer [ 0 ] = 0;
 	if ( f_pcBuffer )
 		strcpy ( str.f_pcBuffer, f_pcBuffer );
-	if ( a_pcStr )
-		strcat ( str.f_pcBuffer, a_pcStr );
+	strcat ( str.f_pcBuffer, a_pcStr );
 	return ( str );
 	M_EPILOG
 	}
@@ -205,12 +221,14 @@ HString HString::operator + ( char const * a_pcStr ) const
 HString HString::operator + ( char const a_cChar ) const
 	{
 	M_PROLOG
-	int len = 0;
+	int l_iLength = 0;
 	HString l_oStr;
+	l_iLength = static_cast < int > ( ( f_pcBuffer ? strlen ( f_pcBuffer ) : 0 ) + 2 );
 	l_oStr = * this;
-	l_oStr.hs_realloc ( ( len = ( f_pcBuffer ? strlen ( f_pcBuffer ) : 0 ) ) + 2 );
-	l_oStr.f_pcBuffer [ len ] = a_cChar;
-	l_oStr.f_pcBuffer [ len + 1 ] = 0;
+	l_oStr.hs_realloc ( l_iLength );
+	l_iLength -= 2;
+	l_oStr.f_pcBuffer [ l_iLength ] = a_cChar;
+	l_oStr.f_pcBuffer [ l_iLength + 1 ] = 0;
 	return ( l_oStr );
 	M_EPILOG
 	}
@@ -299,6 +317,8 @@ bool HString::operator == ( const HString & a_roString ) const
 bool HString::operator == ( char const * a_pcStr ) const
 	{
 	M_PROLOG
+	if ( ! a_pcStr )
+		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
 	return ( ! strcmp ( f_pcBuffer, a_pcStr ) );
 	M_EPILOG
 	}
@@ -313,6 +333,8 @@ bool HString::operator != ( const HString & a_roString ) const
 bool HString::operator != ( char const * a_pcStr ) const
 	{
 	M_PROLOG
+	if ( ! a_pcStr )
+		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
 	return ( strcmp ( f_pcBuffer, a_pcStr ) ? true : false );
 	M_EPILOG
 	}
@@ -327,7 +349,10 @@ bool HString::operator >= ( const HString & a_roString ) const
 bool HString::operator >= ( char const * a_pcStr ) const
 	{
 	M_PROLOG
-	int l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
+	int l_iCmp = 0;
+	if ( ! a_pcStr )
+		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
+	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
 	if ( l_iCmp >= 0 )
 		return ( true );
 	else
@@ -345,7 +370,10 @@ bool HString::operator <= ( const HString & a_roString ) const
 bool HString::operator <= ( char const * a_pcStr ) const
 	{
 	M_PROLOG
-	int l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
+	int l_iCmp = 0;
+	if ( ! a_pcStr )
+		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
+	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
 	if ( l_iCmp <= 0 )
 		return ( true );
 	else
@@ -363,7 +391,10 @@ bool HString::operator > ( const HString & a_roString ) const
 bool HString::operator > ( char const * a_pcStr ) const
 	{
 	M_PROLOG
-	int l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
+	int l_iCmp = 0;
+	if ( ! a_pcStr )
+		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
+	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
 	if ( l_iCmp > 0 )
 		return ( true );
 	else
@@ -381,7 +412,10 @@ bool HString::operator < ( const HString & a_roString ) const
 bool HString::operator < ( char const * a_pcStr ) const
 	{
 	M_PROLOG
-	int l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
+	int l_iCmp = 0;
+	if ( ! a_pcStr )
+		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
+	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
 	if ( l_iCmp < 0 )
 		return ( true );
 	else
@@ -407,7 +441,7 @@ int HString::get_length ( void ) const
 	int l_iLength = 0;
 	if ( ! f_pcBuffer )
 		M_THROW ( "no buffer.", reinterpret_cast < int > ( f_pcBuffer ) );
-	l_iLength = strlen ( f_pcBuffer );
+	l_iLength = static_cast < int > ( strlen ( f_pcBuffer ) );
 	if ( l_iLength > f_iSize )
 		M_THROW ( "no terminating null!", l_iLength );
 	return ( l_iLength );
@@ -420,6 +454,8 @@ HString & HString::format ( char const * a_pcFormat, ... )
 	int l_iSize = 0;
 	va_list ap;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
+	if ( ! a_pcFormat )
+		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
 	va_start ( ap, a_pcFormat );
 	l_iSize = vsnprintf ( l_pcMeasureBuffer, 1, a_pcFormat, ap );
 	if ( l_iSize < 1 )
@@ -428,7 +464,7 @@ HString & HString::format ( char const * a_pcFormat, ... )
 	va_end ( ap );
 	hs_realloc ( l_iSize );
 	va_start ( ap, a_pcFormat );
-	vsprintf ( f_pcBuffer, a_pcFormat, ap );
+	M_IRV ( vsprintf ( f_pcBuffer, a_pcFormat, ap ) );
 	va_end ( ap );
 	return ( * this );
 	M_EPILOG
@@ -485,12 +521,12 @@ HString & HString::replace ( char const * a_pcPattern, char const * a_pcWith )
 	int l_iLenNew, l_iLenOld, l_iLenPattern, l_iLenWith, l_iSubWP, l_iCursor = 0, l_iIndex = 0;
 	if ( ! a_pcPattern )
 		return ( * this );
-	l_iLenPattern = strlen ( a_pcPattern );
+	l_iLenPattern = static_cast < int > ( strlen ( a_pcPattern ) );
 	if ( l_iLenPattern < 1 )
 		return ( * this );
-	l_iLenWith = strlen ( a_pcWith );
+	l_iLenWith = static_cast < int > ( strlen ( a_pcWith ) );
 	l_iSubWP = l_iLenWith - l_iLenPattern;
-	l_iLenOld = l_iLenNew = strlen ( f_pcBuffer );
+	l_iLenOld = l_iLenNew = static_cast < int > ( strlen ( f_pcBuffer ) );
 	while ( ( l_iIndex = find ( a_pcPattern, l_iIndex ) ) > -1 )
 		{
 		l_iLenNew += l_iSubWP;
@@ -501,15 +537,17 @@ HString & HString::replace ( char const * a_pcPattern, char const * a_pcWith )
 	l_pcStr = f_pcBuffer;
 	f_pcBuffer = l_pcTmp;
 	l_iIndex = 0;
-	memset ( l_pcStr, 0, l_iLenNew );
+	memset ( l_pcStr, 0, static_cast < unsigned int > ( l_iLenNew ) );
 	while ( ( l_iIndex = find ( a_pcPattern, l_iIndex ) ) > -1 )
 		{
-		strncat ( l_pcStr, f_pcBuffer + l_iCursor, l_iIndex - l_iCursor );
+		strncat ( l_pcStr, f_pcBuffer + l_iCursor,
+				static_cast < unsigned int > ( l_iIndex - l_iCursor ) );
 		strcat ( l_pcStr, a_pcWith );
 		l_iCursor = l_iIndex + l_iLenPattern;
 		l_iIndex ++;
 		}
-	strncat ( l_pcStr, f_pcBuffer + l_iCursor, l_iLenOld - l_iCursor );
+	strncat ( l_pcStr, f_pcBuffer + l_iCursor,
+			static_cast < unsigned int > ( l_iLenOld - l_iCursor ) );
 	l_pcStr [ l_iLenNew ] = 0;
 	l_pcTmp = f_pcBuffer;
 	f_pcBuffer = l_pcStr;
@@ -521,9 +559,9 @@ HString & HString::replace ( char const * a_pcPattern, char const * a_pcWith )
 HString & HString::upper ( void )
 	{
 	M_PROLOG
-	int l_iCtr, l_iLenght = strlen ( f_pcBuffer );
+	int l_iCtr = 0, l_iLenght = static_cast < int > ( strlen ( f_pcBuffer ) );
 	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr++ )
-		f_pcBuffer [ l_iCtr ] = toupper ( f_pcBuffer [ l_iCtr ] );
+		f_pcBuffer [ l_iCtr ] = static_cast < char > ( toupper ( f_pcBuffer [ l_iCtr ] ) );
 	return ( * this );
 	M_EPILOG
 	}
@@ -531,9 +569,9 @@ HString & HString::upper ( void )
 HString & HString::lower ( void )
 	{
 	M_PROLOG
-	int l_iCtr, l_iLenght = strlen ( f_pcBuffer );
+	int l_iCtr = 0, l_iLenght = static_cast < int > ( strlen ( f_pcBuffer ) );
 	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr++ )
-		f_pcBuffer [ l_iCtr ] = tolower ( f_pcBuffer [ l_iCtr ] );
+		f_pcBuffer [ l_iCtr ] = static_cast < char > ( tolower ( f_pcBuffer [ l_iCtr ] ) );
 	return ( * this );
 	M_EPILOG
 	}
@@ -542,12 +580,12 @@ HString & HString::reverse ( void )
 	{
 	M_PROLOG
 	char a_cChar;
-	int l_iCtr, l_iLenght = strlen ( f_pcBuffer );
+	int l_iCtr = 0, l_iLenght = static_cast < int > ( strlen ( f_pcBuffer ) );
 	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr++ )
 		{
-		a_cChar = toupper ( f_pcBuffer [ l_iCtr ] );
+		a_cChar = static_cast < char > ( toupper ( f_pcBuffer [ l_iCtr ] ) );
 		if ( a_cChar == f_pcBuffer [ l_iCtr ] )
-			f_pcBuffer [ l_iCtr ] = tolower ( f_pcBuffer [ l_iCtr ] );
+			f_pcBuffer [ l_iCtr ] = static_cast < char > ( tolower ( f_pcBuffer [ l_iCtr ] ) );
 		else
 			f_pcBuffer [ l_iCtr ] = a_cChar;
 		}
@@ -558,13 +596,13 @@ HString & HString::reverse ( void )
 HString HString::left ( int a_iTo ) const
 	{
 	M_PROLOG
-	int l_iLenght = strlen ( f_pcBuffer );
+	int l_iLenght = static_cast < int > ( strlen ( f_pcBuffer ) );
 	HString l_oStr;
 	if ( a_iTo < 1 )
 		return ( l_oStr );
 	l_iLenght = ( a_iTo < l_iLenght ? a_iTo : l_iLenght );
 	l_oStr.hs_realloc ( l_iLenght + 1 );
-	strncpy ( l_oStr.f_pcBuffer, f_pcBuffer, l_iLenght );
+	strncpy ( l_oStr.f_pcBuffer, f_pcBuffer, static_cast < unsigned int > ( l_iLenght ) );
 	l_oStr.f_pcBuffer [ l_iLenght ] = 0;
 	return ( l_oStr );
 	M_EPILOG
@@ -573,14 +611,15 @@ HString HString::left ( int a_iTo ) const
 HString HString::mid ( int a_iFrom, int a_iLenght ) const
 	{
 	M_PROLOG
-	int l_iLenOrig = strlen ( f_pcBuffer );
+	int l_iLenOrig = static_cast < int > ( strlen ( f_pcBuffer ) );
 	HString l_oStr;
 	if ( ( a_iLenght < 0 ) || ( a_iFrom < 0 ) || ( a_iFrom >= l_iLenOrig ) )
 		return ( "" );
 	if ( ( a_iLenght == 0 ) || ( ( a_iLenght + a_iFrom ) > l_iLenOrig ) )
 		a_iLenght = l_iLenOrig - a_iFrom;
 	l_oStr.hs_realloc ( a_iLenght + 1 );
-	strncpy ( l_oStr.f_pcBuffer, f_pcBuffer + a_iFrom, a_iLenght );
+	strncpy ( l_oStr.f_pcBuffer, f_pcBuffer + a_iFrom,
+			static_cast < unsigned int > ( a_iLenght ) );
 	l_oStr.f_pcBuffer [ a_iLenght ] = 0;
 	return ( l_oStr );
 	M_EPILOG
@@ -589,13 +628,14 @@ HString HString::mid ( int a_iFrom, int a_iLenght ) const
 HString HString::right ( int a_iFromEnd ) const
 	{
 	M_PROLOG
-	int l_iLenght = strlen ( f_pcBuffer );
+	int l_iLenght = static_cast < int > ( strlen ( f_pcBuffer ) );
 	HString l_oStr;
 	if ( a_iFromEnd < 1 )
 		return ( l_oStr );
 	a_iFromEnd = ( a_iFromEnd < l_iLenght ? a_iFromEnd : l_iLenght );
 	l_oStr.hs_realloc ( a_iFromEnd + 1 );
-	strncpy ( l_oStr.f_pcBuffer, f_pcBuffer + l_iLenght - a_iFromEnd, l_iLenght );
+	strncpy ( l_oStr.f_pcBuffer, f_pcBuffer + l_iLenght - a_iFromEnd,
+			static_cast < unsigned int > ( l_iLenght ) );
 	l_oStr.f_pcBuffer [ a_iFromEnd ] = 0;
 	return ( l_oStr );
 	M_EPILOG
@@ -604,11 +644,11 @@ HString HString::right ( int a_iFromEnd ) const
 HString & HString::trim_left ( char const * a_pcSet )
 	{
 	M_PROLOG
-	int l_iCut = 0, l_iLenght;
+	int l_iCut = 0, l_iLenght = 0;
 	while ( strchr ( a_pcSet, f_pcBuffer [ l_iCut ] ) )l_iCut ++;
 	if ( l_iCut )
 		{
-		l_iLenght = strlen ( f_pcBuffer );
+		l_iLenght = static_cast < int > ( strlen ( f_pcBuffer ) );
 		strcpy ( f_pcBuffer, f_pcBuffer + l_iCut );
 		f_pcBuffer [ l_iLenght - l_iCut ] = 0;
 		}
@@ -620,12 +660,11 @@ HString & HString::trim_right( char const * a_pcSet )
 	{
 	M_PROLOG
 	int l_iCut = 0, l_iLenght;
-	l_iLenght = strlen ( f_pcBuffer );
-	while ( strchr ( a_pcSet, f_pcBuffer [ l_iLenght - l_iCut ] ) )l_iCut ++;
+	l_iLenght = static_cast < int > ( strlen ( f_pcBuffer ) );
+	while ( strchr ( a_pcSet, f_pcBuffer [ l_iLenght - l_iCut ] ) )
+		l_iCut ++;
 	if ( l_iCut )
-		{
-		f_pcBuffer [ l_iLenght - l_iCut + 1 ] = 0;
-		}
+		f_pcBuffer [ ( l_iLenght - l_iCut ) + 1 ] = 0;
 	return ( * this );
 	M_EPILOG
 	}
@@ -639,14 +678,14 @@ HString HString::split ( char const * a_pcAt, int a_iPart ) const
 	if ( f_iSize )
 		{
 		for ( ;	f_pcBuffer [ l_iBegining ] &&	( l_iCtr < a_iPart );	l_iCtr ++ )
-			l_iBegining += strcspn ( f_pcBuffer + l_iBegining, a_pcAt ) + 1;
+			l_iBegining += static_cast < int > ( strcspn ( f_pcBuffer + l_iBegining, a_pcAt ) + 1 );
 		if ( f_pcBuffer [ l_iBegining ] )
 			{
-			l_iSize = strcspn ( f_pcBuffer + l_iBegining, a_pcAt );
+			l_iSize = static_cast < int > ( strcspn ( f_pcBuffer + l_iBegining, a_pcAt ) );
 			return ( mid ( l_iBegining, l_iSize ) );
 			}
 		}
-	return ( "" );;
+	return ( "" );
 	M_EPILOG
 	}
 
@@ -739,25 +778,29 @@ bool operator < ( char const * a_pcStr, const HString & a_roString )
 char * strrnpbrk ( char const * a_pcBuffer, char const * a_pcStopSet,
 		int a_iIndex )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
-	int l_iStopSetSize = strlen ( a_pcStopSet );
+	int l_iStopSetSize = static_cast < int > ( strlen ( a_pcStopSet ) );
 	while ( a_iIndex -- )
 		for ( l_iCtr = 0; l_iCtr < l_iStopSetSize; l_iCtr ++ )
 			if ( a_pcBuffer [ a_iIndex ] == a_pcStopSet [ l_iCtr ] )
 				return ( const_cast < char * > ( a_pcBuffer + a_iIndex ) );
 	return ( NULL );
+	M_EPILOG
 	}
 
 char const * strrpbrk ( char const * a_pcBuffer, char const * a_pcStopSet )
 	{
-	return ( strrnpbrk ( a_pcBuffer, a_pcStopSet, strlen ( a_pcBuffer ) ) );
+	return ( strrnpbrk ( a_pcBuffer, a_pcStopSet,
+				static_cast < int > ( strlen ( a_pcBuffer ) ) ) );
 	}
 
 int strrnspn ( char const * a_pcBuffer, char const * a_pcSkipSet,
 		int a_iLenght )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
-	int l_iSkipSetSize = strlen ( a_pcSkipSet );
+	int l_iSkipSetSize = static_cast < int > ( strlen ( a_pcSkipSet ) );
 	int l_iIndex = a_iLenght;
 	while ( l_iIndex -- )
 		{
@@ -768,11 +811,13 @@ int strrnspn ( char const * a_pcBuffer, char const * a_pcSkipSet,
 			return ( a_iLenght - l_iIndex );
 		}
 	return ( 0 );
+	M_EPILOG
 	}
 
 int strrspn ( char const * a_pcBuffer, char const * a_pcSkipSet )
 	{
-	return ( strrnspn ( a_pcBuffer, a_pcSkipSet, strlen ( a_pcBuffer ) ) );
+	return ( strrnspn ( a_pcBuffer, a_pcSkipSet,
+				static_cast < int > ( strlen ( a_pcBuffer ) ) ) );
 	}
 
 }
