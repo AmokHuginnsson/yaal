@@ -43,6 +43,7 @@ public:
 	long int	m_lId;
 	bool	m_bChecked;
 	/*}*/
+private:
 public:
 	/*{*/
 	HItem ( int  = 0 );

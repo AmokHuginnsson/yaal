@@ -29,6 +29,7 @@ Copyright:
 #include <stdio.h>
 #include <termios.h>
 #include <libintl.h>
+#include <string.h> /* strerror */
 
 #include "config.h"
 
@@ -63,11 +64,11 @@ namespace hconsole
  * 8   - 00001000
  * 128 - 10000000
  */
-#define M_MAKE_ATTR(attr) COLOR_PAIR( \
-		( ( ( attr ) & 112 ) >> 1 ) 				/* background */ \
-			| ( attr ) & 7 ) 									/* foreground */ \
-	| ( ( ( attr ) & 8 ) ? A_BOLD : 0 ) 	/* brighter foreground */ \
-		| ( ( attr ) & 128 ? A_BLINK : 0 )	/* brighter background */
+#define M_MAKE_ATTR(attr)	( COLOR_PAIR( \
+		( ( ( attr ) & 112 ) >> 1 ) 					/* background */ \
+			| ( attr ) & 7 ) 										/* foreground */ \
+	| ( ( ( attr ) & 8 ) ? A_BOLD : 0 ) 		/* brighter foreground */ \
+		| ( ( attr ) & 128 ? A_BLINK : 0 ) )	/* brighter background */
 
 /* public: */
 bool n_bNeedRepaint = false;
@@ -95,8 +96,8 @@ void enter_curses( void )
 		M_THROW ( "stdin in not a tty", 0 );
 	if ( n_bDisableXON )
 		{
-		tcgetattr ( STDIN_FILENO, & n_sTermios );
-		tcgetattr ( STDIN_FILENO, & l_sTermios );
+		M_ENSURE ( tcgetattr ( STDIN_FILENO, & n_sTermios ) == 0 );
+		M_ENSURE ( tcgetattr ( STDIN_FILENO, & l_sTermios ) == 0 );
 		l_sTermios.c_iflag &= ~IXON;
 		if ( n_bLeaveCtrlC )
 			l_sTermios.c_cc [ VINTR ] = 0;
@@ -108,32 +109,33 @@ void enter_curses( void )
 			l_sTermios.c_cc [ VSTART ] = 0;
 		if ( n_bLeaveCtrlBackSlash )
 			l_sTermios.c_cc [ VQUIT ] = 0;
-		tcsetattr ( STDIN_FILENO, TCSAFLUSH, & l_sTermios );
+		M_ENSURE ( tcsetattr ( STDIN_FILENO, TCSAFLUSH, & l_sTermios ) == 0 );
 		}
 	use_env ( true );
 	if ( ! n_psWindow )
 		n_psWindow = initscr();
-	cbreak ( );
-	start_color ( );
-	standout ( );
-	nonl ( );
-	keypad ( stdscr, true );
-	intrflush ( stdscr, false );
+	M_ENSURE ( cbreak ( ) != ERR );
+	M_ENSURE ( start_color ( ) != ERR );
+	M_IRV ( standout ( ) ); /* Macro, returned value without meaning */
+	M_ENSURE ( nonl ( ) == OK );
+	M_ENSURE ( keypad ( stdscr, true ) != ERR );
+	M_ENSURE ( intrflush ( stdscr, false ) != ERR );
 /*	scrollok ( stdscr, true ); */
-	scrollok ( stdscr, false );
-	leaveok ( stdscr, false );
+	M_ENSURE ( scrollok ( stdscr, false ) != ERR );
+	M_ENSURE ( leaveok ( stdscr, false ) != ERR );
 	immedok ( stdscr, false );
-	fflush ( 0 );
-	flushinp ( );
-	curs_set ( D_CURSOR_INVISIBLE );
-	refresh ( );
+	M_ENSURE ( fflush ( NULL ) == 0 );
+	M_IRV ( flushinp ( ) ); /* Always returns OK */
+	M_IRV ( curs_set ( D_CURSOR_INVISIBLE ) );
+	M_ENSURE ( refresh ( ) != ERR );
 	/* init color pairs */
-	assume_default_colors ( COLOR_BLACK, COLOR_BLACK );
+	M_ENSURE ( assume_default_colors ( COLOR_BLACK, COLOR_BLACK ) == OK );
 	for ( l_iBg = 0; l_iBg < 8; l_iBg ++ )
 		for ( l_iFg = 0; l_iFg < 8; l_iFg ++ )
-			init_pair ( l_iBg * 8 + l_iFg, l_piColors [ l_iFg ], l_piColors [ l_iBg ] );
+			M_ENSURE ( init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
+						l_piColors [ l_iFg ], l_piColors [ l_iBg ] ) != ERR );
 	attrset ( COLOR_PAIR( 7 ) );
-	bkgd ( ' ' | M_MAKE_ATTR ( D_FG_LIGHTGRAY | D_BG_BLACK ) | A_INVIS );
+	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( D_FG_LIGHTGRAY | D_BG_BLACK ) | A_INVIS ) ); /* meaningless value from macro */
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( getenv ( "STDHAPI_NO_MOUSE" ) )
@@ -170,21 +172,21 @@ void leave_curses( void )
 //	if ( ! mousemask ( 0, NULL ) )
 //		M_THROW ( "mousemask ( ) returned 0", g_iErrNo );
 	if ( n_bUseMouse )
-		mouse::mouse_close ( );
-	bkgd ( ' ' | M_MAKE_ATTR ( ( D_FG_LIGHTGRAY | D_BG_BLACK ) ) );
-	use_default_colors ( );
-	printw ( "" );
-	fflush ( 0 );
-	flushinp ( );
-	intrflush ( stdscr, true );
-	leaveok ( stdscr, false );
-	immedok ( stdscr, true );
-	refresh ( );
-	nl ( );
+		M_IRV ( mouse::mouse_close ( ) );
+	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( ( D_FG_LIGHTGRAY | D_BG_BLACK ) ) ) );
+	M_ENSURE ( use_default_colors ( ) == OK );
+	M_ENSURE ( printw ( "" ) != ERR );
+	M_ENSURE ( fflush ( NULL ) == 0 );
+	M_IRV ( flushinp ( ) ); /* Always returns OK */
+	M_ENSURE ( intrflush ( stdscr, true ) != ERR );
+	M_IRV ( leaveok ( stdscr, false ) ); /* Always OK */
+	immedok ( stdscr, true ); /* Always OK */
+	M_ENSURE ( refresh ( ) != ERR );
+	M_IRV ( nl ( ) ); /* Always OK */
 	standend ( );
-	keypad ( stdscr, false );
-	nocbreak ( );
-	curs_set ( D_CURSOR_VISIBLE );
+	M_ENSURE ( keypad ( stdscr, false ) != ERR );
+	M_ENSURE ( nocbreak ( ) != ERR );
+	M_IRV ( curs_set ( D_CURSOR_VISIBLE ) );
 /*	reset_shell_mode ( ); */
 /* see comment near def_shell_mode ( ), ( automagicly by endwin ( ) ) */
 /*
@@ -192,20 +194,22 @@ void leave_curses( void )
 	delwin ( n_psWindow );
 	n_psWindow = NULL;
 */
-	endwin ( );
+	M_ENSURE ( endwin ( ) == OK );
 	if ( n_bDisableXON )
-		tcsetattr ( STDIN_FILENO, TCSAFLUSH, & n_sTermios );
+		M_ENSURE ( tcsetattr ( STDIN_FILENO, TCSAFLUSH, & n_sTermios ) == 0 );
 	n_bEnabled = false;
 	return;
 	M_EPILOG
 	}
 	
-void set_attr( unsigned char a_ucAttr )
+void set_attr( int a_iAttr )
 	{
 	M_PROLOG
+	unsigned char l_ucByte = 0;
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", g_iErrNo );
-	attrset ( M_MAKE_ATTR ( a_ucAttr ) );
+	l_ucByte = static_cast < unsigned char > ( a_iAttr );
+	attrset ( M_MAKE_ATTR ( l_ucByte ) );
 	return ;
 	M_EPILOG
 	}
@@ -242,13 +246,13 @@ int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	set_attr ( a_iAttribute );
 	if ( a_iColumn < 0 )
 		{
-		move ( a_iRow, 0 );
-		clrtoeol ( );
+		M_ENSURE ( move ( a_iRow, 0 ) != ERR );
+		M_IRV ( clrtoeol ( ) ); /* Always OK */
 		}
 	else
-		move ( a_iRow, a_iColumn );
+		M_ENSURE ( move ( a_iRow, a_iColumn ) != ERR );
 	l_iError = vw_printw ( stdscr, a_pcFormat, a_rxAp );
-	move ( l_iOrigRow, l_iOrigColumn );
+	M_ENSURE ( move ( l_iOrigRow, l_iOrigColumn ) != ERR );
 	set_attr ( l_iOrigAttribute );
 	return ( l_iError );
 	M_EPILOG
@@ -262,14 +266,14 @@ int get_key( void )
 	int l_iOrigCursState = D_CURSOR_INVISIBLE;
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", g_iErrNo );
-	noecho();
-	fflush( 0 );
+	M_ENSURE ( noecho() != ERR );
+	M_ENSURE ( fflush( NULL ) == 0 );
 	l_iKey = getch ( );
 	if ( l_iKey == D_KEY_ESC )
 		{
-		nodelay ( stdscr, true );
+		M_ENSURE ( nodelay ( stdscr, true ) != ERR );
 		l_iKey = getch ( );
-		nodelay ( stdscr, false );
+		M_ENSURE ( nodelay ( stdscr, false ) != ERR );
 		if ( l_iKey == ERR )
 			l_iKey = D_KEY_ESC;
 		else
@@ -278,15 +282,15 @@ int get_key( void )
 	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
 		{
 		l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
-		c_printf ( n_iHeight - 1, -1, D_FG_WHITE, "ctrl-%c",
-				n_cCommandComposeCharacter );
+		M_IRV ( c_printf ( n_iHeight - 1, -1, D_FG_WHITE, "ctrl-%c",
+					n_cCommandComposeCharacter ) );
 		timeout ( n_iCommandComposeDelay * 100 );
 		l_iKey = getch ( );
 		timeout ( -1 );
 		if ( l_iKey == ERR )
 			{
 			l_iKey = D_KEY_CTRL_(n_cCommandComposeCharacter);
-			c_printf ( n_iHeight - 1, 0, D_FG_LIGHTGRAY, "      " );
+			M_IRV ( c_printf ( n_iHeight - 1, 0, D_FG_LIGHTGRAY, "      " ) );
 			}
 		else
 			{
@@ -294,9 +298,9 @@ int get_key( void )
 				l_iKey = D_KEY_COMMAND_( l_iChar = l_iKey + 96 );
 			else if ( l_iKey == D_KEY_ESC )
 				{
-				nodelay ( stdscr, true );
+				M_ENSURE ( nodelay ( stdscr, true ) != ERR );
 				l_iKey = getch ( );
-				nodelay ( stdscr, false );
+				M_ENSURE ( nodelay ( stdscr, false ) != ERR );
 				if ( l_iKey == ERR )
 					l_iKey = D_KEY_COMMAND_(l_iChar = D_KEY_ESC);
 				else
@@ -304,11 +308,11 @@ int get_key( void )
 				}
 			else
 				l_iKey = D_KEY_COMMAND_(l_iChar = l_iKey);
-			c_printf ( n_iHeight - 1, 6, D_FG_WHITE, " %c", l_iChar );
+			M_IRV ( c_printf ( n_iHeight - 1, 6, D_FG_WHITE, " %c", l_iChar ) );
 			}
-		curs_set ( l_iOrigCursState );
+		M_IRV ( curs_set ( l_iOrigCursState ) );
 		}
-	echo ( );
+	M_ENSURE ( echo ( ) != ERR );
 	switch ( l_iKey )
 		{
 		case ( 347 ):
@@ -322,6 +326,8 @@ int get_key( void )
 			l_iKey = KEY_BACKSPACE;
 			break;
 			}
+		default:
+			break;
 		}
 	return ( l_iKey );
 	M_EPILOG
@@ -333,16 +339,16 @@ int kbhit()
 	int l_iKey;
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", g_iErrNo );
-	nodelay( stdscr, true );
+	M_ENSURE ( nodelay( stdscr, true ) != ERR );
 	l_iKey = get_key ( );
-	nodelay( stdscr, false );
+	M_ENSURE ( nodelay( stdscr, false ) != ERR );
 	if ( l_iKey == ERR )
 		return ( 0 );
 	return ( l_iKey );
 	M_EPILOG
 	}
 	
-char get_attr( void )
+unsigned char get_attr( void )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
@@ -350,15 +356,14 @@ char get_attr( void )
 	attr_t l_xAttr;
 	short l_hColor = 0;
 	int l_iAttribute = 0;
-	int l_iError = 0;
-	l_iError = attr_get ( & l_xAttr, & l_hColor, NULL );
+	M_IRV ( attr_get ( & l_xAttr, & l_hColor, NULL ) ); /* Ugly macro */
 	l_iAttribute = ( l_hColor << 1 ) & 56;
 	l_iAttribute |= ( l_hColor & 7 );
 	if ( l_xAttr & A_BOLD )
 		l_iAttribute |= 8;
 	if ( l_xAttr & A_BLINK )
 		l_iAttribute |= 128;
-	return ( l_iAttribute );
+	return ( static_cast < unsigned char > ( l_iAttribute ) );
 	M_EPILOG
 	}
 	
@@ -367,8 +372,8 @@ void clrscr()
 	M_PROLOG
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", g_iErrNo );
-	clear ( );
-	refresh ( );
+	M_IRV ( clear ( ) ); /* Always returns OK */
+	M_ENSURE ( refresh ( ) != ERR );
 	return;
 	M_EPILOG
 	}
@@ -399,7 +404,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 			a_iKey = get_key ( );
 			l_iEventType = D_EVENT_MOUSE;
 			if ( a_iKey == KEY_MOUSE )
-				mouse::mouse_get ( a_rsMouse );
+				M_IRV ( mouse::mouse_get ( a_rsMouse ) );
 			else
 				l_iEventType = D_EVENT_KEYBOARD;
 			break;

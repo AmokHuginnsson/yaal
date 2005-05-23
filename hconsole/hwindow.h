@@ -38,7 +38,6 @@ namespace stdhapi
 namespace hconsole
 {
 
-class HControl;
 class HControlList;
 
 class HWindow : public HHandler
@@ -79,9 +78,6 @@ private:
 	friend void HStatusBarControl::end_prompt ( void );
 	friend int HStatusBarControl::process_input_normal ( int );
 	void set_focus ( HControl * );
-	/*}*/
-private:
-	/*{*/
 	HWindow ( const HWindow & );
 	HWindow & operator = ( const HWindow & );
 	/*}*/

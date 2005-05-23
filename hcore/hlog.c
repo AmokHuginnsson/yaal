@@ -52,6 +52,7 @@ namespace hcore
 #define D_BUFFER_SIZE			1024
 #define D_HOSTNAME_SIZE		16
 #define D_TIMESTAMP_SIZE	16
+#define D_LOGIN_NAME_MAX	8
 
 HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 	f_lType ( 0 ), f_psStream ( NULL ), f_pcProcessName ( NULL ),
@@ -74,10 +75,10 @@ HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 		f_pcLoginName = xstrdup ( l_psPasswd->pw_name );
 	else
 		{
-		f_pcLoginName = xcalloc ( 8, char );
-		M_IRV ( snprintf ( f_pcLoginName, 6, "%d", l_iUid ) );
+		f_pcLoginName = xcalloc ( D_LOGIN_NAME_MAX + 1, char );
+		M_ENSURE ( snprintf ( f_pcLoginName, D_LOGIN_NAME_MAX, "%d", l_iUid ) <= D_LOGIN_NAME_MAX );
 		}
-	M_IRV ( gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 ) );
+	M_ENSURE ( gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -218,7 +219,7 @@ int HLog::operator ( ) ( char const * a_pcFormat, va_list a_xAp )
 		{
 		f_lType = 0;
 		f_bNewLine = true;
-		M_IRV ( fflush ( f_psStream ) );
+		M_ENSURE ( fflush ( f_psStream ) == 0 );
 		}
 	return ( l_iErr );
 	M_EPILOG
@@ -231,7 +232,7 @@ int HLog::operator ( ) ( char const * a_pcFormat, ... )
 	va_list l_xAp;
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
-		M_IRV ( va_start ( l_xAp, a_pcFormat ) );
+		va_start ( l_xAp, a_pcFormat );
 		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
 		va_end ( l_xAp );
 		}
@@ -247,7 +248,7 @@ int HLog::operator ( ) ( long int a_lType, char const * a_pcFormat, ... )
 	f_lType = a_lType;
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
-		M_IRV ( va_start ( l_xAp, a_pcFormat ) );
+		va_start ( l_xAp, a_pcFormat );
 		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
 		va_end ( l_xAp );
 		}
@@ -279,7 +280,7 @@ HLog & HLog::operator << ( char const * a_pcString )
 			{
 			f_bNewLine = true;
 			f_lType = 0;
-			M_IRV ( fflush ( f_psStream ) );
+			M_ENSURE ( fflush ( f_psStream ) == 0 );
 			}
 		}
 	return ( * this );
@@ -300,7 +301,7 @@ HLog & HLog::operator << ( char const a_cChar )
 			{
 			f_bNewLine = true;
 			f_lType = 0;
-			M_IRV ( fflush ( f_psStream ) );
+			M_ENSURE ( fflush ( f_psStream ) == 0 );
 			}
 		}
 	return ( * this );
@@ -322,7 +323,8 @@ HLog & HLog::operator << ( const long int a_lInteger )
 		{
 		if ( f_bNewLine )
 			timestamp ( );
-		M_IRV ( snprintf ( f_pcBuffer, f_iBufferSize, "%ld", a_lInteger ) );
+		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%ld",
+					a_lInteger ) < static_cast < int > ( f_iBufferSize ) );
 		fprintf ( f_psStream, f_pcBuffer );
 		f_bNewLine = false;
 		}
@@ -337,7 +339,8 @@ HLog & HLog::operator << ( const double a_dDouble )
 		{
 		if ( f_bNewLine )
 			timestamp ( );
-		M_IRV ( snprintf ( f_pcBuffer, f_iBufferSize, "%f", a_dDouble ) );
+		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%f",
+					a_dDouble ) < static_cast < int > ( f_iBufferSize ) );
 		fprintf ( f_psStream, f_pcBuffer );
 		f_bNewLine = false;
 		}

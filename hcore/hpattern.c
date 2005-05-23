@@ -231,7 +231,7 @@ void HPattern::prepare_error_message ( int a_iError )
 	M_PROLOG
 	unsigned int l_iSize = regerror ( a_iError, & f_sCompiled, NULL, 0 );
 	f_oError.hs_realloc ( static_cast < int > ( l_iSize + 1 ) );
-	M_IRV ( regerror ( a_iError, & f_sCompiled, f_oError, l_iSize ) );
+	M_ENSURE ( regerror ( a_iError, & f_sCompiled, f_oError, l_iSize ) < l_iSize );
 	return;
 	M_EPILOG
 	}

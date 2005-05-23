@@ -94,9 +94,9 @@ namespace hconsole
 #define D_KEY_META_BASE			0x04000
 #define D_KEY_COMMAND_BASE	0x08000
 	
-#define	D_KEY_META_(n)			n + D_KEY_META_BASE
-#define D_KEY_CTRL_(n)			n - 96
-#define D_KEY_COMMAND_(n)		n + D_KEY_COMMAND_BASE
+#define	D_KEY_META_(n)			( ( n ) + D_KEY_META_BASE )
+#define D_KEY_CTRL_(n)			( ( n ) - 96 )
+#define D_KEY_COMMAND_(n)		( ( n ) + D_KEY_COMMAND_BASE )
 
 #define D_EVENT_ERROR			0
 #define D_EVENT_KEYBOARD	1
@@ -107,12 +107,12 @@ namespace hconsole
 
 void enter_curses( void );
 void leave_curses( void );
-void set_attr( unsigned char attr );
+void set_attr( int );
 int c_printf ( int, int, int, char const *, ... );
 int c_vprintf ( int, int, int, char const *, va_list & );
 int get_key( void );
 int kbhit( void );
-char get_attr( void );
+unsigned char get_attr( void );
 void clrscr( void );
 bool is_enabled ( void );
 int wait_for_user_input ( int &, mouse::OMouse &, int = 0, int = 0 );

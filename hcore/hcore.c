@@ -101,7 +101,7 @@ void set_env ( char const * a_pcVarValue )
 		log << a_pcVarValue << '\'' << endl;
 		return;
 		}
-	M_IRV ( setenv ( a_pcVarValue, l_pcPtr, true ) );
+	M_ENSURE ( setenv ( a_pcVarValue, l_pcPtr, true ) == 0 );
 	return;
 	M_EPILOG
 	}

@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <string.h>
+
 #include "config.h"
 
 #ifdef HAVE_NCURSES_H
@@ -109,10 +111,10 @@ void HComboboxControl::refresh ( void )
 			: n_iWidth + f_iWidth - f_iColumnRaw;
 /* end of ripped part */
 		HEditControl::refresh ( );
-		::move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 );
+		M_ENSURE ( ::move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 ) != ERR );
 		M_SET_ATTR_LABEL ( );
-		addch ( D_ASCII_DOWN_ARROW );
-		::move ( f_iRowRaw, f_iColumnRaw + HEditControl::f_iCursorPosition );
+		M_ENSURE ( addch ( D_ASCII_DOWN_ARROW ) != ERR );
+		M_ENSURE ( ::move ( f_iRowRaw, f_iColumnRaw + HEditControl::f_iCursorPosition ) != ERR );
 		f_iHeightRaw = 0;
 		}
 	else
@@ -148,10 +150,7 @@ int HComboboxControl::process_input ( int a_iCode )
 				break;
 				}
 			default :
-				{
 				return ( HEditControl::process_input ( a_iCode ) );
-				break;
-				}
 			}
 		refresh ( );
 		}
@@ -170,7 +169,7 @@ int HComboboxControl::click ( mouse::OMouse & a_rsMouse )
 	M_PROLOG
 	if ( f_iMode == D_MODE_EDITCONTROL )
 		{
-		HEditControl::click ( a_rsMouse );
+		M_IRV ( HEditControl::click ( a_rsMouse ) );
 		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
 			: n_iWidth + f_iWidth - f_iColumnRaw;
 		if ( a_rsMouse.f_iColumn == ( f_iColumnRaw + f_iWidthRaw - 1 ) )

@@ -24,9 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdlib.h> /* getenv ( ) */
-#include <string.h> /* strcpy ( ), strcat ( ) */
-#include <stdio.h>  /* fopen ( ) */
+#include <stdlib.h>  /* getenv ( ) */
+#include <string.h>  /* strcpy ( ), strcat ( ) */
+#include <stdio.h>   /* fopen ( ) */
+#include <libintl.h> /* gettext ( ) */
 
 #include "config.h"
 
@@ -45,8 +46,8 @@ namespace hcore
 namespace rc_file
 {
 
-int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
-		OVariable const * a_psVaraibles,
+int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection,
+		OVariable const * a_psVaraibles, int a_iCount,
 		bool ( * set_variables ) ( HString &, HString & ) )
 	{
 	M_PROLOG
@@ -54,7 +55,9 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 	int l_iCtr = 0, l_iCtrOut = 0, l_iLine = 0;
 	FILE * l_psRc = 0;
 	HString l_oOption, l_oValue, l_oMessage;
-	log ( D_LOG_INFO ) << "process_rc_file ( ): ";
+	log ( D_LOG_INFO ) << "process_rc_file ( ): " << a_iCount;
+	if ( a_iCount < 0 )
+		M_THROW ( _ ( "bad variable count" ), a_iCount );
 	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
 		{
 		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );
@@ -84,7 +87,7 @@ int process_rc_file ( char const * a_pcRcName, char const * a_pcSection,
 					}
 				l_iCtr = 0;
 				l_bOptionOK = false;
-				while ( a_psVaraibles [ l_iCtr ].f_pcKey )
+				while ( ( l_iCtr < a_iCount ) && a_psVaraibles [ l_iCtr ].f_pcKey )
 					{
 					if ( ! strcasecmp ( l_oOption, a_psVaraibles [ l_iCtr ].f_pcKey ) )
 						{

@@ -1,0 +1,115 @@
+/* FlexeLint configuration file */
+
+/* Main options */
+-v
++fcp
++cpp(c)
++cpp(h)
++libclass(angle)
+-t2	/* tab size */
+-h1	/* message height */
+-format(%f:%l:%m [%n])
+-format_specific(%f:%l:%m [%n])
+-width(0,0) /* set no wrap */
+
+/* flint predefined option packs */
+/usr/local/share/flint/supp/linux/co-gnu3.lnt
+/usr/local/share/flint/supp/unix/co-unix.lnt
+/usr/local/share/flint/supp/unix/co.lnt
+/usr/local/share/flint/supp/unix/lib-curs.lnt
+/usr/local/share/flint/supp/stl/lib-stl.lnt
+
+/* Include paths */
+-i"/home/amok/prog/stdhapi"
+-i"/home/amok/prog/stdhapi/hcore"
+-i"/home/amok/prog/stdhapi/hconsole"
+-i"/home/amok/prog/stdhapi/tools"
+-i"/home/amok/prog/stdhapi/dbwrapper"
+-i"/home/amok/prog/stdhapi/hdata"
+-i"."
+-i"/usr/include"
+-i"/usr/include/c++/3.3"
+-i"/usr/include/c++/3.3/i486-linux"
+-i"/usr/include/linux"
+-i"/usr/lib/gcc-lib/i486-linux/3.3.5"
+-i"/usr/lib/gcc-lib/i486-linux/3.3.5/include"
+
+/* data types */
++libh(include/stddef.h)
+-header(include/stddef.h)
+
+/* variablre parameter handling */
+-d"__builtin_va_start(arg1,arg2)=(arg1=arg2)"
+
+-emacro(506,bkgd,attr_get)			/* Constant value Boolean */
+-emacro(573,FD_SET,FD_ISSET)		/* Signed-unsigned mix with divide */
+-emacro(605,__builtin_va_start)	/*  */
+-emacro(717,FD_ZERO)						/* do ... while(0); */
+-emacro(737,FD_SET,FD_ISSET)		/* Loss of sign in promotion from int to unsigned long */
+
+/* Reseved words */
++rw(restrict)
+
+/* Disabling warrnings for libraries */
+-elib(39)		/* Redefinition of symbol 'symbol' conflicts with line 'line' */
+-elib(537)	/* Repeated include file 'file' */
+
+/* Definitions */
+-d__STDHAPI_BUILD__
+
+/* Disabling warrnings for our code */
+-e505		/* Redundant left argument to comma */
+-e526		/* Symbol 'symbol' not defined */
+-e528		/* Symbol 'symbol' not referenced */
+-e537		/* Repeated include file 'file' */
+-e545		/* Suspicious use of & */
+-e613		/* Possible use of null pointer 'pointer' in left argument to operator '->' */
+-e668		/* Possibly passing a null pointer to function 'function' */
+-e672		/* Possible memory leak in assignment to pointer 'pointer' */
+-e701		/* Shift left of signed quantity (int) */
+-e714		/* Symbol 'symbol' not referenced */
+-e730		/* Boolean argument to function */
+-e750		/* local macro 'macro' not referenced */
+-e754		/* local structure member 'member' not referenced */
+-e755		/* global macro 'macro' not referenced */
+-e757		/* global declarator 'declarator' not referenced */
+-e758		/* global class 'class' not referenced */
+-e759		/* header declaration for symbol 'symbol' could be moved from header to module */
+-e768		/* global struct member 'member' not referenced */
+-e769		/* global enumeration constant 'constant' not referenced */
+-e778		/* Constant expression evaluates to 0 in operation */
+-e794		/* Conceivable use of null pointer 'pointer' in left argument to operator '->' */
+-e820		/* Boolean test of a parenthesized assignment */
+-e830		/* Location cited in prior message */
+-e1526	/* Member function 'member' not defined */
+-e1702	/* operator 'operator' is both an ordinary function 'function' and a member function 'member' */
+-e1704	/* Constructor 'constructor' has private access specification */
+-e1712	/* default constructor not defined for class 'class' */
+-e1714	/* Member function 'member' not referenced */
+-e1735	/* virtual 'member' has default parameter */
+-e1739	/* Binary operator 'operator' should be non-member function */
+-e1740	/* pointer member 'member' not directly freed or zeroed by destructor */
+-e1763	/* Member function 'member' marked as const indirectly modifies class */
+
+-emacro(572,M_MAKE_ATTR)	/* Excessive shift value (precision 1 shifted right by 1) */
+-emacro({725},M_PROLOG)		/* Expected positive indentation from line 'line' */
+-emacro(1551,M_EPILOG)		/* Function may throw exception '...' in  destructor 'destructor' */
+-emacro(1559,M_EPILOG)		/* Uncaught exception 'exception' may be thrown in destructor 'destructor' */
+-emacro(1775,M_EPILOG)		/* catch block does not catch any declared exception */
+
+-esym(418,strftime,fflush)	/* Passing null pointer to function 'function' */
+-esym(534,stdhapi::hcore::HLog::operato*)
+-esym(752,stdhapi::hcore::g_ppcErrMsgHList)
+-esym(1401,stdhapi::hcore::HPattern::f_sCompiled) /* member 'member' not initialized by constructor */
+-esym(1511,*operator=*)
+-esym(1554,*_pv*) /* Direct pointer copy of member 'member' within copy constructor: 'constructor' */
+-esym(1555,*_pv*) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
+-esym(1764,a_roOption,a_roValue)
+-esym(1769,stdhapi::hcore::HPattern::f_sCompiled,stdhapi::hcore::HThread::f_sAttributes,stdhapi::hcore::HTime::f_sBroken) /* Member or base class 'class' has no constructor */
+
+-function(exit,stdhapi::hcore::HException::failed_assert)
+
+-efile(766,hcore/hlist.c)
+-efile(766,hcore/hmap.c)
+
+/* vim: set ft=cpp: */

@@ -288,6 +288,9 @@ tags: $(SRCS) $(HDRS)
 						--extra="+f+q"; \
 	echo "done."
 
+flint:
+	@flint -b aux/flint.lnt hcore/*.c hconsole/*.c 2|awk '{gsub(" \\(compare with line [^)]+)","");print}'|head -20
+
 ifeq ($(CURDIR),$(DIR_BUILD))
 -include $(OBJS:.o=.d)
 endif
