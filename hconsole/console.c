@@ -132,8 +132,8 @@ void enter_curses( void )
 	M_ENSURE ( assume_default_colors ( COLOR_BLACK, COLOR_BLACK ) == OK );
 	for ( l_iBg = 0; l_iBg < 8; l_iBg ++ )
 		for ( l_iFg = 0; l_iFg < 8; l_iFg ++ )
-			M_ENSURE ( init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
-						l_piColors [ l_iFg ], l_piColors [ l_iBg ] ) != ERR );
+			M_IRV ( init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
+						l_piColors [ l_iFg ], l_piColors [ l_iBg ] ) );
 	attrset ( COLOR_PAIR( 7 ) );
 	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( D_FG_LIGHTGRAY | D_BG_BLACK ) | A_INVIS ) ); /* meaningless value from macro */
 	n_bEnabled = true;
