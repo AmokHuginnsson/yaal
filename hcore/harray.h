@@ -58,7 +58,7 @@ protected:
 public:
 	/*{*/
 	HArray ( int );
-	HArray ( const int &, tType );
+	HArray ( const int &, tType const & );
 	virtual ~HArray ( void );
 	HArray ( const HArray & );
 	HArray & operator = ( const HArray & );
@@ -89,7 +89,7 @@ HArray < tType >::HArray ( int a_iSize ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	}
 
 template < class tType >
-HArray < tType >::HArray ( const int & a_iSize, tType a_tFillWith )
+HArray < tType >::HArray ( const int & a_iSize, tType const & a_tFillWith )
 	: f_iSize ( 0 ), f_ptArray ( NULL )
 	{
 	M_PROLOG

@@ -37,7 +37,7 @@ class HRandomizer
 	{
 protected:
 	/*{*/
-	unsigned long int f_lSeed;
+	unsigned long int f_ulSeed;
 	/*}*/
 public:
 	/*{*/

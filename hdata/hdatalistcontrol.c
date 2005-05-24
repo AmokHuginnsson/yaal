@@ -104,7 +104,7 @@ void HDataListControl::load ( long int /*a_iId*/ )
 			to_tail ( );
 			}
 		else
-			add_tail ( l_oItem );
+			add_tail ( & l_oItem );
 		f_poRecordSet->move_next ( );
 		}
 	if ( l_poSelected )

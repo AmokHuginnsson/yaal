@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <string.h>
+
 #include "config.h"
 
 #ifdef HAVE_NCURSES_H
@@ -102,7 +104,8 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		}
 	else
 		f_bSingleLine = true;
-	f_poParent->add_control ( this, D_KEY_META_(f_oLabel [ f_iShortcutIndex ]) );
+	M_IRV ( f_poParent->add_control ( this,
+				D_KEY_META_(f_oLabel [ f_iShortcutIndex ]) ) );
 	return;
 	M_EPILOG
 	}
@@ -113,6 +116,7 @@ HControl::~HControl ( void )
 #ifdef __DEBUGGER_BABUNI__
 	log << "destroing control: " << f_oLabel << endl;
 #endif /* __DEBUGGER_BABUNI__ */
+	f_poParent = NULL;
 	return;
 	M_EPILOG
 	}
@@ -171,12 +175,11 @@ void HControl::refresh ( void )
 	M_EPILOG
 	}
 
-void HControl::set ( const HInfo & a_roInfo )
+void HControl::set ( const HInfo & )
 	{
 	M_PROLOG
-	HInfo l_oInfo = a_roInfo;
-	if ( & a_roInfo )
-		M_THROW ( "what the fuck?", g_iErrNo );
+	if ( g_iErrNo || ! g_iErrNo )
+		M_THROW ( "Abstract method called!", g_iErrNo );
 	return;
 	M_EPILOG
 	}
@@ -215,10 +218,10 @@ void HControl::draw_label ( void )
 		return;
 		}
 	M_SET_ATTR_LABEL ( );
-	::mvprintw ( f_iRowRaw, f_iColumnRaw, f_oLabel );
+	M_ENSURE ( ::mvprintw ( f_iRowRaw, f_iColumnRaw, f_oLabel ) != ERR );
 	M_SET_ATTR_SHORTCUT ( );
-	::mvprintw( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
-			"%c", f_oLabel [ f_iShortcutIndex ] );
+	M_ENSURE ( ::mvprintw( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
+				"%c", f_oLabel [ f_iShortcutIndex ] ) != ERR );
 	M_SET_ATTR_DATA ( );
 	if ( f_bSingleLine )
 		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;
@@ -257,12 +260,12 @@ int HControl::click ( mouse::OMouse & )
 	M_PROLOG
 	if ( f_bFocused )
 		return ( 1 );
-	set_focus ( );
+	M_IRV ( set_focus ( ) );
 	return ( 0 );
 	M_EPILOG
 	}
 
-bool HControl::hit_test ( int a_iRow, int a_iColumn )
+bool HControl::hit_test ( int a_iRow, int a_iColumn ) const
 	{
 	M_PROLOG
 	if ( ( a_iRow < f_iRowRaw ) || ( a_iRow > ( f_iRowRaw + f_iHeightRaw ) ) )

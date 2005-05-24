@@ -115,10 +115,10 @@ void HWindowListControl::refresh ( void )
 	M_EPILOG
 	}
 
-HItem & HWindowListControl::add_tail ( HItem & a_roElement )
+HItem & HWindowListControl::add_tail ( HItem * a_poElement )
 	{
 	M_PROLOG
-	HItem * l_poItem = & HListControl::add_tail ( a_roElement );
+	HItem * l_poItem = & HListControl::add_tail ( a_poElement );
 	if ( f_iQuantity > 1 )
 		{
 		exchange ( - 2, - 1 );

@@ -29,7 +29,7 @@ Copyright:
 
 #include <sys/types.h>
 
-#include "./hcore/hmap.h"
+#include "hcore/hmap.h"
 
 namespace stdhapi
 {
@@ -61,10 +61,10 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	int process_input ( int, process_handler_key_map_t & );
+	int process_input_with_handlers ( int, const process_handler_key_map_t & );
 	hcore::HString process_command ( void );
-	int register_preprocess_handler ( int, int *, HANDLER_t );
-	int register_postprocess_handler ( int, int *, HANDLER_t );
+	int register_preprocess_handler ( int, int const *, HANDLER_t );
+	int register_postprocess_handler ( int, int const *, HANDLER_t );
 	/*}*/
 	};
 

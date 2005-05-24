@@ -68,14 +68,14 @@ HSearchableControl::~HSearchableControl ( void )
 void HSearchableControl::search ( const HString & a_oPattern, bool a_bBackwards )
 	{
 	M_PROLOG
-	unsigned short int l_hFlag = 'f';
-	f_bSearchActived = ! f_oPattern.parse ( a_oPattern, & l_hFlag,
-			sizeof ( l_hFlag ) / sizeof ( unsigned short int ) );
+	unsigned short int l_uhFlag = 'f';
+	f_bSearchActived = ! f_oPattern.parse ( a_oPattern, & l_uhFlag,
+			sizeof ( l_uhFlag ) / sizeof ( unsigned short int ) );
 	if ( ! f_bSearchActived )
 		f_poParent->status_bar ( )->message ( f_oPattern.error ( ) );
 	else
 		{
-		f_bFiltered = ( l_hFlag & 0xff00 ) ? true : false;
+		f_bFiltered = ( l_uhFlag & 0xff00 ) ? true : false;
 		f_bBackwards = a_bBackwards;
 		if ( f_bBackwards )
 			go_to_match_previous ( );
@@ -97,7 +97,7 @@ void HSearchableControl::highlight ( int a_iRow, int a_iColumn,
 /* We can do const_cast here because output of matches points
  * to inside of f_oVarTmpBuffer */
 	while ( ( l_pcHighlightStart = const_cast < char * > ( f_oPattern.matches ( l_pcHighlightStart,
-			l_iHighlightLength ) ) ) )
+			& l_iHighlightLength ) ) ) )
 		{
 		if ( ( f_bFocused && ( ( a_iCurrent != l_iCtr ) || ! a_bCurrent ) )
 				|| ( ! f_bFocused && ( a_iCurrent == l_iCtr ) && a_bCurrent ) )

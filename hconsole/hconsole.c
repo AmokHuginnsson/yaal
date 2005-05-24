@@ -91,14 +91,14 @@ OVariable n_psVariables [ ] =
 
 void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )
 	{
-	int l_iMask = 0x000f;
+	unsigned int l_uiMask = 0x000f;
 	if ( a_iWhat )
 		{
 		a_iWhat <<= 2;
 		a_iBits <<= a_iWhat;
-		l_iMask <<= a_iWhat;
+		l_uiMask <<= a_iWhat;
 		}
-	a_riWord &= ~ l_iMask;
+	a_riWord &= static_cast < int > ( ~ l_uiMask );
 	a_riWord |= a_iBits;
 	return;
 	}
@@ -177,8 +177,8 @@ void hconsole_init ( void ); __attribute__ ( ( constructor ) )
 void hconsole_init ( void )
 	{
 	g_iErrNo = 0;
-	rc_file::process_rc_file ( "stdhapi", "console",
-			n_psVariables, set_hconsole_variables );
+	M_IRV ( rc_file::process_rc_file ( "stdhapi", "console",
+				n_psVariables, set_hconsole_variables ) );
 	return;
 	}
 
@@ -206,17 +206,4 @@ void stdhapi_hconsole_main ( void )
 }
 
 }
-
-/* older versions of g++ fail to handle __attribute__((constructor))
-   if no static object exists */
-
-#if __GNUC__ < 3 || \
-	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
-
-namespace
-	{
-HString n_oDummyHCONSOLE;
-	}
-
-#endif
 

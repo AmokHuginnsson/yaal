@@ -58,12 +58,12 @@ namespace hconsole
 #define D_CTRLS_COUNT	2
 #define D_ALTS_COUNT	10
 
-HProcess::HProcess ( size_t a_iFileHandlers, size_t a_iKeyHandlers,
-		size_t a_iCommandHandlers )
-				: HHandler ( a_iKeyHandlers, a_iCommandHandlers ),
+HProcess::HProcess ( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
+		size_t a_uiCommandHandlers )
+				: HHandler ( a_uiKeyHandlers, a_uiCommandHandlers ),
 	f_bInitialised ( false ), f_bLoop ( true ), f_iIdleCycles ( 0 ),
 	f_sLatency ( ), f_xFileDescriptorSet ( ), f_poForegroundWindow ( NULL ),
-	f_poWindows ( NULL ), f_oFileDescriptorHandlers ( a_iFileHandlers )
+	f_poWindows ( NULL ), f_oFileDescriptorHandlers ( a_uiFileHandlers )
 	{
 	M_PROLOG
 	return;
@@ -133,7 +133,7 @@ int HProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	l_oInfo = static_cast < void * > ( a_poWindow );
 	l_oInfo ( a_pcTitle );
 	l_oItem [ 0 ] = l_oInfo;
-	f_poWindows->add_tail ( l_oItem );
+	f_poWindows->add_tail ( & l_oItem );
 	f_poForegroundWindow = a_poWindow;
 	f_poForegroundWindow->init ( );
 	::refresh ( );
@@ -183,11 +183,11 @@ int HProcess::process_stdin ( int a_iCode )
 	if ( ! a_iCode )
 		a_iCode = get_key ( );
 	if ( a_iCode )
-		a_iCode = process_input ( a_iCode, f_oPreprocessHandlers );
+		a_iCode = process_input_with_handlers ( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && f_poForegroundWindow )
 			a_iCode = f_poForegroundWindow->process_input ( a_iCode );
 	if ( a_iCode )
-		a_iCode = process_input ( a_iCode, f_oPostprocessHandlers );
+		a_iCode = process_input_with_handlers ( a_iCode, f_oPostprocessHandlers );
 	if ( ! a_iCode )
 		{
 		if ( f_poForegroundWindow )

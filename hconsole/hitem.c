@@ -62,9 +62,12 @@ HItem::HItem ( const HItem & a_roItem, int ) : HArray < HInfo > ( a_roItem ),
 HItem & HItem::operator = ( const HItem & a_roItem )
 	{
 	M_PROLOG
-	( * this ).HArray < HInfo >::operator = ( a_roItem );
-	m_lId = a_roItem.m_lId;
-	m_bChecked = a_roItem.m_bChecked;
+	if ( this != & a_roItem )
+		{
+		( * this ).HArray < HInfo >::operator = ( a_roItem );
+		m_lId = a_roItem.m_lId;
+		m_bChecked = a_roItem.m_bChecked;
+		}
 	return ( * this );
 	M_EPILOG
 	}

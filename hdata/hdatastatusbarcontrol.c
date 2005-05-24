@@ -50,7 +50,7 @@ namespace hdata
 
 HDataStatusBarControl::HDataStatusBarControl ( HDataWindow * a_poParent,
 		char const * a_pcLabel, int a_iStatusBarAttribute )
-								 : HControl ( a_poParent, - 2, 0, 255, 0, a_pcLabel ),
+								 : HControl ( a_poParent, - 2, 0, 2, - 1, a_pcLabel ),
 									HStatusBarControl ( NULL, NULL, a_iStatusBarAttribute )
 	{
 	M_PROLOG

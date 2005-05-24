@@ -36,10 +36,10 @@ namespace stdhapi
 namespace hconsole
 {
 
-HHandler::HHandler ( size_t a_iKeyHandlers, size_t a_iCommandHandlers )
-				: f_oPreprocessHandlers ( a_iKeyHandlers ),
-					f_oPostprocessHandlers ( a_iKeyHandlers ),
-					f_oCommandHandlers ( a_iCommandHandlers ),
+HHandler::HHandler ( size_t a_uiKeyHandlers, size_t a_uiCommandHandlers )
+				: f_oPreprocessHandlers ( a_uiKeyHandlers ),
+					f_oPostprocessHandlers ( a_uiKeyHandlers ),
+					f_oCommandHandlers ( a_uiCommandHandlers ),
 					f_oCommand ( )
 	{
 	M_PROLOG
@@ -54,7 +54,7 @@ HHandler::~HHandler ( void )
 	M_EPILOG
 	}
 
-int HHandler::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
+int HHandler::register_preprocess_handler ( int a_iCodeCount, int const * a_piCodes,
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
@@ -68,7 +68,7 @@ int HHandler::register_preprocess_handler ( int a_iCodeCount, int * a_piCodes,
 	M_EPILOG
 	}
 
-int HHandler::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
+int HHandler::register_postprocess_handler ( int a_iCodeCount, int const * a_piCodes,
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
@@ -82,7 +82,7 @@ int HHandler::register_postprocess_handler ( int a_iCodeCount, int * a_piCodes,
 	M_EPILOG
 	}
 
-int HHandler::process_input ( int a_iCode, process_handler_key_map_t & a_oMap )
+int HHandler::process_input_with_handlers ( int a_iCode, const process_handler_key_map_t & a_oMap )
 	{
 	M_PROLOG
 	HANDLER_t HANDLER = NULL;
@@ -102,7 +102,7 @@ HString HHandler::process_command ( void )
 		l_oCommand = f_oCommand.split ( " \t", 0 );
 		if ( f_oCommandHandlers.get ( l_oCommand, HANDLER ) )
 			{
-			( this->*HANDLER ) ( 0, static_cast < char * > ( f_oCommand ) );
+			M_IRV ( ( this->*HANDLER ) ( 0, static_cast < char * > ( f_oCommand ) ) );
 			f_oCommand = "";
 			}
 		}

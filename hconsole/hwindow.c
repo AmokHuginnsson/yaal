@@ -109,11 +109,11 @@ int HWindow::process_input ( int a_iCode )
 	{
 	M_PROLOG
 	if ( a_iCode )
-		a_iCode = HHandler::process_input ( a_iCode, f_oPreprocessHandlers );
+		a_iCode = process_input_with_handlers ( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && f_poFocusedChild )
 		a_iCode = f_poFocusedChild->process_input ( a_iCode );
 	if ( a_iCode )
-		a_iCode = HHandler::process_input ( a_iCode, f_oPostprocessHandlers );
+		a_iCode = process_input_with_handlers ( a_iCode, f_oPostprocessHandlers );
 	if ( f_oCommand && static_cast < char * > ( f_oCommand ) [ 0 ] )
 		process_command ( );
 	return ( a_iCode );

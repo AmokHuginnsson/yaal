@@ -3,6 +3,7 @@
 /* Main options */
 -v
 +fcp
++fnn
 +cpp(c)
 +cpp(h)
 +libclass(angle)
@@ -21,11 +22,6 @@
 
 /* Include paths */
 -i"/home/amok/prog/stdhapi"
--i"/home/amok/prog/stdhapi/hcore"
--i"/home/amok/prog/stdhapi/hconsole"
--i"/home/amok/prog/stdhapi/tools"
--i"/home/amok/prog/stdhapi/dbwrapper"
--i"/home/amok/prog/stdhapi/hdata"
 -i"."
 -i"/usr/include"
 -i"/usr/include/c++/3.3"
@@ -65,6 +61,7 @@
 -e545		/* Suspicious use of & */
 -e613		/* Possible use of null pointer 'pointer' in left argument to operator '->' */
 -e668		/* Possibly passing a null pointer to function 'function' */
+-e671		/* Possibly passing to function 'function' a negative value (-1) */
 -e672		/* Possible memory leak in assignment to pointer 'pointer' */
 -e701		/* Shift left of signed quantity (int) */
 -e714		/* Symbol 'symbol' not referenced */
@@ -80,6 +77,7 @@
 -e778		/* Constant expression evaluates to 0 in operation */
 -e794		/* Conceivable use of null pointer 'pointer' in left argument to operator '->' */
 -e820		/* Boolean test of a parenthesized assignment */
+-e825		/* control flows into case/default without -fallthrough comment */
 -e830		/* Location cited in prior message */
 -e1526	/* Member function 'member' not defined */
 -e1702	/* operator 'operator' is both an ordinary function 'function' and a member function 'member' */
@@ -93,19 +91,21 @@
 
 -emacro(572,M_MAKE_ATTR)	/* Excessive shift value (precision 1 shifted right by 1) */
 -emacro({725},M_PROLOG)		/* Expected positive indentation from line 'line' */
+-emacro(702,M_ATTR_LABEL,M_SET_ATTR_SHORTCUT)	/* Shift right of signed quantity */
 -emacro(1551,M_EPILOG)		/* Function may throw exception '...' in  destructor 'destructor' */
 -emacro(1559,M_EPILOG)		/* Uncaught exception 'exception' may be thrown in destructor 'destructor' */
 -emacro(1775,M_EPILOG)		/* catch block does not catch any declared exception */
 
 -esym(418,strftime,fflush)	/* Passing null pointer to function 'function' */
+-esym(449,l_poAtom)					/* Pointer variable 'variable' previously deallocated */
 -esym(534,stdhapi::hcore::HLog::operato*)
--esym(752,stdhapi::hcore::g_ppcErrMsgHList)
+-esym(752,stdhapi::hcore::g_ppcErrMsgHList,stdhapi::hcore::g_pulPrimes,stdhapi::hcore::hash)
 -esym(1401,stdhapi::hcore::HPattern::f_sCompiled) /* member 'member' not initialized by constructor */
 -esym(1511,*operator=*)
 -esym(1554,*_pv*) /* Direct pointer copy of member 'member' within copy constructor: 'constructor' */
 -esym(1555,*_pv*) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
 -esym(1764,a_roOption,a_roValue)
--esym(1769,stdhapi::hcore::HPattern::f_sCompiled,stdhapi::hcore::HThread::f_sAttributes,stdhapi::hcore::HTime::f_sBroken) /* Member or base class 'class' has no constructor */
+-esym(1769,stdhapi::hcore::HPattern::f_sCompiled,stdhapi::hcore::HThread::f_sAttributes,stdhapi::hcore::HTime::f_sBroken,stdhapi::hconsole::HEditControl::f_sMask) /* Member or base class 'class' has no constructor */
 
 -function(exit,stdhapi::hcore::HException::failed_assert)
 

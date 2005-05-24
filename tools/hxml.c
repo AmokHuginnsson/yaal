@@ -233,11 +233,11 @@ HXml::~HXml ( void )
 char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 	{
 	M_PROLOG
-	size_t l_iSizeIn = 0, l_iSizeOut = 0, l_iOrigSize = 0, l_iTmp = 0;
+	size_t l_uiSizeIn = 0, l_uiSizeOut = 0, l_uiOrigSize = 0, l_uiTmp = 0;
 	char * l_pcOut = NULL, * l_pcIn = const_cast < char * > ( a_pcData );
 	iconv_t l_xCD = ( iconv_t ) 0;
-	l_iOrigSize = l_iSizeOut = l_iSizeIn = strlen ( a_pcData );
-	f_oConvertedString.hs_realloc ( l_iOrigSize );
+	l_uiOrigSize = l_uiSizeOut = l_uiSizeIn = strlen ( a_pcData );
+	f_oConvertedString.hs_realloc ( l_uiOrigSize );
 	l_pcOut = f_oConvertedString;
 	switch ( a_eWay )
 		{
@@ -249,15 +249,15 @@ char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 			break;
 			}
 		}
-	iconv ( l_xCD, & l_pcIn, & l_iSizeIn, & l_pcOut, & l_iSizeOut );
-	while ( l_iSizeIn )
+	iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut, & l_uiSizeOut );
+	while ( l_uiSizeIn )
 		{
-		l_iTmp = l_iOrigSize;
-		l_iOrigSize <<= 1;
-		f_oConvertedString.hs_realloc ( l_iOrigSize );
-		l_pcOut = static_cast < char * > ( f_oConvertedString ) + l_iTmp - l_iSizeOut;
-		l_iSizeOut += l_iTmp;
-		iconv ( l_xCD, & l_pcIn, & l_iSizeIn, & l_pcOut, & l_iSizeOut );
+		l_uiTmp = l_uiOrigSize;
+		l_uiOrigSize <<= 1;
+		f_oConvertedString.hs_realloc ( l_uiOrigSize );
+		l_pcOut = static_cast < char * > ( f_oConvertedString ) + l_uiTmp - l_uiSizeOut;
+		l_uiSizeOut += l_uiTmp;
+		iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut, & l_uiSizeOut );
 		}
 	if ( l_pcOut )* l_pcOut = 0;
 	return ( f_oConvertedString );

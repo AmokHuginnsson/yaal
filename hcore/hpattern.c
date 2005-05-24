@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <string.h>
+#include <libintl.h>
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
@@ -54,11 +55,11 @@ HPattern::~HPattern ( void )
 	M_EPILOG
 	}
 
-bool HPattern::parse ( char const * a_pcPattern,
+int HPattern::parse ( char const * a_pcPattern,
 		unsigned short int * a_puhFlags, int a_iFlagsCount )
 	{
 	M_PROLOG
-	bool l_bError = false;
+	int l_iError = 0;
 	bool l_bLocalCopyIgnoreCase = false, l_bLocalCopyExtended = false;
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iBegin = 0, l_iEnd = 0;
 	HArray < unsigned short int > l_oLocalCopyFlags ( a_iFlagsCount );
@@ -86,9 +87,9 @@ bool HPattern::parse ( char const * a_pcPattern,
 			f_bExtended = l_bLocalCopyExtended;
 			for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
 				a_puhFlags [ l_iCtrLoc ] = l_oLocalCopyFlags [ l_iCtrLoc ];
-			l_bError = true;
+			l_iError = 1;
 			M_IRV ( f_oError.format ( "bad search option '%c'", l_pcPattern [ l_iCtr ] ) );
-			return ( l_bError );
+			return ( l_iError );
 			}
 		l_iCtr ++;
 		}
@@ -125,22 +126,35 @@ bool HPattern::parse ( char const * a_pcPattern,
 			( l_iEnd - l_iBegin ) + 1 );
 	f_iSimpleMatchLength = f_oPatternReal.get_length ( );
 	if ( ! f_iSimpleMatchLength )
-		l_bError = true;
-	f_bInitialized = ! l_bError;
-	if ( f_bInitialized && f_bExtended )
 		{
-		regfree ( & f_sCompiled );
-		if ( ( l_iEnd = regcomp ( & f_sCompiled, f_oPatternReal, f_bIgnoreCase ? REG_ICASE : 0 ) ) )
-			{
-			prepare_error_message ( l_iEnd );
-			f_oError += ": `";
-			f_oError += f_oPatternReal;
-			f_oError += "'";
-			f_bInitialized = false;
-			l_bError = true;
-			}
+		l_iError = - 1;
+		f_oError = _ ( "empty pattern" );
 		}
-	return ( l_bError );
+	f_bInitialized = ! l_iError;
+	if ( f_bInitialized && f_bExtended )
+		l_iError = parse_re ( f_oPatternReal );
+	return ( l_iError );
+	M_EPILOG
+	}
+
+int HPattern::parse_re ( char const * a_pcPattern )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	regfree ( & f_sCompiled );
+	if ( ( l_iError = regcomp ( & f_sCompiled, a_pcPattern,
+					f_bIgnoreCase ? REG_ICASE : 0 ) ) )
+		{
+		prepare_error_message ( l_iError, a_pcPattern );
+		f_bInitialized = false;
+		}
+	else
+		{
+		f_bInitialized = true;
+		f_bExtended = true;
+		f_iSimpleMatchLength = 1; /* it is not really a simple pattern */
+		}
+	return ( l_iError );
 	M_EPILOG
 	}
 
@@ -177,29 +191,25 @@ bool HPattern::set_switch ( char a_cSwitch, unsigned short int * a_puhFlags,
 	M_EPILOG
 	}
 
-char const * HPattern::matches ( char const * a_pcString, int & a_riMatchLength )
+char const * HPattern::matches ( char const * a_pcString, int * a_piMatchLength, int * a_piError )
 	{
 	M_PROLOG
 	char const * l_pcPtr = NULL;
 	int l_iError = 0;
+	int l_iMatchLength = 0;
+	regmatch_t l_sMatch;
 	if ( f_iSimpleMatchLength )
 		{
 		if ( f_bExtended )
 			{
-			regmatch_t l_sMatch;
 			if ( ! ( l_iError = regexec ( & f_sCompiled, a_pcString, 1, & l_sMatch, 0 ) ) )
 				{
-				a_riMatchLength = l_sMatch.rm_eo - l_sMatch.rm_so;
-				if ( a_riMatchLength > 0 )
+				l_iMatchLength = l_sMatch.rm_eo - l_sMatch.rm_so;
+				if ( l_iMatchLength > 0 )
 					l_pcPtr = const_cast < char * > ( a_pcString ) + l_sMatch.rm_so;
 				}
 			else
-				{
-				prepare_error_message ( l_iError );
-				f_oError += ": `";
-				f_oError += f_oPatternReal;
-				f_oError += "'";
-				}
+				prepare_error_message ( l_iError, f_oPatternReal );
 			}
 		else
 			{
@@ -208,9 +218,13 @@ char const * HPattern::matches ( char const * a_pcString, int & a_riMatchLength 
 			else
 				l_pcPtr = strstr ( a_pcString, f_oPatternReal );
 			if ( l_pcPtr )
-				a_riMatchLength = f_iSimpleMatchLength;
+				l_iMatchLength = f_iSimpleMatchLength;
 			}
 		}
+	if ( a_piMatchLength )
+		( * a_piMatchLength ) = l_iMatchLength;
+	if ( a_piError )
+		( * a_piError ) = l_iError;
 	return ( l_pcPtr );
 	M_EPILOG
 	}
@@ -218,20 +232,29 @@ char const * HPattern::matches ( char const * a_pcString, int & a_riMatchLength 
 int HPattern::count ( char const * a_pcString )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iDummy = 0;
+	int l_iCtr = 0;
 	char const * l_pcPtr = a_pcString;
-	while ( ( l_pcPtr = matches ( l_pcPtr, l_iDummy ) ) )
+	while ( ( l_pcPtr = matches ( l_pcPtr ) ) )
 		l_iCtr ++, l_pcPtr ++;
 	return ( l_iCtr );
 	M_EPILOG
 	}
 
-void HPattern::prepare_error_message ( int a_iError )
+void HPattern::prepare_error_message ( int a_iError, char const * a_pcString )
 	{
 	M_PROLOG
-	unsigned int l_iSize = regerror ( a_iError, & f_sCompiled, NULL, 0 );
-	f_oError.hs_realloc ( static_cast < int > ( l_iSize + 1 ) );
-	M_ENSURE ( regerror ( a_iError, & f_sCompiled, f_oError, l_iSize ) < l_iSize );
+	int l_iSize = static_cast < int > ( regerror ( a_iError,
+				& f_sCompiled, NULL, 0 ) + 1 );
+	f_oError.hs_realloc ( l_iSize + 1 );
+	M_ENSURE ( static_cast < int > ( regerror ( a_iError,
+					& f_sCompiled, f_oError,
+					static_cast < size_t > ( l_iSize ) ) ) < l_iSize );
+	if ( a_pcString )
+		{
+		f_oError += ": `";
+		f_oError += a_pcString;
+		f_oError += "'";
+		}
 	return;
 	M_EPILOG
 	}

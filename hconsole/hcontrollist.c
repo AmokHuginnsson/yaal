@@ -46,7 +46,7 @@ HControlList::HControlList ( void )
 HControlList::~HControlList ( void )
 	{
 	M_PROLOG
-	flush ( ); /* see htree.h for explanation ! */
+	HList < HControl * >::flush ( ); /* see htree.h for explanation ! */
 	return;
 	M_EPILOG
 	}
@@ -70,7 +70,7 @@ HControl * HControlList::next_enabled ( char a_cShorcut )
 	HControl * l_poControlNew = NULL;
 	do
 		{
-		to_tail ( );
+		M_IRV ( to_tail ( ) );
 		l_poControlNew = f_poSelected->get_object ( );
 		l_bLoop = l_poControlNew->set_focus ( a_cShorcut );
 		if ( l_poControlOld == l_poControlNew )
@@ -79,8 +79,8 @@ HControl * HControlList::next_enabled ( char a_cShorcut )
 	while ( l_bLoop );
 	if ( l_poControlNew != l_poControlOld )
 		{
-		l_poControlOld->kill_focus ( );
-		l_poControlNew->set_focus ( -1 );
+		M_IRV ( l_poControlOld->kill_focus ( ) );
+		M_IRV ( l_poControlNew->set_focus ( - 1 ) );
 		}
 	return ( l_poControlNew );
 	M_EPILOG
@@ -98,12 +98,11 @@ void HControlList::select ( HControl * a_poControl )
 	while ( l_iCtr ++ < f_iQuantity )
 		if ( ( * to_tail ( ) ) == a_poControl )
 			{
-			to_head ( );
+			M_IRV ( to_head ( ) );
 			return;
 			}
 	f_poSelected = l_poElement;
 	M_THROW ( "bogus object", reinterpret_cast < int > ( a_poControl ) );
-	return;
 	M_EPILOG
 	}
 

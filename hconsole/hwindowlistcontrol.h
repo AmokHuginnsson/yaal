@@ -48,7 +48,7 @@ public:
 	virtual ~HWindowListControl ( void );
 	int process_input ( int );
 	void refresh ( void );
-	virtual HItem & add_tail ( HItem & );
+	virtual HItem & add_tail ( HItem * = NULL );
 	/*}*/
 protected:
 	/*{*/

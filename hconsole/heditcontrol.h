@@ -27,9 +27,7 @@ Copyright:
 #ifndef __HCONSOLE_HEDITCONTROL_H
 #define __HCONSOLE_HEDITCONTROL_H
 
-#include <sys/types.h>	/* why? - because POSIX says so :/ */
-#include <regex.h>			/* this one is obvious */
-
+#include "hcore/hpattern.h"
 #include "hcore/hstringlist.h"
 #include "hcontrol.h"
 
@@ -63,11 +61,11 @@ protected:
 																			 this variable keeps offset of first
 																			 character shown */
 	int					f_iMaxHistoryLevel;		/* how many instertions should history keep */
-	regex_t			f_sMask;							/* regular expression describing what
+	hcore::HPattern			f_oPattern;		/* regular expression describing what
 																			 characters and
 																			 in what way can be entered */
-	hcore::HString			f_oString;						/* control content */
-	hcore::HStringList f_oHistory; 					/* history of insertions */
+	hcore::HString			f_oString;		/* control content */
+	hcore::HStringList	f_oHistory; 	/* history of insertions */
 	/*}*/
 public:
 	/*{*/
@@ -96,7 +94,6 @@ public:
 	virtual hcore::HInfo get ( void );
 	void set_flags ( bool = false, bool = false );
 	virtual int process_input( int );
-	void set ( char const * );
 	virtual int click ( mouse::OMouse & );
 	/*}*/
 	};

@@ -132,11 +132,13 @@ void HException::print_error ( bool a_bFull ) const
 void HException::log ( char const * a_pcFileName,
 											 char const * a_pcFunctionName, int a_iLine )
 	{
-	size_t l_iLength = strlen ( a_pcFileName );
-	if ( f_iFrame && ! ( strcmp ( f_pcFileName, a_pcFileName ) || strcmp ( f_pcFunctionName, a_pcFunctionName ) ) )
+	size_t l_uiLength = strlen ( a_pcFileName );
+	if ( f_iFrame
+			&& ! ( strcmp ( f_pcFileName, a_pcFileName )
+				|| strcmp ( f_pcFunctionName, a_pcFunctionName ) ) )
 		return;
 	hcore::log ( "Exception frame %2d: %16s : %4d : %s\n", f_iFrame ++,
-			a_pcFileName + ( l_iLength > 16 ? l_iLength - 16 : 0 ),
+			a_pcFileName + ( l_uiLength > 16 ? l_uiLength - 16 : 0 ),
 			a_iLine, a_pcFunctionName );
 	return;
 	}

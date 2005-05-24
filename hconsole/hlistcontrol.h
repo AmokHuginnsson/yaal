@@ -120,9 +120,8 @@ public:
 										const int & = D_ALIGN_LEFT,		/* align */
 										const int & = D_TYPE_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
-	virtual HItem & add_tail ( void );
-	virtual HItem & add_tail ( HItem & );
-	virtual HItem & add_orderly ( HItem & );
+	virtual HItem & add_tail ( HItem * = NULL );
+	virtual HItem & add_orderly ( HItem &, int = D_ASCENDING );
 	virtual int remove_element ( int = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual int remove_tail ( int = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual bool is_searchable ( void );
@@ -131,7 +130,7 @@ public:
 protected:
 	/*{*/
 	int cmpc ( HElement *, HElement * );
-	void sort_by_contents ( int, int = D_ASCENDING );
+	void sort_by_column ( int, int = D_ASCENDING );
 	void recalculate_column_widths ( void );
 	virtual void go_to_match ( void );
 	virtual void go_to_match_previous ( void );

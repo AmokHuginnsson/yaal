@@ -144,7 +144,7 @@ public:
 	virtual tType & add_tail ( tType * = NULL );	/* adds new element at end of the list */
 	virtual tType & add_at ( int, tType * = NULL ); /* adds new element at specified 
 																						position */
-	virtual tType & add_orderly ( tType, int = D_ASCENDING ); /* adds element in
+	virtual tType & add_orderly ( tType &, int = D_ASCENDING ); /* adds element in
 																															 the way that
 																															 keeps order */
 	virtual int remove_element ( int = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
@@ -487,14 +487,14 @@ tType & HList< tType >::add_at ( int a_iIndex, tType * a_ptObject )
 	}
 
 template < class tType >
-tType & HList< tType >::add_orderly ( tType a_tObject, int a_iOrder )
+tType & HList< tType >::add_orderly ( tType & a_rtObject, int a_iOrder )
 	{
 	M_PROLOG
 #define M_SWITCH ( ( cmpc ( f_poIndex, l_poElement ) * a_iOrder ) < 0 )
 	bool l_bBefore = false;
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iQuantity;
 	HElement * l_poElement = new HElement ( NULL, f_iHighestNumber );
-	l_poElement->put ( a_tObject );
+	l_poElement->put ( a_rtObject );
 	while ( f_iQuantity && ( l_iOldIndex != l_iIndex ) )
 		{
 		l_iOldIndex = l_iIndex;

@@ -65,6 +65,7 @@ HListControl::HColumnInfo::HColumnInfo ( void )
 HListControl::HColumnInfo::~HColumnInfo ( void )
 	{
 	M_PROLOG
+	f_poControl = NULL;
 	return;
 	M_EPILOG
 	}
@@ -83,14 +84,18 @@ HListControl::HColumnInfo::HColumnInfo ( const HColumnInfo & a_roColumnInfo )
 HListControl::HColumnInfo & HListControl::HColumnInfo::operator = ( const HColumnInfo & a_roColumnInfo )
 	{
 	M_PROLOG
-	f_iWidthRaw = a_roColumnInfo.f_iWidthRaw;
-	f_iWidth = a_roColumnInfo.f_iWidth;
-	f_iType = a_roColumnInfo.f_iType;
-	f_iAlign = a_roColumnInfo.f_iAlign;
-	f_iShortcutIndex = a_roColumnInfo.f_iShortcutIndex;
-	f_cShortcut = a_roColumnInfo.f_cShortcut;
-	f_oName = a_roColumnInfo.f_oName;
-	f_poControl = a_roColumnInfo.f_poControl;
+	if ( this != & a_roColumnInfo )
+		{
+		f_bDescending = a_roColumnInfo.f_bDescending;
+		f_iWidthRaw = a_roColumnInfo.f_iWidthRaw;
+		f_iWidth = a_roColumnInfo.f_iWidth;
+		f_iType = a_roColumnInfo.f_iType;
+		f_iAlign = a_roColumnInfo.f_iAlign;
+		f_iShortcutIndex = a_roColumnInfo.f_iShortcutIndex;
+		f_cShortcut = a_roColumnInfo.f_cShortcut;
+		f_oName = a_roColumnInfo.f_oName;
+		f_poControl = a_roColumnInfo.f_poControl;
+		}
 	return ( * this );
 	M_EPILOG
 	}
@@ -527,7 +532,7 @@ int HListControl::process_input ( int a_iCode )
 			if ( l_iCtr < l_iErrorCode )
 				{
 				l_iErrorCode = 0;
-				sort_by_contents ( l_iCtr,
+				sort_by_column ( l_iCtr,
 						a_iCode == tolower ( a_iCode ) ? D_ASCENDING : D_DESCENDING );
 				l_poElement = f_poHook;
 				l_iOldPosition = 0;
@@ -587,19 +592,11 @@ void HListControl::add_column ( const int & a_riColumn, char const * a_pcName,
 	M_EPILOG
 	}
 
-HItem & HListControl::add_tail ( void )
-	{
-	M_PROLOG
-	HItem l_oDummy ( f_oHeader.quantity ( ) );
-	return ( add_tail ( l_oDummy ) );
-	M_EPILOG
-	}
-
-HItem & HListControl::add_tail ( HItem & a_roItem )
+HItem & HListControl::add_tail ( HItem * a_poItem )
 	{
 	M_PROLOG
 	HItem * l_poDummy = NULL;
-	l_poDummy = & HList < HItem > ::add_tail ( & a_roItem );
+	l_poDummy = & HList < HItem > ::add_tail ( a_poItem );
 	if ( f_iQuantity > f_iHeightRaw )
 		{
 		f_iCursorPosition = f_iHeightRaw - 1;
@@ -622,11 +619,11 @@ HItem & HListControl::add_tail ( HItem & a_roItem )
 	M_EPILOG
 	}
 
-HItem & HListControl::add_orderly ( HItem & a_roItem )
+HItem & HListControl::add_orderly ( HItem & a_roItem, int a_iOrder )
 	{
 	M_PROLOG
 	HItem * l_poDummy = NULL;
-	l_poDummy = & HList < HItem > ::add_orderly ( a_roItem );
+	l_poDummy = & HList < HItem > ::add_orderly ( a_roItem, a_iOrder );
 	f_iCursorPosition = 0;
 	f_iControlOffset = 0;
 	f_poFirstVisibleRow = f_poHook;
@@ -763,7 +760,7 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 	M_EPILOG
 	}
 
-void HListControl::sort_by_contents ( int a_iColumn, int a_iOrder )
+void HListControl::sort_by_column ( int a_iColumn, int a_iOrder )
 	{
 	M_PROLOG
 	if ( ! f_bSortable )
@@ -804,7 +801,7 @@ int HListControl::click ( mouse::OMouse & a_rsMouse )
 			l_iWidth += l_poColumnInfo->f_iWidthRaw;
 			if ( l_iColumn <= l_iWidth )
 				{
-				sort_by_contents ( l_iCtr,
+				sort_by_column ( l_iCtr,
 						l_poColumnInfo->f_bDescending ? D_ASCENDING : D_DESCENDING );
 				f_poFirstVisibleRow = f_poSelected = f_poHook;
 				f_iControlOffset = f_iCursorPosition = 0;
@@ -835,7 +832,7 @@ bool HListControl::is_searchable ( void )
 void HListControl::go_to_match ( void )
 	{
 	M_PROLOG
-	int l_iDummy = 0, l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
+	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
 	int l_iCount = f_iQuantity + 1, l_iColumns = f_oHeader.quantity ( );
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
@@ -854,8 +851,7 @@ void HListControl::go_to_match ( void )
 			{
 			l_pcHighlightStart = ( * l_poItem ) [ l_iCtr ].get < const HString & > ( );
 			l_iCtrLoc = 0;
-			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
-					l_iDummy ) ) )
+			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart ) ) )
 				{
 				if ( l_iCtrLoc > f_sMatch.f_iMatchNumber )
 					break;
@@ -915,7 +911,7 @@ void HListControl::go_to_match ( void )
 void HListControl::go_to_match_previous ( void )
 	{
 	M_PROLOG
-	int l_iDummy = 0, l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
+	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
 	int l_iCount = f_iQuantity + 1, l_iColumns = f_oHeader.quantity ( );
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
@@ -936,8 +932,7 @@ void HListControl::go_to_match_previous ( void )
 			l_iCtrLoc = 0;
 			if ( f_sMatch.f_iMatchNumber < 0 )
 				f_sMatch.f_iMatchNumber = f_oPattern.count ( l_pcHighlightStart );
-			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart,
-					l_iDummy ) ) )
+			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart ) ) )
 				{
 				if ( l_iCtrLoc == ( f_sMatch.f_iMatchNumber - 1 ) )
 					break;

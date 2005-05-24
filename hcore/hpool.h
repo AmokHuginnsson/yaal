@@ -60,7 +60,7 @@ class HPool
 private:
 	/*{*/
 	pool_type_t f_ePoolType;
-	size_t f_lPoolSize;	/* size of allocated memory buffer */
+	size_t f_ulPoolSize;	/* size of allocated memory buffer */
 	int f_iTop;
 	/*}*/
 protected:
@@ -86,13 +86,13 @@ private:
 #include "xalloc.h"
 
 template < class tType >
-HPool < tType >::HPool ( size_t a_lNewSize, pool_type_t a_ePoolType )
-	: f_ePoolType ( a_ePoolType ), f_lPoolSize ( 0 ), f_iTop ( 0 ),
+HPool < tType >::HPool ( size_t a_ulNewSize, pool_type_t a_ePoolType )
+	: f_ePoolType ( a_ePoolType ), f_ulPoolSize ( 0 ), f_iTop ( 0 ),
 	f_ptPool ( NULL )
 	{
 	M_PROLOG
-	if ( a_lNewSize )
-		pool_realloc ( a_lNewSize );
+	if ( a_ulNewSize )
+		pool_realloc ( a_ulNewSize );
 	return;
 	M_EPILOG
 	}
@@ -103,38 +103,38 @@ HPool < tType >::~HPool ( void )
 	M_PROLOG
 	if ( f_ptPool )
 		xfree ( f_ptPool );
-	f_lPoolSize = 0;
+	f_ulPoolSize = 0;
 	return;
 	M_EPILOG
 	}
 
 template < class tType >
-size_t HPool < tType >::pool_realloc ( const size_t a_lNewSize )
+size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 	{
 	M_PROLOG
-	size_t l_lOldSize = f_lPoolSize;
-	if ( a_lNewSize < 1 )
-		M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_BADSIZE ], a_lNewSize );
+	size_t l_ulOldSize = f_ulPoolSize;
+	if ( a_ulNewSize < 1 )
+		M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_BADSIZE ], a_ulNewSize );
 	if ( f_ePoolType == D_HPOOL_AUTO_GROW )
 		{
-		if ( a_lNewSize > f_lPoolSize )
+		if ( a_ulNewSize > f_ulPoolSize )
 			{
-			f_lPoolSize = 1;
-			while ( f_lPoolSize < a_lNewSize )
-				f_lPoolSize <<= 1;
-			f_ptPool = xrealloc ( f_ptPool, f_lPoolSize, tType );
-			memset ( f_ptPool + l_lOldSize, 0,
-					( f_lPoolSize - l_lOldSize ) * sizeof ( tType ) );
+			f_ulPoolSize = 1;
+			while ( f_ulPoolSize < a_ulNewSize )
+				f_ulPoolSize <<= 1;
+			f_ptPool = xrealloc ( f_ptPool, f_ulPoolSize, tType );
+			memset ( f_ptPool + l_ulOldSize, 0,
+					( f_ulPoolSize - l_ulOldSize ) * sizeof ( tType ) );
 			}
 		}
-	else if ( f_lPoolSize != a_lNewSize )
+	else if ( f_ulPoolSize != a_ulNewSize )
 		{
 		if ( f_ptPool && ( f_ePoolType == D_HPOOL_FIXED_SIZE ) )
-			M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_REALLOC_FIXED ], f_lPoolSize );
-		f_lPoolSize = a_lNewSize;
-		f_ptPool = xrealloc ( f_ptPool, f_lPoolSize, tType );
+			M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_REALLOC_FIXED ], f_ulPoolSize );
+		f_ulPoolSize = a_ulNewSize;
+		f_ptPool = xrealloc ( f_ptPool, f_ulPoolSize, tType );
 		}
-	return ( f_lPoolSize - l_lOldSize );
+	return ( f_ulPoolSize - l_ulOldSize );
 	M_EPILOG
 	}
 
@@ -142,7 +142,7 @@ template < class tType >
 tType & HPool < tType >::operator [ ] ( int a_iIndex )
 	{
 	M_PROLOG
-	if ( ( a_iIndex < 0 ) || ( static_cast < size_t > ( a_iIndex ) >= f_lPoolSize ) )
+	if ( ( a_iIndex < 0 ) || ( static_cast < size_t > ( a_iIndex ) >= f_ulPoolSize ) )
 		M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_BADINDEX ], a_iIndex );
 	return ( f_ptPool [ a_iIndex ] );
 	M_EPILOG

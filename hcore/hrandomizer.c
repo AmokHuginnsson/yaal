@@ -37,7 +37,7 @@ namespace stdhapi
 namespace hcore
 {
 
-HRandomizer::HRandomizer( unsigned long int a_ulSeed ) : f_lSeed ( a_ulSeed )
+HRandomizer::HRandomizer( unsigned long int a_ulSeed ) : f_ulSeed ( a_ulSeed )
 	{
 	M_PROLOG
 	return;
@@ -47,7 +47,7 @@ HRandomizer::HRandomizer( unsigned long int a_ulSeed ) : f_lSeed ( a_ulSeed )
 void HRandomizer::set( unsigned long int a_ulVal )
 	{
 	M_PROLOG
-	f_lSeed = a_ulVal;
+	f_ulSeed = a_ulVal;
 	return ;
 	M_EPILOG
 	}
@@ -55,8 +55,8 @@ void HRandomizer::set( unsigned long int a_ulVal )
 int HRandomizer::rnd( void )
 	{
 	M_PROLOG
-	f_lSeed = MULTIPLIER * f_lSeed + INCREMENT;
-	return ( static_cast < int > ( ( f_lSeed >> 16 ) & 0x7fff ) );
+	f_ulSeed = MULTIPLIER * f_ulSeed + INCREMENT;
+	return ( static_cast < int > ( ( f_ulSeed >> 16 ) & 0x7fff ) );
 	M_EPILOG
 	}
 
