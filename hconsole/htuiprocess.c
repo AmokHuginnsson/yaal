@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <unistd.h>
+#include <string.h>
 
 #include "config.h"
 
@@ -66,6 +67,8 @@ HProcess::HProcess ( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
 	f_poWindows ( NULL ), f_oFileDescriptorHandlers ( a_uiFileHandlers )
 	{
 	M_PROLOG
+	memset ( & f_sLatency, 0, sizeof ( f_sLatency ) );
+	FD_ZERO ( & f_xFileDescriptorSet );
 	return;
 	M_EPILOG
 	}
@@ -97,10 +100,10 @@ int HProcess::init ( char const * a_pcProcessName )
 				g_iErrNo );
 	f_bInitialised = true;
 	l_poMainWindow = new HMainWindow ( );
-	l_poMainWindow->init ( );
+	M_IRV ( l_poMainWindow->init ( ) );
 	f_poWindows = l_poMainWindow->_disclose_window_list ( );
-	add_window ( l_poMainWindow, a_pcProcessName );
-	register_file_descriptor_handler ( STDIN_FILENO, & HProcess::process_stdin );
+	M_IRV ( add_window ( l_poMainWindow, a_pcProcessName ) );
+	M_IRV ( register_file_descriptor_handler ( STDIN_FILENO, & HProcess::process_stdin ) );
 	if ( n_bUseMouse && n_iMouseDes )
 		register_file_descriptor_handler ( n_iMouseDes,
 				& HProcess::process_mouse );
@@ -241,7 +244,8 @@ int HProcess::process_stdin ( int a_iCode )
 	::refresh ( );\
 	}\
 
-#define M_STDHAPI_TEMP_FAILURE_RETRY(expression)	(__extension__ ( \
+#ifdef __GNUC__
+#	define M_STDHAPI_TEMP_FAILURE_RETRY( expression )	(__extension__ ( \
 	{ long int __result; \
 	do \
 		{ \
@@ -255,6 +259,9 @@ int HProcess::process_stdin ( int a_iCode )
 	while (__result == -1L && errno == EINTR); \
 	__result; \
 	}))
+#else /* __GNUC__ */
+#	define M_STDHAPI_TEMP_FAILURE_RETRY( expression ) ( expression )
+#endif /* not __GNUC__ */
 
 int HProcess::run ( void )
 	{
@@ -280,7 +287,7 @@ int HProcess::run ( void )
 				{
 				if ( FD_ISSET ( l_iFileDes, & f_xFileDescriptorSet ) )
 					{
-					( this->*HANDLER ) ( l_iFileDes );
+					M_IRV ( ( this->*HANDLER ) ( l_iFileDes ) );
 					f_iIdleCycles = 0;
 					}
 				}
@@ -331,7 +338,7 @@ int HProcess::handler_mouse ( int a_iCode, void * )
 	M_PROLOG
 	a_iCode = 0;
 	mouse::OMouse l_sMouse;
-	mouse::mouse_get ( l_sMouse );
+	M_IRV ( mouse::mouse_get ( l_sMouse ) );
 #ifdef __DEBUGGER_BABUNI__
 	c_printf ( 0, 0,	D_FG_BLACK | D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );

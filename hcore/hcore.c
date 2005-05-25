@@ -49,6 +49,15 @@ OVariable n_psHCoreVariables [ ] =
 		{ 0, NULL, NULL }
 	};
 
+/* mathematical macros */
+#define D_EPSILON	0.000001
+bool eq ( double const & a_dLeft, double const & a_dRight )
+	{
+	return ( ( ( ( ( a_dLeft ) > ( a_dRight ) )
+					? ( ( a_dLeft ) - ( a_dRight ) )
+					: ( ( a_dRight ) - ( a_dLeft ) ) ) < D_EPSILON ) );
+	}
+
 bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	M_PROLOG

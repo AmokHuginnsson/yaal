@@ -64,12 +64,12 @@ int HMenuControl::HMenuNode::load_sub_menu ( OMenuItem * a_psSubMenu )
 	while ( a_psSubMenu [ l_iCtr ].f_pcLabel )
 		{
 		l_poNode = new HMenuNode ( this );
-		l_oInfo ( a_psSubMenu [ l_iCtr ].f_pcLabel );
-		l_oInfo ( static_cast < void * > ( & a_psSubMenu [ l_iCtr ] ) );
+		M_IRV ( l_oInfo ( a_psSubMenu [ l_iCtr ].f_pcLabel ) );
+		M_IRV ( l_oInfo ( static_cast < void * > ( & a_psSubMenu [ l_iCtr ] ) ) );
 		l_poNode->f_tLeaf [ 0 ] = l_oInfo;
-		f_oBranch.add_tail ( reinterpret_cast < HTree < HItem >::HNode * * > ( & l_poNode ) );
+		M_IRV ( f_oBranch.add_tail ( reinterpret_cast < HTree < HItem >::HNode * * > ( & l_poNode ) ) );
 		if ( a_psSubMenu [ l_iCtr ].f_psSubMenu )
-			l_poNode->load_sub_menu ( a_psSubMenu [ l_iCtr ].f_psSubMenu );
+			M_IRV ( l_poNode->load_sub_menu ( a_psSubMenu [ l_iCtr ].f_psSubMenu ) );
 		l_iCtr ++;
 		}
 	return ( l_iCtr );
@@ -92,6 +92,7 @@ HMenuControl::HMenuControl ( HWindow * a_poParent,
 HMenuControl::~HMenuControl ( void )
 	{
 	M_PROLOG
+	f_poProcess = NULL;
 	return;
 	M_EPILOG
 	}
@@ -107,15 +108,12 @@ void HMenuControl::init ( HProcess * a_poProcess, OMenuItem * a_psMenu )
 		M_THROW ( "process can not run without core data ( process, menu )",
 				g_iErrNo );
 	f_poProcess = a_poProcess;
-	if ( a_psMenu )
-		{
-		f_poRoot = l_poNode = new HMenuControl::HMenuNode ( 0 );
-		f_poRoot->get_object ( ) = l_oDummy;
-		l_poNode->load_sub_menu ( a_psMenu );
-		if ( ! f_poSelected && l_poNode->f_oBranch.quantity ( ) )
-			f_poSelected = l_poNode->f_oBranch [ 0 ];
-		refresh ( );
-		}
+	f_poRoot = l_poNode = new HMenuControl::HMenuNode ( 0 );
+	f_poRoot->get_object ( ) = l_oDummy;
+	M_IRV ( l_poNode->load_sub_menu ( a_psMenu ) );
+	if ( ! f_poSelected && l_poNode->f_oBranch.quantity ( ) )
+		f_poSelected = l_poNode->f_oBranch [ 0 ];
+	refresh ( );
 	return;
 	M_EPILOG
 	}
@@ -127,9 +125,11 @@ int HMenuControl::process_input( int a_iCode )
 	a_iCode = HTreeControl::process_input ( a_iCode );
 	if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
 		{
-		l_psMenu = static_cast < OMenuItem * > ( static_cast < HMenuNode * > ( f_poSelected )->f_tLeaf [ 0 ].get < void * > ( ) );
+		HMenuNode * l_poNode = dynamic_cast < HMenuNode * > ( f_poSelected );
+		M_ASSERT ( l_poNode );
+		l_psMenu = static_cast < OMenuItem * > ( l_poNode->f_tLeaf [ 0 ].get < void * > ( ) );
 		if ( l_psMenu->HANDLER )
-			( f_poProcess->* ( l_psMenu->HANDLER ) )( );
+			M_IRV ( ( f_poProcess->* ( l_psMenu->HANDLER ) ) ( ) );
 		a_iCode = 0;
 		}
 	return ( a_iCode );

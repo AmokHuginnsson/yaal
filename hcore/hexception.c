@@ -159,7 +159,7 @@ void HException::dump_call_stack ( int )
 	l_iSize = backtrace ( l_ppvPointer, 1000 );
 	l_ppcStrings = backtrace_symbols  ( l_ppvPointer, l_iSize );
 
-	hcore::log << "Obtained " << static_cast < int > ( l_iSize ) << " stack frames." << endl;
+	hcore::log << "Obtained " << l_iSize << " stack frames." << endl;
 	if ( a_iLevel < l_iSize )
 		l_iSize = a_iLevel;
 	for  ( l_iCtr = 0; l_iCtr < l_iSize; l_iCtr ++ )

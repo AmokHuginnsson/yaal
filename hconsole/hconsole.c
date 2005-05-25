@@ -91,14 +91,14 @@ OVariable n_psVariables [ ] =
 
 void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )
 	{
-	unsigned int l_uiMask = 0x000f;
+	int l_uiMask = 0x000f;
 	if ( a_iWhat )
 		{
 		a_iWhat <<= 2;
 		a_iBits <<= a_iWhat;
 		l_uiMask <<= a_iWhat;
 		}
-	a_riWord &= static_cast < int > ( ~ l_uiMask );
+	a_riWord &= ~ l_uiMask;
 	a_riWord |= a_iBits;
 	return;
 	}

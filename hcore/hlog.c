@@ -62,7 +62,7 @@ HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 	M_PROLOG
 	uid_t l_iUid = 0;
 	passwd * l_psPasswd = NULL;
-	f_pcBuffer = xcalloc ( static_cast < int > ( f_iBufferSize ), char );
+	f_pcBuffer = xcalloc ( f_iBufferSize, char );
 	f_pcHostName = xcalloc ( D_HOSTNAME_SIZE, char );
 	f_psStream = tmpfile ( );
 	if ( ! f_psStream )
@@ -190,8 +190,8 @@ void HLog::timestamp ( FILE * a_psStream )
 	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
-	l_iSize = static_cast < int > ( strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
-			l_psBrokenTime ) );
+	l_iSize = strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
+			l_psBrokenTime );
 	if ( l_iSize > D_TIMESTAMP_SIZE )
 		M_THROW ( _ ( "strftime returned more than D_TIMESTAMP_SIZE" ), l_iSize );
 	if ( f_pcProcessName )

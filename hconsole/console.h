@@ -116,6 +116,7 @@ unsigned char get_attr( void );
 void clrscr( void );
 bool is_enabled ( void );
 int wait_for_user_input ( int &, mouse::OMouse &, int = 0, int = 0 );
+void bell ( void );
 
 extern bool n_bNeedRepaint;
 extern bool n_bInputWaiting;

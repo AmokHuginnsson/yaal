@@ -30,11 +30,11 @@ Copyright:
 extern "C"
 {
 
-#define xmalloc( size, type ) static_cast < type * > ( xmalloc_internal ( static_cast < long int > ( size ) * static_cast < int > ( sizeof ( type ) ) ) )
+#define xmalloc( size, type ) static_cast < type * > ( xmalloc_internal ( ( size ) * sizeof ( type ) ) )
 void * xmalloc_internal ( const long int );
-#define xcalloc( size, type ) static_cast < type * > ( xcalloc_internal ( static_cast < long int > ( size ) * static_cast < int > ( sizeof ( type ) ) ) )
+#define xcalloc( size, type ) static_cast < type * > ( xcalloc_internal ( ( size ) * sizeof ( type ) ) )
 void * xcalloc_internal ( const long int );
-#define xrealloc( pointer, size, type ) static_cast < type * > ( xrealloc_internal ( pointer, static_cast < long int > ( size ) * static_cast < int > ( sizeof ( type ) ) ) )
+#define xrealloc( pointer, size, type ) static_cast < type * > ( xrealloc_internal ( pointer, ( size ) * sizeof ( type ) ) )
 void * xrealloc_internal ( void *, const long int );
 #define xfree( ptr ) xfree_internal ( reinterpret_cast < void * * > ( & ptr ) )
 void xfree_internal ( void * * );

@@ -60,7 +60,7 @@ protected:
 	/*{*/
 	void _des ( uc_t * /* block */, int /* side */, int /* part */ );
 	void _3des ( uc_t * /* block */, int /* side */ );
-	void permutate ( uc_t * /* buffer */, const uc_t * /* tab */, int /* len */ );
+	void permutate ( uc_t * /* buffer */, const uc_t * /* tab */, int /* len */ ) const;
 	/*}*/
 	};
 

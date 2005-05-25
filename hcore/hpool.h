@@ -73,7 +73,7 @@ public:
 	virtual ~HPool ( void );
 	size_t pool_realloc ( size_t );
 	tType & operator [ ] ( int );
-	tType & add ( tType & );
+	tType & add ( tType const & );
 	void reset ( void );
 	/*}*/
 private:
@@ -149,7 +149,7 @@ tType & HPool < tType >::operator [ ] ( int a_iIndex )
 	}
 
 template < class tType >
-tType & HPool < tType>::add ( tType & a_tPod )
+tType & HPool < tType>::add ( tType const & a_tPod )
 	{
 	M_PROLOG
 	pool_realloc ( f_iTop + 1 );

@@ -52,8 +52,8 @@ HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 HWindowListControl::~HWindowListControl ( void )
 	{
 	M_PROLOG
-	remove_tail ( D_FORCE_REMOVE_ELEMENT );
-	flush ( ); /* see htree.h for explanation ! */
+	HWindowListControl::remove_tail ( D_FORCE_REMOVE_ELEMENT );
+	HWindowListControl::flush ( ); /* see htree.h for explanation ! */
 	return;
 	M_EPILOG
 	}

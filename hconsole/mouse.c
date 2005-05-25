@@ -163,7 +163,7 @@ int console_mouse_open ( void )
 	l_sGpm.maxMod = 0;
 	l_sGpm.pid = ::getpid ( );
 	l_sGpm.vc = l_iVC = hunt_tty ( 0 );
-	l_sGpm.eventMask = GPM_SINGLE | GPM_UP;
+	l_sGpm.eventMask = static_cast < int > ( GPM_UP );
 	l_sGpm.defaultMask = ~ l_sGpm.eventMask;
 	gpm_zerobased = true;
 	if ( Gpm_Open ( & l_sGpm, l_iVC ) == -1 )
@@ -193,7 +193,8 @@ int console_mouse_get ( OMouse & a_rsMouse )
 int console_mouse_close ( void )
 	{
 	M_PROLOG
-	while ( Gpm_Close ( ) );
+	while ( Gpm_Close ( ) )
+		;
 	return ( 0 );
 	M_EPILOG
 	}

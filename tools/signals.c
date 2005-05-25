@@ -97,7 +97,8 @@ HSigStackWrapper::~HSigStackWrapper ( void )
 	{
 	if ( f_sStack.ss_sp )
 		{
-		while ( f_sStack.ss_flags ); /* we wait til last signal returns */
+		while ( f_sStack.ss_flags )
+			; /* we wait til last signal returns */
 		xfree ( f_sStack.ss_sp );
 		f_sStack.ss_sp = NULL;
 		}

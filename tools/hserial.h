@@ -56,7 +56,7 @@ public:
 	virtual ~HSerial ( void );
 	bool open ( void );
 	int read ( char *, int );
-	int close ( void );
+	virtual int close ( void );
 	int write ( char const *, int );
 	void flush ( int );
 	void wait_for_eot ( void );

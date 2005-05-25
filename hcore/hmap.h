@@ -127,7 +127,7 @@ HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( a_uiSize ), f_uiInde
 	M_PROLOG
 	unsigned int l_uiCtr = 0;
 	if ( a_uiSize < 1 )
-		M_THROW ( "bad map size", static_cast < int > ( a_uiSize ) );
+		M_THROW ( "bad map size", a_uiSize );
 	while ( a_uiSize )
 		{
 		a_uiSize >>= 1;
@@ -186,9 +186,9 @@ template < class tType, class ttType >
 ttType & HMap<tType, ttType>::operator [ ] ( const tType & a_rtKey )
 	{
 	M_PROLOG
-	int l_iHash = -1;
+	int l_iHash = - 1;
 	HAtom * l_poAtom = NULL;
-	l_iHash = static_cast < int > ( hash ( a_rtKey ) % f_uiPrime );
+	l_iHash = hash ( a_rtKey ) % f_uiPrime;
 #ifdef __DEBUGGER_BABUNI__
 	HString l_oMessage;
 	l_oMessage.format ( "hash = %d", l_iHash );
@@ -253,7 +253,7 @@ bool HMap<tType, ttType>::has_key ( const tType & a_rtKey ) const
 	M_PROLOG
 	int l_iHash = - 1;
 	HAtom * l_poAtom = NULL;
-	l_iHash = static_cast < int > ( hash ( a_rtKey ) % f_uiPrime );
+	l_iHash = hash ( a_rtKey ) % f_uiPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
 	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		l_poAtom = l_poAtom->f_poNext;
@@ -267,7 +267,7 @@ bool HMap<tType, ttType>::get ( const tType & a_rtKey, ttType & a_rtValue ) cons
 	M_PROLOG
 	int l_iHash = - 1;
 	HAtom * l_poAtom = NULL;
-	l_iHash = static_cast < int > ( hash ( a_rtKey ) % f_uiPrime );
+	l_iHash = hash ( a_rtKey ) % f_uiPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
 	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		l_poAtom = l_poAtom->f_poNext;
@@ -283,7 +283,7 @@ bool HMap<tType, ttType>::remove ( const tType & a_rtKey )
 	M_PROLOG
 	int l_iHash = - 1;
 	HAtom * l_poAtom = NULL, * l_poAncestor = NULL;
-	l_iHash = static_cast < int > ( hash ( a_rtKey ) % f_uiPrime );
+	l_iHash = hash ( a_rtKey ) % f_uiPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
 	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		{

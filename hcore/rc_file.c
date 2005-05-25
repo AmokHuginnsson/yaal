@@ -163,14 +163,14 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 		int & a_riLine )
 	{
 	M_PROLOG
-	static size_t	l_iBlockSize = 256; /* size of buffer allocated to read line */
+	static size_t	l_uiBlockSize = 256; /* size of buffer allocated to read line */
 	static char * l_pcBuffer = 0; /* buffer for read lines */
 	int l_iIndex = 0, l_iLenght = 0, l_iSub = 0;
 	char * l_pcPtr = NULL;
 #ifndef HAVE_GETLINE /* if we do not have getline we need to simulate its beh */
 	int l_iReadLen = 0;
 	if ( ! l_pcBuffer )
-		l_iBlockSize = 256;
+		l_uiBlockSize = 256;
 #endif /* not HAVE_GETLINE */
 	if ( ! a_psFile ) /* the file is closed, we can deallocate allocated memory */
 		{
@@ -178,17 +178,17 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 			{
 			xfree ( l_pcBuffer );
 			l_pcBuffer = 0;
-			l_iBlockSize = 0;
+			l_uiBlockSize = 0;
 			}
 		return ( 0 );
 		}
 	if ( ! l_pcBuffer )
-		l_pcBuffer = xcalloc ( l_iBlockSize, char );
+		l_pcBuffer = xcalloc ( l_uiBlockSize, char );
 	a_roOption = a_roValue = "";
 #ifdef HAVE_GETLINE
-	while ( getline ( &l_pcBuffer, &l_iBlockSize, a_psFile ) > 0 )
+	while ( getline ( &l_pcBuffer, &l_uiBlockSize, a_psFile ) > 0 )
 #else /* HAVE_GETLINE */
-	while ( ( l_iReadLen = fread ( l_pcBuffer, sizeof ( char ), l_iBlockSize, a_psFile ) ) )
+	while ( ( l_iReadLen = fread ( l_pcBuffer, sizeof ( char ), l_uiBlockSize, a_psFile ) ) )
 #endif /* not HAVE_GETLINE */
 		{
 		a_riLine ++;
@@ -201,7 +201,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 		fseek ( a_psFile, l_pcPtr - l_pcBuffer - l_iReadLen, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
 		/* we are looking for first non-whitespace on the line */
-		for ( l_iIndex = 0; l_iIndex < static_cast < int > ( l_iBlockSize - 1 ); l_iIndex++ )
+		for ( l_iIndex = 0; l_iIndex < static_cast < int > ( l_uiBlockSize - 1 ); l_iIndex++ )
 			{
 			if ( ( l_pcBuffer [ l_iIndex ] == ' ')
 					|| ( l_pcBuffer [ l_iIndex ] == '\t' ) )continue;
@@ -214,7 +214,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 				break;
 				}
 			}
-		if ( ( l_iIndex > -1 ) && ( l_iIndex < static_cast < int > ( l_iBlockSize - 1 ) ) )
+		if ( ( l_iIndex > -1 ) && ( l_iIndex < static_cast < int > ( l_uiBlockSize - 1 ) ) )
 			{
 			/* at this point we know we have _some_ option */
 			/* now we look for first whitespace after option */
@@ -223,7 +223,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 				{
 				/* we did not found any whitespace, so we have no value at this line */
 				l_iSub = l_iIndex;
-				l_iLenght = static_cast < int > ( strlen ( l_pcBuffer ) ) - 1;
+				l_iLenght = strlen ( l_pcBuffer ) - 1;
 				/* strip comment from end of line */
 				if ( ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) ) )
 					l_iLenght = ( l_pcPtr - l_pcBuffer ) - 1;
@@ -245,7 +245,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 				a_roOption = l_pcBuffer + l_iIndex;
 				l_pcBuffer [ l_iSub ] = ' ';
 				for ( l_iIndex = l_iSub;
-						l_iIndex < static_cast < int > ( l_iBlockSize - 1 );
+						l_iIndex < static_cast < int > ( l_uiBlockSize - 1 );
 						l_iIndex++ )
 					{
 					if ( ( l_pcBuffer [ l_iIndex ] == ' ')
@@ -258,11 +258,11 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
 						break;
 						}
 					}
-				if ( ( l_iIndex > - 1 ) && ( l_iIndex < static_cast < int > ( l_iBlockSize - 1 ) ) )
+				if ( ( l_iIndex > - 1 ) && ( l_iIndex < static_cast < int > ( l_uiBlockSize - 1 ) ) )
 					{
 					/* we have found a non-whitespace, so there certainly is a value */
 					l_iSub = l_iIndex;
-					l_iLenght = static_cast < int > ( strlen ( l_pcBuffer ) ) - 1;
+					l_iLenght = strlen ( l_pcBuffer ) - 1;
 					/* strip comment from end of line */
 					if ( ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) ) )
 						l_iLenght = ( l_pcPtr - l_pcBuffer ) - 1;

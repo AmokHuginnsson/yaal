@@ -43,6 +43,7 @@ HPattern::HPattern ( bool a_bIgnoreCase ) : f_bInitialized ( false ),
 	f_oPatternInput ( ), f_oPatternReal ( ), f_oError ( )
 	{
 	M_PROLOG
+	memset ( & f_sCompiled, 0, sizeof ( f_sCompiled ) );
 	return;
 	M_EPILOG
 	}
@@ -243,12 +244,10 @@ int HPattern::count ( char const * a_pcString )
 void HPattern::prepare_error_message ( int a_iError, char const * a_pcString )
 	{
 	M_PROLOG
-	int l_iSize = static_cast < int > ( regerror ( a_iError,
-				& f_sCompiled, NULL, 0 ) + 1 );
+	int l_iSize = regerror ( a_iError, & f_sCompiled, NULL, 0 ) + 1;
 	f_oError.hs_realloc ( l_iSize + 1 );
-	M_ENSURE ( static_cast < int > ( regerror ( a_iError,
-					& f_sCompiled, f_oError,
-					static_cast < size_t > ( l_iSize ) ) ) < l_iSize );
+	M_ENSURE ( static_cast < int > ( regerror ( a_iError, & f_sCompiled,
+					f_oError, l_iSize ) ) < l_iSize );
 	if ( a_pcString )
 		{
 		f_oError += ": `";

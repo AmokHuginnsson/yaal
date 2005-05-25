@@ -31,6 +31,8 @@ M_CVSID ( "$CVSHeader$" );
 #include "hdes.h"
 #include "bit.h"
 
+using namespace stdhapi::hcore;
+
 namespace stdhapi
 {
 
@@ -64,8 +66,10 @@ HDes::HDes ( void )
 
 HDes::~HDes ( void )
 	{
+	M_PROLOG
 	flush_keys ( );
 	return;
+	M_EPILOG
 	}
 
 void HDes::generate_keys ( uc_t * a_pcPassword )
@@ -175,7 +179,7 @@ void HDes::_des ( uc_t * a_pcBlock, int a_iSide, int a_iPart )
 	return;
 	}
 
-void HDes::permutate ( uc_t * a_pcBuffer, const uc_t * a_pcTab, int a_iLen )
+void HDes::permutate ( uc_t * a_pcBuffer, const uc_t * a_pcTab, int a_iLen ) const
 	{
 	int l_iCtr = 0;
 	uc_t l_pcBufTmp [ D_DES_BLOCK_SIZE ];

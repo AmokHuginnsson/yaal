@@ -428,6 +428,14 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 	return ( l_iEventType );
 	}
 
+void bell ( void )
+	{
+	M_PROLOG
+	M_ENSURE ( putchar ( '\a' ) == '\a' );
+	return;
+	M_EPILOG
+	}
+
 }
 
 }

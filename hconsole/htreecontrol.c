@@ -68,9 +68,14 @@ HTreeControl::HNodeControl::~HNodeControl ( void )
 void HTreeControl::HNodeControl::expand ( void )
 	{
 	M_PROLOG
+	HNodeControl * l_poNode = NULL;
 	f_bUnfolded = true;
 	if ( f_poTrunk )
-		static_cast < HTreeControl::HNodeControl * > ( f_poTrunk )->expand ( );
+		{
+		l_poNode = dynamic_cast < HTreeControl::HNodeControl * > ( f_poTrunk );
+		M_ASSERT ( l_poNode );
+		l_poNode->expand ( );
+		}
 	return;
 	M_EPILOG
 	}
@@ -89,7 +94,7 @@ void HTreeControl::HNodeControl::collapse ( void )
 	M_EPILOG
 	}
 
-bool HTreeControl::HNodeControl::hit_test ( int a_iRow, int a_iColumn )
+bool HTreeControl::HNodeControl::hit_test ( int a_iRow, int a_iColumn ) const
 	{
 	M_PROLOG
 	if ( f_iRowRaw == a_iRow )
@@ -122,7 +127,7 @@ HTreeControl::HTreeControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 								a_iEnabledAttribute, a_iFocusedAttribute )
 	{
 	M_PROLOG
-	refresh ( );
+	HTreeControl::refresh ( );
 	return;
 	M_EPILOG
 	}
@@ -147,7 +152,7 @@ void HTreeControl::refresh ( void )
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		::mvprintw ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
 	if ( f_poRoot )
-		draw_node ( static_cast < HNodeControl * > ( f_poRoot ), f_iRowRaw );
+		draw_node ( dynamic_cast < HNodeControl * > ( f_poRoot ), f_iRowRaw );
 	return;
 	M_EPILOG
 	}
@@ -159,6 +164,7 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 	int l_iRow = a_iRow;
 	HString const * l_poString = NULL;
 	HInfo * l_poInfo = NULL;
+	M_ASSERT ( a_poNode );
 	l_iCtr = a_poNode->f_oBranch.quantity ( );
 	if ( a_poNode->f_tLeaf )
 		{
@@ -182,7 +188,7 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		{
 		a_poNode->f_oBranch.go ( 0 );
 		while ( l_iCtr -- )
-			l_iRow = draw_node ( static_cast < HNodeControl * > ( * a_poNode->f_oBranch.to_tail ( ) ),
+			l_iRow = draw_node ( dynamic_cast < HNodeControl * > ( * a_poNode->f_oBranch.to_tail ( ) ),
 					l_iRow );
 		}
 	return ( l_iRow );
@@ -195,19 +201,19 @@ int HTreeControl::process_input ( int a_iCode )
 	int l_iErrorCode = 0;
 	HNodeControl * l_poNode = NULL;
 	a_iCode = HControl::process_input ( a_iCode );
-	l_poNode = static_cast < HNodeControl * > ( f_poSelected );
+	l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
 	switch ( a_iCode )
 		{
 		case ( KEY_HOME ):
 			{
-			l_poNode = static_cast < HNodeControl * > ( f_poRoot );
+			l_poNode = dynamic_cast < HNodeControl * > ( f_poRoot );
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				f_poSelected = l_poNode->f_oBranch [ 0 ];
 			break;
 			}
 		case ( KEY_END ):
 			{
-			l_poNode = static_cast < HNodeControl * > ( f_poRoot );
+			l_poNode = dynamic_cast < HNodeControl * > ( f_poRoot );
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				f_poSelected = l_poNode->f_oBranch [ -1 ];
 			break;
@@ -230,15 +236,15 @@ int HTreeControl::process_input ( int a_iCode )
 				}
 			else
 				{
-				l_poNode = static_cast < HNodeControl * > ( f_poSelected );
+				l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
 				while ( l_poNode->f_bUnfolded )
 					{
 					if ( l_poNode->f_oBranch.quantity ( ) )
 						{
 						f_poSelected = l_poNode->f_oBranch [ 0 ];
-						l_poNode = static_cast < HNodeControl * > ( f_poSelected );
+						l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
 						f_poSelected = l_poNode->previous ( D_TREAT_AS_CLOSED );
-						l_poNode = static_cast < HNodeControl * > ( f_poSelected );
+						l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
 						}
 					}
 				}
@@ -257,8 +263,8 @@ int HTreeControl::process_input ( int a_iCode )
 				while ( l_poNode->f_iLevel > 1 )
 					if ( f_poSelected == l_poNode ) 
 						{
-						f_poSelected = static_cast < HNodeControl * > ( l_poNode->f_poTrunk )->next ( );
-						l_poNode = static_cast < HNodeControl * > (f_poSelected );
+						f_poSelected = dynamic_cast < HNodeControl * > ( l_poNode->f_poTrunk )->next ( );
+						l_poNode = dynamic_cast < HNodeControl * > (f_poSelected );
 						}
 					else
 						break;
@@ -291,8 +297,8 @@ int HTreeControl::process_input ( int a_iCode )
 				while ( l_poNode->f_iLevel > 1 )
 					if ( f_poSelected == l_poNode ) 
 						{
-						f_poSelected = static_cast < HNodeControl * > ( l_poNode->f_poTrunk )->next ( );
-						l_poNode = static_cast < HNodeControl * > (f_poSelected );
+						f_poSelected = dynamic_cast < HNodeControl * > ( l_poNode->f_poTrunk )->next ( );
+						l_poNode = dynamic_cast < HNodeControl * > (f_poSelected );
 						}
 					else
 						break;
@@ -313,6 +319,7 @@ int HTreeControl::process_input ( int a_iCode )
 			f_bFocused = false;	/* very  */
 			refresh ( );				/* magic */
 			}
+		/* no break on purpouse, see hlistcontrol.c */
 		default :
 			{
 			l_iErrorCode = a_iCode;
@@ -341,7 +348,7 @@ int HTreeControl::click ( OMouse & a_rsMouse )
 	M_PROLOG
 	if ( ! HControl::click ( a_rsMouse ) )
 		return ( 1 );
-	if ( do_click ( static_cast < HNodeControl * > ( f_poRoot ), a_rsMouse ) )
+	if ( do_click ( dynamic_cast < HNodeControl * > ( f_poRoot ), a_rsMouse ) )
 		refresh ( );
 	return ( 0 );
 	M_EPILOG
@@ -362,7 +369,7 @@ bool HTreeControl::do_click ( HNodeControl * a_poNode, OMouse & a_rsMouse )
 		{
 		a_poNode->f_oBranch.go ( 0 );
 		while ( l_iCtr -- )
-			if ( do_click ( static_cast < HNodeControl * > ( * a_poNode->f_oBranch.to_tail ( ) ), a_rsMouse ) )
+			if ( do_click ( dynamic_cast < HNodeControl * > ( * a_poNode->f_oBranch.to_tail ( ) ), a_rsMouse ) )
 				return ( true );
 		}
 	return ( false );

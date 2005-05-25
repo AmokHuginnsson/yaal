@@ -66,19 +66,19 @@ private:
 	xmlNodeSetPtr				f_psNodeSet;
 	xmlNodePtr					f_psStartNode;
 	/*}*/
-private:
+protected:
 	/*{*/
 	HXmlData ( void );
 	virtual ~HXmlData ( void );
 	HXmlData ( const HXmlData & ) __attribute__(( __noreturn__ ));
 	HXmlData & operator = ( const HXmlData & ) __attribute__(( __noreturn__ ));
-	void xml_free ( xmlDocPtr & );
+	void xml_free ( xmlDocPtr & ) const;
 /*	void xml_free ( xmlNodePtr & ); */
 /*	void xml_free ( xmlNodeSetPtr & ); */
-	void xml_free ( xmlXPathContextPtr & );
-	void xml_free ( xmlXPathObjectPtr & );
+	void xml_free ( xmlXPathContextPtr & ) const;
+	void xml_free ( xmlXPathObjectPtr & ) const;
 	void reset ( void );
-	xmlNodePtr next_node ( xmlNodePtr );
+	xmlNodePtr next_node ( xmlNodePtr ) const;
 	/*}*/
 	};
 
@@ -135,7 +135,7 @@ HXmlData & HXmlData::operator = ( const HXmlData & )
 	M_EPILOG
 	}
 
-void HXmlData::xml_free ( xmlDocPtr & a_rpsDoc )
+void HXmlData::xml_free ( xmlDocPtr & a_rpsDoc ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsDoc )
@@ -170,7 +170,7 @@ void HXmlData::xml_free ( xmlNodeSetPtr & a_rpsNodeSet )
 	}
 */
 	
-void HXmlData::xml_free ( xmlXPathContextPtr & a_rpsContext )
+void HXmlData::xml_free ( xmlXPathContextPtr & a_rpsContext ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsContext )
@@ -181,7 +181,7 @@ void HXmlData::xml_free ( xmlXPathContextPtr & a_rpsContext )
 	M_EPILOG
 	}
 
-void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject )
+void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsObject )
@@ -192,7 +192,7 @@ void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject )
 	M_EPILOG
 	}
 
-xmlNodePtr HXmlData::next_node ( xmlNodePtr a_psNode )
+xmlNodePtr HXmlData::next_node ( xmlNodePtr a_psNode ) const
 	{
 	M_PROLOG
 	xmlNodePtr l_psNode = a_psNode;
@@ -245,7 +245,7 @@ char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 		case ( D_OUT ): { l_xCD = f_xIconvOut; break; }
 		default :
 			{
-			M_THROW ( "unknown convetion way", a_eWay );
+			M_THROW ( "unknown convetion way", static_cast < int > ( a_eWay ) );
 			break;
 			}
 		}
@@ -400,7 +400,7 @@ char const * HXml::iterate ( HString & a_roValue, char const * a_pcPath, bool a_
 				}
 			}
 		while ( a_bStripEmpty && l_pcName && M_TEST_IF_EMPTY () );
-		if ( M_TEST_IF_EMPTY() )
+		if ( l_pcName && M_TEST_IF_EMPTY() )
 			l_pcName = NULL;
 		}
 	return ( l_pcName );

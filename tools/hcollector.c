@@ -52,7 +52,7 @@ HCollector::HCollector ( char const * a_pcDevicePath )
 	M_EPILOG
 	}
 
-bool HCollector::test_char ( char const * a_pcBuffer, int a_iIndex )
+bool HCollector::test_char ( char const * a_pcBuffer, int a_iIndex ) const
 	{
 	return (
 			a_pcBuffer [ a_iIndex ]
@@ -148,12 +148,16 @@ int HCollector::receive_line ( char * & a_pcLine )
 	M_EPILOG
 	}
 
-#define M_STDHAPI_TEMP_FAILURE_RETRY(expression) \
+#ifdef __GNUC__
+#	define M_STDHAPI_TEMP_FAILURE_RETRY( expression ) \
   (__extension__ \
     ({ long int __result; \
        do __result = static_cast <long int> ( expression ); \
        while (__result == -1L && errno == EINTR); \
        __result; }))
+#else /* __GNUC__ */
+#define M_STDHAPI_TEMP_FAILURE_RETRY( expression ) ( expression )
+#endif /* not __GNUC__ */
 
 int HCollector::establish_connection ( int a_iTimeOut )
 	{

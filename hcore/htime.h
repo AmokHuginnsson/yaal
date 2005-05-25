@@ -58,6 +58,7 @@ public:
 			const int = 0 );
 	virtual ~HTime ( void );
 	void set_now ( void );
+	void set ( const time_t & );
 	void format ( char const * = D_DEFAULT_TIME_FORMAT );
 	void set_time ( const int = 0, const int = 0, const int = 0 );
 	void set_date ( const int, const int = 1, const int = 1 );

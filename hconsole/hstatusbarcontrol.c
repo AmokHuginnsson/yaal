@@ -193,7 +193,7 @@ void HStatusBarControl::init_progress ( double a_dMax, char const * a_pcTitle,
 	f_bEstimate = a_bEstimate;
 	f_dProgressSize = a_dMax;
 	f_iLastProgress = - 1;
-	f_iLastPercent = -1;
+	f_iLastPercent = - 1;
 	f_iLastStep = 0;
 	f_oMessage = a_pcTitle;
 	f_oStart.set_now ( );
@@ -220,11 +220,11 @@ void HStatusBarControl::update_progress ( double a_dStep,
 	if ( f_bEstimate )
 		{
 		if ( a_dStep )
-			l_oNow = static_cast < time_t > ( ( f_dProgressSize / a_dStep * l_oStoper ) );
+			l_oNow.set ( static_cast < time_t > ( ( f_dProgressSize / a_dStep ) * l_oStoper ) );
 		l_oLeft = l_oNow - l_oStoper;
 		}
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
-	l_iMaxBar = n_iWidth - 6 - 10 - 2 - ( f_bEstimate ? 10 : 0 );
+	l_iMaxBar = n_iWidth - ( 6 + 10 + 2 + ( f_bEstimate ? 10 : 0 ) );
 	l_iNextPercent = static_cast < int > ( ( 100. * a_dStep / f_dProgressSize ) );
 	l_iNextStep = static_cast < int > ( ( l_iMaxBar * a_dStep / f_dProgressSize ) );
 	l_iNextMinute = l_oStoper.get_minute ( );
@@ -305,7 +305,7 @@ void HStatusBarControl::bar ( char const * a_pcBar )
 	if ( a_pcBar )
 		{
 		f_oVarTmpBuffer.format ( " %%-%ds ",
-				n_iWidth - f_iLabelLength - ( f_bSingleLine ? 2 : 1 ) );
+				( n_iWidth - f_iLabelLength ) - ( f_bSingleLine ? 2 : 1 ) );
 		f_oMessage.format ( f_oVarTmpBuffer, a_pcBar );
 		}
 	::mvprintw ( n_iHeight - 2,

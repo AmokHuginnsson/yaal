@@ -60,14 +60,11 @@ protected:
 		virtual ~HNodeControl ( void );
 		void expand ( void );
 		void collapse ( void );
-		bool hit_test ( int, int );
+		bool hit_test ( int, int ) const;
 		void click ( int );
 		/*}*/
 		friend class HTreeControl;
 		};
-protected:
-	/*{*/
-	/*}*/
 public:
 	/*{*/
 	HTreeControl ( HWindow *,			/* parent */

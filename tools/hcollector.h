@@ -64,7 +64,7 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	bool test_char ( char const *, int );
+	bool test_char ( char const *, int ) const;
 	/*}*/
 	};
 

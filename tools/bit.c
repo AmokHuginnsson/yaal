@@ -37,14 +37,14 @@ namespace stdhapi
 namespace tools
 {
 
-unsigned long int g_pulMaskBitSet[] = 
+unsigned long int g_pulMaskBitSet [ ] = 
 	{
 	2147483648u, 1073741824, 536870912, 268435456, 134217728, 67108864, 33554432,
 	16777216, 8388608, 4194304, 2097152, 1048576, 524288, 262144, 131072, 65536,
 	32768, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1
 	};
                                      
-unsigned long int g_pulMaskBitClear[] =
+unsigned long int g_pulMaskBitClear [ ] =
 	{
 	2147483647, 3221225471u, 3758096383u, 4026531839u, 4160749567u, 4227858431u,
 	4261412863u, 4278190079u, 4286578687u, 4290772991u, 4292870143u, 4293918719u,
@@ -54,8 +54,8 @@ unsigned long int g_pulMaskBitClear[] =
 	4294967293u, 4294967294u
 	};
                                        
-unsigned char g_pcMaskBitSet[] = {128, 64, 32, 16, 8, 4, 2, 1};
-unsigned char g_pcMaskBitClear[] = {127, 191, 223, 239, 247, 251, 253, 254};
+unsigned char g_pucMaskBitSet [ ] = {128, 64, 32, 16, 8, 4, 2, 1};
+unsigned char g_pucMaskBitClear [ ] = {127, 191, 223, 239, 247, 251, 253, 254};
 
 int getbit ( void * a_pvAddress, unsigned long int a_ulNumber )
 	{
@@ -65,7 +65,7 @@ int getbit ( void * a_pvAddress, unsigned long int a_ulNumber )
 	l_pcAddress = static_cast < char * > ( a_pvAddress );
 	l_ulDword = a_ulNumber >> 3;
 	l_iOffset = static_cast < short > ( a_ulNumber ) & 7;
-	l_hState = * ( l_pcAddress + l_ulDword ) & g_pcMaskBitSet [ l_iOffset ];
+	l_hState = * ( l_pcAddress + l_ulDword ) & g_pucMaskBitSet [ l_iOffset ];
 	if ( l_hState )
 		l_hState = 1;
 	return ( l_hState );
@@ -74,15 +74,15 @@ int getbit ( void * a_pvAddress, unsigned long int a_ulNumber )
 void setbit( void * a_pvAddress, unsigned long int a_ulNumber, int a_iState )
 	{
 	int l_iOffset;
-	char * l_pcAddress;
+	unsigned char * l_pcAddress;
 	unsigned long int l_ulDword;
-	l_pcAddress = static_cast < char * > ( a_pvAddress );
+	l_pcAddress = static_cast < unsigned char * > ( a_pvAddress );
 	l_ulDword = a_ulNumber >> 3;
 	l_iOffset = a_ulNumber & 7;
 	if ( a_iState )
-		* ( l_pcAddress + l_ulDword ) |= g_pcMaskBitSet [ l_iOffset ];
+		* ( l_pcAddress + l_ulDword ) |= g_pucMaskBitSet [ l_iOffset ];
 	else
-		* ( l_pcAddress + l_ulDword ) &= g_pcMaskBitClear [ l_iOffset ];
+		* ( l_pcAddress + l_ulDword ) &= g_pucMaskBitClear [ l_iOffset ];
 	return ;
 	}
 	

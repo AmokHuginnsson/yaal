@@ -180,7 +180,7 @@ int HWindow::handler_jump_direct ( int a_iCode, void * )
 	l_poControl = f_poFocusedChild;
 	if ( a_iCode & 0x0ff00 )
 		{
-		f_poFocusedChild = f_oControls.next_enabled ( a_iCode );
+		f_poFocusedChild = f_oControls.next_enabled ( static_cast < char > ( a_iCode ) );
 		if ( f_poFocusedChild != l_poControl )
 			a_iCode = 0;
 		n_bNeedRepaint = true;
@@ -219,7 +219,7 @@ int HWindow::handler_search ( int a_iCode, void * )
 		return ( a_iCode );
 	if ( a_iCode >= D_KEY_COMMAND_BASE )
 		a_iCode -= D_KEY_COMMAND_BASE;
-	l_pcPrompt [ 0 ] = a_iCode;
+	l_pcPrompt [ 0 ] = static_cast < char > ( a_iCode );
 	f_poStatusBar->set_prompt ( l_pcPrompt, D_PROMPT_MODE_SEARCH );
 	a_iCode = 0;
 	return ( a_iCode );

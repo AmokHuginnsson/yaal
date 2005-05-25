@@ -48,6 +48,7 @@ HSerial::HSerial ( char const * a_pcDevice )
 	{
 	M_PROLOG
 	memset ( & f_sTIO, 0, sizeof ( termios ) );
+	memset ( & f_sBackUpTIO, 0, sizeof ( termios ) );
 	if ( a_pcDevice )
 		f_oDevicePath = a_pcDevice;
 	else
@@ -116,8 +117,8 @@ HSerial::~HSerial ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor )
-		close ( );
-	f_iFileDescriptor = 0;
+		HSerial::close ( );
+	M_ASSERT ( ! f_iFileDescriptor );
 	return;
 	M_EPILOG
 	}

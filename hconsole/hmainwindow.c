@@ -40,8 +40,8 @@ HMainWindow::HMainWindow ( void )
 						: HWindow ( "stdhapi" ), f_poMenu ( NULL ), f_poWindowList ( NULL )
 	{
 	M_PROLOG
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,
-			HMainWindow::handler_close );
+	M_IRV ( M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,
+				HMainWindow::handler_close ) );
 	return;
 	M_EPILOG
 	}
@@ -49,6 +49,8 @@ HMainWindow::HMainWindow ( void )
 HMainWindow::~HMainWindow ( void )
 	{
 	M_PROLOG
+	f_poMenu = NULL;
+	f_poWindowList = NULL;
 	return;
 	M_EPILOG
 	}
@@ -63,7 +65,7 @@ int HMainWindow::init ( void )
 	f_poMenu = new HMenuControl ( this, 1, 1, - 2,	- n_iWidth / 2 - 1,
 			" &Menu \n" );
 	f_poMenu->enable ( true );
-	f_poMenu->set_focus ( );
+	M_IRV ( f_poMenu->set_focus ( ) );
 	f_poFocusedChild = f_poMenu;
 	f_poWindowList = new HWindowListControl ( this, 1,
 			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n" );

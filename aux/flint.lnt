@@ -3,6 +3,7 @@
 /* Main options */
 -v
 +fcp
++ffn
 +fnn
 +cpp(c)
 +cpp(h)
@@ -23,12 +24,14 @@
 /* Include paths */
 -i"/home/amok/prog/stdhapi"
 -i"."
--i"/usr/include"
 -i"/usr/include/c++/3.3"
 -i"/usr/include/c++/3.3/i486-linux"
--i"/usr/include/linux"
 -i"/usr/lib/gcc-lib/i486-linux/3.3.5"
 -i"/usr/lib/gcc-lib/i486-linux/3.3.5/include"
+-i"/usr/include"
+-i"/usr/local/include"
+-i"/usr/include/linux"
+-i"/usr/include/libxml2"
 
 /* data types */
 +libh(include/stddef.h)
@@ -54,9 +57,12 @@
 -d__STDHAPI_BUILD__
 
 /* Disabling warrnings for our code */
+-e155		/* Ignoring { }'ed sequence within an expression, 0 assumed */
+-e502		/* Expected unsigned type */
 -e505		/* Redundant left argument to comma */
 -e526		/* Symbol 'symbol' not defined */
 -e528		/* Symbol 'symbol' not referenced */
+-e534		/* Ignoring return value of function 'function' */
 -e537		/* Repeated include file 'file' */
 -e545		/* Suspicious use of & */
 -e613		/* Possible use of null pointer 'pointer' in left argument to operator '->' */
@@ -64,26 +70,36 @@
 -e671		/* Possibly passing to function 'function' a negative value (-1) */
 -e672		/* Possible memory leak in assignment to pointer 'pointer' */
 -e701		/* Shift left of signed quantity (int) */
+-e702		/* Shift right of signed quantity (int) */
+-e713		/* Loss of precision (initialization) */
 -e714		/* Symbol 'symbol' not referenced */
 -e730		/* Boolean argument to function */
+-e732		/* Loss of sign */
+-e737		/* Loss of sign in promotion from int to unsigned long */
+-e743		/* Negative character constant */
 -e750		/* local macro 'macro' not referenced */
 -e754		/* local structure member 'member' not referenced */
 -e755		/* global macro 'macro' not referenced */
 -e757		/* global declarator 'declarator' not referenced */
 -e758		/* global class 'class' not referenced */
 -e759		/* header declaration for symbol 'symbol' could be moved from header to module */
+-e765		/* ::external 'symbol' could be made static */
 -e768		/* global struct member 'member' not referenced */
 -e769		/* global enumeration constant 'constant' not referenced */
 -e778		/* Constant expression evaluates to 0 in operation */
+-e790		/* Suspicious truncation,  integral to float */
 -e794		/* Conceivable use of null pointer 'pointer' in left argument to operator '->' */
 -e820		/* Boolean test of a parenthesized assignment */
 -e825		/* control flows into case/default without -fallthrough comment */
+-e826		/* Suspicious pointer-to-pointer conversion (area too small) */
 -e830		/* Location cited in prior message */
+-e1032	/* Member 'member' cannot be called without object */
 -e1526	/* Member function 'member' not defined */
 -e1702	/* operator 'operator' is both an ordinary function 'function' and a member function 'member' */
 -e1704	/* Constructor 'constructor' has private access specification */
 -e1712	/* default constructor not defined for class 'class' */
 -e1714	/* Member function 'member' not referenced */
+-e1716	/* Virtual member function 'member' not referenced */
 -e1735	/* virtual 'member' has default parameter */
 -e1739	/* Binary operator 'operator' should be non-member function */
 -e1740	/* pointer member 'member' not directly freed or zeroed by destructor */
@@ -99,13 +115,16 @@
 -esym(418,strftime,fflush)	/* Passing null pointer to function 'function' */
 -esym(449,l_poAtom)					/* Pointer variable 'variable' previously deallocated */
 -esym(534,stdhapi::hcore::HLog::operato*)
+-esym(578,stdhapi::tools::des::n_pcBeginingPermutation,stdhapi::tools::des::n_pcEndingPermutation,stdhapi::tools::des::n_pcKeyPermutation,stdhapi::tools::des::n_pcCountOfMoves,stdhapi::tools::des::n_pcPermutationOfCompresion,stdhapi::tools::des::n_pcPermutationOfExpanding,stdhapi::tools::des::n_pcPBlockPermutation,stdhapi::tools::des::n_pppcSBlock,stdhapi::tools::HXmlData) /* Declaration of symbol 'symbol' hides symbol 'symbol' */
 -esym(752,stdhapi::hcore::g_ppcErrMsgHList,stdhapi::hcore::g_pulPrimes,stdhapi::hcore::hash)
--esym(1401,stdhapi::hcore::HPattern::f_sCompiled) /* member 'member' not initialized by constructor */
 -esym(1511,*operator=*)
+-esym(1529,stdhapi::tools::HXmlData::operator=) /* Symbol 'symbol' not first checking for assignment to this */
+-esym(1539,stdhapi::tools::HXmlData::f_ps*) /* member 'member' not assigned by assignment opeator */
+-esym(1536,stdhapi::tools::HAnalyser::f_pdVariables) /* Exposing low access member 'member' */
 -esym(1554,*_pv*) /* Direct pointer copy of member 'member' within copy constructor: 'constructor' */
--esym(1555,*_pv*) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
+-esym(1555,*_pv*,stdhapi::hconsole::HListControl::HColumnInfo::f_poControl) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
 -esym(1764,a_roOption,a_roValue)
--esym(1769,stdhapi::hcore::HPattern::f_sCompiled,stdhapi::hcore::HThread::f_sAttributes,stdhapi::hcore::HTime::f_sBroken,stdhapi::hconsole::HEditControl::f_sMask) /* Member or base class 'class' has no constructor */
+-esym(1769,stdhapi::hcore::HPattern::f_sCompiled,stdhapi::hcore::HThread::f_sAttributes,stdhapi::hcore::HTime::f_sBroken,stdhapi::hconsole::HEditControl::f_sMask,stdhapi::hconsole::HListControl::f_sMatch,stdhapi::hconsole::HProcess::f_sLatency,stdhapi::hconsole::HProcess::f_xFileDescriptorSet,stdhapi::tools::HSerial::f_sTIO,stdhapi::tools::HSerial::f_sBackUpTIO,stdhapi::tools::signals::HSigStackWrapper::f_sStack) /* Member or base class 'class' has no constructor */
 
 -function(exit,stdhapi::hcore::HException::failed_assert)
 

@@ -97,6 +97,15 @@ HTime::~HTime ( void )
 	M_EPILOG
 	}
 
+void HTime::set ( const time_t & a_rxTime )
+	{
+	M_PROLOG
+	f_xValue = a_rxTime;
+	M_ENSURE ( localtime_r ( & f_xValue, & f_sBroken ) );
+	return;
+	M_EPILOG
+	}
+
 void HTime::set_now ( void )
 	{
 	M_PROLOG
@@ -219,7 +228,7 @@ HTime HTime::operator - ( const HTime & a_roTime ) const
 	{
 	M_PROLOG
 	HTime l_oTime;
-	l_oTime.format ( f_oFormat );
+	l_oTime.f_oFormat = f_oFormat;
 	l_oTime.f_xValue = static_cast < time_t > ( difftime ( f_xValue, a_roTime.f_xValue ) );
 	M_ENSURE ( gmtime_r ( & l_oTime.f_xValue, & l_oTime.f_sBroken ) );
 	return ( l_oTime );
@@ -281,12 +290,12 @@ HTime::operator char const * ( void ) const
 	M_PROLOG
 	int l_iSize = 0;
 #ifdef HAVE_SMART_STRFTIME
-	l_iSize = static_cast < int > ( strftime ( NULL, 1024, f_oFormat, & f_sBroken ) + 1 );
+	l_iSize = strftime ( NULL, 1024, f_oFormat, & f_sBroken ) + 1;
 	if ( l_iSize < 2 )
 		M_THROW ( "bad format", g_iErrNo );
 	f_oBuffer.hs_realloc ( l_iSize );
-	M_ENSURE ( strftime ( f_oBuffer, static_cast < unsigned int > ( l_iSize ),
-			f_oFormat, & f_sBroken ) );
+	M_ENSURE ( static_cast < int > ( strftime ( f_oBuffer,
+					l_iSize, f_oFormat, & f_sBroken ) ) < l_iSize );
 #else /* HAVE_SMART_STRFTIME */
 	f_oBuffer.hs_realloc ( 64 ); /* FIXME that is pretty dumb hack */
 	l_iSize = strftime ( f_oBuffer, 63, f_oFormat, & f_sBroken ) + 1;

@@ -29,15 +29,13 @@ Copyright:
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcomplex.h"
+#include "hcore.h"
 
 namespace stdhapi
 {
 
 namespace hcore
 {
-
-#define D_EPSILON	0.000001
-#define M_EQ( left, right ) ( ( ( ( left ) > ( right ) ) ? ( ( left ) - ( right ) ) : ( ( right ) - ( left ) ) ) < D_EPSILON )
 
 HComplex::HComplex ( void ) : f_dReal ( 0 ), f_dImaginary ( 0 )
 	{
@@ -136,16 +134,16 @@ HComplex & HComplex::operator = ( const HComplex & a_roComplex )
 bool HComplex::operator == ( const HComplex & a_roComplex ) const
 	{
 	M_PROLOG
-	return ( M_EQ ( f_dReal, a_roComplex.f_dReal )
-			&& M_EQ ( f_dImaginary, a_roComplex.f_dImaginary ) );
+	return ( eq ( f_dReal, a_roComplex.f_dReal )
+			&& eq ( f_dImaginary, a_roComplex.f_dImaginary ) );
 	M_EPILOG
 	}
 
 bool HComplex::operator != ( const HComplex & a_roComplex ) const
 	{
 	M_PROLOG
-	return ( ! ( M_EQ ( f_dReal, a_roComplex.f_dReal )
-				&& M_EQ ( f_dImaginary, a_roComplex.f_dImaginary ) ) );
+	return ( ! ( eq ( f_dReal, a_roComplex.f_dReal )
+				&& eq ( f_dImaginary, a_roComplex.f_dImaginary ) ) );
 	M_EPILOG
 	}
 

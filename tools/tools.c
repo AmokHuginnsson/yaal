@@ -29,6 +29,7 @@ Copyright:
 #include <stdio.h>	 /* perror function */
 #include <signal.h>	 /* signal handling */
 #include <termios.h> /* B115200 */
+#include <libintl.h> /* gettext */
 
 #include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
 M_CVSID ( "$CVSHeader$" );
@@ -81,7 +82,8 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		{
 		if ( ( a_roValue.get_length ( ) > 1 ) && ( a_roValue [ 0 ] == 'B' ) )
 			{
-			switch ( strtol ( static_cast < char * > ( a_roValue ) + 1, NULL, 10 ) )
+			l_iBaudRate = strtol ( static_cast < char * > ( a_roValue ) + 1, NULL, 10 );
+			switch ( l_iBaudRate )
 				{
 				case ( 115200 ): l_iBaudRate = B115200; break;
 #if ( HAVE_DECL_B76800 )
@@ -102,6 +104,8 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 #endif /* HAVE_DECL_B7200 */
 				case (   4800 ): l_iBaudRate = B4800;   break;
 				case (   2400 ): l_iBaudRate = B2400;   break;
+				default:
+					M_THROW ( _ ( "unknown baud rate" ), l_iBaudRate );
 				}
 			}
 		}
@@ -119,7 +123,7 @@ void tools_init ( void )
 	rc_file::process_rc_file ( "stdhapi", "tools", tools::n_psVariables,
 			set_tools_variables );
 	for ( l_iCtr = 0; l_iCtr < 256; l_iCtr ++ )
-		util::n_pcTransTableStripPL [ l_iCtr ] = l_iCtr;
+		util::n_pcTransTableStripPL [ l_iCtr ] = static_cast < char > ( l_iCtr );
 	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '±' ) ] = 'a';
 	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( '¡' ) ] = 'A';
 	util::n_pcTransTableStripPL [ static_cast < unsigned char > ( 'æ' ) ] = 'c';
@@ -178,14 +182,4 @@ void stdhapi_tools_main ( void )
 
 /* older versions of g++ fail to handle __attribute__((constructor))
    if no static object exists */
-
-#if __GNUC__ < 3 || \
-	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
-
-namespace
-	{
-HString g_oDummyTOOLS;
-	}
-
-#endif
 
