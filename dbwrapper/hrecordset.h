@@ -93,9 +93,9 @@ public:
 	HRecordSet ( HDataBase * );
 	virtual ~HRecordSet ( void );
 	hcore::HString get ( int );
-	bool is_eof ( void );
-	bool is_bof ( void );
-	bool is_open ( void );
+	bool is_eof ( void ) const;
+	bool is_bof ( void ) const;
+	bool is_open ( void ) const;
 	void move_first ( void );
 	void move_last ( void );
 	void move_next ( void );

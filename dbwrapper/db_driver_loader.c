@@ -30,8 +30,6 @@ Copyright:
 #include <stdlib.h>
 #include <libintl.h>
 
-#include "config.h"
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcore/xalloc.h"
@@ -50,12 +48,17 @@ namespace dbwrapper
 
 #define M_DB_ERR(msg) "Error: Data base request ("msg") while no driver loaded."
 
+namespace
+{
+
+typedef void ( * simple_function_ptr_t ) ( void );
 typedef union
 	{
-	typedef void ( * simple_function_ptr_t ) ( void );
 	void * f_pvObjectPointer;
 	simple_function_ptr_t FUNCTION_POINTER;
 	} caster_t;
+
+}
 
 template < typename tType >
 tType dlsym_wrapper ( void * a_pvSpace, char const * a_pcName )
@@ -67,13 +70,14 @@ tType dlsym_wrapper ( void * a_pvSpace, char const * a_pcName )
 
 char const x_tag_g_pcDone [ ] = "done.\r\n", * g_pcDone = x_tag_g_pcDone;
 
-static char const * g_ppcDriver [ 24 ] =
+static char const * g_ppcDriver [ 7 ] =
 	{
 	NULL,
+	"libsqlite3_driver.so",
+	"libsqlite_driver.so",
 	"libmysql_driver.so",
 	"libpostgresql_driver.so",
-	"libsqlite_driver.so",
-	"libsqlite3_driver.so",
+	"liboracle_driver.so",
 	NULL
 	};
 

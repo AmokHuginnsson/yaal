@@ -238,19 +238,19 @@ long int HRecordSet::requery ( char const * a_pcQuery )
 	M_EPILOG
 	}
 
-bool HRecordSet::is_open ( void )
+bool HRecordSet::is_open ( void ) const
 	{
 	return ( f_iMode != D_MODE_CLOSED );
 	}
 
-bool HRecordSet::is_eof ( void )
+bool HRecordSet::is_eof ( void ) const
 	{
 	M_PROLOG
 	return ( f_iCursorPosition >= f_iSetQuantity );
 	M_EPILOG
 	}
 
-bool HRecordSet::is_bof ( void )
+bool HRecordSet::is_bof ( void ) const
 	{
 	M_PROLOG
 	return ( f_iCursorPosition < 0 );
@@ -401,7 +401,7 @@ void HRecordSet::sync ( int a_iField, short & a_rhShort )
 		{
 		l_oTmp = get ( a_iField );
 		if ( ! l_oTmp.is_empty ( ) )
-			a_rhShort = atoi ( l_oTmp );
+			a_rhShort = static_cast < short > ( atoi ( l_oTmp ) );
 		}
 	else
 		f_oValues [ a_iField ] = a_rhShort;

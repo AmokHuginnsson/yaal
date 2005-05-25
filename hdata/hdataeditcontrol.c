@@ -77,6 +77,7 @@ int HDataEditControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
 	bool l_bNoChange = false;
+	HDataWindow * l_poWindow = NULL;
 	switch ( a_iCode )
 		{
 		case ( '\t' ):
@@ -115,10 +116,16 @@ int HDataEditControl::process_input ( int a_iCode )
 				l_bNoChange = true;
 			break;
 			}
+		default:
+			break;
 		}
 	a_iCode = HEditControl::process_input ( a_iCode );
 	if ( ! ( a_iCode || l_bNoChange ) )
-		static_cast < HDataWindow * > ( f_poParent )->set_modified ( );
+		{
+		l_poWindow = dynamic_cast < HDataWindow * > ( f_poParent );
+		M_ASSERT ( l_poWindow );
+		l_poWindow->set_modified ( );
+		}
 	return ( a_iCode );
 	M_EPILOG
 	}

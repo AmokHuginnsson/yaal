@@ -81,14 +81,16 @@ bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 		if ( ! ( strcasecmp ( a_roValue, "none" )
 					&& strcasecmp ( a_roValue, "null" ) ) )
 			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_NONE;
+		else if ( ! strcmp ( a_roValue, "SQLite3" ) )
+			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_SQLITE3;
+		else if ( ! strcmp ( a_roValue, "SQLite" ) )
+			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_SQLITE;
 		else if ( ! strcmp ( a_roValue, "MySQL" ) )
 			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_MYSQL;
 		else if ( ! strcmp ( a_roValue, "PostgreSQL" ) )
 			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_POSTGRESQL;
-		else if ( ! strcmp ( a_roValue, "SQLite" ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_SQLITE;
-		else if ( ! strcmp ( a_roValue, "SQLite3" ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_SQLITE3;
+		else if ( ! strcmp ( a_roValue, "Oracle" ) )
+			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_ORACLE;
 		else
 			{
 			log ( D_LOG_ERROR ) << "Error: `" << a_roValue;
@@ -169,17 +171,4 @@ void stdhapi_dbwrapper_main ( void )
 }
 
 }
-
-/* older versions of g++ fail to handle __attribute__((constructor))
-   if no static object exists */
-
-#if __GNUC__ < 3 || \
-	 ( __GNUC__ == 3 && __GNUC_MINOR__ < 3 )
-
-namespace
-	{
-HString g_oDummyDBWRAPPER;
-	}
-
-#endif
 

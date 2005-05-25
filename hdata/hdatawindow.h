@@ -61,7 +61,7 @@ public:
 	virtual int init ( void );
 	virtual hconsole::HStatusBarControl * init_bar ( char const * );
 	void set_sync_store ( hconsole::HItem * = NULL );
-	bool is_modified ( void );
+	bool is_modified ( void ) const;
 	void set_modified ( bool = true );
 	/*}*/
 protected:

@@ -61,10 +61,8 @@
 -e502		/* Expected unsigned type */
 -e505		/* Redundant left argument to comma */
 -e526		/* Symbol 'symbol' not defined */
--e528		/* Symbol 'symbol' not referenced */
 -e534		/* Ignoring return value of function 'function' */
 -e537		/* Repeated include file 'file' */
--e545		/* Suspicious use of & */
 -e613		/* Possible use of null pointer 'pointer' in left argument to operator '->' */
 -e668		/* Possibly passing a null pointer to function 'function' */
 -e671		/* Possibly passing to function 'function' a negative value (-1) */
@@ -87,7 +85,7 @@
 -e768		/* global struct member 'member' not referenced */
 -e769		/* global enumeration constant 'constant' not referenced */
 -e778		/* Constant expression evaluates to 0 in operation */
--e790		/* Suspicious truncation,  integral to float */
+-e790		/* Suspicious truncation, integral to float */
 -e794		/* Conceivable use of null pointer 'pointer' in left argument to operator '->' */
 -e820		/* Boolean test of a parenthesized assignment */
 -e825		/* control flows into case/default without -fallthrough comment */
@@ -114,13 +112,16 @@
 
 -esym(418,strftime,fflush)	/* Passing null pointer to function 'function' */
 -esym(449,l_poAtom)					/* Pointer variable 'variable' previously deallocated */
+-esym(528,__CVSID__,__CVSTID__) /* Symbol 'symbol' not referenced */
 -esym(534,stdhapi::hcore::HLog::operato*)
 -esym(578,stdhapi::tools::des::n_pcBeginingPermutation,stdhapi::tools::des::n_pcEndingPermutation,stdhapi::tools::des::n_pcKeyPermutation,stdhapi::tools::des::n_pcCountOfMoves,stdhapi::tools::des::n_pcPermutationOfCompresion,stdhapi::tools::des::n_pcPermutationOfExpanding,stdhapi::tools::des::n_pcPBlockPermutation,stdhapi::tools::des::n_pppcSBlock,stdhapi::tools::HXmlData) /* Declaration of symbol 'symbol' hides symbol 'symbol' */
 -esym(752,stdhapi::hcore::g_ppcErrMsgHList,stdhapi::hcore::g_pulPrimes,stdhapi::hcore::hash)
+-esym(763,stdhapi::hdata::HDataWindow) /* Redundant declaration for symbol 'symbol' */
+-esym(1411,stdhapi::dbwrapper::HRecordSet::sync) /* Member with different signature hides virtual member 'member' */
 -esym(1511,*operator=*)
 -esym(1529,stdhapi::tools::HXmlData::operator=) /* Symbol 'symbol' not first checking for assignment to this */
 -esym(1539,stdhapi::tools::HXmlData::f_ps*) /* member 'member' not assigned by assignment opeator */
--esym(1536,stdhapi::tools::HAnalyser::f_pdVariables) /* Exposing low access member 'member' */
+-esym(1536,stdhapi::tools::HAnalyser::f_pdVariables,stdhapi::hdata::HDataProcess::f_oDataBase) /* Exposing low access member 'member' */
 -esym(1554,*_pv*) /* Direct pointer copy of member 'member' within copy constructor: 'constructor' */
 -esym(1555,*_pv*,stdhapi::hconsole::HListControl::HColumnInfo::f_poControl) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
 -esym(1764,a_roOption,a_roValue)

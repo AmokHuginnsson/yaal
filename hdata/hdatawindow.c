@@ -83,6 +83,9 @@ HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
 HDataWindow::~HDataWindow ( void )
 	{
 	M_PROLOG
+	f_poMainControl = NULL;
+	f_psResourcesArray = NULL;
+	f_poSyncStore = NULL;
 	return;
 	M_EPILOG
 	}
@@ -449,7 +452,7 @@ int HDataWindow::handler_cancel ( int, void * )
 	M_EPILOG
 	}
 
-bool HDataWindow::is_modified ( void )
+bool HDataWindow::is_modified ( void ) const
 	{
 	return ( f_bModified );
 	}

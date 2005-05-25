@@ -86,13 +86,14 @@ void HDataListControl::load ( long int /*a_iId*/ )
 	HElement * l_poSelected = f_poSelected;
 	HElement * l_poFirstVisibleRow = f_poFirstVisibleRow;
 	HItem l_oItem ( f_oHeader.quantity ( ) );
-	HDataWindow * l_poParent = static_cast < HDataWindow * > ( f_poParent );
+	HDataWindow * l_poParent = dynamic_cast < HDataWindow * > ( f_poParent );
+	M_ASSERT ( l_poParent );
 	l_poParent->set_sync_store ( & l_oItem );
 	if ( f_poRecordSet->is_open ( ) )
 		l_iCount = f_poRecordSet->requery ( );
 	else
 		l_iCount = f_poRecordSet->open ( );
-	l_poParent->status_bar ( )->init_progress ( l_iCount, "Collecting ..." );
+	l_poParent->status_bar ( )->init_progress ( static_cast < double > ( l_iCount ), "Collecting ..." );
 	if ( f_iQuantity )
 		go ( 0 );
 	while ( ! f_poRecordSet->is_eof ( ) )

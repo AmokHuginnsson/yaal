@@ -62,8 +62,11 @@ HDataStatusBarControl::HDataStatusBarControl ( HDataWindow * a_poParent,
 void HDataStatusBarControl::draw_label ( void )
 	{
 	M_PROLOG
+	HDataWindow * l_poWindow = NULL;
 	HStatusBarControl::draw_label ( );
-	if ( static_cast < HDataWindow * > ( f_poParent )->is_modified ( ) )
+	l_poWindow = dynamic_cast < HDataWindow * > ( f_poParent );
+	M_ASSERT ( l_poWindow );
+	if ( l_poWindow->is_modified ( ) )
 		{
 		M_SET_ATTR_SHORTCUT ( );
 		mvprintw ( n_iHeight - 2, f_iLabelLength - 4, "[+]" );

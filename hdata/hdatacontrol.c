@@ -49,6 +49,7 @@ HDataControl::HDataControl ( HRecordSet * a_poRecordSet )
 HDataControl::~HDataControl ( void )
 	{
 	M_PROLOG
+	f_poRecordSet = NULL;
 	return;
 	M_EPILOG
 	}
