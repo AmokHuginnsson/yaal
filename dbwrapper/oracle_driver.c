@@ -46,11 +46,11 @@ using namespace stdhapi::hcore;
 extern "C"
 {
 
-typedef struct
+struct OAllocator
 	{
 	OAllocator * f_psNext;
 	char * f_pcBuffer;
-	} OAllocator;
+	};
 
 typedef struct
 	{
@@ -270,7 +270,8 @@ char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
 					& l_psParameter, a_iColumn + 1 ) ) == OCI_SUCCESS )
 		{
 		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psParameter,
-						& l_iSize, 0, OCI_ATTR_DATA_SIZE, l_psQuery->f_psError ) ) == OCI_SUCCESS )
+						OCI_DTYPE_PARAM, & l_iSize, 0, OCI_ATTR_DATA_SIZE,
+						l_psQuery->f_psError ) ) == OCI_SUCCESS )
 			{
 			l_pcData = xcalloc ( l_iSize + 1, char );
 			if ( ( ( * l_psQuery->f_piStatus ) = OCIDefineByPos ( l_psQuery->f_psStatement,
@@ -336,13 +337,15 @@ long int dbrs_id ( void * a_pvDataB, void * a_pvDataR )
 	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvDataR );
 	OQuery * l_psAutonumber = NULL;
 	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
-					OCI_HTYPE_STMT, & l_pcName, & l_iNameLength,
-					l_psQuery->f_psError ) ) == OCI_SUCCESS )
+					OCI_HTYPE_STMT, & l_pcName,
+					reinterpret_cast < ub4 * > ( & l_iNameLength ),
+					OCI_ATTR_NAME, l_psQuery->f_psError ) ) == OCI_SUCCESS )
 		{
 		l_pcName [ l_iNameLength ] = 0;
-		l_oSQL.format ( "SELECT %s_sequence.currval FROM dual;", reinterpret_cast < char * > ( l_pcName ) );
+		l_oSQL.format ( "SELECT %s_sequence.currval FROM dual;",
+				reinterpret_cast < char * > ( l_pcName ) );
 		l_psAutonumber = db_query ( a_pvDataB, l_oSQL );
-		l_lId = strtol ( rs_get ( l_psAutonumber, 0, 0 ) );
+		l_lId = strtol ( rs_get ( l_psAutonumber, 0, 0 ), NULL, 10 );
 		db_unquery ( l_psAutonumber );
 		}
 	return ( l_lId );
@@ -359,7 +362,8 @@ char * rs_column_name ( void * a_pvDataR, int a_iField )
 					& l_psParameter, a_iField + 1 ) ) == OCI_SUCCESS )
 		{
 		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psParameter,
-						OCI_DTYPE_PARAM, & l_pcName, & l_iNameLength,
+						OCI_DTYPE_PARAM, & l_pcName,
+						reinterpret_cast < ub4 * > ( & l_iNameLength ),
 						OCI_ATTR_NAME, l_psQuery->f_psError ) ) == OCI_SUCCESS )
 			{
 			if ( l_iNameLength >= 0 )
