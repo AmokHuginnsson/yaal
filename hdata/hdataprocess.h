@@ -28,6 +28,7 @@ Copyright:
 #define __HDATA_HDATAPROCESS_H
 
 #include "hconsole/hprocess.h"
+#include "hconsole/omenuitem.h"
 #include "tools/hxml.h"
 #include "dbwrapper/hdatabase.h"
 
@@ -65,7 +66,7 @@ public:
 	/*{*/
 	HDataProcess ( void );
 	virtual ~HDataProcess ( void );
-	virtual int init_xrc ( char const *, char const * );
+	virtual int init_xrc ( char const *, char const *, stdhapi::hconsole::OMenuItem * );
 	dbwrapper::HDataBase * data_base ( void );
 	/*}*/
 protected:

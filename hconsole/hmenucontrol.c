@@ -102,15 +102,18 @@ void HMenuControl::init ( HProcess * a_poProcess, OMenuItem * a_psMenu )
 	M_PROLOG
 	HItem l_oDummy ( 0 );
 	HMenuNode * l_poNode = NULL;
-	if ( f_poRoot )
+	if ( f_poRoot && a_psMenu )
 		M_THROW ( "menu already initialised", g_iErrNo );
-	if ( ! ( a_poProcess && a_psMenu ) )
+	if ( ! a_poProcess || ! ( f_poRoot || a_psMenu ) )
 		M_THROW ( "process can not run without core data ( process, menu )",
 				g_iErrNo );
 	f_poProcess = a_poProcess;
-	f_poRoot = l_poNode = new HMenuControl::HMenuNode ( 0 );
-	f_poRoot->get_object ( ) = l_oDummy;
-	M_IRV ( l_poNode->load_sub_menu ( a_psMenu ) );
+	if ( ! f_poRoot )
+		{
+		f_poRoot = l_poNode = new HMenuControl::HMenuNode ( 0 );
+		f_poRoot->get_object ( ) = l_oDummy;
+		M_IRV ( l_poNode->load_sub_menu ( a_psMenu ) );
+		}
 	if ( ! f_poSelected && l_poNode->f_oBranch.quantity ( ) )
 		f_poSelected = l_poNode->f_oBranch [ 0 ];
 	refresh ( );

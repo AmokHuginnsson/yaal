@@ -27,6 +27,7 @@ Copyright:
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcore/hlog.h"
+#include "hconsole/hmainwindow.h"
 #include "dbwrapper/db_driver_loader.h"
 #include "hdataprocess.h"
 #include "hdatawindow.h"
@@ -55,13 +56,18 @@ HDataProcess::~HDataProcess ( void )
 	M_EPILOG
 	}
 
-int HDataProcess::init_xrc ( char const * a_pcProcessName, char const * a_pcResource )
+int HDataProcess::init_xrc ( char const * a_pcProcessName,
+		char const * a_pcResource, OMenuItem * a_psMainMenu )
 	{
 	M_PROLOG
 	int l_iError = HProcess::init ( a_pcProcessName );
+	HMainWindow * l_poMainWindow = NULL;
 	if ( ! dbwrapper::db_connect )
 		M_THROW ( "no database driver loaded", g_iErrNo );
 	f_oXml.init ( a_pcResource );
+	l_poMainWindow = dynamic_cast < HMainWindow * > ( f_poForegroundWindow );
+	M_ASSERT ( l_poMainWindow );
+	l_poMainWindow->init_menu ( this, a_psMainMenu );
 	return ( l_iError );
 	M_EPILOG
 	}
