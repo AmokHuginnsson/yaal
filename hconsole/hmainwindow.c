@@ -36,8 +36,8 @@ namespace stdhapi
 namespace hconsole
 {
 
-HMainWindow::HMainWindow ( void )
-						: HWindow ( "stdhapi" ), f_poMenu ( NULL ), f_poWindowList ( NULL )
+HMainWindow::HMainWindow ( char const * a_pcTitle )
+						: HWindow ( a_pcTitle ), f_poMenu ( NULL ), f_poWindowList ( NULL )
 	{
 	M_PROLOG
 	M_IRV ( M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,

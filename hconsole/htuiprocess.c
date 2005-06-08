@@ -99,7 +99,7 @@ int HProcess::init ( char const * a_pcProcessName )
 		M_THROW ( "you can initialise your main process only once, dumbass",
 				g_iErrNo );
 	f_bInitialised = true;
-	l_poMainWindow = new HMainWindow ( );
+	l_poMainWindow = new HMainWindow ( a_pcProcessName );
 	M_IRV ( l_poMainWindow->init ( ) );
 	f_poWindows = l_poMainWindow->_disclose_window_list ( );
 	M_IRV ( add_window ( l_poMainWindow, a_pcProcessName ) );

@@ -47,7 +47,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HMainWindow ( void );
+	HMainWindow ( char const * );
 	virtual ~HMainWindow ( void );
 	virtual int init ( void );
 	void init_menu ( HProcess *, OMenuItem * );

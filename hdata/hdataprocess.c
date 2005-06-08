@@ -41,7 +41,7 @@ namespace stdhapi
 namespace hdata
 {
 
-HDataProcess::HDataProcess ( void ) : HProcess ( ), f_oDataBase ( )
+HDataProcess::HDataProcess ( void ) : HProcess ( ), f_oXml ( ), f_oDataBase ( )
 	{
 	M_PROLOG
 	return;
@@ -55,12 +55,13 @@ HDataProcess::~HDataProcess ( void )
 	M_EPILOG
 	}
 
-int HDataProcess::init ( char const * a_pcProcessName )
+int HDataProcess::init ( char const * a_pcProcessName, char const * a_pcResource )
 	{
 	M_PROLOG
 	int l_iError = HProcess::init ( a_pcProcessName );
 	if ( ! dbwrapper::db_connect )
 		M_THROW ( "no database driver loaded", g_iErrNo );
+	f_oXml.init ( a_pcResource );
 	return ( l_iError );
 	M_EPILOG
 	}

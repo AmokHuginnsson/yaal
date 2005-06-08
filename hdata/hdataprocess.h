@@ -28,6 +28,7 @@ Copyright:
 #define __HDATA_HDATAPROCESS_H
 
 #include "hconsole/hprocess.h"
+#include "tools/hxml.h"
 #include "dbwrapper/hdatabase.h"
 
 namespace stdhapi
@@ -36,17 +37,35 @@ namespace stdhapi
 namespace hdata
 {
 
+class HDataXml : public tools::HXml
+	{
+protected:
+	/*{*/
+	/*}*/
+public:
+	/*{*/
+	void * parse ( void * )
+		{
+		return ( NULL );
+		}
+	/*}*/
+protected:
+	/*{*/
+	/*}*/
+	};
+
 class HDataProcess : public hconsole::HProcess
 	{
 protected:
 	/*{*/
+	HDataXml	f_oXml;
 	dbwrapper::HDataBase f_oDataBase;
 	/*}*/
 public:
 	/*{*/
 	HDataProcess ( void );
 	virtual ~HDataProcess ( void );
-	virtual int init ( char const * );
+	virtual int init ( char const *, char const * );
 	dbwrapper::HDataBase * data_base ( void );
 	/*}*/
 protected:
