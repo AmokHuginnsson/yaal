@@ -65,7 +65,7 @@ public:
 	/*{*/
 	HDataProcess ( void );
 	virtual ~HDataProcess ( void );
-	virtual int init ( char const *, char const * );
+	virtual int init_xrc ( char const *, char const * );
 	dbwrapper::HDataBase * data_base ( void );
 	/*}*/
 protected:

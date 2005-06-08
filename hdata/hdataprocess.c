@@ -55,7 +55,7 @@ HDataProcess::~HDataProcess ( void )
 	M_EPILOG
 	}
 
-int HDataProcess::init ( char const * a_pcProcessName, char const * a_pcResource )
+int HDataProcess::init_xrc ( char const * a_pcProcessName, char const * a_pcResource )
 	{
 	M_PROLOG
 	int l_iError = HProcess::init ( a_pcProcessName );
