@@ -163,7 +163,7 @@ void HEditControl::set_flags ( bool a_bReplace, bool a_bPassword )
 	M_EPILOG
 	}
 
-char const g_pcWhiteSpace [ ] = " \t\n()[].,!?;{}+-*/";
+char const g_pcWordSeparator [ ] = " \t\n`-=[]\\;',./~!@#$%^&*()+{}|:\"<>?";
 
 int HEditControl::process_input ( int a_iCode )
 	{
@@ -335,9 +335,9 @@ int HEditControl::process_input ( int a_iCode )
 		case ( D_KEY_META_('f') ):
 			{
 			l_pcBuffer += ( f_iControlOffset + f_iCursorPosition );
-			l_iErrorCode = strpbrk ( l_pcBuffer, g_pcWhiteSpace ) - l_pcBuffer;
+			l_iErrorCode = strpbrk ( l_pcBuffer, g_pcWordSeparator ) - l_pcBuffer;
 			if ( l_iErrorCode > -1 )
-				l_iErrorCode += strspn ( l_pcBuffer + l_iErrorCode, g_pcWhiteSpace );
+				l_iErrorCode += strspn ( l_pcBuffer + l_iErrorCode, g_pcWordSeparator );
 			else
 				l_iErrorCode = l_iLength - ( f_iControlOffset + f_iCursorPosition );
 			f_iCursorPosition += l_iErrorCode;
@@ -357,9 +357,9 @@ int HEditControl::process_input ( int a_iCode )
 			{
 			if ( f_iControlOffset + f_iCursorPosition )
 				{
-				l_iErrorCode = strrnspn ( l_pcBuffer, g_pcWhiteSpace,
+				l_iErrorCode = strrnspn ( l_pcBuffer, g_pcWordSeparator,
 						f_iControlOffset + f_iCursorPosition );
-				l_pcBuffer = strrnpbrk ( l_pcBuffer, g_pcWhiteSpace,
+				l_pcBuffer = strrnpbrk ( l_pcBuffer, g_pcWordSeparator,
 						f_iControlOffset + f_iCursorPosition - l_iErrorCode );
 				if ( l_pcBuffer )
 					{
@@ -395,9 +395,9 @@ int HEditControl::process_input ( int a_iCode )
 					break;
 					}
 				l_pcBuffer += ( f_iControlOffset + f_iCursorPosition );
-				l_iErrorCode = strpbrk ( l_pcBuffer, g_pcWhiteSpace ) - l_pcBuffer;
+				l_iErrorCode = strpbrk ( l_pcBuffer, g_pcWordSeparator ) - l_pcBuffer;
 				if ( l_iErrorCode > -1 )
-					l_iErrorCode += strspn ( l_pcBuffer + l_iErrorCode, g_pcWhiteSpace );
+					l_iErrorCode += strspn ( l_pcBuffer + l_iErrorCode, g_pcWordSeparator );
 				else
 					l_iErrorCode = l_iLength - ( f_iControlOffset + f_iCursorPosition );
 				l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
@@ -417,9 +417,9 @@ int HEditControl::process_input ( int a_iCode )
 				{
 				if ( f_iControlOffset + f_iCursorPosition )
 					{
-					l_iErrorCode = strrnspn ( l_pcBuffer, g_pcWhiteSpace,
+					l_iErrorCode = strrnspn ( l_pcBuffer, g_pcWordSeparator,
 							f_iControlOffset + f_iCursorPosition );
-					l_pcBuffer = strrnpbrk ( l_pcBuffer, g_pcWhiteSpace,
+					l_pcBuffer = strrnpbrk ( l_pcBuffer, g_pcWordSeparator,
 							f_iControlOffset + f_iCursorPosition - l_iErrorCode );
 					if ( l_pcBuffer )
 						{

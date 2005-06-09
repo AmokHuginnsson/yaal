@@ -774,12 +774,10 @@ char * strrnpbrk ( char const * a_pcBuffer, char const * a_pcStopSet,
 		int a_iIndex )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	int l_iStopSetSize = strlen ( a_pcStopSet );
 	while ( a_iIndex -- )
-		for ( l_iCtr = 0; l_iCtr < l_iStopSetSize; l_iCtr ++ )
-			if ( a_pcBuffer [ a_iIndex ] == a_pcStopSet [ l_iCtr ] )
-				return ( const_cast < char * > ( a_pcBuffer + a_iIndex ) );
+		if ( memchr ( a_pcStopSet, a_pcBuffer [ a_iIndex ], l_iStopSetSize ) )
+			return ( const_cast < char * > ( a_pcBuffer + a_iIndex ) );
 	return ( NULL );
 	M_EPILOG
 	}
@@ -793,18 +791,14 @@ int strrnspn ( char const * a_pcBuffer, char const * a_pcSkipSet,
 		int a_iLenght )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	int l_iSkipSetSize = strlen ( a_pcSkipSet );
 	int l_iIndex = a_iLenght;
 	while ( l_iIndex -- )
 		{
-		for ( l_iCtr = 0; l_iCtr < l_iSkipSetSize; l_iCtr ++ )
-			if ( a_pcBuffer [ l_iIndex ] == a_pcSkipSet [ l_iCtr ] )
-				break;
-		if ( l_iCtr >= l_iSkipSetSize )
+		if ( ! memchr ( a_pcSkipSet, a_pcBuffer [ l_iIndex ], l_iSkipSetSize ) )
 			return ( a_iLenght - l_iIndex );
 		}
-	return ( 0 );
+	return ( a_iLenght );
 	M_EPILOG
 	}
 

@@ -27,9 +27,8 @@ Copyright:
 #ifndef __HCORE_RC_FILE_H
 #define __HCORE_RC_FILE_H
 
-#include <stdio.h>
-
 #include "hstring.h"
+#include "hfile.h"
 
 namespace stdhapi
 {
@@ -52,9 +51,7 @@ namespace rc_file
 			( sizeof ( data ) / sizeof ( OVariable ) ) - 1, callback )
 int process_rc_file_internal ( char const *, char const *,
 		OVariable const *, const int, bool ( * ) ( HString &, HString & ) = NULL );
-int read_rc_line ( HString &, HString &, FILE *, int & );
-FILE * rc_open ( char const *, bool, FILE * = NULL );
-void rc_close ( FILE * );
+int read_rc_line ( HString &, HString &, HFile &, int & );
 void rc_set_variable ( char const *, bool & );
 void rc_set_variable ( char const *, char & );
 void rc_set_variable ( char const *, char ** );

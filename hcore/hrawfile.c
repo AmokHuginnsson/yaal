@@ -55,10 +55,9 @@ int HRawFile::close ( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	if ( f_iFileDescriptor )
-		l_iError = ::close ( f_iFileDescriptor );
-	else
+	if ( ! f_iFileDescriptor )
 		M_THROW ( "file is not opened", g_iErrNo );
+	l_iError = ::close ( f_iFileDescriptor );
 	f_iFileDescriptor = 0;
 	return ( l_iError );
 	M_EPILOG

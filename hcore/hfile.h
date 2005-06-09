@@ -27,24 +27,42 @@ Copyright:
 #ifndef __HCORE_HFILE_H
 #define __HCORE_HFILE_H
 
-#include <stdio.h>
+#include "hstring.h"
 
 namespace stdhapi
 {
 
 namespace hcore
 {
+	
+#define D_READING		1
+#define D_WRITING		2
+#define D_APPEND		4
+#define D_TRUNCATE	8
 
 class HFile
 	{
 protected:
 	/*{*/
-	FILE * f_psStream;
+	int f_iMode;
+	void * f_pvHandle;
+	HString f_oPath;
+	HString f_oError;
 	/*}*/
 public:
 	/*{*/
-	HFile ( void );
-	virtual ~HFile ( void ) ;
+	HFile ( int = D_READING );
+	virtual ~HFile ( void );
+	int open ( char const * );
+	int close ( void );
+	int read_line ( HString &, bool = false, int = 0 );
+	const HString & get_path ( void ) const;
+	const HString & get_error ( void ) const;
+	operator bool ( void ) const;
+	/*}*/
+protected:
+	/*{*/
+	int scan_line ( void );
 	/*}*/
 private:
 	/*{*/

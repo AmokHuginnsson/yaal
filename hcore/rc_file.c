@@ -29,8 +29,6 @@ Copyright:
 #include <stdio.h>   /* fopen ( ) */
 #include <libintl.h> /* gettext ( ) */
 
-#include "config.h"
-
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "rc_file.h"
@@ -45,6 +43,46 @@ namespace hcore
 
 namespace rc_file
 {
+	
+int rc_open ( char const * a_pcRcName, bool a_bLocal, HFile & a_roFile )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	char * l_pcHomePath = 0;
+	HString l_oRcPath;
+	if ( a_roFile )
+		a_roFile.close ( );
+	if ( a_bLocal )
+		{
+		l_pcHomePath = getenv( "HOME" );
+		if ( ! l_pcHomePath )
+			{
+			perror ( "rc_open: getenv ( )" );
+			abort ( );
+			}
+		l_oRcPath = l_pcHomePath;
+		l_oRcPath += "/.";
+		l_oRcPath += a_pcRcName;
+		l_oRcPath += "rc";
+		}
+	else
+		{
+		l_oRcPath = "/etc/";
+		l_oRcPath += a_pcRcName;
+		l_oRcPath += "rc";
+		}
+	l_iError = a_roFile.open ( l_oRcPath );
+	if ( l_iError )
+		l_oRcPath +=	" not found, ";
+	else
+		{
+		l_oRcPath = "config read from: " + l_oRcPath;
+		l_oRcPath += ", ";
+		}
+	log << l_oRcPath;
+	return ( l_iError );
+	M_EPILOG
+	}
 
 int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection,
 		OVariable const * a_psVaraibles, int a_iCount,
@@ -53,17 +91,16 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 	M_PROLOG
 	bool l_pbTFTab [ ] = { false, true }, l_bSection = false, l_bOptionOK;
 	int l_iCtr = 0, l_iCtrOut = 0, l_iLine = 0;
-	FILE * l_psRc = 0;
+	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
 	log ( D_LOG_INFO ) << "process_rc_file ( ): " << a_iCount;
 	if ( a_iCount < 0 )
 		M_THROW ( _ ( "bad variable count" ), a_iCount );
 	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
 		{
-		l_psRc = rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_psRc );
-		if ( l_psRc )
+		if ( ! rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_oRc ) )
 			{
-			while ( read_rc_line ( l_oOption, l_oValue, l_psRc, l_iLine ) )
+			while ( read_rc_line ( l_oOption, l_oValue, l_oRc, l_iLine ) )
 				{
 				if ( n_iDebugLevel )
 					fprintf ( stderr, "option: [%s], value [%s]\n", static_cast < char * > ( l_oOption ),
@@ -147,9 +184,8 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 				}
 			}
 		}
-	if ( l_psRc )
-		rc_close ( l_psRc );
-	l_psRc = NULL;
+	if ( l_oRc )
+		l_oRc.close ( );
 	log << "done." << endl;
 	return ( 0 );
 	M_EPILOG
@@ -159,186 +195,101 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
  * stores rest of line in a_pcValue, returns 1 if there are more lines
  * to read and 0 in other case. */
 
-int read_rc_line ( HString & a_roOption, HString & a_roValue, FILE * a_psFile,
-		int & a_riLine )
+char const n_pcWhiteSpace [ ] = " \t\n\v\f\r";
+
+void strip_comment ( char * a_pcBuffer )
 	{
 	M_PROLOG
-	static size_t	l_uiBlockSize = 256; /* size of buffer allocated to read line */
-	static char * l_pcBuffer = 0; /* buffer for read lines */
-	int l_iIndex = 0, l_iLenght = 0, l_iSub = 0;
-	char * l_pcPtr = NULL;
-#ifndef HAVE_GETLINE /* if we do not have getline we need to simulate its beh */
-	int l_iReadLen = 0;
-	if ( ! l_pcBuffer )
-		l_uiBlockSize = 256;
-#endif /* not HAVE_GETLINE */
-	if ( ! a_psFile ) /* the file is closed, we can deallocate allocated memory */
+	bool l_bApostrophe = false, l_bQuotation = false;
+	int l_iCtr = 0, l_iLenght = strlen ( a_pcBuffer );
+	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr ++ )
 		{
-		if ( l_pcBuffer )
+		switch ( a_pcBuffer [ l_iCtr ] )
 			{
-			xfree ( l_pcBuffer );
-			l_pcBuffer = 0;
-			l_uiBlockSize = 0;
-			}
-		return ( 0 );
-		}
-	if ( ! l_pcBuffer )
-		l_pcBuffer = xcalloc ( l_uiBlockSize, char );
-	a_roOption = a_roValue = "";
-#ifdef HAVE_GETLINE
-	while ( getline ( &l_pcBuffer, &l_uiBlockSize, a_psFile ) > 0 )
-#else /* HAVE_GETLINE */
-	while ( ( l_iReadLen = fread ( l_pcBuffer, sizeof ( char ), l_uiBlockSize, a_psFile ) ) )
-#endif /* not HAVE_GETLINE */
-		{
-		a_riLine ++;
-#ifndef HAVE_GETLINE
-		l_pcPtr = static_cast < char * > ( memchr ( l_pcBuffer,
-					'\n', l_iReadLen ) );
-		if ( ! l_pcPtr )
-			continue;
-		* ++ l_pcPtr = 0;
-		fseek ( a_psFile, l_pcPtr - l_pcBuffer - l_iReadLen, SEEK_CUR );
-#endif /* not HAVE_GETLINE */
-		/* we are looking for first non-whitespace on the line */
-		for ( l_iIndex = 0; l_iIndex < static_cast < int > ( l_uiBlockSize - 1 ); l_iIndex++ )
-			{
-			if ( ( l_pcBuffer [ l_iIndex ] == ' ')
-					|| ( l_pcBuffer [ l_iIndex ] == '\t' ) )continue;
-			else
+			case ( '\'' ):
 				{
-				if ( ( l_pcBuffer [ l_iIndex ] == '#' )
-						|| ( l_pcBuffer [ l_iIndex ] == '\r' )
-						|| ( l_pcBuffer [ l_iIndex ] == '\n' ) )l_iIndex = -99;
-				/* this line is empty or has only a comment */
+				l_bApostrophe = ! l_bApostrophe;
+				break;
+				}
+			case ( '"' ):
+				{
+				l_bQuotation = ! l_bQuotation;
+				break;
+				}
+			case ( '#' ):
+				{
+				if ( ! ( l_bQuotation || l_bQuotation ) )
+					{
+					a_pcBuffer [ l_iCtr ] = 0;
+					return;
+					}
+				break;
+				}
+			default:
+				{
 				break;
 				}
 			}
-		if ( ( l_iIndex > -1 ) && ( l_iIndex < static_cast < int > ( l_uiBlockSize - 1 ) ) )
+		}
+	return;
+	M_EPILOG
+	}
+
+int read_rc_line ( HString & a_roOption, HString & a_roValue, HFile & a_roFile,
+		int & a_riLine )
+	{
+	M_PROLOG
+	int l_iIndex = 0, l_iLenght = 0, l_iEnd = 0;
+	char * l_pcBuffer = NULL, * l_pcPtr = NULL;
+	a_roOption = a_roValue = "";
+	while ( a_roFile.read_line ( a_roOption, true ) >= 0 )
+		{
+		a_riLine ++;
+		l_pcBuffer = a_roOption;
+		l_iIndex = 0;
+		if ( ! l_pcBuffer [ l_iIndex ] )
+			continue; /* empty line */
+		/* we are looking for first non-whitespace on the line */
+		l_iIndex = strspn ( l_pcBuffer, n_pcWhiteSpace );
+		if ( ! l_pcBuffer [ l_iIndex ] || ( l_pcBuffer [ l_iIndex ] == '#' ) )
+			continue; /* there is only white spaces or comments on that line */
+		/* at this point we know we have _some_ option */
+		strip_comment ( l_pcBuffer );
+		/* strip comment from end of line */
+		l_iLenght = strlen ( l_pcBuffer );
+		if ( l_iIndex )
 			{
-			/* at this point we know we have _some_ option */
-			/* now we look for first whitespace after option */
-			l_pcPtr = strpbrk ( l_pcBuffer + l_iIndex, " \t" );
-			if ( ! l_pcPtr )
-				{
-				/* we did not found any whitespace, so we have no value at this line */
-				l_iSub = l_iIndex;
-				l_iLenght = strlen ( l_pcBuffer ) - 1;
-				/* strip comment from end of line */
-				if ( ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) ) )
-					l_iLenght = ( l_pcPtr - l_pcBuffer ) - 1;
-				for ( l_iIndex = l_iLenght; l_iIndex > l_iSub ; l_iIndex-- )
-					if ( ! ( ( l_pcBuffer [ l_iIndex ] == ' ')
-							|| ( l_pcBuffer [ l_iIndex ] == '\t' ) 
-							|| ( l_pcBuffer [ l_iIndex ] == '\r' )
-							|| ( l_pcBuffer [ l_iIndex ] == '\n' ) ) )
-						break;
-				l_pcBuffer [ l_iIndex + 1 ] = 0;
-				a_roOption = l_pcBuffer + l_iSub;
-				}
-			else
-				{
-				/* we have found a whitespace, so there is probability that */
-				/* have a value :-o */
-				l_iSub = l_pcPtr - l_pcBuffer;
-				l_pcBuffer [ l_iSub ] = 0;
-				a_roOption = l_pcBuffer + l_iIndex;
-				l_pcBuffer [ l_iSub ] = ' ';
-				for ( l_iIndex = l_iSub;
-						l_iIndex < static_cast < int > ( l_uiBlockSize - 1 );
-						l_iIndex++ )
-					{
-					if ( ( l_pcBuffer [ l_iIndex ] == ' ')
-							|| ( l_pcBuffer [ l_iIndex ] == '\t' ) )continue;
-					else
-						{
-						if ( ( l_pcBuffer [ l_iIndex ] == '#' )
-								|| ( l_pcBuffer [ l_iIndex ] == '\r' )
-								|| ( l_pcBuffer [ l_iIndex ] == '\n' ) )l_iIndex = - 99;
-						break;
-						}
-					}
-				if ( ( l_iIndex > - 1 ) && ( l_iIndex < static_cast < int > ( l_uiBlockSize - 1 ) ) )
-					{
-					/* we have found a non-whitespace, so there certainly is a value */
-					l_iSub = l_iIndex;
-					l_iLenght = strlen ( l_pcBuffer ) - 1;
-					/* strip comment from end of line */
-					if ( ( l_pcPtr = strchr ( l_pcBuffer + l_iSub, '#' ) ) )
-						l_iLenght = ( l_pcPtr - l_pcBuffer ) - 1;
-					for ( l_iIndex = l_iLenght; l_iIndex > l_iSub ; l_iIndex-- )
-						if ( ! ( ( l_pcBuffer [ l_iIndex ] == ' ')
-								|| ( l_pcBuffer [ l_iIndex ] == '\t' ) 
-								|| ( l_pcBuffer [ l_iIndex ] == '\r' )
-								|| ( l_pcBuffer [ l_iIndex ] == '\n' ) ) ) break;
-					/* now we strip apostrophe or quotation marks */
-					if ( ( ( l_pcBuffer [ l_iSub ] == '\'' )
-								|| ( l_pcBuffer [ l_iSub ] == '"' ) )
-							&& ( l_pcBuffer [ l_iSub ] == l_pcBuffer [ l_iIndex ] ) )
-						l_iIndex --, l_iSub ++;
-					l_pcBuffer [ l_iIndex + 1 ] = 0;
-					a_roValue = l_pcBuffer + l_iSub;
-					}
-				}
-			return ( 1 );
+			memmove ( l_pcBuffer, l_pcBuffer + l_iIndex, l_iLenght - l_iIndex );
+			l_iLenght -= l_iIndex;
+			l_pcBuffer [ l_iLenght ] = 0;
 			}
+		/* now we look for first whitespace after option */
+		if ( ( l_pcPtr = strpbrk ( l_pcBuffer, n_pcWhiteSpace ) ) )
+			{
+			/* we have found a whitespace, so there is probability that */
+			/* have a value :-o */
+			l_iIndex = l_pcPtr - l_pcBuffer;
+			l_pcBuffer [ l_iIndex ++ ] = 0;
+			l_iIndex += strspn ( l_pcBuffer + l_iIndex, n_pcWhiteSpace );
+			if ( l_pcBuffer [ l_iIndex ] )
+				{
+				/* we have found a non-whitespace, so there certainly is a value */
+				l_iEnd = l_iLenght - strrnspn ( l_pcBuffer, n_pcWhiteSpace, l_iLenght );
+				/* now we strip apostrophe or quotation marks */
+				if ( ( ( l_pcBuffer [ l_iEnd ] == '\'' )
+							|| ( l_pcBuffer [ l_iEnd ] == '"' ) )
+						&& ( l_pcBuffer [ l_iEnd ] == l_pcBuffer [ l_iIndex ] ) )
+					l_iIndex ++, l_iEnd --;
+				l_pcBuffer [ l_iEnd + 1 ] = 0;
+				a_roValue = l_pcBuffer + l_iIndex;
+				}
+			}
+		return ( 1 );
 		}
 	return ( 0 );
 	M_EPILOG
 	}
 	
-FILE * rc_open ( char const * a_pcRcName, bool a_bLocal, FILE * a_psFile )
-	{
-	M_PROLOG
-	char * l_pcHomePath = 0;
-	FILE * l_psRc = 0;
-	HString l_oRcPath;
-	if ( a_psFile )
-		fclose ( a_psFile );
-	if ( a_bLocal )
-		{
-		l_pcHomePath = getenv( "HOME" );
-		if ( ! l_pcHomePath )
-			{
-			perror ( "rc_open: getenv ( )" );
-			abort ( );
-			}
-		l_oRcPath = l_pcHomePath;
-		l_oRcPath += "/.";
-		l_oRcPath += a_pcRcName;
-		l_oRcPath += "rc";
-		}
-	else
-		{
-		l_oRcPath = "/etc/";
-		l_oRcPath += a_pcRcName;
-		l_oRcPath += "rc";
-		}
-	l_psRc = fopen ( l_oRcPath, "r" );
-	if ( ! l_psRc )
-		l_oRcPath +=	" not found, ";
-	else
-		{
-		l_oRcPath = "config read from: " + l_oRcPath;
-		l_oRcPath += ", ";
-		}
-	log << l_oRcPath;
-	return ( l_psRc );
-	M_EPILOG
-	}
-	
-void rc_close ( FILE * a_psRc )
-	{
-	M_PROLOG
-	int l_iDummy = 0;
-	HString l_oTmp;
-	M_IRV ( read_rc_line ( l_oTmp, l_oTmp, 0, l_iDummy ) );
-	if ( a_psRc )
-		fclose ( a_psRc );
-	return;
-	M_EPILOG
-	}
-
 void rc_set_variable ( char const * a_pcValue, bool & a_rbVariable )
 	{
 	M_PROLOG
