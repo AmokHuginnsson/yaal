@@ -71,6 +71,7 @@ int HFile::open ( char const * a_pcPath )
 			l_pcMode = "r";
 			break;
 			}
+		case ( D_WRITING ):
 		case ( D_WRITING | D_TRUNCATE ):
 			{
 			l_pcMode = "w";
