@@ -58,6 +58,14 @@ public:
 	int read_line ( HString &, bool = false, int = 0 );
 	const HString & get_path ( void ) const;
 	const HString & get_error ( void ) const;
+	void flush ( void ) const;
+	HFile & operator << ( char const * );
+	HFile & operator << ( char const );
+	HFile & operator << ( const int );
+	HFile & operator << ( const long int );
+	HFile & operator << ( const double );
+	HFile & operator << ( void * );
+	HFile & operator << ( HFile & ( * ) ( HFile & ) );
 	operator bool ( void ) const;
 	/*}*/
 protected:
@@ -69,6 +77,8 @@ private:
 	HFile ( const HFile & );
 	HFile & operator = ( const HFile & );
 	/*}*/
+	friend HFile & endl ( HFile & );
+	friend HFile & flush ( HFile & );
 	};
 
 }

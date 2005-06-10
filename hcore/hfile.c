@@ -199,6 +199,86 @@ const HString & HFile::get_error ( void ) const
 	M_EPILOG
 	}
 
+void HFile::flush ( void ) const
+	{
+	M_PROLOG
+	M_ENSURE ( fflush ( static_cast < FILE * > ( f_pvHandle ) ) == 0 );
+	return;
+	M_EPILOG
+	}
+
+HFile & HFile::operator << ( char const * a_pcString )
+	{
+	M_PROLOG
+	if ( a_pcString )
+		fprintf ( static_cast < FILE * > ( f_pvHandle ), a_pcString );
+	return ( * this );
+	M_EPILOG
+	}
+
+HFile & HFile::operator << ( char const a_cChar )
+	{
+	M_PROLOG
+	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%c", a_cChar );
+	return ( * this );
+	M_EPILOG
+	}
+
+HFile & HFile::operator << ( const int a_iInteger )
+	{
+	M_PROLOG
+	long int l_lTmp = a_iInteger;
+	return ( operator << ( l_lTmp ) );
+	M_EPILOG
+	}
+
+HFile & HFile::operator << ( const long int a_lLongInteger )
+	{
+	M_PROLOG
+	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%ld", a_lLongInteger );
+	return ( * this );
+	M_EPILOG
+	}
+
+HFile & HFile::operator << ( const double a_dDouble )
+	{
+	M_PROLOG
+	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%f", a_dDouble );
+	return ( * this );
+	M_EPILOG
+	}
+
+HFile & HFile::operator << ( void * a_pvPtr )
+	{
+	M_PROLOG
+	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%p", a_pvPtr );
+	return ( * this );
+	M_EPILOG
+	}
+
+HFile & HFile::operator << ( HFile & ( * HFILE ) ( HFile & ) )
+	{
+	M_PROLOG
+	return ( HFILE ( * this ) );
+	M_EPILOG
+	}
+
+HFile & endl ( HFile & a_roFile )
+	{
+	M_PROLOG
+	a_roFile << '\n';
+	return ( a_roFile );
+	M_EPILOG
+	}
+
+HFile & flush ( HFile & a_roFile )
+	{
+	M_PROLOG
+	a_roFile.flush ( );
+	return ( a_roFile );
+	M_EPILOG
+	}
+
 HFile::operator bool ( void ) const
 	{
 	M_PROLOG
