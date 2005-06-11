@@ -62,11 +62,10 @@ namespace hcore
 # define M_EXCEPTION_RELEASE( e ) delete e;
 # define M_THROW( msg, e_no ) throw ( new HException ( __WHERE__, msg, e_no ) )
 #endif /* not __EXCEPTIONS_BY_REFERENCE__ */
-#define M_TRY try{
-#define M_CATCH( e ) }catch ( HException D_EXCEPTION_BY e )
-#define M_PROLOG M_TRY
-#define M_EPILOG M_CATCH ( e ){e->log ( __WHERE__ );throw;}
-#define M_FINAL M_CATCH ( e ){e->log ( __WHERE__ );e->print_error ( true );M_EXCEPTION_RELEASE ( e );}
+#define M_CATCH( e ) catch ( HException D_EXCEPTION_BY e )
+#define M_PROLOG try{
+#define M_EPILOG } M_CATCH ( e ){e->log ( __WHERE__ );throw;}
+#define M_FINAL } M_CATCH ( e ){e->log ( __WHERE__ );e->print_error ( true );M_EXCEPTION_RELEASE ( e );}
 #define M_ENSURE( condition ) if ( ! ( condition ) )M_THROW ( strerror ( errno ), errno )
 #define M_IRV( expression )	static_cast < void > ( expression )
 #define M_ASSERT( condition ) if ( ! ( condition ) )HException::failed_assert ( __WHERE__, #condition )
