@@ -66,7 +66,9 @@ public:
 	HLog & operator << ( char const * );
 	HLog & operator << ( char const );
 	HLog & operator << ( const int );
+	HLog & operator << ( const unsigned int );
 	HLog & operator << ( const long int );
+	HLog & operator << ( const unsigned long int );
 	HLog & operator << ( const double );
 	HLog & operator << ( void * );
 	HLog & operator << ( HLog & ( * ) ( HLog & ) );

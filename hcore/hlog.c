@@ -316,7 +316,15 @@ HLog & HLog::operator << ( const int a_iInteger )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( const long int a_lInteger )
+HLog & HLog::operator << ( const unsigned int a_uiInteger )
+	{
+	M_PROLOG
+	unsigned long int l_ulTmp = a_uiInteger;
+	return ( * this << l_ulTmp );
+	M_EPILOG
+	}
+
+HLog & HLog::operator << ( const long int a_lLongInteger )
 	{
 	M_PROLOG
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
@@ -324,7 +332,23 @@ HLog & HLog::operator << ( const long int a_lInteger )
 		if ( f_bNewLine )
 			timestamp ( );
 		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%ld",
-					a_lInteger ) < static_cast < int > ( f_iBufferSize ) );
+					a_lLongInteger ) < static_cast < int > ( f_iBufferSize ) );
+		fprintf ( f_psStream, f_pcBuffer );
+		f_bNewLine = false;
+		}
+	return ( * this );
+	M_EPILOG
+	}
+
+HLog & HLog::operator << ( const unsigned long int a_ulLongInteger )
+	{
+	M_PROLOG
+	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
+		{
+		if ( f_bNewLine )
+			timestamp ( );
+		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%lu",
+					a_ulLongInteger ) < static_cast < int > ( f_iBufferSize ) );
 		fprintf ( f_psStream, f_pcBuffer );
 		f_bNewLine = false;
 		}
