@@ -39,8 +39,8 @@ namespace hconsole
 #define D_MODE_EDITCONTROL	0
 #define D_MODE_LISTCONTROL	1
 
-class HComboboxControl : virtual public HEditControl,
-	virtual public HListControl
+class HComboboxControl : public virtual HEditControl,
+	public virtual HListControl
 	{
 protected:
 	/*{*/
