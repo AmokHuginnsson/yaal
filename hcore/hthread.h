@@ -49,13 +49,34 @@ public:
 	virtual ~HThread ( void );
 	int spawn ( void );
 	int finish ( void );
-	void listen ( void ) const;
+	bool listen ( void ) const;
 	/*}*/
 private:
 	virtual int run ( void ) = 0;
 	static void * SPAWN ( void * );
 	HThread ( const HThread & );
 	HThread & operator = ( const HThread & );
+	};
+
+class HMutex
+	{
+protected:
+	/*{*/
+	bool	f_bRecursive;
+	pthread_mutexattr_t f_sAttributes;
+	pthread_mutex_t f_xMutex;
+	/*}*/
+public:
+	/*{*/
+	HMutex ( bool = false );
+	virtual ~HMutex ( void );
+	void lock ( void );
+	bool try_lock ( void );
+	void unlock ( void );
+	/*}*/
+protected:
+	/*{*/
+	/*}*/
 	};
 
 }

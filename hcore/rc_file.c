@@ -218,7 +218,7 @@ void strip_comment ( char * a_pcBuffer )
 				}
 			case ( '#' ):
 				{
-				if ( ! ( l_bQuotation || l_bQuotation ) )
+				if ( ! ( l_bQuotation || l_bApostrophe ) )
 					{
 					a_pcBuffer [ l_iCtr ] = 0;
 					return;

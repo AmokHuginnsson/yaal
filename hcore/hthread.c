@@ -95,12 +95,56 @@ void * HThread::SPAWN ( void * a_pvThread )
 	M_EPILOG
 	}
 
-void HThread::listen ( void ) const
+bool HThread::listen ( void ) const
 	{
 	M_PROLOG
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
 	pthread_testcancel ( );
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
+	return ( f_bAlive );
+	M_EPILOG
+	}
+
+HMutex::HMutex ( bool a_bRecursive ) : f_bRecursive ( a_bRecursive ),
+																			 f_sAttributes ( ), f_xMutex ( )
+	{
+	M_PROLOG
+	M_IRV ( pthread_mutexattr_init ( & f_sAttributes ) );
+	M_ENSURE ( pthread_mutexattr_settype ( & f_sAttributes,
+				f_bRecursive ? PTHREAD_MUTEX_RECURSIVE_NP : PTHREAD_MUTEX_ERRORCHECK_NP ) != EINVAL );
+	M_IRV ( pthread_mutex_init ( & f_xMutex, & f_sAttributes ) );
+	return;
+	M_EPILOG
+	}
+
+HMutex::~HMutex ( void )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	while ( ( l_iError = pthread_mutex_destroy ( & f_xMutex ) ) == EBUSY )
+		;
+	M_ENSURE ( l_iError == 0 );
+	M_IRV ( pthread_mutexattr_destroy ( & f_sAttributes ) );
+	return;
+	M_EPILOG
+	}
+
+void HMutex::lock ( void )
+	{
+	M_PROLOG
+	int l_iError = pthread_mutex_lock ( & f_xMutex );
+	if ( ! f_bRecursive )
+		M_ENSURE ( l_iError != EDEADLK );
+	return;
+	M_EPILOG
+	}
+
+void HMutex::unlock ( void )
+	{
+	M_PROLOG
+	int l_iError = pthread_mutex_unlock ( & f_xMutex );
+	if ( ! f_bRecursive )
+		M_ENSURE ( l_iError != EPERM );
 	return;
 	M_EPILOG
 	}
