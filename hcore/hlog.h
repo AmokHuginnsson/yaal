@@ -35,7 +35,7 @@ namespace stdhapi
 namespace hcore
 {
 
-#define M_LOG(MESG) log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, static_cast < char const * > ( ( MESG ) ) )
+#define M_LOG(MESG) stdhapi::hcore::log ( "Log: %16s : %4d : %s : %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, static_cast < char const * > ( ( MESG ) ) )
 
 class HLog
 	{
