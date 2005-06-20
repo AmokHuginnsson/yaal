@@ -222,7 +222,8 @@ fi
 if test ["$ORACLE"] != ["no"] ; then
 	CXXFLAGS=["$CXXFLAGS -L$ORACLE_HOME/lib"]
 	AC_CHECK_LIB([clntsh],[OCIEnvCreate],
-								[],[if test ["$ORACLE"] = ["yes"] ; then
+								[EXTRA_LIB_PATHS="$EXTRA_LIB_PATHS -L$ORACLE_HOME/lib"],
+								[if test ["$ORACLE"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without Oracle.])
 										fi;ORACLE=["no"]])
 	CXXFLAGS=$CXXFLAGS_ORIG
@@ -265,6 +266,7 @@ if test ["$ORACLE"] != ["no"] ; then
 	CPPFLAGS=["$CXXFLAGS"]
 	AC_CHECK_HEADERS([[oci.h]],
 		[AC_SUBST([DO_ORACLE_DRIVER],["oracle"])
+		 AC_SUBST([ORACLE_SID],["$ORACLE_SID"])
 			EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I\$(ORACLE_HOME)/rdbms/public"]
 			DEFAULT_DRIVER=["Oracle"]],
 				[if test ["$ORACLE"] = ["yes"] ; then

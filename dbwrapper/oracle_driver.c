@@ -46,6 +46,12 @@ using namespace stdhapi::hcore;
 extern "C"
 {
 
+OVariable n_psVariables [ ] =
+	{
+		{ D_TYPE_HSTRING, "instance_name", & g_oInstanceName },
+		{ 0, NULL, NULL }
+	};
+
 struct OAllocator
 	{
 	OAllocator * f_psNext;
@@ -97,7 +103,7 @@ void * db_connect ( char const * /* In Oracle user name is name of schema. */,
 		return ( NULL );
 		}
 	if ( ( l_psOracle->f_iStatus = OCIHandleAlloc ( l_psOracle->f_psEnvironment,
-				reinterpret_cast < void ** > ( & l_psOracle->f_psError ),
+				reinterpret_cast < void * * > ( & l_psOracle->f_psError ),
 				OCI_HTYPE_ERROR, 0, NULL ) ) != OCI_SUCCESS )
 		{
 		g_psBrokenDB = l_psOracle;
@@ -105,12 +111,12 @@ void * db_connect ( char const * /* In Oracle user name is name of schema. */,
 		}
 	if ( ( l_psOracle->f_iStatus = OCILogon ( l_psOracle->f_psEnvironment,
 				l_psOracle->f_psError, & l_psOracle->f_psServiceContext,
-				reinterpret_cast < const OraText * > ( a_pcLogin ),
+				reinterpret_cast < OraText const * > ( a_pcLogin ),
 				strlen ( a_pcLogin ),
-				reinterpret_cast < const OraText * > ( a_pcPassword ),
+				reinterpret_cast < OraText const * > ( a_pcPassword ),
 				strlen ( a_pcPassword ),
-				reinterpret_cast < const OraText * > ( "SPOON" ),
-				strlen ( "SPOON" ) ) ) != OCI_SUCCESS )
+				reinterpret_cast < OraText const * > ( static_cast < char const * > ( g_oInstanceName ) ),
+				g_oInstanceName.get_length ( ) ) ) != OCI_SUCCESS )
 		{
 		g_psBrokenDB = l_psOracle;
 		return ( NULL );
@@ -373,6 +379,13 @@ char * rs_column_name ( void * a_pvDataR, int a_iField )
 	if ( l_psParameter )
 		OCIDescriptorFree ( l_psParameter, OCI_DTYPE_PARAM );
 	return ( reinterpret_cast < char * > ( l_pcName ) );
+	}
+
+void oracle_init ( void ) __attribute__((__constructor__));
+void oracle_init ( void )
+	{
+	rc_file::process_rc_file ( "stdhapi", "oracle", n_psVariables, NULL );
+	return;
 	}
 
 }

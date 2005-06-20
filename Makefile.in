@@ -167,14 +167,16 @@ LIBS_dbwrapper	= "-rdynamic @DLOPEN_IN@ -lhcore -lhconsole -ltools"
 DEPS_hdata			= $(TARGET_dbwrapper) $(TARGET_hconsole)
 LIBS_hdata			= "-lncurses -lhcore -lhconsole -ltools -ldbwrapper"
 
+DEPS_sqlite3		= $(TARGET_hcore)
+LIBS_sqlite3		= "-lsqlite3 -lhcore"
+DEPS_sqlite			= $(TARGET_hcore)
+LIBS_sqlite			= "-lsqlite -lhcore"
 DEPS_mysql			= $(TARGET_hcore)
 LIBS_mysql			= "-lmysqlclient -lhcore"
 DEPS_postgresql	= $(TARGET_hcore)
 LIBS_postgresql	= "-lpq -lhcore"
-DEPS_sqlite			= $(TARGET_hcore)
-LIBS_sqlite			= "-lsqlite -lhcore"
-DEPS_sqlite3		= $(TARGET_hcore)
-LIBS_sqlite3		= "-lsqlite3 -lhcore"
+DEPS_oracle			= $(TARGET_hcore)
+LIBS_oracle			= "-lclntsh -lhcore"
 
 #-------------------------------------------------------------------
 

@@ -182,3 +182,12 @@ data_base_driver '@DEFAULT_DRIVER@'
 
 ### dbwrapper END
 
+### oracle driver BEGIN
+[oracle]
+
+# name of the Oracle instance
+# instance_name
+# type: string, default: (installation dependent)
+instance_name '@ORACLE_SID@'
+
+### oracle driver END

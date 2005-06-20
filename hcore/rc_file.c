@@ -93,7 +93,7 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 	int l_iCtr = 0, l_iCtrOut = 0, l_iLine = 0;
 	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
-	log ( D_LOG_INFO ) << "process_rc_file ( ): " << a_iCount;
+	log ( D_LOG_INFO ) << "process_rc_file ( ): ";
 	if ( a_iCount < 0 )
 		M_THROW ( _ ( "bad variable count" ), a_iCount );
 	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
