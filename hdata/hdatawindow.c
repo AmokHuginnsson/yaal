@@ -252,7 +252,7 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 	l_psCI->f_pcName = l_pcName;
 	l_psCI->f_iWidth = 1; 				/* width is awlays proportional */
 	l_psCI->f_iAlign = D_ALIGN_LEFT;
-	l_psCI->f_iType = D_TYPE_HSTRING;
+	l_psCI->f_iType = D_HSTRING;
 	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
 	if ( f_psResourcesArray [ l_iParent ].f_iType == D_CONTROL_LIST )
 		{

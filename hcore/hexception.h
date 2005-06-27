@@ -69,6 +69,27 @@ namespace hcore
 #define M_ENSURE( condition ) if ( ! ( condition ) )M_THROW ( strerror ( errno ), errno )
 #define M_IRV( expression )	static_cast < void > ( expression )
 #define M_ASSERT( condition ) if ( ! ( condition ) )HException::failed_assert ( __WHERE__, #condition )
+#define M_DEFINE_ENUM_OPERATORS( enum_name ) \
+	inline enum_name operator | ( enum_name const & left, enum_name const & right ) \
+		{ return ( static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
+					| static_cast < unsigned long int > ( right ) ) ); } \
+	inline enum_name & operator |= ( enum_name & left, enum_name const & right ) \
+		{ return ( left = static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
+					| static_cast < unsigned long int > ( right ) ) ); } \
+	inline enum_name operator & ( enum_name const & left, enum_name const & right ) \
+		{ return ( static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
+					& static_cast < unsigned long int > ( right ) ) ); } \
+	inline enum_name & operator &= ( enum_name & left, enum_name const & right ) \
+		{ return ( left = static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
+					& static_cast < unsigned long int > ( right ) ) ); } \
+	inline enum_name operator ^ ( enum_name const & left, enum_name const & right ) \
+		{ return ( static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
+					^ static_cast < unsigned long int > ( right ) ) ); } \
+	inline enum_name & operator ^= ( enum_name & left, enum_name const & right ) \
+		{ return ( left = static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
+					^ static_cast < unsigned long int > ( right ) ) ); } \
+	inline enum_name operator ~ ( enum_name const & e ) \
+		{ return ( static_cast < enum_name > ( ~ static_cast < unsigned long int > ( e ) ) ); }
 
 #define D_LOG_DEBUG			1
 #define D_LOG_INFO			2
@@ -79,23 +100,26 @@ namespace hcore
 
 /* those types definitions were in hinfo.h but this file (hexception.h)
  * is included into more files, we assume that sizeof ( int ) >= 4 */
-#define D_TYPE_NONE					0x0000
-#define D_TYPE_BOOL					0x0001
-#define D_TYPE_CHAR					0x0002
-#define D_TYPE_SHORT				0x0004
-#define D_TYPE_INT					0x0008
-#define	D_TYPE_LONG					0x0010
-#define	D_TYPE_LONG_INT			0x0020
-#define D_TYPE_DOUBLE				0x0040
-#define D_TYPE_POINTER			0x0080
-#define D_TYPE_CHAR_POINTER	0x0100
-#define D_TYPE_HOBJECT			0x0200
-#define D_TYPE_HSTRING			0x0400
-#define D_TYPE_HINFO				0x0800
-#define D_TYPE_HMAP					0x1000
-#define D_TYPE_HLIST				0x2000
-#define D_TYPE_HTIME				0x4000
-#define D_TYPE_MASK					0xffff
+
+typedef enum
+	{
+	D_NONE					= 0x0000,
+	D_BOOL					= 0x0001,
+	D_CHAR					= 0x0002,
+	D_SHORT					= 0x0004,
+	D_INT						= 0x0008,
+	D_LONG_INT			= 0x0010,
+	D_DOUBLE				= 0x0020,
+	D_POINTER				= 0x0040,
+	D_CHAR_POINTER	= 0x0080,
+	D_HSTRING				= 0x0100,
+	D_HINFO					= 0x0200,
+	D_HMAP					= 0x0400,
+	D_HLIST					= 0x0800,
+	D_HTIME					= 0x1000,
+	D_MASK					= 0xffff
+	} type_t;
+M_DEFINE_ENUM_OPERATORS( type_t )
 
 #define g_iErrNo errno
 

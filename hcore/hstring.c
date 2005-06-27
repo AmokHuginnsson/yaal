@@ -484,13 +484,13 @@ int HString::find ( char const * a_pcPattern, int a_iAfter ) const
 	{
 	M_PROLOG
 	if ( ( ! a_pcPattern ) || ( a_iAfter < 0 ) )
-		return ( -1 );
+		return ( - 1 );
 	if ( ( ! strlen ( a_pcPattern ) )
 			|| ( static_cast < int > ( strlen ( f_pcBuffer ) ) <= a_iAfter ) )
-		return ( -1 );
+		return ( - 1 );
 	char * l_pcStr = strstr ( f_pcBuffer + a_iAfter, a_pcPattern );
 	if ( ! l_pcStr )
-		return ( -1 );
+		return ( - 1 );
 	return ( l_pcStr - f_pcBuffer );
 	M_EPILOG
 	}

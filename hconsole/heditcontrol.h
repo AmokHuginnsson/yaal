@@ -38,7 +38,7 @@ namespace hconsole
 {
 
 #define D_MASK_LETTERS	"^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$"
-#define D_MASK_CIPHERS	"^[0-9]*$"
+#define D_MASK_DIGITS		"^[0-9]*$"
 #define D_MASK_APLPHA		"^[a-zA-Z0-9]*$"
 #define D_MASK_EXTENDED	"^[0-9a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ\\.\\(\\) -]*$"
 #define D_MASK_LOOSE		".*"

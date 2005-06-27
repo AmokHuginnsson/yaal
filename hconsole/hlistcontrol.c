@@ -186,22 +186,22 @@ void HListControl::refresh ( void )
 					f_oVarTmpBuffer [ 0 ] = 0;
 					switch ( l_poColumnInfo->f_iType )
 						{
-						case ( D_TYPE_LONG_INT ):
+						case ( D_LONG_INT ):
 							{
 							f_oVarTmpBuffer = l_oItem [ l_iCtrLoc ].get < long int > ( );
 							break;
 							}
-						case ( D_TYPE_DOUBLE ):
+						case ( D_DOUBLE ):
 							{
 							f_oVarTmpBuffer = l_oItem [ l_iCtrLoc ].get < double > ( );
 							break;
 							}
-						case ( D_TYPE_HSTRING ):
+						case ( D_HSTRING ):
 							{
 							f_oVarTmpBuffer = l_oItem [ l_iCtrLoc ].get < const HString & > ( );
 							break;
 							}
-						case ( D_TYPE_HTIME ):
+						case ( D_HTIME ):
 							{
 							f_oVarTmpBuffer = static_cast < char const * > ( l_oItem [ l_iCtrLoc ].get < const HTime & > ( ) );
 							break;
@@ -735,17 +735,17 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 		f_poParent->status_bar ( )->update_progress ( static_cast < double > ( f_lComparedItems ) );
 	switch ( f_oHeader [ f_iSortColumn ].f_iType )
 		{
-		case ( D_TYPE_LONG_INT ):
+		case ( D_LONG_INT ):
 			return ( static_cast < long > ( l_roLeftInfo ) - static_cast < long > ( l_roRightInfo ) );
-		case ( D_TYPE_DOUBLE ):
+		case ( D_DOUBLE ):
 			{
 			l_dDifference = static_cast < double > ( l_roLeftInfo ) - static_cast < double > ( l_roRightInfo );
 			break;
 			}
-		case ( D_TYPE_HSTRING ):
+		case ( D_HSTRING ):
 			return ( strcasecmp ( l_roLeftInfo.get < const HString & > ( ),
 					 l_roRightInfo.get < const HString & > ( ) ) );
-		case ( D_TYPE_HTIME ):
+		case ( D_HTIME ):
 			{
 			l_dDifference = static_cast < time_t > ( l_roLeftInfo.get < const HTime & > ( ) ) - static_cast < time_t > ( l_roRightInfo.get < const HTime & > ( ) );
 			break;

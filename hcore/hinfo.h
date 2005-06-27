@@ -41,7 +41,7 @@ class HInfo
 	{
 protected:
 	/*{*/
-	int				f_iType;
+	type_t		f_eType;
 	int				f_iInt;
 	long int	f_lLongInt;
 	double		f_dDouble;

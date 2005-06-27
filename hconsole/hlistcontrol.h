@@ -118,7 +118,7 @@ public:
 										char const *,									/* column name */
 										const int &,									/* width */
 										const int & = D_ALIGN_LEFT,		/* align */
-										const int & = D_TYPE_HSTRING,	/* type */
+										const int & = hcore::D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
 	virtual HItem & add_tail ( HItem * = NULL );
 	virtual HItem & add_orderly ( HItem &, int = D_ASCENDING );

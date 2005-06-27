@@ -75,17 +75,17 @@ int		n_iCommandComposeDelay = 16;
 
 OVariable n_psVariables [ ] =
 	{
-		{ D_TYPE_BOOL, "use_mouse", & n_bUseMouse },
-		{ D_TYPE_BOOL, "disable_XON", & n_bDisableXON },
-		{ D_TYPE_BOOL, "leave_ctrl_c", & n_bLeaveCtrlC },
-		{ D_TYPE_BOOL, "leave_ctrl_z", & n_bLeaveCtrlZ },
-		{ D_TYPE_BOOL, "leave_ctrl_s", & n_bLeaveCtrlS },
-		{ D_TYPE_BOOL, "leave_ctrl_q", & n_bLeaveCtrlQ },
-		{ D_TYPE_BOOL, "leave_ctrl_\\", & n_bLeaveCtrlBackSlash },
-		{ D_TYPE_INT, "esc_delay", & ESCDELAY }, /* defined inside ncurses lib */
-		{ D_TYPE_INT, "latency", & n_iLatency },
-		{ D_TYPE_CHAR, "command_compose_character", & n_cCommandComposeCharacter },
-		{ D_TYPE_INT, "command_compose_delay", & n_iCommandComposeDelay },
+		{ D_BOOL, "use_mouse", & n_bUseMouse },
+		{ D_BOOL, "disable_XON", & n_bDisableXON },
+		{ D_BOOL, "leave_ctrl_c", & n_bLeaveCtrlC },
+		{ D_BOOL, "leave_ctrl_z", & n_bLeaveCtrlZ },
+		{ D_BOOL, "leave_ctrl_s", & n_bLeaveCtrlS },
+		{ D_BOOL, "leave_ctrl_q", & n_bLeaveCtrlQ },
+		{ D_BOOL, "leave_ctrl_\\", & n_bLeaveCtrlBackSlash },
+		{ D_INT, "esc_delay", & ESCDELAY }, /* defined inside ncurses lib */
+		{ D_INT, "latency", & n_iLatency },
+		{ D_CHAR, "command_compose_character", & n_cCommandComposeCharacter },
+		{ D_INT, "command_compose_delay", & n_iCommandComposeDelay },
 		{ 0, NULL, NULL }
 	};
 

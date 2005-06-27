@@ -58,12 +58,12 @@ bool n_bIgnoreSignalSIGQUIT = false;
 
 OVariable n_psVariables [ ] =
 	{
-		{ D_TYPE_BOOL, "ignore_signal_SIGINT", & n_bIgnoreSignalSIGINT },
-		{ D_TYPE_BOOL, "ignore_signal_SIGTSTP", & n_bIgnoreSignalSIGTSTP },
-		{ D_TYPE_BOOL, "ignore_signal_SIGQUIT", & n_bIgnoreSignalSIGQUIT },
-		{ D_TYPE_INT, "collector_connection_timeout",
+		{ D_BOOL, "ignore_signal_SIGINT", & n_bIgnoreSignalSIGINT },
+		{ D_BOOL, "ignore_signal_SIGTSTP", & n_bIgnoreSignalSIGTSTP },
+		{ D_BOOL, "ignore_signal_SIGQUIT", & n_bIgnoreSignalSIGQUIT },
+		{ D_INT, "collector_connection_timeout",
 		& n_iCollectorConnectionTimeOut },
-		{ D_TYPE_CHAR_POINTER, "serial_device", & n_pcSerialDevice },
+		{ D_CHAR_POINTER, "serial_device", & n_pcSerialDevice },
 		{ 0, NULL, NULL }
 	};
 	
