@@ -84,7 +84,10 @@ long int HDataBase::query ( char const * a_pcQuery )
 		log << "SQL: " << a_pcQuery << endl;
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
 	if ( ! f_pvLastResult )
+		{
 		M_LOG ( dbwrapper::db_error ( f_pvCoreData ) );
+		return ( - 1 );
+		}
 	return ( dbwrapper::dbrs_records_count ( f_pvCoreData, f_pvLastResult ) );
 	M_EPILOG
 	}
@@ -121,6 +124,13 @@ long int HDataBase::insert_id ( void )
 	if ( ! f_pvCoreData )
 		M_THROW ( "not connected to database", g_iErrNo );
 	return ( dbwrapper::dbrs_id ( f_pvCoreData, f_pvLastResult ) );
+	M_EPILOG
+	}
+
+char const * HDataBase::get_error ( void ) const
+	{
+	M_PROLOG
+	return ( dbwrapper::db_error ( f_pvCoreData ) );
 	M_EPILOG
 	}
 

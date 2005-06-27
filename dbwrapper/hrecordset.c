@@ -28,6 +28,7 @@ Copyright:
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
+#include "hcore/hlog.h"
 #include "hrecordset.h"
 #include "db_driver_loader.h"
 
@@ -178,8 +179,12 @@ long int HRecordSet::open ( char const * a_pcQuery )
 	free ( );
 	f_iCursorPosition = 0;
 	f_iSetQuantity = f_poDataBase->query ( f_oSQL );
+	if ( f_iSetQuantity < 0 )
+		M_LOG ( f_poDataBase->get_error ( ) );
 	f_pvCoreData = f_poDataBase->get_result ( );
 	f_iFieldCount = dbwrapper::rs_fields_count ( f_pvCoreData );
+	if ( f_iFieldCount < 0 )
+		M_LOG ( f_poDataBase->get_error ( ) );
 	f_iMode = D_MODE_NORMAL;
 	f_oColumnNames.flush ( );
 	f_oValues.flush ( );

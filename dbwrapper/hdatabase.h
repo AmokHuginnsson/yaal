@@ -55,6 +55,7 @@ public:
 	void free_result ( void );
 	void * get_result ( void );
 	long int insert_id ( void );
+	char const * get_error ( void ) const;
 	/*}*/
 protected:
 	/*{*/
