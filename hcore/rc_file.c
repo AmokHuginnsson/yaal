@@ -34,6 +34,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "rc_file.h"
 #include "xalloc.h"
 #include "hlog.h"
+#include "hpattern.h"
 
 namespace stdhapi
 {
@@ -84,6 +85,29 @@ int rc_open ( char const * a_pcRcName, bool a_bLocal, HFile & a_roFile )
 	M_EPILOG
 	}
 
+bool substitute_environment ( HString & a_roString )
+	{
+	int l_iLength = 0;
+	char const * l_pcStart = NULL;
+	HString l_oName;
+	HPattern l_oPattern;
+	if ( a_roString )
+		{
+		M_ENSURE ( l_oPattern.parse_re ( "${[^{}]\\+}" ) == 0 );
+		if ( ( l_pcStart = l_oPattern.matches ( a_roString, & l_iLength ) ) )
+			{
+			l_oName = a_roString.mid ( l_pcStart - static_cast < char * > ( a_roString ), l_iLength );
+			l_pcStart = ::getenv ( l_oName.mid ( 2, l_iLength - 3 ) );
+			if ( l_pcStart )
+				{
+				a_roString.replace ( l_oName, l_pcStart );
+				return ( true );
+				}
+			}
+		}
+	return ( false );
+	}
+
 int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection,
 		OVariable const * a_psVaraibles, int a_iCount,
 		bool ( * set_variables ) ( HString &, HString & ) )
@@ -102,9 +126,6 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 			{
 			while ( read_rc_line ( l_oOption, l_oValue, l_oRc, l_iLine ) )
 				{
-				if ( n_iDebugLevel )
-					fprintf ( stderr, "option: [%s], value [%s]\n", static_cast < char * > ( l_oOption ),
-							static_cast < char * > ( l_oValue ) );
 				if ( a_pcSection )
 					{
 					if ( l_oValue.is_empty ( ) )
@@ -112,6 +133,8 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 						M_IRV ( l_oValue.format ( "[%s]", a_pcSection ) );
 						if ( l_oOption == l_oValue )
 								{
+								if ( n_iDebugLevel )
+									fprintf ( stderr, "section: [%s]\n", static_cast < char * > ( l_oOption ) );
 								log << "section: " << a_pcSection << ", ";
 								l_bSection = true;
 								continue;
@@ -122,6 +145,11 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 					if ( ! l_bSection )
 						continue;
 					}
+				while ( substitute_environment ( l_oValue ) )
+					;
+				if ( n_iDebugLevel )
+					fprintf ( stderr, "option: [%s], value [%s]\n", static_cast < char * > ( l_oOption ),
+							static_cast < char * > ( l_oValue ) );
 				l_iCtr = 0;
 				l_bOptionOK = false;
 				while ( ( l_iCtr < a_iCount ) && a_psVaraibles [ l_iCtr ].f_pcKey )
@@ -130,31 +158,31 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 						{
 						switch ( a_psVaraibles [ l_iCtr ].f_iType )
 							{
-							case ( D_TYPE_BOOL ):
+							case ( D_BOOL ):
 								{
 								rc_set_variable ( l_oValue,
 										* static_cast < bool * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
 								break;
 								}
-							case ( D_TYPE_CHAR ):
+							case ( D_CHAR ):
 								{
 								rc_set_variable ( l_oValue,
 										* static_cast < char * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
 								break;
 								}
-							case ( D_TYPE_INT ):
+							case ( D_INT ):
 								{
 								rc_set_variable ( l_oValue,
 										* static_cast < int * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
 								break;
 								}
-							case ( D_TYPE_CHAR_POINTER ):
+							case ( D_CHAR_POINTER ):
 								{
 								rc_set_variable ( l_oValue,
 										static_cast < char ** > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
 								break;
 								}
-							case ( D_TYPE_HSTRING ):
+							case ( D_HSTRING ):
 								{
 								( * static_cast < HString * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) ) = l_oValue;
 								break;
