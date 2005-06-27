@@ -53,8 +53,8 @@ namespace hconsole
 {
 
 HListControl::HColumnInfo::HColumnInfo ( void )
-	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iType ( 0 ),
-	f_iAlign ( 0 ), f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_oName ( ),
+	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iAlign ( 0 ),
+	f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_eType ( D_HSTRING ), f_oName ( ),
 	f_poControl ( NULL )
 	{
 	M_PROLOG
@@ -71,8 +71,8 @@ HListControl::HColumnInfo::~HColumnInfo ( void )
 	}
 
 HListControl::HColumnInfo::HColumnInfo ( const HColumnInfo & a_roColumnInfo )
-	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iType ( 0 ),
-	f_iAlign ( 0 ), f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_oName ( ),
+	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iAlign ( 0 ),
+	f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_eType ( D_HSTRING ), f_oName ( ),
 	f_poControl ( NULL )
 	{
 	M_PROLOG
@@ -89,7 +89,7 @@ HListControl::HColumnInfo & HListControl::HColumnInfo::operator = ( const HColum
 		f_bDescending = a_roColumnInfo.f_bDescending;
 		f_iWidthRaw = a_roColumnInfo.f_iWidthRaw;
 		f_iWidth = a_roColumnInfo.f_iWidth;
-		f_iType = a_roColumnInfo.f_iType;
+		f_eType = a_roColumnInfo.f_eType;
 		f_iAlign = a_roColumnInfo.f_iAlign;
 		f_iShortcutIndex = a_roColumnInfo.f_iShortcutIndex;
 		f_cShortcut = a_roColumnInfo.f_cShortcut;
@@ -184,7 +184,7 @@ void HListControl::refresh ( void )
 				if ( l_poColumnInfo->f_iWidthRaw )
 					{
 					f_oVarTmpBuffer [ 0 ] = 0;
-					switch ( l_poColumnInfo->f_iType )
+					switch ( l_poColumnInfo->f_eType )
 						{
 						case ( D_LONG_INT ):
 							{
@@ -209,7 +209,7 @@ void HListControl::refresh ( void )
 						default :
 							{
 							M_THROW ( "unknown type",
-									l_poColumnInfo->f_iType );
+									static_cast < int > ( l_poColumnInfo->f_eType ) );
 							break;
 							}
 						}
@@ -562,7 +562,7 @@ int HListControl::process_input ( int a_iCode )
 	}
 
 void HListControl::add_column ( const int & a_riColumn, char const * a_pcName,
-		const int & a_riWidth, const int & a_riAlign, const int & a_riType, 
+		const int & a_riWidth, const int & a_riAlign, const type_t & a_reType, 
 		HControl * a_poControl )
 	{
 	M_PROLOG
@@ -582,7 +582,7 @@ void HListControl::add_column ( const int & a_riColumn, char const * a_pcName,
 		l_iShortcutIndex = 0;
 	f_iSumForOne += a_riWidth;
 	l_oColumnInfo.f_iWidth = a_riWidth;
-	l_oColumnInfo.f_iType = a_riType;
+	l_oColumnInfo.f_eType = a_reType;
 	l_oColumnInfo.f_iAlign = a_riAlign;
 	l_oColumnInfo.f_iShortcutIndex = l_iShortcutIndex;
 	l_oColumnInfo.f_cShortcut = f_oVarTmpBuffer [ l_iShortcutIndex ];
@@ -733,7 +733,7 @@ int HListControl::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 	f_lComparedItems ++;
 	if ( ( f_iQuantity > 1024 ) && ! ( f_lComparedItems % 1024 ) )
 		f_poParent->status_bar ( )->update_progress ( static_cast < double > ( f_lComparedItems ) );
-	switch ( f_oHeader [ f_iSortColumn ].f_iType )
+	switch ( f_oHeader [ f_iSortColumn ].f_eType )
 		{
 		case ( D_LONG_INT ):
 			return ( static_cast < long > ( l_roLeftInfo ) - static_cast < long > ( l_roRightInfo ) );

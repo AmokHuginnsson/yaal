@@ -46,7 +46,7 @@ HLog log;
 
 OVariable n_psHCoreVariables [ ] =
 	{
-		{ 0, NULL, NULL }
+		{ D_NONE, NULL, NULL }
 	};
 
 /* mathematical macros */

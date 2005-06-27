@@ -85,6 +85,7 @@
 -e768		/* global struct member 'member' not referenced */
 -e769		/* global enumeration constant 'constant' not referenced */
 -e778		/* Constant expression evaluates to 0 in operation */
+-e788		/* enum constant 'constant' not used within defaulted switch */
 -e790		/* Suspicious truncation, integral to float */
 -e794		/* Conceivable use of null pointer 'pointer' in left argument to operator '->' */
 -e820		/* Boolean test of a parenthesized assignment */

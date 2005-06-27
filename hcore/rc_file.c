@@ -156,7 +156,7 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 					{
 					if ( ! strcasecmp ( l_oOption, a_psVaraibles [ l_iCtr ].f_pcKey ) )
 						{
-						switch ( a_psVaraibles [ l_iCtr ].f_iType )
+						switch ( a_psVaraibles [ l_iCtr ].f_eType )
 							{
 							case ( D_BOOL ):
 								{
@@ -187,10 +187,10 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 								( * static_cast < HString * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) ) = l_oValue;
 								break;
 								}
-							default :
+							default:
 								{
 								M_THROW ( "unknown type",
-										a_psVaraibles [ l_iCtr ].f_iType );
+										static_cast < int > ( a_psVaraibles [ l_iCtr ].f_eType ) );
 								break;
 								}
 							}

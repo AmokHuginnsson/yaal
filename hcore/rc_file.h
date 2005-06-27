@@ -38,7 +38,7 @@ namespace hcore
 
 struct OVariable
 	{
-	int f_iType;
+	type_t f_eType;
 	char const * f_pcKey;
 	void * f_pvValue;
 	};

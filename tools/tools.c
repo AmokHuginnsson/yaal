@@ -64,7 +64,7 @@ OVariable n_psVariables [ ] =
 		{ D_INT, "collector_connection_timeout",
 		& n_iCollectorConnectionTimeOut },
 		{ D_CHAR_POINTER, "serial_device", & n_pcSerialDevice },
-		{ 0, NULL, NULL }
+		{ D_NONE, NULL, NULL }
 	};
 	
 namespace util

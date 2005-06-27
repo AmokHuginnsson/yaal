@@ -39,6 +39,19 @@ namespace tools
 
 class HAnalyser : public hcore::HTree < hcore::HList < double * > >
 	{
+	typedef enum
+		{
+		E_OK = 0,
+		E_UNKNOWN_MNEMONIC = 1,
+		E_UNEXPECTED_TRMINATION = 2,
+		E_CLOSING_BRACKET_EXPECTED = 3,
+		E_CLOSING_ABSOLUTE_EXPECTED = 4,
+		E_CLOSING_FUNCTION_BRACKET_EXPECTED = 5,
+		E_OPENING_FUNCTION_BRACKET_EXPECTED = 6,
+		E_DIGIT_EXPECTED = 7,
+		E_UNEXPECTED_TOKEN = 8,
+		E_PREMATURE_TRMINATION = 9
+		} syntax_error_t;
 	typedef hcore::HTree < hcore::HList < double * > >::HNode * ANALYZER_NODE_PTR_t;
 	class HAnalyserNode;
 	friend class HAnalyserNode;
@@ -63,9 +76,10 @@ protected:
 	/*{*/
 	int f_iIndex;
 	int f_iLength;
-	int f_iError;
+	syntax_error_t f_eError;
 	double	f_pdVariables [ 26 ];
 	hcore::HPool < double > f_oConstantsPool;
+	hcore::HPool < int > f_oTerminalIndexes;
 	hcore::HString	f_oFormula;
 	/*}*/
 public:
@@ -75,15 +89,17 @@ public:
 	double * analyse ( char const * );
 	double & operator [ ] ( int );
 	double count ( void );
+	char const * get_error ( void ) const;
+	int get_error_token ( void ) const;
 	/*}*/
 protected:
 	/*{*/
-	int translate ( char const * );
-	void addition_production ( HAnalyserNode * );
-	void multiplication_production ( HAnalyserNode * );
-	void power_production ( HAnalyserNode * );
-	void signum_production ( HAnalyserNode * );
-	void terminal_production ( HAnalyserNode * );
+	bool translate ( char const * );
+	bool addition_production ( HAnalyserNode * );
+	bool multiplication_production ( HAnalyserNode * );
+	bool power_production ( HAnalyserNode * );
+	bool signum_production ( HAnalyserNode * );
+	bool terminal_production ( HAnalyserNode * );
 	double count_branch ( HAnalyserNode * );
 	double addition ( HAnalyserNode * );
 	double multiplication ( HAnalyserNode * );

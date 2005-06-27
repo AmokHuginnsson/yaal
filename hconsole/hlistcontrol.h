@@ -50,10 +50,10 @@ class HListControl : public hcore::HList < HItem >, public virtual HSearchableCo
 		bool f_bDescending;
 		int f_iWidthRaw;
 		int f_iWidth;
-		int f_iType;
 		int f_iAlign;
 		int f_iShortcutIndex;
 		char f_cShortcut;
+		hcore::type_t f_eType;
 		hcore::HString f_oName;
 		HControl * f_poControl;
 		/*}*/
@@ -118,7 +118,7 @@ public:
 										char const *,									/* column name */
 										const int &,									/* width */
 										const int & = D_ALIGN_LEFT,		/* align */
-										const int & = hcore::D_HSTRING,	/* type */
+										const hcore::type_t & = hcore::D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
 	virtual HItem & add_tail ( HItem * = NULL );
 	virtual HItem & add_orderly ( HItem &, int = D_ASCENDING );

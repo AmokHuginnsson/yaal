@@ -70,7 +70,7 @@ struct OColumnInfo
 	char const * f_pcName;	/* column name */
 	int f_iWidth;						/* column width */
 	int f_iAlign;						/* column alignment */
-	int f_iType;						/* data type stored in that column */
+	hcore::type_t f_eType;						/* data type stored in that column */
 	};
 
 class HDataControl;

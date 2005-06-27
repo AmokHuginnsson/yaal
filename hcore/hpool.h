@@ -45,18 +45,18 @@ namespace hcore
 #define E_HPOOL_REALLOC_FIXED	2
 #define E_HPOOL_BADINDEX			3
 
-typedef enum
-	{
-	D_HPOOL_FIXED_SIZE,
-	D_HPOOL_AUTO_GROW,
-	D_HPOOL_DUMB
-	} pool_type_t;
-
 extern char const * g_ppcErrMsgHPool [ ];
 
 template < class tType >
 class HPool
 	{
+public:
+	typedef enum
+		{
+		D_FIXED_SIZE,
+		D_AUTO_GROW,
+		D_DUMB
+		} pool_type_t;
 private:
 	/*{*/
 	pool_type_t f_ePoolType;
@@ -69,10 +69,10 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HPool ( size_t, pool_type_t = D_HPOOL_FIXED_SIZE );
+	HPool ( size_t, pool_type_t = D_FIXED_SIZE );
 	virtual ~HPool ( void );
 	size_t pool_realloc ( size_t );
-	tType & operator [ ] ( int );
+	tType & operator [ ] ( int ) const;
 	tType & add ( tType const & );
 	void reset ( void );
 	/*}*/
@@ -115,7 +115,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 	size_t l_ulOldSize = f_ulPoolSize;
 	if ( a_ulNewSize < 1 )
 		M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_BADSIZE ], a_ulNewSize );
-	if ( f_ePoolType == D_HPOOL_AUTO_GROW )
+	if ( f_ePoolType == D_AUTO_GROW )
 		{
 		if ( a_ulNewSize > f_ulPoolSize )
 			{
@@ -129,7 +129,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 		}
 	else if ( f_ulPoolSize != a_ulNewSize )
 		{
-		if ( f_ptPool && ( f_ePoolType == D_HPOOL_FIXED_SIZE ) )
+		if ( f_ptPool && ( f_ePoolType == D_FIXED_SIZE ) )
 			M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_REALLOC_FIXED ], f_ulPoolSize );
 		f_ulPoolSize = a_ulNewSize;
 		f_ptPool = xrealloc ( f_ptPool, f_ulPoolSize, tType );
@@ -139,7 +139,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 	}
 
 template < class tType >
-tType & HPool < tType >::operator [ ] ( int a_iIndex )
+tType & HPool < tType >::operator [ ] ( int a_iIndex ) const
 	{
 	M_PROLOG
 	if ( ( a_iIndex < 0 ) || ( static_cast < size_t > ( a_iIndex ) >= f_ulPoolSize ) )

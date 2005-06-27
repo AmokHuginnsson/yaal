@@ -62,7 +62,7 @@ int		n_iDataBaseDriver = 0;
 
 OVariable n_psVariables [ ] =
 	{
-		{ 0, NULL, NULL }
+		{ D_NONE, NULL, NULL }
 	};
 
 bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
