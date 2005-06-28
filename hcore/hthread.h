@@ -35,28 +35,7 @@ namespace stdhapi
 namespace hcore
 {
 
-class HThread
-	{
-protected:
-	/*{*/
-	bool						f_bAlive;
-	pthread_attr_t	f_sAttributes;
-	pthread_t				f_xThread;
-	/*}*/
-public:
-	/*{*/
-	HThread ( void );
-	virtual ~HThread ( void );
-	int spawn ( void );
-	int finish ( void );
-	bool listen ( void ) const;
-	/*}*/
-private:
-	virtual int run ( void ) = 0;
-	static void * SPAWN ( void * );
-	HThread ( const HThread & );
-	HThread & operator = ( const HThread & );
-	};
+#define M_CRITICAL_SECTION() HLock l_oLock ( f_oMutex );
 
 class HMutex
 	{
@@ -68,14 +47,68 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HMutex ( bool = false );
+	HMutex ( bool /* recursive */ = false );
 	virtual ~HMutex ( void );
 	void lock ( void );
 	bool try_lock ( void );
 	void unlock ( void );
 	/*}*/
+private:
+	/*{*/
+	HMutex ( HMutex const & );
+	HMutex & operator = ( HMutex const & );
+	/*}*/
+	};
+
+class HThread
+	{
+	typedef enum
+		{
+		D_DEAD,
+		D_ALIVE,
+		D_ZOMBIE
+		} status_t;
+private:
+	/*{*/
+	status_t				f_eStatus;
+	/*}*/
 protected:
 	/*{*/
+	pthread_attr_t	f_sAttributes;
+	pthread_t				f_xThread;
+	mutable HMutex	f_oMutex;
+	/*}*/
+public:
+	/*{*/
+	HThread ( void );
+	virtual ~HThread ( void );
+	int spawn ( void );
+	int finish ( void );
+	status_t listen ( void ) const;
+	bool is_alive ( void ) const;
+	/*}*/
+private:
+	virtual int run ( void ) = 0;
+	static void * SPAWN ( void * );
+	HThread ( const HThread & );
+	HThread & operator = ( const HThread & );
+	};
+
+class HLock
+	{
+protected:
+	/*{*/
+	HMutex & f_roMutex;
+	/*}*/
+public:
+	/*{*/
+	explicit HLock ( HMutex & );
+	virtual ~HLock ( void );
+	/*}*/
+private:
+	/*{*/
+	HLock ( HLock const & );
+	HLock & operator = ( HLock const & );
 	/*}*/
 	};
 

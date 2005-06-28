@@ -32,10 +32,6 @@ Copyright:
 
 #include <errno.h>
 
-#ifndef NULL
-#define NULL 0
-#endif /* not NULL */
-
 #ifdef __STDHAPI_BUILD__
 #	include "config.h"
 #endif /* __STDHAPI_BUILD__ */
@@ -66,7 +62,7 @@ namespace hcore
 #define M_PROLOG try{
 #define M_EPILOG } M_CATCH ( e ){e->log ( __WHERE__ );throw;}
 #define M_FINAL } M_CATCH ( e ){e->log ( __WHERE__ );e->print_error ( true );M_EXCEPTION_RELEASE ( e );}
-#define M_ENSURE( condition ) if ( ! ( condition ) )M_THROW ( strerror ( errno ), errno )
+#define M_ENSURE( condition ) if ( ! ( condition ) ){ M_EXCEPTION_CREATE ( e, #condition, errno ); e->set ( strerror ( errno ) ); }
 #define M_IRV( expression )	static_cast < void > ( expression )
 #define M_ASSERT( condition ) if ( ! ( condition ) )HException::failed_assert ( __WHERE__, #condition )
 #define M_DEFINE_ENUM_OPERATORS( enum_name ) \

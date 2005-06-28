@@ -38,7 +38,7 @@ namespace hcore
 {
 
 HThread::HThread ( void )
-	: f_bAlive ( false ), f_sAttributes ( ), f_xThread ( )
+	: f_eStatus ( D_DEAD ), f_sAttributes ( ), f_xThread ( ), f_oMutex ( )
 	{
 	M_PROLOG
 	M_ENSURE ( pthread_attr_init ( & f_sAttributes ) == 0 );
@@ -53,7 +53,8 @@ HThread::HThread ( void )
 HThread::~HThread ( void )
 	{
 	M_PROLOG
-	M_IRV ( finish ( ) );
+	if ( f_eStatus != D_DEAD )
+		M_IRV ( finish ( ) );
 	M_ENSURE ( pthread_attr_destroy ( & f_sAttributes ) == 0 );
 	return;
 	M_EPILOG
@@ -62,11 +63,14 @@ HThread::~HThread ( void )
 int HThread::spawn ( void )
 	{
 	M_PROLOG
-	if ( f_bAlive )
-		M_THROW ( _ ( "thread is already running" ), g_iErrNo );
-	f_bAlive = true;
+	M_CRITICAL_SECTION ( );
+	if ( f_eStatus != D_DEAD )
+		M_THROW ( _ ( "thread is already running" ),
+				static_cast < int > ( f_eStatus ) );
 	M_ENSURE ( pthread_create ( & f_xThread,
 				& f_sAttributes, SPAWN, this ) == 0 );
+	while ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) )
+		;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -74,11 +78,14 @@ int HThread::spawn ( void )
 int HThread::finish ( void )
 	{
 	M_PROLOG
+	M_CRITICAL_SECTION ( );
 	void * l_pvReturn = NULL;
-	if ( f_bAlive )
-		M_ENSURE ( pthread_cancel ( f_xThread ) == 0 );
+	if ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) )
+		M_THROW ( _ ( "thread is not running" ), static_cast < int > ( f_eStatus ) );
+	M_ENSURE ( pthread_cancel ( f_xThread ) == 0 );
 	M_ENSURE ( pthread_join ( f_xThread, & l_pvReturn ) == 0 );
-	return ( 0 );
+	f_eStatus = D_DEAD;
+	return ( reinterpret_cast < int > ( l_pvReturn ) );
 	M_EPILOG
 	}
 
@@ -89,19 +96,27 @@ void * HThread::SPAWN ( void * a_pvThread )
 	HThread * l_poThread = reinterpret_cast < HThread * > ( a_pvThread );
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
 	M_ENSURE ( pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
+	l_poThread->f_eStatus = D_ALIVE;
 	l_pvReturn = reinterpret_cast < void * > ( l_poThread->run ( ) );
-	l_poThread->f_bAlive = false;
+	l_poThread->f_eStatus = D_ZOMBIE;
 	return ( l_pvReturn );
 	M_EPILOG
 	}
 
-bool HThread::listen ( void ) const
+HThread::status_t HThread::listen ( void ) const
 	{
 	M_PROLOG
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
 	pthread_testcancel ( );
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
-	return ( f_bAlive );
+	return ( f_eStatus );
+	M_EPILOG
+	}
+
+bool HThread::is_alive ( void ) const
+	{
+	M_PROLOG
+	return ( f_eStatus == D_ALIVE );
 	M_EPILOG
 	}
 
@@ -145,6 +160,22 @@ void HMutex::unlock ( void )
 	int l_iError = pthread_mutex_unlock ( & f_xMutex );
 	if ( ! f_bRecursive )
 		M_ENSURE ( l_iError != EPERM );
+	return;
+	M_EPILOG
+	}
+
+HLock::HLock ( HMutex & a_roMutex ) : f_roMutex ( a_roMutex )
+	{
+	M_PROLOG
+	f_roMutex.lock ( );
+	return;
+	M_EPILOG
+	}
+
+HLock::~HLock ( void )
+	{
+	M_PROLOG
+	f_roMutex.unlock ( );
 	return;
 	M_EPILOG
 	}
