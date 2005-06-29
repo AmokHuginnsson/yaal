@@ -62,13 +62,13 @@ private:
 
 class HThread
 	{
+private:
 	typedef enum
 		{
 		D_DEAD,
 		D_ALIVE,
 		D_ZOMBIE
 		} status_t;
-private:
 	/*{*/
 	status_t				f_eStatus;
 	/*}*/

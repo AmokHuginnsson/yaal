@@ -125,6 +125,7 @@
 -esym(1536,stdhapi::tools::HAnalyser::f_pdVariables,stdhapi::hdata::HDataProcess::f_oDataBase) /* Exposing low access member 'member' */
 -esym(1554,*_pv*) /* Direct pointer copy of member 'member' within copy constructor: 'constructor' */
 -esym(1555,*_pv*,stdhapi::hconsole::HListControl::HColumnInfo::f_poControl) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
+-esym(1725,stdhapi::hcore::HLock::f_roMutex) /* class member 'member' is a reference */
 -esym(1764,a_roOption,a_roValue)
 -esym(1769,stdhapi::hcore::HPattern::f_sCompiled,stdhapi::hcore::HThread::f_sAttributes,stdhapi::hcore::HMutex::f_sAttributes,stdhapi::hcore::HMutex::f_xMutex,stdhapi::hcore::HTime::f_sBroken,stdhapi::hconsole::HEditControl::f_sMask,stdhapi::hconsole::HListControl::f_sMatch,stdhapi::hconsole::HProcess::f_sLatency,stdhapi::hconsole::HProcess::f_xFileDescriptorSet,stdhapi::tools::HSerial::f_sTIO,stdhapi::tools::HSerial::f_sBackUpTIO,stdhapi::tools::signals::HSigStackWrapper::f_sStack) /* Member or base class 'class' has no constructor */
 
