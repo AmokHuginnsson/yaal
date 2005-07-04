@@ -47,13 +47,13 @@ namespace hcore
 #define M_CVSID(id) static char __CVSID__ [ ] __attribute__((__unused__)) = id
 #define M_CVSTID(id) static char __CVSTID__ [ ] __attribute__((__unused__)) = id
 #define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
-#define M_THROW( msg, e_no ) throw ( HException ( __WHERE__, msg, e_no ) )
+#define M_THROW( msg, e_no ) throw ( stdhapi::hcore::HException ( __WHERE__, msg, e_no ) )
 #define M_PROLOG try{
-#define M_EPILOG } catch ( HException & e ){e->log ( __WHERE__ );throw;}
-#define M_FINAL } catch ( HException & e ){e->log ( __WHERE__ );e->print_error ( true );}
-#define M_ENSURE( condition ) if ( ! ( condition ) ){ HException e ( __WHERE__, #condition, errno ); e->set ( strerror ( errno ) ); }
+#define M_EPILOG } catch ( stdhapi::hcore::HException & e ){e->log ( __WHERE__ );throw;}
+#define M_FINAL } catch ( stdhapi::hcore::HException & e ){e->log ( __WHERE__ );e->print_error ( true );}
+#define M_ENSURE( condition ) if ( ! ( condition ) ){ stdhapi::hcore::HException e ( __WHERE__, #condition, errno ); e->set ( strerror ( errno ) ); }
 #define M_IRV( expression )	static_cast < void > ( expression )
-#define M_ASSERT( condition ) if ( ! ( condition ) )HException::failed_assert ( __WHERE__, #condition )
+#define M_ASSERT( condition ) if ( ! ( condition ) )stdhapi::hcore::HException::failed_assert ( __WHERE__, #condition )
 #define M_DEFINE_ENUM_OPERATORS( enum_name ) \
 	inline enum_name operator | ( enum_name const & left, enum_name const & right ) \
 		{ return ( static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
