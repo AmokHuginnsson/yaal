@@ -6,7 +6,6 @@ AC_INIT([[stdhapi]],[[0.0.0]],[[amok@frihet.ath.cx]])
 
 AC_MSG_RESULT([--- Welcome to stdhapi configurator ---                  [[0%]]])
 
-AC_ARG_ENABLE([[exceptions-by-reference]],[AC_HELP_STRING([exceptions-by-reference],[exceptions should be thrown, and catched by reference])],[AC_DEFINE(__EXCEPTIONS_BY_REFERENCE__)])
 AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, default is `yes' if apriopriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
 dnl ` <- this one fixes syntax highlighting in vim.
 AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, default is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])

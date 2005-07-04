@@ -78,11 +78,11 @@ int HThread::spawn ( void )
 int HThread::finish ( void )
 	{
 	M_PROLOG
-	M_CRITICAL_SECTION ( );
 	void * l_pvReturn = NULL;
 	if ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) )
-		M_THROW ( _ ( "thread is not running" ), static_cast < int > ( f_eStatus ) );
-	M_ENSURE ( pthread_cancel ( f_xThread ) == 0 );
+		M_THROW ( _ ( "thread is not running" ),
+				static_cast < int > ( f_eStatus ) );
+	f_eStatus = D_ZOMBIE;
 	M_ENSURE ( pthread_join ( f_xThread, & l_pvReturn ) == 0 );
 	f_eStatus = D_DEAD;
 	return ( reinterpret_cast < int > ( l_pvReturn ) );
@@ -100,16 +100,6 @@ void * HThread::SPAWN ( void * a_pvThread )
 	l_pvReturn = reinterpret_cast < void * > ( l_poThread->run ( ) );
 	l_poThread->f_eStatus = D_ZOMBIE;
 	return ( l_pvReturn );
-	M_EPILOG
-	}
-
-HThread::status_t HThread::listen ( void ) const
-	{
-	M_PROLOG
-	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
-	pthread_testcancel ( );
-	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
-	return ( f_eStatus );
 	M_EPILOG
 	}
 

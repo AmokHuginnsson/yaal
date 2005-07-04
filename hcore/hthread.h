@@ -84,7 +84,6 @@ public:
 	virtual ~HThread ( void );
 	int spawn ( void );
 	int finish ( void );
-	status_t listen ( void ) const;
 	bool is_alive ( void ) const;
 	/*}*/
 private:

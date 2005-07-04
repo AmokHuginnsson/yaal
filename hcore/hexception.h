@@ -47,22 +47,11 @@ namespace hcore
 #define M_CVSID(id) static char __CVSID__ [ ] __attribute__((__unused__)) = id
 #define M_CVSTID(id) static char __CVSTID__ [ ] __attribute__((__unused__)) = id
 #define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
-#ifdef __EXCEPTIONS_BY_REFERENCE__
-# define D_EXCEPTION_BY &
-# define M_EXCEPTION_CREATE( e, msg, e_no ) HException e ( __WHERE__, msg, e_no )
-# define M_EXCEPTION_RELEASE( e ) /**/
-# define M_THROW( msg, e_no ) throw ( HException ( __WHERE__, msg, e_no ) )
-#else /* __EXCEPTIONS_BY_REFERENCE__ */
-# define D_EXCEPTION_BY *
-# define M_EXCEPTION_CREATE( e, msg, e_no ) HException * e = new HException ( __WHERE__, msg, e_no )
-# define M_EXCEPTION_RELEASE( e ) delete e;
-# define M_THROW( msg, e_no ) throw ( new HException ( __WHERE__, msg, e_no ) )
-#endif /* not __EXCEPTIONS_BY_REFERENCE__ */
-#define M_CATCH( e ) catch ( HException D_EXCEPTION_BY e )
+#define M_THROW( msg, e_no ) throw ( HException ( __WHERE__, msg, e_no ) )
 #define M_PROLOG try{
-#define M_EPILOG } M_CATCH ( e ){e->log ( __WHERE__ );throw;}
-#define M_FINAL } M_CATCH ( e ){e->log ( __WHERE__ );e->print_error ( true );M_EXCEPTION_RELEASE ( e );}
-#define M_ENSURE( condition ) if ( ! ( condition ) ){ M_EXCEPTION_CREATE ( e, #condition, errno ); e->set ( strerror ( errno ) ); }
+#define M_EPILOG } catch ( HException & e ){e->log ( __WHERE__ );throw;}
+#define M_FINAL } catch ( HException & e ){e->log ( __WHERE__ );e->print_error ( true );}
+#define M_ENSURE( condition ) if ( ! ( condition ) ){ HException e ( __WHERE__, #condition, errno ); e->set ( strerror ( errno ) ); }
 #define M_IRV( expression )	static_cast < void > ( expression )
 #define M_ASSERT( condition ) if ( ! ( condition ) )HException::failed_assert ( __WHERE__, #condition )
 #define M_DEFINE_ENUM_OPERATORS( enum_name ) \
@@ -148,6 +137,7 @@ public:
 	void print_error ( bool ) const;
 	static void dump_call_stack ( int );
 	void log ( char const *, char const *, int );
+	char const * what ( void ) const;
 	HException * operator-> ( void );
 	static void failed_assert ( char const *, char const *, int, char const * ) __attribute__(( __noreturn__ ));
 	/*}*/

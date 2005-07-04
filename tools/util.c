@@ -289,7 +289,7 @@ bool verify_IBAN ( char const * a_pcIBAN )
 	if ( l_iLength < D_MIN_IBAN_LENGTH )
 		{
 		n_oLastErrorMessage.format ( "IBAN: Number too short (%d).", l_iLength );
-		return ( false );
+		return ( true );
 		}
 	l_oIBAN.hs_realloc ( l_iLength );
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
@@ -299,12 +299,12 @@ bool verify_IBAN ( char const * a_pcIBAN )
 	if ( l_iLength < D_MIN_IBAN_LENGTH )
 		{
 		n_oLastErrorMessage.format ( "IBAN: Number too short (%d).", l_iLength );
-		return ( false );
+		return ( true );
 		}
 	if ( ! ( isalpha ( l_oIBAN [ 0 ] ) && isalpha ( l_oIBAN [ 1 ] ) ) )
 		{
 		n_oLastErrorMessage = "IBAN: No country code present.";
-		return ( false );
+		return ( true );
 		}
 	l_oTmpString = l_oIBAN.left ( 4 );
 	l_oIBAN <<= 4;
@@ -324,9 +324,9 @@ bool verify_IBAN ( char const * a_pcIBAN )
 /*	M_LOG ( l_oIBAN ); */
 	l_iCtr = modulo_ASCII ( l_oIBAN, 97 );
 	if ( l_iCtr == 1 )
-		return ( true );
+		return ( false );
 	n_oLastErrorMessage.format ( "IBAN: bad checksum: %d", l_iCtr );
-	return ( false );
+	return ( true );
 	}
 
 char const * const get_last_error ( void )

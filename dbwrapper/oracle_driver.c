@@ -33,7 +33,9 @@ Copyright:
 #include <oci.h>
 
 #include "hcore/xalloc.h"
+#include "hcore/hexception.h"
 #include "hcore/hstring.h"
+#include "hcore/rc_file.h"
 
 #ifndef NULL
 #define NULL	0
@@ -47,7 +49,7 @@ extern "C"
 OVariable n_psVariables [ ] =
 	{
 		{ D_HSTRING, "instance_name", & g_oInstanceName },
-		{ 0, NULL, NULL }
+		{ D_NONE, NULL, NULL }
 	};
 
 struct OAllocator

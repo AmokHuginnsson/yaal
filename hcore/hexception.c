@@ -143,6 +143,11 @@ void HException::log ( char const * a_pcFileName,
 	return;
 	}
 
+char const * HException::what ( void ) const
+	{
+	return ( f_pcMessage );
+	}
+
 #ifdef _EXECINFO_H
 void HException::dump_call_stack ( int a_iLevel )
 #else /* _EXECINFO_H */

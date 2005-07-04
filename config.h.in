@@ -5,8 +5,6 @@
 
 /* Define core behavior here. */
 
-#undef __EXCEPTIONS_BY_REFERENCE__
-
 /* End of core behavior definitions. */
 
 /* Define operating system host type here. */
