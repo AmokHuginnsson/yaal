@@ -352,7 +352,7 @@ bool HAnalyser::translate ( char const * a_pcFormula )
 	M_PROLOG
 	int l_iIndex = 0, l_iRealIndex = 0, l_iCtr = 0, l_iLength = 0;
 	l_iLength = strlen ( a_pcFormula );
-	f_oTerminalIndexes.pool_realloc ( l_iLength );
+	f_oTerminalIndexes.pool_realloc ( l_iLength + 1 );
 	while ( l_iIndex < l_iLength )
 		{
 		f_oTerminalIndexes [ l_iRealIndex ] = l_iIndex;
@@ -387,6 +387,7 @@ bool HAnalyser::translate ( char const * a_pcFormula )
 			}
 		f_iLength = l_iRealIndex;
 		}
+	f_oTerminalIndexes [ l_iRealIndex ] = l_iIndex;
 	f_oFormula [ l_iRealIndex ] = 0;
 	return ( false );
 	M_EPILOG
@@ -530,7 +531,8 @@ bool HAnalyser::signum_production ( HAnalyserNode * a_poNode )
 		a_poNode->METHOD = & HAnalyser::signum;
 		}
 	else
-		terminal_production ( a_poNode );
+		if ( terminal_production ( a_poNode ) )
+			return ( true );
 	return ( false );
 	M_EPILOG
 	}
