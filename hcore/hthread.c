@@ -38,7 +38,8 @@ namespace hcore
 {
 
 HThread::HThread ( void )
-	: f_eStatus ( D_DEAD ), f_sAttributes ( ), f_xThread ( ), f_oMutex ( )
+	: f_eStatus ( D_DEAD ), f_sAttributes ( ), f_xThread ( ),
+	f_oMutex ( ), f_oCondition ( )
 	{
 	M_PROLOG
 	M_ENSURE ( pthread_attr_init ( & f_sAttributes ) == 0 );
@@ -69,8 +70,7 @@ int HThread::spawn ( void )
 				static_cast < int > ( f_eStatus ) );
 	M_ENSURE ( pthread_create ( & f_xThread,
 				& f_sAttributes, SPAWN, this ) == 0 );
-	while ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) )
-		;
+	f_oCondition.wait ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -97,6 +97,7 @@ void * HThread::SPAWN ( void * a_pvThread )
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
 	M_ENSURE ( pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
 	l_poThread->f_eStatus = D_ALIVE;
+	l_poThread->f_oCondition.signal ( );
 	l_pvReturn = reinterpret_cast < void * > ( l_poThread->run ( ) );
 	l_poThread->f_eStatus = D_ZOMBIE;
 	return ( l_pvReturn );
@@ -166,6 +167,62 @@ HLock::~HLock ( void )
 	{
 	M_PROLOG
 	f_roMutex.unlock ( );
+	return;
+	M_EPILOG
+	}
+
+HCondition::HCondition ( void ) : f_sAttributes ( ), f_xCondition ( ), f_oMutex ( )
+	{
+	M_PROLOG
+	M_IRV ( pthread_condattr_init ( & f_sAttributes ) );
+	M_IRV ( pthread_cond_init ( & f_xCondition, & f_sAttributes ) );
+	f_oMutex.lock ( );
+	return;
+	M_EPILOG
+	}
+
+HCondition::~HCondition ( void )
+	{
+	M_PROLOG
+	f_oMutex.unlock ( );
+	M_ENSURE ( pthread_cond_destroy ( & f_xCondition ) == 0 );
+	M_IRV ( pthread_condattr_destroy ( & f_sAttributes ) );
+	return;
+	M_EPILOG
+	}
+
+HCondition::status_t HCondition::wait ( unsigned long int * a_pulTimeOutSeconds,
+		unsigned long int * a_pulTimeOutNanoSeconds )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	timespec l_sTimeOut;
+	if ( a_pulTimeOutSeconds || a_pulTimeOutNanoSeconds )
+		{
+		memset ( & l_sTimeOut, 0, sizeof ( timespec ) );
+		if ( a_pulTimeOutSeconds )
+			l_sTimeOut.tv_sec = ( * a_pulTimeOutSeconds );
+		if ( a_pulTimeOutNanoSeconds )
+			l_sTimeOut.tv_nsec = ( * a_pulTimeOutNanoSeconds );
+		l_iError = pthread_cond_timedwait ( & f_xCondition,
+					& f_oMutex.f_xMutex, & l_sTimeOut );
+		if ( a_pulTimeOutSeconds )
+			( * a_pulTimeOutSeconds ) = l_sTimeOut.tv_sec;
+		if ( a_pulTimeOutNanoSeconds )
+			( * a_pulTimeOutNanoSeconds ) = l_sTimeOut.tv_nsec;
+		M_ENSURE ( ( l_iError == 0 ) || ( l_iError == EINTR ) || ( l_iError == ETIMEDOUT ) );
+		return ( ( l_iError == 0 ) ? D_OK : ( ( l_iError == EINTR ) ? D_INTERRUPT : D_TIMEOUT ) );
+		}
+	else pthread_cond_wait ( & f_xCondition, & f_oMutex.f_xMutex );
+	return ( D_OK );
+	M_EPILOG
+	}
+
+void HCondition::signal ( void )
+	{
+	M_PROLOG
+	M_CRITICAL_SECTION ( );
+	M_IRV ( pthread_cond_signal ( & f_xCondition ) );
 	return;
 	M_EPILOG
 	}

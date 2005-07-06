@@ -37,6 +37,7 @@ namespace hcore
 
 #define M_CRITICAL_SECTION() HLock l_oLock ( f_oMutex );
 
+class HCondition;
 class HMutex
 	{
 protected:
@@ -55,8 +56,35 @@ public:
 	/*}*/
 private:
 	/*{*/
+	friend class HCondition;
 	HMutex ( HMutex const & );
 	HMutex & operator = ( HMutex const & );
+	/*}*/
+	};
+
+class HCondition
+	{
+protected:
+	/*{*/
+	pthread_condattr_t f_sAttributes;
+	pthread_cond_t f_xCondition;
+	HMutex f_oMutex;
+	/*}*/
+public:
+	typedef enum
+		{
+		D_OK,
+		D_TIMEOUT,
+		D_INTERRUPT
+		} status_t;
+	/*{*/
+	HCondition ( void );
+	virtual ~HCondition ( void );
+	status_t wait ( unsigned long int * = NULL, unsigned long int * = NULL );
+	void signal ( void );
+	/*}*/
+protected:
+	/*{*/
 	/*}*/
 	};
 
@@ -77,6 +105,7 @@ protected:
 	pthread_attr_t	f_sAttributes;
 	pthread_t				f_xThread;
 	mutable HMutex	f_oMutex;
+	HCondition			f_oCondition;
 	/*}*/
 public:
 	/*{*/
