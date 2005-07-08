@@ -296,7 +296,7 @@ tags: $(SRCS) $(HDRS)
 
 flint:
 	@flint -b aux/flint.lnt hcore/*.c hconsole/*.c tools/*.c \
-						dbwrapper/db_driver_loader.c dbwrapper/dbwrapper.c
+						dbwrapper/db_driver_loader.c dbwrapper/dbwrapper.c \
 						dbwrapper/hdatabase.c dbwrapper/hrecordset.c \
 						hdata/*.c \
 | awk '{gsub(" \\(compare with line [^)]+)","");print}'|head -20
