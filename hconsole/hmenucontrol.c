@@ -121,7 +121,7 @@ void HMenuControl::init ( HProcess * a_poProcess, OMenuItem * a_psMenu )
 	M_EPILOG
 	}
 
-int HMenuControl::process_input( int a_iCode )
+int HMenuControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
 	OMenuItem const * l_psMenu = NULL;
