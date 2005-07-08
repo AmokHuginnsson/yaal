@@ -39,9 +39,13 @@ VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/stdhapi.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
+ifdef TERM
 CL						:= $(shell tput cr;tput dl1)
-HL						:= $(shell tput bold || tput md; tput setaf 1 || tput AF 1)
+BOLD					:= $(shell tput bold || tput md)
+RED						:= $(shell tput setaf 1 || tput AF 1)
 RS						:= $(shell tput sgr0 || tput me)
+NONL					:= "-n"
+endif
 HS = .h
 SS = .c
 OS = .o
@@ -187,13 +191,13 @@ LIBS_oracle			= "-lclntsh -lhcore"
 	echo -n "$(@:.o=.d) " > $(@:.o=.d); \
 	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) | grep -v '^#' >> $(@:.o=.d); \
 	$(CXX) $(CXXFLAGS) $(<) -c -o $(@) 2>&1 | tee -a make.log; \
-	echo -n "done.$(CL)"
+	echo $(NONL) "done.$(CL)"
 
 #	this is "rule" for linking libs
 
 lib%.so.$(RELEASE):
 	@if [ "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
-	echo -n "Linking \`$(@) ... $(HL)"; \
+	echo -n "Linking \`$(@) ... $(BOLD)$(RED)"; \
 	$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
 			-Wl,--entry="stdhapi_$(NAME)_main" \
 			-Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; echo -n $(RS); \
@@ -205,15 +209,15 @@ lib%.so.$(RELEASE):
 	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION); \
 	ln -sf lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so; \
-	else exit 1; fi; echo -n "done.$(CL)"
+	else exit 1; fi; echo $(NONL) "done.$(CL)"
 
 #-------------------------------------------------------------------
 
 .DEFAULT:
 	@if [ "$(suffix $(<))" != ".d" ] ; then \
-	echo -n "$(HL)"; \
+	echo $(NONL) "$(BOLD)$(RED)"; \
 	echo "Lack of \`$(<)'." | tee -a make.log; \
-	echo -n $(RS); fi
+	echo $(NONL) $(RS); fi
 
 #phony targets
 .PHONY: all nodebug install dep clean tags mrproper purge environment
@@ -256,14 +260,14 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 | sort >> $(DIR_HEADERS)/stdhapi.h; \
 	echo '' >> $(DIR_HEADERS)/stdhapi.h; \
 	echo '#endif /* not __STDHAPI_H */' >> $(DIR_HEADERS)/stdhapi.h; \
-	echo -n 'done.$(CL)'; tput bold || tput md; \
+	echo $(NONL) "done.$(CL)$(BOLD)"; \
 	echo "All OK!$(RS)";
 
 $(LD_CACHE):
 	@echo -n "Making environment ... "; \
 	echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf; \
 	/bin/cp -f ./aux/mkcache $(DIR_TARGET); \
-	echo -n "done.$(CL)"
+	echo $(NONL) "done.$(CL)"
 
 clean-dep:
 	@$(FIND) . -name '*.d' | xargs /bin/rm -f
@@ -291,7 +295,11 @@ tags: $(SRCS) $(HDRS)
 	echo "done."
 
 flint:
-	@flint -b aux/flint.lnt hcore/*.c hconsole/*.c tools/*.c dbwrapper/db_driver_loader.c dbwrapper/dbwrapper.c dbwrapper/hdatabase.c dbwrapper/hrecordset.c hdata/*.c | awk '{gsub(" \\(compare with line [^)]+)","");print}'|head -20
+	@flint -b aux/flint.lnt hcore/*.c hconsole/*.c tools/*.c \
+						dbwrapper/db_driver_loader.c dbwrapper/dbwrapper.c
+						dbwrapper/hdatabase.c dbwrapper/hrecordset.c \
+						hdata/*.c \
+| awk '{gsub(" \\(compare with line [^)]+)","");print}'|head -20
 
 ifeq ($(CURDIR),$(DIR_BUILD))
 -include $(OBJS:.o=.d)
