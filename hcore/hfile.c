@@ -38,8 +38,9 @@ namespace stdhapi
 namespace hcore
 {
 
-HFile::HFile ( int a_iMode ) : f_iMode ( a_iMode ), f_pvHandle ( NULL ),
-															 f_oPath ( ), f_oError ( )
+HFile::HFile ( int a_iMode, void * a_pvHandle ) : f_iMode ( a_iMode ),
+	f_pvHandle ( a_pvHandle ), f_oPath ( ), f_oError ( ),
+	f_bExternal ( a_pvHandle ? true : false )
 	{
 	M_PROLOG
 	if ( ( ( a_iMode & D_APPEND ) && ( a_iMode & D_TRUNCATE ) )
@@ -53,7 +54,7 @@ HFile::HFile ( int a_iMode ) : f_iMode ( a_iMode ), f_pvHandle ( NULL ),
 HFile::~HFile ( void )
 	{
 	M_PROLOG
-	if ( f_pvHandle )
+	if ( f_pvHandle && ! f_bExternal )
 		close ( );
 	return;
 	M_EPILOG

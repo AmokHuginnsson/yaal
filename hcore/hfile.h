@@ -49,9 +49,13 @@ protected:
 	HString f_oPath;
 	HString f_oError;
 	/*}*/
+private:
+	/*{*/
+	bool f_bExternal;
+	/*}*/
 public:
 	/*{*/
-	HFile ( int = D_READING );
+	HFile ( int = D_READING, void * = NULL );
 	virtual ~HFile ( void );
 	int open ( char const * );
 	int close ( void );
