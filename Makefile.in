@@ -215,9 +215,9 @@ lib%.so.$(RELEASE):
 
 .DEFAULT:
 	@if [ "$(suffix $(<))" != ".d" ] ; then \
-	echo $(NONL) "$(BOLD)$(RED)"; \
+	echo -n "$(BOLD)$(RED)"; \
 	echo "Lack of \`$(<)'." | tee -a make.log; \
-	echo $(NONL) $(RS); fi
+	echo -n $(RS); fi
 
 #phony targets
 .PHONY: all nodebug install dep clean tags mrproper purge environment
