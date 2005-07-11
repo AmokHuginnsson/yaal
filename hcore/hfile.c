@@ -159,7 +159,6 @@ int HFile::read_line ( HString & a_roLine, mode_read_t a_eMode,
 	M_EPILOG
 	}
 
-
 int HFile::scan_line ( HString & a_roLine, int a_iMaximumLength )
 	{
 	M_PROLOG
