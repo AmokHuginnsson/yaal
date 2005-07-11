@@ -225,8 +225,8 @@ double HAnalyser::functions ( HAnalyserNode * a_poNode )
 			if ( l_dLeftValue == 0 )
 				return ( -1000 );
 			if ( l_dLeftValue < 0 )
-				return ( log ( -l_dLeftValue ) );
-			return ( log ( l_dLeftValue ) );
+				return ( ::log ( -l_dLeftValue ) );
+			return ( ::log ( l_dLeftValue ) );
 			}
 		case ( D_LOG ):
 			{

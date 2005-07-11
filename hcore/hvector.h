@@ -51,7 +51,7 @@ extern char const * g_ppcErrMsgHVector [ ];
 		M_THROW ( g_ppcErrMsgHVector [ E_HVECTOR_DIMNOTMATCH ], \
 				this->f_iSize - a_roVector.f_iSize )
 
-template < class tType >
+template < typename tType >
 class HVector : public HArray < tType >
 	{
 protected:
@@ -81,12 +81,12 @@ public:
 	tType operator ! ( void );
 	bool operator == ( const HVector & );
 	bool operator != ( const HVector & );
-template < class ttType >
+template < typename ttType >
 	friend HVector < ttType > operator * ( const ttType, const HVector < ttType > & );
 	/*}*/
 	};
 
-template < class tType >
+template < typename tType >
 HVector < tType > ::HVector ( const int a_iDimension )
 				: HArray < tType > ( a_iDimension )
 	{
@@ -98,7 +98,7 @@ HVector < tType > ::HVector ( const int a_iDimension )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > ::~HVector ( void )
 	{
 	M_PROLOG
@@ -106,7 +106,7 @@ HVector < tType > ::~HVector ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > ::HVector ( const HVector & a_roVector )
 				: HArray < tType > ( a_roVector )
 	{
@@ -115,7 +115,7 @@ HVector < tType > ::HVector ( const HVector & a_roVector )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HVector < tType > ::set ( const tType * a_pdBody )
 	{
 	M_PROLOG
@@ -125,7 +125,7 @@ int HVector < tType > ::set ( const tType * a_pdBody )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType HVector < tType > ::norm ( )
 	{
 	M_PROLOG
@@ -137,7 +137,7 @@ tType HVector < tType > ::norm ( )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HVector < tType > ::normalize ( )
 	{
 	M_PROLOG
@@ -152,7 +152,7 @@ int HVector < tType > ::normalize ( )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > & 
 HVector < tType > ::operator = ( const HVector & a_roVector )
 	{
@@ -164,7 +164,7 @@ HVector < tType > ::operator = ( const HVector & a_roVector )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > & HVector < tType > ::operator = ( const tType d )
 	{
 	M_PROLOG
@@ -175,7 +175,7 @@ HVector < tType > & HVector < tType > ::operator = ( const tType d )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > HVector < tType > ::operator + ( const HVector & a_roVector )
 	{
 	M_PROLOG
@@ -186,7 +186,7 @@ HVector < tType > HVector < tType > ::operator + ( const HVector & a_roVector )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > HVector < tType > ::operator - ( const HVector & a_roVector )
 	{
 	M_PROLOG
@@ -197,7 +197,7 @@ HVector < tType > HVector < tType > ::operator - ( const HVector & a_roVector )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > HVector < tType > ::operator - ( void )
 	{
 	M_PROLOG
@@ -208,7 +208,7 @@ HVector < tType > HVector < tType > ::operator - ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > HVector < tType > ::operator * ( const tType d )
 	{
 	M_PROLOG
@@ -218,7 +218,7 @@ HVector < tType > HVector < tType > ::operator * ( const tType d )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > HVector < tType > ::operator / ( const tType d )
 	{
 	M_PROLOG
@@ -228,7 +228,7 @@ HVector < tType > HVector < tType > ::operator / ( const tType d )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > & HVector < tType > ::operator += ( const HVector & a_roVector )
 	{
 	M_PROLOG
@@ -240,7 +240,7 @@ HVector < tType > & HVector < tType > ::operator += ( const HVector & a_roVector
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > & HVector < tType > ::operator -= ( const HVector & a_roVector )
 	{
 	M_PROLOG
@@ -252,7 +252,7 @@ HVector < tType > & HVector < tType > ::operator -= ( const HVector & a_roVector
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > & HVector < tType > ::operator *= ( const tType d )
 	{
 	M_PROLOG
@@ -263,7 +263,7 @@ HVector < tType > & HVector < tType > ::operator *= ( const tType d )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > & HVector < tType > ::operator /= ( const tType d )
 	{
 	M_PROLOG
@@ -275,7 +275,7 @@ HVector < tType > & HVector < tType > ::operator /= ( const tType d )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType HVector < tType > ::operator | ( const HVector & a_roVector )
 	{
 	M_PROLOG
@@ -288,7 +288,7 @@ tType HVector < tType > ::operator | ( const HVector & a_roVector )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType HVector < tType > ::operator ! ( void )
 	{
 	M_PROLOG
@@ -296,7 +296,7 @@ tType HVector < tType > ::operator ! ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 bool HVector < tType > ::operator == ( const HVector & a_roVector )
 	{
 	M_PROLOG
@@ -309,7 +309,7 @@ bool HVector < tType > ::operator == ( const HVector & a_roVector )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 bool HVector < tType > ::operator != ( const HVector & a_roVector )
 	{
 	M_PROLOG
@@ -317,7 +317,7 @@ bool HVector < tType > ::operator != ( const HVector & a_roVector )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HVector < tType > operator * ( const tType d, const HVector < tType > & a_roVector )
 	{
 	M_PROLOG

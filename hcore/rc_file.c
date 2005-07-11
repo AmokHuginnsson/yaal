@@ -270,7 +270,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, HFile & a_roFile,
 	int l_iIndex = 0, l_iLenght = 0, l_iEnd = 0;
 	char * l_pcBuffer = NULL, * l_pcPtr = NULL;
 	a_roOption = a_roValue = "";
-	while ( a_roFile.read_line ( a_roOption, true ) >= 0 )
+	while ( a_roFile.read_line ( a_roOption, HFile::D_STRIP_NEWLINES ) >= 0 )
 		{
 		a_riLine ++;
 		l_pcBuffer = a_roOption;

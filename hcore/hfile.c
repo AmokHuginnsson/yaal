@@ -38,15 +38,16 @@ namespace stdhapi
 namespace hcore
 {
 
-HFile::HFile ( int a_iMode, void * a_pvHandle ) : f_iMode ( a_iMode ),
+HFile::HFile ( mode_open_t a_eMode, void * a_pvHandle ) : f_eMode ( a_eMode ),
 	f_pvHandle ( a_pvHandle ), f_oPath ( ), f_oError ( ),
 	f_bExternal ( a_pvHandle ? true : false )
 	{
 	M_PROLOG
-	if ( ( ( a_iMode & D_APPEND ) && ( a_iMode & D_TRUNCATE ) )
-			|| ( ( a_iMode & D_READING ) && ( a_iMode & D_TRUNCATE ) )
-			|| ( ( a_iMode & D_READING ) && ( a_iMode & D_APPEND ) ) )
-		M_THROW ( _ ( "inconsistient mode flags" ), a_iMode );
+	if ( ( ( a_eMode & D_APPEND ) && ( a_eMode & D_TRUNCATE ) )
+			|| ( ( a_eMode & D_READING ) && ( a_eMode & D_TRUNCATE ) )
+			|| ( ( a_eMode & D_READING ) && ( a_eMode & D_APPEND ) ) )
+		M_THROW ( _ ( "inconsistient mode flags" ),
+				static_cast < int > ( a_eMode ) );
 	return;
 	M_EPILOG
 	}
@@ -65,45 +66,20 @@ int HFile::open ( char const * a_pcPath )
 	M_PROLOG
 	int l_iError = 0;
 	char const * l_pcMode = NULL;
-	switch ( f_iMode )
-		{
-		case ( D_READING ):
-			{
-			l_pcMode = "r";
-			break;
-			}
-		case ( D_WRITING ):
-		case ( D_WRITING | D_TRUNCATE ):
-			{
-			l_pcMode = "w";
-			break;
-			}
-		case ( D_WRITING | D_APPEND ):
-			{
-			l_pcMode = "a";
-			break;
-			}
-		case ( D_READING | D_WRITING ):
-			{
-			l_pcMode = "r+";
-			break;
-			}
-		case ( D_READING | D_WRITING | D_TRUNCATE ):
-			{
-			l_pcMode = "w+";
-			break;
-			}
-		case ( D_READING | D_WRITING | D_APPEND ):
-			{
-			l_pcMode = "a+";
-			break;
-			}
-		default:
-			{
-			M_THROW ( "unexpected mode setting", f_iMode );
-			break;
-			}
-		}
+	if ( f_eMode == D_READING )
+		l_pcMode = "r";
+	else if ( ( f_eMode == D_WRITING ) || ( f_eMode == ( D_WRITING | D_TRUNCATE ) ) )
+		l_pcMode = "w";
+	else if ( f_eMode == ( D_WRITING | D_APPEND ) )
+		l_pcMode = "a";
+	else if ( f_eMode == ( D_READING | D_WRITING ) )
+		l_pcMode = "r+";
+	else if ( f_eMode == ( D_READING | D_WRITING | D_TRUNCATE ) )
+		l_pcMode = "w+";
+	else if ( f_eMode == ( D_READING | D_WRITING | D_APPEND ) )
+		l_pcMode = "a+";
+	else
+		M_THROW ( "unexpected mode setting", static_cast < int > ( f_eMode ) );
 	f_oPath = a_pcPath;
 	f_pvHandle = fopen ( a_pcPath, l_pcMode );
 	if ( ! f_pvHandle )
@@ -133,24 +109,44 @@ int HFile::close ( void )
 	M_EPILOG
 	}
 
-int HFile::read_line ( HString & a_roLine, bool a_bStripNewlines, int a_iMaximumLength )
+int HFile::read_line ( HString & a_roLine, mode_read_t a_eMode,
+		int a_iMaximumLength )
 	{
 	M_PROLOG
 	int l_iLength = 0;
 	char * l_pcPtr = NULL;
+	if ( ( a_eMode & D_KEEP_NEWLINES ) && ( a_eMode & D_STRIP_NEWLINES ) )
+		M_THROW ( _ ( "bad newlines setting" ), static_cast < int > ( a_eMode ) );
+	if ( ! ( a_eMode & ( D_KEEP_NEWLINES | D_STRIP_NEWLINES ) ) )
+		a_eMode |= D_KEEP_NEWLINES;
+	if ( ( a_eMode & D_BUFFERED_READS ) && ( a_eMode & D_UNBUFFERED_READS ) )
+		M_THROW ( _ ( "bad buffering setting" ), static_cast < int > ( a_eMode ) );
+	if ( ! ( a_eMode & ( D_BUFFERED_READS | D_UNBUFFERED_READS ) ) )
+		a_eMode |= D_BUFFERED_READS;
 	if ( ! f_pvHandle )
 		M_THROW ( _ ( "no opened file" ), g_iErrNo );
-	l_iLength = scan_line ( );
+	if ( a_eMode & D_BUFFERED_READS )
+		{
+		l_iLength = get_line_length ( );
+		if ( l_iLength )
+			{
+			if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
+				M_THROW ( _ ( "line too long" ), l_iLength );
+			a_roLine.hs_realloc ( l_iLength );
+			l_pcPtr = a_roLine;
+			M_ENSURE ( static_cast < int > ( fread ( l_pcPtr,
+							sizeof ( char ), l_iLength,
+							static_cast < FILE * > ( f_pvHandle ) ) ) == l_iLength );
+			}
+		}
+	else /* D_UNBUFFERED_READS */
+		{
+		l_iLength = scan_line ( a_roLine, a_iMaximumLength );
+		l_pcPtr = a_roLine;
+		}
 	if ( l_iLength )
 		{
-		if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
-			M_THROW ( _ ( "line too long" ), l_iLength );
-		a_roLine.hs_realloc ( l_iLength );
-		l_pcPtr = a_roLine;
-		M_ENSURE ( static_cast < int > ( fread ( l_pcPtr,
-						sizeof ( char ), l_iLength,
-						static_cast < FILE * > ( f_pvHandle ) ) ) == l_iLength );
-		if ( a_bStripNewlines && ( l_iLength > 0 ) )
+		if ( ( a_eMode & D_STRIP_NEWLINES ) && ( l_iLength > 0 ) )
 			{
 			l_iLength --;
 			if ( ( l_iLength > 0 ) && ( l_pcPtr [ l_iLength - 1 ] == '\r' ) )
@@ -163,7 +159,29 @@ int HFile::read_line ( HString & a_roLine, bool a_bStripNewlines, int a_iMaximum
 	M_EPILOG
 	}
 
-int HFile::scan_line ( void )
+
+int HFile::scan_line ( HString & a_roLine, int a_iMaximumLength )
+	{
+	M_PROLOG
+	int l_iSize = 0;
+	char l_cChar = 0;
+	a_roLine = "";
+	while ( fread ( & l_cChar, sizeof ( char ),
+				sizeof ( l_cChar ) / sizeof ( char ),
+				static_cast < FILE * > ( f_pvHandle ) ) == sizeof ( l_cChar ) )
+		{
+		a_roLine += l_cChar;
+		l_iSize ++;
+		if ( l_cChar == '\n' )
+			break;
+		if ( a_iMaximumLength && ( l_iSize > a_iMaximumLength ) )
+			M_THROW ( _ ( "line too long" ), l_iSize );
+		}
+	return ( l_iSize );
+	M_EPILOG
+	}
+
+int HFile::get_line_length ( void )
 	{
 	M_PROLOG
 #define D_SCAN_BUFFER_SIZE	8

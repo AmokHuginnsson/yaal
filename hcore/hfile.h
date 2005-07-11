@@ -34,17 +34,28 @@ namespace stdhapi
 
 namespace hcore
 {
-	
-#define D_READING		1
-#define D_WRITING		2
-#define D_APPEND		4
-#define D_TRUNCATE	8
 
 class HFile
 	{
+public:
+	typedef enum
+		{
+		D_READING = 1,
+		D_WRITING = 2,
+		D_APPEND = 4,
+		D_TRUNCATE = 8
+		} mode_open_t;
+	typedef enum
+		{
+		D_DEFAULTS = 0, /* D_KEEP_NEWLINES | D_BUFFERED_READS */
+		D_KEEP_NEWLINES = 1,
+		D_STRIP_NEWLINES = 2,
+		D_BUFFERED_READS = 4,
+		D_UNBUFFERED_READS = 8
+		} mode_read_t;
 protected:
 	/*{*/
-	int f_iMode;
+	mode_open_t f_eMode;
 	void * f_pvHandle;
 	HString f_oPath;
 	HString f_oError;
@@ -55,11 +66,11 @@ private:
 	/*}*/
 public:
 	/*{*/
-	HFile ( int = D_READING, void * = NULL );
+	HFile ( mode_open_t = D_READING, void * = NULL );
 	virtual ~HFile ( void );
 	int open ( char const * );
 	int close ( void );
-	int read_line ( HString &, bool = false, int = 0 );
+	int read_line ( HString &, mode_read_t = D_DEFAULTS, int = 0 );
 	const HString & get_path ( void ) const;
 	const HString & get_error ( void ) const;
 	void flush ( void ) const;
@@ -74,7 +85,8 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	int scan_line ( void );
+	int get_line_length ( void );
+	int scan_line ( HString &, int );
 	/*}*/
 private:
 	/*{*/
@@ -84,6 +96,9 @@ private:
 	friend HFile & endl ( HFile & );
 	friend HFile & flush ( HFile & );
 	};
+
+template enum_t < HFile::mode_open_t >;
+template enum_t < HFile::mode_read_t >;
 
 }
 

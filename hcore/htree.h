@@ -43,10 +43,10 @@ namespace hcore
 #define D_FILL_NEW_MANUAL	0
 #define D_FILL_NEW_AUTO		1
 
-template < class tttType >
+template < typename tttType >
 class HTree;
 
-template < class ttType >
+template < typename ttType >
 class HBranchList : public HList < ttType >
 	{
 protected:
@@ -62,7 +62,7 @@ protected:
 	/*}*/
 	};
 
-template < class tttType >
+template < typename tttType >
 class HTree
 	{
 protected:
@@ -137,7 +137,7 @@ private:
  *
  */
 
-template < class ttType >
+template < typename ttType >
 HBranchList < ttType > ::~HBranchList ( void )
 	{
 	M_PROLOG
@@ -146,7 +146,7 @@ HBranchList < ttType > ::~HBranchList ( void )
 	M_EPILOG
 	}
 
-template < class ttType >
+template < typename ttType >
 long int HBranchList < ttType > ::empty ( typename HList < ttType > ::HElement * a_poElement )
 	{
 	M_PROLOG
@@ -156,7 +156,7 @@ long int HBranchList < ttType > ::empty ( typename HList < ttType > ::HElement *
 	M_EPILOG
 	}
 
-template < class tttType >
+template < typename tttType >
 HTree < tttType > ::HNode::HNode( HNode * a_poNode ) : f_tLeaf ( ),
 	f_iNumber ( 0 ), f_iHits ( 0 ), f_iLevel ( 0 ), f_oBranch ( ),
 	f_poTrunk ( a_poNode ), f_poTree ( NULL )
@@ -173,7 +173,7 @@ HTree < tttType > ::HNode::HNode( HNode * a_poNode ) : f_tLeaf ( ),
 	M_EPILOG
 	}
 
-template < class tttType >
+template < typename tttType >
 HTree < tttType > ::HNode::~HNode ( void )
 	{
 	M_PROLOG
@@ -181,7 +181,7 @@ HTree < tttType > ::HNode::~HNode ( void )
 	M_EPILOG
 	}
 
-template < class tttType >
+template < typename tttType >
 void HTree < tttType > ::HNode::put( tttType a_tttArgument )
 	{
 	M_PROLOG
@@ -191,7 +191,7 @@ void HTree < tttType > ::HNode::put( tttType a_tttArgument )
 	M_EPILOG
 	}
 	
-template < class tttType >
+template < typename tttType >
 tttType HTree < tttType > ::HNode::get( void )
 	{
 	M_PROLOG
@@ -202,7 +202,7 @@ tttType HTree < tttType > ::HNode::get( void )
 	M_EPILOG
 	}
 
-template < class tttType >
+template < typename tttType >
 typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( int a_iFlag )
 	{
 	M_PROLOG
@@ -222,7 +222,7 @@ typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( int a_i
 	M_EPILOG
 	}
 
-template < class tttType >
+template < typename tttType >
 typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
 	{
 	M_PROLOG
@@ -238,7 +238,7 @@ typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
 	M_EPILOG
 	}
 
-template < class tttType >
+template < typename tttType >
 HTree < tttType >::HTree ( void )
 	: f_poRoot ( NULL ), f_poSelected ( NULL ), f_iHighestNumber ( 0 )
 	{
@@ -247,7 +247,7 @@ HTree < tttType >::HTree ( void )
 	M_EPILOG
 	}
 
-template < class tttType >
+template < typename tttType >
 HTree < tttType > ::~HTree( void )
 	{
 	M_PROLOG
@@ -256,7 +256,7 @@ HTree < tttType > ::~HTree( void )
 	M_EPILOG
 	}
 
-template < class tttType >
+template < typename tttType >
 void HTree < tttType > ::flush ( void )
 	{
 	M_PROLOG

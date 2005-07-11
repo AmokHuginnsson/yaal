@@ -99,6 +99,7 @@
 -e1712	/* default constructor not defined for class 'class' */
 -e1714	/* Member function 'member' not referenced */
 -e1716	/* Virtual member function 'member' not referenced */
+-e1727	/* inline 'inline' not previously defined inline */
 -e1735	/* virtual 'member' has default parameter */
 -e1739	/* Binary operator 'operator' should be non-member function */
 -e1740	/* pointer member 'member' not directly freed or zeroed by destructor */

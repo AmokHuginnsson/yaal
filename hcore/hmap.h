@@ -45,13 +45,13 @@ namespace hcore
 
 extern unsigned long const int * const g_pulPrimes;
 
-template < class tType >
+template < typename tType >
 inline unsigned long int hash ( const tType & a_rtKey )
 	{
 	return ( static_cast < unsigned long int > ( a_rtKey ) );
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 class HMap
 	{
 private:
@@ -103,7 +103,7 @@ private:
 	/*}*/
 	};
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 HMap<tType, ttType>::HAtom::HAtom ( void ) : f_tKey ( ), f_tValue ( ),
 																						 f_poNext ( NULL )
 	{
@@ -112,7 +112,7 @@ HMap<tType, ttType>::HAtom::HAtom ( void ) : f_tKey ( ), f_tValue ( ),
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 HMap<tType, ttType>::HAtom::~HAtom ( void )
 	{
 	M_PROLOG
@@ -120,7 +120,7 @@ HMap<tType, ttType>::HAtom::~HAtom ( void )
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( a_uiSize ), f_uiIndex ( 0 ),
 	f_iQuantity ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
@@ -144,7 +144,7 @@ HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( a_uiSize ), f_uiInde
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 HMap<tType, ttType>::~HMap ( void )
 	{
 	M_PROLOG
@@ -156,7 +156,7 @@ HMap<tType, ttType>::~HMap ( void )
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 void HMap<tType, ttType>::flush ( void )
 	{
 	M_PROLOG
@@ -174,7 +174,7 @@ void HMap<tType, ttType>::flush ( void )
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 int HMap < tType, ttType >::quantity ( ) const
 	{
 	M_PROLOG
@@ -182,7 +182,7 @@ int HMap < tType, ttType >::quantity ( ) const
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 ttType & HMap<tType, ttType>::operator [ ] ( const tType & a_rtKey )
 	{
 	M_PROLOG
@@ -211,7 +211,7 @@ ttType & HMap<tType, ttType>::operator [ ] ( const tType & a_rtKey )
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 void HMap<tType, ttType>::rewind ( void )
 	{
 	M_PROLOG
@@ -221,7 +221,7 @@ void HMap<tType, ttType>::rewind ( void )
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 bool HMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 	{
 	M_PROLOG
@@ -247,7 +247,7 @@ bool HMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 bool HMap<tType, ttType>::has_key ( const tType & a_rtKey ) const
 	{
 	M_PROLOG
@@ -261,7 +261,7 @@ bool HMap<tType, ttType>::has_key ( const tType & a_rtKey ) const
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 bool HMap<tType, ttType>::get ( const tType & a_rtKey, ttType & a_rtValue ) const
 	{
 	M_PROLOG
@@ -277,7 +277,7 @@ bool HMap<tType, ttType>::get ( const tType & a_rtKey, ttType & a_rtValue ) cons
 	M_EPILOG
 	}
 
-template < class tType, class ttType >
+template < typename tType, typename ttType >
 bool HMap<tType, ttType>::remove ( const tType & a_rtKey )
 	{
 	M_PROLOG

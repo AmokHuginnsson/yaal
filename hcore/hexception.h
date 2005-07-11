@@ -54,27 +54,31 @@ namespace hcore
 #define M_ENSURE( condition ) if ( ! ( condition ) ){ stdhapi::hcore::HException e ( __WHERE__, #condition, errno ); e->set ( strerror ( errno ) ); }
 #define M_IRV( expression )	static_cast < void > ( expression )
 #define M_ASSERT( condition ) if ( ! ( condition ) )stdhapi::hcore::HException::failed_assert ( __WHERE__, #condition )
-#define M_DEFINE_ENUM_OPERATORS( enum_name ) \
-	inline enum_name operator | ( enum_name const & left, enum_name const & right ) \
-		{ return ( static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
-					| static_cast < unsigned long int > ( right ) ) ); } \
-	inline enum_name & operator |= ( enum_name & left, enum_name const & right ) \
-		{ return ( left = static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
-					| static_cast < unsigned long int > ( right ) ) ); } \
-	inline enum_name operator & ( enum_name const & left, enum_name const & right ) \
-		{ return ( static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
-					& static_cast < unsigned long int > ( right ) ) ); } \
-	inline enum_name & operator &= ( enum_name & left, enum_name const & right ) \
-		{ return ( left = static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
-					& static_cast < unsigned long int > ( right ) ) ); } \
-	inline enum_name operator ^ ( enum_name const & left, enum_name const & right ) \
-		{ return ( static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
-					^ static_cast < unsigned long int > ( right ) ) ); } \
-	inline enum_name & operator ^= ( enum_name & left, enum_name const & right ) \
-		{ return ( left = static_cast < enum_name > ( static_cast < unsigned long int > ( left ) \
-					^ static_cast < unsigned long int > ( right ) ) ); } \
-	inline enum_name operator ~ ( enum_name const & e ) \
-		{ return ( static_cast < enum_name > ( ~ static_cast < unsigned long int > ( e ) ) ); }
+
+template < typename tType >
+struct enum_t
+	{
+	inline friend tType const operator | ( tType const & left, tType const & right )
+		{ return ( static_cast < tType > ( static_cast < unsigned long int > ( left )
+					| static_cast < unsigned long int > ( right ) ) ); }
+	inline friend tType & operator |= ( tType & left, tType const & right )
+		{ return ( left = static_cast < tType > ( static_cast < unsigned long int > ( left )
+					| static_cast < unsigned long int > ( right ) ) ); }
+	inline friend tType const operator & ( tType const & left, tType const & right )
+		{ return ( static_cast < tType > ( static_cast < unsigned long int > ( left )
+					& static_cast < unsigned long int > ( right ) ) ); }
+	inline friend tType & operator &= ( tType & left, tType const & right )
+		{ return ( left = static_cast < tType > ( static_cast < unsigned long int > ( left )
+					& static_cast < unsigned long int > ( right ) ) ); }
+	inline friend tType const operator ^ ( tType const & left, tType const & right )
+		{ return ( static_cast < tType > ( static_cast < unsigned long int > ( left )
+					^ static_cast < unsigned long int > ( right ) ) ); }
+	inline friend tType & operator ^= ( tType & left, tType const & right )
+		{ return ( left = static_cast < tType > ( static_cast < unsigned long int > ( left )
+					^ static_cast < unsigned long int > ( right ) ) ); }
+	inline friend tType const operator ~ ( tType const & e )
+		{ return ( static_cast < tType > ( ~ static_cast < unsigned long int > ( e ) ) ); }
+	};
 
 #define D_LOG_DEBUG			1
 #define D_LOG_INFO			2
@@ -104,7 +108,7 @@ typedef enum
 	D_HTIME					= 0x1000,
 	D_MASK					= 0xffff
 	} type_t;
-M_DEFINE_ENUM_OPERATORS( type_t )
+template enum_t < type_t >;
 
 #define g_iErrNo errno
 

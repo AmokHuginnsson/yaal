@@ -47,7 +47,7 @@ namespace hcore
 
 extern char const * g_ppcErrMsgHArray [ ];
 
-template < class tType >
+template < typename tType >
 class HArray
 	{
 protected:
@@ -71,7 +71,7 @@ protected:
 	/*}*/
 	};
 
-template < class tType >
+template < typename tType >
 HArray < tType >::HArray ( int a_iSize ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	{
 	M_PROLOG
@@ -88,7 +88,7 @@ HArray < tType >::HArray ( int a_iSize ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HArray < tType >::HArray ( const int & a_iSize, tType const & a_tFillWith )
 	: f_iSize ( 0 ), f_ptArray ( NULL )
 	{
@@ -109,7 +109,7 @@ HArray < tType >::HArray ( const int & a_iSize, tType const & a_tFillWith )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HArray < tType >::~HArray ( void )
 	{
 	M_PROLOG
@@ -121,7 +121,7 @@ HArray < tType >::~HArray ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HArray < tType >::HArray ( const HArray & a_roArray ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	{
 	M_PROLOG
@@ -130,7 +130,7 @@ HArray < tType >::HArray ( const HArray & a_roArray ) : f_iSize ( 0 ), f_ptArray
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HArray < tType > & HArray < tType >::operator = ( const HArray & a_roArray )
 	{
 	M_PROLOG
@@ -160,7 +160,7 @@ HArray < tType > & HArray < tType >::operator = ( const HArray & a_roArray )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HArray < tType >::operator [ ] ( int a_iIndex )
 	{
 	M_PROLOG
@@ -172,7 +172,7 @@ tType & HArray < tType >::operator [ ] ( int a_iIndex )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HArray < tType > ::operator bool ( void ) const
 	{
 	M_PROLOG
@@ -180,7 +180,7 @@ HArray < tType > ::operator bool ( void ) const
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HArray < tType > ::get_size ( void ) const
 	{
 	M_PROLOG

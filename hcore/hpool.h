@@ -47,7 +47,7 @@ namespace hcore
 
 extern char const * g_ppcErrMsgHPool [ ];
 
-template < class tType >
+template < typename tType >
 class HPool
 	{
 public:
@@ -85,7 +85,7 @@ private:
 
 #include "xalloc.h"
 
-template < class tType >
+template < typename tType >
 HPool < tType >::HPool ( size_t a_ulNewSize, pool_type_t a_ePoolType )
 	: f_ePoolType ( a_ePoolType ), f_ulPoolSize ( 0 ), f_iTop ( 0 ),
 	f_ptPool ( NULL )
@@ -97,7 +97,7 @@ HPool < tType >::HPool ( size_t a_ulNewSize, pool_type_t a_ePoolType )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HPool < tType >::~HPool ( void )
 	{
 	M_PROLOG
@@ -108,7 +108,7 @@ HPool < tType >::~HPool ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 	{
 	M_PROLOG
@@ -138,7 +138,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HPool < tType >::operator [ ] ( int a_iIndex ) const
 	{
 	M_PROLOG
@@ -148,7 +148,7 @@ tType & HPool < tType >::operator [ ] ( int a_iIndex ) const
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HPool < tType>::add ( tType const & a_tPod )
 	{
 	M_PROLOG
@@ -159,7 +159,7 @@ tType & HPool < tType>::add ( tType const & a_tPod )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HPool < tType >::reset ( void )
 	{
 	f_iTop = 0;

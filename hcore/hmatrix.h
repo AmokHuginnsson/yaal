@@ -73,7 +73,7 @@ extern char const * g_ppcErrMsgHMatrix [ ];
 		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_COLUMNSROWS ],\
 				f_iColumns - a_roMatrix.f_iRows );
 
-template < class tType >
+template < typename tType >
 class HMatrix : public HArray < HVector < tType > >
 	{
 protected:
@@ -110,19 +110,19 @@ public:
 	tType operator ! ( void );
 	bool operator == ( const HMatrix & );
 	bool operator != ( const HMatrix & );
-template < class ttType >
+template < typename ttType >
 	friend HVector < ttType > operator * ( const HVector < ttType > &, const HMatrix & );
-template < class ttType >
+template < typename ttType >
 	friend HVector < ttType > operator *= ( const HVector < ttType > &, const HMatrix & );
-template < class ttType >
+template < typename ttType >
 	friend HMatrix operator * ( const ttType, const HMatrix < ttType > & );
 	/* } */
 	};
 	
-template < class tType >
+template < typename tType >
 HVector < tType > T ( const HMatrix < tType > &, const HVector < tType > & );
 
-template < class tType >
+template < typename tType >
 HMatrix < tType > ::HMatrix ( const int a_iRows, const int a_iColumns )
 									:	HArray < HVector < tType > > ( a_iRows,
 											HVector < tType > ( a_iColumns ) )
@@ -141,7 +141,7 @@ HMatrix < tType > ::HMatrix ( const int a_iRows, const int a_iColumns )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > ::HMatrix ( const HMatrix & a_roMatrix )
 									:	HArray < HVector < tType > > ( a_roMatrix.f_iRows,
 											HVector < tType > ( a_roMatrix.f_iColumns ) )
@@ -154,7 +154,7 @@ HMatrix < tType > ::HMatrix ( const HMatrix & a_roMatrix )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > :: ~ HMatrix ( void )
 	{
 	M_PROLOG
@@ -162,7 +162,7 @@ HMatrix < tType > :: ~ HMatrix ( void )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 int HMatrix < tType > ::set ( const tType * * d )
 	{
 	M_PROLOG
@@ -173,7 +173,7 @@ int HMatrix < tType > ::set ( const tType * * d )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 int HMatrix < tType > ::row ( void )
 	{
 	M_PROLOG
@@ -181,7 +181,7 @@ int HMatrix < tType > ::row ( void )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 int HMatrix < tType > ::col ( void )
 	{
 	M_PROLOG
@@ -189,7 +189,7 @@ int HMatrix < tType > ::col ( void )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 tType HMatrix < tType > ::det ( void )
 	{
 	M_PROLOG
@@ -246,7 +246,7 @@ tType HMatrix < tType > ::det ( void )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 tType HMatrix < tType > ::M ( const int a_iRow, const int a_iColumn )
 	{
 	M_PROLOG
@@ -276,7 +276,7 @@ tType HMatrix < tType > ::M ( const int a_iRow, const int a_iColumn )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > HMatrix < tType > ::T ( void )
 	{
 	M_PROLOG
@@ -289,7 +289,7 @@ HMatrix < tType > HMatrix < tType > ::T ( void )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > HMatrix < tType > ::_1 ( void )
 	{
 	M_PROLOG
@@ -310,7 +310,7 @@ HMatrix < tType > HMatrix < tType > ::_1 ( void )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator = ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
@@ -324,7 +324,7 @@ HMatrix < tType > & HMatrix < tType > ::operator = ( const HMatrix & a_roMatrix 
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator = ( const tType d )
 	{
 	M_PROLOG
@@ -335,7 +335,7 @@ HMatrix < tType > & HMatrix < tType > ::operator = ( const tType d )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator + ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
@@ -346,7 +346,7 @@ HMatrix < tType > HMatrix < tType > ::operator + ( const HMatrix & a_roMatrix )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator - ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
@@ -357,7 +357,7 @@ HMatrix < tType > HMatrix < tType > ::operator - ( const HMatrix & a_roMatrix )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator - ( void )
 	{
 	M_PROLOG
@@ -368,7 +368,7 @@ HMatrix < tType > HMatrix < tType > ::operator - ( void )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator * ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
@@ -387,7 +387,7 @@ HMatrix < tType > HMatrix < tType > ::operator * ( const HMatrix & a_roMatrix )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator * ( const tType d )
 	{
 	M_PROLOG
@@ -397,7 +397,7 @@ HMatrix < tType > HMatrix < tType > ::operator * ( const tType d )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator / ( const tType d )
 	{
 	M_PROLOG
@@ -407,7 +407,7 @@ HMatrix < tType > HMatrix < tType > ::operator / ( const tType d )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator += ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
@@ -419,7 +419,7 @@ HMatrix < tType > & HMatrix < tType > ::operator += ( const HMatrix & a_roMatrix
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator -= ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
@@ -431,7 +431,7 @@ HMatrix < tType > & HMatrix < tType > ::operator -= ( const HMatrix & a_roMatrix
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator *= ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
@@ -444,7 +444,7 @@ HMatrix < tType > & HMatrix < tType > ::operator *= ( const HMatrix & a_roMatrix
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator *= ( const tType d )
 	{
 	M_PROLOG
@@ -455,7 +455,7 @@ HMatrix < tType > & HMatrix < tType > ::operator *= ( const tType d )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator /= ( const tType d )
 	{
 	M_PROLOG
@@ -467,7 +467,7 @@ HMatrix < tType > & HMatrix < tType > ::operator /= ( const tType d )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator ~ ( void )
 	{
 	M_PROLOG
@@ -479,7 +479,7 @@ HMatrix < tType > HMatrix < tType > ::operator ~ ( void )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 tType HMatrix < tType > ::operator ! ( void )
 	{
 	M_PROLOG
@@ -487,7 +487,7 @@ tType HMatrix < tType > ::operator ! ( void )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 bool HMatrix < tType > ::operator == ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
@@ -500,7 +500,7 @@ bool HMatrix < tType > ::operator == ( const HMatrix & a_roMatrix )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 bool HMatrix < tType > ::operator != ( const HMatrix & a_roMatrix )
 	{
 	M_PROLOG
@@ -508,7 +508,7 @@ bool HMatrix < tType > ::operator != ( const HMatrix & a_roMatrix )
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HVector < tType > operator * ( const HVector < tType > & a_roVector, const HMatrix < tType > & a_roMatrix )
 	{
 	M_PROLOG
@@ -530,7 +530,7 @@ HVector < tType > operator * ( const HVector < tType > & a_roVector, const HMatr
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HVector < tType > operator *= ( const HVector < tType > & a_roVector, const HMatrix < tType > & a_roMatrix )
 	{
 	M_PROLOG
@@ -543,7 +543,7 @@ HVector < tType > operator *= ( const HVector < tType > & a_roVector, const HMat
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HMatrix < tType > operator * ( const tType d, const HMatrix < tType > & a_roMatrix )
 	{
 	M_PROLOG
@@ -553,7 +553,7 @@ HMatrix < tType > operator * ( const tType d, const HMatrix < tType > & a_roMatr
 	M_EPILOG
 	}
 	
-template < class tType >
+template < typename tType >
 HVector < tType > T ( const HMatrix < tType > & a_roMatrix, const HVector < tType > & a_roVector )
 	{
 	M_PROLOG

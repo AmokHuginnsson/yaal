@@ -74,7 +74,7 @@ extern char const * g_ppcErrMsgHList [ ];
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-template < class tType > 
+template < typename tType > 
 class HList
 	{
 protected:
@@ -191,7 +191,7 @@ protected:
 /*++++++++++++++++++++++                             ++++++++++++++++++++++*/
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-template < class tType >
+template < typename tType >
 HList < tType >::HElement::HElement ( HElement * a_poElement,
 		int a_iNumber ) : f_poPrevious ( NULL ), f_tObject ( ), f_poNext ( NULL ),
 											f_iNumber ( a_iNumber ), f_lHits ( 0 )
@@ -212,7 +212,7 @@ HList < tType >::HElement::HElement ( HElement * a_poElement,
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HList< tType >::HElement::~HElement ( void )
 	{
 	M_PROLOG
@@ -222,7 +222,7 @@ HList< tType >::HElement::~HElement ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HList< tType >::HElement::put ( tType a_tObject )
 	{
 	M_PROLOG
@@ -232,7 +232,7 @@ void HList< tType >::HElement::put ( tType a_tObject )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::HElement::get ( void )
 	{
 	M_PROLOG
@@ -243,7 +243,7 @@ tType & HList< tType >::HElement::get ( void )
 
 //============================================================================
 
-template < class tType >
+template < typename tType >
 HList< tType >::HList ( int a_iSize )
 	: f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_iOrder ( D_UNSORTED ),
@@ -256,7 +256,7 @@ HList< tType >::HList ( int a_iSize )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HList< tType >::~HList ( void )
 	{
 	M_PROLOG
@@ -265,7 +265,7 @@ HList< tType >::~HList ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HList< tType >::HList ( const HList< tType > & a_roList )
 	: f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_iOrder ( D_UNSORTED ),
@@ -277,7 +277,7 @@ HList< tType >::HList ( const HList< tType > & a_roList )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HList< tType > & HList< tType >::operator = ( const HList< tType > & a_roList )
 	{
 	M_PROLOG
@@ -332,7 +332,7 @@ HList< tType > & HList< tType >::operator = ( const HList< tType > & a_roList )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HList < tType >::flush ( void )
 	{
 	M_PROLOG
@@ -352,7 +352,7 @@ void HList < tType >::flush ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 long int HList< tType >::empty ( HElement * a_poElement )
 	{
 	M_PROLOG
@@ -363,7 +363,7 @@ long int HList< tType >::empty ( HElement * a_poElement )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HList< tType >::quantity ( void )
 	{
 	M_PROLOG
@@ -371,7 +371,7 @@ int HList< tType >::quantity ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HList< tType >::cmph ( HElement * a_poLeft, HElement * a_poRight )
 	{
 	M_PROLOG
@@ -379,7 +379,7 @@ int HList< tType >::cmph ( HElement * a_poLeft, HElement * a_poRight )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HList< tType >::cmpn ( HElement * a_poLeft, HElement * a_poRight )	
 	{
 	M_PROLOG
@@ -387,13 +387,13 @@ int HList< tType >::cmpn ( HElement * a_poLeft, HElement * a_poRight )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 const int compare_contents ( const tType & a_tLeft, const tType & a_tRight )
 	{
 	return ( a_tLeft - a_tRight );
 	}
 
-template < class tType >
+template < typename tType >
 int HList< tType >::cmpc ( HElement * a_poLeft, HElement * a_poRight )	
 	{
 	M_PROLOG
@@ -401,7 +401,7 @@ int HList< tType >::cmpc ( HElement * a_poLeft, HElement * a_poRight )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::add_element ( tType * a_ptObject )
 	{
 	M_PROLOG
@@ -421,7 +421,7 @@ tType & HList< tType >::add_element ( tType * a_ptObject )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::add_head ( tType * a_ptObject )
 	{
 	M_PROLOG
@@ -438,7 +438,7 @@ tType & HList< tType >::add_head ( tType * a_ptObject )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::add_tail ( tType * a_ptObject )
 	{
 	M_PROLOG
@@ -456,7 +456,7 @@ tType & HList< tType >::add_tail ( tType * a_ptObject )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::add_at ( int a_iIndex, tType * a_ptObject )
 	{
 	M_PROLOG
@@ -486,7 +486,7 @@ tType & HList< tType >::add_at ( int a_iIndex, tType * a_ptObject )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::add_orderly ( tType & a_rtObject, int a_iOrder )
 	{
 	M_PROLOG
@@ -531,7 +531,7 @@ tType & HList< tType >::add_orderly ( tType & a_rtObject, int a_iOrder )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HList< tType >::remove_at ( int a_iIndex, int a_iFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
@@ -602,7 +602,7 @@ int HList< tType >::remove_at ( int a_iIndex, int a_iFlag, tType * * a_pptObject
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HList< tType >::remove_element ( int a_iFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
@@ -662,7 +662,7 @@ int HList< tType >::remove_element ( int a_iFlag, tType * * a_pptObject )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HList< tType >::remove_head ( int a_iFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
@@ -718,7 +718,7 @@ int HList< tType >::remove_head ( int a_iFlag, tType * * a_pptObject )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 int HList< tType >::remove_tail ( int a_iFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
@@ -776,7 +776,7 @@ int HList< tType >::remove_tail ( int a_iFlag, tType * * a_pptObject )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, int a_iFlag )
 	{
 	M_PROLOG
@@ -817,7 +817,7 @@ bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, int a_i
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType * HList< tType >::to_head ( int a_iOffset, int a_iFlag )
 	{
 	M_PROLOG
@@ -834,7 +834,7 @@ tType * HList< tType >::to_head ( int a_iOffset, int a_iFlag )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, int a_iFlag )
 	{
 	M_PROLOG
@@ -875,7 +875,7 @@ bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, int a_i
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType * HList< tType >::to_tail ( int a_iOffset, int a_iFlag )
 	{
 	M_PROLOG
@@ -892,7 +892,7 @@ tType * HList< tType >::to_tail ( int a_iOffset, int a_iFlag )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::operator [ ] ( int a_iIndex )
 	{
 	M_PROLOG
@@ -900,7 +900,7 @@ tType & HList< tType >::operator [ ] ( int a_iIndex )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 typename HList< tType >::HElement * HList < tType >::element_by_index ( int a_iIndex )
 	{
 	M_PROLOG
@@ -952,7 +952,7 @@ we have to check if a_iIndex is lowwer or geater than f_iIndex/2
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_iNumber )
 	{
 	M_PROLOG
@@ -974,7 +974,7 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::go ( int a_iNumber, int a_iFlag )
 	{
 	M_PROLOG
@@ -1001,7 +1001,7 @@ tType & HList< tType >::go ( int a_iNumber, int a_iFlag )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HList< tType >::exchange ( HElement * a_poLeft, HElement * a_poRight )
 	{
 	M_PROLOG
@@ -1042,7 +1042,7 @@ void HList< tType >::exchange ( HElement * a_poLeft, HElement * a_poRight )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HList< tType >::exchange ( int a_iLeft, int a_iRight, int a_iFlag )
 	{
 	M_PROLOG
@@ -1098,7 +1098,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int a_iFlag )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::present ( void )
 	{
 	M_PROLOG
@@ -1108,7 +1108,7 @@ tType & HList< tType >::present ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::head ( void )
 	{
 	M_PROLOG
@@ -1118,7 +1118,7 @@ tType & HList< tType >::head ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 tType & HList< tType >::tail ( void )
 	{
 	M_PROLOG
@@ -1128,7 +1128,7 @@ tType & HList< tType >::tail ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HList< tType >::sort ( void )
 	{
 	M_PROLOG
@@ -1177,7 +1177,7 @@ void HList< tType >::sort ( void )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HList< tType >::sub_swap ( HElement * a_poLeft, HElement * a_poCenter,
 		HElement * a_poRight )
 	{
@@ -1215,7 +1215,7 @@ void HList< tType >::sub_swap ( HElement * a_poLeft, HElement * a_poCenter,
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HList< tType >::sort_by_hits ( int a_iOrder )
 	{
 	M_PROLOG
@@ -1226,7 +1226,7 @@ void HList< tType >::sort_by_hits ( int a_iOrder )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HList < tType >:: sort_by_number ( int a_iOrder )
 	{
 	M_PROLOG
@@ -1237,7 +1237,7 @@ void HList < tType >:: sort_by_number ( int a_iOrder )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 void HList < tType >:: sort_by_contents ( int a_iOrder )
 	{
 	M_PROLOG
@@ -1248,7 +1248,7 @@ void HList < tType >:: sort_by_contents ( int a_iOrder )
 	M_EPILOG
 	}
 
-template < class tType >
+template < typename tType >
 HList< tType >::operator bool ( void ) const
 	{
 	M_PROLOG
