@@ -117,6 +117,10 @@ extern int n_iDebugLevel;
 
 class HException
 	{
+private:
+	/*{*/
+	mutable bool f_bLocal;
+	/*}*/
 protected:
 	/*{*/
 	char f_cChar;

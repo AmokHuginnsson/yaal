@@ -46,8 +46,8 @@ namespace hcore
 HException::HException ( char const * a_pcFileName,
 												 char const * a_pcFunctionName,
 												 int a_iLine, char const * a_pcMessage, int a_iCode )
-	: f_cChar ( 0 ), f_iInt ( 0 ), f_lLong ( 0 ), f_dDouble ( 0 ),
-	f_pcCharPtr ( NULL ), f_pvVoidPtr ( NULL ), f_iFrame ( 0 ),
+	: f_bLocal ( false ), f_cChar ( 0 ), f_iInt ( 0 ), f_lLong ( 0 ),
+	f_dDouble ( 0 ), f_pcCharPtr ( NULL ), f_pvVoidPtr ( NULL ), f_iFrame ( 0 ),
 	f_pcFileName ( NULL ), f_pcFunctionName ( NULL ),
 	f_iCode ( a_iCode ), f_pcMessage ( NULL )
 	{
@@ -61,9 +61,10 @@ HException::HException ( char const * a_pcFileName,
 	}
 
 HException::HException ( const HException & a_roException )
-	: f_cChar ( a_roException.f_cChar ), f_iInt ( a_roException.f_iInt ),
-	f_lLong ( a_roException.f_lLong ), f_dDouble ( a_roException.f_dDouble ),
-	f_pcCharPtr ( NULL ), f_pvVoidPtr ( a_roException.f_pvVoidPtr ),
+	: f_bLocal ( false ), f_cChar ( a_roException.f_cChar ),
+	f_iInt ( a_roException.f_iInt ), f_lLong ( a_roException.f_lLong ),
+	f_dDouble ( a_roException.f_dDouble ), f_pcCharPtr ( NULL ),
+	f_pvVoidPtr ( a_roException.f_pvVoidPtr ),
 	f_iFrame ( a_roException.f_iFrame ), f_pcFileName ( NULL ),
 	f_pcFunctionName ( NULL ), f_iCode ( a_roException.f_iCode ),
 	f_pcMessage ( NULL )
@@ -72,6 +73,7 @@ HException::HException ( const HException & a_roException )
 	f_pcMessage = xstrdup ( a_roException.f_pcMessage );
 	f_pcFileName = xstrdup ( a_roException.f_pcFileName );
 	f_pcFunctionName = xstrdup ( a_roException.f_pcFunctionName );
+	a_roException.f_bLocal = true;
 	return;
 	}
 
@@ -79,8 +81,10 @@ HException::~HException ( void )
 	{
 	try
 		{
-		hcore::log ( "Exception registers: c:0x%02x i:%d l:%ld d:%f pv:%p pc:%s\n",
-				f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
+		if ( ! f_bLocal )
+			hcore::log (
+					"Exception registers: c:0x%02x i:%d l:%ld d:%f pv:%p pc:%s\n",
+					f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
 		}
 	catch ( ... )
 		{
@@ -123,9 +127,10 @@ void HException::set ( char const * a_pcStr )
 void HException::print_error ( bool a_bFull ) const
 	{
 	fprintf ( stderr, "\nException: %s, %d.\n", f_pcMessage, f_iCode );
-	if ( a_bFull )fprintf ( stderr,
-			"Exception registers:\nc:0x%02x\ti:%d\tl:%ld\td:%f\tpv:%p\npc:%s\n",
-			f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
+	if ( a_bFull )
+		fprintf ( stderr,
+				"Exception registers:\nc:0x%02x\ti:%d\tl:%ld\td:%f\tpv:%p\npc:%s\n",
+				f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
 	return;
 	}
 
