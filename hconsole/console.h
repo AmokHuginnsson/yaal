@@ -55,7 +55,7 @@ namespace hconsole
 #define D_CURSOR_VISIBLE			1
 #define D_CURSOR_VERY_VISIBLE	2
 
-#define D_ATTR_DEFAULT				-1
+#define D_ATTR_DEFAULT			( - 1 )
 
 #define D_FG_BLACK					0
 #define D_FG_RED						1

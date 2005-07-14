@@ -238,7 +238,7 @@ char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 	M_PROLOG
 	size_t l_uiSizeIn = 0, l_uiSizeOut = 0, l_uiOrigSize = 0, l_uiTmp = 0;
 	char * l_pcOut = NULL, * l_pcIn = const_cast < char * > ( a_pcData );
-	iconv_t l_xCD = ( iconv_t ) 0;
+	iconv_t l_xCD = static_cast < iconv_t > ( 0 );
 	l_uiOrigSize = l_uiSizeOut = l_uiSizeIn = strlen ( a_pcData );
 	f_oConvertedString.hs_realloc ( l_uiOrigSize );
 	l_pcOut = f_oConvertedString;
@@ -402,7 +402,7 @@ char const * HXml::iterate ( HString & a_roValue, char const * a_pcPath, bool a_
 				break;
 				}
 			}
-		while ( a_bStripEmpty && l_pcName && M_TEST_IF_EMPTY () );
+		while ( a_bStripEmpty && M_TEST_IF_EMPTY () );
 		if ( l_pcName && M_TEST_IF_EMPTY() )
 			l_pcName = NULL;
 		}

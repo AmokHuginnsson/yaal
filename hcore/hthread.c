@@ -70,7 +70,7 @@ int HThread::spawn ( void )
 				static_cast < int > ( f_eStatus ) );
 	M_ENSURE ( pthread_create ( & f_xThread,
 				& f_sAttributes, SPAWN, this ) == 0 );
-	f_oCondition.wait ( );
+	M_IRV ( f_oCondition.wait ( ) );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -213,7 +213,8 @@ HCondition::status_t HCondition::wait ( unsigned long int * a_pulTimeOutSeconds,
 		M_ENSURE ( ( l_iError == 0 ) || ( l_iError == EINTR ) || ( l_iError == ETIMEDOUT ) );
 		return ( ( l_iError == 0 ) ? D_OK : ( ( l_iError == EINTR ) ? D_INTERRUPT : D_TIMEOUT ) );
 		}
-	else pthread_cond_wait ( & f_xCondition, & f_oMutex.f_xMutex );
+	else
+		M_IRV ( pthread_cond_wait ( & f_xCondition, & f_oMutex.f_xMutex ) ); /* Always returns 0. */
 	return ( D_OK );
 	M_EPILOG
 	}

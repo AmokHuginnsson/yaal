@@ -180,8 +180,8 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		else if ( l_iCtr )
 			::mvprintw ( l_iRow, a_poNode->f_iColumnRaw, "-" );
 		if ( a_poNode == f_poSelected )
-			set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
-						: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
+			set_attr ( f_bEnabled ? ( f_bFocused ? ~f_uiFocusedAttribute
+						: ~ f_uiEnabledAttribute ) : ~ f_uiDisabledAttribute );
 		::mvprintw ( l_iRow, a_poNode->f_iColumnRaw + 1, * l_poString );
 		}
 	if ( l_iCtr && ( a_poNode->f_bUnfolded || ! a_poNode->f_iLevel ) )

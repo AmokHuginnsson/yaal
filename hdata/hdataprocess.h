@@ -45,7 +45,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	void * parse ( void * )
+	virtual void * parse ( void * )
 		{
 		return ( NULL );
 		}

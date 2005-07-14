@@ -56,7 +56,7 @@ HFile::~HFile ( void )
 	{
 	M_PROLOG
 	if ( f_pvHandle && ! f_bExternal )
-		close ( );
+		M_IRV ( close ( ) );
 	return;
 	M_EPILOG
 	}
@@ -285,7 +285,7 @@ HFile & HFile::operator << ( HFile & ( * HFILE ) ( HFile & ) )
 HFile & endl ( HFile & a_roFile )
 	{
 	M_PROLOG
-	a_roFile << '\n';
+	M_IRV ( a_roFile << '\n' );
 	return ( a_roFile );
 	M_EPILOG
 	}

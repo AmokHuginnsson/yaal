@@ -41,9 +41,9 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HRandomizer( unsigned long int = 1 );
-	void set( unsigned long int );
-	int rnd();
+	HRandomizer ( unsigned long int = 1 );
+	void set ( unsigned long int );
+	int rnd ( void );
 	/*}*/
 	};
 

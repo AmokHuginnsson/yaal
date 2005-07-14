@@ -267,17 +267,17 @@ void HListControl::refresh ( void )
 					if ( l_iCtr == f_iCursorPosition )
 						{
 						if ( l_oItem.m_bChecked )
-							set_attr ( ! f_bEnabled ? ( ! f_bFocused ? ~ ( f_iFocusedAttribute >> 8 )
-										: ~ ( f_iEnabledAttribute >> 8 ) ) : ~ ( f_iDisabledAttribute >> 8 ) );
+							set_attr ( ! f_bEnabled ? ( ! f_bFocused ? ~ ( f_uiFocusedAttribute >> 8 )
+										: ~ ( f_uiEnabledAttribute >> 8 ) ) : ~ ( f_uiDisabledAttribute >> 8 ) );
 						else
-							set_attr ( f_bEnabled ? ( f_bFocused ? ~f_iFocusedAttribute
-										: ~ f_iEnabledAttribute ) : ~ f_iDisabledAttribute );
+							set_attr ( f_bEnabled ? ( f_bFocused ? ~f_uiFocusedAttribute
+										: ~ f_uiEnabledAttribute ) : ~ f_uiDisabledAttribute );
 						}
 					else
 						{
 						if ( l_oItem.m_bChecked )
-							set_attr ( f_bEnabled ? ( f_bFocused ? ~ ( f_iFocusedAttribute >> 8 )
-										: ~ ( f_iEnabledAttribute >> 8 ) ) : ~ ( f_iDisabledAttribute >> 8 ) );
+							set_attr ( f_bEnabled ? ( f_bFocused ? ~ ( f_uiFocusedAttribute >> 8 )
+										: ~ ( f_uiEnabledAttribute >> 8 ) ) : ~ ( f_uiDisabledAttribute >> 8 ) );
 						else
 							M_SET_ATTR_DATA ( );
 						}
@@ -330,7 +330,7 @@ void HListControl::refresh ( void )
 			l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
 			if ( l_iCtr < l_iColumns )
 				{
-				set_attr ( f_iDisabledAttribute );
+				set_attr ( f_uiDisabledAttribute );
 				for ( l_iCtrLoc = 0; l_iCtrLoc < ( f_iHeightRaw + l_iHR ); l_iCtrLoc ++ )
 					{
 					M_ENSURE ( ::move ( f_iRowRaw + l_iCtrLoc, f_iColumnRaw + l_iColumnOffset - 1 ) != ERR );
@@ -339,7 +339,7 @@ void HListControl::refresh ( void )
 				}
 			}
 		}
-	set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute );
+	set_attr ( ! f_bEnabled ? ( ! f_bFocused ? f_uiFocusedAttribute : f_uiEnabledAttribute ) : f_uiDisabledAttribute );
 	if ( f_iQuantity )
 		{
 		if ( f_iControlOffset )
@@ -768,9 +768,12 @@ void HListControl::sort_by_column ( int a_iColumn, int a_iOrder )
 	f_iOrder = a_iOrder;
 	f_oHeader [ a_iColumn ].f_bDescending = ! ( a_iOrder > 0 );
 	f_lComparedItems = 0;
-	cmp = static_cast < int ( HList<HItem>::* ) ( HElement *, HElement * ) > ( & HListControl::cmpc );
+	cmp = static_cast < int ( HList<HItem>::* ) ( HElement *,
+			HElement * ) > ( & HListControl::cmpc );
 	if ( f_iQuantity > 128 )
-		f_poParent->status_bar ( )->init_progress ( static_cast < double > ( f_iQuantity * f_iQuantity ) / 2.,
+		f_poParent->status_bar ( )->init_progress (
+				static_cast < double > ( f_iQuantity )
+				* static_cast < double > ( f_iQuantity ) / 2.,
 				" Sorting ..." );
 	sort ( );
 	f_iControlOffset = 0;

@@ -113,7 +113,7 @@ public:
 	virtual ~HListControl ( void );
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );
-	int process_input( int );
+	virtual int process_input( int );
 	void add_column ( const int &,									/* at position */
 										char const *,									/* column name */
 										const int &,									/* width */
@@ -129,7 +129,7 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	int cmpc ( HElement *, HElement * );
+	virtual int cmpc ( HElement *, HElement * );
 	void sort_by_column ( int, int = D_ASCENDING );
 	void recalculate_column_widths ( void );
 	virtual void go_to_match ( void );

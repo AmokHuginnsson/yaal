@@ -46,8 +46,8 @@ public:
 	/*{*/
 	HWindowListControl ( HWindow *, int, int, int, int, char const * );
 	virtual ~HWindowListControl ( void );
-	int process_input ( int );
-	void refresh ( void );
+	virtual int process_input ( int );
+	virtual void refresh ( void );
 	virtual HItem & add_tail ( HItem * = NULL );
 	/*}*/
 protected:

@@ -20,6 +20,7 @@
 /usr/local/share/flint/supp/unix/co.lnt
 /usr/local/share/flint/supp/unix/lib-curs.lnt
 /usr/local/share/flint/supp/stl/lib-stl.lnt
+-template(10)
 
 /* Include paths */
 -i"/home/amok/prog/stdhapi"
@@ -40,12 +41,6 @@
 /* variablre parameter handling */
 -d"__builtin_va_start(arg1,arg2)=(arg1=arg2)"
 
--emacro(506,bkgd,attr_get)			/* Constant value Boolean */
--emacro(573,FD_SET,FD_ISSET)		/* Signed-unsigned mix with divide */
--emacro(605,__builtin_va_start)	/*  */
--emacro(717,FD_ZERO)						/* do ... while(0); */
--emacro(737,FD_SET,FD_ISSET)		/* Loss of sign in promotion from int to unsigned long */
-
 /* Reseved words */
 +rw(restrict)
 
@@ -56,11 +51,31 @@
 /* Definitions */
 -d__STDHAPI_BUILD__
 
++e936 // old-style function definition
++e937 // old-style function declaration
++e939 // return type defaults to int
++e940 // omitted braces within an initializer
++e943 // Too few initializers for aggregate
++e944 // argument for operator always evaluates to true/false
+//+e952 // parameter could be declared const
+//+e953 // variable could be declared const
+//+e954 // pointer could be declared const
++e973 // unary operator in macro not parenthesized
++e1902  // useless ';' follows '}'
+//+e1905  // implicit default constructor generated for class 'class'
++e1908	// 'virtual' assumed for destructor '~Name ( )'
++e1909  // 'virtual' assumed
++e1917  // empty prototype for definition, assumed '( void )'
++e1918  // empty prototype for member declaration, assumed ( void )
++e1919  // Multiple assignment operators for class 'Symbol'
++e1920  // Casting to a reference
++e1922  // not checking argument for NULL
++e1924  // C-style cast
++e1925  // public data member
++e1926  // Symbol 'Symbol's default constructor implicitly called
+//+e1928  // Symbol 'Name' did not appear in the constructor initializer list // bug
+
 /* Disabling warrnings for our code */
--e155		/* Ignoring { }'ed sequence within an expression, 0 assumed */
--e502		/* Expected unsigned type */
--e505		/* Redundant left argument to comma */
--e526		/* Symbol 'symbol' not defined */
 -e534		/* Ignoring return value of function 'function' */
 -e537		/* Repeated include file 'file' */
 -e613		/* Possible use of null pointer 'pointer' in left argument to operator '->' */
@@ -71,7 +86,6 @@
 -e702		/* Shift right of signed quantity (int) */
 -e713		/* Loss of precision (initialization) */
 -e714		/* Symbol 'symbol' not referenced */
--e730		/* Boolean argument to function */
 -e732		/* Loss of sign */
 -e737		/* Loss of sign in promotion from int to unsigned long */
 -e743		/* Negative character constant */
@@ -86,12 +100,12 @@
 -e769		/* global enumeration constant 'constant' not referenced */
 -e778		/* Constant expression evaluates to 0 in operation */
 -e788		/* enum constant 'constant' not used within defaulted switch */
--e790		/* Suspicious truncation, integral to float */
 -e794		/* Conceivable use of null pointer 'pointer' in left argument to operator '->' */
 -e820		/* Boolean test of a parenthesized assignment */
 -e825		/* control flows into case/default without -fallthrough comment */
 -e826		/* Suspicious pointer-to-pointer conversion (area too small) */
 -e830		/* Location cited in prior message */
+-e831		/* Reference cited in prior message */
 -e1032	/* Member 'member' cannot be called without object */
 -e1526	/* Member function 'member' not defined */
 -e1702	/* operator 'operator' is both an ordinary function 'function' and a member function 'member' */
@@ -105,15 +119,24 @@
 -e1740	/* pointer member 'member' not directly freed or zeroed by destructor */
 -e1763	/* Member function 'member' marked as const indirectly modifies class */
 
--emacro(572,M_MAKE_ATTR)	/* Excessive shift value (precision 1 shifted right by 1) */
--emacro({725},M_PROLOG)		/* Expected positive indentation from line 'line' */
+
+-emacro(506,bkgd,attr_get)			/* Constant value Boolean */
+-emacro(572,M_MAKE_ATTR)				/* Excessive shift value (precision 1 shifted right by 1) */
+-emacro(573,FD_SET,FD_ISSET)		/* Signed-unsigned mix with divide */
+-emacro(605,__builtin_va_start)	/*  */
 -emacro(702,M_ATTR_LABEL,M_SET_ATTR_SHORTCUT)	/* Shift right of signed quantity */
+-emacro(717,FD_ZERO)						/* do ... while(0); */
+-emacro({725},M_PROLOG)					/* Expected positive indentation from line 'line' */
+-emacro(737,FD_SET,FD_ISSET)		/* Loss of sign in promotion from int to unsigned long */
+-emacro({944},attr_get,M_MAKE_ATTR) /* argument for operator 'operator' always evaluates to */
 -emacro(1551,M_EPILOG)		/* Function may throw exception '...' in  destructor 'destructor' */
 -emacro(1559,M_EPILOG)		/* Uncaught exception 'exception' may be thrown in destructor 'destructor' */
 -emacro(1775,M_EPILOG)		/* catch block does not catch any declared exception */
+-emacro(1924,attr_get,FD_SET,FD_ISSET,addch,SIG_IGN,SIG_DFL) /* C-style cast */
 
 -esym(418,strftime,fflush)	/* Passing null pointer to function 'function' */
 -esym(449,l_poAtom)					/* Pointer variable 'variable' previously deallocated */
+-esym(526,stdhapi::hcore::HList<<1>>,"stdhapi::hcore::HMap<<1>,<2>>",stdhapi::hcore::HTree<<1>>)	/* Symbol 'symbol' not defined */
 -esym(528,__CVSID__,__CVSTID__) /* Symbol 'symbol' not referenced */
 -esym(534,stdhapi::hcore::HLog::operato*)
 -esym(578,stdhapi::tools::des::n_pcBeginingPermutation,stdhapi::tools::des::n_pcEndingPermutation,stdhapi::tools::des::n_pcKeyPermutation,stdhapi::tools::des::n_pcCountOfMoves,stdhapi::tools::des::n_pcPermutationOfCompresion,stdhapi::tools::des::n_pcPermutationOfExpanding,stdhapi::tools::des::n_pcPBlockPermutation,stdhapi::tools::des::n_pppcSBlock,stdhapi::tools::HXmlData) /* Declaration of symbol 'symbol' hides symbol 'symbol' */
@@ -129,6 +152,7 @@
 -esym(1725,stdhapi::hcore::HLock::f_roMutex) /* class member 'member' is a reference */
 -esym(1764,a_roOption,a_roValue)
 -esym(1769,stdhapi::hcore::HPattern::f_sCompiled,stdhapi::hcore::HCondition::f_sAttributes,stdhapi::hcore::HCondition::f_xCondition,stdhapi::hcore::HThread::f_sAttributes,stdhapi::hcore::HMutex::f_sAttributes,stdhapi::hcore::HMutex::f_xMutex,stdhapi::hcore::HTime::f_sBroken,stdhapi::hconsole::HEditControl::f_sMask,stdhapi::hconsole::HListControl::f_sMatch,stdhapi::hconsole::HProcess::f_sLatency,stdhapi::hconsole::HProcess::f_xFileDescriptorSet,stdhapi::tools::HSerial::f_sTIO,stdhapi::tools::HSerial::f_sBackUpTIO,stdhapi::tools::signals::HSigStackWrapper::f_sStack) /* Member or base class 'class' has no constructor */
+-esym(1925,stdhapi::hconsole::HItem::m_lId,stdhapi::hconsole::HItem::m_bChecked,stdhapi::dbwrapper::HRecordSet::m_oFilter,stdhapi::dbwrapper::HRecordSet::m_oSort,stdhapi::dbwrapper::HRecordSet::m_lId)
 
 -function(exit,stdhapi::hcore::HException::failed_assert)
 

@@ -28,7 +28,7 @@ Copyright:
 #define __DBWRAPPER_HRECORDSET_H
 
 /* modes */
-#define D_MODE_CLOSED	-	1
+#define D_MODE_CLOSED		( - 1 )
 #define D_MODE_NORMAL		0
 #define D_MODE_ADDING		1
 #define D_MODE_EDITING	2

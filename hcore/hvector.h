@@ -64,8 +64,8 @@ public:
 	virtual ~HVector ( void );
 	int dim ( void );
 	int set ( const tType * );
-	int normalize ( );
-	tType norm ( );
+	int normalize ( void );
+	tType norm ( void );
 	HVector & operator = ( const HVector & );
 	HVector & operator = ( const tType );
 	HVector operator + ( const HVector & );
@@ -126,7 +126,7 @@ int HVector < tType > ::set ( const tType * a_pdBody )
 	}
 
 template < typename tType >
-tType HVector < tType > ::norm ( )
+tType HVector < tType > ::norm ( void )
 	{
 	M_PROLOG
 	int l_iCtr;
@@ -138,7 +138,7 @@ tType HVector < tType > ::norm ( )
 	}
 
 template < typename tType >
-int HVector < tType > ::normalize ( )
+int HVector < tType > ::normalize ( void )
 	{
 	M_PROLOG
 	int l_iCtr;

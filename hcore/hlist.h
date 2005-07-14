@@ -53,7 +53,7 @@ namespace hcore
 #define D_NOT_FOUND							2048
 #define D_UNSORTED							0
 #define D_ASCENDING							8
-#define D_DESCENDING						-8
+#define D_DESCENDING						( - 8 )
 
 #ifndef NULL
 #define NULL	0
@@ -181,7 +181,7 @@ protected:
 	virtual int cmph ( HElement *, HElement * );
 	virtual int cmpn ( HElement *, HElement * );
 	virtual int cmpc ( HElement *, HElement * );
-	virtual void sort ( );
+	virtual void sort ( void );
 	/*}*/
 	};
 

@@ -143,10 +143,12 @@ void install_special ( SIGNAL_HANDLER_t HANDLER, int a_iSignum )
 		l_oError.format ( "sigaction ( SIG(%d), ... )", a_iSignum );
 		M_THROW ( l_oError, l_iError );
 		}
+#define D_TRUE	1
 	if ( l_sOldHandler.sa_handler == SIG_IGN )
 		sigaction ( a_iSignum, & l_sOldHandler, & l_sHandler );
 	else
-		siginterrupt ( a_iSignum, true );
+		siginterrupt ( a_iSignum, D_TRUE );
+#undef D_TRUE
 	return;
 	M_EPILOG
 	}

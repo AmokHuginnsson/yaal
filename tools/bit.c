@@ -59,8 +59,8 @@ unsigned char g_pucMaskBitClear [ ] = {127, 191, 223, 239, 247, 251, 253, 254};
 
 int getbit ( void * a_pvAddress, unsigned long int a_ulNumber )
 	{
-	short int l_hState = 0, l_iOffset;
-	char * l_pcAddress;
+	short int l_hState = 0, l_iOffset = 0;
+	char * l_pcAddress = NULL;
 	unsigned long int l_ulDword;
 	l_pcAddress = static_cast < char * > ( a_pvAddress );
 	l_ulDword = a_ulNumber >> 3;

@@ -175,7 +175,7 @@ void HMap<tType, ttType>::flush ( void )
 	}
 
 template < typename tType, typename ttType >
-int HMap < tType, ttType >::quantity ( ) const
+int HMap < tType, ttType >::quantity ( void ) const
 	{
 	M_PROLOG
 	return ( f_iQuantity );

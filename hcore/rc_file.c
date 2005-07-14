@@ -52,7 +52,7 @@ int rc_open ( char const * a_pcRcName, bool a_bLocal, HFile & a_roFile )
 	char * l_pcHomePath = 0;
 	HString l_oRcPath;
 	if ( a_roFile )
-		a_roFile.close ( );
+		M_IRV ( a_roFile.close ( ) );
 	if ( a_bLocal )
 		{
 		l_pcHomePath = getenv( "HOME" );
@@ -100,7 +100,7 @@ bool substitute_environment ( HString & a_roString )
 			l_pcStart = ::getenv ( l_oName.mid ( 2, l_iLength - 3 ) );
 			if ( l_pcStart )
 				{
-				a_roString.replace ( l_oName, l_pcStart );
+				M_IRV ( a_roString.replace ( l_oName, l_pcStart ) );
 				return ( true );
 				}
 			}
@@ -213,7 +213,7 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
 			}
 		}
 	if ( l_oRc )
-		l_oRc.close ( );
+		M_IRV ( l_oRc.close ( ) );
 	log << "done." << endl;
 	return ( 0 );
 	M_EPILOG

@@ -70,7 +70,7 @@ public:
 								 char const * );	/* label */
 	virtual ~HMenuControl ( void );
 	void init ( HProcess *, OMenuItem * );
-	int process_input( int );
+	virtual int process_input( int );
 	/*}*/
 private:
 	/*{*/

@@ -59,8 +59,8 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 										 bool a_bDrawLabel, int a_iDisabledAttribute,
 										 int a_iEnabledAttribute, int a_iFocusedAttribute )
 	: f_bEnabled ( false ), f_bFocused ( false ), f_bDrawLabel ( a_bDrawLabel ),
-	f_bSingleLine ( false ), f_iDisabledAttribute ( 0 ), f_iEnabledAttribute ( 0 ),
-	f_iFocusedAttribute ( 0 ), f_iRow ( a_iRow ), f_iColumn ( a_iColumn ),
+	f_bSingleLine ( false ), f_uiDisabledAttribute ( 0 ), f_uiEnabledAttribute ( 0 ),
+	f_uiFocusedAttribute ( 0 ), f_iRow ( a_iRow ), f_iColumn ( a_iColumn ),
 	f_iHeight ( a_iHeight ), f_iWidth ( a_iWidth ), f_iRowRaw ( 0 ),
 	f_iColumnRaw ( 0 ), f_iHeightRaw ( 0 ), f_iWidthRaw ( 0 ),
 	f_oLabel ( a_pcLabel ), f_oVarTmpBuffer ( ), f_poParent ( a_poParent ),
@@ -72,17 +72,17 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	if ( ! a_poParent )
 		M_THROW ( "no parent window.", reinterpret_cast < int > ( a_poParent ) );
 	if ( a_iDisabledAttribute > 0 )
-		f_iDisabledAttribute = a_iDisabledAttribute;
+		f_uiDisabledAttribute = a_iDisabledAttribute;
 	else
-		f_iDisabledAttribute = n_iAttributeDisabled;
+		f_uiDisabledAttribute = n_iAttributeDisabled;
 	if ( a_iEnabledAttribute > 0 )
-		f_iEnabledAttribute = a_iEnabledAttribute;
+		f_uiEnabledAttribute = a_iEnabledAttribute;
 	else
-		f_iEnabledAttribute = n_iAttributeEnabled;
+		f_uiEnabledAttribute = n_iAttributeEnabled;
 	if ( a_iFocusedAttribute > 0 )
-		f_iFocusedAttribute = a_iFocusedAttribute;
+		f_uiFocusedAttribute = a_iFocusedAttribute;
 	else
-		f_iFocusedAttribute = n_iAttributeFocused;
+		f_uiFocusedAttribute = n_iAttributeFocused;
 	f_iShortcutIndex = f_oLabel.find ( '&' );
 	if ( f_iShortcutIndex > -1 )
 		{
@@ -235,9 +235,9 @@ void HControl::set_attributes ( int a_iDisabledAttribute,
 		int a_iEnabledAttribute, int a_iFocusedAttribute )
 	{
 	M_PROLOG
-	f_iDisabledAttribute = a_iDisabledAttribute;
-	f_iEnabledAttribute = a_iEnabledAttribute;
-	f_iFocusedAttribute = a_iFocusedAttribute;
+	f_uiDisabledAttribute = a_iDisabledAttribute;
+	f_uiEnabledAttribute = a_iEnabledAttribute;
+	f_uiFocusedAttribute = a_iFocusedAttribute;
 	refresh ( );
 	return;
 	M_EPILOG

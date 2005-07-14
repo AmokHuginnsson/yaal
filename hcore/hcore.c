@@ -104,14 +104,17 @@ void set_env ( char const * a_pcVarValue )
 		return;
 		}
 	* l_pcPtr ++ = 0;
-	while ( ( * l_pcPtr == ' ' ) || ( * l_pcPtr == '\t' ) )l_pcPtr ++;
+	while ( ( * l_pcPtr == ' ' ) || ( * l_pcPtr == '\t' ) )
+		l_pcPtr ++;
 	if ( ! ( * l_pcPtr ) )
 		{
 		log ( D_LOG_ERROR ) << "no value for environment variable in set_env: `";
 		log << a_pcVarValue << '\'' << endl;
 		return;
 		}
-	M_ENSURE ( setenv ( a_pcVarValue, l_pcPtr, true ) == 0 );
+#define D_TRUE	1
+	M_ENSURE ( setenv ( a_pcVarValue, l_pcPtr, D_TRUE ) == 0 );
+#undef D_TRUE
 	return;
 	M_EPILOG
 	}

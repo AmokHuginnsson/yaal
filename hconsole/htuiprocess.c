@@ -93,7 +93,8 @@ int HProcess::init ( char const * a_pcProcessName )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	int l_piAlts [ D_ALTS_COUNT ], l_piCtrls [ ] = { D_KEY_CTRL_('l'), D_KEY_CTRL_('x') };
+	int l_piAlts [ D_ALTS_COUNT ];
+	int l_piCtrls [ ] = { D_KEY_CTRL_('l'), D_KEY_CTRL_('x') };
 	HMainWindow * l_poMainWindow = NULL;
 	if ( f_bInitialised )
 		M_THROW ( "you can initialise your main process only once, dumbass",
@@ -103,10 +104,11 @@ int HProcess::init ( char const * a_pcProcessName )
 	M_IRV ( l_poMainWindow->init ( ) );
 	f_poWindows = l_poMainWindow->_disclose_window_list ( );
 	M_IRV ( add_window ( l_poMainWindow, a_pcProcessName ) );
-	M_IRV ( register_file_descriptor_handler ( STDIN_FILENO, & HProcess::process_stdin ) );
+	M_IRV ( register_file_descriptor_handler ( STDIN_FILENO,
+				& HProcess::process_stdin ) );
 	if ( n_bUseMouse && n_iMouseDes )
-		register_file_descriptor_handler ( n_iMouseDes,
-				& HProcess::process_mouse );
+		M_IRV ( register_file_descriptor_handler ( n_iMouseDes,
+					& HProcess::process_mouse ) );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_CTRLS_COUNT, l_piCtrls,
 			HProcess::handler_refresh );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('x'), NULL,

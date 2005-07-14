@@ -49,9 +49,9 @@ protected:
 	bool			f_bDrawLabel;					/* will be label driven */
 	bool 			f_bSingleLine;				/* is label in the same line as top of
 																		 control */
-	int				f_iDisabledAttribute;	/* attribute of disabled cotrol */
-	int				f_iEnabledAttribute;	/* attribute of enabled cotrol */	
-	int				f_iFocusedAttribute;	/* attribute of focused cotrol */
+	int unsigned f_uiDisabledAttribute;	/* attribute of disabled cotrol */
+	int unsigned f_uiEnabledAttribute;	/* attribute of enabled cotrol */	
+	int unsigned f_uiFocusedAttribute;	/* attribute of focused cotrol */
 																	/* high byte of attribute in all
 																		 three cases keeps label (control title)
 																 		 color, low byte keeps work place color */
@@ -96,9 +96,9 @@ public:
 	bool hit_test ( int, int ) const;
 	void set_attributes ( int, int, int );
 	void move ( int, int, int, int );
-#define M_ATTR_LABEL( )	( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 )
-#define M_ATTR_SHORTCUT( )	( ! f_bEnabled ? ( ! f_bFocused ? f_iFocusedAttribute >> 8 : f_iEnabledAttribute >> 8 ) : f_iDisabledAttribute >> 8 )
-#define M_ATTR_DATA( )	( f_bEnabled ? ( f_bFocused ? f_iFocusedAttribute : f_iEnabledAttribute ) : f_iDisabledAttribute )
+#define M_ATTR_LABEL( )	( f_bEnabled ? ( f_bFocused ? f_uiFocusedAttribute >> 8 : f_uiEnabledAttribute >> 8 ) : f_uiDisabledAttribute >> 8 )
+#define M_ATTR_SHORTCUT( )	( ! f_bEnabled ? ( ! f_bFocused ? f_uiFocusedAttribute >> 8 : f_uiEnabledAttribute >> 8 ) : f_uiDisabledAttribute >> 8 )
+#define M_ATTR_DATA( )	( f_bEnabled ? ( f_bFocused ? f_uiFocusedAttribute : f_uiEnabledAttribute ) : f_uiDisabledAttribute )
 #define M_SET_ATTR_LABEL( )	set_attr ( M_ATTR_LABEL ( ) )
 #define M_SET_ATTR_SHORTCUT( )	set_attr ( M_ATTR_SHORTCUT ( ) )
 #define M_SET_ATTR_DATA( )	set_attr ( M_ATTR_DATA ( ) )

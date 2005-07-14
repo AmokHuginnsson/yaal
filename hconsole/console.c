@@ -258,7 +258,7 @@ int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	M_EPILOG
 	}
 
-int get_key( void )
+int get_key ( void )
 	{
 	M_PROLOG
 	int l_iKey = 0;
@@ -333,7 +333,7 @@ int get_key( void )
 	M_EPILOG
 	}
 	
-int kbhit()
+int kbhit ( void )
 	{
 	M_PROLOG
 	int l_iKey;
@@ -367,7 +367,7 @@ unsigned char get_attr( void )
 	M_EPILOG
 	}
 	
-void clrscr()
+void clrscr ( void )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
@@ -423,7 +423,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 			}
 		if ( ( a_iKey == KEY_MOUSE )
 				|| ( n_iMouseDes && FD_ISSET ( n_iMouseDes, & l_xFdSet ) ) )
-			mouse::mouse_get ( a_rsMouse ), l_iEventType |= D_EVENT_MOUSE;
+			l_iEventType |= D_EVENT_MOUSE, M_IRV ( mouse::mouse_get ( a_rsMouse ) );
 		}
 	return ( l_iEventType );
 	}

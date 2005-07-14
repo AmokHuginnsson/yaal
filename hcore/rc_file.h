@@ -27,7 +27,6 @@ Copyright:
 #ifndef __HCORE_RC_FILE_H
 #define __HCORE_RC_FILE_H
 
-#include "hstring.h"
 #include "hfile.h"
 
 namespace stdhapi
