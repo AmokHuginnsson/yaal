@@ -285,7 +285,7 @@ mrproper: clean
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile config.h stdhapirc config.log
+	/bin/rm -rf configure Makefile config.h stdhapirc config.log doc/dox
 
 tags: $(SRCS) $(HDRS)
 	@echo -n "Rehashing tags ... "; \
