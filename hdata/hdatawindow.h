@@ -80,8 +80,8 @@ protected:
 	/*}*/
 private:
 	/*{*/
-	HDataWindow ( const HDataWindow & );
-	HDataWindow & operator = ( const HDataWindow & );
+	HDataWindow ( HDataWindow const & );
+	HDataWindow & operator = ( HDataWindow const & );
 	/*}*/
 	};
 

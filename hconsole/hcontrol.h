@@ -88,7 +88,7 @@ public:
 	virtual int set_focus ( char = 0 ); /* focused and shortcut char match */
 	virtual int kill_focus ( void );
 	virtual void refresh ( void ) = 0;
-	virtual void set ( const hcore::HInfo & );
+	virtual void set ( hcore::HInfo const & );
 	virtual hcore::HInfo get ( void );
 	virtual bool is_searchable ( void );
 	virtual void draw_label ( void );
@@ -105,8 +105,8 @@ public:
 	/*}*/
 private:
 	/*{*/
-	HControl ( const HControl & );
-	HControl & operator = ( const HControl & );
+	HControl ( HControl const & );
+	HControl & operator = ( HControl const & );
 	/*}*/
 	};
 

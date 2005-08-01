@@ -34,8 +34,8 @@ Copyright:
 #define D_MODE_EDITING	2
 #define D_MODE_OPENED		D_MODE_NORMAL
 
+#include "hcore/hlist.h"
 #include "hcore/hstring.h"
-#include "hcore/hstringlist.h"
 #include "hcore/htime.h"
 #include "hcore/hinfo.h"
 #include "hdatabase.h"
@@ -65,15 +65,15 @@ protected:
 	hcore::HString f_oColumns;		/* columns that should be returned by next query */
 	hcore::HString f_oFilter;		/* additional constant filter (WHERE clause) */
 	hcore::HString f_oSort;			/* additional constant sort (ORDER BY clause) */
-	hcore::HStringList	f_oColumnNames; /* column names returned by last query */
-	hcore::HStringList f_oValues;			/* values returned by last cursor movement */
+	hcore::HList< hcore::HString >	f_oColumnNames; /* column names returned by last query */
+	hcore::HList< hcore::HString > f_oValues;	/* values returned by last cursor movement */
 	HDataBase * f_poDataBase; /* data-base that this record-set belongs to */
 	/*}*/
 public:
 	/*{*/
 	hcore::HString m_oFilter;		/* additional variable filter (WHERE clause) */
 	hcore::HString m_oSort;			/* additional variable sort (ORDER BY clause) */
-	long int m_lId;
+	int long m_lId;
 	/*}*/
 protected:
 	/*{*/
@@ -82,7 +82,7 @@ protected:
 	void sync ( int, char & );
 	void sync ( int, short & );
 	void sync ( int, int & );
-	void sync ( int, long int & );
+	void sync ( int, int long & );
 	void sync ( int, double & );
 	void sync ( int, hcore::HString & );
 	void sync ( int, hcore::HTime & );
@@ -100,20 +100,20 @@ public:
 	void move_last ( void );
 	void move_next ( void );
 	void move_previous ( void );
-	long int open ( char const * = NULL );
+	int long open ( char const * = NULL );
 	void close ( void );
 	void cancel ( void );
 	void free ( void );
-	long int requery ( char const * = NULL );
+	int long requery ( char const * = NULL );
 	void add_new ( void );
 	void edit ( void );
-	long int update ( void );
+	int long update ( void );
 	void remove ( void );
 	/*}*/
 private:
 	/*{*/
-	HRecordSet ( const HRecordSet & );
-	HRecordSet & operator = ( const HRecordSet & );
+	HRecordSet ( HRecordSet const & );
+	HRecordSet & operator = ( HRecordSet const & );
 	/*}*/
 	};
 

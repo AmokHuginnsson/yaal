@@ -37,7 +37,8 @@ namespace stdhapi
 namespace tools
 {
 
-class HAnalyser : public hcore::HTree < hcore::HList < double * > >
+typedef hcore::HList < double * > double_ptr_list_t;
+class HAnalyser : public hcore::HTree < double_ptr_list_t >
 	{
 	typedef enum
 		{
@@ -52,10 +53,10 @@ class HAnalyser : public hcore::HTree < hcore::HList < double * > >
 		E_UNEXPECTED_TOKEN = 8,
 		E_PREMATURE_TRMINATION = 9
 		} syntax_error_t;
-	typedef hcore::HTree < hcore::HList < double * > >::HNode * ANALYZER_NODE_PTR_t;
+	typedef hcore::HTree < double_ptr_list_t >::HNode * ANALYZER_NODE_PTR_t;
 	class HAnalyserNode;
 	friend class HAnalyserNode;
-	class HAnalyserNode : public hcore::HTree < hcore::HList < double * > > ::HNode
+	class HAnalyserNode : public hcore::HTree < double_ptr_list_t > ::HNode
 		{
 		typedef double ( HAnalyser::* METHOD_t ) ( HAnalyserNode * );
 	protected:

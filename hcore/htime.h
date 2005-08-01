@@ -51,34 +51,34 @@ protected:
 public:
 	/*{*/
 	HTime ( void );
-	HTime ( const HTime & );
-	HTime ( char const * );
-	HTime ( const time_t & );
-	HTime ( const int, const int, const int, const int = 0, const int = 0,
-			const int = 0 );
+	HTime ( HTime const & );
+	HTime ( char const * const );
+	HTime ( time_t const & );
+	HTime ( int const, int const, int const, int const = 0, int const = 0,
+			int const = 0 );
 	virtual ~HTime ( void );
 	void set_now ( void );
-	void set ( const time_t & );
-	void format ( char const * = D_DEFAULT_TIME_FORMAT );
-	void set_time ( const int = 0, const int = 0, const int = 0 );
-	void set_date ( const int, const int = 1, const int = 1 );
-	void set_datetime ( const int, const int = 1, const int = 1,
-						 const int = 0, const int = 0, const int = 0 );
+	void set ( time_t const & );
+	void format ( char const * const = D_DEFAULT_TIME_FORMAT );
+	void set_time ( int const = 0, int const = 0, int const = 0 );
+	void set_date ( int const, int const = 1, int const = 1 );
+	void set_datetime ( int const, int const = 1, int const = 1,
+						 int const = 0, int const = 0, int const = 0 );
 	int get_year ( void ) const;
 	int get_month ( void ) const;
 	int get_day ( void ) const;
 	int get_hour ( void ) const;
 	int get_minute ( void ) const;
 	int get_second ( void ) const;
-	HTime & operator = ( const HTime & );
-	HTime operator - ( const HTime & ) const;
-	HTime & operator -= ( const HTime & );
-	bool operator == ( const time_t & ) const;
-	bool operator != ( const time_t & ) const;
-	bool operator <= ( const time_t & ) const;
-	bool operator >= ( const time_t & ) const;
-	bool operator < ( const time_t & ) const;
-	bool operator > ( const time_t & ) const;
+	HTime & operator = ( HTime const & );
+	HTime operator - ( HTime const & ) const;
+	HTime & operator -= ( HTime const & );
+	bool operator == ( time_t const & ) const;
+	bool operator != ( time_t const & ) const;
+	bool operator <= ( time_t const & ) const;
+	bool operator >= ( time_t const & ) const;
+	bool operator < ( time_t const & ) const;
+	bool operator > ( time_t const & ) const;
 	operator char const * ( void ) const;
 	operator time_t ( void ) const;
 	/*}*/

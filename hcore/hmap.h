@@ -43,12 +43,12 @@ namespace stdhapi
 namespace hcore
 {
 
-extern unsigned long const int * const g_pulPrimes;
+extern long int unsigned const * const g_pulPrimes;
 
 template < typename tType >
-inline unsigned long int hash ( const tType & a_rtKey )
+inline int long unsigned hash ( tType const & a_rtKey )
 	{
-	return ( static_cast < unsigned long int > ( a_rtKey ) );
+	return ( static_cast < int long unsigned > ( a_rtKey ) );
 	}
 
 template < typename tType, typename ttType >
@@ -70,15 +70,15 @@ private:
 		/*}*/
 	private:
 		/*{*/
-		HAtom ( const HAtom & );
-		HAtom & operator = ( const HAtom & );
+		HAtom ( HAtom const & );
+		HAtom & operator = ( HAtom const & );
 		/*}*/
 		friend class HMap < tType, ttType >;
 		};
 protected:
 	/*{*/
-	unsigned int f_uiPrime;
-	unsigned int f_uiIndex;
+	int unsigned f_uiPrime;
+	int unsigned f_uiIndex;
 	int f_iQuantity;
 	HAtom * f_poAtomPtr;
 	HAtom ** f_ppoAtomArray;
@@ -87,19 +87,19 @@ public:
 	/*{*/
 	HMap ( size_t ); /* Lower bound of size of map's table */
 	virtual ~HMap ( void );
-	ttType & operator [ ] ( const tType & );
+	ttType & operator [ ] ( tType const & );
 	void rewind ( void );
 	bool iterate ( tType &, ttType & );
-	bool has_key ( const tType & ) const;
-	bool get ( const tType &, ttType & ) const;
-	bool remove ( const tType & );
+	bool has_key ( tType const & ) const;
+	bool get ( tType const &, ttType & ) const;
+	bool remove ( tType const & );
 	void flush ( void );
 	int quantity ( void ) const;
 	/*}*/
 private:
 	/*{*/
-	HMap ( const HMap & );
-	HMap & operator = ( const HMap & );
+	HMap ( HMap const & );
+	HMap & operator = ( HMap const & );
 	/*}*/
 	};
 
@@ -125,7 +125,7 @@ HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( a_uiSize ), f_uiInde
 	f_iQuantity ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
 	M_PROLOG
-	unsigned int l_uiCtr = 0;
+	int unsigned l_uiCtr = 0;
 	if ( a_uiSize < 1 )
 		M_THROW ( "bad map size", a_uiSize );
 	while ( a_uiSize )
@@ -160,7 +160,7 @@ template < typename tType, typename ttType >
 void HMap<tType, ttType>::flush ( void )
 	{
 	M_PROLOG
-	unsigned int l_uiCtr = 0;
+	int unsigned l_uiCtr = 0;
 	HAtom * l_poAtom = NULL;
 	for ( l_uiCtr = 0; l_uiCtr < f_uiPrime; l_uiCtr ++ )
 		while ( f_ppoAtomArray [ l_uiCtr ] )
@@ -170,6 +170,7 @@ void HMap<tType, ttType>::flush ( void )
 			f_ppoAtomArray [ l_uiCtr ] = l_poAtom;
 			}
 	f_iQuantity = 0;
+	rewind ( );
 	return;
 	M_EPILOG
 	}
@@ -183,7 +184,7 @@ int HMap < tType, ttType >::quantity ( void ) const
 	}
 
 template < typename tType, typename ttType >
-ttType & HMap<tType, ttType>::operator [ ] ( const tType & a_rtKey )
+ttType & HMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
 	{
 	M_PROLOG
 	int l_iHash = - 1;
@@ -248,7 +249,7 @@ bool HMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 	}
 
 template < typename tType, typename ttType >
-bool HMap<tType, ttType>::has_key ( const tType & a_rtKey ) const
+bool HMap<tType, ttType>::has_key ( tType const & a_rtKey ) const
 	{
 	M_PROLOG
 	int l_iHash = - 1;
@@ -262,7 +263,7 @@ bool HMap<tType, ttType>::has_key ( const tType & a_rtKey ) const
 	}
 
 template < typename tType, typename ttType >
-bool HMap<tType, ttType>::get ( const tType & a_rtKey, ttType & a_rtValue ) const
+bool HMap<tType, ttType>::get ( tType const & a_rtKey, ttType & a_rtValue ) const
 	{
 	M_PROLOG
 	int l_iHash = - 1;
@@ -278,7 +279,7 @@ bool HMap<tType, ttType>::get ( const tType & a_rtKey, ttType & a_rtValue ) cons
 	}
 
 template < typename tType, typename ttType >
-bool HMap<tType, ttType>::remove ( const tType & a_rtKey )
+bool HMap<tType, ttType>::remove ( tType const & a_rtKey )
 	{
 	M_PROLOG
 	int l_iHash = - 1;
@@ -305,7 +306,7 @@ bool HMap<tType, ttType>::remove ( const tType & a_rtKey )
 
 /* Helpers and premaps */
 
-unsigned long int hash ( const HString & );
+int long unsigned hash ( HString const & );
 
 }
 

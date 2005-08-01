@@ -43,7 +43,7 @@ protected:
 	/*{*/
 	bool			f_bRealMode;
 	bool			f_bNewLine;
-	long int	f_lType;
+	int long	f_lType;
 	FILE *		f_psStream;
 	char *		f_pcProcessName;
 	char *		f_pcLoginName;
@@ -55,23 +55,25 @@ public:
 	/*{*/
 	HLog ( void );
 	virtual ~HLog ( void );
-	void rehash ( FILE * = stderr, char const * = NULL ); /* already opened file */
-	void rehash ( char const *, char const * = NULL ); /* log file name */
-	int operator ( ) ( char const *, va_list );
-	int operator ( ) ( char const *, ... ); /* log ( "data %d", x );
-																						 will look nice */
-	int operator ( ) ( long int, char const *, ... ); /* log ( "data %d", x );
-																						 will look nice */
-	HLog & operator ( ) ( long int ); /* sets log type */
-	HLog & operator << ( char const * );
+	/* already opened file */
+	void rehash ( FILE * = stderr, char const * const = NULL );
+	/* log file name */
+	void rehash ( char const * const, char const * const = NULL );
+	int operator ( ) ( char const * const, va_list const );
+	int operator ( ) ( char const * const, ... ); /* log ( "data %d", x );
+																									 will look nice */
+	/* log ( "data %d", x ); will look nice */
+	int operator ( ) ( int long const, char const *, ... );
+	HLog & operator ( ) ( int long const ); /* sets log type */
+	HLog & operator << ( char const * const );
 	HLog & operator << ( char const );
-	HLog & operator << ( const int );
-	HLog & operator << ( const unsigned int );
-	HLog & operator << ( const long int );
-	HLog & operator << ( const unsigned long int );
-	HLog & operator << ( const double );
-	HLog & operator << ( void * );
-	HLog & operator << ( HLog & ( * ) ( HLog & ) );
+	HLog & operator << ( int const );
+	HLog & operator << ( int unsigned const );
+	HLog & operator << ( int long const );
+	HLog & operator << ( int long unsigned const );
+	HLog & operator << ( double const );
+	HLog & operator << ( void * const );
+	HLog & operator << ( HLog & ( * const ) ( HLog & ) );
 	/*}*/
 protected:
 	/*{*/
@@ -79,8 +81,8 @@ protected:
 	/*}*/
 private:
 	/*{*/
-	HLog ( const HLog & );
-	HLog & operator = ( const HLog & );
+	HLog ( HLog const & );
+	HLog & operator = ( HLog const & );
 	/*}*/
 	friend HLog & endl ( HLog & );
 	};

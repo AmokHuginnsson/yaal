@@ -27,7 +27,6 @@ Copyright:
 #include <stdlib.h>  /* strtol */
 #include <string.h>  /* strsignal */
 #include <stdio.h>	 /* perror function */
-#include <signal.h>	 /* signal handling */
 #include <termios.h> /* B115200 */
 #include <libintl.h> /* gettext */
 
@@ -73,7 +72,7 @@ extern char n_pcTransTableStripPL [ 256 ];
 	}
 
 /* return true means error occured, false - every thing ok */
-bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
+bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	int l_iBaudRate = 0;
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )

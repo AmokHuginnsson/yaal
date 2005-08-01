@@ -120,7 +120,7 @@ AC_TRY_COMPILE([#include <stdlib.h>],[],
 							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
 CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings -Wl,-soname,conftest"]
-AC_LINK_IFELSE([[extern int errno;void foo(void){errno=0;}]],
+AC_LINK_IFELSE([[extern int my_undefined_symbol;void foo(void){my_undefined_symbol=0;}]],
 							[AC_SUBST([SPECIAL_LINKER_FLAGS],
 								[[-Wl,--no-undefined]]) _FLAGS=["$_FLAGS -Wl,--no-undefined."]],
 							[AC_MSG_WARN([[Cannot use -Wl,--no-undefined!]])])
@@ -167,7 +167,7 @@ AC_MSG_CHECKING([whether strftime() returns required buffer size])
 RESULT=["no"]
 AC_TRY_RUN([#include <time.h>
 #define NULL	0
-int main ( void )
+int main ( int, char const * const * const )
 	{
 	int size = 0;
 	time_t t = time ( NULL );
@@ -178,22 +178,35 @@ int main ( void )
 	}], [AC_DEFINE([HAVE_SMART_STRFTIME])] [RESULT=["yes"]])
 AC_MSG_RESULT([$RESULT])
 
+AC_MSG_CHECKING([whether contents of input buffer for iconv() is const])
+RESULT=["no"]
+AC_COMPILE_IFELSE([#include<iconv.h>
+#define NULL	0
+int main ( int, char const * const * const )
+	{
+	iconv_t conv = 0;
+	size_t size = 0;
+	char const * in = NULL;
+	char * out = NULL;
+	iconv ( conv, & in, & size, & out, & size );
+	return ( 0 );
+	}], [AC_DEFINE([HAVE_ICONV_INPUT_CONST])] RESULT=["yes"])
+AC_MSG_RESULT([$RESULT])
+
 DEFAULT_DRIVER=["null"]
 
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[70%]]])
 CXXFLAGS=$CXXFLAGS_ORIG;
 CPPFLAGS=$CXXFLAGS_ORIG;
-AC_CHECK_LIB([thr],[pthread_create],[AC_SUBST([THREADING_LIBRARY],[thr])],
-	[AC_CHECK_LIB([pthread],[pthread_create],
-								[AC_SUBST([THREADING_LIBRARY],[pthread])],
-		[AC_MSG_ERROR([Cannot build woithout threading library.])])])
+AC_CHECK_LIB([pthread],[pthread_create],
+						 [],[AC_MSG_ERROR([Cannot build without threading library.])])
 LIBS=""
 AC_CHECK_LIB([xml2],[xmlParseFile],
-							[],[AC_MSG_ERROR([Cannot continue without XML library.])])
+						 [],[AC_MSG_ERROR([Cannot continue without XML library.])])
 LIBS=""
 AC_CHECK_LIB([ncurses],[initscr],
-							[],[AC_MSG_ERROR([Cannot continue without ncurses.])])
+						 [],[AC_MSG_ERROR([Cannot continue without ncurses.])])
 LIBS=""
 AC_CHECK_LIB([gpm],[Gpm_Open],[AC_SUBST([MOUSE_LIB],[-lgpm])])
 LIBS=""
@@ -254,7 +267,16 @@ CXXFLAGS=["$CXXFLAGS -I/usr/include/libxml2"]
 CPPFLAGS=["$CPPFLAGS -I/usr/include/libxml2"]
 AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
 	EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/include/libxml2"],
-	[AC_MSG_ERROR([Cannot continue without XML development files.])])
+	[
+		CXXFLAGS=$CXXFLAGS_ORIG
+		CPPFLAGS=$CPPFLAGS_ORIG
+		unset ac_cv_header_libxml2_libxml_xmlversion_h
+		CXXFLAGS=["$CXXFLAGS -I/usr/local/include/libxml2"]
+		CPPFLAGS=["$CPPFLAGS -I/usr/local/include/libxml2"]
+		AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
+			EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/local/include/libxml2"],
+			[AC_MSG_ERROR([Cannot continue without XML development files.])])
+	])
 CXXFLAGS=$CXXFLAGS_ORIG
 CPPFLAGS=$CPPFLAGS_ORIG
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],

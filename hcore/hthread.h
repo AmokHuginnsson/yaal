@@ -48,7 +48,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HMutex ( bool /* recursive */ = false );
+	HMutex ( bool const /* recursive */ = false );
 	virtual ~HMutex ( void );
 	void lock ( void );
 	bool try_lock ( void );
@@ -80,11 +80,16 @@ public:
 	/*{*/
 	HCondition ( void );
 	virtual ~HCondition ( void );
-	status_t wait ( unsigned long int * = NULL, unsigned long int * = NULL );
+	status_t wait ( int long unsigned * = NULL, int long unsigned * = NULL );
 	void signal ( void );
 	/*}*/
 protected:
 	/*{*/
+	/*}*/
+private:
+	/*{*/
+	HCondition ( HCondition const & );
+	HCondition & operator = ( HCondition const & );
 	/*}*/
 	};
 
@@ -117,9 +122,10 @@ public:
 	/*}*/
 private:
 	virtual int run ( void ) = 0;
+	void * control ( void );
 	static void * SPAWN ( void * );
-	HThread ( const HThread & );
-	HThread & operator = ( const HThread & );
+	HThread ( HThread const & );
+	HThread & operator = ( HThread const & );
 	};
 
 class HLock

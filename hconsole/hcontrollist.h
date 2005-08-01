@@ -54,7 +54,7 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	virtual long int empty ( hcore::HList < HControl * > ::HElement * );
+	virtual int long empty ( hcore::HList < HControl * > ::HElement * );
 	/*}*/
 	};
 

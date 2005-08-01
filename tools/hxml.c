@@ -26,6 +26,7 @@ Copyright:
 
 #include <stdio.h>
 #include <string.h>
+#include <libintl.h>
 #include <new>
 
 #include <libxml/xmlversion.h>
@@ -71,15 +72,15 @@ protected:
 	/*{*/
 	HXmlData ( void );
 	virtual ~HXmlData ( void );
-	HXmlData ( const HXmlData & ) __attribute__(( __noreturn__ ));
-	HXmlData & operator = ( const HXmlData & ) __attribute__(( __noreturn__ ));
+	HXmlData ( HXmlData const & ) __attribute__(( __noreturn__ ));
+	HXmlData & operator = ( HXmlData const & ) __attribute__(( __noreturn__ ));
 	void xml_free ( xmlDocPtr & ) const;
 /*	void xml_free ( xmlNodePtr & ); */
 /*	void xml_free ( xmlNodeSetPtr & ); */
 	void xml_free ( xmlXPathContextPtr & ) const;
 	void xml_free ( xmlXPathObjectPtr & ) const;
 	void reset ( void );
-	xmlNodePtr next_node ( xmlNodePtr ) const;
+	xmlNodePtr next_node ( xmlNodePtr, int & ) const;
 	/*}*/
 	};
 
@@ -87,7 +88,8 @@ protected:
 
 }
 
-HXmlData::HXmlData ( void ) : f_psDoc ( NULL ), f_psRoot ( NULL ), f_psNode ( NULL ),
+HXmlData::HXmlData ( void ) : f_psDoc ( NULL ), f_psRoot ( NULL ),
+															f_psNode ( NULL ),
 										f_psContext ( NULL ), f_psObject ( NULL ),
 										f_psNodeSet ( NULL ), f_psNodeStart ( NULL ),
 										f_psProperties ( NULL )
@@ -120,7 +122,7 @@ void HXmlData::reset ( void )
 	M_EPILOG
 	}
 
-HXmlData::HXmlData ( const HXmlData & a_roXml ) : f_psDoc ( NULL ),
+HXmlData::HXmlData ( HXmlData const & a_roXml ) : f_psDoc ( NULL ),
 										f_psRoot ( NULL ), f_psNode ( NULL ),
 										f_psContext ( NULL ), f_psObject ( NULL ),
 										f_psNodeSet ( NULL ), f_psNodeStart ( NULL ),
@@ -131,7 +133,7 @@ HXmlData::HXmlData ( const HXmlData & a_roXml ) : f_psDoc ( NULL ),
 	M_EPILOG
 	}
 
-HXmlData & HXmlData::operator = ( const HXmlData & )
+HXmlData & HXmlData::operator = ( HXmlData const & )
 	{
 	M_PROLOG
 	M_THROW ( "This method should not be called.", g_iErrNo );
@@ -195,16 +197,22 @@ void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject ) const
 	M_EPILOG
 	}
 
-xmlNodePtr HXmlData::next_node ( xmlNodePtr a_psNode ) const
+xmlNodePtr HXmlData::next_node ( xmlNodePtr a_psNode, int & a_riLevel ) const
 	{
 	M_PROLOG
 	xmlNodePtr l_psNode = a_psNode;
 	if ( l_psNode->children )
+		{
 		l_psNode = l_psNode->children;
+		a_riLevel ++;
+		}
 	else if ( l_psNode->next )
 		l_psNode = l_psNode->next;
 	else if ( l_psNode->parent && l_psNode->parent->next )
+		{
 		l_psNode = l_psNode->parent->next;
+		a_riLevel --;
+		}
 	else
 		l_psNode = NULL;
 	return ( l_psNode );
@@ -212,7 +220,8 @@ xmlNodePtr HXmlData::next_node ( xmlNodePtr a_psNode ) const
 	}
 
 HXml::HXml ( void )
-	: f_iIndex ( 0 ), f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
+	: f_iIndex ( 0 ), f_iLevel ( 0 ),
+	f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
 	f_xIconvOut ( static_cast < iconv_t > ( 0 ) ),
 	f_oConvertedString ( ), f_oTmpBuffer ( ), f_oPath ( ), f_poXml ( NULL )
 	{
@@ -226,6 +235,7 @@ HXml::HXml ( void )
 HXml::~HXml ( void )
 	{
 	M_PROLOG
+	xmlCleanupCharEncodingHandlers ( );
 	if ( f_poXml )
 		delete f_poXml;
 	f_poXml = NULL;
@@ -237,10 +247,15 @@ char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 	{
 	M_PROLOG
 	size_t l_uiSizeIn = 0, l_uiSizeOut = 0, l_uiOrigSize = 0, l_uiTmp = 0;
-	char * l_pcOut = NULL, * l_pcIn = const_cast < char * > ( a_pcData );
+	char * l_pcOut = NULL;
+#ifdef HAVE_ICONV_INPUT_CONST
+	char const * l_pcIn = a_pcData;
+#else /* HAVE_ICONV_INPUT_CONST */
+	char * l_pcIn = const_cast < char * > ( a_pcData );
+#endif /* not HAVE_ICONV_INPUT_CONST */
 	iconv_t l_xCD = static_cast < iconv_t > ( 0 );
 	l_uiOrigSize = l_uiSizeOut = l_uiSizeIn = strlen ( a_pcData );
-	f_oConvertedString.hs_realloc ( l_uiOrigSize );
+	f_oConvertedString.hs_realloc ( l_uiOrigSize + 1 );
 	l_pcOut = f_oConvertedString;
 	switch ( a_eWay )
 		{
@@ -248,21 +263,28 @@ char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 		case ( D_OUT ): { l_xCD = f_xIconvOut; break; }
 		default :
 			{
-			M_THROW ( "unknown convetion way", static_cast < int > ( a_eWay ) );
+			M_THROW ( _ ( "unknown convertion way" ),
+					static_cast < int > ( a_eWay ) );
 			break;
 			}
 		}
-	iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut, & l_uiSizeOut );
+	M_ENSURE ( ( iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut,
+					& l_uiSizeOut ) != static_cast < size_t > ( - 1 ) )
+				|| ( g_iErrNo == E2BIG ) );
 	while ( l_uiSizeIn )
 		{
 		l_uiTmp = l_uiOrigSize;
 		l_uiOrigSize <<= 1;
-		f_oConvertedString.hs_realloc ( l_uiOrigSize );
-		l_pcOut = static_cast < char * > ( f_oConvertedString ) + l_uiTmp - l_uiSizeOut;
+		f_oConvertedString.hs_realloc ( l_uiOrigSize + 1 );
+		l_pcOut = static_cast < char * > ( f_oConvertedString )
+			+ l_uiTmp - l_uiSizeOut;
 		l_uiSizeOut += l_uiTmp;
-		iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut, & l_uiSizeOut );
+		M_ENSURE ( ( iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut,
+						& l_uiSizeOut ) != static_cast < size_t > ( - 1 ) )
+				|| ( g_iErrNo == E2BIG ) );
 		}
-	if ( l_pcOut )* l_pcOut = 0;
+	if ( l_pcOut )
+		( * l_pcOut ) = 0;
 	return ( f_oConvertedString );
 	M_EPILOG
 	}
@@ -329,6 +351,7 @@ int HXml::get_node_set_by_path ( char const * a_pcPath )
 		if ( f_poXml->f_psObject )
 			{
 			f_poXml->f_psNodeSet = f_poXml->f_psObject->nodesetval;
+			f_oTmpBuffer = a_pcPath;
 			return ( f_poXml->f_psNodeSet->nodeNr );
 			}
 		}
@@ -339,78 +362,125 @@ int HXml::get_node_set_by_path ( char const * a_pcPath )
 void HXml::init ( char const * a_pcFileName )
 	{
 	M_PROLOG
+	int l_iSavedErrno = g_iErrNo;
 	xmlCharEncoding l_xEncoding = static_cast < xmlCharEncoding > ( 0 );
 	xmlCharEncodingHandlerPtr l_pxHnd = NULL;
 	HString l_oError;
 	if ( f_poXml->f_psDoc )
 		f_poXml->xml_free ( f_poXml->f_psDoc );
 	f_poXml->reset ( );
+	g_iErrNo = 0;
 	f_poXml->f_psDoc = xmlParseFile ( a_pcFileName );
+	if ( g_iErrNo )
+		{
+		log ( D_LOG_WARNING ) << strerror ( g_iErrNo ) << ": " << a_pcFileName;
+		log << ", code: " << g_iErrNo << '.' << endl;
+		}
+	g_iErrNo = l_iSavedErrno;
 	if ( ! f_poXml->f_psDoc )
 		{
-		l_oError.format ( "can not parse `%s'", a_pcFileName );
+		l_oError.format ( _ ( "cannot parse `%s'" ), a_pcFileName );
 		M_THROW ( l_oError, g_iErrNo );
 		}
 	f_poXml->f_psRoot = xmlDocGetRootElement ( f_poXml->f_psDoc );
 	if ( ! f_poXml->f_psRoot )
-		M_THROW ( "empty doc", g_iErrNo );
+		M_THROW ( _ ( "empty doc" ), g_iErrNo );
 #ifdef __DEBUGGER_BABUNI__
 	fprintf ( stdout, "%s\n", f_poXml->f_psRoot->name );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( ! f_poXml->f_psDoc->encoding )
 		{
-		l_oError.format ( "WARRNING: no encoding declared in `%s'.", a_pcFileName );
+		l_oError.format ( _ ( "WARRNING: no encoding declared in `%s'." ),
+				a_pcFileName );
 		M_LOG ( l_oError );
 		}
-	else l_pxHnd = xmlFindCharEncodingHandler ( reinterpret_cast < char const * > ( f_poXml->f_psDoc->encoding ) );
+	else
+		l_pxHnd = xmlFindCharEncodingHandler (
+				reinterpret_cast < char const * > ( f_poXml->f_psDoc->encoding ) );
 	if ( ! l_pxHnd )
 		{
 		l_xEncoding = xmlDetectCharEncoding ( f_poXml->f_psRoot->name,
 				xmlStrlen ( f_poXml->f_psRoot->name ) );
 		if ( ! l_xEncoding )
-			M_THROW ( "can not detect character encoding", g_iErrNo );
+			M_THROW ( _ ( "cannot detect character encoding" ), g_iErrNo );
 		l_pxHnd = xmlGetCharEncodingHandler ( l_xEncoding );
 		}
 	if ( ! l_pxHnd )
-		M_THROW ( "can not enable internal convertion", g_iErrNo );
+		M_THROW ( _ ( "cannot enable internal convertion" ), g_iErrNo );
 	f_xIconvIn = l_pxHnd->iconv_in;
 	f_xIconvOut = l_pxHnd->iconv_out;
 	return;
 	M_EPILOG
 	}
 
-char const * HXml::iterate ( HString & a_roValue, char const * a_pcPath, bool a_bStripEmpty )
+int HXml::iterate ( ONode & a_rsNode,
+		char const * a_pcPath, bool a_bStripEmpty )
 	{
 	M_PROLOG
+	bool l_bOnlyWhite = false;
+	bool l_bEmpty = false;
+	int l_iCtr = 0;
+	int l_iLevel = - 1;
 	char const * l_pcName = NULL;
+	HString l_oProperty;
+	a_rsNode.reset ( );
+	if ( ! a_pcPath || ! a_pcPath [ 0 ] )
+		a_pcPath = "/"; /* scan full tree */
 	if ( ! f_poXml->f_psNodeSet || ( a_pcPath != f_oTmpBuffer ) )
-		get_node_set_by_path ( a_pcPath ), f_iIndex = 0;
-	while ( ! l_pcName && ( f_poXml->f_psNodeSet && ( f_iIndex < f_poXml->f_psNodeSet->nodeNr ) ) )
+		{
+		get_node_set_by_path ( a_pcPath );
+		f_iIndex = 0;
+		f_iLevel = - 2;
+		while ( a_pcPath [ l_iCtr ] )
+			{
+			if ( a_pcPath [ l_iCtr ] == '/' )
+				f_iLevel ++;
+			l_iCtr ++;
+			}
+		l_iCtr --;
+		M_ASSERT ( l_iCtr >= 0 );
+		if ( a_pcPath [ l_iCtr ] != '/' )
+			f_iLevel ++;
+		}
+	while ( ( l_iLevel < 0 ) && ( f_poXml->f_psNodeSet
+				&& ( f_iIndex < f_poXml->f_psNodeSet->nodeNr ) ) )
 		{
 		f_poXml->f_psNodeStart = f_poXml->f_psNodeSet->nodeTab [ f_iIndex ];
 		if ( ! f_poXml->f_psNode )
 			f_poXml->f_psNode = f_poXml->f_psNodeStart;
-#define M_TEST_IF_EMPTY()	( ! strcmp ( l_pcName, "text" ) \
-			&& ! static_cast < char * > ( a_roValue ) [ strspn ( a_roValue, "\n\r\t\f " ) ] )
 		do
 			{
-			l_pcName = iterate ( a_roValue );
-			if ( ! l_pcName || ( f_poXml->f_psNode->prev == f_poXml->f_psNodeStart ) )
+			l_iLevel = iterate ( a_rsNode );
+			if ( ( l_iLevel < 0 )
+					|| ( f_poXml->f_psNode->prev == f_poXml->f_psNodeStart ) )
 				{
 				f_poXml->f_psNode = NULL;
 				f_iIndex ++;
 				break;
 				}
+			l_bOnlyWhite =
+				( a_rsNode.f_oContents.find_other_than ( n_pcWhiteSpace ) < 0 );
+			l_bEmpty = l_bOnlyWhite && ( ! strcmp ( a_rsNode.f_oName, "text" ) );
 			}
-		while ( a_bStripEmpty && M_TEST_IF_EMPTY () );
-		if ( l_pcName && M_TEST_IF_EMPTY() )
-			l_pcName = NULL;
+		while ( a_bStripEmpty && l_bEmpty );
+		if ( ( l_iLevel >= 0 ) && l_bEmpty )
+			l_iLevel = - 1;
 		}
-	return ( l_pcName );
+	if ( a_bStripEmpty && l_bOnlyWhite )
+		a_rsNode.f_oContents = "";
+	if ( l_iLevel > 0 )
+		{
+		while ( ( l_pcName = next_property ( l_oProperty ) ) )
+			a_rsNode.f_oProperties [ l_pcName ] = l_oProperty;
+		l_iLevel = a_rsNode.f_iLevel;
+		}
+	else
+		a_rsNode.f_iLevel = l_iLevel;
+	return ( l_iLevel );
 	M_EPILOG
 	}
 
-char const * HXml::next_property ( HString & a_roValue )
+char const * HXml::next_property ( HString & a_rsNode )
 	{
 	M_PROLOG
 	char const * l_pcName = NULL;
@@ -418,9 +488,12 @@ char const * HXml::next_property ( HString & a_roValue )
 	l_psNode = f_poXml->f_psNode;
 	if ( f_poXml->f_psProperties )
 		{
-		l_pcName = reinterpret_cast < char const * > ( f_poXml->f_psProperties->name );
+		l_pcName = reinterpret_cast < char const * > (
+				f_poXml->f_psProperties->name );
 		if ( f_poXml->f_psProperties->children )
-			a_roValue = convert ( reinterpret_cast < char const * > ( f_poXml->f_psProperties->children->content ) );
+			a_rsNode = convert (
+					reinterpret_cast < char const * > (
+						f_poXml->f_psProperties->children->content ) );
 		}
 	if ( f_poXml->f_psProperties )
 		f_poXml->f_psProperties = f_poXml->f_psProperties->next;
@@ -430,7 +503,7 @@ char const * HXml::next_property ( HString & a_roValue )
 	M_EPILOG
 	}
 
-char const * HXml::iterate ( HString & a_roValue )
+int HXml::iterate ( ONode & a_rsNode )
 	{
 	M_PROLOG
 	char const * l_pcName = NULL;
@@ -440,11 +513,13 @@ char const * HXml::iterate ( HString & a_roValue )
 		{
 		while ( ! l_psNode->name )
 			{
-			if ( ( l_psNode = f_poXml->next_node ( f_poXml->f_psNode ) ) )
+			if ( ( l_psNode = f_poXml->next_node ( f_poXml->f_psNode, f_iLevel ) ) )
 				f_poXml->f_psNode = l_psNode;
 			else break;
 			}
 		l_pcName = reinterpret_cast < char const * > ( f_poXml->f_psNode->name );
+		a_rsNode.f_iLevel = f_iLevel;
+		a_rsNode.f_oName = l_pcName;
 		if ( l_psNode )
 			{
 			f_poXml->f_psNode = l_psNode;
@@ -456,19 +531,23 @@ char const * HXml::iterate ( HString & a_roValue )
 			while ( ! l_psNode->content )
 				{
 				if ( l_psNode->children )
+					{
 					l_psNode = l_psNode->children;
+					f_iLevel ++;
+					}
 				else break;
 				}
 			if ( l_psNode->content )
-				a_roValue = convert ( reinterpret_cast < char const * > ( l_psNode->content ) );
+				a_rsNode.f_oContents = convert (
+						reinterpret_cast < char const * > ( l_psNode->content ) );
 			if ( l_psNode )
 				f_poXml->f_psNode = l_psNode;
 			}
-		if ( ( l_psNode = f_poXml->next_node ( f_poXml->f_psNode ) ) )
+		if ( ( l_psNode = f_poXml->next_node ( f_poXml->f_psNode, f_iLevel ) ) )
 			f_poXml->f_psNode = l_psNode;
 		else l_pcName = NULL;
 		}
-	return ( l_pcName );
+	return ( l_pcName ? f_iLevel : - 1 );
 	M_EPILOG
 	}	
 

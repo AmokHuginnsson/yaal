@@ -66,39 +66,39 @@ private:
 	/*}*/
 public:
 	/*{*/
-	HFile ( mode_open_t = D_READING, void * = NULL );
+	HFile ( mode_open_t const = D_READING, void * const = NULL );
 	virtual ~HFile ( void );
-	int open ( char const * );
+	int open ( char const * const );
 	int close ( void );
-	int read_line ( HString &, mode_read_t = D_DEFAULTS, int = 0 );
-	const HString & get_path ( void ) const;
-	const HString & get_error ( void ) const;
+	int read_line ( HString &, mode_read_t = D_DEFAULTS, int const = 0 );
+	HString const & get_path ( void ) const;
+	HString const & get_error ( void ) const;
 	void flush ( void ) const;
-	HFile & operator << ( char const * );
+	HFile & operator << ( char const * const );
 	HFile & operator << ( char const );
-	HFile & operator << ( const int );
-	HFile & operator << ( const long int );
-	HFile & operator << ( const double );
-	HFile & operator << ( void * );
-	HFile & operator << ( HFile & ( * ) ( HFile & ) );
-	operator bool ( void ) const;
+	HFile & operator << ( int const );
+	HFile & operator << ( int long const );
+	HFile & operator << ( double const );
+	HFile & operator << ( void const * const );
+	HFile & operator << ( HFile & ( * const ) ( HFile & ) );
+	operator bool const ( void ) const;
 	/*}*/
 protected:
 	/*{*/
 	int get_line_length ( void );
-	int scan_line ( HString &, int );
+	int scan_line ( HString &, int const );
 	/*}*/
 private:
 	/*{*/
-	HFile ( const HFile & );
-	HFile & operator = ( const HFile & );
+	HFile ( HFile const & );
+	HFile & operator = ( HFile const & );
 	/*}*/
 	friend HFile & endl ( HFile & );
 	friend HFile & flush ( HFile & );
 	};
 
-template enum_t < HFile::mode_open_t >;
-template enum_t < HFile::mode_read_t >;
+template struct enum_t < HFile::mode_open_t >;
+template struct enum_t < HFile::mode_read_t >;
 
 }
 

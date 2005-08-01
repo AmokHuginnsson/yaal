@@ -39,8 +39,8 @@ namespace stdhapi
 namespace tools
 {
 
-typedef unsigned long int uli_t;
-typedef unsigned short int usi_t;
+typedef int long unsigned uli_t;
+typedef int short unsigned usi_t;
 
 namespace des
 	{

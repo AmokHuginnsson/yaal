@@ -92,14 +92,28 @@ int HThread::finish ( void )
 void * HThread::SPAWN ( void * a_pvThread )
 	{
 	M_PROLOG
+	return ( reinterpret_cast < HThread * > ( a_pvThread )->control ( ) );
+	M_EPILOG
+	}
+
+void * HThread::control ( void )
+	{
+	M_PROLOG
 	void * l_pvReturn = NULL;
-	HThread * l_poThread = reinterpret_cast < HThread * > ( a_pvThread );
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
 	M_ENSURE ( pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
-	l_poThread->f_eStatus = D_ALIVE;
-	l_poThread->f_oCondition.signal ( );
-	l_pvReturn = reinterpret_cast < void * > ( l_poThread->run ( ) );
-	l_poThread->f_eStatus = D_ZOMBIE;
+	f_eStatus = D_ALIVE;
+	f_oCondition.signal ( );
+/* It is possible that destructor of derived class will be called before
+ * next call here (call to run()). So there will be pure virtual method called.
+ * Such event result in program termination.
+ * Scenario that completes behavior described above happens when
+ * two calls to spawn() occur in turn.
+ * To avoid this class user must ensure that derived class destructor
+ * will not finish before eventual call to run is done.
+ */
+	l_pvReturn = reinterpret_cast < void * > ( run ( ) );
+	f_eStatus = D_ZOMBIE;
 	return ( l_pvReturn );
 	M_EPILOG
 	}
@@ -111,13 +125,13 @@ bool HThread::is_alive ( void ) const
 	M_EPILOG
 	}
 
-HMutex::HMutex ( bool a_bRecursive ) : f_bRecursive ( a_bRecursive ),
-																			 f_sAttributes ( ), f_xMutex ( )
+HMutex::HMutex ( bool const a_bRecursive ) : f_bRecursive ( a_bRecursive ),
+																						 f_sAttributes ( ), f_xMutex ( )
 	{
 	M_PROLOG
 	M_IRV ( pthread_mutexattr_init ( & f_sAttributes ) );
 	M_ENSURE ( pthread_mutexattr_settype ( & f_sAttributes,
-				f_bRecursive ? PTHREAD_MUTEX_RECURSIVE_NP : PTHREAD_MUTEX_ERRORCHECK_NP ) != EINVAL );
+				f_bRecursive ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
 	M_IRV ( pthread_mutex_init ( & f_xMutex, & f_sAttributes ) );
 	return;
 	M_EPILOG
@@ -171,7 +185,8 @@ HLock::~HLock ( void )
 	M_EPILOG
 	}
 
-HCondition::HCondition ( void ) : f_sAttributes ( ), f_xCondition ( ), f_oMutex ( )
+HCondition::HCondition ( void )
+	: f_sAttributes ( ), f_xCondition ( ), f_oMutex ( )
 	{
 	M_PROLOG
 	M_IRV ( pthread_condattr_init ( & f_sAttributes ) );
@@ -191,8 +206,8 @@ HCondition::~HCondition ( void )
 	M_EPILOG
 	}
 
-HCondition::status_t HCondition::wait ( unsigned long int * a_pulTimeOutSeconds,
-		unsigned long int * a_pulTimeOutNanoSeconds )
+HCondition::status_t HCondition::wait ( int long unsigned * a_pulTimeOutSeconds,
+		int long unsigned * a_pulTimeOutNanoSeconds )
 	{
 	M_PROLOG
 	int l_iError = 0;

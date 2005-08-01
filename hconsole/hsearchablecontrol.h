@@ -51,7 +51,7 @@ public:
 	/*{*/
 	HSearchableControl ( bool );
 	virtual ~HSearchableControl ( void );
-	virtual void search ( const hcore::HString &, bool );
+	virtual void search ( hcore::HString const &, bool );
 	/*}*/
 protected:
 	/*{*/

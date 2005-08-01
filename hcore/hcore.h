@@ -37,7 +37,7 @@ namespace hcore
 	{
 
 bool eq ( double const &, double const & );
-void set_env ( char const * );
+void set_env ( char const * const );
 void stdhapi_hcore_banner ( void );
 
 	}

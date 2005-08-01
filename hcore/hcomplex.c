@@ -44,7 +44,7 @@ HComplex::HComplex ( void ) : f_dReal ( 0 ), f_dImaginary ( 0 )
 	M_EPILOG
 	}
 
-HComplex::HComplex ( const double a_dReal,  const double a_dImaginary )
+HComplex::HComplex ( double const a_dReal,  double const a_dImaginary )
 	: f_dReal ( a_dReal ), f_dImaginary ( a_dImaginary )
 	{
 	M_PROLOG
@@ -52,7 +52,7 @@ HComplex::HComplex ( const double a_dReal,  const double a_dImaginary )
 	M_EPILOG
 	}
 
-HComplex::HComplex ( const HComplex & a_roComplex ) : f_dReal ( 0 ), f_dImaginary ( 0 )
+HComplex::HComplex ( HComplex const & a_roComplex ) : f_dReal ( 0 ), f_dImaginary ( 0 )
 	{
 	M_PROLOG
 	( * this ) = a_roComplex;
@@ -80,21 +80,21 @@ double HComplex::im ( void ) const
 	M_EPILOG
 	}
 
-double HComplex::set_real ( const double a_dReal )
+double HComplex::set_real ( double const a_dReal )
 	{
 	M_PROLOG
 	return ( f_dReal = a_dReal );
 	M_EPILOG
 	}
 
-double HComplex::set_imaginary ( const double a_dImaginary )
+double HComplex::set_imaginary ( double const a_dImaginary )
 	{
 	M_PROLOG
 	return ( f_dImaginary = a_dImaginary );
 	M_EPILOG
 	}
 
-HComplex & HComplex::set ( const double a_dReal, const double a_dImaginary )
+HComplex & HComplex::set ( double const a_dReal, double const a_dImaginary )
 	{
 	M_PROLOG
 	f_dReal = a_dReal;
@@ -122,7 +122,7 @@ double HComplex::argument ( void ) const
 	M_EPILOG
 	}
 
-HComplex & HComplex::operator = ( const HComplex & a_roComplex )
+HComplex & HComplex::operator = ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	if ( this != & a_roComplex )
@@ -131,7 +131,7 @@ HComplex & HComplex::operator = ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
-bool HComplex::operator == ( const HComplex & a_roComplex ) const
+bool HComplex::operator == ( HComplex const & a_roComplex ) const
 	{
 	M_PROLOG
 	return ( eq ( f_dReal, a_roComplex.f_dReal )
@@ -139,7 +139,7 @@ bool HComplex::operator == ( const HComplex & a_roComplex ) const
 	M_EPILOG
 	}
 
-bool HComplex::operator != ( const HComplex & a_roComplex ) const
+bool HComplex::operator != ( HComplex const & a_roComplex ) const
 	{
 	M_PROLOG
 	return ( ! ( eq ( f_dReal, a_roComplex.f_dReal )
@@ -147,7 +147,7 @@ bool HComplex::operator != ( const HComplex & a_roComplex ) const
 	M_EPILOG
 	}
 
-HComplex & HComplex::operator = ( const double a_dReal )
+HComplex & HComplex::operator = ( double const a_dReal )
 	{
 	M_PROLOG
 	M_IRV ( set ( a_dReal, 0. ) );
@@ -155,7 +155,7 @@ HComplex & HComplex::operator = ( const double a_dReal )
 	M_EPILOG
 	}
 
-HComplex & HComplex::operator += ( const HComplex & a_roComplex )
+HComplex & HComplex::operator += ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	( * this ) = ( * this ) + a_roComplex;
@@ -163,7 +163,7 @@ HComplex & HComplex::operator += ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
-HComplex & HComplex::operator -= ( const HComplex & a_roComplex )
+HComplex & HComplex::operator -= ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	( * this ) = ( * this ) - a_roComplex;
@@ -171,7 +171,7 @@ HComplex & HComplex::operator -= ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
-HComplex & HComplex::operator *= ( const HComplex & a_roComplex )
+HComplex & HComplex::operator *= ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	( * this ) = ( * this ) * a_roComplex;
@@ -179,7 +179,7 @@ HComplex & HComplex::operator *= ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
-HComplex & HComplex::operator *= ( const double a_dValue )
+HComplex & HComplex::operator *= ( double const a_dValue )
 	{
 	M_PROLOG
 	( * this ) = ( * this ) * a_dValue;
@@ -187,7 +187,7 @@ HComplex & HComplex::operator *= ( const double a_dValue )
 	M_EPILOG
 	}
 
-HComplex & HComplex::operator /= ( const HComplex & a_roComplex )
+HComplex & HComplex::operator /= ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	( * this ) = ( * this ) / a_roComplex;
@@ -195,7 +195,7 @@ HComplex & HComplex::operator /= ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
-HComplex & HComplex::operator /= ( const double a_dValue )
+HComplex & HComplex::operator /= ( double const a_dValue )
 	{
 	M_PROLOG
 	( * this ) = ( * this ) / a_dValue;
@@ -203,7 +203,7 @@ HComplex & HComplex::operator /= ( const double a_dValue )
 	M_EPILOG
 	}
 
-HComplex HComplex::operator + ( const HComplex & a_roComplex )
+HComplex HComplex::operator + ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
@@ -213,7 +213,7 @@ HComplex HComplex::operator + ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
-HComplex HComplex::operator - ( const HComplex & a_roComplex )
+HComplex HComplex::operator - ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
@@ -232,7 +232,7 @@ HComplex HComplex::operator - ( void ) const
 	M_EPILOG
 	}
 
-HComplex HComplex::operator * ( const HComplex & a_roComplex )
+HComplex HComplex::operator * ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
@@ -244,7 +244,7 @@ HComplex HComplex::operator * ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
-HComplex HComplex::operator * ( const double a_dValue )
+HComplex HComplex::operator * ( double const a_dValue )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
@@ -254,7 +254,7 @@ HComplex HComplex::operator * ( const double a_dValue )
 	M_EPILOG
 	}
 
-HComplex HComplex::operator / ( const HComplex & a_roComplex )
+HComplex HComplex::operator / ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
@@ -270,7 +270,7 @@ HComplex HComplex::operator / ( const HComplex & a_roComplex )
 	M_EPILOG
 	}
 
-HComplex HComplex::operator / ( const double a_dValue )
+HComplex HComplex::operator / ( double const a_dValue )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
@@ -282,7 +282,7 @@ HComplex HComplex::operator / ( const double a_dValue )
 	M_EPILOG
 	}
 
-HComplex operator * ( const double a_dValue, const HComplex & a_roComplex )
+HComplex operator * ( double const a_dValue, HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	HComplex l_oComplex ( a_roComplex.f_dReal, a_roComplex.f_dImaginary );

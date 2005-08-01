@@ -31,14 +31,14 @@ extern "C"
 {
 
 #define xmalloc( size, type ) static_cast < type * > ( xmalloc_internal ( ( size ) * sizeof ( type ) ) )
-void * xmalloc_internal ( const long int );
+void * xmalloc_internal ( int long const );
 #define xcalloc( size, type ) static_cast < type * > ( xcalloc_internal ( ( size ) * sizeof ( type ) ) )
-void * xcalloc_internal ( const long int );
+void * xcalloc_internal ( int long const );
 #define xrealloc( pointer, size, type ) static_cast < type * > ( xrealloc_internal ( pointer, ( size ) * sizeof ( type ) ) )
-void * xrealloc_internal ( void *, const long int );
+void * xrealloc_internal ( void *, int long const );
 #define xfree( ptr ) xfree_internal ( reinterpret_cast < void * * > ( & ptr ) )
 void xfree_internal ( void * * );
-char * xstrdup ( char const * );
+char * xstrdup ( char const * const );
 
 }
 

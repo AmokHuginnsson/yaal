@@ -47,7 +47,8 @@ HTime::HTime ( void ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
 	M_EPILOG
 	}
 
-HTime::HTime ( char const * a_pcStrTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
+HTime::HTime ( char const * const a_pcStrTime )
+	: f_oFormat ( D_DEFAULT_TIME_FORMAT ),
 	f_oBuffer ( ), f_xValue ( ), f_sBroken ( )
 	{
 	M_PROLOG
@@ -61,7 +62,7 @@ HTime::HTime ( char const * a_pcStrTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
 	M_EPILOG
 	}
 
-HTime::HTime ( const HTime & a_roTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
+HTime::HTime ( HTime const & a_roTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
 	f_oBuffer ( ), f_xValue ( ), f_sBroken ( )
 	{
 	M_PROLOG
@@ -70,7 +71,7 @@ HTime::HTime ( const HTime & a_roTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
 	M_EPILOG
 	}
 
-HTime::HTime ( const time_t & a_rxTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
+HTime::HTime ( time_t const & a_rxTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
 	f_oBuffer ( ), f_xValue ( a_rxTime ), f_sBroken ( )
 	{
 	M_PROLOG
@@ -79,8 +80,8 @@ HTime::HTime ( const time_t & a_rxTime ) : f_oFormat ( D_DEFAULT_TIME_FORMAT ),
 	M_EPILOG
 	}
 
-HTime::HTime ( const int a_iYear, const int a_iMonth, const int a_iDay,
-							 const int a_iHour, const int a_iMinute, const int a_iSecond )
+HTime::HTime ( int const a_iYear, int const a_iMonth, int const a_iDay,
+							 int const a_iHour, int const a_iMinute, int const a_iSecond )
 	: f_oFormat ( D_DEFAULT_TIME_FORMAT ), f_oBuffer ( ), f_xValue ( ),
 	f_sBroken ( )
 	{
@@ -97,7 +98,7 @@ HTime::~HTime ( void )
 	M_EPILOG
 	}
 
-void HTime::set ( const time_t & a_rxTime )
+void HTime::set ( time_t const & a_rxTime )
 	{
 	M_PROLOG
 	f_xValue = a_rxTime;
@@ -115,7 +116,7 @@ void HTime::set_now ( void )
 	M_EPILOG
 	}
 
-void HTime::format ( char const * a_pcFormat )
+void HTime::format ( char const * const a_pcFormat )
 	{
 	M_PROLOG
 	f_oFormat = a_pcFormat;
@@ -123,8 +124,8 @@ void HTime::format ( char const * a_pcFormat )
 	M_EPILOG
 	}
 
-void HTime::set_time ( const int a_iHour, const int a_iMinute,
-											 const int a_iSecond )
+void HTime::set_time ( int const a_iHour, int const a_iMinute,
+											 int const a_iSecond )
 	{
 	M_PROLOG
 	if ( ( a_iHour < 0 ) || ( a_iHour > 23 ) )
@@ -141,8 +142,8 @@ void HTime::set_time ( const int a_iHour, const int a_iMinute,
 	M_EPILOG
 	}
 
-void HTime::set_date ( const int a_iYear, const int a_iMonth,
-											 const int a_iDay )
+void HTime::set_date ( int const a_iYear, int const a_iMonth,
+											 int const a_iDay )
 	{
 	M_PROLOG
 	f_sBroken.tm_year = a_iYear - 1900;
@@ -157,9 +158,9 @@ void HTime::set_date ( const int a_iYear, const int a_iMonth,
 	M_EPILOG
 	}
 
-void HTime::set_datetime ( const int a_iYear, const int a_iMonth,
-											 const int a_iDay, const int a_iHour,
-											 const int a_iMinute, const int a_iSecond )
+void HTime::set_datetime ( int const a_iYear, int const a_iMonth,
+											 int const a_iDay, int const a_iHour,
+											 int const a_iMinute, int const a_iSecond )
 	{
 	M_PROLOG
 	set_date ( a_iYear, a_iMonth, a_iDay );
@@ -210,7 +211,7 @@ int HTime::get_second ( void ) const
 	M_EPILOG
 	}
 
-HTime & HTime::operator = ( const HTime & a_roTime )
+HTime & HTime::operator = ( HTime const & a_roTime )
 	{
 	M_PROLOG
 	if ( this != & a_roTime )
@@ -224,7 +225,7 @@ HTime & HTime::operator = ( const HTime & a_roTime )
 	M_EPILOG
 	}
 
-HTime HTime::operator - ( const HTime & a_roTime ) const
+HTime HTime::operator - ( HTime const & a_roTime ) const
 	{
 	M_PROLOG
 	HTime l_oTime;
@@ -235,7 +236,7 @@ HTime HTime::operator - ( const HTime & a_roTime ) const
 	M_EPILOG
 	}
 
-HTime & HTime::operator -= ( const HTime & a_roTime )
+HTime & HTime::operator -= ( HTime const & a_roTime )
 	{
 	M_PROLOG
 	( * this ) = ( * this ) - a_roTime;
@@ -243,42 +244,42 @@ HTime & HTime::operator -= ( const HTime & a_roTime )
 	M_EPILOG
 	}
 
-bool HTime::operator == ( const time_t & a_rxTime ) const
+bool HTime::operator == ( time_t const & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue == a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator != ( const time_t & a_rxTime ) const
+bool HTime::operator != ( time_t const & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue != a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator <= ( const time_t & a_rxTime ) const
+bool HTime::operator <= ( time_t const & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue <= a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator >= ( const time_t & a_rxTime ) const
+bool HTime::operator >= ( time_t const & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue >= a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator < ( const time_t & a_rxTime ) const
+bool HTime::operator < ( time_t const & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue < a_rxTime );
 	M_EPILOG
 	}
 
-bool HTime::operator > ( const time_t & a_rxTime ) const
+bool HTime::operator > ( time_t const & a_rxTime ) const
 	{
 	M_PROLOG
 	return ( f_xValue > a_rxTime );

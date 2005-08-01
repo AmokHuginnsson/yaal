@@ -78,8 +78,8 @@ private:
 	friend void HStatusBarControl::end_prompt ( void );
 	friend int HStatusBarControl::process_input_normal ( int );
 	void set_focus ( HControl * );
-	HWindow ( const HWindow & );
-	HWindow & operator = ( const HWindow & );
+	HWindow ( HWindow const & );
+	HWindow & operator = ( HWindow const & );
 	/*}*/
 	};
 

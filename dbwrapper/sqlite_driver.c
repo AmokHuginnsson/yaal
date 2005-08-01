@@ -69,6 +69,7 @@ void * db_connect ( char const * a_pcDataBase,
 	int l_iNmLnght = 0;
 	void * l_pvPtr = NULL;
 	char * l_pcDataBase = NULL;
+	char const l_pcFileNameExt [ ] = ".sqlite";
 	struct stat l_sStat;
 	OSQLite * l_psSQLite = NULL;
 	if ( g_psBrokenDB )
@@ -78,9 +79,9 @@ void * db_connect ( char const * a_pcDataBase,
 		}
 	l_psSQLite = xcalloc ( 1, OSQLite );
 	l_iNmLnght = strlen ( a_pcDataBase );
-	l_pcDataBase = xcalloc ( l_iNmLnght + strlen ( ".sqlite" + 1 ), char );
+	l_pcDataBase = xcalloc ( l_iNmLnght + strlen ( l_pcFileNameExt ) + 1, char );
 	strcpy ( l_pcDataBase, a_pcDataBase );
-	strcat ( l_pcDataBase, ".sqlite" );
+	strcat ( l_pcDataBase, l_pcFileNameExt );
 	if ( stat ( l_pcDataBase, & l_sStat ) )
 		{
 		strcpy ( l_pcDataBase + l_iNmLnght, ".db" );
@@ -176,7 +177,7 @@ int rs_fields_count ( void * a_pvData )
 	return ( static_cast < OSQLiteResult * > ( a_pvData )->f_iColumns );
 	}
 
-long int dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
+int long dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
 	{
 	if ( a_pvDataR )
 		return ( static_cast < OSQLiteResult * > ( a_pvDataR )->f_iRows );
@@ -184,7 +185,7 @@ long int dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
 		return ( sqlite_changes ( static_cast < OSQLite * > ( a_pvDataB )->f_psDB ) );
 	}
 
-long int dbrs_id ( void * a_pvDataB, void * )
+int long dbrs_id ( void * a_pvDataB, void * )
 	{
 	return ( sqlite_last_insert_rowid ( static_cast < OSQLite * > ( a_pvDataB )->f_psDB ) );
 	}

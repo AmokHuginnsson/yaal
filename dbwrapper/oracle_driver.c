@@ -337,7 +337,7 @@ int rs_fields_count ( void * a_pvData )
 	return ( l_iFields );
 	}
 
-long int dbrs_records_count ( void *, void * a_pvDataR )
+int long dbrs_records_count ( void *, void * a_pvDataR )
 	{
 	int l_iRows = 0;
 	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvDataR );
@@ -360,10 +360,10 @@ long int dbrs_records_count ( void *, void * a_pvDataR )
 	return ( l_iRows );
 	}
 
-long int dbrs_id ( void * a_pvDataB, void * a_pvDataR )
+int long dbrs_id ( void * a_pvDataB, void * a_pvDataR )
 	{
 	int l_iNameLength = 0;
-	long int l_lId = 0;
+	int long l_lId = 0;
 	HString l_oSQL;
 	text * l_pcName = NULL;
 	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvDataR );

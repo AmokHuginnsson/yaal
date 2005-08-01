@@ -27,6 +27,7 @@ Copyright:
 #include <sys/types.h> /* FD_* macros */
 #include <string.h>
 #include <stdlib.h>
+#include <libintl.h>
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
@@ -41,6 +42,8 @@ namespace stdhapi
 
 namespace tools
 {
+
+char const * const n_pcError = _ ( "collector device not opened" );
 
 HCollector::HCollector ( char const * a_pcDevicePath )
 					: HSerial ( a_pcDevicePath ), f_iLines ( 0 ),
@@ -151,8 +154,8 @@ int HCollector::receive_line ( char * & a_pcLine )
 #ifdef __GNUC__
 #	define M_STDHAPI_TEMP_FAILURE_RETRY( expression ) \
   (__extension__ \
-    ({ long int __result; \
-       do __result = static_cast <long int> ( expression ); \
+    ({ int long __result; \
+       do __result = static_cast <int long> ( expression ); \
        while (__result == -1L && errno == EINTR); \
        __result; }))
 #else /* __GNUC__ */
@@ -165,10 +168,12 @@ int HCollector::establish_connection ( int a_iTimeOut )
 /*
 	 We have small problem here.
 	 There are two ways that communication can start.
-	 Ether waiting part runs before initializing part (the easy case),
+	 Either waiting part runs before initializing part (the easy case),
 	 or initializing part runs before waiting part (here comes the trouble).
 */
 	int l_iLenght = strlen ( D_PROTO_SYN ), l_iError = -1;
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_pcError, f_iFileDescriptor );
 	fd_set	l_xFileDesSet; /* serial port */
 	timeval	l_sWait; /* sleep between re-selects */
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
@@ -202,8 +207,10 @@ int HCollector::establish_connection ( int a_iTimeOut )
 int HCollector::wait_for_connection ( int a_iTimeOut )
 	{
 	M_PROLOG
-	int l_iError = -1;
+	int l_iError = - 1;
 	int l_iLenght = strlen ( D_PROTO_ACK );
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_pcError, f_iFileDescriptor );
 	fd_set	l_xFileDesSet; /* serial port */
 	timeval	l_sWait; /* sleep between re-selects */
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );

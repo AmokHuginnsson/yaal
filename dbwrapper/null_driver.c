@@ -81,12 +81,12 @@ int rs_fields_count ( void * /*a_pvData*/)
 	return ( 0 );
 	}
 
-long int dbrs_records_count ( void * /*a_pvDataB*/ void * /*a_pvDataR*/)
+int long dbrs_records_count ( void * /*a_pvDataB*/ void * /*a_pvDataR*/)
 	{
 	return ( 0 );
 	}
 
-long int dbrs_id ( void * /*a_pvDataB*/ void * /*a_pvDataR*/)
+int long dbrs_id ( void * /*a_pvDataB*/ void * /*a_pvDataR*/)
 	{
 	return ( 0 );
 	}

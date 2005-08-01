@@ -61,13 +61,14 @@ int HMenuControl::HMenuNode::load_sub_menu ( OMenuItem * a_psSubMenu )
 	HString str;
 	HMenuNode * l_poNode = NULL;
 	HInfo l_oInfo;
-	while ( a_psSubMenu [ l_iCtr ].f_pcLabel )
+	while ( ! a_psSubMenu [ l_iCtr ].f_oLabel.is_empty ( ) )
 		{
 		l_poNode = new HMenuNode ( this );
-		M_IRV ( l_oInfo ( a_psSubMenu [ l_iCtr ].f_pcLabel ) );
+		M_IRV ( l_oInfo ( a_psSubMenu [ l_iCtr ].f_oLabel ) );
 		M_IRV ( l_oInfo ( static_cast < void * > ( & a_psSubMenu [ l_iCtr ] ) ) );
 		l_poNode->f_tLeaf [ 0 ] = l_oInfo;
-		M_IRV ( f_oBranch.add_tail ( reinterpret_cast < HTree < HItem >::HNode * * > ( & l_poNode ) ) );
+		M_IRV ( f_oBranch.add_tail (
+					reinterpret_cast < HTree < HItem >::HNode * * > ( & l_poNode ) ) );
 		if ( a_psSubMenu [ l_iCtr ].f_psSubMenu )
 			M_IRV ( l_poNode->load_sub_menu ( a_psSubMenu [ l_iCtr ].f_psSubMenu ) );
 		l_iCtr ++;

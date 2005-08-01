@@ -513,7 +513,7 @@ int HEditControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-void HEditControl::set ( const HInfo & a_roInfo )
+void HEditControl::set ( HInfo const & a_roInfo )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;

@@ -166,7 +166,7 @@ void HRecordSet::build_sql ( void )
 	M_EPILOG
 	}
 
-long int HRecordSet::open ( char const * a_pcQuery )
+int long HRecordSet::open ( char const * a_pcQuery )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -231,7 +231,7 @@ void HRecordSet::free ( void )
 	M_EPILOG
 	}
 
-long int HRecordSet::requery ( char const * a_pcQuery )
+int long HRecordSet::requery ( char const * a_pcQuery )
 	{
 	M_PROLOG
 	close ( );
@@ -342,10 +342,10 @@ void HRecordSet::edit ( void )
 	M_EPILOG
 	}
 
-long int HRecordSet::update ( void )
+int long HRecordSet::update ( void )
 	{
 	M_PROLOG
-	long int l_iRetVal = 0;
+	int long l_iRetVal = 0;
 	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
 		M_THROW ( E_MODE, f_iMode );
 	sync ( );
@@ -430,7 +430,7 @@ void HRecordSet::sync ( int a_iField, int & a_riInt )
 	M_EPILOG
 	}
 
-void HRecordSet::sync ( int a_iField, long int & a_rlLongInt )
+void HRecordSet::sync ( int a_iField, int long & a_rlLongInt )
 	{
 	M_PROLOG
 	HString l_oTmp;
@@ -502,7 +502,7 @@ void HRecordSet::sync ( int a_iField, HInfo & a_roInfo )
 		a_roInfo ( static_cast < char const * > ( l_oTmp ) );
 		}
 	else
-		f_oValues [ a_iField ] = a_roInfo.get < const HString & > ( );
+		f_oValues [ a_iField ] = a_roInfo.get < HString const & > ( );
 	return;
 	M_EPILOG
 	}

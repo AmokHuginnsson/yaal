@@ -80,8 +80,8 @@ protected:
 	/*}*/
 private:
 	/*{*/
-	HProcess ( const HProcess & );
-	HProcess & operator = ( const HProcess & );
+	HProcess ( HProcess const & );
+	HProcess & operator = ( HProcess const & );
 	/*}*/
 	};
 

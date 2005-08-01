@@ -38,6 +38,16 @@ namespace stdhapi
 namespace hdata
 {
 
+#define M_REGISTER_MENU_HANDLER( handler ) \
+	{ \
+	typedef typeof ( *this ) this_t; \
+	l_oHandlers [ #handler ] = static_cast < OMenuItem::HANDLER_t > ( \
+			& this_t::handler ); \
+	}
+
+typedef stdhapi::hcore::HMap < stdhapi::hcore::HString,
+				stdhapi::hconsole::OMenuItem::HANDLER_t > menu_handlers_map_t;
+
 class HDataXml : public tools::HXml
 	{
 protected:
@@ -45,10 +55,10 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	virtual void * parse ( void * )
-		{
-		return ( NULL );
-		}
+	virtual void * parse ( void * );
+	stdhapi::hconsole::OMenuItem * build_menu ( menu_handlers_map_t const &,
+			ONode & );
+	void destroy_menu ( stdhapi::hconsole::OMenuItem * );
 	/*}*/
 protected:
 	/*{*/
@@ -62,17 +72,27 @@ protected:
 	HDataXml	f_oXml;
 	dbwrapper::HDataBase f_oDataBase;
 	/*}*/
+private:
+	/*{*/
+	stdhapi::hconsole::OMenuItem * f_psRootMenu;
+	/*}*/
 public:
 	/*{*/
 	HDataProcess ( void );
 	virtual ~HDataProcess ( void );
-	virtual int init_xrc ( char const *, char const *, stdhapi::hconsole::OMenuItem * );
+	virtual int init_xrc ( char const *, char const *,
+			menu_handlers_map_t const & );
 	dbwrapper::HDataBase * data_base ( void );
 	/*}*/
 protected:
 	/*{*/
 	virtual int handler_quit ( int, void * = NULL );
 	virtual int handler_close_window ( int, void * = NULL );
+	/*}*/
+private:
+	/*{*/
+	HDataProcess ( HDataProcess const & );
+	HDataProcess & operator = ( HDataProcess const & );
 	/*}*/
 	};
 

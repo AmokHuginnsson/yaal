@@ -74,8 +74,8 @@ public:
 	/*}*/
 private:
 	/*{*/
-	HMenuControl ( const HMenuControl & );
-	HMenuControl & operator = ( const HMenuControl & );
+	HMenuControl ( HMenuControl const & );
+	HMenuControl & operator = ( HMenuControl const & );
 	/*}*/
 	};
 

@@ -31,6 +31,7 @@ Copyright:
 #define __HCORE_HEXCEPTION_H
 
 #include <errno.h>
+#include <string.h>
 
 #ifdef __STDHAPI_BUILD__
 #	include "config.h"
@@ -58,26 +59,47 @@ namespace hcore
 template < typename tType >
 struct enum_t
 	{
-	inline friend tType const operator | ( tType const & left, tType const & right )
-		{ return ( static_cast < tType > ( static_cast < unsigned long int > ( left )
-					| static_cast < unsigned long int > ( right ) ) ); }
+	inline friend tType const operator | ( tType const & left,
+			tType const & right )
+		{
+		return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
+					| static_cast < int long unsigned > ( right ) ) );
+		}
 	inline friend tType & operator |= ( tType & left, tType const & right )
-		{ return ( left = static_cast < tType > ( static_cast < unsigned long int > ( left )
-					| static_cast < unsigned long int > ( right ) ) ); }
-	inline friend tType const operator & ( tType const & left, tType const & right )
-		{ return ( static_cast < tType > ( static_cast < unsigned long int > ( left )
-					& static_cast < unsigned long int > ( right ) ) ); }
+		{
+		left = static_cast < tType > ( static_cast < int long unsigned > ( left )
+				| static_cast < int long unsigned > ( right ) );
+		return ( left );
+		}
+	inline friend tType const operator & ( tType const & left,
+			tType const & right )
+		{
+		return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
+					& static_cast < int long unsigned > ( right ) ) );
+		}
 	inline friend tType & operator &= ( tType & left, tType const & right )
-		{ return ( left = static_cast < tType > ( static_cast < unsigned long int > ( left )
-					& static_cast < unsigned long int > ( right ) ) ); }
-	inline friend tType const operator ^ ( tType const & left, tType const & right )
-		{ return ( static_cast < tType > ( static_cast < unsigned long int > ( left )
-					^ static_cast < unsigned long int > ( right ) ) ); }
+		{
+		left = static_cast < tType > ( static_cast < int long unsigned > ( left )
+				& static_cast < int long unsigned > ( right ) );
+		return ( left );
+		}
+	inline friend tType const operator ^ ( tType const & left,
+			tType const & right )
+		{
+		return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
+					^ static_cast < int long unsigned > ( right ) ) );
+		}
 	inline friend tType & operator ^= ( tType & left, tType const & right )
-		{ return ( left = static_cast < tType > ( static_cast < unsigned long int > ( left )
-					^ static_cast < unsigned long int > ( right ) ) ); }
+		{
+		left = static_cast < tType > ( static_cast < int long unsigned > ( left )
+				^ static_cast < int long unsigned > ( right ) );
+		return ( left );
+		}
 	inline friend tType const operator ~ ( tType const & e )
-		{ return ( static_cast < tType > ( ~ static_cast < unsigned long int > ( e ) ) ); }
+		{
+		return ( static_cast < tType > (
+					~ static_cast < int long unsigned > ( e ) ) );
+		}
 	};
 
 #define D_LOG_DEBUG			1
@@ -108,11 +130,11 @@ typedef enum
 	D_HTIME					= 0x1000,
 	D_MASK					= 0xffff
 	} type_t;
-template enum_t < type_t >;
+template struct enum_t < type_t >;
 
 #define g_iErrNo errno
 
-extern long int n_lLogMask;
+extern int long n_lLogMask;
 extern int n_iDebugLevel;
 
 class HException
@@ -137,21 +159,24 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HException ( char const *, char const *, int, char const *, int = 0 );
-	HException ( const HException & );
+	HException ( char const * const, char const * const, int const,
+			char const * const, int const = 0 );
+	HException ( HException const & );
 	virtual ~HException ( void ) ;
-	void set ( char = 0, int = 0, long = 0, double = 0, char const * = 0, void * = 0 );
+	void set ( char const = 0, int const = 0, long const = 0, double const = 0,
+			char const * const = 0, void * const = 0 );
 	void set ( char const * );
-	void print_error ( bool ) const;
-	static void dump_call_stack ( int );
-	void log ( char const *, char const *, int );
+	void print_error ( bool const ) const;
+	static void dump_call_stack ( int const );
+	void log ( char const * const, char const * const, int const );
 	char const * what ( void ) const;
 	HException * operator-> ( void );
-	static void failed_assert ( char const *, char const *, int, char const * ) __attribute__(( __noreturn__ ));
+	static void failed_assert ( char const * const, char const * const, int const,
+			char const * const ) __attribute__(( __noreturn__ ));
 	/*}*/
 private:
 	/*{*/
-	HException & operator = ( const HException & );
+	HException & operator = ( HException const & );
 	/*}*/
 	};
 

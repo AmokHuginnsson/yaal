@@ -30,6 +30,7 @@ Copyright:
 #include <iconv.h>
 
 #include "hcore/hstring.h"
+#include "hcore/hmap.h"
 
 namespace stdhapi
 {
@@ -37,15 +38,39 @@ namespace stdhapi
 namespace tools
 {
 
+#define D_HXML_PROPERTIES_MAP_SIZE	16
+	
 class HXmlData;
 
 class HXml
 	{
+public:
+	struct ONode
+		{
+		int f_iLevel;
+		stdhapi::hcore::HString	f_oName;
+		stdhapi::hcore::HString	f_oContents;
+		stdhapi::hcore::HMap < stdhapi::hcore::HString,
+			stdhapi::hcore::HString > f_oProperties;
+		ONode ( void ) : f_iLevel ( - 1 ), f_oName ( ), f_oContents ( ),
+								f_oProperties ( D_HXML_PROPERTIES_MAP_SIZE ) { }
+		void reset ( void )
+			{
+			M_PROLOG
+			f_iLevel = - 1;
+			f_oName = "";
+			f_oContents = "";
+			f_oProperties.flush ( );
+			return;
+			M_EPILOG
+			}
+		};
 protected:
 	/*{*/
 	typedef void * xml_node_ptr_t;
 	typedef enum { D_IN, D_OUT } way_t;
 	int											f_iIndex; /* index of last accessed node in nodeset */
+	int											f_iLevel; /* level of -||- ... */
 	iconv_t									f_xIconvIn;
 	iconv_t									f_xIconvOut;
 	stdhapi::hcore::HString	f_oConvertedString;
@@ -59,12 +84,12 @@ public:
 	virtual ~ HXml ( void );
 	void init ( char const * );
 	virtual void * parse ( void * ) = 0;
-	char const * iterate ( stdhapi::hcore::HString &, char const *, bool = true );
-	char const * next_property ( stdhapi::hcore::HString & );
+	int iterate ( ONode &, char const *, bool = true );
 	/*}*/
 protected:
 	/*{*/
-	char const * iterate ( stdhapi::hcore::HString & );
+	char const * next_property ( stdhapi::hcore::HString & );
+	int iterate ( ONode & );
 	char * convert ( char const *, way_t = D_OUT );
 	char * get_leaf_by_name ( int, char const * );
 	char * get_leaf_by_name ( xml_node_ptr_t, char const * );
@@ -72,8 +97,8 @@ protected:
 	/*}*/
 private:
 	/*{*/
-	HXml ( const HXml & );
-	HXml & operator = ( const HXml & );
+	HXml ( HXml const & );
+	HXml & operator = ( HXml const & );
 	/*}*/
 	};
 

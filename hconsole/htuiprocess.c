@@ -248,7 +248,7 @@ int HProcess::process_stdin ( int a_iCode )
 
 #ifdef __GNUC__
 #	define M_STDHAPI_TEMP_FAILURE_RETRY( expression )	(__extension__ ( \
-	{ long int __result; \
+	{ int long __result; \
 	do \
 		{ \
 		if ( n_bInputWaiting ) \
@@ -256,7 +256,7 @@ int HProcess::process_stdin ( int a_iCode )
 			process_stdin ( STDIN_FILENO ); \
 			M_REFRESH ( ); \
 			} \
-		__result = (long int) (expression); \
+		__result = (int long) (expression); \
 		} \
 	while (__result == -1L && errno == EINTR); \
 	__result; \

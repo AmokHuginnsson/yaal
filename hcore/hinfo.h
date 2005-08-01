@@ -43,7 +43,7 @@ protected:
 	/*{*/
 	type_t		f_eType;
 	int				f_iInt;
-	long int	f_lLongInt;
+	int long	f_lLongInt;
 	double		f_dDouble;
 	void *		f_pvPointer;
 	HString		f_oString;
@@ -52,21 +52,21 @@ protected:
 public:
 	/*{*/
 	HInfo ( void );
-	HInfo ( const int & );
-	HInfo ( const long int & );
-	HInfo ( const double & );
-	HInfo ( char const * );
-	HInfo ( const HString & );
-	HInfo ( const HTime & );
-	HInfo ( void * );
-	HInfo ( const HInfo &, int = 0 );
+	HInfo ( int const & );
+	HInfo ( int long const & );
+	HInfo ( double const & );
+	HInfo ( char const * const );
+	HInfo ( HString const & );
+	HInfo ( HTime const & );
+	HInfo ( void * const );
+	HInfo ( HInfo const & );
 	virtual ~HInfo ( void );
-	char & operator [ ] ( int );
-	HInfo & operator = ( const HInfo & );
-	HInfo & operator ( ) ( const HInfo & );
+	char & operator [ ] ( int const );
+	HInfo & operator = ( HInfo const & );
+	HInfo & operator ( ) ( HInfo const & );
 	template < typename tType >
-	tType get ( void ) const;
-	operator bool ( void ) const;
+	tType const get ( void ) const;
+	operator bool const ( void ) const;
 	/*}*/
 protected:
 	/*{*/

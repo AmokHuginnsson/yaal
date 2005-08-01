@@ -91,7 +91,7 @@ OVariable n_psVariables [ ] =
 
 void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )
 	{
-	unsigned int l_uiMask = 0x000f;
+	int unsigned l_uiMask = 0x000f;
 	if ( a_iWhat )
 		{
 		a_iWhat <<= 2;
@@ -153,7 +153,7 @@ void set_color ( HString & a_roValue, int & a_riAttribute )
 	return;
 	}
 
-bool set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
+bool const set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )
 		set_env ( a_roValue );

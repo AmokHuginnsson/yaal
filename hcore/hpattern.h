@@ -58,19 +58,20 @@ public:
 	/*{*/
 	HPattern ( bool = false /* default ignore case state */ );
 	virtual ~HPattern ( void );
-	int parse ( char const * /* pattern input */,
-							 unsigned short int * = NULL /* additional flags to parse */,
-							 int = 0 /* number of additional flags */ );
-	int parse_re ( char const * );
+	int parse ( char const * const /* pattern input */,
+							 int short unsigned * const = NULL /*additional flags to parse*/,
+							 int const = 0 /* number of additional flags */ );
+	int parse_re ( char const * const );
 	char const * error ( void ) const;
-	char const * matches ( char const *, int * = NULL /* match length */,
-			int * = NULL /* error code */ );
-	int count ( char const * );
+	char const * matches ( char const * const,
+			int * const = NULL /* match length */,
+			int * const = NULL /* error code */ );
+	int count ( char const * const );
 	/*}*/
 protected:
 	/*{*/
-	void prepare_error_message ( int, char const * );
-	bool set_switch ( char, unsigned short int *, int );
+	void prepare_error_message ( int const, char const * const );
+	bool set_switch ( char const, int short unsigned * const, int const );
 	/*}*/
 	};
 

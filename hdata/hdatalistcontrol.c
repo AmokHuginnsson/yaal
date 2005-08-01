@@ -77,7 +77,7 @@ HDataListControl::~HDataListControl ( void )
 	M_EPILOG
 	}
 
-void HDataListControl::load ( long int /*a_iId*/ )
+void HDataListControl::load ( int long /*a_iId*/ )
 	{
 	M_PROLOG
 	int l_iCount = 0, l_iCtr = 0, l_iQuantity = f_iQuantity;
@@ -124,7 +124,7 @@ void HDataListControl::load ( long int /*a_iId*/ )
 	M_EPILOG
 	}
 
-long int HDataListControl::get_current_id ( void )
+int long HDataListControl::get_current_id ( void )
 	{
 	M_PROLOG
 	return ( static_cast < HItem * > ( & f_poSelected->get_object ( ) )->m_lId );

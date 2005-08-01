@@ -94,7 +94,7 @@ int n_piFunctionMnemonicsLength [ 16 ] =
 	};
 
 HAnalyser::HAnalyserNode::HAnalyserNode ( HAnalyserNode * a_poNode )
-				 : HTree < HList < double * > >::HNode ( a_poNode ), METHOD ( NULL )
+				 : HTree < double_ptr_list_t >::HNode ( a_poNode ), METHOD ( NULL )
 	{
 	M_PROLOG
 	return;

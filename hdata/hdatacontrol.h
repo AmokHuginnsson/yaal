@@ -46,15 +46,15 @@ public:
 	/*{*/
 	HDataControl ( dbwrapper::HRecordSet * );
 	virtual ~HDataControl ( void );
-	virtual void load ( long int = 0 );
-	virtual long int get_current_id ( void );
+	virtual void load ( int long = 0 );
+	virtual int long get_current_id ( void );
 	virtual void add_new ( void );
 	virtual void cancel_new ( void );
 	/*}*/
 private:
 	/*{*/
-	HDataControl ( const HDataControl & );
-	HDataControl & operator = ( const HDataControl & );
+	HDataControl ( HDataControl const & );
+	HDataControl & operator = ( HDataControl const & );
 	/*}*/
 	};
 

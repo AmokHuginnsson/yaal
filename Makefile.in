@@ -96,8 +96,8 @@ ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
 COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe -fPIC \
-																-D__STDHAPI_BUILD__ -D_GNU_SOURCE @DEFS@ \
-																-march=i486
+																-D__STDHAPI_BUILD__ -D_GNU_SOURCE \
+																@DEFS@ -march=i486
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
@@ -161,7 +161,7 @@ SRCS := $(filter-out %_driver.c,$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.o,$(OBJS_dbwrapper))
 $(foreach DRIVER,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(DRIVER))))
 
-LIBS_hcore			=	"-l@THREADING_LIBRARY@ @GETTEXT_LIB@"
+LIBS_hcore			=	"-lpthread @GETTEXT_LIB@"
 DEPS_hconsole		= $(TARGET_hcore)
 LIBS_hconsole		= "-lncurses @MOUSE_LIB@ -lhcore"
 DEPS_tools			= $(TARGET_hconsole)
@@ -299,7 +299,7 @@ flint:
 						dbwrapper/db_driver_loader.c dbwrapper/dbwrapper.c \
 						dbwrapper/hdatabase.c dbwrapper/hrecordset.c \
 						hdata/*.c \
-| awk '{gsub(" \\(compare with line [^)]+)","");print}'|head -20
+| awk '{gsub(" \\(compare with line [^)]+\\)","");print}'|head -20
 
 ifeq ($(CURDIR),$(DIR_BUILD))
 -include $(OBJS:.o=.d)

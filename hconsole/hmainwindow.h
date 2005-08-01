@@ -56,8 +56,8 @@ public:
 	/*}*/
 private:
 	/*{*/
-	HMainWindow ( const HMainWindow & );
-	HMainWindow & operator = ( const HMainWindow & );
+	HMainWindow ( HMainWindow const & );
+	HMainWindow & operator = ( HMainWindow const & );
 	/*}*/
 	};
 

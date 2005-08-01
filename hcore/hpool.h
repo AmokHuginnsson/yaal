@@ -78,8 +78,8 @@ public:
 	/*}*/
 private:
 	/*{*/
-	HPool ( const HPool & );
-	HPool & operator = ( const HPool & );
+	HPool ( HPool const & );
+	HPool & operator = ( HPool const & );
 	/*}*/
 	};
 

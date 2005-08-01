@@ -51,7 +51,7 @@ HItem::~HItem ( void )
 	M_EPILOG
 	}
 
-HItem::HItem ( const HItem & a_roItem, int ) : HArray < HInfo > ( a_roItem ),
+HItem::HItem ( HItem const & a_roItem, int ) : HArray < HInfo > ( a_roItem ),
 	m_lId ( a_roItem.m_lId ), m_bChecked ( a_roItem.m_bChecked )
 	{
 	M_PROLOG
@@ -59,7 +59,7 @@ HItem::HItem ( const HItem & a_roItem, int ) : HArray < HInfo > ( a_roItem ),
 	M_EPILOG
 	}
 
-HItem & HItem::operator = ( const HItem & a_roItem )
+HItem & HItem::operator = ( HItem const & a_roItem )
 	{
 	M_PROLOG
 	if ( this != & a_roItem )

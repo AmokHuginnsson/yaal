@@ -39,9 +39,18 @@ namespace hconsole
 
 struct OMenuItem
 	{
+public: /* All is public for simpler usage. */
+	typedef int ( HProcess::* HANDLER_t ) ( void );
 	OMenuItem * f_psSubMenu;
-	int ( HProcess::* HANDLER ) ( void );
-	char const * f_pcLabel;
+	HANDLER_t HANDLER;
+	stdhapi::hcore::HString f_oLabel;
+/* Methods */
+	OMenuItem ( void );
+	OMenuItem ( OMenuItem * const, HANDLER_t const,
+			stdhapi::hcore::HString const & );
+	OMenuItem ( OMenuItem const & );
+	OMenuItem & operator = ( OMenuItem const & );
+	void reset ( void );
 	};
 
 }

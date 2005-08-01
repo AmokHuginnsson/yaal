@@ -65,12 +65,12 @@ HSearchableControl::~HSearchableControl ( void )
 	M_EPILOG
 	}
 
-void HSearchableControl::search ( const HString & a_oPattern, bool a_bBackwards )
+void HSearchableControl::search ( HString const & a_oPattern, bool a_bBackwards )
 	{
 	M_PROLOG
-	unsigned short int l_uhFlag = 'f';
+	int short unsigned l_uhFlag = 'f';
 	f_bSearchActived = ! f_oPattern.parse ( a_oPattern, & l_uhFlag,
-			sizeof ( l_uhFlag ) / sizeof ( unsigned short int ) );
+			sizeof ( l_uhFlag ) / sizeof ( int short unsigned ) );
 	if ( ! f_bSearchActived )
 		f_poParent->status_bar ( )->message ( f_oPattern.error ( ) );
 	else

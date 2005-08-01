@@ -33,8 +33,8 @@ namespace stdhapi
 namespace tools
 	{
 
-int getbit( void *, unsigned long int );
-void setbit( void *, unsigned long int, int );
+int getbit( void *, int long unsigned );
+void setbit( void *, int long unsigned, int );
 void ror( unsigned char *, int, int, int );
 void rol( unsigned char *, int, int, int );
 

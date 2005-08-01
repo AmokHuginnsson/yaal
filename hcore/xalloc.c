@@ -36,7 +36,7 @@ M_CVSID ( "$CVSHeader$" );
 extern "C"
 {
 
-void * xmalloc_internal ( const long int a_lSize )
+void * xmalloc_internal ( int long const a_lSize )
 	{
 	register void * l_pvNewPtr = NULL;
 	if ( a_lSize < 0 )
@@ -53,14 +53,14 @@ void * xmalloc_internal ( const long int a_lSize )
 	return ( l_pvNewPtr );
 	}
 
-void * xcalloc_internal ( long int a_lSize )
+void * xcalloc_internal ( int long a_lSize )
 	{
 	register void * l_pvNewPtr = xmalloc_internal ( a_lSize );
 	memset ( l_pvNewPtr, 0, a_lSize );
 	return ( l_pvNewPtr );
 	}
 
-void * xrealloc_internal ( void * a_pvPtr, long int a_lSize )
+void * xrealloc_internal ( void * a_pvPtr, int long a_lSize )
 	{
 	register void * l_pvNewPtr = NULL;
 	if ( a_lSize < 0 )
@@ -89,7 +89,7 @@ void xfree_internal ( void * * a_ppvPtr )
 	return;
 	}
 
-char * xstrdup ( char const * a_pcStr )
+char * xstrdup ( char const * const a_pcStr )
 	{
 	char * l_pcNew = 0;
 	if ( ! a_pcStr )

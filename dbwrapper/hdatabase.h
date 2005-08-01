@@ -51,10 +51,10 @@ public:
 	int login ( char const *,		/* database */
 							char const *,		/* login */
 							char const * );	/* password */
-	long int query ( char const * );
+	int long query ( char const * );
 	void free_result ( void );
 	void * get_result ( void );
-	long int insert_id ( void );
+	int long insert_id ( void );
 	char const * get_error ( void ) const;
 	/*}*/
 protected:
@@ -62,8 +62,8 @@ protected:
 	/*}*/
 private:
 	/*{*/
-	HDataBase ( const HDataBase & );
-	HDataBase & operator = ( const HDataBase & );
+	HDataBase ( HDataBase const & );
+	HDataBase & operator = ( HDataBase const & );
 	/*}*/
 	};
 

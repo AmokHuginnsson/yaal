@@ -51,9 +51,6 @@ namespace hcore
 #define	D_WAS_NOT_EMPTIED				512
 #define D_FINAL_REACHED					1024
 #define D_NOT_FOUND							2048
-#define D_UNSORTED							0
-#define D_ASCENDING							8
-#define D_DESCENDING						( - 8 )
 
 #ifndef NULL
 #define NULL	0
@@ -65,6 +62,7 @@ namespace hcore
 #define E_HLIST_EMPTY					4
 #define E_HLIST_BADOFFSET			5
 #define E_HLIST_BADNUMBER			6
+#define E_HLIST_BADORDER			7
 
 extern char const * g_ppcErrMsgHList [ ];
 
@@ -77,6 +75,13 @@ extern char const * g_ppcErrMsgHList [ ];
 template < typename tType > 
 class HList
 	{
+public:
+	typedef enum
+		{
+		D_UNSORTED,
+		D_ASCENDING,
+		D_DESCENDING
+		} sort_order_t;
 protected:
 	class HElement
 		{
@@ -91,7 +96,7 @@ protected:
 		/****************************************/
 		HElement * f_poNext;
 		int f_iNumber;				/* serial number */
-		long int f_lHits;			/* how many times element's object was accessed */
+		int long f_lHits;			/* how many times element's object was accessed */
 		/*}*/
 	public:
 		/*{*/
@@ -109,8 +114,8 @@ protected:
 		/*}*/
 	private:
 		/*{*/
-		HElement ( const HElement & );
-		HElement & operator = ( const HElement & );
+		HElement ( HElement const & );
+		HElement & operator = ( HElement const & );
 		/*}*/
 		friend class HList< tType >;
 		};
@@ -123,7 +128,7 @@ protected:
 	HElement * f_poHook;			/* "begining" of the list ( "first" element ) */
 	HElement * f_poSelected;	/* local temporary pointer, "cursor" */
 /* for internal use only */
-	int f_iOrder;							/* last-to-current sort order */
+	sort_order_t f_eOrder;		/* last-to-current sort order */
 	int f_iIndex;							/* this two fiels will allow boost operator [ ],
 															 int holds last */
 	HElement * f_poIndex;			/* index and HElement * holds pointer to this
@@ -133,20 +138,20 @@ public:
 	/*{*/
 	HList ( int = 0 );                 /* Creates list, with specified size */
 	virtual ~HList ( void );
-	HList ( const HList & );
-	HList & operator = ( const HList & );
+	HList ( HList const & );
+	HList & operator = ( HList const & );
 	virtual void flush ( void );
 	virtual int quantity ( void );
-	virtual tType & add_element ( tType * = NULL ); /* adds new element at current cursor 
-																						position */
-	virtual tType & add_head ( tType * = NULL );    /* adds new element at beggining of 
-																						the list */
-	virtual tType & add_tail ( tType * = NULL );	/* adds new element at end of the list */
-	virtual tType & add_at ( int, tType * = NULL ); /* adds new element at specified 
-																						position */
-	virtual tType & add_orderly ( tType &, int = D_ASCENDING ); /* adds element in
-																															 the way that
-																															 keeps order */
+	virtual tType & add_element ( tType * = NULL ); /* adds new element at
+																										 current cursor position */
+	virtual tType & add_head ( tType * = NULL );    /* adds new element at
+																										 beggining of the list */
+	virtual tType & add_tail ( tType * = NULL );	/* adds new element at
+																									 end of the list */
+	virtual tType & add_at ( int, tType * = NULL ); /* adds new element
+																										 at specified position */
+/* adds element in the way that keeps order */
+	virtual tType & add_orderly ( tType &, sort_order_t = D_ASCENDING );
 	virtual int remove_element ( int = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
 			tType * * = NULL );	/* rmoves element at current cursor position */
 	virtual int remove_at ( int, int = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
@@ -162,9 +167,9 @@ public:
 	virtual tType * to_head ( int = 1, int = D_TREAT_AS_CLOSED );
 	virtual tType * to_tail ( int = 1, int = D_TREAT_AS_CLOSED );
 	virtual void exchange ( int, int, int = D_SEARCH_AFTER_ORDER );
-	virtual void sort_by_hits ( int = D_ASCENDING );
-	virtual void sort_by_number ( int = D_ASCENDING );
-	virtual void sort_by_contents ( int = D_ASCENDING );
+	virtual void sort_by_hits ( sort_order_t = D_ASCENDING );
+	virtual void sort_by_number ( sort_order_t = D_ASCENDING );
+	virtual void sort_by_contents ( sort_order_t = D_ASCENDING );
 	operator bool ( void ) const;
 	/*}*/
 protected:
@@ -173,14 +178,13 @@ protected:
 	virtual bool to_tail ( HElement * &, int = 1, int = D_TREAT_AS_CLOSED );
 	virtual HElement * element_by_index ( int );
 	virtual HElement * element_by_number ( int );
-	int ( HList< tType >::*cmp ) ( HElement *, HElement * );	/* not realy a
-																																	 function */
-	virtual long int empty ( HElement * );
+	bool ( HList< tType >::* IS_ABOVE ) ( HElement *, HElement * );
+	virtual int long empty ( HElement * );
 	virtual void exchange ( HElement *, HElement * );
 	virtual void sub_swap ( HElement *, HElement *, HElement * );
-	virtual int cmph ( HElement *, HElement * );
-	virtual int cmpn ( HElement *, HElement * );
-	virtual int cmpc ( HElement *, HElement * );
+	virtual bool is_above_h ( HElement *, HElement * );
+	virtual bool is_above_n ( HElement *, HElement * );
+	virtual bool is_above_c ( HElement *, HElement * );
 	virtual void sort ( void );
 	/*}*/
 	};
@@ -246,8 +250,8 @@ tType & HList< tType >::HElement::get ( void )
 template < typename tType >
 HList< tType >::HList ( int a_iSize )
 	: f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
-	f_poHook ( NULL ), f_poSelected ( NULL ), f_iOrder ( D_UNSORTED ),
-	f_iIndex ( 0 ), f_poIndex ( NULL ), cmp ( NULL )
+	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
+	f_iIndex ( 0 ), f_poIndex ( NULL ), IS_ABOVE ( NULL )
 	{
 	M_PROLOG
 	while ( a_iSize -- )
@@ -266,10 +270,10 @@ HList< tType >::~HList ( void )
 	}
 
 template < typename tType >
-HList< tType >::HList ( const HList< tType > & a_roList )
+HList< tType >::HList ( HList < tType > const & a_roList )
 	: f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
-	f_poHook ( NULL ), f_poSelected ( NULL ), f_iOrder ( D_UNSORTED ),
-	f_iIndex ( 0 ), f_poIndex ( NULL ), cmp ( NULL )
+	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
+	f_iIndex ( 0 ), f_poIndex ( NULL ), IS_ABOVE ( NULL )
 	{
 	M_PROLOG
 	( * this ) = a_roList;
@@ -278,7 +282,7 @@ HList< tType >::HList ( const HList< tType > & a_roList )
 	}
 
 template < typename tType >
-HList< tType > & HList< tType >::operator = ( const HList< tType > & a_roList )
+HList< tType > & HList< tType >::operator = ( HList < tType > const & a_roList )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -322,7 +326,7 @@ HList< tType > & HList< tType >::operator = ( const HList< tType > & a_roList )
 					f_poIndex = f_poSelected;
 				}
 			}
-		f_iOrder = a_roList.f_iOrder;
+		f_eOrder = a_roList.f_eOrder;
 		f_iIndex = a_roList.f_iIndex;
 		f_iQuantity = a_roList.f_iQuantity;
 		f_iHighestNumber = a_roList.f_iHighestNumber;
@@ -353,10 +357,10 @@ void HList < tType >::flush ( void )
 	}
 
 template < typename tType >
-long int HList< tType >::empty ( HElement * a_poElement )
+int long HList< tType >::empty ( HElement * a_poElement )
 	{
 	M_PROLOG
-	long int l_lTemp = 0;
+	int long l_lTemp = 0;
 	l_lTemp = a_poElement->f_lHits;
 	a_poElement->f_lHits = 0;
 	return ( l_lTemp );
@@ -372,32 +376,35 @@ int HList< tType >::quantity ( void )
 	}
 
 template < typename tType >
-int HList< tType >::cmph ( HElement * a_poLeft, HElement * a_poRight )
+bool HList< tType >::is_above_h ( HElement * a_poLeft, HElement * a_poRight )
 	{
 	M_PROLOG
-	return ( a_poLeft->f_lHits - a_poRight->f_lHits );
+	return ( f_eOrder == D_ASCENDING
+			? a_poLeft->f_lHits > a_poRight->f_lHits
+			: a_poRight->f_lHits > a_poLeft->f_lHits );
 	M_EPILOG
 	}
 
 template < typename tType >
-int HList< tType >::cmpn ( HElement * a_poLeft, HElement * a_poRight )	
+bool HList< tType >::is_above_n ( HElement * a_poLeft, HElement * a_poRight )	
 	{
 	M_PROLOG
-	return ( a_poLeft->f_iNumber - a_poRight->f_iNumber );
+	return ( f_eOrder == D_ASCENDING
+			? a_poLeft->f_iNumber - a_poRight->f_iNumber
+			: a_poRight->f_iNumber > a_poLeft->f_iNumber );
 	M_EPILOG
 	}
 
 template < typename tType >
-const int compare_contents ( const tType & a_tLeft, const tType & a_tRight )
-	{
-	return ( a_tLeft - a_tRight );
-	}
+bool const operator > ( tType const &, tType const & );
 
 template < typename tType >
-int HList< tType >::cmpc ( HElement * a_poLeft, HElement * a_poRight )	
+bool HList< tType >::is_above_c ( HElement * a_poLeft, HElement * a_poRight )
 	{
 	M_PROLOG
-	return ( compare_contents ( a_poLeft->f_tObject, a_poRight->f_tObject ) );
+	return ( f_eOrder == D_ASCENDING
+			? a_poLeft->f_tObject > a_poRight->f_tObject
+			: a_poRight->f_tObject > a_poLeft->f_tObject );
 	M_EPILOG
 	}
 
@@ -487,27 +494,31 @@ tType & HList< tType >::add_at ( int a_iIndex, tType * a_ptObject )
 	}
 
 template < typename tType >
-tType & HList< tType >::add_orderly ( tType & a_rtObject, int a_iOrder )
+tType & HList< tType >::add_orderly ( tType & a_rtObject,
+		sort_order_t a_eOrder )
 	{
 	M_PROLOG
-#define M_SWITCH ( ( cmpc ( f_poIndex, l_poElement ) * a_iOrder ) < 0 )
 	bool l_bBefore = false;
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iQuantity;
 	HElement * l_poElement = new HElement ( NULL, f_iHighestNumber );
 	l_poElement->put ( a_rtObject );
+	if ( ( f_eOrder != D_UNSORTED ) && ( f_eOrder != a_eOrder ) )
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADORDER ],
+				static_cast < int > ( a_eOrder ) );
+	f_eOrder = a_eOrder;
 	while ( f_iQuantity && ( l_iOldIndex != l_iIndex ) )
 		{
 		l_iOldIndex = l_iIndex;
 		l_iIndex = ( l_iLower + l_iUpper ) / 2;
 		M_IRV ( element_by_index ( l_iIndex ) );
-		if ( M_SWITCH )
+		if ( is_above_c ( f_poIndex, l_poElement ) )
 			l_iLower = l_iIndex;
 		else
 			l_iUpper = l_iIndex;
 		}
 	if ( f_poIndex )
 		{
-		if ( M_SWITCH )
+		if ( is_above_c ( f_poIndex, l_poElement ) )
 			f_poIndex = f_poIndex->f_poNext;
 		else
 			l_bBefore = true;
@@ -1139,6 +1150,9 @@ void HList< tType >::sort ( void )
 	HElement * l_poExtreamLower = NULL;
 	HElement * l_poExtreamUpper = NULL;
 	HElement * l_poPointer = NULL;
+	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADORDER ],
+				static_cast < int > ( f_eOrder ) );
 	while ( l_iCtr >= 0 )
 		{
 		l_iCtrLoc = l_iCtr;
@@ -1148,12 +1162,10 @@ void HList< tType >::sort ( void )
 		while ( l_iCtrLoc -- )
 			{
 			if ( ( l_poPointer != l_poExtreamLower )
-					&& ( ( ( this->* cmp ) ( l_poExtreamLower,
-								l_poPointer ) * f_iOrder ) > 0 ) )
+					&& ( ( this->* IS_ABOVE ) ( l_poExtreamLower, l_poPointer ) ) )
 				l_poExtreamLower = l_poPointer;
 			if ( ( l_poPointer != l_poExtreamUpper )
-					&& ( ( ( this->* cmp ) ( l_poExtreamUpper,
-								l_poPointer ) * f_iOrder ) < 0 ) )
+					&& ( ( this->* IS_ABOVE ) ( l_poPointer, l_poExtreamUpper ) ) )
 				l_poExtreamUpper = l_poPointer;
 			l_poPointer = l_poPointer->f_poNext;
 			}
@@ -1216,33 +1228,33 @@ void HList< tType >::sub_swap ( HElement * a_poLeft, HElement * a_poCenter,
 	}
 
 template < typename tType >
-void HList< tType >::sort_by_hits ( int a_iOrder )
+void HList< tType >::sort_by_hits ( sort_order_t a_eOrder )
 	{
 	M_PROLOG
-	f_iOrder = a_iOrder;
-	cmp = & HList< tType >::cmph ;
+	f_eOrder = a_eOrder;
+	IS_ABOVE = & HList< tType >::is_above_h ;
 	sort ( );
 	return ;
 	M_EPILOG
 	}
 
 template < typename tType >
-void HList < tType >:: sort_by_number ( int a_iOrder )
+void HList < tType >:: sort_by_number ( sort_order_t a_eOrder )
 	{
 	M_PROLOG
-	f_iOrder = a_iOrder;
-	cmp = & HList< tType >::cmpn;
+	f_eOrder = a_eOrder;
+	IS_ABOVE = & HList< tType >::is_above_n;
 	sort ( );
 	return ;
 	M_EPILOG
 	}
 
 template < typename tType >
-void HList < tType >:: sort_by_contents ( int a_iOrder )
+void HList < tType >:: sort_by_contents ( sort_order_t a_eOrder )
 	{
 	M_PROLOG
-	f_iOrder = a_iOrder;
-	cmp = & HList< tType >::cmpc;
+	f_eOrder = a_eOrder;
+	IS_ABOVE = & HList< tType >::is_above_c;
 	sort ( );
 	return ;
 	M_EPILOG

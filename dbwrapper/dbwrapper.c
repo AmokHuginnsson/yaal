@@ -65,7 +65,7 @@ OVariable n_psVariables [ ] =
 		{ D_NONE, NULL, NULL }
 	};
 
-bool set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
+bool const set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )
 		set_env ( a_roValue );

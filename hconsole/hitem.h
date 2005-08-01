@@ -40,7 +40,7 @@ class HItem : public hcore::HArray < hcore::HInfo >
 	{
 public:
 	/*{*/
-	long int	m_lId;
+	int long	m_lId;
 	bool	m_bChecked;
 	/*}*/
 private:
@@ -48,8 +48,8 @@ public:
 	/*{*/
 	HItem ( int  = 0 );
 	virtual ~HItem ( void );
-	HItem ( const HItem &, int = 0 );
-	HItem & operator = ( const HItem & );
+	HItem ( HItem const &, int = 0 );
+	HItem & operator = ( HItem const & );
 	/*}*/
 protected:
 	/*{*/

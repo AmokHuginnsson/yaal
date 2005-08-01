@@ -49,8 +49,8 @@ public:
 			bool = false, bool = true, bool = true, bool = true,
 			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataListControl ( void );
-	virtual void load ( long int );
-	virtual long int get_current_id ( void );
+	virtual void load ( int long );
+	virtual int long get_current_id ( void );
 	virtual void add_new ( void );
 	virtual void cancel_new ( void );
 	/*}*/

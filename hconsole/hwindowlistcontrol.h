@@ -52,7 +52,7 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	virtual long int empty ( hcore::HList < HItem > ::HElement * );
+	virtual int long empty ( hcore::HList < HItem > ::HElement * );
 	/*}*/
 	};
 

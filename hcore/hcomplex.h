@@ -43,34 +43,34 @@ protected:
 public:
 	/*{*/
 	HComplex ( void );
-	HComplex ( const double, const double = 0 );
-	HComplex ( const HComplex & );
+	HComplex ( double const, double const = 0 );
+	HComplex ( HComplex const & );
 	virtual ~HComplex ( void );
 	double re ( void ) const;
 	double im ( void ) const;
-	double set_real ( const double );
-	double set_imaginary ( const double );
-	HComplex & set ( const double, const double );
+	double set_real ( double const );
+	double set_imaginary ( double const );
+	HComplex & set ( double const, double const );
 	double modulus ( void ) const;
 	double argument ( void ) const;
-	HComplex & operator = ( const HComplex & );
-	bool operator == ( const HComplex & ) const;
-	bool operator != ( const HComplex & ) const;
-	HComplex & operator = ( const double );
-	HComplex & operator += ( const HComplex & );
-	HComplex & operator -= ( const HComplex & );
-	HComplex & operator *= ( const HComplex & );
-	HComplex & operator *= ( const double );
-	HComplex & operator /= ( const HComplex & );
-	HComplex & operator /= ( const double );
-	HComplex operator + ( const HComplex & );
-	HComplex operator - ( const HComplex & );
+	HComplex & operator = ( HComplex const & );
+	bool operator == ( HComplex const & ) const;
+	bool operator != ( HComplex const & ) const;
+	HComplex & operator = ( double const );
+	HComplex & operator += ( HComplex const & );
+	HComplex & operator -= ( HComplex const & );
+	HComplex & operator *= ( HComplex const & );
+	HComplex & operator *= ( double const );
+	HComplex & operator /= ( HComplex const & );
+	HComplex & operator /= ( double const );
+	HComplex operator + ( HComplex const & );
+	HComplex operator - ( HComplex const & );
 	HComplex operator - ( void ) const;
-	HComplex operator * ( const HComplex & );
-	HComplex operator * ( const double );
-	HComplex operator / ( const HComplex & );
-	HComplex operator / ( const double );
-	friend HComplex operator * ( const double, const HComplex & );
+	HComplex operator * ( HComplex const & );
+	HComplex operator * ( double const );
+	HComplex operator / ( HComplex const & );
+	HComplex operator / ( double const );
+	friend HComplex operator * ( double const, HComplex const & );
 	/*}*/
 protected:
 	/*{*/

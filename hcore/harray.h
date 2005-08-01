@@ -58,10 +58,10 @@ protected:
 public:
 	/*{*/
 	HArray ( int );
-	HArray ( const int &, tType const & );
+	HArray ( int const &, tType const & );
 	virtual ~HArray ( void );
-	HArray ( const HArray & );
-	HArray & operator = ( const HArray & );
+	HArray ( HArray const & );
+	HArray & operator = ( HArray const & );
 	tType & operator [ ] ( int );
 	int get_size ( void ) const;
 	operator bool ( void ) const;
@@ -89,7 +89,7 @@ HArray < tType >::HArray ( int a_iSize ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	}
 
 template < typename tType >
-HArray < tType >::HArray ( const int & a_iSize, tType const & a_tFillWith )
+HArray < tType >::HArray ( int const & a_iSize, tType const & a_tFillWith )
 	: f_iSize ( 0 ), f_ptArray ( NULL )
 	{
 	M_PROLOG
@@ -122,7 +122,7 @@ HArray < tType >::~HArray ( void )
 	}
 
 template < typename tType >
-HArray < tType >::HArray ( const HArray & a_roArray ) : f_iSize ( 0 ), f_ptArray ( NULL )
+HArray < tType >::HArray ( HArray const & a_roArray ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	{
 	M_PROLOG
 	( * this ) = a_roArray;
@@ -131,7 +131,7 @@ HArray < tType >::HArray ( const HArray & a_roArray ) : f_iSize ( 0 ), f_ptArray
 	}
 
 template < typename tType >
-HArray < tType > & HArray < tType >::operator = ( const HArray & a_roArray )
+HArray < tType > & HArray < tType >::operator = ( HArray const & a_roArray )
 	{
 	M_PROLOG
 	int l_iCtr = 0;

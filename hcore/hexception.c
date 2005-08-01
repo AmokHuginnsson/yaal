@@ -43,9 +43,10 @@ namespace stdhapi
 namespace hcore
 {
 
-HException::HException ( char const * a_pcFileName,
-												 char const * a_pcFunctionName,
-												 int a_iLine, char const * a_pcMessage, int a_iCode )
+HException::HException ( char const * const a_pcFileName,
+												 char const * const a_pcFunctionName,
+												 int const a_iLine, char const * const a_pcMessage,
+												 int const a_iCode )
 	: f_bLocal ( false ), f_cChar ( 0 ), f_iInt ( 0 ), f_lLong ( 0 ),
 	f_dDouble ( 0 ), f_pcCharPtr ( NULL ), f_pvVoidPtr ( NULL ), f_iFrame ( 0 ),
 	f_pcFileName ( NULL ), f_pcFunctionName ( NULL ),
@@ -60,7 +61,7 @@ HException::HException ( char const * a_pcFileName,
 	return;
 	}
 
-HException::HException ( const HException & a_roException )
+HException::HException ( HException const & a_roException )
 	: f_bLocal ( false ), f_cChar ( a_roException.f_cChar ),
 	f_iInt ( a_roException.f_iInt ), f_lLong ( a_roException.f_lLong ),
 	f_dDouble ( a_roException.f_dDouble ), f_pcCharPtr ( NULL ),
@@ -100,8 +101,9 @@ HException::~HException ( void )
 	return;
 	}
 
-void HException::set ( char a_cChar, int a_iInt, long a_lLong, double a_dDouble,
-											 char const * a_pcStr, void * a_pvVoidPtr )
+void HException::set ( char const a_cChar, int const a_iInt,
+		long const a_lLong, double const a_dDouble, char const * const a_pcStr,
+		void * const a_pvVoidPtr )
 	{
 	f_cChar = a_cChar;
 	f_iInt = a_iInt;
@@ -115,7 +117,7 @@ void HException::set ( char a_cChar, int a_iInt, long a_lLong, double a_dDouble,
 	return;
 	}
 
-void HException::set ( char const * a_pcStr )
+void HException::set ( char const * const a_pcStr )
 	{
 	if ( f_pcCharPtr )
 		xfree ( f_pcCharPtr );
@@ -124,7 +126,7 @@ void HException::set ( char const * a_pcStr )
 	return;
 	}
 
-void HException::print_error ( bool a_bFull ) const
+void HException::print_error ( bool const a_bFull ) const
 	{
 	fprintf ( stderr, "\nException: %s, %d.\n", f_pcMessage, f_iCode );
 	if ( a_bFull )
@@ -134,8 +136,8 @@ void HException::print_error ( bool a_bFull ) const
 	return;
 	}
 
-void HException::log ( char const * a_pcFileName,
-											 char const * a_pcFunctionName, int a_iLine )
+void HException::log ( char const * const a_pcFileName,
+											 char const * const a_pcFunctionName, int const a_iLine )
 	{
 	size_t l_uiLength = strlen ( a_pcFileName );
 	if ( f_iFrame
@@ -154,9 +156,9 @@ char const * HException::what ( void ) const
 	}
 
 #ifdef _EXECINFO_H
-void HException::dump_call_stack ( int a_iLevel )
+void HException::dump_call_stack ( int const a_iLevel )
 #else /* _EXECINFO_H */
-void HException::dump_call_stack ( int )
+void HException::dump_call_stack ( int const )
 #endif /* not _EXECINFO_H */
 	{
 #ifdef _EXECINFO_H
@@ -186,8 +188,9 @@ HException * HException::operator-> ( void )
 	return ( this );
 	}
 
-void HException::failed_assert ( char const * a_pcFileName,
-		char const * a_pcFunctionName, int a_iLine, char const * a_pcMessage )
+void HException::failed_assert ( char const * const a_pcFileName,
+		char const * const a_pcFunctionName, int const a_iLine,
+		char const * const a_pcMessage )
 	{
 	M_PROLOG
 	fprintf ( stderr, "Failed assertion: `%s' at: %s: %4d: %s\n",

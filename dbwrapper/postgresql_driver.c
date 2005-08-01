@@ -113,7 +113,7 @@ int rs_fields_count ( void * a_pvData )
 	return ( PQnfields ( ( PGresult * ) a_pvData ) );
 	}
 
-long int dbrs_records_count ( void *, void * a_pvDataR )
+int long dbrs_records_count ( void *, void * a_pvDataR )
 	{
 	char * l_pcTmp = PQcmdTuples ( ( PGresult * ) a_pvDataR );
 	if ( l_pcTmp && l_pcTmp [ 0 ] )
@@ -122,7 +122,7 @@ long int dbrs_records_count ( void *, void * a_pvDataR )
 		return ( PQntuples ( ( PGresult * ) a_pvDataR ) );
 	}
 
-long int dbrs_id ( void *, void * a_pvDataR )
+int long dbrs_id ( void *, void * a_pvDataR )
 	{
 	return ( PQoidValue ( ( PGresult * ) a_pvDataR ) );
 	}

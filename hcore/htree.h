@@ -58,7 +58,7 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	virtual long int empty ( typename HList < ttType > ::HElement * );
+	virtual int long empty ( typename HList < ttType > ::HElement * );
 	/*}*/
 	};
 
@@ -96,8 +96,8 @@ protected:
 		/*}*/
 	private:
 		/*{*/
-		HNode ( const HNode & );
-		HNode & operator = ( const HNode & );
+		HNode ( HNode const & );
+		HNode & operator = ( HNode const & );
 		/*}*/
 		friend class HTree < tttType >;
 		friend class HBranchList < HNode * >;
@@ -123,8 +123,8 @@ public:
 	/*}*/
 private:
 	/*{*/
-	HTree ( const HTree & );
-	HTree & operator = ( const HTree & );
+	HTree ( HTree const & );
+	HTree & operator = ( HTree const & );
 	/*}*/
 	friend class HTree < tttType > :: HNode;
 	};
@@ -147,7 +147,7 @@ HBranchList < ttType > ::~HBranchList ( void )
 	}
 
 template < typename ttType >
-long int HBranchList < ttType > ::empty ( typename HList < ttType > ::HElement * a_poElement )
+int long HBranchList < ttType > ::empty ( typename HList < ttType > ::HElement * a_poElement )
 	{
 	M_PROLOG
 	ttType l_poLocalRoot = a_poElement->get_object ( );
@@ -229,7 +229,8 @@ typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
 	HNode * * l_ppoNode = NULL;
 	if ( f_poTrunk )
 		{
-		while ( ( l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED ) ) )
+		while ( ( l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,
+						D_TREAT_AS_OPENED ) ) )
 			if ( ( * l_ppoNode ) == this )
 				break;
 		l_ppoNode = & f_poTrunk->f_oBranch.present ( );

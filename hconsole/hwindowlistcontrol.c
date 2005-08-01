@@ -58,7 +58,7 @@ HWindowListControl::~HWindowListControl ( void )
 	M_EPILOG
 	}
 
-long int HWindowListControl::empty ( HElement* a_poElement )
+int long HWindowListControl::empty ( HElement* a_poElement )
 	{
 	M_PROLOG
 	HWindow * l_poWindow = NULL;

@@ -51,7 +51,7 @@ HControlList::~HControlList ( void )
 	M_EPILOG
 	}
 
-long int HControlList::empty ( HList < HControl * > ::HElement* a_poElement )
+int long HControlList::empty ( HList < HControl * > ::HElement* a_poElement )
 	{
 	M_PROLOG
 	HControl * l_poControl = a_poElement->get_object ( );

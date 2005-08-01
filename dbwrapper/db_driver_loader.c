@@ -108,11 +108,11 @@ char * ( * rs_get ) ( void *, int, int );
 typedef int ( * t7 ) ( void * );
 int ( * rs_fields_count ) ( void * );
 
-typedef long int ( * t8 ) ( void *, void * );
-long int ( * dbrs_records_count ) ( void *, void * );
+typedef int long ( * t8 ) ( void *, void * );
+int long ( * dbrs_records_count ) ( void *, void * );
 
-typedef long int ( * t9 ) ( void *, void * );
-long int ( * dbrs_id ) ( void *, void * );
+typedef int long ( * t9 ) ( void *, void * );
+int long ( * dbrs_id ) ( void *, void * );
 
 typedef char * ( * tA ) ( void *, int );
 char * ( * rs_column_name ) ( void *, int );
@@ -167,13 +167,13 @@ int null_rs_fields_count ( void * )
 	return ( 0 );
 	}
 
-long int null_dbrs_records_count ( void *, void * )
+int long null_dbrs_records_count ( void *, void * )
 	{
 	log ( D_LOG_ERROR ) << M_DB_ERR ( "(dbrs_records_count)" ) << endl;
 	return ( 0 );
 	}
 
-long int null_dbrs_id ( void *, void * )
+int long null_dbrs_id ( void *, void * )
 	{
 	log ( D_LOG_ERROR ) << M_DB_ERR ( "(dbrs_id)" ) << endl;
 	return ( 0 );
@@ -339,14 +339,14 @@ int autoloader_rs_fields_count ( void * a_pvResult )
 	return ( rs_fields_count ( a_pvResult ) );
 	}
 
-long int autoloader_dbrs_records_count ( void * a_pvDataBase,
+int long autoloader_dbrs_records_count ( void * a_pvDataBase,
 		void * a_pvResult )
 	{
 	load_driver ( );
 	return ( dbrs_records_count ( a_pvDataBase, a_pvResult ) );
 	}
 
-long int autoloader_dbrs_id ( void * a_pvDataBase, void * a_pvResult )
+int long autoloader_dbrs_id ( void * a_pvDataBase, void * a_pvResult )
 	{
 	load_driver ( );
 	return ( dbrs_id ( a_pvDataBase, a_pvResult ) );

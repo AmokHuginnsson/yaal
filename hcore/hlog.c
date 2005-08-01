@@ -107,7 +107,8 @@ HLog::~HLog ( void )
 	M_EPILOG
 	}
 
-void HLog::rehash ( FILE * a_psStream, char const * a_pcProcessName )
+void HLog::rehash ( FILE * a_psStream,
+		char const * const a_pcProcessName )
 	{
 	M_PROLOG
 #ifndef HAVE_GETLINE
@@ -156,7 +157,8 @@ void HLog::rehash ( FILE * a_psStream, char const * a_pcProcessName )
 	M_EPILOG
 	}
 
-void HLog::rehash ( char const * a_pcLogFileName, char const * a_pcProcessName )
+void HLog::rehash ( char const * const a_pcLogFileName,
+		char const * const a_pcProcessName )
 	{
 	M_PROLOG
 	if ( ! a_pcLogFileName )
@@ -204,7 +206,7 @@ void HLog::timestamp ( FILE * a_psStream )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( char const * a_pcFormat, va_list a_xAp )
+int HLog::operator ( ) ( char const * const a_pcFormat, va_list const a_xAp )
 	{
 	M_PROLOG
 	int l_iErr = 0;
@@ -225,7 +227,7 @@ int HLog::operator ( ) ( char const * a_pcFormat, va_list a_xAp )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( char const * a_pcFormat, ... )
+int HLog::operator ( ) ( char const * const a_pcFormat, ... )
 	{
 	M_PROLOG
 	int l_iErr = 0;
@@ -240,7 +242,8 @@ int HLog::operator ( ) ( char const * a_pcFormat, ... )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( long int a_lType, char const * a_pcFormat, ... )
+int HLog::operator ( ) ( int long const a_lType,
+		char const * const a_pcFormat, ... )
 	{
 	M_PROLOG
 	int l_iErr = 0;
@@ -256,7 +259,7 @@ int HLog::operator ( ) ( long int a_lType, char const * a_pcFormat, ... )
 	M_EPILOG
 	}
 
-HLog & HLog::operator ( ) ( long int a_lType )
+HLog & HLog::operator ( ) ( int long const a_lType )
 	{
 	M_PROLOG
 	f_lType = a_lType;
@@ -264,7 +267,7 @@ HLog & HLog::operator ( ) ( long int a_lType )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( char const * a_pcString )
+HLog & HLog::operator << ( char const * const a_pcString )
 	{
 	M_PROLOG
 	if ( ! a_pcString )
@@ -308,23 +311,23 @@ HLog & HLog::operator << ( char const a_cChar )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( const int a_iInteger )
+HLog & HLog::operator << ( int const a_iInteger )
 	{
 	M_PROLOG
-	long int l_lTmp = a_iInteger;
+	int long l_lTmp = a_iInteger;
 	return ( * this << l_lTmp );
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( const unsigned int a_uiInteger )
+HLog & HLog::operator << ( int unsigned const a_uiInteger )
 	{
 	M_PROLOG
-	unsigned long int l_ulTmp = a_uiInteger;
+	int long unsigned l_ulTmp = a_uiInteger;
 	return ( * this << l_ulTmp );
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( const long int a_lLongInteger )
+HLog & HLog::operator << ( int long const a_lLongInteger )
 	{
 	M_PROLOG
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
@@ -340,7 +343,7 @@ HLog & HLog::operator << ( const long int a_lLongInteger )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( const unsigned long int a_ulLongInteger )
+HLog & HLog::operator << ( int long unsigned const a_ulLongInteger )
 	{
 	M_PROLOG
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
@@ -356,7 +359,7 @@ HLog & HLog::operator << ( const unsigned long int a_ulLongInteger )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( const double a_dDouble )
+HLog & HLog::operator << ( double const a_dDouble )
 	{
 	M_PROLOG
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
@@ -372,7 +375,7 @@ HLog & HLog::operator << ( const double a_dDouble )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( void * a_pvPtr )
+HLog & HLog::operator << ( void * const a_pvPtr )
 	{
 	M_PROLOG
 	( * this ) ( "%p", a_pvPtr );
@@ -380,7 +383,7 @@ HLog & HLog::operator << ( void * a_pvPtr )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( HLog & ( * x_log ) ( HLog & ) )
+HLog & HLog::operator << ( HLog & ( * const x_log ) ( HLog & ) )
 	{
 	M_PROLOG
 	return ( x_log ( * this ) );

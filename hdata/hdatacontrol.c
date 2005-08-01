@@ -54,14 +54,14 @@ HDataControl::~HDataControl ( void )
 	M_EPILOG
 	}
 
-void HDataControl::load ( long int )
+void HDataControl::load ( int long )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-long int HDataControl::get_current_id ( void )
+int long HDataControl::get_current_id ( void )
 	{
 	M_PROLOG
 	return ( -1 );

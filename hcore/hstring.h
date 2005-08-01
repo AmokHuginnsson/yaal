@@ -43,81 +43,86 @@ protected:
 public:
 	/*{*/
 	HString ( void );
-	HString ( const HString & );
-	HString ( const int, bool ); /* initialize immediately with size */
+	HString ( HString const & );
+	HString ( int const, bool const ); /* initialize immediately with size */
 	virtual ~HString ( void ) ;
-	void hs_realloc ( const int );
-	HString ( char const * );
-	HString ( char );
-	HString ( int );
-	HString ( long int );
-	HString ( double );
-	HString ( const void * );
-	HString & operator = ( const HString & );
-	HString & operator += ( const HString & );
-	HString & operator <<= ( const int );
-	HString operator + ( const HString & ) const;
+	void hs_realloc ( int const );
+	HString ( char const * const );
+	HString ( char const );
+	HString ( int const );
+	HString ( int long const );
+	HString ( double const );
+	HString ( void const * const );
+	HString & operator = ( HString const & );
+	HString & operator += ( HString const & );
+	HString & operator <<= ( int const );
+	HString operator + ( HString const & ) const;
 	HString operator + ( char const * ) const;
 	HString operator + ( char const ) const;
-	HString operator + ( const int ) const;
-	HString operator + ( const long int ) const;
-	HString operator + ( const double ) const;
-	HString operator + ( const void * ) const;
-	char & operator [ ] ( const int );
-	bool operator == ( const HString & ) const;
-	bool operator == ( char const * ) const;
-	bool operator != ( const HString & ) const;
-	bool operator != ( char const * ) const;
-	bool operator >= ( const HString & ) const;
-	bool operator >= ( char const * ) const;
-	bool operator <= ( const HString & ) const;
-	bool operator <= ( char const * ) const;
-	bool operator > ( const HString & ) const;
-	bool operator > ( char const * ) const;
-	bool operator < ( const HString & ) const;
-	bool operator < ( char const * ) const;
+	HString operator + ( int const ) const;
+	HString operator + ( int long const ) const;
+	HString operator + ( double const ) const;
+	HString operator + ( void const * const ) const;
+	char & operator [ ] ( int const );
+	bool operator == ( HString const & ) const;
+	bool operator == ( char const * const ) const;
+	bool operator != ( HString const & ) const;
+	bool operator != ( char const * const ) const;
+	bool operator >= ( HString const & ) const;
+	bool operator >= ( char const * const ) const;
+	bool operator <= ( HString const & ) const;
+	bool operator <= ( char const * const ) const;
+	bool operator > ( HString const & ) const;
+	bool operator > ( char const * const ) const;
+	bool operator < ( HString const & ) const;
+	bool operator < ( char const * const ) const;
 	operator char * ( void ) const; /* add_* functions in HList needs operator
 																		 bool ( ) operator char * works fine here */
 	bool is_empty ( void ) const;
 	int get_length ( void ) const;
-	HString & format ( char const *, ... );
-	int find ( char, int = 0 ) const;
-	int find ( char const *, int = 0 ) const;
-	int reverse_find ( char, int = 0 ) const;
-	HString & replace ( char const *, char const * );
+	HString & format ( char const * const, ... );
+	int find ( char const, int const = 0 ) const;
+	int find ( char const * const, int const = 0 ) const;
+	int reverse_find ( char const, int const = 0 ) const;
+	int find_one_of ( char const * const, int const = 0 ) const;
+	int find_other_than ( char const * const, int const = 0 ) const;
+	HString & replace ( char const * const, char const * const );
 	HString & upper ( void );
 	HString & lower ( void );
 	HString & reverse ( void );
-	HString left ( int ) const;
-	HString mid ( int, int = 0 ) const;
-	HString right  ( int ) const;
-	HString & trim_left ( char const * = " \t\r\n" );
-	HString & trim_right ( char const * = " \t\r\n" );
-	HString split ( char const *, int ) const;
+	HString left ( int const ) const;
+	HString mid ( int const, int /* no const - reused */ = 0 ) const;
+	HString right  ( int /* not const - reused */ ) const;
+	HString & trim_left ( char const * const = " \t\r\n" );
+	HString & trim_right ( char const * const = " \t\r\n" );
+	HString split ( char const * const, int const ) const;
 	/*}*/
 protected:
 	/*{*/
 	/*}*/
 	};
 
-HString operator + ( char const *, const HString & );
-HString operator + ( char const, const HString & );
-HString operator + ( const int, const HString & );
-HString operator + ( const long int, const HString & );
-HString operator + ( const double, const HString & );
-HString operator + ( const void *, const HString & );
-bool operator == ( char const *, const HString & );
-bool operator != ( char const *, const HString & );
-bool operator >= ( char const *, const HString & );
-bool operator <= ( char const *, const HString & );
-bool operator > ( char const *, const HString & );
-bool operator < ( char const *, const HString & );
+HString operator + ( char const *, HString const & );
+HString operator + ( char const, HString const & );
+HString operator + ( int const, HString const & );
+HString operator + ( int long const, HString const & );
+HString operator + ( double const, HString const & );
+HString operator + ( void const * const, HString const & );
+bool operator == ( char const * const, HString const & );
+bool operator != ( char const * const, HString const & );
+bool operator >= ( char const * const, HString const & );
+bool operator <= ( char const * const, HString const & );
+bool operator > ( char const * const, HString const & );
+bool operator < ( char const * const, HString const & );
 
 /* Useful helpers */
-char * strrnpbrk ( char const *, char const *, int );
-char const * strrpbrk ( char const *, char const * );
-int strrnspn ( char const *, char const *, int );
-int strrspn ( char const *, char const * );
+char * strrnpbrk ( char const * const, char const * const,
+		int /* no const - used */ );
+char const * strrpbrk ( char const * const, char const * const );
+int strrnspn ( char const * const, char const * const, int const );
+int strrspn ( char const * const, char const * const );
+
+extern char const n_pcWhiteSpace [ ];
 
 }
 

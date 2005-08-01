@@ -61,9 +61,8 @@ class HListControl : public hcore::HList < HItem >, public virtual HSearchableCo
 		/*{*/
 		HColumnInfo ( void );
 		virtual ~HColumnInfo ( void );
-		HColumnInfo ( const HColumnInfo & );
-		HColumnInfo & operator = ( const HColumnInfo & );
-		const int operator - ( const HColumnInfo & ) const;
+		HColumnInfo ( HColumnInfo const & );
+		HColumnInfo & operator = ( HColumnInfo const & );
 		/*}*/
 	protected:
 		/*{*/
@@ -92,7 +91,7 @@ protected:
 		} f_sMatch;
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
-	long int		f_lComparedItems;			/* items already compared during sorting */
+	int long		f_lComparedItems;			/* items already compared during sorting */
 	/*}*/
 public:
 	/*{*/
@@ -114,14 +113,14 @@ public:
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );
 	virtual int process_input( int );
-	void add_column ( const int &,									/* at position */
+	void add_column ( int const &,									/* at position */
 										char const *,									/* column name */
-										const int &,									/* width */
-										const int & = D_ALIGN_LEFT,		/* align */
+										int const &,									/* width */
+										int const & = D_ALIGN_LEFT,		/* align */
 										const hcore::type_t & = hcore::D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
 	virtual HItem & add_tail ( HItem * = NULL );
-	virtual HItem & add_orderly ( HItem &, int = D_ASCENDING );
+	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
 	virtual int remove_element ( int = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual int remove_tail ( int = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual bool is_searchable ( void );
@@ -129,20 +128,18 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	virtual int cmpc ( HElement *, HElement * );
-	void sort_by_column ( int, int = D_ASCENDING );
+	virtual bool is_above_c ( HElement *, HElement * );
+	void sort_by_column ( int, sort_order_t = D_ASCENDING );
 	void recalculate_column_widths ( void );
 	virtual void go_to_match ( void );
 	virtual void go_to_match_previous ( void );
 	/*}*/
 private:
 	/*{*/
-	HListControl ( const HListControl & );
-	HListControl & operator = ( const HListControl & );
+	HListControl ( HListControl const & );
+	HListControl & operator = ( HListControl const & );
 	/*}*/
 	};
-
-const int compare_contents ( const HItem &, const HItem & );
 
 }
 

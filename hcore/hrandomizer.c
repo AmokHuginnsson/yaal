@@ -37,14 +37,15 @@ namespace stdhapi
 namespace hcore
 {
 
-HRandomizer::HRandomizer ( unsigned long int a_ulSeed ) : f_ulSeed ( a_ulSeed )
+HRandomizer::HRandomizer ( int long unsigned const a_ulSeed )
+	: f_ulSeed ( a_ulSeed )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 	
-void HRandomizer::set ( unsigned long int a_ulVal )
+void HRandomizer::set ( int long unsigned const a_ulVal )
 	{
 	M_PROLOG
 	f_ulSeed = a_ulVal;

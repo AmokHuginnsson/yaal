@@ -27,8 +27,8 @@ Copyright:
 #ifndef __HCONSOLE_HEDITCONTROL_H
 #define __HCONSOLE_HEDITCONTROL_H
 
+#include "hcore/hlist.h"
 #include "hcore/hpattern.h"
-#include "hcore/hstringlist.h"
 #include "hcontrol.h"
 
 namespace stdhapi
@@ -60,12 +60,12 @@ protected:
 	int					f_iControlOffset;			/* when content is bigger than control size
 																			 this variable keeps offset of first
 																			 character shown */
-	int					f_iMaxHistoryLevel;		/* how many instertions should history keep */
+	int					f_iMaxHistoryLevel;	/* how many instertions should history keep */
 	hcore::HPattern			f_oPattern;		/* regular expression describing what
 																			 characters and
 																			 in what way can be entered */
 	hcore::HString			f_oString;		/* control content */
-	hcore::HStringList	f_oHistory; 	/* history of insertions */
+	hcore::HList< hcore::HString >	f_oHistory;	/* history of insertions */
 	/*}*/
 public:
 	/*{*/
@@ -90,7 +90,7 @@ public:
 	virtual ~HEditControl ( void );
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );
-	virtual void set ( const hcore::HInfo & );
+	virtual void set ( hcore::HInfo const & );
 	virtual hcore::HInfo get ( void );
 	void set_flags ( bool = false, bool = false );
 	virtual int process_input( int );

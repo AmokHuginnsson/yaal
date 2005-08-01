@@ -25,6 +25,9 @@
 /* Include paths */
 -i"/home/amok/prog/stdhapi"
 -i"."
+-i"/usr/lib/gcc/i686-pld-linux/4.0.0"
+-i"/usr/lib/gcc/i686-pld-linux/4.0.0/include"
+-i"/usr/include/c++/4.0.0"
 -i"/usr/include/c++/3.3"
 -i"/usr/include/c++/3.3/i486-linux"
 -i"/usr/lib/gcc-lib/i486-linux/3.3.5"
@@ -56,7 +59,7 @@
 +e939 // return type defaults to int
 +e940 // omitted braces within an initializer
 +e943 // Too few initializers for aggregate
-+e944 // argument for operator always evaluates to true/false
+//+e944 // argument for operator always evaluates to true/false // another bug
 //+e952 // parameter could be declared const
 //+e953 // variable could be declared const
 //+e954 // pointer could be declared const
@@ -89,6 +92,7 @@
 -e732		/* Loss of sign */
 -e737		/* Loss of sign in promotion from int to unsigned long */
 -e743		/* Negative character constant */
+-e749		/* local enumeration constant 'constant' not referenced */
 -e750		/* local macro 'macro' not referenced */
 -e754		/* local structure member 'member' not referenced */
 -e755		/* global macro 'macro' not referenced */
@@ -117,9 +121,10 @@
 -e1735	/* virtual 'member' has default parameter */
 -e1739	/* Binary operator 'operator' should be non-member function */
 -e1740	/* pointer member 'member' not directly freed or zeroed by destructor */
+-e1750	/* local template 'template' not referenced */
 -e1763	/* Member function 'member' marked as const indirectly modifies class */
 
-
+-emacro({413},SUN_LEN)						/* Likely use of null pointer 'pointer' in left argument to operator '->' */
 -emacro(506,bkgd,attr_get)			/* Constant value Boolean */
 -emacro(572,M_MAKE_ATTR)				/* Excessive shift value (precision 1 shifted right by 1) */
 -emacro(573,FD_SET,FD_ISSET)		/* Signed-unsigned mix with divide */
@@ -132,8 +137,9 @@
 -emacro(1551,M_EPILOG)		/* Function may throw exception '...' in  destructor 'destructor' */
 -emacro(1559,M_EPILOG)		/* Uncaught exception 'exception' may be thrown in destructor 'destructor' */
 -emacro(1775,M_EPILOG)		/* catch block does not catch any declared exception */
--emacro(1924,attr_get,FD_SET,FD_ISSET,addch,SIG_IGN,SIG_DFL) /* C-style cast */
+-emacro(1924,attr_get,FD_SET,FD_ISSET,addch,SIG_IGN,SIG_DFL,SUN_LEN) /* C-style cast */
 
+-esym(18,sigevent::_sigev_un)	/* Symbol 'symbol' redeclared */
 -esym(418,strftime,fflush)	/* Passing null pointer to function 'function' */
 -esym(449,l_poAtom)					/* Pointer variable 'variable' previously deallocated */
 -esym(526,stdhapi::hcore::HList<<1>>,"stdhapi::hcore::HMap<<1>,<2>>",stdhapi::hcore::HTree<<1>>)	/* Symbol 'symbol' not defined */
@@ -148,7 +154,7 @@
 -esym(1539,stdhapi::tools::HXmlData::f_ps*) /* member 'member' not assigned by assignment opeator */
 -esym(1536,stdhapi::tools::HAnalyser::f_pdVariables,stdhapi::hdata::HDataProcess::f_oDataBase) /* Exposing low access member 'member' */
 -esym(1554,*_pv*) /* Direct pointer copy of member 'member' within copy constructor: 'constructor' */
--esym(1555,*_pv*,stdhapi::hconsole::HListControl::HColumnInfo::f_poControl) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
+-esym(1555,*_pv*,stdhapi::hconsole::HListControl::HColumnInfo::f_poControl,stdhapi::hconsole::OMenuItem::f_psSubMenu,stdhapi::hconsole::OMenuItem::HANDLER) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
 -esym(1725,stdhapi::hcore::HLock::f_roMutex) /* class member 'member' is a reference */
 -esym(1764,a_roOption,a_roValue)
 -esym(1769,stdhapi::hcore::HPattern::f_sCompiled,stdhapi::hcore::HCondition::f_sAttributes,stdhapi::hcore::HCondition::f_xCondition,stdhapi::hcore::HThread::f_sAttributes,stdhapi::hcore::HMutex::f_sAttributes,stdhapi::hcore::HMutex::f_xMutex,stdhapi::hcore::HTime::f_sBroken,stdhapi::hconsole::HEditControl::f_sMask,stdhapi::hconsole::HListControl::f_sMatch,stdhapi::hconsole::HProcess::f_sLatency,stdhapi::hconsole::HProcess::f_xFileDescriptorSet,stdhapi::tools::HSerial::f_sTIO,stdhapi::tools::HSerial::f_sBackUpTIO,stdhapi::tools::signals::HSigStackWrapper::f_sStack) /* Member or base class 'class' has no constructor */

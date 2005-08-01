@@ -41,7 +41,7 @@ namespace stdhapi
 namespace hcore
 {
 
-long int n_lLogMask = 0;
+int long n_lLogMask = 0;
 int n_iDebugLevel = 0;
 HLog log;
 
@@ -59,7 +59,7 @@ bool eq ( double const & a_dLeft, double const & a_dRight )
 					: ( ( a_dRight ) - ( a_dLeft ) ) ) < D_EPSILON ) );
 	}
 
-bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
+bool const set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -92,12 +92,13 @@ bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 	M_EPILOG
 	}
 
-void set_env ( char const * a_pcVarValue )
+void set_env ( char const * const a_pcVarValue )
 	{
 	M_PROLOG
 	char * l_pcPtr = NULL;
 	if ( ( strlen ( a_pcVarValue ) < 3 )
-			|| ( ( ! ( l_pcPtr = const_cast < char * > ( strpbrk ( a_pcVarValue, " \t" ) ) ) ) ) )
+			|| ( ( ! ( l_pcPtr = const_cast < char * > ( strpbrk ( a_pcVarValue,
+								" \t" ) ) ) ) ) )
 		{
 		log ( D_LOG_ERROR ) << "bad set_env argument: `";
 		log << a_pcVarValue << '\'' << endl;

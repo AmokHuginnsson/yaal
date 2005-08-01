@@ -45,7 +45,8 @@ namespace hcore
 namespace rc_file
 {
 	
-int rc_open ( char const * a_pcRcName, bool a_bLocal, HFile & a_roFile )
+int rc_open ( char const * const a_pcRcName, bool const a_bLocal,
+		HFile & a_roFile )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -108,9 +109,10 @@ bool substitute_environment ( HString & a_roString )
 	return ( false );
 	}
 
-int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection,
-		OVariable const * a_psVaraibles, int a_iCount,
-		bool ( * set_variables ) ( HString &, HString & ) )
+int process_rc_file_internal ( char const * const a_pcRcName,
+		char const * const a_pcSection,
+		OVariable const * const a_psVaraibles, int const a_iCount,
+		bool const ( * const set_variables ) ( HString &, HString & ) )
 	{
 	M_PROLOG
 	bool l_pbTFTab [ ] = { false, true }, l_bSection = false, l_bOptionOK;
@@ -223,8 +225,6 @@ int process_rc_file_internal ( char const * a_pcRcName, char const * a_pcSection
  * stores rest of line in a_pcValue, returns 1 if there are more lines
  * to read and 0 in other case. */
 
-char const n_pcWhiteSpace [ ] = " \t\n\v\f\r";
-
 void strip_comment ( char * a_pcBuffer )
 	{
 	M_PROLOG
@@ -318,7 +318,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, HFile & a_roFile,
 	M_EPILOG
 	}
 	
-void rc_set_variable ( char const * a_pcValue, bool & a_rbVariable )
+void rc_set_variable ( char const * const a_pcValue, bool & a_rbVariable )
 	{
 	M_PROLOG
 	static HString l_oMessage;
@@ -344,7 +344,7 @@ void rc_set_variable ( char const * a_pcValue, bool & a_rbVariable )
 	return;
 	}
 
-void rc_set_variable ( char const * a_pcValue, char ** a_ppcVariable )
+void rc_set_variable ( char const * const a_pcValue, char ** a_ppcVariable )
 	{
 	if ( * a_ppcVariable )
 		xfree ( * a_ppcVariable );
@@ -353,7 +353,7 @@ void rc_set_variable ( char const * a_pcValue, char ** a_ppcVariable )
 	return;
 	}
 
-void rc_set_variable ( char const * a_pcValue, int & a_riVariable )
+void rc_set_variable ( char const * const a_pcValue, int & a_riVariable )
 	{
 	int l_iBase = 10;
 	if ( ( strlen ( a_pcValue ) > 2 ) && ( a_pcValue [ 1 ] == 'x' ) )
@@ -361,7 +361,7 @@ void rc_set_variable ( char const * a_pcValue, int & a_riVariable )
 	a_riVariable = strtol ( a_pcValue, NULL, l_iBase );
 	}
 
-void rc_set_variable ( char const * a_pcValue, char & a_rcVariable )
+void rc_set_variable ( char const * const a_pcValue, char & a_rcVariable )
 	{
 	a_rcVariable = a_pcValue [ 0 ];
 	}

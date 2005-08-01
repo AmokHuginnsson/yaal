@@ -46,7 +46,7 @@ HInfo::HInfo ( void )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( const int & a_riInt )
+HInfo::HInfo ( int const & a_riInt )
 	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
@@ -56,7 +56,7 @@ HInfo::HInfo ( const int & a_riInt )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( const long int & a_rlLongInt )
+HInfo::HInfo ( int long const & a_rlLongInt )
 	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
@@ -66,7 +66,7 @@ HInfo::HInfo ( const long int & a_rlLongInt )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( const double & a_rdDouble )
+HInfo::HInfo ( double const & a_rdDouble )
 	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
@@ -76,7 +76,7 @@ HInfo::HInfo ( const double & a_rdDouble )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( void * a_pvPointer )
+HInfo::HInfo ( void * const a_pvPointer )
 	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
@@ -86,7 +86,7 @@ HInfo::HInfo ( void * a_pvPointer )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( char const * a_pcBuffer )
+HInfo::HInfo ( char const * const a_pcBuffer )
 	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
@@ -96,7 +96,7 @@ HInfo::HInfo ( char const * a_pcBuffer )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( const HString & a_roString )
+HInfo::HInfo ( HString const & a_roString )
 	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
@@ -106,7 +106,7 @@ HInfo::HInfo ( const HString & a_roString )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( const HTime & a_roTime )
+HInfo::HInfo ( HTime const & a_roTime )
 	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
@@ -116,7 +116,7 @@ HInfo::HInfo ( const HTime & a_roTime )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( const HInfo & a_roInfo, int )
+HInfo::HInfo ( HInfo const & a_roInfo )
 	: M_HINFO_PURGE ( )
 	{
 	M_PROLOG
@@ -147,14 +147,14 @@ void HInfo::purge ( void )
 	M_EPILOG
 	}
 
-char & HInfo::operator [ ] ( int a_iIndex )
+char & HInfo::operator [ ] ( int const a_iIndex )
 	{
 	M_PROLOG
 	return ( f_oString [ a_iIndex ] );
 	M_EPILOG
 	}
 
-HInfo & HInfo::operator = ( const HInfo & a_roInfo )
+HInfo & HInfo::operator = ( HInfo const & a_roInfo )
 	{
 	M_PROLOG
 	if ( this != & a_roInfo )
@@ -171,7 +171,7 @@ HInfo & HInfo::operator = ( const HInfo & a_roInfo )
 	M_EPILOG
 	}
 
-HInfo & HInfo::operator ( ) ( const HInfo & a_roInfo )
+HInfo & HInfo::operator ( ) ( HInfo const & a_roInfo )
 	{
 	M_PROLOG
 	if ( a_roInfo.f_eType & D_INT )
@@ -192,7 +192,7 @@ HInfo & HInfo::operator ( ) ( const HInfo & a_roInfo )
 	}
 
 template < >
-int HInfo::get < int > ( void ) const
+int const HInfo::get < int > ( void ) const
 	{
 	M_PROLOG
 	return ( f_iInt );
@@ -200,7 +200,7 @@ int HInfo::get < int > ( void ) const
 	}
 
 template < >
-long int HInfo::get < long int > ( void ) const
+int long const HInfo::get < int long > ( void ) const
 	{
 	M_PROLOG
 	return ( f_lLongInt );
@@ -208,7 +208,7 @@ long int HInfo::get < long int > ( void ) const
 	}
 
 template < >
-double HInfo::get < double > ( void ) const
+double const HInfo::get < double > ( void ) const
 	{
 	M_PROLOG
 	return ( f_dDouble );
@@ -216,7 +216,7 @@ double HInfo::get < double > ( void ) const
 	}
 
 template < >
-char const * HInfo::get < char const * > ( void ) const
+char const * const HInfo::get < char const * > ( void ) const
 	{
 	M_PROLOG
 	return ( static_cast < char const * > ( f_oString ) );
@@ -224,7 +224,7 @@ char const * HInfo::get < char const * > ( void ) const
 	}
 
 template < >
-const HString & HInfo::get < const HString & > ( void ) const
+HString const & HInfo::get < HString const & > ( void ) const
 	{
 	M_PROLOG
 	return ( f_oString );
@@ -232,7 +232,7 @@ const HString & HInfo::get < const HString & > ( void ) const
 	}
 
 template < >
-const HTime & HInfo::get < const HTime & > ( void ) const
+HTime const & HInfo::get < HTime const & > ( void ) const
 	{
 	M_PROLOG
 	return ( f_oTime );
@@ -240,7 +240,7 @@ const HTime & HInfo::get < const HTime & > ( void ) const
 	}
 
 template < >
-void * HInfo::get < void * > ( void ) const
+void * const HInfo::get < void * > ( void ) const
 	{
 	M_PROLOG
 	void * l_pvTmp = f_pvPointer;
@@ -248,7 +248,7 @@ void * HInfo::get < void * > ( void ) const
 	M_EPILOG
 	}
 
-HInfo::operator bool ( void ) const
+HInfo::operator bool const ( void ) const
 	{
 	M_PROLOG
 	return ( f_lLongInt || f_dDouble || f_oString );

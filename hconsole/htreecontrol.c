@@ -170,7 +170,7 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		{
 		l_iRow ++;
 		l_poInfo = & a_poNode->f_tLeaf [ 0 ];
-		l_poString = & l_poInfo->get < const HString & > ( );
+		l_poString = & l_poInfo->get < HString const & > ( );
 		a_poNode->f_iRowRaw = l_iRow;
 		a_poNode->f_iColumnRaw = f_iColumnRaw + a_poNode->f_iLevel * 2 - 1; 
 		a_poNode->f_iWidthRaw = l_poString->get_length ( ) + 2;

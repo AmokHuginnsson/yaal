@@ -28,6 +28,7 @@ Copyright:
 #define __HCORE_HSOCKET_H
 
 #include "hrawfile.h"
+#include "hmap.h"
 
 namespace stdhapi
 {
@@ -37,13 +38,37 @@ namespace hcore
 
 class HSocket : public HRawFile
 	{
+	typedef enum
+		{
+		D_FILE,
+		D_NETWORK
+		} socket_type_t;
 protected:
+	typedef HMap < int, HSocket * > clients_t;
 	/*{*/
+	socket_type_t f_eType;
+	int f_iMaximumNumberOfClients;
+	int f_iAddressSize;
+	void * f_pvAddress;
+	clients_t * f_poClients;
 	/*}*/
 public:
 	/*{*/
-	HSocket ( void );
-	virtual ~HSocket ( void ) ;
+	HSocket ( socket_type_t const = D_NETWORK, int const = 0 );
+	virtual ~HSocket ( void );
+	void listen ( char const * const, int const = 0 );
+	HSocket * accept ( void );
+	void connect ( char const * const, int const = 0 );
+	int const get_port ( void ) const;
+	/*}*/
+protected:
+	/*{*/
+	void make_address ( char const * const, int const );
+	/*}*/
+private:
+	/*{*/
+	HSocket ( HSocket const & );
+	HSocket & operator = ( HSocket const & );
 	/*}*/
 	};
 

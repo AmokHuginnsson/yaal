@@ -72,7 +72,7 @@ int HDataBase::login ( char const * a_pcDataBase, char const * a_pcLogin,
 	M_EPILOG
 	}
 
-long int HDataBase::query ( char const * a_pcQuery )
+int long HDataBase::query ( char const * a_pcQuery )
 	{
 	M_PROLOG
 	if ( f_pvLastResult )
@@ -118,7 +118,7 @@ void * HDataBase::get_result ( void )
 	M_EPILOG
 	}
 
-long int HDataBase::insert_id ( void )
+int long HDataBase::insert_id ( void )
 	{
 	M_PROLOG
 	if ( ! f_pvCoreData )

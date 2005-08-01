@@ -27,6 +27,7 @@ Copyright:
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <libintl.h>
 
 #include "config.h"
 
@@ -42,6 +43,8 @@ namespace stdhapi
 
 namespace tools
 {
+
+char const * const n_pcError = _ ( "serial port not opened" );
 
 HSerial::HSerial ( char const * a_pcDevice )
 				: HRawFile ( ), f_oDevicePath ( ), f_sTIO ( ), f_sBackUpTIO ( )
@@ -116,9 +119,9 @@ HSerial::HSerial ( char const * a_pcDevice )
 HSerial::~HSerial ( void )
 	{
 	M_PROLOG
-	if ( f_iFileDescriptor )
+	if ( f_iFileDescriptor >= 0 )
 		HSerial::close ( );
-	M_ASSERT ( ! f_iFileDescriptor );
+	M_ASSERT ( f_iFileDescriptor < 0 );
 	return;
 	M_EPILOG
 	}
@@ -126,7 +129,7 @@ HSerial::~HSerial ( void )
 bool HSerial::open ( void )
 	{
 	M_PROLOG
-	if ( f_iFileDescriptor )
+	if ( f_iFileDescriptor >= 0 )
 		M_THROW ( "serial port already openend", g_iErrNo );
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	f_iFileDescriptor = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
@@ -146,31 +149,9 @@ bool HSerial::open ( void )
 int HSerial::close ( void )
 	{
 	M_PROLOG
-	if ( f_iFileDescriptor )
+	if ( f_iFileDescriptor >= 0 )
 		tcsetattr ( f_iFileDescriptor, TCSANOW, & f_sBackUpTIO );
 	return ( HRawFile::close ( ) );
-	M_EPILOG
-	}
-
-int HSerial::read ( char * a_pcBuffer, int a_iSize )
-	{
-	M_PROLOG
-	int l_iCnt = 0;
-	if ( ! f_iFileDescriptor )
-		M_THROW ( "serial port not opened", g_iErrNo );
-	l_iCnt = ::read ( f_iFileDescriptor, a_pcBuffer, a_iSize );
-	return ( l_iCnt );
-	M_EPILOG
-	}
-
-int HSerial::write ( char const * a_pcBuffer, int a_iSize )
-	{
-	M_PROLOG
-	int l_iCnt = 0;
-	if ( ! f_iFileDescriptor )
-		M_THROW ( "serial port not opened", g_iErrNo );
-	l_iCnt = ::write ( f_iFileDescriptor, a_pcBuffer, a_iSize );
-	return ( l_iCnt );
 	M_EPILOG
 	}
 
@@ -178,6 +159,8 @@ void HSerial::flush ( int a_iType )
 	{
 	M_PROLOG
 	HString l_oErrMsg;
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_pcError, g_iErrNo );
 	if ( tcflush ( f_iFileDescriptor, a_iType ) )
 		switch ( a_iType )
 			{
@@ -200,6 +183,8 @@ void HSerial::flush ( int a_iType )
 void HSerial::wait_for_eot ( void )
 	{
 	M_PROLOG
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_pcError, g_iErrNo );
 	if ( tcdrain ( f_iFileDescriptor ) )
 		M_THROW ( "tcdrain", g_iErrNo );
 	return;

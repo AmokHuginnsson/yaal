@@ -115,7 +115,7 @@ int rs_fields_count ( void * a_pvData )
 	return ( mysql_num_fields ( ( MYSQL_RES * ) a_pvData ) );
 	}
 
-long int dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
+int long dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
 	{
 	if ( a_pvDataR )
 		return ( mysql_num_rows ( ( MYSQL_RES * ) a_pvDataR ) );
@@ -123,7 +123,7 @@ long int dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
 		return ( mysql_affected_rows ( ( MYSQL * ) a_pvDataB ) );
 	}
 
-long int dbrs_id ( void * a_pvDataB, void * )
+int long dbrs_id ( void * a_pvDataB, void * )
 	{
 	return ( mysql_insert_id ( ( MYSQL * ) a_pvDataB ) );
 	}

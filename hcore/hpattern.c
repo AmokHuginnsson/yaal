@@ -37,7 +37,7 @@ namespace stdhapi
 namespace hcore
 {
 
-HPattern::HPattern ( bool a_bIgnoreCase ) : f_bInitialized ( false ),
+HPattern::HPattern ( bool const a_bIgnoreCase ) : f_bInitialized ( false ),
 	f_bIgnoreCaseDefault ( a_bIgnoreCase ), f_bIgnoreCase ( false ),
 	f_bExtended ( false ), f_iSimpleMatchLength ( 0 ), f_sCompiled ( ),
 	f_oPatternInput ( ), f_oPatternReal ( ), f_oError ( )
@@ -56,14 +56,14 @@ HPattern::~HPattern ( void )
 	M_EPILOG
 	}
 
-int HPattern::parse ( char const * a_pcPattern,
-		unsigned short int * a_puhFlags, int a_iFlagsCount )
+int HPattern::parse ( char const * const a_pcPattern,
+		int short unsigned * const a_puhFlags, int const a_iFlagsCount )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	bool l_bLocalCopyIgnoreCase = false, l_bLocalCopyExtended = false;
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iBegin = 0, l_iEnd = 0;
-	HArray < unsigned short int > l_oLocalCopyFlags ( a_iFlagsCount );
+	HArray < int short unsigned > l_oLocalCopyFlags ( a_iFlagsCount );
 	char * l_pcPattern = f_oPatternInput = a_pcPattern;
 	f_oError = "";
 /* making copy of flags */
@@ -138,7 +138,7 @@ int HPattern::parse ( char const * a_pcPattern,
 	M_EPILOG
 	}
 
-int HPattern::parse_re ( char const * a_pcPattern )
+int HPattern::parse_re ( char const * const a_pcPattern )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -164,8 +164,9 @@ char const * HPattern::error ( void ) const
 	return ( f_oError );
 	}
 
-bool HPattern::set_switch ( char a_cSwitch, unsigned short int * a_puhFlags,
-		int a_iFlagsCount )
+bool HPattern::set_switch ( char const a_cSwitch,
+		int short unsigned * const a_puhFlags,
+		int const a_iFlagsCount )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -192,7 +193,8 @@ bool HPattern::set_switch ( char a_cSwitch, unsigned short int * a_puhFlags,
 	M_EPILOG
 	}
 
-char const * HPattern::matches ( char const * a_pcString, int * a_piMatchLength, int * a_piError )
+char const * HPattern::matches ( char const * const a_pcString,
+		int * const a_piMatchLength, int * const a_piError )
 	{
 	M_PROLOG
 	char const * l_pcPtr = NULL;
@@ -230,7 +232,7 @@ char const * HPattern::matches ( char const * a_pcString, int * a_piMatchLength,
 	M_EPILOG
 	}
 
-int HPattern::count ( char const * a_pcString )
+int HPattern::count ( char const * const a_pcString )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -241,7 +243,8 @@ int HPattern::count ( char const * a_pcString )
 	M_EPILOG
 	}
 
-void HPattern::prepare_error_message ( int a_iError, char const * a_pcString )
+void HPattern::prepare_error_message ( int const a_iError,
+		char const * const a_pcString )
 	{
 	M_PROLOG
 	int l_iSize = regerror ( a_iError, & f_sCompiled, NULL, 0 ) + 1;

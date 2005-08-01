@@ -48,13 +48,14 @@ namespace rc_file
 #define process_rc_file( filename, section, data, callback ) \
 	process_rc_file_internal ( filename, section, data, \
 			( sizeof ( data ) / sizeof ( OVariable ) ) - 1, callback )
-int process_rc_file_internal ( char const *, char const *,
-		OVariable const *, const int, bool ( * ) ( HString &, HString & ) = NULL );
+int process_rc_file_internal ( char const * const, char const * const,
+		OVariable const * const, int const,
+		bool const ( * const ) ( HString &, HString & ) = NULL );
 int read_rc_line ( HString &, HString &, HFile &, int & );
-void rc_set_variable ( char const *, bool & );
-void rc_set_variable ( char const *, char & );
-void rc_set_variable ( char const *, char ** );
-void rc_set_variable ( char const *, int & );
+void rc_set_variable ( char const * const, bool & );
+void rc_set_variable ( char const * const, char & );
+void rc_set_variable ( char const * const, char ** );
+void rc_set_variable ( char const * const, int & );
 
 	}
 

@@ -175,7 +175,7 @@ void HControl::refresh ( void )
 	M_EPILOG
 	}
 
-void HControl::set ( const HInfo & )
+void HControl::set ( HInfo const & )
 	{
 	M_PROLOG
 	if ( g_iErrNo || ! g_iErrNo )

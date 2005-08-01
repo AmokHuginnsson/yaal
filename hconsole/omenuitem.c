@@ -29,3 +29,65 @@ M_CVSID ( "$CVSHeader$" );
 #include "omenuitem.h"
 M_CVSTID ( D_CVSID_OMENUITEM_H );
 
+
+using namespace stdhapi::hcore;
+
+namespace stdhapi
+{
+
+namespace hconsole
+{
+
+OMenuItem::OMenuItem ( void )
+	: f_psSubMenu ( NULL ), HANDLER ( NULL ), f_oLabel ( )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+OMenuItem::OMenuItem ( OMenuItem * const a_psMenuItem, HANDLER_t const handler,
+		HString const & a_roLabel )
+	: f_psSubMenu ( a_psMenuItem ), HANDLER ( handler ), f_oLabel ( a_roLabel )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+OMenuItem::OMenuItem ( OMenuItem const & a_roMenuItem )
+	: f_psSubMenu ( NULL ), HANDLER ( NULL ), f_oLabel ( )
+	{
+	M_PROLOG
+	operator = ( a_roMenuItem );
+	return;
+	M_EPILOG
+	}
+
+OMenuItem & OMenuItem::operator = ( OMenuItem const & a_roMenuItem )
+	{
+	M_PROLOG
+	if ( & a_roMenuItem != this )
+		{
+		f_psSubMenu = a_roMenuItem.f_psSubMenu;
+		HANDLER = a_roMenuItem.HANDLER;
+		f_oLabel = a_roMenuItem.f_oLabel;
+		}
+	return ( * this );
+	M_EPILOG
+	}
+
+void OMenuItem::reset ( void )
+	{
+	M_PROLOG
+	f_psSubMenu = NULL;
+	HANDLER = NULL;
+	f_oLabel = "";
+	return;
+	M_EPILOG
+	}
+
+}
+
+}
+
