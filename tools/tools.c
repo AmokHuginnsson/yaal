@@ -158,7 +158,7 @@ static char const g_pcDynamicLinkerPath [ ]
 
 void stdhapi_tools_banner ( void )
 	{
-	fprintf ( stderr, "\ttools\n" );
+	fprintf ( stdout, "\ttools\n" );
 	return;
 	}
 

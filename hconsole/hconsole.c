@@ -187,7 +187,7 @@ static char const g_pcDynamicLinkerPath [ ]
 
 void stdhapi_hconsole_banner ( void )
 	{
-	fprintf ( stderr, "\thconsole\n" );
+	fprintf ( stdout, "\thconsole\n" );
 	return;
 	}
 

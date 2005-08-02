@@ -143,7 +143,7 @@ void hcore_init ( void )
 
 void stdhapi_hcore_banner ( void )
 	{
-	fprintf ( stderr,
+	fprintf ( stdout,
 			"%s\n"
 			"Available libraries:\n"
 			"\thcore\n", COPYRIGHT );

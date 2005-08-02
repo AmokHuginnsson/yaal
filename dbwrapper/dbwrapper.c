@@ -150,7 +150,7 @@ static char const g_pcDynamicLinkerPath [ ] __attribute__(( __unused__,
 
 void stdhapi_dbwrapper_banner ( void )
 	{
-	fprintf ( stderr, "\tdbwrapper\n" );
+	fprintf ( stdout, "\tdbwrapper\n" );
 	return;
 	}
 
