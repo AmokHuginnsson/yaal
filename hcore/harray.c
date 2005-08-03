@@ -37,7 +37,7 @@ namespace stdhapi
 namespace hcore
 {
 
-char const * g_ppcErrMsgHArray [ 4 ] =
+char const * const g_ppcErrMsgHArray [ 4 ] =
 	{
 	_ ( "ok" ),
 /* E_HARRAY_BADSIZE */		_ ( "bad size" ),

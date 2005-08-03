@@ -64,7 +64,7 @@ namespace hcore
 #define E_HLIST_BADNUMBER			6
 #define E_HLIST_BADORDER			7
 
-extern char const * g_ppcErrMsgHList [ ];
+extern char const * const g_ppcErrMsgHList [ ];
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/

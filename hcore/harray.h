@@ -45,7 +45,7 @@ namespace hcore
 #define E_HARRAY_NOMEM			2
 #define E_HARRAY_BADINDEX		3
 
-extern char const * g_ppcErrMsgHArray [ ];
+extern char const * const g_ppcErrMsgHArray [ ];
 
 template < typename tType >
 class HArray

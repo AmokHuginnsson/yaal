@@ -29,6 +29,7 @@ Copyright:
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <libintl.h>
 
 #include "hexception.h"
@@ -43,7 +44,17 @@ namespace stdhapi
 namespace hcore
 {
 
-char const * const n_pcError = _ ( "socket not initialized" );
+#define E_HCORE_HSOCKET_NOT_INITIALIZED		1
+#define E_HCORE_HSOCKET_NOT_A_SERVER			2
+#define E_HCORE_HSOCKET_ALREADY_LISTENING	3
+
+char const * const n_ppcErrMsgHSocket [ 4 ] =
+	{
+	_ ( "ok" ),
+	_ ( "socket not initialized" ),
+	_ ( "socket is not a server" ),
+	_ ( "already listening" )
+	};
 
 HSocket::HSocket ( socket_type_t const a_eSocketType,
 		int const a_iMaximumNumberOfClients )
@@ -82,8 +93,21 @@ HSocket::HSocket ( socket_type_t const a_eSocketType,
 HSocket::~HSocket ( void )
 	{
 	M_PROLOG
+	shutdown ( );
+	/* There will be no memory leakage if shutdown() throws,
+	 * because application has to terminate. */
+	if ( f_pvAddress )
+		xfree ( f_pvAddress );
+	return;
+	M_EPILOG
+	}
+
+void HSocket::shutdown ( void )
+	{
+	M_PROLOG
 	int l_iKey = 0;
 	HSocket * l_poSocket = NULL;
+	sockaddr_un * l_psAddressFile = NULL;
 	if ( f_poClients )
 		{
 		f_poClients->rewind ( );
@@ -95,9 +119,13 @@ HSocket::~HSocket ( void )
 			}
 		delete f_poClients;
 		f_poClients = NULL;
+		if ( ( f_eType & D_FILE ) && ( f_pvAddress ) )
+			{
+			l_psAddressFile = static_cast < sockaddr_un * > ( f_pvAddress );
+			if ( l_psAddressFile->sun_path [ 0 ] )
+				M_ENSURE ( unlink ( l_psAddressFile->sun_path ) == 0 );
+			}
 		}
-	if ( f_pvAddress )
-		xfree ( f_pvAddress );
 	return;
 	M_EPILOG
 	}
@@ -107,7 +135,11 @@ void HSocket::listen ( char const * const a_pcAddress, int const a_iPort )
 	M_PROLOG
 	int l_iReuseAddr = 1;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, f_iFileDescriptor );
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
+	if ( f_poClients )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_ALREADY_LISTENING ], f_iFileDescriptor );
+	if ( f_iMaximumNumberOfClients < 1 )
+		M_THROW ( _ ( "bad maximum number of clients" ), f_iMaximumNumberOfClients );
 	make_address ( a_pcAddress, a_iPort );
 	M_ENSURE ( setsockopt ( f_iFileDescriptor, SOL_SOCKET, SO_REUSEADDR,
 				& l_iReuseAddr, sizeof ( int ) ) == 0 );
@@ -129,7 +161,9 @@ HSocket * HSocket::accept ( void )
 	sockaddr_un l_sAddressFile;
 	sockaddr * l_psAddress;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, f_iFileDescriptor );
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
+	if ( ! f_poClients )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
 	if ( f_eType & D_NETWORK )
 		{
 		l_psAddress = static_cast < sockaddr * > (
@@ -162,7 +196,7 @@ void HSocket::connect ( char const * const a_pcAddress, int const a_iPort )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, f_iFileDescriptor );
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
 	make_address ( a_pcAddress, a_iPort );
 	M_ENSURE ( ::connect ( f_iFileDescriptor,
 				static_cast < sockaddr * > ( f_pvAddress ), f_iAddressSize ) == 0 );
@@ -215,7 +249,7 @@ int const HSocket::get_port ( void ) const
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, f_iFileDescriptor );
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
 	sockaddr_in * l_psAddressNetwork = NULL;
 	if ( ! ( f_eType & D_NETWORK ) )
 		M_THROW ( _ ( "unix socket has not a port attribute" ),

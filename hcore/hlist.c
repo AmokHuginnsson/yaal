@@ -37,7 +37,7 @@ namespace stdhapi
 namespace hcore
 {
 
-char const * g_ppcErrMsgHList [ 8 ] =
+char const * const g_ppcErrMsgHList [ 8 ] =
 	{
 	_ ( "ok" ),
 /* E_HLIST_EMPTYELEMENT */	_ ( "nothing stored yet, so nothing to get" ),

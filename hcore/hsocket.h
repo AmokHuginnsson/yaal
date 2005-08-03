@@ -38,6 +38,7 @@ namespace hcore
 
 class HSocket : public HRawFile
 	{
+public:
 	typedef enum
 		{
 		D_DEFAULTS = 0,
@@ -63,6 +64,7 @@ public:
 	HSocket * accept ( void );
 	void connect ( char const * const, int const = 0 );
 	int const get_port ( void ) const;
+	void shutdown ( void );
 	/*}*/
 protected:
 	/*{*/

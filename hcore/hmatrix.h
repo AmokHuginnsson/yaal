@@ -52,7 +52,7 @@ namespace hcore
 #define E_HMATRIX_ROW_OUTOFRANGE									10
 #define E_HMATRIX_COLUMN_OUTOFRANGE								11
 
-extern char const * g_ppcErrMsgHMatrix [ ];
+extern char const * const g_ppcErrMsgHMatrix [ ];
 
 #define M_CHECK_DIMENSIONS_ROWS_COLUMNS( ) \
 		{\
