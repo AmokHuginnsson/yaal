@@ -91,9 +91,12 @@ HSocket::~HSocket ( void )
 void HSocket::listen ( char const * const a_pcAddress, int const a_iPort )
 	{
 	M_PROLOG
+	int l_iReuseAddr = 1;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, f_iFileDescriptor );
 	make_address ( a_pcAddress, a_iPort );
+	M_ENSURE ( setsockopt ( f_iFileDescriptor, SOL_SOCKET, SO_REUSEADDR,
+				& l_iReuseAddr, sizeof ( int ) ) == 0 );
 	M_ENSURE ( ::bind ( f_iFileDescriptor,
 				static_cast < sockaddr * > ( f_pvAddress ), f_iAddressSize ) == 0 );
 	M_ENSURE ( ::listen ( f_iFileDescriptor, f_iMaximumNumberOfClients ) == 0 );
