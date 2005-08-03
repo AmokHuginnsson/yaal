@@ -40,8 +40,11 @@ class HSocket : public HRawFile
 	{
 	typedef enum
 		{
-		D_FILE,
-		D_NETWORK
+		D_DEFAULTS = 0,
+		D_FILE = 1,
+		D_NETWORK = 2,
+		D_BLOCKING = 4,
+		D_NONBLOCKING = 8
 		} socket_type_t;
 protected:
 	typedef HMap < int, HSocket * > clients_t;
@@ -54,7 +57,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HSocket ( socket_type_t const = D_NETWORK, int const = 0 );
+	HSocket ( socket_type_t const = D_DEFAULTS, int const = 0 );
 	virtual ~HSocket ( void );
 	void listen ( char const * const, int const = 0 );
 	HSocket * accept ( void );
@@ -71,6 +74,8 @@ private:
 	HSocket & operator = ( HSocket const & );
 	/*}*/
 	};
+
+template struct enum_t < HSocket::socket_type_t >;
 
 }
 

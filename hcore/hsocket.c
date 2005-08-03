@@ -28,6 +28,7 @@ Copyright:
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <fcntl.h>
 #include <libintl.h>
 
 #include "hexception.h"
@@ -46,18 +47,31 @@ char const * const n_pcError = _ ( "socket not initialized" );
 
 HSocket::HSocket ( socket_type_t const a_eSocketType,
 		int const a_iMaximumNumberOfClients )
-	: HRawFile ( ), f_eType ( a_eSocketType ),
+	: HRawFile ( ), f_eType ( D_DEFAULTS ),
 	f_iMaximumNumberOfClients ( a_iMaximumNumberOfClients ),
 	f_iAddressSize ( 0 ), f_pvAddress ( NULL ), f_poClients ( NULL )
 	{
 	M_PROLOG
+	f_eType = a_eSocketType;
+	if ( ( a_eSocketType & D_FILE ) && ( a_eSocketType & D_NETWORK ) )
+		M_THROW ( _ ( "bad socket namespace setting" ), static_cast < int > ( a_eSocketType ) );
+	if ( ! ( a_eSocketType & ( D_FILE | D_NETWORK ) ) )
+		f_eType |= D_NETWORK;
+	if ( ( a_eSocketType & D_BLOCKING ) && ( a_eSocketType & D_NONBLOCKING ) )
+		M_THROW ( _ ( "bad socket option" ), static_cast < int > ( a_eSocketType ) );
+	if ( ! ( a_eSocketType & ( D_BLOCKING | D_NONBLOCKING ) ) )
+		f_eType |= D_BLOCKING;
 	if ( f_iMaximumNumberOfClients >= 0 )
+		{
 		M_ENSURE ( ( f_iFileDescriptor = socket (
-						a_eSocketType == D_NETWORK ? PF_INET : PF_LOCAL,
+						( f_eType & D_NETWORK ) ? PF_INET : PF_LOCAL,
 						static_cast < int > ( SOCK_STREAM ),
 						0 /* info libc "Creating a Socket"
 								 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
-	if ( f_eType == D_NETWORK )
+		if ( f_eType & D_NONBLOCKING )
+			M_ENSURE ( fcntl ( f_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
+		}
+	if ( f_eType & D_NETWORK )
 		f_pvAddress = xcalloc ( 1, sockaddr_in );
 	else
 		f_pvAddress = xcalloc ( 1, sockaddr_un );
@@ -116,7 +130,7 @@ HSocket * HSocket::accept ( void )
 	sockaddr * l_psAddress;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, f_iFileDescriptor );
-	if ( f_eType == D_NETWORK )
+	if ( f_eType & D_NETWORK )
 		{
 		l_psAddress = static_cast < sockaddr * > (
 				static_cast < void * > ( & l_sAddressNetwork ) );
@@ -130,6 +144,8 @@ HSocket * HSocket::accept ( void )
 		}
 	M_ENSURE ( ( l_iFileDescriptor = ::accept ( f_iFileDescriptor,
 					l_psAddress, & l_iAddressSize ) ) >= 0 );
+	if ( f_eType & D_NONBLOCKING )
+		M_ENSURE ( fcntl ( l_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 	/* - 1 means that constructor shall not create socket */
 	l_poSocket = new HSocket ( f_eType, - 1 );
 	l_poSocket->f_iFileDescriptor = l_iFileDescriptor;
@@ -164,7 +180,7 @@ void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 	sockaddr_un * l_psAddressFile = NULL;
 	hostent l_sHostName;
 	hostent * l_psHostName = NULL;
-	if ( f_eType == D_NETWORK )
+	if ( f_eType & D_NETWORK )
 		{
 		l_psAddressNetwork = static_cast < sockaddr_in * > ( f_pvAddress );
 		l_psAddressNetwork->sin_family = AF_INET;
@@ -182,7 +198,7 @@ void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 				l_sHostName.h_addr_list [ 0 ] )->s_addr;
 		f_iAddressSize = sizeof ( sockaddr_in );
 		}
-	else /* f_eType == D_FILE */
+	else /* f_eType & D_FILE */
 		{
 		l_psAddressFile = static_cast < sockaddr_un * > ( f_pvAddress );
 		l_psAddressFile->sun_family = AF_LOCAL;
@@ -201,7 +217,7 @@ int const HSocket::get_port ( void ) const
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, f_iFileDescriptor );
 	sockaddr_in * l_psAddressNetwork = NULL;
-	if ( f_eType != D_NETWORK )
+	if ( ! ( f_eType & D_NETWORK ) )
 		M_THROW ( _ ( "unix socket has not a port attribute" ),
 				static_cast < int > ( f_eType ) );
 	l_psAddressNetwork = static_cast < sockaddr_in * > ( f_pvAddress );
