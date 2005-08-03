@@ -29,6 +29,8 @@ Copyright:
 
 #line 31 "hmap.h"
 
+#define D_CVSID_HMAP_H "$CVSHeader$"
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <new>
