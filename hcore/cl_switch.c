@@ -169,8 +169,6 @@ int decode_switches ( int const a_iArgc, char * const * const a_ppcArgv,
 						}
 					case ( D_NONE ):
 						{
-						if ( a_rpsOptions [ l_iCtr ].CALLBACK )
-							a_rpsOptions [ l_iCtr ].CALLBACK ( );
 						break;
 						}
 					default:
@@ -180,6 +178,8 @@ int decode_switches ( int const a_iArgc, char * const * const a_ppcArgv,
 						break;
 						}
 					}
+				if ( a_rpsOptions [ l_iCtr ].CALLBACK )
+					a_rpsOptions [ l_iCtr ].CALLBACK ( );
 				}
 			}
 		if ( ! l_bValidSwitch && a_piUnknown )
