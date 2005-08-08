@@ -27,6 +27,7 @@ Copyright:
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
@@ -334,6 +335,17 @@ char const * const get_last_error ( void )
 	if ( n_oLastErrorMessage )
 		return ( n_oLastErrorMessage );
 	return ( "" );
+	}
+
+void failure ( int a_iExitStatus, char const * const a_pcFormat, ... )
+	{
+	va_list l_xAp;
+	va_start ( l_xAp, a_pcFormat );
+	vfprintf ( stderr, a_pcFormat, l_xAp );
+	log << "failure: ";
+	log ( a_pcFormat, l_xAp );
+	va_end ( l_xAp );
+	exit ( a_iExitStatus );
 	}
 
 }
