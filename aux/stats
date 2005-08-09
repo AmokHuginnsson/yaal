@@ -1,0 +1,59 @@
+#! /bin/sh
+
+SOURCES=`find . -name '*.c'`
+HEADERS=`find . -name '*.h'`
+ALL="${SOURCES} ${HEADERS}"
+
+SOURCES_COUNT=`echo ${SOURCES} | tr " " "\n" | wc -l`
+HEADERS_COUNT=`echo ${HEADERS} | tr " " "\n" | wc -l`
+
+echo "stdhapi statistics:"
+echo "	implementation files: 	${SOURCES_COUNT}"
+echo "	header files: 		${HEADERS_COUNT}"
+TOTAL=$((${SOURCES_COUNT}+${HEADERS_COUNT}))
+echo "	total: 			${TOTAL}"
+
+TMP_FILE=`mktemp`
+
+cat ${SOURCES} ${HEADERS} | grep -v '^$' > ${TMP_FILE}
+
+LINES=`wc -l ${TMP_FILE}|awk '{print $1}'`
+LINES=$((${LINES}-${TOTAL}*21))
+
+echo "	lines:			${LINES}"
+
+CLASSES=`grep -v 'class.*;' ${TMP_FILE} | grep -c '\<class\>'`
+
+echo "	classes:		${CLASSES}"
+
+STRUCTURES=`grep -c '\<struct\>' ${TMP_FILE}`
+
+echo "	structures:		${STRUCTURES}"
+
+MACROS=`grep -c '#define[ 	]\<M_' ${TMP_FILE}`
+
+echo "	macros:			${MACROS}"
+
+DEFINES=`grep -c '#define[ 	]\<D_' ${TMP_FILE}`
+
+echo "	defines:		${DEFINES}"
+
+TYPEDEFS=`grep -c 'typedef' ${TMP_FILE}`
+
+echo "	typedefs:		${TYPEDEFS}"
+
+FUNCTIONS=`grep -c "^	}$" ${TMP_FILE}`
+
+echo "	functions:		${FUNCTIONS}"
+
+GUARDED_FUNCTIONS=`grep -c "\<M_PROLOG\>" ${TMP_FILE}`
+
+echo "	guarded functions:	${GUARDED_FUNCTIONS}"
+
+if [ -f ${TMP_FILE} ] ; then
+	/bin/rm -f ${TMP_FILE}
+fi
+
+exit 0
+
+# vim: ts=8
