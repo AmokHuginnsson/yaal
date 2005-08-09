@@ -88,7 +88,7 @@ HTUIProcess::~HTUIProcess ( void )
 	M_EPILOG
 	}
 
-int HTUIProcess::init ( char const * a_pcProcessName )
+int HTUIProcess::init_tui ( char const * a_pcProcessName )
 	{
 	M_PROLOG
 	int l_iCtr = 0;

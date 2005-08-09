@@ -158,7 +158,7 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 		char const * a_pcResource, menu_handlers_map_t const & a_roHandlers )
 	{
 	M_PROLOG
-	int l_iError = HTUIProcess::init ( a_pcProcessName );
+	int l_iError = HTUIProcess::init_tui ( a_pcProcessName );
 	HMainWindow * l_poMainWindow = NULL;
 	HXml::ONode l_sNode;
 	if ( ! dbwrapper::db_connect )

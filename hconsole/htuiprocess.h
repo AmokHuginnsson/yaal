@@ -51,7 +51,7 @@ public:
 	/*{*/
 	HTUIProcess ( size_t = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );
-	int init ( char const * = "" );
+	int init_tui ( char const * = "" );
 	using hcore::HProcess::run;
 	/*}*/
 protected:

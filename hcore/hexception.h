@@ -114,7 +114,7 @@ struct enum_t
 
 typedef enum
 	{
-	D_NONE					= 0x0000,
+	D_VOID					= 0x0000,
 	D_BOOL					= 0x0001,
 	D_CHAR					= 0x0002,
 	D_SHORT					= 0x0004,

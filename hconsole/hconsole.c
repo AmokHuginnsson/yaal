@@ -86,7 +86,7 @@ OVariable n_psVariables [ ] =
 		{ D_INT, "latency", & n_iLatency },
 		{ D_CHAR, "command_compose_character", & n_cCommandComposeCharacter },
 		{ D_INT, "command_compose_delay", & n_iCommandComposeDelay },
-		{ D_NONE, NULL, NULL }
+		{ D_VOID, NULL, NULL }
 	};
 
 void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )

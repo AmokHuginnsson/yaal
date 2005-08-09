@@ -67,7 +67,7 @@ char const * const make_short_opts ( OOption * const & a_rpsOptions, int a_iCoun
 				a_roBuffer += "::";
 				break;
 				}
-			case ( no_argument ):
+			case ( OOption::D_NONE ):
 			default :
 				{
 				break;
@@ -100,6 +100,7 @@ option * make_option_array ( OOption * const & a_rpsOptions, int a_iCount, HStri
 				l_psOptions [ l_iCtr ].has_arg = optional_argument;
 				break;
 				}
+			case ( OOption::D_NONE ):
 			default :
 				{
 				l_psOptions [ l_iCtr ].has_arg = no_argument;
@@ -167,7 +168,7 @@ int decode_switches ( int const a_iArgc, char * const * const a_ppcArgv,
 						( * static_cast < HString * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) ) = optarg;
 						break;
 						}
-					case ( D_NONE ):
+					case ( D_VOID ):
 						{
 						break;
 						}

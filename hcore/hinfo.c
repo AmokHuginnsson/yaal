@@ -35,7 +35,7 @@ namespace hcore
 {
 
 #define M_HINFO_PURGE( ) \
-	f_eType ( D_NONE ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ),\
+	f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ),\
 	f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 
 HInfo::HInfo ( void )
@@ -136,7 +136,7 @@ HInfo::~HInfo ( void )
 void HInfo::purge ( void )
 	{
 	M_PROLOG
-	f_eType = D_NONE;
+	f_eType = D_VOID;
 	f_iInt = 0;
 	f_lLongInt = 0;
 	f_dDouble = 0;
