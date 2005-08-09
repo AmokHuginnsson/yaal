@@ -29,7 +29,6 @@ Copyright:
 
 #include "hrawfile.h"
 #include "hmap.h"
-//#include "hstring.h"
 
 namespace stdhapi
 {
@@ -56,6 +55,7 @@ protected:
 	int f_iAddressSize;
 	void * f_pvAddress;
 	clients_t * f_poClients;
+	HString f_oHostName;
 	HString f_oVarTmpBuffer;
 	/*}*/
 public:
@@ -72,6 +72,8 @@ public:
 	bool get_client_next ( int &, HSocket * & ) const;
 	void rewind_client_list ( void ) const;
 	int read_until ( HString &, char = '\n' );
+	int get_client_count ( void ) const;
+	HString const & get_host_name ( void );
 	/*}*/
 protected:
 	/*{*/

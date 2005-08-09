@@ -28,6 +28,7 @@ Copyright:
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <libintl.h>
@@ -37,6 +38,7 @@ M_CVSID ( "$CVSHeader$" );
 #include "hsocket.h"
 #include "xalloc.h"
 #include "hstring.h"
+#include "hlog.h"
 
 namespace stdhapi
 {
@@ -61,7 +63,7 @@ HSocket::HSocket ( socket_type_t const a_eSocketType,
 	: HRawFile ( ), f_eType ( D_DEFAULTS ),
 	f_iMaximumNumberOfClients ( a_iMaximumNumberOfClients ),
 	f_iAddressSize ( 0 ), f_pvAddress ( NULL ), f_poClients ( NULL ),
-	f_oVarTmpBuffer ( )
+	f_oHostName ( ), f_oVarTmpBuffer ( )
 	{
 	M_PROLOG
 	f_eType = a_eSocketType;
@@ -127,6 +129,11 @@ void HSocket::shutdown ( void )
 				M_ENSURE ( unlink ( l_psAddressFile->sun_path ) == 0 );
 			}
 		}
+	if ( f_iFileDescriptor >= 0 )
+		{
+		M_ENSURE ( ::shutdown ( f_iFileDescriptor, 2 ) == 0 );
+		f_iFileDescriptor = - 1;
+		}
 	return;
 	M_EPILOG
 	}
@@ -135,14 +142,11 @@ void HSocket::shutdown_client ( int a_iFileDescriptor )
 	{
 	M_PROLOG
 	HSocket * l_poClient = NULL;
-	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
 	if ( ! f_poClients->get ( a_iFileDescriptor, l_poClient ) )
 		M_THROW ( _ ( "no such client" ), a_iFileDescriptor );
 	M_ASSERT ( l_poClient );
-	l_poClient->shutdown ( );
 	delete l_poClient;
 	f_poClients->remove ( a_iFileDescriptor );
 	return;
@@ -225,10 +229,9 @@ void HSocket::connect ( char const * const a_pcAddress, int const a_iPort )
 
 void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 	{
-	M_PROLOG
 #define D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE 1024;
+	M_PROLOG
 	int l_iError = 0;
-	HString l_oWorkBuffer;
 	sockaddr_in * l_psAddressNetwork = NULL;
 	sockaddr_un * l_psAddressFile = NULL;
 	hostent l_sHostName;
@@ -240,11 +243,11 @@ void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 		l_psAddressNetwork->sin_port = htons (
 				static_cast < int short unsigned > ( a_iPort ) );
 		f_iAddressSize = D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
-		l_oWorkBuffer.hs_realloc ( f_iAddressSize );
+		f_oVarTmpBuffer.hs_realloc ( f_iAddressSize );
 		while ( gethostbyname_r ( a_pcAddress, & l_sHostName,
-					static_cast < char * > ( l_oWorkBuffer ), f_iAddressSize,
+					static_cast < char * > ( f_oVarTmpBuffer ), f_iAddressSize,
 					& l_psHostName, & l_iError ) == ERANGE )
-			l_oWorkBuffer.hs_realloc ( f_iAddressSize <<= 1 );
+			f_oVarTmpBuffer.hs_realloc ( f_iAddressSize <<= 1 );
 		g_iErrNo = l_iError;
 		M_ENSURE ( l_psHostName );
 		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast < in_addr * > (
@@ -260,8 +263,10 @@ void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 		l_psAddressFile->sun_path [ sizeof ( l_psAddressFile->sun_path ) - 1 ] = 0;
 		f_iAddressSize = SUN_LEN ( l_psAddressFile );
 		}
+	f_oHostName = a_pcAddress;
 	return;
 	M_EPILOG
+#undef D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE
 	}
 
 int const HSocket::get_port ( void ) const
@@ -282,8 +287,6 @@ HSocket * HSocket::get_client ( int const a_iFileDescriptor ) const
 	{
 	M_PROLOG
 	HSocket * l_poClient = NULL;
-	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
 	f_poClients->get ( a_iFileDescriptor, l_poClient );
@@ -294,8 +297,6 @@ HSocket * HSocket::get_client ( int const a_iFileDescriptor ) const
 bool HSocket::get_client_next ( int & a_riFileDescriptor, HSocket * & a_rpoClient ) const
 	{
 	M_PROLOG
-	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
 	return ( f_poClients->iterate ( a_riFileDescriptor, a_rpoClient ) );
@@ -305,8 +306,6 @@ bool HSocket::get_client_next ( int & a_riFileDescriptor, HSocket * & a_rpoClien
 void HSocket::rewind_client_list ( void ) const
 	{
 	M_PROLOG
-	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
 	f_poClients->rewind ( );
@@ -319,6 +318,8 @@ int HSocket::read_until ( HString & a_roMessage, char a_cStopChar )
 	M_PROLOG
 	int l_iCtr = 0;
 	char * l_pcPtr = NULL;
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
 	a_roMessage = "";
 	do
 		{
@@ -336,6 +337,63 @@ int HSocket::read_until ( HString & a_roMessage, char a_cStopChar )
 		}
 	return ( l_iCtr );
 	M_EPILOG
+	}
+
+int HSocket::get_client_count ( void ) const
+	{
+	M_PROLOG
+	if ( ! f_poClients )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
+	return ( f_poClients->quantity ( ) );
+	M_EPILOG
+	}
+
+HString const & HSocket::get_host_name ( void )
+	{
+#define D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE 1024
+	M_PROLOG
+	int l_iError = 0, l_iCode = 0;
+	int l_iSize = D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
+	sockaddr_in * l_psAddressNetwork = NULL;
+	sockaddr_un * l_psAddressFile = NULL;
+	hostent l_sHostName;
+	hostent * l_psHostName = NULL;
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
+	if ( f_oHostName.is_empty ( ) )
+		{
+		if ( f_eType & D_NETWORK )
+			{
+			l_psAddressNetwork = reinterpret_cast < sockaddr_in * > ( f_pvAddress );
+			f_oVarTmpBuffer.hs_realloc ( l_iSize );
+			memset ( & l_sHostName, 0, sizeof ( hostent ) );
+			while ( ( l_iError = gethostbyaddr_r ( &l_psAddressNetwork->sin_addr, f_iAddressSize,
+						AF_INET, & l_sHostName,
+						static_cast < char * > ( f_oVarTmpBuffer ),
+						l_iSize, & l_psHostName, & l_iCode ) ) == ERANGE )
+				f_oVarTmpBuffer.hs_realloc ( l_iSize <<= 1 );
+			if ( l_iCode )
+				M_LOG ( hstrerror ( l_iCode ) );
+			g_iErrNo = l_iError;
+			M_ENSURE ( l_iError == 0 );
+			if ( l_psHostName )
+				f_oHostName = l_sHostName.h_name;
+			else
+				{
+				f_oHostName = inet_ntop ( AF_INET, & l_psAddressNetwork->sin_addr,
+						static_cast < char * > ( f_oVarTmpBuffer ), l_iSize );
+				}
+			}
+		else
+			{
+			l_psAddressFile = static_cast < sockaddr_un * > ( f_pvAddress );
+			if ( l_psAddressFile->sun_path [ 0 ] )
+				f_oHostName = l_psAddressFile->sun_path [ 0 ];
+			}
+		}
+	return ( f_oHostName );
+	M_EPILOG
+#undef D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE
 	}
 
 }
