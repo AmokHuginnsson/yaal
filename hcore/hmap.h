@@ -300,6 +300,7 @@ bool HMap<tType, ttType>::remove ( tType const & a_rtKey )
 		else
 			f_ppoAtomArray [ l_iHash ] = NULL;
 		delete l_poAtom;
+		rewind ( );
 		f_iQuantity --;
 		}
 	return ( l_poAtom ? true : false );
