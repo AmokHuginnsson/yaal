@@ -44,7 +44,7 @@ char g_pcEMode [ ] = "record set is not in appropriate mode for operation";
 #define E_MODE g_pcEMode
 
 HRecordSet::HRecordSet ( HDataBase * a_poDataBase )
-	: f_pvCoreData ( NULL ), f_oSQL ( ), f_oBuffer ( ), f_iIdFieldOffset ( - 1 ),
+	: f_pvCoreData ( NULL ), f_oSQL ( ), f_oVarTmpBuffer ( ), f_iIdFieldOffset ( - 1 ),
 	f_iFieldCount ( 0 ), f_iMode ( D_MODE_CLOSED ), f_iCursorPosition ( 0 ), 
 	f_iSetQuantity ( 0 ), f_oTable ( ), f_oColumns ( "*" ), f_oFilter ( ), 
 	f_oSort ( ), f_oColumnNames ( ), f_oValues ( ), f_poDataBase ( a_poDataBase ), 
@@ -84,7 +84,7 @@ void HRecordSet::build_sql ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	f_oBuffer = "";
+	f_oVarTmpBuffer = "";
 	switch ( f_iMode )
 		{
 		case ( D_MODE_CLOSED ):
@@ -92,24 +92,24 @@ void HRecordSet::build_sql ( void )
 			f_oSQL.format ( "SELECT %s FROM %s", static_cast < char const * > ( f_oColumns ),
 					static_cast < char const * > ( f_oTable ) );
 			if ( f_oFilter.is_empty ( ) )
-				f_oBuffer = m_oFilter;
+				f_oVarTmpBuffer = m_oFilter;
 			else if ( m_oFilter.is_empty ( ) )
-				f_oBuffer = f_oFilter;
+				f_oVarTmpBuffer = f_oFilter;
 			else
-				f_oBuffer.format ( "%s AND ( %s )", static_cast < char const * > ( f_oFilter ),
+				f_oVarTmpBuffer.format ( "%s AND ( %s )", static_cast < char const * > ( f_oFilter ),
 					static_cast < char const * > ( m_oFilter ) );
-			if ( ! f_oBuffer.is_empty ( ) )
-				f_oSQL += ( " WHERE " + f_oBuffer );
-			f_oBuffer = "";
+			if ( ! f_oVarTmpBuffer.is_empty ( ) )
+				f_oSQL += ( " WHERE " + f_oVarTmpBuffer );
+			f_oVarTmpBuffer = "";
 			if ( f_oSort.is_empty ( ) )
-				f_oBuffer = m_oSort;
+				f_oVarTmpBuffer = m_oSort;
 			else if ( m_oSort.is_empty ( ) )
-				f_oBuffer = f_oSort;
+				f_oVarTmpBuffer = f_oSort;
 			else
-				f_oBuffer.format ( "%s, %s", static_cast < char const * > ( m_oSort ),
+				f_oVarTmpBuffer.format ( "%s, %s", static_cast < char const * > ( m_oSort ),
 					static_cast < char const * > ( f_oSort ) );
-			if ( ! f_oBuffer.is_empty ( ) )
-				f_oSQL += ( " ORDER BY " + f_oBuffer );
+			if ( ! f_oVarTmpBuffer.is_empty ( ) )
+				f_oSQL += ( " ORDER BY " + f_oVarTmpBuffer );
 			f_oSQL += ';';
 			break;
 			}
@@ -120,12 +120,12 @@ void HRecordSet::build_sql ( void )
 				{
 				if ( l_iCtr == f_iIdFieldOffset )
 					continue;
-				if ( ! f_oBuffer.is_empty ( ) )
-					f_oBuffer += ", ";
-				f_oBuffer += f_oColumnNames [ l_iCtr ] + " = '" + f_oValues [ l_iCtr ] + '\'';
+				if ( ! f_oVarTmpBuffer.is_empty ( ) )
+					f_oVarTmpBuffer += ", ";
+				f_oVarTmpBuffer += f_oColumnNames [ l_iCtr ] + " = '" + f_oValues [ l_iCtr ] + '\'';
 				}
-			f_oBuffer += " WHERE id = ";
-			f_oSQL += f_oBuffer;
+			f_oVarTmpBuffer += " WHERE id = ";
+			f_oSQL += f_oVarTmpBuffer;
 			f_oSQL += m_lId;
 			f_oSQL += ';';
 			break;
@@ -137,23 +137,23 @@ void HRecordSet::build_sql ( void )
 				{
 				if ( l_iCtr == f_iIdFieldOffset )
 					continue;
-				if ( ! f_oBuffer.is_empty ( ) )
-					f_oBuffer += ", ";
-				f_oBuffer += f_oColumnNames [ l_iCtr ];
+				if ( ! f_oVarTmpBuffer.is_empty ( ) )
+					f_oVarTmpBuffer += ", ";
+				f_oVarTmpBuffer += f_oColumnNames [ l_iCtr ];
 				}
-			f_oBuffer += " ) VALUES ( ";
-			f_oSQL += f_oBuffer;
-			f_oBuffer = "";
+			f_oVarTmpBuffer += " ) VALUES ( ";
+			f_oSQL += f_oVarTmpBuffer;
+			f_oVarTmpBuffer = "";
 			for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 				{
 				if ( l_iCtr == f_iIdFieldOffset )
 					continue;
-				if ( ! f_oBuffer.is_empty ( ) )
-					f_oBuffer += ", ";
-				f_oBuffer += '\'' + f_oValues [ l_iCtr ] + '\'';
+				if ( ! f_oVarTmpBuffer.is_empty ( ) )
+					f_oVarTmpBuffer += ", ";
+				f_oVarTmpBuffer += '\'' + f_oValues [ l_iCtr ] + '\'';
 				}
-			f_oBuffer += " );";
-			f_oSQL += f_oBuffer;
+			f_oVarTmpBuffer += " );";
+			f_oSQL += f_oVarTmpBuffer;
 			break;
 			}
 		default :

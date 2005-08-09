@@ -44,7 +44,7 @@ class HTime
 protected:
 	/*{*/
 	HString	f_oFormat;
-	mutable HString	f_oBuffer;
+	mutable HString	f_oVarTmpBuffer;
 	time_t	f_xValue;
 	tm			f_sBroken;
 	/*}*/

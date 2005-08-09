@@ -223,7 +223,7 @@ HXml::HXml ( void )
 	: f_iIndex ( 0 ), f_iLevel ( 0 ),
 	f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
 	f_xIconvOut ( static_cast < iconv_t > ( 0 ) ),
-	f_oConvertedString ( ), f_oTmpBuffer ( ), f_oPath ( ), f_poXml ( NULL )
+	f_oConvertedString ( ), f_oVarTmpBuffer ( ), f_oPath ( ), f_poXml ( NULL )
 	{
 	M_PROLOG
 	f_poXml = new ( std::nothrow ) HXmlData ( );
@@ -328,9 +328,9 @@ int HXml::get_node_set_by_path ( char const * a_pcPath )
 	M_PROLOG
 	int l_iLength = 0;
 	char * l_pcPtr = NULL;
-	f_oTmpBuffer = a_pcPath;
-	l_pcPtr = f_oTmpBuffer;
-	l_iLength = f_oTmpBuffer.get_length ( ) - 1;
+	f_oVarTmpBuffer = a_pcPath;
+	l_pcPtr = f_oVarTmpBuffer;
+	l_iLength = f_oVarTmpBuffer.get_length ( ) - 1;
 	if ( f_poXml->f_psObject )
 		f_poXml->xml_free ( f_poXml->f_psObject );
 	if ( f_poXml->f_psContext )
@@ -351,7 +351,7 @@ int HXml::get_node_set_by_path ( char const * a_pcPath )
 		if ( f_poXml->f_psObject )
 			{
 			f_poXml->f_psNodeSet = f_poXml->f_psObject->nodesetval;
-			f_oTmpBuffer = a_pcPath;
+			f_oVarTmpBuffer = a_pcPath;
 			return ( f_poXml->f_psNodeSet->nodeNr );
 			}
 		}
@@ -426,7 +426,7 @@ int HXml::iterate ( ONode & a_rsNode,
 	a_rsNode.reset ( );
 	if ( ! a_pcPath || ! a_pcPath [ 0 ] )
 		a_pcPath = "/"; /* scan full tree */
-	if ( ! f_poXml->f_psNodeSet || ( a_pcPath != f_oTmpBuffer ) )
+	if ( ! f_poXml->f_psNodeSet || ( a_pcPath != f_oVarTmpBuffer ) )
 		{
 		get_node_set_by_path ( a_pcPath );
 		f_iIndex = 0;

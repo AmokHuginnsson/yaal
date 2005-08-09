@@ -52,7 +52,7 @@ private:
 	/*{*/
 	void * f_pvCoreData;	/* very internal for this class used only in base cla */
 	hcore::HString f_oSQL;
-	hcore::HString f_oBuffer;
+	hcore::HString f_oVarTmpBuffer;
 	/*}*/
 protected:
 	/*{*/

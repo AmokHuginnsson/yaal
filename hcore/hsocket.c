@@ -60,7 +60,8 @@ HSocket::HSocket ( socket_type_t const a_eSocketType,
 		int const a_iMaximumNumberOfClients )
 	: HRawFile ( ), f_eType ( D_DEFAULTS ),
 	f_iMaximumNumberOfClients ( a_iMaximumNumberOfClients ),
-	f_iAddressSize ( 0 ), f_pvAddress ( NULL ), f_poClients ( NULL )
+	f_iAddressSize ( 0 ), f_pvAddress ( NULL ), f_poClients ( NULL ),
+	f_oVarTmpBuffer ( )
 	{
 	M_PROLOG
 	f_eType = a_eSocketType;
@@ -126,6 +127,24 @@ void HSocket::shutdown ( void )
 				M_ENSURE ( unlink ( l_psAddressFile->sun_path ) == 0 );
 			}
 		}
+	return;
+	M_EPILOG
+	}
+
+void HSocket::shutdown_client ( int a_iFileDescriptor )
+	{
+	M_PROLOG
+	HSocket * l_poClient = NULL;
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
+	if ( ! f_poClients )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
+	if ( ! f_poClients->get ( a_iFileDescriptor, l_poClient ) )
+		M_THROW ( _ ( "no such client" ), a_iFileDescriptor );
+	M_ASSERT ( l_poClient );
+	l_poClient->shutdown ( );
+	delete l_poClient;
+	f_poClients->remove ( a_iFileDescriptor );
 	return;
 	M_EPILOG
 	}
@@ -256,6 +275,66 @@ int const HSocket::get_port ( void ) const
 				static_cast < int > ( f_eType ) );
 	l_psAddressNetwork = static_cast < sockaddr_in * > ( f_pvAddress );
 	return ( ntohs ( l_psAddressNetwork->sin_port ) );
+	M_EPILOG
+	}
+
+HSocket * HSocket::get_client ( int const a_iFileDescriptor ) const
+	{
+	M_PROLOG
+	HSocket * l_poClient = NULL;
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
+	if ( ! f_poClients )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
+	f_poClients->get ( a_iFileDescriptor, l_poClient );
+	return ( l_poClient );
+	M_EPILOG
+	}
+
+bool HSocket::get_client_next ( int & a_riFileDescriptor, HSocket * & a_rpoClient ) const
+	{
+	M_PROLOG
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
+	if ( ! f_poClients )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
+	return ( f_poClients->iterate ( a_riFileDescriptor, a_rpoClient ) );
+	M_EPILOG
+	}
+
+void HSocket::rewind_client_list ( void ) const
+	{
+	M_PROLOG
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
+	if ( ! f_poClients )
+		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_A_SERVER ], f_iFileDescriptor );
+	f_poClients->rewind ( );
+	return;
+	M_EPILOG
+	}
+
+int HSocket::read_until ( HString & a_roMessage, char a_cStopChar )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	char * l_pcPtr = NULL;
+	a_roMessage = "";
+	do
+		{
+		f_oVarTmpBuffer.hs_realloc ( l_iCtr + 1 );
+		l_pcPtr = f_oVarTmpBuffer;
+		if ( read ( l_pcPtr + l_iCtr, sizeof ( char ) * 1 ) <= 0 )
+			break;
+		}
+	while ( l_pcPtr [ l_iCtr ++ ] != a_cStopChar );
+	if ( l_iCtr > 0 )
+		{
+		l_pcPtr [ l_iCtr ] = 0;
+		a_roMessage.hs_realloc ( l_iCtr );
+		memcpy ( static_cast < char * > ( a_roMessage ), l_pcPtr, l_iCtr + 1 );
+		}
+	return ( l_iCtr );
 	M_EPILOG
 	}
 

@@ -74,7 +74,7 @@ protected:
 	iconv_t									f_xIconvIn;
 	iconv_t									f_xIconvOut;
 	stdhapi::hcore::HString	f_oConvertedString;
-	stdhapi::hcore::HString	f_oTmpBuffer;
+	stdhapi::hcore::HString	f_oVarTmpBuffer;
 	stdhapi::hcore::HString	f_oPath;
 	HXmlData *							f_poXml;
 	/*}*/
