@@ -1,7 +1,7 @@
 /*
 ---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hprocess.c - this file is integral part of `stdhapi' project.
+	htuiprocess.c - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -39,7 +39,7 @@ Copyright:
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
-#include "hprocess.h"
+#include "htuiprocess.h"
 #include "hconsole.h"
 #include "hmainwindow.h"
 #include "mouse.h"
@@ -59,12 +59,11 @@ namespace hconsole
 #define D_CTRLS_COUNT	2
 #define D_ALTS_COUNT	10
 
-HProcess::HProcess ( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
+HTUIProcess::HTUIProcess ( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
 		size_t a_uiCommandHandlers )
-				: HHandler ( a_uiKeyHandlers, a_uiCommandHandlers ),
-	f_bInitialised ( false ), f_bLoop ( true ), f_iIdleCycles ( 0 ),
-	f_sLatency ( ), f_xFileDescriptorSet ( ), f_poForegroundWindow ( NULL ),
-	f_poWindows ( NULL ), f_oFileDescriptorHandlers ( a_uiFileHandlers )
+	: HHandler ( a_uiKeyHandlers, a_uiCommandHandlers ),
+	HProcess ( a_uiFileHandlers ), f_poForegroundWindow ( NULL ),
+	f_poWindows ( NULL )
 	{
 	M_PROLOG
 	memset ( & f_sLatency, 0, sizeof ( f_sLatency ) );
@@ -73,7 +72,7 @@ HProcess::HProcess ( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
 	M_EPILOG
 	}
 
-HProcess::~HProcess ( void )
+HTUIProcess::~HTUIProcess ( void )
 	{
 	M_PROLOG
 	HMainWindow * l_poMainWindow = NULL;
@@ -89,48 +88,43 @@ HProcess::~HProcess ( void )
 	M_EPILOG
 	}
 
-int HProcess::init ( char const * a_pcProcessName )
+int HTUIProcess::init ( char const * a_pcProcessName )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	int l_piAlts [ D_ALTS_COUNT ];
 	int l_piCtrls [ ] = { D_KEY_CTRL_('l'), D_KEY_CTRL_('x') };
 	HMainWindow * l_poMainWindow = NULL;
-	if ( f_bInitialised )
-		M_THROW ( "you can initialise your main process only once, dumbass",
-				g_iErrNo );
-	f_bInitialised = true;
+	HProcess::init ( n_iLatency );
 	l_poMainWindow = new HMainWindow ( a_pcProcessName );
 	M_IRV ( l_poMainWindow->init ( ) );
 	f_poWindows = l_poMainWindow->_disclose_window_list ( );
 	M_IRV ( add_window ( l_poMainWindow, a_pcProcessName ) );
-	M_IRV ( register_file_descriptor_handler ( STDIN_FILENO,
-				& HProcess::process_stdin ) );
+	M_REGISTER_FILE_DESCRIPTOR_HANDLER ( STDIN_FILENO, HTUIProcess::process_stdin );
 	if ( n_bUseMouse && n_iMouseDes )
-		M_IRV ( register_file_descriptor_handler ( n_iMouseDes,
-					& HProcess::process_mouse ) );
+		M_REGISTER_FILE_DESCRIPTOR_HANDLER ( n_iMouseDes, HTUIProcess::process_mouse );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_CTRLS_COUNT, l_piCtrls,
-			HProcess::handler_refresh );
+			HTUIProcess::handler_refresh );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('x'), NULL,
-			HProcess::handler_quit );
+			HTUIProcess::handler_quit );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_META_( '\t' ), NULL,
-			HProcess::handler_jump_meta_tab );
+			HTUIProcess::handler_jump_meta_tab );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,
-			HProcess::handler_close_window );
+			HTUIProcess::handler_close_window );
 	if ( n_bUseMouse )
 		M_REGISTER_POSTPROCESS_HANDLER ( KEY_MOUSE, NULL,
-				HProcess::handler_mouse );
+				HTUIProcess::handler_mouse );
 	for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
 		l_piAlts [ l_iCtr ] = D_KEY_META_( '0' + l_iCtr );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_ALTS_COUNT, l_piAlts,
-			HProcess::handler_jump_meta_direct );
-	f_oCommandHandlers [ "quit" ] = static_cast < HANDLER_t > ( & HProcess::handler_quit );
+			HTUIProcess::handler_jump_meta_direct );
+	f_oCommandHandlers [ "quit" ] = static_cast < HANDLER_t > ( & HTUIProcess::handler_quit );
 	handler_refresh ( 0 );
 	return ( 1 );
 	M_EPILOG
 	}
 
-int HProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
+int HTUIProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	{
 	M_PROLOG
 	HInfo l_oInfo;
@@ -146,41 +140,7 @@ int HProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	M_EPILOG
 	}
 
-int HProcess::register_file_descriptor_handler ( int a_iFileDescriptor,
-		PROCESS_HANDLER_FILEDES_t HANDLER )
-	{
-	M_PROLOG
-	f_oFileDescriptorHandlers [ a_iFileDescriptor ] = HANDLER;
-	return ( 0 );
-	M_EPILOG
-	}
-
-int HProcess::unregister_file_descriptor_handler ( int a_iFileDescriptor )
-	{
-	M_PROLOG
-	return ( f_oFileDescriptorHandlers.remove ( a_iFileDescriptor ) );
-	M_EPILOG
-	}
-
-int HProcess::reconstruct_fdset ( void )
-	{
-	M_PROLOG
-	int l_iFileDes = 0;
-	PROCESS_HANDLER_FILEDES_t DUMMY = NULL;
-	f_sLatency.tv_sec = n_iLatency;
-	f_sLatency.tv_usec = 0;
-	FD_ZERO ( & f_xFileDescriptorSet );
-	if ( ! f_oFileDescriptorHandlers.quantity ( ) )
-		return ( -1 );
-	f_oFileDescriptorHandlers.rewind ( );
-/* FD_SET is a macro and first argument is evaluated twice ! */
-	while ( f_oFileDescriptorHandlers.iterate ( l_iFileDes, DUMMY ) )
-		FD_SET ( l_iFileDes, & f_xFileDescriptorSet );
-	return ( 0 );
-	M_EPILOG
-	}
-
-int HProcess::process_stdin ( int a_iCode )
+int HTUIProcess::process_stdin ( int a_iCode )
 	{
 	M_PROLOG
 	HString l_oCommand;
@@ -238,75 +198,31 @@ int HProcess::process_stdin ( int a_iCode )
 	M_EPILOG
 	}
 
-/* this makro is ripped from unistd.h, I seriously doubt if it is portable */
-
-#define M_REFRESH( )	if ( n_bNeedRepaint )\
-	{\
-	n_bNeedRepaint = false;\
-	::refresh ( );\
-	}\
-
-#ifdef __GNUC__
-#	define M_STDHAPI_TEMP_FAILURE_RETRY( expression )	(__extension__ ( \
-	{ int long __result; \
-	do \
-		{ \
-		if ( n_bInputWaiting ) \
-			{ \
-			process_stdin ( STDIN_FILENO ); \
-			M_REFRESH ( ); \
-			} \
-		__result = (int long) (expression); \
-		} \
-	while (__result == -1L && errno == EINTR); \
-	__result; \
-	}))
-#else /* __GNUC__ */
-#	define M_STDHAPI_TEMP_FAILURE_RETRY( expression ) ( expression )
-#endif /* not __GNUC__ */
-
-int HProcess::run ( void )
+int HTUIProcess::handler_alert ( int, void * )
 	{
 	M_PROLOG
-	int l_iError = 0;
-	int l_iFileDes = 0;
-	PROCESS_HANDLER_FILEDES_t HANDLER = NULL;
-	if ( ! f_bInitialised )
-		M_THROW ( "you have to call HProcess::init ( ) first, dumbass", g_iErrNo );
-	::refresh ( );
-	while ( f_bLoop )
+	if ( n_bNeedRepaint )
 		{
-		reconstruct_fdset ( );
-		if ( ( l_iError = M_STDHAPI_TEMP_FAILURE_RETRY ( select ( FD_SETSIZE,
-							& f_xFileDescriptorSet,	NULL, NULL, & f_sLatency ) ) ) )
-			{
-			if ( l_iError < 0 )
-				M_THROW ( "select ( ) returned", l_iError );
-			if ( ! f_oFileDescriptorHandlers.quantity ( ) )
-				return ( -1 );
-			f_oFileDescriptorHandlers.rewind ( );
-			while ( f_oFileDescriptorHandlers.iterate ( l_iFileDes, HANDLER ) )
-				{
-				if ( FD_ISSET ( l_iFileDes, & f_xFileDescriptorSet ) )
-					{
-					M_IRV ( ( this->*HANDLER ) ( l_iFileDes ) );
-					f_iIdleCycles = 0;
-					}
-				}
-			}
-		else
-			handler_idle ( 0 );
-		if ( n_bNeedRepaint )
-			{
-			n_bNeedRepaint = false;
-			::refresh ( );
-			}
+		n_bNeedRepaint = false;
+		::refresh ( );
 		}
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HProcess::handler_idle ( int a_iCode, void * )
+int HTUIProcess::handler_interrupt ( int, void * )
+	{
+	M_PROLOG
+	if ( n_bInputWaiting )
+		{
+		process_stdin ( STDIN_FILENO );
+		handler_alert ( 0 );
+		}
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HTUIProcess::handler_idle ( int a_iCode, void * )
 	{
 	M_PROLOG
 	HStatusBarControl * l_poStatusBar = NULL;
@@ -322,12 +238,12 @@ int HProcess::handler_idle ( int a_iCode, void * )
 		if ( l_poStatusBar )
 			l_poStatusBar->refresh ( );
 		}
-	f_iIdleCycles ++;
+	a_iCode = HProcess::handler_idle ( a_iCode );
 	return ( a_iCode );
 	M_EPILOG
 	}
 
-int HProcess::process_mouse ( int )
+int HTUIProcess::process_mouse ( int )
 	{
 	M_PROLOG
 	handler_mouse ( 0 );
@@ -335,7 +251,7 @@ int HProcess::process_mouse ( int )
 	M_EPILOG
 	}
 
-int HProcess::handler_mouse ( int a_iCode, void * )
+int HTUIProcess::handler_mouse ( int a_iCode, void * )
 	{
 	M_PROLOG
 	a_iCode = 0;
@@ -352,7 +268,7 @@ int HProcess::handler_mouse ( int a_iCode, void * )
 	M_EPILOG
 	}
 
-int HProcess::handler_refresh ( int, void * )
+int HTUIProcess::handler_refresh ( int, void * )
 	{
 	M_PROLOG
 	::endwin ( );
@@ -367,7 +283,7 @@ int HProcess::handler_refresh ( int, void * )
 	M_EPILOG
 	}
 
-int HProcess::handler_quit ( int, void * )
+int HTUIProcess::handler_quit ( int, void * )
 	{
 	M_PROLOG
 	f_bLoop = false;
@@ -376,7 +292,7 @@ int HProcess::handler_quit ( int, void * )
 	M_EPILOG
 	}
 
-int HProcess::handler_jump_meta_tab ( int a_iCode, void * )
+int HTUIProcess::handler_jump_meta_tab ( int a_iCode, void * )
 	{
 	M_PROLOG
 	if ( f_iIdleCycles < 5 )
@@ -393,7 +309,7 @@ int HProcess::handler_jump_meta_tab ( int a_iCode, void * )
 	M_EPILOG
 	}
 
-int HProcess::handler_jump_meta_direct ( int a_iCode, void * )
+int HTUIProcess::handler_jump_meta_direct ( int a_iCode, void * )
 	{
 	M_PROLOG
 	a_iCode = ( a_iCode & 0xff ) - '0';
@@ -406,7 +322,7 @@ int HProcess::handler_jump_meta_direct ( int a_iCode, void * )
 	M_EPILOG
 	}
 
-int HProcess::handler_close_window ( int a_iCode, void * )
+int HTUIProcess::handler_close_window ( int a_iCode, void * )
 	{
 	M_PROLOG
 	f_poWindows->remove_element ( D_EMPTY_IF_NOT_EMPTIED );

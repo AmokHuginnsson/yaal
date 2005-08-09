@@ -1,7 +1,7 @@
 /*
 ---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hprocess.h - this file is integral part of `stdhapi' project.
+	htuiprocess.h - this file is integral part of `stdhapi' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,11 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HPROCESS_H
-#define __HCONSOLE_HPROCESS_H
+#ifndef __HCONSOLE_HTUIPROCESS_H
+#define __HCONSOLE_HTUIPROCESS_H
 
 #include <sys/types.h>
 
+#include "hcore/hprocess.h"
 #include "hhandler.h"
 #include "hwindow.h"
 #include "hwindowlistcontrol.h"
@@ -39,37 +40,28 @@ namespace stdhapi
 namespace hconsole
 {
 
-class HProcess : public HHandler
+class HTUIProcess : public HHandler, protected hcore::HProcess
 	{
-	typedef int ( HProcess::* PROCESS_HANDLER_FILEDES_t ) ( int );
-	typedef hcore::HMap < int, PROCESS_HANDLER_FILEDES_t > process_filedes_map_t;
 protected:
 	/*{*/
-	bool			f_bInitialised;				/* did process has necessery initialisation */
-	bool			f_bLoop; 							/* indicates if main loop continues */
-	int				f_iIdleCycles;				/* full select()'s with out input */
-	timeval		f_sLatency;						/* sleep between re-selects */
-	fd_set		f_xFileDescriptorSet; /* keyboard and eventual sockets */
 	HWindow *	f_poForegroundWindow; /* sefl explanary */
 	HWindowListControl * f_poWindows;			/* current existing windows */
-	process_filedes_map_t f_oFileDescriptorHandlers;
 	/*}*/
 public:
 	/*{*/
-	HProcess ( size_t = 8, size_t = 32, size_t = 32 );
-	virtual ~HProcess ( void );
-	virtual int init ( char const * = "" );
-	int run ( void );
+	HTUIProcess ( size_t = 8, size_t = 32, size_t = 32 );
+	virtual ~HTUIProcess ( void );
+	int init ( char const * = "" );
+	using hcore::HProcess::run;
 	/*}*/
 protected:
 	/*{*/
-	virtual int reconstruct_fdset ( void );
 	int process_stdin ( int );
 	int process_mouse ( int );
 	int process_commands ( void );
-	int register_file_descriptor_handler ( int, PROCESS_HANDLER_FILEDES_t );
-	int unregister_file_descriptor_handler ( int );
 	int add_window ( HWindow *, char const * );
+	virtual int handler_alert ( int, void * = NULL );
+	virtual int handler_interrupt ( int, void * = NULL );
 	virtual int handler_idle ( int, void * = NULL );
 	virtual int handler_mouse ( int, void * = NULL );
 	virtual int handler_refresh ( int, void * = NULL );
@@ -80,8 +72,8 @@ protected:
 	/*}*/
 private:
 	/*{*/
-	HProcess ( HProcess const & );
-	HProcess & operator = ( HProcess const & );
+	HTUIProcess ( HTUIProcess const & );
+	HTUIProcess & operator = ( HTUIProcess const & );
 	/*}*/
 	};
 
@@ -89,5 +81,5 @@ private:
 
 }
 
-#endif /* not __HCONSOLE_HPROCESS_H */
+#endif /* not __HCONSOLE_HTUIPROCESS_H */
 

@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HDATA_HDATAPROCESS_H
 #define __HDATA_HDATAPROCESS_H
 
-#include "hconsole/hprocess.h"
+#include "hconsole/htuiprocess.h"
 #include "hconsole/omenuitem.h"
 #include "tools/hxml.h"
 #include "dbwrapper/hdatabase.h"
@@ -65,7 +65,7 @@ protected:
 	/*}*/
 	};
 
-class HDataProcess : public hconsole::HProcess
+class HDataProcess : public hconsole::HTUIProcess
 	{
 protected:
 	/*{*/

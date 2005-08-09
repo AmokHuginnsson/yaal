@@ -29,7 +29,7 @@ Copyright:
 
 #define D_CVSID_OMENUITEM_H "$CVSHeader$"
 
-#include "hprocess.h"
+#include "htuiprocess.h"
 
 namespace stdhapi
 {
@@ -40,7 +40,7 @@ namespace hconsole
 struct OMenuItem
 	{
 public: /* All is public for simpler usage. */
-	typedef int ( HProcess::* HANDLER_t ) ( void );
+	typedef int ( HTUIProcess::* HANDLER_t ) ( void );
 	OMenuItem * f_psSubMenu;
 	HANDLER_t HANDLER;
 	stdhapi::hcore::HString f_oLabel;

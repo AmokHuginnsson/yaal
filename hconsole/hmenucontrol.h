@@ -58,7 +58,7 @@ class HMenuControl : public HTreeControl
 		};
 protected:
 	/*{*/
-	HProcess * f_poProcess;
+	HTUIProcess * f_poProcess;
 	/*}*/
 public:
 	/*{*/
@@ -69,7 +69,7 @@ public:
 								 int,							/* width */
 								 char const * );	/* label */
 	virtual ~HMenuControl ( void );
-	void init ( HProcess *, OMenuItem * );
+	void init ( HTUIProcess *, OMenuItem * );
 	virtual int process_input( int );
 	/*}*/
 private:

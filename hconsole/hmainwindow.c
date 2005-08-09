@@ -82,7 +82,7 @@ HWindowListControl * HMainWindow::_disclose_window_list ( void )
 	M_EPILOG
 	}
 
-void HMainWindow::init_menu ( HProcess * a_psProcess, OMenuItem * a_psMenu )
+void HMainWindow::init_menu ( HTUIProcess * a_psProcess, OMenuItem * a_psMenu )
 	{
 	M_PROLOG
 	f_poMenu->init ( a_psProcess,	a_psMenu );

@@ -98,7 +98,7 @@ HMenuControl::~HMenuControl ( void )
 	M_EPILOG
 	}
 
-void HMenuControl::init ( HProcess * a_poProcess, OMenuItem * a_psMenu )
+void HMenuControl::init ( HTUIProcess * a_poProcess, OMenuItem * a_psMenu )
 	{
 	M_PROLOG
 	HItem l_oDummy ( 0 );

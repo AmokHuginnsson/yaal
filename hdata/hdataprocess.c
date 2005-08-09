@@ -137,7 +137,7 @@ void HDataXml::destroy_menu ( OMenuItem * a_psMenu )
 	}
 
 HDataProcess::HDataProcess ( void )
-	: HProcess ( ), f_oXml ( ), f_oDataBase ( ), f_psRootMenu ( NULL )
+	: HTUIProcess ( ), f_oXml ( ), f_oDataBase ( ), f_psRootMenu ( NULL )
 	{
 	M_PROLOG
 	return;
@@ -158,7 +158,7 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 		char const * a_pcResource, menu_handlers_map_t const & a_roHandlers )
 	{
 	M_PROLOG
-	int l_iError = HProcess::init ( a_pcProcessName );
+	int l_iError = HTUIProcess::init ( a_pcProcessName );
 	HMainWindow * l_poMainWindow = NULL;
 	HXml::ONode l_sNode;
 	if ( ! dbwrapper::db_connect )
@@ -197,7 +197,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 				}
 			}
 		}
-	return ( HProcess::handler_quit ( a_iCode ) );
+	return ( HTUIProcess::handler_quit ( a_iCode ) );
 	M_EPILOG
 	}
 
@@ -213,7 +213,7 @@ int HDataProcess::handler_close_window ( int a_iCode, void * )
 				&& ! l_poWindow->status_bar ( )->confirm ( "close window" ) )
 			return ( 0 );
 		}
-	return ( HProcess::handler_close_window ( a_iCode ) );
+	return ( HTUIProcess::handler_close_window ( a_iCode ) );
 	M_EPILOG
 	}
 

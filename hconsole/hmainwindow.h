@@ -50,7 +50,7 @@ public:
 	HMainWindow ( char const * );
 	virtual ~HMainWindow ( void );
 	virtual int init ( void );
-	void init_menu ( HProcess *, OMenuItem * );
+	void init_menu ( HTUIProcess *, OMenuItem * );
 	virtual int handler_close ( int, void * ); /* closes window process */
 	HWindowListControl * _disclose_window_list ( void );
 	/*}*/
