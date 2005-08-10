@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcore/hlog.h"
@@ -126,6 +128,8 @@ int HMenuControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
 	OMenuItem const * l_psMenu = NULL;
+	if ( ! f_poRoot )
+		M_THROW ( _ ( "menu not initialized" ), g_iErrNo );
 	a_iCode = HTreeControl::process_input ( a_iCode );
 	if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
 		{

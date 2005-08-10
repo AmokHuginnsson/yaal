@@ -26,6 +26,7 @@ Copyright:
 
 #include <unistd.h>
 #include <string.h>
+#include <libintl.h>
 
 #include "config.h"
 
@@ -88,7 +89,7 @@ HTUIProcess::~HTUIProcess ( void )
 	M_EPILOG
 	}
 
-int HTUIProcess::init_tui ( char const * a_pcProcessName )
+int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWindow )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -96,10 +97,6 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName )
 	int l_piCtrls [ ] = { D_KEY_CTRL_('l'), D_KEY_CTRL_('x') };
 	HMainWindow * l_poMainWindow = NULL;
 	HProcess::init ( n_iLatency );
-	l_poMainWindow = new HMainWindow ( a_pcProcessName );
-	M_IRV ( l_poMainWindow->init ( ) );
-	f_poWindows = l_poMainWindow->_disclose_window_list ( );
-	M_IRV ( add_window ( l_poMainWindow, a_pcProcessName ) );
 	M_REGISTER_FILE_DESCRIPTOR_HANDLER ( STDIN_FILENO, HTUIProcess::process_stdin );
 	if ( n_bUseMouse && n_iMouseDes )
 		M_REGISTER_FILE_DESCRIPTOR_HANDLER ( n_iMouseDes, HTUIProcess::process_mouse );
@@ -107,17 +104,31 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName )
 			HTUIProcess::handler_refresh );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('x'), NULL,
 			HTUIProcess::handler_quit );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_META_( '\t' ), NULL,
-			HTUIProcess::handler_jump_meta_tab );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,
-			HTUIProcess::handler_close_window );
 	if ( n_bUseMouse )
 		M_REGISTER_POSTPROCESS_HANDLER ( KEY_MOUSE, NULL,
 				HTUIProcess::handler_mouse );
-	for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
-		l_piAlts [ l_iCtr ] = D_KEY_META_( '0' + l_iCtr );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_ALTS_COUNT, l_piAlts,
+	if ( a_poMainWindow )
+		{
+		f_poForegroundWindow = a_poMainWindow;
+		f_poForegroundWindow->init ( );
+		if ( ! f_poForegroundWindow->is_initialised ( ) )
+			M_THROW ( _ ( "window has not been initialised" ), g_iErrNo );
+		}
+	else /* Create automatically default main window. */
+		{
+		l_poMainWindow = new HMainWindow ( a_pcProcessName );
+		M_IRV ( l_poMainWindow->init ( ) );
+		f_poWindows = l_poMainWindow->_disclose_window_list ( );
+		M_IRV ( add_window ( l_poMainWindow, a_pcProcessName ) );
+		M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_META_( '\t' ), NULL,
+				HTUIProcess::handler_jump_meta_tab );
+		M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,
+				HTUIProcess::handler_close_window );
+		for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
+			l_piAlts [ l_iCtr ] = D_KEY_META_( '0' + l_iCtr );
+		M_REGISTER_POSTPROCESS_HANDLER ( D_ALTS_COUNT, l_piAlts,
 			HTUIProcess::handler_jump_meta_direct );
+		}
 	f_oCommandHandlers [ "quit" ] = static_cast < HANDLER_t > ( & HTUIProcess::handler_quit );
 	handler_refresh ( 0 );
 	return ( 1 );
@@ -135,6 +146,8 @@ int HTUIProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	f_poWindows->add_tail ( & l_oItem );
 	f_poForegroundWindow = a_poWindow;
 	f_poForegroundWindow->init ( );
+	if ( ! f_poForegroundWindow->is_initialised ( ) )
+		M_THROW ( _ ( "window has not been initialised" ), g_iErrNo );
 	::refresh ( );
 	return ( 0 );
 	M_EPILOG

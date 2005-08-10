@@ -53,9 +53,9 @@ namespace stdhapi
 namespace hconsole
 {
 
-HWindow::HWindow ( char const * a_pcTitle ) : f_oTitle ( a_pcTitle ),
-	f_poFocusedChild ( NULL ), f_poPreviousFocusedChild ( NULL ),
-	f_oControls ( ), f_poStatusBar ( NULL )
+HWindow::HWindow ( char const * a_pcTitle ) : f_bInitialised ( false ),
+	f_oTitle ( a_pcTitle ), f_poFocusedChild ( NULL ),
+	f_poPreviousFocusedChild ( NULL ), f_oControls ( ), f_poStatusBar ( NULL )
 	{
 	M_PROLOG
 	int l_piCmds [ ] = { ':', D_KEY_COMMAND_( ':' ) };
@@ -94,6 +94,7 @@ int HWindow::init ( void )
 	f_poStatusBar = init_bar ( l_oString );
 	f_poStatusBar->enable ( true );
 	f_oControls.remove_head ( D_FORCE_REMOVE_ELEMENT );
+	f_bInitialised = true;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -260,6 +261,12 @@ HString HWindow::get_command ( void )
 	return ( l_oCommand );
 	M_EPILOG
 	}
+
+bool HWindow::is_initialised ( void ) const
+	{
+	return ( f_bInitialised );
+	}
+
 
 }
 

@@ -50,6 +50,7 @@ public:
 protected:
 	typedef HMap < int, HSocket * > clients_t;
 	/*{*/
+	bool f_bNeedShutdown;
 	socket_type_t f_eType;
 	int f_iMaximumNumberOfClients;
 	int f_iAddressSize;
@@ -71,7 +72,7 @@ public:
 	HSocket * get_client ( int ) const;
 	bool get_client_next ( int &, HSocket * & ) const;
 	void rewind_client_list ( void ) const;
-	int read_until ( HString &, char = '\n' );
+	int read_until ( HString &, char const * const = "\r\n" );
 	int get_client_count ( void ) const;
 	HString const & get_host_name ( void );
 	/*}*/

@@ -60,7 +60,7 @@ char const * const n_ppcErrMsgHSocket [ 4 ] =
 
 HSocket::HSocket ( socket_type_t const a_eSocketType,
 		int const a_iMaximumNumberOfClients )
-	: HRawFile ( ), f_eType ( D_DEFAULTS ),
+	: HRawFile ( ), f_bNeedShutdown ( false ), f_eType ( D_DEFAULTS ),
 	f_iMaximumNumberOfClients ( a_iMaximumNumberOfClients ),
 	f_iAddressSize ( 0 ), f_pvAddress ( NULL ), f_poClients ( NULL ),
 	f_oHostName ( ), f_oVarTmpBuffer ( )
@@ -129,10 +129,11 @@ void HSocket::shutdown ( void )
 				M_ENSURE ( unlink ( l_psAddressFile->sun_path ) == 0 );
 			}
 		}
-	if ( f_iFileDescriptor >= 0 )
+	if ( f_bNeedShutdown && ( f_iFileDescriptor >= 0 ) )
 		{
 		M_ENSURE ( ::shutdown ( f_iFileDescriptor, 2 ) == 0 );
 		f_iFileDescriptor = - 1;
+		f_bNeedShutdown = false;
 		}
 	return;
 	M_EPILOG
@@ -170,6 +171,7 @@ void HSocket::listen ( char const * const a_pcAddress, int const a_iPort )
 				static_cast < sockaddr * > ( f_pvAddress ), f_iAddressSize ) == 0 );
 	M_ENSURE ( ::listen ( f_iFileDescriptor, f_iMaximumNumberOfClients ) == 0 );
 	f_poClients = new clients_t ( f_iMaximumNumberOfClients );
+	f_bNeedShutdown = true;
 	return;
 	M_EPILOG
 	}
@@ -207,6 +209,7 @@ HSocket * HSocket::accept ( void )
 	l_poSocket = new HSocket ( f_eType, - 1 );
 	l_poSocket->f_iFileDescriptor = l_iFileDescriptor;
 	l_poSocket->f_iAddressSize = l_iAddressSize;
+	l_poSocket->f_bNeedShutdown = true;
 	memcpy ( l_poSocket->f_pvAddress, l_psAddress, l_iAddressSize );
 	if ( f_poClients->has_key ( l_iFileDescriptor ) )
 		M_THROW ( _ ( "inconsitient client list state" ), l_iFileDescriptor );
@@ -223,6 +226,7 @@ void HSocket::connect ( char const * const a_pcAddress, int const a_iPort )
 	make_address ( a_pcAddress, a_iPort );
 	M_ENSURE ( ::connect ( f_iFileDescriptor,
 				static_cast < sockaddr * > ( f_pvAddress ), f_iAddressSize ) == 0 );
+	f_bNeedShutdown = true;
 	return;
 	M_EPILOG
 	}
@@ -313,7 +317,7 @@ void HSocket::rewind_client_list ( void ) const
 	M_EPILOG
 	}
 
-int HSocket::read_until ( HString & a_roMessage, char a_cStopChar )
+int HSocket::read_until ( HString & a_roMessage, char const * const a_pcStopSet )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -328,12 +332,16 @@ int HSocket::read_until ( HString & a_roMessage, char a_cStopChar )
 		if ( read ( l_pcPtr + l_iCtr, sizeof ( char ) * 1 ) <= 0 )
 			break;
 		}
-	while ( l_pcPtr [ l_iCtr ++ ] != a_cStopChar );
+	while ( ! strchr ( a_pcStopSet, l_pcPtr [ l_iCtr ++ ] ) );
+	l_iCtr --; /* go back one char for stripping terminator */
 	if ( l_iCtr > 0 )
 		{
 		l_pcPtr [ l_iCtr ] = 0;
-		a_roMessage.hs_realloc ( l_iCtr );
-		memcpy ( static_cast < char * > ( a_roMessage ), l_pcPtr, l_iCtr + 1 );
+		if ( l_iCtr > 0 )
+			{
+			a_roMessage.hs_realloc ( l_iCtr );
+			memcpy ( static_cast < char * > ( a_roMessage ), l_pcPtr, l_iCtr + 1 );
+			}
 		}
 	return ( l_iCtr );
 	M_EPILOG

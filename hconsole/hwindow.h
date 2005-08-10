@@ -44,7 +44,8 @@ class HWindow : public HHandler
 	{
 protected:
 	/*{*/
-	hcore::HString							f_oTitle;					/* title of window */
+	bool								f_bInitialised;		/* was window properly initialised? */
+	hcore::HString			f_oTitle;					/* title of window */
 	HControl * 					f_poFocusedChild;	/* points to control that has focus */
 	HControl *					f_poPreviousFocusedChild; /* control that had focus before
 																									 focus went to status bar */	
@@ -67,6 +68,7 @@ public:
 	int add_control ( HControl *, int );
 	HStatusBarControl * status_bar ( void );
 	hcore::HString get_command ( void );
+	bool is_initialised ( void ) const;
 	/*}*/
 protected:
 	/*{*/
