@@ -347,6 +347,17 @@ int HSocket::read_until ( HString & a_roMessage, char const * const a_pcStopSet 
 	M_EPILOG
 	}
 
+int HSocket::write_until_eos ( HString const & a_roMessage )
+	{
+	M_PROLOG
+	int l_iSize = 0;
+	l_iSize = a_roMessage.get_length ( );
+	if ( l_iSize > 0 )
+		l_iSize = write ( a_roMessage, l_iSize );
+	return ( l_iSize );
+	M_EPILOG
+	}
+
 int HSocket::get_client_count ( void ) const
 	{
 	M_PROLOG
