@@ -38,7 +38,8 @@ namespace hcore
 {
 
 #define M_REGISTER_FILE_DESCRIPTOR_HANDLER( fd, handler ) \
-	register_file_descriptor_handler ( fd, static_cast < process_handler_filedes_t > ( & handler ) )
+	register_file_descriptor_handler ( fd, \
+			static_cast < process_handler_filedes_t > ( & handler ) )
 
 class HProcess
 	{

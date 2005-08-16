@@ -43,7 +43,7 @@ public:
 	/*{*/
 	HRandomizer ( int long unsigned const = 1 );
 	void set ( int long unsigned const );
-	int rnd ( void );
+	int rnd ( int = 0 );
 	/*}*/
 	};
 

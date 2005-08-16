@@ -49,7 +49,7 @@ extern "C"
 OVariable n_psVariables [ ] =
 	{
 		{ D_HSTRING, "instance_name", & g_oInstanceName },
-		{ D_NONE, NULL, NULL }
+		{ D_VOID, NULL, NULL }
 	};
 
 struct OAllocator

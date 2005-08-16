@@ -27,8 +27,6 @@ Copyright:
 #ifndef __HCONSOLE_HTUIPROCESS_H
 #define __HCONSOLE_HTUIPROCESS_H
 
-#include <sys/types.h>
-
 #include "hcore/hprocess.h"
 #include "hhandler.h"
 #include "hwindow.h"
@@ -40,7 +38,7 @@ namespace stdhapi
 namespace hconsole
 {
 
-class HTUIProcess : public HHandler, protected hcore::HProcess
+class HTUIProcess : public HHandler, protected stdhapi::hcore::HProcess
 	{
 protected:
 	/*{*/

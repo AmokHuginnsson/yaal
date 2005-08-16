@@ -12,6 +12,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 		- PostGreSQL
 		- SQLite
 		- SQLite3
+		- OCI
 		- gpm
 
 	tools:

@@ -53,11 +53,14 @@ void HRandomizer::set ( int long unsigned const a_ulVal )
 	M_EPILOG
 	}
 	
-int HRandomizer::rnd ( void )
+int HRandomizer::rnd ( int a_iRange )
 	{
 	M_PROLOG
 	f_ulSeed = MULTIPLIER * f_ulSeed + INCREMENT;
-	return ( static_cast < int > ( ( f_ulSeed >> 16 ) & 0x7fff ) );
+	if ( a_iRange )
+		return ( static_cast < int > ( ( f_ulSeed >> 16 ) & 0x7fff ) % a_iRange );
+	else
+		return ( static_cast < int > ( ( f_ulSeed >> 16 ) & 0x7fff ) );
 	M_EPILOG
 	}
 

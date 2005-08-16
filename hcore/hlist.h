@@ -396,7 +396,17 @@ bool HList< tType >::is_above_n ( HElement * a_poLeft, HElement * a_poRight )
 	}
 
 template < typename tType >
-bool const operator > ( tType const &, tType const & );
+bool const operator > ( tType const &, tType const & )
+#ifdef __STDHAPI_BUILD__
+	;
+#else /* __STDHAPI_BUILD__ */
+	{
+	if ( true == false )
+		M_ASSERT ( ! "operator not defined" );
+	return ( false );
+	}
+#endif /* not __STDHAPI_BUILD__ */
+
 
 template < typename tType >
 bool HList< tType >::is_above_c ( HElement * a_poLeft, HElement * a_poRight )
