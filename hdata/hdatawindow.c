@@ -138,8 +138,9 @@ int HDataWindow::init ( void )
 				l_sEditControlResource.f_pcValue = l_pcValue;
 				l_sEditControlResource.f_pcMask = l_pcMask;
 				l_sEditControlResource.f_bReplace = false;
-				l_sEditControlResource.f_bRightAligned = false;
 				l_sEditControlResource.f_bMultiLine = false;
+				l_sEditControlResource.f_bReadOnly = false;
+				l_sEditControlResource.f_bRightAligned = false;
 				l_sEditControlResource.f_bPassword = false;
 				l_sEditControlResource.f_iMaxHistoryLevel = 8;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )

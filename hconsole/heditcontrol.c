@@ -57,15 +57,16 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
 		char const * a_pcLabel, int a_iBufferSize, char const * a_pcValue,
 		char const * a_pcMask, bool a_bReplace, bool a_bRightAligned,
-		bool a_bMultiLine, bool a_bPassword, int a_iMaxHistoryLevel,
-		bool a_bDrawLabel, int a_iDisabledAttribute,
+		bool a_bMultiLine, bool a_bReadOnly, bool a_bPassword,
+		int a_iMaxHistoryLevel, bool a_bDrawLabel, int a_iDisabledAttribute,
 		int a_iEnabledAttribute, int a_iFocusedAttribute )
 					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 							a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
 							a_iEnabledAttribute, a_iFocusedAttribute ),
 					f_bReplace ( a_bReplace ),
 					f_bMultiLine ( a_bMultiLine || ( a_iHeight > 1 ) ? true : false ),
-					f_bPassword ( a_bPassword ), f_bRightAligned ( a_bRightAligned ),
+					f_bReadOnly ( a_bReadOnly ), f_bRightAligned ( a_bRightAligned ),
+					f_bPassword ( a_bPassword ),
 					f_iMaxStringSize ( a_iBufferSize ), f_iCursorPosition ( 0 ),
 					f_iControlOffset ( 0 ), f_iMaxHistoryLevel ( a_iMaxHistoryLevel ),
 					f_oPattern ( ), f_oString ( a_iBufferSize, true ), f_oHistory ( )
@@ -282,14 +283,19 @@ int HEditControl::process_input ( int a_iCode )
 			}
 		case ( D_KEY_CTRL_( 'u' ) ):
 			{
-			l_iLength = 0;
-			f_iControlOffset = 0;
-			f_iCursorPosition = 0;
+			if ( ! f_bReadOnly )
+				{
+				l_iLength = 0;
+				f_iControlOffset = 0;
+				f_iCursorPosition = 0;
+				}
+			else
+				bell ( );
 			break;
 			}
 		case ( KEY_DELETE ):
 			{
-			if ( ! f_bReplace )
+			if ( ! ( f_bReadOnly || f_bReplace ) )
 				{
 				if ( ( f_iControlOffset + f_iCursorPosition ) >= l_iLength )
 					{
@@ -309,7 +315,7 @@ int HEditControl::process_input ( int a_iCode )
 			}
 		case ( KEY_BS ):
 			{
-			if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
+			if ( ! f_bReadOnly && ( ( f_iControlOffset + f_iCursorPosition ) > 0 ) )
 				{
 				if ( f_iControlOffset > 0 )
 					f_iControlOffset --;
@@ -385,7 +391,7 @@ int HEditControl::process_input ( int a_iCode )
 			}
 		case ( D_KEY_META_('d') ):
 			{
-			if ( ! f_bReplace )
+			if ( ! ( f_bReadOnly || f_bReplace ) )
 				{
 				if ( ( f_iControlOffset + f_iCursorPosition ) >= l_iLength )
 					{
@@ -413,7 +419,7 @@ int HEditControl::process_input ( int a_iCode )
 			}
 		case ( D_KEY_CTRL_('w') ):
 			{
-			if ( ! f_bReplace )
+			if ( ! ( f_bReadOnly || f_bReplace ) )
 				{
 				if ( f_iControlOffset + f_iCursorPosition )
 					{
@@ -450,7 +456,7 @@ int HEditControl::process_input ( int a_iCode )
 			}
 		default:
 			{
-			if ( ( a_iCode > 31 ) && ( a_iCode < 256 ) )
+			if ( ! f_bReadOnly && ( a_iCode > 31 ) && ( a_iCode < 256 ) )
 				{
 				if ( ( ! f_bReplace && ( l_iLength < f_iMaxStringSize ) ) 
 || ( f_bReplace && ( ( f_iControlOffset + f_iCursorPosition ) < l_iLength ) )	)
