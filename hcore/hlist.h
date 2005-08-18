@@ -844,6 +844,8 @@ tType * HList< tType >::to_head ( int a_iOffset, int a_iFlag )
 	M_PROLOG
 	bool l_bOk = false;
 	tType * l_ptObject = NULL;
+	if ( f_poSelected == 0 )
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	l_ptObject = & f_poSelected->get ( );
 	if ( a_iOffset < 0 )
 		l_bOk = to_tail ( f_poSelected, - a_iOffset, a_iFlag );
@@ -902,6 +904,8 @@ tType * HList< tType >::to_tail ( int a_iOffset, int a_iFlag )
 	M_PROLOG
 	bool l_bOk = false;
 	tType * l_ptObject = NULL;
+	if ( f_poSelected == 0 )
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
 	l_ptObject = & f_poSelected->get ( );
 	if ( a_iOffset < 0 )
 		l_bOk = to_head ( f_poSelected, - a_iOffset, a_iFlag );
