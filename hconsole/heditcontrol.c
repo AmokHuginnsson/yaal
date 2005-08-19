@@ -191,8 +191,7 @@ int HEditControl::process_input ( int a_iCode )
 			}
 		case ( KEY_NPAGE ):
 			{
-			M_IRV ( f_oHistory.go ( 0 ) );	
-			M_IRV ( f_oHistory.to_head ( ) );
+			M_IRV ( f_oHistory.go ( - 1 ) );	
 			l_iErrorCode = - 1;
 			break;
 			}
@@ -220,14 +219,13 @@ int HEditControl::process_input ( int a_iCode )
 			while ( -- l_iErrorCode )
 				if ( ( * f_oHistory.to_tail ( ) ) == f_oString )
 					break;
-			if ( f_oString.get_length ( ) &&  ( ! l_iErrorCode ) )
+			if ( f_oString.get_length ( ) && ( ! l_iErrorCode ) )
 				{
 				M_IRV ( f_oHistory.add_head ( & f_oString ) );
 				l_iErrorCode = f_oHistory.quantity ( );
 				while ( l_iErrorCode -- > f_iMaxHistoryLevel )
 					M_IRV ( f_oHistory.remove_at ( l_iErrorCode, D_EMPTY_IF_NOT_EMPTIED ) );
-				M_IRV ( f_oHistory.go ( 0 ) );
-				M_IRV ( f_oHistory.to_head ( ) );
+				M_IRV ( f_oHistory.go ( - 1 ) );
 				}
 			else
 				M_IRV ( f_oHistory.to_head ( ) );
@@ -539,16 +537,6 @@ void HEditControl::set ( HInfo const & a_roInfo )
 		}
 	else
 		f_iCursorPosition = l_iLength;
-	l_iErrorCode = f_oHistory.quantity ( );
-	while ( l_iErrorCode )
-		{
-		if ( ( * f_oHistory.to_tail ( ) ) == f_oString )
-			{
-			M_IRV ( f_oHistory.to_head ( ) );
-			break;
-			}
-		l_iErrorCode --;
-		}
 	refresh ( );
 	return;
 	M_EPILOG

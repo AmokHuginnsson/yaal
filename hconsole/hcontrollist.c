@@ -97,10 +97,7 @@ void HControlList::select ( HControl * a_poControl )
 	f_poSelected = f_poHook;
 	while ( l_iCtr ++ < f_iQuantity )
 		if ( ( * to_tail ( ) ) == a_poControl )
-			{
-			M_IRV ( to_head ( ) );
 			return;
-			}
 	f_poSelected = l_poElement;
 	M_THROW ( "bogus object", reinterpret_cast < int > ( a_poControl ) );
 	M_EPILOG

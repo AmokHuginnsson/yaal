@@ -298,8 +298,8 @@ HList< tType > & HList< tType >::operator = ( HList < tType > const & a_roList )
 		l_poList = const_cast < HList * > ( & a_roList );
 		if ( l_iCount )
 			{
-			M_IRV ( go ( 0 ) );
-			M_IRV ( l_poList->go ( 0 ) );
+			M_IRV ( go ( - 1 ) );
+			M_IRV ( l_poList->go ( - 1 ) );
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )	
 				{
 				( * to_tail ( ) ) = ( * l_poList->to_tail ( ) );
@@ -309,6 +309,8 @@ HList< tType > & HList< tType >::operator = ( HList < tType > const & a_roList )
 					f_poIndex = f_poSelected;
 				}
 			}
+		else if ( a_roList.f_iQuantity )
+			l_poList->go ( - 1 );
 		if ( f_iQuantity > a_roList.f_iQuantity )
 			{
 			l_iCount = f_iQuantity - a_roList.f_iQuantity;
@@ -846,13 +848,12 @@ tType * HList< tType >::to_head ( int a_iOffset, int a_iFlag )
 	tType * l_ptObject = NULL;
 	if ( f_poSelected == 0 )
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
-	l_ptObject = & f_poSelected->get ( );
 	if ( a_iOffset < 0 )
 		l_bOk = to_tail ( f_poSelected, - a_iOffset, a_iFlag );
 	else
 		l_bOk = to_head ( f_poSelected, a_iOffset, a_iFlag );
-	if ( ! l_bOk )
-		l_ptObject = NULL;
+	if ( l_bOk )
+		l_ptObject = & f_poSelected->get ( );
 	return ( l_ptObject );
 	M_EPILOG
 	}
@@ -906,13 +907,12 @@ tType * HList< tType >::to_tail ( int a_iOffset, int a_iFlag )
 	tType * l_ptObject = NULL;
 	if ( f_poSelected == 0 )
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
-	l_ptObject = & f_poSelected->get ( );
 	if ( a_iOffset < 0 )
 		l_bOk = to_head ( f_poSelected, - a_iOffset, a_iFlag );
 	else
 		l_bOk = to_tail ( f_poSelected, a_iOffset, a_iFlag );
-	if ( ! l_bOk )
-		l_ptObject = NULL;
+	if ( l_bOk )
+		l_ptObject = & f_poSelected->get ( );
 	return ( l_ptObject );
 	M_EPILOG
 	}

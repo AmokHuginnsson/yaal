@@ -229,13 +229,14 @@ typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
 	HNode * * l_ppoNode = NULL;
 	if ( f_poTrunk )
 		{
-		while ( ( l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,
-						D_TREAT_AS_OPENED ) ) )
-			if ( ( * l_ppoNode ) == this )
-				break;
-		l_ppoNode = & f_poTrunk->f_oBranch.present ( );
+		for ( l_ppoNode = & f_poTrunk->f_oBranch.go ( 0 );
+				l_ppoNode && ( ( * l_ppoNode ) != this );
+				l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,	D_TREAT_AS_OPENED ) )
+			;
+		if ( l_ppoNode )
+			l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,	D_TREAT_AS_OPENED );
 		}
-	return ( * l_ppoNode );
+	return ( l_ppoNode ? * l_ppoNode : NULL );
 	M_EPILOG
 	}
 

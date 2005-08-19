@@ -114,6 +114,7 @@ OMenuItem * HDataXml::build_menu ( menu_handlers_map_t const & a_roHandlers,
 	l_sMenuItem.reset ( );
 	l_oSubMenu.add_tail ( & l_sMenuItem );
 	l_psMenu = new OMenuItem [ l_iCount = l_oSubMenu.quantity ( ) ];
+	l_oSubMenu.go ( - 1 );
 	for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 		l_psMenu [ l_iCtr ] = ( * l_oSubMenu.to_tail ( ) );
 	return ( l_psMenu );
@@ -184,7 +185,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 	HDataWindow * l_poWindow = NULL;
 	if ( f_poWindows->quantity ( ) )
 		{
-		f_poWindows->go ( 0 );
+		f_poWindows->go ( - 1 );
 		while ( ( l_poItem = f_poWindows->to_tail ( 1, D_TREAT_AS_OPENED ) ) )
 			{
 			l_poWindow = dynamic_cast < HDataWindow * > ( static_cast < HWindow * > ( ( * l_poItem ) [ 0 ].get < void * > ( ) ) );
