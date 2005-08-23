@@ -84,6 +84,7 @@ namespace hconsole
 #define D_BG_LIGHTGRAY			112
 
 #define D_BG_BLINK					128
+#define D_BG_GRAY						D_BG_BLINK
 
 #define D_ATTR_NORMAL				( D_FG_LIGHTGRAY | D_BG_BLACK )
 
