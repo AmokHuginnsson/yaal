@@ -89,6 +89,7 @@ namespace hconsole
 #define D_ATTR_NORMAL				( D_FG_LIGHTGRAY | D_BG_BLACK )
 
 #define D_KEY_ESC						27
+#define D_KEY_ENTER					13
 #define D_KEY_REFRESH				D_KEY_CTRL_L
 #define D_KEY_RESIZE				D_KEY_CTRL_L
 
