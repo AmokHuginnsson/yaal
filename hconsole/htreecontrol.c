@@ -262,6 +262,7 @@ int HTreeControl::process_input ( int a_iCode )
 					break;
 				}
 			}
+		/* when node is unfolded, right key works as down key */
 		case ( KEY_DOWN ):
 			{
 			if ( l_poNode->f_bUnfolded )

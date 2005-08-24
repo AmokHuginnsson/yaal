@@ -55,7 +55,7 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 		char const * a_pcLabel, int a_iStatusBarAttribute )
 								 : HControl ( a_poParent, - 2, 0, 2, - 1, a_pcLabel ),
 									HEditControl ( NULL, 0, 0, 0, 0, NULL, 127, "", D_MASK_LOOSE,
-											false, false, false, false, 255 ),
+											false, false, false, false, false, 255 ),
 	f_iStatusBarAttribute ( 0 ), f_iPromptLength ( 0 ),
 	f_iMode ( D_PROMPT_MODE_NORMAL ), f_iRestrict ( D_PROMPT_RESTRICT_RELAXED ),
 	f_oPrompt ( ), f_bDone ( false ), f_bEstimate ( false ), f_dProgressSize ( 1 ),

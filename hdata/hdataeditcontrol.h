@@ -53,8 +53,9 @@ public:
 								char const * = "",	/* initial content */
 								char const * = D_MASK_DEFAULT, /* mask */
 								bool = false,				/* replace */
-								bool = false,				/* right alignment */
 								bool = false,				/* multiline */
+								bool = false,				/* read only */
+								bool = false,				/* right alignment */
 								bool = false,				/* password */
 								int = 8,						/* max history level */
 								bool = true,				/* draw label */

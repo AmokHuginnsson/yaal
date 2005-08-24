@@ -147,10 +147,10 @@ int HDataWindow::init ( void )
 					l_psECR = static_cast < OEditControlResource * > ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				l_poDataControl = new HDataEditControl ( this,
 						M_SETUP_STANDART, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
-						l_psECR->f_pcMask, l_psECR->f_bReplace, l_psECR->f_bRightAligned,
-						l_psECR->f_bMultiLine, l_psECR->f_bPassword,
-						l_psECR->f_iMaxHistoryLevel,
-						M_SETUP_ATTRIBUTES );
+						l_psECR->f_pcMask, l_psECR->f_bReplace,
+						l_psECR->f_bMultiLine, l_psECR->f_bReadOnly, 
+						l_psECR->f_bRightAligned, l_psECR->f_bPassword,
+						l_psECR->f_iMaxHistoryLevel, M_SETUP_ATTRIBUTES );
 				break;
 				}
 			case ( D_CONTROL_LIST ):
