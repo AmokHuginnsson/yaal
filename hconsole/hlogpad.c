@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <ncurses.h>
+
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hlogpad.h"
@@ -186,6 +188,62 @@ void HLogPad::add ( int a_iAttribute, char const * const a_pcText )
 	add ( a_iAttribute );
 	add ( a_pcText );
 	return;
+	M_EPILOG
+	}
+
+int HLogPad::process_input ( int a_iCode )
+	{
+	M_PROLOG
+	int l_iCode = 0;
+	switch ( a_iCode )
+		{
+		case ( KEY_DOWN ):
+			{
+			if ( ( f_oContents.quantity ( ) ) > ( f_iHeightRaw + f_iOffsetRow ) )
+				f_iOffsetRow ++;
+			break;
+			}
+		case ( KEY_UP ):
+			{
+			if ( f_iOffsetRow > 0 )
+				f_iOffsetRow --;
+			break;
+			}
+		case ( KEY_LEFT ):
+			{
+			if ( f_iOffsetColumn > 0 )
+				f_iOffsetColumn --;
+			break;
+			}
+		case ( KEY_RIGHT ):
+			{
+			f_iOffsetColumn ++;
+			if ( f_iOffsetColumn < 0 )
+				f_iOffsetColumn = 0;
+			break;
+			}
+		case ( KEY_HOME ):
+			{
+			f_iOffsetRow = 0;
+			f_iOffsetColumn = 0;
+			break;
+			}
+		case ( KEY_END ):
+			{
+			f_iOffsetColumn = 0;
+			if ( ( f_iOffsetRow = f_oContents.quantity ( ) ) > f_iHeightRaw )
+				f_iOffsetRow -= f_iHeightRaw;
+			break;
+			}
+		default :
+			{
+			l_iCode = a_iCode;
+			break;
+			}
+		}
+	if ( ! l_iCode )
+		refresh ( );
+	return ( l_iCode );
 	M_EPILOG
 	}
 
