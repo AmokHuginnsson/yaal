@@ -66,6 +66,7 @@ class HLogPad : public HControl
 protected:
 	typedef hcore::HList < HLogLine > contents_t;
 	/*{*/
+	int f_iLines;
 	int f_iOffsetRow;
 	int f_iOffsetColumn;
 	int f_iAttribute;

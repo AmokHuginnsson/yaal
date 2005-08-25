@@ -56,8 +56,8 @@ HLogPad::HLogLine::~HLogLine ( void )
 HLogPad::HLogPad ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		int a_iHeight, int a_iWidth, char const * const a_pcLabel )
 	: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcLabel ),
-	f_iOffsetRow ( 0 ), f_iOffsetColumn ( 0 ), f_iAttribute ( 0 ),
-	f_oContents ( )
+	f_iLines ( 0 ), f_iOffsetRow ( 0 ), f_iOffsetColumn ( 0 ),
+	f_iAttribute ( 0 ), f_oContents ( )
 	{
 	M_PROLOG
 	return;
@@ -74,25 +74,27 @@ HLogPad::~HLogPad ( void )
 void HLogPad::refresh ( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iCursor = 0, l_iColumn = 0;
+	int l_iCtr = 0, l_iRow = 0, l_iCursor = 0, l_iColumn = 0;
 	int l_iBG = f_bFocused ? D_BG_GRAY : D_BG_BLACK;
 	HLogLine * l_poLogLine;
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( static_cast < char * > ( f_oVarTmpBuffer ), ' ', f_iWidthRaw );
+	static_cast < char * > ( f_oVarTmpBuffer ) [ f_iWidthRaw ] = 0;
 	f_iAttribute = D_FG_BLACK | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		c_printf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );
 	if ( f_oContents.quantity ( ) )
 		{
-		l_poLogLine = & f_oContents.go ( f_iOffsetRow );
-		for ( l_iCtr = 0;	l_poLogLine && ( l_iCtr < f_iHeightRaw ); )
+		l_poLogLine = & f_oContents.go ( 0 );
+		l_iCtr = 0;
+		while ( l_poLogLine && ( l_iRow < f_iHeightRaw ) )
 			{
 			if ( l_poLogLine->f_eType == HLogLine::D_ATTRIBUTE )
 				f_iAttribute = l_poLogLine->f_iAttribute | l_iBG;
 			else
 				{
-				if ( l_iCursor < f_iWidthRaw )
+				if ( ( l_iCtr >= f_iOffsetRow ) && ( l_iCursor < f_iWidthRaw ) )
 					{
 					if ( f_iOffsetColumn > l_iColumn )
 						f_oVarTmpBuffer = l_poLogLine->f_oText.mid ( f_iOffsetColumn - l_iColumn );
@@ -101,7 +103,7 @@ void HLogPad::refresh ( void )
 					if ( ( l_iCursor + f_oVarTmpBuffer.get_length ( ) ) >= f_iWidthRaw )
 						f_oVarTmpBuffer [ f_iWidthRaw - l_iCursor ] = 0;
 					if ( f_oVarTmpBuffer [ 0 ] )
-						c_printf ( f_iRowRaw + l_iCtr, f_iColumnRaw + l_iCursor, f_iAttribute, f_oVarTmpBuffer );
+						c_printf ( f_iRowRaw + l_iRow, f_iColumnRaw + l_iCursor, f_iAttribute, f_oVarTmpBuffer );
 					}
 				else
 					f_oVarTmpBuffer = "";
@@ -109,6 +111,8 @@ void HLogPad::refresh ( void )
 					{
 					l_iCursor = 0;
 					l_iColumn = 0;
+					if ( l_iCtr >= f_iOffsetRow )
+						l_iRow ++;
 					l_iCtr ++;
 					}
 				else
@@ -157,6 +161,7 @@ void HLogPad::add ( char const * const a_pcText )
 			{
 			l_poLogLine->f_oText += f_oVarTmpBuffer.left ( l_iIndexNL );
 			l_poLogLine->f_eType = HLogLine::D_TEXT_EOL;
+			f_iLines ++;
 			l_iIndexChar = f_oVarTmpBuffer.find_other_than ( "\r\n", l_iIndexNL + 1 );
 			if ( l_iIndexChar >= 0 )
 				f_oVarTmpBuffer = f_oVarTmpBuffer.mid ( l_iIndexChar );
@@ -174,8 +179,8 @@ void HLogPad::add ( char const * const a_pcText )
 		l_poLogLine->f_eType = HLogLine::D_TEXT;
 		l_poLogLine->f_oText = "";
 		}
-	if ( ( l_iIndexNL = f_oContents.quantity ( ) ) > f_iHeightRaw )
-		f_iOffsetRow = l_iIndexNL - f_iHeightRaw;
+	if ( f_iLines > f_iHeightRaw )
+		f_iOffsetRow = f_iLines - f_iHeightRaw;
 	n_bNeedRepaint = true;
 	refresh ( );
 	return;
@@ -199,7 +204,7 @@ int HLogPad::process_input ( int a_iCode )
 		{
 		case ( KEY_DOWN ):
 			{
-			if ( ( f_oContents.quantity ( ) ) > ( f_iHeightRaw + f_iOffsetRow ) )
+			if ( f_iLines > ( f_iHeightRaw + f_iOffsetRow ) )
 				f_iOffsetRow ++;
 			break;
 			}
@@ -231,8 +236,8 @@ int HLogPad::process_input ( int a_iCode )
 		case ( KEY_END ):
 			{
 			f_iOffsetColumn = 0;
-			if ( ( f_iOffsetRow = f_oContents.quantity ( ) ) > f_iHeightRaw )
-				f_iOffsetRow -= f_iHeightRaw;
+			if ( f_iLines > f_iHeightRaw )
+				f_iOffsetRow = f_iLines - f_iHeightRaw;
 			break;
 			}
 		default :
