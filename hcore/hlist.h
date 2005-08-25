@@ -665,15 +665,34 @@ int HList< tType >::remove_element ( int a_iFlag, tType * * a_pptObject )
 		}
 	else
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+	/* 1 2 3 4 5 6 7
+	 *     ^
+	 * 1 2 4 5 6 7
+	 *     ^
+	 * 1 2 3 4 5
+	 * ^
+	 * 2 3 4 5
+	 * ^
+	 * 1 2 3 4 5
+	 *         ^
+	 * 1 2 3 4  (o)
+	 *       ^
+	 * 1 2 3 4  (c) 
+	 * ^
+	 */
 	if ( ( l_iTreat == D_TREAT_AS_OPENED )
 			&& ( f_poSelected->f_poNext == f_poHook ) )
+		{
 		f_poSelected = f_poSelected->f_poPrevious;
+		if ( a_pptObject )
+			( * a_pptObject ) = NULL;
+		}
 	else
 		f_poSelected = f_poSelected->f_poNext;
 	if ( l_poElement == f_poHook )
 		f_poHook = f_poHook->f_poNext;
 	delete l_poElement;
-	f_iQuantity--;
+	f_iQuantity --;
 	if ( f_iQuantity == 0 )
 		{
 		f_poHook = NULL;
