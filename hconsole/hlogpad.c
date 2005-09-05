@@ -24,7 +24,15 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <ncurses.h>
+#include "config.h"
+
+#ifdef HAVE_NCURSES_H
+#	include <ncurses.h>
+#elif defined ( HAVE_NCURSES_NCURSES_H )
+#	include <ncurses/ncurses.h>
+#else /* HAVE_NCURSES_NCURSES_H */
+#	error "No ncurses header available."
+#endif /* not HAVE_NCURSES_NCURSES_H */
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );

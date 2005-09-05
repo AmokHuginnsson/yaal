@@ -13,7 +13,8 @@ printf "	header files:      %8d\n" ${HEADERS_COUNT}
 TOTAL=$((${SOURCES_COUNT}+${HEADERS_COUNT}))
 printf "	total:             %8d\n" ${TOTAL}
 
-TMP_FILE=`mktemp`
+#TMP_FILE=`mktemp`
+TMP_FILE=`mktemp -t stdhapi-stats.XXXXXX`
 
 cat ${SOURCES} ${HEADERS} | grep -v '^$' > ${TMP_FILE}
 
