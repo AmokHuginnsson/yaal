@@ -683,7 +683,7 @@ void HListControl::recalculate_column_widths ( void )
 	M_EPILOG
 	}
 
-int HListControl::remove_element ( int a_iFlag, HItem * * a_ppoItem )
+int HListControl::remove_element ( treatment_t const & a_eFlag, HItem * * a_ppoItem )
 	{
 	M_PROLOG
 	bool l_bFlag = true;
@@ -701,7 +701,7 @@ int HListControl::remove_element ( int a_iFlag, HItem * * a_ppoItem )
 	if ( f_poSelected == f_poFirstVisibleRow )
 		M_IRV ( to_tail ( f_poFirstVisibleRow ) );
 	n_bNeedRepaint = true;
-	l_iError = HList < HItem > ::remove_element ( a_iFlag, a_ppoItem );
+	l_iError = HList < HItem > ::remove_element ( a_eFlag, a_ppoItem );
 	if ( l_bFlag )
 		M_IRV ( to_head ( ) );
 	refresh ( );
@@ -709,7 +709,7 @@ int HListControl::remove_element ( int a_iFlag, HItem * * a_ppoItem )
 	M_EPILOG
 	}
 
-int HListControl::remove_tail ( int a_iFlag, HItem * * a_ppoItem )
+int HListControl::remove_tail ( treatment_t const & a_eFlag, HItem * * a_ppoItem )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -727,7 +727,7 @@ int HListControl::remove_tail ( int a_iFlag, HItem * * a_ppoItem )
 	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
 		f_iCursorPosition --;
 	n_bNeedRepaint = true;
-	l_iError = HList < HItem > ::remove_tail ( a_iFlag, a_ppoItem );
+	l_iError = HList < HItem > ::remove_tail ( a_eFlag, a_ppoItem );
 	if ( is_enabled ( ) )
 		refresh ( );
 	return ( l_iError );

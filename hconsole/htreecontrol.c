@@ -89,7 +89,7 @@ void HTreeControl::HNodeControl::collapse ( void )
 		return;
 	for ( l_ppoNodeControl = reinterpret_cast < HTreeControl::HNodeControl * * > ( & f_oBranch.go ( 0 ) );
 			l_ppoNodeControl;
-			l_ppoNodeControl = reinterpret_cast < HTreeControl::HNodeControl * * > ( f_oBranch.to_tail ( 1, D_TREAT_AS_OPENED ) ) )
+			l_ppoNodeControl = reinterpret_cast < HTreeControl::HNodeControl * * > ( f_oBranch.to_tail ( 1, branch_t::D_TREAT_AS_OPENED ) ) )
 		( * l_ppoNodeControl )->collapse ( );
 	return;
 	M_EPILOG
@@ -245,7 +245,7 @@ int HTreeControl::process_input ( int a_iCode )
 						{
 						f_poSelected = l_poNode->f_oBranch [ 0 ];
 						l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
-						f_poSelected = l_poNode->previous ( D_TREAT_AS_CLOSED );
+						f_poSelected = l_poNode->previous ( branch_t::D_TREAT_AS_CLOSED );
 						l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
 						}
 					}

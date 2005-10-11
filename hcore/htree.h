@@ -66,6 +66,9 @@ template < typename tttType >
 class HTree
 	{
 protected:
+	class HNode;
+	typedef HBranchList < HNode * > branch_t;
+	typedef typename branch_t::treatment_t treatment_t;
 	class HNode
 		{
 	protected:
@@ -74,7 +77,7 @@ protected:
 		int f_iNumber;																	/* serial number */
 		int f_iHits;			/* how many times element's object was accessed */
 		int f_iLevel;																		/* self explanary */
-		HBranchList < HNode * > f_oBranch;	/* list of next level nodes */
+		branch_t f_oBranch;	/* list of next level nodes */
 		HNode * f_poTrunk;									/* self explanary */
 		HTree * f_poTree;										/* tree that owns node */
 		/*}*/
@@ -91,7 +94,7 @@ protected:
 		virtual ~HNode ( void );
 		void put ( tttType );
 		tttType get ( void );
-		HNode * previous ( int = D_TREAT_AS_OPENED );
+		HNode * previous ( treatment_t const & = branch_t::D_TREAT_AS_OPENED );
 		HNode * next ( void );
 		/*}*/
 	private:
@@ -203,7 +206,7 @@ tttType HTree < tttType > ::HNode::get( void )
 	}
 
 template < typename tttType >
-typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( int a_iFlag )
+typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( treatment_t const & a_eFlag )
 	{
 	M_PROLOG
 	HNode * l_poNode = NULL;
@@ -215,7 +218,7 @@ typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( int a_i
 			f_poTrunk->f_oBranch.to_head ( );
 			l_poNode = f_poTrunk->f_oBranch.present ( );
 			}
-		f_poTrunk->f_oBranch.to_head ( 1, a_iFlag );
+		f_poTrunk->f_oBranch.to_head ( 1, a_eFlag );
 		l_poNode = f_poTrunk->f_oBranch.present ( );
 		}
 	return ( l_poNode );
@@ -231,10 +234,10 @@ typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
 		{
 		for ( l_ppoNode = & f_poTrunk->f_oBranch.go ( 0 );
 				l_ppoNode && ( ( * l_ppoNode ) != this );
-				l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,	D_TREAT_AS_OPENED ) )
+				l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,	branch_t::D_TREAT_AS_OPENED ) )
 			;
 		if ( l_ppoNode )
-			l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,	D_TREAT_AS_OPENED );
+			l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,	branch_t::D_TREAT_AS_OPENED );
 		}
 	return ( l_ppoNode ? * l_ppoNode : NULL );
 	M_EPILOG

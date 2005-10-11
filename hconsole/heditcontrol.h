@@ -66,7 +66,8 @@ protected:
 																			 characters and
 																			 in what way can be entered */
 	hcore::HString			f_oString;		/* control content */
-	hcore::HList< hcore::HString >	f_oHistory;	/* history of insertions */
+	typedef hcore::HList< hcore::HString >	history_t;
+	history_t	f_oHistory;							/* history of insertions */
 	/*}*/
 public:
 	/*{*/

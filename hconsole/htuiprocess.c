@@ -338,7 +338,7 @@ int HTUIProcess::handler_jump_meta_direct ( int a_iCode, void * )
 int HTUIProcess::handler_close_window ( int a_iCode, void * )
 	{
 	M_PROLOG
-	f_poWindows->remove_element ( D_EMPTY_IF_NOT_EMPTIED );
+	f_poWindows->remove_element ( HWindowListControl::D_EMPTY_IF_NOT_EMPTIED );
 	f_poForegroundWindow = static_cast < HWindow * > ( f_poWindows->go ( -1 ) [ 0 ].get < void * > ( ) );
 	handler_refresh ( 0 );
 	a_iCode = 0;

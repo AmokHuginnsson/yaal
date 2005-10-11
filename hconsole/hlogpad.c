@@ -129,7 +129,7 @@ void HLogPad::refresh ( void )
 					l_iColumn += l_poLogLine->f_oText.get_length ( );
 					}
 				}
-			l_poLogLine = f_oContents.to_tail ( 1, D_TREAT_AS_OPENED );
+			l_poLogLine = f_oContents.to_tail ( 1, contents_t::D_TREAT_AS_OPENED );
 			}
 		}
 	return;

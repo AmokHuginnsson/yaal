@@ -186,7 +186,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 	if ( f_poWindows->quantity ( ) )
 		{
 		f_poWindows->go ( - 1 );
-		while ( ( l_poItem = f_poWindows->to_tail ( 1, D_TREAT_AS_OPENED ) ) )
+		while ( ( l_poItem = f_poWindows->to_tail ( 1, HWindowListControl::D_TREAT_AS_OPENED ) ) )
 			{
 			l_poWindow = dynamic_cast < HDataWindow * > ( static_cast < HWindow * > ( ( * l_poItem ) [ 0 ].get < void * > ( ) ) );
 			if ( l_poWindow && l_poWindow->is_modified ( ) )

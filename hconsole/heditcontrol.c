@@ -224,7 +224,7 @@ int HEditControl::process_input ( int a_iCode )
 				M_IRV ( f_oHistory.add_head ( & f_oString ) );
 				l_iErrorCode = f_oHistory.quantity ( );
 				while ( l_iErrorCode -- > f_iMaxHistoryLevel )
-					M_IRV ( f_oHistory.remove_at ( l_iErrorCode, D_EMPTY_IF_NOT_EMPTIED ) );
+					M_IRV ( f_oHistory.remove_at ( l_iErrorCode, history_t::D_EMPTY_IF_NOT_EMPTIED ) );
 				M_IRV ( f_oHistory.go ( - 1 ) );
 				}
 			else

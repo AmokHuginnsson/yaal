@@ -93,7 +93,7 @@ int HWindow::init ( void )
 	l_oString.format ( " [%s]& \n", static_cast < char * > ( f_oTitle ) );
 	f_poStatusBar = init_bar ( l_oString );
 	f_poStatusBar->enable ( true );
-	f_oControls.remove_head ( D_FORCE_REMOVE_ELEMENT );
+	f_oControls.remove_head ( HControlList::D_FORCE_REMOVE_ELEMENT );
 	f_bInitialised = true;
 	return ( 0 );
 	M_EPILOG
