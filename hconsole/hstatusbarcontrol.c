@@ -26,16 +26,6 @@ Copyright:
 
 #include <string.h>
 
-#include "config.h"
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hstatusbarcontrol.h"
@@ -88,13 +78,13 @@ HStatusBarControl::~HStatusBarControl ( void )
 void HStatusBarControl::draw_label ( void )
 	{
 	M_PROLOG
-	::move ( n_iHeight - 2, 0 );
-	::clrtoeol ( );
+	c_move ( n_iHeight - 2, 0 );
+	c_clrtoeol ( );
 	HControl::draw_label ( );
 	bar ( );
 	f_iColumnRaw += f_iPromptLength;
 	f_iWidthRaw -= f_iPromptLength;
-	::move ( f_iRowRaw, f_iPromptLength );
+	c_move ( f_iRowRaw, f_iPromptLength );
 	return;
 	M_EPILOG
 	}
@@ -105,15 +95,15 @@ void HStatusBarControl::refresh ( void )
 	int l_iOrigRow = 0;
 	int l_iOrigColumn = 0;
 	if ( ! f_bFocused )
-		getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
+		c_getyx ( l_iOrigRow, l_iOrigColumn );
 	if ( f_iPromptLength )
 		{
 		set_attr ( f_iStatusBarAttribute >> 8 );
-		::mvprintw ( f_iRowRaw, 0, f_oPrompt );
+		c_mvprintf ( f_iRowRaw, 0, f_oPrompt );
 		}
 	HEditControl::refresh ( );
 	if ( ! f_bFocused )
-		::move ( l_iOrigRow, l_iOrigColumn );
+		c_move ( l_iOrigRow, l_iOrigColumn );
 	return;
 	M_EPILOG
 	}
@@ -121,7 +111,7 @@ void HStatusBarControl::refresh ( void )
 int HStatusBarControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
-	if ( ( a_iCode == KEY_BACKSPACE )
+	if ( ( a_iCode == KEY_CODES::D_BACKSPACE )
 			&& ( f_iRestrict == D_PROMPT_RESTRICT_RELAXED )
 			&& ( f_iMode != D_PROMPT_MODE_MENU )
 			&& ! f_oString.get_length ( ) )
@@ -257,13 +247,13 @@ void HStatusBarControl::update_progress ( double a_dStep,
 			strncpy ( static_cast < char * > ( f_oString ) + n_iWidth - 5, "done", 4 );
 		::memset ( static_cast < char * > ( f_oString ) + 1, '-', l_iMaxBar );
 		::memset ( static_cast < char * > ( f_oString ) + 1, '=', l_iNextStep );
-		mvprintw ( n_iHeight - 1, 0, f_oString );
+		c_mvprintf ( n_iHeight - 1, 0, f_oString );
 		f_oString = "";
 		f_iLastProgress = l_iNextStep;
 		f_iLastPercent = l_iNextPercent;
 		f_iLastMinute = l_iNextMinute;
 		f_iLastSecond = l_iNextSecond;
-		::refresh ( );
+		refresh ( );
 		}
 	return;
 	M_EPILOG
@@ -276,7 +266,7 @@ void HStatusBarControl::message ( int a_iAttribute,
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )
-		putchar ( '\a' );
+		bell ( );
 	c_vprintf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	n_bNeedRepaint = true;
@@ -290,7 +280,7 @@ void HStatusBarControl::message ( char const * a_pcFormat, ... )
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )
-		putchar ( '\a' );
+		bell ( );
 	c_vprintf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	n_bNeedRepaint = true;
@@ -308,7 +298,7 @@ void HStatusBarControl::bar ( char const * a_pcBar )
 				( n_iWidth - f_iLabelLength ) - ( f_bSingleLine ? 2 : 1 ) );
 		f_oMessage.format ( f_oVarTmpBuffer, a_pcBar );
 		}
-	::mvprintw ( n_iHeight - 2,
+	c_mvprintf ( n_iHeight - 2,
 			f_iLabelLength - ( f_bSingleLine ? 0 : 1 ), f_oMessage );
 	return;
 	M_EPILOG
@@ -358,7 +348,7 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 			}
 		case ( '\t' ):
 			{
-			putchar ( '\a' );
+			bell ( );
 			break;
 			}
 		default :

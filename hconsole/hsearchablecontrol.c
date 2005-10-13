@@ -24,16 +24,6 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "config.h"
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hsearchablecontrol.h"
@@ -106,7 +96,7 @@ void HSearchableControl::highlight ( int a_iRow, int a_iColumn,
 			set_attr ( n_iAttributeSearchHighlight );
 		l_cStopChar = l_pcHighlightStart [ l_iHighlightLength ];
 		l_pcHighlightStart [ l_iHighlightLength ] = 0;
-		::mvprintw ( a_iRow, a_iColumn
+		c_mvprintf ( a_iRow, a_iColumn
 				+ ( l_pcHighlightStart - static_cast < char * > ( f_oVarTmpBuffer ) ),
 				l_pcHighlightStart );
 		l_pcHighlightStart [ l_iHighlightLength ] = l_cStopChar;

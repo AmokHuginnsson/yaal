@@ -26,16 +26,6 @@ Copyright:
 
 #include <string.h>
 
-#include "config.h"
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcomboboxcontrol.h"
@@ -111,10 +101,10 @@ void HComboboxControl::refresh ( void )
 			: n_iWidth + f_iWidth - f_iColumnRaw;
 /* end of ripped part */
 		HEditControl::refresh ( );
-		M_ENSURE ( ::move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 ) != ERR );
+		M_ENSURE ( c_move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 ) != C_ERR );
 		M_SET_ATTR_LABEL ( );
-		M_ENSURE ( addch ( D_ASCII_DOWN_ARROW ) != ERR );
-		M_ENSURE ( ::move ( f_iRowRaw, f_iColumnRaw + HEditControl::f_iCursorPosition ) != ERR );
+		M_ENSURE ( c_addch ( GLYPHS::D_DOWN_ARROW ) != C_ERR );
+		M_ENSURE ( c_move ( f_iRowRaw, f_iColumnRaw + HEditControl::f_iCursorPosition ) != C_ERR );
 		f_iHeightRaw = 0;
 		}
 	else
@@ -139,12 +129,12 @@ int HComboboxControl::process_input ( int a_iCode )
 		{
 		switch ( a_iCode )
 			{
-			case ( KEY_UP ):
+			case ( KEY_CODES::D_UP ):
 				{
 				f_iMode = D_MODE_LISTCONTROL;
 				break;
 				}
-			case ( KEY_DOWN ):
+			case ( KEY_CODES::D_DOWN ):
 				{
 				f_iMode = D_MODE_LISTCONTROL;
 				break;

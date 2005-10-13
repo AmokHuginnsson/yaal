@@ -82,6 +82,9 @@ WINDOW * n_psWindow = NULL;
 bool	n_bEnabled = false;
 termios	n_sTermios;
 
+int const C_OK = OK;
+int const C_ERR = ERR;
+
 /* public: */
 void enter_curses( void )
 	{
@@ -214,8 +217,57 @@ void set_attr( int a_iAttr )
 	M_EPILOG
 	}
 
+int c_move ( int const & a_iRow, int const & a_iColumn )
+	{
+	return ( ::move ( a_iRow, a_iColumn ) );
+	}
+
+int curs_set ( int const & a_iCursor )
+	{
+	return ( ::curs_set ( a_iCursor ) );
+	}
+
+int refresh ( void )
+	{
+	return ( ::refresh ( ) );
+	}
+
+int endwin ( void )
+	{
+	return ( ::endwin ( ) );
+	}
+
+void c_getmaxyx ( int & a_riHeight, int & a_riWidth )
+	{
+	getmaxyx ( stdscr, a_riHeight, a_riWidth );
+	return;
+	}
+
+void c_getyx ( int & a_riHeight, int & a_riWidth )
+	{
+	getyx ( stdscr, a_riHeight, a_riWidth );
+	return;
+	}
+
+void c_clrtoeol ( void )
+	{
+	::clrtoeol ( );
+	return;
+	}
+
+int c_mvprintf ( int a_iRow, int a_iColumn, char const * const a_pcFormat,
+		... )
+	{
+	int l_iError = 0;
+	va_list l_xAp;
+	va_start ( l_xAp, a_pcFormat );
+	l_iError = c_vprintf ( a_iRow, a_iColumn, get_attr ( ), a_pcFormat, l_xAp );
+	va_end ( l_xAp );
+	return ( l_iError );
+	}
+
 int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
-							 char const * a_pcFormat, ... )
+							 char const * const a_pcFormat, ... )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -228,7 +280,7 @@ int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	}
 	
 int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
-							 char const * a_pcFormat, va_list & a_rxAp )
+							 char const * const a_pcFormat, va_list & a_rxAp )
 	{
 	M_PROLOG
 	int l_iError = 0;

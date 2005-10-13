@@ -26,16 +26,6 @@ Copyright:
 
 #include <string.h>
 
-#include "config.h"
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "htreecontrol.h"
@@ -151,7 +141,7 @@ void HTreeControl::refresh ( void )
 	memset ( f_oVarTmpBuffer, '_', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		::mvprintw ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
+		c_mvprintf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
 	if ( f_poRoot )
 		draw_node ( dynamic_cast < HNodeControl * > ( f_poRoot ), f_iRowRaw );
 	return;
@@ -177,13 +167,13 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		a_poNode->f_iWidthRaw = l_poString->get_length ( ) + 2;
 		M_SET_ATTR_DATA ( );
 		if ( ! a_poNode->f_bUnfolded && l_iCtr )
-			::mvprintw ( l_iRow, a_poNode->f_iColumnRaw, "+" );
+			c_mvprintf ( l_iRow, a_poNode->f_iColumnRaw, "+" );
 		else if ( l_iCtr )
-			::mvprintw ( l_iRow, a_poNode->f_iColumnRaw, "-" );
+			c_mvprintf ( l_iRow, a_poNode->f_iColumnRaw, "-" );
 		if ( a_poNode == f_poSelected )
 			set_attr ( f_bEnabled ? ( f_bFocused ? ~f_uiFocusedAttribute
 						: ~ f_uiEnabledAttribute ) : ~ f_uiDisabledAttribute );
-		::mvprintw ( l_iRow, a_poNode->f_iColumnRaw + 1, * l_poString );
+		c_mvprintf ( l_iRow, a_poNode->f_iColumnRaw + 1, * l_poString );
 		}
 	if ( l_iCtr && ( a_poNode->f_bUnfolded || ! a_poNode->f_iLevel ) )
 		{
@@ -206,29 +196,29 @@ int HTreeControl::process_input ( int a_iCode )
 	l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
 	switch ( a_iCode )
 		{
-		case ( KEY_HOME ):
+		case ( KEY_CODES::D_HOME ):
 			{
 			l_poNode = dynamic_cast < HNodeControl * > ( f_poRoot );
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				f_poSelected = l_poNode->f_oBranch [ 0 ];
 			break;
 			}
-		case ( KEY_END ):
+		case ( KEY_CODES::D_END ):
 			{
 			l_poNode = dynamic_cast < HNodeControl * > ( f_poRoot );
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				f_poSelected = l_poNode->f_oBranch [ - 1 ];
 			break;
 			}
-		case ( KEY_PPAGE ):
+		case ( KEY_CODES::D_PAGE_UP ):
 			{
 			break;
 			}
-		case ( KEY_NPAGE ):
+		case ( KEY_CODES::D_PAGE_DOWN ):
 			{
 			break;
 			}
-		case ( KEY_UP ):
+		case ( KEY_CODES::D_UP ):
 			{
 			f_poSelected = l_poNode->previous ( );
 			if ( f_poSelected == l_poNode )
@@ -252,7 +242,7 @@ int HTreeControl::process_input ( int a_iCode )
 				}
 			break;
 			}
-		case ( KEY_RIGHT ):
+		case ( KEY_CODES::D_RIGHT ):
 			{
 			l_bWasFolded = ! l_poNode->f_bUnfolded;
 			if ( l_poNode->f_oBranch.quantity ( ) )
@@ -263,7 +253,7 @@ int HTreeControl::process_input ( int a_iCode )
 				}
 			}
 		/* when node is unfolded, right key works as down key */
-		case ( KEY_DOWN ):
+		case ( KEY_CODES::D_DOWN ):
 			{
 			if ( l_poNode->f_bUnfolded )
 				{
@@ -288,7 +278,7 @@ int HTreeControl::process_input ( int a_iCode )
 				}
 			break;
 			}
-		case ( KEY_LEFT ):
+		case ( KEY_CODES::D_LEFT ):
 			{
 			if ( l_poNode->f_bUnfolded && l_poNode->f_iLevel )
 				l_poNode->f_bUnfolded = false;

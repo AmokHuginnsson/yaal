@@ -26,16 +26,6 @@ Copyright:
 
 #include <string.h>
 
-#include "config.h"
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcontrol.h"
@@ -218,10 +208,10 @@ void HControl::draw_label ( void )
 		return;
 		}
 	M_SET_ATTR_LABEL ( );
-	M_ENSURE ( ::mvprintw ( f_iRowRaw, f_iColumnRaw, f_oLabel ) != ERR );
+	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oLabel ) != C_ERR );
 	M_SET_ATTR_SHORTCUT ( );
-	M_ENSURE ( ::mvprintw( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
-				"%c", f_oLabel [ f_iShortcutIndex ] ) != ERR );
+	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
+				"%c", f_oLabel [ f_iShortcutIndex ] ) != C_ERR );
 	M_SET_ATTR_DATA ( );
 	if ( f_bSingleLine )
 		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;

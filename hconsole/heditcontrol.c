@@ -29,16 +29,6 @@ Copyright:
 #include <string.h>
 #include <unistd.h>
 
-#include "config.h"
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcore/xalloc.h"
@@ -137,11 +127,11 @@ void HEditControl::refresh ( void )
 		f_oVarTmpBuffer [ f_oVarTmpBuffer.get_length ( ) ] = ' ';
 		}
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
-	M_ENSURE ( ::mvprintw ( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer ) != ERR );
+	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer ) != C_ERR );
 	if ( f_bFocused )
 		{
-		M_ENSURE ( ::move ( f_iRowRaw,
-					f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) ) != ERR );
+		M_ENSURE ( c_move ( f_iRowRaw,
+					f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) ) != C_ERR );
 		M_IRV ( curs_set ( f_bReplace ? D_CURSOR_VERY_VISIBLE : D_CURSOR_VISIBLE ) );
 		}
 	return;
@@ -183,25 +173,25 @@ int HEditControl::process_input ( int a_iCode )
 	l_iLength = f_oVarTmpBuffer.get_length ( );
 	switch ( a_iCode )
 		{
-		case ( KEY_PPAGE ):
+		case ( KEY_CODES::D_PAGE_UP ):
 			{
 			M_IRV ( f_oHistory.go ( 0 ) );
 			l_iErrorCode = - 1;
 			break;
 			}
-		case ( KEY_NPAGE ):
+		case ( KEY_CODES::D_PAGE_DOWN ):
 			{
 			M_IRV ( f_oHistory.go ( - 1 ) );	
 			l_iErrorCode = - 1;
 			break;
 			}
-		case ( KEY_UP ):
+		case ( KEY_CODES::D_UP ):
 			{
 			M_IRV ( f_oHistory.to_tail ( ) );
 			l_iErrorCode = - 1;
 			break;
 			}
-		case ( KEY_DOWN ):
+		case ( KEY_CODES::D_DOWN ):
 			{
 			M_IRV ( f_oHistory.to_head ( ) );
 			l_iErrorCode = - 1;
@@ -232,7 +222,7 @@ int HEditControl::process_input ( int a_iCode )
 			l_iErrorCode = a_iCode;
 			break;
 			}
-		case ( KEY_LEFT ):
+		case ( KEY_CODES::D_LEFT ):
 			{
 			if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
 				{
@@ -246,14 +236,14 @@ int HEditControl::process_input ( int a_iCode )
 			break;
 			}
 		case ( D_KEY_CTRL_('a') ):
-		case ( KEY_HOME ):
+		case ( KEY_CODES::D_HOME ):
 			{
 			f_iCursorPosition = 0;
 			f_iControlOffset = 0;
 			break;
 			}
 		case ( D_KEY_CTRL_('e') ):
-		case ( KEY_END ):
+		case ( KEY_CODES::D_END ):
 			{
 			if ( l_iLength >= f_iWidthRaw )
 				{
@@ -264,7 +254,7 @@ int HEditControl::process_input ( int a_iCode )
 				f_iCursorPosition = l_iLength;
 			break;
 			}
-		case ( KEY_RIGHT ):
+		case ( KEY_CODES::D_RIGHT ):
 			{
 			if ( ( f_iCursorPosition + f_iControlOffset ) < l_iLength )
 				{
@@ -291,7 +281,7 @@ int HEditControl::process_input ( int a_iCode )
 				bell ( );
 			break;
 			}
-		case ( KEY_DELETE ):
+		case ( KEY_CODES::D_DELETE ):
 			{
 			if ( ! ( f_bReadOnly || f_bReplace ) )
 				{
@@ -311,7 +301,7 @@ int HEditControl::process_input ( int a_iCode )
 				bell ( );
 			break;
 			}
-		case ( KEY_BS ):
+		case ( KEY_CODES::D_BACKSPACE ):
 			{
 			if ( ! f_bReadOnly && ( ( f_iControlOffset + f_iCursorPosition ) > 0 ) )
 				{
@@ -331,7 +321,7 @@ int HEditControl::process_input ( int a_iCode )
 				bell ( );
 			break;
 			}
-		case ( KEY_IC ):
+		case ( KEY_CODES::D_INSERT ):
 			{
 			f_bReplace = ! f_bReplace;
 			break;

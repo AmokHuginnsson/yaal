@@ -24,16 +24,6 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "config.h"
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hlogpad.h"
@@ -210,38 +200,38 @@ int HLogPad::process_input ( int a_iCode )
 	int l_iCode = 0;
 	switch ( a_iCode )
 		{
-		case ( KEY_DOWN ):
+		case ( KEY_CODES::D_DOWN ):
 			{
 			if ( f_iLines > ( f_iHeightRaw + f_iOffsetRow ) )
 				f_iOffsetRow ++;
 			break;
 			}
-		case ( KEY_UP ):
+		case ( KEY_CODES::D_UP ):
 			{
 			if ( f_iOffsetRow > 0 )
 				f_iOffsetRow --;
 			break;
 			}
-		case ( KEY_LEFT ):
+		case ( KEY_CODES::D_LEFT ):
 			{
 			if ( f_iOffsetColumn > 0 )
 				f_iOffsetColumn --;
 			break;
 			}
-		case ( KEY_RIGHT ):
+		case ( KEY_CODES::D_RIGHT ):
 			{
 			f_iOffsetColumn ++;
 			if ( f_iOffsetColumn < 0 )
 				f_iOffsetColumn = 0;
 			break;
 			}
-		case ( KEY_HOME ):
+		case ( KEY_CODES::D_HOME ):
 			{
 			f_iOffsetRow = 0;
 			f_iOffsetColumn = 0;
 			break;
 			}
-		case ( KEY_END ):
+		case ( KEY_CODES::D_END ):
 			{
 			f_iOffsetColumn = 0;
 			if ( f_iLines > f_iHeightRaw )

@@ -39,7 +39,39 @@ namespace stdhapi
 {
 
 namespace hconsole
+{
+
+extern int const C_OK;
+extern int const C_ERR;
+
+struct KEY_CODES
 	{
+	typedef enum
+		{
+		D_PAGE_UP = 256,
+		D_PAGE_DOWN,
+		D_UP,
+		D_DOWN,
+		D_LEFT,
+		D_RIGHT,
+		D_HOME,
+		D_END,
+		D_DELETE,
+		D_INSERT,
+		D_BACKSPACE,
+		D_MOUSE
+		} key_code_t;
+	};
+
+typedef struct
+	{
+	typedef enum
+		{
+		D_DOWN_ARROW,
+		D_UP_ARROW,
+		D_VERTICAL_LINE
+		} glyph_t;
+	} GLYPHS;
 
 #ifdef HAVE_ASCII_GRAPHICS
 #	define D_ASCII_DOWN_ARROW			ACS_DARROW
@@ -110,8 +142,17 @@ namespace hconsole
 void enter_curses( void );
 void leave_curses( void );
 void set_attr( int );
-int c_printf ( int, int, int, char const *, ... );
-int c_vprintf ( int, int, int, char const *, va_list & );
+int c_move ( int const &, int const & );
+int curs_set ( int const & );
+int c_addch ( GLYPHS::glyph_t const & );
+int refresh ( void );
+int endwin ( void );
+void c_getmaxyx ( int &, int & );
+void c_getyx ( int &, int & );
+void c_clrtoeol ( void );
+int c_mvprintf ( int, int, char const * const, ... );
+int c_printf ( int, int, int, char const * const, ... );
+int c_vprintf ( int, int, int, char const * const, va_list & );
 int get_key( void );
 int kbhit( void );
 unsigned char get_attr( void );
@@ -126,7 +167,7 @@ extern int n_iWidth;
 extern int n_iHeight;
 extern int n_iMouseDes;
 
-	}
+}
 
 }
 

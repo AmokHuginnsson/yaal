@@ -28,16 +28,6 @@ Copyright:
 #include <ctype.h>
 #include <libintl.h>
 
-#include "config.h"
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hcore/hlog.h"
@@ -280,8 +270,8 @@ void HListControl::refresh ( void )
 						else
 							M_SET_ATTR_DATA ( );
 						}
-					M_ENSURE ( ::mvprintw ( f_iRowRaw + l_iCtr + l_iHR,
-								f_iColumnRaw + l_iColumnOffset, f_oVarTmpBuffer	) != ERR );
+					M_ENSURE ( c_mvprintf ( f_iRowRaw + l_iCtr + l_iHR,
+								f_iColumnRaw + l_iColumnOffset, f_oVarTmpBuffer	) != C_ERR );
 					if ( f_bSearchActived )
 						highlight ( f_iRowRaw + l_iCtr + l_iHR,
 								f_iColumnRaw + l_iColumnOffset, f_sMatch.f_iMatchNumber,
@@ -303,8 +293,8 @@ void HListControl::refresh ( void )
 	memset ( f_oVarTmpBuffer, '.', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		M_ENSURE ( ::mvprintw ( f_iRowRaw + l_iCtr + l_iHR, f_iColumnRaw,
-					f_oVarTmpBuffer ) != ERR );
+		M_ENSURE ( c_mvprintf ( f_iRowRaw + l_iCtr + l_iHR, f_iColumnRaw,
+					f_oVarTmpBuffer ) != C_ERR );
 	for ( l_iCtr = 0; l_iCtr < l_iColumns; l_iCtr ++ )
 		{
 		l_poColumnInfo = & f_oHeader [ l_iCtr ];
@@ -316,19 +306,19 @@ void HListControl::refresh ( void )
 				M_SET_ATTR_LABEL ( );
 				M_IRV ( f_oVarTmpBuffer.format ( "%%-%ds",
 							l_poColumnInfo->f_iWidthRaw ) );
-				M_ENSURE ( ::mvprintw ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset,
+				M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset,
 							f_oVarTmpBuffer, static_cast < char * > (
 								l_poColumnInfo->f_oName.left (
-									l_poColumnInfo->f_iWidthRaw ) ) ) != ERR );
+									l_poColumnInfo->f_iWidthRaw ) ) ) != C_ERR );
 				M_SET_ATTR_SHORTCUT ( );
-				M_ENSURE ( ::mvprintw ( f_iRowRaw,
+				M_ENSURE ( c_mvprintf ( f_iRowRaw,
 							f_iColumnRaw + l_iColumnOffset + l_poColumnInfo->f_iShortcutIndex,
-							"%c", l_poColumnInfo->f_cShortcut ) != ERR );
+							"%c", l_poColumnInfo->f_cShortcut ) != C_ERR );
 				if ( f_iSortColumn == l_iCtr )
-					M_ENSURE ( ::mvprintw ( f_iRowRaw,
+					M_ENSURE ( c_mvprintf ( f_iRowRaw,
 								f_iColumnRaw + l_iColumnOffset
 								+ l_poColumnInfo->f_iWidthRaw - 2,
-								"%c", l_poColumnInfo->f_bDescending ? '^' : 'v' ) != ERR );
+								"%c", l_poColumnInfo->f_bDescending ? '^' : 'v' ) != C_ERR );
 				}
 			l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
 			if ( l_iCtr < l_iColumns )
@@ -337,9 +327,9 @@ void HListControl::refresh ( void )
 				for ( l_iCtrLoc = 0; l_iCtrLoc < ( f_iHeightRaw + l_iHR );
 						l_iCtrLoc ++ )
 					{
-					M_ENSURE ( ::move ( f_iRowRaw + l_iCtrLoc,
-								f_iColumnRaw + l_iColumnOffset - 1 ) != ERR );
-					M_ENSURE ( addch ( D_ASCII_VERTICAL_LINE ) != ERR );
+					M_ENSURE ( c_move ( f_iRowRaw + l_iCtrLoc,
+								f_iColumnRaw + l_iColumnOffset - 1 ) != C_ERR );
+					M_ENSURE ( c_addch ( GLYPHS::D_VERTICAL_LINE ) != C_ERR );
 					}
 				}
 			}
@@ -351,23 +341,23 @@ void HListControl::refresh ( void )
 		{
 		if ( f_iControlOffset )
 			{
-			M_ENSURE ( ::move ( f_iRowRaw + l_iHR,
-						f_iColumnRaw + l_iColumnOffset - 1 ) != ERR );
-			M_ENSURE ( addch ( D_ASCII_UP_ARROW ) != ERR );
+			M_ENSURE ( c_move ( f_iRowRaw + l_iHR,
+						f_iColumnRaw + l_iColumnOffset - 1 ) != C_ERR );
+			M_ENSURE ( c_addch ( GLYPHS::D_UP_ARROW ) != C_ERR );
 			}
 		if ( ( f_iQuantity - f_iControlOffset ) > f_iHeightRaw )
 			{
-			M_ENSURE ( ::move ( f_iRowRaw + f_iHeightRaw - ( 1 - l_iHR ),
-						f_iColumnRaw + l_iColumnOffset - 1 ) != ERR );
-			M_ENSURE ( addch ( D_ASCII_DOWN_ARROW ) != ERR );
+			M_ENSURE ( c_move ( f_iRowRaw + f_iHeightRaw - ( 1 - l_iHR ),
+						f_iColumnRaw + l_iColumnOffset - 1 ) != C_ERR );
+			M_ENSURE ( c_addch ( GLYPHS::D_DOWN_ARROW ) != C_ERR );
 			}
 		l_dScaled = f_iHeightRaw - 3;
 		l_dScaled *= static_cast < double > (
 				f_iControlOffset + f_iCursorPosition );
 		l_dScaled /= static_cast < double > ( f_iQuantity );
-		M_ENSURE ( ::mvprintw (
+		M_ENSURE ( c_mvprintf (
 					f_iRowRaw + static_cast < int > ( l_dScaled + 1.5 + l_iHR ),
-					f_iColumnRaw + l_iColumnOffset - 1, "#" ) != ERR );
+					f_iColumnRaw + l_iColumnOffset - 1, "#" ) != C_ERR );
 		}
 	f_poSelected = l_poElement;
 	return;
@@ -386,7 +376,7 @@ int HListControl::process_input ( int a_iCode )
 	a_iCode = HControl::process_input ( a_iCode );
 	switch ( a_iCode )
 		{
-		case ( KEY_PPAGE ):
+		case ( KEY_CODES::D_PAGE_UP ):
 			{
 			if ( ! f_iCursorPosition )
 				{
@@ -406,7 +396,7 @@ int HListControl::process_input ( int a_iCode )
 				f_iCursorPosition = 0;
 			break;
 			}
-		case ( KEY_NPAGE ):
+		case ( KEY_CODES::D_PAGE_DOWN ):
 			{
 			if ( f_iQuantity >= f_iHeightRaw )
 				{
@@ -440,7 +430,7 @@ int HListControl::process_input ( int a_iCode )
 				}
 			break;
 			}
-		case ( KEY_UP ):
+		case ( KEY_CODES::D_UP ):
 			{
 			if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
 				{
@@ -457,7 +447,7 @@ int HListControl::process_input ( int a_iCode )
 				bell ( );
 			break;
 			}
-		case ( KEY_HOME ):
+		case ( KEY_CODES::D_HOME ):
 			{
 			l_iOldPosition = 0;
 			f_iCursorPosition = 0;
@@ -465,7 +455,7 @@ int HListControl::process_input ( int a_iCode )
 			l_poElement = f_poSelected = f_poHook;
 			break;
 			}
-		case ( KEY_END ):
+		case ( KEY_CODES::D_END ):
 			{
 			if ( f_iQuantity >= f_iHeightRaw )
 				{
@@ -479,7 +469,7 @@ int HListControl::process_input ( int a_iCode )
 				f_iCursorPosition = f_iQuantity - 1;
 			break;
 			}
-		case ( KEY_DOWN ):
+		case ( KEY_CODES::D_DOWN ):
 			{
 			if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_iQuantity - 1 ) )
 				{

@@ -28,16 +28,6 @@ Copyright:
 #include <string.h>
 #include <libintl.h>
 
-#include "config.h"
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "htuiprocess.h"
@@ -105,7 +95,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWind
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('x'), NULL,
 			HTUIProcess::handler_quit );
 	if ( n_bUseMouse )
-		M_REGISTER_POSTPROCESS_HANDLER ( KEY_MOUSE, NULL,
+		M_REGISTER_POSTPROCESS_HANDLER ( KEY_CODES::D_MOUSE, NULL,
 				HTUIProcess::handler_mouse );
 	if ( a_poMainWindow )
 		{
@@ -148,7 +138,7 @@ int HTUIProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	f_poForegroundWindow->init ( );
 	if ( ! f_poForegroundWindow->is_initialised ( ) )
 		M_THROW ( _ ( "window has not been initialised" ), g_iErrNo );
-	::refresh ( );
+	refresh ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -217,7 +207,7 @@ int HTUIProcess::handler_alert ( int, void * )
 	if ( n_bNeedRepaint )
 		{
 		n_bNeedRepaint = false;
-		::refresh ( );
+		refresh ( );
 		}
 	return ( 0 );
 	M_EPILOG
@@ -284,14 +274,14 @@ int HTUIProcess::handler_mouse ( int a_iCode, void * )
 int HTUIProcess::handler_refresh ( int, void * )
 	{
 	M_PROLOG
-	::endwin ( );
+	endwin ( );
 	n_bNeedRepaint = false;
 	clrscr ( ); /* there is ::refresh ( ) call inside */
 	kbhit ( ); /* cleans all trash from stdio buffer */
-	getmaxyx ( stdscr, n_iHeight, n_iWidth );
+	c_getmaxyx ( n_iHeight, n_iWidth );
 	if ( f_poForegroundWindow )
 		f_poForegroundWindow->refresh ( );
-	::refresh ( );
+	refresh ( );
 	return ( 0 );
 	M_EPILOG
 	}
