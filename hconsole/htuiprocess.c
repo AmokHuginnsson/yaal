@@ -138,7 +138,7 @@ int HTUIProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	f_poForegroundWindow->init ( );
 	if ( ! f_poForegroundWindow->is_initialised ( ) )
 		M_THROW ( _ ( "window has not been initialised" ), g_iErrNo );
-	refresh ( );
+	c_refresh ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -207,7 +207,7 @@ int HTUIProcess::handler_alert ( int, void * )
 	if ( n_bNeedRepaint )
 		{
 		n_bNeedRepaint = false;
-		refresh ( );
+		c_refresh ( );
 		}
 	return ( 0 );
 	M_EPILOG
@@ -281,7 +281,7 @@ int HTUIProcess::handler_refresh ( int, void * )
 	c_getmaxyx ( n_iHeight, n_iWidth );
 	if ( f_poForegroundWindow )
 		f_poForegroundWindow->refresh ( );
-	refresh ( );
+	c_refresh ( );
 	return ( 0 );
 	M_EPILOG
 	}

@@ -50,8 +50,8 @@ struct KEY_CODES
 		{
 		D_PAGE_UP = 256,
 		D_PAGE_DOWN,
-		D_UP,
 		D_DOWN,
+		D_UP,
 		D_LEFT,
 		D_RIGHT,
 		D_HOME,
@@ -72,16 +72,6 @@ typedef struct
 		D_VERTICAL_LINE
 		} glyph_t;
 	} GLYPHS;
-
-#ifdef HAVE_ASCII_GRAPHICS
-#	define D_ASCII_DOWN_ARROW			ACS_DARROW
-#	define D_ASCII_UP_ARROW				ACS_UARROW
-# define D_ASCII_VERTICAL_LINE	ACS_VLINE
-#else
-#	define D_ASCII_DOWN_ARROW			'v'
-#	define D_ASCII_UP_ARROW				'^'
-# define D_ASCII_VERTICAL_LINE	'|'
-#endif /* not HAVE_ASCII_GRAPHICS */
 
 #define D_CURSOR_INVISIBLE		0
 #define D_CURSOR_VISIBLE			1
@@ -145,12 +135,13 @@ void set_attr( int );
 int c_move ( int const &, int const & );
 int curs_set ( int const & );
 int c_addch ( GLYPHS::glyph_t const & );
-int refresh ( void );
+int c_refresh ( void );
 int endwin ( void );
 void c_getmaxyx ( int &, int & );
 void c_getyx ( int &, int & );
 void c_clrtoeol ( void );
 int c_mvprintf ( int, int, char const * const, ... );
+int c_vmvprintf ( int, int, char const * const, va_list & );
 int c_printf ( int, int, int, char const * const, ... );
 int c_vprintf ( int, int, int, char const * const, va_list & );
 int get_key( void );

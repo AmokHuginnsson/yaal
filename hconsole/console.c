@@ -55,6 +55,16 @@ namespace stdhapi
 namespace hconsole
 {
 
+#ifdef HAVE_ASCII_GRAPHICS
+#	define D_ASCII_DOWN_ARROW			ACS_DARROW
+#	define D_ASCII_UP_ARROW				ACS_UARROW
+# define D_ASCII_VERTICAL_LINE	ACS_VLINE
+#else
+#	define D_ASCII_DOWN_ARROW			'v'
+#	define D_ASCII_UP_ARROW				'^'
+# define D_ASCII_VERTICAL_LINE	'|'
+#endif /* not HAVE_ASCII_GRAPHICS */
+
 /* Bbbbffff
  * B - blink
  * b - background color bits
@@ -227,7 +237,12 @@ int curs_set ( int const & a_iCursor )
 	return ( ::curs_set ( a_iCursor ) );
 	}
 
-int refresh ( void )
+int c_addch ( GLYPHS::glyph_t const & a_eGlyph )
+	{
+	return ( ::addch ( a_eGlyph ) );
+	}
+
+int c_refresh ( void )
 	{
 	return ( ::refresh ( ) );
 	}
@@ -261,8 +276,33 @@ int c_mvprintf ( int a_iRow, int a_iColumn, char const * const a_pcFormat,
 	int l_iError = 0;
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
-	l_iError = c_vprintf ( a_iRow, a_iColumn, get_attr ( ), a_pcFormat, l_xAp );
+	l_iError = c_vmvprintf ( a_iRow, a_iColumn, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
+	return ( l_iError );
+	}
+
+int c_vmvprintf ( int a_iRow, int a_iColumn,
+							 char const * const a_pcFormat, va_list & a_rxAp )
+	{
+	int l_iOrigRow = 0;
+	int l_iOrigColumn = 0;
+	int l_iError = 0;
+	if ( ! n_bEnabled )
+		M_THROW ( "not in curses mode", g_iErrNo );
+	if ( a_iColumn >= n_iWidth )
+		M_THROW ( "bad column.", a_iColumn );
+	if ( ( a_iRow < 0 ) || ( a_iRow >= n_iHeight ) )
+		M_THROW ( "bad row.", a_iRow );
+	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
+	if ( a_iColumn < 0 )
+		{
+		M_ENSURE ( move ( a_iRow, 0 ) != ERR );
+		M_IRV ( clrtoeol ( ) ); /* Always OK */
+		}
+	else
+		M_ENSURE ( move ( a_iRow, a_iColumn ) != ERR );
+	l_iError = vw_printw ( stdscr, a_pcFormat, a_rxAp );
+	M_ENSURE ( move ( l_iOrigRow, l_iOrigColumn ) != ERR );
 	return ( l_iError );
 	}
 
@@ -284,27 +324,12 @@ int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	{
 	M_PROLOG
 	int l_iError = 0;
-	int l_iOrigRow = 0;
-	int l_iOrigColumn = 0;
 	int l_iOrigAttribute = 0;
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", g_iErrNo );
-	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	l_iOrigAttribute = get_attr ( );
-	if ( a_iColumn >= n_iWidth )
-		M_THROW ( "bad column.", a_iColumn );
-	if ( ( a_iRow < 0 ) || ( a_iRow >= n_iHeight ) )
-		M_THROW ( "bad row.", a_iRow );
 	set_attr ( a_iAttribute );
-	if ( a_iColumn < 0 )
-		{
-		M_ENSURE ( move ( a_iRow, 0 ) != ERR );
-		M_IRV ( clrtoeol ( ) ); /* Always OK */
-		}
-	else
-		M_ENSURE ( move ( a_iRow, a_iColumn ) != ERR );
-	l_iError = vw_printw ( stdscr, a_pcFormat, a_rxAp );
-	M_ENSURE ( move ( l_iOrigRow, l_iOrigColumn ) != ERR );
+	l_iError = c_vmvprintf ( a_iRow, a_iColumn, a_pcFormat, a_rxAp );
 	set_attr ( l_iOrigAttribute );
 	return ( l_iError );
 	M_EPILOG
