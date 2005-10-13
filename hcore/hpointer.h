@@ -62,6 +62,9 @@ public:
 	virtual ~HPointer ( void );
 	HPointer ( HPointer const & );
 	HPointer & operator = ( HPointer const & );
+	tType & operator * ( void );
+	tType * operator-> ( void );
+	tType & operator [ ] ( int );
 	/*}*/
 	};
 
@@ -69,6 +72,7 @@ template < typename tType, bool array >
 HPointer < tType, array >::HShared::HShared ( tType const * const a_ptPointer )
 	: f_ptPointer ( a_ptPointer ), f_iReferenceCounter ( 1 ), f_bArray ( array )
 	{
+	M_ASSERT ( f_ptPointer );
 	return;
 	}
 
@@ -137,6 +141,26 @@ HPointer < tType, array > & HPointer < tType, array >::operator = ( HPointer con
 			}
 		}
 	return ( * this );
+	}
+
+template < typename tType, bool array >
+tType & HPointer < tType, array >::operator * ( void )
+	{
+	return ( * f_poShared->f_ptPointer );
+	}
+
+template < typename tType, bool array >
+tType * HPointer < tType, array >::operator-> ( void )
+	{
+	return ( f_poShared->f_ptPointer );
+	}
+
+template < typename tType, bool array >
+tType & HPointer < tType, array >::operator [ ] ( int a_iIndex )
+	{
+	M_ASSERT ( f_poShared->f_bArray );
+	M_ASSERT ( a_iIndex >= 0 );
+	return ( f_poShared->f_ptPointer [ a_iIndex ] );
 	}
 
 }
