@@ -28,6 +28,7 @@ Copyright:
 #include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <stdlib.h> /* strtol */
 
 #define __STRICT_ANSI__
 #include <oci.h>
@@ -46,6 +47,7 @@ using namespace stdhapi::hcore;
 extern "C"
 {
 
+HString g_oInstanceName;
 OVariable n_psVariables [ ] =
 	{
 		{ D_HSTRING, "instance_name", & g_oInstanceName },
@@ -294,7 +296,7 @@ char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
 	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvData );
 	if ( ( ( * l_psQuery->f_piStatus ) = OCIParamGet ( l_psQuery->f_psStatement,
 					OCI_HTYPE_STMT, l_psQuery->f_psError,
-					& l_psParameter, a_iColumn + 1 ) ) == OCI_SUCCESS )
+					reinterpret_cast < void * * > ( & l_psParameter ), a_iColumn + 1 ) ) == OCI_SUCCESS )
 		{
 		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psParameter,
 						OCI_DTYPE_PARAM, & l_iSize, 0, OCI_ATTR_DATA_SIZE,
@@ -360,7 +362,7 @@ int long dbrs_records_count ( void *, void * a_pvDataR )
 	return ( l_iRows );
 	}
 
-int long dbrs_id ( void * a_pvDataB, void * a_pvDataR )
+int long dbrs_id ( void *, void * a_pvDataR )
 	{
 	int l_iNameLength = 0;
 	int long l_lId = 0;
@@ -376,7 +378,7 @@ int long dbrs_id ( void * a_pvDataB, void * a_pvDataR )
 		l_pcName [ l_iNameLength ] = 0;
 		l_oSQL.format ( "SELECT %s_sequence.currval FROM dual;",
 				reinterpret_cast < char * > ( l_pcName ) );
-		l_psAutonumber = db_query ( a_pvDataB, l_oSQL );
+		l_psAutonumber = static_cast < OQuery * > ( db_query ( l_psAutonumber, l_oSQL ) );
 		l_lId = strtol ( rs_get ( l_psAutonumber, 0, 0 ), NULL, 10 );
 		db_unquery ( l_psAutonumber );
 		}
@@ -391,7 +393,7 @@ char * rs_column_name ( void * a_pvDataR, int a_iField )
 	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvDataR );
 	if ( ( ( * l_psQuery->f_piStatus ) = OCIParamGet ( l_psQuery->f_psStatement,
 					OCI_HTYPE_STMT, l_psQuery->f_psError,
-					& l_psParameter, a_iField + 1 ) ) == OCI_SUCCESS )
+					reinterpret_cast < void * * > ( & l_psParameter ), a_iField + 1 ) ) == OCI_SUCCESS )
 		{
 		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psParameter,
 						OCI_DTYPE_PARAM, & l_pcName,

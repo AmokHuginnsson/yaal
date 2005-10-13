@@ -67,7 +67,7 @@ extern char const * const g_ppcErrMsgHList [ ];
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-typedef struct
+struct OListTreatment
 	{
 	typedef enum
 		{
@@ -77,7 +77,10 @@ typedef struct
 		D_EMPTY_IF_NOT_EMPTIED = 8,
 		D_FORCE_REMOVE_ELEMENT = 16
 		} treatment_t;
-	} OListTreatment;
+	virtual ~OListTreatment ( void ) { } 
+	};
+
+template struct enum_t < OListTreatment::treatment_t >;
 
 template < typename tType > 
 class HList : public OListTreatment
@@ -195,8 +198,6 @@ protected:
 	virtual void sort ( void );
 	/*}*/
 	};
-
-template struct enum_t < OListTreatment::treatment_t >;
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /*++++++++++++++++++++++                             ++++++++++++++++++++++*/
