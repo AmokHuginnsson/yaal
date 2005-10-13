@@ -1,0 +1,147 @@
+/*
+---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+
+	hpointer.h - this file is integral part of `stdhapi' project.
+
+	i.  You may not make any changes in Copyright information.
+	ii. You must attach Copyright information to any part of every copy
+	    of this software.
+
+Copyright:
+
+ You are free to use this program as is, you can redistribute binary
+ package freely but:
+  1. You can not use any part of sources of this software.
+  2. You can not redistribute any part of sources of this software.
+  3. No reverse engineering is allowed.
+  4. If you want redistribute binary package you can not demand any fees
+     for this software.
+     You can not even demand cost of the carrier (CD for example).
+  5. You can not include it to any commercial enterprise (for example 
+     as a free add-on to payed software or payed newspaper).
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
+*/
+
+#ifndef __HPOINTER_H
+#define __HPOINTER_H
+
+#line 31 "hpointer.h"
+
+#define D_CVSID_HPOINTER_H "$CVSHeader$"
+
+#include "./hcore/hexception.h"
+
+namespace stdhapi
+{
+
+namespace hcore
+{
+
+template < typename tType, bool array = false >
+class HPointer
+	{
+	class HShared
+		{
+		tType * f_ptPointer;
+		int f_iReferenceCounter;
+		bool f_bArray;
+		explicit HShared ( tType const * const );
+		virtual ~HShared ( void );
+		bool release ( void );
+		friend class HPointer;
+		};
+protected:
+	/*{*/
+	HShared * f_poShared;
+	/*}*/
+public:
+	/*{*/
+	explicit HPointer ( tType const * const );
+	virtual ~HPointer ( void );
+	HPointer ( HPointer const & );
+	HPointer & operator = ( HPointer const & );
+	/*}*/
+	};
+
+template < typename tType, bool array >
+HPointer < tType, array >::HShared::HShared ( tType const * const a_ptPointer )
+	: f_ptPointer ( a_ptPointer ), f_iReferenceCounter ( 1 ), f_bArray ( array )
+	{
+	return;
+	}
+
+template < typename tType, bool array >
+HPointer < tType, array >::HShared::~HShared ( void )
+	{
+	M_ASSERT ( f_iReferenceCounter == 1 );
+	release ( );
+	return;
+	}
+
+template < typename tType, bool array >
+bool HPointer < tType, array >::HShared::release ( void )
+	{
+	M_ASSERT ( f_iReferenceCounter > 0 );
+	f_iReferenceCounter --;
+	if ( ! f_iReferenceCounter )
+		{
+		if ( array )
+			delete [ ] f_ptPointer;
+		else
+			delete f_ptPointer;
+		f_ptPointer = NULL;
+		}
+	return ( ! f_iReferenceCounter );
+	}
+
+template < typename tType, bool array >
+HPointer < tType, array >::HPointer ( tType const * const a_ptPointer )
+	: f_poShared ( new HShared ( a_ptPointer ) )
+	{
+	return;
+	}
+
+template < typename tType, bool array >
+HPointer < tType, array >::~HPointer ( void )
+	{
+	if ( f_poShared->release ( ) )
+		delete f_poShared;
+	return;
+	}
+
+template < typename tType, bool array >
+HPointer < tType, array >::HPointer ( HPointer const & a_roPointer )
+	: f_poShared ( NULL )
+	{
+	operator = ( a_roPointer );
+	return;
+	}
+
+template < typename tType, bool array >
+HPointer < tType, array > & HPointer < tType, array >::operator = ( HPointer const & a_roPointer )
+	{
+	if ( ( & a_roPointer != this ) && ( a_roPointer.f_poShared != f_poShared ) )
+		{
+		a_roPointer.f_poShared->f_iReferenceCounter ++;
+		if ( ! f_poShared )
+			f_poShared = a_roPointer.f_poShared;
+		else
+			{
+			M_ASSERT ( f_poShared->f_ptPointer != a_roPointer.f_poShared->f_ptPointer );
+			if ( ! f_poShared->release ( ) )
+				f_poShared = new HShared ( a_roPointer.f_poShared->f_ptPointer );
+			else
+				f_poShared = a_roPointer.f_poShared;
+			}
+		}
+	return ( * this );
+	}
+
+}
+
+}
+
+#endif /* not __HPOINTER_H */
+
