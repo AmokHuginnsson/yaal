@@ -26,14 +26,6 @@ Copyright:
 
 #include "config.h"
 
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hconsole/console.h"
@@ -69,7 +61,7 @@ void HDataStatusBarControl::draw_label ( void )
 	if ( l_poWindow->is_modified ( ) )
 		{
 		M_SET_ATTR_SHORTCUT ( );
-		mvprintw ( n_iHeight - 2, f_iLabelLength - 4, "[+]" );
+		c_mvprintf ( n_iHeight - 2, f_iLabelLength - 4, "[+]" );
 		M_SET_ATTR_DATA ( );
 		}
 	return;

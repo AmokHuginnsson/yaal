@@ -120,10 +120,10 @@ void HEditControl::refresh ( void )
 	M_PROLOG
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
-	memset ( f_oVarTmpBuffer, ' ', f_iWidthRaw );
+	memset ( f_oVarTmpBuffer.raw ( ), ' ', f_iWidthRaw );
 	if ( ! f_bPassword )
 		{
-		strcpy ( f_oVarTmpBuffer, static_cast < char * > ( f_oString ) + f_iControlOffset );
+		strcpy ( f_oVarTmpBuffer.raw ( ), static_cast < char const * const > ( f_oString ) + f_iControlOffset );
 		f_oVarTmpBuffer [ f_oVarTmpBuffer.get_length ( ) ] = ' ';
 		}
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
@@ -165,7 +165,7 @@ int HEditControl::process_input ( int a_iCode )
 	int l_iOldCursorPosition = 0;
 	char * l_pcBuffer = 0;
 	a_iCode = HControl::process_input ( a_iCode );
-	l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
+	l_pcBuffer = f_oVarTmpBuffer.raw ( );
 	memset ( l_pcBuffer, 0, f_iMaxStringSize );
 	f_oVarTmpBuffer = f_oString;
 	l_iOldControlOffset = f_iControlOffset;
@@ -340,7 +340,7 @@ int HEditControl::process_input ( int a_iCode )
 				f_iControlOffset += ( ( f_iCursorPosition - f_iWidthRaw  ) + 1 );
 				f_iCursorPosition = f_iWidthRaw - 1;
 				}
-			l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
+			l_pcBuffer = f_oVarTmpBuffer.raw ( );
 			l_iErrorCode = 0;
 			if ( ( l_iOldCursorPosition == f_iCursorPosition )
 					&& ( l_iOldControlOffset == f_iControlOffset ) )
@@ -358,7 +358,7 @@ int HEditControl::process_input ( int a_iCode )
 				if ( l_pcBuffer )
 					{
 					f_iCursorPosition = ( 1 - f_iControlOffset ) + l_pcBuffer
-						- static_cast < char * > ( f_oVarTmpBuffer );
+						- static_cast < char const * const > ( f_oVarTmpBuffer );
 					if ( f_iCursorPosition < 0 )
 						{
 						f_iControlOffset += f_iCursorPosition;
@@ -370,7 +370,7 @@ int HEditControl::process_input ( int a_iCode )
 					f_iControlOffset = 0;
 					f_iCursorPosition = 0;
 					}
-				l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
+				l_pcBuffer = f_oVarTmpBuffer.raw ( );
 				l_iErrorCode = 0;
 				}
 			else
@@ -394,7 +394,7 @@ int HEditControl::process_input ( int a_iCode )
 					l_iErrorCode += strspn ( l_pcBuffer + l_iErrorCode, g_pcWordSeparator );
 				else
 					l_iErrorCode = l_iLength - ( f_iControlOffset + f_iCursorPosition );
-				l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
+				l_pcBuffer = f_oVarTmpBuffer.raw ( );
 				l_iLength -= l_iErrorCode;
 				memmove ( l_pcBuffer + f_iControlOffset + f_iCursorPosition,
 						l_pcBuffer + f_iControlOffset + f_iCursorPosition + l_iErrorCode,
@@ -418,7 +418,7 @@ int HEditControl::process_input ( int a_iCode )
 					if ( l_pcBuffer )
 						{
 						f_iCursorPosition = ( 1 - f_iControlOffset ) + l_pcBuffer
-							- static_cast < char * > ( f_oVarTmpBuffer );
+							- static_cast < char const * const > ( f_oVarTmpBuffer );
 						if ( f_iCursorPosition < 0 )
 							{
 							f_iControlOffset += f_iCursorPosition;
@@ -430,7 +430,7 @@ int HEditControl::process_input ( int a_iCode )
 						f_iControlOffset = 0;
 						f_iCursorPosition = 0;
 						}
-					l_pcBuffer = static_cast < char * > ( f_oVarTmpBuffer );
+					l_pcBuffer = f_oVarTmpBuffer.raw ( );
 					l_iErrorCode = 0;
 					}
 				memmove ( l_pcBuffer + f_iControlOffset + f_iCursorPosition,
@@ -493,7 +493,7 @@ int HEditControl::process_input ( int a_iCode )
 	if ( ! l_iErrorCode )
 		{
 		f_oString = f_oVarTmpBuffer;
-		f_poParent->status_bar ( )->message ( D_FG_LIGHTGRAY, "" );
+		f_poParent->status_bar ( )->message ( COLORS::D_FG_LIGHTGRAY, "" );
 		refresh ( );
 		}
 	else
@@ -501,7 +501,7 @@ int HEditControl::process_input ( int a_iCode )
 		f_iControlOffset = l_iOldControlOffset;
 		f_iCursorPosition = l_iOldCursorPosition;
 		bell ( );
-		f_poParent->status_bar ( )->message ( D_BG_BROWN, f_oPattern.error ( ) );
+		f_poParent->status_bar ( )->message ( COLORS::D_BG_BROWN, f_oPattern.error ( ) );
 		}
 	return ( a_iCode );
 	M_EPILOG

@@ -53,16 +53,16 @@ namespace hconsole
 {
 
 int n_iLatency = 1;
-int n_iAttributeDisabled = ( D_FG_GREEN | D_BG_BLACK | D_BG_BLINK ) << 8
-															| ( D_FG_LIGHTGRAY | D_BG_BLACK | D_BG_BLINK );
-int n_iAttributeEnabled = ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK ) << 8
-															| ( D_FG_WHITE | D_BG_BLACK | D_BG_BLINK );
-int n_iAttributeFocused = ( D_FG_BRIGHTGREEN | D_BG_BLACK | D_BG_BLINK ) << 8
-															| ( D_FG_BLACK | D_BG_LIGHTGRAY ); 
-int n_iAttributeStatusBar = ( D_FG_WHITE | D_BG_BLACK ) << 8
-															| ( D_FG_LIGHTGRAY | D_BG_BLACK );
-int n_iAttributeSearchHighlight = ( D_FG_BLACK | D_BG_BROWN | D_BG_BLINK ) << 8
-																		| ( D_FG_BLACK | D_BG_BROWN );
+int n_iAttributeDisabled = ( COLORS::D_FG_GREEN | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK ) << 8
+															| ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK );
+int n_iAttributeEnabled = ( COLORS::D_FG_BRIGHTGREEN | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK ) << 8
+															| ( COLORS::D_FG_WHITE | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK );
+int n_iAttributeFocused = ( COLORS::D_FG_BRIGHTGREEN | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK ) << 8
+															| ( COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY ); 
+int n_iAttributeStatusBar = ( COLORS::D_FG_WHITE | COLORS::D_BG_BLACK ) << 8
+															| ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK );
+int n_iAttributeSearchHighlight = ( COLORS::D_FG_BLACK | COLORS::D_BG_BROWN | COLORS::D_BG_BLINK ) << 8
+																		| ( COLORS::D_FG_BLACK | COLORS::D_BG_BROWN );
 bool	n_bUseMouse = false;
 bool	n_bDisableXON = false;
 bool	n_bLeaveCtrlC = false;
@@ -109,37 +109,37 @@ int get_color_bits ( HString & a_roValue, int a_iWhat )
 	if ( l_oStr.is_empty ( ) )
 		return ( 0 );
 	if ( ! strcasecmp ( l_oStr, "BLACK" ) )
-		return ( D_FG_BLACK );
+		return ( COLORS::D_FG_BLACK );
 	else if ( ! strcasecmp ( l_oStr, "RED" ) )
-		return ( D_FG_RED );
+		return ( COLORS::D_FG_RED );
 	else if ( ! strcasecmp ( l_oStr, "GREEN" ) )
-		return ( D_FG_GREEN );
+		return ( COLORS::D_FG_GREEN );
 	else if ( ! strcasecmp ( l_oStr, "BROWN" ) )
-		return ( D_FG_BROWN );
+		return ( COLORS::D_FG_BROWN );
 	else if ( ! strcasecmp ( l_oStr, "BLUE" ) )
-		return ( D_FG_BLUE );
+		return ( COLORS::D_FG_BLUE );
 	else if ( ! strcasecmp ( l_oStr, "MAGENTA" ) )
-		return ( D_FG_MAGENTA );
+		return ( COLORS::D_FG_MAGENTA );
 	else if ( ! strcasecmp ( l_oStr, "CYAN" ) )
-		return ( D_FG_CYAN );
+		return ( COLORS::D_FG_CYAN );
 	else if ( ! strcasecmp ( l_oStr, "LIGHTGRAY" ) )
-		return ( D_FG_LIGHTGRAY );
+		return ( COLORS::D_FG_LIGHTGRAY );
 	else if ( ! strcasecmp ( l_oStr, "GRAY" ) )
-		return ( D_FG_GRAY );
+		return ( COLORS::D_FG_GRAY );
 	else if ( ! strcasecmp ( l_oStr, "BRGIHTRED" ) )
-		return ( D_FG_BRIGHTRED );
+		return ( COLORS::D_FG_BRIGHTRED );
 	else if ( ! strcasecmp ( l_oStr, "BRIGHTGREEN" ) )
-		return ( D_FG_BRIGHTGREEN );
+		return ( COLORS::D_FG_BRIGHTGREEN );
 	else if ( ! strcasecmp ( l_oStr, "YELLOW" ) )
-		return ( D_FG_YELLOW );
+		return ( COLORS::D_FG_YELLOW );
 	else if ( ! strcasecmp ( l_oStr, "BRIGHTBLUE" ) )
-		return ( D_FG_BRIGHTBLUE );
+		return ( COLORS::D_FG_BRIGHTBLUE );
 	else if ( ! strcasecmp ( l_oStr, "BRIGHTMAGENTA" ) )
-		return ( D_FG_BRIGHTMAGENTA );
+		return ( COLORS::D_FG_BRIGHTMAGENTA );
 	else if ( ! strcasecmp ( l_oStr, "BRIGHTCYAN" ) )
-		return ( D_FG_BRIGHTCYAN );
+		return ( COLORS::D_FG_BRIGHTCYAN );
 	else if ( ! strcasecmp ( l_oStr, "WHITE" ) )
-		return ( D_FG_WHITE );
+		return ( COLORS::D_FG_WHITE );
 	return ( 0 );
 	}
 

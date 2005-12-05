@@ -187,7 +187,7 @@ HString kwota_slownie ( double a_dKwota )
 			l_iSub = ( ( l_iLength - l_iCtr ) > 1 ? 2 : 1 );
 			l_iForma = atoi ( l_oString.mid ( ( l_iLength - l_iCtr ) - l_iSub, l_iSub ) );
 			if ( ( l_iCtr > 5 ) && ( ( l_iLength - l_iCtr ) > 2 ) &&
-					! strncmp ( static_cast < char * > ( l_oString ) + ( l_iLength - l_iCtr ) - 3, "000", 3 ) )
+					! strncmp ( static_cast < char const * const > ( l_oString ) + ( l_iLength - l_iCtr ) - 3, "000", 3 ) )
 				continue;
 			}
 		if ( l_iCtr == 2 )

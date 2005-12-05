@@ -26,14 +26,6 @@ Copyright:
 
 #include "config.h"
 
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hconsole/console.h"
@@ -84,37 +76,37 @@ int HDataEditControl::process_input ( int a_iCode )
 		{
 		case ( '\t' ):
 		case ( '\r' ):
-		case ( KEY_LEFT ):
-		case ( KEY_RIGHT ):
+		case ( KEY_CODES::D_LEFT ):
+		case ( KEY_CODES::D_RIGHT ):
 		case ( D_KEY_CTRL_('a') ):
-		case ( KEY_HOME ):
+		case ( KEY_CODES::D_HOME ):
 		case ( D_KEY_CTRL_('e') ):
-		case ( KEY_END ):
-		case ( KEY_IC ):
+		case ( KEY_CODES::D_END ):
+		case ( KEY_CODES::D_INSERT ):
 		case ( D_KEY_META_('f') ):
 		case ( D_KEY_META_('b') ):
 			{
 			l_bNoChange = true;
 			break;
 			}
-		case ( KEY_PPAGE ):
-		case ( KEY_NPAGE ):
-		case ( KEY_UP ):
-		case ( KEY_DOWN ):
+		case ( KEY_CODES::D_PAGE_UP ):
+		case ( KEY_CODES::D_PAGE_DOWN ):
+		case ( KEY_CODES::D_UP ):
+		case ( KEY_CODES::D_DOWN ):
 			{
 			if ( f_bMultiLine )
 				l_bNoChange = true;
 			break;
 			}
-		case ( KEY_BS ):
+		case ( KEY_CODES::D_BACKSPACE ):
 			{
 			if ( ! ( f_iControlOffset + f_iCursorPosition ) )
 				l_bNoChange = true;
 			break;
 			}
-		case ( KEY_DELETE ):
+		case ( KEY_CODES::D_DELETE ):
 			{
-			if ( ! static_cast < char * > ( f_oString ) [ 0 ] )
+			if ( ! static_cast < char const * const > ( f_oString ) [ 0 ] )
 				l_bNoChange = true;
 			break;
 			}

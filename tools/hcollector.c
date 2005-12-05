@@ -82,7 +82,7 @@ int HCollector::send_line ( char const * a_pcLine )
 	if ( l_iLength < 1 )
 		return ( 0 );
 	l_oLocalCopy = a_pcLine;
-	l_pcSpeedUp = static_cast < char * > ( l_oLocalCopy );
+	l_pcSpeedUp = l_oLocalCopy.raw ( );
 	if ( a_pcLine [ l_iLength - 1 ] == '\n' )
 		{
 		l_iLength --;
@@ -121,10 +121,10 @@ int HCollector::receive_line ( char * & a_pcLine )
 	/* P prefix means sender transmission side data */
 	while ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
 		{
-		memset ( f_oLine, 0, D_RECV_BUF_SIZE );
-		read ( f_oLine, D_RECV_BUF_SIZE );
+		memset ( f_oLine.raw ( ), 0, D_RECV_BUF_SIZE );
+		read ( f_oLine.raw ( ), D_RECV_BUF_SIZE );
 		flush ( TCIFLUSH );
-		a_pcLine = ( static_cast < char * > ( f_oLine ) )
+		a_pcLine = f_oLine.raw ( )
 			+ strlen ( D_PROTO_DTA ) + 2 /* for lenght */ + 2 /* for crc */;
 		l_iLength = strlen ( a_pcLine ) - 1;
 		a_pcLine [ l_iLength ] = 0;
@@ -133,10 +133,10 @@ int HCollector::receive_line ( char * & a_pcLine )
 		l_iLength &= 0x0ff;
 		l_iCRC &= 0x0ff;
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
-		strncpy ( f_pcReadBuf, static_cast < char * > ( f_oLine ) + strlen ( D_PROTO_DTA ), 2 );
+		strncpy ( f_pcReadBuf, static_cast < char const * const > ( f_oLine ) + strlen ( D_PROTO_DTA ), 2 );
 		l_iPLength = strtol ( f_pcReadBuf, NULL, 0x10 );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
-		strncpy ( f_pcReadBuf, static_cast < char * > ( f_oLine )
+		strncpy ( f_pcReadBuf, static_cast < char const * const > ( f_oLine )
 				+ strlen ( D_PROTO_DTA ) + 2 /* for Plength */, 2 );
 		l_iPCRC = strtol ( f_pcReadBuf, NULL, 0x10 );
 		if ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )

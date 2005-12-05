@@ -73,13 +73,13 @@ void HLogPad::refresh ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iRow = 0, l_iCursor = 0, l_iColumn = 0;
-	int l_iBG = f_bFocused ? D_BG_GRAY : D_BG_BLACK;
+	int l_iBG = f_bFocused ? COLORS::D_BG_GRAY : COLORS::D_BG_BLACK;
 	HLogLine * l_poLogLine;
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
-	memset ( static_cast < char * > ( f_oVarTmpBuffer ), ' ', f_iWidthRaw );
-	static_cast < char * > ( f_oVarTmpBuffer ) [ f_iWidthRaw ] = 0;
-	f_iAttribute = D_FG_BLACK | l_iBG;
+	memset ( f_oVarTmpBuffer.raw ( ), ' ', f_iWidthRaw );
+	f_oVarTmpBuffer.raw ( ) [ f_iWidthRaw ] = 0;
+	f_iAttribute = COLORS::D_FG_BLACK | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		c_printf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );
 	if ( f_oContents.quantity ( ) )
@@ -152,7 +152,7 @@ void HLogPad::add ( char const * const a_pcText )
 		l_poLogLine->f_oText = "";
 		}
 	f_oVarTmpBuffer = a_pcText;
-	while ( static_cast < char * > ( f_oVarTmpBuffer ) [ 0 ] )
+	while ( static_cast < char const * const > ( f_oVarTmpBuffer ) [ 0 ] )
 		{
 		l_iIndexNL = f_oVarTmpBuffer.find_one_of ( "\r\n" );
 		if ( l_iIndexNL >= 0 )

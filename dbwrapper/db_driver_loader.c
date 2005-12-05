@@ -192,7 +192,7 @@ void dbwrapper_error ( void )
 	HString l_oMessage;
 	l_oMessage = dlerror ( );
 	log ( D_LOG_ERROR ) << l_oMessage << endl;
-	fprintf ( stderr, "(%s), ", static_cast < char * > ( l_oMessage ) );
+	fprintf ( stderr, "(%s), ", static_cast < char const * const > ( l_oMessage ) );
 	return;
 	}
 

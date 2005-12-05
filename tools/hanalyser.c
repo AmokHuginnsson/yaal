@@ -639,7 +639,7 @@ bool HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 				return ( true );
 				}
 			}
-		l_dValue = strtod ( static_cast < char * > ( f_oFormula ) + l_iOffset, NULL );
+		l_dValue = strtod ( static_cast < char const * const > ( f_oFormula ) + l_iOffset, NULL );
 		a_poNode->f_tLeaf.add_tail ( ) = & f_oConstantsPool.add ( l_dValue );
 		return ( false );
 		}

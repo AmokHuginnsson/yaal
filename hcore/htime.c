@@ -295,11 +295,11 @@ HTime::operator char const * ( void ) const
 	if ( l_iSize < 2 )
 		M_THROW ( "bad format", g_iErrNo );
 	f_oVarTmpBuffer.hs_realloc ( l_iSize );
-	M_ENSURE ( static_cast < int > ( strftime ( f_oVarTmpBuffer,
+	M_ENSURE ( static_cast < int > ( strftime ( f_oVarTmpBuffer.raw ( ),
 					l_iSize, f_oFormat, & f_sBroken ) ) < l_iSize );
 #else /* HAVE_SMART_STRFTIME */
 	f_oVarTmpBuffer.hs_realloc ( 64 ); /* FIXME that is pretty dumb hack */
-	l_iSize = strftime ( f_oVarTmpBuffer, 63, f_oFormat, & f_sBroken ) + 1;
+	l_iSize = strftime ( f_oVarTmpBuffer.raw ( ), 63, f_oFormat, & f_sBroken ) + 1;
 	if ( l_iSize < 2 )
 		M_THROW ( "bad format", g_iErrNo );
 #endif /* not HAVE_SMART_STRFTIME */

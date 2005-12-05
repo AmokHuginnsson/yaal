@@ -83,7 +83,7 @@ void HSearchableControl::highlight ( int a_iRow, int a_iColumn,
 	M_PROLOG
 	int l_iHighlightLength = 0, l_iCtr = 0;
 	char l_cStopChar, * l_pcHighlightStart = NULL;
-	l_pcHighlightStart = f_oVarTmpBuffer;
+	l_pcHighlightStart = f_oVarTmpBuffer.raw ( );
 /* We can do const_cast here because output of matches points
  * to inside of f_oVarTmpBuffer */
 	while ( ( l_pcHighlightStart = const_cast < char * > ( f_oPattern.matches ( l_pcHighlightStart,
@@ -97,7 +97,7 @@ void HSearchableControl::highlight ( int a_iRow, int a_iColumn,
 		l_cStopChar = l_pcHighlightStart [ l_iHighlightLength ];
 		l_pcHighlightStart [ l_iHighlightLength ] = 0;
 		c_mvprintf ( a_iRow, a_iColumn
-				+ ( l_pcHighlightStart - static_cast < char * > ( f_oVarTmpBuffer ) ),
+				+ ( l_pcHighlightStart - static_cast < char const * const > ( f_oVarTmpBuffer ) ),
 				l_pcHighlightStart );
 		l_pcHighlightStart [ l_iHighlightLength ] = l_cStopChar;
 		l_pcHighlightStart ++;

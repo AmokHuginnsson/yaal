@@ -80,7 +80,7 @@ int HWindow::init ( void )
 	HString l_oString;
 	clrscr ( );
 	n_bNeedRepaint = true;
-	l_oString.format ( " [%s]& \n", static_cast < char * > ( f_oTitle ) );
+	l_oString.format ( " [%s]& \n", static_cast < char const * const > ( f_oTitle ) );
 	f_poStatusBar = init_bar ( l_oString );
 	f_poStatusBar->enable ( true );
 	f_oControls.remove_head ( HControlList::D_FORCE_REMOVE_ELEMENT );
@@ -105,7 +105,7 @@ int HWindow::process_input ( int a_iCode )
 		a_iCode = f_poFocusedChild->process_input ( a_iCode );
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers ( a_iCode, f_oPostprocessHandlers );
-	if ( f_oCommand && static_cast < char * > ( f_oCommand ) [ 0 ] )
+	if ( f_oCommand && static_cast < char const * const > ( f_oCommand ) [ 0 ] )
 		process_command ( );
 	return ( a_iCode );
 	M_EPILOG
@@ -208,8 +208,8 @@ int HWindow::handler_search ( int a_iCode, void * )
 	char l_pcPrompt [ ] = "/\0";
 	if ( ! f_poFocusedChild->is_searchable ( ) )
 		return ( a_iCode );
-	if ( a_iCode >= D_KEY_COMMAND_BASE )
-		a_iCode -= D_KEY_COMMAND_BASE;
+	if ( a_iCode >= KEY_CODES::D_COMMAND_BASE )
+		a_iCode -= KEY_CODES::D_COMMAND_BASE;
 	l_pcPrompt [ 0 ] = static_cast < char > ( a_iCode );
 	f_poStatusBar->set_prompt ( l_pcPrompt, D_PROMPT_MODE_SEARCH );
 	a_iCode = 0;

@@ -28,16 +28,6 @@ Copyright:
 
 #include "config.h"
 
-/* We need ncurses.h here because of KEY_HOME. */
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hdatawindow.h"
@@ -74,7 +64,7 @@ HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
 			HDataWindow::handler_save );
 	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_CTRL_('r'), NULL,
 			HDataWindow::handler_requery );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_ESC, NULL,
+	M_REGISTER_POSTPROCESS_HANDLER ( KEY_CODES::D_ESC, NULL,
 			HDataWindow::handler_cancel );
 	return;
 	M_EPILOG
@@ -227,7 +217,7 @@ int HDataWindow::init ( void )
 	if ( f_poMainControl )
 		{
 		f_poMainControl->load ( );
-		f_poMainControl->process_input ( KEY_HOME );
+		f_poMainControl->process_input ( KEY_CODES::D_HOME );
 		}
 	refresh ( );
 	return ( 0 );
@@ -348,7 +338,7 @@ int HDataWindow::handler_add_new ( int, void * )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->message ( D_FG_BRIGHTRED,
+		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not add new rocord now." ) );
 		return ( 0 );
 		}
@@ -365,13 +355,13 @@ int HDataWindow::handler_edit ( int, void * )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->message ( D_FG_BRIGHTRED,
+		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not start editing of this record." ) );
 		return ( 0 );
 		}
 	if ( ! f_iSetQuantity )
 		{
-		f_poStatusBar->message ( D_FG_BRIGHTRED,
+		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "There is nothing to edit." ) );
 		return ( 0 );
 		}
@@ -386,13 +376,13 @@ int HDataWindow::handler_delete ( int, void * )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->message ( D_FG_BRIGHTRED,
+		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not delete this record." ) );
 		return ( 0 );
 		}
 	if ( ! f_iSetQuantity )
 		{
-		f_poStatusBar->message ( D_FG_BRIGHTRED,
+		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "There is nothing to remove." ) );
 		return ( 0 );
 		}
@@ -409,7 +399,7 @@ int HDataWindow::handler_save ( int, void * )
 	M_PROLOG
 	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
 		{
-		f_poStatusBar->message ( D_FG_BRIGHTRED, _( "There is nothing to save." ) );
+		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( 0 );
 		}
 	m_lId = update ( );
@@ -425,7 +415,7 @@ int HDataWindow::handler_requery ( int, void * )
 	M_PROLOG
 	if ( f_iMode != D_MODE_NORMAL )
 		{
-		f_poStatusBar->message ( D_FG_BRIGHTRED,
+		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "Finish your current operation first." ) );
 		return ( 0 );
 		}
@@ -448,7 +438,7 @@ int HDataWindow::handler_cancel ( int, void * )
 		f_poMainControl->cancel_new ( );
 	f_bModified = false;
 	f_poStatusBar->refresh ( );
-	f_poStatusBar->message ( D_FG_BRIGHTRED, _ ( "Dropping all changes." ) );
+	f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED, _ ( "Dropping all changes." ) );
 	return ( 0 );
 	M_EPILOG
 	}

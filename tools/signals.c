@@ -32,14 +32,6 @@ Copyright:
 
 #include "config.h"
 
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
 M_CVSID ( "$CVSHeader$" );
 #include "hcore/xalloc.h"
@@ -134,6 +126,8 @@ void install_special ( SIGNAL_HANDLER_t HANDLER, int a_iSignum )
 #else
 	l_sHandler.sa_flags = 0;
 #endif
+/* order of calls of siginterrupt, sigaction does matter */
+	siginterrupt ( a_iSignum, 1 ); /* 1 means true */
 	sigemptyset ( & l_sHandler.sa_mask );
 	sigaddset ( & l_sHandler.sa_mask, a_iSignum );
 	l_sHandler.sa_handler = HANDLER;
@@ -143,29 +137,25 @@ void install_special ( SIGNAL_HANDLER_t HANDLER, int a_iSignum )
 		l_oError.format ( "sigaction ( SIG(%d), ... )", a_iSignum );
 		M_THROW ( l_oError, l_iError );
 		}
-#define D_TRUE	1
 	if ( l_sOldHandler.sa_handler == SIG_IGN )
 		sigaction ( a_iSignum, & l_sOldHandler, & l_sHandler );
-	else
-		siginterrupt ( a_iSignum, D_TRUE );
-#undef D_TRUE
 	return;
 	M_EPILOG
 	}
 
 /* singnal handler definitions */
-	
+
 void signal_WINCH ( int a_iSignum )
 	{
 	M_PROLOG
-	char * l_pcSignalMessage = 0;
+	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
-	l_pcSignalMessage = strsignal ( a_iSignum );
-	l_oMessage = "\nTerminal size changed: ";
-	l_oMessage += l_pcSignalMessage;
+	l_oMessage = "Terminal size changed: ";
+	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
+	l_pcSignalMessage = l_oMessage;
 #ifdef __HCORE_HLOG_H
-	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
+	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
@@ -174,9 +164,9 @@ void signal_WINCH ( int a_iSignum )
 		ungetch ( D_KEY_CTRL_('l') );
 		}
 	else
-		fprintf ( stderr, l_oMessage );
+		fprintf ( stderr, "\n%s", l_pcSignalMessage );
 #else /* __HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, l_oMessage );
+	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 #endif /* not __HCONSOLE_CONSOLE_H */
 	return;
 	M_EPILOG
@@ -187,20 +177,20 @@ void signal_INT ( int a_iSignum )
 	M_PROLOG
 	if ( tools::n_bIgnoreSignalSIGINT )
 		return;
-	char * l_pcSignalMessage = 0;
+	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
-	l_pcSignalMessage = strsignal ( a_iSignum );
-	l_oMessage = "\nInterrupt signal caught, process broken: ";
-	l_oMessage += l_pcSignalMessage;
+	l_oMessage = "Interrupt signal caught, process broken: ";
+	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
+	l_pcSignalMessage = l_oMessage;
 #ifdef __HCORE_HLOG_H
-	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
+	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
 #endif /* __HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, l_oMessage );
+	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( SIGINT, SIG_DFL );
 	raise ( SIGINT );
 	return;
@@ -210,20 +200,20 @@ void signal_INT ( int a_iSignum )
 void signal_TERM ( int a_iSignum )
 	{
 	M_PROLOG
-	char * l_pcSignalMessage = 0;
+	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
-	l_pcSignalMessage = strsignal ( a_iSignum );
-	l_oMessage = "\nProcess was explictly killed: ";
-	l_oMessage += l_pcSignalMessage;
+	l_oMessage = "Process was explictly killed: ";
+	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
+	l_pcSignalMessage = l_oMessage;
 #ifdef __HCORE_HLOG_H
-	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
+	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
 #endif
-	fprintf ( stderr, l_oMessage );
+	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( SIGTERM, SIG_DFL );
 	raise ( SIGTERM );
 	return;
@@ -233,29 +223,29 @@ void signal_TERM ( int a_iSignum )
 void signal_QUIT ( int a_iSignum )
 	{
 	M_PROLOG
-	char * l_pcSignalMessage = 0;
+	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
 	if ( tools::n_bIgnoreSignalSIGQUIT )
 		{
 #ifdef __HCONSOLE_CONSOLE_H
 		if ( is_enabled ( ) )
-			c_printf ( n_iHeight - 1, 0, D_FG_BRIGHTRED,
+			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Hard Quit is disabled by stdhapi configuration." );
 #endif /* __HCONSOLE_CONSOLE_H */
 		return;
 		}
-	l_pcSignalMessage = strsignal ( a_iSignum );
-	l_oMessage = "\nAbnormal program quit forced: ";
-	l_oMessage += l_pcSignalMessage;
+	l_oMessage = "Abnormal program quit forced: ";
+	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
+	l_pcSignalMessage = l_oMessage;
 #ifdef __HCORE_HLOG_H
-	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
+	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
 #endif
-	fprintf ( stderr, l_oMessage );
+	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( SIGQUIT, SIG_DFL );
 	raise ( SIGQUIT );
 	return;
@@ -265,29 +255,29 @@ void signal_QUIT ( int a_iSignum )
 void signal_TSTP ( int a_iSignum )
 	{
 	M_PROLOG
-	char * l_pcSignalMessage = 0;
+	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
 	if ( tools::n_bIgnoreSignalSIGINT )
 		{
 #ifdef __HCONSOLE_CONSOLE_H
 		if ( is_enabled ( ) )
-			c_printf ( n_iHeight - 1, 0, D_FG_BRIGHTRED,
+			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Suspend is disabled by stdhapi configuration." );
 #endif /* __HCONSOLE_CONSOLE_H */
 		return;
 		}
-	l_pcSignalMessage = strsignal ( a_iSignum );
-	l_oMessage = "\nStop signal caught, process suspended: ";
-	l_oMessage += l_pcSignalMessage;
+	l_oMessage = "Stop signal caught, process suspended: ";
+	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
+	l_pcSignalMessage = l_oMessage;
 #ifdef __HCORE_HLOG_H
-	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
+	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
 #endif
-	fprintf ( stderr, l_oMessage );
+	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( SIGTSTP, SIG_DFL );
 	raise ( SIGTSTP );
 	return;
@@ -297,14 +287,14 @@ void signal_TSTP ( int a_iSignum )
 void signal_CONT ( int a_iSignum )
 	{
 	M_PROLOG
-	char * l_pcSignalMessage = 0;
+	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
-	l_pcSignalMessage = strsignal ( a_iSignum );
-	l_oMessage = "\nProcess was resurected: ";
-	l_oMessage += l_pcSignalMessage;
+	l_oMessage = "Process was resurected: ";
+	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
+	l_pcSignalMessage = l_oMessage;
 #ifdef __HCORE_HLOG_H
-	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
+	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
 	if ( ! is_enabled ( ) )
@@ -315,7 +305,9 @@ void signal_CONT ( int a_iSignum )
 		ungetch ( D_KEY_CTRL_('l') );
 		}
 #endif /* __HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, l_oMessage );
+	fprintf ( stderr, "\n%s", l_pcSignalMessage );
+	if ( signal ( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
+		signal ( SIGTSTP, SIG_IGN );
 	return;
 	M_EPILOG
 	}
@@ -323,20 +315,20 @@ void signal_CONT ( int a_iSignum )
 void signal_fatal ( int a_iSignum )
 	{
 	M_PROLOG
-	char * l_pcSignalMessage = 0;
+	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
-	l_pcSignalMessage = strsignal ( a_iSignum );
-	l_oMessage = "\nProcess caused FATAL ERROR: ";
-	l_oMessage += l_pcSignalMessage;
-	l_oMessage += ", bailing out.";
+	l_oMessage = "Process caused FATAL ERROR: ";
+	l_oMessage += strsignal ( a_iSignum );
+	l_oMessage += '.';
+	l_pcSignalMessage = l_oMessage;
 #ifdef __HCORE_HLOG_H
-	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
+	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
 #endif /* __HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, l_oMessage );
+	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( a_iSignum, SIG_DFL );
 	raise ( a_iSignum );
 	return;
@@ -352,32 +344,32 @@ void signal_USR1 ( int a_iSignum )
 		if ( is_enabled ( ) )
 			{
 			n_bInputWaiting = true;
-			ungetch ( KEY_MOUSE );
+			ungetch ( KEY_CODES::D_MOUSE );
 			return;
 			}
 		}
 #endif /* __HCONSOLE_CONSOLE_H */
-	char * l_pcSignalMessage = 0;
+	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
-	l_pcSignalMessage = strsignal ( a_iSignum );
 	l_oMessage = "\nDo you play with the mouse under FreeBSD ? ";
-	l_oMessage += l_pcSignalMessage;
+	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
+	l_pcSignalMessage = l_oMessage;
 #ifdef __HCORE_HLOG_H
-	log << static_cast < char * > ( l_oMessage ) + 1 << endl;
+	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
 #ifdef __HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
 #endif /* __HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, l_oMessage );
+	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( a_iSignum, SIG_DFL );
 	raise ( a_iSignum );
 	return;
 	M_EPILOG
 	}
 
-/*  end of signal handler definitions */
+/* end of signal handler definitions */
 
 void set_handlers ( void )
 	{

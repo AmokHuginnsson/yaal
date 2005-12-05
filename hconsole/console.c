@@ -54,6 +54,17 @@ namespace stdhapi
 
 namespace hconsole
 {
+	int const COLORS::D_FG_BLACK, COLORS::D_FG_RED, COLORS::D_FG_GREEN;
+	int const COLORS::D_FG_BROWN, COLORS::D_FG_BLUE, COLORS::D_FG_MAGENTA;
+	int const COLORS::D_FG_CYAN, COLORS::D_FG_LIGHTGRAY, COLORS::D_FG_GRAY;
+	int const COLORS::D_FG_BRIGHTRED, COLORS::D_FG_BRIGHTGREEN;
+	int const COLORS::D_FG_YELLOW, COLORS::D_FG_BRIGHTBLUE;
+	int const COLORS::D_FG_BRIGHTMAGENTA, COLORS::D_FG_BRIGHTCYAN;
+	int const COLORS::D_FG_WHITE;
+	int const COLORS::D_BG_BLACK, COLORS::D_BG_RED, COLORS::D_BG_GREEN;
+	int const COLORS::D_BG_BROWN, COLORS::D_BG_BLUE, COLORS::D_BG_MAGENTA;
+	int const COLORS::D_BG_CYAN, COLORS::D_BG_LIGHTGRAY, COLORS::D_BG_BLINK;
+	int const COLORS::D_BG_GRAY, COLORS::D_ATTR_NORMAL;
 
 #ifdef HAVE_ASCII_GRAPHICS
 #	define D_ASCII_DOWN_ARROW			ACS_DARROW
@@ -148,7 +159,7 @@ void enter_curses( void )
 			M_IRV ( init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
 						l_piColors [ l_iFg ], l_piColors [ l_iBg ] ) );
 	attrset ( COLOR_PAIR( 7 ) );
-	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( D_FG_LIGHTGRAY | D_BG_BLACK ) | A_INVIS ) ); /* meaningless value from macro */
+	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) | A_INVIS ) ); /* meaningless value from macro */
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( getenv ( "STDHAPI_NO_MOUSE" ) )
@@ -186,7 +197,7 @@ void leave_curses( void )
 //		M_THROW ( "mousemask ( ) returned 0", g_iErrNo );
 	if ( n_bUseMouse )
 		M_IRV ( mouse::mouse_close ( ) );
-	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( ( D_FG_LIGHTGRAY | D_BG_BLACK ) ) ) );
+	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) ) ) );
 	M_ENSURE ( use_default_colors ( ) == OK );
 	M_ENSURE ( printw ( "" ) != ERR );
 	M_ENSURE ( fflush ( NULL ) == 0 );
@@ -239,7 +250,31 @@ int curs_set ( int const & a_iCursor )
 
 int c_addch ( GLYPHS::glyph_t const & a_eGlyph )
 	{
-	return ( ::addch ( a_eGlyph ) );
+	int l_iChar = 0;
+	switch ( a_eGlyph )
+		{
+		case ( GLYPHS::D_DOWN_ARROW ):
+			{
+			l_iChar = D_ASCII_DOWN_ARROW;
+			break;
+			}
+		case ( GLYPHS::D_UP_ARROW ):
+			{
+			l_iChar = D_ASCII_UP_ARROW;
+			break;
+			}
+		case ( GLYPHS::D_VERTICAL_LINE ):
+			{
+			l_iChar = D_ASCII_VERTICAL_LINE;
+			break;
+			}
+		default :
+			{
+			M_ASSERT ( ! "unknown glyph" );
+			break;
+			}
+		}
+	return ( ::addch ( l_iChar ) );
 	}
 
 int c_refresh ( void )
@@ -335,6 +370,11 @@ int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	M_EPILOG
 	}
 
+int ungetch ( int a_iCode )
+	{
+	return ( ::ungetch ( a_iCode ) );
+	}
+
 int get_key ( void )
 	{
 	M_PROLOG
@@ -346,20 +386,20 @@ int get_key ( void )
 	M_ENSURE ( noecho() != ERR );
 	M_ENSURE ( fflush( NULL ) == 0 );
 	l_iKey = getch ( );
-	if ( l_iKey == D_KEY_ESC )
+	if ( l_iKey == KEY_CODES::D_ESC )
 		{
 		M_ENSURE ( nodelay ( stdscr, true ) != ERR );
 		l_iKey = getch ( );
 		M_ENSURE ( nodelay ( stdscr, false ) != ERR );
 		if ( l_iKey == ERR )
-			l_iKey = D_KEY_ESC;
+			l_iKey = KEY_CODES::D_ESC;
 		else
 			l_iKey = D_KEY_META_(l_iKey);
 		}
 	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
 		{
 		l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
-		M_IRV ( c_printf ( n_iHeight - 1, -1, D_FG_WHITE, "ctrl-%c",
+		M_IRV ( c_printf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
 					n_cCommandComposeCharacter ) );
 		timeout ( n_iCommandComposeDelay * 100 );
 		l_iKey = getch ( );
@@ -367,42 +407,46 @@ int get_key ( void )
 		if ( l_iKey == ERR )
 			{
 			l_iKey = D_KEY_CTRL_(n_cCommandComposeCharacter);
-			M_IRV ( c_printf ( n_iHeight - 1, 0, D_FG_LIGHTGRAY, "      " ) );
+			M_IRV ( c_printf ( n_iHeight - 1, 0, COLORS::D_FG_LIGHTGRAY, "      " ) );
 			}
 		else
 			{
-			if ( l_iKey < D_KEY_ESC )
+			if ( l_iKey < KEY_CODES::D_ESC )
 				l_iKey = D_KEY_COMMAND_( l_iChar = l_iKey + 96 );
-			else if ( l_iKey == D_KEY_ESC )
+			else if ( l_iKey == KEY_CODES::D_ESC )
 				{
 				M_ENSURE ( nodelay ( stdscr, true ) != ERR );
 				l_iKey = getch ( );
 				M_ENSURE ( nodelay ( stdscr, false ) != ERR );
 				if ( l_iKey == ERR )
-					l_iKey = D_KEY_COMMAND_(l_iChar = D_KEY_ESC);
+					l_iKey = D_KEY_COMMAND_(l_iChar = KEY_CODES::D_ESC);
 				else
 					l_iKey = D_KEY_COMMAND_(D_KEY_META_(l_iChar = l_iKey));
 				}
 			else
 				l_iKey = D_KEY_COMMAND_(l_iChar = l_iKey);
-			M_IRV ( c_printf ( n_iHeight - 1, 6, D_FG_WHITE, " %c", l_iChar ) );
+			M_IRV ( c_printf ( n_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar ) );
 			}
 		M_IRV ( curs_set ( l_iOrigCursState ) );
 		}
 	M_ENSURE ( echo ( ) != ERR );
 	switch ( l_iKey )
 		{
+		case ( KEY_NPAGE ):			l_iKey = KEY_CODES::D_PAGE_DOWN;	break;
+		case ( KEY_PPAGE ):			l_iKey = KEY_CODES::D_PAGE_UP;		break;
+		case ( KEY_HOME ):			l_iKey = KEY_CODES::D_HOME;				break;
 		case ( 347 ):
-			{
-			l_iKey = KEY_END;
-			break;
-			}
+		case ( KEY_END ):				l_iKey = KEY_CODES::D_END;				break;
 		case ( 8 ):
 		case ( 127 ):
-			{
-			l_iKey = KEY_BACKSPACE;
-			break;
-			}
+		case ( KEY_BACKSPACE ):	l_iKey = KEY_CODES::D_BACKSPACE;	break;
+		case ( KEY_UP ):				l_iKey = KEY_CODES::D_UP;				break;
+		case ( KEY_DOWN ):			l_iKey = KEY_CODES::D_DOWN;				break;
+		case ( KEY_LEFT ):			l_iKey = KEY_CODES::D_LEFT;				break;
+		case ( KEY_RIGHT ):			l_iKey = KEY_CODES::D_RIGHT;			break;
+		case ( KEY_DC ):				l_iKey = KEY_CODES::D_DELETE;			break;
+		case ( KEY_IC ):				l_iKey = KEY_CODES::D_INSERT;			break;
+		case ( KEY_MOUSE ):			l_iKey = KEY_CODES::D_MOUSE;			break;
 		default:
 			break;
 		}

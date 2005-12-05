@@ -26,16 +26,6 @@ Copyright:
 
 #include "config.h"
 
-/* We need ncurses.h here because of KEY_HOME. */
-
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" );
 #include "hdatalistcontrol.h"
@@ -135,8 +125,8 @@ void HDataListControl::add_new ( void )
 	{
 	M_PROLOG
 	add_tail ( );
-	process_input ( KEY_HOME );
-	process_input ( KEY_END );
+	process_input ( KEY_CODES::D_HOME );
+	process_input ( KEY_CODES::D_END );
 	return;
 	M_EPILOG
 	}
@@ -147,8 +137,8 @@ void HDataListControl::cancel_new ( void )
 	remove_tail ( D_EMPTY_IF_NOT_EMPTIED );
 	if ( f_iQuantity )
 		{
-		process_input ( KEY_HOME );
-		process_input ( KEY_END );
+		process_input ( KEY_CODES::D_HOME );
+		process_input ( KEY_CODES::D_END );
 		}
 	return;
 	M_EPILOG

@@ -74,7 +74,7 @@ char const * const make_short_opts ( OOption * const & a_rpsOptions, int a_iCoun
 				}
 			}
 		}
-	return ( a_roBuffer );
+	return ( a_roBuffer.raw ( ) );
 	}
 
 option * make_option_array ( OOption * const & a_rpsOptions, int a_iCount, HString & a_roBuffer )
@@ -83,7 +83,7 @@ option * make_option_array ( OOption * const & a_rpsOptions, int a_iCount, HStri
 	int l_iCtr = 0;
 	option * l_psOptions = NULL;
 	a_roBuffer.hs_realloc ( sizeof ( option ) * a_iCount );
-	l_psOptions = reinterpret_cast < option * > ( static_cast < char * > ( a_roBuffer ) );
+	l_psOptions = reinterpret_cast < option * > ( a_roBuffer.raw ( ) );
 	for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 		{
 		memset ( & l_psOptions [ l_iCtr ], 0, sizeof ( option ) );

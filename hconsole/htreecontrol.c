@@ -138,7 +138,7 @@ void HTreeControl::refresh ( void )
 		curs_set ( D_CURSOR_INVISIBLE );
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
-	memset ( f_oVarTmpBuffer, '_', f_iWidthRaw );
+	memset ( f_oVarTmpBuffer.raw ( ), '_', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		c_mvprintf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
@@ -311,7 +311,7 @@ int HTreeControl::process_input ( int a_iCode )
 	if ( ! l_iErrorCode )
 		{
 		refresh ( );
-		f_poParent->status_bar ( )->message ( D_FG_LIGHTGRAY, "" );
+		f_poParent->status_bar ( )->message ( COLORS::D_FG_LIGHTGRAY, "" );
 		}
 	return ( a_iCode );
 	M_EPILOG

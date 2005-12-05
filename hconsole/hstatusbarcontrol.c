@@ -244,9 +244,9 @@ void HStatusBarControl::update_progress ( double a_dStep,
 					static_cast < char const * > ( l_oStoper ), l_iNextPercent, "%%" );
 			}
 		if ( f_bDone )
-			strncpy ( static_cast < char * > ( f_oString ) + n_iWidth - 5, "done", 4 );
-		::memset ( static_cast < char * > ( f_oString ) + 1, '-', l_iMaxBar );
-		::memset ( static_cast < char * > ( f_oString ) + 1, '=', l_iNextStep );
+			strncpy ( f_oString.raw ( ) + n_iWidth - 5, "done", 4 );
+		::memset ( f_oString.raw ( ) + 1, '-', l_iMaxBar );
+		::memset ( f_oString .raw ( ) + 1, '=', l_iNextStep );
 		c_mvprintf ( n_iHeight - 1, 0, f_oString );
 		f_oString = "";
 		f_iLastProgress = l_iNextStep;

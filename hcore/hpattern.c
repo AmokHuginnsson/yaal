@@ -64,7 +64,7 @@ int HPattern::parse ( char const * const a_pcPattern,
 	bool l_bLocalCopyIgnoreCase = false, l_bLocalCopyExtended = false;
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iBegin = 0, l_iEnd = 0;
 	HArray < int short unsigned > l_oLocalCopyFlags ( a_iFlagsCount );
-	char * l_pcPattern = f_oPatternInput = a_pcPattern;
+	char const * const l_pcPattern = f_oPatternInput = a_pcPattern;
 	f_oError = "";
 /* making copy of flags */
 	l_bLocalCopyIgnoreCase = f_bIgnoreCase;
@@ -250,7 +250,7 @@ void HPattern::prepare_error_message ( int const a_iError,
 	int l_iSize = regerror ( a_iError, & f_sCompiled, NULL, 0 ) + 1;
 	f_oError.hs_realloc ( l_iSize + 1 );
 	M_ENSURE ( static_cast < int > ( regerror ( a_iError, & f_sCompiled,
-					f_oError, l_iSize ) ) < l_iSize );
+					f_oError.raw ( ), l_iSize ) ) < l_iSize );
 	if ( a_pcString )
 		{
 		f_oError += ": `";

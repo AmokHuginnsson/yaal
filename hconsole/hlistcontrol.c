@@ -202,7 +202,7 @@ void HListControl::refresh ( void )
 							{
 							if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
 								{
-								memset ( static_cast < char * > ( f_oVarTmpBuffer ) + l_iTmp, '_',
+								memset ( f_oVarTmpBuffer.raw ( ) + l_iTmp, '_',
 										l_poColumnInfo->f_iWidthRaw - l_iTmp );
 								}
 							f_oVarTmpBuffer [ l_poColumnInfo->f_iWidthRaw ] = 0;
@@ -215,13 +215,13 @@ void HListControl::refresh ( void )
 										l_poColumnInfo->f_iWidthRaw );
 							else if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
 								{
-								memmove ( static_cast < char * > ( f_oVarTmpBuffer ) 
+								memmove ( f_oVarTmpBuffer.raw ( )
 										+ ( l_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2, 
 										f_oVarTmpBuffer, l_iTmp + 1 );
-								memset ( f_oVarTmpBuffer, '_',
+								memset ( f_oVarTmpBuffer.raw ( ), '_',
 										( l_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
 								l_iTmp = f_oVarTmpBuffer.get_length ( );
-								memset ( static_cast < char * > ( f_oVarTmpBuffer ) + l_iTmp,
+								memset ( f_oVarTmpBuffer.raw ( ) + l_iTmp,
 										'_', l_poColumnInfo->f_iWidthRaw - l_iTmp );
 								f_oVarTmpBuffer [ l_poColumnInfo->f_iWidthRaw ] = 0;
 								}
@@ -234,10 +234,10 @@ void HListControl::refresh ( void )
 										l_poColumnInfo->f_iWidthRaw );
 							else if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
 								{
-								memmove ( static_cast < char * > ( f_oVarTmpBuffer )
+								memmove ( f_oVarTmpBuffer.raw ( )
 										+ l_poColumnInfo->f_iWidthRaw - l_iTmp, 
 										f_oVarTmpBuffer, l_iTmp + 1 );
-								memset ( f_oVarTmpBuffer, '_',
+								memset ( f_oVarTmpBuffer.raw ( ), '_',
 										l_poColumnInfo->f_iWidthRaw - l_iTmp );
 								}
 							break;
@@ -290,7 +290,7 @@ void HListControl::refresh ( void )
 		}
 	l_iColumnOffset = 0;
 	M_SET_ATTR_DATA ( );
-	memset ( f_oVarTmpBuffer, '.', f_iWidthRaw );
+	memset ( f_oVarTmpBuffer.raw ( ), '.', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		M_ENSURE ( c_mvprintf ( f_iRowRaw + l_iCtr + l_iHR, f_iColumnRaw,
@@ -307,7 +307,7 @@ void HListControl::refresh ( void )
 				M_IRV ( f_oVarTmpBuffer.format ( "%%-%ds",
 							l_poColumnInfo->f_iWidthRaw ) );
 				M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset,
-							f_oVarTmpBuffer, static_cast < char * > (
+							f_oVarTmpBuffer, static_cast < char const * const > (
 								l_poColumnInfo->f_oName.left (
 									l_poColumnInfo->f_iWidthRaw ) ) ) != C_ERR );
 				M_SET_ATTR_SHORTCUT ( );
@@ -555,7 +555,7 @@ int HListControl::process_input ( int a_iCode )
 	if ( ! l_iErrorCode )
 		{
 		refresh ( );
-		f_poParent->status_bar ( )->message ( D_FG_LIGHTGRAY, "" );
+		f_poParent->status_bar ( )->message ( COLORS::D_FG_LIGHTGRAY, "" );
 		}
 	return ( a_iCode );
 	M_EPILOG

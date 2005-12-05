@@ -90,9 +90,9 @@ protected:
 	/*{*/
 	char const * next_property ( stdhapi::hcore::HString & );
 	int iterate ( ONode & );
-	char * convert ( char const *, way_t = D_OUT );
-	char * get_leaf_by_name ( int, char const * );
-	char * get_leaf_by_name ( xml_node_ptr_t, char const * );
+	char const * convert ( char const *, way_t = D_OUT );
+	char const * get_leaf_by_name ( int, char const * );
+	char const * get_leaf_by_name ( xml_node_ptr_t, char const * );
 	int get_node_set_by_path ( char const * );
 	/*}*/
 private:

@@ -426,11 +426,16 @@ bool HString::operator < ( char const * const a_pcStr ) const
 	M_EPILOG
 	}
 
-HString::operator char * ( void ) const
+HString::operator char const * const ( void ) const
 	{
 	M_PROLOG
 	return ( f_pcBuffer );
 	M_EPILOG
+	}
+
+char * HString::raw ( void ) const
+	{
+	return ( f_pcBuffer );
 	}
 
 bool HString::is_empty ( void ) const

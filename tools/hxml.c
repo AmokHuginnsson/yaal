@@ -243,7 +243,7 @@ HXml::~HXml ( void )
 	M_EPILOG
 	}
 
-char * HXml::convert ( char const * a_pcData, way_t a_eWay )
+char const * HXml::convert ( char const * a_pcData, way_t a_eWay )
 	{
 	M_PROLOG
 	size_t l_uiSizeIn = 0, l_uiSizeOut = 0, l_uiOrigSize = 0, l_uiTmp = 0;
@@ -256,7 +256,7 @@ char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 	iconv_t l_xCD = static_cast < iconv_t > ( 0 );
 	l_uiOrigSize = l_uiSizeOut = l_uiSizeIn = strlen ( a_pcData );
 	f_oConvertedString.hs_realloc ( l_uiOrigSize + 1 );
-	l_pcOut = f_oConvertedString;
+	l_pcOut = f_oConvertedString.raw ( );
 	switch ( a_eWay )
 		{
 		case ( D_IN ): { l_xCD = f_xIconvIn; break; }
@@ -276,8 +276,7 @@ char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 		l_uiTmp = l_uiOrigSize;
 		l_uiOrigSize <<= 1;
 		f_oConvertedString.hs_realloc ( l_uiOrigSize + 1 );
-		l_pcOut = static_cast < char * > ( f_oConvertedString )
-			+ l_uiTmp - l_uiSizeOut;
+		l_pcOut = f_oConvertedString.raw ( ) + l_uiTmp - l_uiSizeOut;
 		l_uiSizeOut += l_uiTmp;
 		M_ENSURE ( ( iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut,
 						& l_uiSizeOut ) != static_cast < size_t > ( - 1 ) )
@@ -289,7 +288,7 @@ char * HXml::convert ( char const * a_pcData, way_t a_eWay )
 	M_EPILOG
 	}
 
-char * HXml::get_leaf_by_name ( int a_iIndex, char const * a_pcName )
+char const * HXml::get_leaf_by_name ( int a_iIndex, char const * a_pcName )
 	{
 	M_PROLOG
 	if ( f_poXml->f_psNodeSet )
@@ -300,10 +299,10 @@ char * HXml::get_leaf_by_name ( int a_iIndex, char const * a_pcName )
 	M_EPILOG
 	}
 
-char * HXml::get_leaf_by_name ( xml_node_ptr_t a_psNode, char const * a_pcName )
+char const * HXml::get_leaf_by_name ( xml_node_ptr_t a_psNode, char const * a_pcName )
 	{
 	M_PROLOG
-	char * l_pcData = NULL;
+	char const * l_pcData = NULL;
 	xmlNodePtr l_psNode = reinterpret_cast < xmlNodePtr > ( a_psNode );
 	while ( l_psNode )
 		{
@@ -329,7 +328,7 @@ int HXml::get_node_set_by_path ( char const * a_pcPath )
 	int l_iLength = 0;
 	char * l_pcPtr = NULL;
 	f_oVarTmpBuffer = a_pcPath;
-	l_pcPtr = f_oVarTmpBuffer;
+	l_pcPtr = f_oVarTmpBuffer.raw ( );
 	l_iLength = f_oVarTmpBuffer.get_length ( ) - 1;
 	if ( f_poXml->f_psObject )
 		f_poXml->xml_free ( f_poXml->f_psObject );
@@ -342,7 +341,7 @@ int HXml::get_node_set_by_path ( char const * a_pcPath )
 		while ( l_pcPtr [ 0 ] )
 			{
 			f_poXml->f_psObject = xmlXPathEvalExpression (
-					reinterpret_cast < const xmlChar * > ( l_pcPtr ),
+					reinterpret_cast < xmlChar const * > ( l_pcPtr ),
 					f_poXml->f_psContext );
 			if ( f_poXml->f_psObject )
 				break;

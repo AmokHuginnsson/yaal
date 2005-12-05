@@ -81,7 +81,7 @@ bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		{
 		if ( ( a_roValue.get_length ( ) > 1 ) && ( a_roValue [ 0 ] == 'B' ) )
 			{
-			l_iBaudRate = strtol ( static_cast < char * > ( a_roValue ) + 1, NULL, 10 );
+			l_iBaudRate = strtol ( static_cast < char const * const > ( a_roValue ) + 1, NULL, 10 );
 			switch ( l_iBaudRate )
 				{
 				case ( 115200 ): l_iBaudRate = B115200; break;

@@ -97,7 +97,7 @@ bool substitute_environment ( HString & a_roString )
 		M_ENSURE ( l_oPattern.parse_re ( "${[^{}]\\+}" ) == 0 );
 		if ( ( l_pcStart = l_oPattern.matches ( a_roString, & l_iLength ) ) )
 			{
-			l_oName = a_roString.mid ( l_pcStart - static_cast < char * > ( a_roString ), l_iLength );
+			l_oName = a_roString.mid ( l_pcStart - static_cast < char const * const > ( a_roString ), l_iLength );
 			l_pcStart = ::getenv ( l_oName.mid ( 2, l_iLength - 3 ) );
 			if ( l_pcStart )
 				{
@@ -136,7 +136,8 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 						if ( l_oOption == l_oValue )
 								{
 								if ( n_iDebugLevel )
-									fprintf ( stderr, "section: [%s]\n", static_cast < char * > ( l_oOption ) );
+									fprintf ( stderr, "section: [%s]\n",
+											static_cast < char const * const > ( l_oOption ) );
 								log << "section: " << a_pcSection << ", ";
 								l_bSection = true;
 								continue;
@@ -150,8 +151,9 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 				while ( substitute_environment ( l_oValue ) )
 					;
 				if ( n_iDebugLevel )
-					fprintf ( stderr, "option: [%s], value [%s]\n", static_cast < char * > ( l_oOption ),
-							static_cast < char * > ( l_oValue ) );
+					fprintf ( stderr, "option: [%s], value [%s]\n",
+							static_cast < char const * const > ( l_oOption ),
+							static_cast < char const * const > ( l_oValue ) );
 				l_iCtr = 0;
 				l_bOptionOK = false;
 				while ( ( l_iCtr < a_iCount ) && a_psVaraibles [ l_iCtr ].f_pcKey )
@@ -273,7 +275,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, HFile & a_roFile,
 	while ( a_roFile.read_line ( a_roOption, HFile::D_STRIP_NEWLINES ) >= 0 )
 		{
 		a_riLine ++;
-		l_pcBuffer = a_roOption;
+		l_pcBuffer = a_roOption.raw ( );
 		l_iIndex = 0;
 		if ( ! l_pcBuffer [ l_iIndex ] )
 			continue; /* empty line */
