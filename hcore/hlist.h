@@ -78,7 +78,6 @@ struct OListTreatment
 		D_FORCE_REMOVE_ELEMENT = 16
 		} treatment_t;
 	virtual ~OListTreatment ( void ) { } 
-	};
 
 template struct enum_t < OListTreatment::treatment_t >;
 
