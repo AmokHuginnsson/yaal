@@ -98,10 +98,10 @@ int HCollector::send_line ( char const * a_pcLine )
 	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
 		{
 		flush ( TCOFLUSH );
-		l_iCtr = write ( l_oLine, l_iLength );
+		l_iCtr = HRawFile::write ( l_oLine, l_iLength );
 		wait_for_eot ( );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
-		read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
+		HRawFile::read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
 		flush ( TCIFLUSH );
 		l_iError ++;
 		}
@@ -122,7 +122,7 @@ int HCollector::receive_line ( char * & a_pcLine )
 	while ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
 		{
 		memset ( f_oLine.raw ( ), 0, D_RECV_BUF_SIZE );
-		read ( f_oLine.raw ( ), D_RECV_BUF_SIZE );
+		HRawFile::read ( f_oLine.raw ( ), D_RECV_BUF_SIZE );
 		flush ( TCIFLUSH );
 		a_pcLine = f_oLine.raw ( )
 			+ strlen ( D_PROTO_DTA ) + 2 /* for lenght */ + 2 /* for crc */;
@@ -140,11 +140,11 @@ int HCollector::receive_line ( char * & a_pcLine )
 				+ strlen ( D_PROTO_DTA ) + 2 /* for Plength */, 2 );
 		l_iPCRC = strtol ( f_pcReadBuf, NULL, 0x10 );
 		if ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
-			l_iError += ( l_iErrLenght - write ( D_PROTO_ERR, l_iErrLenght ) );
+			l_iError += ( l_iErrLenght - HRawFile::write ( D_PROTO_ERR, l_iErrLenght ) );
 		l_iError ++;
 		}
 	flush ( TCOFLUSH );
-	l_iError += ( l_iAckLenght - write ( D_PROTO_ACK, l_iAckLenght ) );
+	l_iError += ( l_iAckLenght - HRawFile::write ( D_PROTO_ACK, l_iAckLenght ) );
 	wait_for_eot ( );
 	f_iLines ++;
 	return ( l_iError );
@@ -180,7 +180,7 @@ int HCollector::establish_connection ( int a_iTimeOut )
 	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
 		{
 		flush ( TCOFLUSH );
-		if ( write ( D_PROTO_SYN, l_iLenght ) != l_iLenght )
+		if ( HRawFile::write ( D_PROTO_SYN, l_iLenght ) != l_iLenght )
 			M_THROW ( "write", l_iLenght );
 		wait_for_eot ( );
 		if ( tcsendbreak ( f_iFileDescriptor, 0 ) )
@@ -193,7 +193,7 @@ int HCollector::establish_connection ( int a_iTimeOut )
 		if ( ( M_STDHAPI_TEMP_FAILURE_RETRY ( select ( FD_SETSIZE,
 							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
 				&& FD_ISSET ( f_iFileDescriptor, & l_xFileDesSet ) )
-			read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
+			HRawFile::read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
 		flush ( TCIFLUSH );
 		l_iError ++;
 		if ( l_iError > a_iTimeOut )
@@ -223,11 +223,11 @@ int HCollector::wait_for_connection ( int a_iTimeOut )
 		if ( ( M_STDHAPI_TEMP_FAILURE_RETRY ( select ( FD_SETSIZE,
 							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
 				&& FD_ISSET ( f_iFileDescriptor, & l_xFileDesSet ) )
-			read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE ), l_iError ++;
+			HRawFile::read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE ), l_iError ++;
 		else
 			return ( -1 );
 		}
-	l_iError += ( l_iLenght - write ( D_PROTO_ACK, l_iLenght ) );
+	l_iError += ( l_iLenght - HRawFile::write ( D_PROTO_ACK, l_iLenght ) );
 	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (wait)" << endl;
 	return ( l_iError );
 	M_EPILOG

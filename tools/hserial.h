@@ -58,6 +58,7 @@ public:
 	virtual int close ( void );
 	void flush ( int );
 	void wait_for_eot ( void );
+	int read ( char * const, int const, int const, int const = 0 );
 	/*}*/
 protected:
 	/*{*/

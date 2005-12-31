@@ -191,6 +191,24 @@ void HSerial::wait_for_eot ( void )
 	M_EPILOG
 	}
 
+int HSerial::read ( char * const a_pcBuffer, int const a_iSize,
+		int const a_iTimeOutSec, int const a_iTimeOutUsec )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	timeval l_xWait;
+	fd_set l_xFdSet;
+	l_xWait.tv_sec = a_iTimeOutSec;
+	l_xWait.tv_usec = a_iTimeOutUsec;
+	FD_ZERO ( & l_xFdSet );
+	FD_SET ( f_iFileDescriptor, & l_xFdSet );
+	l_iError = select ( FD_SETSIZE, & l_xFdSet, NULL, NULL, & l_xWait );
+	if ( ( l_iError > 0 ) && FD_ISSET ( f_iFileDescriptor, & l_xFdSet ) )
+		return ( HRawFile::read ( a_pcBuffer, a_iSize ) );
+	return ( - 1 );
+	M_EPILOG
+	}
+
 }
 
 }
