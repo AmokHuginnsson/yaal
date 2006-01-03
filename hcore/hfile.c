@@ -125,7 +125,7 @@ int HFile::read_line ( HString & a_roLine, mode_read_t a_eMode,
 	if ( ! ( a_eMode & ( D_BUFFERED_READS | D_UNBUFFERED_READS ) ) )
 		a_eMode |= D_BUFFERED_READS;
 	if ( ! f_pvHandle )
-		M_THROW ( _ ( "no opened file" ), g_iErrNo );
+		M_THROW ( _ ( "no file is opened" ), g_iErrNo );
 	if ( a_eMode & D_BUFFERED_READS )
 		{
 		l_iLength = get_line_length ( );
@@ -303,6 +303,22 @@ HFile::operator bool const ( void ) const
 	{
 	M_PROLOG
 	return ( f_pvHandle ? true : false );
+	M_EPILOG
+	}
+
+int HFile::write ( char const * const a_pcBuffer, int a_iSize )
+	{
+	M_PROLOG
+	return ( fwrite ( a_pcBuffer, sizeof ( char ), a_iSize,
+				static_cast < FILE * > ( f_pvHandle ) ) );
+	M_EPILOG
+	}
+
+int HFile::read ( char * const a_pcBuffer, int a_iSize )
+	{
+	M_PROLOG
+	return ( fread ( a_pcBuffer, sizeof ( char ), a_iSize,
+				static_cast < FILE * > ( f_pvHandle ) ) );
 	M_EPILOG
 	}
 
