@@ -46,7 +46,7 @@ namespace tools
 
 char const * const n_pcError = _ ( "serial port not opened" );
 
-HSerial::HSerial ( char const * a_pcDevice )
+HSerial::HSerial ( char const * a_pcDevice, bool a_bCanonical )
 				: HRawFile ( ), f_oDevicePath ( ), f_sTIO ( ), f_sBackUpTIO ( )
 	{
 	M_PROLOG
@@ -87,7 +87,7 @@ HSerial::HSerial ( char const * a_pcDevice )
  *   ICANON  : enable canonical input disable all echo functionality,
  *             and don't send signals to calling program
  */
-	f_sTIO.c_lflag = ICANON | IEXTEN;
+	f_sTIO.c_lflag = ( a_bCanonical ? ICANON : 0 ) | IEXTEN;
 /*
  *   initialize all control characters
  *   default values can be found in /usr/include/termios.h,  and are given
