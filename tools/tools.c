@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
 M_CVSID ( "$CVSHeader$" );
+#include "tools.h"
 #include "hcore/hcore.h"
 #include "hcore/xalloc.h"
 #include "hcore/rc_file.h"    /* read conf from rc */
@@ -54,6 +55,7 @@ int n_iCollectorConnectionTimeOut = 9999;
 bool n_bIgnoreSignalSIGINT = false;
 bool n_bIgnoreSignalSIGTSTP = false;
 bool n_bIgnoreSignalSIGQUIT = false;
+HSerial::mode_t n_eSerialTransferMode = HSerial::D_TEXT;
 
 OVariable n_psVariables [ ] =
 	{
@@ -107,6 +109,15 @@ bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 					M_THROW ( _ ( "unknown baud rate" ), l_iBaudRate );
 				}
 			}
+		}
+	else if ( ! strcasecmp ( a_roOption, "serial_transfer_mode" ) )
+		{
+		if ( ! strcasecmp ( a_roValue, "text" ) )
+			n_eSerialTransferMode = HSerial::D_TEXT;
+		else if ( ! strcasecmp ( a_roValue, "binary" ) )
+			n_eSerialTransferMode = HSerial::D_BINARY;
+		else
+			return ( true );
 		}
 	if ( l_iBaudRate )
 		tools::n_iBaudRate = l_iBaudRate;

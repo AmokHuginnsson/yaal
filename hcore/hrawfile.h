@@ -47,8 +47,8 @@ public:
 	virtual ~HRawFile ( void );
 	virtual int close ( void );
 	file_descriptor_t get_file_descriptor ( void ) const;
-	int read ( char * const, int const );
-	int write ( char const * const, int const );
+	int read ( void * const, int const );
+	int write ( void const * const, int const );
 	/*}*/
 protected:
 	/*{*/

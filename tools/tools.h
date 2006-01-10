@@ -27,6 +27,8 @@ Copyright:
 #ifndef __TOOLS_TOOLS_H
 #define __TOOLS_TOOLS_H
 
+#include "hserial.h"
+
 namespace stdhapi
 {
 
@@ -39,6 +41,7 @@ extern int n_iCollectorConnectionTimeOut;
 extern bool n_bIgnoreSignalSIGINT;
 extern bool n_bIgnoreSignalSIGTSTP;
 extern bool n_bIgnoreSignalSIGQUIT;
+extern HSerial::mode_t n_eSerialTransferMode;
 void stdhapi_tools_banner ( void );
 
 	}

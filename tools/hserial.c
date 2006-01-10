@@ -46,16 +46,19 @@ namespace tools
 
 char const * const n_pcError = _ ( "serial port not opened" );
 
-HSerial::HSerial ( char const * a_pcDevice, bool a_bCanonical )
+HSerial::HSerial ( char const * a_pcDevice, mode_t a_eMode )
 				: HRawFile ( ), f_oDevicePath ( ), f_sTIO ( ), f_sBackUpTIO ( )
 	{
 	M_PROLOG
+	mode_t l_eMode = D_DEFAULT;
 	memset ( & f_sTIO, 0, sizeof ( termios ) );
 	memset ( & f_sBackUpTIO, 0, sizeof ( termios ) );
 	if ( a_pcDevice )
 		f_oDevicePath = a_pcDevice;
 	else
 		f_oDevicePath = tools::n_pcSerialDevice;
+	if ( a_eMode == D_DEFAULT )
+		l_eMode = tools::n_eSerialTransferMode;
 /*
  *   BAUDRATE: Set bps rate. You could also use cfsetispeed and cfsetospeed.
  *   CRTSCTS : output hardware flow control  ( only used if the cable has
@@ -78,7 +81,7 @@ HSerial::HSerial ( char const * a_pcDevice, bool a_bCanonical )
  *             will not terminate input)
  *             otherwise make device raw  ( no other input processing)
  */
-	f_sTIO.c_iflag = IGNPAR | ICRNL | IGNBRK | IXANY;
+	f_sTIO.c_iflag = IGNPAR | ( ( l_eMode == D_TEXT ) ? ICRNL : 0 ) | IGNBRK | IXANY;
 /*
  *  Raw output.
  */
@@ -87,7 +90,7 @@ HSerial::HSerial ( char const * a_pcDevice, bool a_bCanonical )
  *   ICANON  : enable canonical input disable all echo functionality,
  *             and don't send signals to calling program
  */
-	f_sTIO.c_lflag = ( a_bCanonical ? ICANON : 0 ) | IEXTEN;
+	f_sTIO.c_lflag = ( ( l_eMode == D_TEXT ) ? ICANON : 0 ) | IEXTEN;
 /*
  *   initialize all control characters
  *   default values can be found in /usr/include/termios.h,  and are given
@@ -191,7 +194,7 @@ void HSerial::wait_for_eot ( void )
 	M_EPILOG
 	}
 
-int HSerial::read ( char * const a_pcBuffer, int const a_iSize,
+int HSerial::read ( void * const a_pcBuffer, int const a_iSize,
 		int const a_iTimeOutSec, int const a_iTimeOutUsec )
 	{
 	M_PROLOG

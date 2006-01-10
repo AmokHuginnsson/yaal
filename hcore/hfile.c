@@ -306,7 +306,7 @@ HFile::operator bool const ( void ) const
 	M_EPILOG
 	}
 
-int HFile::write ( char const * const a_pcBuffer, int a_iSize )
+int HFile::write ( void const * const a_pcBuffer, int a_iSize )
 	{
 	M_PROLOG
 	return ( fwrite ( a_pcBuffer, sizeof ( char ), a_iSize,
@@ -314,7 +314,7 @@ int HFile::write ( char const * const a_pcBuffer, int a_iSize )
 	M_EPILOG
 	}
 
-int HFile::read ( char * const a_pcBuffer, int a_iSize )
+int HFile::read ( void * const a_pcBuffer, int a_iSize )
 	{
 	M_PROLOG
 	return ( fread ( a_pcBuffer, sizeof ( char ), a_iSize,

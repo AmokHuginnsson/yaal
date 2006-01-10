@@ -73,7 +73,7 @@ file_descriptor_t HRawFile::get_file_descriptor ( void ) const
 	M_EPILOG
 	}
 
-int HRawFile::read ( char * const a_pcBuffer, int const a_iSize )
+int HRawFile::read ( void * const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
 	int l_iCnt = 0;
@@ -84,7 +84,7 @@ int HRawFile::read ( char * const a_pcBuffer, int const a_iSize )
 	M_EPILOG
 	}
 
-int HRawFile::write ( char const * const a_pcBuffer, int const a_iSize )
+int HRawFile::write ( void const * const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
 	int l_iCnt = 0;

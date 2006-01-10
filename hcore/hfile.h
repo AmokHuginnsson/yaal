@@ -82,8 +82,8 @@ public:
 	HFile & operator << ( void const * const );
 	HFile & operator << ( HFile & ( * const ) ( HFile & ) );
 	operator bool const ( void ) const;
-	int write ( char const * const, int );
-	int read ( char * const, int );
+	int write ( void const * const, int );
+	int read ( void * const, int );
 	/*}*/
 protected:
 	/*{*/

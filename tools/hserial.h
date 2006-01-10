@@ -44,6 +44,13 @@ namespace tools
 
 class HSerial : public hcore::HRawFile
 	{
+public:
+	typedef enum
+		{
+		D_DEFAULT,
+		D_TEXT,
+		D_BINARY
+		} mode_t;
 protected:
 	/*{*/
 	hcore::HString f_oDevicePath;
@@ -52,13 +59,13 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HSerial ( char const * = NULL, bool = true ); /* device path, canonical (or not) */
+	HSerial ( char const * = NULL, mode_t = D_DEFAULT ); /* device path, canonical (or not) */
 	virtual ~HSerial ( void );
 	bool open ( void );
 	virtual int close ( void );
 	void flush ( int );
 	void wait_for_eot ( void );
-	int read ( char * const, int const, int const, int const = 0 );
+	int read ( void * const, int const, int const, int const = 0 );
 	/*}*/
 protected:
 	/*{*/
