@@ -657,7 +657,10 @@ double * HAnalyser::analyse ( char const * a_pcFormula )
 	f_eError = E_OK;
 	l_iLength = strlen ( a_pcFormula );
 	if ( l_iLength == 0 )
+		{
+		f_eError = E_PREMATURE_TRMINATION;
 		return ( NULL );
+		}
 	f_oFormula.hs_realloc ( l_iLength + 1 ); /* + 1 for trailing null */
 	if ( translate ( a_pcFormula ) )
 		return ( NULL );
