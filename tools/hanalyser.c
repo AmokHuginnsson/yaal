@@ -740,7 +740,9 @@ char const * HAnalyser::get_error ( void ) const
 int HAnalyser::get_error_token ( void ) const
 	{
 	M_PROLOG
-	return ( f_oTerminalIndexes [ f_iIndex ] );
+	if ( f_iLength > f_iIndex )
+		return ( f_oTerminalIndexes [ f_iIndex ] );
+	return ( 0 );
 	M_EPILOG
 	}
 
