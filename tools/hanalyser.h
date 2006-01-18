@@ -44,14 +44,14 @@ class HAnalyser : public hcore::HTree < double_ptr_list_t >
 		{
 		E_OK = 0,
 		E_UNKNOWN_MNEMONIC = 1,
-		E_UNEXPECTED_TRMINATION = 2,
+		E_UNEXPECTED_TERMINATION = 2,
 		E_CLOSING_BRACKET_EXPECTED = 3,
 		E_CLOSING_ABSOLUTE_EXPECTED = 4,
 		E_CLOSING_FUNCTION_BRACKET_EXPECTED = 5,
 		E_OPENING_FUNCTION_BRACKET_EXPECTED = 6,
 		E_DIGIT_EXPECTED = 7,
 		E_UNEXPECTED_TOKEN = 8,
-		E_PREMATURE_TRMINATION = 9
+		E_PREMATURE_TERMINATION = 9
 		} syntax_error_t;
 	typedef hcore::HTree < double_ptr_list_t >::HNode * ANALYZER_NODE_PTR_t;
 	class HAnalyserNode;

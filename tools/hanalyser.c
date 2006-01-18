@@ -401,9 +401,9 @@ bool HAnalyser::addition_production ( HAnalyserNode * a_poNode )
 	M_ASSERT ( a_poNode );
 	if ( multiplication_production ( a_poNode->grow_up_branch ( ) ) )
 		return ( true );
-	if ( f_iIndex > f_iLength )
+	if ( f_iIndex >= f_iLength )
 		{
-		f_eError = E_UNEXPECTED_TRMINATION;
+		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
 		}
 	a_poNode->METHOD = & HAnalyser::addition;
@@ -442,9 +442,9 @@ bool HAnalyser::multiplication_production ( HAnalyserNode * a_poNode )
 	HAnalyserNode * l_poTrunk = NULL;
 	if ( power_production ( static_cast < HAnalyserNode * > ( a_poNode->grow_up_branch ( ) ) ) )
 		return ( true );
-	if ( f_iIndex > f_iLength )
+	if ( f_iIndex >= f_iLength )
 		{
-		f_eError = E_UNEXPECTED_TRMINATION;
+		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
 		}
 	a_poNode->METHOD = & HAnalyser::multiplication;
@@ -483,9 +483,9 @@ bool HAnalyser::power_production ( HAnalyserNode * a_poNode )
 	HAnalyserNode * l_poTrunk;
 	if ( signum_production( a_poNode->grow_up_branch ( ) ) )
 		return ( true );
-	if ( f_iIndex > f_iLength )
+	if ( f_iIndex >= f_iLength )
 		{
-		f_eError = E_UNEXPECTED_TRMINATION;
+		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
 		}
 	a_poNode->METHOD = & HAnalyser::bracket;
@@ -518,9 +518,9 @@ bool HAnalyser::power_production ( HAnalyserNode * a_poNode )
 bool HAnalyser::signum_production ( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
-	if ( f_iIndex > f_iLength )
+	if ( f_iIndex >= f_iLength )
 		{
-		f_eError = E_UNEXPECTED_TRMINATION;
+		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
 		}
 	if ( f_oFormula [ f_iIndex ] == '-' )
@@ -540,9 +540,9 @@ bool HAnalyser::signum_production ( HAnalyserNode * a_poNode )
 bool HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
-	if ( f_iIndex > f_iLength )
+	if ( f_iIndex >= f_iLength )
 		{
-		f_eError = E_UNEXPECTED_TRMINATION;
+		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
 		}
 	switch ( f_oFormula [ f_iIndex ] )
@@ -619,7 +619,7 @@ bool HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 		int l_iOffset = f_iIndex;
 		if ( f_iIndex >= f_iLength )
 			{
-			f_eError = E_UNEXPECTED_TRMINATION;
+			f_eError = E_UNEXPECTED_TERMINATION;
 			return ( true );
 			}
 		while ( ( f_oFormula [ f_iIndex ] >= '0' )
@@ -658,7 +658,7 @@ double * HAnalyser::analyse ( char const * a_pcFormula )
 	l_iLength = strlen ( a_pcFormula );
 	if ( l_iLength == 0 )
 		{
-		f_eError = E_PREMATURE_TRMINATION;
+		f_eError = E_PREMATURE_TERMINATION;
 		return ( NULL );
 		}
 	f_oFormula.hs_realloc ( l_iLength + 1 ); /* + 1 for trailing null */
@@ -675,8 +675,8 @@ double * HAnalyser::analyse ( char const * a_pcFormula )
 	f_poRoot = l_poNode = new HAnalyserNode ( 0 );
 	l_poNode->f_poTree = this;
 	if ( ! addition_production ( dynamic_cast < HAnalyserNode * > ( f_poRoot ) ) )
-		if ( f_iIndex < f_iLength )
-			f_eError = E_PREMATURE_TRMINATION;
+		if ( ( f_iIndex < f_iLength ) && ( f_eError == E_OK ) )
+			f_eError = E_UNEXPECTED_TOKEN;
 	if ( f_eError != E_OK )
 		return ( NULL );
 	return ( f_pdVariables );
@@ -718,7 +718,7 @@ char const * HAnalyser::get_error ( void ) const
 			return ( _ ( "succesful" ) );
 		case ( E_UNKNOWN_MNEMONIC ):
 			return ( _ ( "unknown mnemonic" ) );
-		case ( E_UNEXPECTED_TRMINATION ):
+		case ( E_UNEXPECTED_TERMINATION ):
 			return ( _ ( "unexpected termination" ) );
 		case ( E_CLOSING_BRACKET_EXPECTED ):
 			return ( _ ( "closing bracket expected" ) );
@@ -732,7 +732,7 @@ char const * HAnalyser::get_error ( void ) const
 			return ( _ ( "digit expected" ) );
 		case ( E_UNEXPECTED_TOKEN ):
 			return ( _ ( "unexpected token" ) );
-		case ( E_PREMATURE_TRMINATION ):
+		case ( E_PREMATURE_TERMINATION ):
 			return ( _ ( "premature termination" ) );
 		default :
 			M_THROW ( _ ( "enknown error code" ), static_cast < int > ( f_eError ) );
@@ -745,6 +745,8 @@ int HAnalyser::get_error_token ( void ) const
 	M_PROLOG
 	if ( f_iLength > f_iIndex )
 		return ( f_oTerminalIndexes [ f_iIndex ] );
+	else if ( f_iIndex >= 0 )
+		return ( f_iLength );
 	return ( 0 );
 	M_EPILOG
 	}
