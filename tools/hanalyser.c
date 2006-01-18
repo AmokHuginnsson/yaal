@@ -401,7 +401,7 @@ bool HAnalyser::addition_production ( HAnalyserNode * a_poNode )
 	M_ASSERT ( a_poNode );
 	if ( multiplication_production ( a_poNode->grow_up_branch ( ) ) )
 		return ( true );
-	if ( f_iIndex >= f_iLength )
+	if ( f_iIndex > f_iLength )
 		{
 		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
@@ -442,7 +442,7 @@ bool HAnalyser::multiplication_production ( HAnalyserNode * a_poNode )
 	HAnalyserNode * l_poTrunk = NULL;
 	if ( power_production ( static_cast < HAnalyserNode * > ( a_poNode->grow_up_branch ( ) ) ) )
 		return ( true );
-	if ( f_iIndex >= f_iLength )
+	if ( f_iIndex > f_iLength )
 		{
 		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
@@ -483,7 +483,7 @@ bool HAnalyser::power_production ( HAnalyserNode * a_poNode )
 	HAnalyserNode * l_poTrunk;
 	if ( signum_production( a_poNode->grow_up_branch ( ) ) )
 		return ( true );
-	if ( f_iIndex >= f_iLength )
+	if ( f_iIndex > f_iLength )
 		{
 		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
@@ -518,7 +518,7 @@ bool HAnalyser::power_production ( HAnalyserNode * a_poNode )
 bool HAnalyser::signum_production ( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
-	if ( f_iIndex >= f_iLength )
+	if ( f_iIndex > f_iLength )
 		{
 		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
@@ -540,7 +540,7 @@ bool HAnalyser::signum_production ( HAnalyserNode * a_poNode )
 bool HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
-	if ( f_iIndex >= f_iLength )
+	if ( f_iIndex > f_iLength )
 		{
 		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
@@ -617,7 +617,7 @@ bool HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 		{
 		double l_dValue = 0;
 		int l_iOffset = f_iIndex;
-		if ( f_iIndex >= f_iLength )
+		if ( f_iIndex > f_iLength )
 			{
 			f_eError = E_UNEXPECTED_TERMINATION;
 			return ( true );
@@ -675,8 +675,12 @@ double * HAnalyser::analyse ( char const * a_pcFormula )
 	f_poRoot = l_poNode = new HAnalyserNode ( 0 );
 	l_poNode->f_poTree = this;
 	if ( ! addition_production ( dynamic_cast < HAnalyserNode * > ( f_poRoot ) ) )
+		{
 		if ( ( f_iIndex < f_iLength ) && ( f_eError == E_OK ) )
 			f_eError = E_UNEXPECTED_TOKEN;
+		}
+	else if ( f_iIndex >= f_iLength )
+		f_eError = E_UNEXPECTED_TERMINATION;
 	if ( f_eError != E_OK )
 		return ( NULL );
 	return ( f_pdVariables );
