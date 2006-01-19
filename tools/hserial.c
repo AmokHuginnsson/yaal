@@ -24,6 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
@@ -44,15 +45,22 @@ namespace stdhapi
 namespace tools
 {
 
-char const * const n_pcError = _ ( "serial port not opened" );
+namespace
+	{
+	char const * const n_pcEAlreadyOpened = _ ( "serial port already openend" );
+	char const * const n_pcENotOpened = _ ( "serial port not opened" );
+	}
 
-HSerial::HSerial ( char const * a_pcDevice, mode_t a_eMode )
-				: HRawFile ( ), f_oDevicePath ( ), f_sTIO ( ), f_sBackUpTIO ( )
+HSerial::HSerial ( char const * const a_pcDevice, mode_t a_eMode )
+				: HRawFile ( ), f_oDevicePath ( ),
+	f_oTIO ( sizeof ( termios ), true ),
+	f_oBackUpTIO ( sizeof ( termios ), true )
 	{
 	M_PROLOG
 	mode_t l_eMode = D_DEFAULT;
-	memset ( & f_sTIO, 0, sizeof ( termios ) );
-	memset ( & f_sBackUpTIO, 0, sizeof ( termios ) );
+	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
+	memset ( & l_sTIO, 0, sizeof ( termios ) );
+	memset ( f_oBackUpTIO.raw ( ), 0, sizeof ( termios ) );
 	if ( a_pcDevice )
 		f_oDevicePath = a_pcDevice;
 	else
@@ -61,60 +69,60 @@ HSerial::HSerial ( char const * a_pcDevice, mode_t a_eMode )
 		l_eMode = tools::n_eSerialTransferMode;
 /*
  *   BAUDRATE: Set bps rate. You could also use cfsetispeed and cfsetospeed.
- *   CRTSCTS : output hardware flow control  ( only used if the cable has
+ *   CRTSCTS : output hardware flow control (only used if the cable has
  *             all necessary lines. See sect. 7 of Serial-HOWTO)
- *             CS8     : 8n1  ( 8bit, no parity, 1 stopbit)
+ *             CS8     : 8n1 (8bit, no parity, 1 stopbit)
  *             CLOCAL  : local connection, no modem contol
  *             CREAD   : enable receiving characters
  */
-	f_sTIO.c_cflag = tools::n_iBaudRate | CRTSCTS | CS8 | CREAD/* | CLOCAL */;
+	l_sTIO.c_cflag = /* tools::n_iBaudRate | */ CRTSCTS | CS8 | CREAD/* | CLOCAL */;
 /*
  *   statement above is *FALSE*, I can not use cfsetispeed and cfsetospeed,
  *   i *MUST* use it. On newer systes c_cflag and BAUDRATE simply does not work.
  *   Newwer interface for setting speed (baudrate)
  */
-	cfsetispeed ( & f_sTIO, tools::n_iBaudRate );
-	cfsetospeed ( & f_sTIO, tools::n_iBaudRate );
+	set_speed ( D_SPEED_DEFAULT );
 /*
  *   IGNPAR  : ignore bytes with parity errors
- *   ICRNL   : map CR to NL  ( otherwise a CR input on the other computer
+ *   ICRNL   : map CR to NL (otherwise a CR input on the other computer
  *             will not terminate input)
- *             otherwise make device raw  ( no other input processing)
+ *             otherwise make device raw (no other input processing)
  */
-	f_sTIO.c_iflag = IGNPAR | ( ( l_eMode == D_TEXT ) ? ICRNL : 0 ) | IGNBRK | IXANY;
+	l_sTIO.c_iflag = IGNPAR | ( ( l_eMode == D_TEXT ) ? ICRNL : 0 ) | IGNBRK | IXANY;
 /*
  *  Raw output.
  */
-	f_sTIO.c_oflag = 0;
+	l_sTIO.c_oflag = 0;
 /*
  *   ICANON  : enable canonical input disable all echo functionality,
  *             and don't send signals to calling program
+ *             more over: return from read() only after EOL
  */
-	f_sTIO.c_lflag = ( ( l_eMode == D_TEXT ) ? ICANON : 0 ) | IEXTEN;
+	l_sTIO.c_lflag = ( ( l_eMode == D_TEXT ) ? ICANON : 0 ) | IEXTEN;
 /*
  *   initialize all control characters
- *   default values can be found in /usr/include/termios.h,  and are given
- *   in the comments,  but we don't need them here
+ *   default values can be found in /usr/include/termios.h, and are given
+ *   in the comments, but we don't need them here
  */
-	f_sTIO.c_cc [ VINTR ]    = 0;    /* Ctrl-c */
-	f_sTIO.c_cc [ VQUIT ]    = 0;    /* Ctrl-\ */
-	f_sTIO.c_cc [ VERASE ]   = 0;    /* del */
-	f_sTIO.c_cc [ VKILL ]    = 0;    /* @ */
-	f_sTIO.c_cc [ VEOF ]     = 4;    /* Ctrl-d */
-	f_sTIO.c_cc [ VTIME ]    = 0;    /* inter-character timer unused */
-	f_sTIO.c_cc [ VMIN ]     = 1;    /* blocking read until 1 character arrives */
+	l_sTIO.c_cc [ VINTR ]    = 0;    /* Ctrl-c */
+	l_sTIO.c_cc [ VQUIT ]    = 0;    /* Ctrl-\ */
+	l_sTIO.c_cc [ VERASE ]   = 0;    /* del */
+	l_sTIO.c_cc [ VKILL ]    = 0;    /* @ */
+	l_sTIO.c_cc [ VEOF ]     = 4;    /* Ctrl-d */
+	l_sTIO.c_cc [ VTIME ]    = 0;    /* inter-character timer unused */
+	l_sTIO.c_cc [ VMIN ]     = 1;    /* blocking read until 1 character arrives */
 #if HAVE_DECL_VSWTC
-	f_sTIO.c_cc [ VSWTC ]    = 0;    /* '\0' */
+	l_sTIO.c_cc [ VSWTC ]    = 0;    /* '\0' */
 #endif /* HAVE_DECL_VSWTC */
-	f_sTIO.c_cc [ VSTART ]   = 0;    /* Ctrl-q */
-	f_sTIO.c_cc [ VSTOP ]    = 0;    /* Ctrl-s */
-	f_sTIO.c_cc [ VSUSP ]    = 0;    /* Ctrl-z */
-	f_sTIO.c_cc [ VEOL ]     = 0;    /* '\0' */
-	f_sTIO.c_cc [ VREPRINT ] = 0;    /* Ctrl-r */
-	f_sTIO.c_cc [ VDISCARD ] = 0;    /* Ctrl-u */
-	f_sTIO.c_cc [ VWERASE ]  = 0;    /* Ctrl-w */
-	f_sTIO.c_cc [ VLNEXT ]   = 0;    /* Ctrl-v */
-	f_sTIO.c_cc [ VEOL2 ]    = 0;    /* '\0' */
+	l_sTIO.c_cc [ VSTART ]   = 0;    /* Ctrl-q */
+	l_sTIO.c_cc [ VSTOP ]    = 0;    /* Ctrl-s */
+	l_sTIO.c_cc [ VSUSP ]    = 0;    /* Ctrl-z */
+	l_sTIO.c_cc [ VEOL ]     = 0;    /* '\0' */
+	l_sTIO.c_cc [ VREPRINT ] = 0;    /* Ctrl-r */
+	l_sTIO.c_cc [ VDISCARD ] = 0;    /* Ctrl-u */
+	l_sTIO.c_cc [ VWERASE ]  = 0;    /* Ctrl-w */
+	l_sTIO.c_cc [ VLNEXT ]   = 0;    /* Ctrl-v */
+	l_sTIO.c_cc [ VEOL2 ]    = 0;    /* '\0' */
 	return;
 	M_EPILOG
 	}
@@ -133,18 +141,19 @@ bool HSerial::open ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		M_THROW ( "serial port already openend", g_iErrNo );
+		M_THROW ( n_pcEAlreadyOpened, g_iErrNo );
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	f_iFileDescriptor = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
 	if ( ! f_iFileDescriptor )
 		M_THROW ( strerror ( g_iErrNo ), g_iErrNo );
 	if ( ! isatty ( f_iFileDescriptor ) )
 		M_THROW ( "not a tty", f_iFileDescriptor );
-	tcgetattr ( f_iFileDescriptor, & f_sBackUpTIO );
+	tcgetattr ( f_iFileDescriptor, reinterpret_cast < termios * > ( f_oBackUpTIO.raw ( ) ) );
 	fcntl ( f_iFileDescriptor, F_SETFD, 0 );
 	fcntl ( f_iFileDescriptor, F_SETFL, 0 );
 	tcflush ( f_iFileDescriptor, TCIOFLUSH );
-	tcsetattr ( f_iFileDescriptor, TCSANOW, & f_sTIO );
+	tcsetattr ( f_iFileDescriptor, TCSANOW,
+			reinterpret_cast < termios const * const > ( static_cast < char const * const > ( f_oTIO ) ) );
 	return ( false );
 	M_EPILOG
 	}
@@ -153,8 +162,52 @@ int HSerial::close ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		tcsetattr ( f_iFileDescriptor, TCSANOW, & f_sBackUpTIO );
+		tcsetattr ( f_iFileDescriptor, TCSANOW,
+				reinterpret_cast < termios const * const > ( static_cast < char const * const > ( f_oBackUpTIO ) ) );
 	return ( HRawFile::close ( ) );
+	M_EPILOG
+	}
+
+void HSerial::set_speed ( speed_t a_eSpeed )
+	{
+	M_PROLOG
+	if ( f_iFileDescriptor >= 0 )
+		M_THROW ( n_pcEAlreadyOpened, g_iErrNo );
+	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
+	int l_iBaudRate = 0;
+	if ( a_eSpeed == D_SPEED_DEFAULT )
+		a_eSpeed = tools::n_eBaudRate;
+	switch ( a_eSpeed )
+		{
+		case ( D_SPEED_B115200 ): l_iBaudRate = B115200; break;
+#if ( HAVE_DECL_B76800 )
+		case ( D_SPEED_B76800 ): l_iBaudRate = B76800; break;
+#endif /* HAVE_DECL_B76800 */
+		case ( D_SPEED_B57600 ): l_iBaudRate = B57600; break;
+		case ( D_SPEED_B38400 ): l_iBaudRate = B38400; break;
+#if ( HAVE_DECL_B28800 )
+		case ( D_SPEED_B28800 ): l_iBaudRate = B28800; break;
+#endif /* HAVE_DECL_B28800 */
+		case ( D_SPEED_B19200 ): l_iBaudRate = B19200; break;
+#if ( HAVE_DECL_B14400 )
+		case ( D_SPEED_B14400 ): l_iBaudRate = B14400; break;
+#endif /* HAVE_DECL_B14400 */
+		case ( D_SPEED_B9600 ): l_iBaudRate = B9600; break;
+#if ( HAVE_DECL_B7200 )
+		case ( D_SPEED_B7200 ): l_iBaudRate = B7200; break;
+#endif /* HAVE_DECL_B7200 */
+		case ( D_SPEED_B4800 ): l_iBaudRate = B4800; break;
+		case ( D_SPEED_B2400 ): l_iBaudRate = B2400; break;
+		case ( D_SPEED_DEFAULT ): break;
+		default :
+			{
+			M_THROW ( _ ( "unknown speed" ), static_cast < int > ( a_eSpeed ) );
+			break;
+			}
+		}
+	cfsetispeed ( & l_sTIO, l_iBaudRate );
+	cfsetospeed ( & l_sTIO, l_iBaudRate );
+	return;
 	M_EPILOG
 	}
 
@@ -163,8 +216,9 @@ void HSerial::flush ( int a_iType )
 	M_PROLOG
 	HString l_oErrMsg;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, g_iErrNo );
+		M_THROW ( n_pcENotOpened, g_iErrNo );
 	if ( tcflush ( f_iFileDescriptor, a_iType ) )
+		{
 		switch ( a_iType )
 			{
 			case ( TCIFLUSH ):
@@ -179,6 +233,7 @@ void HSerial::flush ( int a_iType )
 				M_THROW ( l_oErrMsg, g_iErrNo );
 				}
 			}
+		}
 	return;
 	M_EPILOG
 	}
@@ -187,7 +242,7 @@ void HSerial::wait_for_eot ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, g_iErrNo );
+		M_THROW ( n_pcENotOpened, g_iErrNo );
 	if ( tcdrain ( f_iFileDescriptor ) )
 		M_THROW ( "tcdrain", g_iErrNo );
 	return;

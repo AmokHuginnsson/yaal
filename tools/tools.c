@@ -50,7 +50,7 @@ namespace tools
 {
 
 char * n_pcSerialDevice = NULL;
-int n_iBaudRate = B115200;
+HSerial::speed_t n_eBaudRate = HSerial::D_SPEED_B115200;
 int n_iCollectorConnectionTimeOut = 9999;
 bool n_bIgnoreSignalSIGINT = false;
 bool n_bIgnoreSignalSIGTSTP = false;
@@ -86,25 +86,25 @@ bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 			l_iBaudRate = strtol ( static_cast < char const * const > ( a_roValue ) + 1, NULL, 10 );
 			switch ( l_iBaudRate )
 				{
-				case ( 115200 ): l_iBaudRate = B115200; break;
+				case ( 115200 ): n_eBaudRate = HSerial::D_SPEED_B115200; break;
 #if ( HAVE_DECL_B76800 )
-				case (  76800 ): l_iBaudRate = B76800;  break;
+				case (  76800 ): n_eBaudRate = HSerial::D_SPEED_B76800;  break;
 #endif /* HAVE_DECL_B76800 */
-				case (  57600 ): l_iBaudRate = B57600;  break;
-				case (  38400 ): l_iBaudRate = B38400;  break;
+				case (  57600 ): n_eBaudRate = HSerial::D_SPEED_B57600;  break;
+				case (  38400 ): n_eBaudRate = HSerial::D_SPEED_B38400;  break;
 #if ( HAVE_DECL_B28800 )
-				case (  28800 ): l_iBaudRate = B28800;  break;
+				case (  28800 ): n_eBaudRate = HSerial::D_SPEED_B28800;  break;
 #endif /* HAVE_DECL_B28800 */
-				case (  19200 ): l_iBaudRate = B19200;  break;
+				case (  19200 ): n_eBaudRate = HSerial::D_SPEED_B19200;  break;
 #if ( HAVE_DECL_B14400 )
-				case (  14400 ): l_iBaudRate = B14400;  break;
+				case (  14400 ): n_eBaudRate = HSerial::D_SPEED_B14400;  break;
 #endif /* HAVE_DECL_B14400 */
-				case (   9600 ): l_iBaudRate = B9600;   break;
+				case (   9600 ): n_eBaudRate = HSerial::D_SPEED_B9600;   break;
 #if ( HAVE_DECL_B7200 )
-				case (   7200 ): l_iBaudRate = B7200;   break;
+				case (   7200 ): n_eBaudRate = HSerial::D_SPEED_B7200;   break;
 #endif /* HAVE_DECL_B7200 */
-				case (   4800 ): l_iBaudRate = B4800;   break;
-				case (   2400 ): l_iBaudRate = B2400;   break;
+				case (   4800 ): n_eBaudRate = HSerial::D_SPEED_B4800;   break;
+				case (   2400 ): n_eBaudRate = HSerial::D_SPEED_B2400;   break;
 				default:
 					M_THROW ( _ ( "unknown baud rate" ), l_iBaudRate );
 				}
@@ -119,9 +119,7 @@ bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		else
 			return ( true );
 		}
-	if ( l_iBaudRate )
-		tools::n_iBaudRate = l_iBaudRate;
-	return ( ! l_iBaudRate );
+	return ( false );
 	}
 
 extern "C"

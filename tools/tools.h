@@ -36,7 +36,7 @@ namespace tools
 	{
 	
 extern char * n_pcSerialDevice;
-extern int n_iBaudRate;
+extern HSerial::speed_t n_eBaudRate;
 extern int n_iCollectorConnectionTimeOut;
 extern bool n_bIgnoreSignalSIGINT;
 extern bool n_bIgnoreSignalSIGTSTP;
