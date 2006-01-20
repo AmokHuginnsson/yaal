@@ -37,6 +37,8 @@ M_CVSID ( "$CVSHeader$" );
 #include "hserial.h"
 #include "tools.h"
 
+#include "hcore/hlog.h"
+
 using namespace stdhapi::hcore;
 
 namespace stdhapi
@@ -54,44 +56,17 @@ namespace
 HSerial::flags_t HSerial::D_FLAGS_TEXT = HSerial::D_FLAGS_DEFAULT | HSerial::D_FLAGS_CANONICAL | HSerial::D_FLAGS_CR2NL;
 
 HSerial::HSerial ( char const * const a_pcDevice )
-				: HRawFile ( ), f_oDevicePath ( ),
+				: HRawFile ( ), f_eSpeed ( D_SPEED_DEFAULT ),
+	f_eFlags ( D_FLAGS_DEFAULT ), f_oDevicePath ( ),
 	f_oTIO ( sizeof ( termios ), true ),
 	f_oBackUpTIO ( sizeof ( termios ), true )
 	{
 	M_PROLOG
-	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
-	memset ( & l_sTIO, 0, sizeof ( termios ) );
-	memset ( f_oBackUpTIO.raw ( ), 0, sizeof ( termios ) );
 	if ( a_pcDevice )
 		f_oDevicePath = a_pcDevice;
 	else
 		f_oDevicePath = tools::n_pcSerialDevice;
-	set_speed ( D_SPEED_DEFAULT );
-	set_flags ( D_FLAGS_DEFAULT );
-/*
- *   initialize all control characters
- *   default values can be found in /usr/include/termios.h, and are given
- *   in the comments, but we don't need them here
- */
-	l_sTIO.c_cc [ VINTR ]    = 0;    /* Ctrl-c */
-	l_sTIO.c_cc [ VQUIT ]    = 0;    /* Ctrl-\ */
-	l_sTIO.c_cc [ VERASE ]   = 0;    /* del */
-	l_sTIO.c_cc [ VKILL ]    = 0;    /* @ */
-	l_sTIO.c_cc [ VEOF ]     = 4;    /* Ctrl-d */
-	l_sTIO.c_cc [ VTIME ]    = 0;    /* inter-character timer unused */
-	l_sTIO.c_cc [ VMIN ]     = 1;    /* blocking read until 1 character arrives */
-#if HAVE_DECL_VSWTC
-	l_sTIO.c_cc [ VSWTC ]    = 0;    /* '\0' */
-#endif /* HAVE_DECL_VSWTC */
-	l_sTIO.c_cc [ VSTART ]   = 0;    /* Ctrl-q */
-	l_sTIO.c_cc [ VSTOP ]    = 0;    /* Ctrl-s */
-	l_sTIO.c_cc [ VSUSP ]    = 0;    /* Ctrl-z */
-	l_sTIO.c_cc [ VEOL ]     = 0;    /* '\0' */
-	l_sTIO.c_cc [ VREPRINT ] = 0;    /* Ctrl-r */
-	l_sTIO.c_cc [ VDISCARD ] = 0;    /* Ctrl-u */
-	l_sTIO.c_cc [ VWERASE ]  = 0;    /* Ctrl-w */
-	l_sTIO.c_cc [ VLNEXT ]   = 0;    /* Ctrl-v */
-	l_sTIO.c_cc [ VEOL2 ]    = 0;    /* '\0' */
+	compile ( );
 	return;
 	M_EPILOG
 	}
@@ -111,6 +86,7 @@ bool HSerial::open ( void )
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
 		M_THROW ( n_pcEAlreadyOpened, g_iErrNo );
+	compile( );
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	f_iFileDescriptor = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
 	if ( ! f_iFileDescriptor )
@@ -137,16 +113,60 @@ int HSerial::close ( void )
 	M_EPILOG
 	}
 
+void HSerial::compile ( void )
+	{
+	M_PROLOG
+	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
+	memset ( & l_sTIO, 0, sizeof ( termios ) );
+	memset ( f_oBackUpTIO.raw ( ), 0, sizeof ( termios ) );
+/*
+ *   initialize all control characters
+ *   default values can be found in /usr/include/termios.h, and are given
+ *   in the comments, but we don't need them here
+ */
+	l_sTIO.c_cc [ VINTR ]    = 0;    /* Ctrl-c */
+	l_sTIO.c_cc [ VQUIT ]    = 0;    /* Ctrl-\ */
+	l_sTIO.c_cc [ VERASE ]   = 0;    /* del */
+	l_sTIO.c_cc [ VKILL ]    = 0;    /* @ */
+	l_sTIO.c_cc [ VEOF ]     = 4;    /* Ctrl-d */
+	l_sTIO.c_cc [ VTIME ]    = 0;    /* inter-character timer unused */
+	l_sTIO.c_cc [ VMIN ]     = 1;    /* blocking read until 1 character arrives */
+#if HAVE_DECL_VSWTC
+	l_sTIO.c_cc [ VSWTC ]    = 0;    /* '\0' */
+#endif /* HAVE_DECL_VSWTC */
+	l_sTIO.c_cc [ VSTART ]   = 0;    /* Ctrl-q */
+	l_sTIO.c_cc [ VSTOP ]    = 0;    /* Ctrl-s */
+	l_sTIO.c_cc [ VSUSP ]    = 0;    /* Ctrl-z */
+	l_sTIO.c_cc [ VEOL ]     = 0;    /* '\0' */
+	l_sTIO.c_cc [ VREPRINT ] = 0;    /* Ctrl-r */
+	l_sTIO.c_cc [ VDISCARD ] = 0;    /* Ctrl-u */
+	l_sTIO.c_cc [ VWERASE ]  = 0;    /* Ctrl-w */
+	l_sTIO.c_cc [ VLNEXT ]   = 0;    /* Ctrl-v */
+	l_sTIO.c_cc [ VEOL2 ]    = 0;    /* '\0' */
+	compile_flags ( );
+	compile_speed ( );
+	return;
+	M_EPILOG
+	}
+
 void HSerial::set_speed ( speed_t a_eSpeed )
+	{
+	M_PROLOG
+	f_eSpeed = a_eSpeed;
+	return;
+	M_EPILOG
+	}
+
+void HSerial::compile_speed ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
 		M_THROW ( n_pcEAlreadyOpened, g_iErrNo );
 	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
 	int l_iBaudRate = 0;
-	if ( a_eSpeed == D_SPEED_DEFAULT )
-		a_eSpeed = tools::n_eBaudRate;
-	switch ( a_eSpeed )
+	if ( f_eSpeed == D_SPEED_DEFAULT )
+		f_eSpeed = tools::n_eBaudRate;
+	switch ( f_eSpeed )
 		{
 		case ( D_SPEED_B230400 ): l_iBaudRate = B230400; break;
 		case ( D_SPEED_B115200 ): l_iBaudRate = B115200; break;
@@ -171,7 +191,7 @@ void HSerial::set_speed ( speed_t a_eSpeed )
 		case ( D_SPEED_DEFAULT ): break;
 		default :
 			{
-			M_THROW ( _ ( "unknown speed" ), static_cast < int > ( a_eSpeed ) );
+			M_THROW ( _ ( "unknown speed" ), static_cast < int > ( f_eSpeed ) );
 			break;
 			}
 		}
@@ -184,27 +204,35 @@ void HSerial::set_speed ( speed_t a_eSpeed )
 void HSerial::set_flags ( flags_t a_eFlags )
 	{
 	M_PROLOG
+	f_eFlags = a_eFlags;
+	return;
+	M_EPILOG
+	}
+
+void HSerial::compile_flags ( void )
+	{
+	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
 		M_THROW ( n_pcEAlreadyOpened, g_iErrNo );
 	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
 	int l_iCtr = 0;
-	if ( a_eFlags & D_FLAGS_DEFAULT )
-		a_eFlags |= tools::n_eSerialFlags;
+	if ( f_eFlags & D_FLAGS_DEFAULT )
+		f_eFlags |= tools::n_eSerialFlags;
 	/* consistency tests */
-	if ( ( a_eFlags & D_FLAGS_STOP_BITS_1 ) && ( a_eFlags & D_FLAGS_STOP_BITS_2 ) )
-		M_THROW ( _ ( "stop bits setup inconsistent" ), static_cast < int > ( a_eFlags ) );
-	if ( ( a_eFlags & D_FLAGS_HARDWARE_FLOW_CONTROL ) && ( a_eFlags & D_FLAGS_SOFTWARE_FLOW_CONTROL ) )
-		M_THROW ( _ ( "flow control inconsistent" ), static_cast < int > ( a_eFlags ) );
-	if ( a_eFlags & D_FLAGS_BITS_PER_BYTE_8 )
+	if ( ( f_eFlags & D_FLAGS_STOP_BITS_1 ) && ( f_eFlags & D_FLAGS_STOP_BITS_2 ) )
+		M_THROW ( _ ( "stop bits setup inconsistent" ), static_cast < int > ( f_eFlags ) );
+	if ( ( f_eFlags & D_FLAGS_HARDWARE_FLOW_CONTROL ) && ( f_eFlags & D_FLAGS_SOFTWARE_FLOW_CONTROL ) )
+		M_THROW ( _ ( "flow control inconsistent" ), static_cast < int > ( f_eFlags ) );
+	if ( f_eFlags & D_FLAGS_BITS_PER_BYTE_8 )
 		l_iCtr ++, l_sTIO.c_cflag = CS8;
-	if ( a_eFlags & D_FLAGS_BITS_PER_BYTE_7 )
+	if ( f_eFlags & D_FLAGS_BITS_PER_BYTE_7 )
 		l_iCtr ++, l_sTIO.c_cflag = CS7;
-	if ( a_eFlags & D_FLAGS_BITS_PER_BYTE_6 )
+	if ( f_eFlags & D_FLAGS_BITS_PER_BYTE_6 )
 		l_iCtr ++, l_sTIO.c_cflag = CS6;
-	if ( a_eFlags & D_FLAGS_BITS_PER_BYTE_5 )
+	if ( f_eFlags & D_FLAGS_BITS_PER_BYTE_5 )
 		l_iCtr ++, l_sTIO.c_cflag = CS5;
 	if ( l_iCtr != 1 )
-		M_THROW ( _ ( "bits per byte inconsistent" ), static_cast < int > ( a_eFlags ) );
+		M_THROW ( _ ( "bits per byte inconsistent" ), static_cast < int > ( f_eFlags ) );
 
 	/* compiling settings */
 	/* setting c_cflag */
@@ -222,7 +250,7 @@ void HSerial::set_flags ( flags_t a_eFlags )
  *   Newwer interface for setting speed (baudrate)
  */
 	l_sTIO.c_cflag |= CSIZE | CREAD /* | CLOCAL */;
-	if ( a_eFlags & D_FLAGS_HARDWARE_FLOW_CONTROL )
+	if ( f_eFlags & D_FLAGS_HARDWARE_FLOW_CONTROL )
 		l_sTIO.c_cflag |= CRTSCTS;
 
 	/* setting c_iflag */
@@ -236,11 +264,11 @@ void HSerial::set_flags ( flags_t a_eFlags )
  *   INPCK   : Enable input parity checking.
  */
 	l_sTIO.c_iflag = IGNPAR | IGNBRK | IXANY;
-	if ( a_eFlags & D_FLAGS_CR2NL )
+	if ( f_eFlags & D_FLAGS_CR2NL )
 		l_sTIO.c_iflag |= ICRNL;
-	if ( a_eFlags & D_FLAGS_SOFTWARE_FLOW_CONTROL )
+	if ( f_eFlags & D_FLAGS_SOFTWARE_FLOW_CONTROL )
 		l_sTIO.c_iflag |= IXON | IXOFF;
-	if ( a_eFlags & D_FLAGS_PARITY_CHECK )
+	if ( f_eFlags & D_FLAGS_PARITY_CHECK )
 		l_sTIO.c_iflag |= INPCK;
 
 	/* setting c_oflag */
@@ -251,11 +279,11 @@ void HSerial::set_flags ( flags_t a_eFlags )
  *  PARODD  : Parity for input and output is odd.
  */
 	l_sTIO.c_oflag = 0;
-	if ( a_eFlags | D_FLAGS_STOP_BITS_2 )
+	if ( f_eFlags & D_FLAGS_STOP_BITS_2 )
 		l_sTIO.c_oflag |= CSTOPB;
-	if ( a_eFlags | D_FLAGS_PARITY_CHECK )
+	if ( f_eFlags & D_FLAGS_PARITY_CHECK )
 		l_sTIO.c_oflag |= PARENB;
-	if ( a_eFlags | D_FLAGS_PARITY_ODD )
+	if ( f_eFlags & D_FLAGS_PARITY_ODD )
 		l_sTIO.c_oflag |= PARODD;
 
 /*
@@ -269,9 +297,9 @@ void HSerial::set_flags ( flags_t a_eFlags )
  *   ECHO    : Echo input characters.
  */
 	l_sTIO.c_lflag = IEXTEN;
-	if ( a_eFlags | D_FLAGS_CANONICAL )
+	if ( f_eFlags & D_FLAGS_CANONICAL )
 		l_sTIO.c_lflag |= ICANON;
-	if ( a_eFlags | D_FLAGS_ECHO )
+	if ( f_eFlags & D_FLAGS_ECHO )
 		l_sTIO.c_lflag |= ECHO;
 	return;
 	M_EPILOG

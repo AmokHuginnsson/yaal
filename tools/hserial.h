@@ -86,6 +86,8 @@ public:
 		} speed_t;
 protected:
 	/*{*/
+	speed_t f_eSpeed;
+	flags_t f_eFlags;
 	hcore::HString f_oDevicePath;
 	hcore::HString f_oTIO;
 	hcore::HString f_oBackUpTIO;
@@ -105,6 +107,9 @@ public:
 	/*}*/
 protected:
 	/*{*/
+	void compile ( void );
+	void compile_speed ( void );
+	void compile_flags ( void );
 	/*}*/
 	};
 
