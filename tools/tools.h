@@ -37,11 +37,11 @@ namespace tools
 	
 extern char * n_pcSerialDevice;
 extern HSerial::speed_t n_eBaudRate;
+extern HSerial::flags_t n_eSerialFlags;
 extern int n_iCollectorConnectionTimeOut;
 extern bool n_bIgnoreSignalSIGINT;
 extern bool n_bIgnoreSignalSIGTSTP;
 extern bool n_bIgnoreSignalSIGQUIT;
-extern HSerial::mode_t n_eSerialTransferMode;
 void stdhapi_tools_banner ( void );
 
 	}

@@ -155,6 +155,15 @@ serial_device '/dev/@SERIAL_DEVICE@'
 #          | B19200| B14400 | B9600 | B7200 | B4800 | B2400
 serial_baudrate B115200
 
+# serial_flags
+# type: special(multi flag value),
+# default: HARDWARE_FLOW_CONTROL BITS_PER_BYTE_8
+# this option set various flags controling serial connection behaviour
+# flag names: HARDWARE_FLOW_CONTROL SOFTWARE_FLOW_CONTROL BITS_PER_BYTE_8
+#             BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5 PARITY_CHECK
+#             PARITY_ODD CR2NL ECHO CANONICAL STOP_BITS_1 STOP_BITS_2
+serial_flags HARDWARE_FLOW_CONTROL BITS_PER_BYTE_8
+
 # collector_connection_timeout
 # type: integer, default: 9999
 # time in seconds, after this time elapses process gives up connection

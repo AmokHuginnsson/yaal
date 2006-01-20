@@ -45,13 +45,25 @@ class HSerial : public hcore::HRawFile
 public:
 	typedef enum
 		{
-		D_DEFAULT,
-		D_TEXT,
-		D_BINARY
-		} mode_t;
+		D_FLAGS_DEFAULT								= 0x0001,
+		D_FLAGS_HARDWARE_FLOW_CONTROL = 0x0002,
+		D_FLAGS_SOFTWARE_FLOW_CONTROL = 0x0004,
+		D_FLAGS_STOP_BITS_1						= 0x0008,
+		D_FLAGS_STOP_BITS_2						= 0x0010,
+		D_FLAGS_PARITY_CHECK					= 0x0020,
+		D_FLAGS_PARITY_ODD						= 0x0040,
+		D_FLAGS_BITS_PER_BYTE_8				= 0x0080,
+		D_FLAGS_BITS_PER_BYTE_7				= 0x0100,
+		D_FLAGS_BITS_PER_BYTE_6				= 0x0200,
+		D_FLAGS_BITS_PER_BYTE_5				= 0x0400,
+		D_FLAGS_CANONICAL							= 0x0800,
+		D_FLAGS_ECHO									= 0x1000,
+		D_FLAGS_CR2NL									= 0x2000
+		} flags_t;
 	typedef enum
 		{
 		D_SPEED_DEFAULT,
+		D_SPEED_B230400,
 		D_SPEED_B115200,
 #ifdef HAVE_DECL_B7600
 		D_SPEED_B76800,
@@ -80,19 +92,23 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HSerial ( char const * const = NULL, mode_t = D_DEFAULT ); /* device path, canonical (or not) */
+	HSerial ( char const * const = NULL ); /* device path */
 	virtual ~HSerial ( void );
 	bool open ( void );
 	virtual int close ( void );
 	void set_speed ( speed_t );
+	void set_flags ( flags_t );
 	void flush ( int );
 	void wait_for_eot ( void );
 	int read ( void * const, int const, int const, int const = 0 );
+	static flags_t D_FLAGS_TEXT; /* flags for textmode operation */
 	/*}*/
 protected:
 	/*{*/
 	/*}*/
 	};
+
+template struct hcore::enum_t < HSerial::flags_t >;
 
 }
 

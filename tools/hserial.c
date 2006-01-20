@@ -51,13 +51,14 @@ namespace
 	char const * const n_pcENotOpened = _ ( "serial port not opened" );
 	}
 
-HSerial::HSerial ( char const * const a_pcDevice, mode_t a_eMode )
+HSerial::flags_t HSerial::D_FLAGS_TEXT = HSerial::D_FLAGS_DEFAULT | HSerial::D_FLAGS_CANONICAL | HSerial::D_FLAGS_CR2NL;
+
+HSerial::HSerial ( char const * const a_pcDevice )
 				: HRawFile ( ), f_oDevicePath ( ),
 	f_oTIO ( sizeof ( termios ), true ),
 	f_oBackUpTIO ( sizeof ( termios ), true )
 	{
 	M_PROLOG
-	mode_t l_eMode = D_DEFAULT;
 	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
 	memset ( & l_sTIO, 0, sizeof ( termios ) );
 	memset ( f_oBackUpTIO.raw ( ), 0, sizeof ( termios ) );
@@ -65,40 +66,8 @@ HSerial::HSerial ( char const * const a_pcDevice, mode_t a_eMode )
 		f_oDevicePath = a_pcDevice;
 	else
 		f_oDevicePath = tools::n_pcSerialDevice;
-	if ( a_eMode == D_DEFAULT )
-		l_eMode = tools::n_eSerialTransferMode;
-/*
- *   BAUDRATE: Set bps rate. You could also use cfsetispeed and cfsetospeed.
- *   CRTSCTS : output hardware flow control (only used if the cable has
- *             all necessary lines. See sect. 7 of Serial-HOWTO)
- *             CS8     : 8n1 (8bit, no parity, 1 stopbit)
- *             CLOCAL  : local connection, no modem contol
- *             CREAD   : enable receiving characters
- */
-	l_sTIO.c_cflag = /* tools::n_iBaudRate | */ CRTSCTS | CS8 | CREAD/* | CLOCAL */;
-/*
- *   statement above is *FALSE*, I can not use cfsetispeed and cfsetospeed,
- *   i *MUST* use it. On newer systes c_cflag and BAUDRATE simply does not work.
- *   Newwer interface for setting speed (baudrate)
- */
 	set_speed ( D_SPEED_DEFAULT );
-/*
- *   IGNPAR  : ignore bytes with parity errors
- *   ICRNL   : map CR to NL (otherwise a CR input on the other computer
- *             will not terminate input)
- *             otherwise make device raw (no other input processing)
- */
-	l_sTIO.c_iflag = IGNPAR | ( ( l_eMode == D_TEXT ) ? ICRNL : 0 ) | IGNBRK | IXANY;
-/*
- *  Raw output.
- */
-	l_sTIO.c_oflag = 0;
-/*
- *   ICANON  : enable canonical input disable all echo functionality,
- *             and don't send signals to calling program
- *             more over: return from read() only after EOL
- */
-	l_sTIO.c_lflag = ( ( l_eMode == D_TEXT ) ? ICANON : 0 ) | IEXTEN;
+	set_flags ( D_FLAGS_DEFAULT );
 /*
  *   initialize all control characters
  *   default values can be found in /usr/include/termios.h, and are given
@@ -179,6 +148,7 @@ void HSerial::set_speed ( speed_t a_eSpeed )
 		a_eSpeed = tools::n_eBaudRate;
 	switch ( a_eSpeed )
 		{
+		case ( D_SPEED_B230400 ): l_iBaudRate = B230400; break;
 		case ( D_SPEED_B115200 ): l_iBaudRate = B115200; break;
 #if ( HAVE_DECL_B76800 )
 		case ( D_SPEED_B76800 ): l_iBaudRate = B76800; break;
@@ -207,6 +177,102 @@ void HSerial::set_speed ( speed_t a_eSpeed )
 		}
 	cfsetispeed ( & l_sTIO, l_iBaudRate );
 	cfsetospeed ( & l_sTIO, l_iBaudRate );
+	return;
+	M_EPILOG
+	}
+
+void HSerial::set_flags ( flags_t a_eFlags )
+	{
+	M_PROLOG
+	if ( f_iFileDescriptor >= 0 )
+		M_THROW ( n_pcEAlreadyOpened, g_iErrNo );
+	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
+	int l_iCtr = 0;
+	if ( a_eFlags & D_FLAGS_DEFAULT )
+		a_eFlags |= tools::n_eSerialFlags;
+	/* consistency tests */
+	if ( ( a_eFlags & D_FLAGS_STOP_BITS_1 ) && ( a_eFlags & D_FLAGS_STOP_BITS_2 ) )
+		M_THROW ( _ ( "stop bits setup inconsistent" ), static_cast < int > ( a_eFlags ) );
+	if ( ( a_eFlags & D_FLAGS_HARDWARE_FLOW_CONTROL ) && ( a_eFlags & D_FLAGS_SOFTWARE_FLOW_CONTROL ) )
+		M_THROW ( _ ( "flow control inconsistent" ), static_cast < int > ( a_eFlags ) );
+	if ( a_eFlags & D_FLAGS_BITS_PER_BYTE_8 )
+		l_iCtr ++, l_sTIO.c_cflag = CS8;
+	if ( a_eFlags & D_FLAGS_BITS_PER_BYTE_7 )
+		l_iCtr ++, l_sTIO.c_cflag = CS7;
+	if ( a_eFlags & D_FLAGS_BITS_PER_BYTE_6 )
+		l_iCtr ++, l_sTIO.c_cflag = CS6;
+	if ( a_eFlags & D_FLAGS_BITS_PER_BYTE_5 )
+		l_iCtr ++, l_sTIO.c_cflag = CS5;
+	if ( l_iCtr != 1 )
+		M_THROW ( _ ( "bits per byte inconsistent" ), static_cast < int > ( a_eFlags ) );
+
+	/* compiling settings */
+	/* setting c_cflag */
+/*
+ *   BAUDRATE: Set bps rate. You could also use cfsetispeed and cfsetospeed.
+ *   CRTSCTS : output hardware flow control (only used if the cable has
+ *             all necessary lines. See sect. 7 of Serial-HOWTO)
+ *             CS8     : 8n1 (8bit, no parity, 1 stopbit)
+ *             CLOCAL  : local connection, no modem contol
+ *             CREAD   : enable receiving characters
+ */
+/*
+ *   statement above is *FALSE*, I can not use cfsetispeed and cfsetospeed,
+ *   i *MUST* use it. On newer systes c_cflag and BAUDRATE simply does not work.
+ *   Newwer interface for setting speed (baudrate)
+ */
+	l_sTIO.c_cflag |= CSIZE | CREAD /* | CLOCAL */;
+	if ( a_eFlags & D_FLAGS_HARDWARE_FLOW_CONTROL )
+		l_sTIO.c_cflag |= CRTSCTS;
+
+	/* setting c_iflag */
+/*
+ *   IGNPAR  : ignore bytes with parity errors
+ *   ICRNL   : map CR to NL (otherwise a CR input on the other computer
+ *             will not terminate input)
+ *             otherwise make device raw (no other input processing)
+ *   IXANY   : (not in POSIX.1; XSI) Enable any character to restart output.
+ *   IGNBRK  : Ignore BREAK condition on input.
+ *   INPCK   : Enable input parity checking.
+ */
+	l_sTIO.c_iflag = IGNPAR | IGNBRK | IXANY;
+	if ( a_eFlags & D_FLAGS_CR2NL )
+		l_sTIO.c_iflag |= ICRNL;
+	if ( a_eFlags & D_FLAGS_SOFTWARE_FLOW_CONTROL )
+		l_sTIO.c_iflag |= IXON | IXOFF;
+	if ( a_eFlags & D_FLAGS_PARITY_CHECK )
+		l_sTIO.c_iflag |= INPCK;
+
+	/* setting c_oflag */
+/*
+ *  Raw output.
+ *  CSTOPB  : Set two stop bits, rather than one.
+ *  PARENB  : Enable parity generation on output and parity checking for input.
+ *  PARODD  : Parity for input and output is odd.
+ */
+	l_sTIO.c_oflag = 0;
+	if ( a_eFlags | D_FLAGS_STOP_BITS_2 )
+		l_sTIO.c_oflag |= CSTOPB;
+	if ( a_eFlags | D_FLAGS_PARITY_CHECK )
+		l_sTIO.c_oflag |= PARENB;
+	if ( a_eFlags | D_FLAGS_PARITY_ODD )
+		l_sTIO.c_oflag |= PARODD;
+
+/*
+ *   ICANON  : enable canonical input disable all echo functionality,
+ *             and don't send signals to calling program
+ *             more over: return from read() only after EOL
+ *   IEXTEN  : Enable implementation-defined input processing.
+ *             This flag, as well as ICANON must be enabled for the special
+ *             characters EOL2,  LNEXT,  REPRINT,  WERASE to be interpreted,
+ *             and for the IUCLC flag to be effective.
+ *   ECHO    : Echo input characters.
+ */
+	l_sTIO.c_lflag = IEXTEN;
+	if ( a_eFlags | D_FLAGS_CANONICAL )
+		l_sTIO.c_lflag |= ICANON;
+	if ( a_eFlags | D_FLAGS_ECHO )
+		l_sTIO.c_lflag |= ECHO;
 	return;
 	M_EPILOG
 	}

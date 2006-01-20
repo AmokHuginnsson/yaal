@@ -134,14 +134,14 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 						{
 						M_IRV ( l_oValue.format ( "[%s]", a_pcSection ) );
 						if ( l_oOption == l_oValue )
-								{
-								if ( n_iDebugLevel )
-									fprintf ( stderr, "section: [%s]\n",
-											static_cast < char const * const > ( l_oOption ) );
-								log << "section: " << a_pcSection << ", ";
-								l_bSection = true;
-								continue;
-								}
+							{
+							if ( n_iDebugLevel )
+								fprintf ( stderr, "section: [%s]\n",
+										static_cast < char const * const > ( l_oOption ) );
+							log << "section: " << a_pcSection << ", ";
+							l_bSection = true;
+							continue;
+							}
 						else
 							l_bSection = false;
 						}
@@ -163,40 +163,27 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 						switch ( a_psVaraibles [ l_iCtr ].f_eType )
 							{
 							case ( D_BOOL ):
-								{
 								rc_set_variable ( l_oValue,
 										* static_cast < bool * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-								break;
-								}
+							break;
 							case ( D_CHAR ):
-								{
 								rc_set_variable ( l_oValue,
 										* static_cast < char * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-								break;
-								}
+							break;
 							case ( D_INT ):
-								{
 								rc_set_variable ( l_oValue,
 										* static_cast < int * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-								break;
-								}
+							break;
 							case ( D_CHAR_POINTER ):
-								{
 								rc_set_variable ( l_oValue,
 										static_cast < char ** > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-								break;
-								}
+							break;
 							case ( D_HSTRING ):
-								{
 								( * static_cast < HString * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) ) = l_oValue;
-								break;
-								}
+							break;
 							default:
-								{
 								M_THROW ( "unknown type",
 										static_cast < int > ( a_psVaraibles [ l_iCtr ].f_eType ) );
-								break;
-								}
 							}
 						l_bOptionOK = true;
 						}

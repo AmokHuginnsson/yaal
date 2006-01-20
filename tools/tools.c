@@ -51,11 +51,11 @@ namespace tools
 
 char * n_pcSerialDevice = NULL;
 HSerial::speed_t n_eBaudRate = HSerial::D_SPEED_B115200;
+HSerial::flags_t n_eSerialFlags = HSerial::D_FLAGS_HARDWARE_FLOW_CONTROL | HSerial::D_FLAGS_BITS_PER_BYTE_8;
 int n_iCollectorConnectionTimeOut = 9999;
 bool n_bIgnoreSignalSIGINT = false;
 bool n_bIgnoreSignalSIGTSTP = false;
 bool n_bIgnoreSignalSIGQUIT = false;
-HSerial::mode_t n_eSerialTransferMode = HSerial::D_TEXT;
 
 OVariable n_psVariables [ ] =
 	{
@@ -76,7 +76,8 @@ extern char n_pcTransTableStripPL [ 256 ];
 /* return true means error occured, false - every thing ok */
 bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
-	int l_iBaudRate = 0;
+	int l_iBaudRate = 0, l_iCtr = 0;
+	HString l_oStr;
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )
 		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "serial_baudrate" ) )
@@ -110,14 +111,37 @@ bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 				}
 			}
 		}
-	else if ( ! strcasecmp ( a_roOption, "serial_transfer_mode" ) )
+	else if ( ! strcasecmp ( a_roOption, "serial_flags" ) )
 		{
-		if ( ! strcasecmp ( a_roValue, "text" ) )
-			n_eSerialTransferMode = HSerial::D_TEXT;
-		else if ( ! strcasecmp ( a_roValue, "binary" ) )
-			n_eSerialTransferMode = HSerial::D_BINARY;
-		else
-			return ( true );
+		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
+			{
+			if ( ! strcasecmp ( l_oStr, "HARDWARE_FLOW_CONTROL" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_HARDWARE_FLOW_CONTROL;
+			else if ( ! strcasecmp ( l_oStr, "SOFTWARE_FLOW_CONTROL" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_SOFTWARE_FLOW_CONTROL;
+			else if ( ! strcasecmp ( l_oStr, "ECHO" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_ECHO;
+			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_8" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_BITS_PER_BYTE_8;
+			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_7" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_BITS_PER_BYTE_7;
+			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_6" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_BITS_PER_BYTE_6;
+			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_5" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_BITS_PER_BYTE_5;
+			else if ( ! strcasecmp ( l_oStr, "CANONICAL" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_CANONICAL;
+			else if ( ! strcasecmp ( l_oStr, "STOP_BITS_1" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_STOP_BITS_1;
+			else if ( ! strcasecmp ( l_oStr, "STOP_BITS_2" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_STOP_BITS_2;
+			else if ( ! strcasecmp ( l_oStr, "PARITY_CHECK" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_PARITY_CHECK;
+			else if ( ! strcasecmp ( l_oStr, "PARITY_ODD" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_PARITY_ODD;
+			else
+				return ( true );
+			}
 		}
 	return ( false );
 	}

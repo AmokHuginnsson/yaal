@@ -52,6 +52,7 @@ HCollector::HCollector ( char const * a_pcDevicePath )
 	{
 	M_PROLOG
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
+	set_flags ( HSerial::D_FLAGS_TEXT );
 	return;
 	M_EPILOG
 	}
