@@ -89,7 +89,7 @@ bool HSerial::open ( void )
 	compile( );
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	f_iFileDescriptor = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
-	if ( ! f_iFileDescriptor )
+	if ( f_iFileDescriptor < 0 )
 		M_THROW ( strerror ( g_iErrNo ), g_iErrNo );
 	if ( ! isatty ( f_iFileDescriptor ) )
 		M_THROW ( "not a tty", f_iFileDescriptor );
