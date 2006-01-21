@@ -221,7 +221,7 @@ void HSerial::compile_flags ( void )
 	/* consistency tests */
 	if ( ( f_eFlags & D_FLAGS_STOP_BITS_1 ) && ( f_eFlags & D_FLAGS_STOP_BITS_2 ) )
 		M_THROW ( _ ( "stop bits setup inconsistent" ), static_cast < int > ( f_eFlags ) );
-	if ( ( f_eFlags & D_FLAGS_HARDWARE_FLOW_CONTROL ) && ( f_eFlags & D_FLAGS_SOFTWARE_FLOW_CONTROL ) )
+	if ( ( f_eFlags & D_FLAGS_FLOW_CONTROL_HARDWARE ) && ( f_eFlags & D_FLAGS_FLOW_CONTROL_SOFTWARE ) )
 		M_THROW ( _ ( "flow control inconsistent" ), static_cast < int > ( f_eFlags ) );
 	if ( f_eFlags & D_FLAGS_BITS_PER_BYTE_8 )
 		l_iCtr ++, l_sTIO.c_cflag = CS8;
@@ -250,7 +250,7 @@ void HSerial::compile_flags ( void )
  *   Newwer interface for setting speed (baudrate)
  */
 	l_sTIO.c_cflag |= CSIZE | CREAD /* | CLOCAL */;
-	if ( f_eFlags & D_FLAGS_HARDWARE_FLOW_CONTROL )
+	if ( f_eFlags & D_FLAGS_FLOW_CONTROL_HARDWARE )
 		l_sTIO.c_cflag |= CRTSCTS;
 
 	/* setting c_iflag */
@@ -266,7 +266,7 @@ void HSerial::compile_flags ( void )
 	l_sTIO.c_iflag = IGNPAR | IGNBRK | IXANY;
 	if ( f_eFlags & D_FLAGS_CR2NL )
 		l_sTIO.c_iflag |= ICRNL;
-	if ( f_eFlags & D_FLAGS_SOFTWARE_FLOW_CONTROL )
+	if ( f_eFlags & D_FLAGS_FLOW_CONTROL_SOFTWARE )
 		l_sTIO.c_iflag |= IXON | IXOFF;
 	if ( f_eFlags & D_FLAGS_PARITY_CHECK )
 		l_sTIO.c_iflag |= INPCK;

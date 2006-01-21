@@ -1,6 +1,6 @@
 " rc syntax highlighting
 
-syn keyword stdhapiValues true false on off yes no LOG_DEBUG LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_CVSHEADER LOG_SQL BRIGHTMAGENTA MySQL PostgreSQL SQLite null none HARDWARE_FLOW_CONTROL SOFTWARE_FLOW_CONTROL STOP_BITS_1 STOP_BITS_2 PARITY_CHECK PARITY_ODD CANONICAL ECHO CR2NL BITS_PER_BYTE_8 BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5
+syn keyword stdhapiValues true false on off yes no LOG_DEBUG LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_CVSHEADER LOG_SQL BRIGHTMAGENTA MySQL PostgreSQL SQLite null none FLOW_CONTROL_HARDWARE SOFTWARE_CONTROL_SOFTWARE STOP_BITS_1 STOP_BITS_2 PARITY_CHECK PARITY_ODD CANONICAL ECHO CR2NL BITS_PER_BYTE_8 BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5
 syn keyword stdhapiKeyword log_mask esc_delay disable_XON use_mouse latency command_compose_character command_compose_delay attribute_disabled attribute_enabled attribute_focused attribute_statusbar attribute_search_highlight ignore_signal_SIGINT ignore_signal_SIGTSTP ignore_signal_SIGQUIT serial_device serial_baudrate collector_connection_timeout data_base_driver instance_name serial_flags
 syn keyword stdhapiCommand set_env
 syn keyword stdhapiColorRed RED

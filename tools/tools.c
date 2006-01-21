@@ -51,7 +51,7 @@ namespace tools
 
 char * n_pcSerialDevice = NULL;
 HSerial::speed_t n_eBaudRate = HSerial::D_SPEED_B115200;
-HSerial::flags_t n_eSerialFlags = HSerial::D_FLAGS_HARDWARE_FLOW_CONTROL | HSerial::D_FLAGS_BITS_PER_BYTE_8;
+HSerial::flags_t n_eSerialFlags = HSerial::D_FLAGS_FLOW_CONTROL_HARDWARE | HSerial::D_FLAGS_BITS_PER_BYTE_8;
 int n_iCollectorConnectionTimeOut = 9999;
 bool n_bIgnoreSignalSIGINT = false;
 bool n_bIgnoreSignalSIGTSTP = false;
@@ -115,10 +115,10 @@ bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		{
 		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
 			{
-			if ( ! strcasecmp ( l_oStr, "HARDWARE_FLOW_CONTROL" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_HARDWARE_FLOW_CONTROL;
-			else if ( ! strcasecmp ( l_oStr, "SOFTWARE_FLOW_CONTROL" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_SOFTWARE_FLOW_CONTROL;
+			if ( ! strcasecmp ( l_oStr, "FLOW_CONTROL_HARDWARE" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_FLOW_CONTROL_HARDWARE;
+			else if ( ! strcasecmp ( l_oStr, "SOFTWARE_CONTROL_SOFTWARE" ) )
+				n_eSerialFlags = HSerial::D_FLAGS_FLOW_CONTROL_SOFTWARE;
 			else if ( ! strcasecmp ( l_oStr, "ECHO" ) )
 				n_eSerialFlags = HSerial::D_FLAGS_ECHO;
 			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_8" ) )

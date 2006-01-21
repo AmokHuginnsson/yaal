@@ -157,12 +157,12 @@ serial_baudrate B115200
 
 # serial_flags
 # type: special(multi flag value),
-# default: HARDWARE_FLOW_CONTROL BITS_PER_BYTE_8
+# default: FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
 # this option set various flags controling serial connection behaviour
-# flag names: HARDWARE_FLOW_CONTROL SOFTWARE_FLOW_CONTROL BITS_PER_BYTE_8
+# flag names: FLOW_CONTROL_HARDWARE SOFTWARE_CONTROL_SOFTWARE BITS_PER_BYTE_8
 #             BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5 PARITY_CHECK
 #             PARITY_ODD CR2NL ECHO CANONICAL STOP_BITS_1 STOP_BITS_2
-serial_flags HARDWARE_FLOW_CONTROL BITS_PER_BYTE_8
+serial_flags FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
 
 # collector_connection_timeout
 # type: integer, default: 9999
