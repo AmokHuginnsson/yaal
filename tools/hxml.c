@@ -38,7 +38,7 @@ Copyright:
 #include <libxml/xmlreader.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hxml.h"
 #include "hcore/hlog.h"
 

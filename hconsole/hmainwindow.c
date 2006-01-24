@@ -25,7 +25,7 @@ Copyright:
 */
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hmainwindow.h"
 
 using namespace stdhapi::hcore;

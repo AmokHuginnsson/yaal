@@ -25,7 +25,7 @@ Copyright:
 */
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "oresource.h"
-M_CVSTID ( D_CVSID_ORESOURCE_H );
+M_CVSTID ( D_CVSID_ORESOURCE_H )
 

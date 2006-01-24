@@ -28,7 +28,7 @@ Copyright:
 #include <stdlib.h>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "cl_switch.h"
 #include "rc_file.h"
 #include "hstring.h"

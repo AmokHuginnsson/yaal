@@ -27,7 +27,7 @@ Copyright:
 #include <math.h>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hcomplex.h"
 #include "hcore.h"
 

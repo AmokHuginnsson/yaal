@@ -25,9 +25,9 @@ Copyright:
 */
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "omenuitem.h"
-M_CVSTID ( D_CVSID_OMENUITEM_H );
+M_CVSTID ( D_CVSID_OMENUITEM_H )
 
 
 using namespace stdhapi::hcore;

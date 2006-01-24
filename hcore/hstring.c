@@ -31,7 +31,7 @@ Copyright:
 #include <libintl.h>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hstring.h"
 #include "xalloc.h"
 

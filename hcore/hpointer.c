@@ -25,7 +25,7 @@ Copyright:
 */
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hpointer.h"
-M_CVSTID ( D_CVSID_HPOINTER_H );
+M_CVSTID ( D_CVSID_HPOINTER_H )
 

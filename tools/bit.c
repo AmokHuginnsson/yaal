@@ -28,7 +28,7 @@ Copyright:
 #include <stdio.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hcore/xalloc.h"
 
 namespace stdhapi

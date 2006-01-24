@@ -33,7 +33,7 @@ Copyright:
 #include "config.h"
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hserial.h"
 #include "tools.h"
 

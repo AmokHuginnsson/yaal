@@ -30,7 +30,7 @@ Copyright:
 #include <libintl.h> /* gettext ( ) */
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "rc_file.h"
 #include "xalloc.h"
 #include "hlog.h"

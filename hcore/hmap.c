@@ -25,9 +25,9 @@ Copyright:
 */
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hmap.h"
-M_CVSTID ( D_CVSID_HMAP_H );
+M_CVSTID ( D_CVSID_HMAP_H )
 
 namespace stdhapi
 {

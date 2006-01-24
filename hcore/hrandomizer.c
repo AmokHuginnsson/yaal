@@ -28,7 +28,7 @@ Copyright:
 #define INCREMENT       1
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hrandomizer.h"
 
 namespace stdhapi

@@ -30,7 +30,7 @@ Copyright:
 #include <stdarg.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "util.h"
 #include "hanalyser.h"
 #include "hcore/hlog.h"

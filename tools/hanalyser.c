@@ -36,7 +36,7 @@ Copyright:
 #include <libintl.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hcore/xalloc.h"
 #include "hcore/htree.h"
 #include "hcore/hcore.h"

@@ -29,7 +29,7 @@ Copyright:
 #include "config.h"
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hdatawindow.h"
 #include "hdatalistcontrol.h"
 #include "hdatatreecontrol.h"

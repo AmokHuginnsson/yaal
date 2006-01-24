@@ -33,7 +33,7 @@ Copyright:
 #endif /* _STDIO_H */
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "xalloc.h"
 #include "hlog.h"
 

@@ -27,7 +27,7 @@ Copyright:
 #include <string.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "htreecontrol.h"
 
 using namespace stdhapi::hcore;

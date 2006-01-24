@@ -27,9 +27,9 @@ Copyright:
 #include <libintl.h>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hlist.h"
-M_CVSTID ( D_CVSID_HLIST_H );
+M_CVSTID ( D_CVSID_HLIST_H )
 
 namespace stdhapi
 {

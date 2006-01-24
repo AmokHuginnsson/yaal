@@ -27,10 +27,10 @@ Copyright:
 #include <libintl.h>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hpool.h"
 
-M_CVSTID ( D_CVSID_HPOOL_H );
+M_CVSTID ( D_CVSID_HPOOL_H )
 
 namespace stdhapi
 {

@@ -29,7 +29,7 @@ char const COPYRIGHT [ ] =
 #include <string.h>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hcore.h"
 #include "hlog.h"
 #include "hstring.h"

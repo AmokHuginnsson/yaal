@@ -31,7 +31,7 @@ Copyright:
 #include <libintl.h> /* gettext */
 
 #include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "tools.h"
 #include "hcore/hcore.h"
 #include "hcore/xalloc.h"

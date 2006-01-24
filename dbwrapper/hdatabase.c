@@ -27,7 +27,7 @@ Copyright:
 #include <string.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hcore/hlog.h"
 #include "hdatabase.h"
 #include "db_driver_loader.h"

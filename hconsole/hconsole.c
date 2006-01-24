@@ -38,7 +38,7 @@ Copyright:
 #endif /* not HAVE_NCURSES_NCURSES_H */
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hcore/hcore.h"
 #include "hcore/hlog.h"
 #include "hcore/rc_file.h"

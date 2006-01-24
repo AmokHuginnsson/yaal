@@ -47,7 +47,7 @@ Copyright:
 #endif /* HAVE_GPM_H */
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "mouse.h"
 #include "console.h"
 #include "hcore/hstring.h"

@@ -27,7 +27,7 @@ Copyright:
 #include <libintl.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "hwindow.h"
 #include "console.h"
 

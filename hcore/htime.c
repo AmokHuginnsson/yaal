@@ -29,7 +29,7 @@ Copyright:
 #include "config.h"
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 #include "htime.h"
 
 namespace stdhapi
