@@ -34,6 +34,8 @@ Copyright:
 
 #define D_CVSID_HPOOL_H "$CVSHeader$"
 
+#include "xalloc.h"
+
 namespace stdhapi
 {
 
@@ -83,8 +85,6 @@ private:
 	/*}*/
 	};
 
-#include "xalloc.h"
-
 template < typename tType >
 HPool < tType >::HPool ( size_t a_ulNewSize, pool_type_t a_ePoolType )
 	: f_ePoolType ( a_ePoolType ), f_ulPoolSize ( 0 ), f_iTop ( 0 ),
@@ -122,7 +122,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 			f_ulPoolSize = 1;
 			while ( f_ulPoolSize < a_ulNewSize )
 				f_ulPoolSize <<= 1;
-			f_ptPool = xrealloc ( f_ptPool, f_ulPoolSize, tType );
+			f_ptPool = xrealloc < tType > ( f_ptPool, f_ulPoolSize );
 			memset ( f_ptPool + l_ulOldSize, 0,
 					( f_ulPoolSize - l_ulOldSize ) * sizeof ( tType ) );
 			}
@@ -132,7 +132,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 		if ( f_ptPool && ( f_ePoolType == D_FIXED_SIZE ) )
 			M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_REALLOC_FIXED ], f_ulPoolSize );
 		f_ulPoolSize = a_ulNewSize;
-		f_ptPool = xrealloc ( f_ptPool, f_ulPoolSize, tType );
+		f_ptPool = xrealloc < tType > ( f_ptPool, f_ulPoolSize );
 		}
 	return ( f_ulPoolSize - l_ulOldSize );
 	M_EPILOG

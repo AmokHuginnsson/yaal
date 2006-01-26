@@ -141,7 +141,7 @@ HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( a_uiSize ), f_uiInde
 	l_oMessage.format ( "map prime = %ld", a_uiSize );
 	M_LOG ( ( char * ) l_oMessage );
 #endif /* __DEBUGGER_BABUNI__ */
-	f_ppoAtomArray = xcalloc ( f_uiPrime, HAtom * );
+	f_ppoAtomArray = xcalloc < HAtom * > ( f_uiPrime );
 	return;
 	M_EPILOG
 	}

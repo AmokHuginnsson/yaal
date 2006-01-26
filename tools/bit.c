@@ -31,6 +31,8 @@ Copyright:
 M_CVSID ( "$CVSHeader$" )
 #include "hcore/xalloc.h"
 
+using namespace stdhapi::hcore;
+
 namespace stdhapi
 {
 
@@ -98,7 +100,7 @@ void ror( unsigned char * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	l_iSize = ( a_iLen + a_iStart ) / 8;
 	if ( ( a_iLen + a_iStart ) % 8 )
 		l_iSize++;
-	l_pucTmp = xmalloc ( l_iSize, unsigned char );
+	l_pucTmp = xmalloc < unsigned char > ( l_iSize );
 	for ( l_i = 0; l_i < l_iSize; l_i++ )
 		l_pucTmp[ l_i ] = a_pucTmpBuf[ l_i ];
 	for ( l_i = 0; l_i < a_iLen; l_i++ )
@@ -119,7 +121,7 @@ void rol( unsigned char * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	l_iSize = ( a_iLen + a_iStart ) / 8;
 	if ( ( a_iLen + a_iStart ) % 8 )
 		l_iSize++;
-	l_pucTmp = xmalloc ( l_iSize, unsigned char );
+	l_pucTmp = xmalloc < unsigned char > ( l_iSize );
 	for ( l_i = 0; l_i < l_iSize; l_i++ )
 		l_pucTmp[ l_i ] = a_pucTmpBuf[ l_i ];
 	for ( l_i = 0; l_i < a_iLen; l_i++ )

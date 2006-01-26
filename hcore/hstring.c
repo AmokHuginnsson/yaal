@@ -99,7 +99,7 @@ void HString::hs_realloc ( int const a_iSize )
 		f_iSize = 1;
 		while ( f_iSize < a_iSize )
 			f_iSize <<= 1;
-		f_pcBuffer = xrealloc ( f_pcBuffer, f_iSize, char );
+		f_pcBuffer = xrealloc < char > ( f_pcBuffer, f_iSize );
 		memset ( f_pcBuffer + l_iOldLength, 0, f_iSize - l_iOldLength );
 		}
 	return;

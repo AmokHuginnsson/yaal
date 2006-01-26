@@ -86,9 +86,9 @@ HSocket::HSocket ( socket_type_t const a_eSocketType,
 			M_ENSURE ( fcntl ( f_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 		}
 	if ( f_eType & D_NETWORK )
-		f_pvAddress = xcalloc ( 1, sockaddr_in );
+		f_pvAddress = xcalloc < sockaddr_in > ( 1 );
 	else
-		f_pvAddress = xcalloc ( 1, sockaddr_un );
+		f_pvAddress = xcalloc < sockaddr_un > ( 1 );
 	return;
 	M_EPILOG
 	}

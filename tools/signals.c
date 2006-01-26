@@ -101,7 +101,7 @@ void HSigStackWrapper::create_stack ( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	f_sStack.ss_sp = xmalloc ( SIGSTKSZ, char );
+	f_sStack.ss_sp = xmalloc < char > ( SIGSTKSZ );
 	f_sStack.ss_size = SIGSTKSZ;
 	f_sStack.ss_flags = 0;
 	l_iError = sigaltstack ( & f_sStack, NULL );

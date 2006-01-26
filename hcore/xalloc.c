@@ -97,7 +97,7 @@ char * xstrdup ( char const * const a_pcStr )
 		perror ( "xstrdup: request to duplicate NULL pointer string" );
 		abort ( );
 		}
-	l_pcNew = xcalloc ( strlen ( a_pcStr ) + 1, char );
+	l_pcNew = stdhapi::hcore::xcalloc < char > ( strlen ( a_pcStr ) + 1 );
 	strcpy ( l_pcNew, a_pcStr );
 	return ( l_pcNew );
 	}

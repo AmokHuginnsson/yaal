@@ -62,8 +62,8 @@ HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 	M_PROLOG
 	uid_t l_iUid = 0;
 	passwd * l_psPasswd = NULL;
-	f_pcBuffer = xcalloc ( f_iBufferSize, char );
-	f_pcHostName = xcalloc ( D_HOSTNAME_SIZE, char );
+	f_pcBuffer = xcalloc < char > ( f_iBufferSize );
+	f_pcHostName = xcalloc < char > ( D_HOSTNAME_SIZE );
 	f_psStream = tmpfile ( );
 	if ( ! f_psStream )
 		M_THROW ( "tmpfile returned", reinterpret_cast < int > ( f_psStream ) );
@@ -75,7 +75,7 @@ HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 		f_pcLoginName = xstrdup ( l_psPasswd->pw_name );
 	else
 		{
-		f_pcLoginName = xcalloc ( D_LOGIN_NAME_MAX + 1, char );
+		f_pcLoginName = xcalloc < char > ( D_LOGIN_NAME_MAX + 1 );
 		M_ENSURE ( snprintf ( f_pcLoginName, D_LOGIN_NAME_MAX, "%d", l_iUid ) <= D_LOGIN_NAME_MAX );
 		}
 	M_ENSURE ( gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 ) == 0 );

@@ -167,7 +167,7 @@ void HException::dump_call_stack ( int const )
 	char * * l_ppcStrings = NULL;
 	void * * l_ppvPointer =	reinterpret_cast < void * * > ( & l_pcBuffer );
 
-	l_pcBuffer = xcalloc ( 4000, char );
+	l_pcBuffer = xcalloc < char > ( 4000 );
 	l_iSize = backtrace ( l_ppvPointer, 1000 );
 	l_ppcStrings = backtrace_symbols  ( l_ppvPointer, l_iSize );
 

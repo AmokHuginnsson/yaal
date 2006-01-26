@@ -30,16 +30,48 @@ Copyright:
 extern "C"
 {
 
-#define xmalloc( size, type ) static_cast < type * > ( xmalloc_internal ( ( size ) * sizeof ( type ) ) )
 void * xmalloc_internal ( int long const );
-#define xcalloc( size, type ) static_cast < type * > ( xcalloc_internal ( ( size ) * sizeof ( type ) ) )
 void * xcalloc_internal ( int long const );
-#define xrealloc( pointer, size, type ) static_cast < type * > ( xrealloc_internal ( pointer, ( size ) * sizeof ( type ) ) )
 void * xrealloc_internal ( void *, int long const );
-#define xfree( ptr ) xfree_internal ( reinterpret_cast < void * * > ( & ptr ) )
 void xfree_internal ( void * * );
 char * xstrdup ( char const * const );
 
 }
 
+namespace stdhapi
+{
+
+namespace hcore
+{
+
+template < typename tType >
+inline tType * xmalloc ( int long const a_iCount )
+	{
+	return ( static_cast < tType * > ( xmalloc_internal ( a_iCount * sizeof ( tType ) ) ) );
+	}
+
+template < typename tType >
+inline tType * xcalloc ( int long const a_iCount )
+	{
+	return ( static_cast < tType * > ( xcalloc_internal ( a_iCount * sizeof ( tType ) ) ) );
+	}
+
+template < typename tType >
+inline tType * xrealloc ( void * a_pvPointer, int long const a_iCount )
+	{
+	return ( static_cast < tType * > ( xrealloc_internal ( a_pvPointer, a_iCount * sizeof ( tType ) ) ) );
+	}
+
+template < typename tType >
+void xfree ( tType a_tPointer )
+	{
+	xfree_internal ( reinterpret_cast < void * * > ( & a_tPointer ) );
+	return;
+	}
+
+}
+
+}
+
 #endif /* not __HCORE_XALLOC_H */
+
