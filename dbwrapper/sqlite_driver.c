@@ -36,6 +36,8 @@ Copyright:
 #define NULL	0
 #endif /* not NULL */
 
+using namespace stdhapi::hcore;
+
 extern "C"
 {
 
@@ -77,9 +79,9 @@ void * db_connect ( char const * a_pcDataBase,
 		db_disconnect ( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psSQLite = xcalloc ( 1, OSQLite );
+	l_psSQLite = xcalloc < OSQLite > ( 1 );
 	l_iNmLnght = strlen ( a_pcDataBase );
-	l_pcDataBase = xcalloc ( l_iNmLnght + strlen ( l_pcFileNameExt ) + 1, char );
+	l_pcDataBase = xcalloc < char > ( l_iNmLnght + strlen ( l_pcFileNameExt ) + 1 );
 	strcpy ( l_pcDataBase, a_pcDataBase );
 	strcat ( l_pcDataBase, l_pcFileNameExt );
 	if ( stat ( l_pcDataBase, & l_sStat ) )
@@ -145,7 +147,7 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 	{
 	OSQLite * l_psSQLite = static_cast < OSQLite * > ( a_pvData );
 	OSQLiteResult * l_psResult = NULL;
-	l_psResult = xcalloc ( 1, OSQLiteResult );
+	l_psResult = xcalloc < OSQLiteResult > ( 1 );
 	l_psResult->f_iColumns = 0;
 	l_psResult->f_iRows = 0;
 	l_psResult->f_ppcData = NULL;

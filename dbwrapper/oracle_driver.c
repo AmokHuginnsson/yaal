@@ -90,7 +90,7 @@ void * db_connect ( char const * /* In Oracle user name is name of schema. */,
 		db_disconnect ( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psOracle = xcalloc ( 1, OOracle );
+	l_psOracle = xcalloc < OOracle > ( 1 );
 	if ( ( l_psOracle->f_iStatus = OCIInitialize ( OCI_DEFAULT, NULL, NULL,
 					NULL, NULL ) ) != OCI_SUCCESS )
 		{
@@ -222,7 +222,7 @@ char const * db_error  ( void * a_pvData )
 void * db_query ( void * a_pvData, char const * a_pcQuery )
 	{
 	OOracle * l_psOracle = static_cast < OOracle * > ( a_pvData );
-	OQuery * l_psQuery = xcalloc ( 1, OQuery );
+	OQuery * l_psQuery = xcalloc < OQuery > ( 1 );
 	HString l_oQuery = a_pcQuery;
 	int l_iIters = 0;
 	int l_iLength = strlen ( a_pcQuery );
@@ -302,7 +302,7 @@ char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
 						OCI_DTYPE_PARAM, & l_iSize, 0, OCI_ATTR_DATA_SIZE,
 						l_psQuery->f_psError ) ) == OCI_SUCCESS )
 			{
-			l_pcData = xcalloc ( l_iSize + 1, char );
+			l_pcData = xcalloc < char > ( l_iSize + 1 );
 			if ( ( ( * l_psQuery->f_piStatus ) = OCIDefineByPos ( l_psQuery->f_psStatement,
 							& l_psResult, l_psQuery->f_psError, a_iColumn + 1, l_pcData, l_iSize + 1,
 							SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT ) ) == OCI_SUCCESS )
@@ -311,7 +311,7 @@ char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
 								l_psQuery->f_psError, 1, OCI_FETCH_ABSOLUTE, a_iRow,
 								OCI_DEFAULT ) ) == OCI_SUCCESS )
 					{
-					l_psAllocator = xcalloc ( 1, OAllocator );
+					l_psAllocator = xcalloc < OAllocator > ( 1 );
 					l_psAllocator->f_pcBuffer = l_pcData;
 					if ( l_psQuery->f_psAllocator )
 						l_psQuery->f_psAllocator->f_psNext = l_psAllocator;
