@@ -102,7 +102,7 @@ public:
 	void set_flags ( flags_t );
 	void flush ( int );
 	void wait_for_eot ( void );
-	int read ( void * const, int const, int const, int const = 0 );
+	int timed_read ( void * const, int const, int const, int const = 0 );
 	static flags_t D_FLAGS_TEXT; /* flags for textmode operation */
 	/*}*/
 protected:

@@ -153,17 +153,6 @@ int HCollector::receive_line ( char * & a_pcLine )
 	M_EPILOG
 	}
 
-#ifdef __GNUC__
-#	define M_STDHAPI_TEMP_FAILURE_RETRY( expression ) \
-  (__extension__ \
-    ({ int long __result; \
-       do __result = static_cast <int long> ( expression ); \
-       while (__result == -1L && errno == EINTR); \
-       __result; }))
-#else /* __GNUC__ */
-#define M_STDHAPI_TEMP_FAILURE_RETRY( expression ) ( expression )
-#endif /* not __GNUC__ */
-
 int HCollector::establish_connection ( int a_iTimeOut )
 	{
 	M_PROLOG
@@ -176,8 +165,6 @@ int HCollector::establish_connection ( int a_iTimeOut )
 	int l_iLenght = strlen ( D_PROTO_SYN ), l_iError = -1;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, f_iFileDescriptor );
-	fd_set	l_xFileDesSet; /* serial port */
-	timeval	l_sWait; /* sleep between re-selects */
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_ACK, strlen ( D_PROTO_ACK ) ) )
 		{
@@ -188,14 +175,7 @@ int HCollector::establish_connection ( int a_iTimeOut )
 		if ( tcsendbreak ( f_iFileDescriptor, 0 ) )
 			M_THROW ( "tcsendbreak", g_iErrNo );
 		memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
-		l_sWait.tv_sec = 1;
-		l_sWait.tv_usec = 0;
-		FD_ZERO ( & l_xFileDesSet );
-		FD_SET ( f_iFileDescriptor, & l_xFileDesSet );
-		if ( ( M_STDHAPI_TEMP_FAILURE_RETRY ( select ( FD_SETSIZE,
-							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
-				&& FD_ISSET ( f_iFileDescriptor, & l_xFileDesSet ) )
-			HRawFile::read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE );
+		timed_read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE, 1 );
 		flush ( TCIFLUSH );
 		l_iError ++;
 		if ( l_iError > a_iTimeOut )
@@ -213,19 +193,11 @@ int HCollector::wait_for_connection ( int a_iTimeOut )
 	int l_iLenght = strlen ( D_PROTO_ACK );
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, f_iFileDescriptor );
-	fd_set	l_xFileDesSet; /* serial port */
-	timeval	l_sWait; /* sleep between re-selects */
 	memset ( f_pcReadBuf, 0, D_PROTO_RECV_BUF_SIZE );
 	while ( strncmp ( f_pcReadBuf, D_PROTO_SYN, strlen ( D_PROTO_SYN ) ) )
 		{
-		l_sWait.tv_sec = a_iTimeOut;
-		l_sWait.tv_usec = 0;
-		FD_ZERO ( & l_xFileDesSet );
-		FD_SET ( f_iFileDescriptor, & l_xFileDesSet );
-		if ( ( M_STDHAPI_TEMP_FAILURE_RETRY ( select ( FD_SETSIZE,
-							& l_xFileDesSet,	NULL, NULL, & l_sWait ) ) >= 0 )
-				&& FD_ISSET ( f_iFileDescriptor, & l_xFileDesSet ) )
-			HRawFile::read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE ), l_iError ++;
+		if ( timed_read ( f_pcReadBuf, D_PROTO_RECV_BUF_SIZE, a_iTimeOut ) >= 0 )
+			l_iError ++;
 		else
 			return ( -1 );
 		}

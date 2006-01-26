@@ -26,8 +26,6 @@ Copyright:
 
 #include <libintl.h>
 
-#include "config.h"
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" )
 #include "hdatawindow.h"

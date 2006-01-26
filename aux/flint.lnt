@@ -82,6 +82,7 @@
 -e534		/* Ignoring return value of function 'function' */
 -e537		/* Repeated include file 'file' */
 -e613		/* Possible use of null pointer 'pointer' in left argument to operator '->' */
+-e618		/* Storage class specified after a type */
 -e668		/* Possibly passing a null pointer to function 'function' */
 -e671		/* Possibly passing to function 'function' a negative value (-1) */
 -e672		/* Possible memory leak in assignment to pointer 'pointer' */
@@ -116,6 +117,7 @@
 -e1704	/* Constructor 'constructor' has private access specification */
 -e1712	/* default constructor not defined for class 'class' */
 -e1714	/* Member function 'member' not referenced */
+-e1715	/* static member 'member' not referenced */
 -e1716	/* Virtual member function 'member' not referenced */
 -e1727	/* inline 'inline' not previously defined inline */
 -e1735	/* virtual 'member' has default parameter */
@@ -125,7 +127,7 @@
 -e1763	/* Member function 'member' marked as const indirectly modifies class */
 
 -emacro({413},SUN_LEN)						/* Likely use of null pointer 'pointer' in left argument to operator '->' */
--emacro(506,bkgd,attr_get)			/* Constant value Boolean */
+-emacro(506,bkgd,attr_get,M_ASSERT)			/* Constant value Boolean */
 -emacro(572,M_MAKE_ATTR)				/* Excessive shift value (precision 1 shifted right by 1) */
 -emacro(573,FD_SET,FD_ISSET)		/* Signed-unsigned mix with divide */
 -emacro(605,__builtin_va_start)	/*  */
@@ -133,21 +135,23 @@
 -emacro(717,FD_ZERO)						/* do ... while(0); */
 -emacro({725},M_PROLOG)					/* Expected positive indentation from line 'line' */
 -emacro(737,FD_SET,FD_ISSET)		/* Loss of sign in promotion from int to unsigned long */
+-emacro(774,M_ASSERT)						/* Boolean within 'if' always evaluates to True */
 -emacro({944},attr_get,M_MAKE_ATTR) /* argument for operator 'operator' always evaluates to */
 -emacro(1551,M_EPILOG)		/* Function may throw exception '...' in  destructor 'destructor' */
 -emacro(1559,M_EPILOG)		/* Uncaught exception 'exception' may be thrown in destructor 'destructor' */
 -emacro(1775,M_EPILOG)		/* catch block does not catch any declared exception */
--emacro(1924,attr_get,FD_SET,FD_ISSET,addch,SIG_IGN,SIG_DFL,SUN_LEN) /* C-style cast */
+-emacro(1924,attr_get,FD_SET,FD_ISSET,addch,ACS_DARROW,ACS_UARROW,ACS_VLINE,SIG_IGN,SIG_DFL,SUN_LEN) /* C-style cast */
 
--esym(18,sigevent::_sigev_un)	/* Symbol 'symbol' redeclared */
+-esym(18,sigevent::_sigev_un,stdhapi::hcore::xfree_internal,stdhapi::hcore::xcalloc_internal,stdhapi::hcore::xrealloc_internal)	/* Symbol 'symbol' redeclared */
 -esym(418,strftime,fflush)	/* Passing null pointer to function 'function' */
 -esym(449,l_poAtom)					/* Pointer variable 'variable' previously deallocated */
--esym(526,stdhapi::hcore::HList<<1>>,"stdhapi::hcore::HMap<<1>,<2>>",stdhapi::hcore::HTree<<1>>)	/* Symbol 'symbol' not defined */
+-esym(526,stdhapi::hcore::HList<<1>>,"stdhapi::hcore::HMap<<1>,<2>>","stdhapi::hcore::HPointer<<1>,<2>>",stdhapi::hcore::HTree<<1>>,stdhapi::hcore::xmalloc_internal,stdhapi::hcore::xcalloc_internal,stdhapi::hcore::xrealloc_internal,stdhapi::hcore::xfree_internal,stdhapi::hcore::xstrdup)	/* Symbol 'symbol' not defined */
 -esym(528,__CVSID__,__CVSTID__) /* Symbol 'symbol' not referenced */
 -esym(534,stdhapi::hcore::HLog::operato*)
--esym(578,stdhapi::tools::des::n_pcBeginingPermutation,stdhapi::tools::des::n_pcEndingPermutation,stdhapi::tools::des::n_pcKeyPermutation,stdhapi::tools::des::n_pcCountOfMoves,stdhapi::tools::des::n_pcPermutationOfCompresion,stdhapi::tools::des::n_pcPermutationOfExpanding,stdhapi::tools::des::n_pcPBlockPermutation,stdhapi::tools::des::n_pppcSBlock,stdhapi::tools::HXmlData) /* Declaration of symbol 'symbol' hides symbol 'symbol' */
+-esym(578,stdhapi::hconsole::COLORS,stdhapi::tools::HSerial::speed_t,stdhapi::tools::des::n_pcBeginingPermutation,stdhapi::tools::des::n_pcEndingPermutation,stdhapi::tools::des::n_pcKeyPermutation,stdhapi::tools::des::n_pcCountOfMoves,stdhapi::tools::des::n_pcPermutationOfCompresion,stdhapi::tools::des::n_pcPermutationOfExpanding,stdhapi::tools::des::n_pcPBlockPermutation,stdhapi::tools::des::n_pppcSBlock,stdhapi::tools::HXmlData) /* Declaration of symbol 'symbol' hides symbol 'symbol' */
 -esym(752,stdhapi::hcore::g_ppcErrMsgHList,stdhapi::hcore::g_pulPrimes,stdhapi::hcore::hash)
 -esym(763,stdhapi::hdata::HDataWindow) /* Redundant declaration for symbol 'symbol' */
+-esym(1055,stdhapi::hcore::xfree_internal,stdhapi::hcore::xcalloc_internal,stdhapi::hcore::xrealloc_internal) /* Symbol 'symbol' undeclared, assumed to return int */
 -esym(1061,D_NONE,D_REQUIRED,D_OPTIONAL) /* public member 'member' is not accessible through non-public inheritance */
 -esym(1411,stdhapi::dbwrapper::HRecordSet::sync) /* Member with different signature hides virtual member 'member' */
 -esym(1511,*operator=*)
@@ -165,5 +169,6 @@
 
 -efile(766,hcore/hlist.c)
 -efile(766,hcore/hmap.c)
+-efile(766,hcore/hpointer.c)
 
 /* vim: set ft=cpp: */

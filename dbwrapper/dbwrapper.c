@@ -33,7 +33,6 @@ Copyright:
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" )
-#include "hcore/xalloc.h"
 #include "hcore/hlog.h"
 #include "hcore/hstring.h"
 #include "hcore/rc_file.h"

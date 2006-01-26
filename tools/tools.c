@@ -27,7 +27,6 @@ Copyright:
 #include <stdlib.h>  /* strtol */
 #include <string.h>  /* strsignal */
 #include <stdio.h>	 /* perror function */
-#include <termios.h> /* B115200 */
 #include <libintl.h> /* gettext */
 
 #include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */

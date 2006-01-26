@@ -33,9 +33,6 @@ Copyright:
 M_CVSID ( "$CVSHeader$" )
 #include "xalloc.h"
 
-extern "C"
-{
-
 void * xmalloc_internal ( int long const a_lSize )
 	{
 	register void * l_pvNewPtr = NULL;
@@ -101,6 +98,4 @@ char * xstrdup ( char const * const a_pcStr )
 	strcpy ( l_pcNew, a_pcStr );
 	return ( l_pcNew );
 	}
-
-}
 

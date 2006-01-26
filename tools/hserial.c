@@ -343,10 +343,12 @@ void HSerial::wait_for_eot ( void )
 	M_EPILOG
 	}
 
-int HSerial::read ( void * const a_pcBuffer, int const a_iSize,
+int HSerial::timed_read ( void * const a_pcBuffer, int const a_iSize,
 		int const a_iTimeOutSec, int const a_iTimeOutUsec )
 	{
 	M_PROLOG
+	if ( f_iFileDescriptor < 0 )
+		M_THROW ( n_pcENotOpened, g_iErrNo );
 	int l_iError = 0;
 	timeval l_xWait;
 	fd_set l_xFdSet;

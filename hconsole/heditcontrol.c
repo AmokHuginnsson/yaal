@@ -31,7 +31,6 @@ Copyright:
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" )
-#include "hcore/xalloc.h"
 #include "heditcontrol.h"
 #include "hwindow.h"
 

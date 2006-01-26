@@ -24,8 +24,6 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "config.h"
-
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" )
 #include "hdatalistcontrol.h"

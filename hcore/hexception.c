@@ -27,6 +27,7 @@ Copyright:
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <libintl.h>
 
 #ifdef _STDIO_H
 #include <execinfo.h>
@@ -89,6 +90,8 @@ HException::~HException ( void )
 		}
 	catch ( ... )
 		{
+		fprintf ( stderr, _ ( "CRITICAL FAILURE (~HException) !\n" ) );
+		exit ( - 1 );
 		}
 	if ( f_pcCharPtr )
 		xfree ( f_pcCharPtr );

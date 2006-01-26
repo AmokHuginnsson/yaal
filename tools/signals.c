@@ -28,7 +28,6 @@ Copyright:
 #include <unistd.h>  /* kill function */
 #include <stdio.h>	 /* perror function */
 #include <signal.h>	 /* signal handling */
-#include <libintl.h>
 
 #include "config.h"
 
