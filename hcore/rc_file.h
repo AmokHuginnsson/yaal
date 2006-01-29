@@ -52,7 +52,7 @@ int process_rc_file_internal ( char const * const, char const * const,
 template < typename tType >
 int process_rc_file ( char const * const a_pcConfigName,
 		char const * const a_pcSection,
-		tType & a_tData,
+		tType const & a_tData,
 		bool const ( * const CALLBACK ) ( HString &, HString & ) = NULL )
 	{
 	return ( process_rc_file_internal ( a_pcConfigName, a_pcSection, a_tData,
