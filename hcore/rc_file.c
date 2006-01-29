@@ -44,35 +44,73 @@ namespace hcore
 
 namespace rc_file
 {
-	
-int rc_open ( char const * const a_pcRcName, bool const a_bLocal,
+
+struct RC_PATHER
+	{
+	typedef enum
+		{
+		D_ETC,
+		D_HOME_ETC,
+		D_HOME
+		} placement_t;
+
+	typedef enum
+		{
+		D_NONE = 0,
+		D_GLOBAL = 1,
+		D_LOCAL = 2
+		} placement_bit_t;
+	};
+
+int read_rc_line ( HString &, HString &, HFile &, int & );
+template struct enum_t < RC_PATHER::placement_bit_t >;
+
+HString make_path ( char const * const a_pcRcName,
+		RC_PATHER::placement_t a_ePlacement )
+	{
+	HString l_oRcPath;
+	switch ( a_ePlacement )
+		{
+		case ( RC_PATHER::D_ETC ):
+			{
+			l_oRcPath = "/etc/";
+			l_oRcPath += a_pcRcName;
+			l_oRcPath += "rc";
+			}
+		break;
+		case ( RC_PATHER::D_HOME_ETC ):
+		case ( RC_PATHER::D_HOME ):
+			{
+			char * l_pcHomePath = getenv( "HOME" );
+			if ( ! l_pcHomePath )
+				{
+				perror ( "rc_open: getenv ( )" );
+				abort ( );
+				}
+			l_oRcPath = l_pcHomePath;
+			if ( a_ePlacement == RC_PATHER::D_HOME_ETC )
+				l_oRcPath += "/etc/conf/";
+			else
+				l_oRcPath += "/.";
+			l_oRcPath += a_pcRcName;
+			l_oRcPath += "rc";
+			}
+		break;
+		default :
+		break;
+		}
+	return ( l_oRcPath );
+	}
+
+int rc_open ( char const * const a_pcRcName,
+		RC_PATHER::placement_t const a_ePlacament,
 		HFile & a_roFile )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	char * l_pcHomePath = 0;
-	HString l_oRcPath;
+	HString l_oRcPath = make_path ( a_pcRcName, a_ePlacament );
 	if ( a_roFile )
 		M_IRV ( a_roFile.close ( ) );
-	if ( a_bLocal )
-		{
-		l_pcHomePath = getenv( "HOME" );
-		if ( ! l_pcHomePath )
-			{
-			perror ( "rc_open: getenv ( )" );
-			abort ( );
-			}
-		l_oRcPath = l_pcHomePath;
-		l_oRcPath += "/.";
-		l_oRcPath += a_pcRcName;
-		l_oRcPath += "rc";
-		}
-	else
-		{
-		l_oRcPath = "/etc/";
-		l_oRcPath += a_pcRcName;
-		l_oRcPath += "rc";
-		}
 	l_iError = a_roFile.open ( l_oRcPath );
 	if ( l_iError )
 		l_oRcPath +=	" not found, ";
@@ -115,17 +153,33 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 		bool const ( * const set_variables ) ( HString &, HString & ) )
 	{
 	M_PROLOG
-	bool l_pbTFTab [ ] = { false, true }, l_bSection = false, l_bOptionOK;
-	int l_iCtr = 0, l_iCtrOut = 0, l_iLine = 0;
+	struct OPlacement
+		{
+		RC_PATHER::placement_t f_ePlacement;
+		RC_PATHER::placement_bit_t f_ePlacementBit;
+		} l_psPlacementTab [ ] = {
+				{ RC_PATHER::D_ETC, RC_PATHER::D_GLOBAL },
+				{ RC_PATHER::D_HOME_ETC, RC_PATHER::D_LOCAL },
+				{ RC_PATHER::D_HOME, RC_PATHER::D_LOCAL } };
+	bool l_bSection = false, l_bOptionOK;
+	int l_iCtr = 0, l_iLine = 0;
+	RC_PATHER::placement_bit_t l_eSuccessStory = RC_PATHER::D_NONE;
+	size_t l_iCtrOut = 0;
 	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
 	log ( D_LOG_INFO ) << "process_rc_file ( ): ";
 	if ( a_iCount < 0 )
 		M_THROW ( _ ( "bad variable count" ), a_iCount );
-	for ( l_iCtrOut = 0; l_iCtrOut < 2; l_iCtrOut ++ )
+	for ( l_iCtrOut = 0; l_iCtrOut < ( sizeof ( l_psPlacementTab ) / sizeof ( OPlacement ) ); l_iCtrOut ++ )
 		{
-		if ( ! rc_open ( a_pcRcName, l_pbTFTab [ l_iCtrOut ], l_oRc ) )
+		if ( ( l_eSuccessStory & RC_PATHER::D_GLOBAL )
+				&& ( l_psPlacementTab [ l_iCtrOut ].f_ePlacementBit == RC_PATHER::D_GLOBAL ) )
+			continue;
+		if ( l_eSuccessStory & RC_PATHER::D_LOCAL )
+			break;
+		if ( ! rc_open ( a_pcRcName, l_psPlacementTab [ l_iCtrOut ].f_ePlacement, l_oRc ) )
 			{
+			l_eSuccessStory |= l_psPlacementTab [ l_iCtrOut ].f_ePlacementBit;
 			while ( read_rc_line ( l_oOption, l_oValue, l_oRc, l_iLine ) )
 				{
 				if ( a_pcSection )

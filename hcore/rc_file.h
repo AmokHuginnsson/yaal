@@ -43,21 +43,28 @@ struct OVariable
 	};
 
 namespace rc_file
-	{
+{
 
-#define process_rc_file( filename, section, data, callback ) \
-	process_rc_file_internal ( filename, section, data, \
-			( sizeof ( data ) / sizeof ( OVariable ) ) - 1, callback )
 int process_rc_file_internal ( char const * const, char const * const,
 		OVariable const * const, int const,
 		bool const ( * const ) ( HString &, HString & ) = NULL );
-int read_rc_line ( HString &, HString &, HFile &, int & );
+
+template < typename tType >
+int process_rc_file ( char const * const a_pcConfigName,
+		char const * const a_pcSection,
+		tType & a_tData,
+		bool const ( * const CALLBACK ) ( HString &, HString & ) = NULL )
+	{
+	return ( process_rc_file_internal ( a_pcConfigName, a_pcSection, a_tData,
+			( sizeof ( tType ) / sizeof ( OVariable ) ) - 1, CALLBACK ) );
+	}
+
 void rc_set_variable ( char const * const, bool & );
 void rc_set_variable ( char const * const, char & );
 void rc_set_variable ( char const * const, char ** );
 void rc_set_variable ( char const * const, int & );
 
-	}
+}
 
 }
 
