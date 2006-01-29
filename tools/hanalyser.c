@@ -54,29 +54,32 @@ namespace stdhapi
 namespace tools
 {
 
-#define D_FUNCTIONS 0
-#define D_SIN				2
-#define D_SINH			1
-#define D_COS				4
-#define D_COSH			3
-#define D_TG				6
-#define D_TGH				5
-#define D_CTG				8
-#define D_CTGH			7
-#define D_ARCSIN		9
-#define D_ARCCOS		10
-#define D_ARCTG			11
-#define D_ARCCTG		12
-#define D_EXP				13
-#define D_SQRT			14
-#define D_LN				15
-#define	D_LOG				16
-#define D_ABS				17
-#define D_ADDITION	1
-#define D_MULTIPLICATION 2
-#define D_POWER			3
-#define D_SIGNUM		4
-#define D_BRACKET		5
+struct FUNCTIONS
+	{
+	int const static D_FUNCTIONS = 0;
+	int const static D_SIN = 2;
+	int const static D_SINH = 1;
+	int const static D_COS = 4;
+	int const static D_COSH = 3;
+	int const static D_TG = 6;
+	int const static D_TGH = 5;
+	int const static D_CTG = 8;
+	int const static D_CTGH = 7;
+	int const static D_ARCSIN = 9;
+	int const static D_ARCCOS = 10;
+	int const static D_ARCTG = 11;
+	int const static D_ARCCTG = 12;
+	int const static D_EXP = 13;
+	int const static D_SQRT = 14;
+	int const static D_LN = 15;
+	int const static D_LOG = 16;
+	int const static D_ABS = 17;
+	int const static D_ADDITION = 1;
+	int const static D_MULTIPLICATION = 2;
+	int const static D_POWER = 3;
+	int const static D_SIGNUM = 4;
+	int const static D_BRACKET = 5;
+	};
 	
 #define M_COUNT_BRANCH( arg ) count_branch ( dynamic_cast < HAnalyserNode * > ( arg ) )
 
@@ -162,24 +165,24 @@ double HAnalyser::functions ( HAnalyserNode * a_poNode )
 	l_dLeftValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ 0 ] );
 	switch ( l_iFunction )
 		{
-		case ( D_SIN ):
+		case ( FUNCTIONS::D_SIN ):
 			return ( sin ( l_dLeftValue ) );
-		case ( D_SINH ):
+		case ( FUNCTIONS::D_SINH ):
 			return ( sinh ( l_dLeftValue ) );
-		case ( D_COS ):
+		case ( FUNCTIONS::D_COS ):
 			return ( cos ( l_dLeftValue ) );
-		case ( D_COSH ):
+		case ( FUNCTIONS::D_COSH ):
 			return ( cosh ( l_dLeftValue ) );
-		case ( D_TG	):
+		case ( FUNCTIONS::D_TG	):
 			{
 			if ( eq ( floor ( l_dLeftValue / M_PI + .5 ),
 						( l_dLeftValue / M_PI + .5 ) ) )
 				return ( 0 );
 			return ( tan ( l_dLeftValue ) );
 			}
-		case ( D_TGH ):
+		case ( FUNCTIONS::D_TGH ):
 			return ( tanh ( l_dLeftValue ) );
-		case ( D_CTG ):
+		case ( FUNCTIONS::D_CTG ):
 			{
 			if ( eq ( floor( l_dLeftValue / M_PI ),
 						( l_dLeftValue / M_PI ) ) )
@@ -189,38 +192,38 @@ double HAnalyser::functions ( HAnalyserNode * a_poNode )
 				return ( 0 );
 			return ( 1. / l_dLeftValue );
 			}
-		case ( D_CTGH ):
+		case ( FUNCTIONS::D_CTGH ):
 			{
 			l_dLeftValue = tanh( l_dLeftValue );
 			if ( l_dLeftValue == 0 )
 				return ( 0 );
 			return ( 1. / l_dLeftValue );
 			}
-		case ( D_ARCSIN ):
+		case ( FUNCTIONS::D_ARCSIN ):
 			{
 			if ( ( l_dLeftValue < - M_PI / 2 ) || ( l_dLeftValue > M_PI / 2 ) )
 				return ( 0 );
 			return ( asin ( l_dLeftValue ) );
 			}
-		case ( D_ARCCOS ):
+		case ( FUNCTIONS::D_ARCCOS ):
 			{
 			if ( ( l_dLeftValue < - M_PI / 2 ) || ( l_dLeftValue > M_PI / 2 ) )
 				return ( 0 );
 			return ( acos ( l_dLeftValue ) );
 			}
-		case ( D_ARCTG ):
+		case ( FUNCTIONS::D_ARCTG ):
 			return ( atan ( l_dLeftValue ) );
-		case ( D_ARCCTG ):
+		case ( FUNCTIONS::D_ARCCTG ):
 			return ( M_PI - atan ( l_dLeftValue ) );
-		case ( D_EXP ):
+		case ( FUNCTIONS::D_EXP ):
 			return ( exp ( l_dLeftValue ) );
-		case ( D_SQRT ):
+		case ( FUNCTIONS::D_SQRT ):
 			{
 			if ( l_dLeftValue < 0 )
 				return ( sqrt ( - l_dLeftValue ) );
 			return ( sqrt ( l_dLeftValue ) );
 			}
-		case ( D_LN ):
+		case ( FUNCTIONS::D_LN ):
 			{
 			if ( l_dLeftValue == 0 )
 				return ( -1000 );
@@ -228,7 +231,7 @@ double HAnalyser::functions ( HAnalyserNode * a_poNode )
 				return ( ::log ( -l_dLeftValue ) );
 			return ( ::log ( l_dLeftValue ) );
 			}
-		case ( D_LOG ):
+		case ( FUNCTIONS::D_LOG ):
 			{
 			if ( l_dLeftValue == 0 )
 				return ( - 1000 );
@@ -236,7 +239,7 @@ double HAnalyser::functions ( HAnalyserNode * a_poNode )
 				return ( log10 ( - l_dLeftValue ) );
 			return ( log10 ( l_dLeftValue ) );
 			}
-		case ( D_ABS ):
+		case ( FUNCTIONS::D_ABS ):
 			{
 			if ( l_dLeftValue < 0 )
 				return ( - l_dLeftValue );
@@ -567,7 +570,7 @@ bool HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 			if ( addition_production ( a_poNode->grow_up_branch ( ) ) )
 				return ( true );
 			a_poNode->METHOD = & HAnalyser::functions;
-			a_poNode->f_tLeaf.add_tail ( ) = reinterpret_cast < double * > ( D_ABS );
+			a_poNode->f_tLeaf.add_tail ( ) = reinterpret_cast < double * > ( FUNCTIONS::D_ABS );
 			if ( f_oFormula [ f_iIndex ] != '|' )
 				{
 				f_eError = E_CLOSING_ABSOLUTE_EXPECTED;
@@ -586,8 +589,8 @@ bool HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 		a_poNode->f_tLeaf.add_tail ( ) = f_pdVariables + f_oFormula [ f_iIndex ++ ] - 'A';
 		return ( false );
 		}
-	if ( ( f_oFormula [ f_iIndex ] > D_FUNCTIONS )
-			&& ( f_oFormula [ f_iIndex ] < D_ABS ) )
+	if ( ( f_oFormula [ f_iIndex ] > FUNCTIONS::D_FUNCTIONS )
+			&& ( f_oFormula [ f_iIndex ] < FUNCTIONS::D_ABS ) )
 		{
 		f_iIndex ++;
 		if ( f_oFormula [ f_iIndex ] == '(' )
