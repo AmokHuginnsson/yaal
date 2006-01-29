@@ -159,7 +159,7 @@ void enter_curses( void )
 			M_IRV ( init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
 						l_piColors [ l_iFg ], l_piColors [ l_iBg ] ) );
 	attrset ( COLOR_PAIR( 7 ) );
-	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) | A_INVIS ) ); /* meaningless value from macro */
+	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( COLORS::D_FG_BLACK | COLORS::D_BG_BLACK ) | A_INVIS ) ); /* meaningless value from macro */
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( getenv ( "STDHAPI_NO_MOUSE" ) )
