@@ -131,7 +131,7 @@ void HEditControl::refresh ( void )
 		{
 		M_ENSURE ( c_move ( f_iRowRaw,
 					f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) ) != C_ERR );
-		M_IRV ( curs_set ( f_bReplace ? D_CURSOR_VERY_VISIBLE : D_CURSOR_VISIBLE ) );
+		M_IRV ( curs_set ( f_bReplace ? CURSOR::D_CURSOR_VERY_VISIBLE : CURSOR::D_CURSOR_VISIBLE ) );
 		}
 	return;
 	M_EPILOG

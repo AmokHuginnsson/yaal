@@ -140,7 +140,7 @@ void HListControl::refresh ( void )
 	HColumnInfo * l_poColumnInfo = NULL;
 	l_iTmp = f_iWidthRaw;
 	if ( f_bFocused )
-		M_IRV ( curs_set ( D_CURSOR_INVISIBLE ) );
+		M_IRV ( curs_set ( CURSOR::D_CURSOR_INVISIBLE ) );
 	draw_label ( );
 	if ( ! f_iSumForOne )
 		return;

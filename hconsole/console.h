@@ -73,11 +73,16 @@ struct GLYPHS
 		} glyph_t;
 	};
 
-#define D_CURSOR_INVISIBLE		0
-#define D_CURSOR_VISIBLE			1
-#define D_CURSOR_VERY_VISIBLE	2
+struct CURSOR
+	{
+	typedef enum
+		{
+		D_CURSOR_INVISIBLE, 
+		D_CURSOR_VISIBLE, 
+		D_CURSOR_VERY_VISIBLE
+		} cursor_t;
+	};
 
-#define D_ATTR_DEFAULT			( - 1 )
 
 struct COLORS
 	{
@@ -109,10 +114,8 @@ struct COLORS
 	int const static D_BG_BLINK					= 128;
 	int const static D_BG_GRAY					= D_BG_BLINK;
 	int const static D_ATTR_NORMAL			= ( D_FG_LIGHTGRAY | D_BG_BLACK );
+	int const static D_ATTR_DEFAULT			= - 1;
 	};
-
-#define D_KEY_REFRESH				D_KEY_CTRL_L
-#define D_KEY_RESIZE				D_KEY_CTRL_L
 
 #define	D_KEY_META_(n)			( ( n ) + KEY_CODES::D_META_BASE )
 #define D_KEY_CTRL_(n)			( ( n ) - 96 )

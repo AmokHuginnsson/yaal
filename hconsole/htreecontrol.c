@@ -135,7 +135,7 @@ void HTreeControl::refresh ( void )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( f_bFocused )
-		curs_set ( D_CURSOR_INVISIBLE );
+		curs_set ( CURSOR::D_CURSOR_INVISIBLE );
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer.raw ( ), '_', f_iWidthRaw );

@@ -150,7 +150,7 @@ void enter_curses( void )
 	immedok ( stdscr, false );
 	M_ENSURE ( fflush ( NULL ) == 0 );
 	M_IRV ( flushinp ( ) ); /* Always returns OK */
-	M_IRV ( curs_set ( D_CURSOR_INVISIBLE ) );
+	M_IRV ( curs_set ( CURSOR::D_CURSOR_INVISIBLE ) );
 	M_ENSURE ( refresh ( ) != ERR );
 	/* init color pairs */
 	M_ENSURE ( assume_default_colors ( COLOR_BLACK, COLOR_BLACK ) == OK );
@@ -210,7 +210,7 @@ void leave_curses( void )
 	standend ( );
 	M_ENSURE ( keypad ( stdscr, false ) != ERR );
 	M_ENSURE ( nocbreak ( ) != ERR );
-	M_IRV ( curs_set ( D_CURSOR_VISIBLE ) );
+	M_IRV ( curs_set ( CURSOR::D_CURSOR_VISIBLE ) );
 /*	reset_shell_mode ( ); */
 /* see comment near def_shell_mode ( ), ( automagicly by endwin ( ) ) */
 /*
@@ -380,7 +380,7 @@ int get_key ( void )
 	M_PROLOG
 	int l_iKey = 0;
 	int l_iChar = 0;
-	int l_iOrigCursState = D_CURSOR_INVISIBLE;
+	int l_iOrigCursState = CURSOR::D_CURSOR_INVISIBLE;
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", g_iErrNo );
 	M_ENSURE ( noecho() != ERR );
@@ -398,7 +398,7 @@ int get_key ( void )
 		}
 	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
 		{
-		l_iOrigCursState = curs_set ( D_CURSOR_INVISIBLE );
+		l_iOrigCursState = curs_set ( CURSOR::D_CURSOR_INVISIBLE );
 		M_IRV ( c_printf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
 					n_cCommandComposeCharacter ) );
 		timeout ( n_iCommandComposeDelay * 100 );
