@@ -37,7 +37,7 @@ namespace hconsole
 {
 
 HLogPad::HLogLine::HLogLine ( void )
-	: f_eType ( D_NONE ), f_iAttribute ( - 1 ), f_oText ( )
+	: f_eType ( D_NONE ), f_iAttribute ( COLORS::D_ATTR_NORMAL ), f_oText ( )
 	{
 	M_PROLOG
 	return;
@@ -79,7 +79,7 @@ void HLogPad::refresh ( void )
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer.raw ( ), ' ', f_iWidthRaw );
 	f_oVarTmpBuffer.raw ( ) [ f_iWidthRaw ] = 0;
-	f_iAttribute = COLORS::D_FG_BLACK | l_iBG;
+	f_iAttribute = COLORS::D_ATTR_NORMAL | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		c_printf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );
 	if ( f_oContents.quantity ( ) )
