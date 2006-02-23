@@ -56,29 +56,29 @@ namespace tools
 
 struct FUNCTIONS
 	{
-	int const static D_FUNCTIONS = 0;
-	int const static D_SIN = 2;
-	int const static D_SINH = 1;
-	int const static D_COS = 4;
-	int const static D_COSH = 3;
-	int const static D_TG = 6;
-	int const static D_TGH = 5;
-	int const static D_CTG = 8;
-	int const static D_CTGH = 7;
-	int const static D_ARCSIN = 9;
-	int const static D_ARCCOS = 10;
-	int const static D_ARCTG = 11;
-	int const static D_ARCCTG = 12;
-	int const static D_EXP = 13;
-	int const static D_SQRT = 14;
-	int const static D_LN = 15;
-	int const static D_LOG = 16;
-	int const static D_ABS = 17;
-	int const static D_ADDITION = 1;
-	int const static D_MULTIPLICATION = 2;
-	int const static D_POWER = 3;
-	int const static D_SIGNUM = 4;
-	int const static D_BRACKET = 5;
+	static int const D_FUNCTIONS = 0;
+	static int const D_SIN = 2;
+	static int const D_SINH = 1;
+	static int const D_COS = 4;
+	static int const D_COSH = 3;
+	static int const D_TG = 6;
+	static int const D_TGH = 5;
+	static int const D_CTG = 8;
+	static int const D_CTGH = 7;
+	static int const D_ARCSIN = 9;
+	static int const D_ARCCOS = 10;
+	static int const D_ARCTG = 11;
+	static int const D_ARCCTG = 12;
+	static int const D_EXP = 13;
+	static int const D_SQRT = 14;
+	static int const D_LN = 15;
+	static int const D_LOG = 16;
+	static int const D_ABS = 17;
+	static int const D_ADDITION = 1;
+	static int const D_MULTIPLICATION = 2;
+	static int const D_POWER = 3;
+	static int const D_SIGNUM = 4;
+	static int const D_BRACKET = 5;
 	};
 	
 #define M_COUNT_BRANCH( arg ) count_branch ( dynamic_cast < HAnalyserNode * > ( arg ) )

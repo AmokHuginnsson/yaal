@@ -46,21 +46,21 @@ extern int const C_ERR;
 
 struct KEY_CODES
 	{
-	int const static D_ESC					= 27;
-	int const static D_PAGE_UP			= 256;
-	int const static D_PAGE_DOWN		= D_PAGE_UP		+ 1;
-	int const static D_DOWN					= D_PAGE_DOWN	+ 1;
-	int const static D_UP						= D_DOWN			+ 1;
-	int const static D_LEFT					= D_UP				+ 1;
-	int const static D_RIGHT				= D_LEFT			+ 1;
-	int const static D_HOME					= D_RIGHT			+ 1;
-	int const static D_END					= D_HOME			+ 1;
-	int const static D_DELETE				= D_END				+ 1;
-	int const static D_INSERT				= D_DELETE		+ 1;
-	int const static D_BACKSPACE		= D_INSERT		+ 1;
-	int const static D_MOUSE				=	D_BACKSPACE	+ 1;
-	int const static D_META_BASE		= 0x04000;
-	int const static D_COMMAND_BASE	= 0x08000;
+	static int const D_ESC					= 27;
+	static int const D_PAGE_UP			= 256;
+	static int const D_PAGE_DOWN		= D_PAGE_UP		+ 1;
+	static int const D_DOWN					= D_PAGE_DOWN	+ 1;
+	static int const D_UP						= D_DOWN			+ 1;
+	static int const D_LEFT					= D_UP				+ 1;
+	static int const D_RIGHT				= D_LEFT			+ 1;
+	static int const D_HOME					= D_RIGHT			+ 1;
+	static int const D_END					= D_HOME			+ 1;
+	static int const D_DELETE				= D_END				+ 1;
+	static int const D_INSERT				= D_DELETE		+ 1;
+	static int const D_BACKSPACE		= D_INSERT		+ 1;
+	static int const D_MOUSE				=	D_BACKSPACE	+ 1;
+	static int const D_META_BASE		= 0x04000;
+	static int const D_COMMAND_BASE	= 0x08000;
 	};
 
 struct GLYPHS
@@ -86,35 +86,35 @@ struct CURSOR
 
 struct COLORS
 	{
-	int const static D_FG_BLACK					= 0;
-	int const static D_FG_RED						= 1;
-	int const static D_FG_GREEN					= 2;
-	int const static D_FG_BROWN					= 3;
-	int const static D_FG_BLUE					= 4;
-	int const static D_FG_MAGENTA				= 5;
-	int const static D_FG_CYAN					= 6;
-	int const static D_FG_LIGHTGRAY			= 7;
-	int const static D_FG_GRAY					= 8;
-	int const static D_FG_BRIGHTRED			= 9;
-	int const static D_FG_BRIGHTGREEN		= 10;
-	int const static D_FG_YELLOW				= 11;
-	int const static D_FG_BRIGHTBLUE		= 12;
-	int const static D_FG_BRIGHTMAGENTA	= 13;
-	int const static D_FG_BRIGHTCYAN		= 14;
-	int const static D_FG_WHITE					= 15;
+	static int const D_FG_BLACK					= 0;
+	static int const D_FG_RED						= 1;
+	static int const D_FG_GREEN					= 2;
+	static int const D_FG_BROWN					= 3;
+	static int const D_FG_BLUE					= 4;
+	static int const D_FG_MAGENTA				= 5;
+	static int const D_FG_CYAN					= 6;
+	static int const D_FG_LIGHTGRAY			= 7;
+	static int const D_FG_GRAY					= 8;
+	static int const D_FG_BRIGHTRED			= 9;
+	static int const D_FG_BRIGHTGREEN		= 10;
+	static int const D_FG_YELLOW				= 11;
+	static int const D_FG_BRIGHTBLUE		= 12;
+	static int const D_FG_BRIGHTMAGENTA	= 13;
+	static int const D_FG_BRIGHTCYAN		= 14;
+	static int const D_FG_WHITE					= 15;
 
-	int const static D_BG_BLACK					= 0;
-	int const static D_BG_RED						= 16;
-	int const static D_BG_GREEN					= 32;
-	int const static D_BG_BROWN					= 48;
-	int const static D_BG_BLUE					= 64;
-	int const static D_BG_MAGENTA				= 80;
-	int const static D_BG_CYAN					= 96;
-	int const static D_BG_LIGHTGRAY			= 112;
-	int const static D_BG_BLINK					= 128;
-	int const static D_BG_GRAY					= D_BG_BLINK;
-	int const static D_ATTR_NORMAL			= ( D_FG_LIGHTGRAY | D_BG_BLACK );
-	int const static D_ATTR_DEFAULT			= - 1;
+	static int const D_BG_BLACK					= 0;
+	static int const D_BG_RED						= 16;
+	static int const D_BG_GREEN					= 32;
+	static int const D_BG_BROWN					= 48;
+	static int const D_BG_BLUE					= 64;
+	static int const D_BG_MAGENTA				= 80;
+	static int const D_BG_CYAN					= 96;
+	static int const D_BG_LIGHTGRAY			= 112;
+	static int const D_BG_BLINK					= 128;
+	static int const D_BG_GRAY					= D_BG_BLINK;
+	static int const D_ATTR_NORMAL			= ( D_FG_LIGHTGRAY | D_BG_BLACK );
+	static int const D_ATTR_DEFAULT			= - 1;
 	};
 
 #define	D_KEY_META_(n)			( ( n ) + KEY_CODES::D_META_BASE )
