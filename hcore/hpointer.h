@@ -47,7 +47,7 @@ class HPointer
 		tType * f_ptPointer;
 		int f_iReferenceCounter;
 		bool f_bArray;
-		explicit HShared ( tType const * const );
+		explicit HShared ( tType * const );
 		virtual ~HShared ( void );
 		bool release ( void );
 		friend class HPointer;
@@ -58,7 +58,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	explicit HPointer ( tType const * const );
+	explicit HPointer ( tType * const );
 	virtual ~HPointer ( void );
 	HPointer ( HPointer const & );
 	HPointer & operator = ( HPointer const & );
@@ -69,7 +69,7 @@ public:
 	};
 
 template < typename tType, bool array >
-HPointer < tType, array >::HShared::HShared ( tType const * const a_ptPointer )
+HPointer < tType, array >::HShared::HShared ( tType * const a_ptPointer )
 	: f_ptPointer ( a_ptPointer ), f_iReferenceCounter ( 1 ), f_bArray ( array )
 	{
 	M_ASSERT ( f_ptPointer );
@@ -79,8 +79,7 @@ HPointer < tType, array >::HShared::HShared ( tType const * const a_ptPointer )
 template < typename tType, bool array >
 HPointer < tType, array >::HShared::~HShared ( void )
 	{
-	M_ASSERT ( f_iReferenceCounter == 1 );
-	release ( );
+	M_ASSERT ( f_iReferenceCounter == 0 );
 	return;
 	}
 
@@ -101,7 +100,7 @@ bool HPointer < tType, array >::HShared::release ( void )
 	}
 
 template < typename tType, bool array >
-HPointer < tType, array >::HPointer ( tType const * const a_ptPointer )
+HPointer < tType, array >::HPointer ( tType * const a_ptPointer )
 	: f_poShared ( new HShared ( a_ptPointer ) )
 	{
 	return;
