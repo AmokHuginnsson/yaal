@@ -136,7 +136,7 @@ HXmlData::HXmlData ( HXmlData const & a_roXml ) : f_psDoc ( NULL ),
 HXmlData & HXmlData::operator = ( HXmlData const & )
 	{
 	M_PROLOG
-	M_THROW ( "This method should not be called.", g_iErrNo );
+	M_ASSERT ( ! "This method should not be called." );
 	M_EPILOG
 	}
 
@@ -496,7 +496,7 @@ char const * HXml::next_property ( HString & a_rsNode )
 		}
 	if ( f_poXml->f_psProperties )
 		f_poXml->f_psProperties = f_poXml->f_psProperties->next;
-	else if ( l_psNode && l_psNode->properties )
+	else if ( l_psNode &&  ( l_psNode->type == XML_ATTRIBUTE_NODE ) && l_psNode->properties )
 		f_poXml->f_psProperties = l_psNode->properties;
 	return ( l_pcName );
 	M_EPILOG
@@ -510,7 +510,7 @@ int HXml::iterate ( ONode & a_rsNode )
 	l_psNode = f_poXml->f_psNode;
 	if ( l_psNode )
 		{
-		while ( ! l_psNode->name )
+		while ( ! l_psNode->name || ( l_psNode->type == XML_DTD_NODE ) )
 			{
 			if ( ( l_psNode = f_poXml->next_node ( f_poXml->f_psNode, f_iLevel ) ) )
 				f_poXml->f_psNode = l_psNode;
@@ -522,7 +522,10 @@ int HXml::iterate ( ONode & a_rsNode )
 		if ( l_psNode )
 			{
 			f_poXml->f_psNode = l_psNode;
-			f_poXml->f_psProperties = f_poXml->f_psNode->properties;
+			if ( f_poXml->f_psNode->type == XML_ATTRIBUTE_NODE )
+				f_poXml->f_psProperties = f_poXml->f_psNode->properties;
+			else
+				f_poXml->f_psProperties = NULL;
 			}
 		if ( l_pcName )
 			{

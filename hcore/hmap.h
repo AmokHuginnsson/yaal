@@ -123,7 +123,7 @@ HMap<tType, ttType>::HAtom::~HAtom ( void )
 	}
 
 template < typename tType, typename ttType >
-HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( a_uiSize ), f_uiIndex ( 0 ),
+HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( 0 ), f_uiIndex ( 0 ),
 	f_iQuantity ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
 	M_PROLOG
@@ -135,12 +135,7 @@ HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( a_uiSize ), f_uiInde
 		a_uiSize >>= 1;
 		l_uiCtr ++;
 		}
-	a_uiSize = g_pulPrimes [ l_uiCtr - 1 ];
-#ifdef __DEBUGGER_BABUNI__
-	HString l_oMessage;
-	l_oMessage.format ( "map prime = %ld", a_uiSize );
-	M_LOG ( ( char * ) l_oMessage );
-#endif /* __DEBUGGER_BABUNI__ */
+	f_uiPrime = g_pulPrimes [ l_uiCtr - 1 ];
 	f_ppoAtomArray = xcalloc < HAtom * > ( f_uiPrime );
 	return;
 	M_EPILOG
@@ -192,11 +187,6 @@ ttType & HMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
 	int l_iHash = - 1;
 	HAtom * l_poAtom = NULL;
 	l_iHash = hash ( a_rtKey ) % f_uiPrime;
-#ifdef __DEBUGGER_BABUNI__
-	HString l_oMessage;
-	l_oMessage.format ( "hash = %d", l_iHash );
-	M_LOG ( ( char * ) l_oMessage );
-#endif /* __DEBUGGER_BABUNI__ */
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
 	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		l_poAtom = l_poAtom->f_poNext;
