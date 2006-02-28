@@ -50,6 +50,8 @@ class HPointer
 		explicit HShared ( tType * const );
 		virtual ~HShared ( void );
 		bool release ( void );
+		HShared ( HShared const & );
+		HShared & operator = ( HShared const & );
 		friend class HPointer;
 		};
 protected:

@@ -52,10 +52,11 @@ void * HDataXml::parse ( void * )
 	M_EPILOG
 	}
 
-OMenuItem * HDataXml::build_menu ( menu_handlers_map_t const & a_roHandlers,
-		ONode & a_rsNode )
+OMenuItem * HDataXml::build_menu ( menu_handlers_map_t const & /*a_roHandlers*/,
+		ONode & /*a_rsNode*/ )
 	{
 	M_PROLOG
+#if 0
 	bool l_bRepeat = false;
 	int l_iLevel = 0, l_iLevelOld = - 1;
 	int l_iCtr = 0, l_iCount = 0;
@@ -118,6 +119,8 @@ OMenuItem * HDataXml::build_menu ( menu_handlers_map_t const & a_roHandlers,
 	for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 		l_psMenu [ l_iCtr ] = ( * l_oSubMenu.to_tail ( ) );
 	return ( l_psMenu );
+#endif
+	return ( 0 );
 	M_EPILOG
 	}
 

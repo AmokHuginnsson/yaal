@@ -27,10 +27,10 @@ Copyright:
 #ifndef __TOOLS_HXML_H
 #define __TOOLS_HXML_H
 
-#include <iconv.h>
-
 #include "hcore/hstring.h"
 #include "hcore/hmap.h"
+#include "hcore/hlist.h"
+#include "hcore/hpointer.h"
 
 namespace stdhapi
 {
@@ -38,7 +38,7 @@ namespace stdhapi
 namespace tools
 {
 
-#define D_HXML_PROPERTIES_MAP_SIZE	16
+static int const D_HXML_PROPERTIES_MAP_SIZE = 16;
 	
 class HXmlData;
 
@@ -47,52 +47,56 @@ class HXml
 public:
 	struct ONode
 		{
+		typedef enum
+			{
+			D_NODE,
+			D_CONTENT
+			} type_t;
 		int f_iLevel;
 		stdhapi::hcore::HString	f_oName;
-		stdhapi::hcore::HString	f_oContents;
+		stdhapi::hcore::HList < stdhapi::hcore::HString > f_oContents;
 		stdhapi::hcore::HMap < stdhapi::hcore::HString,
 			stdhapi::hcore::HString > f_oProperties;
+		stdhapi::hcore::HList < ONode > f_oChilds;
+		stdhapi::hcore::HList < type_t > f_oTypes;
 		ONode ( void ) : f_iLevel ( - 1 ), f_oName ( ), f_oContents ( ),
-								f_oProperties ( D_HXML_PROPERTIES_MAP_SIZE ) { }
+								f_oProperties ( D_HXML_PROPERTIES_MAP_SIZE ), f_oChilds ( ), f_oTypes ( ) { }
 		void reset ( void )
 			{
 			M_PROLOG
 			f_iLevel = - 1;
 			f_oName = "";
-			f_oContents = "";
+			f_oContents.flush ( );
 			f_oProperties.flush ( );
+			f_oChilds.flush ( );
+			f_oTypes.flush ( );
 			return;
 			M_EPILOG
 			}
 		};
 protected:
 	/*{*/
+	struct OConvert;
 	typedef void * xml_node_ptr_t;
 	typedef enum { D_IN, D_OUT } way_t;
-	int											f_iIndex; /* index of last accessed node in nodeset */
-	int											f_iLevel; /* level of -||- ... */
-	iconv_t									f_xIconvIn;
-	iconv_t									f_xIconvOut;
+	stdhapi::hcore::HPointer<OConvert> f_oConvert;
 	stdhapi::hcore::HString	f_oConvertedString;
 	stdhapi::hcore::HString	f_oVarTmpBuffer;
-	stdhapi::hcore::HString	f_oPath;
 	HXmlData *							f_poXml;
+	ONode										f_oRoot;
 	/*}*/
 public:
 	/*{*/
 	HXml ( void );
 	virtual ~ HXml ( void );
 	void init ( char const * );
-	virtual void * parse ( void * ) = 0;
-	int iterate ( ONode &, char const *, bool = true );
+	ONode & parse ( char const * const = NULL, bool = true );
+	ONode & get_root ( void );
 	/*}*/
 protected:
 	/*{*/
-	char const * next_property ( stdhapi::hcore::HString & );
-	int iterate ( ONode & );
+	void parse ( xml_node_ptr_t, ONode &, int, bool );
 	char const * convert ( char const *, way_t = D_OUT );
-	char const * get_leaf_by_name ( int, char const * );
-	char const * get_leaf_by_name ( xml_node_ptr_t, char const * );
 	int get_node_set_by_path ( char const * );
 	/*}*/
 private:

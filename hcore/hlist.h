@@ -259,7 +259,8 @@ tType & HList< tType >::HElement::get ( void )
 
 template < typename tType >
 HList< tType >::HList ( int a_iSize )
-	: f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
+	: OListTreatment ( ),
+	f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
 	f_iIndex ( 0 ), f_poIndex ( NULL ), IS_ABOVE ( NULL )
 	{
@@ -281,7 +282,8 @@ HList< tType >::~HList ( void )
 
 template < typename tType >
 HList< tType >::HList ( HList < tType > const & a_roList )
-	: f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
+	: OListTreatment ( ),
+	f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
 	f_iIndex ( 0 ), f_poIndex ( NULL ), IS_ABOVE ( NULL )
 	{

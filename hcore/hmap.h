@@ -88,7 +88,9 @@ protected:
 public:
 	/*{*/
 	HMap ( size_t ); /* Lower bound of size of map's table */
+	HMap ( HMap const & );
 	virtual ~HMap ( void );
+	HMap & operator = ( HMap const & );
 	ttType & operator [ ] ( tType const & );
 	void rewind ( void );
 	bool iterate ( tType &, ttType & );
@@ -100,8 +102,6 @@ public:
 	/*}*/
 private:
 	/*{*/
-	HMap ( HMap const & );
-	HMap & operator = ( HMap const & );
 	/*}*/
 	};
 
@@ -142,6 +142,16 @@ HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( 0 ), f_uiIndex ( 0 )
 	}
 
 template < typename tType, typename ttType >
+HMap<tType, ttType>::HMap ( HMap const & a_roMap ) :  f_uiPrime ( 0 ), f_uiIndex ( 0 ),
+	f_iQuantity ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
+	{
+	M_PROLOG
+	operator = ( a_roMap );
+	return;
+	M_EPILOG
+	}
+
+template < typename tType, typename ttType >
 HMap<tType, ttType>::~HMap ( void )
 	{
 	M_PROLOG
@@ -150,6 +160,43 @@ HMap<tType, ttType>::~HMap ( void )
 		xfree ( f_ppoAtomArray );
 	f_ppoAtomArray = NULL;
 	return;
+	M_EPILOG
+	}
+
+template < typename tType, typename ttType >
+HMap<tType, ttType> & HMap<tType, ttType>::operator = ( HMap const & a_roMap )
+	{
+	M_PROLOG
+	int unsigned l_iCtr = 0;
+	HAtom * l_poAtom = NULL;
+	HAtom ** l_ppoAtom = NULL;
+	if ( & a_roMap != this )
+		{
+		flush ( );
+		if ( f_ppoAtomArray )
+			xfree ( f_ppoAtomArray );
+		f_ppoAtomArray = NULL;
+		f_uiPrime = a_roMap.f_uiPrime;
+		f_uiIndex = a_roMap.f_uiIndex;
+		f_iQuantity = a_roMap.f_iQuantity;
+		f_ppoAtomArray = xcalloc < HAtom * > ( f_uiPrime );
+		for ( l_iCtr = 0; l_iCtr < f_uiPrime; ++ l_iCtr )
+			{
+			l_poAtom =  a_roMap.f_ppoAtomArray [ l_iCtr ];
+			l_ppoAtom = & f_ppoAtomArray [ l_iCtr ];
+			while ( l_poAtom )
+				{
+				( * l_ppoAtom ) = new ( std::nothrow ) HAtom ();
+				( * l_ppoAtom )->f_tKey = l_poAtom->f_tKey;
+				( * l_ppoAtom )->f_tValue = l_poAtom->f_tValue;
+				if ( l_poAtom == a_roMap.f_poAtomPtr )
+					f_poAtomPtr = ( * l_ppoAtom );
+				l_ppoAtom = & ( * l_ppoAtom )->f_poNext;
+				l_poAtom = l_poAtom->f_poNext;
+				}
+			}
+		}
+	return ( * this );
 	M_EPILOG
 	}
 
