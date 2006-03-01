@@ -299,15 +299,22 @@ HList< tType > & HList< tType >::operator = ( HList < tType > const & a_roList )
 	M_PROLOG
 	int l_iCtr = 0;
 	int l_iCount = 0;
+	int l_iIndex = 0;
 	HList * l_poList = NULL;
+	HElement * l_poSelected = NULL;
+	HElement * l_poNewSelected = NULL;
+	HElement * l_poIndex = NULL;
 	if ( this != & a_roList )
 		{
 		l_iCount = f_iQuantity < a_roList.f_iQuantity ? f_iQuantity
 																										: a_roList.f_iQuantity;
 		/* I have to do this cast because to_tail modifies f_poSelected and
 		 * declaring it (to_tail) const would be false, but after full loop
-		 * of to_tail(s) obejct is unmofifiad */
+		 * of to_tail's obejct is unmodified */
 		l_poList = const_cast < HList * > ( & a_roList );
+		l_poSelected = a_roList.f_poSelected;
+		l_poIndex = a_roList.f_poIndex;
+		l_iIndex = a_roList.f_iIndex;
 		if ( l_iCount )
 			{
 			M_IRV ( go ( - 1 ) );
@@ -315,10 +322,12 @@ HList< tType > & HList< tType >::operator = ( HList < tType > const & a_roList )
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )	
 				{
 				( * to_tail ( ) ) = ( * l_poList->to_tail ( ) );
-				if ( a_roList.f_poHook == a_roList.f_poSelected )
+				if ( a_roList.f_poSelected == a_roList.f_poHook )
 					f_poHook = f_poSelected;
-				if ( a_roList.f_poIndex == a_roList.f_poSelected )
-					f_poIndex = f_poSelected;
+				if ( a_roList.f_poSelected == l_poIndex )
+					l_poIndex = f_poSelected;
+				if ( a_roList.f_poSelected == l_poSelected )
+					l_poNewSelected = f_poSelected;
 				}
 			}
 		else if ( a_roList.f_iQuantity )
@@ -334,14 +343,18 @@ HList< tType > & HList< tType >::operator = ( HList < tType > const & a_roList )
 			for ( ; l_iCtr < a_roList.f_iQuantity; l_iCtr ++ )	
 				{
 				M_IRV ( add_tail ( l_poList->to_tail ( ) ) );
-				if ( a_roList.f_poHook == a_roList.f_poSelected )
+				if ( a_roList.f_poSelected == a_roList.f_poHook )
 					f_poHook = f_poSelected;
-				if ( a_roList.f_poIndex == a_roList.f_poSelected )
-					f_poIndex = f_poSelected;
+				if ( a_roList.f_poSelected == l_poIndex )
+					l_poIndex = f_poSelected;
+				if ( a_roList.f_poSelected == l_poSelected )
+					l_poNewSelected = f_poSelected;
 				}
 			}
+		f_poSelected = l_poNewSelected ? l_poNewSelected : f_poHook;
+		f_iIndex = l_iIndex;
+		f_poIndex = l_poIndex;
 		f_eOrder = a_roList.f_eOrder;
-		f_iIndex = a_roList.f_iIndex;
 		f_iQuantity = a_roList.f_iQuantity;
 		f_iHighestNumber = a_roList.f_iHighestNumber;
 		f_iError = a_roList.f_iError;
