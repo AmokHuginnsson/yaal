@@ -48,28 +48,10 @@ namespace hdata
 typedef stdhapi::hcore::HMap < stdhapi::hcore::HString,
 				stdhapi::hconsole::OMenuItem::HANDLER_t > menu_handlers_map_t;
 
-class HDataXml : public tools::HXml
-	{
-protected:
-	/*{*/
-	/*}*/
-public:
-	/*{*/
-	virtual void * parse ( void * );
-	stdhapi::hconsole::OMenuItem * build_menu ( menu_handlers_map_t const &,
-			ONode & );
-	void destroy_menu ( stdhapi::hconsole::OMenuItem * );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
-	};
-
 class HDataProcess : public hconsole::HTUIProcess
 	{
 protected:
 	/*{*/
-	HDataXml	f_oXml;
 	dbwrapper::HDataBase f_oDataBase;
 	/*}*/
 private:
@@ -88,6 +70,9 @@ protected:
 	/*{*/
 	virtual int handler_quit ( int, void * = NULL );
 	virtual int handler_close_window ( int, void * = NULL );
+	stdhapi::hconsole::OMenuItem * build_menu ( stdhapi::tools::HXml::ONode &,
+			menu_handlers_map_t const & );
+	void destroy_menu ( stdhapi::hconsole::OMenuItem * );
 	/*}*/
 private:
 	/*{*/

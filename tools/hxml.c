@@ -88,6 +88,18 @@ struct HXml::OConvert
 	OConvert ( void ) 
 		: f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
 		f_xIconvOut ( static_cast < iconv_t > ( 0 ) ) { }
+	OConvert ( OConvert const & a_roConvert )
+		: f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
+		f_xIconvOut ( static_cast < iconv_t > ( 0 ) )
+		{
+		operator = ( a_roConvert );
+		}
+	OConvert & operator = ( OConvert const & a_roConvert )
+		{
+		f_xIconvIn = a_roConvert.f_xIconvIn;
+		f_xIconvOut = a_roConvert.f_xIconvOut;
+		return ( * this );
+		}
 	};
 
 }
@@ -443,6 +455,7 @@ HXml::ONode & HXml::parse ( char const * a_pcXPath, bool a_bStripEmpty )
 				{
 				parse ( f_poXml->f_psNodeSet->nodeTab [ l_iCtr ],
 						f_oRoot.f_oChilds.add_tail ( ), l_iLevel, a_bStripEmpty );
+				f_oRoot.f_iLevel = 0;
 				f_oRoot.f_oTypes.add_tail ( ) = ONode::D_NODE;
 				}
 			}
