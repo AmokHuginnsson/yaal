@@ -134,10 +134,6 @@ void HDataProcess::build_menu_item ( HXml::ONode & a_rsNode,
 		for ( l_psNode = & a_rsNode.f_oChilds.go ( 0 ); l_psNode;
 				l_psNode = a_rsNode.f_oChilds.to_tail ( 1, HList<HXml::ONode>::D_TREAT_AS_OPENED ) )
 			{
-			if ( l_psNode->f_oContents.quantity ( ) )
-				log_trace << "name: " << l_psNode->f_oName << ", level: " << l_psNode->f_iLevel << ", content: " << l_psNode->f_oContents.head ( ) << endl;
-			else
-				log_trace << "name: " << l_psNode->f_oName << ", level: " << l_psNode->f_iLevel << ", content: " << endl;
 			if ( l_psNode->f_oName == "label" )
 				a_rsMenuItem.f_oLabel = l_psNode->f_oContents.head ( );
 			else if ( l_psNode->f_oName == "handler" )
