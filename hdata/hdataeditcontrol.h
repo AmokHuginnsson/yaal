@@ -51,7 +51,7 @@ public:
 								char const * = "",	/* label */
 								int = 127,					/* maximum string length */
 								char const * = "",	/* initial content */
-								char const * = D_MASK_DEFAULT, /* mask */
+								char const * = stdhapi::hconsole::n_pcMaskDefault, /* mask */
 								bool = false,				/* replace */
 								bool = false,				/* multiline */
 								bool = false,				/* read only */

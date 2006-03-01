@@ -57,7 +57,7 @@ public:
 										 char const *,	/* label */
 										 int = 0, 			/* dropped width */
 										 int = 127,			/* max string length */
-										 char const * = D_MASK_DEFAULT,	/* regexp (mask) */
+										 char const * = n_pcMaskDefault,	/* regexp (mask) */
 										 bool = false,	/* checkable */
 										 bool = true,		/* sortable */
 										 bool = true,		/* searchable */

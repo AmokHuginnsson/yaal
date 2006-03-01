@@ -216,10 +216,10 @@ double const HInfo::get < double > ( void ) const
 	}
 
 template < >
-char const * const HInfo::get < char const * > ( void ) const
+char const * const HInfo::get < char const * const > ( void ) const
 	{
 	M_PROLOG
-	return ( static_cast < char const * > ( f_oString ) );
+	return ( static_cast < char const * const > ( f_oString ) );
 	M_EPILOG
 	}
 

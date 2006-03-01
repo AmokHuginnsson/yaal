@@ -100,7 +100,7 @@ int HDataWindow::init ( void )
 	M_PROLOG
 	int l_iCtr = 0;
 	char l_pcValue [ ] = "";
-	char l_pcMask [ ] = D_MASK_DEFAULT;
+	char const * l_pcMask = n_pcMaskDefault;
 	HDataControl * l_poDataControl = NULL;
 	OAttributes l_sAttributes, * l_psAttr = & l_sAttributes;
 	OEditControlResource l_sEditControlResource;

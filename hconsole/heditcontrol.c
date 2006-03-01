@@ -42,6 +42,13 @@ namespace stdhapi
 namespace hconsole
 {
 
+char const * const n_pcMaskLetters  = "^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$";
+char const * const n_pcMaskDigits   = "^[0-9]*$";
+char const * const n_pcMaskAlpha    = "^[a-zA-Z0-9]*$";
+char const * const n_pcMaskExtended = "^[0-9a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ\\.\\(\\) -]*$";
+char const * const n_pcMaskLoose    = ".*";
+char const * const n_pcMaskDefault  = n_pcMaskLetters;
+
 HEditControl::HEditControl( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
 		char const * a_pcLabel, int a_iBufferSize, char const * a_pcValue,
@@ -511,7 +518,7 @@ void HEditControl::set ( HInfo const & a_roInfo )
 	M_PROLOG
 	int l_iErrorCode = 0;
 	int l_iLength = 0;
-	char const * l_pcString = a_roInfo.get < char const * > ( );
+	char const * l_pcString = a_roInfo.get < char const * const > ( );
 	HString l_oErrorMessage;
 	M_IRV ( f_oPattern.matches ( l_pcString, NULL, & l_iErrorCode ) );
 	if ( l_iErrorCode )

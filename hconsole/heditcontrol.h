@@ -37,12 +37,12 @@ namespace stdhapi
 namespace hconsole
 {
 
-#define D_MASK_LETTERS	"^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$"
-#define D_MASK_DIGITS		"^[0-9]*$"
-#define D_MASK_APLPHA		"^[a-zA-Z0-9]*$"
-#define D_MASK_EXTENDED	"^[0-9a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ\\.\\(\\) -]*$"
-#define D_MASK_LOOSE		".*"
-#define D_MASK_DEFAULT	D_MASK_LETTERS
+extern char const * const n_pcMaskLetters;
+extern char const * const n_pcMaskDigits;
+extern char const * const n_pcMaskAlpha;
+extern char const * const n_pcMaskExtended;
+extern char const * const n_pcMaskLoose;
+extern char const * const n_pcMaskDefault;
 
 class HEditControl : public virtual HControl
 	{
@@ -79,7 +79,7 @@ public:
 								char const * = "",	/* label */
 								int = 127,					/* maximum string length */
 								char const * = "",	/* initial content */
-								char const * = D_MASK_DEFAULT, /* mask */
+								char const * = n_pcMaskDefault, /* mask */
 								bool = false,				/* replace */
 								bool = false,				/* multiline */
 								bool = false,				/* readonly */
