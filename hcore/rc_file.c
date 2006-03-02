@@ -167,7 +167,7 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 	size_t l_iCtrOut = 0;
 	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
-	log ( D_LOG_INFO ) << "process_rc_file ( ): ";
+	log ( LOG_TYPE::D_INFO ) << "process_rc_file ( ): ";
 	if ( a_iCount < 0 )
 		M_THROW ( _ ( "bad variable count" ), a_iCount );
 	for ( l_iCtrOut = 0; l_iCtrOut < ( sizeof ( l_psPlacementTab ) / sizeof ( OPlacement ) ); l_iCtrOut ++ )
@@ -251,7 +251,7 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 								"with value: `%s', on line %d.\n",
 								static_cast < char const * > ( l_oOption ),
 								static_cast < char const * > ( l_oValue ), l_iLine ) );
-					log ( D_LOG_ERROR ) << l_oMessage;
+					log ( LOG_TYPE::D_ERROR ) << l_oMessage;
 					fprintf ( stderr, l_oMessage );
 					}
 				}

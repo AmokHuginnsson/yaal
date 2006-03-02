@@ -71,7 +71,7 @@ bool const set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
 		{
 		if ( ! strcasecmp ( a_roValue, "LOG_SQL" ) )
-			n_lLogMask |= D_LOG_SQL;
+			n_lLogMask |= LOG_TYPE::D_SQL;
 		else
 			return ( true );
 		}
@@ -92,7 +92,7 @@ bool const set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_ORACLE;
 		else
 			{
-			log ( D_LOG_ERROR ) << "Error: `" << a_roValue;
+			log ( LOG_TYPE::D_ERROR ) << "Error: `" << a_roValue;
 			log << "' is unknown driver." << endl;
 			exit ( 1 );
 			}

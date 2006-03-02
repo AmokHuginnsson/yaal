@@ -71,17 +71,17 @@ bool const set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
 			{
 			if ( ! strcasecmp ( l_oStr, "LOG_DEBUG" ) )
-				n_lLogMask |= D_LOG_DEBUG;
+				n_lLogMask |= LOG_TYPE::D_DEBUG;
 			else if ( ! strcasecmp ( l_oStr, "LOG_INFO" ) )
-				n_lLogMask |= D_LOG_INFO;
+				n_lLogMask |= LOG_TYPE::D_INFO;
 			else if ( ! strcasecmp ( l_oStr, "LOG_NOTICE" ) )
-				n_lLogMask |= D_LOG_NOTICE;
+				n_lLogMask |= LOG_TYPE::D_NOTICE;
 			else if ( ! strcasecmp ( l_oStr, "LOG_WARNING" ) )
-				n_lLogMask |= D_LOG_WARNING;
+				n_lLogMask |= LOG_TYPE::D_WARNING;
 			else if ( ! strcasecmp ( l_oStr, "LOG_ERROR" ) )
-				n_lLogMask |= D_LOG_ERROR;
+				n_lLogMask |= LOG_TYPE::D_ERROR;
 			else if ( ! strcasecmp ( l_oStr, "LOG_CVSHEADER" ) )
-				n_lLogMask |= D_LOG_CVSHEADER;
+				n_lLogMask |= LOG_TYPE::D_CVSHEADER;
 			else
 				return ( true );
 			}
@@ -100,7 +100,7 @@ void set_env ( char const * const a_pcVarValue )
 			|| ( ( ! ( l_pcPtr = const_cast < char * > ( strpbrk ( a_pcVarValue,
 								" \t" ) ) ) ) ) )
 		{
-		log ( D_LOG_ERROR ) << "bad set_env argument: `";
+		log ( LOG_TYPE::D_ERROR ) << "bad set_env argument: `";
 		log << a_pcVarValue << '\'' << endl;
 		return;
 		}
@@ -109,7 +109,7 @@ void set_env ( char const * const a_pcVarValue )
 		l_pcPtr ++;
 	if ( ! ( * l_pcPtr ) )
 		{
-		log ( D_LOG_ERROR ) << "no value for environment variable in set_env: `";
+		log ( LOG_TYPE::D_ERROR ) << "no value for environment variable in set_env: `";
 		log << a_pcVarValue << '\'' << endl;
 		return;
 		}

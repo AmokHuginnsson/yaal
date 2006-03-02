@@ -39,14 +39,6 @@ namespace hcore
 
 #define D_CVSID_HLIST_H "$CVSHeader$"
 
-#define D_ERROR									1
-#define D_SEARCH_AFTER_ORDER		8
-#define D_SEARCH_AFTER_NUMBER		16
-#define	D_WAS_EMPTIED						256
-#define	D_WAS_NOT_EMPTIED				512
-#define D_FINAL_REACHED					1024
-#define D_NOT_FOUND							2048
-
 #ifndef NULL
 #define NULL	0
 #endif /* NULL */
@@ -92,6 +84,20 @@ public:
 		D_ASCENDING,
 		D_DESCENDING
 		} sort_order_t;
+	typedef enum
+		{
+		D_SEARCH_AFTER_ORDER,
+		D_SEARCH_AFTER_NUMBER
+		} search_after_t;
+	typedef enum
+		{
+		D_OK = 0,
+		D_ERROR = 1,
+		D_WAS_EMPTIED = 2,
+		D_WAS_NOT_EMPTIED = 4,
+		D_FINAL_REACHED = 8,
+		D_NOT_FOUND = 16
+		} status_t;
 protected:
 	class HElement
 		{
@@ -169,14 +175,14 @@ public:
 	virtual int remove_head ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
 	virtual int remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
 	/* sets cursor at specified index or number */
-	virtual tType & go ( int, int = D_SEARCH_AFTER_ORDER );
+	virtual tType & go ( int, search_after_t = D_SEARCH_AFTER_ORDER );
 	virtual tType & operator [ ] ( int );
 	virtual tType & present ( void );
 	virtual tType & head ( void );
 	virtual tType & tail ( void );
 	virtual tType * to_head ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
 	virtual tType * to_tail ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
-	virtual void exchange ( int, int, int = D_SEARCH_AFTER_ORDER );
+	virtual void exchange ( int, int, search_after_t = D_SEARCH_AFTER_ORDER );
 	virtual void sort_by_hits ( sort_order_t = D_ASCENDING );
 	virtual void sort_by_number ( sort_order_t = D_ASCENDING );
 	virtual void sort_by_contents ( sort_order_t = D_ASCENDING );
@@ -1044,11 +1050,11 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 	}
 
 template < typename tType >
-tType & HList< tType >::go ( int a_iNumber, int a_iFlag )
+tType & HList< tType >::go ( int a_iNumber, search_after_t a_eFlag )
 	{
 	M_PROLOG
 	/* Here we have another function with error code returned by reference */
-	switch ( a_iFlag )
+	switch ( a_eFlag )
 		{
 		case ( D_SEARCH_AFTER_NUMBER ):
 			{
@@ -1062,7 +1068,7 @@ tType & HList< tType >::go ( int a_iNumber, int a_iFlag )
 			}
 		default :
 			{
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_iFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
 			break;
 			}
 		}
@@ -1112,7 +1118,7 @@ void HList< tType >::exchange ( HElement * a_poLeft, HElement * a_poRight )
 	}
 
 template < typename tType >
-void HList< tType >::exchange ( int a_iLeft, int a_iRight, int a_iFlag )
+void HList< tType >::exchange ( int a_iLeft, int a_iRight, search_after_t a_eFlag )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -1120,7 +1126,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int a_iFlag )
 	HElement * l_poLeft = NULL, * l_poRight = NULL;
 	if ( a_iLeft == a_iRight )
 		return;
-	switch ( a_iFlag )
+	switch ( a_eFlag )
 		{
 		case ( D_SEARCH_AFTER_NUMBER ):
 			{
@@ -1158,7 +1164,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, int a_iFlag )
 			}
 		default :
 			{
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_iFlag );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
 			break;
 			}
 		}

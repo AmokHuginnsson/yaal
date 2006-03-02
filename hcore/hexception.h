@@ -102,13 +102,6 @@ struct enum_t
 		}
 	};
 
-#define D_LOG_DEBUG			1
-#define D_LOG_INFO			2
-#define D_LOG_NOTICE		4
-#define D_LOG_WARNING		8
-#define D_LOG_ERROR			16
-#define D_LOG_CVSHEADER 32
-
 /* those types definitions were in hinfo.h but this file (hexception.h)
  * is included into more files, we assume that sizeof ( int ) >= 4 */
 

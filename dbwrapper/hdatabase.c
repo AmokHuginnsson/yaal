@@ -80,7 +80,7 @@ int long HDataBase::query ( char const * a_pcQuery )
 				g_iErrNo );
 	if ( ! f_pvCoreData )
 		M_THROW ( "not connected to database", g_iErrNo );
-	if ( n_lLogMask & D_LOG_SQL )
+	if ( n_lLogMask & LOG_TYPE::D_SQL )
 		log << "SQL: " << a_pcQuery << endl;
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
 	if ( ! f_pvLastResult )

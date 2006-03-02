@@ -117,7 +117,7 @@ int console_mouse_open ( void )
 		M_THROW ( _ ( "can not setup mouse mode" ), g_iErrNo );
 		}
 
-	log ( D_LOG_INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
+	log ( LOG_TYPE::D_INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
 
 	return ( 0 );
 	M_EPILOG
@@ -172,7 +172,7 @@ int console_mouse_open ( void )
 				strerror ( g_iErrNo ) );
 		M_THROW ( l_oError, l_iVC );
 		}
-	log ( D_LOG_INFO ) << "i have opened device: `" << l_iVC << '\'' << endl;
+	log ( LOG_TYPE::D_INFO ) << "i have opened device: `" << l_iVC << '\'' << endl;
 	return ( gpm_fd );
 	M_EPILOG
 	}

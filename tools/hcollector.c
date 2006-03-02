@@ -181,7 +181,7 @@ int HCollector::establish_connection ( int a_iTimeOut )
 		if ( l_iError > a_iTimeOut )
 			return ( -1 );
 		}
-	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (estab)" << endl;
+	::log ( LOG_TYPE::D_DEBUG ) << "Collector: Connected ! (estab)" << endl;
 	return ( l_iError );
 	M_EPILOG
 	}
@@ -202,7 +202,7 @@ int HCollector::wait_for_connection ( int a_iTimeOut )
 			return ( -1 );
 		}
 	l_iError += ( l_iLenght - HRawFile::write ( D_PROTO_ACK, l_iLenght ) );
-	::log ( D_LOG_DEBUG ) << "Collector: Connected ! (wait)" << endl;
+	::log ( LOG_TYPE::D_DEBUG ) << "Collector: Connected ! (wait)" << endl;
 	return ( l_iError );
 	M_EPILOG
 	}

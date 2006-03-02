@@ -327,7 +327,7 @@ void HXml::init ( char const * a_pcFileName )
 	f_poXml->f_psDoc = xmlParseFile ( a_pcFileName );
 	if ( g_iErrNo )
 		{
-		log ( D_LOG_WARNING ) << strerror ( g_iErrNo ) << ": " << a_pcFileName;
+		log ( LOG_TYPE::D_WARNING ) << strerror ( g_iErrNo ) << ": " << a_pcFileName;
 		log << ", code: " << g_iErrNo << '.' << endl;
 		}
 	g_iErrNo = l_iSavedErrno;

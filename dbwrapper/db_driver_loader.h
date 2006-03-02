@@ -35,10 +35,16 @@ Copyright:
 namespace stdhapi
 {
 
+namespace hcore
+{
+namespace LOG_TYPE
+	{
+	static int const D_SQL = 1073741824;
+	}
+}
+
 namespace dbwrapper
 	{
-
-#define D_LOG_SQL 1073741824
 
 #define D_DB_DRIVER_NONE				0
 #define D_DB_DRIVER_SQLITE3			1

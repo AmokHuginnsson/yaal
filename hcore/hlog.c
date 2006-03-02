@@ -68,7 +68,7 @@ HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 	if ( ! f_psStream )
 		M_THROW ( "tmpfile returned", reinterpret_cast < int > ( f_psStream ) );
 	fprintf ( f_psStream, "%-10xProcess started (%d).\n",
-			D_LOG_NOTICE, getpid ( ) );
+			LOG_TYPE::D_NOTICE, getpid ( ) );
 	l_iUid = getuid ( );
 	l_psPasswd = getpwuid ( l_iUid );
 	if ( l_psPasswd )
@@ -86,7 +86,7 @@ HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 HLog::~HLog ( void )
 	{
 	M_PROLOG
-	if ( n_lLogMask & D_LOG_NOTICE )
+	if ( n_lLogMask & LOG_TYPE::D_NOTICE )
 		{
 		if ( f_bNewLine )
 			timestamp ( );
