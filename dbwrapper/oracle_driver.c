@@ -37,6 +37,7 @@ Copyright:
 #include "hcore/hexception.h"
 #include "hcore/hstring.h"
 #include "hcore/rc_file.h"
+#include "hcore/hlog.h"
 
 #ifndef NULL
 #define NULL	0
@@ -46,6 +47,8 @@ using namespace stdhapi::hcore;
 
 extern "C"
 {
+
+static char const * const g_pcLogTag = "Oracle: ";
 
 HString g_oInstanceName;
 OVariable n_psVariables [ ] =
@@ -227,6 +230,7 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 	int l_iIters = 0;
 	int l_iLength = strlen ( a_pcQuery );
 	char * l_pcEnd = ( const_cast < char * > ( a_pcQuery ) + l_iLength ) - 1;
+	
 	if ( ( * l_pcEnd ) == ';' )
 		( * l_pcEnd ) = 0;
 	l_psOracle->f_iStatus = OCIStmtPrepare2 ( l_psOracle->f_psServiceContext,
@@ -238,11 +242,14 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 	if ( ( l_psOracle->f_iStatus != OCI_SUCCESS )
 			&& ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO ) )
 		{
+		log ( LOG_TYPE::D_ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to prepare statement." << endl;
 		db_unquery ( l_psQuery );
 		l_psQuery = NULL;
 		}
 	else
 		{
+		if ( l_psOracle->f_iStatus == OCI_SUCCESS_WITH_INFO )
+			log ( LOG_TYPE::D_INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error ( l_psOracle ) << endl;
 		l_oQuery.upper ( );
 		if ( l_oQuery.find ( "INSERT" ) == 0 )
 			l_iIters = 1;
@@ -257,9 +264,12 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 		if ( ( l_psOracle->f_iStatus != OCI_SUCCESS )
 				&& ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO ) )
 			{
+			log ( LOG_TYPE::D_ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to execute statement." << endl;
 			db_unquery ( l_psQuery );
 			l_psQuery = NULL;
 			}
+		else if ( l_psOracle->f_iStatus == OCI_SUCCESS_WITH_INFO )
+			log ( LOG_TYPE::D_INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error ( l_psOracle ) << endl;
 		}
 	return ( l_psQuery );
 	}
@@ -349,7 +359,10 @@ int long dbrs_records_count ( void *, void * a_pvDataR )
 																								 OCI_DEFAULT );
 	if ( ( ( * l_psQuery->f_piStatus ) != OCI_SUCCESS )
 			&& ( ( * l_psQuery->f_piStatus ) != OCI_SUCCESS_WITH_INFO ) )
+		{
+		log ( LOG_TYPE::D_ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to fetch last row." << endl;
 		return ( - 1 );
+		}
 	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
 					OCI_HTYPE_STMT, & l_iRows, 0, OCI_ATTR_CURRENT_POSITION,
 					l_psQuery->f_psError ) ) != OCI_SUCCESS )
