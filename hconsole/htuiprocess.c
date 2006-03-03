@@ -90,13 +90,13 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWind
 	M_REGISTER_FILE_DESCRIPTOR_HANDLER ( STDIN_FILENO, HTUIProcess::process_stdin );
 	if ( n_bUseMouse && n_iMouseDes )
 		M_REGISTER_FILE_DESCRIPTOR_HANDLER ( n_iMouseDes, HTUIProcess::process_mouse );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_CTRLS_COUNT, l_piCtrls,
-			HTUIProcess::handler_refresh );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('x'), NULL,
-			HTUIProcess::handler_quit );
+	register_postprocess_handler ( D_CTRLS_COUNT, l_piCtrls,
+			& HTUIProcess::handler_refresh );
+	register_postprocess_handler ( D_KEY_COMMAND_('x'), NULL,
+			& HTUIProcess::handler_quit );
 	if ( n_bUseMouse )
-		M_REGISTER_POSTPROCESS_HANDLER ( KEY_CODES::D_MOUSE, NULL,
-				HTUIProcess::handler_mouse );
+		register_postprocess_handler ( KEY_CODES::D_MOUSE, NULL,
+				& HTUIProcess::handler_mouse );
 	if ( a_poMainWindow )
 		{
 		f_poForegroundWindow = a_poMainWindow;
@@ -110,14 +110,14 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWind
 		M_IRV ( l_poMainWindow->init ( ) );
 		f_poWindows = l_poMainWindow->_disclose_window_list ( );
 		M_IRV ( add_window ( l_poMainWindow, a_pcProcessName ) );
-		M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_META_( '\t' ), NULL,
-				HTUIProcess::handler_jump_meta_tab );
-		M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,
-				HTUIProcess::handler_close_window );
+		register_postprocess_handler ( D_KEY_META_( '\t' ), NULL,
+				& HTUIProcess::handler_jump_meta_tab );
+		register_postprocess_handler ( D_KEY_COMMAND_('q'), NULL,
+				& HTUIProcess::handler_close_window );
 		for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
 			l_piAlts [ l_iCtr ] = D_KEY_META_( '0' + l_iCtr );
-		M_REGISTER_POSTPROCESS_HANDLER ( D_ALTS_COUNT, l_piAlts,
-			HTUIProcess::handler_jump_meta_direct );
+		register_postprocess_handler ( D_ALTS_COUNT, l_piAlts,
+			& HTUIProcess::handler_jump_meta_direct );
 		}
 	f_oCommandHandlers [ "quit" ] = static_cast < HANDLER_t > ( & HTUIProcess::handler_quit );
 	handler_refresh ( 0 );

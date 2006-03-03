@@ -281,7 +281,7 @@ void HStatusBarControl::message ( char const * a_pcFormat, ... )
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )
 		bell ( );
-	c_vprintf ( f_iRowRaw, -1, M_ATTR_DATA ( ), a_pcFormat, l_xAp );
+	c_vprintf ( f_iRowRaw, -1, attr_data ( ), a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	n_bNeedRepaint = true;
 	return;
@@ -291,7 +291,7 @@ void HStatusBarControl::message ( char const * a_pcFormat, ... )
 void HStatusBarControl::bar ( char const * a_pcBar )
 	{
 	M_PROLOG
-	M_SET_ATTR_DATA ( );
+	set_attr_data ( );
 	if ( a_pcBar )
 		{
 		f_oVarTmpBuffer.format ( " %%-%ds ",

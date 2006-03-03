@@ -37,11 +37,6 @@ namespace stdhapi
 namespace hconsole
 {
 
-#define M_REGISTER_PREPROCESS_HANDLER( count, tab, handler ) \
-	register_preprocess_handler ( count, tab, static_cast < HANDLER_t > ( & handler ) )
-#define M_REGISTER_POSTPROCESS_HANDLER( count, tab, handler ) \
-	register_postprocess_handler ( count, tab, static_cast < HANDLER_t > ( & handler ) )
-
 class HHandler
 	{
 protected:
@@ -63,8 +58,18 @@ protected:
 	/*{*/
 	int process_input_with_handlers ( int, const process_handler_key_map_t & );
 	hcore::HString process_command ( void );
-	int register_preprocess_handler ( int, int const *, HANDLER_t );
-	int register_postprocess_handler ( int, int const *, HANDLER_t );
+	template < typename tType >
+	int register_preprocess_handler ( int a_iCount, int const * a_piTab, tType HANDLER )
+		{
+		return ( register_preprocess_handler_internal ( a_iCount, a_piTab, static_cast < HANDLER_t > ( HANDLER ) ) );
+		}
+	template < typename tType >
+	int register_postprocess_handler ( int a_iCount, int const * a_piTab, tType HANDLER )
+		{
+		return ( register_postprocess_handler_internal ( a_iCount, a_piTab, static_cast < HANDLER_t > ( HANDLER ) ) );
+		}
+	int register_preprocess_handler_internal ( int, int const *, HANDLER_t );
+	int register_postprocess_handler_internal ( int, int const *, HANDLER_t );
 	/*}*/
 	};
 

@@ -52,18 +52,18 @@ HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
 	f_oViewModeControls ( ), f_oEditModeControls ( )
 	{
 	M_PROLOG
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('n'), NULL,
-			HDataWindow::handler_add_new );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('e'), NULL,
-			HDataWindow::handler_edit );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('d'), NULL,
-			HDataWindow::handler_delete );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('w'), NULL,
-			HDataWindow::handler_save );
-	M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_CTRL_('r'), NULL,
-			HDataWindow::handler_requery );
-	M_REGISTER_POSTPROCESS_HANDLER ( KEY_CODES::D_ESC, NULL,
-			HDataWindow::handler_cancel );
+	register_postprocess_handler ( D_KEY_COMMAND_('n'), NULL,
+			& HDataWindow::handler_add_new );
+	register_postprocess_handler ( D_KEY_COMMAND_('e'), NULL,
+			& HDataWindow::handler_edit );
+	register_postprocess_handler ( D_KEY_COMMAND_('d'), NULL,
+			& HDataWindow::handler_delete );
+	register_postprocess_handler ( D_KEY_COMMAND_('w'), NULL,
+			& HDataWindow::handler_save );
+	register_postprocess_handler ( D_KEY_CTRL_('r'), NULL,
+			& HDataWindow::handler_requery );
+	register_postprocess_handler ( KEY_CODES::D_ESC, NULL,
+			& HDataWindow::handler_cancel );
 	return;
 	M_EPILOG
 	}

@@ -268,7 +268,7 @@ void HListControl::refresh ( void )
 										: ~ ( f_uiEnabledAttribute >> 8 ) )
 									: ~ ( f_uiDisabledAttribute >> 8 ) );
 						else
-							M_SET_ATTR_DATA ( );
+							set_attr_data ( );
 						}
 					M_ENSURE ( c_mvprintf ( f_iRowRaw + l_iCtr + l_iHR,
 								f_iColumnRaw + l_iColumnOffset, f_oVarTmpBuffer	) != C_ERR );
@@ -289,7 +289,7 @@ void HListControl::refresh ( void )
 			}
 		}
 	l_iColumnOffset = 0;
-	M_SET_ATTR_DATA ( );
+	set_attr_data ( );
 	memset ( f_oVarTmpBuffer.raw ( ), '.', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
@@ -303,14 +303,14 @@ void HListControl::refresh ( void )
 			if ( f_bDrawHeader )
 				{
 				f_oVarTmpBuffer = l_poColumnInfo->f_oName;
-				M_SET_ATTR_LABEL ( );
+				set_attr_label ( );
 				M_IRV ( f_oVarTmpBuffer.format ( "%%-%ds",
 							l_poColumnInfo->f_iWidthRaw ) );
 				M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset,
 							f_oVarTmpBuffer, static_cast < char const * const > (
 								l_poColumnInfo->f_oName.left (
 									l_poColumnInfo->f_iWidthRaw ) ) ) != C_ERR );
-				M_SET_ATTR_SHORTCUT ( );
+				set_attr_shortcut ( );
 				M_ENSURE ( c_mvprintf ( f_iRowRaw,
 							f_iColumnRaw + l_iColumnOffset + l_poColumnInfo->f_iShortcutIndex,
 							"%c", l_poColumnInfo->f_cShortcut ) != C_ERR );

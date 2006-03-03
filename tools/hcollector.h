@@ -35,22 +35,25 @@ namespace stdhapi
 namespace tools
 {
 
-#define D_PROTO_SYN						"SYN\n"
-#define D_PROTO_ACK						"ACK\n"
-#define D_PROTO_DTA						"DTA" /* warrning! no endline */
-#define D_PROTO_FIN						"FIN" /* warrning! no endline, but \0 at end,
-																			 so sizeof ( ) retruns 4 */
-#define D_PROTO_ERR						"ERR\n"
-
-#define D_PROTO_RECV_BUF_SIZE	8 /* 5 should be enought but you never know */
-#define D_RECV_BUF_SIZE				256
-
 class HCollector : public HSerial
 	{
+public:
+	struct PROTOCOL
+		{
+		static char const * const D_SYN;
+		static char const * const D_ACK;
+		static char const * const D_DTA; /* warrning! no endline */
+		static char const * const D_FIN; /* warrning! no endline, but \0 at end,
+																							 so sizeof ( ) retruns 4 */
+		static char const * const D_ERR;
+
+		static int const D_RECV_BUF_SIZE = 8; /* 5 should be enought but you never know */
+		static int const D_BUF_SIZE			 = 256;
+		};
 protected:
 	/*{*/
 	int			f_iLines;
-	char		f_pcReadBuf [ D_PROTO_RECV_BUF_SIZE ];
+	char		f_pcReadBuf [ PROTOCOL::D_RECV_BUF_SIZE ];
 	hcore::HString	f_oLine;
 	/*}*/
 public:

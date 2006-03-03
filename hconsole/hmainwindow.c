@@ -40,8 +40,8 @@ HMainWindow::HMainWindow ( char const * a_pcTitle )
 						: HWindow ( a_pcTitle ), f_poMenu ( NULL ), f_poWindowList ( NULL )
 	{
 	M_PROLOG
-	M_IRV ( M_REGISTER_POSTPROCESS_HANDLER ( D_KEY_COMMAND_('q'), NULL,
-				HMainWindow::handler_close ) );
+	M_IRV ( register_postprocess_handler ( D_KEY_COMMAND_('q'), NULL,
+				& HMainWindow::handler_close ) );
 	return;
 	M_EPILOG
 	}

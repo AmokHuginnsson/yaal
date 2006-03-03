@@ -52,9 +52,9 @@ HWindow::HWindow ( char const * a_pcTitle ) : f_bInitialised ( false ),
 	int l_piSearch [ ] = { '/', D_KEY_COMMAND_( '/' ), '?', D_KEY_COMMAND_( '?' ) };
 	if ( ! is_enabled ( ) )
 		M_THROW ( "console not initialised.", g_iErrNo );
-	M_REGISTER_POSTPROCESS_HANDLER ( '\t', NULL, HWindow::handler_jump_tab );
-	M_REGISTER_POSTPROCESS_HANDLER ( 2, l_piCmds, HWindow::handler_command );
-	M_REGISTER_POSTPROCESS_HANDLER ( 4, l_piSearch, HWindow::handler_search );
+	register_postprocess_handler ( '\t', NULL, & HWindow::handler_jump_tab );
+	register_postprocess_handler ( 2, l_piCmds, & HWindow::handler_command );
+	register_postprocess_handler ( 4, l_piSearch, & HWindow::handler_search );
 	return;
 	M_EPILOG
 	}
@@ -117,8 +117,8 @@ int HWindow::add_control ( HControl * a_poControl, int a_iShortCut )
 	if ( f_oPreprocessHandlers.has_key ( a_iShortCut ) )
 		M_THROW ( _ ( "shortcut occupied" ), a_iShortCut );
 	f_oControls.add_tail ( & a_poControl );
-	M_REGISTER_POSTPROCESS_HANDLER ( a_iShortCut, NULL,
-			HWindow::handler_jump_direct );
+	register_postprocess_handler ( a_iShortCut, NULL,
+			& HWindow::handler_jump_direct );
 	f_poFocusedChild = f_oControls.go ( 0 );
 	return ( 0 );
 	M_EPILOG

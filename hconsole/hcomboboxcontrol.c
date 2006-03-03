@@ -102,7 +102,7 @@ void HComboboxControl::refresh ( void )
 /* end of ripped part */
 		HEditControl::refresh ( );
 		M_ENSURE ( c_move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 ) != C_ERR );
-		M_SET_ATTR_LABEL ( );
+		set_attr_label ( );
 		M_ENSURE ( c_addch ( GLYPHS::D_DOWN_ARROW ) != C_ERR );
 		M_ENSURE ( c_move ( f_iRowRaw, f_iColumnRaw + HEditControl::f_iCursorPosition ) != C_ERR );
 		f_iHeightRaw = 0;

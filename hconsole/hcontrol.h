@@ -96,12 +96,12 @@ public:
 	bool hit_test ( int, int ) const;
 	void set_attributes ( int, int, int );
 	void move ( int, int, int, int );
-#define M_ATTR_LABEL( )	( f_bEnabled ? ( f_bFocused ? f_uiFocusedAttribute >> 8 : f_uiEnabledAttribute >> 8 ) : f_uiDisabledAttribute >> 8 )
-#define M_ATTR_SHORTCUT( )	( ! f_bEnabled ? ( ! f_bFocused ? f_uiFocusedAttribute >> 8 : f_uiEnabledAttribute >> 8 ) : f_uiDisabledAttribute >> 8 )
-#define M_ATTR_DATA( )	( f_bEnabled ? ( f_bFocused ? f_uiFocusedAttribute : f_uiEnabledAttribute ) : f_uiDisabledAttribute )
-#define M_SET_ATTR_LABEL( )	set_attr ( M_ATTR_LABEL ( ) )
-#define M_SET_ATTR_SHORTCUT( )	set_attr ( M_ATTR_SHORTCUT ( ) )
-#define M_SET_ATTR_DATA( )	set_attr ( M_ATTR_DATA ( ) )
+	int attr_label ( void );
+	int attr_shortcut ( void );
+	int attr_data ( void );
+	void set_attr_label ( void );
+	void set_attr_shortcut ( void );
+	void set_attr_data ( void );
 	/*}*/
 private:
 	/*{*/

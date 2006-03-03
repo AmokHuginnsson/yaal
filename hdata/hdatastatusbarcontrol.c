@@ -58,9 +58,9 @@ void HDataStatusBarControl::draw_label ( void )
 	M_ASSERT ( l_poWindow );
 	if ( l_poWindow->is_modified ( ) )
 		{
-		M_SET_ATTR_SHORTCUT ( );
+		set_attr_shortcut ( );
 		c_mvprintf ( n_iHeight - 2, f_iLabelLength - 4, "[+]" );
-		M_SET_ATTR_DATA ( );
+		set_attr_data ( );
 		}
 	return;
 	M_EPILOG

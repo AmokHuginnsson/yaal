@@ -165,7 +165,7 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		a_poNode->f_iRowRaw = l_iRow;
 		a_poNode->f_iColumnRaw = f_iColumnRaw + a_poNode->f_iLevel * 2 - 1; 
 		a_poNode->f_iWidthRaw = l_poString->get_length ( ) + 2;
-		M_SET_ATTR_DATA ( );
+		set_attr_data ( );
 		if ( ! a_poNode->f_bUnfolded && l_iCtr )
 			c_mvprintf ( l_iRow, a_poNode->f_iColumnRaw, "+" );
 		else if ( l_iCtr )

@@ -204,15 +204,15 @@ void HControl::draw_label ( void )
 /* done */
 	if ( ! f_bDrawLabel )
 		{
-		M_SET_ATTR_DATA ( );
+		set_attr_data ( );
 		return;
 		}
-	M_SET_ATTR_LABEL ( );
+	set_attr_label ( );
 	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oLabel ) != C_ERR );
-	M_SET_ATTR_SHORTCUT ( );
+	set_attr_shortcut ( );
 	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
 				"%c", f_oLabel [ f_iShortcutIndex ] ) != C_ERR );
-	M_SET_ATTR_DATA ( );
+	set_attr_data ( );
 	if ( f_bSingleLine )
 		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;
 	else
@@ -264,6 +264,51 @@ bool HControl::hit_test ( int a_iRow, int a_iColumn ) const
 			|| ( a_iColumn >= ( f_iColumnRaw + f_iWidthRaw ) ) )
 		return ( false );
 	return ( true );
+	M_EPILOG
+	}
+
+int HControl::attr_label ( void )
+	{
+	M_PROLOG
+	return ( f_bEnabled ? ( f_bFocused ? f_uiFocusedAttribute >> 8 : f_uiEnabledAttribute >> 8 ) : f_uiDisabledAttribute >> 8 );
+	M_EPILOG
+	}
+
+int HControl::attr_shortcut ( void )
+	{
+	M_PROLOG
+	return ( ! f_bEnabled ? ( ! f_bFocused ? f_uiFocusedAttribute >> 8 : f_uiEnabledAttribute >> 8 ) : f_uiDisabledAttribute >> 8 );
+	M_EPILOG
+	}
+
+int HControl::attr_data ( void )
+	{
+	M_PROLOG
+	return ( f_bEnabled ? ( f_bFocused ? f_uiFocusedAttribute : f_uiEnabledAttribute ) : f_uiDisabledAttribute );
+	M_EPILOG
+	}
+
+void HControl::set_attr_label ( void )
+	{
+	M_PROLOG
+	set_attr ( attr_label ( ) );
+	return;
+	M_EPILOG
+	}
+
+void HControl::set_attr_shortcut ( void )
+	{
+	M_PROLOG
+	set_attr ( attr_shortcut ( ) );
+	return;
+	M_EPILOG
+	}
+
+void HControl::set_attr_data ( void )
+	{
+	M_PROLOG
+	set_attr ( attr_data ( ) );
+	return;
 	M_EPILOG
 	}
 

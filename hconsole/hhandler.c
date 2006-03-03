@@ -54,7 +54,7 @@ HHandler::~HHandler ( void )
 	M_EPILOG
 	}
 
-int HHandler::register_preprocess_handler ( int a_iCodeCount, int const * a_piCodes,
+int HHandler::register_preprocess_handler_internal ( int a_iCodeCount, int const * a_piCodes,
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
@@ -68,7 +68,7 @@ int HHandler::register_preprocess_handler ( int a_iCodeCount, int const * a_piCo
 	M_EPILOG
 	}
 
-int HHandler::register_postprocess_handler ( int a_iCodeCount, int const * a_piCodes,
+int HHandler::register_postprocess_handler_internal ( int a_iCodeCount, int const * a_piCodes,
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
