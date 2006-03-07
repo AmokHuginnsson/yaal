@@ -279,8 +279,8 @@ AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
 	])
 CXXFLAGS=$CXXFLAGS_ORIG
 CPPFLAGS=$CPPFLAGS_ORIG
-AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
-	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
+AC_CHECK_HEADERS([[ncurses/curses.h]],_NCURSES_HEADER=['ncurses/curses.h'],
+	[AC_CHECK_HEADERS([[curses.h]],_NCURSES_HEADER=['curses.h'],
 			[AC_MSG_ERROR([Cannot continue without ncurses devel!])])])
 if test ["$ORACLE"] != ["no"] ; then
 	CXXFLAGS=["$CXXFLAGS -I$ORACLE_HOME/rdbms/public"]

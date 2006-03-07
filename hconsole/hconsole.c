@@ -29,13 +29,13 @@ Copyright:
 
 #include "config.h"
 
-#ifdef HAVE_NCURSES_H
-#	include <ncurses.h>
-#elif defined ( HAVE_NCURSES_NCURSES_H )
-#	include <ncurses/ncurses.h>
-#else /* HAVE_NCURSES_NCURSES_H */
+#ifdef HAVE_CURSES_H
+#	include <curses.h>
+#elif defined ( HAVE_NCURSES_CURSES_H )
+#	include <ncurses/curses.h>
+#else /* HAVE_NCURSES_CURSES_H */
 #	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_NCURSES_H */
+#endif /* not HAVE_NCURSES_CURSES_H */
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" )

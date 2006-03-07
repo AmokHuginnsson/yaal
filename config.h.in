@@ -25,9 +25,9 @@
 
 /* ncurses */
 
-#undef HAVE_NCURSES_H
+#undef HAVE_CURSES_H
 
-#undef HAVE_NCURSES_NCURSES_H
+#undef HAVE_NCURSES_CURSES_H
 
 /* mouse */
 
