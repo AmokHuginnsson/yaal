@@ -201,48 +201,33 @@ int HLogPad::process_input ( int a_iCode )
 	switch ( a_iCode )
 		{
 		case ( KEY_CODES::D_DOWN ):
-			{
 			if ( f_iLines > ( f_iHeightRaw + f_iOffsetRow ) )
 				f_iOffsetRow ++;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_UP ):
-			{
 			if ( f_iOffsetRow > 0 )
 				f_iOffsetRow --;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_LEFT ):
-			{
 			if ( f_iOffsetColumn > 0 )
 				f_iOffsetColumn --;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_RIGHT ):
-			{
 			f_iOffsetColumn ++;
 			if ( f_iOffsetColumn < 0 )
 				f_iOffsetColumn = 0;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_HOME ):
-			{
 			f_iOffsetRow = 0;
 			f_iOffsetColumn = 0;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_END ):
-			{
 			f_iOffsetColumn = 0;
 			if ( f_iLines > f_iHeightRaw )
 				f_iOffsetRow = f_iLines - f_iHeightRaw;
-			break;
-			}
+		break;
 		default :
-			{
 			l_iCode = a_iCode;
-			break;
-			}
 		}
 	if ( ! l_iCode )
 		refresh ( );

@@ -59,7 +59,7 @@ extern char const * const g_ppcErrMsgHList [ ];
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-struct OListTreatment
+struct OListBits
 	{
 	typedef enum
 		{
@@ -69,13 +69,22 @@ struct OListTreatment
 		D_EMPTY_IF_NOT_EMPTIED = 8,
 		D_FORCE_REMOVE_ELEMENT = 16
 		} treatment_t;
-	virtual ~OListTreatment ( void ) { } 
+	typedef enum
+		{
+		D_OK = 0,
+		D_ERROR = 1,
+		D_WAS_EMPTIED = 2,
+		D_WAS_NOT_EMPTIED = 4,
+		D_FINAL_REACHED = 8,
+		D_NOT_FOUND = 16
+		} status_t;
+	virtual ~OListBits ( void ) { } 
 	};
 
-template struct enum_t < OListTreatment::treatment_t >;
+template struct enum_t < OListBits::treatment_t >;
 
 template < typename tType > 
-class HList : public OListTreatment
+class HList : public OListBits
 	{
 public:
 	typedef enum
@@ -89,15 +98,6 @@ public:
 		D_SEARCH_AFTER_ORDER,
 		D_SEARCH_AFTER_NUMBER
 		} search_after_t;
-	typedef enum
-		{
-		D_OK = 0,
-		D_ERROR = 1,
-		D_WAS_EMPTIED = 2,
-		D_WAS_NOT_EMPTIED = 4,
-		D_FINAL_REACHED = 8,
-		D_NOT_FOUND = 16
-		} status_t;
 protected:
 	class HElement
 		{
@@ -168,12 +168,12 @@ public:
 																										 at specified position */
 /* adds element in the way that keeps order */
 	virtual tType & add_orderly ( tType &, sort_order_t = D_ASCENDING );
-	virtual int remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
+	virtual status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
 			tType * * = NULL );	/* rmoves element at current cursor position */
-	virtual int remove_at ( int, treatment_t const & = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
+	virtual status_t remove_at ( int, treatment_t const & = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
 			tType * * = NULL );
-	virtual int remove_head ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
-	virtual int remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
+	virtual status_t remove_head ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
+	virtual status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
 	/* sets cursor at specified index or number */
 	virtual tType & go ( int, search_after_t = D_SEARCH_AFTER_ORDER );
 	virtual tType & operator [ ] ( int );
@@ -265,7 +265,7 @@ tType & HList< tType >::HElement::get ( void )
 
 template < typename tType >
 HList< tType >::HList ( int a_iSize )
-	: OListTreatment ( ),
+	: OListBits ( ),
 	f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
 	f_iIndex ( 0 ), f_poIndex ( NULL ), IS_ABOVE ( NULL )
@@ -288,7 +288,7 @@ HList< tType >::~HList ( void )
 
 template < typename tType >
 HList< tType >::HList ( HList < tType > const & a_roList )
-	: OListTreatment ( ),
+	: OListBits ( ),
 	f_iQuantity ( 0 ), f_iHighestNumber ( 0 ), f_iError ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
 	f_iIndex ( 0 ), f_poIndex ( NULL ), IS_ABOVE ( NULL )
@@ -586,12 +586,12 @@ tType & HList< tType >::add_orderly ( tType & a_rtObject,
 	}
 
 template < typename tType >
-int HList< tType >::remove_at ( int a_iIndex, treatment_t const & a_eFlag, tType * * a_pptObject )
+OListBits::status_t HList< tType >::remove_at ( int a_iIndex, treatment_t const & a_eFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
 	treatment_t l_eFlag = a_eFlag & ( D_BLOCK_IF_NOT_EMPTIED | D_EMPTY_IF_NOT_EMPTIED | D_FORCE_REMOVE_ELEMENT );
 	treatment_t l_eTreat = a_eFlag & ( D_TREAT_AS_CLOSED | D_TREAT_AS_OPENED );
-	int l_iError = 0;
+	status_t l_eError = D_OK;
 	HElement * l_poElement = NULL;
 	l_poElement = f_poHook;
 	if ( f_iQuantity > 0 )
@@ -611,21 +611,14 @@ int HList< tType >::remove_at ( int a_iIndex, treatment_t const & a_eFlag, tType
 				case ( D_BLOCK_IF_NOT_EMPTIED ):
 					return ( D_ERROR );
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
-					{
-					l_iError = D_WAS_EMPTIED;
+					l_eError = D_WAS_EMPTIED;
 					M_IRV ( empty ( l_poElement ) );
-					break;
-					}
+				break;
 				case ( D_FORCE_REMOVE_ELEMENT ):
-					{
-					l_iError = D_WAS_NOT_EMPTIED;
-					break;
-					}
+					l_eError = D_WAS_NOT_EMPTIED;
+				break;
 				default :
-					{
 					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( l_eFlag ) );
-					break;
-					}
 				}
 			}
 		}
@@ -652,17 +645,17 @@ int HList< tType >::remove_at ( int a_iIndex, treatment_t const & a_eFlag, tType
 		f_poIndex = NULL;
 		f_iIndex = 0;
 		}
-	return ( l_iError );
+	return ( l_eError );
 	M_EPILOG
 	}
 
 template < typename tType >
-int HList< tType >::remove_element ( treatment_t const & a_eFlag, tType * * a_pptObject )
+OListBits::status_t HList< tType >::remove_element ( treatment_t const & a_eFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
 	treatment_t l_eFlag =  a_eFlag & ( D_BLOCK_IF_NOT_EMPTIED | D_EMPTY_IF_NOT_EMPTIED | D_FORCE_REMOVE_ELEMENT );
 	treatment_t l_eTreat = a_eFlag & ( D_TREAT_AS_CLOSED | D_TREAT_AS_OPENED );
-	int l_iError = 0;
+	status_t l_eError = D_OK;
 	HElement * l_poElement = NULL;
 	if ( f_iQuantity > 0 )
 		{
@@ -676,21 +669,14 @@ int HList< tType >::remove_element ( treatment_t const & a_eFlag, tType * * a_pp
 				case ( D_BLOCK_IF_NOT_EMPTIED ):
 					return ( D_ERROR );
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
-					{
-					l_iError = D_WAS_EMPTIED;
+					l_eError = D_WAS_EMPTIED;
 					M_IRV ( empty ( l_poElement ) );
-					break;
-					}
+				break;
 				case ( D_FORCE_REMOVE_ELEMENT ):
-					{
-					l_iError = D_WAS_NOT_EMPTIED;
-					break;
-					}
+					l_eError = D_WAS_NOT_EMPTIED;
+				break;
 				default :
-					{
 					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( l_eFlag ) );
-					break;
-					}
 				}
 			}
 		}
@@ -731,15 +717,15 @@ int HList< tType >::remove_element ( treatment_t const & a_eFlag, tType * * a_pp
 		}
 	f_iIndex = 0;
 	f_poIndex = NULL;
-	return ( l_iError );
+	return ( l_eError );
 	M_EPILOG
 	}
 
 template < typename tType >
-int HList< tType >::remove_head ( treatment_t const & a_eFlag, tType * * a_pptObject )
+OListBits::status_t HList< tType >::remove_head ( treatment_t const & a_eFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
-	int l_iError = 0;
+	status_t l_eError = D_OK;
 	HElement * l_poElement = NULL;
 	if ( f_iQuantity > 0 )
 		{
@@ -754,21 +740,14 @@ int HList< tType >::remove_head ( treatment_t const & a_eFlag, tType * * a_pptOb
 				case ( D_BLOCK_IF_NOT_EMPTIED ):
 					return ( D_ERROR );
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
-					{
-					l_iError = D_WAS_EMPTIED;
+					l_eError = D_WAS_EMPTIED;
 					M_IRV ( empty ( l_poElement ) );
-					break;
-					}
+				break;
 				case ( D_FORCE_REMOVE_ELEMENT ):
-					{
-					l_iError = D_WAS_NOT_EMPTIED;
-					break;
-					}
+					l_eError = D_WAS_NOT_EMPTIED;
+				break;
 				default :
-					{
 					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
-					break;
-					}
 				}
 			}
 		}
@@ -787,15 +766,15 @@ int HList< tType >::remove_head ( treatment_t const & a_eFlag, tType * * a_pptOb
 		f_poIndex = NULL;
 		f_iIndex = 0;
 		}
-	return ( l_iError );
+	return ( l_eError );
 	M_EPILOG
 	}
 
 template < typename tType >
-int HList< tType >::remove_tail ( treatment_t const & a_eFlag, tType * * a_pptObject )
+OListBits::status_t HList< tType >::remove_tail ( treatment_t const & a_eFlag, tType * * a_pptObject )
 	{
 	M_PROLOG
-	int l_iError = 0;
+	status_t l_eError = D_OK;
 	HElement * l_poElement = NULL;
 	if ( f_iQuantity > 0 )
 		{
@@ -809,21 +788,14 @@ int HList< tType >::remove_tail ( treatment_t const & a_eFlag, tType * * a_pptOb
 				case ( D_BLOCK_IF_NOT_EMPTIED ):
 					return ( D_ERROR );
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
-					{
-					l_iError = D_WAS_EMPTIED;
+					l_eError = D_WAS_EMPTIED;
 					M_IRV ( empty ( l_poElement ) );
-					break;
-					}
+				break;
 				case ( D_FORCE_REMOVE_ELEMENT ):
-					{
-					l_iError = D_WAS_NOT_EMPTIED;
-					break;
-					}
+					l_eError = D_WAS_NOT_EMPTIED;
+				break;
 				default :
-					{
 					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
-					break;
-					}
 				}
 			}
 		if ( l_poElement == f_poSelected )
@@ -845,7 +817,7 @@ int HList< tType >::remove_tail ( treatment_t const & a_eFlag, tType * * a_pptOb
 		}
 	else
 		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
-	return ( l_iError );
+	return ( l_eError );
 	M_EPILOG
 	}
 
@@ -865,8 +837,8 @@ bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, treatme
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
 				a_rpoElement = a_rpoElement->f_poPrevious;
-			break;
 			}
+		break;
 		case ( D_TREAT_AS_OPENED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
@@ -878,13 +850,10 @@ bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, treatme
 					}
 				a_rpoElement = a_rpoElement->f_poPrevious;
 				}
-			break;
 			}
+		break;
 		default :
-			{
 			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
-			break;
-			}
 		}
 	return ( l_bOk );
 	M_EPILOG
@@ -924,8 +893,8 @@ bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, treatme
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
 				a_rpoElement = a_rpoElement->f_poNext;
-			break;
 			}
+		break;
 		case ( D_TREAT_AS_OPENED ):
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iOffset; l_iCtr ++ )
@@ -937,13 +906,10 @@ bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, treatme
 					}
 				a_rpoElement = a_rpoElement->f_poNext;
 				}
-			break;
 			}
+		break;
 		default :
-			{
 			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
-			break;
-			}
 		}
 	return ( l_bOK );
 	M_EPILOG
@@ -1057,20 +1023,13 @@ tType & HList< tType >::go ( int a_iNumber, search_after_t a_eFlag )
 	switch ( a_eFlag )
 		{
 		case ( D_SEARCH_AFTER_NUMBER ):
-			{
 			f_poSelected = element_by_number ( a_iNumber );
-			break;
-			}
+		break;
 		case ( D_SEARCH_AFTER_ORDER ):
-			{
 			f_poSelected = element_by_index ( a_iNumber );
-			break;
-			}
+		break;
 		default :
-			{
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
-			break;
-			}
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
 		}
 	return ( f_poSelected->get ( ) );
 	M_EPILOG
@@ -1154,19 +1113,14 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, search_after_t a_eFla
 				f_iError++;
 				return ;
 				}
-			break;
 			}
+		break;
 		case ( D_SEARCH_AFTER_ORDER ):
-			{
 			l_poLeft = element_by_index ( a_iLeft );
 			l_poRight = element_by_index ( a_iRight );
-			break;
-			}
+		break;
 		default :
-			{
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
-			break;
-			}
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
 		}
 	exchange ( l_poLeft, l_poRight );
 	return;

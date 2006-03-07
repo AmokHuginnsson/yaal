@@ -181,43 +181,23 @@ char const * db_error  ( void * a_pvData )
 		{
 		case ( OCI_SUCCESS_WITH_INFO ):
 		case ( OCI_ERROR ):
-			{
 			OCIErrorGet ( l_psOracle->f_psError, 1, NULL, & code,
 					reinterpret_cast < OraText * > ( l_pcTextBuffer ),
 					OCI_ERROR_MAXMSG_SIZE - 2, OCI_HTYPE_ERROR );
-			break;
-			}
+		break;
 		case ( OCI_NEED_DATA ):
-			{
 			return ( "OCI_NEED_DATA" );
-			break;
-			}
 		case ( OCI_NO_DATA ):
-			{
 			return ( "OCI_NO_DATA" );
-			break;
-			}
 		case ( OCI_INVALID_HANDLE ):
-			{
 			return ( "OCI_INVALID_HANDLE" );
-			break;
-			}
 		case ( OCI_STILL_EXECUTING ):
-			{
 			return ( "OCI_STILL_EXECUTING" );
-			break;
-			}
 		case ( OCI_CONTINUE ):
-			{
 			return ( "OCI_CONTINUE" );
-			break;
-			}
 		default:
-			{
 			snprintf ( l_pcTextBuffer, OCI_ERROR_MAXMSG_SIZE - 2,
 					"Error - %d", l_psOracle->f_iStatus );
-			break;
-			}
 		}
 	return ( l_pcTextBuffer );
 	}

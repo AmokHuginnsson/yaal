@@ -77,12 +77,11 @@ struct CURSOR
 	{
 	typedef enum
 		{
-		D_CURSOR_INVISIBLE, 
-		D_CURSOR_VISIBLE, 
-		D_CURSOR_VERY_VISIBLE
+		D_INVISIBLE, 
+		D_VISIBLE, 
+		D_VERY_VISIBLE
 		} cursor_t;
 	};
-
 
 struct COLORS
 	{
@@ -129,7 +128,7 @@ void enter_curses( void );
 void leave_curses( void );
 void set_attr( int );
 int c_move ( int const &, int const & );
-int curs_set ( int const & );
+CURSOR::cursor_t curs_set ( CURSOR::cursor_t const & );
 int c_addch ( GLYPHS::glyph_t const & );
 int c_refresh ( void );
 int endwin ( void );

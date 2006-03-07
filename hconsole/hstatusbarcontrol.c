@@ -126,19 +126,13 @@ int HStatusBarControl::process_input ( int a_iCode )
 		case ( D_PROMPT_MODE_NORMAL ):
 		case ( D_PROMPT_MODE_COMMAND ):
 		case ( D_PROMPT_MODE_SEARCH ):
-			{
 			a_iCode = process_input_normal ( a_iCode );
-			break;
-			}
+		break;
 		case ( D_PROMPT_MODE_MENU ):
-			{
 			a_iCode = process_input_menu ( a_iCode );
-			break;
-			}
+		break;
 		default :
-			{
 			break;
-			}
 		}
 	return ( a_iCode );
 	M_EPILOG
@@ -344,18 +338,13 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 				if ( l_poSearchableControl )
 					l_poSearchableControl->search ( f_oString, l_bBackwards );
 				}
-			break;
 			}
+		break;
 		case ( '\t' ):
-			{
 			bell ( );
-			break;
-			}
+		break;
 		default :
-			{
 			a_iCode = l_iCode;
-			break;
-			}
 		}
 	return ( a_iCode );
 	M_EPILOG

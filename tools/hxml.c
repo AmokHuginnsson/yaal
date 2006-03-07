@@ -96,8 +96,11 @@ struct HXml::OConvert
 		}
 	OConvert & operator = ( OConvert const & a_roConvert )
 		{
-		f_xIconvIn = a_roConvert.f_xIconvIn;
-		f_xIconvOut = a_roConvert.f_xIconvOut;
+		if ( & a_roConvert != this )
+			{
+			f_xIconvIn = a_roConvert.f_xIconvIn;
+			f_xIconvOut = a_roConvert.f_xIconvOut;
+			}
 		return ( * this );
 		}
 	};

@@ -150,7 +150,7 @@ void enter_curses( void )
 	immedok ( stdscr, false );
 	M_ENSURE ( fflush ( NULL ) == 0 );
 	M_IRV ( flushinp ( ) ); /* Always returns OK */
-	M_IRV ( curs_set ( CURSOR::D_CURSOR_INVISIBLE ) );
+	M_IRV ( curs_set ( CURSOR::D_INVISIBLE ) );
 	M_ENSURE ( refresh ( ) != ERR );
 	/* init color pairs */
 	M_ENSURE ( assume_default_colors ( COLOR_BLACK, COLOR_BLACK ) == OK );
@@ -210,7 +210,7 @@ void leave_curses( void )
 	standend ( );
 	M_ENSURE ( keypad ( stdscr, false ) != ERR );
 	M_ENSURE ( nocbreak ( ) != ERR );
-	M_IRV ( curs_set ( CURSOR::D_CURSOR_VISIBLE ) );
+	M_IRV ( curs_set ( CURSOR::D_VISIBLE ) );
 /*	reset_shell_mode ( ); */
 /* see comment near def_shell_mode ( ), ( automagicly by endwin ( ) ) */
 /*
@@ -243,9 +243,14 @@ int c_move ( int const & a_iRow, int const & a_iColumn )
 	return ( ::move ( a_iRow, a_iColumn ) );
 	}
 
-int curs_set ( int const & a_iCursor )
+CURSOR::cursor_t curs_set ( CURSOR::cursor_t const & a_eCursor )
 	{
-	return ( ::curs_set ( a_iCursor ) );
+	int l_iCursor = ::curs_set ( a_eCursor == CURSOR::D_VISIBLE ? 1 : ( a_eCursor == CURSOR::D_INVISIBLE ? 0 : 2 ) );
+	if ( l_iCursor == 1 )
+		return ( CURSOR::D_VISIBLE );
+	else if ( l_iCursor == 2 )
+		return ( CURSOR::D_VERY_VISIBLE );
+	return ( CURSOR::D_INVISIBLE );
 	}
 
 int c_addch ( GLYPHS::glyph_t const & a_eGlyph )
@@ -254,25 +259,16 @@ int c_addch ( GLYPHS::glyph_t const & a_eGlyph )
 	switch ( a_eGlyph )
 		{
 		case ( GLYPHS::D_DOWN_ARROW ):
-			{
 			l_iChar = D_ASCII_DOWN_ARROW;
-			break;
-			}
+		break;
 		case ( GLYPHS::D_UP_ARROW ):
-			{
 			l_iChar = D_ASCII_UP_ARROW;
-			break;
-			}
+		break;
 		case ( GLYPHS::D_VERTICAL_LINE ):
-			{
 			l_iChar = D_ASCII_VERTICAL_LINE;
-			break;
-			}
+		break;
 		default :
-			{
 			M_ASSERT ( ! "unknown glyph" );
-			break;
-			}
 		}
 	return ( ::addch ( l_iChar ) );
 	}
@@ -380,7 +376,7 @@ int get_key ( void )
 	M_PROLOG
 	int l_iKey = 0;
 	int l_iChar = 0;
-	int l_iOrigCursState = CURSOR::D_CURSOR_INVISIBLE;
+	CURSOR::cursor_t l_eOrigCursState = CURSOR::D_INVISIBLE;
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", g_iErrNo );
 	M_ENSURE ( noecho() != ERR );
@@ -398,7 +394,7 @@ int get_key ( void )
 		}
 	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
 		{
-		l_iOrigCursState = curs_set ( CURSOR::D_CURSOR_INVISIBLE );
+		l_eOrigCursState = curs_set ( CURSOR::D_INVISIBLE );
 		M_IRV ( c_printf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
 					n_cCommandComposeCharacter ) );
 		timeout ( n_iCommandComposeDelay * 100 );
@@ -427,7 +423,7 @@ int get_key ( void )
 				l_iKey = D_KEY_COMMAND_(l_iChar = l_iKey);
 			M_IRV ( c_printf ( n_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar ) );
 			}
-		M_IRV ( curs_set ( l_iOrigCursState ) );
+		M_IRV ( curs_set ( l_eOrigCursState ) );
 		}
 	M_ENSURE ( echo ( ) != ERR );
 	switch ( l_iKey )
@@ -440,7 +436,7 @@ int get_key ( void )
 		case ( 8 ):
 		case ( 127 ):
 		case ( KEY_BACKSPACE ):	l_iKey = KEY_CODES::D_BACKSPACE;	break;
-		case ( KEY_UP ):				l_iKey = KEY_CODES::D_UP;				break;
+		case ( KEY_UP ):				l_iKey = KEY_CODES::D_UP;					break;
 		case ( KEY_DOWN ):			l_iKey = KEY_CODES::D_DOWN;				break;
 		case ( KEY_LEFT ):			l_iKey = KEY_CODES::D_LEFT;				break;
 		case ( KEY_RIGHT ):			l_iKey = KEY_CODES::D_RIGHT;			break;
@@ -448,7 +444,7 @@ int get_key ( void )
 		case ( KEY_IC ):				l_iKey = KEY_CODES::D_INSERT;			break;
 		case ( KEY_MOUSE ):			l_iKey = KEY_CODES::D_MOUSE;			break;
 		default:
-			break;
+		break;
 		}
 	return ( l_iKey );
 	M_EPILOG

@@ -138,7 +138,7 @@ void HEditControl::refresh ( void )
 		{
 		M_ENSURE ( c_move ( f_iRowRaw,
 					f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) ) != C_ERR );
-		M_IRV ( curs_set ( f_bReplace ? CURSOR::D_CURSOR_VERY_VISIBLE : CURSOR::D_CURSOR_VISIBLE ) );
+		M_IRV ( curs_set ( f_bReplace ? CURSOR::D_VERY_VISIBLE : CURSOR::D_VISIBLE ) );
 		}
 	return;
 	M_EPILOG
@@ -180,33 +180,23 @@ int HEditControl::process_input ( int a_iCode )
 	switch ( a_iCode )
 		{
 		case ( KEY_CODES::D_PAGE_UP ):
-			{
 			M_IRV ( f_oHistory.go ( 0 ) );
 			l_iErrorCode = - 1;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_PAGE_DOWN ):
-			{
 			M_IRV ( f_oHistory.go ( - 1 ) );	
 			l_iErrorCode = - 1;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_UP ):
-			{
 			M_IRV ( f_oHistory.to_tail ( ) );
 			l_iErrorCode = - 1;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_DOWN ):
-			{
 			M_IRV ( f_oHistory.to_head ( ) );
 			l_iErrorCode = - 1;
-			break;
-			}
+		break;
 		case ( '\t' ):
-			{
 			f_bFocused = false;
-			}
 		/* enter works like tab without focus movement */
 		case ( '\r' ):
 			{
@@ -226,8 +216,8 @@ int HEditControl::process_input ( int a_iCode )
 			else
 				M_IRV ( f_oHistory.to_head ( ) );
 			l_iErrorCode = a_iCode;
-			break;
 			}
+		break;
 		case ( KEY_CODES::D_LEFT ):
 			{
 			if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
@@ -239,15 +229,13 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				bell ( );
-			break;
 			}
+		break;
 		case ( D_KEY_CTRL_('a') ):
 		case ( KEY_CODES::D_HOME ):
-			{
 			f_iCursorPosition = 0;
 			f_iControlOffset = 0;
-			break;
-			}
+		break;
 		case ( D_KEY_CTRL_('e') ):
 		case ( KEY_CODES::D_END ):
 			{
@@ -258,8 +246,8 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				f_iCursorPosition = l_iLength;
-			break;
 			}
+		break;
 		case ( KEY_CODES::D_RIGHT ):
 			{
 			if ( ( f_iCursorPosition + f_iControlOffset ) < l_iLength )
@@ -273,8 +261,8 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				bell ( );
-			break;
 			}
+		break;
 		case ( D_KEY_CTRL_( 'u' ) ):
 			{
 			if ( ! f_bReadOnly )
@@ -285,8 +273,8 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				bell ( );
-			break;
 			}
+		break;
 		case ( KEY_CODES::D_DELETE ):
 			{
 			if ( ! ( f_bReadOnly || f_bReplace ) )
@@ -305,8 +293,8 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				bell ( );
-			break;
 			}
+		break;
 		case ( KEY_CODES::D_BACKSPACE ):
 			{
 			if ( ! f_bReadOnly && ( ( f_iControlOffset + f_iCursorPosition ) > 0 ) )
@@ -325,13 +313,11 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				bell ( );
-			break;
 			}
+		break;
 		case ( KEY_CODES::D_INSERT ):
-			{
 			f_bReplace = ! f_bReplace;
-			break;
-			}
+		break;
 		case ( D_KEY_META_('f') ):
 			{
 			l_pcBuffer += ( f_iControlOffset + f_iCursorPosition );
@@ -351,8 +337,8 @@ int HEditControl::process_input ( int a_iCode )
 			if ( ( l_iOldCursorPosition == f_iCursorPosition )
 					&& ( l_iOldControlOffset == f_iControlOffset ) )
 				bell ( );
-			break;
 			}
+		break;
 		case ( D_KEY_META_('b') ):
 			{
 			if ( f_iControlOffset + f_iCursorPosition )
@@ -381,8 +367,8 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				bell ( );
-			break;
 			}
+		break;
 		case ( D_KEY_META_('d') ):
 			{
 			if ( ! ( f_bReadOnly || f_bReplace ) )
@@ -409,8 +395,8 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				bell ( );
-			break;
 			}
+		break;
 		case ( D_KEY_CTRL_('w') ):
 			{
 			if ( ! ( f_bReadOnly || f_bReplace ) )
@@ -446,8 +432,8 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				bell ( );
-			break;
 			}
+		break;
 		default:
 			{
 			if ( ! f_bReadOnly && ( a_iCode > 31 ) && ( a_iCode < 256 ) )
@@ -473,7 +459,6 @@ int HEditControl::process_input ( int a_iCode )
 				}
 			else
 				l_iErrorCode = a_iCode;
-			break;
 			}
 		}
 	if ( l_iErrorCode < 0 )

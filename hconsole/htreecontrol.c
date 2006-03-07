@@ -135,7 +135,7 @@ void HTreeControl::refresh ( void )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( f_bFocused )
-		curs_set ( CURSOR::D_CURSOR_INVISIBLE );
+		curs_set ( CURSOR::D_INVISIBLE );
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer.raw ( ), '_', f_iWidthRaw );
@@ -197,27 +197,19 @@ int HTreeControl::process_input ( int a_iCode )
 	switch ( a_iCode )
 		{
 		case ( KEY_CODES::D_HOME ):
-			{
 			l_poNode = dynamic_cast < HNodeControl * > ( f_poRoot );
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				f_poSelected = l_poNode->f_oBranch [ 0 ];
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_END ):
-			{
 			l_poNode = dynamic_cast < HNodeControl * > ( f_poRoot );
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				f_poSelected = l_poNode->f_oBranch [ - 1 ];
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_PAGE_UP ):
-			{
 			break;
-			}
 		case ( KEY_CODES::D_PAGE_DOWN ):
-			{
 			break;
-			}
 		case ( KEY_CODES::D_UP ):
 			{
 			f_poSelected = l_poNode->previous ( );
@@ -240,8 +232,8 @@ int HTreeControl::process_input ( int a_iCode )
 						}
 					}
 				}
-			break;
 			}
+		break;
 		case ( KEY_CODES::D_RIGHT ):
 			{
 			l_bWasFolded = ! l_poNode->f_bUnfolded;
@@ -276,36 +268,27 @@ int HTreeControl::process_input ( int a_iCode )
 				if ( l_poNode && ( l_poNode->f_iLevel > 0 ) )
 					f_poSelected = l_poNode;
 				}
-			break;
 			}
+		break;
 		case ( KEY_CODES::D_LEFT ):
-			{
 			if ( l_poNode->f_bUnfolded && l_poNode->f_iLevel )
 				l_poNode->f_bUnfolded = false;
 			else if ( l_poNode->f_iLevel > 1 )
 				f_poSelected = l_poNode->f_poTrunk;
-			break;
-			}
+		break;
 		case ( ' ' ):
 		case ( '\r' ):
-			{
 			if ( l_poNode->f_oBranch.quantity ( ) )
 				l_poNode->f_bUnfolded = ! l_poNode->f_bUnfolded;
 			else
 				l_iErrorCode = a_iCode;
-			break; /* I have to think more about it. */
-			}
+		break; /* I have to think more about it. */
 		case ( '\t' ):
-			{
 			f_bFocused = false;	/* very  */
 			refresh ( );				/* magic */
-			}
 		/* no break on purpouse, see hlistcontrol.c */
 		default :
-			{
 			l_iErrorCode = a_iCode;
-			break;
-			}
 		}
 	a_iCode = l_iErrorCode;
 	if ( ! l_iErrorCode )

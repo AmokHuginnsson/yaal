@@ -130,15 +130,11 @@ int HComboboxControl::process_input ( int a_iCode )
 		switch ( a_iCode )
 			{
 			case ( KEY_CODES::D_UP ):
-				{
 				f_iMode = D_MODE_LISTCONTROL;
-				break;
-				}
+			break;
 			case ( KEY_CODES::D_DOWN ):
-				{
 				f_iMode = D_MODE_LISTCONTROL;
-				break;
-				}
+			break;
 			default :
 				return ( HEditControl::process_input ( a_iCode ) );
 			}

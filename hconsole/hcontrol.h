@@ -96,12 +96,12 @@ public:
 	bool hit_test ( int, int ) const;
 	void set_attributes ( int, int, int );
 	void move ( int, int, int, int );
-	int attr_label ( void );
-	int attr_shortcut ( void );
-	int attr_data ( void );
-	void set_attr_label ( void );
-	void set_attr_shortcut ( void );
-	void set_attr_data ( void );
+	int attr_label ( void ) const;
+	int attr_shortcut ( void ) const;
+	int attr_data ( void ) const;
+	void set_attr_label ( void ) const;
+	void set_attr_shortcut ( void ) const;
+	void set_attr_data ( void ) const;
 	/*}*/
 private:
 	/*{*/

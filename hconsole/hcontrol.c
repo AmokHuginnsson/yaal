@@ -267,28 +267,28 @@ bool HControl::hit_test ( int a_iRow, int a_iColumn ) const
 	M_EPILOG
 	}
 
-int HControl::attr_label ( void )
+int HControl::attr_label ( void ) const
 	{
 	M_PROLOG
 	return ( f_bEnabled ? ( f_bFocused ? f_uiFocusedAttribute >> 8 : f_uiEnabledAttribute >> 8 ) : f_uiDisabledAttribute >> 8 );
 	M_EPILOG
 	}
 
-int HControl::attr_shortcut ( void )
+int HControl::attr_shortcut ( void ) const
 	{
 	M_PROLOG
 	return ( ! f_bEnabled ? ( ! f_bFocused ? f_uiFocusedAttribute >> 8 : f_uiEnabledAttribute >> 8 ) : f_uiDisabledAttribute >> 8 );
 	M_EPILOG
 	}
 
-int HControl::attr_data ( void )
+int HControl::attr_data ( void ) const
 	{
 	M_PROLOG
 	return ( f_bEnabled ? ( f_bFocused ? f_uiFocusedAttribute : f_uiEnabledAttribute ) : f_uiDisabledAttribute );
 	M_EPILOG
 	}
 
-void HControl::set_attr_label ( void )
+void HControl::set_attr_label ( void ) const
 	{
 	M_PROLOG
 	set_attr ( attr_label ( ) );
@@ -296,7 +296,7 @@ void HControl::set_attr_label ( void )
 	M_EPILOG
 	}
 
-void HControl::set_attr_shortcut ( void )
+void HControl::set_attr_shortcut ( void ) const
 	{
 	M_PROLOG
 	set_attr ( attr_shortcut ( ) );
@@ -304,7 +304,7 @@ void HControl::set_attr_shortcut ( void )
 	M_EPILOG
 	}
 
-void HControl::set_attr_data ( void )
+void HControl::set_attr_data ( void ) const
 	{
 	M_PROLOG
 	set_attr ( attr_data ( ) );

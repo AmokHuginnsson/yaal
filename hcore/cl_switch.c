@@ -58,20 +58,14 @@ char const * const make_short_opts ( OOption * const & a_rpsOptions, int a_iCoun
 		switch ( a_rpsOptions [ l_iCtr ].f_eSwitchType )
 			{
 			case ( OOption::D_REQUIRED ):
-				{
 				a_roBuffer += ':';
-				break;
-				}
+			break;
 			case ( OOption::D_OPTIONAL ):
-				{
 				a_roBuffer += "::";
-				break;
-				}
+			break;
 			case ( OOption::D_NONE ):
 			default :
-				{
 				break;
-				}
 			}
 		}
 	return ( a_roBuffer.raw ( ) );
@@ -91,21 +85,14 @@ option * make_option_array ( OOption * const & a_rpsOptions, int a_iCount, HStri
 		switch ( a_rpsOptions [ l_iCtr ].f_eSwitchType )
 			{
 			case ( OOption::D_REQUIRED ):
-				{
 				l_psOptions [ l_iCtr ].has_arg = required_argument;
-				break;
-				}
+			break;
 			case ( OOption::D_OPTIONAL ):
-				{
 				l_psOptions [ l_iCtr ].has_arg = optional_argument;
-				break;
-				}
+			break;
 			case ( OOption::D_NONE ):
 			default :
-				{
 				l_psOptions [ l_iCtr ].has_arg = no_argument;
-				break;
-				}
 			}
 		l_psOptions [ l_iCtr ].val = a_rpsOptions [ l_iCtr ].f_cShortOption;
 		}
@@ -139,45 +126,30 @@ int decode_switches ( int const a_iArgc, char * const * const a_ppcArgv,
 				switch ( a_rpsOptions [ l_iCtr ].f_eValueType )
 					{
 					case ( D_BOOL ):
-						{
 						rc_set_variable ( "true",
 								* static_cast < bool * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) );
-						break;
-						}
+					break;
 					case ( D_CHAR ):
-						{
 						if ( optarg )
 							rc_set_variable ( optarg,
 									* static_cast < char * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) );
-						break;
-						}
+					break;
 					case ( D_INT ):
-						{
 						rc_set_variable ( optarg,
 								* static_cast < int * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) );
-						break;
-						}
+					break;
 					case ( D_CHAR_POINTER ):
-						{
 						rc_set_variable ( optarg,
 								static_cast < char * * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) );
-						break;
-						}
+					break;
 					case ( D_HSTRING ):
-						{
 						( * static_cast < HString * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) ) = optarg;
-						break;
-						}
+					break;
 					case ( D_VOID ):
-						{
 						break;
-						}
 					default:
-						{
 						M_THROW ( "unknown type",
 								static_cast < int > ( a_rpsOptions [ l_iCtr ].f_eValueType ) );
-						break;
-						}
 					}
 				if ( a_rpsOptions [ l_iCtr ].CALLBACK )
 					a_rpsOptions [ l_iCtr ].CALLBACK ( );

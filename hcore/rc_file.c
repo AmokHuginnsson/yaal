@@ -278,15 +278,11 @@ void strip_comment ( char * a_pcBuffer )
 		switch ( a_pcBuffer [ l_iCtr ] )
 			{
 			case ( '\'' ):
-				{
 				l_bApostrophe = ! l_bApostrophe;
-				break;
-				}
+			break;
 			case ( '"' ):
-				{
 				l_bQuotation = ! l_bQuotation;
-				break;
-				}
+			break;
 			case ( '#' ):
 				{
 				if ( ! ( l_bQuotation || l_bApostrophe ) )
@@ -294,12 +290,10 @@ void strip_comment ( char * a_pcBuffer )
 					a_pcBuffer [ l_iCtr ] = 0;
 					return;
 					}
-				break;
 				}
+			break;
 			default:
-				{
-				break;
-				}
+			break;
 			}
 		}
 	return;

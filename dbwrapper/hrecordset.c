@@ -111,8 +111,8 @@ void HRecordSet::build_sql ( void )
 			if ( ! f_oVarTmpBuffer.is_empty ( ) )
 				f_oSQL += ( " ORDER BY " + f_oVarTmpBuffer );
 			f_oSQL += ';';
-			break;
 			}
+		break;
 		case ( D_MODE_EDITING ):
 			{
 			f_oSQL = "UPDATE " + f_oTable + " SET ";
@@ -128,8 +128,8 @@ void HRecordSet::build_sql ( void )
 			f_oSQL += f_oVarTmpBuffer;
 			f_oSQL += m_lId;
 			f_oSQL += ';';
-			break;
 			}
+		break;
 		case ( D_MODE_ADDING ):
 			{
 			f_oSQL = "INSERT INTO " + f_oTable + " ( ";
@@ -154,13 +154,10 @@ void HRecordSet::build_sql ( void )
 				}
 			f_oVarTmpBuffer += " );";
 			f_oSQL += f_oVarTmpBuffer;
-			break;
 			}
+		break;
 		default :
-			{
 			M_THROW ( E_MODE, f_iMode );
-			break;
-			}
 		}
 	return;
 	M_EPILOG

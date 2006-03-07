@@ -121,8 +121,8 @@ public:
 										HControl * = NULL );					/* control associated */
 	virtual HItem & add_tail ( HItem * = NULL );
 	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
-	virtual int remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
-	virtual int remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
+	virtual stdhapi::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
+	virtual stdhapi::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual bool is_searchable ( void );
 	virtual int click ( mouse::OMouse & );
 	/*}*/
