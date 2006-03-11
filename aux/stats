@@ -16,26 +16,26 @@ printf "	total:             %8d\n" ${TOTAL}
 #TMP_FILE=`mktemp`
 TMP_FILE=`mktemp -t stdhapi-stats.XXXXXX`
 
-cat ${SOURCES} ${HEADERS} | grep -v '^$' > ${TMP_FILE}
+cat ${SOURCES} ${HEADERS} | grep -v '^[ \t]*$\|^[ \t]*/\*' > ${TMP_FILE}
 
 LINES=`wc -l ${TMP_FILE}|awk '{print $1}'`
 LINES=$((${LINES}-${TOTAL}*21))
 
 printf "	lines:             %8d\n" ${LINES}
 
-CLASSES=`grep -v 'class.*;' ${TMP_FILE} | grep -c '\<class\>'`
+CLASSES=`grep '\<class\>' ${TMP_FILE} | grep -cv 'class.*;'`
 
 printf "	classes:           %8d\n" ${CLASSES}
 
-STRUCTURES=`grep -c '\<struct\>' ${TMP_FILE}`
+STRUCTURES=`grep '\<struct\>' ${TMP_FILE} | grep -cv 'struct.*;'`
 
 printf "	structures:        %8d\n" ${STRUCTURES}
 
-MACROS=`grep -c '#define[ 	]\<M_' ${TMP_FILE}`
+MACROS=`awk '/#[ \t]*define[ \t]+M_/{print substr($0,match($0,"M_[A-Z_]*"),RLENGTH)}' ${TMP_FILE}|sort -u|wc -l`
 
 printf "	macros:            %8d\n" ${MACROS}
 
-DEFINES=`grep -c '#define[ 	]\<D_' ${TMP_FILE}`
+DEFINES=`awk '/#[ \t]*define[ \t]+D_/{print substr($0,match($0,"D_[A-Z_]*"),RLENGTH)}' ${TMP_FILE}|sort -u|wc -l`
 
 printf "	defines:           %8d\n" ${DEFINES}
 

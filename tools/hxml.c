@@ -149,13 +149,6 @@ HXmlData::HXmlData ( HXmlData const & a_roXml ) : f_psDoc ( NULL ),
 	M_EPILOG
 	}
 
-HXmlData & HXmlData::operator = ( HXmlData const & )
-	{
-	M_PROLOG
-	M_ASSERT ( ! "This method should not be called." );
-	M_EPILOG
-	}
-
 void HXmlData::xml_free ( xmlDocPtr & a_rpsDoc ) const
 	{
 	M_PROLOG

@@ -8,6 +8,7 @@
 +cpp(c)
 +cpp(h)
 +libclass(angle)
+//-passes(6)
 -t2	/* tab size */
 -h1	/* message height */
 -format(%f:%l:%m [%n])
@@ -31,6 +32,7 @@
 -i"/usr/lib/gcc-lib/i486-linux/3.3.5/include"
 -i"/usr/include/c++/3.4.5"
 -i"/usr/include/c++/3.4.5/i486-linux"
+-i"/usr/include/c++/3.4.5/i686-pld-linux"
 -i"/usr/lib/gcc/i686-pld-linux/3.4.5"
 -i"/usr/lib/gcc/i686-pld-linux/3.4.5/include"
 -i"/usr/lib/gcc/i686-pld-linux/4.0.0"
@@ -84,6 +86,7 @@
 //+e1928  // Symbol 'Name' did not appear in the constructor initializer list // bug
 
 /* Disabling warrnings for our code */
+-e414		/* Possible division by 0 */ // Another fucking bug that makes this piece of crap called FlexeLint almost useless.
 -e534		/* Ignoring return value of function 'function' */
 -e537		/* Repeated include file 'file' */
 -e613		/* Possible use of null pointer 'pointer' in left argument to operator '->' */
@@ -162,9 +165,9 @@
 -esym(1511,*operator=*)
 -esym(1529,stdhapi::tools::HXmlData::operator=) /* Symbol 'symbol' not first checking for assignment to this */
 -esym(1539,stdhapi::tools::HXmlData::f_ps*) /* member 'member' not assigned by assignment opeator */
--esym(1536,stdhapi::tools::HAnalyser::f_pdVariables,stdhapi::hdata::HDataProcess::f_oDataBase) /* Exposing low access member 'member' */
+-esym(1536,stdhapi::tools::HAnalyser::f_pdVariables,stdhapi::tools::HXml::f_oRoot,stdhapi::hdata::HDataProcess::f_oDataBase) /* Exposing low access member 'member' */
 -esym(1554,*_pv*) /* Direct pointer copy of member 'member' within copy constructor: 'constructor' */
--esym(1555,*_pv*,stdhapi::hconsole::HListControl::HColumnInfo::f_poControl,stdhapi::hconsole::OMenuItem::f_psSubMenu,stdhapi::hconsole::OMenuItem::HANDLER) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
+-esym(1555,*_pv*,"stdhapi::hcore::HPointer<OConvert,0>::f_poShared",stdhapi::hconsole::HListControl::HColumnInfo::f_poControl,stdhapi::hconsole::OMenuItem::f_psSubMenu,stdhapi::hconsole::OMenuItem::HANDLER,stdhapi::tools::HXml::OConvert::f_xIconvIn,stdhapi::tools::HXml::OConvert::f_xIconvOut) /* Direct pointer copy of member 'member' within copy assignment operator: 'operator' */
 -esym(1725,stdhapi::hcore::HLock::f_roMutex) /* class member 'member' is a reference */
 -esym(1764,a_roOption,a_roValue)
 -esym(1769,stdhapi::hcore::OListBits,stdhapi::hcore::HPattern::f_sCompiled,stdhapi::hcore::HCondition::f_sAttributes,stdhapi::hcore::HCondition::f_xCondition,stdhapi::hcore::HThread::f_sAttributes,stdhapi::hcore::HMutex::f_sAttributes,stdhapi::hcore::HMutex::f_xMutex,stdhapi::hcore::HTime::f_sBroken,stdhapi::hconsole::HEditControl::f_sMask,stdhapi::hconsole::HListControl::f_sMatch,stdhapi::hcore::HProcess::f_sLatency,stdhapi::hcore::HProcess::f_xFileDescriptorSet,stdhapi::tools::HSerial::f_sTIO,stdhapi::tools::HSerial::f_sBackUpTIO,stdhapi::tools::signals::HSigStackWrapper::f_sStack) /* Member or base class 'class' has no constructor */

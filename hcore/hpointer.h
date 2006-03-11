@@ -39,6 +39,9 @@ namespace stdhapi
 namespace hcore
 {
 
+/* Due to extream vitality of this class,
+ * none of the methods are guarded. */
+
 template < typename tType, bool array = false >
 class HPointer
 	{
@@ -48,8 +51,8 @@ class HPointer
 		int f_iReferenceCounter;
 		bool f_bArray;
 		explicit HShared ( tType * const );
-		virtual ~HShared ( void );
-		bool release ( void );
+		virtual ~HShared ( void ) throw ( );
+		bool release ( void ) throw ( );
 		HShared ( HShared const & );
 		HShared & operator = ( HShared const & );
 		friend class HPointer;
@@ -64,9 +67,9 @@ public:
 	virtual ~HPointer ( void );
 	HPointer ( HPointer const & );
 	HPointer & operator = ( HPointer const & );
-	tType & operator * ( void );
-	tType * operator-> ( void );
-	tType & operator [ ] ( int );
+	tType & operator * ( void ) const;
+	tType * operator-> ( void ) const;
+	tType & operator [ ] ( int ) const;
 	/*}*/
 	};
 
@@ -79,14 +82,14 @@ HPointer < tType, array >::HShared::HShared ( tType * const a_ptPointer )
 	}
 
 template < typename tType, bool array >
-HPointer < tType, array >::HShared::~HShared ( void )
+HPointer < tType, array >::HShared::~HShared ( void ) throw ( )
 	{
 	M_ASSERT ( f_iReferenceCounter == 0 );
 	return;
 	}
 
 template < typename tType, bool array >
-bool HPointer < tType, array >::HShared::release ( void )
+bool HPointer < tType, array >::HShared::release ( void ) throw ( )
 	{
 	M_ASSERT ( f_iReferenceCounter > 0 );
 	f_iReferenceCounter --;
@@ -145,19 +148,19 @@ HPointer < tType, array > & HPointer < tType, array >::operator = ( HPointer con
 	}
 
 template < typename tType, bool array >
-tType & HPointer < tType, array >::operator * ( void )
+tType & HPointer < tType, array >::operator * ( void ) const
 	{
 	return ( * f_poShared->f_ptPointer );
 	}
 
 template < typename tType, bool array >
-tType * HPointer < tType, array >::operator-> ( void )
+tType * HPointer < tType, array >::operator-> ( void ) const
 	{
 	return ( f_poShared->f_ptPointer );
 	}
 
 template < typename tType, bool array >
-tType & HPointer < tType, array >::operator [ ] ( int a_iIndex )
+tType & HPointer < tType, array >::operator [ ] ( int a_iIndex ) const
 	{
 	M_ASSERT ( f_poShared->f_bArray );
 	M_ASSERT ( a_iIndex >= 0 );

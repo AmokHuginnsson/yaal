@@ -70,11 +70,10 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 	int l_iError = HTUIProcess::init_tui ( a_pcProcessName );
 	HMainWindow * l_poMainWindow = NULL;
 	HXml l_oXml;
-	HXml::ONode l_sNode;
 	if ( ! dbwrapper::db_connect )
 		M_THROW ( "no database driver loaded", g_iErrNo );
 	l_oXml.init ( a_pcResource );
-	l_sNode = l_oXml.parse ( "/resource/menu" );
+	HXml::ONode & l_sNode = l_oXml.parse ( "/resource/menu" );
 	f_psRootMenu = build_sub_menu ( l_sNode, a_roHandlers );
 	l_poMainWindow = dynamic_cast < HMainWindow * > ( f_poForegroundWindow );
 	M_ASSERT ( l_poMainWindow );
@@ -107,8 +106,8 @@ OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode & a_rsNode,
 			}
 		}
 	else
-		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + l_psNode->f_oName
-				+ '=' + l_psNode->f_oContents.head ( ), g_iErrNo );
+		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.f_oName
+				+ '=' + a_rsNode.f_oContents.head ( ), g_iErrNo );
 	l_sMenuItem.reset ( );
 	l_oSubMenu.add_tail ( & l_sMenuItem );
 	l_psMenu = new OMenuItem [ l_iCount = l_oSubMenu.quantity ( ) ];
@@ -151,8 +150,8 @@ void HDataProcess::build_menu_item ( HXml::ONode & a_rsNode,
 			}
 		}
 	else
-		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + l_psNode->f_oName
-				+ '=' + l_psNode->f_oContents.head ( ), g_iErrNo );
+		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.f_oName
+				+ '=' + a_rsNode.f_oContents.head ( ), g_iErrNo );
 	return;
 	M_EPILOG
 	}
