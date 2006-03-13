@@ -139,8 +139,8 @@ int HDataWindow::init ( void )
 						l_psECR->f_bMultiLine, l_psECR->f_bReadOnly, 
 						l_psECR->f_bRightAligned, l_psECR->f_bPassword,
 						l_psECR->f_iMaxHistoryLevel, M_SETUP_ATTRIBUTES );
-				break;
 				}
+			break;
 			case ( D_CONTROL_LIST ):
 				{
 				l_sListControlResource.f_bCheckable = false;
@@ -152,30 +152,20 @@ int HDataWindow::init ( void )
 				l_poDataControl = new HDataListControl ( this, this, M_SETUP_STANDART,
 						l_psLCR->f_bCheckable, l_psLCR->f_bSortable, l_psLCR->f_bSearchable,
 						l_psLCR->f_bDrawHeader, M_SETUP_ATTRIBUTES );
-				break;
 				}
+			break;
 			case ( D_CONTROL_TREE ):
-				{
 				l_poDataControl = new HDataTreeControl ( this, this, M_SETUP_STANDART,
 						M_SETUP_ATTRIBUTES );
-				break;
-				}
+			break;
 			case ( D_CONTROL_COMBO ):
-				{
-				break;
-				}
+			break;
 			case ( D_CONTROL_DATE ):
-				{
-				break;
-				}
+			break;
 			case ( D_CONTROL_CHECK ):
-				{
-				break;
-				}
+			break;
 			default :
-				{
-				break;
-				}
+			break;
 			}
 		switch ( f_psResourcesArray [ l_iCtr ].f_iFlags )
 			{
@@ -188,26 +178,19 @@ int HDataWindow::init ( void )
 				f_poMainControl = l_poDataControl;
 				f_oViewModeControls.add_tail ( & l_poDataControl );
 				l_poDataControl->enable ( true );
-				break;
 				}
+			break;
 			case ( D_CONTROL_DATA ):
-				{
 				link ( l_iCtr, l_poDataControl );
 				f_oEditModeControls.add_tail ( & l_poDataControl );
-				break;
-				}
+			break;
 			case ( D_CONTROL_FILTER ):
-				{
 				l_poDataControl->enable ( true );
 				f_oViewModeControls.add_tail ( & l_poDataControl );
-				break;
-				}
+			break;
 			default :
-				{
 				M_THROW ( "unknown resource purpouse",
 						f_psResourcesArray [ l_iCtr ].f_iFlags );
-				break;
-				}
 			}
 		l_iCtr ++;
 		}
@@ -276,8 +259,8 @@ void HDataWindow::set_mode ( int a_iMode )
 				f_oViewModeControls [ l_iCtr ]->enable ( true );
 			if ( l_iCount )
 				f_oViewModeControls [ 0 ]->set_focus ( );
-			break;
 			}
+		break;
 		case ( D_MODE_EDIT ):
 			{
 			l_iCount = f_oViewModeControls.quantity ( );
@@ -288,13 +271,10 @@ void HDataWindow::set_mode ( int a_iMode )
 				f_oEditModeControls [ l_iCtr ]->enable ( true );
 			if ( l_iCount )
 				f_oEditModeControls [ 0 ]->set_focus ( );
-			break;
 			}
+		break;
 		default :
-			{
 			M_THROW ( "unknown window mode", a_iMode );
-			break;
-			}
 		}
 	return;
 	M_EPILOG

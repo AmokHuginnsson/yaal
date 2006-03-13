@@ -87,9 +87,9 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWind
 	int l_piCtrls [ ] = { D_KEY_CTRL_('l'), D_KEY_CTRL_('x') };
 	HMainWindow * l_poMainWindow = NULL;
 	HProcess::init ( n_iLatency );
-	M_REGISTER_FILE_DESCRIPTOR_HANDLER ( STDIN_FILENO, HTUIProcess::process_stdin );
+	register_file_descriptor_handler ( STDIN_FILENO, & HTUIProcess::process_stdin );
 	if ( n_bUseMouse && n_iMouseDes )
-		M_REGISTER_FILE_DESCRIPTOR_HANDLER ( n_iMouseDes, HTUIProcess::process_mouse );
+		register_file_descriptor_handler ( n_iMouseDes, & HTUIProcess::process_mouse );
 	register_postprocess_handler ( D_CTRLS_COUNT, l_piCtrls,
 			& HTUIProcess::handler_refresh );
 	register_postprocess_handler ( D_KEY_COMMAND_('x'), NULL,

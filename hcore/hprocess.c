@@ -71,7 +71,7 @@ int HProcess::init ( int a_iLatencySeconds, int a_iLatencyMicroseconds )
 	M_EPILOG
 	}
 
-int HProcess::register_file_descriptor_handler ( int a_iFileDescriptor,
+int HProcess::register_file_descriptor_handler_internal ( int a_iFileDescriptor,
 		process_handler_filedes_t HANDLER )
 	{
 	M_PROLOG

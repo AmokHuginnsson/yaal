@@ -212,22 +212,18 @@ HString kwota_slownie ( double a_dKwota )
 					l_oSlownie = n_ppcJednNastki [ static_cast < int > ( l_cCyfra ) ] + l_oSlownie;
 				else if ( ! l_iForma && ( ( l_iCtr < 3 ) || ( a_dKwota < 1 ) ) )
 					l_oSlownie = n_ppcJednNastki [ 0 ] + l_oSlownie;
-				break;
 				}
+			break;
 			case ( 1 ) :
-				{
 				if ( l_iForma > 19 )
 					l_oSlownie = n_ppcDzies [ static_cast < int > ( l_cCyfra ) ] + l_oSlownie;
-				break;
-				}
+			break;
 			case ( 2 ) :
-				{
 				if ( l_cCyfra )
 					l_oSlownie = n_ppcSetki [ static_cast < int > ( l_cCyfra ) ] + l_oSlownie;
-				break;
-				}
+			break;
 			default:
-				break;
+			break;
 			}
 		}
 	return ( l_oSlownie );

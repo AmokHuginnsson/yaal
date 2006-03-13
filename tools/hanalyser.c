@@ -54,6 +54,14 @@ namespace stdhapi
 namespace tools
 {
 
+namespace
+	{
+	static int const D_ADD = 0;
+	static int const D_SUBSTRACT = 1;
+	static int const D_MULTIPLY = 0;
+	static int const D_DIVIDE = 1;
+	}
+
 struct FUNCTIONS
 	{
 	static int const D_FUNCTIONS = 0;
@@ -264,16 +272,12 @@ double HAnalyser::addition ( HAnalyserNode * a_poNode )
 		l_dRightValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ l_iIndex ] );
 		switch ( l_iOperator )
 			{
-			case 0 :
-				{
+			case ( D_ADD ) :
 				l_dLeftValue += l_dRightValue;
-				break;
-				}
-			case 1 :
-				{
+			break;
+			case ( D_SUBSTRACT ) :
 				l_dLeftValue -= l_dRightValue;
-				break;
-				}
+			break;
 			default:
 				M_THROW ( _ ( "unknown addition operator" ), l_iOperator );
 			}
@@ -299,17 +303,13 @@ double HAnalyser::multiplication ( HAnalyserNode * a_poNode )
 		l_dRightValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ l_iIndex ] );
 		switch ( l_iOperator )
 			{
-			case 0 :
-				{
+			case ( D_MULTIPLY ) :
 				l_dLeftValue *= l_dRightValue;
-				break;
-				}
-			case 1 :
-				{
+			break;
+			case ( D_DIVIDE ) :
 				if ( l_dRightValue )
 					l_dLeftValue /= l_dRightValue;
-				break;
-				}
+			break;
 			default:
 				M_THROW ( _ ( "unknown multiplication operator" ), l_iOperator );
 			}
@@ -429,7 +429,7 @@ bool HAnalyser::addition_production ( HAnalyserNode * a_poNode )
 	while ( ( f_oFormula [ f_iIndex ] == '+' )
 			|| ( f_oFormula [ f_iIndex ] == '-' ) )
 		{
-		l_iCtr = ( f_oFormula [ f_iIndex ++ ] == '+' ) ? 0 : 1;
+		l_iCtr = ( f_oFormula [ f_iIndex ++ ] == '+' ) ? D_ADD : D_SUBSTRACT;
 		a_poNode->f_tLeaf.add_tail ( ) = reinterpret_cast < double * > ( l_iCtr );
 		if ( multiplication_production ( a_poNode->grow_up_branch ( ) ) )
 			return ( true );
@@ -470,7 +470,7 @@ bool HAnalyser::multiplication_production ( HAnalyserNode * a_poNode )
 	while ( ( f_oFormula [ f_iIndex ] == '*' )
 			|| ( f_oFormula [ f_iIndex ] == '/' ) )
 		{
-		l_iCtr = ( f_oFormula [ f_iIndex ++ ] == '*' ) ? 0 : 1;
+		l_iCtr = ( f_oFormula [ f_iIndex ++ ] == '*' ) ? D_MULTIPLY : D_DIVIDE;
 		a_poNode->f_tLeaf.add_tail ( ) = reinterpret_cast < double * > ( l_iCtr );
 		if ( power_production( a_poNode->grow_up_branch ( ) ) )
 			return ( true );

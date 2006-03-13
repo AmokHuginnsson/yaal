@@ -83,33 +83,25 @@ int HDataEditControl::process_input ( int a_iCode )
 		case ( KEY_CODES::D_INSERT ):
 		case ( D_KEY_META_('f') ):
 		case ( D_KEY_META_('b') ):
-			{
 			l_bNoChange = true;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_PAGE_UP ):
 		case ( KEY_CODES::D_PAGE_DOWN ):
 		case ( KEY_CODES::D_UP ):
 		case ( KEY_CODES::D_DOWN ):
-			{
 			if ( f_bMultiLine )
 				l_bNoChange = true;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_BACKSPACE ):
-			{
 			if ( ! ( f_iControlOffset + f_iCursorPosition ) )
 				l_bNoChange = true;
-			break;
-			}
+		break;
 		case ( KEY_CODES::D_DELETE ):
-			{
 			if ( ! static_cast < char const * const > ( f_oString ) [ 0 ] )
 				l_bNoChange = true;
-			break;
-			}
+		break;
 		default:
-			break;
+		break;
 		}
 	a_iCode = HEditControl::process_input ( a_iCode );
 	if ( ! ( a_iCode || l_bNoChange ) )

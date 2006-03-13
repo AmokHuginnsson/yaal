@@ -37,10 +37,6 @@ namespace stdhapi
 namespace hcore
 {
 
-#define M_REGISTER_FILE_DESCRIPTOR_HANDLER( fd, handler ) \
-	register_file_descriptor_handler ( fd, \
-			static_cast < process_handler_filedes_t > ( & handler ) )
-
 class HProcess
 	{
 protected:
@@ -66,7 +62,12 @@ protected:
 	int init ( int, int = 0 );
 	int run ( void );
 	virtual int reconstruct_fdset ( void );
-	int register_file_descriptor_handler ( int, process_handler_filedes_t );
+	template < typename tType >
+	int register_file_descriptor_handler ( int a_iFileDes, tType HANDLER )
+		{
+		return ( register_file_descriptor_handler_internal ( a_iFileDes, static_cast < process_handler_filedes_t > ( HANDLER ) ) );
+		}
+	int register_file_descriptor_handler_internal ( int, process_handler_filedes_t );
 	int unregister_file_descriptor_handler ( int );
 	virtual int handler_alert ( int, void * = NULL );
 	virtual int handler_interrupt ( int, void * = NULL );
