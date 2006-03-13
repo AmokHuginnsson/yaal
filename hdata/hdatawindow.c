@@ -118,9 +118,9 @@ int HDataWindow::init ( void )
 		{
 		if ( f_psResourcesArray [ l_iCtr ].f_psAttributes )
 			l_psAttr = f_psResourcesArray [ l_iCtr ].f_psAttributes;
-		switch ( f_psResourcesArray [ l_iCtr ].f_iType )
+		switch ( f_psResourcesArray [ l_iCtr ].f_eType )
 			{
-			case ( D_CONTROL_EDIT ):
+			case ( CONTROL_TYPE::D_EDIT ):
 				{
 				l_sEditControlResource.f_iMaxStringSize = 127;
 				l_sEditControlResource.f_pcValue = l_pcValue;
@@ -141,7 +141,7 @@ int HDataWindow::init ( void )
 						l_psECR->f_iMaxHistoryLevel, M_SETUP_ATTRIBUTES );
 				}
 			break;
-			case ( D_CONTROL_LIST ):
+			case ( CONTROL_TYPE::D_LIST ):
 				{
 				l_sListControlResource.f_bCheckable = false;
 				l_sListControlResource.f_bSortable = true;
@@ -154,15 +154,15 @@ int HDataWindow::init ( void )
 						l_psLCR->f_bDrawHeader, M_SETUP_ATTRIBUTES );
 				}
 			break;
-			case ( D_CONTROL_TREE ):
+			case ( CONTROL_TYPE::D_TREE ):
 				l_poDataControl = new HDataTreeControl ( this, this, M_SETUP_STANDART,
 						M_SETUP_ATTRIBUTES );
 			break;
-			case ( D_CONTROL_COMBO ):
+			case ( CONTROL_TYPE::D_COMBO ):
 			break;
-			case ( D_CONTROL_DATE ):
+			case ( CONTROL_TYPE::D_DATE ):
 			break;
-			case ( D_CONTROL_CHECK ):
+			case ( CONTROL_TYPE::D_CHECK ):
 			break;
 			default :
 			break;
@@ -226,7 +226,7 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 	l_psCI->f_iAlign = D_ALIGN_LEFT;
 	l_psCI->f_eType = D_HSTRING;
 	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
-	if ( f_psResourcesArray [ l_iParent ].f_iType == D_CONTROL_LIST )
+	if ( f_psResourcesArray [ l_iParent ].f_eType == CONTROL_TYPE::D_LIST )
 		{
 		l_poPDC = dynamic_cast < HDataListControl * > ( f_oControls [ l_iParent ] );
 		if ( ! l_poPDC )
@@ -238,7 +238,7 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 		}
 	else
 		M_THROW ( "unknown parent type",
-			f_psResourcesArray [ l_iParent ].f_iType );
+			static_cast < int > ( f_psResourcesArray [ l_iParent ].f_eType ) );
 	return;
 	M_EPILOG
 	}

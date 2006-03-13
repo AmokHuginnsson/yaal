@@ -49,12 +49,20 @@ namespace hdata
 #define D_CONTROL_DATA		4
 
 /* control types */
-#define D_CONTROL_EDIT	1
-#define D_CONTROL_LIST	2
-#define D_CONTROL_TREE	3
-#define D_CONTROL_COMBO	4
-#define D_CONTROL_DATE	5
-#define D_CONTROL_CHECK	6
+
+struct CONTROL_TYPE
+	{
+	typedef enum
+		{
+		D_INVALID,
+		D_EDIT,
+		D_LIST,
+		D_TREE,
+		D_COMBO,
+		D_DATE,
+		D_CHECK
+		} type_t; 
+	};
 
 struct OAttributes
 	{
@@ -91,7 +99,7 @@ struct OResource
 	OAttributes *	f_psAttributes;	/* control's attributes */
 /* relative functionality configuration options */
 	int			f_iFlags;							/* tell how control should be treaded */
-	int			f_iType;							/* predefined type of control */
+	CONTROL_TYPE::type_t	f_eType;							/* predefined type of control */
 	void *	f_pvTypeSpecific;			/* additional initialization values control
 																	 type specific */
 	OColumnInfo * f_psColumnInfo;	/* if this control is a child control this field
