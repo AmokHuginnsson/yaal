@@ -134,7 +134,7 @@ int HProcess::run ( void )
 				{
 				if ( FD_ISSET ( l_iFileDes, & f_xFileDescriptorSet ) )
 					{
-					M_IRV ( ( this->*HANDLER ) ( l_iFileDes ) );
+					( this->*HANDLER ) ( l_iFileDes );
 					f_iIdleCycles = 0;
 					}
 				}

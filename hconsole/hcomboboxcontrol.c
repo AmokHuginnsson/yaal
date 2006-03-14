@@ -155,7 +155,7 @@ int HComboboxControl::click ( mouse::OMouse & a_rsMouse )
 	M_PROLOG
 	if ( f_iMode == D_MODE_EDITCONTROL )
 		{
-		M_IRV ( HEditControl::click ( a_rsMouse ) );
+		HEditControl::click ( a_rsMouse );
 		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
 			: n_iWidth + f_iWidth - f_iColumnRaw;
 		if ( a_rsMouse.f_iColumn == ( f_iColumnRaw + f_iWidthRaw - 1 ) )

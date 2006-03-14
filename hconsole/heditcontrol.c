@@ -89,7 +89,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	f_oHistory.add_tail ( ) = "";
 	if ( ( l_iErrorCode = f_oPattern.parse_re ( a_pcMask ) ) )
 		M_THROW ( f_oPattern.error ( ), l_iErrorCode );
-	M_IRV ( f_oPattern.matches ( a_pcValue, NULL, & l_iErrorCode ) );
+	f_oPattern.matches ( a_pcValue, NULL, & l_iErrorCode );
 	if ( l_iErrorCode )
 		M_THROW ( f_oPattern.error ( ), l_iErrorCode );
 	l_iLength = f_oString.get_length ( );
@@ -138,7 +138,7 @@ void HEditControl::refresh ( void )
 		{
 		M_ENSURE ( c_move ( f_iRowRaw,
 					f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) ) != C_ERR );
-		M_IRV ( curs_set ( f_bReplace ? CURSOR::D_VERY_VISIBLE : CURSOR::D_VISIBLE ) );
+		curs_set ( f_bReplace ? CURSOR::D_VERY_VISIBLE : CURSOR::D_VISIBLE );
 		}
 	return;
 	M_EPILOG
@@ -180,19 +180,19 @@ int HEditControl::process_input ( int a_iCode )
 	switch ( a_iCode )
 		{
 		case ( KEY_CODES::D_PAGE_UP ):
-			M_IRV ( f_oHistory.go ( 0 ) );
+			f_oHistory.go ( 0 );
 			l_iErrorCode = - 1;
 		break;
 		case ( KEY_CODES::D_PAGE_DOWN ):
-			M_IRV ( f_oHistory.go ( - 1 ) );	
+			f_oHistory.go ( - 1 );
 			l_iErrorCode = - 1;
 		break;
 		case ( KEY_CODES::D_UP ):
-			M_IRV ( f_oHistory.to_tail ( ) );
+			f_oHistory.to_tail ( );
 			l_iErrorCode = - 1;
 		break;
 		case ( KEY_CODES::D_DOWN ):
-			M_IRV ( f_oHistory.to_head ( ) );
+			f_oHistory.to_head ( );
 			l_iErrorCode = - 1;
 		break;
 		case ( '\t' ):
@@ -207,14 +207,14 @@ int HEditControl::process_input ( int a_iCode )
 					break;
 			if ( f_oString.get_length ( ) && ( ! l_iErrorCode ) )
 				{
-				M_IRV ( f_oHistory.add_head ( & f_oString ) );
+				f_oHistory.add_head ( & f_oString );
 				l_iErrorCode = f_oHistory.quantity ( );
 				while ( l_iErrorCode -- > f_iMaxHistoryLevel )
-					M_IRV ( f_oHistory.remove_at ( l_iErrorCode, history_t::D_EMPTY_IF_NOT_EMPTIED ) );
-				M_IRV ( f_oHistory.go ( - 1 ) );
+					f_oHistory.remove_at ( l_iErrorCode, history_t::D_EMPTY_IF_NOT_EMPTIED );
+				f_oHistory.go ( - 1 );
 				}
 			else
-				M_IRV ( f_oHistory.to_head ( ) );
+				f_oHistory.to_head ( );
 			l_iErrorCode = a_iCode;
 			}
 		break;
@@ -480,7 +480,7 @@ int HEditControl::process_input ( int a_iCode )
 		}
 	l_pcBuffer [ l_iLength ] = 0;
 	a_iCode = l_iErrorCode;
-	M_IRV ( f_oPattern.matches ( f_oVarTmpBuffer, NULL, & l_iErrorCode ) );
+	f_oPattern.matches ( f_oVarTmpBuffer, NULL, & l_iErrorCode );
 	if ( ! l_iErrorCode )
 		{
 		f_oString = f_oVarTmpBuffer;
@@ -505,7 +505,7 @@ void HEditControl::set ( HInfo const & a_roInfo )
 	int l_iLength = 0;
 	char const * l_pcString = a_roInfo.get < char const * const > ( );
 	HString l_oErrorMessage;
-	M_IRV ( f_oPattern.matches ( l_pcString, NULL, & l_iErrorCode ) );
+	f_oPattern.matches ( l_pcString, NULL, & l_iErrorCode );
 	if ( l_iErrorCode )
 		M_THROW ( f_oPattern.error ( ), l_iErrorCode );
 	f_oString = l_pcString;

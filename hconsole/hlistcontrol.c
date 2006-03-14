@@ -140,7 +140,7 @@ void HListControl::refresh ( void )
 	HColumnInfo * l_poColumnInfo = NULL;
 	l_iTmp = f_iWidthRaw;
 	if ( f_bFocused )
-		M_IRV ( curs_set ( CURSOR::D_INVISIBLE ) );
+		curs_set ( CURSOR::D_INVISIBLE );
 	draw_label ( );
 	if ( ! f_iSumForOne )
 		return;
@@ -271,7 +271,7 @@ void HListControl::refresh ( void )
 						l_poColumnInfo->f_poControl->set ( l_oItem [ l_iCtrLoc ] );
 					}
 				}
-			M_IRV ( to_tail ( ) );
+			to_tail ( );
 			}
 		}
 	l_iColumnOffset = 0;
@@ -290,8 +290,8 @@ void HListControl::refresh ( void )
 				{
 				f_oVarTmpBuffer = l_poColumnInfo->f_oName;
 				set_attr_label ( );
-				M_IRV ( f_oVarTmpBuffer.format ( "%%-%ds",
-							l_poColumnInfo->f_iWidthRaw ) );
+				f_oVarTmpBuffer.format ( "%%-%ds",
+							l_poColumnInfo->f_iWidthRaw );
 				M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw + l_iColumnOffset,
 							f_oVarTmpBuffer, static_cast < char const * const > (
 								l_poColumnInfo->f_oName.left (
@@ -368,7 +368,7 @@ int HListControl::process_input ( int a_iCode )
 				{
 				if ( f_iControlOffset )
 					{
-					M_IRV ( to_head ( f_iHeightRaw - 1, D_TREAT_AS_OPENED ) );
+					to_head ( f_iHeightRaw - 1, D_TREAT_AS_OPENED );
 					l_poElement = f_poSelected;
 					f_iControlOffset -= f_iHeightRaw;
 					f_iControlOffset ++;
@@ -396,12 +396,12 @@ int HListControl::process_input ( int a_iCode )
 						{
 						l_poElement = f_poSelected = f_poHook;
 						l_iOldPosition = f_iCursorPosition + 1;
-						M_IRV ( to_head ( f_iHeightRaw ) );
+						to_head ( f_iHeightRaw );
 						f_iControlOffset = f_iQuantity - f_iHeightRaw;
 						}
 					else
 						{
-						M_IRV ( to_tail ( f_iHeightRaw - 1, D_TREAT_AS_OPENED ) );
+						to_tail ( f_iHeightRaw - 1, D_TREAT_AS_OPENED );
 						l_iOldPosition -= f_iCursorPosition;
 						}
 					}
@@ -424,7 +424,7 @@ int HListControl::process_input ( int a_iCode )
 					f_iCursorPosition --;
 				else if ( f_iControlOffset > 0 )
 					{
-					M_IRV ( to_head ( ) );
+					to_head ( );
 					l_poElement = f_poSelected;
 					f_iControlOffset --;
 					}
@@ -444,7 +444,7 @@ int HListControl::process_input ( int a_iCode )
 			if ( f_iQuantity >= f_iHeightRaw )
 				{
 				l_poElement = f_poSelected = f_poHook;
-				M_IRV ( to_head ( f_iHeightRaw ) );
+				to_head ( f_iHeightRaw );
 				f_iCursorPosition = f_iHeightRaw - 1;
 				l_iOldPosition = f_iCursorPosition + 1;
 				f_iControlOffset = f_iQuantity - f_iHeightRaw;
@@ -463,7 +463,7 @@ int HListControl::process_input ( int a_iCode )
 					f_iCursorPosition = f_iHeightRaw - 1;
 					f_iControlOffset ++;
 					l_iOldPosition --;
-					M_IRV ( to_tail ( ) );
+					to_tail ( );
 					}
 				}
 			else
@@ -529,9 +529,9 @@ int HListControl::process_input ( int a_iCode )
 	f_poFirstVisibleRow = f_poSelected;
 	f_poSelected = l_poElement;
 	if ( l_iOldPosition > f_iCursorPosition )
-		M_IRV ( to_head ( l_iOldPosition - f_iCursorPosition ) );
+		to_head ( l_iOldPosition - f_iCursorPosition );
 	else if ( l_iOldPosition < f_iCursorPosition )
-		M_IRV ( to_tail ( f_iCursorPosition - l_iOldPosition ) );
+		to_tail ( f_iCursorPosition - l_iOldPosition );
 	a_iCode = l_iErrorCode;
 	if ( ! l_iErrorCode )
 		{
@@ -569,7 +569,7 @@ void HListControl::add_column ( int const & a_riColumn, char const * a_pcName,
 	l_oColumnInfo.f_cShortcut = f_oVarTmpBuffer [ l_iShortcutIndex ];
 	l_oColumnInfo.f_oName = f_oVarTmpBuffer;
 	l_oColumnInfo.f_poControl = a_poControl;
-	M_IRV ( f_oHeader.add_at ( a_riColumn, & l_oColumnInfo ) );
+	f_oHeader.add_at ( a_riColumn, & l_oColumnInfo );
 	recalculate_column_widths ( );
 	refresh ( );
 	return;
@@ -588,7 +588,7 @@ HItem & HListControl::add_tail ( HItem * a_poItem )
 		if ( f_poFirstVisibleRow )
 			{
 			f_poSelected = f_poFirstVisibleRow;
-			M_IRV ( to_tail ( ) );
+			to_tail ( );
 			f_poFirstVisibleRow = f_poSelected;
 			}
 		}
@@ -597,7 +597,7 @@ HItem & HListControl::add_tail ( HItem * a_poItem )
 	if ( ! f_poFirstVisibleRow )
 		f_poFirstVisibleRow = f_poHook;
 	f_poSelected = f_poHook;
-	M_IRV ( to_head ( ) );
+	to_head ( );
 	n_bNeedRepaint = true;
 	return ( * l_poDummy );
 	M_EPILOG
@@ -663,18 +663,18 @@ OListBits::status_t HListControl::remove_element ( treatment_t const & a_eFlag, 
 			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_iQuantity ) )
 		{
 		f_iControlOffset --;
-		M_IRV ( to_head ( f_poFirstVisibleRow ) );
+		to_head ( f_poFirstVisibleRow );
 		}
 	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
 		f_iCursorPosition --;
 	else
 		l_bFlag = false;
 	if ( f_poSelected == f_poFirstVisibleRow )
-		M_IRV ( to_tail ( f_poFirstVisibleRow ) );
+		to_tail ( f_poFirstVisibleRow );
 	n_bNeedRepaint = true;
 	l_eError = HList < HItem > ::remove_element ( a_eFlag, a_ppoItem );
 	if ( l_bFlag )
-		M_IRV ( to_head ( ) );
+		to_head ( );
 	refresh ( );
 	return ( l_eError );
 	M_EPILOG
@@ -688,11 +688,11 @@ OListBits::status_t HListControl::remove_tail ( treatment_t const & a_eFlag, HIt
 			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_iQuantity )  )
 		{
 		f_iControlOffset --;
-		M_IRV ( to_head ( f_poFirstVisibleRow ) );
+		to_head ( f_poFirstVisibleRow );
 		if ( f_iCursorPosition < ( f_iHeightRaw - 1 ) )
 			{
 			f_iCursorPosition ++;
-			M_IRV ( to_tail ( ) );
+			to_tail ( );
 			}
 		}
 	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_iQuantity - 1 ) ) )
@@ -793,9 +793,9 @@ int HListControl::click ( mouse::OMouse & a_rsMouse )
 		{
 		l_iMoved = f_iCursorPosition - l_iRow;
 		if ( l_iMoved > 0 )
-			M_IRV ( to_head ( l_iMoved ) );
+			to_head ( l_iMoved );
 		else
-			M_IRV ( to_tail ( - l_iMoved ) );
+			to_tail ( - l_iMoved );
 		f_iCursorPosition = l_iRow;
 		refresh ( );
 		}
@@ -854,7 +854,7 @@ void HListControl::go_to_match ( void )
 				f_iControlOffset ++;
 				l_iMoveFirstRow ++;
 				}
-			M_IRV ( to_tail ( ) );
+			to_tail ( );
 			}
 		else
 			{
@@ -868,7 +868,7 @@ void HListControl::go_to_match ( void )
 	if ( l_pcHighlightStart )
 		{
 		if ( l_iMoveFirstRow )
-			M_IRV ( to_tail ( f_poFirstVisibleRow, l_iMoveFirstRow ) );
+			to_tail ( f_poFirstVisibleRow, l_iMoveFirstRow );
 		f_sMatch.f_iColumnWithMatch = l_iCtr;
 		f_sMatch.f_iMatchNumber = l_iCtrLoc;
 		f_sMatch.f_poCurrentMatch = f_poSelected;
@@ -940,16 +940,16 @@ void HListControl::go_to_match_previous ( void )
 				f_iControlOffset --;
 				l_iMoveFirstRow ++;
 				}
-			M_IRV ( to_head ( ) );
+			to_head ( );
 			}
 		else
 			{
 			if ( f_iQuantity >= f_iHeightRaw )
 				{
 				f_poSelected = f_poHook;
-				M_IRV ( to_head ( ) );
+				to_head ( );
 				f_poFirstVisibleRow = f_poSelected;
-				M_IRV ( to_head ( f_poFirstVisibleRow, f_iHeightRaw - 1 ) );
+				to_head ( f_poFirstVisibleRow, f_iHeightRaw - 1 );
 				f_iCursorPosition = f_iHeightRaw - 1;
 				f_iControlOffset = f_iQuantity - f_iHeightRaw;
 				}
@@ -963,7 +963,7 @@ void HListControl::go_to_match_previous ( void )
 	if ( l_pcHighlightStart )
 		{
 		if ( l_iMoveFirstRow )
-			M_IRV ( to_head ( f_poFirstVisibleRow, l_iMoveFirstRow ) );
+			to_head ( f_poFirstVisibleRow, l_iMoveFirstRow );
 		f_sMatch.f_iColumnWithMatch = l_iCtr;
 		f_sMatch.f_iMatchNumber = l_iCtrLoc;
 		f_sMatch.f_poCurrentMatch = f_poSelected;

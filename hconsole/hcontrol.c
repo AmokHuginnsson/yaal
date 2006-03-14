@@ -94,8 +94,8 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		}
 	else
 		f_bSingleLine = true;
-	M_IRV ( f_poParent->add_control ( this,
-				D_KEY_META_(f_oLabel [ f_iShortcutIndex ]) ) );
+	f_poParent->add_control ( this,
+				D_KEY_META_(f_oLabel [ f_iShortcutIndex ]) );
 	return;
 	M_EPILOG
 	}
@@ -250,7 +250,7 @@ int HControl::click ( mouse::OMouse & )
 	M_PROLOG
 	if ( f_bFocused )
 		return ( 1 );
-	M_IRV ( set_focus ( ) );
+	set_focus ( );
 	return ( 0 );
 	M_EPILOG
 	}

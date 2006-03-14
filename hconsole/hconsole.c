@@ -177,8 +177,8 @@ void hconsole_init ( void ); __attribute__ ( ( constructor ) )
 void hconsole_init ( void )
 	{
 	g_iErrNo = 0;
-	M_IRV ( rc_file::process_rc_file ( "stdhapi", "console",
-				n_psVariables, set_hconsole_variables ) );
+	rc_file::process_rc_file ( "stdhapi", "console",
+				n_psVariables, set_hconsole_variables );
 	return;
 	}
 

@@ -70,7 +70,7 @@ HControl * HControlList::next_enabled ( char a_cShorcut )
 	HControl * l_poControlNew = NULL;
 	do
 		{
-		M_IRV ( to_tail ( ) );
+		to_tail ( );
 		l_poControlNew = f_poSelected->get_object ( );
 		l_bLoop = l_poControlNew->set_focus ( a_cShorcut );
 		if ( l_poControlOld == l_poControlNew )
@@ -79,8 +79,8 @@ HControl * HControlList::next_enabled ( char a_cShorcut )
 	while ( l_bLoop );
 	if ( l_poControlNew != l_poControlOld )
 		{
-		M_IRV ( l_poControlOld->kill_focus ( ) );
-		M_IRV ( l_poControlNew->set_focus ( - 1 ) );
+		l_poControlOld->kill_focus ( );
+		l_poControlNew->set_focus ( - 1 );
 		}
 	return ( l_poControlNew );
 	M_EPILOG

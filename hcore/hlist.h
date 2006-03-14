@@ -272,7 +272,7 @@ HList< tType >::HList ( int a_iSize )
 	{
 	M_PROLOG
 	while ( a_iSize -- )
-		M_IRV ( HList::add_tail ( ) );
+		HList::add_tail ( );
 	return ;
 	M_EPILOG
 	}
@@ -323,8 +323,8 @@ HList< tType > & HList< tType >::operator = ( HList < tType > const & a_roList )
 		l_iIndex = a_roList.f_iIndex;
 		if ( l_iCount )
 			{
-			M_IRV ( go ( - 1 ) );
-			M_IRV ( l_poList->go ( - 1 ) );
+			go ( - 1 );
+			l_poList->go ( - 1 );
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )	
 				{
 				( * to_tail ( ) ) = ( * l_poList->to_tail ( ) );
@@ -342,13 +342,13 @@ HList< tType > & HList< tType >::operator = ( HList < tType > const & a_roList )
 			{
 			l_iCount = f_iQuantity - a_roList.f_iQuantity;
 			while ( l_iCount -- )
-				M_IRV ( remove_tail ( D_FORCE_REMOVE_ELEMENT ) );
+				remove_tail ( D_FORCE_REMOVE_ELEMENT );
 			}
 		else if ( f_iQuantity < a_roList.f_iQuantity )
 			{
 			for ( ; l_iCtr < a_roList.f_iQuantity; l_iCtr ++ )	
 				{
-				M_IRV ( add_tail ( l_poList->to_tail ( ) ) );
+				add_tail ( l_poList->to_tail ( ) );
 				if ( a_roList.f_poSelected == a_roList.f_poHook )
 					f_poHook = f_poSelected;
 				if ( a_roList.f_poSelected == l_poIndex )
@@ -375,7 +375,7 @@ void HList < tType >::flush ( void )
 	M_PROLOG
 	while ( f_iQuantity -- )
 		{
-		M_IRV ( empty ( f_poHook->f_poNext ) );
+		empty ( f_poHook->f_poNext );
 		delete f_poHook->f_poNext;
 		}
 	f_iIndex = 0;
@@ -553,7 +553,7 @@ tType & HList< tType >::add_orderly ( tType & a_rtObject,
 		{
 		l_iOldIndex = l_iIndex;
 		l_iIndex = ( l_iLower + l_iUpper ) / 2;
-		M_IRV ( element_by_index ( l_iIndex ) );
+		element_by_index ( l_iIndex );
 		if ( is_above_c ( f_poIndex, l_poElement ) )
 			l_iLower = l_iIndex;
 		else
@@ -612,7 +612,7 @@ OListBits::status_t HList< tType >::remove_at ( int a_iIndex, treatment_t const 
 					return ( D_ERROR );
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					l_eError = D_WAS_EMPTIED;
-					M_IRV ( empty ( l_poElement ) );
+					empty ( l_poElement );
 				break;
 				case ( D_FORCE_REMOVE_ELEMENT ):
 					l_eError = D_WAS_NOT_EMPTIED;
@@ -670,7 +670,7 @@ OListBits::status_t HList< tType >::remove_element ( treatment_t const & a_eFlag
 					return ( D_ERROR );
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					l_eError = D_WAS_EMPTIED;
-					M_IRV ( empty ( l_poElement ) );
+					empty ( l_poElement );
 				break;
 				case ( D_FORCE_REMOVE_ELEMENT ):
 					l_eError = D_WAS_NOT_EMPTIED;
@@ -741,7 +741,7 @@ OListBits::status_t HList< tType >::remove_head ( treatment_t const & a_eFlag, t
 					return ( D_ERROR );
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					l_eError = D_WAS_EMPTIED;
-					M_IRV ( empty ( l_poElement ) );
+					empty ( l_poElement );
 				break;
 				case ( D_FORCE_REMOVE_ELEMENT ):
 					l_eError = D_WAS_NOT_EMPTIED;
@@ -789,7 +789,7 @@ OListBits::status_t HList< tType >::remove_tail ( treatment_t const & a_eFlag, t
 					return ( D_ERROR );
 				case ( D_EMPTY_IF_NOT_EMPTIED ):
 					l_eError = D_WAS_EMPTIED;
-					M_IRV ( empty ( l_poElement ) );
+					empty ( l_poElement );
 				break;
 				case ( D_FORCE_REMOVE_ELEMENT ):
 					l_eError = D_WAS_NOT_EMPTIED;

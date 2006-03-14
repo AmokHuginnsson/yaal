@@ -110,7 +110,7 @@ int rc_open ( char const * const a_pcRcName,
 	int l_iError = 0;
 	HString l_oRcPath = make_path ( a_pcRcName, a_ePlacament );
 	if ( a_roFile )
-		M_IRV ( a_roFile.close ( ) );
+		a_roFile.close ( );
 	l_iError = a_roFile.open ( l_oRcPath );
 	if ( l_iError )
 		l_oRcPath +=	" not found, ";
@@ -139,7 +139,7 @@ bool substitute_environment ( HString & a_roString )
 			l_pcStart = ::getenv ( l_oName.mid ( 2, l_iLength - 3 ) );
 			if ( l_pcStart )
 				{
-				M_IRV ( a_roString.replace ( l_oName, l_pcStart ) );
+				a_roString.replace ( l_oName, l_pcStart );
 				return ( true );
 				}
 			}
@@ -186,7 +186,7 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 					{
 					if ( l_oValue.is_empty ( ) )
 						{
-						M_IRV ( l_oValue.format ( "[%s]", a_pcSection ) );
+						l_oValue.format ( "[%s]", a_pcSection );
 						if ( l_oOption == l_oValue )
 							{
 							if ( n_iDebugLevel )
@@ -247,10 +247,10 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 						&& ! l_bOptionOK )
 					{
 					log << "failed." << endl;
-					M_IRV ( l_oMessage.format ( "Error: unknown option found: `%s', "
+					l_oMessage.format ( "Error: unknown option found: `%s', "
 								"with value: `%s', on line %d.\n",
 								static_cast < char const * > ( l_oOption ),
-								static_cast < char const * > ( l_oValue ), l_iLine ) );
+								static_cast < char const * > ( l_oValue ), l_iLine );
 					log ( LOG_TYPE::D_ERROR ) << l_oMessage;
 					fprintf ( stderr, l_oMessage );
 					}
@@ -258,7 +258,7 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 			}
 		}
 	if ( l_oRc )
-		M_IRV ( l_oRc.close ( ) );
+		l_oRc.close ( );
 	log << "done." << endl;
 	return ( 0 );
 	M_EPILOG

@@ -140,7 +140,7 @@ void enter_curses( void )
 		n_psWindow = initscr();
 	M_ENSURE ( cbreak ( ) != ERR );
 	M_ENSURE ( start_color ( ) != ERR );
-	M_IRV ( standout ( ) ); /* Macro, returned value without meaning */
+	standout ( ); /* Macro, returned value without meaning */
 	M_ENSURE ( nonl ( ) == OK );
 	M_ENSURE ( keypad ( stdscr, true ) != ERR );
 	M_ENSURE ( intrflush ( stdscr, false ) != ERR );
@@ -149,17 +149,17 @@ void enter_curses( void )
 	M_ENSURE ( leaveok ( stdscr, false ) != ERR );
 	immedok ( stdscr, false );
 	M_ENSURE ( fflush ( NULL ) == 0 );
-	M_IRV ( flushinp ( ) ); /* Always returns OK */
-	M_IRV ( curs_set ( CURSOR::D_INVISIBLE ) );
+	flushinp ( ); /* Always returns OK */
+	curs_set ( CURSOR::D_INVISIBLE );
 	M_ENSURE ( refresh ( ) != ERR );
 	/* init color pairs */
 	M_ENSURE ( assume_default_colors ( COLOR_BLACK, COLOR_BLACK ) == OK );
 	for ( l_iBg = 0; l_iBg < 8; l_iBg ++ )
 		for ( l_iFg = 0; l_iFg < 8; l_iFg ++ )
-			M_IRV ( init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
-						l_piColors [ l_iFg ], l_piColors [ l_iBg ] ) );
+			init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
+					l_piColors [ l_iFg ], l_piColors [ l_iBg ] );
 	attrset ( COLOR_PAIR( 7 ) );
-	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( COLORS::D_FG_BLACK | COLORS::D_BG_BLACK ) | A_INVIS ) ); /* meaningless value from macro */
+	bkgd ( ' ' | M_MAKE_ATTR ( COLORS::D_FG_BLACK | COLORS::D_BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( getenv ( "STDHAPI_NO_MOUSE" ) )
@@ -196,21 +196,21 @@ void leave_curses( void )
 //	if ( ! mousemask ( 0, NULL ) )
 //		M_THROW ( "mousemask ( ) returned 0", g_iErrNo );
 	if ( n_bUseMouse )
-		M_IRV ( mouse::mouse_close ( ) );
-	M_IRV ( bkgd ( ' ' | M_MAKE_ATTR ( ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) ) ) );
+		mouse::mouse_close ( );
+	bkgd ( ' ' | M_MAKE_ATTR ( ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) ) );
 	M_ENSURE ( use_default_colors ( ) == OK );
 	M_ENSURE ( printw ( "" ) != ERR );
 	M_ENSURE ( fflush ( NULL ) == 0 );
-	M_IRV ( flushinp ( ) ); /* Always returns OK */
+	flushinp ( ); /* Always returns OK */
 	M_ENSURE ( intrflush ( stdscr, true ) != ERR );
-	M_IRV ( leaveok ( stdscr, false ) ); /* Always OK */
+	leaveok ( stdscr, false ); /* Always OK */
 	immedok ( stdscr, true ); /* Always OK */
 	M_ENSURE ( refresh ( ) != ERR );
-	M_IRV ( nl ( ) ); /* Always OK */
+	nl ( ); /* Always OK */
 	standend ( );
 	M_ENSURE ( keypad ( stdscr, false ) != ERR );
 	M_ENSURE ( nocbreak ( ) != ERR );
-	M_IRV ( curs_set ( CURSOR::D_VISIBLE ) );
+	curs_set ( CURSOR::D_VISIBLE );
 /*	reset_shell_mode ( ); */
 /* see comment near def_shell_mode ( ), ( automagicly by endwin ( ) ) */
 /*
@@ -313,7 +313,7 @@ int c_vmvprintf ( int a_iRow, int a_iColumn,
 	if ( a_iColumn < 0 )
 		{
 		M_ENSURE ( move ( a_iRow, 0 ) != ERR );
-		M_IRV ( clrtoeol ( ) ); /* Always OK */
+		clrtoeol ( ); /* Always OK */
 		}
 	else
 		M_ENSURE ( move ( a_iRow, a_iColumn ) != ERR );
@@ -380,15 +380,15 @@ int get_key ( void )
 	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
 		{
 		l_eOrigCursState = curs_set ( CURSOR::D_INVISIBLE );
-		M_IRV ( c_printf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
-					n_cCommandComposeCharacter ) );
+		c_printf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
+					n_cCommandComposeCharacter );
 		timeout ( n_iCommandComposeDelay * 100 );
 		l_iKey = getch ( );
 		timeout ( -1 );
 		if ( l_iKey == ERR )
 			{
 			l_iKey = D_KEY_CTRL_(n_cCommandComposeCharacter);
-			M_IRV ( c_printf ( n_iHeight - 1, 0, COLORS::D_FG_LIGHTGRAY, "      " ) );
+			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_LIGHTGRAY, "      " );
 			}
 		else
 			{
@@ -406,9 +406,9 @@ int get_key ( void )
 				}
 			else
 				l_iKey = D_KEY_COMMAND_(l_iChar = l_iKey);
-			M_IRV ( c_printf ( n_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar ) );
+			c_printf ( n_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar );
 			}
-		M_IRV ( curs_set ( l_eOrigCursState ) );
+		curs_set ( l_eOrigCursState );
 		}
 	M_ENSURE ( echo ( ) != ERR );
 	switch ( l_iKey )
@@ -458,7 +458,7 @@ unsigned char get_attr( void )
 	attr_t l_xAttr;
 	short l_hColor = 0;
 	int l_iAttribute = 0;
-	M_IRV ( attr_get ( & l_xAttr, & l_hColor, NULL ) ); /* Ugly macro */
+	static_cast < void > ( attr_get ( & l_xAttr, & l_hColor, NULL ) ); /* Ugly macro */
 	l_iAttribute = ( l_hColor << 1 ) & 56;
 	l_iAttribute |= ( l_hColor & 7 );
 	if ( l_xAttr & A_BOLD )
@@ -474,7 +474,7 @@ void clrscr ( void )
 	M_PROLOG
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", g_iErrNo );
-	M_IRV ( clear ( ) ); /* Always returns OK */
+	clear ( ); /* Always returns OK */
 	M_ENSURE ( refresh ( ) != ERR );
 	return;
 	M_EPILOG
@@ -506,7 +506,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 			a_iKey = get_key ( );
 			l_iEventType = D_EVENT_MOUSE;
 			if ( a_iKey == KEY_MOUSE )
-				M_IRV ( mouse::mouse_get ( a_rsMouse ) );
+				mouse::mouse_get ( a_rsMouse );
 			else
 				l_iEventType = D_EVENT_KEYBOARD;
 			break;
@@ -525,7 +525,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 			}
 		if ( ( a_iKey == KEY_MOUSE )
 				|| ( n_iMouseDes && FD_ISSET ( n_iMouseDes, & l_xFdSet ) ) )
-			l_iEventType |= D_EVENT_MOUSE, M_IRV ( mouse::mouse_get ( a_rsMouse ) );
+			l_iEventType |= D_EVENT_MOUSE, mouse::mouse_get ( a_rsMouse );
 		}
 	return ( l_iEventType );
 	}

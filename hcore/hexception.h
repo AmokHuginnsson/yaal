@@ -53,7 +53,6 @@ namespace hcore
 #define M_EPILOG } catch ( stdhapi::hcore::HException & e ){ e->log ( __WHERE__ ); throw; }
 #define M_FINAL } catch ( stdhapi::hcore::HException & e ){ e->log ( __WHERE__ ); e->print_error ( true ); }
 #define M_ENSURE( condition ) if ( ! ( condition ) ){ stdhapi::hcore::HException e ( __WHERE__, #condition, errno ); e->set ( strerror ( errno ) ); throw e; }
-#define M_IRV( expression )	static_cast < void > ( expression )
 #ifndef NDEBUG
 #	define M_ASSERT( condition ) if ( ! ( condition ) )stdhapi::hcore::HException::failed_assert ( __WHERE__, #condition )
 #else /* NDEBUG */

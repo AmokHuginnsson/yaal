@@ -55,7 +55,7 @@ HThread::~HThread ( void )
 	{
 	M_PROLOG
 	if ( f_eStatus != D_DEAD )
-		M_IRV ( finish ( ) );
+		finish ( );
 	M_ENSURE ( pthread_attr_destroy ( & f_sAttributes ) == 0 );
 	return;
 	M_EPILOG
@@ -70,7 +70,7 @@ int HThread::spawn ( void )
 				static_cast < int > ( f_eStatus ) );
 	M_ENSURE ( pthread_create ( & f_xThread,
 				& f_sAttributes, SPAWN, this ) == 0 );
-	M_IRV ( f_oCondition.wait ( ) );
+	f_oCondition.wait ( );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -129,10 +129,10 @@ HMutex::HMutex ( bool const a_bRecursive ) : f_bRecursive ( a_bRecursive ),
 																						 f_sAttributes ( ), f_xMutex ( )
 	{
 	M_PROLOG
-	M_IRV ( pthread_mutexattr_init ( & f_sAttributes ) );
+	pthread_mutexattr_init ( & f_sAttributes );
 	M_ENSURE ( pthread_mutexattr_settype ( & f_sAttributes,
 				f_bRecursive ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
-	M_IRV ( pthread_mutex_init ( & f_xMutex, & f_sAttributes ) );
+	pthread_mutex_init ( & f_xMutex, & f_sAttributes );
 	return;
 	M_EPILOG
 	}
@@ -144,7 +144,7 @@ HMutex::~HMutex ( void )
 	while ( ( l_iError = pthread_mutex_destroy ( & f_xMutex ) ) == EBUSY )
 		;
 	M_ENSURE ( l_iError == 0 );
-	M_IRV ( pthread_mutexattr_destroy ( & f_sAttributes ) );
+	pthread_mutexattr_destroy ( & f_sAttributes );
 	return;
 	M_EPILOG
 	}
@@ -189,8 +189,8 @@ HCondition::HCondition ( void )
 	: f_sAttributes ( ), f_xCondition ( ), f_oMutex ( )
 	{
 	M_PROLOG
-	M_IRV ( pthread_condattr_init ( & f_sAttributes ) );
-	M_IRV ( pthread_cond_init ( & f_xCondition, & f_sAttributes ) );
+	pthread_condattr_init ( & f_sAttributes );
+	pthread_cond_init ( & f_xCondition, & f_sAttributes );
 	f_oMutex.lock ( );
 	return;
 	M_EPILOG
@@ -201,7 +201,7 @@ HCondition::~HCondition ( void )
 	M_PROLOG
 	f_oMutex.unlock ( );
 	M_ENSURE ( pthread_cond_destroy ( & f_xCondition ) == 0 );
-	M_IRV ( pthread_condattr_destroy ( & f_sAttributes ) );
+	pthread_condattr_destroy ( & f_sAttributes );
 	return;
 	M_EPILOG
 	}
@@ -229,7 +229,7 @@ HCondition::status_t HCondition::wait ( int long unsigned * a_pulTimeOutSeconds,
 		return ( ( l_iError == 0 ) ? D_OK : ( ( l_iError == EINTR ) ? D_INTERRUPT : D_TIMEOUT ) );
 		}
 	else
-		M_IRV ( pthread_cond_wait ( & f_xCondition, & f_oMutex.f_xMutex ) ); /* Always returns 0. */
+		pthread_cond_wait ( & f_xCondition, & f_oMutex.f_xMutex ); /* Always returns 0. */
 	return ( D_OK );
 	M_EPILOG
 	}
@@ -238,7 +238,7 @@ void HCondition::signal ( void )
 	{
 	M_PROLOG
 	M_CRITICAL_SECTION ( );
-	M_IRV ( pthread_cond_signal ( & f_xCondition ) );
+	pthread_cond_signal ( & f_xCondition );
 	return;
 	M_EPILOG
 	}

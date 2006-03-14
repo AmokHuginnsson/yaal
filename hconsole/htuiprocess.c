@@ -107,9 +107,9 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWind
 	else /* Create automatically default main window. */
 		{
 		l_poMainWindow = new HMainWindow ( a_pcProcessName );
-		M_IRV ( l_poMainWindow->init ( ) );
+		l_poMainWindow->init ( );
 		f_poWindows = l_poMainWindow->_disclose_window_list ( );
-		M_IRV ( add_window ( l_poMainWindow, a_pcProcessName ) );
+		add_window ( l_poMainWindow, a_pcProcessName );
 		register_postprocess_handler ( D_KEY_META_( '\t' ), NULL,
 				& HTUIProcess::handler_jump_meta_tab );
 		register_postprocess_handler ( D_KEY_COMMAND_('q'), NULL,
@@ -263,7 +263,7 @@ int HTUIProcess::handler_mouse ( int a_iCode, void * )
 	M_PROLOG
 	a_iCode = 0;
 	mouse::OMouse l_sMouse;
-	M_IRV ( mouse::mouse_get ( l_sMouse ) );
+	mouse::mouse_get ( l_sMouse );
 #ifdef __DEBUGGER_BABUNI__
 	c_printf ( 0, 0,	COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );

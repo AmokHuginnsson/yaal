@@ -89,7 +89,7 @@ int HPattern::parse ( char const * const a_pcPattern,
 			for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
 				a_puhFlags [ l_iCtrLoc ] = l_oLocalCopyFlags [ l_iCtrLoc ];
 			l_iError = 1;
-			M_IRV ( f_oError.format ( "bad search option '%c'", l_pcPattern [ l_iCtr ] ) );
+			f_oError.format ( "bad search option '%c'", l_pcPattern [ l_iCtr ] );
 			return ( l_iError );
 			}
 		l_iCtr ++;

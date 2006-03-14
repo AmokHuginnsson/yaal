@@ -135,8 +135,8 @@ void hcore_init ( void )
 	l_pcEnv = ::getenv ( "STDHAPI_DEBUG" );
 	if ( l_pcEnv )
 		n_iDebugLevel = strtol ( l_pcEnv, NULL, 10 );
-	M_IRV ( rc_file::process_rc_file ( "stdhapi", "core",
-				n_psHCoreVariables, set_hcore_variables ) );
+	rc_file::process_rc_file ( "stdhapi", "core",
+				n_psHCoreVariables, set_hcore_variables );
 	return;
 	}
 

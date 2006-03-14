@@ -126,7 +126,7 @@ HComplex & HComplex::operator = ( HComplex const & a_roComplex )
 	{
 	M_PROLOG
 	if ( this != & a_roComplex )
-		M_IRV ( set ( a_roComplex.f_dReal, a_roComplex.f_dImaginary ) );
+		set ( a_roComplex.f_dReal, a_roComplex.f_dImaginary );
 	return ( * this );
 	M_EPILOG
 	}
@@ -150,7 +150,7 @@ bool HComplex::operator != ( HComplex const & a_roComplex ) const
 HComplex & HComplex::operator = ( double const a_dReal )
 	{
 	M_PROLOG
-	M_IRV ( set ( a_dReal, 0. ) );
+	set ( a_dReal, 0. );
 	return ( * this );
 	M_EPILOG
 	}
