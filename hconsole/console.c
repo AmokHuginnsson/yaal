@@ -196,7 +196,7 @@ void leave_curses( void )
 //	if ( ! mousemask ( 0, NULL ) )
 //		M_THROW ( "mousemask ( ) returned 0", g_iErrNo );
 	if ( n_bUseMouse )
-		mouse::mouse_close ( );
+		static_cast < void > ( mouse::mouse_close ( ) );
 	bkgd ( ' ' | M_MAKE_ATTR ( ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) ) );
 	M_ENSURE ( use_default_colors ( ) == OK );
 	M_ENSURE ( printw ( "" ) != ERR );
@@ -506,7 +506,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 			a_iKey = get_key ( );
 			l_iEventType = D_EVENT_MOUSE;
 			if ( a_iKey == KEY_MOUSE )
-				mouse::mouse_get ( a_rsMouse );
+				static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
 			else
 				l_iEventType = D_EVENT_KEYBOARD;
 			break;
@@ -525,7 +525,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 			}
 		if ( ( a_iKey == KEY_MOUSE )
 				|| ( n_iMouseDes && FD_ISSET ( n_iMouseDes, & l_xFdSet ) ) )
-			l_iEventType |= D_EVENT_MOUSE, mouse::mouse_get ( a_rsMouse );
+			l_iEventType |= D_EVENT_MOUSE, static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
 		}
 	return ( l_iEventType );
 	}

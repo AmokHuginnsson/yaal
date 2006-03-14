@@ -263,7 +263,7 @@ int HTUIProcess::handler_mouse ( int a_iCode, void * )
 	M_PROLOG
 	a_iCode = 0;
 	mouse::OMouse l_sMouse;
-	mouse::mouse_get ( l_sMouse );
+	static_cast < void > ( mouse::mouse_get ( l_sMouse ) );
 #ifdef __DEBUGGER_BABUNI__
 	c_printf ( 0, 0,	COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );

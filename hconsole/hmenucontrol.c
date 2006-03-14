@@ -137,7 +137,7 @@ int HMenuControl::process_input ( int a_iCode )
 		M_ASSERT ( l_poNode );
 		l_psMenu = static_cast < OMenuItem * > ( l_poNode->f_tLeaf [ 0 ].get < void * > ( ) );
 		if ( l_psMenu->HANDLER )
-			( f_poProcess->* ( l_psMenu->HANDLER ) ) ( );
+			static_cast < void > ( ( f_poProcess->* ( l_psMenu->HANDLER ) ) ( ) );
 		a_iCode = 0;
 		}
 	return ( a_iCode );

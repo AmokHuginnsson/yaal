@@ -134,7 +134,7 @@ int HProcess::run ( void )
 				{
 				if ( FD_ISSET ( l_iFileDes, & f_xFileDescriptorSet ) )
 					{
-					( this->*HANDLER ) ( l_iFileDes );
+					static_cast < void > ( ( this->*HANDLER ) ( l_iFileDes ) );
 					f_iIdleCycles = 0;
 					}
 				}
