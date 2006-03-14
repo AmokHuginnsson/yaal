@@ -65,12 +65,9 @@ struct KEY_CODES
 
 struct GLYPHS
 	{
-	typedef enum
-		{
-		D_DOWN_ARROW,
-		D_UP_ARROW,
-		D_VERTICAL_LINE
-		} glyph_t;
+	static int const D_DOWN_ARROW;
+	static int const D_UP_ARROW;
+	static int const D_VERTICAL_LINE;
 	};
 
 struct CURSOR
@@ -129,7 +126,7 @@ void leave_curses( void );
 void set_attr( int );
 int c_move ( int const &, int const & );
 CURSOR::cursor_t curs_set ( CURSOR::cursor_t const & );
-int c_addch ( GLYPHS::glyph_t const & );
+int c_addch ( int const & );
 int c_refresh ( void );
 int endwin ( void );
 void c_getmaxyx ( int &, int & );

@@ -33,11 +33,14 @@ namespace stdhapi
 namespace tools
 {
 
-#define D_DES_SIDES_COUNT		2
-#define D_DES_IKEY_SIZE			6
-#define D_DES_BLOCK_SIZE		8
-#define D_DES_IKEYS_COUNT		16
-#define D_DES_PASSWORD_SIZE	16
+struct DES
+	{
+	static int const D_SIDES_COUNT		= 2;
+	static int const D_IKEY_SIZE			= 6;
+	static int const D_BLOCK_SIZE			= 8;
+	static int const D_IKEYS_COUNT		= 16;
+	static int const D_PASSWORD_SIZE	= 16;
+	};
 
 typedef unsigned char uc_t;
 
@@ -45,8 +48,8 @@ class HDes
 	{
 protected:
 	/*{*/
-	uc_t f_pppcIKeys [ D_DES_SIDES_COUNT ]
-		[ D_DES_IKEYS_COUNT ] [ D_DES_IKEY_SIZE ];
+	uc_t f_pppcIKeys [ DES::D_SIDES_COUNT ]
+		[ DES::D_IKEYS_COUNT ] [ DES::D_IKEY_SIZE ];
 	/*}*/
 public:
 	/*{*/

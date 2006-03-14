@@ -67,13 +67,13 @@ namespace hconsole
 	int const COLORS::D_BG_GRAY, COLORS::D_ATTR_NORMAL;
 
 #ifdef HAVE_ASCII_GRAPHICS
-#	define D_ASCII_DOWN_ARROW			ACS_DARROW
-#	define D_ASCII_UP_ARROW				ACS_UARROW
-# define D_ASCII_VERTICAL_LINE	ACS_VLINE
-#else
-#	define D_ASCII_DOWN_ARROW			'v'
-#	define D_ASCII_UP_ARROW				'^'
-# define D_ASCII_VERTICAL_LINE	'|'
+	int const GLYPHS::D_DOWN_ARROW		= ACS_DARROW;
+	int const GLYPHS::D_UP_ARROW			= ACS_UARROW;
+	int const GLYPHS::D_VERTICAL_LINE	= ACS_VLINE;
+#else /* than HAVE_ASCII_GRAPHICS */
+	int const GLYPHS::D_DOWN_ARROW		= 'v';
+	int const GLYPHS::D_UP_ARROW			= '^';
+	int const GLYPHS::D_VERTICAL_LINE	= '|';
 #endif /* not HAVE_ASCII_GRAPHICS */
 
 /* Bbbbffff
@@ -253,24 +253,9 @@ CURSOR::cursor_t curs_set ( CURSOR::cursor_t const & a_eCursor )
 	return ( CURSOR::D_INVISIBLE );
 	}
 
-int c_addch ( GLYPHS::glyph_t const & a_eGlyph )
+int c_addch ( int const & a_iChar )
 	{
-	int l_iChar = 0;
-	switch ( a_eGlyph )
-		{
-		case ( GLYPHS::D_DOWN_ARROW ):
-			l_iChar = D_ASCII_DOWN_ARROW;
-		break;
-		case ( GLYPHS::D_UP_ARROW ):
-			l_iChar = D_ASCII_UP_ARROW;
-		break;
-		case ( GLYPHS::D_VERTICAL_LINE ):
-			l_iChar = D_ASCII_VERTICAL_LINE;
-		break;
-		default :
-			M_ASSERT ( ! "unknown glyph" );
-		}
-	return ( ::addch ( l_iChar ) );
+	return ( ::addch ( a_iChar ) );
 	}
 
 int c_refresh ( void )

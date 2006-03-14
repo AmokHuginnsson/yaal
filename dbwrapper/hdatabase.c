@@ -85,7 +85,7 @@ int long HDataBase::query ( char const * a_pcQuery )
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
 	if ( ! f_pvLastResult )
 		{
-		M_LOG ( dbwrapper::db_error ( f_pvCoreData ) );
+		log ( LOG_TYPE::D_ERROR ) << "SQL error: " << dbwrapper::db_error ( f_pvCoreData ) << endl;
 		return ( - 1 );
 		}
 	return ( dbwrapper::dbrs_records_count ( f_pvCoreData, f_pvLastResult ) );

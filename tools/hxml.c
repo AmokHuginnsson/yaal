@@ -342,7 +342,7 @@ void HXml::init ( char const * a_pcFileName )
 		{
 		l_oError.format ( _ ( "WARRNING: no encoding declared in `%s'." ),
 				a_pcFileName );
-		M_LOG ( l_oError );
+		log_trace << l_oError << endl;
 		}
 	else
 		l_pxHnd = xmlFindCharEncodingHandler (

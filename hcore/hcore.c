@@ -51,7 +51,7 @@ OVariable n_psHCoreVariables [ ] =
 	};
 
 /* mathematical macros */
-#define D_EPSILON	0.000001
+static double const D_EPSILON = 0.000001;
 bool eq ( double const & a_dLeft, double const & a_dRight )
 	{
 	return ( ( ( ( ( a_dLeft ) > ( a_dRight ) )
@@ -113,9 +113,8 @@ void set_env ( char const * const a_pcVarValue )
 		log << a_pcVarValue << '\'' << endl;
 		return;
 		}
-#define D_TRUE	1
+	int const D_TRUE = 1;
 	M_ENSURE ( setenv ( a_pcVarValue, l_pcPtr, D_TRUE ) == 0 );
-#undef D_TRUE
 	return;
 	M_EPILOG
 	}

@@ -409,7 +409,7 @@ HString const & HSocket::get_host_name ( void )
 						l_iSize, & l_psHostName, & l_iCode ) ) == ERANGE )
 				f_oVarTmpBuffer.hs_realloc ( l_iSize <<= 1 );
 			if ( l_iCode )
-				M_LOG ( hstrerror ( l_iCode ) );
+				log_trace << hstrerror ( l_iCode ) << endl;
 			g_iErrNo = l_iError;
 			M_ENSURE ( l_iError == 0 );
 			if ( l_psHostName )

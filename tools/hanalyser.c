@@ -89,7 +89,6 @@ struct FUNCTIONS
 	static int const D_BRACKET = 5;
 	};
 	
-#define M_COUNT_BRANCH( arg ) count_branch ( dynamic_cast < HAnalyserNode * > ( arg ) )
 
 char n_ppcFunctionsMnemonics [ ] [ 8 ] = 
 	{
@@ -170,7 +169,7 @@ double HAnalyser::functions ( HAnalyserNode * a_poNode )
 	M_PROLOG
 	int l_iFunction = reinterpret_cast < int > ( a_poNode->f_tLeaf.tail ( ) );
 	double l_dLeftValue = 0;
-	l_dLeftValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ 0 ] );
+	l_dLeftValue = count_branch ( dynamic_cast < HAnalyserNode * > ( a_poNode->f_oBranch [ 0 ] ) );
 	switch ( l_iFunction )
 		{
 		case ( FUNCTIONS::D_SIN ):
@@ -265,11 +264,11 @@ double HAnalyser::addition ( HAnalyserNode * a_poNode )
 	int l_iOperator = 0;
 	int l_iIndex = 1, l_iQuantity = a_poNode->f_oBranch.quantity ( );
 	double l_dLeftValue = 0, l_dRightValue = 0;
-	l_dLeftValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ 0 ] );
+	l_dLeftValue = count_branch ( dynamic_cast < HAnalyserNode * > ( a_poNode->f_oBranch [ 0 ] ) );
 	while ( l_iIndex < l_iQuantity )
 		{
 		l_iOperator = reinterpret_cast < int > ( a_poNode->f_tLeaf [ l_iIndex - 1 ] );
-		l_dRightValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ l_iIndex ] );
+		l_dRightValue = count_branch ( dynamic_cast < HAnalyserNode * > ( a_poNode->f_oBranch [ l_iIndex ] ) );
 		switch ( l_iOperator )
 			{
 			case ( D_ADD ) :
@@ -296,11 +295,11 @@ double HAnalyser::multiplication ( HAnalyserNode * a_poNode )
 	int l_iOperator = 0;
 	int l_iIndex = 1, l_iQuantity = a_poNode->f_oBranch.quantity ( );
 	double l_dLeftValue = 0, l_dRightValue = 0;
-	l_dLeftValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ 0 ] );
+	l_dLeftValue = count_branch ( dynamic_cast < HAnalyserNode * > ( a_poNode->f_oBranch [ 0 ] ) );
 	while ( l_iIndex < l_iQuantity )
 		{
 		l_iOperator = reinterpret_cast < int > ( a_poNode->f_tLeaf [ l_iIndex - 1 ] );
-		l_dRightValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ l_iIndex ] );
+		l_dRightValue = count_branch ( dynamic_cast < HAnalyserNode * > ( a_poNode->f_oBranch [ l_iIndex ] ) );
 		switch ( l_iOperator )
 			{
 			case ( D_MULTIPLY ) :
@@ -323,8 +322,8 @@ double HAnalyser::power ( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
 	double l_dLeftValue, l_dRightValue;
-	l_dLeftValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ 0 ] );
-	l_dRightValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ 1 ] );
+	l_dLeftValue = count_branch ( dynamic_cast < HAnalyserNode * > ( a_poNode->f_oBranch [ 0 ] ) );
+	l_dRightValue = count_branch ( dynamic_cast < HAnalyserNode * > ( a_poNode->f_oBranch [ 1 ] ) );
 	if ( ( l_dLeftValue < 0 )
 			&& ( ! eq ( l_dRightValue, floor( l_dRightValue ) ) ) )
 		return ( 0 );
@@ -336,7 +335,7 @@ double HAnalyser::signum ( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
 	double l_dLeftValue;
-	l_dLeftValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ 0 ] );
+	l_dLeftValue = count_branch ( dynamic_cast < HAnalyserNode * > ( a_poNode->f_oBranch [ 0 ] ) );
 	return ( - l_dLeftValue );
 	M_EPILOG
 	}
@@ -345,7 +344,7 @@ double HAnalyser::bracket ( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
 	double l_dLeftValue;
-	l_dLeftValue = M_COUNT_BRANCH ( a_poNode->f_oBranch [ 0 ] );
+	l_dLeftValue = count_branch ( dynamic_cast < HAnalyserNode * > ( a_poNode->f_oBranch [ 0 ] ) );
 	return ( l_dLeftValue );
 	M_EPILOG
 	}

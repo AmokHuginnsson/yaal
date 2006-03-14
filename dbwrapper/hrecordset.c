@@ -177,11 +177,11 @@ int long HRecordSet::open ( char const * a_pcQuery )
 	f_iCursorPosition = 0;
 	f_iSetQuantity = f_poDataBase->query ( f_oSQL );
 	if ( f_iSetQuantity < 0 )
-		M_LOG ( f_poDataBase->get_error ( ) );
+		log ( LOG_TYPE::D_ERROR ) << "SQL error (query): " << f_poDataBase->get_error ( ) << endl;
 	f_pvCoreData = f_poDataBase->get_result ( );
 	f_iFieldCount = dbwrapper::rs_fields_count ( f_pvCoreData );
 	if ( f_iFieldCount < 0 )
-		M_LOG ( f_poDataBase->get_error ( ) );
+		log ( LOG_TYPE::D_ERROR ) << "SQL error (fiels count): " << f_poDataBase->get_error ( ) << endl;
 	f_iMode = D_MODE_NORMAL;
 	f_oColumnNames.flush ( );
 	f_oValues.flush ( );
