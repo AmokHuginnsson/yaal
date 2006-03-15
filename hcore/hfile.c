@@ -47,8 +47,7 @@ HFile::HFile ( mode_open_t const a_eMode, void * const a_pvHandle )
 	if ( ( ( a_eMode & D_APPEND ) && ( a_eMode & D_TRUNCATE ) )
 			|| ( ( a_eMode & D_READING ) && ( a_eMode & D_TRUNCATE ) )
 			|| ( ( a_eMode & D_READING ) && ( a_eMode & D_APPEND ) ) )
-		M_THROW ( _ ( "inconsistient mode flags" ),
-				static_cast < int > ( a_eMode ) );
+		M_THROW ( _ ( "inconsistient mode flags" ), a_eMode );
 	return;
 	M_EPILOG
 	}
@@ -80,7 +79,7 @@ int HFile::open ( char const * const a_pcPath )
 	else if ( f_eMode == ( D_READING | D_WRITING | D_APPEND ) )
 		l_pcMode = "a+";
 	else
-		M_THROW ( "unexpected mode setting", static_cast < int > ( f_eMode ) );
+		M_THROW ( "unexpected mode setting", f_eMode );
 	f_oPath = a_pcPath;
 	f_pvHandle = fopen ( a_pcPath, l_pcMode );
 	if ( ! f_pvHandle )
@@ -117,11 +116,11 @@ int HFile::read_line ( HString & a_roLine, mode_read_t a_eMode,
 	int l_iLength = 0;
 	char * l_pcPtr = NULL;
 	if ( ( a_eMode & D_KEEP_NEWLINES ) && ( a_eMode & D_STRIP_NEWLINES ) )
-		M_THROW ( _ ( "bad newlines setting" ), static_cast < int > ( a_eMode ) );
+		M_THROW ( _ ( "bad newlines setting" ), a_eMode );
 	if ( ! ( a_eMode & ( D_KEEP_NEWLINES | D_STRIP_NEWLINES ) ) )
 		a_eMode |= D_KEEP_NEWLINES;
 	if ( ( a_eMode & D_BUFFERED_READS ) && ( a_eMode & D_UNBUFFERED_READS ) )
-		M_THROW ( _ ( "bad buffering setting" ), static_cast < int > ( a_eMode ) );
+		M_THROW ( _ ( "bad buffering setting" ), a_eMode );
 	if ( ! ( a_eMode & ( D_BUFFERED_READS | D_UNBUFFERED_READS ) ) )
 		a_eMode |= D_BUFFERED_READS;
 	if ( ! f_pvHandle )
@@ -184,7 +183,7 @@ int HFile::scan_line ( HString & a_roLine, int const a_iMaximumLength )
 int HFile::get_line_length ( void )
 	{
 	M_PROLOG
-#define D_SCAN_BUFFER_SIZE	8
+	static int const D_SCAN_BUFFER_SIZE = 8;
 	int l_iLength = 0, l_iSize = 0;
 	char l_pcBuffer [ D_SCAN_BUFFER_SIZE ];
 	char const * l_pcPtr = NULL;

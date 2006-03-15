@@ -236,8 +236,7 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 								( * static_cast < HString * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) ) = l_oValue;
 							break;
 							default:
-								M_THROW ( "unknown type",
-										static_cast < int > ( a_psVaraibles [ l_iCtr ].f_eType ) );
+								M_THROW ( "unknown type", a_psVaraibles [ l_iCtr ].f_eType );
 							}
 						l_bOptionOK = true;
 						}

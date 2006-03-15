@@ -47,7 +47,7 @@ namespace hdata
 HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
 		OResource * a_psDataControlInfo )
 	: HWindow ( a_pcTitle ), HRecordSet ( a_poDataBase ),
-	f_bModified ( false ), f_poMainControl ( NULL ),
+	f_bModified ( false ), f_eDocumentMode ( DOCUMENT::D_VIEW ), f_poMainControl ( NULL ),
 	f_psResourcesArray ( a_psDataControlInfo ), f_poSyncStore ( NULL ),
 	f_oViewModeControls ( ), f_oEditModeControls ( )
 	{
@@ -237,19 +237,18 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 		l_poPDC->add_column ( M_SETUP_COLUMN, a_poDataControl );
 		}
 	else
-		M_THROW ( "unknown parent type",
-			static_cast < int > ( f_psResourcesArray [ l_iParent ].f_eType ) );
+		M_THROW ( "unknown parent type", f_psResourcesArray [ l_iParent ].f_eType );
 	return;
 	M_EPILOG
 	}
 
-void HDataWindow::set_mode ( int a_iMode )
+void HDataWindow::set_mode ( DOCUMENT::mode_t a_eMode )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iCount = 0;
-	switch ( a_iMode )
+	switch ( a_eMode )
 		{
-		case ( D_MODE_VIEW ):
+		case ( DOCUMENT::D_VIEW ):
 			{
 			l_iCount = f_oEditModeControls.quantity ( );
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
@@ -261,7 +260,7 @@ void HDataWindow::set_mode ( int a_iMode )
 				f_oViewModeControls [ 0 ]->set_focus ( );
 			}
 		break;
-		case ( D_MODE_EDIT ):
+		case ( DOCUMENT::D_EDIT ):
 			{
 			l_iCount = f_oViewModeControls.quantity ( );
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
@@ -274,7 +273,7 @@ void HDataWindow::set_mode ( int a_iMode )
 			}
 		break;
 		default :
-			M_THROW ( "unknown window mode", a_iMode );
+			M_THROW ( "unknown window mode", a_eMode );
 		}
 	return;
 	M_EPILOG
@@ -293,7 +292,7 @@ void HDataWindow::sync ( void )
 				( * f_poSyncStore ) [ l_iCtr ] ( static_cast < char const * > ( f_oValues [ l_iCtr ] ) );
 		( * f_poSyncStore ).m_lId = m_lId;
 		}
-	else if ( ( f_iMode == D_MODE_ADDING ) || ( f_iMode == D_MODE_EDITING ) )
+	else if ( ( f_eMode == D_ADDING ) || ( f_eMode == D_EDITING ) )
 		{
 		l_iCount = f_oEditModeControls.quantity ( );
 		if ( f_oValues.quantity ( ) >= l_iCount )
@@ -314,7 +313,7 @@ void HDataWindow::set_sync_store ( HItem * a_poItem )
 int HDataWindow::handler_add_new ( int, void * )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )
+	if ( f_eMode != D_OPEN )
 		{
 		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not add new rocord now." ) );
@@ -323,7 +322,7 @@ int HDataWindow::handler_add_new ( int, void * )
 	add_new ( );
 	if ( f_poMainControl )
 		f_poMainControl->add_new ( );
-	set_mode ( D_MODE_EDIT );
+	set_mode ( DOCUMENT::D_EDIT );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -331,7 +330,7 @@ int HDataWindow::handler_add_new ( int, void * )
 int HDataWindow::handler_edit ( int, void * )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )
+	if ( f_eMode != D_NORMAL )
 		{
 		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not start editing of this record." ) );
@@ -343,7 +342,7 @@ int HDataWindow::handler_edit ( int, void * )
 				_ ( "There is nothing to edit." ) );
 		return ( 0 );
 		}
-	set_mode ( D_MODE_EDIT );
+	set_mode ( DOCUMENT::D_EDIT );
 	edit ( );
 	return ( 0 );
 	M_EPILOG
@@ -352,7 +351,7 @@ int HDataWindow::handler_edit ( int, void * )
 int HDataWindow::handler_delete ( int, void * )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )
+	if ( f_eMode != D_NORMAL )
 		{
 		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not delete this record." ) );
@@ -375,7 +374,7 @@ int HDataWindow::handler_delete ( int, void * )
 int HDataWindow::handler_save ( int, void * )
 	{
 	M_PROLOG
-	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
+	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
 		{
 		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( 0 );
@@ -383,7 +382,7 @@ int HDataWindow::handler_save ( int, void * )
 	m_lId = update ( );
 	f_bModified = false;
 	f_poMainControl->load ( );
-	set_mode ( D_MODE_VIEW );
+	set_mode ( DOCUMENT::D_VIEW );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -391,13 +390,13 @@ int HDataWindow::handler_save ( int, void * )
 int HDataWindow::handler_requery ( int, void * )
 	{
 	M_PROLOG
-	if ( f_iMode != D_MODE_NORMAL )
+	if ( f_eMode != D_NORMAL )
 		{
 		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "Finish your current operation first." ) );
 		return ( 0 );
 		}
-	set_mode ( D_MODE_VIEW );
+	set_mode ( DOCUMENT::D_VIEW );
 	f_poMainControl->load ( );
 	refresh ( );
 	return ( 0 );
@@ -407,12 +406,12 @@ int HDataWindow::handler_requery ( int, void * )
 int HDataWindow::handler_cancel ( int, void * )
 	{
 	M_PROLOG
-	int l_iMode = f_iMode;
-	if ( ( f_iMode != D_MODE_ADDING ) && ( f_iMode != D_MODE_EDITING ) )
+	mode_t l_eMode = f_eMode;
+	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
 		return ( 0 );
 	cancel ( );
-	set_mode ( D_MODE_VIEW );
-	if ( ( l_iMode == D_MODE_ADDING ) && f_poMainControl )
+	set_mode ( DOCUMENT::D_VIEW );
+	if ( ( l_eMode == D_ADDING ) && f_poMainControl )
 		f_poMainControl->cancel_new ( );
 	f_bModified = false;
 	f_poStatusBar->refresh ( );

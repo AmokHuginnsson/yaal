@@ -65,16 +65,7 @@ namespace hconsole
 	int const COLORS::D_BG_BROWN, COLORS::D_BG_BLUE, COLORS::D_BG_MAGENTA;
 	int const COLORS::D_BG_CYAN, COLORS::D_BG_LIGHTGRAY, COLORS::D_BG_BLINK;
 	int const COLORS::D_BG_GRAY, COLORS::D_ATTR_NORMAL;
-
-#ifdef HAVE_ASCII_GRAPHICS
-	int const GLYPHS::D_DOWN_ARROW		= ACS_DARROW;
-	int const GLYPHS::D_UP_ARROW			= ACS_UARROW;
-	int const GLYPHS::D_VERTICAL_LINE	= ACS_VLINE;
-#else /* than HAVE_ASCII_GRAPHICS */
-	int const GLYPHS::D_DOWN_ARROW		= 'v';
-	int const GLYPHS::D_UP_ARROW			= '^';
-	int const GLYPHS::D_VERTICAL_LINE	= '|';
-#endif /* not HAVE_ASCII_GRAPHICS */
+	int GLYPHS::D_DOWN_ARROW, GLYPHS::D_UP_ARROW, GLYPHS::D_VERTICAL_LINE;
 
 /* Bbbbffff
  * B - blink
@@ -184,6 +175,15 @@ void enter_curses( void )
 			M_THROW ( _ ( "mouse is console type"
 						" and we did not recived file descriptor" ), g_iErrNo );
 		}
+#ifdef HAVE_ASCII_GRAPHICS
+	GLYPHS::D_DOWN_ARROW		= ACS_DARROW;
+	GLYPHS::D_UP_ARROW			= ACS_UARROW;
+	GLYPHS::D_VERTICAL_LINE	= ACS_VLINE;
+#else /* than HAVE_ASCII_GRAPHICS */
+	GLYPHS::D_DOWN_ARROW		= 'v';
+	GLYPHS::D_UP_ARROW			= '^';
+	GLYPHS::D_VERTICAL_LINE	= '|';
+#endif /* not HAVE_ASCII_GRAPHICS */
 	return;
 	M_EPILOG
 	}

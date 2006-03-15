@@ -546,8 +546,7 @@ tType & HList< tType >::add_orderly ( tType & a_rtObject,
 	HElement * l_poElement = new HElement ( NULL, f_iHighestNumber );
 	l_poElement->put ( a_rtObject );
 	if ( ( f_eOrder != D_UNSORTED ) && ( f_eOrder != a_eOrder ) )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADORDER ],
-				static_cast < int > ( a_eOrder ) );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
 	while ( f_iQuantity && ( l_iOldIndex != l_iIndex ) )
 		{
@@ -618,7 +617,7 @@ OListBits::status_t HList< tType >::remove_at ( int a_iIndex, treatment_t const 
 					l_eError = D_WAS_NOT_EMPTIED;
 				break;
 				default :
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( l_eFlag ) );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], l_eFlag );
 				}
 			}
 		}
@@ -676,7 +675,7 @@ OListBits::status_t HList< tType >::remove_element ( treatment_t const & a_eFlag
 					l_eError = D_WAS_NOT_EMPTIED;
 				break;
 				default :
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( l_eFlag ) );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], l_eFlag );
 				}
 			}
 		}
@@ -747,7 +746,7 @@ OListBits::status_t HList< tType >::remove_head ( treatment_t const & a_eFlag, t
 					l_eError = D_WAS_NOT_EMPTIED;
 				break;
 				default :
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
 				}
 			}
 		}
@@ -795,7 +794,7 @@ OListBits::status_t HList< tType >::remove_tail ( treatment_t const & a_eFlag, t
 					l_eError = D_WAS_NOT_EMPTIED;
 				break;
 				default :
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
+					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
 				}
 			}
 		if ( l_poElement == f_poSelected )
@@ -853,7 +852,7 @@ bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, treatme
 			}
 		break;
 		default :
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
 		}
 	return ( l_bOk );
 	M_EPILOG
@@ -909,7 +908,7 @@ bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, treatme
 			}
 		break;
 		default :
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
 		}
 	return ( l_bOK );
 	M_EPILOG
@@ -1029,7 +1028,7 @@ tType & HList< tType >::go ( int a_iNumber, search_after_t a_eFlag )
 			f_poSelected = element_by_index ( a_iNumber );
 		break;
 		default :
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
 		}
 	return ( f_poSelected->get ( ) );
 	M_EPILOG
@@ -1120,7 +1119,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, search_after_t a_eFla
 			l_poRight = element_by_index ( a_iRight );
 		break;
 		default :
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], static_cast < int > ( a_eFlag ) );
+			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
 		}
 	exchange ( l_poLeft, l_poRight );
 	return;
@@ -1169,8 +1168,7 @@ void HList< tType >::sort ( void )
 	HElement * l_poExtreamUpper = NULL;
 	HElement * l_poPointer = NULL;
 	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADORDER ],
-				static_cast < int > ( f_eOrder ) );
+		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADORDER ], f_eOrder );
 	while ( l_iCtr >= 0 )
 		{
 		l_iCtrLoc = l_iCtr;

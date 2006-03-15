@@ -24,9 +24,6 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#define MULTIPLIER      0x015a4e35L
-#define INCREMENT       1
-
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" )
 #include "hrandomizer.h"
@@ -36,6 +33,12 @@ namespace stdhapi
 
 namespace hcore
 {
+
+namespace
+	{
+	static long unsigned const MULTIPLIER = 0x015a4e35L;
+	static long unsigned const INCREMENT  = 1;
+	}
 
 HRandomizer::HRandomizer ( int long unsigned const a_ulSeed )
 	: f_ulSeed ( a_ulSeed )

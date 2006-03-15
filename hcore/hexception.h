@@ -48,7 +48,7 @@ namespace hcore
 #define M_CVSID(id) namespace { char __CVSID__ [ ] = id; }
 #define M_CVSTID(id) namespace { char __CVSTID__ [ ] = id; }
 #define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
-#define M_THROW( msg, e_no ) throw ( stdhapi::hcore::HException ( __WHERE__, msg, e_no ) )
+#define M_THROW( msg, e_no ) throw ( stdhapi::hcore::HException ( __WHERE__, msg, static_cast < int > ( e_no ) ) )
 #define M_PROLOG try{
 #define M_EPILOG } catch ( stdhapi::hcore::HException & e ){ e->log ( __WHERE__ ); throw; }
 #define M_FINAL } catch ( stdhapi::hcore::HException & e ){ e->log ( __WHERE__ ); e->print_error ( true ); }

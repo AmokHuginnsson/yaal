@@ -65,9 +65,9 @@ struct KEY_CODES
 
 struct GLYPHS
 	{
-	static int const D_DOWN_ARROW;
-	static int const D_UP_ARROW;
-	static int const D_VERTICAL_LINE;
+	static int D_DOWN_ARROW;
+	static int D_UP_ARROW;
+	static int D_VERTICAL_LINE;
 	};
 
 struct CURSOR

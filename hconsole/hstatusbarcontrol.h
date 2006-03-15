@@ -35,23 +35,31 @@ namespace stdhapi
 namespace hconsole
 {
 
-#define D_PROMPT_MODE_NORMAL	0
-#define D_PROMPT_MODE_COMMAND	1
-#define D_PROMPT_MODE_SEARCH	2
-#define D_PROMPT_MODE_MENU		3
-
-#define D_PROMPT_RESTRICT_RELAXED							0
-#define D_PROMPT_RESTRICT_ONLY_ENTER_CAN_QUIT	1
-#define D_PROMPT_RESTRICT_MUST_CANCEL					2
-
 class HStatusBarControl : public HEditControl
 	{
+public:
+	struct PROMPT
+		{
+		typedef enum
+			{
+			D_NORMAL,
+			D_COMMAND,
+			D_SEARCH,
+			D_MENU
+			} mode_t;
+		typedef enum
+			{
+			D_RELAXED,
+			D_ONLY_ENTER_CAN_QUIT,
+			D_MUST_CANCEL
+			} restrict_t;
+		};
 protected:
 	/*{*/
 	int			f_iStatusBarAttribute;
 	int			f_iPromptLength;
-	int			f_iMode;					/* prompt mode */
-	int			f_iRestrict;			/* prompt restrict mode */
+	PROMPT::mode_t f_eMode;					/* prompt mode */
+	PROMPT::restrict_t f_eRestrict;	/* prompt restrict mode */
 	hcore::HString	f_oPrompt;
 	/* progress bar data */
 	bool		f_bDone;
@@ -77,8 +85,8 @@ public:
 	virtual int process_input_normal ( int );
 	virtual int process_input_menu ( int );
 	void setup ( char const *, char const *, int );
-	void set_prompt ( char const * = NULL, int = D_PROMPT_MODE_NORMAL,
-			int = D_PROMPT_RESTRICT_RELAXED );
+	void set_prompt ( char const * = NULL, PROMPT::mode_t = PROMPT::D_NORMAL,
+			PROMPT::restrict_t = PROMPT::D_RELAXED );
 	void end_prompt ( void );
 	void init_progress ( double, char const *, bool = true );
 	void update_progress ( double = -1, char const * = NULL );

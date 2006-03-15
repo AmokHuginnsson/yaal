@@ -197,7 +197,7 @@ int HWindow::handler_command ( int a_iCode, void * )
 	{
 	M_PROLOG
 	a_iCode = 0;
-	f_poStatusBar->set_prompt ( ":", D_PROMPT_MODE_COMMAND );
+	f_poStatusBar->set_prompt ( ":", HStatusBarControl::PROMPT::D_COMMAND );
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -211,7 +211,7 @@ int HWindow::handler_search ( int a_iCode, void * )
 	if ( a_iCode >= KEY_CODES::D_COMMAND_BASE )
 		a_iCode -= KEY_CODES::D_COMMAND_BASE;
 	l_pcPrompt [ 0 ] = static_cast < char > ( a_iCode );
-	f_poStatusBar->set_prompt ( l_pcPrompt, D_PROMPT_MODE_SEARCH );
+	f_poStatusBar->set_prompt ( l_pcPrompt, HStatusBarControl::PROMPT::D_SEARCH );
 	a_iCode = 0;
 	return ( a_iCode );
 	M_EPILOG

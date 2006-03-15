@@ -248,8 +248,7 @@ char const * HXml::convert ( char const * a_pcData, way_t a_eWay )
 		case ( D_OUT ): { l_xCD = f_oConvert->f_xIconvOut; break; }
 		default :
 			{
-			M_THROW ( _ ( "unknown convertion way" ),
-					static_cast < int > ( a_eWay ) );
+			M_THROW ( _ ( "unknown convertion way" ), a_eWay );
 			break;
 			}
 		}

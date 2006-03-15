@@ -66,8 +66,7 @@ int HThread::spawn ( void )
 	M_PROLOG
 	M_CRITICAL_SECTION ( );
 	if ( f_eStatus != D_DEAD )
-		M_THROW ( _ ( "thread is already running" ),
-				static_cast < int > ( f_eStatus ) );
+		M_THROW ( _ ( "thread is already running" ), f_eStatus );
 	M_ENSURE ( pthread_create ( & f_xThread,
 				& f_sAttributes, SPAWN, this ) == 0 );
 	f_oCondition.wait ( );
@@ -80,8 +79,7 @@ int HThread::finish ( void )
 	M_PROLOG
 	void * l_pvReturn = NULL;
 	if ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) )
-		M_THROW ( _ ( "thread is not running" ),
-				static_cast < int > ( f_eStatus ) );
+		M_THROW ( _ ( "thread is not running" ), f_eStatus );
 	f_eStatus = D_ZOMBIE;
 	M_ENSURE ( pthread_join ( f_xThread, & l_pvReturn ) == 0 );
 	f_eStatus = D_DEAD;

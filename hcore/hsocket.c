@@ -68,11 +68,11 @@ HSocket::HSocket ( socket_type_t const a_eSocketType,
 	M_PROLOG
 	f_eType = a_eSocketType;
 	if ( ( a_eSocketType & D_FILE ) && ( a_eSocketType & D_NETWORK ) )
-		M_THROW ( _ ( "bad socket namespace setting" ), static_cast < int > ( a_eSocketType ) );
+		M_THROW ( _ ( "bad socket namespace setting" ), a_eSocketType );
 	if ( ! ( a_eSocketType & ( D_FILE | D_NETWORK ) ) )
 		f_eType |= D_NETWORK;
 	if ( ( a_eSocketType & D_BLOCKING ) && ( a_eSocketType & D_NONBLOCKING ) )
-		M_THROW ( _ ( "bad socket option" ), static_cast < int > ( a_eSocketType ) );
+		M_THROW ( _ ( "bad socket option" ), a_eSocketType );
 	if ( ! ( a_eSocketType & ( D_BLOCKING | D_NONBLOCKING ) ) )
 		f_eType |= D_BLOCKING;
 	if ( f_iMaximumNumberOfClients >= 0 )
@@ -291,8 +291,7 @@ int const HSocket::get_port ( void ) const
 		M_THROW ( n_ppcErrMsgHSocket [ E_HCORE_HSOCKET_NOT_INITIALIZED ], f_iFileDescriptor );
 	sockaddr_in * l_psAddressNetwork = NULL;
 	if ( ! ( f_eType & D_NETWORK ) )
-		M_THROW ( _ ( "unix socket has not a port attribute" ),
-				static_cast < int > ( f_eType ) );
+		M_THROW ( _ ( "unix socket has not a port attribute" ), f_eType );
 	l_psAddressNetwork = static_cast < sockaddr_in * > ( f_pvAddress );
 	return ( ntohs ( l_psAddressNetwork->sin_port ) );
 	M_EPILOG

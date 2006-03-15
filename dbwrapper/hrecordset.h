@@ -27,13 +27,6 @@ Copyright:
 #ifndef __DBWRAPPER_HRECORDSET_H
 #define __DBWRAPPER_HRECORDSET_H
 
-/* modes */
-#define D_MODE_CLOSED		( - 1 )
-#define D_MODE_NORMAL		0
-#define D_MODE_ADDING		1
-#define D_MODE_EDITING	2
-#define D_MODE_OPENED		D_MODE_NORMAL
-
 #include "hcore/hlist.h"
 #include "hcore/hstring.h"
 #include "hcore/htime.h"
@@ -48,6 +41,15 @@ namespace dbwrapper
 
 class HRecordSet
 	{
+public:
+	typedef enum
+		{
+		D_CLOSED,
+		D_OPEN,
+		D_NORMAL = D_OPEN,
+		D_ADDING,
+		D_EDITING
+		} mode_t;
 private:
 	/*{*/
 	void * f_pvCoreData;	/* very internal for this class used only in base cla */
@@ -58,7 +60,7 @@ protected:
 	/*{*/
 	int f_iIdFieldOffset;	/* number (count from 0) of id column in result record-set */
 	int f_iFieldCount;		/* number of columns returned by last query */
-	int f_iMode;					/* normal(opened), closed, adding, editing */
+	mode_t f_eMode;					/* normal(opened), closed, adding, editing */
 	int f_iCursorPosition;/* cursor position in record-set */
 	int f_iSetQuantity;		/* number of records returned by last query */
 	hcore::HString f_oTable;			/* table name */

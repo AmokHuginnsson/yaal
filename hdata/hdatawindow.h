@@ -40,14 +40,21 @@ namespace stdhapi
 namespace hdata
 {
 
-#define D_MODE_VIEW	0
-#define D_MODE_EDIT	1
-
 class HDataWindow : public hconsole::HWindow, public dbwrapper::HRecordSet
 	{
+public:
+	struct DOCUMENT
+		{
+		typedef enum
+			{
+			D_VIEW,
+			D_EDIT
+			} mode_t;
+		};
 protected:
 	/*{*/
 	bool f_bModified;
+	DOCUMENT::mode_t f_eDocumentMode;
 	HDataControl * f_poMainControl;
 	OResource * f_psResourcesArray;
 	hconsole::HItem * f_poSyncStore;
@@ -67,7 +74,7 @@ public:
 protected:
 	/*{*/
 	void link ( int, HDataControl * );
-	void set_mode ( int );
+	void set_mode ( DOCUMENT::mode_t );
 	virtual void sync ( void );
 	void sync ( int, hconsole::HEditControl & );
 	void sync ( int, HDataListControl & );

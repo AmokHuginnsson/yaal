@@ -181,8 +181,7 @@ void HListControl::refresh ( void )
 							f_oVarTmpBuffer = static_cast < char const * > ( l_oItem [ l_iCtrLoc ].get < HTime const & > ( ) );
 						break;
 						default :
-							M_THROW ( "unknown type",
-									static_cast < int > ( l_poColumnInfo->f_eType ) );
+							M_THROW ( "unknown type", l_poColumnInfo->f_eType );
 						}
 					l_iTmp = f_oVarTmpBuffer.get_length ( );
 					switch ( l_poColumnInfo->f_iAlign )

@@ -148,8 +148,7 @@ int decode_switches ( int const a_iArgc, char * const * const a_ppcArgv,
 					case ( D_VOID ):
 						break;
 					default:
-						M_THROW ( "unknown type",
-								static_cast < int > ( a_rpsOptions [ l_iCtr ].f_eValueType ) );
+						M_THROW ( "unknown type", a_rpsOptions [ l_iCtr ].f_eValueType );
 					}
 				if ( a_rpsOptions [ l_iCtr ].CALLBACK )
 					a_rpsOptions [ l_iCtr ].CALLBACK ( );

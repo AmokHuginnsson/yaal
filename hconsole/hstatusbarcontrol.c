@@ -47,7 +47,7 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 									HEditControl ( NULL, 0, 0, 0, 0, NULL, 127, "", n_pcMaskLoose,
 											false, false, false, false, false, 255 ),
 	f_iStatusBarAttribute ( 0 ), f_iPromptLength ( 0 ),
-	f_iMode ( D_PROMPT_MODE_NORMAL ), f_iRestrict ( D_PROMPT_RESTRICT_RELAXED ),
+	f_eMode ( PROMPT::D_NORMAL ), f_eRestrict ( PROMPT::D_RELAXED ),
 	f_oPrompt ( ), f_bDone ( false ), f_bEstimate ( false ), f_dProgressSize ( 1 ),
 	f_iLastProgress ( - 1 ), f_iLastPercent ( - 1 ), f_iLastMinute ( 0 ),
 	f_iLastSecond ( 0 ), f_iLastStep ( 0 ),
@@ -112,8 +112,8 @@ int HStatusBarControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
 	if ( ( a_iCode == KEY_CODES::D_BACKSPACE )
-			&& ( f_iRestrict == D_PROMPT_RESTRICT_RELAXED )
-			&& ( f_iMode != D_PROMPT_MODE_MENU )
+			&& ( f_eRestrict == PROMPT::D_RELAXED )
+			&& ( f_eMode != PROMPT::D_MENU )
 			&& ! f_oString.get_length ( ) )
 		{
 		end_prompt ( );
@@ -121,14 +121,14 @@ int HStatusBarControl::process_input ( int a_iCode )
 		}
 	if ( a_iCode != '\t' )
 		a_iCode = HEditControl::process_input ( a_iCode );
-	switch ( f_iMode )
+	switch ( f_eMode )
 		{
-		case ( D_PROMPT_MODE_NORMAL ):
-		case ( D_PROMPT_MODE_COMMAND ):
-		case ( D_PROMPT_MODE_SEARCH ):
+		case ( PROMPT::D_NORMAL ):
+		case ( PROMPT::D_COMMAND ):
+		case ( PROMPT::D_SEARCH ):
 			a_iCode = process_input_normal ( a_iCode );
 		break;
-		case ( D_PROMPT_MODE_MENU ):
+		case ( PROMPT::D_MENU ):
 			a_iCode = process_input_menu ( a_iCode );
 		break;
 		default :
@@ -138,12 +138,12 @@ int HStatusBarControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-void HStatusBarControl::set_prompt ( char const * a_pcPrompt, int a_iMode,
-		int a_iRestrict )
+void HStatusBarControl::set_prompt ( char const * a_pcPrompt, PROMPT::mode_t a_eMode,
+		PROMPT::restrict_t a_eRestrict )
 	{
 	M_PROLOG
-	f_iMode = a_iMode;
-	f_iRestrict = a_iRestrict;
+	f_eMode = a_eMode;
+	f_eRestrict = a_eRestrict;
 	f_poParent->f_poPreviousFocusedChild = f_poParent->f_poFocusedChild;
 	f_poParent->f_poFocusedChild = f_poParent->f_poStatusBar;
 	f_poParent->f_poPreviousFocusedChild->kill_focus ( );
@@ -316,12 +316,12 @@ bool HStatusBarControl::confirm ( char const * a_pcQuestion )
 	M_EPILOG
 	}
 
-int HStatusBarControl::process_input_normal  ( int a_iCode )
+int HStatusBarControl::process_input_normal ( int a_iCode )
 	{
 	M_PROLOG
 	bool l_bBackwards = false;
 	int l_iCode = a_iCode;
-	int l_iMode = f_iMode;
+	PROMPT::mode_t l_eMode = f_eMode;
 	HSearchableControl * l_poSearchableControl = NULL;
 	a_iCode = 0;
 	switch ( l_iCode )
@@ -330,9 +330,9 @@ int HStatusBarControl::process_input_normal  ( int a_iCode )
 			{
 			l_bBackwards = ( f_oPrompt [ 0 ] == '?' );
 			end_prompt ( );
-			if ( l_iMode == D_PROMPT_MODE_COMMAND )
+			if ( l_eMode == PROMPT::D_COMMAND )
 				f_poParent->f_oCommand = f_oString;
-			else if ( l_iMode == D_PROMPT_MODE_SEARCH )
+			else if ( l_eMode == PROMPT::D_SEARCH )
 				{
 				l_poSearchableControl = dynamic_cast < HSearchableControl * > ( f_poParent->f_poPreviousFocusedChild );
 				if ( l_poSearchableControl )
@@ -360,7 +360,7 @@ int HStatusBarControl::process_input_menu  ( int a_iCode )
 void HStatusBarControl::end_prompt ( void )
 	{
 	M_PROLOG
-	f_iMode = D_PROMPT_MODE_NORMAL;
+	f_eMode = PROMPT::D_NORMAL;
 	f_oPrompt = "";
 	f_iPromptLength = 0;
 	f_poParent->f_poFocusedChild = f_poParent->f_poPreviousFocusedChild;

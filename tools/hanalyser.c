@@ -708,7 +708,7 @@ double HAnalyser::count ( void )
 	M_PROLOG
 	HAnalyserNode * l_poRoot = NULL;
 	if ( ! f_poRoot )
-		M_THROW ( "logic tree is not compiled", static_cast < int > ( f_eError ) );
+		M_THROW ( "logic tree is not compiled", f_eError );
 	l_poRoot = dynamic_cast < HAnalyserNode * > ( f_poRoot );
 	M_ASSERT ( l_poRoot );
 	return ( ( this->* ( l_poRoot->METHOD ) ) ( l_poRoot ) );
@@ -741,7 +741,7 @@ char const * HAnalyser::get_error ( void ) const
 		case ( E_PREMATURE_TERMINATION ):
 			return ( _ ( "premature termination" ) );
 		default :
-			M_THROW ( _ ( "enknown error code" ), static_cast < int > ( f_eError ) );
+			M_THROW ( _ ( "enknown error code" ), f_eError );
 		}
 	M_EPILOG
 	}

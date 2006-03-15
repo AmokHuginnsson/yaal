@@ -191,7 +191,7 @@ void HSerial::compile_speed ( void )
 		case ( D_SPEED_DEFAULT ): break;
 		default :
 			{
-			M_THROW ( _ ( "unknown speed" ), static_cast < int > ( f_eSpeed ) );
+			M_THROW ( _ ( "unknown speed" ), f_eSpeed );
 			break;
 			}
 		}
@@ -220,9 +220,9 @@ void HSerial::compile_flags ( void )
 		f_eFlags |= tools::n_eSerialFlags;
 	/* consistency tests */
 	if ( ( f_eFlags & D_FLAGS_STOP_BITS_1 ) && ( f_eFlags & D_FLAGS_STOP_BITS_2 ) )
-		M_THROW ( _ ( "stop bits setup inconsistent" ), static_cast < int > ( f_eFlags ) );
+		M_THROW ( _ ( "stop bits setup inconsistent" ), f_eFlags );
 	if ( ( f_eFlags & D_FLAGS_FLOW_CONTROL_HARDWARE ) && ( f_eFlags & D_FLAGS_FLOW_CONTROL_SOFTWARE ) )
-		M_THROW ( _ ( "flow control inconsistent" ), static_cast < int > ( f_eFlags ) );
+		M_THROW ( _ ( "flow control inconsistent" ), f_eFlags );
 	if ( f_eFlags & D_FLAGS_BITS_PER_BYTE_8 )
 		l_iCtr ++, l_sTIO.c_cflag = CS8;
 	if ( f_eFlags & D_FLAGS_BITS_PER_BYTE_7 )
@@ -232,7 +232,7 @@ void HSerial::compile_flags ( void )
 	if ( f_eFlags & D_FLAGS_BITS_PER_BYTE_5 )
 		l_iCtr ++, l_sTIO.c_cflag = CS5;
 	if ( l_iCtr != 1 )
-		M_THROW ( _ ( "bits per byte inconsistent" ), static_cast < int > ( f_eFlags ) );
+		M_THROW ( _ ( "bits per byte inconsistent" ), f_eFlags );
 
 	/* compiling settings */
 	/* setting c_cflag */
