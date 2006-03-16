@@ -41,6 +41,19 @@ class HWindow;
 
 class HControl
 	{
+public:
+	struct BITS
+		{
+		struct ALIGN
+			{
+			typedef enum
+				{
+				D_LEFT,
+				D_CENTER,
+				D_RIGHT
+				} align_t;
+			};
+		};
 protected:
 	/*{*/
 	bool			f_bEnabled;						/* is cotrol enabled, focus can go 

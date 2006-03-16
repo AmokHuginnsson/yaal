@@ -27,6 +27,8 @@ Copyright:
 #ifndef __HDATA_ORESOURCE_H
 #define __HDATA_ORESOURCE_H
 
+#include "hconsole/hcontrol.h"
+
 namespace stdhapi
 {
 
@@ -77,7 +79,7 @@ struct OColumnInfo
 	int f_iPlacement; 			/* what place should this new column take */
 	char const * f_pcName;	/* column name */
 	int f_iWidth;						/* column width */
-	int f_iAlign;						/* column alignment */
+	stdhapi::hconsole::HControl::BITS::ALIGN::align_t f_eAlign;						/* column alignment */
 	hcore::type_t f_eType;						/* data type stored in that column */
 	};
 

@@ -47,9 +47,6 @@ namespace stdhapi
 namespace hconsole
 {
 
-#define D_CTRLS_COUNT	2
-#define D_ALTS_COUNT	10
-
 HTUIProcess::HTUIProcess ( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
 		size_t a_uiCommandHandlers )
 	: HHandler ( a_uiKeyHandlers, a_uiCommandHandlers ),
@@ -82,6 +79,8 @@ HTUIProcess::~HTUIProcess ( void )
 int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWindow )
 	{
 	M_PROLOG
+	static int const D_CTRLS_COUNT = 2;
+	static int const D_ALTS_COUNT = 10;
 	int l_iCtr = 0;
 	int l_piAlts [ D_ALTS_COUNT ];
 	int l_piCtrls [ ] = { D_KEY_CTRL_('l'), D_KEY_CTRL_('x') };

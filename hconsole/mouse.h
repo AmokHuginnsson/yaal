@@ -36,9 +36,15 @@ namespace hconsole
 namespace mouse
 {
 
-#define D_MOUSE_BUTTON_ONE		1
-#define D_MOUSE_BUTTON_TWO		2
-#define D_MOUSE_BUTTON_THREE	4
+struct MOUSE_BITS
+	{
+	struct BUTTONS
+		{
+		static int const D_ONE 		= 1;
+		static int const D_TWO		= 2;
+		static int const D_THREE	= 4;
+		};
+	};
 
 typedef struct
 	{

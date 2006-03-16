@@ -37,10 +37,6 @@ namespace stdhapi
 namespace hconsole
 {
 
-#define D_ALIGN_LEFT			0x0010000
-#define D_ALIGN_CENTER		0x0020000
-#define D_ALIGN_RIGHT			0x0040000
-
 class HListControl : public hcore::HList < HItem >, public virtual HSearchableControl
 	{
 	class HColumnInfo
@@ -50,7 +46,7 @@ class HListControl : public hcore::HList < HItem >, public virtual HSearchableCo
 		bool f_bDescending;
 		int f_iWidthRaw;
 		int f_iWidth;
-		int f_iAlign;
+		BITS::ALIGN::align_t f_eAlign;
 		int f_iShortcutIndex;
 		char f_cShortcut;
 		hcore::type_t f_eType;
@@ -116,7 +112,7 @@ public:
 	void add_column ( int const &,									/* at position */
 										char const *,									/* column name */
 										int const &,									/* width */
-										int const & = D_ALIGN_LEFT,		/* align */
+										BITS::ALIGN::align_t const & = BITS::ALIGN::D_LEFT,		/* align */
 										const hcore::type_t & = hcore::D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
 	virtual HItem & add_tail ( HItem * = NULL );

@@ -43,7 +43,7 @@ namespace hconsole
 {
 
 HListControl::HColumnInfo::HColumnInfo ( void )
-	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iAlign ( 0 ),
+	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_eAlign ( BITS::ALIGN::D_LEFT ),
 	f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_eType ( D_HSTRING ), f_oName ( ),
 	f_poControl ( NULL )
 	{
@@ -61,7 +61,7 @@ HListControl::HColumnInfo::~HColumnInfo ( void )
 	}
 
 HListControl::HColumnInfo::HColumnInfo ( HColumnInfo const & a_roColumnInfo )
-	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_iAlign ( 0 ),
+	: f_bDescending ( false ), f_iWidthRaw ( 0 ), f_iWidth ( 0 ), f_eAlign ( BITS::ALIGN::D_LEFT ),
 	f_iShortcutIndex ( 0 ), f_cShortcut ( 0 ), f_eType ( D_HSTRING ), f_oName ( ),
 	f_poControl ( NULL )
 	{
@@ -81,7 +81,7 @@ HListControl::HColumnInfo &
 		f_iWidthRaw = a_roColumnInfo.f_iWidthRaw;
 		f_iWidth = a_roColumnInfo.f_iWidth;
 		f_eType = a_roColumnInfo.f_eType;
-		f_iAlign = a_roColumnInfo.f_iAlign;
+		f_eAlign = a_roColumnInfo.f_eAlign;
 		f_iShortcutIndex = a_roColumnInfo.f_iShortcutIndex;
 		f_cShortcut = a_roColumnInfo.f_cShortcut;
 		f_oName = a_roColumnInfo.f_oName;
@@ -184,16 +184,16 @@ void HListControl::refresh ( void )
 							M_THROW ( "unknown type", l_poColumnInfo->f_eType );
 						}
 					l_iTmp = f_oVarTmpBuffer.get_length ( );
-					switch ( l_poColumnInfo->f_iAlign )
+					switch ( l_poColumnInfo->f_eAlign )
 						{
-						case ( D_ALIGN_LEFT ):
+						case ( BITS::ALIGN::D_LEFT ):
 							{
 							if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
 								f_oVarTmpBuffer.fill ( '_', l_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
 							f_oVarTmpBuffer [ l_poColumnInfo->f_iWidthRaw ] = 0;
 							}
 						break;
-						case ( D_ALIGN_CENTER ):
+						case ( BITS::ALIGN::D_CENTER ):
 							{
 							if ( l_iTmp > l_poColumnInfo->f_iWidthRaw )
 								f_oVarTmpBuffer = f_oVarTmpBuffer.right (
@@ -209,7 +209,7 @@ void HListControl::refresh ( void )
 								}
 							}
 						break;
-						case ( D_ALIGN_RIGHT ):
+						case ( BITS::ALIGN::D_RIGHT ):
 							{
 							if ( l_iTmp > l_poColumnInfo->f_iWidthRaw )
 								f_oVarTmpBuffer = f_oVarTmpBuffer.right (
@@ -224,8 +224,7 @@ void HListControl::refresh ( void )
 							}
 						break;
 						default :
-							M_THROW ( "unknown align",
-									l_poColumnInfo->f_iAlign );
+							M_THROW ( "unknown align", l_poColumnInfo->f_eAlign );
 						}
 					if ( l_iCtr == f_iCursorPosition )
 						{
@@ -534,7 +533,7 @@ int HListControl::process_input ( int a_iCode )
 	}
 
 void HListControl::add_column ( int const & a_riColumn, char const * a_pcName,
-		int const & a_riWidth, int const & a_riAlign, const type_t & a_reType, 
+		int const & a_riWidth, BITS::ALIGN::align_t const & a_reAlign, const type_t & a_reType, 
 		HControl * a_poControl )
 	{
 	M_PROLOG
@@ -555,7 +554,7 @@ void HListControl::add_column ( int const & a_riColumn, char const * a_pcName,
 	f_iSumForOne += a_riWidth;
 	l_oColumnInfo.f_iWidth = a_riWidth;
 	l_oColumnInfo.f_eType = a_reType;
-	l_oColumnInfo.f_iAlign = a_riAlign;
+	l_oColumnInfo.f_eAlign = a_reAlign;
 	l_oColumnInfo.f_iShortcutIndex = l_iShortcutIndex;
 	l_oColumnInfo.f_cShortcut = f_oVarTmpBuffer [ l_iShortcutIndex ];
 	l_oColumnInfo.f_oName = f_oVarTmpBuffer;

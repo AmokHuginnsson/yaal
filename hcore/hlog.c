@@ -49,10 +49,13 @@ namespace stdhapi
 namespace hcore
 {
 
-#define D_BUFFER_SIZE			1024
-#define D_HOSTNAME_SIZE		16
-#define D_TIMESTAMP_SIZE	16
-#define D_LOGIN_NAME_MAX	8
+namespace
+	{
+	static int const D_BUFFER_SIZE		= 1024;
+	static int const D_HOSTNAME_SIZE	= 16;
+	static int const D_TIMESTAMP_SIZE	= 16;
+	static int const D_LOGIN_NAME_MAX	= 8;
+	}
 
 HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 	f_lType ( 0 ), f_psStream ( NULL ), f_pcProcessName ( NULL ),

@@ -92,7 +92,7 @@ HDataWindow::~HDataWindow ( void )
 #define M_SETUP_COLUMN l_psCI->f_iPlacement,\
 						l_psCI->f_pcName,\
 						l_psCI->f_iWidth,\
-						l_psCI->f_iAlign,\
+						l_psCI->f_eAlign,\
 						l_psCI->f_eType
 
 int HDataWindow::init ( void )
@@ -223,7 +223,7 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 	l_psCI->f_iPlacement = -1;		/* -1 means add at the end */
 	l_psCI->f_pcName = l_pcName;
 	l_psCI->f_iWidth = 1; 				/* width is awlays proportional */
-	l_psCI->f_iAlign = D_ALIGN_LEFT;
+	l_psCI->f_eAlign = HControl::BITS::ALIGN::D_LEFT;
 	l_psCI->f_eType = D_HSTRING;
 	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
 	if ( f_psResourcesArray [ l_iParent ].f_eType == CONTROL_TYPE::D_LIST )

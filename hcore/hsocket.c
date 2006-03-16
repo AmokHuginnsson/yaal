@@ -233,7 +233,7 @@ void HSocket::connect ( char const * const a_pcAddress, int const a_iPort )
 
 void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 	{
-#define D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE 1024;
+	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	M_PROLOG
 	int l_iError = 0;
 	sockaddr_in * l_psAddressNetwork = NULL;
@@ -281,7 +281,6 @@ void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 	f_oHostName = a_pcAddress;
 	return;
 	M_EPILOG
-#undef D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE
 	}
 
 int const HSocket::get_port ( void ) const
@@ -379,7 +378,7 @@ int HSocket::get_client_count ( void ) const
 
 HString const & HSocket::get_host_name ( void )
 	{
-#define D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE 1024
+	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	M_PROLOG
 	int l_iError = 0;
 	int l_iSize = D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
@@ -435,7 +434,6 @@ HString const & HSocket::get_host_name ( void )
 		}
 	return ( f_oHostName );
 	M_EPILOG
-#undef D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE
 	}
 
 }
