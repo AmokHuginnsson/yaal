@@ -727,6 +727,31 @@ HString HString::split ( char const * const a_pcAt, int const a_iPart ) const
 	M_EPILOG
 	}
 
+HString & HString::fill ( char a_cFiller, int a_iLength, int a_iOffset )
+	{
+	M_PROLOG
+	if ( a_iLength < 0 )
+		M_THROW ( _ ( "bad length" ), a_iLength );
+	if ( a_iOffset < 0 )
+		M_THROW ( _ ( "bad offset" ), a_iOffset );
+	if ( ( a_iOffset + a_iLength ) >= f_iSize )
+		M_THROW ( _ ( "overflow" ), a_iOffset + a_iLength );
+	if ( a_iLength == 0 )
+		a_iLength = f_iSize - a_iOffset;
+	memset ( f_pcBuffer + a_iOffset, a_cFiller, a_iLength );
+	return ( * this );
+	M_EPILOG
+	}
+
+HString & HString::fillz ( char a_cFiller, int a_iLength, int a_iOffset )
+	{
+	M_PROLOG
+	fill ( a_cFiller, a_iLength, a_iOffset );
+	f_pcBuffer [ a_iLength != 0 ? a_iLength + a_iOffset + 1 : f_iSize ] = 0;
+	return ( * this );
+	M_EPILOG
+	}
+
 HString operator + ( char const * const a_pcStr, HString const & a_roString )
 	{
 	M_PROLOG

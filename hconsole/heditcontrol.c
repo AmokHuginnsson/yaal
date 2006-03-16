@@ -126,7 +126,7 @@ void HEditControl::refresh ( void )
 	M_PROLOG
 	draw_label ( );
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
-	memset ( f_oVarTmpBuffer.raw ( ), ' ', f_iWidthRaw );
+	f_oVarTmpBuffer.fill ( ' ', f_iWidthRaw );
 	if ( ! f_bPassword )
 		{
 		strcpy ( f_oVarTmpBuffer.raw ( ), static_cast < char const * const > ( f_oString ) + f_iControlOffset );
@@ -172,7 +172,6 @@ int HEditControl::process_input ( int a_iCode )
 	char * l_pcBuffer = 0;
 	a_iCode = HControl::process_input ( a_iCode );
 	l_pcBuffer = f_oVarTmpBuffer.raw ( );
-	memset ( l_pcBuffer, 0, f_iMaxStringSize );
 	f_oVarTmpBuffer = f_oString;
 	l_iOldControlOffset = f_iControlOffset;
 	l_iOldCursorPosition = f_iCursorPosition;

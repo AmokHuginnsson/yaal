@@ -189,10 +189,7 @@ void HListControl::refresh ( void )
 						case ( D_ALIGN_LEFT ):
 							{
 							if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
-								{
-								memset ( f_oVarTmpBuffer.raw ( ) + l_iTmp, '_',
-										l_poColumnInfo->f_iWidthRaw - l_iTmp );
-								}
+								f_oVarTmpBuffer.fill ( '_', l_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
 							f_oVarTmpBuffer [ l_poColumnInfo->f_iWidthRaw ] = 0;
 							}
 						break;
@@ -206,12 +203,9 @@ void HListControl::refresh ( void )
 								memmove ( f_oVarTmpBuffer.raw ( )
 										+ ( l_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2, 
 										f_oVarTmpBuffer, l_iTmp + 1 );
-								memset ( f_oVarTmpBuffer.raw ( ), '_',
-										( l_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
+								f_oVarTmpBuffer.fill ( '_',	( l_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
 								l_iTmp = f_oVarTmpBuffer.get_length ( );
-								memset ( f_oVarTmpBuffer.raw ( ) + l_iTmp,
-										'_', l_poColumnInfo->f_iWidthRaw - l_iTmp );
-								f_oVarTmpBuffer [ l_poColumnInfo->f_iWidthRaw ] = 0;
+								f_oVarTmpBuffer.fillz ( '_', l_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
 								}
 							}
 						break;
@@ -223,10 +217,9 @@ void HListControl::refresh ( void )
 							else if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
 								{
 								memmove ( f_oVarTmpBuffer.raw ( )
-										+ l_poColumnInfo->f_iWidthRaw - l_iTmp, 
+										+ l_poColumnInfo->f_iWidthRaw - l_iTmp - 1, 
 										f_oVarTmpBuffer, l_iTmp + 1 );
-								memset ( f_oVarTmpBuffer.raw ( ), '_',
-										l_poColumnInfo->f_iWidthRaw - l_iTmp );
+								f_oVarTmpBuffer.fill ( '_',	l_poColumnInfo->f_iWidthRaw - l_iTmp - 1 );
 								}
 							}
 						break;
@@ -275,8 +268,7 @@ void HListControl::refresh ( void )
 		}
 	l_iColumnOffset = 0;
 	set_attr_data ( );
-	memset ( f_oVarTmpBuffer.raw ( ), '.', f_iWidthRaw );
-	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
+	f_oVarTmpBuffer.fillz ( '.', f_iWidthRaw );
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		M_ENSURE ( c_mvprintf ( f_iRowRaw + l_iCtr + l_iHR, f_iColumnRaw,
 					f_oVarTmpBuffer ) != C_ERR );
