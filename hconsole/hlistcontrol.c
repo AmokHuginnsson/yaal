@@ -217,9 +217,9 @@ void HListControl::refresh ( void )
 							else if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
 								{
 								memmove ( f_oVarTmpBuffer.raw ( )
-										+ l_poColumnInfo->f_iWidthRaw - l_iTmp - 1, 
+										+ ( l_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1, 
 										f_oVarTmpBuffer, l_iTmp + 1 );
-								f_oVarTmpBuffer.fill ( '_',	l_poColumnInfo->f_iWidthRaw - l_iTmp - 1 );
+								f_oVarTmpBuffer.fill ( '_', ( l_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1 );
 								}
 							}
 						break;
