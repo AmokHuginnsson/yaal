@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstring>
+#include <cstdlib>
 #include <unistd.h>
 #include <libintl.h>
-#include <string.h>
-#include <stdlib.h>
 
 #include "config.h"
 
@@ -40,7 +40,7 @@ Copyright:
 #endif /* not HAVE_NCURSES_CURSES_H */
 #ifdef HAVE_SYS_CONSIO_H
 #	include <sys/consio.h>
-#	include <signal.h>
+#	include <csignal>
 #	include <fcntl.h>
 #elif defined ( HAVE_GPM_H )
 #	include <gpm.h>

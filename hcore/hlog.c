@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstring>
+#include <cstdarg>
+#include <ctime>
 #include <unistd.h>
-#include <string.h>
-#include <stdarg.h>
 #include <pwd.h>
-#include <time.h>
 #include <libintl.h>
 
 #include "config.h"

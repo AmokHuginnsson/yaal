@@ -1290,10 +1290,3 @@ HList< tType >::operator bool ( void ) const
 
 #endif /* not __HCORE_HLIST_H */
 
-/*
-#ifdef __DEBUG__
-#include <hlog.h>
-#endif / * __DEBUG__ * /
-	M_LOG ( "one" );
-*/
-

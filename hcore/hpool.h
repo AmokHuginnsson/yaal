@@ -29,8 +29,8 @@ Copyright:
 
 #line 31
 
-#include <stddef.h>
-#include <string.h>
+#include <cstddef>
+#include <cstring>
 
 #define D_CVSID_HPOOL_H "$CVSHeader$"
 

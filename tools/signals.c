@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <string.h>  /* strsignal */
-#include <unistd.h>  /* kill function */
-#include <stdio.h>	 /* perror function */
-#include <signal.h>	 /* signal handling */
+#include <cstring>  /* strsignal */
+#include <cstdio>	  /* perror function */
+#include <csignal>  /* signal handling */
+#include <unistd.h> /* kill function */
 
 #include "config.h"
 

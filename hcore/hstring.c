@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cstdarg>
 #include <libintl.h>
 
 #include "hexception.h"

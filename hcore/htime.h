@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HCORE_HTIME_H
 #define __HCORE_HTIME_H
 
-#include <time.h>
+#include <ctime>
 
 #include "hstring.h"
 

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstdlib>
 #include <getopt.h>
-#include <stdlib.h>
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" )

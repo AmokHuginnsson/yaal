@@ -31,8 +31,8 @@ Copyright:
 
 #define D_CVSID_HMAP_H "$CVSHeader$"
 
-#include <stddef.h>
-#include <stdlib.h>
+#include <cstddef>
+#include <cstdlib>
 #include <new>
 
 #include "./hcore/xalloc.h"

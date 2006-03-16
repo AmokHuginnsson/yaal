@@ -25,8 +25,8 @@ char const COPYRIGHT [ ] =
 " FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.\n"
 "*/\n";
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #include "hexception.h"
 M_CVSID ( "$CVSHeader$" )

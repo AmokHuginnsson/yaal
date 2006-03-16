@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstdlib> /* getenv */
+#include <cstdio>
+#include <cstring> /* strerror */
 #include <unistd.h>
-#include <stdlib.h> /* getenv */
-#include <stdio.h>
 #include <termios.h>
 #include <libintl.h>
-#include <string.h> /* strerror */
 
 #include "config.h"
 

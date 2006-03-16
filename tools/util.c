@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
+#include <cstdarg>
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" )

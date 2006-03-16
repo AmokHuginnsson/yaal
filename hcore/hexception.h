@@ -30,8 +30,8 @@ Copyright:
 #ifndef __HCORE_HEXCEPTION_H
 #define __HCORE_HEXCEPTION_H
 
-#include <errno.h>
-#include <string.h>
+#include <cerrno>
+#include <cstring>
 
 #ifdef __STDHAPI_BUILD__
 #	include "config.h"

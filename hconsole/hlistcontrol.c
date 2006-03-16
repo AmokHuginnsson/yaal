@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <string.h>
-#include <ctype.h>
+#include <cstring>
+#include <cctype>
 #include <libintl.h>
 
 #include "hcore/hexception.h"

@@ -29,7 +29,7 @@ Copyright:
 
 #line 31
 
-#include <math.h>
+#include <cmath>
 
 #include "harray.h"
 #include "hexception.h"

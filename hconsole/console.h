@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HCONSOLE_CONSOLE_H
 #define __HCONSOLE_CONSOLE_H
 
-#include <stdarg.h>
+#include <cstdarg>
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"

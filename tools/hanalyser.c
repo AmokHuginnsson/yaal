@@ -24,15 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifdef __DEBUGGER_BABUNI__
-#define log libc_math_log
-#endif /* __DEBUGGER_BABUNI__ */
-#include <math.h>
-#ifdef __DEBUGGER_BABUNI__
-#undef log
-#endif /* __DEBUGGER_BABUNI__ */
-#include <string.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstring>
+#include <cstdlib>
 #include <libintl.h>
 
 #include "hcore/hexception.h"
@@ -46,6 +40,7 @@ M_CVSID ( "$CVSHeader$" )
 #include "hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
+using namespace stdhapi;
 using namespace stdhapi::hcore;
 
 namespace stdhapi
@@ -283,7 +278,7 @@ double HAnalyser::addition ( HAnalyserNode * a_poNode )
 		l_iIndex++;
 		}
 #ifdef __DEBUGGER_BABUNI__
-	::log << "index: " << l_iIndex << endl;
+	hcore::log << "index: " << l_iIndex << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	return ( l_dLeftValue );
 	M_EPILOG

@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdlib.h>  /* getenv ( ) */
-#include <string.h>  /* strcpy ( ), strcat ( ) */
-#include <stdio.h>   /* fopen ( ) */
+#include <cstdlib>  /* getenv ( ) */
+#include <cstring>  /* strcpy ( ), strcat ( ) */
+#include <cstdio>   /* fopen ( ) */
 #include <libintl.h> /* gettext ( ) */
 
 #include "hexception.h"

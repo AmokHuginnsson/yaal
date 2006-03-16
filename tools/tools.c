@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdlib.h>  /* strtol */
-#include <string.h>  /* strsignal */
-#include <stdio.h>	 /* perror function */
+#include <cstdlib>  /* strtol */
+#include <cstring>  /* strsignal */
+#include <cstdio>	 /* perror function */
 #include <libintl.h> /* gettext */
 
 #include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
