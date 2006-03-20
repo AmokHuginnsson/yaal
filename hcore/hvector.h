@@ -42,18 +42,21 @@ namespace hcore
 
 #define D_CVSID_HVECTOR_H "$CVSHeader$"
 
-#define E_HVECTOR_DIMNOTMATCH	1
 
 extern char const * g_ppcErrMsgHVector [ ];
-
-#define M_CHECK_DIMENSIONS( ) \
-	if ( this->f_iSize != a_roVector.f_iSize ) \
-		M_THROW ( g_ppcErrMsgHVector [ E_HVECTOR_DIMNOTMATCH ], \
-				this->f_iSize - a_roVector.f_iSize )
 
 template < typename tType >
 class HVector : public HArray < tType >
 	{
+public:
+	struct ERROR
+		{
+		typedef enum
+			{
+			E_OK = 0,
+			E_DIMNOTMATCH
+			} error_t;
+		};
 protected:
 	/*{*/
 	/*}*/
@@ -84,6 +87,18 @@ public:
 template < typename ttType >
 	friend HVector < ttType > operator * ( ttType const,
 			HVector < ttType > const & );
+	/*}*/
+private:
+	/*{*/
+	inline void check_dimensions ( int a_iSizeAnother )
+		{
+		M_PROLOG
+		if ( this->f_iSize != a_iSizeAnother )
+			M_THROW ( g_ppcErrMsgHVector [ ERROR::E_DIMNOTMATCH ],
+					this->f_iSize - a_iSizeAnother );
+		return;
+		M_EPILOG
+		}
 	/*}*/
 	};
 
@@ -159,7 +174,7 @@ HVector < tType > ::operator = ( HVector const & a_roVector )
 	{
 	M_PROLOG
 	if ( this->f_iSize )
-		M_CHECK_DIMENSIONS ( );
+		check_dimensions ( a_roVector.f_iSize );
 	( * this ).HArray < tType > ::operator = ( a_roVector );
 	return ( * this );
 	M_EPILOG
@@ -180,7 +195,7 @@ template < typename tType >
 HVector < tType > HVector < tType > ::operator + ( HVector const & a_roVector )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS ( );
+	check_dimensions ( a_roVector.f_iSize );
 	HVector l_oVector ( * this );
 	l_oVector += a_roVector;
 	return ( l_oVector );
@@ -191,7 +206,7 @@ template < typename tType >
 HVector < tType > HVector < tType > ::operator - ( HVector const & a_roVector )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS ( );
+	check_dimensions ( a_roVector.f_iSize );
 	HVector l_oVector ( * this );
 	l_oVector -= a_roVector;
 	return ( l_oVector );
@@ -234,7 +249,7 @@ HVector < tType > & HVector < tType > ::operator += ( HVector const & a_roVector
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	M_CHECK_DIMENSIONS ( );
+	check_dimensions ( a_roVector.f_iSize );
 	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ ) 
 		this->f_ptArray [ l_iCtr ] += a_roVector.f_ptArray [ l_iCtr ];
 	return ( *this );
@@ -246,7 +261,7 @@ HVector < tType > & HVector < tType > ::operator -= ( HVector const & a_roVector
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	M_CHECK_DIMENSIONS ( );
+	check_dimensions ( a_roVector.f_iSize );
 	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ )
 		this->f_ptArray [ l_iCtr ] -= a_roVector.f_ptArray [ l_iCtr ];
 	return ( *this );
@@ -282,7 +297,7 @@ tType HVector < tType > ::operator | ( HVector const & a_roVector )
 	M_PROLOG
 	tType l_tScalar = 0;
 	int l_iCtr = 0;
-	M_CHECK_DIMENSIONS ( );
+	check_dimensions ( a_roVector.f_iSize );
 	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ ) 
 		l_tScalar += ( this->f_ptArray [ l_iCtr ] * a_roVector.f_ptArray [ l_iCtr ] );
 	return ( l_tScalar );
@@ -302,7 +317,7 @@ bool HVector < tType > ::operator == ( HVector const & a_roVector )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	M_CHECK_DIMENSIONS ( );
+	check_dimensions ( a_roVector.f_iSize );
 	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ ) 
 		if ( this->f_ptArray [ l_iCtr ] != a_roVector.f_ptArray [ l_iCtr ] )
 			return ( false );

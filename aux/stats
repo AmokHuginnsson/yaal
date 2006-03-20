@@ -1,8 +1,8 @@
 #! /bin/sh
 if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
-  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "#[\t ]*define[\t ]\+" | grep -v "CVSID" | grep --color "\<[DE]_[A-Z_]\+"
-  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "#[\t ]*define[\t ]\+" | grep -v "CVSID" | grep --color "\<M_[A-Z_]\+"
-  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "#[\t ]*define[\t ]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
+  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "CVSID" | grep --color "\<[DE]_[A-Z_]\+"
+  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "CVSID" | grep --color "\<M_[A-Z_]\+"
+  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
 else
   AWK="gawk"
   SOURCES=`find . -name '*.c'`
@@ -26,9 +26,9 @@ else
   LINES=`wc -l ${TMP_FILE}|${AWK} '{print $1}'`
   LINES=$((${LINES}-${TOTAL}*21))
 
-  PROG_DE="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"(D_|E_)[A-Z_]*\"),RLENGTH)}"
-  PROG_M="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"M_[A-Z_]*\"),RLENGTH)}"
-  PROG_O="/CVSID|\<__.*_H\>|\<D_|\<E_|\<M_/{next}/#[ \t]*define[ \t]+/"
+  PROG_DE="/CVSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"(D_|E_)[A-Z_]*\"),RLENGTH)}"
+  PROG_M="/CVSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"M_[A-Z_]*\"),RLENGTH)}"
+  PROG_O="/\<__.*_H\>|\<D_|\<E_|\<M_/{next}/^#[ \t]*define[ \t]+/"
 
   printf "	lines:             %8d\n" ${LINES}
 

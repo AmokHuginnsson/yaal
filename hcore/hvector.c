@@ -40,7 +40,7 @@ namespace hcore
 char const * g_ppcErrMsgHVector [ 2 ] =
 	{
 	_ ( "ok" ),
-/* E_HVECTOR_DIMNOTMATCH */	_ ( "dimensions do not match" )
+/* HVector::ERROR::E_DIMNOTMATCH */	_ ( "dimensions do not match" )
 	};
 
 }

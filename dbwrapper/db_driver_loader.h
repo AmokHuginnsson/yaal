@@ -28,10 +28,6 @@ Copyright:
 #ifndef __DBWRAPPER_DB_DRIVER_LOADER_H
 #define __DBWRAPPER_DB_DRIVER_LOADER_H
 
-#ifndef NULL
-#define NULL 0
-#endif /* not NULL */
-
 namespace stdhapi
 {
 

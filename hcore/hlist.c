@@ -40,13 +40,13 @@ namespace hcore
 char const * const g_ppcErrMsgHList [ 8 ] =
 	{
 	_ ( "ok" ),
-/* E_HLIST_EMPTYELEMENT */	_ ( "nothing stored yet, so nothing to get" ),
-/* E_HLIST_BADINDEX */			_ ( "index excides list size" ),
-/* E_HLIST_BADFLAG */				_ ( "unknown flag" ),
-/* E_HLIST_EMPTY */					_ ( "list was empty" ),
-/* E_HLIST_BADOFFSET */			_ ( "incorrect offset" ),
-/* E_HLIST_BADNUMBER */			_ ( "wrong number" ),
-/* E_HLIST_BADORDER */			_ ( "inconsistient sort order during ordered add" )
+/* HList::ERROR::E_EMPTYELEMENT */	_ ( "nothing stored yet, so nothing to get" ),
+/* HList::ERROR::E_BADINDEX */			_ ( "index excides list size" ),
+/* HList::ERROR::E_BADFLAG */				_ ( "unknown flag" ),
+/* HList::ERROR::E_EMPTY */					_ ( "list was empty" ),
+/* HList::ERROR::E_BADOFFSET */			_ ( "incorrect offset" ),
+/* HList::ERROR::E_BADNUMBER */			_ ( "wrong number" ),
+/* HList::ERROR::E_BADORDER */			_ ( "inconsistient sort order during ordered add" )
 	};
 
 }

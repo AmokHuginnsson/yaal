@@ -39,18 +39,6 @@ namespace hcore
 
 #define D_CVSID_HLIST_H "$CVSHeader$"
 
-#ifndef NULL
-#define NULL	0
-#endif /* NULL */
-
-#define E_HLIST_EMPTYELEMENT	1
-#define E_HLIST_BADINDEX			2
-#define E_HLIST_BADFLAG				3
-#define E_HLIST_EMPTY					4
-#define E_HLIST_BADOFFSET			5
-#define E_HLIST_BADNUMBER			6
-#define E_HLIST_BADORDER			7
-
 extern char const * const g_ppcErrMsgHList [ ];
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -61,6 +49,20 @@ extern char const * const g_ppcErrMsgHList [ ];
 
 struct OListBits
 	{
+	struct ERROR
+		{
+		typedef enum
+			{
+			E_OK = 0,
+			E_EMPTYELEMENT,
+			E_BADINDEX,
+			E_BADFLAG,
+			E_EMPTY,
+			E_BADOFFSET,
+			E_BADNUMBER,
+			E_BADORDER
+			} error_t;
+		};
 	typedef enum
 		{
 		D_TREAT_AS_CLOSED = 1,
@@ -512,7 +514,7 @@ tType & HList< tType >::add_at ( int a_iIndex, tType * a_ptObject )
 	M_PROLOG
 	HElement * l_poElement = NULL;
 	if ( a_iIndex > f_iQuantity )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADINDEX ], a_iIndex );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADINDEX ], a_iIndex );
 	if ( f_iQuantity == 0 )
 		f_poHook = l_poElement = f_poSelected =
 			new HElement ( NULL, f_iHighestNumber );
@@ -546,7 +548,7 @@ tType & HList< tType >::add_orderly ( tType & a_rtObject,
 	HElement * l_poElement = new HElement ( NULL, f_iHighestNumber );
 	l_poElement->put ( a_rtObject );
 	if ( ( f_eOrder != D_UNSORTED ) && ( f_eOrder != a_eOrder ) )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADORDER ], a_eOrder );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
 	while ( f_iQuantity && ( l_iOldIndex != l_iIndex ) )
 		{
@@ -598,7 +600,7 @@ OListBits::status_t HList< tType >::remove_at ( int a_iIndex, treatment_t const 
 		if ( a_iIndex >= f_iQuantity )
 			{
 			f_iError++;
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADINDEX ], a_iIndex );
+			M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADINDEX ], a_iIndex );
 			}
 		l_poElement = element_by_index ( a_iIndex );
 		if ( a_pptObject )
@@ -617,12 +619,12 @@ OListBits::status_t HList< tType >::remove_at ( int a_iIndex, treatment_t const 
 					l_eError = D_WAS_NOT_EMPTIED;
 				break;
 				default :
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], l_eFlag );
+					M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADFLAG ], l_eFlag );
 				}
 			}
 		}
 	else
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	if ( l_poElement == f_poHook )
 		f_poHook = f_poHook->f_poNext;
 	if ( l_poElement == f_poSelected )
@@ -675,12 +677,12 @@ OListBits::status_t HList< tType >::remove_element ( treatment_t const & a_eFlag
 					l_eError = D_WAS_NOT_EMPTIED;
 				break;
 				default :
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], l_eFlag );
+					M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADFLAG ], l_eFlag );
 				}
 			}
 		}
 	else
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	/* 1 2 3 4 5 6 7
 	 *     ^
 	 * 1 2 4 5 6 7
@@ -746,12 +748,12 @@ OListBits::status_t HList< tType >::remove_head ( treatment_t const & a_eFlag, t
 					l_eError = D_WAS_NOT_EMPTIED;
 				break;
 				default :
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
+					M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADFLAG ], a_eFlag );
 				}
 			}
 		}
 	else
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	if ( l_poElement == f_poSelected )
 		f_poSelected = l_poElement->f_poNext;
 	if ( f_poIndex )
@@ -794,7 +796,7 @@ OListBits::status_t HList< tType >::remove_tail ( treatment_t const & a_eFlag, t
 					l_eError = D_WAS_NOT_EMPTIED;
 				break;
 				default :
-					M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
+					M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADFLAG ], a_eFlag );
 				}
 			}
 		if ( l_poElement == f_poSelected )
@@ -815,7 +817,7 @@ OListBits::status_t HList< tType >::remove_tail ( treatment_t const & a_eFlag, t
 			}
 		}
 	else
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	return ( l_eError );
 	M_EPILOG
 	}
@@ -827,9 +829,9 @@ bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, treatme
 	bool l_bOk = true;
 	int l_iCtr = 0;
 	if ( ! f_iQuantity )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	if ( a_iOffset < 1 )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADOFFSET ], a_iOffset );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADOFFSET ], a_iOffset );
 	switch ( a_eFlag )
 		{
 		case ( D_TREAT_AS_CLOSED ):
@@ -852,7 +854,7 @@ bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, treatme
 			}
 		break;
 		default :
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
+			M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADFLAG ], a_eFlag );
 		}
 	return ( l_bOk );
 	M_EPILOG
@@ -865,7 +867,7 @@ tType * HList< tType >::to_head ( int a_iOffset, treatment_t const & a_eFlag )
 	bool l_bOk = false;
 	tType * l_ptObject = NULL;
 	if ( f_poSelected == 0 )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	if ( a_iOffset < 0 )
 		l_bOk = to_tail ( f_poSelected, - a_iOffset, a_eFlag );
 	else
@@ -883,9 +885,9 @@ bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, treatme
 	bool l_bOK = true;
 	int l_iCtr = 0;
 	if ( ! f_iQuantity )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	if ( a_iOffset < 1 )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADOFFSET ], a_iOffset );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADOFFSET ], a_iOffset );
 	switch ( a_eFlag )
 		{
 		case ( D_TREAT_AS_CLOSED ):
@@ -908,7 +910,7 @@ bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, treatme
 			}
 		break;
 		default :
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
+			M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADFLAG ], a_eFlag );
 		}
 	return ( l_bOK );
 	M_EPILOG
@@ -921,7 +923,7 @@ tType * HList< tType >::to_tail ( int a_iOffset, treatment_t const & a_eFlag )
 	bool l_bOk = false;
 	tType * l_ptObject = NULL;
 	if ( f_poSelected == 0 )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	if ( a_iOffset < 0 )
 		l_bOk = to_head ( f_poSelected, - a_iOffset, a_eFlag );
 	else
@@ -947,14 +949,14 @@ typename HList< tType >::HElement * HList < tType >::element_by_index ( int a_iI
 	if ( f_iQuantity == 0 )
 		{
 		f_iError ++;
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 		}
 	if ( a_iIndex < 0 )
 		a_iIndex += f_iQuantity;
 	if ( ( a_iIndex >= f_iQuantity ) || ( a_iIndex < 0 ) )
 		{
 		f_iError ++;
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADINDEX ], a_iIndex );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADINDEX ], a_iIndex );
 		}
 	if ( ! f_poIndex )
 		f_poIndex = f_poHook;
@@ -1001,7 +1003,7 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 	if ( f_iQuantity == 0 )
 		{
 		f_iError ++;
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 		}
 	l_poElement = f_poHook;
 	for ( l_iCtr = 0; l_iCtr < f_iQuantity; l_iCtr++ )
@@ -1010,7 +1012,7 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 			return ( l_poElement );
 		l_poElement = l_poElement->f_poNext;
 		}
-	M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADNUMBER ], a_iNumber );
+	M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADNUMBER ], a_iNumber );
 	M_EPILOG
 	}
 
@@ -1028,7 +1030,7 @@ tType & HList< tType >::go ( int a_iNumber, search_after_t a_eFlag )
 			f_poSelected = element_by_index ( a_iNumber );
 		break;
 		default :
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
+			M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADFLAG ], a_eFlag );
 		}
 	return ( f_poSelected->get ( ) );
 	M_EPILOG
@@ -1119,7 +1121,7 @@ void HList< tType >::exchange ( int a_iLeft, int a_iRight, search_after_t a_eFla
 			l_poRight = element_by_index ( a_iRight );
 		break;
 		default :
-			M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADFLAG ], a_eFlag );
+			M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADFLAG ], a_eFlag );
 		}
 	exchange ( l_poLeft, l_poRight );
 	return;
@@ -1131,7 +1133,7 @@ tType & HList< tType >::present ( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	return ( f_poSelected->get ( ) );
 	M_EPILOG
 	}
@@ -1141,7 +1143,7 @@ tType & HList< tType >::head ( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	return ( f_poHook->get ( ) );
 	M_EPILOG
 	}
@@ -1151,7 +1153,7 @@ tType & HList< tType >::tail ( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
 	return ( f_poHook->f_poPrevious->get ( ) );
 	M_EPILOG
 	}
@@ -1168,7 +1170,7 @@ void HList< tType >::sort ( void )
 	HElement * l_poExtreamUpper = NULL;
 	HElement * l_poPointer = NULL;
 	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
-		M_THROW ( g_ppcErrMsgHList [ E_HLIST_BADORDER ], f_eOrder );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], f_eOrder );
 	while ( l_iCtr >= 0 )
 		{
 		l_iCtrLoc = l_iCtr;

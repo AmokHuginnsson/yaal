@@ -39,10 +39,6 @@ Copyright:
 #include "hcore/rc_file.h"
 #include "hcore/hlog.h"
 
-#ifndef NULL
-#define NULL	0
-#endif /* not NULL */
-
 using namespace stdhapi::hcore;
 
 extern "C"

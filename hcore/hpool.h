@@ -42,17 +42,23 @@ namespace stdhapi
 namespace hcore
 {
 
-#define E_HPOOL_BADSIZE				0
-#define E_HPOOL_NOMEM					1
-#define E_HPOOL_REALLOC_FIXED	2
-#define E_HPOOL_BADINDEX			3
-
 extern char const * g_ppcErrMsgHPool [ ];
 
 template < typename tType >
 class HPool
 	{
 public:
+	struct ERROR
+		{
+		typedef enum
+			{
+			E_OK = 0,
+			E_BADSIZE,
+			E_NOMEM,
+			E_REALLOC_FIXED,
+			E_BADINDEX
+			} error_t;
+		};
 	typedef enum
 		{
 		D_FIXED_SIZE,
@@ -114,7 +120,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 	M_PROLOG
 	size_t l_ulOldSize = f_ulPoolSize;
 	if ( a_ulNewSize < 1 )
-		M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_BADSIZE ], a_ulNewSize );
+		M_THROW ( g_ppcErrMsgHPool [ ERROR::E_BADSIZE ], a_ulNewSize );
 	if ( f_ePoolType == D_AUTO_GROW )
 		{
 		if ( a_ulNewSize > f_ulPoolSize )
@@ -130,7 +136,7 @@ size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 	else if ( f_ulPoolSize != a_ulNewSize )
 		{
 		if ( f_ptPool && ( f_ePoolType == D_FIXED_SIZE ) )
-			M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_REALLOC_FIXED ], f_ulPoolSize );
+			M_THROW ( g_ppcErrMsgHPool [ ERROR::E_REALLOC_FIXED ], f_ulPoolSize );
 		f_ulPoolSize = a_ulNewSize;
 		f_ptPool = xrealloc < tType > ( f_ptPool, f_ulPoolSize );
 		}
@@ -143,7 +149,7 @@ tType & HPool < tType >::operator [ ] ( int a_iIndex ) const
 	{
 	M_PROLOG
 	if ( ( a_iIndex < 0 ) || ( static_cast < size_t > ( a_iIndex ) >= f_ulPoolSize ) )
-		M_THROW ( g_ppcErrMsgHPool [ E_HPOOL_BADINDEX ], a_iIndex );
+		M_THROW ( g_ppcErrMsgHPool [ ERROR::E_BADINDEX ], a_iIndex );
 	return ( f_ptPool [ a_iIndex ] );
 	M_EPILOG
 	}

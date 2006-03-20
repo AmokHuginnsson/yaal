@@ -27,10 +27,6 @@ Copyright:
 #ifndef __TOOLS_HSERIAL_H
 #define __TOOLS_HSERIAL_H
 
-#ifndef NULL
-#	define NULL 0
-#endif /* not NULL */
-
 #include "hcore/hstring.h"
 #include "hcore/hrawfile.h"
 

@@ -38,10 +38,6 @@ Copyright:
 
 #include <mysql/mysql.h>
 
-#ifndef NULL
-#define NULL	0
-#endif /* not NULL */
-
 extern "C"
 {
 

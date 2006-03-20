@@ -40,42 +40,30 @@ namespace hcore
 
 #define D_CVSID_HMATRIX_H "$CVSHeader$"
 
-#define E_HMATRIX_BADROWS													1
-#define E_HMATRIX_BADCOLUMNS											2
-#define E_HMATRIX_NEWRETURNEDNULL									3
-#define E_HMATRIX_DIMNOTMATCH_ROWS								4
-#define E_HMATRIX_DIMNOTMATCH_COLUMNS							5
-#define E_HMATRIX_NOTASQUARE											6
-#define E_HMATRIX_ODD															7
-#define E_HMATRIX_DIMNOTMATCH_COLUMNSROWS					8
-#define E_HMATRIX_DIMNOTMATCH_COLUMNSROWSCOLUMNS	9
-#define E_HMATRIX_ROW_OUTOFRANGE									10
-#define E_HMATRIX_COLUMN_OUTOFRANGE								11
-
 extern char const * const g_ppcErrMsgHMatrix [ ];
-
-#define M_CHECK_DIMENSIONS_ROWS_COLUMNS( ) \
-		{\
-		if ( f_iRows != a_roMatrix.f_iRows )\
-			M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_ROWS ],\
-					f_iRows - a_roMatrix.f_iRows );\
-		if ( f_iColumns != a_roMatrix.f_iColumns )\
-			M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_COLUMNS ],\
-					f_iColumns - a_roMatrix.f_iColumns );\
-		}
-
-#define M_CHECK_DIMENSIONS_SQUARE( ) \
-	if ( f_iRows != f_iColumns )\
-		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_NOTASQUARE ], f_iRows - f_iColumns )
-
-#define M_CHECK_DIMENSIONS_COLUMNS_ROWS( ) \
-	if ( f_iColumns != a_roMatrix.f_iRows )\
-		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_COLUMNSROWS ],\
-				f_iColumns - a_roMatrix.f_iRows );
 
 template < typename tType >
 class HMatrix : public HArray < HVector < tType > >
 	{
+public:
+	struct ERROR
+		{
+		typedef enum
+			{
+			E_OK = 0,
+			E_BADROWS,
+			E_BADCOLUMNS,
+			E_NEWRETURNEDNULL,
+			E_DIMNOTMATCH_ROWS,
+			E_DIMNOTMATCH_COLUMNS,
+			E_NOTASQUARE,
+			E_ODD,
+			E_DIMNOTMATCH_COLUMNSROWS,
+			E_DIMNOTMATCH_COLUMNSROWSCOLUMNS,
+			E_ROW_OUTOFRANGE,
+			E_COLUMN_OUTOFRANGE
+			} error_t;
+		};
 protected:
 	/* { */
 	int f_iRows;
@@ -119,6 +107,37 @@ template < typename ttType >
 template < typename ttType >
 	friend HMatrix operator * ( ttType const, HMatrix < ttType > const & );
 	/* } */
+private:
+	inline void check_dimensions_columns_rows ( int a_iRowsAnother )
+		{
+		M_PROLOG
+		if ( f_iColumns != a_iRowsAnother )
+			M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_DIMNOTMATCH_COLUMNSROWS ],
+					f_iColumns - a_iRowsAnother );
+		return;
+		M_EPILOG
+		}
+	inline void check_dimensions_rows_columns ( int a_iRowsAnother,
+			int a_iColumnsAnother )
+		{
+		M_PROLOG
+		if ( f_iRows != a_iRowsAnother )
+			M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_DIMNOTMATCH_ROWS ],
+					f_iRows - a_iRowsAnother );
+		if ( f_iColumns != a_iColumnsAnother )
+			M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_DIMNOTMATCH_COLUMNS ],
+					f_iColumns - a_iColumnsAnother );
+		return;
+		M_EPILOG
+		}
+	inline void check_dimensions_square ( void )
+		{
+		M_PROLOG
+		if ( f_iRows != f_iColumns )
+			M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_NOTASQUARE ], f_iRows - f_iColumns );
+		return;
+		M_EPILOG
+		}
 	};
 	
 template < typename tType >
@@ -132,11 +151,11 @@ HMatrix < tType > ::HMatrix ( int const a_iRows, int const a_iColumns )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iRows < 1 )
-		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_BADROWS ], a_iRows );
+		M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_BADROWS ], a_iRows );
 	else
 		f_iRows = a_iRows;
 	if ( a_iColumns < 1 )
-		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_BADCOLUMNS ], a_iColumns );
+		M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_BADCOLUMNS ], a_iColumns );
 	else
 		f_iColumns = a_iColumns;
 	return ;
@@ -195,7 +214,7 @@ template < typename tType >
 tType HMatrix < tType > ::det ( void )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_SQUARE ( );
+	check_dimensions_square ( );
 	int l_iCtrLocRow = 0, l_iCtrRow = 0, l_iExchanges = 0;
 	tType l_tScalar;
 	HMatrix < tType > l_oMatrix ( * this );
@@ -252,12 +271,12 @@ template < typename tType >
 tType HMatrix < tType > ::M ( int const a_iRow, int const a_iColumn )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_SQUARE ( );
+	check_dimensions_square ( );
 	int l_iCtrRow = 0, l_iCtrColumn = 0, l_iCtrRowVirtual = 0, l_iCtrColumnVirtual = 0;
 	if ( a_iRow >= f_iRows )
-		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_ROW_OUTOFRANGE ], a_iRow - f_iRows );
+		M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_ROW_OUTOFRANGE ], a_iRow - f_iRows );
 	if ( a_iColumn >= f_iColumns )
-		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_COLUMN_OUTOFRANGE ], a_iColumn - f_iColumns );
+		M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_COLUMN_OUTOFRANGE ], a_iColumn - f_iColumns );
 	if ( f_iRows == 1 )
 		return ( 0 );
 	HMatrix l_oMatrix ( f_iRows - 1, f_iColumns - 1 );
@@ -295,7 +314,7 @@ template < typename tType >
 HMatrix < tType > HMatrix < tType > ::_1 ( void )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_SQUARE ( );
+	check_dimensions_square ( );
 	tType l_tScalar = 0;
 	int l_iCtrRow = 0, l_iCtrColumn = 0;
 	if ( ( l_tScalar = det ( ) ) != 0 )
@@ -308,7 +327,7 @@ HMatrix < tType > HMatrix < tType > ::_1 ( void )
 		return ( l_oMatrix.T ( ) / l_tScalar );
 		}
 	else
-		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_ODD ], 0 );
+		M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_ODD ], 0 );
 	M_EPILOG
 	}
 	
@@ -320,7 +339,8 @@ HMatrix < tType > & HMatrix < tType > ::operator = ( HMatrix const & a_roMatrix 
 	if ( & a_roMatrix == this )
 		return ( * this );
 	if ( ( f_iRows > 0 ) || ( f_iColumns > 0 ) )
-		M_CHECK_DIMENSIONS_ROWS_COLUMNS ( );
+		check_dimensions_rows_columns ( a_roMatrix.f_iRows,
+				a_roMatrix.f_iColumns );
 	( * this ).HArray < HVector < tType > > ::operator = ( a_roMatrix );
 	return ( * this );
 	M_EPILOG
@@ -341,7 +361,7 @@ template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator + ( HMatrix const & a_roMatrix )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_ROWS_COLUMNS ( );
+	check_dimensions_rows_columns ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
 	HMatrix l_oMatrix ( * this );
 	l_oMatrix += a_roMatrix;
 	return ( l_oMatrix );
@@ -352,7 +372,7 @@ template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator - ( HMatrix const & a_roMatrix )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_ROWS_COLUMNS ( );
+	check_dimensions_rows_columns ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
 	HMatrix l_oMatrix ( * this );
 	l_oMatrix -= a_roMatrix;
 	return ( l_oMatrix );
@@ -374,7 +394,7 @@ template < typename tType >
 HMatrix < tType > HMatrix < tType > ::operator * ( HMatrix const & a_roMatrix )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_COLUMNS_ROWS ( );
+	check_dimensions_columns_rows ( a_roMatrix.f_iRows );
 	tType l_tScalar = 0;
 	int l_iCtrRow = 0, l_iCtrColumn = 0, l_iCtrRowColumn = 0;
 	HMatrix l_oMatrix ( f_iRows, a_roMatrix.f_iColumns );
@@ -413,7 +433,7 @@ template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator += ( HMatrix const & a_roMatrix )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_ROWS_COLUMNS ( );
+	check_dimensions_rows_columns ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
 	int l_iCtr = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr ++ )
 		this->f_ptArray [ l_iCtr ] += a_roMatrix.f_ptArray [ l_iCtr ];
@@ -425,7 +445,7 @@ template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator -= ( HMatrix const & a_roMatrix )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_ROWS_COLUMNS ( );
+	check_dimensions_rows_columns ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
 	int l_iCtr = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
 		* this->f_ptArray [ l_iCtr ] -= a_roMatrix [ l_iCtr ];
@@ -437,9 +457,9 @@ template < typename tType >
 HMatrix < tType > & HMatrix < tType > ::operator *= ( HMatrix const & a_roMatrix )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_COLUMNS_ROWS ( );
+	check_dimensions_columns_rows ( a_roMatrix.f_iRows );
 	if ( a_roMatrix.f_iRows != a_roMatrix.f_iColumns )
-		M_THROW ( g_ppcErrMsgHMatrix [ E_HMATRIX_DIMNOTMATCH_COLUMNSROWSCOLUMNS ],
+		M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_DIMNOTMATCH_COLUMNSROWSCOLUMNS ],
 				a_roMatrix.f_iRows - a_roMatrix.f_iColumns );
 	( * this ) = ( * this ) * a_roMatrix;
 	return ( * this );
@@ -493,7 +513,7 @@ template < typename tType >
 bool HMatrix < tType > ::operator == ( HMatrix const & a_roMatrix )
 	{
 	M_PROLOG
-	M_CHECK_DIMENSIONS_ROWS_COLUMNS ( );
+	check_dimensions_rows_columns ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
 	int l_iCtr = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) 
 		if ( this->f_ptArray [ l_iCtr ] != a_roMatrix [ l_iCtr ] )
