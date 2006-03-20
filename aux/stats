@@ -1,34 +1,35 @@
 #! /bin/sh
+if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
+  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "#[\t ]*define[\t ]\+" | grep -v "CVSID" | grep --color "\<[DE]_[A-Z_]\+"
+  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "#[\t ]*define[\t ]\+" | grep -v "CVSID" | grep --color "\<M_[A-Z_]\+"
+  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "#[\t ]*define[\t ]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
+else
+  AWK="gawk"
+  SOURCES=`find . -name '*.c'`
+  HEADERS=`find . ! -name 'config.h' -a -name '*.h'`
+  ALL="${SOURCES} ${HEADERS}"
 
-SOURCES=`find . -name '*.c'`
-HEADERS=`find . -name '*.h'`
-ALL="${SOURCES} ${HEADERS}"
+  SOURCES_COUNT=`echo ${SOURCES} | tr " " "\n" | wc -l`
+  HEADERS_COUNT=`echo ${HEADERS} | tr " " "\n" | wc -l`
 
-SOURCES_COUNT=`echo ${SOURCES} | tr " " "\n" | wc -l`
-HEADERS_COUNT=`echo ${HEADERS} | tr " " "\n" | wc -l`
-
-printf "stdhapi statistics:\n"
-printf "	implementation files: %5d\n" ${SOURCES_COUNT}
-printf "	header files:      %8d\n" ${HEADERS_COUNT}
-TOTAL=$((${SOURCES_COUNT}+${HEADERS_COUNT}))
-printf "	total:             %8d\n" ${TOTAL}
+  printf "stdhapi statistics:\n"
+  printf "	implementation files: %5d\n" ${SOURCES_COUNT}
+  printf "	header files:      %8d\n" ${HEADERS_COUNT}
+  TOTAL=$((${SOURCES_COUNT}+${HEADERS_COUNT}))
+  printf "	total:             %8d\n" ${TOTAL}
 
 #TMP_FILE=`mktemp`
-TMP_FILE=`mktemp -t stdhapi-stats.XXXXXX`
+  TMP_FILE=`mktemp -t stdhapi-stats.XXXXXX`
 
-cat ${SOURCES} ${HEADERS} | grep -v '^[ \t]*$\|^[ \t]*/\*' > ${TMP_FILE}
+  cat ${SOURCES} ${HEADERS} | grep -v '^[ \t]*$\|^[ \t]*/\*' > ${TMP_FILE}
 
-LINES=`wc -l ${TMP_FILE}|awk '{print $1}'`
-LINES=$((${LINES}-${TOTAL}*21))
+  LINES=`wc -l ${TMP_FILE}|${AWK} '{print $1}'`
+  LINES=$((${LINES}-${TOTAL}*21))
 
-PROG_DE="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"(D_|E_)[A-Z_]*\"),RLENGTH)}"
-PROG_M="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"M_[A-Z_]*\"),RLENGTH)}"
-#PROG_O="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"(D_|E_)[A-Z_]*\"),RLENGTH)}"
+  PROG_DE="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"(D_|E_)[A-Z_]*\"),RLENGTH)}"
+  PROG_M="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"M_[A-Z_]*\"),RLENGTH)}"
+  PROG_O="/CVSID|\<__.*_H\>|\<D_|\<E_|\<M_/{next}/#[ \t]*define[ \t]+/"
 
-if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
-  eval awk "'${PROG_DE}'" ${TMP_FILE} | sort -u 
-  eval awk "'${PROG_M}'" ${TMP_FILE} | sort -u 
-else
   printf "	lines:             %8d\n" ${LINES}
 
   CLASSES=`grep '\<class\>' ${TMP_FILE} | grep -cv 'class.*;'`
@@ -39,13 +40,17 @@ else
 
   printf "	structures:        %8d\n" ${STRUCTURES}
 
-  MACROS=`awk "${PROG_M}" ${TMP_FILE}|sort -u|wc -l`
+  MACROS=`${AWK} "${PROG_M}" ${TMP_FILE}|sort -u|wc -l`
 
   printf "	macros:            %8d\n" ${MACROS}
 
-  DEFINES=`awk "${PROG_DE}" ${TMP_FILE}|sort -u|wc -l`
+  DEFINES=`${AWK} "${PROG_DE}" ${TMP_FILE}|sort -u|wc -l`
 
   printf "	defines:           %8d\n" ${DEFINES}
+  
+  SNEAKY=`${AWK} "${PROG_O}" ${TMP_FILE}|sort -u|wc -l`
+
+  printf "	sneaky:            %8d\n" ${SNEAKY}
 
   TYPEDEFS=`grep -c 'typedef' ${TMP_FILE}`
 
