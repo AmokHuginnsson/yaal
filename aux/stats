@@ -21,35 +21,44 @@ cat ${SOURCES} ${HEADERS} | grep -v '^[ \t]*$\|^[ \t]*/\*' > ${TMP_FILE}
 LINES=`wc -l ${TMP_FILE}|awk '{print $1}'`
 LINES=$((${LINES}-${TOTAL}*21))
 
-printf "	lines:             %8d\n" ${LINES}
+PROG_DE="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"(D_|E_)[A-Z_]*\"),RLENGTH)}"
+PROG_M="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"M_[A-Z_]*\"),RLENGTH)}"
+#PROG_O="/CVSID|\<__.*_H\>/{next}/#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"(D_|E_)[A-Z_]*\"),RLENGTH)}"
 
-CLASSES=`grep '\<class\>' ${TMP_FILE} | grep -cv 'class.*;'`
+if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
+  eval awk "'${PROG_DE}'" ${TMP_FILE} | sort -u 
+  eval awk "'${PROG_M}'" ${TMP_FILE} | sort -u 
+else
+  printf "	lines:             %8d\n" ${LINES}
 
-printf "	classes:           %8d\n" ${CLASSES}
+  CLASSES=`grep '\<class\>' ${TMP_FILE} | grep -cv 'class.*;'`
 
-STRUCTURES=`grep '\<struct\>' ${TMP_FILE} | grep -cv 'struct.*;'`
+  printf "	classes:           %8d\n" ${CLASSES}
 
-printf "	structures:        %8d\n" ${STRUCTURES}
+  STRUCTURES=`grep '\<struct\>' ${TMP_FILE} | grep -cv 'struct.*;'`
 
-MACROS=`awk '/#[ \t]*define[ \t]+M_/{print substr($0,match($0,"M_[A-Z_]*"),RLENGTH)}' ${TMP_FILE}|sort -u|wc -l`
+  printf "	structures:        %8d\n" ${STRUCTURES}
 
-printf "	macros:            %8d\n" ${MACROS}
+  MACROS=`awk "${PROG_M}" ${TMP_FILE}|sort -u|wc -l`
 
-DEFINES=`awk '/#[ \t]*define[ \t]+D_/{print substr($0,match($0,"D_[A-Z_]*"),RLENGTH)}' ${TMP_FILE}|sort -u|wc -l`
+  printf "	macros:            %8d\n" ${MACROS}
 
-printf "	defines:           %8d\n" ${DEFINES}
+  DEFINES=`awk "${PROG_DE}" ${TMP_FILE}|sort -u|wc -l`
 
-TYPEDEFS=`grep -c 'typedef' ${TMP_FILE}`
+  printf "	defines:           %8d\n" ${DEFINES}
 
-printf "	typedefs:          %8d\n" ${TYPEDEFS}
+  TYPEDEFS=`grep -c 'typedef' ${TMP_FILE}`
 
-FUNCTIONS=`grep -c "^	}$" ${TMP_FILE}`
+  printf "	typedefs:          %8d\n" ${TYPEDEFS}
 
-printf "	functions:         %8d\n" ${FUNCTIONS}
+  FUNCTIONS=`grep -c "^	}$" ${TMP_FILE}`
 
-GUARDED_FUNCTIONS=`grep -c "\<M_PROLOG\>" ${TMP_FILE}`
+  printf "	functions:         %8d\n" ${FUNCTIONS}
 
-printf "	guarded functions: %8d\n" ${GUARDED_FUNCTIONS}
+  GUARDED_FUNCTIONS=`grep -c "\<M_PROLOG\>" ${TMP_FILE}`
+
+  printf "	guarded functions: %8d\n" ${GUARDED_FUNCTIONS}
+fi
 
 if [ -f ${TMP_FILE} ] ; then
 	/bin/rm -f ${TMP_FILE}
