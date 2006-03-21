@@ -44,6 +44,7 @@ struct DATACONTROL_BITS
 		{
 		typedef enum
 			{
+			D_INVALID,
 /* main control of a window, contents of this control holds
 	 data of main record-set of a window */
 			D_MAIN,
