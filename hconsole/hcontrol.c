@@ -58,7 +58,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	{
 	M_PROLOG
 	if ( ! is_enabled ( ) )
-		M_THROW ( "not in curses mode.", g_iErrNo );
+		M_THROW ( "not in curses mode.", errno );
 	if ( ! a_poParent )
 		M_THROW ( "no parent window.", reinterpret_cast < int > ( a_poParent ) );
 	if ( a_iDisabledAttribute > 0 )
@@ -168,8 +168,8 @@ void HControl::refresh ( void )
 void HControl::set ( HInfo const & )
 	{
 	M_PROLOG
-	if ( g_iErrNo || ! g_iErrNo )
-		M_THROW ( "Abstract method called!", g_iErrNo );
+	if ( errno || ! errno )
+		M_THROW ( "Abstract method called!", errno );
 	return;
 	M_EPILOG
 	}

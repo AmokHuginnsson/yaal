@@ -37,7 +37,7 @@ namespace stdhapi
 namespace hcore
 {
 
-#define D_DEFAULT_TIME_FORMAT	"%a, %d %b %Y %T %z"
+extern char const * const n_pcDefaultTimeFormat;
 
 class HTime
 	{
@@ -59,7 +59,7 @@ public:
 	virtual ~HTime ( void );
 	void set_now ( void );
 	void set ( time_t const & );
-	void format ( char const * const = D_DEFAULT_TIME_FORMAT );
+	void format ( char const * const = n_pcDefaultTimeFormat );
 	void set_time ( int const = 0, int const = 0, int const = 0 );
 	void set_date ( int const, int const = 1, int const = 1 );
 	void set_datetime ( int const, int const = 1, int const = 1,

@@ -117,9 +117,15 @@ struct COLORS
 #define D_KEY_CTRL_(n)			( ( n ) - 96 )
 #define D_KEY_COMMAND_(n)		( ( n ) + KEY_CODES::D_COMMAND_BASE )
 
-#define D_EVENT_ERROR			0
-#define D_EVENT_KEYBOARD	1
-#define D_EVENT_MOUSE			2
+struct EVENT
+	{
+	enum
+		{
+		D_ERROR,
+		D_KEYBOARD,
+		D_MOUSE
+		};
+	};
 
 void enter_curses( void );
 void leave_curses( void );

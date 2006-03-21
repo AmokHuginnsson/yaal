@@ -241,7 +241,7 @@ ttType & HMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
 		{
 		l_poAtom = new ( std::nothrow ) HAtom ( );
 		if ( ! l_poAtom )
-			M_THROW ( "memory allocation error", g_iErrNo );
+			M_THROW ( "memory allocation error", errno );
 		f_iQuantity ++;
 		l_poAtom->f_poNext = f_ppoAtomArray [ l_iHash ];
 		f_ppoAtomArray [ l_iHash ] = l_poAtom;

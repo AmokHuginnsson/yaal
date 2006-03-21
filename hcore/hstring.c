@@ -41,8 +41,15 @@ namespace stdhapi
 namespace hcore
 {
 
-#define E_HSTRING_NULL_PTR			1
-#define E_HSTRING_UNINITIALIZED	2
+namespace
+	{
+	enum
+		{
+		E_OK = 0,
+		E_NULL_PTR,
+		E_UNINITIALIZED
+		};
+	}
 
 char const n_pcWhiteSpace [ ] = " \t\n\v\f\r";
 char const * n_ppcErrMsgHString [ 3 ] =
@@ -354,7 +361,7 @@ bool HString::operator >= ( char const * const a_pcStr ) const
 	M_PROLOG
 	int l_iCmp = 0;
 	if ( ! ( f_pcBuffer && a_pcStr ) )
-		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
+		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
 	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
 	if ( l_iCmp >= 0 )
 		return ( true );
@@ -375,7 +382,7 @@ bool HString::operator <= ( char const * const a_pcStr ) const
 	M_PROLOG
 	int l_iCmp = 0;
 	if ( ! ( f_pcBuffer && a_pcStr ) )
-		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
+		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
 	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
 	if ( l_iCmp <= 0 )
 		return ( true );
@@ -396,7 +403,7 @@ bool HString::operator > ( char const * const a_pcStr ) const
 	M_PROLOG
 	int l_iCmp = 0;
 	if ( ! ( f_pcBuffer && a_pcStr ) )
-		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
+		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
 	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
 	if ( l_iCmp > 0 )
 		return ( true );
@@ -417,7 +424,7 @@ bool HString::operator < ( char const * const a_pcStr ) const
 	M_PROLOG
 	int l_iCmp = 0;
 	if ( ! ( f_pcBuffer && a_pcStr ) )
-		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
+		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
 	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
 	if ( l_iCmp < 0 )
 		return ( true );
@@ -463,7 +470,7 @@ HString & HString::format ( char const * const a_pcFormat, ... )
 	va_list ap;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	if ( ! a_pcFormat )
-		M_THROW ( n_ppcErrMsgHString [ E_HSTRING_NULL_PTR ], g_iErrNo );
+		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
 	va_start ( ap, a_pcFormat );
 	l_iSize = vsnprintf ( l_pcMeasureBuffer, 1, a_pcFormat, ap );
 	if ( l_iSize < 1 )

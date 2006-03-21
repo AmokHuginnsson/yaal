@@ -624,7 +624,7 @@ OListBits::status_t HList< tType >::remove_at ( int a_iIndex, treatment_t const 
 			}
 		}
 	else
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	if ( l_poElement == f_poHook )
 		f_poHook = f_poHook->f_poNext;
 	if ( l_poElement == f_poSelected )
@@ -682,7 +682,7 @@ OListBits::status_t HList< tType >::remove_element ( treatment_t const & a_eFlag
 			}
 		}
 	else
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	/* 1 2 3 4 5 6 7
 	 *     ^
 	 * 1 2 4 5 6 7
@@ -753,7 +753,7 @@ OListBits::status_t HList< tType >::remove_head ( treatment_t const & a_eFlag, t
 			}
 		}
 	else
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	if ( l_poElement == f_poSelected )
 		f_poSelected = l_poElement->f_poNext;
 	if ( f_poIndex )
@@ -817,7 +817,7 @@ OListBits::status_t HList< tType >::remove_tail ( treatment_t const & a_eFlag, t
 			}
 		}
 	else
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	return ( l_eError );
 	M_EPILOG
 	}
@@ -829,7 +829,7 @@ bool HList< tType >::to_head ( HElement * & a_rpoElement, int a_iOffset, treatme
 	bool l_bOk = true;
 	int l_iCtr = 0;
 	if ( ! f_iQuantity )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	if ( a_iOffset < 1 )
 		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADOFFSET ], a_iOffset );
 	switch ( a_eFlag )
@@ -867,7 +867,7 @@ tType * HList< tType >::to_head ( int a_iOffset, treatment_t const & a_eFlag )
 	bool l_bOk = false;
 	tType * l_ptObject = NULL;
 	if ( f_poSelected == 0 )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	if ( a_iOffset < 0 )
 		l_bOk = to_tail ( f_poSelected, - a_iOffset, a_eFlag );
 	else
@@ -885,7 +885,7 @@ bool HList< tType >::to_tail ( HElement * & a_rpoElement, int a_iOffset, treatme
 	bool l_bOK = true;
 	int l_iCtr = 0;
 	if ( ! f_iQuantity )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	if ( a_iOffset < 1 )
 		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADOFFSET ], a_iOffset );
 	switch ( a_eFlag )
@@ -923,7 +923,7 @@ tType * HList< tType >::to_tail ( int a_iOffset, treatment_t const & a_eFlag )
 	bool l_bOk = false;
 	tType * l_ptObject = NULL;
 	if ( f_poSelected == 0 )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	if ( a_iOffset < 0 )
 		l_bOk = to_head ( f_poSelected, - a_iOffset, a_eFlag );
 	else
@@ -949,7 +949,7 @@ typename HList< tType >::HElement * HList < tType >::element_by_index ( int a_iI
 	if ( f_iQuantity == 0 )
 		{
 		f_iError ++;
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 		}
 	if ( a_iIndex < 0 )
 		a_iIndex += f_iQuantity;
@@ -1003,7 +1003,7 @@ typename HList< tType >::HElement * HList < tType >::element_by_number ( int a_i
 	if ( f_iQuantity == 0 )
 		{
 		f_iError ++;
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 		}
 	l_poElement = f_poHook;
 	for ( l_iCtr = 0; l_iCtr < f_iQuantity; l_iCtr++ )
@@ -1133,7 +1133,7 @@ tType & HList< tType >::present ( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	return ( f_poSelected->get ( ) );
 	M_EPILOG
 	}
@@ -1143,7 +1143,7 @@ tType & HList< tType >::head ( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	return ( f_poHook->get ( ) );
 	M_EPILOG
 	}
@@ -1153,7 +1153,7 @@ tType & HList< tType >::tail ( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], g_iErrNo );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	return ( f_poHook->f_poPrevious->get ( ) );
 	M_EPILOG
 	}

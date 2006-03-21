@@ -63,7 +63,7 @@ int HProcess::init ( int a_iLatencySeconds, int a_iLatencyMicroseconds )
 	M_PROLOG
 	if ( f_bInitialised )
 		M_THROW ( "you can initialise your main process only once, dumbass",
-				g_iErrNo );
+				errno );
 	f_iLatencySeconds = a_iLatencySeconds;
 	f_iLatencyMicroseconds = a_iLatencyMicroseconds;
 	f_bInitialised = true;
@@ -112,9 +112,9 @@ int HProcess::run ( void )
 	int l_iFileDes = 0;
 	process_handler_filedes_t HANDLER = NULL;
 	if ( ! f_bInitialised )
-		M_THROW ( _ ( "you have to call HProcess::init ( ) first, dumbass" ), g_iErrNo );
+		M_THROW ( _ ( "you have to call HProcess::init ( ) first, dumbass" ), errno );
 	if ( ! f_oFileDescriptorHandlers.quantity ( ) )
-		M_THROW ( _ ( "there is no file descriptor to check activity on" ), g_iErrNo );
+		M_THROW ( _ ( "there is no file descriptor to check activity on" ), errno );
 	while ( f_bLoop )
 		{
 		handler_alert ( 0 );
@@ -122,7 +122,7 @@ int HProcess::run ( void )
 		if ( ( l_iError = select ( FD_SETSIZE, & f_xFileDescriptorSet,
 						NULL, NULL, & f_sLatency ) ) )
 			{
-			if ( ( l_iError < 0 ) && ( g_iErrNo == EINTR ) )
+			if ( ( l_iError < 0 ) && ( errno == EINTR ) )
 				{
 				handler_interrupt ( 0 );
 				continue;

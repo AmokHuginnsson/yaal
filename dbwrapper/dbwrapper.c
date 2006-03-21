@@ -52,6 +52,19 @@ namespace stdhapi
 namespace dbwrapper
 {
 
+struct DB_DRIVER
+	{
+	enum
+		{
+		D_NONE = 0,
+		D_SQLITE3,
+		D_SQLITE,
+		D_MYSQL, 
+		D_POSTGRESQL,
+		D_ORACLE
+		};
+	};
+
 void dbwrapper_error ( void );
 void dbwrapper_exit ( void ) __attribute__  ((noreturn));
 
@@ -79,17 +92,17 @@ bool const set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 		{
 		if ( ! ( strcasecmp ( a_roValue, "none" )
 					&& strcasecmp ( a_roValue, "null" ) ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_NONE;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_NONE;
 		else if ( ! strcmp ( a_roValue, "SQLite3" ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_SQLITE3;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_SQLITE3;
 		else if ( ! strcmp ( a_roValue, "SQLite" ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_SQLITE;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_SQLITE;
 		else if ( ! strcmp ( a_roValue, "MySQL" ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_MYSQL;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_MYSQL;
 		else if ( ! strcmp ( a_roValue, "PostgreSQL" ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_POSTGRESQL;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_POSTGRESQL;
 		else if ( ! strcmp ( a_roValue, "Oracle" ) )
-			dbwrapper::n_iDataBaseDriver = D_DB_DRIVER_ORACLE;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_ORACLE;
 		else
 			{
 			log ( LOG_TYPE::D_ERROR ) << "Error: `" << a_roValue;

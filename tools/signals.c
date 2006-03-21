@@ -107,7 +107,7 @@ void HSigStackWrapper::create_stack ( void )
 	if ( l_iError )
 		M_THROW ( "sigaltstack ( )", l_iError );
 	if ( f_sStack.ss_flags )
-		M_THROW ( "sigaltstack ( ) failed to set stack", g_iErrNo );
+		M_THROW ( "sigaltstack ( ) failed to set stack", errno );
 	return;
 	M_EPILOG
 	}

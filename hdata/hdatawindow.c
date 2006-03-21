@@ -89,12 +89,6 @@ HDataWindow::~HDataWindow ( void )
 						l_psAttr->f_iEnabledAttribute,\
 						l_psAttr->f_iFocusedAttribute
 
-#define M_SETUP_COLUMN l_psCI->f_iPlacement,\
-						l_psCI->f_pcName,\
-						l_psCI->f_iWidth,\
-						l_psCI->f_eAlign,\
-						l_psCI->f_eType
-
 int HDataWindow::init ( void )
 	{
 	M_PROLOG
@@ -120,7 +114,7 @@ int HDataWindow::init ( void )
 			l_psAttr = f_psResourcesArray [ l_iCtr ].f_psAttributes;
 		switch ( f_psResourcesArray [ l_iCtr ].f_eType )
 			{
-			case ( CONTROL_TYPE::D_EDIT ):
+			case ( DATACONTROL_BITS::TYPE::D_EDIT ):
 				{
 				l_sEditControlResource.f_iMaxStringSize = 127;
 				l_sEditControlResource.f_pcValue = l_pcValue;
@@ -141,7 +135,7 @@ int HDataWindow::init ( void )
 						l_psECR->f_iMaxHistoryLevel, M_SETUP_ATTRIBUTES );
 				}
 			break;
-			case ( CONTROL_TYPE::D_LIST ):
+			case ( DATACONTROL_BITS::TYPE::D_LIST ):
 				{
 				l_sListControlResource.f_bCheckable = false;
 				l_sListControlResource.f_bSortable = true;
@@ -154,22 +148,22 @@ int HDataWindow::init ( void )
 						l_psLCR->f_bDrawHeader, M_SETUP_ATTRIBUTES );
 				}
 			break;
-			case ( CONTROL_TYPE::D_TREE ):
+			case ( DATACONTROL_BITS::TYPE::D_TREE ):
 				l_poDataControl = new HDataTreeControl ( this, this, M_SETUP_STANDART,
 						M_SETUP_ATTRIBUTES );
 			break;
-			case ( CONTROL_TYPE::D_COMBO ):
+			case ( DATACONTROL_BITS::TYPE::D_COMBO ):
 			break;
-			case ( CONTROL_TYPE::D_DATE ):
+			case ( DATACONTROL_BITS::TYPE::D_DATE ):
 			break;
-			case ( CONTROL_TYPE::D_CHECK ):
+			case ( DATACONTROL_BITS::TYPE::D_CHECK ):
 			break;
 			default :
 			break;
 			}
-		switch ( f_psResourcesArray [ l_iCtr ].f_iFlags )
+		switch ( f_psResourcesArray [ l_iCtr ].f_eRole )
 			{
-			case ( D_CONTROL_MAIN ):
+			case ( DATACONTROL_BITS::ROLE::D_MAIN ):
 				{
 				f_oTable = f_psResourcesArray [ l_iCtr ].f_pcTable;
 				f_oColumns = f_psResourcesArray [ l_iCtr ].f_pcColumns;
@@ -180,17 +174,17 @@ int HDataWindow::init ( void )
 				l_poDataControl->enable ( true );
 				}
 			break;
-			case ( D_CONTROL_DATA ):
+			case ( DATACONTROL_BITS::ROLE::D_DATA ):
 				link ( l_iCtr, l_poDataControl );
 				f_oEditModeControls.add_tail ( & l_poDataControl );
 			break;
-			case ( D_CONTROL_FILTER ):
+			case ( DATACONTROL_BITS::ROLE::D_FILTER ):
 				l_poDataControl->enable ( true );
 				f_oViewModeControls.add_tail ( & l_poDataControl );
 			break;
 			default :
 				M_THROW ( "unknown resource purpouse",
-						f_psResourcesArray [ l_iCtr ].f_iFlags );
+						f_psResourcesArray [ l_iCtr ].f_eRole );
 			}
 		l_iCtr ++;
 		}
@@ -226,7 +220,7 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 	l_psCI->f_eAlign = HControl::BITS::ALIGN::D_LEFT;
 	l_psCI->f_eType = D_HSTRING;
 	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
-	if ( f_psResourcesArray [ l_iParent ].f_eType == CONTROL_TYPE::D_LIST )
+	if ( f_psResourcesArray [ l_iParent ].f_eType == DATACONTROL_BITS::TYPE::D_LIST )
 		{
 		l_poPDC = dynamic_cast < HDataListControl * > ( f_oControls [ l_iParent ] );
 		if ( ! l_poPDC )
@@ -234,7 +228,8 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 					l_iParent );
 		if ( f_psResourcesArray [ a_iChild ].f_psColumnInfo )
 			l_psCI = f_psResourcesArray [ a_iChild ].f_psColumnInfo;
-		l_poPDC->add_column ( M_SETUP_COLUMN, a_poDataControl );
+		l_poPDC->add_column ( l_psCI->f_iPlacement, l_psCI->f_pcName,
+				l_psCI->f_iWidth, l_psCI->f_eAlign, l_psCI->f_eType, a_poDataControl );
 		}
 	else
 		M_THROW ( "unknown parent type", f_psResourcesArray [ l_iParent ].f_eType );

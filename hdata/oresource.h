@@ -37,33 +37,39 @@ namespace hdata
 
 #define D_CVSID_ORESOURCE_H "$CVSHeader$"
 
+struct DATACONTROL_BITS
+	{
 /* control flags */
-
+	struct ROLE
+		{
+		typedef enum
+			{
 /* main control of a window, contents of this control holds
 	 data of main record-set of a window */
-#define D_CONTROL_MAIN		1
+			D_MAIN,
 
 /* this kind of control is meant to setup filter for main
 	 control for `view mode' */
-#define D_CONTROL_FILTER	2
+			D_FILTER,
 
 /* this kind of control is used to store record-set data in `edit mode' */
-#define D_CONTROL_DATA		4
-
+			D_DATA
+			} role_t;
+		};
 /* control types */
-
-struct CONTROL_TYPE
-	{
-	typedef enum
+	struct TYPE
 		{
-		D_INVALID,
-		D_EDIT,
-		D_LIST,
-		D_TREE,
-		D_COMBO,
-		D_DATE,
-		D_CHECK
-		} type_t; 
+		typedef enum
+			{
+			D_INVALID,
+			D_EDIT,
+			D_LIST,
+			D_TREE,
+			D_COMBO,
+			D_DATE,
+			D_CHECK
+			} type_t; 
+		};
 	};
 
 struct OAttributes
@@ -100,8 +106,8 @@ struct OResource
 	char const *	f_pcLabel;			/* control label */
 	OAttributes *	f_psAttributes;	/* control's attributes */
 /* relative functionality configuration options */
-	int			f_iFlags;							/* tell how control should be treaded */
-	CONTROL_TYPE::type_t	f_eType;							/* predefined type of control */
+	DATACONTROL_BITS::ROLE::role_t	f_eRole;							/* tell how control should be treaded */
+	DATACONTROL_BITS::TYPE::type_t	f_eType;							/* predefined type of control */
 	void *	f_pvTypeSpecific;			/* additional initialization values control
 																	 type specific */
 	OColumnInfo * f_psColumnInfo;	/* if this control is a child control this field

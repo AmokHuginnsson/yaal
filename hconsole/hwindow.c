@@ -51,7 +51,7 @@ HWindow::HWindow ( char const * a_pcTitle ) : f_bInitialised ( false ),
 	int l_piCmds [ ] = { ':', D_KEY_COMMAND_( ':' ) };
 	int l_piSearch [ ] = { '/', D_KEY_COMMAND_( '/' ), '?', D_KEY_COMMAND_( '?' ) };
 	if ( ! is_enabled ( ) )
-		M_THROW ( "console not initialised.", g_iErrNo );
+		M_THROW ( "console not initialised.", errno );
 	register_postprocess_handler ( '\t', NULL, & HWindow::handler_jump_tab );
 	register_postprocess_handler ( 2, l_piCmds, & HWindow::handler_command );
 	register_postprocess_handler ( 4, l_piSearch, & HWindow::handler_search );

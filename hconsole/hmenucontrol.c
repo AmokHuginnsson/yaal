@@ -106,10 +106,10 @@ void HMenuControl::init ( HTUIProcess * a_poProcess, OMenuItem * a_psMenu )
 	HItem l_oDummy ( 0 );
 	HMenuNode * l_poNode = NULL;
 	if ( f_poRoot && a_psMenu )
-		M_THROW ( "menu already initialised", g_iErrNo );
+		M_THROW ( "menu already initialised", errno );
 	if ( ! a_poProcess || ! ( f_poRoot || a_psMenu ) )
 		M_THROW ( "process can not run without core data ( process, menu )",
-				g_iErrNo );
+				errno );
 	f_poProcess = a_poProcess;
 	if ( ! f_poRoot )
 		{
@@ -129,7 +129,7 @@ int HMenuControl::process_input ( int a_iCode )
 	M_PROLOG
 	OMenuItem const * l_psMenu = NULL;
 	if ( ! f_poRoot )
-		M_THROW ( _ ( "menu not initialized" ), g_iErrNo );
+		M_THROW ( _ ( "menu not initialized" ), errno );
 	a_iCode = HTreeControl::process_input ( a_iCode );
 	if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
 		{

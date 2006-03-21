@@ -41,15 +41,22 @@ namespace stdhapi
 namespace hcore
 {
 
-#define E_HARRAY_BADSIZE		1
-#define E_HARRAY_NOMEM			2
-#define E_HARRAY_BADINDEX		3
-
 extern char const * const g_ppcErrMsgHArray [ ];
 
 template < typename tType >
 class HArray
 	{
+public:
+	struct ERROR
+		{
+		typedef enum
+			{
+			E_OK = 0,
+			E_BADSIZE,
+			E_NOMEM,
+			E_BADINDEX
+			} error_t;
+		};
 protected:
 	/*{*/
 	int f_iSize;
@@ -76,13 +83,13 @@ HArray < tType >::HArray ( int a_iSize ) : f_iSize ( 0 ), f_ptArray ( NULL )
 	{
 	M_PROLOG
 	if ( a_iSize < 0 )
-		M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
+		M_THROW ( g_ppcErrMsgHArray [ ERROR::E_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
 		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
 		if ( ! f_ptArray )
-			M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
+			M_THROW ( g_ppcErrMsgHArray [ ERROR::E_NOMEM ], a_iSize );
 		}
 	return;
 	M_EPILOG
@@ -95,13 +102,13 @@ HArray < tType >::HArray ( int const & a_iSize, tType const & a_tFillWith )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iSize < 0 )
-		M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_BADSIZE ], a_iSize );
+		M_THROW ( g_ppcErrMsgHArray [ ERROR::E_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
 		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
 		if ( ! f_ptArray )
-			M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], a_iSize );
+			M_THROW ( g_ppcErrMsgHArray [ ERROR::E_NOMEM ], a_iSize );
 		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 			f_ptArray [ l_iCtr ] = a_tFillWith;
 		}
@@ -151,7 +158,7 @@ HArray < tType > & HArray < tType >::operator = ( HArray const & a_roArray )
 			{
 			f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
 			if ( ! f_ptArray )
-				M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_NOMEM ], f_iSize );
+				M_THROW ( g_ppcErrMsgHArray [ ERROR::E_NOMEM ], f_iSize );
 			}
 		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 			f_ptArray [ l_iCtr ] = a_roArray.f_ptArray [ l_iCtr ];
@@ -167,7 +174,7 @@ tType & HArray < tType >::operator [ ] ( int a_iIndex )
 	if ( a_iIndex < 0 )
 		a_iIndex += f_iSize;
 	if ( ( a_iIndex >= f_iSize ) || ( a_iIndex < 0 ) )
-		M_THROW ( g_ppcErrMsgHArray [ E_HARRAY_BADINDEX ], a_iIndex );
+		M_THROW ( g_ppcErrMsgHArray [ ERROR::E_BADINDEX ], a_iIndex );
 	return ( f_ptArray [ a_iIndex ] );
 	M_EPILOG
 	}

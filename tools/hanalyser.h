@@ -69,7 +69,7 @@ class HAnalyser : public hcore::HTree < double_ptr_list_t >
 	protected:
 		/*{*/
 		HAnalyserNode ( HAnalyserNode * );
-		HAnalyserNode * grow_up_branch ( int = D_FILL_NEW_AUTO );
+		HAnalyserNode * grow_up_branch ( int = FILL::D_NEW_AUTO );
 		/*}*/
 		friend class HAnalyser;
 		};

@@ -198,9 +198,9 @@ void HException::failed_assert ( char const * const a_pcFileName,
 	M_PROLOG
 	fprintf ( stderr, "Failed assertion: `%s' at: %s: %4d: %s\n",
 			a_pcMessage, a_pcFileName, a_iLine, a_pcFunctionName );
-	if ( ! g_iErrNo )
-		g_iErrNo ++;
-	exit ( g_iErrNo );
+	if ( ! errno )
+		errno ++;
+	exit ( errno );
 	M_EPILOG
 	}
 

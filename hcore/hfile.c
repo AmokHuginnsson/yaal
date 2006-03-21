@@ -84,7 +84,7 @@ int HFile::open ( char const * const a_pcPath )
 	f_pvHandle = fopen ( a_pcPath, l_pcMode );
 	if ( ! f_pvHandle )
 		{
-		l_iError = g_iErrNo;
+		l_iError = errno;
 		f_oError = strerror ( l_iError );
 		return ( l_iError );
 		}
@@ -97,7 +97,7 @@ int HFile::close ( void )
 	M_PROLOG
 	int l_iError = 0;
 	if ( ! f_pvHandle )
-		M_THROW ( "file is not opened", g_iErrNo );
+		M_THROW ( "file is not opened", errno );
 	l_iError = fclose ( static_cast < FILE * > ( f_pvHandle ) );
 	if ( l_iError )
 		{
@@ -124,7 +124,7 @@ int HFile::read_line ( HString & a_roLine, mode_read_t a_eMode,
 	if ( ! ( a_eMode & ( D_BUFFERED_READS | D_UNBUFFERED_READS ) ) )
 		a_eMode |= D_BUFFERED_READS;
 	if ( ! f_pvHandle )
-		M_THROW ( _ ( "no file is opened" ), g_iErrNo );
+		M_THROW ( _ ( "no file is opened" ), errno );
 	if ( a_eMode & D_BUFFERED_READS )
 		{
 		l_iLength = get_line_length ( );

@@ -47,14 +47,13 @@ namespace hcore
 
 #define M_CVSID(id) namespace { char __CVSID__ [ ] = id; }
 #define M_CVSTID(id) namespace { char __CVSTID__ [ ] = id; }
-#define __WHERE__ __FILE__, __PRETTY_FUNCTION__, __LINE__
-#define M_THROW( msg, e_no ) throw ( stdhapi::hcore::HException ( __WHERE__, msg, static_cast < int > ( e_no ) ) )
+#define M_THROW( msg, e_no ) throw ( stdhapi::hcore::HException ( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, static_cast < int > ( e_no ) ) )
 #define M_PROLOG try{
-#define M_EPILOG } catch ( stdhapi::hcore::HException & e ){ e->log ( __WHERE__ ); throw; }
-#define M_FINAL } catch ( stdhapi::hcore::HException & e ){ e->log ( __WHERE__ ); e->print_error ( true ); }
-#define M_ENSURE( condition ) if ( ! ( condition ) ){ stdhapi::hcore::HException e ( __WHERE__, #condition, errno ); e->set ( strerror ( errno ) ); throw e; }
+#define M_EPILOG } catch ( stdhapi::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
+#define M_FINAL } catch ( stdhapi::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e->print_error ( true ); }
+#define M_ENSURE( condition ) if ( ! ( condition ) ){ stdhapi::hcore::HException e ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno ); e->set ( strerror ( errno ) ); throw e; }
 #ifndef NDEBUG
-#	define M_ASSERT( condition ) if ( ! ( condition ) )stdhapi::hcore::HException::failed_assert ( __WHERE__, #condition )
+#	define M_ASSERT( condition ) if ( ! ( condition ) )stdhapi::hcore::HException::failed_assert ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition )
 #else /* NDEBUG */
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
@@ -127,8 +126,6 @@ typedef enum
 	D_MASK					= 0xffff
 	} type_t;
 template struct enum_t < type_t >;
-
-#define g_iErrNo errno
 
 extern int long n_lLogMask;
 extern int n_iDebugLevel;

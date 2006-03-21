@@ -124,14 +124,14 @@ void hcore_init ( void ) __attribute__ ( ( constructor ) );
 void hcore_init ( void )
 	{
 	char * l_pcEnv = NULL;
-	g_iErrNo = sizeof ( int );
-	if ( g_iErrNo < 4 )
+	errno = sizeof ( int );
+	if ( errno < 4 )
 		{
 		log << "Your CPU or compiler does not support required size of int.";
 		log << endl;
-		exit ( g_iErrNo );
+		exit ( errno );
 		}
-	g_iErrNo = 0;
+	errno = 0;
 	l_pcEnv = ::getenv ( "STDHAPI_DEBUG" );
 	if ( l_pcEnv )
 		n_iDebugLevel = strtol ( l_pcEnv, NULL, 10 );

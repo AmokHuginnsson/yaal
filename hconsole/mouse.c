@@ -83,7 +83,7 @@ int hunt_tty ( int a_iOffset )
 		if ( l_pcTtyName && ( l_pcTtyName = strstr ( l_pcTtyName, ".tty" ) ) )
 			l_iVC = strtol ( l_pcTtyName + 4 + a_iOffset, NULL, 10 );
 		else
-			M_THROW ( "can not find controling virtual console", g_iErrNo );
+			M_THROW ( "can not find controling virtual console", errno );
 		}
 	return ( l_iVC );
 	M_EPILOG
@@ -108,13 +108,13 @@ int console_mouse_open ( void )
 	n_iMouse = open ( l_pcTty, O_RDWR );
 	if ( n_iMouse < 0 )
 		{
-		l_oError.format ( _ ( "can not open mouse, %s" ), strerror ( g_iErrNo ) );
+		l_oError.format ( _ ( "can not open mouse, %s" ), strerror ( errno ) );
 		M_THROW ( l_oError, l_iVC );
 		}
 	if ( ioctl ( n_iMouse, CONS_MOUSECTL, & l_sMouse ) < 0 )
 		{
 		close ( n_iMouse );
-		M_THROW ( _ ( "can not setup mouse mode" ), g_iErrNo );
+		M_THROW ( _ ( "can not setup mouse mode" ), errno );
 		}
 
 	log ( LOG_TYPE::D_INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
@@ -129,7 +129,7 @@ int console_mouse_get ( OMouse & a_rsMouse )
 	mouse_info l_sMouse;
 	l_sMouse.operation = MOUSE_GETINFO;
 	if ( ioctl ( n_iMouse, CONS_MOUSECTL, & l_sMouse ) < 0 )
-		M_THROW ( "can not get mouse data", g_iErrNo );
+		M_THROW ( "can not get mouse data", errno );
 	else
 		{
 		a_rsMouse.f_iButtons = l_sMouse.u.data.buttons;
@@ -144,7 +144,7 @@ int console_mouse_close ( void )
 	{
 	M_PROLOG
 	if ( ! n_iMouse )
-		M_THROW ( "mouse not opened", g_iErrNo );
+		M_THROW ( "mouse not opened", errno );
 	close ( n_iMouse );
 	n_iMouse = 0;
 	return ( 0 );
@@ -169,7 +169,7 @@ int console_mouse_open ( void )
 	if ( Gpm_Open ( & l_sGpm, l_iVC ) == -1 )
 		{
 		l_oError.format ( "Can't open mouse connection: %s",
-				strerror ( g_iErrNo ) );
+				strerror ( errno ) );
 		M_THROW ( l_oError, l_iVC );
 		}
 	log ( LOG_TYPE::D_INFO ) << "i have opened device: `" << l_iVC << '\'' << endl;
@@ -182,7 +182,7 @@ int console_mouse_get ( OMouse & a_rsMouse )
 	M_PROLOG
 	Gpm_Event l_sEvent;
 	if ( Gpm_GetEvent ( & l_sEvent ) != 1 )
-		M_THROW ( _ ( "can not retrieve event") , g_iErrNo );
+		M_THROW ( _ ( "can not retrieve event") , errno );
 	a_rsMouse.f_iButtons = l_sEvent.buttons;
 	a_rsMouse.f_iRow = l_sEvent.y;
 	a_rsMouse.f_iColumn = l_sEvent.x;
@@ -204,7 +204,7 @@ int console_mouse_close ( void )
 int console_mouse_open ( void )
 	{
 	M_PROLOG
-	M_THROW ( _ ( "console mouse support not compiled" ), g_iErrNo );
+	M_THROW ( _ ( "console mouse support not compiled" ), errno );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -212,7 +212,7 @@ int console_mouse_open ( void )
 int console_mouse_get ( OMouse & )
 	{
 	M_PROLOG
-	M_THROW ( _ ( "console mouse support not compiled" ), g_iErrNo );
+	M_THROW ( _ ( "console mouse support not compiled" ), errno );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -238,11 +238,11 @@ int x_mouse_open ( void )
 	l_xDesiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED;
 	l_xMouseMask = mousemask ( l_xDesiredMouseMask, NULL );
 	if ( ! l_xMouseMask )
-		M_THROW ( "mousemask ( ) returned 0", g_iErrNo );
+		M_THROW ( "mousemask ( ) returned 0", errno );
 	else if ( ( l_xMouseMask & l_xDesiredMouseMask ) < l_xDesiredMouseMask )
 		{
 		HString l_oError;
-		HException l_oException ( __WHERE__, "could not set up apropriate mask",
+		HException l_oException ( __FILE__, __PRETTY_FUNCTION__, __LINE__, "could not set up apropriate mask",
 				l_xMouseMask );
 		l_oError.format ( "1 = %d, 2 = %d, 3 = %d",
 				l_xMouseMask & BUTTON1_CLICKED, l_xMouseMask & BUTTON2_CLICKED,
@@ -259,7 +259,7 @@ int x_mouse_get ( OMouse & a_rsMouse )
 	M_PROLOG
 	MEVENT l_sMouse;
 	if ( getmouse ( & l_sMouse ) != OK )
-		M_THROW ( "can not get mouse data", g_iErrNo );
+		M_THROW ( "can not get mouse data", errno );
 	else
 		{
 		a_rsMouse.f_iButtons = l_sMouse.bstate;

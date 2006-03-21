@@ -42,13 +42,6 @@ namespace LOG_TYPE
 namespace dbwrapper
 	{
 
-#define D_DB_DRIVER_NONE				0
-#define D_DB_DRIVER_SQLITE3			1
-#define D_DB_DRIVER_SQLITE			2
-#define D_DB_DRIVER_MYSQL				3
-#define D_DB_DRIVER_POSTGRESQL	4
-#define D_DB_DRIVER_ORACLE			5
-
 extern void * ( * db_connect ) ( char const *, char const *, char const * );
 extern void ( * db_disconnect ) ( void * );
 extern int ( * db_errno ) ( void * );

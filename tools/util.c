@@ -46,8 +46,11 @@ namespace tools
 namespace util
 {
 
-#define D_MIN_IBAN_LENGTH	20
-#define D_STEP_LENGTH			4
+namespace
+	{
+	static int const D_MIN_IBAN_LENGTH = 20;
+	static int const D_STEP_LENGTH = 4;
+	}
 
 char n_pcTransTableStripPL [ 256 ];
 

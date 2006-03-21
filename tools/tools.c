@@ -150,7 +150,7 @@ void tools_init ( void ); __attribute__ ( ( constructor ) )
 void tools_init ( void )
 	{
 	int l_iCtr = 0;
-	g_iErrNo = 0;
+	errno = 0;
 	rc_file::process_rc_file ( "stdhapi", "tools", tools::n_psVariables,
 			set_tools_variables );
 	for ( l_iCtr = 0; l_iCtr < 256; l_iCtr ++ )

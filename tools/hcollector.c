@@ -183,7 +183,7 @@ int HCollector::establish_connection ( int a_iTimeOut )
 			M_THROW ( "write", l_iLenght );
 		wait_for_eot ( );
 		if ( tcsendbreak ( f_iFileDescriptor, 0 ) )
-			M_THROW ( "tcsendbreak", g_iErrNo );
+			M_THROW ( "tcsendbreak", errno );
 		memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
 		timed_read ( f_pcReadBuf, PROTOCOL::D_RECV_BUF_SIZE, 1 );
 		flush ( TCIFLUSH );

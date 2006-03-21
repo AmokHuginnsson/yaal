@@ -71,7 +71,7 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 	HMainWindow * l_poMainWindow = NULL;
 	HXml l_oXml;
 	if ( ! dbwrapper::db_connect )
-		M_THROW ( "no database driver loaded", g_iErrNo );
+		M_THROW ( "no database driver loaded", errno );
 	l_oXml.init ( a_pcResource );
 	HXml::ONode & l_sNode = l_oXml.parse ( "/resource/menu" );
 	f_psRootMenu = build_sub_menu ( l_sNode, a_roHandlers );
@@ -93,7 +93,7 @@ OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode & a_rsNode,
 	HXml::ONode * l_psNode = NULL;
 	HList < OMenuItem > l_oSubMenu;
 	if ( ! a_rsNode.f_oChilds.quantity ( ) )
-		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, g_iErrNo );
+		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
 
 	if ( a_rsNode.f_oName == "menu" )
 		{
@@ -107,7 +107,7 @@ OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode & a_rsNode,
 		}
 	else
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.f_oName
-				+ '=' + a_rsNode.f_oContents.head ( ), g_iErrNo );
+				+ '=' + a_rsNode.f_oContents.head ( ), errno );
 	l_sMenuItem.reset ( );
 	l_oSubMenu.add_tail ( & l_sMenuItem );
 	l_psMenu = new OMenuItem [ l_iCount = l_oSubMenu.quantity ( ) ];
@@ -126,7 +126,7 @@ void HDataProcess::build_menu_item ( HXml::ONode & a_rsNode,
 	char const * const l_pcUnexpected = _ ( ": unexpected node: " );
 	HXml::ONode * l_psNode = NULL;
 	if ( ! a_rsNode.f_oChilds.quantity ( ) )
-		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, g_iErrNo );
+		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
 
 	if ( a_rsNode.f_oName == "menu_item" )
 		{
@@ -140,18 +140,18 @@ void HDataProcess::build_menu_item ( HXml::ONode & a_rsNode,
 				if ( ! a_roHandlers.get ( l_psNode->f_oContents.head ( ),
 							a_rsMenuItem.HANDLER ) )
 					M_THROW ( HString ( _ ( "no such handler: " ) )
-							+ l_psNode->f_oContents.head ( ), g_iErrNo );
+							+ l_psNode->f_oContents.head ( ), errno );
 				}
 			else if ( l_psNode->f_oName == "menu" )
 				a_rsMenuItem.f_psSubMenu = build_sub_menu ( * l_psNode, a_roHandlers );
 			else
 				M_THROW ( HString ( l_pcError ) + l_pcUnexpected + l_psNode->f_oName
-						+ '=' + l_psNode->f_oContents.head ( ), g_iErrNo );
+						+ '=' + l_psNode->f_oContents.head ( ), errno );
 			}
 		}
 	else
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.f_oName
-				+ '=' + a_rsNode.f_oContents.head ( ), g_iErrNo );
+				+ '=' + a_rsNode.f_oContents.head ( ), errno );
 	return;
 	M_EPILOG
 	}

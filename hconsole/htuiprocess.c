@@ -101,7 +101,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWind
 		f_poForegroundWindow = a_poMainWindow;
 		f_poForegroundWindow->init ( );
 		if ( ! f_poForegroundWindow->is_initialised ( ) )
-			M_THROW ( _ ( "window has not been initialised" ), g_iErrNo );
+			M_THROW ( _ ( "window has not been initialised" ), errno );
 		}
 	else /* Create automatically default main window. */
 		{
@@ -136,7 +136,7 @@ int HTUIProcess::add_window ( HWindow * a_poWindow, char const * a_pcTitle )
 	f_poForegroundWindow = a_poWindow;
 	f_poForegroundWindow->init ( );
 	if ( ! f_poForegroundWindow->is_initialised ( ) )
-		M_THROW ( _ ( "window has not been initialised" ), g_iErrNo );
+		M_THROW ( _ ( "window has not been initialised" ), errno );
 	c_refresh ( );
 	return ( 0 );
 	M_EPILOG

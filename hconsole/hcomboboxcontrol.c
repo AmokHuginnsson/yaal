@@ -53,7 +53,7 @@ HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 									HSearchableControl ( a_bSearchable ),
 									HListControl ( NULL, 0, 0, 0, 0, NULL,
 											a_bCheckable, a_bSortable, a_bSearchable, false ),
-									f_iMode ( D_MODE_EDITCONTROL ), f_iDroppedWidth ( a_iDroppedWidth )
+									f_eMode ( MODE::D_EDITCONTROL ), f_iDroppedWidth ( a_iDroppedWidth )
 	{
 	M_PROLOG
 	return;
@@ -70,7 +70,7 @@ HComboboxControl::~HComboboxControl ( void )
 int HComboboxControl::set_focus ( char a_cCode )
 	{
 	M_PROLOG
-	if ( f_iMode == D_MODE_EDITCONTROL )
+	if ( f_eMode == MODE::D_EDITCONTROL )
 		return ( HEditControl::set_focus ( a_cCode ) );
 	return ( HListControl::set_focus ( a_cCode ) );
 	M_EPILOG
@@ -79,9 +79,9 @@ int HComboboxControl::set_focus ( char a_cCode )
 int HComboboxControl::kill_focus ( void )
 	{
 	M_PROLOG
-	if ( f_iMode == D_MODE_LISTCONTROL )
+	if ( f_eMode == MODE::D_LISTCONTROL )
 		{
-		f_iMode = D_MODE_EDITCONTROL;
+		f_eMode = MODE::D_EDITCONTROL;
 		clrscr ( );
 		f_poParent->refresh ( );
 		}
@@ -94,7 +94,7 @@ void HComboboxControl::refresh ( void )
 	M_PROLOG
 	int l_iWidth = 0;
 	int l_iHeight = 0;
-	if ( f_iMode == D_MODE_EDITCONTROL )
+	if ( f_eMode == MODE::D_EDITCONTROL )
 		{
 /* ripped from HControl::draw_label ( ) */
 		l_iWidth = ( f_iWidth > 0 ) ? f_iWidth
@@ -125,15 +125,15 @@ void HComboboxControl::refresh ( void )
 int HComboboxControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
-	if ( f_iMode == D_MODE_EDITCONTROL )
+	if ( f_eMode == MODE::D_EDITCONTROL )
 		{
 		switch ( a_iCode )
 			{
 			case ( KEY_CODES::D_UP ):
-				f_iMode = D_MODE_LISTCONTROL;
+				f_eMode = MODE::D_LISTCONTROL;
 			break;
 			case ( KEY_CODES::D_DOWN ):
-				f_iMode = D_MODE_LISTCONTROL;
+				f_eMode = MODE::D_LISTCONTROL;
 			break;
 			default :
 				return ( HEditControl::process_input ( a_iCode ) );
@@ -153,14 +153,14 @@ int HComboboxControl::process_input ( int a_iCode )
 int HComboboxControl::click ( mouse::OMouse & a_rsMouse )
 	{
 	M_PROLOG
-	if ( f_iMode == D_MODE_EDITCONTROL )
+	if ( f_eMode == MODE::D_EDITCONTROL )
 		{
 		HEditControl::click ( a_rsMouse );
 		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
 			: n_iWidth + f_iWidth - f_iColumnRaw;
 		if ( a_rsMouse.f_iColumn == ( f_iColumnRaw + f_iWidthRaw - 1 ) )
 			{
-			f_iMode = D_MODE_LISTCONTROL;
+			f_eMode = MODE::D_LISTCONTROL;
 			refresh ( );
 			}
 		}
@@ -173,7 +173,7 @@ int HComboboxControl::click ( mouse::OMouse & a_rsMouse )
 void HComboboxControl::close_combo ( void )
 	{
 	M_PROLOG
-	f_iMode = D_MODE_EDITCONTROL;
+	f_eMode = MODE::D_EDITCONTROL;
 	if ( f_iQuantity )
 		HEditControl::set ( present ( ) [ 0 ].get < char const * const > ( ) );
 	clrscr ( );

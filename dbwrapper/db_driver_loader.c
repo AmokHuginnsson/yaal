@@ -206,7 +206,7 @@ void load_driver ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	g_iErrNo = 0;
+	errno = 0;
 	fprintf ( stderr, "Loading dynamic database driver ... " );
 	if ( dbwrapper::n_iDataBaseDriver )
 		{

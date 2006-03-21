@@ -85,12 +85,12 @@ bool HSerial::open ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		M_THROW ( n_pcEAlreadyOpened, g_iErrNo );
+		M_THROW ( n_pcEAlreadyOpened, errno );
 	compile( );
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	f_iFileDescriptor = ::open ( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( strerror ( g_iErrNo ), g_iErrNo );
+		M_THROW ( strerror ( errno ), errno );
 	if ( ! isatty ( f_iFileDescriptor ) )
 		M_THROW ( "not a tty", f_iFileDescriptor );
 	tcgetattr ( f_iFileDescriptor, reinterpret_cast < termios * > ( f_oBackUpTIO.raw ( ) ) );
@@ -161,7 +161,7 @@ void HSerial::compile_speed ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		M_THROW ( n_pcEAlreadyOpened, g_iErrNo );
+		M_THROW ( n_pcEAlreadyOpened, errno );
 	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
 	int l_iBaudRate = 0;
 	if ( f_eSpeed == D_SPEED_DEFAULT )
@@ -213,7 +213,7 @@ void HSerial::compile_flags ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		M_THROW ( n_pcEAlreadyOpened, g_iErrNo );
+		M_THROW ( n_pcEAlreadyOpened, errno );
 	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
 	int l_iCtr = 0;
 	if ( f_eFlags & D_FLAGS_DEFAULT )
@@ -310,21 +310,21 @@ void HSerial::flush ( int a_iType )
 	M_PROLOG
 	HString l_oErrMsg;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcENotOpened, g_iErrNo );
+		M_THROW ( n_pcENotOpened, errno );
 	if ( tcflush ( f_iFileDescriptor, a_iType ) )
 		{
 		switch ( a_iType )
 			{
 			case ( TCIFLUSH ):
-				M_THROW ( "tcflush ( TCIFLUSH )", g_iErrNo );
+				M_THROW ( "tcflush ( TCIFLUSH )", errno );
 			case ( TCOFLUSH ):
-				M_THROW ( "tcflush ( TCOFLUSH )", g_iErrNo );
+				M_THROW ( "tcflush ( TCOFLUSH )", errno );
 			case ( TCIOFLUSH ):
-				M_THROW ( "tcflush ( TCIOFLUSH )", g_iErrNo );
+				M_THROW ( "tcflush ( TCIOFLUSH )", errno );
 			default :
 				{
 				l_oErrMsg.format ( "tcflush ( %d )", a_iType );
-				M_THROW ( l_oErrMsg, g_iErrNo );
+				M_THROW ( l_oErrMsg, errno );
 				}
 			}
 		}
@@ -336,9 +336,9 @@ void HSerial::wait_for_eot ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcENotOpened, g_iErrNo );
+		M_THROW ( n_pcENotOpened, errno );
 	if ( tcdrain ( f_iFileDescriptor ) )
-		M_THROW ( "tcdrain", g_iErrNo );
+		M_THROW ( "tcdrain", errno );
 	return;
 	M_EPILOG
 	}
@@ -348,7 +348,7 @@ int HSerial::timed_read ( void * const a_pcBuffer, int const a_iSize,
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcENotOpened, g_iErrNo );
+		M_THROW ( n_pcENotOpened, errno );
 	int l_iError = 0;
 	timeval l_xWait;
 	fd_set l_xFdSet;

@@ -36,15 +36,21 @@ namespace stdhapi
 namespace hconsole
 {
 
-#define D_MODE_EDITCONTROL	0
-#define D_MODE_LISTCONTROL	1
-
 class HComboboxControl : public virtual HEditControl,
 	public virtual HListControl
 	{
+public:
+	struct MODE
+		{
+		typedef enum
+			{
+			D_EDITCONTROL,
+			D_LISTCONTROL
+			} mode_t;
+		};
 protected:
 	/*{*/
-	int f_iMode; 					/* operating mode (D_MODE_EDITCONTROL|D_MODE_LISTCONTROL) */
+	MODE::mode_t f_eMode; /* operating mode (D_MODE_EDITCONTROL|D_MODE_LISTCONTROL) */
 	int f_iDroppedWidth;	/* width of dropped list */
 	/*}*/
 public:

@@ -153,7 +153,7 @@ void HXmlData::xml_free ( xmlDocPtr & a_rpsDoc ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsDoc )
-		M_THROW ( free_err, g_iErrNo );
+		M_THROW ( free_err, errno );
 	xmlFreeDoc ( a_rpsDoc );
 	a_rpsDoc = NULL;
 	return;
@@ -165,7 +165,7 @@ void HXmlData::xml_free ( xmlNodePtr & a_rpsNode )
 	{
 	M_PROLOG
 	if ( ! a_rpsNode )
-		M_THROW ( free_err, g_iErrNo );
+		M_THROW ( free_err, errno );
 	xmlFreeNode ( a_rpsNode );
 	a_rpsNode = NULL;
 	return;
@@ -176,7 +176,7 @@ void HXmlData::xml_free ( xmlNodeSetPtr & a_rpsNodeSet )
 	{
 	M_PROLOG
 	if ( ! a_rpsNodeSet )
-		M_THROW ( free_err, g_iErrNo );
+		M_THROW ( free_err, errno );
 	xmlXPathFreeNodeSet ( a_rpsNodeSet );
 	a_rpsNodeSet = NULL;
 	return;
@@ -188,7 +188,7 @@ void HXmlData::xml_free ( xmlXPathContextPtr & a_rpsContext ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsContext )
-		M_THROW ( free_err, g_iErrNo );
+		M_THROW ( free_err, errno );
 	xmlXPathFreeContext ( a_rpsContext );
 	a_rpsContext = NULL;
 	return;
@@ -199,7 +199,7 @@ void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsObject )
-		M_THROW ( free_err, g_iErrNo );
+		M_THROW ( free_err, errno );
 	xmlXPathFreeObject ( a_rpsObject );
 	a_rpsObject = NULL;
 	return;
@@ -254,7 +254,7 @@ char const * HXml::convert ( char const * a_pcData, way_t a_eWay )
 		}
 	M_ENSURE ( ( iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut,
 					& l_uiSizeOut ) != static_cast < size_t > ( - 1 ) )
-				|| ( g_iErrNo == E2BIG ) );
+				|| ( errno == E2BIG ) );
 	while ( l_uiSizeIn )
 		{
 		l_uiTmp = l_uiOrigSize;
@@ -264,7 +264,7 @@ char const * HXml::convert ( char const * a_pcData, way_t a_eWay )
 		l_uiSizeOut += l_uiTmp;
 		M_ENSURE ( ( iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut,
 						& l_uiSizeOut ) != static_cast < size_t > ( - 1 ) )
-				|| ( g_iErrNo == E2BIG ) );
+				|| ( errno == E2BIG ) );
 		}
 	if ( l_pcOut )
 		( * l_pcOut ) = 0;
@@ -311,29 +311,29 @@ int HXml::get_node_set_by_path ( char const * a_pcPath )
 void HXml::init ( char const * a_pcFileName )
 	{
 	M_PROLOG
-	int l_iSavedErrno = g_iErrNo;
+	int l_iSavedErrno = errno;
 	xmlCharEncoding l_xEncoding = static_cast < xmlCharEncoding > ( 0 );
 	xmlCharEncodingHandlerPtr l_pxHnd = NULL;
 	HString l_oError;
 	if ( f_poXml->f_psDoc )
 		f_poXml->xml_free ( f_poXml->f_psDoc );
 	f_poXml->reset ( );
-	g_iErrNo = 0;
+	errno = 0;
 	f_poXml->f_psDoc = xmlParseFile ( a_pcFileName );
-	if ( g_iErrNo )
+	if ( errno )
 		{
-		log ( LOG_TYPE::D_WARNING ) << strerror ( g_iErrNo ) << ": " << a_pcFileName;
-		log << ", code: " << g_iErrNo << '.' << endl;
+		log ( LOG_TYPE::D_WARNING ) << strerror ( errno ) << ": " << a_pcFileName;
+		log << ", code: " << errno << '.' << endl;
 		}
-	g_iErrNo = l_iSavedErrno;
+	errno = l_iSavedErrno;
 	if ( ! f_poXml->f_psDoc )
 		{
 		l_oError.format ( _ ( "cannot parse `%s'" ), a_pcFileName );
-		M_THROW ( l_oError, g_iErrNo );
+		M_THROW ( l_oError, errno );
 		}
 	f_poXml->f_psRoot = xmlDocGetRootElement ( f_poXml->f_psDoc );
 	if ( ! f_poXml->f_psRoot )
-		M_THROW ( _ ( "empty doc" ), g_iErrNo );
+		M_THROW ( _ ( "empty doc" ), errno );
 #ifdef __DEBUGGER_BABUNI__
 	fprintf ( stdout, "%s\n", f_poXml->f_psRoot->name );
 #endif /* __DEBUGGER_BABUNI__ */
@@ -351,11 +351,11 @@ void HXml::init ( char const * a_pcFileName )
 		l_xEncoding = xmlDetectCharEncoding ( f_poXml->f_psRoot->name,
 				xmlStrlen ( f_poXml->f_psRoot->name ) );
 		if ( ! l_xEncoding )
-			M_THROW ( _ ( "cannot detect character encoding" ), g_iErrNo );
+			M_THROW ( _ ( "cannot detect character encoding" ), errno );
 		l_pxHnd = xmlGetCharEncodingHandler ( l_xEncoding );
 		}
 	if ( ! l_pxHnd )
-		M_THROW ( _ ( "cannot enable internal convertion" ), g_iErrNo );
+		M_THROW ( _ ( "cannot enable internal convertion" ), errno );
 	f_oConvert->f_xIconvIn = l_pxHnd->iconv_in;
 	f_oConvert->f_xIconvOut = l_pxHnd->iconv_out;
 	return;

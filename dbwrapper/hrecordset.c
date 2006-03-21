@@ -40,8 +40,7 @@ namespace stdhapi
 namespace dbwrapper
 {
 
-char g_pcEMode [ ] = "record set is not in appropriate mode for operation";
-#define E_MODE g_pcEMode
+char n_pcEMode [ ] = "record set is not in appropriate mode for operation";
 
 HRecordSet::HRecordSet ( HDataBase * a_poDataBase )
 	: f_pvCoreData ( NULL ), f_oSQL ( ), f_oVarTmpBuffer ( ), f_iIdFieldOffset ( - 1 ),
@@ -71,7 +70,7 @@ void HRecordSet::sync ( void )
 	M_PROLOG 
 	int l_iCtr = 0;
 	if ( f_eMode == D_CLOSED )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 		sync ( l_iCtr, f_oValues [ l_iCtr ] );
 	if ( f_iFieldCount > 0 )
@@ -157,7 +156,7 @@ void HRecordSet::build_sql ( void )
 			}
 		break;
 		default :
-			M_THROW ( E_MODE, f_eMode );
+			M_THROW ( n_pcEMode, f_eMode );
 		}
 	return;
 	M_EPILOG
@@ -168,7 +167,7 @@ int long HRecordSet::open ( char const * a_pcQuery )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( f_eMode != D_CLOSED )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	if ( a_pcQuery )
 		f_oSQL = a_pcQuery;
 	else
@@ -203,7 +202,7 @@ void HRecordSet::close ( void )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	free ( );
 	f_eMode = D_CLOSED;
 	M_EPILOG
@@ -213,7 +212,7 @@ void HRecordSet::cancel ( void )
 	{
 	M_PROLOG
 	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	f_eMode = D_NORMAL;
 	return;
 	M_EPILOG
@@ -263,7 +262,7 @@ void HRecordSet::move_next ( void )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	f_iCursorPosition ++;
 	if ( f_iCursorPosition > f_iSetQuantity )
 		M_THROW ( "end of set reached", f_iCursorPosition );
@@ -277,7 +276,7 @@ void HRecordSet::move_previous ( void )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	f_iCursorPosition --;
 	if ( f_iCursorPosition < -1 )
 		M_THROW ( "beginning of set reached",
@@ -292,7 +291,7 @@ void HRecordSet::move_first ( void )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	f_iCursorPosition = 0;
 	sync ( );
 	return;
@@ -303,7 +302,7 @@ void HRecordSet::move_last ( void )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	f_iCursorPosition = f_iSetQuantity - 1;
 	sync ( );
 	return;
@@ -323,7 +322,7 @@ void HRecordSet::add_new ( void )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	f_eMode = D_ADDING;
 	return;
 	M_EPILOG
@@ -333,7 +332,7 @@ void HRecordSet::edit ( void )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	f_eMode = D_EDITING;
 	return;
 	M_EPILOG
@@ -344,7 +343,7 @@ int long HRecordSet::update ( void )
 	M_PROLOG
 	int long l_iRetVal = 0;
 	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	sync ( );
 	build_sql ( );
 	f_poDataBase->query ( f_oSQL );
@@ -362,7 +361,7 @@ void HRecordSet::remove ( void )
 	M_PROLOG
 	int l_iCursorPosition = f_iCursorPosition;
 	if ( f_eMode != D_NORMAL )
-		M_THROW ( E_MODE, f_eMode );
+		M_THROW ( n_pcEMode, f_eMode );
 	f_oSQL.format ( "DELETE FROM %s WHERE id = %ld;",
 			static_cast < char const * > ( f_oTable ), m_lId );
 	f_poDataBase->query ( f_oSQL );

@@ -77,9 +77,9 @@ int long HDataBase::query ( char const * a_pcQuery )
 	M_PROLOG
 	if ( f_pvLastResult )
 		M_THROW ( "requery without freeing old one",
-				g_iErrNo );
+				errno );
 	if ( ! f_pvCoreData )
-		M_THROW ( "not connected to database", g_iErrNo );
+		M_THROW ( "not connected to database", errno );
 	if ( n_lLogMask & LOG_TYPE::D_SQL )
 		log << "SQL: " << a_pcQuery << endl;
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
@@ -96,7 +96,7 @@ void HDataBase::free_result ( void )
 	{
 	M_PROLOG
 	if ( ! f_pvCoreData )
-		M_THROW ( "not connected to database", g_iErrNo );
+		M_THROW ( "not connected to database", errno );
 	if ( f_pvLastResult )
 		dbwrapper::db_unquery ( f_pvLastResult );
 	f_pvLastResult = NULL;
@@ -109,9 +109,9 @@ void * HDataBase::get_result ( void )
 	M_PROLOG
 	void * l_pvTmpResult = NULL;
 	if ( ! f_pvCoreData )
-		M_THROW ( "not connected to database", g_iErrNo );
+		M_THROW ( "not connected to database", errno );
 	if ( ! f_pvLastResult )
-		M_THROW ( "no result", g_iErrNo );
+		M_THROW ( "no result", errno );
 	l_pvTmpResult = f_pvLastResult;
 	f_pvLastResult = NULL;
 	return ( l_pvTmpResult );
@@ -122,7 +122,7 @@ int long HDataBase::insert_id ( void )
 	{
 	M_PROLOG
 	if ( ! f_pvCoreData )
-		M_THROW ( "not connected to database", g_iErrNo );
+		M_THROW ( "not connected to database", errno );
 	return ( dbwrapper::dbrs_id ( f_pvCoreData, f_pvLastResult ) );
 	M_EPILOG
 	}

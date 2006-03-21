@@ -59,7 +59,7 @@ int HRawFile::close ( void )
 	M_PROLOG
 	int l_iError = 0;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( "file is not opened", g_iErrNo );
+		M_THROW ( "file is not opened", errno );
 	l_iError = ::close ( f_iFileDescriptor );
 	f_iFileDescriptor = - 1;
 	return ( l_iError );
@@ -78,7 +78,7 @@ int HRawFile::read ( void * const a_pcBuffer, int const a_iSize )
 	M_PROLOG
 	int l_iCnt = 0;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, g_iErrNo );
+		M_THROW ( n_pcError, errno );
 	l_iCnt = ::read ( f_iFileDescriptor, a_pcBuffer, a_iSize );
 	return ( l_iCnt );
 	M_EPILOG
@@ -89,7 +89,7 @@ int HRawFile::write ( void const * const a_pcBuffer, int const a_iSize )
 	M_PROLOG
 	int l_iCnt = 0;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, g_iErrNo );
+		M_THROW ( n_pcError, errno );
 	l_iCnt = ::write ( f_iFileDescriptor, a_pcBuffer, a_iSize );
 	return ( l_iCnt );
 	M_EPILOG

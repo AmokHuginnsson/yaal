@@ -40,9 +40,6 @@ namespace hcore
 
 #define D_CVSID_HTREE_H "$CVSHeader$"
 
-#define D_FILL_NEW_MANUAL	0
-#define D_FILL_NEW_AUTO		1
-
 template < typename tttType >
 class HTree;
 
@@ -65,6 +62,15 @@ protected:
 template < typename tttType >
 class HTree
 	{
+public:
+	struct FILL
+		{
+		enum
+			{
+			D_NEW_MANUAL,
+			D_NEW_AUTO
+			};
+		};
 protected:
 	class HNode;
 	typedef HBranchList < HNode * > branch_t;
@@ -199,7 +205,7 @@ tttType HTree < tttType > ::HNode::get( void )
 	{
 	M_PROLOG
 	if ( ! f_iHits ) 
-		M_THROW ( "no leaf to get from.", g_iErrNo );
+		M_THROW ( "no leaf to get from.", errno );
 	f_iHits ++;
 	return ( f_tLeaf );
 	M_EPILOG

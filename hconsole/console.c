@@ -173,7 +173,7 @@ void enter_curses( void )
 			}
 		if ( ( n_iMouseDes = mouse::mouse_open ( ) ) < 0 )
 			M_THROW ( _ ( "mouse is console type"
-						" and we did not recived file descriptor" ), g_iErrNo );
+						" and we did not recived file descriptor" ), errno );
 		}
 #ifdef HAVE_ASCII_GRAPHICS
 	GLYPHS::D_DOWN_ARROW		= ACS_DARROW;
@@ -192,9 +192,9 @@ void leave_curses( void )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", errno );
 //	if ( ! mousemask ( 0, NULL ) )
-//		M_THROW ( "mousemask ( ) returned 0", g_iErrNo );
+//		M_THROW ( "mousemask ( ) returned 0", errno );
 	if ( n_bUseMouse )
 		static_cast < void > ( mouse::mouse_close ( ) );
 	bkgd ( ' ' | M_MAKE_ATTR ( ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) ) );
@@ -231,7 +231,7 @@ void set_attr( int a_iAttr )
 	M_PROLOG
 	unsigned char l_ucByte = 0;
 	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", errno );
 	l_ucByte = static_cast < unsigned char > ( a_iAttr );
 	attrset ( M_MAKE_ATTR ( l_ucByte ) );
 	return ;
@@ -304,7 +304,7 @@ int c_vmvprintf ( int a_iRow, int a_iColumn,
 	int l_iOrigColumn = 0;
 	int l_iError = 0;
 	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", errno );
 	if ( a_iColumn >= n_iWidth )
 		M_THROW ( "bad column.", a_iColumn );
 	if ( ( a_iRow < 0 ) || ( a_iRow >= n_iHeight ) )
@@ -342,7 +342,7 @@ int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	int l_iError = 0;
 	int l_iOrigAttribute = 0;
 	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", errno );
 	l_iOrigAttribute = get_attr ( );
 	set_attr ( a_iAttribute );
 	l_iError = c_vmvprintf ( a_iRow, a_iColumn, a_pcFormat, a_rxAp );
@@ -363,7 +363,7 @@ int get_key ( void )
 	int l_iChar = 0;
 	CURSOR::cursor_t l_eOrigCursState = CURSOR::D_INVISIBLE;
 	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", errno );
 	M_ENSURE ( noecho() != ERR );
 	M_ENSURE ( fflush( NULL ) == 0 );
 	l_iKey = getch ( );
@@ -440,7 +440,7 @@ int kbhit ( void )
 	M_PROLOG
 	int l_iKey;
 	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", errno );
 	M_ENSURE ( nodelay( stdscr, true ) != ERR );
 	l_iKey = get_key ( );
 	M_ENSURE ( nodelay( stdscr, false ) != ERR );
@@ -454,7 +454,7 @@ unsigned char get_attr( void )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", errno );
 	attr_t l_xAttr;
 	short l_hColor = 0;
 	int l_iAttribute = 0;
@@ -473,7 +473,7 @@ void clrscr ( void )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", g_iErrNo );
+		M_THROW ( "not in curses mode", errno );
 	clear ( ); /* Always returns OK */
 	M_ENSURE ( refresh ( ) != ERR );
 	return;
@@ -504,28 +504,28 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 		if ( n_bInputWaiting )
 			{
 			a_iKey = get_key ( );
-			l_iEventType = D_EVENT_MOUSE;
+			l_iEventType = EVENT::D_MOUSE;
 			if ( a_iKey == KEY_MOUSE )
 				static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
 			else
-				l_iEventType = D_EVENT_KEYBOARD;
+				l_iEventType = EVENT::D_KEYBOARD;
 			break;
 			}
 		l_iError = select ( FD_SETSIZE, & l_xFdSet, NULL, NULL,
 				( a_iTimeOutSec || a_iTimeOutUsec ) ? & l_xWait : NULL );
 		}
-	while ( ( l_iError == -1 ) && ( g_iErrNo == EINTR ) );
+	while ( ( l_iError == -1 ) && ( errno == EINTR ) );
 	if ( l_iError > 0 )
 		{
 		if ( FD_ISSET ( STDIN_FILENO, & l_xFdSet ) )
 			{
-			a_iKey = get_key ( ), l_iEventType = D_EVENT_KEYBOARD;
+			a_iKey = get_key ( ), l_iEventType = EVENT::D_KEYBOARD;
 			if ( a_iKey == KEY_MOUSE )
 				l_iEventType = 0;
 			}
 		if ( ( a_iKey == KEY_MOUSE )
 				|| ( n_iMouseDes && FD_ISSET ( n_iMouseDes, & l_xFdSet ) ) )
-			l_iEventType |= D_EVENT_MOUSE, static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
+			l_iEventType |= EVENT::D_MOUSE, static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
 		}
 	return ( l_iEventType );
 	}
