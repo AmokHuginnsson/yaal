@@ -1,68 +1,70 @@
 #! /bin/sh
+
 if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
-  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "CVSID" | grep --color "\<[DE]_[A-Z_]\+"
-  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "CVSID" | grep --color "\<M_[A-Z_]\+"
-  find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
+	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "CVSID" | grep --color "\<[DE]_[A-Z_]\+"
+	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "CVSID" | grep --color "\<M_[A-Z_]\+"
+	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
+	exit 0
 else
-  AWK="gawk"
-  SOURCES=`find . -name '*.c'`
-  HEADERS=`find . ! -name 'config.h' -a -name '*.h'`
-  ALL="${SOURCES} ${HEADERS}"
+	AWK="gawk"
+	SOURCES=`find . -name '*.c'`
+	HEADERS=`find . ! -name 'config.h' -a -name '*.h'`
+	ALL="${SOURCES} ${HEADERS}"
 
-  SOURCES_COUNT=`echo ${SOURCES} | tr " " "\n" | wc -l`
-  HEADERS_COUNT=`echo ${HEADERS} | tr " " "\n" | wc -l`
+	SOURCES_COUNT=`echo ${SOURCES} | tr " " "\n" | wc -l`
+	HEADERS_COUNT=`echo ${HEADERS} | tr " " "\n" | wc -l`
 
-  printf "stdhapi statistics:\n"
-  printf "	implementation files: %5d\n" ${SOURCES_COUNT}
-  printf "	header files:      %8d\n" ${HEADERS_COUNT}
-  TOTAL=$((${SOURCES_COUNT}+${HEADERS_COUNT}))
-  printf "	total:             %8d\n" ${TOTAL}
+	printf "stdhapi statistics:\n"
+	printf "	implementation files: %5d\n" ${SOURCES_COUNT}
+	printf "	header files:      %8d\n" ${HEADERS_COUNT}
+	TOTAL=$((${SOURCES_COUNT}+${HEADERS_COUNT}))
+	printf "	total:             %8d\n" ${TOTAL}
 
-#TMP_FILE=`mktemp`
-  TMP_FILE=`mktemp -t stdhapi-stats.XXXXXX`
+#	TMP_FILE=`mktemp`
+	TMP_FILE=`mktemp -t stdhapi-stats.XXXXXX`
 
-  cat ${SOURCES} ${HEADERS} | grep -v '^[ \t]*$\|^[ \t]*/\*' > ${TMP_FILE}
+	cat ${SOURCES} ${HEADERS} | grep -v '^[ \t]*$\|^[ \t]*/\*' > ${TMP_FILE}
 
-  LINES=`wc -l ${TMP_FILE}|${AWK} '{print $1}'`
-  LINES=$((${LINES}-${TOTAL}*21))
+	LINES=`wc -l ${TMP_FILE}|${AWK} '{print $1}'`
+	LINES=$((${LINES}-${TOTAL}*21))
 
-  PROG_DE="/CVSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"(D_|E_)[A-Z_]*\"),RLENGTH)}"
-  PROG_M="/CVSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"M_[A-Z_]*\"),RLENGTH)}"
-  PROG_O="/\<__.*_H\>|\<D_|\<E_|\<M_/{next}/^#[ \t]*define[ \t]+/"
+	PROG_DE="/CVSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"[ \t](D_|E_)[A-Z_]*\"),RLENGTH)}"
+	PROG_M="/CVSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"[ \t]M_[A-Z_]*\"),RLENGTH)}"
+	PROG_O="/\<__.*_H\>|\<D_|\<E_|\<M_/{next}/^#[ \t]*define[ \t]+/"
 
-  printf "	lines:             %8d\n" ${LINES}
+	printf "	lines:             %8d\n" ${LINES}
 
-  CLASSES=`grep '\<class\>' ${TMP_FILE} | grep -cv 'class.*;'`
+	CLASSES=`grep '\<class\>' ${TMP_FILE} | grep -cv 'class.*;'`
 
-  printf "	classes:           %8d\n" ${CLASSES}
+	printf "	classes:           %8d\n" ${CLASSES}
 
-  STRUCTURES=`grep '\<struct\>' ${TMP_FILE} | grep -cv 'struct.*;'`
+	STRUCTURES=`grep '\<struct\>' ${TMP_FILE} | grep -cv 'struct.*;'`
 
-  printf "	structures:        %8d\n" ${STRUCTURES}
+	printf "	structures:        %8d\n" ${STRUCTURES}
 
-  MACROS=`${AWK} "${PROG_M}" ${TMP_FILE}|sort -u|wc -l`
+	MACROS=`${AWK} "${PROG_M}" ${TMP_FILE}|sort -u|grep -v '^$'|wc -l`
 
-  printf "	macros:            %8d\n" ${MACROS}
+	printf "	macros:            %8d\n" ${MACROS}
 
-  DEFINES=`${AWK} "${PROG_DE}" ${TMP_FILE}|sort -u|wc -l`
+	DEFINES=`${AWK} "${PROG_DE}" ${TMP_FILE}|sort -u|grep -v '^$'|wc -l`
 
-  printf "	defines:           %8d\n" ${DEFINES}
-  
-  SNEAKY=`${AWK} "${PROG_O}" ${TMP_FILE}|sort -u|wc -l`
+	printf "	defines:           %8d\n" ${DEFINES}
+	
+	SNEAKY=`${AWK} "${PROG_O}" ${TMP_FILE}|sort -u|grep -v '^$'|wc -l`
 
-  printf "	sneaky:            %8d\n" ${SNEAKY}
+	printf "	sneaky:            %8d\n" ${SNEAKY}
 
-  TYPEDEFS=`grep -c 'typedef' ${TMP_FILE}`
+	TYPEDEFS=`grep -c 'typedef' ${TMP_FILE}`
 
-  printf "	typedefs:          %8d\n" ${TYPEDEFS}
+	printf "	typedefs:          %8d\n" ${TYPEDEFS}
 
-  FUNCTIONS=`grep -c "^	}$" ${TMP_FILE}`
+	FUNCTIONS=`grep -c "^	}$" ${TMP_FILE}`
 
-  printf "	functions:         %8d\n" ${FUNCTIONS}
+	printf "	functions:         %8d\n" ${FUNCTIONS}
 
-  GUARDED_FUNCTIONS=`grep -c "\<M_PROLOG\>" ${TMP_FILE}`
+	GUARDED_FUNCTIONS=`grep -c "\<M_PROLOG\>" ${TMP_FILE}`
 
-  printf "	guarded functions: %8d\n" ${GUARDED_FUNCTIONS}
+	printf "	guarded functions: %8d\n" ${GUARDED_FUNCTIONS}
 fi
 
 if [ -f ${TMP_FILE} ] ; then
