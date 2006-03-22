@@ -160,7 +160,7 @@ void signal_WINCH ( int a_iSignum )
 	if ( is_enabled ( ) )
 		{
 		n_bInputWaiting = true;
-		ungetch ( D_KEY_CTRL_('l') );
+		ungetch ( KEY < 'l' >::ctrl );
 		}
 	else
 		fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -301,7 +301,7 @@ void signal_CONT ( int a_iSignum )
 	if ( is_enabled ( ) )
 		{
 		n_bInputWaiting = true;
-		ungetch ( D_KEY_CTRL_('l') );
+		ungetch ( KEY < 'l' >::ctrl );
 		}
 #endif /* __HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );

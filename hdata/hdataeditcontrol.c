@@ -76,13 +76,13 @@ int HDataEditControl::process_input ( int a_iCode )
 		case ( '\r' ):
 		case ( KEY_CODES::D_LEFT ):
 		case ( KEY_CODES::D_RIGHT ):
-		case ( D_KEY_CTRL_('a') ):
+		case ( KEY < 'a' >::ctrl ):
 		case ( KEY_CODES::D_HOME ):
-		case ( D_KEY_CTRL_('e') ):
+		case ( KEY < 'e' >::ctrl ):
 		case ( KEY_CODES::D_END ):
 		case ( KEY_CODES::D_INSERT ):
-		case ( D_KEY_META_('f') ):
-		case ( D_KEY_META_('b') ):
+		case ( KEY < 'f' >::meta ):
+		case ( KEY < 'b' >::meta ):
 			l_bNoChange = true;
 		break;
 		case ( KEY_CODES::D_PAGE_UP ):

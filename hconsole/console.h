@@ -113,9 +113,25 @@ struct COLORS
 	static int const D_ATTR_DEFAULT			= - 1;
 	};
 
-#define	D_KEY_META_(n)			( ( n ) + KEY_CODES::D_META_BASE )
-#define D_KEY_CTRL_(n)			( ( n ) - 96 )
-#define D_KEY_COMMAND_(n)		( ( n ) + KEY_CODES::D_COMMAND_BASE )
+template < int code = 0 >
+struct KEY
+	{
+	static int const meta = code + KEY_CODES::D_META_BASE;
+	static int const meta_r ( int a_iCode )
+		{
+		return ( a_iCode + KEY_CODES::D_META_BASE );
+		}
+	static int const ctrl = code - 96;
+	static int const ctrl_r ( int a_iCode )
+		{
+		return ( a_iCode - 96 );
+		}
+	static int const command = code + KEY_CODES::D_COMMAND_BASE;
+	static int const command_r ( int a_iCode )
+		{
+		return ( a_iCode + KEY_CODES::D_COMMAND_BASE );
+		}
+	};
 
 struct EVENT
 	{
@@ -145,7 +161,7 @@ int c_vprintf ( int, int, int, char const * const, va_list & );
 int ungetch ( int );
 int get_key( void );
 int kbhit( void );
-unsigned char get_attr( void );
+char unsigned get_attr( void );
 void clrscr( void );
 bool is_enabled ( void );
 int wait_for_user_input ( int &, mouse::OMouse &, int = 0, int = 0 );

@@ -42,7 +42,7 @@ struct DES
 	static int const D_PASSWORD_SIZE	= 16;
 	};
 
-typedef unsigned char uc_t;
+typedef char unsigned uc_t;
 
 class HDes
 	{

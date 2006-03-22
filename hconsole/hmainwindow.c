@@ -40,7 +40,7 @@ HMainWindow::HMainWindow ( char const * a_pcTitle )
 						: HWindow ( a_pcTitle ), f_poMenu ( NULL ), f_poWindowList ( NULL )
 	{
 	M_PROLOG
-	register_postprocess_handler ( D_KEY_COMMAND_('q'), NULL,
+	register_postprocess_handler ( KEY < 'q' >::command, NULL,
 				& HMainWindow::handler_close );
 	return;
 	M_EPILOG
@@ -93,7 +93,7 @@ void HMainWindow::init_menu ( HTUIProcess * a_psProcess, OMenuItem * a_psMenu )
 int HMainWindow::handler_close ( int a_iCode, void * )
 	{
 	M_PROLOG
-	a_iCode = D_KEY_COMMAND_('x');
+	a_iCode = KEY < 'x' >::command;
 	return ( a_iCode );
 	M_EPILOG
 	}

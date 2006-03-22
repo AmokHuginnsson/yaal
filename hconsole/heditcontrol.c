@@ -230,12 +230,12 @@ int HEditControl::process_input ( int a_iCode )
 				bell ( );
 			}
 		break;
-		case ( D_KEY_CTRL_('a') ):
+		case ( KEY < 'a' >::ctrl ):
 		case ( KEY_CODES::D_HOME ):
 			f_iCursorPosition = 0;
 			f_iControlOffset = 0;
 		break;
-		case ( D_KEY_CTRL_('e') ):
+		case ( KEY < 'e' >::ctrl ):
 		case ( KEY_CODES::D_END ):
 			{
 			if ( l_iLength >= f_iWidthRaw )
@@ -262,7 +262,7 @@ int HEditControl::process_input ( int a_iCode )
 				bell ( );
 			}
 		break;
-		case ( D_KEY_CTRL_( 'u' ) ):
+		case ( KEY < 'u' >::ctrl ):
 			{
 			if ( ! f_bReadOnly )
 				{
@@ -317,7 +317,7 @@ int HEditControl::process_input ( int a_iCode )
 		case ( KEY_CODES::D_INSERT ):
 			f_bReplace = ! f_bReplace;
 		break;
-		case ( D_KEY_META_('f') ):
+		case ( KEY < 'f' >::meta ):
 			{
 			l_pcBuffer += ( f_iControlOffset + f_iCursorPosition );
 			l_iErrorCode = strpbrk ( l_pcBuffer, g_pcWordSeparator ) - l_pcBuffer;
@@ -338,7 +338,7 @@ int HEditControl::process_input ( int a_iCode )
 				bell ( );
 			}
 		break;
-		case ( D_KEY_META_('b') ):
+		case ( KEY < 'b' >::meta ):
 			{
 			if ( f_iControlOffset + f_iCursorPosition )
 				{
@@ -368,7 +368,7 @@ int HEditControl::process_input ( int a_iCode )
 				bell ( );
 			}
 		break;
-		case ( D_KEY_META_('d') ):
+		case ( KEY < 'd' >::meta ):
 			{
 			if ( ! ( f_bReadOnly || f_bReplace ) )
 				{
@@ -396,7 +396,7 @@ int HEditControl::process_input ( int a_iCode )
 				bell ( );
 			}
 		break;
-		case ( D_KEY_CTRL_('w') ):
+		case ( KEY < 'w' >::ctrl ):
 			{
 			if ( ! ( f_bReadOnly || f_bReplace ) )
 				{

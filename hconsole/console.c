@@ -76,11 +76,23 @@ namespace hconsole
  * 8   - 00001000
  * 128 - 10000000
  */
-#define M_MAKE_ATTR(attr)	( COLOR_PAIR( \
-		( ( ( attr ) & 112 ) >> 1 ) 					/* background */ \
-			| ( attr ) & 7 ) 										/* foreground */ \
-	| ( ( ( attr ) & 8 ) ? A_BOLD : 0 ) 		/* brighter foreground */ \
-		| ( ( attr ) & 128 ? A_BLINK : 0 ) )	/* brighter background */
+template < int attr = 0 >
+struct ATTR
+	{
+	static int const value = COLOR_PAIR(
+				( ( ( attr ) & 112 ) >> 1 ) 	  		/* background */
+				| ( attr ) & 7 ) 								  	/* foreground */
+			| ( ( ( attr ) & 8 ) ? A_BOLD : 0 )   /* brighter foreground */
+			| ( ( attr ) & 128 ? A_BLINK : 0 ); /* brighter background */
+	inline static int const value_r ( int const a_iAttr )
+		{
+		return ( COLOR_PAIR(
+					( ( ( a_iAttr ) & 112 ) >> 1 ) 	  		/* background */
+					| ( a_iAttr ) & 7 ) 								  	/* foreground */
+				| ( ( ( a_iAttr ) & 8 ) ? A_BOLD : 0 )   /* brighter foreground */
+				| ( ( a_iAttr ) & 128 ? A_BLINK : 0 ) ); /* brighter background */
+		}
+	};
 
 /* public: */
 bool n_bNeedRepaint = false;
@@ -150,7 +162,7 @@ void enter_curses( void )
 			init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
 					l_piColors [ l_iFg ], l_piColors [ l_iBg ] );
 	attrset ( COLOR_PAIR( 7 ) );
-	bkgd ( ' ' | M_MAKE_ATTR ( COLORS::D_FG_BLACK | COLORS::D_BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
+	bkgd ( ' ' | ATTR < COLORS::D_FG_BLACK | COLORS::D_BG_BLACK >::value | A_INVIS ); /* meaningless value from macro */
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( getenv ( "STDHAPI_NO_MOUSE" ) )
@@ -197,7 +209,7 @@ void leave_curses( void )
 //		M_THROW ( "mousemask ( ) returned 0", errno );
 	if ( n_bUseMouse )
 		static_cast < void > ( mouse::mouse_close ( ) );
-	bkgd ( ' ' | M_MAKE_ATTR ( ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) ) );
+	bkgd ( ' ' | ATTR < COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK >::value );
 	M_ENSURE ( use_default_colors ( ) == OK );
 	M_ENSURE ( printw ( "" ) != ERR );
 	M_ENSURE ( fflush ( NULL ) == 0 );
@@ -229,11 +241,11 @@ void leave_curses( void )
 void set_attr( int a_iAttr )
 	{
 	M_PROLOG
-	unsigned char l_ucByte = 0;
+	char unsigned l_ucByte = 0;
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", errno );
-	l_ucByte = static_cast < unsigned char > ( a_iAttr );
-	attrset ( M_MAKE_ATTR ( l_ucByte ) );
+	l_ucByte = static_cast < char unsigned > ( a_iAttr );
+	attrset ( ATTR<>::value_r ( l_ucByte ) );
 	return ;
 	M_EPILOG
 	}
@@ -375,9 +387,9 @@ int get_key ( void )
 		if ( l_iKey == ERR )
 			l_iKey = KEY_CODES::D_ESC;
 		else
-			l_iKey = D_KEY_META_(l_iKey);
+			l_iKey = KEY<>::meta_r ( l_iKey );
 		}
-	if ( l_iKey == D_KEY_CTRL_(n_cCommandComposeCharacter) )
+	if ( l_iKey == KEY<>::ctrl_r ( n_cCommandComposeCharacter ) )
 		{
 		l_eOrigCursState = curs_set ( CURSOR::D_INVISIBLE );
 		c_printf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
@@ -387,25 +399,25 @@ int get_key ( void )
 		timeout ( -1 );
 		if ( l_iKey == ERR )
 			{
-			l_iKey = D_KEY_CTRL_(n_cCommandComposeCharacter);
+			l_iKey = KEY<>::ctrl_r ( n_cCommandComposeCharacter );
 			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_LIGHTGRAY, "      " );
 			}
 		else
 			{
 			if ( l_iKey < KEY_CODES::D_ESC )
-				l_iKey = D_KEY_COMMAND_( l_iChar = l_iKey + 96 );
+				l_iKey = KEY<>::command_r ( l_iChar = l_iKey + 96 );
 			else if ( l_iKey == KEY_CODES::D_ESC )
 				{
 				M_ENSURE ( nodelay ( stdscr, true ) != ERR );
 				l_iKey = getch ( );
 				M_ENSURE ( nodelay ( stdscr, false ) != ERR );
 				if ( l_iKey == ERR )
-					l_iKey = D_KEY_COMMAND_(l_iChar = KEY_CODES::D_ESC);
+					l_iKey = KEY<>::command_r (l_iChar = KEY_CODES::D_ESC);
 				else
-					l_iKey = D_KEY_COMMAND_(D_KEY_META_(l_iChar = l_iKey));
+					l_iKey = KEY<>::command_r (KEY<>::meta_r ( l_iChar = l_iKey ) );
 				}
 			else
-				l_iKey = D_KEY_COMMAND_(l_iChar = l_iKey);
+				l_iKey = KEY<>::command_r ( l_iChar = l_iKey );
 			c_printf ( n_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar );
 			}
 		curs_set ( l_eOrigCursState );
@@ -450,7 +462,7 @@ int kbhit ( void )
 	M_EPILOG
 	}
 	
-unsigned char get_attr( void )
+char unsigned get_attr( void )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
@@ -465,7 +477,7 @@ unsigned char get_attr( void )
 		l_iAttribute |= 8;
 	if ( l_xAttr & A_BLINK )
 		l_iAttribute |= 128;
-	return ( static_cast < unsigned char > ( l_iAttribute ) );
+	return ( static_cast < char unsigned > ( l_iAttribute ) );
 	M_EPILOG
 	}
 	

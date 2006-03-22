@@ -1,9 +1,9 @@
 #! /bin/sh
 
 if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
-	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "CVSID" | grep --color "\<[DE]_[A-Z_]\+"
-	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "CVSID" | grep --color "\<M_[A-Z_]\+"
-	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#\W*define[\t ]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
+	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "CVSID" | grep --color "\<[DE]_[A-Z_]\+"
+	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "CVSID" | grep --color "\<M_[A-Z_]\+"
+	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
 	exit 0
 else
 	AWK="gawk"

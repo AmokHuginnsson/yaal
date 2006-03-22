@@ -45,10 +45,11 @@ namespace stdhapi
 namespace dbwrapper
 {
 
-#define M_DB_ERR(msg) "Error: Data base request ("msg") while no driver loaded."
-
 namespace
 {
+
+char const * const etag = "Error: Data base request (";
+char const * const eend = ") while no driver loaded.";
 
 typedef void ( * simple_function_ptr_t ) ( void );
 typedef union
@@ -120,67 +121,67 @@ char * ( * rs_column_name ) ( void *, int );
 
 void * null_db_connect ( char const *, char const *, char const * )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(db_connect)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(db_connect)" << eend << endl;
 	return ( NULL );
 	}
 
 void null_db_disconnect ( void * )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(db_disconnect)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(db_disconnect)" << eend << endl;
 	return;
 	}
 
 int null_db_errno ( void * )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(db_errno)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(db_errno)" << eend << endl;
 	return ( 0 );
 	}
 
 char const * null_db_error ( void * )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "db_error)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "db_error)" << eend << endl;
 	return ( _ ( "null database driver loaded" ) );
 	}
 
 void * null_db_query ( void *, char const * )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(db_query)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(db_query)" << eend << endl;
 	return ( NULL );
 	}
 
 void null_db_unquery ( void * )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(db_unquery)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(db_unquery)" << eend << endl;
 	return;
 	}
 
 char * null_rs_get ( void *, int, int )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(rs_get)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(rs_get)" << eend << endl;
 	return ( NULL );
 	}
 
 int null_rs_fields_count ( void * )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(rs_fields_count)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(rs_fields_count)" << eend << endl;
 	return ( 0 );
 	}
 
 int long null_dbrs_records_count ( void *, void * )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(dbrs_records_count)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(dbrs_records_count)" << eend << endl;
 	return ( 0 );
 	}
 
 int long null_dbrs_id ( void *, void * )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(dbrs_id)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(dbrs_id)" << eend << endl;
 	return ( 0 );
 	}
 
 char * null_rs_column_name ( void *, int )
 	{
-	log ( LOG_TYPE::D_ERROR ) << M_DB_ERR ( "(rs_column_name)" ) << endl;
+	log ( LOG_TYPE::D_ERROR ) << etag << "(rs_column_name)" << eend << endl;
 	return ( NULL );
 	}
 

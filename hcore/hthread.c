@@ -64,7 +64,7 @@ HThread::~HThread ( void )
 int HThread::spawn ( void )
 	{
 	M_PROLOG
-	M_CRITICAL_SECTION ( );
+	HLock l_oLock ( f_oMutex );
 	if ( f_eStatus != D_DEAD )
 		M_THROW ( _ ( "thread is already running" ), f_eStatus );
 	M_ENSURE ( pthread_create ( & f_xThread,
@@ -235,7 +235,7 @@ HCondition::status_t HCondition::wait ( int long unsigned * a_pulTimeOutSeconds,
 void HCondition::signal ( void )
 	{
 	M_PROLOG
-	M_CRITICAL_SECTION ( );
+	HLock l_oLock ( f_oMutex );
 	pthread_cond_signal ( & f_xCondition );
 	return;
 	M_EPILOG

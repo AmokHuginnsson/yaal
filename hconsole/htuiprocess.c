@@ -83,7 +83,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWind
 	static int const D_ALTS_COUNT = 10;
 	int l_iCtr = 0;
 	int l_piAlts [ D_ALTS_COUNT ];
-	int l_piCtrls [ ] = { D_KEY_CTRL_('l'), D_KEY_CTRL_('x') };
+	int l_piCtrls [ ] = { KEY < 'l' >::ctrl, KEY < 'x' >::ctrl };
 	HMainWindow * l_poMainWindow = NULL;
 	HProcess::init ( n_iLatency );
 	register_file_descriptor_handler ( STDIN_FILENO, & HTUIProcess::process_stdin );
@@ -91,7 +91,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWind
 		register_file_descriptor_handler ( n_iMouseDes, & HTUIProcess::process_mouse );
 	register_postprocess_handler ( D_CTRLS_COUNT, l_piCtrls,
 			& HTUIProcess::handler_refresh );
-	register_postprocess_handler ( D_KEY_COMMAND_('x'), NULL,
+	register_postprocess_handler ( KEY < 'x' >::command, NULL,
 			& HTUIProcess::handler_quit );
 	if ( n_bUseMouse )
 		register_postprocess_handler ( KEY_CODES::D_MOUSE, NULL,
@@ -109,12 +109,12 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow * a_poMainWind
 		l_poMainWindow->init ( );
 		f_poWindows = l_poMainWindow->_disclose_window_list ( );
 		add_window ( l_poMainWindow, a_pcProcessName );
-		register_postprocess_handler ( D_KEY_META_( '\t' ), NULL,
+		register_postprocess_handler ( KEY < '\t' >::meta, NULL,
 				& HTUIProcess::handler_jump_meta_tab );
-		register_postprocess_handler ( D_KEY_COMMAND_('q'), NULL,
+		register_postprocess_handler ( KEY < 'q' >::command, NULL,
 				& HTUIProcess::handler_close_window );
 		for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
-			l_piAlts [ l_iCtr ] = D_KEY_META_( '0' + l_iCtr );
+			l_piAlts [ l_iCtr ] = KEY<>::meta_r ( '0' + l_iCtr );
 		register_postprocess_handler ( D_ALTS_COUNT, l_piAlts,
 			& HTUIProcess::handler_jump_meta_direct );
 		}

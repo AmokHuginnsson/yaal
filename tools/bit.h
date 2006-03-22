@@ -35,8 +35,8 @@ namespace tools
 
 int getbit( void *, int long unsigned );
 void setbit( void *, int long unsigned, int );
-void ror( unsigned char *, int, int, int );
-void rol( unsigned char *, int, int, int );
+void ror( char unsigned *, int, int, int );
+void rol( char unsigned *, int, int, int );
 
 	}
 

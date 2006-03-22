@@ -48,8 +48,8 @@ HWindow::HWindow ( char const * a_pcTitle ) : f_bInitialised ( false ),
 	f_poPreviousFocusedChild ( NULL ), f_oControls ( ), f_poStatusBar ( NULL )
 	{
 	M_PROLOG
-	int l_piCmds [ ] = { ':', D_KEY_COMMAND_( ':' ) };
-	int l_piSearch [ ] = { '/', D_KEY_COMMAND_( '/' ), '?', D_KEY_COMMAND_( '?' ) };
+	int l_piCmds [ ] = { ':', KEY < ':' >::command };
+	int l_piSearch [ ] = { '/', KEY < '/' >::command, '?', KEY < '?' >::command };
 	if ( ! is_enabled ( ) )
 		M_THROW ( "console not initialised.", errno );
 	register_postprocess_handler ( '\t', NULL, & HWindow::handler_jump_tab );

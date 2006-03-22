@@ -35,8 +35,6 @@ namespace stdhapi
 namespace hcore
 {
 
-#define M_CRITICAL_SECTION() HLock l_oLock ( f_oMutex );
-
 class HCondition;
 class HMutex
 	{

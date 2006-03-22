@@ -34,12 +34,8 @@ namespace stdhapi
 namespace hcore
 {
 
-#define M_HINFO_PURGE( ) \
-	f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ),\
-	f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
-
 HInfo::HInfo ( void )
-	: M_HINFO_PURGE ( )
+	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 	{
 	M_PROLOG
 	return;
@@ -47,7 +43,7 @@ HInfo::HInfo ( void )
 	}
 
 HInfo::HInfo ( int const & a_riInt )
-	: M_HINFO_PURGE ( )
+	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 	{
 	M_PROLOG
 	f_eType = D_INT;
@@ -57,7 +53,7 @@ HInfo::HInfo ( int const & a_riInt )
 	}
 
 HInfo::HInfo ( int long const & a_rlLongInt )
-	: M_HINFO_PURGE ( )
+	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 	{
 	M_PROLOG
 	f_eType = D_LONG_INT;
@@ -67,7 +63,7 @@ HInfo::HInfo ( int long const & a_rlLongInt )
 	}
 
 HInfo::HInfo ( double const & a_rdDouble )
-	: M_HINFO_PURGE ( )
+	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 	{
 	M_PROLOG
 	f_eType = D_DOUBLE;
@@ -77,7 +73,7 @@ HInfo::HInfo ( double const & a_rdDouble )
 	}
 
 HInfo::HInfo ( void * const a_pvPointer )
-	: M_HINFO_PURGE ( )
+	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 	{
 	M_PROLOG
 	f_eType = D_POINTER;
@@ -87,7 +83,7 @@ HInfo::HInfo ( void * const a_pvPointer )
 	}
 
 HInfo::HInfo ( char const * const a_pcBuffer )
-	: M_HINFO_PURGE ( )
+	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 	{
 	M_PROLOG
 	f_eType = D_HSTRING;
@@ -97,7 +93,7 @@ HInfo::HInfo ( char const * const a_pcBuffer )
 	}
 
 HInfo::HInfo ( HString const & a_roString )
-	: M_HINFO_PURGE ( )
+	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 	{
 	M_PROLOG
 	f_eType = D_HSTRING;
@@ -107,7 +103,7 @@ HInfo::HInfo ( HString const & a_roString )
 	}
 
 HInfo::HInfo ( HTime const & a_roTime )
-	: M_HINFO_PURGE ( )
+	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 	{
 	M_PROLOG
 	f_eType = D_HTIME;
@@ -117,7 +113,7 @@ HInfo::HInfo ( HTime const & a_roTime )
 	}
 
 HInfo::HInfo ( HInfo const & a_roInfo )
-	: M_HINFO_PURGE ( )
+	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
 	{
 	M_PROLOG
 	( * this ) = a_roInfo;

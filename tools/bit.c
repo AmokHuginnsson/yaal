@@ -56,8 +56,8 @@ int long unsigned g_pulMaskBitClear [ ] =
 	4294967293u, 4294967294u
 	};
                                        
-unsigned char g_pucMaskBitSet [ ] = {128, 64, 32, 16, 8, 4, 2, 1};
-unsigned char g_pucMaskBitClear [ ] = {127, 191, 223, 239, 247, 251, 253, 254};
+char unsigned g_pucMaskBitSet [ ] = {128, 64, 32, 16, 8, 4, 2, 1};
+char unsigned g_pucMaskBitClear [ ] = {127, 191, 223, 239, 247, 251, 253, 254};
 
 int getbit ( void * a_pvAddress, int long unsigned a_ulNumber )
 	{
@@ -76,9 +76,9 @@ int getbit ( void * a_pvAddress, int long unsigned a_ulNumber )
 void setbit( void * a_pvAddress, int long unsigned a_ulNumber, int a_iState )
 	{
 	int l_iOffset;
-	unsigned char * l_pcAddress;
+	char unsigned * l_pcAddress;
 	int long unsigned l_ulDword;
-	l_pcAddress = static_cast < unsigned char * > ( a_pvAddress );
+	l_pcAddress = static_cast < char unsigned * > ( a_pvAddress );
 	l_ulDword = a_ulNumber >> 3;
 	l_iOffset = a_ulNumber & 7;
 	if ( a_iState )
@@ -88,10 +88,10 @@ void setbit( void * a_pvAddress, int long unsigned a_ulNumber, int a_iState )
 	return ;
 	}
 	
-void ror( unsigned char * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
+void ror( char unsigned * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	{
 	int l_i, l_iSize;
-	unsigned char * l_pucTmp = 0;
+	char unsigned * l_pucTmp = 0;
 	if ( ( a_iVal < 1 ) || ( a_iVal >= a_iLen ) || ( a_iStart < 0 ) || ( a_iLen < 1 ) )
 		{
 		perror( "e: fatal rolling a_iValues" );
@@ -100,7 +100,7 @@ void ror( unsigned char * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	l_iSize = ( a_iLen + a_iStart ) / 8;
 	if ( ( a_iLen + a_iStart ) % 8 )
 		l_iSize++;
-	l_pucTmp = xmalloc < unsigned char > ( l_iSize );
+	l_pucTmp = xmalloc < char unsigned > ( l_iSize );
 	for ( l_i = 0; l_i < l_iSize; l_i++ )
 		l_pucTmp[ l_i ] = a_pucTmpBuf[ l_i ];
 	for ( l_i = 0; l_i < a_iLen; l_i++ )
@@ -109,10 +109,10 @@ void ror( unsigned char * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	return ;
 	}
 	
-void rol( unsigned char * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
+void rol( char unsigned * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	{
 	int l_i, l_iSize;
-	unsigned char * l_pucTmp = 0;
+	char unsigned * l_pucTmp = 0;
 	if ( ( a_iVal < 1 ) || ( a_iVal >= a_iLen ) || ( a_iStart < 0 ) || ( a_iLen < 1 ) )
 		{
 		perror( "e: fatal rolling values" );
@@ -121,7 +121,7 @@ void rol( unsigned char * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	l_iSize = ( a_iLen + a_iStart ) / 8;
 	if ( ( a_iLen + a_iStart ) % 8 )
 		l_iSize++;
-	l_pucTmp = xmalloc < unsigned char > ( l_iSize );
+	l_pucTmp = xmalloc < char unsigned > ( l_iSize );
 	for ( l_i = 0; l_i < l_iSize; l_i++ )
 		l_pucTmp[ l_i ] = a_pucTmpBuf[ l_i ];
 	for ( l_i = 0; l_i < a_iLen; l_i++ )

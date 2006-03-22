@@ -460,7 +460,7 @@ int HListControl::process_input ( int a_iCode )
 				bell ( );
 			}
 		break;
-		case ( D_KEY_CTRL_( 'n' ) ):
+		case ( KEY < 'n' >::ctrl ):
 			{
 			f_poSelected = l_poElement;
 			if ( f_bBackwards )
@@ -472,7 +472,7 @@ int HListControl::process_input ( int a_iCode )
 			l_iOldPosition = f_iCursorPosition;
 			}
 		break;
-		case ( D_KEY_CTRL_( 'p' ) ):
+		case ( KEY < 'p' >::ctrl ):
 			{
 			f_poSelected = l_poElement;
 			if ( f_bBackwards )

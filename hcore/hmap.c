@@ -52,7 +52,7 @@ int long unsigned hash ( HString const & a_roString )
 	int long unsigned l_ulHash = 0;
 	while ( l_iSize -- )
 		{
-		l_ulHash += static_cast < unsigned char > ( l_pcBuffer [ l_iSize ] );
+		l_ulHash += static_cast < char unsigned > ( l_pcBuffer [ l_iSize ] );
 		l_ulHash <<= 3;
 		}
 	return ( l_ulHash );

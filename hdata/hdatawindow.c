@@ -52,15 +52,15 @@ HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
 	f_oViewModeControls ( ), f_oEditModeControls ( )
 	{
 	M_PROLOG
-	register_postprocess_handler ( D_KEY_COMMAND_('n'), NULL,
+	register_postprocess_handler ( KEY < 'n' >::command, NULL,
 			& HDataWindow::handler_add_new );
-	register_postprocess_handler ( D_KEY_COMMAND_('e'), NULL,
+	register_postprocess_handler ( KEY < 'e' >::command, NULL,
 			& HDataWindow::handler_edit );
-	register_postprocess_handler ( D_KEY_COMMAND_('d'), NULL,
+	register_postprocess_handler ( KEY < 'd' >::command, NULL,
 			& HDataWindow::handler_delete );
-	register_postprocess_handler ( D_KEY_COMMAND_('w'), NULL,
+	register_postprocess_handler ( KEY < 'w' >::command, NULL,
 			& HDataWindow::handler_save );
-	register_postprocess_handler ( D_KEY_CTRL_('r'), NULL,
+	register_postprocess_handler ( KEY < 'r' >::ctrl, NULL,
 			& HDataWindow::handler_requery );
 	register_postprocess_handler ( KEY_CODES::D_ESC, NULL,
 			& HDataWindow::handler_cancel );

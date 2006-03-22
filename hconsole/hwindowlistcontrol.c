@@ -82,7 +82,7 @@ int HWindowListControl::process_input ( int a_iCode )
 	if ( ( f_iQuantity > 1 ) && ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) ) )
 		{
 		go ( f_iControlOffset + f_iCursorPosition - 1 );
-		a_iCode = D_KEY_META_( '\t' );
+		a_iCode = KEY < '\t' >::meta;
 		}
 	else
 		f_poSelected = l_poElement;

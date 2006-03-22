@@ -238,7 +238,7 @@ void usun_ogonki ( char * a_pcString )
 	int l_iCtr = 0;
 	while ( a_pcString [ l_iCtr ] )
 		{
-		a_pcString [ l_iCtr ] = n_pcTransTableStripPL [ static_cast < unsigned char > ( a_pcString [ l_iCtr ] ) ];
+		a_pcString [ l_iCtr ] = n_pcTransTableStripPL [ static_cast < char unsigned > ( a_pcString [ l_iCtr ] ) ];
 		l_iCtr ++;
 		}
 	return;
