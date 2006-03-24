@@ -50,7 +50,7 @@ namespace hcore
 #define M_THROW( msg, e_no ) throw ( stdhapi::hcore::HException ( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, static_cast < int > ( e_no ) ) )
 #define M_PROLOG try{
 #define M_EPILOG } catch ( stdhapi::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
-#define M_FINAL } catch ( stdhapi::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e->print_error ( true ); } catch ( int const error_code ) { exit ( error_code ); }
+#define M_FINAL } catch ( stdhapi::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e->print_error ( true ); } catch ( int const & error_code ) { exit ( error_code ); }
 #define M_ENSURE( condition ) if ( ! ( condition ) ){ stdhapi::hcore::HException e ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno ); e->set ( strerror ( errno ) ); throw e; }
 #ifndef NDEBUG
 #	define M_ASSERT( condition ) if ( ! ( condition ) )stdhapi::hcore::HException::failed_assert ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition )
