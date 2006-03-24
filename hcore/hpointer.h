@@ -133,16 +133,13 @@ HPointer < tType, array > & HPointer < tType, array >::operator = ( HPointer con
 	if ( ( & a_roPointer != this ) && ( a_roPointer.f_poShared != f_poShared ) )
 		{
 		a_roPointer.f_poShared->f_iReferenceCounter ++;
-		if ( ! f_poShared )
-			f_poShared = a_roPointer.f_poShared;
-		else
+		if ( f_poShared )
 			{
 			M_ASSERT ( f_poShared->f_ptPointer != a_roPointer.f_poShared->f_ptPointer );
-			if ( ! f_poShared->release ( ) )
-				f_poShared = new HShared ( a_roPointer.f_poShared->f_ptPointer );
-			else
-				f_poShared = a_roPointer.f_poShared;
+			if ( f_poShared->release ( ) )
+				delete f_poShared;
 			}
+		f_poShared = a_roPointer.f_poShared;
 		}
 	return ( * this );
 	}
