@@ -55,7 +55,6 @@ public:
 	HString ( void const * const );
 	HString & operator = ( HString const & );
 	HString & operator += ( HString const & );
-	HString & operator <<= ( int const );
 	HString operator + ( HString const & ) const;
 	HString operator + ( char const * ) const;
 	HString operator + ( char const ) const;
@@ -97,6 +96,8 @@ public:
 	HString right  ( int /* not const - reused */ ) const;
 	HString & trim_left ( char const * const = " \t\r\n" );
 	HString & trim_right ( char const * const = " \t\r\n" );
+	HString & shift_left ( int const );
+	HString & shift_right ( int const, char const = ' ' );
 	HString split ( char const * const, int const ) const;
 	HString & fill ( char = '\0', int = 0, int = 0 );
 	HString & fillz ( char = '\0', int = 0, int = 0 );

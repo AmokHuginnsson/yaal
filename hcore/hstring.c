@@ -290,23 +290,6 @@ HString & HString::operator += ( HString const & a_roString )
 	M_EPILOG
 	}
 
-HString & HString::operator <<= ( int const a_iShift )
-	{
-	int l_iCtr = 0;
-	if ( a_iShift < 0 )
-		M_THROW ( "bad shift lenght", a_iShift );
-	if ( a_iShift )
-		{
-		while ( f_pcBuffer [ l_iCtr + a_iShift ] )
-			{
-			f_pcBuffer [ l_iCtr ] = f_pcBuffer [ l_iCtr + a_iShift ];
-			l_iCtr ++;
-			}
-		f_pcBuffer [ l_iCtr ] = 0;
-		}
-	return ( * this );
-	}
-
 char & HString::operator [ ] ( int const a_iIndex )
 	{
 	M_PROLOG
@@ -712,6 +695,37 @@ HString & HString::trim_right( char const * const a_pcSet )
 		f_pcBuffer [ ( l_iLenght - l_iCut ) + 1 ] = 0;
 	return ( * this );
 	M_EPILOG
+	}
+
+HString & HString::shift_left ( int const a_iShift )
+	{
+	int l_iLenght = 0;
+	if ( a_iShift < 0 )
+		M_THROW ( "bad left shift lenght", a_iShift );
+	if ( a_iShift )
+		{
+		l_iLenght = get_length ( );
+		if ( a_iShift < l_iLenght )
+			memmove ( f_pcBuffer, f_pcBuffer + a_iShift, l_iLenght + 1 - a_iShift );
+		else
+			f_pcBuffer [ 0 ] = 0;
+		}
+	return ( * this );
+	}
+
+HString & HString::shift_right ( int const a_iShift, char const a_cFiller )
+	{
+	int l_iLenght = 0;
+	if ( a_iShift < 0 )
+		M_THROW ( "bad right shift lenght", a_iShift );
+	if ( a_iShift )
+		{
+		hs_realloc ( l_iLenght + a_iShift + 1 );
+		l_iLenght = get_length ( );
+		memmove ( f_pcBuffer + a_iShift, f_pcBuffer, l_iLenght + 1 );
+		fill ( a_cFiller, a_iShift );
+		}
+	return ( * this );
 	}
 
 HString HString::split ( char const * const a_pcAt, int const a_iPart ) const
