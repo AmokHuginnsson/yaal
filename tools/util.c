@@ -272,7 +272,7 @@ int modulo_ASCII ( char const * const a_pcASCIINumber, int a_iModulo )
 		l_iNumber = strtol ( l_oTmpString, NULL, 10 );
 		l_iNumber %= a_iModulo;
 		l_oTmpString.format ( "%d", l_iNumber );
-		l_oTmpNumber <<= ( l_iTmpLength - l_oTmpString.get_length ( ) );
+		l_oTmpNumber.shift_left ( l_iTmpLength - l_oTmpString.get_length ( ) );
 		l_iTmpLength = l_oTmpString.get_length ( );
 		for ( l_iCtr = 0; l_iCtr < l_iTmpLength; l_iCtr ++ )
 			l_oTmpNumber [ l_iCtr ] = l_oTmpString [ l_iCtr ];
@@ -307,7 +307,7 @@ bool verify_IBAN ( char const * a_pcIBAN )
 		return ( true );
 		}
 	l_oTmpString = l_oIBAN.left ( 4 );
-	l_oIBAN <<= 4;
+	l_oIBAN.shift_left ( 4 );
 	l_oIBAN += l_oTmpString;
 /*	M_LOG ( l_oIBAN ); */
 	l_oIBAN.lower ( );
