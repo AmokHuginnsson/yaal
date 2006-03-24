@@ -73,7 +73,7 @@ int getbit ( void * a_pvAddress, int long unsigned a_ulNumber )
 	return ( l_hState );
 	}
 	
-void setbit( void * a_pvAddress, int long unsigned a_ulNumber, int a_iState )
+void setbit ( void * a_pvAddress, int long unsigned a_ulNumber, int a_iState )
 	{
 	int l_iOffset;
 	char unsigned * l_pcAddress;
@@ -88,14 +88,14 @@ void setbit( void * a_pvAddress, int long unsigned a_ulNumber, int a_iState )
 	return ;
 	}
 	
-void ror( char unsigned * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
+void ror ( char unsigned * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	{
 	int l_i, l_iSize;
 	char unsigned * l_pucTmp = 0;
 	if ( ( a_iVal < 1 ) || ( a_iVal >= a_iLen ) || ( a_iStart < 0 ) || ( a_iLen < 1 ) )
 		{
 		perror( "e: fatal rolling a_iValues" );
-		exit( 1 );
+		throw ( 1 );
 		}
 	l_iSize = ( a_iLen + a_iStart ) / 8;
 	if ( ( a_iLen + a_iStart ) % 8 )
@@ -109,14 +109,14 @@ void ror( char unsigned * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	return ;
 	}
 	
-void rol( char unsigned * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
+void rol ( char unsigned * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	{
 	int l_i, l_iSize;
 	char unsigned * l_pucTmp = 0;
 	if ( ( a_iVal < 1 ) || ( a_iVal >= a_iLen ) || ( a_iStart < 0 ) || ( a_iLen < 1 ) )
 		{
-		perror( "e: fatal rolling values" );
-		exit( 1 );
+		perror ( "e: fatal rolling values" );
+		throw ( 1 );
 		}
 	l_iSize = ( a_iLen + a_iStart ) / 8;
 	if ( ( a_iLen + a_iStart ) % 8 )

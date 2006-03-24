@@ -200,7 +200,7 @@ void HException::failed_assert ( char const * const a_pcFileName,
 			a_pcMessage, a_pcFileName, a_iLine, a_pcFunctionName );
 	if ( ! errno )
 		errno ++;
-	exit ( errno );
+	throw ( errno );
 	M_EPILOG
 	}
 

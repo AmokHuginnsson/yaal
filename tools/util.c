@@ -344,7 +344,7 @@ void failure ( int a_iExitStatus, char const * const a_pcFormat, ... )
 	log << "failure: ";
 	log ( a_pcFormat, l_xAp );
 	va_end ( l_xAp );
-	exit ( a_iExitStatus );
+	throw ( a_iExitStatus );
 	}
 
 }
