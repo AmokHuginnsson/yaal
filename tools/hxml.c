@@ -65,6 +65,7 @@ private:
 	xmlXPathContextPtr	f_psContext;
 	xmlXPathObjectPtr		f_psObject;
 	xmlNodeSetPtr				f_psNodeSet;
+	xmlCharEncodingHandlerPtr f_psCharEncodingHandler;
 	/*}*/
 protected:
 	/*{*/
@@ -111,7 +112,7 @@ struct HXml::OConvert
 
 HXmlData::HXmlData ( void ) : f_psDoc ( NULL ), f_psRoot ( NULL ),
 										f_psContext ( NULL ), f_psObject ( NULL ),
-										f_psNodeSet ( NULL )
+										f_psNodeSet ( NULL ), f_psCharEncodingHandler ( NULL )
 	{
 	M_PROLOG
 	return;
@@ -142,7 +143,7 @@ void HXmlData::reset ( void )
 HXmlData::HXmlData ( HXmlData const & a_roXml ) : f_psDoc ( NULL ),
 										f_psRoot ( NULL ),
 										f_psContext ( NULL ), f_psObject ( NULL ),
-										f_psNodeSet ( NULL )
+										f_psNodeSet ( NULL ), f_psCharEncodingHandler ( NULL )
 	{
 	M_PROLOG
 	this->operator = ( a_roXml );
@@ -220,6 +221,8 @@ HXml::HXml ( void )
 HXml::~HXml ( void )
 	{
 	M_PROLOG
+	if ( f_poXml->f_psCharEncodingHandler )
+		xmlCharEncCloseFunc ( f_poXml->f_psCharEncodingHandler );
 	xmlCleanupCharEncodingHandlers ( );
 	if ( f_poXml )
 		delete f_poXml;
@@ -313,7 +316,6 @@ void HXml::init ( char const * a_pcFileName )
 	M_PROLOG
 	int l_iSavedErrno = errno;
 	xmlCharEncoding l_xEncoding = static_cast < xmlCharEncoding > ( 0 );
-	xmlCharEncodingHandlerPtr l_pxHnd = NULL;
 	HString l_oError;
 	if ( f_poXml->f_psDoc )
 		f_poXml->xml_free ( f_poXml->f_psDoc );
@@ -337,27 +339,25 @@ void HXml::init ( char const * a_pcFileName )
 #ifdef __DEBUGGER_BABUNI__
 	fprintf ( stdout, "%s\n", f_poXml->f_psRoot->name );
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( ! f_poXml->f_psDoc->encoding )
-		{
-		l_oError.format ( _ ( "WARRNING: no encoding declared in `%s'." ),
-				a_pcFileName );
-		log_trace << l_oError << endl;
-		}
-	else
-		l_pxHnd = xmlFindCharEncodingHandler (
+	if ( f_poXml->f_psDoc->encoding )
+		f_poXml->f_psCharEncodingHandler = xmlFindCharEncodingHandler (
 				reinterpret_cast < char const * > ( f_poXml->f_psDoc->encoding ) );
-	if ( ! l_pxHnd )
+	else
+		log ( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: no encoding declared in `" )
+			<< a_pcFileName << "'." << endl;
+	if ( ! f_poXml->f_psCharEncodingHandler )
 		{
+		log ( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: char encoding handler not found" ) << endl;
 		l_xEncoding = xmlDetectCharEncoding ( f_poXml->f_psRoot->name,
 				xmlStrlen ( f_poXml->f_psRoot->name ) );
 		if ( ! l_xEncoding )
 			M_THROW ( _ ( "cannot detect character encoding" ), errno );
-		l_pxHnd = xmlGetCharEncodingHandler ( l_xEncoding );
+		f_poXml->f_psCharEncodingHandler = xmlGetCharEncodingHandler ( l_xEncoding );
 		}
-	if ( ! l_pxHnd )
+	if ( ! f_poXml->f_psCharEncodingHandler )
 		M_THROW ( _ ( "cannot enable internal convertion" ), errno );
-	f_oConvert->f_xIconvIn = l_pxHnd->iconv_in;
-	f_oConvert->f_xIconvOut = l_pxHnd->iconv_out;
+	f_oConvert->f_xIconvIn = f_poXml->f_psCharEncodingHandler->iconv_in;
+	f_oConvert->f_xIconvOut = f_poXml->f_psCharEncodingHandler->iconv_out;
 	return;
 	M_EPILOG
 	}
