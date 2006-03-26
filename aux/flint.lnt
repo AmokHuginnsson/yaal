@@ -137,7 +137,7 @@
 
 -emacro({413},SUN_LEN)						/* Likely use of null pointer 'pointer' in left argument to operator '->' */
 -emacro(506,bkgd,attr_get,M_ASSERT)			/* Constant value Boolean */
--emacro(572,M_MAKE_ATTR)				/* Excessive shift value (precision 1 shifted right by 1) */
+-emacro(572,COLOR_PAIR)				/* Excessive shift value (precision 1 shifted right by 1) */
 -emacro(573,FD_SET,FD_ISSET)		/* Signed-unsigned mix with divide */
 -emacro(605,__builtin_va_start)	/*  */
 -emacro(702,M_ATTR_LABEL,M_SET_ATTR_SHORTCUT)	/* Shift right of signed quantity */

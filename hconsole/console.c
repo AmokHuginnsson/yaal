@@ -80,17 +80,17 @@ template < int attr = 0 >
 struct ATTR
 	{
 	static int const value = COLOR_PAIR(
-				( ( ( attr ) & 112 ) >> 1 ) 	  		/* background */
-				| ( attr ) & 7 ) 								  	/* foreground */
-			| ( ( ( attr ) & 8 ) ? A_BOLD : 0 )   /* brighter foreground */
-			| ( ( attr ) & 128 ? A_BLINK : 0 ); /* brighter background */
+				( ( attr & 112 ) >> 1 ) 	  		/* background */
+				| attr & 7 ) 								  	/* foreground */
+			| ( ( attr & 8 ) ? A_BOLD : 0 )   /* brighter foreground */
+			| ( attr & 128 ? A_BLINK : 0 ); /* brighter background */
 	inline static int const value_r ( int const a_iAttr )
 		{
 		return ( COLOR_PAIR(
-					( ( ( a_iAttr ) & 112 ) >> 1 ) 	  		/* background */
-					| ( a_iAttr ) & 7 ) 								  	/* foreground */
-				| ( ( ( a_iAttr ) & 8 ) ? A_BOLD : 0 )   /* brighter foreground */
-				| ( ( a_iAttr ) & 128 ? A_BLINK : 0 ) ); /* brighter background */
+					( ( a_iAttr & 112 ) >> 1 ) 	  		/* background */
+					| a_iAttr & 7 ) 								  	/* foreground */
+				| ( ( a_iAttr & 8 ) ? A_BOLD : 0 )   /* brighter foreground */
+				| ( a_iAttr & 128 ? A_BLINK : 0 ) ); /* brighter background */
 		}
 	};
 
