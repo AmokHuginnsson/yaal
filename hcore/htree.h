@@ -116,7 +116,7 @@ protected:
 	/*{*/
 	HNode * f_poRoot;			/* self explanary */
 	HNode * f_poSelected;	/* local temporary pointer, "cursor" */
-	int f_iHighestNumber;							/* serial number of last added element */
+	int f_iHighestNumber;	/* serial number of last added element */
 	/*}*/
 public:
 	/*{*/
@@ -135,7 +135,7 @@ private:
 	HTree ( HTree const & );
 	HTree & operator = ( HTree const & );
 	/*}*/
-	friend class HTree < tttType > :: HNode;
+	friend class HTree < tttType >::HNode;
 	};
 
 /*

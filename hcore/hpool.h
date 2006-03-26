@@ -83,6 +83,7 @@ public:
 	tType & operator [ ] ( int ) const;
 	tType & add ( tType const & );
 	void reset ( void );
+	int get_top ( void );
 	/*}*/
 private:
 	/*{*/
@@ -169,6 +170,12 @@ template < typename tType >
 void HPool < tType >::reset ( void )
 	{
 	f_iTop = 0;
+	}
+
+template < typename tType >
+int HPool < tType >::get_top ( void )
+	{
+	return ( f_iTop );;
 	}
 
 }
