@@ -171,7 +171,7 @@ void enter_curses( void )
 		{
 		if ( ::getenv ( "DISPLAY" ) )
 			{
-			log ( LOG_TYPE::D_INFO ) << _ ( "using X mouse support" ) << endl;
+			log ( LOG_TYPE::D_INFO ) << _ ( "using ncurses mouse support" ) << endl;
 			mouse::mouse_open = mouse::x_mouse_open;
 			mouse::mouse_get = mouse::x_mouse_get;
 			mouse::mouse_close = mouse::x_mouse_close;

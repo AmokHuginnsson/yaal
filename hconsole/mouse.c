@@ -73,15 +73,20 @@ int hunt_tty ( int a_iOffset )
 	M_PROLOG
 	/* this hack allows to guess current controling virtual terminal screen */
 	int l_iVC = 0;
-	char * l_pcTtyName = NULL;
+	char * l_pcTtyName = NULL, * l_pcPtr = NULL;
 	l_pcTtyName = ttyname ( STDIN_FILENO );
 	if ( l_pcTtyName && ! strncmp ( l_pcTtyName, "/dev/ttyv", 8 + a_iOffset ) )
 		l_iVC = strtol ( l_pcTtyName + 8 + a_iOffset, NULL, 10 );
 	else
 		{
 		l_pcTtyName = ::getenv ( "STY" );
-		if ( l_pcTtyName && ( l_pcTtyName = strstr ( l_pcTtyName, ".tty" ) ) )
-			l_iVC = strtol ( l_pcTtyName + 4 + a_iOffset, NULL, 10 );
+		if ( l_pcTtyName )
+			{
+			if ( l_pcPtr = strstr ( l_pcTtyName, ".tty" ) )
+				l_iVC = strtol ( l_pcPtr + 4 + a_iOffset, NULL, 10 );
+			else if ( l_pcPtr = strstr ( l_pcTtyName, ".pts" ) )
+				l_iVC = strtol ( l_pcPtr + 4 + a_iOffset, NULL, 10 );
+			}
 		else
 			M_THROW ( "can not find controling virtual console", errno );
 		}
