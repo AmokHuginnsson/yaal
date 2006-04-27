@@ -82,9 +82,9 @@ int hunt_tty ( int a_iOffset )
 		l_pcTtyName = ::getenv ( "STY" );
 		if ( l_pcTtyName )
 			{
-			if ( l_pcPtr = strstr ( l_pcTtyName, ".tty" ) )
+			if ( ( l_pcPtr = strstr ( l_pcTtyName, ".tty" ) ) )
 				l_iVC = strtol ( l_pcPtr + 4 + a_iOffset, NULL, 10 );
-			else if ( l_pcPtr = strstr ( l_pcTtyName, ".pts" ) )
+			else if ( ( l_pcPtr = strstr ( l_pcTtyName, ".pts" ) ) )
 				l_iVC = strtol ( l_pcPtr + 4 + a_iOffset, NULL, 10 );
 			}
 		else
