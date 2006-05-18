@@ -124,13 +124,7 @@ void hcore_init ( void ) __attribute__ ( ( constructor ) );
 void hcore_init ( void )
 	{
 	char * l_pcEnv = NULL;
-	errno = sizeof ( int );
-	if ( errno < 4 )
-		{
-		log << "Your CPU or compiler does not support required size of int.";
-		log << endl;
-		exit ( errno );
-		}
+	STATIC_ASSERT ( sizeof ( int ) >= 4 );
 	errno = 0;
 	l_pcEnv = ::getenv ( "STDHAPI_DEBUG" );
 	if ( l_pcEnv )

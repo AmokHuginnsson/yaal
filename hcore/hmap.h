@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCORE_HMAP_H
-#define __HCORE_HMAP_H
+#ifndef __STDHAPI_HCORE_HMAP_H
+#define __STDHAPI_HCORE_HMAP_H
 
 #line 31 "hmap.h"
 
@@ -352,5 +352,5 @@ int long unsigned hash ( HString const & );
 
 }
 
-#endif /* not __HCORE_HMAP_H */
+#endif /* not __STDHAPI_HCORE_HMAP_H */
 

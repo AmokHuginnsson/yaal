@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HPOINTER_H
-#define __HPOINTER_H
+#ifndef __STDHAPI_HCORE_HPOINTER_H
+#define __STDHAPI_HCORE_HPOINTER_H
 
 #line 31 "hpointer.h"
 
@@ -168,5 +168,5 @@ tType & HPointer < tType, array >::operator [ ] ( int a_iIndex ) const
 
 }
 
-#endif /* not __HPOINTER_H */
+#endif /* not __STDHAPI_HCORE_HPOINTER_H */
 

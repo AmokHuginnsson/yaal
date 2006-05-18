@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCORE_HINFO_H
-#define __HCORE_HINFO_H
+#ifndef __STDHAPI_HCORE_HINFO_H
+#define __STDHAPI_HCORE_HINFO_H
 
 #include "hstring.h"
 #include "htime.h"
@@ -78,4 +78,4 @@ protected:
 
 }
 
-#endif /* not __HCORE_HINFO_H */
+#endif /* not __STDHAPI_HCORE_HINFO_H */

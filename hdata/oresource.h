@@ -86,8 +86,8 @@ struct OColumnInfo
 	int f_iPlacement; 			/* what place should this new column take */
 	char const * f_pcName;	/* column name */
 	int f_iWidth;						/* column width */
-	stdhapi::hconsole::HControl::BITS::ALIGN::align_t f_eAlign;						/* column alignment */
-	hcore::type_t f_eType;						/* data type stored in that column */
+	stdhapi::hconsole::HControl::BITS::ALIGN::align_t f_eAlign;	/* column alignment */
+	type_t f_eType;					/* data type stored in that column */
 	};
 
 class HDataControl;

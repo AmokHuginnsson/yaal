@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCORE_HMATRIX_H
-#define __HCORE_HMATRIX_H
+#ifndef __STDHAPI_HCORE_HMATRIX_H
+#define __STDHAPI_HCORE_HMATRIX_H
 
 #line 31
 
@@ -592,5 +592,5 @@ HVector < tType > T ( HMatrix < tType > const & a_roMatrix,
 
 }
 	
-#endif /* not __HCORE_HMATRIX_H */
+#endif /* not __STDHAPI_HCORE_HMATRIX_H */
 

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCORE_HSTRING_H
-#define __HCORE_HSTRING_H
+#ifndef __STDHAPI_HCORE_HSTRING_H
+#define __STDHAPI_HCORE_HSTRING_H
 
 namespace stdhapi
 {
@@ -133,4 +133,5 @@ extern char const n_pcWhiteSpace [ ];
 
 }
 
-#endif /* not __HCORE_HSTRING_H */
+#endif /* not __STDHAPI_HCORE_HSTRING_H */
+

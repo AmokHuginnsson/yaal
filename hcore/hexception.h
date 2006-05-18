@@ -27,8 +27,8 @@ Copyright:
 /* This file holds (except HException class declaration) main #defines,
 	 macros and global variables used acros whole stdhapi */
 
-#ifndef __HCORE_HEXCEPTION_H
-#define __HCORE_HEXCEPTION_H
+#ifndef __STDHAPI_HCORE_HEXCEPTION_H
+#define __STDHAPI_HCORE_HEXCEPTION_H
 
 #include <cerrno>
 #include <cstring>
@@ -36,98 +36,13 @@ Copyright:
 #ifdef __STDHAPI_BUILD__
 #	include "config.h"
 #endif /* __STDHAPI_BUILD__ */
+#include "base.h"
 
 namespace stdhapi
 {
 
 namespace hcore
 {
-
-#define _(string) gettext (string)
-
-#define M_CVSID(id) namespace { char __CVSID__ [ ] = id; }
-#define M_CVSTID(id) namespace { char __CVSTID__ [ ] = id; }
-#define M_THROW( msg, e_no ) throw ( stdhapi::hcore::HException ( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, static_cast < int > ( e_no ) ) )
-#define M_PROLOG try{
-#define M_EPILOG } catch ( stdhapi::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
-#define M_FINAL } catch ( stdhapi::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e->print_error ( true ); } catch ( int const & error_code ) { exit ( error_code ); }
-#define M_ENSURE( condition ) if ( ! ( condition ) ){ stdhapi::hcore::HException e ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno ); e->set ( strerror ( errno ) ); throw e; }
-#ifndef NDEBUG
-#	define M_ASSERT( condition ) if ( ! ( condition ) )stdhapi::hcore::HException::failed_assert ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition )
-#else /* NDEBUG */
-#	define M_ASSERT( c ) /**/
-#endif /* not NDEBUG */
-
-template < typename tType >
-inline tType const operator | ( tType const & left,
-		tType const & right )
-	{
-	return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
-				| static_cast < int long unsigned > ( right ) ) );
-	}
-template < typename tType >
-inline tType & operator |= ( tType & left, tType const & right )
-	{
-	left = static_cast < tType > ( static_cast < int long unsigned > ( left )
-			| static_cast < int long unsigned > ( right ) );
-	return ( left );
-	}
-template < typename tType >
-inline tType const operator & ( tType const & left,
-		tType const & right )
-	{
-	return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
-				& static_cast < int long unsigned > ( right ) ) );
-	}
-template < typename tType >
-inline tType & operator &= ( tType & left, tType const & right )
-	{
-	left = static_cast < tType > ( static_cast < int long unsigned > ( left )
-			& static_cast < int long unsigned > ( right ) );
-	return ( left );
-	}
-template < typename tType >
-inline tType const operator ^ ( tType const & left,
-		tType const & right )
-	{
-	return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
-				^ static_cast < int long unsigned > ( right ) ) );
-	}
-template < typename tType >
-inline tType & operator ^= ( tType & left, tType const & right )
-	{
-	left = static_cast < tType > ( static_cast < int long unsigned > ( left )
-			^ static_cast < int long unsigned > ( right ) );
-	return ( left );
-	}
-template < typename tType >
-inline tType const operator ~ ( tType const & e )
-	{
-	return ( static_cast < tType > (
-				~ static_cast < int long unsigned > ( e ) ) );
-	}
-
-/* those types definitions were in hinfo.h but this file (hexception.h)
- * is included into more files, we assume that sizeof ( int ) >= 4 */
-
-typedef enum
-	{
-	D_VOID					= 0x0000,
-	D_BOOL					= 0x0001,
-	D_CHAR					= 0x0002,
-	D_SHORT					= 0x0004,
-	D_INT						= 0x0008,
-	D_LONG_INT			= 0x0010,
-	D_DOUBLE				= 0x0020,
-	D_POINTER				= 0x0040,
-	D_CHAR_POINTER	= 0x0080,
-	D_HSTRING				= 0x0100,
-	D_HINFO					= 0x0200,
-	D_HMAP					= 0x0400,
-	D_HLIST					= 0x0800,
-	D_HTIME					= 0x1000,
-	D_MASK					= 0xffff
-	} type_t;
 
 extern int long n_lLogMask;
 extern int n_iDebugLevel;
@@ -179,5 +94,5 @@ private:
 
 }
 
-#endif /* not __HCORE_HEXCEPTION_H */
+#endif /* not __STDHAPI_HCORE_HEXCEPTION_H */
 

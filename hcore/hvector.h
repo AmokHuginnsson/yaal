@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCORE_HVECTOR_H
-#define __HCORE_HVECTOR_H
+#ifndef __STDHAPI_HCORE_HVECTOR_H
+#define __STDHAPI_HCORE_HVECTOR_H
 
 #line 31
 
@@ -348,4 +348,5 @@ HVector < tType > operator * ( tType const a_tScalar,
 
 }
 
-#endif /* not __HCORE_HVECTOR_H */
+#endif /* not __STDHAPI_HCORE_HVECTOR_H */
+

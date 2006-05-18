@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __CL_SWITCH_H
-#define __CL_SWITCH_H
+#ifndef __STDHAPI_HCORE_CL_SWITCH_H
+#define __STDHAPI_HCORE_CL_SWITCH_H
 
 #include "hexception.h"
 
@@ -64,5 +64,5 @@ int decode_switches ( int const, char * const * const,
 
 }
 
-#endif /* not __CL_SWITCH_H */
+#endif /* not __STDHAPI_HCORE_CL_SWITCH_H */
 

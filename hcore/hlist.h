@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCORE_HLIST_H
-#define __HCORE_HLIST_H
+#ifndef __STDHAPI_HCORE_HLIST_H
+#define __STDHAPI_HCORE_HLIST_H
 
 #line 31 "hlist.h"
 
@@ -1288,5 +1288,5 @@ HList< tType >::operator bool ( void ) const
 
 }
 
-#endif /* not __HCORE_HLIST_H */
+#endif /* not __STDHAPI_HCORE_HLIST_H */
 

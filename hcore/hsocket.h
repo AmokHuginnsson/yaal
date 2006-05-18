@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCORE_HSOCKET_H
-#define __HCORE_HSOCKET_H
+#ifndef __STDHAPI_HCORE_HSOCKET_H
+#define __STDHAPI_HCORE_HSOCKET_H
 
 #include "hrawfile.h"
 #include "hmap.h"
@@ -92,4 +92,5 @@ private:
 
 }
 
-#endif /* not __HCORE_HSOCKET_H */
+#endif /* not __STDHAPI_HCORE_HSOCKET_H */
+

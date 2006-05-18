@@ -49,7 +49,7 @@ class HListControl : public hcore::HList < HItem >, public virtual HSearchableCo
 		BITS::ALIGN::align_t f_eAlign;
 		int f_iShortcutIndex;
 		char f_cShortcut;
-		hcore::type_t f_eType;
+		type_t f_eType;
 		hcore::HString f_oName;
 		HControl * f_poControl;
 		/*}*/
@@ -113,7 +113,7 @@ public:
 										char const *,									/* column name */
 										int const &,									/* width */
 										BITS::ALIGN::align_t const & = BITS::ALIGN::D_LEFT,		/* align */
-										const hcore::type_t & = hcore::D_HSTRING,	/* type */
+										const type_t & = D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
 	virtual HItem & add_tail ( HItem * = NULL );
 	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );

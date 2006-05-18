@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCORE_HPROCESS_H
-#define __HCORE_HPROCESS_H
+#ifndef __STDHAPI_HCORE_HPROCESS_H
+#define __STDHAPI_HCORE_HPROCESS_H
 
 #include <sys/types.h>
 
@@ -84,5 +84,5 @@ private:
 
 }
 
-#endif /* not __HCORE_HPROCESS_H */
+#endif /* not __STDHAPI_HCORE_HPROCESS_H */
 

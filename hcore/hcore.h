@@ -27,8 +27,8 @@ Copyright:
 /* This file holds (except HException class declaration) main #defines,
 	 macros and global variables used acros whole stdhapi */
 
-#ifndef __HCORE_HCORE_H
-#define __HCORE_HCORE_H
+#ifndef __STDHAPI_HCORE_HCORE_H
+#define __STDHAPI_HCORE_HCORE_H
 
 namespace stdhapi
 {
@@ -44,5 +44,5 @@ void stdhapi_hcore_banner ( void );
 
 }
 
-#endif /* not __HCORE_HCORE_H */
+#endif /* not __STDHAPI_HCORE_HCORE_H */
 
