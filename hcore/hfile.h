@@ -36,6 +36,10 @@ namespace stdhapi
 namespace hcore
 {
 
+class HFile;
+HFile & endl ( HFile & );
+HFile & flush ( HFile & );
+
 class HFile
 	{
 public:
