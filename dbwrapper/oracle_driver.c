@@ -39,6 +39,7 @@ Copyright:
 #include "hcore/rc_file.h"
 #include "hcore/hlog.h"
 
+using namespace stdhapi;
 using namespace stdhapi::hcore;
 
 extern "C"
