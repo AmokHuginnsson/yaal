@@ -83,8 +83,6 @@ struct OListBits
 	virtual ~OListBits ( void ) { } 
 	};
 
-template struct enum_t < OListBits::treatment_t >;
-
 template < typename tType > 
 class HList : public OListBits
 	{

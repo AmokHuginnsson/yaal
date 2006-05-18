@@ -47,6 +47,9 @@ namespace LOG_TYPE
 	static int const D_CVSHEADER	= 32;
 	}
 
+class HLog;
+HLog & endl ( HLog & );
+
 class HLog
 	{
 protected:

@@ -28,6 +28,7 @@ Copyright:
 #define __HCORE_HFILE_H
 
 #include "hstring.h"
+#include "hexception.h"
 
 namespace stdhapi
 {
@@ -98,9 +99,6 @@ private:
 	friend HFile & endl ( HFile & );
 	friend HFile & flush ( HFile & );
 	};
-
-template struct enum_t < HFile::mode_open_t >;
-template struct enum_t < HFile::mode_read_t >;
 
 }
 

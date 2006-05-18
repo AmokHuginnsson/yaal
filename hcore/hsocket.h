@@ -88,8 +88,6 @@ private:
 	/*}*/
 	};
 
-template struct enum_t < HSocket::socket_type_t >;
-
 }
 
 }

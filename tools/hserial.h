@@ -109,8 +109,6 @@ protected:
 	/*}*/
 	};
 
-template struct hcore::enum_t < HSerial::flags_t >;
-
 }
 
 }

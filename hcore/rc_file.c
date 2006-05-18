@@ -63,7 +63,6 @@ struct RC_PATHER
 	};
 
 int read_rc_line ( HString &, HString &, HFile &, int & );
-template struct enum_t < RC_PATHER::placement_bit_t >;
 
 HString make_path ( char const * const a_pcRcName,
 		RC_PATHER::placement_t a_ePlacement )
