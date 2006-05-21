@@ -31,6 +31,7 @@ Copyright:
 
 #include "hcore/hexception.h"
 M_CVSID ( "$CVSHeader$" )
+#include "hcore/hpointer.h"
 #include "util.h"
 #include "hanalyser.h"
 #include "hcore/hlog.h"
@@ -346,6 +347,65 @@ void failure ( int a_iExitStatus, char const * const a_pcFormat, ... )
 	va_end ( l_xAp );
 	throw ( a_iExitStatus );
 	}
+
+namespace
+{
+int min3 ( int a, int b, int c )
+	{
+	int ret = c;
+	if ( a < ret )
+		ret = a;
+	if ( b < ret )
+		ret = b;
+	return ( ret );
+	}
+}
+
+namespace distance
+{
+
+int levenshtein ( char const * const a_pcOne, char const * const a_pcTwo )
+	{
+	int l_iCost = 0;
+	int l_iIndexOne = 0, l_iIndexTwo = 0;
+	int l_iLengthOne = strlen ( a_pcOne );
+	int l_iLengthTwo = strlen ( a_pcTwo );
+	int * * l_ppiDistanceMatrix = NULL;
+	if ( ! l_iLengthTwo )
+		return ( l_iLengthOne );
+	if ( ! l_iLengthOne )
+		return ( l_iLengthTwo );
+	l_iLengthOne ++;
+	l_iLengthTwo ++;
+	HPointer < int *, HPointerArray, HPointerRelaxed > l_oDistanceMatrixHolder ( new int * [ l_iLengthOne ] );
+	HPointer < int, HPointerArray, HPointerRelaxed > l_oDistanceMatrix ( new int [ l_iLengthOne * l_iLengthTwo ] );
+	l_ppiDistanceMatrix = l_oDistanceMatrixHolder.raw ( );
+	for ( l_iIndexOne = 0; l_iIndexOne < l_iLengthOne; ++ l_iIndexOne )
+		l_ppiDistanceMatrix [ l_iIndexOne ] = l_oDistanceMatrix.raw ( ) + l_iIndexOne * l_iLengthTwo;
+	for ( l_iIndexOne = 0; l_iIndexOne < l_iLengthOne; ++ l_iIndexOne )
+		l_ppiDistanceMatrix [ l_iIndexOne ] [ 0 ] = l_iIndexOne;
+	for ( l_iIndexTwo = 0; l_iIndexTwo < l_iLengthTwo; ++ l_iIndexTwo )
+		l_ppiDistanceMatrix [ 0 ] [ l_iIndexTwo ] = l_iIndexTwo;
+	l_iLengthTwo --;
+	l_iLengthOne --;
+	/* real magic starts here */
+	for ( l_iIndexOne = 0; l_iIndexOne < l_iLengthOne; ++ l_iIndexOne )
+		{
+		for ( l_iIndexTwo = 0; l_iIndexTwo < l_iLengthTwo; ++ l_iIndexTwo )
+			{
+			l_iCost = 0;
+			if ( a_pcOne [ l_iIndexOne ] != a_pcTwo [ l_iIndexTwo ] )
+				l_iCost = 1;
+			l_ppiDistanceMatrix [ l_iIndexOne + 1 ] [ l_iIndexTwo + 1 ] = min3 (
+					l_ppiDistanceMatrix [ l_iIndexOne ] [ l_iIndexTwo + 1 ] + 1,
+					l_ppiDistanceMatrix [ l_iIndexOne + 1 ] [ l_iIndexTwo ] + 1,
+					l_ppiDistanceMatrix [ l_iIndexOne ] [ l_iIndexTwo ] + l_iCost );
+			}
+		}
+	return ( l_ppiDistanceMatrix [ l_iLengthOne ] [ l_iLengthTwo ] );
+	}
+
+}
 
 }
 

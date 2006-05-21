@@ -247,8 +247,8 @@ char const * HXml::convert ( char const * a_pcData, way_t a_eWay )
 	l_pcOut = f_oConvertedString.raw ( );
 	switch ( a_eWay )
 		{
-		case ( D_IN ): { l_xCD = f_oConvert->f_xIconvIn; break; }
-		case ( D_OUT ): { l_xCD = f_oConvert->f_xIconvOut; break; }
+		case ( D_IN ): { l_xCD = ( * f_oConvert ).f_xIconvIn; break; }
+		case ( D_OUT ): { l_xCD = ( * f_oConvert ).f_xIconvOut; break; }
 		default :
 			{
 			M_THROW ( _ ( "unknown convertion way" ), a_eWay );
@@ -356,8 +356,8 @@ void HXml::init ( char const * a_pcFileName )
 		}
 	if ( ! f_poXml->f_psCharEncodingHandler )
 		M_THROW ( _ ( "cannot enable internal convertion" ), errno );
-	f_oConvert->f_xIconvIn = f_poXml->f_psCharEncodingHandler->iconv_in;
-	f_oConvert->f_xIconvOut = f_poXml->f_psCharEncodingHandler->iconv_out;
+	( * f_oConvert ).f_xIconvIn = f_poXml->f_psCharEncodingHandler->iconv_in;
+	( * f_oConvert ).f_xIconvOut = f_poXml->f_psCharEncodingHandler->iconv_out;
 	return;
 	M_EPILOG
 	}

@@ -45,6 +45,13 @@ bool verify_IBAN ( char const * );
 char const * const get_last_error ( void );
 void failure ( int, char const * const, ... ) __attribute__ ( ( __noreturn__ ) );
 
+namespace distance
+{
+
+int levenshtein ( char const * const, char const * const );
+
+}
+
 	}
 
 }
