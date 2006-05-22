@@ -48,7 +48,7 @@ void failure ( int, char const * const, ... ) __attribute__ ( ( __noreturn__ ) )
 namespace distance
 {
 
-int levenshtein ( char const * const, char const * const );
+int levenshtein_damerau ( char const * const, char const * const, bool = true );
 
 }
 

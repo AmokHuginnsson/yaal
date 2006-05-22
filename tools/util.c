@@ -359,12 +359,16 @@ int min3 ( int a, int b, int c )
 		ret = b;
 	return ( ret );
 	}
+int min ( int a, int b )
+	{
+	return ( a < b ? a : b );
+	}
 }
 
 namespace distance
 {
 
-int levenshtein ( char const * const a_pcOne, char const * const a_pcTwo )
+int levenshtein_damerau ( char const * const a_pcOne, char const * const a_pcTwo, bool a_bDamerau )
 	{
 	int l_iCost = 0;
 	int l_iIndexOne = 0, l_iIndexTwo = 0;
@@ -400,6 +404,10 @@ int levenshtein ( char const * const a_pcOne, char const * const a_pcTwo )
 					l_ppiDistanceMatrix [ l_iIndexOne ] [ l_iIndexTwo + 1 ] + 1,
 					l_ppiDistanceMatrix [ l_iIndexOne + 1 ] [ l_iIndexTwo ] + 1,
 					l_ppiDistanceMatrix [ l_iIndexOne ] [ l_iIndexTwo ] + l_iCost );
+			if ( a_bDamerau && ( l_iIndexOne > 0 ) && ( l_iIndexTwo > 0 )
+					&& ( a_pcOne [ l_iIndexOne - 1 ] == a_pcTwo [ l_iIndexTwo ] )
+					&& ( a_pcOne [ l_iIndexOne ] == a_pcTwo [ l_iIndexTwo - 1 ] ) )
+				l_ppiDistanceMatrix [ l_iIndexOne + 1 ] [ l_iIndexTwo + 1 ] = min ( l_ppiDistanceMatrix [ l_iIndexOne + 1 ] [ l_iIndexTwo + 1 ], l_ppiDistanceMatrix [ l_iIndexOne - 1 ] [ l_iIndexTwo - 1 ] + l_iCost );
 			}
 		}
 	return ( l_ppiDistanceMatrix [ l_iLengthOne ] [ l_iLengthTwo ] );
