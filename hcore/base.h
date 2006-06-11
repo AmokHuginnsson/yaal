@@ -52,6 +52,24 @@ template < > struct static_assert_failure < true > { enum { value = 1 }; };
 #endif /* not NDEBUG */
 
 template < typename tType >
+tType min ( tType left, tType right )
+	{
+	return ( left < right ? left : right );
+	}
+
+template < typename tType >
+tType max ( tType left, tType right )
+	{
+	return ( left >= right ? left : right );
+	}
+
+template < typename tType >
+tType abs ( tType val )
+	{
+	return ( val >= 0 ? val : - val );
+	}
+
+template < typename tType >
 inline tType const operator | ( tType const & left,
 		tType const & right )
 	{
