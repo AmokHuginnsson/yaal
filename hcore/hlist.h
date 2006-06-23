@@ -87,6 +87,7 @@ template < typename tType >
 class HList : public OListBits
 	{
 public:
+	/*{*/
 	typedef enum
 		{
 		D_UNSORTED,
@@ -98,45 +99,10 @@ public:
 		D_SEARCH_AFTER_ORDER,
 		D_SEARCH_AFTER_NUMBER
 		} search_after_t;
+	/*}*/
+	class HIterator;
 protected:
-	class HElement
-		{
-	protected:
-		/*{*/
-		HElement * f_poPrevious;
-		/****************************************/
-		/* here we have the most important part */
-		/*           \      |     /             */
-		/**/          tType f_tObject;        /**//**  The Object itself  **/
-		/*           /      |     \             */
-		/****************************************/
-		HElement * f_poNext;
-		int f_iNumber;				/* serial number */
-		int long f_lHits;			/* how many times element's object was accessed */
-		/*}*/
-	public:
-		/*{*/
-		inline tType & get_object ( void ) /* this is special get used for  */
-			{                                /* all derived classes (f.e. in  */
-			return ( f_tObject );            /* compare methods)              */
-			}                                /* this get does not modify hits */
-		/*}*/
-	protected:
-		/*{*/
-		HElement ( HElement *, int );
-		virtual ~HElement ();
-		void put ( tType );
-		tType& get ( void );
-		/*}*/
-	private:
-		/*{*/
-		HElement ( HElement const & );
-		HElement & operator = ( HElement const & );
-		/*}*/
-		friend class HList< tType >;
-		};
-private:
-protected:
+	class HElement;
 	/*{*/
 	int f_iQuantity;					/* how many elements this list contains */
 	int f_iHighestNumber;			/* serial number of last added element */
@@ -156,6 +122,8 @@ public:
 	virtual ~HList ( void );
 	HList ( HList const & );
 	HList & operator = ( HList const & );
+	HIterator begin ( void );
+	HIterator end ( void );
 	virtual void flush ( void );
 	virtual int quantity ( void );
 	virtual tType & add_element ( tType * = NULL ); /* adds new element at
@@ -202,6 +170,72 @@ protected:
 	virtual bool is_above_n ( HElement *, HElement * );
 	virtual bool is_above_c ( HElement *, HElement * );
 	virtual void sort ( void );
+	/*}*/
+	};
+
+template < typename tType >
+class HList < tType >::HElement
+	{
+protected:
+	/*{*/
+	HElement * f_poPrevious;
+	/****************************************/
+	/* here we have the most important part */
+	/*           \      |     /             */
+	/**/          tType f_tObject;        /**//**  The Object itself  **/
+	/*           /      |     \             */
+	/****************************************/
+	HElement * f_poNext;
+	int f_iNumber;				/* serial number */
+	int long f_lHits;			/* how many times element's object was accessed */
+	/*}*/
+public:
+	/*{*/
+	inline tType & get_object ( void ) /* this is special get used for  */
+		{                                /* all derived classes (f.e. in  */
+		return ( f_tObject );            /* compare methods)              */
+		}                                /* this get does not modify hits */
+	/*}*/
+protected:
+	/*{*/
+	HElement ( HElement *, int );
+	virtual ~HElement ();
+	void put ( tType );
+	tType& get ( void );
+	/*}*/
+private:
+	/*{*/
+	HElement ( HElement const & );
+	HElement & operator = ( HElement const & );
+	/*}*/
+	friend class HList< tType >;
+	};
+
+template < typename tType >
+class HList < tType >::HIterator
+	{
+protected:
+	/*{*/
+	HElement * f_poCurrent;
+	/*}*/
+public:
+	/*{*/
+	HIterator ( void );
+	HIterator ( HIterator const & );
+	HIterator & operator ++ ( void );
+	HIterator const operator ++ ( int );
+	HIterator & operator -- ( void );
+	HIterator const operator -- ( int );
+	HIterator & operator = ( HIterator const & );
+	bool operator == ( HIterator const & ) const;
+	bool operator != ( HIterator const & ) const;
+	tType & operator * ( void );
+	tType * operator -> ( void );
+	/*}*/
+protected:
+	/*{*/
+	friend class HList < tType >;
+	explicit HIterator ( HElement * const );
 	/*}*/
 	};
 
@@ -261,6 +295,119 @@ tType & HList< tType >::HElement::get ( void )
 	M_EPILOG
 	}
 
+//========================== Iterator ========================================
+
+template < typename tType >
+HList< tType >::HIterator::HIterator ( void ) : f_poCurrent ( NULL )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+template < typename tType >
+HList< tType >::HIterator::HIterator ( HIterator const & a_roIterator ) : f_poCurrent ( NULL )
+	{
+	M_PROLOG
+	operator = ( a_roIterator );
+	return;
+	M_EPILOG
+	}
+
+template < typename tType >
+HList< tType >::HIterator::HIterator ( HElement * const a_poElement ) : f_poCurrent ( a_poElement )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+template < typename tType >
+typename HList< tType >::HIterator & HList< tType >::HIterator::operator = ( HIterator const & a_roIterator )
+	{
+	M_PROLOG
+	if ( & a_roIterator != this )
+		f_poCurrent = a_roIterator.f_poCurrent;
+	return ( * this );
+	M_EPILOG
+	}
+
+template < typename tType >
+typename HList< tType >::HIterator & HList< tType >::HIterator::operator ++ ( void )
+	{
+	M_PROLOG
+	if ( f_poCurrent )
+		{
+		f_poCurrent = f_poCurrent->f_poNext;
+		if ( f_poCurrent == f_poHook )
+			f_poCurrent = NULL;
+		}
+	return ( * this );
+	M_EPILOG
+	}
+
+template < typename tType >
+typename HList< tType >::HIterator const HList< tType >::HIterator::operator ++ ( int )
+	{
+	M_PROLOG
+	HIterator l_oIterator ( * this );
+	++ ( * this );
+	return ( l_oIterator );
+	M_EPILOG
+	}
+
+template < typename tType >
+typename HList< tType >::HIterator & HList< tType >::HIterator::operator -- ( void )
+	{
+	M_PROLOG
+	if ( f_poCurrent )
+		{
+		f_poCurrent = f_poCurrent->f_poPrevious;
+		if ( f_poCurrent == f_poHook->f_poPrevious )
+			f_poCurrent = NULL;
+		}
+	return ( * this );
+	M_EPILOG
+	}
+
+template < typename tType >
+typename HList< tType >::HIterator const HList< tType >::HIterator::operator -- ( int )
+	{
+	M_PROLOG
+	HIterator l_oIterator ( * this );
+	-- ( * this );
+	return ( l_oIterator );
+	M_EPILOG
+	}
+
+template < typename tType >
+bool HList< tType >::HIterator::operator == ( HIterator const & a_roIterator ) const
+	{
+	M_PROLOG
+	return ( f_poCurrent == a_roIterator.f_poCurrent );
+	M_EPILOG
+	}
+
+template < typename tType >
+bool HList< tType >::HIterator::operator != ( HIterator const & a_roIterator ) const
+	{
+	M_PROLOG
+	return ( f_poCurrent != a_roIterator.f_poCurrent );
+	M_EPILOG
+	}
+
+template < typename tType >
+tType & HList< tType >::HIterator::operator * ( void )
+	{
+	return ( f_poCurrent->get ( ) );
+	}
+
+template < typename tType >
+tType * HList< tType >::HIterator::operator -> ( void )
+	{
+	return ( & f_poCurrent->get ( ) );
+	}
+
 //============================================================================
 
 template < typename tType >
@@ -297,6 +444,18 @@ HList< tType >::HList ( HList < tType > const & a_roList )
 	( * this ) = a_roList;
 	return;
 	M_EPILOG
+	}
+
+template < typename tType >
+typename HList< tType >::HIterator HList< tType >::begin ( void )
+	{
+	return ( HIterator ( f_poHook ) );
+	}
+
+template < typename tType >
+typename HList< tType >::HIterator HList< tType >::end ( void )
+	{
+	return ( HIterator ( ) );
 	}
 
 template < typename tType >

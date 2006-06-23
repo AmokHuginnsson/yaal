@@ -33,11 +33,15 @@
 -i"/usr/include/c++/3.4.5"
 -i"/usr/include/c++/3.4.5/i486-linux"
 -i"/usr/include/c++/3.4.5/i686-pld-linux"
+-i"/usr/include/c++/4.1.2/i686-pld-linux"
 -i"/usr/lib/gcc/i686-pld-linux/3.4.5"
 -i"/usr/lib/gcc/i686-pld-linux/3.4.5/include"
 -i"/usr/lib/gcc/i686-pld-linux/4.0.0"
 -i"/usr/lib/gcc/i686-pld-linux/4.0.0/include"
+-i"/usr/lib/gcc/i686-pld-linux/4.1.2"
+-i"/usr/lib/gcc/i686-pld-linux/4.1.2/include"
 -i"/usr/include/c++/4.0.0"
+-i"/usr/include/c++/4.1.2"
 -i"/usr/include"
 -i"/usr/local/include"
 -i"/usr/include/linux"
@@ -54,6 +58,7 @@
 +rw(restrict)
 
 /* Disabling warrnings for libraries */
+-elib(18)		/* Symbol 'symbol' redeclared (basic) conflicts with */
 -elib(39)		/* Redefinition of symbol 'symbol' conflicts with line 'line' */
 -elib(114)	/* Inconsistent structure declaration for tag 'tag' */
 -elib(537)	/* Repeated include file 'file' */
@@ -104,6 +109,8 @@
 -e743		/* Negative character constant */
 -e749		/* local enumeration constant 'constant' not referenced */
 -e750		/* local macro 'macro' not referenced */
+-e751		/* local typedef 'typedef' not referenced */
+-e753		/* local template 'template' not referenced */
 -e754		/* local structure member 'member' not referenced */
 -e755		/* global macro 'macro' not referenced */
 -e757		/* global declarator 'declarator' not referenced */
