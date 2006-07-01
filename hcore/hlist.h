@@ -222,10 +222,46 @@ public:
 	/*{*/
 	HIterator ( void );
 	HIterator ( HIterator const & );
-	HIterator & operator ++ ( void );
-	HIterator const operator ++ ( int );
-	HIterator & operator -- ( void );
-	HIterator const operator -- ( int );
+	HIterator & operator ++ ( void )
+		{
+		M_PROLOG
+		if ( f_poCurrent )
+			{
+			f_poCurrent = f_poCurrent->f_poNext;
+			if ( f_poCurrent == f_poHook )
+				f_poCurrent = NULL;
+			}
+		return ( * this );
+		M_EPILOG
+		}
+	HIterator const operator ++ ( int )
+		{
+		M_PROLOG
+		HIterator l_oIterator ( * this );
+		++ ( * this );
+		return ( l_oIterator );
+		M_EPILOG
+		}
+	HIterator & operator -- ( void )
+		{
+		M_PROLOG
+		if ( f_poCurrent )
+			{
+			f_poCurrent = f_poCurrent->f_poPrevious;
+			if ( f_poCurrent == f_poHook->f_poPrevious )
+				f_poCurrent = NULL;
+			}
+		return ( * this );
+		M_EPILOG
+		}
+	HIterator const operator -- ( int )
+		{
+		M_PROLOG
+		HIterator l_oIterator ( * this );
+		-- ( * this );
+		return ( l_oIterator );
+		M_EPILOG
+		}
 	HIterator & operator = ( HIterator const & );
 	bool operator == ( HIterator const & ) const;
 	bool operator != ( HIterator const & ) const;
@@ -332,53 +368,19 @@ typename HList< tType >::HIterator & HList< tType >::HIterator::operator = ( HIt
 	M_EPILOG
 	}
 
+/*
 template < typename tType >
 typename HList< tType >::HIterator & HList< tType >::HIterator::operator ++ ( void )
-	{
-	M_PROLOG
-	if ( f_poCurrent )
-		{
-		f_poCurrent = f_poCurrent->f_poNext;
-		if ( f_poCurrent == f_poHook )
-			f_poCurrent = NULL;
-		}
-	return ( * this );
-	M_EPILOG
-	}
 
 template < typename tType >
 typename HList< tType >::HIterator const HList< tType >::HIterator::operator ++ ( int )
-	{
-	M_PROLOG
-	HIterator l_oIterator ( * this );
-	++ ( * this );
-	return ( l_oIterator );
-	M_EPILOG
-	}
 
 template < typename tType >
 typename HList< tType >::HIterator & HList< tType >::HIterator::operator -- ( void )
-	{
-	M_PROLOG
-	if ( f_poCurrent )
-		{
-		f_poCurrent = f_poCurrent->f_poPrevious;
-		if ( f_poCurrent == f_poHook->f_poPrevious )
-			f_poCurrent = NULL;
-		}
-	return ( * this );
-	M_EPILOG
-	}
 
 template < typename tType >
 typename HList< tType >::HIterator const HList< tType >::HIterator::operator -- ( int )
-	{
-	M_PROLOG
-	HIterator l_oIterator ( * this );
-	-- ( * this );
-	return ( l_oIterator );
-	M_EPILOG
-	}
+*/
 
 template < typename tType >
 bool HList< tType >::HIterator::operator == ( HIterator const & a_roIterator ) const
