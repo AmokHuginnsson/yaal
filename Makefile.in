@@ -148,7 +148,7 @@ endef
 
 define MAKE_DIR
 $(1):
-	@/bin/mkdir -p $(1)
+	@umask 022;/bin/mkdir -p $(1)
 endef
 
 define BUILD_TARGET
@@ -243,7 +243,7 @@ install: all
 	@./aux/msh
 
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
-	@cd $(DIR_ROOT); echo -n "Making headers ... "; \
+	@umask 022;cd $(DIR_ROOT); echo -n "Making headers ... "; \
 	for FILE in $(HDRS); do \
 		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); \
 		printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) }; \
