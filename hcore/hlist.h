@@ -124,6 +124,8 @@ public:
 	HList & operator = ( HList const & );
 	HIterator begin ( void );
 	HIterator end ( void );
+	HIterator rend ( void );
+	HIterator rbegin ( void );
 	virtual void flush ( void );
 	virtual int quantity ( void );
 	virtual tType & add_element ( tType * = NULL ); /* adds new element at
@@ -209,6 +211,7 @@ private:
 	HElement & operator = ( HElement const & );
 	/*}*/
 	friend class HList< tType >;
+	friend class HList< tType >::HIterator;
 	};
 
 template < typename tType >
@@ -216,6 +219,7 @@ class HList < tType >::HIterator
 	{
 protected:
 	/*{*/
+	HElement * f_poHook;
 	HElement * f_poCurrent;
 	/*}*/
 public:
@@ -271,7 +275,7 @@ public:
 protected:
 	/*{*/
 	friend class HList < tType >;
-	explicit HIterator ( HElement * const );
+	explicit HIterator ( HElement * const, HElement * const );
 	/*}*/
 	};
 
@@ -334,7 +338,7 @@ tType & HList< tType >::HElement::get ( void )
 //========================== Iterator ========================================
 
 template < typename tType >
-HList< tType >::HIterator::HIterator ( void ) : f_poCurrent ( NULL )
+HList< tType >::HIterator::HIterator ( void ) : f_poHook ( NULL ), f_poCurrent ( NULL )
 	{
 	M_PROLOG
 	return;
@@ -342,7 +346,7 @@ HList< tType >::HIterator::HIterator ( void ) : f_poCurrent ( NULL )
 	}
 
 template < typename tType >
-HList< tType >::HIterator::HIterator ( HIterator const & a_roIterator ) : f_poCurrent ( NULL )
+HList< tType >::HIterator::HIterator ( HIterator const & a_roIterator ) : f_poHook ( NULL ), f_poCurrent ( NULL )
 	{
 	M_PROLOG
 	operator = ( a_roIterator );
@@ -351,7 +355,9 @@ HList< tType >::HIterator::HIterator ( HIterator const & a_roIterator ) : f_poCu
 	}
 
 template < typename tType >
-HList< tType >::HIterator::HIterator ( HElement * const a_poElement ) : f_poCurrent ( a_poElement )
+HList< tType >::HIterator::HIterator ( HElement * const a_poHook,
+		HElement * const a_poElement ) : f_poHook ( a_poHook ),
+	f_poCurrent ( a_poElement )
 	{
 	M_PROLOG
 	return;
@@ -451,13 +457,25 @@ HList< tType >::HList ( HList < tType > const & a_roList )
 template < typename tType >
 typename HList< tType >::HIterator HList< tType >::begin ( void )
 	{
-	return ( HIterator ( f_poHook ) );
+	return ( HIterator ( f_poHook, f_poHook ) );
 	}
 
 template < typename tType >
 typename HList< tType >::HIterator HList< tType >::end ( void )
 	{
-	return ( HIterator ( ) );
+	return ( HIterator ( f_poHook, NULL ) );
+	}
+
+template < typename tType >
+typename HList< tType >::HIterator HList< tType >::rend ( void )
+	{
+	return ( HIterator ( f_poHook, f_poHook->f_poPrevious ) );
+	}
+
+template < typename tType >
+typename HList< tType >::HIterator HList< tType >::rbegin ( void )
+	{
+	return ( HIterator ( f_poHook, NULL ) );
 	}
 
 template < typename tType >
@@ -600,7 +618,6 @@ bool const operator > ( tType const &, tType const & )
 	return ( false );
 	}
 #endif /* not __STDHAPI_BUILD__ */
-
 
 template < typename tType >
 bool HList< tType >::is_above_c ( HElement * a_poLeft, HElement * a_poRight )
