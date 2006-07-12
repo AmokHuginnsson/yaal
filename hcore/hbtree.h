@@ -160,7 +160,8 @@ void HBTree < tType >::HNode::insert_rebalance_red_uncle ( void )
 		{
 		HNode * l_poGrandpa = f_poParent->f_poParent;
 		if ( l_poGrandpa && l_poGrandpa->f_poLeft && l_poGrandpa->f_poRight
-				&& ( l_poGrandpa->f_poLeft->f_eColor == l_poGrandpa->f_poRight->f_eColor == D_RED ) )
+				&& ( l_poGrandpa->f_poLeft->f_eColor == D_RED )
+				&& ( l_poGrandpa->f_poRight->f_eColor == D_RED ) )
 			{
 			l_poGrandpa->f_poLeft->f_eColor = D_BLACK;
 			l_poGrandpa->f_poRight->f_eColor = D_BLACK;
