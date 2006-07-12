@@ -44,32 +44,49 @@ class HBTree
 	{
 protected:
 	/*{*/
+	class HNode;
+	struct ONodePtr
+		{
+		HNode * f_poNode;
+		bool f_bExists;
+		ONodePtr ( void ) : f_poNode ( NULL ), f_bExists ( false ) { }
+		};
 	class HNode
 		{
+		typedef enum
+			{
+			D_RED,
+			D_BLACK
+			} color_t;
 	protected:
 		/*{*/
+		color_t f_eColor;
 		HNode * f_poParent;
 		HNode * f_poLeft;
 		HNode * f_poRight;
 		tType f_tKey;
 		/*}*/
 	public:
-		/*{*/
-		HNode ( void );
-		virtual ~HNode ( void );
-		/*}*/
 	protected:
 		/*{*/
+		HNode ( HNode * const, tType const & );
+		virtual ~HNode ( void );
+		void bud ( tType const &, HNode * const & );
+		ONodePtr find ( tType const & );
+		void insert_rebalance_red_uncle ( void );
 		/*}*/
 	private:
 		/*{*/
 		HNode ( HNode const & );
 		HNode & operator = ( HNode const & );
 		/*}*/
+		friend class HBTree < tType >;
 		};
+	HNode * f_poRoot;
 	/*}*/
 public:
 	/*{*/
+	HBTree ( void );
 	virtual ~HBTree ( void );
 	void insert ( tType const & );
 	void remove ( tType const & );
@@ -81,8 +98,114 @@ protected:
 	};
 
 template < typename tType >
-HBTree < tType >::HNode::HNode ( void )
-	: f_poParent ( NULL ), f_poLeft ( NULL ), f_poRight ( NULL ), f_tKey ( )
+HBTree < tType >::HNode::HNode ( HNode * const a_poParent, tType const & a_tKey )
+	: f_eColor ( D_BLACK ), f_poParent ( a_poParent ),
+	f_poLeft ( NULL ), f_poRight ( NULL ), f_tKey ( a_tKey )
+	{
+	return;
+	}
+
+template < typename tType >
+HBTree < tType >::HNode::~HNode ( void )
+	{
+	if ( f_poLeft )
+		delete f_poLeft;
+	f_poLeft = NULL;
+	if ( f_poRight )
+		delete f_poRight;
+	f_poRight = NULL;
+	return;
+	}
+
+template < typename tType >
+typename HBTree < tType >::ONodePtr HBTree < tType >::HNode::find ( tType const & a_tKey )
+	{
+	ONodePtr l_oNodePtr;
+	l_oNodePtr.f_poNode = this;
+	if ( a_tKey < f_tKey )
+		{
+		if ( f_poLeft )
+			return ( f_poLeft->find ( a_tKey ) );
+		}
+	else if ( a_tKey > f_tKey )
+		{
+		if ( f_poRight )
+			return ( f_poRight->find ( a_tKey ) );
+		}
+	else
+		l_oNodePtr.f_bExists = true;
+	return ( l_oNodePtr );
+	}
+
+template < typename tType >
+void HBTree < tType >::HNode::bud ( tType const & a_tKey, HNode * const & a_rpoRoot )
+	{
+	HNode * l_poNode = new HNode ( this, a_tKey );
+	if ( a_tKey < f_tKey )
+		f_poLeft = l_poNode;
+	else
+		f_poRight = l_poNode;
+	l_poNode->f_eColor = D_RED;
+	if ( f_eColor == D_RED )
+		{
+		l_poNode->insert_rebalance_red_uncle ( );
+		}
+	return;
+	}
+
+template < typename tType >
+void HBTree < tType >::HNode::insert_rebalance_red_uncle ( void )
+	{
+	if ( f_poParent )
+		{
+		HNode * l_poGrandpa = f_poParent->f_poParent;
+		if ( l_poGrandpa && l_poGrandpa->f_poLeft && l_poGrandpa->f_poRight
+				&& ( l_poGrandpa->f_poLeft->f_eColor == l_poGrandpa->f_poRight->f_eColor == D_RED ) )
+			{
+			l_poGrandpa->f_poLeft->f_eColor = D_BLACK;
+			l_poGrandpa->f_poRight->f_eColor = D_BLACK;
+			l_poGrandpa->f_eColor = D_RED;
+			l_poGrandpa->insert_rebalance_red_uncle ( );
+			}
+		}
+	return;
+	}
+
+template < typename tType >
+HBTree < tType >::HBTree ( void ) : f_poRoot ( NULL )
+	{
+	return;
+	}
+
+template < typename tType >
+HBTree < tType >::~HBTree ( void )
+	{
+	if ( f_poRoot )
+		delete f_poRoot;
+	f_poRoot = NULL;
+	return;
+	}
+
+template < typename tType >
+void HBTree < tType >::insert ( tType const & a_tKey )
+	{
+	if ( f_poRoot )
+		{
+		ONodePtr l_oNode = f_poRoot->find ( a_tKey );
+		if ( l_oNode.f_bExists )
+			l_oNode.f_poNode->f_tKey = a_tKey;
+		else
+			l_oNode.f_poNode->bud ( a_tKey, f_poRoot );
+		}
+	else
+		{
+		f_poRoot = new HNode ( NULL, a_tKey );
+		}
+	return;
+	}
+
+template < typename tType >
+void HBTree < tType >::remove ( tType const & )
 	{
 	return;
 	}
