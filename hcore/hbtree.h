@@ -74,6 +74,7 @@ protected:
 		void bud ( tType const &, HNode * const & );
 		ONodePtr find ( tType const & );
 		void insert_rebalance_red_uncle ( void );
+		void insert_rebalance ( void );
 		/*}*/
 	private:
 		/*{*/
@@ -147,9 +148,14 @@ void HBTree < tType >::HNode::bud ( tType const & a_tKey, HNode * const & a_rpoR
 		f_poRight = l_poNode;
 	l_poNode->f_eColor = D_RED;
 	if ( f_eColor == D_RED )
-		{
-		l_poNode->insert_rebalance_red_uncle ( );
-		}
+		l_poNode->insert_rebalance ( );
+	return;
+	}
+
+template < typename tType >
+void HBTree < tType >::HNode::insert_rebalance ( void )
+	{
+	insert_rebalance_red_uncle ( );
 	return;
 	}
 
@@ -166,9 +172,11 @@ void HBTree < tType >::HNode::insert_rebalance_red_uncle ( void )
 			l_poGrandpa->f_poLeft->f_eColor = D_BLACK;
 			l_poGrandpa->f_poRight->f_eColor = D_BLACK;
 			l_poGrandpa->f_eColor = D_RED;
-			l_poGrandpa->insert_rebalance_red_uncle ( );
+			l_poGrandpa->insert_rebalance ( );
 			}
 		}
+	else
+		f_eColor = D_BLACK;
 	return;
 	}
 
