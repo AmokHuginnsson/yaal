@@ -74,6 +74,7 @@ protected:
 		void bud ( tType const &, HNode * const & );
 		ONodePtr find ( tType const & );
 		void insert_rebalance_red_uncle ( void );
+		void insert_rebalance_black_uncle ( HNode * );
 		void insert_rebalance ( void );
 		/*}*/
 	private:
@@ -100,7 +101,7 @@ protected:
 
 template < typename tType >
 HBTree < tType >::HNode::HNode ( HNode * const a_poParent, tType const & a_tKey )
-	: f_eColor ( D_BLACK ), f_poParent ( a_poParent ),
+	: f_eColor ( D_RED ), f_poParent ( a_poParent ),
 	f_poLeft ( NULL ), f_poRight ( NULL ), f_tKey ( a_tKey )
 	{
 	return;
@@ -146,7 +147,6 @@ void HBTree < tType >::HNode::bud ( tType const & a_tKey, HNode * const & a_rpoR
 		f_poLeft = l_poNode;
 	else
 		f_poRight = l_poNode;
-	l_poNode->f_eColor = D_RED;
 	if ( f_eColor == D_RED )
 		l_poNode->insert_rebalance ( );
 	return;
@@ -155,28 +155,45 @@ void HBTree < tType >::HNode::bud ( tType const & a_tKey, HNode * const & a_rpoR
 template < typename tType >
 void HBTree < tType >::HNode::insert_rebalance ( void )
 	{
-	insert_rebalance_red_uncle ( );
+	if ( f_poParent )
+		{
+		HNode * l_poGrandpa = f_poParent->f_poParent;
+		if ( l_poGrandpa )
+			{
+			if ( l_poGrandpa->f_poLeft && l_poGrandpa->f_poRight
+					&& ( l_poGrandpa->f_poLeft->f_eColor == D_RED )
+					&& ( l_poGrandpa->f_poRight->f_eColor == D_RED ) )
+				l_poGrandpa->insert_rebalance_red_uncle ( );
+			else
+				f_poParent->insert_rebalance_black_uncle ( this );
+			}
+		}
+	else
+		f_eColor = D_BLACK;
 	return;
 	}
 
 template < typename tType >
 void HBTree < tType >::HNode::insert_rebalance_red_uncle ( void )
 	{
-	if ( f_poParent )
+	f_poLeft->f_eColor = D_BLACK;
+	f_poRight->f_eColor = D_BLACK;
+	f_eColor = D_RED;
+	insert_rebalance ( );
+	return;
+	}
+
+template < typename tType >
+void HBTree < tType >::HNode::insert_rebalance_black_uncle ( HNode * a_poNewOne )
+	{
+	if ( ( f_poParent->f_poLeft == this ) && ( a_poNewOne == f_poRight ) )
 		{
-		HNode * l_poGrandpa = f_poParent->f_poParent;
-		if ( l_poGrandpa && l_poGrandpa->f_poLeft && l_poGrandpa->f_poRight
-				&& ( l_poGrandpa->f_poLeft->f_eColor == D_RED )
-				&& ( l_poGrandpa->f_poRight->f_eColor == D_RED ) )
-			{
-			l_poGrandpa->f_poLeft->f_eColor = D_BLACK;
-			l_poGrandpa->f_poRight->f_eColor = D_BLACK;
-			l_poGrandpa->f_eColor = D_RED;
-			l_poGrandpa->insert_rebalance ( );
-			}
+		a_poNewOne->f_poParent = f_poParent;
+		a_poNewOne->f_poLeft = this;
+		f_poParent = a_poNewOne;
+		f_poLeft = NULL;
+		f_poRight = NULL;
 		}
-	else
-		f_eColor = D_BLACK;
 	return;
 	}
 
@@ -209,6 +226,7 @@ void HBTree < tType >::insert ( tType const & a_tKey )
 	else
 		{
 		f_poRoot = new HNode ( NULL, a_tKey );
+		f_poRoot->f_eColor = HNode::D_BLACK;
 		}
 	return;
 	}
