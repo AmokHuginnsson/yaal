@@ -186,14 +186,20 @@ void HBTree < tType >::HNode::insert_rebalance_red_uncle ( void )
 template < typename tType >
 void HBTree < tType >::HNode::insert_rebalance_black_uncle ( HNode * a_poNewOne )
 	{
+	bool l_bRotation = false;
 	if ( ( f_poParent->f_poLeft == this ) && ( a_poNewOne == f_poRight ) )
+		a_poNewOne->f_poLeft = this, l_bRotation = true;
+	else if ( ( f_poParent->f_poRight == this ) && ( a_poNewOne == f_poLeft ) )
+		a_poNewOne->f_poRight = this, l_bRotation = true;
+	if ( l_bRotation )
 		{
 		a_poNewOne->f_poParent = f_poParent;
-		a_poNewOne->f_poLeft = this;
 		f_poParent = a_poNewOne;
 		f_poLeft = NULL;
 		f_poRight = NULL;
+		a_poNewOne = this;
 		}
+
 	return;
 	}
 
