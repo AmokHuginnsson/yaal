@@ -75,6 +75,8 @@ protected:
 		ONodePtr find ( tType const & );
 		void insert_rebalance_red_uncle ( void );
 		void insert_rebalance_black_uncle ( HNode * );
+		void rotate_left ( HNode * );
+		void rotate_right ( HNode * );
 		void insert_rebalance ( void );
 		/*}*/
 	private:
@@ -186,20 +188,53 @@ void HBTree < tType >::HNode::insert_rebalance_red_uncle ( void )
 template < typename tType >
 void HBTree < tType >::HNode::insert_rebalance_black_uncle ( HNode * a_poNewOne )
 	{
-	bool l_bRotation = false;
-	if ( ( f_poParent->f_poLeft == this ) && ( a_poNewOne == f_poRight ) )
-		a_poNewOne->f_poLeft = this, l_bRotation = true;
-	else if ( ( f_poParent->f_poRight == this ) && ( a_poNewOne == f_poLeft ) )
-		a_poNewOne->f_poRight = this, l_bRotation = true;
-	if ( l_bRotation )
-		{
-		a_poNewOne->f_poParent = f_poParent;
-		f_poParent = a_poNewOne;
-		f_poLeft = NULL;
-		f_poRight = NULL;
-		a_poNewOne = this;
-		}
+	if ( ( a_poNewOne == f_poRight ) && ( f_poParent->f_poLeft == this ) )
+		rotate_left ( a_poNewOne ), a_poNewOne = this;
+	else if ( ( a_poNewOne == f_poLeft ) && ( f_poParent->f_poRight == this ) )
+		rotate_right ( a_poNewOne ), a_poNewOne = this;
+	a_poNewOne->f_poParent->f_eColor = D_BLACK;
+	a_poNewOne->f_poParent->f_poParent = D_RED;
+	if ( ( a_poNewOne == a_poNewOne->f_poParent->f_poLeft )
+			&& ( a_poNewOne->f_poParent == a_poNewOne->f_poParent->f_poParent->f_poLeft ) )
+		a_poNewOne->f_poParent->f_poParent->rotate_right ( a_poNewOne->f_poParent );
+	else
+		a_poNewOne->f_poParent->f_poParent->rotate_left ( a_poNewOne->f_poParent );
+	return;
+	}
 
+template < typename tType >
+void HBTree < tType >::HNode::rotate_left ( HNode * a_poOne )
+	{
+	HNode * l_poNode1 = NULL;
+	HNode * l_poNode2 = NULL;
+	HNode * l_poNode3 = NULL;
+	if ( f_poParent )
+		f_poParent->f_poLeft = a_poOne;
+	l_poNode1 = f_poLeft;
+	l_poNode2 = a_poOne->f_poLeft;
+	l_poNode3 = a_poOne->f_poRight;
+	f_poLeft = l_poNode1;
+	f_poRight = l_poNode2;
+	a_poOne->f_poLeft = this;
+	a_poOne->f_poRight = l_poNode3;
+	return;
+	}
+
+template < typename tType >
+void HBTree < tType >::HNode::rotate_right ( HNode * a_poOne )
+	{
+	HNode * l_poNode1 = NULL;
+	HNode * l_poNode2 = NULL;
+	HNode * l_poNode3 = NULL;
+	if ( f_poParent )
+		f_poParent->f_poRight = a_poOne;
+	l_poNode1 = f_poRight;
+	l_poNode2 = a_poOne->f_poLeft;
+	l_poNode3 = a_poOne->f_poLeft;
+	f_poRight = l_poNode1;
+	f_poLeft = l_poNode2;
+	a_poOne->f_poRight = this;
+	a_poOne->f_poLeft = l_poNode3;
 	return;
 	}
 
