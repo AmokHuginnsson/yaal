@@ -29,6 +29,8 @@ Copyright:
 
 #line 31
 
+#define D_CVSID_HBTREE_H "$CVSHeader$"
+
 #include "hexception.h"
 
 namespace stdhapi
@@ -37,11 +39,20 @@ namespace stdhapi
 namespace hcore
 {
 
-#define D_CVSID_HBTREE_H "$CVSHeader$"
+extern char const * const n_ppcErrMsgHBTree [ ];
 
 template < typename tType >
 class HBTree
 	{
+public:
+	struct ERROR
+		{
+		typedef enum
+			{
+			E_OK = 0,
+			E_NON_EXISTING_KEY
+			} error_t;
+		};
 protected:
 	/*{*/
 	class HNode;
@@ -193,7 +204,7 @@ void HBTree < tType >::HNode::insert_rebalance_black_uncle ( HNode * a_poNewOne 
 	else if ( ( a_poNewOne == f_poLeft ) && ( f_poParent->f_poRight == this ) )
 		rotate_right ( a_poNewOne ), a_poNewOne = this;
 	a_poNewOne->f_poParent->f_eColor = D_BLACK;
-	a_poNewOne->f_poParent->f_poParent = D_RED;
+	a_poNewOne->f_poParent->f_poParent->f_eColor = D_RED;
 	if ( ( a_poNewOne == a_poNewOne->f_poParent->f_poLeft )
 			&& ( a_poNewOne->f_poParent == a_poNewOne->f_poParent->f_poParent->f_poLeft ) )
 		a_poNewOne->f_poParent->f_poParent->rotate_right ( a_poNewOne->f_poParent );
@@ -273,9 +284,19 @@ void HBTree < tType >::insert ( tType const & a_tKey )
 	}
 
 template < typename tType >
-void HBTree < tType >::remove ( tType const & )
+void HBTree < tType >::remove ( tType const & a_tKey )
 	{
-	return;
+	if ( f_poRoot )
+		{
+		ONodePtr l_oNode = f_poRoot->find ( a_tKey );
+		if ( l_oNode.f_bExists )
+			{
+			l_oNode.f_poNode->f_tKey = a_tKey;
+			return;
+			}
+		}
+	M_THROW ( n_ppcErrMsgHBTree [ HBTree::E_NON_EXISTING_KEY ],
+			static_cast < int > ( HBTree::E_NON_EXISTING_KEY ) );
 	}
 
 }

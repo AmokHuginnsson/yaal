@@ -29,6 +29,8 @@ Copyright:
 
 #line 31 "hlist.h"
 
+#define D_CVSID_HLIST_H "$CVSHeader$"
+
 #include "./hcore/hexception.h"
 
 namespace stdhapi
@@ -36,8 +38,6 @@ namespace stdhapi
 
 namespace hcore
 {
-
-#define D_CVSID_HLIST_H "$CVSHeader$"
 
 extern char const * const g_ppcErrMsgHList [ ];
 

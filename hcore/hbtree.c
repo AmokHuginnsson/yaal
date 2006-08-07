@@ -40,9 +40,7 @@ namespace hcore
 char const * const g_ppcErrMsgHBTree [ 4 ] =
 	{
 	_ ( "ok" ),
-/* HBTree::ERROR::E_BADSIZE */		_ ( "bad size" ),
-/* HBTree::ERROR::E_NOMEM */			_ ( "can not alloc memory with new" ),
-/* HBTree::ERROR::E_BADINDEX */		_ ( "index does not fit into array" )
+/* HBTree::E_NON_EXISTING_KEY */			_ ( "key does not exists" ),
 	};
 
 }

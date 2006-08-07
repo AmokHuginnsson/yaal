@@ -29,6 +29,8 @@ Copyright:
 
 #line 31
 
+#define D_CVSID_HTREE_H "$CVSHeader$"
+
 #include "hexception.h"
 #include "hlist.h"
 
@@ -37,8 +39,6 @@ namespace stdhapi
 
 namespace hcore
 {
-
-#define D_CVSID_HTREE_H "$CVSHeader$"
 
 template < typename tttType >
 class HTree;
