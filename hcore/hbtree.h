@@ -53,6 +53,7 @@ public:
 			E_NON_EXISTING_KEY
 			} error_t;
 		};
+	class HIterator;
 protected:
 	/*{*/
 	class HNode;
@@ -83,7 +84,6 @@ protected:
 		HNode ( HNode * const, tType const & );
 		virtual ~HNode ( void );
 		void bud ( tType const &, HNode * const & );
-		ONodePtr find ( tType const & );
 		void insert_rebalance_red_uncle ( void );
 		void insert_rebalance_black_uncle ( HNode * );
 		void rotate_left ( HNode * );
@@ -105,10 +105,64 @@ public:
 	virtual ~HBTree ( void );
 	void insert ( tType const & );
 	void remove ( tType const & );
-	void find ( tType const & );
+	HIterator find ( tType const & );
 	/*}*/
 protected:
 	/*{*/
+	ONodePtr find_node ( tType const & );
+	/*}*/
+	};
+
+template < typename tType >
+class HBTree < tType >::HIterator
+	{
+protected:
+	/*{*/
+	HNode * f_poHook;
+	HNode * f_poCurrent;
+	/*}*/
+public:
+	/*{*/
+	HIterator ( void );
+	HIterator ( HIterator const & );
+	HIterator & operator ++ ( void )
+		{
+		M_PROLOG
+		return ( * this );
+		M_EPILOG
+		}
+	HIterator const operator ++ ( int )
+		{
+		M_PROLOG
+		HIterator l_oIterator ( * this );
+		++ ( * this );
+		return ( l_oIterator );
+		M_EPILOG
+		}
+	HIterator & operator -- ( void )
+		{
+		M_PROLOG
+		return ( * this );
+		M_EPILOG
+		}
+	HIterator const operator -- ( int )
+		{
+		M_PROLOG
+		HIterator l_oIterator ( * this );
+		-- ( * this );
+		return ( l_oIterator );
+		M_EPILOG
+		}
+	HIterator & operator = ( HIterator const & );
+	bool operator == ( HIterator const & ) const;
+	bool operator != ( HIterator const & ) const;
+	tType & operator * ( void );
+	tType * operator -> ( void );
+	/*}*/
+protected:
+	/*{*/
+	friend class HBTree < tType >;
+	explicit HIterator ( HNode * const, HNode * const );
 	/*}*/
 	};
 
@@ -130,26 +184,6 @@ HBTree < tType >::HNode::~HNode ( void )
 		delete f_poRight;
 	f_poRight = NULL;
 	return;
-	}
-
-template < typename tType >
-typename HBTree < tType >::ONodePtr HBTree < tType >::HNode::find ( tType const & a_tKey )
-	{
-	ONodePtr l_oNodePtr;
-	l_oNodePtr.f_poNode = this;
-	if ( a_tKey < f_tKey )
-		{
-		if ( f_poLeft )
-			return ( f_poLeft->find ( a_tKey ) );
-		}
-	else if ( a_tKey > f_tKey )
-		{
-		if ( f_poRight )
-			return ( f_poRight->find ( a_tKey ) );
-		}
-	else
-		l_oNodePtr.f_bExists = true;
-	return ( l_oNodePtr );
 	}
 
 template < typename tType >
@@ -269,7 +303,7 @@ void HBTree < tType >::insert ( tType const & a_tKey )
 	{
 	if ( f_poRoot )
 		{
-		ONodePtr l_oNode = f_poRoot->find ( a_tKey );
+		ONodePtr l_oNode = find_node ( a_tKey );
 		if ( l_oNode.f_bExists )
 			l_oNode.f_poNode->f_tKey = a_tKey;
 		else
@@ -288,7 +322,7 @@ void HBTree < tType >::remove ( tType const & a_tKey )
 	{
 	if ( f_poRoot )
 		{
-		ONodePtr l_oNode = f_poRoot->find ( a_tKey );
+		ONodePtr l_oNode = find_node ( a_tKey );
 		if ( l_oNode.f_bExists )
 			{
 			l_oNode.f_poNode->f_tKey = a_tKey;
@@ -298,6 +332,37 @@ void HBTree < tType >::remove ( tType const & a_tKey )
 	M_THROW ( n_ppcErrMsgHBTree [ HBTree::E_NON_EXISTING_KEY ],
 			static_cast < int > ( HBTree::E_NON_EXISTING_KEY ) );
 	}
+
+template < typename tType >
+typename HBTree < tType >::ONodePtr HBTree < tType >::find_node ( tType const & a_tKey )
+	{
+	ONodePtr l_oNodePtr;
+	if ( f_poRoot )
+		{
+		l_oNodePtr.f_poNode = f_poRoot;
+		while ( ! l_oNodePtr.f_bExists )
+			{
+			if ( a_tKey < l_oNodePtr.f_poNode->f_tKey )
+				{
+				if ( l_oNodePtr.f_poNode->f_poLeft )
+					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poLeft;
+				else
+					break;
+				}
+			else if ( a_tKey > l_oNodePtr.f_poNode->f_tKey )
+				{
+				if ( l_oNodePtr.f_poNode->f_poRight )
+					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poRight;
+				else
+					break;
+				}
+			else
+				l_oNodePtr.f_bExists = true;
+			}
+		}
+	return ( l_oNodePtr );
+	}
+
 
 }
 
