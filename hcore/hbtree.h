@@ -83,7 +83,7 @@ protected:
 		/*{*/
 		HNode ( HNode * const, tType const & );
 		virtual ~HNode ( void );
-		void bud ( tType const &, HNode * const & );
+		void bud /* bud means "p±czek" */ ( tType const &, HNode * const & );
 		void insert_rebalance_red_uncle ( void );
 		void insert_rebalance_black_uncle ( HNode * );
 		void rotate_left ( HNode * );
@@ -94,6 +94,7 @@ protected:
 		/*{*/
 		HNode ( HNode const & );
 		HNode & operator = ( HNode const & );
+		void set_child ( HNode *, HNode * );
 		/*}*/
 		friend class HBTree < tType >;
 		};
@@ -110,6 +111,7 @@ public:
 protected:
 	/*{*/
 	ONodePtr find_node ( tType const & );
+	void swap ( HNode *, HNode * );
 	/*}*/
 	};
 
@@ -187,7 +189,18 @@ HBTree < tType >::HNode::~HNode ( void )
 	}
 
 template < typename tType >
-void HBTree < tType >::HNode::bud ( tType const & a_tKey, HNode * const & a_rpoRoot )
+void HBTree < tType >::HNode::set_child ( HNode * a_poWhich, HNode * a_poNew )
+	{
+	M_ASSERT ( ( a_poWhich == f_poLeft ) || ( a_poWhich == f_poRight ) );
+	if ( a_poWhich == f_poLeft )
+		f_poLeft = a_poNew;
+	else
+		f_poRight = a_poNew;
+	return;
+	}
+
+template < typename tType >
+void HBTree < tType >::HNode::bud /* bud means "p±czek" */ ( tType const & a_tKey, HNode * const & a_rpoRoot )
 	{
 	HNode * l_poNode = new HNode ( this, a_tKey );
 	if ( a_tKey < f_tKey )
@@ -325,7 +338,36 @@ void HBTree < tType >::remove ( tType const & a_tKey )
 		ONodePtr l_oNode = find_node ( a_tKey );
 		if ( l_oNode.f_bExists )
 			{
-			l_oNode.f_poNode->f_tKey = a_tKey;
+			if ( l_oNode.f_poNode->f_poLeft && l_oNode.f_poNode->f_poRight ) /* both children exists */
+				{
+				
+				}
+			else if ( l_oNode.f_poNode->f_poLeft )
+				{
+				l_oNode.f_poNode->f_poLeft->f_poParent = l_oNode.f_poNode->f_poParent;
+				if ( l_oNode.f_poNode->f_poParent )
+					l_oNode.f_poNode->f_poParent->set_child ( l_oNode.f_poNode, l_oNode.f_poNode->f_poLeft );
+				else
+					f_poRoot = l_oNode.f_poNode->f_poLeft;
+				}
+			else if ( l_oNode.f_poNode->f_poRight )
+				{
+				l_oNode.f_poNode->f_poRight->f_poParent = l_oNode.f_poNode->f_poParent;
+				if ( l_oNode.f_poNode->f_poParent )
+					l_oNode.f_poNode->f_poParent->set_child ( l_oNode.f_poNode, l_oNode.f_poNode->f_poRight );
+				else
+					f_poRoot = l_oNode.f_poNode->f_poRight;
+				}
+			if ( l_oNode.f_poNode->f_poLeft || l_oNode.f_poNode->f_poRight ) /* one of childrens exists */
+				{
+				l_oNode.f_poNode->f_poParent = NULL;
+				l_oNode.f_poNode->f_poLeft = NULL;
+				l_oNode.f_poNode->f_poRight = NULL;
+				}
+			M_ASSERT ( ! ( l_oNode.f_poNode->f_poLeft || l_oNode.f_poNode->f_poRight ) );
+			if ( l_oNode.f_poNode->f_poParent )
+				l_oNode.f_poNode->f_poParent->set_child ( l_oNode.f_poNode, NULL );
+			delete l_oNode.f_poNode;
 			return;
 			}
 		}
@@ -363,6 +405,73 @@ typename HBTree < tType >::ONodePtr HBTree < tType >::find_node ( tType const & 
 	return ( l_oNodePtr );
 	}
 
+template < typename tType >
+void HBTree < tType >::swap ( HNode * a_poFirst, HNode * a_poSecond )
+	{
+	M_ASSERT ( a_poFirst && a_poSecond );
+	M_ASSERT ( a_poFirst != a_poSecond );
+	if ( a_poFirst == f_poRoot )
+		f_poRoot = a_poSecond;
+	else if ( a_poSecond == f_poRoot )
+		f_poRoot = a_poFirst;
+	HNode * l_poFirstParent = a_poFirst->f_poParent;
+	HNode * l_poFirstLeft = a_poFirst->f_poLeft;
+	HNode * l_poFirstRight = a_poFirst->f_poRight;
+	HNode * l_poSecondParent = a_poSecond->f_poParent;
+	HNode * l_poSecondLeft = a_poSecond->f_poLeft;
+	HNode * l_poSecondRight = a_poSecond->f_poRight;
+	if ( l_poFirstParent == l_poSecondParent ) /* siblings */
+		{
+		if ( l_poFirstParent )
+			{
+			if ( l_poFirstParent->f_poLeft == a_poFirst )
+				{
+				l_poFirstParent->f_poLeft = a_poSecond;
+				l_poFirstParent->f_poRight = a_poFirst;
+				}
+			else
+				{
+				l_poFirstParent->f_poLeft = a_poFirst;
+				l_poFirstParent->f_poRight = a_poSecond;
+				}
+			}
+		}
+	else /* not siblings */
+		{
+		if ( l_poFirstParent )
+			{
+			if ( l_poFirstParent->f_poLeft == a_poFirst )
+				l_poFirstParent->f_poLeft = a_poSecond;
+			else
+				l_poFirstParent->f_poRight = a_poSecond;
+			}
+		if ( l_poSecondParent )
+			{
+			if ( l_poSecondParent->f_poLeft == a_poSecond )
+				l_poSecondParent->f_poLeft = a_poFirst;
+			else
+				l_poSecondParent->f_poRight = a_poFirst;
+			}
+		}
+	if ( l_poFirstLeft )
+		l_poFirstLeft->f_poParent = a_poSecond;
+	if ( l_poFirstRight )
+		l_poFirstRight->f_poParent = a_poSecond;
+	if ( l_poSecondLeft )
+		l_poSecondLeft->f_poParent = a_poFirst;
+	if ( l_poSecondRight )
+		l_poSecondRight->f_poParent = a_poFirst;
+	a_poFirst->f_poParent = l_poSecondParent;
+	a_poFirst->f_poLeft = l_poSecondLeft;
+	a_poFirst->f_poRight = l_poSecondRight;
+	a_poSecond->f_poParent = l_poFirstParent;
+	a_poSecond->f_poLeft = l_poFirstLeft;
+	a_poSecond->f_poRight = l_poFirstRight;
+	typename HNode::color_t l_eColor = a_poFirst->f_eColor;
+	a_poFirst->f_eColor = a_poSecond->f_eColor;
+	a_poSecond->f_eColor = l_eColor;
+	return;
+	}
 
 }
 
