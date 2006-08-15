@@ -340,9 +340,13 @@ void HBTree < tType >::remove ( tType const & a_tKey )
 			{
 			if ( l_oNode.f_poNode->f_poLeft && l_oNode.f_poNode->f_poRight ) /* both children exists */
 				{
-				
+				HNode * l_poNode = l_oNode.f_poNode;
+				while ( l_poNode->f_poLeft )
+					l_poNode = l_poNode->f_poLeft;
+				swap ( l_oNode.f_poNode, l_poNode );
+				l_oNode.f_poNode = l_poNode;
 				}
-			else if ( l_oNode.f_poNode->f_poLeft )
+			if ( l_oNode.f_poNode->f_poLeft )
 				{
 				l_oNode.f_poNode->f_poLeft->f_poParent = l_oNode.f_poNode->f_poParent;
 				if ( l_oNode.f_poNode->f_poParent )
@@ -359,12 +363,9 @@ void HBTree < tType >::remove ( tType const & a_tKey )
 					f_poRoot = l_oNode.f_poNode->f_poRight;
 				}
 			if ( l_oNode.f_poNode->f_poLeft || l_oNode.f_poNode->f_poRight ) /* one of childrens exists */
-				{
 				l_oNode.f_poNode->f_poParent = NULL;
-				l_oNode.f_poNode->f_poLeft = NULL;
-				l_oNode.f_poNode->f_poRight = NULL;
-				}
-			M_ASSERT ( ! ( l_oNode.f_poNode->f_poLeft || l_oNode.f_poNode->f_poRight ) );
+			l_oNode.f_poNode->f_poLeft = NULL;
+			l_oNode.f_poNode->f_poRight = NULL;
 			if ( l_oNode.f_poNode->f_poParent )
 				l_oNode.f_poNode->f_poParent->set_child ( l_oNode.f_poNode, NULL );
 			delete l_oNode.f_poNode;
