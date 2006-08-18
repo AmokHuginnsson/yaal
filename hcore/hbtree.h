@@ -93,6 +93,7 @@ protected:
 		friend class HBTree < tType >;
 		};
 	HNode * f_poRoot;
+	long int f_lQuantity;
 	/*}*/
 public:
 	/*{*/
@@ -108,7 +109,7 @@ protected:
 	void swap ( HNode *, HNode * );
 	HNode * sibling ( HNode * );
 	void insert_rebalance ( HNode * );
-	void remove_rebalance ( HNode *, typename HNode::color_t const & );
+	void remove_rebalance ( HNode * );
 	void rotate_left ( HNode * );
 	void rotate_right ( HNode * );
 	/*}*/
@@ -199,7 +200,7 @@ void HBTree < tType >::HNode::set_child ( HNode * a_poWhich, HNode * a_poNew )
 	}
 
 template < typename tType >
-HBTree < tType >::HBTree ( void ) : f_poRoot ( NULL )
+HBTree < tType >::HBTree ( void ) : f_poRoot ( NULL ), f_lQuantity ( 0 )
 	{
 	return;
 	}
@@ -224,6 +225,7 @@ void HBTree < tType >::insert ( tType const & a_tKey )
 	else
 		{
 		HNode * l_poNode = new HNode ( a_tKey );
+		f_lQuantity ++;
 		if ( f_poRoot )
 			{
 			l_poNode->f_poParent = l_oNode.f_poNode;
@@ -291,28 +293,40 @@ void HBTree < tType >::insert_rebalance ( HNode * a_poNode )
 template < typename tType >
 void HBTree < tType >::rotate_left ( HNode * a_poOne )
 	{
-	a_poOne->f_poParent->f_poParent->f_poLeft = a_poOne;
+	if ( a_poOne->f_poParent->f_poParent )
+		a_poOne->f_poParent->f_poParent->f_poLeft = a_poOne;
+	else
+		f_poRoot = a_poOne;
 	HNode * l_poNode1 = a_poOne->f_poParent->f_poLeft;
 	HNode * l_poNode2 = a_poOne->f_poLeft;
 	HNode * l_poNode3 = a_poOne->f_poRight;
+	HNode * l_poParent = a_poOne->f_poParent->f_poParent;
+	a_poOne->f_poParent->f_poParent = a_poOne;
 	a_poOne->f_poParent->f_poLeft = l_poNode1;
 	a_poOne->f_poParent->f_poRight = l_poNode2;
 	a_poOne->f_poLeft = a_poOne->f_poParent;
 	a_poOne->f_poRight = l_poNode3;
+	a_poOne->f_poParent = l_poParent;
 	return;
 	}
 
 template < typename tType >
 void HBTree < tType >::rotate_right ( HNode * a_poOne )
 	{
-	a_poOne->f_poParent->f_poParent->f_poRight = a_poOne;
+	if ( a_poOne->f_poParent->f_poParent )
+		a_poOne->f_poParent->f_poParent->f_poRight = a_poOne;
+	else
+		f_poRoot = a_poOne;
 	HNode * l_poNode1 = a_poOne->f_poParent->f_poRight;
 	HNode * l_poNode2 = a_poOne->f_poRight;
 	HNode * l_poNode3 = a_poOne->f_poLeft;
+	HNode * l_poParent = a_poOne->f_poParent->f_poParent;
+	a_poOne->f_poParent->f_poParent = a_poOne;
 	a_poOne->f_poParent->f_poRight = l_poNode1;
 	a_poOne->f_poParent->f_poLeft = l_poNode2;
 	a_poOne->f_poRight = a_poOne->f_poParent;
 	a_poOne->f_poLeft = l_poNode3;
+	a_poOne->f_poParent = l_poParent;
 	return;
 	}
 
@@ -326,9 +340,9 @@ void HBTree < tType >::remove ( tType const & a_tKey )
 			{
 			if ( l_oNode.f_poNode->f_poLeft && l_oNode.f_poNode->f_poRight ) /* both children exists */
 				{
-				HNode * l_poNode = l_oNode.f_poNode;
-				while ( l_poNode->f_poLeft )
-					l_poNode = l_poNode->f_poLeft;
+				HNode * l_poNode = l_oNode.f_poNode->f_poLeft;
+				while ( l_poNode->f_poRight )
+					l_poNode = l_poNode->f_poRight;
 				swap ( l_oNode.f_poNode, l_poNode );
 				l_oNode.f_poNode = l_poNode;
 				}
@@ -354,14 +368,16 @@ void HBTree < tType >::remove ( tType const & a_tKey )
 					f_poRoot = l_oNode.f_poNode->f_poRight;
 					}
 				}
-			if ( l_oNode.f_poNode->f_poLeft || l_oNode.f_poNode->f_poRight ) /* one of childrens exists */
-				l_oNode.f_poNode->f_poParent = NULL;
-			if ( l_oNode.f_poNode->f_poParent )
+			if ( l_oNode.f_poNode->f_poParent &&
+					! ( l_oNode.f_poNode->f_poLeft || l_oNode.f_poNode->f_poRight ) )
 				l_oNode.f_poNode->f_poParent->set_child ( l_oNode.f_poNode, NULL );
-			remove_rebalance ( l_oNode.f_poNode->f_poLeft ? l_oNode.f_poNode->f_poLeft : l_oNode.f_poNode->f_poRight,
-					l_oNode.f_poNode->f_eColor );
+			remove_rebalance ( l_oNode.f_poNode );
 			l_oNode.f_poNode->f_poLeft = l_oNode.f_poNode->f_poRight = NULL;
 			delete l_oNode.f_poNode;
+			f_lQuantity --;
+			if ( ! f_lQuantity )
+				f_poRoot == NULL;
+			M_ASSERT ( ! ( f_poRoot && f_poRoot->f_poParent ) ); /* very tricky :^) */
 			return;
 			}
 		}
@@ -370,16 +386,23 @@ void HBTree < tType >::remove ( tType const & a_tKey )
 	}
 
 template < typename tType >
-void HBTree < tType >::remove_rebalance ( HNode * a_poNode, typename HNode::color_t const & a_eColor )
+void HBTree < tType >::remove_rebalance ( HNode * a_poNode )
 	{
 	M_ASSERT ( a_poNode );
-	if ( a_eColor == HNode::D_BLACK )
+	HNode l_poChild = a_poNode->f_poLeft ? a_poNode->f_poLeft : a_poNode->f_poRight;
+	M_ASSERT ( a_poNode->f_poParent == l_poChild->f_poParent );
+	if ( a_poNode->f_eColor == HNode::D_BLACK )
 		{
-		if ( a_poNode && ( a_poNode->f_eColor == HNode::D_RED ) )
-			a_poNode->f_eColor = HNode::D_BLACK;
-		else /* hard part starts here */
+		if ( l_poChild )
 			{
-
+			if ( l_poChild->f_eColor == HNode::D_RED )
+				a_poNode->f_eColor = HNode::D_BLACK;
+			else if ( ( a_poNode->f_poParent == NULL ) && f_poRoot )
+				f_poRoot->f_eColor = HNode::D_BLACK;
+			else /* hard part starts here */
+				{
+				HNode * l_poSibling = sibling ( l_poChild );
+				}
 			}
 		}
 	return;
