@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hmap.h - this file is integral part of `stdhapi' project.
+	hmap.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HMAP_H
-#define __STDHAPI_HCORE_HMAP_H
+#ifndef __YAAL_HCORE_HMAP_H
+#define __YAAL_HCORE_HMAP_H
 
 #line 31 "hmap.h"
 
-#define D_CVSID_HMAP_H "$CVSHeader$"
+#define D_VCSID_HMAP_H "$Id$"
 
 #include <cstddef>
 #include <cstdlib>
@@ -39,7 +39,7 @@ Copyright:
 #include "./hcore/hexception.h"
 #include "./hcore/hstring.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -352,5 +352,5 @@ int long unsigned hash ( HString const & );
 
 }
 
-#endif /* not __STDHAPI_HCORE_HMAP_H */
+#endif /* not __YAAL_HCORE_HMAP_H */
 

@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hdataprocess.h - this file is integral part of `stdhapi' project.
+	hdataprocess.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -32,7 +32,7 @@ Copyright:
 #include "tools/hxml.h"
 #include "dbwrapper/hdatabase.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hdata
@@ -45,8 +45,8 @@ namespace hdata
 			& this_t::handler ); \
 	}
 
-typedef stdhapi::hcore::HMap < stdhapi::hcore::HString,
-				stdhapi::hconsole::OMenuItem::HANDLER_t > menu_handlers_map_t;
+typedef yaal::hcore::HMap < yaal::hcore::HString,
+				yaal::hconsole::OMenuItem::HANDLER_t > menu_handlers_map_t;
 
 class HDataProcess : public hconsole::HTUIProcess
 	{
@@ -56,7 +56,7 @@ protected:
 	/*}*/
 private:
 	/*{*/
-	stdhapi::hconsole::OMenuItem * f_psRootMenu;
+	yaal::hconsole::OMenuItem * f_psRootMenu;
 	/*}*/
 public:
 	/*{*/
@@ -70,11 +70,11 @@ protected:
 	/*{*/
 	virtual int handler_quit ( int, void * = NULL );
 	virtual int handler_close_window ( int, void * = NULL );
-	stdhapi::hconsole::OMenuItem * build_sub_menu ( stdhapi::tools::HXml::ONode &,
+	yaal::hconsole::OMenuItem * build_sub_menu ( yaal::tools::HXml::ONode &,
 			menu_handlers_map_t const & );
-	void build_menu_item ( stdhapi::tools::HXml::ONode &,
-			stdhapi::hconsole::OMenuItem &, menu_handlers_map_t const & );
-	void destroy_menu ( stdhapi::hconsole::OMenuItem * );
+	void build_menu_item ( yaal::tools::HXml::ONode &,
+			yaal::hconsole::OMenuItem &, menu_handlers_map_t const & );
+	void destroy_menu ( yaal::hconsole::OMenuItem * );
 	/*}*/
 private:
 	/*{*/

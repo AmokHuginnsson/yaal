@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	db_driver_loader.c - this file is integral part of `stdhapi' project.
+	db_driver_loader.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -31,15 +31,15 @@ Copyright:
 #include <libintl.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "hcore/hstring.h"
 #include "hcore/hlog.h"
 #include "db_driver_loader.h"
 #include "dbwrapper.h"
 
-using namespace stdhapi::hcore;
+using namespace yaal::hcore;
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace dbwrapper
@@ -362,5 +362,5 @@ char * autoloader_rs_column_name ( void * a_pvResult, int a_iColumn )
 
 } /* namespace dbwrapper */
 
-} /* namespace stdhapi */
+} /* namespace yaal */
 

@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hdes.h - this file is integral part of `stdhapi' project.
+	hdes.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -27,7 +27,7 @@ Copyright:
 #ifndef __TOOLS_HDES_H
 #define __TOOLS_HDES_H
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace tools

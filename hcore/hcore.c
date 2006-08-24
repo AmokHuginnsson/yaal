@@ -1,8 +1,8 @@
 char const COPYRIGHT [ ] =
 "/*\n"
-"---           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---\n"
+"---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---\n"
 "\n"
-/* hcore.c - this file is integral part of `stdhapi' project.
+/* hcore.c - this file is integral part of `yaal' project.
  */
 "	i.  You may not make any changes in Copyright information.\n"
 "	ii. You must attach Copyright information to any part of every copy\n"
@@ -29,13 +29,13 @@ char const COPYRIGHT [ ] =
 #include <cstring>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "hcore.h"
 #include "hlog.h"
 #include "hstring.h"
 #include "rc_file.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -126,15 +126,15 @@ void hcore_init ( void )
 	char * l_pcEnv = NULL;
 	STATIC_ASSERT ( sizeof ( int ) >= 4 );
 	errno = 0;
-	l_pcEnv = ::getenv ( "STDHAPI_DEBUG" );
+	l_pcEnv = ::getenv ( "YAAL_DEBUG" );
 	if ( l_pcEnv )
 		n_iDebugLevel = strtol ( l_pcEnv, NULL, 10 );
-	rc_file::process_rc_file ( "stdhapi", "core",
+	rc_file::process_rc_file ( "yaal", "core",
 				n_psHCoreVariables, set_hcore_variables );
 	return;
 	}
 
-void stdhapi_hcore_banner ( void )
+void yaal_hcore_banner ( void )
 	{
 	fprintf ( stdout,
 			"%s\n"
@@ -147,11 +147,11 @@ static char const g_pcDynamicLinkerPath [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 extern "C"
-void stdhapi_hcore_main ( void ) __attribute__(( __noreturn__ ));
-void stdhapi_hcore_main ( void )
+void yaal_hcore_main ( void ) __attribute__(( __noreturn__ ));
+void yaal_hcore_main ( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
-		stdhapi_hcore_banner ( );
+		yaal_hcore_banner ( );
 	exit ( 0 );
 	}
 

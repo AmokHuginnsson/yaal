@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	htuiprocess.c - this file is integral part of `stdhapi' project.
+	htuiprocess.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -29,7 +29,7 @@ Copyright:
 #include <libintl.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "htuiprocess.h"
 #include "hconsole.h"
 #include "hmainwindow.h"
@@ -39,9 +39,9 @@ M_CVSID ( "$CVSHeader$" )
 #include "hcore/hlog.h"
 #endif /* __DEBUGGER_BABUNI__ */
 
-using namespace stdhapi::hcore;
+using namespace yaal::hcore;
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hconsole

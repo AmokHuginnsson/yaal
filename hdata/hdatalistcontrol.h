@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hdatalistcontrol.h - this file is integral part of `stdhapi' project.
+	hdatalistcontrol.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -30,7 +30,7 @@ Copyright:
 #include "hconsole/hlistcontrol.h"
 #include "hdatacontrol.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hdata

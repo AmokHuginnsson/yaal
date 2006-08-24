@@ -1,7 +1,7 @@
 /*
----        `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
+---        `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
 
-	hxml.h - this file is integral part of `stdhapi' project.
+	hxml.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -32,7 +32,7 @@ Copyright:
 #include "hcore/hlist.h"
 #include "hcore/hpointer.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace tools
@@ -53,12 +53,12 @@ public:
 			D_CONTENT
 			} type_t;
 		int f_iLevel;
-		stdhapi::hcore::HString	f_oName;
-		stdhapi::hcore::HList < stdhapi::hcore::HString > f_oContents;
-		stdhapi::hcore::HMap < stdhapi::hcore::HString,
-			stdhapi::hcore::HString > f_oProperties;
-		stdhapi::hcore::HList < ONode > f_oChilds;
-		stdhapi::hcore::HList < type_t > f_oTypes;
+		yaal::hcore::HString	f_oName;
+		yaal::hcore::HList < yaal::hcore::HString > f_oContents;
+		yaal::hcore::HMap < yaal::hcore::HString,
+			yaal::hcore::HString > f_oProperties;
+		yaal::hcore::HList < ONode > f_oChilds;
+		yaal::hcore::HList < type_t > f_oTypes;
 		ONode ( void ) : f_iLevel ( - 1 ), f_oName ( ), f_oContents ( ),
 								f_oProperties ( D_HXML_PROPERTIES_MAP_SIZE ), f_oChilds ( ), f_oTypes ( ) { }
 		void reset ( void )
@@ -79,9 +79,9 @@ protected:
 	struct OConvert;
 	typedef void * xml_node_ptr_t;
 	typedef enum { D_IN, D_OUT } way_t;
-	stdhapi::hcore::HPointer<OConvert> f_oConvert;
-	stdhapi::hcore::HString	f_oConvertedString;
-	stdhapi::hcore::HString	f_oVarTmpBuffer;
+	yaal::hcore::HPointer<OConvert> f_oConvert;
+	yaal::hcore::HString	f_oConvertedString;
+	yaal::hcore::HString	f_oVarTmpBuffer;
 	HXmlData *							f_poXml;
 	ONode										f_oRoot;
 	/*}*/

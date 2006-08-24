@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hconsole.h - this file is integral part of `stdhapi' project.
+	hconsole.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -27,7 +27,7 @@ Copyright:
 #ifndef __HCONSOLE_HCONSOLE_H
 #define __HCONSOLE_HCONSOLE_H
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hconsole
@@ -48,7 +48,7 @@ extern bool	n_bLeaveCtrlQ;
 extern bool	n_bLeaveCtrlBackSlash;
 extern char	n_cCommandComposeCharacter;
 extern int	n_iCommandComposeDelay;
-void stdhapi_hconsole_banner ( void );
+void yaal_hconsole_banner ( void );
 
 	}
 

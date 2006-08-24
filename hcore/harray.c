@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	harray.c - this file is integral part of `stdhapi' project.
+	harray.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -27,11 +27,11 @@ Copyright:
 #include <libintl.h>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "harray.h"
-M_CVSTID ( D_CVSID_HARRAY_H )
+M_VCSTID ( D_VCSID_HARRAY_H )
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore

@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hdataeditcontrol.h - this file is integral part of `stdhapi' project.
+	hdataeditcontrol.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -30,7 +30,7 @@ Copyright:
 #include "hconsole/heditcontrol.h"
 #include "hdatawindow.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hdata
@@ -51,7 +51,7 @@ public:
 								char const * = "",	/* label */
 								int = 127,					/* maximum string length */
 								char const * = "",	/* initial content */
-								char const * = stdhapi::hconsole::n_pcMaskDefault, /* mask */
+								char const * = yaal::hconsole::n_pcMaskDefault, /* mask */
 								bool = false,				/* replace */
 								bool = false,				/* multiline */
 								bool = false,				/* read only */

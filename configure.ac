@@ -1,10 +1,10 @@
-dnl $CVSHeader$
-dnl configure.ac is integral part of stdhapi project.
+dnl $Id$
+dnl configure.ac is integral part of yaal project.
 
 dnl Initialization data.
-AC_INIT([[stdhapi]],[[0.0.0]],[[amok@frihet.ath.cx]])
+AC_INIT([[yaal]],[[0.0.0]],[[amok@frihet.ath.cx]])
 
-AC_MSG_RESULT([--- Welcome to stdhapi configurator ---                  [[0%]]])
+AC_MSG_RESULT([--- Welcome to yaal configurator ---                  [[0%]]])
 
 AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, default is `yes' if apriopriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
 dnl ` <- this one fixes syntax highlighting in vim.
@@ -21,15 +21,15 @@ dnl `
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 
-dnl Unique file in project: stdhapirc is sample configuration file.
+dnl Unique file in project: yaalrc is sample configuration file.
 AC_MSG_RESULT([--- Finding base directory ... ---                      [[12%]]])
-AC_CONFIG_SRCDIR([[stdhapirc.in]])
+AC_CONFIG_SRCDIR([[yaalrc.in]])
 AC_CONFIG_AUX_DIR([aux])
 
-dnl stdhapi is not Free Software.
-AC_COPYRIGHT([[stdhapi (c) 2004 All rights reserved.]])
+dnl yaal is not Free Software.
+AC_COPYRIGHT([[yaal (c) 2004 All rights reserved.]])
 
-dnl stdhapi is still in alpha stage.
+dnl yaal is still in alpha stage.
 AC_REVISION([[$ Revision: 0.0.0 $]])
 
 dnl We select default language.
@@ -73,7 +73,7 @@ dnl Looking for main libc headers
 AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])
 AC_HEADER_MAJOR
 
-dnl We need to know what operating system stdhapi will be compiled on.
+dnl We need to know what operating system yaal will be compiled on.
 AC_MSG_RESULT([--- Guessing host operating system ... ---              [[58%]]])
 AC_CHECK_FILE(
 	[[/etc/rc]],
@@ -366,10 +366,10 @@ MYSQL_SOCKET=[`grep -s "^socket" $FILES|awk '{sub(".*=[ \\t]+","");print;exit}'`
 
 AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
 AC_CONFIG_COMMANDS_PRE([cd doc/html;
-												ln -sf stdhapi_toc.html index.html;cd ../..])
+												ln -sf yaal_toc.html index.html;cd ../..])
 
 if test ["$ORACLE"] = ["no"] -a ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a ["$SQLITE"] = ["no"] -a ["SQLITE3"] = ["no"] ; then
-	AC_MSG_WARN([stdhapi without any data base driver will be
+	AC_MSG_WARN([yaal without any data base driver will be
                     unusable for most professional purpouses.])
 fi
 
@@ -379,7 +379,7 @@ AC_SUBST([DEFAULT_DRIVER], ["$DEFAULT_DRIVER"])
 AC_SUBST([MYSQL_SOCKET],["$MYSQL_SOCKET"])
 
 dnl We have to set up proper compiler/linker flags.
-AC_OUTPUT([Makefile stdhapirc])
+AC_OUTPUT([Makefile yaalrc])
 AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
 AC_MSG_RESULT([[Now you can type \`make'.]])
 

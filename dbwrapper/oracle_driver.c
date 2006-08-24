@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	null_driver.c - this file is integral part of `stdhapi' project.
+	null_driver.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -39,8 +39,8 @@ Copyright:
 #include "hcore/rc_file.h"
 #include "hcore/hlog.h"
 
-using namespace stdhapi;
-using namespace stdhapi::hcore;
+using namespace yaal;
+using namespace yaal::hcore;
 
 extern "C"
 {
@@ -402,7 +402,7 @@ char * rs_column_name ( void * a_pvDataR, int a_iField )
 void oracle_init ( void ) __attribute__((__constructor__));
 void oracle_init ( void )
 	{
-	rc_file::process_rc_file ( "stdhapi", "oracle", n_psVariables, NULL );
+	rc_file::process_rc_file ( "yaal", "oracle", n_psVariables, NULL );
 	return;
 	}
 

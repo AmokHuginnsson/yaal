@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hpool.h - this file is integral part of `stdhapi' project.
+	hpool.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,19 +24,19 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HPOOL_H
-#define __STDHAPI_HCORE_HPOOL_H
+#ifndef __YAAL_HCORE_HPOOL_H
+#define __YAAL_HCORE_HPOOL_H
 
 #line 31
 
 #include <cstddef>
 #include <cstring>
 
-#define D_CVSID_HPOOL_H "$CVSHeader$"
+#define D_VCSID_HPOOL_H "$Id$"
 
 #include "xalloc.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -182,5 +182,5 @@ int HPool < tType >::get_top ( void ) const
 
 }
 
-#endif /* not __STDHAPI_HCORE_HPOOL_H */
+#endif /* not __YAAL_HCORE_HPOOL_H */
 

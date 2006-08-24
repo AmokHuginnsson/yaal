@@ -1,4 +1,4 @@
-*** stdhapi documentation ***
+*** yaal documentation ***
 
 First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 
@@ -38,7 +38,7 @@ represent comments, for example:
 Let installation begin.
 
 # common step for all cases
-	$ cd /path/to/stdhapi/
+	$ cd /path/to/yaal/
 	$ cvs up
 
 # first case (FreeBSD/update/expert)

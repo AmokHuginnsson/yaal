@@ -1,4 +1,4 @@
-*** stdhapi documentation ***
+*** yaal documentation ***
 
 * Supported platforms:
 
@@ -7,8 +7,8 @@
 	- PLD DC/AC
 	- Debian Sarge
 
-If your platform is not on above list, it is very likely that stdhapi
+If your platform is not on above list, it is very likely that yaal
 will not compile/link/work.
 
-You are welcome to port stdhapi to your platform and send us a patch.
+You are welcome to port yaal to your platform and send us a patch.
 

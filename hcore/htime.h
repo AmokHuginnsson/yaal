@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	htime.h - this file is integral part of `stdhapi' project.
+	htime.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,14 +24,14 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HTIME_H
-#define __STDHAPI_HCORE_HTIME_H
+#ifndef __YAAL_HCORE_HTIME_H
+#define __YAAL_HCORE_HTIME_H
 
 #include <ctime>
 
 #include "hstring.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -91,5 +91,5 @@ protected:
 
 }
 
-#endif /* not __STDHAPI_HCORE_HTIME_H */
+#endif /* not __YAAL_HCORE_HTIME_H */
 

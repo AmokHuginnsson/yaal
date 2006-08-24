@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hinfo.h - this file is integral part of `stdhapi' project.
+	hinfo.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,14 +24,14 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HINFO_H
-#define __STDHAPI_HCORE_HINFO_H
+#ifndef __YAAL_HCORE_HINFO_H
+#define __YAAL_HCORE_HINFO_H
 
 #include "hstring.h"
 #include "htime.h"
 #include "hexception.h" /* types definitions */
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -78,4 +78,4 @@ protected:
 
 }
 
-#endif /* not __STDHAPI_HCORE_HINFO_H */
+#endif /* not __YAAL_HCORE_HINFO_H */

@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski           ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski           ---
 
-	hlistcontrol.h - this file is integral part of `stdhapi' project.
+	hlistcontrol.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -31,7 +31,7 @@ Copyright:
 #include "hwindow.h"
 #include "hsearchablecontrol.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hconsole
@@ -117,8 +117,8 @@ public:
 										HControl * = NULL );					/* control associated */
 	virtual HItem & add_tail ( HItem * = NULL );
 	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
-	virtual stdhapi::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
-	virtual stdhapi::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
+	virtual yaal::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
+	virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual bool is_searchable ( void );
 	virtual int click ( mouse::OMouse & );
 	/*}*/

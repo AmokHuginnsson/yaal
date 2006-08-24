@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (a_iColumn) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (a_iColumn) 1978 by Marcin 'Amok' Konarski            ---
 
-	hmatrix.h - this file is integral part of `stdhapi' project.
+	hmatrix.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,21 +24,21 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HMATRIX_H
-#define __STDHAPI_HCORE_HMATRIX_H
+#ifndef __YAAL_HCORE_HMATRIX_H
+#define __YAAL_HCORE_HMATRIX_H
 
 #line 31
 
 #include "hexception.h"
 #include "hvector.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
 {
 
-#define D_CVSID_HMATRIX_H "$CVSHeader$"
+#define D_VCSID_HMATRIX_H "$Id$"
 
 extern char const * const g_ppcErrMsgHMatrix [ ];
 
@@ -592,5 +592,5 @@ HVector < tType > T ( HMatrix < tType > const & a_roMatrix,
 
 }
 	
-#endif /* not __STDHAPI_HCORE_HMATRIX_H */
+#endif /* not __YAAL_HCORE_HMATRIX_H */
 

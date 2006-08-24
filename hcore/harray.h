@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	harray.h - this file is integral part of `stdhapi' project.
+	harray.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,18 +24,18 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HARRAY_H
-#define __STDHAPI_HCORE_HARRAY_H
+#ifndef __YAAL_HCORE_HARRAY_H
+#define __YAAL_HCORE_HARRAY_H
 
 #line 31
 
-#define D_CVSID_HARRAY_H "$CVSHeader$"
+#define D_VCSID_HARRAY_H "$Id$"
 
 #include <new>
 
 #include "hexception.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -199,5 +199,5 @@ int HArray < tType > ::get_size ( void ) const
 
 }
 
-#endif /* __STDHAPI_HCORE_HARRAY_H */
+#endif /* __YAAL_HCORE_HARRAY_H */
 

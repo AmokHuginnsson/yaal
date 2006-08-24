@@ -1,7 +1,7 @@
-/* $CVSHeader$ */
+/* $Id$ */
 
-#ifndef __STDHAPI_CONFIG_H
-#define __STDHAPI_CONFIG_H
+#ifndef __YAAL_CONFIG_H
+#define __YAAL_CONFIG_H
 
 /* Define core behavior here. */
 
@@ -69,5 +69,5 @@
 
 /* End of available functions definitions. */
 
-#endif /* not __STDHAPI_CONFIG_H */
+#endif /* not __YAAL_CONFIG_H */
 

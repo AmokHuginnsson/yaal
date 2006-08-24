@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	dbwrapper.c - this file is integral part of `stdhapi' project.
+	dbwrapper.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -32,7 +32,7 @@ Copyright:
 #include "config.h"
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "hcore/hlog.h"
 #include "hcore/hstring.h"
 #include "hcore/rc_file.h"
@@ -42,11 +42,11 @@ M_CVSID ( "$CVSHeader$" )
 #include "dbwrapper.h"
 #include "db_driver_loader.h"
 
-using namespace stdhapi::hcore;
-using namespace stdhapi::hconsole;
-using namespace stdhapi::tools;
+using namespace yaal::hcore;
+using namespace yaal::hconsole;
+using namespace yaal::tools;
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace dbwrapper
@@ -130,7 +130,7 @@ void dbwrapper_init ( void )
 	dbwrapper::dbrs_records_count = dbwrapper::autoloader_dbrs_records_count;
 	dbwrapper::dbrs_id = dbwrapper::autoloader_dbrs_id;
 	dbwrapper::rs_column_name = dbwrapper::autoloader_rs_column_name;
-	rc_file::process_rc_file ( "stdhapi", "dbwrapper", n_psVariables,
+	rc_file::process_rc_file ( "yaal", "dbwrapper", n_psVariables,
 			set_dbwrapper_variables );
 	return;
 	}
@@ -160,22 +160,22 @@ void dbwrapper_fini ( void )
 static char const g_pcDynamicLinkerPath [ ] __attribute__(( __unused__,
 			__section__(".interp") )) = __DYNAMIC_LINKER__;
 
-void stdhapi_dbwrapper_banner ( void )
+void yaal_dbwrapper_banner ( void )
 	{
 	fprintf ( stdout, "\tdbwrapper\n" );
 	return;
 	}
 
 extern "C"
-void stdhapi_dbwrapper_main ( void ) __attribute__(( __noreturn__ ));
-void stdhapi_dbwrapper_main ( void )
+void yaal_dbwrapper_main ( void ) __attribute__(( __noreturn__ ));
+void yaal_dbwrapper_main ( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
 		{
-		stdhapi_hcore_banner ( );
-		stdhapi_hconsole_banner ( );
-		stdhapi_tools_banner ( );
-		stdhapi_dbwrapper_banner ( );
+		yaal_hcore_banner ( );
+		yaal_hconsole_banner ( );
+		yaal_tools_banner ( );
+		yaal_dbwrapper_banner ( );
 		}
 	exit ( 0 );
 	}

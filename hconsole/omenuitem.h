@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	omenuitem.h - this file is integral part of `stdhapi' project.
+	omenuitem.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -27,11 +27,11 @@ Copyright:
 #ifndef __HCONSOLE_OMENUITEM_H
 #define __HCONSOLE_OMENUITEM_H
 
-#define D_CVSID_OMENUITEM_H "$CVSHeader$"
+#define D_VCSID_OMENUITEM_H "$Id$"
 
 #include "htuiprocess.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hconsole
@@ -43,11 +43,11 @@ public: /* All is public for simpler usage. */
 	typedef int ( HTUIProcess::* HANDLER_t ) ( void );
 	OMenuItem * f_psSubMenu;
 	HANDLER_t HANDLER;
-	stdhapi::hcore::HString f_oLabel;
+	yaal::hcore::HString f_oLabel;
 /* Methods */
 	OMenuItem ( void );
 	OMenuItem ( OMenuItem * const, HANDLER_t const,
-			stdhapi::hcore::HString const & );
+			yaal::hcore::HString const & );
 	OMenuItem ( OMenuItem const & );
 	OMenuItem & operator = ( OMenuItem const & );
 	void reset ( void );

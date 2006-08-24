@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hstatusbarcontrol.c - this file is integral part of `stdhapi' project.
+	hstatusbarcontrol.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -27,15 +27,15 @@ Copyright:
 #include <cstring>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "hstatusbarcontrol.h"
 #include "hwindow.h"
 #include "hconsole.h"
 #include "hsearchablecontrol.h"
 
-using namespace stdhapi::hcore;
+using namespace yaal::hcore;
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hconsole

@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	base.h - this file is integral part of `stdhapi' project.
+	base.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_BASE_H
-#define __STDHAPI_BASE_H
+#ifndef __YAAL_BASE_H
+#define __YAAL_BASE_H
 
 #include "hexception.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 template < bool > struct static_assert_failure;
@@ -38,15 +38,15 @@ template < > struct static_assert_failure < true > { enum { value = 1 }; };
 
 #define _(string) gettext (string)
 
-#define M_CVSID(id) namespace { char __CVSID__ [ ] = id; }
-#define M_CVSTID(id) namespace { char __CVSTID__ [ ] = id; }
-#define M_THROW( msg, e_no ) throw ( stdhapi::hcore::HException ( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, static_cast < int > ( e_no ) ) )
+#define M_VCSID(id) namespace { char __VCSID__ [ ] = id; }
+#define M_VCSTID(id) namespace { char __VCSTID__ [ ] = id; }
+#define M_THROW( msg, e_no ) throw ( yaal::hcore::HException ( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, static_cast < int > ( e_no ) ) )
 #define M_PROLOG try{
-#define M_EPILOG } catch ( stdhapi::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
-#define M_FINAL } catch ( stdhapi::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e->print_error ( true ); } catch ( int const & error_code ) { exit ( error_code ); }
-#define M_ENSURE( condition ) if ( ! ( condition ) ){ stdhapi::hcore::HException e ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno ); e->set ( strerror ( errno ) ); throw e; }
+#define M_EPILOG } catch ( yaal::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
+#define M_FINAL } catch ( yaal::hcore::HException & e ){ e->log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e->print_error ( true ); } catch ( int const & error_code ) { exit ( error_code ); }
+#define M_ENSURE( condition ) if ( ! ( condition ) ){ yaal::hcore::HException e ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno ); e->set ( strerror ( errno ) ); throw e; }
 #ifndef NDEBUG
-#	define M_ASSERT( condition ) if ( ! ( condition ) )stdhapi::hcore::HException::failed_assert ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition )
+#	define M_ASSERT( condition ) if ( ! ( condition ) )yaal::hcore::HException::failed_assert ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition )
 #else /* NDEBUG */
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
@@ -142,4 +142,4 @@ typedef enum
 
 }
 
-#endif /* not __STDHAPI_BASE_H */
+#endif /* not __YAAL_BASE_H */

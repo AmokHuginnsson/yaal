@@ -1,7 +1,7 @@
 /*
----          `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---          `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	xalloc.c - this file is integral part of `stdhapi' project.
+	xalloc.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -30,10 +30,10 @@ Copyright:
 #include <libintl.h>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "xalloc.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -100,7 +100,7 @@ char * xstrdup ( char const * const a_pcStr )
 		perror ( "xstrdup: request to duplicate NULL pointer string" );
 		abort ( );
 		}
-	l_pcNew = stdhapi::hcore::xcalloc < char > ( strlen ( a_pcStr ) + 1 );
+	l_pcNew = yaal::hcore::xcalloc < char > ( strlen ( a_pcStr ) + 1 );
 	strcpy ( l_pcNew, a_pcStr );
 	return ( l_pcNew );
 	}

@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hvector.h - this file is integral part of `stdhapi' project.
+	hvector.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HVECTOR_H
-#define __STDHAPI_HCORE_HVECTOR_H
+#ifndef __YAAL_HCORE_HVECTOR_H
+#define __YAAL_HCORE_HVECTOR_H
 
 #line 31
 
@@ -34,13 +34,13 @@ Copyright:
 #include "harray.h"
 #include "hexception.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
 {
 
-#define D_CVSID_HVECTOR_H "$CVSHeader$"
+#define D_VCSID_HVECTOR_H "$Id$"
 
 
 extern char const * g_ppcErrMsgHVector [ ];
@@ -348,5 +348,5 @@ HVector < tType > operator * ( tType const a_tScalar,
 
 }
 
-#endif /* not __STDHAPI_HCORE_HVECTOR_H */
+#endif /* not __YAAL_HCORE_HVECTOR_H */
 

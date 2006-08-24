@@ -1,7 +1,7 @@
 /*
----          `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski           ---
+---          `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski           ---
 
-	tools.c - this file is integral part of `stdhapi' project.
+	tools.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -30,7 +30,7 @@ Copyright:
 #include <libintl.h> /* gettext */
 
 #include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "tools.h"
 #include "hcore/hcore.h"
 #include "hcore/xalloc.h"
@@ -39,10 +39,10 @@ M_CVSID ( "$CVSHeader$" )
 #include "hcore/hstring.h"    /* HString class */
 #include "hconsole/hconsole.h"
 
-using namespace stdhapi::hcore;
-using namespace stdhapi::hconsole;
+using namespace yaal::hcore;
+using namespace yaal::hconsole;
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace tools
@@ -151,7 +151,7 @@ void tools_init ( void )
 	{
 	int l_iCtr = 0;
 	errno = 0;
-	rc_file::process_rc_file ( "stdhapi", "tools", tools::n_psVariables,
+	rc_file::process_rc_file ( "yaal", "tools", tools::n_psVariables,
 			set_tools_variables );
 	for ( l_iCtr = 0; l_iCtr < 256; l_iCtr ++ )
 		util::n_pcTransTableStripPL [ l_iCtr ] = static_cast < char > ( l_iCtr );
@@ -188,21 +188,21 @@ void tools_fini ( void )
 static char const g_pcDynamicLinkerPath [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
-void stdhapi_tools_banner ( void )
+void yaal_tools_banner ( void )
 	{
 	fprintf ( stdout, "\ttools\n" );
 	return;
 	}
 
 extern "C"
-void stdhapi_tools_main ( void ) __attribute__(( __noreturn__ ));
-void stdhapi_tools_main ( void )
+void yaal_tools_main ( void ) __attribute__(( __noreturn__ ));
+void yaal_tools_main ( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
 		{
-		stdhapi_hcore_banner ( );
-		stdhapi_hconsole_banner ( );
-		stdhapi_tools_banner ( );
+		yaal_hcore_banner ( );
+		yaal_hconsole_banner ( );
+		yaal_tools_banner ( );
 		}
 	exit ( 0 );
 	}

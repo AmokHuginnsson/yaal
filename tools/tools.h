@@ -1,7 +1,7 @@
 /*
----          `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---          `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	tools.h - this file is integral part of `stdhapi' project.
+	tools.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -29,7 +29,7 @@ Copyright:
 
 #include "hserial.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace tools
@@ -42,7 +42,7 @@ extern int n_iCollectorConnectionTimeOut;
 extern bool n_bIgnoreSignalSIGINT;
 extern bool n_bIgnoreSignalSIGTSTP;
 extern bool n_bIgnoreSignalSIGQUIT;
-void stdhapi_tools_banner ( void );
+void yaal_tools_banner ( void );
 
 	}
 

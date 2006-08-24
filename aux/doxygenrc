@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = stdhapi
+PROJECT_NAME           = yaal
 PROJECT_NUMBER         = 0.0.0
 OUTPUT_DIRECTORY       = doc/dox
 CREATE_SUBDIRS         = NO

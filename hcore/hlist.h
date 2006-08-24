@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hlist.h - this file is integral part of `stdhapi' project.
+	hlist.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,16 +24,16 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HLIST_H
-#define __STDHAPI_HCORE_HLIST_H
+#ifndef __YAAL_HCORE_HLIST_H
+#define __YAAL_HCORE_HLIST_H
 
 #line 31 "hlist.h"
 
-#define D_CVSID_HLIST_H "$CVSHeader$"
+#define D_VCSID_HLIST_H "$Id$"
 
 #include "./hcore/hexception.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -609,15 +609,15 @@ bool HList< tType >::is_above_n ( HElement * a_poLeft, HElement * a_poRight )
 
 template < typename tType >
 bool const operator > ( tType const &, tType const & )
-#ifdef __STDHAPI_BUILD__
+#ifdef __YAAL_BUILD__
 	;
-#else /* __STDHAPI_BUILD__ */
+#else /* __YAAL_BUILD__ */
 	{
 	if ( true == false )
 		M_ASSERT ( ! "operator not defined" );
 	return ( false );
 	}
-#endif /* not __STDHAPI_BUILD__ */
+#endif /* not __YAAL_BUILD__ */
 
 template < typename tType >
 bool HList< tType >::is_above_c ( HElement * a_poLeft, HElement * a_poRight )
@@ -1466,5 +1466,5 @@ HList< tType >::operator bool ( void ) const
 
 }
 
-#endif /* not __STDHAPI_HCORE_HLIST_H */
+#endif /* not __YAAL_HCORE_HLIST_H */
 

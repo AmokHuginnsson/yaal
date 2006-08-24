@@ -1,11 +1,11 @@
-# $CVSHeader$
+# $Id$
 # This is wrapper around GNU make.
 
 all: Makefile
 	@make banner MSG="Invoking GNU make (gmake) ..."
 	@gmake all
 
-Makefile: Makefile.in stdhapirc.in config.h.in configure
+Makefile: Makefile.in yaalrc.in config.h.in configure
 	@make banner MSG='Generating \`Makefile'"' and rest of necessary files ..."
 	@./configure
 	@make banner MSG='Ready for \`make'"'."

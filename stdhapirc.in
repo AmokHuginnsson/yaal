@@ -1,5 +1,5 @@
-# $CVSHeader$
-# stdhapi library configuration file.
+# $Id$
+# yaal library configuration file.
 # comments begin with `#' char and continues until end of line
 # configuration file is divided into sections, each section
 # begins with [secttion_name] mark, each option may be placed
@@ -30,7 +30,7 @@
 # log_mask
 # type: special(multi-flag), default: (empty)
 # log_mask decides what types of information will be logged
-# log_mask can occur in all stdhapirc's sections and flag are
+# log_mask can occur in all yaalrc's sections and flag are
 # additive across all sections
 # argument to log_mask can be any combination of flags:
 # LOG_DEBUG, LOG_INFO, LOG_NOTICE, LOG_WARNING, LOG_ERROR, LOG_CVSHEADER
@@ -72,7 +72,7 @@ leave_ctrl_s true
 # use_mouse
 # type: bool, default: false
 # force enabling of mouse interface, warning, when this option
-# is enabled and mouse interface is not available stdhapi library
+# is enabled and mouse interface is not available yaal library
 # will not allow execution of any program that uses hconsole api
 use_mouse true
 

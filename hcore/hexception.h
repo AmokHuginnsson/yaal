@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hexception.h - this file is integral part of `stdhapi' project.
+	hexception.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -25,20 +25,20 @@ Copyright:
 */
 
 /* This file holds (except HException class declaration) main #defines,
-	 macros and global variables used acros whole stdhapi */
+	 macros and global variables used acros whole yaal */
 
-#ifndef __STDHAPI_HCORE_HEXCEPTION_H
-#define __STDHAPI_HCORE_HEXCEPTION_H
+#ifndef __YAAL_HCORE_HEXCEPTION_H
+#define __YAAL_HCORE_HEXCEPTION_H
 
 #include <cerrno>
 #include <cstring>
 
-#ifdef __STDHAPI_BUILD__
+#ifdef __YAAL_BUILD__
 #	include "config.h"
-#endif /* __STDHAPI_BUILD__ */
+#endif /* __YAAL_BUILD__ */
 #include "base.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -94,5 +94,5 @@ private:
 
 }
 
-#endif /* not __STDHAPI_HCORE_HEXCEPTION_H */
+#endif /* not __YAAL_HCORE_HEXCEPTION_H */
 

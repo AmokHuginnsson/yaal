@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hconsole.c - this file is integral part of `stdhapi' project.
+	hconsole.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -38,15 +38,15 @@ Copyright:
 #endif /* not HAVE_NCURSES_CURSES_H */
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "hcore/hcore.h"
 #include "hcore/hlog.h"
 #include "hcore/rc_file.h"
 #include "console.h"
 
-using namespace stdhapi::hcore;
+using namespace yaal::hcore;
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hconsole
@@ -177,7 +177,7 @@ void hconsole_init ( void ); __attribute__ ( ( constructor ) )
 void hconsole_init ( void )
 	{
 	errno = 0;
-	rc_file::process_rc_file ( "stdhapi", "console",
+	rc_file::process_rc_file ( "yaal", "console",
 				n_psVariables, set_hconsole_variables );
 	return;
 	}
@@ -185,20 +185,20 @@ void hconsole_init ( void )
 static char const g_pcDynamicLinkerPath [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
-void stdhapi_hconsole_banner ( void )
+void yaal_hconsole_banner ( void )
 	{
 	fprintf ( stdout, "\thconsole\n" );
 	return;
 	}
 
 extern "C"
-void stdhapi_hconsole_main ( void ) __attribute__(( __noreturn__ ));
-void stdhapi_hconsole_main ( void )
+void yaal_hconsole_main ( void ) __attribute__(( __noreturn__ ));
+void yaal_hconsole_main ( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
 		{
-		stdhapi_hcore_banner ( );
-		stdhapi_hconsole_banner ( );
+		yaal_hcore_banner ( );
+		yaal_hconsole_banner ( );
 		}
 	exit ( 0 );
 	}

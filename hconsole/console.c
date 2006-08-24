@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	console.c - this file is integral part of `stdhapi' project.
+	console.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -42,14 +42,14 @@ Copyright:
 #endif /* not HAVE_NCURSES_CURSES_H */
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "hcore/hlog.h"
 #include "hconsole.h"
 #include "console.h"
 
-using namespace stdhapi::hcore;
+using namespace yaal::hcore;
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hconsole
@@ -165,7 +165,7 @@ void enter_curses( void )
 	bkgd ( ' ' | ATTR < COLORS::D_FG_BLACK | COLORS::D_BG_BLACK >::value | A_INVIS ); /* meaningless value from macro */
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
-	if ( getenv ( "STDHAPI_NO_MOUSE" ) )
+	if ( getenv ( "YAAL_NO_MOUSE" ) )
 		n_bUseMouse = false;
 	if ( n_bUseMouse)
 		{

@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-#---        `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
+#---        `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
 #
-# msh - this file is integral part of `stdhapi' project.
+# msh - this file is integral part of `yaal' project.
 #
 #	i.  You may not make any changes in Copyright information.
 #	ii. You must attach Copyright information to any part of every copy
@@ -49,7 +49,7 @@ echo "setenv LD_LIBRARY_PATH ~/lib"
 echo "#v-"
 echo -n "Do it now ? (yes/[no]) "
 read ANSWER
-if [ -f stdhapirc ] ; then
+if [ -f yaalrc ] ; then
 	cd aux
 fi
 if [ "$ANSWER" ] ; then

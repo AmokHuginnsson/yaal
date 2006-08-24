@@ -1,7 +1,7 @@
 /*
----        `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
+---        `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
 
-	hxml.h - this file is integral part of `stdhapi' project.
+	hxml.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -39,17 +39,17 @@ Copyright:
 #include <libxml/xmlreader.h>
 
 #include "hcore/hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "hxml.h"
 #include "hcore/hlog.h"
 
-using namespace stdhapi::hcore;
-using namespace stdhapi::tools;
+using namespace yaal::hcore;
+using namespace yaal::tools;
 
 char free_err [ ] = "trying to free NULL pointer";
 char schema_err [ ] = "bad xml schema";
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace tools

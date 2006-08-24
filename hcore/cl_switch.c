@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	cl_switch.c - this file is integral part of `stdhapi' project.
+	cl_switch.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -28,18 +28,18 @@ Copyright:
 #include <getopt.h>
 
 #include "hexception.h"
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "cl_switch.h"
 #include "rc_file.h"
 #include "hstring.h"
 #include "hlog.h"
 
-using namespace stdhapi;
-using namespace stdhapi::hcore;
-using namespace stdhapi::hcore::cl_switch;
-using namespace stdhapi::hcore::rc_file;
+using namespace yaal;
+using namespace yaal::hcore;
+using namespace yaal::hcore::cl_switch;
+using namespace yaal::hcore::rc_file;
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore

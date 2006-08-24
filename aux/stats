@@ -1,8 +1,8 @@
 #! /bin/sh
 
 if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
-	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "CVSID" | grep --color "\<[DE]_[A-Z_]\+"
-	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "CVSID" | grep --color "\<M_[A-Z_]\+"
+	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<[DE]_[A-Z_]\+"
+	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<M_[A-Z_]\+"
 	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
 	exit 0
 else
@@ -14,22 +14,22 @@ else
 	SOURCES_COUNT=`echo ${SOURCES} | tr " " "\n" | wc -l`
 	HEADERS_COUNT=`echo ${HEADERS} | tr " " "\n" | wc -l`
 
-	printf "stdhapi statistics:\n"
+	printf "yaal statistics:\n"
 	printf "	implementation files: %5d\n" ${SOURCES_COUNT}
 	printf "	header files:      %8d\n" ${HEADERS_COUNT}
 	TOTAL=$((${SOURCES_COUNT}+${HEADERS_COUNT}))
 	printf "	total:             %8d\n" ${TOTAL}
 
 #	TMP_FILE=`mktemp`
-	TMP_FILE=`mktemp -t stdhapi-stats.XXXXXX`
+	TMP_FILE=`mktemp -t yaal-stats.XXXXXX`
 
 	cat ${SOURCES} ${HEADERS} | grep -v '^[ \t]*$\|^[ \t]*/\*' > ${TMP_FILE}
 
 	LINES=`wc -l ${TMP_FILE}|${AWK} '{print $1}'`
 	LINES=$((${LINES}-${TOTAL}*21))
 
-	PROG_DE="/CVSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"[ \t](D_|E_)[A-Z_]*\"),RLENGTH)}"
-	PROG_M="/CVSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"[ \t]M_[A-Z_]*\"),RLENGTH)}"
+	PROG_DE="/VCSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"[ \t](D_|E_)[A-Z_]*\"),RLENGTH)}"
+	PROG_M="/VCSID|\<__.*_H\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"[ \t]M_[A-Z_]*\"),RLENGTH)}"
 	PROG_O="/\<__.*_H\>|\<D_|\<E_|\<M_/{next}/^#[ \t]*define[ \t]+/"
 
 	printf "	lines:             %8d\n" ${LINES}

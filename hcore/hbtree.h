@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hbtree.h - this file is integral part of `stdhapi' project.
+	hbtree.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,16 +24,16 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HBTREE_H
-#define __STDHAPI_HCORE_HBTREE_H
+#ifndef __YAAL_HCORE_HBTREE_H
+#define __YAAL_HCORE_HBTREE_H
 
 #line 31
 
-#define D_CVSID_HBTREE_H "$CVSHeader$"
+#define D_VCSID_HBTREE_H "$Id$"
 
 #include "hexception.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -311,5 +311,5 @@ typename HBTree::ONodePtr HBTree::find_node ( tType const & a_tKey )
 
 }
 
-#endif /* not __STDHAPI_HCORE_HBTREE_H */
+#endif /* not __YAAL_HCORE_HBTREE_H */
 

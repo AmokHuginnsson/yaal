@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore.h - this file is integral part of `stdhapi' project.
+	hcore.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -25,12 +25,12 @@ Copyright:
 */
 
 /* This file holds (except HException class declaration) main #defines,
-	 macros and global variables used acros whole stdhapi */
+	 macros and global variables used acros whole yaal */
 
-#ifndef __STDHAPI_HCORE_HCORE_H
-#define __STDHAPI_HCORE_HCORE_H
+#ifndef __YAAL_HCORE_HCORE_H
+#define __YAAL_HCORE_HCORE_H
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -38,11 +38,11 @@ namespace hcore
 
 bool eq ( double const &, double const & );
 void set_env ( char const * const );
-void stdhapi_hcore_banner ( void );
+void yaal_hcore_banner ( void );
 
 	}
 
 }
 
-#endif /* not __STDHAPI_HCORE_HCORE_H */
+#endif /* not __YAAL_HCORE_HCORE_H */
 

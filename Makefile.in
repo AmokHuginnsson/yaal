@@ -1,8 +1,8 @@
-# $CVSHeader$
+# $Id$
 #
-#---        `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
+#---        `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
 #
-#	Makefile - this file is integral part of `stdhapi' project.
+#	Makefile - this file is integral part of `yaal' project.
 #
 #	i.  You may not make any changes in Copyright information.
 #	ii. You must attach Copyright information to any part of every copy
@@ -37,7 +37,7 @@ DIR_HEADERS		= $(HOME)/prog/include
 DIR_BUILD			= $(DIR_ROOT)/build
 VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
-HAPI_HEADER		= $(DIR_HEADERS)/stdhapi.h
+HAPI_HEADER		= $(DIR_HEADERS)/yaal.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
 ifdef TERM
 CL						:= $(shell tput cr;tput dl1)
@@ -96,7 +96,7 @@ ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
 COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe -fPIC \
-																-D__STDHAPI_BUILD__ -D_GNU_SOURCE \
+																-D__YAAL_BUILD__ -D_GNU_SOURCE \
 																@DEFS@ -march=i486
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
@@ -199,7 +199,7 @@ lib%.so.$(RELEASE):
 	@if [ "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
 	echo -n "Linking \`$(@) ... $(BOLD)$(RED)"; \
 	$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
-			-Wl,--entry="stdhapi_$(NAME)_main" \
+			-Wl,--entry="yaal_$(NAME)_main" \
 			-Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; echo -n $(RS); \
 	if [ -f $(@) ] ; then \
 	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 \
@@ -250,16 +250,16 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 		!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`; \
 	done; \
 	head -26 $(DIR_HEADERS)/bit.h \
-| sed -e s/bit/stdhapi/ > $(DIR_HEADERS)/stdhapi.h; \
-	echo '#ifndef __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h; \
-	echo '#define __STDHAPI_H' >> $(DIR_HEADERS)/stdhapi.h; \
-	echo '' >> $(DIR_HEADERS)/stdhapi.h; \
-	cat config.h >> $(DIR_HEADERS)/stdhapi.h; \
-	find $(DIR_HEADERS) ! -name 'stdhapi.h' -type f \
+| sed -e s/bit/yaal/ > $(DIR_HEADERS)/yaal.h; \
+	echo '#ifndef __YAAL_H' >> $(DIR_HEADERS)/yaal.h; \
+	echo '#define __YAAL_H' >> $(DIR_HEADERS)/yaal.h; \
+	echo '' >> $(DIR_HEADERS)/yaal.h; \
+	cat config.h >> $(DIR_HEADERS)/yaal.h; \
+	find $(DIR_HEADERS) ! -name 'yaal.h' -type f \
 | awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' \
-| sort >> $(DIR_HEADERS)/stdhapi.h; \
-	echo '' >> $(DIR_HEADERS)/stdhapi.h; \
-	echo '#endif /* not __STDHAPI_H */' >> $(DIR_HEADERS)/stdhapi.h; \
+| sort >> $(DIR_HEADERS)/yaal.h; \
+	echo '' >> $(DIR_HEADERS)/yaal.h; \
+	echo '#endif /* not __YAAL_H */' >> $(DIR_HEADERS)/yaal.h; \
 	echo $(NONL) "done.$(CL)$(BOLD)"; \
 	echo "All OK!$(RS)";
 
@@ -285,7 +285,7 @@ mrproper: clean
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile config.h stdhapirc config.log doc/dox
+	/bin/rm -rf configure Makefile config.h yaalrc config.log doc/dox
 
 tags: $(SRCS) $(HDRS)
 	@echo -n "Rehashing tags ... "; \

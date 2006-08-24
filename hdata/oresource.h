@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	oresource.h - this file is integral part of `stdhapi' project.
+	oresource.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -29,13 +29,13 @@ Copyright:
 
 #include "hconsole/hcontrol.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hdata
 {
 
-#define D_CVSID_ORESOURCE_H "$CVSHeader$"
+#define D_VCSID_ORESOURCE_H "$Id$"
 
 struct DATACONTROL_BITS
 	{
@@ -86,7 +86,7 @@ struct OColumnInfo
 	int f_iPlacement; 			/* what place should this new column take */
 	char const * f_pcName;	/* column name */
 	int f_iWidth;						/* column width */
-	stdhapi::hconsole::HControl::BITS::ALIGN::align_t f_eAlign;	/* column alignment */
+	yaal::hconsole::HControl::BITS::ALIGN::align_t f_eAlign;	/* column alignment */
 	type_t f_eType;					/* data type stored in that column */
 	};
 

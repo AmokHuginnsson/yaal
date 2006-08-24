@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hpointer.h - this file is integral part of `stdhapi' project.
+	hpointer.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,16 +24,16 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HPOINTER_H
-#define __STDHAPI_HCORE_HPOINTER_H
+#ifndef __YAAL_HCORE_HPOINTER_H
+#define __YAAL_HCORE_HPOINTER_H
 
 #line 31 "hpointer.h"
 
-#define D_CVSID_HPOINTER_H "$CVSHeader$"
+#define D_VCSID_HPOINTER_H "$Id$"
 
 #include "./hcore/hexception.h"
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -246,5 +246,5 @@ tType * HPointer < tType, pointer_type_t, access_type_t >::raw ( void ) const
 
 }
 
-#endif /* not __STDHAPI_HCORE_HPOINTER_H */
+#endif /* not __YAAL_HCORE_HPOINTER_H */
 

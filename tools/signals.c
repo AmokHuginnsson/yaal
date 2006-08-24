@@ -1,7 +1,7 @@
 /*
----          `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski           ---
+---          `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski           ---
 
-	signals.c - this file is integral part of `stdhapi' project.
+	signals.c - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -32,7 +32,7 @@ Copyright:
 #include "config.h"
 
 #include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
-M_CVSID ( "$CVSHeader$" )
+M_VCSID ( "$Id$" )
 #include "hcore/xalloc.h"
 #include "hconsole/console.h" /* conio (ncurses) ability */
 #include "hconsole/hconsole.h" /* n_bUseMouse */
@@ -41,10 +41,10 @@ M_CVSID ( "$CVSHeader$" )
 #include "signals.h"
 #include "tools.h"                /* tools namespace */
 
-using namespace stdhapi::hcore;
-using namespace stdhapi::hconsole;
+using namespace yaal::hcore;
+using namespace yaal::hconsole;
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace tools
@@ -229,7 +229,7 @@ void signal_QUIT ( int a_iSignum )
 #ifdef __HCONSOLE_CONSOLE_H
 		if ( is_enabled ( ) )
 			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
-					"Hard Quit is disabled by stdhapi configuration." );
+					"Hard Quit is disabled by yaal configuration." );
 #endif /* __HCONSOLE_CONSOLE_H */
 		return;
 		}
@@ -261,7 +261,7 @@ void signal_TSTP ( int a_iSignum )
 #ifdef __HCONSOLE_CONSOLE_H
 		if ( is_enabled ( ) )
 			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
-					"Suspend is disabled by stdhapi configuration." );
+					"Suspend is disabled by yaal configuration." );
 #endif /* __HCONSOLE_CONSOLE_H */
 		return;
 		}

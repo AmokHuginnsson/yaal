@@ -1,7 +1,7 @@
 /*
----           `stdhapi' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hrandomizer.h - this file is integral part of `stdhapi' project.
+	hrandomizer.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HRANDOMIZER_H
-#define __STDHAPI_HCORE_HRANDOMIZER_H
+#ifndef __YAAL_HCORE_HRANDOMIZER_H
+#define __YAAL_HCORE_HRANDOMIZER_H
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
@@ -51,5 +51,5 @@ public:
 
 }
 	
-#endif /* not __STDHAPI_HCORE_HRANDOMIZER_H */
+#endif /* not __YAAL_HCORE_HRANDOMIZER_H */
 

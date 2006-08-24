@@ -1,7 +1,7 @@
 /*
 ---          libsource 0.0.0 (c) 1978 by Marcin 'Amok' Konarski           ---
 
-	hlog.h - this file is integral part of `stdhapi' project.
+	hlog.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,18 +24,18 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __STDHAPI_HCORE_HLOG_H
-#define __STDHAPI_HCORE_HLOG_H
+#ifndef __YAAL_HCORE_HLOG_H
+#define __YAAL_HCORE_HLOG_H
 
 #include <cstdio>
 
-namespace stdhapi
+namespace yaal
 {
 
 namespace hcore
 {
 
-#define log_trace ( stdhapi::hcore::log << "Log: " << __FILE__ << " : " << " : " << __LINE__ << " : " << __PRETTY_FUNCTION__ << " : " )
+#define log_trace ( yaal::hcore::log << "Log: " << __FILE__ << " : " << " : " << __LINE__ << " : " << __PRETTY_FUNCTION__ << " : " )
 	
 namespace LOG_TYPE
 	{
@@ -106,5 +106,5 @@ extern HLog log;
 
 }
 
-#endif /* not __STDHAPI_HCORE_HLOG_H */
+#endif /* not __YAAL_HCORE_HLOG_H */
 
