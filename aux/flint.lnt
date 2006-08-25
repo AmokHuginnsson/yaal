@@ -24,7 +24,7 @@
 -template(10)
 
 /* Include paths */
--i"/home/amok/prog/yaal"
+-i"/home/amok/src/yaal"
 -i"."
 -i"/usr/include/c++/3.3"
 -i"/usr/include/c++/3.3/i486-linux"
