@@ -46,13 +46,15 @@ RED						:= $(shell tput setaf 1 || tput AF 1)
 RS						:= $(shell tput sgr0 || tput me)
 NONL					:= "-n"
 endif
-HS = .h
-SS = .c
-OS = .o
+# suffixes
+HS = h
+SS = cxx
+OS = o
+DS = d
+.SUFFIXES:
+.SUFFIXES: .$(SS) .$(OS) .$(HS)
 CTAGS	= @CTAGS@
 FIND	= find
-.SUFFIXES:
-.SUFFIXES: $(SS) $(OS) $(HS)
 CXX ?= g++
 CXX := $(subst -x c++ -x c++,-x c++,$(subst colorgcc,colorgcc -x c++,$(CXX)))
 DXX ?= $(CXX)
@@ -128,10 +130,10 @@ ifeq ($(CURDIR),$(DIR_BUILD))
 	SONAME_$(1) := lib$(1).so.$$(VERSION).$$(SUBVERSION)
 	TARGET_$(1) := $$(DIR_TARGET)/lib$(1).so.$$(RELEASE)
 	TARGETS += $$(TARGET_$(1))
-	HDRS += $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) $$(DIR_$(1)) -name "*.h")))
-	SRC_$(1) = $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) $$(DIR_$(1)) -name "*.c")))
+	HDRS += $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) $$(DIR_$(1)) -name "*.$(HS)")))
+	SRC_$(1) = $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) $$(DIR_$(1)) -name "*.$(SS)")))
 	SRCS += $$(SRC_$(1))
-	OBJS_$(1) := $$(patsubst %.c,%.o,$$(SRC_$(1)))
+	OBJS_$(1) := $$(patsubst %.$(SS),%.$(OS),$$(SRC_$(1)))
 	OBJS += $$(OBJS_$(1))
 endif
 endef
@@ -141,8 +143,8 @@ define CONFIGURE_DRIVER
 	TARGET_$(1)_driver := $$(DIR_TARGET)/lib$(1)_driver.so.$$(RELEASE)
 	TARGETS += $$(TARGET_$(1)_driver)
 	OBJS_$(1)_driver := $(1)_driver
-	SRCS += $$(patsubst %,$$(DIR_ROOT)/$$(DIR_dbwrapper)/%.c,$$(OBJS_$(1)_driver))
-	OBJS_$(1)_driver := $$(patsubst %,$$(DIR_dbwrapper)%.o, $$(OBJS_$(1)_driver))
+	SRCS += $$(patsubst %,$$(DIR_ROOT)/$$(DIR_dbwrapper)/%.$(SS),$$(OBJS_$(1)_driver))
+	OBJS_$(1)_driver := $$(patsubst %,$$(DIR_dbwrapper)%.$(OS), $$(OBJS_$(1)_driver))
 	OBJS += $$(OBJS_$(1))
 endef
 
@@ -157,8 +159,8 @@ $$(TARGET_$(1)): $$(OBJS_$(1)) $(2)
 endef
 
 $(foreach COMPONENT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(COMPONENT))))
-SRCS := $(filter-out %_driver.c,$(SRCS))
-OBJS_dbwrapper := $(filter-out %_driver.o,$(OBJS_dbwrapper))
+SRCS := $(filter-out %_driver.$(SS),$(SRCS))
+OBJS_dbwrapper := $(filter-out %_driver.$(OS),$(OBJS_dbwrapper))
 $(foreach DRIVER,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(DRIVER))))
 
 LIBS_hcore			=	"-lpthread @GETTEXT_LIB@"
@@ -186,10 +188,10 @@ LIBS_oracle			= "-lclntsh -lhcore"
 
 # implict pattern rule
 	
-%.o: %.c
+%.$(OS): %.$(SS)
 	@echo -n "Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... "; \
-	echo -n "$(@:.o=.d) " > $(@:.o=.d); \
-	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) | grep -v '^#' >> $(@:.o=.d); \
+	echo -n "$(@:.$(OS)=.$(DS)) " > $(@:.$(OS)=.$(DS)); \
+	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) | grep -v '^#' >> $(@:.$(OS)=.$(DS)); \
 	$(CXX) $(CXXFLAGS) $(<) -c -o $(@) 2>&1 | tee -a make.log; \
 	echo $(NONL) "done.$(CL)"
 
@@ -214,7 +216,7 @@ lib%.so.$(RELEASE):
 #-------------------------------------------------------------------
 
 .DEFAULT:
-	@if [ "$(suffix $(<))" != ".d" ] ; then \
+	@if [ "$(suffix $(<))" != ".$(DS)" ] ; then \
 	echo -n "$(BOLD)$(RED)"; \
 	echo "Lack of \`$(<)'." | tee -a make.log; \
 	echo -n $(RS); fi
@@ -245,7 +247,7 @@ install: all
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	@umask 022;cd $(DIR_ROOT); echo -n "Making headers ... "; \
 	for FILE in $(HDRS); do \
-		awk '/^#include "/ {match($$0,"[a-z_]+\\.h"); \
+		awk '/^#include "/ {match($$0,"[a-z_]+\\.$(HS)"); \
 		printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) }; \
 		!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`; \
 	done; \
@@ -256,7 +258,7 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	echo '' >> $(DIR_HEADERS)/yaal.h; \
 	cat config.h >> $(DIR_HEADERS)/yaal.h; \
 	find $(DIR_HEADERS) ! -name 'yaal.h' -type f \
-| awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.h$$"),99)}' \
+| awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.$(HS)$$"),99)}' \
 | sort >> $(DIR_HEADERS)/yaal.h; \
 	echo '' >> $(DIR_HEADERS)/yaal.h; \
 	echo '#endif /* not __YAAL_H */' >> $(DIR_HEADERS)/yaal.h; \
@@ -270,7 +272,7 @@ $(LD_CACHE):
 	echo $(NONL) "done.$(CL)"
 
 clean-dep:
-	@$(FIND) . -name '*.d' | xargs /bin/rm -f
+	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
 
 clean: clean-dep
 	@/bin/rm -f $(OBJS); \
@@ -289,7 +291,7 @@ purge: mrproper
 
 tags: $(SRCS) $(HDRS)
 	@echo -n "Rehashing tags ... "; \
-	$(CTAGS)	-R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" \
+	$(CTAGS)	-R --langmap="c++:.$(HS).$(SS)" -h ".$(HS)" --languages="c++" \
 						--c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" \
 						--extra="+f+q"; \
 	echo "done."
@@ -298,14 +300,14 @@ stats:
 	@aux/stats
 
 flint:
-	@flint -b aux/flint.lnt hcore/*.c hconsole/*.c tools/*.c \
-						dbwrapper/db_driver_loader.c dbwrapper/dbwrapper.c \
-						dbwrapper/hdatabase.c dbwrapper/hrecordset.c \
-						hdata/*.c \
+	@flint -b aux/flint.lnt hcore/*.$(SS) hconsole/*.$(SS) tools/*.$(SS) \
+						dbwrapper/db_driver_loader.$(SS) dbwrapper/dbwrapper.$(SS) \
+						dbwrapper/hdatabase.$(SS) dbwrapper/hrecordset.$(SS) \
+						hdata/*.$(SS) \
 | awk '{gsub(" \\(compare with line [^)]+\\)","");print}'|head -20
 
 ifeq ($(CURDIR),$(DIR_BUILD))
--include $(OBJS:.o=.d)
+-include $(OBJS:.$(OS)=.$(DS))
 endif
 
 # vim:ts=2

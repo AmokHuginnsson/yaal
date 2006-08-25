@@ -4,7 +4,7 @@ dnl configure.ac is integral part of yaal project.
 dnl Initialization data.
 AC_INIT([[yaal]],[[0.0.0]],[[amok@frihet.ath.cx]])
 
-AC_MSG_RESULT([--- Welcome to yaal configurator ---                  [[0%]]])
+AC_MSG_RESULT([--- Welcome to yaal configurator ---                     [[0%]]])
 
 AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, default is `yes' if apriopriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
 dnl ` <- this one fixes syntax highlighting in vim.
