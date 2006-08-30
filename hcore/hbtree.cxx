@@ -43,6 +43,22 @@ char const * const g_ppcErrMsgHBTree [ 4 ] =
 /* HBTree::E_NON_EXISTING_KEY */			_ ( "key does not exists" ),
 	};
 
+HBTree::HIterator::HIterator ( HBTree::HAbstractNode * const a_poNode )
+	: f_poCurrent ( a_poNode )
+	{
+	return;
+	}
+
+bool HBTree::HIterator::operator == ( HBTree::HIterator const & a_roIterator ) const
+	{
+	return ( f_poCurrent == a_roIterator.f_poCurrent );
+	}
+
+bool HBTree::HIterator::operator != ( HBTree::HIterator const & a_roIterator ) const
+	{
+	return ( f_poCurrent != a_roIterator.f_poCurrent );
+	}
+
 HBTree::HIterator & HBTree::HIterator::operator ++ ( void )
 	{
 	M_PROLOG
@@ -50,9 +66,15 @@ HBTree::HIterator & HBTree::HIterator::operator ++ ( void )
 	while ( f_poCurrent )
 		{
 		if ( f_poCurrent->f_poRight && ( f_poCurrent->f_poRight != l_poLastNode ) )
+			{
 			f_poCurrent = f_poCurrent->f_poRight;
+			break;
+			}
 		else
+			{
+			l_poLastNode = f_poCurrent;
 			f_poCurrent = f_poCurrent->f_poParent;
+			}
 		}
 	return ( * this );
 	M_EPILOG
@@ -74,9 +96,15 @@ HBTree::HIterator & HBTree::HIterator::operator -- ( void )
 	while ( f_poCurrent )
 		{
 		if ( f_poCurrent->f_poLeft && ( f_poCurrent->f_poLeft != l_poLastNode ) )
+			{
 			f_poCurrent = f_poCurrent->f_poLeft;
+			break;
+			}
 		else
+			{
+			l_poLastNode = f_poCurrent;
 			f_poCurrent = f_poCurrent->f_poParent;
+			}
 		}
 	return ( * this );
 	M_EPILOG

@@ -103,6 +103,7 @@ protected:
 		HNode ( HNode const & );
 		HNode & operator = ( HNode const & );
 		/*}*/
+		friend class HBTree;
 		};
 	HAbstractNode * f_poRoot;
 	long int f_lQuantity;
@@ -180,7 +181,7 @@ void HBTree::insert ( tType const & a_tKey )
 	if ( f_poRoot )
 		l_oNode = find_node ( a_tKey );
 	if ( l_oNode.f_bExists )
-		static_cast< HNode < tType > >( l_oNode.f_poNode )->f_tKey = a_tKey;
+		static_cast< HNode < tType > * >( l_oNode.f_poNode )->f_tKey = a_tKey;
 	else
 		{
 		HNode < tType > * l_poNode = new HNode < tType > ( a_tKey );
