@@ -119,6 +119,19 @@ HBTree::HIterator const HBTree::HIterator::operator -- ( int )
 	M_EPILOG
 	}
 
+HBTree::HIterator::HIterator ( HBTree::HIterator const & a_roIterator )
+	: f_poCurrent ( a_roIterator.f_poCurrent )
+	{
+	return;
+	}
+
+HBTree::HIterator & HBTree::HIterator::operator = ( HBTree::HIterator const & a_roIterator )
+	{
+	if ( & a_roIterator != this )
+		f_poCurrent = a_roIterator.f_poCurrent;
+	return ( * this );
+	}
+
 HBTree::HAbstractNode::HAbstractNode ( void )
 	: f_eColor ( D_RED ), f_poParent ( NULL ),
 	f_poLeft ( NULL ), f_poRight ( NULL )

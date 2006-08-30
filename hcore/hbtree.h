@@ -159,6 +159,8 @@ public:
 	HIterator & operator = ( HIterator const & );
 	bool operator == ( HIterator const & ) const;
 	bool operator != ( HIterator const & ) const;
+	template < typename tType >
+	tType & get ( void );
 	/*}*/
 protected:
 	/*{*/
@@ -166,6 +168,14 @@ protected:
 	explicit HIterator ( HAbstractNode * const );
 	/*}*/
 	};
+
+template < typename tType >
+tType & HBTree::HIterator::get ( void )
+	{
+	M_ASSERT ( f_poCurrent );
+	return ( static_cast < HNode < tType > * > ( f_poCurrent )->f_tKey );
+	}
+
 
 template < typename tType >
 HBTree::HNode < tType >::HNode ( tType const & a_tKey )
