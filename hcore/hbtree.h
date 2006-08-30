@@ -151,57 +151,13 @@ public:
 	/*{*/
 	HIterator ( void );
 	HIterator ( HIterator const & );
-	HIterator & operator ++ ( void )
-		{
-		M_PROLOG
-		HAbstractNode * l_poLastNode = f_poCurrent;
-		while ( f_poCurrent )
-			{
-			if ( f_poCurrent->f_poRight && ( f_poCurrent->f_poRight != l_poLastNode ) )
-				f_poCurrent = f_poCurrent->f_poRight;
-			else
-				f_poCurrent = f_poCurrent->f_poParent;
-			}
-		return ( * this );
-		M_EPILOG
-		}
-	HIterator const operator ++ ( int )
-		{
-		M_PROLOG
-		HIterator l_oIterator ( * this );
-		++ ( * this );
-		return ( l_oIterator );
-		M_EPILOG
-		}
-	HIterator & operator -- ( void )
-		{
-		M_PROLOG
-		HAbstractNode * l_poLastNode = f_poCurrent;
-		while ( f_poCurrent )
-			{
-			if ( f_poCurrent->f_poLeft && ( f_poCurrent->f_poLeft != l_poLastNode ) )
-				f_poCurrent = f_poCurrent->f_poLeft;
-			else
-				f_poCurrent = f_poCurrent->f_poParent;
-			}
-		return ( * this );
-		M_EPILOG
-		}
-	HIterator const operator -- ( int )
-		{
-		M_PROLOG
-		HIterator l_oIterator ( * this );
-		-- ( * this );
-		return ( l_oIterator );
-		M_EPILOG
-		}
+	HIterator & operator ++ ( void );
+	HIterator const operator ++ ( int );
+	HIterator & operator -- ( void );
+	HIterator const operator -- ( int );
 	HIterator & operator = ( HIterator const & );
 	bool operator == ( HIterator const & ) const;
 	bool operator != ( HIterator const & ) const;
-	template < typename tType >
-	tType & operator * ( void );
-	template < typename tType >
-	tType * operator -> ( void );
 	/*}*/
 protected:
 	/*{*/

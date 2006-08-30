@@ -43,6 +43,54 @@ char const * const g_ppcErrMsgHBTree [ 4 ] =
 /* HBTree::E_NON_EXISTING_KEY */			_ ( "key does not exists" ),
 	};
 
+HBTree::HIterator & HBTree::HIterator::operator ++ ( void )
+	{
+	M_PROLOG
+	HAbstractNode * l_poLastNode = f_poCurrent;
+	while ( f_poCurrent )
+		{
+		if ( f_poCurrent->f_poRight && ( f_poCurrent->f_poRight != l_poLastNode ) )
+			f_poCurrent = f_poCurrent->f_poRight;
+		else
+			f_poCurrent = f_poCurrent->f_poParent;
+		}
+	return ( * this );
+	M_EPILOG
+	}
+
+HBTree::HIterator const HBTree::HIterator::operator ++ ( int )
+	{
+	M_PROLOG
+	HIterator l_oIterator ( * this );
+	++ ( * this );
+	return ( l_oIterator );
+	M_EPILOG
+	}
+
+HBTree::HIterator & HBTree::HIterator::operator -- ( void )
+	{
+	M_PROLOG
+	HAbstractNode * l_poLastNode = f_poCurrent;
+	while ( f_poCurrent )
+		{
+		if ( f_poCurrent->f_poLeft && ( f_poCurrent->f_poLeft != l_poLastNode ) )
+			f_poCurrent = f_poCurrent->f_poLeft;
+		else
+			f_poCurrent = f_poCurrent->f_poParent;
+		}
+	return ( * this );
+	M_EPILOG
+	}
+
+HBTree::HIterator const HBTree::HIterator::operator -- ( int )
+	{
+	M_PROLOG
+	HIterator l_oIterator ( * this );
+	-- ( * this );
+	return ( l_oIterator );
+	M_EPILOG
+	}
+
 HBTree::HAbstractNode::HAbstractNode ( void )
 	: f_eColor ( D_RED ), f_poParent ( NULL ),
 	f_poLeft ( NULL ), f_poRight ( NULL )
