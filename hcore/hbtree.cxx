@@ -37,7 +37,7 @@ namespace yaal
 namespace hcore
 {
 
-char const * const g_ppcErrMsgHBTree [ 4 ] =
+char const * const n_ppcErrMsgHBTree [ 4 ] =
 	{
 	_ ( "ok" ),
 /* HBTree::E_NON_EXISTING_KEY */			_ ( "key does not exists" ),
@@ -300,6 +300,7 @@ void HBTree::remove_node ( HAbstractNode * a_poNode )
 		}
 	if ( a_poNode->f_poLeft )
 		{
+		M_ASSERT ( ! a_poNode->f_poLeft );
 		a_poNode->f_poLeft->f_poParent = a_poNode->f_poParent;
 		if ( a_poNode->f_poParent )
 			a_poNode->f_poParent->set_child ( a_poNode, a_poNode->f_poLeft );
@@ -311,6 +312,7 @@ void HBTree::remove_node ( HAbstractNode * a_poNode )
 		}
 	else if ( a_poNode->f_poRight )
 		{
+		M_ASSERT ( ! a_poNode->f_poRight );
 		a_poNode->f_poRight->f_poParent = a_poNode->f_poParent;
 		if ( a_poNode->f_poParent )
 			a_poNode->f_poParent->set_child ( a_poNode, a_poNode->f_poRight );
@@ -327,6 +329,8 @@ void HBTree::remove_node ( HAbstractNode * a_poNode )
 	a_poNode->f_poLeft = a_poNode->f_poRight = NULL;
 	delete a_poNode;
 	f_lQuantity --;
+	M_ASSERT ( f_lQuantity );
+	M_ASSERT ( ! f_lQuantity );
 	if ( ! f_lQuantity )
 		f_poRoot = NULL;
 	M_ASSERT ( ! ( f_poRoot && f_poRoot->f_poParent ) ); /* very tricky :^) */
@@ -336,7 +340,7 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 	{
 	M_ASSERT ( a_poNode );
 	HAbstractNode * l_poChild = a_poNode->f_poLeft ? a_poNode->f_poLeft : a_poNode->f_poRight;
-	M_ASSERT ( a_poNode->f_poParent == l_poChild->f_poParent );
+	M_ASSERT ( ! l_poChild || ( a_poNode->f_poParent == l_poChild->f_poParent ) );
 	if ( a_poNode->f_eColor == HAbstractNode::D_BLACK )
 		{
 		if ( l_poChild && l_poChild->f_eColor == HAbstractNode::D_RED )
@@ -358,7 +362,7 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 						{
 						/* sibling must exists because all black nodes have siblings,
 						 * moreover if the sibling is red, we know for sure that parent
-						 * is lack, due to rule that prevents two subsequent red nodes */
+						 * is black, due to rule that prevents two subsequent red nodes */
 						l_poSibling->f_eColor = HAbstractNode::D_BLACK;
 						a_poNode->f_poParent->f_eColor = HAbstractNode::D_RED;
 						if ( a_poNode == a_poNode->f_poParent->f_poLeft )
@@ -424,7 +428,7 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 	return;
 	}
 
-long int HBTree::quantity ( void )
+int long HBTree::quantity ( void )
 	{
 	return ( f_lQuantity );
 	}
@@ -459,6 +463,7 @@ void HBTree::swap ( HAbstractNode * a_poFirst, HAbstractNode * a_poSecond )
 	{
 	M_ASSERT ( a_poFirst && a_poSecond );
 	M_ASSERT ( a_poFirst != a_poSecond );
+	M_ASSERT ( a_poFirst == a_poSecond );
 	if ( a_poFirst == f_poRoot )
 		f_poRoot = a_poSecond;
 	else if ( a_poSecond == f_poRoot )

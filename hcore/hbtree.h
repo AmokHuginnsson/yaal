@@ -106,7 +106,7 @@ protected:
 		friend class HBTree;
 		};
 	HAbstractNode * f_poRoot;
-	long int f_lQuantity;
+	int long f_lQuantity;
 	/*}*/
 public:
 	/*{*/
@@ -118,7 +118,7 @@ public:
 	void remove ( tType const & );
 	template < typename tType >
 	HIterator find ( tType const & );
-	long int quantity ( void );
+	int long quantity ( void );
 	HIterator begin ( void );
 	HIterator end ( void );
 	HIterator rbegin ( void );

@@ -45,7 +45,7 @@ namespace yaal
 namespace hcore
 {
 
-extern long int unsigned const * const g_pulPrimes;
+extern int long unsigned const * const g_pulPrimes;
 
 template < typename tType >
 inline int long unsigned hash ( tType const & a_rtKey )
