@@ -68,12 +68,16 @@ HBTree::HIterator & HBTree::HIterator::operator ++ ( void )
 		if ( f_poCurrent->f_poRight && ( f_poCurrent->f_poRight != l_poLastNode ) )
 			{
 			f_poCurrent = f_poCurrent->f_poRight;
+			while ( f_poCurrent->f_poLeft )
+				f_poCurrent = f_poCurrent->f_poLeft;
 			break;
 			}
 		else
 			{
 			l_poLastNode = f_poCurrent;
 			f_poCurrent = f_poCurrent->f_poParent;
+			if ( f_poCurrent && ( l_poLastNode == f_poCurrent->f_poLeft ) )
+				break;
 			}
 		}
 	return ( * this );
@@ -98,12 +102,16 @@ HBTree::HIterator & HBTree::HIterator::operator -- ( void )
 		if ( f_poCurrent->f_poLeft && ( f_poCurrent->f_poLeft != l_poLastNode ) )
 			{
 			f_poCurrent = f_poCurrent->f_poLeft;
+			while ( f_poCurrent->f_poRight )
+				f_poCurrent = f_poCurrent->f_poRight;
 			break;
 			}
 		else
 			{
 			l_poLastNode = f_poCurrent;
 			f_poCurrent = f_poCurrent->f_poParent;
+			if ( f_poCurrent && ( l_poLastNode == f_poCurrent->f_poRight ) )
+				break;
 			}
 		}
 	return ( * this );
@@ -223,39 +231,60 @@ void HBTree::insert_rebalance ( HAbstractNode * a_poNode )
 
 void HBTree::rotate_left ( HAbstractNode * a_poNode )
 	{
-	if ( a_poNode->f_poParent )
-		a_poNode->f_poParent->f_poLeft = a_poNode->f_poRight;
-	else
-		f_poRoot = a_poNode->f_poRight;
-	HAbstractNode * l_poNode1 = a_poNode->f_poLeft;
-	HAbstractNode * l_poNode2 = a_poNode->f_poRight->f_poLeft;
-	HAbstractNode * l_poNode3 = a_poNode->f_poRight->f_poRight;
+	/* 
+	 * At the beggining of left rotation:
+	 * a_poNode is parent node (center of the rotation)
+	 * a_poNode->f_poRight is child node (lets call it satelite)
+	 *
+	 * At the end of left rotation:
+	 * center of the rotation is left child
+	 * of its satelite
+	 */
 	HAbstractNode * l_poParent = a_poNode->f_poParent;
-	a_poNode->f_poParent = a_poNode->f_poRight;
-	a_poNode->f_poLeft = l_poNode1;
-	a_poNode->f_poRight = l_poNode2;
-	a_poNode->f_poParent->f_poLeft = a_poNode;
-	a_poNode->f_poParent->f_poRight = l_poNode3;
-	a_poNode->f_poParent->f_poParent = l_poParent;
+	HAbstractNode * l_poNode = a_poNode->f_poRight;
+	if ( l_poParent )
+		{
+		if ( l_poParent->f_poLeft == a_poNode )
+			l_poParent->f_poLeft = l_poNode;
+		else
+			{
+			M_ASSERT ( l_poParent->f_poRight == a_poNode );
+			l_poParent->f_poRight = l_poNode;
+			}
+		}
+	else
+		f_poRoot = l_poNode;
+	a_poNode->f_poParent = l_poNode;
+	a_poNode->f_poRight = l_poNode->f_poLeft;
+	if ( a_poNode->f_poRight )
+		a_poNode->f_poRight->f_poParent = a_poNode;
+	l_poNode->f_poLeft = a_poNode;
+	l_poNode->f_poParent = l_poParent;
 	return;
 	}
 
 void HBTree::rotate_right ( HAbstractNode * a_poNode )
 	{
-	if ( a_poNode->f_poParent )
-		a_poNode->f_poParent->f_poRight = a_poNode->f_poLeft;
-	else
-		f_poRoot = a_poNode->f_poLeft;
-	HAbstractNode * l_poNode1 = a_poNode->f_poRight;
-	HAbstractNode * l_poNode2 = a_poNode->f_poLeft->f_poRight;
-	HAbstractNode * l_poNode3 = a_poNode->f_poLeft->f_poLeft;
 	HAbstractNode * l_poParent = a_poNode->f_poParent;
-	a_poNode->f_poParent = a_poNode->f_poLeft;
-	a_poNode->f_poRight = l_poNode1;
-	a_poNode->f_poLeft = l_poNode2;
-	a_poNode->f_poParent->f_poRight = a_poNode;
-	a_poNode->f_poParent->f_poLeft = l_poNode3;
-	a_poNode->f_poParent->f_poParent = l_poParent;
+	HAbstractNode * l_poNode = a_poNode->f_poLeft;
+	if ( l_poParent )
+		{
+		if ( l_poParent->f_poRight == a_poNode )
+			l_poParent->f_poRight = l_poNode;
+		else
+			{
+			M_ASSERT ( l_poParent->f_poLeft == a_poNode );
+			l_poParent->f_poLeft = l_poNode;
+			}
+		}
+	else
+		f_poRoot = l_poNode;
+	a_poNode->f_poParent = l_poNode;
+	a_poNode->f_poLeft = l_poNode->f_poRight;
+	if ( a_poNode->f_poLeft )
+		a_poNode->f_poLeft->f_poParent = a_poNode;
+	l_poNode->f_poRight = a_poNode;
+	l_poNode->f_poParent = l_poParent;
 	return;
 	}
 
@@ -393,6 +422,11 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 			}
 		}
 	return;
+	}
+
+long int HBTree::quantity ( void )
+	{
+	return ( f_lQuantity );
 	}
 
 HBTree::HIterator HBTree::begin ( void )

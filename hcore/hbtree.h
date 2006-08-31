@@ -118,6 +118,7 @@ public:
 	void remove ( tType const & );
 	template < typename tType >
 	HIterator find ( tType const & );
+	long int quantity ( void );
 	HIterator begin ( void );
 	HIterator end ( void );
 	HIterator rbegin ( void );
