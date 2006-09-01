@@ -242,7 +242,8 @@ void HBTree::remove ( tType const & a_tKey )
 template < typename tType >
 HBTree::HIterator HBTree::find ( tType const & a_tKey )
 	{
-	return ( HIterator ( find_node ( a_tKey ) ) );
+	ONodePtr l_oNodePtr = find_node ( a_tKey );
+	return ( HIterator ( l_oNodePtr.f_bExists ? l_oNodePtr.f_poNode : NULL ) );
 	}
 
 template < typename tType >
@@ -261,7 +262,7 @@ typename HBTree::ONodePtr HBTree::find_node ( tType const & a_tKey )
 				else
 					break;
 				}
-			else if ( a_tKey > static_cast < HNode < tType > * > ( l_oNodePtr.f_poNode )->f_tKey )
+			else if ( static_cast < HNode < tType > * > ( l_oNodePtr.f_poNode )->f_tKey < a_tKey )
 				{
 				if ( l_oNodePtr.f_poNode->f_poRight )
 					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poRight;
