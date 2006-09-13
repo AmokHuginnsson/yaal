@@ -33,6 +33,8 @@ Copyright:
 
 #include "hexception.h"
 
+#include "hlog.h"
+
 namespace yaal
 {
 
@@ -235,6 +237,7 @@ void HBTree::remove ( tType const & a_tKey )
 			return;
 			}
 		}
+	yaal::hcore::log << "not existing node: " << a_tKey << endl;
 	M_THROW ( n_ppcErrMsgHBTree [ ERROR::E_NON_EXISTING_KEY ],
 			static_cast < int > ( ERROR::E_NON_EXISTING_KEY ) );
 	}

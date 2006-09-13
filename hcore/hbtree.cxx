@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hbtree.c - this file is integral part of `yaal' project.
+	hbtree.cxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -297,11 +297,10 @@ void HBTree::remove_node ( HAbstractNode * a_poNode )
 		while ( l_poNode->f_poRight )
 			l_poNode = l_poNode->f_poRight;
 		swap ( a_poNode, l_poNode );
-		a_poNode = l_poNode;
 		}
 	if ( a_poNode->f_poLeft )
 		{
-		M_ASSERT ( ! a_poNode->f_poLeft );
+		M_ASSERT ( ! a_poNode->f_poRight );
 		a_poNode->f_poLeft->f_poParent = a_poNode->f_poParent;
 		if ( a_poNode->f_poParent )
 			a_poNode->f_poParent->set_child ( a_poNode, a_poNode->f_poLeft );
@@ -322,9 +321,9 @@ void HBTree::remove_node ( HAbstractNode * a_poNode )
 			f_poRoot = a_poNode->f_poRight;
 			}
 		}
-	remove_rebalance ( a_poNode );
-	if ( a_poNode->f_poParent &&
-			! ( a_poNode->f_poLeft || a_poNode->f_poRight ) )
+//	remove_rebalance ( a_poNode );
+	if ( ( a_poNode->f_poParent )
+			&& ! ( a_poNode->f_poLeft || a_poNode->f_poRight ) )
 		a_poNode->f_poParent->set_child ( a_poNode, NULL );
 	a_poNode->f_poLeft = a_poNode->f_poRight = NULL;
 	delete a_poNode;
@@ -368,6 +367,7 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 							rotate_left ( a_poNode->f_poParent );
 						else
 							rotate_right ( a_poNode->f_poParent );
+						l_poSibling = sibling ( a_poNode );
 						log << "rbt: rotation" << endl;
 						}
 						{
@@ -402,6 +402,7 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 							l_poSibling->f_eColor = HAbstractNode::D_RED;
 							l_poSibling->f_poLeft->f_eColor = HAbstractNode::D_BLACK;
 							rotate_right ( l_poSibling );
+							l_poSibling = sibling ( a_poNode );
 							log << "rbt: rotate sibling right" << endl;
 							}
 						else if ( ( a_poNode == a_poNode->f_poParent->f_poRight ) && ( l_poSibling->f_eColor == HAbstractNode::D_BLACK )
@@ -411,6 +412,7 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 							l_poSibling->f_eColor = HAbstractNode::D_RED;
 							l_poSibling->f_poRight->f_eColor = HAbstractNode::D_BLACK;
 							rotate_left ( l_poSibling );
+							l_poSibling = sibling ( a_poNode );
 							log << "rbt: rotate sibling left" << endl;
 							}
 						l_poSibling->f_eColor = a_poNode->f_poParent->f_eColor;
@@ -471,7 +473,6 @@ void HBTree::swap ( HAbstractNode * a_poFirst, HAbstractNode * a_poSecond )
 	{
 	M_ASSERT ( a_poFirst && a_poSecond );
 	M_ASSERT ( a_poFirst != a_poSecond );
-	M_ASSERT ( a_poFirst == a_poSecond );
 	if ( a_poFirst == f_poRoot )
 		f_poRoot = a_poSecond;
 	else if ( a_poSecond == f_poRoot )
@@ -484,35 +485,40 @@ void HBTree::swap ( HAbstractNode * a_poFirst, HAbstractNode * a_poSecond )
 	HAbstractNode * l_poSecondRight = a_poSecond->f_poRight;
 	if ( l_poFirstParent == l_poSecondParent ) /* siblings */
 		{
-		if ( l_poFirstParent )
+		M_ASSERT ( l_poFirstParent );
+		if ( a_poFirst == l_poFirstParent->f_poLeft )
 			{
-			if ( l_poFirstParent->f_poLeft == a_poFirst )
-				{
-				l_poFirstParent->f_poLeft = a_poSecond;
-				l_poFirstParent->f_poRight = a_poFirst;
-				}
-			else
-				{
-				l_poFirstParent->f_poLeft = a_poFirst;
-				l_poFirstParent->f_poRight = a_poSecond;
-				}
+			l_poFirstParent->f_poLeft = a_poSecond;
+			l_poFirstParent->f_poRight = a_poFirst;
+			}
+		else
+			{
+			M_ASSERT ( a_poFirst == l_poFirstParent->f_poRight );
+			l_poFirstParent->f_poLeft = a_poFirst;
+			l_poFirstParent->f_poRight = a_poSecond;
 			}
 		}
 	else /* not siblings */
 		{
 		if ( l_poFirstParent )
 			{
-			if ( l_poFirstParent->f_poLeft == a_poFirst )
+			if ( a_poFirst == l_poFirstParent->f_poLeft )
 				l_poFirstParent->f_poLeft = a_poSecond;
 			else
+				{
+				M_ASSERT ( a_poFirst == l_poFirstParent->f_poRight );
 				l_poFirstParent->f_poRight = a_poSecond;
+				}
 			}
 		if ( l_poSecondParent )
 			{
-			if ( l_poSecondParent->f_poLeft == a_poSecond )
+			if ( a_poSecond == l_poSecondParent->f_poLeft )
 				l_poSecondParent->f_poLeft = a_poFirst;
 			else
+				{
+				M_ASSERT ( a_poSecond == l_poSecondParent->f_poRight );
 				l_poSecondParent->f_poRight = a_poFirst;
+				}
 			}
 		}
 	if ( l_poFirstLeft )

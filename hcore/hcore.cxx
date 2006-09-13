@@ -2,7 +2,7 @@ char const COPYRIGHT [ ] =
 "/*\n"
 "---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---\n"
 "\n"
-/* hcore.c - this file is integral part of `yaal' project.
+/* hcore.cxx - this file is integral part of `yaal' project.
  */
 "	i.  You may not make any changes in Copyright information.\n"
 "	ii. You must attach Copyright information to any part of every copy\n"
