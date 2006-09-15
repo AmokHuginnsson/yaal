@@ -2,13 +2,24 @@
 
 * Supported platforms:
 
-	- FreeBSD 6-CURRENT
+	- FreeBSD 7-CURRENT
 	- Debian Sid
-	- PLD DC/AC
-	- Debian Sarge
+	- PLD TH
 
 If your platform is not on above list, it is very likely that yaal
 will not compile/link/work.
 
+Yaal does not intend to support any "stable" release of any
+system. Yaal was meant to be compatibile only with systems at
+bleeding edge of development stage. Above statements mean:
+We do not maintain backward compatibility of any kind,
+if You want increase Your yaal integration success probability
+please use newest development (build) tools available,
+especialy C++ compiler and GNU make tool.
+
 You are welcome to port yaal to your platform and send us a patch.
 
+IMPORTANT:
+Yaal containers implementation has been created with sole educational
+purposes. If You want template containers do NOT use yaal's containers,
+use STL instead.

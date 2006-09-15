@@ -5,13 +5,14 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 * System requirements:
 
 	libraries:
+		- libxml2
 		- ncurses
 	
 	optional libraries:
+		- SQLite3
+		- SQLite
 		- MySQL
 		- PostGreSQL
-		- SQLite
-		- SQLite3
 		- OCI
 		- gpm
 
@@ -21,7 +22,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 		- gcc/g++
 
 	other:
-		- lots of guts
+		- lots of grace and patience
 
 * Installation process:
 
@@ -39,7 +40,7 @@ Let installation begin.
 
 # common step for all cases
 	$ cd /path/to/yaal/
-	$ cvs up
+	$ svn up
 
 # first case (FreeBSD/update/expert)
 	$ make
