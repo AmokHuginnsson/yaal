@@ -158,6 +158,11 @@ char const * HException::what ( void ) const
 	return ( f_pcMessage );
 	}
 
+int HException::code ( void ) const
+	{
+	return ( f_iCode );
+	}
+
 #ifdef _EXECINFO_H
 void HException::dump_call_stack ( int const a_iLevel )
 #else /* _EXECINFO_H */

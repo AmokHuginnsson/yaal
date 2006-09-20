@@ -80,6 +80,7 @@ public:
 	static void dump_call_stack ( int const );
 	void log ( char const * const, char const * const, int const );
 	char const * what ( void ) const;
+	int code ( void ) const;
 	HException * operator-> ( void );
 	static void failed_assert ( char const * const, char const * const, int const,
 			char const * const ) __attribute__(( __noreturn__ ));
