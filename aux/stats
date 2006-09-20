@@ -7,7 +7,7 @@ if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
 	exit 0
 else
 	AWK="gawk"
-	SOURCES=`find . -name '*.c'`
+	SOURCES=`find . -name '*.cxx'`
 	HEADERS=`find . ! -name 'config.h' -a -name '*.h'`
 	ALL="${SOURCES} ${HEADERS}"
 

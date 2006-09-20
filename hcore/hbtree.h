@@ -163,7 +163,7 @@ public:
 	bool operator == ( HIterator const & ) const;
 	bool operator != ( HIterator const & ) const;
 	template < typename tType >
-	tType & get ( void );
+	tType const & operator * ( void );
 	/*}*/
 protected:
 	/*{*/
@@ -173,7 +173,7 @@ protected:
 	};
 
 template < typename tType >
-tType & HBTree::HIterator::get ( void )
+tType const & HBTree::HIterator::operator * ( void )
 	{
 	M_ASSERT ( f_poCurrent );
 	return ( static_cast < HNode < tType > * > ( f_poCurrent )->f_tKey );

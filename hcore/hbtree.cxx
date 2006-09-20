@@ -30,7 +30,6 @@ Copyright:
 M_VCSID ( "$Id$" )
 #include "hbtree.h"
 M_VCSTID ( D_VCSID_HBTREE_H )
-#include "hlog.h"
 
 namespace yaal
 {
@@ -321,7 +320,7 @@ void HBTree::remove_node ( HAbstractNode * a_poNode )
 			f_poRoot = a_poNode->f_poRight;
 			}
 		}
-//	remove_rebalance ( a_poNode );
+	remove_rebalance ( a_poNode );
 	if ( ( a_poNode->f_poParent )
 			&& ! ( a_poNode->f_poLeft || a_poNode->f_poRight ) )
 		a_poNode->f_poParent->set_child ( a_poNode, NULL );
@@ -350,7 +349,6 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 			 * no matter if it's child of removed node, or the node it self */
 			for ( int i = 0; ; ++i ) /* tail recursion may be easily changed to iteration */
 				{
-				log << "rbt: " << i << endl;
 				if ( a_poNode->f_poParent == NULL )
 					f_poRoot->f_eColor = HAbstractNode::D_BLACK;
 				else /* hard part starts here */
@@ -368,13 +366,6 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 						else
 							rotate_right ( a_poNode->f_poParent );
 						l_poSibling = sibling ( a_poNode );
-						log << "rbt: rotation" << endl;
-						}
-						{
-						log << "rbt: node " <<  ( void * )a_poNode << endl;
-						log << "rbt: color " <<  ( int )a_poNode->f_eColor << endl;
-						log << "rbt: parent " <<  ( void * )a_poNode->f_poParent << endl;
-						log << "rbt: parent color " <<  ( int )a_poNode->f_poParent->f_eColor << endl;
 						}
 					if ( ( a_poNode->f_poParent->f_eColor == HAbstractNode::D_BLACK )
 							&& ( l_poSibling->f_eColor == HAbstractNode::D_BLACK )
@@ -403,7 +394,6 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 							l_poSibling->f_poLeft->f_eColor = HAbstractNode::D_BLACK;
 							rotate_right ( l_poSibling );
 							l_poSibling = sibling ( a_poNode );
-							log << "rbt: rotate sibling right" << endl;
 							}
 						else if ( ( a_poNode == a_poNode->f_poParent->f_poRight ) && ( l_poSibling->f_eColor == HAbstractNode::D_BLACK )
 								&& ( l_poSibling->f_poRight && l_poSibling->f_poRight->f_eColor == HAbstractNode::D_RED )
@@ -413,7 +403,6 @@ void HBTree::remove_rebalance ( HAbstractNode * a_poNode )
 							l_poSibling->f_poRight->f_eColor = HAbstractNode::D_BLACK;
 							rotate_left ( l_poSibling );
 							l_poSibling = sibling ( a_poNode );
-							log << "rbt: rotate sibling left" << endl;
 							}
 						l_poSibling->f_eColor = a_poNode->f_poParent->f_eColor;
 						a_poNode->f_poParent->f_eColor = HAbstractNode::D_BLACK;
@@ -529,12 +518,30 @@ void HBTree::swap ( HAbstractNode * a_poFirst, HAbstractNode * a_poSecond )
 		l_poSecondLeft->f_poParent = a_poFirst;
 	if ( l_poSecondRight )
 		l_poSecondRight->f_poParent = a_poFirst;
-	a_poFirst->f_poParent = l_poSecondParent;
-	a_poFirst->f_poLeft = l_poSecondLeft;
-	a_poFirst->f_poRight = l_poSecondRight;
-	a_poSecond->f_poParent = l_poFirstParent;
-	a_poSecond->f_poLeft = l_poFirstLeft;
-	a_poSecond->f_poRight = l_poFirstRight;
+	if ( l_poSecondParent != a_poFirst )
+		a_poFirst->f_poParent = l_poSecondParent;
+	else
+		a_poFirst->f_poParent = a_poSecond;
+	if ( l_poSecondLeft != a_poFirst )
+		a_poFirst->f_poLeft = l_poSecondLeft;
+	else
+		a_poFirst->f_poLeft = a_poSecond;
+	if ( l_poSecondRight != a_poFirst )
+		a_poFirst->f_poRight = l_poSecondRight;
+	else
+		a_poFirst->f_poRight = a_poSecond;
+	if ( l_poFirstParent != a_poSecond )
+		a_poSecond->f_poParent = l_poFirstParent;
+	else
+		a_poSecond->f_poParent = a_poFirst;
+	if ( l_poFirstLeft != a_poSecond )
+		a_poSecond->f_poLeft = l_poFirstLeft;
+	else
+		a_poSecond->f_poLeft = a_poFirst;
+	if ( l_poFirstRight != a_poSecond )
+		a_poSecond->f_poRight = l_poFirstRight;
+	else
+		a_poSecond->f_poRight = a_poFirst;
 	HAbstractNode::color_t l_eColor = a_poFirst->f_eColor;
 	a_poFirst->f_eColor = a_poSecond->f_eColor;
 	a_poSecond->f_eColor = l_eColor;
