@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hbtree.h - this file is integral part of `yaal' project.
+	hsbbstree.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __YAAL_HCORE_HBTREE_H
-#define __YAAL_HCORE_HBTREE_H
+#ifndef __YAAL_HCORE_HSBBSTREE_H
+#define __YAAL_HCORE_HSBBSTREE_H
 
 #line 31
 
-#define D_VCSID_HBTREE_H "$Id$"
+#define D_VCSID_HSBBSTREE_H "$Id$"
 
 #include "hexception.h"
 
@@ -41,9 +41,11 @@ namespace yaal
 namespace hcore
 {
 
-extern char const * const n_ppcErrMsgHBTree [ ];
+extern char const * const n_ppcErrMsgHSBBSTree [ ];
 
-class HBTree
+/* HSBBSTree stands for: Self-balancing binary search tree. */
+
+class HSBBSTree
 	{
 public:
 	struct ERROR
@@ -90,7 +92,7 @@ protected:
 		HAbstractNode & operator = ( HAbstractNode const & );
 		void set_child ( HAbstractNode *, HAbstractNode * );
 		/*}*/
-		friend class HBTree;
+		friend class HSBBSTree;
 		};
 	template < typename tType >
 	class HNode : public HAbstractNode
@@ -105,15 +107,15 @@ protected:
 		HNode ( HNode const & );
 		HNode & operator = ( HNode const & );
 		/*}*/
-		friend class HBTree;
+		friend class HSBBSTree;
 		};
 	HAbstractNode * f_poRoot;
 	int long f_lQuantity;
 	/*}*/
 public:
 	/*{*/
-	HBTree ( void );
-	virtual ~HBTree ( void );
+	HSBBSTree ( void );
+	virtual ~HSBBSTree ( void );
 	template < typename tType >
 	void insert ( tType const & );
 	template < typename tType >
@@ -140,12 +142,12 @@ protected:
 	/*}*/
 private:
 	/*{*/
-	HBTree ( HBTree const & );
-	HBTree & operator = ( HBTree const & );
+	HSBBSTree ( HSBBSTree const & );
+	HSBBSTree & operator = ( HSBBSTree const & );
 	/*}*/
 	};
 
-class HBTree::HIterator
+class HSBBSTree::HIterator
 	{
 protected:
 	/*{*/
@@ -167,13 +169,13 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	friend class HBTree;
+	friend class HSBBSTree;
 	explicit HIterator ( HAbstractNode * const );
 	/*}*/
 	};
 
 template < typename tType >
-tType const & HBTree::HIterator::operator * ( void )
+tType const & HSBBSTree::HIterator::operator * ( void )
 	{
 	M_ASSERT ( f_poCurrent );
 	return ( static_cast < HNode < tType > * > ( f_poCurrent )->f_tKey );
@@ -181,14 +183,14 @@ tType const & HBTree::HIterator::operator * ( void )
 
 
 template < typename tType >
-HBTree::HNode < tType >::HNode ( tType const & a_tKey )
+HSBBSTree::HNode < tType >::HNode ( tType const & a_tKey )
 	: HAbstractNode ( ), f_tKey ( a_tKey )
 	{
 	return;
 	}
 
 template < typename tType >
-void HBTree::insert ( tType const & a_tKey )
+void HSBBSTree::insert ( tType const & a_tKey )
 	{
 	ONodePtr l_oNode;
 	if ( f_poRoot )
@@ -226,7 +228,7 @@ void HBTree::insert ( tType const & a_tKey )
 	}
 
 template < typename tType >
-void HBTree::remove ( tType const & a_tKey )
+void HSBBSTree::remove ( tType const & a_tKey )
 	{
 	if ( f_poRoot )
 		{
@@ -238,19 +240,19 @@ void HBTree::remove ( tType const & a_tKey )
 			}
 		}
 	yaal::hcore::log << "not existing node: " << a_tKey << endl;
-	M_THROW ( n_ppcErrMsgHBTree [ ERROR::E_NON_EXISTING_KEY ],
+	M_THROW ( n_ppcErrMsgHSBBSTree [ ERROR::E_NON_EXISTING_KEY ],
 			static_cast < int > ( ERROR::E_NON_EXISTING_KEY ) );
 	}
 
 template < typename tType >
-HBTree::HIterator HBTree::find ( tType const & a_tKey )
+HSBBSTree::HIterator HSBBSTree::find ( tType const & a_tKey )
 	{
 	ONodePtr l_oNodePtr = find_node ( a_tKey );
 	return ( HIterator ( l_oNodePtr.f_bExists ? l_oNodePtr.f_poNode : NULL ) );
 	}
 
 template < typename tType >
-typename HBTree::ONodePtr HBTree::find_node ( tType const & a_tKey )
+typename HSBBSTree::ONodePtr HSBBSTree::find_node ( tType const & a_tKey )
 	{
 	ONodePtr l_oNodePtr;
 	if ( f_poRoot )
@@ -283,5 +285,5 @@ typename HBTree::ONodePtr HBTree::find_node ( tType const & a_tKey )
 
 }
 
-#endif /* not __YAAL_HCORE_HBTREE_H */
+#endif /* not __YAAL_HCORE_HSBBSTREE_H */
 
