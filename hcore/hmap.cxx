@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hmap.cxx - this file is integral part of `yaal' project.
+	hhashmap.cxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -26,8 +26,8 @@ Copyright:
 
 #include "hexception.h"
 M_VCSID ( "$Id$" )
-#include "hmap.h"
-M_VCSTID ( D_VCSID_HMAP_H )
+#include "hhashmap.h"
+M_VCSTID ( D_VCSID_HHASHMAP_H )
 
 namespace yaal
 {

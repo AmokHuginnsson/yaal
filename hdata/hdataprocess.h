@@ -45,7 +45,7 @@ namespace hdata
 			& this_t::handler ); \
 	}
 
-typedef yaal::hcore::HMap < yaal::hcore::HString,
+typedef yaal::hcore::HHashMap < yaal::hcore::HString,
 				yaal::hconsole::OMenuItem::HANDLER_t > menu_handlers_map_t;
 
 class HDataProcess : public hconsole::HTUIProcess

@@ -161,7 +161,7 @@
 -esym(18,sigevent::_sigev_un,yaal::hcore::xfree_internal,yaal::hcore::xcalloc_internal,yaal::hcore::xrealloc_internal)	/* Symbol 'symbol' redeclared */
 -esym(418,strftime,fflush)	/* Passing null pointer to function 'function' */
 -esym(449,l_poAtom)					/* Pointer variable 'variable' previously deallocated */
--esym(526,yaal::hcore::HList<<1>>,"yaal::hcore::HMap<<1>,<2>>","yaal::hcore::HPointer<<1>,<2>>",yaal::hcore::HTree<<1>>,yaal::hcore::xmalloc_internal,yaal::hcore::xcalloc_internal,yaal::hcore::xrealloc_internal,yaal::hcore::xfree_internal,yaal::hcore::xstrdup)	/* Symbol 'symbol' not defined */
+-esym(526,yaal::hcore::HList<<1>>,"yaal::hcore::HHashMap<<1>,<2>>","yaal::hcore::HPointer<<1>,<2>>",yaal::hcore::HTree<<1>>,yaal::hcore::xmalloc_internal,yaal::hcore::xcalloc_internal,yaal::hcore::xrealloc_internal,yaal::hcore::xfree_internal,yaal::hcore::xstrdup)	/* Symbol 'symbol' not defined */
 -esym(528,__VCSID__,__VCSTID__) /* Symbol 'symbol' not referenced */
 -esym(534,yaal::hcore::HLog::operato*)
 -esym(752,yaal::hcore::g_ppcErrMsgHList,yaal::hcore::g_pulPrimes,yaal::hcore::hash)
@@ -183,7 +183,7 @@
 -function(exit,yaal::hcore::HException::failed_assert)
 
 -efile(766,hcore/hlist.c)
--efile(766,hcore/hmap.c)
+-efile(766,hcore/hhashmap.c)
 -efile(766,hcore/hpointer.c)
 
 /* vim: set ft=cpp: */

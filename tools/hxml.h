@@ -28,7 +28,7 @@ Copyright:
 #define __TOOLS_HXML_H
 
 #include "hcore/hstring.h"
-#include "hcore/hmap.h"
+#include "hcore/hhashmap.h"
 #include "hcore/hlist.h"
 #include "hcore/hpointer.h"
 
@@ -55,7 +55,7 @@ public:
 		int f_iLevel;
 		yaal::hcore::HString	f_oName;
 		yaal::hcore::HList < yaal::hcore::HString > f_oContents;
-		yaal::hcore::HMap < yaal::hcore::HString,
+		yaal::hcore::HHashMap < yaal::hcore::HString,
 			yaal::hcore::HString > f_oProperties;
 		yaal::hcore::HList < ONode > f_oChilds;
 		yaal::hcore::HList < type_t > f_oTypes;

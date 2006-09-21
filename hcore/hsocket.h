@@ -28,7 +28,7 @@ Copyright:
 #define __YAAL_HCORE_HSOCKET_H
 
 #include "hrawfile.h"
-#include "hmap.h"
+#include "hhashmap.h"
 
 namespace yaal
 {
@@ -48,7 +48,7 @@ public:
 		D_NONBLOCKING = 8
 		} socket_type_t;
 protected:
-	typedef HMap < int, HSocket * > clients_t;
+	typedef HHashMap < int, HSocket * > clients_t;
 	/*{*/
 	bool f_bNeedShutdown;
 	socket_type_t f_eType;

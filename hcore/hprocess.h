@@ -29,7 +29,7 @@ Copyright:
 
 #include <sys/types.h>
 
-#include "hmap.h"
+#include "hhashmap.h"
 
 namespace yaal
 {
@@ -41,7 +41,7 @@ class HProcess
 	{
 protected:
 	typedef int ( HProcess::* process_handler_filedes_t ) ( int );
-	typedef hcore::HMap < int, process_handler_filedes_t > process_filedes_map_t;
+	typedef hcore::HHashMap < int, process_handler_filedes_t > process_filedes_map_t;
 	/*{*/
 	bool			f_bInitialised;					/* did process has necessery initialisation */
 	bool			f_bLoop; 								/* indicates if main loop continues */

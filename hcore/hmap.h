@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hmap.h - this file is integral part of `yaal' project.
+	hhashmap.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __YAAL_HCORE_HMAP_H
-#define __YAAL_HCORE_HMAP_H
+#ifndef __YAAL_HCORE_HHASHMAP_H
+#define __YAAL_HCORE_HHASHMAP_H
 
-#line 31 "hmap.h"
+#line 31 "hhashmap.h"
 
-#define D_VCSID_HMAP_H "$Id$"
+#define D_VCSID_HHASHMAP_H "$Id$"
 
 #include <cstddef>
 #include <cstdlib>
@@ -54,7 +54,7 @@ inline int long unsigned hash ( tType const & a_rtKey )
 	}
 
 template < typename tType, typename ttType >
-class HMap
+class HHashMap
 	{
 private:
 	class HAtom
@@ -75,7 +75,7 @@ private:
 		HAtom ( HAtom const & );
 		HAtom & operator = ( HAtom const & );
 		/*}*/
-		friend class HMap < tType, ttType >;
+		friend class HHashMap < tType, ttType >;
 		};
 protected:
 	/*{*/
@@ -87,10 +87,10 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HMap ( size_t ); /* Lower bound of size of map's table */
-	HMap ( HMap const & );
-	virtual ~HMap ( void );
-	HMap & operator = ( HMap const & );
+	HHashMap ( size_t ); /* Lower bound of size of map's table */
+	HHashMap ( HHashMap const & );
+	virtual ~HHashMap ( void );
+	HHashMap & operator = ( HHashMap const & );
 	ttType & operator [ ] ( tType const & );
 	void rewind ( void );
 	bool iterate ( tType &, ttType & );
@@ -106,7 +106,7 @@ private:
 	};
 
 template < typename tType, typename ttType >
-HMap<tType, ttType>::HAtom::HAtom ( void ) : f_tKey ( ), f_tValue ( ),
+HHashMap<tType, ttType>::HAtom::HAtom ( void ) : f_tKey ( ), f_tValue ( ),
 																						 f_poNext ( NULL )
 	{
 	M_PROLOG
@@ -115,7 +115,7 @@ HMap<tType, ttType>::HAtom::HAtom ( void ) : f_tKey ( ), f_tValue ( ),
 	}
 
 template < typename tType, typename ttType >
-HMap<tType, ttType>::HAtom::~HAtom ( void )
+HHashMap<tType, ttType>::HAtom::~HAtom ( void )
 	{
 	M_PROLOG
 	return;
@@ -123,7 +123,7 @@ HMap<tType, ttType>::HAtom::~HAtom ( void )
 	}
 
 template < typename tType, typename ttType >
-HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( 0 ), f_uiIndex ( 0 ),
+HHashMap<tType, ttType>::HHashMap ( size_t a_uiSize ) : f_uiPrime ( 0 ), f_uiIndex ( 0 ),
 	f_iQuantity ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
 	M_PROLOG
@@ -142,7 +142,7 @@ HMap<tType, ttType>::HMap ( size_t a_uiSize ) : f_uiPrime ( 0 ), f_uiIndex ( 0 )
 	}
 
 template < typename tType, typename ttType >
-HMap<tType, ttType>::HMap ( HMap const & a_roMap ) :  f_uiPrime ( 0 ), f_uiIndex ( 0 ),
+HHashMap<tType, ttType>::HHashMap ( HHashMap const & a_roMap ) :  f_uiPrime ( 0 ), f_uiIndex ( 0 ),
 	f_iQuantity ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
 	M_PROLOG
@@ -152,7 +152,7 @@ HMap<tType, ttType>::HMap ( HMap const & a_roMap ) :  f_uiPrime ( 0 ), f_uiIndex
 	}
 
 template < typename tType, typename ttType >
-HMap<tType, ttType>::~HMap ( void )
+HHashMap<tType, ttType>::~HHashMap ( void )
 	{
 	M_PROLOG
 	flush ( );
@@ -164,7 +164,7 @@ HMap<tType, ttType>::~HMap ( void )
 	}
 
 template < typename tType, typename ttType >
-HMap<tType, ttType> & HMap<tType, ttType>::operator = ( HMap const & a_roMap )
+HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const & a_roMap )
 	{
 	M_PROLOG
 	int unsigned l_iCtr = 0;
@@ -201,7 +201,7 @@ HMap<tType, ttType> & HMap<tType, ttType>::operator = ( HMap const & a_roMap )
 	}
 
 template < typename tType, typename ttType >
-void HMap<tType, ttType>::flush ( void )
+void HHashMap<tType, ttType>::flush ( void )
 	{
 	M_PROLOG
 	int unsigned l_uiCtr = 0;
@@ -220,7 +220,7 @@ void HMap<tType, ttType>::flush ( void )
 	}
 
 template < typename tType, typename ttType >
-int HMap < tType, ttType >::quantity ( void ) const
+int HHashMap < tType, ttType >::quantity ( void ) const
 	{
 	M_PROLOG
 	return ( f_iQuantity );
@@ -228,7 +228,7 @@ int HMap < tType, ttType >::quantity ( void ) const
 	}
 
 template < typename tType, typename ttType >
-ttType & HMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
+ttType & HHashMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
 	{
 	M_PROLOG
 	int l_iHash = - 1;
@@ -252,7 +252,7 @@ ttType & HMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
 	}
 
 template < typename tType, typename ttType >
-void HMap<tType, ttType>::rewind ( void )
+void HHashMap<tType, ttType>::rewind ( void )
 	{
 	M_PROLOG
 	f_uiIndex = 0;
@@ -262,7 +262,7 @@ void HMap<tType, ttType>::rewind ( void )
 	}
 
 template < typename tType, typename ttType >
-bool HMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
+bool HHashMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 	{
 	M_PROLOG
 	if ( f_poAtomPtr )
@@ -288,7 +288,7 @@ bool HMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 	}
 
 template < typename tType, typename ttType >
-bool HMap<tType, ttType>::has_key ( tType const & a_rtKey ) const
+bool HHashMap<tType, ttType>::has_key ( tType const & a_rtKey ) const
 	{
 	M_PROLOG
 	int l_iHash = - 1;
@@ -302,7 +302,7 @@ bool HMap<tType, ttType>::has_key ( tType const & a_rtKey ) const
 	}
 
 template < typename tType, typename ttType >
-bool HMap<tType, ttType>::get ( tType const & a_rtKey, ttType & a_rtValue ) const
+bool HHashMap<tType, ttType>::get ( tType const & a_rtKey, ttType & a_rtValue ) const
 	{
 	M_PROLOG
 	int l_iHash = - 1;
@@ -318,7 +318,7 @@ bool HMap<tType, ttType>::get ( tType const & a_rtKey, ttType & a_rtValue ) cons
 	}
 
 template < typename tType, typename ttType >
-bool HMap<tType, ttType>::remove ( tType const & a_rtKey )
+bool HHashMap<tType, ttType>::remove ( tType const & a_rtKey )
 	{
 	M_PROLOG
 	int l_iHash = - 1;
@@ -352,5 +352,5 @@ int long unsigned hash ( HString const & );
 
 }
 
-#endif /* not __YAAL_HCORE_HMAP_H */
+#endif /* not __YAAL_HCORE_HHASHMAP_H */
 
