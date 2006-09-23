@@ -27,7 +27,7 @@ Copyright:
 #ifndef __YAAL_HCORE_CL_SWITCH_H
 #define __YAAL_HCORE_CL_SWITCH_H
 
-#include "hexception.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {

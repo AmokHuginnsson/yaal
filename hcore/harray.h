@@ -33,7 +33,7 @@ Copyright:
 
 #include <new>
 
-#include "hexception.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {

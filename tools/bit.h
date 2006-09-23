@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __TOOLS_BIT_H
-#define __TOOLS_BIT_H
+#ifndef __YAAL_TOOLS_BIT_H
+#define __YAAL_TOOLS_BIT_H
 
 namespace yaal
 {
@@ -42,4 +42,4 @@ void rol( char unsigned *, int, int, int );
 
 }
 
-#endif /* not __TOOLS_BIT_H */
+#endif /* not __YAAL_TOOLS_BIT_H */

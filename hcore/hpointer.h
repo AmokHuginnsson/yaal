@@ -31,7 +31,7 @@ Copyright:
 
 #define D_VCSID_HPOINTER_H "$Id$"
 
-#include "./hcore/hexception.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {

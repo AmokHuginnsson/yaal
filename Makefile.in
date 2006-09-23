@@ -33,7 +33,7 @@ COMPONENTS		= hcore hconsole tools dbwrapper hdata
 DRIVERS				= @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE_DRIVER@ @DO_SQLITE3_DRIVER@
 export DIR_ROOT	?= $(CURDIR)
 DIR_TARGET		= $(HOME)/usr/lib
-DIR_HEADERS		= $(HOME)/usr/include
+DIR_HEADERS		= $(HOME)/usr/include/yaal/
 DIR_BUILD			= $(DIR_ROOT)/build
 VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
@@ -247,18 +247,19 @@ install: all
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	@umask 022;cd $(DIR_ROOT); echo -n "Making headers ... "; \
 	for FILE in $(HDRS); do \
-		awk '/^#include "/ {match($$0,"[a-z_]+\\.$(HS)"); \
-		printf "#include <%s>\n", substr($$0,RSTART,RLENGTH) }; \
-		!/^#include "/' $$FILE > $(DIR_HEADERS)/`basename $$FILE`; \
+		mkdir -p $(DIR_HEADERS)/`dirname $$FILE` ; \
+		awk '/^#include "/ {match($$0,"\"[a-z_./-]+"); \
+		printf "#include <yaal/%s>\n", substr($$0,RSTART+1,RLENGTH-1) }; \
+		!/^#include "/' $$FILE > $(DIR_HEADERS)/$$FILE; \
 	done; \
-	head -26 $(DIR_HEADERS)/bit.h \
+	head -26 $(DIR_HEADERS)/tools/bit.h \
 | sed -e s/bit/yaal/ > $(DIR_HEADERS)/yaal.h; \
 	echo '#ifndef __YAAL_H' >> $(DIR_HEADERS)/yaal.h; \
 	echo '#define __YAAL_H' >> $(DIR_HEADERS)/yaal.h; \
 	echo '' >> $(DIR_HEADERS)/yaal.h; \
 	cat config.h >> $(DIR_HEADERS)/yaal.h; \
 	find $(DIR_HEADERS) ! -name 'yaal.h' -type f \
-| awk '{printf "#include <%s>\n", substr ($$1,match($$1,"[a-z_]+.$(HS)$$"),99)}' \
+| awk '{printf "#include <%s>\n", substr ($$1,match($$1,"yaal"),255)}' \
 | sort >> $(DIR_HEADERS)/yaal.h; \
 	echo '' >> $(DIR_HEADERS)/yaal.h; \
 	echo '#endif /* not __YAAL_H */' >> $(DIR_HEADERS)/yaal.h; \

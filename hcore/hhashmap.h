@@ -35,9 +35,9 @@ Copyright:
 #include <cstdlib>
 #include <new>
 
-#include "./hcore/xalloc.h"
-#include "./hcore/hexception.h"
-#include "./hcore/hstring.h"
+#include "hcore/xalloc.h"
+#include "hcore/hexception.h"
+#include "hcore/hstring.h"
 
 namespace yaal
 {

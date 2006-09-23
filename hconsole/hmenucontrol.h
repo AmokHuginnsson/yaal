@@ -24,11 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HMENUCONTROL_H
-#define __HCONSOLE_HMENUCONTROL_H
+#ifndef __YAAL_HCONSOLE_HMENUCONTROL_H
+#define __YAAL_HCONSOLE_HMENUCONTROL_H
 
-#include "htreecontrol.h"
-#include "omenuitem.h"
+#include "hconsole/htreecontrol.h"
+#include "hconsole/omenuitem.h"
 
 namespace yaal
 {
@@ -83,4 +83,4 @@ private:
 
 }
 
-#endif /* not __HCONSOLE_HMENUCONTROL_H */
+#endif /* not __YAAL_HCONSOLE_HMENUCONTROL_H */

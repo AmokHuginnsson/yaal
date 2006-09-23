@@ -25,8 +25,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __DBWRAPPER_DB_DRIVER_LOADER_H
-#define __DBWRAPPER_DB_DRIVER_LOADER_H
+#ifndef __YAAL_DBWRAPPER_DB_DRIVER_LOADER_H
+#define __YAAL_DBWRAPPER_DB_DRIVER_LOADER_H
 
 namespace yaal
 {
@@ -70,5 +70,5 @@ char * autoloader_rs_column_name ( void *, int );
 
 }
 
-#endif /* not __DBWRAPPER_DB_DRIVER_LOADER_H */
+#endif /* not __YAAL_DBWRAPPER_DB_DRIVER_LOADER_H */
 

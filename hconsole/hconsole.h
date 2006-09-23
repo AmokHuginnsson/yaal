@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HCONSOLE_H
-#define __HCONSOLE_HCONSOLE_H
+#ifndef __YAAL_HCONSOLE_HCONSOLE_H
+#define __YAAL_HCONSOLE_HCONSOLE_H
 
 namespace yaal
 {
@@ -54,5 +54,5 @@ void yaal_hconsole_banner ( void );
 
 }
 
-#endif /* not __HCONSOLE_HCONSOLE_H */
+#endif /* not __YAAL_HCONSOLE_HCONSOLE_H */
 

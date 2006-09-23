@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HSTATUSBARCONTROL_H
-#define __HCONSOLE_HSTATUSBARCONTROL_H
+#ifndef __YAAL_HCONSOLE_HSTATUSBARCONTROL_H
+#define __YAAL_HCONSOLE_HSTATUSBARCONTROL_H
 
-#include "heditcontrol.h"
+#include "hconsole/heditcontrol.h"
 
 namespace yaal
 {
@@ -102,5 +102,5 @@ public:
 
 }
 
-#endif /* not __HCONSOLE_HSTATUSBARCONTROL_H */
+#endif /* not __YAAL_HCONSOLE_HSTATUSBARCONTROL_H */
 

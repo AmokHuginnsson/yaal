@@ -29,7 +29,7 @@ Copyright:
 
 #include <ctime>
 
-#include "hstring.h"
+#include "hcore/hstring.h"
 
 namespace yaal
 {

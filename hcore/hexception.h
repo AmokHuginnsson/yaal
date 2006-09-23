@@ -36,7 +36,7 @@ Copyright:
 #ifdef __YAAL_BUILD__
 #	include "config.h"
 #endif /* __YAAL_BUILD__ */
-#include "base.h"
+#include "hcore/base.h"
 
 namespace yaal
 {

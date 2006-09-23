@@ -24,13 +24,13 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HTUIPROCESS_H
-#define __HCONSOLE_HTUIPROCESS_H
+#ifndef __YAAL_HCONSOLE_HTUIPROCESS_H
+#define __YAAL_HCONSOLE_HTUIPROCESS_H
 
 #include "hcore/hprocess.h"
-#include "hhandler.h"
-#include "hwindow.h"
-#include "hwindowlistcontrol.h"
+#include "hconsole/hhandler.h"
+#include "hconsole/hwindow.h"
+#include "hconsole/hwindowlistcontrol.h"
 
 namespace yaal
 {
@@ -79,5 +79,5 @@ private:
 
 }
 
-#endif /* not __HCONSOLE_HTUIPROCESS_H */
+#endif /* not __YAAL_HCONSOLE_HTUIPROCESS_H */
 

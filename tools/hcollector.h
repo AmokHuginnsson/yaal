@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __TOOLS_HCOLLECTOR_H
-#define __TOOLS_HCOLLECTOR_H
+#ifndef __YAAL_TOOLS_HCOLLECTOR_H
+#define __YAAL_TOOLS_HCOLLECTOR_H
 
-#include "hserial.h"
+#include "tools/hserial.h"
 
 namespace yaal
 {
@@ -75,4 +75,4 @@ protected:
 
 }
 	
-#endif /* not __TOOLS_HCOLLECTOR_H */
+#endif /* not __YAAL_TOOLS_HCOLLECTOR_H */

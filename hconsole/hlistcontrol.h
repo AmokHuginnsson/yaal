@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HLISTCONTROL_H
-#define __HCONSOLE_HLISTCONTROL_H
+#ifndef __YAAL_HCONSOLE_HLISTCONTROL_H
+#define __YAAL_HCONSOLE_HLISTCONTROL_H
 
-#include "hitem.h"
-#include "hwindow.h"
-#include "hsearchablecontrol.h"
+#include "hconsole/hitem.h"
+#include "hconsole/hwindow.h"
+#include "hconsole/hsearchablecontrol.h"
 
 namespace yaal
 {
@@ -141,4 +141,4 @@ private:
 
 }
 
-#endif /* not __HCONSOLE_HLISTCONTROL_H */
+#endif /* not __YAAL_HCONSOLE_HLISTCONTROL_H */

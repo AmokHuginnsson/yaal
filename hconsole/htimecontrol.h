@@ -24,11 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HTIMECONTROL_H
-#define __HCONSOLE_HTIMECONTROL_H
+#ifndef __YAAL_HCONSOLE_HTIMECONTROL_H
+#define __YAAL_HCONSOLE_HTIMECONTROL_H
 
 #include "hcore/htime.h"
-#include "hwindow.h"
+#include "hconsole/hwindow.h"
 
 namespace yaal
 {
@@ -57,4 +57,4 @@ protected:
 
 }
 
-#endif /* not __HCONSOLE_HTIMECONTROL_H */
+#endif /* not __YAAL_HCONSOLE_HTIMECONTROL_H */

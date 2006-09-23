@@ -24,11 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HDATA_HDATASTATUSBARCONTROL_H
-#define __HDATA_HDATASTATUSBARCONTROL_H
+#ifndef __YAAL_HDATA_HDATASTATUSBARCONTROL_H
+#define __YAAL_HDATA_HDATASTATUSBARCONTROL_H
 
 #include "hconsole/hstatusbarcontrol.h"
-#include "hdatawindow.h"
+#include "hdata/hdatawindow.h"
 
 namespace yaal
 {
@@ -55,5 +55,5 @@ protected:
 
 }
 
-#endif /* not __HDATA_HDATASTATUSBARCONTROL_H */
+#endif /* not __YAAL_HDATA_HDATASTATUSBARCONTROL_H */
 

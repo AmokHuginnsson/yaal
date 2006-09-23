@@ -25,8 +25,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __DBWRAPPER_DBWRAPPER_H
-#define __DBWRAPPER_DBWRAPPER_H
+#ifndef __YAAL_DBWRAPPER_DBWRAPPER_H
+#define __YAAL_DBWRAPPER_DBWRAPPER_H
 
 namespace yaal
 {
@@ -41,5 +41,5 @@ void yaal_dbwrapper_banner ( void );
 
 }
 
-#endif /* not __DBWRAPPER_DBWRAPPER_H */
+#endif /* not __YAAL_DBWRAPPER_DBWRAPPER_H */
 

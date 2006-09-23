@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __TOOLS_HDES_H
-#define __TOOLS_HDES_H
+#ifndef __YAAL_TOOLS_HDES_H
+#define __YAAL_TOOLS_HDES_H
 
 namespace yaal
 {
@@ -71,5 +71,5 @@ protected:
 
 }
 
-#endif /* not __TOOLS_HDES_H */
+#endif /* not __YAAL_TOOLS_HDES_H */
 

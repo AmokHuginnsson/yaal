@@ -29,8 +29,8 @@ Copyright:
 
 #line 31
 
-#include "hexception.h"
-#include "hvector.h"
+#include "hcore/hexception.h"
+#include "hcore/hvector.h"
 
 namespace yaal
 {

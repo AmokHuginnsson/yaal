@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HITEM_H
-#define __HCONSOLE_HITEM_H
+#ifndef __YAAL_HCONSOLE_HITEM_H
+#define __YAAL_HCONSOLE_HITEM_H
 
 #include "hcore/harray.h"
 #include "hcore/hinfo.h"
@@ -60,4 +60,4 @@ protected:
 
 }
 
-#endif /* not __HCONSOLE_HITEM_H */
+#endif /* not __YAAL_HCONSOLE_HITEM_H */

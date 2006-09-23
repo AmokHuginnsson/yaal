@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HTREECONTROL_H
-#define __HCONSOLE_HTREECONTROL_H
+#ifndef __YAAL_HCONSOLE_HTREECONTROL_H
+#define __YAAL_HCONSOLE_HTREECONTROL_H
 
 #include "hcore/htree.h"
-#include "hitem.h"
-#include "hwindow.h"
+#include "hconsole/hitem.h"
+#include "hconsole/hwindow.h"
 
 namespace yaal
 {
@@ -94,4 +94,4 @@ protected:
 
 }
 
-#endif /* not __HCONSOLE_HTREECONTROL_H */
+#endif /* not __YAAL_HCONSOLE_HTREECONTROL_H */

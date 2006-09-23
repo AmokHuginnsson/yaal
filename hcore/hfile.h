@@ -27,8 +27,8 @@ Copyright:
 #ifndef __YAAL_HCORE_HFILE_H
 #define __YAAL_HCORE_HFILE_H
 
-#include "hstring.h"
-#include "hexception.h"
+#include "hcore/hstring.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {

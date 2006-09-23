@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HHANDLER_H
-#define __HCONSOLE_HHANDLER_H
+#ifndef __YAAL_HCONSOLE_HHANDLER_H
+#define __YAAL_HCONSOLE_HHANDLER_H
 
 #include <sys/types.h>
 
@@ -77,4 +77,4 @@ protected:
 
 }
 
-#endif /* not __HCONSOLE_HHANDLER_H */
+#endif /* not __YAAL_HCONSOLE_HHANDLER_H */

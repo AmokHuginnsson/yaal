@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __YAAL_BASE_H
-#define __YAAL_BASE_H
+#ifndef __YAAL_HCORE_BASE_H
+#define __YAAL_HCORE_BASE_H
 
-#include "hexception.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {
@@ -142,4 +142,4 @@ typedef enum
 
 }
 
-#endif /* not __YAAL_BASE_H */
+#endif /* not __YAAL_HCORE_BASE_H */

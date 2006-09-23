@@ -24,11 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HDATA_HDATATREECONTROL_H
-#define __HDATA_HDATATREECONTROL_H
+#ifndef __YAAL_HDATA_HDATATREECONTROL_H
+#define __YAAL_HDATA_HDATATREECONTROL_H
 
 #include "hconsole/htreecontrol.h"
-#include "hdatacontrol.h"
+#include "hdata/hdatacontrol.h"
 
 namespace yaal
 {
@@ -59,4 +59,4 @@ protected:
 
 }
 
-#endif /* not __HDATA_HDATATREECONTROL_H */
+#endif /* not __YAAL_HDATA_HDATATREECONTROL_H */

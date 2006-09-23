@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HWINDOWLISTCONTROL_H
-#define __HCONSOLE_HWINDOWLISTCONTROL_H
+#ifndef __YAAL_HCONSOLE_HWINDOWLISTCONTROL_H
+#define __YAAL_HCONSOLE_HWINDOWLISTCONTROL_H
 
-#include "hlistcontrol.h"
+#include "hconsole/hlistcontrol.h"
 
 namespace yaal
 {
@@ -60,4 +60,4 @@ protected:
 
 }
 
-#endif /* not __HCONSOLE_HWINDOWLISTCONTROL_H */
+#endif /* not __YAAL_HCONSOLE_HWINDOWLISTCONTROL_H */

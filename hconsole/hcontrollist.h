@@ -24,11 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HCONTROLLIST_H
-#define __HCONSOLE_HCONTROLLIST_H
+#ifndef __YAAL_HCONSOLE_HCONTROLLIST_H
+#define __YAAL_HCONSOLE_HCONTROLLIST_H
 
 #include "hcore/hlist.h"
-#include "hcontrol.h"
+#include "hconsole/hcontrol.h"
 
 namespace yaal
 {
@@ -62,4 +62,4 @@ protected:
 
 }
 
-#endif /* not __HCONSOLE_HCONTROLLIST_H */
+#endif /* not __YAAL_HCONSOLE_HCONTROLLIST_H */

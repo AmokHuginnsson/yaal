@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HEDITCONTROL_H
-#define __HCONSOLE_HEDITCONTROL_H
+#ifndef __YAAL_HCONSOLE_HEDITCONTROL_H
+#define __YAAL_HCONSOLE_HEDITCONTROL_H
 
 #include "hcore/hlist.h"
 #include "hcore/hpattern.h"
-#include "hcontrol.h"
+#include "hconsole/hcontrol.h"
 
 namespace yaal
 {
@@ -105,4 +105,4 @@ public:
 
 }
 
-#endif /* not __HCONSOLE_HEDITCONTROL_H */
+#endif /* not __YAAL_HCONSOLE_HEDITCONTROL_H */

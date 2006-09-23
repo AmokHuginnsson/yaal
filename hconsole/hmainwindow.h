@@ -24,13 +24,13 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HMAINWINDOW_H
-#define __HCONSOLE_HMAINWINDOW_H
+#ifndef __YAAL_HCONSOLE_HMAINWINDOW_H
+#define __YAAL_HCONSOLE_HMAINWINDOW_H
 
-#include "hwindow.h"
-#include "omenuitem.h"
-#include "hmenucontrol.h"
-#include "hwindowlistcontrol.h"
+#include "hconsole/hwindow.h"
+#include "hconsole/omenuitem.h"
+#include "hconsole/hmenucontrol.h"
+#include "hconsole/hwindowlistcontrol.h"
 
 namespace yaal
 {
@@ -65,4 +65,4 @@ private:
 
 }
 
-#endif /* not __HCONSOLE_HMAINWINDOW_H */
+#endif /* not __YAAL_HCONSOLE_HMAINWINDOW_H */

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __TOOLS_SIGHAND_H
-#define __TOOLS_SIGHAND_H
+#ifndef __YAAL_TOOLS_SIGHAND_H
+#define __YAAL_TOOLS_SIGHAND_H
 
 namespace yaal
 {
@@ -44,5 +44,5 @@ void set_handlers ( void );
 
 }
 
-#endif /* not __TOOLS_SIGHAND_H */
+#endif /* not __YAAL_TOOLS_SIGHAND_H */
 

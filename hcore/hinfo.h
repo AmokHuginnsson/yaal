@@ -27,9 +27,9 @@ Copyright:
 #ifndef __YAAL_HCORE_HINFO_H
 #define __YAAL_HCORE_HINFO_H
 
-#include "hstring.h"
-#include "htime.h"
-#include "hexception.h" /* types definitions */
+#include "hcore/hstring.h"
+#include "hcore/htime.h"
+#include "hcore/hexception.h" /* types definitions */
 
 namespace yaal
 {

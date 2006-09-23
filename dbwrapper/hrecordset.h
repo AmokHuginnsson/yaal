@@ -24,14 +24,14 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __DBWRAPPER_HRECORDSET_H
-#define __DBWRAPPER_HRECORDSET_H
+#ifndef __YAAL_DBWRAPPER_HRECORDSET_H
+#define __YAAL_DBWRAPPER_HRECORDSET_H
 
 #include "hcore/hlist.h"
 #include "hcore/hstring.h"
 #include "hcore/htime.h"
 #include "hcore/hinfo.h"
-#include "hdatabase.h"
+#include "dbwrapper/hdatabase.h"
 
 namespace yaal
 {
@@ -123,4 +123,4 @@ private:
 
 }
 
-#endif /* not __DBWRAPPER_HRECORDSET_H */
+#endif /* not __YAAL_DBWRAPPER_HRECORDSET_H */

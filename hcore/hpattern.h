@@ -30,8 +30,8 @@ Copyright:
 #include <sys/types.h>	/* why? - because POSIX says so :/ */
 #include <regex.h>			/* this one is obvious */
 
-#include "harray.h"
-#include "hstring.h"
+#include "hcore/harray.h"
+#include "hcore/hstring.h"
 
 namespace yaal
 {

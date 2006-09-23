@@ -27,8 +27,8 @@ Copyright:
 #ifndef __YAAL_HCORE_HSOCKET_H
 #define __YAAL_HCORE_HSOCKET_H
 
-#include "hrawfile.h"
-#include "hhashmap.h"
+#include "hcore/hrawfile.h"
+#include "hcore/hhashmap.h"
 
 namespace yaal
 {

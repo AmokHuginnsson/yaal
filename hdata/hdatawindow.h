@@ -24,15 +24,15 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HDATA_HDATAWINDOW_H
-#define __HDATA_HDATAWINDOW_H
+#ifndef __YAAL_HDATA_HDATAWINDOW_H
+#define __YAAL_HDATA_HDATAWINDOW_H
 
 #include "dbwrapper/hrecordset.h"
 #include "hconsole/hwindow.h"
 #include "hconsole/hlistcontrol.h"
-#include "hdatacontrol.h"
-#include "hdatalistcontrol.h"
-#include "oresource.h"
+#include "hdata/hdatacontrol.h"
+#include "hdata/hdatalistcontrol.h"
+#include "hdata/oresource.h"
 
 namespace yaal
 {
@@ -96,4 +96,4 @@ private:
 
 }
 
-#endif /* not __HDATA_HDATAWINDOW_H */
+#endif /* not __YAAL_HDATA_HDATAWINDOW_H */

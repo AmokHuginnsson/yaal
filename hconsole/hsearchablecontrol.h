@@ -24,11 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HSEARCHABLECONTROL_H
-#define __HCONSOLE_HSEARCHABLECONTROL_H
+#ifndef __YAAL_HCONSOLE_HSEARCHABLECONTROL_H
+#define __YAAL_HCONSOLE_HSEARCHABLECONTROL_H
 
 #include "hcore/hpattern.h"
-#include "hcontrol.h"
+#include "hconsole/hcontrol.h"
 
 namespace yaal
 {
@@ -65,5 +65,5 @@ protected:
 
 }
 
-#endif /* not __HCONSOLE_HSEARCHABLECONTROL_H */
+#endif /* not __YAAL_HCONSOLE_HSEARCHABLECONTROL_H */
 

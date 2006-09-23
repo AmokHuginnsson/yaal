@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_CONSOLE_H
-#define __HCONSOLE_CONSOLE_H
+#ifndef __YAAL_HCONSOLE_CONSOLE_H
+#define __YAAL_HCONSOLE_CONSOLE_H
 
 #include <cstdarg>
 
@@ -33,7 +33,7 @@ Copyright:
 #	include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "mouse.h"
+#include "hconsole/mouse.h"
 
 namespace yaal
 {
@@ -177,5 +177,5 @@ extern int n_iMouseDes;
 
 }
 
-#endif /* not __HCONSOLE_CONSOLE_H */
+#endif /* not __YAAL_HCONSOLE_CONSOLE_H */
 

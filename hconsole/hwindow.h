@@ -24,13 +24,13 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_HWINDOW_H
-#define __HCONSOLE_HWINDOW_H
+#ifndef __YAAL_HCONSOLE_HWINDOW_H
+#define __YAAL_HCONSOLE_HWINDOW_H
 
-#include "hcontrol.h"
-#include "hcontrollist.h"
-#include "hhandler.h"
-#include "hstatusbarcontrol.h"
+#include "hconsole/hcontrol.h"
+#include "hconsole/hcontrollist.h"
+#include "hconsole/hhandler.h"
+#include "hconsole/hstatusbarcontrol.h"
 
 namespace yaal
 {
@@ -91,4 +91,4 @@ private:
 
 }
 
-#endif /* not __HCONSOLE_HWINDOW_H */
+#endif /* not __YAAL_HCONSOLE_HWINDOW_H */

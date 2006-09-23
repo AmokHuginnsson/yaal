@@ -29,7 +29,7 @@ Copyright:
 
 #include <sys/types.h>
 
-#include "hhashmap.h"
+#include "hcore/hhashmap.h"
 
 namespace yaal
 {

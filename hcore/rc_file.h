@@ -27,7 +27,7 @@ Copyright:
 #ifndef __YAAL_HCORE_RC_FILE_H
 #define __YAAL_HCORE_RC_FILE_H
 
-#include "hfile.h"
+#include "hcore/hfile.h"
 
 namespace yaal
 {

@@ -34,7 +34,7 @@ Copyright:
 
 #define D_VCSID_HPOOL_H "$Id$"
 
-#include "xalloc.h"
+#include "hcore/xalloc.h"
 
 namespace yaal
 {

@@ -31,9 +31,7 @@ Copyright:
 
 #define D_VCSID_HSBBSTREE_H "$Id$"
 
-#include "hexception.h"
-
-#include "hlog.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {
@@ -239,7 +237,6 @@ void HSBBSTree::remove ( tType const & a_tKey )
 			return;
 			}
 		}
-	yaal::hcore::log << "not existing node: " << a_tKey << endl;
 	M_THROW ( n_ppcErrMsgHSBBSTree [ ERROR::E_NON_EXISTING_KEY ],
 			static_cast < int > ( ERROR::E_NON_EXISTING_KEY ) );
 	}

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __TOOLS_HSERIAL_H
-#define __TOOLS_HSERIAL_H
+#ifndef __YAAL_TOOLS_HSERIAL_H
+#define __YAAL_TOOLS_HSERIAL_H
 
 #include "hcore/hstring.h"
 #include "hcore/hrawfile.h"
@@ -113,5 +113,5 @@ protected:
 
 }
 
-#endif /* not __TOOLS_HSERIAL_H */
+#endif /* not __YAAL_TOOLS_HSERIAL_H */
 

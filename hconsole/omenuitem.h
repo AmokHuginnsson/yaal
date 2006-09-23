@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __HCONSOLE_OMENUITEM_H
-#define __HCONSOLE_OMENUITEM_H
+#ifndef __YAAL_HCONSOLE_OMENUITEM_H
+#define __YAAL_HCONSOLE_OMENUITEM_H
 
 #define D_VCSID_OMENUITEM_H "$Id$"
 
-#include "htuiprocess.h"
+#include "hconsole/htuiprocess.h"
 
 namespace yaal
 {
@@ -57,4 +57,4 @@ public: /* All is public for simpler usage. */
 
 }
 
-#endif /* not __HCONSOLE_OMENUITEM_H */
+#endif /* not __YAAL_HCONSOLE_OMENUITEM_H */

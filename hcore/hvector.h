@@ -31,8 +31,8 @@ Copyright:
 
 #include <cmath>
 
-#include "harray.h"
-#include "hexception.h"
+#include "hcore/harray.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {
