@@ -127,7 +127,7 @@ public:
 	HIterator rend ( void );
 	HIterator rbegin ( void );
 	virtual void flush ( void );
-	virtual int quantity ( void );
+	int quantity ( void );
 	virtual tType & add_element ( tType * = NULL ); /* adds new element at
 																										 current cursor position */
 	virtual tType & add_head ( tType * = NULL );    /* adds new element at
@@ -137,24 +137,24 @@ public:
 	virtual tType & add_at ( int, tType * = NULL ); /* adds new element
 																										 at specified position */
 /* adds element in the way that keeps order */
-	virtual tType & add_orderly ( tType &, sort_order_t = D_ASCENDING );
-	virtual status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
+	tType & add_orderly ( tType &, sort_order_t = D_ASCENDING );
+	status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
 			tType * * = NULL );	/* rmoves element at current cursor position */
-	virtual status_t remove_at ( int, treatment_t const & = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
+	status_t remove_at ( int, treatment_t const & = D_BLOCK_IF_NOT_EMPTIED | D_TREAT_AS_CLOSED,
 			tType * * = NULL );
-	virtual status_t remove_head ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
-	virtual status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
+	status_t remove_head ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
+	status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, tType * * = NULL );
 	/* sets cursor at specified index or number */
-	virtual tType & go ( int, search_after_t = D_SEARCH_AFTER_ORDER );
-	virtual tType & operator [ ] ( int );
-	virtual tType & present ( void );
-	virtual tType & head ( void );
-	virtual tType & tail ( void );
-	virtual tType * to_head ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
-	virtual tType * to_tail ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
-	virtual void exchange ( int, int, search_after_t = D_SEARCH_AFTER_ORDER );
-	virtual void sort_by_hits ( sort_order_t = D_ASCENDING );
-	virtual void sort_by_number ( sort_order_t = D_ASCENDING );
+	tType & go ( int, search_after_t = D_SEARCH_AFTER_ORDER );
+	tType & operator [ ] ( int );
+	tType & present ( void );
+	tType & head ( void );
+	tType & tail ( void );
+	tType * to_head ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
+	tType * to_tail ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
+	void exchange ( int, int, search_after_t = D_SEARCH_AFTER_ORDER );
+	void sort_by_hits ( sort_order_t = D_ASCENDING );
+	void sort_by_number ( sort_order_t = D_ASCENDING );
 	virtual void sort_by_contents ( sort_order_t = D_ASCENDING );
 	operator bool ( void ) const;
 	/*}*/
