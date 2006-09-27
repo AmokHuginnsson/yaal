@@ -427,12 +427,17 @@ void HSBBSTree::remove_rebalance ( HAbstractNode * a_poNode )
 	return;
 	}
 
-int long HSBBSTree::quantity ( void )
+int long HSBBSTree::size ( void ) const
 	{
 	return ( f_lQuantity );
 	}
 
-HSBBSTree::HIterator HSBBSTree::begin ( void )
+bool HSBBSTree::empty ( void ) const
+	{
+	return ( ! f_poRoot );
+	}
+
+HSBBSTree::HIterator HSBBSTree::begin ( void ) const
 	{
 	HAbstractNode * l_poNode = f_poRoot;
 	while ( l_poNode && l_poNode->f_poLeft )
@@ -440,12 +445,12 @@ HSBBSTree::HIterator HSBBSTree::begin ( void )
 	return ( HIterator ( l_poNode ) );
 	}
 
-HSBBSTree::HIterator HSBBSTree::end ( void )
+HSBBSTree::HIterator HSBBSTree::end ( void ) const
 	{
 	return ( HIterator ( NULL ) );
 	}
 
-HSBBSTree::HIterator HSBBSTree::rbegin ( void )
+HSBBSTree::HIterator HSBBSTree::rbegin ( void ) const
 	{
 	HAbstractNode * l_poNode = f_poRoot;
 	while ( l_poNode && l_poNode->f_poRight )
@@ -453,7 +458,7 @@ HSBBSTree::HIterator HSBBSTree::rbegin ( void )
 	return ( HIterator ( l_poNode ) );
 	}
 
-HSBBSTree::HIterator HSBBSTree::rend ( void )
+HSBBSTree::HIterator HSBBSTree::rend ( void ) const
 	{
 	return ( HIterator ( NULL ) );
 	}
@@ -548,7 +553,7 @@ void HSBBSTree::swap ( HAbstractNode * a_poFirst, HAbstractNode * a_poSecond )
 	return;
 	}
 
-HSBBSTree::HAbstractNode * HSBBSTree::sibling ( HAbstractNode * a_poNode )
+HSBBSTree::HAbstractNode * HSBBSTree::sibling ( HAbstractNode * a_poNode ) const
 	{
 	if ( a_poNode->f_poParent->f_poLeft == a_poNode )
 		return ( a_poNode->f_poParent->f_poRight );

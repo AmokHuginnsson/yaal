@@ -119,20 +119,21 @@ public:
 	template < typename tType >
 	void remove ( tType const & );
 	template < typename tType >
-	HIterator find ( tType const & );
-	int long quantity ( void );
-	HIterator begin ( void );
-	HIterator end ( void );
-	HIterator rbegin ( void );
-	HIterator rend ( void );
+	HIterator find ( tType const & ) const;
+	int long size ( void ) const;
+	bool empty ( void ) const;
+	HIterator begin ( void ) const;
+	HIterator end ( void ) const;
+	HIterator rbegin ( void ) const;
+	HIterator rend ( void ) const;
 	/*}*/
 protected:
 	/*{*/
 	template < typename tType >
-	ONodePtr find_node ( tType const & );
+	ONodePtr find_node ( tType const & ) const;
 	void remove_node ( HAbstractNode * );
 	void swap ( HAbstractNode *, HAbstractNode * );
-	HAbstractNode * sibling ( HAbstractNode * );
+	HAbstractNode * sibling ( HAbstractNode * ) const;
 	void insert_rebalance ( HAbstractNode * );
 	void remove_rebalance ( HAbstractNode * );
 	void rotate_left ( HAbstractNode * );
@@ -242,14 +243,14 @@ void HSBBSTree::remove ( tType const & a_tKey )
 	}
 
 template < typename tType >
-HSBBSTree::HIterator HSBBSTree::find ( tType const & a_tKey )
+HSBBSTree::HIterator HSBBSTree::find ( tType const & a_tKey ) const
 	{
 	ONodePtr l_oNodePtr = find_node ( a_tKey );
 	return ( HIterator ( l_oNodePtr.f_bExists ? l_oNodePtr.f_poNode : NULL ) );
 	}
 
 template < typename tType >
-typename HSBBSTree::ONodePtr HSBBSTree::find_node ( tType const & a_tKey )
+typename HSBBSTree::ONodePtr HSBBSTree::find_node ( tType const & a_tKey ) const
 	{
 	ONodePtr l_oNodePtr;
 	if ( f_poRoot )
