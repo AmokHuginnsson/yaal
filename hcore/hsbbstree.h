@@ -51,7 +51,8 @@ public:
 		typedef enum
 			{
 			E_OK = 0,
-			E_NON_EXISTING_KEY
+			E_NON_EXISTING_KEY,
+			E_NIL_ITERATOR
 			} error_t;
 		};
 	class HIterator;
@@ -99,6 +100,7 @@ public:
 	void insert ( tType const & );
 	template < typename tType >
 	void remove ( tType const & );
+	void remove ( HIterator const & );
 	template < typename tType >
 	HIterator find ( tType const & ) const;
 	int long size ( void ) const;
@@ -147,7 +149,6 @@ tType const & HSBBSTree::HIterator::operator * ( void )
 	M_ASSERT ( f_poCurrent );
 	return ( static_cast < HNode < tType > * > ( f_poCurrent )->f_tKey );
 	}
-
 
 template < typename tType >
 HSBBSTree::HNode < tType >::HNode ( tType const & a_tKey )

@@ -41,6 +41,7 @@ char const * const n_ppcErrMsgHSBBSTree [ 4 ] =
 	{
 	_ ( "ok" ),
 /* HSBBSTree::E_NON_EXISTING_KEY */			_ ( "key does not exists" ),
+/* HSBBSTree::E_NIL_ITERATOR */					_ ( "dereferencing nil iterator" )
 	};
 
 HSBBSTree::HIterator::HIterator ( HSBBSTree::HAbstractNode * const a_poNode )
@@ -285,6 +286,15 @@ void HSBBSTree::rotate_right ( HAbstractNode * a_poNode )
 		a_poNode->f_poLeft->f_poParent = a_poNode;
 	l_poNode->f_poRight = a_poNode;
 	l_poNode->f_poParent = l_poParent;
+	return;
+	}
+
+void HSBBSTree::remove ( HIterator const & a_oIt )
+	{
+	if ( ! a_oIt.f_poCurrent )
+		M_THROW ( n_ppcErrMsgHSBBSTree [ ERROR::E_NIL_ITERATOR ],
+				static_cast<int> ( ERROR::E_NIL_ITERATOR ) );
+	remove_node ( a_oIt.f_poCurrent );
 	return;
 	}
 

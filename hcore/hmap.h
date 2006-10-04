@@ -42,21 +42,41 @@ namespace hcore
 template < typename tType, typename ttType >
 class HPair
 	{
+	tType f_tKey;
+	ttType f_tValue;
 public:
-
-	virtual ~HPair ( void );
-protected:
+	tType & first;
+	ttType & second;
+	HPair ( void ) : f_tKey ( ), f_tValue ( ), first ( f_tKey ), second ( f_tValue ) {}
+	HPair ( tType key, ttType value ) : f_tKey ( key ), f_tValue ( value ), first ( f_tKey ), second ( f_tValue ) {}
+	HPair ( HPair const & pair ) : f_tKey ( pair.f_tKey ), f_tValue ( pair.f_tValue ), first ( f_tKey ), second ( f_tValue ) {}
+	HPair & operator = ( HPair const & pair )
+		{
+		if ( & pair != this )
+			{
+			f_tKey = pair.f_tKey;
+			f_tValue = pair.f_tValue;
+			}
+		return ( * this );
+		}
+	bool operator == ( HPair const & pair ) const
+		{	return ( ( f_tKey == pair.f_tKey ) && ( f_tValue == pair.f_tValue ) );	}
+	bool operator != ( HPair const & pair ) const
+		{	return ( ! operator == ( pair ) );	}
+	bool operator <  ( HPair const & pair ) const
+		{	return ( ( f_tKey < pair.f_tKey ) || ( ! ( f_tKey < pair.f_tKey ) && ( f_tValue < pair.f_tValue ) ) );	}
 	};
 
 template < typename tType, typename ttType >
 class HMap
 	{
+	typedef HPair < const tType, ttType > map_elem_t;
 public:
 	class HIterator
 		{
 		HSBBSTree::HIterator f_oEngine;
 	public:
-		explicit HIterator ( HSBBSTree::HIterator const & it ) : f_oEngine ( it ){};
+		explicit HIterator ( HSBBSTree::HIterator const & it ) : f_oEngine ( it ) {};
 		HIterator & operator ++ ( void )
 			{
 			++ f_oEngine;
@@ -80,9 +100,9 @@ public:
 			return ( it );
 			}
 		tType const & operator * ( void )
-			{	return ( f_oEngine.operator*<tType> ( ) );	}
+			{	return ( f_oEngine.operator*<map_elem_t> ( ) );	}
 		tType const * const operator -> ( void )
-			{ return ( & f_oEngine.operator*<tType> ( ) );	}
+			{ return ( & f_oEngine.operator*<map_elem_t> ( ) );	}
 		bool operator == ( HIterator const & it ) const
 			{ return ( f_oEngine == it.f_oEngine ); }
 		bool operator != ( HIterator const & it ) const
@@ -96,7 +116,7 @@ public:
 		{ return ( f_oEngine.size ( ) );	}
 	bool empty ( void ) const
 		{ return ( f_oEngine.empty ( ) );	}
-	void insert ( tType const & e )
+	void insert ( map_elem_t const & e )
 		{	f_oEngine.insert ( e );	}
 	void remove ( tType const & e )
 		{	f_oEngine.remove ( e );	}
