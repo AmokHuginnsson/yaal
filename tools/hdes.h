@@ -46,25 +46,18 @@ typedef char unsigned uc_t;
 
 class HDes
 	{
-protected:
-	/*{*/
 	uc_t f_pppcIKeys [ DES::D_SIDES_COUNT ]
 		[ DES::D_IKEYS_COUNT ] [ DES::D_IKEY_SIZE ];
-	/*}*/
 public:
-	/*{*/
 	HDes ( void );
 	virtual ~HDes ( void );
 	void crypt ( uc_t *, int, int );
 	void generate_keys ( uc_t * );
 	void flush_keys ( void );
-	/*}*/
-protected:
-	/*{*/
+private:
 	void _des ( uc_t * /* block */, int /* side */, int /* part */ );
 	void _3des ( uc_t * /* block */, int /* side */ );
 	void permutate ( uc_t * /* buffer */, const uc_t * /* tab */, int /* len */ ) const;
-	/*}*/
 	};
 
 }

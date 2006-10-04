@@ -41,8 +41,6 @@ class HListControl : public hcore::HList < HItem >, public virtual HSearchableCo
 	{
 	class HColumnInfo
 		{
-	protected:
-		/*{*/
 		bool f_bDescending;
 		int f_iWidthRaw;
 		int f_iWidth;
@@ -52,21 +50,14 @@ class HListControl : public hcore::HList < HItem >, public virtual HSearchableCo
 		type_t f_eType;
 		hcore::HString f_oName;
 		HControl * f_poControl;
-		/*}*/
 	public:
-		/*{*/
 		HColumnInfo ( void );
 		virtual ~HColumnInfo ( void );
 		HColumnInfo ( HColumnInfo const & );
 		HColumnInfo & operator = ( HColumnInfo const & );
-		/*}*/
-	protected:
-		/*{*/
-		/*}*/
 		friend class HListControl;
 		};
 protected:
-	/*{*/
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
 	bool				f_bDrawHeader;				/* should be header driven */
@@ -88,9 +79,7 @@ protected:
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
 	int long		f_lComparedItems;			/* items already compared during sorting */
-	/*}*/
 public:
-	/*{*/
 	HListControl ( HWindow *,		 	/* parent */
 								 int,						/* row */
 								 int,						/* col */
@@ -106,35 +95,30 @@ public:
 								 int = -1,			/* enabled attribute */
 								 int = -1 );		/* focused attribute */
 	virtual ~HListControl ( void );
-	virtual void refresh ( void );
-	virtual int set_focus ( char = 0 );
-	virtual int process_input( int );
 	void add_column ( int const &,									/* at position */
 										char const *,									/* column name */
 										int const &,									/* width */
 										BITS::ALIGN::align_t const & = BITS::ALIGN::D_LEFT,		/* align */
 										const type_t & = D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
+	virtual yaal::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual HItem & add_tail ( HItem * = NULL );
 	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
-	virtual yaal::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
+	virtual int set_focus ( char = 0 );
+protected:
+	virtual void refresh ( void );
+	virtual int process_input( int );
 	virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual bool is_searchable ( void );
 	virtual int click ( mouse::OMouse & );
-	/*}*/
-protected:
-	/*{*/
 	virtual bool is_above_c ( HElement *, HElement * );
-	void sort_by_column ( int, sort_order_t = D_ASCENDING );
-	void recalculate_column_widths ( void );
 	virtual void go_to_match ( void );
 	virtual void go_to_match_previous ( void );
-	/*}*/
 private:
-	/*{*/
+	void sort_by_column ( int, sort_order_t = D_ASCENDING );
+	void recalculate_column_widths ( void );
 	HListControl ( HListControl const & );
 	HListControl & operator = ( HListControl const & );
-	/*}*/
 	};
 
 }

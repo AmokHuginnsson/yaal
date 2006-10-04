@@ -55,7 +55,6 @@ public:
 			};
 		};
 protected:
-	/*{*/
 	bool			f_bEnabled;						/* is cotrol enabled, focus can go 
 																		 only to enabled control */
 	bool			f_bFocused;						/* has control focus */
@@ -87,9 +86,7 @@ protected:
 /* this is used locally, there is no way to modify this variables explictly */
 	int				f_iLabelLength;	 			/* lenght of the label */
 	int				f_iShortcutIndex;			/* index of shortcut char in label */
-	/*}*/
 public:
-	/*{*/
 /* parent, row, col, height, width, label */
 	HControl ( HWindow *, int, int, int, int, char const *,
 /* draw label, disabled attribute, enabled-attribute, focused-attribute */
@@ -115,12 +112,9 @@ public:
 	void set_attr_label ( void ) const;
 	void set_attr_shortcut ( void ) const;
 	void set_attr_data ( void ) const;
-	/*}*/
 private:
-	/*{*/
 	HControl ( HControl const & );
 	HControl & operator = ( HControl const & );
-	/*}*/
 	};
 
 }

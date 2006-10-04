@@ -49,12 +49,8 @@ extern int n_iDebugLevel;
 
 class HException
 	{
-private:
-	/*{*/
 	mutable bool f_bLocal;
-	/*}*/
 protected:
-	/*{*/
 	char f_cChar;
 	int	 f_iInt;
 	long f_lLong;
@@ -66,9 +62,7 @@ protected:
 	char * f_pcFunctionName;
 	int  f_iCode;
 	char * f_pcMessage;
-	/*}*/
 public:
-	/*{*/
 	HException ( char const * const, char const * const, int const,
 			char const * const, int const = 0 );
 	HException ( HException const & );
@@ -84,11 +78,8 @@ public:
 	HException * operator-> ( void );
 	static void failed_assert ( char const * const, char const * const, int const,
 			char const * const ) __attribute__(( __noreturn__ ));
-	/*}*/
 private:
-	/*{*/
 	HException & operator = ( HException const & );
-	/*}*/
 	};
 
 }

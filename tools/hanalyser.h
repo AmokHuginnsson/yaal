@@ -73,8 +73,6 @@ class HAnalyser : public hcore::HTree < double_ptr_list_t >
 		/*}*/
 		friend class HAnalyser;
 		};
-protected:
-	/*{*/
 	int f_iIndex;
 	int f_iLength;
 	syntax_error_t f_eError;
@@ -82,7 +80,6 @@ protected:
 	hcore::HPool < double > f_oConstantsPool;
 	hcore::HPool < int > f_oTerminalIndexes;
 	hcore::HString	f_oFormula;
-	/*}*/
 public:
 	/*{*/
 	HAnalyser ( void );
@@ -92,9 +89,7 @@ public:
 	double count ( void );
 	char const * get_error ( void ) const;
 	int get_error_token ( void ) const;
-	/*}*/
-protected:
-	/*{*/
+private:
 	bool translate ( char const * );
 	bool addition_production ( HAnalyserNode * );
 	bool multiplication_production ( HAnalyserNode * );
@@ -108,7 +103,6 @@ protected:
 	double signum ( HAnalyserNode * );
 	double bracket ( HAnalyserNode * );
 	double functions ( HAnalyserNode * );
-	/*}*/
 	};
 
 }

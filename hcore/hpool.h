@@ -66,17 +66,11 @@ public:
 		D_DUMB
 		} pool_type_t;
 private:
-	/*{*/
 	pool_type_t f_ePoolType;
 	size_t f_ulPoolSize;	/* size of allocated memory buffer */
 	int f_iTop;
-	/*}*/
-protected:
-	/*{*/
 	tType * f_ptPool;	/* pointer to allocated memory pool */
-	/*}*/
 public:
-	/*{*/
 	HPool ( size_t, pool_type_t = D_FIXED_SIZE );
 	virtual ~HPool ( void );
 	size_t pool_realloc ( size_t );
@@ -84,12 +78,9 @@ public:
 	tType & add ( tType const & );
 	void reset ( void );
 	int get_top ( void ) const;
-	/*}*/
 private:
-	/*{*/
 	HPool ( HPool const & );
 	HPool & operator = ( HPool const & );
-	/*}*/
 	};
 
 template < typename tType >

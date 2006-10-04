@@ -57,11 +57,6 @@ public:
 			E_DIMNOTMATCH
 			} error_t;
 		};
-protected:
-	/*{*/
-	/*}*/
-public:
-	/*{*/
 	HVector ( int = 0 );
 	HVector ( HVector const & );
 	virtual ~HVector ( void );
@@ -84,12 +79,10 @@ public:
 	tType operator ! ( void );
 	bool operator == ( HVector const & );
 	bool operator != ( HVector const & );
-template < typename ttType >
+	template < typename ttType >
 	friend HVector < ttType > operator * ( ttType const,
 			HVector < ttType > const & );
-	/*}*/
 private:
-	/*{*/
 	inline void check_dimensions ( int a_iSizeAnother )
 		{
 		M_PROLOG
@@ -99,7 +92,6 @@ private:
 		return;
 		M_EPILOG
 		}
-	/*}*/
 	};
 
 template < typename tType >

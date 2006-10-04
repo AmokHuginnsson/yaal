@@ -40,19 +40,11 @@ class HDataWindow;
 
 class HDataTreeControl : public HDataControl, public virtual hconsole::HTreeControl
 	{
-protected:
-	/*{*/
-	/*}*/
 public:
-	/*{*/
 	HDataTreeControl ( dbwrapper::HRecordSet *, HDataWindow *, int, int, int, int, char const *,
 			bool = true, int = -1, int = -1, int = -1 );
 	virtual ~HDataTreeControl ( void );
 	virtual void load ( int long );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 }

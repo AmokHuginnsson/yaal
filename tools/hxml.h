@@ -75,7 +75,6 @@ public:
 			}
 		};
 protected:
-	/*{*/
 	struct OConvert;
 	typedef void * xml_node_ptr_t;
 	typedef enum { D_IN, D_OUT } way_t;
@@ -84,26 +83,19 @@ protected:
 	yaal::hcore::HString	f_oVarTmpBuffer;
 	HXmlData *							f_poXml;
 	ONode										f_oRoot;
-	/*}*/
 public:
-	/*{*/
 	HXml ( void );
 	virtual ~ HXml ( void );
 	void init ( char const * );
 	ONode & parse ( char const * const = NULL, bool = true );
 	ONode & get_root ( void );
-	/*}*/
 protected:
-	/*{*/
 	void parse ( xml_node_ptr_t, ONode &, int, bool );
 	char const * convert ( char const *, way_t = D_OUT );
 	int get_node_set_by_path ( char const * );
-	/*}*/
 private:
-	/*{*/
 	HXml ( HXml const & );
 	HXml & operator = ( HXml const & );
-	/*}*/
 	};
 
 }

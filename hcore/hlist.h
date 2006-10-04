@@ -87,7 +87,6 @@ template < typename tType >
 class HList : public OListBits
 	{
 public:
-	/*{*/
 	typedef enum
 		{
 		D_UNSORTED,
@@ -99,11 +98,9 @@ public:
 		D_SEARCH_AFTER_ORDER,
 		D_SEARCH_AFTER_NUMBER
 		} search_after_t;
-	/*}*/
 	class HIterator;
 protected:
 	class HElement;
-	/*{*/
 	int f_iQuantity;					/* how many elements this list contains */
 	int f_iHighestNumber;			/* serial number of last added element */
 	int f_iError;							/* numer of errors in list access */
@@ -115,9 +112,7 @@ protected:
 															 int holds last */
 	HElement * f_poIndex;			/* index and HElement * holds pointer to this
 															 last element */
-	/*}*/
 public:
-	/*{*/
 	HList ( int = 0 );                 /* Creates list, with specified size */
 	virtual ~HList ( void );
 	HList ( HList const & );
@@ -157,9 +152,7 @@ public:
 	void sort_by_number ( sort_order_t = D_ASCENDING );
 	virtual void sort_by_contents ( sort_order_t = D_ASCENDING );
 	operator bool ( void ) const;
-	/*}*/
 protected:
-	/*{*/
 	virtual bool to_head ( HElement * &, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
 	virtual bool to_tail ( HElement * &, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
 	virtual HElement * element_by_index ( int );
@@ -172,7 +165,6 @@ protected:
 	virtual bool is_above_n ( HElement *, HElement * );
 	virtual bool is_above_c ( HElement *, HElement * );
 	virtual void sort ( void );
-	/*}*/
 	};
 
 template < typename tType >

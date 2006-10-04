@@ -46,17 +46,10 @@ class HTree;
 template < typename ttType >
 class HBranchList : public HList < ttType >
 	{
-protected:
-	/*{*/
-	/*}*/
 public:
-	/*{*/
 	virtual ~HBranchList ( void );
-	/*}*/
 protected:
-	/*{*/
 	virtual int long empty ( typename HList < ttType > ::HElement * );
-	/*}*/
 	};
 
 template < typename tttType >
@@ -78,7 +71,6 @@ protected:
 	class HNode
 		{
 	protected:
-		/*{*/
 		tttType f_tLeaf;																/* object itself */
 		int f_iNumber;																	/* serial number */
 		int f_iHits;			/* how many times element's object was accessed */
@@ -86,40 +78,28 @@ protected:
 		branch_t f_oBranch;	/* list of next level nodes */
 		HNode * f_poTrunk;									/* self explanary */
 		HTree * f_poTree;										/* tree that owns node */
-		/*}*/
 	public:
-		/*{*/
 		inline tttType & get_object ( void )	/* this is special get used for  */
 			{																		/* all derived classes (f.e. in  */
 			return ( f_tLeaf );									/* compare methods)              */
 			}																		/* this get does not modify hits */
-		/*}*/
 	protected:
-		/*{*/
 		HNode ( HNode * = NULL ); /* ( parent ) */
 		virtual ~HNode ( void );
 		void put ( tttType );
 		tttType get ( void );
 		HNode * previous ( treatment_t const & = branch_t::D_TREAT_AS_OPENED );
 		HNode * next ( void );
-		/*}*/
 	private:
-		/*{*/
 		HNode ( HNode const & );
 		HNode & operator = ( HNode const & );
-		/*}*/
 		friend class HTree < tttType >;
 		friend class HBranchList < HNode * >;
 		};
-private:
-protected:
-	/*{*/
 	HNode * f_poRoot;			/* self explanary */
 	HNode * f_poSelected;	/* local temporary pointer, "cursor" */
 	int f_iHighestNumber;	/* serial number of last added element */
-	/*}*/
 public:
-	/*{*/
 	HTree ( void );
 	virtual ~HTree ( );
 	virtual void flush ( void );
@@ -129,12 +109,9 @@ public:
 	tttType & down ( void );
 	tttType & up ( void );
 	void graft ( int, HTree < tttType > * );
-	/*}*/
 private:
-	/*{*/
 	HTree ( HTree const & );
 	HTree & operator = ( HTree const & );
-	/*}*/
 	friend class HTree < tttType >::HNode;
 	};
 

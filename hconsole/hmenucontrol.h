@@ -42,26 +42,16 @@ class HMenuControl : public HTreeControl
 	friend class HMenuNode;
 	class HMenuNode : public HTreeControl::HNodeControl
 		{
-	protected:
-		/*{*/
-		/*}*/
 	public:
-		/*{*/
 		int load_sub_menu ( OMenuItem * );
-		/*}*/
 	protected:
-		/*{*/
 		HMenuNode ( HMenuNode * );
 		virtual ~HMenuNode ( void );
-		/*}*/
 		friend class HMenuControl;
 		};
 protected:
-	/*{*/
 	HTUIProcess * f_poProcess;
-	/*}*/
 public:
-	/*{*/
 	HMenuControl ( HWindow *,				/* parent */
 								 int,							/* row */
 								 int,							/* col */
@@ -70,13 +60,11 @@ public:
 								 char const * );	/* label */
 	virtual ~HMenuControl ( void );
 	void init ( HTUIProcess *, OMenuItem * );
+protected:
 	virtual int process_input( int );
-	/*}*/
 private:
-	/*{*/
 	HMenuControl ( HMenuControl const & );
 	HMenuControl & operator = ( HMenuControl const & );
-	/*}*/
 	};
 
 }

@@ -43,7 +43,6 @@ class HControlList;
 class HWindow : public HHandler
 	{
 protected:
-	/*{*/
 	bool								f_bInitialised;		/* was window properly initialised? */
 	hcore::HString			f_oTitle;					/* title of window */
 	HControl * 					f_poFocusedChild;	/* points to control that has focus */
@@ -51,9 +50,7 @@ protected:
 																									 focus went to status bar */	
 	HControlList				f_oControls;	/* list of all control inside _this_ wind */
 	HStatusBarControl * f_poStatusBar;
-	/*}*/
 public:
-	/*{*/
 	HWindow ( char const * ); /* title */
 	virtual ~HWindow ( void );
 	virtual int init ( void );
@@ -69,12 +66,7 @@ public:
 	HStatusBarControl * status_bar ( void );
 	hcore::HString get_command ( void );
 	bool is_initialised ( void ) const;
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 private:
-	/*{*/
 	friend int HControl::set_focus ( char );
 	friend void HStatusBarControl::set_prompt ( char const *,
 			HStatusBarControl::PROMPT::mode_t,
@@ -84,7 +76,6 @@ private:
 	void set_focus ( HControl * );
 	HWindow ( HWindow const & );
 	HWindow & operator = ( HWindow const & );
-	/*}*/
 	};
 
 }

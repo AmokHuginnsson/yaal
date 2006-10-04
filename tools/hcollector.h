@@ -50,25 +50,19 @@ public:
 		static int const D_RECV_BUF_SIZE = 8; /* 5 should be enought but you never know */
 		static int const D_BUF_SIZE			 = 256;
 		};
-protected:
-	/*{*/
+private:
 	int			f_iLines;
 	char		f_pcReadBuf [ PROTOCOL::D_RECV_BUF_SIZE ];
 	hcore::HString	f_oLine;
-	/*}*/
 public:
-	/*{*/
 	HCollector ( char const * = NULL ); /* device path */
 	int send_line ( char const * );
 	int receive_line ( char * & );
 	int establish_connection ( int = 9999 );
 	int wait_for_connection ( int = 9999 );
 	int read_collector ( void ( * ) ( char *, int ) );
-	/*}*/
-protected:
-	/*{*/
+private:
 	bool test_char ( char const *, int ) const;
-	/*}*/
 	};
 
 }

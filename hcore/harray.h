@@ -58,12 +58,9 @@ public:
 			} error_t;
 		};
 protected:
-	/*{*/
 	int f_iSize;
 	tType * f_ptArray;
-	/*}*/
 public:
-	/*{*/
 	HArray ( int );
 	HArray ( int const &, tType const & );
 	virtual ~HArray ( void );
@@ -72,10 +69,6 @@ public:
 	tType & operator [ ] ( int );
 	int get_size ( void ) const;
 	operator bool ( void ) const;
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 template < typename tType >

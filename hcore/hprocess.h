@@ -42,7 +42,6 @@ class HProcess
 protected:
 	typedef int ( HProcess::* process_handler_filedes_t ) ( int );
 	typedef hcore::HHashMap < int, process_handler_filedes_t > process_filedes_map_t;
-	/*{*/
 	bool			f_bInitialised;					/* did process has necessery initialisation */
 	bool			f_bLoop; 								/* indicates if main loop continues */
 	int				f_iIdleCycles;					/* full select()'s without io activity */
@@ -51,12 +50,6 @@ protected:
 	timeval		f_sLatency;							/* sleep between re-selects (helper) */
 	fd_set		f_xFileDescriptorSet; 	/* keyboard and eventual sockets */
 	process_filedes_map_t f_oFileDescriptorHandlers;
-	/*}*/
-public:
-	/*{*/
-	/*}*/
-protected:
-	/*{*/
 	HProcess ( size_t );
 	virtual ~HProcess ( void );
 	int init ( int, int = 0 );
@@ -72,12 +65,9 @@ protected:
 	virtual int handler_alert ( int, void * = NULL );
 	virtual int handler_interrupt ( int, void * = NULL );
 	virtual int handler_idle ( int, void * = NULL );
-	/*}*/
 private:
-	/*{*/
 	HProcess ( HProcess const & );
 	HProcess & operator = ( HProcess const & );
-	/*}*/
 	};
 
 }

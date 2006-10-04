@@ -64,13 +64,10 @@ public:
 			E_COLUMN_OUTOFRANGE
 			} error_t;
 		};
-protected:
-	/* { */
+private:
 	int f_iRows;
 	int f_iColumns;
-	/* } */
 public:
-	/* { */
 	HMatrix ( int const, int const );
 	HMatrix ( HMatrix const & );
 	virtual ~HMatrix ( void );
@@ -98,15 +95,14 @@ public:
 	tType operator ! ( void );
 	bool operator == ( HMatrix const & );
 	bool operator != ( HMatrix const & );
-template < typename ttType >
+	template < typename ttType >
 	friend HVector < ttType > operator * ( HVector < ttType > const &,
 			HMatrix const & );
-template < typename ttType >
+	template < typename ttType >
 	friend HVector < ttType > operator *= ( HVector < ttType > const &,
 			HMatrix const & );
-template < typename ttType >
+	template < typename ttType >
 	friend HMatrix operator * ( ttType const, HMatrix < ttType > const & );
-	/* } */
 private:
 	inline void check_dimensions_columns_rows ( int a_iRowsAnother )
 		{

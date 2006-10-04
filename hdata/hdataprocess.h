@@ -51,23 +51,16 @@ typedef yaal::hcore::HHashMap < yaal::hcore::HString,
 class HDataProcess : public hconsole::HTUIProcess
 	{
 protected:
-	/*{*/
 	dbwrapper::HDataBase f_oDataBase;
-	/*}*/
 private:
-	/*{*/
 	yaal::hconsole::OMenuItem * f_psRootMenu;
-	/*}*/
 public:
-	/*{*/
 	HDataProcess ( void );
 	virtual ~HDataProcess ( void );
 	virtual int init_xrc ( char const *, char const *,
 			menu_handlers_map_t const & );
 	dbwrapper::HDataBase * data_base ( void );
-	/*}*/
 protected:
-	/*{*/
 	virtual int handler_quit ( int, void * = NULL );
 	virtual int handler_close_window ( int, void * = NULL );
 	yaal::hconsole::OMenuItem * build_sub_menu ( yaal::tools::HXml::ONode &,
@@ -75,12 +68,9 @@ protected:
 	void build_menu_item ( yaal::tools::HXml::ONode &,
 			yaal::hconsole::OMenuItem &, menu_handlers_map_t const & );
 	void destroy_menu ( yaal::hconsole::OMenuItem * );
-	/*}*/
 private:
-	/*{*/
 	HDataProcess ( HDataProcess const & );
 	HDataProcess & operator = ( HDataProcess const & );
-	/*}*/
 	};
 
 }

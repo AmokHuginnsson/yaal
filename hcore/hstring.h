@@ -35,13 +35,10 @@ namespace hcore
 
 class HString
 	{
-protected:
-	/*{*/
+private:
 	char *	f_pcBuffer;
 	int	f_iSize;
-	/*}*/
 public:
-	/*{*/
 	HString ( void );
 	HString ( HString const & );
 	HString ( int const, bool const ); /* initialize immediately with size */
@@ -101,10 +98,6 @@ public:
 	HString split ( char const * const, int const ) const;
 	HString & fill ( char = '\0', int = 0, int = 0 );
 	HString & fillz ( char = '\0', int = 0, int = 0 );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 HString operator + ( char const *, HString const & );

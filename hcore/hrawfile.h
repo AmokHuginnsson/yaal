@@ -38,21 +38,14 @@ typedef int file_descriptor_t;
 class HRawFile
 	{
 protected:
-	/*{*/
 	file_descriptor_t f_iFileDescriptor; /* raw file descriptor of the file */
-	/*}*/
 public:
-	/*{*/
 	HRawFile ( void );
 	virtual ~HRawFile ( void );
 	virtual int close ( void );
 	file_descriptor_t get_file_descriptor ( void ) const;
 	int read ( void * const, int const );
 	int write ( void const * const, int const );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 }

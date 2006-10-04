@@ -40,7 +40,6 @@ namespace hconsole
 class HHandler
 	{
 protected:
-	/*{*/
 	typedef int ( HHandler::* HANDLER_t ) ( int, void * );
 	typedef hcore::HHashMap < int, HANDLER_t > process_handler_key_map_t;
 	typedef hcore::HHashMap < hcore::HString, HANDLER_t > process_handler_command_map_t;
@@ -48,14 +47,10 @@ protected:
 	process_handler_key_map_t f_oPostprocessHandlers;
 	process_handler_command_map_t f_oCommandHandlers;
 	hcore::HString f_oCommand;
-	/*}*/
 public:
-	/*{*/
 	HHandler ( size_t = 32, size_t = 32 );
 	virtual ~HHandler ( void );
-	/*}*/
 protected:
-	/*{*/
 	int process_input_with_handlers ( int, const process_handler_key_map_t & );
 	hcore::HString process_command ( void );
 	template < typename tType >
@@ -70,7 +65,6 @@ protected:
 		}
 	int register_preprocess_handler_internal ( int, int const *, HANDLER_t );
 	int register_postprocess_handler_internal ( int, int const *, HANDLER_t );
-	/*}*/
 	};
 
 }

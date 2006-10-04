@@ -39,21 +39,12 @@ namespace hconsole
 class HItem : public hcore::HArray < hcore::HInfo >
 	{
 public:
-	/*{*/
 	int long	m_lId;
 	bool	m_bChecked;
-	/*}*/
-private:
-public:
-	/*{*/
 	HItem ( int  = 0 );
 	virtual ~HItem ( void );
 	HItem ( HItem const &, int = 0 );
 	HItem & operator = ( HItem const & );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 }

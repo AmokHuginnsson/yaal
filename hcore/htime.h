@@ -41,15 +41,11 @@ extern char const * const n_pcDefaultTimeFormat;
 
 class HTime
 	{
-protected:
-	/*{*/
 	HString	f_oFormat;
 	mutable HString	f_oVarTmpBuffer;
 	time_t	f_xValue;
 	tm			f_sBroken;
-	/*}*/
 public:
-	/*{*/
 	HTime ( void );
 	HTime ( HTime const & );
 	HTime ( char const * const );
@@ -81,10 +77,6 @@ public:
 	bool operator > ( time_t const & ) const;
 	operator char const * ( void ) const;
 	operator time_t ( void ) const;
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 }

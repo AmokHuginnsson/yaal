@@ -55,8 +55,7 @@ public:
 			} error_t;
 		};
 	class HIterator;
-protected:
-	/*{*/
+private:
 	class HAbstractNode;
 	struct ONodePtr
 		{
@@ -71,47 +70,29 @@ protected:
 			D_RED,
 			D_BLACK
 			} color_t;
-	protected:
-		/*{*/
 		color_t f_eColor;
 		HAbstractNode * f_poParent;
 		HAbstractNode * f_poLeft;
 		HAbstractNode * f_poRight;
-		/*}*/
-	public:
-	protected:
-		/*{*/
 		HAbstractNode ( void );
 		virtual ~HAbstractNode ( void );
-		/*}*/
-	private:
-		/*{*/
 		HAbstractNode ( HAbstractNode const & );
 		HAbstractNode & operator = ( HAbstractNode const & );
 		void set_child ( HAbstractNode *, HAbstractNode * );
-		/*}*/
 		friend class HSBBSTree;
 		};
 	template < typename tType >
 	class HNode : public HAbstractNode
 		{
-	protected:
-		/*{*/
 		tType f_tKey;
 		HNode ( tType const & );
-		/*}*/
-	private:
-		/*{*/
 		HNode ( HNode const & );
 		HNode & operator = ( HNode const & );
-		/*}*/
 		friend class HSBBSTree;
 		};
 	HAbstractNode * f_poRoot;
 	int long f_lQuantity;
-	/*}*/
 public:
-	/*{*/
 	HSBBSTree ( void );
 	virtual ~HSBBSTree ( void );
 	template < typename tType >
@@ -126,9 +107,7 @@ public:
 	HIterator end ( void ) const;
 	HIterator rbegin ( void ) const;
 	HIterator rend ( void ) const;
-	/*}*/
-protected:
-	/*{*/
+private:
 	template < typename tType >
 	ONodePtr find_node ( tType const & ) const;
 	void remove_node ( HAbstractNode * );
@@ -138,22 +117,14 @@ protected:
 	void remove_rebalance ( HAbstractNode * );
 	void rotate_left ( HAbstractNode * );
 	void rotate_right ( HAbstractNode * );
-	/*}*/
-private:
-	/*{*/
 	HSBBSTree ( HSBBSTree const & );
 	HSBBSTree & operator = ( HSBBSTree const & );
-	/*}*/
 	};
 
 class HSBBSTree::HIterator
 	{
-protected:
-	/*{*/
 	HAbstractNode * f_poCurrent;
-	/*}*/
 public:
-	/*{*/
 	HIterator ( void );
 	HIterator ( HIterator const & );
 	HIterator & operator ++ ( void );
@@ -165,12 +136,9 @@ public:
 	bool operator != ( HIterator const & ) const;
 	template < typename tType >
 	tType const & operator * ( void );
-	/*}*/
-protected:
-	/*{*/
+private:
 	friend class HSBBSTree;
 	explicit HIterator ( HAbstractNode * const );
-	/*}*/
 	};
 
 template < typename tType >

@@ -81,12 +81,8 @@ class HPointer
 		HShared & operator = ( HShared const & );
 		friend class HPointer;
 		};
-protected:
-	/*{*/
 	HShared * f_poShared;
-	/*}*/
 public:
-	/*{*/
 	explicit HPointer ( tType * const );
 	virtual ~HPointer ( void );
 	HPointer ( HPointer const & );
@@ -97,7 +93,6 @@ public:
 	bool operator != ( HPointer const & ) const;
 	tType * operator-> ( void ) const;
 	tType * raw ( void ) const;
-	/*}*/
 	};
 
 template < typename tType >

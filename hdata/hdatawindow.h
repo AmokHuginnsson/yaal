@@ -52,7 +52,6 @@ public:
 			} mode_t;
 		};
 protected:
-	/*{*/
 	bool f_bModified;
 	DOCUMENT::mode_t f_eDocumentMode;
 	HDataControl * f_poMainControl;
@@ -60,9 +59,7 @@ protected:
 	hconsole::HItem * f_poSyncStore;
 	hcore::HList < HDataControl * > f_oViewModeControls;
 	hcore::HList < HDataControl * > f_oEditModeControls;
-	/*}*/
 public:
-	/*{*/
 	HDataWindow ( char const *, dbwrapper::HDataBase * = NULL, OResource * = NULL );
 	virtual ~HDataWindow ( void );
 	virtual int init ( void );
@@ -70,9 +67,7 @@ public:
 	void set_sync_store ( hconsole::HItem * = NULL );
 	bool is_modified ( void ) const;
 	void set_modified ( bool = true );
-	/*}*/
 protected:
-	/*{*/
 	void link ( int, HDataControl * );
 	void set_mode ( DOCUMENT::mode_t );
 	virtual void sync ( void );
@@ -84,12 +79,9 @@ protected:
 	int handler_save ( int, void * );
 	int handler_requery ( int, void * );
 	int handler_cancel ( int, void * );
-	/*}*/
 private:
-	/*{*/
 	HDataWindow ( HDataWindow const & );
 	HDataWindow & operator = ( HDataWindow const & );
-	/*}*/
 	};
 
 }

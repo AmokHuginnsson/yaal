@@ -45,28 +45,19 @@ protected:
 	class HNodeControl : public hcore::HTree < HItem >::HNode
 		{
 	protected:
-		/*{*/
 		bool f_bUnfolded;	/* is this branch folded? */
 		int f_iRowRaw;
 		int	f_iColumnRaw;
 		int f_iWidthRaw;
-		/*}*/
-	public:
-		/*{*/
-		/*}*/
-	protected:
-		/*{*/
 		HNodeControl ( HNodeControl * );
 		virtual ~HNodeControl ( void );
 		void expand ( void );
 		void collapse ( void );
 		bool hit_test ( int, int ) const;
 		void click ( int );
-		/*}*/
 		friend class HTreeControl;
 		};
 public:
-	/*{*/
 	HTreeControl ( HWindow *,			/* parent */
 								 int,						/* row */
 								 int,						/* col */
@@ -83,11 +74,8 @@ public:
 	virtual int set_focus ( char = 0 );
 	virtual int process_input( int );
 	virtual int click ( mouse::OMouse & );
-	/*}*/
-protected:
-	/*{*/
+private:
 	bool do_click ( HNodeControl *, mouse::OMouse & );
-	/*}*/
 	};
 
 }

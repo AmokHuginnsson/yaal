@@ -49,7 +49,6 @@ public:
 		} socket_type_t;
 protected:
 	typedef HHashMap < int, HSocket * > clients_t;
-	/*{*/
 	bool f_bNeedShutdown;
 	socket_type_t f_eType;
 	int f_iMaximumNumberOfClients;
@@ -58,9 +57,7 @@ protected:
 	clients_t * f_poClients;
 	HString f_oHostName;
 	HString f_oVarTmpBuffer;
-	/*}*/
 public:
-	/*{*/
 	HSocket ( socket_type_t const = D_DEFAULTS, int const = 0 );
 	virtual ~HSocket ( void );
 	void listen ( char const * const, int const = 0 );
@@ -76,16 +73,11 @@ public:
 	int write_until_eos ( HString const & );
 	int get_client_count ( void ) const;
 	HString const & get_host_name ( void );
-	/*}*/
 protected:
-	/*{*/
 	void make_address ( char const * const, int const );
-	/*}*/
 private:
-	/*{*/
 	HSocket ( HSocket const & );
 	HSocket & operator = ( HSocket const & );
-	/*}*/
 	};
 
 }

@@ -40,11 +40,7 @@ class HDataWindow;
 
 class HDataListControl : public HDataControl, public virtual hconsole::HListControl
 	{
-protected:
-	/*{*/
-	/*}*/
 public:
-	/*{*/
 	HDataListControl ( dbwrapper::HRecordSet *, HDataWindow *, int, int, int, int, char const *, 
 			bool = false, bool = true, bool = true, bool = true,
 			bool = true, int = -1, int = -1, int = -1 );
@@ -53,10 +49,6 @@ public:
 	virtual int long get_current_id ( void );
 	virtual void add_new ( void );
 	virtual void cancel_new ( void );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 }

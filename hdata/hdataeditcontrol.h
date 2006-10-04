@@ -38,11 +38,7 @@ namespace hdata
 
 class HDataEditControl : public HDataControl, public virtual hconsole::HEditControl
 	{
-protected:
-	/*{*/
-	/*}*/
 public:
-	/*{*/
 	HDataEditControl ( HDataWindow *,					/* parent */
 								int,								/* top ( parent relative ) */
 								int,								/* left */
@@ -63,10 +59,6 @@ public:
 								int = -1,						/* enabled attribute */
 								int = -1 );					/* focused attribute */
 	virtual int process_input( int );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 }

@@ -35,13 +35,9 @@ namespace hcore
 
 class HComplex
 	{
-protected:
-	/*{*/
 	double f_dReal;
 	double f_dImaginary;
-	/*}*/
 public:
-	/*{*/
 	HComplex ( void );
 	HComplex ( double const, double const = 0 );
 	HComplex ( HComplex const & );
@@ -71,10 +67,6 @@ public:
 	HComplex operator / ( HComplex const & );
 	HComplex operator / ( double const );
 	friend HComplex operator * ( double const, HComplex const & );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 }

@@ -56,7 +56,6 @@ inline int long unsigned hash ( tType const & a_rtKey )
 template < typename tType, typename ttType >
 class HHashMap
 	{
-private:
 	class HAtom
 		{
 	protected:
@@ -77,16 +76,12 @@ private:
 		/*}*/
 		friend class HHashMap < tType, ttType >;
 		};
-protected:
-	/*{*/
 	int unsigned f_uiPrime;
 	int unsigned f_uiIndex;
 	int f_iQuantity;
 	HAtom * f_poAtomPtr;
 	HAtom ** f_ppoAtomArray;
-	/*}*/
 public:
-	/*{*/
 	HHashMap ( size_t ); /* Lower bound of size of map's table */
 	HHashMap ( HHashMap const & );
 	virtual ~HHashMap ( void );
@@ -99,10 +94,6 @@ public:
 	bool remove ( tType const & );
 	void flush ( void );
 	int quantity ( void ) const;
-	/*}*/
-private:
-	/*{*/
-	/*}*/
 	};
 
 template < typename tType, typename ttType >

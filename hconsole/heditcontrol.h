@@ -47,7 +47,6 @@ extern char const * const n_pcMaskDefault;
 class HEditControl : public virtual HControl
 	{
 protected:
-	/*{*/
 	bool				f_bReplace;						/* current edit mode */
 	bool				f_bMultiLine;					/* is control multiline */
 	bool				f_bReadOnly;					/* shall editing be disabled */
@@ -68,9 +67,7 @@ protected:
 	hcore::HString			f_oString;		/* control content */
 	typedef hcore::HList< hcore::HString >	history_t;
 	history_t	f_oHistory;							/* history of insertions */
-	/*}*/
 public:
-	/*{*/
 	HEditControl ( HWindow *,					/* parent */
 								int,								/* top ( parent relative ) */
 								int,								/* left */
@@ -91,14 +88,14 @@ public:
 								int = -1,						/* enabled attribute */
 								int = -1 );					/* focused attribute */
 	virtual ~HEditControl ( void );
+	void set_flags ( bool = false, bool = false );
+	virtual hcore::HInfo get ( void );
+protected:
 	virtual void refresh ( void );
 	virtual int set_focus ( char = 0 );
 	virtual void set ( hcore::HInfo const & );
-	virtual hcore::HInfo get ( void );
-	void set_flags ( bool = false, bool = false );
 	virtual int process_input( int );
 	virtual int click ( mouse::OMouse & );
-	/*}*/
 	};
 
 }

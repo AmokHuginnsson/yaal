@@ -39,7 +39,16 @@ namespace yaal
 namespace hcore
 {
 
-template < typename tType >
+template < typename tType, typename ttType >
+class HPair
+	{
+public:
+
+	virtual ~HPair ( void );
+protected:
+	};
+
+template < typename tType, typename ttType >
 class HMap
 	{
 public:
@@ -101,6 +110,13 @@ public:
 		{ return ( HIterator ( f_oEngine.rbegin ( ) ) ); }
 	HIterator rend ( void ) const
 		{ return ( HIterator ( f_oEngine.rend ( ) ) ); }
+	ttType & operator [ ] ( tType const & key )
+		{
+		HIterator it = find ( key );
+		if ( it != end ( ) )
+			return ( *it );
+		insert ( key );
+		}
 	};
 
 }

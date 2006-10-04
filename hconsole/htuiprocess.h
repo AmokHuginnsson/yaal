@@ -41,19 +41,14 @@ namespace hconsole
 class HTUIProcess : public HHandler, protected yaal::hcore::HProcess
 	{
 protected:
-	/*{*/
 	HWindow *	f_poForegroundWindow; /* sefl explanary */
 	HWindowListControl * f_poWindows;			/* current existing windows */
-	/*}*/
 public:
-	/*{*/
 	HTUIProcess ( size_t = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );
 	int init_tui ( char const * = "", HWindow * = NULL );
 	using hcore::HProcess::run;
-	/*}*/
 protected:
-	/*{*/
 	int process_stdin ( int );
 	int process_mouse ( int );
 	int process_commands ( void );
@@ -67,12 +62,9 @@ protected:
 	virtual int handler_jump_meta_tab ( int, void * = NULL );
 	virtual int handler_jump_meta_direct ( int, void * = NULL );
 	virtual int handler_close_window ( int, void * = NULL );
-	/*}*/
 private:
-	/*{*/
 	HTUIProcess ( HTUIProcess const & );
 	HTUIProcess & operator = ( HTUIProcess const & );
-	/*}*/
 	};
 
 }

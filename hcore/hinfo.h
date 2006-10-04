@@ -39,8 +39,6 @@ namespace hcore
 
 class HInfo
 	{
-protected:
-	/*{*/
 	type_t		f_eType;
 	int				f_iInt;
 	int long	f_lLongInt;
@@ -48,9 +46,7 @@ protected:
 	void *		f_pvPointer;
 	HString		f_oString;
 	HTime			f_oTime;
-	/*}*/
 public:
-	/*{*/
 	HInfo ( void );
 	HInfo ( int const & );
 	HInfo ( int long const & );
@@ -67,11 +63,8 @@ public:
 	template < typename tType >
 	tType const get ( void ) const;
 	operator bool const ( void ) const;
-	/*}*/
-protected:
-	/*{*/
+private:
 	void purge ( void );
-	/*}*/
 	};
 
 }

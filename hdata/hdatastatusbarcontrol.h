@@ -38,17 +38,9 @@ namespace hdata
 
 class HDataStatusBarControl : public hconsole::HStatusBarControl
 	{
-protected:
-	/*{*/
-	/*}*/
 public:
-	/*{*/
 	HDataStatusBarControl ( HDataWindow *, char const *, int = -1 );
 	virtual void draw_label ( void );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 }

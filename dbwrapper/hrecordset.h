@@ -51,13 +51,10 @@ public:
 		D_EDITING
 		} mode_t;
 private:
-	/*{*/
 	void * f_pvCoreData;	/* very internal for this class used only in base cla */
 	hcore::HString f_oSQL;
 	hcore::HString f_oVarTmpBuffer;
-	/*}*/
 protected:
-	/*{*/
 	int f_iIdFieldOffset;	/* number (count from 0) of id column in result record-set */
 	int f_iFieldCount;		/* number of columns returned by last query */
 	mode_t f_eMode;					/* normal(opened), closed, adding, editing */
@@ -70,15 +67,11 @@ protected:
 	hcore::HList< hcore::HString >	f_oColumnNames; /* column names returned by last query */
 	hcore::HList< hcore::HString > f_oValues;	/* values returned by last cursor movement */
 	HDataBase * f_poDataBase; /* data-base that this record-set belongs to */
-	/*}*/
 public:
-	/*{*/
 	hcore::HString m_oFilter;		/* additional variable filter (WHERE clause) */
 	hcore::HString m_oSort;			/* additional variable sort (ORDER BY clause) */
 	int long m_lId;
-	/*}*/
 protected:
-	/*{*/
 	void build_sql ( void );
 	virtual void sync ( void );
 	void sync ( int, char & );
@@ -89,9 +82,7 @@ protected:
 	void sync ( int, hcore::HString & );
 	void sync ( int, hcore::HTime & );
 	void sync ( int, hcore::HInfo & );
-	/*}*/
 public:
-	/*{*/
 	HRecordSet ( HDataBase * );
 	virtual ~HRecordSet ( void );
 	hcore::HString get ( int );
@@ -111,12 +102,9 @@ public:
 	void edit ( void );
 	int long update ( void );
 	void remove ( void );
-	/*}*/
 private:
-	/*{*/
 	HRecordSet ( HRecordSet const & );
 	HRecordSet & operator = ( HRecordSet const & );
-	/*}*/
 	};
 
 }

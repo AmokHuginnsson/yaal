@@ -1,4 +1,3 @@
-
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 

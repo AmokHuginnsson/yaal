@@ -41,8 +41,6 @@ namespace hcore
 
 class HPattern
 	{
-protected:
-	/*{*/
 	bool		f_bInitialized;				/* is pattern initialized */
 	bool		f_bIgnoreCaseDefault;	/* default value for ignore case switch */
 	bool		f_bIgnoreCase;				/* self explanary */
@@ -53,9 +51,7 @@ protected:
 	HString	f_oPatternInput;			/* current search pattern */
 	HString	f_oPatternReal;				/* pattern with stripped switches */
 	HString f_oError;							/* error message of last operation */
-	/*}*/
 public:
-	/*{*/
 	HPattern ( bool = false /* default ignore case state */ );
 	virtual ~HPattern ( void );
 	int parse ( char const * const /* pattern input */,
@@ -67,12 +63,9 @@ public:
 			int * const = NULL /* match length */,
 			int * const = NULL /* error code */ );
 	int count ( char const * const );
-	/*}*/
-protected:
-	/*{*/
+private:
 	void prepare_error_message ( int const, char const * const );
 	bool set_switch ( char const, int short unsigned * const, int const );
-	/*}*/
 	};
 
 }

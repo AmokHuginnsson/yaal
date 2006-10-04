@@ -39,21 +39,14 @@ class HWindow;
 
 class HWindowListControl : public HListControl
 	{
-protected:
-	/*{*/
-	/*}*/
 public:
-	/*{*/
 	HWindowListControl ( HWindow *, int, int, int, int, char const * );
 	virtual ~HWindowListControl ( void );
 	virtual int process_input ( int );
 	virtual void refresh ( void );
 	virtual HItem & add_tail ( HItem * = NULL );
-	/*}*/
 protected:
-	/*{*/
 	virtual int long empty ( hcore::HList < HItem > ::HElement * );
-	/*}*/
 	};
 
 }

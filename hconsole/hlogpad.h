@@ -47,44 +47,29 @@ class HLogPad : public HControl
 			D_TEXT,
 			D_TEXT_EOL
 			} type_t;
-	protected:
-		/*{*/
 		type_t f_eType;
 		int f_iAttribute;
 		hcore::HString f_oText;
-		/*}*/
 	public:
-		/*{*/
 		HLogLine ( void );
 		virtual ~HLogLine ( void );
-		/*}*/
-	protected:
-		/*{*/
-		/*}*/
 		friend class HLogPad;
 		};
-protected:
 	typedef hcore::HList < HLogLine > contents_t;
-	/*{*/
 	int f_iLines;
 	int f_iOffsetRow;
 	int f_iOffsetColumn;
 	int f_iAttribute;
 	contents_t f_oContents;
-	/*}*/
 public:
-	/*{*/
 	HLogPad ( HWindow *, int, int, int, int, char const * const );
 	virtual ~HLogPad ( void );
 	void add ( int, char const * const );
 	void add ( char const * const );
 	void add ( int );
+protected:
 	virtual int process_input ( int );
 	virtual void refresh ( void );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 	};
 
 }

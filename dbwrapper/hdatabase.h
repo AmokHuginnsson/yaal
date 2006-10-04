@@ -36,16 +36,10 @@ namespace dbwrapper
 class HDataBase
 	{
 private:
-	/*{*/
 	void * f_pvCoreData;	/* very internal for this class used only in base cla */
-	/*}*/
-protected:
-	/*{*/
 	void * f_pvLastResult; /* result of last query, helps prevent requering
 														with out retriving/freeing old one */
-	/*}*/
 public:
-	/*{*/
 	HDataBase ( void );
 	virtual ~HDataBase ( void );
 	int login ( char const *,		/* database */
@@ -56,15 +50,9 @@ public:
 	void * get_result ( void );
 	int long insert_id ( void );
 	char const * get_error ( void ) const;
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 private:
-	/*{*/
 	HDataBase ( HDataBase const & );
 	HDataBase & operator = ( HDataBase const & );
-	/*}*/
 	};
 
 }

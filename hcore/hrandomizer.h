@@ -35,16 +35,11 @@ namespace hcore
 
 class HRandomizer
 	{
-protected:
-	/*{*/
 	int long unsigned f_ulSeed;
-	/*}*/
 public:
-	/*{*/
 	HRandomizer ( int long unsigned const = 1 );
 	void set ( int long unsigned const );
 	int rnd ( int = 0 );
-	/*}*/
 	};
 
 }

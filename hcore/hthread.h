@@ -62,12 +62,9 @@ private:
 
 class HCondition
 	{
-protected:
-	/*{*/
 	pthread_condattr_t f_sAttributes;
 	pthread_cond_t f_xCondition;
 	HMutex f_oMutex;
-	/*}*/
 public:
 	typedef enum
 		{
@@ -75,49 +72,35 @@ public:
 		D_TIMEOUT,
 		D_INTERRUPT
 		} status_t;
-	/*{*/
 	HCondition ( void );
 	virtual ~HCondition ( void );
 	status_t wait ( int long unsigned * = NULL, int long unsigned * = NULL );
 	void signal ( void );
-	/*}*/
-protected:
-	/*{*/
-	/*}*/
 private:
-	/*{*/
 	HCondition ( HCondition const & );
 	HCondition & operator = ( HCondition const & );
-	/*}*/
 	};
 
 class HThread
 	{
-private:
 	typedef enum
 		{
 		D_DEAD,
 		D_ALIVE,
 		D_ZOMBIE
 		} status_t;
-	/*{*/
 	status_t				f_eStatus;
-	/*}*/
-protected:
-	/*{*/
 	pthread_attr_t	f_sAttributes;
 	pthread_t				f_xThread;
+protected:
 	mutable HMutex	f_oMutex;
 	HCondition			f_oCondition;
-	/*}*/
 public:
-	/*{*/
 	HThread ( void );
 	virtual ~HThread ( void );
 	int spawn ( void );
 	int finish ( void );
 	bool is_alive ( void ) const;
-	/*}*/
 private:
 	virtual int run ( void ) = 0;
 	void * control ( void );
@@ -128,20 +111,13 @@ private:
 
 class HLock
 	{
-protected:
-	/*{*/
 	HMutex & f_roMutex;
-	/*}*/
 public:
-	/*{*/
 	explicit HLock ( HMutex & );
 	virtual ~HLock ( void );
-	/*}*/
 private:
-	/*{*/
 	HLock ( HLock const & );
 	HLock & operator = ( HLock const & );
-	/*}*/
 	};
 
 }

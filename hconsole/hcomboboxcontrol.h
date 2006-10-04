@@ -49,12 +49,9 @@ public:
 			} mode_t;
 		};
 protected:
-	/*{*/
 	MODE::mode_t f_eMode; /* operating mode (D_MODE_EDITCONTROL|D_MODE_LISTCONTROL) */
 	int f_iDroppedWidth;	/* width of dropped list */
-	/*}*/
 public:
-	/*{*/
 	HComboboxControl ( HWindow *,			/* parent */
 										 int,						/* row */
 										 int,						/* col */
@@ -77,11 +74,8 @@ public:
 	virtual int kill_focus ( void ); /* this one will be used here */
 	virtual void refresh ( void );
 	virtual int click ( mouse::OMouse & );
-	/*}*/
-protected:
-	/*{*/
+private:
 	void close_combo ( void );
-	/*}*/
 	};
 
 }

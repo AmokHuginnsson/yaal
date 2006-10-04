@@ -55,7 +55,6 @@ public:
 			} restrict_t;
 		};
 protected:
-	/*{*/
 	int			f_iStatusBarAttribute;
 	int			f_iPromptLength;
 	PROMPT::mode_t f_eMode;					/* prompt mode */
@@ -73,17 +72,9 @@ protected:
 	hcore::HString	f_oMessage;
 	hcore::HTime		f_oStart;
 	/* end of progress bar data */
-	/*}*/
 public:
-	/*{*/
 	HStatusBarControl ( HWindow *, char const *, int = -1 );
 	virtual ~HStatusBarControl ( void );
-	virtual void draw_label ( void );
-	virtual void refresh ( void );
-	virtual int verify ( void );
-	virtual int process_input ( int );
-	virtual int process_input_normal ( int );
-	virtual int process_input_menu ( int );
 	void setup ( char const *, char const *, int );
 	void set_prompt ( char const * = NULL, PROMPT::mode_t = PROMPT::D_NORMAL,
 			PROMPT::restrict_t = PROMPT::D_RELAXED );
@@ -95,7 +86,13 @@ public:
 	void bar ( char const * = NULL );
 	int ask ( char const *, char const * );
 	bool confirm ( char const * );
-	/*}*/
+	virtual int process_input_normal ( int );
+	virtual int process_input_menu ( int );
+	virtual void refresh ( void );
+protected:
+	virtual void draw_label ( void );
+	virtual int verify ( void );
+	virtual int process_input ( int );
 	};
 
 }

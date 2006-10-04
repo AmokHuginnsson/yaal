@@ -52,8 +52,6 @@ HLog & endl ( HLog & );
 
 class HLog
 	{
-protected:
-	/*{*/
 	bool			f_bRealMode;
 	bool			f_bNewLine;
 	int long	f_lType;
@@ -63,9 +61,7 @@ protected:
 	char *		f_pcHostName;
 	char *		f_pcBuffer;
 	size_t		f_iBufferSize;
-	/*}*/
 public:
-	/*{*/
 	HLog ( void );
 	virtual ~HLog ( void );
 	/* already opened file */
@@ -87,16 +83,10 @@ public:
 	HLog & operator << ( double const );
 	HLog & operator << ( void * const );
 	HLog & operator << ( HLog & ( * const ) ( HLog & ) );
-	/*}*/
-protected:
-	/*{*/
-	void timestamp ( FILE * = NULL );
-	/*}*/
 private:
-	/*{*/
+	void timestamp ( FILE * = NULL );
 	HLog ( HLog const & );
 	HLog & operator = ( HLog const & );
-	/*}*/
 	friend HLog & endl ( HLog & );
 	};
 

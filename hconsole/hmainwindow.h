@@ -40,25 +40,19 @@ namespace hconsole
 
 class HMainWindow : public HWindow
 	{
-protected:
-	/*{*/
 	HMenuControl * f_poMenu;
 	HWindowListControl * f_poWindowList;
-	/*}*/
 public:
-	/*{*/
 	HMainWindow ( char const * );
 	virtual ~HMainWindow ( void );
-	virtual int init ( void );
 	void init_menu ( HTUIProcess *, OMenuItem * );
-	virtual int handler_close ( int, void * ); /* closes window process */
 	HWindowListControl * _disclose_window_list ( void );
-	/*}*/
+	virtual int init ( void );
+protected:
+	virtual int handler_close ( int, void * ); /* closes window process */
 private:
-	/*{*/
 	HMainWindow ( HMainWindow const & );
 	HMainWindow & operator = ( HMainWindow const & );
-	/*}*/
 	};
 
 }

@@ -58,19 +58,13 @@ public:
 		D_BUFFERED_READS = 4,
 		D_UNBUFFERED_READS = 8
 		} mode_read_t;
-protected:
-	/*{*/
+private:
 	mode_open_t f_eMode;
 	void * f_pvHandle;
 	HString f_oPath;
 	HString f_oError;
-	/*}*/
-private:
-	/*{*/
 	bool f_bExternal;
-	/*}*/
 public:
-	/*{*/
 	HFile ( mode_open_t const = D_READING, void * const = NULL );
 	virtual ~HFile ( void );
 	int open ( char const * const );
@@ -89,17 +83,11 @@ public:
 	operator bool const ( void ) const;
 	int write ( void const * const, int );
 	int read ( void * const, int );
-	/*}*/
-protected:
-	/*{*/
+private:
 	int get_line_length ( void );
 	int scan_line ( HString &, int const );
-	/*}*/
-private:
-	/*{*/
 	HFile ( HFile const & );
 	HFile & operator = ( HFile const & );
-	/*}*/
 	friend HFile & endl ( HFile & );
 	friend HFile & flush ( HFile & );
 	};
