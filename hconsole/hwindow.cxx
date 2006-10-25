@@ -136,7 +136,7 @@ void HWindow::refresh ( void )
 	HControl * l_poControl = NULL;
 	if ( f_poStatusBar && ( f_poStatusBar != f_poFocusedChild ) )
 		f_poStatusBar->refresh ( );
-	l_iCtr = f_oControls.quantity ( );
+	l_iCtr = f_oControls.size ( );
 	while ( l_iCtr -- )
 		{
 		l_poControl = * f_oControls.to_tail ( );
@@ -228,7 +228,7 @@ int HWindow::click ( mouse::OMouse & a_rsMouse )
 		return ( 1 );
 	if ( f_poFocusedChild->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
 		return ( f_poFocusedChild->click ( a_rsMouse ) );
-	l_iCtr = f_oControls.quantity ( );
+	l_iCtr = f_oControls.size ( );
 	while ( l_iCtr -- )
 		{
 		l_poControl = * f_oControls.to_tail ( );

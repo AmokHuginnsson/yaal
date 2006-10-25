@@ -75,7 +75,7 @@ void HTreeControl::HNodeControl::collapse ( void )
 	M_PROLOG
 	HTreeControl::HNodeControl * * l_ppoNodeControl = NULL;
 	f_bUnfolded = false;
-  if  ( ! f_oBranch.quantity ( ) )
+  if  ( ! f_oBranch.size ( ) )
 		return;
 	for ( l_ppoNodeControl = reinterpret_cast < HTreeControl::HNodeControl * * > ( & f_oBranch.go ( 0 ) );
 			l_ppoNodeControl;
@@ -156,7 +156,7 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 	HString const * l_poString = NULL;
 	HInfo * l_poInfo = NULL;
 	M_ASSERT ( a_poNode );
-	l_iCtr = a_poNode->f_oBranch.quantity ( );
+	l_iCtr = a_poNode->f_oBranch.size ( );
 	if ( a_poNode->f_tLeaf )
 		{
 		l_iRow ++;
@@ -198,12 +198,12 @@ int HTreeControl::process_input ( int a_iCode )
 		{
 		case ( KEY_CODES::D_HOME ):
 			l_poNode = dynamic_cast < HNodeControl * > ( f_poRoot );
-			if ( l_poNode->f_oBranch.quantity ( ) )
+			if ( l_poNode->f_oBranch.size ( ) )
 				f_poSelected = l_poNode->f_oBranch [ 0 ];
 		break;
 		case ( KEY_CODES::D_END ):
 			l_poNode = dynamic_cast < HNodeControl * > ( f_poRoot );
-			if ( l_poNode->f_oBranch.quantity ( ) )
+			if ( l_poNode->f_oBranch.size ( ) )
 				f_poSelected = l_poNode->f_oBranch [ - 1 ];
 		break;
 		case ( KEY_CODES::D_PAGE_UP ):
@@ -223,7 +223,7 @@ int HTreeControl::process_input ( int a_iCode )
 				l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
 				while ( l_poNode->f_bUnfolded )
 					{
-					if ( l_poNode->f_oBranch.quantity ( ) )
+					if ( l_poNode->f_oBranch.size ( ) )
 						{
 						f_poSelected = l_poNode->f_oBranch [ 0 ];
 						l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
@@ -237,7 +237,7 @@ int HTreeControl::process_input ( int a_iCode )
 		case ( KEY_CODES::D_RIGHT ):
 			{
 			l_bWasFolded = ! l_poNode->f_bUnfolded;
-			if ( l_poNode->f_oBranch.quantity ( ) )
+			if ( l_poNode->f_oBranch.size ( ) )
 				{
 				l_poNode->f_bUnfolded = true;
 				if ( l_bWasFolded )
@@ -249,7 +249,7 @@ int HTreeControl::process_input ( int a_iCode )
 			{
 			if ( l_poNode->f_bUnfolded )
 				{
-				if ( l_poNode->f_oBranch.quantity ( ) )
+				if ( l_poNode->f_oBranch.size ( ) )
 					f_poSelected = l_poNode->f_oBranch [ 0 ];
 				}
 			else
@@ -278,7 +278,7 @@ int HTreeControl::process_input ( int a_iCode )
 		break;
 		case ( ' ' ):
 		case ( '\r' ):
-			if ( l_poNode->f_oBranch.quantity ( ) )
+			if ( l_poNode->f_oBranch.size ( ) )
 				l_poNode->f_bUnfolded = ! l_poNode->f_bUnfolded;
 			else
 				l_iErrorCode = a_iCode;
@@ -322,7 +322,7 @@ bool HTreeControl::do_click ( HNodeControl * a_poNode, OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	l_iCtr = a_poNode->f_oBranch.quantity ( );
+	l_iCtr = a_poNode->f_oBranch.size ( );
 	if ( a_poNode->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
 		{
 		a_poNode->click ( a_rsMouse.f_iColumn );

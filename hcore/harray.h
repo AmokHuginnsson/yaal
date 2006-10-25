@@ -67,8 +67,11 @@ public:
 	HArray ( HArray const & );
 	HArray & operator = ( HArray const & );
 	tType & operator [ ] ( int );
+	tType const & operator [ ] ( int ) const;
 	int get_size ( void ) const;
 	operator bool ( void ) const;
+private:
+	tType & get ( int );
 	};
 
 template < typename tType >
@@ -161,7 +164,7 @@ HArray < tType > & HArray < tType >::operator = ( HArray const & a_roArray )
 	}
 
 template < typename tType >
-tType & HArray < tType >::operator [ ] ( int a_iIndex )
+tType & HArray < tType >::get ( int a_iIndex )
 	{
 	M_PROLOG
 	if ( a_iIndex < 0 )
@@ -169,6 +172,22 @@ tType & HArray < tType >::operator [ ] ( int a_iIndex )
 	if ( ( a_iIndex >= f_iSize ) || ( a_iIndex < 0 ) )
 		M_THROW ( n_ppcErrMsgHArray [ ERROR::E_BADINDEX ], a_iIndex );
 	return ( f_ptArray [ a_iIndex ] );
+	M_EPILOG
+	}
+
+template < typename tType >
+tType & HArray < tType >::operator [ ] ( int a_iIndex )
+	{
+	M_PROLOG
+	return ( get ( a_iIndex ) );
+	M_EPILOG
+	}
+
+template < typename tType >
+tType const & HArray < tType >::operator [ ] ( int a_iIndex ) const
+	{
+	M_PROLOG
+	return ( get ( a_iIndex ) );
 	M_EPILOG
 	}
 

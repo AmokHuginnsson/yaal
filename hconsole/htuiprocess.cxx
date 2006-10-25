@@ -319,7 +319,7 @@ int HTUIProcess::handler_jump_meta_direct ( int a_iCode, void * )
 	{
 	M_PROLOG
 	a_iCode = ( a_iCode & 0xff ) - '0';
-	if ( a_iCode >= f_poWindows->quantity ( ) )
+	if ( a_iCode >= f_poWindows->size ( ) )
 		return ( 0 );
 	f_poForegroundWindow = static_cast < HWindow * > ( f_poWindows->go ( a_iCode - 1 ) [ 0 ].get < void * > ( ) );
 	handler_refresh ( 0 );

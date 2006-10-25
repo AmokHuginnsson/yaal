@@ -38,16 +38,16 @@ namespace hconsole
 
 class HControl;
 
-class HControlList : public hcore::HList < HControl * >
+class HControlList
 	{
+	typedef hcore::HList < HControl * > control_list_t;
+	control_list_t f_oList;
+	control_list_t::HIterator f_oFocused;
 public:
 	HControlList ( void );
-	virtual ~HControlList ( void );
 	/* find next enabled control in window, if short cut char is specified */
 	HControl * next_enabled ( char = 0 ); /* enabled and match shortcut char */
 	void select ( HControl * );						/* this one should be private :( */
-protected:
-	virtual int long empty ( hcore::HList < HControl * > ::HElement * );
 	};
 
 }

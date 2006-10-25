@@ -112,8 +112,9 @@ void HComboboxControl::refresh ( void )
 		l_iHeight = f_iHeight;
 		l_iWidth = f_iWidth;
 		f_iWidth = f_iDroppedWidth;
-		if ( f_iQuantity < f_iHeight )
-			f_iHeight = f_iQuantity + 1;
+		int size = f_oList.size ( );
+		if ( size < f_iHeight )
+			f_iHeight = size + 1;
 		HListControl::refresh ( );
 		f_iHeight = l_iHeight;
 		f_iWidth = l_iWidth;
@@ -174,8 +175,8 @@ void HComboboxControl::close_combo ( void )
 	{
 	M_PROLOG
 	f_eMode = MODE::D_EDITCONTROL;
-	if ( f_iQuantity )
-		HEditControl::set ( present ( ) [ 0 ].get < char const * const > ( ) );
+	if ( ! f_oList.empty ( ) )
+		HEditControl::set ( f_oList.present ( ) [ 0 ].get < char const * const > ( ) );
 	clrscr ( );
 	f_poParent->refresh ( );
 	return;

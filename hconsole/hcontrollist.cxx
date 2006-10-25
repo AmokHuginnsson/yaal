@@ -36,29 +36,10 @@ namespace yaal
 namespace hconsole
 {
 
-HControlList::HControlList ( void )
+HControlList::HControlList ( void ) : f_oList ( ), f_oFocused ( )
 	{
 	M_PROLOG
 	return;
-	M_EPILOG
-	}
-
-HControlList::~HControlList ( void )
-	{
-	M_PROLOG
-	HList < HControl * >::flush ( ); /* see htree.h for explanation ! */
-	return;
-	M_EPILOG
-	}
-
-int long HControlList::empty ( HList < HControl * > ::HElement* a_poElement )
-	{
-	M_PROLOG
-	HControl * l_poControl = a_poElement->get_object ( );
-	if ( l_poControl )
-		delete l_poControl;
-	l_poControl = 0;
-	return ( HList < HControl * > ::empty ( a_poElement ) );
 	M_EPILOG
 	}
 
@@ -66,12 +47,12 @@ HControl * HControlList::next_enabled ( char a_cShorcut )
 	{
 	M_PROLOG
 	bool l_bLoop = true;
-	HControl * l_poControlOld = present ( );
+	HControl * l_poControlOld = f_oList.present ( );
 	HControl * l_poControlNew = NULL;
 	do
 		{
-		to_tail ( );
-		l_poControlNew = f_poSelected->get_object ( );
+		f_oList.to_tail ( );
+		l_poControlNew = f_oList.present ( );
 		l_bLoop = l_poControlNew->set_focus ( a_cShorcut );
 		if ( l_poControlOld == l_poControlNew )
 			l_bLoop = false;
@@ -89,16 +70,17 @@ HControl * HControlList::next_enabled ( char a_cShorcut )
 void HControlList::select ( HControl * a_poControl )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	HElement * l_poElement = NULL;
-	if ( f_poSelected->get_object ( ) == a_poControl )
+	if ( f_oList.present ( ) == a_poControl )
 		return;
-	l_poElement = f_poSelected;
-	f_poSelected = f_poHook;
-	while ( l_iCtr ++ < f_iQuantity )
-		if ( ( * to_tail ( ) ) == a_poControl )
+	control_list_t::HIterator end = f_oList.end ( );
+	for ( control_list_t::HIterator it = f_oList.begin ( ); it != end; ++ it )
+		{
+		if ( *it == a_poControl )
+			{
+			f_oFocused = it;
 			return;
-	f_poSelected = l_poElement;
+			}
+		}
 	M_THROW ( "bogus object", reinterpret_cast < int > ( a_poControl ) );
 	M_EPILOG
 	}

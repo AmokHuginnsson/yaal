@@ -37,8 +37,11 @@ namespace yaal
 namespace hconsole
 {
 
-class HListControl : public hcore::HList < HItem >, public virtual HSearchableControl
+class HListControl : virtual public HSearchableControl
 	{
+public:
+	typedef hcore::HList < HItem > item_list_t;
+protected:
 	class HColumnInfo
 		{
 		bool f_bDescending;
@@ -57,7 +60,6 @@ class HListControl : public hcore::HList < HItem >, public virtual HSearchableCo
 		HColumnInfo & operator = ( HColumnInfo const & );
 		friend class HListControl;
 		};
-protected:
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
 	bool				f_bDrawHeader;				/* should be header driven */
@@ -69,16 +71,18 @@ protected:
 																			 begining */
 	int					f_iSumForOne;					/* sum of percentage columns width */
 	hcore::HList < HColumnInfo >	f_oHeader;	/* list header info */
-	HElement *	f_poFirstVisibleRow;	/* pointer to first visible row */
-	struct
-		{
-		int f_iColumnWithMatch;
-		int f_iMatchNumber;
-		HElement *	f_poCurrentMatch;		/* row that has current pattern match */
-		} f_sMatch;
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
 	int long		f_lComparedItems;			/* items already compared during sorting */
+	item_list_t	f_oList;
+	item_list_t::HIterator	f_oFirstVisibleRow;	/* pointer to first visible row */
+	struct match_t
+		{
+		int f_iColumnWithMatch;
+		int f_iMatchNumber;
+		item_list_t::HIterator	f_oCurrentMatch;		/* row that has current pattern match */
+		match_t ( ) : f_iColumnWithMatch ( 0 ), f_iMatchNumber ( - 1 ), f_oCurrentMatch ( ) { }
+		} f_sMatch;
 public:
 	HListControl ( HWindow *,		 	/* parent */
 								 int,						/* row */
@@ -101,21 +105,31 @@ public:
 										BITS::ALIGN::align_t const & = BITS::ALIGN::D_LEFT,		/* align */
 										const type_t & = D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
-	virtual yaal::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
-	virtual HItem & add_tail ( HItem * = NULL );
-	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
+//	virtual yaal::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
+	void add_tail ( HItem const & );
+//	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
 	virtual int set_focus ( char = 0 );
 protected:
 	virtual void refresh ( void );
 	virtual int process_input( int );
-	virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
+	//virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual bool is_searchable ( void );
 	virtual int click ( mouse::OMouse & );
-	virtual bool is_above_c ( HElement *, HElement * );
+//	virtual bool is_above_c ( HElement *, HElement * );
 	virtual void go_to_match ( void );
 	virtual void go_to_match_previous ( void );
+	void handle_key_page_up ( void );
+	void handle_key_page_down ( void );
+	void handle_key_up ( void );
+	void handle_key_home ( void );
+	void handle_key_end ( void );
+	void handle_key_down ( void );
+	void handle_key_ctrl_n ( void );
+	void handle_key_ctrl_p ( void );
+	void handle_key_space ( void );
+	void handle_key_tab ( void );
 private:
-	void sort_by_column ( int, sort_order_t = D_ASCENDING );
+	void sort_by_column ( int, hcore::OListBits::sort_order_t = hcore::OListBits::D_ASCENDING );
 	void recalculate_column_widths ( void );
 	HListControl ( HListControl const & );
 	HListControl & operator = ( HListControl const & );
