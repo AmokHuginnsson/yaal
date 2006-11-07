@@ -82,7 +82,7 @@ void HLogPad::refresh ( void )
 	f_iAttribute = COLORS::D_ATTR_NORMAL | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		c_printf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );
-	if ( f_oContents.quantity ( ) )
+	if ( f_oContents.size ( ) )
 		{
 		l_poLogLine = & f_oContents.go ( 0 );
 		l_iCtr = 0;
@@ -143,7 +143,7 @@ void HLogPad::add ( char const * const a_pcText )
 	int l_iIndexNL = 0, l_iIndexChar = 0;
 	HLogLine l_oLogLine;
 	HLogLine * l_poLogLine = NULL;
-	if ( f_oContents.quantity ( ) )
+	if ( f_oContents.size ( ) )
 		l_poLogLine = & f_oContents.tail ( );
 	if ( ! l_poLogLine || ( l_poLogLine->f_eType != HLogLine::D_TEXT ) )
 		{

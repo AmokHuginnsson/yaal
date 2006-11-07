@@ -134,7 +134,7 @@ typedef enum
 	D_CHAR_POINTER	= 0x0080,
 	D_HSTRING				= 0x0100,
 	D_HINFO					= 0x0200,
-	D_HHASHMAP					= 0x0400,
+	D_HHASHMAP			= 0x0400,
 	D_HLIST					= 0x0800,
 	D_HTIME					= 0x1000,
 	D_MASK					= 0xffff

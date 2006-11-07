@@ -136,6 +136,8 @@ public:
 	void exchange ( int, int );
 	void sort_by_contents ( sort_order_t = D_ASCENDING );
 	bool empty ( void );
+	template < typename T >
+	void sort ( T const & );
 protected:
 	bool to_head ( HElement * &, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
 	bool to_tail ( HElement * &, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
@@ -143,8 +145,6 @@ protected:
 	bool ( HList< tType >::* IS_ABOVE ) ( HElement *, HElement * );
 	void exchange ( HElement *, HElement * );
 	void sub_swap ( HElement *, HElement *, HElement * );
-	template < typename T >
-	void sort ( T const & );
 	};
 
 template < typename tType >

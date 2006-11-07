@@ -73,7 +73,6 @@ protected:
 	hcore::HList < HColumnInfo >	f_oHeader;	/* list header info */
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
-	int long		f_lComparedItems;			/* items already compared during sorting */
 	item_list_t	f_oList;
 	item_list_t::HIterator	f_oFirstVisibleRow;	/* pointer to first visible row */
 	struct match_t

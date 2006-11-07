@@ -105,7 +105,6 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iControlOffset ( 0 ), f_iCursorPosition ( 0 ), f_iSumForOne ( 0 ),
 	f_oHeader ( ),
 	f_iSortColumn ( - 1 ),
-	f_lComparedItems ( 0 ),
 	f_oList ( ), f_oFirstVisibleRow ( ), f_sMatch ( )
 	{
 	M_PROLOG
@@ -677,12 +676,22 @@ OListBits::status_t HListControl::remove_tail ( treatment_t const & a_eFlag, HIt
 namespace
 {
 
+struct OProgressHelper
+	{
+	int long f_lComparedItems;
+	int long f_iSize;
+	HWindow * f_poWindow;
+	};
+
 class CompareListControlItems
 	{
 	OListBits::sort_order_t f_eOrder;
 	int f_iSortColumn;
+	type_t f_eType;
+	OProgressHelper & f_roProgressHelper;
 public:
-	CompareListControlItems ( OListBits::sort_order_t a_eOrder, int a_iColumn ) : f_eOrder ( a_eOrder ), f_iSortColumn ( a_iColumn ) { }
+	CompareListControlItems ( OListBits::sort_order_t a_eOrder, int a_iColumn, type_t a_eType, OProgressHelper & a_roProgressHelper )
+		: f_eOrder ( a_eOrder ), f_iSortColumn ( a_iColumn ), f_eType ( a_eType ), f_roProgressHelper ( a_roProgressHelper ) { }
 	bool operator ( ) ( HListControl::item_list_t::HIterator const &, HListControl::item_list_t::HIterator const & ) const;
 	};
 
@@ -695,10 +704,10 @@ bool CompareListControlItems::operator ( ) ( HListControl::item_list_t::HIterato
 	HListControl::item_list_t::HIterator const & l_oRight = f_eOrder == OListBits::D_ASCENDING ? a_oRight : a_oLeft;
 	HInfo const & l_roLeftInfo = ( *l_oLeft ) [ f_iSortColumn ];
 	HInfo const & l_roRightInfo = ( *l_oRight ) [ f_iSortColumn ];
-	f_lComparedItems ++;
-	if ( ( l_iSize > 1024 ) && ! ( f_lComparedItems % 1024 ) )
-		f_poParent->status_bar ( )->update_progress ( static_cast < double > ( f_lComparedItems ) );
-	switch ( f_oHeader [ f_iSortColumn ].f_eType )
+	++ f_roProgressHelper.f_lComparedItems;
+	if ( ( f_roProgressHelper.f_iSize > 1024 ) && ! ( f_roProgressHelper.f_lComparedItems % 1024 ) )
+		f_roProgressHelper.f_poWindow->status_bar ( )->update_progress ( static_cast < double > ( f_roProgressHelper.f_lComparedItems ) );
+	switch ( f_eType )
 		{
 		case ( D_LONG_INT ):
 			return ( l_roLeftInfo.get< long > ( ) > l_roRightInfo.get < long > ( ) );
@@ -711,7 +720,7 @@ bool CompareListControlItems::operator ( ) ( HListControl::item_list_t::HIterato
 		case ( D_HTIME ):
 			l_dDifference = static_cast < time_t > ( l_roLeftInfo.get < HTime const & > ( ) ) > static_cast < time_t > ( l_roRightInfo.get < HTime const & > ( ) );
 		break;
-		default :
+		default:
 			break;
 		}
 	return ( l_dDifference > 0 ? 1 : ( l_dDifference < 0 ? - 1 : 0 ) );
@@ -726,18 +735,17 @@ void HListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a_eOr
 	if ( ! f_bSortable )
 		return;
 	f_iSortColumn = a_iColumn;
-	f_eOrder = a_eOrder;
-	f_oHeader [ a_iColumn ].f_bDescending = a_eOrder == D_DESCENDING;
-	f_lComparedItems = 0;
+	f_oHeader [ a_iColumn ].f_bDescending = a_eOrder == OListBits::D_DESCENDING;
+	long int l_iSize = f_oList.size ( );
 	if ( l_iSize > 128 )
 		f_poParent->status_bar ( )->init_progress (
 				static_cast < double > ( l_iSize )
 				* static_cast < double > ( l_iSize ) / 2.,
 				" Sorting ..." );
-	sort ( CompareListControlItems ( a_eOrder, a_iColumn ) );
-	f_iControlOffset = 0;
-	f_iCursorPosition = 0;
-	f_oFirstVisibleRow = f_poSelected = f_poHook;
+	OProgressHelper l_oHelper = { 0, f_oList.size ( ), f_poParent };
+	f_oList.sort ( CompareListControlItems ( a_eOrder, a_iColumn, f_oHeader [ f_iSortColumn ].f_eType, l_oHelper ) );
+	f_oFirstVisibleRow = f_oList.begin ( );
+	f_iControlOffset = f_iCursorPosition = 0;
 	return;
 	M_EPILOG
 	}
@@ -745,7 +753,7 @@ void HListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a_eOr
 int HListControl::click ( mouse::OMouse & a_rsMouse )
 	{
 	M_PROLOG
-	int l_iRow = 0, l_iColumn = 0, l_iMoved = 0, l_iCtr = 0;
+	int l_iRow = 0, l_iColumn = 0, l_iCtr = 0;
 	int l_iWidth = 0, l_iColumns = f_oHeader.size ( );
 	HColumnInfo * l_poColumnInfo = NULL;
 	if ( ! HControl::click ( a_rsMouse ) )
@@ -763,21 +771,14 @@ int HListControl::click ( mouse::OMouse & a_rsMouse )
 			if ( l_iColumn <= l_iWidth )
 				{
 				sort_by_column ( l_iCtr,
-						l_poColumnInfo->f_bDescending ? D_ASCENDING : D_DESCENDING );
-				f_oFirstVisibleRow = f_poSelected = f_poHook;
-				f_iControlOffset = f_iCursorPosition = 0;
+						l_poColumnInfo->f_bDescending ? OListBits::D_ASCENDING : OListBits::D_DESCENDING );
 				refresh ( );
 				break;
 				}
 			}
 		}
-	else if ( l_iRow < l_iSize )
+	else if ( l_iRow < f_oList.size ( ) )
 		{
-		l_iMoved = f_iCursorPosition - l_iRow;
-		if ( l_iMoved > 0 )
-			to_head ( l_iMoved );
-		else
-			to_tail ( - l_iMoved );
 		f_iCursorPosition = l_iRow;
 		refresh ( );
 		}
@@ -793,8 +794,9 @@ bool HListControl::is_searchable ( void )
 void HListControl::go_to_match ( void )
 	{
 	M_PROLOG
+/*
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iCount = l_iSize + 1, l_iColumns = f_oHeader.size ( );
+	int l_iCount = f_oList.size ( ) + 1, l_iColumns = f_oHeader.size ( );
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
 	HItem * l_poItem = NULL;
@@ -826,7 +828,7 @@ void HListControl::go_to_match ( void )
 		if ( l_pcHighlightStart )
 			break;
 		f_sMatch.f_iColumnWithMatch = 0;
-/* this part is from process_input, but slightly modified */
+/ * this part is from process_input, but slightly modified * /
 		if ( ( f_iCursorPosition + f_iControlOffset ) < ( l_iSize - 1 ) )
 			{
 			f_iCursorPosition ++;
@@ -845,7 +847,7 @@ void HListControl::go_to_match ( void )
 			l_iMoveFirstRow = 0;
 			f_poParent->status_bar ( )->message ( _ ( "search hit BOTTOM, continuing at TOP" ) );
 			}
-/* end od it */
+/ * end od it * /
 		}
 	if ( l_pcHighlightStart )
 		{
@@ -864,7 +866,7 @@ void HListControl::go_to_match ( void )
 		f_sMatch.f_iMatchNumber = - 1;
 		f_sMatch.f_iColumnWithMatch = 0;
 		f_poParent->status_bar ( )->message ( HString ( _ ( "pattern not found: " ) ) + f_oPattern.error ( ) );
-		}
+		}*/
 	return;
 	M_EPILOG
 	}
@@ -872,8 +874,9 @@ void HListControl::go_to_match ( void )
 void HListControl::go_to_match_previous ( void )
 	{
 	M_PROLOG
+/*
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iCount = l_iSize + 1, l_iColumns = f_oHeader.size ( );
+	int l_iCount = f_oList.size ( ) + 1, l_iColumns = f_oHeader.size ( );
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
 	HItem * l_poItem = NULL;
@@ -912,7 +915,7 @@ void HListControl::go_to_match_previous ( void )
 		if ( l_pcHighlightStart )
 			break;
 		f_sMatch.f_iColumnWithMatch = l_iColumns - 1;
-/* this part is from process_input, but slightly modified */
+/ * this part is from process_input, but slightly modified * /
 		if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
 			{
 			if ( f_iCursorPosition > 0 )
@@ -940,7 +943,7 @@ void HListControl::go_to_match_previous ( void )
 			l_iMoveFirstRow = 0;
 			f_poParent->status_bar ( )->message ( _ ( "search hit TOP, continuing at BOTTOM" ) );
 			}
-/* end od it */
+/ * end od it * /
 		}
 	if ( l_pcHighlightStart )
 		{
@@ -959,7 +962,7 @@ void HListControl::go_to_match_previous ( void )
 		f_sMatch.f_iMatchNumber = - 1;
 		f_sMatch.f_iColumnWithMatch = 0;
 		f_poParent->status_bar ( )->message ( _ ( "pattern not found" ) );
-		}
+		}*/
 	return;
 	M_EPILOG
 	}
