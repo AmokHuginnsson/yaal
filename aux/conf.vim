@@ -23,6 +23,8 @@ syn match yaalSection	/^\[.*\]$/
 syn match yaalValues	/\<[0-9]\+\>/
 syn match yaalValues	/B[0-9]\+/
 syn match yaalKeyword /\<leave_ctrl_\([cqsz]\>\|\\\)/
+syn match yaalVariables /\${[A-Za-z0-9_]\+}/ containedin=confString
+syn match yaalDeclaration /[A-Za-z0-9_]\+=/me=e-1
 hi yaalValues cterm=NONE ctermfg=magenta gui=NONE guifg=magenta
 hi yaalCommand cterm=NONE ctermfg=yellow gui=NONE guifg=yellow
 hi yaalKeyword cterm=NONE ctermfg=green gui=NONE guifg=green
@@ -43,3 +45,5 @@ hi yaalColorBrightCyan cterm=NONE ctermfg=cyan gui=NONE guifg=cyan
 hi yaalColorWhite cterm=NONE ctermfg=white gui=NONE guifg=white
 hi yaalColorBlack cterm=NONE ctermfg=black ctermbg=gray gui=NONE guifg=black guibg=gray
 
+hi link yaalVariables yaalColorBrightGreen
+hi link yaalDeclaration yaalColorCyan
