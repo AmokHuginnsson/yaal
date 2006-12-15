@@ -41,18 +41,13 @@ namespace hconsole
 HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
 		char const * a_pcLabel, int a_iDroppedWidth,
-		int a_iMaxLength, char const * a_pcMask,
-		bool a_bCheckable, bool a_bSortable, bool a_bSearchable,
-		bool a_bDrawLabel, int a_iDisabledAttribute,
-		int a_iEnabledAttribute, int a_iFocusedAttribute )
+		int a_iMaxLength, char const * a_pcMask, bool a_bSearchable )
 								: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-										a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
-										a_iEnabledAttribute, a_iFocusedAttribute ),
+										a_iWidth, a_pcLabel ),
 									HEditControl ( NULL, 0, 0, 0, 0, NULL, a_iMaxLength, "",
 											a_pcMask ),
 									HSearchableControl ( a_bSearchable ),
-									HListControl ( NULL, 0, 0, 0, 0, NULL,
-											a_bCheckable, a_bSortable, a_bSearchable, false ),
+									HListControl ( NULL, 0, 0, 0, 0, NULL ),
 									f_eMode ( MODE::D_EDITCONTROL ), f_iDroppedWidth ( a_iDroppedWidth )
 	{
 	M_PROLOG
@@ -112,7 +107,7 @@ void HComboboxControl::refresh ( void )
 		l_iHeight = f_iHeight;
 		l_iWidth = f_iWidth;
 		f_iWidth = f_iDroppedWidth;
-		int size = f_oList.size ( );
+		int size = (*f_oList).size ( );
 		if ( size < f_iHeight )
 			f_iHeight = size + 1;
 		HListControl::refresh ( );
@@ -175,8 +170,8 @@ void HComboboxControl::close_combo ( void )
 	{
 	M_PROLOG
 	f_eMode = MODE::D_EDITCONTROL;
-	if ( ! f_oList.empty ( ) )
-		HEditControl::set ( f_oList.present ( ) [ 0 ].get < char const * const > ( ) );
+	if ( ! (*f_oList).empty ( ) )
+		HEditControl::set ( (*f_oList).present ( ) [ 0 ].get < char const * const > ( ) );
 	clrscr ( );
 	f_poParent->refresh ( );
 	return;

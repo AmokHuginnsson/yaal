@@ -54,6 +54,7 @@ public:
 				} align_t;
 			};
 		};
+	static int const D_DEFAULT_ATTRS = -1;
 protected:
 	bool			f_bEnabled;						/* is cotrol enabled, focus can go 
 																		 only to enabled control */
@@ -61,9 +62,9 @@ protected:
 	bool			f_bDrawLabel;					/* will be label driven */
 	bool 			f_bSingleLine;				/* is label in the same line as top of
 																		 control */
-	int unsigned f_uiDisabledAttribute;	/* attribute of disabled cotrol */
-	int unsigned f_uiEnabledAttribute;	/* attribute of enabled cotrol */	
-	int unsigned f_uiFocusedAttribute;	/* attribute of focused cotrol */
+	int unsigned f_uiAttributeDisabled;	/* attribute of disabled cotrol */
+	int unsigned f_uiAttributeEnabled;	/* attribute of enabled cotrol */	
+	int unsigned f_uiAttributeFocused;	/* attribute of focused cotrol */
 																	/* high byte of attribute in all
 																		 three cases keeps label (control title)
 																 		 color, low byte keeps work place color */
@@ -88,9 +89,7 @@ protected:
 	int				f_iShortcutIndex;			/* index of shortcut char in label */
 public:
 /* parent, row, col, height, width, label */
-	HControl ( HWindow *, int, int, int, int, char const *,
-/* draw label, disabled attribute, enabled-attribute, focused-attribute */
-			bool = true, int = -1, int = -1,	int = -1 );
+	HControl ( HWindow *, int, int, int, int, char const * );
 	virtual ~HControl ( void );
 	void enable ( bool );
 	virtual int process_input ( int );
@@ -104,7 +103,8 @@ public:
 	virtual void draw_label ( void );
 	virtual int click ( mouse::OMouse & );
 	bool hit_test ( int, int ) const;
-	void set_attributes ( int, int, int );
+	void set_attributes ( int = D_DEFAULT_ATTRS, int = D_DEFAULT_ATTRS, int = D_DEFAULT_ATTRS );
+	void set_draw_label ( bool );
 	void move ( int, int, int, int );
 	int attr_label ( void ) const;
 	int attr_shortcut ( void ) const;

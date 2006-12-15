@@ -43,15 +43,6 @@ namespace hcore
 template < typename tttType >
 class HTree;
 
-template < typename ttType >
-class HBranchList : public HList < ttType >
-	{
-public:
-	virtual ~HBranchList ( void );
-protected:
-	virtual int long empty ( typename HList < ttType > ::HElement * );
-	};
-
 template < typename tttType >
 class HTree
 	{
@@ -66,7 +57,7 @@ public:
 		};
 protected:
 	class HNode;
-	typedef HBranchList < HNode * > branch_t;
+	typedef HList < HNode * > branch_t;
 	typedef typename branch_t::treatment_t treatment_t;
 	class HNode
 		{
@@ -94,7 +85,7 @@ protected:
 		HNode ( HNode const & );
 		HNode & operator = ( HNode const & );
 		friend class HTree < tttType >;
-		friend class HBranchList < HNode * >;
+		friend class HList < HNode * >;
 		};
 	HNode * f_poRoot;			/* self explanary */
 	HNode * f_poSelected;	/* local temporary pointer, "cursor" */
@@ -114,33 +105,6 @@ private:
 	HTree & operator = ( HTree const & );
 	friend class HTree < tttType >::HNode;
 	};
-
-/*
- *	*VERY IMPORTANT NOTE*:
- *
- *	Virtual class members called from base class constructor or base class
- *	destructor context does *NOT* act as _virtual_ .
- *
- */
-
-template < typename ttType >
-HBranchList < ttType > ::~HBranchList ( void )
-	{
-	M_PROLOG
-	HList < ttType > ::flush ( );
-	return;
-	M_EPILOG
-	}
-
-template < typename ttType >
-int long HBranchList < ttType > ::empty ( typename HList < ttType > ::HElement * a_poElement )
-	{
-	M_PROLOG
-	ttType l_poLocalRoot = a_poElement->get_object ( );
-	delete l_poLocalRoot;
-	return ( HList < ttType > ::empty ( a_poElement ) );
-	M_EPILOG
-	}
 
 template < typename tttType >
 HTree < tttType > ::HNode::HNode( HNode * a_poNode ) : f_tLeaf ( ),

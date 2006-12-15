@@ -117,7 +117,7 @@ void HMenuControl::init ( HTUIProcess * a_poProcess, OMenuItem * a_psMenu )
 		f_poRoot->get_object ( ) = l_oDummy;
 		l_poNode->load_sub_menu ( a_psMenu );
 		}
-	if ( ! f_poSelected && l_poNode->f_oBranch.quantity ( ) )
+	if ( ! f_poSelected && l_poNode->f_oBranch.size ( ) )
 		f_poSelected = l_poNode->f_oBranch [ 0 ];
 	refresh ( );
 	return;

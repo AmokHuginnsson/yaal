@@ -36,11 +36,11 @@ namespace yaal
 namespace hconsole
 {
 
-HMainWindow::HMainWindow ( char const * a_pcTitle )
-						: HWindow ( a_pcTitle ), f_poMenu ( NULL ), f_poWindowList ( NULL )
+HMainWindow::HMainWindow ( char const * a_pcTitle, HListControl::item_list_ptr_t a_oWindows )
+						: HWindow ( a_pcTitle ), f_poMenu ( NULL ), f_oWindowList ( a_oWindows )
 	{
 	M_PROLOG
-	register_postprocess_handler ( KEY < 'q' >::command, NULL,
+	register_postprocess_handler ( KEY<'q'>::command, NULL,
 				& HMainWindow::handler_close );
 	return;
 	M_EPILOG
@@ -50,7 +50,6 @@ HMainWindow::~HMainWindow ( void )
 	{
 	M_PROLOG
 	f_poMenu = NULL;
-	f_poWindowList = NULL;
 	return;
 	M_EPILOG
 	}
@@ -67,18 +66,11 @@ int HMainWindow::init ( void )
 	f_poMenu->enable ( true );
 	f_poMenu->set_focus ( );
 	f_poFocusedChild = f_poMenu;
-	f_poWindowList = new HWindowListControl ( this, 1,
-			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n" );
-	f_poWindowList->add_column ( -1, "&Okno", 1 );
-	f_poWindowList->enable ( true );
+	HWindowListControl * l_poWindowList = new HWindowListControl ( this, 1,
+			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n", f_oWindowList );
+	l_poWindowList->add_column ( -1, "&Okno", 1 );
+	l_poWindowList->enable ( true );
 	return ( l_iError );
-	M_EPILOG
-	}
-
-HWindowListControl * HMainWindow::_disclose_window_list ( void )
-	{
-	M_PROLOG
-	return ( f_poWindowList );
 	M_EPILOG
 	}
 
@@ -93,7 +85,7 @@ void HMainWindow::init_menu ( HTUIProcess * a_psProcess, OMenuItem * a_psMenu )
 int HMainWindow::handler_close ( int a_iCode, void * )
 	{
 	M_PROLOG
-	a_iCode = KEY < 'x' >::command;
+	a_iCode = KEY<'x'>::command;
 	return ( a_iCode );
 	M_EPILOG
 	}

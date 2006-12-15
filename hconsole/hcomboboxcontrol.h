@@ -61,13 +61,7 @@ public:
 										 int = 0, 			/* dropped width */
 										 int = 127,			/* max string length */
 										 char const * = n_pcMaskDefault,	/* regexp (mask) */
-										 bool = false,	/* checkable */
-										 bool = true,		/* sortable */
-										 bool = true,		/* searchable */
-										 bool = true,		/* draw label */
-										 int = -1, 			/* disabled attribute */
-										 int = -1,			/* enabled attribute */
-										 int = -1 );		/* focused attribute */
+										 bool = true		/* searchable */ );		/* focused attribute */
 	virtual ~HComboboxControl ( void );
 	virtual int process_input ( int );
 	virtual int set_focus ( char = 0 );

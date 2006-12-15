@@ -71,7 +71,7 @@ public:
 	int get_size ( void ) const;
 	operator bool ( void ) const;
 private:
-	tType & get ( int );
+	tType & get ( int ) const;
 	};
 
 template < typename tType >
@@ -164,7 +164,7 @@ HArray < tType > & HArray < tType >::operator = ( HArray const & a_roArray )
 	}
 
 template < typename tType >
-tType & HArray < tType >::get ( int a_iIndex )
+tType & HArray < tType >::get ( int a_iIndex ) const
 	{
 	M_PROLOG
 	if ( a_iIndex < 0 )

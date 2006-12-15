@@ -37,12 +37,13 @@ namespace hconsole
 {
 
 HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
-		int a_iColumn, int a_iHeight, int a_iWidth, char const * a_pcLabel )
+		int a_iColumn, int a_iHeight, int a_iWidth, char const * a_pcLabel,
+		HListControl::item_list_ptr_t a_oWindows )
 									:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 											a_iWidth, a_pcLabel ),
 										HSearchableControl ( false ),
 										HListControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-												a_iWidth, a_pcLabel, false, false, false, false )
+												a_iWidth, a_pcLabel, a_oWindows )
 	{
 	M_PROLOG
 	return;
@@ -55,22 +56,6 @@ HWindowListControl::~HWindowListControl ( void )
 	HWindowListControl::remove_tail ( D_FORCE_REMOVE_ELEMENT );
 	HWindowListControl::flush ( ); /* see htree.h for explanation ! */
 	return;
-	M_EPILOG
-	}
-
-int long HWindowListControl::empty ( HElement* a_poElement )
-	{
-	M_PROLOG
-	HWindow * l_poWindow = NULL;
-	HItem * l_poItem = & a_poElement->get_object ( );
-	if ( * l_poItem )
-		{
-		l_poWindow = static_cast < HWindow * > ( ( * l_poItem ) [ 0 ].get < void * > ( ) );
-		if ( l_poWindow )
-			delete l_poWindow;
-		l_poWindow = NULL;
-		}
-	return ( HListControl::empty ( a_poElement ) );
 	M_EPILOG
 	}
 

@@ -39,7 +39,7 @@ VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/yaal.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
-ifdef TERM
+ifeq ($(TERMINAL),TERM)
 CL						:= $(shell tput cr;tput dl1)
 BOLD					:= $(shell tput bold || tput md)
 RED						:= $(shell tput setaf 1 || tput AF 1)
@@ -226,7 +226,8 @@ lib%.so.$(RELEASE):
 
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment
-	@$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile
+	@test -t 1 && export TERMINAL="TERM" ; \
+	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile
 else
 all: $(TARGETS) $(HAPI_HEADER)
 endif

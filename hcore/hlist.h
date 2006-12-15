@@ -113,7 +113,7 @@ public:
 	int size ( void );
 	tType & add_element ( tType * = NULL ); /* adds new element at current cursor position */
 	tType & add_head ( tType * = NULL );    /* adds new element at beggining of the list */
-	tType & add_tail ( tType * = NULL );	/* adds new element at end of the list */
+	tType const & add_tail ( tType const * = NULL );	/* adds new element at end of the list */
 	void push_back ( tType const & );
 	tType & add_at ( int, tType * = NULL ); /* adds new element at specified position */
 /* adds element in the way that keeps order */
@@ -532,7 +532,7 @@ tType & HList< tType >::add_head ( tType * a_ptObject )
 	}
 
 template < typename tType >
-tType & HList< tType >::add_tail ( tType * a_ptObject )
+tType const & HList< tType >::add_tail ( tType const * a_ptObject )
 	{
 	M_PROLOG
 	HElement * l_poElement = new HElement ( f_poHook );
@@ -1072,10 +1072,10 @@ void HList< tType >::sort ( T const & less )
 		while ( l_iCtrLoc -- )
 			{
 			if ( ( l_poPointer != l_poExtreamLower )
-					&& less ( HIterator ( l_poExtreamLower ), HIterator ( l_poPointer ) ) )
+					&& less ( HIterator ( f_poHook, l_poExtreamLower ), HIterator ( f_poHook, l_poPointer ) ) )
 				l_poExtreamLower = l_poPointer;
 			if ( ( l_poPointer != l_poExtreamUpper )
-					&& less ( HIterator ( l_poPointer ), HIterator ( l_poExtreamUpper ) ) )
+					&& less ( HIterator ( f_poHook, l_poPointer ), HIterator ( f_poHook, l_poExtreamUpper ) ) )
 				l_poExtreamUpper = l_poPointer;
 			l_poPointer = l_poPointer->f_poNext;
 			}

@@ -27,6 +27,7 @@ Copyright:
 #ifndef __YAAL_HCONSOLE_HLISTCONTROL_H
 #define __YAAL_HCONSOLE_HLISTCONTROL_H
 
+#include "hcore/hpointer.h"
 #include "hconsole/hitem.h"
 #include "hconsole/hwindow.h"
 #include "hconsole/hsearchablecontrol.h"
@@ -41,6 +42,7 @@ class HListControl : virtual public HSearchableControl
 	{
 public:
 	typedef hcore::HList < HItem > item_list_t;
+	typedef yaal::hcore::HPointer<item_list_t> item_list_ptr_t;
 protected:
 	class HColumnInfo
 		{
@@ -60,6 +62,19 @@ protected:
 		HColumnInfo & operator = ( HColumnInfo const & );
 		friend class HListControl;
 		};
+	struct FLAGS
+		{
+		typedef enum
+			{
+			D_NONE = 0,
+			D_CHECKABLE = 1,
+			D_SORTABLE = 2,
+			D_EDITABLE = 4,
+			D_DRAW_HEADER = 8,
+			D_ALL = -1
+			} list_flags_t;
+		};
+	item_list_ptr_t f_oList;
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
 	bool				f_bDrawHeader;				/* should be header driven */
@@ -70,10 +85,9 @@ protected:
 	int					f_iCursorPosition;		/* cursor position relative to control
 																			 begining */
 	int					f_iSumForOne;					/* sum of percentage columns width */
-	hcore::HList < HColumnInfo >	f_oHeader;	/* list header info */
+	hcore::HList<HColumnInfo>	f_oHeader;	/* list header info */
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
-	item_list_t	f_oList;
 	item_list_t::HIterator	f_oFirstVisibleRow;	/* pointer to first visible row */
 	struct match_t
 		{
@@ -88,15 +102,7 @@ public:
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 char const *,	/* label */
-								 bool = false,	/* checkable */
-								 bool = true,		/* sortable */
-								 bool = true, 	/* searchable */
-								 bool = true,		/* draw header */
-								 bool = true,		/* draw label */
-								 int = -1, 			/* disabled attribute */
-								 int = -1,			/* enabled attribute */
-								 int = -1 );		/* focused attribute */
+								 char const *, item_list_ptr_t = item_list_ptr_t() );	/* label */
 	virtual ~HListControl ( void );
 	void add_column ( int const &,									/* at position */
 										char const *,									/* column name */
@@ -108,6 +114,8 @@ public:
 	void add_tail ( HItem const & );
 //	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
 	virtual int set_focus ( char = 0 );
+	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
+	item_list_t const & get_data ( void ) const;
 protected:
 	virtual void refresh ( void );
 	virtual int process_input( int );

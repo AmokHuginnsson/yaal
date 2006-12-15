@@ -41,12 +41,11 @@ namespace hconsole
 class HMainWindow : public HWindow
 	{
 	HMenuControl * f_poMenu;
-	HWindowListControl * f_poWindowList;
+	HListControl::item_list_ptr_t f_oWindowList;
 public:
-	HMainWindow ( char const * );
+	HMainWindow ( char const *, HListControl::item_list_ptr_t );
 	virtual ~HMainWindow ( void );
 	void init_menu ( HTUIProcess *, OMenuItem * );
-	HWindowListControl * _disclose_window_list ( void );
 	virtual int init ( void );
 protected:
 	virtual int handler_close ( int, void * ); /* closes window process */

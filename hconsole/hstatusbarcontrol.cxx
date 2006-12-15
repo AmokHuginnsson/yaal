@@ -62,8 +62,8 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 		f_iStatusBarAttribute = n_iAttributeStatusBar;
 	l_iAttribte = f_iStatusBarAttribute;
 	l_iAttribte &= 0x00ff;
-	f_uiFocusedAttribute &= 0xff00;
-	f_uiFocusedAttribute |= l_iAttribte;
+	f_uiAttributeFocused &= 0xff00;
+	f_uiAttributeFocused |= l_iAttribte;
 	return;
 	M_EPILOG
 	}

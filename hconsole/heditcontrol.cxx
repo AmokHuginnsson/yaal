@@ -54,11 +54,9 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		char const * a_pcLabel, int a_iBufferSize, char const * a_pcValue,
 		char const * a_pcMask, bool a_bReplace, bool a_bRightAligned,
 		bool a_bMultiLine, bool a_bReadOnly, bool a_bPassword,
-		int a_iMaxHistoryLevel, bool a_bDrawLabel, int a_iDisabledAttribute,
-		int a_iEnabledAttribute, int a_iFocusedAttribute )
+		int a_iMaxHistoryLevel )
 					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-							a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
-							a_iEnabledAttribute, a_iFocusedAttribute ),
+							a_iWidth, a_pcLabel ),
 					f_bReplace ( a_bReplace ),
 					f_bMultiLine ( a_bMultiLine || ( a_iHeight > 1 ) ? true : false ),
 					f_bReadOnly ( a_bReadOnly ), f_bRightAligned ( a_bRightAligned ),
@@ -86,7 +84,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		M_THROW (
 				"edit-control right aligned and multiline at the same time", 0 );
 	f_oString = a_pcValue;
-	f_oHistory.add_tail ( ) = "";
+	f_oHistory.push_back ( "" );
 	if ( ( l_iErrorCode = f_oPattern.parse_re ( a_pcMask ) ) )
 		M_THROW ( f_oPattern.error ( ), l_iErrorCode );
 	f_oPattern.matches ( a_pcValue, NULL, & l_iErrorCode );

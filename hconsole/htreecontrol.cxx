@@ -110,12 +110,9 @@ void HTreeControl::HNodeControl::click ( int a_iColumn )
 	}
 
 HTreeControl::HTreeControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-		int a_iHeight, int a_iWidth, char const * a_pcLabel, bool a_bDrawLabel,
-		int a_iDisabledAttribute, int a_iEnabledAttribute,
-		int a_iFocusedAttribute )
+		int a_iHeight, int a_iWidth, char const * a_pcLabel )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
-								a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
-								a_iEnabledAttribute, a_iFocusedAttribute )
+								a_pcLabel )
 	{
 	M_PROLOG
 	HTreeControl::refresh ( );
@@ -171,8 +168,8 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 		else if ( l_iCtr )
 			c_mvprintf ( l_iRow, a_poNode->f_iColumnRaw, "-" );
 		if ( a_poNode == f_poSelected )
-			set_attr ( f_bEnabled ? ( f_bFocused ? ~f_uiFocusedAttribute
-						: ~ f_uiEnabledAttribute ) : ~ f_uiDisabledAttribute );
+			set_attr ( f_bEnabled ? ( f_bFocused ? ~f_uiAttributeFocused
+						: ~ f_uiAttributeEnabled ) : ~ f_uiAttributeDisabled );
 		c_mvprintf ( l_iRow, a_poNode->f_iColumnRaw + 1, * l_poString );
 		}
 	if ( l_iCtr && ( a_poNode->f_bUnfolded || ! a_poNode->f_iLevel ) )

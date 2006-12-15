@@ -132,7 +132,7 @@ void HLogPad::add ( int a_iAttribute )
 	HLogLine l_oLogLine;
 	l_oLogLine.f_eType = HLogLine::D_ATTRIBUTE;
 	l_oLogLine.f_iAttribute = a_iAttribute;
-	f_oContents.add_tail ( ) = l_oLogLine;
+	f_oContents.push_back ( l_oLogLine );
 	return;
 	M_EPILOG
 	}

@@ -63,11 +63,7 @@ public:
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 char const *,	/* label */
-								 bool = true,		/* draw label */
-								 int = -1, 			/* disabled attribute */
-								 int = -1,			/* enabled attribute */
-								 int = -1 );		/* focused attribute */
+								 char const * );	/* label */
 	virtual ~HTreeControl ( void );
 	virtual void refresh ( void );
 	int draw_node ( HNodeControl *, int );
