@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_HCONSOLE_HLISTCONTROL_H
 
 #include "hcore/hpointer.h"
+#include "hcore/hlist.h"
 #include "hconsole/hitem.h"
 #include "hconsole/hwindow.h"
 #include "hconsole/hsearchablecontrol.h"
@@ -38,11 +39,8 @@ namespace yaal
 namespace hconsole
 {
 
-class HListControl : virtual public HSearchableControl
+class HBaseListControl : virtual public HSearchableControl
 	{
-public:
-	typedef hcore::HList < HItem > item_list_t;
-	typedef yaal::hcore::HPointer<item_list_t> item_list_ptr_t;
 protected:
 	class HColumnInfo
 		{
@@ -60,7 +58,7 @@ protected:
 		virtual ~HColumnInfo ( void );
 		HColumnInfo ( HColumnInfo const & );
 		HColumnInfo & operator = ( HColumnInfo const & );
-		friend class HListControl;
+		friend class HBaseListControl;
 		};
 	struct FLAGS
 		{
@@ -74,7 +72,6 @@ protected:
 			D_ALL = -1
 			} list_flags_t;
 		};
-	item_list_ptr_t f_oList;
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
 	bool				f_bDrawHeader;				/* should be header driven */
@@ -85,25 +82,23 @@ protected:
 	int					f_iCursorPosition;		/* cursor position relative to control
 																			 begining */
 	int					f_iSumForOne;					/* sum of percentage columns width */
-	hcore::HList<HColumnInfo>	f_oHeader;	/* list header info */
+	yaal::hcore::HList<HColumnInfo>	f_oHeader;	/* list header info */
 /* for internal use only */
 	int					f_iSortColumn;				/* column used for current sort operation */
-	item_list_t::HIterator	f_oFirstVisibleRow;	/* pointer to first visible row */
 	struct match_t
 		{
 		int f_iColumnWithMatch;
 		int f_iMatchNumber;
-		item_list_t::HIterator	f_oCurrentMatch;		/* row that has current pattern match */
-		match_t ( ) : f_iColumnWithMatch ( 0 ), f_iMatchNumber ( - 1 ), f_oCurrentMatch ( ) { }
+		match_t ( ) : f_iColumnWithMatch ( 0 ), f_iMatchNumber ( - 1 ) { }
 		} f_sMatch;
 public:
-	HListControl ( HWindow *,		 	/* parent */
+	HBaseListControl ( HWindow *,		 	/* parent */
 								 int,						/* row */
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 char const *, item_list_ptr_t = item_list_ptr_t() );	/* label */
-	virtual ~HListControl ( void );
+								 char const * );	/* label */
+	virtual ~HBaseListControl ( void );
 	void add_column ( int const &,									/* at position */
 										char const *,									/* column name */
 										int const &,									/* width */
@@ -115,9 +110,14 @@ public:
 //	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
 	virtual int set_focus ( char = 0 );
 	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
-	item_list_t const & get_data ( void ) const;
 protected:
+	virtual int long do_size() = 0;
+	virtual void do_draw_items() = 0;
+	virtual void do_first_item() = 0;
+	virtual void do_next_item() = 0;
+	virtual yaal::hcore::HString const & get_text_for_cell( int, type_t ) = 0;
 	virtual void refresh ( void );
+	void draw_cell ( yaal::hcore::HString & );
 	virtual int process_input( int );
 	//virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual bool is_searchable ( void );
@@ -138,9 +138,92 @@ protected:
 private:
 	void sort_by_column ( int, hcore::OListBits::sort_order_t = hcore::OListBits::D_ASCENDING );
 	void recalculate_column_widths ( void );
-	HListControl ( HListControl const & );
-	HListControl & operator = ( HListControl const & );
+	HBaseListControl ( HBaseListControl const & );
+	HBaseListControl & operator = ( HBaseListControl const & );
 	};
+
+template <typename tType = HItem>
+class HListControl : public HBaseListControl
+	{
+public:
+	typedef yaal::hcore::HList<tType> item_list_t;
+	typedef typename item_list_t::HIterator iterator_t;
+	typedef yaal::hcore::HPointer<item_list_t> item_list_ptr_t;
+	HListControl ( HWindow *,		 	/* parent */
+								 int,						/* row */
+								 int,						/* col */
+								 int,						/* height */
+								 int,						/* width */
+								 char const *, item_list_ptr_t = item_list_ptr_t() );	/* label */
+	item_list_t const & get_data ( void ) const;
+protected:
+	item_list_ptr_t f_oList;
+	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */
+	iterator_t	f_oCurrentMatch;		/* row that has current pattern match */
+	iterator_t	f_oIterator;		/* row that has current pattern match */
+	virtual int long do_size();
+	virtual void do_draw_items();
+	virtual void do_first_item();
+	virtual void do_next_item();
+	virtual yaal::hcore::HString const & get_text_for_cell( int, type_t );
+	};
+
+template <typename tType>
+HListControl<tType>::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
+		int a_iHeight, int a_iWidth, char const * a_pcLabel, item_list_ptr_t a_oData )
+						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
+								a_pcLabel ),
+							HSearchableControl ( true ),
+							HBaseListControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcLabel ),
+	f_oList ( ( !!a_oData ) ? a_oData : item_list_ptr_t ( new item_list_t() ) ),
+	f_oFirstVisibleRow ( ), f_oCurrentMatch ( ), f_oIterator()
+	{
+	return;
+	}
+
+template <typename tType>
+int long HListControl<tType>::do_size( void )
+	{
+	return ( (*f_oList).size() );
+	}
+
+template <typename tType>
+void HListControl<tType>::do_first_item( void )
+	{
+	f_oIterator = f_oFirstVisibleRow;
+	return;
+	}
+
+template <typename tType>
+void HListControl<tType>::do_next_item( void )
+	{
+	++ f_oIterator;
+	return;
+	}
+
+template <typename tType>
+yaal::hcore::HString const & HListControl<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
+	{
+	HItem & l_oItem = *f_oIterator;
+	switch ( a_eType )
+		{
+		case ( D_LONG_INT ):
+			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get < int long > ( );
+		break;
+		case ( D_DOUBLE ):
+			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get < double > ( );
+		break;
+		case ( D_HSTRING ):
+			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get < yaal::hcore::HString const & > ( );
+		break;
+		case ( D_HTIME ):
+			f_oVarTmpBuffer = static_cast < char const * > ( l_oItem [ a_iColumn ].get < yaal::hcore::HTime const & > ( ) );
+		break;
+		default :
+			M_THROW ( "unknown type", a_eType );
+		}
+	return ( f_oVarTmpBuffer );
+	}
 
 }
 

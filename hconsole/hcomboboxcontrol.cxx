@@ -47,7 +47,7 @@ HComboboxControl::HComboboxControl ( HWindow * a_poParent,
 									HEditControl ( NULL, 0, 0, 0, 0, NULL, a_iMaxLength, "",
 											a_pcMask ),
 									HSearchableControl ( a_bSearchable ),
-									HListControl ( NULL, 0, 0, 0, 0, NULL ),
+									HListControl<> ( NULL, 0, 0, 0, 0, NULL ),
 									f_eMode ( MODE::D_EDITCONTROL ), f_iDroppedWidth ( a_iDroppedWidth )
 	{
 	M_PROLOG
@@ -67,7 +67,7 @@ int HComboboxControl::set_focus ( char a_cCode )
 	M_PROLOG
 	if ( f_eMode == MODE::D_EDITCONTROL )
 		return ( HEditControl::set_focus ( a_cCode ) );
-	return ( HListControl::set_focus ( a_cCode ) );
+	return ( HListControl<>::set_focus ( a_cCode ) );
 	M_EPILOG
 	}
 
@@ -110,7 +110,7 @@ void HComboboxControl::refresh ( void )
 		int size = (*f_oList).size ( );
 		if ( size < f_iHeight )
 			f_iHeight = size + 1;
-		HListControl::refresh ( );
+		HListControl<>::refresh ( );
 		f_iHeight = l_iHeight;
 		f_iWidth = l_iWidth;
 		}
@@ -139,7 +139,7 @@ int HComboboxControl::process_input ( int a_iCode )
 	else
 		{
 		if ( a_iCode != '\r' )
-			return ( HListControl::process_input ( a_iCode ) );
+			return ( HListControl<>::process_input ( a_iCode ) );
 		close_combo ( );
 		}
 	return ( 0 );
@@ -160,7 +160,7 @@ int HComboboxControl::click ( mouse::OMouse & a_rsMouse )
 			refresh ( );
 			}
 		}
-	else if ( HListControl::click ( a_rsMouse ) )
+	else if ( HListControl<>::click ( a_rsMouse ) )
 		close_combo ( );
 	return ( 0 );
 	M_EPILOG
