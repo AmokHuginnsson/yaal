@@ -112,12 +112,12 @@ public:
 	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
 protected:
 	virtual int long do_size() = 0;
-	virtual void do_draw_items() = 0;
 	virtual void do_first_item() = 0;
 	virtual void do_next_item() = 0;
 	virtual yaal::hcore::HString const & get_text_for_cell( int, type_t ) = 0;
+	virtual void set_child_control_data_for_cell( int, HControl * ) = 0;
 	virtual void refresh ( void );
-	void draw_cell ( yaal::hcore::HString & );
+	void draw_cell ( int, int, HColumnInfo const * const );
 	virtual int process_input( int );
 	//virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual bool is_searchable ( void );
@@ -162,10 +162,10 @@ protected:
 	iterator_t	f_oCurrentMatch;		/* row that has current pattern match */
 	iterator_t	f_oIterator;		/* row that has current pattern match */
 	virtual int long do_size();
-	virtual void do_draw_items();
 	virtual void do_first_item();
 	virtual void do_next_item();
 	virtual yaal::hcore::HString const & get_text_for_cell( int, type_t );
+	virtual void set_child_control_data_for_cell( int, HControl * );
 	};
 
 template <typename tType>
@@ -223,6 +223,14 @@ yaal::hcore::HString const & HListControl<tType>::get_text_for_cell( int a_iColu
 			M_THROW ( "unknown type", a_eType );
 		}
 	return ( f_oVarTmpBuffer );
+	}
+
+template <typename tType>
+void HListControl<tType>::set_child_control_data_for_cell( int a_iColumn, HControl * a_poControl )
+	{
+	HItem & l_oItem = *f_oIterator;
+	a_poControl->set( l_oItem [ a_iColumn ] );
+	return;
 	}
 
 }

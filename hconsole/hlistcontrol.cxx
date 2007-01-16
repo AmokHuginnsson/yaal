@@ -150,14 +150,12 @@ void HBaseListControl::refresh ( void )
 				l_poColumnInfo = & f_oHeader [ l_iCtrLoc ];
 				if ( l_poColumnInfo->f_iWidthRaw )
 					{
-					f_oVarTmpBuffer [ 0 ] = get_text_for_cell ( l_iCtrLoc, l_poColumnInfo->f_eType );
+					f_oVarTmpBuffer = get_text_for_cell ( l_iCtrLoc, l_poColumnInfo->f_eType );
+					draw_cell( l_iCtr, l_iCtrLoc, l_poColumnInfo );
 					l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
 					}
-				if ( l_iCtr == f_iCursorPosition )
-					{
-					if ( l_poColumnInfo->f_poControl )
-						l_poColumnInfo->f_poControl->set ( l_oItem [ l_iCtrLoc ] );
-					}
+				if ( ( l_iCtr == f_iCursorPosition ) && l_poColumnInfo->f_poControl )
+					set_child_control_data_for_cell ( l_iCtrLoc, l_poColumnInfo->f_poControl );
 				}
 			}
 		}
@@ -235,53 +233,53 @@ void HBaseListControl::refresh ( void )
 	M_EPILOG
 	}
 
-void HBaseListControl::draw_cell ( yaal::hcore::HString & a_roText )
+void HBaseListControl::draw_cell ( int a_iRow, int a_iColumn, HColumnInfo const * const  a_poColumnInfo )
 	{
-	f_oVarTmpBuffer = a_roText;
+	int l_iTmp = 0;
 	l_iTmp = f_oVarTmpBuffer.get_length ( );
-	switch ( l_poColumnInfo->f_eAlign )
+	switch ( a_poColumnInfo->f_eAlign )
 		{
 		case ( BITS::ALIGN::D_LEFT ):
 			{
-			if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
-				f_oVarTmpBuffer.fill ( '_', l_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
-			f_oVarTmpBuffer [ l_poColumnInfo->f_iWidthRaw ] = 0;
+			if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
+				f_oVarTmpBuffer.fill ( '_', a_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
+			f_oVarTmpBuffer [ a_poColumnInfo->f_iWidthRaw ] = 0;
 			}
 		break;
 		case ( BITS::ALIGN::D_CENTER ):
 			{
-			if ( l_iTmp > l_poColumnInfo->f_iWidthRaw )
+			if ( l_iTmp > a_poColumnInfo->f_iWidthRaw )
 				f_oVarTmpBuffer = f_oVarTmpBuffer.right (
-						l_poColumnInfo->f_iWidthRaw );
-			else if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
+						a_poColumnInfo->f_iWidthRaw );
+			else if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
 				{
 				memmove ( f_oVarTmpBuffer.raw ( )
-						+ ( l_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2, 
+						+ ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2, 
 						f_oVarTmpBuffer, l_iTmp + 1 );
-				f_oVarTmpBuffer.fill ( '_',	( l_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
+				f_oVarTmpBuffer.fill ( '_',	( a_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
 				l_iTmp = f_oVarTmpBuffer.get_length ( );
-				f_oVarTmpBuffer.fillz ( '_', l_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
+				f_oVarTmpBuffer.fillz ( '_', a_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
 				}
 			}
 		break;
 		case ( BITS::ALIGN::D_RIGHT ):
 			{
-			if ( l_iTmp > l_poColumnInfo->f_iWidthRaw )
+			if ( l_iTmp > a_poColumnInfo->f_iWidthRaw )
 				f_oVarTmpBuffer = f_oVarTmpBuffer.right (
-						l_poColumnInfo->f_iWidthRaw );
-			else if ( l_iTmp < l_poColumnInfo->f_iWidthRaw )
+						a_poColumnInfo->f_iWidthRaw );
+			else if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
 				{
 				memmove ( f_oVarTmpBuffer.raw ( )
-						+ ( l_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1, 
+						+ ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1, 
 						f_oVarTmpBuffer, l_iTmp + 1 );
-				f_oVarTmpBuffer.fill ( '_', ( l_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1 );
+				f_oVarTmpBuffer.fill ( '_', ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1 );
 				}
 			}
 		break;
 		default :
-			M_THROW ( "unknown align", l_poColumnInfo->f_eAlign );
+			M_THROW ( "unknown align", a_poColumnInfo->f_eAlign );
 		}
-	if ( l_iCtr == f_iCursorPosition )
+	if ( a_iRow == f_iCursorPosition )
 		{
 		if ( l_oItem.m_bChecked )
 			set_attr ( ! f_bEnabled
@@ -302,13 +300,13 @@ void HBaseListControl::draw_cell ( yaal::hcore::HString & a_roText )
 		else
 			set_attr_data ( );
 		}
-	M_ENSURE ( c_mvprintf ( f_iRowRaw + l_iCtr + l_iHR,
+	M_ENSURE ( c_mvprintf ( f_iRowRaw + a_iRow + l_iHR,
 				f_iColumnRaw + l_iColumnOffset, f_oVarTmpBuffer	) != C_ERR );
 	if ( f_bSearchActived )
-		highlight ( f_iRowRaw + l_iCtr + l_iHR,
+		highlight ( f_iRowRaw + a_iRow + l_iHR,
 				f_iColumnRaw + l_iColumnOffset, f_sMatch.f_iMatchNumber,
 				( it == f_sMatch.f_oCurrentMatch ) &&
-				( l_iCtrLoc == f_sMatch.f_iColumnWithMatch ) );
+				( a_iColumn == f_sMatch.f_iColumnWithMatch ) );
 	return;
 	}
 
