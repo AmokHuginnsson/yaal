@@ -27,6 +27,10 @@ Copyright:
 #ifndef __YAAL_HCONSOLE_HITEM_H
 #define __YAAL_HCONSOLE_HITEM_H
 
+#line 31
+
+#define D_VCSID_HCONSOLE_HITEM_H "$Id$"
+
 #include "hcore/harray.h"
 #include "hcore/hinfo.h"
 
@@ -36,7 +40,8 @@ namespace yaal
 namespace hconsole
 {
 
-class HItem : public hcore::HArray < hcore::HInfo >
+template <typename tType>
+class HItem : public hcore::HArray < tType >
 	{
 public:
 	int long	m_lId;
@@ -46,6 +51,40 @@ public:
 	HItem ( HItem const &, int = 0 );
 	HItem & operator = ( HItem const & );
 	};
+
+template <typename tType>
+HItem<tType>::HItem ( int a_iSize ) : hcore::HArray<tType> ( a_iSize ),
+															 m_lId ( 0 ), m_bChecked ( false )
+	{
+	return;
+	}
+
+template <typename tType>
+HItem<tType>::~HItem ( void )
+	{
+	return;
+	}
+
+template <typename tType>
+HItem<tType>::HItem ( HItem const & a_roItem, int ) : hcore::HArray<tType> ( a_roItem ),
+	m_lId ( a_roItem.m_lId ), m_bChecked ( a_roItem.m_bChecked )
+	{
+	return;
+	}
+
+template <typename tType>
+HItem<tType> & HItem<tType>::operator= ( HItem<tType> const & a_roItem )
+	{
+	M_PROLOG
+	if ( this != & a_roItem )
+		{
+		(*this).hcore::HArray<tType>::operator= ( a_roItem );
+		m_lId = a_roItem.m_lId;
+		m_bChecked = a_roItem.m_bChecked;
+		}
+	return ( *this );
+	M_EPILOG
+	}
 
 }
 

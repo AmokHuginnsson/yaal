@@ -106,18 +106,19 @@ public:
 										const type_t & = D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
 //	virtual yaal::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
-	void add_tail ( HItem const & );
 //	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
 	virtual int set_focus ( char = 0 );
 	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
 protected:
-	virtual int long do_size() = 0;
-	virtual void do_first_item() = 0;
-	virtual void do_next_item() = 0;
-	virtual yaal::hcore::HString const & get_text_for_cell( int, type_t ) = 0;
+	virtual int long do_size( void ) = 0;
+	virtual void do_first_item( void ) = 0;
+	virtual void do_next_item( void ) = 0;
+	virtual void do_switch_state( void ) = 0;
+	virtual bool do_is_current_match( void ) = 0;
+	virtual bool get_text_for_cell( int, type_t ) = 0;
 	virtual void set_child_control_data_for_cell( int, HControl * ) = 0;
 	virtual void refresh ( void );
-	void draw_cell ( int, int, HColumnInfo const * const );
+	void draw_cell ( int, int, int, HColumnInfo const * const, bool );
 	virtual int process_input( int );
 	//virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
 	virtual bool is_searchable ( void );
@@ -142,11 +143,12 @@ private:
 	HBaseListControl & operator = ( HBaseListControl const & );
 	};
 
-template <typename tType = HItem>
+template <typename tType = yaal::hcore::HInfo>
 class HListControl : public HBaseListControl
 	{
 public:
-	typedef yaal::hcore::HList<tType> item_list_t;
+	typedef HItem<tType> row_t;
+	typedef yaal::hcore::HList<row_t> item_list_t;
 	typedef typename item_list_t::HIterator iterator_t;
 	typedef yaal::hcore::HPointer<item_list_t> item_list_ptr_t;
 	HListControl ( HWindow *,		 	/* parent */
@@ -156,15 +158,18 @@ public:
 								 int,						/* width */
 								 char const *, item_list_ptr_t = item_list_ptr_t() );	/* label */
 	item_list_t const & get_data ( void ) const;
+	void add_tail ( row_t & );
 protected:
 	item_list_ptr_t f_oList;
 	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */
 	iterator_t	f_oCurrentMatch;		/* row that has current pattern match */
 	iterator_t	f_oIterator;		/* row that has current pattern match */
-	virtual int long do_size();
-	virtual void do_first_item();
-	virtual void do_next_item();
-	virtual yaal::hcore::HString const & get_text_for_cell( int, type_t );
+	virtual int long do_size( void );
+	virtual void do_first_item( void );
+	virtual void do_next_item( void );
+	virtual void do_switch_state( void );
+	virtual bool do_is_current_match( void ) = 0;
+	virtual bool get_text_for_cell( int, type_t );
 	virtual void set_child_control_data_for_cell( int, HControl * );
 	};
 
@@ -202,35 +207,79 @@ void HListControl<tType>::do_next_item( void )
 	}
 
 template <typename tType>
-yaal::hcore::HString const & HListControl<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
+void HListControl<tType>::do_switch_state( void )
 	{
-	HItem & l_oItem = *f_oIterator;
+	if ( f_bCheckable && ! (*f_oList).empty ( ) )
+		f_oIterator->m_bChecked = ! f_oIterator->m_bChecked;
+	}
+template <typename tType>
+bool HListControl<tType>::do_is_current_match( void )
+	{
+	return ( f_oIterator == f_oCurrentMatch );
+	}
+
+namespace list_control_helper
+	{
+	yaal::hcore::HString const & GetLongFromCell( yaal::hcore::HInfo const & );
+	yaal::hcore::HString const & GetDoubleFromCell( yaal::hcore::HInfo const & );
+	yaal::hcore::HString const & GetStringFromCell( yaal::hcore::HInfo const & );
+	char const * GetTimeFromCell( yaal::hcore::HInfo const & );
+	int long GetIdFromCell( HItem<yaal::hcore::HInfo> const & );
+	bool GetStateFromCell( HItem<yaal::hcore::HInfo> const & );
+	}
+
+template <typename tType>
+bool HListControl<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
+	{
+	row_t & l_oItem = *f_oIterator;
 	switch ( a_eType )
 		{
 		case ( D_LONG_INT ):
-			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get < int long > ( );
+			f_oVarTmpBuffer = list_control_helper::GetLongFromCell ( l_oItem [ a_iColumn ] );
 		break;
 		case ( D_DOUBLE ):
-			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get < double > ( );
+			f_oVarTmpBuffer = list_control_helper::GetDoubleFromCell ( l_oItem [ a_iColumn ] );
 		break;
 		case ( D_HSTRING ):
-			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get < yaal::hcore::HString const & > ( );
+			f_oVarTmpBuffer = list_control_helper::GetStringFromCell ( l_oItem [ a_iColumn ] );
 		break;
 		case ( D_HTIME ):
-			f_oVarTmpBuffer = static_cast < char const * > ( l_oItem [ a_iColumn ].get < yaal::hcore::HTime const & > ( ) );
+			f_oVarTmpBuffer = list_control_helper::GetTimeFromCell ( l_oItem [ a_iColumn ] );
 		break;
 		default :
 			M_THROW ( "unknown type", a_eType );
 		}
-	return ( f_oVarTmpBuffer );
+	return ( l_oItem.m_bChecked );
 	}
 
 template <typename tType>
 void HListControl<tType>::set_child_control_data_for_cell( int a_iColumn, HControl * a_poControl )
 	{
-	HItem & l_oItem = *f_oIterator;
+	row_t l_oItem = *f_oIterator;
 	a_poControl->set( l_oItem [ a_iColumn ] );
 	return;
+	}
+
+template <typename tType>
+void HListControl<tType>::add_tail( row_t & a_tRow )
+	{
+	M_PROLOG
+	(*f_oList).push_back ( a_tRow );
+	int l_iSize = (*f_oList).size ( );
+	if ( l_iSize > f_iHeightRaw )
+		{
+		f_iCursorPosition = f_iHeightRaw - 1;
+		f_iControlOffset = l_iSize - f_iHeightRaw;
+		if ( f_oFirstVisibleRow != (*f_oList).end ( ) )
+			++ f_oFirstVisibleRow;
+		}
+	else
+		f_iCursorPosition = l_iSize - 1;
+	if ( f_oFirstVisibleRow == (*f_oList).end ( ) )
+		f_oFirstVisibleRow = (*f_oList).begin ( );
+	n_bNeedRepaint = true;
+	return;
+	M_EPILOG
 	}
 
 }

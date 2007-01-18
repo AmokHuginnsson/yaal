@@ -27,6 +27,7 @@ Copyright:
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
 #include "hitem.h"
+M_VCSTID ( D_VCSID_HCONSOLE_HITEM_H )
 
 using namespace yaal::hcore;
 
@@ -35,42 +36,6 @@ namespace yaal
 
 namespace hconsole
 {
-
-HItem::HItem ( int a_iSize ) : HArray < HInfo > ( a_iSize ),
-															 m_lId ( 0 ), m_bChecked ( false )
-	{
-	M_PROLOG
-	return;
-	M_EPILOG
-	}
-
-HItem::~HItem ( void )
-	{
-	M_PROLOG
-	return;
-	M_EPILOG
-	}
-
-HItem::HItem ( HItem const & a_roItem, int ) : HArray < HInfo > ( a_roItem ),
-	m_lId ( a_roItem.m_lId ), m_bChecked ( a_roItem.m_bChecked )
-	{
-	M_PROLOG
-	return;
-	M_EPILOG
-	}
-
-HItem & HItem::operator = ( HItem const & a_roItem )
-	{
-	M_PROLOG
-	if ( this != & a_roItem )
-		{
-		( * this ).HArray < HInfo >::operator = ( a_roItem );
-		m_lId = a_roItem.m_lId;
-		m_bChecked = a_roItem.m_bChecked;
-		}
-	return ( * this );
-	M_EPILOG
-	}
 
 }
 
