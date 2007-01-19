@@ -40,40 +40,40 @@ namespace yaal
 namespace hconsole
 {
 
-template <typename tType>
-class HItem : public hcore::HArray < tType >
+template <typename tType = yaal::hcore::HInfo>
+class HItem_t : public hcore::HArray < tType >
 	{
 public:
 	int long	m_lId;
 	bool	m_bChecked;
-	HItem ( int  = 0 );
-	virtual ~HItem ( void );
-	HItem ( HItem const &, int = 0 );
-	HItem & operator = ( HItem const & );
+	HItem_t ( int  = 0 );
+	virtual ~HItem_t ( void );
+	HItem_t ( HItem_t const &, int = 0 );
+	HItem_t & operator = ( HItem_t const & );
 	};
 
 template <typename tType>
-HItem<tType>::HItem ( int a_iSize ) : hcore::HArray<tType> ( a_iSize ),
+HItem_t<tType>::HItem_t ( int a_iSize ) : hcore::HArray<tType> ( a_iSize ),
 															 m_lId ( 0 ), m_bChecked ( false )
 	{
 	return;
 	}
 
 template <typename tType>
-HItem<tType>::~HItem ( void )
+HItem_t<tType>::~HItem_t ( void )
 	{
 	return;
 	}
 
 template <typename tType>
-HItem<tType>::HItem ( HItem const & a_roItem, int ) : hcore::HArray<tType> ( a_roItem ),
+HItem_t<tType>::HItem_t ( HItem_t const & a_roItem, int ) : hcore::HArray<tType> ( a_roItem ),
 	m_lId ( a_roItem.m_lId ), m_bChecked ( a_roItem.m_bChecked )
 	{
 	return;
 	}
 
 template <typename tType>
-HItem<tType> & HItem<tType>::operator= ( HItem<tType> const & a_roItem )
+HItem_t<tType> & HItem_t<tType>::operator= ( HItem_t<tType> const & a_roItem )
 	{
 	M_PROLOG
 	if ( this != & a_roItem )
@@ -85,6 +85,8 @@ HItem<tType> & HItem<tType>::operator= ( HItem<tType> const & a_roItem )
 	return ( *this );
 	M_EPILOG
 	}
+
+typedef HItem_t<> HItem;
 
 }
 

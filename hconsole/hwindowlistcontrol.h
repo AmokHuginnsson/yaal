@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_HCONSOLE_HWINDOWLISTCONTROL_H
 
 #include "hconsole/hlistcontrol.h"
+#include "hconsole/htuiprocess.h"
 
 namespace yaal
 {
@@ -37,14 +38,13 @@ namespace hconsole
 
 class HWindow;
 
-class HWindowListControl : public HListControl
+class HWindowListControl : public HListControl_t<HTUIProcess::hwindow_ptr_t>
 	{
 public:
 	HWindowListControl ( HWindow *, int, int, int, int, char const *, HListControl::item_list_ptr_t );
 	virtual ~HWindowListControl ( void );
 	virtual int process_input ( int );
 	virtual void refresh ( void );
-	virtual HItem & add_tail ( HItem * = NULL );
 protected:
 	};
 

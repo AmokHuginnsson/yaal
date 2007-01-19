@@ -37,7 +37,7 @@ namespace hconsole
 {
 
 class HComboboxControl : public virtual HEditControl,
-	public virtual HListControl<>
+	public virtual HListControl
 	{
 public:
 	struct MODE

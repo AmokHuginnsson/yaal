@@ -39,6 +39,28 @@ namespace yaal
 namespace hconsole
 {
 
+
+namespace list_control_helper
+	{
+	yaal::hcore::HString const GetLongFromCell( yaal::hcore::HInfo const & );
+	yaal::hcore::HString const GetDoubleFromCell( yaal::hcore::HInfo const & );
+	yaal::hcore::HString const GetStringFromCell( yaal::hcore::HInfo const & );
+	char const * GetTimeFromCell( yaal::hcore::HInfo const & );
+	int long GetIdFromCell( HItem const & );
+	bool GetStateFromCell( HItem const & );
+	struct OSortHelper
+		{
+		int f_iSortColumn;
+		yaal::hcore::OListBits::sort_order_t f_eOrder;
+		type_t f_eType;
+		int long f_lComparedItems;
+		int long f_iSize;
+		HWindow * f_poWindow;
+		void progress ( void );
+		};
+	bool compare_cells( yaal::hcore::HInfo const &, yaal::hcore::HInfo const &, OSortHelper & );
+	}
+
 class HBaseListControl : virtual public HSearchableControl
 	{
 protected:
@@ -105,8 +127,8 @@ public:
 										BITS::ALIGN::align_t const & = BITS::ALIGN::D_LEFT,		/* align */
 										const type_t & = D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
-//	virtual yaal::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
-//	virtual HItem & add_orderly ( HItem &, sort_order_t = D_ASCENDING );
+//	virtual yaal::hcore::OListBits::status_t remove_element ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem_t * * = NULL );
+//	virtual HItem_t & add_orderly ( HItem_t &, sort_order_t = D_ASCENDING );
 	virtual int set_focus ( char = 0 );
 	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
 protected:
@@ -115,12 +137,13 @@ protected:
 	virtual void do_next_item( void ) = 0;
 	virtual void do_switch_state( void ) = 0;
 	virtual bool do_is_current_match( void ) = 0;
+	virtual void do_sort( list_control_helper::OSortHelper & ) = 0;
 	virtual bool get_text_for_cell( int, type_t ) = 0;
 	virtual void set_child_control_data_for_cell( int, HControl * ) = 0;
 	virtual void refresh ( void );
 	void draw_cell ( int, int, int, HColumnInfo const * const, bool );
 	virtual int process_input( int );
-	//virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem * * = NULL );
+	//virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const & = D_BLOCK_IF_NOT_EMPTIED, HItem_t * * = NULL );
 	virtual bool is_searchable ( void );
 	virtual int click ( mouse::OMouse & );
 //	virtual bool is_above_c ( HElement *, HElement * );
@@ -144,14 +167,14 @@ private:
 	};
 
 template <typename tType = yaal::hcore::HInfo>
-class HListControl : public HBaseListControl
+class HListControl_t : public HBaseListControl
 	{
 public:
-	typedef HItem<tType> row_t;
+	typedef HItem_t<tType> row_t;
 	typedef yaal::hcore::HList<row_t> item_list_t;
 	typedef typename item_list_t::HIterator iterator_t;
 	typedef yaal::hcore::HPointer<item_list_t> item_list_ptr_t;
-	HListControl ( HWindow *,		 	/* parent */
+	HListControl_t ( HWindow *,		 	/* parent */
 								 int,						/* row */
 								 int,						/* col */
 								 int,						/* height */
@@ -168,13 +191,14 @@ protected:
 	virtual void do_first_item( void );
 	virtual void do_next_item( void );
 	virtual void do_switch_state( void );
-	virtual bool do_is_current_match( void ) = 0;
+	virtual bool do_is_current_match( void );
+	virtual void do_sort( list_control_helper::OSortHelper & );
 	virtual bool get_text_for_cell( int, type_t );
 	virtual void set_child_control_data_for_cell( int, HControl * );
 	};
 
 template <typename tType>
-HListControl<tType>::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
+HListControl_t<tType>::HListControl_t ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		int a_iHeight, int a_iWidth, char const * a_pcLabel, item_list_ptr_t a_oData )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
 								a_pcLabel ),
@@ -187,49 +211,40 @@ HListControl<tType>::HListControl ( HWindow * a_poParent, int a_iRow, int a_iCol
 	}
 
 template <typename tType>
-int long HListControl<tType>::do_size( void )
+int long HListControl_t<tType>::do_size( void )
 	{
 	return ( (*f_oList).size() );
 	}
 
 template <typename tType>
-void HListControl<tType>::do_first_item( void )
+void HListControl_t<tType>::do_first_item( void )
 	{
 	f_oIterator = f_oFirstVisibleRow;
 	return;
 	}
 
 template <typename tType>
-void HListControl<tType>::do_next_item( void )
+void HListControl_t<tType>::do_next_item( void )
 	{
 	++ f_oIterator;
 	return;
 	}
 
 template <typename tType>
-void HListControl<tType>::do_switch_state( void )
+void HListControl_t<tType>::do_switch_state( void )
 	{
 	if ( f_bCheckable && ! (*f_oList).empty ( ) )
 		f_oIterator->m_bChecked = ! f_oIterator->m_bChecked;
 	}
+
 template <typename tType>
-bool HListControl<tType>::do_is_current_match( void )
+bool HListControl_t<tType>::do_is_current_match( void )
 	{
 	return ( f_oIterator == f_oCurrentMatch );
 	}
 
-namespace list_control_helper
-	{
-	yaal::hcore::HString const & GetLongFromCell( yaal::hcore::HInfo const & );
-	yaal::hcore::HString const & GetDoubleFromCell( yaal::hcore::HInfo const & );
-	yaal::hcore::HString const & GetStringFromCell( yaal::hcore::HInfo const & );
-	char const * GetTimeFromCell( yaal::hcore::HInfo const & );
-	int long GetIdFromCell( HItem<yaal::hcore::HInfo> const & );
-	bool GetStateFromCell( HItem<yaal::hcore::HInfo> const & );
-	}
-
 template <typename tType>
-bool HListControl<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
+bool HListControl_t<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
 	{
 	row_t & l_oItem = *f_oIterator;
 	switch ( a_eType )
@@ -253,7 +268,7 @@ bool HListControl<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
 	}
 
 template <typename tType>
-void HListControl<tType>::set_child_control_data_for_cell( int a_iColumn, HControl * a_poControl )
+void HListControl_t<tType>::set_child_control_data_for_cell( int a_iColumn, HControl * a_poControl )
 	{
 	row_t l_oItem = *f_oIterator;
 	a_poControl->set( l_oItem [ a_iColumn ] );
@@ -261,7 +276,7 @@ void HListControl<tType>::set_child_control_data_for_cell( int a_iColumn, HContr
 	}
 
 template <typename tType>
-void HListControl<tType>::add_tail( row_t & a_tRow )
+void HListControl_t<tType>::add_tail( row_t & a_tRow )
 	{
 	M_PROLOG
 	(*f_oList).push_back ( a_tRow );
@@ -281,6 +296,44 @@ void HListControl<tType>::add_tail( row_t & a_tRow )
 	return;
 	M_EPILOG
 	}
+
+template <typename tType>
+typename HListControl_t<tType>::item_list_t const & HListControl_t<tType>::get_data ( void ) const
+	{
+	return ( (*f_oList) );
+	}
+
+template <typename tType>
+class CompareListControlItems
+	{
+	list_control_helper::OSortHelper & f_roSortHelper;
+public:
+	CompareListControlItems ( list_control_helper::OSortHelper & a_roSortHelper )
+		: f_roSortHelper ( a_roSortHelper ) { }
+	bool operator() ( typename HListControl_t<tType>::item_list_t::HIterator const &, typename HListControl_t<tType>::item_list_t::HIterator const & ) const;
+	};
+
+template <typename tType>
+bool CompareListControlItems<tType>::operator() ( typename HListControl_t<tType>::item_list_t::HIterator const & a_oLeft,
+		typename HListControl_t<tType>::item_list_t::HIterator const & a_oRight ) const
+	{
+	M_PROLOG
+	typename HListControl_t<tType>::item_list_t::HIterator const & l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oLeft : a_oRight;
+	typename HListControl_t<tType>::item_list_t::HIterator const & l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oRight : a_oLeft;
+	yaal::hcore::HInfo const & l_roLeftInfo = ( *l_oLeft ) [ f_roSortHelper.f_iSortColumn ];
+	yaal::hcore::HInfo const & l_roRightInfo = ( *l_oRight ) [ f_roSortHelper.f_iSortColumn ];
+	return ( list_control_helper::compare_cells( l_roLeftInfo, l_roRightInfo, f_roSortHelper ) );
+	M_EPILOG
+	}
+
+template <typename tType>
+void HListControl_t<tType>::do_sort( list_control_helper::OSortHelper & a_roHelper )
+	{
+	(*f_oList).sort ( CompareListControlItems<tType> ( a_roHelper ) );
+	f_oFirstVisibleRow = (*f_oList).begin();
+	}
+
+typedef HListControl_t<> HListControl;
 
 }
 

@@ -631,58 +631,69 @@ OListBits::status_t HBaseListControl::remove_tail ( treatment_t const & a_eFlag,
 	}
 #endif
 
-namespace
+
+namespace list_control_helper
 {
 
-struct OProgressHelper
+yaal::hcore::HString const GetLongFromCell( HInfo const & a_oInfo )
 	{
-	int long f_lComparedItems;
-	int long f_iSize;
-	HWindow * f_poWindow;
-	};
+	return ( HString ( a_oInfo.get<int long>() ) );
+	}
 
-class CompareListControlItems
+yaal::hcore::HString const GetDoubleFromCell( HInfo const & a_oInfo )
 	{
-	OListBits::sort_order_t f_eOrder;
-	int f_iSortColumn;
-	type_t f_eType;
-	OProgressHelper & f_roProgressHelper;
-public:
-	CompareListControlItems ( OListBits::sort_order_t a_eOrder, int a_iColumn, type_t a_eType, OProgressHelper & a_roProgressHelper )
-		: f_eOrder ( a_eOrder ), f_iSortColumn ( a_iColumn ), f_eType ( a_eType ), f_roProgressHelper ( a_roProgressHelper ) { }
-	bool operator() ( HBaseListControl::item_list_t::HIterator const &, HBaseListControl::item_list_t::HIterator const & ) const;
-	};
+	return ( HString ( a_oInfo.get<double>() ) );
+	}
 
-bool CompareListControlItems::operator() ( HBaseListControl::item_list_t::HIterator const & a_oLeft,
-		HBaseListControl::item_list_t::HIterator const & a_oRight ) const
+yaal::hcore::HString const GetStringFromCell( HInfo const & a_oInfo )
 	{
-	M_PROLOG
+	return ( a_oInfo.get<yaal::hcore::HString const &>() );
+	}
+
+char const * GetTimeFromCell( HInfo const & a_oInfo )
+	{
+	return ( a_oInfo.get<yaal::hcore::HTime const &>() );
+	}
+
+int long GetIdFromCell( HItem const & )
+	{
+	return ( 0 );
+	}
+
+bool GetStateFromCell( HItem const & )
+	{
+	return ( false );
+	}
+
+void OSortHelper::progress( void )
+	{
+	++ f_lComparedItems;
+	if ( ( f_iSize > 1024 ) && ! ( f_lComparedItems % 1024 ) )
+		f_poWindow->status_bar()->update_progress ( static_cast<double>( f_lComparedItems ) );
+	return;
+	}
+
+bool compare_cells( HInfo const & a_oLeft, HInfo const & a_oRight, OSortHelper & a_roSortHelper )
+	{
 	double l_dDifference = 0;
-	HBaseListControl::item_list_t::HIterator const & l_oLeft = f_eOrder == OListBits::D_ASCENDING ? a_oLeft : a_oRight;
-	HBaseListControl::item_list_t::HIterator const & l_oRight = f_eOrder == OListBits::D_ASCENDING ? a_oRight : a_oLeft;
-	HInfo const & l_roLeftInfo = ( *l_oLeft ) [ f_iSortColumn ];
-	HInfo const & l_roRightInfo = ( *l_oRight ) [ f_iSortColumn ];
-	++ f_roProgressHelper.f_lComparedItems;
-	if ( ( f_roProgressHelper.f_iSize > 1024 ) && ! ( f_roProgressHelper.f_lComparedItems % 1024 ) )
-		f_roProgressHelper.f_poWindow->status_bar()->update_progress ( static_cast<double>( f_roProgressHelper.f_lComparedItems ) );
-	switch ( f_eType )
+	a_roSortHelper.progress();
+	switch ( a_roSortHelper.f_eType )
 		{
 		case ( D_LONG_INT ):
-			return ( l_roLeftInfo.get<long>() > l_roRightInfo.get<long>() );
+			return ( a_oLeft.get<long>() > a_oRight.get<long>() );
 		case ( D_DOUBLE ):
-			l_dDifference = l_roLeftInfo.get<double>() > l_roRightInfo.get<double>();
+			l_dDifference = a_oLeft.get<double>() > a_oRight.get<double>();
 		break;
 		case ( D_HSTRING ):
-			return ( strcasecmp ( l_roLeftInfo.get<HString const &>(),
-					 l_roRightInfo.get<HString const &>() ) > 0 );
+			return ( strcasecmp ( a_oLeft.get<HString const &>(),
+					 a_oRight.get<HString const &>() ) > 0 );
 		case ( D_HTIME ):
-			l_dDifference = static_cast<time_t>( l_roLeftInfo.get<HTime const &>() ) > static_cast<time_t>( l_roRightInfo.get<HTime const &>() );
+			l_dDifference = static_cast<time_t>( a_oLeft.get<HTime const &>() ) > static_cast<time_t>( a_oRight.get<HTime const &>() );
 		break;
 		default:
 			break;
 		}
 	return ( l_dDifference > 0 ? 1 : ( l_dDifference < 0 ? - 1 : 0 ) );
-	M_EPILOG
 	}
 
 }
@@ -700,9 +711,8 @@ void HBaseListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a
 				static_cast<double>( l_iSize )
 				* static_cast<double>( l_iSize ) / 2.,
 				" Sorting ..." );
-	OProgressHelper l_oHelper = { 0, do_size(), f_poParent };
-	(*f_oList).sort ( CompareListControlItems ( a_eOrder, a_iColumn, f_oHeader [ f_iSortColumn ].f_eType, l_oHelper ) );
-	f_oFirstVisibleRow = (*f_oList).begin();
+	list_control_helper::OSortHelper l_oHelper = { a_iColumn, a_eOrder, f_oHeader [ f_iSortColumn ].f_eType, 0, do_size(), f_poParent };
+	do_sort( l_oHelper );
 	f_iControlOffset = f_iCursorPosition = 0;
 	return;
 	M_EPILOG
@@ -735,7 +745,7 @@ int HBaseListControl::click ( mouse::OMouse & a_rsMouse )
 				}
 			}
 		}
-	else if ( l_iRow < (*f_oList).size() )
+	else if ( l_iRow < do_size() )
 		{
 		f_iCursorPosition = l_iRow;
 		refresh();
@@ -925,11 +935,6 @@ void HBaseListControl::go_to_match_previous ( void )
 	M_EPILOG
 	}
 
-HBaseListControl::item_list_t const & HBaseListControl::get_data ( void ) const
-	{
-	return ( (*f_oList) );
-	}
-
 void HBaseListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t a_eMask )
 	{
 	if ( a_eMask & FLAGS::D_SORTABLE )
@@ -946,38 +951,3 @@ void HBaseListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_fla
 }
 
 }
-
-namespace list_control_helper
-	{
-
-	yaal::hcore::HString const GetLongFromCell( HInfo const & a_oInfo )
-		{
-		return ( HString ( a_oInfo.get<int long>() ) );
-		}
-
-	yaal::hcore::HString const GetDoubleFromCell( HInfo const & a_oInfo )
-		{
-		return ( HString ( a_oInfo.get<double>() ) );
-		}
-
-	yaal::hcore::HString const GetStringFromCell( HInfo const & a_oInfo )
-		{
-		return ( a_oInfo.get<yaal::hcore::HString const &>() );
-		}
-
-	char const * GetTimeFromCell( HInfo const & a_oInfo )
-		{
-		return ( a_oInfo.get<yaal::hcore::HTime const &>() );
-		}
-
-	int long GetIdFromCell( HItem<HInfo> const & )
-		{
-		return ( 0 );
-		}
-
-	bool GetStateFromCell( HItem<HInfo> const & )
-		{
-		return ( false );
-		}
-
-	}

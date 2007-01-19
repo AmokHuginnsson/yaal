@@ -119,12 +119,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, hwindow_ptr_t a_oMainW
 int HTUIProcess::add_window ( hwindow_ptr_t a_oWindow, char const * a_pcTitle )
 	{
 	M_PROLOG
-	HInfo l_oInfo;
-	HItem l_oItem ( 1 );
-	l_oInfo = static_cast < void * > ( a_oWindow.raw ( ) ); FIXME
-	l_oInfo ( a_pcTitle );
-	l_oItem [ 0 ] = l_oInfo;
-	f_oWindows->push_back ( l_oItem );
+	f_oWindows->push_back ( a_oWindow );
 	f_oForegroundWindow = a_oWindow;
 	f_oForegroundWindow->init ( );
 	if ( ! f_oForegroundWindow->is_initialised ( ) )

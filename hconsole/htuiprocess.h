@@ -41,8 +41,9 @@ namespace hconsole
 
 class HTUIProcess : public HHandler, protected yaal::hcore::HProcess
 	{
-protected:
+public:
 	typedef yaal::hcore::HPointer<HWindow> hwindow_ptr_t;
+protected:
 	hwindow_ptr_t f_oMainWindow; /* self explanary */
 	HListControl::item_list_t::HIterator f_oForegroundWindow; /* self explanary */
 	HListControl::item_list_ptr_t f_oWindows;	/* current existing windows */
