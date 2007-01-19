@@ -173,7 +173,7 @@ public:
 	typedef HItem_t<tType> row_t;
 	typedef yaal::hcore::HList<row_t> item_list_t;
 	typedef typename item_list_t::HIterator iterator_t;
-	typedef yaal::hcore::HPointer<item_list_t> item_list_ptr_t;
+	typedef yaal::hcore::HPointer<item_list_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> item_list_ptr_t;
 	HListControl_t ( HWindow *,		 	/* parent */
 								 int,						/* row */
 								 int,						/* col */

@@ -36,7 +36,7 @@ namespace yaal
 namespace hconsole
 {
 
-HMainWindow::HMainWindow ( char const * a_pcTitle, HListControl::item_list_ptr_t a_oWindows )
+HMainWindow::HMainWindow ( char const * a_pcTitle, HWindowListControl::item_list_ptr_t a_oWindows )
 						: HWindow ( a_pcTitle ), f_poMenu ( NULL ), f_oWindowList ( a_oWindows )
 	{
 	M_PROLOG

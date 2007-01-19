@@ -27,7 +27,6 @@ Copyright:
 #ifndef __YAAL_HCONSOLE_HTUIPROCESS_H
 #define __YAAL_HCONSOLE_HTUIPROCESS_H
 
-#include "hcore/hpointer.h"
 #include "hcore/hprocess.h"
 #include "hconsole/hhandler.h"
 #include "hconsole/hwindow.h"
@@ -41,12 +40,10 @@ namespace hconsole
 
 class HTUIProcess : public HHandler, protected yaal::hcore::HProcess
 	{
-public:
-	typedef yaal::hcore::HPointer<HWindow> hwindow_ptr_t;
 protected:
 	hwindow_ptr_t f_oMainWindow; /* self explanary */
-	HListControl::item_list_t::HIterator f_oForegroundWindow; /* self explanary */
-	HListControl::item_list_ptr_t f_oWindows;	/* current existing windows */
+	HWindowListControl::item_list_t::HIterator f_oForegroundWindow; /* self explanary */
+	HWindowListControl::item_list_ptr_t f_oWindows;	/* current existing windows */
 public:
 	HTUIProcess ( size_t = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );
@@ -56,7 +53,7 @@ protected:
 	int process_stdin ( int );
 	int process_mouse ( int );
 	int process_commands ( void );
-	int add_window ( hwindow_ptr_t, char const * );
+	int add_window ( hwindow_ptr_t );
 	virtual int handler_alert ( int, void * = NULL );
 	virtual int handler_interrupt ( int, void * = NULL );
 	virtual int handler_idle ( int, void * = NULL );

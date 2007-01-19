@@ -51,7 +51,7 @@ HTUIProcess::HTUIProcess ( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
 		size_t a_uiCommandHandlers )
 	: HHandler ( a_uiKeyHandlers, a_uiCommandHandlers ),
 	HProcess ( a_uiFileHandlers ), f_oMainWindow(), f_oForegroundWindow(),
-	f_oWindows ( new HListControl::item_list_t() )
+	f_oWindows ( new HWindowListControl::item_list_t() )
 	{
 	M_PROLOG
 	memset ( & f_sLatency, 0, sizeof ( f_sLatency ) );
@@ -98,7 +98,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, hwindow_ptr_t a_oMainW
 		{
 		l_oMainWindow = hwindow_ptr_t ( new HMainWindow ( a_pcProcessName, f_oWindows ) );
 		l_oMainWindow->init ( );
-		add_window ( l_oMainWindow, a_pcProcessName );
+		add_window ( l_oMainWindow );
 		register_postprocess_handler ( KEY < '\t' >::meta, NULL,
 				& HTUIProcess::handler_jump_meta_tab );
 		register_postprocess_handler ( KEY < 'q' >::command, NULL,
@@ -109,20 +109,22 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, hwindow_ptr_t a_oMainW
 			& HTUIProcess::handler_jump_meta_direct );
 		}
 	f_oMainWindow = l_oMainWindow;
-	f_oForegroundWindow = HListControl::item_list_t::HIterator();
+	f_oForegroundWindow = HWindowListControl::item_list_t::HIterator();
 	f_oCommandHandlers [ "quit" ] = static_cast < HANDLER_t > ( & HTUIProcess::handler_quit );
 	handler_refresh ( 0 );
 	return ( 1 );
 	M_EPILOG
 	}
 
-int HTUIProcess::add_window ( hwindow_ptr_t a_oWindow, char const * a_pcTitle )
+int HTUIProcess::add_window ( hwindow_ptr_t a_oWindow )
 	{
 	M_PROLOG
-	f_oWindows->push_back ( a_oWindow );
-	f_oForegroundWindow = a_oWindow;
-	f_oForegroundWindow->init ( );
-	if ( ! f_oForegroundWindow->is_initialised ( ) )
+	HItem_t<hwindow_ptr_t> l_oItem( 1 );
+	l_oItem[ 0 ] = a_oWindow;
+	f_oWindows->push_back ( l_oItem );
+	f_oForegroundWindow = f_oWindows->rbegin();
+	(*f_oForegroundWindow)[ 0 ]->init ( );
+	if ( ! (*f_oForegroundWindow)[ 0 ]->is_initialised ( ) )
 		M_THROW ( _ ( "window has not been initialised" ), errno );
 	c_refresh ( );
 	return ( 0 );
@@ -138,21 +140,21 @@ int HTUIProcess::process_stdin ( int a_iCode )
 		a_iCode = get_key ( );
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers ( a_iCode, f_oPreprocessHandlers );
-	if ( a_iCode && !! f_oForegroundWindow )
-			a_iCode = f_oForegroundWindow->process_input ( a_iCode );
+	if ( a_iCode && !! (*f_oForegroundWindow)[ 0 ] )
+			a_iCode = (*f_oForegroundWindow)[ 0 ]->process_input ( a_iCode );
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers ( a_iCode, f_oPostprocessHandlers );
 	if ( ! a_iCode )
 		{
-		if ( !! f_oForegroundWindow )
-			f_oCommand = f_oForegroundWindow->get_command ( );
+		if ( !! (*f_oForegroundWindow)[ 0 ] )
+			f_oCommand = (*f_oForegroundWindow)[ 0 ]->get_command ( );
 		if ( f_oCommand
 				&& static_cast < char const * const > ( f_oCommand ) [ 0 ] )
 			l_oCommand = process_command ( );
 		if ( l_oCommand
 				&& static_cast < char const * const > ( l_oCommand ) [ 0 ]
-				&& !! f_oForegroundWindow )
-			f_oForegroundWindow->status_bar ( )->message ( COLORS::D_FG_RED,
+				&& !! (*f_oForegroundWindow)[ 0 ] )
+			(*f_oForegroundWindow)[0]->status_bar ( )->message ( COLORS::D_FG_RED,
 					"unknown command: `%s'",
 					static_cast < char const * const > ( l_oCommand ) );
 		}
@@ -184,8 +186,8 @@ int HTUIProcess::process_stdin ( int a_iCode )
 	else
 		c_printf ( 0, 0, COLORS::D_FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( a_iCode && !! f_oForegroundWindow )
-		f_oForegroundWindow->status_bar ( )->message ( COLORS::D_FG_RED,
+	if ( a_iCode && !! (*f_oForegroundWindow)[ 0 ] )
+		(*f_oForegroundWindow)[0]->status_bar ( )->message ( COLORS::D_FG_RED,
 				"unknown function, err code(%d)", a_iCode );
 	return ( a_iCode );
 	M_EPILOG
@@ -225,9 +227,9 @@ int HTUIProcess::handler_idle ( int a_iCode, void * )
 			COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, l_oClock );
 	n_bNeedRepaint = true;
 #endif /* __DEBUG__ */
-	if ( !! f_oForegroundWindow )
+	if ( !! (*f_oForegroundWindow)[ 0 ] )
 		{
-		l_poStatusBar = f_oForegroundWindow->status_bar ( );
+		l_poStatusBar = (*f_oForegroundWindow)[ 0 ]->status_bar ( );
 		if ( l_poStatusBar )
 			l_poStatusBar->refresh ( );
 		}
@@ -255,8 +257,8 @@ int HTUIProcess::handler_mouse ( int a_iCode, void * )
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );
 	n_bNeedRepaint = true;
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( !! f_oForegroundWindow )
-		f_oForegroundWindow->click ( l_sMouse );
+	if ( !! (*f_oForegroundWindow)[ 0 ] )
+		(*f_oForegroundWindow)[0]->click ( l_sMouse );
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -269,8 +271,8 @@ int HTUIProcess::handler_refresh ( int, void * )
 	clrscr ( ); /* there is ::refresh ( ) call inside */
 	kbhit ( ); /* cleans all trash from stdio buffer */
 	c_getmaxyx ( n_iHeight, n_iWidth );
-	if ( !! f_oForegroundWindow )
-		f_oForegroundWindow->refresh ( );
+	if ( !! (*f_oForegroundWindow)[ 0 ] )
+		(*f_oForegroundWindow)[0]->refresh ( );
 	c_refresh ( );
 	return ( 0 );
 	M_EPILOG
@@ -289,13 +291,9 @@ int HTUIProcess::handler_jump_meta_tab ( int a_iCode, void * )
 	{
 	M_PROLOG
 	if ( f_iIdleCycles < 5 )
-		{
-		f_oWindows->to_tail ( );
-		HInfo & l_oInfo = f_oWindows->present ( ) [ 0 ];
-		f_oForegroundWindow = static_cast < HWindow * > ( l_oInfo.get < void * > ( ) );
-		}
+		++ f_oForegroundWindow;
 	else
-		f_oForegroundWindow = static_cast < HWindow * > ( f_oWindows->go ( -1 ) [ 0 ].get < void * > ( ) );
+		f_oForegroundWindow = f_oWindows->begin();
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );
@@ -308,7 +306,9 @@ int HTUIProcess::handler_jump_meta_direct ( int a_iCode, void * )
 	a_iCode = ( a_iCode & 0xff ) - '0';
 	if ( a_iCode >= f_oWindows->size ( ) )
 		return ( 0 );
-	f_oForegroundWindow = static_cast < HWindow * > ( f_oWindows->go ( a_iCode - 1 ) [ 0 ].get < void * > ( ) );
+	f_oForegroundWindow = f_oWindows->begin();
+	while ( -- a_iCode )
+		++ f_oForegroundWindow;
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );
@@ -318,8 +318,9 @@ int HTUIProcess::handler_jump_meta_direct ( int a_iCode, void * )
 int HTUIProcess::handler_close_window ( int a_iCode, void * )
 	{
 	M_PROLOG
-	f_oWindows->remove_element ( HWindowListControl::D_EMPTY_IF_NOT_EMPTIED );
-	f_oForegroundWindow = static_cast < HWindow * > ( f_oWindows->go ( -1 ) [ 0 ].get < void * > ( ) );
+	HWindowListControl::item_list_t::HIterator it = f_oForegroundWindow;
+	-- f_oForegroundWindow;
+	f_oWindows->erase ( it );
 	handler_refresh ( 0 );
 	a_iCode = 0;
 	return ( a_iCode );

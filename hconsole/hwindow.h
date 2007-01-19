@@ -27,6 +27,7 @@ Copyright:
 #ifndef __YAAL_HCONSOLE_HWINDOW_H
 #define __YAAL_HCONSOLE_HWINDOW_H
 
+#include "hcore/hpointer.h"
 #include "hconsole/hcontrol.h"
 #include "hconsole/hcontrollist.h"
 #include "hconsole/hhandler.h"
@@ -77,6 +78,8 @@ private:
 	HWindow ( HWindow const & );
 	HWindow & operator = ( HWindow const & );
 	};
+
+typedef yaal::hcore::HPointer<HWindow, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> hwindow_ptr_t;
 
 }
 

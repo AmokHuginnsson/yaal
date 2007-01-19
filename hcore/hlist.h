@@ -124,6 +124,7 @@ public:
 			tType * * = NULL );
 	status_t remove_head ( tType * * = NULL );
 	status_t remove_tail ( tType * * = NULL );
+	status_t erase ( HIterator & );
 	/* sets cursor at specified index or number */
 	tType & go ( int );
 	tType & operator [ ] ( int );
@@ -785,6 +786,13 @@ OListBits::status_t HList< tType >::remove_tail ( tType * * a_pptObject )
 		M_THROW ( g_ppcErrMsgHList [ ERROR::E_EMPTY ], errno );
 	return ( l_eError );
 	M_EPILOG
+	}
+
+template < typename tType >
+OListBits::status_t HList<tType>::erase ( HIterator & a_roIterator )
+	{
+	f_poSelected = a_roIterator.f_poCurrent;
+	return ( remove_element() );
 	}
 
 template < typename tType >

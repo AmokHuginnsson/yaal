@@ -46,9 +46,9 @@ class HItem_t : public hcore::HArray < tType >
 public:
 	int long	m_lId;
 	bool	m_bChecked;
-	HItem_t ( int  = 0 );
+	HItem_t ( int = 0 );
 	virtual ~HItem_t ( void );
-	HItem_t ( HItem_t const &, int = 0 );
+	HItem_t ( HItem_t const &, int );
 	HItem_t & operator = ( HItem_t const & );
 	};
 
