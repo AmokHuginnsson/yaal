@@ -45,7 +45,7 @@ namespace hconsole
 
 HWindow::HWindow ( char const * a_pcTitle ) : f_bInitialised ( false ),
 	f_oTitle ( a_pcTitle ), f_poFocusedChild ( NULL ),
-	f_poPreviousFocusedChild ( NULL ), f_oControls ( ), f_poStatusBar ( NULL )
+	f_poPreviousFocusedChild ( NULL ), f_oControls ( ), f_oStatusBar ( )
 	{
 	M_PROLOG
 	int l_piCmds [ ] = { ':', KEY < ':' >::command };
@@ -62,11 +62,6 @@ HWindow::HWindow ( char const * a_pcTitle ) : f_bInitialised ( false ),
 HWindow::~HWindow ( void )
 	{
 	M_PROLOG
-	if ( f_poStatusBar )
-		{
-		delete f_poStatusBar;
-		f_poStatusBar = NULL;
-		}
 #ifdef __DEBUGGER_BABUNI__
 	log << "destroing window: " << f_oTitle << endl;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -81,18 +76,11 @@ int HWindow::init ( void )
 	clrscr ( );
 	n_bNeedRepaint = true;
 	l_oString.format ( " [%s]& \n", static_cast < char const * const > ( f_oTitle ) );
-	f_poStatusBar = init_bar ( l_oString );
-	f_poStatusBar->enable ( true );
+	f_oStatusBar = status_bar_ptr_t( new HStatusBarControl ( this, l_oString ) );
+	f_oStatusBar->enable ( true );
 	f_oControls.remove_head ( HControlList::D_FORCE_REMOVE_ELEMENT );
 	f_bInitialised = true;
 	return ( 0 );
-	M_EPILOG
-	}
-
-HStatusBarControl * HWindow::init_bar ( char const * a_pcLabel )
-	{
-	M_PROLOG
-	return ( new HStatusBarControl ( this, a_pcLabel ) );
 	M_EPILOG
 	}
 

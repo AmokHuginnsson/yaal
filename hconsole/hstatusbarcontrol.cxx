@@ -145,7 +145,7 @@ void HStatusBarControl::set_prompt ( char const * a_pcPrompt, PROMPT::mode_t a_e
 	f_eMode = a_eMode;
 	f_eRestrict = a_eRestrict;
 	f_poParent->f_poPreviousFocusedChild = f_poParent->f_poFocusedChild;
-	f_poParent->f_poFocusedChild = f_poParent->f_poStatusBar;
+	f_poParent->f_poFocusedChild = f_poParent->f_oStatusBar.raw();
 	f_poParent->f_poPreviousFocusedChild->kill_focus ( );
 	set_focus ( -1 );
 	if ( a_pcPrompt )
@@ -364,7 +364,7 @@ void HStatusBarControl::end_prompt ( void )
 	f_oPrompt = "";
 	f_iPromptLength = 0;
 	f_poParent->f_poFocusedChild = f_poParent->f_poPreviousFocusedChild;
-	f_poParent->f_poStatusBar->kill_focus ( );
+	f_poParent->f_oStatusBar->kill_focus ( );
 	f_poParent->f_poFocusedChild->set_focus ( -1 );
 	return;
 	M_EPILOG

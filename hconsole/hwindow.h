@@ -50,12 +50,12 @@ protected:
 	HControl *					f_poPreviousFocusedChild; /* control that had focus before
 																									 focus went to status bar */	
 	HControlList				f_oControls;	/* list of all control inside _this_ wind */
-	HStatusBarControl * f_poStatusBar;
+	typedef yaal::hcore::HPointer<HStatusBarControl,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> status_bar_ptr_t;
+	status_bar_ptr_t		f_oStatusBar;
 public:
 	HWindow ( char const * ); /* title */
 	virtual ~HWindow ( void );
 	virtual int init ( void );
-	virtual HStatusBarControl * init_bar ( char const * );
 	void refresh ( void );
 	int process_input ( int );
 	virtual int handler_jump_tab ( int, void * ); /* jump thru controlos with tab key */
