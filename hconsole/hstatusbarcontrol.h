@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_HCONSOLE_HSTATUSBARCONTROL_H
 
 #include "hconsole/heditcontrol.h"
+#include "hcore/hpointer.h"
 
 namespace yaal
 {
@@ -38,6 +39,7 @@ namespace hconsole
 class HStatusBarControl : public HEditControl
 	{
 public:
+	typedef yaal::hcore::HPointer<HStatusBarControl,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
 	struct PROMPT
 		{
 		typedef enum

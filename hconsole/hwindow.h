@@ -43,6 +43,8 @@ class HControlList;
 
 class HWindow : public HHandler
 	{
+public:
+	typedef yaal::hcore::HPointer<HWindow, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
 protected:
 	bool								f_bInitialised;		/* was window properly initialised? */
 	hcore::HString			f_oTitle;					/* title of window */
@@ -50,8 +52,7 @@ protected:
 	HControl *					f_poPreviousFocusedChild; /* control that had focus before
 																									 focus went to status bar */	
 	HControlList				f_oControls;	/* list of all control inside _this_ wind */
-	typedef yaal::hcore::HPointer<HStatusBarControl,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> status_bar_ptr_t;
-	status_bar_ptr_t		f_oStatusBar;
+	HStatusBarControl::ptr_t		f_oStatusBar;
 public:
 	HWindow ( char const * ); /* title */
 	virtual ~HWindow ( void );
@@ -78,8 +79,6 @@ private:
 	HWindow ( HWindow const & );
 	HWindow & operator = ( HWindow const & );
 	};
-
-typedef yaal::hcore::HPointer<HWindow, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> hwindow_ptr_t;
 
 }
 

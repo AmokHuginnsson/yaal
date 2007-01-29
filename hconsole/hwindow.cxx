@@ -78,7 +78,7 @@ int HWindow::init ( void )
 	l_oString.format ( " [%s]& \n", static_cast < char const * const > ( f_oTitle ) );
 	f_oStatusBar = status_bar_ptr_t( new HStatusBarControl ( this, l_oString ) );
 	f_oStatusBar->enable ( true );
-	f_oControls.remove_head ( HControlList::D_FORCE_REMOVE_ELEMENT );
+	f_oControls.remove_head();
 	f_bInitialised = true;
 	return ( 0 );
 	M_EPILOG
@@ -99,12 +99,12 @@ int HWindow::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-int HWindow::add_control ( HControl * a_poControl, int a_iShortCut )
+int HWindow::add_control ( HControl::ptr_t a_oControl, int a_iShortCut )
 	{
 	M_PROLOG
 	if ( f_oPreprocessHandlers.has_key ( a_iShortCut ) )
 		M_THROW ( _ ( "shortcut occupied" ), a_iShortCut );
-	f_oControls.add_tail ( & a_poControl );
+	f_oControls.add_tail ( a_oControl );
 	register_postprocess_handler ( a_iShortCut, NULL,
 			& HWindow::handler_jump_direct );
 	f_poFocusedChild = f_oControls.go ( 0 );

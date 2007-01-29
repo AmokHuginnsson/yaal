@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_HCONSOLE_HCONTROL_H
 
 #include "hconsole/console.h"
+#include "hcore/hpointer.h"
 #include "hcore/hstring.h"
 #include "hcore/hinfo.h"
 
@@ -55,6 +56,7 @@ public:
 			};
 		};
 	static int const D_DEFAULT_ATTRS = -1;
+	typedef yaal::hcore::HPointer<HControl,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
 protected:
 	bool			f_bEnabled;						/* is cotrol enabled, focus can go 
 																		 only to enabled control */
