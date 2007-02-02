@@ -41,19 +41,19 @@ namespace hconsole
 class HTUIProcess : public HHandler, protected yaal::hcore::HProcess
 	{
 protected:
-	hwindow_ptr_t f_oMainWindow; /* self explanary */
+	HWindow::ptr_t f_oMainWindow; /* self explanary */
 	HWindowListControl::item_list_t::HIterator f_oForegroundWindow; /* self explanary */
 	HWindowListControl::item_list_ptr_t f_oWindows;	/* current existing windows */
 public:
 	HTUIProcess ( size_t = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );
-	int init_tui ( char const * = "", hwindow_ptr_t = hwindow_ptr_t() );
+	int init_tui ( char const * = "", HWindow::ptr_t = HWindow::ptr_t() );
 	using hcore::HProcess::run;
 protected:
 	int process_stdin ( int );
 	int process_mouse ( int );
 	int process_commands ( void );
-	int add_window ( hwindow_ptr_t );
+	int add_window ( HWindow::ptr_t );
 	virtual int handler_alert ( int, void * = NULL );
 	virtual int handler_interrupt ( int, void * = NULL );
 	virtual int handler_idle ( int, void * = NULL );

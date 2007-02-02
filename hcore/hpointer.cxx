@@ -27,5 +27,5 @@ Copyright:
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hpointer.h"
-M_VCSTID ( D_VCSID_HPOINTER_H )
+M_VCSTID ( D_VCSID_YAAL_HCORE_HPOINTER_H )
 

@@ -38,7 +38,7 @@ namespace hconsole
 
 class HWindow;
 
-class HWindowListControl : public HListControl_t<hwindow_ptr_t>
+class HWindowListControl : public HListControl_t<HWindow::ptr_t>
 	{
 public:
 	HWindowListControl ( HWindow *, int, int, int, int, char const *, HWindowListControl::item_list_ptr_t );

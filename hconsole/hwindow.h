@@ -48,7 +48,7 @@ public:
 protected:
 	bool								f_bInitialised;		/* was window properly initialised? */
 	hcore::HString			f_oTitle;					/* title of window */
-	HControl * 					f_poFocusedChild;	/* points to control that has focus */
+	HControlList::control_list_t::HIterator	& f_oFocusedChild;	/* points to control that has focus */
 	HControl *					f_poPreviousFocusedChild; /* control that had focus before
 																									 focus went to status bar */	
 	HControlList				f_oControls;	/* list of all control inside _this_ wind */

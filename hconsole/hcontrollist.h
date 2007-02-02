@@ -40,15 +40,17 @@ class HControl;
 
 class HControlList
 	{
+public:
 	typedef hcore::HList<HControl::ptr_t> control_list_t;
+private:
 	control_list_t f_oList;
 	control_list_t::HIterator f_oFocused;
 public:
 	HControlList ( void );
 	/* find next enabled control in window, if short cut char is specified */
-	HControl * next_enabled ( char = 0 ); /* enabled and match shortcut char */
+	void next_enabled ( char = 0 ); /* enabled and match shortcut char */
 	void remove_head( void );
-	void select ( HControl * );						/* this one should be private :( */
+//	void select ( HControl * );	/* this one should be private :( */
 	};
 
 }

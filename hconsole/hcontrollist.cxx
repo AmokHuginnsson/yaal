@@ -43,30 +43,29 @@ HControlList::HControlList ( void ) : f_oList ( ), f_oFocused ( )
 	M_EPILOG
 	}
 
-HControl * HControlList::next_enabled ( char a_cShorcut )
+void HControlList::next_enabled ( char a_cShorcut )
 	{
 	M_PROLOG
 	bool l_bLoop = true;
-	HControl * l_poControlOld = f_oList.present ( );
-	HControl * l_poControlNew = NULL;
+	HControlList::control_list_t::HIterator it = f_oFocused;
 	do
 		{
-		f_oList.to_tail ( );
-		l_poControlNew = f_oList.present ( );
-		l_bLoop = l_poControlNew->set_focus ( a_cShorcut );
-		if ( l_poControlOld == l_poControlNew )
+		++ f_oFocused;
+		l_bLoop = (*f_oFocused)->set_focus ( a_cShorcut );
+		if ( f_oFocused == it )
 			l_bLoop = false;
 		}
 	while ( l_bLoop );
-	if ( l_poControlNew != l_poControlOld )
+	if ( f_oFocused != it )
 		{
-		l_poControlOld->kill_focus ( );
-		l_poControlNew->set_focus ( - 1 );
+		(*it)->kill_focus ( );
+		(*f_oFocused)->set_focus ( - 1 );
 		}
-	return ( l_poControlNew );
+	return;
 	M_EPILOG
 	}
 
+/*
 void HControlList::select ( HControl * a_poControl )
 	{
 	M_PROLOG
@@ -84,6 +83,7 @@ void HControlList::select ( HControl * a_poControl )
 	M_THROW ( "bogus object", reinterpret_cast < int > ( a_poControl ) );
 	M_EPILOG
 	}
+*/
 
 }
 
