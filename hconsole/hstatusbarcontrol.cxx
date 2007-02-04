@@ -144,9 +144,9 @@ void HStatusBarControl::set_prompt ( char const * a_pcPrompt, PROMPT::mode_t a_e
 	M_PROLOG
 	f_eMode = a_eMode;
 	f_eRestrict = a_eRestrict;
-	f_poParent->f_poPreviousFocusedChild = f_poParent->f_poFocusedChild;
-	f_poParent->f_poFocusedChild = f_poParent->f_oStatusBar.raw();
-	f_poParent->f_poPreviousFocusedChild->kill_focus ( );
+	f_poParent->f_oPreviousFocusedChild = f_poParent->f_oFocusedChild;
+	f_poParent->f_oControls.select( f_poParent->f_oStatusBar );
+	(*f_poParent->f_oPreviousFocusedChild)->kill_focus ( );
 	set_focus ( -1 );
 	if ( a_pcPrompt )
 		{
@@ -334,7 +334,7 @@ int HStatusBarControl::process_input_normal ( int a_iCode )
 				f_poParent->f_oCommand = f_oString;
 			else if ( l_eMode == PROMPT::D_SEARCH )
 				{
-				l_poSearchableControl = dynamic_cast < HSearchableControl * > ( f_poParent->f_poPreviousFocusedChild );
+				l_poSearchableControl = dynamic_cast < HSearchableControl * > ( &*f_poParent->f_oPreviousFocusedChild );
 				if ( l_poSearchableControl )
 					l_poSearchableControl->search ( f_oString, l_bBackwards );
 				}
@@ -363,9 +363,9 @@ void HStatusBarControl::end_prompt ( void )
 	f_eMode = PROMPT::D_NORMAL;
 	f_oPrompt = "";
 	f_iPromptLength = 0;
-	f_poParent->f_poFocusedChild = f_poParent->f_poPreviousFocusedChild;
+	f_poParent->f_oFocusedChild = f_poParent->f_oPreviousFocusedChild;
 	f_poParent->f_oStatusBar->kill_focus ( );
-	f_poParent->f_poFocusedChild->set_focus ( -1 );
+	(*f_poParent->f_oFocusedChild)->set_focus ( -1 );
 	return;
 	M_EPILOG
 	}

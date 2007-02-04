@@ -36,7 +36,7 @@ namespace yaal
 namespace hconsole
 {
 
-HControlList::HControlList ( void ) : f_oList ( ), f_oFocused ( )
+HControlList::HControlList ( control_list_t::HIterator & a_roFocused ) : f_oList ( ), f_roFocused ( a_roFocused )
 	{
 	M_PROLOG
 	return;
@@ -47,19 +47,19 @@ void HControlList::next_enabled ( char a_cShorcut )
 	{
 	M_PROLOG
 	bool l_bLoop = true;
-	HControlList::control_list_t::HIterator it = f_oFocused;
+	HControlList::control_list_t::HIterator it = f_roFocused;
 	do
 		{
-		++ f_oFocused;
-		l_bLoop = (*f_oFocused)->set_focus ( a_cShorcut );
-		if ( f_oFocused == it )
+		++ f_roFocused;
+		l_bLoop = (*f_roFocused)->set_focus ( a_cShorcut );
+		if ( f_roFocused == it )
 			l_bLoop = false;
 		}
 	while ( l_bLoop );
-	if ( f_oFocused != it )
+	if ( f_roFocused != it )
 		{
 		(*it)->kill_focus ( );
-		(*f_oFocused)->set_focus ( - 1 );
+		(*f_roFocused)->set_focus ( - 1 );
 		}
 	return;
 	M_EPILOG
@@ -76,7 +76,7 @@ void HControlList::select ( HControl * a_poControl )
 		{
 		if ( *it == a_poControl )
 			{
-			f_oFocused = it;
+			f_roFocused = it;
 			return;
 			}
 		}
@@ -84,6 +84,41 @@ void HControlList::select ( HControl * a_poControl )
 	M_EPILOG
 	}
 */
+
+void HControlList::add_control( HControl::ptr_t a_oControl )
+	{
+	M_PROLOG
+	f_oList.push_back( a_oControl );
+	f_roFocused = f_oList.rbegin();
+	return;
+	M_EPILOG
+	}
+
+void HControlList::refresh_all( void )
+	{
+	M_PROLOG
+	for ( control_list_t::HIterator it = f_oList.begin();
+			it != f_oList.end(); ++ it )
+		if ( it != f_roFocused )
+			(*it)->refresh ( );
+	if ( !! (*f_roFocused) )
+		(*f_roFocused)->refresh();
+	return;
+	M_EPILOG
+	}
+
+int HControlList::hit_test_all( mouse::OMouse& a_rsMouse )
+	{
+	M_PROLOG
+	if ( (*f_roFocused)->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
+		return ( (*f_roFocused)->click ( a_rsMouse ) );
+	for ( control_list_t::HIterator it = f_oList.begin();
+			it != f_oList.end(); ++ it )
+		if ( (*it)->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
+			return ( (*it)->click ( a_rsMouse ) );
+	return( 0 );
+	M_EPILOG
+	}
 
 }
 

@@ -67,7 +67,7 @@ HTUIProcess::~HTUIProcess ( void )
 	M_EPILOG
 	}
 
-int HTUIProcess::init_tui ( char const * a_pcProcessName, hwindow_ptr_t a_oMainWindow )
+int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow::ptr_t a_oMainWindow )
 	{
 	M_PROLOG
 	static int const D_CTRLS_COUNT = 2;
@@ -75,7 +75,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, hwindow_ptr_t a_oMainW
 	int l_iCtr = 0;
 	int l_piAlts [ D_ALTS_COUNT ];
 	int l_piCtrls [ ] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
-	hwindow_ptr_t l_oMainWindow;
+	HWindow::ptr_t l_oMainWindow;
 	HProcess::init ( n_iLatency );
 	register_file_descriptor_handler ( STDIN_FILENO, & HTUIProcess::process_stdin );
 	if ( n_bUseMouse && n_iMouseDes )
@@ -96,7 +96,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, hwindow_ptr_t a_oMainW
 		}
 	else /* Create automatically default main window. */
 		{
-		l_oMainWindow = hwindow_ptr_t ( new HMainWindow ( a_pcProcessName, f_oWindows ) );
+		l_oMainWindow = HWindow::ptr_t ( new HMainWindow ( a_pcProcessName, f_oWindows ) );
 		l_oMainWindow->init ( );
 		add_window ( l_oMainWindow );
 		register_postprocess_handler ( KEY < '\t' >::meta, NULL,
@@ -116,10 +116,10 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, hwindow_ptr_t a_oMainW
 	M_EPILOG
 	}
 
-int HTUIProcess::add_window ( hwindow_ptr_t a_oWindow )
+int HTUIProcess::add_window ( HWindow::ptr_t a_oWindow )
 	{
 	M_PROLOG
-	HItem_t<hwindow_ptr_t> l_oItem( 1 );
+	HItem_t<HWindow::ptr_t> l_oItem( 1 );
 	l_oItem[ 0 ] = a_oWindow;
 	f_oWindows->push_back ( l_oItem );
 	f_oForegroundWindow = f_oWindows->rbegin();
@@ -220,7 +220,6 @@ int HTUIProcess::handler_interrupt ( int, void * )
 int HTUIProcess::handler_idle ( int a_iCode, void * )
 	{
 	M_PROLOG
-	HStatusBarControl * l_poStatusBar = NULL;
 #ifdef __DEBUG__
 	HString l_oClock ( static_cast < char const * > ( HTime ( ) ) );
 	c_printf ( 0, n_iWidth - l_oClock.get_length ( ),
@@ -229,9 +228,9 @@ int HTUIProcess::handler_idle ( int a_iCode, void * )
 #endif /* __DEBUG__ */
 	if ( !! (*f_oForegroundWindow)[ 0 ] )
 		{
-		l_poStatusBar = (*f_oForegroundWindow)[ 0 ]->status_bar ( );
-		if ( l_poStatusBar )
-			l_poStatusBar->refresh ( );
+		HStatusBarControl::ptr_t& l_oStatusBar = (*f_oForegroundWindow)[ 0 ]->status_bar ( );
+		if ( !! l_oStatusBar )
+			l_oStatusBar->refresh ( );
 		}
 	a_iCode = HProcess::handler_idle ( a_iCode );
 	return ( a_iCode );

@@ -48,8 +48,8 @@ public:
 protected:
 	bool								f_bInitialised;		/* was window properly initialised? */
 	hcore::HString			f_oTitle;					/* title of window */
-	HControlList::control_list_t::HIterator	& f_oFocusedChild;	/* points to control that has focus */
-	HControl *					f_poPreviousFocusedChild; /* control that had focus before
+	HControlList::control_list_t::HIterator	f_oFocusedChild;	/* points to control that has focus */
+	HControlList::control_list_t::HIterator f_oPreviousFocusedChild; /* control that had focus before
 																									 focus went to status bar */	
 	HControlList				f_oControls;	/* list of all control inside _this_ wind */
 	HStatusBarControl::ptr_t		f_oStatusBar;
@@ -64,8 +64,8 @@ public:
 	virtual int handler_command ( int, void * ); /* put window into command awaiting */
 	virtual int handler_search ( int, void * ); /* put window into search pattern scan */
 	virtual int click ( mouse::OMouse & );
-	int add_control ( HControl *, int );
-	HStatusBarControl * status_bar ( void );
+	int add_control ( HControl::ptr_t, int );
+	HStatusBarControl::ptr_t& status_bar ( void );
 	hcore::HString get_command ( void );
 	bool is_initialised ( void ) const;
 private:
@@ -75,7 +75,7 @@ private:
 			HStatusBarControl::PROMPT::restrict_t );
 	friend void HStatusBarControl::end_prompt ( void );
 	friend int HStatusBarControl::process_input_normal ( int );
-	void set_focus ( HControl * );
+	void set_focus ( HControl::ptr_t& );
 	HWindow ( HWindow const & );
 	HWindow & operator = ( HWindow const & );
 	};

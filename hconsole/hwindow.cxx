@@ -44,8 +44,8 @@ namespace hconsole
 {
 
 HWindow::HWindow ( char const * a_pcTitle ) : f_bInitialised ( false ),
-	f_oTitle ( a_pcTitle ), f_poFocusedChild ( NULL ),
-	f_poPreviousFocusedChild ( NULL ), f_oControls ( ), f_oStatusBar ( )
+	f_oTitle ( a_pcTitle ), f_oFocusedChild ( ),
+	f_oPreviousFocusedChild ( ), f_oControls ( f_oFocusedChild ), f_oStatusBar ( )
 	{
 	M_PROLOG
 	int l_piCmds [ ] = { ':', KEY < ':' >::command };
@@ -76,7 +76,7 @@ int HWindow::init ( void )
 	clrscr ( );
 	n_bNeedRepaint = true;
 	l_oString.format ( " [%s]& \n", static_cast < char const * const > ( f_oTitle ) );
-	f_oStatusBar = status_bar_ptr_t( new HStatusBarControl ( this, l_oString ) );
+	f_oStatusBar = HStatusBarControl::ptr_t( new HStatusBarControl ( this, l_oString ) );
 	f_oStatusBar->enable ( true );
 	f_oControls.remove_head();
 	f_bInitialised = true;
@@ -89,8 +89,8 @@ int HWindow::process_input ( int a_iCode )
 	M_PROLOG
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers ( a_iCode, f_oPreprocessHandlers );
-	if ( a_iCode && f_poFocusedChild )
-		a_iCode = f_poFocusedChild->process_input ( a_iCode );
+	if ( a_iCode && !! (*f_oFocusedChild) )
+		a_iCode = (*f_oFocusedChild)->process_input ( a_iCode );
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers ( a_iCode, f_oPostprocessHandlers );
 	if ( f_oCommand && static_cast < char const * const > ( f_oCommand ) [ 0 ] )
@@ -104,35 +104,24 @@ int HWindow::add_control ( HControl::ptr_t a_oControl, int a_iShortCut )
 	M_PROLOG
 	if ( f_oPreprocessHandlers.has_key ( a_iShortCut ) )
 		M_THROW ( _ ( "shortcut occupied" ), a_iShortCut );
-	f_oControls.add_tail ( a_oControl );
+	f_oControls.add_control ( a_oControl );
 	register_postprocess_handler ( a_iShortCut, NULL,
 			& HWindow::handler_jump_direct );
-	f_poFocusedChild = f_oControls.go ( 0 );
 	return ( 0 );
 	M_EPILOG
 	}
 
-HStatusBarControl * HWindow::status_bar ( void )
+HStatusBarControl::ptr_t& HWindow::status_bar ( void )
 	{
-	return ( f_poStatusBar );
+	return ( f_oStatusBar );
 	}
 
 void HWindow::refresh ( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	HControl * l_poControl = NULL;
-	if ( f_poStatusBar && ( f_poStatusBar != f_poFocusedChild ) )
-		f_poStatusBar->refresh ( );
-	l_iCtr = f_oControls.size ( );
-	while ( l_iCtr -- )
-		{
-		l_poControl = * f_oControls.to_tail ( );
-		if ( l_poControl != f_poFocusedChild )
-			l_poControl->refresh ( );
-		}
-	if ( f_poFocusedChild )
-		f_poFocusedChild->refresh ( );
+	if ( ( !! f_oStatusBar ) && ( f_oStatusBar != *f_oFocusedChild ) )
+		f_oStatusBar->refresh ( );
+	f_oControls.refresh_all();
 	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
@@ -141,7 +130,7 @@ void HWindow::refresh ( void )
 int HWindow::handler_jump_tab ( int a_iCode, void * )
 	{
 	M_PROLOG
-	f_poFocusedChild = f_oControls.next_enabled ( );
+	f_oControls.next_enabled ( );
 	n_bNeedRepaint = true;
 	a_iCode = 0;
 	return ( a_iCode );
@@ -151,16 +140,15 @@ int HWindow::handler_jump_tab ( int a_iCode, void * )
 int HWindow::handler_jump_direct ( int a_iCode, void * )
 	{
 	M_PROLOG
-	HControl * l_poControl = NULL;
 	/* call below is _magic_, HControlList::next_enabled ( ) takes char as an
 	 * argument, so a_iCode & 0x0ff is passed into the function,
 	 * a_iCode is consrtructed from ordinary char by D_KEY_META_ macro,
 	 * see console.h for details */
-	l_poControl = f_poFocusedChild;
+	HControlList::control_list_t::HIterator it = f_oFocusedChild;
 	if ( a_iCode & 0x0ff00 )
 		{
-		f_poFocusedChild = f_oControls.next_enabled ( static_cast < char > ( a_iCode ) );
-		if ( f_poFocusedChild != l_poControl )
+		f_oControls.next_enabled ( static_cast < char > ( a_iCode ) );
+		if ( f_oFocusedChild != it )
 			a_iCode = 0;
 		n_bNeedRepaint = true;
 		}
@@ -168,14 +156,13 @@ int HWindow::handler_jump_direct ( int a_iCode, void * )
 	M_EPILOG
 	}
 
-void HWindow::set_focus ( HControl * a_poControl )
+void HWindow::set_focus ( HControl::ptr_t& a_oControl )
 	{
 	M_PROLOG
-	if ( f_poFocusedChild == a_poControl )
+	if ( (*f_oFocusedChild) == a_oControl )
 		return;
-	f_oControls.select ( a_poControl );
-	f_poFocusedChild->kill_focus ( );
-	f_poFocusedChild = a_poControl;
+	(*f_oFocusedChild)->kill_focus ( );
+	f_oControls.select ( a_oControl );
 	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
@@ -185,7 +172,7 @@ int HWindow::handler_command ( int a_iCode, void * )
 	{
 	M_PROLOG
 	a_iCode = 0;
-	f_poStatusBar->set_prompt ( ":", HStatusBarControl::PROMPT::D_COMMAND );
+	f_oStatusBar->set_prompt ( ":", HStatusBarControl::PROMPT::D_COMMAND );
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -194,38 +181,25 @@ int HWindow::handler_search ( int a_iCode, void * )
 	{
 	M_PROLOG
 	char l_pcPrompt [ ] = "/\0";
-	if ( ! f_poFocusedChild->is_searchable ( ) )
+	if ( ! (*f_oFocusedChild)->is_searchable ( ) )
 		return ( a_iCode );
 	if ( a_iCode >= KEY_CODES::D_COMMAND_BASE )
 		a_iCode -= KEY_CODES::D_COMMAND_BASE;
 	l_pcPrompt [ 0 ] = static_cast < char > ( a_iCode );
-	f_poStatusBar->set_prompt ( l_pcPrompt, HStatusBarControl::PROMPT::D_SEARCH );
+	f_oStatusBar->set_prompt ( l_pcPrompt, HStatusBarControl::PROMPT::D_SEARCH );
 	a_iCode = 0;
 	return ( a_iCode );
 	M_EPILOG
 	}
 
-int HWindow::click ( mouse::OMouse & a_rsMouse )
+int HWindow::click ( mouse::OMouse& a_rsMouse )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	HControl * l_poControl = NULL;
 	if ( ! a_rsMouse.f_iButtons )
 		return ( 1 );
-	if ( f_poFocusedChild == f_poStatusBar )
+	if ( (*f_oFocusedChild) == f_oStatusBar )
 		return ( 1 );
-	if ( f_poFocusedChild->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
-		return ( f_poFocusedChild->click ( a_rsMouse ) );
-	l_iCtr = f_oControls.size ( );
-	while ( l_iCtr -- )
-		{
-		l_poControl = * f_oControls.to_tail ( );
-		if ( l_poControl->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
-			{
-			l_poControl->click ( a_rsMouse );
-			break;
-			}
-		}
+	f_oControls.hit_test_all( a_rsMouse );
 	return ( 0 );
 	M_EPILOG
 	}

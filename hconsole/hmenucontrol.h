@@ -29,6 +29,7 @@ Copyright:
 
 #include "hconsole/htreecontrol.h"
 #include "hconsole/omenuitem.h"
+#include "hcore/hpointer.h"
 
 namespace yaal
 {
@@ -38,6 +39,9 @@ namespace hconsole
 
 class HMenuControl : public HTreeControl
 	{
+public:
+	typedef yaal::hcore::HPointer<HMenuControl, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+private:
 	class HMenuNode;
 	friend class HMenuNode;
 	class HMenuNode : public HTreeControl::HNodeControl

@@ -44,13 +44,17 @@ public:
 	typedef hcore::HList<HControl::ptr_t> control_list_t;
 private:
 	control_list_t f_oList;
-	control_list_t::HIterator f_oFocused;
+	control_list_t::HIterator & f_roFocused;
 public:
-	HControlList ( void );
+	HControlList ( control_list_t::HIterator & );
 	/* find next enabled control in window, if short cut char is specified */
 	void next_enabled ( char = 0 ); /* enabled and match shortcut char */
 	void remove_head( void );
-//	void select ( HControl * );	/* this one should be private :( */
+	void select ( HControl * );	/* this one should be private :( */
+	void select ( HControl::ptr_t );	/* this one should be private :( */
+	void add_control( HControl::ptr_t );
+	void refresh_all( void );
+	int hit_test_all( mouse::OMouse& );
 	};
 
 }

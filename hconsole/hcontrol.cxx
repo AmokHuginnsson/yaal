@@ -81,7 +81,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		}
 	else
 		f_bSingleLine = true;
-	f_poParent->add_control ( this,
+	f_poParent->add_control ( HControl::ptr_t ( this ),
 				KEY<>::meta_r ( f_oLabel [ f_iShortcutIndex ]) );
 	return;
 	M_EPILOG

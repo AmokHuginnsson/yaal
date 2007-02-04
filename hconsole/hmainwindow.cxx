@@ -49,7 +49,6 @@ HMainWindow::HMainWindow ( char const * a_pcTitle, HWindowListControl::item_list
 HMainWindow::~HMainWindow ( void )
 	{
 	M_PROLOG
-	f_poMenu = NULL;
 	return;
 	M_EPILOG
 	}
@@ -65,11 +64,11 @@ int HMainWindow::init ( void )
 			" &Menu \n" );
 	f_poMenu->enable ( true );
 	f_poMenu->set_focus ( );
-	f_poFocusedChild = f_poMenu;
 	HWindowListControl * l_poWindowList = new HWindowListControl ( this, 1,
 			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n", f_oWindowList );
 	l_poWindowList->add_column ( -1, "&Okno", 1 );
 	l_poWindowList->enable ( true );
+	f_oControls.select( f_poMenu );
 	return ( l_iError );
 	M_EPILOG
 	}
