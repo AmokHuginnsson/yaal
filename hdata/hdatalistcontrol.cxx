@@ -41,16 +41,11 @@ namespace hdata
 
 HDataListControl::HDataListControl ( HRecordSet * a_poRecordSet,
 		HDataWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
-		int a_iWidth, char const * a_pcTitle,
-		bool a_bCheckable, bool a_bSortable, bool a_bSearchable,
-		bool a_bDrawHeader, bool a_bDrawLabel, int a_iDisabledAttribute,
-		int a_iEnabledAttribute, int a_iFocusedAttribute )
+		int a_iWidth, char const * a_pcTitle )
 								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
-										a_iWidth, a_pcTitle, a_bDrawLabel, a_iDisabledAttribute,
-										a_iEnabledAttribute, a_iFocusedAttribute ),
-								HSearchableControl ( a_bSearchable ),
-								HListControl ( NULL, 0, 0, 0, 0, NULL,
-										a_bCheckable, a_bSortable, false, a_bDrawHeader ),
+										a_iWidth, a_pcTitle ),
+								HSearchableControl ( true ),
+								HListControl ( NULL, 0, 0, 0, 0, NULL ),
 								HDataControl ( a_poRecordSet )
 	{
 	M_PROLOG
@@ -68,7 +63,7 @@ HDataListControl::~HDataListControl ( void )
 void HDataListControl::load ( int long /*a_iId*/ )
 	{
 	M_PROLOG
-	int l_iCount = 0, l_iCtr = 0, l_iQuantity = f_iQuantity;
+	int l_iCount = 0, l_iCtr = 0, l_iQuantity = f_oList->size();
 	int l_iCursorPosition = f_iCursorPosition;
 	int l_iControlOffset = f_iControlOffset;
 	HElement * l_poSelected = f_poSelected;
@@ -82,7 +77,7 @@ void HDataListControl::load ( int long /*a_iId*/ )
 	else
 		l_iCount = f_poRecordSet->open ( );
 	l_poParent->status_bar ( )->init_progress ( static_cast < double > ( l_iCount ), "Collecting ..." );
-	if ( f_iQuantity )
+	if ( f_oList->size() )
 		go ( 0 );
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
@@ -133,7 +128,7 @@ void HDataListControl::cancel_new ( void )
 	{
 	M_PROLOG
 	remove_tail ( D_EMPTY_IF_NOT_EMPTIED );
-	if ( f_iQuantity )
+	if ( f_oList->size() )
 		{
 		process_input ( KEY_CODES::D_HOME );
 		process_input ( KEY_CODES::D_END );

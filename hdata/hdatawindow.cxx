@@ -310,7 +310,7 @@ int HDataWindow::handler_add_new ( int, void * )
 	M_PROLOG
 	if ( f_eMode != D_OPEN )
 		{
-		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
+		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not add new rocord now." ) );
 		return ( 0 );
 		}
@@ -327,13 +327,13 @@ int HDataWindow::handler_edit ( int, void * )
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
 		{
-		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
+		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not start editing of this record." ) );
 		return ( 0 );
 		}
 	if ( ! f_iSetQuantity )
 		{
-		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
+		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "There is nothing to edit." ) );
 		return ( 0 );
 		}
@@ -348,13 +348,13 @@ int HDataWindow::handler_delete ( int, void * )
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
 		{
-		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
+		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not delete this record." ) );
 		return ( 0 );
 		}
 	if ( ! f_iSetQuantity )
 		{
-		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
+		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "There is nothing to remove." ) );
 		return ( 0 );
 		}
@@ -371,7 +371,7 @@ int HDataWindow::handler_save ( int, void * )
 	M_PROLOG
 	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
 		{
-		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED, _( "There is nothing to save." ) );
+		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( 0 );
 		}
 	m_lId = update ( );
@@ -387,7 +387,7 @@ int HDataWindow::handler_requery ( int, void * )
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
 		{
-		f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED,
+		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "Finish your current operation first." ) );
 		return ( 0 );
 		}
@@ -409,8 +409,8 @@ int HDataWindow::handler_cancel ( int, void * )
 	if ( ( l_eMode == D_ADDING ) && f_poMainControl )
 		f_poMainControl->cancel_new ( );
 	f_bModified = false;
-	f_poStatusBar->refresh ( );
-	f_poStatusBar->message ( COLORS::D_FG_BRIGHTRED, _ ( "Dropping all changes." ) );
+	f_oStatusBar->refresh ( );
+	f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED, _ ( "Dropping all changes." ) );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -426,7 +426,7 @@ void HDataWindow::set_modified ( bool a_bModified )
 	bool l_bModified = f_bModified;
 	f_bModified = a_bModified;
 	if ( ! l_bModified )
-		f_poStatusBar->refresh ( );
+		f_oStatusBar->refresh ( );
 	return;
 	M_EPILOG
 	}

@@ -44,20 +44,15 @@ HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 		char const * a_pcLabel, int a_iBufferSize, char const * a_pcValue,
 		char const * a_pcMask, bool a_bReplace, bool a_bMultiLine,
 		bool a_bReadOnly, bool a_bRightAligned,
-		bool a_bPassword, int a_iMaxHistoryLevel,
-		bool a_bDrawLabel, int a_iDisabledAttribute,
-		int a_iEnabledAttribute, int a_iFocusedAttribute )
+		bool a_bPassword, int a_iMaxHistoryLevel )
 								:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-										a_iWidth, a_pcLabel, a_bDrawLabel, a_iDisabledAttribute,
-										a_iEnabledAttribute, a_iFocusedAttribute ),
+										a_iWidth, a_pcLabel ),
 									HEditControl( a_poParent,
 										a_iRow, a_iColumn, a_iHeight, a_iWidth,
 										a_pcLabel, a_iBufferSize, a_pcValue,
 										a_pcMask, a_bReplace, a_bMultiLine,
 										a_bReadOnly, a_bRightAligned,
-										a_bPassword, a_iMaxHistoryLevel,
-										a_bDrawLabel, a_iDisabledAttribute,
-										a_iEnabledAttribute, a_iFocusedAttribute ),
+										a_bPassword, a_iMaxHistoryLevel ),
 									HDataControl ( NULL )
 	{
 	M_PROLOG
