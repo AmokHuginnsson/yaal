@@ -403,14 +403,15 @@ void HXml::parse ( xml_node_ptr_t a_pvData, ONode & a_rsNode, int a_iLevel, bool
 					if ( ! a_bStripEmpty || ( f_oVarTmpBuffer.find_other_than ( n_pcWhiteSpace ) >= 0 ) )
 						{
 						a_rsNode.f_oContents.add_tail ( & f_oVarTmpBuffer );
-						a_rsNode.f_oTypes.add_tail ( ) = ONode::D_CONTENT;
+						a_rsNode.f_oTypes.push_back ( ONode::D_CONTENT );
 						}
 					}
 				break;
 				case ( XML_ELEMENT_NODE ):
 					{
+					
 					parse ( l_psNode, a_rsNode.f_oChilds.add_tail ( ), a_iLevel + 1, a_bStripEmpty );
-					a_rsNode.f_oTypes.add_tail ( ) = ONode::D_NODE;
+					a_rsNode.f_oTypes.push_back ( ONode::D_NODE );
 					}
 				break;
 				default :
@@ -451,7 +452,7 @@ HXml::ONode & HXml::parse ( char const * a_pcXPath, bool a_bStripEmpty )
 				parse ( f_poXml->f_psNodeSet->nodeTab [ l_iCtr ],
 						f_oRoot.f_oChilds.add_tail ( ), l_iLevel, a_bStripEmpty );
 				f_oRoot.f_iLevel = 0;
-				f_oRoot.f_oTypes.add_tail ( ) = ONode::D_NODE;
+				f_oRoot.f_oTypes.push_back ( ONode::D_NODE );
 				}
 			}
 		else if ( f_poXml->f_psNodeSet->nodeNr == 1 )

@@ -54,11 +54,12 @@ public:
 			} type_t;
 		int f_iLevel;
 		yaal::hcore::HString	f_oName;
-		yaal::hcore::HList < yaal::hcore::HString > f_oContents;
-		yaal::hcore::HHashMap < yaal::hcore::HString,
-			yaal::hcore::HString > f_oProperties;
-		yaal::hcore::HList < ONode > f_oChilds;
-		yaal::hcore::HList < type_t > f_oTypes;
+		typedef yaal::hcore::HList<yaal::hcore::HString> contents_t;
+		contents_t f_oContents;
+		typedef yaal::hcore::HHashMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
+		properties_t f_oProperties;
+		yaal::hcore::HList<ONode> f_oChilds;
+		yaal::hcore::HList<type_t> f_oTypes;
 		ONode ( void ) : f_iLevel ( - 1 ), f_oName ( ), f_oContents ( ),
 								f_oProperties ( D_HXML_PROPERTIES_MAP_SIZE ), f_oChilds ( ), f_oTypes ( ) { }
 		void reset ( void )

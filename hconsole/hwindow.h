@@ -75,9 +75,9 @@ private:
 			HStatusBarControl::PROMPT::restrict_t );
 	friend void HStatusBarControl::end_prompt ( void );
 	friend int HStatusBarControl::process_input_normal ( int );
-	void set_focus ( HControl::ptr_t& );
-	HWindow ( HWindow const & );
-	HWindow & operator = ( HWindow const & );
+	void acquire_focus ( HControl const* const );
+	HWindow ( HWindow const& );
+	HWindow & operator = ( HWindow const& );
 	};
 
 }

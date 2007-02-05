@@ -50,7 +50,7 @@ public:
 	/* find next enabled control in window, if short cut char is specified */
 	void next_enabled ( char = 0 ); /* enabled and match shortcut char */
 	void remove_head( void );
-	void select ( HControl * );	/* this one should be private :( */
+	void select ( HControl const* );	/* this one should be private :( */
 	void select ( HControl::ptr_t );	/* this one should be private :( */
 	void add_control( HControl::ptr_t );
 	void refresh_all( void );

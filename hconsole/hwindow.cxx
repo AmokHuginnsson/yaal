@@ -156,13 +156,13 @@ int HWindow::handler_jump_direct ( int a_iCode, void * )
 	M_EPILOG
 	}
 
-void HWindow::set_focus ( HControl::ptr_t& a_oControl )
+void HWindow::acquire_focus ( HControl const* const a_poControl )
 	{
 	M_PROLOG
-	if ( (*f_oFocusedChild) == a_oControl )
+	if ( (*f_oFocusedChild) == a_poControl )
 		return;
 	(*f_oFocusedChild)->kill_focus ( );
-	f_oControls.select ( a_oControl );
+	f_oControls.select ( a_poControl );
 	n_bNeedRepaint = true;
 	return;
 	M_EPILOG

@@ -127,7 +127,7 @@ int HControl::set_focus ( char a_cShortCut )
 		return ( 1 );
 	f_bFocused = true;
 	if ( ! a_cShortCut )
-		f_poParent->set_focus ( this );
+		f_poParent->acquire_focus ( this );
 	if ( a_cShortCut <= 0 )
 		refresh ( );
 	return ( 0 );

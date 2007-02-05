@@ -97,7 +97,11 @@ public:
 	template<typename hiert_t>
 	bool operator== ( HPointer<hiert_t, pointer_type_t, access_type_t> const& ) const;
 	template<typename hiert_t>
+	bool operator== ( hiert_t const* const ) const;
+	template<typename hiert_t>
 	bool operator!= ( HPointer<hiert_t, pointer_type_t, access_type_t> const& ) const;
+	template<typename hiert_t>
+	bool operator!= ( hiert_t const* const ) const;
 	tType* operator-> ( void ) const;
 	tType* raw ( void ) const;
 	bool operator! ( void ) const;
@@ -268,9 +272,42 @@ bool HPointer<tType, pointer_type_t, access_type_t>::operator== ( HPointer<hier_
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 template<typename hier_t>
+bool HPointer<tType, pointer_type_t, access_type_t>::operator== ( hier_t const* const a_ptPointer ) const
+	{
+	return ( ( ! ( f_poShared || a_ptPointer ) ) || ( f_poShared->f_ptPointer == a_ptPointer ) );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename>class access_type_t>
+template<typename hier_t>
 bool HPointer<tType, pointer_type_t, access_type_t>::operator!= ( HPointer<hier_t, pointer_type_t, access_type_t>const & a_tPointer ) const
 	{
-	return ( ( f_poShared && ! reinterpret_cast<HPointer const*>( &a_tPointer )->f_poShared ) || ( ! f_poShared && reinterpret_cast<HPointer const*>( &a_tPointer )->f_poShared ) || ( f_poShared && reinterpret_cast<HPointer const *>( &a_tPointer )->f_poShared && ( f_poShared->f_ptPointer != reinterpret_cast<HPointer const*>( &a_tPointer)->f_poShared->f_ptPointer ) ) );
+	return ( ( f_poShared && ! reinterpret_cast<HPointer const*>( &a_tPointer )->f_poShared )
+			|| ( ! f_poShared && reinterpret_cast<HPointer const*>( &a_tPointer )->f_poShared )
+			|| ( f_poShared && reinterpret_cast<HPointer const *>( &a_tPointer )->f_poShared
+				&& ( f_poShared->f_ptPointer != reinterpret_cast<HPointer const*>( &a_tPointer)->f_poShared->f_ptPointer ) ) );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename>class access_type_t>
+template<typename hier_t>
+bool HPointer<tType, pointer_type_t, access_type_t>::operator!= ( hier_t const* const a_ptPointer ) const
+	{
+	return ( ( f_poShared && ( a_ptPointer != f_poShared->f_ptPointer ) ) || ( ! f_poShared && a_ptPointer ) );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename>class access_type_t, typename hier_t>
+bool operator== ( hier_t const* const a_ptPointer, HPointer<tType, pointer_type_t, access_type_t> const& a_oPointer )
+	{
+	return ( a_oPointer == a_ptPointer );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename>class access_type_t, typename hier_t>
+bool operator!= ( hier_t const* const a_ptPointer, HPointer<tType, pointer_type_t, access_type_t> const& a_oPointer )
+	{
+	return ( a_oPointer != a_ptPointer );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,

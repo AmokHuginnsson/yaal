@@ -38,11 +38,11 @@ namespace hconsole
 
 HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 		int a_iColumn, int a_iHeight, int a_iWidth, char const * a_pcLabel,
-		HListControl::item_list_ptr_t a_oWindows )
+		HWindowListControl::item_list_ptr_t a_oWindows )
 									:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 											a_iWidth, a_pcLabel ),
 										HSearchableControl ( false ),
-										HListControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
+										HListControl_t<HWindow::ptr_t> ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 												a_iWidth, a_pcLabel, a_oWindows )
 	{
 	M_PROLOG
@@ -53,8 +53,7 @@ HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 HWindowListControl::~HWindowListControl ( void )
 	{
 	M_PROLOG
-	HWindowListControl::remove_tail ( D_FORCE_REMOVE_ELEMENT );
-	HWindowListControl::flush ( ); /* see htree.h for explanation ! */
+/*	HWindowListControl::remove_tail ( D_FORCE_REMOVE_ELEMENT ); */
 	return;
 	M_EPILOG
 	}
@@ -62,15 +61,12 @@ HWindowListControl::~HWindowListControl ( void )
 int HWindowListControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
-	HElement * l_poElement = f_poSelected;
-	a_iCode = HListControl::process_input ( a_iCode );
-	if ( ( f_iQuantity > 1 ) && ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) ) )
+	a_iCode = HListControl_t<HWindow::ptr_t>::process_input ( a_iCode );
+	if ( ( f_oList->size() > 1 ) && ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) ) )
 		{
-		go ( f_iControlOffset + f_iCursorPosition - 1 );
+		f_oList->go ( f_iControlOffset + f_iCursorPosition - 1 );
 		a_iCode = KEY < '\t' >::meta;
 		}
-	else
-		f_poSelected = l_poElement;
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -78,48 +74,18 @@ int HWindowListControl::process_input ( int a_iCode )
 void HWindowListControl::refresh ( void )
 	{
 	M_PROLOG
-	HElement * l_poElement = f_poSelected;
-	if ( ! f_iQuantity )
-		return;
-	f_iQuantity --;
-	if ( ( f_iControlOffset + f_iCursorPosition ) >= f_iQuantity )
-		{
-		if ( f_iControlOffset )
-			{
-			f_iControlOffset --;
-			f_poSelected = f_poFirstVisibleRow;
-			to_head ( );
-			f_poFirstVisibleRow = f_poSelected;
-			}
-		else
-			f_iCursorPosition --;
-		}
-	HListControl::refresh ( );
-	f_iQuantity ++;
-	f_poSelected = l_poElement;
+	HListControl_t<HWindow::ptr_t>::refresh ( );
 	M_EPILOG
 	}
 
-HItem & HWindowListControl::add_tail ( HItem * a_poElement )
+/*
+void HWindowListControl::add_tail ( HItem * a_poElement )
 	{
 	M_PROLOG
-	HItem * l_poItem = & HListControl::add_tail ( a_poElement );
-	if ( f_iQuantity > 1 )
-		{
-		exchange ( - 2, - 1 );
-		if ( f_iQuantity > f_iHeightRaw )
-			{
-			go ( 0 );
-			to_head ( f_iHeightRaw );
-			f_poFirstVisibleRow = f_poSelected;
-			}
-		else
-			f_poFirstVisibleRow = f_poHook;
-		go ( - 2 );
-		}
-	return ( * l_poItem );
+	f_oList->push_back ( a_poElement );
 	M_EPILOG
 	}
+*/
 
 }
 

@@ -45,6 +45,7 @@ public:
 	virtual ~HWindowListControl ( void );
 	virtual int process_input ( int );
 	virtual void refresh ( void );
+	virtual void set_child_control_data_for_cell( int, HControl* ){}
 protected:
 	};
 

@@ -113,7 +113,7 @@ public:
 	int size ( void );
 	tType & add_element ( tType * = NULL ); /* adds new element at current cursor position */
 	tType & add_head ( tType * = NULL );    /* adds new element at beggining of the list */
-	tType const & add_tail ( tType const * = NULL );	/* adds new element at end of the list */
+	tType & add_tail ( tType const * = NULL );	/* adds new element at end of the list */
 	void push_back ( tType const & );
 	tType & add_at ( int, tType * = NULL ); /* adds new element at specified position */
 /* adds element in the way that keeps order */
@@ -533,7 +533,7 @@ tType & HList< tType >::add_head ( tType * a_ptObject )
 	}
 
 template < typename tType >
-tType const & HList< tType >::add_tail ( tType const * a_ptObject )
+tType & HList< tType >::add_tail ( tType const * a_ptObject )
 	{
 	M_PROLOG
 	HElement * l_poElement = new HElement ( f_poHook );
