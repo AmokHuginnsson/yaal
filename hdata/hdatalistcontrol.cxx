@@ -64,11 +64,7 @@ void HDataListControl::load ( int long /*a_iId*/ )
 	{
 	M_PROLOG
 	int l_iCount = 0, l_iCtr = 0, l_iQuantity = f_oList->size();
-	int l_iCursorPosition = f_iCursorPosition;
-	int l_iControlOffset = f_iControlOffset;
-	HElement * l_poSelected = f_poSelected;
-	HElement * l_poFirstVisibleRow = f_poFirstVisibleRow;
-	HItem l_oItem ( f_oHeader.quantity ( ) );
+	HItem l_oItem ( f_oHeader.size ( ) );
 	HDataWindow * l_poParent = dynamic_cast < HDataWindow * > ( f_poParent );
 	M_ASSERT ( l_poParent );
 	l_poParent->set_sync_store ( & l_oItem );
@@ -77,31 +73,21 @@ void HDataListControl::load ( int long /*a_iId*/ )
 	else
 		l_iCount = f_poRecordSet->open ( );
 	l_poParent->status_bar ( )->init_progress ( static_cast < double > ( l_iCount ), "Collecting ..." );
-	if ( f_oList->size() )
-		go ( 0 );
+	model_t::HIterator it = f_oList->begin();
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
 		l_poParent->status_bar ( )->update_progress ( );
-		if ( l_iCtr ++ < l_iQuantity )
+		if ( it != f_oList->end() )
 			{	
-			f_poSelected->get_object ( ) = l_oItem;
-			to_tail ( );
+			(*it) = l_oItem;
+			++ it;
 			}
 		else
-			add_tail ( & l_oItem );
+			f_oList->push_back ( l_oItem );
 		f_poRecordSet->move_next ( );
 		}
-	if ( l_poSelected )
-		f_poSelected = l_poSelected;
-	else
-		f_poSelected = f_poHook;
-	if ( l_poFirstVisibleRow )
-		f_poFirstVisibleRow = l_poFirstVisibleRow;
-	else
-		f_poFirstVisibleRow = f_poHook;
-	f_iCursorPosition = l_iCursorPosition;
-	f_iControlOffset = l_iControlOffset;
-	while ( l_iCtr ++ < l_iQuantity )remove_tail ( D_EMPTY_IF_NOT_EMPTIED );
+	while ( l_iCtr ++ < l_iQuantity )
+		f_oList->remove_tail();
 	l_poParent->set_sync_store ( );
 	return;
 	M_EPILOG
@@ -110,14 +96,14 @@ void HDataListControl::load ( int long /*a_iId*/ )
 int long HDataListControl::get_current_id ( void )
 	{
 	M_PROLOG
-	return ( static_cast < HItem * > ( & f_poSelected->get_object ( ) )->m_lId );
+	return ( (*f_oCursor).m_lId );
 	M_EPILOG
 	}
 
 void HDataListControl::add_new ( void )
 	{
 	M_PROLOG
-	add_tail ( );
+	f_oList->add_tail ( );
 	process_input ( KEY_CODES::D_HOME );
 	process_input ( KEY_CODES::D_END );
 	return;
@@ -127,7 +113,7 @@ void HDataListControl::add_new ( void )
 void HDataListControl::cancel_new ( void )
 	{
 	M_PROLOG
-	remove_tail ( D_EMPTY_IF_NOT_EMPTIED );
+	f_oList->remove_tail();
 	if ( f_oList->size() )
 		{
 		process_input ( KEY_CODES::D_HOME );

@@ -41,8 +41,7 @@ class HDataWindow;
 class HDataTreeControl : public HDataControl, public virtual hconsole::HTreeControl
 	{
 public:
-	HDataTreeControl ( dbwrapper::HRecordSet *, HDataWindow *, int, int, int, int, char const *,
-			bool = true, int = -1, int = -1, int = -1 );
+	HDataTreeControl ( dbwrapper::HRecordSet *, HDataWindow *, int, int, int, int, char const * );
 	virtual ~HDataTreeControl ( void );
 	virtual void load ( int long );
 	};

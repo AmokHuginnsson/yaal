@@ -176,19 +176,20 @@ class HListControl_t : public HBaseListControl
 	{
 public:
 	typedef HItem_t<tType> row_t;
-	typedef yaal::hcore::HList<row_t> item_list_t;
-	typedef typename item_list_t::HIterator iterator_t;
-	typedef yaal::hcore::HPointer<item_list_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> item_list_ptr_t;
+	typedef yaal::hcore::HList<row_t> model_t;
+	typedef typename model_t::HIterator iterator_t;
+	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
 	HListControl_t ( HWindow *,		 	/* parent */
 								 int,						/* row */
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 char const *, item_list_ptr_t = item_list_ptr_t() );	/* label */
-	item_list_t const& get_data ( void ) const;
+								 char const *, model_ptr_t = model_ptr_t() );	/* label */
+	model_t const& get_data ( void ) const;
 	void add_tail ( row_t& );
 protected:
-	item_list_ptr_t f_oList;
+	model_ptr_t f_oList;
+	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
 	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */
 	iterator_t	f_oCurrentMatch;		/* row that has current pattern match */
 	iterator_t	f_oIterator;		/* row that has current pattern match */
@@ -204,13 +205,13 @@ protected:
 
 template <typename tType>
 HListControl_t<tType>::HListControl_t ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-		int a_iHeight, int a_iWidth, char const * a_pcLabel, item_list_ptr_t a_oData )
+		int a_iHeight, int a_iWidth, char const * a_pcLabel, model_ptr_t a_oData )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
 								a_pcLabel ),
 							HSearchableControl ( true ),
 							HBaseListControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcLabel ),
-	f_oList ( ( !!a_oData ) ? a_oData : item_list_ptr_t ( new item_list_t() ) ),
-	f_oFirstVisibleRow ( ), f_oCurrentMatch ( ), f_oIterator()
+	f_oList ( ( !!a_oData ) ? a_oData : model_ptr_t ( new model_t() ) ),
+	f_oCursor(), f_oFirstVisibleRow ( ), f_oCurrentMatch ( ), f_oIterator()
 	{
 	return;
 	}
@@ -301,7 +302,7 @@ void HListControl_t<tType>::add_tail( row_t& a_tRow )
 	}
 
 template <typename tType>
-typename HListControl_t<tType>::item_list_t const& HListControl_t<tType>::get_data ( void ) const
+typename HListControl_t<tType>::model_t const& HListControl_t<tType>::get_data ( void ) const
 	{
 	return ( (*f_oList) );
 	}
@@ -313,16 +314,16 @@ class CompareListControlItems
 public:
 	CompareListControlItems ( list_control_helper::OSortHelper& a_roSortHelper )
 		: f_roSortHelper ( a_roSortHelper ) { }
-	bool operator() ( typename HListControl_t<tType>::item_list_t::HIterator const&, typename HListControl_t<tType>::item_list_t::HIterator const& ) const;
+	bool operator() ( typename HListControl_t<tType>::model_t::HIterator const&, typename HListControl_t<tType>::model_t::HIterator const& ) const;
 	};
 
 template <typename tType>
-bool CompareListControlItems<tType>::operator() ( typename HListControl_t<tType>::item_list_t::HIterator const& a_oLeft,
-		typename HListControl_t<tType>::item_list_t::HIterator const& a_oRight ) const
+bool CompareListControlItems<tType>::operator() ( typename HListControl_t<tType>::model_t::HIterator const& a_oLeft,
+		typename HListControl_t<tType>::model_t::HIterator const& a_oRight ) const
 	{
 	M_PROLOG
-	typename HListControl_t<tType>::item_list_t::HIterator const& l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oLeft : a_oRight;
-	typename HListControl_t<tType>::item_list_t::HIterator const& l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oRight : a_oLeft;
+	typename HListControl_t<tType>::model_t::HIterator const& l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oLeft : a_oRight;
+	typename HListControl_t<tType>::model_t::HIterator const& l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oRight : a_oLeft;
 	tType const& l_roLeftCell = ( *l_oLeft ) [ f_roSortHelper.f_iSortColumn ];
 	tType const& l_roRightCell = ( *l_oRight ) [ f_roSortHelper.f_iSortColumn ];
 	return ( list_control_helper::compare_cells( l_roLeftCell, l_roRightCell, f_roSortHelper ) );

@@ -38,7 +38,7 @@ namespace hconsole
 
 HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 		int a_iColumn, int a_iHeight, int a_iWidth, char const * a_pcLabel,
-		HWindowListControl::item_list_ptr_t a_oWindows )
+		HWindowListControl::model_ptr_t a_oWindows )
 									:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 											a_iWidth, a_pcLabel ),
 										HSearchableControl ( false ),

@@ -41,7 +41,7 @@ class HWindow;
 class HWindowListControl : public HListControl_t<HWindow::ptr_t>
 	{
 public:
-	HWindowListControl ( HWindow *, int, int, int, int, char const *, HWindowListControl::item_list_ptr_t );
+	HWindowListControl ( HWindow *, int, int, int, int, char const *, HWindowListControl::model_ptr_t );
 	virtual ~HWindowListControl ( void );
 	virtual int process_input ( int );
 	virtual void refresh ( void );

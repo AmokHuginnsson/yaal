@@ -75,7 +75,7 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 	l_oXml.init ( a_pcResource );
 	HXml::ONode & l_sNode = l_oXml.parse ( "/resource/menu" );
 	f_psRootMenu = build_sub_menu ( l_sNode, a_roHandlers );
-	l_poMainWindow = dynamic_cast < HMainWindow * > ( f_poForegroundWindow );
+	l_poMainWindow = dynamic_cast < HMainWindow * > ( &*f_oForegroundWindow );
 	M_ASSERT ( l_poMainWindow );
 	l_poMainWindow->init_menu ( this, f_psRootMenu );
 	return ( l_iError );
@@ -92,7 +92,7 @@ OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode & a_rsNode,
 	OMenuItem l_sMenuItem, * l_psMenu = NULL;
 	HXml::ONode * l_psNode = NULL;
 	HList < OMenuItem > l_oSubMenu;
-	if ( ! a_rsNode.f_oChilds.quantity ( ) )
+	if ( ! a_rsNode.f_oChilds.size ( ) )
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
 
 	if ( a_rsNode.f_oName == "menu" )
@@ -110,7 +110,7 @@ OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode & a_rsNode,
 				+ '=' + a_rsNode.f_oContents.head ( ), errno );
 	l_sMenuItem.reset ( );
 	l_oSubMenu.add_tail ( & l_sMenuItem );
-	l_psMenu = new OMenuItem [ l_iCount = l_oSubMenu.quantity ( ) ];
+	l_psMenu = new OMenuItem [ l_iCount = l_oSubMenu.size ( ) ];
 	l_oSubMenu.go ( - 1 );
 	for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 		l_psMenu [ l_iCtr ] = ( * l_oSubMenu.to_tail ( ) );
@@ -125,7 +125,7 @@ void HDataProcess::build_menu_item ( HXml::ONode & a_rsNode,
 	char const * const l_pcError = _ ( "malformed resource file (menu section)" );
 	char const * const l_pcUnexpected = _ ( ": unexpected node: " );
 	HXml::ONode * l_psNode = NULL;
-	if ( ! a_rsNode.f_oChilds.quantity ( ) )
+	if ( ! a_rsNode.f_oChilds.size ( ) )
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
 
 	if ( a_rsNode.f_oName == "menu_item" )
@@ -182,7 +182,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 	M_PROLOG
 	HItem * l_poItem = NULL;
 	HDataWindow * l_poWindow = NULL;
-	if ( f_poWindows->quantity ( ) )
+	if ( f_oWindows->size ( ) )
 		{
 		f_poWindows->go ( - 1 );
 		while ( ( l_poItem = f_poWindows->to_tail ( 1, HWindowListControl::D_TREAT_AS_OPENED ) ) )

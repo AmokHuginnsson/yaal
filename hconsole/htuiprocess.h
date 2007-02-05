@@ -42,8 +42,8 @@ class HTUIProcess : public HHandler, protected yaal::hcore::HProcess
 	{
 protected:
 	HWindow::ptr_t f_oMainWindow; /* self explanary */
-	HWindowListControl::item_list_t::HIterator f_oForegroundWindow; /* self explanary */
-	HWindowListControl::item_list_ptr_t f_oWindows;	/* current existing windows */
+	HWindowListControl::model_t::HIterator f_oForegroundWindow; /* self explanary */
+	HWindowListControl::model_ptr_t f_oWindows;	/* current existing windows */
 public:
 	HTUIProcess ( size_t = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );
