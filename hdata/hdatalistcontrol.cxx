@@ -73,7 +73,7 @@ void HDataListControl::load ( int long /*a_iId*/ )
 	else
 		l_iCount = f_poRecordSet->open ( );
 	l_poParent->status_bar ( )->init_progress ( static_cast < double > ( l_iCount ), "Collecting ..." );
-	model_t::HIterator it = f_oList->begin();
+	model_t::iterator it = f_oList->begin();
 	while ( ! f_poRecordSet->is_eof ( ) )
 		{
 		l_poParent->status_bar ( )->update_progress ( );

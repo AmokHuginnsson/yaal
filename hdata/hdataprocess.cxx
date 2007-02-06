@@ -180,19 +180,20 @@ HDataBase * HDataProcess::data_base ( void )
 int HDataProcess::handler_quit ( int a_iCode, void * )
 	{
 	M_PROLOG
-	HItem * l_poItem = NULL;
 	HDataWindow * l_poWindow = NULL;
 	if ( f_oWindows->size ( ) )
 		{
-		f_poWindows->go ( - 1 );
-		while ( ( l_poItem = f_poWindows->to_tail ( 1, HWindowListControl::D_TREAT_AS_OPENED ) ) )
+		model_t::iterator it = f_oWindows->begin();
+		if ( it != f_oWindows->end() )
+			++ it;
+		for ( ; it != f_oWindows->end(); ++ it )
 			{
-			l_poWindow = dynamic_cast < HDataWindow * > ( static_cast < HWindow * > ( ( * l_poItem ) [ 0 ].get < void * > ( ) ) );
-			if ( l_poWindow && l_poWindow->is_modified ( ) )
+			l_poWindow = dynamic_cast<HDataWindow*>( static_cast<HWindow*>( &*(*it)[0] ) );
+			if ( l_poWindow && l_poWindow->is_modified() )
 				{
-				f_poForegroundWindow = l_poWindow;
-				handler_refresh ( 0 );
-				if ( ! l_poWindow->status_bar ( )->confirm ( "exit program" ) )
+				f_oWindows->select( l_poWindow );
+				handler_refresh( 0 );
+				if ( ! l_poWindow->status_bar()->confirm ( "exit program" ) )
 					return ( 0 );
 				}
 			}
@@ -205,9 +206,9 @@ int HDataProcess::handler_close_window ( int a_iCode, void * )
 	{
 	M_PROLOG
 	HDataWindow * l_poWindow = NULL;
-	if ( f_poForegroundWindow )
+	if ( !! (*f_oForegroundWindow) )
 		{
-		l_poWindow = dynamic_cast < HDataWindow * > ( f_poForegroundWindow );
+		l_poWindow = dynamic_cast<HDataWindow*> ( &*f_oForegroundWindow );
 		if ( l_poWindow
 				&& l_poWindow->is_modified ( )
 				&& ! l_poWindow->status_bar ( )->confirm ( "close window" ) )

@@ -245,10 +245,10 @@ void HDataWindow::set_mode ( DOCUMENT::mode_t a_eMode )
 		{
 		case ( DOCUMENT::D_VIEW ):
 			{
-			l_iCount = f_oEditModeControls.quantity ( );
+			l_iCount = f_oEditModeControls.size ( );
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				f_oEditModeControls [ l_iCtr ]->enable ( false );
-			l_iCount = f_oViewModeControls.quantity ( );
+			l_iCount = f_oViewModeControls.size ( );
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				f_oViewModeControls [ l_iCtr ]->enable ( true );
 			if ( l_iCount )
@@ -257,10 +257,10 @@ void HDataWindow::set_mode ( DOCUMENT::mode_t a_eMode )
 		break;
 		case ( DOCUMENT::D_EDIT ):
 			{
-			l_iCount = f_oViewModeControls.quantity ( );
+			l_iCount = f_oViewModeControls.size ( );
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				f_oViewModeControls [ l_iCtr ]->enable ( false );
-			l_iCount = f_oEditModeControls.quantity ( );
+			l_iCount = f_oEditModeControls.size ( );
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				f_oEditModeControls [ l_iCtr ]->enable ( true );
 			if ( l_iCount )
@@ -282,15 +282,15 @@ void HDataWindow::sync ( void )
 	if ( f_poSyncStore )
 		{
 		l_iCount = f_poSyncStore->get_size ( );
-		if ( f_oValues.quantity ( ) >= l_iCount )
+		if ( f_oValues.size ( ) >= l_iCount )
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				( * f_poSyncStore ) [ l_iCtr ] ( static_cast < char const * > ( f_oValues [ l_iCtr ] ) );
 		( * f_poSyncStore ).m_lId = m_lId;
 		}
 	else if ( ( f_eMode == D_ADDING ) || ( f_eMode == D_EDITING ) )
 		{
-		l_iCount = f_oEditModeControls.quantity ( );
-		if ( f_oValues.quantity ( ) >= l_iCount )
+		l_iCount = f_oEditModeControls.size ( );
+		if ( f_oValues.size ( ) >= l_iCount )
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				f_oValues [ l_iCtr ] = f_oEditModeControls [ l_iCtr ]->get ( ).get < HString const & > ( );
 		m_lId = f_poMainControl->get_current_id ( );

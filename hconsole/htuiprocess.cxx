@@ -109,7 +109,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow::ptr_t a_oMain
 			& HTUIProcess::handler_jump_meta_direct );
 		}
 	f_oMainWindow = l_oMainWindow;
-	f_oForegroundWindow = HWindowListControl::model_t::HIterator();
+	f_oForegroundWindow = HWindowListControl::model_t::cyclic_iterator();
 	f_oCommandHandlers [ "quit" ] = static_cast < HANDLER_t > ( & HTUIProcess::handler_quit );
 	handler_refresh ( 0 );
 	return ( 1 );
@@ -317,7 +317,7 @@ int HTUIProcess::handler_jump_meta_direct ( int a_iCode, void * )
 int HTUIProcess::handler_close_window ( int a_iCode, void * )
 	{
 	M_PROLOG
-	HWindowListControl::model_t::HIterator it = f_oForegroundWindow;
+	HWindowListControl::model_t::cyclic_iterator it = f_oForegroundWindow;
 	-- f_oForegroundWindow;
 	f_oWindows->erase ( it );
 	handler_refresh ( 0 );

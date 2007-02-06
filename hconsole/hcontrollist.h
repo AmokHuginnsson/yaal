@@ -44,9 +44,9 @@ public:
 	typedef hcore::HList<HControl::ptr_t> control_list_t;
 private:
 	control_list_t f_oList;
-	control_list_t::HIterator & f_roFocused;
+	control_list_t::cyclic_iterator& f_roFocused;
 public:
-	HControlList ( control_list_t::HIterator & );
+	HControlList ( control_list_t::cyclic_iterator & );
 	/* find next enabled control in window, if short cut char is specified */
 	void next_enabled ( char = 0 ); /* enabled and match shortcut char */
 	void remove_head( void );

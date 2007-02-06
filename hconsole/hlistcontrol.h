@@ -177,7 +177,7 @@ class HListControl_t : public HBaseListControl
 public:
 	typedef HItem_t<tType> row_t;
 	typedef yaal::hcore::HList<row_t> model_t;
-	typedef typename model_t::HIterator iterator_t;
+	typedef typename model_t::iterator iterator_t;
 	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
 	HListControl_t ( HWindow *,		 	/* parent */
 								 int,						/* row */
@@ -314,16 +314,16 @@ class CompareListControlItems
 public:
 	CompareListControlItems ( list_control_helper::OSortHelper& a_roSortHelper )
 		: f_roSortHelper ( a_roSortHelper ) { }
-	bool operator() ( typename HListControl_t<tType>::model_t::HIterator const&, typename HListControl_t<tType>::model_t::HIterator const& ) const;
+	bool operator() ( typename HListControl_t<tType>::model_t::iterator const&, typename HListControl_t<tType>::model_t::iterator const& ) const;
 	};
 
 template <typename tType>
-bool CompareListControlItems<tType>::operator() ( typename HListControl_t<tType>::model_t::HIterator const& a_oLeft,
-		typename HListControl_t<tType>::model_t::HIterator const& a_oRight ) const
+bool CompareListControlItems<tType>::operator() ( typename HListControl_t<tType>::model_t::iterator const& a_oLeft,
+		typename HListControl_t<tType>::model_t::iterator const& a_oRight ) const
 	{
 	M_PROLOG
-	typename HListControl_t<tType>::model_t::HIterator const& l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oLeft : a_oRight;
-	typename HListControl_t<tType>::model_t::HIterator const& l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oRight : a_oLeft;
+	typename HListControl_t<tType>::model_t::iterator const& l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oLeft : a_oRight;
+	typename HListControl_t<tType>::model_t::iterator const& l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oRight : a_oLeft;
 	tType const& l_roLeftCell = ( *l_oLeft ) [ f_roSortHelper.f_iSortColumn ];
 	tType const& l_roRightCell = ( *l_oRight ) [ f_roSortHelper.f_iSortColumn ];
 	return ( list_control_helper::compare_cells( l_roLeftCell, l_roRightCell, f_roSortHelper ) );

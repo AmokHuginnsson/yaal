@@ -36,7 +36,7 @@ namespace yaal
 namespace hconsole
 {
 
-HControlList::HControlList ( control_list_t::HIterator & a_roFocused ) : f_oList ( ), f_roFocused ( a_roFocused )
+HControlList::HControlList ( control_list_t::cyclic_iterator& a_roFocused ) : f_oList ( ), f_roFocused ( a_roFocused )
 	{
 	M_PROLOG
 	return;
@@ -47,7 +47,7 @@ void HControlList::next_enabled ( char a_cShorcut )
 	{
 	M_PROLOG
 	bool l_bLoop = true;
-	HControlList::control_list_t::HIterator it = f_roFocused;
+	HControlList::control_list_t::cyclic_iterator it = f_roFocused;
 	do
 		{
 		++ f_roFocused;
@@ -97,7 +97,7 @@ void HControlList::add_control( HControl::ptr_t a_oControl )
 void HControlList::refresh_all( void )
 	{
 	M_PROLOG
-	for ( control_list_t::HIterator it = f_oList.begin();
+	for ( control_list_t::iterator it = f_oList.begin();
 			it != f_oList.end(); ++ it )
 		if ( it != f_roFocused )
 			(*it)->refresh ( );
@@ -112,7 +112,7 @@ int HControlList::hit_test_all( mouse::OMouse& a_rsMouse )
 	M_PROLOG
 	if ( (*f_roFocused)->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
 		return ( (*f_roFocused)->click ( a_rsMouse ) );
-	for ( control_list_t::HIterator it = f_oList.begin();
+	for ( control_list_t::iterator it = f_oList.begin();
 			it != f_oList.end(); ++ it )
 		if ( (*it)->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
 			return ( (*it)->click ( a_rsMouse ) );
