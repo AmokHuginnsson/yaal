@@ -620,14 +620,14 @@ tType& HList<tType>::add_orderly ( tType& a_rtObject,
 		l_iOldIndex = l_iIndex;
 		l_iIndex = ( l_iLower + l_iUpper ) / 2;
 		element_by_index ( l_iIndex );
-		if ( is_above_c ( f_poIndex, l_poElement ) )
+		if ( less ( f_poIndex->f_tObject, l_poElement->f_tObject ) )
 			l_iLower = l_iIndex;
 		else
 			l_iUpper = l_iIndex;
 		}
 	if ( f_poIndex )
 		{
-		if ( is_above_c ( f_poIndex, l_poElement ) )
+		if ( less ( f_poIndex->f_tObject, l_poElement->f_tObject ) )
 			f_poIndex = f_poIndex->f_poNext;
 		else
 			l_bBefore = true;

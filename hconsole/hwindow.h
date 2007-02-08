@@ -48,8 +48,8 @@ public:
 protected:
 	bool								f_bInitialised;		/* was window properly initialised? */
 	hcore::HString			f_oTitle;					/* title of window */
-	HControlList::control_list_t::cyclic_iterator	f_oFocusedChild;	/* points to control that has focus */
-	HControlList::control_list_t::cyclic_iterator f_oPreviousFocusedChild; /* control that had focus before
+	HControlList::model_t::cyclic_iterator	f_oFocusedChild;	/* points to control that has focus */
+	HControlList::model_t::cyclic_iterator f_oPreviousFocusedChild; /* control that had focus before
 																									 focus went to status bar */	
 	HControlList				f_oControls;	/* list of all control inside _this_ wind */
 	HStatusBarControl::ptr_t		f_oStatusBar;

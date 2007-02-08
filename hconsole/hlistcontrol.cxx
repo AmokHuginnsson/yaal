@@ -522,23 +522,6 @@ void HBaseListControl::add_column ( int const & a_riColumn, char const * a_pcNam
 	M_EPILOG
 	}
 
-#if 0
-HItem & HBaseListControl::add_orderly ( HItem & a_roItem, sort_order_t a_eOrder )
-	{
-	M_PROLOG
-	HItem * l_poDummy = NULL;
-	l_poDummy = & HList<HItem>::add_orderly ( a_roItem, a_eOrder );
-	f_iCursorPosition = 0;
-	f_iControlOffset = 0;
-	f_oFirstVisibleRow = f_poHook;
-	f_poSelected = f_poHook;
-	n_bNeedRepaint = true;
-	return ( * l_poDummy );
-	M_EPILOG
-	}
-#endif
-
-
 int HBaseListControl::set_focus ( char a_cShorcut )
 	{
 	M_PROLOG
@@ -577,34 +560,6 @@ void HBaseListControl::recalculate_column_widths ( void )
 	}
 
 #if 0
-OListBits::status_t HBaseListControl::remove_element ( treatment_t const & a_eFlag, HItem * * a_ppoItem )
-	{
-	M_PROLOG
-	bool l_bFlag = true;
-	status_t l_eError = D_OK;
-	if ( f_iControlOffset
-			&& ( ( f_iControlOffset + f_iHeightRaw ) == l_iSize ) )
-		{
-		f_iControlOffset --;
-		to_head ( f_oFirstVisibleRow );
-		}
-	else if ( f_iCursorPosition && ( f_iCursorPosition == ( l_iSize - 1 ) ) )
-		f_iCursorPosition --;
-	else
-		l_bFlag = false;
-	if ( f_poSelected == f_oFirstVisibleRow )
-		to_tail ( f_oFirstVisibleRow );
-	n_bNeedRepaint = true;
-	l_eError = HList<HItem> ::remove_element ( a_eFlag, a_ppoItem );
-	if ( l_bFlag )
-		to_head();
-	refresh();
-	return ( l_eError );
-	M_EPILOG
-	}
-#endif
-
-#if 0
 OListBits::status_t HBaseListControl::remove_tail ( treatment_t const & a_eFlag, HItem * * a_ppoItem )
 	{
 	M_PROLOG
@@ -631,25 +586,28 @@ OListBits::status_t HBaseListControl::remove_tail ( treatment_t const & a_eFlag,
 	}
 #endif
 
-
 namespace list_control_helper
 {
 
-yaal::hcore::HString const GetLongFromCell( HInfo const & a_oInfo )
+template<>
+yaal::hcore::HString const GetLongFromCell( HInfo const& a_oInfo )
 	{
 	return ( HString ( a_oInfo.get<int long>() ) );
 	}
 
-yaal::hcore::HString const GetDoubleFromCell( HInfo const & a_oInfo )
+template<>
+yaal::hcore::HString const GetDoubleFromCell( HInfo const& a_oInfo )
 	{
 	return ( HString ( a_oInfo.get<double>() ) );
 	}
 
-yaal::hcore::HString const GetStringFromCell( HInfo const & a_oInfo )
+template<>
+yaal::hcore::HString const GetStringFromCell( HInfo const& a_oInfo )
 	{
 	return ( a_oInfo.get<yaal::hcore::HString const &>() );
 	}
 
+template<>
 char const * GetTimeFromCell( HInfo const & a_oInfo )
 	{
 	return ( a_oInfo.get<yaal::hcore::HTime const &>() );
@@ -673,6 +631,7 @@ void OSortHelper::progress( void )
 	return;
 	}
 
+template<>
 bool compare_cells( HInfo const & a_oLeft, HInfo const & a_oRight, OSortHelper & a_roSortHelper )
 	{
 	double l_dDifference = 0;

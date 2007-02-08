@@ -144,7 +144,7 @@ int HWindow::handler_jump_direct ( int a_iCode, void * )
 	 * argument, so a_iCode & 0x0ff is passed into the function,
 	 * a_iCode is consrtructed from ordinary char by D_KEY_META_ macro,
 	 * see console.h for details */
-	HControlList::control_list_t::cyclic_iterator it = f_oFocusedChild;
+	HControlList::model_t::cyclic_iterator it = f_oFocusedChild;
 	if ( a_iCode & 0x0ff00 )
 		{
 		f_oControls.next_enabled ( static_cast < char > ( a_iCode ) );

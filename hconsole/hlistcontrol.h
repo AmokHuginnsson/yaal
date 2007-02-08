@@ -133,8 +133,6 @@ public:
 										BITS::ALIGN::align_t const& = BITS::ALIGN::D_LEFT,		/* align */
 										const type_t& = D_HSTRING,	/* type */
 										HControl * = NULL );					/* control associated */
-//	virtual yaal::hcore::OListBits::status_t remove_element ( treatment_t const& = D_BLOCK_IF_NOT_EMPTIED, HItem_t * * = NULL );
-//	virtual HItem_t& add_orderly ( HItem_t&, sort_order_t = D_ASCENDING );
 	virtual int set_focus ( char = 0 );
 	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
 protected:
@@ -180,14 +178,18 @@ public:
 	typedef yaal::hcore::HList<row_t> model_t;
 	typedef typename model_t::iterator iterator_t;
 	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
-	HListControl_t ( HWindow *,		 	/* parent */
+	HListControl_t ( HWindow*,		 	/* parent */
 								 int,						/* row */
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 char const *, model_ptr_t = model_ptr_t() );	/* label */
+								 char const*, model_ptr_t = model_ptr_t() );	/* label */
 	model_t const& get_data ( void ) const;
-	void add_tail ( row_t& );
+	void add_tail( row_t& );
+	void add_orderly( row_t&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
+	void remove_current_row();
+	void set_current_row_cell( int, tType );
+	int long get_row_count( void );
 protected:
 	model_ptr_t f_oList;
 	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
@@ -205,7 +207,7 @@ protected:
 	};
 
 template <typename tType>
-HListControl_t<tType>::HListControl_t ( HWindow * a_poParent, int a_iRow, int a_iColumn,
+HListControl_t<tType>::HListControl_t ( HWindow* a_poParent, int a_iRow, int a_iColumn,
 		int a_iHeight, int a_iWidth, char const * a_pcLabel, model_ptr_t a_oData )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
 								a_pcLabel ),
@@ -221,6 +223,12 @@ template <typename tType>
 int long HListControl_t<tType>::do_size( void )
 	{
 	return ( (*f_oList).size() );
+	}
+
+template <typename tType>
+int long HListControl_t<tType>::get_row_count( void )
+	{
+	return ( do_size() );
 	}
 
 template <typename tType>
@@ -300,6 +308,53 @@ void HListControl_t<tType>::add_tail( row_t& a_tRow )
 	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
+	}
+
+template <typename tType>
+void HListControl_t<tType>::add_orderly ( row_t& a_tRow, yaal::hcore::OListBits::sort_order_t a_eOrder )
+	{
+	M_PROLOG
+	f_oList->add_orderly( a_tRow, a_eOrder );
+	f_iCursorPosition = 0;
+	f_iControlOffset = 0;
+	f_oCursor = f_oFirstVisibleRow = f_oList->begin();
+	n_bNeedRepaint = true;
+	return;
+	M_EPILOG
+	}
+
+template <typename tType>
+void HListControl_t<tType>::remove_current_row ( void )
+	{
+	M_PROLOG
+	bool l_bFlag = true;
+	if ( f_iControlOffset
+			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_oList->size() ) )
+		{
+		f_iControlOffset --;
+		++ f_oFirstVisibleRow;
+		}
+	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_oList->size() - 1 ) ) )
+		f_iCursorPosition --;
+	else
+		l_bFlag = false;
+	if ( f_oCursor == f_oFirstVisibleRow )
+		++ f_oFirstVisibleRow;
+	n_bNeedRepaint = true;
+	iterator_t it = f_oCursor;
+	if ( l_bFlag )
+		++ f_oCursor;
+	f_oList->erase ( it );
+	refresh();
+	return;
+	M_EPILOG
+	}
+
+template <typename tType>
+void HListControl_t<tType>::set_current_row_cell ( int a_iColumn, tType a_tValue )
+	{
+	(*f_oCursor)[ a_iColumn ] = a_tValue;
+	return;
 	}
 
 template <typename tType>
