@@ -38,7 +38,7 @@ namespace hdata
 
 class HDataWindow;
 
-class HDataListControl : public HDataControl, public virtual hconsole::HListControl
+class HDataListControl : public HDataControl, public virtual yaal::hconsole::HListControl
 	{
 public:
 	HDataListControl ( dbwrapper::HRecordSet *, HDataWindow *, int, int, int, int, char const * );

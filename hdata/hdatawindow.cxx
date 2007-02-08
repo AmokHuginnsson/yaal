@@ -84,11 +84,6 @@ HDataWindow::~HDataWindow ( void )
 						f_psResourcesArray [ l_iCtr ].f_iWidth,\
 						f_psResourcesArray [ l_iCtr ].f_pcLabel
 
-#define M_SETUP_ATTRIBUTES l_psAttr->f_bDrawLabel,\
-						l_psAttr->f_iDisabledAttribute,\
-						l_psAttr->f_iEnabledAttribute,\
-						l_psAttr->f_iFocusedAttribute
-
 int HDataWindow::init ( void )
 	{
 	M_PROLOG
@@ -132,7 +127,7 @@ int HDataWindow::init ( void )
 						l_psECR->f_pcMask, l_psECR->f_bReplace,
 						l_psECR->f_bMultiLine, l_psECR->f_bReadOnly, 
 						l_psECR->f_bRightAligned, l_psECR->f_bPassword,
-						l_psECR->f_iMaxHistoryLevel, M_SETUP_ATTRIBUTES );
+						l_psECR->f_iMaxHistoryLevel );
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_LIST ):
@@ -143,14 +138,17 @@ int HDataWindow::init ( void )
 				l_sListControlResource.f_bDrawHeader = true;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psLCR = static_cast < OListControlResource * > ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
-				l_poDataControl = new HDataListControl ( this, this, M_SETUP_STANDART,
-						l_psLCR->f_bCheckable, l_psLCR->f_bSortable, l_psLCR->f_bSearchable,
-						l_psLCR->f_bDrawHeader, M_SETUP_ATTRIBUTES );
+				HDataListControl* l_poList = NULL;
+				l_poDataControl = l_poList = new HDataListControl ( this, this, M_SETUP_STANDART );
+				l_poList->set_flags( ( l_psLCR->f_bCheckable ? HBaseListControl::FLAGS::D_CHECKABLE : HBaseListControl::FLAGS::D_NONE )
+						| ( l_psLCR->f_bSortable ? HBaseListControl::FLAGS::D_SORTABLE : HBaseListControl::FLAGS::D_NONE )
+						| ( l_psLCR->f_bEditable ? HBaseListControl::FLAGS::D_EDITABLE : HBaseListControl::FLAGS::D_NONE )
+						| ( l_psLCR->f_bDrawHeader ? HBaseListControl::FLAGS::D_EDITABLE : HBaseListControl::FLAGS::D_NONE ),
+						HBaseListControl::FLAGS::D_ALL );
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_TREE ):
-				l_poDataControl = new HDataTreeControl ( this, this, M_SETUP_STANDART,
-						M_SETUP_ATTRIBUTES );
+				l_poDataControl = new HDataTreeControl ( this, this, M_SETUP_STANDART );
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_COMBO ):
 			break;
@@ -160,6 +158,13 @@ int HDataWindow::init ( void )
 			break;
 			default :
 			break;
+			}
+		if ( l_poDataControl )
+			{
+			l_poDataControl->set_draw_label( l_psAttr->f_bDrawLabel );
+			l_poDataControl->set_attributes( l_psAttr->f_iDisabledAttribute,
+					l_psAttr->f_iEnabledAttribute,
+					l_psAttr->f_iFocusedAttribute );
 			}
 		switch ( f_psResourcesArray [ l_iCtr ].f_eRole )
 			{
@@ -222,7 +227,7 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
 	if ( f_psResourcesArray [ l_iParent ].f_eType == DATACONTROL_BITS::TYPE::D_LIST )
 		{
-		l_poPDC = dynamic_cast < HDataListControl * > ( f_oControls [ l_iParent ] );
+		l_poPDC = dynamic_cast < HDataListControl * > ( f_oControls.get_control_by_no( l_iParent ) );
 		if ( ! l_poPDC )
 			M_THROW ( "wrong control resource order",
 					l_iParent );

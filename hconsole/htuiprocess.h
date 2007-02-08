@@ -55,6 +55,7 @@ protected:
 	int process_mouse ( int );
 	int process_commands ( void );
 	int add_window ( HWindow::ptr_t );
+	void select( HWindow const* );
 	virtual int handler_alert ( int, void * = NULL );
 	virtual int handler_interrupt ( int, void * = NULL );
 	virtual int handler_idle ( int, void * = NULL );

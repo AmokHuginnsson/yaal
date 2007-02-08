@@ -191,7 +191,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 			l_poWindow = dynamic_cast<HDataWindow*>( static_cast<HWindow*>( &*(*it)[0] ) );
 			if ( l_poWindow && l_poWindow->is_modified() )
 				{
-				f_oWindows->select( l_poWindow );
+				select( l_poWindow );
 				handler_refresh( 0 );
 				if ( ! l_poWindow->status_bar()->confirm ( "exit program" ) )
 					return ( 0 );

@@ -68,6 +68,19 @@ namespace list_control_helper
 
 class HBaseListControl : virtual public HSearchableControl
 	{
+public:
+	struct FLAGS
+		{
+		typedef enum
+			{
+			D_NONE = 0,
+			D_CHECKABLE = 1,
+			D_SORTABLE = 2,
+			D_EDITABLE = 4,
+			D_DRAW_HEADER = 8,
+			D_ALL = -1
+			} list_flags_t;
+		};
 protected:
 	class HColumnInfo
 		{
@@ -86,18 +99,6 @@ protected:
 		HColumnInfo ( HColumnInfo const& );
 		HColumnInfo& operator = ( HColumnInfo const& );
 		friend class HBaseListControl;
-		};
-	struct FLAGS
-		{
-		typedef enum
-			{
-			D_NONE = 0,
-			D_CHECKABLE = 1,
-			D_SORTABLE = 2,
-			D_EDITABLE = 4,
-			D_DRAW_HEADER = 8,
-			D_ALL = -1
-			} list_flags_t;
 		};
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
