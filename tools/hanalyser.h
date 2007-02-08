@@ -37,8 +37,8 @@ namespace yaal
 namespace tools
 {
 
-typedef hcore::HList < int > double_ptr_list_t;
-class HAnalyser : public hcore::HTree < double_ptr_list_t >
+typedef hcore::HList<int> double_ptr_list_t;
+class HAnalyser : public hcore::HTree<double_ptr_list_t>
 	{
 	typedef enum
 		{

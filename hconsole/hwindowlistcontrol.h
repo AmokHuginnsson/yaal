@@ -38,7 +38,8 @@ namespace hconsole
 
 class HWindow;
 
-class HWindowListControl : public HListControl_t<HWindow::ptr_t>
+typedef HListControl_t<HWindow::ptr_t> HBaseWindowListControl;
+class HWindowListControl : public HBaseWindowListControl
 	{
 public:
 	HWindowListControl ( HWindow *, int, int, int, int, char const *, HWindowListControl::model_ptr_t );
@@ -46,7 +47,6 @@ public:
 	virtual int process_input ( int );
 	virtual void refresh ( void );
 	virtual void set_child_control_data_for_cell( int, HControl* ){}
-	virtual void select ( HWindow const* );	/* this one should be private :( */
 protected:
 	};
 

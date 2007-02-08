@@ -59,30 +59,54 @@ namespace
 
 struct FUNCTIONS
 	{
-	static int const D_FUNCTIONS = 0;
-	static int const D_SIN = 2;
-	static int const D_SINH = 1;
-	static int const D_COS = 4;
-	static int const D_COSH = 3;
-	static int const D_TG = 6;
-	static int const D_TGH = 5;
-	static int const D_CTG = 8;
-	static int const D_CTGH = 7;
-	static int const D_ARCSIN = 9;
-	static int const D_ARCCOS = 10;
-	static int const D_ARCTG = 11;
-	static int const D_ARCCTG = 12;
-	static int const D_EXP = 13;
-	static int const D_SQRT = 14;
-	static int const D_LN = 15;
-	static int const D_LOG = 16;
-	static int const D_ABS = 17;
-	static int const D_ADDITION = 1;
-	static int const D_MULTIPLICATION = 2;
-	static int const D_POWER = 3;
-	static int const D_SIGNUM = 4;
-	static int const D_BRACKET = 5;
+	static int const D_FUNCTIONS;
+	static int const D_SIN;
+	static int const D_SINH;
+	static int const D_COS;
+	static int const D_COSH;
+	static int const D_TG;
+	static int const D_TGH;
+	static int const D_CTG;
+	static int const D_CTGH;
+	static int const D_ARCSIN;
+	static int const D_ARCCOS;
+	static int const D_ARCTG;
+	static int const D_ARCCTG;
+	static int const D_EXP;
+	static int const D_SQRT;
+	static int const D_LN;
+	static int const D_LOG;
+	static int const D_ABS;
+	static int const D_ADDITION;
+	static int const D_MULTIPLICATION;
+	static int const D_POWER;
+	static int const D_SIGNUM;
+	static int const D_BRACKET;
 	};
+
+int const FUNCTIONS::D_FUNCTIONS = 0;
+int const FUNCTIONS::D_SIN = 2;
+int const FUNCTIONS::D_SINH = 1;
+int const FUNCTIONS::D_COS = 4;
+int const FUNCTIONS::D_COSH = 3;
+int const FUNCTIONS::D_TG = 6;
+int const FUNCTIONS::D_TGH = 5;
+int const FUNCTIONS::D_CTG = 8;
+int const FUNCTIONS::D_CTGH = 7;
+int const FUNCTIONS::D_ARCSIN = 9;
+int const FUNCTIONS::D_ARCCOS = 10;
+int const FUNCTIONS::D_ARCTG = 11;
+int const FUNCTIONS::D_ARCCTG = 12;
+int const FUNCTIONS::D_EXP = 13;
+int const FUNCTIONS::D_SQRT = 14;
+int const FUNCTIONS::D_LN = 15;
+int const FUNCTIONS::D_LOG = 16;
+int const FUNCTIONS::D_ABS = 17;
+int const FUNCTIONS::D_ADDITION = 1;
+int const FUNCTIONS::D_MULTIPLICATION = 2;
+int const FUNCTIONS::D_POWER = 3;
+int const FUNCTIONS::D_SIGNUM = 4;
+int const FUNCTIONS::D_BRACKET = 5;
 	
 
 char n_ppcFunctionsMnemonics [ ] [ 8 ] = 

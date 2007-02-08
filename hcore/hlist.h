@@ -139,16 +139,15 @@ public:
 	tType& tail ( void );
 	tType* to_head ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
 	tType* to_tail ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
-	void exchange ( int, int );
-	void sort_by_contents ( sort_order_t = D_ASCENDING );
-	bool empty ( void );
-	template<typename T >
-	void sort ( T const& );
+	void exchange( int, int );
+	void sort_by_contents( sort_order_t = D_ASCENDING );
+	bool empty( void );
+	template<typename T>
+	void sort( T const& );
 protected:
 	bool to_head ( HElement*&, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
 	bool to_tail ( HElement*&, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
 	HElement * element_by_index ( int );
-	bool ( HList<tType>::* IS_ABOVE ) ( HElement*, HElement* );
 	void exchange ( HElement*, HElement* );
 	void sub_swap ( HElement*, HElement*, HElement* );
 	};
@@ -227,7 +226,7 @@ public:
 	bool operator == ( HIterator const & ) const;
 	bool operator != ( HIterator const & ) const;
 	tType& operator* ( void );
-	tType const& operator * ( void ) const;
+	tType const& operator* ( void ) const;
 	tType* operator -> ( void );
 	/*}*/
 protected:
@@ -369,7 +368,7 @@ template<typename tType>
 HList< tType >::HList ( int a_iSize )
 	: OListBits ( ), f_iSize ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
-	f_iIndex ( 0 ), f_poIndex ( NULL ), IS_ABOVE ( NULL )
+	f_iIndex ( 0 ), f_poIndex ( NULL )
 	{
 	M_PROLOG
 	while ( a_iSize -- )
@@ -391,7 +390,7 @@ template<typename tType>
 HList< tType >::HList ( HList < tType > const & a_roList )
 	: OListBits ( ), f_iSize ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
-	f_iIndex ( 0 ), f_poIndex ( NULL ), IS_ABOVE ( NULL )
+	f_iIndex ( 0 ), f_poIndex ( NULL )
 	{
 	M_PROLOG
 	( * this ) = a_roList;
@@ -1086,7 +1085,7 @@ tType& HList<tType>::tail ( void )
 
 template<typename tType>
 template<typename T >
-void HList<tType>::sort ( T const& less )
+void HList<tType>::sort( T const& less )
 	{
 	M_PROLOG
 	int l_iCtr = f_iSize;
@@ -1107,10 +1106,10 @@ void HList<tType>::sort ( T const& less )
 		while ( l_iCtrLoc -- )
 			{
 			if ( ( l_poPointer != l_poExtreamLower )
-					&& less ( iterator ( f_poHook, l_poExtreamLower ), iterator ( f_poHook, l_poPointer ) ) )
+					&& less ( l_poPointer->f_tObject, l_poExtreamLower->f_tObject ) )
 				l_poExtreamLower = l_poPointer;
 			if ( ( l_poPointer != l_poExtreamUpper )
-					&& less ( iterator ( f_poHook, l_poPointer ), iterator ( f_poHook, l_poExtreamUpper ) ) )
+					&& less ( l_poExtreamUpper->f_tObject, l_poPointer->f_tObject ) )
 				l_poExtreamUpper = l_poPointer;
 			l_poPointer = l_poPointer->f_poNext;
 			}
@@ -1177,8 +1176,7 @@ void HList<tType>::sort_by_contents ( sort_order_t a_eOrder )
 	{
 	M_PROLOG
 	f_eOrder = a_eOrder;
-	IS_ABOVE = & HList< tType >::is_above_c;
-	sort ( );
+	sort ( yaal::less<tType> );
 	return ;
 	M_EPILOG
 	}

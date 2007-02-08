@@ -326,6 +326,21 @@ int HTUIProcess::handler_close_window ( int a_iCode, void * )
 	M_EPILOG
 	}
 
+void HTUIProcess::select( HWindow const* const a_poWindow )
+	{
+	M_PROLOG
+	for ( HBaseWindowListControl::model_t::iterator it = f_oWindows->begin(); it != f_oWindows->end(); ++ it )
+		{
+		if ( (*it)[0] == a_poWindow )
+			{
+			f_oForegroundWindow = it;
+			break;
+			}
+		}
+	return;
+	M_EPILOG
+	}
+
 }
 
 }

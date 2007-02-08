@@ -69,6 +69,12 @@ tType abs ( tType val )
 	return ( val >= 0 ? val : - val );
 	}
 
+template<typename tType>
+bool less( tType const& a_rtLeft, tType const& a_rtRight )
+	{
+	return ( a_rtLeft < a_rtRight );
+	}
+
 template < typename tType >
 inline tType const operator | ( tType const & left,
 		tType const & right )
