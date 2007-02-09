@@ -85,25 +85,24 @@ protected:
 	hcore::HString	f_oLabel;					/* control title */
 	hcore::HString	f_oVarTmpBuffer;	/* buffer for temporary operations, used
 																			 to keep memory fragmentation low */
-	HWindow * f_poParent;						/* window that will hold this control */
-/* this is used locally, there is no way to modify this variables explictly */
-	int				f_iLabelLength;	 			/* lenght of the label */
+	HWindow* f_poParent;						/* window that will hold this control */
+/* this is used locally, there is no way to modify this variables explicitly */
+	int				f_iLabelLength;	 			/* length of the label */
 	int				f_iShortcutIndex;			/* index of shortcut char in label */
 public:
 /* parent, row, col, height, width, label */
-	HControl ( HWindow *, int, int, int, int, char const * );
+	HControl ( HWindow*, int, int, int, int, char const* );
 	virtual ~HControl ( void );
 	void enable ( bool );
 	virtual int process_input ( int );
 	/* set focus if control is enabled or if shortcut char is specified */
 	virtual int set_focus ( char = 0 ); /* focused and shortcut char match */
 	virtual int kill_focus ( void );
-	virtual void refresh ( void ) = 0;
-	virtual void set ( hcore::HInfo const & );
+	virtual void set ( hcore::HInfo const& );
 	virtual hcore::HInfo get ( void );
 	virtual bool is_searchable ( void );
-	virtual void draw_label ( void );
-	virtual int click ( mouse::OMouse & );
+	void refresh ( void );
+	int click ( mouse::OMouse& );
 	bool hit_test ( int, int ) const;
 	void set_attributes ( int = D_DEFAULT_ATTRS, int = D_DEFAULT_ATTRS, int = D_DEFAULT_ATTRS );
 	void set_draw_label ( bool );
@@ -114,9 +113,14 @@ public:
 	void set_attr_label ( void ) const;
 	void set_attr_shortcut ( void ) const;
 	void set_attr_data ( void ) const;
+	void schedule_refresh( void ) const;
+protected:
+	virtual void do_refresh ( void ) = 0;
+	virtual int do_click ( mouse::OMouse& );
+	virtual void draw_label ( void );
 private:
-	HControl ( HControl const & );
-	HControl & operator = ( HControl const & );
+	HControl ( HControl const& );
+	HControl& operator = ( HControl const& );
 	};
 
 }

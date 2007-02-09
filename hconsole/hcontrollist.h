@@ -49,7 +49,7 @@ public:
 	HControlList ( model_t::cyclic_iterator & );
 	/* find next enabled control in window, if short cut char is specified */
 	void next_enabled ( char = 0 ); /* enabled and match shortcut char */
-	void remove_head( void );
+	void pop_front( void );
 	void select ( HControl const* );	/* this one should be private :( */
 	void select ( HControl::ptr_t );	/* this one should be private :( */
 	void add_control( HControl::ptr_t );

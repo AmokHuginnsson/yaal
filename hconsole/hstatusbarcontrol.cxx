@@ -33,6 +33,10 @@ M_VCSID ( "$Id$" )
 #include "hconsole.h"
 #include "hsearchablecontrol.h"
 
+#ifdef __DEBUGGER_BABUNI__
+#include "hcore/hlog.h"
+#endif /* __DEBUGGER_BABUNI__ */
+
 using namespace yaal::hcore;
 
 namespace yaal
@@ -89,7 +93,7 @@ void HStatusBarControl::draw_label ( void )
 	M_EPILOG
 	}
 
-void HStatusBarControl::refresh ( void )
+void HStatusBarControl::do_refresh ( void )
 	{
 	M_PROLOG
 	int l_iOrigRow = 0;

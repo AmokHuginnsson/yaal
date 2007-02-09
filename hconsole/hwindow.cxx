@@ -76,9 +76,14 @@ int HWindow::init ( void )
 	clrscr ( );
 	n_bNeedRepaint = true;
 	l_oString.format ( " [%s]& \n", static_cast < char const * const > ( f_oTitle ) );
-	f_oStatusBar = HStatusBarControl::ptr_t( new HStatusBarControl ( this, l_oString ) );
+	new HStatusBarControl ( this, l_oString );
+	/*
+	 * After line above window has 1 (one) control which is HStatusBarControl.
+	 * This only control has a focus.
+	 * */
+	f_oStatusBar = *f_oFocusedChild;
 	f_oStatusBar->enable ( true );
-	f_oControls.remove_head();
+	f_oControls.pop_front();
 	f_bInitialised = true;
 	return ( 0 );
 	M_EPILOG

@@ -119,7 +119,7 @@ HEditControl::~HEditControl( void )
 	M_EPILOG
 	}
 
-void HEditControl::refresh ( void )
+void HEditControl::do_refresh ( void )
 	{
 	M_PROLOG
 	draw_label ( );
@@ -527,7 +527,7 @@ int HEditControl::set_focus ( char a_cShorcut )
 	M_EPILOG
 	}
 
-int HEditControl::click ( mouse::OMouse & a_rsMouse )
+int HEditControl::do_click ( mouse::OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	int l_iPosition = 0;

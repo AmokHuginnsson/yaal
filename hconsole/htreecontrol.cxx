@@ -127,7 +127,7 @@ HTreeControl::~HTreeControl ( void )
 	M_EPILOG
 	}
 
-void HTreeControl::refresh ( void )
+void HTreeControl::do_refresh ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -304,7 +304,7 @@ int HTreeControl::set_focus ( char a_cShorcut )
 	M_EPILOG
 	}
 
-int HTreeControl::click ( OMouse & a_rsMouse )
+int HTreeControl::do_click ( OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	if ( ! HControl::click ( a_rsMouse ) )

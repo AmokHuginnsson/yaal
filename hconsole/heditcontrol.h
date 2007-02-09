@@ -87,11 +87,11 @@ public:
 	void set_flags ( bool = false, bool = false );
 	virtual hcore::HInfo get ( void );
 protected:
-	virtual void refresh ( void );
+	virtual void do_refresh ( void );
 	virtual int set_focus ( char = 0 );
 	virtual void set ( hcore::HInfo const & );
 	virtual int process_input( int );
-	virtual int click ( mouse::OMouse & );
+	virtual int do_click ( mouse::OMouse & );
 	};
 
 }

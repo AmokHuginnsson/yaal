@@ -102,7 +102,7 @@ HBaseListControl::HBaseListControl ( HWindow * a_poParent, int a_iRow, int a_iCo
 	f_oHeader(), f_iSortColumn ( - 1 ), f_sMatch()
 	{
 	M_PROLOG
-	HBaseListControl::refresh();
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}
@@ -112,7 +112,7 @@ HBaseListControl::~HBaseListControl ( void )
 	return;
 	}
 
-void HBaseListControl::refresh ( void )
+void HBaseListControl::do_refresh ( void )
 	{
 	M_PROLOG
 	bool l_bChecked = false;
@@ -677,7 +677,7 @@ void HBaseListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a
 	M_EPILOG
 	}
 
-int HBaseListControl::click ( mouse::OMouse & a_rsMouse )
+int HBaseListControl::do_click ( mouse::OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	int l_iRow = 0, l_iColumn = 0, l_iCtr = 0;

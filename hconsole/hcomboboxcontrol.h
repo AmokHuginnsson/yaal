@@ -66,8 +66,9 @@ public:
 	virtual int process_input ( int );
 	virtual int set_focus ( char = 0 );
 	virtual int kill_focus ( void ); /* this one will be used here */
-	virtual void refresh ( void );
-	virtual int click ( mouse::OMouse & );
+protected:
+	virtual void do_refresh ( void );
+	virtual int do_click ( mouse::OMouse & );
 private:
 	void close_combo ( void );
 	};

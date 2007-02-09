@@ -65,11 +65,12 @@ public:
 								 int,						/* width */
 								 char const * );	/* label */
 	virtual ~HTreeControl ( void );
-	virtual void refresh ( void );
 	int draw_node ( HNodeControl *, int );
 	virtual int set_focus ( char = 0 );
 	virtual int process_input( int );
-	virtual int click ( mouse::OMouse & );
+protected:
+	virtual int do_click ( mouse::OMouse & );
+	virtual void do_refresh ( void );
 private:
 	bool do_click ( HNodeControl *, mouse::OMouse & );
 	};

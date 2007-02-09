@@ -270,7 +270,7 @@ int HTUIProcess::handler_refresh ( int, void * )
 	clrscr ( ); /* there is ::refresh ( ) call inside */
 	kbhit ( ); /* cleans all trash from stdio buffer */
 	c_getmaxyx ( n_iHeight, n_iWidth );
-	if ( !! (*f_oForegroundWindow)[ 0 ] )
+	if ( f_oForegroundWindow.is_valid() && ( !! (*f_oForegroundWindow)[ 0 ] ) )
 		(*f_oForegroundWindow)[0]->refresh ( );
 	c_refresh ( );
 	return ( 0 );

@@ -130,6 +130,28 @@ HControl* HControlList::get_control_by_no( int a_iOffset )
 	M_EPILOG
 	}
 
+void HControlList::pop_front( void )
+	{
+	M_PROLOG
+	f_oList.remove_head();
+	M_EPILOG
+	}
+
+void HControlList::select ( HControl const* a_poControl )
+	{
+	M_PROLOG
+	for ( model_t::iterator it = f_oList.begin(); it != f_oList.end(); ++ it )
+		{
+		if ( (*it) == a_poControl )
+			{
+			f_roFocused = it;
+			break;
+			}
+		}
+	return;
+	M_EPILOG
+	}
+
 }
 
 }

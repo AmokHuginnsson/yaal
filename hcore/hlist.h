@@ -228,6 +228,7 @@ public:
 	tType& operator* ( void );
 	tType const& operator* ( void ) const;
 	tType* operator -> ( void );
+	bool is_valid( void );
 	/*}*/
 protected:
 	/*{*/
@@ -362,6 +363,13 @@ tType * HList<tType>::HIterator<treatment>::operator -> ( void )
 	return ( & f_poCurrent->f_tObject );
 	}
 
+template<typename tType>
+template<OListBits::treatment_t const treatment>
+bool HList<tType>::HIterator<treatment>::is_valid( void )
+	{
+	return ( f_poCurrent ? true : false );
+	}
+
 //============================================================================
 
 template<typename tType>
@@ -413,13 +421,13 @@ typename HList<tType>::iterator HList<tType>::end( void )
 template<typename tType>
 typename HList<tType>::iterator HList<tType>::rend( void )
 	{
-	return ( iterator ( f_poHook, f_poHook->f_poPrevious ) );
+	return ( iterator ( f_poHook, NULL ) );
 	}
 
 template<typename tType>
 typename HList<tType>::iterator HList<tType>::rbegin( void )
 	{
-	return ( iterator ( f_poHook, NULL ) );
+	return ( iterator ( f_poHook, f_poHook->f_poPrevious ) );
 	}
 
 template<typename tType>
@@ -594,10 +602,12 @@ tType& HList<tType>::add_at ( int a_iIndex, tType* a_ptObject )
 	f_poSelected = l_poElement = new HElement ( l_poElement );
 	if ( f_iSize && ! a_iIndex )
 		f_poHook = l_poElement;
+	if ( f_iSize == 0 )
+		f_poHook = f_poSelected = l_poElement;
 	f_iSize ++;
 	if ( a_ptObject )
 		l_poElement->f_tObject = * a_ptObject;
-	if ( f_poIndex &&  ( a_iIndex >= 0 ) && ( a_iIndex <= f_iIndex ) )
+	if ( f_poIndex && ( a_iIndex >= 0 ) && ( a_iIndex <= f_iIndex ) )
 		f_poIndex = f_poIndex->f_poPrevious;
 	return ( l_poElement->f_tObject );
 	M_EPILOG

@@ -148,6 +148,7 @@ int HControl::kill_focus ( void )
 void HControl::refresh ( void )
 	{
 	M_PROLOG
+	do_refresh();
 	return;
 	M_EPILOG
 	}
@@ -241,7 +242,14 @@ void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 	M_EPILOG
 	}
 
-int HControl::click ( mouse::OMouse & )
+int HControl::click ( mouse::OMouse & a_roMouse )
+	{
+	M_PROLOG
+	return ( do_click( a_roMouse ) );
+	M_EPILOG
+	}
+
+int HControl::do_click ( mouse::OMouse & )
 	{
 	M_PROLOG
 	if ( f_bFocused )
@@ -311,6 +319,12 @@ void HControl::set_attr_data ( void ) const
 void HControl::set_draw_label( bool a_bDrawLabel )
 	{
 	f_bDrawLabel = a_bDrawLabel;
+	return;
+	}
+
+void HControl::schedule_refresh( void ) const
+	{
+	n_bNeedRepaint = true;
 	return;
 	}
 

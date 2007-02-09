@@ -84,7 +84,7 @@ int HComboboxControl::kill_focus ( void )
 	M_EPILOG
 	}
 
-void HComboboxControl::refresh ( void )
+void HComboboxControl::do_refresh ( void )
 	{
 	M_PROLOG
 	int l_iWidth = 0;
@@ -146,7 +146,7 @@ int HComboboxControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-int HComboboxControl::click ( mouse::OMouse & a_rsMouse )
+int HComboboxControl::do_click ( mouse::OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	if ( f_eMode == MODE::D_EDITCONTROL )

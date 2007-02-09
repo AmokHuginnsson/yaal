@@ -90,8 +90,8 @@ public:
 	bool confirm ( char const * );
 	virtual int process_input_normal ( int );
 	virtual int process_input_menu ( int );
-	virtual void refresh ( void );
 protected:
+	virtual void do_refresh ( void );
 	virtual void draw_label ( void );
 	virtual int verify ( void );
 	virtual int process_input ( int );

@@ -144,12 +144,12 @@ protected:
 	virtual void do_sort( list_control_helper::OSortHelper& ) = 0;
 	virtual bool get_text_for_cell( int, type_t ) = 0;
 	virtual void set_child_control_data_for_cell( int, HControl* ) = 0;
-	virtual void refresh ( void );
+	virtual void do_refresh ( void );
 	void draw_cell ( int, int, int, HColumnInfo const* const, bool );
 	virtual int process_input( int );
 	//virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const& = D_BLOCK_IF_NOT_EMPTIED, HItem_t * * = NULL );
 	virtual bool is_searchable ( void );
-	virtual int click ( mouse::OMouse& );
+	virtual int do_click ( mouse::OMouse& );
 //	virtual bool is_above_c ( HElement *, HElement * );
 	virtual void go_to_match ( void );
 	virtual void go_to_match_previous ( void );
