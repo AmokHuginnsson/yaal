@@ -156,7 +156,7 @@ void signal_WINCH ( int a_iSignum )
 #ifdef __HCORE_HLOG_H
 	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		{
 		n_bInputWaiting = true;
@@ -164,9 +164,9 @@ void signal_WINCH ( int a_iSignum )
 		}
 	else
 		fprintf ( stderr, "\n%s", l_pcSignalMessage );
-#else /* __HCONSOLE_CONSOLE_H */
+#else /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
-#endif /* not __HCONSOLE_CONSOLE_H */
+#endif /* not __YAAL_HCONSOLE_CONSOLE_H */
 	return;
 	M_EPILOG
 	}
@@ -185,10 +185,10 @@ void signal_INT ( int a_iSignum )
 #ifdef __HCORE_HLOG_H
 	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
-#endif /* __HCONSOLE_CONSOLE_H */
+#endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( SIGINT, SIG_DFL );
 	raise ( SIGINT );
@@ -208,7 +208,7 @@ void signal_TERM ( int a_iSignum )
 #ifdef __HCORE_HLOG_H
 	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
 #endif
@@ -226,11 +226,11 @@ void signal_QUIT ( int a_iSignum )
 	HString l_oMessage;
 	if ( tools::n_bIgnoreSignalSIGQUIT )
 		{
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 		if ( is_enabled ( ) )
 			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Hard Quit is disabled by yaal configuration." );
-#endif /* __HCONSOLE_CONSOLE_H */
+#endif /* __YAAL_HCONSOLE_CONSOLE_H */
 		return;
 		}
 	l_oMessage = "Abnormal program quit forced: ";
@@ -240,7 +240,7 @@ void signal_QUIT ( int a_iSignum )
 #ifdef __HCORE_HLOG_H
 	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
 #endif
@@ -258,11 +258,11 @@ void signal_TSTP ( int a_iSignum )
 	HString l_oMessage;
 	if ( tools::n_bIgnoreSignalSIGINT )
 		{
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 		if ( is_enabled ( ) )
 			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Suspend is disabled by yaal configuration." );
-#endif /* __HCONSOLE_CONSOLE_H */
+#endif /* __YAAL_HCONSOLE_CONSOLE_H */
 		return;
 		}
 	l_oMessage = "Stop signal caught, process suspended: ";
@@ -272,7 +272,7 @@ void signal_TSTP ( int a_iSignum )
 #ifdef __HCORE_HLOG_H
 	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
 #endif
@@ -295,7 +295,7 @@ void signal_CONT ( int a_iSignum )
 #ifdef __HCORE_HLOG_H
 	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( ! is_enabled ( ) )
 		enter_curses();
 	if ( is_enabled ( ) )
@@ -303,7 +303,7 @@ void signal_CONT ( int a_iSignum )
 		n_bInputWaiting = true;
 		ungetch ( KEY < 'l' >::ctrl );
 		}
-#endif /* __HCONSOLE_CONSOLE_H */
+#endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	if ( signal ( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
 		signal ( SIGTSTP, SIG_IGN );
@@ -323,10 +323,10 @@ void signal_fatal ( int a_iSignum )
 #ifdef __HCORE_HLOG_H
 	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
-#endif /* __HCONSOLE_CONSOLE_H */
+#endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( a_iSignum, SIG_DFL );
 	raise ( a_iSignum );
@@ -337,7 +337,7 @@ void signal_fatal ( int a_iSignum )
 void signal_USR1 ( int a_iSignum )
 	{
 	M_PROLOG
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( n_bUseMouse )
 		{
 		if ( is_enabled ( ) )
@@ -347,7 +347,7 @@ void signal_USR1 ( int a_iSignum )
 			return;
 			}
 		}
-#endif /* __HCONSOLE_CONSOLE_H */
+#endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
 	l_oMessage = "\nDo you play with the mouse under FreeBSD ? ";
@@ -357,10 +357,10 @@ void signal_USR1 ( int a_iSignum )
 #ifdef __HCORE_HLOG_H
 	log << l_oMessage << endl;
 #endif /* __HCORE_HLOG_H */
-#ifdef __HCONSOLE_CONSOLE_H
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
-#endif /* __HCONSOLE_CONSOLE_H */
+#endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( a_iSignum, SIG_DFL );
 	raise ( a_iSignum );
