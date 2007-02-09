@@ -252,7 +252,7 @@ int x_mouse_open ( void )
 		l_oError.format ( "1 = %d, 2 = %d, 3 = %d",
 				l_xMouseMask & BUTTON1_CLICKED, l_xMouseMask & BUTTON2_CLICKED,
 				l_xMouseMask & BUTTON3_CLICKED );
-		l_oException->set ( l_oError );
+		l_oException.set ( l_oError );
 		throw ( l_oException );
 		}
 	return ( 0 );

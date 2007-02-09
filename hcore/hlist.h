@@ -305,7 +305,10 @@ typename HList<tType>::template HIterator<treatment>& HList<tType>::HIterator<tr
 	{
 	M_PROLOG
 	if ( reinterpret_cast<HIterator<treatment> const*>( &a_roIterator ) != this )
+		{
+		f_poHook = a_roIterator.f_poHook;
 		f_poCurrent = a_roIterator.f_poCurrent;
+		}
 	return ( *this );
 	M_EPILOG
 	}
@@ -367,7 +370,7 @@ template<typename tType>
 template<OListBits::treatment_t const treatment>
 bool HList<tType>::HIterator<treatment>::is_valid( void )
 	{
-	return ( f_poCurrent ? true : false );
+	return ( f_poHook && f_poCurrent );
 	}
 
 //============================================================================

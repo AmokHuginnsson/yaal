@@ -91,6 +91,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow::ptr_t a_oMain
 		{
 		l_oMainWindow = a_oMainWindow;
 		l_oMainWindow->init ( );
+		f_oMainWindow = l_oMainWindow;
 		if ( ! l_oMainWindow->is_initialised ( ) )
 			M_THROW ( _ ( "window has not been initialised" ), errno );
 		}
@@ -98,6 +99,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow::ptr_t a_oMain
 		{
 		l_oMainWindow = HWindow::ptr_t ( new HMainWindow ( a_pcProcessName, f_oWindows ) );
 		l_oMainWindow->init ( );
+		f_oMainWindow = l_oMainWindow;
 		add_window ( l_oMainWindow );
 		register_postprocess_handler ( KEY < '\t' >::meta, NULL,
 				& HTUIProcess::handler_jump_meta_tab );
@@ -108,8 +110,7 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow::ptr_t a_oMain
 		register_postprocess_handler ( D_ALTS_COUNT, l_piAlts,
 			& HTUIProcess::handler_jump_meta_direct );
 		}
-	f_oMainWindow = l_oMainWindow;
-	f_oForegroundWindow = HWindowListControl::model_t::cyclic_iterator();
+	f_oForegroundWindow = f_oWindows->begin();
 	f_oCommandHandlers [ "quit" ] = static_cast < HANDLER_t > ( & HTUIProcess::handler_quit );
 	handler_refresh ( 0 );
 	return ( 1 );
@@ -121,9 +122,11 @@ int HTUIProcess::add_window ( HWindow::ptr_t a_oWindow )
 	M_PROLOG
 	HItem_t<HWindow::ptr_t> l_oItem( 1 );
 	l_oItem[ 0 ] = a_oWindow;
+	a_oWindow->init();
 	f_oWindows->push_back ( l_oItem );
 	f_oForegroundWindow = f_oWindows->rbegin();
-	(*f_oForegroundWindow)[ 0 ]->init ( );
+	M_ASSERT( f_oForegroundWindow.is_valid() );
+	f_oMainWindow->update_all();
 	if ( ! (*f_oForegroundWindow)[ 0 ]->is_initialised ( ) )
 		M_THROW ( _ ( "window has not been initialised" ), errno );
 	c_refresh ( );

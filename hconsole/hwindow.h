@@ -68,6 +68,8 @@ public:
 	HStatusBarControl::ptr_t& status_bar ( void );
 	hcore::HString get_command ( void );
 	bool is_initialised ( void ) const;
+	void update_all( void );
+	yaal::hcore::HString const& get_title( void ) const;
 private:
 	friend int HControl::set_focus ( char );
 	friend void HStatusBarControl::set_prompt ( char const *,

@@ -33,6 +33,8 @@ Copyright:
 #include "hconsole/hwindow.h"
 #include "hconsole/hsearchablecontrol.h"
 
+#include "hcore/hlog.h"
+
 namespace yaal
 {
 
@@ -202,6 +204,7 @@ protected:
 	virtual void do_switch_state( void );
 	virtual bool do_is_current_match( void );
 	virtual void do_sort( list_control_helper::OSortHelper& );
+	virtual void do_update( void );
 	virtual bool get_text_for_cell( int, type_t );
 	virtual void set_child_control_data_for_cell( int, HControl* );
 	};
@@ -234,6 +237,8 @@ int long HListControl_t<tType>::get_row_count( void )
 template <typename tType>
 void HListControl_t<tType>::do_first_item( void )
 	{
+	M_ASSERT( f_oList->size() );
+	M_ASSERT( f_oFirstVisibleRow.is_valid() );
 	f_oIterator = f_oFirstVisibleRow;
 	return;
 	}
@@ -253,6 +258,15 @@ void HListControl_t<tType>::do_switch_state( void )
 	}
 
 template <typename tType>
+void HListControl_t<tType>::do_update( void )
+	{
+	M_PROLOG
+	f_oFirstVisibleRow = f_oCursor = f_oList->begin();
+	return;
+	M_EPILOG
+	}
+
+template <typename tType>
 bool HListControl_t<tType>::do_is_current_match( void )
 	{
 	return ( f_oIterator == f_oCurrentMatch );
@@ -261,6 +275,7 @@ bool HListControl_t<tType>::do_is_current_match( void )
 template <typename tType>
 bool HListControl_t<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
 	{
+	M_ASSERT( f_oIterator.is_valid() );
 	row_t& l_oItem = *f_oIterator;
 	switch ( a_eType )
 		{
@@ -292,19 +307,23 @@ template <typename tType>
 void HListControl_t<tType>::add_tail( row_t& a_tRow )
 	{
 	M_PROLOG
-	(*f_oList).push_back ( a_tRow );
-	int l_iSize = (*f_oList).size ( );
+	f_oList->push_back ( a_tRow );
+	int l_iSize = f_oList->size();
 	if ( l_iSize > f_iHeightRaw )
 		{
 		f_iCursorPosition = f_iHeightRaw - 1;
 		f_iControlOffset = l_iSize - f_iHeightRaw;
-		if ( f_oFirstVisibleRow != (*f_oList).end ( ) )
+		if ( f_oFirstVisibleRow != f_oList->end() )
 			++ f_oFirstVisibleRow;
 		}
 	else
 		f_iCursorPosition = l_iSize - 1;
-	if ( f_oFirstVisibleRow == (*f_oList).end ( ) )
-		f_oFirstVisibleRow = (*f_oList).begin ( );
+	log_trace << " already has a row " << yaal::hcore::endl;
+	if ( f_oFirstVisibleRow == f_oList->end() )
+		{
+		log_trace << " setting iterator " << yaal::hcore::endl;
+		f_oFirstVisibleRow = f_oList->begin();
+		}
 	n_bNeedRepaint = true;
 	return;
 	M_EPILOG

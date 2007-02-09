@@ -224,6 +224,20 @@ bool HWindow::is_initialised ( void ) const
 	return ( f_bInitialised );
 	}
 
+void HWindow::update_all( void )
+	{
+	M_PROLOG
+	f_oControls.update_all();
+	return;
+	M_EPILOG
+	}
+
+HString const& HWindow::get_title( void ) const
+	{
+	M_PROLOG
+	return ( f_oTitle );
+	M_EPILOG
+	}
 
 }
 

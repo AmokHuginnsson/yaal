@@ -102,6 +102,7 @@ public:
 	virtual hcore::HInfo get ( void );
 	virtual bool is_searchable ( void );
 	void refresh ( void );
+	void update( void );
 	int click ( mouse::OMouse& );
 	bool hit_test ( int, int ) const;
 	void set_attributes ( int = D_DEFAULT_ATTRS, int = D_DEFAULT_ATTRS, int = D_DEFAULT_ATTRS );
@@ -116,6 +117,7 @@ public:
 	void schedule_refresh( void ) const;
 protected:
 	virtual void do_refresh ( void ) = 0;
+	virtual void do_update( void );
 	virtual int do_click ( mouse::OMouse& );
 	virtual void draw_label ( void );
 private:

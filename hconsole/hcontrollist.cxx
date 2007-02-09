@@ -107,6 +107,16 @@ void HControlList::refresh_all( void )
 	M_EPILOG
 	}
 
+void HControlList::update_all( void )
+	{
+	M_PROLOG
+	for ( model_t::iterator it = f_oList.begin();
+			it != f_oList.end(); ++ it )
+			(*it)->update ( );
+	return;
+	M_EPILOG
+	}
+
 int HControlList::hit_test_all( mouse::OMouse& a_rsMouse )
 	{
 	M_PROLOG

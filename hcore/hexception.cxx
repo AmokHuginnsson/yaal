@@ -27,6 +27,7 @@ Copyright:
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+#include <csignal>
 #include <libintl.h>
 
 #ifdef _STDIO_H
@@ -191,20 +192,18 @@ void HException::dump_call_stack ( int const )
 	return;
 	}
 
-HException * HException::operator-> ( void )
-	{
-	return ( this );
-	}
-
 void HException::failed_assert ( char const * const a_pcFileName,
 		char const * const a_pcFunctionName, int const a_iLine,
 		char const * const a_pcMessage )
 	{
 	M_PROLOG
+	hcore::log << "Failed assertion: " << a_pcMessage << " -> " << a_pcFileName << "(" << a_iLine << "): " << a_pcFunctionName << endl;
 	fprintf ( stderr, "Failed assertion: `%s' at: %s: %4d: %s\n",
 			a_pcMessage, a_pcFileName, a_iLine, a_pcFunctionName );
 	if ( ! errno )
 		errno ++;
+	if ( getenv( "YAAL_DUMP_ON_FAILED_ASSERTION" ) )
+		raise( SIGABRT );
 	throw ( errno );
 	M_EPILOG
 	}

@@ -153,6 +153,14 @@ void HControl::refresh ( void )
 	M_EPILOG
 	}
 
+void HControl::update ( void )
+	{
+	M_PROLOG
+	do_update();
+	return;
+	M_EPILOG
+	}
+
 void HControl::set ( HInfo const & )
 	{
 	M_PROLOG
@@ -257,6 +265,11 @@ int HControl::do_click ( mouse::OMouse & )
 	set_focus ( );
 	return ( 0 );
 	M_EPILOG
+	}
+
+void HControl::do_update ( void )
+	{
+	return;
 	}
 
 bool HControl::hit_test ( int a_iRow, int a_iColumn ) const

@@ -87,6 +87,73 @@ void HWindowListControl::add_tail ( HItem * a_poElement )
 	}
 */
 
+namespace list_control_helper
+{
+
+/*
+template<>
+yaal::hcore::HString const GetLongFromCell( HInfo const& a_oInfo )
+	{
+	return ( HString ( a_oInfo.get<int long>() ) );
+	}
+
+template<>
+yaal::hcore::HString const GetDoubleFromCell( HInfo const& a_oInfo )
+	{
+	return ( HString ( a_oInfo.get<double>() ) );
+	}
+*/
+
+template<>
+yaal::hcore::HString const GetStringFromCell( HWindow::ptr_t const& a_oWindow )
+	{
+	return ( a_oWindow->get_title() );
+	}
+
+/*
+template<>
+char const * GetTimeFromCell( HInfo const & a_oInfo )
+	{
+	return ( a_oInfo.get<yaal::hcore::HTime const &>() );
+	}
+
+int long GetIdFromCell( HItem const & )
+	{
+	return ( 0 );
+	}
+
+bool GetStateFromCell( HItem const & )
+	{
+	return ( false );
+	}
+
+template<>
+bool compare_cells( HInfo const & a_oLeft, HInfo const & a_oRight, OSortHelper & a_roSortHelper )
+	{
+	double l_dDifference = 0;
+	a_roSortHelper.progress();
+	switch ( a_roSortHelper.f_eType )
+		{
+		case ( D_LONG_INT ):
+			return ( a_oLeft.get<long>() > a_oRight.get<long>() );
+		case ( D_DOUBLE ):
+			l_dDifference = a_oLeft.get<double>() > a_oRight.get<double>();
+		break;
+		case ( D_HSTRING ):
+			return ( strcasecmp ( a_oLeft.get<HString const &>(),
+					 a_oRight.get<HString const &>() ) > 0 );
+		case ( D_HTIME ):
+			l_dDifference = static_cast<time_t>( a_oLeft.get<HTime const &>() ) > static_cast<time_t>( a_oRight.get<HTime const &>() );
+		break;
+		default:
+			break;
+		}
+	return ( l_dDifference > 0 ? 1 : ( l_dDifference < 0 ? - 1 : 0 ) );
+	}
+*/
+
+}
+
 }
 
 }
