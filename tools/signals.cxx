@@ -153,9 +153,9 @@ void signal_WINCH ( int a_iSignum )
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	l_pcSignalMessage = l_oMessage;
-#ifdef __HCORE_HLOG_H
+#ifdef __YAAL_HCORE_HLOG_H
 	log << l_oMessage << endl;
-#endif /* __HCORE_HLOG_H */
+#endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		{
@@ -182,9 +182,9 @@ void signal_INT ( int a_iSignum )
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	l_pcSignalMessage = l_oMessage;
-#ifdef __HCORE_HLOG_H
+#ifdef __YAAL_HCORE_HLOG_H
 	log << l_oMessage << endl;
-#endif /* __HCORE_HLOG_H */
+#endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
@@ -205,9 +205,9 @@ void signal_TERM ( int a_iSignum )
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	l_pcSignalMessage = l_oMessage;
-#ifdef __HCORE_HLOG_H
+#ifdef __YAAL_HCORE_HLOG_H
 	log << l_oMessage << endl;
-#endif /* __HCORE_HLOG_H */
+#endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
@@ -237,9 +237,9 @@ void signal_QUIT ( int a_iSignum )
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	l_pcSignalMessage = l_oMessage;
-#ifdef __HCORE_HLOG_H
+#ifdef __YAAL_HCORE_HLOG_H
 	log << l_oMessage << endl;
-#endif /* __HCORE_HLOG_H */
+#endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
@@ -269,9 +269,9 @@ void signal_TSTP ( int a_iSignum )
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	l_pcSignalMessage = l_oMessage;
-#ifdef __HCORE_HLOG_H
+#ifdef __YAAL_HCORE_HLOG_H
 	log << l_oMessage << endl;
-#endif /* __HCORE_HLOG_H */
+#endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
@@ -292,9 +292,9 @@ void signal_CONT ( int a_iSignum )
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	l_pcSignalMessage = l_oMessage;
-#ifdef __HCORE_HLOG_H
+#ifdef __YAAL_HCORE_HLOG_H
 	log << l_oMessage << endl;
-#endif /* __HCORE_HLOG_H */
+#endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( ! is_enabled ( ) )
 		enter_curses();
@@ -320,9 +320,9 @@ void signal_fatal ( int a_iSignum )
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	l_pcSignalMessage = l_oMessage;
-#ifdef __HCORE_HLOG_H
+#ifdef __YAAL_HCORE_HLOG_H
 	log << l_oMessage << endl;
-#endif /* __HCORE_HLOG_H */
+#endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
@@ -354,9 +354,9 @@ void signal_USR1 ( int a_iSignum )
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	l_pcSignalMessage = l_oMessage;
-#ifdef __HCORE_HLOG_H
+#ifdef __YAAL_HCORE_HLOG_H
 	log << l_oMessage << endl;
-#endif /* __HCORE_HLOG_H */
+#endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( is_enabled ( ) )
 		leave_curses();
