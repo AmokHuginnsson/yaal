@@ -182,7 +182,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>::~HPointer ( void )
 	{
-	if ( f_poShared->release ( ) )
+	if ( f_poShared && f_poShared->release ( ) )
 		delete f_poShared;
 	return;
 	}
@@ -247,6 +247,9 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 tType & HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) const
 	{
+	M_ASSERT( f_poShared );
+	if ( ! f_poShared->f_ptPointer )
+		throw 0;
 	return ( * f_poShared->f_ptPointer );
 	}
 
@@ -314,6 +317,9 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 tType* HPointer<tType, pointer_type_t, access_type_t>::operator-> ( void ) const
 	{
+	M_ASSERT( f_poShared );
+	if ( ! f_poShared->f_ptPointer )
+		throw 0;
 	return ( access_type_t<tType>::raw ( f_poShared->f_ptPointer ) );
 	}
 
@@ -321,7 +327,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 tType* HPointer<tType, pointer_type_t, access_type_t>::raw ( void ) const
 	{
-	return ( access_type_t<tType>::raw ( f_poShared->f_ptPointer ) );
+	return ( f_poShared ? access_type_t<tType>::raw ( f_poShared->f_ptPointer ) : NULL );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
