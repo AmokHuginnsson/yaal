@@ -121,7 +121,7 @@ int HDataWindow::init ( void )
 				l_sEditControlResource.f_bPassword = false;
 				l_sEditControlResource.f_iMaxHistoryLevel = 8;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
-					l_psECR = static_cast < OEditControlResource * > ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
+					l_psECR = static_cast<OEditControlResource*>( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				l_poDataControl = new HDataEditControl ( this,
 						M_SETUP_STANDART, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
 						l_psECR->f_pcMask, l_psECR->f_bReplace,
@@ -137,7 +137,7 @@ int HDataWindow::init ( void )
 				l_sListControlResource.f_bSearchable = true;
 				l_sListControlResource.f_bDrawHeader = true;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
-					l_psLCR = static_cast < OListControlResource * > ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
+					l_psLCR = static_cast<OListControlResource*>( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				HDataListControl* l_poList = NULL;
 				l_poDataControl = l_poList = new HDataListControl ( this, this, M_SETUP_STANDART );
 				l_poList->set_flags( ( l_psLCR->f_bCheckable ? HBaseListControl::FLAGS::D_CHECKABLE : HBaseListControl::FLAGS::D_NONE )

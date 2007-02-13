@@ -88,6 +88,7 @@ void HDataListControl::load ( int long /*a_iId*/ )
 		}
 	while ( l_iCtr ++ < l_iQuantity )
 		f_oList->remove_tail();
+	reset();
 	l_poParent->set_sync_store ( );
 	return;
 	M_EPILOG

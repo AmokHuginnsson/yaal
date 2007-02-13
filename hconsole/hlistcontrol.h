@@ -192,6 +192,7 @@ public:
 	void remove_current_row();
 	void set_current_row_cell( int, tType );
 	int long get_row_count( void );
+	void reset( void );
 protected:
 	model_ptr_t f_oList;
 	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
@@ -409,6 +410,19 @@ void HListControl_t<tType>::do_sort( list_control_helper::OSortHelper& a_roHelpe
 	{
 	(*f_oList).sort ( CompareListControlItems<HItem_t<tType> > ( a_roHelper ) );
 	f_oFirstVisibleRow = (*f_oList).begin();
+	}
+
+template <typename tType>
+void HListControl_t<tType>::reset( void )
+	{
+	M_PROLOG
+	f_iControlOffset = f_iCursorPosition = 0;
+	if ( do_size() )
+		f_oFirstVisibleRow = f_oCursor = f_oList->begin();
+	else
+		f_oFirstVisibleRow = f_oCursor = f_oList->end();
+	return;
+	M_EPILOG
 	}
 
 typedef HListControl_t<> HListControl;

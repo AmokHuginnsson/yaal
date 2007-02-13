@@ -170,8 +170,8 @@ void HComboboxControl::close_combo ( void )
 	{
 	M_PROLOG
 	f_eMode = MODE::D_EDITCONTROL;
-	if ( ! (*f_oList).empty ( ) )
-		HEditControl::set ( (*f_oList).present ( ) [ 0 ].get < char const * const > ( ) );
+	if ( f_oList->empty ( ) )
+		HEditControl::set ( (*f_oCursor) [ 0 ].get < char const * const > ( ) );
 	clrscr ( );
 	f_poParent->refresh ( );
 	return;
