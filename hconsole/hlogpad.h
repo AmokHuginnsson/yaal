@@ -69,7 +69,7 @@ public:
 	void add ( int );
 protected:
 	virtual int process_input ( int );
-	virtual void refresh ( void );
+	virtual void do_refresh ( void );
 	};
 
 }

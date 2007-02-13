@@ -105,7 +105,7 @@ void HStatusBarControl::do_refresh ( void )
 		set_attr ( f_iStatusBarAttribute >> 8 );
 		c_mvprintf ( f_iRowRaw, 0, f_oPrompt );
 		}
-	HEditControl::refresh ( );
+	HEditControl::do_refresh ( );
 	if ( ! f_bFocused )
 		c_move ( l_iOrigRow, l_iOrigColumn );
 	return;

@@ -95,7 +95,7 @@ void HComboboxControl::do_refresh ( void )
 		l_iWidth = ( f_iWidth > 0 ) ? f_iWidth
 			: n_iWidth + f_iWidth - f_iColumnRaw;
 /* end of ripped part */
-		HEditControl::refresh ( );
+		HEditControl::do_refresh ( );
 		M_ENSURE ( c_move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 ) != C_ERR );
 		set_attr_label ( );
 		M_ENSURE ( c_addch ( GLYPHS::D_DOWN_ARROW ) != C_ERR );
@@ -110,7 +110,7 @@ void HComboboxControl::do_refresh ( void )
 		int size = (*f_oList).size ( );
 		if ( size < f_iHeight )
 			f_iHeight = size + 1;
-		HListControl::refresh ( );
+		HListControl::do_refresh ( );
 		f_iHeight = l_iHeight;
 		f_iWidth = l_iWidth;
 		}
@@ -151,7 +151,7 @@ int HComboboxControl::do_click ( mouse::OMouse & a_rsMouse )
 	M_PROLOG
 	if ( f_eMode == MODE::D_EDITCONTROL )
 		{
-		HEditControl::click ( a_rsMouse );
+		HEditControl::do_click ( a_rsMouse );
 		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
 			: n_iWidth + f_iWidth - f_iColumnRaw;
 		if ( a_rsMouse.f_iColumn == ( f_iColumnRaw + f_iWidthRaw - 1 ) )
@@ -160,7 +160,7 @@ int HComboboxControl::do_click ( mouse::OMouse & a_rsMouse )
 			refresh ( );
 			}
 		}
-	else if ( HListControl::click ( a_rsMouse ) )
+	else if ( HListControl::do_click ( a_rsMouse ) )
 		close_combo ( );
 	return ( 0 );
 	M_EPILOG

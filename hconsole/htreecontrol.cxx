@@ -115,7 +115,6 @@ HTreeControl::HTreeControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 								a_pcLabel )
 	{
 	M_PROLOG
-	HTreeControl::refresh ( );
 	return;
 	M_EPILOG
 	}

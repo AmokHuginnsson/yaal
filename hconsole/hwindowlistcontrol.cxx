@@ -71,10 +71,10 @@ int HWindowListControl::process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-void HWindowListControl::refresh ( void )
+void HWindowListControl::do_refresh ( void )
 	{
 	M_PROLOG
-	HListControl_t<HWindow::ptr_t>::refresh ( );
+	HListControl_t<HWindow::ptr_t>::do_refresh ( );
 	M_EPILOG
 	}
 

@@ -65,26 +65,6 @@ void HControlList::next_enabled ( char a_cShorcut )
 	M_EPILOG
 	}
 
-/*
-void HControlList::select ( HControl * a_poControl )
-	{
-	M_PROLOG
-	if ( f_oList.present ( ) == a_poControl )
-		return;
-	model_t::HIterator end = f_oList.end ( );
-	for ( model_t::HIterator it = f_oList.begin ( ); it != end; ++ it )
-		{
-		if ( *it == a_poControl )
-			{
-			f_roFocused = it;
-			return;
-			}
-		}
-	M_THROW ( "bogus object", reinterpret_cast < int > ( a_poControl ) );
-	M_EPILOG
-	}
-*/
-
 void HControlList::add_control( HControl::ptr_t a_oControl )
 	{
 	M_PROLOG
@@ -150,13 +130,19 @@ void HControlList::pop_front( void )
 void HControlList::select ( HControl const* a_poControl )
 	{
 	M_PROLOG
-	for ( model_t::iterator it = f_oList.begin(); it != f_oList.end(); ++ it )
+	if ( (*f_roFocused) != a_poControl )
 		{
-		if ( (*it) == a_poControl )
+		model_t::iterator it;
+		for (  it = f_oList.begin(); it != f_oList.end(); ++ it )
 			{
-			f_roFocused = it;
-			break;
+			if ( (*it) == a_poControl )
+				{
+				f_roFocused = it;
+				break;
+				}
 			}
+		if ( it == f_oList.end() )
+			M_THROW ( "bogus object", reinterpret_cast < int > ( a_poControl ) );
 		}
 	return;
 	M_EPILOG

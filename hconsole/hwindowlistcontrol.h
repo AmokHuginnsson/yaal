@@ -45,7 +45,7 @@ public:
 	HWindowListControl ( HWindow *, int, int, int, int, char const *, HWindowListControl::model_ptr_t );
 	virtual ~HWindowListControl ( void );
 	virtual int process_input ( int );
-	virtual void refresh ( void );
+	virtual void do_refresh ( void );
 	virtual void set_child_control_data_for_cell( int, HControl* ){}
 protected:
 	};

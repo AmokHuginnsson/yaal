@@ -107,7 +107,6 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		f_iCursorPosition = l_iLength;
 #ifdef __DEBUG__
 #endif /* __DEBUG__ */
-	HEditControl::refresh ( );
 	return;
 	M_EPILOG
 	}

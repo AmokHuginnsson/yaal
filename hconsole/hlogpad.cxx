@@ -69,7 +69,7 @@ HLogPad::~HLogPad ( void )
 	M_EPILOG
 	}
 
-void HLogPad::refresh ( void )
+void HLogPad::do_refresh ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iRow = 0, l_iCursor = 0, l_iColumn = 0;

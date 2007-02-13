@@ -229,16 +229,24 @@ template<typename tType, template<typename>class pointer_type_t,
 template<typename hier_t>
 HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<hier_t, pointer_type_t, access_type_t> const& a_roPointer )
 	{
-	if ( ( reinterpret_cast<HPointer const *>( &a_roPointer ) != this ) && ( reinterpret_cast<HPointer const *>( &a_roPointer )->f_poShared != f_poShared ) )
+	HPointer const* alien = reinterpret_cast<HPointer const *>( &a_roPointer );
+	if ( ( alien != this ) && ( alien->f_poShared != f_poShared ) )
 		{
-		reinterpret_cast<HPointer const *>( &a_roPointer )->f_poShared->f_iReferenceCounter ++;
+		alien->f_poShared->f_iReferenceCounter ++;
 		if ( f_poShared )
 			{
-			M_ASSERT ( f_poShared->f_ptPointer != reinterpret_cast<HPointer const *>( &a_roPointer )->f_poShared->f_ptPointer );
+			M_ASSERT ( f_poShared->f_ptPointer != alien->f_poShared->f_ptPointer );
 			if ( f_poShared->release ( ) )
 				delete f_poShared;
 			}
-		f_poShared = reinterpret_cast<HPointer const *>( &a_roPointer )->f_poShared;
+		f_poShared = alien->f_poShared;
+		/* Magic - it's a kind of magic
+		 * It's a kind of magic
+		 * Magic magic magic magic
+		 * Ha ha ha it's magic
+		 * It's a kind of magic
+		 *           -- Roger Taylor */
+		f_poShared->f_ptPointer = dynamic_cast<tType*>( reinterpret_cast<hier_t*>( f_poShared->f_ptPointer ) );
 		}
 	return ( *this );
 	}
@@ -264,12 +272,11 @@ tType & HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iInde
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 template<typename hier_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator== ( HPointer<hier_t, pointer_type_t, access_type_t>const & a_tPointer ) const
+bool HPointer<tType, pointer_type_t, access_type_t>::operator== ( HPointer<hier_t, pointer_type_t, access_type_t>const & a_roPointer ) const
 	{
-	return ( ( ! ( f_poShared
-					|| reinterpret_cast<HPointer const*>( &a_tPointer )->f_poShared ) )
-			|| ( f_poShared && reinterpret_cast<HPointer const*>( &a_tPointer )->f_poShared
-				&& ( f_poShared->f_ptPointer == reinterpret_cast<HPointer const*>( &a_tPointer )->f_poShared->f_ptPointer ) ) );
+	HPointer const* alien = reinterpret_cast<HPointer const *>( &a_roPointer );
+	return ( ( ! ( f_poShared || alien->f_poShared ) ) || ( f_poShared && alien->f_poShared
+				&& ( f_poShared->f_ptPointer == alien->f_poShared->f_ptPointer ) ) );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
@@ -283,12 +290,13 @@ bool HPointer<tType, pointer_type_t, access_type_t>::operator== ( hier_t const* 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 template<typename hier_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator!= ( HPointer<hier_t, pointer_type_t, access_type_t>const & a_tPointer ) const
+bool HPointer<tType, pointer_type_t, access_type_t>::operator!= ( HPointer<hier_t, pointer_type_t, access_type_t>const & a_roPointer ) const
 	{
-	return ( ( f_poShared && ! reinterpret_cast<HPointer const*>( &a_tPointer )->f_poShared )
-			|| ( ! f_poShared && reinterpret_cast<HPointer const*>( &a_tPointer )->f_poShared )
-			|| ( f_poShared && reinterpret_cast<HPointer const *>( &a_tPointer )->f_poShared
-				&& ( f_poShared->f_ptPointer != reinterpret_cast<HPointer const*>( &a_tPointer)->f_poShared->f_ptPointer ) ) );
+	HPointer const* alien = reinterpret_cast<HPointer const *>( &a_roPointer );
+	return ( ( f_poShared && ! alien->f_poShared )
+			|| ( ! f_poShared && alien->f_poShared )
+			|| ( f_poShared && alien->f_poShared
+				&& ( f_poShared->f_ptPointer != alien->f_poShared->f_ptPointer ) ) );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
