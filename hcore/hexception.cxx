@@ -45,6 +45,8 @@ namespace yaal
 namespace hcore
 {
 
+void* HException::ERROR_STREAM = stderr;
+
 HException::HException ( char const * const a_pcFileName,
 												 char const * const a_pcFunctionName,
 												 int const a_iLine, char const * const a_pcMessage,
@@ -91,7 +93,7 @@ HException::~HException ( void )
 		}
 	catch ( ... )
 		{
-		fprintf ( stderr, _ ( "CRITICAL FAILURE (~HException) !\n" ) );
+		fprintf ( static_cast<FILE*>( ERROR_STREAM ), _ ( "CRITICAL FAILURE (~HException) !\n" ) );
 		exit ( - 1 );
 		}
 	if ( f_pcCharPtr )
@@ -132,9 +134,9 @@ void HException::set ( char const * const a_pcStr )
 
 void HException::print_error ( bool const a_bFull ) const
 	{
-	fprintf ( stderr, "\nException: %s, %d.\n", f_pcMessage, f_iCode );
+	fprintf ( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", f_pcMessage, f_iCode );
 	if ( a_bFull )
-		fprintf ( stderr,
+		fprintf ( static_cast<FILE*>( ERROR_STREAM ),
 				"Exception registers:\nc:0x%02x\ti:%d\tl:%ld\td:%f\tpv:%p\npc:%s\n",
 				f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
 	return;
@@ -198,13 +200,22 @@ void HException::failed_assert ( char const * const a_pcFileName,
 	{
 	M_PROLOG
 	hcore::log << "Failed assertion: " << a_pcMessage << " -> " << a_pcFileName << "(" << a_iLine << "): " << a_pcFunctionName << endl;
-	fprintf ( stderr, "Failed assertion: `%s' at: %s: %4d: %s\n",
+	fprintf ( static_cast<FILE*>( ERROR_STREAM ), "Failed assertion: `%s' at: %s: %4d: %s\n",
 			a_pcMessage, a_pcFileName, a_iLine, a_pcFunctionName );
 	if ( ! errno )
 		errno ++;
 	if ( getenv( "YAAL_DUMP_ON_FAILED_ASSERTION" ) )
 		raise( SIGABRT );
 	throw ( errno );
+	M_EPILOG
+	}
+
+void HException::set_error_stream( void* a_pvErrorStream )
+	{
+	M_PROLOG
+	M_ASSERT( a_pvErrorStream );
+	ERROR_STREAM = a_pvErrorStream;
+	return;
 	M_EPILOG
 	}
 

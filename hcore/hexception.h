@@ -51,6 +51,7 @@ class HException
 	{
 	mutable bool f_bLocal;
 protected:
+	static void* ERROR_STREAM;
 	char f_cChar;
 	int	 f_iInt;
 	long f_lLong;
@@ -77,6 +78,7 @@ public:
 	int code ( void ) const;
 	static void failed_assert ( char const * const, char const * const, int const,
 			char const * const ) __attribute__(( __noreturn__ ));
+	static void set_error_stream( void* );
 private:
 	HException & operator = ( HException const & );
 	};
