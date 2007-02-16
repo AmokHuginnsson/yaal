@@ -119,7 +119,8 @@ protected:
 	virtual void do_refresh ( void ) = 0;
 	virtual void do_update( void );
 	virtual int do_click ( mouse::OMouse& );
-	virtual void draw_label ( void );
+	virtual void do_draw_label ( void );
+	void draw_label ( void );
 private:
 	HControl ( HControl const& );
 	HControl& operator = ( HControl const& );

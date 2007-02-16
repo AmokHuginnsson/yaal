@@ -173,6 +173,22 @@ extern int n_iWidth;
 extern int n_iHeight;
 extern int n_iMouseDes;
 
+char const* const red = "\033[0m\033[31m";
+char const* const green = "\033[0m\033[32m";
+char const* const brown = "\033[0m\033[33m";
+char const* const blue = "\033[0m\033[34m";
+char const* const magenta = "\033[0m\033[35m";
+char const* const cyan = "\033[0m\033[36m";
+char const* const lightgray = "\033[0m\033[37m";
+char const* const gray = "\033[40m\033[1m";
+char const* const brightred = "\033[1m\033[31m";
+char const* const brightgreen = "\033[1m\033[32m";
+char const* const yellow = "\033[1m\033[33m";
+char const* const brightblue = "\033[1m\033[34m";
+char const* const brightmagenta = "\033[1m\033[35m";
+char const* const brightcyan = "\033[1m\033[36m";
+char const* const white = "\033[1m\033[37m";
+
 }
 
 }

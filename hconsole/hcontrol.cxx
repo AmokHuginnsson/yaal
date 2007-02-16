@@ -185,7 +185,15 @@ bool HControl::is_searchable ( void )
 	M_EPILOG
 	}
 
-void HControl::draw_label ( void )
+void HControl::draw_label( void )
+	{
+	M_PROLOG
+	do_draw_label();
+	return;
+	M_EPILOG
+	}
+
+void HControl::do_draw_label( void )
 	{
 	M_PROLOG
 	n_bNeedRepaint = true;

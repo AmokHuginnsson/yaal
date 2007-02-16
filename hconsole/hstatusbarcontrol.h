@@ -75,26 +75,26 @@ protected:
 	hcore::HTime		f_oStart;
 	/* end of progress bar data */
 public:
-	HStatusBarControl ( HWindow *, char const *, int = -1 );
+	HStatusBarControl( HWindow*, char const*, int = -1 );
 	virtual ~HStatusBarControl ( void );
-	void setup ( char const *, char const *, int );
-	void set_prompt ( char const * = NULL, PROMPT::mode_t = PROMPT::D_NORMAL,
+	void setup( char const*, char const*, int );
+	void set_prompt( char const * = NULL, PROMPT::mode_t = PROMPT::D_NORMAL,
 			PROMPT::restrict_t = PROMPT::D_RELAXED );
-	void end_prompt ( void );
-	void init_progress ( double, char const *, bool = true );
-	void update_progress ( double = -1, char const * = NULL );
-	void message ( int, char const *, ... );
-	void message ( char const *, ... );
-	void bar ( char const * = NULL );
-	int ask ( char const *, char const * );
-	bool confirm ( char const * );
-	virtual int process_input_normal ( int );
-	virtual int process_input_menu ( int );
+	void end_prompt( void );
+	void init_progress( double, char const*, bool = true );
+	void update_progress( double = -1, char const * = NULL );
+	void message( int, char const*, ... );
+	void message( char const*, ... );
+	void bar( char const* = NULL );
+	int ask( char const*, char const* );
+	bool confirm( char const* );
+	virtual int process_input_normal( int );
+	virtual int process_input_menu( int );
 protected:
-	virtual void do_refresh ( void );
-	virtual void draw_label ( void );
-	virtual int verify ( void );
-	virtual int process_input ( int );
+	virtual void do_refresh( void );
+	virtual void do_draw_label( void );
+	virtual int verify( void );
+	virtual int process_input( int );
 	};
 
 }

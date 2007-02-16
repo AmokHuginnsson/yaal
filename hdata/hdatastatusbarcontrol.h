@@ -40,7 +40,7 @@ class HDataStatusBarControl : public hconsole::HStatusBarControl
 	{
 public:
 	HDataStatusBarControl ( HDataWindow *, char const *, int = -1 );
-	virtual void draw_label ( void );
+	virtual void do_draw_label ( void );
 	};
 
 }

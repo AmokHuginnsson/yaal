@@ -49,7 +49,7 @@ HDataStatusBarControl::HDataStatusBarControl ( HDataWindow * a_poParent,
 	M_EPILOG
 	}
 
-void HDataStatusBarControl::draw_label ( void )
+void HDataStatusBarControl::do_draw_label ( void )
 	{
 	M_PROLOG
 	HDataWindow * l_poWindow = NULL;

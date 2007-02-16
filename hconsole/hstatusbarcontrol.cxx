@@ -79,7 +79,7 @@ HStatusBarControl::~HStatusBarControl ( void )
 	M_EPILOG
 	}
 
-void HStatusBarControl::draw_label ( void )
+void HStatusBarControl::do_draw_label ( void )
 	{
 	M_PROLOG
 	c_move ( n_iHeight - 2, 0 );
