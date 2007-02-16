@@ -148,6 +148,14 @@ void HControlList::select ( HControl const* a_poControl )
 	M_EPILOG
 	}
 
+void HControlList::select ( HControl::ptr_t const& a_oControl )
+	{
+	M_PROLOG
+	select( a_oControl.raw() );
+	return;
+	M_EPILOG
+	}
+
 }
 
 }
