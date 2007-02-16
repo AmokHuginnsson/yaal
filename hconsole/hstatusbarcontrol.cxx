@@ -84,7 +84,7 @@ void HStatusBarControl::do_draw_label ( void )
 	M_PROLOG
 	c_move ( n_iHeight - 2, 0 );
 	c_clrtoeol ( );
-	HControl::draw_label ( );
+	HControl::do_draw_label ( );
 	bar ( );
 	f_iColumnRaw += f_iPromptLength;
 	f_iWidthRaw -= f_iPromptLength;
