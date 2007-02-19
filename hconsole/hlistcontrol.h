@@ -77,6 +77,7 @@ public:
 	virtual char const* get_time( void );
 	virtual int long get_id( void );
 	virtual void set_child_control_data( HControl* );
+	virtual HAbstractCell& operator= ( HAbstractCell const& );
 	};
 
 class HInfoCell
@@ -93,10 +94,48 @@ public:
 	virtual void set_child_control_data( HControl* );
 	};
 
+class HAbstractRow
+	{
+public:
+	virtual ~HAbstractRow( void );
+	virtual void switch_state( void );
+	virtual HAbstractCell& operator[]( int );
+	};
+
+template<typename tType>
+class HRow : public HAbstractRow
+	{
+	HItem_t<tType> f_oData;
+public:
+	HRow( int );
+	virtual tType& operator[]( int );
+	};
+
+class HAbstractControler
+	{
+public:
+	typedef yaal::hcore::HPointer<HAbstractControler,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
+	virtual ~HAbstractControler( void );
+	virtual int long size( void );
+	virtual bool empty( void );
+	};
+
+class HInfoControler : public HAbstractControler
+	{
+public:
+	typedef HAbstractRow row_t;
+	typedef yaal::hcore::HList<row_t> model_t;
+	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
+	typedef model_t::iterator iterator_t;
+private:
+	model_ptr_t f_oList;
+public:
+	};
+
 class HListControl : virtual public HSearchableControl
 	{
 public:
-	typedef HItem_t<HAbstractCell> row_t;
+	typedef HAbstractRow row_t;
 	typedef yaal::hcore::HList<row_t> model_t;
 	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
 	typedef model_t::iterator iterator_t;
@@ -154,7 +193,7 @@ protected:
 	iterator_t	f_oIterator; /* helper */ 
 	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
 	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */
-	model_ptr_t f_oList;
+	HAbstractControler::ptr_t f_oControler;
 public:
 	HListControl ( HWindow*,		 	/* parent */
 								 int,						/* row */
@@ -173,8 +212,8 @@ public:
 	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
 	void reset( void );
 	model_t const& get_data ( void ) const;
-	void add_tail( HAbstractCell& );
-	void add_orderly( HAbstractCell&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
+	void add_tail( row_t& );
+	void add_orderly( row_t&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
 	void remove_current_row();
 	int long get_row_count( void );
 protected:

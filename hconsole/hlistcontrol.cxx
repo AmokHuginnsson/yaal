@@ -435,7 +435,8 @@ void HListControl::handle_key_space ( void )
 	M_ASSERT( ! (*f_oList).empty() );
 	M_ASSERT( f_oCursor.is_valid() );
 	if ( f_bCheckable )
-		f_oCursor->m_bChecked = ! f_oCursor->m_bChecked;
+		f_oCursor->switch_state();
+//		f_oCursor->m_bChecked = ! f_oCursor->m_bChecked;
 	return;
 	}
 

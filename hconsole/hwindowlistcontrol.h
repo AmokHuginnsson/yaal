@@ -38,7 +38,7 @@ namespace hconsole
 
 class HWindow;
 
-class HWindowCell
+class HWindowCell : public HAbstractCell
 	{
 	HWindow::ptr_t f_oWindow;
 public:
