@@ -38,8 +38,21 @@ namespace hconsole
 
 class HWindow;
 
-typedef HListControl_t<HWindow::ptr_t> HBaseWindowListControl;
-class HWindowListControl : public HBaseWindowListControl
+class HWindowCell
+	{
+	HWindow::ptr_t f_oWindow;
+public:
+	explicit HWindowCell( HWindow::ptr_t const& );
+	virtual ~HWindowCell( void );
+	virtual yaal::hcore::HString get_long( void );
+	virtual yaal::hcore::HString get_double( void );
+	virtual yaal::hcore::HString get_string( void );
+	virtual char const* get_time( void );
+	virtual int long get_id( void );
+	virtual void set_child_control_data( HControl* );
+	};
+
+class HWindowListControl : public HListControl
 	{
 public:
 	HWindowListControl ( HWindow *, int, int, int, int, char const *, HWindowListControl::model_ptr_t );

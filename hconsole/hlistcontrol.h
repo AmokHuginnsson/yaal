@@ -41,7 +41,6 @@ namespace yaal
 namespace hconsole
 {
 
-
 namespace list_control_helper
 	{
 	template<typename tType>
@@ -68,9 +67,39 @@ namespace list_control_helper
 	bool compare_cells( tType const&, tType const&, OSortHelper& );
 	}
 
-class HBaseListControl : virtual public HSearchableControl
+class HAbstractCell
 	{
 public:
+	virtual ~HAbstractCell( void );
+	virtual yaal::hcore::HString get_long( void );
+	virtual yaal::hcore::HString get_double( void );
+	virtual yaal::hcore::HString get_string( void );
+	virtual char const* get_time( void );
+	virtual int long get_id( void );
+	virtual void set_child_control_data( HControl* );
+	};
+
+class HInfoCell
+	{
+	yaal::hcore::HInfo f_oInfo;
+public:
+	explicit HInfoCell( yaal::hcore::HInfo const& );
+	virtual ~HInfoCell( void );
+	virtual yaal::hcore::HString get_long( void );
+	virtual yaal::hcore::HString get_double( void );
+	virtual yaal::hcore::HString get_string( void );
+	virtual char const* get_time( void );
+	virtual int long get_id( void );
+	virtual void set_child_control_data( HControl* );
+	};
+
+class HListControl : virtual public HSearchableControl
+	{
+public:
+	typedef HItem_t<HAbstractCell> row_t;
+	typedef yaal::hcore::HList<row_t> model_t;
+	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
+	typedef model_t::iterator iterator_t;
 	struct FLAGS
 		{
 		typedef enum
@@ -100,7 +129,7 @@ protected:
 		virtual ~HColumnInfo ( void );
 		HColumnInfo ( HColumnInfo const& );
 		HColumnInfo& operator = ( HColumnInfo const& );
-		friend class HBaseListControl;
+		friend class HListControl;
 		};
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
@@ -119,16 +148,21 @@ protected:
 		{
 		int f_iColumnWithMatch;
 		int f_iMatchNumber;
-		match_t ( ) : f_iColumnWithMatch ( 0 ), f_iMatchNumber ( - 1 ) { }
+		iterator_t	f_oCurrentMatch;		/* row that has current pattern match */
+		match_t ( ) : f_iColumnWithMatch ( 0 ), f_iMatchNumber ( - 1 ), f_oCurrentMatch() { }
 		} f_sMatch;
+	iterator_t	f_oIterator; /* helper */ 
+	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
+	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */
+	model_ptr_t f_oList;
 public:
-	HBaseListControl ( HWindow*,		 	/* parent */
+	HListControl ( HWindow*,		 	/* parent */
 								 int,						/* row */
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 char const * );	/* label */
-	virtual ~HBaseListControl ( void );
+								 char const*, model_ptr_t = model_ptr_t() );	/* label */
+	virtual ~HListControl ( void );
 	void add_column ( int const&,									/* at position */
 										char const*,									/* column name */
 										int const&,									/* width */
@@ -137,15 +171,16 @@ public:
 										HControl * = NULL );					/* control associated */
 	virtual int set_focus ( char = 0 );
 	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
+	void reset( void );
+	model_t const& get_data ( void ) const;
+	void add_tail( HAbstractCell& );
+	void add_orderly( HAbstractCell&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
+	void remove_current_row();
+	int long get_row_count( void );
 protected:
-	virtual int long do_size( void ) = 0;
-	virtual void do_first_item( void ) = 0;
-	virtual void do_next_item( void ) = 0;
-	virtual void do_switch_state( void ) = 0;
-	virtual bool do_is_current_match( void ) = 0;
-	virtual void do_sort( list_control_helper::OSortHelper& ) = 0;
-	virtual bool get_text_for_cell( int, type_t ) = 0;
-	virtual void set_child_control_data_for_cell( int, HControl* ) = 0;
+	virtual void do_sort( list_control_helper::OSortHelper& );
+	virtual bool get_text_for_cell( int, type_t );
+	virtual void set_child_control_data_for_cell( int, HControl* );
 	virtual void do_refresh ( void );
 	void draw_cell ( int, int, int, HColumnInfo const* const, bool );
 	virtual int process_input( int );
@@ -168,115 +203,20 @@ protected:
 private:
 	void sort_by_column ( int, hcore::OListBits::sort_order_t = hcore::OListBits::D_ASCENDING );
 	void recalculate_column_widths ( void );
-	HBaseListControl ( HBaseListControl const& );
-	HBaseListControl& operator = ( HBaseListControl const& );
+	HListControl ( HListControl const& );
+	HListControl& operator = ( HListControl const& );
 	};
 
-template <typename tType = yaal::hcore::HInfo>
-class HListControl_t : public HBaseListControl
-	{
-public:
-	typedef HItem_t<tType> row_t;
-	typedef yaal::hcore::HList<row_t> model_t;
-	typedef typename model_t::iterator iterator_t;
-	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
-	HListControl_t ( HWindow*,		 	/* parent */
-								 int,						/* row */
-								 int,						/* col */
-								 int,						/* height */
-								 int,						/* width */
-								 char const*, model_ptr_t = model_ptr_t() );	/* label */
-	model_t const& get_data ( void ) const;
-	void add_tail( row_t& );
-	void add_orderly( row_t&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
-	void remove_current_row();
-	void set_current_row_cell( int, tType );
-	int long get_row_count( void );
-	void reset( void );
-protected:
-	model_ptr_t f_oList;
-	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
-	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */
-	iterator_t	f_oCurrentMatch;		/* row that has current pattern match */
-	iterator_t	f_oIterator;		/* row that has current pattern match */
-	virtual int long do_size( void );
-	virtual void do_first_item( void );
-	virtual void do_next_item( void );
-	virtual void do_switch_state( void );
-	virtual bool do_is_current_match( void );
-	virtual void do_sort( list_control_helper::OSortHelper& );
-	virtual void do_update( void );
-	virtual bool get_text_for_cell( int, type_t );
-	virtual void set_child_control_data_for_cell( int, HControl* );
-	};
-
-template <typename tType>
-HListControl_t<tType>::HListControl_t ( HWindow* a_poParent, int a_iRow, int a_iColumn,
-		int a_iHeight, int a_iWidth, char const * a_pcLabel, model_ptr_t a_oData )
-						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
-								a_pcLabel ),
-							HSearchableControl ( true ),
-							HBaseListControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcLabel ),
-	f_oList ( ( !!a_oData ) ? a_oData : model_ptr_t ( new model_t() ) ),
-	f_oCursor(), f_oFirstVisibleRow ( ), f_oCurrentMatch ( ), f_oIterator()
-	{
-	return;
-	}
-
-template <typename tType>
-int long HListControl_t<tType>::do_size( void )
-	{
-	return ( (*f_oList).size() );
-	}
-
-template <typename tType>
-int long HListControl_t<tType>::get_row_count( void )
-	{
-	return ( do_size() );
-	}
-
-template <typename tType>
-void HListControl_t<tType>::do_first_item( void )
-	{
-	M_ASSERT( f_oList->size() );
-	M_ASSERT( f_oFirstVisibleRow.is_valid() );
-	f_oIterator = f_oFirstVisibleRow;
-	return;
-	}
-
-template <typename tType>
-void HListControl_t<tType>::do_next_item( void )
-	{
-	++ f_oIterator;
-	return;
-	}
-
-template <typename tType>
-void HListControl_t<tType>::do_switch_state( void )
-	{
-	if ( f_bCheckable&& ! (*f_oList).empty ( ) )
-		f_oIterator->m_bChecked = ! f_oIterator->m_bChecked;
-	}
-
-template <typename tType>
-void HListControl_t<tType>::do_update( void )
-	{
-	M_PROLOG
-	f_oFirstVisibleRow = f_oCursor = f_oList->begin();
-	return;
-	M_EPILOG
-	}
-
-template <typename tType>
+/*
+template<typename tType>
 bool HListControl_t<tType>::do_is_current_match( void )
 	{
-	return ( f_oIterator == f_oCurrentMatch );
 	}
 
-template <typename tType>
+template<typename tType>
 bool HListControl_t<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
 	{
-	M_ASSERT( f_oIterator.is_valid() );
+	M_ASSERT( f_oIterator->is_valid() );
 	row_t& l_oItem = *f_oIterator;
 	switch ( a_eType )
 		{
@@ -298,13 +238,13 @@ bool HListControl_t<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
 	return ( l_oItem.m_bChecked );
 	}
 
-template <typename tType>
+template<typename tType>
 void HListControl_t<tType>::set_child_control_data_for_cell( int, HControl* )
 	{
 	return;
 	}
 
-template <typename tType>
+template<typename tType>
 void HListControl_t<tType>::add_tail( row_t& a_tRow )
 	{
 	M_PROLOG
@@ -315,7 +255,7 @@ void HListControl_t<tType>::add_tail( row_t& a_tRow )
 		f_iCursorPosition = f_iHeightRaw - 1;
 		f_iControlOffset = l_iSize - f_iHeightRaw;
 		if ( f_oFirstVisibleRow != f_oList->end() )
-			++ f_oFirstVisibleRow;
+			++ (*f_oFirstVisibleRow);
 		}
 	else
 		f_iCursorPosition = l_iSize - 1;
@@ -330,7 +270,7 @@ void HListControl_t<tType>::add_tail( row_t& a_tRow )
 	M_EPILOG
 	}
 
-template <typename tType>
+template<typename tType>
 void HListControl_t<tType>::add_orderly ( row_t& a_tRow, yaal::hcore::OListBits::sort_order_t a_eOrder )
 	{
 	M_PROLOG
@@ -343,7 +283,7 @@ void HListControl_t<tType>::add_orderly ( row_t& a_tRow, yaal::hcore::OListBits:
 	M_EPILOG
 	}
 
-template <typename tType>
+template<typename tType>
 void HListControl_t<tType>::remove_current_row ( void )
 	{
 	M_PROLOG
@@ -352,38 +292,38 @@ void HListControl_t<tType>::remove_current_row ( void )
 			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_oList->size() ) )
 		{
 		f_iControlOffset --;
-		++ f_oFirstVisibleRow;
+		++ (*f_oFirstVisibleRow);
 		}
 	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_oList->size() - 1 ) ) )
 		f_iCursorPosition --;
 	else
 		l_bFlag = false;
-	if ( f_oCursor == f_oFirstVisibleRow )
-		++ f_oFirstVisibleRow;
+	if ( (*f_oCursor) == (*f_oFirstVisibleRow) )
+		++ (*f_oFirstVisibleRow);
 	n_bNeedRepaint = true;
 	iterator_t it = f_oCursor;
 	if ( l_bFlag )
-		++ f_oCursor;
+		++ (*f_oCursor);
 	f_oList->erase ( it );
 	refresh();
 	return;
 	M_EPILOG
 	}
 
-template <typename tType>
+template<typename tType>
 void HListControl_t<tType>::set_current_row_cell ( int a_iColumn, tType a_tValue )
 	{
 	(*f_oCursor)[ a_iColumn ] = a_tValue;
 	return;
 	}
 
-template <typename tType>
+template<typename tType>
 typename HListControl_t<tType>::model_t const& HListControl_t<tType>::get_data ( void ) const
 	{
 	return ( (*f_oList) );
 	}
 
-template <typename tType>
+template<typename tType>
 class CompareListControlItems
 	{
 	list_control_helper::OSortHelper& f_roSortHelper;
@@ -393,7 +333,7 @@ public:
 	bool operator() ( tType const&, tType const& ) const;
 	};
 
-template <typename tType>
+template<typename tType>
 bool CompareListControlItems<tType>::operator() ( tType const& a_oLeft,
 		tType const& a_oRight ) const
 	{
@@ -405,27 +345,14 @@ bool CompareListControlItems<tType>::operator() ( tType const& a_oLeft,
 	M_EPILOG
 	}
 
-template <typename tType>
+template<typename tType>
 void HListControl_t<tType>::do_sort( list_control_helper::OSortHelper& a_roHelper )
 	{
 	(*f_oList).sort ( CompareListControlItems<HItem_t<tType> > ( a_roHelper ) );
 	f_oFirstVisibleRow = (*f_oList).begin();
 	}
 
-template <typename tType>
-void HListControl_t<tType>::reset( void )
-	{
-	M_PROLOG
-	f_iControlOffset = f_iCursorPosition = 0;
-	if ( do_size() )
-		f_oFirstVisibleRow = f_oCursor = f_oList->begin();
-	else
-		f_oFirstVisibleRow = f_oCursor = f_oList->end();
-	return;
-	M_EPILOG
-	}
-
-typedef HListControl_t<> HListControl;
+*/
 
 }
 

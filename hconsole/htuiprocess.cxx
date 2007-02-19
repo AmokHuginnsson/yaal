@@ -120,8 +120,8 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow::ptr_t a_oMain
 int HTUIProcess::add_window ( HWindow::ptr_t a_oWindow )
 	{
 	M_PROLOG
-	HItem_t<HWindow::ptr_t> l_oItem( 1 );
-	l_oItem[ 0 ] = a_oWindow;
+	HItem_t<HAbstractCell> l_oItem( 1 );
+	l_oItem[ 0 ] = HWindowCell( a_oWindow );
 	a_oWindow->init();
 	f_oWindows->push_back ( l_oItem );
 	f_oForegroundWindow = f_oWindows->rbegin();
