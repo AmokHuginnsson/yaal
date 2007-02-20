@@ -92,7 +92,7 @@ HListControl::HColumnInfo &
 	}
 
 HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-		int a_iHeight, int a_iWidth, char const* a_pcLabel, model_ptr_t a_oData )
+		int a_iHeight, int a_iWidth, char const* a_pcLabel, HAbstractControler::ptr_t const& a_oData )
 						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
 								a_pcLabel ),
 							HSearchableControl ( true ),
@@ -100,7 +100,8 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_bDrawHeader ( true ), f_bEditable ( false ),
 	f_iControlOffset ( 0 ), f_iCursorPosition ( 0 ), f_iSumForOne ( 0 ),
 	f_oHeader(), f_iSortColumn ( -1 ), f_sMatch(),
-	f_oIterator(), f_oCursor(), f_oFirstVisibleRow(), f_oList ( ( !!a_oData ) ? a_oData : model_ptr_t ( new model_t() ) )
+	f_oIterator(), f_oCursor(), f_oFirstVisibleRow(),
+	f_oControler ( ( !!a_oData ) ? a_oData : HAbstractControler::ptr_t ( new HInfoControler() ) )
 	{
 	M_PROLOG
 	schedule_refresh();
@@ -123,7 +124,7 @@ void HListControl::do_refresh ( void )
 	int l_iTmp = 0;
 	int l_iColumns = f_oHeader.size();
 	int l_iHR = f_bDrawHeader ? 1 : 0; /* HR stands for header row */
-	int l_iSize = f_oList->size();
+	int l_iSize = f_oControler->size();
 	double l_dScaled = 0;
 	HColumnInfo * l_poColumnInfo = NULL;
 	l_iTmp = f_iWidthRaw;
@@ -141,7 +142,7 @@ void HListControl::do_refresh ( void )
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	if ( l_iSize > 0 )
 		{
-		f_oIterator = f_oList->begin();
+		f_oIterator = f_oControler->begin();
 		for ( l_iCtr = 0;
 					l_iCtr < ( l_iSize > f_iHeightRaw ? f_iHeightRaw : l_iSize );
 					++ l_iCtr, ++ f_oIterator )
@@ -334,7 +335,7 @@ void HListControl::handle_key_page_up ( void )
 
 void HListControl::handle_key_page_down ( void )
 	{
-	int l_iSize = f_oList->size();
+	int l_iSize = f_oControler->size();
 	if ( l_iSize >= f_iHeightRaw )
 		{
 		if ( f_iCursorPosition == ( f_iHeightRaw - 1 ) )
@@ -383,7 +384,7 @@ void HListControl::handle_key_home ( void )
 
 void HListControl::handle_key_end ( void )
 	{
-	int l_iSize = f_oList->size();
+	int l_iSize = f_oControler->size();
 	if ( l_iSize >= f_iHeightRaw )
 		{
 		f_iCursorPosition = f_iHeightRaw - 1;
@@ -396,7 +397,7 @@ void HListControl::handle_key_end ( void )
 
 void HListControl::handle_key_down ( void )
 	{
-	if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_oList->size() - 1 ) )
+	if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_oControler->size() - 1 ) )
 		{
 		f_iCursorPosition ++;
 		++ f_oCursor;
@@ -432,7 +433,7 @@ void HListControl::handle_key_ctrl_p ( void )
 
 void HListControl::handle_key_space ( void )
 	{
-	M_ASSERT( ! (*f_oList).empty() );
+	M_ASSERT( ! (*f_oControler).empty() );
 	M_ASSERT( f_oCursor.is_valid() );
 	if ( f_bCheckable )
 		f_oCursor->switch_state();
@@ -501,7 +502,7 @@ void HListControl::add_column ( int const & a_riColumn, char const * a_pcName,
 	M_PROLOG
 	int l_iShortcutIndex = 0;
 	HColumnInfo l_oColumnInfo;
-	int l_iSize = f_oList->size();
+	int l_iSize = f_oControler->size();
 	if ( l_iSize )
 		M_THROW ( "can not add new column when list not empty", l_iSize );
 	f_oVarTmpBuffer = a_pcName;
@@ -670,13 +671,13 @@ void HListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a_eOr
 		return;
 	f_iSortColumn = a_iColumn;
 	f_oHeader [ a_iColumn ].f_bDescending = a_eOrder == OListBits::D_DESCENDING;
-	long int l_iSize = f_oList->size();
+	long int l_iSize = f_oControler->size();
 	if ( l_iSize > 128 )
 		f_poParent->status_bar()->init_progress (
 				static_cast<double>( l_iSize )
 				* static_cast<double>( l_iSize ) / 2.,
 				" Sorting ..." );
-	list_control_helper::OSortHelper l_oHelper = { a_iColumn, a_eOrder, f_oHeader [ f_iSortColumn ].f_eType, 0, f_oList->size(), f_poParent };
+	list_control_helper::OSortHelper l_oHelper = { a_iColumn, a_eOrder, f_oHeader [ f_iSortColumn ].f_eType, 0, f_oControler->size(), f_poParent };
 	do_sort( l_oHelper );
 	f_iControlOffset = f_iCursorPosition = 0;
 	return;
@@ -710,7 +711,7 @@ int HListControl::do_click ( mouse::OMouse & a_rsMouse )
 				}
 			}
 		}
-	else if ( l_iRow < f_oList->size() )
+	else if ( l_iRow < f_oControler->size() )
 		{
 		f_iCursorPosition = l_iRow;
 		refresh();
@@ -727,7 +728,7 @@ bool HListControl::is_searchable ( void )
 void HListControl::reset( void )
 	{
 	M_PROLOG
-	f_oFirstVisibleRow = f_oCursor = f_oList->begin();
+	f_oFirstVisibleRow = f_oCursor = f_oControler->begin();
 	f_iControlOffset = f_iCursorPosition = 0;
 	M_EPILOG
 	}
@@ -737,7 +738,7 @@ void HListControl::go_to_match ( void )
 	M_PROLOG
 /*
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iCount = (*f_oList).size() + 1, l_iColumns = f_oHeader.size();
+	int l_iCount = (*f_oControler).size() + 1, l_iColumns = f_oHeader.size();
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
 	HItem * l_poItem = NULL;
@@ -817,7 +818,7 @@ void HListControl::go_to_match_previous ( void )
 	M_PROLOG
 /*
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iCount = (*f_oList).size() + 1, l_iColumns = f_oHeader.size();
+	int l_iCount = (*f_oControler).size() + 1, l_iColumns = f_oHeader.size();
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
 	HItem * l_poItem = NULL;

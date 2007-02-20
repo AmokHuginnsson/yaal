@@ -114,15 +114,27 @@ public:
 class HAbstractControler
 	{
 public:
+	class HModelIteratorWrapper
+		{
+	public:
+		HAbstractRow& operator* ( void );
+		HAbstractRow* operator-> ( void );
+		HModelIteratorWrapper& operator++ ( void );
+		HModelIteratorWrapper& operator-- ( void );
+		bool operator== ( HModelIteratorWrapper const& );
+		bool is_valid( void );
+		};
 	typedef yaal::hcore::HPointer<HAbstractControler,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
 	virtual ~HAbstractControler( void );
 	virtual int long size( void );
 	virtual bool empty( void );
+	virtual HModelIteratorWrapper begin();
 	};
 
 class HInfoControler : public HAbstractControler
 	{
 public:
+	typedef yaal::hcore::HPointer<HAbstractControler,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
 	typedef HAbstractRow row_t;
 	typedef yaal::hcore::HList<row_t> model_t;
 	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
@@ -130,6 +142,7 @@ public:
 private:
 	model_ptr_t f_oList;
 public:
+	HInfoControler( model_ptr_t = model_ptr_t() );
 	};
 
 class HListControl : virtual public HSearchableControl
@@ -138,7 +151,7 @@ public:
 	typedef HAbstractRow row_t;
 	typedef yaal::hcore::HList<row_t> model_t;
 	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
-	typedef model_t::iterator iterator_t;
+	typedef HAbstractControler::HModelIteratorWrapper iterator_t;
 	struct FLAGS
 		{
 		typedef enum
@@ -200,7 +213,7 @@ public:
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 char const*, model_ptr_t = model_ptr_t() );	/* label */
+								 char const*, HAbstractControler::ptr_t const& = HInfoControler::ptr_t() );	/* label */
 	virtual ~HListControl ( void );
 	void add_column ( int const&,									/* at position */
 										char const*,									/* column name */
