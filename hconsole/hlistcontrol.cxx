@@ -101,7 +101,7 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iControlOffset ( 0 ), f_iCursorPosition ( 0 ), f_iSumForOne ( 0 ),
 	f_oHeader(), f_iSortColumn ( -1 ), f_sMatch(),
 	f_oIterator(), f_oCursor(), f_oFirstVisibleRow(),
-	f_oControler ( ( !!a_oData ) ? a_oData : HAbstractControler::ptr_t ( new HInfoControler() ) )
+	f_oControler( a_oData )
 	{
 	M_PROLOG
 	schedule_refresh();

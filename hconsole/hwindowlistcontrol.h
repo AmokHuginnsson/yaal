@@ -38,24 +38,11 @@ namespace hconsole
 
 class HWindow;
 
-class HWindowCell : public HAbstractCell
-	{
-	HWindow::ptr_t f_oWindow;
-public:
-	explicit HWindowCell( HWindow::ptr_t const& );
-	virtual ~HWindowCell( void );
-	virtual yaal::hcore::HString get_long( void );
-	virtual yaal::hcore::HString get_double( void );
-	virtual yaal::hcore::HString get_string( void );
-	virtual char const* get_time( void );
-	virtual int long get_id( void );
-	virtual void set_child_control_data( HControl* );
-	};
-
 class HWindowListControl : public HListControl
 	{
 public:
-	HWindowListControl ( HWindow *, int, int, int, int, char const *, HWindowListControl::model_ptr_t );
+	HWindowListControl ( HWindow *, int, int, int, int, char const *,
+			HAbstractControler::ptr_t const& = HListControler<HCell<HWindow::ptr_t> >::ptr_t() );
 	virtual ~HWindowListControl ( void );
 	virtual int process_input ( int );
 	virtual void do_refresh ( void );
