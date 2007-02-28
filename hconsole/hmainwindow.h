@@ -41,9 +41,9 @@ namespace hconsole
 class HMainWindow : public HWindow
 	{
 	HMenuControl * f_poMenu;
-	HWindowListControl::model_ptr_t f_oWindowList;
+	HTUIProcess::model_ptr_t f_oWindowList;
 public:
-	HMainWindow ( char const *, HWindowListControl::model_ptr_t );
+	HMainWindow ( char const *, HTUIProcess::model_ptr_t );
 	virtual ~HMainWindow ( void );
 	void init_menu ( HTUIProcess *, OMenuItem * );
 	virtual int init ( void );

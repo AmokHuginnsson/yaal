@@ -94,7 +94,7 @@ public:
 	HControl ( HWindow*, int, int, int, int, char const* );
 	virtual ~HControl ( void );
 	void enable ( bool );
-	virtual int process_input ( int );
+	int process_input ( int );
 	/* set focus if control is enabled or if shortcut char is specified */
 	virtual int set_focus ( char = 0 ); /* focused and shortcut char match */
 	virtual int kill_focus ( void );
@@ -116,6 +116,7 @@ public:
 	void set_attr_data ( void ) const;
 	void schedule_refresh( void ) const;
 protected:
+	virtual int do_process_input ( int );
 	virtual void do_refresh ( void ) = 0;
 	virtual void do_update( void );
 	virtual int do_click ( mouse::OMouse& );

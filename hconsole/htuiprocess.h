@@ -40,11 +40,13 @@ namespace hconsole
 
 class HTUIProcess : public HHandler, protected yaal::hcore::HProcess
 	{
+public:
+	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
+	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
 protected:
 	HWindow::ptr_t f_oMainWindow; /* self explanary */
-	HWindowListControl::model_t::cyclic_iterator f_oForegroundWindow; /* self explanary */
-	typedef HWindowListControl::model_t model_t;
-	HWindowListControl::model_ptr_t f_oWindows;	/* current existing windows */
+	model_t::cyclic_iterator f_oForegroundWindow; /* self explanary */
+	model_ptr_t f_oWindows;	/* current existing windows */
 public:
 	HTUIProcess ( size_t = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );

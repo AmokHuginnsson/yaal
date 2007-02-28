@@ -448,7 +448,7 @@ void HListControl::handle_key_tab ( void )
 	return;
 	}
 
-int HListControl::process_input ( int a_iCode )
+int HListControl::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
 	int l_iCtr = 0;

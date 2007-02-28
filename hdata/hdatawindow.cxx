@@ -140,11 +140,11 @@ int HDataWindow::init ( void )
 					l_psLCR = static_cast<OListControlResource*>( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				HDataListControl* l_poList = NULL;
 				l_poDataControl = l_poList = new HDataListControl ( this, this, M_SETUP_STANDART );
-				l_poList->set_flags( ( l_psLCR->f_bCheckable ? HBaseListControl::FLAGS::D_CHECKABLE : HBaseListControl::FLAGS::D_NONE )
-						| ( l_psLCR->f_bSortable ? HBaseListControl::FLAGS::D_SORTABLE : HBaseListControl::FLAGS::D_NONE )
-						| ( l_psLCR->f_bEditable ? HBaseListControl::FLAGS::D_EDITABLE : HBaseListControl::FLAGS::D_NONE )
-						| ( l_psLCR->f_bDrawHeader ? HBaseListControl::FLAGS::D_EDITABLE : HBaseListControl::FLAGS::D_NONE ),
-						HBaseListControl::FLAGS::D_ALL );
+				l_poList->set_flags( ( l_psLCR->f_bCheckable ? HListControl::FLAGS::D_CHECKABLE : HListControl::FLAGS::D_NONE )
+						| ( l_psLCR->f_bSortable ? HListControl::FLAGS::D_SORTABLE : HListControl::FLAGS::D_NONE )
+						| ( l_psLCR->f_bEditable ? HListControl::FLAGS::D_EDITABLE : HListControl::FLAGS::D_NONE )
+						| ( l_psLCR->f_bDrawHeader ? HListControl::FLAGS::D_EDITABLE : HListControl::FLAGS::D_NONE ),
+						HListControl::FLAGS::D_ALL );
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_TREE ):

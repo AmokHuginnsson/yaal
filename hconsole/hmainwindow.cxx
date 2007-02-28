@@ -36,7 +36,7 @@ namespace yaal
 namespace hconsole
 {
 
-HMainWindow::HMainWindow ( char const * a_pcTitle, HWindowListControl::model_ptr_t a_oWindows )
+HMainWindow::HMainWindow ( char const * a_pcTitle, HTUIProcess::model_ptr_t a_oWindows )
 						: HWindow ( a_pcTitle ), f_poMenu ( NULL ), f_oWindowList ( a_oWindows )
 	{
 	M_PROLOG
@@ -65,7 +65,8 @@ int HMainWindow::init ( void )
 	f_poMenu->enable ( true );
 	f_poMenu->set_focus ( );
 	HWindowListControl * l_poWindowList = new HWindowListControl ( this, 1,
-			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n", f_oWindowList );
+			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n",
+			HListControler<HWindow::ptr_t>::ptr_t( new HListControler<HWindow::ptr_t>( f_oWindowList ) ) );
 	l_poWindowList->add_column ( -1, "&Okno", 1 );
 	l_poWindowList->enable ( true );
 	f_oControls.select( f_poMenu );

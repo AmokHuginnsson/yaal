@@ -41,10 +41,9 @@ class HWindow;
 class HWindowListControl : public HListControl
 	{
 public:
-	HWindowListControl ( HWindow *, int, int, int, int, char const *,
-			HAbstractControler::ptr_t const& = HListControler<HCell<HWindow::ptr_t> >::ptr_t() );
+	HWindowListControl ( HWindow *, int, int, int, int, char const *, HAbstractControler::ptr_t const& );
 	virtual ~HWindowListControl ( void );
-	virtual int process_input ( int );
+	virtual int do_process_input ( int );
 	virtual void do_refresh ( void );
 	virtual void set_child_control_data_for_cell( int, HControl* ){}
 protected:

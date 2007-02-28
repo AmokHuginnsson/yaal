@@ -106,7 +106,7 @@ public:
 template<typename tType>
 class HRow : public HAbstractRow
 	{
-	HItem_t<tType> f_oData;
+	HItem_t<HCell<tType> > f_oData;
 public:
 	HRow( int );
 	virtual tType& operator[]( int );
@@ -118,11 +118,15 @@ public:
 	class HModelIteratorWrapper
 		{
 	public:
+		HModelIteratorWrapper( void );
+		HModelIteratorWrapper( HModelIteratorWrapper const& );
 		HAbstractRow& operator* ( void );
 		HAbstractRow* operator-> ( void );
 		HModelIteratorWrapper& operator++ ( void );
 		HModelIteratorWrapper& operator-- ( void );
+		HModelIteratorWrapper& operator= ( HModelIteratorWrapper const& );
 		bool operator== ( HModelIteratorWrapper const& );
+		bool operator!= ( HModelIteratorWrapper const& );
 		bool is_valid( void );
 		};
 	typedef yaal::hcore::HPointer<HAbstractControler,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
@@ -130,6 +134,7 @@ public:
 	virtual int long size( void );
 	virtual bool empty( void );
 	virtual HModelIteratorWrapper begin();
+	virtual HModelIteratorWrapper end();
 	};
 
 template<typename tType>
@@ -137,16 +142,16 @@ class HListControler : public HAbstractControler
 	{
 public:
 	typedef yaal::hcore::HPointer<HAbstractControler,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
-	typedef HAbstractRow row_t;
-	typedef yaal::hcore::HList<row_t> model_t;
+	typedef HRow<tType> row_t;
+	typedef yaal::hcore::HList<tType> model_t;
 	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
-	typedef model_t::iterator iterator_t;
+	typedef typename model_t::iterator iterator_t;
 private:
 	model_ptr_t f_oList;
 public:
 	HListControler( model_ptr_t = model_ptr_t() );
-//	void add_tail( row_t& );
-//	void add_orderly( row_t&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
+	void add_tail( tType& );
+	void add_orderly( tType&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
 	};
 
 class HListControl : virtual public HSearchableControl
@@ -234,11 +239,10 @@ protected:
 	virtual void set_child_control_data_for_cell( int, HControl* );
 	virtual void do_refresh ( void );
 	void draw_cell ( int, int, int, HColumnInfo const* const, bool );
-	virtual int process_input( int );
+	virtual int do_process_input( int );
 	//virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const& = D_BLOCK_IF_NOT_EMPTIED, HItem_t * * = NULL );
 	virtual bool is_searchable ( void );
 	virtual int do_click ( mouse::OMouse& );
-//	virtual bool is_above_c ( HElement *, HElement * );
 	virtual void go_to_match ( void );
 	virtual void go_to_match_previous ( void );
 	void handle_key_page_up ( void );

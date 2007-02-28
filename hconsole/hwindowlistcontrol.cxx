@@ -38,12 +38,12 @@ namespace hconsole
 
 HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 		int a_iColumn, int a_iHeight, int a_iWidth, char const * a_pcLabel,
-		HWindowListControl::model_ptr_t a_oWindows )
+		HAbstractControler::ptr_t const& a_oControler )
 									:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 											a_iWidth, a_pcLabel ),
-										HSearchableControl ( false ),
-										HListControl_t<HWindow::ptr_t> ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-												a_iWidth, a_pcLabel, a_oWindows )
+										HSearchableControl( false ),
+										HListControl( a_poParent, a_iRow, a_iColumn, a_iHeight,
+												a_iWidth, a_pcLabel, a_oControler )
 	{
 	M_PROLOG
 	return;
@@ -58,15 +58,12 @@ HWindowListControl::~HWindowListControl ( void )
 	M_EPILOG
 	}
 
-int HWindowListControl::process_input ( int a_iCode )
+int HWindowListControl::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
-	a_iCode = HListControl_t<HWindow::ptr_t>::process_input ( a_iCode );
-	if ( ( f_oList->size() > 1 ) && ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) ) )
-		{
-		f_oList->go ( f_iControlOffset + f_iCursorPosition - 1 );
+	a_iCode = HListControl::do_process_input ( a_iCode );
+	if ( ( f_oControler->size() > 1 ) && ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) ) )
 		a_iCode = KEY < '\t' >::meta;
-		}
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -74,7 +71,7 @@ int HWindowListControl::process_input ( int a_iCode )
 void HWindowListControl::do_refresh ( void )
 	{
 	M_PROLOG
-	HListControl_t<HWindow::ptr_t>::do_refresh ( );
+	HListControl::do_refresh ( );
 	M_EPILOG
 	}
 
