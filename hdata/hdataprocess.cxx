@@ -76,7 +76,7 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 	HXml::ONode & l_sNode = l_oXml.parse ( "/resource/menu" );
 	f_psRootMenu = build_sub_menu ( l_sNode, a_roHandlers );
 	M_ASSERT ( f_oForegroundWindow.is_valid() );
-	l_poMainWindow = dynamic_cast < HMainWindow * > ( &*((*f_oForegroundWindow)[0]) );
+	l_poMainWindow = dynamic_cast < HMainWindow * > ( &*(*f_oForegroundWindow) );
 	M_ASSERT ( l_poMainWindow );
 	l_poMainWindow->init_menu ( this, f_psRootMenu );
 	return ( l_iError );
@@ -189,7 +189,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 			++ it;
 		for ( ; it != f_oWindows->end(); ++ it )
 			{
-			l_poWindow = dynamic_cast<HDataWindow*>( static_cast<HWindow*>( &*(*it)[0] ) );
+			l_poWindow = dynamic_cast<HDataWindow*>( static_cast<HWindow*>( &*(*it) ) );
 			if ( l_poWindow && l_poWindow->is_modified() )
 				{
 				select( l_poWindow );

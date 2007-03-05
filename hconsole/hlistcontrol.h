@@ -83,7 +83,7 @@ public:
 template<typename tType>
 class HCell : public HAbstractCell
 	{
-	yaal::hcore::HInfo f_oInfo;
+	tType f_tData;
 public:
 	explicit HCell( yaal::hcore::HInfo const& );
 	virtual ~HCell( void );
@@ -109,7 +109,7 @@ class HRow : public HAbstractRow
 	HItem_t<HCell<tType> > f_oData;
 public:
 	HRow( int );
-	virtual tType& operator[]( int );
+	virtual HCell<tType>& operator[]( int );
 	};
 
 class HAbstractControler
