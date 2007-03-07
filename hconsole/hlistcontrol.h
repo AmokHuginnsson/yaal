@@ -106,7 +106,10 @@ public:
 template<typename tType>
 class HRow : public HAbstractRow
 	{
-	HItem_t<HCell<tType> > f_oData;
+public:
+	typedef HItem_t<HCell<tType> > data_t;
+private:
+	data_t f_oData;
 public:
 	HRow( int );
 	virtual HCell<tType>& operator[]( int );
@@ -141,16 +144,16 @@ template<typename tType>
 class HListControler : public HAbstractControler
 	{
 public:
-	typedef yaal::hcore::HPointer<HAbstractControler,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HListControler<tType>,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
 	typedef HRow<tType> row_t;
-	typedef yaal::hcore::HList<tType> model_t;
+	typedef yaal::hcore::HList<row_t> model_t;
 	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
 	typedef typename model_t::iterator iterator_t;
 private:
 	model_ptr_t f_oList;
 public:
 	HListControler( model_ptr_t = model_ptr_t() );
-	void add_tail( tType& );
+	void add_tail( typename HRow<tType>::data_t& );
 	void add_orderly( tType&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
 	};
 
@@ -264,12 +267,12 @@ private:
 
 /*
 template<typename tType>
-bool HListControl_t<tType>::do_is_current_match( void )
+bool HListControl<tType>::do_is_current_match( void )
 	{
 	}
 
 template<typename tType>
-bool HListControl_t<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
+bool HListControl<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
 	{
 	M_ASSERT( f_oIterator->is_valid() );
 	row_t& l_oItem = *f_oIterator;
@@ -294,13 +297,13 @@ bool HListControl_t<tType>::get_text_for_cell( int a_iColumn, type_t a_eType )
 	}
 
 template<typename tType>
-void HListControl_t<tType>::set_child_control_data_for_cell( int, HControl* )
+void HListControl<tType>::set_child_control_data_for_cell( int, HControl* )
 	{
 	return;
 	}
 
 template<typename tType>
-void HListControl_t<tType>::add_tail( row_t& a_tRow )
+void HListControl<tType>::add_tail( row_t& a_tRow )
 	{
 	M_PROLOG
 	f_oList->push_back ( a_tRow );
@@ -326,7 +329,7 @@ void HListControl_t<tType>::add_tail( row_t& a_tRow )
 	}
 
 template<typename tType>
-void HListControl_t<tType>::add_orderly ( row_t& a_tRow, yaal::hcore::OListBits::sort_order_t a_eOrder )
+void HListControl<tType>::add_orderly ( row_t& a_tRow, yaal::hcore::OListBits::sort_order_t a_eOrder )
 	{
 	M_PROLOG
 	f_oList->add_orderly( a_tRow, a_eOrder );
@@ -339,7 +342,7 @@ void HListControl_t<tType>::add_orderly ( row_t& a_tRow, yaal::hcore::OListBits:
 	}
 
 template<typename tType>
-void HListControl_t<tType>::remove_current_row ( void )
+void HListControl<tType>::remove_current_row ( void )
 	{
 	M_PROLOG
 	bool l_bFlag = true;
@@ -366,14 +369,14 @@ void HListControl_t<tType>::remove_current_row ( void )
 	}
 
 template<typename tType>
-void HListControl_t<tType>::set_current_row_cell ( int a_iColumn, tType a_tValue )
+void HListControl<tType>::set_current_row_cell ( int a_iColumn, tType a_tValue )
 	{
 	(*f_oCursor)[ a_iColumn ] = a_tValue;
 	return;
 	}
 
 template<typename tType>
-typename HListControl_t<tType>::model_t const& HListControl_t<tType>::get_data ( void ) const
+typename HListControl<tType>::model_t const& HListControl<tType>::get_data ( void ) const
 	{
 	return ( (*f_oList) );
 	}
@@ -401,7 +404,7 @@ bool CompareListControlItems<tType>::operator() ( tType const& a_oLeft,
 	}
 
 template<typename tType>
-void HListControl_t<tType>::do_sort( list_control_helper::OSortHelper& a_roHelper )
+void HListControl<tType>::do_sort( list_control_helper::OSortHelper& a_roHelper )
 	{
 	(*f_oList).sort ( CompareListControlItems<HItem_t<tType> > ( a_roHelper ) );
 	f_oFirstVisibleRow = (*f_oList).begin();

@@ -46,7 +46,7 @@ HDataListControl::HDataListControl ( HRecordSet * a_poRecordSet,
 										a_iWidth, a_pcTitle ),
 								HSearchableControl ( true ),
 								HListControl ( NULL, 0, 0, 0, 0, NULL ),
-								HDataControl ( a_poRecordSet )
+								HDataControl ( a_poRecordSet ), f_oDataControler( f_oControler )
 	{
 	M_PROLOG
 	return;
@@ -63,7 +63,7 @@ HDataListControl::~HDataListControl ( void )
 void HDataListControl::load ( int long /*a_iId*/ )
 	{
 	M_PROLOG
-	int l_iCount = 0, l_iCtr = 0, l_iQuantity = f_oControler->size();
+	int l_iCount = 0, l_iCtr = 0, l_iQuantity = f_oDataControler->size();
 	HItem l_oItem ( f_oHeader.size() );
 	HDataWindow * l_poParent = dynamic_cast<HDataWindow*> ( f_poParent );
 	M_ASSERT ( l_poParent );
@@ -73,21 +73,21 @@ void HDataListControl::load ( int long /*a_iId*/ )
 	else
 		l_iCount = f_poRecordSet->open();
 	l_poParent->status_bar ( )->init_progress ( static_cast<double>( l_iCount ), "Collecting ..." );
-	iterator_t it = f_oControler->begin();
+	iterator_t it = f_oDataControler->begin();
 	while ( ! f_poRecordSet->is_eof() )
 		{
 		l_poParent->status_bar()->update_progress();
-		if ( it != f_oControler->end() )
+		if ( it != f_oDataControler->end() )
 			{	
 			(*it) = l_oItem;
 			++ it;
 			}
 		else
-			f_oControler->add_tail( l_oItem );
+			f_oDataControler->add_tail( l_oItem );
 		f_poRecordSet->move_next();
 		}
 	while ( l_iCtr ++ < l_iQuantity )
-		f_oControler->remove_tail();
+		f_oDataControler->remove_tail();
 	reset();
 	l_poParent->set_sync_store();
 	return;
@@ -104,7 +104,7 @@ int long HDataListControl::get_current_id ( void )
 void HDataListControl::add_new ( void )
 	{
 	M_PROLOG
-	f_oControler->add_tail ( );
+	f_oDataControler->add_tail ( );
 	process_input ( KEY_CODES::D_HOME );
 	process_input ( KEY_CODES::D_END );
 	return;
@@ -114,8 +114,8 @@ void HDataListControl::add_new ( void )
 void HDataListControl::cancel_new ( void )
 	{
 	M_PROLOG
-	f_oControler->remove_tail();
-	if ( f_oControler->size() )
+	f_oDataControler->remove_tail();
+	if ( f_oDataControler->size() )
 		{
 		process_input ( KEY_CODES::D_HOME );
 		process_input ( KEY_CODES::D_END );

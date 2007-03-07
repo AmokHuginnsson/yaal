@@ -41,6 +41,7 @@ class HDataWindow;
 class HDataListControl : public HDataControl, public virtual yaal::hconsole::HListControl
 	{
 public:
+	yaal::hconsole::HListControler<yaal::hcore::HInfo>::ptr_t f_oDataControler;
 	HDataListControl ( dbwrapper::HRecordSet *, HDataWindow *, int, int, int, int, char const * );
 	virtual ~HDataListControl ( void );
 	virtual void load ( int long );

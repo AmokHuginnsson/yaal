@@ -924,7 +924,7 @@ void HListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t
 
 /*
 template<>
-void HListControl_t<HInfo>::set_child_control_data_for_cell( int a_iColumn, HControl* a_poControl )
+void HListControl<HInfo>::set_child_control_data_for_cell( int a_iColumn, HControl* a_poControl )
 	{
 	row_t l_oItem = *f_oIterator;
 	a_poControl->set( l_oItem [ a_iColumn ] );
