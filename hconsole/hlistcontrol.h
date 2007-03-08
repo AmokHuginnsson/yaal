@@ -100,6 +100,7 @@ class HAbstractRow
 public:
 	virtual ~HAbstractRow( void );
 	virtual void switch_state( void );
+	virtual int long get_id( void );
 	virtual HAbstractCell& operator[]( int );
 	};
 
@@ -107,7 +108,7 @@ template<typename tType>
 class HRow : public HAbstractRow
 	{
 public:
-	typedef HItem_t<HCell<tType> > data_t;
+	typedef HItem_t<tType> data_t;
 private:
 	data_t f_oData;
 public:
@@ -140,21 +141,36 @@ public:
 	virtual HModelIteratorWrapper end();
 	};
 
-template<typename tType>
+/*
+ * We can decide to give user possibility to choose model record type
+ * or we can assume that each model row consists of some kind of array
+ * and allow user to specify type of elements stored in this array.
+ *
+ * Former approach is more flexible while the latter is easier to implement.
+ * Unfortunatelly latter approach badly limits model type traits
+ * (i.e. one would have to use list of arrays of window pointers instead
+ * of plain list of window pointers, wide HWindowListControl).
+ *
+ * We will go for the former.
+ */
+
+template<typename tType = HItem>
 class HListControler : public HAbstractControler
 	{
 public:
 	typedef yaal::hcore::HPointer<HListControler<tType>,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
 	typedef HRow<tType> row_t;
-	typedef yaal::hcore::HList<row_t> model_t;
+	typedef yaal::hcore::HList<tType> model_t;
 	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
 	typedef typename model_t::iterator iterator_t;
 private:
 	model_ptr_t f_oList;
 public:
 	HListControler( model_ptr_t = model_ptr_t() );
-	void add_tail( typename HRow<tType>::data_t& );
+	void add_tail( typename HRow<tType>::data_t const& );
 	void add_orderly( tType&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
+	void remove_tail( void );
+	model_ptr_t get_model( void );
 	};
 
 class HListControl : virtual public HSearchableControl
@@ -243,7 +259,6 @@ protected:
 	virtual void do_refresh ( void );
 	void draw_cell ( int, int, int, HColumnInfo const* const, bool );
 	virtual int do_process_input( int );
-	//virtual yaal::hcore::OListBits::status_t remove_tail ( treatment_t const& = D_BLOCK_IF_NOT_EMPTIED, HItem_t * * = NULL );
 	virtual bool is_searchable ( void );
 	virtual int do_click ( mouse::OMouse& );
 	virtual void go_to_match ( void );

@@ -64,7 +64,7 @@ int HMainWindow::init ( void )
 			" &Menu \n" );
 	f_poMenu->enable ( true );
 	f_poMenu->set_focus ( );
-	HWindowListControl * l_poWindowList = new HWindowListControl ( this, 1,
+	HWindowListControl * l_poWindowList = new HWindowListControl( this, 1,
 			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n",
 			HListControler<HWindow::ptr_t>::ptr_t( new HListControler<HWindow::ptr_t>( f_oWindowList ) ) );
 	l_poWindowList->add_column ( -1, "&Okno", 1 );

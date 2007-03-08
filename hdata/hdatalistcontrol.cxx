@@ -73,17 +73,18 @@ void HDataListControl::load ( int long /*a_iId*/ )
 	else
 		l_iCount = f_poRecordSet->open();
 	l_poParent->status_bar ( )->init_progress ( static_cast<double>( l_iCount ), "Collecting ..." );
-	iterator_t it = f_oDataControler->begin();
+	HListControler<>::model_ptr_t l_oModel = f_oDataControler->get_model();
+	HListControler<>::model_t::iterator it = l_oModel->begin();
 	while ( ! f_poRecordSet->is_eof() )
 		{
 		l_poParent->status_bar()->update_progress();
-		if ( it != f_oDataControler->end() )
+		if ( it != l_oModel->end() )
 			{	
 			(*it) = l_oItem;
 			++ it;
 			}
 		else
-			f_oDataControler->add_tail( l_oItem );
+			l_oModel->push_back( l_oItem );
 		f_poRecordSet->move_next();
 		}
 	while ( l_iCtr ++ < l_iQuantity )
@@ -97,14 +98,14 @@ void HDataListControl::load ( int long /*a_iId*/ )
 int long HDataListControl::get_current_id ( void )
 	{
 	M_PROLOG
-	return ( (*f_oCursor).m_lId );
+	return ( f_oCursor->get_id() );
 	M_EPILOG
 	}
 
 void HDataListControl::add_new ( void )
 	{
 	M_PROLOG
-	f_oDataControler->add_tail ( );
+	f_oDataControler->get_model()->push_back( HItem( f_oHeader.size() ) );
 	process_input ( KEY_CODES::D_HOME );
 	process_input ( KEY_CODES::D_END );
 	return;
