@@ -53,7 +53,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iHeight ( a_iHeight ), f_iWidth ( a_iWidth ), f_iRowRaw ( 0 ),
 	f_iColumnRaw ( 0 ), f_iHeightRaw ( 0 ), f_iWidthRaw ( 0 ),
 	f_oLabel ( a_pcLabel ), f_oVarTmpBuffer ( ), f_poParent ( a_poParent ),
-	f_iLabelLength ( 0 ), f_iShortcutIndex ( 0 )
+	f_iLabelLength ( 0 ), f_iShortcutIndex ( 0 ), f_bValid( false )
 	{
 	M_PROLOG
 	if ( ! is_enabled ( ) )
@@ -353,6 +353,12 @@ void HControl::set_draw_label( bool a_bDrawLabel )
 void HControl::schedule_refresh( void ) const
 	{
 	n_bNeedRepaint = true;
+	return;
+	}
+
+void HControl::invalidate( void )
+	{
+	f_bValid = false;
 	return;
 	}
 

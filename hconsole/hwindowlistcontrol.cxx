@@ -84,32 +84,14 @@ void HWindowListControl::add_tail ( HItem * a_poElement )
 	}
 */
 
+template<>
+yaal::hcore::HString const HCell<HWindow::ptr_t>::get_string( void )
+	{
+	return ( f_rtData->get_title() );
+	}
+
 namespace list_control_helper
 {
-
-template<>
-yaal::hcore::HString const GetLongFromCell( HWindow::ptr_t const& )
-	{
-	return ( "" );
-	}
-
-template<>
-yaal::hcore::HString const GetDoubleFromCell( HWindow::ptr_t const& )
-	{
-	return ( "" );
-	}
-
-template<>
-yaal::hcore::HString const GetStringFromCell( HWindow::ptr_t const& a_oWindow )
-	{
-	return ( a_oWindow->get_title() );
-	}
-
-template<>
-char const * GetTimeFromCell( HWindow::ptr_t const& )
-	{
-	return ( "" );
-	}
 
 /*
 int long GetIdFromCell( HItem const & )

@@ -98,14 +98,14 @@ void HDataListControl::load ( int long /*a_iId*/ )
 int long HDataListControl::get_current_id ( void )
 	{
 	M_PROLOG
-	return ( f_oCursor->get_id() );
+	return ( (*f_oCursor)->get_id() );
 	M_EPILOG
 	}
 
 void HDataListControl::add_new ( void )
 	{
 	M_PROLOG
-	f_oDataControler->get_model()->push_back( HItem( f_oHeader.size() ) );
+	f_oDataControler->add_tail( HItem( f_oHeader.size() ) );
 	process_input ( KEY_CODES::D_HOME );
 	process_input ( KEY_CODES::D_END );
 	return;

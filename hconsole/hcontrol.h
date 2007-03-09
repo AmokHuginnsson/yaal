@@ -89,6 +89,7 @@ protected:
 /* this is used locally, there is no way to modify this variables explicitly */
 	int				f_iLabelLength;	 			/* length of the label */
 	int				f_iShortcutIndex;			/* index of shortcut char in label */
+	bool			f_bValid;
 public:
 /* parent, row, col, height, width, label */
 	HControl ( HWindow*, int, int, int, int, char const* );
@@ -115,6 +116,7 @@ public:
 	void set_attr_shortcut ( void ) const;
 	void set_attr_data ( void ) const;
 	void schedule_refresh( void ) const;
+	void invalidate( void );
 protected:
 	virtual int do_process_input ( int );
 	virtual void do_refresh ( void ) = 0;

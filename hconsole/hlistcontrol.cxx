@@ -104,6 +104,7 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_oControler( a_oData )
 	{
 	M_PROLOG
+	f_oControler->set_control( this );
 	schedule_refresh();
 	return;
 	M_EPILOG
@@ -145,7 +146,7 @@ void HListControl::do_refresh ( void )
 		f_oIterator = f_oControler->begin();
 		for ( l_iCtr = 0;
 					l_iCtr < ( l_iSize > f_iHeightRaw ? f_iHeightRaw : l_iSize );
-					++ l_iCtr, ++ f_oIterator )
+					++ l_iCtr, ++(*f_oIterator) )
 			{
 			l_iColumnOffset = 0;
 			for ( l_iCtrLoc = 0; l_iCtrLoc < l_iColumns; l_iCtrLoc ++ )
@@ -367,7 +368,7 @@ void HListControl::handle_key_up ( void )
 			f_iCursorPosition --;
 		else if ( f_iControlOffset > 0 )
 			{
-			-- f_oFirstVisibleRow;
+			--(*f_oFirstVisibleRow);
 			f_iControlOffset --;
 			}
 		}
@@ -400,12 +401,12 @@ void HListControl::handle_key_down ( void )
 	if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_oControler->size() - 1 ) )
 		{
 		f_iCursorPosition ++;
-		++ f_oCursor;
+		++(*f_oCursor);
 		if ( f_iCursorPosition >= f_iHeightRaw )
 			{
 			f_iCursorPosition = f_iHeightRaw - 1;
 			f_iControlOffset ++;
-			++ f_oFirstVisibleRow;
+			++(*f_oFirstVisibleRow);
 			}
 		}
 	else
@@ -434,9 +435,9 @@ void HListControl::handle_key_ctrl_p ( void )
 void HListControl::handle_key_space ( void )
 	{
 	M_ASSERT( ! (*f_oControler).empty() );
-	M_ASSERT( f_oCursor.is_valid() );
+	M_ASSERT( f_oCursor->is_valid() );
 	if ( f_bCheckable )
-		f_oCursor->switch_state();
+		(*f_oCursor)->switch_state();
 //		f_oCursor->m_bChecked = ! f_oCursor->m_bChecked;
 	return;
 	}
@@ -596,30 +597,6 @@ OListBits::status_t HListControl::remove_tail ( treatment_t const & a_eFlag, HIt
 namespace list_control_helper
 {
 
-template<>
-yaal::hcore::HString const GetLongFromCell( HInfo const& a_oInfo )
-	{
-	return ( HString ( a_oInfo.get<int long>() ) );
-	}
-
-template<>
-yaal::hcore::HString const GetDoubleFromCell( HInfo const& a_oInfo )
-	{
-	return ( HString ( a_oInfo.get<double>() ) );
-	}
-
-template<>
-yaal::hcore::HString const GetStringFromCell( HInfo const& a_oInfo )
-	{
-	return ( a_oInfo.get<yaal::hcore::HString const &>() );
-	}
-
-template<>
-char const * GetTimeFromCell( HInfo const & a_oInfo )
-	{
-	return ( a_oInfo.get<yaal::hcore::HTime const &>() );
-	}
-
 int long GetIdFromCell( HItem const & )
 	{
 	return ( 0 );
@@ -678,7 +655,7 @@ void HListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a_eOr
 				* static_cast<double>( l_iSize ) / 2.,
 				" Sorting ..." );
 	list_control_helper::OSortHelper l_oHelper = { a_iColumn, a_eOrder, f_oHeader [ f_iSortColumn ].f_eType, 0, f_oControler->size(), f_poParent };
-	do_sort( l_oHelper );
+	sort( l_oHelper );
 	f_iControlOffset = f_iCursorPosition = 0;
 	return;
 	M_EPILOG
@@ -920,6 +897,82 @@ void HListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t
 	if ( a_eMask & FLAGS::D_DRAW_HEADER )
 		f_bDrawHeader = a_eFlags & FLAGS::D_DRAW_HEADER;
 	return;
+	}
+
+bool HListControl::get_text_for_cell( int a_iColumn, type_t a_eType )
+	{
+	M_ASSERT( f_oIterator->is_valid() );
+	row_t& l_oItem = *(*f_oIterator);
+	switch ( a_eType )
+		{
+		case ( D_LONG_INT ):
+			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_long();
+		break;
+		case ( D_DOUBLE ):
+			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_double();
+		break;
+		case ( D_HSTRING ):
+			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_string();
+		break;
+		case ( D_HTIME ):
+			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_time();
+		break;
+		default :
+			M_THROW ( "unknown type", a_eType );
+		}
+	return ( l_oItem.get_checked() );
+	}
+
+template<>
+HListControler<>::model_ptr_t HListControler<>::get_model( void )
+	{
+	return ( f_oList );
+	}
+
+void HAbstractControler::set_control( HControl* a_poControl )
+	{
+	f_poControl = a_poControl;
+	return;
+	}
+
+template<>
+yaal::hcore::HString const HCell<>::get_long( void )
+	{
+	return ( HString ( f_rtData.get<int long>() ) );
+	}
+
+template<>
+yaal::hcore::HString const HCell<>::get_double( void )
+	{
+	return ( HString ( f_rtData.get<double>() ) );
+	}
+
+template<>
+yaal::hcore::HString const HCell<>::get_string( void )
+	{
+	return ( f_rtData.get<yaal::hcore::HString const &>() );
+	}
+
+template<>
+char const * HCell<>::get_time( void )
+	{
+	return ( f_rtData.get<yaal::hcore::HTime const &>() );
+	}
+
+/*
+template<>
+HRow<>::HRow( int a_iCellCount ) : f_oData(), f_oCellViews( a_iCellCount )
+	{
+	for ( int i = 0; i < a_iCellCount; ++ i )
+		f_oCellViews[ i ] = HCell<>( f_oData[ i ] );
+	return;
+	}
+*/
+
+template<>
+HCell<>& HRow<>::operator[] ( int a_iColumn )
+	{
+	return ( f_oCellViews[ a_iColumn ] );
 	}
 
 /*
