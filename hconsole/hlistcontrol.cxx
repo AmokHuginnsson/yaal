@@ -146,7 +146,7 @@ void HListControl::do_refresh ( void )
 		f_oIterator = f_oControler->begin();
 		for ( l_iCtr = 0;
 					l_iCtr < ( l_iSize > f_iHeightRaw ? f_iHeightRaw : l_iSize );
-					++ l_iCtr, ++(*f_oIterator) )
+					++ l_iCtr, ++f_oIterator )
 			{
 			l_iColumnOffset = 0;
 			for ( l_iCtrLoc = 0; l_iCtrLoc < l_iColumns; l_iCtrLoc ++ )
@@ -368,7 +368,7 @@ void HListControl::handle_key_up ( void )
 			f_iCursorPosition --;
 		else if ( f_iControlOffset > 0 )
 			{
-			--(*f_oFirstVisibleRow);
+			--f_oFirstVisibleRow;
 			f_iControlOffset --;
 			}
 		}
@@ -401,12 +401,12 @@ void HListControl::handle_key_down ( void )
 	if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_oControler->size() - 1 ) )
 		{
 		f_iCursorPosition ++;
-		++(*f_oCursor);
+		++f_oCursor;
 		if ( f_iCursorPosition >= f_iHeightRaw )
 			{
 			f_iCursorPosition = f_iHeightRaw - 1;
 			f_iControlOffset ++;
-			++(*f_oFirstVisibleRow);
+			++f_oFirstVisibleRow;
 			}
 		}
 	else
@@ -434,10 +434,10 @@ void HListControl::handle_key_ctrl_p ( void )
 
 void HListControl::handle_key_space ( void )
 	{
-	M_ASSERT( ! (*f_oControler).empty() );
-	M_ASSERT( f_oCursor->is_valid() );
+	M_ASSERT( ! f_oControler->empty() );
+	M_ASSERT( f_oCursor.is_valid() );
 	if ( f_bCheckable )
-		(*f_oCursor)->switch_state();
+		f_oCursor->switch_state();
 //		f_oCursor->m_bChecked = ! f_oCursor->m_bChecked;
 	return;
 	}
@@ -566,33 +566,6 @@ void HListControl::recalculate_column_widths ( void )
 	return;
 	M_EPILOG
 	}
-
-#if 0
-OListBits::status_t HListControl::remove_tail ( treatment_t const & a_eFlag, HItem * * a_ppoItem )
-	{
-	M_PROLOG
-	status_t l_eError = D_OK;
-	if ( f_iControlOffset
-			&& ( ( f_iControlOffset + f_iHeightRaw ) == l_iSize )  )
-		{
-		f_iControlOffset --;
-		to_head ( f_oFirstVisibleRow );
-		if ( f_iCursorPosition < ( f_iHeightRaw - 1 ) )
-			{
-			f_iCursorPosition ++;
-			to_tail();
-			}
-		}
-	else if ( f_iCursorPosition && ( f_iCursorPosition == ( l_iSize - 1 ) ) )
-		f_iCursorPosition --;
-	n_bNeedRepaint = true;
-	l_eError = HList<HItem> ::remove_tail ( a_eFlag, a_ppoItem );
-	if ( is_enabled() )
-		refresh();
-	return ( l_eError );
-	M_EPILOG
-	}
-#endif
 
 namespace list_control_helper
 {
@@ -901,8 +874,8 @@ void HListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t
 
 bool HListControl::get_text_for_cell( int a_iColumn, type_t a_eType )
 	{
-	M_ASSERT( f_oIterator->is_valid() );
-	row_t& l_oItem = *(*f_oIterator);
+	M_ASSERT( f_oIterator.is_valid() );
+	row_t l_oItem = *f_oIterator;
 	switch ( a_eType )
 		{
 		case ( D_LONG_INT ):
@@ -927,6 +900,16 @@ template<>
 HListControler<>::model_ptr_t HListControler<>::get_model( void )
 	{
 	return ( f_oList );
+	}
+
+HAbstractControler::~HAbstractControler( void )
+	{
+	return;
+	}
+
+HAbstractControler::HAbstractControler( void ) : f_poControl( NULL )
+	{
+	return;
 	}
 
 void HAbstractControler::set_control( HControl* a_poControl )
@@ -961,6 +944,83 @@ char const * HCell<>::get_time( void )
 
 /*
 template<>
+HCell<>& HRow<>::operator[] ( int a_iColumn )
+	{
+	return ( f_oCellViews[ a_iColumn ] );
+	}
+*/
+
+HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( void ) : f_oIterator()
+	{
+	return;
+	}
+
+HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t const& a_oIt ) : f_oIterator( a_oIt )
+	{
+	return;
+	}
+
+bool HAbstractControler::HModelIteratorWrapper::is_valid( void )
+	{
+	return ( f_oIterator->is_valid() );
+	}
+
+bool HAbstractControler::HModelIteratorWrapper::operator==( HAbstractControler::HModelIteratorWrapper const& a_oIt )
+	{
+	return ( f_oIterator == a_oIt.f_oIterator );
+	}
+
+bool HAbstractControler::HModelIteratorWrapper::operator!=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
+	{
+	return ( f_oIterator != a_oIt.f_oIterator );
+	}
+
+HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator++( void )
+	{
+	f_oIterator->next();
+	return ( *this );
+	}
+
+HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator--( void )
+	{
+	f_oIterator->previous();
+	return ( *this );
+	}
+
+HAbstractRow HAbstractControler::HModelIteratorWrapper::operator*( void )
+	{
+	return ( f_oIterator->dereference() );
+	}
+
+HAbstractRow* HAbstractControler::HModelIteratorWrapper::operator->( void )
+	{
+	return ( f_oIterator->call() );
+	}
+
+HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
+	{
+	if ( &a_oIt != this )
+		f_oIterator = a_oIt.f_oIterator->clone();
+	return ( *this );
+	}
+
+HAbstractControler::HAbstractModelIterator::HAbstractModelIterator( void )
+	{
+	return;
+	}
+
+HAbstractControler::HAbstractModelIterator::~HAbstractModelIterator( void )
+	{
+	return;
+	}
+
+bool HAbstractControler::HAbstractModelIterator::is_equal( HAbstractControler::HAbstractModelIterator const& )
+	{
+	return( false );
+	}
+
+/*
+template<>
 HRow<>::HRow( int a_iCellCount ) : f_oData(), f_oCellViews( a_iCellCount )
 	{
 	for ( int i = 0; i < a_iCellCount; ++ i )
@@ -968,12 +1028,6 @@ HRow<>::HRow( int a_iCellCount ) : f_oData(), f_oCellViews( a_iCellCount )
 	return;
 	}
 */
-
-template<>
-HCell<>& HRow<>::operator[] ( int a_iColumn )
-	{
-	return ( f_oCellViews[ a_iColumn ] );
-	}
 
 /*
 template<>

@@ -98,7 +98,7 @@ void HDataListControl::load ( int long /*a_iId*/ )
 int long HDataListControl::get_current_id ( void )
 	{
 	M_PROLOG
-	return ( (*f_oCursor)->get_id() );
+	return ( f_oCursor->get_id() );
 	M_EPILOG
 	}
 
