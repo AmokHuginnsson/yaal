@@ -29,6 +29,7 @@ M_VCSID ( "$Id$" )
 #include "hmainwindow.h"
 
 using namespace yaal::hcore;
+using namespace yaal::hconsole::list_control_helper;
 
 namespace yaal
 {

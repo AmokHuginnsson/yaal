@@ -35,6 +35,7 @@ M_VCSID ( "$Id$" )
 #include "hconsole.h"
 
 using namespace yaal::hcore;
+using namespace yaal::hconsole::list_control_helper;
 
 namespace yaal
 {
@@ -567,53 +568,6 @@ void HListControl::recalculate_column_widths ( void )
 	M_EPILOG
 	}
 
-namespace list_control_helper
-{
-
-int long GetIdFromCell( HItem const & )
-	{
-	return ( 0 );
-	}
-
-bool GetStateFromCell( HItem const & )
-	{
-	return ( false );
-	}
-
-void OSortHelper::progress( void )
-	{
-	++ f_lComparedItems;
-	if ( ( f_iSize > 1024 ) && ! ( f_lComparedItems % 1024 ) )
-		f_poWindow->status_bar()->update_progress ( static_cast<double>( f_lComparedItems ) );
-	return;
-	}
-
-template<>
-bool compare_cells( HInfo const & a_oLeft, HInfo const & a_oRight, OSortHelper & a_roSortHelper )
-	{
-	double l_dDifference = 0;
-	a_roSortHelper.progress();
-	switch ( a_roSortHelper.f_eType )
-		{
-		case ( D_LONG_INT ):
-			return ( a_oLeft.get<long>() > a_oRight.get<long>() );
-		case ( D_DOUBLE ):
-			l_dDifference = a_oLeft.get<double>() > a_oRight.get<double>();
-		break;
-		case ( D_HSTRING ):
-			return ( strcasecmp ( a_oLeft.get<HString const &>(),
-					 a_oRight.get<HString const &>() ) > 0 );
-		case ( D_HTIME ):
-			l_dDifference = static_cast<time_t>( a_oLeft.get<HTime const &>() ) > static_cast<time_t>( a_oRight.get<HTime const &>() );
-		break;
-		default:
-			break;
-		}
-	return ( l_dDifference > 0 ? 1 : ( l_dDifference < 0 ? - 1 : 0 ) );
-	}
-
-}
-
 void HListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a_eOrder )
 	{
 	M_PROLOG
@@ -875,7 +829,7 @@ void HListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t
 bool HListControl::get_text_for_cell( int a_iColumn, type_t a_eType )
 	{
 	M_ASSERT( f_oIterator.is_valid() );
-	row_t l_oItem = *f_oIterator;
+	HAbstractRow& l_oItem = *f_oIterator;
 	switch ( a_eType )
 		{
 		case ( D_LONG_INT ):
@@ -894,6 +848,51 @@ bool HListControl::get_text_for_cell( int a_iColumn, type_t a_eType )
 			M_THROW ( "unknown type", a_eType );
 		}
 	return ( l_oItem.get_checked() );
+	}
+
+namespace list_control_helper
+{
+
+int long GetIdFromCell( HItem const & )
+	{
+	return ( 0 );
+	}
+
+bool GetStateFromCell( HItem const & )
+	{
+	return ( false );
+	}
+
+void OSortHelper::progress( void )
+	{
+	++ f_lComparedItems;
+	if ( ( f_iSize > 1024 ) && ! ( f_lComparedItems % 1024 ) )
+		f_poWindow->status_bar()->update_progress ( static_cast<double>( f_lComparedItems ) );
+	return;
+	}
+
+template<>
+bool compare_cells( HInfo const & a_oLeft, HInfo const & a_oRight, OSortHelper & a_roSortHelper )
+	{
+	double l_dDifference = 0;
+	a_roSortHelper.progress();
+	switch ( a_roSortHelper.f_eType )
+		{
+		case ( D_LONG_INT ):
+			return ( a_oLeft.get<long>() > a_oRight.get<long>() );
+		case ( D_DOUBLE ):
+			l_dDifference = a_oLeft.get<double>() > a_oRight.get<double>();
+		break;
+		case ( D_HSTRING ):
+			return ( strcasecmp ( a_oLeft.get<HString const &>(),
+					 a_oRight.get<HString const &>() ) > 0 );
+		case ( D_HTIME ):
+			l_dDifference = static_cast<time_t>( a_oLeft.get<HTime const &>() ) > static_cast<time_t>( a_oRight.get<HTime const &>() );
+		break;
+		default:
+			break;
+		}
+	return ( l_dDifference > 0 ? 1 : ( l_dDifference < 0 ? - 1 : 0 ) );
 	}
 
 template<>
@@ -987,7 +986,7 @@ HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWra
 	return ( *this );
 	}
 
-HAbstractRow HAbstractControler::HModelIteratorWrapper::operator*( void )
+HAbstractRow& HAbstractControler::HModelIteratorWrapper::operator*( void )
 	{
 	return ( f_oIterator->dereference() );
 	}
@@ -1018,6 +1017,30 @@ bool HAbstractControler::HAbstractModelIterator::is_equal( HAbstractControler::H
 	{
 	return( false );
 	}
+
+HAbstractRow::~HAbstractRow( void )
+	{
+	return;
+	}
+
+int long HAbstractRow::get_id( void )
+	{
+	return ( 0 );
+	}
+
+void HAbstractRow::switch_state( void )
+	{
+	return;
+	}
+
+template<>
+void HRow<>::switch_state( void )
+	{
+	f_roIterator->m_bChecked = ! f_roIterator->m_bChecked;
+	return;
+	}
+
+}
 
 /*
 template<>

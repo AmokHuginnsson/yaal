@@ -42,20 +42,20 @@ namespace hconsole
 {
 
 namespace list_control_helper
+{
+
+struct OSortHelper
 	{
-	struct OSortHelper
-		{
-		int f_iSortColumn;
-		yaal::hcore::OListBits::sort_order_t f_eOrder;
-		type_t f_eType;
-		int long f_lComparedItems;
-		int long f_iSize;
-		HWindow * f_poWindow;
-		void progress ( void );
-		};
-	template<typename tType>
-	bool compare_cells( tType const&, tType const&, OSortHelper& );
-	}
+	int f_iSortColumn;
+	yaal::hcore::OListBits::sort_order_t f_eOrder;
+	type_t f_eType;
+	int long f_lComparedItems;
+	int long f_iSize;
+	HWindow * f_poWindow;
+	void progress ( void );
+	};
+template<typename tType>
+bool compare_cells( tType const&, tType const&, OSortHelper& );
 
 class HAbstractCell
 	{
@@ -77,36 +77,36 @@ class HCell : public HAbstractCell
 public:
 	explicit HCell( yaal::hcore::HInfo const& );
 	virtual ~HCell( void );
-	virtual yaal::hcore::HString const get_long( void );
-	virtual yaal::hcore::HString const get_double( void );
-	virtual yaal::hcore::HString const get_string( void );
-	virtual char const* get_time( void );
-	virtual int long get_id( void );
-	virtual void set_child_control_data( HControl* );
+	virtual yaal::hcore::HString const get_long( void ) = 0;
+	virtual yaal::hcore::HString const get_double( void ) = 0;
+	virtual yaal::hcore::HString const get_string( void ) = 0;
+	virtual char const* get_time( void ) = 0;
+	virtual int long get_id( void ) = 0;
+	virtual void set_child_control_data( HControl* ) = 0;
 	};
 
 class HAbstractRow
 	{
 public:
 	virtual ~HAbstractRow( void );
+	virtual void switch_state( void ) = 0;
+	virtual int long get_id( void ) = 0;
+	virtual bool get_checked( void ) = 0;
+	virtual HAbstractCell& operator[]( int ) = 0;
+	};
+
+template<typename tType = HItem>
+class HRow : public HAbstractRow
+	{
+	typedef yaal::hcore::HList<tType> model_t;
+	typedef typename model_t::iterator iterator_t;
+	iterator_t& f_roIterator;
+public:
+	HRow( iterator_t& );
+	virtual HCell<tType>& operator[]( int );
 	virtual void switch_state( void );
 	virtual int long get_id( void );
 	virtual bool get_checked( void );
-	virtual HAbstractCell& operator[]( int );
-	};
-
-template<typename tType = yaal::hcore::HInfo>
-class HRow : public HAbstractRow
-	{
-public:
-	typedef HItem_t<tType> data_t;
-private:
-	data_t f_oData;
-//	yaal::hcore::HArray<HCell<tType> > f_oCellViews;
-public:
-	HRow( int );
-	HRow( tType const& );
-	virtual HCell<tType>& operator[]( int );
 	};
 
 class HAbstractControler
@@ -119,7 +119,7 @@ private:
 	class HAbstractModelIterator
 		{
 		HAbstractModelIterator( HAbstractModelIterator const& );
-		virtual HAbstractRow dereference( void );
+		virtual HAbstractRow& dereference( void );
 		virtual HAbstractRow* call( void );
 		virtual void next( void );
 		virtual void previous( void );
@@ -143,7 +143,7 @@ public:
 		HModelIteratorWrapper( void );
 		explicit HModelIteratorWrapper( iterator_ptr_t const& );
 		HModelIteratorWrapper( HModelIteratorWrapper const& );
-		HAbstractRow operator* ( void );
+		HAbstractRow& operator* ( void );
 		HAbstractRow* operator-> ( void );
 		HModelIteratorWrapper& operator++ ( void );
 		HModelIteratorWrapper& operator-- ( void );
@@ -183,14 +183,16 @@ class HListControler : public HAbstractControler
 public:
 	typedef yaal::hcore::HList<tType> model_t;
 	typedef typename model_t::iterator iterator_t;
+	typedef HRow<tType> row_t;
 private:
 	class HModelIterator : public HAbstractModelIterator
 		{
 		iterator_t f_oIterator;
+		row_t f_oRow;
 		HModelIterator( void );
 		HModelIterator( HModelIterator const& );
 		explicit HModelIterator( iterator_t const& );
-		virtual HAbstractRow dereference( void );
+		virtual HAbstractRow& dereference( void );
 		virtual HAbstractRow* call( void );
 		virtual void next( void );
 		virtual void previous( void );
@@ -204,7 +206,6 @@ private:
 public:
 	typedef yaal::hcore::HPointer<HModelIterator,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> iterator_ptr_t;
 	typedef yaal::hcore::HPointer<HListControler<tType>,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
-	typedef HRow<tType> row_t;
 	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
 private:
 	model_ptr_t f_oList;
@@ -220,11 +221,12 @@ public:
 	virtual HModelIteratorWrapper end();
 	};
 
+}
+
 class HListControl : virtual public HSearchableControl
 	{
 public:
-	typedef HAbstractControler::HModelIteratorWrapper iterator_t;
-	typedef HAbstractRow row_t;
+	typedef list_control_helper::HAbstractControler::HModelIteratorWrapper iterator_t;
 	struct FLAGS
 		{
 		typedef enum
@@ -279,14 +281,14 @@ protected:
 	iterator_t	f_oIterator; /* helper */ 
 	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
 	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */
-	HAbstractControler::ptr_t f_oControler;
+	list_control_helper::HAbstractControler::ptr_t f_oControler;
 public:
 	HListControl ( HWindow*,		 	/* parent */
 								 int,						/* row */
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 char const*, HAbstractControler::ptr_t const& = HListControler<>::ptr_t() );	/* label */
+								 char const*, list_control_helper::HAbstractControler::ptr_t const& = list_control_helper::HListControler<>::ptr_t() );	/* label */
 	virtual ~HListControl ( void );
 	void add_column ( int const&,									/* at position */
 										char const*,									/* column name */
@@ -297,7 +299,7 @@ public:
 	virtual int set_focus ( char = 0 );
 	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
 	void reset( void );
-	HAbstractControler::ptr_t const& get_controler ( void ) const;
+	list_control_helper::HAbstractControler::ptr_t const& get_controler ( void ) const;
 	void remove_current_row();
 	int long get_row_count( void );
 	void sort( list_control_helper::OSortHelper& );
@@ -327,6 +329,9 @@ private:
 	HListControl ( HListControl const& );
 	HListControl& operator = ( HListControl const& );
 	};
+
+namespace list_control_helper
+{
 
 template<typename tType>
 HListControler<tType>::HListControler( model_ptr_t a_oModel ) : HAbstractControler(), f_oList( a_oModel )
@@ -397,7 +402,7 @@ bool HListControler<tType>::empty( void )
 	}
 
 template<typename tType>
-HListControler<tType>::HModelIterator::HModelIterator( iterator_t const& a_oIt ) : f_oIterator( a_oIt )
+HListControler<tType>::HModelIterator::HModelIterator( iterator_t const& a_oIt ) : f_oIterator( a_oIt ), f_oRow( f_oIterator )
 	{
 	return;
 	}
@@ -423,10 +428,18 @@ void HListControler<tType>::HModelIterator::previous( void )
 	}
 
 template<typename tType>
-HAbstractRow HListControler<tType>::HModelIterator::dereference( void )
+HAbstractRow& HListControler<tType>::HModelIterator::dereference( void )
 	{
-	return ( HRow<tType>( *f_oIterator ) );
+	return ( f_oRow );
 	}
+
+template<typename tType>
+HRow<tType>::HRow( iterator_t& a_oIt ) : f_roIterator( a_oIt )
+	{
+	return;
+	}
+
+}
 
 /*
 template<typename tType>

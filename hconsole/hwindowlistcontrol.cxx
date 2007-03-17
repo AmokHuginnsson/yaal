@@ -29,6 +29,7 @@ M_VCSID ( "$Id$" )
 #include "hwindowlistcontrol.h"
 
 using namespace yaal::hcore;
+using namespace yaal::hconsole::list_control_helper;
 
 namespace yaal
 {
@@ -84,14 +85,14 @@ void HWindowListControl::add_tail ( HItem * a_poElement )
 	}
 */
 
+namespace list_control_helper
+{
+
 template<>
 yaal::hcore::HString const HCell<HWindow::ptr_t>::get_string( void )
 	{
 	return ( f_rtData->get_title() );
 	}
-
-namespace list_control_helper
-{
 
 /*
 int long GetIdFromCell( HItem const & )
@@ -111,6 +112,12 @@ bool compare_cells( HWindow::ptr_t const& a_oLeft, HWindow::ptr_t const& a_oRigh
 	a_roSortHelper.progress();
 	return ( strcasecmp ( a_oLeft->get_title(),
 			 a_oRight->get_title() ) > 0 );
+	}
+
+template<>
+void HRow<HWindow::ptr_t>::switch_state( void )
+	{
+	return;
 	}
 
 }

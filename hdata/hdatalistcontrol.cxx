@@ -31,6 +31,7 @@ M_VCSID ( "$Id$" )
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;
+using namespace yaal::hconsole::list_control_helper;
 using namespace yaal::dbwrapper;
 
 namespace yaal
