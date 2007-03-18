@@ -119,14 +119,14 @@ private:
 	class HAbstractModelIterator
 		{
 		HAbstractModelIterator( HAbstractModelIterator const& );
-		virtual HAbstractRow& dereference( void );
-		virtual HAbstractRow* call( void );
-		virtual void next( void );
-		virtual void previous( void );
-		virtual iterator_ptr_t& clone( void );
+		virtual HAbstractRow& dereference( void ) = 0;
+		virtual HAbstractRow* call( void ) = 0;
+		virtual void next( void ) = 0;
+		virtual void previous( void ) = 0;
+		virtual void assign( iterator_ptr_t const& ) = 0;
 		virtual bool is_equal( HAbstractModelIterator const& );
 		virtual bool is_not_equal( HAbstractModelIterator const& );
-		virtual bool is_valid( void );
+		virtual bool is_valid( void ) = 0;
 		friend class HModelIteratorWrapper;
 	public:
 		HAbstractModelIterator( void );
@@ -196,7 +196,7 @@ private:
 		virtual HAbstractRow* call( void );
 		virtual void next( void );
 		virtual void previous( void );
-		virtual iterator_ptr_t& clone( void );
+		virtual void assign( iterator_ptr_t const& );
 		virtual bool is_equal( HModelIterator const& );
 		virtual bool is_not_equal( HModelIterator const& );
 		virtual bool is_valid( void );
@@ -431,6 +431,31 @@ template<typename tType>
 HAbstractRow& HListControler<tType>::HModelIterator::dereference( void )
 	{
 	return ( f_oRow );
+	}
+
+template<typename tType>
+HAbstractRow* HListControler<tType>::HModelIterator::call( void )
+	{
+	return ( &f_oRow );
+	}
+
+template<typename tType>
+bool HListControler<tType>::HModelIterator::is_equal( HListControler<tType>::HModelIterator const& a_oIt )
+	{
+	return ( f_oIterator == a_oIt.f_oIterator );
+	}
+
+template<typename tType>
+bool HListControler<tType>::HModelIterator::is_not_equal( HListControler<tType>::HModelIterator const& a_oIt )
+	{
+	return ( f_oIterator != a_oIt.f_oIterator );
+	}
+
+template<typename tType>
+void HListControler<tType>::HModelIterator::assign( HAbstractControler::iterator_ptr_t const& )
+	{
+//	f_oIterator = iterator_ptr_t( new HModelIterator( &*a_oIt ) );
+	return;
 	}
 
 template<typename tType>

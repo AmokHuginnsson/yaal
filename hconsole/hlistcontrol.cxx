@@ -853,16 +853,6 @@ bool HListControl::get_text_for_cell( int a_iColumn, type_t a_eType )
 namespace list_control_helper
 {
 
-int long GetIdFromCell( HItem const & )
-	{
-	return ( 0 );
-	}
-
-bool GetStateFromCell( HItem const & )
-	{
-	return ( false );
-	}
-
 void OSortHelper::progress( void )
 	{
 	++ f_lComparedItems;
@@ -999,7 +989,7 @@ HAbstractRow* HAbstractControler::HModelIteratorWrapper::operator->( void )
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
 	if ( &a_oIt != this )
-		f_oIterator = a_oIt.f_oIterator->clone();
+		f_oIterator->assign( a_oIt.f_oIterator );
 	return ( *this );
 	}
 
@@ -1014,6 +1004,11 @@ HAbstractControler::HAbstractModelIterator::~HAbstractModelIterator( void )
 	}
 
 bool HAbstractControler::HAbstractModelIterator::is_equal( HAbstractControler::HAbstractModelIterator const& )
+	{
+	return( false );
+	}
+
+bool HAbstractControler::HAbstractModelIterator::is_not_equal( HAbstractControler::HAbstractModelIterator const& )
 	{
 	return( false );
 	}

@@ -76,15 +76,6 @@ void HWindowListControl::do_refresh ( void )
 	M_EPILOG
 	}
 
-/*
-void HWindowListControl::add_tail ( HItem * a_poElement )
-	{
-	M_PROLOG
-	f_oList->push_back ( a_poElement );
-	M_EPILOG
-	}
-*/
-
 namespace list_control_helper
 {
 
@@ -118,6 +109,18 @@ template<>
 void HRow<HWindow::ptr_t>::switch_state( void )
 	{
 	return;
+	}
+
+template<>
+int long HRow<HWindow::ptr_t>::get_id( void )
+	{
+	return ( -1 );
+	}
+
+template<>
+bool HRow<HWindow::ptr_t>::get_checked( void )
+	{
+	return ( false );
 	}
 
 }
