@@ -105,22 +105,61 @@ bool compare_cells( HWindow::ptr_t const& a_oLeft, HWindow::ptr_t const& a_oRigh
 			 a_oRight->get_title() ) > 0 );
 	}
 
+typedef yaal::hcore::HList<HWindow::ptr_t>::iterator window_iterator_t;
+
 template<>
-void HRow<HWindow::ptr_t>::switch_state( void )
+HRow<window_iterator_t>::HRow( iterator_t& a_oIt ) : f_roIterator( a_oIt ), f_oCells( 1 )
+	{
+	f_oCells[ 0 ] = HCell<window_iterator_t>::ptr_t( new HCell<window_iterator_t>( f_roIterator, 0 ) );
+	return;
+	}
+
+template<>
+void HRow<window_iterator_t>::switch_state( void )
 	{
 	return;
 	}
 
 template<>
-int long HRow<HWindow::ptr_t>::get_id( void )
+int long HRow<window_iterator_t>::get_id( void )
 	{
 	return ( -1 );
 	}
 
 template<>
-bool HRow<HWindow::ptr_t>::get_checked( void )
+bool HRow<window_iterator_t>::get_checked( void )
 	{
 	return ( false );
+	}
+
+template<>
+yaal::hcore::HString const HCell<window_iterator_t>::get_long( void )
+	{
+	return ( 0 );
+	}
+
+template<>
+yaal::hcore::HString const HCell<window_iterator_t>::get_double( void )
+	{
+	return ( 0 );
+	}
+
+template<>
+yaal::hcore::HString const HCell<window_iterator_t>::get_string( void )
+	{
+	return ( (*f_rtData)->get_title() );
+	}
+
+template<>
+char const * HCell<window_iterator_t>::get_time( void )
+	{
+	return ( "" );
+	}
+
+template<>
+void HCell<window_iterator_t>::set_child_control_data( HControl* )
+	{
+	return;
 	}
 
 }

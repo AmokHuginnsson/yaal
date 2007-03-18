@@ -160,7 +160,7 @@ void HListControl::do_refresh ( void )
 					l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
 					}
 				if ( ( l_iCtr == f_iCursorPosition ) && l_poColumnInfo->f_poControl )
-					set_child_control_data_for_cell ( l_iCtrLoc, l_poColumnInfo->f_poControl );
+					(*f_oIterator)[ l_iCtrLoc ].set_child_control_data ( l_poColumnInfo->f_poControl );
 				}
 			}
 		}
@@ -910,86 +910,78 @@ void HAbstractControler::set_control( HControl* a_poControl )
 template<>
 yaal::hcore::HString const HCell<>::get_long( void )
 	{
-	return ( HString ( f_rtData.get<int long>() ) );
+	return ( HString ( (*f_rtData)[ f_iColumn ].get<int long>() ) );
 	}
 
 template<>
 yaal::hcore::HString const HCell<>::get_double( void )
 	{
-	return ( HString ( f_rtData.get<double>() ) );
+	return ( HString ( (*f_rtData)[ f_iColumn ].get<double>() ) );
 	}
 
 template<>
 yaal::hcore::HString const HCell<>::get_string( void )
 	{
-	return ( f_rtData.get<yaal::hcore::HString const &>() );
+	return ( (*f_rtData)[ f_iColumn ].get<yaal::hcore::HString const &>() );
 	}
 
 template<>
 char const * HCell<>::get_time( void )
 	{
-	return ( f_rtData.get<yaal::hcore::HTime const &>() );
+	return ( (*f_rtData)[ f_iColumn ].get<yaal::hcore::HTime const &>() );
 	}
 
-/*
-template<>
-HCell<>& HRow<>::operator[] ( int a_iColumn )
-	{
-	return ( f_oCellViews[ a_iColumn ] );
-	}
-*/
-
-HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( void ) : f_oIterator()
+HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( void ) : f_oIteratorPtr()
 	{
 	return;
 	}
 
-HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t const& a_oIt ) : f_oIterator( a_oIt )
+HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t const& a_oIt ) : f_oIteratorPtr( a_oIt )
 	{
 	return;
 	}
 
 bool HAbstractControler::HModelIteratorWrapper::is_valid( void )
 	{
-	return ( f_oIterator->is_valid() );
+	return ( f_oIteratorPtr->is_valid() );
 	}
 
 bool HAbstractControler::HModelIteratorWrapper::operator==( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
-	return ( f_oIterator == a_oIt.f_oIterator );
+	return ( f_oIteratorPtr->is_equal( *a_oIt.f_oIteratorPtr ) );
 	}
 
 bool HAbstractControler::HModelIteratorWrapper::operator!=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
-	return ( f_oIterator != a_oIt.f_oIterator );
+	return ( f_oIteratorPtr->is_not_equal( *a_oIt.f_oIteratorPtr ) );
 	}
 
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator++( void )
 	{
-	f_oIterator->next();
+	f_oIteratorPtr->next();
 	return ( *this );
 	}
 
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator--( void )
 	{
-	f_oIterator->previous();
+	f_oIteratorPtr->previous();
 	return ( *this );
 	}
 
 HAbstractRow& HAbstractControler::HModelIteratorWrapper::operator*( void )
 	{
-	return ( f_oIterator->dereference() );
+	return ( f_oIteratorPtr->dereference() );
 	}
 
 HAbstractRow* HAbstractControler::HModelIteratorWrapper::operator->( void )
 	{
-	return ( f_oIterator->call() );
+	return ( f_oIteratorPtr->call() );
 	}
 
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
 	if ( &a_oIt != this )
-		f_oIterator->assign( a_oIt.f_oIterator );
+		f_oIteratorPtr->assign( *a_oIt.f_oIteratorPtr );
 	return ( *this );
 	}
 
@@ -1011,6 +1003,11 @@ bool HAbstractControler::HAbstractModelIterator::is_equal( HAbstractControler::H
 bool HAbstractControler::HAbstractModelIterator::is_not_equal( HAbstractControler::HAbstractModelIterator const& )
 	{
 	return( false );
+	}
+
+void HAbstractControler::HAbstractModelIterator::assign( HAbstractControler::HAbstractModelIterator const& )
+	{
+	return;
 	}
 
 HAbstractRow::~HAbstractRow( void )
@@ -1035,27 +1032,40 @@ void HRow<>::switch_state( void )
 	return;
 	}
 
+template<>
+bool HRow<>::get_checked( void )
+	{
+	return ( f_roIterator->m_bChecked );
+	}
+
+template<>
+int long HRow<>::get_id( void )
+	{
+	return ( f_roIterator->m_lId );
+	}
+
+template<>
+HRow<>::HRow( iterator_t& a_oIt ) : f_roIterator( a_oIt ), f_oCells( a_oIt->get_size() )
+	{
+	int l_iCellCount = a_oIt->get_size();
+	for ( int i = 0; i < l_iCellCount; ++ i )
+		f_oCells[ i ] = HCell<>::ptr_t( new HCell<>( f_roIterator, i ) );
+	return;
+	}
+
+HAbstractCell::~HAbstractCell( void )
+	{
+	return;
+	}
+
+template<>
+void HCell<>::set_child_control_data( HControl* a_poControl )
+	{
+	a_poControl->set( (*f_rtData)[ f_iColumn ] );
+	return;
+	}
+
 }
-
-/*
-template<>
-HRow<>::HRow( int a_iCellCount ) : f_oData(), f_oCellViews( a_iCellCount )
-	{
-	for ( int i = 0; i < a_iCellCount; ++ i )
-		f_oCellViews[ i ] = HCell<>( f_oData[ i ] );
-	return;
-	}
-*/
-
-/*
-template<>
-void HListControl<HInfo>::set_child_control_data_for_cell( int a_iColumn, HControl* a_poControl )
-	{
-	row_t l_oItem = *f_oIterator;
-	a_poControl->set( l_oItem [ a_iColumn ] );
-	return;
-	}
-*/
 
 }
 

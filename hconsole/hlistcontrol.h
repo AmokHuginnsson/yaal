@@ -60,29 +60,28 @@ bool compare_cells( tType const&, tType const&, OSortHelper& );
 class HAbstractCell
 	{
 public:
+	typedef yaal::hcore::HPointer<HAbstractCell,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
 	virtual ~HAbstractCell( void );
-	virtual yaal::hcore::HString const get_long( void );
-	virtual yaal::hcore::HString const get_double( void );
-	virtual yaal::hcore::HString const get_string( void );
-	virtual char const* get_time( void );
-	virtual int long get_id( void );
-	virtual void set_child_control_data( HControl* );
-	virtual HAbstractCell& operator= ( HAbstractCell const& );
-	};
-
-template<typename tType = yaal::hcore::HInfo>
-class HCell : public HAbstractCell
-	{
-	tType& f_rtData;
-public:
-	explicit HCell( yaal::hcore::HInfo const& );
-	virtual ~HCell( void );
 	virtual yaal::hcore::HString const get_long( void ) = 0;
 	virtual yaal::hcore::HString const get_double( void ) = 0;
 	virtual yaal::hcore::HString const get_string( void ) = 0;
 	virtual char const* get_time( void ) = 0;
-	virtual int long get_id( void ) = 0;
 	virtual void set_child_control_data( HControl* ) = 0;
+	};
+
+template<typename tType = yaal::hcore::HList<HItem>::iterator>
+class HCell : public HAbstractCell
+	{
+	int f_iColumn;
+	tType& f_rtData;
+public:
+	explicit HCell( tType&, int );
+	virtual ~HCell( void );
+	virtual yaal::hcore::HString const get_long( void );
+	virtual yaal::hcore::HString const get_double( void );
+	virtual yaal::hcore::HString const get_string( void );
+	virtual char const* get_time( void );
+	virtual void set_child_control_data( HControl* );
 	};
 
 class HAbstractRow
@@ -95,15 +94,16 @@ public:
 	virtual HAbstractCell& operator[]( int ) = 0;
 	};
 
-template<typename tType = HItem>
+template<typename tType = yaal::hcore::HList<HItem>::iterator>
 class HRow : public HAbstractRow
 	{
-	typedef yaal::hcore::HList<tType> model_t;
-	typedef typename model_t::iterator iterator_t;
-	iterator_t& f_roIterator;
+	typedef tType iterator_t;
+	typedef yaal::hcore::HArray<HAbstractCell::ptr_t> cells_t;
+	tType& f_roIterator;
+	cells_t f_oCells;
 public:
-	HRow( iterator_t& );
-	virtual HCell<tType>& operator[]( int );
+	HRow( tType& );
+	virtual HAbstractCell& operator[]( int );
 	virtual void switch_state( void );
 	virtual int long get_id( void );
 	virtual bool get_checked( void );
@@ -123,7 +123,7 @@ private:
 		virtual HAbstractRow* call( void ) = 0;
 		virtual void next( void ) = 0;
 		virtual void previous( void ) = 0;
-		virtual void assign( iterator_ptr_t const& ) = 0;
+		virtual void assign( HAbstractModelIterator const& );
 		virtual bool is_equal( HAbstractModelIterator const& );
 		virtual bool is_not_equal( HAbstractModelIterator const& );
 		virtual bool is_valid( void ) = 0;
@@ -138,7 +138,7 @@ public:
 	typedef yaal::hcore::HPointer<HAbstractControler,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
 	class HModelIteratorWrapper
 		{
-		iterator_ptr_t f_oIterator;
+		iterator_ptr_t f_oIteratorPtr;
 	public:
 		HModelIteratorWrapper( void );
 		explicit HModelIteratorWrapper( iterator_ptr_t const& );
@@ -183,7 +183,7 @@ class HListControler : public HAbstractControler
 public:
 	typedef yaal::hcore::HList<tType> model_t;
 	typedef typename model_t::iterator iterator_t;
-	typedef HRow<tType> row_t;
+	typedef HRow<iterator_t> row_t;
 private:
 	class HModelIterator : public HAbstractModelIterator
 		{
@@ -196,7 +196,7 @@ private:
 		virtual HAbstractRow* call( void );
 		virtual void next( void );
 		virtual void previous( void );
-		virtual void assign( iterator_ptr_t const& );
+		virtual void assign( HModelIterator const& );
 		virtual bool is_equal( HModelIterator const& );
 		virtual bool is_not_equal( HModelIterator const& );
 		virtual bool is_valid( void );
@@ -305,7 +305,6 @@ public:
 	void sort( list_control_helper::OSortHelper& );
 protected:
 	virtual bool get_text_for_cell( int, type_t );
-	virtual void set_child_control_data_for_cell( int, HControl* );
 	virtual void do_refresh ( void );
 	void draw_cell ( int, int, int, HColumnInfo const* const, bool );
 	virtual int do_process_input( int );
@@ -452,14 +451,26 @@ bool HListControler<tType>::HModelIterator::is_not_equal( HListControler<tType>:
 	}
 
 template<typename tType>
-void HListControler<tType>::HModelIterator::assign( HAbstractControler::iterator_ptr_t const& )
+void HListControler<tType>::HModelIterator::assign( HListControler<tType>::HModelIterator const& a_oIt )
 	{
-//	f_oIterator = iterator_ptr_t( new HModelIterator( &*a_oIt ) );
+	f_oIterator = a_oIt.f_oIterator;
 	return;
 	}
 
 template<typename tType>
-HRow<tType>::HRow( iterator_t& a_oIt ) : f_roIterator( a_oIt )
+HAbstractCell& HRow<tType>::operator[] ( int a_iColumn )
+	{
+	return ( *(f_oCells[ a_iColumn ]) );
+	}
+
+template<typename tType>
+HCell<tType>::HCell( tType& a_oIt, int a_iColumn ) : f_iColumn( a_iColumn ), f_rtData( a_oIt )
+	{
+	return;
+	}
+
+template<typename tType>
+HCell<tType>::~HCell( void )
 	{
 	return;
 	}
