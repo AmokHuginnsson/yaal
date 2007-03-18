@@ -582,7 +582,7 @@ void HListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a_eOr
 				* static_cast<double>( l_iSize ) / 2.,
 				" Sorting ..." );
 	list_control_helper::OSortHelper l_oHelper = { a_iColumn, a_eOrder, f_oHeader [ f_iSortColumn ].f_eType, 0, f_oControler->size(), f_poParent };
-	sort( l_oHelper );
+	f_oControler->sort( l_oHelper );
 	f_iControlOffset = f_iCursorPosition = 0;
 	return;
 	M_EPILOG
@@ -1063,6 +1063,18 @@ void HCell<>::set_child_control_data( HControl* a_poControl )
 	{
 	a_poControl->set( (*f_rtData)[ f_iColumn ] );
 	return;
+	}
+
+template<>
+bool CompareListControlItems<>::operator() ( HItem const& a_oLeft,
+		HItem const& a_oRight ) const
+	{
+	M_PROLOG
+	HItem const& l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oLeft : a_oRight;
+	HItem const& l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oRight : a_oLeft;
+	return ( list_control_helper::compare_cells( l_oLeft[ f_roSortHelper.f_iSortColumn ],
+				l_oRight[ f_roSortHelper.f_iSortColumn ], f_roSortHelper ) );
+	M_EPILOG
 	}
 
 }

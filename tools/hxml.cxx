@@ -106,10 +106,6 @@ struct HXml::OConvert
 		}
 	};
 
-}
-
-}
-
 HXmlData::HXmlData ( void ) : f_psDoc ( NULL ), f_psRoot ( NULL ),
 										f_psContext ( NULL ), f_psObject ( NULL ),
 										f_psNodeSet ( NULL ), f_psCharEncodingHandler ( NULL )
@@ -137,16 +133,6 @@ void HXmlData::reset ( void )
 	M_PROLOG
 	f_psNodeSet = NULL;
 	return;
-	M_EPILOG
-	}
-
-HXmlData::HXmlData ( HXmlData const & a_roXml ) : f_psDoc ( NULL ),
-										f_psRoot ( NULL ),
-										f_psContext ( NULL ), f_psObject ( NULL ),
-										f_psNodeSet ( NULL ), f_psCharEncodingHandler ( NULL )
-	{
-	M_PROLOG
-	this->operator = ( a_roXml );
 	M_EPILOG
 	}
 
@@ -469,4 +455,8 @@ HXml::ONode & HXml::get_root ( void )
 	return ( f_oRoot );
 	M_EPILOG
 	}
+
+}
+
+}
 

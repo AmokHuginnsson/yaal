@@ -162,6 +162,17 @@ void HCell<window_iterator_t>::set_child_control_data( HControl* )
 	return;
 	}
 
+template<>
+bool CompareListControlItems<HWindow::ptr_t>::operator() ( HWindow::ptr_t const& a_oLeft,
+		HWindow::ptr_t const& a_oRight ) const
+	{
+	M_PROLOG
+	HWindow::ptr_t const& l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oLeft : a_oRight;
+	HWindow::ptr_t const& l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oRight : a_oLeft;
+	return ( strcasecmp( l_oLeft->get_title(), l_oRight->get_title() ) > 0 );
+	M_EPILOG
+	}
+
 }
 
 }

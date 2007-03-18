@@ -154,6 +154,7 @@ public:
 		};
 	HAbstractControler( void );
 	virtual ~HAbstractControler( void );
+	virtual void sort( list_control_helper::OSortHelper& ) = 0;
 	virtual int long size( void ) = 0;
 	virtual bool empty( void ) = 0;
 	virtual HModelIteratorWrapper begin() = 0;
@@ -215,6 +216,7 @@ public:
 	void add_orderly( tType const&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
 	void remove_tail( void );
 	model_ptr_t get_model( void );
+	virtual void sort( list_control_helper::OSortHelper& );
 	virtual bool empty( void );
 	virtual int long size( void );
 	virtual HModelIteratorWrapper begin();
@@ -302,7 +304,6 @@ public:
 	list_control_helper::HAbstractControler::ptr_t const& get_controler ( void ) const;
 	void remove_current_row();
 	int long get_row_count( void );
-	void sort( list_control_helper::OSortHelper& );
 protected:
 	virtual bool get_text_for_cell( int, type_t );
 	virtual void do_refresh ( void );
@@ -475,14 +476,26 @@ HCell<tType>::~HCell( void )
 	return;
 	}
 
+template<typename tType = HItem>
+class CompareListControlItems
+	{
+	list_control_helper::OSortHelper& f_roSortHelper;
+public:
+	CompareListControlItems ( list_control_helper::OSortHelper& a_roSortHelper )
+		: f_roSortHelper ( a_roSortHelper ) { }
+	bool operator() ( tType const&, tType const& ) const;
+	};
+
+template<typename tType>
+void HListControler<tType>::sort( list_control_helper::OSortHelper& a_roHelper )
+	{
+	f_oList->sort ( CompareListControlItems<tType> ( a_roHelper ) );
+	f_poControl->invalidate();
+	}
+
 }
 
 /*
-template<typename tType>
-bool HListControl<tType>::do_is_current_match( void )
-	{
-	}
-
 
 template<typename tType>
 void HListControl<tType>::add_orderly ( row_t& a_tRow, yaal::hcore::OListBits::sort_order_t a_eOrder )
@@ -522,48 +535,6 @@ void HListControl<tType>::remove_current_row ( void )
 	refresh();
 	return;
 	M_EPILOG
-	}
-
-template<typename tType>
-void HListControl<tType>::set_current_row_cell ( int a_iColumn, tType a_tValue )
-	{
-	(*f_oCursor)[ a_iColumn ] = a_tValue;
-	return;
-	}
-
-template<typename tType>
-typename HListControl<tType>::model_t const& HListControl<tType>::get_data ( void ) const
-	{
-	return ( (*f_oList) );
-	}
-
-template<typename tType>
-class CompareListControlItems
-	{
-	list_control_helper::OSortHelper& f_roSortHelper;
-public:
-	CompareListControlItems ( list_control_helper::OSortHelper& a_roSortHelper )
-		: f_roSortHelper ( a_roSortHelper ) { }
-	bool operator() ( tType const&, tType const& ) const;
-	};
-
-template<typename tType>
-bool CompareListControlItems<tType>::operator() ( tType const& a_oLeft,
-		tType const& a_oRight ) const
-	{
-	M_PROLOG
-	tType const& l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oLeft : a_oRight;
-	tType const& l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::D_ASCENDING ? a_oRight : a_oLeft;
-	return ( list_control_helper::compare_cells( l_oLeft[ f_roSortHelper.f_iSortColumn ],
-				l_oRight[ f_roSortHelper.f_iSortColumn ], f_roSortHelper ) );
-	M_EPILOG
-	}
-
-template<typename tType>
-void HListControl<tType>::do_sort( list_control_helper::OSortHelper& a_roHelper )
-	{
-	(*f_oList).sort ( CompareListControlItems<HItem_t<tType> > ( a_roHelper ) );
-	f_oFirstVisibleRow = (*f_oList).begin();
 	}
 
 */
