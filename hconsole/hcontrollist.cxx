@@ -156,6 +156,14 @@ void HControlList::select ( HControl::ptr_t const& a_oControl )
 	M_EPILOG
 	}
 
+void HControlList::exchange( int a_iFormer, int a_iLatter )
+	{
+	M_PROLOG
+	f_oList.exchange( a_iFormer, a_iLatter );
+	return;
+	M_EPILOG
+	}
+
 }
 
 }

@@ -301,7 +301,7 @@ public:
 	virtual int set_focus ( char = 0 );
 	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
 	void reset( void );
-	list_control_helper::HAbstractControler::ptr_t const& get_controler ( void ) const;
+	list_control_helper::HAbstractControler::ptr_t& get_controler ( void );
 	void remove_current_row();
 	int long get_row_count( void );
 protected:
@@ -363,6 +363,16 @@ void HListControler<tType>::add_tail( tType const& a_tRow )
 		}
 	n_bNeedRepaint = true;
 */
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+void HListControler<tType>::add_orderly ( tType const& a_tRow, yaal::hcore::OListBits::sort_order_t a_eOrder )
+	{
+	M_PROLOG
+	f_oList->add_orderly( a_tRow, a_eOrder );
+	f_poControl->invalidate();
 	return;
 	M_EPILOG
 	}
@@ -493,22 +503,7 @@ void HListControler<tType>::sort( list_control_helper::OSortHelper& a_roHelper )
 	f_poControl->invalidate();
 	}
 
-}
-
 /*
-
-template<typename tType>
-void HListControl<tType>::add_orderly ( row_t& a_tRow, yaal::hcore::OListBits::sort_order_t a_eOrder )
-	{
-	M_PROLOG
-	f_oList->add_orderly( a_tRow, a_eOrder );
-	f_iCursorPosition = 0;
-	f_iControlOffset = 0;
-	f_oCursor = f_oFirstVisibleRow = f_oList->begin();
-	n_bNeedRepaint = true;
-	return;
-	M_EPILOG
-	}
 
 template<typename tType>
 void HListControl<tType>::remove_current_row ( void )
@@ -538,6 +533,8 @@ void HListControl<tType>::remove_current_row ( void )
 	}
 
 */
+
+}
 
 }
 

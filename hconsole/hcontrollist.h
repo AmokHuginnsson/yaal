@@ -57,6 +57,7 @@ public:
 	void update_all( void );
 	int hit_test_all( mouse::OMouse& );
 	HControl* get_control_by_no( int );
+	void exchange( int, int );
 	};
 
 }

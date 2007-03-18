@@ -850,6 +850,16 @@ bool HListControl::get_text_for_cell( int a_iColumn, type_t a_eType )
 	return ( l_oItem.get_checked() );
 	}
 
+list_control_helper::HAbstractControler::ptr_t& HListControl::get_controler( void )
+	{
+	return ( f_oControler );
+	}
+
+int long HListControl::get_row_count( void )
+	{
+	return ( f_oControler->size() );
+	}
+
 namespace list_control_helper
 {
 

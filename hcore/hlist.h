@@ -121,7 +121,7 @@ public:
 	void push_back ( tType const & );
 	tType& add_at ( int, tType* = NULL ); /* adds new element at specified position */
 /* adds element in the way that keeps order */
-	tType& add_orderly ( tType&, sort_order_t = D_ASCENDING );
+	tType& add_orderly ( tType const&, sort_order_t = D_ASCENDING );
 	status_t remove_element ( treatment_t const& = D_TREAT_AS_CLOSED,
 			tType** = NULL );	/* removes element at current cursor position */
 	status_t remove_at ( int, treatment_t const& = D_TREAT_AS_CLOSED,
@@ -617,7 +617,7 @@ tType& HList<tType>::add_at ( int a_iIndex, tType* a_ptObject )
 	}
 
 template<typename tType>
-tType& HList<tType>::add_orderly ( tType& a_rtObject,
+tType& HList<tType>::add_orderly ( tType const& a_rtObject,
 		sort_order_t a_eOrder )
 	{
 	M_PROLOG
@@ -1054,8 +1054,6 @@ template<typename tType>
 void HList<tType>::exchange ( int a_iLeft, int a_iRight )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	int l_iOther = 0;
 	HElement * l_poLeft = NULL, * l_poRight = NULL;
 	if ( a_iLeft == a_iRight )
 		return;
