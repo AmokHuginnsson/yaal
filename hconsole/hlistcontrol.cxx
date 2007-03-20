@@ -860,6 +860,32 @@ int long HListControl::get_row_count( void )
 	return ( f_oControler->size() );
 	}
 
+void HListControl::remove_current_row ( void )
+	{
+	M_PROLOG
+	bool l_bFlag = true;
+	if ( f_iControlOffset
+			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_oControler->size() ) )
+		{
+		f_iControlOffset --;
+		++ f_oFirstVisibleRow;
+		}
+	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_oControler->size() - 1 ) ) )
+		f_iCursorPosition --;
+	else
+		l_bFlag = false;
+	if ( f_oCursor == f_oFirstVisibleRow )
+		++ f_oFirstVisibleRow;
+	n_bNeedRepaint = true;
+	iterator_t it = f_oCursor;
+	if ( l_bFlag )
+		++ f_oCursor;
+	f_oControler->erase ( it );
+	refresh();
+	return;
+	M_EPILOG
+	}
+
 namespace list_control_helper
 {
 
@@ -914,6 +940,16 @@ HAbstractControler::HAbstractControler( void ) : f_poControl( NULL )
 void HAbstractControler::set_control( HControl* a_poControl )
 	{
 	f_poControl = a_poControl;
+	return;
+	}
+
+void HAbstractControler::erase( HAbstractControler::HModelIteratorWrapper& )
+	{
+	return;
+	}
+
+void HAbstractControler::add_tail( void )
+	{
 	return;
 	}
 
@@ -988,11 +1024,23 @@ HAbstractRow* HAbstractControler::HModelIteratorWrapper::operator->( void )
 	return ( f_oIteratorPtr->call() );
 	}
 
+HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( HAbstractControler::HModelIteratorWrapper const& a_oIt )
+	: f_oIteratorPtr()
+	{
+	operator=( a_oIt );
+	return;
+	}
+
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
 	if ( &a_oIt != this )
 		f_oIteratorPtr->assign( *a_oIt.f_oIteratorPtr );
 	return ( *this );
+	}
+
+HAbstractControler::iterator_ptr_t& HAbstractControler::HModelIteratorWrapper::raw( void )
+	{
+	return ( f_oIteratorPtr );
 	}
 
 HAbstractControler::HAbstractModelIterator::HAbstractModelIterator( void )

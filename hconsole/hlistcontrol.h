@@ -148,6 +148,7 @@ public:
 		HModelIteratorWrapper& operator++ ( void );
 		HModelIteratorWrapper& operator-- ( void );
 		HModelIteratorWrapper& operator= ( HModelIteratorWrapper const& );
+		iterator_ptr_t& raw( void );
 		bool operator== ( HModelIteratorWrapper const& );
 		bool operator!= ( HModelIteratorWrapper const& );
 		bool is_valid( void );
@@ -159,6 +160,8 @@ public:
 	virtual bool empty( void ) = 0;
 	virtual HModelIteratorWrapper begin() = 0;
 	virtual HModelIteratorWrapper end() = 0;
+	virtual void erase( HModelIteratorWrapper& );
+	virtual void add_tail( void );
 	void set_control( HControl* );
 private:
 	HAbstractControler( HAbstractControler const& );
@@ -201,6 +204,7 @@ private:
 		virtual bool is_equal( HModelIterator const& );
 		virtual bool is_not_equal( HModelIterator const& );
 		virtual bool is_valid( void );
+		iterator_t& raw( void );
 		friend class HModelIteratorWrapper;
 		friend class HListControler<tType>;
 		};
@@ -221,6 +225,8 @@ public:
 	virtual int long size( void );
 	virtual HModelIteratorWrapper begin();
 	virtual HModelIteratorWrapper end();
+	virtual void erase( HModelIteratorWrapper& );
+	virtual void add_tail( void );
 	};
 
 }
@@ -469,6 +475,12 @@ void HListControler<tType>::HModelIterator::assign( HListControler<tType>::HMode
 	}
 
 template<typename tType>
+typename HListControler<tType>::iterator_t& HListControler<tType>::HModelIterator::raw( void )
+	{
+	return ( f_oIterator );
+	}
+
+template<typename tType>
 HAbstractCell& HRow<tType>::operator[] ( int a_iColumn )
 	{
 	return ( *(f_oCells[ a_iColumn ]) );
@@ -503,36 +515,19 @@ void HListControler<tType>::sort( list_control_helper::OSortHelper& a_roHelper )
 	f_poControl->invalidate();
 	}
 
-/*
-
 template<typename tType>
-void HListControl<tType>::remove_current_row ( void )
+void HListControler<tType>::erase( HAbstractControler::HModelIteratorWrapper& a_oIt )
 	{
-	M_PROLOG
-	bool l_bFlag = true;
-	if ( f_iControlOffset
-			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_oList->size() ) )
-		{
-		f_iControlOffset --;
-		++ (*f_oFirstVisibleRow);
-		}
-	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_oList->size() - 1 ) ) )
-		f_iCursorPosition --;
-	else
-		l_bFlag = false;
-	if ( (*f_oCursor) == (*f_oFirstVisibleRow) )
-		++ (*f_oFirstVisibleRow);
-	n_bNeedRepaint = true;
-	iterator_t it = f_oCursor;
-	if ( l_bFlag )
-		++ (*f_oCursor);
-	f_oList->erase ( it );
-	refresh();
+	typename HListControler<tType>::iterator_ptr_t l_oIt = a_oIt.raw();
+	f_oList->erase( l_oIt->raw() );
 	return;
-	M_EPILOG
 	}
 
-*/
+template<typename tType>
+void HListControler<tType>::add_tail( void )
+	{
+	return;
+	}
 
 }
 
