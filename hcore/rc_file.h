@@ -42,6 +42,11 @@ struct OVariable
 	void * f_pvValue;
 	};
 
+/*! \brief Reading configuration files.
+ * 
+ * rc_file gives easy to use API for reading configuration files
+ * that are common in Unix world.
+ */
 namespace rc_file
 {
 

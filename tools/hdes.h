@@ -44,6 +44,10 @@ struct DES
 
 typedef char unsigned uc_t;
 
+/*! \brief Cryptography interface.
+ * 
+ * Small class incorporates simple cryptography functionality.
+ */
 class HDes
 	{
 	uc_t f_pppcIKeys [ DES::D_SIDES_COUNT ]

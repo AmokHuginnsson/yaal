@@ -32,6 +32,11 @@ Copyright:
 namespace yaal
 {
 
+/*! \brief Addtional useful functions.
+ * 
+ * This namespace contains some very cool functions that
+ * easies performing complex tasks.
+ */
 namespace tools
 	{
 	

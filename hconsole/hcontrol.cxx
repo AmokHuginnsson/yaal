@@ -112,6 +112,8 @@ void HControl::enable ( bool a_bEnable )
 int HControl::process_input ( int a_iCode )
 	{
 	M_PROLOG
+	if ( ! f_bValid )
+		update();
 	return ( do_process_input( a_iCode ) );
 	M_EPILOG
 	}
@@ -155,6 +157,8 @@ int HControl::kill_focus ( void )
 void HControl::refresh ( void )
 	{
 	M_PROLOG
+	if ( ! f_bValid )
+		update();
 	do_refresh();
 	return;
 	M_EPILOG
@@ -164,6 +168,7 @@ void HControl::update ( void )
 	{
 	M_PROLOG
 	do_update();
+	f_bValid = true;
 	return;
 	M_EPILOG
 	}
@@ -268,6 +273,8 @@ void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 int HControl::click ( mouse::OMouse & a_roMouse )
 	{
 	M_PROLOG
+	if ( ! f_bValid )
+		update();
 	return ( do_click( a_roMouse ) );
 	M_EPILOG
 	}

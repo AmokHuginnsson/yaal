@@ -286,7 +286,6 @@ protected:
 		iterator_t	f_oCurrentMatch;		/* row that has current pattern match */
 		match_t ( ) : f_iColumnWithMatch ( 0 ), f_iMatchNumber ( - 1 ), f_oCurrentMatch() { }
 		} f_sMatch;
-	iterator_t	f_oIterator; /* helper */ 
 	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
 	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */
 	list_control_helper::HAbstractControler::ptr_t f_oControler;
@@ -311,9 +310,9 @@ public:
 	void remove_current_row();
 	int long get_row_count( void );
 protected:
-	virtual bool get_text_for_cell( int, type_t );
+	virtual bool get_text_for_cell( iterator_t&, int, type_t );
 	virtual void do_refresh ( void );
-	void draw_cell ( int, int, int, HColumnInfo const* const, bool );
+	void draw_cell ( iterator_t&, int, int, int, HColumnInfo const* const, bool );
 	virtual int do_process_input( int );
 	virtual bool is_searchable ( void );
 	virtual int do_click ( mouse::OMouse& );

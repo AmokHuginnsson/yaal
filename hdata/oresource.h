@@ -32,6 +32,12 @@ Copyright:
 namespace yaal
 {
 
+/*! \brief Api for rapid database based aplication development.
+ * 
+ * This namspace joins powers of APIs that are found in hconsole
+ * and in dbwrapper. Its user may rapidly create fulfeatured applications
+ * that use console interface, mouse capabilities and database access.
+ */
 namespace hdata
 {
 

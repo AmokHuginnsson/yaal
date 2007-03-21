@@ -33,6 +33,8 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Console and X mouse handling.
+ */
 namespace mouse
 {
 

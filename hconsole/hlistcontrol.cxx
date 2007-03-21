@@ -101,8 +101,7 @@ HListControl::HListControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_bDrawHeader ( true ), f_bEditable ( false ),
 	f_iControlOffset ( 0 ), f_iCursorPosition ( 0 ), f_iSumForOne ( 0 ),
 	f_oHeader(), f_iSortColumn ( -1 ), f_sMatch(),
-	f_oIterator(), f_oCursor(), f_oFirstVisibleRow(),
-	f_oControler( a_oData )
+	f_oCursor(), f_oFirstVisibleRow(), f_oControler( a_oData )
 	{
 	M_PROLOG
 	f_oControler->set_control( this );
@@ -144,10 +143,10 @@ void HListControl::do_refresh ( void )
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	if ( l_iSize > 0 )
 		{
-		f_oIterator = f_oControler->begin();
+		iterator_t it = f_oFirstVisibleRow;
 		for ( l_iCtr = 0;
 					l_iCtr < ( l_iSize > f_iHeightRaw ? f_iHeightRaw : l_iSize );
-					++ l_iCtr, ++f_oIterator )
+					++ l_iCtr, ++ it )
 			{
 			l_iColumnOffset = 0;
 			for ( l_iCtrLoc = 0; l_iCtrLoc < l_iColumns; l_iCtrLoc ++ )
@@ -155,12 +154,12 @@ void HListControl::do_refresh ( void )
 				l_poColumnInfo = & f_oHeader [ l_iCtrLoc ];
 				if ( l_poColumnInfo->f_iWidthRaw )
 					{
-					l_bChecked = get_text_for_cell ( l_iCtrLoc, l_poColumnInfo->f_eType );
-					draw_cell( l_iCtr, l_iCtrLoc, l_iColumnOffset, l_poColumnInfo, l_bChecked );
+					l_bChecked = get_text_for_cell ( it, l_iCtrLoc, l_poColumnInfo->f_eType );
+					draw_cell( it, l_iCtr, l_iCtrLoc, l_iColumnOffset, l_poColumnInfo, l_bChecked );
 					l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
 					}
 				if ( ( l_iCtr == f_iCursorPosition ) && l_poColumnInfo->f_poControl )
-					(*f_oIterator)[ l_iCtrLoc ].set_child_control_data ( l_poColumnInfo->f_poControl );
+					(*it)[ l_iCtrLoc ].set_child_control_data ( l_poColumnInfo->f_poControl );
 				}
 			}
 		}
@@ -238,7 +237,7 @@ void HListControl::do_refresh ( void )
 	M_EPILOG
 	}
 
-void HListControl::draw_cell ( int a_iRow, int a_iColumn, int a_iColumnOffset, HColumnInfo const * const  a_poColumnInfo, bool a_bChecked )
+void HListControl::draw_cell ( iterator_t& a_oIt, int a_iRow, int a_iColumn, int a_iColumnOffset, HColumnInfo const * const  a_poColumnInfo, bool a_bChecked )
 	{
 	int l_iHR = f_bDrawHeader ? 1 : 0; /* HR stands for header row */
 	int l_iTmp = 0;
@@ -311,7 +310,7 @@ void HListControl::draw_cell ( int a_iRow, int a_iColumn, int a_iColumnOffset, H
 	if ( f_bSearchActived )
 		highlight ( f_iRowRaw + a_iRow + l_iHR,
 				f_iColumnRaw + a_iColumnOffset, f_sMatch.f_iMatchNumber,
-				( f_oIterator == f_sMatch.f_oCurrentMatch )
+				( a_oIt == f_sMatch.f_oCurrentMatch )
 				&& ( a_iColumn == f_sMatch.f_iColumnWithMatch ) );
 	return;
 	}
@@ -826,10 +825,10 @@ void HListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t
 	return;
 	}
 
-bool HListControl::get_text_for_cell( int a_iColumn, type_t a_eType )
+bool HListControl::get_text_for_cell( iterator_t& a_oIt, int a_iColumn, type_t a_eType )
 	{
-	M_ASSERT( f_oIterator.is_valid() );
-	HAbstractRow& l_oItem = *f_oIterator;
+	M_ASSERT( a_oIt.is_valid() );
+	HAbstractRow& l_oItem = *a_oIt;
 	switch ( a_eType )
 		{
 		case ( D_LONG_INT ):

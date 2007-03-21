@@ -35,6 +35,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Small but useful utils.
+ */
 namespace util
 	{
 

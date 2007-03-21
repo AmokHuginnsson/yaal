@@ -29,6 +29,11 @@ Copyright:
 
 #include "hcore/hexception.h"
 
+/*! \brief All library API belongs here.
+ *
+ * This namaspace contains all yaal library API and code.
+ * Stdhapi code and API is divided into several sections.
+ */
 namespace yaal
 {
 

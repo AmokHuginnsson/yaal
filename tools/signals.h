@@ -33,6 +33,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Unix signals handling.
+ */
 namespace signals
 	{
 	
