@@ -54,7 +54,7 @@ public:
 								bool = false,				/* right alignment */
 								bool = false,				/* password */
 								int = 8 );						/* max history level */
-	virtual int process_input( int );
+	virtual int do_process_input( int );
 	};
 
 }

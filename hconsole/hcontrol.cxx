@@ -208,7 +208,7 @@ void HControl::draw_label( void )
 void HControl::do_draw_label( void )
 	{
 	M_PROLOG
-	n_bNeedRepaint = true;
+	schedule_refresh();
 /* reposition control acordingly to current parent window size */
 	f_iRowRaw = ( f_iRow >= 0 ) ? f_iRow : n_iHeight + f_iRow;
 	f_iColumnRaw = ( f_iColumn >= 0 ) ? f_iColumn

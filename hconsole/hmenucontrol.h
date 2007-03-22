@@ -65,7 +65,7 @@ public:
 	virtual ~HMenuControl ( void );
 	void init ( HTUIProcess *, OMenuItem * );
 protected:
-	virtual int process_input( int );
+	virtual int do_process_input( int );
 private:
 	HMenuControl ( HMenuControl const & );
 	HMenuControl & operator = ( HMenuControl const & );

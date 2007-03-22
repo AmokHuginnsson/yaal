@@ -194,7 +194,7 @@ void HLogPad::add ( int a_iAttribute, char const * const a_pcText )
 	M_EPILOG
 	}
 
-int HLogPad::process_input ( int a_iCode )
+int HLogPad::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
 	int l_iCode = 0;

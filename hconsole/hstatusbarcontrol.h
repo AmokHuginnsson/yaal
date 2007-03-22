@@ -94,7 +94,7 @@ protected:
 	virtual void do_refresh( void );
 	virtual void do_draw_label( void );
 	virtual int verify( void );
-	virtual int process_input( int );
+	virtual int do_process_input( int );
 	};
 
 }

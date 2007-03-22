@@ -182,7 +182,7 @@ int HTreeControl::draw_node ( HNodeControl * a_poNode, int a_iRow )
 	M_EPILOG
 	}
 
-int HTreeControl::process_input ( int a_iCode )
+int HTreeControl::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
 	bool l_bWasFolded = false;

@@ -68,7 +68,7 @@ public:
 	void add ( char const * const );
 	void add ( int );
 protected:
-	virtual int process_input ( int );
+	virtual int do_process_input ( int );
 	virtual void do_refresh ( void );
 	};
 

@@ -60,7 +60,7 @@ HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 	M_EPILOG
 	}
 
-int HDataEditControl::process_input ( int a_iCode )
+int HDataEditControl::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
 	bool l_bNoChange = false;

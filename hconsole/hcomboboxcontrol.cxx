@@ -118,7 +118,7 @@ void HComboboxControl::do_refresh ( void )
 	M_EPILOG
 	}
 
-int HComboboxControl::process_input ( int a_iCode )
+int HComboboxControl::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
 	if ( f_eMode == MODE::D_EDITCONTROL )

@@ -67,8 +67,8 @@ public:
 	virtual ~HTreeControl ( void );
 	int draw_node ( HNodeControl *, int );
 	virtual int set_focus ( char = 0 );
-	virtual int process_input( int );
 protected:
+	virtual int do_process_input( int );
 	virtual int do_click ( mouse::OMouse & );
 	virtual void do_refresh ( void );
 private:

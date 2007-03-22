@@ -90,7 +90,7 @@ protected:
 	virtual void do_refresh ( void );
 	virtual int set_focus ( char = 0 );
 	virtual void set ( hcore::HInfo const & );
-	virtual int process_input( int );
+	virtual int do_process_input( int );
 	virtual int do_click ( mouse::OMouse & );
 	};
 

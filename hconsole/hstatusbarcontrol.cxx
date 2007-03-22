@@ -112,7 +112,7 @@ void HStatusBarControl::do_refresh ( void )
 	M_EPILOG
 	}
 
-int HStatusBarControl::process_input ( int a_iCode )
+int HStatusBarControl::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
 	if ( ( a_iCode == KEY_CODES::D_BACKSPACE )

@@ -159,7 +159,7 @@ void HEditControl::set_flags ( bool a_bReplace, bool a_bPassword )
 
 char const g_pcWordSeparator [ ] = " \t\n`-=[]\\;',./~!@#$%^&*()+{}|:\"<>?";
 
-int HEditControl::process_input ( int a_iCode )
+int HEditControl::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
 	int l_iLength = 0;

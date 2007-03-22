@@ -63,10 +63,10 @@ public:
 										 char const * = n_pcMaskDefault,	/* regexp (mask) */
 										 bool = true		/* searchable */ );		/* focused attribute */
 	virtual ~HComboboxControl ( void );
-	virtual int process_input ( int );
 	virtual int set_focus ( char = 0 );
 	virtual int kill_focus ( void ); /* this one will be used here */
 protected:
+	virtual int do_process_input ( int );
 	virtual void do_refresh ( void );
 	virtual int do_click ( mouse::OMouse & );
 private:
