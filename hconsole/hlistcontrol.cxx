@@ -885,6 +885,13 @@ void HListControl::remove_current_row ( void )
 	M_EPILOG
 	}
 
+void HListControl::do_update( void )
+	{
+	f_iControlOffset = f_iCursorPosition = 0;
+	f_oFirstVisibleRow = f_oCursor = f_oControler->begin();
+	return;
+	}
+
 namespace list_control_helper
 {
 
@@ -1033,7 +1040,12 @@ HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( HAbstractContr
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
 	if ( &a_oIt != this )
-		f_oIteratorPtr->assign( *a_oIt.f_oIteratorPtr );
+		{
+		if ( f_oIteratorPtr.raw() )
+			f_oIteratorPtr->assign( *a_oIt.f_oIteratorPtr );
+		else
+			f_oIteratorPtr = a_oIt.f_oIteratorPtr;
+		}
 	return ( *this );
 	}
 

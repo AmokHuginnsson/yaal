@@ -207,6 +207,8 @@ private:
 		iterator_t& raw( void );
 		friend class HModelIteratorWrapper;
 		friend class HListControler<tType>;
+	public:
+		~HModelIterator( void );
 		};
 public:
 	typedef yaal::hcore::HPointer<HModelIterator,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> iterator_ptr_t;
@@ -315,6 +317,7 @@ protected:
 	void draw_cell ( iterator_t&, int, int, int, HColumnInfo const* const, bool );
 	virtual int do_process_input( int );
 	virtual bool is_searchable ( void );
+	virtual void do_update( void );
 	virtual int do_click ( mouse::OMouse& );
 	virtual void go_to_match ( void );
 	virtual void go_to_match_previous ( void );
@@ -418,6 +421,12 @@ bool HListControler<tType>::empty( void )
 
 template<typename tType>
 HListControler<tType>::HModelIterator::HModelIterator( iterator_t const& a_oIt ) : f_oIterator( a_oIt ), f_oRow( f_oIterator )
+	{
+	return;
+	}
+
+template<typename tType>
+HListControler<tType>::HModelIterator::~HModelIterator( void )
 	{
 	return;
 	}

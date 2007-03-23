@@ -222,7 +222,7 @@ lib%.so.$(RELEASE):
 	echo -n $(RS); fi
 
 #phony targets
-.PHONY: all nodebug install dep clean tags stats mrproper purge environment
+.PHONY: all nodebug install dep clean tags stats mrproper purge environment doc
 
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment
@@ -297,6 +297,9 @@ tags: $(SRCS) $(HDRS)
 						--c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" \
 						--extra="+f+q"; \
 	echo "done."
+
+doc: $(SRCS) $(HDRS)
+	@doxygen aux/doxygenrc
 
 stats:
 	@aux/stats
