@@ -203,18 +203,66 @@ public:
  * \return True if point with row, col coordinates is inside of this control.
  */
 	bool hit_test( int row, int col ) const;
-	void set_attributes( int = D_DEFAULT_ATTRS, int = D_DEFAULT_ATTRS, int = D_DEFAULT_ATTRS );
-	void set_draw_label( bool );
-	void move( int, int, int, int );
+
+/*! \brief Set various foreground/background colors for a control.
+ *
+ * Each attribute holds information about foreground/background colors of three
+ * specific parts of a control.
+ *
+ * Those parts are:
+ *  - label
+ *  - data
+ *
+ * \param disabled - Colors for control in disabled state.
+ * \param enabled - Colors for control in enabled state.
+ * \param focused - Colors for control while its focused.
+ */
+	void set_attributes( int disabled = D_DEFAULT_ATTRS, int enabled = D_DEFAULT_ATTRS, int focused = D_DEFAULT_ATTRS );
+
+/*! \brief Decide if label shall be drawn for this particular instance of a control.
+ *
+ * \param draw - If set to true the label is drawn.
+ */
+	void set_draw_label( bool draw );
+
+/*! \brief Set new coordinates and size for a control.
+ *
+ * \param row - New control vertical position.
+ * \param col - New control horizontal position.
+ * \param height - New control height.
+ * \param width -  New control width.
+ */
+	void move( int row, int col, int height, int width );
+
+/*! \brief Retrieve attribute (colors) of a controls label.
+ *
+ * \return Attribute of controls label.
+ */
 	int attr_label( void ) const;
+
+/*! \brief Retrieve attribute (controls) of a controls shortcut highlight.
+ *
+ * \return Attribute of controls shortcut highlight.
+ */
 	int attr_shortcut( void ) const;
+
+/*! \brief Retrieve attribute (controls) of a controls data.
+ *
+ * \return Attribute of controls data.
+ */
 	int attr_data( void ) const;
+
+/*! \brief Schedule this control for full refresh on next refresh cycle.
+ */
+	void schedule_refresh( void ) const;
+
+/*! \brief Mark this control as no longer synchronized with its internel controler.
+ */
+	void invalidate( void );
+protected:
 	void set_attr_label( void ) const;
 	void set_attr_shortcut( void ) const;
 	void set_attr_data( void ) const;
-	void schedule_refresh( void ) const;
-	void invalidate( void );
-protected:
 	virtual int do_process_input( int );
 	virtual void do_refresh( void ) = 0;
 	virtual void do_update( void );

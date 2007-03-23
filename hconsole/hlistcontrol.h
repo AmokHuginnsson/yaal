@@ -41,6 +41,11 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Pack of helpers "list control" concept.
+ *
+ * List control helpers are provided as a means of customization
+ * of HListControler class.
+ */
 namespace list_control_helper
 {
 

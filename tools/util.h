@@ -40,17 +40,19 @@ namespace tools
 namespace util
 	{
 
-hcore::HString kwota_slownie ( double );
-void usun_ogonki ( char * );
-double atof_ex ( char const *, bool = false );
-bool verify_IBAN ( char const * );
-char const * const get_last_error ( void );
-void failure ( int, char const * const, ... ) __attribute__ ( ( __noreturn__ ) );
+hcore::HString kwota_slownie( double );
+void usun_ogonki( char* );
+double atof_ex( char const*, bool = false );
+bool verify_IBAN( char const* );
+char const* const get_last_error( void );
+void failure( int, char const* const, ... ) __attribute__ ( ( __noreturn__ ) );
 
+/*! \brief The Levenshtein and Levenshtein-Damerau string distance functions.
+ */
 namespace distance
 {
 
-int levenshtein_damerau ( char const * const, char const * const, bool = true );
+int levenshtein_damerau ( char const* const, char const* const, bool = true );
 
 }
 

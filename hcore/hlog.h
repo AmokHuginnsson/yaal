@@ -36,7 +36,9 @@ namespace hcore
 {
 
 #define log_trace ( yaal::hcore::log << "Log: " << __FILE__ << " : " << " : " << __LINE__ << " : " << __PRETTY_FUNCTION__ << " : " )
-	
+
+/*! \brief Enumeration of available log levels.
+ */
 namespace LOG_TYPE
 	{
 	static int const D_DEBUG			= 1; 
@@ -48,46 +50,46 @@ namespace LOG_TYPE
 	}
 
 class HLog;
-HLog & endl ( HLog & );
+HLog& endl( HLog& );
 
 class HLog
 	{
 	bool			f_bRealMode;
 	bool			f_bNewLine;
 	int long	f_lType;
-	FILE *		f_psStream;
-	char *		f_pcProcessName;
-	char *		f_pcLoginName;
-	char *		f_pcHostName;
-	char *		f_pcBuffer;
+	FILE*		f_psStream;
+	char*		f_pcProcessName;
+	char*		f_pcLoginName;
+	char*		f_pcHostName;
+	char*		f_pcBuffer;
 	size_t		f_iBufferSize;
 public:
-	HLog ( void );
-	virtual ~HLog ( void );
+	HLog( void );
+	virtual ~HLog( void );
 	/* already opened file */
-	void rehash ( FILE * = stderr, char const * const = NULL );
+	void rehash( FILE* = stderr, char const* const = NULL );
 	/* log file name */
-	void rehash ( char const * const, char const * const = NULL );
-	int operator ( ) ( char const * const, va_list const );
-	int operator ( ) ( char const * const, ... ); /* log ( "data %d", x );
+	void rehash( char const* const, char const* const = NULL );
+	int operator()( char const* const, va_list const );
+	int operator()( char const* const, ... ); /* log ( "data %d", x );
 																									 will look nice */
 	/* log ( "data %d", x ); will look nice */
-	int operator ( ) ( int long const, char const *, ... );
-	HLog & operator ( ) ( int long const ); /* sets log type */
-	HLog & operator << ( char const * const );
-	HLog & operator << ( char const );
-	HLog & operator << ( int const );
-	HLog & operator << ( int unsigned const );
-	HLog & operator << ( int long const );
-	HLog & operator << ( int long unsigned const );
-	HLog & operator << ( double const );
-	HLog & operator << ( void * const );
-	HLog & operator << ( HLog & ( * const ) ( HLog & ) );
+	int operator()( int long const, char const*, ... );
+	HLog& operator()( int long const ); /* sets log type */
+	HLog& operator<< ( char const* const );
+	HLog& operator<< ( char const );
+	HLog& operator<< ( int const );
+	HLog& operator<< ( int unsigned const );
+	HLog& operator<< ( int long const );
+	HLog& operator<< ( int long unsigned const );
+	HLog& operator<< ( double const );
+	HLog& operator<< ( void* const );
+	HLog& operator<< ( HLog& ( *const )( HLog& ) );
 private:
 	void timestamp ( FILE * = NULL );
-	HLog ( HLog const & );
-	HLog & operator = ( HLog const & );
-	friend HLog & endl ( HLog & );
+	HLog( HLog const& );
+	HLog& operator= ( HLog const& );
+	friend HLog& endl( HLog& );
 	};
 
 extern HLog log;

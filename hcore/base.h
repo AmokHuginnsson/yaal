@@ -33,6 +33,12 @@ Copyright:
  *
  * This namaspace contains all yaal library API and code.
  * Stdhapi code and API is divided into several sections.
+ *
+ * yaal comes from YAAL which comes from Y.A.A.L. which comes from:
+ *  - Yet
+ *  - Another
+ *  - Abstraction
+ *  - Layer
  */
 namespace yaal
 {

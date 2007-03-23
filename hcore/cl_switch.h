@@ -52,6 +52,11 @@ typedef struct
 	simple_callback_t CALLBACK;
 	} OOption;
 
+/*! \brief Handling of command line switches.
+ * 
+ * cl_switch gives easy to use API for interpreting and handling
+ * command line switches that are common in Unix world.
+ */
 namespace cl_switch
 	{
 

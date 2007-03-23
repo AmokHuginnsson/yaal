@@ -42,6 +42,8 @@ namespace tools
 typedef int long unsigned uli_t;
 typedef int short unsigned usi_t;
 
+/*! \brief The DES algorithm helper data tables.
+ */
 namespace des
 	{
 	
