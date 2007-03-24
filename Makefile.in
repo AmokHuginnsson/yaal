@@ -103,7 +103,7 @@ COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe -fPIC \
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
-	COMPILER_DEBUG_FLAGS				= -g -g3 -ggdb -ggdb3 -gstabs+ -pg -fno-inline \
+	COMPILER_DEBUG_FLAGS				= -g -g3 -ggdb -ggdb3 -pg -fno-inline \
 																-D__DEBUG__ $(DB)
 endif
 COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I/usr/local/include \
