@@ -36,6 +36,7 @@ VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/yaal.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
+CTAGS	= @CTAGS@
 include $(DIR_ROOT)/aux/common-basic.mk
 include $(DIR_ROOT)/aux/common-term.mk
 include $(DIR_ROOT)/aux/common-suffix.mk

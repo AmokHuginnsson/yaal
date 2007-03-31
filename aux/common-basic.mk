@@ -1,5 +1,4 @@
 SHELL					= /bin/sh
-CTAGS	= @CTAGS@
 RELEASE				= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 DIR_BUILD			= $(DIR_ROOT)/build
 FIND	= find
