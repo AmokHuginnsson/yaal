@@ -24,104 +24,35 @@
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 
-SHELL					= /bin/sh
+export DIR_ROOT	?= $(CURDIR)
 VERSION				= 0
 SUBVERSION		= 0
 EXTRAVERSION	= 0
-RELEASE				= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 COMPONENTS		= hcore hconsole tools dbwrapper hdata
 DRIVERS				= @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE_DRIVER@ @DO_SQLITE3_DRIVER@
-export DIR_ROOT	?= $(CURDIR)
 DIR_TARGET		= $(HOME)/usr/lib
 DIR_HEADERS		= $(HOME)/usr/include/yaal/
-DIR_BUILD			= $(DIR_ROOT)/build
 VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/yaal.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
-ifeq ($(TERMINAL),TERM)
-CL						:= $(shell tput cr;tput dl1)
-BOLD					:= $(shell tput bold || tput md)
-RED						:= $(shell tput setaf 1 || tput AF 1)
-RS						:= $(shell tput sgr0 || tput me)
-NONL					:= "-n"
-endif
-# suffixes
-HS = h
-SS = cxx
-OS = o
-DS = d
-.SUFFIXES:
-.SUFFIXES: .$(SS) .$(OS) .$(HS)
-CTAGS	= @CTAGS@
-FIND	= find
-CXX ?= g++
-CXX := $(subst -x c++ -x c++,-x c++,$(subst colorgcc,colorgcc -x c++,$(CXX)))
-DXX ?= $(CXX)
-DXX := $(subst -x c++,,$(subst colorg,g,$(DXX)))
-LXX ?= g++
-ARFLAGS = r
-CWARNING_FLAGS =	\
-						@PEDANTIC_ERRORS@\
-						@EXTRA_WARNINGS@\
-						-Wall\
-						-Wcast-align\
-						-Wcast-qual\
-						-Wconversion\
-						-Wendif-labels\
-						-Werror\
-						-Winline\
-						-Wlarger-than-4096\
-						-Wlong-long\
-						-Wmissing-noreturn\
-						-Wpointer-arith\
-						-Wredundant-decls\
-						@WARN_SHADOW@\
-						-Wsign-compare\
-						-Wundef\
-						-Wwrite-strings
-#						-Wbad-function-cast\
-						-Wmissing-declarations\
-						-Wmissing-prototypes\
-						-Wnested-externs\
-						-Wstrict-prototypes\
-						-Wtraditional\ #C only
-#						-Wmissing-format-attribute\
-						-Wunreachable-code\ # too much warrnings
-#						-Waggregate-return\ # useless for C++
-CXXWARNING_FLAGS		=	\
-						-Weffc++\
-						-Wsign-promo
-#						-Wold-style-cast\ # lots of warrnings from libc headers
-#						-Woverloaded-virtual\ # too much unecessary warrnings
-ifeq ($(HD),1)
-	DB = -D__DEBUGGER_BABUNI__
-endif
-COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe -fPIC \
-																-D__YAAL_BUILD__ -D_GNU_SOURCE \
-																@DEFS@ -march=i486
-ifdef NODEBUG
-	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
-else
-	COMPILER_DEBUG_FLAGS				= -g -g3 -ggdb -ggdb3 -pg -fno-inline \
-																-D__DEBUG__ $(DB)
-endif
+include $(DIR_ROOT)/aux/common-basic.mk
+include $(DIR_ROOT)/aux/common-term.mk
+include $(DIR_ROOT)/aux/common-suffix.mk
+include $(DIR_ROOT)/aux/common-wrapper.mk
+include $(DIR_ROOT)/aux/common-flags.mk
+CWARNING_FLAGS								+= @PEDANTIC_ERRORS@ @EXTRA_WARNINGS@ @WARN_SHADOW@
+COMPILER_PRIME_FLAGS					+= -D__YAAL_BUILD__ -fPIC @DEFS@
 COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I/usr/local/include \
 																@EXTRA_INCLUDE_PATHS@
-# -fno-external-templates #deprecated
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \
 																@EXTRA_LIB_PATHS@
-LINKER_PRIME_FLAGS						=	\
-								-shared\
-								@SPECIAL_LINKER_FLAGS@\
-								-Wl,--fatal-warnings\
-								-Wl,--demangle\
+
+LINKER_PRIME_FLAGS +=	-shared\
 								-Wl,--export-dynamic\
+								@SPECIAL_LINKER_FLAGS@\
 								-Wl,-soname,
-CXXFLAGS			= $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
-								$(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) \
-								$(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS)
-LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS)
+include $(DIR_ROOT)/aux/common-flags-post.mk
 
 define PREPARE_VARIABLES
 	DIR_$(1) := ./$(1)/
@@ -186,15 +117,6 @@ LIBS_oracle			= "-lclntsh -lhcore"
 
 #-------------------------------------------------------------------
 
-# implict pattern rule
-	
-%.$(OS): %.$(SS)
-	@echo -n "Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... "; \
-	echo -n "$(@:.$(OS)=.$(DS)) " > $(@:.$(OS)=.$(DS)); \
-	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) | grep -v '^#' >> $(@:.$(OS)=.$(DS)); \
-	$(CXX) $(CXXFLAGS) $(<) -c -o $(@) 2>&1 | tee -a make.log; \
-	echo $(NONL) "done.$(CL)"
-
 #	this is "rule" for linking libs
 
 lib%.so.$(RELEASE):
@@ -213,13 +135,10 @@ lib%.so.$(RELEASE):
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so; \
 	else exit 1; fi; echo $(NONL) "done.$(CL)"
 
-#-------------------------------------------------------------------
+include $(DIR_ROOT)/aux/common-implicid-compile.mk
+#------------------------------------------------------------------------
 
-.DEFAULT:
-	@if [ "$(suffix $(<))" != ".$(DS)" ] ; then \
-	echo -n "$(BOLD)$(RED)"; \
-	echo "Lack of \`$(<)'." | tee -a make.log; \
-	echo -n $(RS); fi
+include $(DIR_ROOT)/aux/common-target-default.mk
 
 #phony targets
 .PHONY: all nodebug install dep clean tags stats mrproper purge environment doc
@@ -291,12 +210,7 @@ purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
 	/bin/rm -rf configure Makefile config.h yaalrc config.log doc/dox
 
-tags: $(SRCS) $(HDRS)
-	@echo -n "Rehashing tags ... "; \
-	$(CTAGS)	-R --langmap="c++:.$(HS).$(SS)" -h ".$(HS)" --languages="c++" \
-						--c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" \
-						--extra="+f+q"; \
-	echo "done."
+include $(DIR_ROOT)/aux/common-target-tags.mk
 
 doc: $(SRCS) $(HDRS)
 	@doxygen aux/doxygenrc
