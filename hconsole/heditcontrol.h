@@ -86,10 +86,10 @@ public:
 	virtual ~HEditControl ( void );
 	void set_flags ( bool = false, bool = false );
 	virtual hcore::HInfo get ( void );
-protected:
-	virtual void do_refresh ( void );
 	virtual int set_focus ( char = 0 );
 	virtual void set ( hcore::HInfo const & );
+protected:
+	virtual void do_refresh ( void );
 	virtual int do_process_input( int );
 	virtual int do_click ( mouse::OMouse & );
 	};

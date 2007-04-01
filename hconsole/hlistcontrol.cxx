@@ -888,7 +888,8 @@ void HListControl::remove_current_row ( void )
 void HListControl::do_update( void )
 	{
 	f_iControlOffset = f_iCursorPosition = 0;
-	f_oFirstVisibleRow = f_oCursor = f_oControler->begin();
+	f_oFirstVisibleRow = f_oControler->begin();
+	f_oCursor = f_oControler->begin();
 	return;
 	}
 
