@@ -62,20 +62,20 @@ template < > struct static_assert_failure < true > { enum { value = 1 }; };
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
 
-template < typename tType >
-tType min ( tType left, tType right )
+template<typename tType>
+tType min( tType left, tType right )
 	{
 	return ( left < right ? left : right );
 	}
 
-template < typename tType >
-tType max ( tType left, tType right )
+template<typename tType>
+tType max( tType left, tType right )
 	{
 	return ( left >= right ? left : right );
 	}
 
-template < typename tType >
-tType abs ( tType val )
+template<typename tType>
+tType abs( tType val )
 	{
 	return ( val >= 0 ? val : - val );
 	}
@@ -86,50 +86,50 @@ bool less( tType const& a_rtLeft, tType const& a_rtRight )
 	return ( a_rtLeft < a_rtRight );
 	}
 
-template < typename tType >
-inline tType const operator | ( tType const & left,
-		tType const & right )
+template<typename tType>
+inline tType const operator | ( tType const& left,
+		tType const& right )
 	{
 	return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
 				| static_cast < int long unsigned > ( right ) ) );
 	}
-template < typename tType >
-inline tType & operator |= ( tType & left, tType const & right )
+template<typename tType>
+inline tType& operator |= ( tType& left, tType const& right )
 	{
 	left = static_cast < tType > ( static_cast < int long unsigned > ( left )
 			| static_cast < int long unsigned > ( right ) );
 	return ( left );
 	}
-template < typename tType >
-inline tType const operator & ( tType const & left,
-		tType const & right )
+template<typename tType>
+inline tType const operator & ( tType const& left,
+		tType const& right )
 	{
 	return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
 				& static_cast < int long unsigned > ( right ) ) );
 	}
-template < typename tType >
-inline tType & operator &= ( tType & left, tType const & right )
+template<typename tType>
+inline tType& operator &= ( tType& left, tType const& right )
 	{
 	left = static_cast < tType > ( static_cast < int long unsigned > ( left )
 			& static_cast < int long unsigned > ( right ) );
 	return ( left );
 	}
-template < typename tType >
-inline tType const operator ^ ( tType const & left,
-		tType const & right )
+template<typename tType>
+inline tType const operator ^ ( tType const& left,
+		tType const& right )
 	{
 	return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
 				^ static_cast < int long unsigned > ( right ) ) );
 	}
-template < typename tType >
-inline tType & operator ^= ( tType & left, tType const & right )
+template<typename tType>
+inline tType& operator ^= ( tType& left, tType const& right )
 	{
 	left = static_cast < tType > ( static_cast < int long unsigned > ( left )
 			^ static_cast < int long unsigned > ( right ) );
 	return ( left );
 	}
-template < typename tType >
-inline tType const operator ~ ( tType const & e )
+template<typename tType>
+inline tType const operator ~ ( tType const& e )
 	{
 	return ( static_cast < tType > (
 				~ static_cast < int long unsigned > ( e ) ) );
@@ -156,6 +156,13 @@ typedef enum
 	D_HTIME					= 0x1000,
 	D_MASK					= 0xffff
 	} type_t;
+
+template<typename tType>
+tType& clone( tType& object )
+	{
+	typedef typeof( *object ) ttType;
+	return ( tType( new ttType( *object ) ) );
+	}
 
 }
 
