@@ -128,7 +128,7 @@ private:
 		virtual HAbstractRow* call( void ) = 0;
 		virtual void next( void ) = 0;
 		virtual void previous( void ) = 0;
-		virtual void assign( HAbstractModelIterator const& );
+		virtual void assign_to( iterator_ptr_t& ) const;
 		virtual bool is_equal( HAbstractModelIterator const& );
 		virtual bool is_not_equal( HAbstractModelIterator const& );
 		virtual bool is_valid( void ) = 0;
@@ -205,7 +205,7 @@ private:
 		virtual HAbstractRow* call( void );
 		virtual void next( void );
 		virtual void previous( void );
-		virtual void assign( HModelIterator const& );
+		virtual void assign_to( iterator_ptr_t& ) const;
 		virtual bool is_equal( HModelIterator const& );
 		virtual bool is_not_equal( HModelIterator const& );
 		virtual bool is_valid( void );
@@ -481,9 +481,9 @@ bool HListControler<tType>::HModelIterator::is_not_equal( HListControler<tType>:
 	}
 
 template<typename tType>
-void HListControler<tType>::HModelIterator::assign( HListControler<tType>::HModelIterator const& a_oIt )
+void HListControler<tType>::HModelIterator::assign_to( HAbstractControler::iterator_ptr_t& a_oIt ) const
 	{
-	f_oIterator = a_oIt.f_oIterator;
+	a_oIt = iterator_ptr_t( new HModelIterator( f_oIterator ) );
 	return;
 	}
 

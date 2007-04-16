@@ -1042,10 +1042,8 @@ HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWra
 	{
 	if ( &a_oIt != this )
 		{
-		if ( f_oIteratorPtr.raw() )
-			f_oIteratorPtr->assign( *a_oIt.f_oIteratorPtr );
-		else
-			f_oIteratorPtr = a_oIt.f_oIteratorPtr;
+		if ( a_oIt.f_oIteratorPtr.raw() )
+			a_oIt.f_oIteratorPtr->assign_to( f_oIteratorPtr );
 		}
 	return ( *this );
 	}
@@ -1075,7 +1073,7 @@ bool HAbstractControler::HAbstractModelIterator::is_not_equal( HAbstractControle
 	return( false );
 	}
 
-void HAbstractControler::HAbstractModelIterator::assign( HAbstractControler::HAbstractModelIterator const& )
+void HAbstractControler::HAbstractModelIterator::assign_to( HAbstractControler::iterator_ptr_t& ) const
 	{
 	return;
 	}
