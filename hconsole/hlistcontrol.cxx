@@ -454,7 +454,7 @@ int HListControl::do_process_input ( int a_iCode )
 	M_PROLOG
 	int l_iCtr = 0;
 	int l_iErrorCode = 0;
-	a_iCode = HControl::process_input ( a_iCode );
+	a_iCode = HControl::do_process_input ( a_iCode );
 	switch ( a_iCode )
 		{
 		case ( KEY_CODES::D_PAGE_UP ):		handle_key_page_up();		break;
@@ -593,7 +593,7 @@ int HListControl::do_click ( mouse::OMouse & a_rsMouse )
 	int l_iRow = 0, l_iColumn = 0, l_iCtr = 0;
 	int l_iWidth = 0, l_iColumns = f_oHeader.size();
 	HColumnInfo * l_poColumnInfo = NULL;
-	if ( ! HControl::click ( a_rsMouse ) )
+	if ( ! HControl::do_click ( a_rsMouse ) )
 		return ( 1 );
 	l_iRow = ( a_rsMouse.f_iRow - f_iRowRaw ) - ( f_bDrawHeader ? 1 : 0 );
 	if ( l_iRow == f_iCursorPosition )

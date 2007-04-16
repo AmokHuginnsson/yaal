@@ -188,7 +188,7 @@ int HTreeControl::do_process_input ( int a_iCode )
 	bool l_bWasFolded = false;
 	int l_iErrorCode = 0;
 	HNodeControl * l_poNode = NULL;
-	a_iCode = HControl::process_input ( a_iCode );
+	a_iCode = HControl::do_process_input ( a_iCode );
 	l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
 	switch ( a_iCode )
 		{
@@ -306,7 +306,7 @@ int HTreeControl::set_focus ( char a_cShorcut )
 int HTreeControl::do_click ( OMouse & a_rsMouse )
 	{
 	M_PROLOG
-	if ( ! HControl::click ( a_rsMouse ) )
+	if ( ! HControl::do_click ( a_rsMouse ) )
 		return ( 1 );
 	if ( do_click ( dynamic_cast < HNodeControl * > ( f_poRoot ), a_rsMouse ) )
 		refresh ( );

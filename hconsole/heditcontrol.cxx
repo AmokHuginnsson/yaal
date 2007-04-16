@@ -167,7 +167,7 @@ int HEditControl::do_process_input ( int a_iCode )
 	int l_iOldControlOffset = 0;
 	int l_iOldCursorPosition = 0;
 	char * l_pcBuffer = 0;
-	a_iCode = HControl::process_input ( a_iCode );
+	a_iCode = HControl::do_process_input ( a_iCode );
 	l_pcBuffer = f_oVarTmpBuffer.raw ( );
 	f_oVarTmpBuffer = f_oString;
 	l_iOldControlOffset = f_iControlOffset;
@@ -530,7 +530,7 @@ int HEditControl::do_click ( mouse::OMouse & a_rsMouse )
 	{
 	M_PROLOG
 	int l_iPosition = 0;
-	if ( ! HControl::click ( a_rsMouse ) )
+	if ( ! HControl::do_click ( a_rsMouse ) )
 		return ( 1 );
 	l_iPosition = a_rsMouse.f_iColumn - f_iColumnRaw;
 	if ( l_iPosition < f_oString.get_length ( ) )

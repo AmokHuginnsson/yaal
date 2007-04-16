@@ -124,7 +124,7 @@ int HStatusBarControl::do_process_input ( int a_iCode )
 		return ( 0 );
 		}
 	if ( a_iCode != '\t' )
-		a_iCode = HEditControl::process_input ( a_iCode );
+		a_iCode = HEditControl::do_process_input ( a_iCode );
 	switch ( f_eMode )
 		{
 		case ( PROMPT::D_NORMAL ):

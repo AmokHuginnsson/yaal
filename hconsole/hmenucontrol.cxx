@@ -130,7 +130,7 @@ int HMenuControl::do_process_input ( int a_iCode )
 	OMenuItem const * l_psMenu = NULL;
 	if ( ! f_poRoot )
 		M_THROW ( _ ( "menu not initialized" ), errno );
-	a_iCode = HTreeControl::process_input ( a_iCode );
+	a_iCode = HTreeControl::do_process_input ( a_iCode );
 	if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
 		{
 		HMenuNode * l_poNode = dynamic_cast < HMenuNode * > ( f_poSelected );

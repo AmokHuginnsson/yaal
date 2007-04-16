@@ -132,14 +132,14 @@ int HComboboxControl::do_process_input ( int a_iCode )
 				f_eMode = MODE::D_LISTCONTROL;
 			break;
 			default :
-				return ( HEditControl::process_input ( a_iCode ) );
+				return ( HEditControl::do_process_input ( a_iCode ) );
 			}
 		refresh ( );
 		}
 	else
 		{
 		if ( a_iCode != '\r' )
-			return ( HListControl::process_input ( a_iCode ) );
+			return ( HListControl::do_process_input ( a_iCode ) );
 		close_combo ( );
 		}
 	return ( 0 );
