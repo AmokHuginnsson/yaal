@@ -525,7 +525,6 @@ void HListControl::add_column ( int const & a_riColumn, char const * a_pcName,
 	l_oColumnInfo.f_poControl = a_poControl;
 	f_oHeader.add_at ( a_riColumn, & l_oColumnInfo );
 	recalculate_column_widths();
-	refresh();
 	return;
 	M_EPILOG
 	}
