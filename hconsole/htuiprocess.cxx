@@ -73,46 +73,42 @@ int HTUIProcess::init_tui ( char const * a_pcProcessName, HWindow::ptr_t a_oMain
 	static int const D_CTRLS_COUNT = 2;
 	static int const D_ALTS_COUNT = 10;
 	int l_iCtr = 0;
-	int l_piAlts [ D_ALTS_COUNT ];
-	int l_piCtrls [ ] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
+	int l_piAlts[ D_ALTS_COUNT ];
+	int l_piCtrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t l_oMainWindow;
-	HProcess::init ( n_iLatency );
-	register_file_descriptor_handler ( STDIN_FILENO, & HTUIProcess::process_stdin );
+	HProcess::init( n_iLatency );
+	register_file_descriptor_handler( STDIN_FILENO, &HTUIProcess::process_stdin );
 	if ( n_bUseMouse && n_iMouseDes )
-		register_file_descriptor_handler ( n_iMouseDes, & HTUIProcess::process_mouse );
-	register_postprocess_handler ( D_CTRLS_COUNT, l_piCtrls,
+		register_file_descriptor_handler( n_iMouseDes, &HTUIProcess::process_mouse );
+	register_postprocess_handler( D_CTRLS_COUNT, l_piCtrls,
 			& HTUIProcess::handler_refresh );
-	register_postprocess_handler ( KEY<'x'>::command, NULL,
+	register_postprocess_handler( KEY<'x'>::command, NULL,
 			& HTUIProcess::handler_quit );
 	if ( n_bUseMouse )
-		register_postprocess_handler ( KEY_CODES::D_MOUSE, NULL,
+		register_postprocess_handler( KEY_CODES::D_MOUSE, NULL,
 				& HTUIProcess::handler_mouse );
 	if ( !! a_oMainWindow )
-		{
 		l_oMainWindow = a_oMainWindow;
-		l_oMainWindow->init ( );
-		f_oMainWindow = l_oMainWindow;
-		if ( ! l_oMainWindow->is_initialised ( ) )
-			M_THROW ( _ ( "window has not been initialised" ), errno );
-		}
 	else /* Create automatically default main window. */
 		{
-		l_oMainWindow = HWindow::ptr_t ( new HMainWindow ( a_pcProcessName, f_oWindows ) );
-		l_oMainWindow->init ( );
-		f_oMainWindow = l_oMainWindow;
-		add_window ( l_oMainWindow );
-		register_postprocess_handler ( KEY < '\t' >::meta, NULL,
-				& HTUIProcess::handler_jump_meta_tab );
-		register_postprocess_handler ( KEY < 'q' >::command, NULL,
-				& HTUIProcess::handler_close_window );
+		l_oMainWindow = HWindow::ptr_t( new HMainWindow( a_pcProcessName, f_oWindows ) );
+		register_postprocess_handler( KEY<'\t'>::meta, NULL,
+				&HTUIProcess::handler_jump_meta_tab );
+		register_postprocess_handler( KEY<'q'>::command, NULL,
+				&HTUIProcess::handler_close_window );
 		for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
-			l_piAlts [ l_iCtr ] = KEY<>::meta_r ( '0' + l_iCtr );
-		register_postprocess_handler ( D_ALTS_COUNT, l_piAlts,
-			& HTUIProcess::handler_jump_meta_direct );
+			l_piAlts[ l_iCtr ] = KEY<>::meta_r ( '0' + l_iCtr );
+		register_postprocess_handler( D_ALTS_COUNT, l_piAlts,
+			&HTUIProcess::handler_jump_meta_direct );
 		}
+	l_oMainWindow->init();
+	f_oMainWindow = l_oMainWindow;
+	add_window( l_oMainWindow );
+	if ( ! l_oMainWindow->is_initialised() )
+		M_THROW( _( "window has not been initialised" ), errno );
 	f_oForegroundWindow = f_oWindows->begin();
-	f_oCommandHandlers [ "quit" ] = static_cast < HANDLER_t > ( & HTUIProcess::handler_quit );
-	handler_refresh ( 0 );
+	f_oCommandHandlers[ "quit" ] = static_cast<HANDLER_t>( &HTUIProcess::handler_quit );
+	handler_refresh( 0 );
 	return ( 1 );
 	M_EPILOG
 	}
@@ -121,13 +117,13 @@ int HTUIProcess::add_window ( HWindow::ptr_t a_oWindow )
 	{
 	M_PROLOG
 	a_oWindow->init();
-	f_oWindows->push_back ( a_oWindow );
+	f_oWindows->push_back( a_oWindow );
 	f_oForegroundWindow = f_oWindows->rbegin();
 	M_ASSERT( f_oForegroundWindow.is_valid() );
 	f_oMainWindow->update_all();
-	if ( ! (*f_oForegroundWindow)->is_initialised ( ) )
-		M_THROW ( _ ( "window has not been initialised" ), errno );
-	c_refresh ( );
+	if ( ! (*f_oForegroundWindow)->is_initialised() )
+		M_THROW ( _( "window has not been initialised" ), errno );
+	c_refresh();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -140,24 +136,24 @@ int HTUIProcess::process_stdin ( int a_iCode )
 	if ( ! a_iCode )
 		a_iCode = get_key ( );
 	if ( a_iCode )
-		a_iCode = process_input_with_handlers ( a_iCode, f_oPreprocessHandlers );
+		a_iCode = process_input_with_handlers( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && !! (*f_oForegroundWindow) )
-			a_iCode = (*f_oForegroundWindow)->process_input ( a_iCode );
+			a_iCode = (*f_oForegroundWindow)->process_input( a_iCode );
 	if ( a_iCode )
-		a_iCode = process_input_with_handlers ( a_iCode, f_oPostprocessHandlers );
+		a_iCode = process_input_with_handlers( a_iCode, f_oPostprocessHandlers );
 	if ( ! a_iCode )
 		{
 		if ( !! (*f_oForegroundWindow) )
-			f_oCommand = (*f_oForegroundWindow)->get_command ( );
+			f_oCommand = (*f_oForegroundWindow)->get_command();
 		if ( f_oCommand
-				&& static_cast < char const * const > ( f_oCommand ) [ 0 ] )
-			l_oCommand = process_command ( );
+				&& static_cast< char const * const>( f_oCommand )[ 0 ] )
+			l_oCommand = process_command();
 		if ( l_oCommand
-				&& static_cast < char const * const > ( l_oCommand ) [ 0 ]
+				&& static_cast< char const * const>( l_oCommand )[ 0 ]
 				&& !! (*f_oForegroundWindow) )
-			(*f_oForegroundWindow)->status_bar ( )->message ( COLORS::D_FG_RED,
+			(*f_oForegroundWindow)->status_bar()->message( COLORS::D_FG_RED,
 					"unknown command: `%s'",
-					static_cast < char const * const > ( l_oCommand ) );
+					static_cast<char const * const>( l_oCommand ) );
 		}
 #ifdef __DEBUGGER_BABUNI__
 	n_bNeedRepaint = true;
@@ -188,7 +184,7 @@ int HTUIProcess::process_stdin ( int a_iCode )
 		c_printf ( 0, 0, COLORS::D_FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( a_iCode && !! (*f_oForegroundWindow) )
-		(*f_oForegroundWindow)->status_bar ( )->message ( COLORS::D_FG_RED,
+		(*f_oForegroundWindow)->status_bar()->message ( COLORS::D_FG_RED,
 				"unknown function, err code(%d)", a_iCode );
 	return ( a_iCode );
 	M_EPILOG
