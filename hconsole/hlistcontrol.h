@@ -165,6 +165,8 @@ public:
 	virtual bool empty( void ) = 0;
 	virtual HModelIteratorWrapper begin() = 0;
 	virtual HModelIteratorWrapper end() = 0;
+	virtual HModelIteratorWrapper rbegin() = 0;
+	virtual HModelIteratorWrapper rend() = 0;
 	virtual void erase( HModelIteratorWrapper& );
 	virtual void add_tail( void );
 	void set_control( HControl* );
@@ -232,6 +234,8 @@ public:
 	virtual int long size( void );
 	virtual HModelIteratorWrapper begin();
 	virtual HModelIteratorWrapper end();
+	virtual HModelIteratorWrapper rbegin();
+	virtual HModelIteratorWrapper rend();
 	virtual void erase( HModelIteratorWrapper& );
 	virtual void add_tail( void );
 	};
@@ -339,6 +343,9 @@ protected:
 private:
 	void sort_by_column ( int, hcore::OListBits::sort_order_t = hcore::OListBits::D_ASCENDING );
 	void recalculate_column_widths ( void );
+	void draw_background( int );
+	void draw_header( int );
+	void draw_scroll( int );
 	HListControl ( HListControl const& );
 	HListControl& operator = ( HListControl const& );
 	};
@@ -416,6 +423,18 @@ template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::end( void )
 	{
 	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( f_oList->end() ) ) ) );
+	}
+
+template<typename tType>
+HAbstractControler::HModelIteratorWrapper HListControler<tType>::rbegin( void )
+	{
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( f_oList->rbegin() ) ) ) );
+	}
+
+template<typename tType>
+HAbstractControler::HModelIteratorWrapper HListControler<tType>::rend( void )
+	{
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( f_oList->rend() ) ) ) );
 	}
 
 template<typename tType>

@@ -46,7 +46,7 @@ char const * const g_ppcErrMsgHList [ 8 ] =
 /* HList::ERROR::E_EMPTY */					_ ( "list was empty" ),
 /* HList::ERROR::E_BADOFFSET */			_ ( "incorrect offset" ),
 /* HList::ERROR::E_BADNUMBER */			_ ( "wrong number" ),
-/* HList::ERROR::E_BADORDER */			_ ( "inconsistient sort order during ordered add" )
+/* HList::ERROR::E_BADORDER */			_ ( "inconsistient sort order" )
 	};
 
 }
