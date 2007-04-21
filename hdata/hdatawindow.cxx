@@ -143,7 +143,7 @@ int HDataWindow::init ( void )
 				l_poList->set_flags( ( l_psLCR->f_bCheckable ? HListControl::FLAGS::D_CHECKABLE : HListControl::FLAGS::D_NONE )
 						| ( l_psLCR->f_bSortable ? HListControl::FLAGS::D_SORTABLE : HListControl::FLAGS::D_NONE )
 						| ( l_psLCR->f_bEditable ? HListControl::FLAGS::D_EDITABLE : HListControl::FLAGS::D_NONE )
-						| ( l_psLCR->f_bDrawHeader ? HListControl::FLAGS::D_EDITABLE : HListControl::FLAGS::D_NONE ),
+						| ( l_psLCR->f_bDrawHeader ? HListControl::FLAGS::D_DRAW_HEADER : HListControl::FLAGS::D_NONE ),
 						HListControl::FLAGS::D_ALL );
 				}
 			break;
