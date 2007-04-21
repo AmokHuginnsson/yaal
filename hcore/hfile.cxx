@@ -38,10 +38,10 @@ namespace yaal
 namespace hcore
 {
 
-HFile::HFile ( mode_open_t const a_eMode, void * const a_pvHandle )
-	: f_eMode ( a_eMode ),
-	f_pvHandle ( a_pvHandle ), f_oPath ( ), f_oError ( ),
-	f_bExternal ( a_pvHandle ? true : false )
+HFile::HFile ( mode_open_t const a_eMode, void* const a_pvHandle )
+	: f_eMode( a_eMode ),
+	f_pvHandle( a_pvHandle ), f_oPath(), f_oError(),
+	f_bExternal( a_pvHandle ? true : false )
 	{
 	M_PROLOG
 	if ( ( ( a_eMode & D_APPEND ) && ( a_eMode & D_TRUNCATE ) )
@@ -61,7 +61,7 @@ HFile::~HFile ( void )
 	M_EPILOG
 	}
 
-int HFile::open ( char const * const a_pcPath )
+int HFile::open( char const* const a_pcPath )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -92,7 +92,7 @@ int HFile::open ( char const * const a_pcPath )
 	M_EPILOG
 	}
 
-int HFile::close ( void )
+int HFile::close( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -109,7 +109,7 @@ int HFile::close ( void )
 	M_EPILOG
 	}
 
-int HFile::read_line ( HString & a_roLine, mode_read_t a_eMode,
+int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		int const a_iMaximumLength )
 	{
 	M_PROLOG
@@ -159,7 +159,7 @@ int HFile::read_line ( HString & a_roLine, mode_read_t a_eMode,
 	M_EPILOG
 	}
 
-int HFile::scan_line ( HString & a_roLine, int const a_iMaximumLength )
+int HFile::scan_line( HString& a_roLine, int const a_iMaximumLength )
 	{
 	M_PROLOG
 	int l_iSize = 0;
@@ -180,7 +180,7 @@ int HFile::scan_line ( HString & a_roLine, int const a_iMaximumLength )
 	M_EPILOG
 	}
 
-int HFile::get_line_length ( void )
+int HFile::get_line_length( void )
 	{
 	M_PROLOG
 	static int const D_SCAN_BUFFER_SIZE = 8;
@@ -204,21 +204,21 @@ int HFile::get_line_length ( void )
 	M_EPILOG
 	}
 
-HString const & HFile::get_path ( void ) const
+HString const& HFile::get_path( void ) const
 	{
 	M_PROLOG
 	return ( f_oPath );
 	M_EPILOG
 	}
 
-HString const & HFile::get_error ( void ) const
+HString const& HFile::get_error( void ) const
 	{
 	M_PROLOG
 	return ( f_oError );
 	M_EPILOG
 	}
 
-void HFile::flush ( void ) const
+void HFile::flush( void ) const
 	{
 	M_PROLOG
 	M_ENSURE ( fflush ( static_cast < FILE * > ( f_pvHandle ) ) == 0 );
@@ -226,7 +226,7 @@ void HFile::flush ( void ) const
 	M_EPILOG
 	}
 
-HFile & HFile::operator << ( char const * const a_pcString )
+HFile& HFile::operator << ( char const* const a_pcString )
 	{
 	M_PROLOG
 	if ( a_pcString )
@@ -235,7 +235,7 @@ HFile & HFile::operator << ( char const * const a_pcString )
 	M_EPILOG
 	}
 
-HFile & HFile::operator << ( char const a_cChar )
+HFile& HFile::operator << ( char const a_cChar )
 	{
 	M_PROLOG
 	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%c", a_cChar );
@@ -243,7 +243,7 @@ HFile & HFile::operator << ( char const a_cChar )
 	M_EPILOG
 	}
 
-HFile & HFile::operator << ( int const a_iInteger )
+HFile& HFile::operator << ( int const a_iInteger )
 	{
 	M_PROLOG
 	int long l_lTmp = a_iInteger;
@@ -251,7 +251,7 @@ HFile & HFile::operator << ( int const a_iInteger )
 	M_EPILOG
 	}
 
-HFile & HFile::operator << ( int long const a_lLongInteger )
+HFile& HFile::operator << ( int long const a_lLongInteger )
 	{
 	M_PROLOG
 	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%ld", a_lLongInteger );
@@ -259,7 +259,7 @@ HFile & HFile::operator << ( int long const a_lLongInteger )
 	M_EPILOG
 	}
 
-HFile & HFile::operator << ( double const a_dDouble )
+HFile& HFile::operator << ( double const a_dDouble )
 	{
 	M_PROLOG
 	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%f", a_dDouble );
@@ -267,7 +267,7 @@ HFile & HFile::operator << ( double const a_dDouble )
 	M_EPILOG
 	}
 
-HFile & HFile::operator << ( void const * const a_pvPtr )
+HFile& HFile::operator << ( void const* const a_pvPtr )
 	{
 	M_PROLOG
 	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%p", a_pvPtr );
@@ -275,14 +275,14 @@ HFile & HFile::operator << ( void const * const a_pvPtr )
 	M_EPILOG
 	}
 
-HFile & HFile::operator << ( HFile & ( * const HFILE ) ( HFile & ) )
+HFile& HFile::operator << ( HFile& ( *const HFILE ) ( HFile& ) )
 	{
 	M_PROLOG
 	return ( HFILE ( * this ) );
 	M_EPILOG
 	}
 
-HFile & endl ( HFile & a_roFile )
+HFile& endl ( HFile& a_roFile )
 	{
 	M_PROLOG
 	a_roFile << '\n';
@@ -290,7 +290,7 @@ HFile & endl ( HFile & a_roFile )
 	M_EPILOG
 	}
 
-HFile & flush ( HFile & a_roFile )
+HFile& flush ( HFile& a_roFile )
 	{
 	M_PROLOG
 	a_roFile.flush ( );
@@ -298,14 +298,14 @@ HFile & flush ( HFile & a_roFile )
 	M_EPILOG
 	}
 
-HFile::operator bool const ( void ) const
+HFile::operator opcm_t const ( void ) const
 	{
 	M_PROLOG
-	return ( f_pvHandle ? true : false );
+	return ( f_pvHandle ? &OPointerConversion::f_iValid : NULL );
 	M_EPILOG
 	}
 
-int HFile::write ( void const * const a_pcBuffer, int a_iSize )
+int HFile::write( void const* const a_pcBuffer, int a_iSize )
 	{
 	M_PROLOG
 	return ( fwrite ( a_pcBuffer, sizeof ( char ), a_iSize,
@@ -313,7 +313,7 @@ int HFile::write ( void const * const a_pcBuffer, int a_iSize )
 	M_EPILOG
 	}
 
-int HFile::read ( void * const a_pcBuffer, int a_iSize )
+int HFile::read( void* const a_pcBuffer, int a_iSize )
 	{
 	M_PROLOG
 	return ( fread ( a_pcBuffer, sizeof ( char ), a_iSize,

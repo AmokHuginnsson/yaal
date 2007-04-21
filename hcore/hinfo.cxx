@@ -16,8 +16,8 @@ Copyright:
   3. No reverse engineering is allowed.
   4. If you want redistribute binary package you can not demand any fees
      for this software.
-     You can not even demand cost of the carrier (CD for example).
-  5. You can not include it to any commercial enterprise (for example 
+     You can not even demand cost of the carrier(CD for example).
+  5. You can not include it to any commercial enterprise(for example 
      as a free add-on to payed software or payed newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -34,16 +34,16 @@ namespace yaal
 namespace hcore
 {
 
-HInfo::HInfo ( void )
-	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+HInfo::HInfo( void )
+	: f_eType( D_VOID ), f_iInt( 0 ), f_lLongInt( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-HInfo::HInfo ( int const & a_riInt )
-	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+HInfo::HInfo( int const& a_riInt )
+	: f_eType( D_VOID ), f_iInt( 0 ), f_lLongInt( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	f_eType = D_INT;
@@ -52,8 +52,8 @@ HInfo::HInfo ( int const & a_riInt )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( int long const & a_rlLongInt )
-	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+HInfo::HInfo( int long const& a_rlLongInt )
+	: f_eType( D_VOID ), f_iInt( 0 ), f_lLongInt( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	f_eType = D_LONG_INT;
@@ -62,8 +62,8 @@ HInfo::HInfo ( int long const & a_rlLongInt )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( double const & a_rdDouble )
-	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+HInfo::HInfo ( double const& a_rdDouble )
+	: f_eType( D_VOID ), f_iInt( 0 ), f_lLongInt( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	f_eType = D_DOUBLE;
@@ -72,8 +72,8 @@ HInfo::HInfo ( double const & a_rdDouble )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( void * const a_pvPointer )
-	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+HInfo::HInfo( void* const a_pvPointer )
+	: f_eType( D_VOID ), f_iInt( 0 ), f_lLongInt( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	f_eType = D_POINTER;
@@ -82,8 +82,8 @@ HInfo::HInfo ( void * const a_pvPointer )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( char const * const a_pcBuffer )
-	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+HInfo::HInfo( char const* const a_pcBuffer )
+	: f_eType( D_VOID ), f_iInt( 0 ), f_lLongInt( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	f_eType = D_HSTRING;
@@ -92,8 +92,8 @@ HInfo::HInfo ( char const * const a_pcBuffer )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( HString const & a_roString )
-	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+HInfo::HInfo( HString const& a_roString )
+	: f_eType( D_VOID ), f_iInt( 0 ), f_lLongInt( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	f_eType = D_HSTRING;
@@ -102,8 +102,8 @@ HInfo::HInfo ( HString const & a_roString )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( HTime const & a_roTime )
-	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+HInfo::HInfo( HTime const& a_roTime )
+	: f_eType( D_VOID ), f_iInt( 0 ), f_lLongInt( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	f_eType = D_HTIME;
@@ -112,8 +112,8 @@ HInfo::HInfo ( HTime const & a_roTime )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( HInfo const & a_roInfo )
-	: f_eType ( D_VOID ), f_iInt ( 0 ), f_lLongInt ( 0 ), f_dDouble ( 0 ), f_pvPointer ( NULL ), f_oString ( "" ), f_oTime ( )
+HInfo::HInfo( HInfo const& a_roInfo )
+	: f_eType( D_VOID ), f_iInt( 0 ), f_lLongInt( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	( * this ) = a_roInfo;
@@ -121,15 +121,15 @@ HInfo::HInfo ( HInfo const & a_roInfo )
 	M_EPILOG
 	}
 
-HInfo::~HInfo ( void )
+HInfo::~HInfo( void )
 	{
 	M_PROLOG
-	purge ( );
+	purge( );
 	return;
 	M_EPILOG
 	}
 
-void HInfo::purge ( void )
+void HInfo::purge( void )
 	{
 	M_PROLOG
 	f_eType = D_VOID;
@@ -137,20 +137,20 @@ void HInfo::purge ( void )
 	f_lLongInt = 0;
 	f_dDouble = 0;
 	f_oString = "";
-	f_oTime = HTime ( );
+	f_oTime = HTime( );
 	f_pvPointer = NULL;
 	return;
 	M_EPILOG
 	}
 
-char & HInfo::operator [ ] ( int const a_iIndex )
+char& HInfo::operator [] ( int const a_iIndex )
 	{
 	M_PROLOG
 	return ( f_oString [ a_iIndex ] );
 	M_EPILOG
 	}
 
-HInfo & HInfo::operator = ( HInfo const & a_roInfo )
+HInfo& HInfo::operator = ( HInfo const& a_roInfo )
 	{
 	M_PROLOG
 	if ( this != & a_roInfo )
@@ -167,7 +167,7 @@ HInfo & HInfo::operator = ( HInfo const & a_roInfo )
 	M_EPILOG
 	}
 
-HInfo & HInfo::operator ( ) ( HInfo const & a_roInfo )
+HInfo& HInfo::operator () ( HInfo const& a_roInfo )
 	{
 	M_PROLOG
 	if ( a_roInfo.f_eType & D_INT )
@@ -187,67 +187,67 @@ HInfo & HInfo::operator ( ) ( HInfo const & a_roInfo )
 	M_EPILOG
 	}
 
-template < >
-int const HInfo::get < int > ( void ) const
+template<>
+int const HInfo::get<int>( void ) const
 	{
 	M_PROLOG
 	return ( f_iInt );
 	M_EPILOG
 	}
 
-template < >
-int long const HInfo::get < int long > ( void ) const
+template<>
+int long const HInfo::get<int long>( void ) const
 	{
 	M_PROLOG
 	return ( f_lLongInt );
 	M_EPILOG
 	}
 
-template < >
-double const HInfo::get < double > ( void ) const
+template<>
+double const HInfo::get<double>( void ) const
 	{
 	M_PROLOG
 	return ( f_dDouble );
 	M_EPILOG
 	}
 
-template < >
-char const * const HInfo::get < char const * const > ( void ) const
+template<>
+char const* const HInfo::get<char const* const>( void ) const
 	{
 	M_PROLOG
 	return ( static_cast < char const * const > ( f_oString ) );
 	M_EPILOG
 	}
 
-template < >
-HString const & HInfo::get < HString const & > ( void ) const
+template<>
+HString const& HInfo::get<HString const&>( void ) const
 	{
 	M_PROLOG
 	return ( f_oString );
 	M_EPILOG
 	}
 
-template < >
-HTime const & HInfo::get < HTime const & > ( void ) const
+template<>
+HTime const& HInfo::get<HTime const&>( void ) const
 	{
 	M_PROLOG
 	return ( f_oTime );
 	M_EPILOG
 	}
 
-template < >
-void * const HInfo::get < void * > ( void ) const
+template<>
+void* const HInfo::get<void*>( void ) const
 	{
 	M_PROLOG
-	void * l_pvTmp = f_pvPointer;
+	void* l_pvTmp = f_pvPointer;
 	return ( l_pvTmp );
 	M_EPILOG
 	}
 
-HInfo::operator bool const ( void ) const
+HInfo::operator opcm_t const ( void ) const
 	{
 	M_PROLOG
-	return ( f_lLongInt || f_dDouble || f_oString );
+	return ( f_lLongInt || f_dDouble || f_oString ? &OPointerConversion::f_iValid : NULL );
 	M_EPILOG
 	}
 

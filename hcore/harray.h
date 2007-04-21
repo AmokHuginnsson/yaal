@@ -46,6 +46,8 @@ extern char const * const n_ppcErrMsgHArray [ ];
 template < typename tType >
 class HArray
 	{
+	struct OPointerConversion { int f_iValid; };
+	typedef int OPointerConversion::* opcm_t;
 public:
 	struct ERROR
 		{
@@ -59,82 +61,82 @@ public:
 		};
 protected:
 	int f_iSize;
-	tType * f_ptArray;
+	tType* f_ptArray;
 public:
-	HArray ( int );
-	HArray ( int const &, tType const & );
-	virtual ~HArray ( void );
-	HArray ( HArray const & );
-	HArray & operator = ( HArray const & );
-	tType & operator [ ] ( int );
-	tType const & operator [ ] ( int ) const;
-	int get_size ( void ) const;
-	operator bool ( void ) const;
+	HArray( int );
+	HArray( int const&, tType const& );
+	virtual ~HArray( void );
+	HArray( HArray const& );
+	HArray& operator = ( HArray const& );
+	tType& operator [] ( int );
+	tType const& operator [] ( int ) const;
+	int get_size( void ) const;
+	operator opcm_t ( void ) const;
 private:
-	tType & get ( int ) const;
+	tType& get( int ) const;
 	};
 
-template < typename tType >
-HArray < tType >::HArray ( int a_iSize ) : f_iSize ( 0 ), f_ptArray ( NULL )
+template<typename tType>
+HArray<tType>::HArray( int a_iSize ) : f_iSize( 0 ), f_ptArray( NULL )
 	{
 	M_PROLOG
 	if ( a_iSize < 0 )
-		M_THROW ( n_ppcErrMsgHArray [ ERROR::E_BADSIZE ], a_iSize );
+		M_THROW ( n_ppcErrMsgHArray[ ERROR::E_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
-		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
+		f_ptArray = new ( std::nothrow ) tType[ f_iSize ];
 		if ( ! f_ptArray )
-			M_THROW ( n_ppcErrMsgHArray [ ERROR::E_NOMEM ], a_iSize );
+			M_THROW( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_iSize );
 		}
 	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-HArray < tType >::HArray ( int const & a_iSize, tType const & a_tFillWith )
-	: f_iSize ( 0 ), f_ptArray ( NULL )
+template<typename tType>
+HArray<tType>::HArray( int const& a_iSize, tType const& a_tFillWith )
+	: f_iSize( 0 ), f_ptArray( NULL )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iSize < 0 )
-		M_THROW ( n_ppcErrMsgHArray [ ERROR::E_BADSIZE ], a_iSize );
+		M_THROW( n_ppcErrMsgHArray[ ERROR::E_BADSIZE ], a_iSize );
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
 		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
 		if ( ! f_ptArray )
-			M_THROW ( n_ppcErrMsgHArray [ ERROR::E_NOMEM ], a_iSize );
+			M_THROW ( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_iSize );
 		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
-			f_ptArray [ l_iCtr ] = a_tFillWith;
+			f_ptArray[ l_iCtr ] = a_tFillWith;
 		}
 	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-HArray < tType >::~HArray ( void )
+template<typename tType>
+HArray<tType>::~HArray( void )
 	{
 	M_PROLOG
 	if ( f_ptArray )
-		delete [ ] f_ptArray;
+		delete [] f_ptArray;
 	f_iSize = 0;
 	f_ptArray = NULL;
 	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-HArray < tType >::HArray ( HArray const & a_roArray ) : f_iSize ( 0 ), f_ptArray ( NULL )
+template<typename tType>
+HArray<tType>::HArray( HArray const& a_roArray ) : f_iSize( 0 ), f_ptArray( NULL )
 	{
 	M_PROLOG
-	( * this ) = a_roArray;
+	( *this ) = a_roArray;
 	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-HArray < tType > & HArray < tType >::operator = ( HArray const & a_roArray )
+template<typename tType>
+HArray<tType>& HArray<tType>::operator = ( HArray const& a_roArray )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -144,7 +146,7 @@ HArray < tType > & HArray < tType >::operator = ( HArray const & a_roArray )
 			{
 			if ( f_ptArray )
 				{
-				delete [ ] f_ptArray;
+				delete [] f_ptArray;
 				f_ptArray = NULL;
 				f_iSize = 0;
 				}
@@ -154,53 +156,53 @@ HArray < tType > & HArray < tType >::operator = ( HArray const & a_roArray )
 			{
 			f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
 			if ( ! f_ptArray )
-				M_THROW ( n_ppcErrMsgHArray [ ERROR::E_NOMEM ], f_iSize );
+				M_THROW( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], f_iSize );
 			}
 		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
-			f_ptArray [ l_iCtr ] = a_roArray.f_ptArray [ l_iCtr ];
+			f_ptArray[ l_iCtr ] = a_roArray.f_ptArray[ l_iCtr ];
 		}
-	return ( * this );
+	return ( *this );
 	M_EPILOG
 	}
 
-template < typename tType >
-tType & HArray < tType >::get ( int a_iIndex ) const
+template<typename tType>
+tType& HArray<tType>::get( int a_iIndex ) const
 	{
 	M_PROLOG
 	if ( a_iIndex < 0 )
 		a_iIndex += f_iSize;
 	if ( ( a_iIndex >= f_iSize ) || ( a_iIndex < 0 ) )
-		M_THROW ( n_ppcErrMsgHArray [ ERROR::E_BADINDEX ], a_iIndex );
-	return ( f_ptArray [ a_iIndex ] );
+		M_THROW( n_ppcErrMsgHArray[ ERROR::E_BADINDEX ], a_iIndex );
+	return ( f_ptArray[ a_iIndex ] );
 	M_EPILOG
 	}
 
-template < typename tType >
-tType & HArray < tType >::operator [ ] ( int a_iIndex )
+template<typename tType>
+tType& HArray<tType>::operator[] ( int a_iIndex )
 	{
 	M_PROLOG
-	return ( get ( a_iIndex ) );
+	return ( get( a_iIndex ) );
 	M_EPILOG
 	}
 
-template < typename tType >
-tType const & HArray < tType >::operator [ ] ( int a_iIndex ) const
+template<typename tType>
+tType const& HArray<tType>::operator[] ( int a_iIndex ) const
 	{
 	M_PROLOG
-	return ( get ( a_iIndex ) );
+	return ( get( a_iIndex ) );
 	M_EPILOG
 	}
 
-template < typename tType >
-HArray < tType > ::operator bool ( void ) const
+template<typename tType>
+HArray<tType> ::operator opcm_t ( void ) const
 	{
 	M_PROLOG
-	return ( f_iSize ? true : false );
+	return ( f_iSize ? &OPointerConversion::f_iValid : NULL );
 	M_EPILOG
 	}
 
-template < typename tType >
-int HArray < tType > ::get_size ( void ) const
+template<typename tType>
+int HArray<tType>::get_size( void ) const
 	{
 	M_PROLOG
 	return ( f_iSize );

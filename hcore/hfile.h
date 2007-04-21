@@ -37,11 +37,13 @@ namespace hcore
 {
 
 class HFile;
-HFile & endl ( HFile & );
-HFile & flush ( HFile & );
+HFile& endl ( HFile& );
+HFile& flush ( HFile& );
 
 class HFile
 	{
+	struct OPointerConversion { int f_iValid; };
+	typedef int OPointerConversion::* opcm_t;
 public:
 	typedef enum
 		{
@@ -60,36 +62,36 @@ public:
 		} mode_read_t;
 private:
 	mode_open_t f_eMode;
-	void * f_pvHandle;
+	void* f_pvHandle;
 	HString f_oPath;
 	HString f_oError;
 	bool f_bExternal;
 public:
-	HFile ( mode_open_t const = D_READING, void * const = NULL );
+	HFile( mode_open_t const = D_READING, void* const = NULL );
 	virtual ~HFile ( void );
-	int open ( char const * const );
-	int close ( void );
-	int read_line ( HString &, mode_read_t = D_DEFAULTS, int const = 0 );
-	HString const & get_path ( void ) const;
-	HString const & get_error ( void ) const;
+	int open( char const* const );
+	int close( void );
+	int read_line( HString&, mode_read_t = D_DEFAULTS, int const = 0 );
+	HString const& get_path( void ) const;
+	HString const& get_error( void ) const;
 	void flush ( void ) const;
-	HFile & operator << ( char const * const );
-	HFile & operator << ( char const );
-	HFile & operator << ( int const );
-	HFile & operator << ( int long const );
-	HFile & operator << ( double const );
-	HFile & operator << ( void const * const );
-	HFile & operator << ( HFile & ( * const ) ( HFile & ) );
-	operator bool const ( void ) const;
-	int write ( void const * const, int );
-	int read ( void * const, int );
+	HFile& operator << ( char const* const );
+	HFile& operator << ( char const );
+	HFile& operator << ( int const );
+	HFile& operator << ( int long const );
+	HFile& operator << ( double const );
+	HFile& operator << ( void const* const );
+	HFile& operator << ( HFile& ( *const ) ( HFile& ) );
+	operator opcm_t const ( void ) const;
+	int write( void const* const, int );
+	int read( void* const, int );
 private:
-	int get_line_length ( void );
-	int scan_line ( HString &, int const );
-	HFile ( HFile const & );
-	HFile & operator = ( HFile const & );
-	friend HFile & endl ( HFile & );
-	friend HFile & flush ( HFile & );
+	int get_line_length( void );
+	int scan_line( HString&, int const );
+	HFile( HFile const& );
+	HFile& operator = ( HFile const& );
+	friend HFile& endl ( HFile& );
+	friend HFile& flush ( HFile& );
 	};
 
 }

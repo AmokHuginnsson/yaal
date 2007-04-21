@@ -39,32 +39,34 @@ namespace hcore
 
 class HInfo
 	{
+	struct OPointerConversion { int f_iValid; };
+	typedef int OPointerConversion::* opcm_t;
 	type_t		f_eType;
 	int				f_iInt;
 	int long	f_lLongInt;
 	double		f_dDouble;
-	void *		f_pvPointer;
+	void*		f_pvPointer;
 	HString		f_oString;
 	HTime			f_oTime;
 public:
-	HInfo ( void );
-	HInfo ( int const & );
-	HInfo ( int long const & );
-	HInfo ( double const & );
-	HInfo ( char const * const );
-	HInfo ( HString const & );
-	HInfo ( HTime const & );
-	HInfo ( void * const );
-	HInfo ( HInfo const & );
-	virtual ~HInfo ( void );
-	char & operator [ ] ( int const );
-	HInfo & operator = ( HInfo const & );
-	HInfo & operator ( ) ( HInfo const & );
+	HInfo( void );
+	HInfo( int const& );
+	HInfo( int long const& );
+	HInfo( double const& );
+	HInfo( char const* const );
+	HInfo( HString const& );
+	HInfo( HTime const& );
+	HInfo( void* const );
+	HInfo( HInfo const& );
+	virtual ~HInfo( void );
+	char& operator [] ( int const );
+	HInfo& operator = ( HInfo const& );
+	HInfo& operator ( ) ( HInfo const& );
 	template < typename tType >
-	tType const get ( void ) const;
-	operator bool const ( void ) const;
+	tType const get( void ) const;
+	operator opcm_t const ( void ) const;
 private:
-	void purge ( void );
+	void purge( void );
 	};
 
 }
