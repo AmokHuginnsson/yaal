@@ -121,7 +121,8 @@ public:
 	void push_back ( tType const & );
 	tType& add_at ( int, tType* = NULL ); /* adds new element at specified position */
 /* adds element in the way that keeps order */
-	tType& add_orderly ( tType const&, sort_order_t = D_ASCENDING );
+	template<typename T>
+	tType& add_orderly ( tType const&, T const&, sort_order_t = D_ASCENDING );
 	status_t remove_element ( treatment_t const& = D_TREAT_AS_CLOSED,
 			tType** = NULL );	/* removes element at current cursor position */
 	status_t remove_at ( int, treatment_t const& = D_TREAT_AS_CLOSED,
@@ -143,7 +144,7 @@ public:
 	void sort_by_contents( sort_order_t = D_ASCENDING );
 	bool empty( void );
 	template<typename T>
-	void sort( T const& );
+	void sort( T const&, sort_order_t = D_ASCENDING );
 protected:
 	bool to_head ( HElement*&, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
 	bool to_tail ( HElement*&, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
@@ -617,8 +618,9 @@ tType& HList<tType>::add_at ( int a_iIndex, tType* a_ptObject )
 	}
 
 template<typename tType>
+template<typename T>
 tType& HList<tType>::add_orderly ( tType const& a_rtObject,
-		sort_order_t a_eOrder )
+		T const& less, sort_order_t a_eOrder )
 	{
 	M_PROLOG
 	bool l_bBefore = false;
@@ -1095,8 +1097,8 @@ tType& HList<tType>::tail ( void )
 	}
 
 template<typename tType>
-template<typename T >
-void HList<tType>::sort( T const& less )
+template<typename T>
+void HList<tType>::sort( T const& less, sort_order_t a_eOrder )
 	{
 	M_PROLOG
 	int l_iCtr = f_iSize;
@@ -1106,6 +1108,7 @@ void HList<tType>::sort( T const& less )
 	HElement* l_poExtreamLower = NULL;
 	HElement* l_poExtreamUpper = NULL;
 	HElement* l_poPointer = NULL;
+	f_eOrder = a_eOrder;
 	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
 		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], f_eOrder );
 	while ( l_iCtr >= 0 )

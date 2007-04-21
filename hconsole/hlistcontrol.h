@@ -41,6 +41,8 @@ namespace yaal
 namespace hconsole
 {
 
+class HListControl;
+
 /*! \brief Pack of helpers "list control" concept.
  *
  * List control helpers are provided as a means of customization
@@ -138,7 +140,7 @@ private:
 		virtual ~HAbstractModelIterator( void );
 		};
 protected:
-	HControl* f_poControl;
+	HListControl* f_poControl;
 public:
 	typedef yaal::hcore::HPointer<HAbstractControler,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
 	class HModelIteratorWrapper
@@ -169,7 +171,7 @@ public:
 	virtual HModelIteratorWrapper rend() = 0;
 	virtual void erase( HModelIteratorWrapper& );
 	virtual void add_tail( void );
-	void set_control( HControl* );
+	void set_control( HListControl* );
 private:
 	HAbstractControler( HAbstractControler const& );
 	HAbstractControler& operator=( HAbstractControler const& );
@@ -226,7 +228,7 @@ private:
 public:
 	HListControler( model_ptr_t = model_ptr_t() );
 	void add_tail( tType const& );
-	void add_orderly( tType const&, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
+	void add_orderly( tType const&, int, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
 	void remove_tail( void );
 	model_ptr_t get_model( void );
 	virtual void sort( list_control_helper::OSortHelper& );
@@ -320,6 +322,7 @@ public:
 	list_control_helper::HAbstractControler::ptr_t& get_controler ( void );
 	void remove_current_row();
 	int long get_row_count( void );
+	type_t get_column_type( int );
 protected:
 	virtual bool get_text_for_cell( iterator_t&, int, type_t );
 	virtual void do_refresh ( void );
@@ -352,6 +355,16 @@ private:
 
 namespace list_control_helper
 {
+
+template<typename tType = HItem>
+class CompareListControlItems
+	{
+	list_control_helper::OSortHelper& f_roSortHelper;
+public:
+	CompareListControlItems ( list_control_helper::OSortHelper& a_roSortHelper )
+		: f_roSortHelper ( a_roSortHelper ) { }
+	bool operator() ( tType const&, tType const& ) const;
+	};
 
 template<typename tType>
 HListControler<tType>::HListControler( model_ptr_t a_oModel ) : HAbstractControler(), f_oList( a_oModel )
@@ -388,10 +401,13 @@ void HListControler<tType>::add_tail( tType const& a_tRow )
 	}
 
 template<typename tType>
-void HListControler<tType>::add_orderly ( tType const& a_tRow, yaal::hcore::OListBits::sort_order_t a_eOrder )
+void HListControler<tType>::add_orderly ( tType const& a_tRow, int a_iColumn, yaal::hcore::OListBits::sort_order_t a_eOrder )
 	{
 	M_PROLOG
-	f_oList->add_orderly( a_tRow, a_eOrder );
+	list_control_helper::OSortHelper l_oHelper =
+		{ a_iColumn, a_eOrder, f_poControl->get_column_type( a_iColumn ),
+		0, size(), NULL };
+	f_oList->add_orderly( a_tRow, CompareListControlItems<tType> ( l_oHelper ), a_eOrder );
 	f_poControl->invalidate();
 	return;
 	M_EPILOG
@@ -529,16 +545,6 @@ HCell<tType>::~HCell( void )
 	{
 	return;
 	}
-
-template<typename tType = HItem>
-class CompareListControlItems
-	{
-	list_control_helper::OSortHelper& f_roSortHelper;
-public:
-	CompareListControlItems ( list_control_helper::OSortHelper& a_roSortHelper )
-		: f_roSortHelper ( a_roSortHelper ) { }
-	bool operator() ( tType const&, tType const& ) const;
-	};
 
 template<typename tType>
 void HListControler<tType>::sort( list_control_helper::OSortHelper& a_roHelper )

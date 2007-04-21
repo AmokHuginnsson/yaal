@@ -971,6 +971,13 @@ void HListControl::do_update( void )
 	return;
 	}
 
+type_t HListControl::get_column_type( int a_iColumn )
+	{
+	M_PROLOG
+	return ( f_oHeader[ a_iColumn ].f_eType );
+	M_EPILOG
+	}
+
 namespace list_control_helper
 {
 
@@ -986,24 +993,25 @@ template<>
 bool compare_cells( HInfo const& a_oLeft, HInfo const& a_oRight, OSortHelper& a_roSortHelper )
 	{
 	double l_dDifference = 0;
-	a_roSortHelper.progress();
+	if ( a_roSortHelper.f_poWindow )
+		a_roSortHelper.progress();
 	switch ( a_roSortHelper.f_eType )
 		{
 		case ( D_LONG_INT ):
-			return ( a_oLeft.get<long>() > a_oRight.get<long>() );
+			return ( a_oLeft.get<long>() < a_oRight.get<long>() );
 		case ( D_DOUBLE ):
-			l_dDifference = a_oLeft.get<double>() > a_oRight.get<double>();
+			l_dDifference = a_oLeft.get<double>() - a_oRight.get<double>();
 		break;
 		case ( D_HSTRING ):
 			return ( strcasecmp ( a_oLeft.get<HString const &>(),
-					 a_oRight.get<HString const&>() ) > 0 );
+					 a_oRight.get<HString const&>() ) < 0 );
 		case ( D_HTIME ):
-			l_dDifference = static_cast<time_t>( a_oLeft.get<HTime const&>() ) > static_cast<time_t>( a_oRight.get<HTime const&>() );
+			l_dDifference = static_cast<time_t>( a_oLeft.get<HTime const&>() ) - static_cast<time_t>( a_oRight.get<HTime const&>() );
 		break;
 		default:
 			break;
 		}
-	return ( l_dDifference > 0 ? 1 : ( l_dDifference < 0 ? - 1 : 0 ) );
+	return ( l_dDifference < 0 ? true : false );
 	}
 
 template<>
@@ -1022,7 +1030,7 @@ HAbstractControler::HAbstractControler( void ) : f_poControl( NULL )
 	return;
 	}
 
-void HAbstractControler::set_control( HControl* a_poControl )
+void HAbstractControler::set_control( HListControl* a_poControl )
 	{
 	f_poControl = a_poControl;
 	return;
