@@ -260,7 +260,6 @@ public:
 			D_ALL = -1
 			} list_flags_t;
 		};
-protected:
 	class HColumnInfo
 		{
 		bool f_bDescending;
@@ -278,7 +277,9 @@ protected:
 		HColumnInfo ( HColumnInfo const& );
 		HColumnInfo& operator = ( HColumnInfo const& );
 		friend class HListControl;
+		static int const D_ADD_AT_THE_END = -1;
 		};
+protected:
 	bool				f_bCheckable;					/* can items be checked/unchecked */
 	bool        f_bSortable;					/* can control content be sorted */
 	bool				f_bDrawHeader;				/* should be header driven */

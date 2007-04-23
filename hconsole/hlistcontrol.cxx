@@ -34,6 +34,7 @@ M_VCSID ( "$Id$" )
 #include "hlistcontrol.h"
 #include "hconsole.h"
 
+using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::hconsole::list_control_helper;
 
@@ -714,25 +715,23 @@ void HListControl::reset( void )
 void HListControl::go_to_match ( void )
 	{
 	M_PROLOG
-/*
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iCount = (*f_oControler).size() + 1, l_iColumns = f_oHeader.size();
+	int l_iSize = f_oControler->size(), l_iCount = l_iSize + 1, l_iColumns = f_oHeader.size();
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
-	HItem * l_poItem = NULL;
-	HElement * l_poSelectedOrig = f_poSelected;
-	HElement * l_poFirstVisibleRowOrig = f_oFirstVisibleRow;
+	iterator_t l_oCursorOrig = f_oCursor;
+	iterator_t l_oFirstVisibleRowOrig = f_oFirstVisibleRow;
 	if ( ! f_bSearchActived )
 		return;
-	if ( f_sMatch.f_poCurrentMatch != f_poSelected )
-		f_sMatch.f_iMatchNumber = - 1;
-	f_sMatch.f_poCurrentMatch = f_poSelected;
+	if ( f_sMatch.f_oCurrentMatch != f_oCursor )
+		f_sMatch.f_iMatchNumber = -1;
+	f_sMatch.f_oCurrentMatch = f_oCursor;
 	while ( l_iCount -- )
 		{
-		l_poItem = & f_poSelected->get_object();
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
 			{
-			l_pcHighlightStart = ( * l_poItem ) [ l_iCtr ].get<HString const &>();
+			get_text_for_cell( f_oCursor, l_iCtr, D_HSTRING );
+			l_pcHighlightStart = f_oVarTmpBuffer.raw();
 			l_iCtrLoc = 0;
 			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart ) ) )
 				{
@@ -743,12 +742,12 @@ void HListControl::go_to_match ( void )
 				}
 			if ( l_pcHighlightStart )
 				break;
-			f_sMatch.f_iMatchNumber = - 1;
+			f_sMatch.f_iMatchNumber = -1;
 			}
 		if ( l_pcHighlightStart )
 			break;
 		f_sMatch.f_iColumnWithMatch = 0;
-/ * this part is from process_input, but slightly modified * /
+/* this part is from process_input, but slightly modified */
 		if ( ( f_iCursorPosition + f_iControlOffset ) < ( l_iSize - 1 ) )
 			{
 			f_iCursorPosition ++;
@@ -758,35 +757,35 @@ void HListControl::go_to_match ( void )
 				f_iControlOffset ++;
 				l_iMoveFirstRow ++;
 				}
-			to_tail();
+			++ f_oCursor;
 			}
 		else
 			{
-			f_poSelected = f_oFirstVisibleRow = f_poHook;
+			f_oCursor = f_oFirstVisibleRow = f_oControler->begin();
 			f_iControlOffset = f_iCursorPosition = 0;
 			l_iMoveFirstRow = 0;
-			f_poParent->status_bar()->message ( _ ( "search hit BOTTOM, continuing at TOP" ) );
+			f_poParent->status_bar()->message( _( "search hit BOTTOM, continuing at TOP" ) );
 			}
-/ * end od it * /
+/* end od it */
 		}
 	if ( l_pcHighlightStart )
 		{
 		if ( l_iMoveFirstRow )
-			to_tail ( f_oFirstVisibleRow, l_iMoveFirstRow );
+			increment( f_oFirstVisibleRow, l_iMoveFirstRow );
 		f_sMatch.f_iColumnWithMatch = l_iCtr;
 		f_sMatch.f_iMatchNumber = l_iCtrLoc;
-		f_sMatch.f_poCurrentMatch = f_poSelected;
+		f_sMatch.f_oCurrentMatch = f_oCursor;
 		}
 	else
 		{
-		f_poSelected = l_poSelectedOrig;
-		f_oFirstVisibleRow = l_poFirstVisibleRowOrig;
+		f_oCursor = l_oCursorOrig;
+		f_oFirstVisibleRow = l_oFirstVisibleRowOrig;
 		f_iCursorPosition = l_iCursorPositionOrig;
 		f_iControlOffset = l_iControlOffsetOrig;
-		f_sMatch.f_iMatchNumber = - 1;
+		f_sMatch.f_iMatchNumber = -1;
 		f_sMatch.f_iColumnWithMatch = 0;
-		f_poParent->status_bar()->message ( HString ( _ ( "pattern not found: " ) ) + f_oPattern.error() );
-		}*/
+		f_poParent->status_bar()->message( HString( _( "pattern not found: " ) ) + f_oPattern.error() );
+		}
 	return;
 	M_EPILOG
 	}
@@ -794,25 +793,23 @@ void HListControl::go_to_match ( void )
 void HListControl::go_to_match_previous ( void )
 	{
 	M_PROLOG
-/*
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iCount = (*f_oControler).size() + 1, l_iColumns = f_oHeader.size();
+	int l_iSize = f_oControler->size(), l_iCount = l_iSize + 1, l_iColumns = f_oHeader.size();
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
-	HItem * l_poItem = NULL;
-	HElement * l_poSelectedOrig = f_poSelected;
-	HElement * l_poFirstVisibleRowOrig = f_oFirstVisibleRow;
+	iterator_t l_oCursorOrig = f_oCursor;
+	iterator_t l_oFirstVisibleRowOrig = f_oFirstVisibleRow;
 	if ( ! f_bSearchActived )
 		return;
-	if ( f_sMatch.f_poCurrentMatch != f_poSelected )
-		f_sMatch.f_iMatchNumber = - 1;
-	f_sMatch.f_poCurrentMatch = f_poSelected;
+	if ( f_sMatch.f_oCurrentMatch != f_oCursor )
+		f_sMatch.f_iMatchNumber = -1;
+	f_sMatch.f_oCurrentMatch = f_oCursor;
 	while ( l_iCount -- )
 		{
-		l_poItem = & f_poSelected->get_object();
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
 			{
-			l_pcHighlightStart = ( * l_poItem ) [ l_iCtr ].get<HString const &>();
+			get_text_for_cell( f_oCursor, l_iCtr, D_HSTRING );
+			l_pcHighlightStart = f_oVarTmpBuffer.raw();
 			l_iCtrLoc = 0;
 			if ( f_sMatch.f_iMatchNumber < 0 )
 				f_sMatch.f_iMatchNumber = f_oPattern.count ( l_pcHighlightStart );
@@ -830,12 +827,12 @@ void HListControl::go_to_match_previous ( void )
 				}
 			if ( l_pcHighlightStart )
 				break;
-			f_sMatch.f_iMatchNumber = - 1;
+			f_sMatch.f_iMatchNumber = -1;
 			}
 		if ( l_pcHighlightStart )
 			break;
 		f_sMatch.f_iColumnWithMatch = l_iColumns - 1;
-/ * this part is from process_input, but slightly modified * /
+/* this part is from process_input, but slightly modified */
 		if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
 			{
 			if ( f_iCursorPosition > 0 )
@@ -845,44 +842,44 @@ void HListControl::go_to_match_previous ( void )
 				f_iControlOffset --;
 				l_iMoveFirstRow ++;
 				}
-			to_head();
+			++ f_oCursor;
 			}
 		else
 			{
 			if ( l_iSize >= f_iHeightRaw )
 				{
-				f_poSelected = f_poHook;
-				to_head();
-				f_oFirstVisibleRow = f_poSelected;
-				to_head ( f_oFirstVisibleRow, f_iHeightRaw - 1 );
+				f_oCursor = f_oControler->begin();
+				++ f_oCursor;
+				f_oFirstVisibleRow = f_oCursor;
+				increment( f_oFirstVisibleRow, f_iHeightRaw - 1 );
 				f_iCursorPosition = f_iHeightRaw - 1;
 				f_iControlOffset = l_iSize - f_iHeightRaw;
 				}
 			else
 				f_iCursorPosition = l_iSize - 1;
 			l_iMoveFirstRow = 0;
-			f_poParent->status_bar()->message ( _ ( "search hit TOP, continuing at BOTTOM" ) );
+			f_poParent->status_bar()->message( _( "search hit TOP, continuing at BOTTOM" ) );
 			}
-/ * end od it * /
+/* end od it */
 		}
 	if ( l_pcHighlightStart )
 		{
 		if ( l_iMoveFirstRow )
-			to_head ( f_oFirstVisibleRow, l_iMoveFirstRow );
+			increment( f_oFirstVisibleRow, l_iMoveFirstRow );
 		f_sMatch.f_iColumnWithMatch = l_iCtr;
 		f_sMatch.f_iMatchNumber = l_iCtrLoc;
-		f_sMatch.f_poCurrentMatch = f_poSelected;
+		f_sMatch.f_oCurrentMatch = f_oCursor;
 		}
 	else
 		{
-		f_poSelected = l_poSelectedOrig;
-		f_oFirstVisibleRow = l_poFirstVisibleRowOrig;
+		f_oCursor = l_oCursorOrig;
+		f_oFirstVisibleRow = l_oFirstVisibleRowOrig;
 		f_iCursorPosition = l_iCursorPositionOrig;
 		f_iControlOffset = l_iControlOffsetOrig;
-		f_sMatch.f_iMatchNumber = - 1;
+		f_sMatch.f_iMatchNumber = -1;
 		f_sMatch.f_iColumnWithMatch = 0;
-		f_poParent->status_bar()->message ( _ ( "pattern not found" ) );
-		}*/
+		f_poParent->status_bar()->message( _( "pattern not found" ) );
+		}
 	return;
 	M_EPILOG
 	}
@@ -1087,12 +1084,12 @@ bool HAbstractControler::HModelIteratorWrapper::is_valid( void )
 
 bool HAbstractControler::HModelIteratorWrapper::operator==( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
-	return ( f_oIteratorPtr->is_equal( *a_oIt.f_oIteratorPtr ) );
+	return ( f_oIteratorPtr.raw() ? f_oIteratorPtr->is_equal( *a_oIt.f_oIteratorPtr ) : a_oIt.f_oIteratorPtr.raw() == NULL );
 	}
 
 bool HAbstractControler::HModelIteratorWrapper::operator!=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
-	return ( f_oIteratorPtr->is_not_equal( *a_oIt.f_oIteratorPtr ) );
+	return ( f_oIteratorPtr.raw() ? f_oIteratorPtr->is_not_equal( *a_oIt.f_oIteratorPtr ) : a_oIt.f_oIteratorPtr.raw() != NULL );
 	}
 
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator++( void )

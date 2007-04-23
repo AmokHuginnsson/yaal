@@ -215,11 +215,11 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 	{
 	M_PROLOG
 	int l_iParent = 0;
-	char l_pcName [ ] = "";
+	char l_pcName [] = "";
 	HDataListControl * l_poPDC = NULL; /* PDC stands for ParentDataControl */
 /* CI stands for ColumnInfo */
 	OColumnInfo l_sColumnInfo, * l_psCI = & l_sColumnInfo;
-	l_psCI->f_iPlacement = -1;		/* -1 means add at the end */
+	l_psCI->f_iPlacement = HDataListControl::HColumnInfo::D_ADD_AT_THE_END;
 	l_psCI->f_pcName = l_pcName;
 	l_psCI->f_iWidth = 1; 				/* width is awlays proportional */
 	l_psCI->f_eAlign = HControl::BITS::ALIGN::D_LEFT;
@@ -227,17 +227,17 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
 	if ( f_psResourcesArray [ l_iParent ].f_eType == DATACONTROL_BITS::TYPE::D_LIST )
 		{
-		l_poPDC = dynamic_cast < HDataListControl * > ( f_oControls.get_control_by_no( l_iParent ) );
+		l_poPDC = dynamic_cast<HDataListControl*>( f_oControls.get_control_by_no( l_iParent + 1 /* 1 stands for offset caused by 'status bar' */ ) );
 		if ( ! l_poPDC )
 			M_THROW ( "wrong control resource order",
 					l_iParent );
-		if ( f_psResourcesArray [ a_iChild ].f_psColumnInfo )
-			l_psCI = f_psResourcesArray [ a_iChild ].f_psColumnInfo;
-		l_poPDC->add_column ( l_psCI->f_iPlacement, l_psCI->f_pcName,
+		if ( f_psResourcesArray[ a_iChild ].f_psColumnInfo )
+			l_psCI = f_psResourcesArray[ a_iChild ].f_psColumnInfo;
+		l_poPDC->add_column( l_psCI->f_iPlacement, l_psCI->f_pcName,
 				l_psCI->f_iWidth, l_psCI->f_eAlign, l_psCI->f_eType, a_poDataControl );
 		}
 	else
-		M_THROW ( "unknown parent type", f_psResourcesArray [ l_iParent ].f_eType );
+		M_THROW( "unknown parent type", f_psResourcesArray [ l_iParent ].f_eType );
 	return;
 	M_EPILOG
 	}

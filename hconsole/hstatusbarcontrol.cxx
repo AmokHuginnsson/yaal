@@ -338,7 +338,7 @@ int HStatusBarControl::process_input_normal ( int a_iCode )
 				f_poParent->f_oCommand = f_oString;
 			else if ( l_eMode == PROMPT::D_SEARCH )
 				{
-				l_poSearchableControl = dynamic_cast < HSearchableControl * > ( &*f_poParent->f_oPreviousFocusedChild );
+				l_poSearchableControl = dynamic_cast < HSearchableControl * > ( &(*(*f_poParent->f_oPreviousFocusedChild)) );
 				if ( l_poSearchableControl )
 					l_poSearchableControl->search ( f_oString, l_bBackwards );
 				}

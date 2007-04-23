@@ -27,6 +27,7 @@ Copyright:
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
 #include "hcontrollist.h"
+#include "hstatusbarcontrol.h"
 
 using namespace yaal::hcore;
 
@@ -43,7 +44,7 @@ HControlList::HControlList ( model_t::cyclic_iterator& a_roFocused ) : f_oList (
 	M_EPILOG
 	}
 
-void HControlList::next_enabled ( char a_cShorcut )
+void HControlList::next_enabled( char a_cShorcut )
 	{
 	M_PROLOG
 	bool l_bLoop = true;
@@ -51,15 +52,17 @@ void HControlList::next_enabled ( char a_cShorcut )
 	do
 		{
 		++ f_roFocused;
-		l_bLoop = (*f_roFocused)->set_focus ( a_cShorcut );
+		if ( dynamic_cast<HStatusBarControl*>( &(*(*f_roFocused))) )
+			continue;
+		l_bLoop = (*f_roFocused)->set_focus( a_cShorcut );
 		if ( f_roFocused == it )
 			l_bLoop = false;
 		}
 	while ( l_bLoop );
 	if ( f_roFocused != it )
 		{
-		(*it)->kill_focus ( );
-		(*f_roFocused)->set_focus ( - 1 );
+		(*it)->kill_focus();
+		(*f_roFocused)->set_focus( -1 );
 		}
 	return;
 	M_EPILOG
@@ -159,7 +162,7 @@ void HControlList::select ( HControl::ptr_t const& a_oControl )
 void HControlList::exchange( int a_iFormer, int a_iLatter )
 	{
 	M_PROLOG
-	f_oList.exchange( a_iFormer, a_iLatter );
+	f_oList.exchange( a_iFormer + 1, a_iLatter + 1 );
 	return;
 	M_EPILOG
 	}
