@@ -361,6 +361,28 @@ inline void decrement( tType& iterator, int count )
 		;
 	}
 
+template<typename tType, typename ttType>
+inline void cyclic_increment( ttType& model, tType& iterator, int count )
+	{
+	for ( int i = 0; i < count; ++ i )
+		{
+		++ iterator;
+		if ( ! iterator.is_valid() )
+			iterator = model->begin();
+		}
+	}
+
+template<typename tType, typename ttType>
+inline void cyclic_decrement( ttType& model, tType& iterator, int count )
+	{
+	for ( int i = 0; i < count; ++ i )
+		{
+		-- iterator;
+		if ( ! iterator.is_valid() )
+			iterator = model->rbegin();
+		}
+	}
+
 }
 
 void HListControl::handle_key_page_up ( void )
@@ -842,16 +864,16 @@ void HListControl::go_to_match_previous ( void )
 				f_iControlOffset --;
 				l_iMoveFirstRow ++;
 				}
-			++ f_oCursor;
+			cyclic_decrement( f_oControler, f_oCursor, 1 );
 			}
 		else
 			{
 			if ( l_iSize >= f_iHeightRaw )
 				{
 				f_oCursor = f_oControler->begin();
-				++ f_oCursor;
+				cyclic_decrement( f_oControler, f_oCursor, 1 );
 				f_oFirstVisibleRow = f_oCursor;
-				increment( f_oFirstVisibleRow, f_iHeightRaw - 1 );
+				cyclic_decrement( f_oControler, f_oFirstVisibleRow, f_iHeightRaw - 1 );
 				f_iCursorPosition = f_iHeightRaw - 1;
 				f_iControlOffset = l_iSize - f_iHeightRaw;
 				}
@@ -865,7 +887,7 @@ void HListControl::go_to_match_previous ( void )
 	if ( l_pcHighlightStart )
 		{
 		if ( l_iMoveFirstRow )
-			increment( f_oFirstVisibleRow, l_iMoveFirstRow );
+			cyclic_decrement( f_oControler, f_oFirstVisibleRow, l_iMoveFirstRow );
 		f_sMatch.f_iColumnWithMatch = l_iCtr;
 		f_sMatch.f_iMatchNumber = l_iCtrLoc;
 		f_sMatch.f_oCurrentMatch = f_oCursor;
