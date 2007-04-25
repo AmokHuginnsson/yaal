@@ -311,7 +311,7 @@ void HListControl::draw_cell ( iterator_t& a_oIt, int a_iRow, int a_iColumn, int
 			}
 		break;
 		default :
-			M_THROW ( "unknown align", a_poColumnInfo->f_eAlign );
+			M_THROW( "unknown align", a_poColumnInfo->f_eAlign );
 		}
 	if ( a_iRow == f_iCursorPosition )
 		{
@@ -334,7 +334,7 @@ void HListControl::draw_cell ( iterator_t& a_oIt, int a_iRow, int a_iColumn, int
 		else
 			set_attr_data();
 		}
-	M_ENSURE ( c_mvprintf ( f_iRowRaw + a_iRow,
+	M_ENSURE( c_mvprintf( f_iRowRaw + a_iRow,
 				f_iColumnRaw + a_iColumnOffset, f_oVarTmpBuffer	) != C_ERR );
 	if ( f_bSearchActived )
 		highlight( f_iRowRaw + a_iRow,

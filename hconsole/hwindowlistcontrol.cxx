@@ -59,20 +59,20 @@ HWindowListControl::~HWindowListControl ( void )
 	M_EPILOG
 	}
 
-int HWindowListControl::do_process_input ( int a_iCode )
+int HWindowListControl::do_process_input( int a_iCode )
 	{
 	M_PROLOG
-	a_iCode = HListControl::do_process_input ( a_iCode );
+	a_iCode = HListControl::do_process_input( a_iCode );
 	if ( ( f_oControler->size() > 1 ) && ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) ) )
-		a_iCode = KEY < '\t' >::meta;
+		a_iCode = KEY<'\t'>::meta;
 	return ( a_iCode );
 	M_EPILOG
 	}
 
-void HWindowListControl::do_refresh ( void )
+void HWindowListControl::do_refresh( void )
 	{
 	M_PROLOG
-	HListControl::do_refresh ( );
+	HListControl::do_refresh( );
 	M_EPILOG
 	}
 
