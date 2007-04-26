@@ -267,7 +267,7 @@ void HListControl::draw_scroll( int a_iPosX )
 	M_EPILOG
 	}
 
-void HListControl::draw_cell ( iterator_t& a_oIt, int a_iRow, int a_iColumn, int a_iColumnOffset, HColumnInfo const * const  a_poColumnInfo, bool a_bChecked )
+void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int a_iColumnOffset, HColumnInfo const* const  a_poColumnInfo, bool a_bChecked )
 	{
 	int l_iTmp = 0;
 	l_iTmp = f_oVarTmpBuffer.get_length();
@@ -283,7 +283,7 @@ void HListControl::draw_cell ( iterator_t& a_oIt, int a_iRow, int a_iColumn, int
 		case ( BITS::ALIGN::D_CENTER ):
 			{
 			if ( l_iTmp > a_poColumnInfo->f_iWidthRaw )
-				f_oVarTmpBuffer = f_oVarTmpBuffer.right (
+				f_oVarTmpBuffer = f_oVarTmpBuffer.right(
 						a_poColumnInfo->f_iWidthRaw );
 			else if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
 				{
@@ -385,7 +385,7 @@ inline void cyclic_decrement( ttType& model, tType& iterator, int count )
 
 }
 
-void HListControl::handle_key_page_up ( void )
+void HListControl::handle_key_page_up( void )
 	{
 	if ( ! f_iCursorPosition )
 		{
@@ -410,7 +410,7 @@ void HListControl::handle_key_page_up ( void )
 	return;
 	}
 
-void HListControl::handle_key_page_down ( void )
+void HListControl::handle_key_page_down( void )
 	{
 	int l_iSize = f_oControler->size();
 	if ( l_iSize >= f_iHeightRaw )
@@ -451,7 +451,7 @@ void HListControl::handle_key_page_down ( void )
 	return;
 	}
 
-void HListControl::handle_key_up ( void )
+void HListControl::handle_key_up( void )
 	{
 	if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
 		{
@@ -471,13 +471,13 @@ void HListControl::handle_key_up ( void )
 	return;
 	}
 
-void HListControl::handle_key_home ( void )
+void HListControl::handle_key_home( void )
 	{
 	reset();
 	return;
 	}
 
-void HListControl::handle_key_end ( void )
+void HListControl::handle_key_end( void )
 	{
 	int l_iSize = f_oControler->size();
 	f_oCursor = f_oControler->rbegin();
@@ -493,7 +493,7 @@ void HListControl::handle_key_end ( void )
 	return;
 	}
 
-void HListControl::handle_key_down ( void )
+void HListControl::handle_key_down( void )
 	{
 	if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_oControler->size() - 1 ) )
 		{
@@ -520,7 +520,7 @@ void HListControl::handle_key_ctrl_n ( void )
 	return;
 	}
 
-void HListControl::handle_key_ctrl_p ( void )
+void HListControl::handle_key_ctrl_p( void )
 	{
 	if ( f_bBackwards )
 		go_to_match();
@@ -529,7 +529,7 @@ void HListControl::handle_key_ctrl_p ( void )
 	return;
 	}
 
-void HListControl::handle_key_space ( void )
+void HListControl::handle_key_space( void )
 	{
 	M_ASSERT( ! f_oControler->empty() );
 	M_ASSERT( f_oCursor.is_valid() );
@@ -626,14 +626,14 @@ void HListControl::add_column( int const& a_riColumn, char const* a_pcName,
 	M_EPILOG
 	}
 
-int HListControl::set_focus ( char a_cShorcut )
+int HListControl::set_focus( char a_cShorcut )
 	{
 	M_PROLOG
-	return ( HControl::set_focus ( a_cShorcut ) );
+	return ( HControl::set_focus( a_cShorcut ) );
 	M_EPILOG
 	}
 
-void HListControl::recalculate_column_widths ( void )
+void HListControl::recalculate_column_widths( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -663,7 +663,7 @@ void HListControl::recalculate_column_widths ( void )
 	M_EPILOG
 	}
 
-void HListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a_eOrder )
+void HListControl::sort_by_column( int a_iColumn, OListBits::sort_order_t a_eOrder )
 	{
 	M_PROLOG
 	if ( ! f_bSortable )
@@ -685,7 +685,7 @@ void HListControl::sort_by_column ( int a_iColumn, OListBits::sort_order_t a_eOr
 	M_EPILOG
 	}
 
-int HListControl::do_click ( mouse::OMouse& a_rsMouse )
+int HListControl::do_click( mouse::OMouse& a_rsMouse )
 	{
 	M_PROLOG
 	int l_iRow = 0, l_iColumn = 0, l_iCtr = 0;
