@@ -130,9 +130,9 @@ private:
 		virtual HAbstractRow* call( void ) = 0;
 		virtual void next( void ) = 0;
 		virtual void previous( void ) = 0;
-		virtual void assign_to( iterator_ptr_t& ) const;
-		virtual bool is_equal( HAbstractModelIterator const& );
-		virtual bool is_not_equal( HAbstractModelIterator const& );
+		virtual void assign_to( iterator_ptr_t& ) const = 0;
+		virtual bool is_equal( HAbstractModelIterator const& ) const = 0;
+		virtual bool is_not_equal( HAbstractModelIterator const& ) const = 0;
 		virtual bool is_valid( void ) = 0;
 		friend class HModelIteratorWrapper;
 	public:
@@ -210,9 +210,9 @@ private:
 		virtual void next( void );
 		virtual void previous( void );
 		virtual void assign_to( iterator_ptr_t& ) const;
-		virtual bool is_equal( HModelIterator const& );
-		virtual bool is_not_equal( HModelIterator const& );
-		virtual bool is_valid( void );
+		virtual bool is_equal( HModelIterator const& ) const;
+		virtual bool is_not_equal( HModelIterator const& ) const;
+		virtual bool is_valid( void ) const;
 		iterator_t& raw( void );
 		friend class HModelIteratorWrapper;
 		friend class HListControler<tType>;
@@ -473,7 +473,7 @@ HListControler<tType>::HModelIterator::~HModelIterator( void )
 	}
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_valid( void )
+bool HListControler<tType>::HModelIterator::is_valid( void ) const
 	{
 	return ( f_oIterator.is_valid() );
 	}

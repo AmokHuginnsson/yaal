@@ -1168,32 +1168,7 @@ HAbstractControler::HAbstractModelIterator::~HAbstractModelIterator( void )
 	return;
 	}
 
-bool HAbstractControler::HAbstractModelIterator::is_equal( HAbstractControler::HAbstractModelIterator const& )
-	{
-	return( false );
-	}
-
-bool HAbstractControler::HAbstractModelIterator::is_not_equal( HAbstractControler::HAbstractModelIterator const& )
-	{
-	return( false );
-	}
-
-void HAbstractControler::HAbstractModelIterator::assign_to( HAbstractControler::iterator_ptr_t& ) const
-	{
-	return;
-	}
-
 HAbstractRow::~HAbstractRow( void )
-	{
-	return;
-	}
-
-int long HAbstractRow::get_id( void )
-	{
-	return ( 0 );
-	}
-
-void HAbstractRow::switch_state( void )
 	{
 	return;
 	}
