@@ -229,7 +229,7 @@ public:
 	tType& operator* ( void );
 	tType const& operator* ( void ) const;
 	tType* operator -> ( void );
-	bool is_valid( void );
+	bool is_valid( void ) const;
 	/*}*/
 protected:
 	/*{*/
@@ -369,7 +369,7 @@ tType * HList<tType>::HIterator<treatment>::operator -> ( void )
 
 template<typename tType>
 template<OListBits::treatment_t const treatment>
-bool HList<tType>::HIterator<treatment>::is_valid( void )
+bool HList<tType>::HIterator<treatment>::is_valid( void ) const
 	{
 	return ( f_poHook && f_poCurrent );
 	}

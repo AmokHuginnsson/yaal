@@ -40,18 +40,18 @@ namespace hconsole
 
 class HMainWindow : public HWindow
 	{
-	HMenuControl * f_poMenu;
+	HMenuControl* f_poMenu;
 	HTUIProcess::model_ptr_t f_oWindowList;
 public:
-	HMainWindow ( char const *, HTUIProcess::model_ptr_t );
-	virtual ~HMainWindow ( void );
-	void init_menu ( HTUIProcess *, OMenuItem * );
-	virtual int init ( void );
+	HMainWindow( char const*, HTUIProcess::model_ptr_t );
+	virtual ~HMainWindow( void );
+	void init_menu( HTUIProcess*, OMenuItem* );
+	virtual int init( void );
 protected:
-	virtual int handler_close ( int, void * ); /* closes window process */
+	virtual int handler_close( int, void* ); /* closes window process */
 private:
-	HMainWindow ( HMainWindow const & );
-	HMainWindow & operator = ( HMainWindow const & );
+	HMainWindow( HMainWindow const& );
+	HMainWindow& operator = ( HMainWindow const& );
 	};
 
 }

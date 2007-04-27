@@ -1099,7 +1099,7 @@ HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t
 	return;
 	}
 
-bool HAbstractControler::HModelIteratorWrapper::is_valid( void )
+bool HAbstractControler::HModelIteratorWrapper::is_valid( void ) const
 	{
 	return ( f_oIteratorPtr->is_valid() );
 	}

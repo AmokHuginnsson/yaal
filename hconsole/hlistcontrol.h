@@ -133,7 +133,7 @@ private:
 		virtual void assign_to( iterator_ptr_t& ) const = 0;
 		virtual bool is_equal( HAbstractModelIterator const& ) const = 0;
 		virtual bool is_not_equal( HAbstractModelIterator const& ) const = 0;
-		virtual bool is_valid( void ) = 0;
+		virtual bool is_valid( void ) const = 0;
 		friend class HModelIteratorWrapper;
 	public:
 		HAbstractModelIterator( void );
@@ -158,7 +158,7 @@ public:
 		iterator_ptr_t& raw( void );
 		bool operator== ( HModelIteratorWrapper const& );
 		bool operator!= ( HModelIteratorWrapper const& );
-		bool is_valid( void );
+		bool is_valid( void ) const;
 		};
 	HAbstractControler( void );
 	virtual ~HAbstractControler( void );
@@ -210,8 +210,8 @@ private:
 		virtual void next( void );
 		virtual void previous( void );
 		virtual void assign_to( iterator_ptr_t& ) const;
-		virtual bool is_equal( HModelIterator const& ) const;
-		virtual bool is_not_equal( HModelIterator const& ) const;
+		virtual bool is_equal( HAbstractModelIterator const& ) const;
+		virtual bool is_not_equal( HAbstractModelIterator const& ) const;
 		virtual bool is_valid( void ) const;
 		iterator_t& raw( void );
 		friend class HModelIteratorWrapper;
@@ -505,15 +505,15 @@ HAbstractRow* HListControler<tType>::HModelIterator::call( void )
 	}
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_equal( HListControler<tType>::HModelIterator const& a_oIt )
+bool HListControler<tType>::HModelIterator::is_equal( HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
 	{
-	return ( f_oIterator == a_oIt.f_oIterator );
+	return ( f_oIterator == dynamic_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator ); /*FIXME*/
 	}
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_not_equal( HListControler<tType>::HModelIterator const& a_oIt )
+bool HListControler<tType>::HModelIterator::is_not_equal( HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
 	{
-	return ( f_oIterator != a_oIt.f_oIterator );
+	return ( f_oIterator != dynamic_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator ); /*FIXME*/
 	}
 
 template<typename tType>

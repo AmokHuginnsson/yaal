@@ -51,7 +51,7 @@ HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 	M_EPILOG
 	}
 
-HWindowListControl::~HWindowListControl ( void )
+HWindowListControl::~HWindowListControl( void )
 	{
 	M_PROLOG
 /*	HWindowListControl::remove_tail ( D_FORCE_REMOVE_ELEMENT ); */
@@ -72,7 +72,7 @@ int HWindowListControl::do_process_input( int a_iCode )
 void HWindowListControl::do_refresh( void )
 	{
 	M_PROLOG
-	HListControl::do_refresh( );
+	HListControl::do_refresh();
 	M_EPILOG
 	}
 
@@ -84,18 +84,6 @@ yaal::hcore::HString const HCell<HWindow::ptr_t>::get_string( void )
 	{
 	return ( f_rtData->get_title() );
 	}
-
-/*
-int long GetIdFromCell( HItem const & )
-	{
-	return ( 0 );
-	}
-
-bool GetStateFromCell( HItem const & )
-	{
-	return ( false );
-	}
-*/
 
 template<>
 bool compare_cells( HWindow::ptr_t const& a_oLeft, HWindow::ptr_t const& a_oRight, OSortHelper & a_roSortHelper )

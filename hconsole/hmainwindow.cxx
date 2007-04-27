@@ -37,8 +37,8 @@ namespace yaal
 namespace hconsole
 {
 
-HMainWindow::HMainWindow ( char const * a_pcTitle, HTUIProcess::model_ptr_t a_oWindows )
-						: HWindow ( a_pcTitle ), f_poMenu ( NULL ), f_oWindowList ( a_oWindows )
+HMainWindow::HMainWindow( char const* a_pcTitle, HTUIProcess::model_ptr_t a_oWindows )
+						: HWindow( a_pcTitle ), f_poMenu( NULL ), f_oWindowList( a_oWindows )
 	{
 	M_PROLOG
 	register_postprocess_handler ( KEY<'q'>::command, NULL,
@@ -47,43 +47,43 @@ HMainWindow::HMainWindow ( char const * a_pcTitle, HTUIProcess::model_ptr_t a_oW
 	M_EPILOG
 	}
 
-HMainWindow::~HMainWindow ( void )
+HMainWindow::~HMainWindow( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-int HMainWindow::init ( void )
+int HMainWindow::init( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	if ( f_oFocusedChild.is_valid() && ( !! (*f_oFocusedChild) ) )
 		return ( 0 );
-	l_iError = HWindow::init ( );
-	f_poMenu = new HMenuControl ( this, 1, 1, - 2,	- n_iWidth / 2 - 1,
+	l_iError = HWindow::init();
+	f_poMenu = new HMenuControl( this, 1, 1, - 2,	- n_iWidth / 2 - 1,
 			" &Menu \n" );
-	f_poMenu->enable ( true );
-	f_poMenu->set_focus ( );
-	HWindowListControl * l_poWindowList = new HWindowListControl( this, 1,
+	f_poMenu->enable( true );
+	f_poMenu->set_focus();
+	HWindowListControl* l_poWindowList = new HWindowListControl( this, 1,
 			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n",
 			HListControler<HWindow::ptr_t>::ptr_t( new HListControler<HWindow::ptr_t>( f_oWindowList ) ) );
-	l_poWindowList->add_column ( -1, "&Okno", 1 );
-	l_poWindowList->enable ( true );
+	l_poWindowList->add_column( -1, "&Okno", 1 );
+	l_poWindowList->enable( true );
 	f_oControls.select( f_poMenu );
 	return ( l_iError );
 	M_EPILOG
 	}
 
-void HMainWindow::init_menu ( HTUIProcess * a_psProcess, OMenuItem * a_psMenu )
+void HMainWindow::init_menu( HTUIProcess* a_psProcess, OMenuItem* a_psMenu )
 	{
 	M_PROLOG
-	f_poMenu->init ( a_psProcess,	a_psMenu );
+	f_poMenu->init( a_psProcess,	a_psMenu );
 	return;
 	M_EPILOG
 	}
 
-int HMainWindow::handler_close ( int a_iCode, void * )
+int HMainWindow::handler_close( int a_iCode, void* )
 	{
 	M_PROLOG
 	a_iCode = KEY<'x'>::command;
