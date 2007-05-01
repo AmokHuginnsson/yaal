@@ -91,7 +91,7 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 		l_oMainWindow = a_oMainWindow;
 	else /* Create automatically default main window. */
 		{
-		l_oMainWindow = HWindow::ptr_t( new HMainWindow( a_pcProcessName, f_oWindows ) );
+		l_oMainWindow = HWindow::ptr_t( new HMainWindow( a_pcProcessName, f_oWindows, f_oForegroundWindow ) );
 		register_postprocess_handler( KEY<'\t'>::meta, NULL,
 				&HTUIProcess::handler_jump_meta_tab );
 		register_postprocess_handler( KEY<'q'>::command, NULL,

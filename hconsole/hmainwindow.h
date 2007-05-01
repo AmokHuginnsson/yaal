@@ -42,8 +42,9 @@ class HMainWindow : public HWindow
 	{
 	HMenuControl* f_poMenu;
 	HTUIProcess::model_ptr_t f_oWindowList;
+	HTUIProcess::model_t::cyclic_iterator& f_roForegroundWindow;
 public:
-	HMainWindow( char const*, HTUIProcess::model_ptr_t );
+	HMainWindow( char const*, HTUIProcess::model_ptr_t, HTUIProcess::model_t::cyclic_iterator& );
 	virtual ~HMainWindow( void );
 	void init_menu( HTUIProcess*, OMenuItem* );
 	virtual int init( void );

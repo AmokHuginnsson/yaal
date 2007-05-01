@@ -39,12 +39,12 @@ namespace hconsole
 
 HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 		int a_iColumn, int a_iHeight, int a_iWidth, char const * a_pcLabel,
-		HAbstractControler::ptr_t const& a_oControler )
+		HAbstractControler::ptr_t const& a_oControler, model_t::cyclic_iterator& a_roForegroundWindow )
 									:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
 											a_iWidth, a_pcLabel ),
 										HSearchableControl( false ),
 										HListControl( a_poParent, a_iRow, a_iColumn, a_iHeight,
-												a_iWidth, a_pcLabel, a_oControler )
+												a_iWidth, a_pcLabel, a_oControler ), f_roForegroundWindow( a_roForegroundWindow )
 	{
 	M_PROLOG
 	return;
@@ -64,7 +64,13 @@ int HWindowListControl::do_process_input( int a_iCode )
 	M_PROLOG
 	a_iCode = HListControl::do_process_input( a_iCode );
 	if ( ( f_oControler->size() > 1 ) && ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) ) )
+		{
 		a_iCode = KEY<'\t'>::meta;
+		iterator_t it = f_oControler->begin();
+		while ( it != f_oCursor )
+			++ it, ++ f_roForegroundWindow;
+		-- f_roForegroundWindow;
+		}
 	return ( a_iCode );
 	M_EPILOG
 	}
