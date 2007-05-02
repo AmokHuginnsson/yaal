@@ -303,7 +303,7 @@ int HTUIProcess::handler_jump_meta_direct( int a_iCode, void* )
 	if ( a_iCode >= f_oWindows->size() )
 		return ( 0 );
 	f_oForegroundWindow = f_oWindows->begin();
-	while ( -- a_iCode )
+	while ( a_iCode -- )
 		++ f_oForegroundWindow;
 	handler_refresh( 0 );
 	a_iCode = 0;
