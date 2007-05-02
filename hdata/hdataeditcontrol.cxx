@@ -98,7 +98,7 @@ int HDataEditControl::do_process_input ( int a_iCode )
 		default:
 		break;
 		}
-	a_iCode = HEditControl::process_input ( a_iCode );
+	a_iCode = HEditControl::do_process_input ( a_iCode );
 	if ( ! ( a_iCode || l_bNoChange ) )
 		{
 		l_poWindow = dynamic_cast < HDataWindow * > ( f_poParent );
