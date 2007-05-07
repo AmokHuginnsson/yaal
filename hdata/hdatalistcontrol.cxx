@@ -64,7 +64,7 @@ HDataListControl::~HDataListControl ( void )
 void HDataListControl::load ( int long /*a_iId*/ )
 	{
 	M_PROLOG
-	int l_iCount = 0, l_iCtr = 0, l_iQuantity = f_oDataControler->size();
+	int l_iCount = 0, l_iCtr = 0, l_iSize = f_oDataControler->size();
 	HItem l_oItem ( f_oHeader.size() );
 	HDataWindow * l_poParent = dynamic_cast<HDataWindow*> ( f_poParent );
 	M_ASSERT ( l_poParent );
@@ -87,8 +87,9 @@ void HDataListControl::load ( int long /*a_iId*/ )
 		else
 			l_oModel->push_back( l_oItem );
 		f_poRecordSet->move_next();
+		++ l_iCtr;
 		}
-	while ( l_iCtr ++ < l_iQuantity )
+	while ( l_iCtr ++ < l_iSize )
 		f_oDataControler->remove_tail();
 	reset();
 	l_poParent->set_sync_store();
