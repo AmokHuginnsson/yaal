@@ -63,13 +63,22 @@ int HWindowListControl::do_process_input( int a_iCode )
 	{
 	M_PROLOG
 	a_iCode = HListControl::do_process_input( a_iCode );
-	if ( ( f_oControler->size() > 1 ) && ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) ) )
+	int l_iSize = f_oControler->size();
+	if ( l_iSize > 1 )
 		{
-		a_iCode = KEY<'\t'>::meta;
-		iterator_t it = f_oControler->begin();
-		while ( it != f_oCursor )
-			++ it, ++ f_roForegroundWindow;
-		-- f_roForegroundWindow;
+		if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
+			{
+			a_iCode = KEY<'\t'>::meta;
+			iterator_t it = f_oControler->begin();
+			while ( it != f_oCursor )
+				++ it, ++ f_roForegroundWindow;
+			-- f_roForegroundWindow;
+			}
+		else if ( f_oCursor == f_oControler->begin() )
+			{
+			++ f_oCursor;
+			++ f_iCursorPosition;
+			}
 		}
 	return ( a_iCode );
 	M_EPILOG

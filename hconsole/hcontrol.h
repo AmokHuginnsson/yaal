@@ -40,9 +40,9 @@ namespace hconsole
 
 class HWindow;
 
-/*! \brief Base class for all TUI classes.
+/*! \brief Base class for all TUI control classes.
  *
- * This class is a common interface for all TUI classes.
+ * This class is a common interface for all TUI control classes.
  */
 class HControl
 	{
@@ -252,7 +252,7 @@ public:
  */
 	int attr_data( void ) const;
 
-/*! \brief Schedule this control for full refresh on next refresh cycle.
+/*! \brief Schedule full refresh on next refresh cycle.
  */
 	void schedule_refresh( void ) const;
 

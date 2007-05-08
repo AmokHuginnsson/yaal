@@ -542,7 +542,7 @@ void HListControl::handle_key_space( void )
 void HListControl::handle_key_tab( void )
 	{
 	f_bFocused = false;	/* very  */
-	refresh();				/* magic */
+	schedule_refresh();				/* magic */
 	return;
 	}
 
@@ -586,7 +586,7 @@ int HListControl::do_process_input( int a_iCode )
 	a_iCode = l_iErrorCode;
 	if ( ! l_iErrorCode )
 		{
-		refresh();
+		schedule_refresh();
 		f_poParent->status_bar()->message( COLORS::D_FG_LIGHTGRAY, "" );
 		}
 	return ( a_iCode );
@@ -707,7 +707,7 @@ int HListControl::do_click( mouse::OMouse& a_rsMouse )
 				{
 				sort_by_column ( l_iCtr,
 						l_poColumnInfo->f_bDescending ? OListBits::D_ASCENDING : OListBits::D_DESCENDING );
-				refresh();
+				schedule_refresh();
 				break;
 				}
 			}
@@ -715,7 +715,7 @@ int HListControl::do_click( mouse::OMouse& a_rsMouse )
 	else if ( l_iRow < f_oControler->size() )
 		{
 		f_iCursorPosition = l_iRow;
-		refresh();
+		schedule_refresh();
 		}
 	return ( 0 );
 	M_EPILOG
@@ -974,7 +974,7 @@ void HListControl::remove_current_row ( void )
 	if ( l_bFlag )
 		++ f_oCursor;
 	f_oControler->erase( it );
-	refresh();
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}
