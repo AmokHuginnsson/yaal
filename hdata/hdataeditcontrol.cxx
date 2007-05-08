@@ -103,7 +103,7 @@ int HDataEditControl::do_process_input ( int a_iCode )
 		{
 		l_poWindow = dynamic_cast < HDataWindow * > ( f_poParent );
 		M_ASSERT ( l_poWindow );
-		l_poWindow->set_modified ( );
+		l_poWindow->set_modified();
 		}
 	return ( a_iCode );
 	M_EPILOG

@@ -77,10 +77,10 @@ int HComboboxControl::kill_focus ( void )
 	if ( f_eMode == MODE::D_LISTCONTROL )
 		{
 		f_eMode = MODE::D_EDITCONTROL;
-		clrscr ( );
-		f_poParent->refresh ( );
+		clrscr();
+		f_poParent->schedule_refresh();
 		}
-	return ( HControl::kill_focus ( ) );
+	return ( HControl::kill_focus() );
 	M_EPILOG
 	}
 
@@ -91,13 +91,13 @@ void HComboboxControl::do_refresh ( void )
 	int l_iHeight = 0;
 	if ( f_eMode == MODE::D_EDITCONTROL )
 		{
-/* ripped from HControl::draw_label ( ) */
+/* ripped from HControl::draw_label() */
 		l_iWidth = ( f_iWidth > 0 ) ? f_iWidth
 			: n_iWidth + f_iWidth - f_iColumnRaw;
 /* end of ripped part */
-		HEditControl::do_refresh ( );
+		HEditControl::do_refresh();
 		M_ENSURE ( c_move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 ) != C_ERR );
-		set_attr_label ( );
+		set_attr_label();
 		M_ENSURE ( c_addch ( GLYPHS::D_DOWN_ARROW ) != C_ERR );
 		M_ENSURE ( c_move ( f_iRowRaw, f_iColumnRaw + HEditControl::f_iCursorPosition ) != C_ERR );
 		f_iHeightRaw = 0;
@@ -111,7 +111,7 @@ void HComboboxControl::do_refresh ( void )
 		int l_iHR = ( f_bDrawLabel ? 1 : 0 ) + ( f_bDrawHeader && ! f_bSingleLine ? 1 : 0 );
 		if ( size < ( f_iHeight - l_iHR ) )
 			f_iHeight = size + l_iHR;
-		HListControl::do_refresh ( );
+		HListControl::do_refresh();
 		f_iHeight = l_iHeight;
 		f_iWidth = l_iWidth;
 		}
@@ -119,7 +119,7 @@ void HComboboxControl::do_refresh ( void )
 	M_EPILOG
 	}
 
-int HComboboxControl::do_process_input ( int a_iCode )
+int HComboboxControl::do_process_input( int a_iCode )
 	{
 	M_PROLOG
 	if ( f_eMode == MODE::D_EDITCONTROL )
@@ -135,46 +135,45 @@ int HComboboxControl::do_process_input ( int a_iCode )
 			default :
 				return ( HEditControl::do_process_input ( a_iCode ) );
 			}
-		refresh ( );
+		schedule_refresh();
 		}
 	else
 		{
 		if ( a_iCode != '\r' )
 			return ( HListControl::do_process_input ( a_iCode ) );
-		close_combo ( );
+		close_combo();
 		}
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HComboboxControl::do_click ( mouse::OMouse & a_rsMouse )
+int HComboboxControl::do_click( mouse::OMouse& a_rsMouse )
 	{
 	M_PROLOG
 	if ( f_eMode == MODE::D_EDITCONTROL )
 		{
-		HEditControl::do_click ( a_rsMouse );
+		HEditControl::do_click( a_rsMouse );
 		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
 			: n_iWidth + f_iWidth - f_iColumnRaw;
 		if ( a_rsMouse.f_iColumn == ( f_iColumnRaw + f_iWidthRaw - 1 ) )
 			{
 			f_eMode = MODE::D_LISTCONTROL;
-			refresh ( );
+			schedule_refresh();
 			}
 		}
-	else if ( HListControl::do_click ( a_rsMouse ) )
-		close_combo ( );
+	else if ( HListControl::do_click( a_rsMouse ) )
+		close_combo();
 	return ( 0 );
 	M_EPILOG
 	}
 			
-void HComboboxControl::close_combo ( void )
+void HComboboxControl::close_combo( void )
 	{
 	M_PROLOG
 	f_eMode = MODE::D_EDITCONTROL;
-	if ( f_oControler->empty ( ) )
-		HEditControl::set ( (*f_oCursor)[ 0 ].get_string ( ) );
-	clrscr ( );
-	f_poParent->refresh ( );
+	if ( f_oControler->empty() )
+		HEditControl::set( (*f_oCursor)[ 0 ].get_string() );
+	f_poParent->schedule_refresh();
 	return;
 	M_EPILOG
 	}

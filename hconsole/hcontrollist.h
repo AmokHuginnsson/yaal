@@ -53,7 +53,7 @@ public:
 	void select ( HControl const* );	/* this one should be private :( */
 	void select ( HControl::ptr_t const& );	/* this one should be private :( */
 	void add_control( HControl::ptr_t );
-	void refresh_all( void );
+	void refresh_all( bool );
 	void update_all( void );
 	int hit_test_all( mouse::OMouse& );
 	HControl* get_control_by_no( int );

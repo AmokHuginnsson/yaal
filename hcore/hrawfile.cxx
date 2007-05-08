@@ -50,7 +50,7 @@ HRawFile::~HRawFile ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		HRawFile::close ( );
+		HRawFile::close();
 	M_EPILOG
 	}
 

@@ -246,7 +246,7 @@ protected:
 
 template<typename tType>
 HList < tType >::HElement::HElement ( HElement* a_poElement )
-	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject ( )
+	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject()
 	{
 	if ( a_poElement == 0 )
 		{
@@ -378,13 +378,13 @@ bool HList<tType>::HIterator<treatment>::is_valid( void ) const
 
 template<typename tType>
 HList< tType >::HList ( int a_iSize )
-	: OListBits ( ), f_iSize ( 0 ),
+	: OListBits(), f_iSize ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
 	f_iIndex ( 0 ), f_poIndex ( NULL )
 	{
 	M_PROLOG
 	while ( a_iSize -- )
-		HList::add_tail ( );
+		HList::add_tail();
 	return ;
 	M_EPILOG
 	}
@@ -400,7 +400,7 @@ HList< tType >::~HList ( void )
 
 template<typename tType>
 HList< tType >::HList ( HList < tType > const & a_roList )
-	: OListBits ( ), f_iSize ( 0 ),
+	: OListBits(), f_iSize ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
 	f_iIndex ( 0 ), f_poIndex ( NULL )
 	{
@@ -468,7 +468,7 @@ HList<tType>& HList< tType >::operator = ( HList<tType> const& a_roList )
 			l_poList->go ( - 1 );
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )	
 				{
-				( * to_tail ( ) ) = ( * l_poList->to_tail ( ) );
+				( * to_tail() ) = ( * l_poList->to_tail() );
 				if ( a_roList.f_poSelected == a_roList.f_poHook )
 					f_poHook = f_poSelected;
 				if ( a_roList.f_poSelected == l_poIndex )
@@ -483,13 +483,13 @@ HList<tType>& HList< tType >::operator = ( HList<tType> const& a_roList )
 			{
 			l_iCount = f_iSize - a_roList.f_iSize;
 			while ( l_iCount -- )
-				remove_tail ( );
+				remove_tail();
 			}
 		else if ( f_iSize < a_roList.f_iSize )
 			{
 			for ( ; l_iCtr < a_roList.f_iSize; l_iCtr ++ )	
 				{
-				add_tail ( l_poList->to_tail ( ) );
+				add_tail ( l_poList->to_tail() );
 				if ( a_roList.f_poSelected == a_roList.f_poHook )
 					f_poHook = f_poSelected;
 				if ( a_roList.f_poSelected == l_poIndex )

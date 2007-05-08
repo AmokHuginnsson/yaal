@@ -62,14 +62,14 @@ using namespace des;
 
 HDes::HDes ( void )
 	{
-	flush_keys ( );
+	flush_keys();
 	return;
 	}
 
 HDes::~HDes ( void )
 	{
 	M_PROLOG
-	flush_keys ( );
+	flush_keys();
 	return;
 	M_EPILOG
 	}
@@ -80,7 +80,7 @@ void HDes::generate_keys ( uc_t * a_pcPassword )
 	uc_t l_pcIKeyLow [ DES::D_BLOCK_SIZE ];
 	uc_t l_pcIKeyHigh [ DES::D_BLOCK_SIZE ];
 	uc_t l_pcTmpKey [ DES::D_BLOCK_SIZE ];
-	flush_keys ( );
+	flush_keys();
 	for ( l_iCtr = 0; l_iCtr < DES::D_BLOCK_SIZE; l_iCtr ++ )
 		{
 		l_pcIKeyHigh [ l_iCtr ] = a_pcPassword [ l_iCtr ];

@@ -166,7 +166,7 @@ int console_mouse_open ( void )
 	Gpm_Connect l_sGpm;
 	l_sGpm.minMod = 0;
 	l_sGpm.maxMod = 0;
-	l_sGpm.pid = ::getpid ( );
+	l_sGpm.pid = ::getpid();
 	l_sGpm.vc = l_iVC = hunt_tty ( 0 );
 	l_sGpm.eventMask = static_cast < int > ( GPM_UP );
 	l_sGpm.defaultMask = ~ l_sGpm.eventMask;
@@ -198,7 +198,7 @@ int console_mouse_get ( OMouse & a_rsMouse )
 int console_mouse_close ( void )
 	{
 	M_PROLOG
-	while ( Gpm_Close ( ) )
+	while ( Gpm_Close() )
 		;
 	return ( 0 );
 	M_EPILOG
@@ -243,7 +243,7 @@ int x_mouse_open ( void )
 	l_xDesiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED;
 	l_xMouseMask = mousemask ( l_xDesiredMouseMask, NULL );
 	if ( ! l_xMouseMask )
-		M_THROW ( "mousemask ( ) returned 0", errno );
+		M_THROW ( "mousemask() returned 0", errno );
 	else if ( ( l_xMouseMask & l_xDesiredMouseMask ) < l_xDesiredMouseMask )
 		{
 		HString l_oError;

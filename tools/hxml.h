@@ -60,17 +60,17 @@ public:
 		properties_t f_oProperties;
 		yaal::hcore::HList<ONode> f_oChilds;
 		yaal::hcore::HList<type_t> f_oTypes;
-		ONode ( void ) : f_iLevel ( - 1 ), f_oName ( ), f_oContents ( ),
-								f_oProperties ( D_HXML_PROPERTIES_MAP_SIZE ), f_oChilds ( ), f_oTypes ( ) { }
+		ONode ( void ) : f_iLevel ( - 1 ), f_oName(), f_oContents(),
+								f_oProperties ( D_HXML_PROPERTIES_MAP_SIZE ), f_oChilds(), f_oTypes() { }
 		void reset ( void )
 			{
 			M_PROLOG
 			f_iLevel = - 1;
 			f_oName = "";
-			f_oContents.flush ( );
-			f_oProperties.flush ( );
-			f_oChilds.flush ( );
-			f_oTypes.flush ( );
+			f_oContents.flush();
+			f_oProperties.flush();
+			f_oChilds.flush();
+			f_oTypes.flush();
 			return;
 			M_EPILOG
 			}

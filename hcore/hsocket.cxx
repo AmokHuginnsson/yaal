@@ -64,10 +64,10 @@ char const * const n_ppcErrMsgHSocket [ 4 ] =
 
 HSocket::HSocket ( socket_type_t const a_eSocketType,
 		int const a_iMaximumNumberOfClients )
-	: HRawFile ( ), f_bNeedShutdown ( false ), f_eType ( D_DEFAULTS ),
+	: HRawFile(), f_bNeedShutdown ( false ), f_eType ( D_DEFAULTS ),
 	f_iMaximumNumberOfClients ( a_iMaximumNumberOfClients ),
 	f_iAddressSize ( 0 ), f_pvAddress ( NULL ), f_poClients ( NULL ),
-	f_oHostName ( ), f_oVarTmpBuffer ( )
+	f_oHostName(), f_oVarTmpBuffer()
 	{
 	M_PROLOG
 	f_eType = a_eSocketType;
@@ -100,7 +100,7 @@ HSocket::HSocket ( socket_type_t const a_eSocketType,
 HSocket::~HSocket ( void )
 	{
 	M_PROLOG
-	shutdown ( );
+	shutdown();
 	/* There will be no memory leakage if shutdown() throws,
 	 * because application has to terminate. */
 	if ( f_pvAddress )
@@ -117,7 +117,7 @@ void HSocket::shutdown ( void )
 	sockaddr_un * l_psAddressFile = NULL;
 	if ( f_poClients )
 		{
-		f_poClients->rewind ( );
+		f_poClients->rewind();
 		while ( f_poClients->iterate ( l_iKey, l_poSocket ) )
 			{
 			if ( l_poSocket )
@@ -258,7 +258,7 @@ void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 		f_iAddressSize = D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
 		f_oVarTmpBuffer.hs_realloc ( f_iAddressSize );
 		while ( gethostbyname_r ( a_pcAddress, & l_sHostName,
-					f_oVarTmpBuffer.raw ( ), f_iAddressSize,
+					f_oVarTmpBuffer.raw(), f_iAddressSize,
 					& l_psHostName, & l_iError ) == ERANGE )
 			f_oVarTmpBuffer.hs_realloc ( f_iAddressSize <<= 1 );
 		errno = l_iError;
@@ -325,7 +325,7 @@ void HSocket::rewind_client_list ( void ) const
 	M_PROLOG
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
-	f_poClients->rewind ( );
+	f_poClients->rewind();
 	return;
 	M_EPILOG
 	}
@@ -341,7 +341,7 @@ int HSocket::read_until ( HString & a_roMessage, char const * const a_pcStopSet 
 	do
 		{
 		f_oVarTmpBuffer.hs_realloc ( l_iCtr + 1 );
-		l_pcPtr = f_oVarTmpBuffer.raw ( );
+		l_pcPtr = f_oVarTmpBuffer.raw();
 		if ( read ( l_pcPtr + l_iCtr, sizeof ( char ) * 1 ) <= 0 )
 			break;
 		}
@@ -353,7 +353,7 @@ int HSocket::read_until ( HString & a_roMessage, char const * const a_pcStopSet 
 		if ( l_iCtr > 0 )
 			{
 			a_roMessage.hs_realloc ( l_iCtr );
-			memcpy ( a_roMessage.raw ( ), l_pcPtr, l_iCtr + 1 );
+			memcpy ( a_roMessage.raw(), l_pcPtr, l_iCtr + 1 );
 			}
 		}
 	return ( l_iCtr );
@@ -364,7 +364,7 @@ int HSocket::write_until_eos ( HString const & a_roMessage )
 	{
 	M_PROLOG
 	int l_iSize = 0;
-	l_iSize = a_roMessage.get_length ( );
+	l_iSize = a_roMessage.get_length();
 	if ( l_iSize > 0 )
 		l_iSize = write ( a_roMessage, l_iSize );
 	return ( l_iSize );
@@ -376,7 +376,7 @@ int HSocket::get_client_count ( void ) const
 	M_PROLOG
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
-	return ( f_poClients->quantity ( ) );
+	return ( f_poClients->quantity() );
 	M_EPILOG
 	}
 
@@ -397,7 +397,7 @@ HString const & HSocket::get_host_name ( void )
 #endif /* ! HAVE_GETHOSTBYNAME_R */
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_INITIALIZED ], f_iFileDescriptor );
-	if ( f_oHostName.is_empty ( ) )
+	if ( f_oHostName.is_empty() )
 		{
 		if ( f_eType & D_NETWORK )
 			{
@@ -407,7 +407,7 @@ HString const & HSocket::get_host_name ( void )
 			memset ( & l_sHostName, 0, sizeof ( hostent ) );
 			while ( ( l_iError = gethostbyaddr_r ( &l_psAddressNetwork->sin_addr, f_iAddressSize,
 						AF_INET, & l_sHostName,
-						f_oVarTmpBuffer.raw ( ),
+						f_oVarTmpBuffer.raw(),
 						l_iSize, & l_psHostName, & l_iCode ) ) == ERANGE )
 				f_oVarTmpBuffer.hs_realloc ( l_iSize <<= 1 );
 			if ( l_iCode )
@@ -419,12 +419,12 @@ HString const & HSocket::get_host_name ( void )
 			else
 				{
 				f_oHostName = inet_ntop ( AF_INET, & l_psAddressNetwork->sin_addr,
-						f_oVarTmpBuffer.raw ( ), l_iSize );
+						f_oVarTmpBuffer.raw(), l_iSize );
 				}
 #else /* HAVE_GETHOSTBYNAME_R */
 			l_iError = getnameinfo (
 							reinterpret_cast < sockaddr * > ( l_psAddressNetwork ), f_iAddressSize,
-							f_oVarTmpBuffer.raw ( ), l_iSize, NULL, 0, NI_NOFQDN );
+							f_oVarTmpBuffer.raw(), l_iSize, NULL, 0, NI_NOFQDN );
 			M_ENSURE ( l_iError == 0 );
 			f_oHostName = f_oVarTmpBuffer;
 #endif /* ! HAVE_GETHOSTBYNAME_R */

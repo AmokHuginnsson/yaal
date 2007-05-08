@@ -94,7 +94,8 @@ protected:
 /* this is used locally, there is no way to modify this variables explicitly */
 	int				f_iLabelLength;	 			/*!< Length of the label. */
 	int				f_iShortcutIndex;			/*!< Index of shortcut char in label. */
-	bool			f_bValid;
+	bool			f_bValid;							/*!< Is controler data in sync with control internals. */
+	bool			f_bNeedRepaint;				/*!< Does this control need to be repainted. */
 public:
 /** \brief Control constructor.
  *
@@ -254,11 +255,18 @@ public:
 
 /*! \brief Schedule full refresh on next refresh cycle.
  */
-	void schedule_refresh( void ) const;
+	void schedule_refresh( void );
 
 /*! \brief Mark this control as no longer synchronized with its internel controler.
  */
 	void invalidate( void );
+
+/*! \brief Tells if this control needs to be repainted.
+ *
+ * \return True if refresh is required.
+ */
+	bool need_repaint( void ) const;
+
 protected:
 	void set_attr_label( void ) const;
 	void set_attr_shortcut( void ) const;

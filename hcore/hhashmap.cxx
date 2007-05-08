@@ -48,7 +48,7 @@ int long unsigned const x_tag_g_pulPrimes [ 32 ] =
 int long unsigned hash ( HString const & a_roString )
 	{
 	char const * const l_pcBuffer = a_roString;
-	int l_iSize = a_roString.get_length ( );
+	int l_iSize = a_roString.get_length();
 	int long unsigned l_ulHash = 0;
 	while ( l_iSize -- )
 		{

@@ -38,8 +38,8 @@ namespace hcore
 {
 
 HThread::HThread ( void )
-	: f_eStatus ( D_DEAD ), f_sAttributes ( ), f_xThread ( ),
-	f_oMutex ( ), f_oCondition ( )
+	: f_eStatus ( D_DEAD ), f_sAttributes(), f_xThread(),
+	f_oMutex(), f_oCondition()
 	{
 	M_PROLOG
 	M_ENSURE ( pthread_attr_init ( & f_sAttributes ) == 0 );
@@ -55,7 +55,7 @@ HThread::~HThread ( void )
 	{
 	M_PROLOG
 	if ( f_eStatus != D_DEAD )
-		finish ( );
+		finish();
 	M_ENSURE ( pthread_attr_destroy ( & f_sAttributes ) == 0 );
 	return;
 	M_EPILOG
@@ -69,7 +69,7 @@ int HThread::spawn ( void )
 		M_THROW ( _ ( "thread is already running" ), f_eStatus );
 	M_ENSURE ( pthread_create ( & f_xThread,
 				& f_sAttributes, SPAWN, this ) == 0 );
-	f_oCondition.wait ( );
+	f_oCondition.wait();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -90,7 +90,7 @@ int HThread::finish ( void )
 void * HThread::SPAWN ( void * a_pvThread )
 	{
 	M_PROLOG
-	return ( reinterpret_cast < HThread * > ( a_pvThread )->control ( ) );
+	return ( reinterpret_cast < HThread * > ( a_pvThread )->control() );
 	M_EPILOG
 	}
 
@@ -101,7 +101,7 @@ void * HThread::control ( void )
 	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
 	M_ENSURE ( pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
 	f_eStatus = D_ALIVE;
-	f_oCondition.signal ( );
+	f_oCondition.signal();
 /* It is possible that destructor of derived class will be called before
  * next call here (call to run()). So there will be pure virtual method called.
  * Such event result in program termination.
@@ -110,7 +110,7 @@ void * HThread::control ( void )
  * To avoid this class user must ensure that derived class destructor
  * will not finish before eventual call to run is done.
  */
-	l_pvReturn = reinterpret_cast < void * > ( run ( ) );
+	l_pvReturn = reinterpret_cast < void * > ( run() );
 	f_eStatus = D_ZOMBIE;
 	return ( l_pvReturn );
 	M_EPILOG
@@ -124,7 +124,7 @@ bool HThread::is_alive ( void ) const
 	}
 
 HMutex::HMutex ( bool const a_bRecursive ) : f_bRecursive ( a_bRecursive ),
-																						 f_sAttributes ( ), f_xMutex ( )
+																						 f_sAttributes(), f_xMutex()
 	{
 	M_PROLOG
 	pthread_mutexattr_init ( & f_sAttributes );
@@ -170,7 +170,7 @@ void HMutex::unlock ( void )
 HLock::HLock ( HMutex & a_roMutex ) : f_roMutex ( a_roMutex )
 	{
 	M_PROLOG
-	f_roMutex.lock ( );
+	f_roMutex.lock();
 	return;
 	M_EPILOG
 	}
@@ -178,18 +178,18 @@ HLock::HLock ( HMutex & a_roMutex ) : f_roMutex ( a_roMutex )
 HLock::~HLock ( void )
 	{
 	M_PROLOG
-	f_roMutex.unlock ( );
+	f_roMutex.unlock();
 	return;
 	M_EPILOG
 	}
 
 HCondition::HCondition ( void )
-	: f_sAttributes ( ), f_xCondition ( ), f_oMutex ( )
+	: f_sAttributes(), f_xCondition(), f_oMutex()
 	{
 	M_PROLOG
 	pthread_condattr_init ( & f_sAttributes );
 	pthread_cond_init ( & f_xCondition, & f_sAttributes );
-	f_oMutex.lock ( );
+	f_oMutex.lock();
 	return;
 	M_EPILOG
 	}
@@ -197,7 +197,7 @@ HCondition::HCondition ( void )
 HCondition::~HCondition ( void )
 	{
 	M_PROLOG
-	f_oMutex.unlock ( );
+	f_oMutex.unlock();
 	M_ENSURE ( pthread_cond_destroy ( & f_xCondition ) == 0 );
 	pthread_condattr_destroy ( & f_sAttributes );
 	return;

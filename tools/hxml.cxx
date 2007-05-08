@@ -194,11 +194,11 @@ void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject ) const
 	}
 
 HXml::HXml ( void )
-	: f_oConvert ( new OConvert ), f_oConvertedString ( ),
-	f_oVarTmpBuffer ( ), f_poXml ( NULL ), f_oRoot ( )
+	: f_oConvert ( new OConvert ), f_oConvertedString(),
+	f_oVarTmpBuffer(), f_poXml ( NULL ), f_oRoot()
 	{
 	M_PROLOG
-	f_poXml = new ( std::nothrow ) HXmlData ( );
+	f_poXml = new ( std::nothrow ) HXmlData();
 	M_ENSURE ( f_poXml );
 	M_EPILOG
 	return;
@@ -209,7 +209,7 @@ HXml::~HXml ( void )
 	M_PROLOG
 	if ( f_poXml->f_psCharEncodingHandler )
 		xmlCharEncCloseFunc ( f_poXml->f_psCharEncodingHandler );
-	xmlCleanupCharEncodingHandlers ( );
+	xmlCleanupCharEncodingHandlers();
 	if ( f_poXml )
 		delete f_poXml;
 	f_poXml = NULL;
@@ -230,7 +230,7 @@ char const * HXml::convert ( char const * a_pcData, way_t a_eWay )
 	iconv_t l_xCD = static_cast < iconv_t > ( 0 );
 	l_uiOrigSize = l_uiSizeOut = l_uiSizeIn = strlen ( a_pcData );
 	f_oConvertedString.hs_realloc ( l_uiOrigSize + 1 );
-	l_pcOut = f_oConvertedString.raw ( );
+	l_pcOut = f_oConvertedString.raw();
 	switch ( a_eWay )
 		{
 		case ( D_IN ): { l_xCD = ( * f_oConvert ).f_xIconvIn; break; }
@@ -249,7 +249,7 @@ char const * HXml::convert ( char const * a_pcData, way_t a_eWay )
 		l_uiTmp = l_uiOrigSize;
 		l_uiOrigSize <<= 1;
 		f_oConvertedString.hs_realloc ( l_uiOrigSize + 1 );
-		l_pcOut = f_oConvertedString.raw ( ) + l_uiTmp - l_uiSizeOut;
+		l_pcOut = f_oConvertedString.raw() + l_uiTmp - l_uiSizeOut;
 		l_uiSizeOut += l_uiTmp;
 		M_ENSURE ( ( iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut,
 						& l_uiSizeOut ) != static_cast < size_t > ( - 1 ) )
@@ -267,13 +267,13 @@ int HXml::get_node_set_by_path ( char const * a_pcPath )
 	int l_iLength = 0;
 	char * l_pcPtr = NULL;
 	f_oVarTmpBuffer = a_pcPath;
-	l_pcPtr = f_oVarTmpBuffer.raw ( );
-	l_iLength = f_oVarTmpBuffer.get_length ( ) - 1;
+	l_pcPtr = f_oVarTmpBuffer.raw();
+	l_iLength = f_oVarTmpBuffer.get_length() - 1;
 	if ( f_poXml->f_psObject )
 		f_poXml->xml_free ( f_poXml->f_psObject );
 	if ( f_poXml->f_psContext )
 		f_poXml->xml_free ( f_poXml->f_psContext );
-	f_poXml->reset ( );
+	f_poXml->reset();
 	f_poXml->f_psContext = xmlXPathNewContext ( f_poXml->f_psDoc );
 	if ( f_poXml->f_psContext )
 		{
@@ -305,7 +305,7 @@ void HXml::init ( char const * a_pcFileName )
 	HString l_oError;
 	if ( f_poXml->f_psDoc )
 		f_poXml->xml_free ( f_poXml->f_psDoc );
-	f_poXml->reset ( );
+	f_poXml->reset();
 	errno = 0;
 	f_poXml->f_psDoc = xmlParseFile ( a_pcFileName );
 	if ( errno )
@@ -396,7 +396,7 @@ void HXml::parse ( xml_node_ptr_t a_pvData, ONode & a_rsNode, int a_iLevel, bool
 				case ( XML_ELEMENT_NODE ):
 					{
 					
-					parse ( l_psNode, a_rsNode.f_oChilds.add_tail ( ), a_iLevel + 1, a_bStripEmpty );
+					parse ( l_psNode, a_rsNode.f_oChilds.add_tail(), a_iLevel + 1, a_bStripEmpty );
 					a_rsNode.f_oTypes.push_back ( ONode::D_NODE );
 					}
 				break;
@@ -418,7 +418,7 @@ HXml::ONode & HXml::parse ( char const * a_pcXPath, bool a_bStripEmpty )
 	if ( ! a_pcXPath || ! a_pcXPath [ 0 ] )
 		a_pcXPath = "/"; /* scan full tree */
 	get_node_set_by_path ( a_pcXPath );
-	f_oRoot.reset ( );
+	f_oRoot.reset();
 	while ( a_pcXPath [ l_iCtr ] )
 		{
 		if ( a_pcXPath [ l_iCtr ] == '/' )
@@ -436,7 +436,7 @@ HXml::ONode & HXml::parse ( char const * a_pcXPath, bool a_bStripEmpty )
 			for ( l_iCtr = 0; l_iCtr < f_poXml->f_psNodeSet->nodeNr; ++ l_iCtr )
 				{
 				parse ( f_poXml->f_psNodeSet->nodeTab [ l_iCtr ],
-						f_oRoot.f_oChilds.add_tail ( ), l_iLevel, a_bStripEmpty );
+						f_oRoot.f_oChilds.add_tail(), l_iLevel, a_bStripEmpty );
 				f_oRoot.f_iLevel = 0;
 				f_oRoot.f_oTypes.push_back ( ONode::D_NODE );
 				}

@@ -41,7 +41,7 @@ namespace hcore
 HProcess::HProcess ( size_t a_uiFileHandlers )
 	: f_bInitialised ( false ), f_bLoop ( true ), f_iIdleCycles ( 0 ),
 	f_iLatencySeconds ( 0 ), f_iLatencyMicroseconds ( 0 ),
-	f_sLatency ( ), f_xFileDescriptorSet ( ),
+	f_sLatency(), f_xFileDescriptorSet(),
 	f_oFileDescriptorHandlers ( a_uiFileHandlers )
 	{
 	M_PROLOG
@@ -95,9 +95,9 @@ int HProcess::reconstruct_fdset ( void )
 	f_sLatency.tv_sec = f_iLatencySeconds;
 	f_sLatency.tv_usec = f_iLatencyMicroseconds;
 	FD_ZERO ( & f_xFileDescriptorSet );
-	if ( ! f_oFileDescriptorHandlers.quantity ( ) )
+	if ( ! f_oFileDescriptorHandlers.quantity() )
 		return ( -1 );
-	f_oFileDescriptorHandlers.rewind ( );
+	f_oFileDescriptorHandlers.rewind();
 /* FD_SET is a macro and first argument is evaluated twice ! */
 	while ( f_oFileDescriptorHandlers.iterate ( l_iFileDes, DUMMY ) )
 		FD_SET ( l_iFileDes, & f_xFileDescriptorSet );
@@ -112,13 +112,13 @@ int HProcess::run ( void )
 	int l_iFileDes = 0;
 	process_handler_filedes_t HANDLER = NULL;
 	if ( ! f_bInitialised )
-		M_THROW ( _ ( "you have to call HProcess::init ( ) first, dumbass" ), errno );
-	if ( ! f_oFileDescriptorHandlers.quantity ( ) )
+		M_THROW ( _ ( "you have to call HProcess::init() first, dumbass" ), errno );
+	if ( ! f_oFileDescriptorHandlers.quantity() )
 		M_THROW ( _ ( "there is no file descriptor to check activity on" ), errno );
 	while ( f_bLoop )
 		{
 		handler_alert ( 0 );
-		reconstruct_fdset ( );
+		reconstruct_fdset();
 		if ( ( l_iError = select ( FD_SETSIZE, & f_xFileDescriptorSet,
 						NULL, NULL, & f_sLatency ) ) )
 			{
@@ -128,8 +128,8 @@ int HProcess::run ( void )
 				continue;
 				}
 			if ( l_iError < 0 )
-				M_THROW ( "select ( ) returned", l_iError );
-			f_oFileDescriptorHandlers.rewind ( );
+				M_THROW ( "select() returned", l_iError );
+			f_oFileDescriptorHandlers.rewind();
 			while ( f_oFileDescriptorHandlers.iterate ( l_iFileDes, HANDLER ) )
 				{
 				if ( FD_ISSET ( l_iFileDes, & f_xFileDescriptorSet ) )

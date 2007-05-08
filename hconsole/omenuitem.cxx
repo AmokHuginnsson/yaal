@@ -39,7 +39,7 @@ namespace hconsole
 {
 
 OMenuItem::OMenuItem ( void )
-	: f_psSubMenu ( NULL ), HANDLER ( NULL ), f_oLabel ( )
+	: f_psSubMenu ( NULL ), HANDLER ( NULL ), f_oLabel()
 	{
 	M_PROLOG
 	return;
@@ -56,7 +56,7 @@ OMenuItem::OMenuItem ( OMenuItem * const a_psMenuItem, HANDLER_t const handler,
 	}
 
 OMenuItem::OMenuItem ( OMenuItem const & a_roMenuItem )
-	: f_psSubMenu ( NULL ), HANDLER ( NULL ), f_oLabel ( )
+	: f_psSubMenu ( NULL ), HANDLER ( NULL ), f_oLabel()
 	{
 	M_PROLOG
 	operator = ( a_roMenuItem );

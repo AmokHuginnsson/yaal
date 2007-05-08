@@ -293,7 +293,7 @@ HString & HString::operator += ( HString const & a_roString )
 char & HString::operator [ ] ( int const a_iIndex )
 	{
 	M_PROLOG
-	int l_iLength = get_length ( );
+	int l_iLength = get_length();
 	if  ( ( a_iIndex >= f_iSize ) || ( a_iIndex > l_iLength ) )
 		M_THROW ( "index out of bound", a_iIndex );
 	return ( f_pcBuffer [ a_iIndex ] );
@@ -704,7 +704,7 @@ HString & HString::shift_left ( int const a_iShift )
 		M_THROW ( "bad left shift lenght", a_iShift );
 	if ( a_iShift )
 		{
-		l_iLenght = get_length ( );
+		l_iLenght = get_length();
 		if ( a_iShift < l_iLenght )
 			memmove ( f_pcBuffer, f_pcBuffer + a_iShift, l_iLenght + 1 - a_iShift );
 		else
@@ -721,7 +721,7 @@ HString & HString::shift_right ( int const a_iShift, char const a_cFiller )
 	if ( a_iShift )
 		{
 		hs_realloc ( l_iLenght + a_iShift + 1 );
-		l_iLenght = get_length ( );
+		l_iLenght = get_length();
 		memmove ( f_pcBuffer + a_iShift, f_pcBuffer, l_iLenght + 1 );
 		fill ( a_cFiller, a_iShift );
 		}

@@ -45,13 +45,13 @@ void * xmalloc_internal ( int long const a_lSize )
 	if ( a_lSize < 0 )
 		{
 		perror ( _ ( "xmalloc_internal: requested size lower than 0" ) );
-		abort ( );
+		abort();
 		}
 	l_pvNewPtr = malloc ( a_lSize );
 	if ( l_pvNewPtr == 0 )
 		{
 		perror ( _ ( "xmalloc_internal: malloc returned NULL" ) );
-		abort ( );
+		abort();
 		}
 	return ( l_pvNewPtr );
 	}
@@ -69,23 +69,23 @@ void * xrealloc_internal ( void * a_pvPtr, int long a_lSize )
 	if ( a_lSize < 0 )
 		{
 		perror ( _ ( "xrealloc_internal: requested size lower than 0" ) );
-		abort ( );
+		abort();
 		}
 	l_pvNewPtr = realloc ( a_pvPtr, a_lSize );
 	if ( l_pvNewPtr == 0 )
 		{
 		perror ( _ ( "xrealloc_internal: realloc returned NULL" ) );
-		abort ( );
+		abort();
 		}
 	return ( l_pvNewPtr );
 	}
 
-void xfree_internal ( void * * a_ppvPtr ) throw ( )
+void xfree_internal ( void * * a_ppvPtr ) throw()
 	{
 	if ( ( * a_ppvPtr ) == NULL )
 		{
 		perror ( "xfree_internal: request to free NULL pointer" );
-		abort ( );
+		abort();
 		}
 	free ( ( * a_ppvPtr ) );
 	( * a_ppvPtr ) = NULL;
@@ -98,7 +98,7 @@ char * xstrdup ( char const * const a_pcStr )
 	if ( ! a_pcStr )
 		{
 		perror ( "xstrdup: request to duplicate NULL pointer string" );
-		abort ( );
+		abort();
 		}
 	l_pcNew = yaal::hcore::xcalloc < char > ( strlen ( a_pcStr ) + 1 );
 	strcpy ( l_pcNew, a_pcStr );

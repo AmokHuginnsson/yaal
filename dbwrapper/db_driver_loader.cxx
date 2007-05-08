@@ -190,7 +190,7 @@ char * null_rs_column_name ( void *, int )
 void dbwrapper_error ( void )
 	{
 	HString l_oMessage;
-	l_oMessage = dlerror ( );
+	l_oMessage = dlerror();
 	log ( LOG_TYPE::D_ERROR ) << l_oMessage << endl;
 	fprintf ( stderr, "(%s), ", static_cast < char const * const > ( l_oMessage ) );
 	return;
@@ -219,12 +219,12 @@ void load_driver ( void )
 			{
 			if ( ( l_iCtr == dbwrapper::n_iDataBaseDriver ) && l_iCtr ++ )
 				continue;
-			dbwrapper_error ( );
+			dbwrapper_error();
 			n_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ],
 					RTLD_NOW | RTLD_GLOBAL );
 			}
 		if ( ! n_pvDlHandle )
-			dbwrapper_exit ( );
+			dbwrapper_exit();
 		else
 			{
 			log ( LOG_TYPE::D_NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
@@ -234,35 +234,35 @@ void load_driver ( void )
 		fprintf ( stderr, "Linking symbols ... " );
 		if ( ! ( db_disconnect = dlsym_wrapper < t1 > ( n_pvDlHandle,
 						"db_disconnect" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( db_errno = dlsym_wrapper < t2 > ( n_pvDlHandle,
 						"db_errno" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( db_error = dlsym_wrapper < t3 > ( n_pvDlHandle,
 						"db_error" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( db_query = dlsym_wrapper < t4 > ( n_pvDlHandle,
 						"db_query" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( db_unquery = dlsym_wrapper < t5 > ( n_pvDlHandle,
 						"db_unquery" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( rs_get = dlsym_wrapper < t6 > ( n_pvDlHandle, "rs_get" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( rs_fields_count = dlsym_wrapper < t7 > ( n_pvDlHandle,
 						"rs_fields_count" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( dbrs_records_count = dlsym_wrapper < t8 > ( n_pvDlHandle,
 						"dbrs_records_count" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( dbrs_id = dlsym_wrapper < t9 > ( n_pvDlHandle, "dbrs_id" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( rs_column_name = dlsym_wrapper < tA > ( n_pvDlHandle,
 						"rs_column_name" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		else if ( ! ( db_connect = dlsym_wrapper < t0 > ( n_pvDlHandle,
 						"db_connect" ) ) )
-			dbwrapper_error ( );
+			dbwrapper_error();
 		if ( db_connect != autoloader_db_connect )
 			fprintf ( stderr, x_tag_g_pcDone );
 		else
@@ -291,70 +291,70 @@ void load_driver ( void )
 void * autoloader_db_connect ( char const * a_pcDataBase,
 		char const * a_pcLogin, char const * a_pcPassword )
 	{
-	load_driver ( );
+	load_driver();
 	return ( db_connect ( a_pcDataBase, a_pcLogin, a_pcPassword ) );
 	}
 
 void autoloader_db_disconnect ( void * a_pvDataBase )
 	{
-	load_driver ( );
+	load_driver();
 	db_disconnect ( a_pvDataBase );
 	return;
 	}
 
 int autoloader_db_errno ( void * a_pvDataBase )
 	{
-	load_driver ( );
+	load_driver();
 	return ( db_errno ( a_pvDataBase ) );
 	}
 
 char const * autoloader_db_error ( void * a_pvDataBase )
 	{
-	load_driver ( );
+	load_driver();
 	return ( db_error ( a_pvDataBase ) );
 	}
 
 void * autoloader_db_query ( void * a_pvDataBase, char const * a_pcQuery )
 	{
-	load_driver ( );
+	load_driver();
 	return ( db_query ( a_pvDataBase, a_pcQuery ) );
 	}
 
 void autoloader_db_unquery ( void * a_pvDataBase )
 	{
-	load_driver ( );
+	load_driver();
 	db_unquery ( a_pvDataBase );
 	return;
 	}
 
 char * autoloader_rs_get ( void * a_pvResult, int a_iRow, int a_iCol )
 	{
-	load_driver ( );
+	load_driver();
 	return ( rs_get ( a_pvResult, a_iRow, a_iCol ) );
 	}
 
 int autoloader_rs_fields_count ( void * a_pvResult )
 	{
-	load_driver ( );
+	load_driver();
 	return ( rs_fields_count ( a_pvResult ) );
 	}
 
 int long autoloader_dbrs_records_count ( void * a_pvDataBase,
 		void * a_pvResult )
 	{
-	load_driver ( );
+	load_driver();
 	return ( dbrs_records_count ( a_pvDataBase, a_pvResult ) );
 	}
 
 int long autoloader_dbrs_id ( void * a_pvDataBase, void * a_pvResult )
 	{
-	load_driver ( );
+	load_driver();
 	return ( dbrs_id ( a_pvDataBase, a_pvResult ) );
 	}
 
 char * autoloader_rs_column_name ( void * a_pvResult, int a_iColumn )
 	{
-	load_driver ( );
+	load_driver();
 	return ( rs_column_name ( a_pvResult, a_iColumn ) );
 	}
 

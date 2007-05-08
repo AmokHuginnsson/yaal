@@ -92,7 +92,7 @@ protected:
 	int f_iHighestNumber;	/* serial number of last added element */
 public:
 	HTree ( void );
-	virtual ~HTree ( );
+	virtual ~HTree();
 	virtual void flush ( void );
 	tttType & remove_node ( void );
 	tttType cut_branch ( int );
@@ -107,8 +107,8 @@ private:
 	};
 
 template < typename tttType >
-HTree < tttType > ::HNode::HNode( HNode * a_poNode ) : f_tLeaf ( ),
-	f_iNumber ( 0 ), f_iHits ( 0 ), f_iLevel ( 0 ), f_oBranch ( ),
+HTree < tttType > ::HNode::HNode( HNode * a_poNode ) : f_tLeaf(),
+	f_iNumber ( 0 ), f_iHits ( 0 ), f_iLevel ( 0 ), f_oBranch(),
 	f_poTrunk ( a_poNode ), f_poTree ( NULL )
 	{
 	M_PROLOG
@@ -159,14 +159,14 @@ typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( treatme
 	HNode * l_poNode = NULL;
 	if ( f_poTrunk )
 		{
-		l_poNode = f_poTrunk->f_oBranch.present ( );
+		l_poNode = f_poTrunk->f_oBranch.present();
 		while ( l_poNode != this )
 			{
-			f_poTrunk->f_oBranch.to_head ( );
-			l_poNode = f_poTrunk->f_oBranch.present ( );
+			f_poTrunk->f_oBranch.to_head();
+			l_poNode = f_poTrunk->f_oBranch.present();
 			}
 		f_poTrunk->f_oBranch.to_head ( 1, a_eFlag );
-		l_poNode = f_poTrunk->f_oBranch.present ( );
+		l_poNode = f_poTrunk->f_oBranch.present();
 		}
 	return ( l_poNode );
 	M_EPILOG
@@ -203,7 +203,7 @@ template < typename tttType >
 HTree < tttType > ::~HTree( void )
 	{
 	M_PROLOG
-	HTree::flush ( );
+	HTree::flush();
 	return ;
 	M_EPILOG
 	}

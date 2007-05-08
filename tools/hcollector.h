@@ -44,7 +44,7 @@ public:
 		static char const * const D_ACK;
 		static char const * const D_DTA; /* warrning! no endline */
 		static char const * const D_FIN; /* warrning! no endline, but \0 at end,
-																							 so sizeof ( ) retruns 4 */
+																							 so sizeof() retruns 4 */
 		static char const * const D_ERR;
 
 		static int const D_RECV_BUF_SIZE = 8; /* 5 should be enought but you never know */

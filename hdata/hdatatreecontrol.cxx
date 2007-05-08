@@ -62,12 +62,12 @@ HDataTreeControl::~HDataTreeControl ( void )
 void HDataTreeControl::load ( int long /*a_iId*/ )
 	{
 	M_PROLOG
-	f_poRecordSet->open ( );
-	while ( ! f_poRecordSet->is_eof ( ) )
+	f_poRecordSet->open();
+	while ( ! f_poRecordSet->is_eof() )
 		{
-		f_poRecordSet->move_next ( );
+		f_poRecordSet->move_next();
 		}
-	f_poRecordSet->close ( );
+	f_poRecordSet->close();
 	return;
 	M_EPILOG
 	}

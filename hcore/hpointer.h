@@ -96,7 +96,7 @@ public:
 	tType* raw ( void ) const;
 	bool operator! ( void ) const;
 private:
-	bool release ( void ) throw ( );
+	bool release ( void ) throw();
 	};
 
 template<typename tType>
@@ -133,7 +133,7 @@ HPointer<tType, pointer_type_t, access_type_t >::HPointer ( void )
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::release ( void ) throw ( )
+bool HPointer<tType, pointer_type_t, access_type_t>::release ( void ) throw()
 	{
 	M_ASSERT ( (*f_piReferenceCounter) > 0 );
 	(*f_piReferenceCounter) --;
@@ -159,7 +159,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>::~HPointer ( void )
 	{
-	f_ptShared && release ( );
+	f_ptShared && release();
 	return;
 	}
 

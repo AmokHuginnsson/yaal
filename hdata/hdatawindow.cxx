@@ -49,7 +49,7 @@ HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
 	: HWindow ( a_pcTitle ), HRecordSet ( a_poDataBase ),
 	f_bModified ( false ), f_eDocumentMode ( DOCUMENT::D_VIEW ), f_poMainControl ( NULL ),
 	f_psResourcesArray ( a_psDataControlInfo ), f_poSyncStore ( NULL ),
-	f_oViewModeControls ( ), f_oEditModeControls ( )
+	f_oViewModeControls(), f_oEditModeControls()
 	{
 	M_PROLOG
 	register_postprocess_handler ( KEY < 'n' >::command, NULL,
@@ -102,7 +102,7 @@ int HDataWindow::init ( void )
 	l_sAttributes.f_iDisabledAttribute = -1;
 	l_sAttributes.f_iEnabledAttribute = -1;
 	l_sAttributes.f_iFocusedAttribute = -1;
-	HWindow::init ( );
+	HWindow::init();
 	while ( f_psResourcesArray [ l_iCtr ].f_pcLabel )
 		{
 		if ( f_psResourcesArray [ l_iCtr ].f_psAttributes )
@@ -193,13 +193,13 @@ int HDataWindow::init ( void )
 			}
 		l_iCtr ++;
 		}
-	f_poMainControl->set_focus ( );
+	f_poMainControl->set_focus();
 	if ( f_poMainControl )
 		{
-		f_poMainControl->load ( );
+		f_poMainControl->load();
 		f_poMainControl->process_input ( KEY_CODES::D_HOME );
 		}
-	refresh ( );
+	refresh();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -250,26 +250,26 @@ void HDataWindow::set_mode ( DOCUMENT::mode_t a_eMode )
 		{
 		case ( DOCUMENT::D_VIEW ):
 			{
-			l_iCount = f_oEditModeControls.size ( );
+			l_iCount = f_oEditModeControls.size();
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				f_oEditModeControls [ l_iCtr ]->enable ( false );
-			l_iCount = f_oViewModeControls.size ( );
+			l_iCount = f_oViewModeControls.size();
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				f_oViewModeControls [ l_iCtr ]->enable ( true );
 			if ( l_iCount )
-				f_oViewModeControls [ 0 ]->set_focus ( );
+				f_oViewModeControls [ 0 ]->set_focus();
 			}
 		break;
 		case ( DOCUMENT::D_EDIT ):
 			{
-			l_iCount = f_oViewModeControls.size ( );
+			l_iCount = f_oViewModeControls.size();
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				f_oViewModeControls [ l_iCtr ]->enable ( false );
-			l_iCount = f_oEditModeControls.size ( );
+			l_iCount = f_oEditModeControls.size();
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				f_oEditModeControls [ l_iCtr ]->enable ( true );
 			if ( l_iCount )
-				f_oEditModeControls [ 0 ]->set_focus ( );
+				f_oEditModeControls [ 0 ]->set_focus();
 			}
 		break;
 		default :
@@ -283,22 +283,22 @@ void HDataWindow::sync ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iCount = 0;
-	HRecordSet::sync ( );
+	HRecordSet::sync();
 	if ( f_poSyncStore )
 		{
-		l_iCount = f_poSyncStore->get_size ( );
-		if ( f_oValues.size ( ) >= l_iCount )
+		l_iCount = f_poSyncStore->get_size();
+		if ( f_oValues.size() >= l_iCount )
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 				( * f_poSyncStore ) [ l_iCtr ] ( static_cast < char const * > ( f_oValues [ l_iCtr ] ) );
 		( * f_poSyncStore ).m_lId = m_lId;
 		}
 	else if ( ( f_eMode == D_ADDING ) || ( f_eMode == D_EDITING ) )
 		{
-		l_iCount = f_oEditModeControls.size ( );
-		if ( f_oValues.size ( ) >= l_iCount )
+		l_iCount = f_oEditModeControls.size();
+		if ( f_oValues.size() >= l_iCount )
 			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-				f_oValues [ l_iCtr ] = f_oEditModeControls [ l_iCtr ]->get ( ).get < HString const & > ( );
-		m_lId = f_poMainControl->get_current_id ( );
+				f_oValues [ l_iCtr ] = f_oEditModeControls [ l_iCtr ]->get().get < HString const & >();
+		m_lId = f_poMainControl->get_current_id();
 		}
 	return;
 	M_EPILOG
@@ -319,9 +319,9 @@ int HDataWindow::handler_add_new ( int, void * )
 				_ ( "You can not add new rocord now." ) );
 		return ( 0 );
 		}
-	add_new ( );
+	add_new();
 	if ( f_poMainControl )
-		f_poMainControl->add_new ( );
+		f_poMainControl->add_new();
 	set_mode ( DOCUMENT::D_EDIT );
 	return ( 0 );
 	M_EPILOG
@@ -343,7 +343,7 @@ int HDataWindow::handler_edit ( int, void * )
 		return ( 0 );
 		}
 	set_mode ( DOCUMENT::D_EDIT );
-	edit ( );
+	edit();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -364,9 +364,9 @@ int HDataWindow::handler_delete ( int, void * )
 		return ( 0 );
 		}
 	if ( f_poMainControl )
-		m_lId = f_poMainControl->get_current_id ( );
-	remove ( );
-	f_poMainControl->load ( );
+		m_lId = f_poMainControl->get_current_id();
+	remove();
+	f_poMainControl->load();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -379,9 +379,9 @@ int HDataWindow::handler_save ( int, void * )
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( 0 );
 		}
-	m_lId = update ( );
+	m_lId = update();
 	f_bModified = false;
-	f_poMainControl->load ( );
+	f_poMainControl->load();
 	set_mode ( DOCUMENT::D_VIEW );
 	return ( 0 );
 	M_EPILOG
@@ -397,8 +397,8 @@ int HDataWindow::handler_requery ( int, void * )
 		return ( 0 );
 		}
 	set_mode ( DOCUMENT::D_VIEW );
-	f_poMainControl->load ( );
-	refresh ( );
+	f_poMainControl->load();
+	refresh();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -409,12 +409,12 @@ int HDataWindow::handler_cancel ( int, void * )
 	mode_t l_eMode = f_eMode;
 	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
 		return ( 0 );
-	cancel ( );
+	cancel();
 	set_mode ( DOCUMENT::D_VIEW );
 	if ( ( l_eMode == D_ADDING ) && f_poMainControl )
-		f_poMainControl->cancel_new ( );
+		f_poMainControl->cancel_new();
 	f_bModified = false;
-	f_oStatusBar->refresh ( );
+	f_oStatusBar->refresh();
 	f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED, _ ( "Dropping all changes." ) );
 	return ( 0 );
 	M_EPILOG
@@ -431,7 +431,7 @@ void HDataWindow::set_modified ( bool a_bModified )
 	bool l_bModified = f_bModified;
 	f_bModified = a_bModified;
 	if ( ! l_bModified )
-		f_oStatusBar->refresh ( );
+		f_oStatusBar->refresh();
 	return;
 	M_EPILOG
 	}

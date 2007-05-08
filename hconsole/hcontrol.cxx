@@ -52,11 +52,11 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_uiAttributeFocused ( n_iAttributeFocused ), f_iRow ( a_iRow ), f_iColumn ( a_iColumn ),
 	f_iHeight ( a_iHeight ), f_iWidth ( a_iWidth ), f_iRowRaw ( 0 ),
 	f_iColumnRaw ( 0 ), f_iHeightRaw ( 0 ), f_iWidthRaw ( 0 ),
-	f_oLabel ( a_pcLabel ), f_oVarTmpBuffer ( ), f_poParent ( a_poParent ),
-	f_iLabelLength ( 0 ), f_iShortcutIndex ( 0 ), f_bValid( false )
+	f_oLabel ( a_pcLabel ), f_oVarTmpBuffer(), f_poParent ( a_poParent ),
+	f_iLabelLength ( 0 ), f_iShortcutIndex ( 0 ), f_bValid( false ), f_bNeedRepaint( false )
 	{
 	M_PROLOG
-	if ( ! is_enabled ( ) )
+	if ( ! is_enabled() )
 		M_THROW ( "not in curses mode.", errno );
 	if ( ! a_poParent )
 		M_THROW ( "no parent window.", reinterpret_cast < int > ( a_poParent ) );
@@ -68,7 +68,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		}
 	else
 		f_iShortcutIndex = 0;
-	f_iLabelLength = a_pcLabel ? f_oLabel.get_length ( ) : 0;
+	f_iLabelLength = a_pcLabel ? f_oLabel.get_length() : 0;
 	if ( f_iLabelLength )
 		{
 		if ( f_oLabel [ f_iLabelLength - 1 ] != '\n' )
@@ -104,7 +104,7 @@ void HControl::enable ( bool a_bEnable )
 	f_bEnabled = a_bEnable;
 	if ( ! f_bEnabled )
 		f_bFocused = false;
-	refresh ( );
+	refresh();
 	return;
 	M_EPILOG
 	}
@@ -138,7 +138,7 @@ int HControl::set_focus ( char a_cShortCut )
 	if ( ! a_cShortCut )
 		f_poParent->acquire_focus ( this );
 	if ( a_cShortCut <= 0 )
-		refresh ( );
+		refresh();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -149,7 +149,7 @@ int HControl::kill_focus ( void )
 	if ( ! f_bFocused )
 		return ( 1 );
 	f_bFocused = false;
-	refresh ( );
+	refresh();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -201,6 +201,7 @@ void HControl::draw_label( void )
 	{
 	M_PROLOG
 	do_draw_label();
+	f_bNeedRepaint = false;
 	return;
 	M_EPILOG
 	}
@@ -220,15 +221,15 @@ void HControl::do_draw_label( void )
 /* done */
 	if ( ! f_bDrawLabel )
 		{
-		set_attr_data ( );
+		set_attr_data();
 		return;
 		}
-	set_attr_label ( );
+	set_attr_label();
 	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oLabel ) != C_ERR );
-	set_attr_shortcut ( );
+	set_attr_shortcut();
 	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
 				"%c", f_oLabel [ f_iShortcutIndex ] ) != C_ERR );
-	set_attr_data ( );
+	set_attr_data();
 	if ( f_bSingleLine )
 		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;
 	else
@@ -253,7 +254,7 @@ void HControl::set_attributes ( int a_iAttributeDisabled,
 		f_uiAttributeFocused = n_iAttributeFocused;
 	else
 		f_uiAttributeFocused = a_iAttributeFocused;
-	refresh ( );
+	refresh();
 	return;
 	M_EPILOG
 	}
@@ -265,7 +266,7 @@ void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 	f_iColumn = a_iColumn;
 	f_iHeight = a_iHeight;
 	f_iWidth = a_iWidth;
-	refresh ( );
+	refresh();
 	return;
 	M_EPILOG
 	}
@@ -284,7 +285,7 @@ int HControl::do_click ( mouse::OMouse & )
 	M_PROLOG
 	if ( f_bFocused )
 		return ( 1 );
-	set_focus ( );
+	set_focus();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -330,7 +331,7 @@ int HControl::attr_data ( void ) const
 void HControl::set_attr_label ( void ) const
 	{
 	M_PROLOG
-	set_attr ( attr_label ( ) );
+	set_attr ( attr_label() );
 	return;
 	M_EPILOG
 	}
@@ -338,7 +339,7 @@ void HControl::set_attr_label ( void ) const
 void HControl::set_attr_shortcut ( void ) const
 	{
 	M_PROLOG
-	set_attr ( attr_shortcut ( ) );
+	set_attr ( attr_shortcut() );
 	return;
 	M_EPILOG
 	}
@@ -346,7 +347,7 @@ void HControl::set_attr_shortcut ( void ) const
 void HControl::set_attr_data ( void ) const
 	{
 	M_PROLOG
-	set_attr ( attr_data ( ) );
+	set_attr ( attr_data() );
 	return;
 	M_EPILOG
 	}
@@ -357,8 +358,9 @@ void HControl::set_draw_label( bool a_bDrawLabel )
 	return;
 	}
 
-void HControl::schedule_refresh( void ) const
+void HControl::schedule_refresh( void )
 	{
+	f_bNeedRepaint = true;
 	n_bNeedRepaint = true;
 	return;
 	}
@@ -367,6 +369,11 @@ void HControl::invalidate( void )
 	{
 	f_bValid = false;
 	return;
+	}
+
+bool HControl::need_repaint( void ) const
+	{
+	return ( f_bNeedRepaint );
 	}
 
 }

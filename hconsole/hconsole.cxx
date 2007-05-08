@@ -106,7 +106,7 @@ void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )
 int get_color_bits ( HString & a_roValue, int a_iWhat )
 	{
 	HString l_oStr = a_roValue.split ( " \t", a_iWhat );
-	if ( l_oStr.is_empty ( ) )
+	if ( l_oStr.is_empty() )
 		return ( 0 );
 	if ( ! strcasecmp ( l_oStr, "BLACK" ) )
 		return ( COLORS::D_FG_BLACK );
@@ -197,8 +197,8 @@ void yaal_hconsole_main ( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
 		{
-		yaal_hcore_banner ( );
-		yaal_hconsole_banner ( );
+		yaal_hcore_banner();
+		yaal_hconsole_banner();
 		}
 	exit ( 0 );
 	}

@@ -40,7 +40,7 @@ HHandler::HHandler ( size_t a_uiKeyHandlers, size_t a_uiCommandHandlers )
 				: f_oPreprocessHandlers ( a_uiKeyHandlers ),
 					f_oPostprocessHandlers ( a_uiKeyHandlers ),
 					f_oCommandHandlers ( a_uiCommandHandlers ),
-					f_oCommand ( )
+					f_oCommand()
 	{
 	M_PROLOG
 	return;
@@ -102,7 +102,7 @@ HString HHandler::process_command ( void )
 		l_oCommand = f_oCommand.split ( " \t", 0 );
 		if ( f_oCommandHandlers.get ( l_oCommand, HANDLER ) )
 			{
-			static_cast < void > ( ( this->*HANDLER ) ( 0, f_oCommand.raw ( ) ) );
+			static_cast < void > ( ( this->*HANDLER ) ( 0, f_oCommand.raw() ) );
 			f_oCommand = "";
 			}
 		}

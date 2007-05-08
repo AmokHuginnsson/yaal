@@ -67,12 +67,12 @@ HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
 	passwd * l_psPasswd = NULL;
 	f_pcBuffer = xcalloc < char > ( f_iBufferSize );
 	f_pcHostName = xcalloc < char > ( D_HOSTNAME_SIZE );
-	f_psStream = tmpfile ( );
+	f_psStream = tmpfile();
 	if ( ! f_psStream )
 		M_THROW ( "tmpfile returned", reinterpret_cast < int > ( f_psStream ) );
 	fprintf ( f_psStream, "%-10xProcess started (%d).\n",
-			LOG_TYPE::D_NOTICE, getpid ( ) );
-	l_iUid = getuid ( );
+			LOG_TYPE::D_NOTICE, getpid() );
+	l_iUid = getuid();
 	l_psPasswd = getpwuid ( l_iUid );
 	if ( l_psPasswd )
 		f_pcLoginName = xstrdup ( l_psPasswd->pw_name );
@@ -92,7 +92,7 @@ HLog::~HLog ( void )
 	if ( n_lLogMask & LOG_TYPE::D_NOTICE )
 		{
 		if ( f_bNewLine )
-			timestamp ( );
+			timestamp();
 		fprintf ( f_psStream, "Process exited normally.\n" );
 		}
 	if ( ( f_psStream != stdout ) && ( f_psStream != stderr ) )
@@ -209,12 +209,12 @@ void HLog::timestamp ( FILE * a_psStream )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( char const * const a_pcFormat, va_list const a_xAp )
+int HLog::operator() ( char const * const a_pcFormat, va_list const a_xAp )
 	{
 	M_PROLOG
 	int l_iErr = 0;
 	if ( f_bNewLine )
-		timestamp ( );
+		timestamp();
 	memset ( f_pcBuffer, 0, f_iBufferSize );
 	l_iErr = vsnprintf ( f_pcBuffer, f_iBufferSize, a_pcFormat, a_xAp );
 	fprintf ( f_psStream, f_pcBuffer );
@@ -230,7 +230,7 @@ int HLog::operator ( ) ( char const * const a_pcFormat, va_list const a_xAp )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( char const * const a_pcFormat, ... )
+int HLog::operator() ( char const * const a_pcFormat, ... )
 	{
 	M_PROLOG
 	int l_iErr = 0;
@@ -245,7 +245,7 @@ int HLog::operator ( ) ( char const * const a_pcFormat, ... )
 	M_EPILOG
 	}
 
-int HLog::operator ( ) ( int long const a_lType,
+int HLog::operator() ( int long const a_lType,
 		char const * const a_pcFormat, ... )
 	{
 	M_PROLOG
@@ -262,7 +262,7 @@ int HLog::operator ( ) ( int long const a_lType,
 	M_EPILOG
 	}
 
-HLog & HLog::operator ( ) ( int long const a_lType )
+HLog & HLog::operator() ( int long const a_lType )
 	{
 	M_PROLOG
 	f_lType = a_lType;
@@ -278,7 +278,7 @@ HLog & HLog::operator << ( char const * const a_pcString )
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
 		if ( f_bNewLine )
-			timestamp ( );
+			timestamp();
 		fprintf ( f_psStream, a_pcString );
 		if ( a_pcString [ strlen ( a_pcString ) - 1 ] != '\n' )
 			f_bNewLine = false;
@@ -299,7 +299,7 @@ HLog & HLog::operator << ( char const a_cChar )
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
 		if ( f_bNewLine )
-			timestamp ( );
+			timestamp();
 		fprintf ( f_psStream, "%c", a_cChar );
 		if ( a_cChar != '\n' )
 			f_bNewLine = false;
@@ -336,7 +336,7 @@ HLog & HLog::operator << ( int long const a_lLongInteger )
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
 		if ( f_bNewLine )
-			timestamp ( );
+			timestamp();
 		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%ld",
 					a_lLongInteger ) < static_cast < int > ( f_iBufferSize ) );
 		fprintf ( f_psStream, f_pcBuffer );
@@ -352,7 +352,7 @@ HLog & HLog::operator << ( int long unsigned const a_ulLongInteger )
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
 		if ( f_bNewLine )
-			timestamp ( );
+			timestamp();
 		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%lu",
 					a_ulLongInteger ) < static_cast < int > ( f_iBufferSize ) );
 		fprintf ( f_psStream, f_pcBuffer );
@@ -368,7 +368,7 @@ HLog & HLog::operator << ( double const a_dDouble )
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
 		if ( f_bNewLine )
-			timestamp ( );
+			timestamp();
 		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%f",
 					a_dDouble ) < static_cast < int > ( f_iBufferSize ) );
 		fprintf ( f_psStream, f_pcBuffer );

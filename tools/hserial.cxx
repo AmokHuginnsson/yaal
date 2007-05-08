@@ -56,8 +56,8 @@ namespace
 HSerial::flags_t HSerial::D_FLAGS_TEXT = HSerial::D_FLAGS_DEFAULT | HSerial::D_FLAGS_CANONICAL | HSerial::D_FLAGS_CR2NL;
 
 HSerial::HSerial ( char const * const a_pcDevice )
-				: HRawFile ( ), f_eSpeed ( D_SPEED_DEFAULT ),
-	f_eFlags ( D_FLAGS_DEFAULT ), f_oDevicePath ( ),
+				: HRawFile(), f_eSpeed ( D_SPEED_DEFAULT ),
+	f_eFlags ( D_FLAGS_DEFAULT ), f_oDevicePath(),
 	f_oTIO ( sizeof ( termios ), true ),
 	f_oBackUpTIO ( sizeof ( termios ), true )
 	{
@@ -66,7 +66,7 @@ HSerial::HSerial ( char const * const a_pcDevice )
 		f_oDevicePath = a_pcDevice;
 	else
 		f_oDevicePath = tools::n_pcSerialDevice;
-	compile ( );
+	compile();
 	return;
 	M_EPILOG
 	}
@@ -75,7 +75,7 @@ HSerial::~HSerial ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		HSerial::close ( );
+		HSerial::close();
 	M_ASSERT ( f_iFileDescriptor < 0 );
 	return;
 	M_EPILOG
@@ -93,7 +93,7 @@ bool HSerial::open ( void )
 		M_THROW ( strerror ( errno ), errno );
 	if ( ! isatty ( f_iFileDescriptor ) )
 		M_THROW ( "not a tty", f_iFileDescriptor );
-	tcgetattr ( f_iFileDescriptor, reinterpret_cast < termios * > ( f_oBackUpTIO.raw ( ) ) );
+	tcgetattr ( f_iFileDescriptor, reinterpret_cast < termios * > ( f_oBackUpTIO.raw() ) );
 	fcntl ( f_iFileDescriptor, F_SETFD, 0 );
 	fcntl ( f_iFileDescriptor, F_SETFL, 0 );
 	tcflush ( f_iFileDescriptor, TCIOFLUSH );
@@ -109,16 +109,16 @@ int HSerial::close ( void )
 	if ( f_iFileDescriptor >= 0 )
 		tcsetattr ( f_iFileDescriptor, TCSANOW,
 				reinterpret_cast < termios const * const > ( static_cast < char const * const > ( f_oBackUpTIO ) ) );
-	return ( HRawFile::close ( ) );
+	return ( HRawFile::close() );
 	M_EPILOG
 	}
 
 void HSerial::compile ( void )
 	{
 	M_PROLOG
-	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
+	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw() );
 	memset ( & l_sTIO, 0, sizeof ( termios ) );
-	memset ( f_oBackUpTIO.raw ( ), 0, sizeof ( termios ) );
+	memset ( f_oBackUpTIO.raw(), 0, sizeof ( termios ) );
 /*
  *   initialize all control characters
  *   default values can be found in /usr/include/termios.h, and are given
@@ -143,8 +143,8 @@ void HSerial::compile ( void )
 	l_sTIO.c_cc [ VWERASE ]  = 0;    /* Ctrl-w */
 	l_sTIO.c_cc [ VLNEXT ]   = 0;    /* Ctrl-v */
 	l_sTIO.c_cc [ VEOL2 ]    = 0;    /* '\0' */
-	compile_flags ( );
-	compile_speed ( );
+	compile_flags();
+	compile_speed();
 	return;
 	M_EPILOG
 	}
@@ -162,7 +162,7 @@ void HSerial::compile_speed ( void )
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
 		M_THROW ( n_pcEAlreadyOpened, errno );
-	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
+	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw() );
 	int l_iBaudRate = 0;
 	if ( f_eSpeed == D_SPEED_DEFAULT )
 		f_eSpeed = tools::n_eBaudRate;
@@ -214,7 +214,7 @@ void HSerial::compile_flags ( void )
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
 		M_THROW ( n_pcEAlreadyOpened, errno );
-	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw ( ) );
+	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.raw() );
 	int l_iCtr = 0;
 	if ( f_eFlags & D_FLAGS_DEFAULT )
 		f_eFlags |= tools::n_eSerialFlags;

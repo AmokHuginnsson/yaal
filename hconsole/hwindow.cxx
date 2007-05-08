@@ -44,7 +44,7 @@ namespace hconsole
 {
 
 HWindow::HWindow( char const * a_pcTitle ) : f_bInitialised( false ),
-	f_oTitle( a_pcTitle ), f_oFocusedChild(),
+	f_bNeedRepaint( false ), f_oTitle( a_pcTitle ), f_oFocusedChild(),
 	f_oPreviousFocusedChild(), f_oControls( f_oFocusedChild ), f_oStatusBar()
 	{
 	M_PROLOG
@@ -98,7 +98,7 @@ int HWindow::process_input( int a_iCode )
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers ( a_iCode, f_oPostprocessHandlers );
 	if ( f_oCommand && static_cast < char const * const > ( f_oCommand ) [ 0 ] )
-		process_command ( );
+		process_command();
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -123,9 +123,12 @@ HStatusBarControl::ptr_t& HWindow::status_bar( void )
 void HWindow::refresh( void )
 	{
 	M_PROLOG
+	if ( f_bNeedRepaint )
+		clrscr();
 	if ( ( !! f_oStatusBar ) && ( f_oStatusBar != *f_oFocusedChild ) )
-		f_oStatusBar->refresh ( );
-	f_oControls.refresh_all();
+		f_oStatusBar->refresh();
+	f_oControls.refresh_all( f_bNeedRepaint );
+	f_bNeedRepaint = false;
 	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
@@ -144,7 +147,7 @@ int HWindow::handler_jump_tab( int a_iCode, void* )
 int HWindow::handler_jump_direct( int a_iCode, void* )
 	{
 	M_PROLOG
-	/* call below is _magic_, HControlList::next_enabled ( ) takes char as an
+	/* call below is _magic_, HControlList::next_enabled() takes char as an
 	 * argument, so a_iCode & 0x0ff is passed into the function,
 	 * a_iCode is consrtructed from ordinary char by D_KEY_META_ macro,
 	 * see console.h for details */
@@ -165,7 +168,7 @@ void HWindow::acquire_focus( HControl const* const a_poControl )
 	M_PROLOG
 	if ( (*f_oFocusedChild) == a_poControl )
 		return;
-	(*f_oFocusedChild)->kill_focus ( );
+	(*f_oFocusedChild)->kill_focus();
 	f_oControls.select ( a_poControl );
 	n_bNeedRepaint = true;
 	return;
@@ -185,7 +188,7 @@ int HWindow::handler_search( int a_iCode, void* )
 	{
 	M_PROLOG
 	char l_pcPrompt [ ] = "/\0";
-	if ( ! (*f_oFocusedChild)->is_searchable ( ) )
+	if ( ! (*f_oFocusedChild)->is_searchable() )
 		return ( a_iCode );
 	if ( a_iCode >= KEY_CODES::D_COMMAND_BASE )
 		a_iCode -= KEY_CODES::D_COMMAND_BASE;
@@ -236,6 +239,13 @@ HString const& HWindow::get_title( void ) const
 	M_PROLOG
 	return ( f_oTitle );
 	M_EPILOG
+	}
+
+void HWindow::schedule_refresh( void )
+	{
+	f_bNeedRepaint = true;
+	n_bNeedRepaint = true;
+	return;
 	}
 
 }

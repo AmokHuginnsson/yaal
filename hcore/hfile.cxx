@@ -56,7 +56,7 @@ HFile::~HFile ( void )
 	{
 	M_PROLOG
 	if ( f_pvHandle && ! f_bExternal )
-		close ( );
+		close();
 	return;
 	M_EPILOG
 	}
@@ -127,13 +127,13 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		M_THROW ( _ ( "no file is opened" ), errno );
 	if ( a_eMode & D_BUFFERED_READS )
 		{
-		l_iLength = get_line_length ( );
+		l_iLength = get_line_length();
 		if ( l_iLength )
 			{
 			if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
 				M_THROW ( _ ( "line too long" ), l_iLength );
 			a_roLine.hs_realloc ( l_iLength );
-			l_pcPtr = a_roLine.raw ( );
+			l_pcPtr = a_roLine.raw();
 			M_ENSURE ( static_cast < int > ( fread ( l_pcPtr,
 							sizeof ( char ), l_iLength,
 							static_cast < FILE * > ( f_pvHandle ) ) ) == l_iLength );
@@ -142,7 +142,7 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 	else /* D_UNBUFFERED_READS */
 		{
 		l_iLength = scan_line ( a_roLine, a_iMaximumLength );
-		l_pcPtr = a_roLine.raw ( );
+		l_pcPtr = a_roLine.raw();
 		}
 	if ( l_iLength )
 		{
@@ -293,7 +293,7 @@ HFile& endl ( HFile& a_roFile )
 HFile& flush ( HFile& a_roFile )
 	{
 	M_PROLOG
-	a_roFile.flush ( );
+	a_roFile.flush();
 	return ( a_roFile );
 	M_EPILOG
 	}

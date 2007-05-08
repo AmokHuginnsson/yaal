@@ -37,7 +37,7 @@ namespace yaal
 namespace hconsole
 {
 
-HControlList::HControlList ( model_t::cyclic_iterator& a_roFocused ) : f_oList ( ), f_roFocused ( a_roFocused )
+HControlList::HControlList( model_t::cyclic_iterator& a_roFocused ) : f_oList(), f_roFocused( a_roFocused )
 	{
 	M_PROLOG
 	return;
@@ -77,14 +77,14 @@ void HControlList::add_control( HControl::ptr_t a_oControl )
 	M_EPILOG
 	}
 
-void HControlList::refresh_all( void )
+void HControlList::refresh_all( bool a_bForce )
 	{
 	M_PROLOG
 	for ( model_t::iterator it = f_oList.begin();
 			it != f_oList.end(); ++ it )
-		if ( it != f_roFocused )
-			(*it)->refresh ( );
-	if ( !! (*f_roFocused) )
+		if ( ( it != f_roFocused ) && ( a_bForce || (*it)->need_repaint() ) )
+			(*it)->refresh();
+	if ( !! (*f_roFocused) && ( a_bForce || (*f_roFocused)->need_repaint() ) )
 		(*f_roFocused)->refresh();
 	return;
 	M_EPILOG
@@ -95,7 +95,7 @@ void HControlList::update_all( void )
 	M_PROLOG
 	for ( model_t::iterator it = f_oList.begin();
 			it != f_oList.end(); ++ it )
-			(*it)->update ( );
+			(*it)->update();
 	return;
 	M_EPILOG
 	}
@@ -130,7 +130,7 @@ void HControlList::pop_front( void )
 	M_EPILOG
 	}
 
-void HControlList::select ( HControl const* a_poControl )
+void HControlList::select( HControl const* a_poControl )
 	{
 	M_PROLOG
 	if ( (*f_roFocused) != a_poControl )
@@ -151,7 +151,7 @@ void HControlList::select ( HControl const* a_poControl )
 	M_EPILOG
 	}
 
-void HControlList::select ( HControl::ptr_t const& a_oControl )
+void HControlList::select( HControl::ptr_t const& a_oControl )
 	{
 	M_PROLOG
 	select( a_oControl.raw() );

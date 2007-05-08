@@ -47,7 +47,7 @@ class HPair
 public:
 	tType & first;
 	ttType & second;
-	HPair ( void ) : f_tKey ( ), f_tValue ( ), first ( f_tKey ), second ( f_tValue ) {}
+	HPair ( void ) : f_tKey(), f_tValue(), first ( f_tKey ), second ( f_tValue ) {}
 	HPair ( tType key, ttType value ) : f_tKey ( key ), f_tValue ( value ), first ( f_tKey ), second ( f_tValue ) {}
 	HPair ( HPair const & pair ) : f_tKey ( pair.f_tKey ), f_tValue ( pair.f_tValue ), first ( f_tKey ), second ( f_tValue ) {}
 	HPair & operator = ( HPair const & pair )
@@ -100,9 +100,9 @@ public:
 			return ( it );
 			}
 		tType const & operator * ( void )
-			{	return ( f_oEngine.operator*<map_elem_t> ( ) );	}
+			{	return ( f_oEngine.operator*<map_elem_t>() );	}
 		tType const * const operator -> ( void )
-			{ return ( & f_oEngine.operator*<map_elem_t> ( ) );	}
+			{ return ( & f_oEngine.operator*<map_elem_t>() );	}
 		bool operator == ( HIterator const & it ) const
 			{ return ( f_oEngine == it.f_oEngine ); }
 		bool operator != ( HIterator const & it ) const
@@ -111,11 +111,11 @@ public:
 private:
 	HSBBSTree f_oEngine;
 public:
-	HMap ( void ) : f_oEngine ( ) {};
+	HMap ( void ) : f_oEngine() {};
 	size_t size ( void ) const
-		{ return ( f_oEngine.size ( ) );	}
+		{ return ( f_oEngine.size() );	}
 	bool empty ( void ) const
-		{ return ( f_oEngine.empty ( ) );	}
+		{ return ( f_oEngine.empty() );	}
 	void insert ( map_elem_t const & e )
 		{	f_oEngine.insert ( e );	}
 	void remove ( tType const & e )
@@ -123,17 +123,17 @@ public:
 	HIterator find ( tType const & e ) const
 		{ return ( f_oEngine.find ( e ) ); }
 	HIterator begin ( void ) const
-		{ return ( HIterator ( f_oEngine.begin ( ) ) ); }
+		{ return ( HIterator ( f_oEngine.begin() ) ); }
 	HIterator end ( void ) const
-		{ return ( HIterator ( f_oEngine.end ( ) ) ); }
+		{ return ( HIterator ( f_oEngine.end() ) ); }
 	HIterator rbegin ( void ) const
-		{ return ( HIterator ( f_oEngine.rbegin ( ) ) ); }
+		{ return ( HIterator ( f_oEngine.rbegin() ) ); }
 	HIterator rend ( void ) const
-		{ return ( HIterator ( f_oEngine.rend ( ) ) ); }
+		{ return ( HIterator ( f_oEngine.rend() ) ); }
 	ttType & operator [ ] ( tType const & key )
 		{
 		HIterator it = find ( key );
-		if ( it != end ( ) )
+		if ( it != end() )
 			return ( *it );
 		insert ( key );
 		}

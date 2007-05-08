@@ -134,7 +134,7 @@ void enter_curses( void )
 	int l_iFg = 0, l_iBg = 0;
 	termios l_sTermios;
 /*	def_shell_mode(); */
-/* this is done automaticly by initscr ( ), read man next time */
+/* this is done automaticly by initscr(), read man next time */
 	if ( ! isatty ( STDIN_FILENO ) )
 		M_THROW ( "stdin in not a tty", 0 );
 	if ( n_bDisableXON )
@@ -157,10 +157,10 @@ void enter_curses( void )
 	use_env ( true );
 	if ( ! n_psWindow )
 		n_psWindow = initscr();
-	M_ENSURE ( cbreak ( ) != ERR );
-	M_ENSURE ( start_color ( ) != ERR );
-	standout ( ); /* Macro, returned value without meaning */
-	M_ENSURE ( nonl ( ) == OK );
+	M_ENSURE ( cbreak() != ERR );
+	M_ENSURE ( start_color() != ERR );
+	standout(); /* Macro, returned value without meaning */
+	M_ENSURE ( nonl() == OK );
 	M_ENSURE ( keypad ( stdscr, true ) != ERR );
 	M_ENSURE ( intrflush ( stdscr, false ) != ERR );
 /*	scrollok ( stdscr, true ); */
@@ -168,9 +168,9 @@ void enter_curses( void )
 	M_ENSURE ( leaveok ( stdscr, false ) != ERR );
 	immedok ( stdscr, false );
 	M_ENSURE ( fflush ( NULL ) == 0 );
-	flushinp ( ); /* Always returns OK */
+	flushinp(); /* Always returns OK */
 	curs_set ( CURSOR::D_INVISIBLE );
-	M_ENSURE ( refresh ( ) != ERR );
+	M_ENSURE ( refresh() != ERR );
 	/* init color pairs */
 	M_ENSURE ( assume_default_colors ( COLOR_BLACK, COLOR_BLACK ) == OK );
 	for ( l_iBg = 0; l_iBg < 8; l_iBg ++ )
@@ -199,7 +199,7 @@ void enter_curses( void )
 			mouse::mouse_get = mouse::console_mouse_get;
 			mouse::mouse_close = mouse::console_mouse_close;
 			}
-		if ( ( n_iMouseDes = mouse::mouse_open ( ) ) < 0 )
+		if ( ( n_iMouseDes = mouse::mouse_open() ) < 0 )
 			M_THROW ( _ ( "mouse is console type"
 						" and we did not recived file descriptor" ), errno );
 		}
@@ -222,31 +222,31 @@ void leave_curses( void )
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", errno );
 //	if ( ! mousemask ( 0, NULL ) )
-//		M_THROW ( "mousemask ( ) returned 0", errno );
+//		M_THROW ( "mousemask() returned 0", errno );
 	if ( n_bUseMouse )
-		static_cast < void > ( mouse::mouse_close ( ) );
+		static_cast < void > ( mouse::mouse_close() );
 	bkgd ( ' ' | ATTR < COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK >::value );
-	M_ENSURE ( use_default_colors ( ) == OK );
+	M_ENSURE ( use_default_colors() == OK );
 	M_ENSURE ( printw ( "" ) != ERR );
 	M_ENSURE ( fflush ( NULL ) == 0 );
-	flushinp ( ); /* Always returns OK */
+	flushinp(); /* Always returns OK */
 	M_ENSURE ( intrflush ( stdscr, true ) != ERR );
 	leaveok ( stdscr, false ); /* Always OK */
 	immedok ( stdscr, true ); /* Always OK */
-	M_ENSURE ( refresh ( ) != ERR );
-	nl ( ); /* Always OK */
-	standend ( );
+	M_ENSURE ( refresh() != ERR );
+	nl(); /* Always OK */
+	standend();
 	M_ENSURE ( keypad ( stdscr, false ) != ERR );
-	M_ENSURE ( nocbreak ( ) != ERR );
+	M_ENSURE ( nocbreak() != ERR );
 	curs_set ( CURSOR::D_VISIBLE );
-/*	reset_shell_mode ( ); */
-/* see comment near def_shell_mode ( ), ( automagicly by endwin ( ) ) */
+/*	reset_shell_mode(); */
+/* see comment near def_shell_mode(), ( automagicly by endwin() ) */
 /*
 	if ( n_psWindow )
 	delwin ( n_psWindow );
 	n_psWindow = NULL;
 */
-	M_ENSURE ( endwin ( ) == OK );
+	M_ENSURE ( endwin() == OK );
 	if ( n_bDisableXON )
 		M_ENSURE ( tcsetattr ( STDIN_FILENO, TCSAFLUSH, & n_sTermios ) == 0 );
 	n_bEnabled = false;
@@ -288,12 +288,12 @@ int c_addch ( int const & a_iChar )
 
 int c_refresh ( void )
 	{
-	return ( ::refresh ( ) );
+	return ( ::refresh() );
 	}
 
 int endwin ( void )
 	{
-	return ( ::endwin ( ) );
+	return ( ::endwin() );
 	}
 
 void c_getmaxyx ( int & a_riHeight, int & a_riWidth )
@@ -310,7 +310,7 @@ void c_getyx ( int & a_riHeight, int & a_riWidth )
 
 void c_clrtoeol ( void )
 	{
-	::clrtoeol ( );
+	::clrtoeol();
 	return;
 	}
 
@@ -341,7 +341,7 @@ int c_vmvprintf ( int a_iRow, int a_iColumn,
 	if ( a_iColumn < 0 )
 		{
 		M_ENSURE ( move ( a_iRow, 0 ) != ERR );
-		clrtoeol ( ); /* Always OK */
+		clrtoeol(); /* Always OK */
 		}
 	else
 		M_ENSURE ( move ( a_iRow, a_iColumn ) != ERR );
@@ -371,7 +371,7 @@ int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 	int l_iOrigAttribute = 0;
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", errno );
-	l_iOrigAttribute = get_attr ( );
+	l_iOrigAttribute = get_attr();
 	set_attr ( a_iAttribute );
 	l_iError = c_vmvprintf ( a_iRow, a_iColumn, a_pcFormat, a_rxAp );
 	set_attr ( l_iOrigAttribute );
@@ -394,11 +394,11 @@ int get_key ( void )
 		M_THROW ( "not in curses mode", errno );
 	M_ENSURE ( noecho() != ERR );
 	M_ENSURE ( fflush( NULL ) == 0 );
-	l_iKey = getch ( );
+	l_iKey = getch();
 	if ( l_iKey == KEY_CODES::D_ESC )
 		{
 		M_ENSURE ( nodelay ( stdscr, true ) != ERR );
-		l_iKey = getch ( );
+		l_iKey = getch();
 		M_ENSURE ( nodelay ( stdscr, false ) != ERR );
 		if ( l_iKey == ERR )
 			l_iKey = KEY_CODES::D_ESC;
@@ -411,7 +411,7 @@ int get_key ( void )
 		c_printf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
 					n_cCommandComposeCharacter );
 		timeout ( n_iCommandComposeDelay * 100 );
-		l_iKey = getch ( );
+		l_iKey = getch();
 		timeout ( -1 );
 		if ( l_iKey == ERR )
 			{
@@ -425,7 +425,7 @@ int get_key ( void )
 			else if ( l_iKey == KEY_CODES::D_ESC )
 				{
 				M_ENSURE ( nodelay ( stdscr, true ) != ERR );
-				l_iKey = getch ( );
+				l_iKey = getch();
 				M_ENSURE ( nodelay ( stdscr, false ) != ERR );
 				if ( l_iKey == ERR )
 					l_iKey = KEY<>::command_r (l_iChar = KEY_CODES::D_ESC);
@@ -438,7 +438,7 @@ int get_key ( void )
 			}
 		curs_set ( l_eOrigCursState );
 		}
-	M_ENSURE ( echo ( ) != ERR );
+	M_ENSURE ( echo() != ERR );
 	switch ( l_iKey )
 		{
 		case ( KEY_NPAGE ):			l_iKey = KEY_CODES::D_PAGE_DOWN;	break;
@@ -470,7 +470,7 @@ int kbhit ( void )
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", errno );
 	M_ENSURE ( nodelay( stdscr, true ) != ERR );
-	l_iKey = get_key ( );
+	l_iKey = get_key();
 	M_ENSURE ( nodelay( stdscr, false ) != ERR );
 	if ( l_iKey == ERR )
 		return ( 0 );
@@ -502,8 +502,8 @@ void clrscr ( void )
 	M_PROLOG
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", errno );
-	clear ( ); /* Always returns OK */
-	M_ENSURE ( refresh ( ) != ERR );
+	clear(); /* Always returns OK */
+	M_ENSURE ( refresh() != ERR );
 	return;
 	M_EPILOG
 	}
@@ -531,7 +531,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 		{
 		if ( n_bInputWaiting )
 			{
-			a_iKey = get_key ( );
+			a_iKey = get_key();
 			l_iEventType = EVENT::D_MOUSE;
 			if ( a_iKey == KEY_MOUSE )
 				static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
@@ -547,7 +547,7 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 		{
 		if ( FD_ISSET ( STDIN_FILENO, & l_xFdSet ) )
 			{
-			a_iKey = get_key ( ), l_iEventType = EVENT::D_KEYBOARD;
+			a_iKey = get_key(), l_iEventType = EVENT::D_KEYBOARD;
 			if ( a_iKey == KEY_MOUSE )
 				l_iEventType = 0;
 			}

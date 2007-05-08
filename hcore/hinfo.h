@@ -61,7 +61,7 @@ public:
 	virtual ~HInfo( void );
 	char& operator [] ( int const );
 	HInfo& operator = ( HInfo const& );
-	HInfo& operator ( ) ( HInfo const& );
+	HInfo& operator() ( HInfo const& );
 	template < typename tType >
 	tType const get( void ) const;
 	operator opcm_t const ( void ) const;

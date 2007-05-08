@@ -81,7 +81,7 @@ bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "serial_baudrate" ) )
 		{
-		if ( ( a_roValue.get_length ( ) > 1 ) && ( a_roValue [ 0 ] == 'B' ) )
+		if ( ( a_roValue.get_length() > 1 ) && ( a_roValue [ 0 ] == 'B' ) )
 			{
 			l_iBaudRate = strtol ( static_cast < char const * const > ( a_roValue ) + 1, NULL, 10 );
 			switch ( l_iBaudRate )
@@ -112,7 +112,7 @@ bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		}
 	else if ( ! strcasecmp ( a_roOption, "serial_flags" ) )
 		{
-		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
+		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty() )
 			{
 			if ( ! strcasecmp ( l_oStr, "FLOW_CONTROL_HARDWARE" ) )
 				n_eSerialFlags = HSerial::D_FLAGS_FLOW_CONTROL_HARDWARE;
@@ -200,9 +200,9 @@ void yaal_tools_main ( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
 		{
-		yaal_hcore_banner ( );
-		yaal_hconsole_banner ( );
-		yaal_tools_banner ( );
+		yaal_hcore_banner();
+		yaal_hconsole_banner();
+		yaal_tools_banner();
 		}
 	exit ( 0 );
 	}

@@ -151,7 +151,7 @@ int HVector < tType > ::normalize ( void )
 	M_PROLOG
 	int l_iCtr;
 	tType l_tLenght;
-	l_tLenght = norm ( );
+	l_tLenght = norm();
 	if ( ! l_tLenght )
 		return ( 1 );
 	for ( l_iCtr = 0; l_iCtr < this->f_iSize; l_iCtr ++ )
@@ -300,7 +300,7 @@ template < typename tType >
 tType HVector < tType > ::operator ! ( void )
 	{
 	M_PROLOG
-	return ( norm ( ) );
+	return ( norm() );
 	M_EPILOG
 	}
 

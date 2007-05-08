@@ -42,7 +42,7 @@ namespace hconsole
 HSearchableControl::HSearchableControl ( bool a_bSearchable )
 									: HControl ( NULL, 0, 0, 0, 0, NULL ),
 	f_bSearchable ( a_bSearchable ), f_bSearchActived ( false ),
-	f_bFiltered ( false ), f_bBackwards ( false ), f_oPattern ( )
+	f_bFiltered ( false ), f_bBackwards ( false ), f_oPattern()
 	{
 	M_PROLOG
 	return;
@@ -74,7 +74,7 @@ void HSearchableControl::search( HString const& a_oPattern, bool a_bBackwards )
 		else
 			go_to_match();
 		}
-	refresh();
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}

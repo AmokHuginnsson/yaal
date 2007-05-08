@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <cstdlib>  /* getenv ( ) */
-#include <cstring>  /* strcpy ( ), strcat ( ) */
-#include <cstdio>   /* fopen ( ) */
-#include <libintl.h> /* gettext ( ) */
+#include <cstdlib>  /* getenv() */
+#include <cstring>  /* strcpy(), strcat() */
+#include <cstdio>   /* fopen() */
+#include <libintl.h> /* gettext() */
 
 #include "hexception.h"
 M_VCSID ( "$Id$" )
@@ -83,8 +83,8 @@ HString make_path ( char const * const a_pcRcName,
 			char * l_pcHomePath = getenv( "HOME" );
 			if ( ! l_pcHomePath )
 				{
-				perror ( "rc_open: getenv ( )" );
-				abort ( );
+				perror ( "rc_open: getenv()" );
+				abort();
 				}
 			l_oRcPath = l_pcHomePath;
 			if ( a_ePlacement == RC_PATHER::D_HOME_ETC )
@@ -109,7 +109,7 @@ int rc_open ( char const * const a_pcRcName,
 	int l_iError = 0;
 	HString l_oRcPath = make_path ( a_pcRcName, a_ePlacament );
 	if ( a_roFile )
-		a_roFile.close ( );
+		a_roFile.close();
 	l_iError = a_roFile.open ( l_oRcPath );
 	if ( l_iError )
 		l_oRcPath +=	" not found, ";
@@ -166,7 +166,7 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 	size_t l_iCtrOut = 0;
 	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
-	log ( LOG_TYPE::D_INFO ) << "process_rc_file ( ): ";
+	log ( LOG_TYPE::D_INFO ) << "process_rc_file(): ";
 	if ( a_iCount < 0 )
 		M_THROW ( _ ( "bad variable count" ), a_iCount );
 	for ( l_iCtrOut = 0; l_iCtrOut < ( sizeof ( l_psPlacementTab ) / sizeof ( OPlacement ) ); l_iCtrOut ++ )
@@ -183,7 +183,7 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 				{
 				if ( a_pcSection )
 					{
-					if ( l_oValue.is_empty ( ) )
+					if ( l_oValue.is_empty() )
 						{
 						l_oValue.format ( "[%s]", a_pcSection );
 						if ( l_oOption == l_oValue )
@@ -256,7 +256,7 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 			}
 		}
 	if ( l_oRc )
-		l_oRc.close ( );
+		l_oRc.close();
 	log << "done." << endl;
 	return ( 0 );
 	M_EPILOG
@@ -308,7 +308,7 @@ int read_rc_line ( HString & a_roOption, HString & a_roValue, HFile & a_roFile,
 	while ( a_roFile.read_line ( a_roOption, HFile::D_STRIP_NEWLINES ) >= 0 )
 		{
 		a_riLine ++;
-		l_pcBuffer = a_roOption.raw ( );
+		l_pcBuffer = a_roOption.raw();
 		l_iIndex = 0;
 		if ( ! l_pcBuffer [ l_iIndex ] )
 			continue; /* empty line */

@@ -43,11 +43,11 @@ namespace dbwrapper
 char n_pcEMode [ ] = "record set is not in appropriate mode for operation";
 
 HRecordSet::HRecordSet ( HDataBase * a_poDataBase )
-	: f_pvCoreData ( NULL ), f_oSQL ( ), f_oVarTmpBuffer ( ), f_iIdFieldOffset ( - 1 ),
+	: f_pvCoreData ( NULL ), f_oSQL(), f_oVarTmpBuffer(), f_iIdFieldOffset ( - 1 ),
 	f_iFieldCount ( 0 ), f_eMode ( D_CLOSED ), f_iCursorPosition ( 0 ), 
-	f_iSetQuantity ( 0 ), f_oTable ( ), f_oColumns ( "*" ), f_oFilter ( ), 
-	f_oSort ( ), f_oColumnNames ( ), f_oValues ( ), f_poDataBase ( a_poDataBase ), 
-	m_oFilter ( ), m_oSort ( ), m_lId ( 0 )
+	f_iSetQuantity ( 0 ), f_oTable(), f_oColumns ( "*" ), f_oFilter(), 
+	f_oSort(), f_oColumnNames(), f_oValues(), f_poDataBase ( a_poDataBase ), 
+	m_oFilter(), m_oSort(), m_lId ( 0 )
 	{
 	M_PROLOG
 	return;
@@ -90,24 +90,24 @@ void HRecordSet::build_sql ( void )
 			{
 			f_oSQL.format ( "SELECT %s FROM %s", static_cast < char const * > ( f_oColumns ),
 					static_cast < char const * > ( f_oTable ) );
-			if ( f_oFilter.is_empty ( ) )
+			if ( f_oFilter.is_empty() )
 				f_oVarTmpBuffer = m_oFilter;
-			else if ( m_oFilter.is_empty ( ) )
+			else if ( m_oFilter.is_empty() )
 				f_oVarTmpBuffer = f_oFilter;
 			else
 				f_oVarTmpBuffer.format ( "%s AND ( %s )", static_cast < char const * > ( f_oFilter ),
 					static_cast < char const * > ( m_oFilter ) );
-			if ( ! f_oVarTmpBuffer.is_empty ( ) )
+			if ( ! f_oVarTmpBuffer.is_empty() )
 				f_oSQL += ( " WHERE " + f_oVarTmpBuffer );
 			f_oVarTmpBuffer = "";
-			if ( f_oSort.is_empty ( ) )
+			if ( f_oSort.is_empty() )
 				f_oVarTmpBuffer = m_oSort;
-			else if ( m_oSort.is_empty ( ) )
+			else if ( m_oSort.is_empty() )
 				f_oVarTmpBuffer = f_oSort;
 			else
 				f_oVarTmpBuffer.format ( "%s, %s", static_cast < char const * > ( m_oSort ),
 					static_cast < char const * > ( f_oSort ) );
-			if ( ! f_oVarTmpBuffer.is_empty ( ) )
+			if ( ! f_oVarTmpBuffer.is_empty() )
 				f_oSQL += ( " ORDER BY " + f_oVarTmpBuffer );
 			f_oSQL += ';';
 			}
@@ -119,7 +119,7 @@ void HRecordSet::build_sql ( void )
 				{
 				if ( l_iCtr == f_iIdFieldOffset )
 					continue;
-				if ( ! f_oVarTmpBuffer.is_empty ( ) )
+				if ( ! f_oVarTmpBuffer.is_empty() )
 					f_oVarTmpBuffer += ", ";
 				f_oVarTmpBuffer += f_oColumnNames [ l_iCtr ] + " = '" + f_oValues [ l_iCtr ] + '\'';
 				}
@@ -136,7 +136,7 @@ void HRecordSet::build_sql ( void )
 				{
 				if ( l_iCtr == f_iIdFieldOffset )
 					continue;
-				if ( ! f_oVarTmpBuffer.is_empty ( ) )
+				if ( ! f_oVarTmpBuffer.is_empty() )
 					f_oVarTmpBuffer += ", ";
 				f_oVarTmpBuffer += f_oColumnNames [ l_iCtr ];
 				}
@@ -147,7 +147,7 @@ void HRecordSet::build_sql ( void )
 				{
 				if ( l_iCtr == f_iIdFieldOffset )
 					continue;
-				if ( ! f_oVarTmpBuffer.is_empty ( ) )
+				if ( ! f_oVarTmpBuffer.is_empty() )
 					f_oVarTmpBuffer += ", ";
 				f_oVarTmpBuffer += '\'' + f_oValues [ l_iCtr ] + '\'';
 				}
@@ -171,29 +171,29 @@ int long HRecordSet::open ( char const * a_pcQuery )
 	if ( a_pcQuery )
 		f_oSQL = a_pcQuery;
 	else
-		build_sql ( );
-	free ( );
+		build_sql();
+	free();
 	f_iCursorPosition = 0;
 	f_iSetQuantity = f_poDataBase->query ( f_oSQL );
 	if ( f_iSetQuantity < 0 )
-		log ( LOG_TYPE::D_ERROR ) << "SQL error (query): " << f_poDataBase->get_error ( ) << endl;
-	f_pvCoreData = f_poDataBase->get_result ( );
+		log ( LOG_TYPE::D_ERROR ) << "SQL error (query): " << f_poDataBase->get_error() << endl;
+	f_pvCoreData = f_poDataBase->get_result();
 	f_iFieldCount = dbwrapper::rs_fields_count ( f_pvCoreData );
 	if ( f_iFieldCount < 0 )
-		log ( LOG_TYPE::D_ERROR ) << "SQL error (fiels count): " << f_poDataBase->get_error ( ) << endl;
+		log ( LOG_TYPE::D_ERROR ) << "SQL error (fiels count): " << f_poDataBase->get_error() << endl;
 	f_eMode = D_NORMAL;
-	f_oColumnNames.flush ( );
-	f_oValues.flush ( );
+	f_oColumnNames.flush();
+	f_oValues.flush();
 	for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 		{
-		f_oColumnNames.add_tail ( ) = dbwrapper::rs_column_name ( f_pvCoreData,
+		f_oColumnNames.add_tail() = dbwrapper::rs_column_name ( f_pvCoreData,
 				l_iCtr );
-		if ( f_oColumnNames.tail ( ) == "id" )
+		if ( f_oColumnNames.tail() == "id" )
 			f_iIdFieldOffset = l_iCtr;
-		f_oValues.add_tail ( );
+		f_oValues.add_tail();
 		}
 	if ( f_iSetQuantity > 0 )
-		sync ( );
+		sync();
 	return ( f_iSetQuantity );
 	M_EPILOG
 	}
@@ -203,7 +203,7 @@ void HRecordSet::close ( void )
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
 		M_THROW ( n_pcEMode, f_eMode );
-	free ( );
+	free();
 	f_eMode = D_CLOSED;
 	M_EPILOG
 	}
@@ -230,11 +230,11 @@ void HRecordSet::free ( void )
 int long HRecordSet::requery ( char const * a_pcQuery )
 	{
 	M_PROLOG
-	close ( );
+	close();
 	if ( a_pcQuery )
 		f_oSQL = a_pcQuery;
 	else
-		build_sql ( );
+		build_sql();
 	return ( open ( f_oSQL ) );
 	M_EPILOG
 	}
@@ -267,7 +267,7 @@ void HRecordSet::move_next ( void )
 	if ( f_iCursorPosition > f_iSetQuantity )
 		M_THROW ( "end of set reached", f_iCursorPosition );
 	if ( f_iCursorPosition < f_iSetQuantity )
-		sync ( );
+		sync();
 	return;
 	M_EPILOG
 	}
@@ -282,7 +282,7 @@ void HRecordSet::move_previous ( void )
 		M_THROW ( "beginning of set reached",
 				f_iCursorPosition );
 	if ( f_iCursorPosition >= 0 )
-		sync ( );
+		sync();
 	return;
 	M_EPILOG
 	}
@@ -293,7 +293,7 @@ void HRecordSet::move_first ( void )
 	if ( f_eMode != D_NORMAL )
 		M_THROW ( n_pcEMode, f_eMode );
 	f_iCursorPosition = 0;
-	sync ( );
+	sync();
 	return;
 	M_EPILOG
 	}
@@ -304,7 +304,7 @@ void HRecordSet::move_last ( void )
 	if ( f_eMode != D_NORMAL )
 		M_THROW ( n_pcEMode, f_eMode );
 	f_iCursorPosition = f_iSetQuantity - 1;
-	sync ( );
+	sync();
 	return;
 	M_EPILOG
 	}
@@ -344,14 +344,14 @@ int long HRecordSet::update ( void )
 	int long l_iRetVal = 0;
 	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
 		M_THROW ( n_pcEMode, f_eMode );
-	sync ( );
-	build_sql ( );
+	sync();
+	build_sql();
 	f_poDataBase->query ( f_oSQL );
 	if ( f_eMode == D_ADDING )
-		l_iRetVal = f_poDataBase->insert_id ( );
-	f_poDataBase->free_result ( );
+		l_iRetVal = f_poDataBase->insert_id();
+	f_poDataBase->free_result();
 	f_eMode = D_NORMAL;
-	requery ( );
+	requery();
 	return ( l_iRetVal );
 	M_EPILOG
 	}
@@ -365,8 +365,8 @@ void HRecordSet::remove ( void )
 	f_oSQL.format ( "DELETE FROM %s WHERE id = %ld;",
 			static_cast < char const * > ( f_oTable ), m_lId );
 	f_poDataBase->query ( f_oSQL );
-	f_poDataBase->free_result ( );
-	requery ( );
+	f_poDataBase->free_result();
+	requery();
 	if ( f_iSetQuantity > 0 )
 		{
 		if ( l_iCursorPosition >= f_iSetQuantity )
@@ -385,7 +385,7 @@ void HRecordSet::sync ( int a_iField, char & a_rcChar )
 	if ( f_eMode == D_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )
+		if ( ! l_oTmp.is_empty() )
 			a_rcChar = l_oTmp [ 0 ];
 		}
 	else
@@ -401,7 +401,7 @@ void HRecordSet::sync ( int a_iField, short & a_rhShort )
 	if ( f_eMode == D_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )
+		if ( ! l_oTmp.is_empty() )
 			a_rhShort = static_cast < short > ( atoi ( l_oTmp ) );
 		}
 	else
@@ -417,7 +417,7 @@ void HRecordSet::sync ( int a_iField, int & a_riInt )
 	if ( f_eMode == D_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )
+		if ( ! l_oTmp.is_empty() )
 			a_riInt = atoi ( l_oTmp );
 		}
 	else
@@ -433,7 +433,7 @@ void HRecordSet::sync ( int a_iField, int long & a_rlLongInt )
 	if ( f_eMode == D_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )
+		if ( ! l_oTmp.is_empty() )
 			a_rlLongInt = atol ( l_oTmp );
 		}
 	else
@@ -449,7 +449,7 @@ void HRecordSet::sync ( int a_iField, double & a_rdDouble )
 	if ( f_eMode == D_NORMAL )
 		{
 		l_oTmp = get ( a_iField );
-		if ( ! l_oTmp.is_empty ( ) )
+		if ( ! l_oTmp.is_empty() )
 			a_rdDouble = atof ( l_oTmp );
 		}
 	else
@@ -498,7 +498,7 @@ void HRecordSet::sync ( int a_iField, HInfo & a_roInfo )
 		a_roInfo ( static_cast < char const * > ( l_oTmp ) );
 		}
 	else
-		f_oValues [ a_iField ] = a_roInfo.get < HString const & > ( );
+		f_oValues [ a_iField ] = a_roInfo.get < HString const & >();
 	return;
 	M_EPILOG
 	}

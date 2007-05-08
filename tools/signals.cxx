@@ -76,7 +76,7 @@ public:
 /*}*/
 	} g_oSigStack;
 
-HSigStackWrapper::HSigStackWrapper ( void ) : f_sStack ( )
+HSigStackWrapper::HSigStackWrapper ( void ) : f_sStack()
 	{
 	f_sStack.ss_sp = NULL;
 	f_sStack.ss_size = 0;
@@ -105,9 +105,9 @@ void HSigStackWrapper::create_stack ( void )
 	f_sStack.ss_flags = 0;
 	l_iError = sigaltstack ( & f_sStack, NULL );
 	if ( l_iError )
-		M_THROW ( "sigaltstack ( )", l_iError );
+		M_THROW ( "sigaltstack()", l_iError );
 	if ( f_sStack.ss_flags )
-		M_THROW ( "sigaltstack ( ) failed to set stack", errno );
+		M_THROW ( "sigaltstack() failed to set stack", errno );
 	return;
 	M_EPILOG
 	}
@@ -157,7 +157,7 @@ void signal_WINCH ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )
+	if ( is_enabled() )
 		{
 		n_bInputWaiting = true;
 		ungetch ( KEY < 'l' >::ctrl );
@@ -186,7 +186,7 @@ void signal_INT ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )
+	if ( is_enabled() )
 		leave_curses();
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -209,7 +209,7 @@ void signal_TERM ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )
+	if ( is_enabled() )
 		leave_curses();
 #endif
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -227,7 +227,7 @@ void signal_QUIT ( int a_iSignum )
 	if ( tools::n_bIgnoreSignalSIGQUIT )
 		{
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-		if ( is_enabled ( ) )
+		if ( is_enabled() )
 			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Hard Quit is disabled by yaal configuration." );
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
@@ -241,7 +241,7 @@ void signal_QUIT ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )
+	if ( is_enabled() )
 		leave_curses();
 #endif
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -259,7 +259,7 @@ void signal_TSTP ( int a_iSignum )
 	if ( tools::n_bIgnoreSignalSIGINT )
 		{
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-		if ( is_enabled ( ) )
+		if ( is_enabled() )
 			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Suspend is disabled by yaal configuration." );
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
@@ -273,7 +273,7 @@ void signal_TSTP ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )
+	if ( is_enabled() )
 		leave_curses();
 #endif
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -296,9 +296,9 @@ void signal_CONT ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( ! is_enabled ( ) )
+	if ( ! is_enabled() )
 		enter_curses();
-	if ( is_enabled ( ) )
+	if ( is_enabled() )
 		{
 		n_bInputWaiting = true;
 		ungetch ( KEY < 'l' >::ctrl );
@@ -324,7 +324,7 @@ void signal_fatal ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )
+	if ( is_enabled() )
 		leave_curses();
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -340,7 +340,7 @@ void signal_USR1 ( int a_iSignum )
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 	if ( n_bUseMouse )
 		{
-		if ( is_enabled ( ) )
+		if ( is_enabled() )
 			{
 			n_bInputWaiting = true;
 			ungetch ( KEY_CODES::D_MOUSE );
@@ -358,7 +358,7 @@ void signal_USR1 ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled ( ) )
+	if ( is_enabled() )
 		leave_curses();
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -373,7 +373,7 @@ void signal_USR1 ( int a_iSignum )
 void set_handlers ( void )
 	{
 	M_PROLOG
-	g_oSigStack.create_stack ( );
+	g_oSigStack.create_stack();
 	install_special ( signals::signal_USR1, SIGUSR1 );
 	install_special ( signals::signal_WINCH, SIGWINCH );
 	if ( signal ( SIGINT, signals::signal_INT ) == SIG_IGN )

@@ -152,7 +152,7 @@ tType const & HSBBSTree::HIterator::operator * ( void )
 
 template < typename tType >
 HSBBSTree::HNode < tType >::HNode ( tType const & a_tKey )
-	: HAbstractNode ( ), f_tKey ( a_tKey )
+	: HAbstractNode(), f_tKey ( a_tKey )
 	{
 	return;
 	}

@@ -134,7 +134,7 @@ int HTUIProcess::process_stdin( int a_iCode )
 	HString l_oCommand;
 	n_bInputWaiting = false;
 	if ( ! a_iCode )
-		a_iCode = get_key ( );
+		a_iCode = get_key();
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && !! (*f_oForegroundWindow) )
@@ -196,7 +196,7 @@ int HTUIProcess::handler_alert( int, void* )
 	if ( n_bNeedRepaint )
 		{
 		n_bNeedRepaint = false;
-		c_refresh ( );
+		c_refresh();
 		}
 	return ( 0 );
 	M_EPILOG
@@ -219,13 +219,13 @@ int HTUIProcess::handler_idle( int a_iCode, void* )
 	M_PROLOG
 #ifdef __DEBUG__
 	HString l_oClock( static_cast<char const *>( HTime() ) );
-	c_printf( 0, n_iWidth - l_oClock.get_length ( ),
+	c_printf( 0, n_iWidth - l_oClock.get_length(),
 			COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, l_oClock );
 	n_bNeedRepaint = true;
 #endif /* __DEBUG__ */
 	if ( !! (*f_oForegroundWindow) )
 		{
-		HStatusBarControl::ptr_t& l_oStatusBar = (*f_oForegroundWindow)->status_bar ( );
+		HStatusBarControl::ptr_t& l_oStatusBar = (*f_oForegroundWindow)->status_bar();
 		if ( !! l_oStatusBar )
 			l_oStatusBar->refresh();
 		}
@@ -264,7 +264,7 @@ int HTUIProcess::handler_refresh( int, void* )
 	M_PROLOG
 	endwin();
 	n_bNeedRepaint = false;
-	clrscr(); /* there is ::refresh ( ) call inside */
+	clrscr(); /* there is ::refresh() call inside */
 	kbhit(); /* cleans all trash from stdio buffer */
 	c_getmaxyx( n_iHeight, n_iWidth );
 	if ( f_oForegroundWindow.is_valid() && ( !! (*f_oForegroundWindow) ) )

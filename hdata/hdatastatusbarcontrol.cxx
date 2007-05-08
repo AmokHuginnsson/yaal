@@ -53,14 +53,14 @@ void HDataStatusBarControl::do_draw_label ( void )
 	{
 	M_PROLOG
 	HDataWindow * l_poWindow = NULL;
-	HStatusBarControl::draw_label ( );
+	HStatusBarControl::draw_label();
 	l_poWindow = dynamic_cast < HDataWindow * > ( f_poParent );
 	M_ASSERT ( l_poWindow );
-	if ( l_poWindow->is_modified ( ) )
+	if ( l_poWindow->is_modified() )
 		{
-		set_attr_shortcut ( );
+		set_attr_shortcut();
 		c_mvprintf ( n_iHeight - 2, f_iLabelLength - 4, "[+]" );
-		set_attr_data ( );
+		set_attr_data();
 		}
 	return;
 	M_EPILOG

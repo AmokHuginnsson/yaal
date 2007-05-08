@@ -73,7 +73,7 @@ public:
 	bool operator < ( HString const & ) const;
 	bool operator < ( char const * const ) const;
 	/* add_* functions in HList needs operator
-		 bool ( ) operator char * works fine here */
+		 bool() operator char * works fine here */
 	operator char const * const ( void ) const;
 	char * raw ( void ) const;
 	bool is_empty ( void ) const;

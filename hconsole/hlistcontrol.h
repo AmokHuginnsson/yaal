@@ -298,7 +298,7 @@ protected:
 		int f_iColumnWithMatch;
 		int f_iMatchNumber;
 		iterator_t	f_oCurrentMatch;		/* row that has current pattern match */
-		match_t ( ) : f_iColumnWithMatch ( 0 ), f_iMatchNumber ( - 1 ), f_oCurrentMatch() { }
+		match_t() : f_iColumnWithMatch ( 0 ), f_iMatchNumber ( - 1 ), f_oCurrentMatch() { }
 		} f_sMatch;
 	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
 	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */

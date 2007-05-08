@@ -48,7 +48,7 @@ char const * const HCollector::PROTOCOL::D_SYN = "SYN\n";
 char const * const HCollector::PROTOCOL::D_ACK = "ACK\n";
 char const * const HCollector::PROTOCOL::D_DTA = "DTA"; /* warrning! no endline */
 char const * const HCollector::PROTOCOL::D_FIN = "FIN"; /* warrning! no endline, but \0 at end,
-																																	so sizeof ( ) retruns 4 */
+																																	so sizeof() retruns 4 */
 char const * const HCollector::PROTOCOL::D_ERR = "ERR\n";
 
 int const HCollector::PROTOCOL::D_RECV_BUF_SIZE; /* 5 should be enought but you never know */
@@ -94,7 +94,7 @@ int HCollector::send_line ( char const * a_pcLine )
 	if ( l_iLength < 1 )
 		return ( 0 );
 	l_oLocalCopy = a_pcLine;
-	l_pcSpeedUp = l_oLocalCopy.raw ( );
+	l_pcSpeedUp = l_oLocalCopy.raw();
 	if ( a_pcLine [ l_iLength - 1 ] == '\n' )
 		{
 		l_iLength --;
@@ -111,7 +111,7 @@ int HCollector::send_line ( char const * a_pcLine )
 		{
 		flush ( TCOFLUSH );
 		l_iCtr = HRawFile::write ( l_oLine, l_iLength );
-		wait_for_eot ( );
+		wait_for_eot();
 		memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
 		HRawFile::read ( f_pcReadBuf, PROTOCOL::D_RECV_BUF_SIZE );
 		flush ( TCIFLUSH );
@@ -133,10 +133,10 @@ int HCollector::receive_line ( char * & a_pcLine )
 	/* P prefix means sender transmission side data */
 	while ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
 		{
-		memset ( f_oLine.raw ( ), 0, PROTOCOL::D_BUF_SIZE );
-		HRawFile::read ( f_oLine.raw ( ), PROTOCOL::D_BUF_SIZE );
+		memset ( f_oLine.raw(), 0, PROTOCOL::D_BUF_SIZE );
+		HRawFile::read ( f_oLine.raw(), PROTOCOL::D_BUF_SIZE );
 		flush ( TCIFLUSH );
-		a_pcLine = f_oLine.raw ( )
+		a_pcLine = f_oLine.raw()
 			+ strlen ( PROTOCOL::D_DTA ) + 2 /* for lenght */ + 2 /* for crc */;
 		l_iLength = strlen ( a_pcLine ) - 1;
 		a_pcLine [ l_iLength ] = 0;
@@ -157,7 +157,7 @@ int HCollector::receive_line ( char * & a_pcLine )
 		}
 	flush ( TCOFLUSH );
 	l_iError += ( l_iAckLenght - HRawFile::write ( PROTOCOL::D_ACK, l_iAckLenght ) );
-	wait_for_eot ( );
+	wait_for_eot();
 	f_iLines ++;
 	return ( l_iError );
 	M_EPILOG
@@ -181,7 +181,7 @@ int HCollector::establish_connection ( int a_iTimeOut )
 		flush ( TCOFLUSH );
 		if ( HRawFile::write ( PROTOCOL::D_SYN, l_iLenght ) != l_iLenght )
 			M_THROW ( "write", l_iLenght );
-		wait_for_eot ( );
+		wait_for_eot();
 		if ( tcsendbreak ( f_iFileDescriptor, 0 ) )
 			M_THROW ( "tcsendbreak", errno );
 		memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );

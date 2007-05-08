@@ -47,6 +47,7 @@ public:
 	typedef yaal::hcore::HPointer<HWindow, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
 protected:
 	bool								f_bInitialised;		/* was window properly initialised? */
+	bool								f_bNeedRepaint;		/*!< \brief Does this window need to be repainted? */
 	hcore::HString			f_oTitle;					/* title of window */
 	HControlList::model_t::cyclic_iterator	f_oFocusedChild;	/* points to control that has focus */
 	HControlList::model_t::cyclic_iterator f_oPreviousFocusedChild; /* control that had focus before
@@ -70,6 +71,10 @@ public:
 	bool is_initialised ( void ) const;
 	void update_all( void );
 	yaal::hcore::HString const& get_title( void ) const;
+
+/*! \brief Schedule full refresh on next refresh cycle.
+ */
+	void schedule_refresh( void );
 private:
 	friend int HControl::set_focus ( char );
 	friend void HStatusBarControl::set_prompt ( char const *,

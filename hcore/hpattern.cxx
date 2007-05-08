@@ -39,8 +39,8 @@ namespace hcore
 
 HPattern::HPattern ( bool const a_bIgnoreCase ) : f_bInitialized ( false ),
 	f_bIgnoreCaseDefault ( a_bIgnoreCase ), f_bIgnoreCase ( false ),
-	f_bExtended ( false ), f_iSimpleMatchLength ( 0 ), f_sCompiled ( ),
-	f_oPatternInput ( ), f_oPatternReal ( ), f_oError ( )
+	f_bExtended ( false ), f_iSimpleMatchLength ( 0 ), f_sCompiled(),
+	f_oPatternInput(), f_oPatternReal(), f_oError()
 	{
 	M_PROLOG
 	memset ( & f_sCompiled, 0, sizeof ( f_sCompiled ) );
@@ -105,7 +105,7 @@ int HPattern::parse ( char const * const a_pcPattern,
 		l_oLocalCopyFlags [ l_iCtrLoc ] = a_puhFlags [ l_iCtrLoc ];
 /* end of copy */
 /* look for switches at the end of pattern */
-	l_iEnd = l_iCtr = f_oPatternInput.get_length ( ) - 1;
+	l_iEnd = l_iCtr = f_oPatternInput.get_length() - 1;
 	if ( l_iEnd < 0 )
 		return ( true );
 	while ( ( l_iCtr > 0 ) && ( l_pcPattern [ l_iCtr ] != '/' ) )
@@ -125,7 +125,7 @@ int HPattern::parse ( char const * const a_pcPattern,
 /* end of looking at end */
 	f_oError = f_oPatternReal = f_oPatternInput.mid ( l_iBegin,
 			( l_iEnd - l_iBegin ) + 1 );
-	f_iSimpleMatchLength = f_oPatternReal.get_length ( );
+	f_iSimpleMatchLength = f_oPatternReal.get_length();
 	if ( ! f_iSimpleMatchLength )
 		{
 		l_iError = - 1;
@@ -250,7 +250,7 @@ void HPattern::prepare_error_message ( int const a_iError,
 	int l_iSize = regerror ( a_iError, & f_sCompiled, NULL, 0 ) + 1;
 	f_oError.hs_realloc ( l_iSize + 1 );
 	M_ENSURE ( static_cast < int > ( regerror ( a_iError, & f_sCompiled,
-					f_oError.raw ( ), l_iSize ) ) < l_iSize );
+					f_oError.raw(), l_iSize ) ) < l_iSize );
 	if ( a_pcString )
 		{
 		f_oError += ": `";

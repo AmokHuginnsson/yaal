@@ -183,7 +183,7 @@ HString kwota_slownie ( double a_dKwota )
 	HString l_oString;
 	HString l_oPrzypadek;
 	l_oString.format ( "%.2f", a_dKwota );
-	l_iLength = l_oString.get_length ( );
+	l_iLength = l_oString.get_length();
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
 		{
 		if ( ( l_iCtr % 3 ) == 0 )
@@ -253,7 +253,7 @@ double atof_ex ( char const * a_pcString, bool a_bParse )
 	l_oStr.replace ( " ", "" );
 	l_oStr.replace ( "\t", "" );
 	if ( a_bParse && l_oAnalyser.analyse ( l_oStr ) )
-		return ( l_oAnalyser.count ( ) );
+		return ( l_oAnalyser.count() );
 	return ( strtod ( l_oStr, NULL ) );
 	}
 
@@ -266,15 +266,15 @@ int modulo_ASCII ( char const * const a_pcASCIINumber, int a_iModulo )
 		M_THROW ( "bad ASCII number length", l_iLength );
 	if ( ! a_iModulo )
 		M_THROW ( "zero denominatior", a_iModulo );
-	while ( l_oTmpNumber.get_length ( ) > D_STEP_LENGTH )
+	while ( l_oTmpNumber.get_length() > D_STEP_LENGTH )
 		{
 		l_oTmpString = l_oTmpNumber.mid ( l_iStep * D_STEP_LENGTH, D_STEP_LENGTH );
-		l_iTmpLength = l_oTmpString.get_length ( );
+		l_iTmpLength = l_oTmpString.get_length();
 		l_iNumber = strtol ( l_oTmpString, NULL, 10 );
 		l_iNumber %= a_iModulo;
 		l_oTmpString.format ( "%d", l_iNumber );
-		l_oTmpNumber.shift_left ( l_iTmpLength - l_oTmpString.get_length ( ) );
-		l_iTmpLength = l_oTmpString.get_length ( );
+		l_oTmpNumber.shift_left ( l_iTmpLength - l_oTmpString.get_length() );
+		l_iTmpLength = l_oTmpString.get_length();
 		for ( l_iCtr = 0; l_iCtr < l_iTmpLength; l_iCtr ++ )
 			l_oTmpNumber [ l_iCtr ] = l_oTmpString [ l_iCtr ];
 /*		M_LOG ( l_oTmpNumber ); */
@@ -296,7 +296,7 @@ bool verify_IBAN ( char const * a_pcIBAN )
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
 		if ( isalnum ( a_pcIBAN [ l_iCtr ] ) )
 			l_oIBAN += a_pcIBAN [ l_iCtr ];
-	l_iLength = l_oIBAN.get_length ( );
+	l_iLength = l_oIBAN.get_length();
 	if ( l_iLength < D_MIN_IBAN_LENGTH )
 		{
 		n_oLastErrorMessage.format ( "IBAN: Number too short (%d).", l_iLength );
@@ -311,7 +311,7 @@ bool verify_IBAN ( char const * a_pcIBAN )
 	l_oIBAN.shift_left ( 4 );
 	l_oIBAN += l_oTmpString;
 /*	M_LOG ( l_oIBAN ); */
-	l_oIBAN.lower ( );
+	l_oIBAN.lower();
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
 		{
 		if ( isalpha ( l_oIBAN [ l_iCtr ] ) )
@@ -319,7 +319,7 @@ bool verify_IBAN ( char const * a_pcIBAN )
 			l_oTmpString.format ( "%02d", ( l_oIBAN [ l_iCtr ] - 'a' ) + 10 );
 			l_pcPattern [ 0 ] = l_oIBAN [ l_iCtr ];
 			l_oIBAN.replace ( l_pcPattern, l_oTmpString );
-			l_iLength = l_oIBAN.get_length ( );
+			l_iLength = l_oIBAN.get_length();
 			}
 		}
 /*	M_LOG ( l_oIBAN ); */
@@ -383,9 +383,9 @@ int levenshtein_damerau ( char const * const a_pcOne, char const * const a_pcTwo
 	l_iLengthTwo ++;
 	HPointer < int *, HPointerArray, HPointerRelaxed > l_oDistanceMatrixHolder ( new int * [ l_iLengthOne ] );
 	HPointer < int, HPointerArray, HPointerRelaxed > l_oDistanceMatrix ( new int [ l_iLengthOne * l_iLengthTwo ] );
-	l_ppiDistanceMatrix = l_oDistanceMatrixHolder.raw ( );
+	l_ppiDistanceMatrix = l_oDistanceMatrixHolder.raw();
 	for ( l_iIndexOne = 0; l_iIndexOne < l_iLengthOne; ++ l_iIndexOne )
-		l_ppiDistanceMatrix [ l_iIndexOne ] = l_oDistanceMatrix.raw ( ) + l_iIndexOne * l_iLengthTwo;
+		l_ppiDistanceMatrix [ l_iIndexOne ] = l_oDistanceMatrix.raw() + l_iIndexOne * l_iLengthTwo;
 	for ( l_iIndexOne = 0; l_iIndexOne < l_iLengthOne; ++ l_iIndexOne )
 		l_ppiDistanceMatrix [ l_iIndexOne ] [ 0 ] = l_iIndexOne;
 	for ( l_iIndexTwo = 0; l_iIndexTwo < l_iLengthTwo; ++ l_iIndexTwo )

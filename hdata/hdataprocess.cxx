@@ -46,7 +46,7 @@ namespace hdata
 {
 
 HDataProcess::HDataProcess ( void )
-	: HTUIProcess ( ), f_oDataBase ( ), f_psRootMenu ( NULL )
+	: HTUIProcess(), f_oDataBase(), f_psRootMenu ( NULL )
 	{
 	M_PROLOG
 	return;
@@ -93,7 +93,7 @@ OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode & a_rsNode,
 	OMenuItem l_sMenuItem, * l_psMenu = NULL;
 	HXml::ONode * l_psNode = NULL;
 	HList < OMenuItem > l_oSubMenu;
-	if ( ! a_rsNode.f_oChilds.size ( ) )
+	if ( ! a_rsNode.f_oChilds.size() )
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
 
 	if ( a_rsNode.f_oName == "menu" )
@@ -101,20 +101,20 @@ OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode & a_rsNode,
 		for ( l_psNode = & a_rsNode.f_oChilds.go ( 0 ); l_psNode;
 				l_psNode = a_rsNode.f_oChilds.to_tail ( 1, HList<HXml::ONode>::D_TREAT_AS_OPENED ) )
 			{
-			l_sMenuItem.reset ( );
+			l_sMenuItem.reset();
 			build_menu_item ( * l_psNode, l_sMenuItem, a_roHandlers );
 			l_oSubMenu.add_tail ( & l_sMenuItem );
 			}
 		}
 	else
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.f_oName
-				+ '=' + a_rsNode.f_oContents.head ( ), errno );
-	l_sMenuItem.reset ( );
+				+ '=' + a_rsNode.f_oContents.head(), errno );
+	l_sMenuItem.reset();
 	l_oSubMenu.add_tail ( & l_sMenuItem );
-	l_psMenu = new OMenuItem [ l_iCount = l_oSubMenu.size ( ) ];
+	l_psMenu = new OMenuItem [ l_iCount = l_oSubMenu.size() ];
 	l_oSubMenu.go ( - 1 );
 	for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-		l_psMenu [ l_iCtr ] = ( * l_oSubMenu.to_tail ( ) );
+		l_psMenu [ l_iCtr ] = ( * l_oSubMenu.to_tail() );
 	return ( l_psMenu );
 	M_EPILOG
 	}
@@ -126,7 +126,7 @@ void HDataProcess::build_menu_item ( HXml::ONode & a_rsNode,
 	char const * const l_pcError = _ ( "malformed resource file (menu section)" );
 	char const * const l_pcUnexpected = _ ( ": unexpected node: " );
 	HXml::ONode * l_psNode = NULL;
-	if ( ! a_rsNode.f_oChilds.size ( ) )
+	if ( ! a_rsNode.f_oChilds.size() )
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
 
 	if ( a_rsNode.f_oName == "menu_item" )
@@ -135,24 +135,24 @@ void HDataProcess::build_menu_item ( HXml::ONode & a_rsNode,
 				l_psNode = a_rsNode.f_oChilds.to_tail ( 1, HList<HXml::ONode>::D_TREAT_AS_OPENED ) )
 			{
 			if ( l_psNode->f_oName == "label" )
-				a_rsMenuItem.f_oLabel = l_psNode->f_oContents.head ( );
+				a_rsMenuItem.f_oLabel = l_psNode->f_oContents.head();
 			else if ( l_psNode->f_oName == "handler" )
 				{
-				if ( ! a_roHandlers.get ( l_psNode->f_oContents.head ( ),
+				if ( ! a_roHandlers.get ( l_psNode->f_oContents.head(),
 							a_rsMenuItem.HANDLER ) )
 					M_THROW ( HString ( _ ( "no such handler: " ) )
-							+ l_psNode->f_oContents.head ( ), errno );
+							+ l_psNode->f_oContents.head(), errno );
 				}
 			else if ( l_psNode->f_oName == "menu" )
 				a_rsMenuItem.f_psSubMenu = build_sub_menu ( * l_psNode, a_roHandlers );
 			else
 				M_THROW ( HString ( l_pcError ) + l_pcUnexpected + l_psNode->f_oName
-						+ '=' + l_psNode->f_oContents.head ( ), errno );
+						+ '=' + l_psNode->f_oContents.head(), errno );
 			}
 		}
 	else
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.f_oName
-				+ '=' + a_rsNode.f_oContents.head ( ), errno );
+				+ '=' + a_rsNode.f_oContents.head(), errno );
 	return;
 	M_EPILOG
 	}
@@ -162,7 +162,7 @@ void HDataProcess::destroy_menu ( OMenuItem * a_psMenu )
 	M_PROLOG
 	int l_iCtr = 0;
 	M_ASSERT ( a_psMenu );
-	while ( ! a_psMenu [ l_iCtr ].f_oLabel.is_empty ( ) )
+	while ( ! a_psMenu [ l_iCtr ].f_oLabel.is_empty() )
 		{
 		if ( a_psMenu [ l_iCtr ].f_psSubMenu )
 			destroy_menu ( a_psMenu [ l_iCtr ].f_psSubMenu );
@@ -182,7 +182,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 	{
 	M_PROLOG
 	HDataWindow * l_poWindow = NULL;
-	if ( f_oWindows->size ( ) )
+	if ( f_oWindows->size() )
 		{
 		model_t::iterator it = f_oWindows->begin();
 		if ( it != f_oWindows->end() )
@@ -211,8 +211,8 @@ int HDataProcess::handler_close_window ( int a_iCode, void * )
 		{
 		l_poWindow = dynamic_cast<HDataWindow*> ( &*f_oForegroundWindow );
 		if ( l_poWindow
-				&& l_poWindow->is_modified ( )
-				&& ! l_poWindow->status_bar ( )->confirm ( "close window" ) )
+				&& l_poWindow->is_modified()
+				&& ! l_poWindow->status_bar()->confirm ( "close window" ) )
 			return ( 0 );
 		}
 	return ( HTUIProcess::handler_close_window ( a_iCode ) );

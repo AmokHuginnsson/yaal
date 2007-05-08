@@ -146,8 +146,8 @@ void dbwrapper_fini ( void )
 #ifndef __HOST_OS_TYPE_FREEBSD__
 		if ( dlclose ( dbwrapper::n_pvDlHandle ) )
 			{
-			dbwrapper_error ( );
-			dbwrapper_exit ( );
+			dbwrapper_error();
+			dbwrapper_exit();
 			}
 		else
 #endif /* not __HOST_OS_TYPE_FREEBSD__ */
@@ -172,10 +172,10 @@ void yaal_dbwrapper_main ( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
 		{
-		yaal_hcore_banner ( );
-		yaal_hconsole_banner ( );
-		yaal_tools_banner ( );
-		yaal_dbwrapper_banner ( );
+		yaal_hcore_banner();
+		yaal_hconsole_banner();
+		yaal_tools_banner();
+		yaal_dbwrapper_banner();
 		}
 	exit ( 0 );
 	}

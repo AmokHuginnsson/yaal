@@ -68,7 +68,7 @@ bool const set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
 		{
-		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty ( ) )
+		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty() )
 			{
 			if ( ! strcasecmp ( l_oStr, "LOG_DEBUG" ) )
 				n_lLogMask |= LOG_TYPE::D_DEBUG;
@@ -151,7 +151,7 @@ void yaal_hcore_main ( void ) __attribute__(( __noreturn__ ));
 void yaal_hcore_main ( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
-		yaal_hcore_banner ( );
+		yaal_hcore_banner();
 	exit ( 0 );
 	}
 

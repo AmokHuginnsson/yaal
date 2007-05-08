@@ -37,7 +37,7 @@ namespace hconsole
 {
 
 HLogPad::HLogLine::HLogLine ( void )
-	: f_eType ( D_NONE ), f_iAttribute ( COLORS::D_ATTR_NORMAL ), f_oText ( )
+	: f_eType ( D_NONE ), f_iAttribute ( COLORS::D_ATTR_NORMAL ), f_oText()
 	{
 	M_PROLOG
 	return;
@@ -55,7 +55,7 @@ HLogPad::HLogPad ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		int a_iHeight, int a_iWidth, char const * const a_pcLabel )
 	: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcLabel ),
 	f_iLines ( 0 ), f_iOffsetRow ( 0 ), f_iOffsetColumn ( 0 ),
-	f_iAttribute ( 0 ), f_oContents ( )
+	f_iAttribute ( 0 ), f_oContents()
 	{
 	M_PROLOG
 	return;
@@ -75,14 +75,14 @@ void HLogPad::do_refresh ( void )
 	int l_iCtr = 0, l_iRow = 0, l_iCursor = 0, l_iColumn = 0;
 	int l_iBG = f_bFocused ? COLORS::D_BG_GRAY : COLORS::D_BG_BLACK;
 	HLogLine * l_poLogLine;
-	draw_label ( );
+	draw_label();
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
-	memset ( f_oVarTmpBuffer.raw ( ), ' ', f_iWidthRaw );
-	f_oVarTmpBuffer.raw ( ) [ f_iWidthRaw ] = 0;
+	memset ( f_oVarTmpBuffer.raw(), ' ', f_iWidthRaw );
+	f_oVarTmpBuffer.raw() [ f_iWidthRaw ] = 0;
 	f_iAttribute = COLORS::D_ATTR_NORMAL | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		c_printf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );
-	if ( f_oContents.size ( ) )
+	if ( f_oContents.size() )
 		{
 		l_poLogLine = & f_oContents.go ( 0 );
 		l_iCtr = 0;
@@ -98,7 +98,7 @@ void HLogPad::do_refresh ( void )
 						f_oVarTmpBuffer = l_poLogLine->f_oText.mid ( f_iOffsetColumn - l_iColumn );
 					else
 						f_oVarTmpBuffer = l_poLogLine->f_oText;
-					if ( ( l_iCursor + f_oVarTmpBuffer.get_length ( ) ) >= f_iWidthRaw )
+					if ( ( l_iCursor + f_oVarTmpBuffer.get_length() ) >= f_iWidthRaw )
 						f_oVarTmpBuffer [ f_iWidthRaw - l_iCursor ] = 0;
 					if ( f_oVarTmpBuffer [ 0 ] )
 						c_printf ( f_iRowRaw + l_iRow, f_iColumnRaw + l_iCursor, f_iAttribute, f_oVarTmpBuffer );
@@ -115,8 +115,8 @@ void HLogPad::do_refresh ( void )
 					}
 				else
 					{
-					l_iCursor += f_oVarTmpBuffer.get_length ( );
-					l_iColumn += l_poLogLine->f_oText.get_length ( );
+					l_iCursor += f_oVarTmpBuffer.get_length();
+					l_iColumn += l_poLogLine->f_oText.get_length();
 					}
 				}
 			l_poLogLine = f_oContents.to_tail ( 1, contents_t::D_TREAT_AS_OPENED );
@@ -143,8 +143,8 @@ void HLogPad::add ( char const * const a_pcText )
 	int l_iIndexNL = 0, l_iIndexChar = 0;
 	HLogLine l_oLogLine;
 	HLogLine * l_poLogLine = NULL;
-	if ( f_oContents.size ( ) )
-		l_poLogLine = & f_oContents.tail ( );
+	if ( f_oContents.size() )
+		l_poLogLine = & f_oContents.tail();
 	if ( ! l_poLogLine || ( l_poLogLine->f_eType != HLogLine::D_TEXT ) )
 		{
 		l_poLogLine = & l_oLogLine;
@@ -179,8 +179,7 @@ void HLogPad::add ( char const * const a_pcText )
 		}
 	if ( f_iLines > f_iHeightRaw )
 		f_iOffsetRow = f_iLines - f_iHeightRaw;
-	n_bNeedRepaint = true;
-	refresh ( );
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}
@@ -230,7 +229,7 @@ int HLogPad::do_process_input ( int a_iCode )
 			l_iCode = a_iCode;
 		}
 	if ( ! l_iCode )
-		refresh ( );
+		schedule_refresh();
 	return ( l_iCode );
 	M_EPILOG
 	}

@@ -118,7 +118,7 @@ void * db_connect ( char const * /* In Oracle user name is name of schema. */,
 				reinterpret_cast < OraText const * > ( a_pcPassword ),
 				strlen ( a_pcPassword ),
 				reinterpret_cast < OraText const * > ( static_cast < char const * > ( g_oInstanceName ) ),
-				g_oInstanceName.get_length ( ) ) ) != OCI_SUCCESS )
+				g_oInstanceName.get_length() ) ) != OCI_SUCCESS )
 		{
 		g_psBrokenDB = l_psOracle;
 		return ( NULL );
@@ -227,7 +227,7 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 		{
 		if ( l_psOracle->f_iStatus == OCI_SUCCESS_WITH_INFO )
 			log ( LOG_TYPE::D_INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error ( l_psOracle ) << endl;
-		l_oQuery.upper ( );
+		l_oQuery.upper();
 		if ( l_oQuery.find ( "INSERT" ) == 0 )
 			l_iIters = 1;
 		else if ( l_oQuery.find ( "UPDATE" ) == 0 )

@@ -97,7 +97,7 @@ public:
 	};
 
 template < typename tType, typename ttType >
-HHashMap<tType, ttType>::HAtom::HAtom ( void ) : f_tKey ( ), f_tValue ( ),
+HHashMap<tType, ttType>::HAtom::HAtom ( void ) : f_tKey(), f_tValue(),
 																						 f_poNext ( NULL )
 	{
 	M_PROLOG
@@ -146,7 +146,7 @@ template < typename tType, typename ttType >
 HHashMap<tType, ttType>::~HHashMap ( void )
 	{
 	M_PROLOG
-	flush ( );
+	flush();
 	if ( f_ppoAtomArray )
 		xfree ( f_ppoAtomArray );
 	f_ppoAtomArray = NULL;
@@ -163,7 +163,7 @@ HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const &
 	HAtom ** l_ppoAtom = NULL;
 	if ( & a_roMap != this )
 		{
-		flush ( );
+		flush();
 		if ( f_ppoAtomArray )
 			xfree ( f_ppoAtomArray );
 		f_ppoAtomArray = NULL;
@@ -205,7 +205,7 @@ void HHashMap<tType, ttType>::flush ( void )
 			f_ppoAtomArray [ l_uiCtr ] = l_poAtom;
 			}
 	f_iQuantity = 0;
-	rewind ( );
+	rewind();
 	return;
 	M_EPILOG
 	}
@@ -230,7 +230,7 @@ ttType & HHashMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
 		l_poAtom = l_poAtom->f_poNext;
 	if ( ! l_poAtom )
 		{
-		l_poAtom = new ( std::nothrow ) HAtom ( );
+		l_poAtom = new ( std::nothrow ) HAtom();
 		if ( ! l_poAtom )
 			M_THROW ( "memory allocation error", errno );
 		f_iQuantity ++;
@@ -328,7 +328,7 @@ bool HHashMap<tType, ttType>::remove ( tType const & a_rtKey )
 		else
 			f_ppoAtomArray [ l_iHash ] = NULL;
 		delete l_poAtom;
-		rewind ( );
+		rewind();
 		f_iQuantity --;
 		}
 	return ( l_poAtom ? true : false );
