@@ -97,7 +97,7 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 		register_postprocess_handler( KEY<'q'>::command, NULL,
 				&HTUIProcess::handler_close_window );
 		for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
-			l_piAlts[ l_iCtr ] = KEY<>::meta_r ( '0' + l_iCtr );
+			l_piAlts[ l_iCtr ] = KEY<>::meta_r( '0' + l_iCtr );
 		register_postprocess_handler( D_ALTS_COUNT, l_piAlts,
 			&HTUIProcess::handler_jump_meta_direct );
 		}
@@ -108,7 +108,7 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 		M_THROW( _( "window has not been initialised" ), errno );
 	f_oForegroundWindow = f_oWindows->begin();
 	f_oCommandHandlers[ "quit" ] = static_cast<HANDLER_t>( &HTUIProcess::handler_quit );
-	handler_refresh( 0 );
+	refresh();
 	return ( 1 );
 	M_EPILOG
 	}
@@ -123,6 +123,7 @@ int HTUIProcess::add_window( HWindow::ptr_t a_oWindow )
 	f_oMainWindow->update_all();
 	if ( ! (*f_oForegroundWindow)->is_initialised() )
 		M_THROW ( _( "window has not been initialised" ), errno );
+	refresh( true );
 	c_refresh();
 	return ( 0 );
 	M_EPILOG
@@ -155,6 +156,8 @@ int HTUIProcess::process_stdin( int a_iCode )
 					"unknown command: `%s'",
 					static_cast<char const * const>( l_oCommand ) );
 		}
+	if ( n_bNeedRepaint )
+		refresh();
 #ifdef __DEBUGGER_BABUNI__
 	n_bNeedRepaint = true;
 	if ( a_iCode )
@@ -248,13 +251,15 @@ int HTUIProcess::handler_mouse( int a_iCode, void* )
 	a_iCode = 0;
 	mouse::OMouse l_sMouse;
 	static_cast<void>( mouse::mouse_get( l_sMouse ) );
+	if ( !! (*f_oForegroundWindow) )
+		(*f_oForegroundWindow)->click( l_sMouse );
+	if ( n_bNeedRepaint )
+		refresh();
 #ifdef __DEBUGGER_BABUNI__
 	c_printf( 0, 0,	COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );
 	n_bNeedRepaint = true;
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( !! (*f_oForegroundWindow) )
-		(*f_oForegroundWindow)->click( l_sMouse );
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -267,8 +272,7 @@ int HTUIProcess::handler_refresh( int, void* )
 	clrscr(); /* there is ::refresh() call inside */
 	kbhit(); /* cleans all trash from stdio buffer */
 	c_getmaxyx( n_iHeight, n_iWidth );
-	if ( f_oForegroundWindow.is_valid() && ( !! (*f_oForegroundWindow) ) )
-		(*f_oForegroundWindow)->refresh();
+	refresh( true );
 	c_refresh();
 	return ( 0 );
 	M_EPILOG
@@ -290,7 +294,7 @@ int HTUIProcess::handler_jump_meta_tab( int a_iCode, void* )
 		++ f_oForegroundWindow;
 	else
 		f_oForegroundWindow = f_oWindows->begin();
-	handler_refresh( 0 );
+	refresh( true );
 	a_iCode = 0;
 	return ( a_iCode );
 	M_EPILOG
@@ -305,7 +309,7 @@ int HTUIProcess::handler_jump_meta_direct( int a_iCode, void* )
 	f_oForegroundWindow = f_oWindows->begin();
 	while ( a_iCode -- )
 		++ f_oForegroundWindow;
-	handler_refresh( 0 );
+	refresh( true );
 	a_iCode = 0;
 	return ( a_iCode );
 	M_EPILOG
@@ -317,7 +321,7 @@ int HTUIProcess::handler_close_window( int a_iCode, void* )
 	model_t::cyclic_iterator it = f_oForegroundWindow;
 	-- f_oForegroundWindow;
 	f_oWindows->erase( it );
-	handler_refresh( 0 );
+	refresh( true );
 	a_iCode = 0;
 	return ( a_iCode );
 	M_EPILOG
@@ -333,6 +337,19 @@ void HTUIProcess::select( HWindow const* const a_poWindow )
 			f_oForegroundWindow = it;
 			break;
 			}
+		}
+	return;
+	M_EPILOG
+	}
+
+void HTUIProcess::refresh( bool a_bForce )
+	{
+	M_PROLOG
+	if ( f_oForegroundWindow.is_valid() && ( !! (*f_oForegroundWindow) ) )
+		{
+		if ( a_bForce )
+			(*f_oForegroundWindow)->schedule_refresh();
+		(*f_oForegroundWindow)->refresh();
 		}
 	return;
 	M_EPILOG

@@ -38,11 +38,11 @@ namespace yaal
 namespace hcore
 {
 
-HProcess::HProcess ( size_t a_uiFileHandlers )
-	: f_bInitialised ( false ), f_bLoop ( true ), f_iIdleCycles ( 0 ),
-	f_iLatencySeconds ( 0 ), f_iLatencyMicroseconds ( 0 ),
+HProcess::HProcess( size_t a_uiFileHandlers )
+	: f_bInitialised( false ), f_bLoop( true ), f_iIdleCycles( 0 ),
+	f_iLatencySeconds( 0 ), f_iLatencyMicroseconds( 0 ),
 	f_sLatency(), f_xFileDescriptorSet(),
-	f_oFileDescriptorHandlers ( a_uiFileHandlers )
+	f_oFileDescriptorHandlers( a_uiFileHandlers )
 	{
 	M_PROLOG
 	memset ( & f_sLatency, 0, sizeof ( f_sLatency ) );
@@ -51,14 +51,14 @@ HProcess::HProcess ( size_t a_uiFileHandlers )
 	M_EPILOG
 	}
 
-HProcess::~HProcess ( void )
+HProcess::~HProcess( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-int HProcess::init ( int a_iLatencySeconds, int a_iLatencyMicroseconds )
+int HProcess::init( int a_iLatencySeconds, int a_iLatencyMicroseconds )
 	{
 	M_PROLOG
 	if ( f_bInitialised )
@@ -71,7 +71,7 @@ int HProcess::init ( int a_iLatencySeconds, int a_iLatencyMicroseconds )
 	M_EPILOG
 	}
 
-int HProcess::register_file_descriptor_handler_internal ( int a_iFileDescriptor,
+int HProcess::register_file_descriptor_handler_internal( int a_iFileDescriptor,
 		process_handler_filedes_t HANDLER )
 	{
 	M_PROLOG
@@ -80,14 +80,14 @@ int HProcess::register_file_descriptor_handler_internal ( int a_iFileDescriptor,
 	M_EPILOG
 	}
 
-int HProcess::unregister_file_descriptor_handler ( int a_iFileDescriptor )
+int HProcess::unregister_file_descriptor_handler( int a_iFileDescriptor )
 	{
 	M_PROLOG
-	return ( f_oFileDescriptorHandlers.remove ( a_iFileDescriptor ) );
+	return ( f_oFileDescriptorHandlers.remove( a_iFileDescriptor ) );
 	M_EPILOG
 	}
 
-int HProcess::reconstruct_fdset ( void )
+int HProcess::reconstruct_fdset( void )
 	{
 	M_PROLOG
 	int l_iFileDes = 0;
@@ -105,16 +105,16 @@ int HProcess::reconstruct_fdset ( void )
 	M_EPILOG
 	}
 
-int HProcess::run ( void )
+int HProcess::run( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	int l_iFileDes = 0;
 	process_handler_filedes_t HANDLER = NULL;
 	if ( ! f_bInitialised )
-		M_THROW ( _ ( "you have to call HProcess::init() first, dumbass" ), errno );
+		M_THROW( _ ( "you have to call HProcess::init() first, dumbass" ), errno );
 	if ( ! f_oFileDescriptorHandlers.quantity() )
-		M_THROW ( _ ( "there is no file descriptor to check activity on" ), errno );
+		M_THROW( _ ( "there is no file descriptor to check activity on" ), errno );
 	while ( f_bLoop )
 		{
 		handler_alert ( 0 );
@@ -124,43 +124,43 @@ int HProcess::run ( void )
 			{
 			if ( ( l_iError < 0 ) && ( errno == EINTR ) )
 				{
-				handler_interrupt ( 0 );
+				handler_interrupt( 0 );
 				continue;
 				}
 			if ( l_iError < 0 )
 				M_THROW ( "select() returned", l_iError );
 			f_oFileDescriptorHandlers.rewind();
-			while ( f_oFileDescriptorHandlers.iterate ( l_iFileDes, HANDLER ) )
+			while ( f_oFileDescriptorHandlers.iterate( l_iFileDes, HANDLER ) )
 				{
-				if ( FD_ISSET ( l_iFileDes, & f_xFileDescriptorSet ) )
+				if ( FD_ISSET( l_iFileDes, & f_xFileDescriptorSet ) )
 					{
-					static_cast < void > ( ( this->*HANDLER ) ( l_iFileDes ) );
+					static_cast<void>( ( this->*HANDLER ) ( l_iFileDes ) );
 					f_iIdleCycles = 0;
 					}
 				}
 			}
 		else
-			handler_idle ( 0 );
+			handler_idle( 0 );
 		}
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HProcess::handler_alert ( int, void * )
+int HProcess::handler_alert( int, void* )
 	{
 	M_PROLOG
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HProcess::handler_interrupt ( int, void * )
+int HProcess::handler_interrupt( int, void* )
 	{
 	M_PROLOG
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HProcess::handler_idle ( int a_iCode, void * )
+int HProcess::handler_idle( int a_iCode, void* )
 	{
 	M_PROLOG
 	f_iIdleCycles ++;

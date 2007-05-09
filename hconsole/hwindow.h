@@ -55,20 +55,20 @@ protected:
 	HControlList				f_oControls;	/* list of all control inside _this_ wind */
 	HStatusBarControl::ptr_t		f_oStatusBar;
 public:
-	HWindow ( char const * ); /* title */
-	virtual ~HWindow ( void );
-	virtual int init ( void );
-	void refresh ( void );
-	int process_input ( int );
-	virtual int handler_jump_tab ( int, void * ); /* jump thru controlos with tab key */
-	virtual int handler_jump_direct ( int, void * ); /* direct jump to specified cntrl */
-	virtual int handler_command ( int, void * ); /* put window into command awaiting */
-	virtual int handler_search ( int, void * ); /* put window into search pattern scan */
-	virtual int click ( mouse::OMouse & );
-	int add_control ( HControl::ptr_t, int );
-	HStatusBarControl::ptr_t& status_bar ( void );
-	hcore::HString get_command ( void );
-	bool is_initialised ( void ) const;
+	HWindow( char const* ); /* title */
+	virtual ~HWindow( void );
+	virtual int init( void );
+	void refresh( void );
+	int process_input( int );
+	virtual int handler_jump_tab( int, void* ); /* jump thru controlos with tab key */
+	virtual int handler_jump_direct ( int, void* ); /* direct jump to specified cntrl */
+	virtual int handler_command( int, void* ); /* put window into command awaiting */
+	virtual int handler_search( int, void* ); /* put window into search pattern scan */
+	virtual int click( mouse::OMouse& );
+	int add_control( HControl::ptr_t, int );
+	HStatusBarControl::ptr_t& status_bar( void );
+	hcore::HString get_command( void );
+	bool is_initialised( void ) const;
 	void update_all( void );
 	yaal::hcore::HString const& get_title( void ) const;
 
@@ -76,15 +76,15 @@ public:
  */
 	void schedule_refresh( void );
 private:
-	friend int HControl::set_focus ( char );
-	friend void HStatusBarControl::set_prompt ( char const *,
+	friend int HControl::set_focus( char );
+	friend void HStatusBarControl::set_prompt( char const *,
 			HStatusBarControl::PROMPT::mode_t,
 			HStatusBarControl::PROMPT::restrict_t );
-	friend void HStatusBarControl::end_prompt ( void );
-	friend int HStatusBarControl::process_input_normal ( int );
-	void acquire_focus ( HControl const* const );
-	HWindow ( HWindow const& );
-	HWindow & operator = ( HWindow const& );
+	friend void HStatusBarControl::end_prompt( void );
+	friend int HStatusBarControl::process_input_normal( int );
+	void acquire_focus( HControl const* const );
+	HWindow( HWindow const& );
+	HWindow& operator = ( HWindow const& );
 	};
 
 }

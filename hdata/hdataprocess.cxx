@@ -76,9 +76,10 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 	HXml::ONode & l_sNode = l_oXml.parse ( "/resource/menu" );
 	f_psRootMenu = build_sub_menu ( l_sNode, a_roHandlers );
 	M_ASSERT ( f_oForegroundWindow.is_valid() );
-	l_poMainWindow = dynamic_cast < HMainWindow * > ( &*(*f_oForegroundWindow) );
+	l_poMainWindow = dynamic_cast<HMainWindow*>( &*(*f_oForegroundWindow) );
 	M_ASSERT ( l_poMainWindow );
-	l_poMainWindow->init_menu ( this, f_psRootMenu );
+	l_poMainWindow->init_menu( this, f_psRootMenu );
+	l_poMainWindow->refresh();
 	return ( l_iError );
 	M_EPILOG
 	}

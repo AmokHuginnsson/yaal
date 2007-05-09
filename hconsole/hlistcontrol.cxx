@@ -173,6 +173,7 @@ void HListControl::do_refresh ( void )
 			: f_uiAttributeDisabled );
 	if ( l_iSize > f_iHeightRaw )
 		draw_scroll( f_iColumnRaw + l_iColumnOffset - 1 );
+	f_iRowRaw -= l_iHR;
 	return;
 	M_EPILOG
 	}
@@ -535,7 +536,6 @@ void HListControl::handle_key_space( void )
 	M_ASSERT( f_oCursor.is_valid() );
 	if ( f_bCheckable )
 		f_oCursor->switch_state();
-//		f_oCursor->m_bChecked = ! f_oCursor->m_bChecked;
 	return;
 	}
 
@@ -690,7 +690,7 @@ int HListControl::do_click( mouse::OMouse& a_rsMouse )
 	M_PROLOG
 	int l_iRow = 0, l_iColumn = 0, l_iCtr = 0;
 	int l_iWidth = 0, l_iColumns = f_oHeader.size();
-	HColumnInfo * l_poColumnInfo = NULL;
+	HColumnInfo* l_poColumnInfo = NULL;
 	if ( ! HControl::do_click( a_rsMouse ) )
 		return ( 1 );
 	l_iRow = ( a_rsMouse.f_iRow - f_iRowRaw ) - ( f_bDrawHeader ? 1 : 0 );
@@ -701,11 +701,11 @@ int HListControl::do_click( mouse::OMouse& a_rsMouse )
 		l_iColumn = a_rsMouse.f_iColumn + f_iColumnRaw - 1;
 		for ( l_iCtr = 0; l_iCtr < l_iColumns; l_iCtr ++ )
 			{
-			l_poColumnInfo = & f_oHeader [ l_iCtr ];
+			l_poColumnInfo = &f_oHeader [ l_iCtr ];
 			l_iWidth += l_poColumnInfo->f_iWidthRaw;
 			if ( l_iColumn <= l_iWidth )
 				{
-				sort_by_column ( l_iCtr,
+				sort_by_column( l_iCtr,
 						l_poColumnInfo->f_bDescending ? OListBits::D_ASCENDING : OListBits::D_DESCENDING );
 				schedule_refresh();
 				break;
@@ -721,7 +721,7 @@ int HListControl::do_click( mouse::OMouse& a_rsMouse )
 	M_EPILOG
 	}
 
-bool HListControl::is_searchable ( void )
+bool HListControl::is_searchable( void )
 	{
 	return ( f_bSearchable );
 	}

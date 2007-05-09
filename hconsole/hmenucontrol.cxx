@@ -119,7 +119,7 @@ void HMenuControl::init ( HTUIProcess * a_poProcess, OMenuItem * a_psMenu )
 		}
 	if ( ! f_poSelected && l_poNode->f_oBranch.size() )
 		f_poSelected = l_poNode->f_oBranch [ 0 ];
-	refresh();
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}

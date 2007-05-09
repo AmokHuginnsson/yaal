@@ -104,7 +104,7 @@ void HControl::enable ( bool a_bEnable )
 	f_bEnabled = a_bEnable;
 	if ( ! f_bEnabled )
 		f_bFocused = false;
-	refresh();
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}
@@ -138,7 +138,7 @@ int HControl::set_focus ( char a_cShortCut )
 	if ( ! a_cShortCut )
 		f_poParent->acquire_focus ( this );
 	if ( a_cShortCut <= 0 )
-		refresh();
+		schedule_refresh();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -149,7 +149,7 @@ int HControl::kill_focus ( void )
 	if ( ! f_bFocused )
 		return ( 1 );
 	f_bFocused = false;
-	refresh();
+	schedule_refresh();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -254,7 +254,7 @@ void HControl::set_attributes ( int a_iAttributeDisabled,
 		f_uiAttributeFocused = n_iAttributeFocused;
 	else
 		f_uiAttributeFocused = a_iAttributeFocused;
-	refresh();
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}
@@ -266,7 +266,7 @@ void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 	f_iColumn = a_iColumn;
 	f_iHeight = a_iHeight;
 	f_iWidth = a_iWidth;
-	refresh();
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}
