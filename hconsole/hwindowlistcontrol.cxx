@@ -76,8 +76,16 @@ int HWindowListControl::do_process_input( int a_iCode )
 			}
 		else if ( f_oCursor == f_oControler->begin() )
 			{
-			++ f_oCursor;
-			++ f_iCursorPosition;
+			if ( l_iSize < f_iHeightRaw )
+				{
+				++ f_oCursor;
+				++ f_iCursorPosition;
+				}
+			else
+				{
+				++ f_oFirstVisibleRow;
+				++ f_iControlOffset;
+				}
 			}
 		}
 	return ( a_iCode );
