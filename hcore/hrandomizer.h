@@ -42,6 +42,11 @@ public:
 	int rnd ( int = 0 );
 	};
 
+namespace randomizer_helper
+	{
+	void init_randomizer_from_time( HRandomizer& );
+	}
+
 }
 
 }

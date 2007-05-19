@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <sys/time.h>
+
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hrandomizer.h"
@@ -66,6 +68,19 @@ int HRandomizer::rnd ( int a_iRange )
 		return ( static_cast < int > ( ( f_ulSeed >> 16 ) & 0x7fff ) );
 	M_EPILOG
 	}
+
+namespace randomizer_helper
+{
+
+void init_randomizer_from_time( HRandomizer& rnd )
+	{
+	struct timeval tv;
+	M_ENSURE( gettimeofday( &tv, NULL ) == 0 );
+	rnd.set( tv.tv_sec + tv.tv_usec );
+	return;
+	}
+
+}
 
 }
 
