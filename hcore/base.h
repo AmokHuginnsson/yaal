@@ -49,8 +49,8 @@ template < > struct static_assert_failure < true > { enum { value = 1 }; };
 
 #define _(string) gettext (string)
 
-#define M_VCSID(id) namespace { char __VCSID__ [ ] = id; }
-#define M_VCSTID(id) namespace { char __VCSTID__ [ ] = id; }
+#define M_VCSID(id) namespace { static char const* const wrapper_VCSID( void ) { wrapper_VCSID(); return id; } }
+#define M_VCSTID(id) namespace { static char const* const wrapper_VCSTID( void ) { wrapper_VCSTID(); return id; } }
 #define M_THROW( msg, e_no ) throw ( yaal::hcore::HException ( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, static_cast < int > ( e_no ) ) )
 #define M_PROLOG try{
 #define M_EPILOG } catch ( yaal::hcore::HException & e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
