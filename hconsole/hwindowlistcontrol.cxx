@@ -51,20 +51,12 @@ HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
 	M_EPILOG
 	}
 
-HWindowListControl::~HWindowListControl( void )
-	{
-	M_PROLOG
-/*	HWindowListControl::remove_tail ( D_FORCE_REMOVE_ELEMENT ); */
-	return;
-	M_EPILOG
-	}
-
 int HWindowListControl::do_process_input( int a_iCode )
 	{
 	M_PROLOG
 	a_iCode = HListControl::do_process_input( a_iCode );
 	int l_iSize = f_oControler->size();
-	if ( l_iSize > 1 )
+	if ( l_iSize > 0 )
 		{
 		if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
 			{
@@ -74,28 +66,8 @@ int HWindowListControl::do_process_input( int a_iCode )
 				++ it, ++ f_roForegroundWindow;
 			-- f_roForegroundWindow;
 			}
-		else if ( f_oCursor == f_oControler->begin() )
-			{
-			if ( l_iSize < f_iHeightRaw )
-				{
-				++ f_oCursor;
-				++ f_iCursorPosition;
-				}
-			else
-				{
-				++ f_oFirstVisibleRow;
-				++ f_iControlOffset;
-				}
-			}
 		}
 	return ( a_iCode );
-	M_EPILOG
-	}
-
-void HWindowListControl::do_refresh( void )
-	{
-	M_PROLOG
-	HListControl::do_refresh();
 	M_EPILOG
 	}
 
