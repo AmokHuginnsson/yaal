@@ -64,33 +64,36 @@ namespace hconsole
 	int const COLORS::D_BG_BLACK, COLORS::D_BG_RED, COLORS::D_BG_GREEN;
 	int const COLORS::D_BG_BROWN, COLORS::D_BG_BLUE, COLORS::D_BG_MAGENTA;
 	int const COLORS::D_BG_CYAN, COLORS::D_BG_LIGHTGRAY, COLORS::D_BG_BLINK;
-	int const COLORS::D_BG_GRAY, COLORS::D_ATTR_NORMAL;
+	int const COLORS::D_BG_GRAY, COLORS::D_BG_BRIGHTRED, COLORS::D_BG_BRIGHTGREEN;
+	int const COLORS::D_BG_YELLOW, COLORS::D_BG_BRIGHTBLUE;
+	int const COLORS::D_BG_BRIGHTMAGENTA, COLORS::D_BG_BRIGHTCYAN;
+	int const COLORS::D_BG_WHITE, COLORS::D_ATTR_NORMAL;
 	int GLYPHS::D_DOWN_ARROW, GLYPHS::D_UP_ARROW, GLYPHS::D_VERTICAL_LINE;
 
 /* Bbbbffff
  * B - blink
  * b - background color bits
  * f - foreground color bits
- * 112 - 01110000
- * 7   - 00000111
- * 8   - 00001000
- * 128 - 10000000
+ * 112 (0x70) - 01110000
+ * 7   (0x07) - 00000111
+ * 8   (0x08) - 00001000
+ * 128 (0x80) - 10000000
  */
-template < int attr = 0 >
+template<int attr = 0>
 struct ATTR
 	{
 	static int const value = COLOR_PAIR(
-				( ( attr & 112 ) >> 1 ) 	  		/* background */
-				| attr & 7 ) 								  	/* foreground */
-			| ( ( attr & 8 ) ? A_BOLD : 0 )   /* brighter foreground */
-			| ( attr & 128 ? A_BLINK : 0 ); /* brighter background */
+				( ( attr & 0x70 ) >> 1 )         /* background */
+				|   attr & 0x07 )                /* foreground */
+			| ( ( attr & 0x08 ) ? A_BOLD : 0 ) /* brighter foreground */
+			| (   attr & 0x80 ? A_BLINK : 0 ); /* brighter background */
 	inline static int const value_r ( int const a_iAttr )
 		{
 		return ( COLOR_PAIR(
-					( ( a_iAttr & 112 ) >> 1 ) 	  		/* background */
-					| a_iAttr & 7 ) 								  	/* foreground */
-				| ( ( a_iAttr & 8 ) ? A_BOLD : 0 )   /* brighter foreground */
-				| ( a_iAttr & 128 ? A_BLINK : 0 ) ); /* brighter background */
+					( ( a_iAttr & 0x70 ) >> 1 )           /* background */
+					|   a_iAttr & 0x07 )                  /* foreground */
+				| ( ( a_iAttr & 0x08 ) ? A_BOLD : 0 )   /* brighter foreground */
+				| (   a_iAttr & 0x80 ? A_BLINK : 0 ) ); /* brighter background */
 		}
 	};
 

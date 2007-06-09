@@ -114,8 +114,15 @@ struct COLORS
 	static int const D_BG_LIGHTGRAY			= 112;
 	static int const D_BG_BLINK					= 128;
 	static int const D_BG_GRAY					= D_BG_BLINK;
+	static int const D_BG_BRIGHTRED			= 16 | D_BG_BLINK;
+	static int const D_BG_BRIGHTGREEN		= 32 | D_BG_BLINK;
+	static int const D_BG_YELLOW				= 48 | D_BG_BLINK;
+	static int const D_BG_BRIGHTBLUE		= 64 | D_BG_BLINK;
+	static int const D_BG_BRIGHTMAGENTA	= 80 | D_BG_BLINK;
+	static int const D_BG_BRIGHTCYAN		= 96 | D_BG_BLINK;
+	static int const D_BG_WHITE					= 112 | D_BG_BLINK;
 	static int const D_ATTR_NORMAL			= ( D_FG_LIGHTGRAY | D_BG_BLACK );
-	static int const D_ATTR_DEFAULT			= - 1;
+	static int const D_ATTR_DEFAULT			= -1;
 	};
 
 template < int code = 0 >
