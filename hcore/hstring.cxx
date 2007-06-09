@@ -449,21 +449,35 @@ int HString::get_length ( void ) const
 HString & HString::format ( char const * const a_pcFormat, ... )
 	{
 	M_PROLOG
-	int l_iSize = 0;
 	va_list ap;
+	va_start ( ap, a_pcFormat );
+	try
+		{
+		vformat( a_pcFormat, &ap );
+		}
+	catch ( ... )
+		{
+		va_end( ap );
+		throw;
+		}
+	va_end ( ap );
+	return ( * this );
+	M_EPILOG
+	}
+
+HString & HString::vformat ( char const * const a_pcFormat, void* a_xAp )
+	{
+	M_PROLOG
+	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	if ( ! a_pcFormat )
 		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
-	va_start ( ap, a_pcFormat );
-	l_iSize = vsnprintf ( l_pcMeasureBuffer, 1, a_pcFormat, ap );
+	l_iSize = vsnprintf ( l_pcMeasureBuffer, 1, a_pcFormat, *static_cast<va_list*>( a_xAp ) );
 	if ( l_iSize < 1 )
 		return ( * this );
 	l_iSize ++;
-	va_end ( ap );
 	hs_realloc ( l_iSize );
-	va_start ( ap, a_pcFormat );
-	M_ENSURE ( vsnprintf ( f_pcBuffer, l_iSize, a_pcFormat, ap ) < l_iSize );
-	va_end ( ap );
+	M_ENSURE ( vsnprintf ( f_pcBuffer, l_iSize, a_pcFormat, *static_cast<va_list*>( a_xAp ) ) < l_iSize );
 	return ( * this );
 	M_EPILOG
 	}
