@@ -228,7 +228,7 @@ void signal_QUIT ( int a_iSignum )
 		{
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 		if ( is_enabled() )
-			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
+			c_cmvprintf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Hard Quit is disabled by yaal configuration." );
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 		return;
@@ -260,7 +260,7 @@ void signal_TSTP ( int a_iSignum )
 		{
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
 		if ( is_enabled() )
-			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
+			c_cmvprintf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Suspend is disabled by yaal configuration." );
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 		return;
