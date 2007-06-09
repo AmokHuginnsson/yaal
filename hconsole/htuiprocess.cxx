@@ -163,28 +163,28 @@ int HTUIProcess::process_stdin( int a_iCode )
 	if ( a_iCode )
 		{
 		if ( a_iCode > D_KEY_COMMAND_(D_KEY_META_(0)) )
-			c_printf ( 0, 0, COLORS::D_FG_GREEN,
+			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"COMMAND-META-%c: %5d       ",
 					a_iCode - D_KEY_COMMAND_(D_KEY_META_(0)), a_iCode );
 		else if ( a_iCode > D_KEY_COMMAND_(0) )
-			c_printf ( 0, 0, COLORS::D_FG_GREEN,
+			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"     COMMAND-%c: %5d       ",
 					a_iCode - D_KEY_COMMAND_(0), a_iCode );
 		else if ( a_iCode > D_KEY_META_(0) )
-			c_printf ( 0, 0, COLORS::D_FG_GREEN,
+			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"        META-%c: %5d       ",
 					a_iCode - D_KEY_META_(0), a_iCode );
 		else if ( a_iCode < D_KEY_ESC )
-			c_printf ( 0, 0, COLORS::D_FG_GREEN,
+			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"        CTRL-%c: %5d       ",
 					a_iCode + 96, a_iCode);
 		else
-			c_printf ( 0, 0, COLORS::D_FG_GREEN,
+			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"             %c: %5d       ",
 					a_iCode, a_iCode );
 		}
 	else
-		c_printf ( 0, 0, COLORS::D_FG_GREEN, "                           " );
+		c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( a_iCode && !! (*f_oForegroundWindow) )
 		(*f_oForegroundWindow)->status_bar()->message ( COLORS::D_FG_RED,
@@ -222,7 +222,7 @@ int HTUIProcess::handler_idle( int a_iCode, void* )
 	M_PROLOG
 #ifdef __DEBUG__
 	HString l_oClock( static_cast<char const *>( HTime() ) );
-	c_printf( 0, n_iWidth - l_oClock.get_length(),
+	c_cmvprintf( 0, n_iWidth - l_oClock.get_length(),
 			COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, l_oClock );
 	n_bNeedRepaint = true;
 #endif /* __DEBUG__ */
@@ -256,7 +256,7 @@ int HTUIProcess::handler_mouse( int a_iCode, void* )
 	if ( n_bNeedRepaint )
 		refresh();
 #ifdef __DEBUGGER_BABUNI__
-	c_printf( 0, 0,	COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
+	c_cmvprintf( 0, 0,	COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );
 	n_bNeedRepaint = true;
 #endif /* __DEBUGGER_BABUNI__ */

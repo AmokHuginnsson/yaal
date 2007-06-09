@@ -25,6 +25,8 @@ Copyright:
 */
 
 #include <cstring>
+#include <libintl.h>
+#include <cstdio>
 
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
@@ -261,12 +263,13 @@ void HStatusBarControl::message ( int a_iAttribute,
 		char const * a_pcFormat, ... )
 	{
 	M_PROLOG
-	va_list l_xAp;
-	va_start ( l_xAp, a_pcFormat );
+	va_list ap;
+	va_start ( ap, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )
 		bell();
-	c_vprintf ( f_iRowRaw, -1, a_iAttribute, a_pcFormat, l_xAp );
-	va_end ( l_xAp );
+	f_oVarTmpBuffer.vformat( a_pcFormat, &ap );
+	c_cmvprintf ( f_iRowRaw, -1, a_iAttribute, f_oVarTmpBuffer );
+	va_end ( ap );
 	n_bNeedRepaint = true;
 	return;
 	M_EPILOG
@@ -279,7 +282,8 @@ void HStatusBarControl::message ( char const * a_pcFormat, ... )
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )
 		bell();
-	c_vprintf ( f_iRowRaw, -1, attr_data(), a_pcFormat, l_xAp );
+	f_oVarTmpBuffer.vformat( a_pcFormat, &l_xAp );
+	c_cmvprintf ( f_iRowRaw, -1, attr_data(), f_oVarTmpBuffer );
 	va_end ( l_xAp );
 	n_bNeedRepaint = true;
 	return;

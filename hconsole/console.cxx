@@ -314,16 +314,8 @@ void c_clrtoeol ( void )
 	return;
 	}
 
-int c_mvprintf ( int a_iRow, int a_iColumn, char const * const a_pcFormat,
-		... )
-	{
-	int l_iError = 0;
-	va_list l_xAp;
-	va_start ( l_xAp, a_pcFormat );
-	l_iError = c_vmvprintf ( a_iRow, a_iColumn, a_pcFormat, l_xAp );
-	va_end ( l_xAp );
-	return ( l_iError );
-	}
+namespace
+{
 
 int c_vmvprintf ( int a_iRow, int a_iColumn,
 							 char const * const a_pcFormat, va_list & a_rxAp )
@@ -350,31 +342,65 @@ int c_vmvprintf ( int a_iRow, int a_iColumn,
 	return ( l_iError );
 	}
 
-int c_printf ( int a_iRow, int a_iColumn, int a_iAttribute,
+int c_vcmvprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
+							 char const* const a_pcFormat, va_list& a_rxAp )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	int l_iOrigAttribute = 0;
+	if ( ! n_bEnabled )
+		M_THROW( "not in curses mode", errno );
+	l_iOrigAttribute = get_attr();
+	set_attr( a_iAttribute );
+	l_iError = c_vmvprintf( a_iRow, a_iColumn, a_pcFormat, a_rxAp );
+	set_attr( l_iOrigAttribute );
+	return ( l_iError );
+	M_EPILOG
+	}
+	
+int c_vprintf ( char const* const a_pcFormat, va_list& a_rxAp )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	if ( ! n_bEnabled )
+		M_THROW( "not in curses mode", errno );
+	l_iError = vw_printw( stdscr, a_pcFormat, a_rxAp );
+	return ( l_iError );
+	M_EPILOG
+	}
+
+}
+
+int c_printf ( char const* const a_pcFormat, ... )
+	{
+	int l_iError = 0;
+	va_list l_xAp;
+	va_start( l_xAp, a_pcFormat );
+	l_iError = c_vprintf( a_pcFormat, l_xAp );
+	va_end( l_xAp );
+	return ( l_iError );
+	}
+
+int c_mvprintf( int a_iRow, int a_iColumn, char const* const a_pcFormat,
+		... )
+	{
+	int l_iError = 0;
+	va_list l_xAp;
+	va_start( l_xAp, a_pcFormat );
+	l_iError = c_vmvprintf( a_iRow, a_iColumn, a_pcFormat, l_xAp );
+	va_end( l_xAp );
+	return ( l_iError );
+	}
+
+int c_cmvprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
 							 char const * const a_pcFormat, ... )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
-	l_iError = c_vprintf ( a_iRow, a_iColumn, a_iAttribute, a_pcFormat, l_xAp );
+	l_iError = c_vcmvprintf ( a_iRow, a_iColumn, a_iAttribute, a_pcFormat, l_xAp );
 	va_end ( l_xAp );
-	return ( l_iError );
-	M_EPILOG
-	}
-	
-int c_vprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
-							 char const * const a_pcFormat, va_list & a_rxAp )
-	{
-	M_PROLOG
-	int l_iError = 0;
-	int l_iOrigAttribute = 0;
-	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", errno );
-	l_iOrigAttribute = get_attr();
-	set_attr ( a_iAttribute );
-	l_iError = c_vmvprintf ( a_iRow, a_iColumn, a_pcFormat, a_rxAp );
-	set_attr ( l_iOrigAttribute );
 	return ( l_iError );
 	M_EPILOG
 	}
@@ -408,7 +434,7 @@ int get_key ( void )
 	if ( l_iKey == KEY<>::ctrl_r ( n_cCommandComposeCharacter ) )
 		{
 		l_eOrigCursState = curs_set ( CURSOR::D_INVISIBLE );
-		c_printf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
+		c_cmvprintf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
 					n_cCommandComposeCharacter );
 		timeout ( n_iCommandComposeDelay * 100 );
 		l_iKey = getch();
@@ -416,7 +442,7 @@ int get_key ( void )
 		if ( l_iKey == ERR )
 			{
 			l_iKey = KEY<>::ctrl_r ( n_cCommandComposeCharacter );
-			c_printf ( n_iHeight - 1, 0, COLORS::D_FG_LIGHTGRAY, "      " );
+			c_cmvprintf ( n_iHeight - 1, 0, COLORS::D_FG_LIGHTGRAY, "      " );
 			}
 		else
 			{
@@ -434,7 +460,7 @@ int get_key ( void )
 				}
 			else
 				l_iKey = KEY<>::command_r ( l_iChar = l_iKey );
-			c_printf ( n_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar );
+			c_cmvprintf ( n_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar );
 			}
 		curs_set ( l_eOrigCursState );
 		}
