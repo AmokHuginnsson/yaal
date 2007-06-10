@@ -86,14 +86,14 @@ struct ATTR
 				( ( attr & 0x70 ) >> 1 )         /* background */
 				|   attr & 0x07 )                /* foreground */
 			| ( ( attr & 0x08 ) ? A_BOLD : 0 ) /* brighter foreground */
-			| (   attr & 0x80 ? A_BLINK : 0 ); /* brighter background */
+			| ( ( attr & 0x80 ) ? A_BLINK : 0 ); /* brighter background */
 	inline static int const value_r ( int const a_iAttr )
 		{
 		return ( COLOR_PAIR(
 					( ( a_iAttr & 0x70 ) >> 1 )           /* background */
 					|   a_iAttr & 0x07 )                  /* foreground */
 				| ( ( a_iAttr & 0x08 ) ? A_BOLD : 0 )   /* brighter foreground */
-				| (   a_iAttr & 0x80 ? A_BLINK : 0 ) ); /* brighter background */
+				| ( ( a_iAttr & 0x80 ) ? A_BLINK : 0 ) ); /* brighter background */
 		}
 	};
 
@@ -181,7 +181,7 @@ void enter_curses( void )
 			init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
 					l_piColors [ l_iFg ], l_piColors [ l_iBg ] );
 	attrset ( COLOR_PAIR( 7 ) );
-	bkgd ( ' ' | ATTR < COLORS::D_FG_BLACK | COLORS::D_BG_BLACK >::value | A_INVIS ); /* meaningless value from macro */
+	bkgd( ' ' | ATTR<COLORS::D_FG_BLACK | COLORS::D_BG_BLACK>::value | A_INVIS ); /* meaningless value from macro */
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( getenv ( "YAAL_NO_MOUSE" ) )
@@ -228,7 +228,7 @@ void leave_curses( void )
 //		M_THROW ( "mousemask() returned 0", errno );
 	if ( n_bUseMouse )
 		static_cast < void > ( mouse::mouse_close() );
-	bkgd ( ' ' | ATTR < COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK >::value );
+	bkgd( ' ' | ATTR<COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK>::value );
 	M_ENSURE ( use_default_colors() == OK );
 	M_ENSURE ( printw ( "" ) != ERR );
 	M_ENSURE ( fflush ( NULL ) == 0 );
