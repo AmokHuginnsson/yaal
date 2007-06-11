@@ -464,6 +464,7 @@ void HListControl::handle_key_up( void )
 		else if ( f_iControlOffset > 0 )
 			{
 			-- f_oFirstVisibleRow;
+			-- f_oCursor;
 			f_iControlOffset --;
 			}
 		}
