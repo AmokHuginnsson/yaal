@@ -28,6 +28,7 @@ Copyright:
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
+#include <libintl.h>
 
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
@@ -70,19 +71,16 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	int l_iLength = 0;
 	HString l_oErrorMessage;
 	if ( a_iBufferSize < 1 )
-		M_THROW ( "buffer size is ridiculously low",
-				a_iBufferSize );
+		M_THROW( _( "buffer size is ridiculously low" ), a_iBufferSize );
 	if ( a_pcValue )
 		{
 		l_iLength = strlen ( a_pcValue );
 		if ( l_iLength > a_iBufferSize )
-			M_THROW ( "initial value too big",
-					l_iLength - a_iBufferSize );
+			M_THROW( _( "initial value too big" ), l_iLength - a_iBufferSize );
 		}
 	f_oVarTmpBuffer.hs_realloc ( a_iBufferSize + 1 );
 	if ( f_bRightAligned && f_bMultiLine )
-		M_THROW (
-				"edit-control right aligned and multiline at the same time", 0 );
+		M_THROW( _( "edit-control right aligned and multiline at the same time" ), 0 );
 	f_oString = a_pcValue;
 	f_oHistory.push_back ( "" );
 	if ( ( l_iErrorCode = f_oPattern.parse_re ( a_pcMask ) ) )

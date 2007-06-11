@@ -406,7 +406,7 @@ void HListControl::handle_key_page_up( void )
 	else
 		{
 		f_iCursorPosition = 0;
-		f_oCursor = f_oControler->begin();
+		f_oCursor = f_oFirstVisibleRow;
 		}
 	return;
 	}
@@ -1210,6 +1210,7 @@ template<>
 void HCell<>::set_child_control_data( HControl* a_poControl )
 	{
 	a_poControl->set( (*f_rtData)[ f_iColumn ] );
+	a_poControl->refresh();
 	return;
 	}
 
