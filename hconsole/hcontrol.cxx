@@ -122,7 +122,7 @@ int HControl::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
 	if ( ! f_bFocused )
-		M_THROW ( "input in widow without focus", a_iCode );
+		M_THROW( "input in control without focus", a_iCode );
 	return ( a_iCode );
 	M_EPILOG
 	}
