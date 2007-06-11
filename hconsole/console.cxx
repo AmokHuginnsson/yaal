@@ -79,21 +79,25 @@ namespace hconsole
  * 8   (0x08) - 00001000
  * 128 (0x80) - 10000000
  */
-template<int attr = 0>
 struct ATTR
 	{
-	static int const value = COLOR_PAIR(
-				( ( attr & 0x70 ) >> 1 )         /* background */
-				|   attr & 0x07 )                /* foreground */
-			| ( ( attr & 0x08 ) ? A_BOLD : 0 ) /* brighter foreground */
-			| ( ( attr & 0x80 ) ? A_BLINK : 0 ); /* brighter background */
-	inline static int const value_r ( int const a_iAttr )
+	inline static int const value ( int const a_iAttr )
 		{
 		return ( COLOR_PAIR(
-					( ( a_iAttr & 0x70 ) >> 1 )           /* background */
-					|   a_iAttr & 0x07 )                  /* foreground */
-				| ( ( a_iAttr & 0x08 ) ? A_BOLD : 0 )   /* brighter foreground */
+					( ( a_iAttr & 0x70 ) >> 1 )             /* background */
+					|   a_iAttr & 0x07 )                    /* foreground */
+				| ( ( a_iAttr & 0x08 ) ? A_BOLD : 0 )     /* brighter foreground */
 				| ( ( a_iAttr & 0x80 ) ? A_BLINK : 0 ) ); /* brighter background */
+		}
+	inline static int const value_fix ( int const a_iAttr )
+		{
+		if ( a_iAttr & 0x80 )
+			return ( COLOR_PAIR(
+						( (   a_iAttr & 0x07 ) << 3 )
+						| ( ( a_iAttr & 0x70 ) >> 4 ) )
+					| ( (   a_iAttr & 0x08 ) ? A_BLINK : 0 )
+					| A_BOLD | A_REVERSE );
+		return ( value( a_iAttr ) );
 		}
 	};
 
@@ -123,6 +127,7 @@ int n_iMouseDes = 0;
 /* private: */
 WINDOW * n_psWindow = NULL;
 bool	n_bEnabled = false;
+bool	n_bBrokenBrightBackground = false;
 termios	n_sTermios;
 
 int const C_OK = OK;
@@ -166,7 +171,6 @@ void enter_curses( void )
 	M_ENSURE ( nonl() == OK );
 	M_ENSURE ( keypad ( stdscr, true ) != ERR );
 	M_ENSURE ( intrflush ( stdscr, false ) != ERR );
-/*	scrollok ( stdscr, true ); */
 	M_ENSURE ( scrollok ( stdscr, false ) != ERR );
 	M_ENSURE ( leaveok ( stdscr, false ) != ERR );
 	immedok ( stdscr, false );
@@ -181,7 +185,8 @@ void enter_curses( void )
 			init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
 					l_piColors [ l_iFg ], l_piColors [ l_iBg ] );
 	attrset ( COLOR_PAIR( 7 ) );
-	bkgd( ' ' | ATTR<COLORS::D_FG_BLACK | COLORS::D_BG_BLACK>::value | A_INVIS ); /* meaningless value from macro */
+	bkgd( ' ' | ATTR::value( COLORS::D_FG_BLACK | COLORS::D_BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
+	n_bBrokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
 	n_bEnabled = true;
 	getmaxyx ( stdscr, n_iHeight, n_iWidth );
 	if ( getenv ( "YAAL_NO_MOUSE" ) )
@@ -224,11 +229,9 @@ void leave_curses( void )
 	M_PROLOG
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", errno );
-//	if ( ! mousemask ( 0, NULL ) )
-//		M_THROW ( "mousemask() returned 0", errno );
 	if ( n_bUseMouse )
 		static_cast < void > ( mouse::mouse_close() );
-	bkgd( ' ' | ATTR<COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK>::value );
+	bkgd( ' ' | ATTR::value( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) );
 	M_ENSURE ( use_default_colors() == OK );
 	M_ENSURE ( printw ( "" ) != ERR );
 	M_ENSURE ( fflush ( NULL ) == 0 );
@@ -264,7 +267,10 @@ void set_attr( int a_iAttr )
 	if ( ! n_bEnabled )
 		M_THROW ( "not in curses mode", errno );
 	l_ucByte = static_cast < char unsigned > ( a_iAttr );
-	attrset ( ATTR<>::value_r ( l_ucByte ) );
+	if ( n_bBrokenBrightBackground )
+		attrset ( ATTR::value_fix ( l_ucByte ) );
+	else
+		attrset ( ATTR::value ( l_ucByte ) );
 	return ;
 	M_EPILOG
 	}
@@ -511,18 +517,18 @@ char unsigned get_attr( void )
 	{
 	M_PROLOG
 	if ( ! n_bEnabled )
-		M_THROW ( "not in curses mode", errno );
+		M_THROW( "not in curses mode", errno );
 	attr_t l_xAttr;
 	short l_hColor = 0;
 	int l_iAttribute = 0;
-	static_cast < void > ( attr_get ( & l_xAttr, & l_hColor, NULL ) ); /* Ugly macro */
+	static_cast<void>( attr_get( &l_xAttr, &l_hColor, NULL ) ); /* Ugly macro */
 	l_iAttribute = ( l_hColor << 1 ) & 56;
 	l_iAttribute |= ( l_hColor & 7 );
 	if ( l_xAttr & A_BOLD )
 		l_iAttribute |= 8;
 	if ( l_xAttr & A_BLINK )
 		l_iAttribute |= 128;
-	return ( static_cast < char unsigned > ( l_iAttribute ) );
+	return ( static_cast<char unsigned>( l_iAttribute ) );
 	M_EPILOG
 	}
 	
