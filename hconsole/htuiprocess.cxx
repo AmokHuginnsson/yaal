@@ -267,12 +267,10 @@ int HTUIProcess::handler_refresh( int, void* )
 	{
 	M_PROLOG
 	endwin();
-	n_bNeedRepaint = false;
 	clrscr(); /* there is ::refresh() call inside */
 	kbhit(); /* cleans all trash from stdio buffer */
 	c_getmaxyx( n_iHeight, n_iWidth );
 	refresh( true );
-	c_refresh();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -350,6 +348,8 @@ void HTUIProcess::refresh( bool a_bForce )
 			(*f_oForegroundWindow)->schedule_refresh();
 		(*f_oForegroundWindow)->refresh();
 		}
+	c_refresh();
+	n_bNeedRepaint = false;
 	return;
 	M_EPILOG
 	}
