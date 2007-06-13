@@ -101,7 +101,6 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 		register_postprocess_handler( D_ALTS_COUNT, l_piAlts,
 			&HTUIProcess::handler_jump_meta_direct );
 		}
-	l_oMainWindow->init();
 	f_oMainWindow = l_oMainWindow;
 	add_window( l_oMainWindow );
 	if ( ! l_oMainWindow->is_initialised() )
