@@ -72,7 +72,8 @@ void HControlList::add_control( HControl::ptr_t a_oControl )
 	{
 	M_PROLOG
 	f_oList.push_back( a_oControl );
-	f_roFocused = f_oList.rbegin();
+	if ( ! f_roFocused.is_valid() )
+		f_roFocused = f_oList.rbegin();
 	return;
 	M_EPILOG
 	}
