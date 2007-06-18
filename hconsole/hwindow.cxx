@@ -73,7 +73,6 @@ int HWindow::init( void )
 	{
 	M_PROLOG
 	HString l_oString;
-	clrscr();
 	n_bNeedRepaint = true;
 	l_oString.format( " [%s]& \n", static_cast< char const* const>( f_oTitle ) );
 	new HStatusBarControl( this, l_oString );

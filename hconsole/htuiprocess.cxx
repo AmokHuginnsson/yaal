@@ -123,7 +123,6 @@ int HTUIProcess::add_window( HWindow::ptr_t a_oWindow )
 	if ( ! (*f_oForegroundWindow)->is_initialised() )
 		M_THROW ( _( "window has not been initialised" ), errno );
 	refresh( true );
-	c_refresh();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -267,10 +266,9 @@ int HTUIProcess::handler_refresh( int, void* )
 	{
 	M_PROLOG
 	endwin();
-	clrscr(); /* there is ::refresh() call inside */
 	kbhit(); /* cleans all trash from stdio buffer */
 	c_getmaxyx( n_iHeight, n_iWidth );
-	refresh( true );
+	refresh( true ); /* there is c_clrscr(); and c_refresh() call inside */
 	return ( 0 );
 	M_EPILOG
 	}
