@@ -1,5 +1,5 @@
 /*
----           `yaal' 0.0.0 (a_iColumn) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' (a_iColumn) 1978 by Marcin 'Amok' Konarski            ---
 
 	hmatrix.h - this file is integral part of `yaal' project.
 

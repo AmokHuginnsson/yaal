@@ -1,5 +1,5 @@
 /*
----           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
 	hhashmap.h - this file is integral part of `yaal' project.
 

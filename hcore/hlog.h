@@ -1,5 +1,5 @@
 /*
----          libsource 0.0.0 (c) 1978 by Marcin 'Amok' Konarski           ---
+---          libsource (c) 1978 by Marcin 'Amok' Konarski           ---
 
 	hlog.h - this file is integral part of `yaal' project.
 

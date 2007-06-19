@@ -5,6 +5,8 @@
 
 /* Define core behavior here. */
 
+#undef PACKAGE_VERSION
+
 /* End of core behavior definitions. */
 
 /* Define operating system host type here. */

@@ -1,6 +1,7 @@
+#include "config.h"
 char const COPYRIGHT [ ] =
 "/*\n"
-"---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---\n"
+"---           `yaal' "PACKAGE_VERSION" (c) 1978 by Marcin 'Amok' Konarski            ---\n"
 "\n"
 /* hcore.cxx - this file is integral part of `yaal' project.
  */
