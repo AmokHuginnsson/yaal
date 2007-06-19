@@ -267,10 +267,10 @@ void HStatusBarControl::message ( int a_iAttribute,
 	va_start ( ap, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )
 		bell();
-	f_oVarTmpBuffer.vformat( a_pcFormat, &ap );
-	c_cmvprintf ( f_iRowRaw, -1, a_iAttribute, f_oVarTmpBuffer );
+//	f_oString.vformat( a_pcFormat, &ap );
+	f_iStatusBarAttribute = a_iAttribute << 8;
 	va_end ( ap );
-	n_bNeedRepaint = true;
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}
@@ -282,10 +282,9 @@ void HStatusBarControl::message ( char const * a_pcFormat, ... )
 	va_start ( l_xAp, a_pcFormat );
 	if ( a_pcFormat && a_pcFormat [ 0 ] )
 		bell();
-	f_oVarTmpBuffer.vformat( a_pcFormat, &l_xAp );
-	c_cmvprintf ( f_iRowRaw, -1, attr_data(), f_oVarTmpBuffer );
+//	f_oString.vformat( a_pcFormat, &l_xAp );
 	va_end ( l_xAp );
-	n_bNeedRepaint = true;
+	schedule_refresh();
 	return;
 	M_EPILOG
 	}
