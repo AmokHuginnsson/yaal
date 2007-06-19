@@ -472,10 +472,7 @@ HString & HString::vformat ( char const * const a_pcFormat, void* a_xAp )
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	if ( ! a_pcFormat )
 		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
-	l_iSize = vsnprintf ( l_pcMeasureBuffer, 1, a_pcFormat, *static_cast<va_list*>( a_xAp ) );
-	if ( l_iSize < 1 )
-		return ( * this );
-	l_iSize ++;
+	l_iSize = vsnprintf ( l_pcMeasureBuffer, 1, a_pcFormat, *static_cast<va_list*>( a_xAp ) ) + 1;
 	hs_realloc ( l_iSize );
 	M_ENSURE ( vsnprintf ( f_pcBuffer, l_iSize, a_pcFormat, *static_cast<va_list*>( a_xAp ) ) < l_iSize );
 	return ( * this );
