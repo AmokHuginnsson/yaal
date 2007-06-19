@@ -553,6 +553,7 @@ int HListControl::do_process_input( int a_iCode )
 	int l_iCtr = 0;
 	int l_iErrorCode = 0;
 	a_iCode = HControl::do_process_input( a_iCode );
+	f_oVarTmpBuffer = "";
 	switch ( a_iCode )
 		{
 		case ( KEY_CODES::D_PAGE_UP ):		handle_key_page_up();		break;
@@ -588,7 +589,7 @@ int HListControl::do_process_input( int a_iCode )
 	if ( ! l_iErrorCode )
 		{
 		schedule_refresh();
-		f_poParent->status_bar()->message( COLORS::D_FG_LIGHTGRAY, "" );
+		f_poParent->status_bar()->message( COLORS::D_FG_LIGHTGRAY, f_oVarTmpBuffer );
 		}
 	return ( a_iCode );
 	M_EPILOG
@@ -735,13 +736,14 @@ void HListControl::reset( void )
 	M_EPILOG
 	}
 
-void HListControl::go_to_match ( void )
+void HListControl::go_to_match( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
 	int l_iSize = f_oControler->size(), l_iCount = l_iSize + 1, l_iColumns = f_oHeader.size();
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
+	char const * l_pcOutcome = NULL;
 	iterator_t l_oCursorOrig = f_oCursor;
 	iterator_t l_oFirstVisibleRowOrig = f_oFirstVisibleRow;
 	if ( ! f_bSearchActived )
@@ -787,7 +789,7 @@ void HListControl::go_to_match ( void )
 			f_oCursor = f_oFirstVisibleRow = f_oControler->begin();
 			f_iControlOffset = f_iCursorPosition = 0;
 			l_iMoveFirstRow = 0;
-			f_poParent->status_bar()->message( _( "search hit BOTTOM, continuing at TOP" ) );
+			l_pcOutcome = _( "search hit BOTTOM, continuing at TOP" );
 			}
 /* end od it */
 		}
@@ -798,6 +800,7 @@ void HListControl::go_to_match ( void )
 		f_sMatch.f_iColumnWithMatch = l_iCtr;
 		f_sMatch.f_iMatchNumber = l_iCtrLoc;
 		f_sMatch.f_oCurrentMatch = f_oCursor;
+		f_oVarTmpBuffer = "";
 		}
 	else
 		{
@@ -807,8 +810,10 @@ void HListControl::go_to_match ( void )
 		f_iControlOffset = l_iControlOffsetOrig;
 		f_sMatch.f_iMatchNumber = -1;
 		f_sMatch.f_iColumnWithMatch = 0;
-		f_poParent->status_bar()->message( HString( _( "pattern not found: " ) ) + f_oPattern.error() );
+		f_oVarTmpBuffer = HString( _( "pattern not found: " ) ) + f_oPattern.error();
 		}
+	if ( l_pcOutcome )
+		f_oVarTmpBuffer = l_pcOutcome;
 	return;
 	M_EPILOG
 	}
@@ -820,6 +825,7 @@ void HListControl::go_to_match_previous ( void )
 	int l_iSize = f_oControler->size(), l_iCount = l_iSize + 1, l_iColumns = f_oHeader.size();
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
+	char const * l_pcOutcome = NULL;
 	iterator_t l_oCursorOrig = f_oCursor;
 	iterator_t l_oFirstVisibleRowOrig = f_oFirstVisibleRow;
 	if ( ! f_bSearchActived )
@@ -881,7 +887,7 @@ void HListControl::go_to_match_previous ( void )
 			else
 				f_iCursorPosition = l_iSize - 1;
 			l_iMoveFirstRow = 0;
-			f_poParent->status_bar()->message( _( "search hit TOP, continuing at BOTTOM" ) );
+			l_pcOutcome = _( "search hit TOP, continuing at BOTTOM" );
 			}
 /* end od it */
 		}
@@ -892,6 +898,7 @@ void HListControl::go_to_match_previous ( void )
 		f_sMatch.f_iColumnWithMatch = l_iCtr;
 		f_sMatch.f_iMatchNumber = l_iCtrLoc;
 		f_sMatch.f_oCurrentMatch = f_oCursor;
+		f_oVarTmpBuffer = "";
 		}
 	else
 		{
@@ -901,8 +908,10 @@ void HListControl::go_to_match_previous ( void )
 		f_iControlOffset = l_iControlOffsetOrig;
 		f_sMatch.f_iMatchNumber = -1;
 		f_sMatch.f_iColumnWithMatch = 0;
-		f_poParent->status_bar()->message( _( "pattern not found" ) );
+		f_oVarTmpBuffer = _( "pattern not found" );
 		}
+	if ( l_pcOutcome )
+		f_oVarTmpBuffer = l_pcOutcome;
 	return;
 	M_EPILOG
 	}

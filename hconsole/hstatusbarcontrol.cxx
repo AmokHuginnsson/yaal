@@ -70,6 +70,7 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 	l_iAttribte &= 0x00ff;
 	f_uiAttributeFocused &= 0xff00;
 	f_uiAttributeFocused |= l_iAttribte;
+	f_iStatusBarAttribute &= 0xff00;
 	return;
 	M_EPILOG
 	}
@@ -110,6 +111,12 @@ void HStatusBarControl::do_refresh ( void )
 	HEditControl::do_refresh();
 	if ( ! f_bFocused )
 		c_move ( l_iOrigRow, l_iOrigColumn );
+	if ( f_iStatusBarAttribute & 0xff )
+		{
+		f_uiAttributeEnabled &= 0xff00;
+		f_uiAttributeEnabled |= ( f_iStatusBarAttribute & 0x00ff );
+		f_iStatusBarAttribute &= 0xff00;
+		}
 	return;
 	M_EPILOG
 	}
@@ -263,14 +270,21 @@ void HStatusBarControl::message ( int a_iAttribute,
 		char const * a_pcFormat, ... )
 	{
 	M_PROLOG
-	va_list ap;
-	va_start ( ap, a_pcFormat );
-	if ( a_pcFormat && a_pcFormat [ 0 ] )
-		bell();
-//	f_oString.vformat( a_pcFormat, &ap );
-	f_iStatusBarAttribute = a_iAttribute << 8;
-	va_end ( ap );
-	schedule_refresh();
+	if ( ! f_bFocused )
+		{
+		va_list ap;
+		va_start ( ap, a_pcFormat );
+		if ( a_pcFormat && a_pcFormat [ 0 ] )
+			bell();
+		f_oVarTmpBuffer.vformat( a_pcFormat, &ap );
+		set( f_oVarTmpBuffer );
+		va_end ( ap );
+		if ( ! ( f_iStatusBarAttribute & 0x00ff ) )
+			f_iStatusBarAttribute |= ( f_uiAttributeEnabled & 0x00ff );
+		f_uiAttributeEnabled &= 0xff00;
+		f_uiAttributeEnabled |= ( a_iAttribute & 0x00ff );
+		schedule_refresh();
+		}
 	return;
 	M_EPILOG
 	}
@@ -278,13 +292,17 @@ void HStatusBarControl::message ( int a_iAttribute,
 void HStatusBarControl::message ( char const * a_pcFormat, ... )
 	{
 	M_PROLOG
-	va_list l_xAp;
-	va_start ( l_xAp, a_pcFormat );
-	if ( a_pcFormat && a_pcFormat [ 0 ] )
-		bell();
-//	f_oString.vformat( a_pcFormat, &l_xAp );
-	va_end ( l_xAp );
-	schedule_refresh();
+	if ( ! f_bFocused )
+		{
+		va_list l_xAp;
+		va_start ( l_xAp, a_pcFormat );
+		if ( a_pcFormat && a_pcFormat [ 0 ] )
+			bell();
+		f_oVarTmpBuffer.vformat( a_pcFormat, &l_xAp );
+		set( f_oVarTmpBuffer );
+		va_end ( l_xAp );
+		schedule_refresh();
+		}
 	return;
 	M_EPILOG
 	}
