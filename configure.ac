@@ -2,7 +2,11 @@ dnl $Id$
 dnl configure.ac is integral part of yaal project.
 
 dnl Initialization data.
-AC_INIT([[yaal]],[[0.0.0]],[[amok@frihet.ath.cx]])
+
+pushdef([AC_VERSION],esyscmd(awk '/^VERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
+pushdef([AC_SUBVERSION],esyscmd(awk '/^SUBVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
+pushdef([AC_EXTRAVERSION],esyscmd(awk '/^EXTRAVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
+AC_INIT([[yaal]],[AC_VERSION.AC_SUBVERSION.AC_EXTRAVERSION],[[amok@frihet.ath.cx]])
 
 AC_MSG_RESULT([--- Welcome to yaal configurator ---                     [[0%]]])
 
@@ -30,7 +34,7 @@ dnl yaal is not Free Software.
 AC_COPYRIGHT([[yaal (c) 2004 All rights reserved.]])
 
 dnl yaal is still in alpha stage.
-AC_REVISION([[$ Revision: 0.0.0 $]])
+AC_REVISION([[$Id$]])
 
 dnl We select default language.
 AC_LANG([C++])
