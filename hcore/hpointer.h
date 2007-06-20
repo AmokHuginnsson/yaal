@@ -126,7 +126,7 @@ tType* HPointerRelaxed<tType >::raw ( tType* a_ptPointer )
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t >
 HPointer<tType, pointer_type_t, access_type_t >::HPointer ( void )
-	: f_piReferenceCounter( new int ( 0 ) ), f_ptShared ( NULL )
+	: f_piReferenceCounter( NULL ), f_ptShared ( NULL )
 	{
 	return;
 	}

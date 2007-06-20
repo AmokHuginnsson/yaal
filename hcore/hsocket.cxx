@@ -112,18 +112,9 @@ HSocket::~HSocket ( void )
 void HSocket::shutdown ( void )
 	{
 	M_PROLOG
-	int l_iKey = 0;
-	HSocket * l_poSocket = NULL;
-	sockaddr_un * l_psAddressFile = NULL;
+	sockaddr_un* l_psAddressFile = NULL;
 	if ( f_poClients )
 		{
-		f_poClients->rewind();
-		while ( f_poClients->iterate ( l_iKey, l_poSocket ) )
-			{
-			if ( l_poSocket )
-				delete l_poSocket;
-			f_poClients->operator [ ] ( l_iKey ) = NULL;
-			}
 		delete f_poClients;
 		f_poClients = NULL;
 		if ( ( f_eType & D_FILE ) && ( f_pvAddress ) )
@@ -146,46 +137,44 @@ void HSocket::shutdown ( void )
 void HSocket::shutdown_client ( int a_iFileDescriptor )
 	{
 	M_PROLOG
-	HSocket * l_poClient = NULL;
+	socket_ptr_t l_oClient;
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
-	if ( ! f_poClients->get ( a_iFileDescriptor, l_poClient ) )
+	if ( ! f_poClients->get ( a_iFileDescriptor, l_oClient ) )
 		M_THROW ( _ ( "no such client" ), a_iFileDescriptor );
-	M_ASSERT ( l_poClient );
-	delete l_poClient;
+	M_ASSERT ( !! l_oClient );
 	f_poClients->remove ( a_iFileDescriptor );
 	return;
 	M_EPILOG
 	}
 
-void HSocket::listen ( char const * const a_pcAddress, int const a_iPort )
+void HSocket::listen( char const* const a_pcAddress, int const a_iPort )
 	{
 	M_PROLOG
 	int l_iReuseAddr = 1;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_INITIALIZED ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket [ E_NOT_INITIALIZED ], f_iFileDescriptor );
 	if ( f_poClients )
-		M_THROW ( n_ppcErrMsgHSocket [ E_ALREADY_LISTENING ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket [ E_ALREADY_LISTENING ], f_iFileDescriptor );
 	if ( f_iMaximumNumberOfClients < 1 )
-		M_THROW ( _ ( "bad maximum number of clients" ), f_iMaximumNumberOfClients );
+		M_THROW( _( "bad maximum number of clients" ), f_iMaximumNumberOfClients );
 	make_address ( a_pcAddress, a_iPort );
-	M_ENSURE ( setsockopt ( f_iFileDescriptor, SOL_SOCKET, SO_REUSEADDR,
-				& l_iReuseAddr, sizeof ( int ) ) == 0 );
-	M_ENSURE ( ::bind ( f_iFileDescriptor,
-				static_cast < sockaddr * > ( f_pvAddress ), f_iAddressSize ) == 0 );
-	M_ENSURE ( ::listen ( f_iFileDescriptor, f_iMaximumNumberOfClients ) == 0 );
-	f_poClients = new clients_t ( f_iMaximumNumberOfClients );
+	M_ENSURE( setsockopt( f_iFileDescriptor, SOL_SOCKET, SO_REUSEADDR,
+				&l_iReuseAddr, sizeof ( int ) ) == 0 );
+	M_ENSURE( ::bind( f_iFileDescriptor,
+				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 );
+	M_ENSURE( ::listen( f_iFileDescriptor, f_iMaximumNumberOfClients ) == 0 );
+	f_poClients = new clients_t( f_iMaximumNumberOfClients );
 	f_bNeedShutdown = true;
 	return;
 	M_EPILOG
 	}
 
-HSocket * HSocket::accept ( void )
+HSocket::socket_ptr_t HSocket::accept( void )
 	{
 	M_PROLOG
 	int l_iFileDescriptor = - 1;
 	socklen_t l_iAddressSize = 0;
-	HSocket * l_poSocket = NULL;
 	sockaddr_in l_sAddressNetwork;
 	sockaddr_un l_sAddressFile;
 	sockaddr * l_psAddress;
@@ -210,15 +199,15 @@ HSocket * HSocket::accept ( void )
 	if ( f_eType & D_NONBLOCKING )
 		M_ENSURE ( fcntl ( l_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 	/* - 1 means that constructor shall not create socket */
-	l_poSocket = new HSocket ( f_eType, - 1 );
-	l_poSocket->f_iFileDescriptor = l_iFileDescriptor;
-	l_poSocket->f_iAddressSize = l_iAddressSize;
-	l_poSocket->f_bNeedShutdown = true;
-	memcpy ( l_poSocket->f_pvAddress, l_psAddress, l_iAddressSize );
+	socket_ptr_t l_oSocket = socket_ptr_t( new HSocket ( f_eType, - 1 ) );
+	l_oSocket->f_iFileDescriptor = l_iFileDescriptor;
+	l_oSocket->f_iAddressSize = l_iAddressSize;
+	l_oSocket->f_bNeedShutdown = true;
+	memcpy ( l_oSocket->f_pvAddress, l_psAddress, l_iAddressSize );
 	if ( f_poClients->has_key ( l_iFileDescriptor ) )
 		M_THROW ( _ ( "inconsitient client list state" ), l_iFileDescriptor );
-	f_poClients->operator [ ] ( l_iFileDescriptor ) = l_poSocket;
-	return ( l_poSocket );
+	f_poClients->operator [ ] ( l_iFileDescriptor ) = l_oSocket;
+	return ( l_oSocket );
 	M_EPILOG
 	}
 
@@ -300,18 +289,18 @@ int const HSocket::get_port ( void ) const
 	M_EPILOG
 	}
 
-HSocket * HSocket::get_client ( int const a_iFileDescriptor ) const
+HSocket::socket_ptr_t HSocket::get_client ( int const a_iFileDescriptor ) const
 	{
 	M_PROLOG
-	HSocket * l_poClient = NULL;
+	socket_ptr_t l_oClient;
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
-	f_poClients->get ( a_iFileDescriptor, l_poClient );
-	return ( l_poClient );
+	f_poClients->get ( a_iFileDescriptor, l_oClient );
+	return ( l_oClient );
 	M_EPILOG
 	}
 
-bool HSocket::get_client_next ( int & a_riFileDescriptor, HSocket * & a_rpoClient ) const
+bool HSocket::get_client_next ( int& a_riFileDescriptor, socket_ptr_t& a_rpoClient ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )

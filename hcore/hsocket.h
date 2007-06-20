@@ -27,6 +27,7 @@ Copyright:
 #ifndef __YAAL_HCORE_HSOCKET_H
 #define __YAAL_HCORE_HSOCKET_H
 
+#include "hcore/hpointer.h"
 #include "hcore/hrawfile.h"
 #include "hcore/hhashmap.h"
 
@@ -39,6 +40,7 @@ namespace hcore
 class HSocket : public HRawFile
 	{
 public:
+	typedef HPointer<HSocket, HPointerScalar, HPointerRelaxed> socket_ptr_t;
 	typedef enum
 		{
 		D_DEFAULTS = 0,
@@ -48,36 +50,36 @@ public:
 		D_NONBLOCKING = 8
 		} socket_type_t;
 protected:
-	typedef HHashMap < int, HSocket * > clients_t;
+	typedef HHashMap<int, socket_ptr_t> clients_t;
 	bool f_bNeedShutdown;
 	socket_type_t f_eType;
 	int f_iMaximumNumberOfClients;
 	int f_iAddressSize;
-	void * f_pvAddress;
-	clients_t * f_poClients;
+	void* f_pvAddress;
+	clients_t* f_poClients;
 	HString f_oHostName;
 	HString f_oVarTmpBuffer;
 public:
-	HSocket ( socket_type_t const = D_DEFAULTS, int const = 0 );
-	virtual ~HSocket ( void );
-	void listen ( char const * const, int const = 0 );
-	HSocket * accept ( void );
-	void connect ( char const * const, int const = 0 );
-	int const get_port ( void ) const;
-	void shutdown ( void );
-	void shutdown_client ( int );
-	HSocket * get_client ( int ) const;
-	bool get_client_next ( int &, HSocket * & ) const;
-	void rewind_client_list ( void ) const;
-	int read_until ( HString &, char const * const = "\r\n" );
-	int write_until_eos ( HString const & );
-	int get_client_count ( void ) const;
-	HString const & get_host_name ( void );
+	HSocket( socket_type_t const = D_DEFAULTS, int const = 0 );
+	virtual ~HSocket( void );
+	void listen( char const* const, int const = 0 );
+	socket_ptr_t accept( void );
+	void connect( char const* const, int const = 0 );
+	int const get_port( void ) const;
+	void shutdown( void );
+	void shutdown_client( int );
+	socket_ptr_t get_client( int ) const;
+	bool get_client_next( int&, socket_ptr_t& ) const;
+	void rewind_client_list( void ) const;
+	int read_until( HString&, char const* const = "\r\n" );
+	int write_until_eos( HString const& );
+	int get_client_count( void ) const;
+	HString const& get_host_name( void );
 protected:
-	void make_address ( char const * const, int const );
+	void make_address( char const* const, int const );
 private:
-	HSocket ( HSocket const & );
-	HSocket & operator = ( HSocket const & );
+	HSocket( HSocket const& );
+	HSocket& operator = ( HSocket const& );
 	};
 
 }
