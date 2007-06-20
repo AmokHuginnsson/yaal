@@ -439,14 +439,18 @@ bool HAnalyser::addition_production( HAnalyserNode* a_poNode )
 		{
 		if ( ! a_poNode->f_poTrunk )
 			return ( false );
-		l_poTrunk = dynamic_cast < HAnalyserNode * > ( a_poNode->f_poTrunk );
+		l_poTrunk = dynamic_cast<HAnalyserNode*>( a_poNode->f_poTrunk );
 		M_ASSERT ( l_poTrunk );
 		while ( l_poTrunk->f_oBranch [ l_iCtr ] != a_poNode )
 			l_iCtr ++;
 		l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
+		dynamic_cast<HAnalyserNode*>( a_poNode->f_oBranch[ 0 ] )->f_poTrunk = l_poTrunk;
 		a_poNode->f_oBranch [ 0 ] = 0;
 		if ( a_poNode->f_oBranch.size() > 1 )
+			{
 			a_poNode->f_oBranch [ 1 ] = 0;
+			M_ASSERT( ! "What the f*ck?" );
+			}
 		if ( a_poNode )
 			delete a_poNode;
 		return ( false );
@@ -485,9 +489,13 @@ bool HAnalyser::multiplication_production( HAnalyserNode* a_poNode )
 		while ( l_poTrunk->f_oBranch [ l_iCtr ] != a_poNode )
 			l_iCtr ++;
 		l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
+		dynamic_cast<HAnalyserNode*>( a_poNode->f_oBranch[ 0 ] )->f_poTrunk = l_poTrunk;
 		a_poNode->f_oBranch [ 0 ] = 0;
 		if ( a_poNode->f_oBranch.size() > 1 )
+			{
 			a_poNode->f_oBranch [ 1 ] = 0;
+			M_ASSERT( ! "What the f*ck?" );
+			}
 		if ( a_poNode )
 			delete a_poNode;
 		return ( false );
@@ -527,15 +535,22 @@ bool HAnalyser::power_production( HAnalyserNode* a_poNode )
 	else
 		{
 		if ( ! a_poNode->f_poTrunk )
+			{
+			M_ASSERT( ! "What the f*ck?!!!" );
 			return ( false );
+			}
 		l_poTrunk = dynamic_cast<HAnalyserNode*>( a_poNode->f_poTrunk );
 		M_ASSERT ( l_poTrunk );
 		while ( l_poTrunk->f_oBranch [ l_iCtr ] != a_poNode )
 			l_iCtr ++;
 		l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
+		dynamic_cast<HAnalyserNode*>( a_poNode->f_oBranch[ 0 ] )->f_poTrunk = l_poTrunk;
 		a_poNode->f_oBranch [ 0 ] = 0;
 		if ( a_poNode->f_oBranch.size() > 1 )
+			{
+			M_ASSERT( ! "What the f*ck?" );
 			a_poNode->f_oBranch [ 1 ] = 0;
+			}
 		if ( a_poNode )
 			delete a_poNode;
 		}
@@ -543,7 +558,7 @@ bool HAnalyser::power_production( HAnalyserNode* a_poNode )
 	M_EPILOG
 	}
 
-bool HAnalyser::signum_production ( HAnalyserNode * a_poNode )
+bool HAnalyser::signum_production( HAnalyserNode * a_poNode )
 	{
 	M_PROLOG
 	if ( f_iIndex > f_iLength )
@@ -565,7 +580,7 @@ bool HAnalyser::signum_production ( HAnalyserNode * a_poNode )
 	M_EPILOG
 	}
 
-bool HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
+bool HAnalyser::terminal_production( HAnalyserNode* a_poNode )
 	{
 	M_PROLOG
 	if ( f_iIndex > f_iLength )
@@ -683,7 +698,7 @@ bool HAnalyser::terminal_production ( HAnalyserNode * a_poNode )
 	M_EPILOG
 	}
 
-double * HAnalyser::analyse ( char const * a_pcFormula )
+double* HAnalyser::analyse( char const* a_pcFormula )
 	{
 	M_PROLOG
 	int l_iLength = 0;
@@ -709,7 +724,7 @@ double * HAnalyser::analyse ( char const * a_pcFormula )
 	f_poRoot = 0;
 	f_poRoot = l_poNode = new HAnalyserNode ( 0 );
 	l_poNode->f_poTree = this;
-	if ( ! addition_production ( dynamic_cast < HAnalyserNode * > ( f_poRoot ) ) )
+	if ( ! addition_production( dynamic_cast<HAnalyserNode*>( f_poRoot ) ) )
 		{
 		if ( ( f_iIndex < f_iLength ) && ( f_eError == E_OK ) )
 			f_eError = E_UNEXPECTED_TOKEN;
@@ -722,7 +737,7 @@ double * HAnalyser::analyse ( char const * a_pcFormula )
 	M_EPILOG
 	}
 
-double & HAnalyser::operator [ ] ( int a_iIndex )
+double& HAnalyser::operator [ ] ( int a_iIndex )
 	{
 	M_PROLOG
 	if ( ( a_iIndex >= 'a' ) && ( a_iIndex <= 'a' ) )
@@ -736,7 +751,7 @@ double & HAnalyser::operator [ ] ( int a_iIndex )
 	M_EPILOG
 	}
 
-double HAnalyser::count ( void )
+double HAnalyser::count( void )
 	{
 	M_PROLOG
 	HAnalyserNode * l_poRoot = NULL;
@@ -748,7 +763,7 @@ double HAnalyser::count ( void )
 	M_EPILOG
 	}
 
-char const * HAnalyser::get_error ( void ) const
+char const* HAnalyser::get_error( void ) const
 	{
 	M_PROLOG
 	switch ( f_eError )
@@ -779,7 +794,7 @@ char const * HAnalyser::get_error ( void ) const
 	M_EPILOG
 	}
 
-int HAnalyser::get_error_token ( void ) const
+int HAnalyser::get_error_token( void ) const
 	{
 	M_PROLOG
 	if ( f_iLength > f_iIndex )
