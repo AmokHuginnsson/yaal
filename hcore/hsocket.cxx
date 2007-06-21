@@ -137,7 +137,7 @@ void HSocket::shutdown ( void )
 void HSocket::shutdown_client ( int a_iFileDescriptor )
 	{
 	M_PROLOG
-	socket_ptr_t l_oClient;
+	ptr_t l_oClient;
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
 	if ( ! f_poClients->get ( a_iFileDescriptor, l_oClient ) )
@@ -170,7 +170,7 @@ void HSocket::listen( char const* const a_pcAddress, int const a_iPort )
 	M_EPILOG
 	}
 
-HSocket::socket_ptr_t HSocket::accept( void )
+HSocket::ptr_t HSocket::accept( void )
 	{
 	M_PROLOG
 	int l_iFileDescriptor = - 1;
@@ -199,7 +199,7 @@ HSocket::socket_ptr_t HSocket::accept( void )
 	if ( f_eType & D_NONBLOCKING )
 		M_ENSURE ( fcntl ( l_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 	/* - 1 means that constructor shall not create socket */
-	socket_ptr_t l_oSocket = socket_ptr_t( new HSocket ( f_eType, - 1 ) );
+	ptr_t l_oSocket = ptr_t( new HSocket ( f_eType, - 1 ) );
 	l_oSocket->f_iFileDescriptor = l_iFileDescriptor;
 	l_oSocket->f_iAddressSize = l_iAddressSize;
 	l_oSocket->f_bNeedShutdown = true;
@@ -289,10 +289,10 @@ int const HSocket::get_port ( void ) const
 	M_EPILOG
 	}
 
-HSocket::socket_ptr_t HSocket::get_client ( int const a_iFileDescriptor ) const
+HSocket::ptr_t HSocket::get_client ( int const a_iFileDescriptor ) const
 	{
 	M_PROLOG
-	socket_ptr_t l_oClient;
+	ptr_t l_oClient;
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
 	f_poClients->get ( a_iFileDescriptor, l_oClient );
@@ -300,7 +300,7 @@ HSocket::socket_ptr_t HSocket::get_client ( int const a_iFileDescriptor ) const
 	M_EPILOG
 	}
 
-bool HSocket::get_client_next ( int& a_riFileDescriptor, socket_ptr_t& a_rpoClient ) const
+bool HSocket::get_client_next ( int& a_riFileDescriptor, ptr_t& a_rpoClient ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )

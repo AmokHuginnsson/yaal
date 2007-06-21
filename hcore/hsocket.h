@@ -40,7 +40,7 @@ namespace hcore
 class HSocket : public HRawFile
 	{
 public:
-	typedef HPointer<HSocket, HPointerScalar, HPointerRelaxed> socket_ptr_t;
+	typedef HPointer<HSocket, HPointerScalar, HPointerRelaxed> ptr_t;
 	typedef enum
 		{
 		D_DEFAULTS = 0,
@@ -50,7 +50,7 @@ public:
 		D_NONBLOCKING = 8
 		} socket_type_t;
 protected:
-	typedef HHashMap<int, socket_ptr_t> clients_t;
+	typedef HHashMap<int, ptr_t> clients_t;
 	bool f_bNeedShutdown;
 	socket_type_t f_eType;
 	int f_iMaximumNumberOfClients;
@@ -63,13 +63,13 @@ public:
 	HSocket( socket_type_t const = D_DEFAULTS, int const = 0 );
 	virtual ~HSocket( void );
 	void listen( char const* const, int const = 0 );
-	socket_ptr_t accept( void );
+	ptr_t accept( void );
 	void connect( char const* const, int const = 0 );
 	int const get_port( void ) const;
 	void shutdown( void );
 	void shutdown_client( int );
-	socket_ptr_t get_client( int ) const;
-	bool get_client_next( int&, socket_ptr_t& ) const;
+	ptr_t get_client( int ) const;
+	bool get_client_next( int&, ptr_t& ) const;
 	void rewind_client_list( void ) const;
 	int read_until( HString&, char const* const = "\r\n" );
 	int write_until_eos( HString const& );
