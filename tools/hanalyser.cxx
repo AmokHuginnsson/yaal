@@ -440,19 +440,14 @@ bool HAnalyser::addition_production( HAnalyserNode* a_poNode )
 		if ( ! a_poNode->f_poTrunk )
 			return ( false );
 		l_poTrunk = dynamic_cast<HAnalyserNode*>( a_poNode->f_poTrunk );
-		M_ASSERT ( l_poTrunk );
+		M_ASSERT( l_poTrunk );
+		M_ASSERT( a_poNode->f_oBranch.size() == 1 );
 		while ( l_poTrunk->f_oBranch [ l_iCtr ] != a_poNode )
 			l_iCtr ++;
 		l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
 		dynamic_cast<HAnalyserNode*>( a_poNode->f_oBranch[ 0 ] )->f_poTrunk = l_poTrunk;
 		a_poNode->f_oBranch [ 0 ] = 0;
-		if ( a_poNode->f_oBranch.size() > 1 )
-			{
-			a_poNode->f_oBranch [ 1 ] = 0;
-			M_ASSERT( ! "What the f*ck?" );
-			}
-		if ( a_poNode )
-			delete a_poNode;
+		delete a_poNode;
 		return ( false );
 		}
 	while ( ( f_oFormula [ f_iIndex ] == '+' )
@@ -485,19 +480,14 @@ bool HAnalyser::multiplication_production( HAnalyserNode* a_poNode )
 		if ( ! a_poNode->f_poTrunk )
 			return ( false );
 		l_poTrunk = dynamic_cast < HAnalyserNode * > ( a_poNode->f_poTrunk );
-		M_ASSERT ( l_poTrunk );
+		M_ASSERT( l_poTrunk );
+		M_ASSERT( a_poNode->f_oBranch.size() == 1 );
 		while ( l_poTrunk->f_oBranch [ l_iCtr ] != a_poNode )
 			l_iCtr ++;
 		l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
 		dynamic_cast<HAnalyserNode*>( a_poNode->f_oBranch[ 0 ] )->f_poTrunk = l_poTrunk;
 		a_poNode->f_oBranch [ 0 ] = 0;
-		if ( a_poNode->f_oBranch.size() > 1 )
-			{
-			a_poNode->f_oBranch [ 1 ] = 0;
-			M_ASSERT( ! "What the f*ck?" );
-			}
-		if ( a_poNode )
-			delete a_poNode;
+		delete a_poNode;
 		return ( false );
 		}
 	while ( ( f_oFormula [ f_iIndex ] == '*' )
@@ -535,24 +525,16 @@ bool HAnalyser::power_production( HAnalyserNode* a_poNode )
 	else
 		{
 		if ( ! a_poNode->f_poTrunk )
-			{
-			M_ASSERT( ! "What the f*ck?!!!" );
 			return ( false );
-			}
 		l_poTrunk = dynamic_cast<HAnalyserNode*>( a_poNode->f_poTrunk );
-		M_ASSERT ( l_poTrunk );
+		M_ASSERT( l_poTrunk );
+		M_ASSERT( a_poNode->f_oBranch.size() == 1 );
 		while ( l_poTrunk->f_oBranch [ l_iCtr ] != a_poNode )
 			l_iCtr ++;
 		l_poTrunk->f_oBranch [ l_iCtr ] = a_poNode->f_oBranch [ 0 ];
 		dynamic_cast<HAnalyserNode*>( a_poNode->f_oBranch[ 0 ] )->f_poTrunk = l_poTrunk;
 		a_poNode->f_oBranch [ 0 ] = 0;
-		if ( a_poNode->f_oBranch.size() > 1 )
-			{
-			M_ASSERT( ! "What the f*ck?" );
-			a_poNode->f_oBranch [ 1 ] = 0;
-			}
-		if ( a_poNode )
-			delete a_poNode;
+		delete a_poNode;
 		}
 	return ( false );
 	M_EPILOG

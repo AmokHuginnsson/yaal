@@ -127,6 +127,8 @@ template < typename tttType >
 HTree < tttType > ::HNode::~HNode ( void )
 	{
 	M_PROLOG
+	for ( typename branch_t::iterator it = f_oBranch.begin(); it != f_oBranch.end(); ++ it )
+		delete *it;
 	return;
 	M_EPILOG
 	}
