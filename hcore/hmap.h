@@ -99,9 +99,9 @@ public:
 			-- f_oEngine;
 			return ( it );
 			}
-		tType const & operator * ( void )
+		map_elem_t const & operator * ( void )
 			{	return ( f_oEngine.operator*<map_elem_t>() );	}
-		tType const * const operator -> ( void )
+		map_elem_t const * const operator -> ( void )
 			{ return ( & f_oEngine.operator*<map_elem_t>() );	}
 		bool operator == ( HIterator const & it ) const
 			{ return ( f_oEngine == it.f_oEngine ); }
