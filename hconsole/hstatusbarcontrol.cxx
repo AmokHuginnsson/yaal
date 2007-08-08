@@ -85,13 +85,14 @@ HStatusBarControl::~HStatusBarControl ( void )
 void HStatusBarControl::do_draw_label ( void )
 	{
 	M_PROLOG
-	c_move ( n_iHeight - 2, 0 );
-	c_clrtoeol();
+	HConsole& cons = HCons::get_instance();
+	cons.c_move( cons.get_height() - 2, 0 );
+	cons.c_clrtoeol();
 	HControl::do_draw_label();
 	bar();
 	f_iColumnRaw += f_iPromptLength;
 	f_iWidthRaw -= f_iPromptLength;
-	c_move ( f_iRowRaw, f_iPromptLength );
+	cons.c_move( f_iRowRaw, f_iPromptLength );
 	return;
 	M_EPILOG
 	}
@@ -101,16 +102,17 @@ void HStatusBarControl::do_refresh ( void )
 	M_PROLOG
 	int l_iOrigRow = 0;
 	int l_iOrigColumn = 0;
+	HConsole& cons = HCons::get_instance();
 	if ( ! f_bFocused )
-		c_getyx ( l_iOrigRow, l_iOrigColumn );
+		cons.c_getyx( l_iOrigRow, l_iOrigColumn );
 	if ( f_iPromptLength )
 		{
-		set_attr ( f_iStatusBarAttribute >> 8 );
-		c_mvprintf ( f_iRowRaw, 0, f_oPrompt );
+		cons.set_attr ( f_iStatusBarAttribute >> 8 );
+		cons.c_mvprintf ( f_iRowRaw, 0, f_oPrompt );
 		}
 	HEditControl::do_refresh();
 	if ( ! f_bFocused )
-		c_move ( l_iOrigRow, l_iOrigColumn );
+		cons.c_move ( l_iOrigRow, l_iOrigColumn );
 	if ( f_iStatusBarAttribute & 0xff )
 		{
 		f_uiAttributeEnabled &= 0xff00;
@@ -208,6 +210,7 @@ void HStatusBarControl::update_progress ( double a_dStep,
 	int l_iNextMinute = 0;
 	int l_iNextSecond = 0;
 	HTime l_oStoper, l_oNow, l_oLeft;
+	HConsole& cons = HCons::get_instance();
 	l_oNow.format ( "(%T)" );
 	if ( f_bDone )
 		return;
@@ -221,7 +224,7 @@ void HStatusBarControl::update_progress ( double a_dStep,
 		l_oLeft = l_oNow - l_oStoper;
 		}
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
-	l_iMaxBar = n_iWidth - ( 6 + 10 + 2 + ( f_bEstimate ? 10 : 0 ) );
+	l_iMaxBar = cons.get_width() - ( 6 + 10 + 2 + ( f_bEstimate ? 10 : 0 ) );
 	l_iNextPercent = static_cast < int > ( ( 100. * a_dStep / f_dProgressSize ) );
 	l_iNextStep = static_cast < int > ( ( l_iMaxBar * a_dStep / f_dProgressSize ) );
 	l_iNextMinute = l_oStoper.get_minute();
@@ -241,44 +244,44 @@ void HStatusBarControl::update_progress ( double a_dStep,
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", l_iMaxBar );
 			f_oString.format ( f_oVarTmpBuffer, "-",
-					( a_dStep ? ( static_cast < char const * > ( l_oLeft ) ) : "(?\?:?\?:?\?)" ),
-					static_cast < char const * > ( l_oStoper ),	l_iNextPercent, "%%" );
+					( a_dStep ? ( static_cast<char const *>( l_oLeft ) ) : "(?\?:?\?:?\?)" ),
+					static_cast<char const *>( l_oStoper ),	l_iNextPercent, "%%" );
 			}
 		else
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s[%%3d%%s]", l_iMaxBar );
 			f_oString.format ( f_oVarTmpBuffer, "-",
-					static_cast < char const * > ( l_oStoper ), l_iNextPercent, "%%" );
+					static_cast<char const*>( l_oStoper ), l_iNextPercent, "%%" );
 			}
 		if ( f_bDone )
-			strncpy ( f_oString.raw() + n_iWidth - 5, "done", 4 );
+			strncpy ( f_oString.raw() + cons.get_width() - 5, "done", 4 );
 		f_oString.fill ( '-', l_iMaxBar, 1 );
 		f_oString.fill ( '=', l_iNextStep, 1 );
-		c_mvprintf ( n_iHeight - 1, 0, f_oString );
+		cons.c_mvprintf ( cons.get_height() - 1, 0, f_oString );
 		f_oString = "";
 		f_iLastProgress = l_iNextStep;
 		f_iLastPercent = l_iNextPercent;
 		f_iLastMinute = l_iNextMinute;
 		f_iLastSecond = l_iNextSecond;
-		c_refresh();
+		cons.c_refresh();
 		}
 	return;
 	M_EPILOG
 	}
 
-void HStatusBarControl::message ( int a_iAttribute,
-		char const * a_pcFormat, ... )
+void HStatusBarControl::message( int a_iAttribute,
+		char const* a_pcFormat, ... )
 	{
 	M_PROLOG
 	if ( ! f_bFocused )
 		{
 		va_list ap;
-		va_start ( ap, a_pcFormat );
+		va_start( ap, a_pcFormat );
 		if ( a_pcFormat && a_pcFormat [ 0 ] )
-			bell();
+			HCons::get_instance().bell();
 		f_oVarTmpBuffer.vformat( a_pcFormat, &ap );
 		set( f_oVarTmpBuffer );
-		va_end ( ap );
+		va_end( ap );
 		if ( ! ( f_iStatusBarAttribute & 0x00ff ) )
 			f_iStatusBarAttribute |= ( f_uiAttributeEnabled & 0x00ff );
 		f_uiAttributeEnabled &= 0xff00;
@@ -289,18 +292,18 @@ void HStatusBarControl::message ( int a_iAttribute,
 	M_EPILOG
 	}
 
-void HStatusBarControl::message ( char const * a_pcFormat, ... )
+void HStatusBarControl::message( char const* a_pcFormat, ... )
 	{
 	M_PROLOG
 	if ( ! f_bFocused )
 		{
 		va_list l_xAp;
-		va_start ( l_xAp, a_pcFormat );
+		va_start( l_xAp, a_pcFormat );
 		if ( a_pcFormat && a_pcFormat [ 0 ] )
-			bell();
+			HCons::get_instance().bell();
 		f_oVarTmpBuffer.vformat( a_pcFormat, &l_xAp );
 		set( f_oVarTmpBuffer );
-		va_end ( l_xAp );
+		va_end( l_xAp );
 		schedule_refresh();
 		}
 	return;
@@ -310,14 +313,15 @@ void HStatusBarControl::message ( char const * a_pcFormat, ... )
 void HStatusBarControl::bar ( char const * a_pcBar )
 	{
 	M_PROLOG
+	HConsole& cons = HCons::get_instance();
 	set_attr_data();
 	if ( a_pcBar )
 		{
 		f_oVarTmpBuffer.format ( " %%-%ds ",
-				( n_iWidth - f_iLabelLength ) - ( f_bSingleLine ? 2 : 1 ) );
+				( cons.get_width() - f_iLabelLength ) - ( f_bSingleLine ? 2 : 1 ) );
 		f_oMessage.format ( f_oVarTmpBuffer, a_pcBar );
 		}
-	c_mvprintf ( n_iHeight - 2,
+	cons.c_mvprintf ( cons.get_height() - 2,
 			f_iLabelLength - ( f_bSingleLine ? 0 : 1 ), f_oMessage );
 	return;
 	M_EPILOG
@@ -366,7 +370,7 @@ int HStatusBarControl::process_input_normal ( int a_iCode )
 			}
 		break;
 		case ( '\t' ):
-			bell();
+		HCons::get_instance().bell();
 		break;
 		default :
 			a_iCode = l_iCode;

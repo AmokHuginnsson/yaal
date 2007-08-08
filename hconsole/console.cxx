@@ -306,9 +306,9 @@ int HConsole::endwin ( void )
 	return ( ::endwin() );
 	}
 
-void HConsole::c_getmaxyx( int& a_riHeight, int& a_riWidth )
+void HConsole::c_getmaxyx( void )
 	{
-	getmaxyx ( stdscr, a_riHeight, a_riWidth );
+	getmaxyx( stdscr, f_iHeight, f_iWidth );
 	return;
 	}
 

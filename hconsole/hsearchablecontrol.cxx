@@ -85,6 +85,7 @@ void HSearchableControl::highlight( int a_iRow, int a_iColumn,
 	M_PROLOG
 	int l_iHighlightLength = 0, l_iCtr = 0;
 	char l_cStopChar, * l_pcHighlightStart = NULL;
+	HConsole& cons = HCons::get_instance();
 	l_pcHighlightStart = f_oVarTmpBuffer.raw();
 /* We can do const_cast here because output of matches points
  * to inside of f_oVarTmpBuffer */
@@ -93,12 +94,12 @@ void HSearchableControl::highlight( int a_iRow, int a_iColumn,
 		{
 		if ( ( f_bFocused && ( ( a_iCurrent != l_iCtr ) || ! a_bCurrent ) )
 				|| ( ! f_bFocused && ( a_iCurrent == l_iCtr ) && a_bCurrent ) )
-			set_attr( n_iAttributeSearchHighlight >> 8 );
+			cons.set_attr( n_iAttributeSearchHighlight >> 8 );
 		else
-			set_attr( n_iAttributeSearchHighlight );
+			cons.set_attr( n_iAttributeSearchHighlight );
 		l_cStopChar = l_pcHighlightStart[ l_iHighlightLength ];
 		l_pcHighlightStart[ l_iHighlightLength ] = 0;
-		c_mvprintf( a_iRow, a_iColumn
+		cons.c_mvprintf( a_iRow, a_iColumn
 				+ ( l_pcHighlightStart - static_cast < char const * const > ( f_oVarTmpBuffer ) ),
 				l_pcHighlightStart );
 		l_pcHighlightStart[ l_iHighlightLength ] = l_cStopChar;

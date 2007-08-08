@@ -129,16 +129,17 @@ void HTreeControl::do_refresh( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
+	HConsole& cons = HCons::get_instance();
 	if ( f_bFocused )
-		curs_set ( CURSOR::D_INVISIBLE );
+		cons.curs_set ( CURSOR::D_INVISIBLE );
 	draw_label();
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer.raw(), '_', f_iWidthRaw );
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		c_mvprintf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
+		cons.c_mvprintf( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
 	if ( f_poRoot )
-		draw_node ( dynamic_cast < HNodeControl * > ( f_poRoot ), f_iRowRaw );
+		draw_node ( dynamic_cast<HNodeControl*>( f_poRoot ), f_iRowRaw );
 	return;
 	M_EPILOG
 	}
@@ -150,31 +151,32 @@ int HTreeControl::draw_node( HNodeControl* a_poNode, int a_iRow )
 	int l_iRow = a_iRow;
 	HString const * l_poString = NULL;
 	HInfo * l_poInfo = NULL;
+	HConsole& cons = HCons::get_instance();
 	M_ASSERT ( a_poNode );
 	l_iCtr = a_poNode->f_oBranch.size();
 	if ( a_poNode->f_tLeaf )
 		{
 		l_iRow ++;
 		l_poInfo = & a_poNode->f_tLeaf [ 0 ];
-		l_poString = & l_poInfo->get < HString const & >();
+		l_poString = & l_poInfo->get<HString const&>();
 		a_poNode->f_iRowRaw = l_iRow;
 		a_poNode->f_iColumnRaw = f_iColumnRaw + a_poNode->f_iLevel * 2 - 1; 
 		a_poNode->f_iWidthRaw = l_poString->get_length() + 2;
 		set_attr_data();
 		if ( ! a_poNode->f_bUnfolded && l_iCtr )
-			c_mvprintf ( l_iRow, a_poNode->f_iColumnRaw, "+" );
+			cons.c_mvprintf( l_iRow, a_poNode->f_iColumnRaw, "+" );
 		else if ( l_iCtr )
-			c_mvprintf ( l_iRow, a_poNode->f_iColumnRaw, "-" );
+			cons.c_mvprintf( l_iRow, a_poNode->f_iColumnRaw, "-" );
 		if ( a_poNode == f_poSelected )
-			set_attr ( f_bEnabled ? ( f_bFocused ? ~f_uiAttributeFocused
+			cons.set_attr( f_bEnabled ? ( f_bFocused ? ~f_uiAttributeFocused
 						: ~ f_uiAttributeEnabled ) : ~ f_uiAttributeDisabled );
-		c_mvprintf ( l_iRow, a_poNode->f_iColumnRaw + 1, * l_poString );
+		cons.c_mvprintf( l_iRow, a_poNode->f_iColumnRaw + 1, * l_poString );
 		}
 	if ( l_iCtr && ( a_poNode->f_bUnfolded || ! a_poNode->f_iLevel ) )
 		{
 		a_poNode->f_oBranch.go ( - 1 );
 		while ( l_iCtr -- )
-			l_iRow = draw_node ( dynamic_cast < HNodeControl * > ( * a_poNode->f_oBranch.to_tail() ),
+			l_iRow = draw_node( dynamic_cast<HNodeControl*>( * a_poNode->f_oBranch.to_tail() ),
 					l_iRow );
 		}
 	return ( l_iRow );

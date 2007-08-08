@@ -60,15 +60,16 @@ int HMainWindow::init( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
+	HConsole& cons = HCons::get_instance();
 	if ( f_oFocusedChild.is_valid() && ( !! (*f_oFocusedChild) ) )
 		return ( 0 );
 	l_iError = HWindow::init();
-	f_poMenu = new HMenuControl( this, 1, 1, - 2,	- n_iWidth / 2 - 1,
+	f_poMenu = new HMenuControl( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,
 			" &Menu \n" );
 	f_poMenu->enable( true );
 	f_poMenu->set_focus();
 	HWindowListControl* l_poWindowList = new HWindowListControl( this, 1,
-			- n_iWidth / 2 + 1, - 2, - 1, " &Opened window list: \n",
+			- cons.get_width() / 2 + 1, - 2, - 1, " &Opened window list: \n",
 			HListControler<HWindow::ptr_t>::ptr_t( new HListControler<HWindow::ptr_t>( f_oWindowList ) ),
 			f_roForegroundWindow );
 	l_poWindowList->add_column( -1, "&Okno", 1 );

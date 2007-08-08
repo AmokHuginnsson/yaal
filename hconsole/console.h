@@ -176,7 +176,7 @@ public:
 	int c_addch( int const& );
 	int c_refresh( void );
 	int endwin( void );
-	void c_getmaxyx( int&, int& );
+	void c_getmaxyx( void );
 	void c_getyx( int&, int& );
 	void c_clrtoeol( void );
 	int c_printf( char const* const, ... ) const;

@@ -133,7 +133,7 @@ int HTUIProcess::process_stdin( int a_iCode )
 	HString l_oCommand;
 	n_bInputWaiting = false;
 	if ( ! a_iCode )
-		a_iCode = get_key();
+		a_iCode = HCons::get_instance().get_key();
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && !! (*f_oForegroundWindow) )
@@ -197,7 +197,7 @@ int HTUIProcess::handler_alert( int, void* )
 	if ( n_bNeedRepaint )
 		{
 		n_bNeedRepaint = false;
-		c_refresh();
+		HCons::get_instance().c_refresh();
 		}
 	return ( 0 );
 	M_EPILOG
@@ -219,8 +219,9 @@ int HTUIProcess::handler_idle( int a_iCode, void* )
 	{
 	M_PROLOG
 #ifdef __DEBUG__
+	HConsole& cons = HCons::get_instance();
 	HString l_oClock( static_cast<char const *>( HTime() ) );
-	c_cmvprintf( 0, n_iWidth - l_oClock.get_length(),
+	cons.c_cmvprintf( 0, cons.get_width() - l_oClock.get_length(),
 			COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, l_oClock );
 	n_bNeedRepaint = true;
 #endif /* __DEBUG__ */
@@ -265,9 +266,10 @@ int HTUIProcess::handler_mouse( int a_iCode, void* )
 int HTUIProcess::handler_refresh( int, void* )
 	{
 	M_PROLOG
-	endwin();
-	kbhit(); /* cleans all trash from stdio buffer */
-	c_getmaxyx( n_iHeight, n_iWidth );
+	HConsole& cons = HCons::get_instance();
+	cons.endwin();
+	cons.kbhit(); /* cleans all trash from stdio buffer */
+	cons.c_getmaxyx();
 	refresh( true ); /* there is c_clrscr(); and c_refresh() call inside */
 	return ( 0 );
 	M_EPILOG
@@ -277,7 +279,7 @@ int HTUIProcess::handler_quit( int, void* )
 	{
 	M_PROLOG
 	f_bLoop = false;
-	clrscr();
+	HCons::get_instance().clrscr();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -346,7 +348,7 @@ void HTUIProcess::refresh( bool a_bForce )
 			(*f_oForegroundWindow)->schedule_refresh();
 		(*f_oForegroundWindow)->refresh();
 		}
-	c_refresh();
+	HCons::get_instance().c_refresh();
 	n_bNeedRepaint = false;
 	return;
 	M_EPILOG

@@ -149,6 +149,7 @@ void signal_WINCH ( int a_iSignum )
 	M_PROLOG
 	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
+	HConsole& cons = HCons::get_instance();
 	l_oMessage = "Terminal size changed: ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
@@ -157,10 +158,10 @@ void signal_WINCH ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled() )
+	if ( cons.is_enabled() )
 		{
 		n_bInputWaiting = true;
-		ungetch ( KEY < 'l' >::ctrl );
+		cons.ungetch( KEY<'l'>::ctrl );
 		}
 	else
 		fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -186,8 +187,9 @@ void signal_INT ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled() )
-		leave_curses();
+	HConsole& cons = HCons::get_instance();
+	if ( cons.is_enabled() )
+		cons.leave_curses();
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( SIGINT, SIG_DFL );
@@ -209,8 +211,9 @@ void signal_TERM ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled() )
-		leave_curses();
+	HConsole& cons = HCons::get_instance();
+	if ( cons.is_enabled() )
+		cons.leave_curses();
 #endif
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( SIGTERM, SIG_DFL );
@@ -224,11 +227,14 @@ void signal_QUIT ( int a_iSignum )
 	M_PROLOG
 	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
+	HConsole& cons = HCons::get_instance();
+#endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	if ( tools::n_bIgnoreSignalSIGQUIT )
 		{
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-		if ( is_enabled() )
-			c_cmvprintf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
+		if ( cons.is_enabled() )
+			cons.c_cmvprintf ( cons.get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Hard Quit is disabled by yaal configuration." );
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 		return;
@@ -241,8 +247,8 @@ void signal_QUIT ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled() )
-		leave_curses();
+	if ( cons.is_enabled() )
+		cons.leave_curses();
 #endif
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( SIGQUIT, SIG_DFL );
@@ -256,11 +262,14 @@ void signal_TSTP ( int a_iSignum )
 	M_PROLOG
 	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
+#ifdef __YAAL_HCONSOLE_CONSOLE_H
+	HConsole& cons = HCons::get_instance();
+#endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	if ( tools::n_bIgnoreSignalSIGINT )
 		{
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-		if ( is_enabled() )
-			c_cmvprintf ( n_iHeight - 1, 0, COLORS::D_FG_BRIGHTRED,
+		if ( cons.is_enabled() )
+			cons.c_cmvprintf ( cons.get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Suspend is disabled by yaal configuration." );
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 		return;
@@ -273,8 +282,8 @@ void signal_TSTP ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled() )
-		leave_curses();
+	if ( cons.is_enabled() )
+		cons.leave_curses();
 #endif
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( SIGTSTP, SIG_DFL );
@@ -296,12 +305,13 @@ void signal_CONT ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( ! is_enabled() )
-		enter_curses();
-	if ( is_enabled() )
+	HConsole& cons = HCons::get_instance();
+	if ( ! cons.is_enabled() )
+		cons.enter_curses();
+	if ( cons.is_enabled() )
 		{
 		n_bInputWaiting = true;
-		ungetch ( KEY < 'l' >::ctrl );
+		cons.ungetch ( KEY < 'l' >::ctrl );
 		}
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -324,8 +334,9 @@ void signal_fatal ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled() )
-		leave_curses();
+	HConsole& cons = HCons::get_instance();
+	if ( cons.is_enabled() )
+		cons.leave_curses();
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( a_iSignum, SIG_DFL );
@@ -338,12 +349,13 @@ void signal_USR1 ( int a_iSignum )
 	{
 	M_PROLOG
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
+	HConsole& cons = HCons::get_instance();
 	if ( n_bUseMouse )
 		{
-		if ( is_enabled() )
+		if ( cons.is_enabled() )
 			{
 			n_bInputWaiting = true;
-			ungetch ( KEY_CODES::D_MOUSE );
+			cons.ungetch ( KEY_CODES::D_MOUSE );
 			return;
 			}
 		}
@@ -358,8 +370,8 @@ void signal_USR1 ( int a_iSignum )
 	log << l_oMessage << endl;
 #endif /* __YAAL_HCORE_HLOG_H */
 #ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( is_enabled() )
-		leave_curses();
+	if ( cons.is_enabled() )
+		cons.leave_curses();
 #endif /* __YAAL_HCONSOLE_CONSOLE_H */
 	fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	signal ( a_iSignum, SIG_DFL );
