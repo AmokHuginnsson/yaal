@@ -118,23 +118,24 @@ char const* const brightcyan = "\033[1m\033[36m";
 char const* const white = "\033[1m\033[37m";
 
 /* public: */
-bool n_bNeedRepaint = false;
-bool n_bInputWaiting = false;
-int n_iWidth = 0;
-int n_iHeight = 0;
-int n_iMouseDes = 0;
 
 /* private: */
-WINDOW * n_psWindow = NULL;
-bool	n_bEnabled = false;
-bool	n_bBrokenBrightBackground = false;
-termios	n_sTermios;
+WINDOW* f_psWindow = NULL;
+bool	f_bEnabled = false;
+bool	f_bBrokenBrightBackground = false;
+termios	f_sTermios;
 
 int const C_OK = OK;
 int const C_ERR = ERR;
+bool n_bNeedRepaint( false );
 
 /* public: */
-void enter_curses( void )
+
+HConsole::HConsole( void ) : f_bInputWaiting( false ), f_iWidth( 0 ), f_iHeight( 0 ), f_iMouseDes( 0 )
+	{
+	}
+
+void HConsole::enter_curses( void )
 	{
 	M_PROLOG
 	short l_piColors [ ] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
@@ -147,7 +148,7 @@ void enter_curses( void )
 		M_THROW ( "stdin in not a tty", 0 );
 	if ( n_bDisableXON )
 		{
-		M_ENSURE ( tcgetattr ( STDIN_FILENO, & n_sTermios ) == 0 );
+		M_ENSURE ( tcgetattr ( STDIN_FILENO, & f_sTermios ) == 0 );
 		M_ENSURE ( tcgetattr ( STDIN_FILENO, & l_sTermios ) == 0 );
 		l_sTermios.c_iflag &= ~IXON;
 		if ( n_bLeaveCtrlC )
@@ -163,8 +164,8 @@ void enter_curses( void )
 		M_ENSURE ( tcsetattr ( STDIN_FILENO, TCSAFLUSH, & l_sTermios ) == 0 );
 		}
 	use_env ( true );
-	if ( ! n_psWindow )
-		n_psWindow = initscr();
+	if ( ! f_psWindow )
+		f_psWindow = initscr();
 	M_ENSURE ( cbreak() != ERR );
 	M_ENSURE ( start_color() != ERR );
 	standout(); /* Macro, returned value without meaning */
@@ -186,9 +187,9 @@ void enter_curses( void )
 					l_piColors [ l_iFg ], l_piColors [ l_iBg ] );
 	attrset ( COLOR_PAIR( 7 ) );
 	bkgd( ' ' | ATTR::value( COLORS::D_FG_BLACK | COLORS::D_BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
-	n_bBrokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
-	n_bEnabled = true;
-	getmaxyx ( stdscr, n_iHeight, n_iWidth );
+	f_bBrokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
+	f_bEnabled = true;
+	getmaxyx ( stdscr, f_iHeight, f_iWidth );
 	if ( getenv ( "YAAL_NO_MOUSE" ) )
 		n_bUseMouse = false;
 	if ( n_bUseMouse)
@@ -207,7 +208,7 @@ void enter_curses( void )
 			mouse::mouse_get = mouse::console_mouse_get;
 			mouse::mouse_close = mouse::console_mouse_close;
 			}
-		if ( ( n_iMouseDes = mouse::mouse_open() ) < 0 )
+		if ( ( f_iMouseDes = mouse::mouse_open() ) < 0 )
 			M_THROW ( _ ( "mouse is console type"
 						" and we did not recived file descriptor" ), errno );
 		}
@@ -224,10 +225,10 @@ void enter_curses( void )
 	M_EPILOG
 	}
 	
-void leave_curses( void )
+void HConsole::leave_curses( void )
 	{
 	M_PROLOG
-	if ( ! n_bEnabled )
+	if ( ! f_bEnabled )
 		M_THROW ( "not in curses mode", errno );
 	if ( n_bUseMouse )
 		static_cast < void > ( mouse::mouse_close() );
@@ -248,26 +249,26 @@ void leave_curses( void )
 /*	reset_shell_mode(); */
 /* see comment near def_shell_mode(), ( automagicly by endwin() ) */
 /*
-	if ( n_psWindow )
-	delwin ( n_psWindow );
-	n_psWindow = NULL;
+	if ( f_psWindow )
+	delwin ( f_psWindow );
+	f_psWindow = NULL;
 */
 	M_ENSURE ( endwin() == OK );
 	if ( n_bDisableXON )
-		M_ENSURE ( tcsetattr ( STDIN_FILENO, TCSAFLUSH, & n_sTermios ) == 0 );
-	n_bEnabled = false;
+		M_ENSURE ( tcsetattr ( STDIN_FILENO, TCSAFLUSH, & f_sTermios ) == 0 );
+	f_bEnabled = false;
 	return;
 	M_EPILOG
 	}
 	
-void set_attr( int a_iAttr )
+void HConsole::set_attr( int a_iAttr ) const
 	{
 	M_PROLOG
 	char unsigned l_ucByte = 0;
-	if ( ! n_bEnabled )
+	if ( ! f_bEnabled )
 		M_THROW ( "not in curses mode", errno );
 	l_ucByte = static_cast < char unsigned > ( a_iAttr );
-	if ( n_bBrokenBrightBackground )
+	if ( f_bBrokenBrightBackground )
 		attrset ( ATTR::value_fix ( l_ucByte ) );
 	else
 		attrset ( ATTR::value ( l_ucByte ) );
@@ -275,12 +276,12 @@ void set_attr( int a_iAttr )
 	M_EPILOG
 	}
 
-int c_move ( int const & a_iRow, int const & a_iColumn )
+int HConsole::c_move( int const& a_iRow, int const& a_iColumn )
 	{
 	return ( ::move ( a_iRow, a_iColumn ) );
 	}
 
-CURSOR::cursor_t curs_set ( CURSOR::cursor_t const & a_eCursor )
+CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &a_eCursor ) const
 	{
 	int l_iCursor = ::curs_set ( a_eCursor == CURSOR::D_VISIBLE ? 1 : ( a_eCursor == CURSOR::D_INVISIBLE ? 0 : 2 ) );
 	if ( l_iCursor == 1 )
@@ -290,53 +291,61 @@ CURSOR::cursor_t curs_set ( CURSOR::cursor_t const & a_eCursor )
 	return ( CURSOR::D_INVISIBLE );
 	}
 
-int c_addch ( int const & a_iChar )
+int HConsole::c_addch( int const& a_iChar )
 	{
 	return ( ::addch ( a_iChar ) );
 	}
 
-int c_refresh ( void )
+int HConsole::c_refresh( void )
 	{
 	return ( ::refresh() );
 	}
 
-int endwin ( void )
+int HConsole::endwin ( void )
 	{
 	return ( ::endwin() );
 	}
 
-void c_getmaxyx ( int & a_riHeight, int & a_riWidth )
+void HConsole::c_getmaxyx( int& a_riHeight, int& a_riWidth )
 	{
 	getmaxyx ( stdscr, a_riHeight, a_riWidth );
 	return;
 	}
 
-void c_getyx ( int & a_riHeight, int & a_riWidth )
+void HConsole::c_getyx( int& a_riHeight, int& a_riWidth )
 	{
 	getyx ( stdscr, a_riHeight, a_riWidth );
 	return;
 	}
 
-void c_clrtoeol ( void )
+void HConsole::c_clrtoeol( void )
 	{
 	::clrtoeol();
 	return;
 	}
 
-namespace
-{
+int const& HConsole::get_height( void ) const
+	{
+	return ( f_iHeight );
+	}
 
-int c_vmvprintf ( int a_iRow, int a_iColumn,
-							 char const * const a_pcFormat, va_list & a_rxAp )
+int const& HConsole::get_width( void ) const
+	{
+	return ( f_iWidth );
+	}
+
+int HConsole::c_vmvprintf ( int a_iRow, int a_iColumn,
+							 char const* const a_pcFormat, void* a_pxAp ) const
 	{
 	int l_iOrigRow = 0;
 	int l_iOrigColumn = 0;
 	int l_iError = 0;
-	if ( ! n_bEnabled )
+	va_list& l_rxAp = *static_cast<va_list*>( a_pxAp );
+	if ( ! f_bEnabled )
 		M_THROW ( "not in curses mode", errno );
-	if ( a_iColumn >= n_iWidth )
+	if ( a_iColumn >= f_iWidth )
 		M_THROW ( "bad column.", a_iColumn );
-	if ( ( a_iRow < 0 ) || ( a_iRow >= n_iHeight ) )
+	if ( ( a_iRow < 0 ) || ( a_iRow >= f_iHeight ) )
 		M_THROW ( "bad row.", a_iRow );
 	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
 	if ( a_iColumn < 0 )
@@ -346,86 +355,86 @@ int c_vmvprintf ( int a_iRow, int a_iColumn,
 		}
 	else
 		M_ENSURE ( move ( a_iRow, a_iColumn ) != ERR );
-	l_iError = vw_printw ( stdscr, a_pcFormat, a_rxAp );
+	l_iError = vw_printw ( stdscr, a_pcFormat, l_rxAp );
 	M_ENSURE ( move ( l_iOrigRow, l_iOrigColumn ) != ERR );
 	return ( l_iError );
 	}
 
-int c_vcmvprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
-							 char const* const a_pcFormat, va_list& a_rxAp )
+int HConsole::c_vcmvprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
+							 char const* const a_pcFormat, void* a_pxAp ) const
 	{
 	M_PROLOG
 	int l_iError = 0;
 	int l_iOrigAttribute = 0;
-	if ( ! n_bEnabled )
+	va_list& l_rxAp = *static_cast<va_list*>( a_pxAp );
+	if ( ! f_bEnabled )
 		M_THROW( "not in curses mode", errno );
 	l_iOrigAttribute = get_attr();
 	set_attr( a_iAttribute );
-	l_iError = c_vmvprintf( a_iRow, a_iColumn, a_pcFormat, a_rxAp );
+	l_iError = c_vmvprintf( a_iRow, a_iColumn, a_pcFormat, l_rxAp );
 	set_attr( l_iOrigAttribute );
 	return ( l_iError );
 	M_EPILOG
 	}
 	
-int c_vprintf ( char const* const a_pcFormat, va_list& a_rxAp )
+int HConsole::c_vprintf ( char const* const a_pcFormat, void* a_pxAp ) const
 	{
 	M_PROLOG
 	int l_iError = 0;
-	if ( ! n_bEnabled )
+	va_list& l_rxAp = *static_cast<va_list*>( a_pxAp );
+	if ( ! f_bEnabled )
 		M_THROW( "not in curses mode", errno );
-	l_iError = vw_printw( stdscr, a_pcFormat, a_rxAp );
+	l_iError = vw_printw( stdscr, a_pcFormat, l_rxAp );
 	return ( l_iError );
 	M_EPILOG
 	}
 
-}
-
-int c_printf ( char const* const a_pcFormat, ... )
+int HConsole::c_printf( char const* const a_pcFormat, ... ) const
 	{
 	int l_iError = 0;
 	va_list l_xAp;
 	va_start( l_xAp, a_pcFormat );
-	l_iError = c_vprintf( a_pcFormat, l_xAp );
+	l_iError = c_vprintf( a_pcFormat, &l_xAp );
 	va_end( l_xAp );
 	return ( l_iError );
 	}
 
-int c_mvprintf( int a_iRow, int a_iColumn, char const* const a_pcFormat,
-		... )
+int HConsole::c_mvprintf( int a_iRow, int a_iColumn, char const* const a_pcFormat,
+		... ) const
 	{
 	int l_iError = 0;
 	va_list l_xAp;
 	va_start( l_xAp, a_pcFormat );
-	l_iError = c_vmvprintf( a_iRow, a_iColumn, a_pcFormat, l_xAp );
+	l_iError = c_vmvprintf( a_iRow, a_iColumn, a_pcFormat, &l_xAp );
 	va_end( l_xAp );
 	return ( l_iError );
 	}
 
-int c_cmvprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
-							 char const * const a_pcFormat, ... )
+int HConsole::c_cmvprintf( int a_iRow, int a_iColumn, int a_iAttribute,
+							 char const* const a_pcFormat, ... ) const
 	{
 	M_PROLOG
 	int l_iError = 0;
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
-	l_iError = c_vcmvprintf ( a_iRow, a_iColumn, a_iAttribute, a_pcFormat, l_xAp );
+	l_iError = c_vcmvprintf ( a_iRow, a_iColumn, a_iAttribute, a_pcFormat, &l_xAp );
 	va_end ( l_xAp );
 	return ( l_iError );
 	M_EPILOG
 	}
 
-int ungetch ( int a_iCode )
+int HConsole::ungetch( int a_iCode ) const
 	{
 	return ( ::ungetch ( a_iCode ) );
 	}
 
-int get_key ( void )
+int HConsole::get_key( void ) const
 	{
 	M_PROLOG
 	int l_iKey = 0;
 	int l_iChar = 0;
 	CURSOR::cursor_t l_eOrigCursState = CURSOR::D_INVISIBLE;
-	if ( ! n_bEnabled )
+	if ( ! f_bEnabled )
 		M_THROW ( "not in curses mode", errno );
 	M_ENSURE ( noecho() != ERR );
 	M_ENSURE ( fflush( NULL ) == 0 );
@@ -443,7 +452,7 @@ int get_key ( void )
 	if ( l_iKey == KEY<>::ctrl_r ( n_cCommandComposeCharacter ) )
 		{
 		l_eOrigCursState = curs_set ( CURSOR::D_INVISIBLE );
-		c_cmvprintf ( n_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
+		c_cmvprintf ( f_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
 					n_cCommandComposeCharacter );
 		timeout ( n_iCommandComposeDelay * 100 );
 		l_iKey = getch();
@@ -451,7 +460,7 @@ int get_key ( void )
 		if ( l_iKey == ERR )
 			{
 			l_iKey = KEY<>::ctrl_r ( n_cCommandComposeCharacter );
-			c_cmvprintf ( n_iHeight - 1, 0, COLORS::D_FG_LIGHTGRAY, "      " );
+			c_cmvprintf ( f_iHeight - 1, 0, COLORS::D_FG_LIGHTGRAY, "      " );
 			}
 		else
 			{
@@ -469,7 +478,7 @@ int get_key ( void )
 				}
 			else
 				l_iKey = KEY<>::command_r ( l_iChar = l_iKey );
-			c_cmvprintf ( n_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar );
+			c_cmvprintf ( f_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar );
 			}
 		curs_set ( l_eOrigCursState );
 		}
@@ -498,11 +507,11 @@ int get_key ( void )
 	M_EPILOG
 	}
 	
-int kbhit ( void )
+int HConsole::kbhit( void ) const
 	{
 	M_PROLOG
 	int l_iKey;
-	if ( ! n_bEnabled )
+	if ( ! f_bEnabled )
 		M_THROW ( "not in curses mode", errno );
 	M_ENSURE ( nodelay( stdscr, true ) != ERR );
 	l_iKey = get_key();
@@ -513,10 +522,10 @@ int kbhit ( void )
 	M_EPILOG
 	}
 	
-char unsigned get_attr( void )
+char unsigned HConsole::get_attr( void ) const
 	{
 	M_PROLOG
-	if ( ! n_bEnabled )
+	if ( ! f_bEnabled )
 		M_THROW( "not in curses mode", errno );
 	attr_t l_xAttr;
 	short l_hColor = 0;
@@ -532,10 +541,10 @@ char unsigned get_attr( void )
 	M_EPILOG
 	}
 	
-void clrscr ( void )
+void HConsole::clrscr( void ) const
 	{
 	M_PROLOG
-	if ( ! n_bEnabled )
+	if ( ! f_bEnabled )
 		M_THROW ( "not in curses mode", errno );
 	clear(); /* Always returns OK */
 	M_ENSURE ( refresh() != ERR );
@@ -543,15 +552,15 @@ void clrscr ( void )
 	M_EPILOG
 	}
 
-bool is_enabled ( void )
+bool HConsole::is_enabled( void ) const
 	{
 	M_PROLOG
-	return ( n_bEnabled );
+	return ( f_bEnabled );
 	M_EPILOG
 	}
 
-int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
-		int a_iTimeOutSec, int a_iTimeOutUsec )
+int HConsole::wait_for_user_input( int& a_iKey, mouse::OMouse& a_rsMouse,
+		int a_iTimeOutSec, int a_iTimeOutUsec ) const
 	{
 	int l_iError = - 1, l_iEventType = 0;
 	timeval l_xWait;
@@ -560,11 +569,11 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 	l_xWait.tv_usec = a_iTimeOutUsec;
 	FD_ZERO ( & l_xFdSet );
 	FD_SET ( STDIN_FILENO, & l_xFdSet );
-	if ( n_iMouseDes )
-		FD_SET ( n_iMouseDes, & l_xFdSet );
+	if ( f_iMouseDes )
+		FD_SET ( f_iMouseDes, & l_xFdSet );
 	do
 		{
-		if ( n_bInputWaiting )
+		if ( f_bInputWaiting )
 			{
 			a_iKey = get_key();
 			l_iEventType = EVENT::D_MOUSE;
@@ -587,13 +596,13 @@ int wait_for_user_input ( int & a_iKey, mouse::OMouse & a_rsMouse,
 				l_iEventType = 0;
 			}
 		if ( ( a_iKey == KEY_MOUSE )
-				|| ( n_iMouseDes && FD_ISSET ( n_iMouseDes, & l_xFdSet ) ) )
+				|| ( f_iMouseDes && FD_ISSET ( f_iMouseDes, & l_xFdSet ) ) )
 			l_iEventType |= EVENT::D_MOUSE, static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
 		}
 	return ( l_iEventType );
 	}
 
-void bell ( void )
+void HConsole::bell( void ) const
 	{
 	M_PROLOG
 	M_ENSURE ( putchar ( '\a' ) == '\a' );

@@ -77,7 +77,7 @@ int HComboboxControl::kill_focus ( void )
 	if ( f_eMode == MODE::D_LISTCONTROL )
 		{
 		f_eMode = MODE::D_EDITCONTROL;
-		clrscr();
+		HCons::get_instance().clrscr();
 		f_poParent->schedule_refresh();
 		}
 	return ( HControl::kill_focus() );
@@ -89,17 +89,18 @@ void HComboboxControl::do_refresh ( void )
 	M_PROLOG
 	int l_iWidth = 0;
 	int l_iHeight = 0;
+	HConsole& cons = HCons::get_instance();
 	if ( f_eMode == MODE::D_EDITCONTROL )
 		{
 /* ripped from HControl::draw_label() */
 		l_iWidth = ( f_iWidth > 0 ) ? f_iWidth
-			: n_iWidth + f_iWidth - f_iColumnRaw;
+			: cons.get_width() + f_iWidth - f_iColumnRaw;
 /* end of ripped part */
 		HEditControl::do_refresh();
-		M_ENSURE ( c_move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 ) != C_ERR );
+		M_ENSURE ( cons.c_move ( f_iRowRaw, f_iColumnRaw + l_iWidth - 1 ) != C_ERR );
 		set_attr_label();
-		M_ENSURE ( c_addch ( GLYPHS::D_DOWN_ARROW ) != C_ERR );
-		M_ENSURE ( c_move ( f_iRowRaw, f_iColumnRaw + HEditControl::f_iCursorPosition ) != C_ERR );
+		M_ENSURE ( cons.c_addch ( GLYPHS::D_DOWN_ARROW ) != C_ERR );
+		M_ENSURE ( cons.c_move ( f_iRowRaw, f_iColumnRaw + HEditControl::f_iCursorPosition ) != C_ERR );
 		f_iHeightRaw = 0;
 		}
 	else
@@ -154,7 +155,7 @@ int HComboboxControl::do_click( mouse::OMouse& a_rsMouse )
 		{
 		HEditControl::do_click( a_rsMouse );
 		f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
-			: n_iWidth + f_iWidth - f_iColumnRaw;
+			: HCons::get_instance().get_width() + f_iWidth - f_iColumnRaw;
 		if ( a_rsMouse.f_iColumn == ( f_iColumnRaw + f_iWidthRaw - 1 ) )
 			{
 			f_eMode = MODE::D_LISTCONTROL;

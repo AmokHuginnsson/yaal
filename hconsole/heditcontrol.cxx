@@ -93,7 +93,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
  * f_iWidthRaw until draw_label(), which is called from refresh()
  * because ... see next comment */
 	f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
-		: n_iWidth + f_iWidth - f_iColumnRaw;
+		: HCons::get_instance().get_width() + f_iWidth - f_iColumnRaw;
 /* f_iWidthRaw must be set up properly before setting up f_iCursorPosition and
  * f_iControlOffset whose are used in refresh() */
 	if ( l_iLength >= f_iWidthRaw )
@@ -119,6 +119,7 @@ HEditControl::~HEditControl( void )
 void HEditControl::do_refresh ( void )
 	{
 	M_PROLOG
+	HConsole& cons = HCons::get_instance();
 	draw_label();
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	f_oVarTmpBuffer.fill ( ' ', f_iWidthRaw );
@@ -128,12 +129,12 @@ void HEditControl::do_refresh ( void )
 		f_oVarTmpBuffer [ f_oVarTmpBuffer.get_length() ] = ' ';
 		}
 	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
-	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer ) != C_ERR );
+	M_ENSURE ( cons.c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer ) != C_ERR );
 	if ( f_bFocused )
 		{
-		M_ENSURE ( c_move ( f_iRowRaw,
+		M_ENSURE ( cons.c_move ( f_iRowRaw,
 					f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) ) != C_ERR );
-		curs_set ( f_bReplace ? CURSOR::D_VERY_VISIBLE : CURSOR::D_VISIBLE );
+		cons.curs_set ( f_bReplace ? CURSOR::D_VERY_VISIBLE : CURSOR::D_VISIBLE );
 		}
 	return;
 	M_EPILOG
@@ -165,6 +166,7 @@ int HEditControl::do_process_input ( int a_iCode )
 	int l_iOldControlOffset = 0;
 	int l_iOldCursorPosition = 0;
 	char * l_pcBuffer = 0;
+	HConsole& cons = HCons::get_instance();
 	a_iCode = HControl::do_process_input ( a_iCode );
 	l_pcBuffer = f_oVarTmpBuffer.raw();
 	f_oVarTmpBuffer = f_oString;
@@ -222,7 +224,7 @@ int HEditControl::do_process_input ( int a_iCode )
 					f_iControlOffset --;
 				}
 			else
-				bell();
+				cons.bell();
 			}
 		break;
 		case ( KEY < 'a' >::ctrl ):
@@ -254,7 +256,7 @@ int HEditControl::do_process_input ( int a_iCode )
 					}
 				}
 			else
-				bell();
+				cons.bell();
 			}
 		break;
 		case ( KEY < 'u' >::ctrl ):
@@ -266,7 +268,7 @@ int HEditControl::do_process_input ( int a_iCode )
 				f_iCursorPosition = 0;
 				}
 			else
-				bell();
+				cons.bell();
 			}
 		break;
 		case ( KEY_CODES::D_DELETE ):
@@ -286,7 +288,7 @@ int HEditControl::do_process_input ( int a_iCode )
 				l_iLength --;
 				}
 			else
-				bell();
+				cons.bell();
 			}
 		break;
 		case ( KEY_CODES::D_BACKSPACE ):
@@ -306,7 +308,7 @@ int HEditControl::do_process_input ( int a_iCode )
 					}
 				}
 			else
-				bell();
+				cons.bell();
 			}
 		break;
 		case ( KEY_CODES::D_INSERT ):
@@ -330,7 +332,7 @@ int HEditControl::do_process_input ( int a_iCode )
 			l_iErrorCode = 0;
 			if ( ( l_iOldCursorPosition == f_iCursorPosition )
 					&& ( l_iOldControlOffset == f_iControlOffset ) )
-				bell();
+				cons.bell();
 			}
 		break;
 		case ( KEY < 'b' >::meta ):
@@ -360,7 +362,7 @@ int HEditControl::do_process_input ( int a_iCode )
 				l_iErrorCode = 0;
 				}
 			else
-				bell();
+				cons.bell();
 			}
 		break;
 		case ( KEY < 'd' >::meta ):
@@ -388,7 +390,7 @@ int HEditControl::do_process_input ( int a_iCode )
 				l_iErrorCode = 0;
 				}
 			else
-				bell();
+				cons.bell();
 			}
 		break;
 		case ( KEY < 'w' >::ctrl ):
@@ -425,7 +427,7 @@ int HEditControl::do_process_input ( int a_iCode )
 				l_iLength = f_oVarTmpBuffer.get_length();
 				}
 			else
-				bell();
+				cons.bell();
 			}
 		break;
 		default:
@@ -449,7 +451,7 @@ int HEditControl::do_process_input ( int a_iCode )
 						}
 					}
 				else
-					bell();
+					cons.bell();
 				}
 			else
 				l_iErrorCode = a_iCode;
@@ -485,7 +487,7 @@ int HEditControl::do_process_input ( int a_iCode )
 		{
 		f_iControlOffset = l_iOldControlOffset;
 		f_iCursorPosition = l_iOldCursorPosition;
-		bell();
+		cons.bell();
 		f_poParent->status_bar()->message ( COLORS::D_BG_BROWN, f_oPattern.error() );
 		}
 	return ( a_iCode );

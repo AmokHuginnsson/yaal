@@ -33,6 +33,7 @@ Copyright:
 #	include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "hcore/hsingleton.h"
 #include "hconsole/mouse.h"
 
 namespace yaal
@@ -155,34 +156,45 @@ struct EVENT
 		};
 	};
 
-void enter_curses( void );
-void leave_curses( void );
-void set_attr( int );
-int c_move ( int const &, int const & );
-CURSOR::cursor_t curs_set ( CURSOR::cursor_t const & );
-int c_addch ( int const & );
-int c_refresh ( void );
-int endwin ( void );
-void c_getmaxyx ( int &, int & );
-void c_getyx ( int &, int & );
-void c_clrtoeol ( void );
-int c_printf ( char const * const, ... );
-int c_mvprintf ( int, int, char const * const, ... );
-int c_cmvprintf ( int, int, int, char const * const, ... );
-int ungetch ( int );
-int get_key( void );
-int kbhit( void );
-char unsigned get_attr( void );
-void clrscr( void );
-bool is_enabled ( void );
-int wait_for_user_input ( int &, mouse::OMouse &, int = 0, int = 0 );
-void bell ( void );
-
 extern bool n_bNeedRepaint;
-extern bool n_bInputWaiting;
-extern int n_iWidth;
-extern int n_iHeight;
-extern int n_iMouseDes;
+
+class HConsole
+	{
+	bool f_bInputWaiting;
+	int f_iWidth;
+	int f_iHeight;
+	int f_iMouseDes;
+public:
+	HConsole( void );
+	int const& get_height( void ) const;
+	int const& get_width( void ) const;
+	void enter_curses( void );
+	void leave_curses( void );
+	void set_attr( int ) const;
+	int c_move ( int const&, int const& );
+	CURSOR::cursor_t curs_set( CURSOR::cursor_t const& ) const;
+	int c_addch( int const& );
+	int c_refresh( void );
+	int endwin( void );
+	void c_getmaxyx( int&, int& );
+	void c_getyx( int&, int& );
+	void c_clrtoeol( void );
+	int c_printf( char const* const, ... ) const;
+	int c_mvprintf( int, int, char const* const, ... ) const;
+	int c_cmvprintf( int, int, int, char const* const, ... ) const;
+	int ungetch( int ) const;
+	int get_key( void ) const;
+	int kbhit( void ) const;
+	char unsigned get_attr( void ) const;
+	void clrscr( void ) const;
+	bool is_enabled( void ) const;
+	int wait_for_user_input ( int&, mouse::OMouse&, int = 0, int = 0 ) const;
+	void bell( void ) const;
+protected:
+	int c_vmvprintf ( int, int, char const* const, void* ) const;
+	int c_vcmvprintf ( int, int, int, char const* const, void* ) const;
+	int c_vprintf ( char const* const, void* ) const;
+	};
 
 extern char const* const red;
 extern char const* const green;
@@ -199,6 +211,8 @@ extern char const* const brightblue;
 extern char const* const brightmagenta;
 extern char const* const brightcyan;
 extern char const* const white;
+
+typedef yaal::hcore::HSingleton<HConsole> HCons;
 
 }
 

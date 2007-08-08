@@ -74,14 +74,15 @@ void HLogPad::do_refresh ( void )
 	M_PROLOG
 	int l_iCtr = 0, l_iRow = 0, l_iCursor = 0, l_iColumn = 0;
 	int l_iBG = f_bFocused ? COLORS::D_BG_GRAY : COLORS::D_BG_BLACK;
-	HLogLine * l_poLogLine;
+	HConsole& cons = HCons::get_instance();
+	HLogLine* l_poLogLine = NULL;
 	draw_label();
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer.raw(), ' ', f_iWidthRaw );
 	f_oVarTmpBuffer.raw() [ f_iWidthRaw ] = 0;
 	f_iAttribute = COLORS::D_ATTR_NORMAL | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		c_cmvprintf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );
+		cons.c_cmvprintf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );
 	if ( f_oContents.size() )
 		{
 		l_poLogLine = & f_oContents.go ( 0 );
@@ -101,7 +102,7 @@ void HLogPad::do_refresh ( void )
 					if ( ( l_iCursor + f_oVarTmpBuffer.get_length() ) >= f_iWidthRaw )
 						f_oVarTmpBuffer [ f_iWidthRaw - l_iCursor ] = 0;
 					if ( f_oVarTmpBuffer [ 0 ] )
-						c_cmvprintf ( f_iRowRaw + l_iRow, f_iColumnRaw + l_iCursor, f_iAttribute, f_oVarTmpBuffer );
+						cons.c_cmvprintf ( f_iRowRaw + l_iRow, f_iColumnRaw + l_iCursor, f_iAttribute, f_oVarTmpBuffer );
 					}
 				else
 					f_oVarTmpBuffer = "";

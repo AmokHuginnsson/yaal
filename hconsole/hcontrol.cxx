@@ -56,7 +56,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iLabelLength ( 0 ), f_iShortcutIndex ( 0 ), f_bValid( false ), f_bNeedRepaint( false )
 	{
 	M_PROLOG
-	if ( ! is_enabled() )
+	if ( ! HCons::get_instance().is_enabled() )
 		M_THROW ( "not in curses mode.", errno );
 	if ( ! a_poParent )
 		M_THROW ( "no parent window.", reinterpret_cast < int > ( a_poParent ) );
@@ -209,15 +209,16 @@ void HControl::draw_label( void )
 void HControl::do_draw_label( void )
 	{
 	M_PROLOG
+	HConsole& cons = HCons::get_instance();
 	schedule_refresh();
 /* reposition control acordingly to current parent window size */
-	f_iRowRaw = ( f_iRow >= 0 ) ? f_iRow : n_iHeight + f_iRow;
+	f_iRowRaw = ( f_iRow >= 0 ) ? f_iRow : cons.get_height() + f_iRow;
 	f_iColumnRaw = ( f_iColumn >= 0 ) ? f_iColumn
-		: n_iWidth + f_iColumn;
+		: cons.get_width() + f_iColumn;
 	f_iHeightRaw = ( f_iHeight > 0 ) ? f_iHeight 
-		: n_iHeight + f_iHeight - f_iRowRaw;
+		: cons.get_height() + f_iHeight - f_iRowRaw;
 	f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
-		: n_iWidth + f_iWidth - f_iColumnRaw;
+		: cons.get_width() + f_iWidth - f_iColumnRaw;
 /* done */
 	if ( ! f_bDrawLabel )
 		{
@@ -225,9 +226,9 @@ void HControl::do_draw_label( void )
 		return;
 		}
 	set_attr_label();
-	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oLabel ) != C_ERR );
+	M_ENSURE ( cons.c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oLabel ) != C_ERR );
 	set_attr_shortcut();
-	M_ENSURE ( c_mvprintf ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
+	M_ENSURE ( cons.c_mvprintf ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
 				"%c", f_oLabel [ f_iShortcutIndex ] ) != C_ERR );
 	set_attr_data();
 	if ( f_bSingleLine )
@@ -331,7 +332,7 @@ int HControl::attr_data ( void ) const
 void HControl::set_attr_label ( void ) const
 	{
 	M_PROLOG
-	set_attr ( attr_label() );
+	HCons::get_instance().set_attr ( attr_label() ); /* FIXME */
 	return;
 	M_EPILOG
 	}
@@ -339,7 +340,7 @@ void HControl::set_attr_label ( void ) const
 void HControl::set_attr_shortcut ( void ) const
 	{
 	M_PROLOG
-	set_attr ( attr_shortcut() );
+	HCons::get_instance().set_attr ( attr_shortcut() ); /* FIXME */
 	return;
 	M_EPILOG
 	}
@@ -347,7 +348,7 @@ void HControl::set_attr_shortcut ( void ) const
 void HControl::set_attr_data ( void ) const
 	{
 	M_PROLOG
-	set_attr ( attr_data() );
+	HCons::get_instance().set_attr ( attr_data() ); /* FIXME */
 	return;
 	M_EPILOG
 	}
