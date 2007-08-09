@@ -340,7 +340,7 @@ int HConsole::get_mouse_fd( void ) const
 	return ( f_iMouseDes );
 	}
 
-int HConsole::c_vmvprintf ( int a_iRow, int a_iColumn,
+int HConsole::c_vmvprintf( int a_iRow, int a_iColumn,
 							 char const* const a_pcFormat, void* a_pxAp ) const
 	{
 	int l_iOrigRow = 0;
@@ -348,36 +348,35 @@ int HConsole::c_vmvprintf ( int a_iRow, int a_iColumn,
 	int l_iError = 0;
 	va_list& l_rxAp = *static_cast<va_list*>( a_pxAp );
 	if ( ! f_bEnabled )
-		M_THROW ( "not in curses mode", errno );
+		M_THROW( "not in curses mode", errno );
 	if ( a_iColumn >= f_iWidth )
-		M_THROW ( "bad column.", a_iColumn );
+		M_THROW( "bad column.", a_iColumn );
 	if ( ( a_iRow < 0 ) || ( a_iRow >= f_iHeight ) )
-		M_THROW ( "bad row.", a_iRow );
-	getyx ( stdscr, l_iOrigRow, l_iOrigColumn );
+		M_THROW( "bad row.", a_iRow );
+	getyx( stdscr, l_iOrigRow, l_iOrigColumn );
 	if ( a_iColumn < 0 )
 		{
-		M_ENSURE ( move ( a_iRow, 0 ) != ERR );
+		M_ENSURE( move ( a_iRow, 0 ) != ERR );
 		clrtoeol(); /* Always OK */
 		}
 	else
-		M_ENSURE ( move ( a_iRow, a_iColumn ) != ERR );
+		M_ENSURE( move( a_iRow, a_iColumn ) != ERR );
 	l_iError = vw_printw ( stdscr, a_pcFormat, l_rxAp );
-	M_ENSURE ( move ( l_iOrigRow, l_iOrigColumn ) != ERR );
+	M_ENSURE( move( l_iOrigRow, l_iOrigColumn ) != ERR );
 	return ( l_iError );
 	}
 
-int HConsole::c_vcmvprintf ( int a_iRow, int a_iColumn, int a_iAttribute,
+int HConsole::c_vcmvprintf( int a_iRow, int a_iColumn, int a_iAttribute,
 							 char const* const a_pcFormat, void* a_pxAp ) const
 	{
 	M_PROLOG
 	int l_iError = 0;
 	int l_iOrigAttribute = 0;
-	va_list& l_rxAp = *static_cast<va_list*>( a_pxAp );
 	if ( ! f_bEnabled )
 		M_THROW( "not in curses mode", errno );
 	l_iOrigAttribute = get_attr();
 	set_attr( a_iAttribute );
-	l_iError = c_vmvprintf( a_iRow, a_iColumn, a_pcFormat, l_rxAp );
+	l_iError = c_vmvprintf( a_iRow, a_iColumn, a_pcFormat, a_pxAp );
 	set_attr( l_iOrigAttribute );
 	return ( l_iError );
 	M_EPILOG
@@ -422,9 +421,9 @@ int HConsole::c_cmvprintf( int a_iRow, int a_iColumn, int a_iAttribute,
 	M_PROLOG
 	int l_iError = 0;
 	va_list l_xAp;
-	va_start ( l_xAp, a_pcFormat );
-	l_iError = c_vcmvprintf ( a_iRow, a_iColumn, a_iAttribute, a_pcFormat, &l_xAp );
-	va_end ( l_xAp );
+	va_start( l_xAp, a_pcFormat );
+	l_iError = c_vcmvprintf( a_iRow, a_iColumn, a_iAttribute, a_pcFormat, &l_xAp );
+	va_end( l_xAp );
 	return ( l_iError );
 	M_EPILOG
 	}
