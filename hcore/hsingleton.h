@@ -28,12 +28,29 @@ Copyright:
 #define __YAAL_HCORE_HSINGLETON_H
 
 #include "hcore/hpointer.h"
+#include "hcore/hmap.h"
+#include "hcore/hlist.h"
 
 namespace yaal
 {
 
 namespace hcore
 {
+
+class HDestructor
+	{
+	};
+
+class HLifeTimeTracker
+	{
+	typedef yaal::hcore::HList<HDestructor> destructor_list_t;
+	typedef yaal::hcore::HPointer<destructor_list_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> destructor_list_ptr_t;
+	typedef yaal::hcore::HMap<int, destructor_list_ptr_t> map_stack_t;
+	static map_stack_t f_oDestructors;
+public:
+	static void register_destructor( int = 0 );
+	static void destruct( void );
+	};
 
 template<typename tType>
 class HSingleton
