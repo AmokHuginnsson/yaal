@@ -78,8 +78,9 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 	HWindow::ptr_t l_oMainWindow;
 	HProcess::init( n_iLatency );
 	register_file_descriptor_handler( STDIN_FILENO, &HTUIProcess::process_stdin );
-	if ( n_bUseMouse && n_iMouseDes )
-		register_file_descriptor_handler( n_iMouseDes, &HTUIProcess::process_mouse );
+	int l_iMouseDes = HCons::get_instance().get_mouse_fd();
+	if ( n_bUseMouse && l_iMouseDes )
+		register_file_descriptor_handler( l_iMouseDes, &HTUIProcess::process_mouse );
 	register_postprocess_handler( D_CTRLS_COUNT, l_piCtrls,
 			& HTUIProcess::handler_refresh );
 	register_postprocess_handler( KEY<'x'>::command, NULL,

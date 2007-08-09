@@ -157,10 +157,10 @@ struct EVENT
 	};
 
 extern bool n_bNeedRepaint;
+extern bool n_bInputWaiting;
 
 class HConsole
 	{
-	bool f_bInputWaiting;
 	int f_iWidth;
 	int f_iHeight;
 	int f_iMouseDes;
@@ -190,6 +190,7 @@ public:
 	bool is_enabled( void ) const;
 	int wait_for_user_input ( int&, mouse::OMouse&, int = 0, int = 0 ) const;
 	void bell( void ) const;
+	int get_mouse_fd( void ) const;
 protected:
 	int c_vmvprintf ( int, int, char const* const, void* ) const;
 	int c_vcmvprintf ( int, int, int, char const* const, void* ) const;

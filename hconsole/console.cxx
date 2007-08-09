@@ -128,10 +128,11 @@ termios	f_sTermios;
 int const C_OK = OK;
 int const C_ERR = ERR;
 bool n_bNeedRepaint( false );
+bool n_bInputWaiting( false );
 
 /* public: */
 
-HConsole::HConsole( void ) : f_bInputWaiting( false ), f_iWidth( 0 ), f_iHeight( 0 ), f_iMouseDes( 0 )
+HConsole::HConsole( void ) : f_iWidth( 0 ), f_iHeight( 0 ), f_iMouseDes( 0 )
 	{
 	}
 
@@ -332,6 +333,11 @@ int const& HConsole::get_height( void ) const
 int const& HConsole::get_width( void ) const
 	{
 	return ( f_iWidth );
+	}
+
+int HConsole::get_mouse_fd( void ) const
+	{
+	return ( f_iMouseDes );
 	}
 
 int HConsole::c_vmvprintf ( int a_iRow, int a_iColumn,
@@ -573,7 +579,7 @@ int HConsole::wait_for_user_input( int& a_iKey, mouse::OMouse& a_rsMouse,
 		FD_SET ( f_iMouseDes, & l_xFdSet );
 	do
 		{
-		if ( f_bInputWaiting )
+		if ( n_bInputWaiting )
 			{
 			a_iKey = get_key();
 			l_iEventType = EVENT::D_MOUSE;
