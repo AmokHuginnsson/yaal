@@ -29,7 +29,6 @@ M_VCSID ( "$Id$" )
 #include "hsearchablecontrol.h"
 #include "hwindow.h"
 #include "hconsole.h"
-#include "hcore/hlog.h"
 
 using namespace yaal::hcore;
 
@@ -60,7 +59,6 @@ void HSearchableControl::search( HString const& a_oPattern, bool a_bBackwards )
 	{
 	M_PROLOG
 	int short unsigned l_uhFlag = 'f';
-	log_trace << a_oPattern << endl;
 	f_bSearchActived = ! f_oPattern.parse( a_oPattern, &l_uhFlag,
 			sizeof ( l_uhFlag ) / sizeof ( int short unsigned ) );
 	if ( ! f_bSearchActived )
