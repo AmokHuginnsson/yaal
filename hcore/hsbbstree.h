@@ -60,9 +60,9 @@ private:
 	class HAbstractNode;
 	struct ONodePtr
 		{
-		HAbstractNode * f_poNode;
+		HAbstractNode* f_poNode;
 		bool f_bExists;
-		ONodePtr ( void ) : f_poNode ( NULL ), f_bExists ( false ) { }
+		ONodePtr( void ) : f_poNode( NULL ), f_bExists( false ) { }
 		};
 	class HAbstractNode
 		{
@@ -86,103 +86,104 @@ private:
 	class HNode : public HAbstractNode
 		{
 		tType f_tKey;
-		HNode ( tType const & );
-		HNode ( HNode const & );
-		HNode & operator = ( HNode const & );
+		HNode( tType const& );
+		HNode( HNode const& );
+		HNode& operator = ( HNode const& );
 		friend class HSBBSTree;
 		};
-	HAbstractNode * f_poRoot;
+	HAbstractNode* f_poRoot;
 	int long f_lQuantity;
 public:
-	HSBBSTree ( void );
-	virtual ~HSBBSTree ( void );
-	template < typename tType >
-	void insert ( tType const & );
-	template < typename tType >
-	void remove ( tType const & );
-	void remove ( HIterator const & );
-	template < typename tType >
-	HIterator find ( tType const & ) const;
-	int long size ( void ) const;
-	bool empty ( void ) const;
-	HIterator begin ( void ) const;
-	HIterator end ( void ) const;
-	HIterator rbegin ( void ) const;
-	HIterator rend ( void ) const;
+	HSBBSTree( void );
+	virtual ~HSBBSTree( void );
+	template<typename tType>
+	HIterator insert( tType const& );
+	template<typename tType>
+	void remove( tType const& );
+	void remove( HIterator const& );
+	template<typename tType>
+	HIterator find( tType const& ) const;
+	int long size( void ) const;
+	bool empty( void ) const;
+	HIterator begin( void ) const;
+	HIterator end( void ) const;
+	HIterator rbegin( void ) const;
+	HIterator rend( void ) const;
 private:
-	template < typename tType >
-	ONodePtr find_node ( tType const & ) const;
-	void remove_node ( HAbstractNode * );
-	void swap ( HAbstractNode *, HAbstractNode * );
-	HAbstractNode * sibling ( HAbstractNode * ) const;
-	void insert_rebalance ( HAbstractNode * );
-	void remove_rebalance ( HAbstractNode * );
-	void rotate_left ( HAbstractNode * );
-	void rotate_right ( HAbstractNode * );
-	HSBBSTree ( HSBBSTree const & );
-	HSBBSTree & operator = ( HSBBSTree const & );
+	template<typename tType>
+	ONodePtr find_node( tType const& ) const;
+	void remove_node( HAbstractNode* );
+	void swap( HAbstractNode*, HAbstractNode* );
+	HAbstractNode* sibling( HAbstractNode* ) const;
+	void insert_rebalance( HAbstractNode* );
+	void remove_rebalance( HAbstractNode* );
+	void rotate_left( HAbstractNode* );
+	void rotate_right( HAbstractNode* );
+	HSBBSTree( HSBBSTree const& );
+	HSBBSTree& operator = ( HSBBSTree const& );
 	};
 
 class HSBBSTree::HIterator
 	{
 	HAbstractNode * f_poCurrent;
 public:
-	HIterator ( void );
-	HIterator ( HIterator const & );
-	HIterator & operator ++ ( void );
+	HIterator( void );
+	HIterator( HIterator const& );
+	HIterator& operator ++ ( void );
 	HIterator const operator ++ ( int );
-	HIterator & operator -- ( void );
+	HIterator& operator -- ( void );
 	HIterator const operator -- ( int );
-	HIterator & operator = ( HIterator const & );
-	bool operator == ( HIterator const & ) const;
-	bool operator != ( HIterator const & ) const;
-	template < typename tType >
-	tType const & operator * ( void );
+	HIterator& operator = ( HIterator const& );
+	bool operator == ( HIterator const& ) const;
+	bool operator != ( HIterator const& ) const;
+	template<typename tType>
+	tType const& operator * ( void );
 private:
 	friend class HSBBSTree;
-	explicit HIterator ( HAbstractNode * const );
+	explicit HIterator( HAbstractNode* const );
 	};
 
-template < typename tType >
-tType const & HSBBSTree::HIterator::operator * ( void )
+template<typename tType>
+tType const& HSBBSTree::HIterator::operator * ( void )
 	{
 	M_ASSERT ( f_poCurrent );
-	return ( static_cast < HNode < tType > * > ( f_poCurrent )->f_tKey );
+	return ( static_cast<HNode<tType>*>( f_poCurrent )->f_tKey );
 	}
 
-template < typename tType >
-HSBBSTree::HNode < tType >::HNode ( tType const & a_tKey )
-	: HAbstractNode(), f_tKey ( a_tKey )
+template<typename tType>
+HSBBSTree::HNode < tType >::HNode( tType const& a_tKey )
+	: HAbstractNode(), f_tKey( a_tKey )
 	{
 	return;
 	}
 
-template < typename tType >
-void HSBBSTree::insert ( tType const & a_tKey )
+template<typename tType>
+HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 	{
 	ONodePtr l_oNode;
+	HNode<tType>* l_poNode = NULL;
 	if ( f_poRoot )
-		l_oNode = find_node ( a_tKey );
+		l_oNode = find_node( a_tKey );
 	if ( l_oNode.f_bExists )
-		static_cast< HNode < tType > * >( l_oNode.f_poNode )->f_tKey = a_tKey;
+		( l_poNode = static_cast<HNode<tType>*>( l_oNode.f_poNode ) )->f_tKey = a_tKey;
 	else
 		{
-		HNode < tType > * l_poNode = new HNode < tType > ( a_tKey );
+		l_poNode = new HNode<tType>( a_tKey );
 		f_lQuantity ++;
 		if ( f_poRoot )
 			{
 			l_poNode->f_poParent = l_oNode.f_poNode;
-			if ( a_tKey < static_cast< HNode < tType > * > ( l_oNode.f_poNode )->f_tKey )
+			if ( a_tKey < static_cast<HNode<tType>*>( l_oNode.f_poNode )->f_tKey )
 				{
-				M_ASSERT ( ! l_oNode.f_poNode->f_poLeft );
+				M_ASSERT( ! l_oNode.f_poNode->f_poLeft );
 				l_oNode.f_poNode->f_poLeft = l_poNode;
 				}
 			else
 				{
-				M_ASSERT ( ! l_oNode.f_poNode->f_poRight );
+				M_ASSERT( ! l_oNode.f_poNode->f_poRight );
 				l_oNode.f_poNode->f_poRight = l_poNode;
 				}
-			insert_rebalance ( l_poNode );
+			insert_rebalance( l_poNode );
 			}
 		else
 			{
@@ -192,34 +193,34 @@ void HSBBSTree::insert ( tType const & a_tKey )
 		}
 	M_ASSERT ( ( ! f_poRoot ) || ( f_poRoot->f_poParent == NULL ) );
 	M_ASSERT ( ( ! f_poRoot ) || ( f_poRoot->f_eColor == HAbstractNode::D_BLACK ) );
-	return;
+	return ( HIterator( l_poNode ) );
 	}
 
-template < typename tType >
-void HSBBSTree::remove ( tType const & a_tKey )
+template<typename tType>
+void HSBBSTree::remove( tType const& a_tKey )
 	{
 	if ( f_poRoot )
 		{
-		ONodePtr l_oNode = find_node ( a_tKey );
+		ONodePtr l_oNode = find_node( a_tKey );
 		if ( l_oNode.f_bExists )
 			{
-			remove_node ( l_oNode.f_poNode );
+			remove_node( l_oNode.f_poNode );
 			return;
 			}
 		}
-	M_THROW ( n_ppcErrMsgHSBBSTree [ ERROR::E_NON_EXISTING_KEY ],
-			static_cast < int > ( ERROR::E_NON_EXISTING_KEY ) );
+	M_THROW( n_ppcErrMsgHSBBSTree [ ERROR::E_NON_EXISTING_KEY ],
+			static_cast<int>( ERROR::E_NON_EXISTING_KEY ) );
 	}
 
-template < typename tType >
-HSBBSTree::HIterator HSBBSTree::find ( tType const & a_tKey ) const
+template<typename tType>
+HSBBSTree::HIterator HSBBSTree::find( tType const& a_tKey ) const
 	{
-	ONodePtr l_oNodePtr = find_node ( a_tKey );
-	return ( HIterator ( l_oNodePtr.f_bExists ? l_oNodePtr.f_poNode : NULL ) );
+	ONodePtr l_oNodePtr = find_node( a_tKey );
+	return ( HIterator( l_oNodePtr.f_bExists ? l_oNodePtr.f_poNode : NULL ) );
 	}
 
-template < typename tType >
-typename HSBBSTree::ONodePtr HSBBSTree::find_node ( tType const & a_tKey ) const
+template<typename tType>
+typename HSBBSTree::ONodePtr HSBBSTree::find_node( tType const& a_tKey ) const
 	{
 	ONodePtr l_oNodePtr;
 	if ( f_poRoot )
@@ -227,14 +228,14 @@ typename HSBBSTree::ONodePtr HSBBSTree::find_node ( tType const & a_tKey ) const
 		l_oNodePtr.f_poNode = f_poRoot;
 		while ( ! l_oNodePtr.f_bExists )
 			{
-			if ( a_tKey < static_cast < HNode < tType > * > ( l_oNodePtr.f_poNode )->f_tKey )
+			if ( a_tKey < static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey )
 				{
 				if ( l_oNodePtr.f_poNode->f_poLeft )
 					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poLeft;
 				else
 					break;
 				}
-			else if ( static_cast < HNode < tType > * > ( l_oNodePtr.f_poNode )->f_tKey < a_tKey )
+			else if ( static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey < a_tKey )
 				{
 				if ( l_oNodePtr.f_poNode->f_poRight )
 					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poRight;

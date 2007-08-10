@@ -28,3 +28,18 @@ Copyright:
 M_VCSID ( "$Id$" )
 #include "hsingleton.h"
 
+namespace yaal
+{
+
+namespace hcore
+{
+
+void HLifeTimeTracker::register_destructor( destructor_ptr_t& a_oDestructor, int a_iLifeTime )
+	{
+	f_oDestructors[ a_iLifeTime ]->push_back( a_oDestructor );
+	}
+
+}
+
+}
+
