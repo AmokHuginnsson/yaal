@@ -54,22 +54,22 @@ private:
 	typedef yaal::hcore::HMap<int, destructor_list_ptr_t> map_stack_t;
 	static map_stack_t f_oDestructors;
 public:
-	static void register_destructor( destructor_ptr_t&, int = 0 );
+	static void register_destructor( destructor_ptr_t, int = 0 );
 	static void destruct( void );
 	};
 
 template<typename tType>
 class HDestructor : public HAbstractDestructor
 	{
-	tType* f_ptObject;
+	tType*& f_ptObject;
 public:
-	explicit HDestructor( tType* );
+	explicit HDestructor( tType*& );
 	~HDestructor( void );
 	virtual void destruct( void );
 	};
 
 template<typename tType>
-HDestructor<tType>::HDestructor( tType* a_ptObject ) : HAbstractDestructor(), f_ptObject( a_ptObject )
+HDestructor<tType>::HDestructor( tType*& a_ptObject ) : HAbstractDestructor(), f_ptObject( a_ptObject )
 	{
 	}
 
@@ -102,14 +102,16 @@ tType* HSingleton<tType>::f_ptInstance = NULL;
 template<typename tType>
 void HSingleton<tType>::create_instance( void )
 	{
-	HLifeTimeTracker::register_destructor( HLifeTimeTracker::destructor_ptr_t( new HDestructor<tType>( f_ptInstance = new tType() ) ) );
+	HLifeTimeTracker::register_destructor( HLifeTimeTracker::destructor_ptr_t( new HDestructor<tType>( f_ptInstance ) ) );
+	f_ptInstance = new tType();
 	}
 
 template<typename tType>
 tType& HSingleton<tType>::get_instance( void )
 	{
-	static tType instance;
-	return ( instance );
+	if ( ! f_ptInstance )
+		create_instance();
+	return ( *f_ptInstance );
 	}
 
 }

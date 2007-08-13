@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstdlib>
+
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hsingleton.h"
@@ -34,9 +36,26 @@ namespace yaal
 namespace hcore
 {
 
-void HLifeTimeTracker::register_destructor( destructor_ptr_t& a_oDestructor, int a_iLifeTime )
+HLifeTimeTracker::map_stack_t HLifeTimeTracker::f_oDestructors;
+
+void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int a_iLifeTime )
 	{
+	if ( f_oDestructors.find( a_iLifeTime ) == f_oDestructors.end() )
+		f_oDestructors[ a_iLifeTime ] = destructor_list_ptr_t( new destructor_list_t() );
 	f_oDestructors[ a_iLifeTime ]->push_back( a_oDestructor );
+	M_ENSURE( atexit( HLifeTimeTracker::destruct ) == 0 );
+	}
+
+void HLifeTimeTracker::destruct( void )
+	{
+	for ( map_stack_t::HIterator it = f_oDestructors.begin(); it != f_oDestructors.end(); ++ it )
+		{
+		destructor_list_ptr_t i = it->second;
+		destructor_list_t::iterator top = i->rbegin();
+		i->remove_tail();
+		(*top)->destruct();
+		}
+	return;
 	}
 
 }
