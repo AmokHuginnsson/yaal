@@ -125,7 +125,7 @@ private:
 
 class HSBBSTree::HIterator
 	{
-	HAbstractNode * f_poCurrent;
+	HAbstractNode* f_poCurrent;
 public:
 	HIterator( void );
 	HIterator( HIterator const& );
@@ -143,10 +143,23 @@ private:
 	explicit HIterator( HAbstractNode* const );
 	};
 
+namespace self_balancing_binary_search_tree_helper
+{
+
+template<typename key_t>
+inline void update( key_t&, key_t const& )
+	{	}
+
+template<typename key_t>
+inline bool less( key_t const& left, key_t const& right )
+	{	return ( left < right );	}
+
+}
+
 template<typename tType>
 tType const& HSBBSTree::HIterator::operator * ( void )
 	{
-	M_ASSERT ( f_poCurrent );
+	M_ASSERT( f_poCurrent );
 	return ( static_cast<HNode<tType>*>( f_poCurrent )->f_tKey );
 	}
 
@@ -165,7 +178,10 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 	if ( f_poRoot )
 		l_oNode = find_node( a_tKey );
 	if ( l_oNode.f_bExists )
-		( l_poNode = static_cast<HNode<tType>*>( l_oNode.f_poNode ) )->f_tKey = a_tKey;
+		{
+		l_poNode = static_cast<HNode<tType>*>( l_oNode.f_poNode );
+		self_balancing_binary_search_tree_helper::update( l_poNode->f_tKey, a_tKey );
+		}
 	else
 		{
 		l_poNode = new HNode<tType>( a_tKey );
@@ -173,7 +189,7 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 		if ( f_poRoot )
 			{
 			l_poNode->f_poParent = l_oNode.f_poNode;
-			if ( a_tKey < static_cast<HNode<tType>*>( l_oNode.f_poNode )->f_tKey )
+			if ( self_balancing_binary_search_tree_helper::less( a_tKey, static_cast<HNode<tType>*>( l_oNode.f_poNode )->f_tKey ) )
 				{
 				M_ASSERT( ! l_oNode.f_poNode->f_poLeft );
 				l_oNode.f_poNode->f_poLeft = l_poNode;
@@ -191,8 +207,8 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 			f_poRoot->f_eColor = HAbstractNode::D_BLACK;
 			}
 		}
-	M_ASSERT ( ( ! f_poRoot ) || ( f_poRoot->f_poParent == NULL ) );
-	M_ASSERT ( ( ! f_poRoot ) || ( f_poRoot->f_eColor == HAbstractNode::D_BLACK ) );
+	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_poParent == NULL ) );
+	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_eColor == HAbstractNode::D_BLACK ) );
 	return ( HIterator( l_poNode ) );
 	}
 
@@ -228,14 +244,14 @@ typename HSBBSTree::ONodePtr HSBBSTree::find_node( tType const& a_tKey ) const
 		l_oNodePtr.f_poNode = f_poRoot;
 		while ( ! l_oNodePtr.f_bExists )
 			{
-			if ( a_tKey < static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey )
+			if ( self_balancing_binary_search_tree_helper::less( a_tKey, static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey ) )
 				{
 				if ( l_oNodePtr.f_poNode->f_poLeft )
 					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poLeft;
 				else
 					break;
 				}
-			else if ( static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey < a_tKey )
+			else if ( self_balancing_binary_search_tree_helper::less( static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey, a_tKey ) )
 				{
 				if ( l_oNodePtr.f_poNode->f_poRight )
 					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poRight;

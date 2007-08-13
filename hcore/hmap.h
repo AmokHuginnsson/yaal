@@ -31,8 +31,6 @@ Copyright:
 
 #define D_VCSID_HMAP_H "$Id$"
 
-#include "hcore/hsbbstree.h"
-
 namespace yaal
 {
 
@@ -60,12 +58,42 @@ public:
 		return ( *this );
 		}
 	bool operator == ( HPair const& pair ) const
-		{	return ( f_tKey == pair.f_tKey );	}
+		{	return ( ( f_tKey == pair.f_tKey ) && ( f_tValue == pair.f_tValue ) );	}
 	bool operator != ( HPair const& pair ) const
 		{	return ( ! operator == ( pair ) );	}
 	bool operator < ( HPair const& pair ) const
-		{	return ( f_tKey < pair.f_tKey );	}
+		{
+		return ( ( f_tKey < pair.f_tKey )
+				|| ( ! ( pair.f_tKey < f_tKey ) && ( f_tValue < pair.f_tValue ) ) );
+		}
 	};
+
+namespace self_balancing_binary_search_tree_helper
+{
+
+template<typename tType, typename ttType>
+inline void update( HPair<tType, ttType>& left, HPair<tType, ttType> const& right )
+	{
+	left.second = right.second;
+	}
+
+template<typename tType, typename ttType>
+inline bool less( HPair<tType, ttType> const& left, HPair<tType, ttType> const& right )
+	{	return ( left.first < right.first );	}
+
+}
+
+}
+
+}
+
+#include "hcore/hsbbstree.h"
+
+namespace yaal
+{
+
+namespace hcore
+{
 
 template<typename tType, typename ttType>
 class HMap
@@ -111,7 +139,7 @@ public:
 private:
 	HSBBSTree f_oEngine;
 public:
-	HMap ( void ) : f_oEngine() {};
+	HMap( void ) : f_oEngine() {};
 	size_t size( void ) const
 		{ return ( f_oEngine.size() );	}
 	bool empty ( void ) const
