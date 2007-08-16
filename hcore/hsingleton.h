@@ -61,7 +61,7 @@ public:
 template<typename tType>
 class HDestructor : public HAbstractDestructor
 	{
-	tType*& f_ptObject;
+	tType*& f_rptObject;
 public:
 	explicit HDestructor( tType*& );
 	~HDestructor( void );
@@ -69,7 +69,7 @@ public:
 	};
 
 template<typename tType>
-HDestructor<tType>::HDestructor( tType*& a_ptObject ) : HAbstractDestructor(), f_ptObject( a_ptObject )
+HDestructor<tType>::HDestructor( tType*& a_rptObject ) : HAbstractDestructor(), f_rptObject( a_rptObject )
 	{
 	}
 
@@ -82,9 +82,9 @@ HDestructor<tType>::~HDestructor( void )
 template<typename tType>
 void HDestructor<tType>::destruct( void )
 	{
-	if ( f_ptObject )
-		delete f_ptObject;
-	f_ptObject = NULL;
+	if ( f_rptObject )
+		delete f_rptObject;
+	f_rptObject = NULL;
 	}
 
 template<typename tType>
@@ -102,6 +102,7 @@ tType* HSingleton<tType>::f_ptInstance = NULL;
 template<typename tType>
 void HSingleton<tType>::create_instance( void )
 	{
+	M_ASSERT( ! f_ptInstance );
 	HLifeTimeTracker::register_destructor( HLifeTimeTracker::destructor_ptr_t( new HDestructor<tType>( f_ptInstance ) ) );
 	f_ptInstance = new tType();
 	}

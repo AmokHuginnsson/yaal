@@ -48,13 +48,13 @@ void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int 
 
 void HLifeTimeTracker::destruct( void )
 	{
-	for ( map_stack_t::HIterator it = f_oDestructors.begin(); it != f_oDestructors.end(); ++ it )
-		{
-		destructor_list_ptr_t i = it->second;
-		destructor_list_t::iterator top = i->rbegin();
-		i->remove_tail();
-		(*top)->destruct();
-		}
+	map_stack_t::HIterator it = f_oDestructors.begin();
+	destructor_list_ptr_t i = it->second;
+	destructor_list_t::iterator top = i->rbegin();
+	i->remove_tail();
+	(*top)->destruct();
+	if ( i->empty() )
+		f_oDestructors.remove( it->first );
 	return;
 	}
 
