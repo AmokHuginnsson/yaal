@@ -165,7 +165,6 @@ class HConsole
 	int f_iHeight;
 	int f_iMouseDes;
 public:
-	HConsole( void );
 	int const& get_height( void ) const;
 	int const& get_width( void ) const;
 	void enter_curses( void );
@@ -195,6 +194,9 @@ protected:
 	int c_vmvprintf ( int, int, char const* const, void* ) const;
 	int c_vcmvprintf ( int, int, int, char const* const, void* ) const;
 	int c_vprintf ( char const* const, void* ) const;
+private:
+	HConsole( void );
+	friend class yaal::hcore::HSingleton<HConsole>;
 	};
 
 extern char const* const red;
