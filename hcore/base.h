@@ -43,9 +43,9 @@ Copyright:
 namespace yaal
 {
 
-template < bool > struct static_assert_failure;
-template < > struct static_assert_failure < true > { enum { value = 1 }; };
-#define STATIC_ASSERT( condition ) { typedef char SAF##__LINE__ [ static_assert_failure < ( condition ) >::value ]; }
+template<bool> struct static_assert_failure;
+template<> struct static_assert_failure<true> { enum { value = 1 }; };
+#define STATIC_ASSERT( condition ) { typedef char SAF##__LINE__ [ static_assert_failure<( condition )>::value ]; }
 
 #define _(string) gettext (string)
 
@@ -61,6 +61,18 @@ template < > struct static_assert_failure < true > { enum { value = 1 }; };
 #else /* NDEBUG */
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
+
+template<int long unsigned const input>
+struct binary
+	{
+	static int long unsigned const value = ( binary<input / 10>::value << 1 ) + ( input % 10 );
+	};
+
+template<>
+struct binary<0>
+	{
+	static int long unsigned const value = 0;
+	};
 
 template<typename tType>
 tType min( tType left, tType right )
