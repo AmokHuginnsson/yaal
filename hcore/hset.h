@@ -47,60 +47,70 @@ public:
 		{
 		HSBBSTree::HIterator f_oEngine;
 	public:
-		explicit HIterator ( HSBBSTree::HIterator const & it ) : f_oEngine ( it ){};
-		HIterator & operator ++ ( void )
+		HIterator( void ) : f_oEngine() {}
+		HIterator( HIterator const& a_oIt ) : f_oEngine( a_oIt.f_oEngine ) {}
+		HIterator& operator= ( HIterator const& a_oIt )
+			{
+			if ( &a_oIt != this )
+				f_oEngine = a_oIt.f_oEngine;
+			return ( *this );
+			}
+		HIterator& operator ++ ( void )
 			{
 			++ f_oEngine;
-			return ( * this );
+			return ( *this );
 			}
 		HIterator const operator ++ ( int )
 			{
-			HIterator it ( f_oEngine );
+			HIterator it( f_oEngine );
 			++ f_oEngine;
 			return ( it );
 			}
-		HIterator & operator -- ( void )
+		HIterator& operator -- ( void )
 			{
 			-- f_oEngine;
-			return ( * this );
+			return ( *this );
 			}
 		HIterator const operator -- ( int )
 			{
-			HIterator it ( f_oEngine );
+			HIterator it( f_oEngine );
 			-- f_oEngine;
 			return ( it );
 			}
-		tType const & operator * ( void )
+		tType const& operator * ( void )
 			{	return ( f_oEngine.operator*<tType>() );	}
-		tType const * const operator -> ( void )
-			{ return ( & f_oEngine.operator*<tType>() );	}
-		bool operator == ( HIterator const & it ) const
+		tType const* const operator -> ( void )
+			{ return ( &f_oEngine.operator*<tType>() );	}
+		bool operator == ( HIterator const& it ) const
 			{ return ( f_oEngine == it.f_oEngine ); }
-		bool operator != ( HIterator const & it ) const
+		bool operator != ( HIterator const& it ) const
 			{ return ( f_oEngine != it.f_oEngine ); }
+	private:
+		friend class HSet<tType>;
+		explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 		};
 private:
 	HSBBSTree f_oEngine;
 public:
-	HSet ( void ) : f_oEngine() {};
-	size_t size ( void ) const
+	HSet( void ) : f_oEngine() {};
+	size_t size( void ) const
 		{ return ( f_oEngine.size() );	}
-	bool empty ( void ) const
+	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
-	void insert ( tType const & e )
-		{	f_oEngine.insert ( e );	}
-	void remove ( tType const & e )
-		{	f_oEngine.remove ( e );	}
-	HIterator find ( tType const & e ) const
-		{ return ( f_oEngine.find ( e ) ); }
-	HIterator begin ( void ) const
-		{ return ( HIterator ( f_oEngine.begin() ) ); }
-	HIterator end ( void ) const
-		{ return ( HIterator ( f_oEngine.end() ) ); }
-	HIterator rbegin ( void ) const
-		{ return ( HIterator ( f_oEngine.rbegin() ) ); }
-	HIterator rend ( void ) const
-		{ return ( HIterator ( f_oEngine.rend() ) ); }
+	HIterator insert( tType const& e )
+		{	return ( HIterator( f_oEngine.insert( e ) ) );	}
+	void remove( tType const& e )
+		{	f_oEngine.remove( e );	}
+	HIterator find( tType const& e ) const
+		{ return ( f_oEngine.find( e ) ); }
+	HIterator begin( void ) const
+		{ return ( HIterator( f_oEngine.begin() ) ); }
+	HIterator end( void ) const
+		{ return ( HIterator( f_oEngine.end() ) ); }
+	HIterator rbegin( void ) const
+		{ return ( HIterator( f_oEngine.rbegin() ) ); }
+	HIterator rend( void ) const
+		{ return ( HIterator( f_oEngine.rend() ) ); }
 	};
 
 }

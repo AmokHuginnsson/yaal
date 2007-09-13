@@ -44,13 +44,19 @@ char const * const n_ppcErrMsgHSBBSTree [ 4 ] =
 /* HSBBSTree::E_NIL_ITERATOR */					_ ( "dereferencing nil iterator" )
 	};
 
-HSBBSTree::HIterator::HIterator ( HSBBSTree::HAbstractNode * const a_poNode )
-	: f_poCurrent ( a_poNode )
+HSBBSTree::HIterator::HIterator( void )
+	: f_poCurrent( NULL )
 	{
 	return;
 	}
 
-bool HSBBSTree::HIterator::operator == ( HSBBSTree::HIterator const & a_roIterator ) const
+HSBBSTree::HIterator::HIterator( HSBBSTree::HAbstractNode* const a_poNode )
+	: f_poCurrent( a_poNode )
+	{
+	return;
+	}
+
+bool HSBBSTree::HIterator::operator == ( HSBBSTree::HIterator const& a_roIterator ) const
 	{
 	return ( f_poCurrent == a_roIterator.f_poCurrent );
 	}
@@ -136,9 +142,9 @@ HSBBSTree::HIterator::HIterator ( HSBBSTree::HIterator const & a_roIterator )
 
 HSBBSTree::HIterator & HSBBSTree::HIterator::operator = ( HSBBSTree::HIterator const & a_roIterator )
 	{
-	if ( & a_roIterator != this )
+	if ( &a_roIterator != this )
 		f_poCurrent = a_roIterator.f_poCurrent;
-	return ( * this );
+	return ( *this );
 	}
 
 HSBBSTree::HAbstractNode::HAbstractNode ( void )

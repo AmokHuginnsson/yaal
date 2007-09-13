@@ -104,7 +104,14 @@ public:
 		{
 		HSBBSTree::HIterator f_oEngine;
 	public:
-		explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
+		HIterator( void ) : f_oEngine() {}
+		HIterator( HIterator const& a_oIt ) : f_oEngine( a_oIt.f_oEngine ) {}
+		HIterator& operator= ( HIterator const& a_oIt )
+			{
+			if ( &a_oIt != this )
+				f_oEngine = a_oIt.f_oEngine;
+			return ( *this );
+			}
 		HIterator& operator ++ ( void )
 			{
 			++ f_oEngine;
@@ -127,7 +134,7 @@ public:
 			-- f_oEngine;
 			return ( it );
 			}
-		map_elem_t const &operator * ( void )
+		map_elem_t const& operator * ( void )
 			{	return ( f_oEngine.operator*<map_elem_t>() );	}
 		map_elem_t const* const operator -> ( void )
 			{ return ( &f_oEngine.operator*<map_elem_t>() );	}
@@ -135,6 +142,9 @@ public:
 			{ return ( f_oEngine == it.f_oEngine ); }
 		bool operator != ( HIterator const& it ) const
 			{ return ( f_oEngine != it.f_oEngine ); }
+	private:
+		friend class HMap<tType, ttType>;
+		explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 		};
 private:
 	HSBBSTree f_oEngine;
@@ -142,22 +152,22 @@ public:
 	HMap( void ) : f_oEngine() {};
 	size_t size( void ) const
 		{ return ( f_oEngine.size() );	}
-	bool empty ( void ) const
+	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
-	HIterator insert ( map_elem_t const& e )
+	HIterator insert( map_elem_t const& e )
 		{	return ( HIterator( f_oEngine.insert( e ) ) );	}
-	void remove ( tType const& e )
+	void remove( tType const& e )
 		{	f_oEngine.remove( e );	}
 	HIterator find( tType const& e ) const
 		{ return ( HIterator( f_oEngine.find( map_elem_t( e, ttType() ) ) ) ); }
 	HIterator begin( void ) const
-		{ return ( HIterator ( f_oEngine.begin() ) ); }
+		{ return ( HIterator( f_oEngine.begin() ) ); }
 	HIterator end( void ) const
-		{ return ( HIterator ( f_oEngine.end() ) ); }
+		{ return ( HIterator( f_oEngine.end() ) ); }
 	HIterator rbegin( void ) const
-		{ return ( HIterator ( f_oEngine.rbegin() ) ); }
+		{ return ( HIterator( f_oEngine.rbegin() ) ); }
 	HIterator rend( void ) const
-		{ return ( HIterator ( f_oEngine.rend() ) ); }
+		{ return ( HIterator( f_oEngine.rend() ) ); }
 	ttType& operator[] ( tType const& key )
 		{
 		HIterator it = find( key );

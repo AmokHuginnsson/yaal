@@ -154,7 +154,7 @@ protected:
 	};
 
 template<typename tType>
-class HList < tType >::HElement
+class HList<tType>::HElement
 	{
 	HElement* f_poPrevious;
 	HElement* f_poNext;
@@ -181,7 +181,7 @@ public:
 	/*{*/
 	HIterator( void );
 	template<OListBits::treatment_t family>
-	HIterator( HIterator<family> const & );
+	HIterator( HIterator<family> const& );
 	HIterator& operator ++ ( void )
 		{
 		M_PROLOG
@@ -211,14 +211,14 @@ public:
 			if ( ( treatment == OListBits::D_TREAT_AS_OPENED ) && ( f_poCurrent == f_poHook->f_poPrevious ) )
 				f_poCurrent = NULL;
 			}
-		return ( * this );
+		return ( *this );
 		M_EPILOG
 		}
 	HIterator const operator -- ( int )
 		{
 		M_PROLOG
-		HIterator l_oIterator ( * this );
-		-- ( * this );
+		HIterator l_oIterator( * this );
+		-- ( *this );
 		return ( l_oIterator );
 		M_EPILOG
 		}
@@ -233,8 +233,8 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	friend class HList < tType >;
-	explicit HIterator ( HElement * const, HElement * const );
+	friend class HList<tType>;
+	HIterator( HElement* const, HElement* const );
 	/*}*/
 	};
 
@@ -245,7 +245,7 @@ protected:
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 template<typename tType>
-HList < tType >::HElement::HElement ( HElement* a_poElement )
+HList<tType>::HElement::HElement ( HElement* a_poElement )
 	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject()
 	{
 	if ( a_poElement == 0 )
@@ -399,7 +399,7 @@ HList< tType >::~HList ( void )
 	}
 
 template<typename tType>
-HList< tType >::HList ( HList < tType > const & a_roList )
+HList< tType >::HList ( HList<tType> const & a_roList )
 	: OListBits(), f_iSize ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
 	f_iIndex ( 0 ), f_poIndex ( NULL )
@@ -957,7 +957,7 @@ tType& HList<tType>::operator [ ] ( int a_iIndex )
 	}
 
 template<typename tType>
-typename HList<tType>::HElement * HList < tType >::element_by_index ( int a_iIndex )
+typename HList<tType>::HElement * HList<tType>::element_by_index ( int a_iIndex )
 	{
 	M_PROLOG
 	if ( f_iSize == 0 )
