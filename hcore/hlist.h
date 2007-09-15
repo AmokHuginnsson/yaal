@@ -104,52 +104,52 @@ public:
 	class HIterator;
 	typedef HIterator<> iterator;
 	typedef HIterator<OListBits::D_TREAT_AS_CLOSED> cyclic_iterator;
-	HList ( int = 0 );                 /* Creates list, with specified size */
-	virtual ~HList ( void );
-	HList ( HList const& );
+	HList( int = 0 );                 /* Creates list, with specified size */
+	virtual ~HList( void );
+	HList( HList const& );
 	HList& operator = ( HList const& );
 	cyclic_iterator hook( void );
 	iterator begin( void );
 	iterator end( void );
 	iterator rend( void );
 	iterator rbegin( void );
-	void flush ( void );
-	int size ( void );
-	tType& add_element ( tType* = NULL ); /* adds new element at current cursor position */
-	tType& add_head ( tType* = NULL );    /* adds new element at beggining of the list */
-	tType& add_tail ( tType const * = NULL );	/* adds new element at end of the list */
-	void push_back ( tType const & );
-	tType& add_at ( int, tType* = NULL ); /* adds new element at specified position */
+	void flush( void );
+	int size( void );
+	tType& add_element( tType* = NULL ); /* adds new element at current cursor position */
+	tType& add_head( tType* = NULL );    /* adds new element at beggining of the list */
+	tType& add_tail( tType const * = NULL );	/* adds new element at end of the list */
+	void push_back( tType const & );
+	tType& add_at( int, tType* = NULL ); /* adds new element at specified position */
 /* adds element in the way that keeps order */
 	template<typename T>
-	tType& add_orderly ( tType const&, T const&, sort_order_t = D_ASCENDING );
-	status_t remove_element ( treatment_t const& = D_TREAT_AS_CLOSED,
+	tType& add_orderly( tType const&, T const&, sort_order_t = D_ASCENDING );
+	status_t remove_element( treatment_t const& = D_TREAT_AS_CLOSED,
 			tType** = NULL );	/* removes element at current cursor position */
 	status_t remove_at ( int, treatment_t const& = D_TREAT_AS_CLOSED,
 			tType** = NULL );
-	status_t remove_head ( tType** = NULL );
-	status_t remove_tail ( tType** = NULL );
+	status_t remove_head( tType** = NULL );
+	status_t remove_tail( tType** = NULL );
 	template<OListBits::treatment_t treatment>
-	status_t erase ( HIterator<treatment>& );
+	status_t erase( HIterator<treatment>& );
 	/* sets cursor at specified index or number */
-	tType& go ( int );
-	tType& operator [ ] ( int );
-	tType const& operator [ ] ( int ) const;
-	tType& present ( void );
-	tType& head ( void );
-	tType& tail ( void );
-	tType* to_head ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
-	tType* to_tail ( int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
+	tType& go( int );
+	tType& operator[] ( int );
+	tType const& operator[] ( int ) const;
+	tType& present( void );
+	tType& head( void );
+	tType& tail( void );
+	tType* to_head( int = 1, treatment_t const& = D_TREAT_AS_CLOSED );
+	tType* to_tail( int = 1, treatment_t const& = D_TREAT_AS_CLOSED );
 	void exchange( int, int );
 	void sort_by_contents( sort_order_t = D_ASCENDING );
 	bool empty( void );
 	template<typename T>
 	void sort( T const&, sort_order_t = D_ASCENDING );
 protected:
-	bool to_head ( HElement*&, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
-	bool to_tail ( HElement*&, int = 1, treatment_t const & = D_TREAT_AS_CLOSED );
-	HElement * element_by_index ( int );
-	void exchange ( HElement*, HElement* );
+	bool to_head( HElement*&, int = 1, treatment_t const& = D_TREAT_AS_CLOSED );
+	bool to_tail( HElement*&, int = 1, treatment_t const& = D_TREAT_AS_CLOSED );
+	HElement* element_by_index ( int );
+	void exchange( HElement*, HElement* );
 	void sub_swap ( HElement*, HElement*, HElement* );
 	};
 
@@ -830,7 +830,7 @@ OListBits::status_t HList< tType >::remove_tail ( tType** a_pptObject )
 
 template<typename tType>
 template<OListBits::treatment_t const treatment>
-OListBits::status_t HList<tType>::erase ( HIterator<treatment>& a_roIterator )
+OListBits::status_t HList<tType>::erase( HIterator<treatment>& a_roIterator )
 	{
 	f_poSelected = a_roIterator.f_poCurrent;
 	return ( remove_element() );
