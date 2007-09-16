@@ -29,6 +29,8 @@ Copyright:
 
 #include <cstdio>
 
+#include "hcore/hsingleton.h"
+
 namespace yaal
 {
 
@@ -64,8 +66,6 @@ class HLog
 	char*		f_pcBuffer;
 	size_t		f_iBufferSize;
 public:
-	HLog( void );
-	virtual ~HLog( void );
 	/* already opened file */
 	void rehash( FILE* = stderr, char const* const = NULL );
 	/* log file name */
@@ -86,13 +86,17 @@ public:
 	HLog& operator<< ( void* const );
 	HLog& operator<< ( HLog& ( *const )( HLog& ) );
 private:
+	HLog( void );
+	virtual ~HLog( void );
 	void timestamp ( FILE * = NULL );
 	HLog( HLog const& );
 	HLog& operator= ( HLog const& );
 	friend HLog& endl( HLog& );
+	friend class yaal::hcore::HSingleton<HLog>;
+	friend class yaal::hcore::HDestructor<HLog>;
 	};
 
-extern HLog log;
+extern HLog& log;
 
 }
 

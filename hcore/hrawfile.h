@@ -38,14 +38,36 @@ typedef int file_descriptor_t;
 class HRawFile
 	{
 protected:
+	typedef int ( HRawFile::* READER_t )( void* const, int const );
+	typedef int ( HRawFile::* WRITER_t )( void const* const, int const );
+	struct TYPE
+		{
+		typedef enum
+			{
+			D_DEFAULT			= 0, /* means plain */
+			D_PLAIN				= 1,
+			D_SSL_SERVER	= 2,
+			D_SSL_CLIENT	= 4
+			} raw_file_type_t;
+		};
+	TYPE::raw_file_type_t f_eType;
 	file_descriptor_t f_iFileDescriptor; /* raw file descriptor of the file */
 public:
-	HRawFile ( void );
-	virtual ~HRawFile ( void );
-	virtual int close ( void );
-	file_descriptor_t get_file_descriptor ( void ) const;
-	int read ( void * const, int const );
-	int write ( void const * const, int const );
+	HRawFile( TYPE::raw_file_type_t = TYPE::D_DEFAULT );
+	virtual ~HRawFile( void );
+	virtual int close( void );
+	file_descriptor_t get_file_descriptor( void ) const;
+	READER_t reader;
+	WRITER_t writer;
+	int read( void* const, int const );
+	int write( void const* const, int const );
+protected:
+	int read_plain( void* const, int const );
+	int write_plain( void const* const, int const );
+	int read_ssl_loader( void* const, int const );
+	int write_ssl_loader( void const* const, int const );
+	int read_ssl( void* const, int const );
+	int write_ssl( void const* const, int const );
 	};
 
 }

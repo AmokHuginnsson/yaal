@@ -30,11 +30,16 @@ Copyright:
 #ifndef __YAAL_HCORE_HCORE_H
 #define __YAAL_HCORE_HCORE_H
 
+#include "hcore/hstring.h"
+
 namespace yaal
 {
 
 namespace hcore
 	{
+
+extern yaal::hcore::HString n_oSSLKey;
+extern yaal::hcore::HString n_oSSLCert;
 
 bool eq ( double const &, double const & );
 void set_env ( char const * const );

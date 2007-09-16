@@ -35,6 +35,7 @@ M_VCSID ( "$Id$" )
 #include "hlog.h"
 #include "hstring.h"
 #include "rc_file.h"
+#include "hsingleton.h"
 
 namespace yaal
 {
@@ -44,10 +45,15 @@ namespace hcore
 
 int long n_lLogMask = 0;
 int n_iDebugLevel = 0;
-HLog log;
+HString n_oSSLKey;
+HString n_oSSLCert;
+typedef HSingleton<HLog> HLogInstance;
+HLog& log = HLogInstance::get_instance( 1000 );
 
 OVariable n_psHCoreVariables [ ] =
 	{
+		{ D_HSTRING, "ssl_key", &n_oSSLKey },
+		{ D_HSTRING, "ssl_cert", &n_oSSLCert },
 		{ D_VOID, NULL, NULL }
 	};
 

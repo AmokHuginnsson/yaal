@@ -38,7 +38,7 @@ namespace hcore
 
 HLifeTimeTracker::map_stack_t HLifeTimeTracker::f_oDestructors;
 
-void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int a_iLifeTime )
+void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int const& a_iLifeTime )
 	{
 	if ( f_oDestructors.find( a_iLifeTime ) == f_oDestructors.end() )
 		f_oDestructors[ a_iLifeTime ] = destructor_list_ptr_t( new destructor_list_t() );

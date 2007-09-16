@@ -54,7 +54,7 @@ private:
 	typedef yaal::hcore::HMap<int, destructor_list_ptr_t> map_stack_t;
 	static map_stack_t f_oDestructors;
 public:
-	static void register_destructor( destructor_ptr_t, int = 0 );
+	static void register_destructor( destructor_ptr_t, int const& );
 	static void destruct( void );
 	};
 
@@ -91,27 +91,27 @@ template<typename tType>
 class HSingleton
 	{
 	static tType* f_ptInstance;
-	static void create_instance( void );
+	static void create_instance( int const& );
 public:
-	static tType& get_instance( void );
+	static tType& get_instance( int const& = 0 );
 	};
 
 template<typename tType>
 tType* HSingleton<tType>::f_ptInstance = NULL;
 
 template<typename tType>
-void HSingleton<tType>::create_instance( void )
+void HSingleton<tType>::create_instance( int const& a_iLifeTime )
 	{
 	M_ASSERT( ! f_ptInstance );
-	HLifeTimeTracker::register_destructor( HLifeTimeTracker::destructor_ptr_t( new HDestructor<tType>( f_ptInstance ) ) );
+	HLifeTimeTracker::register_destructor( HLifeTimeTracker::destructor_ptr_t( new HDestructor<tType>( f_ptInstance ) ), a_iLifeTime );
 	f_ptInstance = new tType();
 	}
 
 template<typename tType>
-tType& HSingleton<tType>::get_instance( void )
+tType& HSingleton<tType>::get_instance( int const& a_iLifeTime )
 	{
 	if ( ! f_ptInstance )
-		create_instance();
+		create_instance( a_iLifeTime );
 	return ( *f_ptInstance );
 	}
 

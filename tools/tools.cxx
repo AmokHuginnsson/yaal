@@ -154,25 +154,25 @@ void tools_init ( void )
 	rc_file::process_rc_file ( "yaal", "tools", tools::n_psVariables,
 			set_tools_variables );
 	for ( l_iCtr = 0; l_iCtr < 256; l_iCtr ++ )
-		util::n_pcTransTableStripPL [ l_iCtr ] = static_cast < char > ( l_iCtr );
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '±' ) ] = 'a';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '¡' ) ] = 'A';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( 'æ' ) ] = 'c';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( 'Æ' ) ] = 'C';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( 'ê' ) ] = 'e';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( 'Ê' ) ] = 'E';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '³' ) ] = 'l';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '£' ) ] = 'L';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( 'ñ' ) ] = 'n';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( 'Ñ' ) ] = 'N';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( 'ó' ) ] = 'o';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( 'Ó' ) ] = 'O';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '¶' ) ] = 's';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '¦' ) ] = 'S';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '¼' ) ] = 'z';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '¬' ) ] = 'Z';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '¿' ) ] = 'z';
-	util::n_pcTransTableStripPL [ static_cast < char unsigned > ( '¯' ) ] = 'Z';
+		util::n_pcTransTableStripPL[ l_iCtr ] = static_cast<char>( l_iCtr );
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '±' ) ] = 'a';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¡' ) ] = 'A';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'æ' ) ] = 'c';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'Æ' ) ] = 'C';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'ê' ) ] = 'e';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'Ê' ) ] = 'E';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '³' ) ] = 'l';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '£' ) ] = 'L';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'ñ' ) ] = 'n';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'Ñ' ) ] = 'N';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'ó' ) ] = 'o';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'Ó' ) ] = 'O';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¶' ) ] = 's';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¦' ) ] = 'S';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¼' ) ] = 'z';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¬' ) ] = 'Z';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¿' ) ] = 'z';
+	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¯' ) ] = 'Z';
 	return;
 	}
 

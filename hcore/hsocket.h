@@ -41,18 +41,23 @@ class HSocket : public HRawFile
 	{
 public:
 	typedef HPointer<HSocket, HPointerScalar, HPointerRelaxed> ptr_t;
-	typedef enum
+	struct TYPE
 		{
-		D_DEFAULTS = 0,
-		D_FILE = 1,
-		D_NETWORK = 2,
-		D_BLOCKING = 4,
-		D_NONBLOCKING = 8
-		} socket_type_t;
+		typedef enum
+			{
+			D_DEFAULT			= 0x00,
+			D_FILE				= 0x01,
+			D_NETWORK			= 0x02,
+			D_BLOCKING		= 0x04,
+			D_NONBLOCKING	= 0x08,
+			D_SSL_SERVER	= 0x10,
+			D_SSL_CLIENT	= 0x20
+			} socket_type_t;
+		};
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;
 	bool f_bNeedShutdown;
-	socket_type_t f_eType;
+	TYPE::socket_type_t f_eType;
 	int f_iMaximumNumberOfClients;
 	int f_iAddressSize;
 	void* f_pvAddress;
@@ -60,7 +65,7 @@ protected:
 	HString f_oHostName;
 	HString f_oVarTmpBuffer;
 public:
-	HSocket( socket_type_t const = D_DEFAULTS, int const = 0 );
+	HSocket( TYPE::socket_type_t const = TYPE::D_DEFAULT, int const = 0 );
 	virtual ~HSocket( void );
 	void listen( char const* const, int const = 0 );
 	ptr_t accept( void );

@@ -36,6 +36,16 @@
 # LOG_DEBUG, LOG_INFO, LOG_NOTICE, LOG_WARNING, LOG_ERROR, LOG_CVSHEADER
 log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_CVSHEADER
 
+# ssl_key
+# type: string, default: (empty)
+# ssl_key is path to file with private ssl key
+ssl_key "${HOME}/var/db/yaal.key"
+
+# ssl_cert
+# type: string, default: (empty)
+# ssl_cert is path to file with ssl certificate
+ssl_cert "${HOME}/var/db/yaal.pem"
+
 ### core END
 
 ### console BEGIN
