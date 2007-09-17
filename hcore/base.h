@@ -32,7 +32,7 @@ Copyright:
 /*! \brief All library API belongs here.
  *
  * This namaspace contains all yaal library API and code.
- * Stdhapi code and API is divided into several sections.
+ * YAAL code and API is divided into several sections.
  *
  * yaal comes from YAAL which comes from Y.A.A.L. which comes from:
  *  - Yet
@@ -51,13 +51,13 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 
 #define M_VCSID(id) namespace { static char const* const wrapper_VCSID( void ) { wrapper_VCSID(); return id; } }
 #define M_VCSTID(id) namespace { static char const* const wrapper_VCSTID( void ) { wrapper_VCSTID(); return id; } }
-#define M_THROW( msg, e_no ) throw ( yaal::hcore::HException ( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, static_cast < int > ( e_no ) ) )
+#define M_THROW( msg, e_no ) throw ( yaal::hcore::HException( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, static_cast<int>( e_no ) ) )
 #define M_PROLOG try{
-#define M_EPILOG } catch ( yaal::hcore::HException & e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
-#define M_FINAL } catch ( yaal::hcore::HException & e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error ( true ); } catch ( int const & error_code ) { exit ( error_code ); }
-#define M_ENSURE( condition ) if ( ! ( condition ) ){ yaal::hcore::HException e ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno ); e.set ( strerror ( errno ) ); throw e; }
+#define M_EPILOG } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
+#define M_FINAL } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error( true ); } catch ( int const& error_code ) { exit( error_code ); }
+#define M_ENSURE( condition ) if ( ! ( condition ) ){ yaal::hcore::HException e( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno ); e.set( strerror( errno ) ); throw e; }
 #ifndef NDEBUG
-#	define M_ASSERT( condition ) if ( ! ( condition ) )yaal::hcore::HException::failed_assert ( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition )
+#	define M_ASSERT( condition ) if ( ! ( condition ) )yaal::hcore::HException::failed_assert( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition )
 #else /* NDEBUG */
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
@@ -102,49 +102,48 @@ template<typename tType>
 inline tType const operator | ( tType const& left,
 		tType const& right )
 	{
-	return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
-				| static_cast < int long unsigned > ( right ) ) );
+	return ( static_cast<tType>( static_cast<int long unsigned>( left )
+				| static_cast<int long unsigned>( right ) ) );
 	}
 template<typename tType>
 inline tType& operator |= ( tType& left, tType const& right )
 	{
-	left = static_cast < tType > ( static_cast < int long unsigned > ( left )
-			| static_cast < int long unsigned > ( right ) );
+	left = static_cast<tType>( static_cast<int long unsigned>( left )
+			| static_cast<int long unsigned>( right ) );
 	return ( left );
 	}
 template<typename tType>
 inline tType const operator & ( tType const& left,
 		tType const& right )
 	{
-	return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
-				& static_cast < int long unsigned > ( right ) ) );
+	return ( static_cast<tType>( static_cast<int long unsigned>( left )
+				& static_cast<int long unsigned>( right ) ) );
 	}
 template<typename tType>
 inline tType& operator &= ( tType& left, tType const& right )
 	{
-	left = static_cast < tType > ( static_cast < int long unsigned > ( left )
-			& static_cast < int long unsigned > ( right ) );
+	left = static_cast<tType>( static_cast<int long unsigned>( left )
+			& static_cast<int long unsigned>( right ) );
 	return ( left );
 	}
 template<typename tType>
 inline tType const operator ^ ( tType const& left,
 		tType const& right )
 	{
-	return ( static_cast < tType > ( static_cast < int long unsigned > ( left )
-				^ static_cast < int long unsigned > ( right ) ) );
+	return ( static_cast<tType>( static_cast<int long unsigned>( left )
+				^ static_cast<int long unsigned>( right ) ) );
 	}
 template<typename tType>
 inline tType& operator ^= ( tType& left, tType const& right )
 	{
-	left = static_cast < tType > ( static_cast < int long unsigned > ( left )
-			^ static_cast < int long unsigned > ( right ) );
+	left = static_cast<tType>( static_cast<int long unsigned>( left )
+			^ static_cast<int long unsigned>( right ) );
 	return ( left );
 	}
 template<typename tType>
 inline tType const operator ~ ( tType const& e )
 	{
-	return ( static_cast < tType > (
-				~ static_cast < int long unsigned > ( e ) ) );
+	return ( static_cast<tType>( ~ static_cast<int long unsigned>( e ) ) );
 	}
 
 /* those types definitions were in hinfo.h but this file (hexception.h)
