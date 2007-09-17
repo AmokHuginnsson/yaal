@@ -206,6 +206,9 @@ CPPFLAGS=$CXXFLAGS_ORIG;
 AC_CHECK_LIB([pthread],[pthread_create],
 						 [],[AC_MSG_ERROR([Cannot build without threading library.])])
 LIBS=""
+AC_CHECK_LIB([ssl],[SSL_load_error_strings],
+						 [],[AC_MSG_ERROR([Cannot continue without OpenSSL library.])])
+LIBS=""
 AC_CHECK_LIB([xml2],[xmlParseFile],
 						 [],[AC_MSG_ERROR([Cannot continue without XML library.])])
 LIBS=""
@@ -261,6 +264,7 @@ fi
 AC_MSG_RESULT([--- All needed libraries found. ---                     [[76%]]])
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
+AC_CHECK_HEADERS([[openssl/ssl.h]],_CONSOLE_MOUSE=["gpm"])
 _CONSOLE_MOUSE=[""];
 AC_CHECK_HEADERS([[sys/consio.h]],_CONSOLE_MOUSE=["moused"])
 AC_CHECK_HEADERS([[gpm.h]],_CONSOLE_MOUSE=["gpm"])
