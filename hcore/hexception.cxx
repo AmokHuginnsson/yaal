@@ -48,21 +48,23 @@ namespace hcore
 
 void* HException::ERROR_STREAM = stderr;
 
-HException::HException ( char const * const a_pcFileName,
-												 char const * const a_pcFunctionName,
-												 int const a_iLine, char const * const a_pcMessage,
+char const* const n_pcExceptionType = _( "Exception type" );
+
+HException::HException( char const* const a_pcFileName,
+												 char const* const a_pcFunctionName,
+												 int const a_iLine, char const* const a_pcMessage,
 												 int const a_iCode )
-	: f_bLocal ( false ), f_cChar ( 0 ), f_iInt ( 0 ), f_lLong ( 0 ),
-	f_dDouble ( 0 ), f_pcCharPtr ( NULL ), f_pvVoidPtr ( NULL ), f_iFrame ( 0 ),
-	f_pcFileName ( NULL ), f_pcFunctionName ( NULL ),
-	f_iCode ( a_iCode ), f_pcMessage ( NULL )
+	: f_bLocal( false ), f_cChar( 0 ), f_iInt( 0 ), f_lLong( 0 ),
+	f_dDouble( 0 ), f_pcCharPtr( NULL ), f_pvVoidPtr( NULL ), f_iFrame( 0 ),
+	f_pcFileName( NULL ), f_pcFunctionName( NULL ),
+	f_iCode( a_iCode ), f_pcMessage( NULL )
 	{
-	f_pcMessage = xstrdup ( a_pcMessage );
-	f_pcFileName = xstrdup ( a_pcFileName );
-	f_pcFunctionName = xstrdup ( a_pcFunctionName );
+	f_pcMessage = xstrdup( a_pcMessage );
+	f_pcFileName = xstrdup( a_pcFileName );
+	f_pcFunctionName = xstrdup( a_pcFunctionName );
 	hcore::log << "Exception: " << f_pcMessage << ", code: " << f_iCode;
 	hcore::log << '.' << endl;
-	log ( a_pcFileName, a_pcFunctionName, a_iLine );
+	log( a_pcFileName, a_pcFunctionName, a_iLine );
 	return;
 	}
 
@@ -234,6 +236,19 @@ void HException::set_error_stream( void* a_pvErrorStream )
 	ERROR_STREAM = a_pvErrorStream;
 	return;
 	M_EPILOG
+	}
+
+char* HException::get_type_name( char const* const a_pcName )
+	{
+	int status = 0;
+	return ( abi::__cxa_demangle( a_pcName, 0, 0, &status ) );
+	}
+
+void HException::cleanup( char* a_pcPtr )
+	{
+	if ( a_pcPtr )
+		xfree( a_pcPtr );
+	return;
 	}
 
 }

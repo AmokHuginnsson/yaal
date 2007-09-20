@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hpointer.h"
 #include "hcore/hrawfile.h"
 #include "hcore/hhashmap.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {
@@ -86,6 +87,8 @@ private:
 	HSocket( HSocket const& );
 	HSocket& operator = ( HSocket const& );
 	};
+
+typedef HExceptionT<HSocket> HSocketException;
 
 }
 

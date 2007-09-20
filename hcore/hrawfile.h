@@ -27,6 +27,8 @@ Copyright:
 #ifndef __YAAL_HCORE_HRAWFILE_H
 #define __YAAL_HCORE_HRAWFILE_H
 
+#include "hcore/hopenssl.h"
+
 namespace yaal
 {
 
@@ -52,6 +54,7 @@ protected:
 		};
 	TYPE::raw_file_type_t f_eType;
 	file_descriptor_t f_iFileDescriptor; /* raw file descriptor of the file */
+	HOpenSSL::ptr_t f_oSSL;
 public:
 	HRawFile( TYPE::raw_file_type_t = TYPE::D_DEFAULT );
 	virtual ~HRawFile( void );

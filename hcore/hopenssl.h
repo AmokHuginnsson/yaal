@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hpointer.h"
 #include "hcore/hsingleton.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {
@@ -38,6 +39,7 @@ namespace hcore
 
 class HOpenSSL
 	{
+public:
 	struct TYPE
 		{
 		typedef enum
@@ -46,23 +48,25 @@ class HOpenSSL
 			D_CLIENT
 			} ssl_context_type_t;
 		};
+private:
 	struct OSSLContext
 		{
+		void* f_pvMethod;
 		void* f_pvContext;
 		OSSLContext( void );
 		virtual ~OSSLContext( void );
-		virtual void* get_method( void );
+		void init( void );
 	private:
 		OSSLContext( OSSLContext const& );
 		OSSLContext& operator=( OSSLContext const& );
 		};
 	struct OSSLContextServer : public OSSLContext
 		{
-		virtual void* get_method( void );
+		OSSLContextServer( void );
 		};
 	struct OSSLContextClient : public OSSLContext
 		{
-		virtual void* get_method( void );
+		OSSLContextClient( void );
 		};
 	typedef yaal::hcore::HSingleton<OSSLContextServer> OSSLContextServerInstance;
 	typedef yaal::hcore::HSingleton<OSSLContextClient> OSSLContextClientInstance;
@@ -77,6 +81,8 @@ private:
 	HOpenSSL( HOpenSSL const& );
 	HOpenSSL& operator=( HOpenSSL const& );
 	};
+
+typedef HExceptionT<HOpenSSL> HOpenSSLException;
 
 }
 

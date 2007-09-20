@@ -32,6 +32,7 @@ Copyright:
 
 #include <cerrno>
 #include <cstring>
+#include <typeinfo>
 
 #ifdef __YAAL_BUILD__
 #	include "config.h"
@@ -56,31 +57,43 @@ protected:
 	int	 f_iInt;
 	long f_lLong;
 	double f_dDouble;
-	char * f_pcCharPtr;
-	void * f_pvVoidPtr;
+	char* f_pcCharPtr;
+	void* f_pvVoidPtr;
 	int  f_iFrame;
-	char * f_pcFileName;
-	char * f_pcFunctionName;
+	char* f_pcFileName;
+	char* f_pcFunctionName;
 	int  f_iCode;
-	char * f_pcMessage;
+	char* f_pcMessage;
 public:
-	HException ( char const * const, char const * const, int const,
-			char const * const, int const = 0 );
-	HException ( HException const & );
-	virtual ~HException ( void ) ;
-	void set ( char const = 0, int const = 0, long const = 0, double const = 0,
-			char const * const = 0, void * const = 0 );
-	void set ( char const * );
-	void print_error ( bool const ) const;
-	static void dump_call_stack ( int const );
-	void log ( char const * const, char const * const, int const );
-	char const * what ( void ) const;
-	int code ( void ) const;
-	static void failed_assert ( char const * const, char const * const, int const,
-			char const * const ) __attribute__(( __noreturn__ ));
+	HException( char const* const, char const* const, int const,
+			char const* const, int const = 0 );
+	HException( HException const& );
+	virtual ~HException( void ) ;
+	void set( char const = 0, int const = 0, long const = 0, double const = 0,
+			char const* const = 0, void* const = 0 );
+	void set( char const* );
+	void print_error( bool const ) const;
+	static void dump_call_stack( int const );
+	void log( char const* const, char const* const, int const );
+	char const* what( void ) const;
+	int code( void ) const;
+	static void failed_assert( char const* const, char const* const, int const,
+			char const* const ) __attribute__(( __noreturn__ ));
 	static void set_error_stream( void* );
+	static char* get_type_name( char const* const );
+	static void cleanup( char* );
 private:
-	HException & operator = ( HException const & );
+	HException& operator = ( HException const& );
+	};
+
+extern char const* const n_pcExceptionType;
+
+template<typename tType>
+class HExceptionT : public HException
+	{
+public:
+	HExceptionT( char const* const a_pcReason, char* ptr = get_type_name( typeid( tType ).name() ) ) : HException( n_pcExceptionType, ptr, 0, a_pcReason, errno )
+		{ cleanup( ptr );	}
 	};
 
 }

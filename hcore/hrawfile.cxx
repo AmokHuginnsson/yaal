@@ -39,7 +39,7 @@ namespace hcore
 
 char const * const n_pcError = _( "file is not opened" );
 
-HRawFile::HRawFile ( TYPE::raw_file_type_t a_eType ) : f_eType( a_eType ), f_iFileDescriptor( -1 ),
+HRawFile::HRawFile ( TYPE::raw_file_type_t a_eType ) : f_eType( a_eType ), f_iFileDescriptor( -1 ), f_oSSL(),
 	reader( ( ( a_eType & TYPE::D_SSL_SERVER )
 				|| ( a_eType & TYPE::D_SSL_CLIENT ) ) ? &HRawFile::read_ssl_loader : &HRawFile::read_plain ),
 	writer( ( ( a_eType & TYPE::D_SSL_SERVER )
@@ -90,33 +90,27 @@ int HRawFile::read( void* const a_pcBuffer, int const a_iSize )
 int HRawFile::read_plain( void* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
-	int l_iCnt = 0;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, errno );
-	l_iCnt = ::read( f_iFileDescriptor, a_pcBuffer, a_iSize );
-	return ( l_iCnt );
+	return ( ::read( f_iFileDescriptor, a_pcBuffer, a_iSize ) );
 	M_EPILOG
 	}
 
 int HRawFile::read_ssl( void* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
-	int l_iCnt = 0;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, errno );
-	l_iCnt = ::read( f_iFileDescriptor, a_pcBuffer, a_iSize );
-	return ( l_iCnt );
+	return ( f_oSSL->read( a_pcBuffer, a_iSize ) );
 	M_EPILOG
 	}
 
 int HRawFile::read_ssl_loader( void* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
-	int l_iCnt = 0;
-	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, errno );
-	l_iCnt = ::read( f_iFileDescriptor, a_pcBuffer, a_iSize );
-	return ( l_iCnt );
+	f_oSSL = HOpenSSL::ptr_t( new HOpenSSL( f_iFileDescriptor, f_eType & TYPE::D_SSL_SERVER ? HOpenSSL::TYPE::D_SERVER : HOpenSSL::TYPE::D_CLIENT ) );
+	reader = &HRawFile::read_ssl;
+	return ( read_ssl( a_pcBuffer, a_iSize ) );
 	M_EPILOG
 	}
 
@@ -130,33 +124,27 @@ int HRawFile::write( void const* const a_pcBuffer, int const a_iSize )
 int HRawFile::write_plain( void const* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
-	int l_iCnt = 0;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, errno );
-	l_iCnt = ::write( f_iFileDescriptor, a_pcBuffer, a_iSize );
-	return ( l_iCnt );
+	return ( ::write( f_iFileDescriptor, a_pcBuffer, a_iSize ) );
 	M_EPILOG
 	}
 
 int HRawFile::write_ssl( void const* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
-	int l_iCnt = 0;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, errno );
-	l_iCnt = ::write( f_iFileDescriptor, a_pcBuffer, a_iSize );
-	return ( l_iCnt );
+	return ( f_oSSL->write( a_pcBuffer, a_iSize ) );
 	M_EPILOG
 	}
 
 int HRawFile::write_ssl_loader( void const* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
-	int l_iCnt = 0;
-	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, errno );
-	l_iCnt = ::write( f_iFileDescriptor, a_pcBuffer, a_iSize );
-	return ( l_iCnt );
+	f_oSSL = HOpenSSL::ptr_t( new HOpenSSL( f_iFileDescriptor, f_eType & TYPE::D_SSL_SERVER ? HOpenSSL::TYPE::D_SERVER : HOpenSSL::TYPE::D_CLIENT ) );
+	writer = &HRawFile::write_ssl;
+	return ( write_ssl( a_pcBuffer, a_iSize ) );
 	M_EPILOG
 	}
 

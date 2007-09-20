@@ -43,29 +43,44 @@ namespace yaal
 namespace hcore
 {
 
-HOpenSSL::OSSLContext::OSSLContext( void ) : f_pvContext( NULL )
+namespace openssl_helper
+{
+
+HString& format_error_message( HString& a_oBuffer )
 	{
+	int l_iCode = 0;
+	a_oBuffer = "";
+	while ( ( l_iCode = ERR_get_error() ) )
+		( a_oBuffer += ( a_oBuffer.is_empty() ? "" : "\n" ) ) += ERR_error_string( l_iCode, NULL );
+	return ( a_oBuffer );
+	}
+
+}
+
+HOpenSSL::OSSLContext::OSSLContext( void ) : f_pvMethod( NULL ), f_pvContext( NULL )
+	{
+	}
+
+void HOpenSSL::OSSLContext::init( void )
+	{
+	M_PROLOG
 	SSL_load_error_strings();
 	SSLeay_add_ssl_algorithms();
-	SSL_METHOD* l_pxMethod = static_cast<SSL_METHOD*>( get_method() );
+	SSL_METHOD* l_pxMethod = static_cast<SSL_METHOD*>( f_pvMethod );
 	SSL_CTX* ctx = NULL;
+	HString l_oBuffer;
+	ERR_clear_error();
 	f_pvContext = ctx = SSL_CTX_new( l_pxMethod );
-	if ( SSL_CTX_use_certificate_file( ctx, n_oSSLCert, SSL_FILETYPE_PEM ) <= 0 )
-		{
-		ERR_print_errors_fp(stderr);
-		exit(3);
-		}
+	if ( ! f_pvContext )
+		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
 	if ( SSL_CTX_use_PrivateKey_file( ctx, n_oSSLKey, SSL_FILETYPE_PEM ) <= 0 )
-		{
-		ERR_print_errors_fp(stderr);
-		exit(4);
-		}
+		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+	if ( SSL_CTX_use_certificate_file( ctx, n_oSSLCert, SSL_FILETYPE_PEM ) <= 0 )
+		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
 	if ( ! SSL_CTX_check_private_key( ctx ) )
-		{
-		fprintf(stderr,"Private key does not match the certificate public key\n");
-		exit(5);
-		}
+		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
 	return;
+	M_EPILOG
 	}
 
 HOpenSSL::OSSLContext::~OSSLContext( void )
@@ -76,14 +91,51 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 	return;
 	}
 
-void* HOpenSSL::OSSLContextServer::get_method( void )
+HOpenSSL::OSSLContextServer::OSSLContextServer( void )
 	{
-	return ( SSLv23_server_method() );
+	f_pvMethod = SSLv23_server_method();
+	init();
 	}
 
-void* HOpenSSL::OSSLContextClient::get_method( void )
+HOpenSSL::OSSLContextClient::OSSLContextClient( void )
 	{
-	return ( SSLv23_client_method() );
+	f_pvMethod = SSLv23_client_method();
+	init();
+	}
+
+HOpenSSL::HOpenSSL( int a_iFileDescriptor, TYPE::ssl_context_type_t a_eType ) : f_pvSSL( NULL )
+	{
+	M_PROLOG
+	HString l_oBuffer;
+	OSSLContext* context = ( ( a_eType == TYPE::D_SERVER ) ? static_cast<OSSLContext*>( &OSSLContextServerInstance::get_instance() ) : static_cast<OSSLContext*>( &OSSLContextClientInstance::get_instance() ) );
+	SSL* ssl = NULL;
+	f_pvSSL = ssl = SSL_new( static_cast<SSL_CTX*>( context->f_pvContext ) );
+	if ( ! f_pvSSL )
+		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+	SSL_set_fd( ssl, a_iFileDescriptor );
+	if ( SSL_accept( ssl ) == -1 )
+		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+	return;
+	M_EPILOG
+	}
+
+HOpenSSL::~HOpenSSL( void )
+	{
+	if ( f_pvSSL )
+		SSL_free( static_cast<SSL*>( f_pvSSL ) );
+	return;
+	}
+
+int HOpenSSL::read( void* const a_pvBuffer, int const a_iSize )
+	{
+	M_ASSERT( f_pvSSL );
+	return ( SSL_read( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize ) );
+	}
+
+int HOpenSSL::write( void const* const a_pvBuffer, int const a_iSize )
+	{
+	M_ASSERT( f_pvSSL );
+	return ( SSL_write( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize ) );
 	}
 
 }

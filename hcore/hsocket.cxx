@@ -68,13 +68,14 @@ HSocket::HSocket( TYPE::socket_type_t const a_eSocketType,
 			? HRawFile::TYPE::D_SSL_SERVER
 			: ( ( a_eSocketType & TYPE::D_SSL_CLIENT )
 				? HRawFile::TYPE::D_SSL_CLIENT : HRawFile::TYPE::D_DEFAULT ) ),
-	f_bNeedShutdown( false ), f_eType( TYPE::D_DEFAULT ),
+	f_bNeedShutdown( false ), f_eType( a_eSocketType ),
 	f_iMaximumNumberOfClients( a_iMaximumNumberOfClients ),
 	f_iAddressSize( 0 ), f_pvAddress( NULL ), f_poClients( NULL ),
 	f_oHostName(), f_oVarTmpBuffer()
 	{
 	M_PROLOG
-	f_eType = a_eSocketType;
+	if ( f_eType == TYPE::D_DEFAULT )
+		f_eType |= TYPE::D_SSL_SERVER;
 	if ( ( a_eSocketType & TYPE::D_FILE ) && ( a_eSocketType & TYPE::D_NETWORK ) )
 		M_THROW ( _ ( "bad socket namespace setting" ), a_eSocketType );
 	if ( ! ( a_eSocketType & ( TYPE::D_FILE | TYPE::D_NETWORK ) ) )
