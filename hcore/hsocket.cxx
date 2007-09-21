@@ -215,13 +215,14 @@ HSocket::ptr_t HSocket::accept( void )
 	if ( f_eType & ( TYPE::D_SSL_SERVER | TYPE::D_SSL_CLIENT ) )
 		l_eType &= ~TYPE::D_SSL_CLIENT, l_eType |= TYPE::D_SSL_SERVER;
 	ptr_t l_oSocket = ptr_t( new HSocket( l_eType, - 1 ) );
+	M_ASSERT( ! l_oSocket->f_oSSL );
 	l_oSocket->f_iFileDescriptor = l_iFileDescriptor;
 	l_oSocket->f_iAddressSize = l_iAddressSize;
 	l_oSocket->f_bNeedShutdown = true;
 	::memcpy( l_oSocket->f_pvAddress, l_psAddress, l_iAddressSize );
 	if ( f_poClients->has_key( l_iFileDescriptor ) )
 		M_THROW( _( "inconsitient client list state" ), l_iFileDescriptor );
-	f_poClients->operator[](l_iFileDescriptor ) = l_oSocket;
+	f_poClients->operator[]( l_iFileDescriptor ) = l_oSocket;
 	return ( l_oSocket );
 	M_EPILOG
 	}

@@ -109,7 +109,7 @@ int HSerial::do_close ( void )
 	if ( f_iFileDescriptor >= 0 )
 		tcsetattr ( f_iFileDescriptor, TCSANOW,
 				reinterpret_cast < termios const * const > ( static_cast < char const * const > ( f_oBackUpTIO ) ) );
-	return ( HRawFile::close() );
+	return ( HRawFile::do_close() );
 	M_EPILOG
 	}
 
