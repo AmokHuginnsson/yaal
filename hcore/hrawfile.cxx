@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <unistd.h>
+#include <poll.h>
 #include <libintl.h>
 
 #include "hexception.h"
@@ -81,7 +82,8 @@ int HRawFile::close_plain( void )
 int HRawFile::close_ssl( void )
 	{
 	M_PROLOG
-	f_oSSL->shutdown();
+	if ( is_write_ready() )
+		f_oSSL->shutdown();
 	return ( do_close() );
 	M_EPILOG
 	}
@@ -139,10 +141,21 @@ int HRawFile::read_ssl_loader( void* const a_pcBuffer, int const a_iSize )
 	M_EPILOG
 	}
 
+bool HRawFile::is_write_ready( void )
+	{
+	pollfd l_sWriter;
+	::memset( &l_sWriter, 0, sizeof ( l_sWriter ) );
+	l_sWriter.fd = f_iFileDescriptor;
+	l_sWriter.events = POLLOUT;
+	return ( ( poll( &l_sWriter, 1, 0 ) == 1 ) && ( l_sWriter.revents & POLLOUT ) );
+	}
+
 int HRawFile::write( void const* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
-	return ( (this->*writer)( a_pcBuffer, a_iSize ) );
+	if ( is_write_ready() )
+		return ( (this->*writer)( a_pcBuffer, a_iSize ) ); 
+	return ( -1 );
 	M_EPILOG
 	}
 

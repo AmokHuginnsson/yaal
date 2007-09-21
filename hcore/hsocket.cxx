@@ -138,7 +138,10 @@ int HSocket::do_close( void )
 		}
 	if ( f_bNeedShutdown && ( f_iFileDescriptor >= 0 ) )
 		{
-		M_ENSURE( ::shutdown( f_iFileDescriptor, 2 ) == 0 );
+		if ( is_write_ready() )
+			M_ENSURE( ::shutdown( f_iFileDescriptor, 2 ) == 0 )
+		else
+			HRawFile::do_close();
 		f_iFileDescriptor = - 1;
 		f_bNeedShutdown = false;
 		}

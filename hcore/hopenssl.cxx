@@ -159,7 +159,8 @@ void HOpenSSL::shutdown( void )
 	{
 	M_PROLOG
 	M_ASSERT( f_pvSSL );
-	SSL_shutdown( static_cast<SSL*>( f_pvSSL ) );
+	while ( ! SSL_shutdown( static_cast<SSL*>( f_pvSSL ) ) )
+		;
 	M_EPILOG
 	}
 
