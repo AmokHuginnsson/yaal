@@ -54,7 +54,7 @@ char const * const make_short_opts ( OOption * const & a_rpsOptions, int a_iCoun
 	a_roBuffer = "";
 	for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 		{
-		a_roBuffer += static_cast < char > ( a_rpsOptions [ l_iCtr ].f_cShortOption );
+		a_roBuffer += static_cast<char>( a_rpsOptions [ l_iCtr ].f_pcShortOption[0] );
 		switch ( a_rpsOptions [ l_iCtr ].f_eSwitchType )
 			{
 			case ( OOption::D_REQUIRED ):
@@ -94,7 +94,7 @@ option * make_option_array ( OOption * const & a_rpsOptions, int a_iCount, HStri
 			default :
 				l_psOptions [ l_iCtr ].has_arg = no_argument;
 			}
-		l_psOptions [ l_iCtr ].val = a_rpsOptions [ l_iCtr ].f_cShortOption;
+		l_psOptions[ l_iCtr ].val = a_rpsOptions[ l_iCtr ].f_pcShortOption[0];
 		}
 	return ( l_psOptions );
 	M_EPILOG
@@ -120,7 +120,7 @@ int decode_switches ( int const a_iArgc, char * const * const a_ppcArgv,
 		l_bValidSwitch = false;
 		for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 			{
-			if ( a_rpsOptions [ l_iCtr ].f_cShortOption == l_iChar )
+			if ( a_rpsOptions[ l_iCtr ].f_pcShortOption[0] == l_iChar )
 				{
 				l_bValidSwitch = true;
 				switch ( a_rpsOptions [ l_iCtr ].f_eValueType )

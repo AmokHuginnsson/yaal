@@ -35,12 +35,12 @@ namespace yaal
 namespace hcore
 {
 
-typedef void ( * simple_callback_t ) ( void );
+typedef void ( *simple_callback_t )( void );
 
 typedef struct
 	{
-	char const * const f_pcLongOption;
-	char f_cShortOption;
+	char const* const f_pcLongOption;
+	char const* const f_pcShortOption;
 	enum
 		{
 		D_NONE,
