@@ -42,6 +42,7 @@ class HRawFile
 protected:
 	typedef int ( HRawFile::* READER_t )( void* const, int const );
 	typedef int ( HRawFile::* WRITER_t )( void const* const, int const );
+	typedef int ( HRawFile::* CLOSER_t )( void );
 	struct TYPE
 		{
 		typedef enum
@@ -58,13 +59,17 @@ protected:
 public:
 	HRawFile( TYPE::raw_file_type_t = TYPE::D_DEFAULT );
 	virtual ~HRawFile( void );
-	virtual int close( void );
+	int close( void );
 	file_descriptor_t get_file_descriptor( void ) const;
 	READER_t reader;
 	WRITER_t writer;
+	CLOSER_t closer;
 	int read( void* const, int const );
 	int write( void const* const, int const );
 protected:
+	virtual int do_close( void );
+	int close_plain( void );
+	int close_ssl( void );
 	int read_plain( void* const, int const );
 	int write_plain( void const* const, int const );
 	int read_ssl_loader( void* const, int const );

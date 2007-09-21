@@ -64,9 +64,9 @@ char const * const n_ppcErrMsgHSocket [ 4 ] =
 
 HSocket::HSocket( TYPE::socket_type_t const a_eSocketType,
 		int const a_iMaximumNumberOfClients )
-	: HRawFile( ( ( a_eSocketType == TYPE::D_DEFAULT ) || ( a_eSocketType & TYPE::D_SSL_SERVER ) )
+	: HRawFile( ( a_eSocketType & TYPE::D_SSL_SERVER )
 			? HRawFile::TYPE::D_SSL_SERVER
-			: ( ( a_eSocketType & TYPE::D_SSL_CLIENT )
+			: ( ( ( a_eSocketType == TYPE::D_DEFAULT ) || ( a_eSocketType & TYPE::D_SSL_CLIENT ) )
 				? HRawFile::TYPE::D_SSL_CLIENT : HRawFile::TYPE::D_DEFAULT ) ),
 	f_bNeedShutdown( false ), f_eType( a_eSocketType ),
 	f_iMaximumNumberOfClients( a_iMaximumNumberOfClients ),
@@ -75,24 +75,24 @@ HSocket::HSocket( TYPE::socket_type_t const a_eSocketType,
 	{
 	M_PROLOG
 	if ( f_eType == TYPE::D_DEFAULT )
-		f_eType |= TYPE::D_SSL_SERVER;
+		f_eType |= TYPE::D_SSL_CLIENT;
 	if ( ( a_eSocketType & TYPE::D_FILE ) && ( a_eSocketType & TYPE::D_NETWORK ) )
-		M_THROW ( _ ( "bad socket namespace setting" ), a_eSocketType );
+		M_THROW( _( "bad socket namespace setting" ), a_eSocketType );
 	if ( ! ( a_eSocketType & ( TYPE::D_FILE | TYPE::D_NETWORK ) ) )
 		f_eType |= TYPE::D_NETWORK;
 	if ( ( a_eSocketType & TYPE::D_BLOCKING ) && ( a_eSocketType & TYPE::D_NONBLOCKING ) )
-		M_THROW ( _ ( "bad socket option" ), a_eSocketType );
+		M_THROW( _( "bad socket option" ), a_eSocketType );
 	if ( ! ( a_eSocketType & ( TYPE::D_BLOCKING | TYPE::D_NONBLOCKING ) ) )
 		f_eType |= TYPE::D_BLOCKING;
 	if ( f_iMaximumNumberOfClients >= 0 )
 		{
-		M_ENSURE ( ( f_iFileDescriptor = socket (
+		M_ENSURE( ( f_iFileDescriptor = ::socket(
 						( f_eType & TYPE::D_NETWORK ) ? PF_INET : PF_LOCAL,
 						static_cast<int>( SOCK_STREAM ),
 						0 /* info libc "Creating a Socket"
 								 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
 		if ( f_eType & TYPE::D_NONBLOCKING )
-			M_ENSURE ( fcntl ( f_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
+			M_ENSURE( ::fcntl( f_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 		}
 	if ( f_eType & TYPE::D_NETWORK )
 		f_pvAddress = xcalloc<sockaddr_in>( 1 );
@@ -117,6 +117,13 @@ HSocket::~HSocket( void )
 void HSocket::shutdown( void )
 	{
 	M_PROLOG
+	close();
+	M_EPILOG
+	}
+
+int HSocket::do_close( void )
+	{
+	M_PROLOG
 	sockaddr_un* l_psAddressFile = NULL;
 	if ( f_poClients )
 		{
@@ -135,7 +142,7 @@ void HSocket::shutdown( void )
 		f_iFileDescriptor = - 1;
 		f_bNeedShutdown = false;
 		}
-	return;
+	return( 0 );
 	M_EPILOG
 	}
 
@@ -204,7 +211,10 @@ HSocket::ptr_t HSocket::accept( void )
 	if ( f_eType & TYPE::D_NONBLOCKING )
 		M_ENSURE( ::fcntl ( l_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 	/* - 1 means that constructor shall not create socket */
-	ptr_t l_oSocket = ptr_t( new HSocket( f_eType, - 1 ) );
+	TYPE::socket_type_t l_eType = f_eType;
+	if ( f_eType & ( TYPE::D_SSL_SERVER | TYPE::D_SSL_CLIENT ) )
+		l_eType &= ~TYPE::D_SSL_CLIENT, l_eType |= TYPE::D_SSL_SERVER;
+	ptr_t l_oSocket = ptr_t( new HSocket( l_eType, - 1 ) );
 	l_oSocket->f_iFileDescriptor = l_iFileDescriptor;
 	l_oSocket->f_iAddressSize = l_iAddressSize;
 	l_oSocket->f_bNeedShutdown = true;
@@ -281,16 +291,16 @@ void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 	M_EPILOG
 	}
 
-int const HSocket::get_port ( void ) const
+int const HSocket::get_port( void ) const
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_INITIALIZED ], f_iFileDescriptor );
-	sockaddr_in * l_psAddressNetwork = NULL;
+		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
+	sockaddr_in* l_psAddressNetwork = NULL;
 	if ( ! ( f_eType & TYPE::D_NETWORK ) )
-		M_THROW ( _ ( "unix socket has not a port attribute" ), f_eType );
-	l_psAddressNetwork = static_cast < sockaddr_in * > ( f_pvAddress );
-	return ( ntohs ( l_psAddressNetwork->sin_port ) );
+		M_THROW( _( "unix socket has not a port attribute" ), f_eType );
+	l_psAddressNetwork = static_cast<sockaddr_in*>( f_pvAddress );
+	return ( ::ntohs( l_psAddressNetwork->sin_port ) );
 	M_EPILOG
 	}
 
@@ -328,39 +338,39 @@ int HSocket::read_until ( HString & a_roMessage, char const * const a_pcStopSet 
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	char * l_pcPtr = NULL;
+	char* l_pcPtr = NULL;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_INITIALIZED ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
 	a_roMessage = "";
 	do
 		{
-		f_oVarTmpBuffer.hs_realloc ( l_iCtr + 1 );
+		f_oVarTmpBuffer.hs_realloc( l_iCtr + 1 );
 		l_pcPtr = f_oVarTmpBuffer.raw();
-		if ( read ( l_pcPtr + l_iCtr, sizeof ( char ) * 1 ) <= 0 )
+		if ( read( l_pcPtr + l_iCtr, sizeof ( char ) * 1 ) <= 0 )
 			break;
 		}
-	while ( ! strchr ( a_pcStopSet, l_pcPtr [ l_iCtr ++ ] ) );
+	while ( ! ::strchr( a_pcStopSet, l_pcPtr[ l_iCtr ++ ] ) );
 	l_iCtr --; /* go back one char for stripping terminator */
 	if ( l_iCtr > 0 )
 		{
-		l_pcPtr [ l_iCtr ] = 0;
+		l_pcPtr[ l_iCtr ] = 0;
 		if ( l_iCtr > 0 )
 			{
-			a_roMessage.hs_realloc ( l_iCtr );
-			memcpy ( a_roMessage.raw(), l_pcPtr, l_iCtr + 1 );
+			a_roMessage.hs_realloc( l_iCtr );
+			::memcpy( a_roMessage.raw(), l_pcPtr, l_iCtr + 1 );
 			}
 		}
 	return ( l_iCtr );
 	M_EPILOG
 	}
 
-int HSocket::write_until_eos ( HString const & a_roMessage )
+int HSocket::write_until_eos( HString const& a_roMessage )
 	{
 	M_PROLOG
 	int l_iSize = 0;
 	l_iSize = a_roMessage.get_length();
 	if ( l_iSize > 0 )
-		l_iSize = write ( a_roMessage, l_iSize );
+		l_iSize = write( a_roMessage, l_iSize );
 	return ( l_iSize );
 	M_EPILOG
 	}

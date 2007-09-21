@@ -75,7 +75,7 @@ HSerial::~HSerial ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		HSerial::close();
+		close();
 	M_ASSERT ( f_iFileDescriptor < 0 );
 	return;
 	M_EPILOG
@@ -103,7 +103,7 @@ bool HSerial::open ( void )
 	M_EPILOG
 	}
 
-int HSerial::close ( void )
+int HSerial::do_close ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )

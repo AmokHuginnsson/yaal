@@ -77,6 +77,7 @@ public:
 	~HOpenSSL( void );
 	int read( void* const, int const );
 	int write( void const* const, int const );
+	void shutdown( void );
 private:
 	HOpenSSL( HOpenSSL const& );
 	HOpenSSL& operator=( HOpenSSL const& );

@@ -82,6 +82,7 @@ public:
 	int get_client_count( void ) const;
 	HString const& get_host_name( void );
 protected:
+	virtual int do_close( void );
 	void make_address( char const* const, int const );
 private:
 	HSocket( HSocket const& );

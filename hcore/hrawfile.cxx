@@ -43,7 +43,8 @@ HRawFile::HRawFile ( TYPE::raw_file_type_t a_eType ) : f_eType( a_eType ), f_iFi
 	reader( ( ( a_eType & TYPE::D_SSL_SERVER )
 				|| ( a_eType & TYPE::D_SSL_CLIENT ) ) ? &HRawFile::read_ssl_loader : &HRawFile::read_plain ),
 	writer( ( ( a_eType & TYPE::D_SSL_SERVER )
-				|| ( a_eType & TYPE::D_SSL_CLIENT ) ) ? &HRawFile::write_ssl_loader : &HRawFile::write_plain )
+				|| ( a_eType & TYPE::D_SSL_CLIENT ) ) ? &HRawFile::write_ssl_loader : &HRawFile::write_plain ),
+	closer( &HRawFile::close_plain )
 	{
 	M_PROLOG
 	M_ASSERT( ! ( ( a_eType == TYPE::D_DEFAULT ) && ( a_eType & TYPE::D_SSL_SERVER ) ) );
@@ -55,7 +56,7 @@ HRawFile::HRawFile ( TYPE::raw_file_type_t a_eType ) : f_eType( a_eType ), f_iFi
 	M_EPILOG
 	}
 
-HRawFile::~HRawFile ( void )
+HRawFile::~HRawFile( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
@@ -63,13 +64,35 @@ HRawFile::~HRawFile ( void )
 	M_EPILOG
 	}
 
-int HRawFile::close ( void )
+int HRawFile::close( void )
+	{
+	M_PROLOG
+	return ( (this->*closer)() );
+	M_EPILOG
+	}
+
+int HRawFile::close_plain( void )
+	{
+	M_PROLOG
+	return ( do_close() );
+	M_EPILOG
+	}
+
+int HRawFile::close_ssl( void )
+	{
+	M_PROLOG
+	f_oSSL->shutdown();
+	return ( do_close() );
+	M_EPILOG
+	}
+
+int HRawFile::do_close ( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( "file is not opened", errno );
-	l_iError = ::close ( f_iFileDescriptor );
+		M_THROW( "file is not opened", errno );
+	l_iError = ::close( f_iFileDescriptor );
 	f_iFileDescriptor = -1;
 	return ( l_iError );
 	M_EPILOG
@@ -110,6 +133,8 @@ int HRawFile::read_ssl_loader( void* const a_pcBuffer, int const a_iSize )
 	M_PROLOG
 	f_oSSL = HOpenSSL::ptr_t( new HOpenSSL( f_iFileDescriptor, f_eType & TYPE::D_SSL_SERVER ? HOpenSSL::TYPE::D_SERVER : HOpenSSL::TYPE::D_CLIENT ) );
 	reader = &HRawFile::read_ssl;
+	writer = &HRawFile::write_ssl;
+	closer = &HRawFile::close_ssl;
 	return ( read_ssl( a_pcBuffer, a_iSize ) );
 	M_EPILOG
 	}
@@ -143,7 +168,9 @@ int HRawFile::write_ssl_loader( void const* const a_pcBuffer, int const a_iSize 
 	{
 	M_PROLOG
 	f_oSSL = HOpenSSL::ptr_t( new HOpenSSL( f_iFileDescriptor, f_eType & TYPE::D_SSL_SERVER ? HOpenSSL::TYPE::D_SERVER : HOpenSSL::TYPE::D_CLIENT ) );
+	reader = &HRawFile::read_ssl;
 	writer = &HRawFile::write_ssl;
+	closer = &HRawFile::close_ssl;
 	return ( write_ssl( a_pcBuffer, a_iSize ) );
 	M_EPILOG
 	}

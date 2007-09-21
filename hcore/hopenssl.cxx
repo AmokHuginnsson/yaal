@@ -93,14 +93,18 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 
 HOpenSSL::OSSLContextServer::OSSLContextServer( void )
 	{
+	M_PROLOG
 	f_pvMethod = SSLv23_server_method();
 	init();
+	M_EPILOG
 	}
 
 HOpenSSL::OSSLContextClient::OSSLContextClient( void )
 	{
+	M_PROLOG
 	f_pvMethod = SSLv23_client_method();
 	init();
+	M_EPILOG
 	}
 
 HOpenSSL::HOpenSSL( int a_iFileDescriptor, TYPE::ssl_context_type_t a_eType ) : f_pvSSL( NULL )
@@ -113,8 +117,17 @@ HOpenSSL::HOpenSSL( int a_iFileDescriptor, TYPE::ssl_context_type_t a_eType ) : 
 	if ( ! f_pvSSL )
 		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
 	SSL_set_fd( ssl, a_iFileDescriptor );
-	if ( SSL_accept( ssl ) == -1 )
-		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+	if ( a_eType == TYPE::D_SERVER )
+		{
+		if ( SSL_accept( ssl ) == -1 )
+			throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+		}
+	else
+		{
+		M_ASSERT( a_eType == TYPE::D_CLIENT );
+		if ( SSL_connect( ssl ) == -1 )
+			throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+		}
 	return;
 	M_EPILOG
 	}
@@ -128,14 +141,26 @@ HOpenSSL::~HOpenSSL( void )
 
 int HOpenSSL::read( void* const a_pvBuffer, int const a_iSize )
 	{
+	M_PROLOG
 	M_ASSERT( f_pvSSL );
 	return ( SSL_read( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize ) );
+	M_EPILOG
 	}
 
 int HOpenSSL::write( void const* const a_pvBuffer, int const a_iSize )
 	{
+	M_PROLOG
 	M_ASSERT( f_pvSSL );
 	return ( SSL_write( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize ) );
+	M_EPILOG
+	}
+
+void HOpenSSL::shutdown( void )
+	{
+	M_PROLOG
+	M_ASSERT( f_pvSSL );
+	SSL_shutdown( static_cast<SSL*>( f_pvSSL ) );
+	M_EPILOG
 	}
 
 }

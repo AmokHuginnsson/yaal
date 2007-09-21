@@ -87,20 +87,21 @@ protected:
 	hcore::HString f_oTIO;
 	hcore::HString f_oBackUpTIO;
 public:
-	HSerial ( char const * const = NULL ); /* device path */
-	virtual ~HSerial ( void );
-	bool open ( void );
-	virtual int close ( void );
-	void set_speed ( speed_t );
-	void set_flags ( flags_t );
-	void flush ( int );
-	void wait_for_eot ( void );
-	int timed_read ( void * const, int const, int const, int const = 0 );
+	HSerial( char const* const = NULL ); /* device path */
+	virtual ~HSerial( void );
+	bool open( void );
+	void set_speed( speed_t );
+	void set_flags( flags_t );
+	void flush( int );
+	void wait_for_eot( void );
+	int timed_read( void* const, int const, int const, int const = 0 );
 	static flags_t D_FLAGS_TEXT; /* flags for textmode operation */
+protected:
+	virtual int do_close( void );
 private:
-	void compile ( void );
-	void compile_speed ( void );
-	void compile_flags ( void );
+	void compile( void );
+	void compile_speed( void );
+	void compile_flags( void );
 	};
 
 }
