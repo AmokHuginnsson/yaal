@@ -27,6 +27,8 @@ Copyright:
 #ifndef __YAAL_HCORE_HSTRING_H
 #define __YAAL_HCORE_HSTRING_H
 
+#include <limits.h>
+
 namespace yaal
 {
 
@@ -90,7 +92,7 @@ public:
 	HString& lower( void );
 	HString& reverse( void );
 	HString left( int const ) const;
-	HString mid( int, int /* no const - reused */ = 0 ) const;
+	HString mid( int, int /* no const - reused */ = INT_MAX ) const;
 	HString right( int /* not const - reused */ ) const;
 	HString& trim_left( char const* const = " \t\r\n" );
 	HString& trim_right( char const* const = " \t\r\n" );

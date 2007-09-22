@@ -657,7 +657,8 @@ HString HString::mid( int a_iFrom, int /* reused */ a_iLenght ) const
 		a_iLenght += a_iFrom, a_iFrom = 0;
 	if ( ( a_iLenght <= 0 ) || ( a_iFrom >= l_iLenOrig ) )
 		return ( "" );
-	if ( ( a_iLenght == -1 ) || ( ( a_iLenght + a_iFrom ) > l_iLenOrig ) )
+	a_iLenght = ( a_iLenght < l_iLenOrig ? a_iLenght : l_iLenOrig );
+	if ( ( a_iLenght + a_iFrom ) > l_iLenOrig )
 		a_iLenght = l_iLenOrig - a_iFrom;
 	l_oStr.hs_realloc ( a_iLenght + 1 );
 	strncpy ( l_oStr.f_pcBuffer, f_pcBuffer + a_iFrom, a_iLenght );
