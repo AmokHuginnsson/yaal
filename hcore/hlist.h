@@ -832,8 +832,10 @@ template<typename tType>
 template<OListBits::treatment_t const treatment>
 OListBits::status_t HList<tType>::erase( HIterator<treatment>& a_roIterator )
 	{
+	M_PROLOG
 	f_poSelected = a_roIterator.f_poCurrent;
 	return ( remove_element() );
+	M_EPILOG
 	}
 
 template<typename tType>
