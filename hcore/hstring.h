@@ -50,6 +50,7 @@ public:
 	HString( char const );
 	HString( int const );
 	HString( int long const );
+	HString( size_t const );
 	HString( double const );
 	HString( void const* const );
 	HString& operator = ( HString const& );
@@ -59,6 +60,7 @@ public:
 	HString operator + ( char const ) const;
 	HString operator + ( int const ) const;
 	HString operator + ( int long const ) const;
+	HString operator + ( size_t const ) const;
 	HString operator + ( double const ) const;
 	HString operator + ( void const* const ) const;
 	char& operator [ ] ( int const );

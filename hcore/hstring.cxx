@@ -160,6 +160,18 @@ HString::HString ( int long const a_lLong ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	M_EPILOG
 	}
 
+HString::HString ( size_t const a_ulLong ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
+	{
+	M_PROLOG
+	int l_iSize = 0;
+	char l_pcMeasureBuffer [ 3 ] = "\0\0";
+	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%u", a_ulLong ) + 1;
+	hs_realloc ( l_iSize );
+	M_ENSURE ( snprintf ( f_pcBuffer, l_iSize, "%u", a_ulLong ) < l_iSize );
+	return;
+	M_EPILOG
+	}
+
 HString::HString ( double const a_dDouble ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
@@ -246,7 +258,7 @@ HString HString::operator + ( char const a_cChar ) const
 HString HString::operator + ( int const a_iInt ) const
 	{
 	M_PROLOG
-	return ( * this + static_cast < long > ( a_iInt ) );
+	return ( * this + static_cast<long>( a_iInt ) );
 	M_EPILOG
 	}
 
@@ -255,8 +267,19 @@ HString HString::operator + ( int long const a_lLong ) const
 	M_PROLOG
 	HString l_oStr;
 	HString l_oLong;
-	l_oStr = ( f_pcBuffer ? static_cast < char const * > ( * this ) : "" );
+	l_oStr = ( f_pcBuffer ? static_cast<char const*>( *this ) : "" );
 	l_oLong = a_lLong;
+	return ( l_oStr + l_oLong );
+	M_EPILOG
+	}
+
+HString HString::operator + ( size_t const a_ulLong ) const
+	{
+	M_PROLOG
+	HString l_oStr;
+	HString l_oLong;
+	l_oStr = ( f_pcBuffer ? static_cast<char const*>( *this ) : "" );
+	l_oLong = a_ulLong;
 	return ( l_oStr + l_oLong );
 	M_EPILOG
 	}
