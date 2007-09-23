@@ -147,7 +147,7 @@ bool HRawFile::is_write_ready( void )
 	::memset( &l_sWriter, 0, sizeof ( l_sWriter ) );
 	l_sWriter.fd = f_iFileDescriptor;
 	l_sWriter.events = POLLOUT;
-	return ( ( poll( &l_sWriter, 1, 0 ) == 1 ) && ( l_sWriter.revents & POLLOUT ) );
+	return ( ( poll( &l_sWriter, 1, 0 ) == 1 ) && ( l_sWriter.revents & POLLOUT ) && ! ( l_sWriter.revents & POLLHUP ) );
 	}
 
 int HRawFile::write( void const* const a_pcBuffer, int const a_iSize )
