@@ -25,11 +25,13 @@ Copyright:
 */
 
 #include <cstring>
+#include <unistd.h>
 #include <libintl.h>
 
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hthread.h"
+#include "hlog.h"
 
 namespace yaal
 {
@@ -37,137 +39,182 @@ namespace yaal
 namespace hcore
 {
 
-HThread::HThread ( void )
-	: f_eStatus ( D_DEAD ), f_sAttributes(), f_xThread(),
+HThread::HThread( void )
+	: f_eStatus( D_DEAD ), f_sAttributes(), f_xThread(),
 	f_oMutex(), f_oCondition()
 	{
 	M_PROLOG
-	M_ENSURE ( pthread_attr_init ( & f_sAttributes ) == 0 );
-	M_ENSURE ( pthread_attr_setdetachstate ( & f_sAttributes,
+	M_ENSURE( ::pthread_attr_init( &f_sAttributes ) == 0 );
+	M_ENSURE( ::pthread_attr_setdetachstate( &f_sAttributes,
 				PTHREAD_CREATE_JOINABLE ) == 0 );
-	M_ENSURE ( pthread_attr_setinheritsched ( & f_sAttributes,
+	M_ENSURE( ::pthread_attr_setinheritsched( &f_sAttributes,
 				PTHREAD_INHERIT_SCHED ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-HThread::~HThread ( void )
+HThread::~HThread( void )
 	{
 	M_PROLOG
 	if ( f_eStatus != D_DEAD )
 		finish();
-	M_ENSURE ( pthread_attr_destroy ( & f_sAttributes ) == 0 );
+	M_ENSURE( ::pthread_attr_destroy( &f_sAttributes ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-int HThread::spawn ( void )
+int HThread::spawn( void )
 	{
 	M_PROLOG
-	HLock l_oLock ( f_oMutex );
+	HLock l_oLock( f_oMutex );
 	if ( f_eStatus != D_DEAD )
-		M_THROW ( _ ( "thread is already running" ), f_eStatus );
-	M_ENSURE ( pthread_create ( & f_xThread,
-				& f_sAttributes, SPAWN, this ) == 0 );
+		M_THROW( _( "thread is already running or spawning" ), f_eStatus );
+	f_eStatus = D_SPAWNING;
+	M_ENSURE( ::pthread_create( &f_xThread, &f_sAttributes, SPAWN, this ) == 0 );
 	f_oCondition.wait();
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HThread::finish ( void )
+void HThread::schedule_finish( void )
 	{
 	M_PROLOG
-	void * l_pvReturn = NULL;
-	if ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) )
-		M_THROW ( _ ( "thread is not running" ), f_eStatus );
-	f_eStatus = D_ZOMBIE;
-	M_ENSURE ( pthread_join ( f_xThread, & l_pvReturn ) == 0 );
+	if ( f_eStatus != D_DEAD )
+		f_eStatus = D_ZOMBIE;
+	return;
+	M_EPILOG
+	}
+
+int HThread::finish( void )
+	{
+	M_PROLOG
+	if ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) && ( f_eStatus != D_SPAWNING ) )
+		M_THROW( _( "thread is not running" ), f_eStatus );
+	schedule_finish();
+	void* l_pvReturn = NULL;
+	f_oCondition.wait();
+	M_ENSURE( ::pthread_join( f_xThread, &l_pvReturn ) == 0 );
 	f_eStatus = D_DEAD;
-	return ( reinterpret_cast < int > ( l_pvReturn ) );
+	return ( reinterpret_cast<int>( l_pvReturn ) );
 	M_EPILOG
 	}
 
-void * HThread::SPAWN ( void * a_pvThread )
+void* HThread::SPAWN( void* a_pvThread )
 	{
 	M_PROLOG
-	return ( reinterpret_cast < HThread * > ( a_pvThread )->control() );
+	return ( reinterpret_cast<HThread*>( a_pvThread )->control() );
+	/*
+	 * We cannot afford silencing uncaught exceptions here.
+	 * Because of not catching an exception at the thread owner layer
+	 * is a severe coding bug, application must crash in the event
+	 * of uncaught exception.
+	 */
 	M_EPILOG
 	}
 
-void * HThread::control ( void )
+void* HThread::control( void )
 	{
 	M_PROLOG
-	void * l_pvReturn = NULL;
-	M_ENSURE ( pthread_setcancelstate ( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
-	M_ENSURE ( pthread_setcanceltype ( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
+	void* l_pvReturn = NULL;
+	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
+	M_ENSURE( ::pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
 	f_eStatus = D_ALIVE;
 	f_oCondition.signal();
-/* It is possible that destructor of derived class will be called before
- * next call here (call to run()). So there will be pure virtual method called.
- * Such event result in program termination.
- * Scenario that completes behavior described above happens when
- * two calls to spawn() occur in turn.
- * To avoid this class user must ensure that derived class destructor
- * will not finish before eventual call to run is done.
- */
-	l_pvReturn = reinterpret_cast < void * > ( run() );
+	/*
+	 * Setting int run(); as pure virtual exposed us to undefined behavior
+	 * at the event of two subsequent spawn() calls.
+	 *
+	 * The scenario is:
+	 * There are 2 threads: T1 and T2.
+	 * T1 does:
+	 * spawn();
+	 *
+	 * T2 is created from this spawn, and invokes this function (control()).
+	 * Here, between line above and line below comes task switch.
+	 *
+	 * T1 does:
+	 * spawn();
+	 *
+	 * The second spawn fails with an exception and the thread object is destroyed.
+	 * Here comes another task switch and although finish() waits on signal
+	 * that is send after the run() call, the derived class is already destroyed
+	 * and the run below is "pure virtual" with no underneath object.
+	 *
+	 * That is way we have to deliver interface that allows users to not specify
+	 * any useful or meaningful int run();
+	 */
+	l_pvReturn = reinterpret_cast<void*>( run() );
 	f_eStatus = D_ZOMBIE;
+	f_oCondition.signal();
 	return ( l_pvReturn );
 	M_EPILOG
 	}
 
-bool HThread::is_alive ( void ) const
+bool HThread::is_alive( void ) const
 	{
 	M_PROLOG
 	return ( f_eStatus == D_ALIVE );
 	M_EPILOG
 	}
 
-HMutex::HMutex ( bool const a_bRecursive ) : f_bRecursive ( a_bRecursive ),
+int HThread::run( void )
+	{
+	M_PROLOG
+	/*
+	 * Just avoid crash on two subsequent spawn() calls.
+	 */
+	log << "Pure virtual call - ignored." << endl;
+	return( -1 );
+	M_EPILOG
+	}
+
+HMutex::HMutex( TYPE::mutex_type_t const a_eType ) : f_eType ( a_eType ),
 																						 f_sAttributes(), f_xMutex()
 	{
 	M_PROLOG
-	pthread_mutexattr_init ( & f_sAttributes );
-	M_ENSURE ( pthread_mutexattr_settype ( & f_sAttributes,
-				f_bRecursive ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
-	pthread_mutex_init ( & f_xMutex, & f_sAttributes );
+	if ( f_eType == TYPE::D_DEFAULT )
+		f_eType = TYPE::D_NON_RECURSIVE;
+	::pthread_mutexattr_init( &f_sAttributes );
+	M_ENSURE( ::pthread_mutexattr_settype( &f_sAttributes,
+				f_eType & TYPE::D_RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
+	::pthread_mutex_init( &f_xMutex, &f_sAttributes );
 	return;
 	M_EPILOG
 	}
 
-HMutex::~HMutex ( void )
+HMutex::~HMutex( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	while ( ( l_iError = pthread_mutex_destroy ( & f_xMutex ) ) == EBUSY )
+	while ( ( l_iError = ::pthread_mutex_destroy( &f_xMutex ) ) == EBUSY )
 		;
-	M_ENSURE ( l_iError == 0 );
-	pthread_mutexattr_destroy ( & f_sAttributes );
+	M_ENSURE( l_iError == 0 );
+	::pthread_mutexattr_destroy( &f_sAttributes );
 	return;
 	M_EPILOG
 	}
 
-void HMutex::lock ( void )
+void HMutex::lock( void )
 	{
 	M_PROLOG
-	int l_iError = pthread_mutex_lock ( & f_xMutex );
-	if ( ! f_bRecursive )
-		M_ENSURE ( l_iError != EDEADLK );
+	int l_iError = ::pthread_mutex_lock( &f_xMutex );
+	if ( ! ( f_eType & TYPE::D_RECURSIVE ) )
+		M_ENSURE( l_iError != EDEADLK );
 	return;
 	M_EPILOG
 	}
 
-void HMutex::unlock ( void )
+void HMutex::unlock( void )
 	{
 	M_PROLOG
-	int l_iError = pthread_mutex_unlock ( & f_xMutex );
-	if ( ! f_bRecursive )
-		M_ENSURE ( l_iError != EPERM );
+	int l_iError = ::pthread_mutex_unlock( &f_xMutex );
+	if ( ! ( f_eType & TYPE::D_RECURSIVE ) )
+		M_ENSURE( l_iError != EPERM );
 	return;
 	M_EPILOG
 	}
 
-HLock::HLock ( HMutex & a_roMutex ) : f_roMutex ( a_roMutex )
+HLock::HLock( HMutex& a_roMutex ) : f_roMutex( a_roMutex )
 	{
 	M_PROLOG
 	f_roMutex.lock();
@@ -175,7 +222,7 @@ HLock::HLock ( HMutex & a_roMutex ) : f_roMutex ( a_roMutex )
 	M_EPILOG
 	}
 
-HLock::~HLock ( void )
+HLock::~HLock( void )
 	{
 	M_PROLOG
 	f_roMutex.unlock();
@@ -183,42 +230,42 @@ HLock::~HLock ( void )
 	M_EPILOG
 	}
 
-HCondition::HCondition ( void )
+HCondition::HCondition( void )
 	: f_sAttributes(), f_xCondition(), f_oMutex()
 	{
 	M_PROLOG
-	pthread_condattr_init ( & f_sAttributes );
-	pthread_cond_init ( & f_xCondition, & f_sAttributes );
+	::pthread_condattr_init( &f_sAttributes );
+	::pthread_cond_init( &f_xCondition, &f_sAttributes );
 	f_oMutex.lock();
 	return;
 	M_EPILOG
 	}
 
-HCondition::~HCondition ( void )
+HCondition::~HCondition( void )
 	{
 	M_PROLOG
 	f_oMutex.unlock();
-	M_ENSURE ( pthread_cond_destroy ( & f_xCondition ) == 0 );
-	pthread_condattr_destroy ( & f_sAttributes );
+	M_ENSURE( ::pthread_cond_destroy( &f_xCondition ) == 0 );
+	::pthread_condattr_destroy( &f_sAttributes );
 	return;
 	M_EPILOG
 	}
 
-HCondition::status_t HCondition::wait ( int long unsigned * a_pulTimeOutSeconds,
-		int long unsigned * a_pulTimeOutNanoSeconds )
+HCondition::status_t HCondition::wait( int long unsigned* a_pulTimeOutSeconds,
+		int long unsigned* a_pulTimeOutNanoSeconds )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	timespec l_sTimeOut;
 	if ( a_pulTimeOutSeconds || a_pulTimeOutNanoSeconds )
 		{
-		memset ( & l_sTimeOut, 0, sizeof ( timespec ) );
+		::memset ( &l_sTimeOut, 0, sizeof ( timespec ) );
 		if ( a_pulTimeOutSeconds )
-			l_sTimeOut.tv_sec = ( * a_pulTimeOutSeconds );
+			l_sTimeOut.tv_sec = ( *a_pulTimeOutSeconds );
 		if ( a_pulTimeOutNanoSeconds )
-			l_sTimeOut.tv_nsec = ( * a_pulTimeOutNanoSeconds );
-		l_iError = pthread_cond_timedwait ( & f_xCondition,
-					& f_oMutex.f_xMutex, & l_sTimeOut );
+			l_sTimeOut.tv_nsec = ( *a_pulTimeOutNanoSeconds );
+		l_iError = ::pthread_cond_timedwait( &f_xCondition,
+					&f_oMutex.f_xMutex, &l_sTimeOut );
 		if ( a_pulTimeOutSeconds )
 			( * a_pulTimeOutSeconds ) = l_sTimeOut.tv_sec;
 		if ( a_pulTimeOutNanoSeconds )
@@ -227,16 +274,16 @@ HCondition::status_t HCondition::wait ( int long unsigned * a_pulTimeOutSeconds,
 		return ( ( l_iError == 0 ) ? D_OK : ( ( l_iError == EINTR ) ? D_INTERRUPT : D_TIMEOUT ) );
 		}
 	else
-		pthread_cond_wait ( & f_xCondition, & f_oMutex.f_xMutex ); /* Always returns 0. */
+		::pthread_cond_wait( &f_xCondition, &f_oMutex.f_xMutex ); /* Always returns 0. */
 	return ( D_OK );
 	M_EPILOG
 	}
 
-void HCondition::signal ( void )
+void HCondition::signal( void )
 	{
 	M_PROLOG
-	HLock l_oLock ( f_oMutex );
-	pthread_cond_signal ( & f_xCondition );
+	HLock l_oLock( f_oMutex );
+	::pthread_cond_signal( &f_xCondition );
 	return;
 	M_EPILOG
 	}

@@ -38,25 +38,35 @@ namespace hcore
 class HCondition;
 class HMutex
 	{
+public:
+	struct TYPE
+		{
+		typedef enum
+			{
+			D_DEFAULT = 0,
+			D_RECURSIVE = 1,
+			D_NON_RECURSIVE = 2
+			} mutex_type_t;
+		};
 protected:
 	/*{*/
-	bool	f_bRecursive;
+	TYPE::mutex_type_t f_eType;
 	pthread_mutexattr_t f_sAttributes;
 	pthread_mutex_t f_xMutex;
 	/*}*/
 public:
 	/*{*/
-	HMutex ( bool const /* recursive */ = false );
-	virtual ~HMutex ( void );
-	void lock ( void );
-	bool try_lock ( void );
-	void unlock ( void );
+	HMutex( TYPE::mutex_type_t const /* recursive | fair */ = TYPE::D_DEFAULT );
+	virtual ~HMutex( void );
+	void lock( void );
+	bool try_lock( void );
+	void unlock( void );
 	/*}*/
 private:
 	/*{*/
 	friend class HCondition;
-	HMutex ( HMutex const & );
-	HMutex & operator = ( HMutex const & );
+	HMutex( HMutex const& );
+	HMutex& operator = ( HMutex const& );
 	/*}*/
 	};
 
@@ -72,13 +82,13 @@ public:
 		D_TIMEOUT,
 		D_INTERRUPT
 		} status_t;
-	HCondition ( void );
-	virtual ~HCondition ( void );
-	status_t wait ( int long unsigned * = NULL, int long unsigned * = NULL );
-	void signal ( void );
+	HCondition( void );
+	virtual ~HCondition( void );
+	status_t wait( int long unsigned* = NULL, int long unsigned* = NULL );
+	void signal( void );
 private:
-	HCondition ( HCondition const & );
-	HCondition & operator = ( HCondition const & );
+	HCondition( HCondition const& );
+	HCondition& operator = ( HCondition const& );
 	};
 
 class HThread
@@ -86,6 +96,7 @@ class HThread
 	typedef enum
 		{
 		D_DEAD,
+		D_SPAWNING,
 		D_ALIVE,
 		D_ZOMBIE
 		} status_t;
@@ -96,28 +107,29 @@ protected:
 	mutable HMutex	f_oMutex;
 	HCondition			f_oCondition;
 public:
-	HThread ( void );
-	virtual ~HThread ( void );
-	int spawn ( void );
-	int finish ( void );
-	bool is_alive ( void ) const;
+	HThread( void );
+	virtual ~HThread( void );
+	int spawn( void );
+	int finish( void );
+	void schedule_finish( void );
+	bool is_alive( void ) const;
 private:
-	virtual int run ( void ) = 0;
-	void * control ( void );
-	static void * SPAWN ( void * );
-	HThread ( HThread const & );
-	HThread & operator = ( HThread const & );
+	virtual int run( void );
+	void* control( void );
+	static void* SPAWN( void* );
+	HThread( HThread const& );
+	HThread& operator = ( HThread const& );
 	};
 
 class HLock
 	{
-	HMutex & f_roMutex;
+	HMutex& f_roMutex;
 public:
-	explicit HLock ( HMutex & );
-	virtual ~HLock ( void );
+	explicit HLock( HMutex& );
+	virtual ~HLock( void );
 private:
-	HLock ( HLock const & );
-	HLock & operator = ( HLock const & );
+	HLock( HLock const& );
+	HLock& operator = ( HLock const& );
 	};
 
 }
