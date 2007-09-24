@@ -50,7 +50,7 @@ HString n_oSSLCert;
 typedef HSingleton<HLog> HLogInstance;
 HLog& log = HLogInstance::get_instance( 1000 );
 
-OVariable n_psHCoreVariables [ ] =
+OVariable n_psHCoreVariables[] =
 	{
 		{ D_HSTRING, "ssl_key", &n_oSSLKey },
 		{ D_HSTRING, "ssl_cert", &n_oSSLCert },
@@ -127,8 +127,8 @@ void set_env ( char const * const a_pcVarValue )
 	}
 
 extern "C"
-void hcore_init ( void ) __attribute__ ( ( constructor ) );
-void hcore_init ( void )
+void hcore_init( void ) __attribute__(( constructor ));
+void hcore_init( void )
 	{
 	char * l_pcEnv = NULL;
 	STATIC_ASSERT ( sizeof ( int ) >= 4 );

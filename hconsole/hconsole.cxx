@@ -73,7 +73,7 @@ bool	n_bLeaveCtrlBackSlash = false;
 char	n_cCommandComposeCharacter = 'x';
 int		n_iCommandComposeDelay = 16;
 
-OVariable n_psVariables [ ] =
+OVariable n_psVariables[] =
 	{
 		{ D_BOOL, "use_mouse", & n_bUseMouse },
 		{ D_BOOL, "disable_XON", & n_bDisableXON },
@@ -173,7 +173,7 @@ bool const set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
 	}
 
 extern "C"
-void hconsole_init ( void ); __attribute__ ( ( constructor ) )
+void hconsole_init ( void ) __attribute__(( constructor ));
 void hconsole_init ( void )
 	{
 	errno = 0;

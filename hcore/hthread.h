@@ -122,13 +122,24 @@ public:
 	int spawn( void );
 	int finish( void );
 	void schedule_finish( void );
-	bool is_alive( void ) const;
+ 	bool is_alive( void ) const;
 private:
 	virtual int run( void );
 	void* control( void );
 	static void* SPAWN( void* );
 	HThread( HThread const& );
 	HThread& operator = ( HThread const& );
+	};
+
+template<typename tType>
+class HThreadT : public HThread
+	{
+	tType& call;
+public:
+	HThreadT( tType& callee ) : call( callee ) {}
+private:
+	virtual int run( void )
+		{ return ( call( const_cast<HThreadT const* const>( this ) ) ); }
 	};
 
 class HLock
