@@ -114,8 +114,7 @@ class HThread
 	HChunk f_oAttributes;
 	HChunk f_oThread;
 protected:
-	mutable HMutex	f_oMutex;
-	HCondition			f_oCondition;
+	HCondition f_oCondition;
 public:
 	HThread( void );
 	virtual ~HThread( void );

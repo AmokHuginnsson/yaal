@@ -55,8 +55,8 @@ void* HChunk::get( void ) const
 	}
 
 HThread::HThread( void )
-	: f_eStatus( D_DEAD ), f_oAttributes( xcalloc<pthread_attr_t>( 1 ) ), f_oThread( xcalloc<pthread_t>( 1 ) ),
-	f_oMutex(), f_oCondition()
+	: f_eStatus( D_DEAD ), f_oAttributes( xcalloc<pthread_attr_t>( 1 ) ),
+	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oCondition()
 	{
 	M_PROLOG
 	pthread_attr_t* attr = static_cast<pthread_attr_t*>( f_oAttributes.get() );
@@ -80,7 +80,6 @@ HThread::~HThread( void )
 int HThread::spawn( void )
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
 	if ( f_eStatus != D_DEAD )
 		M_THROW( _( "thread is already running or spawning" ), f_eStatus );
 	f_eStatus = D_SPAWNING;
