@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hpointer.h"
 #include "hcore/hsingleton.h"
 #include "hcore/hexception.h"
+#include "hcore/hthread.h"
 
 namespace yaal
 {
@@ -51,6 +52,7 @@ public:
 private:
 	struct OSSLContext
 		{
+		static HMutex f_oMutex;
 		void* f_pvMethod;
 		void* f_pvContext;
 		OSSLContext( void );

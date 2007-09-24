@@ -57,6 +57,8 @@ HString& format_error_message( HString& a_oBuffer )
 
 }
 
+HMutex HOpenSSL::OSSLContext::f_oMutex;
+
 HOpenSSL::OSSLContext::OSSLContext( void ) : f_pvMethod( NULL ), f_pvContext( NULL )
 	{
 	}
@@ -64,6 +66,7 @@ HOpenSSL::OSSLContext::OSSLContext( void ) : f_pvMethod( NULL ), f_pvContext( NU
 void HOpenSSL::OSSLContext::init( void )
 	{
 	M_PROLOG
+	HLock l_oLock( f_oMutex );
 	SSL_load_error_strings();
 	SSLeay_add_ssl_algorithms();
 	SSL_METHOD* l_pxMethod = static_cast<SSL_METHOD*>( f_pvMethod );

@@ -27,13 +27,23 @@ Copyright:
 #ifndef __YAAL_HCORE_HTHREAD_H
 #define __YAAL_HCORE_HTHREAD_H
 
-#include <pthread.h>
-
 namespace yaal
 {
 
 namespace hcore
 {
+
+class HChunk
+	{
+	void* f_pvData;
+public:
+	HChunk( void* );
+	~HChunk( void );
+	void* get() const;
+private:
+	HChunk( HChunk const& );
+	HChunk& operator = ( HChunk const& );
+	};
 
 class HCondition;
 class HMutex
@@ -51,8 +61,8 @@ public:
 protected:
 	/*{*/
 	TYPE::mutex_type_t f_eType;
-	pthread_mutexattr_t f_sAttributes;
-	pthread_mutex_t f_xMutex;
+	HChunk f_oAttributes;
+	HChunk f_oMutex;
 	/*}*/
 public:
 	/*{*/
@@ -72,8 +82,8 @@ private:
 
 class HCondition
 	{
-	pthread_condattr_t f_sAttributes;
-	pthread_cond_t f_xCondition;
+	HChunk f_oAttributes;
+	HChunk f_oCondition;
 	HMutex f_oMutex;
 public:
 	typedef enum
@@ -100,9 +110,9 @@ class HThread
 		D_ALIVE,
 		D_ZOMBIE
 		} status_t;
-	status_t				f_eStatus;
-	pthread_attr_t	f_sAttributes;
-	pthread_t				f_xThread;
+	status_t f_eStatus;
+	HChunk f_oAttributes;
+	HChunk f_oThread;
 protected:
 	mutable HMutex	f_oMutex;
 	HCondition			f_oCondition;

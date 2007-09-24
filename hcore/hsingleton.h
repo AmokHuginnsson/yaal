@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hpointer.h"
 #include "hcore/hmap.h"
 #include "hcore/hlist.h"
+#include "hcore/hthread.h"
 
 namespace yaal
 {
@@ -52,6 +53,7 @@ private:
 	typedef yaal::hcore::HList<destructor_ptr_t> destructor_list_t;
 	typedef yaal::hcore::HPointer<destructor_list_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> destructor_list_ptr_t;
 	typedef yaal::hcore::HMap<int, destructor_list_ptr_t> map_stack_t;
+	static yaal::hcore::HMutex f_oMutex;
 	static map_stack_t f_oDestructors;
 public:
 	static void register_destructor( destructor_ptr_t, int const& );

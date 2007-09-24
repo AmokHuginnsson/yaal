@@ -36,10 +36,12 @@ namespace yaal
 namespace hcore
 {
 
+HMutex HLifeTimeTracker::f_oMutex;
 HLifeTimeTracker::map_stack_t HLifeTimeTracker::f_oDestructors;
 
 void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int const& a_iLifeTime )
 	{
+	HLock l_oLock( f_oMutex );
 	if ( f_oDestructors.find( a_iLifeTime ) == f_oDestructors.end() )
 		f_oDestructors[ a_iLifeTime ] = destructor_list_ptr_t( new destructor_list_t() );
 	f_oDestructors[ a_iLifeTime ]->push_back( a_oDestructor );
@@ -48,6 +50,7 @@ void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int 
 
 void HLifeTimeTracker::destruct( void )
 	{
+	HLock l_oLock( f_oMutex );
 	map_stack_t::HIterator it = f_oDestructors.begin();
 	M_ASSERT( it != f_oDestructors.end() );
 	destructor_list_ptr_t i = it->second;
