@@ -56,7 +56,7 @@ void* HChunk::get( void ) const
 
 HThread::HThread( void )
 	: f_eStatus( D_DEAD ), f_oAttributes( xcalloc<pthread_attr_t>( 1 ) ),
-	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oCondition()
+	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::D_RECURSIVE ), f_oCondition()
 	{
 	M_PROLOG
 	pthread_attr_t* attr = static_cast<pthread_attr_t*>( f_oAttributes.get() );
@@ -70,6 +70,7 @@ HThread::HThread( void )
 HThread::~HThread( void )
 	{
 	M_PROLOG
+	HLock l_oLock( f_oMutex );
 	if ( f_eStatus != D_DEAD )
 		finish();
 	M_ENSURE( ::pthread_attr_destroy( static_cast<pthread_attr_t*>( f_oAttributes.get() ) ) == 0 );
@@ -80,6 +81,7 @@ HThread::~HThread( void )
 int HThread::spawn( void )
 	{
 	M_PROLOG
+	HLock l_oLock( f_oMutex );
 	if ( f_eStatus != D_DEAD )
 		M_THROW( _( "thread is already running or spawning" ), f_eStatus );
 	f_eStatus = D_SPAWNING;
@@ -93,6 +95,7 @@ int HThread::spawn( void )
 void HThread::schedule_finish( void )
 	{
 	M_PROLOG
+	HLock l_oLock( f_oMutex );
 	if ( f_eStatus != D_DEAD )
 		f_eStatus = D_ZOMBIE;
 	return;
@@ -102,11 +105,14 @@ void HThread::schedule_finish( void )
 int HThread::finish( void )
 	{
 	M_PROLOG
+	HLock l_oLock( f_oMutex );
 	if ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) && ( f_eStatus != D_SPAWNING ) )
 		M_THROW( _( "thread is not running" ), f_eStatus );
 	schedule_finish();
 	void* l_pvReturn = NULL;
+	f_oMutex.unlock();
 	f_oCondition.wait();
+	f_oMutex.lock();
 	M_ENSURE( ::pthread_join( *static_cast<pthread_t*>( f_oThread.get() ), &l_pvReturn ) == 0 );
 	f_eStatus = D_DEAD;
 	return ( reinterpret_cast<int>( l_pvReturn ) );
@@ -167,6 +173,7 @@ void* HThread::control( void )
 bool HThread::is_alive( void ) const
 	{
 	M_PROLOG
+	HLock l_oLock( f_oMutex );
 	return ( f_eStatus == D_ALIVE );
 	M_EPILOG
 	}
