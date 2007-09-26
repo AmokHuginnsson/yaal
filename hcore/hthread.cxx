@@ -72,7 +72,12 @@ HThread::~HThread( void )
 	M_PROLOG
 	HLock l_oLock( f_oMutex );
 	if ( f_eStatus != D_DEAD )
+		{
+		f_oMutex.unlock();
 		finish();
+		f_oMutex.lock();
+		}
+	M_ASSERT( f_eStatus == D_DEAD );
 	M_ENSURE( ::pthread_attr_destroy( static_cast<pthread_attr_t*>( f_oAttributes.get() ) ) == 0 );
 	return;
 	M_EPILOG
