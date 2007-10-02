@@ -69,50 +69,51 @@ private:
 	pool_type_t f_ePoolType;
 	size_t f_ulPoolSize;	/* size of allocated memory buffer */
 	int f_iTop;
-	tType * f_ptPool;	/* pointer to allocated memory pool */
+	tType* f_ptPool;	/* pointer to allocated memory pool */
 public:
-	HPool ( size_t, pool_type_t = D_FIXED_SIZE );
-	virtual ~HPool ( void );
-	size_t pool_realloc ( size_t );
-	tType & operator [ ] ( int ) const;
-	tType & add ( tType const & );
-	void reset ( void );
-	int get_top ( void ) const;
+	HPool( size_t, pool_type_t = D_FIXED_SIZE );
+	virtual ~HPool( void );
+	size_t pool_realloc( size_t );
+	tType& operator[] ( int ) const;
+	void add( tType const& );
+	void reset( void );
+	int get_top( void ) const;
 private:
 	HPool ( HPool const & );
 	HPool & operator = ( HPool const & );
 	};
 
 template < typename tType >
-HPool < tType >::HPool ( size_t a_ulNewSize, pool_type_t a_ePoolType )
-	: f_ePoolType ( a_ePoolType ), f_ulPoolSize ( 0 ), f_iTop ( 0 ),
-	f_ptPool ( NULL )
+HPool<tType>::HPool ( size_t a_ulNewSize, pool_type_t a_ePoolType )
+	: f_ePoolType( a_ePoolType ), f_ulPoolSize( 0 ), f_iTop( 0 ),
+	f_ptPool( NULL )
 	{
 	M_PROLOG
 	if ( a_ulNewSize )
-		pool_realloc ( a_ulNewSize );
+		pool_realloc( a_ulNewSize );
 	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-HPool < tType >::~HPool ( void )
+template<typename tType>
+HPool<tType>::~HPool( void )
 	{
 	M_PROLOG
 	if ( f_ptPool )
-		xfree ( f_ptPool );
+		xfree( f_ptPool );
 	f_ulPoolSize = 0;
+	f_iTop = 0;
 	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
+template<typename tType>
+size_t HPool<tType>::pool_realloc( const size_t a_ulNewSize )
 	{
 	M_PROLOG
 	size_t l_ulOldSize = f_ulPoolSize;
 	if ( a_ulNewSize < 1 )
-		M_THROW ( g_ppcErrMsgHPool [ ERROR::E_BADSIZE ], a_ulNewSize );
+		M_THROW( g_ppcErrMsgHPool[ ERROR::E_BADSIZE ], a_ulNewSize );
 	if ( f_ePoolType == D_AUTO_GROW )
 		{
 		if ( a_ulNewSize > f_ulPoolSize )
@@ -120,51 +121,52 @@ size_t HPool < tType >::pool_realloc ( const size_t a_ulNewSize )
 			f_ulPoolSize = 1;
 			while ( f_ulPoolSize < a_ulNewSize )
 				f_ulPoolSize <<= 1;
-			f_ptPool = xrealloc < tType > ( f_ptPool, f_ulPoolSize );
-			memset ( f_ptPool + l_ulOldSize, 0,
+			f_ptPool = xrealloc<tType>( f_ptPool, f_ulPoolSize );
+			memset( f_ptPool + l_ulOldSize, 0,
 					( f_ulPoolSize - l_ulOldSize ) * sizeof ( tType ) );
 			}
 		}
 	else if ( f_ulPoolSize != a_ulNewSize )
 		{
 		if ( f_ptPool && ( f_ePoolType == D_FIXED_SIZE ) )
-			M_THROW ( g_ppcErrMsgHPool [ ERROR::E_REALLOC_FIXED ], f_ulPoolSize );
+			M_THROW( g_ppcErrMsgHPool[ ERROR::E_REALLOC_FIXED ], f_ulPoolSize );
 		f_ulPoolSize = a_ulNewSize;
-		f_ptPool = xrealloc < tType > ( f_ptPool, f_ulPoolSize );
+		f_ptPool = xrealloc<tType>( f_ptPool, f_ulPoolSize );
 		}
+	f_iTop = a_ulNewSize;
 	return ( f_ulPoolSize - l_ulOldSize );
 	M_EPILOG
 	}
 
-template < typename tType >
-tType & HPool < tType >::operator [ ] ( int a_iIndex ) const
+template<typename tType>
+tType& HPool<tType>::operator[]( int a_iIndex ) const
 	{
 	M_PROLOG
-	if ( ( a_iIndex < 0 ) || ( static_cast < size_t > ( a_iIndex ) >= f_ulPoolSize ) )
-		M_THROW ( g_ppcErrMsgHPool [ ERROR::E_BADINDEX ], a_iIndex );
-	return ( f_ptPool [ a_iIndex ] );
+	if ( ( a_iIndex < 0 ) || ( a_iIndex >= f_iTop ) )
+		M_THROW( g_ppcErrMsgHPool[ ERROR::E_BADINDEX ], a_iIndex );
+	return ( f_ptPool[ a_iIndex ] );
 	M_EPILOG
 	}
 
-template < typename tType >
-tType & HPool < tType>::add ( tType const & a_tPod )
+template<typename tType>
+void HPool<tType>::add( tType const& a_tPod )
 	{
 	M_PROLOG
-	pool_realloc ( f_iTop + 1 );
-	f_ptPool [ f_iTop ] = a_tPod;
-	f_iTop ++;
-	return ( f_ptPool [ f_iTop - 1 ] );
+	size_t l_iOldTop = f_iTop;
+	pool_realloc( f_iTop + 1 );
+	f_ptPool[ l_iOldTop ] = a_tPod;
+	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-void HPool < tType >::reset ( void )
+template<typename tType>
+void HPool<tType>::reset( void )
 	{
 	f_iTop = 0;
 	}
 
-template < typename tType >
-int HPool < tType >::get_top ( void ) const
+template<typename tType>
+int HPool<tType>::get_top( void ) const
 	{
 	return ( f_iTop );
 	}
