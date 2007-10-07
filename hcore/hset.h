@@ -39,7 +39,21 @@ namespace yaal
 namespace hcore
 {
 
-template < typename tType >
+template<typename tType>
+struct set_helper
+{
+
+template<typename key_t>
+inline static void update( key_t&, key_t const& )
+	{	}
+
+template<typename key_t>
+inline static bool less( key_t const& left, key_t const& right )
+	{	return ( left < right );	}
+
+};
+
+template<typename tType, typename ttType = set_helper<tType> >
 class HSet
 	{
 public:
@@ -98,11 +112,11 @@ public:
 	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
 	HIterator insert( tType const& e )
-		{	return ( HIterator( f_oEngine.insert( e ) ) );	}
+		{	return ( HIterator( f_oEngine.insert<tType, ttType>( e ) ) );	}
 	void remove( tType const& e )
-		{	f_oEngine.remove( e );	}
+		{	f_oEngine.remove<tType, ttType>( e );	}
 	HIterator find( tType const& e ) const
-		{ return ( f_oEngine.find( e ) ); }
+		{ return ( f_oEngine.find<tType, ttType>( e ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( f_oEngine.begin() ) ); }
 	HIterator end( void ) const

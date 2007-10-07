@@ -108,11 +108,11 @@ public:
 	virtual ~HList( void );
 	HList( HList const& );
 	HList& operator = ( HList const& );
-	cyclic_iterator hook( void );
-	iterator begin( void );
-	iterator end( void );
-	iterator rend( void );
-	iterator rbegin( void );
+	cyclic_iterator hook( void ) const;
+	iterator begin( void ) const;
+	iterator end( void ) const;
+	iterator rend( void ) const;
+	iterator rbegin( void ) const;
 	void flush( void );
 	int size( void );
 	tType& add_element( tType* = NULL ); /* adds new element at current cursor position */
@@ -411,31 +411,31 @@ HList< tType >::HList ( HList<tType> const & a_roList )
 	}
 
 template<typename tType>
-typename HList<tType>::iterator HList<tType>::begin( void )
+typename HList<tType>::iterator HList<tType>::begin( void ) const
 	{
 	return ( iterator ( f_poHook, f_poHook ) );
 	}
 
 template<typename tType>
-typename HList<tType>::iterator HList<tType>::end( void )
+typename HList<tType>::iterator HList<tType>::end( void ) const
 	{
 	return ( iterator ( f_poHook, NULL ) );
 	}
 
 template<typename tType>
-typename HList<tType>::iterator HList<tType>::rend( void )
+typename HList<tType>::iterator HList<tType>::rend( void ) const
 	{
 	return ( iterator ( f_poHook, NULL ) );
 	}
 
 template<typename tType>
-typename HList<tType>::iterator HList<tType>::rbegin( void )
+typename HList<tType>::iterator HList<tType>::rbegin( void ) const
 	{
 	return ( iterator ( f_poHook, f_poHook->f_poPrevious ) );
 	}
 
 template<typename tType>
-typename HList<tType>::cyclic_iterator HList<tType>::hook( void )
+typename HList<tType>::cyclic_iterator HList<tType>::hook( void ) const
 	{
 	return ( cyclic_iterator ( f_poHook, f_poHook ) );
 	}

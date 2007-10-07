@@ -96,12 +96,12 @@ private:
 public:
 	HSBBSTree( void );
 	virtual ~HSBBSTree( void );
-	template<typename tType>
+	template<typename tType, typename ttType>
 	HIterator insert( tType const& );
-	template<typename tType>
+	template<typename tType, typename ttType>
 	void remove( tType const& );
 	void remove( HIterator const& );
-	template<typename tType>
+	template<typename tType, typename ttType>
 	HIterator find( tType const& ) const;
 	int long size( void ) const;
 	bool empty( void ) const;
@@ -110,7 +110,7 @@ public:
 	HIterator rbegin( void ) const;
 	HIterator rend( void ) const;
 private:
-	template<typename tType>
+	template<typename tType, typename ttType>
 	ONodePtr find_node( tType const& ) const;
 	void remove_node( HAbstractNode* );
 	void swap( HAbstractNode*, HAbstractNode* );
@@ -143,19 +143,6 @@ private:
 	explicit HIterator( HAbstractNode* const );
 	};
 
-namespace self_balancing_binary_search_tree_helper
-{
-
-template<typename key_t>
-inline void update( key_t&, key_t const& )
-	{	}
-
-template<typename key_t>
-inline bool less( key_t const& left, key_t const& right )
-	{	return ( left < right );	}
-
-}
-
 template<typename tType>
 tType const& HSBBSTree::HIterator::operator * ( void )
 	{
@@ -170,17 +157,17 @@ HSBBSTree::HNode<tType>::HNode( tType const& a_tKey )
 	return;
 	}
 
-template<typename tType>
+template<typename tType, typename ttType>
 HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 	{
 	ONodePtr l_oNode;
 	HNode<tType>* l_poNode = NULL;
 	if ( f_poRoot )
-		l_oNode = find_node( a_tKey );
+		l_oNode = find_node<tType, ttType>( a_tKey );
 	if ( l_oNode.f_bExists )
 		{
 		l_poNode = static_cast<HNode<tType>*>( l_oNode.f_poNode );
-		self_balancing_binary_search_tree_helper::update( l_poNode->f_tKey, a_tKey );
+		ttType::update( l_poNode->f_tKey, a_tKey );
 		}
 	else
 		{
@@ -189,7 +176,7 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 		if ( f_poRoot )
 			{
 			l_poNode->f_poParent = l_oNode.f_poNode;
-			if ( self_balancing_binary_search_tree_helper::less( a_tKey, static_cast<HNode<tType>*>( l_oNode.f_poNode )->f_tKey ) )
+			if ( ttType::less( a_tKey, static_cast<HNode<tType>*>( l_oNode.f_poNode )->f_tKey ) )
 				{
 				M_ASSERT( ! l_oNode.f_poNode->f_poLeft );
 				l_oNode.f_poNode->f_poLeft = l_poNode;
@@ -212,12 +199,12 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 	return ( HIterator( l_poNode ) );
 	}
 
-template<typename tType>
+template<typename tType, typename ttType>
 void HSBBSTree::remove( tType const& a_tKey )
 	{
 	if ( f_poRoot )
 		{
-		ONodePtr l_oNode = find_node( a_tKey );
+		ONodePtr l_oNode = find_node<tType, ttType>( a_tKey );
 		if ( l_oNode.f_bExists )
 			{
 			remove_node( l_oNode.f_poNode );
@@ -228,14 +215,14 @@ void HSBBSTree::remove( tType const& a_tKey )
 			static_cast<int>( ERROR::E_NON_EXISTING_KEY ) );
 	}
 
-template<typename tType>
+template<typename tType, typename ttType>
 HSBBSTree::HIterator HSBBSTree::find( tType const& a_tKey ) const
 	{
-	ONodePtr l_oNodePtr = find_node( a_tKey );
+	ONodePtr l_oNodePtr = find_node<tType, ttType>( a_tKey );
 	return ( HIterator( l_oNodePtr.f_bExists ? l_oNodePtr.f_poNode : NULL ) );
 	}
 
-template<typename tType>
+template<typename tType, typename ttType>
 typename HSBBSTree::ONodePtr HSBBSTree::find_node( tType const& a_tKey ) const
 	{
 	ONodePtr l_oNodePtr;
@@ -244,14 +231,14 @@ typename HSBBSTree::ONodePtr HSBBSTree::find_node( tType const& a_tKey ) const
 		l_oNodePtr.f_poNode = f_poRoot;
 		while ( ! l_oNodePtr.f_bExists )
 			{
-			if ( self_balancing_binary_search_tree_helper::less( a_tKey, static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey ) )
+			if ( ttType::less( a_tKey, static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey ) )
 				{
 				if ( l_oNodePtr.f_poNode->f_poLeft )
 					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poLeft;
 				else
 					break;
 				}
-			else if ( self_balancing_binary_search_tree_helper::less( static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey, a_tKey ) )
+			else if ( ttType::less( static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey, a_tKey ) )
 				{
 				if ( l_oNodePtr.f_poNode->f_poRight )
 					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poRight;

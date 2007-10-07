@@ -31,6 +31,8 @@ Copyright:
 
 #define D_VCSID_HMAP_H "$Id$"
 
+#include "hcore/hsbbstree.h"
+
 namespace yaal
 {
 
@@ -68,37 +70,24 @@ public:
 		}
 	};
 
-namespace self_balancing_binary_search_tree_helper
+template<typename tType, typename ttType>
+struct map_helper
 {
 
-template<typename tType, typename ttType>
-inline void update( HPair<tType, ttType>& left, HPair<tType, ttType> const& right )
+inline static void update( HPair<tType, ttType>& left, HPair<tType, ttType> const& right )
 	{
 	left.second = right.second;
 	}
 
-template<typename tType, typename ttType>
-inline bool less( HPair<tType, ttType> const& left, HPair<tType, ttType> const& right )
+inline static bool less( HPair<tType, ttType> const& left, HPair<tType, ttType> const& right )
 	{	return ( left.first < right.first );	}
 
-}
+};
 
-}
-
-}
-
-#include "hcore/hsbbstree.h"
-
-namespace yaal
-{
-
-namespace hcore
-{
-
-template<typename tType, typename ttType>
+template<typename tType, typename ttType, typename tttType = map_helper<tType const, ttType> >
 class HMap
 	{
-	typedef HPair<const tType, ttType> map_elem_t;
+	typedef HPair<tType const, ttType> map_elem_t;
 public:
 	class HIterator
 		{
@@ -155,11 +144,16 @@ public:
 	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
 	HIterator insert( map_elem_t const& e )
-		{	return ( HIterator( f_oEngine.insert( e ) ) );	}
+		{	return ( HIterator( f_oEngine.insert<map_elem_t, tttType>( e ) ) );	}
 	void remove( tType const& e )
-		{	f_oEngine.remove( e );	}
+		{
+		HIterator it = find( e );
+		if ( it != end() )
+			f_oEngine.remove( it.f_oEngine );
+		return;
+		}
 	HIterator find( tType const& e ) const
-		{ return ( HIterator( f_oEngine.find( map_elem_t( e, ttType() ) ) ) ); }
+		{ return ( HIterator( f_oEngine.find<map_elem_t, tttType>( map_elem_t( e, ttType() ) ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( f_oEngine.begin() ) ); }
 	HIterator end( void ) const
