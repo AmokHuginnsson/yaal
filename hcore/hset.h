@@ -116,7 +116,7 @@ public:
 	void remove( tType const& e )
 		{	f_oEngine.remove<tType, ttType>( e );	}
 	HIterator find( tType const& e ) const
-		{ return ( f_oEngine.find<tType, ttType>( e ) ); }
+		{ return ( HIterator( f_oEngine.find<tType, ttType>( e ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( f_oEngine.begin() ) ); }
 	HIterator end( void ) const
