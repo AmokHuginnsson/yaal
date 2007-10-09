@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	xmath.h - this file is integral part of `yaal' project.
+	hfsitem.cxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,12 +24,15 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __YAAL_TOOLS_XMATH_H
-#define __YAAL_TOOLS_XMATH_H
+#include <dirent.h>
 
-#line 31
+#include "hcore/hexception.h"
+M_VCSID ( "$Id$" )
+#include "hfsitem.h"
+#include "hcore/xalloc.h"
 
-#define D_VCSID_XMATH_H "$Id$"
+using namespace yaal;
+using namespace yaal::hcore;
 
 namespace yaal
 {
@@ -37,30 +40,22 @@ namespace yaal
 namespace tools
 {
 
-namespace xmath
-{
-
-template<typename number_t>
-number_t factorial( number_t a_iNumber )
+HFSItem::HFSItem( HString const& a_oRoot ) : f_oRoot( a_oRoot ), f_oDirEnt( xcalloc<dirent>( 1 ) )
 	{
-	number_t n = 1;
-	for ( number_t i = 2; i <= a_iNumber; ++ i )
-		n *= i;
-	return ( n );
+	M_PROLOG
+	return;
+	M_EPILOG
 	}
 
-template<typename number_t>
-number_t binomial_coefficient( number_t a_iCardinal, number_t a_iSubCardinal )
+HFSItem::HIterator HFSItem::begin( void )
 	{
-	return ( factorial( a_iCardinal ) / ( factorial( a_iSubCardinal ) * factorial( a_iCardinal - a_iSubCardinal ) ) );
+	M_PROLOG
+	HIterator it;
+	return ( it );
+	M_EPILOG
 	}
 
 }
 
 }
-
-}
-
-
-#endif /* not __YAAL_TOOLS_XMATH_H */
 

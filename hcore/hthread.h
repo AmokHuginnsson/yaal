@@ -27,23 +27,13 @@ Copyright:
 #ifndef __YAAL_HCORE_HTHREAD_H
 #define __YAAL_HCORE_HTHREAD_H
 
+#include "hcore/hchunk.h"
+
 namespace yaal
 {
 
 namespace hcore
 {
-
-class HChunk
-	{
-	void* f_pvData;
-public:
-	HChunk( void* );
-	~HChunk( void );
-	void* get() const;
-private:
-	HChunk( HChunk const& );
-	HChunk& operator = ( HChunk const& );
-	};
 
 class HCondition;
 class HMutex

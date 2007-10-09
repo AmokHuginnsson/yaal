@@ -41,19 +41,6 @@ namespace yaal
 namespace hcore
 {
 
-HChunk::HChunk( void* a_pvData ) : f_pvData( a_pvData )
-	{}
-
-HChunk::~HChunk( void )
-	{
-	xfree( f_pvData );
-	}
-
-void* HChunk::get( void ) const
-	{
-	return ( f_pvData );
-	}
-
 HThread::HThread( void )
 	: f_eStatus( D_DEAD ), f_oAttributes( xcalloc<pthread_attr_t>( 1 ) ),
 	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::D_RECURSIVE ), f_oCondition()

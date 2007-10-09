@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	xmath.h - this file is integral part of `yaal' project.
+	hchunk.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,43 +24,30 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __YAAL_TOOLS_XMATH_H
-#define __YAAL_TOOLS_XMATH_H
-
-#line 31
-
-#define D_VCSID_XMATH_H "$Id$"
+#ifndef __YAAL_HCORE_HCHUNK_H
+#define __YAAL_HCORE_HCHUNK_H
 
 namespace yaal
 {
 
-namespace tools
+namespace hcore
 {
 
-namespace xmath
-{
-
-template<typename number_t>
-number_t factorial( number_t a_iNumber )
+class HChunk
 	{
-	number_t n = 1;
-	for ( number_t i = 2; i <= a_iNumber; ++ i )
-		n *= i;
-	return ( n );
-	}
-
-template<typename number_t>
-number_t binomial_coefficient( number_t a_iCardinal, number_t a_iSubCardinal )
-	{
-	return ( factorial( a_iCardinal ) / ( factorial( a_iSubCardinal ) * factorial( a_iCardinal - a_iSubCardinal ) ) );
-	}
+	void* f_pvData;
+public:
+	HChunk( void* );
+	~HChunk( void );
+	void* get() const;
+private:
+	HChunk( HChunk const& );
+	HChunk& operator = ( HChunk const& );
+	};
 
 }
 
 }
 
-}
-
-
-#endif /* not __YAAL_TOOLS_XMATH_H */
+#endif /* not __YAAL_HCORE_HCHUNK_H */
 
