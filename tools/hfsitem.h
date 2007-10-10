@@ -39,65 +39,46 @@ namespace tools
 
 class HFSItem
 	{
-	yaal::hcore::HString f_oRoot;
-	yaal::hcore::HChunk f_oDirEnt;
+	int f_iNameLen;
+	yaal::hcore::HString f_oPath;
 public:
 	typedef yaal::hcore::HPointer<HFSItem, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
 	class HIterator;
 	explicit HFSItem( yaal::hcore::HString const& );
-	bool is_dir( void );
-	yaal::hcore::HString get_name();
+	~HFSItem( void );
+	HFSItem( HFSItem const& );
+	HFSItem& operator = ( HFSItem const& );
+	bool is_dir( void ) const;
+	yaal::hcore::HString get_path() const;
+	yaal::hcore::HString get_name() const;
 	HIterator begin( void );
 	HIterator end( void );
 private:
-	void next( void );
-	void previous( void );
+	void set_path( yaal::hcore::HString const&, int );
+	friend class HIterator;
 	};
 
 class HFSItem::HIterator
 	{
-	HFSItem::ptr_t f_oEngine;
+	yaal::hcore::HString f_oPath;
+	void* f_pvDir;
+	yaal::hcore::HChunk::ptr_t f_oDirEnt;
+	HFSItem f_oItem;
 public:
-	HIterator( HIterator const& a_oIt ) : f_oEngine( a_oIt.f_oEngine ) {}
-	HIterator& operator= ( HIterator const& a_oIt )
-		{
-		if ( &a_oIt != this )
-			f_oEngine = a_oIt.f_oEngine;
-		return ( *this );
-		}
-	HIterator& operator ++ ( void )
-		{
-		f_oEngine->next();
-		return ( *this );
-		}
+	HIterator( HIterator const& a_oIt );
+	~HIterator( void );
+	HIterator& operator= ( HIterator const& a_oIt );
+	HIterator& operator ++ ( void );
 	HIterator const operator ++ ( int );
-/*		{
-		HIterator it( f_oEngine );
-		f_oEngine->next();
-		return ( it );
-		}*/
-	HIterator& operator -- ( void )
-		{
-		f_oEngine->previous();
-		return ( *this );
-		}
-	HIterator const operator -- ( int );
-/*		{
-		HIterator it( f_oEngine );
-		f_oEngine->previous();
-		return ( it );
-		}*/
-	HFSItem const& operator * ( void )
-		{	return ( f_oEngine.operator*() );	}
-	HFSItem const* const operator -> ( void )
-		{ return ( &f_oEngine.operator*() );	}
-	bool operator == ( HIterator const& it ) const
-		{ return ( f_oEngine == it.f_oEngine ); }
-	bool operator != ( HIterator const& it ) const
-		{ return ( f_oEngine != it.f_oEngine ); }
+	HFSItem const& operator* ( void );
+	HFSItem const* const operator->( void );
+	bool operator == ( HIterator const& it ) const;
+	bool operator != ( HIterator const& it ) const;
 private:
+	void update( void );
+	void cleanup( void );
 	friend class HFSItem;
-	explicit HIterator( yaal::hcore::HString const& it );// : f_oEngine( it ) {};
+	explicit HIterator( yaal::hcore::HString const& it );
 	};
 
 }
