@@ -50,6 +50,7 @@ public:
 	HString( char const );
 	HString( int const );
 	HString( int long const );
+	HString( int long unsigned const );
 	HString( size_t const );
 	HString( double const );
 	HString( void const* const );

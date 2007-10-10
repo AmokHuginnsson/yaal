@@ -71,10 +71,27 @@ HStreamInterface& HStreamInterface::operator << ( int const a_iInteger )
 	M_EPILOG
 	}
 
+HStreamInterface& HStreamInterface::operator << ( int unsigned const a_uiUnsignedInteger )
+	{
+	M_PROLOG
+	int long unsigned l_ulTmp = a_uiUnsignedInteger;
+	return ( operator << ( l_ulTmp ) );
+	M_EPILOG
+	}
+
 HStreamInterface& HStreamInterface::operator << ( int long const a_lLongInteger )
 	{
 	M_PROLOG
 	HString str( a_lLongInteger );
+	do_write_string( str );
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::operator << ( int long unsigned const a_ulUnsignedLongInteger )
+	{
+	M_PROLOG
+	HString str( a_ulUnsignedLongInteger );
 	do_write_string( str );
 	return ( *this );
 	M_EPILOG

@@ -160,6 +160,18 @@ HString::HString ( int long const a_lLong ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	M_EPILOG
 	}
 
+HString::HString ( int long unsigned const a_lLong ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
+	{
+	M_PROLOG
+	int l_iSize = 0;
+	char l_pcMeasureBuffer [ 3 ] = "\0\0";
+	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%lu", a_lLong ) + 1;
+	hs_realloc ( l_iSize );
+	M_ENSURE ( snprintf ( f_pcBuffer, l_iSize, "%lu", a_lLong ) < l_iSize );
+	return;
+	M_EPILOG
+	}
+
 HString::HString ( size_t const a_ulLong ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
