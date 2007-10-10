@@ -679,7 +679,7 @@ HString HString::mid( int a_iFrom, int /* reused */ a_iLenght ) const
 	if ( a_iFrom < 0 )
 		a_iLenght += a_iFrom, a_iFrom = 0;
 	if ( ( a_iLenght <= 0 ) || ( a_iFrom >= l_iLenOrig ) )
-		return ( "" );
+		return ( l_oStr );
 	a_iLenght = ( a_iLenght < l_iLenOrig ? a_iLenght : l_iLenOrig );
 	if ( ( a_iLenght + a_iFrom ) > l_iLenOrig )
 		a_iLenght = l_iLenOrig - a_iFrom;
@@ -690,18 +690,18 @@ HString HString::mid( int a_iFrom, int /* reused */ a_iLenght ) const
 	M_EPILOG
 	}
 
-HString HString::right ( int /* reused */ a_iFromEnd ) const
+HString HString::right( int /* reused */ a_iFromEnd ) const
 	{
 	M_PROLOG
-	int l_iLenght = strlen ( f_pcBuffer );
+	int l_iLenght = ::strlen( f_pcBuffer );
 	HString l_oStr;
 	if ( a_iFromEnd < 1 )
 		return ( l_oStr );
 	a_iFromEnd = ( a_iFromEnd < l_iLenght ? a_iFromEnd : l_iLenght );
-	l_oStr.hs_realloc ( a_iFromEnd + 1 );
-	strncpy ( l_oStr.f_pcBuffer, f_pcBuffer + l_iLenght - a_iFromEnd,
-			l_iLenght );
-	l_oStr.f_pcBuffer [ a_iFromEnd ] = 0;
+	l_oStr.hs_realloc( a_iFromEnd + 1 );
+	::strncpy( l_oStr.f_pcBuffer, f_pcBuffer + l_iLenght - a_iFromEnd,
+			a_iFromEnd );
+	l_oStr.f_pcBuffer[ a_iFromEnd ] = 0;
 	return ( l_oStr );
 	M_EPILOG
 	}

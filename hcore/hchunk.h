@@ -27,6 +27,8 @@ Copyright:
 #ifndef __YAAL_HCORE_HCHUNK_H
 #define __YAAL_HCORE_HCHUNK_H
 
+#include "hcore/hpointer.h"
+
 namespace yaal
 {
 
@@ -37,6 +39,7 @@ class HChunk
 	{
 	void* f_pvData;
 public:
+	typedef yaal::hcore::HPointer<HChunk, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
 	HChunk( void* );
 	~HChunk( void );
 	void* get() const;
