@@ -64,7 +64,6 @@ protected:
 	void* f_pvAddress;
 	clients_t* f_poClients;
 	HString f_oHostName;
-	HString f_oVarTmpBuffer;
 public:
 	HSocket( TYPE::socket_type_t const = TYPE::D_DEFAULT, int const = 0 );
 	virtual ~HSocket( void );
@@ -77,7 +76,6 @@ public:
 	ptr_t get_client( int ) const;
 	bool get_client_next( int&, ptr_t& ) const;
 	void rewind_client_list( void ) const;
-	int read_until( HString&, char const* const = "\r\n" );
 	int write_until_eos( HString const& );
 	int get_client_count( void ) const;
 	HString const& get_host_name( void );

@@ -109,7 +109,9 @@ file_descriptor_t HRawFile::get_file_descriptor ( void ) const
 
 int HRawFile::read( void* const a_pcBuffer, int const a_iSize )
 	{
-	return ( (this->*reader)( a_pcBuffer, a_iSize ) );
+	M_PROLOG
+	return ( do_read( a_pcBuffer, a_iSize ) );
+	M_EPILOG
 	}
 
 int HRawFile::read_plain( void* const a_pcBuffer, int const a_iSize )
@@ -186,6 +188,22 @@ int HRawFile::write_ssl_loader( void const* const a_pcBuffer, int const a_iSize 
 	closer = &HRawFile::close_ssl;
 	return ( write_ssl( a_pcBuffer, a_iSize ) );
 	M_EPILOG
+	}
+
+int HRawFile::do_write_string( char const* const a_pcString )
+	{
+	return ( write( a_pcString, strlen( a_pcString ) ) );
+	}
+
+int HRawFile::do_read( void* const a_pcBuffer, int const a_iSize )
+	{
+	M_PROLOG
+	return ( (this->*reader)( a_pcBuffer, a_iSize ) );
+	M_EPILOG
+	}
+
+void HRawFile::do_flush( void ) const
+	{
 	}
 
 }

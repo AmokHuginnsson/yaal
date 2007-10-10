@@ -28,7 +28,7 @@ Copyright:
 #define __YAAL_HCORE_HFILE_H
 
 #include "hcore/hstring.h"
-#include "hcore/hexception.h"
+#include "hcore/hstreaminterface.h"
 
 namespace yaal
 {
@@ -36,11 +36,7 @@ namespace yaal
 namespace hcore
 {
 
-class HFile;
-HFile& endl ( HFile& );
-HFile& flush ( HFile& );
-
-class HFile
+class HFile : public HStreamInterface
 	{
 	struct OPointerConversion { int f_iValid; };
 	typedef int OPointerConversion::* opcm_t;
@@ -74,24 +70,17 @@ public:
 	int read_line( HString&, mode_read_t = D_DEFAULTS, int const = 0 );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
-	void flush ( void ) const;
-	HFile& operator << ( char const* const );
-	HFile& operator << ( char const );
-	HFile& operator << ( int const );
-	HFile& operator << ( int long const );
-	HFile& operator << ( double const );
-	HFile& operator << ( void const* const );
-	HFile& operator << ( HFile& ( *const ) ( HFile& ) );
-	operator opcm_t const ( void ) const;
 	int write( void const* const, int );
 	int read( void* const, int );
+	virtual void flush( void ) const;
+	operator opcm_t const ( void ) const;
 private:
+	virtual int do_write_string( char const* const );
+	virtual void do_flush( void ) const;
+	virtual int do_read( void* const, int const );
 	int get_line_length( void );
-	int scan_line( HString&, int const );
 	HFile( HFile const& );
 	HFile& operator = ( HFile const& );
-	friend HFile& endl ( HFile& );
-	friend HFile& flush ( HFile& );
 	};
 
 }

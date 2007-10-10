@@ -39,7 +39,7 @@ namespace hcore
 {
 
 HFile::HFile ( mode_open_t const a_eMode, void* const a_pvHandle )
-	: f_eMode( a_eMode ),
+	: HStreamInterface(), f_eMode( a_eMode ),
 	f_pvHandle( a_pvHandle ), f_oPath(), f_oError(),
 	f_bExternal( a_pvHandle ? true : false )
 	{
@@ -134,14 +134,16 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 				M_THROW ( _ ( "line too long" ), l_iLength );
 			a_roLine.hs_realloc ( l_iLength );
 			l_pcPtr = a_roLine.raw();
-			M_ENSURE ( static_cast < int > ( fread ( l_pcPtr,
+			M_ENSURE ( static_cast<int>( ::fread( l_pcPtr,
 							sizeof ( char ), l_iLength,
-							static_cast < FILE * > ( f_pvHandle ) ) ) == l_iLength );
+							static_cast<FILE*>( f_pvHandle ) ) ) == l_iLength );
 			}
 		}
 	else /* D_UNBUFFERED_READS */
 		{
-		l_iLength = scan_line ( a_roLine, a_iMaximumLength );
+		l_iLength = read_until( a_roLine );
+		if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
+			M_THROW ( _ ( "line too long" ), l_iLength );
 		l_pcPtr = a_roLine.raw();
 		}
 	if ( l_iLength )
@@ -156,27 +158,6 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		return ( l_iLength );
 		}
 	return ( - 1 );
-	M_EPILOG
-	}
-
-int HFile::scan_line( HString& a_roLine, int const a_iMaximumLength )
-	{
-	M_PROLOG
-	int l_iSize = 0;
-	char l_cChar = 0;
-	a_roLine = "";
-	while ( fread ( & l_cChar, sizeof ( char ),
-				sizeof ( l_cChar ) / sizeof ( char ),
-				static_cast < FILE * > ( f_pvHandle ) ) == sizeof ( l_cChar ) )
-		{
-		a_roLine += l_cChar;
-		l_iSize ++;
-		if ( l_cChar == '\n' )
-			break;
-		if ( a_iMaximumLength && ( l_iSize > a_iMaximumLength ) )
-			M_THROW ( _ ( "line too long" ), l_iSize );
-		}
-	return ( l_iSize );
 	M_EPILOG
 	}
 
@@ -221,80 +202,16 @@ HString const& HFile::get_error( void ) const
 void HFile::flush( void ) const
 	{
 	M_PROLOG
-	M_ENSURE ( fflush ( static_cast < FILE * > ( f_pvHandle ) ) == 0 );
+	do_flush();
 	return;
 	M_EPILOG
 	}
 
-HFile& HFile::operator << ( char const* const a_pcString )
+void HFile::do_flush( void ) const
 	{
 	M_PROLOG
-	if ( a_pcString )
-		fprintf ( static_cast < FILE * > ( f_pvHandle ), a_pcString );
-	return ( * this );
-	M_EPILOG
-	}
-
-HFile& HFile::operator << ( char const a_cChar )
-	{
-	M_PROLOG
-	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%c", a_cChar );
-	return ( * this );
-	M_EPILOG
-	}
-
-HFile& HFile::operator << ( int const a_iInteger )
-	{
-	M_PROLOG
-	int long l_lTmp = a_iInteger;
-	return ( operator << ( l_lTmp ) );
-	M_EPILOG
-	}
-
-HFile& HFile::operator << ( int long const a_lLongInteger )
-	{
-	M_PROLOG
-	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%ld", a_lLongInteger );
-	return ( * this );
-	M_EPILOG
-	}
-
-HFile& HFile::operator << ( double const a_dDouble )
-	{
-	M_PROLOG
-	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%f", a_dDouble );
-	return ( * this );
-	M_EPILOG
-	}
-
-HFile& HFile::operator << ( void const* const a_pvPtr )
-	{
-	M_PROLOG
-	fprintf ( static_cast < FILE * > ( f_pvHandle ), "%p", a_pvPtr );
-	return ( * this );
-	M_EPILOG
-	}
-
-HFile& HFile::operator << ( HFile& ( *const HFILE ) ( HFile& ) )
-	{
-	M_PROLOG
-	return ( HFILE ( * this ) );
-	M_EPILOG
-	}
-
-HFile& endl ( HFile& a_roFile )
-	{
-	M_PROLOG
-	a_roFile << '\n';
-	return ( a_roFile );
-	M_EPILOG
-	}
-
-HFile& flush ( HFile& a_roFile )
-	{
-	M_PROLOG
-	a_roFile.flush();
-	return ( a_roFile );
+	M_ENSURE ( fflush ( static_cast < FILE * > ( f_pvHandle ) ) == 0 );
+	return;
 	M_EPILOG
 	}
 
@@ -313,13 +230,28 @@ int HFile::write( void const* const a_pcBuffer, int a_iSize )
 	M_EPILOG
 	}
 
-int HFile::read( void* const a_pcBuffer, int a_iSize )
+int HFile::do_read( void* const a_pcBuffer, int a_iSize )
 	{
 	M_PROLOG
 	return ( fread ( a_pcBuffer, sizeof ( char ), a_iSize,
 				static_cast < FILE * > ( f_pvHandle ) ) );
 	M_EPILOG
 	}
+
+int HFile::read( void* const a_pcBuffer, int a_iSize )
+	{
+	M_PROLOG
+	return ( do_read( a_pcBuffer, a_iSize ) );
+	M_EPILOG
+	}
+
+int HFile::do_write_string( char const* const a_pcString )
+	{
+	M_PROLOG
+	return ( ::fprintf( static_cast<FILE*>( f_pvHandle ), a_pcString ) );
+	M_EPILOG
+	}
+
 
 }
 

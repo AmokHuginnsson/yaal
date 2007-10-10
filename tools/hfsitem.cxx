@@ -54,14 +54,6 @@ HFSItem::~HFSItem( void )
 	{
 	}
 
-HFSItem::HFSItem( HFSItem const& a_oFSItem ) : f_iNameLen( 0 ), f_oPath()
-	{
-	M_PROLOG
-	operator = ( a_oFSItem );
-	return;
-	M_EPILOG
-	}
-
 bool HFSItem::is_directory() const
 	{
 	M_PROLOG

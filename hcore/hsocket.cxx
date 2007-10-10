@@ -71,7 +71,7 @@ HSocket::HSocket( TYPE::socket_type_t const a_eSocketType,
 	f_bNeedShutdown( false ), f_eType( a_eSocketType ),
 	f_iMaximumNumberOfClients( a_iMaximumNumberOfClients ),
 	f_iAddressSize( 0 ), f_pvAddress( NULL ), f_poClients( NULL ),
-	f_oHostName(), f_oVarTmpBuffer()
+	f_oHostName()
 	{
 	M_PROLOG
 	if ( f_eType == TYPE::D_DEFAULT )
@@ -335,36 +335,6 @@ void HSocket::rewind_client_list ( void ) const
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
 	f_poClients->rewind();
 	return;
-	M_EPILOG
-	}
-
-int HSocket::read_until ( HString & a_roMessage, char const * const a_pcStopSet )
-	{
-	M_PROLOG
-	int l_iCtr = 0;
-	char* l_pcPtr = NULL;
-	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
-	a_roMessage = "";
-	do
-		{
-		f_oVarTmpBuffer.hs_realloc( l_iCtr + 1 );
-		l_pcPtr = f_oVarTmpBuffer.raw();
-		if ( read( l_pcPtr + l_iCtr, sizeof ( char ) * 1 ) <= 0 )
-			break;
-		}
-	while ( ! ::strchr( a_pcStopSet, l_pcPtr[ l_iCtr ++ ] ) );
-	l_iCtr --; /* go back one char for stripping terminator */
-	if ( l_iCtr > 0 )
-		{
-		l_pcPtr[ l_iCtr ] = 0;
-		if ( l_iCtr > 0 )
-			{
-			a_roMessage.hs_realloc( l_iCtr );
-			::memcpy( a_roMessage.raw(), l_pcPtr, l_iCtr + 1 );
-			}
-		}
-	return ( l_iCtr );
 	M_EPILOG
 	}
 

@@ -30,6 +30,7 @@ Copyright:
 #include <cstdio>
 
 #include "hcore/hsingleton.h"
+#include "hcore/hstreaminterface.h"
 
 namespace yaal
 {
@@ -52,9 +53,8 @@ namespace LOG_TYPE
 	}
 
 class HLog;
-HLog& endl( HLog& );
 
-class HLog
+class HLog : public HStreamInterface
 	{
 	bool			f_bRealMode;
 	bool			f_bNewLine;
@@ -76,22 +76,15 @@ public:
 	/* log ( "data %d", x ); will look nice */
 	int operator()( int long const, char const*, ... );
 	HLog& operator()( int long const ); /* sets log type */
-	HLog& operator<< ( char const* const );
-	HLog& operator<< ( char const );
-	HLog& operator<< ( int const );
-	HLog& operator<< ( int unsigned const );
-	HLog& operator<< ( int long const );
-	HLog& operator<< ( int long unsigned const );
-	HLog& operator<< ( double const );
-	HLog& operator<< ( void* const );
-	HLog& operator<< ( HLog& ( *const )( HLog& ) );
 private:
 	HLog( void );
 	virtual ~HLog( void );
 	void timestamp ( FILE * = NULL );
+	virtual int do_write_string( char const* const );
+	virtual void do_flush( void ) const;
+	virtual int do_read( void* const, int const );
 	HLog( HLog const& );
 	HLog& operator= ( HLog const& );
-	friend HLog& endl( HLog& );
 	friend class yaal::hcore::HSingleton<HLog>;
 	friend class yaal::hcore::HDestructor<HLog>;
 	};

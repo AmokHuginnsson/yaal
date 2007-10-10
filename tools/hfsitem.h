@@ -46,8 +46,6 @@ public:
 	class HIterator;
 	explicit HFSItem( yaal::hcore::HString const& );
 	~HFSItem( void );
-	HFSItem( HFSItem const& );
-	HFSItem& operator = ( HFSItem const& );
 	bool is_directory( void ) const;
 	bool is_file( void ) const;
 	bool is_executable( void ) const;

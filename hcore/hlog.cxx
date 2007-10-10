@@ -57,7 +57,7 @@ namespace
 	static int const D_LOGIN_NAME_MAX	= 8;
 	}
 
-HLog::HLog ( void ) : f_bRealMode ( false ), f_bNewLine ( true ),
+HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( true ),
 	f_lType ( 0 ), f_psStream ( NULL ), f_pcProcessName ( NULL ),
 	f_pcLoginName ( NULL ), f_pcHostName ( NULL ), f_pcBuffer ( NULL ),
 	f_iBufferSize ( D_BUFFER_SIZE )
@@ -270,137 +270,41 @@ HLog & HLog::operator() ( int long const a_lType )
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( char const * const a_pcString )
+int HLog::do_write_string( char const * const a_pcString )
 	{
 	M_PROLOG
+	int len = 0;
 	if ( ! a_pcString )
-		return ( * this );
+		return ( 0 );
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
 		if ( f_bNewLine )
 			timestamp();
-		fprintf ( f_psStream, a_pcString );
+		len = fprintf ( f_psStream, a_pcString );
 		if ( a_pcString [ strlen ( a_pcString ) - 1 ] != '\n' )
 			f_bNewLine = false;
 		else
 			{
 			f_bNewLine = true;
 			f_lType = 0;
-			M_ENSURE ( fflush ( f_psStream ) == 0 );
+			M_ENSURE( ::fflush ( f_psStream ) == 0 );
 			}
 		}
-	return ( * this );
+	return ( len );
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( char const a_cChar )
+void HLog::do_flush( void ) const
 	{
 	M_PROLOG
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
-		{
-		if ( f_bNewLine )
-			timestamp();
-		fprintf ( f_psStream, "%c", a_cChar );
-		if ( a_cChar != '\n' )
-			f_bNewLine = false;
-		else
-			{
-			f_bNewLine = true;
-			f_lType = 0;
-			M_ENSURE ( fflush ( f_psStream ) == 0 );
-			}
-		}
-	return ( * this );
+	M_ENSURE( ::fflush ( f_psStream ) == 0 );
+	return;
 	M_EPILOG
 	}
 
-HLog & HLog::operator << ( int const a_iInteger )
+int HLog::do_read( void* const, int )
 	{
-	M_PROLOG
-	int long l_lTmp = a_iInteger;
-	return ( * this << l_lTmp );
-	M_EPILOG
-	}
-
-HLog & HLog::operator << ( int unsigned const a_uiInteger )
-	{
-	M_PROLOG
-	int long unsigned l_ulTmp = a_uiInteger;
-	return ( * this << l_ulTmp );
-	M_EPILOG
-	}
-
-HLog & HLog::operator << ( int long const a_lLongInteger )
-	{
-	M_PROLOG
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
-		{
-		if ( f_bNewLine )
-			timestamp();
-		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%ld",
-					a_lLongInteger ) < static_cast < int > ( f_iBufferSize ) );
-		fprintf ( f_psStream, f_pcBuffer );
-		f_bNewLine = false;
-		}
-	return ( * this );
-	M_EPILOG
-	}
-
-HLog & HLog::operator << ( int long unsigned const a_ulLongInteger )
-	{
-	M_PROLOG
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
-		{
-		if ( f_bNewLine )
-			timestamp();
-		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%lu",
-					a_ulLongInteger ) < static_cast < int > ( f_iBufferSize ) );
-		fprintf ( f_psStream, f_pcBuffer );
-		f_bNewLine = false;
-		}
-	return ( * this );
-	M_EPILOG
-	}
-
-HLog & HLog::operator << ( double const a_dDouble )
-	{
-	M_PROLOG
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
-		{
-		if ( f_bNewLine )
-			timestamp();
-		M_ENSURE ( snprintf ( f_pcBuffer, f_iBufferSize, "%f",
-					a_dDouble ) < static_cast < int > ( f_iBufferSize ) );
-		fprintf ( f_psStream, f_pcBuffer );
-		f_bNewLine = false;
-		}
-	return ( * this );
-	M_EPILOG
-	}
-
-HLog & HLog::operator << ( void * const a_pvPtr )
-	{
-	M_PROLOG
-	( * this ) ( "%p", a_pvPtr );
-	return ( * this );
-	M_EPILOG
-	}
-
-HLog & HLog::operator << ( HLog & ( * const x_log ) ( HLog & ) )
-	{
-	M_PROLOG
-	return ( x_log ( * this ) );
-	M_EPILOG
-	}
-
-HLog & endl ( HLog & a_roLog )
-	{
-	M_PROLOG
-	if ( ! ( a_roLog.f_lType && a_roLog.f_bRealMode ) || ( a_roLog.f_lType & n_lLogMask ) )
-		a_roLog << '\n';
-	a_roLog.f_lType = 0;
-	return ( a_roLog );
-	M_EPILOG
+	return ( 0 );
 	}
 
 }

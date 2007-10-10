@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_HCORE_HRAWFILE_H
 
 #include "hcore/hopenssl.h"
+#include "hcore/hstreaminterface.h"
 
 namespace yaal
 {
@@ -37,7 +38,7 @@ namespace hcore
 
 typedef int file_descriptor_t;
 
-class HRawFile
+class HRawFile : public HStreamInterface
 	{
 protected:
 	typedef int ( HRawFile::* READER_t )( void* const, int const );
@@ -77,6 +78,9 @@ protected:
 	int write_ssl_loader( void const* const, int const );
 	int read_ssl( void* const, int const );
 	int write_ssl( void const* const, int const );
+	virtual int do_write_string( char const* const );
+	virtual int do_read( void* const, int const );
+	virtual void do_flush( void ) const;
 	};
 
 }
