@@ -62,12 +62,38 @@ HFSItem::HFSItem( HFSItem const& a_oFSItem ) : f_iNameLen( 0 ), f_oPath()
 	M_EPILOG
 	}
 
-bool HFSItem::is_dir() const
+bool HFSItem::is_directory() const
 	{
 	M_PROLOG
 	struct stat l_sStat;
-	M_ENSURE( ( stat( f_oPath, &l_sStat ) == 0 ) || ( lstat( f_oPath, &l_sStat ) == 0 ) );
+	do_stat( &l_sStat );
 	return ( S_ISDIR( l_sStat.st_mode ) );
+	M_EPILOG
+	}
+
+bool HFSItem::is_file() const
+	{
+	M_PROLOG
+	struct stat l_sStat;
+	do_stat( &l_sStat );
+	return ( S_ISREG( l_sStat.st_mode ) );
+	M_EPILOG
+	}
+
+bool HFSItem::is_executable() const
+	{
+	M_PROLOG
+	struct stat l_sStat;
+	do_stat( &l_sStat );
+	return ( l_sStat.st_mode & ( S_IXUSR | S_IXGRP | S_IXOTH ) );
+	M_EPILOG
+	}
+
+void HFSItem::do_stat( void* buf ) const
+	{
+	M_PROLOG
+	M_ENSURE( ( ::stat( f_oPath, static_cast<struct stat*>( buf ) ) == 0 ) || ( ::lstat( f_oPath, static_cast<struct stat*>( buf ) ) == 0 ) );
+	return;
 	M_EPILOG
 	}
 
@@ -95,7 +121,7 @@ void HFSItem::set_path( HString const& a_oPath, int a_iNameLen )
 HFSItem::HIterator HFSItem::begin( void )
 	{
 	M_PROLOG
-	M_ENSURE( is_dir() );
+	M_ENSURE( is_directory() );
 	return ( HIterator( f_oPath ) );
 	M_EPILOG
 	}

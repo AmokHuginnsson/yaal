@@ -48,12 +48,15 @@ public:
 	~HFSItem( void );
 	HFSItem( HFSItem const& );
 	HFSItem& operator = ( HFSItem const& );
-	bool is_dir( void ) const;
+	bool is_directory( void ) const;
+	bool is_file( void ) const;
+	bool is_executable( void ) const;
 	yaal::hcore::HString get_path() const;
 	yaal::hcore::HString get_name() const;
 	HIterator begin( void );
 	HIterator end( void );
 private:
+	void do_stat( void* ) const;
 	void set_path( yaal::hcore::HString const&, int );
 	friend class HIterator;
 	};
