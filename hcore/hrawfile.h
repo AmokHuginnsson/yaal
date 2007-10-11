@@ -65,8 +65,6 @@ public:
 	READER_t reader;
 	WRITER_t writer;
 	CLOSER_t closer;
-	int read( void* const, int const );
-	int write( void const* const, int const );
 protected:
 	virtual int do_close( void );
 	bool is_write_ready( void );
@@ -78,7 +76,7 @@ protected:
 	int write_ssl_loader( void const* const, int const );
 	int read_ssl( void* const, int const );
 	int write_ssl( void const* const, int const );
-	virtual int do_write_string( char const* const );
+	virtual int do_write( void const* const, int const );
 	virtual int do_read( void* const, int const );
 	virtual void do_flush( void ) const;
 	};

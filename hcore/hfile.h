@@ -70,12 +70,10 @@ public:
 	int read_line( HString&, mode_read_t = D_DEFAULTS, int const = 0 );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
-	int write( void const* const, int );
-	int read( void* const, int );
 	virtual void flush( void ) const;
 	operator opcm_t const ( void ) const;
 private:
-	virtual int do_write_string( char const* const );
+	virtual int do_write( void const* const, int const );
 	virtual void do_flush( void ) const;
 	virtual int do_read( void* const, int const );
 	int get_line_length( void );

@@ -222,33 +222,18 @@ HFile::operator opcm_t const ( void ) const
 	M_EPILOG
 	}
 
-int HFile::write( void const* const a_pcBuffer, int a_iSize )
-	{
-	M_PROLOG
-	return ( fwrite ( a_pcBuffer, sizeof ( char ), a_iSize,
-				static_cast < FILE * > ( f_pvHandle ) ) );
-	M_EPILOG
-	}
-
 int HFile::do_read( void* const a_pcBuffer, int a_iSize )
 	{
 	M_PROLOG
-	return ( fread ( a_pcBuffer, sizeof ( char ), a_iSize,
-				static_cast < FILE * > ( f_pvHandle ) ) );
+	return ( ::fread ( a_pcBuffer, sizeof ( char ), a_iSize,
+				static_cast<FILE*>( f_pvHandle ) ) );
 	M_EPILOG
 	}
 
-int HFile::read( void* const a_pcBuffer, int a_iSize )
+int HFile::do_write( void const* const a_pcString, int const a_iSize )
 	{
 	M_PROLOG
-	return ( do_read( a_pcBuffer, a_iSize ) );
-	M_EPILOG
-	}
-
-int HFile::do_write_string( char const* const a_pcString )
-	{
-	M_PROLOG
-	return ( ::fprintf( static_cast<FILE*>( f_pvHandle ), a_pcString ) );
+	return ( ::fwrite( a_pcString, sizeof ( char ), a_iSize, static_cast<FILE*>( f_pvHandle ) ) );
 	M_EPILOG
 	}
 

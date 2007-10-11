@@ -270,18 +270,19 @@ HLog & HLog::operator() ( int long const a_lType )
 	M_EPILOG
 	}
 
-int HLog::do_write_string( char const * const a_pcString )
+int HLog::do_write( void const* const a_pcString, int const a_iSize )
 	{
 	M_PROLOG
-	int len = 0;
 	if ( ! a_pcString )
 		return ( 0 );
+	int len = 0;
+	char const* const str = static_cast<char const* const>( a_pcString );
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
 		{
 		if ( f_bNewLine )
 			timestamp();
-		len = fprintf ( f_psStream, a_pcString );
-		if ( a_pcString [ strlen ( a_pcString ) - 1 ] != '\n' )
+		len = fprintf ( f_psStream, str );
+		if ( str [ a_iSize - 1 ] != '\n' )
 			f_bNewLine = false;
 		else
 			{

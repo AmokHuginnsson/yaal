@@ -49,7 +49,7 @@ HStreamInterface::~HStreamInterface( void )
 HStreamInterface& HStreamInterface::operator << ( char const* const a_pcString )
 	{
 	M_PROLOG
-	do_write_string( a_pcString );
+	do_write( a_pcString, strlen( a_pcString ) );
 	return ( *this );
 	M_EPILOG
 	}
@@ -58,7 +58,7 @@ HStreamInterface& HStreamInterface::operator << ( char const a_cChar )
 	{
 	M_PROLOG
 	HString str( a_cChar );
-	do_write_string( str );
+	do_write( str, sizeof ( char const ) );
 	return ( *this );
 	M_EPILOG
 	}
@@ -83,7 +83,7 @@ HStreamInterface& HStreamInterface::operator << ( int long const a_lLongInteger 
 	{
 	M_PROLOG
 	HString str( a_lLongInteger );
-	do_write_string( str );
+	do_write( str, str.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -92,7 +92,7 @@ HStreamInterface& HStreamInterface::operator << ( int long unsigned const a_ulUn
 	{
 	M_PROLOG
 	HString str( a_ulUnsignedLongInteger );
-	do_write_string( str );
+	do_write( str, str.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -101,7 +101,7 @@ HStreamInterface& HStreamInterface::operator << ( double const a_dDouble )
 	{
 	M_PROLOG
 	HString str( a_dDouble );
-	do_write_string( str );
+	do_write( str, str.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -110,7 +110,7 @@ HStreamInterface& HStreamInterface::operator << ( void const* const a_pvPtr )
 	{
 	M_PROLOG
 	HString str( a_pvPtr );
-	do_write_string( str );
+	do_write( str, str.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -125,7 +125,7 @@ HStreamInterface& HStreamInterface::operator << ( HStreamInterface& ( *const HFI
 HStreamInterface& endl( HStreamInterface& a_roFile )
 	{
 	M_PROLOG
-	a_roFile.do_write_string( "\n" );
+	a_roFile.do_write( "\n", 1 );
 	return ( a_roFile );
 	M_EPILOG
 	}
@@ -163,6 +163,20 @@ int HStreamInterface::read_until( HString& a_roMessage, char const* const a_pcSt
 			}
 		}
 	return ( l_iCtr );
+	M_EPILOG
+	}
+
+int HStreamInterface::read( void* const a_pvBuffer, int const a_iSize )
+	{
+	M_PROLOG
+	return ( do_read( a_pvBuffer, a_iSize ) );
+	M_EPILOG
+	}
+
+int HStreamInterface::write( void const* const a_pvBuffer, int const a_iSize )
+	{
+	M_PROLOG
+	return ( do_write( a_pvBuffer, a_iSize ) );
 	M_EPILOG
 	}
 

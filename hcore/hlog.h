@@ -80,7 +80,7 @@ private:
 	HLog( void );
 	virtual ~HLog( void );
 	void timestamp ( FILE * = NULL );
-	virtual int do_write_string( char const* const );
+	virtual int do_write( void const* const, int const );
 	virtual void do_flush( void ) const;
 	virtual int do_read( void* const, int const );
 	HLog( HLog const& );

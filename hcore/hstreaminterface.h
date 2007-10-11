@@ -57,10 +57,11 @@ public:
 	HStreamInterface& operator << ( HStreamInterface& ( *const )( HStreamInterface& ) );
 	int read_until( yaal::hcore::HString&, char const* const = "\r\n" );
 	int read( void* const, int const );
+	int write( void const* const, int const );
 private:
-	virtual int do_write_string( char const* const ) = 0;
-	virtual void do_flush( void ) const = 0;
+	virtual int do_write( void const* const, int const ) = 0;
 	virtual int do_read( void* const, int const ) = 0;
+	virtual void do_flush( void ) const = 0;
 	friend HStreamInterface& endl( HStreamInterface& );
 	friend HStreamInterface& flush( HStreamInterface& );
 	};
