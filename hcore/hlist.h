@@ -119,6 +119,7 @@ public:
 	tType& add_head( tType* = NULL );    /* adds new element at beggining of the list */
 	tType& add_tail( tType const * = NULL );	/* adds new element at end of the list */
 	void push_back( tType const & );
+	void pop_back( void );
 	tType& add_at( int, tType* = NULL ); /* adds new element at specified position */
 /* adds element in the way that keeps order */
 	template<typename T>
@@ -584,9 +585,21 @@ tType& HList<tType>::add_tail ( tType const* a_ptObject )
 	}
 
 template<typename tType>
-void HList<tType>::push_back ( tType const& a_rtObject )
+void HList<tType>::push_back( tType const& a_rtObject )
 	{
-	add_tail ( & a_rtObject );
+	M_PROLOG
+	add_tail( &a_rtObject );
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+void HList<tType>::pop_back( void )
+	{
+	M_PROLOG
+	remove_tail();
+	return;
+	M_EPILOG
 	}
 
 template<typename tType>

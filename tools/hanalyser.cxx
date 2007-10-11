@@ -665,14 +665,14 @@ bool HAnalyser::terminal_production( HAnalyserNode* a_poNode )
 				}
 			}
 		l_dValue = strtod ( static_cast < char const * const > ( f_oFormula ) + l_iOffset, NULL );
-		f_oConstantsPool.add ( l_dValue );
+		f_oConstantsPool.push_back( l_dValue );
 		/* We save variables as positive indexes and constants as negative
 		 * indexes, positive and negative 0 index would conflict so
 		 * we shift negative indexes by 1, so 0 becomes -1, 1 becomes -2,
 		 * 2 becomes -3, and so on and so forth.
-		 * HPool::get_top() returns current access/addition peak for revelant pool,
-		 * so to get index of lately added value we need to decrement get_top by 1. */
-		a_poNode->f_tLeaf.push_back ( - ( f_oConstantsPool.get_top() - 1 ) - 1 );
+		 * HPool::size() returns current access/addition peak for revelant pool,
+		 * so to get index of lately added value we need to decrement size by 1. */
+		a_poNode->f_tLeaf.push_back ( - ( f_oConstantsPool.size() - 1 ) - 1 );
 		return ( false );
 		}
 	f_eError = E_UNEXPECTED_TOKEN;

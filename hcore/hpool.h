@@ -18,7 +18,7 @@ Copyright:
      for this software.
      You can not even demand cost of the carrier (CD for example).
   5. You can not include it to any commercial enterprise (for example 
-     as a free add-on to payed software or payed newspaper).
+     as a free push_back-on to payed software or payed newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
@@ -75,9 +75,9 @@ public:
 	virtual ~HPool( void );
 	size_t pool_realloc( size_t );
 	tType& operator[] ( int ) const;
-	void add( tType const& );
+	void push_back( tType const& );
 	void reset( void );
-	int get_top( void ) const;
+	int size( void ) const;
 private:
 	HPool ( HPool const & );
 	HPool & operator = ( HPool const & );
@@ -149,7 +149,7 @@ tType& HPool<tType>::operator[]( int a_iIndex ) const
 	}
 
 template<typename tType>
-void HPool<tType>::add( tType const& a_tPod )
+void HPool<tType>::push_back( tType const& a_tPod )
 	{
 	M_PROLOG
 	size_t l_iOldTop = f_iTop;
@@ -166,7 +166,7 @@ void HPool<tType>::reset( void )
 	}
 
 template<typename tType>
-int HPool<tType>::get_top( void ) const
+int HPool<tType>::size( void ) const
 	{
 	return ( f_iTop );
 	}
