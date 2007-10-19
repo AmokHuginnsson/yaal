@@ -49,7 +49,8 @@ HStreamInterface::~HStreamInterface( void )
 HStreamInterface& HStreamInterface::operator << ( char const* const a_pcString )
 	{
 	M_PROLOG
-	do_write( a_pcString, strlen( a_pcString ) );
+	if ( a_pcString )
+		do_write( a_pcString, strlen( a_pcString ) );
 	return ( *this );
 	M_EPILOG
 	}
