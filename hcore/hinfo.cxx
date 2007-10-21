@@ -143,7 +143,7 @@ void HInfo::purge( void )
 	M_EPILOG
 	}
 
-char& HInfo::operator [] ( int const a_iIndex )
+char HInfo::operator [] ( int const a_iIndex )
 	{
 	M_PROLOG
 	return ( f_oString [ a_iIndex ] );

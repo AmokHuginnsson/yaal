@@ -276,7 +276,7 @@ int modulo_ASCII ( char const * const a_pcASCIINumber, int a_iModulo )
 		l_oTmpNumber.shift_left ( l_iTmpLength - l_oTmpString.get_length() );
 		l_iTmpLength = l_oTmpString.get_length();
 		for ( l_iCtr = 0; l_iCtr < l_iTmpLength; l_iCtr ++ )
-			l_oTmpNumber [ l_iCtr ] = l_oTmpString [ l_iCtr ];
+			l_oTmpNumber.set_at( l_iCtr, l_oTmpString[ l_iCtr ] );
 /*		M_LOG ( l_oTmpNumber ); */
 		}
 	return ( strtol ( l_oTmpNumber, NULL, 10 ) % a_iModulo );

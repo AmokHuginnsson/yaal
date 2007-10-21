@@ -100,7 +100,7 @@ void HLogPad::do_refresh ( void )
 					else
 						f_oVarTmpBuffer = l_poLogLine->f_oText;
 					if ( ( l_iCursor + f_oVarTmpBuffer.get_length() ) >= f_iWidthRaw )
-						f_oVarTmpBuffer [ f_iWidthRaw - l_iCursor ] = 0;
+						f_oVarTmpBuffer.set_at( f_iWidthRaw - l_iCursor, 0 );
 					if ( f_oVarTmpBuffer [ 0 ] )
 						cons.c_cmvprintf ( f_iRowRaw + l_iRow, f_iColumnRaw + l_iCursor, f_iAttribute, f_oVarTmpBuffer );
 					}

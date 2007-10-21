@@ -325,13 +325,24 @@ HString & HString::operator += ( HString const & a_roString )
 	M_EPILOG
 	}
 
-char & HString::operator [ ] ( int const a_iIndex )
+char HString::operator[] ( int const a_iIndex )
 	{
 	M_PROLOG
 	int l_iLength = get_length();
 	if  ( ( a_iIndex >= f_iSize ) || ( a_iIndex > l_iLength ) )
 		M_THROW ( "index out of bound", a_iIndex );
 	return ( f_pcBuffer [ a_iIndex ] );
+	M_EPILOG
+	}
+
+char HString::set_at( int const a_iIndex, char a_cChar )
+	{
+	M_PROLOG
+	int l_iLength = get_length();
+	if  ( ( a_iIndex >= f_iSize ) || ( a_iIndex > l_iLength ) )
+		M_THROW( "index out of bound", a_iIndex );
+	f_pcBuffer[ a_iIndex ] = a_cChar;
+	return ( a_cChar );
 	M_EPILOG
 	}
 

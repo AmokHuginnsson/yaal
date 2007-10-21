@@ -282,7 +282,7 @@ void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int 
 			{
 			if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
 				f_oVarTmpBuffer.fill( '_', a_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
-			f_oVarTmpBuffer[ a_poColumnInfo->f_iWidthRaw ] = 0;
+			f_oVarTmpBuffer.set_at( a_poColumnInfo->f_iWidthRaw, 0 );
 			}
 		break;
 		case ( BITS::ALIGN::D_CENTER ):
@@ -613,7 +613,7 @@ void HListControl::add_column( int const& a_riColumn, char const* a_pcName,
 	l_iShortcutIndex = f_oVarTmpBuffer.find( '&' );
 	if ( l_iShortcutIndex > -1 )
 		{
-		f_oVarTmpBuffer[ l_iShortcutIndex ] = 0;
+		f_oVarTmpBuffer.set_at( l_iShortcutIndex, 0 );
 		f_oVarTmpBuffer += a_pcName + l_iShortcutIndex + 1;
 		}
 	else

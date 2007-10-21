@@ -64,7 +64,8 @@ public:
 	HString operator + ( size_t const ) const;
 	HString operator + ( double const ) const;
 	HString operator + ( void const* const ) const;
-	char& operator [ ] ( int const );
+	char operator[] ( int const );
+	char set_at( int, char );
 	bool operator == ( HString const& ) const;
 	bool operator == ( char const* const ) const;
 	bool operator != ( HString const& ) const;

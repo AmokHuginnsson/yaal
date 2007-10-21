@@ -389,15 +389,15 @@ bool HAnalyser::translate( char const* a_pcFormula )
 			{
 			for ( l_iCtr = 0; l_iCtr < 16; l_iCtr++ )
 				if ( strncmp( a_pcFormula + l_iIndex,
-							n_ppcFunctionsMnemonics [ l_iCtr ],
-							n_piFunctionMnemonicsLength [ l_iCtr ] ) == 0 )
+							n_ppcFunctionsMnemonics[ l_iCtr ],
+							n_piFunctionMnemonicsLength[ l_iCtr ] ) == 0 )
 				{
-				f_oFormula [ l_iRealIndex ] = static_cast < char > ( l_iCtr + 1 );
+				f_oFormula.set_at( l_iRealIndex, static_cast<char>( l_iCtr + 1 ) );
 				break;
 				}
 			if ( l_iCtr < 16 )
 				{
-				l_iIndex += n_piFunctionMnemonicsLength [ l_iCtr ];
+				l_iIndex += n_piFunctionMnemonicsLength[ l_iCtr ];
 				l_iRealIndex ++;
 				}
 			else
@@ -409,14 +409,14 @@ bool HAnalyser::translate( char const* a_pcFormula )
 			}
 		else
 			{
-			f_oFormula [ l_iRealIndex ] = a_pcFormula [ l_iIndex ];
+			f_oFormula.set_at( l_iRealIndex, a_pcFormula[ l_iIndex ] );
 			l_iIndex ++;
 			l_iRealIndex ++;
 			}
 		f_iLength = l_iRealIndex;
 		}
-	f_oTerminalIndexes [ l_iRealIndex ] = l_iIndex;
-	f_oFormula [ l_iRealIndex ] = 0;
+	f_oTerminalIndexes[ l_iRealIndex ] = l_iIndex;
+	f_oFormula.set_at( l_iRealIndex, 0 );
 	return ( false );
 	M_EPILOG
 	}

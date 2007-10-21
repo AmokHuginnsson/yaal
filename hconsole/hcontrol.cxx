@@ -63,7 +63,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	f_iShortcutIndex = f_oLabel.find ( '&' );
 	if ( f_iShortcutIndex > -1 )
 		{
-		f_oLabel [ f_iShortcutIndex ] = 0;
+		f_oLabel.set_at( f_iShortcutIndex, 0 );
 		f_oLabel += a_pcLabel + f_iShortcutIndex + 1;
 		}
 	else
@@ -76,7 +76,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		else
 			{
 			f_bSingleLine = false;
-			f_oLabel [ f_iLabelLength - 1 ] = 0;
+			f_oLabel.set_at( f_iLabelLength - 1, 0 );
 			}
 		}
 	else

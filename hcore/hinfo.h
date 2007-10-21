@@ -59,7 +59,7 @@ public:
 	HInfo( void* const );
 	HInfo( HInfo const& );
 	virtual ~HInfo( void );
-	char& operator [] ( int const );
+	char operator [] ( int const );
 	HInfo& operator = ( HInfo const& );
 	HInfo& operator() ( HInfo const& );
 	template < typename tType >

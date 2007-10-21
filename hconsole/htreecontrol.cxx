@@ -135,7 +135,7 @@ void HTreeControl::do_refresh( void )
 	draw_label();
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	memset ( f_oVarTmpBuffer.raw(), '_', f_iWidthRaw );
-	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
+	f_oVarTmpBuffer.set_at( f_iWidthRaw, 0 );
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		cons.c_mvprintf( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
 	if ( f_poRoot )

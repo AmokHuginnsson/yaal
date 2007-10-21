@@ -126,9 +126,9 @@ void HEditControl::do_refresh ( void )
 	if ( ! f_bPassword )
 		{
 		strcpy ( f_oVarTmpBuffer.raw(), static_cast < char const * const > ( f_oString ) + f_iControlOffset );
-		f_oVarTmpBuffer [ f_oVarTmpBuffer.get_length() ] = ' ';
+		f_oVarTmpBuffer.set_at( f_oVarTmpBuffer.get_length(), ' ' );
 		}
-	f_oVarTmpBuffer [ f_iWidthRaw ] = 0;
+	f_oVarTmpBuffer.set_at( f_iWidthRaw, 0 );
 	M_ENSURE ( cons.c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer ) != C_ERR );
 	if ( f_bFocused )
 		{
