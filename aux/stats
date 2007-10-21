@@ -1,9 +1,10 @@
 #! /bin/sh
 
 if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
-	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<[DE]_[A-Z_]\+"
-	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<M_[A-Z_]\+"
-	find . ! -name 'config.h' -a -name '*.[ch]' | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
+	find . ! -name 'config.h' -a \( -name '*.h' -o -name '*.cxx' \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<[DE]_[A-Z_]\+"
+	find . ! -name 'config.h' -a \( -name '*.h' -o -name '*.cxx' \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<M_[A-Z_]\+"
+	find . ! -name 'config.h' -a \( -name '*.h' -o -name '*.cxx' \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "\<E_\|\<D_\|\<M_\|\<__.*_H\>" | grep --color " [a-zA-Z_]\+"
+	find . ! -name 'config.h' -a \( -name '*.h' -o -name '*.cxx' \) | xargs grep -En --color "(\<reinterpret_cast\>|\<const_cast\>|\<dynamic_cast\>)"
 	exit 0
 else
 	AWK="gawk"
@@ -53,6 +54,18 @@ else
 	SNEAKY=`${AWK} "${PROG_O}" ${TMP_FILE}|sort -u|grep -v '^$'|wc -l`
 
 	printf "	sneaky:            %8d\n" ${SNEAKY}
+
+	REINTERPRET_CAST=`grep '\<reinterpret_cast\>' ${TMP_FILE} | wc -l`
+
+	printf "	reinterpret_cast:  %8d\n" ${REINTERPRET_CAST}
+
+	CONST_CAST=`grep '\<const_cast\>' ${TMP_FILE} | wc -l`
+
+	printf "	const_cast:        %8d\n" ${CONST_CAST}
+
+	DYNAMIC_CAST=`grep '\<dynamic_cast\>' ${TMP_FILE} | wc -l`
+
+	printf "	dynamic_cast:      %8d\n" ${DYNAMIC_CAST}
 
 	TYPEDEFS=`grep -c 'typedef' ${TMP_FILE}`
 
