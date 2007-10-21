@@ -92,7 +92,13 @@ public:
 	ONode & get_root ( void );
 protected:
 	void parse ( xml_node_ptr_t, ONode &, int, bool );
-	char const * convert ( char const *, way_t = D_OUT );
+#ifdef HAVE_ICONV_INPUT_CONST
+#	define D_YAAL_TOOLS_HXML_ICONV_CONST const
+#else /* HAVE_ICONV_INPUT_CONST */
+#	define D_YAAL_TOOLS_HXML_ICONV_CONST /**/
+#endif /* not HAVE_ICONV_INPUT_CONST */
+	char const* convert( char D_YAAL_TOOLS_HXML_ICONV_CONST*, way_t = D_OUT );
+#undef D_YAAL_TOOLS_HXML_ICONV_CONST
 	int get_node_set_by_path ( char const * );
 private:
 	HXml ( HXml const & );

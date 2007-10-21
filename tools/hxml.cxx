@@ -217,49 +217,52 @@ HXml::~HXml ( void )
 	M_EPILOG
 	}
 
-char const * HXml::convert ( char const * a_pcData, way_t a_eWay )
+#ifdef HAVE_ICONV_INPUT_CONST
+#	define D_YAAL_TOOLS_HXML_ICONV_CONST const
+#else /* HAVE_ICONV_INPUT_CONST */
+#	define D_YAAL_TOOLS_HXML_ICONV_CONST /**/
+#endif /* not HAVE_ICONV_INPUT_CONST */
+
+char const* HXml::convert( char D_YAAL_TOOLS_HXML_ICONV_CONST* a_pcData, way_t a_eWay )
 	{
 	M_PROLOG
 	size_t l_uiSizeIn = 0, l_uiSizeOut = 0, l_uiOrigSize = 0, l_uiTmp = 0;
-	char * l_pcOut = NULL;
-#ifdef HAVE_ICONV_INPUT_CONST
-	char const * l_pcIn = a_pcData;
-#else /* HAVE_ICONV_INPUT_CONST */
-	char * l_pcIn = const_cast < char * > ( a_pcData );
-#endif /* not HAVE_ICONV_INPUT_CONST */
-	iconv_t l_xCD = static_cast < iconv_t > ( 0 );
-	l_uiOrigSize = l_uiSizeOut = l_uiSizeIn = strlen ( a_pcData );
-	f_oConvertedString.hs_realloc ( l_uiOrigSize + 1 );
+	char* l_pcOut = NULL;
+	iconv_t l_xCD = static_cast<iconv_t>( 0 );
+	l_uiOrigSize = l_uiSizeOut = l_uiSizeIn = ::strlen( a_pcData );
+	f_oConvertedString.hs_realloc( l_uiOrigSize + 1 );
 	l_pcOut = f_oConvertedString.raw();
 	switch ( a_eWay )
 		{
-		case ( D_IN ): { l_xCD = ( * f_oConvert ).f_xIconvIn; break; }
-		case ( D_OUT ): { l_xCD = ( * f_oConvert ).f_xIconvOut; break; }
+		case ( D_IN ): { l_xCD = ( *f_oConvert ).f_xIconvIn; break; }
+		case ( D_OUT ): { l_xCD = ( *f_oConvert ).f_xIconvOut; break; }
 		default :
 			{
-			M_THROW ( _ ( "unknown convertion way" ), a_eWay );
+			M_THROW( _( "unknown convertion way" ), a_eWay );
 			break;
 			}
 		}
-	M_ENSURE ( ( iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut,
-					& l_uiSizeOut ) != static_cast < size_t > ( - 1 ) )
+	M_ENSURE( ( ::iconv( l_xCD, &a_pcData, &l_uiSizeIn, &l_pcOut,
+					&l_uiSizeOut ) != static_cast<size_t>( -1 ) )
 				|| ( errno == E2BIG ) );
 	while ( l_uiSizeIn )
 		{
 		l_uiTmp = l_uiOrigSize;
 		l_uiOrigSize <<= 1;
-		f_oConvertedString.hs_realloc ( l_uiOrigSize + 1 );
+		f_oConvertedString.hs_realloc( l_uiOrigSize + 1 );
 		l_pcOut = f_oConvertedString.raw() + l_uiTmp - l_uiSizeOut;
 		l_uiSizeOut += l_uiTmp;
-		M_ENSURE ( ( iconv ( l_xCD, & l_pcIn, & l_uiSizeIn, & l_pcOut,
-						& l_uiSizeOut ) != static_cast < size_t > ( - 1 ) )
+		M_ENSURE( ( ::iconv( l_xCD, &a_pcData, &l_uiSizeIn, &l_pcOut,
+						&l_uiSizeOut ) != static_cast<size_t>( -1 ) )
 				|| ( errno == E2BIG ) );
 		}
 	if ( l_pcOut )
-		( * l_pcOut ) = 0;
+		( *l_pcOut ) = 0;
 	return ( f_oConvertedString );
 	M_EPILOG
 	}
+
+#undef D_YAAL_TOOLS_HXML_ICONV_CONST
 
 int HXml::get_node_set_by_path ( char const * a_pcPath )
 	{
@@ -370,7 +373,7 @@ void HXml::parse ( xml_node_ptr_t a_pvData, ONode & a_rsNode, int a_iLevel, bool
 					{
 					if ( l_psAttribute->children )
 						a_rsNode.f_oProperties [ l_pcName ] = l_psAttribute->children->content ? convert (
-								reinterpret_cast < char const * > (
+								reinterpret_cast < char* > (
 									l_psAttribute->children->content ) ) : "";
 					}
 				l_psAttribute = l_psAttribute->next;
@@ -385,7 +388,7 @@ void HXml::parse ( xml_node_ptr_t a_pvData, ONode & a_rsNode, int a_iLevel, bool
 				case ( XML_ENTITY_REF_NODE ):
 				case ( XML_TEXT_NODE ): if ( l_psNode->content )
 					{
-					f_oVarTmpBuffer = convert ( reinterpret_cast < char const * > ( l_psNode->content ) );
+					f_oVarTmpBuffer = convert ( reinterpret_cast<char*>( l_psNode->content ) );
 					if ( ! a_bStripEmpty || ( f_oVarTmpBuffer.find_other_than ( n_pcWhiteSpace ) >= 0 ) )
 						{
 						a_rsNode.f_oContents.add_tail ( & f_oVarTmpBuffer );
