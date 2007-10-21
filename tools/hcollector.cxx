@@ -52,16 +52,20 @@ char const * const HCollector::PROTOCOL::D_FIN = "FIN"; /* warrning! no endline,
 char const * const HCollector::PROTOCOL::D_ERR = "ERR\n";
 
 int const HCollector::PROTOCOL::D_RECV_BUF_SIZE; /* 5 should be enought but you never know */
-int const HCollector::PROTOCOL::D_BUF_SIZE;
 
 char const * const n_pcError = _ ( "collector device not opened" );
 
-HCollector::HCollector ( char const * a_pcDevicePath )
-					: HSerial ( a_pcDevicePath ), f_iLines ( 0 ),
-						f_oLine ( PROTOCOL::D_BUF_SIZE, true )
+HCollector::HCollector( char const* a_pcDevicePath )
+					: HSerial( a_pcDevicePath ), f_iLines( 0 ),
+						f_oLine()
 	{
 	M_PROLOG
 	memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
+	/*
+	 * Actual f_pcReadBuf buffer size is equal to PROTOCOL::D_RECV_BUF_SIZE + 1.
+	 * So we have additional one byte for string terminator (0).
+	 */
+	f_pcReadBuf[ PROTOCOL::D_RECV_BUF_SIZE ] = 0;
 	set_flags ( HSerial::D_FLAGS_TEXT );
 	return;
 	M_EPILOG
@@ -89,21 +93,19 @@ int HCollector::send_line ( char const * a_pcLine )
 	int l_iCRC = 0;
 	int l_iError = -1;
 	int l_iLength = strlen ( a_pcLine );
-	char * l_pcSpeedUp = NULL;
 	HString l_oLine, l_oLocalCopy;
 	if ( l_iLength < 1 )
 		return ( 0 );
 	l_oLocalCopy = a_pcLine;
-	l_pcSpeedUp = l_oLocalCopy.raw();
 	if ( a_pcLine [ l_iLength - 1 ] == '\n' )
 		{
 		l_iLength --;
-		l_pcSpeedUp [ l_iLength ] = 0;
+		l_oLocalCopy.set_at( l_iLength, 0 );
 		}
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
-		l_iCRC += l_pcSpeedUp [ l_iCtr ];
+		l_iCRC += l_oLocalCopy[ l_iCtr ];
 	l_oLine.format ( "%s%02x%02x%s\n", PROTOCOL::D_DTA,
-			l_iLength & 0x0ff, l_iCRC & 0x0ff, l_pcSpeedUp );
+			l_iLength & 0x0ff, l_iCRC & 0x0ff, static_cast<char const* const>( l_oLocalCopy ) );
 	memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
 	l_iLength += strlen ( PROTOCOL::D_DTA );
 	l_iLength += ( 2 /* for lenght */ + 2 /* for crc */ + 1 /* for newline */ );
@@ -121,7 +123,7 @@ int HCollector::send_line ( char const * a_pcLine )
 	M_EPILOG
 	}
 
-int HCollector::receive_line ( char * & a_pcLine )
+int HCollector::receive_line ( HString& a_oLine )
 	{
 	M_PROLOG
 	int l_iError = -1;
@@ -133,15 +135,20 @@ int HCollector::receive_line ( char * & a_pcLine )
 	/* P prefix means sender transmission side data */
 	while ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
 		{
-		memset ( f_oLine.raw(), 0, PROTOCOL::D_BUF_SIZE );
-		HRawFile::read ( f_oLine.raw(), PROTOCOL::D_BUF_SIZE );
-		flush ( TCIFLUSH );
-		a_pcLine = f_oLine.raw()
-			+ strlen ( PROTOCOL::D_DTA ) + 2 /* for lenght */ + 2 /* for crc */;
-		l_iLength = strlen ( a_pcLine ) - 1;
-		a_pcLine [ l_iLength ] = 0;
+		f_oLine = "";
+		f_pcReadBuf[ 0 ] = 0;
+		while ( strlen( f_pcReadBuf ) < static_cast<size_t>( PROTOCOL::D_RECV_BUF_SIZE ) )
+			{
+			memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
+			HRawFile::read ( f_pcReadBuf, PROTOCOL::D_RECV_BUF_SIZE );
+			f_oLine += f_pcReadBuf;
+			}
+		flush( TCIFLUSH );
+		a_oLine = f_oLine;
+		a_oLine.shift_left(	::strlen( PROTOCOL::D_DTA ) + 2 /* for lenght */ + 2 /* for crc */ );
+		l_iLength = a_oLine.get_length() - 1;
 		for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
-			l_iCRC += a_pcLine [ l_iCtr ];
+			l_iCRC += a_oLine[ l_iCtr ];
 		l_iLength &= 0x0ff;
 		l_iCRC &= 0x0ff;
 		memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
@@ -217,20 +224,20 @@ int HCollector::wait_for_connection ( int a_iTimeOut )
 	M_EPILOG
 	}
 
-int HCollector::read_collector ( void ( * process_line ) ( char *, int ) ) 
+int HCollector::read_collector ( void ( *process_line )( char const* const, int ) ) 
 	{
 	M_PROLOG
 	int l_iError = 0;
-	char * l_pcLine = NULL;
 	f_iLines = 0;
 	l_iError = wait_for_connection ( tools::n_iCollectorConnectionTimeOut );
+	HString l_oLine;
 	while ( l_iError >= 0 )
 		{
-		l_iError += receive_line ( l_pcLine );
+		l_iError += receive_line( l_oLine );
 		/* '\n' is stripped from each line so we need to FIN treat special */
-		if ( ! strncmp ( l_pcLine, PROTOCOL::D_FIN, sizeof ( PROTOCOL::D_FIN ) ) )
+		if ( ! ::strncmp( l_oLine, PROTOCOL::D_FIN, sizeof ( PROTOCOL::D_FIN ) ) )
 			break;
-		process_line ( l_pcLine, f_iLines );
+		process_line( l_oLine, f_iLines );
 		}
 	return ( l_iError );
 	M_EPILOG
