@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_TOOLS_HSERIAL_H
 
 #include "hcore/hstring.h"
+#include "hcore/hchunk.h"
 #include "hcore/hrawfile.h"
 
 namespace yaal
@@ -84,8 +85,8 @@ protected:
 	speed_t f_eSpeed;
 	flags_t f_eFlags;
 	hcore::HString f_oDevicePath;
-	hcore::HString f_oTIO;
-	hcore::HString f_oBackUpTIO;
+	hcore::HChunk f_oTIO;
+	hcore::HChunk f_oBackUpTIO;
 public:
 	HSerial( char const* const = NULL ); /* device path */
 	virtual ~HSerial( void );
