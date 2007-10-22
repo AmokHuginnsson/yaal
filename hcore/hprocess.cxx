@@ -146,21 +146,21 @@ int HProcess::run( void )
 	M_EPILOG
 	}
 
-int HProcess::handler_alert( int, void* )
+int HProcess::handler_alert( int, void const* )
 	{
 	M_PROLOG
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HProcess::handler_interrupt( int, void* )
+int HProcess::handler_interrupt( int, void const* )
 	{
 	M_PROLOG
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HProcess::handler_idle( int a_iCode, void* )
+int HProcess::handler_idle( int a_iCode, void const* )
 	{
 	M_PROLOG
 	f_iIdleCycles ++;

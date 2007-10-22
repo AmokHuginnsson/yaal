@@ -62,9 +62,9 @@ protected:
 		}
 	int register_file_descriptor_handler_internal ( int, process_handler_filedes_t );
 	int unregister_file_descriptor_handler ( int );
-	virtual int handler_alert ( int, void * = NULL );
-	virtual int handler_interrupt ( int, void * = NULL );
-	virtual int handler_idle ( int, void * = NULL );
+	virtual int handler_alert ( int, void const* = NULL );
+	virtual int handler_interrupt ( int, void const* = NULL );
+	virtual int handler_idle ( int, void const* = NULL );
 private:
 	HProcess ( HProcess const & );
 	HProcess & operator = ( HProcess const & );
