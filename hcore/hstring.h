@@ -107,8 +107,8 @@ public:
 	HString split( char const* const, int const ) const;
 	HString& fill( char = '\0', int = 0, int = 0 );
 	HString& fillz( char = '\0', int = 0, int = 0 );
-	void erase( int, int );
-	void insert( int, int );
+	HString& erase( int, int );
+	HString& insert( int, int, char const* = NULL );
 	};
 
 HString operator + ( char const*, HString const& );
