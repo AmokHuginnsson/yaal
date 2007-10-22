@@ -32,6 +32,8 @@ M_VCSID ( "$Id$" )
 #include "cl_switch.h"
 #include "rc_file.h"
 #include "hstring.h"
+#include "hchunk.h"
+#include "xalloc.h"
 #include "hlog.h"
 
 using namespace yaal;
@@ -68,20 +70,19 @@ char const * const make_short_opts ( OOption * const & a_rpsOptions, int a_iCoun
 				break;
 			}
 		}
-	return ( a_roBuffer.raw() );
+	return ( static_cast<char const* const>( a_roBuffer ) );
 	}
 
-option * make_option_array ( OOption * const & a_rpsOptions, int a_iCount, HString & a_roBuffer )
+option * make_option_array( OOption * const & a_rpsOptions, int a_iCount, HChunk& a_roBuffer )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	option * l_psOptions = NULL;
-	a_roBuffer.hs_realloc ( sizeof ( option ) * a_iCount );
-	l_psOptions = reinterpret_cast < option * > ( a_roBuffer.raw() );
+	l_psOptions = static_cast<option*>( a_roBuffer.get() );
 	for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 		{
-		memset ( & l_psOptions [ l_iCtr ], 0, sizeof ( option ) );
-		l_psOptions [ l_iCtr ].name = a_rpsOptions [ l_iCtr ].f_pcLongOption;
+		memset( &l_psOptions[ l_iCtr ], 0, sizeof( option ) );
+		l_psOptions[ l_iCtr ].name = a_rpsOptions[ l_iCtr ].f_pcLongOption;
 		switch ( a_rpsOptions [ l_iCtr ].f_eSwitchType )
 			{
 			case ( OOption::D_REQUIRED ):
@@ -109,7 +110,8 @@ int decode_switches ( int const a_iArgc, char * const * const a_ppcArgv,
 	int l_iChar = 0, l_iCtr = 0;
 	char const * l_pcShortOpts = NULL;
 	option * l_psOptionArray = NULL;
-	HString l_oLongOptBuffer, l_oShortOptBuffer;
+	HString l_oShortOptBuffer;
+	HChunk l_oLongOptBuffer( xcalloc<option>( a_iCount ) );
 	hcore::log << "Decoding switches ... ";
 	l_pcShortOpts = make_short_opts ( a_rpsOptions, a_iCount, l_oShortOptBuffer );
 	l_psOptionArray = make_option_array ( a_rpsOptions, a_iCount,

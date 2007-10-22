@@ -537,49 +537,96 @@ int HString::find ( char const a_cChar, int const a_iAfter ) const
 	M_EPILOG
 	}
 
-int HString::find ( char const * const a_pcPattern, int const a_iAfter ) const
+int HString::find( char const* const a_pcPattern, int const a_iAfter ) const
 	{
 	M_PROLOG
 	if ( ( ! a_pcPattern ) || ( a_iAfter < 0 ) )
 		return ( - 1 );
-	if ( ( ! strlen ( a_pcPattern ) )
-			|| ( static_cast < int > ( strlen ( f_pcBuffer ) ) <= a_iAfter ) )
+	if ( ( ! ::strlen( a_pcPattern ) )
+			|| ( static_cast<int>( ::strlen( f_pcBuffer ) ) <= a_iAfter ) )
 		return ( - 1 );
-	char * l_pcStr = strstr ( f_pcBuffer + a_iAfter, a_pcPattern );
+	char* l_pcStr = ::strstr( f_pcBuffer + a_iAfter, a_pcPattern );
 	if ( ! l_pcStr )
 		return ( - 1 );
 	return ( l_pcStr - f_pcBuffer );
 	M_EPILOG
 	}
 
-int HString::find_one_of ( char const * const a_pcSet,
-		int const a_iAfter ) const
+int HString::find_one_of( char const* const a_pcSet,
+		int a_iAfter ) const
 	{
 	M_PROLOG
-	if ( ( ! a_pcSet ) || ( a_iAfter < 0 ) )
+	if ( ! a_pcSet )
 		return ( - 1 );
-	if ( ( ! strlen ( a_pcSet ) )
-			|| ( static_cast < int > ( strlen ( f_pcBuffer ) ) <= a_iAfter ) )
+	if ( a_iAfter < 0 )
+		a_iAfter = 0;
+	if ( ( ! ::strlen ( a_pcSet ) )
+			|| ( static_cast<int>( ::strlen( f_pcBuffer ) ) <= a_iAfter ) )
 		return ( - 1 );
-	char * l_pcStr = strpbrk ( f_pcBuffer + a_iAfter, a_pcSet );
+	char * l_pcStr = ::strpbrk( f_pcBuffer + a_iAfter, a_pcSet );
 	if ( ! l_pcStr )
 		return ( - 1 );
 	return ( l_pcStr - f_pcBuffer );
 	M_EPILOG
 	}
 
-int HString::find_other_than ( char const * const a_pcSet,
-		int const a_iAfter ) const
+int HString::reverse_find_one_of( char const* const a_pcSet,
+		int a_iBefore ) const
+	{
+	M_PROLOG
+	if ( ! a_pcSet )
+		return ( - 1 );
+	if ( a_iBefore < 0 )
+		a_iBefore = 0;
+	int l_iLength = ::strlen( f_pcBuffer );
+	if ( ( ! ::strlen( a_pcSet ) ) || ( l_iLength <= a_iBefore ) )
+		return ( - 1 );
+	-- l_iLength;
+	char* l_pcStr = strrnpbrk( f_pcBuffer + l_iLength - a_iBefore, a_pcSet, l_iLength - a_iBefore );
+	if ( ! l_pcStr )
+		return ( - 1 );
+	return ( f_pcBuffer + l_iLength - l_pcStr );
+	M_EPILOG
+	}
+
+int HString::find_other_than( char const* const a_pcSet,
+		int a_iAfter ) const
 	{
 	M_PROLOG
 	int l_iLength = 0, l_iIndex = 0;
-	if ( ( ! a_pcSet ) || ( a_iAfter < 0 ) )
-		return ( - 1 );
-	l_iLength = static_cast < int > ( strlen ( f_pcBuffer ) );
-	if ( ( ! strlen ( a_pcSet ) )	|| ( l_iLength <= a_iAfter ) )
-		return ( - 1 );
-	l_iIndex = strspn ( f_pcBuffer + a_iAfter, a_pcSet );
+	if ( ! a_pcSet )
+		return ( 0 );
+	if ( a_iAfter < 0 )
+		a_iAfter = 0;
+	if ( ! strlen( a_pcSet ) )
+		return ( 0 );
+	l_iLength = static_cast<int>( ::strlen ( f_pcBuffer ) );
+	if ( l_iLength <= a_iAfter )
+		return ( -1 );
+	l_iIndex = ::strspn( f_pcBuffer + a_iAfter, a_pcSet );
 	if ( l_iIndex >= l_iLength )
+		return ( - 1 );
+	return ( l_iIndex );
+	M_EPILOG
+	}
+
+int HString::reverse_find_other_than( char const* const a_pcSet,
+		int a_iBefore ) const
+	{
+	M_PROLOG
+	int l_iLength = 0, l_iIndex = 0;
+	if ( ! a_pcSet )
+		return ( 0 );
+	if ( a_iBefore < 0 )
+		a_iBefore = 0;
+	if ( ! strlen( a_pcSet ) )
+		return ( 0 );
+	l_iLength = static_cast<int>( ::strlen ( f_pcBuffer ) );
+	if ( l_iLength <= a_iBefore )
+		return ( -1 );
+	-- l_iLength;
+	l_iIndex = strrnspn( f_pcBuffer + l_iLength - a_iBefore, a_pcSet, l_iLength - a_iBefore );
+	if ( l_iIndex > l_iLength )
 		return ( - 1 );
 	return ( l_iIndex );
 	M_EPILOG
@@ -920,42 +967,49 @@ bool operator < ( char const * const a_pcStr, HString const & a_roString )
 
 /* all str* and mem* functions takes const pointer as argument and returns
 	 non const pointer */
-char * strrnpbrk ( char const * const a_pcBuffer,
-		char const * const a_pcStopSet, int a_iIndex )
+char* strrnpbrk( char const* const a_pcBuffer,
+		char const* const a_pcStopSet, int a_iIndex )
 	{
 	M_PROLOG
-	int l_iStopSetSize = strlen ( a_pcStopSet );
-	while ( a_iIndex -- )
-		if ( memchr ( a_pcStopSet, a_pcBuffer [ a_iIndex ], l_iStopSetSize ) )
-			return ( const_cast < char * > ( a_pcBuffer + a_iIndex ) );
+	int l_iStopSetSize = ::strlen( a_pcStopSet );
+	int l_iIndex = a_iIndex;
+	while ( l_iIndex )
+		{
+		if ( ::memchr( a_pcStopSet, a_pcBuffer[ l_iIndex - a_iIndex ], l_iStopSetSize ) )
+			return ( const_cast<char*>( a_pcBuffer + a_iIndex ) );
+		-- l_iIndex;
+		}
 	return ( NULL );
 	M_EPILOG
 	}
 
-char const * strrpbrk ( char const * const a_pcBuffer,
-		char const * const a_pcStopSet )
+char const* strrpbrk ( char const * const a_pcBuffer,
+		char const* const a_pcStopSet )
 	{
-	return ( strrnpbrk ( a_pcBuffer, a_pcStopSet, strlen ( a_pcBuffer ) ) );
+	int l_iLength = ::strlen( a_pcBuffer ) - 1;
+	return ( strrnpbrk( a_pcBuffer + l_iLength, a_pcStopSet, l_iLength ) );
 	}
 
-int strrnspn ( char const * const a_pcBuffer, char const * const a_pcSkipSet,
-		int const a_iLenght )
+int strrnspn( char const* const a_pcBuffer, char const* const a_pcSkipSet,
+		int const a_iIndex )
 	{
 	M_PROLOG
-	int l_iSkipSetSize = strlen ( a_pcSkipSet );
-	int l_iIndex = a_iLenght;
-	while ( l_iIndex -- )
+	int l_iSkipSetSize = ::strlen( a_pcSkipSet );
+	int l_iIndex = a_iIndex;
+	while ( l_iIndex )
 		{
-		if ( ! memchr ( a_pcSkipSet, a_pcBuffer [ l_iIndex ], l_iSkipSetSize ) )
-			return ( a_iLenght - l_iIndex );
+		if ( ! ::memchr( a_pcSkipSet, a_pcBuffer[ l_iIndex - a_iIndex ], l_iSkipSetSize ) )
+			return ( a_iIndex - l_iIndex );
+		-- l_iIndex;
 		}
-	return ( a_iLenght );
+	return ( a_iIndex );
 	M_EPILOG
 	}
 
-int strrspn ( char const * const a_pcBuffer, char const * const a_pcSkipSet )
+int strrspn ( char const* const a_pcBuffer, char const* const a_pcSkipSet )
 	{
-	return ( strrnspn ( a_pcBuffer, a_pcSkipSet, strlen ( a_pcBuffer ) ) );
+	int l_iLength = ::strlen( a_pcBuffer ) - 1;
+	return ( strrnspn( a_pcBuffer + l_iLength, a_pcSkipSet, l_iLength ) );
 	}
 
 }

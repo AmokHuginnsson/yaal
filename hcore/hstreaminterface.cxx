@@ -143,26 +143,20 @@ int HStreamInterface::read_until( HString& a_roMessage, char const* const a_pcSt
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	char* l_pcPtr = NULL;
-	a_roMessage = "";
+	char l_cByte = 0;
+	f_oVarTmpBuffer = "";
 	do
 		{
-		f_oVarTmpBuffer.hs_realloc( l_iCtr + 1 );
-		l_pcPtr = f_oVarTmpBuffer.raw();
-		if ( do_read( l_pcPtr + l_iCtr, sizeof ( char ) * 1 ) <= 0 )
+		if ( do_read( &l_cByte, sizeof ( char ) * 1 ) <= 0 )
 			break;
+		f_oVarTmpBuffer += l_cByte;
+		++ l_iCtr;
 		}
-	while ( ! ::strchr( a_pcStopSet, l_pcPtr[ l_iCtr ++ ] ) );
+	while ( ! ::strchr( a_pcStopSet, l_cByte ) );
 	l_iCtr --; /* go back one char for stripping terminator */
-	if ( l_iCtr > 0 )
-		{
-		l_pcPtr[ l_iCtr ] = 0;
-		if ( l_iCtr > 0 )
-			{
-			a_roMessage.hs_realloc( l_iCtr );
-			::memcpy( a_roMessage.raw(), l_pcPtr, l_iCtr + 1 );
-			}
-		}
+	if ( l_iCtr >= 0 )
+		f_oVarTmpBuffer.set_at( l_iCtr, 0 );
+	a_roMessage = f_oVarTmpBuffer;
 	return ( l_iCtr );
 	M_EPILOG
 	}

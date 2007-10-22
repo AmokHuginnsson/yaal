@@ -226,12 +226,7 @@ HXml::~HXml ( void )
 char const* HXml::convert( char D_YAAL_TOOLS_HXML_ICONV_CONST* a_pcData, way_t a_eWay )
 	{
 	M_PROLOG
-	size_t l_uiSizeIn = 0, l_uiSizeOut = 0, l_uiOrigSize = 0, l_uiTmp = 0;
-	char* l_pcOut = NULL;
 	iconv_t l_xCD = static_cast<iconv_t>( 0 );
-	l_uiOrigSize = l_uiSizeOut = l_uiSizeIn = ::strlen( a_pcData );
-	f_oConvertedString.hs_realloc( l_uiOrigSize + 1 );
-	l_pcOut = f_oConvertedString.raw();
 	switch ( a_eWay )
 		{
 		case ( D_IN ): { l_xCD = ( *f_oConvert ).f_xIconvIn; break; }
@@ -242,22 +237,23 @@ char const* HXml::convert( char D_YAAL_TOOLS_HXML_ICONV_CONST* a_pcData, way_t a
 			break;
 			}
 		}
-	M_ENSURE( ( ::iconv( l_xCD, &a_pcData, &l_uiSizeIn, &l_pcOut,
-					&l_uiSizeOut ) != static_cast<size_t>( -1 ) )
-				|| ( errno == E2BIG ) );
-	while ( l_uiSizeIn )
+	size_t l_uiSizeOut = 0, l_uiSizeIn = ::strlen( a_pcData );
+	/* The longers single character in any encoding is 6 bytes long. */
+	size_t const D_ICONV_OUTPUT_BUFFER_LENGTH = 8;
+	/* Additional character for nil terminator. */
+	char l_pcOutput[ D_ICONV_OUTPUT_BUFFER_LENGTH + 1 ];
+	f_oConvertedString = "";
+	do
 		{
-		l_uiTmp = l_uiOrigSize;
-		l_uiOrigSize <<= 1;
-		f_oConvertedString.hs_realloc( l_uiOrigSize + 1 );
-		l_pcOut = f_oConvertedString.raw() + l_uiTmp - l_uiSizeOut;
-		l_uiSizeOut += l_uiTmp;
+		::memset( l_pcOutput, 0, D_ICONV_OUTPUT_BUFFER_LENGTH + 1 );
+		l_uiSizeOut = D_ICONV_OUTPUT_BUFFER_LENGTH;
+		char* l_pcOut = l_pcOutput;
 		M_ENSURE( ( ::iconv( l_xCD, &a_pcData, &l_uiSizeIn, &l_pcOut,
 						&l_uiSizeOut ) != static_cast<size_t>( -1 ) )
 				|| ( errno == E2BIG ) );
+		f_oConvertedString += l_pcOutput;
 		}
-	if ( l_pcOut )
-		( *l_pcOut ) = 0;
+	while ( l_uiSizeIn );
 	return ( f_oConvertedString );
 	M_EPILOG
 	}
@@ -267,27 +263,24 @@ char const* HXml::convert( char D_YAAL_TOOLS_HXML_ICONV_CONST* a_pcData, way_t a
 int HXml::get_node_set_by_path ( char const * a_pcPath )
 	{
 	M_PROLOG
-	int l_iLength = 0;
-	char * l_pcPtr = NULL;
 	f_oVarTmpBuffer = a_pcPath;
-	l_pcPtr = f_oVarTmpBuffer.raw();
-	l_iLength = f_oVarTmpBuffer.get_length() - 1;
+	int l_iLength = f_oVarTmpBuffer.get_length() - 1;
 	if ( f_poXml->f_psObject )
 		f_poXml->xml_free ( f_poXml->f_psObject );
 	if ( f_poXml->f_psContext )
 		f_poXml->xml_free ( f_poXml->f_psContext );
 	f_poXml->reset();
-	f_poXml->f_psContext = xmlXPathNewContext ( f_poXml->f_psDoc );
+	f_poXml->f_psContext = xmlXPathNewContext( f_poXml->f_psDoc );
 	if ( f_poXml->f_psContext )
 		{
-		while ( l_pcPtr [ 0 ] )
+		while ( f_oVarTmpBuffer[ 0 ] )
 			{
-			f_poXml->f_psObject = xmlXPathEvalExpression (
-					reinterpret_cast < xmlChar const * > ( l_pcPtr ),
+			f_poXml->f_psObject = xmlXPathEvalExpression(
+					reinterpret_cast<xmlChar const*>( static_cast<char const* const>( f_oVarTmpBuffer ) ),
 					f_poXml->f_psContext );
 			if ( f_poXml->f_psObject )
 				break;
-			l_pcPtr [ l_iLength -- ] = 0;
+			f_oVarTmpBuffer.set_at( l_iLength --, 0 );
 			}
 		if ( f_poXml->f_psObject )
 			{

@@ -266,14 +266,14 @@ int process_rc_file_internal ( char const * const a_pcRcName,
  * stores rest of line in a_pcValue, returns 1 if there are more lines
  * to read and 0 in other case. */
 
-void strip_comment ( char * a_pcBuffer )
+void strip_comment( HString& a_roLine )
 	{
 	M_PROLOG
 	bool l_bApostrophe = false, l_bQuotation = false;
-	int l_iCtr = 0, l_iLenght = strlen ( a_pcBuffer );
+	int l_iCtr = 0, l_iLenght = a_roLine.get_length();
 	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr ++ )
 		{
-		switch ( a_pcBuffer [ l_iCtr ] )
+		switch ( a_roLine[ l_iCtr ] )
 			{
 			case ( '\'' ):
 				l_bApostrophe = ! l_bApostrophe;
@@ -285,7 +285,7 @@ void strip_comment ( char * a_pcBuffer )
 				{
 				if ( ! ( l_bQuotation || l_bApostrophe ) )
 					{
-					a_pcBuffer [ l_iCtr ] = 0;
+					a_roLine.set_at( l_iCtr, 0 );
 					return;
 					}
 				}
@@ -298,54 +298,52 @@ void strip_comment ( char * a_pcBuffer )
 	M_EPILOG
 	}
 
-int read_rc_line ( HString & a_roOption, HString & a_roValue, HFile & a_roFile,
-		int & a_riLine )
+int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
+		int& a_riLine )
 	{
 	M_PROLOG
 	int l_iIndex = 0, l_iLenght = 0, l_iEnd = 0;
-	char * l_pcBuffer = NULL, * l_pcPtr = NULL;
 	a_roOption = a_roValue = "";
-	while ( a_roFile.read_line ( a_roOption, HFile::D_STRIP_NEWLINES ) >= 0 )
+	while ( a_roFile.read_line( a_roOption, HFile::D_STRIP_NEWLINES ) >= 0 )
 		{
 		a_riLine ++;
-		l_pcBuffer = a_roOption.raw();
 		l_iIndex = 0;
-		if ( ! l_pcBuffer [ l_iIndex ] )
+		if ( ! a_roOption[ l_iIndex ] )
 			continue; /* empty line */
 		/* we are looking for first non-whitespace on the line */
-		l_iIndex = strspn ( l_pcBuffer, n_pcWhiteSpace );
-		if ( ! l_pcBuffer [ l_iIndex ] || ( l_pcBuffer [ l_iIndex ] == '#' ) )
+		l_iIndex = a_roOption.find_other_than( n_pcWhiteSpace );
+		if ( ! a_roOption[ l_iIndex ] || ( a_roOption[ l_iIndex ] == '#' ) )
 			continue; /* there is only white spaces or comments on that line */
 		/* at this point we know we have _some_ option */
-		strip_comment ( l_pcBuffer );
+		strip_comment( a_roOption );
 		/* strip comment from end of line */
-		l_iLenght = strlen ( l_pcBuffer );
+		l_iLenght = a_roOption.get_length();
 		if ( l_iIndex )
 			{
-			memmove ( l_pcBuffer, l_pcBuffer + l_iIndex, l_iLenght - l_iIndex );
+			a_roOption.shift_left( l_iIndex );
 			l_iLenght -= l_iIndex;
-			l_pcBuffer [ l_iLenght ] = 0;
 			}
 		/* now we look for first whitespace after option */
-		if ( ( l_pcPtr = strpbrk ( l_pcBuffer, n_pcWhiteSpace ) ) )
+		if ( ( l_iIndex = a_roOption.find_one_of( n_pcWhiteSpace ) ) > 0 )
 			{
 			/* we have found a whitespace, so there is probability that */
 			/* have a value :-o */
-			l_iIndex = l_pcPtr - l_pcBuffer;
-			l_pcBuffer [ l_iIndex ++ ] = 0;
-			l_iIndex += strspn ( l_pcBuffer + l_iIndex, n_pcWhiteSpace );
-			if ( l_pcBuffer [ l_iIndex ] )
+			int l_iEndOfOption = l_iIndex;
+			l_iIndex = a_roOption.find_other_than( n_pcWhiteSpace, l_iIndex );
+			if ( ( l_iIndex > 0 ) && a_roOption[ l_iIndex + l_iEndOfOption ] )
 				{
 				/* we have found a non-whitespace, so there certainly is a value */
-				l_iEnd = l_iLenght - strrnspn ( l_pcBuffer, n_pcWhiteSpace, l_iLenght );
+				l_iIndex += l_iEndOfOption;
+				l_iEnd = ( l_iLenght - 1 ) - a_roOption.reverse_find_other_than( n_pcWhiteSpace );
 				/* now we strip apostrophe or quotation marks */
-				if ( ( ( l_pcBuffer [ l_iEnd ] == '\'' )
-							|| ( l_pcBuffer [ l_iEnd ] == '"' ) )
-						&& ( l_pcBuffer [ l_iEnd ] == l_pcBuffer [ l_iIndex ] ) )
+				if ( ( ( a_roOption[ l_iEnd ] == '\'' )
+							|| ( a_roOption[ l_iEnd ] == '"' ) )
+						&& ( a_roOption[ l_iEnd ] == a_roOption[ l_iIndex ] ) )
 					l_iIndex ++, l_iEnd --;
-				l_pcBuffer [ l_iEnd + 1 ] = 0;
-				a_roValue = l_pcBuffer + l_iIndex;
+				a_roOption.set_at( l_iEnd + 1, 0 );
+				a_roValue = a_roOption.mid( l_iIndex );
 				}
+			a_roOption.set_at( l_iEndOfOption, 0 );
 			}
 		return ( 1 );
 		}

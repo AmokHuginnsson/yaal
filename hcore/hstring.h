@@ -89,8 +89,10 @@ public:
 	int find( char const, int const = 0 ) const;
 	int find( char const* const, int const = 0 ) const;
 	int reverse_find( char const, int const = 0 ) const;
-	int find_one_of( char const* const, int const = 0 ) const;
-	int find_other_than( char const* const, int const = 0 ) const;
+	int find_one_of( char const* const, int = 0 ) const;
+	int reverse_find_one_of( char const* const, int = 0 ) const;
+	int find_other_than( char const* const, int = 0 ) const;
+	int reverse_find_other_than( char const* const, int = 0 ) const;
 	HString& replace( char const* const, char const* const );
 	HString& upper( void );
 	HString& lower( void );
