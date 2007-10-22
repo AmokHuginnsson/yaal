@@ -133,7 +133,7 @@ void HWindow::refresh( void )
 	M_EPILOG
 	}
 
-int HWindow::handler_jump_tab( int a_iCode, void* )
+int HWindow::handler_jump_tab( int a_iCode, void const* )
 	{
 	M_PROLOG
 	f_oControls.next_enabled();
@@ -143,7 +143,7 @@ int HWindow::handler_jump_tab( int a_iCode, void* )
 	M_EPILOG
 	}
 
-int HWindow::handler_jump_direct( int a_iCode, void* )
+int HWindow::handler_jump_direct( int a_iCode, void const* )
 	{
 	M_PROLOG
 	/* call below is _magic_, HControlList::next_enabled() takes char as an
@@ -174,7 +174,7 @@ void HWindow::acquire_focus( HControl const* const a_poControl )
 	M_EPILOG
 	}
 
-int HWindow::handler_command( int a_iCode, void* )
+int HWindow::handler_command( int a_iCode, void const* )
 	{
 	M_PROLOG
 	a_iCode = 0;
@@ -183,7 +183,7 @@ int HWindow::handler_command( int a_iCode, void* )
 	M_EPILOG
 	}
 
-int HWindow::handler_search( int a_iCode, void* )
+int HWindow::handler_search( int a_iCode, void const* )
 	{
 	M_PROLOG
 	char l_pcPrompt [ ] = "/\0";

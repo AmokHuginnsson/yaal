@@ -59,15 +59,15 @@ protected:
 	int add_window ( HWindow::ptr_t );
 	void select( HWindow const* const );
 	void refresh( bool = false );
-	virtual int handler_alert ( int, void * = NULL );
-	virtual int handler_interrupt ( int, void * = NULL );
-	virtual int handler_idle ( int, void * = NULL );
-	virtual int handler_mouse ( int, void * = NULL );
-	virtual int handler_refresh ( int, void * = NULL );
-	virtual int handler_quit ( int, void * = NULL );
-	virtual int handler_jump_meta_tab ( int, void * = NULL );
-	virtual int handler_jump_meta_direct ( int, void * = NULL );
-	virtual int handler_close_window ( int, void * = NULL );
+	virtual int handler_alert ( int, void const* = NULL );
+	virtual int handler_interrupt ( int, void const* = NULL );
+	virtual int handler_idle ( int, void const* = NULL );
+	virtual int handler_mouse ( int, void const* = NULL );
+	virtual int handler_refresh ( int, void const* = NULL );
+	virtual int handler_quit ( int, void const* = NULL );
+	virtual int handler_jump_meta_tab ( int, void const* = NULL );
+	virtual int handler_jump_meta_direct ( int, void const* = NULL );
+	virtual int handler_close_window ( int, void const* = NULL );
 private:
 	HTUIProcess ( HTUIProcess const & );
 	HTUIProcess & operator = ( HTUIProcess const & );

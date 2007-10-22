@@ -310,7 +310,7 @@ void HDataWindow::set_sync_store ( HItem * a_poItem )
 	return;
 	}
 
-int HDataWindow::handler_add_new ( int, void * )
+int HDataWindow::handler_add_new ( int, void const* )
 	{
 	M_PROLOG
 	if ( f_eMode != D_OPEN )
@@ -327,7 +327,7 @@ int HDataWindow::handler_add_new ( int, void * )
 	M_EPILOG
 	}
 
-int HDataWindow::handler_edit ( int, void * )
+int HDataWindow::handler_edit ( int, void const* )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
@@ -348,7 +348,7 @@ int HDataWindow::handler_edit ( int, void * )
 	M_EPILOG
 	}
 
-int HDataWindow::handler_delete ( int, void * )
+int HDataWindow::handler_delete ( int, void const* )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
@@ -371,7 +371,7 @@ int HDataWindow::handler_delete ( int, void * )
 	M_EPILOG
 	}
 
-int HDataWindow::handler_save ( int, void * )
+int HDataWindow::handler_save ( int, void const* )
 	{
 	M_PROLOG
 	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
@@ -387,7 +387,7 @@ int HDataWindow::handler_save ( int, void * )
 	M_EPILOG
 	}
 
-int HDataWindow::handler_requery ( int, void * )
+int HDataWindow::handler_requery ( int, void const* )
 	{
 	M_PROLOG
 	if ( f_eMode != D_NORMAL )
@@ -403,7 +403,7 @@ int HDataWindow::handler_requery ( int, void * )
 	M_EPILOG
 	}
 
-int HDataWindow::handler_cancel ( int, void * )
+int HDataWindow::handler_cancel ( int, void const* )
 	{
 	M_PROLOG
 	mode_t l_eMode = f_eMode;

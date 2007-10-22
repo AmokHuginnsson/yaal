@@ -52,6 +52,9 @@ HMainWindow::HMainWindow( char const* a_pcTitle, HTUIProcess::model_ptr_t a_oWin
 HMainWindow::~HMainWindow( void )
 	{
 	M_PROLOG
+#ifdef __DEBUGGER_BABUNI__
+	log_trace << "destruction success" << endl;
+#endif /* __DEBUGGER_BABUNI__ */
 	return;
 	M_EPILOG
 	}
@@ -87,7 +90,7 @@ void HMainWindow::init_menu( HTUIProcess* a_psProcess, OMenuItem* a_psMenu )
 	M_EPILOG
 	}
 
-int HMainWindow::handler_close( int a_iCode, void* )
+int HMainWindow::handler_close( int a_iCode, void const* )
 	{
 	M_PROLOG
 	a_iCode = KEY<'x'>::command;

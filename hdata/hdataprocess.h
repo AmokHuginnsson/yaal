@@ -61,8 +61,8 @@ public:
 			menu_handlers_map_t const & );
 	dbwrapper::HDataBase * data_base ( void );
 protected:
-	virtual int handler_quit ( int, void * = NULL );
-	virtual int handler_close_window ( int, void * = NULL );
+	virtual int handler_quit ( int, void const* = NULL );
+	virtual int handler_close_window ( int, void const* = NULL );
 	yaal::hconsole::OMenuItem * build_sub_menu ( yaal::tools::HXml::ONode &,
 			menu_handlers_map_t const & );
 	void build_menu_item ( yaal::tools::HXml::ONode &,

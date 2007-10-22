@@ -73,12 +73,12 @@ protected:
 	virtual void sync ( void );
 	void sync ( int, hconsole::HEditControl & );
 	void sync ( int, HDataListControl & );
-	int handler_add_new ( int, void * );
-	int handler_edit ( int, void * );
-	int handler_delete ( int, void * );
-	int handler_save ( int, void * );
-	int handler_requery ( int, void * );
-	int handler_cancel ( int, void * );
+	int handler_add_new ( int, void const* );
+	int handler_edit ( int, void const* );
+	int handler_delete ( int, void const* );
+	int handler_save ( int, void const* );
+	int handler_requery ( int, void const* );
+	int handler_cancel ( int, void const* );
 private:
 	HDataWindow ( HDataWindow const & );
 	HDataWindow & operator = ( HDataWindow const & );

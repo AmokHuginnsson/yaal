@@ -59,6 +59,9 @@ HDataProcess::~HDataProcess ( void )
 	if ( f_psRootMenu )
 		destroy_menu ( f_psRootMenu );
 	f_psRootMenu = NULL;
+#ifdef __DEBUGGER_BABUNI__
+	log_trace << "destruction success" << endl;
+#endif /* __DEBUGGER_BABUNI__ */
 	return;
 	M_EPILOG
 	}
@@ -179,7 +182,7 @@ HDataBase * HDataProcess::data_base ( void )
 	return ( & f_oDataBase );
 	}
 
-int HDataProcess::handler_quit ( int a_iCode, void * )
+int HDataProcess::handler_quit ( int a_iCode, void const* )
 	{
 	M_PROLOG
 	HDataWindow * l_poWindow = NULL;
@@ -204,7 +207,7 @@ int HDataProcess::handler_quit ( int a_iCode, void * )
 	M_EPILOG
 	}
 
-int HDataProcess::handler_close_window ( int a_iCode, void * )
+int HDataProcess::handler_close_window ( int a_iCode, void const* )
 	{
 	M_PROLOG
 	HDataWindow * l_poWindow = NULL;

@@ -909,9 +909,9 @@ HString& HString::insert( int a_iFrom, int a_iLength, char const* a_pcChunk )
 		{
 		if ( a_pcChunk && ( static_cast<size_t>( a_iLength ) > ::strlen( a_pcChunk ) ) )
 			M_THROW( "length too big for this chunk", a_iLength );
-		int l_iOldSize = f_iSize;
-		hs_realloc( get_length() + a_iLength + 1 );
-		::memmove( f_pcBuffer + a_iFrom + a_iLength, f_pcBuffer + a_iFrom, l_iOldSize - a_iFrom );
+		int l_iLength = get_length();
+		hs_realloc( l_iLength + a_iLength + 1 );
+		::memmove( f_pcBuffer + a_iFrom + a_iLength, f_pcBuffer + a_iFrom, ( l_iLength + 1 ) - a_iFrom );
 		if ( a_pcChunk )
 			::strncpy( f_pcBuffer + a_iFrom, a_pcChunk, a_iLength );
 		}

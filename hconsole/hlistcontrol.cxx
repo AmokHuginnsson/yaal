@@ -273,6 +273,7 @@ void HListControl::draw_scroll( int a_iPosX )
 
 void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int a_iColumnOffset, HColumnInfo const* const  a_poColumnInfo, bool a_bChecked )
 	{
+	M_PROLOG
 	int l_iTmp = 0;
 	HConsole& cons = HCons::get_instance();
 	l_iTmp = f_oVarTmpBuffer.get_length();
@@ -341,6 +342,7 @@ void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int 
 				( a_oIt == f_sMatch.f_oCurrentMatch )
 				&& ( a_iColumn == f_sMatch.f_iColumnWithMatch ) );
 	return;
+	M_EPILOG
 	}
 
 namespace

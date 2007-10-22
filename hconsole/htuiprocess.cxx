@@ -63,6 +63,10 @@ HTUIProcess::HTUIProcess( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
 HTUIProcess::~HTUIProcess( void )
 	{
 	M_PROLOG
+	f_oWindows->remove_head();
+#ifdef __DEBUGGER_BABUNI__
+	log_trace << "destruction success" << endl;
+#endif /* __DEBUGGER_BABUNI__ */
 	return;
 	M_EPILOG
 	}
@@ -133,8 +137,9 @@ int HTUIProcess::process_stdin( int a_iCode )
 	M_PROLOG
 	HString l_oCommand;
 	n_bInputWaiting = false;
+	HConsole& cons = HCons::get_instance();
 	if ( ! a_iCode )
-		a_iCode = HCons::get_instance().get_key();
+		a_iCode = cons.get_key();
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers( a_iCode, f_oPreprocessHandlers );
 	if ( a_iCode && !! (*f_oForegroundWindow) )
@@ -161,29 +166,29 @@ int HTUIProcess::process_stdin( int a_iCode )
 	n_bNeedRepaint = true;
 	if ( a_iCode )
 		{
-		if ( a_iCode > D_KEY_COMMAND_(D_KEY_META_(0)) )
-			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+		if ( a_iCode > KEY<KEY<0>::meta>::command )
+			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"COMMAND-META-%c: %5d       ",
-					a_iCode - D_KEY_COMMAND_(D_KEY_META_(0)), a_iCode );
-		else if ( a_iCode > D_KEY_COMMAND_(0) )
-			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+					a_iCode - KEY<KEY<0>::meta>::command, a_iCode );
+		else if ( a_iCode > KEY<0>::command )
+			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"     COMMAND-%c: %5d       ",
-					a_iCode - D_KEY_COMMAND_(0), a_iCode );
-		else if ( a_iCode > D_KEY_META_(0) )
-			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+					a_iCode - KEY<0>::command, a_iCode );
+		else if ( a_iCode > KEY<0>::meta )
+			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"        META-%c: %5d       ",
-					a_iCode - D_KEY_META_(0), a_iCode );
-		else if ( a_iCode < D_KEY_ESC )
-			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+					a_iCode - KEY<0>::meta, a_iCode );
+		else if ( a_iCode < KEY_CODES::D_ESC )
+			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"        CTRL-%c: %5d       ",
 					a_iCode + 96, a_iCode);
 		else
-			c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
 					"             %c: %5d       ",
 					a_iCode, a_iCode );
 		}
 	else
-		c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN, "                           " );
+		cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( a_iCode && !! (*f_oForegroundWindow) )
 		(*f_oForegroundWindow)->status_bar()->message ( COLORS::D_FG_RED,
@@ -192,7 +197,7 @@ int HTUIProcess::process_stdin( int a_iCode )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_alert( int, void* )
+int HTUIProcess::handler_alert( int, void const* )
 	{
 	M_PROLOG
 	if ( n_bNeedRepaint )
@@ -204,7 +209,7 @@ int HTUIProcess::handler_alert( int, void* )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_interrupt( int, void* )
+int HTUIProcess::handler_interrupt( int, void const* )
 	{
 	M_PROLOG
 	if ( n_bInputWaiting )
@@ -216,7 +221,7 @@ int HTUIProcess::handler_interrupt( int, void* )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_idle( int a_iCode, void* )
+int HTUIProcess::handler_idle( int a_iCode, void const* )
 	{
 	M_PROLOG
 #ifdef __DEBUG__
@@ -245,7 +250,7 @@ int HTUIProcess::process_mouse( int )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_mouse( int a_iCode, void* )
+int HTUIProcess::handler_mouse( int a_iCode, void const* )
 	{
 	M_PROLOG
 	a_iCode = 0;
@@ -256,7 +261,7 @@ int HTUIProcess::handler_mouse( int a_iCode, void* )
 	if ( n_bNeedRepaint )
 		refresh();
 #ifdef __DEBUGGER_BABUNI__
-	c_cmvprintf( 0, 0,	COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
+	HCons::get_instance().c_cmvprintf( 0, 0,	COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );
 	n_bNeedRepaint = true;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -264,7 +269,7 @@ int HTUIProcess::handler_mouse( int a_iCode, void* )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_refresh( int, void* )
+int HTUIProcess::handler_refresh( int, void const* )
 	{
 	M_PROLOG
 	HConsole& cons = HCons::get_instance();
@@ -276,7 +281,7 @@ int HTUIProcess::handler_refresh( int, void* )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_quit( int, void* )
+int HTUIProcess::handler_quit( int, void const* )
 	{
 	M_PROLOG
 	f_bLoop = false;
@@ -285,7 +290,7 @@ int HTUIProcess::handler_quit( int, void* )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_jump_meta_tab( int a_iCode, void* )
+int HTUIProcess::handler_jump_meta_tab( int a_iCode, void const* )
 	{
 	M_PROLOG
 	if ( f_iIdleCycles < 5 )
@@ -298,7 +303,7 @@ int HTUIProcess::handler_jump_meta_tab( int a_iCode, void* )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_jump_meta_direct( int a_iCode, void* )
+int HTUIProcess::handler_jump_meta_direct( int a_iCode, void const* )
 	{
 	M_PROLOG
 	a_iCode = ( a_iCode & 0xff ) - '0';
@@ -313,7 +318,7 @@ int HTUIProcess::handler_jump_meta_direct( int a_iCode, void* )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_close_window( int a_iCode, void* )
+int HTUIProcess::handler_close_window( int a_iCode, void const* )
 	{
 	M_PROLOG
 	model_t::cyclic_iterator it = f_oForegroundWindow;
