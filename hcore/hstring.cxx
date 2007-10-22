@@ -897,17 +897,21 @@ HString& HString::insert( int a_iFrom, int a_iLength, char const* a_pcChunk )
 	if ( a_iFrom < 0 )
 		{
 		a_iLength += a_iFrom;
-		if ( a_pcChunk && ( static_cast<size_t>( -a_iFrom ) > ::strlen( a_pcChunk ) ) )
-			M_THROW( "negative offset caused chunk overflow", a_iFrom );
-		a_pcChunk += -a_iFrom;
+		if ( a_pcChunk )
+			{
+			if ( static_cast<size_t>( -a_iFrom ) > ::strlen( a_pcChunk ) )
+				M_THROW( "negative offset caused chunk overflow", a_iFrom );
+			a_pcChunk += -a_iFrom;
+			}
 		a_iFrom = 0;
 		}
 	if ( ( a_iLength > 0 ) && ( a_iFrom < f_iSize ) )
 		{
 		if ( a_pcChunk && ( static_cast<size_t>( a_iLength ) > ::strlen( a_pcChunk ) ) )
 			M_THROW( "length too big for this chunk", a_iLength );
+		int l_iOldSize = f_iSize;
 		hs_realloc( get_length() + a_iLength + 1 );
-		::memmove( f_pcBuffer + a_iFrom + a_iLength, f_pcBuffer + a_iFrom, f_iSize - a_iFrom );
+		::memmove( f_pcBuffer + a_iFrom + a_iLength, f_pcBuffer + a_iFrom, l_iOldSize - a_iFrom );
 		if ( a_pcChunk )
 			::strncpy( f_pcBuffer + a_iFrom, a_pcChunk, a_iLength );
 		}
