@@ -30,6 +30,7 @@ Copyright:
 #include <ctime>
 
 #include "hcore/hstring.h"
+#include "hcore/hpool.h"
 
 namespace yaal
 {
@@ -41,8 +42,9 @@ extern char const * const n_pcDefaultTimeFormat;
 
 class HTime
 	{
+	typedef yaal::hcore::HPool<char> cache_t;
 	HString	f_oFormat;
-	mutable HString	f_oVarTmpBuffer;
+	mutable cache_t f_oCache;
 	time_t	f_xValue;
 	tm			f_sBroken;
 public:

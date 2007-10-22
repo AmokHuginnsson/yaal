@@ -30,6 +30,7 @@ Copyright:
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hpattern.h"
+#include "hpool.h"
 
 namespace yaal
 {
@@ -247,10 +248,11 @@ void HPattern::prepare_error_message ( int const a_iError,
 		char const * const a_pcString )
 	{
 	M_PROLOG
-	int l_iSize = regerror ( a_iError, & f_sCompiled, NULL, 0 ) + 1;
-	f_oError.hs_realloc ( l_iSize + 1 );
-	M_ENSURE ( static_cast < int > ( regerror ( a_iError, & f_sCompiled,
-					f_oError.raw(), l_iSize ) ) < l_iSize );
+	int l_iSize = ::regerror( a_iError, &f_sCompiled, NULL, 0 ) + 1;
+	HPool<char> l_oBuffer( l_iSize + 1 );
+	M_ENSURE( static_cast<int>( ::regerror( a_iError, &f_sCompiled,
+					l_oBuffer.raw(), l_iSize ) ) < l_iSize );
+	f_oError = l_oBuffer.raw();
 	if ( a_pcString )
 		{
 		f_oError += ": `";

@@ -44,7 +44,7 @@ namespace hcore
 
 extern char const * g_ppcErrMsgHPool [ ];
 
-template < typename tType >
+template<typename tType>
 class HPool
 	{
 public:
@@ -78,9 +78,10 @@ public:
 	void push_back( tType const& );
 	void reset( void );
 	int size( void ) const;
+	tType* raw( void ) const;
 private:
-	HPool ( HPool const & );
-	HPool & operator = ( HPool const & );
+	HPool( HPool const& );
+	HPool& operator = ( HPool const& );
 	};
 
 template < typename tType >
@@ -169,6 +170,12 @@ template<typename tType>
 int HPool<tType>::size( void ) const
 	{
 	return ( f_iTop );
+	}
+
+template<typename tType>
+tType* HPool<tType>::raw( void ) const
+	{
+	return ( f_ptPool );
 	}
 
 }

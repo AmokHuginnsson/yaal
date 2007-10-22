@@ -36,7 +36,7 @@ namespace yaal
 namespace hcore
 {
 
-HStreamInterface::HStreamInterface( void ) : f_oVarTmpBuffer()
+HStreamInterface::HStreamInterface( void ) : f_oCache( 1, cache_t::D_AUTO_GROW )
 	{
 	return;
 	}
@@ -143,20 +143,19 @@ int HStreamInterface::read_until( HString& a_roMessage, char const* const a_pcSt
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	char l_cByte = 0;
-	f_oVarTmpBuffer = "";
+	char* l_pcBuffer = NULL;
 	do
 		{
-		if ( do_read( &l_cByte, sizeof ( char ) * 1 ) <= 0 )
+		f_oCache.pool_realloc( l_iCtr + 1 );
+		l_pcBuffer = f_oCache.raw();
+		if ( do_read( l_pcBuffer + l_iCtr, sizeof ( char ) * 1 ) <= 0 )
 			break;
-		f_oVarTmpBuffer += l_cByte;
-		++ l_iCtr;
 		}
-	while ( ! ::strchr( a_pcStopSet, l_cByte ) );
+	while ( ! ::strchr( a_pcStopSet, l_pcBuffer[ l_iCtr ++ ] ) );
 	l_iCtr --; /* go back one char for stripping terminator */
 	if ( l_iCtr >= 0 )
-		f_oVarTmpBuffer.set_at( l_iCtr, 0 );
-	a_roMessage = f_oVarTmpBuffer;
+		l_pcBuffer[ l_iCtr ] = 0 ;
+	a_roMessage = l_pcBuffer;
 	return ( l_iCtr );
 	M_EPILOG
 	}

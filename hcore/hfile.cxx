@@ -132,11 +132,13 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 			{
 			if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
 				M_THROW ( _ ( "line too long" ), l_iLength );
-			a_roLine.hs_realloc ( l_iLength );
-			l_pcPtr = a_roLine.raw();
+			f_oCache.pool_realloc( l_iLength );
+			l_pcPtr = f_oCache.raw();
 			M_ENSURE ( static_cast<int>( ::fread( l_pcPtr,
 							sizeof ( char ), l_iLength,
 							static_cast<FILE*>( f_pvHandle ) ) ) == l_iLength );
+			l_pcPtr[ l_iLength ] = 0;
+			a_roLine = l_pcPtr;
 			}
 		}
 	else /* D_UNBUFFERED_READS */
@@ -144,17 +146,16 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		l_iLength = read_until( a_roLine );
 		if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
 			M_THROW ( _ ( "line too long" ), l_iLength );
-		l_pcPtr = a_roLine.raw();
 		}
 	if ( l_iLength )
 		{
 		if ( ( a_eMode & D_STRIP_NEWLINES ) && ( l_iLength > 0 ) )
 			{
 			l_iLength --;
-			if ( ( l_iLength > 0 ) && ( l_pcPtr [ l_iLength - 1 ] == '\r' ) )
+			if ( ( l_iLength > 0 ) && ( a_roLine[ l_iLength - 1 ] == '\r' ) )
 				l_iLength --;
 			}
-		l_pcPtr [ l_iLength ] = 0;
+		a_roLine.set_at( l_iLength, 0 );
 		return ( l_iLength );
 		}
 	return ( - 1 );

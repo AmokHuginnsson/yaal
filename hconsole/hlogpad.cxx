@@ -78,8 +78,7 @@ void HLogPad::do_refresh ( void )
 	HLogLine* l_poLogLine = NULL;
 	draw_label();
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
-	memset ( f_oVarTmpBuffer.raw(), ' ', f_iWidthRaw );
-	f_oVarTmpBuffer.raw() [ f_iWidthRaw ] = 0;
+	f_oVarTmpBuffer.fillz(  ' ', f_iWidthRaw );
 	f_iAttribute = COLORS::D_ATTR_NORMAL | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		cons.c_cmvprintf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );

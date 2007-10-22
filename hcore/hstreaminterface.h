@@ -28,6 +28,7 @@ Copyright:
 #define __HSTREAMINTERFACE_H
 
 #include "hcore/hstring.h"
+#include "hcore/hpool.h"
 
 namespace yaal
 {
@@ -42,7 +43,8 @@ HStreamInterface& flush( HStreamInterface& );
 class HStreamInterface
 	{
 protected:
-	HString f_oVarTmpBuffer;
+	typedef yaal::hcore::HPool<char> cache_t;
+	cache_t f_oCache;
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );

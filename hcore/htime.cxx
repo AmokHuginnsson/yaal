@@ -41,7 +41,7 @@ namespace hcore
 char const * const n_pcDefaultTimeFormat = "%a, %d %b %Y %T %z";
 
 HTime::HTime ( void ) : f_oFormat ( n_pcDefaultTimeFormat ),
-	f_oVarTmpBuffer(), f_xValue(), f_sBroken()
+	f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue(), f_sBroken()
 	{
 	M_PROLOG
 	set_now();
@@ -51,7 +51,7 @@ HTime::HTime ( void ) : f_oFormat ( n_pcDefaultTimeFormat ),
 
 HTime::HTime ( char const * const a_pcStrTime )
 	: f_oFormat ( n_pcDefaultTimeFormat ),
-	f_oVarTmpBuffer(), f_xValue(), f_sBroken()
+	f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue(), f_sBroken()
 	{
 	M_PROLOG
 	char * l_pcErr = strptime ( a_pcStrTime, f_oFormat, & f_sBroken );
@@ -65,7 +65,7 @@ HTime::HTime ( char const * const a_pcStrTime )
 	}
 
 HTime::HTime ( HTime const & a_roTime ) : f_oFormat ( n_pcDefaultTimeFormat ),
-	f_oVarTmpBuffer(), f_xValue(), f_sBroken()
+	f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue(), f_sBroken()
 	{
 	M_PROLOG
 	( * this ) = a_roTime;
@@ -74,7 +74,7 @@ HTime::HTime ( HTime const & a_roTime ) : f_oFormat ( n_pcDefaultTimeFormat ),
 	}
 
 HTime::HTime ( time_t const & a_rxTime ) : f_oFormat ( n_pcDefaultTimeFormat ),
-	f_oVarTmpBuffer(), f_xValue ( a_rxTime ), f_sBroken()
+	f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue ( a_rxTime ), f_sBroken()
 	{
 	M_PROLOG
 	M_ENSURE ( localtime_r ( & f_xValue, & f_sBroken ) );
@@ -84,7 +84,7 @@ HTime::HTime ( time_t const & a_rxTime ) : f_oFormat ( n_pcDefaultTimeFormat ),
 
 HTime::HTime ( int const a_iYear, int const a_iMonth, int const a_iDay,
 							 int const a_iHour, int const a_iMinute, int const a_iSecond )
-	: f_oFormat ( n_pcDefaultTimeFormat ), f_oVarTmpBuffer(), f_xValue(),
+	: f_oFormat ( n_pcDefaultTimeFormat ), f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue(),
 	f_sBroken()
 	{
 	M_PROLOG
@@ -220,7 +220,7 @@ HTime & HTime::operator = ( HTime const & a_roTime )
 		{
 		f_oFormat = a_roTime.f_oFormat;
 		f_xValue = a_roTime.f_xValue;
-		f_oVarTmpBuffer = "";
+		f_oCache[ 0 ] = 0;
 		memcpy ( & f_sBroken, & a_roTime.f_sBroken, sizeof ( tm ) );
 		}
 	return ( * this );
@@ -288,7 +288,7 @@ bool HTime::operator > ( time_t const & a_rxTime ) const
 	M_EPILOG
 	}
 
-HTime::operator char const * ( void ) const
+HTime::operator char const* ( void ) const
 	{
 	M_PROLOG
 	int l_iSize = 0;
@@ -296,16 +296,16 @@ HTime::operator char const * ( void ) const
 	l_iSize = strftime ( NULL, 1024, f_oFormat, & f_sBroken ) + 1;
 	if ( l_iSize < 2 )
 		M_THROW ( "bad format", errno );
-	f_oVarTmpBuffer.hs_realloc ( l_iSize );
-	M_ENSURE ( static_cast < int > ( strftime ( f_oVarTmpBuffer.raw(),
+	f_oCache.pool_realloc ( l_iSize );
+	M_ENSURE ( static_cast < int > ( strftime ( f_oCache.raw(),
 					l_iSize, f_oFormat, & f_sBroken ) ) < l_iSize );
 #else /* HAVE_SMART_STRFTIME */
-	f_oVarTmpBuffer.hs_realloc ( 64 ); /* FIXME that is pretty dumb hack */
-	l_iSize = strftime ( f_oVarTmpBuffer.raw(), 63, f_oFormat, & f_sBroken ) + 1;
+	f_oCache.pool_realloc ( 64 ); /* FIXME that is pretty dumb hack */
+	l_iSize = strftime ( f_oCache.raw(), 63, f_oFormat, & f_sBroken ) + 1;
 	if ( l_iSize < 2 )
 		M_THROW ( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */
-	return ( f_oVarTmpBuffer );
+	return ( f_oCache.raw() );
 	M_EPILOG
 	}
 

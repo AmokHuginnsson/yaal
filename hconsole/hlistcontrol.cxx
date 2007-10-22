@@ -760,7 +760,7 @@ void HListControl::go_to_match( void )
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
 			{
 			get_text_for_cell( f_oCursor, l_iCtr, D_HSTRING );
-			l_pcHighlightStart = f_oVarTmpBuffer.raw();
+			l_pcHighlightStart = static_cast<char const* const>( f_oVarTmpBuffer );
 			l_iCtrLoc = 0;
 			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart ) ) )
 				{
@@ -842,7 +842,7 @@ void HListControl::go_to_match_previous ( void )
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
 			{
 			get_text_for_cell( f_oCursor, l_iCtr, D_HSTRING );
-			l_pcHighlightStart = f_oVarTmpBuffer.raw();
+			l_pcHighlightStart = static_cast<char const* const>( f_oVarTmpBuffer );
 			l_iCtrLoc = 0;
 			if ( f_sMatch.f_iMatchNumber < 0 )
 				f_sMatch.f_iMatchNumber = f_oPattern.count ( l_pcHighlightStart );

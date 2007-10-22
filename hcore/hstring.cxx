@@ -106,8 +106,8 @@ void HString::hs_realloc ( int const a_iSize )
 		f_iSize = 1;
 		while ( f_iSize < a_iSize )
 			f_iSize <<= 1;
-		f_pcBuffer = xrealloc < char > ( f_pcBuffer, f_iSize );
-		memset ( f_pcBuffer + l_iOldLength, 0, f_iSize - l_iOldLength );
+		f_pcBuffer = xrealloc<char>( f_pcBuffer, f_iSize );
+		::memset( f_pcBuffer + l_iOldLength, 0, f_iSize - l_iOldLength );
 		}
 	return;
 	M_EPILOG
@@ -328,18 +328,16 @@ HString & HString::operator += ( HString const & a_roString )
 char HString::operator[] ( int const a_iIndex )
 	{
 	M_PROLOG
-	int l_iLength = get_length();
-	if  ( ( a_iIndex >= f_iSize ) || ( a_iIndex > l_iLength ) )
-		M_THROW ( "index out of bound", a_iIndex );
-	return ( f_pcBuffer [ a_iIndex ] );
+	if ( a_iIndex >= f_iSize )
+		M_THROW( "index out of bound", a_iIndex );
+	return ( f_pcBuffer[ a_iIndex ] );
 	M_EPILOG
 	}
 
 char HString::set_at( int const a_iIndex, char a_cChar )
 	{
 	M_PROLOG
-	int l_iLength = get_length();
-	if  ( ( a_iIndex >= f_iSize ) || ( a_iIndex > l_iLength ) )
+	if ( a_iIndex >= f_iSize )
 		M_THROW( "index out of bound", a_iIndex );
 	f_pcBuffer[ a_iIndex ] = a_cChar;
 	return ( a_cChar );
@@ -855,28 +853,55 @@ HString HString::split ( char const * const a_pcAt, int const a_iPart ) const
 	M_EPILOG
 	}
 
-HString & HString::fill ( char a_cFiller, int a_iLength, int a_iOffset )
+HString& HString::fill( char a_cFiller, int a_iLength, int a_iOffset )
 	{
 	M_PROLOG
 	if ( a_iLength < 0 )
-		M_THROW ( _ ( "bad length" ), a_iLength );
+		M_THROW( _( "bad length" ), a_iLength );
 	if ( a_iOffset < 0 )
-		M_THROW ( _ ( "bad offset" ), a_iOffset );
+		M_THROW( _( "bad offset" ), a_iOffset );
 	if ( ( a_iOffset + a_iLength ) >= f_iSize )
-		M_THROW ( _ ( "overflow" ), a_iOffset + a_iLength );
+		M_THROW( _( "overflow" ), a_iOffset + a_iLength );
 	if ( a_iLength == 0 )
 		a_iLength = f_iSize - a_iOffset;
-	memset ( f_pcBuffer + a_iOffset, a_cFiller, a_iLength );
-	return ( * this );
+	::memset( f_pcBuffer + a_iOffset, a_cFiller, a_iLength );
+	return ( *this );
 	M_EPILOG
 	}
 
-HString & HString::fillz ( char a_cFiller, int a_iLength, int a_iOffset )
+HString& HString::fillz ( char a_cFiller, int a_iLength, int a_iOffset )
 	{
 	M_PROLOG
-	fill ( a_cFiller, a_iLength, a_iOffset );
-	f_pcBuffer [ a_iLength != 0 ? a_iLength + a_iOffset + 1 : f_iSize ] = 0;
-	return ( * this );
+	fill( a_cFiller, a_iLength, a_iOffset );
+	f_pcBuffer [ a_iLength != 0 ? a_iLength + a_iOffset : f_iSize ] = 0;
+	return ( *this );
+	M_EPILOG
+	}
+
+void HString::erase( int a_iFrom, int a_iLength )
+	{
+	M_PROLOG
+	if ( a_iFrom < 0 )
+		a_iLength += a_iFrom, a_iFrom = 0;
+	if ( ( a_iFrom + a_iLength ) >= f_iSize )
+		a_iLength = ( f_iSize - a_iFrom ) - 1;
+	if ( ( a_iLength > 0 ) && ( a_iFrom < f_iSize ) )
+		::memmove( f_pcBuffer + a_iFrom, f_pcBuffer + a_iFrom + a_iLength, f_iSize - ( a_iFrom + a_iLength ) );
+	return;
+	M_EPILOG
+	}
+
+void HString::insert( int a_iFrom, int a_iLength )
+	{
+	M_PROLOG
+	if ( a_iFrom < 0 )
+		a_iLength += a_iFrom, a_iFrom = 0;
+	if ( ( a_iLength > 0 ) && ( a_iFrom < f_iSize ) )
+		{
+		hs_realloc( get_length() + a_iLength + 1 );
+		::memmove( f_pcBuffer + a_iFrom + a_iLength, f_pcBuffer + a_iFrom, f_iSize - a_iFrom );
+		}
+	return;
 	M_EPILOG
 	}
 
