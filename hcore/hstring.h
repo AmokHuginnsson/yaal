@@ -86,9 +86,9 @@ public:
 	int get_length( void ) const;
 	HString& format( char const* const, ... );
 	HString& vformat( char const* const, void* );
-	int find( char const, int const = 0 ) const;
-	int find( char const* const, int const = 0 ) const;
-	int reverse_find( char const, int const = 0 ) const;
+	int find( char const, int = 0 ) const;
+	int find( char const* const, int = 0 ) const;
+	int reverse_find( char const, int = 0 ) const;
 	int find_one_of( char const* const, int = 0 ) const;
 	int reverse_find_one_of( char const* const, int = 0 ) const;
 	int find_other_than( char const* const, int = 0 ) const;
@@ -123,13 +123,6 @@ bool operator >= ( char const* const, HString const& );
 bool operator <= ( char const* const, HString const& );
 bool operator > ( char const* const, HString const& );
 bool operator < ( char const* const, HString const& );
-
-/* Useful helpers */
-char * strrnpbrk( char const* const, char const* const,
-		int /* no const - used */ );
-char const* strrpbrk( char const* const, char const* const );
-int strrnspn( char const* const, char const* const, int const );
-int strrspn( char const* const, char const* const );
 
 extern char const n_pcWhiteSpace[];
 

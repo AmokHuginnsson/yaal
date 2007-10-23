@@ -35,7 +35,6 @@ namespace yaal
 namespace hcore
 {
 
-class HCondition;
 class HMutex
 	{
 public:
@@ -64,7 +63,6 @@ public:
 	/*}*/
 private:
 	/*{*/
-	friend class HCondition;
 	HMutex( HMutex const& );
 	HMutex& operator = ( HMutex const& );
 	/*}*/
@@ -72,19 +70,11 @@ private:
 
 class HCondition
 	{
-	HChunk f_oAttributes;
 	HChunk f_oCondition;
-	HMutex f_oMutex;
 public:
-	typedef enum
-		{
-		D_OK,
-		D_TIMEOUT,
-		D_INTERRUPT
-		} status_t;
 	HCondition( void );
 	virtual ~HCondition( void );
-	status_t wait( int long unsigned* = NULL, int long unsigned* = NULL );
+	void wait( void );
 	void signal( void );
 private:
 	HCondition( HCondition const& );

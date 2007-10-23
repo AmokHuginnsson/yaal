@@ -92,6 +92,21 @@ protected:
 	virtual void do_refresh ( void );
 	virtual int do_process_input( int );
 	virtual int do_click ( mouse::OMouse & );
+private:
+	int find_eow( int );
+	int go_to_eow( int );
+	int kill_line( void );
+	int move_right( int );
+	int move_left( void );
+	int go_to_end( int );
+	int delete_char( int );
+	int kill_char( void );
+	int find_bow( int );
+	int go_to_bow( int );
+	int delete_word( int );
+	int kill_word( int );
+	int insert_char( int, int );
+	int update_from_history( void );
 	};
 
 }

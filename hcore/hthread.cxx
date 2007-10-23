@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <pthread.h>
+#include <semaphore.h>
 #include <cstring>
 #include <unistd.h>
 #include <libintl.h>
@@ -246,13 +247,10 @@ HLock::~HLock( void )
 	}
 
 HCondition::HCondition( void )
-	: f_oAttributes( xcalloc<pthread_condattr_t>( 1 ) ), f_oCondition( xcalloc<pthread_cond_t>( 1 ) ), f_oMutex()
+	: f_oCondition( xcalloc<sem_t>( 1 ) )
 	{
 	M_PROLOG
-	pthread_condattr_t* attr = static_cast<pthread_condattr_t*>( f_oAttributes.get() );
-	::pthread_condattr_init( attr );
-	::pthread_cond_init( static_cast<pthread_cond_t*>( f_oCondition.get() ), attr );
-	f_oMutex.lock();
+	M_ENSURE( ::sem_init( static_cast<sem_t*>( f_oCondition.get() ), 0, 0 ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -260,47 +258,23 @@ HCondition::HCondition( void )
 HCondition::~HCondition( void )
 	{
 	M_PROLOG
-	f_oMutex.unlock();
-	M_ENSURE( ::pthread_cond_destroy( static_cast<pthread_cond_t*>( f_oCondition.get() ) ) == 0 );
-	::pthread_condattr_destroy( static_cast<pthread_condattr_t*>( f_oAttributes.get() ) );
+	M_ENSURE( ::sem_destroy( static_cast<sem_t*>( f_oCondition.get() ) ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-HCondition::status_t HCondition::wait( int long unsigned* a_pulTimeOutSeconds,
-		int long unsigned* a_pulTimeOutNanoSeconds )
+void HCondition::wait( void )
 	{
 	M_PROLOG
-	int l_iError = 0;
-	timespec l_sTimeOut;
-	if ( a_pulTimeOutSeconds || a_pulTimeOutNanoSeconds )
-		{
-		::memset ( &l_sTimeOut, 0, sizeof ( timespec ) );
-		if ( a_pulTimeOutSeconds )
-			l_sTimeOut.tv_sec = ( *a_pulTimeOutSeconds );
-		if ( a_pulTimeOutNanoSeconds )
-			l_sTimeOut.tv_nsec = ( *a_pulTimeOutNanoSeconds );
-		l_iError = ::pthread_cond_timedwait( static_cast<pthread_cond_t*>( f_oCondition.get() ),
-					static_cast<pthread_mutex_t*>( f_oMutex.f_oMutex.get() ), &l_sTimeOut );
-		if ( a_pulTimeOutSeconds )
-			( * a_pulTimeOutSeconds ) = l_sTimeOut.tv_sec;
-		if ( a_pulTimeOutNanoSeconds )
-			( * a_pulTimeOutNanoSeconds ) = l_sTimeOut.tv_nsec;
-		M_ENSURE ( ( l_iError == 0 ) || ( l_iError == EINTR ) || ( l_iError == ETIMEDOUT ) );
-		return ( ( l_iError == 0 ) ? D_OK : ( ( l_iError == EINTR ) ? D_INTERRUPT : D_TIMEOUT ) );
-		}
-	else
-		::pthread_cond_wait( static_cast<pthread_cond_t*>( f_oCondition.get() ),
-				static_cast<pthread_mutex_t*>( f_oMutex.f_oMutex.get() ) ); /* Always returns 0. */
-	return ( D_OK );
+	::sem_wait( static_cast<sem_t*>( f_oCondition.get() ) ); /* Always returns 0. */
+	return;
 	M_EPILOG
 	}
 
 void HCondition::signal( void )
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	::pthread_cond_signal( static_cast<pthread_cond_t*>( f_oCondition.get() ) );
+	M_ENSURE( ::sem_post( static_cast<sem_t*>( f_oCondition.get() ) ) == 0 );
 	return;
 	M_EPILOG
 	}

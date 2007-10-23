@@ -330,10 +330,9 @@ int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
 			/* have a value :-o */
 			int l_iEndOfOption = l_iIndex;
 			l_iIndex = a_roOption.find_other_than( n_pcWhiteSpace, l_iIndex );
-			if ( ( l_iIndex > 0 ) && a_roOption[ l_iIndex + l_iEndOfOption ] )
+			if ( ( l_iIndex > 0 ) && a_roOption[ l_iIndex ] )
 				{
 				/* we have found a non-whitespace, so there certainly is a value */
-				l_iIndex += l_iEndOfOption;
 				l_iEnd = ( l_iLenght - 1 ) - a_roOption.reverse_find_other_than( n_pcWhiteSpace );
 				/* now we strip apostrophe or quotation marks */
 				if ( ( ( a_roOption[ l_iEnd ] == '\'' )
