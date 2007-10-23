@@ -150,15 +150,13 @@ int HTUIProcess::process_stdin( int a_iCode )
 		{
 		if ( !! (*f_oForegroundWindow) )
 			f_oCommand = (*f_oForegroundWindow)->get_command();
-		if ( f_oCommand
-				&& static_cast< char const * const>( f_oCommand )[ 0 ] )
+		if ( f_oCommand && static_cast<char const* const>( f_oCommand )[ 0 ] )
 			l_oCommand = process_command();
-		if ( l_oCommand
-				&& static_cast< char const * const>( l_oCommand )[ 0 ]
+		if ( l_oCommand && static_cast<char const* const>( l_oCommand )[ 0 ]
 				&& !! (*f_oForegroundWindow) )
 			(*f_oForegroundWindow)->status_bar()->message( COLORS::D_FG_RED,
 					"unknown command: `%s'",
-					static_cast<char const * const>( l_oCommand ) );
+					static_cast<char const* const>( l_oCommand ) );
 		}
 	if ( n_bNeedRepaint )
 		refresh();
@@ -285,6 +283,7 @@ int HTUIProcess::handler_quit( int, void const* )
 	{
 	M_PROLOG
 	f_bLoop = false;
+	n_bNeedRepaint = false;
 	HCons::get_instance().clrscr();
 	return ( 0 );
 	M_EPILOG
