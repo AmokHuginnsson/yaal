@@ -35,9 +35,9 @@ M_VCSID ( "$Id$" )
 #include "hconsole.h"
 #include "hsearchablecontrol.h"
 
-#ifdef __DEBUGGER_BABUNI__
+//#ifdef __DEBUGGER_BABUNI__
 #include "hcore/hlog.h"
-#endif /* __DEBUGGER_BABUNI__ */
+//#endif /* __DEBUGGER_BABUNI__ */
 
 using namespace yaal::hcore;
 
@@ -196,11 +196,12 @@ void HStatusBarControl::init_progress ( double a_dMax, char const * a_pcTitle,
 	f_iLastStep = 0;
 	f_oMessage = a_pcTitle;
 	f_oStart.set_now();
+	refresh();
 	return;
 	M_EPILOG
 	}
 
-void HStatusBarControl::update_progress ( double a_dStep,
+void HStatusBarControl::update_progress( double a_dStep,
 		char const * a_pcTitle )
 	{
 	M_PROLOG
@@ -215,18 +216,18 @@ void HStatusBarControl::update_progress ( double a_dStep,
 	if ( f_bDone )
 		return;
 	if ( a_dStep < 0 )
-		a_dStep = f_iLastStep ++;
+		a_dStep = ++ f_iLastStep;
 	l_oStoper = l_oNow - f_oStart;
 	if ( f_bEstimate )
 		{
 		if ( a_dStep )
-			l_oNow.set ( static_cast < time_t > ( ( f_dProgressSize / a_dStep ) * l_oStoper ) );
+			l_oNow.set ( static_cast<time_t>( ( f_dProgressSize / a_dStep ) * l_oStoper ) );
 		l_oLeft = l_oNow - l_oStoper;
 		}
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
-	l_iMaxBar = cons.get_width() - ( 6 + 10 + 2 + ( f_bEstimate ? 10 : 0 ) );
-	l_iNextPercent = static_cast < int > ( ( 100. * a_dStep / f_dProgressSize ) );
-	l_iNextStep = static_cast < int > ( ( l_iMaxBar * a_dStep / f_dProgressSize ) );
+	l_iMaxBar = f_iWidthRaw - ( 6 + 10 + 2 + ( f_bEstimate ? 10 : 0 ) );
+	l_iNextPercent = static_cast<int>( ( 100. * a_dStep / f_dProgressSize ) );
+	l_iNextStep = static_cast<int>( ( l_iMaxBar * a_dStep / f_dProgressSize ) );
 	l_iNextMinute = l_oStoper.get_minute();
 	l_iNextSecond = l_oStoper.get_second();
 	if ( l_iNextStep >= l_iMaxBar )
@@ -253,11 +254,16 @@ void HStatusBarControl::update_progress ( double a_dStep,
 			f_oString.format ( f_oVarTmpBuffer, "-",
 					static_cast<char const*>( l_oStoper ), l_iNextPercent, "%%" );
 			}
-		if ( f_bDone )
-			strncpy ( f_oString.raw() + cons.get_width() - 5, "done", 4 );
 		f_oString.fill ( '-', l_iMaxBar, 1 );
-		f_oString.fill ( '=', l_iNextStep, 1 );
-		cons.c_mvprintf ( cons.get_height() - 1, 0, f_oString );
+		if ( l_iNextStep > 0 )
+			f_oString.fill ( '=', l_iNextStep, 1 );
+		if ( f_bDone )
+			{
+			int l_iLength = f_oString.get_length();
+			f_oString.erase( l_iLength - 6, 5 );
+			f_oString.insert( l_iLength - 6, 4, "done" );
+			}
+		cons.c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oString );
 		f_oString = "";
 		f_iLastProgress = l_iNextStep;
 		f_iLastPercent = l_iNextPercent;
