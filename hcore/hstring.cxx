@@ -472,7 +472,7 @@ HString::operator char const * const ( void ) const
 	M_EPILOG
 	}
 
-char * HString::raw ( void ) const
+char const* const HString::raw( void ) const
 	{
 	return ( f_pcBuffer );
 	}

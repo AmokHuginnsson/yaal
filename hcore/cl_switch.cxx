@@ -70,7 +70,7 @@ char const * const make_short_opts ( OOption * const & a_rpsOptions, int a_iCoun
 				break;
 			}
 		}
-	return ( static_cast<char const* const>( a_roBuffer ) );
+	return ( a_roBuffer.raw() );
 	}
 
 option * make_option_array( OOption * const & a_rpsOptions, int a_iCount, HChunk& a_roBuffer )

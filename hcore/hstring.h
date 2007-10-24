@@ -81,7 +81,7 @@ public:
 	/* add_* functions in HList needs operator
 		 bool() operator char * works fine here */
 	operator char const* const ( void ) const;
-	char* raw( void ) const;
+	char const* const raw( void ) const;
 	bool is_empty( void ) const;
 	int get_length( void ) const;
 	HString& format( char const* const, ... );
