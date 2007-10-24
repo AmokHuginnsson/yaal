@@ -116,10 +116,11 @@ public:
 	void flush( void );
 	int size( void );
 	tType& add_element( tType* = NULL ); /* adds new element at current cursor position */
-	tType& add_head( tType* = NULL );    /* adds new element at beggining of the list */
-	tType& add_tail( tType const * = NULL );	/* adds new element at end of the list */
-	void push_back( tType const & );
+	tType& add_head( tType const* = NULL );    /* adds new element at beggining of the list */
+	tType& add_tail( tType const* = NULL );	/* adds new element at end of the list */
+	void push_back( tType const& );
 	void pop_back( void );
+	void push_front( tType const& );
 	tType& add_at( int, tType* = NULL ); /* adds new element at specified position */
 /* adds element in the way that keeps order */
 	template<typename T>
@@ -555,7 +556,7 @@ tType& HList<tType>::add_element ( tType* a_ptObject )
 	}
 
 template<typename tType>
-tType& HList<tType>::add_head ( tType* a_ptObject )
+tType& HList<tType>::add_head ( tType const* a_ptObject )
 	{
 	M_PROLOG
 	f_poHook = new HElement ( f_poHook );
@@ -598,6 +599,15 @@ void HList<tType>::pop_back( void )
 	{
 	M_PROLOG
 	remove_tail();
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+void HList<tType>::push_front( tType const& a_rtObject )
+	{
+	M_PROLOG
+	add_head( &a_rtObject );
 	return;
 	M_EPILOG
 	}

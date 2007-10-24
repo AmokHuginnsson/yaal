@@ -86,6 +86,11 @@ void HOpenSSL::OSSLContext::init( void )
 	M_EPILOG
 	}
 
+int HOpenSSL::OSSLContext::life_time( int a_iLifeTime )
+	{
+	return ( a_iLifeTime );
+	}
+
 HOpenSSL::OSSLContext::~OSSLContext( void )
 	{
 	if ( f_pvContext )

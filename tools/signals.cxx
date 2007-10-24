@@ -28,21 +28,19 @@ Copyright:
 #include <cstdio>	  /* perror function */
 #include <csignal>  /* signal handling */
 #include <unistd.h> /* kill function */
+#include <cstdlib>  /* exit */
 
 #include "config.h"
 
 #include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
 M_VCSID ( "$Id$" )
 #include "hcore/xalloc.h"
-#include "hconsole/console.h" /* conio (ncurses) ability */
-#include "hconsole/hconsole.h" /* n_bUseMouse */
 #include "hcore/hlog.h"       /* log object */
 #include "hcore/hstring.h"    /* HString class */
 #include "signals.h"
 #include "tools.h"                /* tools namespace */
 
 using namespace yaal::hcore;
-using namespace yaal::hconsole;
 
 namespace yaal
 {
@@ -50,375 +48,288 @@ namespace yaal
 namespace tools
 {
 
-namespace signals
+namespace
 {
 
-/* Some notes about signal reinstalling.
- * Default behavior on BSD and GNU systems is to keep current signal
- * handler after signal delivery, only SVID systems reinstall SIG_DFL
- * after signal delivery. So we do not need to be concernd about signal
- * reinstallation inside our signal handlers, because we support only
- * BSD and GNU compatibile systems. */
-
-typedef void ( * SIGNAL_HANDLER_t ) ( int );
-
-class HSigStackWrapper
+class HBaseSignalHandlers : public HSignalHandlerInterface
 	{
-protected:
-/*{*/
-	stack_t f_sStack;
-/*}*/
 public:
-/*{*/
-	HSigStackWrapper ( void );
-	virtual ~HSigStackWrapper ( void );
-	void create_stack ( void );
-/*}*/
-	} g_oSigStack;
+	void unlock( int );
+	void lock( int );
+	int signal_INT( int );
+	int signal_TERM( int );
+	int signal_QUIT( int );
+	int signal_TSTP( int );
+	int signal_CONT( int );
+	int signal_fatal( int ) __attribute__(( __noreturn__ ));
+	int signal_USR1( int );
+	};
 
-HSigStackWrapper::HSigStackWrapper ( void ) : f_sStack()
-	{
-	f_sStack.ss_sp = NULL;
-	f_sStack.ss_size = 0;
-	f_sStack.ss_flags = 0;
-	return;
-	}
+}
 
-HSigStackWrapper::~HSigStackWrapper ( void )
-	{
-	if ( f_sStack.ss_sp )
-		{
-		while ( f_sStack.ss_flags )
-			; /* we wait til last signal returns */
-		xfree ( f_sStack.ss_sp );
-		f_sStack.ss_sp = NULL;
-		}
-	return;
-	}
-
-void HSigStackWrapper::create_stack ( void )
+int HSignalService::HHandlerGeneric::invoke( int a_iSigNo )
 	{
 	M_PROLOG
-	int l_iError = 0;
-	f_sStack.ss_sp = xmalloc < char > ( SIGSTKSZ );
-	f_sStack.ss_size = SIGSTKSZ;
-	f_sStack.ss_flags = 0;
-	l_iError = sigaltstack ( & f_sStack, NULL );
-	if ( l_iError )
-		M_THROW ( "sigaltstack()", l_iError );
-	if ( f_sStack.ss_flags )
-		M_THROW ( "sigaltstack() failed to set stack", errno );
+	return ( (get_base()->*HANDLE)( a_iSigNo ) );
+	M_EPILOG
+	}
+
+HSignalHandlerInterface*	HSignalService::HHandlerInternal::get_base( void )
+	{
+	M_PROLOG
+	return ( &*f_oBase );
+	M_EPILOG
+	}
+
+HSignalHandlerInterface*	HSignalService::HHandlerExternal::get_base( void )
+	{
+	M_PROLOG
+	return ( f_poBase );
+	M_EPILOG
+	}
+
+int HSignalService::f_iExitStatus = 0;
+HSignalService::HSignalService( void )
+	: f_bLoop( true ), f_oLocker( xcalloc<sigset_t>( 1 ) ),
+	f_oWorker( *this ), f_oMutex(), f_oHandlers()
+	{
+	M_PROLOG
+	sigemptyset( static_cast<sigset_t*>( f_oLocker.get() ) );
+	HSignalHandlerInterface::ptr_t base( new HBaseSignalHandlers() );
+	register_handler( SIGINT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_INT ) ) );
+	register_handler( SIGTERM, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_TERM ) ) );
+	register_handler( SIGQUIT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_QUIT ) ) );
+	register_handler( SIGTSTP, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_TSTP ) ) );
+	register_handler( SIGCONT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_CONT ) ) );
+	register_handler( SIGUSR1, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_USR1 ) ) );
+	HHandlerGeneric::ptr_t fatal( new HHandlerInternal( base, &HBaseSignalHandlers::signal_fatal ) );
+	register_handler( SIGSEGV, fatal );
+	register_handler( SIGBUS, fatal );
+	register_handler( SIGABRT, fatal );
+	register_handler( SIGILL, fatal );
+	register_handler( SIGFPE, fatal );
+	register_handler( SIGIOT, fatal );
+	register_handler( SIGTRAP, fatal );
+	register_handler( SIGSYS, fatal );
+	register_handler( SIGPIPE, fatal );
+	lock_on( SIGURG );
+	f_oWorker.spawn();
 	return;
 	M_EPILOG
 	}
 
-void install_special ( SIGNAL_HANDLER_t HANDLER, int a_iSignum )
+HSignalService::~HSignalService( void )
 	{
 	M_PROLOG
-	int l_iError = 0;
-	struct sigaction l_sHandler, l_sOldHandler;
-	HString l_oError;
-#if 0 
-/* We need to wait til signal handling with sigaltstack
- * will be fixed in LinuxThreads environment. */
-	l_sHandler.sa_flags = SA_ONSTACK;
-#else
-	l_sHandler.sa_flags = 0;
-#endif
-/* order of calls of siginterrupt, sigaction does matter */
-	siginterrupt ( a_iSignum, 1 ); /* 1 means true */
-	sigemptyset ( & l_sHandler.sa_mask );
-	sigaddset ( & l_sHandler.sa_mask, a_iSignum );
-	l_sHandler.sa_handler = HANDLER;
-	l_iError = sigaction ( a_iSignum, & l_sHandler, & l_sOldHandler );
-	if ( l_iError )
-		{
-		l_oError.format ( "sigaction ( SIG(%d), ... )", a_iSignum );
-		M_THROW ( l_oError, l_iError );
-		}
-	if ( l_sOldHandler.sa_handler == SIG_IGN )
-		sigaction ( a_iSignum, & l_sOldHandler, & l_sHandler );
+	f_bLoop = false;
+	/*
+	 * man for raise() is full of shit
+	 * raise( SIG_NO ) is NOT equivalent for kill( getpid(), SIG_NO )
+	 * with respect to multi-thread environment at least
+	 * all hail to IBM Signal Managment documentation
+	 */
+	kill( getpid(), SIGURG );
+	f_oWorker.finish();
 	return;
 	M_EPILOG
 	}
+
+int HSignalService::operator()( HThread const* )
+	{
+	M_PROLOG
+	while ( f_bLoop && f_oWorker.is_alive() )
+		{
+		int l_iSigNo = 0;
+		sigwait( static_cast<sigset_t*>( f_oLocker.get() ), &l_iSigNo );
+		HLock l_oLock( f_oMutex );
+		handlers_t::HIterator it = f_oHandlers.find( l_iSigNo );
+		if ( it != f_oHandlers.end() )
+			{
+			handler_list_ptr_t i = it->second;
+			for ( handler_list_t::iterator handlerIt = i->begin(); handlerIt != i->end(); ++ handlerIt )
+				{
+				HHandlerGeneric::ptr_t handler = *handlerIt;
+				M_ASSERT( !! handler );
+				int status = handler->invoke( l_iSigNo );
+				if ( status > 0 )
+					break; /* signal was entirely consumed */
+				else if ( status < 0 )
+					{
+					f_bLoop = false;
+					schedule_exit( -1 - status );
+					}
+				}
+			}
+		else
+			M_ENSURE( l_iSigNo == SIGURG );
+		}
+	return ( 0 );
+	M_EPILOG
+	}
+
+void HSignalService::register_handler( int a_iSigNo, HSignalService::HHandlerGeneric::ptr_t a_oHandler )
+	{
+	M_PROLOG
+	HLock l_oLock( f_oMutex );
+	if ( f_oHandlers.find( a_iSigNo ) == f_oHandlers.end() )
+		f_oHandlers[ a_iSigNo ] = handler_list_ptr_t( new handler_list_t() );
+	f_oHandlers[ a_iSigNo ]->push_front( a_oHandler );
+	lock_on( a_iSigNo );
+	kill( getpid(), SIGURG );
+	return;
+	M_EPILOG
+	}
+
+void HSignalService::lock_on( int a_iSigNo )
+	{
+	M_PROLOG
+	sigaddset( static_cast<sigset_t*>( f_oLocker.get() ), a_iSigNo );
+	pthread_sigmask( SIG_BLOCK, static_cast<sigset_t*>( f_oLocker.get() ), NULL );
+	return;
+	M_EPILOG
+	}
+
+void HSignalService::schedule_exit( int a_iExitStatus )
+	{
+	f_iExitStatus = a_iExitStatus;
+	signal( SIGALRM, HSignalService::exit );
+	alarm( 1 );
+	}
+
+void HSignalService::exit( int )
+	{
+	::exit( f_iExitStatus );
+	}
+
+int HSignalService::life_time( int )
+	{
+	return ( 100 );
+	}
+
+namespace
+{
 
 /* singnal handler definitions */
 
-void signal_WINCH ( int a_iSignum )
+void HBaseSignalHandlers::unlock( int a_iSigNo )
 	{
-	M_PROLOG
-	char const * l_pcSignalMessage = NULL;
-	HString l_oMessage;
-	HConsole& cons = HCons::get_instance();
-	l_oMessage = "Terminal size changed: ";
-	l_oMessage += strsignal ( a_iSignum );
-	l_oMessage += '.';
-	l_pcSignalMessage = l_oMessage;
-#ifdef __YAAL_HCORE_HLOG_H
-	log << l_oMessage << endl;
-#endif /* __YAAL_HCORE_HLOG_H */
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( cons.is_enabled() )
-		{
-		n_bInputWaiting = true;
-		cons.ungetch( KEY<'l'>::ctrl );
-		}
-	else
-		fprintf ( stderr, "\n%s", l_pcSignalMessage );
-#else /* __YAAL_HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, "\n%s", l_pcSignalMessage );
-#endif /* not __YAAL_HCONSOLE_CONSOLE_H */
-	return;
-	M_EPILOG
+	sigset_t set;
+	sigemptyset( &set );
+	sigaddset( &set, a_iSigNo );
+	pthread_sigmask( SIG_UNBLOCK, &set, NULL );
 	}
 
-void signal_INT ( int a_iSignum )
+void HBaseSignalHandlers::lock( int a_iSigNo )
+	{
+	sigset_t set;
+	sigemptyset( &set );
+	sigaddset( &set, a_iSigNo );
+	pthread_sigmask( SIG_BLOCK, &set, NULL );
+	}
+
+int HBaseSignalHandlers::signal_INT ( int a_iSignum )
 	{
 	M_PROLOG
 	if ( tools::n_bIgnoreSignalSIGINT )
-		return;
-	char const * l_pcSignalMessage = NULL;
+		return ( 0 );
 	HString l_oMessage;
 	l_oMessage = "Interrupt signal caught, process broken: ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
-	l_pcSignalMessage = l_oMessage;
-#ifdef __YAAL_HCORE_HLOG_H
-	log << l_oMessage << endl;
-#endif /* __YAAL_HCORE_HLOG_H */
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	HConsole& cons = HCons::get_instance();
-	if ( cons.is_enabled() )
-		cons.leave_curses();
-#endif /* __YAAL_HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, "\n%s", l_pcSignalMessage );
-	signal ( SIGINT, SIG_DFL );
-	raise ( SIGINT );
-	return;
+	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
+	fprintf ( stderr, "\n%s\n", l_oMessage.raw() );
+	return ( -1 );
 	M_EPILOG
 	}
 	
-void signal_TERM ( int a_iSignum )
+int HBaseSignalHandlers::signal_TERM( int a_iSignum )
 	{
 	M_PROLOG
-	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
 	l_oMessage = "Process was explictly killed: ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
-	l_pcSignalMessage = l_oMessage;
-#ifdef __YAAL_HCORE_HLOG_H
-	log << l_oMessage << endl;
-#endif /* __YAAL_HCORE_HLOG_H */
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	HConsole& cons = HCons::get_instance();
-	if ( cons.is_enabled() )
-		cons.leave_curses();
-#endif
-	fprintf ( stderr, "\n%s", l_pcSignalMessage );
-	signal ( SIGTERM, SIG_DFL );
-	raise ( SIGTERM );
-	return;
+	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
+	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
+	return ( -2 );
 	M_EPILOG
 	}
 	
-void signal_QUIT ( int a_iSignum )
+int HBaseSignalHandlers::signal_QUIT ( int a_iSignum )
 	{
 	M_PROLOG
+	if ( tools::n_bIgnoreSignalSIGQUIT )
+		return ( 0 );
 	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	HConsole& cons = HCons::get_instance();
-#endif /* __YAAL_HCONSOLE_CONSOLE_H */
-	if ( tools::n_bIgnoreSignalSIGQUIT )
-		{
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-		if ( cons.is_enabled() )
-			cons.c_cmvprintf ( cons.get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
-					"Hard Quit is disabled by yaal configuration." );
-#endif /* __YAAL_HCONSOLE_CONSOLE_H */
-		return;
-		}
 	l_oMessage = "Abnormal program quit forced: ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	l_pcSignalMessage = l_oMessage;
-#ifdef __YAAL_HCORE_HLOG_H
-	log << l_oMessage << endl;
-#endif /* __YAAL_HCORE_HLOG_H */
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( cons.is_enabled() )
-		cons.leave_curses();
-#endif
-	fprintf ( stderr, "\n%s", l_pcSignalMessage );
-	signal ( SIGQUIT, SIG_DFL );
-	raise ( SIGQUIT );
-	return;
+	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
+	fprintf ( stderr, "\n%s\n", l_pcSignalMessage );
+	abort();
 	M_EPILOG
 	}
 
-void signal_TSTP ( int a_iSignum )
+int HBaseSignalHandlers::signal_TSTP ( int a_iSignum )
 	{
 	M_PROLOG
-	char const * l_pcSignalMessage = NULL;
+	if ( tools::n_bIgnoreSignalSIGTSTP )
+		return ( 0 );
 	HString l_oMessage;
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	HConsole& cons = HCons::get_instance();
-#endif /* __YAAL_HCONSOLE_CONSOLE_H */
-	if ( tools::n_bIgnoreSignalSIGINT )
-		{
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-		if ( cons.is_enabled() )
-			cons.c_cmvprintf ( cons.get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
-					"Suspend is disabled by yaal configuration." );
-#endif /* __YAAL_HCONSOLE_CONSOLE_H */
-		return;
-		}
 	l_oMessage = "Stop signal caught, process suspended: ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
-	l_pcSignalMessage = l_oMessage;
-#ifdef __YAAL_HCORE_HLOG_H
-	log << l_oMessage << endl;
-#endif /* __YAAL_HCORE_HLOG_H */
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( cons.is_enabled() )
-		cons.leave_curses();
-#endif
-	fprintf ( stderr, "\n%s", l_pcSignalMessage );
-	signal ( SIGTSTP, SIG_DFL );
-	raise ( SIGTSTP );
-	return;
+	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
+	fprintf ( stderr, "\n%s\n", l_oMessage.raw() );
+	unlock( SIGTSTP );
+	raise( SIGTSTP );
+	return ( 0 );
 	M_EPILOG
 	}
 
-void signal_CONT ( int a_iSignum )
+int HBaseSignalHandlers::signal_CONT ( int a_iSignum )
 	{
 	M_PROLOG
-	char const * l_pcSignalMessage = NULL;
+	lock( SIGTSTP );
 	HString l_oMessage;
 	l_oMessage = "Process was resurected: ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
-	l_pcSignalMessage = l_oMessage;
-#ifdef __YAAL_HCORE_HLOG_H
-	log << l_oMessage << endl;
-#endif /* __YAAL_HCORE_HLOG_H */
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	HConsole& cons = HCons::get_instance();
-	if ( ! cons.is_enabled() )
-		cons.enter_curses();
-	if ( cons.is_enabled() )
-		{
-		n_bInputWaiting = true;
-		cons.ungetch ( KEY < 'l' >::ctrl );
-		}
-#endif /* __YAAL_HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, "\n%s", l_pcSignalMessage );
-	if ( signal ( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
-		signal ( SIGTSTP, SIG_IGN );
-	return;
+	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
+	fprintf ( stderr, "\n%s\n", l_oMessage.raw() );
+	return ( 0 );
 	M_EPILOG
 	}
 
-void signal_fatal ( int a_iSignum )
+int HBaseSignalHandlers::signal_fatal ( int a_iSignum )
 	{
 	M_PROLOG
-	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
 	l_oMessage = "Process caused FATAL ERROR: ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
-	l_pcSignalMessage = l_oMessage;
-#ifdef __YAAL_HCORE_HLOG_H
-	log << l_oMessage << endl;
-#endif /* __YAAL_HCORE_HLOG_H */
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	HConsole& cons = HCons::get_instance();
-	if ( cons.is_enabled() )
-		cons.leave_curses();
-#endif /* __YAAL_HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, "\n%s", l_pcSignalMessage );
-	signal ( a_iSignum, SIG_DFL );
-	raise ( a_iSignum );
-	return;
+	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
+	fprintf ( stderr, "\n%s\n", l_oMessage.raw() );
+	abort();
 	M_EPILOG
 	}
 
-void signal_USR1 ( int a_iSignum )
+int HBaseSignalHandlers::signal_USR1 ( int a_iSignum )
 	{
 	M_PROLOG
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	HConsole& cons = HCons::get_instance();
-	if ( n_bUseMouse )
-		{
-		if ( cons.is_enabled() )
-			{
-			n_bInputWaiting = true;
-			cons.ungetch ( KEY_CODES::D_MOUSE );
-			return;
-			}
-		}
-#endif /* __YAAL_HCONSOLE_CONSOLE_H */
-	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
 	l_oMessage = "\nDo you play with the mouse under FreeBSD ? ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
-	l_pcSignalMessage = l_oMessage;
-#ifdef __YAAL_HCORE_HLOG_H
-	log << l_oMessage << endl;
-#endif /* __YAAL_HCORE_HLOG_H */
-#ifdef __YAAL_HCONSOLE_CONSOLE_H
-	if ( cons.is_enabled() )
-		cons.leave_curses();
-#endif /* __YAAL_HCONSOLE_CONSOLE_H */
-	fprintf ( stderr, "\n%s", l_pcSignalMessage );
-	signal ( a_iSignum, SIG_DFL );
-	raise ( a_iSignum );
-	return;
+	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
+	fprintf ( stderr, "\n%s\n", l_oMessage.raw() );
+	return ( -3 );
 	M_EPILOG
 	}
 
 /* end of signal handler definitions */
-
-void set_handlers ( void )
-	{
-	M_PROLOG
-	g_oSigStack.create_stack();
-	install_special ( signals::signal_USR1, SIGUSR1 );
-	install_special ( signals::signal_WINCH, SIGWINCH );
-	if ( signal ( SIGINT, signals::signal_INT ) == SIG_IGN )
-		signal ( SIGINT, SIG_IGN );
-	if ( signal ( SIGTERM, signals::signal_TERM ) == SIG_IGN )
-		signal ( SIGTERM, SIG_IGN );
-	if ( signal ( SIGQUIT, signals::signal_QUIT ) == SIG_IGN )
-		signal ( SIGQUIT, SIG_IGN );
-	if ( signal ( SIGTSTP, signals::signal_TSTP ) == SIG_IGN )
-		signal ( SIGTSTP, SIG_IGN );
-	if ( signal ( SIGCONT, signals::signal_CONT ) == SIG_IGN )
-		signal ( SIGCONT, SIG_IGN );
-	if ( signal ( SIGPIPE, signals::signal_fatal ) == SIG_IGN )
-		signal ( SIGPIPE, SIG_IGN );
-	if ( signal ( SIGFPE, signals::signal_fatal ) == SIG_IGN )
-		signal ( SIGFPE, SIG_IGN );
-	if ( signal ( SIGILL, signals::signal_fatal ) == SIG_IGN )
-		signal ( SIGILL, SIG_IGN );
-	if ( signal ( SIGSEGV, signals::signal_fatal ) == SIG_IGN )
-		signal ( SIGSEGV, SIG_IGN );
-	if ( signal ( SIGBUS, signals::signal_fatal ) == SIG_IGN )
-		signal ( SIGBUS, SIG_IGN );
-	if ( signal ( SIGABRT, signals::signal_fatal ) == SIG_IGN )
-		signal ( SIGABRT, SIG_IGN );
-	if ( signal ( SIGIOT, signals::signal_fatal ) == SIG_IGN )
-		signal ( SIGIOT, SIG_IGN );
-	if ( signal( SIGTRAP, signals::signal_fatal ) == SIG_IGN )
-		signal ( SIGTRAP, SIG_IGN );
-	if ( signal ( SIGSYS, signals::signal_fatal ) == SIG_IGN )
-		signal ( SIGSYS, SIG_IGN );
-	return;
-	M_EPILOG
-	}
 
 }
 

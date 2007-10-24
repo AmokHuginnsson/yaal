@@ -28,7 +28,7 @@ export DIR_ROOT	?= $(CURDIR)
 VERSION				= 0
 SUBVERSION		= 0
 EXTRAVERSION	= 2
-COMPONENTS		= hcore hconsole tools dbwrapper hdata
+COMPONENTS		= hcore tools hconsole dbwrapper hdata
 DRIVERS				= @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE_DRIVER@ @DO_SQLITE3_DRIVER@
 DIR_TARGET		= $(HOME)/usr/lib
 DIR_HEADERS		= $(HOME)/usr/include/yaal/
@@ -63,11 +63,11 @@ OBJS_dbwrapper := $(filter-out %_driver.$(OS),$(OBJS_dbwrapper))
 $(foreach DRIVER,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(DRIVER))))
 
 LIBS_hcore			=	"-lpthread -lssl @GETTEXT_LIB@"
-DEPS_hconsole		= $(TARGET_hcore)
-LIBS_hconsole		= "-lncurses @MOUSE_LIB@ -lhcore"
-DEPS_tools			= $(TARGET_hconsole)
-LIBS_tools			= "-lxml2 -lncurses -lhcore -lhconsole"
-DEPS_dbwrapper	= $(TARGET_hcore) $(TARGET_hconsole) $(TARGET_tools)
+DEPS_tools			= $(TARGET_hcore)
+LIBS_tools			= "-lxml2 -lhcore"
+DEPS_hconsole		= $(TARGET_hcore) $(TARGET_tools)
+LIBS_hconsole		= "-lncurses @MOUSE_LIB@ -lhcore -ltools"
+DEPS_dbwrapper	= $(TARGET_hcore) $(TARGET_tools) $(TARGET_hconsole)
 LIBS_dbwrapper	= "-rdynamic @DLOPEN_IN@ -lhcore -lhconsole -ltools"
 DEPS_hdata			= $(TARGET_dbwrapper) $(TARGET_hconsole)
 LIBS_hdata			= "-lncurses -lhcore -lhconsole -ltools -ldbwrapper"

@@ -79,6 +79,7 @@ public:
 private:
 	HLog( void );
 	virtual ~HLog( void );
+	static int life_time( int );
 	void timestamp ( FILE * = NULL );
 	virtual int do_write( void const* const, int const );
 	virtual void do_flush( void ) const;

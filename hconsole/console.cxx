@@ -27,6 +27,7 @@ Copyright:
 #include <cstdlib> /* getenv */
 #include <cstdio>
 #include <cstring> /* strerror */
+#include <csignal>  /* signal handling */
 #include <unistd.h>
 #include <termios.h>
 #include <libintl.h>
@@ -44,10 +45,12 @@ Copyright:
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
 #include "hcore/hlog.h"
+#include "tools/tools.h"
 #include "hconsole.h"
 #include "console.h"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal
 {
@@ -132,8 +135,38 @@ bool n_bInputWaiting( false );
 
 /* public: */
 
-HConsole::HConsole( void ) : f_iWidth( 0 ), f_iHeight( 0 ), f_iMouseDes( 0 )
+HConsole::HConsole( void ) : f_bInitialized( false ), f_iWidth( 0 ), f_iHeight( 0 ), f_iMouseDes( 0 )
 	{
+	}
+
+void HConsole::init( void )
+	{
+	M_PROLOG
+	f_bInitialized = true;
+	HSignalService& signalService = HSignalServiceFactory::get_instance();
+	signalService.register_handler( SIGWINCH,
+			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_terminal_resize ) ) );
+	signalService.register_handler( SIGQUIT,
+			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_quit ) ) );
+	signalService.register_handler( SIGTSTP,
+			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_tstp ) ) );
+	signalService.register_handler( SIGCONT,
+			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_cont ) ) );
+	signalService.register_handler( SIGUSR1,
+			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_mouse ) ) );
+	HSignalService::HHandlerGeneric::ptr_t cleanup( new HSignalService::HHandlerExternal( this, &HConsole::console_cleanup ) );
+	signalService.register_handler( SIGINT, cleanup );
+	signalService.register_handler( SIGTERM, cleanup );
+	signalService.register_handler( SIGSEGV, cleanup );
+	signalService.register_handler( SIGBUS, cleanup );
+	signalService.register_handler( SIGABRT, cleanup );
+	signalService.register_handler( SIGILL, cleanup );
+	signalService.register_handler( SIGFPE, cleanup );
+	signalService.register_handler( SIGIOT, cleanup );
+	signalService.register_handler( SIGTRAP, cleanup );
+	signalService.register_handler( SIGSYS, cleanup );
+	signalService.register_handler( SIGPIPE, cleanup );
+	M_EPILOG
 	}
 
 void HConsole::enter_curses( void )
@@ -147,6 +180,8 @@ void HConsole::enter_curses( void )
 /* this is done automaticly by initscr(), read man next time */
 	if ( ! isatty ( STDIN_FILENO ) )
 		M_THROW ( "stdin in not a tty", 0 );
+	if ( ! f_bInitialized )
+		init();
 	if ( n_bDisableXON )
 		{
 		M_ENSURE ( tcgetattr ( STDIN_FILENO, & f_sTermios ) == 0 );
@@ -310,6 +345,7 @@ int HConsole::endwin ( void )
 void HConsole::c_getmaxyx( void )
 	{
 	getmaxyx( stdscr, f_iHeight, f_iWidth );
+	log( LOG_TYPE::D_INFO ) << "New terminal dimenstions: " << f_iHeight << "x" << f_iWidth << "." << endl;
 	return;
 	}
 
@@ -612,6 +648,110 @@ void HConsole::bell( void ) const
 	M_PROLOG
 	M_ENSURE ( putchar ( '\a' ) == '\a' );
 	return;
+	M_EPILOG
+	}
+
+int HConsole::on_terminal_resize( int a_iSignum )
+	{
+	M_PROLOG
+	char const * l_pcSignalMessage = NULL;
+	HString l_oMessage;
+	l_oMessage = "Terminal size changed: ";
+	l_oMessage += strsignal ( a_iSignum );
+	l_oMessage += '.';
+	l_pcSignalMessage = l_oMessage;
+	log << l_oMessage << endl;
+	if ( is_enabled() )
+		{
+		n_bInputWaiting = true;
+		ungetch( KEY<'l'>::ctrl );
+		}
+	else
+		fprintf ( stderr, "\n%s", l_pcSignalMessage );
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HConsole::life_time( int a_iLifeTime )
+	{
+	return ( a_iLifeTime );
+	}
+
+int HConsole::console_cleanup( int a_iSigNo )
+	{
+	M_PROLOG
+	if ( ( a_iSigNo == SIGINT ) && ( tools::n_bIgnoreSignalSIGINT ) )
+		return ( 0 );
+	HConsole& cons = HCons::get_instance();
+	if ( cons.is_enabled() )
+		cons.leave_curses();
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HConsole::on_quit( int )
+	{
+	M_PROLOG
+	HConsole& cons = HCons::get_instance();
+	if ( cons.is_enabled() )
+		{
+		if ( tools::n_bIgnoreSignalSIGQUIT )
+			cons.c_cmvprintf ( cons.get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
+					"Hard Quit is disabled by yaal configuration." );
+		else
+			cons.leave_curses();
+		}
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HConsole::on_tstp( int )
+	{
+	M_PROLOG
+	HConsole& cons = HCons::get_instance();
+	if ( cons.is_enabled() )
+		{
+		if ( tools::n_bIgnoreSignalSIGTSTP )
+			cons.c_cmvprintf ( cons.get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
+					"Suspend is disabled by yaal configuration." );
+		else
+			cons.leave_curses();
+		}
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HConsole::on_cont( int )
+	{
+	M_PROLOG
+	HConsole& cons = HCons::get_instance();
+	if ( ! cons.is_enabled() )
+		cons.enter_curses();
+	if ( cons.is_enabled() )
+		{
+		n_bInputWaiting = true;
+		cons.ungetch( KEY<'l'>::ctrl );
+		}
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HConsole::on_mouse( int )
+	{
+	M_PROLOG
+	HConsole& cons = HCons::get_instance();
+	if ( n_bUseMouse )
+		{
+		if ( cons.is_enabled() )
+			{
+			n_bInputWaiting = true;
+			cons.ungetch ( KEY_CODES::D_MOUSE );
+			return ( 1 );
+			}
+		}
+	if ( cons.is_enabled() )
+		cons.leave_curses();
+	return ( 0 );
 	M_EPILOG
 	}
 

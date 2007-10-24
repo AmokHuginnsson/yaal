@@ -48,6 +48,47 @@ ssl_cert "${HOME}/var/db/keys/yaal.pem"
 
 ### core END
 
+### tools BEGIN
+[tools]
+
+# ignore_signal_(SIGINT|SIGTSTP|SIGQUIT)
+# type: bool, default: false
+# this option tells if process should ignore recievied signal
+ignore_signal_SIGINT false
+ignore_signal_SIGTSTP false
+ignore_signal_SIGQUIT false
+
+# serial port configuration
+
+# serial_device
+# type: string, default: (system dependent)
+# describes path to device
+serial_device '/dev/@SERIAL_DEVICE@'
+
+# serial_baudrate
+# type: string, default: B115200
+# this option sets serial line connection speed (baudrate)
+# baudrate B115200 | B76800 | B57600 | B38400 | B28800
+#          | B19200| B14400 | B9600 | B7200 | B4800 | B2400
+serial_baudrate B115200
+
+# serial_flags
+# type: special(multi flag value),
+# default: FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
+# this option set various flags controling serial connection behaviour
+# flag names: FLOW_CONTROL_HARDWARE SOFTWARE_CONTROL_SOFTWARE BITS_PER_BYTE_8
+#             BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5 PARITY_CHECK
+#             PARITY_ODD CR2NL ECHO CANONICAL STOP_BITS_1 STOP_BITS_2
+serial_flags FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
+
+# collector_connection_timeout
+# type: integer, default: 9999
+# time in seconds, after this time elapses process gives up connection
+# to collector atempt
+collector_connection_timeout 8
+
+### tools END
+
 ### console BEGIN
 [console]
 
@@ -140,47 +181,6 @@ attribute_search_highlight BLACK YELLOW BLACK BROWN
 
 ## colors END
 ### console END
-
-### tools BEGIN
-[tools]
-
-# ignore_signal_(SIGINT|SIGTSTP|SIGQUIT)
-# type: bool, default: false
-# this option tells if process should ignore recievied signal
-ignore_signal_SIGINT false
-ignore_signal_SIGTSTP false
-ignore_signal_SIGQUIT false
-
-# serial port configuration
-
-# serial_device
-# type: string, default: (system dependent)
-# describes path to device
-serial_device '/dev/@SERIAL_DEVICE@'
-
-# serial_baudrate
-# type: string, default: B115200
-# this option sets serial line connection speed (baudrate)
-# baudrate B115200 | B76800 | B57600 | B38400 | B28800
-#          | B19200| B14400 | B9600 | B7200 | B4800 | B2400
-serial_baudrate B115200
-
-# serial_flags
-# type: special(multi flag value),
-# default: FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
-# this option set various flags controling serial connection behaviour
-# flag names: FLOW_CONTROL_HARDWARE SOFTWARE_CONTROL_SOFTWARE BITS_PER_BYTE_8
-#             BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5 PARITY_CHECK
-#             PARITY_ODD CR2NL ECHO CANONICAL STOP_BITS_1 STOP_BITS_2
-serial_flags FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
-
-# collector_connection_timeout
-# type: integer, default: 9999
-# time in seconds, after this time elapses process gives up connection
-# to collector atempt
-collector_connection_timeout 8
-
-### tools END
 
 ### dbwrapper BEGIN
 [dbwrapper]

@@ -34,6 +34,7 @@ Copyright:
 #endif /* HAVE_CONFIG_H */
 
 #include "hcore/hsingleton.h"
+#include "tools/signals.h"
 #include "hconsole/mouse.h"
 
 namespace yaal
@@ -159,8 +160,9 @@ struct EVENT
 extern bool n_bNeedRepaint;
 extern bool n_bInputWaiting;
 
-class HConsole
+class HConsole : public yaal::tools::HSignalHandlerInterface
 	{
+	bool f_bInitialized;
 	int f_iWidth;
 	int f_iHeight;
 	int f_iMouseDes;
@@ -190,10 +192,18 @@ public:
 	int wait_for_user_input ( int&, mouse::OMouse&, int = 0, int = 0 ) const;
 	void bell( void ) const;
 	int get_mouse_fd( void ) const;
+	int on_terminal_resize( int );
+	int console_cleanup( int );
+	int on_quit( int );
+	int on_tstp( int );
+	int on_cont( int );
+	int on_mouse( int );
 protected:
 	int c_vmvprintf ( int, int, char const* const, void* ) const;
 	int c_vcmvprintf ( int, int, int, char const* const, void* ) const;
 	int c_vprintf ( char const* const, void* ) const;
+	void init( void );
+	static int life_time( int );
 private:
 	HConsole( void );
 	friend class yaal::hcore::HSingleton<HConsole>;

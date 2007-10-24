@@ -63,7 +63,8 @@ HTUIProcess::HTUIProcess( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
 HTUIProcess::~HTUIProcess( void )
 	{
 	M_PROLOG
-	f_oWindows->remove_head();
+	if ( f_oWindows->size() > 0 )
+		f_oWindows->remove_head();
 #ifdef __DEBUGGER_BABUNI__
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -270,6 +271,7 @@ int HTUIProcess::handler_mouse( int a_iCode, void const* )
 int HTUIProcess::handler_refresh( int, void const* )
 	{
 	M_PROLOG
+	log_trace << "full screen repaint" << endl;
 	HConsole& cons = HCons::get_instance();
 	cons.endwin();
 	cons.kbhit(); /* cleans all trash from stdio buffer */

@@ -58,6 +58,7 @@ private:
 		OSSLContext( void );
 		virtual ~OSSLContext( void );
 		void init( void );
+		static int life_time( int );
 	private:
 		OSSLContext( OSSLContext const& );
 		OSSLContext& operator=( OSSLContext const& );
