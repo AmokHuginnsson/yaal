@@ -123,10 +123,7 @@ int HProcess::run( void )
 						NULL, NULL, & f_sLatency ) ) )
 			{
 			if ( ( l_iError < 0 ) && ( errno == EINTR ) )
-				{
-				handler_interrupt( 0 );
 				continue;
-				}
 			if ( l_iError < 0 )
 				M_THROW ( "select() returned", l_iError );
 			f_oFileDescriptorHandlers.rewind();
@@ -147,13 +144,6 @@ int HProcess::run( void )
 	}
 
 int HProcess::handler_alert( int, void const* )
-	{
-	M_PROLOG
-	return ( 0 );
-	M_EPILOG
-	}
-
-int HProcess::handler_interrupt( int, void const* )
 	{
 	M_PROLOG
 	return ( 0 );

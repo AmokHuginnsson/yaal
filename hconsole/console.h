@@ -158,7 +158,6 @@ struct EVENT
 	};
 
 extern bool n_bNeedRepaint;
-extern bool n_bInputWaiting;
 
 class HConsole : public yaal::tools::HSignalHandlerInterface
 	{
@@ -166,6 +165,7 @@ class HConsole : public yaal::tools::HSignalHandlerInterface
 	int f_iWidth;
 	int f_iHeight;
 	int f_iMouseDes;
+	int f_piEvent[2];
 public:
 	int const& get_height( void ) const;
 	int const& get_width( void ) const;
@@ -192,6 +192,7 @@ public:
 	int wait_for_user_input ( int&, mouse::OMouse&, int = 0, int = 0 ) const;
 	void bell( void ) const;
 	int get_mouse_fd( void ) const;
+	int get_event_fd( void ) const;
 	int on_terminal_resize( int );
 	int console_cleanup( int );
 	int on_quit( int );
@@ -206,7 +207,9 @@ protected:
 	static int life_time( int );
 private:
 	HConsole( void );
+	~HConsole( void );
 	friend class yaal::hcore::HSingleton<HConsole>;
+	friend class yaal::hcore::HDestructor<HConsole>;
 	};
 
 extern char const* const red;

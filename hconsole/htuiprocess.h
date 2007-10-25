@@ -55,12 +55,12 @@ public:
 protected:
 	int process_stdin ( int );
 	int process_mouse ( int );
+	int process_terminal_event( int );
 	int process_commands ( void );
 	int add_window ( HWindow::ptr_t );
 	void select( HWindow const* const );
 	void refresh( bool = false );
 	virtual int handler_alert ( int, void const* = NULL );
-	virtual int handler_interrupt ( int, void const* = NULL );
 	virtual int handler_idle ( int, void const* = NULL );
 	virtual int handler_mouse ( int, void const* = NULL );
 	virtual int handler_refresh ( int, void const* = NULL );

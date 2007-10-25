@@ -131,12 +131,23 @@ termios	f_sTermios;
 int const C_OK = OK;
 int const C_ERR = ERR;
 bool n_bNeedRepaint( false );
-bool n_bInputWaiting( false );
 
 /* public: */
 
-HConsole::HConsole( void ) : f_bInitialized( false ), f_iWidth( 0 ), f_iHeight( 0 ), f_iMouseDes( 0 )
+HConsole::HConsole( void ) : f_bInitialized( false ), f_iWidth( 0 ), f_iHeight( 0 ), f_iMouseDes( 0 ), f_piEvent()
 	{
+	f_piEvent[ 0 ] = -1;
+	f_piEvent[ 1 ] = -1;
+	return;
+	}
+
+HConsole::~HConsole( void )
+	{
+	if ( f_piEvent[ 0 ] >= 0 )
+		::close( f_piEvent[ 0 ] );
+	if ( f_piEvent[ 1 ] >= 0 )
+		::close( f_piEvent[ 1 ] );
+	return;
 	}
 
 void HConsole::init( void )
@@ -166,6 +177,7 @@ void HConsole::init( void )
 	signalService.register_handler( SIGTRAP, cleanup );
 	signalService.register_handler( SIGSYS, cleanup );
 	signalService.register_handler( SIGPIPE, cleanup );
+	M_ENSURE( pipe( f_piEvent ) == 0 );
 	M_EPILOG
 	}
 
@@ -374,6 +386,12 @@ int const& HConsole::get_width( void ) const
 int HConsole::get_mouse_fd( void ) const
 	{
 	return ( f_iMouseDes );
+	}
+
+int HConsole::get_event_fd( void ) const
+	{
+	M_ENSURE( f_piEvent[ 0 ] >= 0 );
+	return ( f_piEvent[ 0 ] );
 	}
 
 int HConsole::c_vmvprintf( int a_iRow, int a_iColumn,
@@ -614,16 +632,6 @@ int HConsole::wait_for_user_input( int& a_iKey, mouse::OMouse& a_rsMouse,
 		FD_SET ( f_iMouseDes, & l_xFdSet );
 	do
 		{
-		if ( n_bInputWaiting )
-			{
-			a_iKey = get_key();
-			l_iEventType = EVENT::D_MOUSE;
-			if ( a_iKey == KEY_MOUSE )
-				static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
-			else
-				l_iEventType = EVENT::D_KEYBOARD;
-			break;
-			}
 		l_iError = select ( FD_SETSIZE, & l_xFdSet, NULL, NULL,
 				( a_iTimeOutSec || a_iTimeOutUsec ) ? & l_xWait : NULL );
 		}
@@ -663,8 +671,8 @@ int HConsole::on_terminal_resize( int a_iSignum )
 	log << l_oMessage << endl;
 	if ( is_enabled() )
 		{
-		n_bInputWaiting = true;
-		ungetch( KEY<'l'>::ctrl );
+		char c = 'r';
+		::write( f_piEvent[ 1 ], &c, 1 ); 
 		}
 	else
 		fprintf ( stderr, "\n%s", l_pcSignalMessage );
@@ -682,9 +690,8 @@ int HConsole::console_cleanup( int a_iSigNo )
 	M_PROLOG
 	if ( ( a_iSigNo == SIGINT ) && ( tools::n_bIgnoreSignalSIGINT ) )
 		return ( 0 );
-	HConsole& cons = HCons::get_instance();
-	if ( cons.is_enabled() )
-		cons.leave_curses();
+	if ( is_enabled() )
+		leave_curses();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -692,14 +699,13 @@ int HConsole::console_cleanup( int a_iSigNo )
 int HConsole::on_quit( int )
 	{
 	M_PROLOG
-	HConsole& cons = HCons::get_instance();
-	if ( cons.is_enabled() )
+	if ( is_enabled() )
 		{
 		if ( tools::n_bIgnoreSignalSIGQUIT )
-			cons.c_cmvprintf ( cons.get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
+			c_cmvprintf ( get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Hard Quit is disabled by yaal configuration." );
 		else
-			cons.leave_curses();
+			leave_curses();
 		}
 	return ( 0 );
 	M_EPILOG
@@ -708,14 +714,13 @@ int HConsole::on_quit( int )
 int HConsole::on_tstp( int )
 	{
 	M_PROLOG
-	HConsole& cons = HCons::get_instance();
-	if ( cons.is_enabled() )
+	if ( is_enabled() )
 		{
 		if ( tools::n_bIgnoreSignalSIGTSTP )
-			cons.c_cmvprintf ( cons.get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
+			c_cmvprintf ( get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
 					"Suspend is disabled by yaal configuration." );
 		else
-			cons.leave_curses();
+			leave_curses();
 		}
 	return ( 0 );
 	M_EPILOG
@@ -724,13 +729,12 @@ int HConsole::on_tstp( int )
 int HConsole::on_cont( int )
 	{
 	M_PROLOG
-	HConsole& cons = HCons::get_instance();
-	if ( ! cons.is_enabled() )
-		cons.enter_curses();
-	if ( cons.is_enabled() )
+	if ( ! is_enabled() )
+		enter_curses();
+	if ( is_enabled() )
 		{
-		n_bInputWaiting = true;
-		cons.ungetch( KEY<'l'>::ctrl );
+		char c = 'r';
+		::write( f_piEvent[ 1 ], &c, 1 ); 
 		}
 	return ( 0 );
 	M_EPILOG
@@ -739,18 +743,17 @@ int HConsole::on_cont( int )
 int HConsole::on_mouse( int )
 	{
 	M_PROLOG
-	HConsole& cons = HCons::get_instance();
 	if ( n_bUseMouse )
 		{
-		if ( cons.is_enabled() )
+		if ( is_enabled() )
 			{
-			n_bInputWaiting = true;
-			cons.ungetch ( KEY_CODES::D_MOUSE );
+			char c = 'm';
+			::write( f_piEvent[ 1 ], &c, 1 ); 
 			return ( 1 );
 			}
 		}
-	if ( cons.is_enabled() )
-		cons.leave_curses();
+	if ( is_enabled() )
+		leave_curses();
 	return ( 0 );
 	M_EPILOG
 	}

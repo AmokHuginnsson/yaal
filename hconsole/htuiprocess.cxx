@@ -83,9 +83,11 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 	HWindow::ptr_t l_oMainWindow;
 	HProcess::init( n_iLatency );
 	register_file_descriptor_handler( STDIN_FILENO, &HTUIProcess::process_stdin );
-	int l_iMouseDes = HCons::get_instance().get_mouse_fd();
+	HConsole& cons = HCons::get_instance();
+	int l_iMouseDes = cons.get_mouse_fd();
 	if ( n_bUseMouse && l_iMouseDes )
 		register_file_descriptor_handler( l_iMouseDes, &HTUIProcess::process_mouse );
+	register_file_descriptor_handler( cons.get_event_fd(), &HTUIProcess::process_terminal_event );
 	register_postprocess_handler( D_CTRLS_COUNT, l_piCtrls,
 			& HTUIProcess::handler_refresh );
 	register_postprocess_handler( KEY<'x'>::command, NULL,
@@ -137,7 +139,6 @@ int HTUIProcess::process_stdin( int a_iCode )
 	{
 	M_PROLOG
 	HString l_oCommand;
-	n_bInputWaiting = false;
 	HConsole& cons = HCons::get_instance();
 	if ( ! a_iCode )
 		a_iCode = cons.get_key();
@@ -208,18 +209,6 @@ int HTUIProcess::handler_alert( int, void const* )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_interrupt( int, void const* )
-	{
-	M_PROLOG
-	if ( n_bInputWaiting )
-		{
-		process_stdin( STDIN_FILENO );
-		handler_alert( 0 );
-		}
-	return ( 0 );
-	M_EPILOG
-	}
-
 int HTUIProcess::handler_idle( int a_iCode, void const* )
 	{
 	M_PROLOG
@@ -268,13 +257,32 @@ int HTUIProcess::handler_mouse( int a_iCode, void const* )
 	M_EPILOG
 	}
 
+int HTUIProcess::process_terminal_event( int a_iEvent )
+	{
+	M_PROLOG
+	char type;
+	::read( a_iEvent, &type, 1 );
+	int ret = 0;
+	switch( type )
+		{
+		case 'r':
+			ret = handler_refresh( 0 );
+		break;
+		case 'm':
+			ret = process_mouse( 0 );
+		break;
+		}
+	return ( ret );
+	M_EPILOG
+	}
+
 int HTUIProcess::handler_refresh( int, void const* )
 	{
 	M_PROLOG
-	log_trace << "full screen repaint" << endl;
 	HConsole& cons = HCons::get_instance();
 	cons.endwin();
 	cons.kbhit(); /* cleans all trash from stdio buffer */
+	cons.c_refresh();
 	cons.c_getmaxyx();
 	refresh( true ); /* there is c_clrscr(); and c_refresh() call inside */
 	return ( 0 );
