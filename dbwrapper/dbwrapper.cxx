@@ -157,8 +157,8 @@ void dbwrapper_fini ( void )
 	return;
 	}
 
-static char const g_pcDynamicLinkerPath [ ] __attribute__(( __unused__,
-			__section__(".interp") )) = __DYNAMIC_LINKER__;
+static char const g_pcDynamicLinkerPath [ ]
+	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 void yaal_dbwrapper_banner ( void )
 	{
@@ -167,14 +167,14 @@ void yaal_dbwrapper_banner ( void )
 	}
 
 extern "C"
-void yaal_dbwrapper_main ( void ) __attribute__(( __noreturn__ ));
-void yaal_dbwrapper_main ( void )
+void yaal_dbwrapper_main( void ) __attribute__(( __noreturn__ ));
+void yaal_dbwrapper_main( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
 		{
 		yaal_hcore_banner();
-		yaal_hconsole_banner();
 		yaal_tools_banner();
+		yaal_hconsole_banner();
 		yaal_dbwrapper_banner();
 		}
 	exit ( 0 );

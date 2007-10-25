@@ -42,9 +42,11 @@ M_VCSID ( "$Id$" )
 #include "hcore/hcore.h"
 #include "hcore/hlog.h"
 #include "hcore/rc_file.h"
+#include "tools/tools.h"
 #include "console.h"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal
 {
@@ -198,6 +200,7 @@ void yaal_hconsole_main ( void )
 	if ( g_pcDynamicLinkerPath [ 0 ] )
 		{
 		yaal_hcore_banner();
+		yaal_tools_banner();
 		yaal_hconsole_banner();
 		}
 	exit ( 0 );
