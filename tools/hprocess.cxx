@@ -27,22 +27,27 @@ Copyright:
 #include <cstring>
 #include <unistd.h>
 #include <libintl.h>
+#include <signal.h>
 
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
 #include "hprocess.h"
 
+#include "hcore/rc_file.h"
+
+using namespace yaal::hcore;
+
 namespace yaal
 {
 
-namespace hcore
+namespace tools
 {
 
 HProcess::HProcess( size_t a_uiFileHandlers )
 	: f_bInitialised( false ), f_bLoop( true ), f_iIdleCycles( 0 ),
 	f_iLatencySeconds( 0 ), f_iLatencyMicroseconds( 0 ),
 	f_sLatency(), f_xFileDescriptorSet(),
-	f_oFileDescriptorHandlers( a_uiFileHandlers )
+	f_oFileDescriptorHandlers( a_uiFileHandlers ), f_oEvent()
 	{
 	M_PROLOG
 	memset ( & f_sLatency, 0, sizeof ( f_sLatency ) );
@@ -58,17 +63,32 @@ HProcess::~HProcess( void )
 	M_EPILOG
 	}
 
-int HProcess::init( int a_iLatencySeconds, int a_iLatencyMicroseconds )
+int HProcess::do_init( void )
 	{
-	M_PROLOG
 	if ( f_bInitialised )
 		M_THROW ( "you can initialise your main process only once, dumbass",
 				errno );
+	HSignalService& ss = HSignalServiceFactory::get_instance();
+	HSignalService::HHandlerGeneric::ptr_t handler( new HSignalService::HHandlerExternal( this, &HProcess::handler_interrupt ) );
+	ss.register_handler( SIGINT, handler );
+	ss.register_handler( SIGHUP, handler );
+	register_file_descriptor_handler( f_oEvent.get_reader_fd(), &HProcess::process_interrupt );
+	f_bInitialised = true;
+	return ( 0 );
+	}
+
+int HProcess::init( int a_iLatencySeconds, int a_iLatencyMicroseconds )
+	{
+	M_PROLOG
 	f_iLatencySeconds = a_iLatencySeconds;
 	f_iLatencyMicroseconds = a_iLatencyMicroseconds;
-	f_bInitialised = true;
 	return ( 1 );
 	M_EPILOG
+	}
+
+int HProcess::do_cleanup( void )
+	{
+	return ( 0 );
 	}
 
 int HProcess::register_file_descriptor_handler_internal( int a_iFileDescriptor,
@@ -111,13 +131,14 @@ int HProcess::run( void )
 	int l_iError = 0;
 	int l_iFileDes = 0;
 	process_handler_filedes_t HANDLER = NULL;
+	do_init();
 	if ( ! f_bInitialised )
 		M_THROW( _ ( "you have to call HProcess::init() first, dumbass" ), errno );
 	if ( ! f_oFileDescriptorHandlers.quantity() )
 		M_THROW( _ ( "there is no file descriptor to check activity on" ), errno );
 	while ( f_bLoop )
 		{
-		handler_alert ( 0 );
+		handler_alert( 0 );
 		reconstruct_fdset();
 		if ( ( l_iError = select ( FD_SETSIZE, & f_xFileDescriptorSet,
 						NULL, NULL, & f_sLatency ) ) )
@@ -139,7 +160,29 @@ int HProcess::run( void )
 		else
 			handler_idle( 0 );
 		}
+	do_cleanup();
 	return ( 0 );
+	M_EPILOG
+	}
+
+int HProcess::process_interrupt( int )
+	{
+	M_PROLOG
+	int l_iSigNo = 0;
+	f_oEvent.read( &l_iSigNo, sizeof ( l_iSigNo ) );
+	if ( l_iSigNo == SIGINT )
+		f_bLoop = false;
+	else if ( l_iSigNo == SIGHUP )
+		rc_file::reload_configuration();
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HProcess::handler_interrupt( int a_iSigNo )
+	{
+	M_PROLOG
+	f_oEvent.write( &a_iSigNo, sizeof ( a_iSigNo ) );
+	return ( 1 );
 	M_EPILOG
 	}
 

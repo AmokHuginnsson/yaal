@@ -27,7 +27,7 @@ Copyright:
 #ifndef __YAAL_HCONSOLE_HTUIPROCESS_H
 #define __YAAL_HCONSOLE_HTUIPROCESS_H
 
-#include "hcore/hprocess.h"
+#include "tools/hprocess.h"
 #include "hconsole/hhandler.h"
 #include "hconsole/hwindow.h"
 #include "hconsole/hwindowlistcontrol.h"
@@ -38,7 +38,7 @@ namespace yaal
 namespace hconsole
 {
 
-class HTUIProcess : public HHandler, protected yaal::hcore::HProcess
+class HTUIProcess : public HHandler, public yaal::tools::HProcess
 	{
 public:
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
@@ -50,8 +50,7 @@ protected:
 public:
 	HTUIProcess ( size_t = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );
-	int init_tui ( char const * = "", HWindow::ptr_t = HWindow::ptr_t() );
-	using hcore::HProcess::run;
+	int init_tui( char const* = "", HWindow::ptr_t = HWindow::ptr_t() );
 protected:
 	int process_stdin ( int );
 	int process_mouse ( int );

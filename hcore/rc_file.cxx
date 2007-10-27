@@ -62,7 +62,7 @@ struct RC_PATHER
 		} placement_bit_t;
 	};
 
-int read_rc_line ( HString &, HString &, HFile &, int & );
+int read_rc_line( HString&, HString&, HFile&, int& );
 
 HString make_path ( char const * const a_pcRcName,
 		RC_PATHER::placement_t a_ePlacement )
@@ -146,12 +146,66 @@ bool substitute_environment ( HString & a_roString )
 	return ( false );
 	}
 
-int process_rc_file_internal ( char const * const a_pcRcName,
-		char const * const a_pcSection,
-		OVariable const * const a_psVaraibles, int const a_iCount,
-		bool const ( * const set_variables ) ( HString &, HString & ) )
+namespace
+{
+
+struct ORCLoader
+	{
+	HString f_oPath;
+	HString f_oSection;
+	OVariable const* f_psVaraibles;
+	int f_iCount;
+	RC_CALLBACK_t rc_callback;
+ 	ORCLoader( void ) :
+		f_oPath(), f_oSection(), f_psVaraibles( NULL ),
+		f_iCount( 0 ), rc_callback( NULL ) { }
+ 	ORCLoader( char const* const a_pcRcName,
+		char const* const a_pcSection,
+		OVariable const* const a_psVaraibles, int const a_iCount,
+		RC_CALLBACK_t callback ) :
+		f_oPath( a_pcRcName ), f_oSection( a_pcSection ), f_psVaraibles( a_psVaraibles ),
+		f_iCount( a_iCount ), rc_callback( callback ) { }
+ 	ORCLoader( ORCLoader const& loader ) :
+		f_oPath(), f_oSection(), f_psVaraibles( NULL ),
+		f_iCount( 0 ), rc_callback( NULL ) { operator = ( loader ); }
+	ORCLoader& operator = ( ORCLoader const& loader )
+		{
+		if ( &loader != this )
+			{
+			f_oPath = loader.f_oPath;
+			f_oSection = loader.f_oSection;
+			f_psVaraibles = loader.f_psVaraibles;
+			f_iCount = loader.f_iCount;
+			rc_callback = loader.rc_callback;
+			}
+		return ( *this );
+		}
+	};
+
+typedef HList<ORCLoader> rc_loaders_t;
+rc_loaders_t n_oRCLoades;
+bool n_bRCLoadersLocked = false;
+
+class HLocker
+	{
+	bool& f_rbLock;
+public:
+	HLocker( bool& a_rbLock ) : f_rbLock( a_rbLock )
+		{ f_rbLock = true; }
+	~HLocker( void )
+		{ f_rbLock = false; }
+	};
+
+}
+
+int process_rc_file_internal( char const* const a_pcRcName,
+		char const* const a_pcSection,
+		OVariable const* const a_psVaraibles, int const a_iCount,
+		RC_CALLBACK_t rc_callback )
 	{
 	M_PROLOG
+	if ( ! n_bRCLoadersLocked )
+		n_oRCLoades.push_back( ORCLoader( a_pcRcName, a_pcSection, a_psVaraibles, a_iCount, rc_callback ) );
 	struct OPlacement
 		{
 		RC_PATHER::placement_t f_ePlacement;
@@ -241,7 +295,7 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 						}
 					l_iCtr ++;
 					}
-				if ( set_variables && set_variables ( l_oOption, l_oValue )
+				if ( rc_callback && rc_callback ( l_oOption, l_oValue )
 						&& ! l_bOptionOK )
 					{
 					log << "failed." << endl;
@@ -258,6 +312,17 @@ int process_rc_file_internal ( char const * const a_pcRcName,
 	if ( l_oRc )
 		l_oRc.close();
 	log << "done." << endl;
+	return ( 0 );
+	M_EPILOG
+	}
+
+int reload_configuration( void )
+	{
+	M_PROLOG
+	HLocker lock( n_bRCLoadersLocked );
+	log << "Reloading configuration." << endl;
+	for ( rc_loaders_t::iterator it = n_oRCLoades.begin(); it != n_oRCLoades.end(); ++ it )
+		process_rc_file_internal( it->f_oPath, it->f_oSection, it->f_psVaraibles, it->f_iCount, it->rc_callback );
 	return ( 0 );
 	M_EPILOG
 	}

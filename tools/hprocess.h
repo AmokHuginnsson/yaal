@@ -24,24 +24,26 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __YAAL_HCORE_HPROCESS_H
-#define __YAAL_HCORE_HPROCESS_H
+#ifndef __YAAL_TOOLS_HPROCESS_H
+#define __YAAL_TOOLS_HPROCESS_H
 
 #include <sys/types.h>
 
 #include "hcore/hhashmap.h"
+#include "hcore/hpipe.h"
+#include "tools/signals.h"
 
 namespace yaal
 {
 
-namespace hcore
+namespace tools
 {
 
-class HProcess
+class HProcess : public yaal::tools::HSignalHandlerInterface
 	{
 protected:
 	typedef int ( HProcess::* process_handler_filedes_t ) ( int );
-	typedef hcore::HHashMap < int, process_handler_filedes_t > process_filedes_map_t;
+	typedef hcore::HHashMap<int, process_handler_filedes_t> process_filedes_map_t;
 	bool			f_bInitialised;					/* did process has necessery initialisation */
 	bool			f_bLoop; 								/* indicates if main loop continues */
 	int				f_iIdleCycles;					/* full select()'s without io activity */
@@ -50,28 +52,39 @@ protected:
 	timeval		f_sLatency;							/* sleep between re-selects (helper) */
 	fd_set		f_xFileDescriptorSet; 	/* keyboard and eventual sockets */
 	process_filedes_map_t f_oFileDescriptorHandlers;
-	HProcess ( size_t );
-	virtual ~HProcess ( void );
-	int init ( int, int = 0 );
-	int run ( void );
-	virtual int reconstruct_fdset ( void );
-	template < typename tType >
-	int register_file_descriptor_handler ( int a_iFileDes, tType HANDLER )
+	yaal::hcore::HPipe f_oEvent;
+	HProcess( size_t );
+	virtual ~HProcess( void );
+public:
+	int run( void );
+	int init( int, int = 0 );
+protected:
+	int reconstruct_fdset( void );
+	template<typename tType>
+	int register_file_descriptor_handler( int a_iFileDes, tType HANDLER )
 		{
-		return ( register_file_descriptor_handler_internal ( a_iFileDes, static_cast < process_handler_filedes_t > ( HANDLER ) ) );
+		return ( register_file_descriptor_handler_internal( a_iFileDes, static_cast<process_handler_filedes_t>( HANDLER ) ) );
 		}
-	int register_file_descriptor_handler_internal ( int, process_handler_filedes_t );
-	int unregister_file_descriptor_handler ( int );
-	virtual int handler_alert ( int, void const* = NULL );
-	virtual int handler_idle ( int, void const* = NULL );
+	int register_file_descriptor_handler_internal( int, process_handler_filedes_t );
+	int unregister_file_descriptor_handler( int );
+	/*! \brief Process incoming events from interrupt socket.
+	 */
+	int process_interrupt( int );
+	/*! \brief Callback for SignalService.
+	 */
+	int handler_interrupt( int );
+	virtual int handler_alert( int, void const* = NULL );
+	virtual int handler_idle( int, void const* = NULL );
+	virtual int do_init( void );
+	virtual int do_cleanup( void );
 private:
-	HProcess ( HProcess const & );
-	HProcess & operator = ( HProcess const & );
+	HProcess( HProcess const& );
+	HProcess& operator = ( HProcess const& );
 	};
 
 }
 
 }
 
-#endif /* not __YAAL_HCORE_HPROCESS_H */
+#endif /* not __YAAL_TOOLS_HPROCESS_H */
 

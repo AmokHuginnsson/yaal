@@ -57,6 +57,7 @@ public:
 	void unlock( int );
 	void lock( int );
 	int signal_INT( int );
+	int signal_HUP( int );
 	int signal_TERM( int );
 	int signal_QUIT( int );
 	int signal_TSTP( int );
@@ -97,6 +98,7 @@ HSignalService::HSignalService( void )
 	sigemptyset( static_cast<sigset_t*>( f_oLocker.get() ) );
 	HSignalHandlerInterface::ptr_t base( new HBaseSignalHandlers() );
 	register_handler( SIGINT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_INT ) ) );
+	register_handler( SIGHUP, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_HUP ) ) );
 	register_handler( SIGTERM, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_TERM ) ) );
 	register_handler( SIGQUIT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_QUIT ) ) );
 	register_handler( SIGTSTP, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_TSTP ) ) );
@@ -234,6 +236,19 @@ int HBaseSignalHandlers::signal_INT ( int a_iSignum )
 		return ( 0 );
 	HString l_oMessage;
 	l_oMessage = "Interrupt signal caught, process broken: ";
+	l_oMessage += strsignal ( a_iSignum );
+	l_oMessage += '.';
+	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
+	fprintf ( stderr, "\n%s\n", l_oMessage.raw() );
+	return ( -1 );
+	M_EPILOG
+	}
+
+int HBaseSignalHandlers::signal_HUP( int a_iSignum )
+	{
+	M_PROLOG
+	HString l_oMessage;
+	l_oMessage = "Unhandled HUP received: ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
 	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;

@@ -114,7 +114,7 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 	if ( ! l_oMainWindow->is_initialised() )
 		M_THROW( _( "window has not been initialised" ), errno );
 	f_oForegroundWindow = f_oWindows->begin();
-	f_oCommandHandlers[ "quit" ] = static_cast<HANDLER_t>( &HTUIProcess::handler_quit );
+	f_oCommandHandlers[ "quit" ] = static_cast<HHandler::HANDLER_t>( &HTUIProcess::handler_quit );
 	refresh();
 	return ( 1 );
 	M_EPILOG

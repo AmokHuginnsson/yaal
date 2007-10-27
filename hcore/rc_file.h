@@ -38,8 +38,8 @@ namespace hcore
 struct OVariable
 	{
 	type_t f_eType;
-	char const * f_pcKey;
-	void * f_pvValue;
+	char const* f_pcKey;
+	void* f_pvValue;
 	};
 
 /*! \brief Reading configuration files.
@@ -50,17 +50,18 @@ struct OVariable
 namespace rc_file
 {
 
-int process_rc_file_internal ( char const * const, char const * const,
-		OVariable const * const, int const,
-		bool const ( * const ) ( HString &, HString & ) = NULL );
+typedef bool const ( * RC_CALLBACK_t )( HString&, HString& );
 
-template < typename tType >
-int process_rc_file ( char const * const a_pcConfigName,
-		char const * const a_pcSection,
-		tType const & a_tData,
-		bool const ( * const CALLBACK ) ( HString &, HString & ) = NULL )
+int reload_configuration( void );
+int process_rc_file_internal( char const* const, char const* const,
+		OVariable const* const, int const, RC_CALLBACK_t = NULL );
+
+template<typename tType>
+int process_rc_file( char const* const a_pcConfigName,
+		char const* const a_pcSection,
+		tType const& a_tData, RC_CALLBACK_t CALLBACK  = NULL )
 	{
-	return ( process_rc_file_internal ( a_pcConfigName, a_pcSection, a_tData,
+	return ( process_rc_file_internal( a_pcConfigName, a_pcSection, a_tData,
 			( sizeof ( tType ) / sizeof ( OVariable ) ) - 1, CALLBACK ) );
 	}
 
