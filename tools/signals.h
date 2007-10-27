@@ -53,10 +53,10 @@ class HSignalService
 public:
 	class HHandlerGeneric
 		{
-		HSignalHandlerInterface::HANDLER_t HANDLE;
+		HSignalHandlerInterface::HANDLER_t HANDLER;
 	public:
 		typedef yaal::hcore::HPointer<HHandlerGeneric, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
-		HHandlerGeneric( HSignalHandlerInterface::HANDLER_t handle ) : HANDLE( handle ) { }
+		HHandlerGeneric( HSignalHandlerInterface::HANDLER_t handle ) : HANDLER( handle ) { }
 		virtual ~HHandlerGeneric( void ) { }
 		virtual HSignalHandlerInterface* get_base() = 0;
 		int invoke( int );

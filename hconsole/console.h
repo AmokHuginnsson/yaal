@@ -34,6 +34,7 @@ Copyright:
 #endif /* HAVE_CONFIG_H */
 
 #include "hcore/hsingleton.h"
+#include "hcore/hpipe.h"
 #include "tools/signals.h"
 #include "hconsole/mouse.h"
 
@@ -165,7 +166,7 @@ class HConsole : public yaal::tools::HSignalHandlerInterface
 	int f_iWidth;
 	int f_iHeight;
 	int f_iMouseDes;
-	int f_piEvent[2];
+	yaal::hcore::HPipe::ptr_t f_oEvent;
 public:
 	int const& get_height( void ) const;
 	int const& get_width( void ) const;

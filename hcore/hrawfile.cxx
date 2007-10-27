@@ -82,7 +82,7 @@ int HRawFile::close_plain( void )
 int HRawFile::close_ssl( void )
 	{
 	M_PROLOG
-	if ( is_write_ready() )
+	if ( is_write_ready( f_iFileDescriptor ) )
 		f_oSSL->shutdown();
 	return ( do_close() );
 	M_EPILOG
@@ -136,11 +136,11 @@ int HRawFile::read_ssl_loader( void* const a_pcBuffer, int const a_iSize )
 	M_EPILOG
 	}
 
-bool HRawFile::is_write_ready( void )
+bool HRawFile::is_write_ready( int a_iFileDescriptor )
 	{
 	pollfd l_sWriter;
 	::memset( &l_sWriter, 0, sizeof ( l_sWriter ) );
-	l_sWriter.fd = f_iFileDescriptor;
+	l_sWriter.fd = a_iFileDescriptor;
 	l_sWriter.events = POLLOUT;
 	return ( ( poll( &l_sWriter, 1, 0 ) == 1 ) && ( l_sWriter.revents & POLLOUT ) && ! ( l_sWriter.revents & POLLHUP ) );
 	}
@@ -148,7 +148,7 @@ bool HRawFile::is_write_ready( void )
 int HRawFile::do_write( void const* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
-	if ( is_write_ready() )
+	if ( is_write_ready( f_iFileDescriptor ) )
 		return ( (this->*writer)( a_pcBuffer, a_iSize ) ); 
 	return ( -1 );
 	M_EPILOG

@@ -134,19 +134,13 @@ bool n_bNeedRepaint( false );
 
 /* public: */
 
-HConsole::HConsole( void ) : f_bInitialized( false ), f_iWidth( 0 ), f_iHeight( 0 ), f_iMouseDes( 0 ), f_piEvent()
+HConsole::HConsole( void ) : f_bInitialized( false ), f_iWidth( 0 ), f_iHeight( 0 ), f_iMouseDes( 0 ), f_oEvent()
 	{
-	f_piEvent[ 0 ] = -1;
-	f_piEvent[ 1 ] = -1;
 	return;
 	}
 
 HConsole::~HConsole( void )
 	{
-	if ( f_piEvent[ 0 ] >= 0 )
-		::close( f_piEvent[ 0 ] );
-	if ( f_piEvent[ 1 ] >= 0 )
-		::close( f_piEvent[ 1 ] );
 	return;
 	}
 
@@ -177,7 +171,7 @@ void HConsole::init( void )
 	signalService.register_handler( SIGTRAP, cleanup );
 	signalService.register_handler( SIGSYS, cleanup );
 	signalService.register_handler( SIGPIPE, cleanup );
-	M_ENSURE( pipe( f_piEvent ) == 0 );
+	f_oEvent = HPipe::ptr_t( new HPipe );
 	M_EPILOG
 	}
 
@@ -390,8 +384,7 @@ int HConsole::get_mouse_fd( void ) const
 
 int HConsole::get_event_fd( void ) const
 	{
-	M_ENSURE( f_piEvent[ 0 ] >= 0 );
-	return ( f_piEvent[ 0 ] );
+	return ( f_oEvent->get_reader_fd() );
 	}
 
 int HConsole::c_vmvprintf( int a_iRow, int a_iColumn,
@@ -670,10 +663,7 @@ int HConsole::on_terminal_resize( int a_iSignum )
 	l_pcSignalMessage = l_oMessage;
 	log << l_oMessage << endl;
 	if ( is_enabled() )
-		{
-		char c = 'r';
-		::write( f_piEvent[ 1 ], &c, 1 ); 
-		}
+		*f_oEvent << 'r';
 	else
 		fprintf ( stderr, "\n%s", l_pcSignalMessage );
 	return ( 0 );
@@ -732,10 +722,7 @@ int HConsole::on_cont( int )
 	if ( ! is_enabled() )
 		enter_curses();
 	if ( is_enabled() )
-		{
-		char c = 'r';
-		::write( f_piEvent[ 1 ], &c, 1 ); 
-		}
+		*f_oEvent << 'r';
 	return ( 0 );
 	M_EPILOG
 	}
@@ -747,8 +734,7 @@ int HConsole::on_mouse( int )
 		{
 		if ( is_enabled() )
 			{
-			char c = 'm';
-			::write( f_piEvent[ 1 ], &c, 1 ); 
+			*f_oEvent << 'm';
 			return ( 1 );
 			}
 		}

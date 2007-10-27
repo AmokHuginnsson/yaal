@@ -70,7 +70,7 @@ public:
 int HSignalService::HHandlerGeneric::invoke( int a_iSigNo )
 	{
 	M_PROLOG
-	return ( (get_base()->*HANDLE)( a_iSigNo ) );
+	return ( (get_base()->*HANDLER)( a_iSigNo ) );
 	M_EPILOG
 	}
 
