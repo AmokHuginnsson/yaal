@@ -82,7 +82,7 @@ private:
 		void set_child ( HAbstractNode *, HAbstractNode * );
 		friend class HSBBSTree;
 		};
-	template < typename tType >
+	template<typename tType>
 	class HNode : public HAbstractNode
 		{
 		tType f_tKey;
@@ -98,11 +98,11 @@ public:
 	virtual ~HSBBSTree( void );
 	template<typename tType, typename ttType>
 	HIterator insert( tType const& );
-	template<typename tType, typename ttType>
-	void remove( tType const& );
+	template<typename tType, typename ttType, typename tttType>
+	void remove( ttType const& );
 	void remove( HIterator const& );
-	template<typename tType, typename ttType>
-	HIterator find( tType const& ) const;
+	template<typename tType, typename ttType, typename tttType>
+	HIterator find( ttType const& ) const;
 	int long size( void ) const;
 	bool empty( void ) const;
 	HIterator begin( void ) const;
@@ -110,8 +110,8 @@ public:
 	HIterator rbegin( void ) const;
 	HIterator rend( void ) const;
 private:
-	template<typename tType, typename ttType>
-	ONodePtr find_node( tType const& ) const;
+	template<typename tType, typename ttType, typename tttType>
+	ONodePtr find_node( ttType const& ) const;
 	void remove_node( HAbstractNode* );
 	void swap( HAbstractNode*, HAbstractNode* );
 	HAbstractNode* sibling( HAbstractNode* ) const;
@@ -163,7 +163,7 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 	ONodePtr l_oNode;
 	HNode<tType>* l_poNode = NULL;
 	if ( f_poRoot )
-		l_oNode = find_node<tType, ttType>( a_tKey );
+		l_oNode = find_node<tType, tType, ttType>( a_tKey );
 	if ( l_oNode.f_bExists )
 		{
 		l_poNode = static_cast<HNode<tType>*>( l_oNode.f_poNode );
@@ -199,12 +199,12 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 	return ( HIterator( l_poNode ) );
 	}
 
-template<typename tType, typename ttType>
-void HSBBSTree::remove( tType const& a_tKey )
+template<typename tType, typename ttType, typename tttType>
+void HSBBSTree::remove( ttType const& a_tKey )
 	{
 	if ( f_poRoot )
 		{
-		ONodePtr l_oNode = find_node<tType, ttType>( a_tKey );
+		ONodePtr l_oNode = find_node<tType, ttType, tttType>( a_tKey );
 		if ( l_oNode.f_bExists )
 			{
 			remove_node( l_oNode.f_poNode );
@@ -215,15 +215,15 @@ void HSBBSTree::remove( tType const& a_tKey )
 			static_cast<int>( ERROR::E_NON_EXISTING_KEY ) );
 	}
 
-template<typename tType, typename ttType>
-HSBBSTree::HIterator HSBBSTree::find( tType const& a_tKey ) const
+template<typename tType, typename ttType, typename tttType>
+HSBBSTree::HIterator HSBBSTree::find( ttType const& a_tKey ) const
 	{
-	ONodePtr l_oNodePtr = find_node<tType, ttType>( a_tKey );
+	ONodePtr l_oNodePtr = find_node<tType, ttType, tttType>( a_tKey );
 	return ( HIterator( l_oNodePtr.f_bExists ? l_oNodePtr.f_poNode : NULL ) );
 	}
 
-template<typename tType, typename ttType>
-typename HSBBSTree::ONodePtr HSBBSTree::find_node( tType const& a_tKey ) const
+template<typename tType, typename ttType, typename tttType>
+typename HSBBSTree::ONodePtr HSBBSTree::find_node( ttType const& a_tKey ) const
 	{
 	ONodePtr l_oNodePtr;
 	if ( f_poRoot )
@@ -231,14 +231,14 @@ typename HSBBSTree::ONodePtr HSBBSTree::find_node( tType const& a_tKey ) const
 		l_oNodePtr.f_poNode = f_poRoot;
 		while ( ! l_oNodePtr.f_bExists )
 			{
-			if ( ttType::less( a_tKey, static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey ) )
+			if ( tttType::less( a_tKey, static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey ) )
 				{
 				if ( l_oNodePtr.f_poNode->f_poLeft )
 					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poLeft;
 				else
 					break;
 				}
-			else if ( ttType::less( static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey, a_tKey ) )
+			else if ( tttType::less( static_cast<HNode<tType>*>( l_oNodePtr.f_poNode )->f_tKey, a_tKey ) )
 				{
 				if ( l_oNodePtr.f_poNode->f_poRight )
 					l_oNodePtr.f_poNode = l_oNodePtr.f_poNode->f_poRight;

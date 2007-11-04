@@ -114,9 +114,9 @@ public:
 	HIterator insert( tType const& e )
 		{	return ( HIterator( f_oEngine.insert<tType, ttType>( e ) ) );	}
 	void remove( tType const& e )
-		{	f_oEngine.remove<tType, ttType>( e );	}
+		{	f_oEngine.remove<tType, tType, ttType>( e );	}
 	HIterator find( tType const& e ) const
-		{ return ( HIterator( f_oEngine.find<tType, ttType>( e ) ) ); }
+		{ return ( HIterator( f_oEngine.find<tType, tType, ttType>( e ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( f_oEngine.begin() ) ); }
 	HIterator end( void ) const

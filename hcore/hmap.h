@@ -82,6 +82,12 @@ inline static void update( HPair<tType, ttType>& left, HPair<tType, ttType> cons
 inline static bool less( HPair<tType, ttType> const& left, HPair<tType, ttType> const& right )
 	{	return ( left.first < right.first );	}
 
+inline static bool less( tType const& left, HPair<tType, ttType> const& right )
+	{	return ( left < right.first );	}
+
+inline static bool less( HPair<tType, ttType> const& left, tType const& right )
+	{	return ( left.first < right );	}
+
 };
 
 template<typename tType, typename ttType, typename tttType = map_helper<tType const, ttType> >
@@ -153,7 +159,7 @@ public:
 		return;
 		}
 	HIterator find( tType const& e ) const
-		{ return ( HIterator( f_oEngine.find<map_elem_t, tttType>( map_elem_t( e, ttType() ) ) ) ); }
+		{ return ( HIterator( f_oEngine.find<map_elem_t, tType, tttType>( e ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( f_oEngine.begin() ) ); }
 	HIterator end( void ) const
