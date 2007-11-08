@@ -47,8 +47,8 @@ int long n_lLogMask = 0;
 int n_iDebugLevel = 0;
 HString n_oSSLKey;
 HString n_oSSLCert;
-typedef HSingleton<HLog> HLogInstance;
-HLog& log = HLogInstance::get_instance( 1000 );
+typedef HSingleton<HLog> HLogService;
+HLog& log = HLogService::get_instance( 1000 );
 
 OVariable n_psHCoreVariables[] =
 	{

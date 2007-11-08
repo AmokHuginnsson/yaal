@@ -50,26 +50,31 @@ public:
 			} ssl_context_type_t;
 		};
 private:
-	struct OSSLContext
+	class OSSLContext : public HSingletonInterface
 		{
 		static HMutex f_oMutex;
+	public:
 		void* f_pvMethod;
 		void* f_pvContext;
+		void init( void );
+	protected:
 		OSSLContext( void );
 		virtual ~OSSLContext( void );
-		void init( void );
-		static int life_time( int );
 	private:
 		OSSLContext( OSSLContext const& );
 		OSSLContext& operator=( OSSLContext const& );
 		};
-	struct OSSLContextServer : public OSSLContext
+	class OSSLContextServer : public OSSLContext
 		{
 		OSSLContextServer( void );
+		friend class HSingleton<OSSLContextServer>;
+		friend class HDestructor<OSSLContextServer>;
 		};
-	struct OSSLContextClient : public OSSLContext
+	class OSSLContextClient : public OSSLContext
 		{
 		OSSLContextClient( void );
+		friend class HSingleton<OSSLContextClient>;
+		friend class HDestructor<OSSLContextClient>;
 		};
 	typedef yaal::hcore::HSingleton<OSSLContextServer> OSSLContextServerInstance;
 	typedef yaal::hcore::HSingleton<OSSLContextClient> OSSLContextClientInstance;

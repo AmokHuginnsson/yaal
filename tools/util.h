@@ -47,6 +47,16 @@ bool verify_IBAN( char const* );
 char const* const get_last_error( void );
 void failure( int, char const* const, ... ) __attribute__ ( ( __noreturn__ ) );
 
+/*! \brief Various convinient sleep functions.
+ */
+namespace sleep
+{
+
+int milisecond( int, bool = false );
+int second( int, bool = false );
+
+}
+
 /*! \brief The Levenshtein and Levenshtein-Damerau string distance functions.
  */
 namespace distance

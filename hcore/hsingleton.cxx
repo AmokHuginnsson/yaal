@@ -39,6 +39,11 @@ namespace hcore
 HMutex HLifeTimeTracker::f_oMutex;
 HLifeTimeTracker::map_stack_t HLifeTimeTracker::f_oDestructors;
 
+int HSingletonInterface::life_time( int a_iLifeTime )
+	{
+	return ( a_iLifeTime );
+	}
+
 void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int const& a_iLifeTime )
 	{
 	HLock l_oLock( f_oMutex );

@@ -29,7 +29,7 @@ Copyright:
 
 #line 31
 
-#define D_VCSID_HARRAY_H "$Id$"
+#define D_VCSID_YAAL_HCORE_HARRAY_H "$Id$"
 
 #include <new>
 

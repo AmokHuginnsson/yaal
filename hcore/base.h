@@ -175,6 +175,16 @@ tType& clone( tType& object )
 	return ( tType( new ttType( *object ) ) );
 	}
 
+class HNonCopyable
+	{
+public:
+	HNonCopyable( void ) {}
+	virtual ~HNonCopyable( void ) {}
+private:
+	HNonCopyable( HNonCopyable const& );
+	HNonCopyable& operator = ( HNonCopyable const& );
+	};
+
 }
 
 #endif /* not __YAAL_HCORE_BASE_H */

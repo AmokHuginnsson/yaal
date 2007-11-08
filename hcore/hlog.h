@@ -54,7 +54,7 @@ namespace LOG_TYPE
 
 class HLog;
 
-class HLog : public HStreamInterface
+class HLog : public HStreamInterface, private HSingletonInterface
 	{
 	bool			f_bRealMode;
 	bool			f_bNewLine;
@@ -79,7 +79,6 @@ public:
 private:
 	HLog( void );
 	virtual ~HLog( void );
-	static int life_time( int );
 	void timestamp ( FILE * = NULL );
 	virtual int do_write( void const* const, int const );
 	virtual void do_flush( void ) const;

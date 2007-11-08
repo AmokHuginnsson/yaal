@@ -160,7 +160,7 @@ struct EVENT
 
 extern bool n_bNeedRepaint;
 
-class HConsole : public yaal::tools::HSignalHandlerInterface
+class HConsole : public yaal::tools::HSignalHandlerInterface, private yaal::hcore::HSingletonInterface
 	{
 	bool f_bInitialized;
 	int f_iWidth;
@@ -205,7 +205,6 @@ protected:
 	int c_vcmvprintf ( int, int, int, char const* const, void* ) const;
 	int c_vprintf ( char const* const, void* ) const;
 	void init( void );
-	static int life_time( int );
 private:
 	HConsole( void );
 	~HConsole( void );

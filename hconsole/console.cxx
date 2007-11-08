@@ -670,11 +670,6 @@ int HConsole::on_terminal_resize( int a_iSignum )
 	M_EPILOG
 	}
 
-int HConsole::life_time( int a_iLifeTime )
-	{
-	return ( a_iLifeTime );
-	}
-
 int HConsole::console_cleanup( int a_iSigNo )
 	{
 	M_PROLOG

@@ -1,7 +1,7 @@
 /*
----           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	harray.cxx - this file is integral part of `yaal' project.
+	hcaller.cxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,27 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <libintl.h>
-
 #include "hexception.h"
 M_VCSID ( "$Id$" )
-#include "harray.h"
-M_VCSTID ( D_VCSID_YAAL_HCORE_HARRAY_H )
+#include "hcaller.h"
+M_VCSTID ( D_VCSID_YAAL_HCORE_HCALLER_H )
 
-namespace yaal
-{
-
-namespace hcore
-{
-
-char const * const n_ppcErrMsgHArray [ 4 ] =
-	{
-	_ ( "ok" ),
-/* HArray::ERROR::E_BADSIZE */		_ ( "bad size" ),
-/* HArray::ERROR::E_NOMEM */			_ ( "can not alloc memory with new" ),
-/* HArray::ERROR::E_BADINDEX */		_ ( "index does not fit into array" )
-	};
-
-}
-
-}

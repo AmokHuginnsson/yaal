@@ -308,11 +308,6 @@ int HLog::do_read( void* const, int )
 	return ( 0 );
 	}
 
-int HLog::life_time( int a_iLifeTime )
-	{
-	return ( a_iLifeTime );
-	}
-
 }
 
 }

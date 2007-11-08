@@ -38,6 +38,12 @@ namespace yaal
 namespace hcore
 {
 
+class HSingletonInterface : private HNonCopyable
+	{
+public:
+	static int life_time( int );
+	};
+
 class HAbstractDestructor
 	{
 public:

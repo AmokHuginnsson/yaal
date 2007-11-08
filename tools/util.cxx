@@ -348,6 +348,35 @@ void failure ( int a_iExitStatus, char const * const a_pcFormat, ... )
 	throw ( a_iExitStatus );
 	}
 
+namespace sleep
+{
+
+int sleep_real( timeval& a_xTime, bool a_bIgnoreInterrrupt )
+	{
+	int err = 0;
+	while ( ( ( err = ::select( 0, NULL, NULL, NULL, &a_xTime ) ) == -1 ) && ( errno == EINTR ) && a_bIgnoreInterrrupt )
+		;
+	return ( err );
+	}
+
+int milisecond( int a_iQuantity, bool a_bIgnoreInterrrupt )
+	{
+	timeval wait;
+	wait.tv_sec = 0;
+	wait.tv_usec = a_iQuantity * 1000;
+	return ( sleep_real( wait, a_bIgnoreInterrrupt ) );
+	}
+
+int second( int a_iQuantity, bool a_bIgnoreInterrrupt )
+	{
+	timeval wait;
+	wait.tv_sec = a_iQuantity;
+	wait.tv_usec = 0;
+	return ( sleep_real( wait, a_bIgnoreInterrrupt ) );
+	}
+
+}
+
 namespace
 {
 int min3 ( int a, int b, int c )
