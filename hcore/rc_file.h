@@ -28,19 +28,13 @@ Copyright:
 #define __YAAL_HCORE_RC_FILE_H
 
 #include "hcore/hfile.h"
+#include "hcore/ooption.h"
 
 namespace yaal
 {
 
 namespace hcore
 {
-
-struct OVariable
-	{
-	type_t f_eType;
-	char const* f_pcKey;
-	void* f_pvValue;
-	};
 
 /*! \brief Reading configuration files.
  * 
@@ -54,7 +48,7 @@ typedef bool const ( * RC_CALLBACK_t )( HString&, HString& );
 
 int reload_configuration( void );
 int process_rc_file_internal( char const* const, char const* const,
-		OVariable const* const, int const, RC_CALLBACK_t = NULL );
+		OOption const* const, int const, RC_CALLBACK_t = NULL );
 
 template<typename tType>
 int process_rc_file( char const* const a_pcConfigName,
@@ -62,7 +56,7 @@ int process_rc_file( char const* const a_pcConfigName,
 		tType const& a_tData, RC_CALLBACK_t CALLBACK  = NULL )
 	{
 	return ( process_rc_file_internal( a_pcConfigName, a_pcSection, a_tData,
-			( sizeof ( tType ) / sizeof ( OVariable ) ) - 1, CALLBACK ) );
+			( sizeof ( tType ) / sizeof ( OOption ) ) - 1, CALLBACK ) );
 	}
 
 void rc_set_variable ( char const * const, bool & );

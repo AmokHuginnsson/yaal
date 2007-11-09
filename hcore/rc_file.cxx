@@ -153,7 +153,7 @@ struct ORCLoader
 	{
 	HString f_oPath;
 	HString f_oSection;
-	OVariable const* f_psVaraibles;
+	OOption const* f_psVaraibles;
 	int f_iCount;
 	RC_CALLBACK_t rc_callback;
  	ORCLoader( void ) :
@@ -161,9 +161,9 @@ struct ORCLoader
 		f_iCount( 0 ), rc_callback( NULL ) { }
  	ORCLoader( char const* const a_pcRcName,
 		char const* const a_pcSection,
-		OVariable const* const a_psVaraibles, int const a_iCount,
+		OOption const* const a_psOptions, int const a_iCount,
 		RC_CALLBACK_t callback ) :
-		f_oPath( a_pcRcName ), f_oSection( a_pcSection ), f_psVaraibles( a_psVaraibles ),
+		f_oPath( a_pcRcName ), f_oSection( a_pcSection ), f_psVaraibles( a_psOptions ),
 		f_iCount( a_iCount ), rc_callback( callback ) { }
  	ORCLoader( ORCLoader const& loader ) :
 		f_oPath(), f_oSection(), f_psVaraibles( NULL ),
@@ -200,12 +200,12 @@ public:
 
 int process_rc_file_internal( char const* const a_pcRcName,
 		char const* const a_pcSection,
-		OVariable const* const a_psVaraibles, int const a_iCount,
+		OOption const* const a_psOptions, int const a_iCount,
 		RC_CALLBACK_t rc_callback )
 	{
 	M_PROLOG
 	if ( ! n_bRCLoadersLocked )
-		n_oRCLoades.push_back( ORCLoader( a_pcRcName, a_pcSection, a_psVaraibles, a_iCount, rc_callback ) );
+		n_oRCLoades.push_back( ORCLoader( a_pcRcName, a_pcSection, a_psOptions, a_iCount, rc_callback ) );
 	struct OPlacement
 		{
 		RC_PATHER::placement_t f_ePlacement;
@@ -243,8 +243,8 @@ int process_rc_file_internal( char const* const a_pcRcName,
 						if ( l_oOption == l_oValue )
 							{
 							if ( n_iDebugLevel )
-								fprintf ( stderr, "section: [%s]\n",
-										static_cast < char const * const > ( l_oOption ) );
+								::fprintf( stderr, "section: [%s]\n",
+										static_cast<char const * const>( l_oOption ) );
 							log << "section: " << a_pcSection << ", ";
 							l_bSection = true;
 							continue;
@@ -255,44 +255,18 @@ int process_rc_file_internal( char const* const a_pcRcName,
 					if ( ! l_bSection )
 						continue;
 					}
-				while ( substitute_environment ( l_oValue ) )
+				while ( substitute_environment( l_oValue ) )
 					;
 				if ( n_iDebugLevel )
-					fprintf ( stderr, "option: [%s], value [%s]\n",
-							static_cast < char const * const > ( l_oOption ),
-							static_cast < char const * const > ( l_oValue ) );
+					::fprintf( stderr, "option: [%s], value [%s]\n",
+							static_cast<char const * const>( l_oOption ),
+							static_cast<char const * const>( l_oValue ) );
 				l_iCtr = 0;
 				l_bOptionOK = false;
-				while ( ( l_iCtr < a_iCount ) && a_psVaraibles [ l_iCtr ].f_pcKey )
+				while ( ( l_iCtr < a_iCount ) && a_psOptions[ l_iCtr ].f_pcName )
 					{
-					if ( ! strcasecmp ( l_oOption, a_psVaraibles [ l_iCtr ].f_pcKey ) )
-						{
-						switch ( a_psVaraibles [ l_iCtr ].f_eType )
-							{
-							case ( D_BOOL ):
-								rc_set_variable ( l_oValue,
-										* static_cast < bool * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-							break;
-							case ( D_CHAR ):
-								rc_set_variable ( l_oValue,
-										* static_cast < char * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-							break;
-							case ( D_INT ):
-								rc_set_variable ( l_oValue,
-										* static_cast < int * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-							break;
-							case ( D_CHAR_POINTER ):
-								rc_set_variable ( l_oValue,
-										static_cast < char ** > ( a_psVaraibles [ l_iCtr ].f_pvValue ) );
-							break;
-							case ( D_HSTRING ):
-								( * static_cast < HString * > ( a_psVaraibles [ l_iCtr ].f_pvValue ) ) = l_oValue;
-							break;
-							default:
-								M_THROW ( "unknown type", a_psVaraibles [ l_iCtr ].f_eType );
-							}
-						l_bOptionOK = true;
-						}
+					if ( ! ::strcasecmp( l_oOption, a_psOptions[ l_iCtr ].f_pcName ) )
+						l_bOptionOK = true, set_option( a_psOptions[ l_iCtr ], l_oValue );
 					l_iCtr ++;
 					}
 				if ( rc_callback && rc_callback ( l_oOption, l_oValue )
@@ -301,8 +275,8 @@ int process_rc_file_internal( char const* const a_pcRcName,
 					log << "failed." << endl;
 					l_oMessage.format ( "Error: unknown option found: `%s', "
 								"with value: `%s', on line %d.\n",
-								static_cast < char const * > ( l_oOption ),
-								static_cast < char const * > ( l_oValue ), l_iLine );
+								static_cast<char const *>( l_oOption ),
+								static_cast<char const *>( l_oValue ), l_iLine );
 					log ( LOG_TYPE::D_ERROR ) << l_oMessage;
 					fprintf ( stderr, l_oMessage );
 					}

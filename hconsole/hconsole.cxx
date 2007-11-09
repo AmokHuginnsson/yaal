@@ -75,20 +75,21 @@ bool	n_bLeaveCtrlBackSlash = false;
 char	n_cCommandComposeCharacter = 'x';
 int		n_iCommandComposeDelay = 16;
 
-OVariable n_psVariables[] =
+OOption n_psVariables[] =
 	{
-		{ D_BOOL, "use_mouse", & n_bUseMouse },
-		{ D_BOOL, "disable_XON", & n_bDisableXON },
-		{ D_BOOL, "leave_ctrl_c", & n_bLeaveCtrlC },
-		{ D_BOOL, "leave_ctrl_z", & n_bLeaveCtrlZ },
-		{ D_BOOL, "leave_ctrl_s", & n_bLeaveCtrlS },
-		{ D_BOOL, "leave_ctrl_q", & n_bLeaveCtrlQ },
-		{ D_BOOL, "leave_ctrl_\\", & n_bLeaveCtrlBackSlash },
-		{ D_INT, "esc_delay", & ESCDELAY }, /* defined inside ncurses lib */
-		{ D_INT, "latency", & n_iLatency },
-		{ D_CHAR, "command_compose_character", & n_cCommandComposeCharacter },
-		{ D_INT, "command_compose_delay", & n_iCommandComposeDelay },
-		{ D_VOID, NULL, NULL }
+		{ "use_mouse", D_BOOL, &n_bUseMouse, 0, OOption::D_OPTIONAL, NULL, "enable mouse support", NULL },
+		{ "disable_XON", D_BOOL, &n_bDisableXON, 0, OOption::D_OPTIONAL, NULL, "disable flow control events", NULL },
+		{ "leave_ctrl_c", D_BOOL, &n_bLeaveCtrlC, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+C sequence", NULL },
+		{ "leave_ctrl_z", D_BOOL, &n_bLeaveCtrlZ, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+Z sequence", NULL },
+		{ "leave_ctrl_s", D_BOOL, &n_bLeaveCtrlS, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+S sequence", NULL },
+		{ "leave_ctrl_q", D_BOOL, &n_bLeaveCtrlQ, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+Q sequence", NULL },
+		{ "leave_ctrl_\\", D_BOOL, &n_bLeaveCtrlBackSlash, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+\\ sequence", NULL },
+		{ "esc_delay", D_INT, &ESCDELAY, 0, OOption::D_REQUIRED, NULL, "ncurses escape sequence time span", NULL }, /* defined inside ncurses lib */
+		{ "latency", D_INT, &n_iLatency, 0, OOption::D_REQUIRED, NULL, "how often invoke idle event", NULL },
+		{ "command_compose_character", D_CHAR, &n_cCommandComposeCharacter, 0, OOption::D_REQUIRED, NULL,
+			"character that shall be uses as command composition base", NULL },
+		{ "command_compose_delay", D_INT, &n_iCommandComposeDelay, 0, OOption::D_REQUIRED, NULL, "command composition time span", NULL },
+		{ NULL, D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
 	};
 
 void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )

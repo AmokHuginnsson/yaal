@@ -50,11 +50,11 @@ HString n_oSSLCert;
 typedef HSingleton<HLog> HLogService;
 HLog& log = HLogService::get_instance( 1000 );
 
-OVariable n_psHCoreVariables[] =
+OOption n_psHCoreVariables[] =
 	{
-		{ D_HSTRING, "ssl_key", &n_oSSLKey },
-		{ D_HSTRING, "ssl_cert", &n_oSSLCert },
-		{ D_VOID, NULL, NULL }
+		{ "ssl_key", D_HSTRING, &n_oSSLKey, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL private key file.", NULL },
+		{ "ssl_cert", D_HSTRING, &n_oSSLCert, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL certificate file.", NULL },
+		{ NULL, D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
 	};
 
 /* mathematical macros */

@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	cl_switch.h - this file is integral part of `yaal' project.
+	ooption.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,10 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __YAAL_HCORE_CL_SWITCH_H
-#define __YAAL_HCORE_CL_SWITCH_H
-
-#include "hcore/ooption.h"
+#ifndef __YAAL_HCORE_OOPTION_H
+#define __YAAL_HCORE_OOPTION_H
 
 namespace yaal
 {
@@ -35,22 +33,30 @@ namespace yaal
 namespace hcore
 {
 
-/*! \brief Handling of command line switches.
- * 
- * cl_switch gives easy to use API for interpreting and handling
- * command line switches that are common in Unix world.
- */
-namespace cl_switch
+typedef void ( *simple_callback_t )( void );
+
+typedef struct
 	{
+	char const* const f_pcName;
+	type_t f_eValueType;
+	void* f_pvValue;
+	char const* const f_pcShortForm;
+	enum
+		{
+		D_NONE,
+		D_OPTIONAL,
+		D_REQUIRED
+		} f_eSwitchType;
+	char const* f_pcArgument;
+	char const* f_pcDescription;
+	simple_callback_t CALLBACK;
+	} OOption;
 
-int decode_switches ( int const, char* const* const,
-		OOption* const&, int const, int* const = NULL );
-
-	}
+void set_option( OOption const&, char const* const );
 
 }
 
 }
 
-#endif /* not __YAAL_HCORE_CL_SWITCH_H */
+#endif /* not __YAAL_HCORE_OOPTION_H */
 

@@ -72,9 +72,9 @@ extern void * n_pvDlHandle;
 
 int		n_iDataBaseDriver = 0;
 
-OVariable n_psVariables [ ] =
+OOption n_psVariables[] =
 	{
-		{ D_VOID, NULL, NULL }
+		{ NULL, D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
 	};
 
 bool const set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )

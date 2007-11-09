@@ -54,15 +54,14 @@ bool n_bIgnoreSignalSIGINT = false;
 bool n_bIgnoreSignalSIGTSTP = false;
 bool n_bIgnoreSignalSIGQUIT = false;
 
-OVariable n_psVariables [ ] =
+OOption n_psVariables [ ] =
 	{
-		{ D_BOOL, "ignore_signal_SIGINT", & n_bIgnoreSignalSIGINT },
-		{ D_BOOL, "ignore_signal_SIGTSTP", & n_bIgnoreSignalSIGTSTP },
-		{ D_BOOL, "ignore_signal_SIGQUIT", & n_bIgnoreSignalSIGQUIT },
-		{ D_INT, "collector_connection_timeout",
-		& n_iCollectorConnectionTimeOut },
-		{ D_CHAR_POINTER, "serial_device", & n_pcSerialDevice },
-		{ D_VOID, NULL, NULL }
+		{ "ignore_signal_SIGINT", D_BOOL, &n_bIgnoreSignalSIGINT, 0, OOption::D_OPTIONAL, NULL, "ignore INT (interrupt) signal", NULL },
+		{ "ignore_signal_SIGTSTP", D_BOOL, &n_bIgnoreSignalSIGTSTP, 0, OOption::D_OPTIONAL, NULL, "ignore TSTP (terminal stop, suspend) signal", NULL },
+		{ "ignore_signal_SIGQUIT", D_BOOL, &n_bIgnoreSignalSIGQUIT, 0, OOption::D_OPTIONAL, NULL, "ignore QUIT, core dump signal", NULL },
+		{ "serial_device", D_CHAR_POINTER, &n_pcSerialDevice, 0, OOption::D_REQUIRED, NULL, "path to serial device", NULL },
+		{ "collector_connection_timeout", D_INT, &n_iCollectorConnectionTimeOut, 0, OOption::D_REQUIRED, NULL, "timeout on collector device read", NULL },
+		{ NULL, D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
 	};
 	
 namespace util

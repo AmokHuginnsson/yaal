@@ -56,7 +56,7 @@ char const * const make_short_opts ( OOption * const & a_rpsOptions, int a_iCoun
 	a_roBuffer = "";
 	for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 		{
-		a_roBuffer += static_cast<char>( a_rpsOptions [ l_iCtr ].f_pcShortOption[0] );
+		a_roBuffer += static_cast<char>( a_rpsOptions [ l_iCtr ].f_pcShortForm[0] );
 		switch ( a_rpsOptions [ l_iCtr ].f_eSwitchType )
 			{
 			case ( OOption::D_REQUIRED ):
@@ -82,7 +82,7 @@ option * make_option_array( OOption * const & a_rpsOptions, int a_iCount, HChunk
 	for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 		{
 		memset( &l_psOptions[ l_iCtr ], 0, sizeof( option ) );
-		l_psOptions[ l_iCtr ].name = a_rpsOptions[ l_iCtr ].f_pcLongOption;
+		l_psOptions[ l_iCtr ].name = a_rpsOptions[ l_iCtr ].f_pcName;
 		switch ( a_rpsOptions [ l_iCtr ].f_eSwitchType )
 			{
 			case ( OOption::D_REQUIRED ):
@@ -95,7 +95,7 @@ option * make_option_array( OOption * const & a_rpsOptions, int a_iCount, HChunk
 			default :
 				l_psOptions [ l_iCtr ].has_arg = no_argument;
 			}
-		l_psOptions[ l_iCtr ].val = a_rpsOptions[ l_iCtr ].f_pcShortOption[0];
+		l_psOptions[ l_iCtr ].val = a_rpsOptions[ l_iCtr ].f_pcShortForm[0];
 		}
 	return ( l_psOptions );
 	M_EPILOG
@@ -122,42 +122,11 @@ int decode_switches ( int const a_iArgc, char * const * const a_ppcArgv,
 		l_bValidSwitch = false;
 		for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 			{
-			if ( a_rpsOptions[ l_iCtr ].f_pcShortOption[0] == l_iChar )
-				{
-				l_bValidSwitch = true;
-				switch ( a_rpsOptions [ l_iCtr ].f_eValueType )
-					{
-					case ( D_BOOL ):
-						rc_set_variable ( "true",
-								* static_cast < bool * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) );
-					break;
-					case ( D_CHAR ):
-						if ( optarg )
-							rc_set_variable ( optarg,
-									* static_cast < char * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) );
-					break;
-					case ( D_INT ):
-						rc_set_variable ( optarg,
-								* static_cast < int * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) );
-					break;
-					case ( D_CHAR_POINTER ):
-						rc_set_variable ( optarg,
-								static_cast < char * * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) );
-					break;
-					case ( D_HSTRING ):
-						( * static_cast < HString * > ( a_rpsOptions [ l_iCtr ].f_pvValue ) ) = optarg;
-					break;
-					case ( D_VOID ):
-						break;
-					default:
-						M_THROW ( "unknown type", a_rpsOptions [ l_iCtr ].f_eValueType );
-					}
-				if ( a_rpsOptions [ l_iCtr ].CALLBACK )
-					a_rpsOptions [ l_iCtr ].CALLBACK();
-				}
+			if ( a_rpsOptions[ l_iCtr ].f_pcShortForm[0] == l_iChar )
+				l_bValidSwitch = true, set_option( a_rpsOptions[ l_iCtr ], optarg );
 			}
 		if ( ! l_bValidSwitch && a_piUnknown )
-			( * a_piUnknown ) ++;
+			( *a_piUnknown ) ++;
 		}
 	hcore::log << "done." << endl;
 	return ( optind );
