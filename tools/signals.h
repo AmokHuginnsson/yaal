@@ -29,7 +29,7 @@ Copyright:
 
 #include "hcore/hpointer.h"
 #include "hcore/hchunk.h"
-#include "hcore/hmap.h"
+#include "hcore/hmultimap.h"
 #include "hcore/hlist.h"
 #include "hcore/hthread.h"
 #include "hcore/hsingleton.h"
@@ -85,7 +85,7 @@ private:
 	typedef yaal::hcore::HThreadT<HSignalService> signal_service_t;
 	typedef yaal::hcore::HList<HHandlerGeneric::ptr_t> handler_list_t;
 	typedef yaal::hcore::HPointer<handler_list_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> handler_list_ptr_t;
-	typedef yaal::hcore::HMap<int, handler_list_ptr_t> handlers_t;
+	typedef yaal::hcore::HMultiMap<int, HHandlerGeneric::ptr_t> handlers_t;
 	static int f_iExitStatus;
 	bool f_bLoop;
 	yaal::hcore::HChunk f_oLocker;

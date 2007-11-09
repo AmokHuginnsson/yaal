@@ -65,14 +65,16 @@ public:
 			}
 		HIterator& operator ++ ( void )
 			{
+			M_PROLOG
 			++ f_oMinor;
 			if ( ! f_oMinor.is_valid() )
 				{
 				++ f_oMajor;
-				if ( f_oMajor != f_poOwner->end() )
+				if ( f_oMajor != f_poOwner->f_oEngine.end() )
 					f_oMinor = f_oMajor->second->begin();
 				}
 			return ( *this );
+			M_EPILOG
 			}
 		HIterator const operator ++ ( int )
 			{
@@ -82,14 +84,16 @@ public:
 			}
 		HIterator& operator -- ( void )
 			{
+			M_PROLOG
 			-- f_oMinor;
 			if ( ! f_oMinor.is_valid() )
 				{
 				-- f_oMajor;
-				if ( f_oMajor != f_poOwner->rend() )
+				if ( f_oMajor != f_poOwner->f_oEngine.rend() )
 					f_oMinor = f_oMajor->second->rbegin();
 				}
 			return ( *this );
+			M_EPILOG
 			}
 		HIterator const operator -- ( int )
 			{
@@ -97,8 +101,8 @@ public:
 			-- f_oEngine;
 			return ( it );
 			}
-		map_elem_t const& operator* ( void )
-			{	return ( map_elem_t( f_oMajor.first, *f_oMinor ) );	}
+		map_elem_t operator* ( void )
+			{	return ( map_elem_t( f_oMajor->first, *f_oMinor ) );	}
 		bool operator == ( HIterator const& it ) const
 			{ return ( ( f_oMinor == it.f_oMinor ) && ( f_oMajor == it.f_oMajor ) ); }
 		bool operator != ( HIterator const& it ) const
@@ -115,70 +119,100 @@ public:
 	HMultiMap( void ) : f_oEngine() {};
 	size_t size( void ) const
 		{
+		M_PROLOG
 		int l_iSize = 0;
 		for ( typename multimap_engine_t::HIterator it = f_oEngine.begin(); it != f_oEngine.end(); ++ it )
 			l_iSize += it->second->size();
 		return ( l_iSize );
+		M_EPILOG
 		}
 	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
 	HIterator push_back( tType const& key, ttType const& value )
 		{
+		M_PROLOG
+		typename multimap_engine_t::HIterator major = ensuere_key( key );
+		major->second->push_back( value );
+		typename value_list_t::iterator minor = major->second->rbegin();
+		return ( HIterator( this, major, minor ) );
+		M_EPILOG
+		}
+	HIterator push_front( tType const& key, ttType const& value )
+		{
+		M_PROLOG
+		typename multimap_engine_t::HIterator major = ensuere_key( key );
+		major->second->push_front( value );
+		typename value_list_t::iterator minor = major->second->begin();
+		return ( HIterator( this, major, minor ) );
+		M_EPILOG
+		}
+	void remove_set( tType const& key )
+		{
+		M_PROLOG
+		HIterator it = find( key );
+		if ( it != end() )
+			f_oEngine.erase( it.f_oMajor );
+		return;
+		M_EPILOG
+		}
+	void erase( HIterator& it )
+		{
+		M_PROLOG
+		value_list_ptr_t list = it.f_oMajor->second;
+		list->erase( it.f_oMinor );
+		if ( ! list->size() )
+			f_oEngine.erase( it.f_oMajor );
+		return;
+		M_EPILOG
+		}
+	HIterator find( tType const& key ) const
+		{
+		M_PROLOG
+		typename multimap_engine_t::HIterator major = f_oEngine.find( key );
+		typename value_list_t::iterator minor;
+		if ( major != f_oEngine.end() )
+			minor = major->second->begin();
+		return ( HIterator( this, major, minor ) );
+		M_EPILOG
+		}
+	HIterator begin( void ) const
+		{
+		M_PROLOG
+		typename multimap_engine_t::HIterator major = f_oEngine.begin();
+		typename value_list_t::iterator minor;
+		if ( !! major->second )
+			minor = major->second->begin();
+		return ( HIterator( this, major, minor ) );
+		M_EPILOG
+		}
+	HIterator end( void ) const
+		{ return ( HIterator( this, f_oEngine.end(), typename value_list_t::iterator() ) ); }
+	HIterator rbegin( void ) const
+		{
+		M_PROLOG
+		typename multimap_engine_t::HIterator major = f_oEngine.rbegin();
+		typename value_list_t::iterator minor;
+		if ( !! major->second )
+			minor = major->second->rbegin();
+		return ( HIterator( this, major, minor ) );
+		M_EPILOG
+		}
+	HIterator rend( void ) const
+		{ return ( HIterator( this, f_oEngine.rend(), typename value_list_t::iterator() ) ); }
+
+private:
+	typename multimap_engine_t::HIterator ensuere_key( tType const& key )
+		{
+		M_PROLOG
 		typename multimap_engine_t::HIterator major = f_oEngine.find( key );
 		if ( major == f_oEngine.end() )
 			{
 			value_list_ptr_t list = value_list_ptr_t( new value_list_t() );
 			major = f_oEngine.insert( key, list );
 			}
-		major->second->push_back( value );
-		typename value_list_t::iterator minor = major->second->rbegin();
-		return ( HIterator( this, major, minor ) );
+		return ( major );
+		M_EPILOG
 		}
-	void remove_set( tType const& key )
-		{
-		HIterator it = find( key );
-		if ( it != end() )
-			f_oEngine.erase( it.f_oMajor );
-		return;
-		}
-	void erase( HIterator const& it )
-		{
-		value_list_ptr_t list = it->f_oMajor->second;
-		list->erase( it->f_oMinor );
-		if ( ! list->size() )
-			f_oEngine.erase( it.f_oMajor );
-		return;
-		}
-	HIterator find( tType const& key ) const
-		{
-		typename multimap_engine_t::HIterator major = f_oEngine.find( key );
-		typename value_list_t::iterator minor;
-		if ( major != f_oEngine.end() )
-			minor = major->second->begin();
-		return ( HIterator( this, major, minor ) );
-		}
-	HIterator begin( void ) const
-		{
-		typename multimap_engine_t::HIterator major = f_oEngine.begin();
-		typename value_list_t::iterator minor;
-		if ( !! major->second )
-			minor = major->second->begin();
-		return ( HIterator( this, major, minor ) );
-		}
-	HIterator end( void ) const
-		{
-		return ( HIterator( this, f_oEngine.end(), value_list_t::iterator() ) );
-		}
-	HIterator rbegin( void ) const
-		{
-		typename multimap_engine_t::HIterator major = f_oEngine.rbegin();
-		typename value_list_t::iterator minor;
-		if ( !! major->second )
-			minor = major->second->rbegin();
-		return ( HIterator( this, major, minor ) );
-		}
-	HIterator rend( void ) const
-		{ return ( HIterator( this, f_oEngine.rend(), value_list_t::iterator() ) ); }
 	};
 
 

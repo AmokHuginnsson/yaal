@@ -28,7 +28,7 @@ Copyright:
 #define __YAAL_HCORE_HSINGLETON_H
 
 #include "hcore/hpointer.h"
-#include "hcore/hmap.h"
+#include "hcore/hmultimap.h"
 #include "hcore/hlist.h"
 #include "hcore/hthread.h"
 
@@ -58,7 +58,7 @@ public:
 private:
 	typedef yaal::hcore::HList<destructor_ptr_t> destructor_list_t;
 	typedef yaal::hcore::HPointer<destructor_list_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> destructor_list_ptr_t;
-	typedef yaal::hcore::HMap<int, destructor_list_ptr_t> map_stack_t;
+	typedef yaal::hcore::HMultiMap<int, destructor_ptr_t> map_stack_t;
 	static yaal::hcore::HMutex f_oMutex;
 	static map_stack_t f_oDestructors;
 public:

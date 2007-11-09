@@ -144,13 +144,12 @@ int HSignalService::operator()( HThread const* )
 		int l_iSigNo = 0;
 		sigwait( static_cast<sigset_t*>( f_oLocker.get() ), &l_iSigNo );
 		HLock l_oLock( f_oMutex );
-		handlers_t::HIterator it = f_oHandlers.find( l_iSigNo );
-		if ( it != f_oHandlers.end() )
+		handlers_t::HIterator it;
+		if ( ( it = f_oHandlers.find( l_iSigNo ) ) != f_oHandlers.end() )
 			{
-			handler_list_ptr_t i = it->second;
-			for ( handler_list_t::iterator handlerIt = i->begin(); handlerIt != i->end(); ++ handlerIt )
+			for ( ; ( it != f_oHandlers.end() ) && ( (*it).first == l_iSigNo ); ++ it )
 				{
-				HHandlerGeneric::ptr_t handler = *handlerIt;
+				HHandlerGeneric::ptr_t handler = (*it).second;
 				M_ASSERT( !! handler );
 				int status = handler->invoke( l_iSigNo );
 				if ( status > 0 )
@@ -172,10 +171,7 @@ int HSignalService::operator()( HThread const* )
 void HSignalService::register_handler( int a_iSigNo, HSignalService::HHandlerGeneric::ptr_t a_oHandler )
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	if ( f_oHandlers.find( a_iSigNo ) == f_oHandlers.end() )
-		f_oHandlers[ a_iSigNo ] = handler_list_ptr_t( new handler_list_t() );
-	f_oHandlers[ a_iSigNo ]->push_front( a_oHandler );
+	f_oHandlers.push_front( a_iSigNo, a_oHandler );
 	lock_on( a_iSigNo );
 	kill( getpid(), SIGURG );
 	return;
