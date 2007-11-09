@@ -46,6 +46,7 @@ public:
 	typedef yaal::hcore::HPointer<HCallInterface, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
 	virtual ~HCallInterface( void ) {}
 	virtual void invoke( void ) = 0;
+	virtual void* id( void ) = 0;
 	};
 
 template<typename call_t,
@@ -218,6 +219,8 @@ public:
 				static_cast<argI_t*>( NULL ),
 				static_cast<argJ_t*>( NULL ) );
 		}
+	virtual void* id( void )
+		{ return ( &f_oObiect ); }
 	};
 
 template<typename CLASS_t, typename METHOD_t,

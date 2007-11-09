@@ -131,7 +131,7 @@ public:
 	HIterator push_back( tType const& key, ttType const& value )
 		{
 		M_PROLOG
-		typename multimap_engine_t::HIterator major = ensuere_key( key );
+		typename multimap_engine_t::HIterator major = ensure_key( key );
 		major->second->push_back( value );
 		typename value_list_t::iterator minor = major->second->rbegin();
 		return ( HIterator( this, major, minor ) );
@@ -140,7 +140,7 @@ public:
 	HIterator push_front( tType const& key, ttType const& value )
 		{
 		M_PROLOG
-		typename multimap_engine_t::HIterator major = ensuere_key( key );
+		typename multimap_engine_t::HIterator major = ensure_key( key );
 		major->second->push_front( value );
 		typename value_list_t::iterator minor = major->second->begin();
 		return ( HIterator( this, major, minor ) );
@@ -201,7 +201,7 @@ public:
 		{ return ( HIterator( this, f_oEngine.rend(), typename value_list_t::iterator() ) ); }
 
 private:
-	typename multimap_engine_t::HIterator ensuere_key( tType const& key )
+	typename multimap_engine_t::HIterator ensure_key( tType const& key )
 		{
 		M_PROLOG
 		typename multimap_engine_t::HIterator major = f_oEngine.find( key );

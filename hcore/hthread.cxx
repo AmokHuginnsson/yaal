@@ -44,7 +44,7 @@ namespace hcore
 
 HThread::HThread( void )
 	: f_eStatus( D_DEAD ), f_oAttributes( xcalloc<pthread_attr_t>( 1 ) ),
-	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::D_RECURSIVE ), f_oCondition()
+	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::D_RECURSIVE ), f_oSemaphore()
 	{
 	M_PROLOG
 	pthread_attr_t* attr = static_cast<pthread_attr_t*>( f_oAttributes.get() );
@@ -80,7 +80,7 @@ int HThread::spawn( void )
 	f_eStatus = D_SPAWNING;
 	M_ENSURE( ::pthread_create( static_cast<pthread_t*>( f_oThread.get() ),
 				static_cast<pthread_attr_t*>( f_oAttributes.get() ), SPAWN, this ) == 0 );
-	f_oCondition.wait();
+	f_oSemaphore.wait();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -104,7 +104,7 @@ int HThread::finish( void )
 	schedule_finish();
 	void* l_pvReturn = NULL;
 	f_oMutex.unlock();
-	f_oCondition.wait();
+	f_oSemaphore.wait();
 	f_oMutex.lock();
 	M_ENSURE( ::pthread_join( *static_cast<pthread_t*>( f_oThread.get() ), &l_pvReturn ) == 0 );
 	f_eStatus = D_DEAD;
@@ -132,7 +132,7 @@ void* HThread::control( void )
 	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
 	M_ENSURE( ::pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
 	f_eStatus = D_ALIVE;
-	f_oCondition.signal();
+	f_oSemaphore.signal();
 	/*
 	 * Setting int run(); as pure virtual exposed us to undefined behavior
 	 * at the event of two subsequent spawn() calls.
@@ -158,7 +158,7 @@ void* HThread::control( void )
 	 */
 	l_pvReturn = reinterpret_cast<void*>( run() );
 	f_eStatus = D_ZOMBIE;
-	f_oCondition.signal();
+	f_oSemaphore.signal();
 	return ( l_pvReturn );
 	M_EPILOG
 	}
@@ -246,35 +246,35 @@ HLock::~HLock( void )
 	M_EPILOG
 	}
 
-HCondition::HCondition( void )
-	: f_oCondition( xcalloc<sem_t>( 1 ) )
+HSemaphore::HSemaphore( void )
+	: f_oSemaphore( xcalloc<sem_t>( 1 ) )
 	{
 	M_PROLOG
-	M_ENSURE( ::sem_init( static_cast<sem_t*>( f_oCondition.get() ), 0, 0 ) == 0 );
+	M_ENSURE( ::sem_init( static_cast<sem_t*>( f_oSemaphore.get() ), 0, 0 ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-HCondition::~HCondition( void )
+HSemaphore::~HSemaphore( void )
 	{
 	M_PROLOG
-	M_ENSURE( ::sem_destroy( static_cast<sem_t*>( f_oCondition.get() ) ) == 0 );
+	M_ENSURE( ::sem_destroy( static_cast<sem_t*>( f_oSemaphore.get() ) ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-void HCondition::wait( void )
+void HSemaphore::wait( void )
 	{
 	M_PROLOG
-	::sem_wait( static_cast<sem_t*>( f_oCondition.get() ) ); /* Always returns 0. */
+	::sem_wait( static_cast<sem_t*>( f_oSemaphore.get() ) ); /* Always returns 0. */
 	return;
 	M_EPILOG
 	}
 
-void HCondition::signal( void )
+void HSemaphore::signal( void )
 	{
 	M_PROLOG
-	M_ENSURE( ::sem_post( static_cast<sem_t*>( f_oCondition.get() ) ) == 0 );
+	M_ENSURE( ::sem_post( static_cast<sem_t*>( f_oSemaphore.get() ) ) == 0 );
 	return;
 	M_EPILOG
 	}

@@ -68,17 +68,17 @@ private:
 	/*}*/
 	};
 
-class HCondition
+class HSemaphore
 	{
-	HChunk f_oCondition;
+	HChunk f_oSemaphore;
 public:
-	HCondition( void );
-	virtual ~HCondition( void );
+	HSemaphore( void );
+	virtual ~HSemaphore( void );
 	void wait( void );
 	void signal( void );
 private:
-	HCondition( HCondition const& );
-	HCondition& operator = ( HCondition const& );
+	HSemaphore( HSemaphore const& );
+	HSemaphore& operator = ( HSemaphore const& );
 	};
 
 class HThread
@@ -95,7 +95,7 @@ class HThread
 	HChunk f_oThread;
 protected:
 	mutable HMutex f_oMutex;
-	HCondition f_oCondition;
+	HSemaphore f_oSemaphore;
 public:
 	HThread( void );
 	virtual ~HThread( void );
