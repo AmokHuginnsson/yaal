@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcaller.h - this file is integral part of `yaal' project.
+	hcall.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,12 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __YAAL_HCORE_HCALLER_H
-#define __YAAL_HCORE_HCALLER_H
+#ifndef __YAAL_HCORE_HCALL_H
+#define __YAAL_HCORE_HCALL_H
 
 #line 31
 
-#define D_VCSID_YAAL_HCORE_HCALLER_H "$Id$"
+#define D_VCSID_YAAL_HCORE_HCALL_H "$Id$"
 
 #include "hcore/hpointer.h"
 
@@ -39,26 +39,26 @@ namespace yaal
 namespace hcore
 {
 
-class HCallerInterface
+class HCallInterface
 	{
 public:
 	class HPseudoType {};
-	typedef yaal::hcore::HPointer<HCallerInterface, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
-	virtual ~HCallerInterface( void ) {}
+	typedef yaal::hcore::HPointer<HCallInterface, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+	virtual ~HCallInterface( void ) {}
 	virtual void invoke( void ) = 0;
 	};
 
 template<typename call_t,
-	typename argA_t = HCallerInterface::HPseudoType,
-	typename argB_t = HCallerInterface::HPseudoType,
-	typename argC_t = HCallerInterface::HPseudoType,
-	typename argD_t = HCallerInterface::HPseudoType,
-	typename argE_t = HCallerInterface::HPseudoType,
-	typename argF_t = HCallerInterface::HPseudoType,
-	typename argG_t = HCallerInterface::HPseudoType,
-	typename argH_t = HCallerInterface::HPseudoType,
-	typename argI_t = HCallerInterface::HPseudoType,
-	typename argJ_t = HCallerInterface::HPseudoType>
+	typename argA_t = HCallInterface::HPseudoType,
+	typename argB_t = HCallInterface::HPseudoType,
+	typename argC_t = HCallInterface::HPseudoType,
+	typename argD_t = HCallInterface::HPseudoType,
+	typename argE_t = HCallInterface::HPseudoType,
+	typename argF_t = HCallInterface::HPseudoType,
+	typename argG_t = HCallInterface::HPseudoType,
+	typename argH_t = HCallInterface::HPseudoType,
+	typename argI_t = HCallInterface::HPseudoType,
+	typename argJ_t = HCallInterface::HPseudoType>
 class HFunctor
 	{
 	call_t& call;
@@ -100,17 +100,17 @@ public:
 	};
 
 template<typename CLASS_t, typename METHOD_t,
-	typename argA_t = HCallerInterface::HPseudoType,
-	typename argB_t = HCallerInterface::HPseudoType,
-	typename argC_t = HCallerInterface::HPseudoType,
-	typename argD_t = HCallerInterface::HPseudoType,
-	typename argE_t = HCallerInterface::HPseudoType,
-	typename argF_t = HCallerInterface::HPseudoType,
-	typename argG_t = HCallerInterface::HPseudoType,
-	typename argH_t = HCallerInterface::HPseudoType,
-	typename argI_t = HCallerInterface::HPseudoType,
-	typename argJ_t = HCallerInterface::HPseudoType>
-class HCaller : public HCallerInterface
+	typename argA_t = HCallInterface::HPseudoType,
+	typename argB_t = HCallInterface::HPseudoType,
+	typename argC_t = HCallInterface::HPseudoType,
+	typename argD_t = HCallInterface::HPseudoType,
+	typename argE_t = HCallInterface::HPseudoType,
+	typename argF_t = HCallInterface::HPseudoType,
+	typename argG_t = HCallInterface::HPseudoType,
+	typename argH_t = HCallInterface::HPseudoType,
+	typename argI_t = HCallInterface::HPseudoType,
+	typename argJ_t = HCallInterface::HPseudoType>
+class HCall : public HCallInterface
 	{
 	CLASS_t f_oObiect;
 	METHOD_t METHOD;
@@ -125,7 +125,7 @@ class HCaller : public HCallerInterface
 	argI_t f_xArgI;
 	argJ_t f_xArgJ;
 public:
-	HCaller(
+	HCall(
 			CLASS_t, METHOD_t,
 			argA_t = argA_t(), argB_t = argB_t(), argC_t = argC_t(), argD_t = argD_t(),
 			argE_t = argE_t(), argF_t = argF_t(), argG_t = argG_t(), argH_t = argH_t(),
@@ -139,68 +139,68 @@ public:
 		}
 	void invoke( 
 			argA_t const*, argB_t const*, argC_t const*, argD_t const*, argE_t const*,
-			argF_t const*, argG_t const*, argH_t const*, argI_t const*, HCallerInterface::HPseudoType* )
+			argF_t const*, argG_t const*, argH_t const*, argI_t const*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)( f_xArgA, f_xArgB, f_xArgC, f_xArgD, f_xArgE, f_xArgF, f_xArgG, f_xArgH, f_xArgI );
 		}
 	void invoke( 
 			argA_t const*, argB_t const*, argC_t const*, argD_t const*, argE_t const*,
-			argF_t const*, argG_t const*, argH_t const*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType* )
+			argF_t const*, argG_t const*, argH_t const*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)( f_xArgA, f_xArgB, f_xArgC, f_xArgD, f_xArgE, f_xArgF, f_xArgG, f_xArgH );
 		}
 	void invoke( 
 			argA_t const*, argB_t const*, argC_t const*, argD_t const*, argE_t const*,
-			argF_t const*, argG_t const*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType* )
+			argF_t const*, argG_t const*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)( f_xArgA, f_xArgB, f_xArgC, f_xArgD, f_xArgE, f_xArgF, f_xArgG );
 		}
 	void invoke( 
 			argA_t const*, argB_t const*, argC_t const*, argD_t const*, argE_t const*,
-			argF_t const*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType* )
+			argF_t const*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)( f_xArgA, f_xArgB, f_xArgC, f_xArgD, f_xArgE, f_xArgF );
 		}
 	void invoke( 
 			argA_t const*, argB_t const*, argC_t const*, argD_t const*, argE_t const*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType* )
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)( f_xArgA, f_xArgB, f_xArgC, f_xArgD, f_xArgE );
 		}
 	void invoke( 
-			argA_t const*, argB_t const*, argC_t const*, argD_t const*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType* )
+			argA_t const*, argB_t const*, argC_t const*, argD_t const*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)( f_xArgA, f_xArgB, f_xArgC, f_xArgD );
 		}
 	void invoke( 
-			argA_t const*, argB_t const*, argC_t const*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType* )
+			argA_t const*, argB_t const*, argC_t const*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)( f_xArgA, f_xArgB, f_xArgC );
 		}
 	void invoke( 
-			argA_t const*, argB_t const*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType* )
+			argA_t const*, argB_t const*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)( f_xArgA, f_xArgB );
 		}
 	void invoke( 
-			argA_t const*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType* )
+			argA_t const*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)( f_xArgA );
 		}
 	void invoke( 
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*,
-			HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType*, HCallerInterface::HPseudoType* )
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*,
+			HCallInterface::HPseudoType*, HCallInterface::HPseudoType*, HCallInterface::HPseudoType* )
 		{
 		(f_oObiect.*METHOD)();
 		}
@@ -224,7 +224,7 @@ template<typename CLASS_t, typename METHOD_t,
 	typename argA_t, typename argB_t, typename argC_t, typename argD_t,
 	typename argE_t, typename argF_t, typename argG_t, typename argH_t,
 	typename argI_t, typename argJ_t>
-HCaller<CLASS_t, METHOD_t, argA_t, argB_t, argC_t, argD_t, argE_t, argF_t, argG_t, argH_t, argI_t, argJ_t>::HCaller(
+HCall<CLASS_t, METHOD_t, argA_t, argB_t, argC_t, argD_t, argE_t, argF_t, argG_t, argH_t, argI_t, argJ_t>::HCall(
 			CLASS_t a_oObject, METHOD_t A_METHOD,
 			argA_t a_xArgA, argB_t a_xArgB,
 			argC_t a_xArgC, argD_t a_xArgD,
@@ -242,5 +242,5 @@ HCaller<CLASS_t, METHOD_t, argA_t, argB_t, argC_t, argD_t, argE_t, argF_t, argG_
 
 }
 
-#endif /* not __YAAL_HCORE_HCALLER_H */
+#endif /* not __YAAL_HCORE_HCALL_H */
 

@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcaller.cxx - this file is integral part of `yaal' project.
+	hcall.cxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -26,6 +26,6 @@ Copyright:
 
 #include "hexception.h"
 M_VCSID ( "$Id$" )
-#include "hcaller.h"
-M_VCSTID ( D_VCSID_YAAL_HCORE_HCALLER_H )
+#include "hcall.h"
+M_VCSTID ( D_VCSID_YAAL_HCORE_HCALL_H )
 
