@@ -180,7 +180,7 @@ public:
 		M_PROLOG
 		typename multimap_engine_t::HIterator major = f_oEngine.begin();
 		typename value_list_t::iterator minor;
-		if ( !! major->second )
+		if ( major != f_oEngine.end() )
 			minor = major->second->begin();
 		return ( HIterator( this, major, minor ) );
 		M_EPILOG
@@ -192,7 +192,7 @@ public:
 		M_PROLOG
 		typename multimap_engine_t::HIterator major = f_oEngine.rbegin();
 		typename value_list_t::iterator minor;
-		if ( !! major->second )
+		if ( major != f_oEngine.end() )
 			minor = major->second->rbegin();
 		return ( HIterator( this, major, minor ) );
 		M_EPILOG
