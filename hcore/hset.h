@@ -100,7 +100,7 @@ public:
 		bool operator != ( HIterator const& it ) const
 			{ return ( f_oEngine != it.f_oEngine ); }
 	private:
-		friend class HSet<tType>;
+		friend class HSet<tType, ttType>;
 		explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 		};
 private:
@@ -115,6 +115,8 @@ public:
 		{	return ( HIterator( f_oEngine.insert<tType, ttType>( e ) ) );	}
 	void remove( tType const& e )
 		{	f_oEngine.remove<tType, tType, ttType>( e );	}
+	void erase( HIterator const& it )
+		{ f_oEngine.remove( it.f_oEngine ); }
 	HIterator find( tType const& e ) const
 		{ return ( HIterator( f_oEngine.find<tType, tType, ttType>( e ) ) ); }
 	HIterator begin( void ) const

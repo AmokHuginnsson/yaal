@@ -62,6 +62,42 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
 
+template<typename T>
+struct trait_strip_reference
+	{
+	typedef T type;
+	};
+
+template<typename T>
+struct trait_strip_reference<T&>
+	{
+	typedef T type;
+	};
+
+template<typename T>
+struct trait_strip_const
+	{
+	typedef T type;
+	};
+
+template<typename T>
+struct trait_strip_const<T const>
+	{
+	typedef T type;
+	};
+
+template<typename T>
+struct trait_add_const_if_not_reference
+	{
+	typedef T const type;
+	};
+
+template<typename T>
+struct trait_add_const_if_not_reference<T&>
+	{
+	typedef T type;
+	};
+
 template<int long unsigned const input>
 struct binary
 	{

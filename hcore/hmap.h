@@ -45,8 +45,8 @@ class HPair
 	tType f_tKey;
 	ttType f_tValue;
 public:
-	tType& first;
-	ttType& second;
+	typename trait_strip_reference<tType>::type& first;
+	typename trait_strip_reference<ttType>::type& second;
 	HPair( void ) : f_tKey(), f_tValue(), first( f_tKey ), second( f_tValue ) {}
 	HPair( tType key, ttType value ) : f_tKey( key ), f_tValue( value ), first( f_tKey ), second( f_tValue ) {}
 	HPair( HPair const& pair ) : f_tKey( pair.f_tKey ), f_tValue( pair.f_tValue ), first( f_tKey ), second( f_tValue ) {}
@@ -138,7 +138,7 @@ public:
 		bool operator != ( HIterator const& it ) const
 			{ return ( f_oEngine != it.f_oEngine ); }
 	private:
-		friend class HMap<tType, ttType>;
+		friend class HMap<tType, ttType, tttType>;
 		explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 		};
 private:
@@ -151,6 +151,8 @@ public:
 		{ return ( f_oEngine.empty() );	}
 	HIterator insert( map_elem_t const& e )
 		{	return ( HIterator( f_oEngine.insert<map_elem_t, tttType>( e ) ) );	}
+	HIterator insert( tType const& key, ttType const& value )
+		{	return ( HIterator( f_oEngine.insert<map_elem_t, tttType>( map_elem_t( key, value ) ) ) );	}
 	void remove( tType const& e )
 		{
 		HIterator it = find( e );
@@ -158,6 +160,8 @@ public:
 			f_oEngine.remove( it.f_oEngine );
 		return;
 		}
+	void erase( HIterator const& it )
+		{ f_oEngine.remove( it.f_oEngine ); }
 	HIterator find( tType const& e ) const
 		{ return ( HIterator( f_oEngine.find<map_elem_t, tType, tttType>( e ) ) ); }
 	HIterator begin( void ) const

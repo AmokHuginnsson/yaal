@@ -337,6 +337,7 @@ template<OListBits::treatment_t const treatment>
 bool HList< tType >::HIterator<treatment>::operator == ( HIterator const& a_roIterator ) const
 	{
 	M_PROLOG
+	M_ASSERT( ( ! ( f_poOwner && a_roIterator.f_poOwner ) ) || ( f_poOwner == a_roIterator.f_poOwner ) );
 	return ( f_poCurrent == a_roIterator.f_poCurrent );
 	M_EPILOG
 	}
@@ -346,6 +347,7 @@ template<OListBits::treatment_t const treatment>
 bool HList<tType>::HIterator<treatment>::operator!= ( HIterator const& a_roIterator ) const
 	{
 	M_PROLOG
+	M_ASSERT( ( ! ( f_poOwner && a_roIterator.f_poOwner ) ) || ( f_poOwner == a_roIterator.f_poOwner ) );
 	return ( f_poCurrent != a_roIterator.f_poCurrent );
 	M_EPILOG
 	}
