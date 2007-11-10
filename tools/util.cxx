@@ -337,6 +337,120 @@ char const * const get_last_error ( void )
 	return ( "" );
 	}
 
+void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
+	{
+	::printf(
+"Usage: %s [OPTION]... [FILE]...\n"
+"%s - %s\n\n"
+"Mandatory arguments to long options are mandatory for short options too.\n"
+"Options:\n",
+			a_pcProgramName, a_pcProgramName, a_pcIntro );
+	size_t l_iLongestLongLength = 0;
+	size_t l_iLongestShortLength = 0;
+	for ( int i = 0; i < a_iCount; ++ i )
+		{
+		OOption& o = a_psOptions[ i ];
+		size_t tmp = ( o.f_pcName ? ::strlen( o.f_pcName ) + 2 : 0 ) + ( o.f_pcArgument ? ::strlen( o.f_pcArgument ) + 1 : 0 ) + ( o.f_eSwitchType == OOption::D_OPTIONAL ? 2 : 1 );
+		if ( tmp > l_iLongestLongLength )
+			l_iLongestLongLength = tmp;
+		tmp = 0;
+		if ( a_psOptions[ i ].f_pcShortForm && ( ( tmp = ::strlen( a_psOptions[ i ].f_pcShortForm ) + 1 ) > l_iLongestShortLength ) )
+			l_iLongestShortLength = tmp;
+		}
+	HString desc;
+	char const* description = NULL;
+	for ( int i = 0; i < a_iCount; ++ i )
+		{
+		OOption& o = a_psOptions[ i ];
+		HString sf;
+		if ( o.f_pcShortForm )
+			{
+			sf = "-";
+			sf += o.f_pcShortForm;
+			}
+		char const* coma = o.f_pcShortForm && o.f_pcName ? "," : " ";
+		if ( ! description )
+			description = o.f_pcDescription;
+		HString lf;
+		if ( o.f_pcName )
+			{
+			lf = "--";
+			lf += o.f_pcName;
+			}
+		if ( o.f_pcArgument )
+			{
+			if ( o.f_eSwitchType == OOption::D_OPTIONAL )
+				lf += "[";
+			( lf += "=" ) += o.f_pcArgument;
+			if ( o.f_eSwitchType == OOption::D_OPTIONAL )
+				lf += "]";
+			}
+		if ( i > 0 )
+			{
+			OOption& p = a_psOptions[ i - 1 ];
+			if ( o.f_pcName && p.f_pcName && ( ! ::strcmp( o.f_pcName, p.f_pcName ) ) )
+				{
+				lf = "", coma = " ";
+				if ( description == o.f_pcDescription )
+					description = "";
+				}
+			if ( o.f_pcShortForm && p.f_pcShortForm && ( ! ::strcmp( o.f_pcShortForm, p.f_pcShortForm ) ) )
+				{
+				sf = "", coma = " ";
+				if ( description == o.f_pcDescription )
+					description = "";
+				}
+			}
+		printf( "  %*s%s %-*s ",
+				l_iLongestShortLength, sf.raw(), coma,
+				l_iLongestLongLength, lf.raw() );
+		int cols = 80 - ( l_iLongestLongLength + l_iLongestShortLength + 7 );
+		int eol = 0;
+		desc = description;
+		bool loop = true;
+		do
+			{
+			eol = 0;
+			while ( ( eol < cols ) && ( eol >= 0 ) )
+				{
+				eol = desc.find_one_of( n_pcWhiteSpace, eol );
+				if ( ( eol < 0 ) || ( eol > cols ) )
+					break;
+				eol = desc.find_other_than( n_pcWhiteSpace, eol );
+				}
+			if ( eol >= cols )
+				{
+				HString line = desc.left( eol );
+				printf( "%s\n", line.raw() );
+				desc.shift_left( eol );
+				desc.trim_left();
+				desc.insert( 0, 2, "  " );
+				if ( i < ( a_iCount - 1 ) )
+					{
+					OOption& n = a_psOptions[ i + 1 ];
+					if ( ( o.f_pcName && n.f_pcName && ( ! ::strcmp( o.f_pcName, n.f_pcName ) ) )
+							|| ( o.f_pcShortForm && n.f_pcShortForm && ( ! ::strcmp( o.f_pcShortForm, n.f_pcShortForm ) ) ) )
+						{
+						description = desc.raw();
+						break;
+						}
+					}
+				printf( "     %*s", l_iLongestLongLength + l_iLongestShortLength, "" );
+				}
+			else
+				{
+				printf( "%s\n", desc.raw() );
+				description = NULL;
+				loop = false;
+				}
+			}
+		while ( loop );
+		}
+	if ( a_pcNotes )
+		::printf( "\n%s\n", a_pcNotes );
+	return;
+	}
+
 void failure ( int a_iExitStatus, char const * const a_pcFormat, ... )
 	{
 	va_list l_xAp;

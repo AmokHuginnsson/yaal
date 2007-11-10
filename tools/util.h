@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_TOOLS_UTIL_H
 
 #include "hcore/hstring.h"
+#include "hcore/ooption.h"
 
 namespace yaal
 {
@@ -40,12 +41,13 @@ namespace tools
 namespace util
 	{
 
-hcore::HString kwota_slownie( double );
+yaal::hcore::HString kwota_slownie( double );
 void usun_ogonki( char* );
 double atof_ex( char const*, bool = false );
 bool verify_IBAN( char const* );
 char const* const get_last_error( void );
-void failure( int, char const* const, ... ) __attribute__ ( ( __noreturn__ ) );
+void show_help( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const = NULL );
+void failure( int, char const* const, ... ) __attribute__(( __noreturn__ ));
 
 /*! \brief Various convinient sleep functions.
  */
