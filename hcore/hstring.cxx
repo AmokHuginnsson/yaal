@@ -781,35 +781,32 @@ HString HString::right( int /* reused */ a_iFromEnd ) const
 	M_EPILOG
 	}
 
-HString & HString::trim_left ( char const * const a_pcSet )
+HString& HString::trim_left( char const* const a_pcSet )
 	{
 	M_PROLOG
-	int l_iCut = 0, l_iLenght = 0;
-	while ( strchr ( a_pcSet, f_pcBuffer [ l_iCut ] ) )l_iCut ++;
+	int l_iCut = 0;
+	while ( ::strchr( a_pcSet, f_pcBuffer[ l_iCut ] ) )
+		++ l_iCut;
 	if ( l_iCut )
-		{
-		l_iLenght = strlen ( f_pcBuffer );
-		strcpy ( f_pcBuffer, f_pcBuffer + l_iCut );
-		f_pcBuffer [ l_iLenght - l_iCut ] = 0;
-		}
-	return ( * this );
+		shift_left( l_iCut );
+	return ( *this );
 	M_EPILOG
 	}
 
-HString & HString::trim_right( char const * const a_pcSet )
+HString& HString::trim_right( char const* const a_pcSet )
 	{
 	M_PROLOG
 	int l_iCut = 0, l_iLenght;
-	l_iLenght = strlen ( f_pcBuffer );
-	while ( strchr ( a_pcSet, f_pcBuffer [ l_iLenght - l_iCut ] ) )
+	l_iLenght = ::strlen( f_pcBuffer );
+	while ( ::strchr( a_pcSet, f_pcBuffer[ l_iLenght - l_iCut ] ) )
 		l_iCut ++;
 	if ( l_iCut )
-		f_pcBuffer [ ( l_iLenght - l_iCut ) + 1 ] = 0;
-	return ( * this );
+		f_pcBuffer[ ( l_iLenght - l_iCut ) + 1 ] = 0;
+	return ( *this );
 	M_EPILOG
 	}
 
-HString & HString::shift_left ( int const a_iShift )
+HString& HString::shift_left( int const a_iShift )
 	{
 	int l_iLenght = 0;
 	if ( a_iShift < 0 )
@@ -818,11 +815,11 @@ HString & HString::shift_left ( int const a_iShift )
 		{
 		l_iLenght = get_length();
 		if ( a_iShift < l_iLenght )
-			memmove ( f_pcBuffer, f_pcBuffer + a_iShift, l_iLenght + 1 - a_iShift );
+			::memmove( f_pcBuffer, f_pcBuffer + a_iShift, l_iLenght + 1 - a_iShift );
 		else
-			f_pcBuffer [ 0 ] = 0;
+			f_pcBuffer[ 0 ] = 0;
 		}
-	return ( * this );
+	return ( *this );
 	}
 
 HString & HString::shift_right ( int const a_iShift, char const a_cFiller )
