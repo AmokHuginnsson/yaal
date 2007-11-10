@@ -27,13 +27,16 @@ Copyright:
 #ifndef __YAAL_HCORE_OOPTION_H
 #define __YAAL_HCORE_OOPTION_H
 
+#include "hcore/hpair.h"
+
 namespace yaal
 {
 
 namespace hcore
 {
 
-typedef void ( *simple_callback_t )( void );
+typedef void ( *param_callback_t )( void* );
+typedef yaal::hcore::HPair<param_callback_t, void*> simple_callback_t; 
 
 typedef struct
 	{
@@ -49,7 +52,7 @@ typedef struct
 		} f_eSwitchType;
 	char const* f_pcArgument;
 	char const* f_pcDescription;
-	simple_callback_t CALLBACK;
+	simple_callback_t* CALLBACK;
 	} OOption;
 
 void set_option( OOption const&, char const* const );

@@ -73,7 +73,7 @@ void set_option( OOption const& a_sOption, char const* const a_pcValue )
 			M_THROW( "unknown type", a_sOption.f_eValueType );
 		}
 	if ( a_sOption.CALLBACK )
-		a_sOption.CALLBACK();
+		a_sOption.CALLBACK->first( a_sOption.CALLBACK->second );
 	return;
 	M_EPILOG
 	}
