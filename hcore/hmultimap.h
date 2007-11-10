@@ -155,14 +155,16 @@ public:
 		return;
 		M_EPILOG
 		}
-	void erase( HIterator& it )
+	HIterator erase( HIterator& it )
 		{
 		M_PROLOG
+		HIterator newIt( it );
+		++ newIt;
 		value_list_ptr_t list = it.f_oMajor->second;
 		list->erase( it.f_oMinor );
 		if ( ! list->size() )
 			f_oEngine.erase( it.f_oMajor );
-		return;
+		return ( newIt );
 		M_EPILOG
 		}
 	HIterator find( tType const& key ) const

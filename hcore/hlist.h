@@ -72,10 +72,8 @@ struct OListBits
 		{
 		D_OK = 0,
 		D_ERROR = 1,
-		D_WAS_EMPTIED = 2,
-		D_WAS_NOT_EMPTIED = 4,
-		D_FINAL_REACHED = 8,
-		D_NOT_FOUND = 16
+		D_FINAL_REACHED = 2,
+		D_NOT_FOUND = 4
 		} status_t;
 	typedef enum
 		{
@@ -132,7 +130,7 @@ public:
 	status_t remove_head( tType** = NULL );
 	status_t remove_tail( tType** = NULL );
 	template<OListBits::treatment_t treatment>
-	status_t erase( HIterator<treatment>& );
+	HIterator<treatment> erase( HIterator<treatment>& );
 	/* sets cursor at specified index or number */
 	tType& go( int );
 	tType& operator[] ( int );
@@ -267,7 +265,7 @@ HList<tType>::HElement::HElement ( HElement* a_poElement )
 	}
 
 template<typename tType>
-HList< tType >::HElement::~HElement ( void )
+HList<tType>::HElement::~HElement ( void )
 	{
 	f_poPrevious->f_poNext = f_poNext;
 	f_poNext->f_poPrevious = f_poPrevious;
@@ -320,21 +318,21 @@ typename HList<tType>::template HIterator<treatment>& HList<tType>::HIterator<tr
 
 /*
 template<typename tType>
-typename HList< tType >::HIterator & HList< tType >::HIterator::operator ++ ( void )
+typename HList<tType>::HIterator & HList< tType >::HIterator::operator ++ ( void )
 
 template<typename tType>
-typename HList< tType >::HIterator const HList< tType >::HIterator::operator ++ ( int )
+typename HList<tType>::HIterator const HList< tType >::HIterator::operator ++ ( int )
 
 template<typename tType>
-typename HList< tType >::HIterator & HList< tType >::HIterator::operator -- ( void )
+typename HList<tType>::HIterator & HList< tType >::HIterator::operator -- ( void )
 
 template<typename tType>
-typename HList< tType >::HIterator const HList< tType >::HIterator::operator -- ( int )
+typename HList<tType>::HIterator const HList< tType >::HIterator::operator -- ( int )
 */
 
 template<typename tType>
 template<OListBits::treatment_t const treatment>
-bool HList< tType >::HIterator<treatment>::operator == ( HIterator const& a_roIterator ) const
+bool HList<tType>::HIterator<treatment>::operator == ( HIterator const& a_roIterator ) const
 	{
 	M_PROLOG
 	M_ASSERT( ( ! ( f_poOwner && a_roIterator.f_poOwner ) ) || ( f_poOwner == a_roIterator.f_poOwner ) );
@@ -383,7 +381,7 @@ bool HList<tType>::HIterator<treatment>::is_valid( void ) const
 //============================================================================
 
 template<typename tType>
-HList< tType >::HList ( int a_iSize )
+HList<tType>::HList ( int a_iSize )
 	: OListBits(), f_iSize ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
 	f_iIndex ( 0 ), f_poIndex ( NULL )
@@ -396,7 +394,7 @@ HList< tType >::HList ( int a_iSize )
 	}
 
 template<typename tType>
-HList< tType >::~HList ( void )
+HList<tType>::~HList ( void )
 	{
 	M_PROLOG
 	HList::flush ();
@@ -405,7 +403,7 @@ HList< tType >::~HList ( void )
 	}
 
 template<typename tType>
-HList< tType >::HList ( HList<tType> const & a_roList )
+HList<tType>::HList ( HList<tType> const & a_roList )
 	: OListBits(), f_iSize ( 0 ),
 	f_poHook ( NULL ), f_poSelected ( NULL ), f_eOrder ( D_UNSORTED ),
 	f_iIndex ( 0 ), f_poIndex ( NULL )
@@ -447,7 +445,7 @@ typename HList<tType>::cyclic_iterator HList<tType>::hook( void ) const
 	}
 
 template<typename tType>
-HList<tType>& HList< tType >::operator = ( HList<tType> const& a_roList )
+HList<tType>& HList<tType>::operator = ( HList<tType> const& a_roList )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -692,7 +690,7 @@ tType& HList<tType>::add_orderly ( tType const& a_rtObject,
 	}
 
 template<typename tType>
-OListBits::status_t HList< tType >::remove_at ( int a_iIndex, treatment_t const& a_eFlag, tType** a_pptObject )
+OListBits::status_t HList<tType>::remove_at ( int a_iIndex, treatment_t const& a_eFlag, tType** a_pptObject )
 	{
 	M_PROLOG
 	treatment_t l_eTreat = a_eFlag & ( D_TREAT_AS_CLOSED | D_TREAT_AS_OPENED );
@@ -735,7 +733,7 @@ OListBits::status_t HList< tType >::remove_at ( int a_iIndex, treatment_t const&
 	}
 
 template<typename tType>
-OListBits::status_t HList< tType >::remove_element ( treatment_t const& a_eFlag, tType** a_pptObject )
+OListBits::status_t HList<tType>::remove_element ( treatment_t const& a_eFlag, tType** a_pptObject )
 	{
 	M_PROLOG
 	treatment_t l_eTreat = a_eFlag & ( D_TREAT_AS_CLOSED | D_TREAT_AS_OPENED );
@@ -789,7 +787,7 @@ OListBits::status_t HList< tType >::remove_element ( treatment_t const& a_eFlag,
 	}
 
 template<typename tType>
-OListBits::status_t HList< tType >::remove_head ( tType** a_pptObject )
+OListBits::status_t HList<tType>::remove_head ( tType** a_pptObject )
 	{
 	M_PROLOG
 	status_t l_eError = D_OK;
@@ -821,7 +819,7 @@ OListBits::status_t HList< tType >::remove_head ( tType** a_pptObject )
 	}
 
 template<typename tType>
-OListBits::status_t HList< tType >::remove_tail ( tType** a_pptObject )
+OListBits::status_t HList<tType>::remove_tail ( tType** a_pptObject )
 	{
 	M_PROLOG
 	status_t l_eError = D_OK;
@@ -856,16 +854,19 @@ OListBits::status_t HList< tType >::remove_tail ( tType** a_pptObject )
 
 template<typename tType>
 template<OListBits::treatment_t const treatment>
-OListBits::status_t HList<tType>::erase( HIterator<treatment>& a_roIterator )
+typename HList<tType>::template HIterator<treatment> HList<tType>::erase( HIterator<treatment>& a_roIterator )
 	{
 	M_PROLOG
+	HIterator<treatment> it = a_roIterator;
+	++ it;
 	f_poSelected = a_roIterator.f_poCurrent;
-	return ( remove_element() );
+	remove_element();
+	return ( it );
 	M_EPILOG
 	}
 
 template<typename tType>
-bool HList< tType >::to_head ( HElement*& a_rpoElement, int a_iOffset, treatment_t const & a_eFlag )
+bool HList<tType>::to_head ( HElement*& a_rpoElement, int a_iOffset, treatment_t const & a_eFlag )
 	{
 	M_PROLOG
 	bool l_bOk = true;

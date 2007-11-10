@@ -130,8 +130,13 @@ public:
 			f_oEngine.remove( it.f_oEngine );
 		return;
 		}
-	void erase( HIterator const& it )
-		{ f_oEngine.remove( it.f_oEngine ); }
+	HIterator erase( HIterator const& it )
+		{
+		HIterator newIt( it );
+		++ newIt;
+		f_oEngine.remove( it.f_oEngine );
+		return ( newIt );
+		}
 	HIterator find( tType const& e ) const
 		{ return ( HIterator( f_oEngine.find<map_elem_t, tType, tttType>( e ) ) ); }
 	HIterator begin( void ) const
