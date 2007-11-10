@@ -125,51 +125,15 @@ char n_ppcTemat [ ] [ 12 ] =
 
 char n_pppcKoncowka [ ] [ 3 ] [ 6 ] =
 	{
-		{
-		"",
-		"e",
-		"y"
-		},
-		{
-		"y ",
-		"e ",
-		"ych "
-		},
-		{
-		"±c ",
-		"±ce ",
-		"êcy "
-		},
-		{
-		" ",
-		"y ",
-		"ów "
-		},
-		{
-		" ",
-		"y ",
-		"ów "
-		},
-		{
-		" ",
-		"y ",
-		"ów "
-		},
-		{
-		" ",
-		"y ",
-		"ów "
-		},
-		{
-		" ",
-		"y ",
-		"ów "
-		},
-		{
-		" ",
-		"y ",
-		"ów "
-		}
+		{ "", "e", "y" },
+		{ "y ", "e ", "ych " },
+		{ "±c ", "±ce ", "êcy " },
+		{ " ", "y ", "ów " },
+		{ " ", "y ", "ów " },
+		{ " ", "y ", "ów " },
+		{ " ", "y ", "ów " },
+		{ " ", "y ", "ów " },
+		{ " ", "y ", "ów " }
 	};
 
 HString n_oLastErrorMessage;
@@ -420,8 +384,7 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 				}
 			if ( eol >= cols )
 				{
-				HString line = desc.left( eol );
-				printf( "%s\n", line.raw() );
+				printf( "%.*s\n", eol, desc.raw() );
 				desc.shift_left( eol );
 				desc.trim_left();
 				desc.insert( 0, 2, "  " );
