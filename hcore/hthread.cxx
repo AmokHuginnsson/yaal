@@ -319,8 +319,14 @@ HCondition::status_t HCondition::wait( int long unsigned const& a_ulTimeOutSecon
 	int l_iError = 0;
 	timespec l_sTimeOut;
 	clock_gettime( CLOCK_REALTIME, &l_sTimeOut );
+	static int long const D_NANO_IN_WHOLE = 1000 * 1000 * 1000; /* splited for easier reading */
 	l_sTimeOut.tv_sec += a_ulTimeOutSeconds;
 	l_sTimeOut.tv_nsec += a_ulTimeOutNanoSeconds;
+	if ( l_sTimeOut.tv_nsec >= D_NANO_IN_WHOLE )
+		{
+		++ l_sTimeOut.tv_sec;
+		l_sTimeOut.tv_nsec -= D_NANO_IN_WHOLE;
+		}
 	l_iError = ::pthread_cond_timedwait( static_cast<pthread_cond_t*>( f_oCondition.get() ),
 				static_cast<pthread_mutex_t*>( f_roMutex.f_oMutex.get() ), &l_sTimeOut );
 	M_ENSURE ( ( l_iError == 0 ) || ( l_iError == EINTR ) || ( l_iError == ETIMEDOUT ) );
