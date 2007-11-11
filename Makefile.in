@@ -62,7 +62,7 @@ SRCS := $(filter-out %_driver.$(SS),$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.$(OS),$(OBJS_dbwrapper))
 $(foreach DRIVER,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(DRIVER))))
 
-LIBS_hcore			=	"-lpthread -lssl @GETTEXT_LIB@"
+LIBS_hcore			=	"-lrt -lpthread -lssl @GETTEXT_LIB@"
 DEPS_tools			= $(TARGET_hcore)
 LIBS_tools			= "-lxml2 -lhcore"
 DEPS_hconsole		= $(TARGET_hcore) $(TARGET_tools)

@@ -279,6 +279,64 @@ void HSemaphore::signal( void )
 	M_EPILOG
 	}
 
+HCondition::HCondition( HMutex& a_roMutex )
+	: f_oAttributes( xcalloc<pthread_condattr_t>( 1 ) ), f_oCondition( xcalloc<pthread_cond_t>( 1 ) ), f_roMutex( a_roMutex )
+	{
+	M_PROLOG
+	pthread_condattr_t* attr = static_cast<pthread_condattr_t*>( f_oAttributes.get() );
+	::pthread_condattr_init( attr );
+	::pthread_cond_init( static_cast<pthread_cond_t*>( f_oCondition.get() ), attr );
+	return;
+	M_EPILOG
+	}
+
+HCondition::~HCondition( void )
+	{
+	M_PROLOG
+	M_ENSURE( ::pthread_cond_destroy( static_cast<pthread_cond_t*>( f_oCondition.get() ) ) == 0 );
+	::pthread_condattr_destroy( static_cast<pthread_condattr_t*>( f_oAttributes.get() ) );
+	return;
+	M_EPILOG
+	}
+
+/*
+ * Read it or die!
+ *
+ * When ::pthread_cond_wait() is invoked, calling thread releases mutex
+ * and goes to sleep, then scheduler (when she sees it as apriopriate)
+ * switches tasks. In the second task ::pthread_cond_signal() is called ...
+ * Here comes important part: scheduler does not neceserily switches task
+ * right back, it means that more than one call to ::pthread_cond_signal()
+ * may occure in sequence, and all signals, that are send before scheduler
+ * switches back to task one, when ::pthread_cond_wait() may lock again,
+ * are lost!
+ */
+
+HCondition::status_t HCondition::wait( int long unsigned const& a_ulTimeOutSeconds,
+		int long unsigned const& a_ulTimeOutNanoSeconds )
+	{
+	M_PROLOG
+	int l_iError = 0;
+	timespec l_sTimeOut;
+	clock_gettime( CLOCK_REALTIME, &l_sTimeOut );
+	l_sTimeOut.tv_sec += a_ulTimeOutSeconds;
+	l_sTimeOut.tv_nsec += a_ulTimeOutNanoSeconds;
+	l_iError = ::pthread_cond_timedwait( static_cast<pthread_cond_t*>( f_oCondition.get() ),
+				static_cast<pthread_mutex_t*>( f_roMutex.f_oMutex.get() ), &l_sTimeOut );
+	M_ENSURE ( ( l_iError == 0 ) || ( l_iError == EINTR ) || ( l_iError == ETIMEDOUT ) );
+	return ( ( l_iError == 0 ) ? D_OK : ( ( l_iError == EINTR ) ? D_INTERRUPT : D_TIMEOUT ) );
+	M_EPILOG
+	}
+
+void HCondition::signal( void )
+	{
+	M_PROLOG
+	HLock l_oLock( f_roMutex );
+	::pthread_cond_signal( static_cast<pthread_cond_t*>( f_oCondition.get() ) );
+	return;
+	M_EPILOG
+	}
+
 }
 
 }
