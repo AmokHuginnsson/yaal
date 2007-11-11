@@ -110,6 +110,18 @@ struct binary<0>
 	static int long unsigned const value = 0;
 	};
 
+template<int long unsigned const base, int long unsigned const exponent, int long unsigned const helper = 1>
+struct power
+	{
+	static int long unsigned const value = power<base, exponent - 1, helper * base>::value;
+	};
+
+template<int long unsigned const base, int long unsigned const helper>
+struct power<base,0,helper>
+	{
+	static int long unsigned const value = helper;
+	};
+
 template<typename tType>
 tType min( tType left, tType right )
 	{
