@@ -182,8 +182,8 @@ int long HRecordSet::open ( char const * a_pcQuery )
 	if ( f_iFieldCount < 0 )
 		log ( LOG_TYPE::D_ERROR ) << "SQL error (fiels count): " << f_poDataBase->get_error() << endl;
 	f_eMode = D_NORMAL;
-	f_oColumnNames.flush();
-	f_oValues.flush();
+	f_oColumnNames.clear();
+	f_oValues.clear();
 	for ( l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
 		{
 		f_oColumnNames.add_tail() = dbwrapper::rs_column_name ( f_pvCoreData,

@@ -154,6 +154,8 @@ public:
 			it = insert( map_elem_t( key, ttType() ) );
 		return ( it->second );
 		}
+	void clear( void )
+		{ f_oEngine.clear(); }
 	};
 
 }

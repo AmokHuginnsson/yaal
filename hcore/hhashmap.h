@@ -92,7 +92,7 @@ public:
 	bool has_key ( tType const & ) const;
 	bool get ( tType const &, ttType & ) const;
 	bool remove ( tType const & );
-	void flush ( void );
+	void clear ( void );
 	int quantity ( void ) const;
 	};
 
@@ -146,7 +146,7 @@ template < typename tType, typename ttType >
 HHashMap<tType, ttType>::~HHashMap ( void )
 	{
 	M_PROLOG
-	flush();
+	clear();
 	if ( f_ppoAtomArray )
 		xfree ( f_ppoAtomArray );
 	f_ppoAtomArray = NULL;
@@ -163,7 +163,7 @@ HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const &
 	HAtom ** l_ppoAtom = NULL;
 	if ( & a_roMap != this )
 		{
-		flush();
+		clear();
 		if ( f_ppoAtomArray )
 			xfree ( f_ppoAtomArray );
 		f_ppoAtomArray = NULL;
@@ -192,7 +192,7 @@ HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const &
 	}
 
 template < typename tType, typename ttType >
-void HHashMap<tType, ttType>::flush ( void )
+void HHashMap<tType, ttType>::clear ( void )
 	{
 	M_PROLOG
 	int unsigned l_uiCtr = 0;

@@ -111,7 +111,7 @@ public:
 	iterator end( void ) const;
 	iterator rend( void ) const;
 	iterator rbegin( void ) const;
-	void flush( void );
+	void clear( void );
 	int size( void );
 	tType& add_element( tType* = NULL ); /* adds new element at current cursor position */
 	tType& add_head( tType const* = NULL );    /* adds new element at beggining of the list */
@@ -397,7 +397,7 @@ template<typename tType>
 HList<tType>::~HList ( void )
 	{
 	M_PROLOG
-	HList::flush ();
+	HList::clear ();
 	return ;
 	M_EPILOG
 	}
@@ -512,7 +512,7 @@ HList<tType>& HList<tType>::operator = ( HList<tType> const& a_roList )
 	}
 
 template<typename tType>
-void HList<tType>::flush ( void )
+void HList<tType>::clear ( void )
 	{
 	M_PROLOG
 	while ( f_iSize -- )

@@ -201,6 +201,16 @@ public:
 		}
 	HIterator rend( void ) const
 		{ return ( HIterator( this, f_oEngine.rend(), typename value_list_t::iterator() ) ); }
+	void clear( void )
+		{ f_oEngine.clear(); }
+	int long count( tType const& key )
+		{
+		typename multimap_engine_t::HIterator major = f_oEngine.find( key );
+		int long cnt = 0;
+		if ( major != f_oEngine.end() )
+			cnt = major->size();
+		return ( cnt );
+		}
 
 private:
 	typename multimap_engine_t::HIterator ensure_key( tType const& key )

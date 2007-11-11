@@ -67,10 +67,10 @@ public:
 			M_PROLOG
 			f_iLevel = - 1;
 			f_oName = "";
-			f_oContents.flush();
-			f_oProperties.flush();
-			f_oChilds.flush();
-			f_oTypes.flush();
+			f_oContents.clear();
+			f_oProperties.clear();
+			f_oChilds.clear();
+			f_oTypes.clear();
 			return;
 			M_EPILOG
 			}

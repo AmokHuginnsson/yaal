@@ -92,7 +92,7 @@ private:
 		friend class HSBBSTree;
 		};
 	HAbstractNode* f_poRoot;
-	int long f_lQuantity;
+	int long f_lSize;
 public:
 	HSBBSTree( void );
 	virtual ~HSBBSTree( void );
@@ -105,6 +105,7 @@ public:
 	HIterator find( ttType const& ) const;
 	int long size( void ) const;
 	bool empty( void ) const;
+	void clear( void );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
 	HIterator rbegin( void ) const;
@@ -172,7 +173,7 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 	else
 		{
 		l_poNode = new HNode<tType>( a_tKey );
-		f_lQuantity ++;
+		f_lSize ++;
 		if ( f_poRoot )
 			{
 			l_poNode->f_poParent = l_oNode.f_poNode;

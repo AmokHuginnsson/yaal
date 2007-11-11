@@ -132,6 +132,8 @@ public:
 		{ return ( HIterator( f_oEngine.rbegin() ) ); }
 	HIterator rend( void ) const
 		{ return ( HIterator( f_oEngine.rend() ) ); }
+	void clear( void )
+		{ f_oEngine.clear(); }
 	};
 
 }
