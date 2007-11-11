@@ -192,6 +192,7 @@ void HSBBSTree::clear( void )
 	if ( f_poRoot )
 		delete f_poRoot;
 	f_poRoot = NULL;
+	f_lSize = 0;
 	M_EPILOG
 	}
 
