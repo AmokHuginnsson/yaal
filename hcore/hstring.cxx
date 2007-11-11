@@ -360,7 +360,7 @@ bool HString::operator == ( char const * const a_pcStr ) const
 	{
 	M_PROLOG
 	if ( f_pcBuffer && a_pcStr )
-		return ( ! strcmp ( f_pcBuffer, a_pcStr ) );
+		return ( ! ::strcoll( f_pcBuffer, a_pcStr ) );
 	if ( f_pcBuffer )
 		return ( ! f_pcBuffer [ 0 ] );
 	return ( ! a_pcStr [ 0 ] );
@@ -394,7 +394,7 @@ bool HString::operator >= ( char const * const a_pcStr ) const
 	int l_iCmp = 0;
 	if ( ! ( f_pcBuffer && a_pcStr ) )
 		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
-	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
+	l_iCmp = ::strcoll( f_pcBuffer, a_pcStr );
 	if ( l_iCmp >= 0 )
 		return ( true );
 	else
@@ -415,7 +415,7 @@ bool HString::operator <= ( char const * const a_pcStr ) const
 	int l_iCmp = 0;
 	if ( ! ( f_pcBuffer && a_pcStr ) )
 		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
-	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
+	l_iCmp = ::strcoll( f_pcBuffer, a_pcStr );
 	if ( l_iCmp <= 0 )
 		return ( true );
 	else
@@ -436,7 +436,7 @@ bool HString::operator > ( char const * const a_pcStr ) const
 	int l_iCmp = 0;
 	if ( ! ( f_pcBuffer && a_pcStr ) )
 		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
-	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
+	l_iCmp = ::strcoll( f_pcBuffer, a_pcStr );
 	if ( l_iCmp > 0 )
 		return ( true );
 	else
@@ -457,7 +457,7 @@ bool HString::operator < ( char const * const a_pcStr ) const
 	int l_iCmp = 0;
 	if ( ! ( f_pcBuffer && a_pcStr ) )
 		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
-	l_iCmp = strcmp ( f_pcBuffer, a_pcStr );
+	l_iCmp = ::strcoll( f_pcBuffer, a_pcStr );
 	if ( l_iCmp < 0 )
 		return ( true );
 	else
