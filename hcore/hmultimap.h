@@ -177,6 +177,18 @@ public:
 		return ( HIterator( this, major, minor ) );
 		M_EPILOG
 		}
+	HIterator upper_bound( tType const& key ) const
+		{
+		M_PROLOG
+		typename multimap_engine_t::HIterator major = f_oEngine.find( key );
+		if ( major != f_oEngine.end() )
+			++ major;
+		typename value_list_t::iterator minor;
+		if ( major != f_oEngine.end() )
+			minor = major->second->rbegin();
+		return ( HIterator( this, major, minor ) );
+		M_EPILOG
+		}
 	HIterator begin( void ) const
 		{
 		M_PROLOG
@@ -208,7 +220,7 @@ public:
 		typename multimap_engine_t::HIterator major = f_oEngine.find( key );
 		int long cnt = 0;
 		if ( major != f_oEngine.end() )
-			cnt = major->size();
+			cnt = major->second->size();
 		return ( cnt );
 		}
 
