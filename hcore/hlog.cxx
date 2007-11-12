@@ -168,6 +168,7 @@ void HLog::rehash ( char const * const a_pcLogFileName,
 		M_THROW ( "new file name argument is",
 				reinterpret_cast < int > ( a_pcLogFileName ) );
 	rehash ( fopen ( a_pcLogFileName, "a" ), a_pcProcessName );
+	do_flush();
 	return;
 	M_EPILOG
 	}
