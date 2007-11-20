@@ -146,6 +146,9 @@ bool less( tType const& a_rtLeft, tType const& a_rtRight )
 	return ( a_rtLeft < a_rtRight );
 	}
 
+template<typename to_t, typename from_t>
+to_t lexical_cast( from_t const& );
+
 template<typename tType>
 inline tType const operator | ( tType const& left,
 		tType const& right )
