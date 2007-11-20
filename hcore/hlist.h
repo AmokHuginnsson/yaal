@@ -112,7 +112,7 @@ public:
 	iterator rend( void ) const;
 	iterator rbegin( void ) const;
 	void clear( void );
-	int size( void );
+	int size( void ) const;
 	tType& add_element( tType* = NULL ); /* adds new element at current cursor position */
 	tType& add_head( tType const* = NULL );    /* adds new element at beggining of the list */
 	tType& add_tail( tType const* = NULL );	/* adds new element at end of the list */
@@ -130,7 +130,7 @@ public:
 	status_t remove_head( tType** = NULL );
 	status_t remove_tail( tType** = NULL );
 	template<OListBits::treatment_t treatment>
-	HIterator<treatment> erase( HIterator<treatment>& );
+	HIterator<treatment> erase( HIterator<treatment> const& );
 	/* sets cursor at specified index or number */
 	tType& go( int );
 	tType& operator[] ( int );
@@ -533,7 +533,7 @@ bool HList<tType>::empty ( void )
 	}
 
 template<typename tType>
-int HList<tType>::size ( void )
+int HList<tType>::size ( void ) const
 	{
 	M_PROLOG
 	return ( f_iSize );
@@ -854,7 +854,7 @@ OListBits::status_t HList<tType>::remove_tail ( tType** a_pptObject )
 
 template<typename tType>
 template<OListBits::treatment_t const treatment>
-typename HList<tType>::template HIterator<treatment> HList<tType>::erase( HIterator<treatment>& a_roIterator )
+typename HList<tType>::template HIterator<treatment> HList<tType>::erase( HIterator<treatment> const& a_roIterator )
 	{
 	M_PROLOG
 	HIterator<treatment> it = a_roIterator;
