@@ -83,6 +83,8 @@ public:
 	operator char const* const ( void ) const;
 	char const* const raw( void ) const;
 	bool is_empty( void ) const;
+	bool empty( void ) const;
+	void clear( void );
 	int get_length( void ) const;
 	HString& format( char const* const, ... );
 	HString& vformat( char const* const, void* );

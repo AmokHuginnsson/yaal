@@ -38,7 +38,7 @@ namespace tools
 
 class HStringStream : public yaal::hcore::HStreamInterface
 	{
-	yaal::hcore::HString f_oBuffer;
+	mutable yaal::hcore::HString f_oBuffer;
 public:
 	HStringStream( void );
 	char const* const raw( void ) const;

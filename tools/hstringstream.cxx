@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstdio>
+
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
 #include "hstringstream.h"
@@ -34,7 +36,7 @@ namespace yaal
 namespace tools
 {
 
-HStringStream::HStringStream( void ) : f_oBuffer()
+HStringStream::HStringStream( void ) : f_oBuffer( "" )
 	{
 	}
 
@@ -46,13 +48,14 @@ char const* const HStringStream::raw( void ) const
 int HStringStream::do_write( void const* const a_pvBuffer, int const a_iSize )
 	{
 	M_PROLOG
-	f_oBuffer.insert( f_oBuffer.get_length(), a_iSize, static_cast< char const* const>( a_pvBuffer ) );
+	f_oBuffer.insert( f_oBuffer.get_length(), a_iSize, static_cast<char const* const>( a_pvBuffer ) );
 	return ( a_iSize );
 	M_EPILOG
 	}
 
 void HStringStream::do_flush( void ) const
 	{
+	f_oBuffer.clear();
 	}
 
 int HStringStream::do_read( void* const a_pvBuffer, int const a_iSize )

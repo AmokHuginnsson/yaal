@@ -477,9 +477,21 @@ char const* const HString::raw( void ) const
 	return ( f_pcBuffer );
 	}
 
-bool HString::is_empty ( void ) const
+bool HString::empty( void ) const
 	{
-	return ( ! ( f_pcBuffer && f_pcBuffer [ 0 ] ) );
+	return ( is_empty() );
+	}
+
+bool HString::is_empty( void ) const
+	{
+	return ( ! ( f_pcBuffer && f_pcBuffer[ 0 ] ) );
+	}
+
+void HString::clear( void )
+	{
+	if ( f_pcBuffer )
+		f_pcBuffer[ 0 ] = 0;
+	return;
 	}
 
 int HString::get_length ( void ) const
