@@ -38,10 +38,12 @@ namespace tools
 
 class HStringStream : public yaal::hcore::HStreamInterface
 	{
+	mutable bool f_bUsed;
 	mutable yaal::hcore::HString f_oBuffer;
 public:
 	HStringStream( void );
 	char const* const raw( void ) const;
+	void use( void ) const;
 private:
 	virtual int do_write( void const* const, int const );
 	virtual void do_flush( void ) const;

@@ -36,7 +36,7 @@ namespace yaal
 namespace tools
 {
 
-HStringStream::HStringStream( void ) : f_oBuffer( "" )
+HStringStream::HStringStream( void ) : f_bUsed( false ), f_oBuffer( "" )
 	{
 	}
 
@@ -48,6 +48,11 @@ char const* const HStringStream::raw( void ) const
 int HStringStream::do_write( void const* const a_pvBuffer, int const a_iSize )
 	{
 	M_PROLOG
+	if ( f_bUsed )
+		{
+		f_oBuffer.clear();
+		f_bUsed = false;
+		}
 	f_oBuffer.insert( f_oBuffer.get_length(), a_iSize, static_cast<char const* const>( a_pvBuffer ) );
 	return ( a_iSize );
 	M_EPILOG
@@ -68,8 +73,14 @@ int HStringStream::do_read( void* const a_pvBuffer, int const a_iSize )
 	M_EPILOG
 	}
 
+void HStringStream::use( void ) const
+	{
+	f_bUsed = true;
+	}
+
 char const* const operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream )
 	{
+	stream.use();
 	return ( stream.raw() );
 	}
 
