@@ -44,6 +44,7 @@ public:
 	HStringStream( void );
 	char const* const raw( void ) const;
 	void use( void ) const;
+	void clear( void );
 private:
 	virtual int do_write( void const* const, int const );
 	virtual void do_flush( void ) const;

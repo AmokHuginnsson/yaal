@@ -78,6 +78,14 @@ void HStringStream::use( void ) const
 	f_bUsed = true;
 	}
 
+void HStringStream::clear( void )
+	{
+	M_PROLOG
+	f_oBuffer.clear();
+	return;
+	M_EPILOG
+	}
+
 char const* const operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream )
 	{
 	stream.use();
