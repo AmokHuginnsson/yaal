@@ -16,7 +16,7 @@ $(DIR_BUILD):
 
 header.gch: $(VPATH)/header $(HDRS)
 	@echo -n "Generating precompiled header \`$(subst $(DIR_ROOT)/,,$(<))' ... "; \
-	$(CXX) -xc++-header $(CXXFLAGS) $(<) -o $(@) ;\
+	$(CXX) -xc++-header $(subst -include header,,$(CXXFLAGS)) $(<) -o $(@) ;\
 	echo $(NONL) "done.$(CL)"
 
 $(TARGET): header.gch $(OBJS)
