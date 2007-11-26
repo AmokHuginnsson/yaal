@@ -186,15 +186,12 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<tType, pointer_type_t, access_type_t> const& a_roPointer )
 	{
-	if ( &a_roPointer != this )
+	if ( ( &a_roPointer != this ) && ( f_ptShared != a_roPointer.f_ptShared ) )
 		{
 		if ( a_roPointer.f_ptShared )
 			(*a_roPointer.f_piReferenceCounter) ++;
 		if ( f_ptShared )
-			{
-			M_ASSERT ( f_ptShared != a_roPointer.f_ptShared );
 			release();
-			}
 		f_ptShared = a_roPointer.f_ptShared;
 		f_piReferenceCounter = a_roPointer.f_piReferenceCounter;
 		}

@@ -224,7 +224,7 @@ void HException::failed_assert ( char const * const a_pcFileName,
 	if ( ! errno )
 		errno ++;
 	if ( getenv( "YAAL_DUMP_ON_FAILED_ASSERTION" ) )
-		raise( SIGABRT );
+		abort();
 	throw ( errno );
 	M_EPILOG
 	}
