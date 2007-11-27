@@ -36,6 +36,11 @@
 # LOG_DEBUG, LOG_INFO, LOG_NOTICE, LOG_WARNING, LOG_ERROR, LOG_CVSHEADER
 log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_CVSHEADER
 
+# resolve_hostnames
+# type: bool, default true
+# resolve_hostnames switch enables/disables resolving IP address into host names.
+resolve_hostnames false
+
 # ssl_key
 # type: string, default: (empty)
 # ssl_key is path to file with private ssl key

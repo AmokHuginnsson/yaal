@@ -42,6 +42,7 @@ class HSocket : public HRawFile
 	{
 public:
 	typedef HPointer<HSocket, HPointerScalar, HPointerRelaxed> ptr_t;
+	static bool f_bResolveHostnames;
 	struct TYPE
 		{
 		typedef enum

@@ -66,6 +66,8 @@ class HLog : public HStreamInterface, private HSingletonInterface
 	char*		f_pcBuffer;
 	size_t		f_iBufferSize;
 public:
+	static int long f_lLogMask;
+public:
 	/* already opened file */
 	void rehash( FILE* = stderr, char const* const = NULL );
 	/* log file name */

@@ -36,6 +36,8 @@ M_VCSID ( "$Id$" )
 #include "hstring.h"
 #include "rc_file.h"
 #include "hsingleton.h"
+#include "hopenssl.h"
+#include "hsocket.h"
 
 namespace yaal
 {
@@ -43,17 +45,15 @@ namespace yaal
 namespace hcore
 {
 
-int long n_lLogMask = 0;
 int n_iDebugLevel = 0;
-HString n_oSSLKey;
-HString n_oSSLCert;
 typedef HSingleton<HLog> HLogService;
 HLog& log = HLogService::get_instance( 1000 );
 
 OOption n_psHCoreVariables[] =
 	{
-		{ "ssl_key", D_HSTRING, &n_oSSLKey, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL private key file.", NULL },
-		{ "ssl_cert", D_HSTRING, &n_oSSLCert, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL certificate file.", NULL },
+		{ "ssl_key", D_HSTRING, &HOpenSSL::f_oSSLKey, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL private key file.", NULL },
+		{ "ssl_cert", D_HSTRING, &HOpenSSL::f_oSSLCert, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL certificate file.", NULL },
+		{ "resolve_hostnames", D_BOOL, &HSocket::f_bResolveHostnames, 0, OOption::D_REQUIRED, NULL, "Resolve IP address into host names.", NULL },
 		{ NULL, D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
 	};
 
@@ -78,17 +78,17 @@ bool const set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty() )
 			{
 			if ( ! strcasecmp ( l_oStr, "LOG_DEBUG" ) )
-				n_lLogMask |= LOG_TYPE::D_DEBUG;
+				HLog::f_lLogMask |= LOG_TYPE::D_DEBUG;
 			else if ( ! strcasecmp ( l_oStr, "LOG_INFO" ) )
-				n_lLogMask |= LOG_TYPE::D_INFO;
+				HLog::f_lLogMask |= LOG_TYPE::D_INFO;
 			else if ( ! strcasecmp ( l_oStr, "LOG_NOTICE" ) )
-				n_lLogMask |= LOG_TYPE::D_NOTICE;
+				HLog::f_lLogMask |= LOG_TYPE::D_NOTICE;
 			else if ( ! strcasecmp ( l_oStr, "LOG_WARNING" ) )
-				n_lLogMask |= LOG_TYPE::D_WARNING;
+				HLog::f_lLogMask |= LOG_TYPE::D_WARNING;
 			else if ( ! strcasecmp ( l_oStr, "LOG_ERROR" ) )
-				n_lLogMask |= LOG_TYPE::D_ERROR;
+				HLog::f_lLogMask |= LOG_TYPE::D_ERROR;
 			else if ( ! strcasecmp ( l_oStr, "LOG_CVSHEADER" ) )
-				n_lLogMask |= LOG_TYPE::D_CVSHEADER;
+				HLog::f_lLogMask |= LOG_TYPE::D_CVSHEADER;
 			else
 				return ( true );
 			}

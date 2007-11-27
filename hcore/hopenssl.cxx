@@ -57,6 +57,9 @@ HString& format_error_message( HString& a_oBuffer )
 
 }
 
+yaal::hcore::HString HOpenSSL::f_oSSLKey;
+yaal::hcore::HString HOpenSSL::f_oSSLCert;
+
 HMutex HOpenSSL::OSSLContext::f_oMutex;
 
 HOpenSSL::OSSLContext::OSSLContext( void ) : f_pvMethod( NULL ), f_pvContext( NULL )
@@ -76,9 +79,9 @@ void HOpenSSL::OSSLContext::init( void )
 	f_pvContext = ctx = SSL_CTX_new( l_pxMethod );
 	if ( ! f_pvContext )
 		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
-	if ( SSL_CTX_use_PrivateKey_file( ctx, n_oSSLKey, SSL_FILETYPE_PEM ) <= 0 )
+	if ( SSL_CTX_use_PrivateKey_file( ctx, f_oSSLKey, SSL_FILETYPE_PEM ) <= 0 )
 		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
-	if ( SSL_CTX_use_certificate_file( ctx, n_oSSLCert, SSL_FILETYPE_PEM ) <= 0 )
+	if ( SSL_CTX_use_certificate_file( ctx, f_oSSLCert, SSL_FILETYPE_PEM ) <= 0 )
 		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
 	if ( ! SSL_CTX_check_private_key( ctx ) )
 		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );

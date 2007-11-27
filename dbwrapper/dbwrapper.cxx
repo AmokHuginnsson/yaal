@@ -84,7 +84,7 @@ bool const set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
 		{
 		if ( ! strcasecmp ( a_roValue, "LOG_SQL" ) )
-			n_lLogMask |= LOG_TYPE::D_SQL;
+			HLog::f_lLogMask |= LOG_TYPE::D_SQL;
 		else
 			return ( true );
 		}

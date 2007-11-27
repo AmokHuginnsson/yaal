@@ -62,6 +62,8 @@ char const * const n_ppcErrMsgHSocket [ 4 ] =
 	_ ( "already listening" )
 	};
 
+bool HSocket::f_bResolveHostnames = true;
+
 HSocket::HSocket( TYPE::socket_type_t const a_eSocketType,
 		int const a_iMaximumNumberOfClients )
 	: HRawFile( ( a_eSocketType & TYPE::D_SSL_SERVER )
@@ -210,14 +212,14 @@ HSocket::ptr_t HSocket::accept( void )
 		l_iAddressSize = sizeof ( l_sAddressFile );
 		}
 	M_ENSURE( ( l_iFileDescriptor = ::accept( f_iFileDescriptor,
-					l_psAddress, & l_iAddressSize ) ) >= 0 );
+					l_psAddress, &l_iAddressSize ) ) >= 0 );
 	if ( f_eType & TYPE::D_NONBLOCKING )
-		M_ENSURE( ::fcntl ( l_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
+		M_ENSURE( ::fcntl( l_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 	/* - 1 means that constructor shall not create socket */
 	TYPE::socket_type_t l_eType = f_eType;
 	if ( f_eType & ( TYPE::D_SSL_SERVER | TYPE::D_SSL_CLIENT ) )
 		l_eType &= ~TYPE::D_SSL_CLIENT, l_eType |= TYPE::D_SSL_SERVER;
-	ptr_t l_oSocket = ptr_t( new HSocket( l_eType, - 1 ) );
+	ptr_t l_oSocket = ptr_t( new HSocket( l_eType, -1 ) );
 	M_ASSERT( ! l_oSocket->f_oSSL );
 	l_oSocket->f_iFileDescriptor = l_iFileDescriptor;
 	l_oSocket->f_iAddressSize = l_iAddressSize;
@@ -265,27 +267,27 @@ void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 #ifdef HAVE_GETHOSTBYNAME_R
 		f_iAddressSize = D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
 		f_oCache.pool_realloc( f_iAddressSize );
-		while ( gethostbyname_r ( a_pcAddress, & l_sHostName,
+		while ( ::gethostbyname_r( a_pcAddress, & l_sHostName,
 					f_oCache.raw(), f_iAddressSize,
-					& l_psHostName, & l_iError ) == ERANGE )
+					&l_psHostName, &l_iError ) == ERANGE )
 			f_oCache.pool_realloc ( f_iAddressSize <<= 1 );
 		errno = l_iError;
 		M_ENSURE ( l_psHostName );
-		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast < in_addr * > (
+		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>(
 				l_sHostName.h_addr_list [ 0 ] )->s_addr;
 #else /* HAVE_GETHOSTBYNAME_R */
 		l_iError = getaddrinfo ( a_pcAddress, NULL, NULL, & l_psAddrInfo );
 		M_ENSURE ( ! l_iError && l_psAddrInfo );
-		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast < in_addr * > ( l_psAddrInfo->ai_addr )->s_addr;
+		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>( l_psAddrInfo->ai_addr )->s_addr;
 		freeaddrinfo ( l_psAddrInfo );
 #endif /* not HAVE_GETHOSTBYNAME_R */
 		f_iAddressSize = sizeof ( sockaddr_in );
 		}
 	else /* f_eType & TYPE::D_FILE */
 		{
-		l_psAddressFile = static_cast < sockaddr_un * > ( f_pvAddress );
+		l_psAddressFile = static_cast<sockaddr_un*>( f_pvAddress );
 		l_psAddressFile->sun_family = AF_LOCAL;
-		strncpy ( l_psAddressFile->sun_path, a_pcAddress,
+		::strncpy( l_psAddressFile->sun_path, a_pcAddress,
 				sizeof ( l_psAddressFile->sun_path ) );
 		l_psAddressFile->sun_path [ sizeof ( l_psAddressFile->sun_path ) - 1 ] = 0;
 		f_iAddressSize = SUN_LEN ( l_psAddressFile );
@@ -379,33 +381,36 @@ HString const & HSocket::get_host_name ( void )
 		{
 		if ( f_eType & TYPE::D_NETWORK )
 			{
-			l_psAddressNetwork = reinterpret_cast<sockaddr_in*>( f_pvAddress );
+			char const* name = NULL;
 			f_oCache.pool_realloc( l_iSize );
-#ifdef HAVE_GETHOSTBYNAME_R
-			::memset( &l_sHostName, 0, sizeof ( hostent ) );
-			while ( ( l_iError = ::gethostbyaddr_r( &l_psAddressNetwork->sin_addr, f_iAddressSize,
-						AF_INET, &l_sHostName,
-						f_oCache.raw(),
-						l_iSize, &l_psHostName, &l_iCode ) ) == ERANGE )
-				f_oCache.pool_realloc( l_iSize <<= 1 );
-			if ( l_iCode )
-				log_trace << ::hstrerror( l_iCode ) << endl;
-			errno = l_iError;
-			M_ENSURE( l_iError == 0 );
-			if ( l_psHostName )
-				f_oHostName = l_sHostName.h_name;
-			else
+			l_psAddressNetwork = reinterpret_cast<sockaddr_in*>( f_pvAddress );
+			if ( f_bResolveHostnames )
 				{
-				f_oHostName = inet_ntop( AF_INET, &l_psAddressNetwork->sin_addr,
-						f_oCache.raw(), l_iSize );
-				}
+#ifdef HAVE_GETHOSTBYNAME_R
+				::memset( &l_sHostName, 0, sizeof ( hostent ) );
+				while ( ( l_iError = ::gethostbyaddr_r( &l_psAddressNetwork->sin_addr, f_iAddressSize,
+							AF_INET, &l_sHostName,
+							f_oCache.raw(),
+							l_iSize, &l_psHostName, &l_iCode ) ) == ERANGE )
+					f_oCache.pool_realloc( l_iSize <<= 1 );
+				if ( l_iCode )
+					log_trace << ::hstrerror( l_iCode ) << endl;
+				errno = l_iError;
+				M_ENSURE( l_iError == 0 );
+				if ( l_psHostName )
+					name = l_sHostName.h_name;
 #else /* HAVE_GETHOSTBYNAME_R */
-			l_iError = getnameinfo(
-							reinterpret_cast<sockaddr*>( l_psAddressNetwork ), f_iAddressSize,
-							f_oCache.raw(), l_iSize, NULL, 0, NI_NOFQDN );
-			M_ENSURE( l_iError == 0 );
-			f_oHostName = f_oCache.raw();
+				l_iError = getnameinfo(
+								reinterpret_cast<sockaddr*>( l_psAddressNetwork ), f_iAddressSize,
+								f_oCache.raw(), l_iSize, NULL, 0, NI_NOFQDN );
+				M_ENSURE( l_iError == 0 );
+				name = f_oCache.raw();
 #endif /* ! HAVE_GETHOSTBYNAME_R */
+				}
+			if ( ! name )
+				name = inet_ntop( AF_INET, &l_psAddressNetwork->sin_addr,
+						f_oCache.raw(), l_iSize );
+			f_oHostName = name;
 			}
 		else
 			{

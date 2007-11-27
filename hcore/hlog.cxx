@@ -57,6 +57,8 @@ namespace
 	static int const D_LOGIN_NAME_MAX	= 8;
 	}
 
+int long HLog::f_lLogMask = 0;
+
 HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( true ),
 	f_lType ( 0 ), f_psStream ( NULL ), f_pcProcessName ( NULL ),
 	f_pcLoginName ( NULL ), f_pcHostName ( NULL ), f_pcBuffer ( NULL ),
@@ -89,7 +91,7 @@ HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( tr
 HLog::~HLog ( void )
 	{
 	M_PROLOG
-	if ( n_lLogMask & LOG_TYPE::D_NOTICE )
+	if ( f_lLogMask & LOG_TYPE::D_NOTICE )
 		{
 		if ( f_bNewLine )
 			timestamp();
@@ -144,7 +146,7 @@ void HLog::rehash ( FILE * a_psStream,
 			fseek ( f_psStream, l_pcPtr - f_pcBuffer - l_iLen, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
 			f_lType = strtol ( f_pcBuffer, NULL, 0x10 );
-			if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
+			if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 				{
 				timestamp ( a_psStream );
 				fprintf ( a_psStream, f_pcBuffer + 10 );
@@ -236,7 +238,7 @@ int HLog::operator() ( char const * const a_pcFormat, ... )
 	M_PROLOG
 	int l_iErr = 0;
 	va_list l_xAp;
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
+	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 		{
 		va_start ( l_xAp, a_pcFormat );
 		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
@@ -253,7 +255,7 @@ int HLog::operator() ( int long const a_lType,
 	int l_iErr = 0;
 	va_list l_xAp;
 	f_lType = a_lType;
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
+	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 		{
 		va_start ( l_xAp, a_pcFormat );
 		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
@@ -278,7 +280,7 @@ int HLog::do_write( void const* const a_pcString, int const a_iSize )
 		return ( 0 );
 	int len = 0;
 	char const* const str = static_cast<char const* const>( a_pcString );
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & n_lLogMask ) )
+	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 		{
 		if ( f_bNewLine )
 			timestamp();

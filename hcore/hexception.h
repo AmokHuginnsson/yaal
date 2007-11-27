@@ -45,7 +45,6 @@ namespace yaal
 namespace hcore
 {
 
-extern int long n_lLogMask;
 extern int n_iDebugLevel;
 
 class HException

@@ -31,6 +31,7 @@ Copyright:
 #include "hcore/hsingleton.h"
 #include "hcore/hexception.h"
 #include "hcore/hthread.h"
+#include "hcore/hstring.h"
 
 namespace yaal
 {
@@ -41,6 +42,8 @@ namespace hcore
 class HOpenSSL
 	{
 public:
+	static yaal::hcore::HString f_oSSLKey;
+	static yaal::hcore::HString f_oSSLCert;
 	struct TYPE
 		{
 		typedef enum

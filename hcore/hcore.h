@@ -38,9 +38,6 @@ namespace yaal
 namespace hcore
 	{
 
-extern yaal::hcore::HString n_oSSLKey;
-extern yaal::hcore::HString n_oSSLCert;
-
 bool eq ( double const &, double const & );
 void set_env ( char const * const );
 void yaal_hcore_banner ( void );
