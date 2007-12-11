@@ -153,7 +153,7 @@ void* HThread::control( void )
 	 * that is send after the run() call, the derived class is already destroyed
 	 * and the run below is "pure virtual" with no underneath object.
 	 *
-	 * That is way we have to deliver interface that allows users to not specify
+	 * That is why we have to deliver interface that allows users to not specify
 	 * any useful or meaningful int run();
 	 */
 	l_pvReturn = reinterpret_cast<void*>( run() );
