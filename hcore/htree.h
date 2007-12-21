@@ -40,91 +40,95 @@ namespace yaal
 namespace hcore
 {
 
-template < typename tttType >
+template<typename tType>
 class HTree;
 
-template < typename tttType >
+template<typename tType>
 class HTree
 	{
-public:
-	struct FILL
-		{
-		enum
-			{
-			D_NEW_MANUAL,
-			D_NEW_AUTO
-			};
-		};
-protected:
+	typedef HTree<tType> tree_t;
 	class HNode;
-	typedef HList < HNode * > branch_t;
-	typedef typename branch_t::treatment_t treatment_t;
+	typedef HList<HNode*> branch_t;
+public:
+	class HIterator;
+	typedef HIterator iterator;
+private:
 	class HNode
 		{
-	protected:
-		tttType f_tLeaf;																/* object itself */
-		int f_iNumber;																	/* serial number */
-		int f_iHits;			/* how many times element's object was accessed */
-		int f_iLevel;																		/* self explanary */
+		tType f_tData;			/* object itself */
+		int f_iLevel;				/* self explanary */
 		branch_t f_oBranch;	/* list of next level nodes */
-		HNode * f_poTrunk;									/* self explanary */
-		HTree * f_poTree;										/* tree that owns node */
+		HNode* f_poTrunk;	/* self explanary */
+		HTree<tType>* f_poTree;
 	public:
-		inline tttType & get_object ( void )	/* this is special get used for  */
-			{																		/* all derived classes (f.e. in  */
-			return ( f_tLeaf );									/* compare methods)              */
-			}																		/* this get does not modify hits */
-	protected:
-		HNode ( HNode * = NULL ); /* ( parent ) */
-		virtual ~HNode ( void );
-		void put ( tttType );
-		tttType get ( void );
-		HNode * previous ( treatment_t const & = branch_t::D_TREAT_AS_OPENED );
-		HNode * next ( void );
+		int long child_count( void ) const;
+		bool has_childs( void ) const;
+		typename tree_t::iterator insert_node( typename tree_t::iterator const&, typename tree_t::HNode* = NULL );
+		typename tree_t::iterator insert_node( typename tree_t::iterator const&, tType const& );
+		typename tree_t::iterator replace_node( typename tree_t::iterator const&, typename tree_t::HNode* );
+		typename tree_t::iterator add_node( typename tree_t::HNode* = NULL );
+		typename tree_t::iterator add_node( tType const& );
+		void remove_node( tree_t::iterator );
+		typename tree_t::iterator begin();
+		typename tree_t::iterator const begin() const;
+		typename tree_t::iterator end();
+		typename tree_t::iterator const end() const;
+		typename tree_t::iterator rbegin();
+		typename tree_t::iterator rend();
+		tType* operator->( void );
+		tType const* operator->( void ) const;
 	private:
-		HNode ( HNode const & );
-		HNode & operator = ( HNode const & );
-		friend class HTree < tttType >;
-		friend class HList < HNode * >;
+		HNode ( HNode* = NULL ); /* ( parent ) */
+		virtual ~HNode( void );
+		HNode( HNode const& );
+		HNode& operator = ( HNode const& );
+		friend class HTree<tType>;
+		friend class HList<HNode*>;
 		};
-	HNode * f_poRoot;			/* self explanary */
-	HNode * f_poSelected;	/* local temporary pointer, "cursor" */
-	int f_iHighestNumber;	/* serial number of last added element */
+	HNode* f_poRoot;			/* self explanary */
 public:
 	HTree ( void );
 	virtual ~HTree();
-	virtual void flush ( void );
-	tttType & remove_node ( void );
-	tttType cut_branch ( int );
-	tttType cut_leaf ( int );
-	tttType & down ( void );
-	tttType & up ( void );
-	void graft ( int, HTree < tttType > * );
+	HNode& get_root( void );
+	virtual void clear( void );
+	void erase( iterator const& );
 private:
-	HTree ( HTree const & );
-	HTree & operator = ( HTree const & );
-	friend class HTree < tttType >::HNode;
+	HTree( HTree const& );
+	HTree& operator = ( HTree const& );
+	friend class HTree<tType>::HNode;
 	};
 
-template < typename tttType >
-HTree < tttType > ::HNode::HNode( HNode * a_poNode ) : f_tLeaf(),
-	f_iNumber ( 0 ), f_iHits ( 0 ), f_iLevel ( 0 ), f_oBranch(),
-	f_poTrunk ( a_poNode ), f_poTree ( NULL )
+template<typename tType>
+class HTree<tType>::HIterator
+	{
+public:
+	HIterator( void );
+	HIterator( HIterator const& );
+	HIterator& operator ++ ( void );
+	HIterator& operator = ( HIterator const& );
+	bool operator == ( HIterator const& ) const;
+	bool operator != ( HIterator const& ) const;
+	typename HTree<tType>::HNode& operator* ( void );
+	typename HTree<tType>::HNode const& operator* ( void ) const;
+	typename HTree<tType>::HNode* operator->( void );
+	typename HTree<tType>::HNode const* operator->( void ) const;
+private:
+	};
+
+template<typename tType>
+HTree<tType>::HNode::HNode( HNode* a_poNode ) : f_tData(),
+	f_iLevel( 0 ), f_oBranch(),
+	f_poTrunk( a_poNode )
 	{
 	M_PROLOG
 	if ( a_poNode )
-		{
-		f_poTree = a_poNode->f_poTree;
 		f_iLevel = a_poNode->f_iLevel + 1;
-		if ( f_poTree )
-			f_iNumber = f_poTree->f_iHighestNumber ++;
-		}
 	return ;
 	M_EPILOG
 	}
 
-template < typename tttType >
-HTree < tttType > ::HNode::~HNode ( void )
+template<typename tType>
+HTree<tType>::HNode::~HNode ( void )
 	{
 	M_PROLOG
 	for ( typename branch_t::iterator it = f_oBranch.begin(); it != f_oBranch.end(); ++ it )
@@ -133,85 +137,26 @@ HTree < tttType > ::HNode::~HNode ( void )
 	M_EPILOG
 	}
 
-template < typename tttType >
-void HTree < tttType > ::HNode::put( tttType a_tttArgument )
-	{
-	M_PROLOG
-	f_tLeaf = a_tttArgument;
-	f_iHits ++;
-	return ;
-	M_EPILOG
-	}
-	
-template < typename tttType >
-tttType HTree < tttType > ::HNode::get( void )
-	{
-	M_PROLOG
-	if ( ! f_iHits ) 
-		M_THROW ( "no leaf to get from.", errno );
-	f_iHits ++;
-	return ( f_tLeaf );
-	M_EPILOG
-	}
-
-template < typename tttType >
-typename HTree <tttType> ::HNode * HTree < tttType > ::HNode::previous ( treatment_t const & a_eFlag )
-	{
-	M_PROLOG
-	HNode * l_poNode = NULL;
-	if ( f_poTrunk )
-		{
-		l_poNode = f_poTrunk->f_oBranch.present();
-		while ( l_poNode != this )
-			{
-			f_poTrunk->f_oBranch.to_head();
-			l_poNode = f_poTrunk->f_oBranch.present();
-			}
-		f_poTrunk->f_oBranch.to_head ( 1, a_eFlag );
-		l_poNode = f_poTrunk->f_oBranch.present();
-		}
-	return ( l_poNode );
-	M_EPILOG
-	}
-
-template < typename tttType >
-typename HTree < tttType > ::HNode * HTree < tttType > ::HNode::next ( void )
-	{
-	M_PROLOG
-	HNode * * l_ppoNode = NULL;
-	if ( f_poTrunk )
-		{
-		for ( l_ppoNode = & f_poTrunk->f_oBranch.go ( 0 );
-				l_ppoNode && ( ( * l_ppoNode ) != this );
-				l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,	branch_t::D_TREAT_AS_OPENED ) )
-			;
-		if ( l_ppoNode )
-			l_ppoNode = f_poTrunk->f_oBranch.to_tail ( 1,	branch_t::D_TREAT_AS_OPENED );
-		}
-	return ( l_ppoNode ? * l_ppoNode : NULL );
-	M_EPILOG
-	}
-
-template < typename tttType >
-HTree < tttType >::HTree ( void )
-	: f_poRoot ( NULL ), f_poSelected ( NULL ), f_iHighestNumber ( 0 )
+template<typename tType>
+HTree < tType >::HTree ( void )
+	: f_poRoot( NULL )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template < typename tttType >
-HTree < tttType > ::~HTree( void )
+template<typename tType>
+HTree<tType>::~HTree( void )
 	{
 	M_PROLOG
-	HTree::flush();
+	clear();
 	return ;
 	M_EPILOG
 	}
 
-template < typename tttType >
-void HTree < tttType > ::flush ( void )
+template<typename tType>
+void HTree<tType>::clear ( void )
 	{
 	M_PROLOG
 	if ( f_poRoot )

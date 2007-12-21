@@ -75,7 +75,6 @@ void HLogPad::do_refresh ( void )
 	int l_iCtr = 0, l_iRow = 0, l_iCursor = 0, l_iColumn = 0;
 	int l_iBG = f_bFocused ? COLORS::D_BG_GRAY : COLORS::D_BG_BLACK;
 	HConsole& cons = HCons::get_instance();
-	HLogLine* l_poLogLine = NULL;
 	draw_label();
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	f_oVarTmpBuffer.fillz(  ' ', f_iWidthRaw );
@@ -84,20 +83,19 @@ void HLogPad::do_refresh ( void )
 		cons.c_cmvprintf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );
 	if ( f_oContents.size() )
 		{
-		l_poLogLine = & f_oContents.go ( 0 );
 		l_iCtr = 0;
-		while ( l_poLogLine && ( l_iRow < f_iHeightRaw ) )
+		for ( contents_t::iterator it = f_oContents.begin(); ( it != f_oContents.end() ) && ( l_iRow < f_iHeightRaw ); ++ it )
 			{
-			if ( l_poLogLine->f_eType == HLogLine::D_ATTRIBUTE )
-				f_iAttribute = l_poLogLine->f_iAttribute | l_iBG;
+			if ( it->f_eType == HLogLine::D_ATTRIBUTE )
+				f_iAttribute = it->f_iAttribute | l_iBG;
 			else
 				{
 				if ( ( l_iCtr >= f_iOffsetRow ) && ( l_iCursor < f_iWidthRaw ) )
 					{
 					if ( f_iOffsetColumn > l_iColumn )
-						f_oVarTmpBuffer = l_poLogLine->f_oText.mid ( f_iOffsetColumn - l_iColumn );
+						f_oVarTmpBuffer = it->f_oText.mid ( f_iOffsetColumn - l_iColumn );
 					else
-						f_oVarTmpBuffer = l_poLogLine->f_oText;
+						f_oVarTmpBuffer = it->f_oText;
 					if ( ( l_iCursor + f_oVarTmpBuffer.get_length() ) >= f_iWidthRaw )
 						f_oVarTmpBuffer.set_at( f_iWidthRaw - l_iCursor, 0 );
 					if ( f_oVarTmpBuffer [ 0 ] )
@@ -105,7 +103,7 @@ void HLogPad::do_refresh ( void )
 					}
 				else
 					f_oVarTmpBuffer = "";
-				if ( l_poLogLine->f_eType == HLogLine::D_TEXT_EOL )
+				if ( it->f_eType == HLogLine::D_TEXT_EOL )
 					{
 					l_iCursor = 0;
 					l_iColumn = 0;
@@ -116,10 +114,9 @@ void HLogPad::do_refresh ( void )
 				else
 					{
 					l_iCursor += f_oVarTmpBuffer.get_length();
-					l_iColumn += l_poLogLine->f_oText.get_length();
+					l_iColumn += it->f_oText.get_length();
 					}
 				}
-			l_poLogLine = f_oContents.to_tail ( 1, contents_t::D_TREAT_AS_OPENED );
 			}
 		}
 	return;
@@ -142,14 +139,14 @@ void HLogPad::add ( char const * const a_pcText )
 	M_PROLOG
 	int l_iIndexNL = 0, l_iIndexChar = 0;
 	HLogLine l_oLogLine;
-	HLogLine * l_poLogLine = NULL;
+	HLogLine * it = NULL;
 	if ( f_oContents.size() )
-		l_poLogLine = & f_oContents.tail();
-	if ( ! l_poLogLine || ( l_poLogLine->f_eType != HLogLine::D_TEXT ) )
+		it = & f_oContents.tail();
+	if ( ! it || ( it->f_eType != HLogLine::D_TEXT ) )
 		{
-		l_poLogLine = & l_oLogLine;
-		l_poLogLine->f_eType = HLogLine::D_TEXT;
-		l_poLogLine->f_oText = "";
+		it = & l_oLogLine;
+		it->f_eType = HLogLine::D_TEXT;
+		it->f_oText = "";
 		}
 	f_oVarTmpBuffer = a_pcText;
 	while ( static_cast < char const * const > ( f_oVarTmpBuffer ) [ 0 ] )
@@ -157,8 +154,8 @@ void HLogPad::add ( char const * const a_pcText )
 		l_iIndexNL = f_oVarTmpBuffer.find_one_of ( "\r\n" );
 		if ( l_iIndexNL >= 0 )
 			{
-			l_poLogLine->f_oText += f_oVarTmpBuffer.left ( l_iIndexNL );
-			l_poLogLine->f_eType = HLogLine::D_TEXT_EOL;
+			it->f_oText += f_oVarTmpBuffer.left ( l_iIndexNL );
+			it->f_eType = HLogLine::D_TEXT_EOL;
 			f_iLines ++;
 			l_iIndexChar = f_oVarTmpBuffer.find_other_than ( "\r\n", l_iIndexNL + 1 );
 			if ( l_iIndexChar >= 0 )
@@ -168,14 +165,14 @@ void HLogPad::add ( char const * const a_pcText )
 			}
 		else
 			{
-			l_poLogLine->f_oText += f_oVarTmpBuffer;
+			it->f_oText += f_oVarTmpBuffer;
 			f_oVarTmpBuffer = "";
 			}
-		if ( l_poLogLine == & l_oLogLine )
-			f_oContents.add_tail ( l_poLogLine );
-		l_poLogLine = & l_oLogLine;
-		l_poLogLine->f_eType = HLogLine::D_TEXT;
-		l_poLogLine->f_oText = "";
+		if ( it == & l_oLogLine )
+			f_oContents.add_tail ( it );
+		it = & l_oLogLine;
+		it->f_eType = HLogLine::D_TEXT;
+		it->f_oText = "";
 		}
 	if ( f_iLines > f_iHeightRaw )
 		f_iOffsetRow = f_iLines - f_iHeightRaw;

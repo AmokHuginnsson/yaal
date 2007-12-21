@@ -67,6 +67,7 @@ protected:
 	hcore::HString			f_oString;		/* control content */
 	typedef hcore::HList< hcore::HString >	history_t;
 	history_t	f_oHistory;							/* history of insertions */
+	history_t::cyclic_iterator f_oHistoryIt;
 public:
 	HEditControl ( HWindow *,					/* parent */
 								int,								/* top ( parent relative ) */

@@ -87,21 +87,22 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 	M_EPILOG
 	}
 
-OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode & a_rsNode,
-		menu_handlers_map_t const & a_roHandlers )
+OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode& a_rsNode,
+		menu_handlers_map_t const& /*a_roHandlers*/ )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iCount = 0;
 	char const * const l_pcError = _ ( "malformed resource file (menu section)" );
 	char const * const l_pcUnexpected = _ ( ": unexpected node: " );
 	OMenuItem l_sMenuItem, * l_psMenu = NULL;
-	HXml::ONode * l_psNode = NULL;
-	HList < OMenuItem > l_oSubMenu;
+// FIXME	HXml::ONode * l_psNode = NULL;
+	typedef HList<OMenuItem> menu_item_list_t;
+	menu_item_list_t l_oSubMenu;
 	if ( ! a_rsNode.f_oChilds.size() )
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
 
 	if ( a_rsNode.f_oName == "menu" )
 		{
+/*
 		for ( l_psNode = & a_rsNode.f_oChilds.go ( 0 ); l_psNode;
 				l_psNode = a_rsNode.f_oChilds.to_tail ( 1, HList<HXml::ONode>::D_TREAT_AS_OPENED ) )
 			{
@@ -109,32 +110,35 @@ OMenuItem * HDataProcess::build_sub_menu ( HXml::ONode & a_rsNode,
 			build_menu_item ( * l_psNode, l_sMenuItem, a_roHandlers );
 			l_oSubMenu.add_tail ( & l_sMenuItem );
 			}
+			FIXME
+*/
 		}
 	else
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.f_oName
 				+ '=' + a_rsNode.f_oContents.head(), errno );
 	l_sMenuItem.reset();
-	l_oSubMenu.add_tail ( & l_sMenuItem );
-	l_psMenu = new OMenuItem [ l_iCount = l_oSubMenu.size() ];
-	l_oSubMenu.go ( - 1 );
-	for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-		l_psMenu [ l_iCtr ] = ( * l_oSubMenu.to_tail() );
+	l_oSubMenu.add_tail ( &l_sMenuItem );
+	l_psMenu = new OMenuItem[ l_oSubMenu.size() ];
+	int l_iCtr = 0;
+	for ( menu_item_list_t::iterator it = l_oSubMenu.begin(); it != l_oSubMenu.end(); ++ it )
+		l_psMenu[ l_iCtr ] = *it;
 	return ( l_psMenu );
 	M_EPILOG
 	}
 
-void HDataProcess::build_menu_item ( HXml::ONode & a_rsNode,
-		OMenuItem & a_rsMenuItem, menu_handlers_map_t const & a_roHandlers )
+void HDataProcess::build_menu_item ( HXml::ONode& a_rsNode,
+		OMenuItem& /*a_rsMenuItem*/, menu_handlers_map_t const& /*a_roHandlers*/ )
 	{
 	M_PROLOG
 	char const * const l_pcError = _ ( "malformed resource file (menu section)" );
 	char const * const l_pcUnexpected = _ ( ": unexpected node: " );
-	HXml::ONode * l_psNode = NULL;
 	if ( ! a_rsNode.f_oChilds.size() )
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
 
 	if ( a_rsNode.f_oName == "menu_item" )
 		{
+		/*
+		HXml::ONode * l_psNode = NULL;
 		for ( l_psNode = & a_rsNode.f_oChilds.go ( 0 ); l_psNode;
 				l_psNode = a_rsNode.f_oChilds.to_tail ( 1, HList<HXml::ONode>::D_TREAT_AS_OPENED ) )
 			{
@@ -153,6 +157,8 @@ void HDataProcess::build_menu_item ( HXml::ONode & a_rsNode,
 				M_THROW ( HString ( l_pcError ) + l_pcUnexpected + l_psNode->f_oName
 						+ '=' + l_psNode->f_oContents.head(), errno );
 			}
+			FIXME
+		*/
 		}
 	else
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.f_oName

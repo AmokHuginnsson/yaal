@@ -65,7 +65,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 					f_bPassword ( a_bPassword ),
 					f_iMaxStringSize ( a_iBufferSize ), f_iCursorPosition ( 0 ),
 					f_iControlOffset ( 0 ), f_iMaxHistoryLevel ( a_iMaxHistoryLevel ),
-					f_oPattern(), f_oString ( a_iBufferSize, true ), f_oHistory()
+					f_oPattern(), f_oString ( a_iBufferSize, true ), f_oHistory(), f_oHistoryIt()
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
@@ -84,6 +84,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		M_THROW( _( "edit-control right aligned and multiline at the same time" ), 0 );
 	f_oString = a_pcValue;
 	f_oHistory.push_back ( "" );
+	f_oHistoryIt = f_oHistory.hook();
 	if ( ( l_iErrorCode = f_oPattern.parse_re ( a_pcMask ) ) )
 		M_THROW ( f_oPattern.error(), l_iErrorCode );
 	f_oPattern.matches ( a_pcValue, NULL, & l_iErrorCode );
@@ -423,8 +424,8 @@ int HEditControl::insert_char( int a_iCode, int a_iLength )
 int HEditControl::update_from_history( void )
 	{
 	M_PROLOG
-	if ( f_oHistory.size() )
-		f_oVarTmpBuffer = f_oHistory.present();
+	if ( ! f_oHistory.is_empty() && ( f_oHistoryIt != f_oHistory.end() ) )
+		f_oVarTmpBuffer = *f_oHistoryIt;
 	int l_iLength = f_oVarTmpBuffer.get_length();
 	if ( l_iLength >= f_iWidthRaw )
 		{
@@ -458,19 +459,20 @@ int HEditControl::do_process_input ( int a_iCode )
 	switch ( a_iCode )
 		{
 		case ( KEY_CODES::D_PAGE_UP ):
-			f_oHistory.go ( 0 );
+			f_oHistoryIt = f_oHistory.hook();
 			l_iErrorCode = D_HISTORY_OPERATION;
 		break;
 		case ( KEY_CODES::D_PAGE_DOWN ):
-			f_oHistory.go ( - 1 );
+			f_oHistoryIt = f_oHistory.hook();
+			-- f_oHistoryIt;
 			l_iErrorCode = D_HISTORY_OPERATION;
 		break;
 		case ( KEY_CODES::D_UP ):
-			f_oHistory.to_tail();
+			++ f_oHistoryIt;
 			l_iErrorCode = D_HISTORY_OPERATION;
 		break;
 		case ( KEY_CODES::D_DOWN ):
-			f_oHistory.to_head();
+			-- f_oHistoryIt;
 			l_iErrorCode = D_HISTORY_OPERATION;
 		break;
 		case ( '\t' ):
@@ -481,18 +483,19 @@ int HEditControl::do_process_input ( int a_iCode )
 			l_iErrorCode = f_oHistory.size();
 			l_iErrorCode ++;
 			while ( -- l_iErrorCode )
-				if ( ( * f_oHistory.to_tail() ) == f_oString )
+				if ( ( *( ++ f_oHistoryIt ) ) == f_oString )
 					break;
 			if ( f_oString.get_length() && ( ! l_iErrorCode ) )
 				{
-				f_oHistory.add_head ( & f_oString );
+				f_oHistory.add_head( &f_oString );
 				l_iErrorCode = f_oHistory.size();
 				while ( l_iErrorCode -- > f_iMaxHistoryLevel )
 					f_oHistory.remove_at ( l_iErrorCode );
-				f_oHistory.go ( - 1 );
+				f_oHistoryIt = f_oHistory.hook();
+				-- f_oHistoryIt;
 				}
 			else
-				f_oHistory.to_head();
+				-- f_oHistoryIt;
 			l_iErrorCode = D_DATA_ENTER;
 			}
 		break;

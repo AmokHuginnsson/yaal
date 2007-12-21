@@ -37,8 +37,7 @@ namespace yaal
 namespace tools
 {
 
-typedef hcore::HList<int> int_list_t;
-class HAnalyser : public hcore::HTree<int_list_t>
+class HAnalyser
 	{
 	typedef enum
 		{
@@ -53,25 +52,14 @@ class HAnalyser : public hcore::HTree<int_list_t>
 		E_UNEXPECTED_TOKEN = 8,
 		E_PREMATURE_TERMINATION = 9
 		} syntax_error_t;
-	typedef hcore::HTree<int_list_t>::HNode* ANALYZER_NODE_PTR_t;
-	class HAnalyserNode;
-	friend class HAnalyserNode;
-	class HAnalyserNode : public hcore::HTree<int_list_t>::HNode
+	typedef hcore::HList<int> int_list_t;
+	struct OEquationElement;
+	typedef hcore::HTree<OEquationElement> tree_t;
+	struct OEquationElement
 		{
-		typedef double ( HAnalyser::* METHOD_t ) ( HAnalyserNode* );
-	protected:
-		/*{*/
+		typedef double ( HAnalyser::* METHOD_t ) ( tree_t::iterator );
 		METHOD_t METHOD;
-		/*}*/
-	public:
-		/*{*/
-		/*}*/
-	protected:
-		/*{*/
-		HAnalyserNode( HAnalyserNode* );
-		HAnalyserNode* grow_up_branch( int = FILL::D_NEW_AUTO );
-		/*}*/
-		friend class HAnalyser;
+		int_list_t f_oVariables;
 		};
 	int f_iIndex;
 	int f_iLength;
@@ -91,18 +79,18 @@ public:
 	int get_error_token( void ) const;
 private:
 	bool translate( char const* );
-	bool addition_production( HAnalyserNode* );
-	bool multiplication_production( HAnalyserNode* );
-	bool power_production( HAnalyserNode* );
-	bool signum_production( HAnalyserNode* );
-	bool terminal_production( HAnalyserNode* );
-	double count_branch( HAnalyserNode* );
-	double addition( HAnalyserNode* );
-	double multiplication( HAnalyserNode* );
-	double power( HAnalyserNode* );
-	double signum( HAnalyserNode* );
-	double bracket( HAnalyserNode* );
-	double functions( HAnalyserNode* );
+	bool addition_production( tree_t::iterator const& );
+	bool multiplication_production( tree_t::iterator const& );
+	bool power_production( tree_t::iterator const& );
+	bool signum_production( tree_t::iterator const& );
+	bool terminal_production( tree_t::iterator const& );
+	double count_branch( tree_t::iterator const& );
+	double addition( tree_t::iterator const& );
+	double multiplication( tree_t::iterator const& );
+	double power( tree_t::iterator const& );
+	double signum( tree_t::iterator const& );
+	double bracket( tree_t::iterator const& );
+	double functions( tree_t::iterator const& );
 	};
 
 }

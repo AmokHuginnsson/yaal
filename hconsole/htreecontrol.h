@@ -37,42 +37,42 @@ namespace yaal
 namespace hconsole
 {
 
-class HTreeControl : public hcore::HTree < HItem >, public virtual HControl
+class HTreeControl : public virtual HControl
 	{
 protected:
 	class HNodeControl;
 	friend class HNodeControl;
-	class HNodeControl : public hcore::HTree < HItem >::HNode
+	class HNodeControl
 		{
 	protected:
 		bool f_bUnfolded;	/* is this branch folded? */
 		int f_iRowRaw;
 		int	f_iColumnRaw;
 		int f_iWidthRaw;
-		HNodeControl ( HNodeControl * );
+		HNodeControl( HNodeControl* );
 		virtual ~HNodeControl ( void );
-		void expand ( void );
-		void collapse ( void );
-		bool hit_test ( int, int ) const;
-		void click ( int );
+		void expand( void );
+		void collapse( void );
+		bool hit_test( int, int ) const;
+		void click( int );
 		friend class HTreeControl;
 		};
 public:
-	HTreeControl ( HWindow *,			/* parent */
+	HTreeControl( HWindow*,			/* parent */
 								 int,						/* row */
 								 int,						/* col */
 								 int,						/* height */
 								 int,						/* width */
-								 char const * );	/* label */
-	virtual ~HTreeControl ( void );
-	int draw_node ( HNodeControl *, int );
-	virtual int set_focus ( char = 0 );
+								 char const* );	/* label */
+	virtual ~HTreeControl( void );
+	int draw_node( HNodeControl*, int );
+	virtual int set_focus( char = 0 );
 protected:
 	virtual int do_process_input( int );
-	virtual int do_click ( mouse::OMouse & );
-	virtual void do_refresh ( void );
+	virtual int do_click( mouse::OMouse& );
+	virtual void do_refresh( void );
 private:
-	bool do_click ( HNodeControl *, mouse::OMouse & );
+	bool do_click( HNodeControl*, mouse::OMouse& );
 	};
 
 }

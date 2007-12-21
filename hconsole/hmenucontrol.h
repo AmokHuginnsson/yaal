@@ -41,34 +41,23 @@ class HMenuControl : public HTreeControl
 	{
 public:
 	typedef yaal::hcore::HPointer<HMenuControl, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
-private:
-	class HMenuNode;
-	friend class HMenuNode;
-	class HMenuNode : public HTreeControl::HNodeControl
-		{
-	public:
-		int load_sub_menu ( OMenuItem * );
-	protected:
-		HMenuNode ( HMenuNode * );
-		virtual ~HMenuNode ( void );
-		friend class HMenuControl;
-		};
 protected:
-	HTUIProcess * f_poProcess;
+	HTUIProcess* f_poProcess;
 public:
-	HMenuControl ( HWindow *,				/* parent */
+	HMenuControl( HWindow*,				/* parent */
 								 int,							/* row */
 								 int,							/* col */
 								 int,							/* height */
 								 int,							/* width */
-								 char const * );	/* label */
-	virtual ~HMenuControl ( void );
-	void init ( HTUIProcess *, OMenuItem * );
+								 char const* );	/* label */
+	virtual ~HMenuControl( void );
+	void init( HTUIProcess*, OMenuItem* );
 protected:
+	int load_sub_menu( HTreeControl::HNodeControl*, OMenuItem* );
 	virtual int do_process_input( int );
 private:
-	HMenuControl ( HMenuControl const & );
-	HMenuControl & operator = ( HMenuControl const & );
+	HMenuControl( HMenuControl const& );
+	HMenuControl& operator = ( HMenuControl const& );
 	};
 
 }
