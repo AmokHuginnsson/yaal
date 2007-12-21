@@ -622,7 +622,7 @@ void HListControl::add_column( int const& a_riColumn, char const* a_pcName,
 	l_oColumnInfo.f_cShortcut = f_oVarTmpBuffer[ l_iShortcutIndex ];
 	l_oColumnInfo.f_oName = f_oVarTmpBuffer;
 	l_oColumnInfo.f_poControl = a_poControl;
-	f_oHeader.add_at( a_riColumn, &l_oColumnInfo );
+	f_oHeader.insert( f_oHeader.n_th( a_riColumn ), &l_oColumnInfo );
 	recalculate_column_widths();
 	return;
 	M_EPILOG
