@@ -122,6 +122,7 @@ public:
 	void push_back( tType const& );
 	void pop_back( void );
 	void push_front( tType const& );
+	void pop_front( void );
 	/*!
 	 * Add element in the way that keeps order.
 	 */
@@ -139,7 +140,7 @@ public:
 	tType const& head( void ) const;
 	tType& tail( void );
 	tType const& tail( void ) const;
-	void exchange( int, int );
+	void exchange( iterator const&, iterator const& );
 	void sort_by_contents( sort_order_t = D_ASCENDING );
 	bool empty( void );
 	bool is_empty( void );
@@ -600,6 +601,15 @@ void HList<tType>::push_front( tType const& a_rtObject )
 	}
 
 template<typename tType>
+void HList<tType>::pop_front( void )
+	{
+	M_PROLOG
+	remove_head();
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
 template<typename T>
 tType& HList<tType>::add_orderly( tType const& a_rtObject,
 		T const& less, sort_order_t a_eOrder )
@@ -844,16 +854,11 @@ void HList<tType>::exchange( HElement* a_poLeft, HElement* a_poRight )
 	}
 
 template<typename tType>
-void HList<tType>::exchange( int a_iLeft, int a_iRight )
+void HList<tType>::exchange( iterator const& left, iterator const& right )
 	{
 	M_PROLOG
-	HElement* l_poLeft = NULL;
-	HElement* l_poRight = NULL;
-	if ( a_iLeft == a_iRight )
-		return;
-	l_poLeft = element_by_index( a_iLeft );
-	l_poRight = element_by_index( a_iRight );
-	exchange( l_poLeft, l_poRight );
+	if ( left != right )
+		exchange( left.f_poCurrent, right.f_poCurrent );
 	return;
 	M_EPILOG
 	}

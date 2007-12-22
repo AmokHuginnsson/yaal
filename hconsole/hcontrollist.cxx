@@ -163,7 +163,7 @@ void HControlList::select( HControl::ptr_t const& a_oControl )
 void HControlList::exchange( int a_iFormer, int a_iLatter )
 	{
 	M_PROLOG
-	f_oList.exchange( a_iFormer + 1, a_iLatter + 1 );
+	f_oList.exchange( f_oList.n_th( a_iFormer + 1 ), f_oList.n_th( a_iLatter + 1 ) );
 	return;
 	M_EPILOG
 	}
