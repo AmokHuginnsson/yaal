@@ -116,7 +116,9 @@ public:
 	 * Adds new element at specified position.
 	 */
 	template<OListBits::treatment_t treatment>
-	HIterator<treatment> insert( HIterator<treatment> const&, tType* = NULL );
+	HIterator<treatment> insert( HIterator<treatment> const&, tType const* = NULL );
+	template<OListBits::treatment_t treatment>
+	HIterator<treatment> insert( HIterator<treatment> const&, tType const& );
 	tType& add_head( tType const* = NULL );    /* adds new element at beggining of the list */
 	tType& add_tail( tType const* = NULL );	/* adds new element at end of the list */
 	void push_back( tType const& );
@@ -530,11 +532,11 @@ int HList<tType>::size( void ) const
 template<typename tType>
 template<OListBits::treatment_t const treatment>
 typename HList<tType>::template HIterator<treatment> HList<tType>::insert( HIterator<treatment> const& a_oPositon,
-		tType* a_ptObject )
+		tType const* a_ptObject )
 	{
 	M_PROLOG
 	HElement* l_poElement = new HElement( a_oPositon.f_poCurrent );
-	if ( f_iSize == 0 )
+	if ( ( f_iSize == 0 ) || ( ( a_oPositon.f_poCurrent == f_poHook ) && ( treatment == D_TREAT_AS_OPENED ) ) )
 		f_poHook = l_poElement;
 	f_iSize ++;
 	f_iIndex = 0;
@@ -542,6 +544,16 @@ typename HList<tType>::template HIterator<treatment> HList<tType>::insert( HIter
 	if ( a_ptObject )
 		l_poElement->f_tObject = *a_ptObject;
 	return ( iterator( this, l_poElement ) );
+	M_EPILOG
+	}
+
+template<typename tType>
+template<OListBits::treatment_t const treatment>
+typename HList<tType>::template HIterator<treatment> HList<tType>::insert( HIterator<treatment> const& a_oPositon,
+		tType const& val )
+	{
+	M_PROLOG
+	return ( insert( a_oPositon, &val ) );
 	M_EPILOG
 	}
 
@@ -666,19 +678,27 @@ typename HList<tType>::template HIterator<treatment> HList<tType>::erase( HItera
 	++ it;
 	if ( ! f_iSize )
 		M_THROW( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
-	/* 1 2 3 4 5 6 7
+	/*
+	 * What iterator shall be returned.
+	 *
+	 * common easy:
+	 * 1 2 3 4 5 6 7
 	 *     ^
 	 * 1 2 4 5 6 7
 	 *     ^
+	 *
+	 * common special:
 	 * 1 2 3 4 5
 	 * ^
 	 * 2 3 4 5
 	 * ^
+	 *
+	 * tricky:
 	 * 1 2 3 4 5
 	 *         ^
-	 * 1 2 3 4  (o)
-	 *       ^
-	 * 1 2 3 4  (c) 
+	 * 1 2 3 4 (nil)  (opened list)
+	 *           ^
+	 * 1 2 3 4  (closed list) 
 	 * ^
 	 */
 	if ( a_roIterator.f_poCurrent == f_poHook )
