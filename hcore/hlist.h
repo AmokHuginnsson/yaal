@@ -105,11 +105,16 @@ public:
 	virtual ~HList( void );
 	HList( HList const& );
 	HList& operator = ( HList const& );
-	cyclic_iterator hook( void ) const;
-	iterator begin( void ) const;
-	iterator end( void ) const;
-	iterator rend( void ) const;
-	iterator rbegin( void ) const;
+	cyclic_iterator hook( void );
+	cyclic_iterator const hook( void ) const;
+	iterator begin( void );
+	iterator end( void );
+	iterator rend( void );
+	iterator rbegin( void );
+	iterator const begin( void ) const;
+	iterator const end( void ) const;
+	iterator const rend( void ) const;
+	iterator const rbegin( void ) const;
 	void clear( void );
 	int size( void ) const;
 	/*!
@@ -144,8 +149,8 @@ public:
 	tType const& tail( void ) const;
 	void exchange( iterator const&, iterator const& );
 	void sort_by_contents( sort_order_t = D_ASCENDING );
-	bool empty( void );
-	bool is_empty( void );
+	bool empty( void ) const;
+	bool is_empty( void ) const;
 	template<typename T>
 	void sort( T const&, sort_order_t = D_ASCENDING );
 protected:
@@ -417,31 +422,61 @@ HList<tType>::HList ( HList<tType> const & a_roList )
 	}
 
 template<typename tType>
-typename HList<tType>::iterator HList<tType>::begin( void ) const
+typename HList<tType>::iterator const HList<tType>::begin( void ) const
 	{
 	return ( iterator( this, f_poHook ) );
 	}
 
 template<typename tType>
-typename HList<tType>::iterator HList<tType>::end( void ) const
+typename HList<tType>::iterator HList<tType>::begin( void )
+	{
+	return ( iterator( this, f_poHook ) );
+	}
+
+template<typename tType>
+typename HList<tType>::iterator const HList<tType>::end( void ) const
 	{
 	return ( iterator( this, NULL ) );
 	}
 
 template<typename tType>
-typename HList<tType>::iterator HList<tType>::rend( void ) const
+typename HList<tType>::iterator HList<tType>::end( void )
 	{
 	return ( iterator( this, NULL ) );
 	}
 
 template<typename tType>
-typename HList<tType>::iterator HList<tType>::rbegin( void ) const
+typename HList<tType>::iterator const HList<tType>::rbegin( void ) const
 	{
 	return ( iterator( this, f_poHook->f_poPrevious ) );
 	}
 
 template<typename tType>
-typename HList<tType>::cyclic_iterator HList<tType>::hook( void ) const
+typename HList<tType>::iterator HList<tType>::rbegin( void )
+	{
+	return ( iterator( this, f_poHook->f_poPrevious ) );
+	}
+
+template<typename tType>
+typename HList<tType>::iterator const  HList<tType>::rend( void ) const
+	{
+	return ( iterator( this, NULL ) );
+	}
+
+template<typename tType>
+typename HList<tType>::iterator HList<tType>::rend( void )
+	{
+	return ( iterator( this, NULL ) );
+	}
+
+template<typename tType>
+typename HList<tType>::cyclic_iterator const HList<tType>::hook( void ) const
+	{
+	return ( cyclic_iterator( this, f_poHook ) );
+	}
+
+template<typename tType>
+typename HList<tType>::cyclic_iterator HList<tType>::hook( void )
 	{
 	return ( cyclic_iterator( this, f_poHook ) );
 	}
@@ -510,13 +545,13 @@ void HList<tType>::clear( void )
 	}
 
 template<typename tType>
-bool HList<tType>::is_empty( void )
+bool HList<tType>::is_empty( void ) const
 	{
 	return ( ! f_iSize );
 	}
 
 template<typename tType>
-bool HList<tType>::empty( void )
+bool HList<tType>::empty( void ) const
 	{
 	return ( ! f_iSize );
 	}
