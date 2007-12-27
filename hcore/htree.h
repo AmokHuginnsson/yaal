@@ -82,7 +82,7 @@ public:
 	bool has_childs( void ) const;
 	typename tree_t::iterator insert_node( typename tree_t::iterator const&, typename tree_t::HNode* );
 	typename tree_t::iterator insert_node( typename tree_t::iterator const&, tType const& );
-	typename tree_t::iterator replace_node( typename tree_t::iterator const&, typename tree_t::HNode* );
+	typename tree_t::iterator replace_node( typename tree_t::iterator, typename HTree<tType>::HNode* );
 	typename tree_t::iterator add_node( typename tree_t::HNode* );
 	typename tree_t::iterator add_node( tType const& );
 	void remove_node( tree_t::iterator const& );
@@ -105,6 +105,7 @@ private:
 	virtual ~HNode( void );
 	HNode( HNode const& );
 	HNode& operator = ( HNode const& );
+	void detach( HNode* );
 	friend class HTree<tType>;
 	friend class HList<HNode*>;
 	};
@@ -269,6 +270,19 @@ typename HTree<tType>::iterator HTree<tType>::HNode::insert_node( HTree<tType>::
 	}
 
 template<typename tType>
+typename HTree<tType>::iterator HTree<tType>::HNode::replace_node( HTree<tType>::HIterator pos, HTree<tType>::HNode* node )
+	{
+	if ( node->f_poTrunk )
+		node->f_poTrunk->detach( node );
+	else
+		node->f_poTree->f_poRoot = NULL;
+	delete *pos.f_oIterator;
+	*pos.f_oIterator = node;
+	node->f_poTrunk = this;
+	return ( pos );
+	}
+
+template<typename tType>
 typename HTree<tType>::node_t HTree<tType>::HNode::get_parent( void )
 	{
 	return ( f_poTrunk );
@@ -278,6 +292,20 @@ template<typename tType>
 typename HTree<tType>::const_node_t HTree<tType>::HNode::get_parent( void ) const
 	{
 	return ( f_poTrunk );
+	}
+
+template<typename tType>
+void HTree<tType>::HNode::detach( HTree<tType>::HNode* node )
+	{
+	for ( typename branch_t::iterator it = f_oBranch.begin(); it != f_oBranch.end(); ++ it )
+		{
+		if ( *it == node )
+			{
+			*it = NULL;
+			break;
+			}
+		}
+	return;
 	}
 
 template<typename tType>
