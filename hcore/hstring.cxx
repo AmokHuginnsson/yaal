@@ -501,8 +501,7 @@ int HString::get_length( void ) const
 	if ( ! f_pcBuffer )
 		M_THROW ( "no buffer.", reinterpret_cast<int>( f_pcBuffer ) );
 	l_iLength = ::strlen( f_pcBuffer );
-	if ( l_iLength > f_iSize )
-		M_THROW( "no terminating null!", l_iLength );
+	M_ASSERT( l_iLength < f_iSize );
 	return ( l_iLength );
 	M_EPILOG
 	}
