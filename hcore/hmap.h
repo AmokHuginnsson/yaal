@@ -156,6 +156,11 @@ public:
 		}
 	void clear( void )
 		{ f_oEngine.clear(); }
+	void swap( HMap<tType, ttType, tttType>& other )
+		{
+		if ( &other != this )
+			f_oEngine.swap( other.f_oEngine );
+		}
 	};
 
 }

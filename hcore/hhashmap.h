@@ -45,15 +45,15 @@ namespace yaal
 namespace hcore
 {
 
-extern int long unsigned const * const g_pulPrimes;
+extern int long unsigned const* const g_pulPrimes;
 
-template < typename tType >
-inline int long unsigned hash ( tType const & a_rtKey )
+template<typename tType>
+inline int long unsigned hash( tType const& a_rtKey )
 	{
-	return ( static_cast < int long unsigned > ( a_rtKey ) );
+	return ( static_cast<int long unsigned>( a_rtKey ) );
 	}
 
-template < typename tType, typename ttType >
+template<typename tType, typename ttType>
 class HHashMap
 	{
 	class HAtom
@@ -62,51 +62,51 @@ class HHashMap
 		/*{*/
 		tType		f_tKey;
 		ttType	f_tValue;
-		HAtom * f_poNext;
+		HAtom* f_poNext;
 		/*}*/
 	public:
 		/*{*/
-		HAtom ( void );
-		virtual ~HAtom ( void );
+		HAtom( void );
+		virtual ~HAtom( void );
 		/*}*/
 	private:
 		/*{*/
-		HAtom ( HAtom const & );
-		HAtom & operator = ( HAtom const & );
+		HAtom( HAtom const& );
+		HAtom& operator = ( HAtom const& );
 		/*}*/
-		friend class HHashMap < tType, ttType >;
+		friend class HHashMap<tType, ttType>;
 		};
 	int unsigned f_uiPrime;
 	int unsigned f_uiIndex;
-	int f_iQuantity;
-	HAtom * f_poAtomPtr;
-	HAtom ** f_ppoAtomArray;
+	int f_iSize;
+	HAtom* f_poAtomPtr;
+	HAtom** f_ppoAtomArray;
 public:
-	HHashMap ( size_t ); /* Lower bound of size of map's table */
-	HHashMap ( HHashMap const & );
-	virtual ~HHashMap ( void );
-	HHashMap & operator = ( HHashMap const & );
-	ttType & operator [ ] ( tType const & );
-	void rewind ( void );
-	bool iterate ( tType &, ttType & );
-	bool has_key ( tType const & ) const;
-	bool get ( tType const &, ttType & ) const;
-	bool remove ( tType const & );
-	void clear ( void );
-	int quantity ( void ) const;
+	HHashMap( size_t ); /* Lower bound of size of map's table */
+	HHashMap( HHashMap const& );
+	virtual ~HHashMap( void );
+	HHashMap& operator = ( HHashMap const& );
+	ttType& operator [] ( tType const& );
+	void rewind( void );
+	bool iterate( tType&, ttType& );
+	bool has_key( tType const& ) const;
+	bool get( tType const&, ttType& ) const;
+	bool remove( tType const& );
+	void clear( void );
+	int size( void ) const;
 	};
 
-template < typename tType, typename ttType >
-HHashMap<tType, ttType>::HAtom::HAtom ( void ) : f_tKey(), f_tValue(),
-																						 f_poNext ( NULL )
+template<typename tType, typename ttType>
+HHashMap<tType, ttType>::HAtom::HAtom( void ) : f_tKey(), f_tValue(),
+																						 f_poNext( NULL )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
-HHashMap<tType, ttType>::HAtom::~HAtom ( void )
+template<typename tType, typename ttType>
+HHashMap<tType, ttType>::HAtom::~HAtom( void )
 	{
 	M_PROLOG
 	return;
@@ -115,7 +115,7 @@ HHashMap<tType, ttType>::HAtom::~HAtom ( void )
 
 template < typename tType, typename ttType >
 HHashMap<tType, ttType>::HHashMap ( size_t a_uiSize ) : f_uiPrime ( 0 ), f_uiIndex ( 0 ),
-	f_iQuantity ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
+	f_iSize ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
 	M_PROLOG
 	int unsigned l_uiCtr = 0;
@@ -134,7 +134,7 @@ HHashMap<tType, ttType>::HHashMap ( size_t a_uiSize ) : f_uiPrime ( 0 ), f_uiInd
 
 template < typename tType, typename ttType >
 HHashMap<tType, ttType>::HHashMap ( HHashMap const & a_roMap ) :  f_uiPrime ( 0 ), f_uiIndex ( 0 ),
-	f_iQuantity ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
+	f_iSize ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
 	M_PROLOG
 	operator = ( a_roMap );
@@ -169,7 +169,7 @@ HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const &
 		f_ppoAtomArray = NULL;
 		f_uiPrime = a_roMap.f_uiPrime;
 		f_uiIndex = a_roMap.f_uiIndex;
-		f_iQuantity = a_roMap.f_iQuantity;
+		f_iSize = a_roMap.f_iSize;
 		f_ppoAtomArray = xcalloc < HAtom * > ( f_uiPrime );
 		for ( l_iCtr = 0; l_iCtr < f_uiPrime; ++ l_iCtr )
 			{
@@ -204,17 +204,17 @@ void HHashMap<tType, ttType>::clear ( void )
 			delete f_ppoAtomArray [ l_uiCtr ];
 			f_ppoAtomArray [ l_uiCtr ] = l_poAtom;
 			}
-	f_iQuantity = 0;
+	f_iSize = 0;
 	rewind();
 	return;
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
-int HHashMap < tType, ttType >::quantity ( void ) const
+template<typename tType, typename ttType>
+int HHashMap<tType, ttType>::size( void ) const
 	{
 	M_PROLOG
-	return ( f_iQuantity );
+	return ( f_iSize );
 	M_EPILOG
 	}
 
@@ -233,7 +233,7 @@ ttType & HHashMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
 		l_poAtom = new ( std::nothrow ) HAtom();
 		if ( ! l_poAtom )
 			M_THROW ( "memory allocation error", errno );
-		f_iQuantity ++;
+		f_iSize ++;
 		l_poAtom->f_poNext = f_ppoAtomArray [ l_iHash ];
 		f_ppoAtomArray [ l_iHash ] = l_poAtom;
 		l_poAtom->f_tKey = a_rtKey;
@@ -242,8 +242,8 @@ ttType & HHashMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
-void HHashMap<tType, ttType>::rewind ( void )
+template<typename tType, typename ttType>
+void HHashMap<tType, ttType>::rewind( void )
 	{
 	M_PROLOG
 	f_uiIndex = 0;
@@ -329,7 +329,7 @@ bool HHashMap<tType, ttType>::remove ( tType const & a_rtKey )
 			f_ppoAtomArray [ l_iHash ] = NULL;
 		delete l_poAtom;
 		rewind();
-		f_iQuantity --;
+		f_iSize --;
 		}
 	return ( l_poAtom ? true : false );
 	M_EPILOG
@@ -337,7 +337,7 @@ bool HHashMap<tType, ttType>::remove ( tType const & a_rtKey )
 
 /* Helpers and premaps */
 
-int long unsigned hash ( HString const & );
+int long unsigned hash( HString const& );
 
 }
 

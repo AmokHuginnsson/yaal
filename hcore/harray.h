@@ -43,7 +43,7 @@ namespace hcore
 
 extern char const * const n_ppcErrMsgHArray [ ];
 
-template < typename tType >
+template<typename tType>
 class HArray
 	{
 	struct OPointerConversion { int f_iValid; };

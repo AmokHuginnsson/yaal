@@ -134,6 +134,11 @@ public:
 		{ return ( HIterator( f_oEngine.rend() ) ); }
 	void clear( void )
 		{ f_oEngine.clear(); }
+	void swap( HSet<tType, ttType>& other )
+		{
+		if ( &other != this )
+				f_oEngine.swap( other.f_oEngine );
+		}
 	};
 
 }

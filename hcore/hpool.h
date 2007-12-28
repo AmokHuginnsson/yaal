@@ -78,6 +78,7 @@ public:
 	void push_back( tType const& );
 	void reset( void );
 	int size( void ) const;
+	void swap( HPool<tType>& );
 	tType* raw( void ) const;
 private:
 	HPool( HPool const& );
@@ -170,6 +171,27 @@ template<typename tType>
 int HPool<tType>::size( void ) const
 	{
 	return ( f_iTop );
+	}
+
+template<typename tType>
+void HPool<tType>::swap( HPool<tType>& other )
+	{
+	if ( &other != this )
+		{
+		pool_type_t l_ePoolType = f_ePoolType;
+		size_t l_ulPoolSize = f_ulPoolSize;
+		int l_iTop = f_iTop;
+		tType* l_ptPool = f_ptPool;
+		f_ePoolType = other.f_ePoolType;
+		f_ulPoolSize = other.f_ulPoolSize;
+		f_iTop = other.f_iTop;
+		f_ptPool = other.f_ptPool;
+		other.f_ePoolType = l_ePoolType;
+		other.f_ulPoolSize = l_ulPoolSize;
+		other.f_iTop = l_iTop;
+		other.f_ptPool = l_ptPool;
+		}
+	return;
 	}
 
 template<typename tType>
