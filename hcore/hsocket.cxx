@@ -356,7 +356,7 @@ int HSocket::get_client_count ( void ) const
 	M_PROLOG
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
-	return ( f_poClients->quantity() );
+	return ( f_poClients->size() );
 	M_EPILOG
 	}
 

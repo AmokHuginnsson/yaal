@@ -115,7 +115,7 @@ int HProcess::reconstruct_fdset( void )
 	f_sLatency.tv_sec = f_iLatencySeconds;
 	f_sLatency.tv_usec = f_iLatencyMicroseconds;
 	FD_ZERO ( & f_xFileDescriptorSet );
-	if ( ! f_oFileDescriptorHandlers.quantity() )
+	if ( ! f_oFileDescriptorHandlers.size() )
 		return ( -1 );
 	f_oFileDescriptorHandlers.rewind();
 /* FD_SET is a macro and first argument is evaluated twice ! */
@@ -134,7 +134,7 @@ int HProcess::run( void )
 	do_init();
 	if ( ! f_bInitialised )
 		M_THROW( _ ( "you have to call HProcess::init() first, dumbass" ), errno );
-	if ( ! f_oFileDescriptorHandlers.quantity() )
+	if ( ! f_oFileDescriptorHandlers.size() )
 		M_THROW( _ ( "there is no file descriptor to check activity on" ), errno );
 	while ( f_bLoop )
 		{
