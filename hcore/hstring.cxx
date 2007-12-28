@@ -494,24 +494,38 @@ void HString::clear( void )
 	return;
 	}
 
-int HString::get_length ( void ) const
+int HString::get_length( void ) const
 	{
 	M_PROLOG
 	int l_iLength = 0;
 	if ( ! f_pcBuffer )
-		M_THROW ( "no buffer.", reinterpret_cast < int > ( f_pcBuffer ) );
-	l_iLength = strlen ( f_pcBuffer );
+		M_THROW ( "no buffer.", reinterpret_cast<int>( f_pcBuffer ) );
+	l_iLength = ::strlen( f_pcBuffer );
 	if ( l_iLength > f_iSize )
-		M_THROW ( "no terminating null!", l_iLength );
+		M_THROW( "no terminating null!", l_iLength );
 	return ( l_iLength );
 	M_EPILOG
 	}
 
-HString & HString::format ( char const * const a_pcFormat, ... )
+void HString::swap( HString& other )
+	{
+	if ( &other != this )
+		{
+		int l_iSize = f_iSize;
+		char* l_pcBuffer = f_pcBuffer;
+		f_iSize = other.f_iSize;
+		f_pcBuffer = other.f_pcBuffer;
+		other.f_iSize = l_iSize;
+		other.f_pcBuffer = l_pcBuffer;
+		}
+	return;
+	}
+
+HString& HString::format ( char const* const a_pcFormat, ... )
 	{
 	M_PROLOG
 	va_list ap;
-	va_start ( ap, a_pcFormat );
+	va_start( ap, a_pcFormat );
 	try
 		{
 		vformat( a_pcFormat, &ap );
@@ -521,8 +535,8 @@ HString & HString::format ( char const * const a_pcFormat, ... )
 		va_end( ap );
 		throw;
 		}
-	va_end ( ap );
-	return ( * this );
+	va_end( ap );
+	return ( *this );
 	M_EPILOG
 	}
 

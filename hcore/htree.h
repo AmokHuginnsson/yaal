@@ -62,6 +62,7 @@ public:
 	const_node_t get_root( void ) const;
 	node_t set_new_root( void );
 	void clear( void );
+	void swap( HTree<tType>& );
 private:
 	HTree( HTree const& );
 	HTree& operator = ( HTree const& );
@@ -302,6 +303,7 @@ void HTree<tType>::HNode::detach( HTree<tType>::HNode* node )
 		if ( *it == node )
 			{
 			*it = NULL;
+			f_oBranch.erase( it );
 			break;
 			}
 		}
@@ -398,6 +400,18 @@ void HTree<tType>::clear( void )
 		delete f_poRoot;
 	f_poRoot = NULL;
 	M_EPILOG
+	}
+
+template<typename tType>
+void HTree<tType>::swap( HTree<tType>& other )
+	{
+	if ( &other != this )
+		{
+		HNode* l_poRoot = f_poRoot;
+		f_poRoot = other.f_poRoot;
+		other.f_poRoot = l_poRoot;
+		}
+	return;
 	}
 
 template<typename tType>

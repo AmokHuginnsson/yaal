@@ -105,7 +105,9 @@ public:
 	HIterator find( ttType const& ) const;
 	int long size( void ) const;
 	bool empty( void ) const;
+	bool is_empty( void ) const;
 	void clear( void );
+	void swap( HSBBSTree& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
 	HIterator rbegin( void ) const;

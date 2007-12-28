@@ -463,6 +463,25 @@ bool HSBBSTree::empty( void ) const
 	return ( ! f_poRoot );
 	}
 
+bool HSBBSTree::is_empty( void ) const
+	{
+	return ( ! f_poRoot );
+	}
+
+void HSBBSTree::swap( HSBBSTree& other )
+	{
+	if ( &other != this )
+		{
+		int long l_lSize = f_lSize;
+		HAbstractNode* l_poRoot = f_poRoot;
+		f_lSize = other.f_lSize;
+		f_poRoot = other.f_poRoot;
+		other.f_lSize = l_lSize;
+		other.f_poRoot = l_poRoot;
+		}
+	return;
+	}
+
 HSBBSTree::HIterator HSBBSTree::begin( void ) const
 	{
 	HAbstractNode * l_poNode = f_poRoot;

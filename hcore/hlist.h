@@ -89,12 +89,12 @@ class HList : public OListBits
 	{
 	class HElement;
 	int f_iSize;					/* how many elements this list contains */
-	HElement * f_poHook;			/* "begining" of the list ( "first" element ) */
+	HElement* f_poHook;			/* "begining" of the list ( "first" element ) */
 /* for internal use only */
 	sort_order_t f_eOrder;		/* last-to-current sort order */
 	int f_iIndex;							/* this two fiels will allow boost operator [ ],
 															 int holds last */
-	HElement * f_poIndex;			/* index and HElement * holds pointer to this
+	HElement* f_poIndex;			/* index and HElement * holds pointer to this
 															 last element */
 public:
 	template<OListBits::treatment_t const treatment = OListBits::D_TREAT_AS_OPENED>
@@ -117,6 +117,7 @@ public:
 	iterator const rbegin( void ) const;
 	void clear( void );
 	int size( void ) const;
+	void swap( HList<tType>& );
 	/*!
 	 * Adds new element at specified position.
 	 */
@@ -562,6 +563,30 @@ int HList<tType>::size( void ) const
 	M_PROLOG
 	return ( f_iSize );
 	M_EPILOG
+	}
+
+template<typename tType>
+void HList<tType>::swap( HList<tType>& other )
+	{
+	if ( &other != this )
+		{
+		int l_iSize = f_iSize;
+		int l_iIndex = f_iIndex;
+		sort_order_t l_eOrder = f_eOrder;
+		HElement* l_poHook = f_poHook;
+		HElement* l_poIndex = f_poIndex;
+		f_iSize = other.f_iSize;
+		f_iIndex = other.f_iIndex;
+		f_eOrder = other.f_eOrder;
+		f_poHook = other.f_poHook;
+		f_poIndex = other.f_poIndex;
+		other.f_iSize = l_iSize;
+		other.f_iIndex = l_iIndex;
+		other.f_eOrder = l_eOrder;
+		other.f_poHook = l_poHook;
+		other.f_poIndex = l_poIndex;
+		}
+	return;
 	}
 
 template<typename tType>

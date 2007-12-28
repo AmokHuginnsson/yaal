@@ -86,6 +86,7 @@ public:
 	bool empty( void ) const;
 	void clear( void );
 	int get_length( void ) const;
+	void swap( HString& );
 	HString& format( char const* const, ... );
 	HString& vformat( char const* const, void* );
 	int find( char const, int = 0 ) const;
