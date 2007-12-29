@@ -161,6 +161,11 @@ public:
 		if ( &other != this )
 			f_oEngine.swap( other.f_oEngine );
 		}
+	void copy_from( HMap<tType, ttType, tttType> const& source )
+		{
+		if ( &source != this )
+			f_oEngine.copy_from<map_elem_t, tttType>( source.f_oEngine );
+		}
 	};
 
 }

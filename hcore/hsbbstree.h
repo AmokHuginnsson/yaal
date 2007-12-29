@@ -72,14 +72,14 @@ private:
 			D_BLACK
 			} color_t;
 		color_t f_eColor;
-		HAbstractNode * f_poParent;
-		HAbstractNode * f_poLeft;
-		HAbstractNode * f_poRight;
-		HAbstractNode ( void );
-		virtual ~HAbstractNode ( void );
-		HAbstractNode ( HAbstractNode const & );
-		HAbstractNode & operator = ( HAbstractNode const & );
-		void set_child ( HAbstractNode *, HAbstractNode * );
+		HAbstractNode* f_poParent;
+		HAbstractNode* f_poLeft;
+		HAbstractNode* f_poRight;
+		HAbstractNode( void );
+		virtual ~HAbstractNode( void );
+		HAbstractNode( HAbstractNode const& );
+		HAbstractNode& operator = ( HAbstractNode const & );
+		void set_child( HAbstractNode*, HAbstractNode* );
 		friend class HSBBSTree;
 		};
 	template<typename tType>
@@ -108,6 +108,8 @@ public:
 	bool is_empty( void ) const;
 	void clear( void );
 	void swap( HSBBSTree& );
+	template<typename tType, typename ttType>
+	void copy_from( HSBBSTree const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
 	HIterator rbegin( void ) const;
@@ -140,17 +142,19 @@ public:
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
 	template<typename tType>
-	tType const& operator * ( void );
+	tType const& operator* ( void );
 private:
 	friend class HSBBSTree;
 	explicit HIterator( HAbstractNode* const );
 	};
 
 template<typename tType>
-tType const& HSBBSTree::HIterator::operator * ( void )
+tType const& HSBBSTree::HIterator::operator* ( void )
 	{
+	M_PROLOG
 	M_ASSERT( f_poCurrent );
 	return ( static_cast<HNode<tType>*>( f_poCurrent )->f_tKey );
+	M_EPILOG
 	}
 
 template<typename tType>
@@ -163,6 +167,7 @@ HSBBSTree::HNode<tType>::HNode( tType const& a_tKey )
 template<typename tType, typename ttType>
 HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 	{
+	M_PROLOG
 	ONodePtr l_oNode;
 	HNode<tType>* l_poNode = NULL;
 	if ( f_poRoot )
@@ -200,11 +205,13 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_poParent == NULL ) );
 	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_eColor == HAbstractNode::D_BLACK ) );
 	return ( HIterator( l_poNode ) );
+	M_EPILOG
 	}
 
 template<typename tType, typename ttType, typename tttType>
 void HSBBSTree::remove( ttType const& a_tKey )
 	{
+	M_PROLOG
 	if ( f_poRoot )
 		{
 		ONodePtr l_oNode = find_node<tType, ttType, tttType>( a_tKey );
@@ -216,18 +223,22 @@ void HSBBSTree::remove( ttType const& a_tKey )
 		}
 	M_THROW( n_ppcErrMsgHSBBSTree [ ERROR::E_NON_EXISTING_KEY ],
 			static_cast<int>( ERROR::E_NON_EXISTING_KEY ) );
+	M_EPILOG
 	}
 
 template<typename tType, typename ttType, typename tttType>
 HSBBSTree::HIterator HSBBSTree::find( ttType const& a_tKey ) const
 	{
+	M_PROLOG
 	ONodePtr l_oNodePtr = find_node<tType, ttType, tttType>( a_tKey );
 	return ( HIterator( l_oNodePtr.f_bExists ? l_oNodePtr.f_poNode : NULL ) );
+	M_EPILOG
 	}
 
 template<typename tType, typename ttType, typename tttType>
 typename HSBBSTree::ONodePtr HSBBSTree::find_node( ttType const& a_tKey ) const
 	{
+	M_PROLOG
 	ONodePtr l_oNodePtr;
 	if ( f_poRoot )
 		{
@@ -253,6 +264,21 @@ typename HSBBSTree::ONodePtr HSBBSTree::find_node( ttType const& a_tKey ) const
 			}
 		}
 	return ( l_oNodePtr );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType>
+void HSBBSTree::copy_from( HSBBSTree const& source )
+	{
+	M_PROLOG
+	if ( &source != this )
+		{
+		clear();
+		for ( HIterator it = source.begin(); it != source.end(); ++ it )
+			insert<tType, ttType>( it.operator*<tType>() );
+		}
+	return;
+	M_EPILOG
 	}
 
 }

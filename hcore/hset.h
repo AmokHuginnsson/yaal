@@ -139,6 +139,11 @@ public:
 		if ( &other != this )
 				f_oEngine.swap( other.f_oEngine );
 		}
+	void copy_from( HSet<tType, ttType> const& source )
+		{
+		if ( &source != this )
+			f_oEngine.copy_from<tType, ttType>( source.f_oEngine );
+		}
 	};
 
 }

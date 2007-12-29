@@ -41,36 +41,36 @@ namespace hdata
 #define M_REGISTER_MENU_HANDLER( handler ) \
 	{ \
 	typedef typeof ( *this ) this_t; \
-	l_oHandlers [ #handler ] = static_cast < OMenuItem::HANDLER_t > ( \
-			& this_t::handler ); \
+	l_oHandlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
+			&this_t::handler ); \
 	}
 
-typedef yaal::hcore::HHashMap < yaal::hcore::HString,
-				yaal::hconsole::OMenuItem::HANDLER_t > menu_handlers_map_t;
+typedef yaal::hcore::HHashMap<yaal::hcore::HString,
+				yaal::hconsole::OMenuItem::HANDLER_t> menu_handlers_map_t;
 
 class HDataProcess : public hconsole::HTUIProcess
 	{
 protected:
 	dbwrapper::HDataBase f_oDataBase;
 private:
-	yaal::hconsole::OMenuItem * f_psRootMenu;
+	yaal::hconsole::OMenuItem* f_psRootMenu;
 public:
-	HDataProcess ( void );
-	virtual ~HDataProcess ( void );
-	virtual int init_xrc ( char const *, char const *,
-			menu_handlers_map_t const & );
-	dbwrapper::HDataBase * data_base ( void );
+	HDataProcess( void );
+	virtual ~HDataProcess( void );
+	virtual int init_xrc( char const*, char const*,
+			menu_handlers_map_t const& );
+	dbwrapper::HDataBase* data_base( void );
 protected:
-	virtual int handler_quit ( int, void const* = NULL );
-	virtual int handler_close_window ( int, void const* = NULL );
-	yaal::hconsole::OMenuItem * build_sub_menu ( yaal::tools::HXml::ONode &,
-			menu_handlers_map_t const & );
-	void build_menu_item ( yaal::tools::HXml::ONode &,
-			yaal::hconsole::OMenuItem &, menu_handlers_map_t const & );
-	void destroy_menu ( yaal::hconsole::OMenuItem * );
+	virtual int handler_quit( int, void const* = NULL );
+	virtual int handler_close_window( int, void const* = NULL );
+	yaal::hconsole::OMenuItem* build_sub_menu( yaal::tools::HXml::const_xml_element_t,
+			menu_handlers_map_t const& );
+	void build_menu_item( yaal::tools::HXml::const_xml_element_t,
+			yaal::hconsole::OMenuItem&, menu_handlers_map_t const& );
+	void destroy_menu( yaal::hconsole::OMenuItem* );
 private:
-	HDataProcess ( HDataProcess const & );
-	HDataProcess & operator = ( HDataProcess const & );
+	HDataProcess( HDataProcess const& );
+	HDataProcess& operator = ( HDataProcess const& );
 	};
 
 }

@@ -195,7 +195,7 @@ void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject ) const
 
 HXml::HXml ( void )
 	: f_oConvert ( new OConvert ), f_oConvertedString(),
-	f_oVarTmpBuffer(), f_poXml ( NULL ), f_oRoot()
+	f_oVarTmpBuffer(), f_poXml ( NULL ), f_oDOM()
 	{
 	M_PROLOG
 	f_poXml = new ( std::nothrow ) HXmlData();
@@ -344,18 +344,17 @@ void HXml::init ( char const * a_pcFileName )
 	M_EPILOG
 	}
 
-void HXml::parse ( xml_node_ptr_t a_pvData, ONode & a_rsNode, int a_iLevel, bool a_bStripEmpty )
+void HXml::parse ( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStripEmpty )
 	{
 	M_PROLOG
 	char const * l_pcName = NULL;
 	xmlNodePtr l_psNode = static_cast<xmlNodePtr> ( a_pvData );
 	xmlAttrPtr l_psAttribute = NULL;
-	a_rsNode.f_iLevel = a_iLevel;
 	if ( ( l_psNode->type == XML_DOCUMENT_NODE ) && ( l_psNode->children ) )
-		parse ( l_psNode->children, a_rsNode, a_iLevel, a_bStripEmpty );
+		parse ( l_psNode->children, a_rsNode, a_bStripEmpty );
 	else
 		{
-		a_rsNode.f_oName = reinterpret_cast < char const * > ( l_psNode->name );
+		(**a_rsNode).f_oName = reinterpret_cast < char const * > ( l_psNode->name );
 		if ( l_psNode->properties )
 			{
 			l_psAttribute = l_psNode->properties;
@@ -365,7 +364,7 @@ void HXml::parse ( xml_node_ptr_t a_pvData, ONode & a_rsNode, int a_iLevel, bool
 				if ( l_pcName )
 					{
 					if ( l_psAttribute->children )
-						a_rsNode.f_oProperties [ l_pcName ] = l_psAttribute->children->content ? convert (
+						(**a_rsNode).f_oProperties [ l_pcName ] = l_psAttribute->children->content ? convert (
 								reinterpret_cast < char* > (
 									l_psAttribute->children->content ) ) : "";
 					}
@@ -383,18 +382,11 @@ void HXml::parse ( xml_node_ptr_t a_pvData, ONode & a_rsNode, int a_iLevel, bool
 					{
 					f_oVarTmpBuffer = convert ( reinterpret_cast<char*>( l_psNode->content ) );
 					if ( ! a_bStripEmpty || ( f_oVarTmpBuffer.find_other_than ( n_pcWhiteSpace ) >= 0 ) )
-						{
-						a_rsNode.f_oContents.add_tail ( & f_oVarTmpBuffer );
-						a_rsNode.f_oTypes.push_back ( ONode::D_CONTENT );
-						}
+						(**a_rsNode).f_oContents = f_oVarTmpBuffer;
 					}
 				break;
 				case ( XML_ELEMENT_NODE ):
-					{
-					
-					parse ( l_psNode, a_rsNode.f_oChilds.add_tail(), a_iLevel + 1, a_bStripEmpty );
-					a_rsNode.f_oTypes.push_back ( ONode::D_NODE );
-					}
+					parse ( l_psNode, &*a_rsNode->add_node( OXMLElement() ), a_bStripEmpty );
 				break;
 				default :
 					log_trace << "unsupported type: " << static_cast < int > ( l_psNode->type ) << endl;
@@ -407,48 +399,38 @@ void HXml::parse ( xml_node_ptr_t a_pvData, ONode & a_rsNode, int a_iLevel, bool
 	M_EPILOG
 	}
 
-HXml::ONode & HXml::parse ( char const * a_pcXPath, bool a_bStripEmpty )
+HXml::tree_t::node_t HXml::parse ( char const * a_pcXPath, bool a_bStripEmpty )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iLevel = - 1;
 	if ( ! a_pcXPath || ! a_pcXPath [ 0 ] )
 		a_pcXPath = "/"; /* scan full tree */
-	get_node_set_by_path ( a_pcXPath );
-	f_oRoot.reset();
-	while ( a_pcXPath [ l_iCtr ] )
-		{
-		if ( a_pcXPath [ l_iCtr ] == '/' )
-			l_iLevel ++;
+	get_node_set_by_path( a_pcXPath );
+	f_oDOM.clear();
+	int l_iCtr = 0;
+	while ( a_pcXPath[ l_iCtr ] )
 		l_iCtr ++;
-		}
 	l_iCtr --;
 	M_ASSERT ( l_iCtr >= 0 );
-	if ( a_pcXPath [ l_iCtr ] != '/' )
-		l_iLevel ++;
 	if ( f_poXml->f_psNodeSet )
 		{
 		if ( f_poXml->f_psNodeSet->nodeNr > 1 )
 			{
 			for ( l_iCtr = 0; l_iCtr < f_poXml->f_psNodeSet->nodeNr; ++ l_iCtr )
-				{
 				parse ( f_poXml->f_psNodeSet->nodeTab [ l_iCtr ],
-						f_oRoot.f_oChilds.add_tail(), l_iLevel, a_bStripEmpty );
-				f_oRoot.f_iLevel = 0;
-				f_oRoot.f_oTypes.push_back ( ONode::D_NODE );
-				}
+						f_oDOM.create_new_root(), a_bStripEmpty );
 			}
 		else if ( f_poXml->f_psNodeSet->nodeNr == 1 )
 			parse ( f_poXml->f_psNodeSet->nodeTab [ 0 ],
-					f_oRoot, l_iLevel, a_bStripEmpty );
+					f_oDOM.create_new_root(), a_bStripEmpty );
 		}
-	return ( f_oRoot );
+	return ( f_oDOM.get_root() );
 	M_EPILOG
 	}
 
-HXml::ONode & HXml::get_root ( void )
+HXml::tree_t::node_t HXml::get_root ( void )
 	{
 	M_PROLOG
-	return ( f_oRoot );
+	return ( f_oDOM.get_root() );
 	M_EPILOG
 	}
 
