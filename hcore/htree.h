@@ -251,6 +251,18 @@ tType const& HTree<tType>::HNode::operator* ( void ) const
 	}
 
 template<typename tType>
+tType* HTree<tType>::HNode::operator->( void )
+	{
+	return ( &f_tData );
+	}
+
+template<typename tType>
+tType const* HTree<tType>::HNode::operator->( void ) const
+	{
+	return ( &f_tData );
+	}
+
+template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::add_node( tType const& value )
 	{
 	node_t n = NULL;

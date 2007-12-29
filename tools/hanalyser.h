@@ -57,9 +57,10 @@ class HAnalyser
 	typedef hcore::HTree<OEquationElement> tree_t;
 	struct OEquationElement
 		{
-		typedef double ( HAnalyser::* METHOD_t ) ( tree_t::iterator );
+		typedef double ( HAnalyser::* METHOD_t ) ( tree_t::const_node_t );
 		METHOD_t METHOD;
 		int_list_t f_oVariables;
+		OEquationElement() : METHOD(), f_oVariables() {}
 		};
 	int f_iIndex;
 	int f_iLength;
@@ -68,6 +69,7 @@ class HAnalyser
 	hcore::HPool<double> f_oConstantsPool;
 	hcore::HPool<int> f_oTerminalIndexes;
 	hcore::HString	f_oFormula;
+	tree_t f_oEquationTree;
 public:
 	/*{*/
 	HAnalyser( void );
@@ -79,18 +81,19 @@ public:
 	int get_error_token( void ) const;
 private:
 	bool translate( char const* );
-	bool addition_production( tree_t::iterator const& );
-	bool multiplication_production( tree_t::iterator const& );
-	bool power_production( tree_t::iterator const& );
-	bool signum_production( tree_t::iterator const& );
-	bool terminal_production( tree_t::iterator const& );
-	double count_branch( tree_t::iterator const& );
-	double addition( tree_t::iterator const& );
-	double multiplication( tree_t::iterator const& );
-	double power( tree_t::iterator const& );
-	double signum( tree_t::iterator const& );
-	double bracket( tree_t::iterator const& );
-	double functions( tree_t::iterator const& );
+	bool addition_production( tree_t::node_t );
+	bool multiplication_production( tree_t::node_t );
+	bool power_production( tree_t::node_t );
+	bool signum_production( tree_t::node_t );
+	bool terminal_production( tree_t::node_t );
+	double count_branch( tree_t::const_node_t );
+	double addition( tree_t::const_node_t );
+	double multiplication( tree_t::const_node_t );
+	double power( tree_t::const_node_t );
+	double signum( tree_t::const_node_t );
+	double bracket( tree_t::const_node_t );
+	double functions( tree_t::const_node_t );
+	void shorten_the_branch( tree_t::node_t );
 	};
 
 }
