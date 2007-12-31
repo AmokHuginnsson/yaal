@@ -412,7 +412,7 @@ bool HAnalyser::addition_production( tree_t::node_t a_roNode )
 	M_PROLOG
 	int l_iCtr = 0;
 	M_ASSERT ( a_roNode );
-	if ( multiplication_production( &*a_roNode->add_node( OEquationElement() ) ) )
+	if ( multiplication_production( &*a_roNode->add_node() ) )
 		return ( true );
 	if ( f_iIndex > f_iLength )
 		{
@@ -430,7 +430,7 @@ bool HAnalyser::addition_production( tree_t::node_t a_roNode )
 		{
 		l_iCtr = ( f_oFormula [ f_iIndex ++ ] == '+' ) ? D_ADD : D_SUBSTRACT;
 		(**a_roNode).f_oVariables.add_tail( &l_iCtr );
-		if ( multiplication_production( &*a_roNode->add_node( OEquationElement() ) ) )
+		if ( multiplication_production( &*a_roNode->add_node() ) )
 			return ( true );
 		}
 	return ( false );
@@ -441,7 +441,7 @@ bool HAnalyser::multiplication_production( tree_t::node_t a_roNode )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( power_production( &*a_roNode->add_node( OEquationElement() ) ) )
+	if ( power_production( &*a_roNode->add_node() ) )
 		return ( true );
 	if ( f_iIndex > f_iLength )
 		{
@@ -459,7 +459,7 @@ bool HAnalyser::multiplication_production( tree_t::node_t a_roNode )
 		{
 		l_iCtr = ( f_oFormula[ f_iIndex ++ ] == '*' ) ? D_MULTIPLY : D_DIVIDE;
 		(**a_roNode).f_oVariables.add_tail( &l_iCtr );
-		if ( power_production( &*a_roNode->add_node( OEquationElement() ) ) )
+		if ( power_production( &*a_roNode->add_node() ) )
 			return ( true );
 		}
 	return ( false );
@@ -489,7 +489,7 @@ void HAnalyser::shorten_the_branch( tree_t::node_t a_poNode )
 bool HAnalyser::power_production( tree_t::node_t a_roNode )
 	{
 	M_PROLOG
-	if ( signum_production( &*a_roNode->add_node( OEquationElement() ) ) )
+	if ( signum_production( &*a_roNode->add_node() ) )
 		return ( true );
 	if ( f_iIndex > f_iLength )
 		{
@@ -500,7 +500,7 @@ bool HAnalyser::power_production( tree_t::node_t a_roNode )
 	if ( f_oFormula[ f_iIndex ] == '^' )
 		{
 		f_iIndex ++;
-		if ( power_production( &*a_roNode->add_node( OEquationElement() ) ) )
+		if ( power_production( &*a_roNode->add_node() ) )
 			return ( true );
 		(**a_roNode).METHOD = &HAnalyser::power;
 		}
@@ -521,7 +521,7 @@ bool HAnalyser::signum_production( tree_t::node_t a_roNode )
 	if ( f_oFormula[ f_iIndex ] == '-' )
 		{
 		f_iIndex ++;
-		if ( terminal_production( &*a_roNode->add_node( OEquationElement() ) ) )
+		if ( terminal_production( &*a_roNode->add_node() ) )
 			return ( true );
 		(**a_roNode).METHOD = &HAnalyser::signum;
 		}
@@ -559,7 +559,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 		case '|' :
 			{
 			f_iIndex ++;
-			if ( addition_production ( &*a_roNode->add_node( OEquationElement() ) ) )
+			if ( addition_production ( &*a_roNode->add_node() ) )
 				return ( true );
 			(**a_roNode).METHOD = &HAnalyser::functions;
 			(**a_roNode).f_oVariables.push_back( FUNCTIONS::D_ABS );
@@ -590,7 +590,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 			f_iIndex ++;
 			(**a_roNode).METHOD = &HAnalyser::functions;
 			(**a_roNode).f_oVariables.push_back ( static_cast<int>( f_oFormula[ f_iIndex - 2 ] ) );
-			if ( addition_production ( &*a_roNode->add_node( OEquationElement() ) ) )
+			if ( addition_production ( &*a_roNode->add_node() ) )
 				return ( true );
 			if ( f_oFormula [ f_iIndex ] != ')' )
 				{

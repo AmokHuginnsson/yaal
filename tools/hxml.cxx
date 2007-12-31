@@ -260,7 +260,7 @@ char const* HXml::convert( char D_YAAL_TOOLS_HXML_ICONV_CONST* a_pcData, way_t a
 
 #undef D_YAAL_TOOLS_HXML_ICONV_CONST
 
-int HXml::get_node_set_by_path ( char const * a_pcPath )
+int HXml::get_node_set_by_path( char const* a_pcPath )
 	{
 	M_PROLOG
 	f_oVarTmpBuffer = a_pcPath;
@@ -297,16 +297,16 @@ void HXml::init ( char const * a_pcFileName )
 	{
 	M_PROLOG
 	int l_iSavedErrno = errno;
-	xmlCharEncoding l_xEncoding = static_cast < xmlCharEncoding > ( 0 );
+	xmlCharEncoding l_xEncoding = static_cast<xmlCharEncoding>( 0 );
 	HString l_oError;
 	if ( f_poXml->f_psDoc )
 		f_poXml->xml_free ( f_poXml->f_psDoc );
 	f_poXml->reset();
 	errno = 0;
-	f_poXml->f_psDoc = xmlParseFile ( a_pcFileName );
+	f_poXml->f_psDoc = xmlParseFile( a_pcFileName );
 	if ( errno )
 		{
-		log ( LOG_TYPE::D_WARNING ) << strerror ( errno ) << ": " << a_pcFileName;
+		log( LOG_TYPE::D_WARNING ) << ::strerror( errno ) << ": " << a_pcFileName;
 		log << ", code: " << errno << '.' << endl;
 		}
 	errno = l_iSavedErrno;
@@ -325,84 +325,91 @@ void HXml::init ( char const * a_pcFileName )
 		f_poXml->f_psCharEncodingHandler = xmlFindCharEncodingHandler (
 				reinterpret_cast < char const * > ( f_poXml->f_psDoc->encoding ) );
 	else
-		log ( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: no encoding declared in `" )
+		log( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: no encoding declared in `" )
 			<< a_pcFileName << "'." << endl;
 	if ( ! f_poXml->f_psCharEncodingHandler )
 		{
-		log ( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: char encoding handler not found" ) << endl;
+		log( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: char encoding handler not found" ) << endl;
 		l_xEncoding = xmlDetectCharEncoding ( f_poXml->f_psRoot->name,
 				xmlStrlen ( f_poXml->f_psRoot->name ) );
 		if ( ! l_xEncoding )
-			M_THROW ( _ ( "cannot detect character encoding" ), errno );
-		f_poXml->f_psCharEncodingHandler = xmlGetCharEncodingHandler ( l_xEncoding );
+			M_THROW( _( "cannot detect character encoding" ), errno );
+		f_poXml->f_psCharEncodingHandler = xmlGetCharEncodingHandler( l_xEncoding );
 		}
 	if ( ! f_poXml->f_psCharEncodingHandler )
-		M_THROW ( _ ( "cannot enable internal convertion" ), errno );
-	( * f_oConvert ).f_xIconvIn = f_poXml->f_psCharEncodingHandler->iconv_in;
-	( * f_oConvert ).f_xIconvOut = f_poXml->f_psCharEncodingHandler->iconv_out;
+		M_THROW( _( "cannot enable internal convertion" ), errno );
+	(*f_oConvert).f_xIconvIn = f_poXml->f_psCharEncodingHandler->iconv_in;
+	(*f_oConvert).f_xIconvOut = f_poXml->f_psCharEncodingHandler->iconv_out;
 	return;
 	M_EPILOG
 	}
 
-void HXml::parse ( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStripEmpty )
+void HXml::parse( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStripEmpty )
 	{
 	M_PROLOG
-	char const * l_pcName = NULL;
-	xmlNodePtr l_psNode = static_cast<xmlNodePtr> ( a_pvData );
-	xmlAttrPtr l_psAttribute = NULL;
-	if ( ( l_psNode->type == XML_DOCUMENT_NODE ) && ( l_psNode->children ) )
-		parse ( l_psNode->children, a_rsNode, a_bStripEmpty );
-	else
+	xmlNodePtr l_psNode = static_cast<xmlNodePtr>( a_pvData );
+	while ( l_psNode )
 		{
-		(**a_rsNode).f_oName = reinterpret_cast < char const * > ( l_psNode->name );
-		if ( l_psNode->properties )
+		switch ( l_psNode->type )
 			{
-			l_psAttribute = l_psNode->properties;
-			while ( l_psAttribute )
+			case ( XML_DOCUMENT_NODE ):
+				l_psNode = l_psNode->children;
+			continue;
+			case ( XML_DTD_NODE ):
+				l_psNode = l_psNode->next; /* FIXME */
+			continue;
+			case ( XML_ELEMENT_NODE ):
 				{
-				l_pcName = reinterpret_cast < char const * > ( l_psAttribute->name );
-				if ( l_pcName )
+				if ( a_rsNode )
+					a_rsNode = &*a_rsNode->add_node();
+				else
+					a_rsNode = f_oDOM.create_new_root();
+				(**a_rsNode).f_oName = reinterpret_cast<char const*>( l_psNode->name );
+				if ( l_psNode->properties )
 					{
-					if ( l_psAttribute->children )
-						(**a_rsNode).f_oProperties [ l_pcName ] = l_psAttribute->children->content ? convert (
-								reinterpret_cast < char* > (
-									l_psAttribute->children->content ) ) : "";
+					xmlAttrPtr l_psAttribute = l_psNode->properties;
+					while ( l_psAttribute )
+						{
+						char const* l_pcName = reinterpret_cast<char const*>( l_psAttribute->name );
+						if ( l_pcName )
+							{
+							if ( l_psAttribute->children )
+								(**a_rsNode).f_oProperties[ l_pcName ] = l_psAttribute->children->content ? convert(
+										reinterpret_cast<char*>( l_psAttribute->children->content ) ) : "";
+							}
+						l_psAttribute = l_psAttribute->next;
+						}
 					}
-				l_psAttribute = l_psAttribute->next;
+				xmlNodePtr child = l_psNode->children;
+				while ( child )
+					{
+					parse( child, a_rsNode, a_bStripEmpty );
+					child = child->next;
+					}
 				}
-			}
-		if ( l_psNode->type == XML_ELEMENT_NODE )
-			l_psNode = l_psNode->children;
-		while ( l_psNode )
-			{
-			switch ( l_psNode->type )
+			break;
+			case ( XML_ENTITY_REF_NODE ):
+			case ( XML_TEXT_NODE ): if ( l_psNode->content )
 				{
-				case ( XML_ENTITY_REF_NODE ):
-				case ( XML_TEXT_NODE ): if ( l_psNode->content )
-					{
-					f_oVarTmpBuffer = convert ( reinterpret_cast<char*>( l_psNode->content ) );
-					if ( ! a_bStripEmpty || ( f_oVarTmpBuffer.find_other_than ( n_pcWhiteSpace ) >= 0 ) )
-						(**a_rsNode).f_oContents = f_oVarTmpBuffer;
-					}
-				break;
-				case ( XML_ELEMENT_NODE ):
-					parse ( l_psNode, &*a_rsNode->add_node( OXMLElement() ), a_bStripEmpty );
-				break;
-				default :
-					log_trace << "unsupported type: " << static_cast < int > ( l_psNode->type ) << endl;
-				break;
+				f_oVarTmpBuffer = convert( reinterpret_cast<char*>( l_psNode->content ) );
+				if ( ! a_bStripEmpty || ( f_oVarTmpBuffer.find_other_than( n_pcWhiteSpace ) >= 0 ) )
+					a_rsNode->add_node( f_oVarTmpBuffer );
 				}
-			l_psNode = l_psNode->next;
+			break;
+			default:
+				log_trace << "unsupported type: " << static_cast<int>( l_psNode->type ) << endl;
+			break;
 			}
+		l_psNode = NULL;
 		}
 	return;
 	M_EPILOG
 	}
 
-HXml::tree_t::node_t HXml::parse ( char const * a_pcXPath, bool a_bStripEmpty )
+HXml::tree_t::node_t HXml::parse( char const* a_pcXPath, bool a_bStripEmpty )
 	{
 	M_PROLOG
-	if ( ! a_pcXPath || ! a_pcXPath [ 0 ] )
+	if ( ! a_pcXPath || ! a_pcXPath[ 0 ] )
 		a_pcXPath = "/"; /* scan full tree */
 	get_node_set_by_path( a_pcXPath );
 	f_oDOM.clear();
@@ -416,12 +423,12 @@ HXml::tree_t::node_t HXml::parse ( char const * a_pcXPath, bool a_bStripEmpty )
 		if ( f_poXml->f_psNodeSet->nodeNr > 1 )
 			{
 			for ( l_iCtr = 0; l_iCtr < f_poXml->f_psNodeSet->nodeNr; ++ l_iCtr )
-				parse ( f_poXml->f_psNodeSet->nodeTab [ l_iCtr ],
-						f_oDOM.create_new_root(), a_bStripEmpty );
+				parse( f_poXml->f_psNodeSet->nodeTab[ l_iCtr ],
+						NULL, a_bStripEmpty );
 			}
 		else if ( f_poXml->f_psNodeSet->nodeNr == 1 )
-			parse ( f_poXml->f_psNodeSet->nodeTab [ 0 ],
-					f_oDOM.create_new_root(), a_bStripEmpty );
+			parse( f_poXml->f_psNodeSet->nodeTab[ 0 ],
+					NULL, a_bStripEmpty );
 		}
 	return ( f_oDOM.get_root() );
 	M_EPILOG

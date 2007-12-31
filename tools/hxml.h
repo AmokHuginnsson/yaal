@@ -56,6 +56,7 @@ public:
 		typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
 		properties_t f_oProperties;
 		OXMLElement( void ) : f_oName(), f_oContents(), f_oProperties() { }
+		OXMLElement( yaal::hcore::HString const& value ) : f_oName(), f_oContents( value ), f_oProperties() {}
 		OXMLElement( OXMLElement const& source ) : f_oName( source.f_oName ),
 			f_oContents( source.f_oContents ), f_oProperties()
 			{ f_oProperties.copy_from( source.f_oProperties ); }
@@ -81,11 +82,11 @@ public:
 			M_EPILOG
 			}
 		};
+	typedef yaal::hcore::HTree<OXMLElement> tree_t;
 protected:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
 	typedef enum { D_IN, D_OUT } way_t;
-	typedef yaal::hcore::HTree<OXMLElement> tree_t;
 	yaal::hcore::HPointer<OConvert> f_oConvert;
 	yaal::hcore::HString	f_oConvertedString;
 	yaal::hcore::HString	f_oVarTmpBuffer;

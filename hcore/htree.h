@@ -87,6 +87,7 @@ public:
 	typename tree_t::iterator replace_node( typename tree_t::iterator, typename HTree<tType>::HNode* );
 	typename tree_t::iterator add_node( typename tree_t::HNode* );
 	typename tree_t::iterator add_node( tType const& );
+	typename tree_t::iterator add_node( void );
 	void remove_node( tree_t::iterator const& );
 	typename tree_t::iterator begin();
 	typename tree_t::iterator const begin() const;
@@ -268,6 +269,14 @@ typename HTree<tType>::iterator HTree<tType>::HNode::add_node( tType const& valu
 	node_t n = NULL;
 	f_oBranch.push_back( n = new HNode( f_poTree, this ) );
 	**n = value;
+	return ( HIterator( this, f_oBranch.rbegin() ) );
+	}
+
+template<typename tType>
+typename HTree<tType>::iterator HTree<tType>::HNode::add_node( void )
+	{
+	node_t n = NULL;
+	f_oBranch.push_back( n = new HNode( f_poTree, this ) );
 	return ( HIterator( this, f_oBranch.rbegin() ) );
 	}
 
