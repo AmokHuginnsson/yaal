@@ -43,8 +43,8 @@ class HXmlData;
 
 class HXml
 	{
-	class HNode;
 public:
+	class HNode;
 	class HNodeProxy;
 	class HIterator;
 	typedef HIterator iterator;
@@ -128,7 +128,7 @@ private:
 
 class HXml::HNodeProxy
 	{
-	HXml::tree_t::node_t f_poNode;
+	mutable HXml::tree_t::node_t f_poNode;
 public:
 	HXml::HIterator begin();
 	HXml::HIterator const begin() const;
@@ -145,6 +145,7 @@ public:
 	HXml::HNode::TYPE::type_t get_type() const;
 	bool has_childs( void ) const;
 	int child_count( void ) const;
+	int get_level( void ) const;
 	yaal::hcore::HString const& get_name( void ) const;
 	yaal::hcore::HString const& get_value( void ) const;
 	void set_name( char const* const );
@@ -158,13 +159,14 @@ public:
 	HNodeProxy& operator = ( HNodeProxy const& );
 private:
 	friend class HXml;
+	friend class HXml::HIterator;
 	HNodeProxy( HXml::tree_t::node_t );
 	};
 
 class HXml::HIterator
 	{
-	HXml::tree_t::const_node_t f_poOwner;
-	HXml::tree_t::iterator f_oIterator;
+	HXml::HNodeProxy const* f_poOwner;
+	mutable HXml::tree_t::iterator f_oIterator;
 	HXml::HNodeProxy f_oProxy;
 public:
 	HIterator( void );
@@ -200,7 +202,7 @@ public:
 	HXml::HNodeProxy const* operator->( void ) const;
 private:
 	friend class HXml::HNodeProxy;
-	HIterator( HXml::tree_t::const_node_t, HXml::tree_t::iterator const& );
+	HIterator( HXml::HNodeProxy const*, HXml::tree_t::iterator const& );
 	};
 
 }

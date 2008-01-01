@@ -433,11 +433,140 @@ void HXml::parse( char const* a_pcXPath, bool a_bStripEmpty )
 	M_EPILOG
 	}
 
+HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t a_poNode ) : f_poNode( a_poNode )
+	{
+	}
+
 HXml::HNodeProxy HXml::get_root ( void )
 	{
 	M_PROLOG
 	return ( HNodeProxy( f_oDOM.get_root() ) );
 	M_EPILOG
+	}
+
+int HXml::HNodeProxy::get_level( void ) const
+	{
+	return ( f_poNode->get_level() );
+	}
+
+HXml::HNode::TYPE::type_t HXml::HNodeProxy::get_type( void ) const
+	{
+	return ( (**f_poNode).f_eType );
+	}
+
+HString const& HXml::HNodeProxy::get_name( void ) const
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( (**f_poNode).f_oText );
+	}
+
+HString const& HXml::HNodeProxy::get_value( void ) const
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_CONTENT );
+	return ( (**f_poNode).f_oText );
+	}
+
+HXml::HNode::properties_t& HXml::HNodeProxy::properties( void )
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( (**f_poNode).f_oProperties );
+	}
+
+HXml::HNode::properties_t const& HXml::HNodeProxy::properties( void ) const
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( (**f_poNode).f_oProperties );
+	}
+
+bool HXml::HNodeProxy::has_childs( void ) const
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( f_poNode->has_childs() );
+	}
+
+int HXml::HNodeProxy::child_count( void ) const
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( f_poNode->child_count() );
+	}
+
+HXml::HIterator HXml::HNodeProxy::begin( void )
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( HXml::HIterator( this, f_poNode->begin() ) );
+	}
+
+HXml::HIterator const HXml::HNodeProxy::begin( void ) const
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( HXml::HIterator( this, f_poNode->begin() ) );
+	}
+
+HXml::HIterator HXml::HNodeProxy::end( void )
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( HXml::HIterator( this, f_poNode->end() ) );
+	}
+
+HXml::HIterator const HXml::HNodeProxy::end( void ) const
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( HXml::HIterator( this, f_poNode->end() ) );
+	}
+
+HXml::HIterator HXml::HNodeProxy::rbegin( void )
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( HXml::HIterator( this, f_poNode->rbegin() ) );
+	}
+
+HXml::HIterator const HXml::HNodeProxy::rbegin( void ) const
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( HXml::HIterator( this, f_poNode->rbegin() ) );
+	}
+
+HXml::HIterator HXml::HNodeProxy::rend( void )
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( HXml::HIterator( this, f_poNode->rend() ) );
+	}
+
+HXml::HIterator const HXml::HNodeProxy::rend( void ) const
+	{
+	M_ASSERT( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE );
+	return ( HXml::HIterator( this, f_poNode->rend() ) );
+	}
+
+HXml::HIterator::HIterator( HXml::HNodeProxy const* a_poOwner, HXml::tree_t::iterator const& it )
+	: f_poOwner( a_poOwner ), f_oIterator( it ), f_oProxy( NULL )
+	{
+	}
+
+bool HXml::HIterator::operator == ( HXml::HIterator const& other ) const
+	{
+	return ( f_oIterator == other.f_oIterator );
+	}
+
+bool HXml::HIterator::operator != ( HXml::HIterator const& other ) const
+	{
+	return ( f_oIterator != other.f_oIterator );
+	}
+
+HXml::HNodeProxy& HXml::HIterator::operator* ( void )
+	{
+	M_ASSERT( f_poOwner );
+	M_ASSERT( f_oIterator != f_poOwner->f_poNode->end() );
+	f_oProxy.f_poNode = &*f_oIterator;
+	return ( f_oProxy );
+	}
+
+HXml::HNodeProxy const& HXml::HIterator::operator* ( void ) const
+	{
+	M_ASSERT( f_poOwner );
+	M_ASSERT( f_oIterator != f_poOwner->f_poNode->end() );
+	f_oProxy.f_poNode = &*f_oIterator;
+	return ( f_oProxy );
 	}
 
 }
