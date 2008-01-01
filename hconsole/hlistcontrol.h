@@ -507,13 +507,13 @@ HAbstractRow* HListControler<tType>::HModelIterator::call( void )
 template<typename tType>
 bool HListControler<tType>::HModelIterator::is_equal( HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
 	{
-	return ( f_oIterator == dynamic_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator ); /*FIXME*/
+	return ( f_oIterator == static_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator );
 	}
 
 template<typename tType>
 bool HListControler<tType>::HModelIterator::is_not_equal( HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
 	{
-	return ( f_oIterator != dynamic_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator ); /*FIXME*/
+	return ( f_oIterator != static_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator );
 	}
 
 template<typename tType>

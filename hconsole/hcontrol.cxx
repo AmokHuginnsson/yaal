@@ -226,9 +226,9 @@ void HControl::do_draw_label( void )
 		return;
 		}
 	set_attr_label();
-	M_ENSURE ( cons.c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oLabel ) != C_ERR );
+	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw, f_oLabel ) != C_ERR );
 	set_attr_shortcut();
-	M_ENSURE ( cons.c_mvprintf ( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
+	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
 				"%c", f_oLabel [ f_iShortcutIndex ] ) != C_ERR );
 	set_attr_data();
 	if ( f_bSingleLine )
@@ -239,7 +239,7 @@ void HControl::do_draw_label( void )
 	M_EPILOG
 	}
 
-void HControl::set_attributes ( int a_iAttributeDisabled,
+void HControl::set_attributes( int a_iAttributeDisabled,
 		int a_iAttributeEnabled, int a_iAttributeFocused )
 	{
 	M_PROLOG
@@ -260,7 +260,7 @@ void HControl::set_attributes ( int a_iAttributeDisabled,
 	M_EPILOG
 	}
 
-void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
+void HControl::move( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 	{
 	M_PROLOG
 	f_iRow = a_iRow;
@@ -272,7 +272,7 @@ void HControl::move ( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
 	M_EPILOG
 	}
 
-int HControl::click ( mouse::OMouse & a_roMouse )
+int HControl::click( mouse::OMouse& a_roMouse )
 	{
 	M_PROLOG
 	if ( ! f_bValid )
@@ -281,7 +281,7 @@ int HControl::click ( mouse::OMouse & a_roMouse )
 	M_EPILOG
 	}
 
-int HControl::do_click ( mouse::OMouse & )
+int HControl::do_click( mouse::OMouse& )
 	{
 	M_PROLOG
 	if ( f_bFocused )
@@ -291,12 +291,12 @@ int HControl::do_click ( mouse::OMouse & )
 	M_EPILOG
 	}
 
-void HControl::do_update ( void )
+void HControl::do_update( void )
 	{
 	return;
 	}
 
-bool HControl::hit_test ( int a_iRow, int a_iColumn ) const
+bool HControl::hit_test( int a_iRow, int a_iColumn ) const
 	{
 	M_PROLOG
 	if ( ( a_iRow < f_iRowRaw ) || ( a_iRow > ( f_iRowRaw + f_iHeightRaw ) ) )
@@ -308,47 +308,47 @@ bool HControl::hit_test ( int a_iRow, int a_iColumn ) const
 	M_EPILOG
 	}
 
-int HControl::attr_label ( void ) const
+int HControl::attr_label( void ) const
 	{
 	M_PROLOG
 	return ( f_bEnabled ? ( f_bFocused ? f_uiAttributeFocused >> 8 : f_uiAttributeEnabled >> 8 ) : f_uiAttributeDisabled >> 8 );
 	M_EPILOG
 	}
 
-int HControl::attr_shortcut ( void ) const
+int HControl::attr_shortcut( void ) const
 	{
 	M_PROLOG
 	return ( ! f_bEnabled ? ( ! f_bFocused ? f_uiAttributeFocused >> 8 : f_uiAttributeEnabled >> 8 ) : f_uiAttributeDisabled >> 8 );
 	M_EPILOG
 	}
 
-int HControl::attr_data ( void ) const
+int HControl::attr_data( void ) const
 	{
 	M_PROLOG
 	return ( f_bEnabled ? ( f_bFocused ? f_uiAttributeFocused : f_uiAttributeEnabled ) : f_uiAttributeDisabled );
 	M_EPILOG
 	}
 
-void HControl::set_attr_label ( void ) const
+void HControl::set_attr_label( void ) const
 	{
 	M_PROLOG
-	HCons::get_instance().set_attr ( attr_label() ); /* FIXME */
+	HCons::get_instance().set_attr( attr_label() );
 	return;
 	M_EPILOG
 	}
 
-void HControl::set_attr_shortcut ( void ) const
+void HControl::set_attr_shortcut( void ) const
 	{
 	M_PROLOG
-	HCons::get_instance().set_attr ( attr_shortcut() ); /* FIXME */
+	HCons::get_instance().set_attr( attr_shortcut() );
 	return;
 	M_EPILOG
 	}
 
-void HControl::set_attr_data ( void ) const
+void HControl::set_attr_data( void ) const
 	{
 	M_PROLOG
-	HCons::get_instance().set_attr ( attr_data() ); /* FIXME */
+	HCons::get_instance().set_attr( attr_data() );
 	return;
 	M_EPILOG
 	}

@@ -89,30 +89,25 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 	}
 
 OMenuItem * HDataProcess::build_sub_menu( HXml::HNodeProxy const& a_rsNode,
-		menu_handlers_map_t const& /*a_roHandlers*/ )
+		menu_handlers_map_t const& a_roHandlers )
 	{
 	M_PROLOG
 	char const * const l_pcError = _ ( "malformed resource file (menu section)" );
 	char const * const l_pcUnexpected = _ ( ": unexpected node: " );
 	OMenuItem l_sMenuItem, * l_psMenu = NULL;
-// FIXME	HXml::ONode * l_psNode = NULL;
 	typedef HList<OMenuItem> menu_item_list_t;
 	menu_item_list_t l_oSubMenu;
 	if ( ! a_rsNode.child_count() )
-		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
+		M_THROW( HString( l_pcError ) + l_pcUnexpected, errno );
 
 	if ( a_rsNode.get_name() == "menu" )
 		{
-/*
-		for ( l_psNode = & a_rsNode.f_oChilds.go ( 0 ); l_psNode;
-				l_psNode = a_rsNode.f_oChilds.to_tail ( 1, HList<HXml::ONode>::D_TREAT_AS_OPENED ) )
+		for ( HXml::HIterator it = a_rsNode.begin(); it != a_rsNode.end(); ++ it )
 			{
 			l_sMenuItem.reset();
-			build_menu_item ( * l_psNode, l_sMenuItem, a_roHandlers );
-			l_oSubMenu.add_tail ( & l_sMenuItem );
+			build_menu_item( *it, l_sMenuItem, a_roHandlers );
+			l_oSubMenu.add_tail( &l_sMenuItem );
 			}
-			FIXME
-*/
 		}
 	else
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.get_name()
@@ -128,7 +123,7 @@ OMenuItem * HDataProcess::build_sub_menu( HXml::HNodeProxy const& a_rsNode,
 	}
 
 void HDataProcess::build_menu_item ( HXml::HNodeProxy const& a_rsNode,
-		OMenuItem& /*a_rsMenuItem*/, menu_handlers_map_t const& /*a_roHandlers*/ )
+		OMenuItem& a_rsMenuItem, menu_handlers_map_t const& a_roHandlers )
 	{
 	M_PROLOG
 	char const * const l_pcError = _ ( "malformed resource file (menu section)" );
@@ -138,28 +133,24 @@ void HDataProcess::build_menu_item ( HXml::HNodeProxy const& a_rsNode,
 
 	if ( a_rsNode.get_name() == "menu_item" )
 		{
-		/*
-		HXml::ONode * l_psNode = NULL;
-		for ( l_psNode = & a_rsNode.f_oChilds.go ( 0 ); l_psNode;
-				l_psNode = a_rsNode.f_oChilds.to_tail ( 1, HList<HXml::ONode>::D_TREAT_AS_OPENED ) )
+		for ( HXml::HIterator it = a_rsNode.begin(); it != a_rsNode.end(); ++ it )
 			{
-			if ( l_psNode->f_oName == "label" )
-				a_rsMenuItem.f_oLabel = l_psNode->f_oContents.head();
-			else if ( l_psNode->f_oName == "handler" )
+			HString const& name = it->get_name();
+			HString const& contents = it->begin()->get_value();
+			if ( name == "label" )
+				a_rsMenuItem.f_oLabel = contents;
+			else if ( name == "handler" )
 				{
-				if ( ! a_roHandlers.get ( l_psNode->f_oContents.head(),
-							a_rsMenuItem.HANDLER ) )
-					M_THROW ( HString ( _ ( "no such handler: " ) )
-							+ l_psNode->f_oContents.head(), errno );
+				if ( ! a_roHandlers.get ( contents, a_rsMenuItem.HANDLER ) )
+					M_THROW( HString( _( "no such handler: " ) )
+							+ contents, errno );
 				}
-			else if ( l_psNode->f_oName == "menu" )
-				a_rsMenuItem.f_psSubMenu = build_sub_menu ( * l_psNode, a_roHandlers );
+			else if ( name == "menu" )
+				a_rsMenuItem.f_psSubMenu = build_sub_menu( *it, a_roHandlers );
 			else
-				M_THROW ( HString ( l_pcError ) + l_pcUnexpected + l_psNode->f_oName
-						+ '=' + l_psNode->f_oContents.head(), errno );
+				M_THROW( HString( l_pcError ) + l_pcUnexpected + name
+						+ '=' + contents, errno );
 			}
-			FIXME
-		*/
 		}
 	else
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected + a_rsNode.get_name()

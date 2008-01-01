@@ -490,7 +490,7 @@ int HEditControl::do_process_input ( int a_iCode )
 				f_oHistory.add_head( &f_oString );
 				l_iErrorCode = f_oHistory.size();
 				while ( l_iErrorCode -- > f_iMaxHistoryLevel )
-					f_oHistory.pop_back(); /* FIXME */
+					f_oHistory.pop_back(); /* FIXME investigate if it actually work */
 				f_oHistoryIt = f_oHistory.hook();
 				-- f_oHistoryIt;
 				}

@@ -356,7 +356,7 @@ void HXml::parse( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStri
 				l_psNode = l_psNode->children;
 			continue;
 			case ( XML_DTD_NODE ):
-				l_psNode = l_psNode->next; /* FIXME */
+				l_psNode = l_psNode->next; /* FIXME add DTD handling later (keeping track of entities) */
 			continue;
 			case ( XML_ELEMENT_NODE ):
 				{

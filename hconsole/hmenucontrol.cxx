@@ -39,27 +39,20 @@ namespace yaal
 namespace hconsole
 {
 
-int HMenuControl::load_sub_menu( HTreeControl::HNodeControl* /*a_poNode*/, OMenuItem * a_psSubMenu )
+int HMenuControl::load_sub_menu( tree_t::node_t node, OMenuItem* a_psSubMenu )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	HString str;
-// FIXME	HNodeControl * l_poNode = NULL;
-	HInfo l_oInfo;
 	while ( ! a_psSubMenu [ l_iCtr ].f_oLabel.is_empty() )
 		{
-/*
-		l_poNode = new HNodeControl ( this );
-		l_oInfo ( a_psSubMenu [ l_iCtr ].f_oLabel );
-		l_oInfo ( static_cast < void * > ( & a_psSubMenu [ l_iCtr ] ) );
-		l_poNode->f_tLeaf [ 0 ] = l_oInfo;
-		f_oBranch.add_tail (
-					reinterpret_cast < HTree < HItem >::HNode * * > ( & l_poNode ) );
+		HNodeControl info;
+		info[ 0 ]( a_psSubMenu [ l_iCtr ].f_oLabel );
+		info[ 0 ]( static_cast<void*>( &a_psSubMenu[ l_iCtr ] ) );
+		tree_t::iterator it = node->add_node( info );
 		if ( a_psSubMenu [ l_iCtr ].f_psSubMenu )
-			l_poNode->load_sub_menu ( a_psSubMenu [ l_iCtr ].f_psSubMenu );
+			load_sub_menu( &*it, a_psSubMenu[ l_iCtr ].f_psSubMenu );
 		l_iCtr ++;
-		FIXME
-*/
 		}
 	return ( l_iCtr );
 	M_EPILOG
@@ -86,52 +79,42 @@ HMenuControl::~HMenuControl ( void )
 	M_EPILOG
 	}
 
-void HMenuControl::init( HTUIProcess* /*a_poProcess*/, OMenuItem* /*a_psMenu*/ )
+void HMenuControl::init( HTUIProcess* a_poProcess, OMenuItem* a_psMenu )
 	{
 	M_PROLOG
-	HItem l_oDummy ( 0 );
-/*
-	HNodeControl * l_poNode = NULL;
-	if ( f_poRoot && a_psMenu )
+	if ( f_oTree.get_root() && a_psMenu )
 		M_THROW ( "menu already initialised", errno );
-	if ( ! a_poProcess || ! ( f_poRoot || a_psMenu ) )
+	if ( ! a_poProcess || ! ( f_oTree.get_root() || a_psMenu ) )
 		M_THROW ( "process can not run without core data ( process, menu )",
 				errno );
 	f_poProcess = a_poProcess;
-	if ( ! f_poRoot )
+	tree_t::node_t l_poNode = NULL;
+	if ( ! f_oTree.get_root() )
 		{
-		f_poRoot = l_poNode = new HMenuControl::HNodeControl ( 0 );
-		f_poRoot->get_object() = l_oDummy;
-		l_poNode->load_sub_menu ( a_psMenu );
+		l_poNode = f_oTree.create_new_root();
+		load_sub_menu( l_poNode, a_psMenu );
 		}
-	if ( ! f_poSelected && l_poNode->f_oBranch.size() )
-		f_poSelected = l_poNode->f_oBranch [ 0 ];
+	if ( ! f_poSelected && l_poNode->has_childs() )
+		f_poSelected = &*l_poNode->begin();
 	schedule_refresh();
-	FIXME
-*/
 	return;
 	M_EPILOG
 	}
 
-int HMenuControl::do_process_input ( int a_iCode )
+int HMenuControl::do_process_input( int a_iCode )
 	{
 	M_PROLOG
-/*
 	OMenuItem const * l_psMenu = NULL;
-	if ( ! f_poRoot )
+	if ( ! f_oTree.get_root() )
 		M_THROW ( _ ( "menu not initialized" ), errno );
 	a_iCode = HTreeControl::do_process_input ( a_iCode );
 	if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
 		{
-		HNodeControl * l_poNode = dynamic_cast < HNodeControl * > ( f_poSelected );
-		M_ASSERT ( l_poNode );
-		l_psMenu = static_cast < OMenuItem * > ( l_poNode->f_tLeaf [ 0 ].get < void * >() );
+		l_psMenu = static_cast<OMenuItem const*>( (**f_poSelected)[ 0 ].get<void*>() );
 		if ( l_psMenu->HANDLER )
-			static_cast < void > ( ( f_poProcess->* ( l_psMenu->HANDLER ) )() );
+			static_cast<void>( ( f_poProcess->* ( l_psMenu->HANDLER ) )() );
 		a_iCode = 0;
 		}
-		FIXME
-*/
 	return ( a_iCode );
 	M_EPILOG
 	}

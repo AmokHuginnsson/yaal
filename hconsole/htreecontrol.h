@@ -49,14 +49,21 @@ protected:
 		int f_iRowRaw;
 		int	f_iColumnRaw;
 		int f_iWidthRaw;
-		HNodeControl( HNodeControl* );
+		HItem f_oData;
+	public:
+		HNodeControl( void );
 		virtual ~HNodeControl ( void );
+		yaal::hcore::HInfo& operator[]( int );
+	protected:
 		void expand( void );
 		void collapse( void );
 		bool hit_test( int, int ) const;
 		void click( int );
 		friend class HTreeControl;
 		};
+	typedef yaal::hcore::HTree<HNodeControl> tree_t;
+	tree_t f_oTree;
+	tree_t::node_t f_poSelected;
 public:
 	HTreeControl( HWindow*,			/* parent */
 								 int,						/* row */
@@ -65,14 +72,20 @@ public:
 								 int,						/* width */
 								 char const* );	/* label */
 	virtual ~HTreeControl( void );
-	int draw_node( HNodeControl*, int );
+	int draw_node( tree_t::node_t, int );
 	virtual int set_focus( char = 0 );
 protected:
 	virtual int do_process_input( int );
 	virtual int do_click( mouse::OMouse& );
 	virtual void do_refresh( void );
 private:
-	bool do_click( HNodeControl*, mouse::OMouse& );
+	bool do_click( tree_t::node_t, mouse::OMouse& );
+	void expand( tree_t::node_t );
+	void collapse( tree_t::node_t );
+	tree_t::node_t next( tree_t::node_t );
+	tree_t::node_t previous( tree_t::node_t, bool = false );
+	HTreeControl( HTreeControl const& );
+	HTreeControl& operator = ( HTreeControl const& );
 	};
 
 }

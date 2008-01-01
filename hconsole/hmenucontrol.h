@@ -53,7 +53,7 @@ public:
 	virtual ~HMenuControl( void );
 	void init( HTUIProcess*, OMenuItem* );
 protected:
-	int load_sub_menu( HTreeControl::HNodeControl*, OMenuItem* );
+	int load_sub_menu( tree_t::node_t, OMenuItem* );
 	virtual int do_process_input( int );
 private:
 	HMenuControl( HMenuControl const& );
