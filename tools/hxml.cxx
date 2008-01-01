@@ -364,7 +364,7 @@ void HXml::parse( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStri
 					a_rsNode = &*a_rsNode->add_node();
 				else
 					a_rsNode = f_oDOM.create_new_root();
-				(**a_rsNode).f_oName = reinterpret_cast<char const*>( l_psNode->name );
+				(**a_rsNode).f_oText = reinterpret_cast<char const*>( l_psNode->name );
 				if ( l_psNode->properties )
 					{
 					xmlAttrPtr l_psAttribute = l_psNode->properties;
@@ -393,7 +393,7 @@ void HXml::parse( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStri
 				{
 				f_oVarTmpBuffer = convert( reinterpret_cast<char*>( l_psNode->content ) );
 				if ( ! a_bStripEmpty || ( f_oVarTmpBuffer.find_other_than( n_pcWhiteSpace ) >= 0 ) )
-					a_rsNode->add_node( f_oVarTmpBuffer );
+					a_rsNode->add_node( HNode( HNode::TYPE::D_CONTENT, f_oVarTmpBuffer ) );
 				}
 			break;
 			default:
@@ -406,7 +406,7 @@ void HXml::parse( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStri
 	M_EPILOG
 	}
 
-HXml::tree_t::node_t HXml::parse( char const* a_pcXPath, bool a_bStripEmpty )
+void HXml::parse( char const* a_pcXPath, bool a_bStripEmpty )
 	{
 	M_PROLOG
 	if ( ! a_pcXPath || ! a_pcXPath[ 0 ] )
@@ -430,14 +430,13 @@ HXml::tree_t::node_t HXml::parse( char const* a_pcXPath, bool a_bStripEmpty )
 			parse( f_poXml->f_psNodeSet->nodeTab[ 0 ],
 					NULL, a_bStripEmpty );
 		}
-	return ( f_oDOM.get_root() );
 	M_EPILOG
 	}
 
-HXml::tree_t::node_t HXml::get_root ( void )
+HXml::HNodeProxy HXml::get_root ( void )
 	{
 	M_PROLOG
-	return ( f_oDOM.get_root() );
+	return ( HNodeProxy( f_oDOM.get_root() ) );
 	M_EPILOG
 	}
 

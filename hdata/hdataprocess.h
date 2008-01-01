@@ -63,9 +63,9 @@ public:
 protected:
 	virtual int handler_quit( int, void const* = NULL );
 	virtual int handler_close_window( int, void const* = NULL );
-	yaal::hconsole::OMenuItem* build_sub_menu( yaal::tools::HXml::const_xml_element_t,
+	yaal::hconsole::OMenuItem* build_sub_menu( yaal::tools::HXml::HNodeProxy const&,
 			menu_handlers_map_t const& );
-	void build_menu_item( yaal::tools::HXml::const_xml_element_t,
+	void build_menu_item( yaal::tools::HXml::HNodeProxy const&,
 			yaal::hconsole::OMenuItem&, menu_handlers_map_t const& );
 	void destroy_menu( yaal::hconsole::OMenuItem* );
 private:

@@ -43,46 +43,12 @@ class HXmlData;
 
 class HXml
 	{
+	class HNode;
 public:
-	struct OXMLElement
-		{
-		typedef enum
-			{
-			D_NODE,
-			D_CONTENT
-			} type_t;
-		yaal::hcore::HString f_oName;
-		yaal::hcore::HString f_oContents;
-		typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
-		properties_t f_oProperties;
-		OXMLElement( void ) : f_oName(), f_oContents(), f_oProperties() { }
-		OXMLElement( yaal::hcore::HString const& value ) : f_oName(), f_oContents( value ), f_oProperties() {}
-		OXMLElement( OXMLElement const& source ) : f_oName( source.f_oName ),
-			f_oContents( source.f_oContents ), f_oProperties()
-			{ f_oProperties.copy_from( source.f_oProperties ); }
-		OXMLElement& operator = ( OXMLElement const& source )
-			{
-			M_PROLOG
-			if ( &source != this )
-				{
-				f_oName = source.f_oName;
-				f_oContents = source.f_oContents;
-				f_oProperties.copy_from( source.f_oProperties );
-				}
-			return ( *this );
-			M_EPILOG
-			}
-		void reset( void )
-			{
-			M_PROLOG
-			f_oName.clear();
-			f_oContents.clear();
-			f_oProperties.clear();
-			return;
-			M_EPILOG
-			}
-		};
-	typedef yaal::hcore::HTree<OXMLElement> tree_t;
+	class HNodeProxy;
+	class HIterator;
+	typedef HIterator iterator;
+	typedef yaal::hcore::HTree<HNode> tree_t;
 protected:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
@@ -98,8 +64,8 @@ public:
 	HXml( void );
 	virtual ~ HXml( void );
 	void init( char const* );
-	tree_t::node_t parse( char const* const = NULL, bool = true );
-	tree_t::node_t get_root( void );
+	void parse( char const* const = NULL, bool = true );
+	HNodeProxy get_root( void );
 protected:
 	void parse ( xml_node_ptr_t, tree_t::node_t, bool );
 #ifdef HAVE_ICONV_INPUT_CONST
@@ -113,6 +79,128 @@ protected:
 private:
 	HXml( HXml const& );
 	HXml& operator = ( HXml const& );
+	};
+
+class HXml::HNode
+	{
+public:
+	struct TYPE
+		{
+		typedef enum
+			{
+			D_NODE,
+			D_CONTENT
+			} type_t;
+		};
+	typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
+private:
+	TYPE::type_t f_eType;
+	yaal::hcore::HString f_oText;
+	properties_t f_oProperties;
+public:
+	HNode( void ) : f_eType( TYPE::D_NODE ), f_oText(), f_oProperties() { }
+	HNode( TYPE::type_t const& type, yaal::hcore::HString const& value ) : f_eType( type ), f_oText( value ), f_oProperties() {}
+	HNode( HNode const& source ) : f_eType( source.f_eType ), f_oText( source.f_oText ), f_oProperties()
+		{ f_oProperties.copy_from( source.f_oProperties ); }
+	HNode& operator = ( HNode const& source )
+		{
+		M_PROLOG
+		if ( &source != this )
+			{
+			f_eType = source.f_eType;
+			f_oText = source.f_oText;
+			f_oProperties.copy_from( source.f_oProperties );
+			}
+		return ( *this );
+		M_EPILOG
+		}
+private:
+	void reset( void )
+		{
+		M_PROLOG
+		f_oText.clear();
+		f_oProperties.clear();
+		return;
+		M_EPILOG
+		}
+	friend class HXml;
+	};
+
+class HXml::HNodeProxy
+	{
+	HXml::tree_t::node_t f_poNode;
+public:
+	HXml::HIterator begin();
+	HXml::HIterator const begin() const;
+	HXml::HIterator end();
+	HXml::HIterator const end() const;
+	HXml::HIterator rbegin();
+	HXml::HIterator const rbegin() const;
+	HXml::HIterator rend();
+	HXml::HIterator const rend() const;
+	HXml::HIterator get_element_by_id( char const* const );
+	HXml::HIterator const get_element_by_id( char const* const ) const;
+	HXml::HIterator query( char const* const );
+	HXml::HIterator const query( char const* const ) const;
+	HXml::HNode::TYPE::type_t get_type() const;
+	bool has_childs( void ) const;
+	int child_count( void ) const;
+	yaal::hcore::HString const& get_name( void ) const;
+	yaal::hcore::HString const& get_value( void ) const;
+	void set_name( char const* const );
+	void set_value( char const* const );
+	HXml::HNode::properties_t& properties( void );
+	HXml::HNode::properties_t const& properties( void ) const;
+	HXml::HIterator remove_node( HXml::HIterator );
+	HXml::HIterator add_node( HXml::HNode::TYPE::type_t const&, char const* const );
+	HXml::HIterator insert_node( HXml::HIterator );
+	HNodeProxy( HNodeProxy const& );
+	HNodeProxy& operator = ( HNodeProxy const& );
+private:
+	friend class HXml;
+	HNodeProxy( HXml::tree_t::node_t );
+	};
+
+class HXml::HIterator
+	{
+	HXml::tree_t::const_node_t f_poOwner;
+	HXml::tree_t::iterator f_oIterator;
+	HXml::HNodeProxy f_oProxy;
+public:
+	HIterator( void );
+	HIterator( HIterator const& );
+	HIterator& operator ++ ( void )
+		{
+		++ f_oIterator;
+		return ( *this );
+		}
+	HIterator operator ++ ( int )
+		{
+		HIterator it( *this );
+		++ f_oIterator;
+		return ( it );
+		}
+	HIterator& operator -- ( void )
+		{
+		-- f_oIterator;
+		return ( *this );
+		}
+	HIterator operator -- ( int )
+		{
+		HIterator it( *this );
+		-- f_oIterator;
+		return ( it );
+		}
+	HIterator& operator = ( HIterator const& );
+	bool operator == ( HIterator const& ) const;
+	bool operator != ( HIterator const& ) const;
+	HXml::HNodeProxy& operator* ( void );
+	HXml::HNodeProxy const& operator* ( void ) const;
+	HXml::HNodeProxy* operator->( void );
+	HXml::HNodeProxy const* operator->( void ) const;
+private:
+	friend class HXml::HNodeProxy;
+	HIterator( HXml::tree_t::const_node_t, HXml::tree_t::iterator const& );
 	};
 
 }
