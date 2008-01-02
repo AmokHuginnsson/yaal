@@ -2,9 +2,8 @@
 
 * Supported platforms:
 
-	- FreeBSD 7-CURRENT
+	- FreeBSD 7
 	- Debian Sid
-	- PLD TH
 
 If your platform is not on above list, it is very likely that yaal
 will not compile/link/work.

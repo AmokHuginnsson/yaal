@@ -5,6 +5,9 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 * System requirements:
 
 	libraries:
+    - pthread
+    - ssl
+    - rt
 		- libxml2
 		- ncurses
 	
