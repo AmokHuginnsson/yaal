@@ -149,22 +149,24 @@ int HTreeControl::draw_node( tree_t::node_t a_poNode, int a_iRow )
 	int l_iRow = a_iRow;
 	HConsole& cons = HCons::get_instance();
 	M_ASSERT( a_poNode );
-	M_ASSERT( (**a_poNode).f_oData.get_size() );
-	l_iRow ++;
-	HInfo const& info = (**a_poNode).f_oData[ 0 ];
-	HString const& str = info.get<HString const&>();
-	(**a_poNode).f_iRowRaw = l_iRow;
-	(**a_poNode).f_iColumnRaw = f_iColumnRaw + a_poNode->get_level() * 2 - 1; 
-	(**a_poNode).f_iWidthRaw = str.get_length() + 2;
-	set_attr_data();
-	if ( ! ( (**a_poNode).f_bUnfolded || ! a_poNode->has_childs() ) )
-		cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw, "+" );
-	else if ( a_poNode->has_childs() )
-		cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw, "-" );
-	if ( a_poNode == f_poSelected )
-		cons.set_attr( f_bEnabled ? ( f_bFocused ? ~f_uiAttributeFocused
-					: ~ f_uiAttributeEnabled ) : ~ f_uiAttributeDisabled );
-	cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw + 1, str );
+	if ( (**a_poNode).f_oData.get_size() )
+		{
+		l_iRow ++;
+		HInfo const& info = (**a_poNode).f_oData[ 0 ];
+		HString const& str = info.get<HString const&>();
+		(**a_poNode).f_iRowRaw = l_iRow;
+		(**a_poNode).f_iColumnRaw = f_iColumnRaw + a_poNode->get_level() * 2 - 1; 
+		(**a_poNode).f_iWidthRaw = str.get_length() + 2;
+		set_attr_data();
+		if ( ! ( (**a_poNode).f_bUnfolded || ! a_poNode->has_childs() ) )
+			cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw, "+" );
+		else if ( a_poNode->has_childs() )
+			cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw, "-" );
+		if ( a_poNode == f_poSelected )
+			cons.set_attr( f_bEnabled ? ( f_bFocused ? ~f_uiAttributeFocused
+						: ~ f_uiAttributeEnabled ) : ~ f_uiAttributeDisabled );
+		cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw + 1, str );
+		}
 	if ( a_poNode->has_childs() && ( (**a_poNode).f_bUnfolded || ! a_poNode->get_level() ) )
 		{
 		for ( tree_t::iterator it = a_poNode->begin(); it != a_poNode->end(); ++ it )
@@ -335,8 +337,11 @@ HTreeControl::tree_t::node_t HTreeControl::previous( tree_t::node_t node, bool w
 			;
 		if ( it != parent->end() )
 			{
-			if ( wrap && ( it == parent->begin() ) )
-				it = parent->rbegin();
+			if ( it == parent->begin() )
+				{
+				if ( wrap )
+					it = parent->rbegin();
+				}
 			else
 				-- it;
 			}
