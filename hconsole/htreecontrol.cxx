@@ -39,9 +39,9 @@ namespace yaal
 namespace hconsole
 {
 
-HTreeControl::HNodeControl::HNodeControl( void )
+HTreeControl::HNodeControl::HNodeControl( int cols )
 						: f_bUnfolded( false ),
-						f_iRowRaw( 0 ), f_iColumnRaw( 0 ), f_iWidthRaw( 0 ), f_oData()
+						f_iRowRaw( 0 ), f_iColumnRaw( 0 ), f_iWidthRaw( 0 ), f_oData( cols )
 	{
 	M_PROLOG
 	return;
@@ -149,6 +149,7 @@ int HTreeControl::draw_node( tree_t::node_t a_poNode, int a_iRow )
 	int l_iRow = a_iRow;
 	HConsole& cons = HCons::get_instance();
 	M_ASSERT( a_poNode );
+	M_ASSERT( (**a_poNode).f_oData.get_size() );
 	l_iRow ++;
 	HInfo const& info = (**a_poNode).f_oData[ 0 ];
 	HString const& str = info.get<HString const&>();

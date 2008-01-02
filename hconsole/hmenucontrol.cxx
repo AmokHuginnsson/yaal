@@ -46,7 +46,7 @@ int HMenuControl::load_sub_menu( tree_t::node_t node, OMenuItem* a_psSubMenu )
 	HString str;
 	while ( ! a_psSubMenu [ l_iCtr ].f_oLabel.is_empty() )
 		{
-		HNodeControl info;
+		HNodeControl info( 1 );
 		info[ 0 ]( a_psSubMenu [ l_iCtr ].f_oLabel );
 		info[ 0 ]( static_cast<void*>( &a_psSubMenu[ l_iCtr ] ) );
 		tree_t::iterator it = node->add_node( info );

@@ -51,7 +51,7 @@ protected:
 		int f_iWidthRaw;
 		HItem f_oData;
 	public:
-		HNodeControl( void );
+		HNodeControl( int = 0 );
 		virtual ~HNodeControl ( void );
 		yaal::hcore::HInfo& operator[]( int );
 	protected:

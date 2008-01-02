@@ -116,7 +116,7 @@ OMenuItem * HDataProcess::build_sub_menu( HXml::HNodeProxy const& a_rsNode,
 	l_oSubMenu.add_tail ( &l_sMenuItem );
 	l_psMenu = new OMenuItem[ l_oSubMenu.size() ];
 	int l_iCtr = 0;
-	for ( menu_item_list_t::iterator it = l_oSubMenu.begin(); it != l_oSubMenu.end(); ++ it )
+	for ( menu_item_list_t::iterator it = l_oSubMenu.begin(); it != l_oSubMenu.end(); ++ it, ++ l_iCtr )
 		l_psMenu[ l_iCtr ] = *it;
 	return ( l_psMenu );
 	M_EPILOG
@@ -126,8 +126,8 @@ void HDataProcess::build_menu_item ( HXml::HNodeProxy const& a_rsNode,
 		OMenuItem& a_rsMenuItem, menu_handlers_map_t const& a_roHandlers )
 	{
 	M_PROLOG
-	char const * const l_pcError = _ ( "malformed resource file (menu section)" );
-	char const * const l_pcUnexpected = _ ( ": unexpected node: " );
+	char const* const l_pcError = _( "malformed resource file (menu section)" );
+	char const* const l_pcUnexpected = _( ": unexpected node: " );
 	if ( ! a_rsNode.has_childs() )
 		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
 
@@ -136,7 +136,7 @@ void HDataProcess::build_menu_item ( HXml::HNodeProxy const& a_rsNode,
 		for ( HXml::HIterator it = a_rsNode.begin(); it != a_rsNode.end(); ++ it )
 			{
 			HString const& name = it->get_name();
-			HString const& contents = it->begin()->get_value();
+			HString const contents = it->begin()->get_type() == HXml::HNode::TYPE::D_CONTENT ? it->begin()->get_value() : "";
 			if ( name == "label" )
 				a_rsMenuItem.f_oLabel = contents;
 			else if ( name == "handler" )

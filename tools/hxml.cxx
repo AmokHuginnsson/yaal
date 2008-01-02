@@ -569,6 +569,22 @@ HXml::HNodeProxy const& HXml::HIterator::operator* ( void ) const
 	return ( f_oProxy );
 	}
 
+HXml::HNodeProxy* HXml::HIterator::operator->( void )
+	{
+	M_ASSERT( f_poOwner );
+	M_ASSERT( f_oIterator != f_poOwner->f_poNode->end() );
+	f_oProxy.f_poNode = &*f_oIterator;
+	return ( &f_oProxy );
+	}
+
+HXml::HNodeProxy const* HXml::HIterator::operator->( void ) const
+	{
+	M_ASSERT( f_poOwner );
+	M_ASSERT( f_oIterator != f_poOwner->f_poNode->end() );
+	f_oProxy.f_poNode = &*f_oIterator;
+	return ( &f_oProxy );
+	}
+
 }
 
 }
