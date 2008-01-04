@@ -158,12 +158,12 @@ public:
 	template<typename T>
 	void merge_sort( T const&, sort_order_t = D_ASCENDING );
 	template<typename T>
-	void insert_sort( T const&, sort_order_t = D_ASCENDING );
+	void select_sort( T const&, sort_order_t = D_ASCENDING );
 protected:
 	template<typename T>
 	void merge_sort( HElement*&, HElement*&, T const&, sort_order_t = D_ASCENDING );
 	template<typename T>
-	void insert_sort( HElement*&, HElement*&, int, T const&, sort_order_t = D_ASCENDING );
+	void select_sort( HElement*&, HElement*&, int, T const&, sort_order_t = D_ASCENDING );
 	HElement* element_by_index ( int );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
@@ -1015,15 +1015,15 @@ void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less,
 		}
 	int const D_ARBITRARILY_CHOSEN_THRESHOLD = 7;
 	if ( ( stepsLeft + stepsRight + 2 ) < D_ARBITRARILY_CHOSEN_THRESHOLD )
-		insert_sort( left, right, stepsLeft + stepsRight + 2, less, a_eOrder );
+		select_sort( left, right, stepsLeft + stepsRight + 2, less, a_eOrder );
 	else
 		{
 		if ( stepsLeft < D_ARBITRARILY_CHOSEN_THRESHOLD )
-			insert_sort( left, leftIt, stepsLeft + 1, less, a_eOrder );
+			select_sort( left, leftIt, stepsLeft + 1, less, a_eOrder );
 		else
 			merge_sort( left, leftIt, less, a_eOrder );
 		if ( stepsRight < D_ARBITRARILY_CHOSEN_THRESHOLD )
-			insert_sort( rightIt, right, stepsRight + 1, less, a_eOrder );
+			select_sort( rightIt, right, stepsRight + 1, less, a_eOrder );
 		else
 			merge_sort( rightIt, right, less, a_eOrder );
 		HElement* first = NULL;
@@ -1084,7 +1084,7 @@ void HList<tType>::merge_sort( T const& less, sort_order_t a_eOrder )
 
 template<typename tType>
 template<typename T>
-void HList<tType>::insert_sort(
+void HList<tType>::select_sort(
 		HElement*& a_rpoBaseLower, HElement*& a_rpoBaseUpper,
 		int distance, T const& less, sort_order_t a_eOrder )
 	{
@@ -1142,14 +1142,14 @@ void HList<tType>::insert_sort(
 
 template<typename tType>
 template<typename T>
-void HList<tType>::insert_sort( T const& less, sort_order_t a_eOrder )
+void HList<tType>::select_sort( T const& less, sort_order_t a_eOrder )
 	{
 	M_PROLOG
 	if ( f_iSize > 1 )
 		{
 		HElement* first = f_poHook;
 		HElement* last = f_poHook->f_poPrevious;
-		insert_sort( first, last, f_iSize, less, a_eOrder );
+		select_sort( first, last, f_iSize, less, a_eOrder );
 		}
 	return;
 	M_EPILOG;
