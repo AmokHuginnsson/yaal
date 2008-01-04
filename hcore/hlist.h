@@ -87,6 +87,7 @@ struct OListBits
 template<typename tType> 
 class HList : public OListBits
 	{
+private:
 	class HElement;
 	int f_iSize;					/* how many elements this list contains */
 	HElement* f_poHook;			/* "begining" of the list ( "first" element ) */
@@ -149,12 +150,18 @@ public:
 	tType& tail( void );
 	tType const& tail( void ) const;
 	void exchange( iterator const&, iterator const& );
-	void sort_by_contents( sort_order_t = D_ASCENDING );
+	void sort( sort_order_t = D_ASCENDING );
 	bool empty( void ) const;
 	bool is_empty( void ) const;
 	template<typename T>
-	void sort( T const&, sort_order_t = D_ASCENDING );
+	void merge_sort( T const&, sort_order_t = D_ASCENDING );
+	template<typename T>
+	void insert_sort( T const&, sort_order_t = D_ASCENDING );
 protected:
+	template<typename T>
+	void merge_sort( HElement*&, HElement*&, T const&, sort_order_t = D_ASCENDING );
+	template<typename T>
+	void insert_sort( HElement*&, HElement*&, int, T const&, sort_order_t = D_ASCENDING );
 	HElement* element_by_index ( int );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
@@ -165,6 +172,7 @@ protected:
 template<typename tType>
 class HList<tType>::HElement
 	{
+private:
 	HElement* f_poPrevious;
 	HElement* f_poNext;
 	tType f_tObject; /* The Object itself. */
@@ -181,7 +189,7 @@ template<typename tType>
 template<OListBits::treatment_t const treatment>
 class HList<tType>::HIterator
 	{
-protected:
+private:
 	/*{*/
 	HList<tType> const* f_poOwner;
 	HElement* f_poCurrent;
@@ -449,13 +457,13 @@ typename HList<tType>::iterator HList<tType>::end( void )
 template<typename tType>
 typename HList<tType>::iterator const HList<tType>::rbegin( void ) const
 	{
-	return ( iterator( this, f_poHook->f_poPrevious ) );
+	return ( iterator( this, f_poHook ? f_poHook->f_poPrevious : NULL ) );
 	}
 
 template<typename tType>
 typename HList<tType>::iterator HList<tType>::rbegin( void )
 	{
-	return ( iterator( this, f_poHook->f_poPrevious ) );
+	return ( iterator( this, f_poHook ? f_poHook->f_poPrevious : NULL ) );
 	}
 
 template<typename tType>
@@ -985,95 +993,162 @@ tType const& HList<tType>::tail( void ) const
 
 template<typename tType>
 template<typename T>
-void HList<tType>::sort( T const& less, sort_order_t a_eOrder )
+void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less, sort_order_t a_eOrder )
 	{
 	M_PROLOG
-	int l_iCtr = f_iSize;
-	int l_iCtrLoc = 0;
-	HElement* l_poBaseLower = f_poHook;
-	HElement* l_poBaseUpper = f_poHook->f_poPrevious;
-	HElement* l_poExtreamLower = NULL;
-	HElement* l_poExtreamUpper = NULL;
-	HElement* l_poPointer = NULL;
-	f_eOrder = a_eOrder;
-	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], f_eOrder );
-	while ( l_iCtr >= 0 )
+	HElement* leftIt = left;
+	HElement* rightIt = right;
+	int long stepsLeft = 0;
+	int long stepsRight = 0;
+	while ( leftIt != rightIt )
 		{
-		l_iCtrLoc = l_iCtr;
-		l_poExtreamLower = l_poBaseLower;
-		l_poExtreamUpper = l_poBaseUpper;
-		l_poPointer = l_poBaseLower;
-		while ( l_iCtrLoc -- )
+		if ( leftIt->f_poNext == rightIt )
+			break;
+		leftIt = leftIt->f_poNext;
+		++ stepsLeft;
+		if ( leftIt == rightIt->f_poPrevious )
+			break;
+		rightIt = rightIt->f_poPrevious;
+		++ stepsRight;
+		}
+	int const D_ARBITRARILY_CHOSEN_THRESHOLD = 7;
+	if ( ( stepsLeft + stepsRight + 2 ) < D_ARBITRARILY_CHOSEN_THRESHOLD )
+		insert_sort( left, right, stepsLeft + stepsRight + 2, less, a_eOrder );
+	else
+		{
+		if ( stepsLeft < D_ARBITRARILY_CHOSEN_THRESHOLD )
+			insert_sort( left, leftIt, stepsLeft + 1, less, a_eOrder );
+		else
+			merge_sort( left, leftIt, less, a_eOrder );
+		if ( stepsRight < D_ARBITRARILY_CHOSEN_THRESHOLD )
+			insert_sort( rightIt, right, stepsRight + 1, less, a_eOrder );
+		else
+			merge_sort( rightIt, right, less, a_eOrder );
+		HElement* first = NULL;
+		while ( left != leftIt )
 			{
-			if ( ( l_poPointer != l_poExtreamLower )
-					&& less ( l_poPointer->f_tObject, l_poExtreamLower->f_tObject ) )
-				l_poExtreamLower = l_poPointer;
-			if ( ( l_poPointer != l_poExtreamUpper )
-					&& less ( l_poExtreamUpper->f_tObject, l_poPointer->f_tObject ) )
-				l_poExtreamUpper = l_poPointer;
-			l_poPointer = l_poPointer->f_poNext;
+			if ( less( rightIt->f_tObject, left->f_tObject ) )
+				{
+				HElement* ptr = rightIt;
+				if ( ! first )
+					first = ptr;
+				while ( ( rightIt != right ) && less( rightIt->f_poNext->f_tObject, left->f_tObject ) )
+					rightIt = rightIt->f_poNext;
+				ptr->f_poPrevious->f_poNext = rightIt->f_poNext;
+				rightIt->f_poNext->f_poPrevious = ptr->f_poPrevious;
+				left->f_poPrevious->f_poNext = ptr;
+				ptr->f_poPrevious = left->f_poPrevious;
+				left->f_poPrevious = rightIt;
+				rightIt->f_poNext = left;
+				}
+			if ( ! first )
+				first = left;
+			left = left->f_poNext;
 			}
-		if ( l_poExtreamLower != l_poBaseLower )
-			{
-			exchange ( l_poBaseLower, l_poExtreamLower );
-			if ( l_poExtreamLower == l_poBaseUpper )
-				l_poBaseUpper = l_poBaseLower;
-			l_poBaseLower = l_poExtreamLower;
-			}
-		if ( l_poExtreamUpper != l_poBaseUpper )
-			{
-			exchange ( l_poBaseUpper, l_poExtreamUpper );
-			l_poBaseUpper = l_poExtreamUpper;
-			}
-		l_poBaseLower = l_poBaseLower->f_poNext;
-		l_poBaseUpper = l_poBaseUpper->f_poPrevious;
-		l_iCtr -= 2;
+		left = first;
+		right = leftIt;
 		}
 	return;
 	M_EPILOG
 	}
 
 template<typename tType>
-void HList<tType>::sub_swap ( HElement * a_poLeft, HElement * a_poCenter,
-		HElement* a_poRight )
+template<typename T>
+void HList<tType>::merge_sort( T const& less, sort_order_t a_eOrder )
 	{
 	M_PROLOG
-	HElement * l_poCenterPrevious = NULL, * l_poRightNext = NULL;
-	HElement * l_poLeftPrevious = NULL;
-	if ( a_poLeft == a_poCenter )
-		return;
-	if ( a_poLeft == f_poHook )
-		f_poHook = a_poCenter;
-	else if ( a_poCenter == f_poHook )
-		f_poHook = a_poLeft;
-	if ( a_poLeft->f_poPrevious == a_poRight )
-		return;
-/*
- *   wwwwq lxxxxxx cyyyyyyr pwwww -> wwwwq cyyyyyyr lxxxxxx pwwww
- */
-	
-	l_poCenterPrevious = a_poCenter->f_poPrevious;
-	l_poRightNext = a_poRight->f_poNext;
-	l_poLeftPrevious = a_poLeft->f_poPrevious;
-	
-	l_poLeftPrevious->f_poNext = a_poCenter;
-	l_poCenterPrevious->f_poNext = l_poRightNext;
-	l_poRightNext->f_poPrevious = l_poCenterPrevious;
-	a_poLeft->f_poPrevious = a_poRight;
-	a_poRight->f_poNext = a_poLeft;
-	a_poCenter->f_poPrevious = l_poLeftPrevious;
-	
+	if ( f_iSize > 1 )
+		{
+		HElement* first = f_poHook;
+		HElement* last = f_poHook->f_poPrevious;
+		merge_sort( first, last, less, a_eOrder );
+		f_poHook = first;
+		f_poIndex = NULL;
+		f_iIndex = 0;
+		}
 	return;
 	M_EPILOG
 	}
 
 template<typename tType>
-void HList<tType>::sort_by_contents ( sort_order_t a_eOrder )
+template<typename T>
+void HList<tType>::insert_sort(
+		HElement*& a_rpoBaseLower, HElement*& a_rpoBaseUpper,
+		int distance, T const& less, sort_order_t a_eOrder )
+	{
+	M_PROLOG
+	int l_iCtrLoc = 0;
+	HElement* l_poExtreamLower = NULL;
+	HElement* l_poExtreamUpper = NULL;
+	HElement* l_poBaseLower = a_rpoBaseLower;
+	HElement* l_poBaseUpper = a_rpoBaseUpper;
+	HElement* l_poPointer = NULL;
+	f_eOrder = a_eOrder;
+	int ctr = distance;
+	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], f_eOrder );
+	while ( ctr >= 0 )
+		{
+		l_iCtrLoc = ctr;
+		l_poExtreamLower = l_poBaseLower;
+		l_poExtreamUpper = l_poBaseUpper;
+		l_poPointer = l_poBaseLower;
+		while ( l_iCtrLoc -- )
+			{
+			if ( ( l_poPointer != l_poExtreamLower )
+					&& less( l_poPointer->f_tObject, l_poExtreamLower->f_tObject ) )
+				l_poExtreamLower = l_poPointer;
+			if ( ( l_poPointer != l_poExtreamUpper )
+					&& less( l_poExtreamUpper->f_tObject, l_poPointer->f_tObject ) )
+				l_poExtreamUpper = l_poPointer;
+			l_poPointer = l_poPointer->f_poNext;
+			}
+		if ( l_poExtreamLower != l_poBaseLower )
+			{
+			exchange( l_poBaseLower, l_poExtreamLower );
+			if ( l_poExtreamLower == l_poBaseUpper )
+				l_poBaseUpper = l_poBaseLower;
+			l_poBaseLower = l_poExtreamLower;
+			}
+		if ( l_poExtreamUpper != l_poBaseUpper )
+			{
+			exchange( l_poBaseUpper, l_poExtreamUpper );
+			l_poBaseUpper = l_poExtreamUpper;
+			}
+		if ( ctr == distance )
+			{
+			a_rpoBaseLower = l_poBaseLower;
+			a_rpoBaseUpper = l_poBaseUpper;
+			}
+		l_poBaseLower = l_poBaseLower->f_poNext;
+		l_poBaseUpper = l_poBaseUpper->f_poPrevious;
+		ctr -= 2;
+		}
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+template<typename T>
+void HList<tType>::insert_sort( T const& less, sort_order_t a_eOrder )
+	{
+	M_PROLOG
+	if ( f_iSize > 1 )
+		{
+		HElement* first = f_poHook;
+		HElement* last = f_poHook->f_poPrevious;
+		insert_sort( first, last, f_iSize, less, a_eOrder );
+		}
+	return;
+	M_EPILOG;
+	}
+
+template<typename tType>
+void HList<tType>::sort( sort_order_t a_eOrder )
 	{
 	M_PROLOG
 	f_eOrder = a_eOrder;
-	sort ( yaal::less<tType> );
+	merge_sort( yaal::less<tType> );
 	return ;
 	M_EPILOG
 	}

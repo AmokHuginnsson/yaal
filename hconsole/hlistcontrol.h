@@ -550,7 +550,7 @@ HCell<tType>::~HCell( void )
 template<typename tType>
 void HListControler<tType>::sort( list_control_helper::OSortHelper& a_roHelper )
 	{
-	f_oList->sort ( CompareListControlItems<tType> ( a_roHelper ) );
+	f_oList->merge_sort( CompareListControlItems<tType> ( a_roHelper ) );
 	f_poControl->invalidate();
 	}
 
