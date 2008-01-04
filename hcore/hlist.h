@@ -151,6 +151,8 @@ public:
 	tType const& tail( void ) const;
 	void exchange( iterator const&, iterator const& );
 	void sort( sort_order_t = D_ASCENDING );
+	template<typename T>
+	void sort( T const&, sort_order_t = D_ASCENDING );
 	bool empty( void ) const;
 	bool is_empty( void ) const;
 	template<typename T>
@@ -1025,7 +1027,8 @@ void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less,
 		else
 			merge_sort( rightIt, right, less, a_eOrder );
 		HElement* first = NULL;
-		while ( left != leftIt )
+		++ stepsLeft;
+		while ( stepsLeft -- )
 			{
 			if ( less( rightIt->f_tObject, left->f_tObject ) )
 				{
@@ -1034,19 +1037,28 @@ void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less,
 					first = ptr;
 				while ( ( rightIt != right ) && less( rightIt->f_poNext->f_tObject, left->f_tObject ) )
 					rightIt = rightIt->f_poNext;
+				HElement* nextRight = rightIt->f_poNext;
+				bool to_break = false;
+				if ( rightIt == right )
+					to_break = true;
 				ptr->f_poPrevious->f_poNext = rightIt->f_poNext;
 				rightIt->f_poNext->f_poPrevious = ptr->f_poPrevious;
 				left->f_poPrevious->f_poNext = ptr;
 				ptr->f_poPrevious = left->f_poPrevious;
 				left->f_poPrevious = rightIt;
 				rightIt->f_poNext = left;
+				rightIt = nextRight;
+				if ( to_break )
+					{
+					right = rightIt->f_poPrevious;
+					break;
+					}
 				}
 			if ( ! first )
 				first = left;
 			left = left->f_poNext;
 			}
 		left = first;
-		right = leftIt;
 		}
 	return;
 	M_EPILOG
@@ -1151,6 +1163,16 @@ void HList<tType>::sort( sort_order_t a_eOrder )
 	merge_sort( yaal::less<tType> );
 	return ;
 	M_EPILOG
+	}
+
+template<typename tType>
+template<typename T>
+void HList<tType>::sort( T const& less, sort_order_t a_eOrder )
+	{
+	M_PROLOG
+	merge_sort( less, a_eOrder );
+	return;
+	M_EPILOG;
 	}
 
 }
