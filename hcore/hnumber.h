@@ -45,8 +45,8 @@ public:
 	static int D_DEFAULT_PRECISION;
 public:
 	HNumber( void );
-	HNumber( double );
-	HNumber( double, int );
+	HNumber( double long );
+	HNumber( double long, int );
 	HNumber( HString const& );
 	HNumber( HString const&, int );
 	HNumber( HNumber const& );
@@ -68,7 +68,7 @@ public:
 	HNumber operator / ( HNumber const& );
 	void set_precision( int );
 	int get_precision( void ) const;
-	double to_double( void ) const;
+	double long to_double( void ) const;
 	HString to_string( void ) const;
 private:
 	void from_string( HString const& );

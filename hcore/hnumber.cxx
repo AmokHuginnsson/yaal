@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstdlib>
+
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hnumber.h"
@@ -51,7 +53,18 @@ HNumber::HNumber( void )
 			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
 	f_oCanonical( f_iPrecision + D_SPECIAL_CHARS, canonical_t::D_AUTO_GROW )
 	{
+	M_PROLOG
+	f_oCanonical[ 0 ] = '0';
+	f_oCanonical[ 1 ] = 0;
 	return;
+	M_EPILOG
+	}
+
+HNumber::~HNumber( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
 	}
 
 void HNumber::from_double( double a_dNumber )
@@ -82,25 +95,29 @@ void HNumber::from_string( HString const& a_oNumber )
 	 * 5 <- valid
 	 */
 	M_ENSURE( end >= 0 );
+	if ( ( end - start ) > 1 )
+		start = end - 1;
 
 	end = a_oNumber.find_one_of( D_VALID_CHARACTERS + D_VALID_THIRD_CHARACTERS, end );
 	M_ENSURE( end >= 0 );
+	M_ENSURE( ( end - start ) <= 2 );
 	
 	end = a_oNumber.find_other_than( D_VALID_CHARACTERS + D_VALID_THIRD_CHARACTERS, end );
 
 	int len = a_oNumber.get_length();
 	( end > 0 ) || ( end = len );
+	len -= start;
 	( len < f_iPrecision ) || ( len = f_iPrecision );
 	char* dst = f_oCanonical.raw();
 	char const* const src = a_oNumber.raw();
 	for ( int i = 0; i < len; ++ i )
-		dst[ i ] = src[ i ];
+		dst[ i ] = src[ i + start ];
 	dst[ len ] = 0;
 	return;
 	M_EPILOG
 	}
 
-HNumber::HNumber( double a_dNumber )
+HNumber::HNumber( double long a_dNumber )
 	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
 			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
 	f_oCanonical( f_iPrecision + D_SPECIAL_CHARS, canonical_t::D_AUTO_GROW )
@@ -111,7 +128,7 @@ HNumber::HNumber( double a_dNumber )
 	M_EPILOG
 	}
 
-HNumber::HNumber( double a_dNumber, int a_iPrecision )
+HNumber::HNumber( double long a_dNumber, int a_iPrecision )
 	: f_iPrecision( a_iPrecision > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
 			? a_iPrecision : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
 	f_oCanonical( f_iPrecision + D_SPECIAL_CHARS, canonical_t::D_AUTO_GROW )
@@ -130,6 +147,20 @@ HNumber::HNumber( HString const& a_oNumber )
 	M_PROLOG
 	from_string( a_oNumber );
 	return;
+	M_EPILOG
+	}
+
+HString HNumber::to_string( void ) const
+	{
+	M_PROLOG
+	return ( f_oCanonical.raw() );
+	M_EPILOG
+	}
+
+double long HNumber::to_double( void ) const
+	{
+	M_PROLOG
+	return ( strtold( f_oCanonical.raw(), NULL ) );
 	M_EPILOG
 	}
 
@@ -165,6 +196,11 @@ HNumber& HNumber::operator = ( HNumber const& source )
 		}
 	return ( *this );
 	M_EPILOG
+	}
+
+int HNumber::get_precision( void ) const
+	{
+	return ( f_iPrecision );
 	}
 
 }
