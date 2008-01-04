@@ -80,13 +80,12 @@ public:
 	int size( void ) const;
 	void swap( HPool<tType>& );
 	tType* raw( void ) const;
-private:
 	HPool( HPool const& );
 	HPool& operator = ( HPool const& );
 	};
 
-template < typename tType >
-HPool<tType>::HPool ( size_t a_ulNewSize, pool_type_t a_ePoolType )
+template<typename tType>
+HPool<tType>::HPool( size_t a_ulNewSize, pool_type_t a_ePoolType )
 	: f_ePoolType( a_ePoolType ), f_ulPoolSize( 0 ), f_iTop( 0 ),
 	f_ptPool( NULL )
 	{
@@ -94,6 +93,38 @@ HPool<tType>::HPool ( size_t a_ulNewSize, pool_type_t a_ePoolType )
 	if ( a_ulNewSize )
 		pool_realloc( a_ulNewSize );
 	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+HPool<tType>::HPool( HPool<tType> const& source )
+	: f_ePoolType( source.f_ePoolType ), f_ulPoolSize( 0 ), f_iTop( 0 ),
+	f_ptPool( NULL )
+	{
+	M_PROLOG
+	if ( source.f_ulPoolSize )
+		{
+		pool_realloc( source.f_ulPoolSize );
+		memcpy( f_ptPool, source.f_ptPool, f_ulPoolSize * sizeof ( tType ) );
+		}
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+HPool<tType>& HPool<tType>::operator = ( HPool<tType> const& source )
+	{
+	M_PROLOG
+	if ( &source != this )
+		{
+		f_ePoolType = source.f_ePoolType;
+		if ( source.f_ulPoolSize )
+			{
+			pool_realloc( source.f_ulPoolSize );
+			memcpy( f_ptPool, source.f_ptPool, f_ulPoolSize * sizeof ( tType ) );
+			}
+		}
+	return ( *this );
 	M_EPILOG
 	}
 
