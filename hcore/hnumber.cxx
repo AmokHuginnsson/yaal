@@ -29,6 +29,7 @@ Copyright:
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hnumber.h"
+#include "hlog.h"
 
 namespace yaal
 {
@@ -40,10 +41,9 @@ namespace
 {
 int const D_SPECIAL_CHARS = 3; /* minus, dot, nil */
 char const* const D_VALID_CHARACTERS = "-.0123456789";
-int D_VALID_FIRST_CHARACTERS = 0;
-int D_VALID_SECOND_CHARACTERS = 1;
-int D_VALID_THIRD_CHARACTERS = 2;
+int const D_JUST_DIGITS = 2;
 int const D_HARDCODED_MINIMUM_DEFAULT_PRECISION = 16;
+int const D_A_DOT = 1;
 }
 
 int HNumber::D_DEFAULT_PRECISION = 100;
@@ -85,9 +85,9 @@ void HNumber::from_double( double a_dNumber )
 void HNumber::from_string( HString const& a_oNumber )
 	{
 	M_PROLOG
-	int start = a_oNumber.find_one_of( D_VALID_CHARACTERS + D_VALID_FIRST_CHARACTERS );
+	int start = a_oNumber.find_one_of( D_VALID_CHARACTERS );
 	M_ENSURE( start >= 0 );
-	int end = a_oNumber.find_one_of( D_VALID_CHARACTERS + D_VALID_SECOND_CHARACTERS, start );
+	int end = a_oNumber.find_one_of( D_VALID_CHARACTERS + D_JUST_DIGITS, start );
 	/*
 	 * next valid character is next to last find i.e.:
 	 * -5 <- valid
@@ -95,22 +95,29 @@ void HNumber::from_string( HString const& a_oNumber )
 	 * 5 <- valid
 	 */
 	M_ENSURE( end >= 0 );
-	if ( ( end - start ) > 1 )
-		start = end - 1;
-
-	end = a_oNumber.find_one_of( D_VALID_CHARACTERS + D_VALID_THIRD_CHARACTERS, end );
-	M_ENSURE( end >= 0 );
 	M_ENSURE( ( end - start ) <= 2 );
+	char const* const src = a_oNumber.raw();
+	char maybe_a_dot = end > 0 ? src[ end - 1 ] : '?';
+	M_ENSURE( ( ( end - start ) <= 1 )
+			|| ( ( maybe_a_dot == D_VALID_CHARACTERS[ D_A_DOT ] )
+				&& ( src[ start ] != D_VALID_CHARACTERS[ D_A_DOT ] ) ) );
 	
-	end = a_oNumber.find_other_than( D_VALID_CHARACTERS + D_VALID_THIRD_CHARACTERS, end );
+	end = a_oNumber.find_other_than( D_VALID_CHARACTERS + D_JUST_DIGITS, end );
+	if ( ( end > 0 )
+			&& ( src[ end ] == D_VALID_CHARACTERS[ D_A_DOT ] )
+			&& ( maybe_a_dot != D_VALID_CHARACTERS[ D_A_DOT ] ) )
+		{
+		int decimal_digit = a_oNumber.find_one_of( D_VALID_CHARACTERS + D_JUST_DIGITS, end );
+		if ( decimal_digit > 0 )
+			end = a_oNumber.find_other_than( D_VALID_CHARACTERS + D_JUST_DIGITS, decimal_digit );
+		}
 
 	int len = a_oNumber.get_length();
 	( end > 0 ) || ( end = len );
-	len -= start;
+	end -= start;
 	( len < f_iPrecision ) || ( len = f_iPrecision );
 	char* dst = f_oCanonical.raw();
-	char const* const src = a_oNumber.raw();
-	for ( int i = 0; i < len; ++ i )
+	for ( int i = 0; i < end; ++ i )
 		dst[ i ] = src[ i + start ];
 	dst[ len ] = 0;
 	return;
@@ -145,6 +152,9 @@ HNumber::HNumber( HString const& a_oNumber )
 	f_oCanonical( f_iPrecision + D_SPECIAL_CHARS, canonical_t::D_AUTO_GROW )
 	{
 	M_PROLOG
+	int len = a_oNumber.get_length();
+	if ( len > f_iPrecision )
+		f_oCanonical.pool_realloc( f_iPrecision = len );
 	from_string( a_oNumber );
 	return;
 	M_EPILOG

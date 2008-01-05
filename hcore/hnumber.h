@@ -47,6 +47,34 @@ public:
 	HNumber( void );
 	HNumber( double long );
 	HNumber( double long, int );
+
+	/*! Construct a number from supplied string.
+	 *
+	 * String may contain other character, first number found will be used,
+	 * i.e:
+	 * (let '_' be 'any' (non-digit, non-minus and non-dot) character)
+	 *
+	 * __2__       = 2
+	 * __32__111__ = 32
+	 * 12__        = 12
+	 * __3.14      = 3.14
+	 * __-2__      = -3
+	 * -.3         = -.3
+	 * -0.5        = -0.5
+	 * _-.4_       = -0.4
+	 * 99-4        = 99
+	 * 4.-4        = 4
+	 *
+	 * beware that "-", "." and "-." starts a number,
+	 * first started number must be valid, so following produces an exception:
+	 *
+	 * -           = ex
+	 * .           = ex
+	 * -.          = ex
+	 * __-__33__   = ex
+	 * __._22.2__  = ex
+	 * _-._1_      = ex
+	 */
 	HNumber( HString const& );
 	HNumber( HString const&, int );
 	HNumber( HNumber const& );
