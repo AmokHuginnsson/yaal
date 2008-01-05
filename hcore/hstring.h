@@ -53,6 +53,7 @@ public:
 	HString( int long unsigned const );
 	HString( size_t const );
 	HString( double const );
+	HString( double long const );
 	HString( void const* const );
 	HString& operator = ( HString const& );
 	HString& operator += ( HString const& );
@@ -63,6 +64,7 @@ public:
 	HString operator + ( int long const ) const;
 	HString operator + ( size_t const ) const;
 	HString operator + ( double const ) const;
+	HString operator + ( double long const ) const;
 	HString operator + ( void const* const ) const;
 	char operator[] ( int const );
 	char set_at( int, char );
@@ -119,6 +121,7 @@ HString operator + ( char const, HString const& );
 HString operator + ( int const, HString const& );
 HString operator + ( int long const, HString const& );
 HString operator + ( double const, HString const& );
+HString operator + ( double long const, HString const& );
 HString operator + ( void const* const, HString const& );
 bool operator == ( char const* const, HString const& );
 bool operator != ( char const* const, HString const& );
