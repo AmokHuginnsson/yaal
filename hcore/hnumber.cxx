@@ -43,6 +43,7 @@ int const D_SPECIAL_CHARS = 3; /* minus, dot, nil */
 char const* const D_VALID_CHARACTERS = "-.0123456789";
 int const D_JUST_DIGITS = 2;
 int const D_HARDCODED_MINIMUM_DEFAULT_PRECISION = 16;
+int const D_A_MINUS = 0;
 int const D_A_DOT = 1;
 }
 
@@ -74,10 +75,13 @@ void HNumber::from_double( double a_dNumber )
 	char const* const src = source.raw();
 	char* dst = f_oCanonical.raw();
 	int len = source.get_length();
-	( len < f_iPrecision ) || ( len = f_iPrecision );
-	for ( int i = 0; i < len; ++ i )
+	int integral = source.find( D_VALID_CHARACTERS[ D_A_DOT ] );
+	int total = integral >= 0 ? integral + f_iPrecision : f_iPrecision;
+	f_oCanonical.pool_realloc( total + D_SPECIAL_CHARS );
+	( len < total ) || ( len = total );
+	for ( int i = 0; i < total; ++ i )
 		dst[ i ] = src[ i ];
-	dst[ len ] = 0;
+	dst[ total ] = 0;
 	return;
 	M_EPILOG
 	}
@@ -115,7 +119,12 @@ void HNumber::from_string( HString const& a_oNumber )
 	int len = a_oNumber.get_length();
 	( end > 0 ) || ( end = len );
 	end -= start;
-	( len < f_iPrecision ) || ( len = f_iPrecision );
+	int integral = a_oNumber.find( D_VALID_CHARACTERS[ D_A_DOT ], start );
+	if ( ( integral >= 0 ) && ( ( end - integral ) > f_iPrecision ) )
+		f_iPrecision = end - integral;
+	int total = integral >= 0 ? ( integral - start ) + f_iPrecision : f_iPrecision;
+	f_oCanonical.pool_realloc( total + D_SPECIAL_CHARS );
+	( end < total ) || ( end = total );
 	char* dst = f_oCanonical.raw();
 	for ( int i = 0; i < end; ++ i )
 		dst[ i ] = src[ i + start ];
@@ -152,9 +161,6 @@ HNumber::HNumber( HString const& a_oNumber )
 	f_oCanonical( f_iPrecision + D_SPECIAL_CHARS, canonical_t::D_AUTO_GROW )
 	{
 	M_PROLOG
-	int len = a_oNumber.get_length();
-	if ( len > f_iPrecision )
-		f_oCanonical.pool_realloc( f_iPrecision = len );
 	from_string( a_oNumber );
 	return;
 	M_EPILOG
@@ -187,7 +193,7 @@ HNumber::HNumber( HString const& a_oNumber, int a_iPrecision )
 
 HNumber::HNumber( HNumber const& source )
 	: f_iPrecision( source.f_iPrecision ),
-	f_oCanonical( f_iPrecision + D_SPECIAL_CHARS, canonical_t::D_AUTO_GROW )
+	f_oCanonical( source.f_oCanonical.size(), canonical_t::D_AUTO_GROW )
 	{
 	M_PROLOG
 	f_oCanonical = source.f_oCanonical;
@@ -211,6 +217,57 @@ HNumber& HNumber::operator = ( HNumber const& source )
 int HNumber::get_precision( void ) const
 	{
 	return ( f_iPrecision );
+	}
+
+void HNumber::set_precision( int a_iPrecision )
+	{
+	M_PROLOG
+	if ( ( a_iPrecision > f_iPrecision ) && ( a_iPrecision > D_HARDCODED_MINIMUM_DEFAULT_PRECISION ) )
+		{
+		int increase = a_iPrecision - f_iPrecision;
+		f_iPrecision = a_iPrecision;
+		f_oCanonical.pool_realloc( f_oCanonical.size() + increase );
+		}
+	return;
+	M_EPILOG
+	}
+
+bool HNumber::operator == ( HNumber const& other ) const
+	{
+	int l1 = ::strlen( f_oCanonical.raw() );
+	int l2 = ::strlen( other.f_oCanonical.raw() );
+	return ( ( l1 == l2 ) && ! ::memcmp( f_oCanonical.raw(), other.f_oCanonical.raw(), l1 ) );
+	}
+
+bool HNumber::operator != ( HNumber const& other ) const
+	{
+	return ( ! operator == ( other ) );
+	}
+
+bool HNumber::operator < ( HNumber const& other ) const
+	{
+	char const* canon_this = f_oCanonical.raw();
+	char const* canon_other = other.f_oCanonical.raw();
+	bool neg_this = canon_this[ 0 ] == D_VALID_CHARACTERS[ D_A_MINUS ];
+	bool neg_other = canon_other[ 0 ] == D_VALID_CHARACTERS[ D_A_MINUS ];
+	if ( neg_this && ! neg_other )
+		return ( true );
+	return ( false );
+	}
+
+bool HNumber::operator > ( HNumber const& other ) const
+	{
+	return ( other < *this );
+	}
+
+bool HNumber::operator <= ( HNumber const& other ) const
+	{
+	return ( ( operator == ( other ) ) || ( operator < ( other ) ) );
+	}
+
+bool HNumber::operator >= ( HNumber const& other ) const
+	{
+	return ( other <= *this );
 	}
 
 }

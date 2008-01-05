@@ -29,7 +29,6 @@ Copyright:
 
 #line 31
 
-#include <cstddef>
 #include <cstring>
 
 #define D_VCSID_HPOOL_H "$Id$"
@@ -67,13 +66,13 @@ public:
 		} pool_type_t;
 private:
 	pool_type_t f_ePoolType;
-	size_t f_ulPoolSize;	/* size of allocated memory buffer */
-	int f_iTop;
+	int f_iAllocedBytes;	/* size of allocated memory buffer */
+	int f_iSize; /*! size of container */
 	tType* f_ptPool;	/* pointer to allocated memory pool */
 public:
-	HPool( size_t, pool_type_t = D_FIXED_SIZE );
+	HPool( int, pool_type_t = D_FIXED_SIZE );
 	virtual ~HPool( void );
-	size_t pool_realloc( size_t );
+	void pool_realloc( int );
 	tType& operator[] ( int ) const;
 	void push_back( tType const& );
 	void reset( void );
@@ -85,8 +84,8 @@ public:
 	};
 
 template<typename tType>
-HPool<tType>::HPool( size_t a_ulNewSize, pool_type_t a_ePoolType )
-	: f_ePoolType( a_ePoolType ), f_ulPoolSize( 0 ), f_iTop( 0 ),
+HPool<tType>::HPool( int a_ulNewSize, pool_type_t a_ePoolType )
+	: f_ePoolType( a_ePoolType ), f_iAllocedBytes( 0 ), f_iSize( 0 ),
 	f_ptPool( NULL )
 	{
 	M_PROLOG
@@ -98,14 +97,14 @@ HPool<tType>::HPool( size_t a_ulNewSize, pool_type_t a_ePoolType )
 
 template<typename tType>
 HPool<tType>::HPool( HPool<tType> const& source )
-	: f_ePoolType( source.f_ePoolType ), f_ulPoolSize( 0 ), f_iTop( 0 ),
+	: f_ePoolType( source.f_ePoolType ), f_iAllocedBytes( 0 ), f_iSize( 0 ),
 	f_ptPool( NULL )
 	{
 	M_PROLOG
-	if ( source.f_ulPoolSize )
+	if ( source.f_iSize )
 		{
-		pool_realloc( source.f_ulPoolSize );
-		memcpy( f_ptPool, source.f_ptPool, f_ulPoolSize * sizeof ( tType ) );
+		pool_realloc( source.f_iSize );
+		memcpy( f_ptPool, source.f_ptPool, f_iSize * sizeof ( tType ) );
 		}
 	return;
 	M_EPILOG
@@ -118,10 +117,10 @@ HPool<tType>& HPool<tType>::operator = ( HPool<tType> const& source )
 	if ( &source != this )
 		{
 		f_ePoolType = source.f_ePoolType;
-		if ( source.f_ulPoolSize )
+		if ( source.f_iSize )
 			{
-			pool_realloc( source.f_ulPoolSize );
-			memcpy( f_ptPool, source.f_ptPool, f_ulPoolSize * sizeof ( tType ) );
+			pool_realloc( source.f_iSize );
+			memcpy( f_ptPool, source.f_ptPool, f_iSize * sizeof ( tType ) );
 			}
 		}
 	return ( *this );
@@ -134,40 +133,39 @@ HPool<tType>::~HPool( void )
 	M_PROLOG
 	if ( f_ptPool )
 		xfree( f_ptPool );
-	f_ulPoolSize = 0;
-	f_iTop = 0;
+	f_iAllocedBytes = 0;
+	f_iSize = 0;
 	return;
 	M_EPILOG
 	}
 
 template<typename tType>
-size_t HPool<tType>::pool_realloc( const size_t a_ulNewSize )
+void HPool<tType>::pool_realloc( const int a_ulNewSize )
 	{
 	M_PROLOG
-	size_t l_ulOldSize = f_ulPoolSize;
 	if ( a_ulNewSize < 1 )
 		M_THROW( g_ppcErrMsgHPool[ ERROR::E_BADSIZE ], a_ulNewSize );
 	if ( f_ePoolType == D_AUTO_GROW )
 		{
-		if ( a_ulNewSize > f_ulPoolSize )
+		if ( a_ulNewSize > f_iAllocedBytes )
 			{
-			f_ulPoolSize = 1;
-			while ( f_ulPoolSize < a_ulNewSize )
-				f_ulPoolSize <<= 1;
-			f_ptPool = xrealloc<tType>( f_ptPool, f_ulPoolSize );
-			memset( f_ptPool + l_ulOldSize, 0,
-					( f_ulPoolSize - l_ulOldSize ) * sizeof ( tType ) );
+			f_iAllocedBytes = 1;
+			while ( f_iAllocedBytes < a_ulNewSize )
+				f_iAllocedBytes <<= 1;
+			f_ptPool = xrealloc<tType>( f_ptPool, f_iAllocedBytes );
+			memset( f_ptPool + f_iSize, 0,
+					( f_iAllocedBytes - f_iSize ) * sizeof ( tType ) );
 			}
 		}
-	else if ( f_ulPoolSize != a_ulNewSize )
+	else if ( f_iAllocedBytes != a_ulNewSize )
 		{
 		if ( f_ptPool && ( f_ePoolType == D_FIXED_SIZE ) )
-			M_THROW( g_ppcErrMsgHPool[ ERROR::E_REALLOC_FIXED ], f_ulPoolSize );
-		f_ulPoolSize = a_ulNewSize;
-		f_ptPool = xrealloc<tType>( f_ptPool, f_ulPoolSize );
+			M_THROW( g_ppcErrMsgHPool[ ERROR::E_REALLOC_FIXED ], f_iAllocedBytes );
+		f_iAllocedBytes = a_ulNewSize;
+		f_ptPool = xrealloc<tType>( f_ptPool, f_iAllocedBytes );
 		}
-	f_iTop = a_ulNewSize;
-	return ( f_ulPoolSize - l_ulOldSize );
+	f_iSize = a_ulNewSize;
+	return;
 	M_EPILOG
 	}
 
@@ -175,7 +173,7 @@ template<typename tType>
 tType& HPool<tType>::operator[]( int a_iIndex ) const
 	{
 	M_PROLOG
-	if ( ( a_iIndex < 0 ) || ( a_iIndex >= f_iTop ) )
+	if ( ( a_iIndex < 0 ) || ( a_iIndex >= f_iSize ) )
 		M_THROW( g_ppcErrMsgHPool[ ERROR::E_BADINDEX ], a_iIndex );
 	return ( f_ptPool[ a_iIndex ] );
 	M_EPILOG
@@ -185,8 +183,8 @@ template<typename tType>
 void HPool<tType>::push_back( tType const& a_tPod )
 	{
 	M_PROLOG
-	size_t l_iOldTop = f_iTop;
-	pool_realloc( f_iTop + 1 );
+	int l_iOldTop = f_iSize;
+	pool_realloc( f_iSize + 1 );
 	f_ptPool[ l_iOldTop ] = a_tPod;
 	return;
 	M_EPILOG
@@ -195,13 +193,13 @@ void HPool<tType>::push_back( tType const& a_tPod )
 template<typename tType>
 void HPool<tType>::reset( void )
 	{
-	f_iTop = 0;
+	f_iSize = 0;
 	}
 
 template<typename tType>
 int HPool<tType>::size( void ) const
 	{
-	return ( f_iTop );
+	return ( f_iSize );
 	}
 
 template<typename tType>
@@ -210,16 +208,16 @@ void HPool<tType>::swap( HPool<tType>& other )
 	if ( &other != this )
 		{
 		pool_type_t l_ePoolType = f_ePoolType;
-		size_t l_ulPoolSize = f_ulPoolSize;
-		int l_iTop = f_iTop;
+		int l_ulPoolSize = f_iAllocedBytes;
+		int l_iTop = f_iSize;
 		tType* l_ptPool = f_ptPool;
 		f_ePoolType = other.f_ePoolType;
-		f_ulPoolSize = other.f_ulPoolSize;
-		f_iTop = other.f_iTop;
+		f_iAllocedBytes = other.f_iAllocedBytes;
+		f_iSize = other.f_iSize;
 		f_ptPool = other.f_ptPool;
 		other.f_ePoolType = l_ePoolType;
-		other.f_ulPoolSize = l_ulPoolSize;
-		other.f_iTop = l_iTop;
+		other.f_iAllocedBytes = l_ulPoolSize;
+		other.f_iSize = l_iTop;
 		other.f_ptPool = l_ptPool;
 		}
 	return;
