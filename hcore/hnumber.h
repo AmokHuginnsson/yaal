@@ -40,6 +40,9 @@ class HNumber
 	{
 	typedef HPool<char> canonical_t;
 	int f_iPrecision;
+	bool f_bNegative;
+	int f_iDigitCount;
+	int f_iIntegralPartSize;
 	canonical_t f_oCanonical;
 public:
 	static int D_DEFAULT_PRECISION;
@@ -94,13 +97,17 @@ public:
 	HNumber operator * ( HNumber const& );
 	HNumber operator - ( HNumber const& );
 	HNumber operator / ( HNumber const& );
+	void swap( HNumber& );
 	void set_precision( int );
 	int get_precision( void ) const;
 	double long to_double( void ) const;
 	HString to_string( void ) const;
+	bool is_exact( void ) const;
 private:
+	int integral_length( void ) const;
+	int decimal_length( void ) const;
 	void from_string( HString const& );
-	void from_double( double );
+	void from_double( double long );
 	};
 
 }
