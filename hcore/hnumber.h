@@ -78,6 +78,8 @@ public:
 	 * __._22.2__  = ex
 	 * _-._1_      = ex
 	 */
+	HNumber( char const* const );
+	HNumber( char const* const, int );
 	HNumber( HString const& );
 	HNumber( HString const&, int );
 	HNumber( HNumber const& );
@@ -93,10 +95,11 @@ public:
 	HNumber& operator *= ( HNumber const& );
 	HNumber& operator -= ( HNumber const& );
 	HNumber& operator /= ( HNumber const& );
-	HNumber operator + ( HNumber const& );
-	HNumber operator * ( HNumber const& );
-	HNumber operator - ( HNumber const& );
-	HNumber operator / ( HNumber const& );
+	HNumber operator + ( HNumber const& ) const;
+	HNumber operator * ( HNumber const& ) const;
+	HNumber operator - ( HNumber const& ) const;
+	HNumber operator - ( void ) const;
+	HNumber operator / ( HNumber const& ) const;
 	void swap( HNumber& );
 	void set_precision( int );
 	int get_precision( void ) const;

@@ -80,21 +80,21 @@ public:
 	HMatrix _1 ( void );
 	HMatrix & operator = ( HMatrix const & );
 	HMatrix & operator = ( tType const );
-	HMatrix operator + ( HMatrix const & );
-	HMatrix operator - ( HMatrix const & );
-	HMatrix operator - ( void );
-	HMatrix operator * ( HMatrix const & );
-	HMatrix operator * ( tType const );
-	HMatrix operator / ( tType const );
+	HMatrix operator + ( HMatrix const & ) const;
+	HMatrix operator - ( HMatrix const & ) const;
+	HMatrix operator - ( void ) const;
+	HMatrix operator * ( HMatrix const & ) const;
+	HMatrix operator * ( tType const ) const;
+	HMatrix operator / ( tType const ) const;
 	HMatrix & operator += ( HMatrix const & );
 	HMatrix & operator -= ( HMatrix const & );
 	HMatrix & operator *= ( HMatrix const & );
 	HMatrix & operator *= ( tType const );
 	HMatrix & operator /= ( tType const );
-	HMatrix operator ~ ( void );
-	tType operator ! ( void );
-	bool operator == ( HMatrix const & );
-	bool operator != ( HMatrix const & );
+	HMatrix operator ~ ( void ) const;
+	tType operator ! ( void ) const;
+	bool operator == ( HMatrix const & ) const;
+	bool operator != ( HMatrix const & ) const;
 	template < typename ttType >
 	friend HVector < ttType > operator * ( HVector < ttType > const &,
 			HMatrix const & );
@@ -104,7 +104,7 @@ public:
 	template < typename ttType >
 	friend HMatrix operator * ( ttType const, HMatrix < ttType > const & );
 private:
-	inline void check_dimensions_columns_rows ( int a_iRowsAnother )
+	inline void check_dimensions_columns_rows ( int a_iRowsAnother ) const
 		{
 		M_PROLOG
 		if ( f_iColumns != a_iRowsAnother )
@@ -114,7 +114,7 @@ private:
 		M_EPILOG
 		}
 	inline void check_dimensions_rows_columns ( int a_iRowsAnother,
-			int a_iColumnsAnother )
+			int a_iColumnsAnother ) const
 		{
 		M_PROLOG
 		if ( f_iRows != a_iRowsAnother )
@@ -126,7 +126,7 @@ private:
 		return;
 		M_EPILOG
 		}
-	inline void check_dimensions_square ( void )
+	inline void check_dimensions_square ( void ) const
 		{
 		M_PROLOG
 		if ( f_iRows != f_iColumns )
@@ -354,7 +354,7 @@ HMatrix < tType > & HMatrix < tType > ::operator = ( tType const a_tScalar )
 	}
 	
 template < typename tType >
-HMatrix < tType > HMatrix < tType > ::operator + ( HMatrix const & a_roMatrix )
+HMatrix < tType > HMatrix < tType > ::operator + ( HMatrix const & a_roMatrix ) const
 	{
 	M_PROLOG
 	check_dimensions_rows_columns ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
@@ -365,7 +365,7 @@ HMatrix < tType > HMatrix < tType > ::operator + ( HMatrix const & a_roMatrix )
 	}
 	
 template < typename tType >
-HMatrix < tType > HMatrix < tType > ::operator - ( HMatrix const & a_roMatrix )
+HMatrix < tType > HMatrix < tType > ::operator - ( HMatrix const & a_roMatrix ) const
 	{
 	M_PROLOG
 	check_dimensions_rows_columns ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
@@ -376,7 +376,7 @@ HMatrix < tType > HMatrix < tType > ::operator - ( HMatrix const & a_roMatrix )
 	}
 	
 template < typename tType >
-HMatrix < tType > HMatrix < tType > ::operator - ( void )
+HMatrix < tType > HMatrix < tType > ::operator - ( void ) const
 	{
 	M_PROLOG
 	HMatrix < tType > l_oMatrix ( f_iRows, f_iColumns );
@@ -387,7 +387,7 @@ HMatrix < tType > HMatrix < tType > ::operator - ( void )
 	}
 	
 template < typename tType >
-HMatrix < tType > HMatrix < tType > ::operator * ( HMatrix const & a_roMatrix )
+HMatrix < tType > HMatrix < tType > ::operator * ( HMatrix const & a_roMatrix ) const
 	{
 	M_PROLOG
 	check_dimensions_columns_rows ( a_roMatrix.f_iRows );
@@ -406,7 +406,7 @@ HMatrix < tType > HMatrix < tType > ::operator * ( HMatrix const & a_roMatrix )
 	}
 	
 template < typename tType >
-HMatrix < tType > HMatrix < tType > ::operator * ( tType const a_tScalar )
+HMatrix < tType > HMatrix < tType > ::operator * ( tType const a_tScalar ) const
 	{
 	M_PROLOG
 	HMatrix l_oMatrix ( * this );
@@ -416,7 +416,7 @@ HMatrix < tType > HMatrix < tType > ::operator * ( tType const a_tScalar )
 	}
 	
 template < typename tType >
-HMatrix < tType > HMatrix < tType > ::operator / ( tType const a_tScalar )
+HMatrix < tType > HMatrix < tType > ::operator / ( tType const a_tScalar ) const
 	{
 	M_PROLOG
 	HMatrix l_oMatrix ( * this );
@@ -486,7 +486,7 @@ HMatrix < tType > & HMatrix < tType > ::operator /= ( tType const a_tScalar )
 	}
 	
 template < typename tType >
-HMatrix < tType > HMatrix < tType > ::operator ~ ( void )
+HMatrix < tType > HMatrix < tType > ::operator ~ ( void ) const
 	{
 	M_PROLOG
 	int l_iCtr;
@@ -498,7 +498,7 @@ HMatrix < tType > HMatrix < tType > ::operator ~ ( void )
 	}
 	
 template < typename tType >
-tType HMatrix < tType > ::operator ! ( void )
+tType HMatrix < tType > ::operator ! ( void ) const
 	{
 	M_PROLOG
 	return ( det() );
@@ -506,7 +506,7 @@ tType HMatrix < tType > ::operator ! ( void )
 	}
 	
 template < typename tType >
-bool HMatrix < tType > ::operator == ( HMatrix const & a_roMatrix )
+bool HMatrix < tType > ::operator == ( HMatrix const & a_roMatrix ) const
 	{
 	M_PROLOG
 	check_dimensions_rows_columns ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
@@ -519,7 +519,7 @@ bool HMatrix < tType > ::operator == ( HMatrix const & a_roMatrix )
 	}
 	
 template < typename tType >
-bool HMatrix < tType > ::operator != ( HMatrix const & a_roMatrix )
+bool HMatrix < tType > ::operator != ( HMatrix const & a_roMatrix ) const
 	{
 	M_PROLOG
 	return ( ! ( * this == a_roMatrix ) );

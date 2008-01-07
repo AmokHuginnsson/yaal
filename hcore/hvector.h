@@ -63,27 +63,27 @@ public:
 	int dim ( void );
 	int set ( tType const * );
 	int normalize ( void );
-	tType norm ( void );
-	HVector & operator = ( HVector const & );
-	HVector & operator = ( tType const );
-	HVector operator + ( HVector const & );
-	HVector operator - ( HVector const & );
-	HVector operator - ( void );
-	HVector operator * ( tType const );
-	HVector operator / ( tType const );
-	HVector & operator += ( HVector const & );
-	HVector & operator -= ( HVector const & );
-	HVector & operator *= ( tType const );
-	HVector & operator /= ( tType const );
-	tType operator | ( HVector const & );
-	tType operator ! ( void );
-	bool operator == ( HVector const & );
-	bool operator != ( HVector const & );
+	tType norm ( void ) const;
+	HVector& operator = ( HVector const& );
+	HVector& operator = ( tType const );
+	HVector operator + ( HVector const& ) const;
+	HVector operator - ( HVector const& ) const;
+	HVector operator - ( void ) const;
+	HVector operator * ( tType const ) const;
+	HVector operator / ( tType const ) const;
+	HVector& operator += ( HVector const& );
+	HVector& operator -= ( HVector const& );
+	HVector& operator *= ( tType const );
+	HVector& operator /= ( tType const );
+	tType operator | ( HVector const& ) const;
+	tType operator ! ( void ) const;
+	bool operator == ( HVector const& ) const;
+	bool operator != ( HVector const& ) const;
 	template < typename ttType >
-	friend HVector < ttType > operator * ( ttType const,
-			HVector < ttType > const & );
+	friend HVector<ttType> operator * ( ttType const,
+			HVector<ttType> const& );
 private:
-	inline void check_dimensions ( int a_iSizeAnother )
+	inline void check_dimensions ( int a_iSizeAnother ) const
 		{
 		M_PROLOG
 		if ( this->f_iSize != a_iSizeAnother )
@@ -134,7 +134,7 @@ int HVector < tType > ::set ( tType const * a_pdBody )
 	}
 
 template < typename tType >
-tType HVector < tType > ::norm ( void )
+tType HVector < tType > ::norm ( void ) const
 	{
 	M_PROLOG
 	int l_iCtr;
@@ -184,7 +184,7 @@ HVector < tType > & HVector < tType > ::operator = ( tType const a_tScalar )
 	}
 
 template < typename tType >
-HVector < tType > HVector < tType > ::operator + ( HVector const & a_roVector )
+HVector < tType > HVector < tType > ::operator + ( HVector const & a_roVector ) const
 	{
 	M_PROLOG
 	check_dimensions ( a_roVector.f_iSize );
@@ -195,7 +195,7 @@ HVector < tType > HVector < tType > ::operator + ( HVector const & a_roVector )
 	}
 
 template < typename tType >
-HVector < tType > HVector < tType > ::operator - ( HVector const & a_roVector )
+HVector < tType > HVector < tType > ::operator - ( HVector const & a_roVector ) const
 	{
 	M_PROLOG
 	check_dimensions ( a_roVector.f_iSize );
@@ -206,7 +206,7 @@ HVector < tType > HVector < tType > ::operator - ( HVector const & a_roVector )
 	}
 
 template < typename tType >
-HVector < tType > HVector < tType > ::operator - ( void )
+HVector < tType > HVector < tType > ::operator - ( void ) const
 	{
 	M_PROLOG
 	HVector l_oVector ( this->f_iSize );
@@ -217,7 +217,7 @@ HVector < tType > HVector < tType > ::operator - ( void )
 	}
 
 template < typename tType >
-HVector < tType > HVector < tType > ::operator * ( tType const a_tScalar )
+HVector < tType > HVector < tType > ::operator * ( tType const a_tScalar ) const
 	{
 	M_PROLOG
 	HVector l_oVector ( * this );
@@ -227,7 +227,7 @@ HVector < tType > HVector < tType > ::operator * ( tType const a_tScalar )
 	}
 
 template < typename tType >
-HVector < tType > HVector < tType > ::operator / ( tType const a_tScalar )
+HVector < tType > HVector < tType > ::operator / ( tType const a_tScalar ) const
 	{
 	M_PROLOG
 	HVector l_oVector ( * this );
@@ -284,7 +284,7 @@ HVector < tType > & HVector < tType > ::operator /= ( tType const a_tScalar )
 	}
 
 template < typename tType >
-tType HVector < tType > ::operator | ( HVector const & a_roVector )
+tType HVector < tType > ::operator | ( HVector const & a_roVector ) const
 	{
 	M_PROLOG
 	tType l_tScalar = 0;
@@ -297,7 +297,7 @@ tType HVector < tType > ::operator | ( HVector const & a_roVector )
 	}
 
 template < typename tType >
-tType HVector < tType > ::operator ! ( void )
+tType HVector < tType > ::operator ! ( void ) const
 	{
 	M_PROLOG
 	return ( norm() );
@@ -305,7 +305,7 @@ tType HVector < tType > ::operator ! ( void )
 	}
 
 template < typename tType >
-bool HVector < tType > ::operator == ( HVector const & a_roVector )
+bool HVector < tType > ::operator == ( HVector const & a_roVector ) const
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -318,7 +318,7 @@ bool HVector < tType > ::operator == ( HVector const & a_roVector )
 	}
 
 template < typename tType >
-bool HVector < tType > ::operator != ( HVector const & a_roVector )
+bool HVector < tType > ::operator != ( HVector const & a_roVector ) const
 	{
 	M_PROLOG
 	return ( ! ( * this == a_roVector ) );

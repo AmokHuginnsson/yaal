@@ -94,6 +94,30 @@ HNumber::HNumber( double long a_dNumber, int a_iPrecision )
 	M_EPILOG
 	}
 
+HNumber::HNumber( char const* const a_pcNumber )
+	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
+			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
+	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
+	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
+	{
+	M_PROLOG
+	from_string( a_pcNumber );
+	return;
+	M_EPILOG
+	}
+
+HNumber::HNumber( char const* const a_pcNumber, int a_iPrecision )
+	: f_iPrecision( a_iPrecision > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
+			? a_iPrecision : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
+	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
+	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
+	{
+	M_PROLOG
+	from_string( a_pcNumber );
+	return;
+	M_EPILOG
+	}
+
 HNumber::HNumber( HString const& a_oNumber )
 	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
 			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
@@ -182,11 +206,66 @@ void HNumber::from_string( HString const& a_oNumber )
 	{
 	M_PROLOG
 	int start = a_oNumber.find_one_of( D_VALID_CHARACTERS );
-	M_ENSURE( start >= 0 );
+	M_ENSURE( start >= 0 ); /* exclude "!!!!" */
 	char const* const src = a_oNumber.raw();
-	f_bNegative = ( src[ start ] == D_VALID_CHARACTERS[ D_A_MINUS ] );
+	f_bNegative = ( src[ start ] == D_VALID_CHARACTERS[ D_A_MINUS ] ); /* "!!!-???" */
 	if ( f_bNegative )
 		++ start;
+	int len = a_oNumber.get_length();
+	M_ENSURE( start < len ); /* exclude "!!-" */
+	M_ENSURE( a_oNumber.find_one_of( D_VALID_CHARACTERS + D_A_DOT, start ) == start ); /* exclude "--" and "-!!" */
+	int idx = a_oNumber.find_other_than( "0", start );
+	int end = start + 1;
+	if ( idx < 0 ) /* "!!!-0" or "00000" */
+		{
+		f_bNegative = false;
+		f_iIntegralPartSize = 1;
+		f_iDigitCount = 1;
+		}
+	else /* "!!![-][.1-9]???" */
+		{
+		start = idx;
+		int dot = a_oNumber.find( D_VALID_CHARACTERS[ D_A_DOT ], start );
+		log_trace << "dot1: " << dot << endl;
+		idx = a_oNumber.find_other_than( D_VALID_CHARACTERS + D_A_DOT, start );
+		if ( ( idx >= 0 ) && ( idx < dot ) ) /* "!!232!!." */
+			dot = -1;
+		int digit = a_oNumber.find_one_of( D_VALID_CHARACTERS + D_A_ZERO, start );
+		M_ENSURE( digit >= 0 ); /* must have digit */
+		M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
+		end = a_oNumber.find_other_than( D_VALID_CHARACTERS + ( dot >= 0 ? D_A_ZERO : D_A_DOT ), dot >= 0 ? dot + 1 : start );
+		log_trace << "end: " << end << endl;
+		if ( end < 0 )
+			end = len;
+		log_trace << "dot2: " << dot << endl;
+		if ( dot >= 0 )
+			{
+			log_trace << "len - end: " << len - end << endl;
+			idx = a_oNumber.reverse_find_other_than( "0", len - end );
+			if ( idx >= 0 )
+				end = len - idx;
+			}
+		f_iDigitCount = end - start;
+		if ( dot >= 0 )
+			{
+			f_iIntegralPartSize = dot - start;
+			-- f_iDigitCount;
+			}
+		else
+			f_iIntegralPartSize = f_iDigitCount;
+		}
+	if ( decimal_length() > f_iPrecision )
+		f_iPrecision = decimal_length();
+	log_trace << a_oNumber << " " << f_iPrecision << " " << f_iDigitCount << " " << f_iIntegralPartSize << " " << decimal_length() << endl;
+	f_oCanonical.pool_realloc( f_iDigitCount );
+	char* dst = f_oCanonical.raw();
+	idx = 0;
+	for ( int i = start; i < end; ++ i )
+		{
+		if ( src[ i ] == D_VALID_CHARACTERS[ D_A_DOT ] )
+			continue;
+		dst[ idx ++ ] = src[ i ] - D_VALID_CHARACTERS[ D_A_ZERO ];
+		}
 	return;
 	M_EPILOG
 	}
@@ -224,7 +303,8 @@ int HNumber::get_precision( void ) const
 void HNumber::set_precision( int a_iPrecision )
 	{
 	M_PROLOG
-	f_iPrecision = a_iPrecision;
+	if ( ( a_iPrecision <= f_iPrecision ) || ( decimal_length() < f_iPrecision ) )
+		f_iPrecision = a_iPrecision;
 	if ( ( f_iIntegralPartSize + f_iPrecision ) < f_iDigitCount )
 		f_iDigitCount = f_iIntegralPartSize + f_iPrecision;
 	return;
@@ -279,6 +359,11 @@ bool HNumber::operator <= ( HNumber const& other ) const
 bool HNumber::operator >= ( HNumber const& other ) const
 	{
 	return ( other <= *this );
+	}
+
+HNumber HNumber::operator + ( HNumber const& ) const
+	{
+	return ( HNumber() );
 	}
 
 }
