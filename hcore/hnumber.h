@@ -95,11 +95,13 @@ public:
 	HNumber& operator *= ( HNumber const& );
 	HNumber& operator -= ( HNumber const& );
 	HNumber& operator /= ( HNumber const& );
+	HNumber& operator ^= ( int long unsigned );
 	HNumber operator + ( HNumber const& ) const;
 	HNumber operator * ( HNumber const& ) const;
 	HNumber operator - ( HNumber const& ) const;
 	HNumber operator - ( void ) const;
 	HNumber operator / ( HNumber const& ) const;
+	HNumber operator ^ ( int long unsigned ) const;
 	void swap( HNumber& );
 	void set_precision( int );
 	int get_precision( void ) const;

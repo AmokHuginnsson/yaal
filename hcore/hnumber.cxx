@@ -510,16 +510,16 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 		char const* const fo = f_oCanonical.raw();
 		char const* const fi = factor.f_oCanonical.raw();
 		element.f_iDigitCount = factor.f_iDigitCount + 1; /* one for carrier */
-		int digit = f_iDigitCount - 1; /* index of last digit in first factor */
+		int digit = f_iDigitCount; /* index of last digit in first factor */
 		int decimal = decimal_length() + factor.decimal_length();
-		while ( digit >= 0 )
+		while ( -- digit >= 0 )
 			{
 			int carrier = 0;
-			int inner = factor.f_iDigitCount - 1; /* index of last digit in second factor */
+			int inner = factor.f_iDigitCount; /* index of last digit in second factor */
 			e[ element.f_iDigitCount - 1 ] = 0;
 			if ( fo[ digit ] )
 				{
-				while ( inner >= 0 )
+				while ( -- inner >= 0 )
 					{
 					int pos = inner + 1;
 					e[ pos ] = fo[ digit ] * fi[ inner ] + carrier;
@@ -530,7 +530,6 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 						}
 					else
 						carrier = 0;
-					-- inner;
 					}
 				e[ 0 ] = carrier;
 				int lz = 0;
@@ -547,7 +546,6 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 					element.f_iDigitCount += lz;
 				}
 			++ element.f_iDigitCount;
-			-- digit;
 			}
 		n.f_bNegative = ! ( ( f_bNegative && factor.f_bNegative ) || ! ( f_bNegative || factor.f_bNegative ) );
 		}
@@ -578,6 +576,20 @@ HNumber HNumber::operator - ( void ) const
 	if ( f_iDigitCount )
 		n.f_bNegative = ! n.f_bNegative;
 	return ( n );
+	}
+
+HNumber HNumber::operator ^ ( int long unsigned exp ) const
+	{
+	HNumber n( *this );
+	while ( -- exp )
+		n *= *this;
+	return ( n );
+	}
+
+HNumber& HNumber::operator ^= ( int long unsigned exp )
+	{
+	operator = ( *this ^ exp );
+	return ( *this );
 	}
 
 }
