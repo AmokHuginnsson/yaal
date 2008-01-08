@@ -379,7 +379,99 @@ bool HNumber::operator >= ( HNumber const& other ) const
 
 HNumber HNumber::operator + ( HNumber const& element ) const
 	{
-	return ( element );
+	int ips = max( f_iIntegralPartSize, element.f_iIntegralPartSize );
+	int dps = max( decimal_length(), element.decimal_length() );
+	HNumber n;
+	if ( decimal_length() < element.decimal_length() )
+		n.f_iPrecision = is_exact() ? element.f_iPrecision : f_iPrecision;
+	else
+		n.f_iPrecision = element.is_exact() ? f_iPrecision : element.f_iPrecision;
+	( dps <= n.f_iPrecision ) || ( dps = n.f_iPrecision );
+	int ressize = ips + dps + 1; /* + 1 for possible carrier */
+	n.f_oCanonical.pool_realloc( ressize );
+	n.f_iIntegralPartSize = ips;
+	char* res = n.f_oCanonical.raw();
+	bool carrier = false;
+	char* ep1 = f_oCanonical.raw();
+	char* ep2 = element.f_oCanonical.raw();
+	int idx = ressize - 1; /* index of first processed digit */
+	int lm[] = { ips - f_iIntegralPartSize, ips - element.f_iIntegralPartSize };
+	int rm[] = { dps - decimal_length(), dps - element.decimal_length() };
+	( rm[ 0 ] >= 0 ) || ( rm[ 0 ] = 0 );
+	( rm[ 1 ] >= 0 ) || ( rm[ 1 ] = 0 );
+	int e[ 2 ];
+	char* ep[] = { ep1, ep2 };
+	bool sub = ( ( f_bNegative && ! element.f_bNegative ) || ( ! f_bNegative && element.f_bNegative ) );
+	bool swp = sub && ( f_bNegative ? -*this < element : *this < -element );
+	while ( idx > 0 )
+		{
+		int ld = idx; /* left index distance */
+		int rd = ( ressize - 1 ) - idx;/* right index distance */
+		for ( int i = 0; i < 2; ++ i )
+			{
+			int k = swp ? 1 - i : i;
+			e[ i ] = 0;
+			if ( ep[ k ] && ( ld >= lm[ k ] ) && ( rd >= rm[ k ] ) )
+				e[ i ] = ep[ k ][ ( idx - lm[ k ] ) - 1 ];
+			}
+		if ( sub )
+			{
+			int x = e[ 0 ] - ( carrier ? 1 : 0 );
+			if ( x < e[ 1 ] )
+				{
+				x += 10;
+				carrier = true;
+				}
+			else
+				carrier = false;
+			res[ idx ] = x - e[ 1 ];
+			}
+		else
+			{
+			res[ idx ] =  e[ 0 ] + e[ 1 ] + ( carrier ? 1 : 0 );
+			if ( res[ idx ] > 9 )
+				{
+				res[ idx ] -= 10;
+				carrier = true;
+				}
+			else
+				carrier = false;
+			}
+		-- idx;
+		}
+	if ( ressize > 0 )
+		{
+		if ( sub )
+			{
+			int shift = 1;
+			while ( ( res[ shift ] == 0 ) && ( shift <= n.f_iIntegralPartSize ) )
+				++ shift;
+			ressize -= shift;
+			++ n.f_iIntegralPartSize -= shift;
+			::memmove( res, res + shift , ressize );
+			n.f_bNegative = f_bNegative ? ! swp : swp;
+			}
+		else
+			{
+			n.f_bNegative = f_bNegative && element.f_bNegative;
+			if ( carrier )
+				{
+				res[ 0 ] = 1;
+				++ n.f_iIntegralPartSize;
+				}
+			else
+				{
+				-- ressize;
+				::memmove( res, res + 1, ressize );
+				}
+			}
+		}
+	n.f_iDigitCount = ressize;
+	while ( ( n.decimal_length() > 0 ) && ( res[ n.f_iDigitCount - 1 ] == 0 ) )
+		-- n.f_iDigitCount;
+	if ( n.f_iDigitCount == 0 )
+		n.f_bNegative = false;
+	return ( n );
 	}
 
 HNumber& HNumber::operator += ( HNumber const& element )
@@ -427,7 +519,10 @@ HNumber& HNumber::operator /= ( HNumber const& )
 
 HNumber HNumber::operator - ( void ) const
 	{
-	return ( HNumber() );
+	HNumber n( *this );
+	if ( f_iDigitCount )
+		n.f_bNegative = ! n.f_bNegative;
+	return ( n );
 	}
 
 }
