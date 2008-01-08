@@ -225,7 +225,6 @@ void HNumber::from_string( HString const& a_oNumber )
 		{
 		start = idx;
 		int dot = a_oNumber.find( D_VALID_CHARACTERS[ D_A_DOT ], start );
-		log_trace << "dot1: " << dot << endl;
 		idx = a_oNumber.find_other_than( D_VALID_CHARACTERS + D_A_DOT, start );
 		if ( ( idx >= 0 ) && ( idx < dot ) ) /* "!!232!!." */
 			dot = -1;
@@ -233,13 +232,10 @@ void HNumber::from_string( HString const& a_oNumber )
 		M_ENSURE( digit >= 0 ); /* must have digit */
 		M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
 		end = a_oNumber.find_other_than( D_VALID_CHARACTERS + ( dot >= 0 ? D_A_ZERO : D_A_DOT ), dot >= 0 ? dot + 1 : start );
-		log_trace << "end: " << end << endl;
 		if ( end < 0 )
 			end = len;
-		log_trace << "dot2: " << dot << endl;
 		if ( dot >= 0 )
 			{
-			log_trace << "len - end: " << len - end << endl;
 			idx = a_oNumber.reverse_find_other_than( "0", len - end );
 			if ( idx >= 0 )
 				end = len - idx;
@@ -489,7 +485,7 @@ HNumber HNumber::operator - ( HNumber const& element ) const
 
 HNumber& HNumber::operator -= ( HNumber const& element )
 	{
-	operator += ( -element );
+	operator = ( *this + -element );
 	return ( *this );
 	}
 
