@@ -54,11 +54,10 @@ int HNumber::D_DEFAULT_PRECISION = 100;
 HNumber::HNumber( void )
 	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
 			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
-	f_bNegative( false ), f_iDigitCount( 1 ), f_iIntegralPartSize( 1 ),
+	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
 	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
 	{
 	M_PROLOG
-	f_oCanonical[ 0 ] = 0;
 	return;
 	M_EPILOG
 	}
@@ -219,8 +218,8 @@ void HNumber::from_string( HString const& a_oNumber )
 	if ( idx < 0 ) /* "!!!-0" or "00000" */
 		{
 		f_bNegative = false;
-		f_iIntegralPartSize = 1;
-		f_iDigitCount = 1;
+		f_iIntegralPartSize = 0;
+		f_iDigitCount = 0;
 		}
 	else /* "!!![-][.1-9]???" */
 		{
@@ -253,18 +252,17 @@ void HNumber::from_string( HString const& a_oNumber )
 			}
 		else
 			f_iIntegralPartSize = f_iDigitCount;
-		}
-	if ( decimal_length() > f_iPrecision )
-		f_iPrecision = decimal_length();
-	log_trace << a_oNumber << " " << f_iPrecision << " " << f_iDigitCount << " " << f_iIntegralPartSize << " " << decimal_length() << endl;
-	f_oCanonical.pool_realloc( f_iDigitCount );
-	char* dst = f_oCanonical.raw();
-	idx = 0;
-	for ( int i = start; i < end; ++ i )
-		{
-		if ( src[ i ] == D_VALID_CHARACTERS[ D_A_DOT ] )
-			continue;
-		dst[ idx ++ ] = src[ i ] - D_VALID_CHARACTERS[ D_A_ZERO ];
+		if ( decimal_length() > f_iPrecision )
+			f_iPrecision = decimal_length();
+		f_oCanonical.pool_realloc( f_iDigitCount );
+		char* dst = f_oCanonical.raw();
+		idx = 0;
+		for ( int i = start; i < end; ++ i )
+			{
+			if ( src[ i ] == D_VALID_CHARACTERS[ D_A_DOT ] )
+				continue;
+			dst[ idx ++ ] = src[ i ] - D_VALID_CHARACTERS[ D_A_ZERO ];
+			}
 		}
 	return;
 	M_EPILOG
@@ -284,6 +282,8 @@ HString HNumber::to_string( void ) const
 		str += D_VALID_CHARACTERS[ D_A_DOT ];
 	for ( ; digit < f_iDigitCount; ++ digit )
 		str += static_cast<char>( src[ digit ] + D_VALID_CHARACTERS[ D_A_ZERO ] );
+	if ( ! f_iDigitCount )
+		str = "0";
 	return ( str );
 	M_EPILOG
 	}
@@ -337,13 +337,29 @@ bool HNumber::operator != ( HNumber const& other ) const
 
 bool HNumber::operator < ( HNumber const& other ) const
 	{
-	char const* canon_this = f_oCanonical.raw();
-	char const* canon_other = other.f_oCanonical.raw();
-	bool neg_this = canon_this[ 0 ] == D_VALID_CHARACTERS[ D_A_MINUS ];
-	bool neg_other = canon_other[ 0 ] == D_VALID_CHARACTERS[ D_A_MINUS ];
-	if ( neg_this && ! neg_other )
-		return ( true );
-	return ( false );
+	char const* p1 = f_oCanonical.raw();
+	char const* p2 = other.f_oCanonical.raw();
+	bool lower = false;
+	if ( f_bNegative && ! other.f_bNegative )
+		lower = true;
+	else if ( ( f_bNegative && other.f_bNegative ) || ( ! ( f_bNegative || other.f_bNegative ) ) )
+		{
+		int cmp = 1;
+		if ( f_iIntegralPartSize < other.f_iIntegralPartSize )
+			lower = true;
+		else if ( f_iIntegralPartSize == other.f_iIntegralPartSize )
+			{
+			int len = min( f_iDigitCount, other.f_iDigitCount );
+			cmp = memcmp( p1, p2, len );
+			if ( ! cmp )
+				lower = f_iDigitCount < other.f_iDigitCount;
+			else
+				lower = cmp < 0;
+			}
+		if ( cmp && f_bNegative && other.f_bNegative )
+			lower = ! lower;
+		}
+	return ( lower );
 	}
 
 bool HNumber::operator > ( HNumber const& other ) const
@@ -361,7 +377,55 @@ bool HNumber::operator >= ( HNumber const& other ) const
 	return ( other <= *this );
 	}
 
-HNumber HNumber::operator + ( HNumber const& ) const
+HNumber HNumber::operator + ( HNumber const& element ) const
+	{
+	return ( element );
+	}
+
+HNumber& HNumber::operator += ( HNumber const& element )
+	{
+	operator = ( *this + element );
+	return ( *this );
+	}
+
+HNumber HNumber::operator - ( HNumber const& element ) const
+	{
+	HNumber n( *this );
+	n -= element;
+	return ( n );
+	}
+
+HNumber& HNumber::operator -= ( HNumber const& element )
+	{
+	operator += ( -element );
+	return ( *this );
+	}
+
+HNumber HNumber::operator * ( HNumber const& factor ) const
+	{
+	HNumber n( *this );
+	n *= factor;
+	return ( n );
+	}
+
+HNumber& HNumber::operator *= ( HNumber const& )
+	{
+	return ( *this );
+	}
+
+HNumber HNumber::operator / ( HNumber const& factor ) const
+	{
+	HNumber n( *this );
+	n /= factor;
+	return ( n );
+	}
+
+HNumber& HNumber::operator /= ( HNumber const& )
+	{
+	return ( *this );
+	}
+
+HNumber HNumber::operator - ( void ) const
 	{
 	return ( HNumber() );
 	}
