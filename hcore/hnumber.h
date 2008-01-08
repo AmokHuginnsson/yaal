@@ -107,6 +107,7 @@ public:
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
 private:
+	int absolute_lower( HNumber const& ) const;
 	int integral_length( void ) const;
 	int decimal_length( void ) const;
 	void from_string( HString const& );
