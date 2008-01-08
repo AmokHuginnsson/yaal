@@ -509,37 +509,44 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 		char* e = element.f_oCanonical.raw();
 		char const* const fo = f_oCanonical.raw();
 		char const* const fi = factor.f_oCanonical.raw();
-		element.f_iDigitCount = factor.f_iDigitCount;
-		int digit = factor.f_iDigitCount - 1;
+		element.f_iDigitCount = factor.f_iDigitCount + 1; /* one for carrier */
+		int digit = f_iDigitCount - 1; /* index of last digit in first factor */
+		int decimal = decimal_length() + factor.decimal_length();
 		while ( digit >= 0 )
 			{
 			int carrier = 0;
-			int inner = f_iDigitCount - 1; /* index of last digit */
-			::memset( e, 0, element.f_iDigitCount );
-			while ( inner >= 0 )
+			int inner = factor.f_iDigitCount - 1; /* index of last digit in second factor */
+			e[ element.f_iDigitCount - 1 ] = 0;
+			if ( fo[ digit ] )
 				{
-				int pos = element.f_iDigitCount - inner;
-				e[ pos ] = fo[ inner ] * fi[ digit ] + carrier;
-				if ( e[ pos ] > 9 )
+				while ( inner >= 0 )
 					{
-					carrier = e[ pos ] / 10;
-					e[ pos ] %= 10;
+					int pos = inner + 1;
+					e[ pos ] = fo[ digit ] * fi[ inner ] + carrier;
+					if ( e[ pos ] > 9 )
+						{
+						carrier = e[ pos ] / 10;
+						e[ pos ] %= 10;
+						}
+					else
+						carrier = 0;
+					-- inner;
 					}
-				else
-					carrier = 0;
-				-- inner;
-				}
-			if ( carrier )
-				{
 				e[ 0 ] = carrier;
-				++ element.f_iDigitCount;
+				int lz = 0;
+				while ( e[ lz ] == 0 )
+					++ lz;
+				if ( lz )
+					{
+					element.f_iDigitCount -= lz;
+					::memmove( e, e + lz, element.f_iDigitCount );
+					}
+				element.f_iIntegralPartSize = element.f_iDigitCount - decimal;
+				n += element;
+				if ( lz )
+					element.f_iDigitCount += lz;
 				}
-			if ( e[ 0 ] == 0 )
-				::memmove( e, e + 1, element.f_iDigitCount );
-			element.f_iIntegralPartSize = element.f_iDigitCount - ( decimal_length() + factor.decimal_length() );
-			n += element;
-			if ( ! carrier )
-				++ element.f_iDigitCount;
+			++ element.f_iDigitCount;
 			-- digit;
 			}
 		n.f_bNegative = ! ( ( f_bNegative && factor.f_bNegative ) || ! ( f_bNegative || factor.f_bNegative ) );
