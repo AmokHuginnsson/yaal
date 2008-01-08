@@ -1,5 +1,5 @@
 #phony targets
-.PHONY: all dep static clean tags mrproper purge bin install
+.PHONY: all dep static prof clean clean-dep tags mrproper purge bin install
 
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: $(DIR_BUILD)
@@ -32,6 +32,9 @@ $(PRJNAME).info : src/$(PRJNAME).texinfo
 
 static:
 	@$(MAKE) LIBS="$(STATICLIBS)"
+
+prof:
+	@$(MAKE) LINKER_SPECIAL_FLAGS=-pg static
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
