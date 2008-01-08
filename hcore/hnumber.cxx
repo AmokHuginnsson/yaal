@@ -581,9 +581,13 @@ HNumber HNumber::operator - ( void ) const
 HNumber HNumber::operator ^ ( int long unsigned exp ) const
 	{
 	HNumber n( *this );
-	while ( -- exp )
-		n *= *this;
-	return ( n );
+	int long unsigned p = exp >> 1;
+	if ( p > 2 )
+		n = n ^ p;
+	else
+		while ( -- p )
+			n *= *this;
+	return ( ( exp % 2 ) ? ( n * n * *this ) : ( n * n ) );
 	}
 
 HNumber& HNumber::operator ^= ( int long unsigned exp )
