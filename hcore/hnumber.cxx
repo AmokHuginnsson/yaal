@@ -239,6 +239,8 @@ void HNumber::from_string( HString const& a_oNumber )
 			idx = a_oNumber.reverse_find_other_than( "0", len - end );
 			if ( idx >= 0 )
 				end = len - idx;
+			else
+				end = start + 1;
 			}
 		f_iDigitCount = end - start;
 		if ( dot >= 0 )
@@ -250,7 +252,8 @@ void HNumber::from_string( HString const& a_oNumber )
 			f_iIntegralPartSize = f_iDigitCount;
 		if ( decimal_length() > f_iPrecision )
 			f_iPrecision = decimal_length();
-		f_oCanonical.pool_realloc( f_iDigitCount );
+		if ( f_iDigitCount )
+			f_oCanonical.pool_realloc( f_iDigitCount );
 		char* dst = f_oCanonical.raw();
 		idx = 0;
 		for ( int i = start; i < end; ++ i )
