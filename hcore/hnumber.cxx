@@ -204,6 +204,7 @@ void HNumber::from_double( double long a_dNumber )
 void HNumber::from_string( HString const& a_oNumber )
 	{
 	M_PROLOG
+	/* ! - represent known but invalid character, ? - represent unknown character */
 	int start = a_oNumber.find_one_of( D_VALID_CHARACTERS );
 	M_ENSURE( start >= 0 ); /* exclude "!!!!" */
 	char const* const src = a_oNumber.raw();
@@ -213,34 +214,29 @@ void HNumber::from_string( HString const& a_oNumber )
 	int len = a_oNumber.get_length();
 	M_ENSURE( start < len ); /* exclude "!!-" */
 	M_ENSURE( a_oNumber.find_one_of( D_VALID_CHARACTERS + D_A_DOT, start ) == start ); /* exclude "--" and "-!!" */
-	int idx = a_oNumber.find_other_than( "0", start );
+	int idx = a_oNumber.find_other_than( "0", start ); /* skip leading 0s */
 	int end = start + 1;
-	if ( idx < 0 ) /* "!!!-0" or "00000" */
+	f_iIntegralPartSize = 0;
+	f_iDigitCount = 0;
+	if ( idx >= 0 ) do /* "!!![-][.1-9]???" or "000." */
 		{
-		f_bNegative = false;
-		f_iIntegralPartSize = 0;
-		f_iDigitCount = 0;
-		}
-	else /* "!!![-][.1-9]???" */
-		{
+		int first_valid = start;
 		start = idx;
 		int dot = a_oNumber.find( D_VALID_CHARACTERS[ D_A_DOT ], start );
 		idx = a_oNumber.find_other_than( D_VALID_CHARACTERS + D_A_DOT, start );
 		if ( ( idx >= 0 ) && ( idx < dot ) ) /* "!!232!!." */
 			dot = -1;
 		int digit = a_oNumber.find_one_of( D_VALID_CHARACTERS + D_A_ZERO, start );
+		if ( ( digit < 0 ) && ( first_valid < start ) )
+			break;
 		M_ENSURE( digit >= 0 ); /* must have digit */
 		M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
 		end = a_oNumber.find_other_than( D_VALID_CHARACTERS + ( dot >= 0 ? D_A_ZERO : D_A_DOT ), dot >= 0 ? dot + 1 : start );
-		if ( end < 0 )
-			end = len;
+		( end >= 0 ) || ( end = len );
 		if ( dot >= 0 )
 			{
 			idx = a_oNumber.reverse_find_other_than( "0", len - end );
-			if ( idx >= 0 )
-				end = len - idx;
-			else
-				end = start + 1;
+			end = ( idx >= 0 ) ? len - idx : start + 1;
 			}
 		f_iDigitCount = end - start;
 		if ( dot >= 0 )
@@ -263,6 +259,9 @@ void HNumber::from_string( HString const& a_oNumber )
 			dst[ idx ++ ] = src[ i ] - D_VALID_CHARACTERS[ D_A_ZERO ];
 			}
 		}
+	while ( 0 );
+	if ( f_iDigitCount == 0 )
+		f_bNegative = false;
 	return;
 	M_EPILOG
 	}
