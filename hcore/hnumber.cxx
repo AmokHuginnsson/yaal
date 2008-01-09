@@ -397,7 +397,7 @@ HNumber HNumber::operator + ( HNumber const& element ) const
 	bool carrier = false;
 	char* ep1 = f_oCanonical.raw();
 	char* ep2 = element.f_oCanonical.raw();
-	int idx = ressize - 1; /* index of first processed digit */
+	int idx = ressize; /* index of first processed digit */
 	int lm[] = { ips - f_iIntegralPartSize, ips - element.f_iIntegralPartSize };
 	int rm[] = { dps - decimal_length(), dps - element.decimal_length() };
 	( rm[ 0 ] >= 0 ) || ( rm[ 0 ] = 0 );
@@ -406,7 +406,7 @@ HNumber HNumber::operator + ( HNumber const& element ) const
 	char* ep[] = { ep1, ep2 };
 	bool sub = ( ( f_bNegative && ! element.f_bNegative ) || ( ! f_bNegative && element.f_bNegative ) );
 	bool swp = sub && ( absolute_lower( element ) < 0 );
-	while ( idx > 0 )
+	while ( -- idx > 0 )
 		{
 		int ld = idx; /* left index distance */
 		int rd = ( ressize - 1 ) - idx;/* right index distance */
@@ -440,7 +440,6 @@ HNumber HNumber::operator + ( HNumber const& element ) const
 			else
 				carrier = false;
 			}
-		-- idx;
 		}
 	if ( ressize > 0 )
 		{
@@ -558,15 +557,21 @@ HNumber& HNumber::operator *= ( HNumber const& factor )
 	return ( *this );
 	}
 
-HNumber HNumber::operator / ( HNumber const& ) const
+HNumber HNumber::operator / ( HNumber const& factor ) const
 	{
+	M_ENSURE( factor != "0" )
 	HNumber n;
+	HNumber numerator;
+	HNumber denominator( factor );
+	denominator.f_iIntegralPartSize = denominator.f_iDigitCount;
+	numerator.f_oCanonical.pool_realloc( denominator.f_iDigitCount );
+	numerator.f_iDigitCount = numerator.f_iIntegralPartSize = denominator.f_iDigitCount;
 	return ( n );
 	}
 
 HNumber& HNumber::operator /= ( HNumber const& factor )
 	{
-	operator = ( *this * factor );
+	operator = ( *this / factor );
 	return ( *this );
 	}
 
