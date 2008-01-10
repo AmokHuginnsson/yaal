@@ -109,6 +109,7 @@ public:
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
 private:
+	bool mutate( char*, int long, char const*[], int long*, int long*, bool, bool ) const;
 	int absolute_lower( HNumber const& ) const;
 	int integral_length( void ) const;
 	int decimal_length( void ) const;

@@ -38,34 +38,35 @@ namespace yaal
 namespace hcore
 {
 
-void * xmalloc_internal ( int long const );
-void * xcalloc_internal ( int long const );
-void * xrealloc_internal ( void *, int long const );
-void xfree_internal ( void * * ) throw();
-char * xstrdup ( char const * const );
+void* xmalloc_internal( int long const );
+void* xcalloc_internal( int long const );
+void* xrealloc_internal( void*, int long const );
+void xfree_internal( void* ) throw();
+char* xstrdup ( char const* const );
 
-template < typename tType >
-inline tType * xmalloc ( int long const a_iCount )
+template<typename tType>
+inline tType* xmalloc( int long const a_iCount )
 	{
-	return ( static_cast < tType * > ( xmalloc_internal ( a_iCount * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( xmalloc_internal( a_iCount * sizeof ( tType ) ) ) );
 	}
 
-template < typename tType >
-inline tType * xcalloc ( int long const a_iCount )
+template<typename tType>
+inline tType* xcalloc( int long const a_iCount )
 	{
-	return ( static_cast < tType * > ( xcalloc_internal ( a_iCount * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( xcalloc_internal( a_iCount * sizeof ( tType ) ) ) );
 	}
 
-template < typename tType >
-inline tType * xrealloc ( void * a_pvPointer, int long const a_iCount )
+template<typename tType>
+inline tType* xrealloc( void* a_pvPointer, int long const a_iCount )
 	{
-	return ( static_cast < tType * > ( xrealloc_internal ( a_pvPointer, a_iCount * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( xrealloc_internal ( a_pvPointer, a_iCount * sizeof ( tType ) ) ) );
 	}
 
-template < typename tType >
-inline void xfree ( tType a_tPointer ) throw()
+template<typename tType>
+inline void xfree( tType& a_tPointer ) throw()
 	{
-	xfree_internal ( reinterpret_cast < void * * > ( & a_tPointer ) );
+	xfree_internal( a_tPointer );
+	a_tPointer = NULL;
 	return;
 	}
 

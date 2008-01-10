@@ -380,42 +380,23 @@ bool HNumber::operator >= ( HNumber const& other ) const
 	return ( other <= *this );
 	}
 
-HNumber HNumber::operator + ( HNumber const& element ) const
+bool HNumber::mutate( char* res, int long ressize, char const* ep[], int long* lm, int long* rm, bool sub, bool swp ) const
 	{
-	int ips = max( f_iIntegralPartSize, element.f_iIntegralPartSize );
-	int dps = max( decimal_length(), element.decimal_length() );
-	HNumber n;
-	if ( decimal_length() < element.decimal_length() )
-		n.f_iPrecision = is_exact() ? element.f_iPrecision : f_iPrecision;
-	else
-		n.f_iPrecision = element.is_exact() ? f_iPrecision : element.f_iPrecision;
-	( dps <= n.f_iPrecision ) || ( dps = n.f_iPrecision );
-	int ressize = ips + dps + 1; /* + 1 for possible carrier */
-	n.f_oCanonical.pool_realloc( ressize );
-	n.f_iIntegralPartSize = ips;
-	char* res = n.f_oCanonical.raw();
 	bool carrier = false;
-	char* ep1 = f_oCanonical.raw();
-	char* ep2 = element.f_oCanonical.raw();
-	int idx = ressize; /* index of first processed digit */
-	int lm[] = { ips - f_iIntegralPartSize, ips - element.f_iIntegralPartSize };
-	int rm[] = { dps - decimal_length(), dps - element.decimal_length() };
-	( rm[ 0 ] >= 0 ) || ( rm[ 0 ] = 0 );
-	( rm[ 1 ] >= 0 ) || ( rm[ 1 ] = 0 );
 	int e[ 2 ];
-	char* ep[] = { ep1, ep2 };
-	bool sub = ( ( f_bNegative && ! element.f_bNegative ) || ( ! f_bNegative && element.f_bNegative ) );
-	bool swp = sub && ( absolute_lower( element ) < 0 );
+	int long idx = ressize; /* index of first processed digit */
+	char const* epx[] = { swp ? ep[ 1 ] : ep[ 0 ], swp ? ep[ 0 ] : ep[ 1 ] };
+	int long lmx[] = { swp ? lm[ 1 ] : lm[ 0 ], swp ? lm[ 0 ] : lm[ 1 ] };
+	int long rmx[] = { swp ? rm[ 1 ] : rm[ 0 ], swp ? rm[ 0 ] : rm[ 1 ] };
+	int long rd = ( ressize - 1 ) - idx;/* right index distance */
 	while ( -- idx > 0 )
 		{
-		int ld = idx; /* left index distance */
-		int rd = ( ressize - 1 ) - idx;/* right index distance */
+		++ rd;
 		for ( int i = 0; i < 2; ++ i )
 			{
-			int k = swp ? 1 - i : i;
 			e[ i ] = 0;
-			if ( ep[ k ] && ( ld > lm[ k ] ) && ( rd >= rm[ k ] ) )
-				e[ i ] = ep[ k ][ ( idx - lm[ k ] ) - 1 ];
+			if ( epx[ i ] && ( idx > lmx[ i ] ) && ( rd >= rmx[ i ] ) )
+				e[ i ] = epx[ i ][ ( idx - lmx[ i ] ) - 1 ];
 			}
 		if ( sub )
 			{
@@ -441,6 +422,33 @@ HNumber HNumber::operator + ( HNumber const& element ) const
 				carrier = false;
 			}
 		}
+	return ( carrier );
+	}
+
+HNumber HNumber::operator + ( HNumber const& element ) const
+	{
+	int long ips = max( f_iIntegralPartSize, element.f_iIntegralPartSize );
+	int long dps = max( decimal_length(), element.decimal_length() );
+	HNumber n;
+	if ( decimal_length() < element.decimal_length() )
+		n.f_iPrecision = is_exact() ? element.f_iPrecision : f_iPrecision;
+	else
+		n.f_iPrecision = element.is_exact() ? f_iPrecision : element.f_iPrecision;
+	( dps <= n.f_iPrecision ) || ( dps = n.f_iPrecision );
+	int long ressize = ips + dps + 1; /* + 1 for possible carrier */
+	n.f_oCanonical.pool_realloc( ressize );
+	n.f_iIntegralPartSize = ips;
+	char* res = n.f_oCanonical.raw();
+	char const* ep1 = f_oCanonical.raw();
+	char const* ep2 = element.f_oCanonical.raw();
+	int long lm[] = { ips - f_iIntegralPartSize, ips - element.f_iIntegralPartSize };
+	int long rm[] = { dps - decimal_length(), dps - element.decimal_length() };
+	( rm[ 0 ] >= 0 ) || ( rm[ 0 ] = 0 );
+	( rm[ 1 ] >= 0 ) || ( rm[ 1 ] = 0 );
+	char const* ep[] = { ep1, ep2 };
+	bool sub = ( ( f_bNegative && ! element.f_bNegative ) || ( ! f_bNegative && element.f_bNegative ) );
+	bool swp = sub && ( absolute_lower( element ) < 0 );
+	bool carrier = mutate( res, ressize, ep, lm, rm, sub, swp );
 	if ( ressize > 0 )
 		{
 		if ( sub )
@@ -502,22 +510,25 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 		n = factor * ( *this );
 	else if ( f_iDigitCount && factor.f_iDigitCount )
 		{
-		HNumber element;
-		n.f_oCanonical.pool_realloc( f_iDigitCount + factor.f_iDigitCount );
-		element.f_oCanonical.pool_realloc( f_iDigitCount + factor.f_iDigitCount );
-		char* e = element.f_oCanonical.raw();
+		HPool<char> element( factor.f_iDigitCount + 1 );
+		n.f_oCanonical.pool_realloc( n.f_iDigitCount = f_iDigitCount + factor.f_iDigitCount );
+		n.f_iIntegralPartSize = f_iIntegralPartSize + factor.f_iIntegralPartSize;
+		char* e = element.raw();
 		char const* const fo = f_oCanonical.raw();
 		char const* const fi = factor.f_oCanonical.raw();
-		element.f_iDigitCount = factor.f_iDigitCount + 1; /* one for carrier */
 		int digit = f_iDigitCount; /* index of last digit in first factor */
-		int decimal = decimal_length() + factor.decimal_length();
+/* variables for mutate() */
+		int long lm[] = { 0, 0 };
+		int long rm[] = { 0, 0 };
+		char* res = ( n.f_oCanonical.raw() + f_iDigitCount ) - 2; /* - 1 for carrier */
+		char const* ep[] = { res, e };
+/* the end of variables for mutate() */
 		while ( -- digit >= 0 )
 			{
-			int carrier = 0;
-			int inner = factor.f_iDigitCount; /* index of last digit in second factor */
-			e[ element.f_iDigitCount - 1 ] = 0;
 			if ( fo[ digit ] )
 				{
+				int carrier = 0;
+				int inner = factor.f_iDigitCount; /* index of last digit in second factor */
 				while ( -- inner >= 0 )
 					{
 					int pos = inner + 1;
@@ -531,21 +542,25 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 						carrier = 0;
 					}
 				e[ 0 ] = carrier;
-				int lz = 0;
-				while ( e[ lz ] == 0 )
-					++ lz;
-				if ( lz )
-					{
-					element.f_iDigitCount -= lz;
-					::memmove( e, e + lz, element.f_iDigitCount );
-					}
-				element.f_iIntegralPartSize = element.f_iDigitCount - decimal;
-				n += element;
-				if ( lz )
-					element.f_iDigitCount += lz;
+				ep[ 0 ] = res + 1;
+				mutate( res, factor.f_iDigitCount + 1 + 1, ep, lm, rm, false, false );
+				-- res;
 				}
-			++ element.f_iDigitCount;
+			else
+				-- res;
 			}
+		res = n.f_oCanonical.raw();
+		int shift = 0;
+		while ( ( shift < n.f_iIntegralPartSize ) && ( res[ shift ] == 0 ) )
+			++ shift;
+		if ( shift )
+			{
+			n.f_iIntegralPartSize -= shift;
+			n.f_iDigitCount -= shift;
+			::memmove( res, res + shift, n.f_iDigitCount );
+			}
+		while ( ( n.decimal_length() > 0 ) && ( res[ n.f_iDigitCount - 1 ] == 0 ) )
+			-- n.f_iDigitCount;
 		n.f_bNegative = ! ( ( f_bNegative && factor.f_bNegative ) || ! ( f_bNegative || factor.f_bNegative ) );
 		}
 	return ( n );
@@ -561,11 +576,30 @@ HNumber HNumber::operator / ( HNumber const& factor ) const
 	{
 	M_ENSURE( factor != "0" )
 	HNumber n;
-	HNumber numerator;
-	HNumber denominator( factor );
-	denominator.f_iIntegralPartSize = denominator.f_iDigitCount;
-	numerator.f_oCanonical.pool_realloc( denominator.f_iDigitCount );
-	numerator.f_iDigitCount = numerator.f_iIntegralPartSize = denominator.f_iDigitCount;
+	if ( operator != ( "0" ) )
+		{
+		HNumber reminder;
+		HNumber denominator( factor );
+		denominator.f_iIntegralPartSize = denominator.f_iDigitCount;
+		reminder.f_iDigitCount = denominator.f_iDigitCount + 1; /* + 1 for carrier */
+		reminder.f_iIntegralPartSize = reminder.f_iDigitCount;
+		reminder.f_oCanonical.pool_realloc( reminder.f_iDigitCount );
+		char* src = f_oCanonical.raw();
+		char* base = reminder.f_oCanonical.raw();
+		do
+			{
+			int len = min( f_iDigitCount, reminder.f_iDigitCount );
+			memcpy( base, src, len );
+			int digit = 0;
+			while ( reminder > denominator )
+				{
+				reminder -= denominator;
+				++ digit;
+				}
+			n.f_oCanonical.push_back( digit );
+			}
+		while ( reminder != "0" );
+		}
 	return ( n );
 	}
 

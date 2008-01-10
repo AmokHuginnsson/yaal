@@ -39,69 +39,68 @@ namespace yaal
 namespace hcore
 {
 
-void * xmalloc_internal ( int long const a_lSize )
+void* xmalloc_internal( int long const a_lSize )
 	{
-	register void * l_pvNewPtr = NULL;
+	register void* l_pvNewPtr = NULL;
 	if ( a_lSize < 0 )
 		{
-		perror ( _ ( "xmalloc_internal: requested size lower than 0" ) );
-		abort();
+		::perror( _( "xmalloc_internal: requested size lower than 0" ) );
+		::abort();
 		}
-	l_pvNewPtr = malloc ( a_lSize );
+	l_pvNewPtr = ::malloc( a_lSize );
 	if ( l_pvNewPtr == 0 )
 		{
-		perror ( _ ( "xmalloc_internal: malloc returned NULL" ) );
-		abort();
+		::perror( _( "xmalloc_internal: malloc returned NULL" ) );
+		::abort();
 		}
 	return ( l_pvNewPtr );
 	}
 
-void * xcalloc_internal ( int long a_lSize )
+void* xcalloc_internal( int long a_lSize )
 	{
-	register void * l_pvNewPtr = xmalloc_internal ( a_lSize );
-	memset ( l_pvNewPtr, 0, a_lSize );
+	register void* l_pvNewPtr = xmalloc_internal( a_lSize );
+	::memset( l_pvNewPtr, 0, a_lSize );
 	return ( l_pvNewPtr );
 	}
 
-void * xrealloc_internal ( void * a_pvPtr, int long a_lSize )
+void* xrealloc_internal( void* a_pvPtr, int long a_lSize )
 	{
-	register void * l_pvNewPtr = NULL;
+	register void* l_pvNewPtr = NULL;
 	if ( a_lSize < 0 )
 		{
-		perror ( _ ( "xrealloc_internal: requested size lower than 0" ) );
-		abort();
+		::perror( _( "xrealloc_internal: requested size lower than 0" ) );
+		::abort();
 		}
 	l_pvNewPtr = realloc ( a_pvPtr, a_lSize );
 	if ( l_pvNewPtr == 0 )
 		{
-		perror ( _ ( "xrealloc_internal: realloc returned NULL" ) );
-		abort();
+		::perror( _( "xrealloc_internal: realloc returned NULL" ) );
+		::abort();
 		}
 	return ( l_pvNewPtr );
 	}
 
-void xfree_internal ( void * * a_ppvPtr ) throw()
+void xfree_internal( void* a_pvPtr ) throw()
 	{
-	if ( ( * a_ppvPtr ) == NULL )
+	if ( a_pvPtr == NULL )
 		{
-		perror ( "xfree_internal: request to free NULL pointer" );
-		abort();
+		::perror( "xfree_internal: request to free NULL pointer" );
+		::abort();
 		}
-	free ( ( * a_ppvPtr ) );
-	( * a_ppvPtr ) = NULL;
+	::free( a_pvPtr );
 	return;
 	}
 
-char * xstrdup ( char const * const a_pcStr )
+char* xstrdup( char const* const a_pcStr )
 	{
-	char * l_pcNew = 0;
+	char* l_pcNew = 0;
 	if ( ! a_pcStr )
 		{
-		perror ( "xstrdup: request to duplicate NULL pointer string" );
-		abort();
+		::perror( "xstrdup: request to duplicate NULL pointer string" );
+		::abort();
 		}
-	l_pcNew = yaal::hcore::xcalloc < char > ( strlen ( a_pcStr ) + 1 );
-	strcpy ( l_pcNew, a_pcStr );
+	l_pcNew = yaal::hcore::xcalloc<char>( ::strlen( a_pcStr ) + 1 );
+	::strcpy( l_pcNew, a_pcStr );
 	return ( l_pcNew );
 	}
 
