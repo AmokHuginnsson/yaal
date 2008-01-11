@@ -39,10 +39,10 @@ namespace hcore
 class HNumber
 	{
 	typedef HPool<char> canonical_t;
-	int f_iPrecision;
+	int long f_iPrecision;
 	bool f_bNegative;
-	int f_iDigitCount;
-	int f_iIntegralPartSize;
+	int long f_iDigitCount;
+	int long f_iIntegralPartSize;
 	canonical_t f_oCanonical;
 public:
 	static int D_DEFAULT_PRECISION;

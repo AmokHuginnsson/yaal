@@ -246,8 +246,8 @@ void HNumber::from_string( HString const& a_oNumber )
 			}
 		else
 			f_iIntegralPartSize = f_iDigitCount;
-		if ( decimal_length() > f_iPrecision )
-			f_iPrecision = decimal_length();
+		if ( decimal_length() >= f_iPrecision )
+			f_iPrecision = decimal_length() + 1;
 		if ( f_iDigitCount )
 			f_oCanonical.pool_realloc( f_iDigitCount );
 		char* dst = f_oCanonical.raw();
@@ -572,33 +572,69 @@ HNumber& HNumber::operator *= ( HNumber const& factor )
 	return ( *this );
 	}
 
-HNumber HNumber::operator / ( HNumber const& factor ) const
+HNumber HNumber::operator / ( HNumber const& denominator ) const
 	{
-	M_ENSURE( factor != "0" )
+	M_ENSURE( denominator != "0" )
 	HNumber n;
 	if ( operator != ( "0" ) )
 		{
-		HNumber reminder;
-		HNumber denominator( factor );
-		denominator.f_iIntegralPartSize = denominator.f_iDigitCount;
-		reminder.f_iDigitCount = denominator.f_iDigitCount + 1; /* + 1 for carrier */
-		reminder.f_iIntegralPartSize = reminder.f_iDigitCount;
-		reminder.f_oCanonical.pool_realloc( reminder.f_iDigitCount );
-		char* src = f_oCanonical.raw();
-		char* base = reminder.f_oCanonical.raw();
+		n.f_iPrecision = f_iPrecision + denominator.f_iPrecision;
+		char* den = denominator.f_oCanonical.raw();
+		int shift = 0;
+		while ( ( shift < denominator.f_iDigitCount ) && ( den[ shift ] == 0 ) )
+			++ shift;
+		int long denlen = denominator.f_iDigitCount - shift;
+		HPool<char> reminder( denlen + 1 ); /* + 1 for carrier */
+		HPool<char> pseudoden( denlen + 1 );
+		char const* src = f_oCanonical.raw();
+		den = pseudoden.raw();
+		char* rem = reminder.raw();
+		int long lm[] = { 0, 0 };
+		int long rm[] = { 0, 0 };
+		char const* ep[] = { rem, den };
+		int long len = min( f_iDigitCount, denlen );
+		::memset( den, 0, denlen + 1 );
+		::memset( rem, 0, denlen + 1 );
+		::memcpy( den + 1, denominator.f_oCanonical.raw() + shift, denlen );
+		::memcpy( rem + 1 + denlen - len, src, len );
+		int cmp = 0;
 		do
 			{
-			int len = min( f_iDigitCount, reminder.f_iDigitCount );
-			memcpy( base, src, len );
 			int digit = 0;
-			while ( reminder > denominator )
+			while ( ( cmp = memcmp( rem, den, denlen + 1 ) ) > 0 )
 				{
-				reminder -= denominator;
+				mutate( rem - 1, denlen + 1 + 1, ep, lm, rm, true, false );
+				++ digit;
+				}
+			::memmove( rem, rem + 1, denlen );
+			rem[ denlen ] = len < f_iDigitCount ? src[ len ] : 0;
+			if ( ! cmp )
+				{
+				rem[ 0 ] = 0;
 				++ digit;
 				}
 			n.f_oCanonical.push_back( digit );
+			++ len;
 			}
-		while ( reminder != "0" );
+		while ( ( len <= f_iDigitCount ) || ( ( len < n.f_iPrecision ) && cmp ) );
+		n.f_iDigitCount = n.f_oCanonical.size();
+		char* res = n.f_oCanonical.raw();
+		n.f_iIntegralPartSize = f_iIntegralPartSize + denominator.decimal_length() - denominator.f_iIntegralPartSize;
+		( n.f_iIntegralPartSize >= 0 ) || ( n.f_iIntegralPartSize = 0 );
+		shift = 0;
+		while ( ( shift < n.f_iIntegralPartSize ) && ( res[ shift ] == 0 ) )
+			++ shift;
+		if ( shift )
+			{
+			n.f_iIntegralPartSize -= shift;
+			n.f_iDigitCount -= shift;
+			::memmove( res, res + shift, n.f_iDigitCount );
+			}
+		while ( ( n.decimal_length() > 0 ) && ( res[ n.f_iDigitCount - 1 ] == 0 ) )
+			-- n.f_iDigitCount;
+		M_ASSERT( n.f_iIntegralPartSize >= 0 );
+		M_ASSERT( n.f_iDigitCount >= 0 );
+		n.f_bNegative = ! ( ( f_bNegative && denominator.f_bNegative ) || ! ( f_bNegative || denominator.f_bNegative ) );
 		}
 	return ( n );
 	}
