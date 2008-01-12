@@ -618,9 +618,14 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 			}
 		while ( ( len <= f_iDigitCount ) || ( ( len < n.f_iPrecision ) && cmp ) );
 		n.f_iDigitCount = n.f_oCanonical.size();
+		n.f_iIntegralPartSize = 0;
+		while ( n.f_iDigitCount < n.f_iIntegralPartSize )
+			{
+			++ n.f_iDigitCount;
+			n.f_oCanonical.push_back( 0 );
+			}
 		char* res = n.f_oCanonical.raw();
-		n.f_iIntegralPartSize = f_iIntegralPartSize + denominator.decimal_length() - denominator.f_iIntegralPartSize;
-		( n.f_iIntegralPartSize >= 0 ) || ( n.f_iIntegralPartSize = 0 );
+/*
 		shift = 0;
 		while ( ( shift < n.f_iIntegralPartSize ) && ( res[ shift ] == 0 ) )
 			++ shift;
@@ -630,6 +635,8 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 			n.f_iDigitCount -= shift;
 			::memmove( res, res + shift, n.f_iDigitCount );
 			}
+*/
+		( n.f_iIntegralPartSize >= 0 ) || ( n.f_iIntegralPartSize = 0 );
 		while ( ( n.decimal_length() > 0 ) && ( res[ n.f_iDigitCount - 1 ] == 0 ) )
 			-- n.f_iDigitCount;
 		M_ASSERT( n.f_iIntegralPartSize >= 0 );
