@@ -597,7 +597,13 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 		::memset( rem, 0, denlen + 1 );
 		::memcpy( den + 1, denominator.f_oCanonical.raw() + shift, denlen );
 		::memcpy( rem + 1 + denlen - len, src, len );
+		shift = denominator.f_iIntegralPartSize - f_iIntegralPartSize - denominator.decimal_length();
+		while ( -- shift > 0 )
+			n.f_oCanonical.push_back( 0 );
 		int cmp = 0;
+		shift = 0;
+		bool carrier = ( denominator.f_iIntegralPartSize - f_iIntegralPartSize - denominator.decimal_length() ) > 0;
+		bool ncar = false;
 		do
 			{
 			int digit = 0;
@@ -613,29 +619,29 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 				rem[ 0 ] = 0;
 				++ digit;
 				}
-			n.f_oCanonical.push_back( digit );
+			if ( digit || shift )
+				{
+				n.f_oCanonical.push_back( digit );
+				shift = 1;
+				}
+			if ( rem[ 0 ] && carrier && ! shift )
+				{
+				n.f_oCanonical.push_back( 0 );
+				carrier = false;
+				}
+			else if ( rem[ 0 ] && ! shift )
+				ncar = true;
 			++ len;
 			}
 		while ( ( len <= f_iDigitCount ) || ( ( len < n.f_iPrecision ) && cmp ) );
 		n.f_iDigitCount = n.f_oCanonical.size();
-		n.f_iIntegralPartSize = 0;
+		n.f_iIntegralPartSize = f_iIntegralPartSize - denominator.f_iIntegralPartSize + denominator.f_iDigitCount - denlen + ( ! ncar ? 1 : 0 );
 		while ( n.f_iDigitCount < n.f_iIntegralPartSize )
 			{
 			++ n.f_iDigitCount;
 			n.f_oCanonical.push_back( 0 );
 			}
 		char* res = n.f_oCanonical.raw();
-/*
-		shift = 0;
-		while ( ( shift < n.f_iIntegralPartSize ) && ( res[ shift ] == 0 ) )
-			++ shift;
-		if ( shift )
-			{
-			n.f_iIntegralPartSize -= shift;
-			n.f_iDigitCount -= shift;
-			::memmove( res, res + shift, n.f_iDigitCount );
-			}
-*/
 		( n.f_iIntegralPartSize >= 0 ) || ( n.f_iIntegralPartSize = 0 );
 		while ( ( n.decimal_length() > 0 ) && ( res[ n.f_iDigitCount - 1 ] == 0 ) )
 			-- n.f_iDigitCount;
