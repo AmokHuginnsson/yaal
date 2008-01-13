@@ -42,7 +42,7 @@ namespace
 int const D_SPECIAL_CHARS = 3; /* minus, dot, nil */
 char const* const D_VALID_CHARACTERS = "-.0123456789";
 int const D_JUST_DIGITS = 2;
-int const D_HARDCODED_MINIMUM_DEFAULT_PRECISION = 16;
+int const D_HARDCODED_MINIMUM_PRECISION = 16;
 int const D_A_MINUS = 0;
 int const D_A_DOT = 1;
 int const D_A_ZERO = 2;
@@ -52,8 +52,8 @@ int const D_NUMBER_START = 3;
 int HNumber::D_DEFAULT_PRECISION = 100;
 
 HNumber::HNumber( void )
-	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
-			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
+	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_PRECISION
+			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_PRECISION ),
 	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
 	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
 	{
@@ -70,8 +70,8 @@ HNumber::~HNumber( void )
 	}
 
 HNumber::HNumber( double long a_dNumber )
-	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
-			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
+	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_PRECISION
+			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_PRECISION ),
 	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
 	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
 	{
@@ -82,8 +82,8 @@ HNumber::HNumber( double long a_dNumber )
 	}
 
 HNumber::HNumber( double long a_dNumber, int a_iPrecision )
-	: f_iPrecision( a_iPrecision > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
-			? a_iPrecision : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
+	: f_iPrecision( a_iPrecision > D_HARDCODED_MINIMUM_PRECISION
+			? a_iPrecision : D_HARDCODED_MINIMUM_PRECISION ),
 	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
 	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
 	{
@@ -94,8 +94,8 @@ HNumber::HNumber( double long a_dNumber, int a_iPrecision )
 	}
 
 HNumber::HNumber( char const* const a_pcNumber )
-	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
-			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
+	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_PRECISION
+			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_PRECISION ),
 	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
 	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
 	{
@@ -106,8 +106,8 @@ HNumber::HNumber( char const* const a_pcNumber )
 	}
 
 HNumber::HNumber( char const* const a_pcNumber, int a_iPrecision )
-	: f_iPrecision( a_iPrecision > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
-			? a_iPrecision : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
+	: f_iPrecision( a_iPrecision > D_HARDCODED_MINIMUM_PRECISION
+			? a_iPrecision : D_HARDCODED_MINIMUM_PRECISION ),
 	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
 	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
 	{
@@ -118,8 +118,8 @@ HNumber::HNumber( char const* const a_pcNumber, int a_iPrecision )
 	}
 
 HNumber::HNumber( HString const& a_oNumber )
-	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
-			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
+	: f_iPrecision( D_DEFAULT_PRECISION > D_HARDCODED_MINIMUM_PRECISION
+			? D_DEFAULT_PRECISION : D_HARDCODED_MINIMUM_PRECISION ),
 	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
 	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
 	{
@@ -130,8 +130,8 @@ HNumber::HNumber( HString const& a_oNumber )
 	}
 
 HNumber::HNumber( HString const& a_oNumber, int a_iPrecision )
-	: f_iPrecision( a_iPrecision > D_HARDCODED_MINIMUM_DEFAULT_PRECISION
-			? a_iPrecision : D_HARDCODED_MINIMUM_DEFAULT_PRECISION ),
+	: f_iPrecision( a_iPrecision > D_HARDCODED_MINIMUM_PRECISION
+			? a_iPrecision : D_HARDCODED_MINIMUM_PRECISION ),
 	f_bNegative( false ), f_iDigitCount( 0 ), f_iIntegralPartSize( 0 ),
 	f_oCanonical( f_iDigitCount, canonical_t::D_AUTO_GROW )
 	{
@@ -301,7 +301,8 @@ int HNumber::get_precision( void ) const
 void HNumber::set_precision( int a_iPrecision )
 	{
 	M_PROLOG
-	if ( ( a_iPrecision <= f_iPrecision ) || ( decimal_length() < f_iPrecision ) )
+	if ( ( a_iPrecision >= D_HARDCODED_MINIMUM_PRECISION )
+			&& ( ( a_iPrecision <= f_iPrecision ) || ( decimal_length() < f_iPrecision ) ) )
 		f_iPrecision = a_iPrecision;
 	if ( ( f_iIntegralPartSize + f_iPrecision ) < f_iDigitCount )
 		f_iDigitCount = f_iIntegralPartSize + f_iPrecision;
@@ -597,13 +598,20 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 		::memset( rem, 0, denlen + 1 );
 		::memcpy( den + 1, denominator.f_oCanonical.raw() + shift, denlen );
 		::memcpy( rem + 1 + denlen - len, src, len );
-		shift = denominator.f_iIntegralPartSize - f_iIntegralPartSize - denominator.decimal_length();
+		shift = 0;
+		while ( ( shift < f_iDigitCount ) && ( src[ shift ++ ] == 0 ) )
+			n.f_oCanonical.push_back( 0 );
+		shift = denominator.f_iIntegralPartSize - f_iIntegralPartSize;
 		while ( -- shift > 0 )
 			n.f_oCanonical.push_back( 0 );
 		int cmp = 0;
 		shift = 0;
 		bool carrier = ( denominator.f_iIntegralPartSize - f_iIntegralPartSize - denominator.decimal_length() ) > 0;
 		bool ncar = false;
+		int pred_int = f_iIntegralPartSize - denominator.f_iIntegralPartSize + denominator.f_iDigitCount - denlen;
+		( pred_int >= 0 ) || ( pred_int = 0 );
+		++ pred_int;
+		int size = n.f_oCanonical.size();
 		do
 			{
 			int digit = 0;
@@ -616,24 +624,26 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 			rem[ denlen ] = len < f_iDigitCount ? src[ len ] : 0;
 			if ( ! cmp )
 				{
-				rem[ 0 ] = 0;
+				::memset( rem, 0, denlen );
 				++ digit;
 				}
 			if ( digit || shift )
 				{
 				n.f_oCanonical.push_back( digit );
+				++ size;
 				shift = 1;
 				}
 			if ( rem[ 0 ] && carrier && ! shift )
 				{
 				n.f_oCanonical.push_back( 0 );
+				++ size;
 				carrier = false;
 				}
 			else if ( rem[ 0 ] && ! shift )
 				ncar = true;
 			++ len;
 			}
-		while ( ( len <= f_iDigitCount ) || ( ( len < n.f_iPrecision ) && cmp ) );
+		while ( ( len <= f_iDigitCount ) || ( ( ( size - pred_int ) < n.f_iPrecision ) && cmp ) );
 		n.f_iDigitCount = n.f_oCanonical.size();
 		n.f_iIntegralPartSize = f_iIntegralPartSize - denominator.f_iIntegralPartSize + denominator.f_iDigitCount - denlen + ( ! ncar ? 1 : 0 );
 		while ( n.f_iDigitCount < n.f_iIntegralPartSize )
@@ -642,7 +652,28 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 			n.f_oCanonical.push_back( 0 );
 			}
 		char* res = n.f_oCanonical.raw();
+		if ( ( n.f_iIntegralPartSize < 0 ) && ncar )
+			{
+			n.f_oCanonical.pool_realloc( n.f_oCanonical.size() + 1 );
+			res = n.f_oCanonical.raw();
+			::memmove( res + 1, res, n.f_iDigitCount );
+			res[ 0 ] = 0;
+			++ n.f_iDigitCount;
+			}
 		( n.f_iIntegralPartSize >= 0 ) || ( n.f_iIntegralPartSize = 0 );
+		shift = 0;
+		while ( ( shift < n.f_iIntegralPartSize ) && ( res[ shift ] == 0 ) )
+			++ shift;
+		if ( shift )
+			{
+			n.f_iIntegralPartSize -= shift;
+			n.f_iDigitCount -= shift;
+			::memmove( res, res + shift, n.f_iDigitCount );
+			}
+		if ( n.f_iDigitCount > ( n.f_iIntegralPartSize + n.f_iPrecision ) )
+			n.f_iDigitCount = n.f_iIntegralPartSize + n.f_iPrecision;
+		else if ( n.f_iDigitCount == ( n.f_iIntegralPartSize + n.f_iPrecision ) )
+			++ n.f_iPrecision;
 		while ( ( n.decimal_length() > 0 ) && ( res[ n.f_iDigitCount - 1 ] == 0 ) )
 			-- n.f_iDigitCount;
 		M_ASSERT( n.f_iIntegralPartSize >= 0 );
