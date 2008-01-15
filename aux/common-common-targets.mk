@@ -34,7 +34,10 @@ static:
 	@$(MAKE) LIBS="$(STATICLIBS)"
 
 prof:
-	@$(MAKE) LINKER_SPECIAL_FLAGS=-pg static
+	@DO_PROFILING=1 $(MAKE) static
+
+cov:
+	@DO_COVERAGE=1 $(MAKE) static
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f

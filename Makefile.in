@@ -49,6 +49,8 @@ COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I/usr/local/include \
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \
 																@EXTRA_LIB_PATHS@
 
+# WARNING!! -Wl,soname, must be last option, and last character of it,
+# meaning "," must be immediately followed by end of line
 LINKER_PRIME_FLAGS +=	-shared\
 								-Wl,--export-dynamic\
 								@SPECIAL_LINKER_FLAGS@\
@@ -109,7 +111,7 @@ include $(DIR_ROOT)/aux/common-implicit-compile.mk
 include $(DIR_ROOT)/aux/common-target-default.mk
 
 #phony targets
-.PHONY: all nodebug install dep clean tags stats mrproper purge environment doc
+.PHONY: all nodebug prof cov install dep clean tags stats mrproper purge environment doc
 
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment
@@ -126,8 +128,13 @@ $(foreach DIR,$(DIRS),$(eval $(call MAKE_DIR,$(DIR))))
 environment: $(DIRS) $(LD_CACHE)
 
 nodebug:
-	export NODEBUG="yes"; \
-	$(MAKE) -e all
+	NODEBUG="yes" $(MAKE) -e all
+
+prof:
+	DO_PROFILING=1 $(MAKE) -e all
+
+cov:
+	DO_COVERAGE=1 $(MAKE) -e all
 
 install: all
 	@./aux/msh

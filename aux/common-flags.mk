@@ -36,9 +36,17 @@ COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe \
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
-	COMPILER_DEBUG_FLAGS				= -g -g3 -ggdb -ggdb3 -pg -fno-inline \
-																-D__DEBUG__ $(DB)
+	COMPILER_DEBUG_FLAGS				= -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
+endif
+ifdef DO_PROFILING
+	COMPILER_PROFILING_FLAGS = -pg
+	LINKER_PROFILING_FLAGS = -pg
+endif
+ifdef DO_COVERAGE
+	COMPILER_COVERAGE_FLAGS = --coverage
+	LINKER_COVERAGE_FLAGS = --coverage
 endif
 LINKER_PRIME_FLAGS						= \
 								-Wl,--fatal-warnings \
 								-Wl,--demangle
+

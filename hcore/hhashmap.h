@@ -27,7 +27,7 @@ Copyright:
 #ifndef __YAAL_HCORE_HHASHMAP_H
 #define __YAAL_HCORE_HHASHMAP_H
 
-#line 31 "hhashmap.h"
+#line 31
 
 #define D_VCSID_HHASHMAP_H "$Id$"
 

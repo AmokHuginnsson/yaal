@@ -27,7 +27,7 @@ Copyright:
 #ifndef __YAAL_HCORE_HPOINTER_H
 #define __YAAL_HCORE_HPOINTER_H
 
-#line 31 "hpointer.h"
+#line 31
 
 #define D_VCSID_YAAL_HCORE_HPOINTER_H "$Id$"
 

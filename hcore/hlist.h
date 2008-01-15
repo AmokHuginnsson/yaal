@@ -27,7 +27,7 @@ Copyright:
 #ifndef __YAAL_HCORE_HLIST_H
 #define __YAAL_HCORE_HLIST_H
 
-#line 31 "hlist.h"
+#line 31
 
 #define D_VCSID_HLIST_H "$Id$"
 
@@ -155,15 +155,14 @@ public:
 	void sort( T const&, sort_order_t = D_ASCENDING );
 	bool empty( void ) const;
 	bool is_empty( void ) const;
+private:
 	template<typename T>
-	void merge_sort( T const&, sort_order_t = D_ASCENDING );
+	void merge_sort( HElement*&, HElement*&, T const& );
 	template<typename T>
-	void select_sort( T const&, sort_order_t = D_ASCENDING );
-protected:
+	void insert_sort( HElement*&, HElement*&, T const& );
+	void insert( HElement*, HElement* );
 	template<typename T>
-	void merge_sort( HElement*&, HElement*&, T const&, sort_order_t = D_ASCENDING );
-	template<typename T>
-	void select_sort( HElement*&, HElement*&, int, T const&, sort_order_t = D_ASCENDING );
+	void select_sort( HElement*&, HElement*&, int, T const& );
 	HElement* element_by_index ( int );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
@@ -995,7 +994,7 @@ tType const& HList<tType>::tail( void ) const
 
 template<typename tType>
 template<typename T>
-void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less, sort_order_t a_eOrder )
+void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less )
 	{
 	M_PROLOG
 	HElement* leftIt = left;
@@ -1015,17 +1014,17 @@ void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less,
 		}
 	int const D_ARBITRARILY_CHOSEN_THRESHOLD = 7;
 	if ( ( stepsLeft + stepsRight + 2 ) < D_ARBITRARILY_CHOSEN_THRESHOLD )
-		select_sort( left, right, stepsLeft + stepsRight + 2, less, a_eOrder );
+		insert_sort( left, right, less );
 	else
 		{
 		if ( stepsLeft < D_ARBITRARILY_CHOSEN_THRESHOLD )
-			select_sort( left, leftIt, stepsLeft + 1, less, a_eOrder );
+			insert_sort( left, leftIt, less );
 		else
-			merge_sort( left, leftIt, less, a_eOrder );
+			merge_sort( left, leftIt, less );
 		if ( stepsRight < D_ARBITRARILY_CHOSEN_THRESHOLD )
-			select_sort( rightIt, right, stepsRight + 1, less, a_eOrder );
+			insert_sort( rightIt, right, less );
 		else
-			merge_sort( rightIt, right, less, a_eOrder );
+			merge_sort( rightIt, right, less );
 		HElement* first = NULL;
 		++ stepsLeft;
 		while ( stepsLeft -- )
@@ -1066,27 +1065,64 @@ void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less,
 
 template<typename tType>
 template<typename T>
-void HList<tType>::merge_sort( T const& less, sort_order_t a_eOrder )
+void HList<tType>::insert_sort(
+		HElement*& a_rpoBaseLower, HElement*& a_rpoBaseUpper,
+		T const& less )
 	{
 	M_PROLOG
-	if ( f_iSize > 1 )
+	if ( a_rpoBaseLower != a_rpoBaseUpper )
 		{
-		HElement* first = f_poHook;
-		HElement* last = f_poHook->f_poPrevious;
-		merge_sort( first, last, less, a_eOrder );
-		f_poHook = first;
-		f_poIndex = NULL;
-		f_iIndex = 0;
+		HElement* top = a_rpoBaseLower;
+		while ( top != a_rpoBaseUpper )
+			{
+			top = top->f_poNext;
+			HElement* ptr = top;
+			while ( ( ptr != a_rpoBaseLower ) && less( top->f_tObject, ptr->f_poPrevious->f_tObject ) )
+				ptr = ptr->f_poPrevious;
+			if ( ptr != top )
+				{
+				HElement* oldtop = top->f_poPrevious;
+				insert( ptr, top );
+				if ( top == a_rpoBaseUpper )
+					a_rpoBaseUpper = oldtop;
+				if ( ptr == a_rpoBaseLower )
+					a_rpoBaseLower = top;
+				top = oldtop;
+				}
+			}
+		a_rpoBaseUpper = top;
 		}
 	return;
 	M_EPILOG
 	}
 
 template<typename tType>
+void HList<tType>::insert( HElement* pos, HElement* elem )
+	{
+	M_ASSERT( pos != elem );
+	if ( ( pos->f_poNext == elem ) || ( pos->f_poPrevious == elem ) )
+		exchange( pos, elem );
+	else
+		{
+		if ( pos == f_poHook )
+			f_poHook = elem;
+		if ( pos == f_poIndex )
+			f_poIndex = elem;
+		elem->f_poNext->f_poPrevious = elem->f_poPrevious;
+		elem->f_poPrevious->f_poNext = elem->f_poNext;
+		elem->f_poNext = pos;
+		elem->f_poPrevious = pos->f_poPrevious;
+		pos->f_poPrevious->f_poNext = elem;
+		pos->f_poPrevious = elem;
+		}
+	return;
+	}
+
+template<typename tType>
 template<typename T>
 void HList<tType>::select_sort(
 		HElement*& a_rpoBaseLower, HElement*& a_rpoBaseUpper,
-		int distance, T const& less, sort_order_t a_eOrder )
+		int distance, T const& less )
 	{
 	M_PROLOG
 	int l_iCtrLoc = 0;
@@ -1095,10 +1131,7 @@ void HList<tType>::select_sort(
 	HElement* l_poBaseLower = a_rpoBaseLower;
 	HElement* l_poBaseUpper = a_rpoBaseUpper;
 	HElement* l_poPointer = NULL;
-	f_eOrder = a_eOrder;
 	int ctr = distance;
-	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], f_eOrder );
 	while ( ctr >= 0 )
 		{
 		l_iCtrLoc = ctr;
@@ -1141,27 +1174,11 @@ void HList<tType>::select_sort(
 	}
 
 template<typename tType>
-template<typename T>
-void HList<tType>::select_sort( T const& less, sort_order_t a_eOrder )
-	{
-	M_PROLOG
-	if ( f_iSize > 1 )
-		{
-		HElement* first = f_poHook;
-		HElement* last = f_poHook->f_poPrevious;
-		select_sort( first, last, f_iSize, less, a_eOrder );
-		}
-	return;
-	M_EPILOG;
-	}
-
-template<typename tType>
 void HList<tType>::sort( sort_order_t a_eOrder )
 	{
 	M_PROLOG
-	f_eOrder = a_eOrder;
-	merge_sort( yaal::less<tType> );
-	return ;
+	sort( yaal::less<tType>, a_eOrder );
+	return;
 	M_EPILOG
 	}
 
@@ -1170,7 +1187,18 @@ template<typename T>
 void HList<tType>::sort( T const& less, sort_order_t a_eOrder )
 	{
 	M_PROLOG
-	merge_sort( less, a_eOrder );
+	f_eOrder = a_eOrder;
+	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], f_eOrder );
+	if ( f_iSize > 1 )
+		{
+		HElement* first = f_poHook;
+		HElement* last = f_poHook->f_poPrevious;
+		merge_sort( first, last, less );
+		f_poHook = first;
+		f_poIndex = NULL;
+		f_iIndex = 0;
+		}
 	return;
 	M_EPILOG;
 	}
