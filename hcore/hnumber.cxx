@@ -46,6 +46,7 @@ int const D_A_MINUS = 0;
 int const D_A_DOT = 1;
 int const D_A_ZERO = 2;
 int const D_NUMBER_START = 3;
+int const D_KARATSUBA_THRESHOLD = 16000; /* FIXME */
 }
 
 int HNumber::D_DEFAULT_PRECISION = 100;
@@ -380,48 +381,111 @@ bool HNumber::operator >= ( HNumber const& other ) const
 	return ( other <= *this );
 	}
 
-bool HNumber::mutate( char* res, int long ressize, char const* ep[], int long* lm, int long* rm, bool sub, bool swp ) const
+bool HNumber::mutate_addition( char* res, int long ressize,
+		char const* const ep[], int long* lm, int long* rm, bool sub, bool swp ) const
 	{
-	bool carrier = false;
+	int carrier = 0;
 	int e[ 2 ];
-	int long idx = ressize; /* index of first processed digit */
-	char const* epx[] = { swp ? ep[ 1 ] : ep[ 0 ], swp ? ep[ 0 ] : ep[ 1 ] };
-	int long lmx[] = { swp ? lm[ 1 ] : lm[ 0 ], swp ? lm[ 0 ] : lm[ 1 ] };
-	int long rmx[] = { swp ? rm[ 1 ] : rm[ 0 ], swp ? rm[ 0 ] : rm[ 1 ] };
-	int long rd = ( ressize - 1 ) - idx;/* right index distance */
-	while ( -- idx > 0 )
+	int long lmx[] = { lm ? ( swp ? lm[ 1 ] : lm[ 0 ] ) : 0, lm ? ( swp ? lm[ 0 ] : lm[ 1 ] ) : 0 };
+	int long rmx[] = { rm ? ( swp ? rm[ 1 ] : rm[ 0 ] ) : 0, rm ? ( swp ? rm[ 0 ] : rm[ 1 ] ) : 0 };
+	char const* const epx[] =
 		{
-		++ rd;
-		for ( int i = 0; i < 2; ++ i )
-			{
-			e[ i ] = 0;
-			if ( epx[ i ] && ( idx > lmx[ i ] ) && ( rd >= rmx[ i ] ) )
-				e[ i ] = epx[ i ][ ( idx - lmx[ i ] ) - 1 ];
-			}
+		swp ? ep[ 1 ] - lmx[ 0 ] - 1 : ep[ 0 ] - lmx[ 0 ] - 1,
+		swp ? ep[ 0 ] - lmx[ 1 ] - 1 : ep[ 1 ] - lmx[ 1 ] - 1
+		};
+	int long idx = ressize - 1; /* index of first processed digit */
+	int side = ( rmx[ 0 ] > rmx[ 1 ] ) ? 1 : 0; 
+	int long off = rmx[ 1 - side ];
+	char const* src = epx[ side ];
+	e[ 1 - side ] = 0;
+	while ( off -- && ( idx > 0 ) )
+		{
+		e[ side ] = src[ idx ];
 		if ( sub )
 			{
-			int x = e[ 0 ] - ( carrier ? 1 : 0 );
+			int x = e[ 0 ] - carrier;
 			if ( x < e[ 1 ] )
 				{
 				x += 10;
-				carrier = true;
+				carrier = 1;
 				}
 			else
-				carrier = false;
+				carrier = 0;
 			res[ idx ] = x - e[ 1 ];
 			}
 		else
 			{
-			res[ idx ] =  e[ 0 ] + e[ 1 ] + ( carrier ? 1 : 0 );
+			res[ idx ] =  e[ 0 ] + e[ 1 ] + carrier;
 			if ( res[ idx ] > 9 )
 				{
 				res[ idx ] -= 10;
-				carrier = true;
+				carrier = 1;
 				}
 			else
-				carrier = false;
+				carrier = 0;
 			}
+		-- idx;
 		}
+	side = ( lmx[ 0 ] > lmx[ 1 ] ) ? 1 : 0; 
+	off = lmx[ 1 - side ];
+	while ( idx > off )
+		{
+		if ( sub )
+			{
+			int x = epx[ 0 ][ idx ] - carrier;
+			if ( x < epx[ 1 ][ idx ] )
+				{
+				x += 10;
+				carrier = 1;
+				}
+			else
+				carrier = 0;
+			res[ idx ] = x - epx[ 1 ][ idx ];
+			}
+		else
+			{
+			res[ idx ] =  epx[ 0 ][ idx ] + epx[ 1 ][ idx ] + carrier;
+			if ( res[ idx ] > 9 )
+				{
+				res[ idx ] -= 10;
+				carrier = 1;
+				}
+			else
+				carrier = 0;
+			}
+		-- idx;
+		}
+	src = epx[ side ];
+	e[ 1 - side ] = 0;
+	while ( idx > 0 )
+		{
+		e[ side ] = src[ idx ];
+		if ( sub )
+			{
+			int x = e[ 0 ] - carrier;
+			if ( x < e[ 1 ] )
+				{
+				x += 10;
+				carrier = 1;
+				}
+			else
+				carrier = 0;
+			res[ idx ] = x - e[ 1 ];
+			}
+		else
+			{
+			res[ idx ] =  e[ 0 ] + e[ 1 ] + carrier;
+			if ( res[ idx ] > 9 )
+				{
+				res[ idx ] -= 10;
+				carrier = 1;
+				}
+			else
+				carrier = 0;
+			}
+		-- idx;
+		}
+	res[ 0 ] = ! sub && carrier ? 1 : 0;
 	return ( carrier );
 	}
 
@@ -448,37 +512,14 @@ HNumber HNumber::operator + ( HNumber const& element ) const
 	char const* ep[] = { ep1, ep2 };
 	bool sub = ( ( f_bNegative && ! element.f_bNegative ) || ( ! f_bNegative && element.f_bNegative ) );
 	bool swp = sub && ( absolute_lower( element ) < 0 );
-	bool carrier = mutate( res, ressize, ep, lm, rm, sub, swp );
+	mutate_addition( res, ressize, ep, lm, rm, sub, swp );
 	if ( ressize > 0 )
 		{
-		if ( sub )
-			{
-			int shift = 1;
-			while ( ( shift <= n.f_iIntegralPartSize ) && ( res[ shift ] == 0 ) )
-				++ shift;
-			ressize -= shift;
-			++ n.f_iIntegralPartSize -= shift;
-			::memmove( res, res + shift , ressize );
-			n.f_bNegative = f_bNegative ? ! swp : swp;
-			}
-		else
-			{
-			n.f_bNegative = f_bNegative && element.f_bNegative;
-			if ( carrier )
-				{
-				res[ 0 ] = 1;
-				++ n.f_iIntegralPartSize;
-				}
-			else
-				{
-				-- ressize;
-				::memmove( res, res + 1, ressize );
-				}
-			}
+		n.f_bNegative = sub ? ( f_bNegative ? ! swp : swp ) : ( f_bNegative && element.f_bNegative );
+		++ n.f_iIntegralPartSize;
 		}
 	n.f_iDigitCount = ressize;
-	while ( ( n.decimal_length() > 0 ) && ( res[ n.f_iDigitCount - 1 ] == 0 ) )
-		-- n.f_iDigitCount;
+	n.normalize();
 	if ( n.f_iDigitCount == 0 )
 		n.f_bNegative = false;
 	return ( n );
@@ -510,57 +551,10 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 		n = factor * ( *this );
 	else if ( f_iDigitCount && factor.f_iDigitCount )
 		{
-		HPool<char> element( factor.f_iDigitCount + 1 );
 		n.f_oCanonical.pool_realloc( n.f_iDigitCount = f_iDigitCount + factor.f_iDigitCount );
 		n.f_iIntegralPartSize = f_iIntegralPartSize + factor.f_iIntegralPartSize;
-		char* e = element.raw();
-		char const* const fo = f_oCanonical.raw();
-		char const* const fi = factor.f_oCanonical.raw();
-		int digit = f_iDigitCount; /* index of last digit in first factor */
-/* variables for mutate() */
-		int long lm[] = { 0, 0 };
-		int long rm[] = { 0, 0 };
-		char* res = ( n.f_oCanonical.raw() + f_iDigitCount ) - 2; /* - 1 for carrier */
-		char const* ep[] = { res, e };
-/* the end of variables for mutate() */
-		while ( -- digit >= 0 )
-			{
-			if ( fo[ digit ] )
-				{
-				int carrier = 0;
-				int inner = factor.f_iDigitCount; /* index of last digit in second factor */
-				while ( -- inner >= 0 )
-					{
-					int pos = inner + 1;
-					e[ pos ] = fo[ digit ] * fi[ inner ] + carrier;
-					if ( e[ pos ] > 9 )
-						{
-						carrier = e[ pos ] / 10;
-						e[ pos ] %= 10;
-						}
-					else
-						carrier = 0;
-					}
-				e[ 0 ] = carrier;
-				ep[ 0 ] = res + 1;
-				mutate( res, factor.f_iDigitCount + 1 + 1, ep, lm, rm, false, false );
-				-- res;
-				}
-			else
-				-- res;
-			}
-		res = n.f_oCanonical.raw();
-		int shift = 0;
-		while ( ( shift < n.f_iIntegralPartSize ) && ( res[ shift ] == 0 ) )
-			++ shift;
-		if ( shift )
-			{
-			n.f_iIntegralPartSize -= shift;
-			n.f_iDigitCount -= shift;
-			::memmove( res, res + shift, n.f_iDigitCount );
-			}
-		while ( ( n.decimal_length() > 0 ) && ( res[ n.f_iDigitCount - 1 ] == 0 ) )
-			-- n.f_iDigitCount;
+		karatsuba( n.f_oCanonical, f_oCanonical.raw(), f_iDigitCount, factor.f_oCanonical.raw(), factor.f_iDigitCount );
+		n.normalize();
 		n.f_bNegative = ! ( ( f_bNegative && factor.f_bNegative ) || ! ( f_bNegative || factor.f_bNegative ) );
 		}
 	return ( n );
@@ -574,9 +568,9 @@ HNumber& HNumber::operator *= ( HNumber const& factor )
 
 HNumber HNumber::operator / ( HNumber const& denominator ) const
 	{
-	M_ENSURE( denominator != "0" )
+	M_ENSURE( denominator.f_iDigitCount != 0 )
 	HNumber n;
-	if ( operator != ( "0" ) )
+	if ( f_iDigitCount )
 		{
 		n.f_iPrecision = f_iPrecision + denominator.f_iPrecision;
 		char* den = denominator.f_oCanonical.raw();
@@ -584,13 +578,11 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 		while ( ( shift < denominator.f_iDigitCount ) && ( den[ shift ] == 0 ) )
 			++ shift;
 		int long denlen = denominator.f_iDigitCount - shift;
-		HPool<char> reminder( denlen + 1 ); /* + 1 for carrier */
-		HPool<char> pseudoden( denlen + 1 );
+		canonical_t reminder( denlen + 1 ); /* + 1 for carrier */
+		canonical_t pseudoden( denlen + 1 );
 		char const* src = f_oCanonical.raw();
 		den = pseudoden.raw();
 		char* rem = reminder.raw();
-		int long lm[] = { 0, 0 };
-		int long rm[] = { 0, 0 };
 		char const* ep[] = { rem, den };
 		int long len = min( f_iDigitCount, denlen );
 		::memset( den, 0, denlen + 1 );
@@ -616,7 +608,7 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 			int digit = 0;
 			while ( ( cmp = memcmp( rem, den, denlen + 1 ) ) > 0 )
 				{
-				mutate( rem - 1, denlen + 1 + 1, ep, lm, rm, true, false );
+				mutate_addition( rem - 1, denlen + 1 + 1, ep, NULL, NULL, true, false );
 				++ digit;
 				}
 			::memmove( rem, rem + 1, denlen );
@@ -653,28 +645,16 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 		char* res = n.f_oCanonical.raw();
 		if ( ( n.f_iIntegralPartSize < 0 ) && ncar )
 			{
-			n.f_oCanonical.pool_realloc( n.f_oCanonical.size() + 1 );
+			n.f_oCanonical.push_back( 0 );
 			res = n.f_oCanonical.raw();
 			::memmove( res + 1, res, n.f_iDigitCount );
 			res[ 0 ] = 0;
 			++ n.f_iDigitCount;
 			}
 		( n.f_iIntegralPartSize >= 0 ) || ( n.f_iIntegralPartSize = 0 );
-		shift = 0;
-		while ( ( shift < n.f_iIntegralPartSize ) && ( res[ shift ] == 0 ) )
-			++ shift;
-		if ( shift )
-			{
-			n.f_iIntegralPartSize -= shift;
-			n.f_iDigitCount -= shift;
-			::memmove( res, res + shift, n.f_iDigitCount );
-			}
+		n.normalize();
 		if ( n.f_iDigitCount > ( n.f_iIntegralPartSize + n.f_iPrecision ) )
 			n.f_iDigitCount = n.f_iIntegralPartSize + n.f_iPrecision;
-		else if ( n.f_iDigitCount == ( n.f_iIntegralPartSize + n.f_iPrecision ) )
-			++ n.f_iPrecision;
-		while ( ( n.decimal_length() > 0 ) && ( res[ n.f_iDigitCount - 1 ] == 0 ) )
-			-- n.f_iDigitCount;
 		M_ASSERT( n.f_iIntegralPartSize >= 0 );
 		M_ASSERT( n.f_iDigitCount >= 0 );
 		n.f_bNegative = ! ( ( f_bNegative && denominator.f_bNegative ) || ! ( f_bNegative || denominator.f_bNegative ) );
@@ -712,6 +692,92 @@ HNumber& HNumber::operator ^= ( int long unsigned exp )
 	{
 	operator = ( *this ^ exp );
 	return ( *this );
+	}
+
+void HNumber::normalize( void )
+	{
+	char* res = f_oCanonical.raw();
+	int shift = 0;
+	while ( ( shift < f_iIntegralPartSize ) && ( res[ shift ] == 0 ) )
+		++ shift;
+	if ( shift )
+		{
+		f_iIntegralPartSize -= shift;
+		f_iDigitCount -= shift;
+		::memmove( res, res + shift, f_iDigitCount );
+		}
+	while ( ( decimal_length() > 0 ) && ( res[ f_iDigitCount - 1 ] == 0 ) )
+		-- f_iDigitCount;
+	if ( f_iDigitCount == ( f_iIntegralPartSize + f_iPrecision ) )
+		++ f_iPrecision;
+	return;
+	}
+
+void HNumber::karatsuba( canonical_t& result, char const* const fx, int long fxs, char const* const fy, int long fys ) const
+	{
+	if ( ( ( fxs > D_KARATSUBA_THRESHOLD ) || ( fys > D_KARATSUBA_THRESHOLD ) ) && ( fxs > 0 ) && ( fys > 0 ) )
+		{
+		int long fs = max( fxs, fys );
+		int long m = ( fs / 2 ) + ( fs & 1 ); /* Size of upper/lower half of number */
+		canonical_t r2m( fs + 1 ); /* intermediate result ( fx1 * fx2 ( * B ^ 2m ) ) + 1 for carrier */
+		canonical_t r( fs + 1 ); /* intermediate result ( fx1 * fx2 ) + 1 for carrier */
+		karatsuba( r2m, fx, fxs - m, fy, fys - m );
+		karatsuba( r, fx + fxs - m , min( fxs, m ), fy + fys - m, min( fys, m ) );
+		canonical_t hx( m + 1 ); /* + 1 for carrier */
+		canonical_t hy( m + 1 ); 
+		canonical_t Z( fs + 1 );
+		/* preparation of hx and hy */
+		/* hx = fx / B^m + fx % B^m */
+		int long lm[] = { 2 * m - fxs, m - fxs };
+		char const* ep[] = { fx + 1, fx + fxs - m + 1 };
+		mutate_addition( hx.raw(), m + 1, ep, lm, NULL, false, false );
+		/* hy */
+		lm[ 0 ] = 2 * m - fys;
+		lm[ 1 ] = m - fys;
+		ep[ 0 ] = fy + 1;
+		ep[ 1 ] = fy + fys - m + 1;
+		mutate_addition( hy.raw(), m + 1, ep, lm, NULL, false, false );
+		/* find Z */
+		karatsuba( Z, hx.raw(), m, hy.raw(), m );
+		/* combine all results */
+
+		}
+	else if ( ( fxs > 0 ) && ( fys > 0 ) )
+		{
+/* variables for mutate_addition() */
+		canonical_t element( fys + 1 );
+		char* e = element.raw();
+		char* res = ( result.raw() + fxs ) - 2; /* - 1 for carrier */
+		char const* ep[] = { res, e };
+/* the end of variables for mutate_addition() */
+		while ( -- fxs >= 0 )
+			{
+			if ( fx[ fxs ] )
+				{
+				int carrier = 0;
+				int inner = fys; /* index of last digit in second factor */
+				while ( -- inner >= 0 )
+					{
+					int pos = inner + 1;
+					e[ pos ] = fx[ fxs ] * fy[ inner ] + carrier;
+					if ( e[ pos ] > 9 )
+						{
+						carrier = e[ pos ] / 10;
+						e[ pos ] %= 10;
+						}
+					else
+						carrier = 0;
+					}
+				e[ 0 ] = carrier;
+				ep[ 0 ] = res + 1;
+				mutate_addition( res, fys + 1 + 1, ep, NULL, NULL, false, false );
+				-- res;
+				}
+			else
+				-- res;
+			}
+		}
+	return;
 	}
 
 }

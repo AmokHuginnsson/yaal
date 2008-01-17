@@ -109,12 +109,14 @@ public:
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
 private:
-	bool mutate( char*, int long, char const*[], int long*, int long*, bool, bool ) const;
+	bool mutate_addition( char*, int long, char const* const[], int long*, int long*, bool, bool ) const;
 	int absolute_lower( HNumber const& ) const;
+	void karatsuba( canonical_t&, char const* const, int long, char const* const, int long ) const;
 	int integral_length( void ) const;
 	int decimal_length( void ) const;
 	void from_string( HString const& );
 	void from_double( double long );
+	void normalize( void );
 	};
 
 }
