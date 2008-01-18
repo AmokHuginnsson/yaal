@@ -153,7 +153,7 @@ void HPool<tType>::pool_realloc( const int a_ulNewSize )
 			while ( f_iAllocedBytes < a_ulNewSize )
 				f_iAllocedBytes <<= 1;
 			f_ptPool = xrealloc<tType>( f_ptPool, f_iAllocedBytes );
-			memset( f_ptPool + f_iSize, 0,
+			::memset( f_ptPool + f_iSize, 0,
 					( f_iAllocedBytes - f_iSize ) * sizeof ( tType ) );
 			}
 		}
@@ -163,6 +163,9 @@ void HPool<tType>::pool_realloc( const int a_ulNewSize )
 			M_THROW( g_ppcErrMsgHPool[ ERROR::E_REALLOC_FIXED ], f_iAllocedBytes );
 		f_iAllocedBytes = a_ulNewSize;
 		f_ptPool = xrealloc<tType>( f_ptPool, f_iAllocedBytes );
+		if ( a_ulNewSize > f_iSize )
+			::memset( f_ptPool + f_iSize, 0,
+					( f_iAllocedBytes - f_iSize ) * sizeof ( tType ) );
 		}
 	f_iSize = a_ulNewSize;
 	return;
