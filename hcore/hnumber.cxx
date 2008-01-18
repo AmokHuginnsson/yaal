@@ -26,8 +26,6 @@ Copyright:
 
 #include <cstdlib>
 
-#include <iostream>
-
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hnumber.h"
@@ -48,7 +46,7 @@ int const D_A_MINUS = 0;
 int const D_A_DOT = 1;
 int const D_A_ZERO = 2;
 int const D_NUMBER_START = 3;
-int const D_KARATSUBA_THRESHOLD = 12; /* FIXME */
+int const D_KARATSUBA_THRESHOLD = 20; /* FIXME: 20 is fine */
 }
 
 int HNumber::D_DEFAULT_PRECISION = 100;
@@ -487,7 +485,8 @@ bool HNumber::mutate_addition( char* res, int long ressize,
 			}
 		-- idx;
 		}
-	res[ 0 ] = ! sub && carrier ? 1 : 0;
+	if ( carrier && ! sub )
+		++ res[ 0 ];
 	return ( carrier );
 	}
 
@@ -553,9 +552,11 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 		n = factor * ( *this );
 	else if ( f_iDigitCount && factor.f_iDigitCount )
 		{
-		n.f_oCanonical.pool_realloc( n.f_iDigitCount = f_iDigitCount + factor.f_iDigitCount );
+		n.f_iDigitCount = f_iDigitCount + factor.f_iDigitCount;
 		n.f_iIntegralPartSize = f_iIntegralPartSize + factor.f_iIntegralPartSize;
-		karatsuba( n.f_oCanonical, f_oCanonical.raw(), f_iDigitCount, factor.f_oCanonical.raw(), factor.f_iDigitCount );
+		karatsuba( n.f_oCanonical,
+				f_oCanonical.raw(), f_iDigitCount,
+				factor.f_oCanonical.raw(), factor.f_iDigitCount );
 		n.normalize();
 		n.f_bNegative = ! ( ( f_bNegative && factor.f_bNegative ) || ! ( f_bNegative || factor.f_bNegative ) );
 		}
@@ -713,83 +714,123 @@ void HNumber::normalize( void )
 	return;
 	}
 
-void dump( HPool<char> const& c )
+void HNumber::karatsuba( canonical_t& result, char const* fx, int long fxs, char const* fy, int long fys ) const
 	{
-	char const* const p = c.raw();
-	int long size = c.size();
-	for ( int i = 0; i < size; ++ i )
-		std::cout << static_cast<char>( p[ i ] + '0' );
-	std::cout << std::endl;
-	}
-
-void HNumber::karatsuba( canonical_t& result, char const* const fx, int long fxs, char const* const fy, int long fys ) const
-	{
-	if ( ( ( fxs > D_KARATSUBA_THRESHOLD ) || ( fys > D_KARATSUBA_THRESHOLD ) ) && ( fxs > 0 ) && ( fys > 0 ) )
+	int long shift = 0;
+	while ( ( shift < fxs ) && ! fx[ shift ] )
+		++ shift;
+	int long fxrl = fxs - shift;
+	int long totalShift = shift;
+	shift = 0;
+	while ( ( shift < fys ) && ! fy[ shift ] )
+		++ shift;
+	int long fyrl = fys - shift;
+	totalShift += shift;
+	if ( ( ( fxrl > D_KARATSUBA_THRESHOLD ) || ( fyrl > D_KARATSUBA_THRESHOLD ) ) && ( fxrl > 0 ) && ( fyrl > 0 ) )
 		{
+		fx += ( fxs - fxrl );
+		fy += ( fys - fyrl );
+		fxs = fxrl;
+		fys = fyrl;
+		if ( ! result.size() && ( fxs + fys ) )
+			result.pool_realloc( fxs + fys + totalShift );
+
 		int long fs = max( fxs, fys );
 		int long fl = min( fxs, fys );
 		int long m = ( fs / 2 ) + ( fs & 1 ); /* Size of upper/lower half of number */
-		canonical_t r2m( fs - m + ( fl > m ? fl - m : 0 ) ); /* intermediate result ( fx1 * fx2 ( * B ^ 2m ) ) + 1 for carrier */
-		canonical_t r( m + ( fl >= m ? m : fl ) ); /* intermediate result ( fx2 * fy2 ) + 1 for carrier */
+		canonical_t r2m( 0 ); /* intermediate result ( fx1 * fx2 ( * B ^ 2m ) ) + 1 for carrier */
 		karatsuba( r2m, fx, fxs - m, fy, fys - m );
-		dump( r2m );
-		karatsuba( r, fx + fxs - m, min( fxs, m ), fy + fys - m, min( fys, m ) );
-		dump( r );
+		canonical_t r( 0 ); /* intermediate result ( fx2 * fy2 ) + 1 for carrier */
+		karatsuba( r, fx + ( fxs > m ? fxs - m : 0 ), min( fxs, m ), fy + ( fys > m ? fys - m : 0 ), min( fys, m ) );
 		canonical_t hx( m + 1 ); /* + 1 for carrier */
 		canonical_t hy( m + 1 ); 
-		canonical_t Z( 2 * m + 2 );
 		/* preparation of hx and hy */
 		/* hx = fx / B^m + fx % B^m */
 		int long lm[] = { 2 * m - fxs, 0 };
 		char const* ep[] = { fx, fx + fxs - m };
-		mutate_addition( hx.raw(), m + 1, ep, lm, NULL, false, false );
-		dump( hx );
+		if ( fxs > m )
+			mutate_addition( hx.raw(), m + 1, ep, lm, NULL, false, false );
+		else
+			memcpy( hx.raw() + hx.size() - fxs, fx, fxs );
 		/* hy */
 		lm[ 0 ] = 2 * m - fys;
 		ep[ 0 ] = fy;
 		ep[ 1 ] = fy + fys - m;
-		mutate_addition( hy.raw(), m + 1, ep, lm, NULL, false, false );
-		dump( hy );
+		if ( fys > m )
+			mutate_addition( hy.raw(), m + 1, ep, lm, NULL, false, false );
+		else
+			memcpy( hy.raw() + hy.size() - fys, fy, fys );
 		/* find Z */
-		karatsuba( Z, hx.raw(), hx.size(), hy.raw(), hx.size() );
-		dump( Z );
+		canonical_t Z( 0 );
+		karatsuba( Z, hx.raw(), hx.size(), hy.raw(), hy.size() );
 		/* combine all results */
 		
-		int long size = result.size();
-		char* res = result.raw();
+		canonical_t tmpres( fxs + fys + 1 );
+		int long size = tmpres.size();
+		char* res = tmpres.raw();
 
 		/* res = Z*B^m + r */
+		int long s = Z.size();
+		char const* p = Z.raw();
+		shift = 0;
+		while ( ( shift < s ) && ! p[ shift ] )
+			++ shift;
+		s -= shift;
+		p += shift;
 		ep[ 0 ] = r.raw();
-		ep[ 1 ] = Z.raw();
-		lm[ 0 ] = Z.size() - r.size() + m;
+		ep[ 1 ] = p;
+		lm[ 0 ] = s - r.size() + m;
 		lm[ 1 ] = 0;
-		memcpy( res + size - r.size(), r.raw(), r.size() );
-		mutate_addition( res + size - Z.size() - m - 1, Z.size() + 1, ep, lm, NULL, false, false );
-		dump( result );
+		if ( ep[ 0 ] )
+			{
+			::memcpy( res + size - r.size(), r.raw(), r.size() );
+			mutate_addition( res + size - m - s - 1, s + 1, ep, lm, NULL, false, false );
+			}
+		else
+			::memcpy( res + size - m - s, p, s );
+
+		/* res += r2m*B^2m */
+		s = r2m.size();
+		shift = 0;
+		p = r2m.raw();
+		lm[ 0 ] = 0;
+		if ( p )
+			{
+			while ( ( shift < s ) && ! p[ shift ] )
+				++ shift;
+			s -= shift;
+			p += shift;
+			ep[ 0 ] = res + 1 + shift;
+			ep[ 1 ] = p;
+			lm[ 1 ] = 0;
+			mutate_addition( res + shift, s + 1, ep, lm, NULL, false, false );
+			}
 
 		/* res -= r2m*B^m, res -= r*B^m */
 
-		ep[ 0 ] = res + size - r2m.size() - m - 1;
-		ep[ 1 ] = r2m.raw();
-		lm[ 0 ] = 0;
-		lm[ 1 ] = 1;
-		mutate_addition( res + size - r2m.size() - m - 2, r2m.size() + 2, ep, lm, NULL, true, false );
-		dump( result );
-		ep[ 0 ] = res + size - r.size() - m - 1;
-		ep[ 1 ] = r.raw();
-		mutate_addition( res + size - r.size() - m - 2, r.size() + 2, ep, lm, NULL, true, false );
-		dump( result );
+		int ncar = ( fl > m ? 1 : 0 );
+		int car = 1 - ncar;
 
-		/* res += r2m*B^fs */
-		ep[ 0 ] = res + 1;
-		ep[ 1 ] = r2m.raw() + 1;
-		lm[ 1 ] = 0;
-		mutate_addition( res, r2m.size(), ep, lm, NULL, false, false );
-		dump( result );
+		ep[ 0 ] = res + ncar;
+		ep[ 1 ] = r2m.raw();
+		if ( ep[ 1 ] )
+			{
+			lm[ 1 ] = size - r2m.size() - m - ncar;
+			mutate_addition( res - car, size - m + car, ep, lm, NULL, true, false );
+			}
+		ep[ 1 ] = r.raw();
+		if ( ep[ 1 ] )
+			{
+			lm[ 1 ] = size - r.size() - m - ncar;
+			mutate_addition( res - car, size - m + car, ep, lm, NULL, true, false );
+			}
+		::memcpy( result.raw() + totalShift, tmpres.raw() + 1, result.size() - totalShift );
 		}
-	else if ( ( fxs > 0 ) && ( fys > 0 ) )
+	else if ( ( fxrl > 0 ) && ( fyrl > 0 ) )
 		{
 /* variables for mutate_addition() */
+		if ( ! result.size() )
+			result.pool_realloc( fxs + fys );
 		canonical_t element( fys + 1 );
 		char* e = element.raw();
 		char* res = ( result.raw() + fxs ) - 2; /* - 1 for carrier */

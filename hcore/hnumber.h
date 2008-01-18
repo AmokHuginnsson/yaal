@@ -38,6 +38,7 @@ namespace hcore
 
 class HNumber
 	{
+private:
 	typedef HPool<char> canonical_t;
 	int long f_iPrecision;
 	bool f_bNegative;
@@ -111,7 +112,7 @@ public:
 private:
 	bool mutate_addition( char*, int long, char const* const[], int long*, int long*, bool, bool ) const;
 	int absolute_lower( HNumber const& ) const;
-	void karatsuba( canonical_t&, char const* const, int long, char const* const, int long ) const;
+	void karatsuba( canonical_t&, char const*, int long, char const*, int long ) const;
 	int integral_length( void ) const;
 	int decimal_length( void ) const;
 	void from_string( HString const& );
