@@ -378,25 +378,6 @@ void HListControler<tType>::add_tail( tType const& a_tRow )
 	M_PROLOG
 	f_oList->push_back( a_tRow );
 	f_poControl->invalidate();
-/*
-	int l_iSize = f_oList->size();
-	if ( l_iSize > f_iHeightRaw )
-		{
-		f_iCursorPosition = f_iHeightRaw - 1;
-		f_iControlOffset = l_iSize - f_iHeightRaw;
-		if ( f_oFirstVisibleRow != f_oList->end() )
-			++ (*f_oFirstVisibleRow);
-		}
-	else
-		f_iCursorPosition = l_iSize - 1;
-	log_trace << " already has a row " << yaal::hcore::endl;
-	if ( f_oFirstVisibleRow == f_oList->end() )
-		{
-		log_trace << " setting iterator " << yaal::hcore::endl;
-		f_oFirstVisibleRow = f_oList->begin();
-		}
-	n_bNeedRepaint = true;
-*/
 	return;
 	M_EPILOG
 	}

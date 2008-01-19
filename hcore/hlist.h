@@ -690,6 +690,23 @@ void HList<tType>::pop_front( void )
 	M_EPILOG
 	}
 
+namespace
+{
+
+template<typename tType, typename T>
+bool asc_less( tType const& a, tType const& b, T const& comp )
+	{
+	return ( comp( a, b ) );
+	}
+
+template<typename tType, typename T>
+bool desc_less( tType const& a, tType const& b, T const& comp )
+	{
+	return ( comp( b, a ) );
+	}
+
+}
+
 template<typename tType>
 template<typename T>
 tType& HList<tType>::add_orderly( tType const& a_rtObject,
@@ -703,19 +720,25 @@ tType& HList<tType>::add_orderly( tType const& a_rtObject,
 	if ( ( f_eOrder != D_UNSORTED ) && ( f_eOrder != a_eOrder ) )
 		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
+	typedef bool ( *comp_t )( tType const&, tType const&, T const& );
+	comp_t my_comp;
+	if ( f_eOrder == D_ASCENDING )
+		my_comp = asc_less<tType, T>;
+	else
+		my_comp = desc_less<tType, T>;
 	while ( f_iSize && ( l_iOldIndex != l_iIndex ) )
 		{
 		l_iOldIndex = l_iIndex;
 		l_iIndex = ( l_iLower + l_iUpper ) / 2;
 		element_by_index( l_iIndex );
-		if ( less ( f_poIndex->f_tObject, l_poElement->f_tObject ) )
+		if ( my_comp( f_poIndex->f_tObject, l_poElement->f_tObject, less ) )
 			l_iLower = l_iIndex;
 		else
 			l_iUpper = l_iIndex;
 		}
 	if ( f_poIndex )
 		{
-		if ( less ( f_poIndex->f_tObject, l_poElement->f_tObject ) )
+		if ( my_comp( f_poIndex->f_tObject, l_poElement->f_tObject, less ) )
 			f_poIndex = f_poIndex->f_poNext;
 		else
 			l_bBefore = true;
@@ -1027,14 +1050,20 @@ void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less 
 			merge_sort( rightIt, right, less );
 		HElement* first = NULL;
 		++ stepsLeft;
+		typedef bool ( *comp_t )( tType const&, tType const&, T const& );
+		comp_t my_comp;
+		if ( f_eOrder == D_ASCENDING )
+			my_comp = asc_less<tType, T>;
+		else
+			my_comp = desc_less<tType, T>;
 		while ( stepsLeft -- )
 			{
-			if ( less( rightIt->f_tObject, left->f_tObject ) )
+			if ( my_comp( rightIt->f_tObject, left->f_tObject, less ) )
 				{
 				HElement* ptr = rightIt;
 				if ( ! first )
 					first = ptr;
-				while ( ( rightIt != right ) && less( rightIt->f_poNext->f_tObject, left->f_tObject ) )
+				while ( ( rightIt != right ) && my_comp( rightIt->f_poNext->f_tObject, left->f_tObject, less ) )
 					rightIt = rightIt->f_poNext;
 				HElement* nextRight = rightIt->f_poNext;
 				bool to_break = false;
@@ -1073,11 +1102,17 @@ void HList<tType>::insert_sort(
 	if ( a_rpoBaseLower != a_rpoBaseUpper )
 		{
 		HElement* top = a_rpoBaseLower;
+		typedef bool ( *comp_t )( tType const&, tType const&, T const& );
+		comp_t my_comp;
+		if ( f_eOrder == D_ASCENDING )
+			my_comp = asc_less<tType, T>;
+		else
+			my_comp = desc_less<tType, T>;
 		while ( top != a_rpoBaseUpper )
 			{
 			top = top->f_poNext;
 			HElement* ptr = top;
-			while ( ( ptr != a_rpoBaseLower ) && less( top->f_tObject, ptr->f_poPrevious->f_tObject ) )
+			while ( ( ptr != a_rpoBaseLower ) && my_comp( top->f_tObject, ptr->f_poPrevious->f_tObject, less ) )
 				ptr = ptr->f_poPrevious;
 			if ( ptr != top )
 				{
@@ -1100,7 +1135,7 @@ template<typename tType>
 void HList<tType>::insert( HElement* pos, HElement* elem )
 	{
 	M_ASSERT( pos != elem );
-	if ( ( pos->f_poNext == elem ) || ( pos->f_poPrevious == elem ) )
+	if ( pos->f_poNext == elem )
 		exchange( pos, elem );
 	else
 		{
@@ -1132,6 +1167,12 @@ void HList<tType>::select_sort(
 	HElement* l_poBaseUpper = a_rpoBaseUpper;
 	HElement* l_poPointer = NULL;
 	int ctr = distance;
+	typedef bool ( *comp_t )( tType const&, tType const&, T const& );
+	comp_t my_comp;
+	if ( f_eOrder == D_ASCENDING )
+		my_comp = asc_less<tType, T>;
+	else
+		my_comp = desc_less<tType, T>;
 	while ( ctr >= 0 )
 		{
 		l_iCtrLoc = ctr;
@@ -1141,10 +1182,10 @@ void HList<tType>::select_sort(
 		while ( l_iCtrLoc -- )
 			{
 			if ( ( l_poPointer != l_poExtreamLower )
-					&& less( l_poPointer->f_tObject, l_poExtreamLower->f_tObject ) )
+					&& my_comp( l_poPointer->f_tObject, l_poExtreamLower->f_tObject, less ) )
 				l_poExtreamLower = l_poPointer;
 			if ( ( l_poPointer != l_poExtreamUpper )
-					&& less( l_poExtreamUpper->f_tObject, l_poPointer->f_tObject ) )
+					&& my_comp( l_poExtreamUpper->f_tObject, l_poPointer->f_tObject, less ) )
 				l_poExtreamUpper = l_poPointer;
 			l_poPointer = l_poPointer->f_poNext;
 			}
