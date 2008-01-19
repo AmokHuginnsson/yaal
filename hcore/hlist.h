@@ -1143,12 +1143,15 @@ void HList<tType>::insert( HElement* pos, HElement* elem )
 			f_poHook = elem;
 		if ( pos == f_poIndex )
 			f_poIndex = elem;
-		elem->f_poNext->f_poPrevious = elem->f_poPrevious;
-		elem->f_poPrevious->f_poNext = elem->f_poNext;
-		elem->f_poNext = pos;
-		elem->f_poPrevious = pos->f_poPrevious;
-		pos->f_poPrevious->f_poNext = elem;
-		pos->f_poPrevious = elem;
+		if ( pos->f_poPrevious != elem )
+			{
+			elem->f_poNext->f_poPrevious = elem->f_poPrevious;
+			elem->f_poPrevious->f_poNext = elem->f_poNext;
+			elem->f_poNext = pos;
+			elem->f_poPrevious = pos->f_poPrevious;
+			pos->f_poPrevious->f_poNext = elem;
+			pos->f_poPrevious = elem;
+			}
 		}
 	return;
 	}
