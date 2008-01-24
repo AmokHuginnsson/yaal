@@ -42,7 +42,11 @@ public:
 	typedef yaal::hcore::HPointer<HChunk, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
 	HChunk( void* );
 	~HChunk( void );
-	void* get() const;
+	template<typename tType>
+	tType* get() const
+		{ return ( static_cast<tType*>( f_pvData ) ); }
+	void set( void* );
+	void clear( void );
 private:
 	HChunk( HChunk const& );
 	HChunk& operator = ( HChunk const& );

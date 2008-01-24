@@ -93,12 +93,12 @@ bool HSerial::open( void )
 		M_THROW( ::strerror( errno ), errno );
 	if ( ! isatty ( f_iFileDescriptor ) )
 		M_THROW( "not a tty", f_iFileDescriptor );
-	::tcgetattr( f_iFileDescriptor, reinterpret_cast<termios*>( f_oBackUpTIO.get() ) );
+	::tcgetattr( f_iFileDescriptor, f_oBackUpTIO.get<termios>() );
 	::fcntl( f_iFileDescriptor, F_SETFD, 0 );
 	::fcntl( f_iFileDescriptor, F_SETFL, 0 );
 	::tcflush( f_iFileDescriptor, TCIOFLUSH );
 	::tcsetattr( f_iFileDescriptor, TCSANOW,
-			static_cast<termios const* const>( f_oTIO.get() ) );
+			f_oTIO.get<termios const>() );
 	return ( false );
 	M_EPILOG
 	}
@@ -108,7 +108,7 @@ int HSerial::do_close ( void )
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
 		::tcsetattr( f_iFileDescriptor, TCSANOW,
-				static_cast<termios const* const>( f_oBackUpTIO.get() ) );
+				f_oBackUpTIO.get<termios const>() );
 	return ( HRawFile::do_close() );
 	M_EPILOG
 	}
@@ -116,9 +116,9 @@ int HSerial::do_close ( void )
 void HSerial::compile ( void )
 	{
 	M_PROLOG
-	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.get() );
-	memset ( & l_sTIO, 0, sizeof ( termios ) );
-	memset ( f_oBackUpTIO.get(), 0, sizeof ( termios ) );
+	termios& l_sTIO = *f_oTIO.get<termios>();
+	::memset( &l_sTIO, 0, sizeof ( termios ) );
+	::memset( f_oBackUpTIO.get<void>(), 0, sizeof ( termios ) );
 /*
  *   initialize all control characters
  *   default values can be found in /usr/include/termios.h, and are given
@@ -162,7 +162,7 @@ void HSerial::compile_speed ( void )
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
 		M_THROW ( n_pcEAlreadyOpened, errno );
-	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.get() );
+	termios& l_sTIO = *f_oTIO.get<termios>();
 	int l_iBaudRate = 0;
 	if ( f_eSpeed == D_SPEED_DEFAULT )
 		f_eSpeed = tools::n_eBaudRate;
@@ -214,7 +214,7 @@ void HSerial::compile_flags ( void )
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
 		M_THROW ( n_pcEAlreadyOpened, errno );
-	termios & l_sTIO = * reinterpret_cast < termios * > ( f_oTIO.get() );
+	termios& l_sTIO = *f_oTIO.get<termios>();
 	int l_iCtr = 0;
 	if ( f_eFlags & D_FLAGS_DEFAULT )
 		f_eFlags |= tools::n_eSerialFlags;

@@ -37,6 +37,7 @@ Copyright:
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
 #include <libxml/xmlreader.h>
+#include <libxml/xmlwriter.h>
 
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
@@ -46,8 +47,8 @@ M_VCSID ( "$Id$" )
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-char free_err [ ] = "trying to free NULL pointer";
-char schema_err [ ] = "bad xml schema";
+char free_err[] = "trying to free NULL pointer";
+char schema_err[] = "bad xml schema";
 
 namespace yaal
 {
@@ -69,16 +70,16 @@ private:
 	/*}*/
 protected:
 	/*{*/
-	HXmlData ( void );
-	virtual ~HXmlData ( void );
-	HXmlData ( HXmlData const & ) __attribute__(( __noreturn__ ));
-	HXmlData & operator = ( HXmlData const & ) __attribute__(( __noreturn__ ));
-	void xml_free ( xmlDocPtr & ) const;
+	HXmlData( void );
+	virtual ~HXmlData( void );
+	HXmlData( HXmlData const& ) __attribute__(( __noreturn__ ));
+	HXmlData& operator = ( HXmlData const& ) __attribute__(( __noreturn__ ));
+	void xml_free( xmlDocPtr& ) const;
 /*	void xml_free ( xmlNodePtr & ); */
 /*	void xml_free ( xmlNodeSetPtr & ); */
-	void xml_free ( xmlXPathContextPtr & ) const;
-	void xml_free ( xmlXPathObjectPtr & ) const;
-	void reset ( void );
+	void xml_free( xmlXPathContextPtr& ) const;
+	void xml_free( xmlXPathObjectPtr& ) const;
+	void reset( void );
 	/*}*/
 	};
 
@@ -86,29 +87,29 @@ struct HXml::OConvert
 	{
 	iconv_t f_xIconvIn;
 	iconv_t f_xIconvOut;
-	OConvert ( void ) 
-		: f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
-		f_xIconvOut ( static_cast < iconv_t > ( 0 ) ) { }
-	OConvert ( OConvert const & a_roConvert )
-		: f_xIconvIn ( static_cast < iconv_t > ( 0 ) ),
-		f_xIconvOut ( static_cast < iconv_t > ( 0 ) )
+	OConvert( void ) 
+		: f_xIconvIn ( static_cast<iconv_t>( 0 ) ),
+		f_xIconvOut ( static_cast<iconv_t>( 0 ) ) { }
+	OConvert( OConvert const& a_roConvert )
+		: f_xIconvIn ( static_cast<iconv_t>( 0 ) ),
+		f_xIconvOut ( static_cast<iconv_t>( 0 ) )
 		{
 		operator = ( a_roConvert );
 		}
-	OConvert & operator = ( OConvert const & a_roConvert )
+	OConvert& operator = ( OConvert const& a_roConvert )
 		{
-		if ( & a_roConvert != this )
+		if ( &a_roConvert != this )
 			{
 			f_xIconvIn = a_roConvert.f_xIconvIn;
 			f_xIconvOut = a_roConvert.f_xIconvOut;
 			}
-		return ( * this );
+		return ( *this );
 		}
 	};
 
-HXmlData::HXmlData ( void ) : f_psDoc ( NULL ), f_psRoot ( NULL ),
-										f_psContext ( NULL ), f_psObject ( NULL ),
-										f_psNodeSet ( NULL ), f_psCharEncodingHandler ( NULL )
+HXmlData::HXmlData( void ) : f_psDoc( NULL ), f_psRoot( NULL ),
+	f_psContext( NULL ), f_psObject( NULL ),
+	f_psNodeSet( NULL ), f_psCharEncodingHandler( NULL )
 	{
 	M_PROLOG
 	return;
@@ -119,16 +120,17 @@ HXmlData::~HXmlData ( void )
 	{
 	M_PROLOG
 	if ( f_psContext )
-		xml_free ( f_psContext );
+		xml_free( f_psContext );
 	if ( f_psObject )
-		xml_free ( f_psObject );
+		xml_free( f_psObject );
 	if ( f_psDoc )
-		xml_free ( f_psDoc );
+		xml_free( f_psDoc );
+	xmlCleanupParser();
 	return;
 	M_EPILOG
 	}
 
-void HXmlData::reset ( void )
+void HXmlData::reset( void )
 	{
 	M_PROLOG
 	f_psNodeSet = NULL;
@@ -136,12 +138,12 @@ void HXmlData::reset ( void )
 	M_EPILOG
 	}
 
-void HXmlData::xml_free ( xmlDocPtr & a_rpsDoc ) const
+void HXmlData::xml_free( xmlDocPtr& a_rpsDoc ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsDoc )
-		M_THROW ( free_err, errno );
-	xmlFreeDoc ( a_rpsDoc );
+		M_THROW( free_err, errno );
+	xmlFreeDoc( a_rpsDoc );
 	a_rpsDoc = NULL;
 	return;
 	M_EPILOG
@@ -199,7 +201,7 @@ HXml::HXml ( void )
 	{
 	M_PROLOG
 	f_poXml = new ( std::nothrow ) HXmlData();
-	M_ENSURE ( f_poXml );
+	M_ENSURE( f_poXml );
 	M_EPILOG
 	return;
 	}
@@ -208,7 +210,7 @@ HXml::~HXml ( void )
 	{
 	M_PROLOG
 	if ( f_poXml->f_psCharEncodingHandler )
-		xmlCharEncCloseFunc ( f_poXml->f_psCharEncodingHandler );
+		xmlCharEncCloseFunc( f_poXml->f_psCharEncodingHandler );
 	xmlCleanupCharEncodingHandlers();
 	if ( f_poXml )
 		delete f_poXml;
@@ -293,7 +295,7 @@ int HXml::get_node_set_by_path( char const* a_pcPath )
 	M_EPILOG
 	}
 
-void HXml::init ( char const * a_pcFileName )
+void HXml::init( char const* a_pcFileName )
 	{
 	M_PROLOG
 	int l_iSavedErrno = errno;
@@ -430,6 +432,24 @@ void HXml::parse( char const* a_pcXPath, bool a_bStripEmpty )
 			parse( f_poXml->f_psNodeSet->nodeTab[ 0 ],
 					NULL, a_bStripEmpty );
 		}
+	M_EPILOG
+	}
+
+void HXml::load( char const* const a_pcPath )
+	{
+	M_PROLOG
+	init( a_pcPath );
+	parse( NULL, true );
+	return;
+	M_EPILOG
+	}
+
+void HXml::save( char const* const a_pcPath )
+	{
+	M_PROLOG
+	xmlTextWriterPtr writer = xmlNewTextWriterFilename( a_pcPath, 0 );
+	xmlFreeTextWriter( writer );
+	return;
 	M_EPILOG
 	}
 

@@ -55,6 +55,7 @@ public:
 private:
 	class OSSLContext : public HSingletonInterface
 		{
+		static int f_iUsers;
 		static HMutex f_oMutex;
 	public:
 		void* f_pvMethod;

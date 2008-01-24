@@ -41,12 +41,20 @@ HChunk::HChunk( void* a_pvData ) : f_pvData( a_pvData )
 
 HChunk::~HChunk( void )
 	{
-	xfree( f_pvData );
+	clear();
 	}
 
-void* HChunk::get( void ) const
+void HChunk::set( void* a_pvData )
 	{
-	return ( f_pvData );
+	clear();
+	f_pvData = a_pvData;
+	return;
+	}
+
+void HChunk::clear( void )
+	{
+	if ( f_pvData )
+		xfree( f_pvData );
 	}
 
 }

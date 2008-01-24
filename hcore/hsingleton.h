@@ -111,7 +111,8 @@ template<typename tType>
 void HSingleton<tType>::create_instance( int const& a_iLifeTime )
 	{
 	M_ASSERT( ! f_ptInstance );
-	HLifeTimeTracker::register_destructor( HLifeTimeTracker::destructor_ptr_t( new HDestructor<tType>( f_ptInstance ) ), tType::life_time( a_iLifeTime ) );
+	HLifeTimeTracker::destructor_ptr_t p( new HDestructor<tType>( f_ptInstance ) );
+	HLifeTimeTracker::register_destructor( p, tType::life_time( a_iLifeTime ) );
 	f_ptInstance = new tType();
 	}
 
@@ -119,7 +120,12 @@ template<typename tType>
 tType& HSingleton<tType>::get_instance( int const& a_iLifeTime )
 	{
 	if ( ! f_ptInstance )
-		create_instance( a_iLifeTime );
+		{
+		static HMutex l_oMutex;
+		HLock l( l_oMutex );
+		if ( ! f_ptInstance )
+			create_instance( a_iLifeTime );
+		}
 	return ( *f_ptInstance );
 	}
 

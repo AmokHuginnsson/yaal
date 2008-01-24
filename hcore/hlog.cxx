@@ -60,35 +60,36 @@ namespace
 int long HLog::f_lLogMask = 0;
 
 HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( true ),
-	f_lType ( 0 ), f_psStream ( NULL ), f_pcProcessName ( NULL ),
-	f_pcLoginName ( NULL ), f_pcHostName ( NULL ), f_pcBuffer ( NULL ),
-	f_iBufferSize ( D_BUFFER_SIZE )
+	f_lType ( 0 ), f_iBufferSize ( D_BUFFER_SIZE ),
+	f_psStream ( NULL ), f_pcProcessName( NULL ),
+	f_oLoginName ( NULL ), f_oHostName( xcalloc<char>( D_HOSTNAME_SIZE ) ),
+	f_oBuffer ( xcalloc<char>( f_iBufferSize ) )
 	{
 	M_PROLOG
 	uid_t l_iUid = 0;
-	passwd * l_psPasswd = NULL;
-	f_pcBuffer = xcalloc < char > ( f_iBufferSize );
-	f_pcHostName = xcalloc < char > ( D_HOSTNAME_SIZE );
 	f_psStream = tmpfile();
 	if ( ! f_psStream )
-		M_THROW ( "tmpfile returned", reinterpret_cast < int > ( f_psStream ) );
-	fprintf ( f_psStream, "%-10xProcess started (%d).\n",
+		M_THROW( "tmpfile returned", reinterpret_cast<int>( f_psStream ) );
+	::fprintf( f_psStream, "%-10xProcess started (%d).\n",
 			LOG_TYPE::D_NOTICE, getpid() );
 	l_iUid = getuid();
-	l_psPasswd = getpwuid ( l_iUid );
-	if ( l_psPasswd )
-		f_pcLoginName = xstrdup ( l_psPasswd->pw_name );
+	passwd l_sPasswd;
+	long bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
+	HChunk buf( xcalloc<char>( bsize + 1 ) );
+	passwd* any;
+	if ( ! getpwuid_r( l_iUid, &l_sPasswd, buf.get<char>(), bsize, &any ) )
+		f_oLoginName.set( xstrdup( l_sPasswd.pw_name ) );
 	else
 		{
-		f_pcLoginName = xcalloc < char > ( D_LOGIN_NAME_MAX + 1 );
-		M_ENSURE ( snprintf ( f_pcLoginName, D_LOGIN_NAME_MAX, "%d", l_iUid ) <= D_LOGIN_NAME_MAX );
+		f_oLoginName.set( xcalloc<char>( D_LOGIN_NAME_MAX + 1 ) );
+		M_ENSURE( ::snprintf( f_oLoginName.get<char>(), D_LOGIN_NAME_MAX, "%d", l_iUid ) <= D_LOGIN_NAME_MAX );
 		}
-	M_ENSURE ( gethostname ( f_pcHostName, D_HOSTNAME_SIZE - 1 ) == 0 );
+	M_ENSURE( ::gethostname( f_oHostName.get<char>(), D_HOSTNAME_SIZE - 1 ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-HLog::~HLog ( void )
+HLog::~HLog( void )
 	{
 	M_PROLOG
 	if ( f_lLogMask & LOG_TYPE::D_NOTICE )
@@ -98,16 +99,8 @@ HLog::~HLog ( void )
 		fprintf ( f_psStream, "Process exited normally.\n" );
 		}
 	if ( ( f_psStream != stdout ) && ( f_psStream != stderr ) )
-		fclose ( f_psStream );
+		fclose( f_psStream );
 	f_psStream = NULL;
-	if ( f_pcLoginName )
-		xfree ( f_pcLoginName );
-	if ( f_pcHostName )
-		xfree ( f_pcHostName );
-	f_pcHostName = NULL;
-	if ( f_pcBuffer )
-		xfree ( f_pcBuffer );
-	f_pcBuffer = NULL;
 	return;
 	M_EPILOG
 	}
@@ -117,42 +110,43 @@ void HLog::rehash ( FILE * a_psStream,
 	{
 	M_PROLOG
 #ifndef HAVE_GETLINE
-	char * l_pcPtr = NULL;
+	char* l_pcPtr = NULL;
 	int l_iLen = 0;
 #endif /* not HAVE_GETLINE */
-	FILE * l_psTmpFile;
+	FILE* l_psTmpFile;
 	f_bRealMode = true;
 	if ( a_pcProcessName )
-		f_pcProcessName = basename ( a_pcProcessName );
+		f_pcProcessName = ::basename( a_pcProcessName );
 	if ( ! a_psStream )
 		M_THROW ( "file parameter is", reinterpret_cast < int > ( a_psStream ) );
 	if ( f_psStream )
 		{
 		fseek ( f_psStream, 0, SEEK_SET );
+		char* buf = f_oBuffer.get<char>();
 #ifdef HAVE_GETLINE 
-		while ( getline ( & f_pcBuffer, & f_iBufferSize, f_psStream ) > 0 )
+		while ( getline( &buf, &f_iBufferSize, f_psStream ) > 0 )
 #else /* HAVE_GETLINE */
-		while ( ( l_iLen = fread ( f_pcBuffer, sizeof ( char ), f_iBufferSize, f_psStream ) ) )
+		while ( ( l_iLen = fread ( buf, sizeof ( char ), f_iBufferSize, f_psStream ) ) )
 #endif /* not HAVE_GETLINE */
 			{
 #ifndef HAVE_GETLINE
-			l_pcPtr = static_cast < char * > ( memchr ( f_pcBuffer, '\n', l_iLen ) );
+			l_pcPtr = static_cast<char*>( ::memchr( buf, '\n', l_iLen ) );
 			if ( ! l_pcPtr )
 				{
-				fprintf ( a_psStream, f_pcBuffer );
+				fprintf( a_psStream, buf );
 				continue;
 				}
 			* ++ l_pcPtr = 0;
-			fseek ( f_psStream, l_pcPtr - f_pcBuffer - l_iLen, SEEK_CUR );
+			::fseek( f_psStream, l_pcPtr - buf - l_iLen, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
-			f_lType = strtol ( f_pcBuffer, NULL, 0x10 );
+			f_lType = ::strtol( buf, NULL, 0x10 );
 			if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 				{
-				timestamp ( a_psStream );
-				fprintf ( a_psStream, f_pcBuffer + 10 );
+				timestamp( a_psStream );
+				::fprintf( a_psStream, buf + 10 );
 				}
 			}
-		if ( f_pcBuffer [ strlen ( f_pcBuffer ) - 1 ] == '\n' )
+		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
 			f_lType = 0;
 		l_psTmpFile = f_psStream;
 		fclose ( l_psTmpFile );
@@ -201,13 +195,13 @@ void HLog::timestamp ( FILE * a_psStream )
 	l_iSize = strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
 			l_psBrokenTime );
 	if ( l_iSize > D_TIMESTAMP_SIZE )
-		M_THROW ( _ ( "strftime returned more than D_TIMESTAMP_SIZE" ), l_iSize );
+		M_THROW( _( "strftime returned more than D_TIMESTAMP_SIZE" ), l_iSize );
 	if ( f_pcProcessName )
-		fprintf ( a_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_pcLoginName,
-				f_pcHostName, f_pcProcessName );
+		fprintf( a_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_oLoginName.get<char>(),
+				f_oHostName.get<char>(), f_pcProcessName );
 	else
-		fprintf ( a_psStream, "%s %s@%s: ", l_pcBuffer, f_pcLoginName,
-			f_pcHostName );
+		fprintf( a_psStream, "%s %s@%s: ", l_pcBuffer, f_oLoginName.get<char>(),
+			f_oHostName.get<char>() );
 	return;
 	M_EPILOG
 	}
@@ -218,16 +212,17 @@ int HLog::operator() ( char const * const a_pcFormat, va_list const a_xAp )
 	int l_iErr = 0;
 	if ( f_bNewLine )
 		timestamp();
-	memset ( f_pcBuffer, 0, f_iBufferSize );
-	l_iErr = vsnprintf ( f_pcBuffer, f_iBufferSize, a_pcFormat, a_xAp );
-	fprintf ( f_psStream, f_pcBuffer );
-	if ( f_pcBuffer [ strlen ( f_pcBuffer ) - 1 ] != '\n' )
+	char* buf = f_oBuffer.get<char>();
+	::memset( buf, 0, f_iBufferSize );
+	l_iErr = ::vsnprintf( buf, f_iBufferSize, a_pcFormat, a_xAp );
+	fprintf( f_psStream, buf );
+	if ( buf[ ::strlen( buf ) - 1 ] != '\n' )
 		f_bNewLine = false;
 	else
 		{
 		f_lType = 0;
 		f_bNewLine = true;
-		M_ENSURE ( fflush ( f_psStream ) == 0 );
+		M_ENSURE( ::fflush( f_psStream ) == 0 );
 		}
 	return ( l_iErr );
 	M_EPILOG

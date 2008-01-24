@@ -95,7 +95,7 @@ HSignalService::HSignalService( void )
 	f_oWorker( *this ), f_oMutex(), f_oHandlers()
 	{
 	M_PROLOG
-	sigemptyset( static_cast<sigset_t*>( f_oLocker.get() ) );
+	sigemptyset( f_oLocker.get<sigset_t>() );
 	HSignalHandlerInterface::ptr_t base( new HBaseSignalHandlers() );
 	register_handler( SIGINT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_INT ) ) );
 	register_handler( SIGHUP, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_HUP ) ) );
@@ -142,7 +142,7 @@ int HSignalService::operator()( HThread const* )
 	while ( f_bLoop && f_oWorker.is_alive() )
 		{
 		int l_iSigNo = 0;
-		sigwait( static_cast<sigset_t*>( f_oLocker.get() ), &l_iSigNo );
+		sigwait( f_oLocker.get<sigset_t>(), &l_iSigNo );
 		HLock l_oLock( f_oMutex );
 		handlers_t::HIterator it;
 		if ( ( it = f_oHandlers.find( l_iSigNo ) ) != f_oHandlers.end() )
@@ -181,8 +181,8 @@ void HSignalService::register_handler( int a_iSigNo, HSignalService::HHandlerGen
 void HSignalService::lock_on( int a_iSigNo )
 	{
 	M_PROLOG
-	sigaddset( static_cast<sigset_t*>( f_oLocker.get() ), a_iSigNo );
-	pthread_sigmask( SIG_BLOCK, static_cast<sigset_t*>( f_oLocker.get() ), NULL );
+	sigaddset( f_oLocker.get<sigset_t>(), a_iSigNo );
+	pthread_sigmask( SIG_BLOCK, f_oLocker.get<sigset_t>(), NULL );
 	return;
 	M_EPILOG
 	}

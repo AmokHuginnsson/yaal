@@ -30,6 +30,7 @@ Copyright:
 #include <cstdio>
 
 #include "hcore/hsingleton.h"
+#include "hcore/hchunk.h"
 #include "hcore/hstreaminterface.h"
 
 namespace yaal
@@ -59,12 +60,12 @@ class HLog : public HStreamInterface, private HSingletonInterface
 	bool			f_bRealMode;
 	bool			f_bNewLine;
 	int long	f_lType;
+	size_t		f_iBufferSize;
 	FILE*		f_psStream;
 	char*		f_pcProcessName;
-	char*		f_pcLoginName;
-	char*		f_pcHostName;
-	char*		f_pcBuffer;
-	size_t		f_iBufferSize;
+	HChunk	f_oLoginName;
+	HChunk	f_oHostName;
+	HChunk	f_oBuffer;
 public:
 	static int long f_lLogMask;
 public:

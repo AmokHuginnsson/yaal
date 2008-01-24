@@ -73,12 +73,12 @@ char const * const make_short_opts ( OOption * const & a_rpsOptions, int a_iCoun
 	return ( a_roBuffer.raw() );
 	}
 
-option * make_option_array( OOption * const & a_rpsOptions, int a_iCount, HChunk& a_roBuffer )
+option* make_option_array( OOption* const& a_rpsOptions, int a_iCount, HChunk& a_roBuffer )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	option * l_psOptions = NULL;
-	l_psOptions = static_cast<option*>( a_roBuffer.get() );
+	l_psOptions = a_roBuffer.get<option>();
 	for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 		{
 		memset( &l_psOptions[ l_iCtr ], 0, sizeof( option ) );
@@ -101,9 +101,9 @@ option * make_option_array( OOption * const & a_rpsOptions, int a_iCount, HChunk
 	M_EPILOG
 	}
 
-int decode_switches ( int const a_iArgc, char * const * const a_ppcArgv,
-		OOption * const & a_rpsOptions, int const a_iCount,
-		int * const a_piUnknown )
+int decode_switches( int const a_iArgc, char* const* const a_ppcArgv,
+		OOption* const& a_rpsOptions, int const a_iCount,
+		int* const a_piUnknown )
 	{
 	M_PROLOG
 	bool l_bValidSwitch = false;

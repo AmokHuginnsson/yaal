@@ -163,7 +163,7 @@ HFSItem::HIterator& HFSItem::HIterator::operator = ( HFSItem::HIterator const& a
 			if ( !! f_oDirEnt )
 				f_oDirEnt = HChunk::ptr_t( new HChunk( xcalloc<dirent>( 1 ) ) );
 			seekdir( static_cast<DIR*>( f_pvDir ), telldir( static_cast<DIR*>( a_oFSItemIterator.f_pvDir ) ) );
-			::memcpy( f_oDirEnt->get(), a_oFSItemIterator.f_oDirEnt->get(), sizeof ( dirent ) );
+			::memcpy( f_oDirEnt->get<void>(), a_oFSItemIterator.f_oDirEnt->get<void>(), sizeof ( dirent ) );
 			f_oItem.set_path( a_oFSItemIterator.f_oItem.f_oPath, a_oFSItemIterator.f_oItem.f_iNameLen );
 			}
 		}
@@ -179,7 +179,7 @@ bool HFSItem::HIterator::operator == ( HIterator const& it ) const
 		if ( ! ( f_pvDir || it.f_pvDir ) )
 			same = true;
 		else if ( f_pvDir && it.f_pvDir )
-			same = ( static_cast<dirent*>( f_oDirEnt->get() )->d_fileno == static_cast<dirent*>( it.f_oDirEnt->get() )->d_fileno );
+			same = ( f_oDirEnt->get<dirent>()->d_fileno == it.f_oDirEnt->get<dirent>()->d_fileno );
 		}
 	return ( same );
 	}
@@ -193,7 +193,7 @@ HFSItem::HIterator& HFSItem::HIterator::operator++( void )
 	{
 	M_ASSERT( f_pvDir );
 	dirent* result = NULL;
-	readdir_r( static_cast<DIR*>( f_pvDir ), static_cast<dirent*>( f_oDirEnt->get() ), &result );
+	readdir_r( static_cast<DIR*>( f_pvDir ), f_oDirEnt->get<dirent>(), &result );
 	if ( ! result )
 		cleanup();
 	return ( *this );
@@ -202,7 +202,7 @@ HFSItem::HIterator& HFSItem::HIterator::operator++( void )
 void HFSItem::HIterator::update( void )
 	{
 	M_PROLOG
-	dirent* ent = static_cast<dirent*>( f_oDirEnt->get() );
+	dirent* ent = f_oDirEnt->get<dirent>();
 	f_oItem.set_path( f_oPath + "/" + ent->d_name, strlen( ent->d_name ) );
 	return;
 	M_EPILOG

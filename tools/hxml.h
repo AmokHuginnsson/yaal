@@ -66,6 +66,8 @@ public:
 	void init( char const* );
 	void parse( char const* const = NULL, bool = true );
 	HNodeProxy get_root( void );
+	void load( char const* const );
+	void save( char const* const );
 protected:
 	void parse ( xml_node_ptr_t, tree_t::node_t, bool );
 #ifdef HAVE_ICONV_INPUT_CONST

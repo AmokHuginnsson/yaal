@@ -30,6 +30,9 @@ Copyright:
 #include <openssl/pem.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <openssl/conf.h>
+#include <openssl/engine.h>
+#include <unistd.h>
 
 #include "hexception.h"
 M_VCSID ( "$Id$" )
@@ -60,6 +63,7 @@ HString& format_error_message( HString& a_oBuffer )
 yaal::hcore::HString HOpenSSL::f_oSSLKey;
 yaal::hcore::HString HOpenSSL::f_oSSLCert;
 
+int HOpenSSL::OSSLContext::f_iUsers = 0;
 HMutex HOpenSSL::OSSLContext::f_oMutex;
 
 HOpenSSL::OSSLContext::OSSLContext( void ) : f_pvMethod( NULL ), f_pvContext( NULL )
@@ -70,8 +74,12 @@ void HOpenSSL::OSSLContext::init( void )
 	{
 	M_PROLOG
 	HLock l_oLock( f_oMutex );
-	SSL_load_error_strings();
-	SSLeay_add_ssl_algorithms();
+	if ( f_iUsers == 0 )
+		{
+		SSL_load_error_strings();
+		SSLeay_add_ssl_algorithms();
+		}
+	++ f_iUsers;
 	SSL_METHOD* l_pxMethod = static_cast<SSL_METHOD*>( f_pvMethod );
 	SSL_CTX* ctx = NULL;
 	HString l_oBuffer;
@@ -91,9 +99,21 @@ void HOpenSSL::OSSLContext::init( void )
 
 HOpenSSL::OSSLContext::~OSSLContext( void )
 	{
+	HLock l_oLock( f_oMutex );
 	if ( f_pvContext )
 		SSL_CTX_free( static_cast<SSL_CTX*>( f_pvContext ) );
 	f_pvContext = NULL;
+	-- f_iUsers;
+	if ( f_iUsers == 0 )
+		{
+		ERR_remove_state( getpid() );
+		ERR_remove_state( 0 );
+		ENGINE_cleanup();
+		CONF_modules_unload( 1 );
+		ERR_free_strings();
+		EVP_cleanup();
+		CRYPTO_cleanup_all_ex_data();
+		}
 	return;
 	}
 
