@@ -52,7 +52,7 @@ public:
 protected:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
-	typedef enum { D_IN, D_OUT } way_t;
+	typedef enum { D_TO_EXTERNAL, D_TO_INTERNAL } way_t;
 	yaal::hcore::HPointer<OConvert> f_oConvert;
 	yaal::hcore::HString	f_oConvertedString;
 	yaal::hcore::HString	f_oVarTmpBuffer;
@@ -69,15 +69,10 @@ public:
 	HNodeProxy get_root( void );
 	void load( char const* const );
 	void save( char const* const );
-protected:
+private:
 	void parse ( xml_node_ptr_t, tree_t::node_t, bool );
-#ifdef HAVE_ICONV_INPUT_CONST
-#	define D_YAAL_TOOLS_HXML_ICONV_CONST const
-#else /* HAVE_ICONV_INPUT_CONST */
-#	define D_YAAL_TOOLS_HXML_ICONV_CONST /**/
-#endif /* not HAVE_ICONV_INPUT_CONST */
-	char const* convert( char D_YAAL_TOOLS_HXML_ICONV_CONST*, way_t = D_OUT );
-#undef D_YAAL_TOOLS_HXML_ICONV_CONST
+	void dump_node( void*, HNodeProxy const& );
+	char const* convert( char const*, way_t = D_TO_INTERNAL );
 	int get_node_set_by_path( char const* );
 private:
 	HXml( HXml const& );

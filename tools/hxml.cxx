@@ -53,6 +53,7 @@ namespace
 char free_err[] = "trying to free NULL pointer";
 /* char schema_err[] = "bad xml schema"; */
 char const* const D_DEFAULT_ENCODING = "iso-8859-2";
+typedef HResource<xmlTextWriterPtr, typeof( &xmlFreeTextWriter )> writer_resource_t;
 }
 
 namespace yaal
@@ -90,14 +91,14 @@ protected:
 
 struct HXml::OConvert
 	{
-	iconv_t f_xIconvIn;
-	iconv_t f_xIconvOut;
+	iconv_t f_xIconvToExternal;
+	iconv_t f_xIconvToInternal;
 	OConvert( void ) 
-		: f_xIconvIn ( static_cast<iconv_t>( 0 ) ),
-		f_xIconvOut ( static_cast<iconv_t>( 0 ) ) { }
+		: f_xIconvToExternal ( static_cast<iconv_t>( 0 ) ),
+		f_xIconvToInternal ( static_cast<iconv_t>( 0 ) ) { }
 	OConvert( OConvert const& a_roConvert )
-		: f_xIconvIn ( static_cast<iconv_t>( 0 ) ),
-		f_xIconvOut ( static_cast<iconv_t>( 0 ) )
+		: f_xIconvToExternal ( static_cast<iconv_t>( 0 ) ),
+		f_xIconvToInternal ( static_cast<iconv_t>( 0 ) )
 		{
 		operator = ( a_roConvert );
 		}
@@ -105,8 +106,8 @@ struct HXml::OConvert
 		{
 		if ( &a_roConvert != this )
 			{
-			f_xIconvIn = a_roConvert.f_xIconvIn;
-			f_xIconvOut = a_roConvert.f_xIconvOut;
+			f_xIconvToExternal = a_roConvert.f_xIconvToExternal;
+			f_xIconvToInternal = a_roConvert.f_xIconvToInternal;
 			}
 		return ( *this );
 		}
@@ -230,21 +231,22 @@ HXml::~HXml ( void )
 #	define D_YAAL_TOOLS_HXML_ICONV_CONST /**/
 #endif /* not HAVE_ICONV_INPUT_CONST */
 
-char const* HXml::convert( char D_YAAL_TOOLS_HXML_ICONV_CONST* a_pcData, way_t a_eWay )
+char const* HXml::convert( char const* a_pcData, way_t a_eWay )
 	{
 	M_PROLOG
+	char D_YAAL_TOOLS_HXML_ICONV_CONST* source = const_cast<char D_YAAL_TOOLS_HXML_ICONV_CONST*>( a_pcData );
 	iconv_t l_xCD = static_cast<iconv_t>( 0 );
 	switch ( a_eWay )
 		{
-		case ( D_IN ): { l_xCD = ( *f_oConvert ).f_xIconvIn; break; }
-		case ( D_OUT ): { l_xCD = ( *f_oConvert ).f_xIconvOut; break; }
+		case ( D_TO_EXTERNAL ): { l_xCD = ( *f_oConvert ).f_xIconvToExternal; break; }
+		case ( D_TO_INTERNAL ): { l_xCD = ( *f_oConvert ).f_xIconvToInternal; break; }
 		default :
 			{
 			M_THROW( _( "unknown convertion way" ), a_eWay );
 			break;
 			}
 		}
-	size_t l_uiSizeOut = 0, l_uiSizeIn = ::strlen( a_pcData );
+	size_t l_uiSizeOut = 0, l_uiSizeIn = ::strlen( source );
 	/* The longers single character in any encoding is 6 bytes long. */
 	size_t const D_ICONV_OUTPUT_BUFFER_LENGTH = 8;
 	/* Additional character for nil terminator. */
@@ -255,7 +257,7 @@ char const* HXml::convert( char D_YAAL_TOOLS_HXML_ICONV_CONST* a_pcData, way_t a
 		::memset( l_pcOutput, 0, D_ICONV_OUTPUT_BUFFER_LENGTH + 1 );
 		l_uiSizeOut = D_ICONV_OUTPUT_BUFFER_LENGTH;
 		char* l_pcOut = l_pcOutput;
-		M_ENSURE( ( ::iconv( l_xCD, &a_pcData, &l_uiSizeIn, &l_pcOut,
+		M_ENSURE( ( ::iconv( l_xCD, &source, &l_uiSizeIn, &l_pcOut,
 						&l_uiSizeOut ) != static_cast<size_t>( -1 ) )
 				|| ( errno == E2BIG ) );
 		f_oConvertedString += l_pcOutput;
@@ -345,8 +347,8 @@ void HXml::init( char const* a_pcFileName )
 		}
 	if ( ! f_poXml->f_psCharEncodingHandler )
 		M_THROW( _( "cannot enable internal convertion" ), errno );
-	(*f_oConvert).f_xIconvIn = f_poXml->f_psCharEncodingHandler->iconv_in;
-	(*f_oConvert).f_xIconvOut = f_poXml->f_psCharEncodingHandler->iconv_out;
+	(*f_oConvert).f_xIconvToExternal = f_poXml->f_psCharEncodingHandler->iconv_in;
+	(*f_oConvert).f_xIconvToInternal = f_poXml->f_psCharEncodingHandler->iconv_out;
 	return;
 	M_EPILOG
 	}
@@ -453,15 +455,59 @@ void HXml::load( char const* const a_pcPath )
 void HXml::save( char const* const a_pcPath )
 	{
 	M_PROLOG
-	typedef HResource<xmlTextWriterPtr, typeof( &xmlFreeTextWriter )> writer_resource_t;
 	writer_resource_t writer( xmlNewTextWriterFilename( a_pcPath, 0 ), xmlFreeTextWriter );
 	if ( ! writer.get() )
 		throw HXmlException( HString( "Cannot open file for writting: " ) + a_pcPath );
 	int rc = xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding, NULL );
 	if ( rc < 0 )
 		throw HXmlException( HString( "Unable to start document with encoding: " ) + f_oEncoding );
+	rc = xmlTextWriterEndDocument( writer.get() );
+	dump_node( &writer, get_root() );
+	if ( rc < 0 )
+		throw HXmlException( "Unable to end document." );
 	return;
 	M_EPILOG
+	}
+
+void HXml::dump_node( void* writer_p, HNodeProxy const& node )
+	{
+	writer_resource_t& writer = *static_cast<writer_resource_t*>( writer_p );
+	HString const& str = node.get_name();
+	int level = node.get_level();
+	int rc = xmlTextWriterSetIndent( writer.get(), level );
+	if ( rc < 0 )
+		throw HXmlException( HString( "Unable to set indent level: " ) + level );
+	rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const* const>( str.raw() ) );
+	if ( rc < 0 )
+		throw HXmlException( HString( "Unable to write start element: " ) + str );
+	HNode::properties_t const& prop = node.properties();
+	for ( HNode::properties_t::HIterator it = prop.begin(); it != prop.end(); ++ it )
+		{
+		HString const& pname = it->first;
+		HString const& pvalue = it->second;
+		rc = xmlTextWriterWriteAttribute( writer.get(),
+				reinterpret_cast<xmlChar const* const>( pname.raw() ),
+				reinterpret_cast<xmlChar const* const>( convert( pvalue.raw(), D_TO_EXTERNAL ) ) );
+		if ( rc < 0 )
+			throw HXmlException( HString( "Unable to write a property: " ) + str + ", with value: " + pvalue );
+		}
+	for ( HXml::HIterator it = node.begin(); it != node.end(); ++ it )
+		{
+		if ( it->get_type() == HXml::HNode::TYPE::D_NODE )
+			dump_node( writer_p, *it );
+		else
+			{
+			HString const& value = it->get_value();
+			rc = xmlTextWriterWriteString( writer.get(),
+					reinterpret_cast<xmlChar const*>( convert( value, D_TO_EXTERNAL ) ) );
+			if ( rc < 0 )
+				throw HXmlException( HString( "Unable to write a node value: " ) + value );
+			}
+		}
+	rc = xmlTextWriterEndElement( writer.get() );
+	if ( rc < 0 )
+		throw HXmlException( HString( "Unable to write end element: " ) + str );
+	return;
 	}
 
 HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t a_poNode ) : f_poNode( a_poNode )
@@ -471,7 +517,7 @@ HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t a_poNode ) : f_poNode( a_poNo
 HXml::HNodeProxy HXml::get_root ( void )
 	{
 	M_PROLOG
-	return ( HNodeProxy( f_oDOM.get_root() ) );
+		return ( HNodeProxy( f_oDOM.get_root() ) );
 	M_EPILOG
 	}
 
