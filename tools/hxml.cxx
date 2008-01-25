@@ -42,13 +42,18 @@ Copyright:
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
 #include "hxml.h"
+#include "hcore/hresource.h"
 #include "hcore/hlog.h"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
+namespace
+{
 char free_err[] = "trying to free NULL pointer";
-char schema_err[] = "bad xml schema";
+/* char schema_err[] = "bad xml schema"; */
+char const* const D_DEFAULT_ENCODING = "iso-8859-2";
+}
 
 namespace yaal
 {
@@ -197,7 +202,7 @@ void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject ) const
 
 HXml::HXml ( void )
 	: f_oConvert ( new OConvert ), f_oConvertedString(),
-	f_oVarTmpBuffer(), f_poXml ( NULL ), f_oDOM()
+	f_oVarTmpBuffer(), f_oEncoding( D_DEFAULT_ENCODING ), f_poXml ( NULL ), f_oDOM()
 	{
 	M_PROLOG
 	f_poXml = new ( std::nothrow ) HXmlData();
@@ -314,8 +319,8 @@ void HXml::init( char const* a_pcFileName )
 	errno = l_iSavedErrno;
 	if ( ! f_poXml->f_psDoc )
 		{
-		l_oError.format ( _ ( "cannot parse `%s'" ), a_pcFileName );
-		M_THROW ( l_oError, errno );
+		l_oError.format( _( "cannot parse `%s'" ), a_pcFileName );
+		throw HXmlException( l_oError );
 		}
 	f_poXml->f_psRoot = xmlDocGetRootElement ( f_poXml->f_psDoc );
 	if ( ! f_poXml->f_psRoot )
@@ -444,11 +449,17 @@ void HXml::load( char const* const a_pcPath )
 	M_EPILOG
 	}
 
+
 void HXml::save( char const* const a_pcPath )
 	{
 	M_PROLOG
-	xmlTextWriterPtr writer = xmlNewTextWriterFilename( a_pcPath, 0 );
-	xmlFreeTextWriter( writer );
+	typedef HResource<xmlTextWriterPtr, typeof( &xmlFreeTextWriter )> writer_resource_t;
+	writer_resource_t writer( xmlNewTextWriterFilename( a_pcPath, 0 ), xmlFreeTextWriter );
+	if ( ! writer.get() )
+		throw HXmlException( HString( "Cannot open file for writting: " ) + a_pcPath );
+	int rc = xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding, NULL );
+	if ( rc < 0 )
+		throw HXmlException( HString( "Unable to start document with encoding: " ) + f_oEncoding );
 	return;
 	M_EPILOG
 	}

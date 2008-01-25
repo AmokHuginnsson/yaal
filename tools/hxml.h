@@ -56,6 +56,7 @@ protected:
 	yaal::hcore::HPointer<OConvert> f_oConvert;
 	yaal::hcore::HString	f_oConvertedString;
 	yaal::hcore::HString	f_oVarTmpBuffer;
+	yaal::hcore::HString	f_oEncoding;
 	HXmlData*							f_poXml;
 	tree_t f_oDOM;
 public:
@@ -206,6 +207,8 @@ private:
 	friend class HXml::HNodeProxy;
 	HIterator( HXml::HNodeProxy const*, HXml::tree_t::iterator const& );
 	};
+
+typedef yaal::hcore::HExceptionT<HXml> HXmlException;
 
 }
 

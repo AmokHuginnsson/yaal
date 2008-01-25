@@ -62,6 +62,35 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
 
+template<typename function_t, typename value_t>
+class HBinder
+	{
+	template<typename func_t, typename arga_t, typename argb_t>
+	struct type_of
+		{
+		static func_t _type_provider;
+		typedef typeof( _type_provider( arga_t(), argb_t() ) ) type;
+		};
+	function_t CALLER;
+	value_t f_tValue;
+public:
+	HBinder( function_t, value_t );
+	template<typename tType>
+	typename type_of<function_t, value_t, tType>::type operator()( tType value ) const
+		{ return ( CALLER( value, f_tValue ) ); }
+	};
+
+template<typename function_t, typename value_t>
+HBinder<function_t, value_t>::HBinder( function_t func, value_t value )
+	: CALLER( func ), f_tValue( value )
+	{ }
+
+template<typename function_t, typename value_t>
+HBinder<function_t, value_t> bind2nd( function_t func, value_t value )
+	{
+	return ( HBinder<function_t, value_t>( func, value ) );
+	}
+
 template<typename T>
 struct trait_strip_reference
 	{
