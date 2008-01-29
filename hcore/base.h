@@ -91,6 +91,13 @@ HBinder<function_t, value_t> bind2nd( function_t func, value_t value )
 	return ( HBinder<function_t, value_t>( func, value ) );
 	}
 
+template<typename iterator_t, typename call_t>
+void for_each( iterator_t const& begin, iterator_t const& end, call_t& CALL )
+	{
+	for ( iterator_t it = begin; it != end; ++ it )
+		CALL( *it );
+	}
+
 template<typename T>
 struct trait_strip_reference
 	{

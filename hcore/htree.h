@@ -169,8 +169,12 @@ template<typename tType>
 HTree<tType>::HNode::~HNode( void )
 	{
 	M_PROLOG
-	for ( typename branch_t::iterator it = f_oBranch.begin(); it != f_oBranch.end(); ++ it )
-		delete *it;
+	struct tool
+		{
+		static void deleter( HNode*& node )
+			{ delete node; }
+		};
+	for_each( f_oBranch.begin(), f_oBranch.end(), tool::deleter );
 	return;
 	M_EPILOG
 	}

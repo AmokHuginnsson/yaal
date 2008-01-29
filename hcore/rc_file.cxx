@@ -290,13 +290,21 @@ int process_rc_file_internal( char const* const a_pcRcName,
 	M_EPILOG
 	}
 
+void process_loader( ORCLoader& loader )
+	{
+	M_PROLOG
+	process_rc_file_internal( loader.f_oPath, loader.f_oSection,
+			loader.f_psVaraibles, loader.f_iCount, loader.rc_callback );
+	return;
+	M_EPILOG
+	}
+
 int reload_configuration( void )
 	{
 	M_PROLOG
 	HLocker lock( n_bRCLoadersLocked );
 	log << "Reloading configuration." << endl;
-	for ( rc_loaders_t::iterator it = n_oRCLoades.begin(); it != n_oRCLoades.end(); ++ it )
-		process_rc_file_internal( it->f_oPath, it->f_oSection, it->f_psVaraibles, it->f_iCount, it->rc_callback );
+	for_each( n_oRCLoades.begin(), n_oRCLoades.end(), process_loader );
 	return ( 0 );
 	M_EPILOG
 	}
