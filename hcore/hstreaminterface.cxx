@@ -36,6 +36,8 @@ namespace yaal
 namespace hcore
 {
 
+char const* const HStreamInterface::eols = "\r\n"; /* order matters */
+
 HStreamInterface::HStreamInterface( void ) : f_oCache( 1, cache_t::D_AUTO_GROW )
 	{
 	return;
@@ -139,22 +141,23 @@ HStreamInterface& flush( HStreamInterface& a_roFile )
 	M_EPILOG
 	}
 
-int HStreamInterface::read_until( HString& a_roMessage, char const* const a_pcStopSet )
+int HStreamInterface::read_until( HString& a_roMessage, char const* const a_pcStopSet, bool a_bStripDelim )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	char* l_pcBuffer = NULL;
+	int err = 0;
 	do
 		{
-		f_oCache.pool_realloc( l_iCtr + 1 );
+		f_oCache.pool_realloc( l_iCtr + 2 );
 		l_pcBuffer = f_oCache.raw();
-		if ( do_read( l_pcBuffer + l_iCtr, sizeof ( char ) * 1 ) <= 0 )
-			break;
+		err = do_read( l_pcBuffer + l_iCtr, sizeof ( char ) * 1 );
 		}
-	while ( ! ::strchr( a_pcStopSet, l_pcBuffer[ l_iCtr ++ ] ) );
-	l_iCtr --; /* go back one char for stripping terminator */
+	while ( ( err > 0 ) && ! ::strchr( a_pcStopSet, l_pcBuffer[ l_iCtr ++ ] ) );
+	if ( a_bStripDelim && ( err > 0 ) )
+		-- l_iCtr;
 	if ( l_iCtr >= 0 )
-		l_pcBuffer[ l_iCtr ] = 0 ;
+		l_pcBuffer[ l_iCtr ] = 0;
 	a_roMessage = l_pcBuffer;
 	return ( l_iCtr );
 	M_EPILOG

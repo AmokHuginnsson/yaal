@@ -57,9 +57,17 @@ public:
 	HStreamInterface& operator << ( double const );
 	HStreamInterface& operator << ( void const* const );
 	HStreamInterface& operator << ( HStreamInterface& ( *const )( HStreamInterface& ) );
-	int read_until( yaal::hcore::HString&, char const* const = "\r\n" );
+	/*! \brief Read data from stream until end of it or until delimiter is encountered.
+	 *
+	 * \param store - Store read date here.
+	 * \param delim - Stop reading data at any character in this set.
+	 * \param strip - Remove delimiting stop char from output buffer.
+	 * \return Number of characters avctualy read.
+	 */
+	int read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
 	int read( void* const, int const );
 	int write( void const* const, int const );
+	static char const* const eols;
 private:
 	virtual int do_write( void const* const, int const ) = 0;
 	virtual int do_read( void* const, int const ) = 0;

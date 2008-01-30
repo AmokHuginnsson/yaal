@@ -113,7 +113,6 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		int const a_iMaximumLength )
 	{
 	M_PROLOG
-	int l_iLength = 0;
 	char * l_pcPtr = NULL;
 	if ( ( a_eMode & D_KEEP_NEWLINES ) && ( a_eMode & D_STRIP_NEWLINES ) )
 		M_THROW ( _ ( "bad newlines setting" ), a_eMode );
@@ -125,16 +124,17 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		a_eMode |= D_BUFFERED_READS;
 	if ( ! f_pvHandle )
 		M_THROW ( _ ( "no file is opened" ), errno );
+	int l_iLength = -1;
 	if ( a_eMode & D_BUFFERED_READS )
 		{
 		l_iLength = get_line_length();
 		if ( l_iLength )
 			{
 			if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
-				M_THROW ( _ ( "line too long" ), l_iLength );
+				M_THROW( _( "line too long" ), l_iLength );
 			f_oCache.pool_realloc( l_iLength );
 			l_pcPtr = f_oCache.raw();
-			M_ENSURE ( static_cast<int>( ::fread( l_pcPtr,
+			M_ENSURE( static_cast<int>( ::fread( l_pcPtr,
 							sizeof ( char ), l_iLength,
 							static_cast<FILE*>( f_pvHandle ) ) ) == l_iLength );
 			l_pcPtr[ l_iLength ] = 0;
@@ -143,11 +143,11 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		}
 	else /* D_UNBUFFERED_READS */
 		{
-		l_iLength = read_until( a_roLine );
+		l_iLength = read_until( a_roLine, HStreamInterface::eols, false );
 		if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
-			M_THROW ( _ ( "line too long" ), l_iLength );
+			M_THROW( _( "line too long" ), l_iLength );
 		}
-	if ( l_iLength )
+	if ( l_iLength > 0 )
 		{
 		if ( ( a_eMode & D_STRIP_NEWLINES ) && ( l_iLength > 0 ) )
 			{
@@ -156,9 +156,10 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 				l_iLength --;
 			}
 		a_roLine.set_at( l_iLength, 0 );
-		return ( l_iLength );
 		}
-	return ( - 1 );
+	else
+		l_iLength = -1;
+	return ( l_iLength );
 	M_EPILOG
 	}
 

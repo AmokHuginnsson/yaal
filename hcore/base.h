@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/*! \file hcore/base.h
+ * \brief Basic declarations used across whole library.
+ */
+
 #ifndef __YAAL_HCORE_BASE_H
 #define __YAAL_HCORE_BASE_H
 
