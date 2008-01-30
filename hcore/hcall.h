@@ -46,6 +46,7 @@ public:
 	typedef yaal::hcore::HPointer<HCallInterface, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
 	virtual ~HCallInterface( void ) {}
 	virtual void invoke( void ) = 0;
+	virtual void operator()( void ) = 0;
 	virtual void* id( void ) = 0;
 	};
 
@@ -210,6 +211,8 @@ public:
 				static_cast<a8_t*>( NULL ),
 				static_cast<a9_t*>( NULL ) );
 		}
+	virtual void operator()( void )
+		{ invoke(); }
 	virtual void* id( void )
 		{ return ( &f_oObiect ); }
 	};
