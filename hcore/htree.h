@@ -46,6 +46,7 @@ class HTree;
 template<typename tType>
 class HTree
 	{
+private:
 	typedef HTree<tType> tree_t;
 public:
 	class HNode;
@@ -73,6 +74,7 @@ private:
 template<typename tType>
 class HTree<tType>::HNode
 	{
+private:
 	typedef HList<node_t> branch_t;
 	tType f_tData;			/* object itself */
 	branch_t f_oBranch;	/* list of next level nodes */
@@ -114,7 +116,7 @@ private:
 	HNode( HNode const& );
 	HNode& operator = ( HNode const& );
 	void detach( void );
-	HNode* clone( void ) const;
+	HNode* clone( HNode* ) const;
 	void disjointed( HTree<tType>::HIterator const&, typename tree_t::HNode* ) const;
 	friend class HTree<tType>;
 	friend class HList<HNode*>;
@@ -371,6 +373,7 @@ typename HTree<tType>::iterator HTree<tType>::HNode::move_node( HTree<tType>::HI
 		{
 		node->detach();
 		it = HIterator( this, f_oBranch.insert( pos.f_oIterator, node ) );
+		node->f_poTrunk = this;
 		}
 	return ( it );
 	}
@@ -387,6 +390,7 @@ typename HTree<tType>::iterator HTree<tType>::HNode::move_node( HTree<tType>::HN
 		node->detach();
 		f_oBranch.push_back( node );
 		it = HIterator( this, f_oBranch.rbegin() );
+		node->f_poTrunk = this;
 		}
 	return ( it );
 	}
@@ -397,7 +401,7 @@ typename HTree<tType>::iterator HTree<tType>::HNode::copy_node( HTree<tType>::HI
 #if not defined(NDEBUG)
 	disjointed( pos, node );
 #endif
-	HIterator it( this, f_oBranch.insert( pos.f_oIterator, node->clone() ) );
+	HIterator it( this, f_oBranch.insert( pos.f_oIterator, node->clone( this ) ) );
 	return ( it );
 	}
 
@@ -407,19 +411,20 @@ typename HTree<tType>::iterator HTree<tType>::HNode::copy_node( HTree<tType>::HN
 #if not defined(NDEBUG)
 	disjointed( rbegin(), node );
 #endif
-	f_oBranch.push_back( node->clone() );
+	f_oBranch.push_back( node->clone( this ) );
 	HIterator it( this, f_oBranch.rbegin() );
 	return ( it );
 	}
 
 template<typename tType>
-typename HTree<tType>::node_t HTree<tType>::HNode::clone( void ) const
+typename HTree<tType>::node_t HTree<tType>::HNode::clone( HNode* parent ) const
 	{
 	node_t node = new HNode( f_tData );
+	node->f_poTrunk = parent;
 	typename branch_t::iterator endIt = f_oBranch.end();
 	for ( typename branch_t::iterator it = f_oBranch.begin();
 			it != endIt; ++ it )
-		node->f_oBranch.push_back( (*it)->clone() );
+		node->f_oBranch.push_back( (*it)->clone( node ) );
 	return ( node );
 	}
 
@@ -605,6 +610,7 @@ typename HTree<tType>::node_t HTree<tType>::set_new_root( HTree<tType>::HNode* n
 		f_poRoot = node;
 		delete wasted;
 		node->f_poTree = this;
+		node->f_poTrunk = NULL;
 		}
 	return ( node );
 	M_EPILOG
