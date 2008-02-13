@@ -38,6 +38,9 @@ Copyright:
 #include <libxml/xpath.h>
 #include <libxml/xmlreader.h>
 #include <libxml/xmlwriter.h>
+#include <libxslt/xslt.h>
+#include <libxslt/xsltInternals.h>
+#include <libxslt/transform.h>
 
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
@@ -53,6 +56,7 @@ namespace
 char free_err[] = "trying to free NULL pointer";
 /* char schema_err[] = "bad xml schema"; */
 char const* const D_DEFAULT_ENCODING = "iso-8859-2";
+typedef HResource<xmlDocPtr, typeof( &xmlFreeDoc )> doc_resource_t;
 typedef HResource<xmlTextWriterPtr, typeof( &xmlFreeTextWriter )> writer_resource_t;
 }
 
@@ -67,7 +71,7 @@ class HXmlData
 private:
 	/*{*/
 	friend class HXml;
-	xmlDocPtr						f_psDoc;
+	doc_resource_t			f_oDoc;
 	xmlNodePtr					f_psRoot;
 	xmlXPathContextPtr	f_psContext;
 	xmlXPathObjectPtr		f_psObject;
@@ -80,7 +84,6 @@ protected:
 	virtual ~HXmlData( void );
 	HXmlData( HXmlData const& ) __attribute__(( __noreturn__ ));
 	HXmlData& operator = ( HXmlData const& ) __attribute__(( __noreturn__ ));
-	void xml_free( xmlDocPtr& ) const;
 /*	void xml_free ( xmlNodePtr & ); */
 /*	void xml_free ( xmlNodeSetPtr & ); */
 	void xml_free( xmlXPathContextPtr& ) const;
@@ -113,7 +116,7 @@ struct HXml::OConvert
 		}
 	};
 
-HXmlData::HXmlData( void ) : f_psDoc( NULL ), f_psRoot( NULL ),
+HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ), f_psRoot( NULL ),
 	f_psContext( NULL ), f_psObject( NULL ),
 	f_psNodeSet( NULL ), f_psCharEncodingHandler( NULL )
 	{
@@ -129,8 +132,6 @@ HXmlData::~HXmlData ( void )
 		xml_free( f_psContext );
 	if ( f_psObject )
 		xml_free( f_psObject );
-	if ( f_psDoc )
-		xml_free( f_psDoc );
 	xmlCleanupParser();
 	return;
 	M_EPILOG
@@ -140,17 +141,6 @@ void HXmlData::reset( void )
 	{
 	M_PROLOG
 	f_psNodeSet = NULL;
-	return;
-	M_EPILOG
-	}
-
-void HXmlData::xml_free( xmlDocPtr& a_rpsDoc ) const
-	{
-	M_PROLOG
-	if ( ! a_rpsDoc )
-		M_THROW( free_err, errno );
-	xmlFreeDoc( a_rpsDoc );
-	a_rpsDoc = NULL;
 	return;
 	M_EPILOG
 	}
@@ -279,7 +269,7 @@ int HXml::get_node_set_by_path( char const* a_pcPath )
 	if ( f_poXml->f_psContext )
 		f_poXml->xml_free ( f_poXml->f_psContext );
 	f_poXml->reset();
-	f_poXml->f_psContext = xmlXPathNewContext( f_poXml->f_psDoc );
+	f_poXml->f_psContext = xmlXPathNewContext( f_poXml->f_oDoc.get() );
 	if ( f_poXml->f_psContext )
 		{
 		while ( f_oVarTmpBuffer[ 0 ] )
@@ -308,31 +298,29 @@ void HXml::init( char const* a_pcFileName )
 	int l_iSavedErrno = errno;
 	xmlCharEncoding l_xEncoding = static_cast<xmlCharEncoding>( 0 );
 	HString l_oError;
-	if ( f_poXml->f_psDoc )
-		f_poXml->xml_free ( f_poXml->f_psDoc );
 	f_poXml->reset();
 	errno = 0;
-	f_poXml->f_psDoc = xmlParseFile( a_pcFileName );
+	doc_resource_t doc( xmlParseFile( a_pcFileName ), xmlFreeDoc );
 	if ( errno )
 		{
 		log( LOG_TYPE::D_WARNING ) << ::strerror( errno ) << ": " << a_pcFileName;
 		log << ", code: " << errno << '.' << endl;
 		}
 	errno = l_iSavedErrno;
-	if ( ! f_poXml->f_psDoc )
+	if ( ! doc.get() )
 		{
 		l_oError.format( _( "cannot parse `%s'" ), a_pcFileName );
 		throw HXmlException( l_oError );
 		}
-	f_poXml->f_psRoot = xmlDocGetRootElement ( f_poXml->f_psDoc );
+	f_poXml->f_psRoot = xmlDocGetRootElement( doc.get() );
 	if ( ! f_poXml->f_psRoot )
 		M_THROW ( _ ( "empty doc" ), errno );
 #ifdef __DEBUGGER_BABUNI__
 	fprintf ( stdout, "%s\n", f_poXml->f_psRoot->name );
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( f_poXml->f_psDoc->encoding )
+	if ( doc.get()->encoding )
 		f_poXml->f_psCharEncodingHandler = xmlFindCharEncodingHandler (
-				reinterpret_cast < char const * > ( f_poXml->f_psDoc->encoding ) );
+				reinterpret_cast<char const *>( doc.get()->encoding ) );
 	else
 		log( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: no encoding declared in `" )
 			<< a_pcFileName << "'." << endl;
@@ -349,6 +337,7 @@ void HXml::init( char const* a_pcFileName )
 		M_THROW( _( "cannot enable internal convertion" ), errno );
 	(*f_oConvert).f_xIconvToExternal = f_poXml->f_psCharEncodingHandler->iconv_in;
 	(*f_oConvert).f_xIconvToInternal = f_poXml->f_psCharEncodingHandler->iconv_out;
+	f_poXml->f_oDoc.swap( doc );
 	return;
 	M_EPILOG
 	}
@@ -660,6 +649,17 @@ HXml::HNodeProxy const* HXml::HIterator::operator->( void ) const
 	M_ASSERT( f_oIterator != f_poOwner->f_poNode->end() );
 	f_oProxy.f_poNode = &*f_oIterator;
 	return ( &f_oProxy );
+	}
+
+void HXml::apply_style( char const* const a_pcPath )
+	{
+	M_ASSERT( f_poXml->f_oDoc.get() );
+	typedef HResource<xsltStylesheetPtr, typeof( &xsltFreeStylesheet )> style_resource_t;
+	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( a_pcPath ) ), xsltFreeStylesheet );
+	doc_resource_t doc( xsltApplyStylesheet( style.get(), f_poXml->f_oDoc.get() ,NULL ), xmlFreeDoc );
+	if ( ! doc.get() )
+		throw HXmlException( HString( "cannot apply stylesheet: " ) + a_pcPath );
+	f_poXml->f_oDoc.swap( doc );
 	}
 
 }

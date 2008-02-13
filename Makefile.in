@@ -66,7 +66,7 @@ $(foreach DRIVER,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(DRIVER))))
 
 LIBS_hcore			=	"-lrt -lpthread -lssl @GETTEXT_LIB@"
 DEPS_tools			= $(TARGET_hcore)
-LIBS_tools			= "-lxml2 -lhcore"
+LIBS_tools			= "-lxml2 -lxslt -lhcore"
 DEPS_hconsole		= $(TARGET_hcore) $(TARGET_tools)
 LIBS_hconsole		= "-lncurses @MOUSE_LIB@ -lhcore -ltools"
 DEPS_dbwrapper	= $(TARGET_hcore) $(TARGET_tools)

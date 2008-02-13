@@ -59,6 +59,21 @@ public:
 		}
 	resource_t get( void ) const
 		{ return ( f_tResource ); }
+	void swap( HResource& other )
+		{
+		if ( &other != this )
+			{
+			resource_t resource = f_tResource;
+			allocated_t allocated = ALLOCATED;
+			free_t free_ = FREE;
+			f_tResource = other.f_tResource;
+			ALLOCATED = other.ALLOCATED;
+			FREE = other.FREE;
+			other.f_tResource = resource;
+			other.ALLOCATED = allocated;
+			other.FREE = free_;
+			}
+		}
 private:
 	HResource( HResource const& );
 	HResource& operator = ( HResource const& );

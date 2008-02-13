@@ -65,6 +65,7 @@ public:
 	HXml( void );
 	virtual ~ HXml( void );
 	void init( char const* );
+	void apply_style( char const* const );
 	void parse( char const* const = NULL, bool = true );
 	HNodeProxy get_root( void );
 	void load( char const* const );
