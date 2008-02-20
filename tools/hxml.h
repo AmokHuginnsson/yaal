@@ -70,6 +70,7 @@ public:
 	HNodeProxy get_root( void );
 	void load( char const* const );
 	void save( char const* const );
+	void create_root( char const* const, char const* const = NULL );
 private:
 	void parse ( xml_node_ptr_t, tree_t::node_t, bool );
 	void dump_node( void*, HNodeProxy const& );
@@ -156,6 +157,7 @@ public:
 	HXml::HIterator insert_node( HXml::HIterator );
 	HNodeProxy( HNodeProxy const& );
 	HNodeProxy& operator = ( HNodeProxy const& );
+	bool operator ! ( void ) const;
 private:
 	friend class HXml;
 	friend class HXml::HIterator;
