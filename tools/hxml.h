@@ -116,7 +116,7 @@ public:
 		M_EPILOG
 		}
 private:
-	void reset( void )
+	void clear( void )
 		{
 		M_PROLOG
 		f_oText.clear();

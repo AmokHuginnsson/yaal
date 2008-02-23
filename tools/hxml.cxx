@@ -465,8 +465,14 @@ void HXml::save( char const* const a_pcPath )
 	int rc = xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding, NULL );
 	if ( rc < 0 )
 		throw HXmlException( HString( "Unable to start document with encoding: " ) + f_oEncoding );
-	rc = xmlTextWriterEndDocument( writer.get() );
+	rc = xmlTextWriterSetIndent( writer.get(), 1 );
+	if ( rc < 0 )
+		throw HXmlException( "Unable to enable indenting." );
+	rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( "\t" ) );
+	if ( rc < 0 )
+		throw HXmlException( "Cannot set indent string." );
 	dump_node( &writer, get_root() );
+	rc = xmlTextWriterEndDocument( writer.get() );
 	if ( rc < 0 )
 		throw HXmlException( "Unable to end document." );
 	return;
@@ -477,11 +483,7 @@ void HXml::dump_node( void* writer_p, HNodeProxy const& node )
 	{
 	writer_resource_t& writer = *static_cast<writer_resource_t*>( writer_p );
 	HString const& str = node.get_name();
-	int level = node.get_level();
-	int rc = xmlTextWriterSetIndent( writer.get(), level );
-	if ( rc < 0 )
-		throw HXmlException( HString( "Unable to set indent level: " ) + level );
-	rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const* const>( str.raw() ) );
+	int rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const* const>( str.raw() ) );
 	if ( rc < 0 )
 		throw HXmlException( HString( "Unable to write start element: " ) + str );
 	HNode::properties_t const& prop = node.properties();
@@ -581,6 +583,15 @@ HXml::HNode::properties_t const& HXml::HNodeProxy::properties( void ) const
 	{
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( (**f_poNode).f_oProperties );
+	}
+
+HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& a_eType, char const* const a_pcName )
+	{
+	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
+	tree_t::iterator it = f_poNode->add_node();
+	(**it).f_oText = a_pcName;
+	(**it).f_eType = a_eType;
+	return ( HXml::HIterator( this, it ) );
 	}
 
 bool HXml::HNodeProxy::has_childs( void ) const
