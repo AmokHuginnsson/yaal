@@ -45,6 +45,7 @@ Copyright:
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
 #include "hxml.h"
+#include "hcore/hsingleton.h"
 #include "hcore/hresource.h"
 #include "hcore/hlog.h"
 
@@ -65,7 +66,47 @@ namespace yaal
 
 namespace tools
 {
-	
+
+class HXmlParserG : public HSingletonInterface
+	{
+	HXmlParserG( void );
+	~HXmlParserG( void );
+	friend class HSingleton<HXmlParserG>;
+	friend class HDestructor<HXmlParserG>;
+	};
+
+typedef HSingleton<HXmlParserG> HXmlParserGlobal;
+
+HXmlParserG::HXmlParserG( void )
+	{
+	}
+
+HXmlParserG::~HXmlParserG( void )
+	{
+	xmlCleanupParser();
+	}
+
+class HXsltParserG : public HSingletonInterface
+	{
+	HXsltParserG( void );
+	~HXsltParserG( void );
+	friend class HSingleton<HXsltParserG>;
+	friend class HDestructor<HXsltParserG>;
+	};
+
+typedef HSingleton<HXsltParserG> HXsltParserGlobal;
+
+HXsltParserG::HXsltParserG( void )
+	{
+//	xmlSubstituteEntitiesDefault( 1 );
+//	xmlLoadExtDtdDefaultValue = 1;
+	}
+
+HXsltParserG::~HXsltParserG( void )
+	{
+	xsltCleanupGlobals();
+	}
+
 class HXmlData
 	{
 private:
@@ -84,11 +125,9 @@ protected:
 	virtual ~HXmlData( void );
 	HXmlData( HXmlData const& ) __attribute__(( __noreturn__ ));
 	HXmlData& operator = ( HXmlData const& ) __attribute__(( __noreturn__ ));
-/*	void xml_free ( xmlNodePtr & ); */
-/*	void xml_free ( xmlNodeSetPtr & ); */
 	void xml_free( xmlXPathContextPtr& ) const;
 	void xml_free( xmlXPathObjectPtr& ) const;
-	void reset( void );
+	void clear( void );
 	/*}*/
 	};
 
@@ -128,48 +167,24 @@ HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ), f_psRoot( NULL ),
 HXmlData::~HXmlData ( void )
 	{
 	M_PROLOG
+	clear();
+	return;
+	M_EPILOG
+	}
+
+void HXmlData::clear( void )
+	{
+	M_PROLOG
+	f_psNodeSet = NULL;
 	if ( f_psContext )
 		xml_free( f_psContext );
 	if ( f_psObject )
 		xml_free( f_psObject );
-	xmlCleanupParser();
 	return;
 	M_EPILOG
 	}
 
-void HXmlData::reset( void )
-	{
-	M_PROLOG
-	f_psNodeSet = NULL;
-	return;
-	M_EPILOG
-	}
-
-/*
-void HXmlData::xml_free ( xmlNodePtr & a_rpsNode )
-	{
-	M_PROLOG
-	if ( ! a_rpsNode )
-		M_THROW ( free_err, errno );
-	xmlFreeNode ( a_rpsNode );
-	a_rpsNode = NULL;
-	return;
-	M_EPILOG
-	}
-
-void HXmlData::xml_free ( xmlNodeSetPtr & a_rpsNodeSet )
-	{
-	M_PROLOG
-	if ( ! a_rpsNodeSet )
-		M_THROW ( free_err, errno );
-	xmlXPathFreeNodeSet ( a_rpsNodeSet );
-	a_rpsNodeSet = NULL;
-	return;
-	M_EPILOG
-	}
-*/
-
-void HXmlData::xml_free ( xmlXPathContextPtr & a_rpsContext ) const
+void HXmlData::xml_free( xmlXPathContextPtr& a_rpsContext ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsContext )
@@ -180,20 +195,20 @@ void HXmlData::xml_free ( xmlXPathContextPtr & a_rpsContext ) const
 	M_EPILOG
 	}
 
-void HXmlData::xml_free ( xmlXPathObjectPtr & a_rpsObject ) const
+void HXmlData::xml_free( xmlXPathObjectPtr& a_rpsObject ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsObject )
-		M_THROW ( free_err, errno );
-	xmlXPathFreeObject ( a_rpsObject );
+		M_THROW( free_err, errno );
+	xmlXPathFreeObject( a_rpsObject );
 	a_rpsObject = NULL;
 	return;
 	M_EPILOG
 	}
 
-HXml::HXml ( void )
-	: f_oConvert ( new OConvert ), f_oConvertedString(),
-	f_oVarTmpBuffer(), f_oEncoding( D_DEFAULT_ENCODING ), f_poXml ( NULL ), f_oDOM()
+HXml::HXml( void )
+	: f_oConvert( new OConvert ), f_oConvertedString(),
+	f_oVarTmpBuffer(), f_oEncoding( D_DEFAULT_ENCODING ), f_poXml( NULL ), f_oDOM()
 	{
 	M_PROLOG
 	f_poXml = new ( std::nothrow ) HXmlData();
@@ -268,7 +283,7 @@ int HXml::get_node_set_by_path( char const* a_pcPath )
 		f_poXml->xml_free ( f_poXml->f_psObject );
 	if ( f_poXml->f_psContext )
 		f_poXml->xml_free ( f_poXml->f_psContext );
-	f_poXml->reset();
+	f_poXml->clear();
 	f_poXml->f_psContext = xmlXPathNewContext( f_poXml->f_oDoc.get() );
 	if ( f_poXml->f_psContext )
 		{
@@ -298,7 +313,8 @@ void HXml::init( char const* a_pcFileName )
 	int l_iSavedErrno = errno;
 	xmlCharEncoding l_xEncoding = static_cast<xmlCharEncoding>( 0 );
 	HString l_oError;
-	f_poXml->reset();
+	HXmlParserGlobal::get_instance();
+	f_poXml->clear();
 	errno = 0;
 	doc_resource_t doc( xmlParseFile( a_pcFileName ), xmlFreeDoc );
 	if ( errno )
@@ -510,6 +526,16 @@ void HXml::create_root( char const* const a_pcName, char const* const a_pcEncodi
 	M_EPILOG
 	}
 
+void HXml::clear( void )
+	{
+	M_PROLOG
+	f_oEncoding.clear();
+	f_oDOM.clear();
+	f_poXml->clear();
+	return;
+	M_EPILOG
+	}
+
 HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t a_poNode ) : f_poNode( a_poNode )
 	{
 	}
@@ -672,6 +698,7 @@ HXml::HNodeProxy const* HXml::HIterator::operator->( void ) const
 void HXml::apply_style( char const* const a_pcPath )
 	{
 	M_ASSERT( f_poXml->f_oDoc.get() );
+	HXsltParserGlobal::get_instance();
 	typedef HResource<xsltStylesheetPtr, typeof( &xsltFreeStylesheet )> style_resource_t;
 	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( a_pcPath ) ), xsltFreeStylesheet );
 	doc_resource_t doc( xsltApplyStylesheet( style.get(), f_poXml->f_oDoc.get() ,NULL ), xmlFreeDoc );

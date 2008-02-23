@@ -71,6 +71,7 @@ public:
 	void load( char const* const );
 	void save( char const* const );
 	void create_root( char const* const, char const* const = NULL );
+	void clear( void );
 private:
 	void parse ( xml_node_ptr_t, tree_t::node_t, bool );
 	void dump_node( void*, HNodeProxy const& );
