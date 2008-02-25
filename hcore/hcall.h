@@ -46,8 +46,9 @@ public:
 	typedef yaal::hcore::HPointer<HCallInterface, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
 	virtual ~HCallInterface( void ) {}
 	virtual void invoke( void ) = 0;
+	virtual void invoke( void ) const = 0;
 	virtual void operator()( void ) = 0;
-	virtual void* id( void ) = 0;
+	virtual void const* id( void ) = 0;
 	};
 
 template<typename call_t,
@@ -99,6 +100,8 @@ public:
 		{ call( a0 ); }
 	void method( void )
 		{ call(); }
+	void method( void ) const
+		{ call(); }
 	};
 
 template<typename CLASS_t, typename METHOD_t,
@@ -137,67 +140,100 @@ public:
 	void invoke( 
 			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
 			a5_t const*, a6_t const*, a7_t const*, a8_t const*, a9_t const* )
-		{
-		(f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 ); }
+	void invoke( 
+			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
+			a5_t const*, a6_t const*, a7_t const*, a8_t const*, a9_t const* ) const
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 ); }
 	void invoke( 
 			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
 			a5_t const*, a6_t const*, a7_t const*, a8_t const*, __ )
-		{
-		(f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6, f_xArg7, f_xArg8 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5, f_xArg6, f_xArg7, f_xArg8 ); }
+	void invoke( 
+			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
+			a5_t const*, a6_t const*, a7_t const*, a8_t const*, __ ) const
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5, f_xArg6, f_xArg7, f_xArg8 ); }
 	void invoke( 
 			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
 			a5_t const*, a6_t const*, a7_t const*, __, __ )
-		{
-		(f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6, f_xArg7 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5, f_xArg6, f_xArg7 ); }
+	void invoke( 
+			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
+			a5_t const*, a6_t const*, a7_t const*, __, __ ) const
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5, f_xArg6, f_xArg7 ); }
 	void invoke( 
 			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
 			a5_t const*, a6_t const*, __, __, __ )
-		{
-		(f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5, f_xArg6 ); }
+	void invoke( 
+			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
+			a5_t const*, a6_t const*, __, __, __ ) const
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5, f_xArg6 ); }
 	void invoke( 
 			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
 			a5_t const*, __, __, __, __ )
-		{
-		(f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5 ); }
+	void invoke( 
+			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
+			a5_t const*, __, __, __, __ ) const
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
+				f_xArg5 ); }
 	void invoke( 
 			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
 			__, __, __, __, __ )
-		{
-		(f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4 ); }
+	void invoke( 
+			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
+			__, __, __, __, __ ) const
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4 ); }
 	void invoke( a0_t const*, a1_t const*, a2_t const*, a3_t const*, __,
 			__, __, __, __, __ )
-		{
-		(f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3 ); }
+	void invoke( a0_t const*, a1_t const*, a2_t const*, a3_t const*, __,
+			__, __, __, __, __ ) const
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3 ); }
 	void invoke( a0_t const*, a1_t const*, a2_t const*, __, __, __, __,
 			__, __, __ )
-		{
-		(f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2 ); }
+	void invoke( a0_t const*, a1_t const*, a2_t const*, __, __, __, __,
+			__, __, __ ) const
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2 ); }
 	void invoke( a0_t const*, a1_t const*, __, __, __, __, __, __, __, __ )
-		{
-		(f_oObiect.*METHOD)( f_xArg0, f_xArg1 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1 ); }
+	void invoke( a0_t const*, a1_t const*, __, __, __, __, __, __, __, __ ) const
+		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1 ); }
 	void invoke( a0_t const*, __, __, __, __, __, __, __, __, __ )
-		{
-		(f_oObiect.*METHOD)( f_xArg0 );
-		}
+		{ (f_oObiect.*METHOD)( f_xArg0 ); }
+	void invoke( a0_t const*, __, __, __, __, __, __, __, __, __ ) const
+		{ (f_oObiect.*METHOD)( f_xArg0 ); }
 	void invoke( __, __, __, __, __, __, __, __, __, __ )
-		{
-		(f_oObiect.*METHOD)();
-		}
+		{ (f_oObiect.*METHOD)(); }
+	void invoke( __, __, __, __, __, __, __, __, __, __ ) const
+		{ (f_oObiect.*METHOD)(); }
 	virtual void invoke( void )
+		{
+		invoke(
+				static_cast<a0_t*>( NULL ),
+				static_cast<a1_t*>( NULL ),
+				static_cast<a2_t*>( NULL ),
+				static_cast<a3_t*>( NULL ),
+				static_cast<a4_t*>( NULL ),
+				static_cast<a5_t*>( NULL ),
+				static_cast<a6_t*>( NULL ),
+				static_cast<a7_t*>( NULL ),
+				static_cast<a8_t*>( NULL ),
+				static_cast<a9_t*>( NULL ) );
+		}
+	virtual void invoke( void ) const
 		{
 		invoke(
 				static_cast<a0_t*>( NULL ),
@@ -213,7 +249,7 @@ public:
 		}
 	virtual void operator()( void )
 		{ invoke(); }
-	virtual void* id( void )
+	virtual void const* id( void )
 		{ return ( &f_oObiect ); }
 	};
 

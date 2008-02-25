@@ -188,8 +188,8 @@ void HXmlData::xml_free( xmlXPathContextPtr& a_rpsContext ) const
 	{
 	M_PROLOG
 	if ( ! a_rpsContext )
-		M_THROW ( free_err, errno );
-	xmlXPathFreeContext ( a_rpsContext );
+		M_THROW( free_err, errno );
+	xmlXPathFreeContext( a_rpsContext );
 	a_rpsContext = NULL;
 	return;
 	M_EPILOG
@@ -247,12 +247,11 @@ char const* HXml::convert( char const* a_pcData, way_t a_eWay )
 		case ( D_TO_INTERNAL ): { l_xCD = ( *f_oConvert ).f_xIconvToInternal; break; }
 		default :
 			{
-			M_THROW( _( "unknown convertion way" ), a_eWay );
-			break;
+			M_ASSERT( ! _( "unknown convertion way" ) );
 			}
 		}
 	size_t l_uiSizeOut = 0, l_uiSizeIn = ::strlen( source );
-	/* The longers single character in any encoding is 6 bytes long. */
+	/* The longest single character in any encoding is 6 bytes long. */
 	size_t const D_ICONV_OUTPUT_BUFFER_LENGTH = 8;
 	/* Additional character for nil terminator. */
 	char l_pcOutput[ D_ICONV_OUTPUT_BUFFER_LENGTH + 1 ];
@@ -468,7 +467,8 @@ void HXml::save( char const* const a_pcPath )
 	rc = xmlTextWriterSetIndent( writer.get(), 1 );
 	if ( rc < 0 )
 		throw HXmlException( "Unable to enable indenting." );
-	rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( "\t" ) );
+	static char const* const D_INDENTION_STRING = "\t";
+	rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( D_INDENTION_STRING ) );
 	if ( rc < 0 )
 		throw HXmlException( "Cannot set indent string." );
 	dump_node( &writer, get_root() );
