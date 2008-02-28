@@ -68,6 +68,7 @@ public:
 	void apply_style( char const* const );
 	void parse( char const* const = NULL, bool = true );
 	HNodeProxy get_root( void );
+	HNodeProxy const get_root( void ) const;
 	void load( char const* const );
 	void save( char const* const );
 	void create_root( char const* const, char const* const = NULL );
@@ -162,7 +163,7 @@ public:
 private:
 	friend class HXml;
 	friend class HXml::HIterator;
-	HNodeProxy( HXml::tree_t::node_t );
+	HNodeProxy( HXml::tree_t::const_node_t );
 	};
 
 class HXml::HIterator

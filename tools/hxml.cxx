@@ -538,11 +538,19 @@ void HXml::clear( void )
 	M_EPILOG
 	}
 
-HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t a_poNode ) : f_poNode( a_poNode )
+HXml::HNodeProxy::HNodeProxy( HXml::tree_t::const_node_t a_poNode )
+	: f_poNode( const_cast<HXml::tree_t::node_t>( a_poNode ) )
 	{
 	}
 
-HXml::HNodeProxy HXml::get_root ( void )
+HXml::HNodeProxy HXml::get_root( void )
+	{
+	M_PROLOG
+	return ( HNodeProxy( f_oDOM.get_root() ) );
+	M_EPILOG
+	}
+
+HXml::HNodeProxy const HXml::get_root( void ) const
 	{
 	M_PROLOG
 	return ( HNodeProxy( f_oDOM.get_root() ) );
