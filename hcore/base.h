@@ -138,6 +138,18 @@ struct trait_add_const_if_not_reference<T&>
 	typedef T type;
 	};
 
+template<typename source, typename destination>
+struct trait_copy_const
+	{
+	typedef destination type;
+	};
+
+template<typename source, typename destination>
+struct trait_copy_const<source const, destination>
+	{
+	typedef destination const type;
+	};
+
 template<int long unsigned const input>
 struct binary
 	{

@@ -275,8 +275,8 @@ double HAnalyser::addition( tree_t::const_node_t a_roNode )
 	M_PROLOG
 	int l_iOperator = 0;
 	double l_dLeftValue = 0, l_dRightValue = 0;
-	tree_t::iterator it = a_roNode->begin();
-	int_list_t::iterator var = (*a_roNode)->f_oVariables.begin();
+	tree_t::const_iterator it = a_roNode->begin();
+	int_list_t::const_iterator var = (*a_roNode)->f_oVariables.begin();
 	l_dLeftValue = count_branch( &*it );
 	while ( ( ++ it ) != a_roNode->end() )
 		{
@@ -304,8 +304,8 @@ double HAnalyser::multiplication( tree_t::const_node_t a_roNode )
 	M_PROLOG
 	int l_iOperator = 0;
 	double l_dLeftValue = 0, l_dRightValue = 0;
-	tree_t::iterator it = a_roNode->begin();
-	int_list_t::iterator var = (*a_roNode)->f_oVariables.begin();
+	tree_t::const_iterator it = a_roNode->begin();
+	int_list_t::const_iterator var = (*a_roNode)->f_oVariables.begin();
 	l_dLeftValue = count_branch( &*it );
 	while ( ( ++ it ) != a_roNode->end() )
 		{
@@ -333,7 +333,7 @@ double HAnalyser::power( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	double l_dLeftValue, l_dRightValue;
-	tree_t::iterator it = a_roNode->begin();
+	tree_t::const_iterator it = a_roNode->begin();
 	l_dLeftValue = count_branch ( &*it );
 	l_dRightValue = count_branch ( &*( ++ it ) );
 	if ( ( l_dLeftValue < 0 )
