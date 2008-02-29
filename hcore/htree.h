@@ -128,8 +128,8 @@ template<typename tType>
 template<typename const_qual_t>
 class HTree<tType>::HIterator
 	{
-	typedef typename trait_copy_const<const_qual_t, HNode>::type const_qual_node_t;
-	typedef typename trait_copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;
+	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
+	typedef typename trait::copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;
 	typedef typename HTree<tType>::const_node_t owner_t;
 	typedef typename HTree<tType>::HNode::branch_t::template HIterator<const_qual_node_ptr_t,
 					OListBits::D_TREAT_AS_OPENED> list_it_t;

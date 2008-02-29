@@ -43,8 +43,8 @@ class HPair
 	tType f_tKey;
 	ttType f_tValue;
 public:
-	typename trait_strip_reference<tType>::type& first;
-	typename trait_strip_reference<ttType>::type& second;
+	typename trait::strip_reference<tType>::type& first;
+	typename trait::strip_reference<ttType>::type& second;
 	HPair( void ) : f_tKey(), f_tValue(), first( f_tKey ), second( f_tValue ) {}
 	HPair( tType key, ttType value ) : f_tKey( key ), f_tValue( value ), first( f_tKey ), second( f_tValue ) {}
 	HPair( HPair const& pair ) : f_tKey( pair.f_tKey ), f_tValue( pair.f_tValue ), first( f_tKey ), second( f_tValue ) {}

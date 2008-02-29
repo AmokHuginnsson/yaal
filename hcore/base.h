@@ -102,53 +102,58 @@ void for_each( iterator_t const& begin, iterator_t const& end, call_t& CALL )
 		CALL( *it );
 	}
 
+namespace trait
+{
+
 template<typename T>
-struct trait_strip_reference
+struct strip_reference
 	{
 	typedef T type;
 	};
 
 template<typename T>
-struct trait_strip_reference<T&>
+struct strip_reference<T&>
 	{
 	typedef T type;
 	};
 
 template<typename T>
-struct trait_strip_const
+struct strip_const
 	{
 	typedef T type;
 	};
 
 template<typename T>
-struct trait_strip_const<T const>
+struct strip_const<T const>
 	{
 	typedef T type;
 	};
 
 template<typename T>
-struct trait_add_const_if_not_reference
+struct add_const_if_not_reference
 	{
 	typedef T const type;
 	};
 
 template<typename T>
-struct trait_add_const_if_not_reference<T&>
+struct add_const_if_not_reference<T&>
 	{
 	typedef T type;
 	};
 
 template<typename source, typename destination>
-struct trait_copy_const
+struct copy_const
 	{
 	typedef destination type;
 	};
 
 template<typename source, typename destination>
-struct trait_copy_const<source const, destination>
+struct copy_const<source const, destination>
 	{
 	typedef destination const type;
 	};
+
+}
 
 template<int long unsigned const input>
 struct binary
