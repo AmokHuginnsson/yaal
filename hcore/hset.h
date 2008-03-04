@@ -57,52 +57,8 @@ template<typename tType, typename ttType = set_helper<tType> >
 class HSet
 	{
 public:
-	class HIterator
-		{
-		HSBBSTree::HIterator f_oEngine;
-	public:
-		HIterator( void ) : f_oEngine() {}
-		HIterator( HIterator const& a_oIt ) : f_oEngine( a_oIt.f_oEngine ) {}
-		HIterator& operator= ( HIterator const& a_oIt )
-			{
-			if ( &a_oIt != this )
-				f_oEngine = a_oIt.f_oEngine;
-			return ( *this );
-			}
-		HIterator& operator ++ ( void )
-			{
-			++ f_oEngine;
-			return ( *this );
-			}
-		HIterator const operator ++ ( int )
-			{
-			HIterator it( f_oEngine );
-			++ f_oEngine;
-			return ( it );
-			}
-		HIterator& operator -- ( void )
-			{
-			-- f_oEngine;
-			return ( *this );
-			}
-		HIterator const operator -- ( int )
-			{
-			HIterator it( f_oEngine );
-			-- f_oEngine;
-			return ( it );
-			}
-		tType const& operator * ( void )
-			{	return ( f_oEngine.operator*<tType>() );	}
-		tType const* const operator -> ( void )
-			{ return ( &f_oEngine.operator*<tType>() );	}
-		bool operator == ( HIterator const& it ) const
-			{ return ( f_oEngine == it.f_oEngine ); }
-		bool operator != ( HIterator const& it ) const
-			{ return ( f_oEngine != it.f_oEngine ); }
-	private:
-		friend class HSet<tType, ttType>;
-		explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
-		};
+	class HIterator;
+	typedef HIterator iterator;
 private:
 	HSBBSTree f_oEngine;
 public:
@@ -144,6 +100,54 @@ public:
 		if ( &source != this )
 			f_oEngine.copy_from<tType, ttType>( source.f_oEngine );
 		}
+	};
+
+template<typename tType, typename ttType = set_helper<tType> >
+class HSet<tType, ttType>::HIterator
+	{
+	HSBBSTree::HIterator f_oEngine;
+public:
+	HIterator( void ) : f_oEngine() {}
+	HIterator( HIterator const& a_oIt ) : f_oEngine( a_oIt.f_oEngine ) {}
+	HIterator& operator= ( HIterator const& a_oIt )
+		{
+		if ( &a_oIt != this )
+			f_oEngine = a_oIt.f_oEngine;
+		return ( *this );
+		}
+	HIterator& operator ++ ( void )
+		{
+		++ f_oEngine;
+		return ( *this );
+		}
+	HIterator const operator ++ ( int )
+		{
+		HIterator it( f_oEngine );
+		++ f_oEngine;
+		return ( it );
+		}
+	HIterator& operator -- ( void )
+		{
+		-- f_oEngine;
+		return ( *this );
+		}
+	HIterator const operator -- ( int )
+		{
+		HIterator it( f_oEngine );
+		-- f_oEngine;
+		return ( it );
+		}
+	tType const& operator * ( void )
+		{	return ( f_oEngine.operator*<tType>() );	}
+	tType const* const operator -> ( void )
+		{ return ( &f_oEngine.operator*<tType>() );	}
+	bool operator == ( HIterator const& it ) const
+		{ return ( f_oEngine == it.f_oEngine ); }
+	bool operator != ( HIterator const& it ) const
+		{ return ( f_oEngine != it.f_oEngine ); }
+private:
+	friend class HSet<tType, ttType>;
+	explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 	};
 
 }

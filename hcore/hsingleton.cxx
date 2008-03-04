@@ -54,7 +54,7 @@ void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int 
 void HLifeTimeTracker::destruct( void )
 	{
 	HLock l_oLock( f_oMutex );
-	map_stack_t::HIterator it = f_oDestructors.begin();
+	map_stack_t::iterator it = f_oDestructors.begin();
 	M_ASSERT( it != f_oDestructors.end() );
 	destructor_ptr_t destructor = (*it).second;
 	M_ASSERT( !! destructor );

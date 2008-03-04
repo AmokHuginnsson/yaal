@@ -40,77 +40,35 @@ namespace yaal
 namespace hcore
 {
 
-template<typename tType, typename ttType>
+template<typename key_t, typename value_t>
 struct map_helper
 {
 
-inline static void update( HPair<tType, ttType>& left, HPair<tType, ttType> const& right )
+inline static void update( HPair<key_t, value_t>& left, HPair<key_t, value_t> const& right )
 	{
 	left.second = right.second;
 	}
 
-inline static bool less( HPair<tType, ttType> const& left, HPair<tType, ttType> const& right )
+inline static bool less( HPair<key_t, value_t> const& left, HPair<key_t, value_t> const& right )
 	{	return ( left.first < right.first );	}
 
-inline static bool less( tType const& left, HPair<tType, ttType> const& right )
+inline static bool less( key_t const& left, HPair<key_t, value_t> const& right )
 	{	return ( left < right.first );	}
 
-inline static bool less( HPair<tType, ttType> const& left, tType const& right )
+inline static bool less( HPair<key_t, value_t> const& left, key_t const& right )
 	{	return ( left.first < right );	}
 
 };
 
-template<typename tType, typename ttType, typename tttType = map_helper<tType const, ttType> >
+template<typename key_t, typename value_t, typename helper_t = map_helper<key_t const, value_t> >
 class HMap
 	{
-	typedef HPair<tType const, ttType> map_elem_t;
+	typedef HPair<key_t const, value_t> map_elem_t;
 public:
-	class HIterator
-		{
-		HSBBSTree::HIterator f_oEngine;
-	public:
-		HIterator( void ) : f_oEngine() {}
-		HIterator( HIterator const& a_oIt ) : f_oEngine( a_oIt.f_oEngine ) {}
-		HIterator& operator= ( HIterator const& a_oIt )
-			{
-			if ( &a_oIt != this )
-				f_oEngine = a_oIt.f_oEngine;
-			return ( *this );
-			}
-		HIterator& operator ++ ( void )
-			{
-			++ f_oEngine;
-			return ( *this );
-			}
-		HIterator const operator ++ ( int )
-			{
-			HIterator it( f_oEngine );
-			++ f_oEngine;
-			return ( it );
-			}
-		HIterator& operator -- ( void )
-			{
-			-- f_oEngine;
-			return ( *this );
-			}
-		HIterator const operator -- ( int )
-			{
-			HIterator it( f_oEngine );
-			-- f_oEngine;
-			return ( it );
-			}
-		map_elem_t const& operator* ( void )
-			{	return ( f_oEngine.operator*<map_elem_t>() );	}
-		map_elem_t const* const operator-> ( void )
-			{ return ( &f_oEngine.operator*<map_elem_t>() );	}
-		bool operator == ( HIterator const& it ) const
-			{ return ( f_oEngine == it.f_oEngine ); }
-		bool operator != ( HIterator const& it ) const
-			{ return ( f_oEngine != it.f_oEngine ); }
-	private:
-		friend class HMap<tType, ttType, tttType>;
-		explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
-		};
+	template<typename const_qual_t>
+	class HIterator;
+	typedef HIterator<map_elem_t> iterator;
+	typedef HIterator<map_elem_t const> const_iterator;
 private:
 	HSBBSTree f_oEngine;
 public:
@@ -119,53 +77,116 @@ public:
 		{ return ( f_oEngine.size() );	}
 	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
-	HIterator insert( map_elem_t const& e )
-		{	return ( HIterator( f_oEngine.insert<map_elem_t, tttType>( e ) ) );	}
-	HIterator insert( tType const& key, ttType const& value )
-		{	return ( HIterator( f_oEngine.insert<map_elem_t, tttType>( map_elem_t( key, value ) ) ) );	}
-	void remove( tType const& e )
+	iterator insert( map_elem_t const& e )
+		{	return ( iterator( f_oEngine.insert<map_elem_t, helper_t>( e ) ) );	}
+	iterator insert( key_t const& key, value_t const& value )
+		{	return ( iterator( f_oEngine.insert<map_elem_t, helper_t>( map_elem_t( key, value ) ) ) );	}
+	void remove( key_t const& e )
 		{
-		HIterator it = find( e );
+		iterator it = find( e );
 		if ( it != end() )
 			f_oEngine.remove( it.f_oEngine );
 		return;
 		}
-	HIterator erase( HIterator const& it )
+	iterator erase( iterator const& it )
 		{
-		HIterator newIt( it );
+		iterator newIt( it );
 		++ newIt;
 		f_oEngine.remove( it.f_oEngine );
 		return ( newIt );
 		}
-	HIterator find( tType const& e ) const
-		{ return ( HIterator( f_oEngine.find<map_elem_t, tType, tttType>( e ) ) ); }
-	HIterator begin( void ) const
-		{ return ( HIterator( f_oEngine.begin() ) ); }
-	HIterator end( void ) const
-		{ return ( HIterator( f_oEngine.end() ) ); }
-	HIterator rbegin( void ) const
-		{ return ( HIterator( f_oEngine.rbegin() ) ); }
-	HIterator rend( void ) const
-		{ return ( HIterator( f_oEngine.rend() ) ); }
-	ttType& operator[] ( tType const& key )
+	iterator find( key_t const& e )
+		{ return ( iterator( f_oEngine.find<map_elem_t, key_t, helper_t>( e ) ) ); }
+	const_iterator find( key_t const& e ) const
+		{ return ( const_iterator( f_oEngine.find<map_elem_t, key_t, helper_t>( e ) ) ); }
+	iterator begin( void )
+		{ return ( iterator( f_oEngine.begin() ) ); }
+	const_iterator begin( void ) const
+		{ return ( const_iterator( f_oEngine.begin() ) ); }
+	iterator end( void )
+		{ return ( iterator( f_oEngine.end() ) ); }
+	const_iterator end( void ) const
+		{ return ( const_iterator( f_oEngine.end() ) ); }
+	iterator rbegin( void )
+		{ return ( iterator( f_oEngine.rbegin() ) ); }
+	const_iterator rbegin( void ) const
+		{ return ( const_iterator( f_oEngine.rbegin() ) ); }
+	iterator rend( void )
+		{ return ( iterator( f_oEngine.rend() ) ); }
+	const_iterator rend( void ) const
+		{ return ( const_iterator( f_oEngine.rend() ) ); }
+	value_t& operator[] ( key_t const& key )
 		{
-		HIterator it = find( key );
+		iterator it = find( key );
 		if ( it == end() )
-			it = insert( map_elem_t( key, ttType() ) );
+			it = insert( map_elem_t( key, value_t() ) );
 		return ( it->second );
 		}
 	void clear( void )
 		{ f_oEngine.clear(); }
-	void swap( HMap<tType, ttType, tttType>& other )
+	void swap( HMap<key_t, value_t, helper_t>& other )
 		{
 		if ( &other != this )
 			f_oEngine.swap( other.f_oEngine );
 		}
-	void copy_from( HMap<tType, ttType, tttType> const& source )
+	void copy_from( HMap<key_t, value_t, helper_t> const& source )
 		{
 		if ( &source != this )
-			f_oEngine.copy_from<map_elem_t, tttType>( source.f_oEngine );
+			f_oEngine.copy_from<map_elem_t, helper_t>( source.f_oEngine );
 		}
+	};
+
+template<typename key_t, typename value_t, typename helper_t>
+template<typename const_qual_t>
+class HMap<key_t, value_t, helper_t>::HIterator
+	{
+	HSBBSTree::HIterator f_oEngine;
+public:
+	HIterator( void ) : f_oEngine() {}
+	HIterator( HIterator const& a_oIt ) : f_oEngine( a_oIt.f_oEngine ) {}
+	HIterator& operator= ( HIterator const& a_oIt )
+		{
+		if ( &a_oIt != this )
+			f_oEngine = a_oIt.f_oEngine;
+		return ( *this );
+		}
+	HIterator& operator ++ ( void )
+		{
+		++ f_oEngine;
+		return ( *this );
+		}
+	HIterator const operator ++ ( int )
+		{
+		HIterator it( f_oEngine );
+		++ f_oEngine;
+		return ( it );
+		}
+	HIterator& operator -- ( void )
+		{
+		-- f_oEngine;
+		return ( *this );
+		}
+	HIterator const operator -- ( int )
+		{
+		HIterator it( f_oEngine );
+		-- f_oEngine;
+		return ( it );
+		}
+	const_qual_t& operator* ( void )
+		{	return ( f_oEngine.operator*<const_qual_t>() );	}
+	const_qual_t& operator* ( void ) const
+		{	return ( f_oEngine.operator*<const_qual_t>() );	}
+	const_qual_t* const operator-> ( void )
+		{ return ( &f_oEngine.operator*<const_qual_t>() );	}
+	const_qual_t* const operator-> ( void ) const
+		{ return ( &f_oEngine.operator*<const_qual_t>() );	}
+	bool operator == ( HIterator const& it ) const
+		{ return ( f_oEngine == it.f_oEngine ); }
+	bool operator != ( HIterator const& it ) const
+		{ return ( f_oEngine != it.f_oEngine ); }
+private:
+	friend class HMap<key_t, value_t, helper_t>;
+	explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 	};
 
 }
