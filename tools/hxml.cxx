@@ -487,7 +487,7 @@ void HXml::dump_node( void* writer_p, HNodeProxy const& node )
 	if ( rc < 0 )
 		throw HXmlException( HString( "Unable to write start element: " ) + str );
 	HNode::properties_t const& prop = node.properties();
-	for ( HNode::properties_t::HIterator it = prop.begin(); it != prop.end(); ++ it )
+	for ( HNode::properties_t::const_iterator it = prop.begin(); it != prop.end(); ++ it )
 		{
 		HString const& pname = it->first;
 		HString const& pvalue = it->second;

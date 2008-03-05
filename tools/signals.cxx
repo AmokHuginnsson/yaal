@@ -144,7 +144,7 @@ int HSignalService::operator()( HThread const* )
 		int l_iSigNo = 0;
 		sigwait( f_oLocker.get<sigset_t>(), &l_iSigNo );
 		HLock l_oLock( f_oMutex );
-		handlers_t::HIterator it;
+		handlers_t::iterator it;
 		if ( ( it = f_oHandlers.find( l_iSigNo ) ) != f_oHandlers.end() )
 			{
 			for ( ; ( it != f_oHandlers.end() ) && ( (*it).first == l_iSigNo ); ++ it )

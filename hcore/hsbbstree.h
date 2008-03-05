@@ -142,14 +142,14 @@ public:
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
 	template<typename tType>
-	tType const& operator* ( void );
+	tType& operator* ( void );
 private:
 	friend class HSBBSTree;
 	explicit HIterator( HAbstractNode* const );
 	};
 
 template<typename tType>
-tType const& HSBBSTree::HIterator::operator* ( void )
+tType& HSBBSTree::HIterator::operator* ( void )
 	{
 	M_PROLOG
 	M_ASSERT( f_poCurrent );

@@ -78,7 +78,7 @@ void HAbstractAsyncCaller::flush( void* a_pvInvoker )
 	{
 	M_PROLOG
 	HLock l( f_oMutex );
-	for ( queue_t::HIterator it = f_oQueue.begin(); it != f_oQueue.end(); )
+	for ( queue_t::iterator it = f_oQueue.begin(); it != f_oQueue.end(); )
 		{
 		if ( (*it).second->id() == a_pvInvoker )
 			it = f_oQueue.erase( it );
@@ -132,7 +132,7 @@ int HAsyncCaller::do_work( void )
 		{
 		f_oSemaphore.wait();
 		HLock l( f_oMutex );
-		queue_t::HIterator it = f_oQueue.begin();
+		queue_t::iterator it = f_oQueue.begin();
 		if ( it != f_oQueue.end() )
 			{
 			(*it).second->invoke();

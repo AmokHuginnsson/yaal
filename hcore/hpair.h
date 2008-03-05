@@ -40,31 +40,29 @@ namespace hcore
 template<typename tType, typename ttType>
 class HPair
 	{
-	tType f_tKey;
-	ttType f_tValue;
 public:
-	typename trait::strip_reference<tType>::type& first;
-	typename trait::strip_reference<ttType>::type& second;
-	HPair( void ) : f_tKey(), f_tValue(), first( f_tKey ), second( f_tValue ) {}
-	HPair( tType key, ttType value ) : f_tKey( key ), f_tValue( value ), first( f_tKey ), second( f_tValue ) {}
-	HPair( HPair const& pair ) : f_tKey( pair.f_tKey ), f_tValue( pair.f_tValue ), first( f_tKey ), second( f_tValue ) {}
+	tType first;
+	ttType second;
+	HPair( void ) : first(), second() {}
+	HPair( tType key, ttType value ) : first( key ), second( value ) {}
+	HPair( HPair const& pair ) : first( pair.first ), second( pair.second ) {}
 	HPair& operator = ( HPair const& pair )
 		{
 		if ( &pair != this )
 			{
-			f_tKey = pair.f_tKey;
-			f_tValue = pair.f_tValue;
+			first = pair.first;
+			second = pair.second;
 			}
 		return ( *this );
 		}
 	bool operator == ( HPair const& pair ) const
-		{	return ( ( f_tKey == pair.f_tKey ) && ( f_tValue == pair.f_tValue ) );	}
+		{	return ( ( first == pair.first ) && ( second == pair.second ) );	}
 	bool operator != ( HPair const& pair ) const
 		{	return ( ! operator == ( pair ) );	}
 	bool operator < ( HPair const& pair ) const
 		{
-		return ( ( f_tKey < pair.f_tKey )
-				|| ( ! ( pair.f_tKey < f_tKey ) && ( f_tValue < pair.f_tValue ) ) );
+		return ( ( first < pair.first )
+				|| ( ! ( pair.first < first ) && ( second < pair.second ) ) );
 		}
 	};
 

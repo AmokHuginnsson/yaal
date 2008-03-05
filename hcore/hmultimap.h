@@ -226,11 +226,8 @@ template<typename const_qual_t>
 class HMultiMap<key_t, value_t, helper_t>::HIterator
 	{
 	typedef HMultiMap<key_t, value_t, helper_t> multi_map_t;
-	typedef HPair<key_t const, value_list_ptr_t> map_engine_elem_t;
-	typedef typename trait::copy_const<const_qual_t, map_engine_elem_t>::type const_qual_map_engine_elem_t;
-	typedef typename multimap_engine_t::template HIterator<const_qual_map_engine_elem_t> key_iterator_t;
-	typedef typename trait::copy_const<const_qual_t, value_t>::type const_qual_value_t;
-	typedef typename value_list_t::template HIterator<const_qual_value_t, OListBits::D_TREAT_AS_OPENED> value_iterator_t;
+	typedef typename multi_map_t::multimap_engine_t::iterator key_iterator_t;
+	typedef typename value_list_t::iterator value_iterator_t;
 	multi_map_t const* f_poOwner;
 	key_iterator_t f_oMajor;
 	value_iterator_t f_oMinor;

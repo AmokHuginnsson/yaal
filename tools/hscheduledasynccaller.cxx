@@ -68,7 +68,7 @@ int HScheduledAsyncCaller::do_work( void )
 	HLock l( f_oMutex );
 	while ( f_bLoop )
 		{
-		queue_t::HIterator it = f_oQueue.begin();
+		queue_t::iterator it = f_oQueue.begin();
 		while ( ( it != f_oQueue.end() ) && ( (*it).first <= time( NULL ) ) )
 			{
 			(*it).second->invoke();

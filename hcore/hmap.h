@@ -140,6 +140,7 @@ template<typename key_t, typename value_t, typename helper_t>
 template<typename const_qual_t>
 class HMap<key_t, value_t, helper_t>::HIterator
 	{
+	typedef HMap<key_t, value_t, helper_t> map_t;
 	HSBBSTree::HIterator f_oEngine;
 public:
 	HIterator( void ) : f_oEngine() {}
@@ -173,16 +174,18 @@ public:
 		return ( it );
 		}
 	const_qual_t& operator* ( void )
-		{	return ( f_oEngine.operator*<const_qual_t>() );	}
+		{ return ( f_oEngine.operator*<typename map_t::map_elem_t>() ); }
 	const_qual_t& operator* ( void ) const
-		{	return ( f_oEngine.operator*<const_qual_t>() );	}
+		{ return ( f_oEngine.operator*<typename map_t::map_elem_t>() ); }
 	const_qual_t* const operator-> ( void )
-		{ return ( &f_oEngine.operator*<const_qual_t>() );	}
+		{ return ( &f_oEngine.operator*<typename map_t::map_elem_t>() ); }
 	const_qual_t* const operator-> ( void ) const
-		{ return ( &f_oEngine.operator*<const_qual_t>() );	}
-	bool operator == ( HIterator const& it ) const
+		{ return ( &f_oEngine.operator*<typename map_t::map_elem_t>() ); }
+	template<typename other_const_qual_t>
+	bool operator == ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( f_oEngine == it.f_oEngine ); }
-	bool operator != ( HIterator const& it ) const
+	template<typename other_const_qual_t>
+	bool operator != ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( f_oEngine != it.f_oEngine ); }
 private:
 	friend class HMap<key_t, value_t, helper_t>;
