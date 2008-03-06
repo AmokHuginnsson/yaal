@@ -46,15 +46,18 @@ class HXml
 public:
 	class HNode;
 	class HNodeProxy;
+	class HConstNodeProxy;
 	class HIterator;
+	class HConstIterator;
 	typedef HIterator iterator;
+	typedef HConstIterator const_iterator;
 	typedef yaal::hcore::HTree<HNode> tree_t;
 protected:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
 	typedef enum { D_TO_EXTERNAL, D_TO_INTERNAL } way_t;
 	yaal::hcore::HPointer<OConvert> f_oConvert;
-	yaal::hcore::HString	f_oConvertedString;
+	mutable yaal::hcore::HString	f_oConvertedString;
 	yaal::hcore::HString	f_oVarTmpBuffer;
 	yaal::hcore::HString	f_oEncoding;
 	HXmlData*							f_poXml;
@@ -68,15 +71,15 @@ public:
 	void apply_style( char const* const );
 	void parse( char const* const = NULL, bool = true );
 	HNodeProxy get_root( void );
-	HNodeProxy const get_root( void ) const;
+	HConstNodeProxy const get_root( void ) const;
 	void load( char const* const );
-	void save( char const* const );
+	void save( char const* const ) const;
 	void create_root( char const* const, char const* const = NULL );
 	void clear( void );
 private:
 	void parse ( xml_node_ptr_t, tree_t::node_t, bool );
-	void dump_node( void*, HNodeProxy const& );
-	char const* convert( char const*, way_t = D_TO_INTERNAL );
+	void dump_node( void*, HConstNodeProxy const& ) const;
+	char const* convert( char const*, way_t = D_TO_INTERNAL ) const;
 	int get_node_set_by_path( char const* );
 private:
 	HXml( HXml const& );
@@ -128,6 +131,33 @@ private:
 	friend class HXml;
 	};
 
+class HXml::HConstNodeProxy
+	{
+	HXml::tree_t::const_node_t f_poNode;
+public:
+	HXml::HConstIterator const begin() const;
+	HXml::HConstIterator const end() const;
+	HXml::HConstIterator const rbegin() const;
+	HXml::HConstIterator const rend() const;
+	HXml::HConstIterator const get_element_by_id( char const* const ) const;
+	HXml::HConstIterator const query( char const* const ) const;
+	HXml::HNode::TYPE::type_t get_type() const;
+	bool has_childs( void ) const;
+	int child_count( void ) const;
+	int get_level( void ) const;
+	yaal::hcore::HString const& get_name( void ) const;
+	yaal::hcore::HString const& get_value( void ) const;
+	HXml::HNode::properties_t const& properties( void ) const;
+	HConstNodeProxy( HConstNodeProxy const& );
+	HConstNodeProxy( HNodeProxy const& );
+	HConstNodeProxy& operator = ( HConstNodeProxy const& );
+	bool operator ! ( void ) const;
+private:
+	friend class HXml;
+	friend class HXml::HConstIterator;
+	HConstNodeProxy( HXml::tree_t::const_node_t );
+	};
+
 class HXml::HNodeProxy
 	{
 	mutable HXml::tree_t::node_t f_poNode;
@@ -163,14 +193,13 @@ public:
 private:
 	friend class HXml;
 	friend class HXml::HIterator;
-	HNodeProxy( HXml::tree_t::const_node_t );
+	HNodeProxy( HXml::tree_t::node_t );
 	};
 
 class HXml::HIterator
 	{
 	HXml::HNodeProxy const* f_poOwner;
 	mutable HXml::tree_t::iterator f_oIterator;
-	HXml::HNodeProxy f_oProxy;
 public:
 	HIterator( void );
 	HIterator( HIterator const& );
@@ -199,13 +228,49 @@ public:
 	HIterator& operator = ( HIterator const& );
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
-	HXml::HNodeProxy& operator* ( void );
-	HXml::HNodeProxy const& operator* ( void ) const;
-	HXml::HNodeProxy* operator->( void );
-	HXml::HNodeProxy const* operator->( void ) const;
+	HXml::HNodeProxy operator* ( void );
+	HXml::HConstNodeProxy const operator* ( void ) const;
 private:
 	friend class HXml::HNodeProxy;
 	HIterator( HXml::HNodeProxy const*, HXml::tree_t::iterator const& );
+	};
+
+class HXml::HConstIterator
+	{
+	HXml::HConstNodeProxy const* f_poOwner;
+	mutable HXml::tree_t::const_iterator f_oIterator;
+public:
+	HConstIterator( void );
+	HConstIterator( HConstIterator const& );
+	HConstIterator& operator ++ ( void )
+		{
+		++ f_oIterator;
+		return ( *this );
+		}
+	HConstIterator operator ++ ( int )
+		{
+		HConstIterator it( *this );
+		++ f_oIterator;
+		return ( it );
+		}
+	HConstIterator& operator -- ( void )
+		{
+		-- f_oIterator;
+		return ( *this );
+		}
+	HConstIterator operator -- ( int )
+		{
+		HConstIterator it( *this );
+		-- f_oIterator;
+		return ( it );
+		}
+	HConstIterator& operator = ( HConstIterator const& );
+	bool operator == ( HConstIterator const& ) const;
+	bool operator != ( HConstIterator const& ) const;
+	HXml::HConstNodeProxy const operator* ( void ) const;
+private:
+	friend class HXml::HConstNodeProxy;
+	HConstIterator( HXml::HConstNodeProxy const*, HXml::tree_t::const_iterator const& );
 	};
 
 typedef yaal::hcore::HExceptionT<HXml> HXmlException;

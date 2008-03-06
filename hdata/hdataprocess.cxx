@@ -135,8 +135,8 @@ void HDataProcess::build_menu_item ( HXml::HNodeProxy const& a_rsNode,
 		{
 		for ( HXml::HIterator it = a_rsNode.begin(); it != a_rsNode.end(); ++ it )
 			{
-			HString const& name = it->get_name();
-			HString const contents = it->begin()->get_type() == HXml::HNode::TYPE::D_CONTENT ? it->begin()->get_value() : "";
+			HString const& name = (*it).get_name();
+			HString const contents = (*(*it).begin()).get_type() == HXml::HNode::TYPE::D_CONTENT ? (*(*it).begin()).get_value() : "";
 			if ( name == "label" )
 				a_rsMenuItem.f_oLabel = contents;
 			else if ( name == "handler" )
