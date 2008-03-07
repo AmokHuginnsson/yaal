@@ -59,6 +59,8 @@ char free_err[] = "trying to free NULL pointer";
 char const* const D_DEFAULT_ENCODING = "iso-8859-2";
 typedef HResource<xmlDocPtr, typeof( &xmlFreeDoc )> doc_resource_t;
 typedef HResource<xmlTextWriterPtr, typeof( &xmlFreeTextWriter )> writer_resource_t;
+typedef HResource<xmlCharEncodingHandlerPtr, typeof( &xmlCharEncCloseFunc )> encoder_resource_t;
+typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 }
 
 namespace yaal
@@ -84,6 +86,7 @@ HXmlParserG::HXmlParserG( void )
 HXmlParserG::~HXmlParserG( void )
 	{
 	xmlCleanupParser();
+	xmlCleanupCharEncodingHandlers();
 	}
 
 class HXsltParserG : public HSingletonInterface
@@ -107,17 +110,82 @@ HXsltParserG::~HXsltParserG( void )
 	xsltCleanupGlobals();
 	}
 
+struct HXml::OConvert
+	{
+	encoder_resource_ptr_t f_oEncoder;
+	iconv_t f_xIconvToExternal;
+	iconv_t f_xIconvToInternal;
+	OConvert( void ) 
+		: f_oEncoder(),
+		f_xIconvToExternal ( static_cast<iconv_t>( 0 ) ),
+		f_xIconvToInternal ( static_cast<iconv_t>( 0 ) ) { }
+	OConvert( OConvert const& a_roConvert )
+		: f_oEncoder(),
+		f_xIconvToExternal ( static_cast<iconv_t>( 0 ) ),
+		f_xIconvToInternal ( static_cast<iconv_t>( 0 ) )
+		{
+		operator = ( a_roConvert );
+		}
+	OConvert& operator = ( OConvert const& a_roConvert )
+		{
+		if ( &a_roConvert != this )
+			{
+			f_oEncoder = a_roConvert.f_oEncoder;
+			f_xIconvToExternal = a_roConvert.f_xIconvToExternal;
+			f_xIconvToInternal = a_roConvert.f_xIconvToInternal;
+			}
+		return ( *this );
+		}
+	void init( char const* const a_pcEncoding )
+		{
+		xmlCharEncodingHandlerPtr encoder = xmlFindCharEncodingHandler( a_pcEncoding );
+		if ( ! encoder )
+			M_THROW( _( "cannot enable internal convertion" ), errno );
+		f_oEncoder = encoder_resource_ptr_t(
+				new encoder_resource_t( encoder, xmlCharEncCloseFunc ) );
+		f_xIconvToExternal = (*f_oEncoder).get()->iconv_in;
+		f_xIconvToInternal = (*f_oEncoder).get()->iconv_out;
+		}
+	void init( char const* const a_pcEncoding, xmlNodePtr a_psRoot, char const* const a_pcFileName )
+		{
+		xmlCharEncodingHandlerPtr encoder = NULL;
+		if ( a_pcEncoding )
+			encoder = xmlFindCharEncodingHandler( a_pcEncoding );
+		else
+			log( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: no encoding declared in `" )
+				<< a_pcFileName << "'." << endl;
+		if ( ! encoder )
+			{
+			log( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: char encoding handler not found" ) << endl;
+			xmlCharEncoding l_xEncoding = xmlDetectCharEncoding( a_psRoot->name,
+					xmlStrlen( a_psRoot->name ) );
+			if ( ! l_xEncoding )
+				M_THROW( _( "cannot detect character encoding" ), errno );
+			encoder = xmlGetCharEncodingHandler( l_xEncoding );
+			}
+		if ( ! encoder )
+			M_THROW( _( "cannot enable internal convertion" ), errno );
+		f_oEncoder = encoder_resource_ptr_t(
+				new encoder_resource_t( encoder, xmlCharEncCloseFunc ) );
+		f_xIconvToExternal = (*f_oEncoder).get()->iconv_in;
+		f_xIconvToInternal = (*f_oEncoder).get()->iconv_out;
+		}
+	bool operator ! ( void )
+		{
+		return ( ! ( f_xIconvToExternal && f_xIconvToInternal ) );
+		}
+	};
+
 class HXmlData
 	{
 private:
 	/*{*/
 	friend class HXml;
-	doc_resource_t			f_oDoc;
-	xmlNodePtr					f_psRoot;
-	xmlXPathContextPtr	f_psContext;
-	xmlXPathObjectPtr		f_psObject;
-	xmlNodeSetPtr				f_psNodeSet;
-	xmlCharEncodingHandlerPtr f_psCharEncodingHandler;
+	doc_resource_t     f_oDoc;
+	xmlNodePtr         f_psRoot;
+	xmlXPathContextPtr f_psContext;
+	xmlXPathObjectPtr  f_psObject;
+	xmlNodeSetPtr      f_psNodeSet;
 	/*}*/
 protected:
 	/*{*/
@@ -131,33 +199,9 @@ protected:
 	/*}*/
 	};
 
-struct HXml::OConvert
-	{
-	iconv_t f_xIconvToExternal;
-	iconv_t f_xIconvToInternal;
-	OConvert( void ) 
-		: f_xIconvToExternal ( static_cast<iconv_t>( 0 ) ),
-		f_xIconvToInternal ( static_cast<iconv_t>( 0 ) ) { }
-	OConvert( OConvert const& a_roConvert )
-		: f_xIconvToExternal ( static_cast<iconv_t>( 0 ) ),
-		f_xIconvToInternal ( static_cast<iconv_t>( 0 ) )
-		{
-		operator = ( a_roConvert );
-		}
-	OConvert& operator = ( OConvert const& a_roConvert )
-		{
-		if ( &a_roConvert != this )
-			{
-			f_xIconvToExternal = a_roConvert.f_xIconvToExternal;
-			f_xIconvToInternal = a_roConvert.f_xIconvToInternal;
-			}
-		return ( *this );
-		}
-	};
-
 HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ), f_psRoot( NULL ),
 	f_psContext( NULL ), f_psObject( NULL ),
-	f_psNodeSet( NULL ), f_psCharEncodingHandler( NULL )
+	f_psNodeSet( NULL )
 	{
 	M_PROLOG
 	return;
@@ -207,7 +251,7 @@ void HXmlData::xml_free( xmlXPathObjectPtr& a_rpsObject ) const
 	}
 
 HXml::HXml( void )
-	: f_oConvert( new OConvert ), f_oConvertedString(),
+	: f_oConvert( new HXml::OConvert ), f_oConvertedString(),
 	f_oVarTmpBuffer(), f_oEncoding( D_DEFAULT_ENCODING ), f_poXml( NULL ), f_oDOM()
 	{
 	M_PROLOG
@@ -220,9 +264,6 @@ HXml::HXml( void )
 HXml::~HXml ( void )
 	{
 	M_PROLOG
-	if ( f_poXml->f_psCharEncodingHandler )
-		xmlCharEncCloseFunc( f_poXml->f_psCharEncodingHandler );
-	xmlCleanupCharEncodingHandlers();
 	if ( f_poXml )
 		delete f_poXml;
 	f_poXml = NULL;
@@ -239,6 +280,7 @@ HXml::~HXml ( void )
 char const* HXml::convert( char const* a_pcData, way_t a_eWay ) const
 	{
 	M_PROLOG
+	M_ASSERT( a_pcData );
 	char D_YAAL_TOOLS_HXML_ICONV_CONST* source = const_cast<char D_YAAL_TOOLS_HXML_ICONV_CONST*>( a_pcData );
 	iconv_t l_xCD = static_cast<iconv_t>( 0 );
 	switch ( a_eWay )
@@ -310,7 +352,6 @@ void HXml::init( char const* a_pcFileName )
 	{
 	M_PROLOG
 	int l_iSavedErrno = errno;
-	xmlCharEncoding l_xEncoding = static_cast<xmlCharEncoding>( 0 );
 	HString l_oError;
 	HXmlParserGlobal::get_instance();
 	f_poXml->clear();
@@ -333,25 +374,8 @@ void HXml::init( char const* a_pcFileName )
 #ifdef __DEBUGGER_BABUNI__
 	fprintf ( stdout, "%s\n", f_poXml->f_psRoot->name );
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( doc.get()->encoding )
-		f_poXml->f_psCharEncodingHandler = xmlFindCharEncodingHandler (
-				reinterpret_cast<char const *>( doc.get()->encoding ) );
-	else
-		log( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: no encoding declared in `" )
-			<< a_pcFileName << "'." << endl;
-	if ( ! f_poXml->f_psCharEncodingHandler )
-		{
-		log( LOG_TYPE::D_WARNING ) << _ ( "HXml::WARNING: char encoding handler not found" ) << endl;
-		l_xEncoding = xmlDetectCharEncoding ( f_poXml->f_psRoot->name,
-				xmlStrlen ( f_poXml->f_psRoot->name ) );
-		if ( ! l_xEncoding )
-			M_THROW( _( "cannot detect character encoding" ), errno );
-		f_poXml->f_psCharEncodingHandler = xmlGetCharEncodingHandler( l_xEncoding );
-		}
-	if ( ! f_poXml->f_psCharEncodingHandler )
-		M_THROW( _( "cannot enable internal convertion" ), errno );
-	(*f_oConvert).f_xIconvToExternal = f_poXml->f_psCharEncodingHandler->iconv_in;
-	(*f_oConvert).f_xIconvToInternal = f_poXml->f_psCharEncodingHandler->iconv_out;
+	(*f_oConvert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
+			f_poXml->f_psRoot, a_pcFileName );
 	f_poXml->f_oDoc.swap( doc );
 	return;
 	M_EPILOG
@@ -471,6 +495,8 @@ void HXml::save( char const* const a_pcPath ) const
 	rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( D_INDENTION_STRING ) );
 	if ( rc < 0 )
 		throw HXmlException( "Cannot set indent string." );
+	if ( ! (*f_oConvert) )
+		(*f_oConvert).init( f_oEncoding );
 	dump_node( &writer, get_root() );
 	rc = xmlTextWriterEndDocument( writer.get() );
 	if ( rc < 0 )
@@ -817,6 +843,36 @@ HXml::HIterator::HIterator( HXml::HNodeProxy const* a_poOwner, HXml::tree_t::ite
 HXml::HConstIterator::HConstIterator( HXml::HConstNodeProxy const* a_poOwner, HXml::tree_t::const_iterator const& it )
 	: f_poOwner( a_poOwner ), f_oIterator( it )
 	{
+	}
+
+HXml::HIterator::HIterator( HXml::HIterator const& other )
+	: f_poOwner( other.f_poOwner ), f_oIterator( other.f_oIterator )
+	{
+	}
+
+HXml::HConstIterator::HConstIterator( HXml::HConstIterator const& other )
+	: f_poOwner( other.f_poOwner ), f_oIterator( other.f_oIterator )
+	{
+	}
+
+HXml::HIterator& HXml::HIterator::operator = ( HXml::HIterator const& other )
+	{
+	if ( &other != this )
+		{
+		f_poOwner = other.f_poOwner;
+		f_oIterator = other.f_oIterator;
+		}
+	return ( *this );
+	}
+
+HXml::HConstIterator& HXml::HConstIterator::operator = ( HXml::HConstIterator const& other )
+	{
+	if ( &other != this )
+		{
+		f_poOwner = other.f_poOwner;
+		f_oIterator = other.f_oIterator;
+		}
+	return ( *this );
 	}
 
 bool HXml::HIterator::operator == ( HXml::HIterator const& other ) const
