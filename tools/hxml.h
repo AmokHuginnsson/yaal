@@ -186,7 +186,11 @@ public:
 	HXml::HNode::properties_t const& properties( void ) const;
 	HXml::HIterator remove_node( HXml::HIterator );
 	HXml::HIterator add_node( HXml::HNode::TYPE::type_t const&, char const* const );
-	HXml::HIterator insert_node( HXml::HIterator );
+	HXml::HIterator insert_node( HXml::HIterator, HXml::HNode::TYPE::type_t const&, char const* const );
+	HXml::HIterator move_node( HXml::HIterator, HXml::HNodeProxy );
+	HXml::HIterator move_node( HXml::HNodeProxy );
+	HXml::HIterator copy_node( HXml::HIterator, HXml::HNodeProxy );
+	HXml::HIterator copy_node( HXml::HNodeProxy );
 	HNodeProxy( HNodeProxy const& );
 	HNodeProxy& operator = ( HNodeProxy const& );
 	bool operator ! ( void ) const;

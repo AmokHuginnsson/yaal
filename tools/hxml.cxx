@@ -666,6 +666,43 @@ HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& a_e
 	return ( HXml::HIterator( this, it ) );
 	}
 
+HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, HXml::HNode::TYPE::type_t const& a_eType, char const* const a_pcName )
+	{
+	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
+	tree_t::iterator newIt = f_poNode->insert_node( it.f_oIterator, HNode() );
+	(**newIt).f_oText = a_pcName;
+	(**newIt).f_eType = a_eType;
+	return ( HXml::HIterator( this, newIt ) );
+	}
+
+HXml::HIterator HXml::HNodeProxy::move_node( HXml::HIterator it, HXml::HNodeProxy node )
+	{
+	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
+	tree_t::iterator newIt = f_poNode->move_node( it.f_oIterator, node.f_poNode );
+	return ( HXml::HIterator( this, newIt ) );
+	}
+
+HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node )
+	{
+	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
+	tree_t::iterator newIt = f_poNode->move_node( node.f_poNode );
+	return ( HXml::HIterator( this, newIt ) );
+	}
+
+HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProxy node )
+	{
+	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
+	tree_t::iterator newIt = f_poNode->copy_node( it.f_oIterator, node.f_poNode );
+	return ( HXml::HIterator( this, newIt ) );
+	}
+
+HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HNodeProxy node )
+	{
+	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
+	tree_t::iterator newIt = f_poNode->copy_node( node.f_poNode );
+	return ( HXml::HIterator( this, newIt ) );
+	}
+
 bool HXml::HNodeProxy::has_childs( void ) const
 	{
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
