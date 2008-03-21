@@ -59,10 +59,10 @@ LINKER_PRIME_FLAGS +=	-shared\
 include $(DIR_ROOT)/aux/common-flags-post.mk
 include $(DIR_ROOT)/aux/common-func.mk
 
-$(foreach COMPONENT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(COMPONENT))))
+$(foreach IT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(IT))))
 SRCS := $(filter-out %_driver.$(SS),$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.$(OS),$(OBJS_dbwrapper))
-$(foreach DRIVER,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(DRIVER))))
+$(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT))))
 
 LIBS_hcore			=	"-lrt -lpthread -lssl @GETTEXT_LIB@"
 DEPS_tools			= $(TARGET_hcore)
@@ -121,9 +121,9 @@ else
 all: $(TARGETS) $(HAPI_HEADER)
 endif
 
-$(foreach COMPONENT,$(COMPONENTS),$(eval $(call BUILD_TARGET,$(COMPONENT),$(DEPS_$(COMPONENT)),$(LIBS_$(COMPONENT)))))
-$(foreach DRIVER,$(DRIVERS),$(eval $(call BUILD_TARGET,$(DRIVER)_driver,$(DEPS_$(DRIVER)),$(LIBS_$(DRIVER)))))
-$(foreach DIR,$(DIRS),$(eval $(call MAKE_DIR,$(DIR))))
+$(foreach IT,$(COMPONENTS),$(eval $(call BUILD_TARGET_LIB,$(IT),$(DEPS_$(IT)),$(LIBS_$(IT)))))
+$(foreach IT,$(DRIVERS),$(eval $(call BUILD_TARGET_LIB,$(IT)_driver,$(DEPS_$(IT)),$(LIBS_$(IT)))))
+$(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 
 environment: $(DIRS) $(LD_CACHE)
 

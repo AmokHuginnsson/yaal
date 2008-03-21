@@ -28,7 +28,7 @@ $(1):
 	@umask 022;/bin/mkdir -p $(1)
 endef
 
-define BUILD_TARGET
+define BUILD_TARGET_LIB
 $$(TARGET_$(1)): $$(OBJS_$(1)) $(2)
 	@$$(MAKE) -f ../Makefile --no-print-directory lib$(1).so.$$(RELEASE) NAME=$(1) LIBS=$(3)
 endef

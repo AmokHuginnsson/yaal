@@ -1,31 +1,20 @@
 #phony targets
-.PHONY: all dep static prof clean clean-dep tags mrproper purge bin install
+.PHONY: all dep static prof clean clean-dep tags mrproper purge bin install environment
 
 ifneq ($(CURDIR),$(DIR_BUILD))
-all: $(DIR_BUILD)
+all: environment
 	@test -t 1 && export TERMINAL="TERM" ; \
 	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile
 else
-all: $(TARGET)
+all: $(REAL_TARGETS)
 endif
+
+environment: $(DIR_BUILD) $(DIRS)
 
 $(DIR_BUILD):
 	@/bin/mkdir -p $(@); \
 	echo "Program version $(RELEASE)-`date +%Y%m%d`."; \
 	echo "#define VER \"$(RELEASE)-`date +%Y%m%d`\"" > $(DIR_BUILD)/version.h
-
-header.gch: $(VPATH)/header $(HDRS)
-	@echo -n "Generating precompiled header \`$(subst $(DIR_ROOT)/,,$(<))' ... "; \
-	$(CXX) -xc++-header $(subst -include header,,$(CXXFLAGS)) $(<) -o $(@) ;\
-	echo $(NONL) "done.$(CL)"
-
-$(TARGET): header.gch $(OBJS)
-	@echo -n "Linking \`$@' ... "
-	@$(LXX) $(LINKER_FLAGS) -o $(TARGET) $(OBJS) $(LIBS) 2>&1 | tee -a make.log
-ifdef NODEBUG
-	@strip $(TARGET)
-endif
-	@echo "done."
 
 $(PRJNAME).info : src/$(PRJNAME).texinfo
 	@makeinfo src/$(PRJNAME).texinfo
@@ -46,8 +35,8 @@ clean: clean-dep
 	@/bin/rm -f *~ *.out .*~ .*.swp *.bak *.log *.info .depend
 	@/bin/rm -f core $(TARGET).core 1exec.core journal.tut log.tut
 	@/bin/rm -f src/core src/$(TARGET).core src/1exec.core
-	@/bin/rm -f $(OBJS)
-	@/bin/rm -f $(TARGET)
+	@/bin/rm -f $(OBJS_TARGET)
+	@/bin/rm -f $(DIR_BUILD)/$(TARGET)/$(EXEC_NAME)
 	@cln .
 
 mrproper: clean
