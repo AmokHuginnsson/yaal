@@ -232,31 +232,31 @@ HSocket::ptr_t HSocket::accept( void )
 	M_EPILOG
 	}
 
-void HSocket::connect ( char const * const a_pcAddress, int const a_iPort )
+void HSocket::connect( char const* const a_pcAddress, int const a_iPort )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_INITIALIZED ], f_iFileDescriptor );
-	make_address ( a_pcAddress, a_iPort );
-	M_ENSURE ( ::connect ( f_iFileDescriptor,
-				static_cast < sockaddr * > ( f_pvAddress ), f_iAddressSize ) == 0 );
+		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
+	make_address( a_pcAddress, a_iPort );
+	M_ENSURE( ::connect( f_iFileDescriptor,
+				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 );
 	f_bNeedShutdown = true;
 	return;
 	M_EPILOG
 	}
 
-void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
+void HSocket::make_address( char const* const a_pcAddress, int const a_iPort )
 	{
 	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	M_PROLOG
 	int l_iError = 0;
-	sockaddr_in * l_psAddressNetwork = NULL;
-	sockaddr_un * l_psAddressFile = NULL;
+	sockaddr_in* l_psAddressNetwork = NULL;
+	sockaddr_un* l_psAddressFile = NULL;
 #ifdef HAVE_GETHOSTBYNAME_R
 	hostent l_sHostName;
-	hostent * l_psHostName = NULL;
+	hostent* l_psHostName = NULL;
 #else /* HAVE_GETHOSTBYNAME_R */
-	addrinfo * l_psAddrInfo = NULL;
+	addrinfo* l_psAddrInfo = NULL;
 #endif /* ! HAVE_GETHOSTBYNAME_R */
 	if ( f_eType & TYPE::D_NETWORK )
 		{
@@ -289,8 +289,8 @@ void HSocket::make_address ( char const * const a_pcAddress, int const a_iPort )
 		l_psAddressFile->sun_family = AF_LOCAL;
 		::strncpy( l_psAddressFile->sun_path, a_pcAddress,
 				sizeof ( l_psAddressFile->sun_path ) );
-		l_psAddressFile->sun_path [ sizeof ( l_psAddressFile->sun_path ) - 1 ] = 0;
-		f_iAddressSize = SUN_LEN ( l_psAddressFile );
+		l_psAddressFile->sun_path[ sizeof ( l_psAddressFile->sun_path ) - 1 ] = 0;
+		f_iAddressSize = SUN_LEN( l_psAddressFile );
 		}
 	f_oHostName = a_pcAddress;
 	return;
