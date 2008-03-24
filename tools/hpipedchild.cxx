@@ -110,7 +110,15 @@ int HPipedChild::do_write( void const* const a_pcString, int const a_iSize )
 	{
 	M_PROLOG
 	M_ASSERT( f_iPipeOut >= 0 );
-	return ( ::write( f_iPipeOut, a_pcString, a_iSize ) );
+	int iWritten = 0;
+	do
+		{
+		iWritten += TEMP_FAILURE_RETRY( ::write( f_iPipeOut,
+					static_cast<char const* const>( a_pcString ) + iWritten,
+					a_iSize - iWritten ) );
+		}
+	while ( iWritten < a_iSize );
+	return ( iWritten );
 	M_EPILOG
 	}
 

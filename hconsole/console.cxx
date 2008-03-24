@@ -625,7 +625,7 @@ int HConsole::wait_for_user_input( int& a_iKey, mouse::OMouse& a_rsMouse,
 		FD_SET ( f_iMouseDes, & l_xFdSet );
 	do
 		{
-		l_iError = select ( FD_SETSIZE, & l_xFdSet, NULL, NULL,
+		l_iError = ::select( FD_SETSIZE, & l_xFdSet, NULL, NULL,
 				( a_iTimeOutSec || a_iTimeOutUsec ) ? & l_xWait : NULL );
 		}
 	while ( ( l_iError == -1 ) && ( errno == EINTR ) );

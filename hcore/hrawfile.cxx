@@ -26,6 +26,7 @@ Copyright:
 
 #include <unistd.h>
 #include <poll.h>
+#include <cstdlib>
 #include <libintl.h>
 
 #include "hexception.h"
@@ -154,12 +155,54 @@ int HRawFile::do_write( void const* const a_pcBuffer, int const a_iSize )
 	M_EPILOG
 	}
 
+bool HRawFile::wait_for( ACTION::action_t const& a_eAction, void* a_pvTime )
+	{
+	int l_iError = - 1;
+	fd_set l_xFdSet;
+	timeval* l_pxWait = static_cast<timeval*>( a_pvTime );
+	while ( l_pxWait->tv_sec || l_pxWait->tv_usec )
+		{
+		FD_ZERO( & l_xFdSet );
+		FD_SET( f_iFileDescriptor, &l_xFdSet );
+		l_iError = TEMP_FAILURE_RETRY( ::select( FD_SETSIZE,
+					( a_eAction == ACTION::D_READ ) ? &l_xFdSet : NULL,
+					( a_eAction == ACTION::D_WRITE ) ? &l_xFdSet : NULL,
+					NULL, l_pxWait ) );
+		if ( l_iError < 0 )
+			break;
+		else if ( ( l_iError > 0 )
+				&& FD_ISSET( f_iFileDescriptor, &l_xFdSet ) )
+			break;
+		else if ( ! l_iError )
+			break;
+		}
+	return ( l_iError <= 0 );
+	}
+
 int HRawFile::write_plain( void const* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, errno );
-	return ( ::write( f_iFileDescriptor, a_pcBuffer, a_iSize ) );
+	int iWritten = 0;
+	timeval tv = { f_iTimeOut, 0 };
+	do
+		{
+		if ( ( f_iTimeOut > 0 ) && wait_for( ACTION::D_WRITE, &tv ) )
+			throw HStreamInterfaceException( _( "timeout on write" ) );
+		int ret = TEMP_FAILURE_RETRY( ::write( f_iFileDescriptor,
+					static_cast<char const* const>( a_pcBuffer ) + iWritten,
+					a_iSize - iWritten ) );
+		if ( ret < 0 )
+			{
+			iWritten = ret;
+			break;
+			}
+		else
+			iWritten += ret;
+		}
+	while ( iWritten < a_iSize );
+	return ( iWritten );
 	M_EPILOG
 	}
 

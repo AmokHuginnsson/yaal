@@ -190,7 +190,7 @@ public:
 	char unsigned get_attr( void ) const;
 	void clrscr( void ) const;
 	bool is_enabled( void ) const;
-	int wait_for_user_input ( int&, mouse::OMouse&, int = 0, int = 0 ) const;
+	int wait_for_user_input( int&, mouse::OMouse&, int = 0, int = 0 ) const;
 	void bell( void ) const;
 	int get_mouse_fd( void ) const;
 	int get_event_fd( void ) const;

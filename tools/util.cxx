@@ -478,24 +478,24 @@ int levenshtein_damerau ( char const * const a_pcOne, char const * const a_pcTwo
 	{
 	int l_iCost = 0;
 	int l_iIndexOne = 0, l_iIndexTwo = 0;
-	int l_iLengthOne = strlen ( a_pcOne );
-	int l_iLengthTwo = strlen ( a_pcTwo );
-	int * * l_ppiDistanceMatrix = NULL;
+	int l_iLengthOne = ::strlen( a_pcOne );
+	int l_iLengthTwo = ::strlen( a_pcTwo );
+	int** l_ppiDistanceMatrix = NULL;
 	if ( ! l_iLengthTwo )
 		return ( l_iLengthOne );
 	if ( ! l_iLengthOne )
 		return ( l_iLengthTwo );
 	l_iLengthOne ++;
 	l_iLengthTwo ++;
-	HPointer < int *, HPointerArray, HPointerRelaxed > l_oDistanceMatrixHolder ( new int * [ l_iLengthOne ] );
-	HPointer < int, HPointerArray, HPointerRelaxed > l_oDistanceMatrix ( new int [ l_iLengthOne * l_iLengthTwo ] );
+	HPointer<int*, HPointerArray, HPointerRelaxed> l_oDistanceMatrixHolder( new int*[ l_iLengthOne ] );
+	HPointer<int, HPointerArray, HPointerRelaxed> l_oDistanceMatrix( new int[ l_iLengthOne * l_iLengthTwo ] );
 	l_ppiDistanceMatrix = l_oDistanceMatrixHolder.raw();
 	for ( l_iIndexOne = 0; l_iIndexOne < l_iLengthOne; ++ l_iIndexOne )
-		l_ppiDistanceMatrix [ l_iIndexOne ] = l_oDistanceMatrix.raw() + l_iIndexOne * l_iLengthTwo;
+		l_ppiDistanceMatrix[ l_iIndexOne ] = l_oDistanceMatrix.raw() + l_iIndexOne * l_iLengthTwo;
 	for ( l_iIndexOne = 0; l_iIndexOne < l_iLengthOne; ++ l_iIndexOne )
-		l_ppiDistanceMatrix [ l_iIndexOne ] [ 0 ] = l_iIndexOne;
+		l_ppiDistanceMatrix[ l_iIndexOne ][ 0 ] = l_iIndexOne;
 	for ( l_iIndexTwo = 0; l_iIndexTwo < l_iLengthTwo; ++ l_iIndexTwo )
-		l_ppiDistanceMatrix [ 0 ] [ l_iIndexTwo ] = l_iIndexTwo;
+		l_ppiDistanceMatrix[ 0 ][ l_iIndexTwo ] = l_iIndexTwo;
 	l_iLengthTwo --;
 	l_iLengthOne --;
 	/* real magic starts here */
@@ -506,17 +506,19 @@ int levenshtein_damerau ( char const * const a_pcOne, char const * const a_pcTwo
 			l_iCost = 0;
 			if ( a_pcOne [ l_iIndexOne ] != a_pcTwo [ l_iIndexTwo ] )
 				l_iCost = 1;
-			l_ppiDistanceMatrix [ l_iIndexOne + 1 ] [ l_iIndexTwo + 1 ] = min3 (
-					l_ppiDistanceMatrix [ l_iIndexOne ] [ l_iIndexTwo + 1 ] + 1,
-					l_ppiDistanceMatrix [ l_iIndexOne + 1 ] [ l_iIndexTwo ] + 1,
-					l_ppiDistanceMatrix [ l_iIndexOne ] [ l_iIndexTwo ] + l_iCost );
+			l_ppiDistanceMatrix[ l_iIndexOne + 1 ][ l_iIndexTwo + 1 ] = min3(
+					l_ppiDistanceMatrix[ l_iIndexOne ][ l_iIndexTwo + 1 ] + 1,
+					l_ppiDistanceMatrix[ l_iIndexOne + 1 ][ l_iIndexTwo ] + 1,
+					l_ppiDistanceMatrix[ l_iIndexOne ][ l_iIndexTwo ] + l_iCost );
 			if ( a_bDamerau && ( l_iIndexOne > 0 ) && ( l_iIndexTwo > 0 )
-					&& ( a_pcOne [ l_iIndexOne - 1 ] == a_pcTwo [ l_iIndexTwo ] )
-					&& ( a_pcOne [ l_iIndexOne ] == a_pcTwo [ l_iIndexTwo - 1 ] ) )
-				l_ppiDistanceMatrix [ l_iIndexOne + 1 ] [ l_iIndexTwo + 1 ] = min ( l_ppiDistanceMatrix [ l_iIndexOne + 1 ] [ l_iIndexTwo + 1 ], l_ppiDistanceMatrix [ l_iIndexOne - 1 ] [ l_iIndexTwo - 1 ] + l_iCost );
+					&& ( a_pcOne[ l_iIndexOne - 1 ] == a_pcTwo[ l_iIndexTwo ] )
+					&& ( a_pcOne[ l_iIndexOne ] == a_pcTwo[ l_iIndexTwo - 1 ] ) )
+				l_ppiDistanceMatrix[ l_iIndexOne + 1 ][ l_iIndexTwo + 1 ] = min(
+						l_ppiDistanceMatrix[ l_iIndexOne + 1 ][ l_iIndexTwo + 1 ],
+						l_ppiDistanceMatrix[ l_iIndexOne - 1 ][ l_iIndexTwo - 1 ] + l_iCost );
 			}
 		}
-	return ( l_ppiDistanceMatrix [ l_iLengthOne ] [ l_iLengthTwo ] );
+	return ( l_ppiDistanceMatrix[ l_iLengthOne ][ l_iLengthTwo ] );
 	}
 
 }

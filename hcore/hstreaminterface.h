@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hstring.h"
 #include "hcore/hpool.h"
+#include "hcore/hexception.h"
 
 namespace yaal
 {
@@ -45,6 +46,8 @@ class HStreamInterface
 protected:
 	typedef yaal::hcore::HPool<char> cache_t;
 	cache_t f_oCache;
+	int f_iOffset;
+	int f_iTimeOut;
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
@@ -67,6 +70,7 @@ public:
 	int read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
 	int read( void* const, int const );
 	int write( void const* const, int const );
+	void set_timeout( int );
 	static char const* const eols;
 private:
 	virtual int do_write( void const* const, int const ) = 0;
@@ -75,6 +79,8 @@ private:
 	friend HStreamInterface& endl( HStreamInterface& );
 	friend HStreamInterface& flush( HStreamInterface& );
 	};
+
+typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
 
 }
 

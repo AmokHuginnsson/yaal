@@ -54,6 +54,14 @@ protected:
 			D_SSL_CLIENT	= 4
 			} raw_file_type_t;
 		};
+	struct ACTION
+		{
+		typedef enum
+			{
+			D_READ,
+			D_WRITE
+			} action_t;
+		};
 	TYPE::raw_file_type_t f_eType;
 	file_descriptor_t f_iFileDescriptor; /* raw file descriptor of the file */
 	HOpenSSL::ptr_t f_oSSL;
@@ -79,6 +87,8 @@ protected:
 	virtual int do_write( void const* const, int const );
 	virtual int do_read( void* const, int const );
 	virtual void do_flush( void ) const;
+private:
+	bool wait_for( ACTION::action_t const&, void* );
 	};
 
 }
