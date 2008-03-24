@@ -224,9 +224,10 @@ HSocket::ptr_t HSocket::accept( void )
 	l_oSocket->f_iFileDescriptor = l_iFileDescriptor;
 	l_oSocket->f_iAddressSize = l_iAddressSize;
 	l_oSocket->f_bNeedShutdown = true;
+	l_oSocket->set_timeout( f_iTimeOut );
 	::memcpy( l_oSocket->f_pvAddress, l_psAddress, l_iAddressSize );
 	if ( f_poClients->has_key( l_iFileDescriptor ) )
-		M_THROW( _( "inconsitient client list state" ), l_iFileDescriptor );
+		M_THROW( _( "inconsitent client list state" ), l_iFileDescriptor );
 	f_poClients->operator[]( l_iFileDescriptor ) = l_oSocket;
 	return ( l_oSocket );
 	M_EPILOG

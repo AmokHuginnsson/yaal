@@ -39,7 +39,7 @@ namespace hcore
 char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
-	: f_oCache( 1, cache_t::D_AUTO_GROW ), f_iOffset( 0 ), f_iTimeOut( 0 )
+	: f_oCache( 1, cache_t::D_AUTO_GROW ), f_iOffset( 0 )
 	{
 	return;
 	}
@@ -185,12 +185,6 @@ int HStreamInterface::write( void const* const a_pvBuffer, int const a_iSize )
 	M_PROLOG
 	return ( do_write( a_pvBuffer, a_iSize ) );
 	M_EPILOG
-	}
-
-void HStreamInterface::set_timeout( int a_iTimeout )
-	{
-	f_iTimeOut = a_iTimeout;
-	return;
 	}
 
 }

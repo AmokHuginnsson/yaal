@@ -41,7 +41,8 @@ namespace hcore
 
 char const * const n_pcError = _( "file is not opened" );
 
-HRawFile::HRawFile ( TYPE::raw_file_type_t a_eType ) : f_eType( a_eType ), f_iFileDescriptor( -1 ), f_oSSL(),
+HRawFile::HRawFile ( TYPE::raw_file_type_t a_eType )
+	: f_eType( a_eType ), f_iFileDescriptor( -1 ), f_iTimeOut( 0 ), f_oSSL(),
 	reader( ( ( a_eType & TYPE::D_SSL_SERVER )
 				|| ( a_eType & TYPE::D_SSL_CLIENT ) ) ? &HRawFile::read_ssl_loader : &HRawFile::read_plain ),
 	writer( ( ( a_eType & TYPE::D_SSL_SERVER )
@@ -235,6 +236,12 @@ int HRawFile::do_read( void* const a_pcBuffer, int const a_iSize )
 
 void HRawFile::do_flush( void ) const
 	{
+	}
+
+void HRawFile::set_timeout( int a_iTimeout )
+	{
+	f_iTimeOut = a_iTimeout;
+	return;
 	}
 
 }

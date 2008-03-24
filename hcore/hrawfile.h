@@ -64,6 +64,7 @@ protected:
 		};
 	TYPE::raw_file_type_t f_eType;
 	file_descriptor_t f_iFileDescriptor; /* raw file descriptor of the file */
+	int f_iTimeOut;
 	HOpenSSL::ptr_t f_oSSL;
 public:
 	HRawFile( TYPE::raw_file_type_t = TYPE::D_DEFAULT );
@@ -74,6 +75,7 @@ public:
 	WRITER_t writer;
 	CLOSER_t closer;
 	static bool is_write_ready( int );
+	void set_timeout( int );
 protected:
 	virtual int do_close( void );
 	int close_plain( void );
