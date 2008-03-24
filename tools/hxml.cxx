@@ -446,8 +446,9 @@ void HXml::parse( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStri
 void HXml::parse( char const* a_pcXPath, bool a_bStripEmpty )
 	{
 	M_PROLOG
+	char const* const D_FULL_TREE = "//*";
 	if ( ! a_pcXPath || ! a_pcXPath[ 0 ] )
-		a_pcXPath = "/"; /* scan full tree */
+		a_pcXPath = D_FULL_TREE; /* scan full tree */
 	get_node_set_by_path( a_pcXPath );
 	f_oDOM.clear();
 	int l_iCtr = 0;
@@ -457,15 +458,16 @@ void HXml::parse( char const* a_pcXPath, bool a_bStripEmpty )
 	M_ASSERT ( l_iCtr >= 0 );
 	if ( f_poXml->f_psNodeSet )
 		{
-		if ( f_poXml->f_psNodeSet->nodeNr > 1 )
+		if ( strcmp( a_pcXPath, D_FULL_TREE ) )
 			{
+			tree_t::node_t root = f_oDOM.create_new_root();
+			(**root).f_oText = "xpath_result_set";
 			for ( l_iCtr = 0; l_iCtr < f_poXml->f_psNodeSet->nodeNr; ++ l_iCtr )
 				parse( f_poXml->f_psNodeSet->nodeTab[ l_iCtr ],
-						NULL, a_bStripEmpty );
+						root, a_bStripEmpty );
 			}
-		else if ( f_poXml->f_psNodeSet->nodeNr == 1 )
-			parse( f_poXml->f_psNodeSet->nodeTab[ 0 ],
-					NULL, a_bStripEmpty );
+		else
+			parse( f_poXml->f_psNodeSet->nodeTab[ 0 ], NULL, a_bStripEmpty );
 		}
 	M_EPILOG
 	}

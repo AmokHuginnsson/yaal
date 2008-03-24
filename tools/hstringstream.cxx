@@ -49,6 +49,11 @@ char const* const HStringStream::raw( void ) const
 	return ( f_oBuffer.raw() );
 	}
 
+yaal::hcore::HString const& HStringStream::string( void ) const
+	{
+	return ( f_oBuffer );
+	}
+
 int HStringStream::do_write( void const* const a_pvBuffer, int const a_iSize )
 	{
 	M_PROLOG

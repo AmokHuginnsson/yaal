@@ -44,6 +44,7 @@ public:
 	HStringStream( void );
 	HStringStream( char const* const );
 	char const* const raw( void ) const;
+	yaal::hcore::HString const& string( void ) const;
 	void use( void ) const;
 	void clear( void );
 private:
