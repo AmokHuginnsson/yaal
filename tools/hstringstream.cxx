@@ -40,6 +40,10 @@ HStringStream::HStringStream( void ) : f_bUsed( false ), f_oBuffer( "" )
 	{
 	}
 
+HStringStream::HStringStream( char const* const a_pcInit ) : f_bUsed( false ), f_oBuffer( a_pcInit )
+	{
+	}
+
 char const* const HStringStream::raw( void ) const
 	{
 	return ( f_oBuffer.raw() );
