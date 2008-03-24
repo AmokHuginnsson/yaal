@@ -35,6 +35,7 @@ M_VCSID ( "$Id$" )
 #include "xalloc.h"
 #include "hlog.h"
 #include "hpattern.h"
+#include "hcore.h"
 
 namespace yaal
 {
@@ -397,52 +398,31 @@ int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
 	M_EPILOG
 	}
 	
-void rc_set_variable ( char const * const a_pcValue, bool & a_rbVariable )
+void rc_set_variable( char const* const a_pcValue, bool& a_rbVariable )
 	{
 	M_PROLOG
-	static HString l_oMessage;
-	if ( ! strcasecmp ( a_pcValue, "yes" ) )
-		a_rbVariable = true;
-	else if ( ! strcasecmp ( a_pcValue, "no" ) )
-		a_rbVariable = false;
-	else if ( ! strcasecmp ( a_pcValue, "true" ) )
-		a_rbVariable = true;
-	else if ( ! strcasecmp ( a_pcValue, "false" ) )
-		a_rbVariable = false;
-	else if ( ! strcasecmp ( a_pcValue, "on" ) )
-		a_rbVariable = true;
-	else if ( ! strcasecmp ( a_pcValue, "off" ) )
-		a_rbVariable = false;
-	else
-		{
-		l_oMessage = "bad value: ";
-		l_oMessage += a_pcValue;
-		M_THROW ( l_oMessage, a_rbVariable );
-		}
+	a_rbVariable = to_bool( a_pcValue );
 	M_EPILOG
 	return;
 	}
 
-void rc_set_variable ( char const * const a_pcValue, char ** a_ppcVariable )
+void rc_set_variable( char const * const a_pcValue, char ** a_ppcVariable )
 	{
 	if ( * a_ppcVariable )
 		xfree ( * a_ppcVariable );
-	* a_ppcVariable = NULL;
-	* a_ppcVariable = xstrdup ( a_pcValue );
+	*a_ppcVariable = NULL;
+	*a_ppcVariable = xstrdup ( a_pcValue );
 	return;
 	}
 
-void rc_set_variable ( char const * const a_pcValue, int & a_riVariable )
+void rc_set_variable( char const* const a_pcValue, int & a_riVariable )
 	{
-	int l_iBase = 10;
-	if ( ( strlen ( a_pcValue ) > 2 ) && ( a_pcValue [ 1 ] == 'x' ) )
-		l_iBase = 16;
-	a_riVariable = strtol ( a_pcValue, NULL, l_iBase );
+	a_riVariable = to_int( a_pcValue );
 	}
 
-void rc_set_variable ( char const * const a_pcValue, char & a_rcVariable )
+void rc_set_variable( char const* const a_pcValue, char & a_rcVariable )
 	{
-	a_rcVariable = a_pcValue [ 0 ];
+	a_rcVariable = a_pcValue[ 0 ];
 	}
 
 }

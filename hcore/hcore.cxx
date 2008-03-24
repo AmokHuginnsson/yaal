@@ -126,6 +126,44 @@ void set_env ( char const * const a_pcVarValue )
 	M_EPILOG
 	}
 
+bool to_bool( char const* const a_pcValue )
+	{
+	static HString l_oMessage;
+	bool bVal = false;
+	if ( ! strcasecmp ( a_pcValue, "yes" ) )
+		bVal = true;
+	else if ( ! strcasecmp ( a_pcValue, "no" ) )
+		bVal = false;
+	else if ( ! strcasecmp ( a_pcValue, "true" ) )
+		bVal = true;
+	else if ( ! strcasecmp ( a_pcValue, "false" ) )
+		bVal = false;
+	else if ( ! strcasecmp ( a_pcValue, "on" ) )
+		bVal = true;
+	else if ( ! strcasecmp ( a_pcValue, "off" ) )
+		bVal = false;
+	else
+		{
+		l_oMessage = "bad value: ";
+		l_oMessage += a_pcValue;
+		M_THROW ( l_oMessage, bVal );
+		}
+	return ( bVal );
+	}
+
+int long to_int( char const* const a_pcValue )
+	{
+	int l_iBase = 10;
+	if ( ( ::strlen( a_pcValue ) > 2 ) && ( a_pcValue[ 1 ] == 'x' ) )
+		l_iBase = 16;
+	return ( ::strtol( a_pcValue, NULL, l_iBase ) );
+	}
+
+double long to_double( char const* const a_pcValue )
+	{
+	return ( strtold( a_pcValue, NULL ) );
+	}
+
 extern "C"
 void hcore_init( void ) __attribute__(( constructor ));
 void hcore_init( void )

@@ -38,9 +38,12 @@ namespace yaal
 namespace hcore
 	{
 
-bool eq ( double const &, double const & );
-void set_env ( char const * const );
-void yaal_hcore_banner ( void );
+bool eq( double const&, double const& );
+void set_env( char const* const );
+void yaal_hcore_banner( void );
+bool to_bool( char const* const );
+int long to_int( char const* const );
+double long to_double( char const* const );
 
 	}
 
