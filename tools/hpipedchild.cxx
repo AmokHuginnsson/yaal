@@ -55,10 +55,10 @@ HPipedChild::~HPipedChild( void )
 void HPipedChild::finish( void )
 	{
 	if ( f_iPipeOut >= 0 )
-		::close( f_iPipeOut );
+		TEMP_FAILURE_RETRY( ::close( f_iPipeOut ) );
 	f_iPipeOut = -1;
 	if ( f_iPipeIn >= 0 )
-		::close( f_iPipeIn );
+		TEMP_FAILURE_RETRY( ::close( f_iPipeIn ) );
 	f_iPipeIn = -1;
 	if ( f_iPid > 0 )
 		{
@@ -79,7 +79,7 @@ void HPipedChild::spawn( char const* const a_pcImage )
 		M_THROW( "fork", errno );
 	if ( ! f_iPid )
 		{
-		if ( ::close( l_piFileDesLeft [ 0 ] ) || ::close( l_piFileDesRight [ 1 ] ) )
+		if ( TEMP_FAILURE_RETRY( ::close( l_piFileDesLeft[ 0 ] ) ) || TEMP_FAILURE_RETRY( ::close( l_piFileDesRight[ 1 ] ) ) )
 			M_THROW( "close", errno );
 		if ( ( ::dup2( l_piFileDesRight [ 0 ], ::fileno( stdin ) ) < 0 )
 				|| ( ::dup2( l_piFileDesLeft [ 1 ], ::fileno( stdout ) ) < 0 ) )
@@ -89,7 +89,7 @@ void HPipedChild::spawn( char const* const a_pcImage )
 		}
 	else
 		{
-		if ( ::close( l_piFileDesLeft [ 1 ] ) || ::close( l_piFileDesRight [ 0 ] ) )
+		if ( TEMP_FAILURE_RETRY( ::close( l_piFileDesLeft[ 1 ] ) ) || TEMP_FAILURE_RETRY( ::close( l_piFileDesRight[ 0 ] ) ) )
 			M_THROW( "close", errno );
 		f_iPipeIn = l_piFileDesLeft [ 0 ];
 		f_iPipeOut = l_piFileDesRight [ 1 ];

@@ -49,8 +49,8 @@ HPipe::HPipe( void )
 HPipe::~HPipe( void )
 	{
 	M_PROLOG
-	::close( f_piPipe[ 1 ] );
-	::close( f_piPipe[ 0 ] );
+	TEMP_FAILURE_RETRY( ::close( f_piPipe[ 1 ] ) );
+	TEMP_FAILURE_RETRY( ::close( f_piPipe[ 0 ] ) );
 	return;
 	M_EPILOG
 	}

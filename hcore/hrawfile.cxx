@@ -96,7 +96,7 @@ int HRawFile::do_close ( void )
 	int l_iError = 0;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW( "file is not opened", errno );
-	l_iError = ::close( f_iFileDescriptor );
+	l_iError = TEMP_FAILURE_RETRY( ::close( f_iFileDescriptor ) );
 	f_iFileDescriptor = -1;
 	return ( l_iError );
 	M_EPILOG
