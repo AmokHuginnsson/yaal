@@ -77,7 +77,7 @@ int HDataProcess::init_xrc ( char const * a_pcProcessName,
 		M_THROW ( "no database driver loaded", errno );
 	l_oXml.init ( a_pcResource );
 	l_oXml.parse ( "/resource/menu" );
-	HXml::HNodeProxy const node = l_oXml.get_root();
+	HXml::HNodeProxy const node = *(l_oXml.get_root().begin());
 	f_psRootMenu = build_sub_menu( node, a_roHandlers );
 	M_ASSERT ( f_oForegroundWindow.is_valid() );
 	l_poMainWindow = dynamic_cast<HMainWindow*>( &*(*f_oForegroundWindow) );
