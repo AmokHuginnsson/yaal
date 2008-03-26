@@ -82,8 +82,10 @@ public:
 	HPointer& operator = ( HPointer const& );
 	template<typename hier_t>
 	HPointer& operator = ( HPointer<hier_t,pointer_type_t,access_type_t> const& );
-	tType& operator* ( void ) const;
-	tType& operator[] ( int ) const;
+	tType const& operator* ( void ) const;
+	tType& operator* ( void );
+	tType const& operator[] ( int ) const;
+	tType& operator[] ( int );
 	template<typename hier_t>
 	bool operator == ( HPointer<hier_t, pointer_type_t, access_type_t> const& ) const;
 	template<typename hier_t>
@@ -92,8 +94,10 @@ public:
 	bool operator != ( HPointer<hier_t, pointer_type_t, access_type_t> const& ) const;
 	template<typename hier_t>
 	bool operator != ( hier_t const* const ) const;
-	tType* operator->( void ) const;
-	tType* raw ( void ) const;
+	tType const* operator->( void ) const;
+	tType* operator->( void );
+	tType const* raw ( void ) const;
+	tType* raw ( void );
 	bool operator! ( void ) const;
 private:
 	bool release( void ) throw();
@@ -221,7 +225,7 @@ HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, 
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-tType& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) const
+tType const& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) const
 	{
 	M_ASSERT( f_ptShared );
 	return ( *f_ptShared );
@@ -229,7 +233,23 @@ tType& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) const
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-tType& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex ) const
+tType& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void )
+	{
+	M_ASSERT( f_ptShared );
+	return ( *f_ptShared );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename>class access_type_t>
+tType const& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex ) const
+	{
+	M_ASSERT( a_iIndex >= 0 );
+	return ( pointer_type_t<tType>::object_at ( f_ptShared, a_iIndex ) );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename>class access_type_t>
+tType& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex )
 	{
 	M_ASSERT( a_iIndex >= 0 );
 	return ( pointer_type_t<tType>::object_at ( f_ptShared, a_iIndex ) );
@@ -285,7 +305,7 @@ bool operator != ( hier_t const* const a_ptPointer, HPointer<tType, pointer_type
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-tType* HPointer<tType, pointer_type_t, access_type_t>::operator->( void ) const
+tType const* HPointer<tType, pointer_type_t, access_type_t>::operator->( void ) const
 	{
 	M_ASSERT( f_ptShared );
 	return ( access_type_t<tType>::raw ( f_ptShared ) );
@@ -293,7 +313,22 @@ tType* HPointer<tType, pointer_type_t, access_type_t>::operator->( void ) const
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-tType* HPointer<tType, pointer_type_t, access_type_t>::raw ( void ) const
+tType* HPointer<tType, pointer_type_t, access_type_t>::operator->( void )
+	{
+	M_ASSERT( f_ptShared );
+	return ( access_type_t<tType>::raw ( f_ptShared ) );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename>class access_type_t>
+tType const* HPointer<tType, pointer_type_t, access_type_t>::raw ( void ) const
+	{
+	return ( access_type_t<tType>::raw ( f_ptShared ) );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename>class access_type_t>
+tType* HPointer<tType, pointer_type_t, access_type_t>::raw ( void )
 	{
 	return ( access_type_t<tType>::raw ( f_ptShared ) );
 	}

@@ -56,7 +56,7 @@ protected:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
 	typedef enum { D_TO_EXTERNAL, D_TO_INTERNAL } way_t;
-	yaal::hcore::HPointer<OConvert> f_oConvert;
+	mutable yaal::hcore::HPointer<OConvert> f_oConvert;
 	mutable yaal::hcore::HString	f_oConvertedString;
 	yaal::hcore::HString	f_oVarTmpBuffer;
 	yaal::hcore::HString	f_oEncoding;

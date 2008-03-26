@@ -170,7 +170,7 @@ struct HXml::OConvert
 		f_xIconvToExternal = (*f_oEncoder).get()->iconv_in;
 		f_xIconvToInternal = (*f_oEncoder).get()->iconv_out;
 		}
-	bool operator ! ( void )
+	bool operator ! ( void ) const
 		{
 		return ( ! ( f_xIconvToExternal && f_xIconvToInternal ) );
 		}
