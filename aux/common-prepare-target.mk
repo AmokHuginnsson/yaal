@@ -18,6 +18,7 @@ SRCS_$(1) = $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) -H ./$$(SRC_$(
 OBJS_$(1) = $$(subst ./$$(SRC_$(1))/,./$$($(1))/,$$(patsubst %.$(SS),%.$(OS),$$(SRCS_$(1))))
 USE_PCH_$(1) = -include ./$$(SRC_$(1))/header
 PCH_$(1) = $$($$(COMPILER_PCH_FLAGS)_PCH_$(1))
+OBJS := $$(OBJS) $$(OBJS_$(1))
 
 endif
 
