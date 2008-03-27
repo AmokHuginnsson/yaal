@@ -141,10 +141,8 @@ int HSocket::do_close( void )
 	if ( f_bNeedShutdown && ( f_iFileDescriptor >= 0 ) )
 		{
 		if ( is_write_ready( f_iFileDescriptor ) )
-			M_ENSURE( ::shutdown( f_iFileDescriptor, 2 ) == 0 )
-		else
-			HRawFile::do_close();
-		f_iFileDescriptor = - 1;
+			M_ENSURE( ::shutdown( f_iFileDescriptor, SHUT_RDWR ) == 0 )
+		HRawFile::do_close();
 		f_bNeedShutdown = false;
 		}
 	return( 0 );
@@ -156,11 +154,11 @@ void HSocket::shutdown_client( int a_iFileDescriptor )
 	M_PROLOG
 	ptr_t l_oClient;
 	if ( ! f_poClients )
-		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
-	if ( ! f_poClients->get ( a_iFileDescriptor, l_oClient ) )
-		M_THROW ( _ ( "no such client" ), a_iFileDescriptor );
-	M_ASSERT ( !! l_oClient );
-	f_poClients->remove ( a_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+	if ( ! f_poClients->get( a_iFileDescriptor, l_oClient ) )
+		M_THROW( _( "no such client" ), a_iFileDescriptor );
+	M_ASSERT( !! l_oClient );
+	f_poClients->remove( a_iFileDescriptor );
 	return;
 	M_EPILOG
 	}

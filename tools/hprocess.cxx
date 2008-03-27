@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstring>
+#include <cstdio>
 #include <unistd.h>
 #include <libintl.h>
 #include <signal.h>
@@ -95,7 +96,7 @@ int HProcess::register_file_descriptor_handler_internal( int a_iFileDescriptor,
 		process_handler_filedes_t HANDLER )
 	{
 	M_PROLOG
-	f_oFileDescriptorHandlers [ a_iFileDescriptor ] = HANDLER;
+	f_oFileDescriptorHandlers[ a_iFileDescriptor ] = HANDLER;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -140,8 +141,8 @@ int HProcess::run( void )
 		{
 		handler_alert( 0 );
 		reconstruct_fdset();
-		if ( ( l_iError = select ( FD_SETSIZE, & f_xFileDescriptorSet,
-						NULL, NULL, & f_sLatency ) ) )
+		if ( ( l_iError = ::select( FD_SETSIZE, &f_xFileDescriptorSet,
+						NULL, NULL, &f_sLatency ) ) )
 			{
 			if ( ( l_iError < 0 ) && ( errno == EINTR ) )
 				continue;
@@ -150,9 +151,9 @@ int HProcess::run( void )
 			f_oFileDescriptorHandlers.rewind();
 			while ( f_oFileDescriptorHandlers.iterate( l_iFileDes, HANDLER ) )
 				{
-				if ( FD_ISSET( l_iFileDes, & f_xFileDescriptorSet ) )
+				if ( FD_ISSET( l_iFileDes, &f_xFileDescriptorSet ) )
 					{
-					static_cast<void>( ( this->*HANDLER ) ( l_iFileDes ) );
+					static_cast<void>( ( this->*HANDLER )( l_iFileDes ) );
 					f_iIdleCycles = 0;
 					}
 				}
