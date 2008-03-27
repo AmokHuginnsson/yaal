@@ -95,6 +95,12 @@ void HStringStream::clear( void )
 	M_EPILOG
 	}
 
+char const* const HStringStream::consume( void ) const
+	{
+	use();
+	return ( f_oBuffer.raw() );
+	}
+
 char const* const operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream )
 	{
 	stream.use();

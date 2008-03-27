@@ -47,6 +47,7 @@ public:
 	yaal::hcore::HString const& string( void ) const;
 	void use( void ) const;
 	void clear( void );
+	char const* const consume( void ) const;
 private:
 	virtual int do_write( void const* const, int const );
 	virtual void do_flush( void ) const;
