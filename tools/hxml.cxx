@@ -496,8 +496,8 @@ void HXml::load( char const* const a_pcPath )
 void HXml::save( char const* const a_pcPath ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poXml->f_oDoc.get() );
 	do_save();
+	M_ASSERT( f_poXml->f_oDoc.get() );
 	if ( f_poXml->f_oStyle.get() )
 		{
 		if ( xsltSaveResultToFilename( a_pcPath, f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get(), 0 ) == -1 )
@@ -515,8 +515,8 @@ void HXml::save( char const* const a_pcPath ) const
 void HXml::save( int const& a_iFileDes ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poXml->f_oDoc.get() );
 	do_save();
+	M_ASSERT( f_poXml->f_oDoc.get() );
 	if ( f_poXml->f_oStyle.get() )
 		{
 		if ( xsltSaveResultToFd( a_iFileDes, f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get() ) == -1 )
