@@ -50,7 +50,7 @@ echo "#v-"
 echo -n "Do it now ? (yes/[no]) "
 read ANSWER
 if [ -f yaalrc ] ; then
-	cd aux
+	cd _aux
 fi
 if [ "$ANSWER" ] ; then
 	if [ $ANSWER = "yes" ] ; then

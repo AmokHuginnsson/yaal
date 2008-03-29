@@ -37,11 +37,11 @@ DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/yaal.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
 CTAGS	= @CTAGS@
-include $(DIR_ROOT)/aux/common-basic.mk
-include $(DIR_ROOT)/aux/common-term.mk
-include $(DIR_ROOT)/aux/common-suffix.mk
-include $(DIR_ROOT)/aux/common-wrapper.mk
-include $(DIR_ROOT)/aux/common-flags.mk
+include $(DIR_ROOT)/_aux/common-basic.mk
+include $(DIR_ROOT)/_aux/common-term.mk
+include $(DIR_ROOT)/_aux/common-suffix.mk
+include $(DIR_ROOT)/_aux/common-wrapper.mk
+include $(DIR_ROOT)/_aux/common-flags.mk
 CWARNING_FLAGS								+= @PEDANTIC_ERRORS@ @EXTRA_WARNINGS@ @WARN_SHADOW@
 COMPILER_PRIME_FLAGS					+= -D__YAAL_BUILD__ -fPIC @DEFS@
 COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I/usr/local/include \
@@ -56,8 +56,8 @@ LINKER_PRIME_FLAGS +=	-shared\
 								@SPECIAL_LINKER_FLAGS@\
 								-Wl,-soname,
 
-include $(DIR_ROOT)/aux/common-flags-post.mk
-include $(DIR_ROOT)/aux/common-func.mk
+include $(DIR_ROOT)/_aux/common-flags-post.mk
+include $(DIR_ROOT)/_aux/common-func.mk
 
 $(foreach IT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(IT))))
 SRCS := $(filter-out %_driver.$(SS),$(SRCS))
@@ -105,10 +105,10 @@ lib%.so.$(RELEASE):
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so; \
 	else exit 1; fi; echo $(NONL) "done.$(CL)"
 
-include $(DIR_ROOT)/aux/common-implicit-compile.mk
+include $(DIR_ROOT)/_aux/common-implicit-compile.mk
 #------------------------------------------------------------------------
 
-include $(DIR_ROOT)/aux/common-target-default.mk
+include $(DIR_ROOT)/_aux/common-target-default.mk
 
 #phony targets
 .PHONY: all nodebug prof cov install dep clean tags stats mrproper purge environment doc
@@ -137,7 +137,7 @@ cov:
 	DO_COVERAGE=1 $(MAKE) -e all
 
 install: all
-	@./aux/msh
+	@./_aux/msh
 
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	@umask 022;cd $(DIR_ROOT); echo -n "Making headers ... "; \
@@ -164,7 +164,7 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 $(LD_CACHE):
 	@echo -n "Making environment ... "; \
 	echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf; \
-	/bin/cp -f ./aux/mkcache $(DIR_TARGET); \
+	/bin/cp -f ./_aux/mkcache $(DIR_TARGET); \
 	echo $(NONL) "done.$(CL)"
 
 clean-dep:
@@ -185,16 +185,16 @@ purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
 	/bin/rm -rf configure Makefile config.h yaalrc config.log doc/dox
 
-include $(DIR_ROOT)/aux/common-target-tags.mk
+include $(DIR_ROOT)/_aux/common-target-tags.mk
 
 doc: $(SRCS) $(HDRS)
-	@doxygen aux/doxygenrc
+	@doxygen _aux/doxygenrc
 
 stats:
-	@aux/stats
+	@_aux/stats
 
 flint:
-	@flint -b aux/flint.lnt hcore/*.$(SS) hconsole/*.$(SS) tools/*.$(SS) \
+	@flint -b _aux/flint.lnt hcore/*.$(SS) hconsole/*.$(SS) tools/*.$(SS) \
 						dbwrapper/db_driver_loader.$(SS) dbwrapper/dbwrapper.$(SS) \
 						dbwrapper/hdatabase.$(SS) dbwrapper/hrecordset.$(SS) \
 						hdata/*.$(SS) \

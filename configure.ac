@@ -28,7 +28,7 @@ AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 dnl Unique file in project: yaalrc is sample configuration file.
 AC_MSG_RESULT([--- Finding base directory ... ---                      [[12%]]])
 AC_CONFIG_SRCDIR([[yaalrc.in]])
-AC_CONFIG_AUX_DIR([aux])
+AC_CONFIG_AUX_DIR([_aux])
 
 dnl yaal is not Free Software.
 AC_COPYRIGHT([[yaal (c) 2004 All rights reserved.]])
