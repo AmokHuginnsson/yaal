@@ -46,8 +46,6 @@ extern char const * const n_ppcErrMsgHArray [ ];
 template<typename tType>
 class HArray
 	{
-	struct OPointerConversion { int f_iValid; };
-	typedef int OPointerConversion::* opcm_t;
 public:
 	struct ERROR
 		{
@@ -71,7 +69,7 @@ public:
 	tType& operator [] ( int );
 	tType const& operator [] ( int ) const;
 	int get_size( void ) const;
-	operator opcm_t ( void ) const;
+	bool operator ! ( void ) const;
 private:
 	tType& get( int ) const;
 	};
@@ -194,10 +192,10 @@ tType const& HArray<tType>::operator[] ( int a_iIndex ) const
 	}
 
 template<typename tType>
-HArray<tType> ::operator opcm_t ( void ) const
+bool HArray<tType>::operator ! ( void ) const
 	{
 	M_PROLOG
-	return ( f_iSize ? &OPointerConversion::f_iValid : NULL );
+	return ( ! f_ptArray );
 	M_EPILOG
 	}
 
