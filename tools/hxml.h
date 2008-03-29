@@ -74,9 +74,11 @@ public:
 	HConstNodeProxy const get_root( void ) const;
 	void load( char const* const );
 	void save( char const* const ) const;
+	void save( int const& ) const;
 	void create_root( char const* const, char const* const = NULL );
 	void clear( void );
 private:
+	void do_save( void ) const;
 	void parse ( xml_node_ptr_t, tree_t::node_t, bool );
 	void dump_node( void*, HConstNodeProxy const& ) const;
 	char const* convert( char const*, way_t = D_TO_INTERNAL ) const;

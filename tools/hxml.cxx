@@ -41,6 +41,7 @@ Copyright:
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
+#include <libxslt/xsltutils.h>
 
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
@@ -60,6 +61,7 @@ char const* const D_DEFAULT_ENCODING = "iso-8859-2";
 typedef HResource<xmlDocPtr, typeof( &xmlFreeDoc )> doc_resource_t;
 typedef HResource<xmlTextWriterPtr, typeof( &xmlFreeTextWriter )> writer_resource_t;
 typedef HResource<xmlCharEncodingHandlerPtr, typeof( &xmlCharEncCloseFunc )> encoder_resource_t;
+typedef HResource<xsltStylesheetPtr, typeof( &xsltFreeStylesheet )> style_resource_t;
 typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 }
 
@@ -182,6 +184,7 @@ private:
 	/*{*/
 	friend class HXml;
 	doc_resource_t     f_oDoc;
+	style_resource_t   f_oStyle;
 	xmlNodePtr         f_psRoot;
 	xmlXPathContextPtr f_psContext;
 	xmlXPathObjectPtr  f_psObject;
@@ -199,7 +202,8 @@ protected:
 	/*}*/
 	};
 
-HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ), f_psRoot( NULL ),
+HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ),
+	f_oStyle( NULL, xsltFreeStylesheet ), f_psRoot( NULL ),
 	f_psContext( NULL ), f_psObject( NULL ),
 	f_psNodeSet( NULL )
 	{
@@ -393,7 +397,15 @@ void HXml::parse( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStri
 				l_psNode = l_psNode->children;
 			continue;
 			case ( XML_DTD_NODE ):
+				{
+				xmlNodePtr child = l_psNode->children;
+				while ( child )
+					{
+					parse( child, a_rsNode, a_bStripEmpty );
+					child = child->next;
+					}
 				l_psNode = l_psNode->next; /* FIXME add DTD handling later (keeping track of entities) */
+				}
 			continue;
 			case ( XML_ELEMENT_NODE ):
 				{
@@ -484,9 +496,49 @@ void HXml::load( char const* const a_pcPath )
 void HXml::save( char const* const a_pcPath ) const
 	{
 	M_PROLOG
-	writer_resource_t writer( xmlNewTextWriterFilename( a_pcPath, 0 ), xmlFreeTextWriter );
+	M_ASSERT( f_poXml->f_oDoc.get() );
+	do_save();
+	if ( f_poXml->f_oStyle.get() )
+		{
+		if ( xsltSaveResultToFilename( a_pcPath, f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get(), 0 ) == -1 )
+			throw HXmlException( HString( "Cannot open file for writting: " ) + a_pcPath );
+		}
+	else
+		{
+		if ( xmlSaveFile( a_pcPath, f_poXml->f_oDoc.get() ) == -1 )
+			throw HXmlException( HString( "Cannot open file for writting: " ) + a_pcPath );
+		}
+	return;
+	M_EPILOG
+	}
+
+void HXml::save( int const& a_iFileDes ) const
+	{
+	M_PROLOG
+	M_ASSERT( f_poXml->f_oDoc.get() );
+	do_save();
+	if ( f_poXml->f_oStyle.get() )
+		{
+		if ( xsltSaveResultToFd( a_iFileDes, f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get() ) == -1 )
+			throw HXmlException( HString( "Cannot connect to file descriptor: " ) + a_iFileDes );
+		}
+	else
+		{
+		if ( xmlSaveFileTo( xmlOutputBufferCreateFd( a_iFileDes, NULL ), f_poXml->f_oDoc.get(), f_oEncoding ) == -1 )
+			throw HXmlException( HString( "Cannot connect to file descriptor: " ) + a_iFileDes );
+		}
+	return;
+	M_EPILOG
+	}
+
+void HXml::do_save( void ) const
+	{
+	M_PROLOG
+	xmlDocPtr pDoc;
+	writer_resource_t writer( xmlNewTextWriterDoc( &pDoc, 0 ), xmlFreeTextWriter );
 	if ( ! writer.get() )
-		throw HXmlException( HString( "Cannot open file for writting: " ) + a_pcPath );
+		throw HXmlException( _( "Cannot create the xml DOC writer." ) );
+	doc_resource_t doc( pDoc, xmlFreeDoc );
 	int rc = xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding, NULL );
 	if ( rc < 0 )
 		throw HXmlException( HString( "Unable to start document with encoding: " ) + f_oEncoding );
@@ -503,6 +555,7 @@ void HXml::save( char const* const a_pcPath ) const
 	rc = xmlTextWriterEndDocument( writer.get() );
 	if ( rc < 0 )
 		throw HXmlException( "Unable to end document." );
+	f_poXml->f_oDoc.swap( doc );
 	return;
 	M_EPILOG
 	}
@@ -915,12 +968,12 @@ void HXml::apply_style( char const* const a_pcPath )
 	{
 	M_ASSERT( f_poXml->f_oDoc.get() );
 	HXsltParserGlobal::get_instance();
-	typedef HResource<xsltStylesheetPtr, typeof( &xsltFreeStylesheet )> style_resource_t;
 	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( a_pcPath ) ), xsltFreeStylesheet );
-	doc_resource_t doc( xsltApplyStylesheet( style.get(), f_poXml->f_oDoc.get() ,NULL ), xmlFreeDoc );
+	doc_resource_t doc( xsltApplyStylesheet( style.get(), f_poXml->f_oDoc.get(), NULL ), xmlFreeDoc );
 	if ( ! doc.get() )
 		throw HXmlException( HString( "cannot apply stylesheet: " ) + a_pcPath );
 	f_poXml->f_oDoc.swap( doc );
+	f_poXml->f_oStyle.swap( style );
 	}
 
 }
