@@ -61,6 +61,8 @@ typedef HResource<xmlDocPtr, typeof( &xmlFreeDoc )> doc_resource_t;
 typedef HResource<xmlTextWriterPtr, typeof( &xmlFreeTextWriter )> writer_resource_t;
 typedef HResource<xmlCharEncodingHandlerPtr, typeof( &xmlCharEncCloseFunc )> encoder_resource_t;
 typedef HResource<xsltStylesheetPtr, typeof( &xsltFreeStylesheet )> style_resource_t;
+typedef HResource<xmlXPathContextPtr, typeof( &xmlXPathFreeContext )> xpath_context_resource_t;
+typedef HResource<xmlXPathObjectPtr, typeof( &xmlXPathFreeObject )> xpath_object_resource_t;
 typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 }
 
@@ -184,6 +186,8 @@ private:
 	friend class HXml;
 	doc_resource_t     f_oDoc;
 	style_resource_t   f_oStyle;
+	xpath_context_resource_t f_oXPathContext;
+	xpath_object_resource_t f_oXPathObject;
 	xmlNodeSetPtr      f_psNodeSet;
 	/*}*/
 protected:
@@ -197,6 +201,8 @@ protected:
 
 HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ),
 	f_oStyle( NULL, xsltFreeStylesheet ),
+	f_oXPathContext( NULL, xmlXPathFreeContext ),
+	f_oXPathObject( NULL, xmlXPathFreeObject ),
 	f_psNodeSet( NULL )
 	{
 	M_PROLOG
@@ -279,12 +285,11 @@ char const* HXml::convert( char const* a_pcData, way_t a_eWay ) const
 int HXml::get_node_set_by_path( char const* a_pcPath )
 	{
 	M_PROLOG
-	typedef HResource<xmlXPathContextPtr, typeof( &xmlXPathFreeContext )> xpath_context_resource_t;
-	typedef HResource<xmlXPathObjectPtr, typeof( &xmlXPathFreeObject )> xpath_object_resource_t;
 	f_oVarTmpBuffer = a_pcPath;
 	int l_iLength = f_oVarTmpBuffer.get_length() - 1;
 	xpath_context_resource_t ctx( xmlXPathNewContext( f_poXml->f_oDoc.get() ), xmlXPathFreeContext );
 	int setSize = 0;
+	f_poXml->f_psNodeSet = NULL;
 	if ( ctx.get() )
 		{
 		xmlXPathObjectPtr objPtr = NULL;
@@ -300,11 +305,13 @@ int HXml::get_node_set_by_path( char const* a_pcPath )
 		xpath_object_resource_t obj( objPtr, xmlXPathFreeObject );
 		if ( obj.get() )
 			{
-			f_poXml->f_psNodeSet = obj.get()->nodesetval;
 			f_oVarTmpBuffer = a_pcPath;
+			f_poXml->f_psNodeSet = obj.get()->nodesetval;
+			f_poXml->f_oXPathObject.swap( obj );
 			setSize = f_poXml->f_psNodeSet ? f_poXml->f_psNodeSet->nodeNr : 0;
 			}
 		}
+	f_poXml->f_oXPathContext.swap( ctx );
 	return ( setSize );
 	M_EPILOG
 	}
