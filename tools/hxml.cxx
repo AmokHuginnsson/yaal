@@ -490,28 +490,33 @@ void HXml::save( int const& a_iFileDes ) const
 void HXml::do_save( void ) const
 	{
 	M_PROLOG
-	xmlDocPtr pDoc = NULL;
-	writer_resource_t writer( xmlNewTextWriterDoc( &pDoc, 0 ), xmlFreeTextWriter );
-	if ( ! writer.get() )
-		throw HXmlException( _( "Cannot create the xml DOC writer." ) );
-	doc_resource_t doc( pDoc, xmlFreeDoc );
-	int rc = xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding, NULL );
-	if ( rc < 0 )
-		throw HXmlException( HString( "Unable to start document with encoding: " ) + f_oEncoding );
-	rc = xmlTextWriterSetIndent( writer.get(), 1 );
-	if ( rc < 0 )
-		throw HXmlException( "Unable to enable indenting." );
-	static char const* const D_INDENTION_STRING = "\t";
-	rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( D_INDENTION_STRING ) );
-	if ( rc < 0 )
-		throw HXmlException( "Cannot set indent string." );
-	if ( ! (*f_oConvert) )
-		(*f_oConvert).init( f_oEncoding );
-	dump_node( &writer, get_root() );
-	rc = xmlTextWriterEndDocument( writer.get() );
-	if ( rc < 0 )
-		throw HXmlException( "Unable to end document." );
-	f_poXml->f_oDoc.swap( doc );
+	doc_resource_t doc( NULL, xmlFreeDoc );
+	/* flush writer to DOM. */
+		{
+		xmlDocPtr pDoc = NULL;
+		writer_resource_t writer( xmlNewTextWriterDoc( &pDoc, 0 ), xmlFreeTextWriter );
+		if ( ! writer.get() )
+			throw HXmlException( _( "Cannot create the xml DOC writer." ) );
+		doc_resource_t dummy( pDoc, xmlFreeDoc );
+		doc.swap( dummy );
+		int rc = xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding, "yes" );
+		if ( rc < 0 )
+			throw HXmlException( HString( "Unable to start document with encoding: " ) + f_oEncoding );
+		rc = xmlTextWriterSetIndent( writer.get(), 1 );
+		if ( rc < 0 )
+			throw HXmlException( "Unable to enable indenting." );
+		static char const* const D_INDENTION_STRING = "\t";
+		rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( D_INDENTION_STRING ) );
+		if ( rc < 0 )
+			throw HXmlException( "Cannot set indent string." );
+		if ( ! (*f_oConvert) )
+			(*f_oConvert).init( f_oEncoding );
+		dump_node( &writer, get_root() );
+		rc = xmlTextWriterEndDocument( writer.get() );
+		if ( rc < 0 )
+			throw HXmlException( "Unable to end document." );
+		}
+	xmlFreeNode( xmlDocSetRootElement( f_poXml->f_oDoc.get(), xmlDocGetRootElement( doc.get() ) ) );
 	return;
 	M_EPILOG
 	}
