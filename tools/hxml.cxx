@@ -55,7 +55,6 @@ using namespace yaal::tools;
 
 namespace
 {
-char free_err[] = "trying to free NULL pointer";
 /* char schema_err[] = "bad xml schema"; */
 char const* const D_DEFAULT_ENCODING = "iso-8859-2";
 typedef HResource<xmlDocPtr, typeof( &xmlFreeDoc )> doc_resource_t;
@@ -185,9 +184,6 @@ private:
 	friend class HXml;
 	doc_resource_t     f_oDoc;
 	style_resource_t   f_oStyle;
-	xmlNodePtr         f_psRoot;
-	xmlXPathContextPtr f_psContext;
-	xmlXPathObjectPtr  f_psObject;
 	xmlNodeSetPtr      f_psNodeSet;
 	/*}*/
 protected:
@@ -196,15 +192,11 @@ protected:
 	virtual ~HXmlData( void );
 	HXmlData( HXmlData const& ) __attribute__(( __noreturn__ ));
 	HXmlData& operator = ( HXmlData const& ) __attribute__(( __noreturn__ ));
-	void xml_free( xmlXPathContextPtr& ) const;
-	void xml_free( xmlXPathObjectPtr& ) const;
-	void clear( void );
 	/*}*/
 	};
 
 HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ),
-	f_oStyle( NULL, xsltFreeStylesheet ), f_psRoot( NULL ),
-	f_psContext( NULL ), f_psObject( NULL ),
+	f_oStyle( NULL, xsltFreeStylesheet ),
 	f_psNodeSet( NULL )
 	{
 	M_PROLOG
@@ -215,41 +207,6 @@ HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ),
 HXmlData::~HXmlData ( void )
 	{
 	M_PROLOG
-	clear();
-	return;
-	M_EPILOG
-	}
-
-void HXmlData::clear( void )
-	{
-	M_PROLOG
-	f_psNodeSet = NULL;
-	if ( f_psContext )
-		xml_free( f_psContext );
-	if ( f_psObject )
-		xml_free( f_psObject );
-	return;
-	M_EPILOG
-	}
-
-void HXmlData::xml_free( xmlXPathContextPtr& a_rpsContext ) const
-	{
-	M_PROLOG
-	if ( ! a_rpsContext )
-		M_THROW( free_err, errno );
-	xmlXPathFreeContext( a_rpsContext );
-	a_rpsContext = NULL;
-	return;
-	M_EPILOG
-	}
-
-void HXmlData::xml_free( xmlXPathObjectPtr& a_rpsObject ) const
-	{
-	M_PROLOG
-	if ( ! a_rpsObject )
-		M_THROW( free_err, errno );
-	xmlXPathFreeObject( a_rpsObject );
-	a_rpsObject = NULL;
 	return;
 	M_EPILOG
 	}
@@ -322,33 +279,33 @@ char const* HXml::convert( char const* a_pcData, way_t a_eWay ) const
 int HXml::get_node_set_by_path( char const* a_pcPath )
 	{
 	M_PROLOG
+	typedef HResource<xmlXPathContextPtr, typeof( &xmlXPathFreeContext )> xpath_context_resource_t;
+	typedef HResource<xmlXPathObjectPtr, typeof( &xmlXPathFreeObject )> xpath_object_resource_t;
 	f_oVarTmpBuffer = a_pcPath;
 	int l_iLength = f_oVarTmpBuffer.get_length() - 1;
-	if ( f_poXml->f_psObject )
-		f_poXml->xml_free ( f_poXml->f_psObject );
-	if ( f_poXml->f_psContext )
-		f_poXml->xml_free ( f_poXml->f_psContext );
-	f_poXml->clear();
-	f_poXml->f_psContext = xmlXPathNewContext( f_poXml->f_oDoc.get() );
-	if ( f_poXml->f_psContext )
+	xpath_context_resource_t ctx( xmlXPathNewContext( f_poXml->f_oDoc.get() ), xmlXPathFreeContext );
+	int setSize = 0;
+	if ( ctx.get() )
 		{
-		while ( f_oVarTmpBuffer[ 0 ] )
+		xmlXPathObjectPtr objPtr = NULL;
+		while ( ! f_oVarTmpBuffer.is_empty() )
 			{
-			f_poXml->f_psObject = xmlXPathEvalExpression(
+			objPtr = xmlXPathEvalExpression(
 					reinterpret_cast<xmlChar const*>( static_cast<char const* const>( f_oVarTmpBuffer ) ),
-					f_poXml->f_psContext );
-			if ( f_poXml->f_psObject )
+					ctx.get() );
+			if ( objPtr )
 				break;
 			f_oVarTmpBuffer.set_at( l_iLength --, 0 );
 			}
-		if ( f_poXml->f_psObject )
+		xpath_object_resource_t obj( objPtr, xmlXPathFreeObject );
+		if ( obj.get() )
 			{
-			f_poXml->f_psNodeSet = f_poXml->f_psObject->nodesetval;
+			f_poXml->f_psNodeSet = obj.get()->nodesetval;
 			f_oVarTmpBuffer = a_pcPath;
-			return ( f_poXml->f_psNodeSet ? f_poXml->f_psNodeSet->nodeNr : 0 );
+			setSize = f_poXml->f_psNodeSet ? f_poXml->f_psNodeSet->nodeNr : 0;
 			}
 		}
-	return ( 0 );
+	return ( setSize );
 	M_EPILOG
 	}
 
@@ -358,7 +315,6 @@ void HXml::init( char const* a_pcFileName )
 	int l_iSavedErrno = errno;
 	HString l_oError;
 	HXmlParserGlobal::get_instance();
-	f_poXml->clear();
 	errno = 0;
 	doc_resource_t doc( xmlParseFile( a_pcFileName ), xmlFreeDoc );
 	if ( errno )
@@ -372,14 +328,14 @@ void HXml::init( char const* a_pcFileName )
 		l_oError.format( _( "cannot parse `%s'" ), a_pcFileName );
 		throw HXmlException( l_oError );
 		}
-	f_poXml->f_psRoot = xmlDocGetRootElement( doc.get() );
-	if ( ! f_poXml->f_psRoot )
+	xmlNodePtr root = xmlDocGetRootElement( doc.get() );
+	if ( ! root )
 		M_THROW ( _ ( "empty doc" ), errno );
 #ifdef __DEBUGGER_BABUNI__
-	fprintf ( stdout, "%s\n", f_poXml->f_psRoot->name );
+	fprintf ( stdout, "%s\n", root->name );
 #endif /* __DEBUGGER_BABUNI__ */
 	(*f_oConvert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
-			f_poXml->f_psRoot, a_pcFileName );
+			root, a_pcFileName );
 	f_poXml->f_oDoc.swap( doc );
 	return;
 	M_EPILOG
@@ -479,7 +435,7 @@ void HXml::parse( char const* a_pcXPath, bool a_bStripEmpty )
 						root, a_bStripEmpty );
 			}
 		else
-			parse( f_poXml->f_psNodeSet->nodeTab[ 0 ], NULL, a_bStripEmpty );
+			parse( xmlDocGetRootElement( f_poXml->f_oDoc.get() ), NULL, a_bStripEmpty );
 		}
 	M_EPILOG
 	}
@@ -534,7 +490,7 @@ void HXml::save( int const& a_iFileDes ) const
 void HXml::do_save( void ) const
 	{
 	M_PROLOG
-	xmlDocPtr pDoc;
+	xmlDocPtr pDoc = NULL;
 	writer_resource_t writer( xmlNewTextWriterDoc( &pDoc, 0 ), xmlFreeTextWriter );
 	if ( ! writer.get() )
 		throw HXmlException( _( "Cannot create the xml DOC writer." ) );
@@ -614,7 +570,6 @@ void HXml::clear( void )
 	M_PROLOG
 	f_oEncoding.clear();
 	f_oDOM.clear();
-	f_poXml->clear();
 	return;
 	M_EPILOG
 	}

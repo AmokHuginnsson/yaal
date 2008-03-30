@@ -66,7 +66,7 @@ public:
 	typedef tree_t::node_t xml_element_t;
 	typedef tree_t::const_node_t const_xml_element_t;
 	HXml( void );
-	virtual ~ HXml( void );
+	virtual ~HXml( void );
 	void init( char const* );
 	void apply_style( char const* const );
 	void parse( char const* const = NULL, bool = true );
@@ -79,7 +79,7 @@ public:
 	void clear( void );
 private:
 	void do_save( void ) const;
-	void parse ( xml_node_ptr_t, tree_t::node_t, bool );
+	void parse( xml_node_ptr_t, tree_t::node_t, bool );
 	void dump_node( void*, HConstNodeProxy const& ) const;
 	char const* convert( char const*, way_t = D_TO_INTERNAL ) const;
 	int get_node_set_by_path( char const* );
