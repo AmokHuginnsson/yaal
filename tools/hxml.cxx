@@ -186,8 +186,8 @@ private:
 	friend class HXml;
 	doc_resource_t     f_oDoc;
 	style_resource_t   f_oStyle;
-	xpath_context_resource_t f_oXPathContext;
-	xpath_object_resource_t f_oXPathObject;
+	mutable xpath_context_resource_t f_oXPathContext;
+	mutable xpath_object_resource_t f_oXPathObject;
 	xmlNodeSetPtr      f_psNodeSet;
 	/*}*/
 protected:
@@ -196,6 +196,7 @@ protected:
 	virtual ~HXmlData( void );
 	HXmlData( HXmlData const& ) __attribute__(( __noreturn__ ));
 	HXmlData& operator = ( HXmlData const& ) __attribute__(( __noreturn__ ));
+	void clear( void ) const;
 	/*}*/
 	};
 
@@ -213,6 +214,17 @@ HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ),
 HXmlData::~HXmlData ( void )
 	{
 	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+void HXmlData::clear( void ) const
+	{
+	M_PROLOG
+	xpath_context_resource_t ctx( NULL, xmlXPathFreeContext );
+	xpath_object_resource_t obj( NULL, xmlXPathFreeObject );
+	f_oXPathObject.swap( obj );
+	f_oXPathContext.swap( ctx );
 	return;
 	M_EPILOG
 	}
@@ -523,7 +535,11 @@ void HXml::do_save( void ) const
 		if ( rc < 0 )
 			throw HXmlException( "Unable to end document." );
 		}
-	xmlFreeNode( xmlDocSetRootElement( f_poXml->f_oDoc.get(), xmlDocGetRootElement( doc.get() ) ) );
+	f_poXml->clear();
+	if ( f_poXml->f_oDoc.get() )
+		xmlFreeNode( xmlDocSetRootElement( f_poXml->f_oDoc.get(), xmlDocGetRootElement( doc.get() ) ) );
+	else
+		f_poXml->f_oDoc.swap( doc );
 	return;
 	M_EPILOG
 	}
