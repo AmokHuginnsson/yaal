@@ -142,7 +142,8 @@ HStreamInterface& flush( HStreamInterface& a_roFile )
 	M_EPILOG
 	}
 
-int HStreamInterface::read_until( HString& a_roMessage, char const* const a_pcStopSet, bool a_bStripDelim )
+int HStreamInterface::read_until( HString& a_roMessage,
+		char const* const a_pcStopSet, bool a_bStripDelim )
 	{
 	M_PROLOG
 	int err = 0;
@@ -159,15 +160,17 @@ int HStreamInterface::read_until( HString& a_roMessage, char const* const a_pcSt
 		err = do_read( l_pcBuffer + f_iOffset, sizeof ( char ) * 1 );
 		}
 	while ( ( err > 0 ) && ! ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ++ ] ) );
-	if ( err > 0 )
+	if ( err >= 0 )
 		{
 		if ( a_bStripDelim )
 			-- f_iOffset;
 		if ( f_iOffset >= 0 )
+			{
 			l_pcBuffer[ f_iOffset ] = 0;
+			a_roMessage = l_pcBuffer;
+			}
 		err = f_iOffset;
 		f_iOffset = 0;
-		a_roMessage = l_pcBuffer;
 		}
 	return ( err );
 	M_EPILOG
