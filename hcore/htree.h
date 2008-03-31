@@ -94,7 +94,7 @@ public:
 	typename tree_t::iterator add_node( tType const& );
 	typename tree_t::iterator add_node( void );
 	typename tree_t::iterator replace_node( typename tree_t::iterator, typename HTree<tType>::HNode* );
-	void remove_node( tree_t::iterator const& );
+	typename tree_t::iterator remove_node( tree_t::iterator );
 	typename tree_t::iterator begin();
 	typename tree_t::const_iterator begin() const;
 	typename tree_t::iterator end();
@@ -367,6 +367,13 @@ typename HTree<tType>::iterator HTree<tType>::HNode::replace_node( HTree<tType>:
 		delete wasted;
 		}
 	return ( pos );
+	}
+
+template<typename tType>
+typename HTree<tType>::iterator HTree<tType>::HNode::remove_node( HTree<tType>::iterator pos )
+	{
+	delete *pos.f_oIterator;
+	return ( iterator( this, f_oBranch.erase( pos.f_oIterator ) ) );
 	}
 
 template<typename tType>

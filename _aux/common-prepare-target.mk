@@ -34,7 +34,7 @@ $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 
 $$(REAL_TARGET): $$($(1))/header.gch $$(OBJS_$(1))
 	@echo -n "Linking \`$$(@)' ... "
-	@$(LXX) $(LINKER_FLAGS) -o $$(@) $$(OBJS_$(1)) $$(LIBS) 2>&1 | tee -a make.log
+	@$(LXX) $(LINKER_FLAGS) $(LINKER_FLAGS_$(1)) -o $$(@) $$(OBJS_$(1)) $$(LIBS) 2>&1 | tee -a make.log
 ifdef NODEBUG
 	@strip $$(REAL_TARGET)
 endif

@@ -959,6 +959,29 @@ void HXml::apply_style( char const* const a_pcPath )
 	f_poXml->f_oStyle.swap( style );
 	}
 
+HXml::xml_element_t HXml::get_element_by_id( xml_element_t const& node, char const* const id ) const
+	{
+	xml_element_t result = NULL;
+	HXml::HNode::properties_t::iterator idIt = (*node)->f_oProperties.find( "id" );
+	if ( ( idIt != (*node)->f_oProperties.end() ) && ( idIt->second == id ) )
+		result = node;
+	for ( tree_t::iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
+		result = get_element_by_id( &*it, id );
+	return ( result );
+	}
+
+HXml::HNodeProxy HXml::get_element_by_id( char const* const id )
+	{
+	return ( HNodeProxy( get_element_by_id( f_oDOM.get_root(), id ) ) );
+	}
+
+HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it )
+	{
+	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
+	tree_t::iterator newIt = f_poNode->remove_node( it.f_oIterator );
+	return ( HXml::HIterator( this, newIt ) );
+	}
+
 }
 
 }

@@ -77,12 +77,15 @@ public:
 	void save( int const& ) const;
 	void create_root( char const* const, char const* const = NULL );
 	void clear( void );
+	HNodeProxy get_element_by_id( char const* const );
+	HConstNodeProxy const get_element_by_id( char const* const ) const;
 private:
 	void do_save( void ) const;
 	void parse( xml_node_ptr_t, tree_t::node_t, bool );
 	void dump_node( void*, HConstNodeProxy const& ) const;
 	char const* convert( char const*, way_t = D_TO_INTERNAL ) const;
 	int get_node_set_by_path( char const* );
+	xml_element_t get_element_by_id( xml_element_t const&, char const* const ) const;
 private:
 	HXml( HXml const& );
 	HXml& operator = ( HXml const& );
@@ -172,8 +175,6 @@ public:
 	HXml::HIterator const rbegin() const;
 	HXml::HIterator rend();
 	HXml::HIterator const rend() const;
-	HXml::HIterator get_element_by_id( char const* const );
-	HXml::HIterator const get_element_by_id( char const* const ) const;
 	HXml::HIterator query( char const* const );
 	HXml::HIterator const query( char const* const ) const;
 	HXml::HNode::TYPE::type_t get_type() const;
