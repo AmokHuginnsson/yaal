@@ -511,6 +511,7 @@ void HXml::do_save( void ) const
 	M_PROLOG
 	doc_resource_t doc( NULL, xmlFreeDoc );
 	/* flush writer to DOM. */
+	M_ENSURE( !! get_root() );
 		{
 		xmlDocPtr pDoc = NULL;
 		writer_resource_t writer( xmlNewTextWriterDoc( &pDoc, 0 ), xmlFreeTextWriter );
@@ -585,8 +586,7 @@ void HXml::create_root( char const* const a_pcName, char const* const a_pcEncodi
 	{
 	M_PROLOG
 	M_ASSERT( a_pcName );
-	if ( a_pcEncoding )
-		f_oEncoding = a_pcEncoding;
+	f_oEncoding = a_pcEncoding ? a_pcEncoding : D_DEFAULT_ENCODING;
 	tree_t::node_t root = f_oDOM.create_new_root();
 	(**root).f_oText = a_pcName;
 	return;
@@ -598,6 +598,7 @@ void HXml::clear( void )
 	M_PROLOG
 	f_oEncoding.clear();
 	f_oDOM.clear();
+	f_poXml->clear();
 	return;
 	M_EPILOG
 	}
@@ -955,6 +956,7 @@ void HXml::apply_style( char const* const a_pcPath )
 	doc_resource_t doc( xsltApplyStylesheet( style.get(), f_poXml->f_oDoc.get(), NULL ), xmlFreeDoc );
 	if ( ! doc.get() )
 		throw HXmlException( HString( "cannot apply stylesheet: " ) + a_pcPath );
+	f_poXml->clear();
 	f_poXml->f_oDoc.swap( doc );
 	f_poXml->f_oStyle.swap( style );
 	}
