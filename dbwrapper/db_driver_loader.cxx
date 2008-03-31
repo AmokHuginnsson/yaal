@@ -51,21 +51,21 @@ namespace
 char const * const etag = "Error: Data base request (";
 char const * const eend = ") while no driver loaded.";
 
-typedef void ( * simple_function_ptr_t ) ( void );
-typedef union
+template<typename tType>
+union caster_t
 	{
-	void * f_pvObjectPointer;
-	simple_function_ptr_t FUNCTION_POINTER;
-	} caster_t;
+	void* f_pvObjectPointer;
+	tType FUNCTION_POINTER;
+	};
 
 }
 
-template < typename tType >
-tType dlsym_wrapper ( void * a_pvSpace, char const * a_pcName )
+template<typename tType>
+tType dlsym_wrapper( void* a_pvSpace, char const* a_pcName )
 	{
-	caster_t l_xCaster;
-	l_xCaster.f_pvObjectPointer = dlsym ( a_pvSpace, a_pcName );
-	return ( reinterpret_cast < tType > ( l_xCaster.FUNCTION_POINTER ) );
+	caster_t<tType> l_xCaster;
+	l_xCaster.f_pvObjectPointer = dlsym( a_pvSpace, a_pcName );
+	return ( l_xCaster.FUNCTION_POINTER );
 	}
 
 char const x_tag_g_pcDone [ ] = "done.\r\n", * g_pcDone = x_tag_g_pcDone;

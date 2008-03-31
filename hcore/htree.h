@@ -399,7 +399,7 @@ typename HTree<tType>::iterator HTree<tType>::HNode::move_node( HTree<tType>::HN
 	disjointed( begin(), node );
 #endif
 	iterator it = rbegin();
-	if ( *it.f_oIterator != node )
+	if ( ( it == rend() ) || ( *it.f_oIterator != node ) )
 		{
 		node->detach();
 		f_oBranch.push_back( node );
