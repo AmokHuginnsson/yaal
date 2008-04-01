@@ -103,7 +103,7 @@ public:
 	HNumber operator - ( void ) const;
 	HNumber operator / ( HNumber const& ) const;
 	HNumber operator ^ ( int long unsigned ) const;
-	void swap( HNumber& );
+	static void swap( HNumber&, HNumber& );
 	void set_precision( int );
 	int get_precision( void ) const;
 	double long to_double( void ) const;

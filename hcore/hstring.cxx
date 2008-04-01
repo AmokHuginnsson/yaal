@@ -529,16 +529,12 @@ int HString::get_length( void ) const
 	M_EPILOG
 	}
 
-void HString::swap( HString& other )
+void HString::swap( HString& left, HString& right )
 	{
-	if ( &other != this )
+	if ( &left != &right )
 		{
-		int l_iSize = f_iSize;
-		char* l_pcBuffer = f_pcBuffer;
-		f_iSize = other.f_iSize;
-		f_pcBuffer = other.f_pcBuffer;
-		other.f_iSize = l_iSize;
-		other.f_pcBuffer = l_pcBuffer;
+		yaal::swap( left.f_iSize, right.f_iSize );
+		yaal::swap( left.f_pcBuffer, right.f_pcBuffer );
 		}
 	return;
 	}

@@ -59,19 +59,13 @@ public:
 		}
 	resource_t get( void ) const
 		{ return ( f_tResource ); }
-	void swap( HResource& other )
+	static void swap( HResource& left, HResource& right )
 		{
-		if ( &other != this )
+		if ( &left != &right )
 			{
-			resource_t resource = f_tResource;
-			allocated_t allocated = ALLOCATED;
-			free_t free_ = FREE;
-			f_tResource = other.f_tResource;
-			ALLOCATED = other.ALLOCATED;
-			FREE = other.FREE;
-			other.f_tResource = resource;
-			other.ALLOCATED = allocated;
-			other.FREE = free_;
+			yaal::swap( left.f_tResource, right.f_tResource );
+			yaal::swap( left.ALLOCATED, right.ALLOCATED );
+			yaal::swap( left.FREE, right.FREE );
 			}
 		}
 private:

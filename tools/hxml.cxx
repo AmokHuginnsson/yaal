@@ -223,8 +223,8 @@ void HXmlData::clear( void ) const
 	M_PROLOG
 	xpath_context_resource_t ctx( NULL, xmlXPathFreeContext );
 	xpath_object_resource_t obj( NULL, xmlXPathFreeObject );
-	f_oXPathObject.swap( obj );
-	f_oXPathContext.swap( ctx );
+	xpath_object_resource_t::swap( f_oXPathObject, obj );
+	xpath_context_resource_t::swap( f_oXPathContext, ctx );
 	return;
 	M_EPILOG
 	}
@@ -319,11 +319,11 @@ int HXml::get_node_set_by_path( char const* a_pcPath )
 			{
 			f_oVarTmpBuffer = a_pcPath;
 			f_poXml->f_psNodeSet = obj.get()->nodesetval;
-			f_poXml->f_oXPathObject.swap( obj );
+			xpath_object_resource_t::swap( f_poXml->f_oXPathObject, obj );
 			setSize = f_poXml->f_psNodeSet ? f_poXml->f_psNodeSet->nodeNr : 0;
 			}
 		}
-	f_poXml->f_oXPathContext.swap( ctx );
+	xpath_context_resource_t::swap( f_poXml->f_oXPathContext, ctx );
 	return ( setSize );
 	M_EPILOG
 	}
@@ -355,7 +355,7 @@ void HXml::init( char const* a_pcFileName )
 #endif /* __DEBUGGER_BABUNI__ */
 	(*f_oConvert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
 			root, a_pcFileName );
-	f_poXml->f_oDoc.swap( doc );
+	doc_resource_t::swap( f_poXml->f_oDoc, doc );
 	return;
 	M_EPILOG
 	}
@@ -518,7 +518,7 @@ void HXml::do_save( void ) const
 		if ( ! writer.get() )
 			throw HXmlException( _( "Cannot create the xml DOC writer." ) );
 		doc_resource_t dummy( pDoc, xmlFreeDoc );
-		doc.swap( dummy );
+		doc_resource_t::swap( doc, dummy );
 		int rc = xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding, "yes" );
 		if ( rc < 0 )
 			throw HXmlException( HString( "Unable to start document with encoding: " ) + f_oEncoding );
@@ -540,7 +540,7 @@ void HXml::do_save( void ) const
 	if ( f_poXml->f_oDoc.get() )
 		xmlFreeNode( xmlDocSetRootElement( f_poXml->f_oDoc.get(), xmlDocGetRootElement( doc.get() ) ) );
 	else
-		f_poXml->f_oDoc.swap( doc );
+		doc_resource_t::swap( f_poXml->f_oDoc, doc );
 	return;
 	M_EPILOG
 	}
@@ -957,8 +957,8 @@ void HXml::apply_style( char const* const a_pcPath )
 	if ( ! doc.get() )
 		throw HXmlException( HString( "cannot apply stylesheet: " ) + a_pcPath );
 	f_poXml->clear();
-	f_poXml->f_oDoc.swap( doc );
-	f_poXml->f_oStyle.swap( style );
+	doc_resource_t::swap( f_poXml->f_oDoc, doc );
+	style_resource_t::swap( f_poXml->f_oStyle, style );
 	}
 
 HXml::xml_element_t HXml::get_element_by_id( xml_element_t const& node, char const* const id ) const

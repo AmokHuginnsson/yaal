@@ -321,7 +321,7 @@ void HSBBSTree::remove_node( HAbstractNode* a_poNode )
 		HAbstractNode* l_poNode = a_poNode->f_poLeft;
 		while ( l_poNode->f_poRight )
 			l_poNode = l_poNode->f_poRight;
-		swap ( a_poNode, l_poNode );
+		swap( a_poNode, l_poNode );
 		}
 	if ( a_poNode->f_poLeft )
 		{
@@ -468,16 +468,12 @@ bool HSBBSTree::is_empty( void ) const
 	return ( ! f_poRoot );
 	}
 
-void HSBBSTree::swap( HSBBSTree& other )
+void HSBBSTree::swap( HSBBSTree& left, HSBBSTree& right )
 	{
-	if ( &other != this )
+	if ( &left != &right )
 		{
-		int long l_lSize = f_lSize;
-		HAbstractNode* l_poRoot = f_poRoot;
-		f_lSize = other.f_lSize;
-		f_poRoot = other.f_poRoot;
-		other.f_lSize = l_lSize;
-		other.f_poRoot = l_poRoot;
+		yaal::swap( left.f_lSize, right.f_lSize );
+		yaal::swap( left.f_poRoot, right.f_poRoot );
 		}
 	return;
 	}
@@ -508,7 +504,7 @@ HSBBSTree::HIterator HSBBSTree::rend( void ) const
 	return ( HIterator ( NULL ) );
 	}
 
-void HSBBSTree::swap( HAbstractNode * a_poFirst, HAbstractNode * a_poSecond )
+void HSBBSTree::swap( HAbstractNode* a_poFirst, HAbstractNode* a_poSecond )
 	{
 	M_ASSERT ( a_poFirst && a_poSecond );
 	M_ASSERT ( a_poFirst != a_poSecond );

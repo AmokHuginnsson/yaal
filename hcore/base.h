@@ -66,6 +66,18 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
 
+template<typename tType>
+void swap( tType& left, tType& right )
+	{
+	if ( &left != &right )
+		{
+		tType tmp = left;
+		left = right;
+		right = tmp;
+		}
+	return;
+	}
+
 template<typename function_t, typename value_t>
 class HBinder
 	{

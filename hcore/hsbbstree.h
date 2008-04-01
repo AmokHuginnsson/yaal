@@ -107,7 +107,7 @@ public:
 	bool empty( void ) const;
 	bool is_empty( void ) const;
 	void clear( void );
-	void swap( HSBBSTree& );
+	static void swap( HSBBSTree&, HSBBSTree& );
 	template<typename tType, typename ttType>
 	void copy_from( HSBBSTree const& );
 	HIterator begin( void ) const;

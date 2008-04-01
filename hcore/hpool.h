@@ -77,7 +77,7 @@ public:
 	void push_back( tType const& );
 	void reset( void );
 	int size( void ) const;
-	void swap( HPool<tType>& );
+	static void swap( HPool<tType>&, HPool<tType>& );
 	tType* raw( void ) const;
 	HPool( HPool const& );
 	HPool& operator = ( HPool const& );
@@ -206,22 +206,14 @@ int HPool<tType>::size( void ) const
 	}
 
 template<typename tType>
-void HPool<tType>::swap( HPool<tType>& other )
+void HPool<tType>::swap( HPool<tType>& left, HPool<tType>& right )
 	{
-	if ( &other != this )
+	if ( &left != &right )
 		{
-		pool_type_t l_ePoolType = f_ePoolType;
-		int l_ulPoolSize = f_iAllocedBytes;
-		int l_iTop = f_iSize;
-		tType* l_ptPool = f_ptPool;
-		f_ePoolType = other.f_ePoolType;
-		f_iAllocedBytes = other.f_iAllocedBytes;
-		f_iSize = other.f_iSize;
-		f_ptPool = other.f_ptPool;
-		other.f_ePoolType = l_ePoolType;
-		other.f_iAllocedBytes = l_ulPoolSize;
-		other.f_iSize = l_iTop;
-		other.f_ptPool = l_ptPool;
+		yaal::swap( left.f_ePoolType, right.f_ePoolType );
+		yaal::swap( left.f_iAllocedBytes, right.f_iAllocedBytes );
+		yaal::swap( left.f_iSize, right.f_iSize );
+		yaal::swap( left.f_ptPool, right.f_ptPool );
 		}
 	return;
 	}

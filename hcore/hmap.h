@@ -124,10 +124,10 @@ public:
 		}
 	void clear( void )
 		{ f_oEngine.clear(); }
-	void swap( HMap<key_t, value_t, helper_t>& other )
+	static void swap( HMap<key_t, value_t, helper_t>& left, HMap<key_t, value_t, helper_t>& right )
 		{
-		if ( &other != this )
-			f_oEngine.swap( other.f_oEngine );
+		if ( &left != &right )
+			HSBBSTree::swap( left.f_oEngine, right.f_oEngine );
 		}
 	void copy_from( HMap<key_t, value_t, helper_t> const& source )
 		{

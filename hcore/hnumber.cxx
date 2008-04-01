@@ -29,6 +29,7 @@ Copyright:
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hnumber.h"
+#include "base.h"
 
 namespace yaal
 {
@@ -169,24 +170,16 @@ HNumber& HNumber::operator = ( HNumber const& source )
 	M_EPILOG
 	}
 
-void HNumber::swap( HNumber& source )
+void HNumber::swap( HNumber& left, HNumber& right )
 	{
 	M_PROLOG
-	if ( &source != this )
+	if ( &left != &right )
 		{
-		int l_iPrecision = f_iPrecision;
-		bool l_bNegative = f_bNegative;
-		int l_iDigitCount = f_iDigitCount;
-		int l_iIntegralPartSize = f_iIntegralPartSize;
-		f_iPrecision = source.f_iPrecision;
-		f_bNegative = source.f_bNegative;
-		f_iDigitCount = source.f_iDigitCount;
-		f_iIntegralPartSize = source.f_iIntegralPartSize;
-		source.f_iPrecision = l_iPrecision;
-		source.f_bNegative = l_bNegative;
-		source.f_iDigitCount = l_iDigitCount;
-		source.f_iIntegralPartSize = l_iIntegralPartSize;
-		source.f_oCanonical.swap( f_oCanonical );
+		yaal::swap( left.f_iPrecision, right.f_iPrecision );
+		yaal::swap( left.f_bNegative, right.f_bNegative );
+		yaal::swap( left.f_iDigitCount, right.f_iDigitCount );
+		yaal::swap( left.f_iIntegralPartSize, right.f_iIntegralPartSize );
+		canonical_t::swap( left.f_oCanonical, right.f_oCanonical );
 		}
 	return;
 	M_EPILOG

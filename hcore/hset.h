@@ -90,10 +90,10 @@ public:
 		{ return ( HIterator( f_oEngine.rend() ) ); }
 	void clear( void )
 		{ f_oEngine.clear(); }
-	void swap( HSet<tType, ttType>& other )
+	static void swap( HSet<tType, ttType>& left, HSet<tType, ttType>& right )
 		{
-		if ( &other != this )
-				f_oEngine.swap( other.f_oEngine );
+		if ( &left != &right )
+			HSBBSTree::swap( left.f_oEngine, right.f_oEngine );
 		}
 	void copy_from( HSet<tType, ttType> const& source )
 		{
