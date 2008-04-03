@@ -209,7 +209,9 @@ int console_mouse_close( void )
 int console_mouse_open ( void )
 	{
 	M_PROLOG
-	M_THROW( _( "console mouse support not compiled" ), errno );
+	int a( 1 );
+	if ( a )
+		M_THROW( _( "console mouse support not compiled" ), errno );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -217,7 +219,9 @@ int console_mouse_open ( void )
 int console_mouse_get( OMouse& )
 	{
 	M_PROLOG
-	M_THROW( _( "console mouse support not compiled" ), errno );
+	int a( 1 );
+	if ( a )
+		M_THROW( _( "console mouse support not compiled" ), errno );
 	return ( 0 );
 	M_EPILOG
 	}
