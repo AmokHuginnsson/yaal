@@ -71,7 +71,7 @@ void swap( tType& left, tType& right )
 	{
 	if ( &left != &right )
 		{
-		tType tmp = left;
+		tType tmp( left );
 		left = right;
 		right = tmp;
 		}
