@@ -86,13 +86,13 @@ void HOpenSSL::OSSLContext::init( void )
 	ERR_clear_error();
 	f_pvContext = ctx = SSL_CTX_new( l_pxMethod );
 	if ( ! f_pvContext )
-		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( l_oBuffer ) );
 	if ( SSL_CTX_use_PrivateKey_file( ctx, f_oSSLKey, SSL_FILETYPE_PEM ) <= 0 )
-		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( l_oBuffer ) );
 	if ( SSL_CTX_use_certificate_file( ctx, f_oSSLCert, SSL_FILETYPE_PEM ) <= 0 )
-		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( l_oBuffer ) );
 	if ( ! SSL_CTX_check_private_key( ctx ) )
-		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( l_oBuffer ) );
 	return;
 	M_EPILOG
 	}

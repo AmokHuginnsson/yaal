@@ -96,6 +96,7 @@ private:
 	};
 
 typedef HExceptionT<HOpenSSL> HOpenSSLException;
+typedef HExceptionT<HOpenSSL> HOpenSSLFatalException;
 
 }
 
