@@ -41,7 +41,7 @@ namespace yaal
 namespace hcore
 {
 
-extern char const * const n_ppcErrMsgHArray [ ];
+extern char const* const n_ppcErrMsgHArray[];
 
 template<typename tType>
 class HArray
@@ -70,6 +70,7 @@ public:
 	tType const& operator [] ( int ) const;
 	int get_size( void ) const;
 	bool operator ! ( void ) const;
+	static void swap( HArray&, HArray& );
 private:
 	tType& get( int ) const;
 	};
@@ -102,7 +103,7 @@ HArray<tType>::HArray( int const& a_iSize, tType const& a_tFillWith )
 	f_iSize = a_iSize;
 	if ( a_iSize )
 		{
-		f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
+		f_ptArray = new ( std::nothrow ) tType[ f_iSize ];
 		if ( ! f_ptArray )
 			M_THROW ( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_iSize );
 		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
@@ -137,7 +138,6 @@ template<typename tType>
 HArray<tType>& HArray<tType>::operator = ( HArray const& a_roArray )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	if ( this != & a_roArray )
 		{
 		if ( a_roArray.f_iSize != f_iSize )
@@ -156,7 +156,7 @@ HArray<tType>& HArray<tType>::operator = ( HArray const& a_roArray )
 			if ( ! f_ptArray )
 				M_THROW( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], f_iSize );
 			}
-		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
+		for ( int l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
 			f_ptArray[ l_iCtr ] = a_roArray.f_ptArray[ l_iCtr ];
 		}
 	return ( *this );
@@ -205,6 +205,14 @@ int HArray<tType>::get_size( void ) const
 	M_PROLOG
 	return ( f_iSize );
 	M_EPILOG
+	}
+
+template<typename tType>
+void HArray<tType>::swap( HArray& left, HArray& right )
+	{
+	yaal::swap( left.f_ptArray, right.f_ptArray );
+	yaal::swap( left.f_iSize, right.f_iSize );
+	return;
 	}
 
 }
