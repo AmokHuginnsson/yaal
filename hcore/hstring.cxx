@@ -593,7 +593,7 @@ int HString::find( char const* const a_pcPattern, int a_iAfter ) const
 	{
 	M_PROLOG
 	if ( ! a_pcPattern )
-		return ( - 1 );
+		return ( -1 );
 	return ( nfind( a_pcPattern, ::strlen( a_pcPattern ), a_iAfter ) );
 	M_EPILOG
 	}
@@ -602,13 +602,13 @@ int HString::nfind( char const* const a_pcPattern, int a_iPatternLength, int a_i
 	{
 	M_PROLOG
 	if ( ! a_pcPattern )
-		return ( - 1 );
+		return ( -1 );
 	if ( a_iAfter < 0 )
 		a_iAfter = 0;
 	int len = 0;
 	if ( ( ! a_iPatternLength )
-			|| ( static_cast<int>( len = ::strlen( f_pcBuffer ) ) <= a_iAfter ) )
-		return ( - 1 );
+			|| ( static_cast<int>( len = ::strlen( f_pcBuffer ) ) < ( a_iAfter + a_iPatternLength ) ) )
+		return ( -1 );
 	return ( kmpsearch( f_pcBuffer + a_iAfter, len - a_iAfter,
 				a_pcPattern, a_iPatternLength ) );
 	M_EPILOG
