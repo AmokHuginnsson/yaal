@@ -270,10 +270,11 @@ int HEditControl::delete_char( int a_iLength )
 		else
 			{
 			f_oVarTmpBuffer.erase( f_iControlOffset + f_iCursorPosition, 1 );
-			if ( f_iControlOffset > 0 )
+			if ( ( f_iControlOffset > 0 ) && ( ( f_iControlOffset + f_iWidthRaw ) >= a_iLength ) )
+				{
 				f_iControlOffset --;
-			if ( f_iCursorPosition < ( f_iWidthRaw - 1 ) )
 				++ f_iCursorPosition;
+				}
 			}
 		}
 	return ( err );
