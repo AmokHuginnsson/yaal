@@ -122,6 +122,14 @@ void copy( src_it_type_t src, src_it_type_t const& end, dst_it_type_t dst )
 	return;
 	}
 
+template<typename iterator_t, typename generator_t>
+void generate( iterator_t it, iterator_t const& end, generator_t generator )
+	{
+	for ( ; it != end; ++ it )
+		*it = generator();
+	return;
+	}
+
 namespace trait
 {
 

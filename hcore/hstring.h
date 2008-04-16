@@ -93,6 +93,7 @@ public:
 	HString& vformat( char const* const, void* );
 	int find( char const, int = 0 ) const;
 	int find( char const* const, int = 0 ) const;
+	int nfind( char const* const, int, int = 0 ) const;
 	int reverse_find( char const, int = 0 ) const;
 	int find_one_of( char const* const, int = 0 ) const;
 	int reverse_find_one_of( char const* const, int = 0 ) const;
