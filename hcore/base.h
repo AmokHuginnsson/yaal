@@ -108,10 +108,18 @@ HBinder<function_t, value_t> bind2nd( function_t func, value_t value )
 	}
 
 template<typename iterator_t, typename call_t>
-void for_each( iterator_t const& begin, iterator_t const& end, call_t& CALL )
+void for_each( iterator_t it, iterator_t const& end, call_t& CALL )
 	{
-	for ( iterator_t it = begin; it != end; ++ it )
+	for ( ; it != end; ++ it )
 		CALL( *it );
+	}
+
+template<typename src_it_type_t, typename dst_it_type_t>
+void copy( src_it_type_t src, src_it_type_t const& end, dst_it_type_t dst )
+	{
+	for ( ; src != end; ++ src )
+		*dst = *src, ++ dst;
+	return;
 	}
 
 namespace trait
