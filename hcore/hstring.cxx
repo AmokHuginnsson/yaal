@@ -34,6 +34,7 @@ Copyright:
 M_VCSID ( "$Id$" )
 #include "hstring.h"
 #include "xalloc.h"
+#include "hpool.h"
 
 namespace yaal
 {
@@ -54,6 +55,7 @@ namespace
 char * strrnpbrk( char const* const, char const* const,
 		int /* no const - used */ );
 int strrnspn( char const* const, char const* const, int const );
+int kmpsearch( char const* const, int const&, char const* const, int const& );
 	}
 
 char const n_pcWhiteSpace [ ] = " \t\n\v\f\r";
@@ -594,13 +596,12 @@ int HString::find( char const* const a_pcPattern, int a_iAfter ) const
 		return ( - 1 );
 	if ( a_iAfter < 0 )
 		a_iAfter = 0;
+	int len = 0;
 	if ( ( ! ::strlen( a_pcPattern ) )
-			|| ( static_cast<int>( ::strlen( f_pcBuffer ) ) <= a_iAfter ) )
+			|| ( static_cast<int>( len = ::strlen( f_pcBuffer ) ) <= a_iAfter ) )
 		return ( - 1 );
-	char* l_pcStr = ::strstr( f_pcBuffer + a_iAfter, a_pcPattern );
-	if ( ! l_pcStr )
-		return ( - 1 );
-	return ( l_pcStr - f_pcBuffer );
+	return ( kmpsearch( f_pcBuffer + a_iAfter, len - a_iAfter,
+				a_pcPattern, strlen( a_pcPattern ) ) );
 	M_EPILOG
 	}
 
@@ -1096,6 +1097,33 @@ int strrnspn( char const* const a_pcBuffer, char const* const a_pcSkipSet,
 		}
 	return ( a_iLength );
 	M_EPILOG
+	}
+
+int kmpsearch( char const* const str, int const& lenstr, char const* const pat, int const& lenpat )
+	{
+	typedef HPool<int> kmpnext_t;
+	kmpnext_t KMPnext( lenpat + 1 );
+	int* next = KMPnext.raw();
+	int b = next[ 0 ] = -1;
+	for ( int i = 1; i <= lenpat; ++ i )
+		{
+		while ( ( b > -1 ) && ( pat[ b ] != pat[ i - 1 ] ) )
+			b = next[ b ];
+		++ b;
+		next[ i ] = ( pat[ i ] == pat[ b ] ) ? next[ b ] : b;
+		}
+	int start = -1;
+	b = 0;
+	for ( int i = 0; i < lenstr; ++ i )
+		{
+		while ( ( b > -1 ) && ( pat[ b ] != str[ i ] ) )
+			b = next[ b ];
+		if ( ++ b < lenpat )
+			continue;
+		start = i - b + 1;
+		break;
+		}
+	return ( start );
 	}
 
 }

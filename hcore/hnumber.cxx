@@ -569,7 +569,7 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 	if ( f_iDigitCount )
 		{
 		n.f_iPrecision = f_iPrecision + denominator.f_iPrecision;
-		char* den = denominator.f_oCanonical.raw();
+		char const* const den = denominator.f_oCanonical.raw();
 		int shift = 0;
 		while ( ( shift < denominator.f_iDigitCount ) && ( den[ shift ] == 0 ) )
 			++ shift;
@@ -577,11 +577,11 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 		canonical_t reminder( denlen + 1 ); /* + 1 for carrier */
 		canonical_t pseudoden( denlen + 1 );
 		char const* src = f_oCanonical.raw();
-		den = pseudoden.raw();
+		char* pden = pseudoden.raw();
 		char* rem = reminder.raw();
-		char const* ep[] = { rem, den };
+		char const* ep[] = { rem, pden };
 		int long len = min( f_iDigitCount, denlen );
-		::memcpy( den + 1, denominator.f_oCanonical.raw() + shift, denlen );
+		::memcpy( pden + 1, denominator.f_oCanonical.raw() + shift, denlen );
 		::memcpy( rem + 1 + denlen - len, src, len );
 		shift = 0;
 		while ( ( shift < f_iDigitCount ) && ( src[ shift ++ ] == 0 ) )
@@ -600,7 +600,7 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 		do
 			{
 			int digit = 0;
-			while ( ( cmp = memcmp( rem, den, denlen + 1 ) ) > 0 )
+			while ( ( cmp = memcmp( rem, pden, denlen + 1 ) ) > 0 )
 				{
 				mutate_addition( rem - 1, denlen + 1 + 1, ep, NULL, NULL, true, false );
 				++ digit;

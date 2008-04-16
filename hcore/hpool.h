@@ -64,6 +64,8 @@ public:
 		D_AUTO_GROW,
 		D_DUMB
 		} pool_type_t;
+	typedef tType* iterator;
+	typedef tType const* const_iterator;
 private:
 	pool_type_t f_ePoolType;
 	int f_iAllocedBytes;	/* size of allocated memory buffer */
@@ -78,7 +80,16 @@ public:
 	void reset( void );
 	int size( void ) const;
 	static void swap( HPool<tType>&, HPool<tType>& );
-	tType* raw( void ) const;
+	tType const* const raw( void ) const;
+	tType* raw( void );
+	const_iterator begin( void ) const;
+	iterator begin( void );
+	const_iterator end( void ) const;
+	iterator end( void );
+	const_iterator rbegin( void ) const;
+	iterator rbegin( void );
+	const_iterator rend( void ) const;
+	iterator rend( void );
 	HPool( HPool const& );
 	HPool& operator = ( HPool const& );
 	};
@@ -219,9 +230,63 @@ void HPool<tType>::swap( HPool<tType>& left, HPool<tType>& right )
 	}
 
 template<typename tType>
-tType* HPool<tType>::raw( void ) const
+tType const* const HPool<tType>::raw( void ) const
 	{
 	return ( f_ptPool );
+	}
+
+template<typename tType>
+tType* HPool<tType>::raw( void )
+	{
+	return ( f_ptPool );
+	}
+
+template<typename tType>
+typename HPool<tType>::const_iterator HPool<tType>::begin( void ) const
+	{
+	return ( f_ptPool );
+	}
+
+template<typename tType>
+typename HPool<tType>::iterator HPool<tType>::begin( void )
+	{
+	return ( f_ptPool );
+	}
+
+template<typename tType>
+typename HPool<tType>::const_iterator HPool<tType>::end( void ) const
+	{
+	return ( f_ptPool + f_iSize );
+	}
+
+template<typename tType>
+typename HPool<tType>::iterator HPool<tType>::end( void )
+	{
+	return ( f_ptPool + f_iSize );
+	}
+
+template<typename tType>
+typename HPool<tType>::const_iterator HPool<tType>::rbegin( void ) const
+	{
+	return ( f_ptPool + f_iSize - 1 );
+	}
+
+template<typename tType>
+typename HPool<tType>::iterator HPool<tType>::rbegin( void )
+	{
+	return ( f_ptPool + f_iSize - 1 );
+	}
+
+template<typename tType>
+typename HPool<tType>::const_iterator HPool<tType>::rend( void ) const
+	{
+	return ( f_ptPool - 1 );
+	}
+
+template<typename tType>
+typename HPool<tType>::iterator HPool<tType>::rend( void )
+	{
+	return ( f_ptPool - 1 );
 	}
 
 }
