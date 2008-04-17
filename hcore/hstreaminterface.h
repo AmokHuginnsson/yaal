@@ -43,10 +43,25 @@ HStreamInterface& flush( HStreamInterface& );
 
 class HStreamInterface
 	{
+public:
+	struct STATUS
+		{
+		typedef enum
+			{
+			D_OK,
+			D_REPEAT,
+			D_ERROR
+			} code_t;
+		int octets;
+		code_t code;
+		STATUS( void ) : octets( 0 ), code( D_OK ) {}
+		operator int const ( void ) const { return ( octets ); }
+		};
 protected:
 	typedef yaal::hcore::HPool<char> cache_t;
 	cache_t f_oCache;
 	int f_iOffset;
+	STATUS f_sStatus;
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
@@ -66,12 +81,10 @@ public:
 	 * \param strip - Remove delimiting stop char from output buffer.
 	 * \return Number of characters avctualy read.
 	 */
-	int read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
+	STATUS const& read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
 	int read( void* const, int const );
 	int write( void const* const, int const );
 	static char const* const eols;
-	static int const D_REPEAT = -1;
-	static int const D_ERROR = -2;
 private:
 	virtual int do_write( void const* const, int const ) = 0;
 	virtual int do_read( void* const, int const ) = 0;

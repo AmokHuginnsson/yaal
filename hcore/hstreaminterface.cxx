@@ -39,7 +39,7 @@ namespace hcore
 char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
-	: f_oCache( 1, cache_t::D_AUTO_GROW ), f_iOffset( 0 )
+	: f_oCache( 1, cache_t::D_AUTO_GROW ), f_iOffset( 0 ), f_sStatus()
 	{
 	return;
 	}
@@ -142,11 +142,11 @@ HStreamInterface& flush( HStreamInterface& a_roFile )
 	M_EPILOG
 	}
 
-int HStreamInterface::read_until( HString& a_roMessage,
+HStreamInterface::STATUS const& HStreamInterface::read_until( HString& a_roMessage,
 		char const* const a_pcStopSet, bool a_bStripDelim )
 	{
 	M_PROLOG
-	int err = 0;
+	int nRead = 0;
 	int iPoolSize = f_oCache.size();
 	char* l_pcBuffer = f_oCache.raw();
 	do
@@ -157,10 +157,10 @@ int HStreamInterface::read_until( HString& a_roMessage,
 			l_pcBuffer = f_oCache.raw();
 			iPoolSize = f_oCache.size();
 			}
-		err = do_read( l_pcBuffer + f_iOffset, sizeof ( char ) * 1 );
+		nRead = do_read( l_pcBuffer + f_iOffset, sizeof ( char ) * 1 );
 		}
-	while ( ( err > 0 ) && ! ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ++ ] ) );
-	if ( err >= 0 )
+	while ( ( nRead > 0 ) && ! ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ++ ] ) );
+	if ( nRead >= 0 )
 		{
 		if ( a_bStripDelim )
 			-- f_iOffset;
@@ -169,13 +169,18 @@ int HStreamInterface::read_until( HString& a_roMessage,
 			l_pcBuffer[ f_iOffset ] = 0;
 			a_roMessage = l_pcBuffer;
 			}
-		if ( err > 0 )
-			err = f_iOffset;
-		else
-			err = D_ERROR;
+		f_sStatus.octets = f_iOffset;
 		f_iOffset = 0;
+		if ( ! nRead )
+			f_sStatus.code = STATUS::D_ERROR;
+		else if ( f_sStatus.octets == 0 )
+			f_sStatus.code = STATUS::D_REPEAT;
+		else
+			f_sStatus.code = STATUS::D_OK;
 		}
-	return ( err );
+	else
+		f_sStatus.code = STATUS::D_REPEAT;
+	return ( f_sStatus );
 	M_EPILOG
 	}
 
