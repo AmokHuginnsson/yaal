@@ -169,7 +169,10 @@ int HStreamInterface::read_until( HString& a_roMessage,
 			l_pcBuffer[ f_iOffset ] = 0;
 			a_roMessage = l_pcBuffer;
 			}
-		err = f_iOffset;
+		if ( err > 0 )
+			err = f_iOffset;
+		else
+			err = D_ERROR;
 		f_iOffset = 0;
 		}
 	return ( err );

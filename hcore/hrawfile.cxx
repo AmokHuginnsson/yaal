@@ -32,6 +32,7 @@ Copyright:
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hrawfile.h"
+#include "hclock.h"
 
 namespace yaal
 {
@@ -184,7 +185,7 @@ int HRawFile::write_plain( void const* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, errno );
+		M_THROW( n_pcError, errno );
 	int iWritten = 0;
 	timeval tv = { f_iTimeOut, 0 };
 	do
@@ -211,8 +212,24 @@ int HRawFile::write_ssl( void const* const a_pcBuffer, int const a_iSize )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, errno );
-	return ( f_oSSL->write( a_pcBuffer, a_iSize ) );
+		M_THROW( n_pcError, errno );
+	HClock clk;
+	int nWritten = 0;
+	do
+		{
+		if ( f_iTimeOut  && ( clk.get_time_elapsed() > f_iTimeOut ) )
+			throw HStreamInterfaceException( _( "timeout on write" ) );
+		int ret = f_oSSL->write( static_cast<char const* const>( a_pcBuffer ) + nWritten, a_iSize );
+		if ( ! ret )
+			{
+			nWritten = ret;
+			break;
+			}
+		else if ( ret > 0 )
+			nWritten += ret;
+		}
+	while ( nWritten < a_iSize );
+	return ( nWritten );
 	M_EPILOG
 	}
 

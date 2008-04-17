@@ -34,9 +34,12 @@ Copyright:
 #include <openssl/engine.h>
 #include <unistd.h>
 
+#include <iostream>
+
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hopenssl.h"
+#include "hlog.h"
 
 #include "hcore.h"
 
@@ -49,10 +52,10 @@ namespace hcore
 namespace openssl_helper
 {
 
-HString& format_error_message( HString& a_oBuffer )
+HString& format_error_message( HString& a_oBuffer, int err = 0 )
 	{
 	int l_iCode = 0;
-	a_oBuffer = "";
+	a_oBuffer = err ? ERR_error_string( err, NULL ) : "";
 	while ( ( l_iCode = ERR_get_error() ) )
 		( a_oBuffer += ( a_oBuffer.is_empty() ? "" : "\n" ) ) += ERR_error_string( l_iCode, NULL );
 	return ( a_oBuffer );
@@ -133,7 +136,9 @@ HOpenSSL::OSSLContextClient::OSSLContextClient( void )
 	M_EPILOG
 	}
 
-HOpenSSL::HOpenSSL( int a_iFileDescriptor, TYPE::ssl_context_type_t a_eType ) : f_pvSSL( NULL )
+HOpenSSL::HOpenSSL( int a_iFileDescriptor, TYPE::ssl_context_type_t a_eType )
+	: f_bPendingOperation( false ), f_pvSSL( NULL ),
+	do_accept_or_connect( ( a_eType == TYPE::D_SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect )
 	{
 	M_PROLOG
 	HString l_oBuffer;
@@ -143,17 +148,7 @@ HOpenSSL::HOpenSSL( int a_iFileDescriptor, TYPE::ssl_context_type_t a_eType ) : 
 	if ( ! f_pvSSL )
 		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
 	SSL_set_fd( ssl, a_iFileDescriptor );
-	if ( a_eType == TYPE::D_SERVER )
-		{
-		if ( SSL_accept( ssl ) == -1 )
-			throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
-		}
-	else
-		{
-		M_ASSERT( a_eType == TYPE::D_CLIENT );
-		if ( SSL_connect( ssl ) == -1 )
-			throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
-		}
+	accept_or_connect();
 	return;
 	M_EPILOG
 	}
@@ -165,11 +160,62 @@ HOpenSSL::~HOpenSSL( void )
 	return;
 	}
 
+void HOpenSSL::accept_or_connect( void )
+	{
+	M_PROLOG
+	int ret = (this->*do_accept_or_connect)();
+	if ( ret == -1 )
+		{
+		check_err( ret );
+		f_bPendingOperation = true;
+		}
+	else
+		f_bPendingOperation = false;
+	return;
+	M_EPILOG
+	}
+
+int HOpenSSL::accept( void )
+	{
+	M_PROLOG
+	return ( SSL_accept( static_cast<SSL*>( f_pvSSL ) ) );
+	M_EPILOG
+	}
+
+int HOpenSSL::connect( void )
+	{
+	M_PROLOG
+	return ( SSL_connect( static_cast<SSL*>( f_pvSSL ) ) );
+	M_EPILOG
+	}
+
+void HOpenSSL::check_err( int code ) const
+	{
+	M_PROLOG
+	int err = SSL_get_error( static_cast<SSL*>( f_pvSSL ), code );
+	if ( ( err != SSL_ERROR_WANT_READ ) && ( err != SSL_ERROR_WANT_WRITE ) )
+		{
+		HString l_oBuffer;
+		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+		}
+	return;
+	M_EPILOG
+	}
+
 int HOpenSSL::read( void* const a_pvBuffer, int const a_iSize )
 	{
 	M_PROLOG
 	M_ASSERT( f_pvSSL );
-	return ( SSL_read( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize ) );
+	if ( f_bPendingOperation )
+		accept_or_connect();
+	int nRead = -1;
+	if ( ! f_bPendingOperation )
+		{
+		nRead = SSL_read( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize );
+		if ( nRead <= 0 )
+			check_err( nRead );
+		}
+	return ( nRead );
 	M_EPILOG
 	}
 
@@ -177,7 +223,16 @@ int HOpenSSL::write( void const* const a_pvBuffer, int const a_iSize )
 	{
 	M_PROLOG
 	M_ASSERT( f_pvSSL );
-	return ( SSL_write( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize ) );
+	if ( f_bPendingOperation )
+		accept_or_connect();
+	int nWritten = 0;
+	if ( ! f_bPendingOperation )
+		{
+		nWritten = SSL_write( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize );
+		if ( nWritten <= 0 )
+			check_err( nWritten );
+		}
+	return ( nWritten );
 	M_EPILOG
 	}
 

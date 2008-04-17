@@ -609,8 +609,8 @@ int HString::nfind( char const* const a_pcPattern, int a_iPatternLength, int a_i
 	if ( ( ! a_iPatternLength )
 			|| ( static_cast<int>( len = ::strlen( f_pcBuffer ) ) < ( a_iAfter + a_iPatternLength ) ) )
 		return ( -1 );
-	return ( kmpsearch( f_pcBuffer + a_iAfter, len - a_iAfter,
-				a_pcPattern, a_iPatternLength ) );
+	int idx = kmpsearch( f_pcBuffer + a_iAfter, len - a_iAfter, a_pcPattern, a_iPatternLength );
+	return ( idx >= 0 ? idx + a_iAfter : -1 );
 	M_EPILOG
 	}
 

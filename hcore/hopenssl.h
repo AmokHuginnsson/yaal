@@ -82,6 +82,7 @@ private:
 		};
 	typedef yaal::hcore::HSingleton<OSSLContextServer> OSSLContextServerInstance;
 	typedef yaal::hcore::HSingleton<OSSLContextClient> OSSLContextClientInstance;
+	bool f_bPendingOperation;
 	void* f_pvSSL;
 public:
 	typedef yaal::hcore::HPointer<HOpenSSL, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
@@ -91,6 +92,12 @@ public:
 	int write( void const* const, int const );
 	void shutdown( void );
 private:
+	void accept_or_connect( void );
+	int accept( void );
+	int connect( void );
+	void check_err( int ) const;
+	typedef int ( HOpenSSL::* operation_t )( void );
+	operation_t do_accept_or_connect;
 	HOpenSSL( HOpenSSL const& );
 	HOpenSSL& operator=( HOpenSSL const& );
 	};

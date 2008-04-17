@@ -70,6 +70,8 @@ public:
 	int read( void* const, int const );
 	int write( void const* const, int const );
 	static char const* const eols;
+	static int const D_REPEAT = -1;
+	static int const D_ERROR = -2;
 private:
 	virtual int do_write( void const* const, int const ) = 0;
 	virtual int do_read( void* const, int const ) = 0;
