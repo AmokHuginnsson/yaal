@@ -38,6 +38,7 @@ Copyright:
 #include <libxml/xpath.h>
 #include <libxml/xmlreader.h>
 #include <libxml/xmlwriter.h>
+#include <libxml/xinclude.h>
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
@@ -347,6 +348,8 @@ void HXml::init( char const* a_pcFileName )
 		l_oError.format( _( "cannot parse `%s'" ), a_pcFileName );
 		throw HXmlException( l_oError );
 		}
+	if ( xmlXIncludeProcess( doc.get() ) < 0 )
+		throw HXmlException( "processing XInclude failed" );
 	xmlNodePtr root = xmlDocGetRootElement( doc.get() );
 	if ( ! root )
 		M_THROW ( _ ( "empty doc" ), errno );
