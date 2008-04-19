@@ -48,7 +48,7 @@ HThread::HThread( void )
 	{
 	M_PROLOG
 	pthread_attr_t* attr = f_oAttributes.get<pthread_attr_t>();
-	M_ENSURE( ::pthread_attr_init( attr ) == 0 );
+	M_ENSURE( ::pthread_attr_init( attr ) == 0 ); /* FIXME resource leak possible */
 	M_ENSURE( ::pthread_attr_setdetachstate( attr, PTHREAD_CREATE_JOINABLE ) == 0 );
 	M_ENSURE( ::pthread_attr_setinheritsched( attr, PTHREAD_INHERIT_SCHED ) == 0 );
 	return;
@@ -190,7 +190,7 @@ HMutex::HMutex( TYPE::mutex_type_t const a_eType ) : f_eType ( a_eType ),
 	if ( f_eType == TYPE::D_DEFAULT )
 		f_eType = TYPE::D_NON_RECURSIVE;
 	pthread_mutexattr_t* attr = f_oAttributes.get<pthread_mutexattr_t>();
-	::pthread_mutexattr_init( attr );
+	::pthread_mutexattr_init( attr ); /* FIXME resource leak possible */
 	M_ENSURE( ::pthread_mutexattr_settype( attr,
 				f_eType & TYPE::D_RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
 	::pthread_mutex_init( f_oMutex.get<pthread_mutex_t>(), attr );
