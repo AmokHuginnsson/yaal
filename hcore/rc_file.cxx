@@ -102,9 +102,9 @@ HString make_path ( char const * const a_pcRcName,
 	return ( l_oRcPath );
 	}
 
-int rc_open ( char const * const a_pcRcName,
+int rc_open( char const* const a_pcRcName,
 		RC_PATHER::placement_t const a_ePlacament,
-		HFile & a_roFile )
+		HFile& a_roFile )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -124,27 +124,25 @@ int rc_open ( char const * const a_pcRcName,
 	M_EPILOG
 	}
 
-bool substitute_environment ( HString & a_roString )
+bool substitute_environment( HString& a_roString )
 	{
 	int l_iLength = 0;
-	char const * l_pcStart = NULL;
+	char const* l_pcStart = NULL;
 	HString l_oName;
 	HPattern l_oPattern;
+	bool envVarRefFound = false;
 	if ( a_roString )
 		{
-		M_ENSURE ( l_oPattern.parse_re ( "${[^{}]\\+}" ) == 0 );
-		if ( ( l_pcStart = l_oPattern.matches ( a_roString, & l_iLength ) ) )
+		M_ENSURE( l_oPattern.parse_re( "${[^{}]\\+}" ) == 0 );
+		if ( ( l_pcStart = l_oPattern.matches( a_roString, &l_iLength ) ) )
 			{
-			l_oName = a_roString.mid ( l_pcStart - static_cast < char const * const > ( a_roString ), l_iLength );
-			l_pcStart = ::getenv ( l_oName.mid ( 2, l_iLength - 3 ) );
-			if ( l_pcStart )
-				{
-				a_roString.replace ( l_oName, l_pcStart );
-				return ( true );
-				}
+			l_oName = a_roString.mid( l_pcStart - static_cast<char const* const>( a_roString ), l_iLength );
+			l_pcStart = ::getenv( l_oName.mid( 2, l_iLength - 3 ) );
+			a_roString.replace( l_oName, l_pcStart ? l_pcStart : "" );
+			envVarRefFound = true;
 			}
 		}
-	return ( false );
+	return ( envVarRefFound );
 	}
 
 namespace

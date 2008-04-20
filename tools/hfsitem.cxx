@@ -110,6 +110,12 @@ void HFSItem::set_path( HString const& a_oPath, int a_iNameLen )
 	M_EPILOG
 	}
 
+bool HFSItem::operator ! ( void ) const
+	{
+	struct stat dummy;
+	return ( ! ( ( ::stat( f_oPath, &dummy ) == 0 ) || ( ::lstat( f_oPath, &dummy ) == 0 ) ) );
+	}
+
 HFSItem::HIterator HFSItem::begin( void )
 	{
 	M_PROLOG

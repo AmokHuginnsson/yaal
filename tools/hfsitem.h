@@ -53,6 +53,7 @@ public:
 	yaal::hcore::HString get_name() const;
 	HIterator begin( void );
 	HIterator end( void );
+	bool operator ! ( void ) const;
 private:
 	void do_stat( void* ) const;
 	void set_path( yaal::hcore::HString const&, int );
