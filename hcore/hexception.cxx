@@ -126,16 +126,16 @@ void HException::set ( char const a_cChar, int const a_iInt,
 	return;
 	}
 
-void HException::set ( char const * const a_pcStr )
+void HException::set( char const* const a_pcStr )
 	{
 	if ( f_pcCharPtr )
-		xfree ( f_pcCharPtr );
+		xfree( f_pcCharPtr );
 	if ( a_pcStr )
-		f_pcCharPtr = xstrdup ( a_pcStr );
+		f_pcCharPtr = xstrdup( a_pcStr );
 	return;
 	}
 
-void HException::print_error ( bool const a_bFull ) const
+void HException::print_error( bool const a_bFull ) const
 	{
 	fprintf ( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", f_pcMessage, f_iCode );
 	if ( a_bFull )
@@ -145,26 +145,33 @@ void HException::print_error ( bool const a_bFull ) const
 	return;
 	}
 
-void HException::log ( char const * const a_pcFileName,
-											 char const * const a_pcFunctionName, int const a_iLine )
+void HException::log( char const* const a_pcFileName,
+											 char const* const a_pcFunctionName, int const a_iLine )
 	{
-	size_t l_uiLength = strlen ( a_pcFileName );
+	static int const D_DEBUG_LEVEL_HELPER = 5; /* FIXME */
+	size_t l_uiLength = ::strlen( a_pcFileName );
 	if ( f_iFrame
-			&& ! ( strcmp ( f_pcFileName, a_pcFileName )
-				|| strcmp ( f_pcFunctionName, a_pcFunctionName ) ) )
+			&& ! ( ::strcmp( f_pcFileName, a_pcFileName )
+				|| ::strcmp( f_pcFunctionName, a_pcFunctionName ) ) )
 		return;
-	hcore::log ( "Exception frame %2d: %16s : %4d : %s\n", f_iFrame ++,
-			a_pcFileName + ( l_uiLength > 16 ? l_uiLength - 16 : 0 ),
-			a_iLine, a_pcFunctionName );
+#define M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA \
+				"Exception frame %2d: %16s : %4d : %s\n", f_iFrame,\
+				a_pcFileName + ( l_uiLength > 16 ? l_uiLength - 16 : 0 ),\
+				a_iLine, a_pcFunctionName
+	if ( n_iDebugLevel > D_DEBUG_LEVEL_HELPER )
+		fprintf( static_cast<FILE*>( ERROR_STREAM ), M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA );
+	hcore::log( M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA );
+	++ f_iFrame;
+#undef M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA
 	return;
 	}
 
-char const * HException::what ( void ) const
+char const* HException::what( void ) const
 	{
 	return ( f_pcMessage );
 	}
 
-int HException::code ( void ) const
+int HException::code( void ) const
 	{
 	return ( f_iCode );
 	}
@@ -213,13 +220,13 @@ void HException::dump_call_stack( int const )
 	return;
 	}
 
-void HException::failed_assert ( char const * const a_pcFileName,
+void HException::failed_assert( char const * const a_pcFileName,
 		char const * const a_pcFunctionName, int const a_iLine,
 		char const * const a_pcMessage )
 	{
 	M_PROLOG
 	hcore::log << "Failed assertion: " << a_pcMessage << " -> " << a_pcFileName << "(" << a_iLine << "): " << a_pcFunctionName << endl;
-	fprintf ( static_cast<FILE*>( ERROR_STREAM ), "Failed assertion: `%s' at: %s: %4d: %s\n",
+	fprintf( static_cast<FILE*>( ERROR_STREAM ), "Failed assertion: `%s' at: %s: %4d: %s\n",
 			a_pcMessage, a_pcFileName, a_iLine, a_pcFunctionName );
 	if ( ! errno )
 		errno ++;

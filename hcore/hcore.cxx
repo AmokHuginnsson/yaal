@@ -161,7 +161,7 @@ int long to_int( char const* const a_pcValue )
 
 double long to_double( char const* const a_pcValue )
 	{
-	return ( strtold( a_pcValue, NULL ) );
+	return ( ::strtold( a_pcValue, NULL ) );
 	}
 
 extern "C"
@@ -169,12 +169,12 @@ void hcore_init( void ) __attribute__(( constructor ));
 void hcore_init( void )
 	{
 	char * l_pcEnv = NULL;
-	STATIC_ASSERT ( sizeof ( int ) >= 4 );
+	STATIC_ASSERT( sizeof ( int ) >= 4 );
 	errno = 0;
-	l_pcEnv = ::getenv ( "YAAL_DEBUG" );
+	l_pcEnv = ::getenv( "YAAL_DEBUG" );
 	if ( l_pcEnv )
-		n_iDebugLevel = strtol ( l_pcEnv, NULL, 10 );
-	rc_file::process_rc_file ( "yaal", "core",
+		n_iDebugLevel = to_int( l_pcEnv );
+	rc_file::process_rc_file( "yaal", "core",
 				n_psHCoreVariables, set_hcore_variables );
 	return;
 	}
