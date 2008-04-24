@@ -79,13 +79,16 @@ public:
 	void clear( void );
 	HNodeProxy get_element_by_id( char const* const );
 	HConstNodeProxy const get_element_by_id( char const* const ) const;
+	HNodeProxy get_element_by_path( char const* const );
+	HConstNodeProxy const get_element_by_path( char const* const ) const;
 private:
 	void do_save( void ) const;
 	void parse( xml_node_ptr_t, tree_t::node_t, bool );
 	void dump_node( void*, HConstNodeProxy const& ) const;
 	char const* convert( char const*, way_t = D_TO_INTERNAL ) const;
 	int get_node_set_by_path( char const* );
-	xml_element_t get_element_by_id( xml_element_t const&, char const* const ) const;
+	const_xml_element_t get_element_by_id( const_xml_element_t const&, char const* const ) const;
+	const_xml_element_t get_element_by_path( const_xml_element_t const&, yaal::hcore::HString const&, int const& ) const;
 private:
 	HXml( HXml const& );
 	HXml& operator = ( HXml const& );

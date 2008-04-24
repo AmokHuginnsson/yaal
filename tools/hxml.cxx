@@ -964,20 +964,25 @@ void HXml::apply_style( char const* const a_pcPath )
 	style_resource_t::swap( f_poXml->f_oStyle, style );
 	}
 
-HXml::xml_element_t HXml::get_element_by_id( xml_element_t const& node, char const* const id ) const
+HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& node, char const* const id ) const
 	{
-	xml_element_t result = NULL;
-	HXml::HNode::properties_t::iterator idIt = (*node)->f_oProperties.find( "id" );
+	const_xml_element_t result = NULL;
+	HXml::HNode::properties_t::const_iterator idIt = (*node)->f_oProperties.find( "id" );
 	if ( ( idIt != (*node)->f_oProperties.end() ) && ( idIt->second == id ) )
 		result = node;
-	for ( tree_t::iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
+	for ( tree_t::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
 		result = get_element_by_id( &*it, id );
 	return ( result );
 	}
 
 HXml::HNodeProxy HXml::get_element_by_id( char const* const id )
 	{
-	return ( HNodeProxy( get_element_by_id( f_oDOM.get_root(), id ) ) );
+	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_id( f_oDOM.get_root(), id ) ) ) );
+	}
+
+HXml::HConstNodeProxy const HXml::get_element_by_id( char const* const id ) const
+	{
+	return ( HConstNodeProxy( get_element_by_id( f_oDOM.get_root(), id ) ) );
 	}
 
 HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it )
@@ -985,6 +990,40 @@ HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it )
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	tree_t::iterator newIt = f_poNode->remove_node( it.f_oIterator );
 	return ( HXml::HIterator( this, newIt ) );
+	}
+
+HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& node,
+		HString const& path, int const& part ) const
+	{
+	const_xml_element_t result = NULL;
+	HString name = path.split( "/", part );
+	if ( ! name.is_empty() )
+		{
+		if ( (**node).f_oText == name )
+			{
+			for ( tree_t::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
+				if ( (**it).f_eType == HXml::HNode::TYPE::D_NODE )
+					result = get_element_by_path( &*it, path, part + 1 );
+			}
+		}
+	else
+		{
+		if ( node->get_level() )
+			result = node->get_parent();
+		else
+			result = node;
+		}
+	return ( result );
+	}
+
+HXml::HNodeProxy HXml::get_element_by_path( char const* const path )
+	{
+	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_path( f_oDOM.get_root(), path, 1 ) ) ) );
+	}
+
+HXml::HConstNodeProxy const HXml::get_element_by_path( char const* const path ) const
+	{
+	return ( HConstNodeProxy( get_element_by_path( f_oDOM.get_root(), path, 1 ) ) );
 	}
 
 }
