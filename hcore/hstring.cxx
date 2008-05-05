@@ -179,7 +179,7 @@ HString::HString ( int long unsigned const a_lLong ) : f_pcBuffer ( NULL ), f_iS
 	M_EPILOG
 	}
 
-HString::HString ( size_t const a_ulLong ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
+HString::HString ( int unsigned const a_ulLong ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	{
 	M_PROLOG
 	int l_iSize = 0;

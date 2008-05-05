@@ -49,9 +49,9 @@ public:
 	HString( char const* const );
 	HString( char const );
 	HString( int const );
+	HString( int unsigned const );
 	HString( int long const );
 	HString( int long unsigned const );
-	HString( size_t const );
 	HString( double const );
 	HString( double long const );
 	HString( void const* const );
