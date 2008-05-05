@@ -93,6 +93,11 @@ class HExceptionT : public HException
 public:
 	HExceptionT( char const* const a_pcReason, char* ptr = get_type_name( typeid( tType ).name() ) ) : HException( n_pcExceptionType, ptr, 0, a_pcReason, errno )
 		{ cleanup( ptr );	}
+	HExceptionT( char const* const a_pcFileName,
+			char const* const a_pcFunctionName, int const a_iLine,
+			char const* const a_pcReason, int const a_iCode )
+		: HException( a_pcFileName, a_pcFunctionName, a_iLine, a_pcReason, a_iCode )
+		{	}
 	};
 
 }
