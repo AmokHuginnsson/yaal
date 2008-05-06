@@ -40,7 +40,7 @@ namespace yaal
 namespace hdata
 {
 
-class HDataWindow : public hconsole::HWindow, public dbwrapper::HRecordSet
+class HDataWindow : public hconsole::HWindow
 	{
 public:
 	struct DOCUMENT

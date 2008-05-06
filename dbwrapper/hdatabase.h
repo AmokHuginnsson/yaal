@@ -27,6 +27,8 @@ Copyright:
 #ifndef __YAAL_DBWRAPPER_HDATABASE_H
 #define __YAAL_DBWRAPPER_HDATABASE_H
 
+#include "dbwrapper/hrecordset.h"
+
 namespace yaal
 {
 
@@ -36,23 +38,19 @@ namespace dbwrapper
 class HDataBase
 	{
 private:
-	void * f_pvCoreData;	/* very internal for this class used only in base cla */
-	void * f_pvLastResult; /* result of last query, helps prevent requering
-														with out retriving/freeing old one */
+	void* f_pvCoreData;	/* very internal for this class used only in base cla */
 public:
-	HDataBase ( void );
-	virtual ~HDataBase ( void );
-	int login ( char const *,		/* database */
-							char const *,		/* login */
-							char const * );	/* password */
-	int long query ( char const * );
-	void free_result ( void );
-	void * get_result ( void );
-	int long insert_id ( void );
-	char const * get_error ( void ) const;
+	HDataBase( void );
+	virtual ~HDataBase( void );
+	int connect( char const*,		/* database */
+							char const*,		/* login */
+							char const* );	/* password */
+	void disconnect( void );
+	HRecordSet query( char const* );
+	char const* get_error( void ) const;
 private:
-	HDataBase ( HDataBase const & );
-	HDataBase & operator = ( HDataBase const & );
+	HDataBase( HDataBase const& );
+	HDataBase& operator = ( HDataBase const& );
 	};
 
 }

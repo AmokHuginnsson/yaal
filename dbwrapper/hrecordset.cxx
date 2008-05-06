@@ -34,6 +34,8 @@ M_VCSID ( "$Id$" )
 
 using namespace yaal::hcore;
 
+#if 0
+
 namespace yaal
 {
 
@@ -506,4 +508,6 @@ void HRecordSet::sync ( int a_iField, HInfo & a_roInfo )
 }
 
 }
+
+#endif
 

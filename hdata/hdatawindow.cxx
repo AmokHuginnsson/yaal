@@ -44,9 +44,9 @@ namespace yaal
 namespace hdata
 {
 
-HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase * a_poDataBase,
-		OResource * a_psDataControlInfo )
-	: HWindow ( a_pcTitle ), HRecordSet ( a_poDataBase ),
+HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase* /* FIXME a_poDataBase */,
+		OResource* a_psDataControlInfo )
+	: HWindow ( a_pcTitle ),
 	f_bModified ( false ), f_eDocumentMode ( DOCUMENT::D_VIEW ), f_poMainControl ( NULL ),
 	f_psResourcesArray ( a_psDataControlInfo ), f_poSyncStore ( NULL ),
 	f_oViewModeControls(), f_oEditModeControls()
@@ -78,7 +78,7 @@ HDataWindow::~HDataWindow ( void )
 	M_EPILOG
 	}
 
-#define M_SETUP_STANDART	f_psResourcesArray [ l_iCtr ].f_iRow,\
+#define M_SETUP_STANDARD	f_psResourcesArray [ l_iCtr ].f_iRow,\
 						f_psResourcesArray [ l_iCtr ].f_iColumn,\
 						f_psResourcesArray [ l_iCtr ].f_iHeight,\
 						f_psResourcesArray [ l_iCtr ].f_iWidth,\
@@ -123,7 +123,7 @@ int HDataWindow::init ( void )
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psECR = static_cast<OEditControlResource*>( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				l_poDataControl = new HDataEditControl ( this,
-						M_SETUP_STANDART, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
+						M_SETUP_STANDARD, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
 						l_psECR->f_pcMask, l_psECR->f_bReplace,
 						l_psECR->f_bMultiLine, l_psECR->f_bReadOnly, 
 						l_psECR->f_bRightAligned, l_psECR->f_bPassword,
@@ -139,7 +139,7 @@ int HDataWindow::init ( void )
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psLCR = static_cast<OListControlResource*>( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				HDataListControl* l_poList = NULL;
-				l_poDataControl = l_poList = new HDataListControl ( this, this, M_SETUP_STANDART );
+				l_poDataControl = l_poList = new HDataListControl( /* FIXME this */ NULL, this, M_SETUP_STANDARD );
 				l_poList->set_flags( ( l_psLCR->f_bCheckable ? HListControl::FLAGS::D_CHECKABLE : HListControl::FLAGS::D_NONE )
 						| ( l_psLCR->f_bSortable ? HListControl::FLAGS::D_SORTABLE : HListControl::FLAGS::D_NONE )
 						| ( l_psLCR->f_bEditable ? HListControl::FLAGS::D_EDITABLE : HListControl::FLAGS::D_NONE )
@@ -148,7 +148,7 @@ int HDataWindow::init ( void )
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_TREE ):
-				l_poDataControl = new HDataTreeControl ( this, this, M_SETUP_STANDART );
+				l_poDataControl = new HDataTreeControl ( /* FIXME this */ NULL, this, M_SETUP_STANDARD );
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_COMBO ):
 			break;
@@ -170,6 +170,7 @@ int HDataWindow::init ( void )
 			{
 			case ( DATACONTROL_BITS::ROLE::D_MAIN ):
 				{
+				/* FIXME
 				f_oTable = f_psResourcesArray [ l_iCtr ].f_pcTable;
 				f_oColumns = f_psResourcesArray [ l_iCtr ].f_pcColumns;
 				f_oFilter = f_psResourcesArray [ l_iCtr ].f_pcFilter;
@@ -177,6 +178,7 @@ int HDataWindow::init ( void )
 				f_poMainControl = l_poDataControl;
 				f_oViewModeControls.add_tail ( & l_poDataControl );
 				l_poDataControl->enable ( true );
+				*/
 				}
 			break;
 			case ( DATACONTROL_BITS::ROLE::D_DATA ):
@@ -282,6 +284,7 @@ void HDataWindow::set_mode ( DOCUMENT::mode_t a_eMode )
 void HDataWindow::sync ( void )
 	{
 	M_PROLOG
+/* FIXME
 	int l_iCtr = 0, l_iCount = 0;
 	HRecordSet::sync();
 	if ( f_poSyncStore )
@@ -300,6 +303,7 @@ void HDataWindow::sync ( void )
 				f_oValues [ l_iCtr ] = f_oEditModeControls [ l_iCtr ]->get().get < HString const & >();
 		m_lId = f_poMainControl->get_current_id();
 		}
+*/
 	return;
 	M_EPILOG
 	}
@@ -313,6 +317,7 @@ void HDataWindow::set_sync_store ( HItem * a_poItem )
 int HDataWindow::handler_add_new ( int, void const* )
 	{
 	M_PROLOG
+/* FIXME
 	if ( f_eMode != D_OPEN )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
@@ -323,6 +328,7 @@ int HDataWindow::handler_add_new ( int, void const* )
 	if ( f_poMainControl )
 		f_poMainControl->add_new();
 	set_mode ( DOCUMENT::D_EDIT );
+*/
 	return ( 0 );
 	M_EPILOG
 	}
@@ -330,6 +336,7 @@ int HDataWindow::handler_add_new ( int, void const* )
 int HDataWindow::handler_edit ( int, void const* )
 	{
 	M_PROLOG
+/* FIXME
 	if ( f_eMode != D_NORMAL )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
@@ -344,6 +351,7 @@ int HDataWindow::handler_edit ( int, void const* )
 		}
 	set_mode ( DOCUMENT::D_EDIT );
 	edit();
+*/
 	return ( 0 );
 	M_EPILOG
 	}
@@ -351,6 +359,7 @@ int HDataWindow::handler_edit ( int, void const* )
 int HDataWindow::handler_delete ( int, void const* )
 	{
 	M_PROLOG
+/* FIXME
 	if ( f_eMode != D_NORMAL )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
@@ -367,6 +376,7 @@ int HDataWindow::handler_delete ( int, void const* )
 		m_lId = f_poMainControl->get_current_id();
 	remove();
 	f_poMainControl->load();
+*/
 	return ( 0 );
 	M_EPILOG
 	}
@@ -374,6 +384,7 @@ int HDataWindow::handler_delete ( int, void const* )
 int HDataWindow::handler_save ( int, void const* )
 	{
 	M_PROLOG
+/* FIXME
 	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED, _( "There is nothing to save." ) );
@@ -383,6 +394,7 @@ int HDataWindow::handler_save ( int, void const* )
 	f_bModified = false;
 	f_poMainControl->load();
 	set_mode ( DOCUMENT::D_VIEW );
+*/
 	return ( 0 );
 	M_EPILOG
 	}
@@ -390,6 +402,7 @@ int HDataWindow::handler_save ( int, void const* )
 int HDataWindow::handler_requery ( int, void const* )
 	{
 	M_PROLOG
+/* FIXME
 	if ( f_eMode != D_NORMAL )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
@@ -399,6 +412,7 @@ int HDataWindow::handler_requery ( int, void const* )
 	set_mode ( DOCUMENT::D_VIEW );
 	f_poMainControl->load();
 	refresh();
+*/
 	return ( 0 );
 	M_EPILOG
 	}
@@ -406,6 +420,7 @@ int HDataWindow::handler_requery ( int, void const* )
 int HDataWindow::handler_cancel ( int, void const* )
 	{
 	M_PROLOG
+/* FIXME
 	mode_t l_eMode = f_eMode;
 	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
 		return ( 0 );
@@ -416,6 +431,7 @@ int HDataWindow::handler_cancel ( int, void const* )
 	f_bModified = false;
 	f_oStatusBar->refresh();
 	f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED, _ ( "Dropping all changes." ) );
+*/
 	return ( 0 );
 	M_EPILOG
 	}

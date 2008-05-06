@@ -42,6 +42,12 @@ namespace hcore
 /* Due to extream vitality of this struct,
  * none of the methods are guarded. */
 
+struct REFERENCE_COUNTER_TYPE
+	{
+	static int const D_OWNER = 0;
+	static int const D_OBSERVER = 1;
+	};
+
 template<typename tType>
 struct HPointerScalar
 	{
@@ -139,29 +145,35 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 bool HPointer<tType, pointer_type_t, access_type_t>::release( void ) throw()
 	{
-	M_ASSERT ( (*f_piReferenceCounter) > 0 );
-	(*f_piReferenceCounter) --;
-	if ( ! (*f_piReferenceCounter) )
+	M_ASSERT ( f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OWNER ] > 0 );
+	-- f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OWNER ];
+	-- f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OBSERVER ];
+	if ( ! f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OWNER ] )
 		{
 		pointer_type_t<tType>::delete_pointee( f_ptShared );
-		delete f_piReferenceCounter;
 		f_ptShared = NULL;
+		}
+	if ( ! f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OBSERVER ] )
+		{
+		delete [] f_piReferenceCounter;
 		f_piReferenceCounter = NULL;
 		}
-	return ( ! f_piReferenceCounter );
+	return ( ! ( f_piReferenceCounter && f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OWNER ] ) );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-HPointer<tType, pointer_type_t, access_type_t>::HPointer ( tType* const a_ptPointer )
-	: f_piReferenceCounter( new int ( 1 ) ), f_ptShared ( a_ptPointer )
+HPointer<tType, pointer_type_t, access_type_t>::HPointer( tType* const a_ptPointer )
+	: f_piReferenceCounter( new int[ 2 ] ), f_ptShared( a_ptPointer )
 	{
+	f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OWNER ] = 1;
+	f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OBSERVER ] = 1;
 	return;
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-HPointer<tType, pointer_type_t, access_type_t>::~HPointer ( void )
+HPointer<tType, pointer_type_t, access_type_t>::~HPointer( void )
 	{
 	f_ptShared && release();
 	return;
@@ -193,7 +205,10 @@ HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, 
 	if ( ( &a_roPointer != this ) && ( f_ptShared != a_roPointer.f_ptShared ) )
 		{
 		if ( a_roPointer.f_ptShared )
-			(*a_roPointer.f_piReferenceCounter) ++;
+			{
+			++ a_roPointer.f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OWNER ];
+			++ a_roPointer.f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OBSERVER ];
+			}
 		if ( f_ptShared )
 			release();
 		f_ptShared = a_roPointer.f_ptShared;
@@ -211,7 +226,10 @@ HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, 
 	if ( alien != this ) 
 		{
 		if ( alien->f_ptShared )
-			(*alien->f_piReferenceCounter) ++;
+			{
+			++ alien->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OWNER ];
+			++ alien->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_OBSERVER ];
+			}
 		if ( f_ptShared )
 			{
 			M_ASSERT ( f_ptShared != reinterpret_cast<hier_t*>( alien->f_ptShared ) );
@@ -321,16 +339,16 @@ tType* HPointer<tType, pointer_type_t, access_type_t>::operator->( void )
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-tType const* HPointer<tType, pointer_type_t, access_type_t>::raw ( void ) const
+tType const* HPointer<tType, pointer_type_t, access_type_t>::raw( void ) const
 	{
-	return ( access_type_t<tType>::raw ( f_ptShared ) );
+	return ( access_type_t<tType>::raw( f_ptShared ) );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-tType* HPointer<tType, pointer_type_t, access_type_t>::raw ( void )
+tType* HPointer<tType, pointer_type_t, access_type_t>::raw( void )
 	{
-	return ( access_type_t<tType>::raw ( f_ptShared ) );
+	return ( access_type_t<tType>::raw( f_ptShared ) );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,

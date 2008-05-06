@@ -29,9 +29,7 @@ Copyright:
 
 #include "hcore/hlist.h"
 #include "hcore/hstring.h"
-#include "hcore/htime.h"
-#include "hcore/hinfo.h"
-#include "dbwrapper/hdatabase.h"
+#include "hcore/hpointer.h"
 
 namespace yaal
 {
@@ -39,72 +37,47 @@ namespace yaal
 namespace dbwrapper
 {
 
+class HDataBase;
+typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
+
 class HRecordSet
 	{
 public:
-	typedef enum
-		{
-		D_CLOSED,
-		D_OPEN,
-		D_NORMAL = D_OPEN,
-		D_ADDING,
-		D_EDITING
-		} mode_t;
+	typedef yaal::hcore::HList<yaal::hcore::HString> column_names_t;
+	typedef yaal::hcore::HList<yaal::hcore::HString> values_t;
+	class HIterator;
+	typedef HIterator iterator;
 private:
-	void * f_pvCoreData;	/* very internal for this class used only in base cla */
-	hcore::HString f_oSQL;
-	hcore::HString f_oVarTmpBuffer;
-protected:
-	int f_iIdFieldOffset;	/* number (count from 0) of id column in result record-set */
+	database_ptr_t f_oDataBase; /* data-base that this record-set belongs to */
+	void* f_pvCoreData;	/* very internal for this class used only in base cla */
+	yaal::hcore::HString f_oVarTmpBuffer;
 	int f_iFieldCount;		/* number of columns returned by last query */
-	mode_t f_eMode;					/* normal(opened), closed, adding, editing */
-	int f_iCursorPosition;/* cursor position in record-set */
-	int f_iSetQuantity;		/* number of records returned by last query */
-	hcore::HString f_oTable;			/* table name */
-	hcore::HString f_oColumns;		/* columns that should be returned by next query */
-	hcore::HString f_oFilter;		/* additional constant filter (WHERE clause) */
-	hcore::HString f_oSort;			/* additional constant sort (ORDER BY clause) */
-	hcore::HList< hcore::HString >	f_oColumnNames; /* column names returned by last query */
-	hcore::HList< hcore::HString > f_oValues;	/* values returned by last cursor movement */
-	HDataBase * f_poDataBase; /* data-base that this record-set belongs to */
+	int f_iSetSize;		/* number of records returned by last query */
+	column_names_t f_oColumnNames; /* column names returned by last query */
 public:
-	hcore::HString m_oFilter;		/* additional variable filter (WHERE clause) */
-	hcore::HString m_oSort;			/* additional variable sort (ORDER BY clause) */
-	int long m_lId;
-protected:
-	void build_sql ( void );
-	virtual void sync ( void );
-	void sync ( int, char & );
-	void sync ( int, short & );
-	void sync ( int, int & );
-	void sync ( int, int long & );
-	void sync ( int, double & );
-	void sync ( int, hcore::HString & );
-	void sync ( int, hcore::HTime & );
-	void sync ( int, hcore::HInfo & );
-public:
-	HRecordSet ( HDataBase * );
-	virtual ~HRecordSet ( void );
-	hcore::HString get ( int );
-	bool is_eof ( void ) const;
-	bool is_bof ( void ) const;
-	bool is_open ( void ) const;
-	void move_first ( void );
-	void move_last ( void );
-	void move_next ( void );
-	void move_previous ( void );
-	int long open ( char const * = NULL );
-	void close ( void );
-	void cancel ( void );
-	void free ( void );
-	int long requery ( char const * = NULL );
-	void add_new ( void );
-	void edit ( void );
-	int long update ( void );
-	void remove ( void );
+	HRecordSet( database_ptr_t, void* );
+	virtual ~HRecordSet( void );
 private:
-	HRecordSet ( HRecordSet const & );
-	HRecordSet & operator = ( HRecordSet const & );
+	HRecordSet( HRecordSet const& );
+	HRecordSet& operator = ( HRecordSet const& );
+	};
+
+class HRecordSet::HIterator
+	{
+	
+	int f_iCursorPosition; /* cursor position in record-set */
+	};
+
+class HSQLDescriptor
+	{
+private:
+	yaal::hcore::HString f_oTable;			/* table name */
+	yaal::hcore::HString f_oColumns;		/* columns that should be returned by next query */
+	yaal::hcore::HString f_oFilter;		/* additional constant filter (WHERE clause) */
+	yaal::hcore::HString f_oSort;			/* additional constant sort (ORDER BY clause) */
+public:
+	HSQLDescriptor( void );
+	yaal::hcore::HString build_sql( void );
 	};
 
 }

@@ -61,11 +61,12 @@ HDataListControl::~HDataListControl ( void )
 	M_EPILOG
 	}
 
-void HDataListControl::load ( int long /*a_iId*/ )
+void HDataListControl::load( int long /*a_iId*/ )
 	{
 	M_PROLOG
+/* FIXME
 	int l_iCount = 0, l_iCtr = 0, l_iSize = f_oDataControler->size();
-	HItem l_oItem ( f_oHeader.size() );
+	HItem l_oItem( f_oHeader.size() );
 	HDataWindow * l_poParent = dynamic_cast<HDataWindow*> ( f_poParent );
 	M_ASSERT ( l_poParent );
 	l_poParent->set_sync_store( & l_oItem );
@@ -93,6 +94,7 @@ void HDataListControl::load ( int long /*a_iId*/ )
 		f_oDataControler->remove_tail();
 	reset();
 	l_poParent->set_sync_store();
+*/
 	return;
 	M_EPILOG
 	}

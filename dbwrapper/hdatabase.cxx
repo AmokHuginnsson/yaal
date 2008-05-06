@@ -34,52 +34,48 @@ M_VCSID ( "$Id$" )
 
 using namespace yaal::hcore;
 
+#if 0
+
 namespace yaal
 {
 
 namespace dbwrapper
 {
 
-HDataBase::HDataBase ( void ) : f_pvCoreData ( NULL ), f_pvLastResult ( NULL )
+HDataBase::HDataBase( void ) : f_pvCoreData( NULL )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-HDataBase::~HDataBase ( void )
+HDataBase::~HDataBase( void )
 	{
 	M_PROLOG
-	if ( f_pvLastResult )
-		dbwrapper::db_unquery ( f_pvLastResult );
-	f_pvLastResult = NULL;
 	if ( f_pvCoreData )
-		dbwrapper::db_disconnect ( f_pvCoreData );
+		dbwrapper::db_disconnect( f_pvCoreData );
 	f_pvCoreData = NULL;
 	return;
 	M_EPILOG
 	}
 
-int HDataBase::login ( char const * a_pcDataBase, char const * a_pcLogin,
-		char const * a_pcPassword )
+int HDataBase::connect( char const* a_pcDataBase, char const* a_pcLogin,
+		char const* a_pcPassword )
 	{
 	M_PROLOG
 	f_pvCoreData = dbwrapper::db_connect( a_pcDataBase, a_pcLogin, a_pcPassword );
 	if ( ! f_pvCoreData )
-		M_THROW ( dbwrapper::db_error ( f_pvCoreData ),
-				dbwrapper::db_errno ( f_pvCoreData ) );
+		M_THROW( dbwrapper::db_error( f_pvCoreData ),
+				dbwrapper::db_errno( f_pvCoreData ) );
 	return ( 0 );
 	M_EPILOG
 	}
 
-int long HDataBase::query ( char const * a_pcQuery )
+int long HDataBase::query( char const* a_pcQuery )
 	{
 	M_PROLOG
-	if ( f_pvLastResult )
-		M_THROW ( "requery without freeing old one",
-				errno );
 	if ( ! f_pvCoreData )
-		M_THROW ( "not connected to database", errno );
+		M_THROW( "not connected to database", errno );
 	if ( HLog::f_lLogMask & LOG_TYPE::D_SQL )
 		log << "SQL: " << a_pcQuery << endl;
 	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
@@ -138,3 +134,4 @@ char const * HDataBase::get_error ( void ) const
 
 }
 
+#endif
