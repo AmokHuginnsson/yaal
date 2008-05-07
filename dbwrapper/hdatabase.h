@@ -27,6 +27,7 @@ Copyright:
 #ifndef __YAAL_DBWRAPPER_HDATABASE_H
 #define __YAAL_DBWRAPPER_HDATABASE_H
 
+#include "hcore/hpointer.h"
 #include "dbwrapper/hrecordset.h"
 
 namespace yaal
@@ -40,17 +41,20 @@ class HDataBase
 private:
 	void* f_pvCoreData;	/* very internal for this class used only in base cla */
 public:
-	HDataBase( void );
-	virtual ~HDataBase( void );
+	typedef yaal::hcore::HPointer<HDataBase> ptr_t;
 	int connect( char const*,		/* database */
 							char const*,		/* login */
 							char const* );	/* password */
 	void disconnect( void );
 	HRecordSet query( char const* );
 	char const* get_error( void ) const;
+	static ptr_t get_connector( void );
 private:
+	HDataBase( void );
+	virtual ~HDataBase( void );
 	HDataBase( HDataBase const& );
 	HDataBase& operator = ( HDataBase const& );
+	friend class yaal::hcore::HPointer<HDataBase>;
 	};
 
 }

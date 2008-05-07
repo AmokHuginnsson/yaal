@@ -60,7 +60,7 @@ public:
 			};
 		};
 	static int const D_DEFAULT_ATTRS = -1;
-	typedef yaal::hcore::HPointer<HControl,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HControl> ptr_t;
 protected:
 	bool			f_bEnabled;						/*!< Tells if control is enabled, focus can go only to enabled control. */
 	bool			f_bFocused;						/*!< Tells if control has focus. */

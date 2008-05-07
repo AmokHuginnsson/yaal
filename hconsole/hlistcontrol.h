@@ -67,7 +67,7 @@ bool compare_cells( tType const&, tType const&, OSortHelper& );
 class HAbstractCell
 	{
 public:
-	typedef yaal::hcore::HPointer<HAbstractCell,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HAbstractCell> ptr_t;
 	virtual ~HAbstractCell( void );
 	virtual yaal::hcore::HString const get_long( void ) = 0;
 	virtual yaal::hcore::HString const get_double( void ) = 0;
@@ -122,7 +122,7 @@ public:
 	class HModelIteratorWrapper;
 private:
 	class HAbstractModelIterator;
-	typedef yaal::hcore::HPointer<HAbstractModelIterator,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> iterator_ptr_t;
+	typedef yaal::hcore::HPointer<HAbstractModelIterator> iterator_ptr_t;
 	class HAbstractModelIterator
 		{
 		HAbstractModelIterator( HAbstractModelIterator const& );
@@ -142,7 +142,7 @@ private:
 protected:
 	HListControl* f_poControl;
 public:
-	typedef yaal::hcore::HPointer<HAbstractControler,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HAbstractControler> ptr_t;
 	class HModelIteratorWrapper
 		{
 		iterator_ptr_t f_oIteratorPtr;
@@ -220,9 +220,9 @@ private:
 		~HModelIterator( void );
 		};
 public:
-	typedef yaal::hcore::HPointer<HModelIterator,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> iterator_ptr_t;
-	typedef yaal::hcore::HPointer<HListControler<tType>,yaal::hcore::HPointerScalar,yaal::hcore::HPointerRelaxed> ptr_t;
-	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
+	typedef yaal::hcore::HPointer<HModelIterator> iterator_ptr_t;
+	typedef yaal::hcore::HPointer<HListControler<tType> > ptr_t;
+	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 private:
 	model_ptr_t f_oList;
 public:

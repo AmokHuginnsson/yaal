@@ -42,7 +42,7 @@ class HTUIProcess : public HHandler, public yaal::tools::HProcess
 	{
 public:
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
-	typedef yaal::hcore::HPointer<model_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> model_ptr_t;
+	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 protected:
 	HWindow::ptr_t f_oMainWindow; /* self explanary */
 	model_t::cyclic_iterator f_oForegroundWindow; /* self explanary */

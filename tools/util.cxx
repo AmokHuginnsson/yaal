@@ -487,8 +487,8 @@ int levenshtein_damerau ( char const * const a_pcOne, char const * const a_pcTwo
 		return ( l_iLengthTwo );
 	l_iLengthOne ++;
 	l_iLengthTwo ++;
-	HPointer<int*, HPointerArray, HPointerRelaxed> l_oDistanceMatrixHolder( new int*[ l_iLengthOne ] );
-	HPointer<int, HPointerArray, HPointerRelaxed> l_oDistanceMatrix( new int[ l_iLengthOne * l_iLengthTwo ] );
+	HPointer<int*, HPointerArray> l_oDistanceMatrixHolder( new int*[ l_iLengthOne ] );
+	HPointer<int, HPointerArray> l_oDistanceMatrix( new int[ l_iLengthOne * l_iLengthTwo ] );
 	l_ppiDistanceMatrix = l_oDistanceMatrixHolder.raw();
 	for ( l_iIndexOne = 0; l_iIndexOne < l_iLengthOne; ++ l_iIndexOne )
 		l_ppiDistanceMatrix[ l_iIndexOne ] = l_oDistanceMatrix.raw() + l_iIndexOne * l_iLengthTwo;

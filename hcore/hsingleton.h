@@ -54,10 +54,10 @@ public:
 class HLifeTimeTracker
 	{
 public:
-	typedef yaal::hcore::HPointer<HAbstractDestructor, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> destructor_ptr_t;
+	typedef yaal::hcore::HPointer<HAbstractDestructor> destructor_ptr_t;
 private:
 	typedef yaal::hcore::HList<destructor_ptr_t> destructor_list_t;
-	typedef yaal::hcore::HPointer<destructor_list_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> destructor_list_ptr_t;
+	typedef yaal::hcore::HPointer<destructor_list_t> destructor_list_ptr_t;
 	typedef yaal::hcore::HMultiMap<int, destructor_ptr_t> map_stack_t;
 	static yaal::hcore::HMutex f_oMutex;
 	static map_stack_t f_oDestructors;

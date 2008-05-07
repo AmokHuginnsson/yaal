@@ -55,7 +55,7 @@ public:
 		{
 		HSignalHandlerInterface::HANDLER_t HANDLER;
 	public:
-		typedef yaal::hcore::HPointer<HHandlerGeneric, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+		typedef yaal::hcore::HPointer<HHandlerGeneric> ptr_t;
 		HHandlerGeneric( HSignalHandlerInterface::HANDLER_t handle ) : HANDLER( handle ) { }
 		virtual ~HHandlerGeneric( void ) { }
 		virtual HSignalHandlerInterface* get_base() = 0;
@@ -84,7 +84,7 @@ public:
 private:
 	typedef yaal::hcore::HThreadT<HSignalService> signal_service_t;
 	typedef yaal::hcore::HList<HHandlerGeneric::ptr_t> handler_list_t;
-	typedef yaal::hcore::HPointer<handler_list_t, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> handler_list_ptr_t;
+	typedef yaal::hcore::HPointer<handler_list_t> handler_list_ptr_t;
 	typedef yaal::hcore::HMultiMap<int, HHandlerGeneric::ptr_t> handlers_t;
 	static int f_iExitStatus;
 	bool f_bLoop;

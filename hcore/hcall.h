@@ -43,7 +43,7 @@ class HCallInterface
 	{
 public:
 	class HPseudoType {};
-	typedef yaal::hcore::HPointer<HCallInterface, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HCallInterface> ptr_t;
 	virtual ~HCallInterface( void ) {}
 	virtual void invoke( void ) = 0;
 	virtual void invoke( void ) const = 0;

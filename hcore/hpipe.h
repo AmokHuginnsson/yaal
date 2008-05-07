@@ -40,7 +40,7 @@ class HPipe : public yaal::hcore::HStreamInterface
 	{
 	int f_piPipe[ 2 ];
 public:
-	typedef yaal::hcore::HPointer<HPipe, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HPipe> ptr_t;
 	HPipe( void );
 	~HPipe( void );
 	int get_reader_fd( void ) const;

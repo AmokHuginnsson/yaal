@@ -85,7 +85,7 @@ private:
 	bool f_bPendingOperation;
 	void* f_pvSSL;
 public:
-	typedef yaal::hcore::HPointer<HOpenSSL, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HOpenSSL> ptr_t;
 	HOpenSSL( int, TYPE::ssl_context_type_t );
 	~HOpenSSL( void );
 	int read( void* const, int const );

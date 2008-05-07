@@ -42,7 +42,7 @@ class HSocket : public HRawFile
 	{
 public:
 	typedef HSocket self_t;
-	typedef HPointer<HSocket, HPointerScalar, HPointerRelaxed> ptr_t;
+	typedef HPointer<HSocket> ptr_t;
 	static bool f_bResolveHostnames;
 	struct TYPE
 		{

@@ -39,7 +39,7 @@ class HChunk
 	{
 	void* f_pvData;
 public:
-	typedef yaal::hcore::HPointer<HChunk, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HChunk> ptr_t;
 	HChunk( void* );
 	~HChunk( void );
 	template<typename tType>

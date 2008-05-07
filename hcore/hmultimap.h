@@ -37,11 +37,11 @@ namespace yaal
 namespace hcore
 {
 
-template<typename key_t, typename value_t, typename helper_t = map_helper<key_t const, HPointer<HList<value_t>, HPointerScalar, HPointerRelaxed> > >
+template<typename key_t, typename value_t, typename helper_t = map_helper<key_t const, HPointer<HList<value_t> > > >
 class HMultiMap
 	{
 	typedef HList<value_t> value_list_t;
-	typedef HPointer<value_list_t, HPointerScalar, HPointerRelaxed> value_list_ptr_t;
+	typedef HPointer<value_list_t> value_list_ptr_t;
 	typedef HMap<key_t, value_list_ptr_t, helper_t> multimap_engine_t;
 	typedef HPair<key_t const&, value_t&> map_elem_t;
 public:

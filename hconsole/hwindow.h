@@ -44,7 +44,7 @@ class HControlList;
 class HWindow : public HHandler
 	{
 public:
-	typedef yaal::hcore::HPointer<HWindow, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HWindow> ptr_t;
 protected:
 	bool								f_bInitialised;		/* was window properly initialised? */
 	bool								f_bNeedRepaint;		/*!< \brief Does this window need to be repainted? */

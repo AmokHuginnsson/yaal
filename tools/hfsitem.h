@@ -42,7 +42,7 @@ class HFSItem
 	int f_iNameLen;
 	yaal::hcore::HString f_oPath;
 public:
-	typedef yaal::hcore::HPointer<HFSItem, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HFSItem> ptr_t;
 	class HIterator;
 	explicit HFSItem( yaal::hcore::HString const& );
 	~HFSItem( void );

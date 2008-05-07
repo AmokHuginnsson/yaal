@@ -40,7 +40,7 @@ namespace hconsole
 class HMenuControl : public HTreeControl
 	{
 public:
-	typedef yaal::hcore::HPointer<HMenuControl, yaal::hcore::HPointerScalar, yaal::hcore::HPointerRelaxed> ptr_t;
+	typedef yaal::hcore::HPointer<HMenuControl> ptr_t;
 protected:
 	HTUIProcess* f_poProcess;
 public:
