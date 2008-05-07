@@ -34,15 +34,13 @@ M_VCSID ( "$Id$" )
 
 using namespace yaal::hcore;
 
-#if 0
-
 namespace yaal
 {
 
 namespace dbwrapper
 {
 
-HDataBase::HDataBase( void ) : f_pvCoreData( NULL )
+HDataBase::HDataBase( void ) : HPointerFromThisInterface<HDataBase>(), f_pvCoreData( NULL )
 	{
 	M_PROLOG
 	return;
@@ -71,67 +69,33 @@ int HDataBase::connect( char const* a_pcDataBase, char const* a_pcLogin,
 	M_EPILOG
 	}
 
-int long HDataBase::query( char const* a_pcQuery )
+HRecordSet HDataBase::query( char const* a_pcQuery )
 	{
 	M_PROLOG
 	if ( ! f_pvCoreData )
 		M_THROW( "not connected to database", errno );
 	if ( HLog::f_lLogMask & LOG_TYPE::D_SQL )
 		log << "SQL: " << a_pcQuery << endl;
-	f_pvLastResult = dbwrapper::db_query ( f_pvCoreData, a_pcQuery );
-	if ( ! f_pvLastResult )
-		{
-		log ( LOG_TYPE::D_ERROR ) << "SQL error: " << dbwrapper::db_error ( f_pvCoreData ) << endl;
-		return ( - 1 );
-		}
-	return ( dbwrapper::dbrs_records_count ( f_pvCoreData, f_pvLastResult ) );
-	M_EPILOG
-	}
-
-void HDataBase::free_result ( void )
-	{
-	M_PROLOG
-	if ( ! f_pvCoreData )
-		M_THROW ( "not connected to database", errno );
-	if ( f_pvLastResult )
-		dbwrapper::db_unquery ( f_pvLastResult );
-	f_pvLastResult = NULL;
-	return;
-	M_EPILOG
-	}
-
-void * HDataBase::get_result ( void )
-	{
-	M_PROLOG
-	void * l_pvTmpResult = NULL;
-	if ( ! f_pvCoreData )
-		M_THROW ( "not connected to database", errno );
-	if ( ! f_pvLastResult )
-		M_THROW ( "no result", errno );
-	l_pvTmpResult = f_pvLastResult;
-	f_pvLastResult = NULL;
-	return ( l_pvTmpResult );
-	M_EPILOG
-	}
-
-int long HDataBase::insert_id ( void )
-	{
-	M_PROLOG
-	if ( ! f_pvCoreData )
-		M_THROW ( "not connected to database", errno );
-	return ( dbwrapper::dbrs_id ( f_pvCoreData, f_pvLastResult ) );
+	void* l_pvResult = dbwrapper::db_query( f_pvCoreData, a_pcQuery );
+	if ( ! l_pvResult )
+		throw HSQLException( HString( "SQL error: " ) + dbwrapper::db_error ( f_pvCoreData ) );
+	return ( HRecordSet( get_pointer(), l_pvResult ) );
 	M_EPILOG
 	}
 
 char const * HDataBase::get_error ( void ) const
 	{
 	M_PROLOG
-	return ( dbwrapper::db_error ( f_pvCoreData ) );
+	return ( dbwrapper::db_error( f_pvCoreData ) );
 	M_EPILOG
+	}
+
+HDataBase::ptr_t HDataBase::get_connector( void )
+	{
+	return ( ptr_t( new HDataBase() ) );
 	}
 
 }
 
 }
 
-#endif

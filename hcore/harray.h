@@ -61,7 +61,7 @@ protected:
 	int f_iSize;
 	tType* f_ptArray;
 public:
-	HArray( int );
+	HArray( int const& = 0 );
 	HArray( int const&, tType const& );
 	virtual ~HArray( void );
 	HArray( HArray const& );
@@ -69,6 +69,8 @@ public:
 	tType& operator [] ( int );
 	tType const& operator [] ( int ) const;
 	int get_size( void ) const;
+	int size( void ) const;
+	void clear( void );
 	bool operator ! ( void ) const;
 	static void swap( HArray&, HArray& );
 private:
@@ -76,7 +78,7 @@ private:
 	};
 
 template<typename tType>
-HArray<tType>::HArray( int a_iSize ) : f_iSize( 0 ), f_ptArray( NULL )
+HArray<tType>::HArray( int const& a_iSize ) : f_iSize( 0 ), f_ptArray( NULL )
 	{
 	M_PROLOG
 	if ( a_iSize < 0 )
@@ -115,6 +117,15 @@ HArray<tType>::HArray( int const& a_iSize, tType const& a_tFillWith )
 
 template<typename tType>
 HArray<tType>::~HArray( void )
+	{
+	M_PROLOG
+	clear();
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+void HArray<tType>::clear( void )
 	{
 	M_PROLOG
 	if ( f_ptArray )

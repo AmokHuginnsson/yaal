@@ -53,11 +53,15 @@ struct HPointerStrict
 	{
 	static tType* raw( tType* );
 	static tType& object_at( tType*, int );
+	static void delete_pointee( tType* );
+	static void delete_pointee_array( tType* );
 	};
 
 template<typename tType>
 struct HPointerWeak
 	{
+	inline static void delete_pointee( tType* ){}
+	inline static void delete_pointee_array( tType* ){}
 	};
 
 template<typename tType, typename access_type_t>
@@ -85,8 +89,8 @@ public:
 	explicit HPointer( tType* const );
 	virtual ~HPointer( void );
 	HPointer( HPointer const& );
-	template<typename hier_t>
-	HPointer( HPointer<hier_t, pointer_type_t, access_type_t> const& );
+	template<typename hier_t, template<typename> class alien_access_t>
+	HPointer( HPointer<hier_t, pointer_type_t, alien_access_t> const& );
 	HPointer& operator = ( HPointer const& );
 	template<typename hier_t>
 	HPointer& operator = ( HPointer<hier_t,pointer_type_t,access_type_t> const& );
@@ -119,20 +123,23 @@ protected:
 	typedef HPointer<tType, HPointerScalar, HPointerWeak> weak_t;
 	weak_t f_oSelfObserver;
 public:
+	HPointerFromThisInterface( void );
+	virtual ~HPointerFromThisInterface( void ){}
 	ptr_t get_pointer( void );
+	ptr_t const get_pointer( void ) const;
 protected:
 	void initialize_observer( ptr_t const& );
 	friend class HPointer<tType, HPointerScalar, HPointerStrict>;
 	};
 
-template<typename tType, typename access_type_t>
-void HPointerScalar<tType, access_type_t>::delete_pointee( tType* a_ptPointer )
+template<typename tType>
+void HPointerStrict<tType>::delete_pointee( tType* a_ptPointer )
 	{
 	delete a_ptPointer;
 	}
 
-template<typename tType, typename access_type_t>
-void HPointerArray<tType, access_type_t>::delete_pointee( tType* a_ptPointer )
+template<typename tType>
+void HPointerStrict<tType>::delete_pointee_array( tType* a_ptPointer )
 	{
 	delete [] a_ptPointer;
 	}
@@ -147,6 +154,18 @@ template<typename tType>
 tType* HPointerStrict<tType>::raw( tType* a_ptPointer )
 	{
 	return ( a_ptPointer );
+	}
+
+template<typename tType, typename access_type_t>
+void HPointerScalar<tType, access_type_t>::delete_pointee( tType* a_ptPointer )
+	{
+	access_type_t::delete_pointee( a_ptPointer );
+	}
+
+template<typename tType, typename access_type_t>
+void HPointerArray<tType, access_type_t>::delete_pointee( tType* a_ptPointer )
+	{
+	access_type_t::delete_pointee_array( a_ptPointer );
 	}
 
 template<typename tType, typename access_type_t>
@@ -218,8 +237,8 @@ HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<tType, pointe
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-template<typename hier_t>
-HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<hier_t, pointer_type_t, access_type_t> const& a_roPointer )
+template<typename hier_t, template<typename>class alien_access_t>
+HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<hier_t, pointer_type_t, alien_access_t> const& a_roPointer )
 	: f_piReferenceCounter( NULL ), f_ptShared( NULL )
 	{
 	operator = ( a_roPointer );
@@ -387,9 +406,27 @@ bool HPointer<tType, pointer_type_t, access_type_t>::operator ! ( void ) const
 	}
 
 template<typename tType>
+HPointerFromThisInterface<tType>::HPointerFromThisInterface( void ) : f_oSelfObserver()
+	{
+	return;
+	}
+
+template<typename tType>
 void HPointerFromThisInterface<tType>::initialize_observer( ptr_t const& a_oFirstOwner )
 	{
 	f_oSelfObserver = a_oFirstOwner;
+	}
+
+template<typename tType>
+typename HPointerFromThisInterface<tType>::ptr_t HPointerFromThisInterface<tType>::get_pointer( void )
+	{
+	return ( f_oSelfObserver );
+	}
+
+template<typename tType>
+typename HPointerFromThisInterface<tType>::ptr_t const HPointerFromThisInterface<tType>::get_pointer( void ) const
+	{
+	return ( f_oSelfObserver );
 	}
 
 }

@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_DBWRAPPER_HRECORDSET_H
 
 #include "hcore/hlist.h"
+#include "hcore/harray.h"
 #include "hcore/hstring.h"
 #include "hcore/hpointer.h"
 
@@ -43,42 +44,80 @@ typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
 class HRecordSet
 	{
 public:
-	typedef yaal::hcore::HList<yaal::hcore::HString> column_names_t;
-	typedef yaal::hcore::HList<yaal::hcore::HString> values_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> column_names_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
 	class HIterator;
 	typedef HIterator iterator;
 private:
 	database_ptr_t f_oDataBase; /* data-base that this record-set belongs to */
-	void* f_pvCoreData;	/* very internal for this class used only in base cla */
-	yaal::hcore::HString f_oVarTmpBuffer;
+	void* f_pvResult;	/* very internal for this class used only in base cla */
 	int f_iFieldCount;		/* number of columns returned by last query */
 	int f_iSetSize;		/* number of records returned by last query */
 	column_names_t f_oColumnNames; /* column names returned by last query */
 public:
 	HRecordSet( database_ptr_t, void* );
 	virtual ~HRecordSet( void );
-private:
 	HRecordSet( HRecordSet const& );
 	HRecordSet& operator = ( HRecordSet const& );
+	void clear( void );
+	iterator begin( void );
+	iterator end( void );
+	iterator rbegin( void );
+	iterator rend( void );
+	bool is_empty( void ) const;
 	};
 
 class HRecordSet::HIterator
 	{
-	
 	int f_iCursorPosition; /* cursor position in record-set */
+	HRecordSet* f_poOwner;
+public:
+	HIterator( HIterator const& );
+	HIterator& operator = ( HIterator const& );
+	HIterator& operator ++ ( void );
+	HIterator& operator -- ( void );
+	HIterator operator ++ ( int );
+	HIterator operator -- ( int );
+	bool operator == ( HIterator const& ) const;
+	bool operator != ( HIterator const& ) const;
+	yaal::hcore::HString const& operator[] ( int const& );
+	yaal::hcore::HString const& operator[] ( char const * const );
+private:
+	HIterator( HRecordSet*, int const& );
+	friend class HRecordSet;
 	};
 
 class HSQLDescriptor
 	{
+public:
+	typedef HSQLDescriptor self_t;
+	struct MODE
+		{
+		typedef enum
+			{
+			D_SELECT,
+			D_UPDATE,
+			D_INSERT,
+			D_DELETE
+			} mode_t;
+		};
 private:
+	yaal::hcore::HString f_oVarTmpBuffer;
+	yaal::hcore::HString f_oSQL;
 	yaal::hcore::HString f_oTable;			/* table name */
 	yaal::hcore::HString f_oColumns;		/* columns that should be returned by next query */
 	yaal::hcore::HString f_oFilter;		/* additional constant filter (WHERE clause) */
 	yaal::hcore::HString f_oSort;			/* additional constant sort (ORDER BY clause) */
+	typedef yaal::hcore::HArray<yaal::hcore::HString> fields_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
+	fields_t f_oFields;
+	values_t f_oValues;
 public:
 	HSQLDescriptor( void );
-	yaal::hcore::HString build_sql( void );
+	yaal::hcore::HString const& build_sql( MODE::mode_t const& );
 	};
+
+typedef yaal::hcore::HExceptionT<HRecordSet> HRecordSetException;
 
 }
 

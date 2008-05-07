@@ -36,7 +36,7 @@ namespace yaal
 namespace dbwrapper
 {
 
-class HDataBase
+class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase>
 	{
 private:
 	void* f_pvCoreData;	/* very internal for this class used only in base cla */
@@ -54,8 +54,11 @@ private:
 	virtual ~HDataBase( void );
 	HDataBase( HDataBase const& );
 	HDataBase& operator = ( HDataBase const& );
-	friend class yaal::hcore::HPointer<HDataBase>;
+	friend class yaal::hcore::HPointerStrict<HDataBase>;
 	};
+
+typedef yaal::hcore::HExceptionT<HDataBase> HDataBaseException;
+typedef HDataBaseException HSQLException;
 
 }
 
