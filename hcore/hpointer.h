@@ -66,6 +66,8 @@ struct HPointerStrict
 	static void initialize_from_this( HPointerFromThisInterface<tType>&, ptr_t const& );
 	template<typename ptr_t>
 	static void initialize_from_this( tType&, ptr_t const& );
+	static void inc_reference_counter( int* );
+	static void dec_reference_counter( int* );
 	};
 
 template<typename tType>
@@ -73,6 +75,8 @@ struct HPointerWeak
 	{
 	inline static void delete_pointee( tType* ){}
 	inline static void delete_pointee_array( tType* ){}
+	static void inc_reference_counter( int* );
+	static void dec_reference_counter( int* );
 	};
 
 template<typename tType, typename access_type_t>
@@ -93,8 +97,18 @@ template<typename tType, template<typename, typename>class pointer_type_t = HPoi
 				 template<typename>class access_type_t = HPointerStrict>
 class HPointer
 	{
-	int* f_piReferenceCounter;
-	tType* f_ptShared;
+	class HShared
+		{
+		int f_piReferenceCounter[ 2 ];
+		tType* f_ptObject;
+		HShared( tType* a_ptPointer ) : f_piReferenceCounter(), f_ptObject( a_ptPointer )
+			{
+			f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] = 0;
+			f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] = 0;
+			}
+		friend class HPointer;
+		};
+	HShared* f_poShared;
 public:
 	HPointer( void );
 	explicit HPointer( tType* const );
@@ -105,18 +119,17 @@ public:
 	HPointer& operator = ( HPointer const& );
 	template<typename hier_t, template<typename> class alien_access_t>
 	HPointer& operator = ( HPointer<hier_t, pointer_type_t, alien_access_t> const& );
-	static HPointer& assign( HPointer<tType, pointer_type_t, HPointerStrict>&, HPointer const& );
-	static HPointer& assign( HPointer<tType, pointer_type_t, HPointerWeak>&, HPointer const& );
+	HPointer& assign( HPointer const& );
 	tType const& operator* ( void ) const;
 	tType& operator* ( void );
 	tType const& operator[] ( int ) const;
 	tType& operator[] ( int );
-	template<typename hier_t>
-	bool operator == ( HPointer<hier_t, pointer_type_t, access_type_t> const& ) const;
+	template<typename hier_t, template<typename>class alien_access_t>
+	bool operator == ( HPointer<hier_t, pointer_type_t, alien_access_t> const& ) const;
 	template<typename hier_t>
 	bool operator == ( hier_t const* const ) const;
-	template<typename hier_t>
-	bool operator != ( HPointer<hier_t, pointer_type_t, access_type_t> const& ) const;
+	template<typename hier_t, template<typename>class alien_access_t>
+	bool operator != ( HPointer<hier_t, pointer_type_t, alien_access_t> const& ) const;
 	template<typename hier_t>
 	bool operator != ( hier_t const* const ) const;
 	tType const* operator->( void ) const;
@@ -169,6 +182,35 @@ tType* HPointerStrict<tType>::raw( tType* a_ptPointer )
 	return ( a_ptPointer );
 	}
 
+template<typename tType>
+void HPointerStrict<tType>::inc_reference_counter( int* a_piReferenceCounter )
+	{
+	++ a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ];
+	++ a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
+	}
+
+template<typename tType>
+void HPointerWeak<tType>::inc_reference_counter( int* a_piReferenceCounter )
+	{
+	++ a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
+	}
+
+template<typename tType>
+void HPointerStrict<tType>::dec_reference_counter( int* a_piReferenceCounter )
+	{
+	M_ASSERT( a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 );
+	M_ASSERT( a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] > 0 );
+	-- a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ];
+	-- a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
+	}
+
+template<typename tType>
+void HPointerWeak<tType>::dec_reference_counter( int* a_piReferenceCounter )
+	{
+	M_ASSERT( a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] > 0 );
+	-- a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
+	}
+
 template<typename tType, typename access_type_t>
 void HPointerScalar<tType, access_type_t>::delete_pointee( tType* a_ptPointer )
 	{
@@ -196,7 +238,7 @@ tType* HPointerScalar<tType, access_type_t>::raw( tType* a_ptPointer )
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>::HPointer( void )
-	: f_piReferenceCounter( NULL ), f_ptShared( NULL )
+	: f_poShared( NULL )
 	{
 	return;
 	}
@@ -205,29 +247,28 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 bool HPointer<tType, pointer_type_t, access_type_t>::release( void ) throw()
 	{
-	M_ASSERT ( f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 );
-	-- f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ];
-	-- f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
-	if ( ! f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] )
+	M_ASSERT( f_poShared );
+	access_type_t<tType>::dec_reference_counter( f_poShared->f_piReferenceCounter );
+	if ( ! f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] )
 		{
-		pointer_type_t<tType, access_type_t<tType> >::delete_pointee( f_ptShared );
-		f_ptShared = NULL;
+		pointer_type_t<tType, access_type_t<tType> >::delete_pointee( f_poShared->f_ptObject );
+		f_poShared->f_ptObject = NULL;
 		}
-	if ( ! f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] )
+	if ( ! f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] )
 		{
-		delete [] f_piReferenceCounter;
-		f_piReferenceCounter = NULL;
+		delete f_poShared;
+		f_poShared = NULL;
 		}
-	return ( ! ( f_piReferenceCounter && f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] ) );
+	return ( ! ( f_poShared->f_piReferenceCounter && f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>::HPointer( tType* const a_ptPointer )
-	: f_piReferenceCounter( new int[ 2 ] ), f_ptShared( a_ptPointer )
+	: f_poShared( new HShared( a_ptPointer ) )
 	{
-	f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] = 1;
-	f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] = 1;
+	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] = 1;
+	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] = 1;
 	access_type_t<tType>::initialize_from_this( *a_ptPointer, *this );
 	return;
 	}
@@ -236,14 +277,14 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>::~HPointer( void )
 	{
-	f_ptShared && release();
+	f_poShared->f_ptObject && release();
 	return;
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<tType, pointer_type_t, access_type_t> const& a_roPointer )
-	: f_piReferenceCounter( NULL ), f_ptShared( NULL )
+	: f_poShared( new HShared( NULL ) )
 	{
 	operator = ( a_roPointer );
 	return;
@@ -253,7 +294,7 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 template<typename hier_t, template<typename>class alien_access_t>
 HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<hier_t, pointer_type_t, alien_access_t> const& a_roPointer )
-	: f_piReferenceCounter( NULL ), f_ptShared( NULL )
+	: f_poShared( new HShared( NULL ) )
 	{
 	operator = ( a_roPointer );
 	return;
@@ -263,7 +304,7 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<tType, pointer_type_t, access_type_t> const& a_roPointer )
 	{
-	return ( assign( *this, a_roPointer ) );
+	return ( assign( a_roPointer ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
@@ -271,42 +312,38 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 template<typename hier_t, template<typename>class alien_access_t>
 HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<hier_t, pointer_type_t, alien_access_t> const& a_roPointer )
 	{
-	return ( assign( *this, *reinterpret_cast<HPointer const*>( &a_roPointer ) ) );
+	return ( assign( *reinterpret_cast<HPointer const*>( &a_roPointer ) ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::assign( HPointer<tType, pointer_type_t, HPointerStrict>& to, HPointer const& from )
+HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::assign( HPointer const& from )
 	{
-	if ( ( &from != &to ) && ( to.f_ptShared != from.f_ptShared ) )
+	if ( ( &from != this ) && ( f_poShared->f_ptObject != from.f_poShared->f_ptObject ) )
 		{
-		if ( from.f_ptShared )
-			{
-			++ from.f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ];
-			++ from.f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
-			}
-		if ( to.f_ptShared )
-			to.release();
-		to.f_ptShared = from.f_ptShared;
-		to.f_piReferenceCounter = from.f_piReferenceCounter;
+		if ( from.f_poShared->f_ptObject )
+			access_type_t<tType>::inc_reference_counter( from.f_poShared->f_piReferenceCounter );
+		if ( f_poShared->f_ptObject )
+			release();
+		f_poShared = from.f_poShared;
 		}
-	return ( to );
+	return ( *this );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 tType const& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) const
 	{
-	M_ASSERT( f_ptShared );
-	return ( *f_ptShared );
+	M_ASSERT( f_poShared->f_ptObject );
+	return ( *f_poShared->f_ptObject );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 tType& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void )
 	{
-	M_ASSERT( f_ptShared );
-	return ( *f_ptShared );
+	M_ASSERT( f_poShared->f_ptObject );
+	return ( *f_poShared->f_ptObject );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
@@ -314,7 +351,7 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 tType const& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex ) const
 	{
 	M_ASSERT( a_iIndex >= 0 );
-	return ( pointer_type_t<tType, access_type_t<tType> >::object_at( f_ptShared, a_iIndex ) );
+	return ( pointer_type_t<tType, access_type_t<tType> >::object_at( f_poShared->f_ptObject, a_iIndex ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
@@ -322,16 +359,16 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 tType& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex )
 	{
 	M_ASSERT( a_iIndex >= 0 );
-	return ( pointer_type_t<tType, access_type_t<tType> >::object_at( f_ptShared, a_iIndex ) );
+	return ( pointer_type_t<tType, access_type_t<tType> >::object_at( f_poShared->f_ptObject, a_iIndex ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-template<typename hier_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator == ( HPointer<hier_t, pointer_type_t, access_type_t>const & a_roPointer ) const
+template<typename hier_t, template<typename>class alien_access_t>
+bool HPointer<tType, pointer_type_t, access_type_t>::operator == ( HPointer<hier_t, pointer_type_t, alien_access_t>const & a_roPointer ) const
 	{
 	HPointer const* alien = reinterpret_cast<HPointer const *>( &a_roPointer );
-	return ( f_ptShared == reinterpret_cast<hier_t*>( alien->f_ptShared ) );
+	return ( f_poShared->f_ptObject == reinterpret_cast<hier_t*>( alien->f_poShared->f_ptObject ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
@@ -339,16 +376,16 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 template<typename hier_t>
 bool HPointer<tType, pointer_type_t, access_type_t>::operator == ( hier_t const* const a_ptPointer ) const
 	{
-	return ( f_ptShared == a_ptPointer );
+	return ( f_poShared->f_ptObject == a_ptPointer );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
-template<typename hier_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator != ( HPointer<hier_t, pointer_type_t, access_type_t>const & a_roPointer ) const
+template<typename hier_t, template<typename>class alien_access_t>
+bool HPointer<tType, pointer_type_t, access_type_t>::operator != ( HPointer<hier_t, pointer_type_t, alien_access_t>const & a_roPointer ) const
 	{
 	HPointer const* alien = reinterpret_cast<HPointer const *>( &a_roPointer );
-	return ( f_ptShared != reinterpret_cast<hier_t*>( alien->f_ptShared ) );
+	return ( f_poShared->f_ptObject != reinterpret_cast<hier_t*>( alien->f_poShared->f_ptObject ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
@@ -356,7 +393,7 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 template<typename hier_t>
 bool HPointer<tType, pointer_type_t, access_type_t>::operator != ( hier_t const* const a_ptPointer ) const
 	{
-	return ( f_ptShared != a_ptPointer );
+	return ( f_poShared->f_ptObject != a_ptPointer );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
@@ -377,37 +414,37 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 tType const* HPointer<tType, pointer_type_t, access_type_t>::operator->( void ) const
 	{
-	M_ASSERT( f_ptShared );
-	return ( access_type_t<tType>::raw ( f_ptShared ) );
+	M_ASSERT( f_poShared->f_ptObject );
+	return ( access_type_t<tType>::raw ( f_poShared->f_ptObject ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 tType* HPointer<tType, pointer_type_t, access_type_t>::operator->( void )
 	{
-	M_ASSERT( f_ptShared );
-	return ( access_type_t<tType>::raw ( f_ptShared ) );
+	M_ASSERT( f_poShared->f_ptObject );
+	return ( access_type_t<tType>::raw ( f_poShared->f_ptObject ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 tType const* HPointer<tType, pointer_type_t, access_type_t>::raw( void ) const
 	{
-	return ( access_type_t<tType>::raw( f_ptShared ) );
+	return ( access_type_t<tType>::raw( f_poShared->f_ptObject ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 tType* HPointer<tType, pointer_type_t, access_type_t>::raw( void )
 	{
-	return ( access_type_t<tType>::raw( f_ptShared ) );
+	return ( access_type_t<tType>::raw( f_poShared->f_ptObject ) );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 bool HPointer<tType, pointer_type_t, access_type_t>::operator ! ( void ) const
 	{
-	return ( ! f_ptShared );
+	return ( ! f_poShared->f_ptObject );
 	}
 
 template<typename tType>

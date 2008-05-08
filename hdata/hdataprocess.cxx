@@ -46,7 +46,7 @@ namespace hdata
 {
 
 HDataProcess::HDataProcess ( void )
-	: HTUIProcess(), f_oDataBase(), f_psRootMenu ( NULL )
+	: HTUIProcess(), f_oDataBase( HDataBase::get_connector() ), f_psRootMenu ( NULL )
 	{
 	M_PROLOG
 	return;
@@ -175,9 +175,9 @@ void HDataProcess::destroy_menu( OMenuItem* a_psMenu )
 	M_EPILOG
 	}
 
-HDataBase * HDataProcess::data_base ( void )
+database_ptr_t HDataProcess::data_base( void )
 	{
-	return ( & f_oDataBase );
+	return ( f_oDataBase );
 	}
 
 int HDataProcess::handler_quit ( int a_iCode, void const* )
