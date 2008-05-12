@@ -524,7 +524,7 @@ int HString::get_length( void ) const
 	M_PROLOG
 	int l_iLength = 0;
 	if ( ! f_pcBuffer )
-		M_THROW ( "no buffer.", reinterpret_cast<int>( f_pcBuffer ) );
+		M_THROW ( "no buffer.", reinterpret_cast<int long>( f_pcBuffer ) );
 	l_iLength = ::strlen( f_pcBuffer );
 	M_ASSERT( l_iLength < f_iSize );
 	return ( l_iLength );

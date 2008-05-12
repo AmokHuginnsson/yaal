@@ -108,7 +108,7 @@ int HThread::finish( void )
 	f_oMutex.lock();
 	M_ENSURE( ::pthread_join( *f_oThread.get<pthread_t>(), &l_pvReturn ) == 0 );
 	f_eStatus = D_DEAD;
-	return ( reinterpret_cast<int>( l_pvReturn ) );
+	return ( reinterpret_cast<int long>( l_pvReturn ) );
 	M_EPILOG
 	}
 
