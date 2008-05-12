@@ -206,7 +206,7 @@ void HLog::timestamp ( FILE * a_psStream )
 	M_EPILOG
 	}
 
-int HLog::operator() ( char const* const a_pcFormat, va_list const a_xAp )
+int HLog::operator() ( char const* const a_pcFormat, va_list a_xAp )
 	{
 	M_PROLOG
 	int l_iErr = 0;
