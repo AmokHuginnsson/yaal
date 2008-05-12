@@ -54,8 +54,7 @@ HRecordSet::HRecordSet( database_ptr_t a_oDataBase, void* a_pvReuslt )
 		log ( LOG_TYPE::D_ERROR ) << "SQL error (query): " << f_oDataBase->get_error() << endl;
 	if ( f_iFieldCount < 0 )
 		log ( LOG_TYPE::D_ERROR ) << "SQL error (fiels count): " << f_oDataBase->get_error() << endl;
-	f_oColumnNames.clear();
-	for ( int l_iCtr = 0; l_iCtr < f_iFieldCount; l_iCtr ++ )
+	for ( int l_iCtr = 0; l_iCtr < f_iFieldCount; ++ l_iCtr )
 		f_oColumnNames[ l_iCtr ] = dbwrapper::rs_column_name( f_pvResult,
 				l_iCtr );
 	return;
@@ -190,6 +189,60 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 	M_EPILOG
 	}
 
+HRecordSet::HIterator::HIterator( HRecordSet* a_poOwner, int const& a_iPosition )
+	: f_poOwner( a_poOwner ), f_iCursorPosition( a_iPosition )
+	{
+	}
+
+HRecordSet::HIterator::HIterator( HIterator const& it )
+	: f_poOwner( it.f_poOwner ), f_iCursorPosition( it.f_iCursorPosition )
+	{
+	}
+
+HRecordSet::HIterator& HRecordSet::HIterator::operator = ( HIterator const& it )
+	{
+	if ( &it != this )
+		{
+		f_poOwner = it.f_poOwner;
+		f_iCursorPosition = it.f_iCursorPosition;
+		}
+	return ( *this );
+	}
+
+bool HRecordSet::HIterator::operator == ( HIterator const& it ) const
+	{
+	M_ASSERT( it.f_poOwner == f_poOwner );
+	return ( it.f_iCursorPosition == f_iCursorPosition );
+	}
+
+bool HRecordSet::HIterator::operator != ( HIterator const& it ) const
+	{
+	M_ASSERT( it.f_poOwner == f_poOwner );
+	return ( it.f_iCursorPosition != f_iCursorPosition );
+	}
+
+HRecordSet::HIterator& HRecordSet::HIterator::operator ++ ( void )
+	{
+	M_ASSERT( f_poOwner );
+	++ f_iCursorPosition;
+	return ( *this );
+	}
+
+HRecordSet::HIterator HRecordSet::HIterator::operator ++ ( int )
+	{
+	M_ASSERT( f_poOwner );
+	HIterator it( *this );
+	++ f_iCursorPosition;
+	return ( it );
+	}
+
+yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& a_iField )
+	{
+	M_ASSERT( f_poOwner );
+	return ( dbwrapper::rs_get ( f_poOwner->f_pvResult, f_iCursorPosition,
+			a_iField ) );
+	}
+
 #if 0
 
 int long HRecordSet::update ( void )
@@ -207,15 +260,6 @@ int long HRecordSet::update ( void )
 	f_eMode = D_NORMAL;
 	requery();
 	return ( l_iRetVal );
-	M_EPILOG
-	}
-
-HString HRecordSet::get ( int a_iField )
-	{
-	M_PROLOG
-	HString l_oTmp = dbwrapper::rs_get ( f_pvResult, f_iCursorPosition,
-			a_iField );
-	return ( l_oTmp );
 	M_EPILOG
 	}
 

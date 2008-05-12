@@ -146,7 +146,7 @@ void HControlList::select( HControl const* a_poControl )
 				}
 			}
 		if ( it == f_oList.end() )
-			M_THROW ( "bogus object", reinterpret_cast < int > ( a_poControl ) );
+			M_THROW( "bogus object", reinterpret_cast<int long>( a_poControl ) );
 		}
 	return;
 	M_EPILOG

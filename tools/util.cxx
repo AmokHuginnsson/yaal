@@ -366,8 +366,8 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 				}
 			}
 		printf( "  %*s%s %-*s ",
-				l_iLongestShortLength, sf.raw(), coma,
-				l_iLongestLongLength, lf.raw() );
+				static_cast<int>( l_iLongestShortLength ), sf.raw(), coma,
+				static_cast<int>( l_iLongestLongLength ), lf.raw() );
 		int cols = 80 - ( l_iLongestLongLength + l_iLongestShortLength + 7 );
 		int eol = 0;
 		desc = description;
@@ -398,7 +398,7 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 						break;
 						}
 					}
-				printf( "     %*s", l_iLongestLongLength + l_iLongestShortLength, "" );
+				printf( "     %*s", static_cast<int>( l_iLongestLongLength + l_iLongestShortLength ), "" );
 				}
 			else
 				{

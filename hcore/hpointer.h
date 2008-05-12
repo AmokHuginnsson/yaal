@@ -60,12 +60,12 @@ struct HPointerStrict
 	{
 	static tType* raw( tType* );
 	static tType& object_at( tType*, int );
-	static void delete_pointee( tType* );
-	static void delete_pointee_array( tType* );
+	static void delete_pointee( tType*& );
+	static void delete_pointee_array( tType*& );
 	template<typename ptr_t>
-	static void initialize_from_this( HPointerFromThisInterface<tType>&, ptr_t const& );
+	static void initialize_from_this( HPointerFromThisInterface<tType>*, ptr_t const& );
 	template<typename ptr_t>
-	static void initialize_from_this( tType&, ptr_t const& );
+	static void initialize_from_this( void*, ptr_t const& );
 	static void inc_reference_counter( int* );
 	static void dec_reference_counter( int* );
 	};
@@ -73,8 +73,8 @@ struct HPointerStrict
 template<typename tType>
 struct HPointerWeak
 	{
-	inline static void delete_pointee( tType* ){}
-	inline static void delete_pointee_array( tType* ){}
+	inline static void delete_pointee( tType*& ){}
+	inline static void delete_pointee_array( tType*& ){}
 	static void inc_reference_counter( int* );
 	static void dec_reference_counter( int* );
 	};
@@ -82,14 +82,14 @@ struct HPointerWeak
 template<typename tType, typename access_type_t>
 struct HPointerScalar
 	{
-	static void delete_pointee( tType* );
+	static void delete_pointee( tType*& );
 	static tType* raw( tType* );
 	};
 
 template<typename tType, typename access_type_t>
 struct HPointerArray
 	{
-	static void delete_pointee( tType* );
+	static void delete_pointee( tType*& );
 	static tType& object_at( tType*, int );
 	};
 
@@ -155,19 +155,21 @@ public:
 	ptr_t const get_pointer( void ) const;
 protected:
 	void initialize_observer( ptr_t const& );
-	friend class HPointer<tType, HPointerScalar, HPointerStrict>;
+	friend class HPointerStrict<tType>;
 	};
 
 template<typename tType>
-void HPointerStrict<tType>::delete_pointee( tType* a_ptPointer )
+void HPointerStrict<tType>::delete_pointee( tType*& a_ptPointer )
 	{
 	delete a_ptPointer;
+	a_ptPointer = NULL;
 	}
 
 template<typename tType>
-void HPointerStrict<tType>::delete_pointee_array( tType* a_ptPointer )
+void HPointerStrict<tType>::delete_pointee_array( tType*& a_ptPointer )
 	{
 	delete [] a_ptPointer;
+	a_ptPointer = NULL;
 	}
 
 template<typename tType>
@@ -212,13 +214,13 @@ void HPointerWeak<tType>::dec_reference_counter( int* a_piReferenceCounter )
 	}
 
 template<typename tType, typename access_type_t>
-void HPointerScalar<tType, access_type_t>::delete_pointee( tType* a_ptPointer )
+void HPointerScalar<tType, access_type_t>::delete_pointee( tType*& a_ptPointer )
 	{
 	access_type_t::delete_pointee( a_ptPointer );
 	}
 
 template<typename tType, typename access_type_t>
-void HPointerArray<tType, access_type_t>::delete_pointee( tType* a_ptPointer )
+void HPointerArray<tType, access_type_t>::delete_pointee( tType*& a_ptPointer )
 	{
 	access_type_t::delete_pointee_array( a_ptPointer );
 	}
@@ -250,7 +252,7 @@ HPointer<tType, pointer_type_t, access_type_t>::HPointer( tType* const a_ptPoint
 	{
 	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] = 1;
 	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] = 1;
-	access_type_t<tType>::initialize_from_this( *a_ptPointer, *this );
+	access_type_t<tType>::initialize_from_this( a_ptPointer, *this );
 	return;
 	}
 
@@ -319,12 +321,9 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 bool HPointer<tType, pointer_type_t, access_type_t>::release( void ) throw()
 	{
 	M_ASSERT( f_poShared );
-	access_type_t<tType>::dec_reference_counter( f_poShared->f_piReferenceCounter );
-	if ( ! f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] )
-		{
+	if ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] == 1 )
 		pointer_type_t<tType, access_type_t<tType> >::delete_pointee( f_poShared->f_ptObject );
-		f_poShared->f_ptObject = NULL;
-		}
+	access_type_t<tType>::dec_reference_counter( f_poShared->f_piReferenceCounter );
 	if ( ! f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] )
 		{
 		delete f_poShared;
@@ -455,15 +454,15 @@ bool HPointer<tType, pointer_type_t, access_type_t>::operator ! ( void ) const
 
 template<typename tType>
 template<typename ptr_t>
-void HPointerStrict<tType>::initialize_from_this( HPointerFromThisInterface<tType>& obj,
+void HPointerStrict<tType>::initialize_from_this( HPointerFromThisInterface<tType>* obj,
 		ptr_t const& ptr )
 	{
-	obj.initialize_observer( ptr );
+	obj->initialize_observer( ptr );
 	}
 
 template<typename tType>
 template<typename ptr_t>
-void HPointerStrict<tType>::initialize_from_this( tType&,
+void HPointerStrict<tType>::initialize_from_this( void*,
 		ptr_t const& )
 	{
 	}

@@ -59,7 +59,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 	if ( ! HCons::get_instance().is_enabled() )
 		M_THROW ( "not in curses mode.", errno );
 	if ( ! a_poParent )
-		M_THROW ( "no parent window.", reinterpret_cast < int > ( a_poParent ) );
+		M_THROW ( "no parent window.", reinterpret_cast<int long>( a_poParent ) );
 	f_iShortcutIndex = f_oLabel.find ( '&' );
 	if ( f_iShortcutIndex > -1 )
 		{

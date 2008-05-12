@@ -69,8 +69,8 @@ public:
 
 class HRecordSet::HIterator
 	{
-	int f_iCursorPosition; /* cursor position in record-set */
 	HRecordSet* f_poOwner;
+	int f_iCursorPosition; /* cursor position in record-set */
 public:
 	HIterator( HIterator const& );
 	HIterator& operator = ( HIterator const& );
@@ -80,8 +80,8 @@ public:
 	HIterator operator -- ( int );
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
-	yaal::hcore::HString const& operator[] ( int const& );
-	yaal::hcore::HString const& operator[] ( char const * const );
+	yaal::hcore::HString operator[] ( int const& );
+	yaal::hcore::HString operator[] ( char const * const );
 private:
 	HIterator( HRecordSet*, int const& );
 	friend class HRecordSet;
