@@ -32,7 +32,7 @@ ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
 COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe \
-																-D_GNU_SOURCE -march=i486
+																-D_GNU_SOURCE
 ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else

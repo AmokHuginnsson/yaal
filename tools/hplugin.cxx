@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <dlfcn.h>
+
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
 #include "hplugin.h"
@@ -40,6 +42,45 @@ HPlugin::HPlugin( void ) : f_pvHandle( NULL )
 
 HPlugin::~HPlugin( void )
 	{
+	if ( f_pvHandle )
+		unload();
+	}
+
+void HPlugin::load( char const* const a_pcPath )
+	{
+	M_PROLOG
+	M_ENSURE( ( f_pvHandle = dlopen( a_pcPath, RTLD_NOW | RTLD_GLOBAL ) ) != NULL );
+	return;
+	M_EPILOG
+	}
+
+void HPlugin::unload( void )
+	{
+	M_PROLOG
+	M_ENSURE( dlclose( f_pvHandle ) == 0 );
+	f_pvHandle = NULL;
+	return;
+	M_EPILOG
+	}
+
+char const* const HPlugin::error_message( int )
+	{
+	return ( dlerror() );
+	}
+
+void* HPlugin::resolve( char const* const a_pcSymbolName )
+	{
+	M_PROLOG
+	M_ASSERT( f_pvHandle );
+	void* sym = NULL;
+	M_ENSURE( ( sym = dlsym( f_pvHandle, a_pcSymbolName ) ) != NULL );
+	return ( sym );
+	M_EPILOG
+	}
+
+bool HPlugin::is_loaded( void ) const
+	{
+	return ( f_pvHandle );
 	}
 
 }

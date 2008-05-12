@@ -34,10 +34,12 @@ Copyright:
 M_VCSID ( "$Id$" )
 #include "hcore/hstring.h"
 #include "hcore/hlog.h"
+#include "tools/hplugin.h"
 #include "db_driver_loader.h"
 #include "dbwrapper.h"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal
 {
@@ -51,26 +53,11 @@ namespace
 char const * const etag = "Error: Data base request (";
 char const * const eend = ") while no driver loaded.";
 
-template<typename tType>
-union caster_t
-	{
-	void* f_pvObjectPointer;
-	tType FUNCTION_POINTER;
-	};
-
 }
 
-template<typename tType>
-tType dlsym_wrapper( void* a_pvSpace, char const* a_pcName )
-	{
-	caster_t<tType> l_xCaster;
-	l_xCaster.f_pvObjectPointer = dlsym( a_pvSpace, a_pcName );
-	return ( l_xCaster.FUNCTION_POINTER );
-	}
+char const* const g_pcDone = "done.\r\n";
 
-char const x_tag_g_pcDone [ ] = "done.\r\n", * g_pcDone = x_tag_g_pcDone;
-
-static char const * g_ppcDriver [ 7 ] =
+static char const* g_ppcDriver[ 7 ] =
 	{
 	NULL,
 	"libsqlite3_driver.so",
@@ -81,8 +68,7 @@ static char const * g_ppcDriver [ 7 ] =
 	NULL
 	};
 
-	
-void * n_pvDlHandle = NULL;
+HPlugin n_oDBDriver;
 
 typedef void * ( * t0 ) ( char const *, char const *, char const * );
 void * ( * db_connect ) ( char const *, char const *, char const * );
@@ -212,61 +198,54 @@ void load_driver ( void )
 	if ( dbwrapper::n_iDataBaseDriver )
 		{
 		l_iCtr = dbwrapper::n_iDataBaseDriver;
-		n_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ], RTLD_NOW | RTLD_GLOBAL );
-		if ( ! n_pvDlHandle )
-			l_iCtr = 1;
-		while ( ! n_pvDlHandle && g_ppcDriver [ l_iCtr ] )
+		try
+			{
+			n_oDBDriver.load( g_ppcDriver [ l_iCtr ++ ] );
+			}
+		catch ( HPluginException& )
+			{
+			}
+		while ( ! n_oDBDriver.is_loaded() && g_ppcDriver[ l_iCtr ] )
 			{
 			if ( ( l_iCtr == dbwrapper::n_iDataBaseDriver ) && l_iCtr ++ )
 				continue;
 			dbwrapper_error();
-			n_pvDlHandle = dlopen ( g_ppcDriver [ l_iCtr ++ ],
-					RTLD_NOW | RTLD_GLOBAL );
+			try
+				{
+				n_oDBDriver.load( g_ppcDriver [ l_iCtr ++ ] );
+				}
+			catch ( HPluginException& )
+				{
+				}
 			}
-		if ( ! n_pvDlHandle )
+		if ( ! n_oDBDriver.is_loaded() )
 			dbwrapper_exit();
 		else
 			{
 			log ( LOG_TYPE::D_NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
 			log << "] driver." << endl;
 			}
-		fprintf ( stderr, x_tag_g_pcDone );
+		fprintf ( stderr, g_pcDone );
 		fprintf ( stderr, "Linking symbols ... " );
-		if ( ! ( db_disconnect = dlsym_wrapper < t1 > ( n_pvDlHandle,
-						"db_disconnect" ) ) )
-			dbwrapper_error();
-		else if ( ! ( db_errno = dlsym_wrapper < t2 > ( n_pvDlHandle,
-						"db_errno" ) ) )
-			dbwrapper_error();
-		else if ( ! ( db_error = dlsym_wrapper < t3 > ( n_pvDlHandle,
-						"db_error" ) ) )
-			dbwrapper_error();
-		else if ( ! ( db_query = dlsym_wrapper < t4 > ( n_pvDlHandle,
-						"db_query" ) ) )
-			dbwrapper_error();
-		else if ( ! ( db_unquery = dlsym_wrapper < t5 > ( n_pvDlHandle,
-						"db_unquery" ) ) )
-			dbwrapper_error();
-		else if ( ! ( rs_get = dlsym_wrapper < t6 > ( n_pvDlHandle, "rs_get" ) ) )
-			dbwrapper_error();
-		else if ( ! ( rs_fields_count = dlsym_wrapper < t7 > ( n_pvDlHandle,
-						"rs_fields_count" ) ) )
-			dbwrapper_error();
-		else if ( ! ( dbrs_records_count = dlsym_wrapper < t8 > ( n_pvDlHandle,
-						"dbrs_records_count" ) ) )
-			dbwrapper_error();
-		else if ( ! ( dbrs_id = dlsym_wrapper < t9 > ( n_pvDlHandle, "dbrs_id" ) ) )
-			dbwrapper_error();
-		else if ( ! ( rs_column_name = dlsym_wrapper < tA > ( n_pvDlHandle,
-						"rs_column_name" ) ) )
-			dbwrapper_error();
-		else if ( ! ( db_connect = dlsym_wrapper < t0 > ( n_pvDlHandle,
-						"db_connect" ) ) )
-			dbwrapper_error();
-		if ( db_connect != autoloader_db_connect )
-			fprintf ( stderr, x_tag_g_pcDone );
-		else
+		try
+			{
+			n_oDBDriver.resolve( "db_disconnect", db_disconnect );
+			n_oDBDriver.resolve( "db_errno", db_errno );
+			n_oDBDriver.resolve( "db_error", db_error );
+			n_oDBDriver.resolve( "db_query", db_query );
+			n_oDBDriver.resolve( "db_unquery", db_unquery );
+			n_oDBDriver.resolve( "rs_fields_count", rs_fields_count );
+			n_oDBDriver.resolve( "dbrs_records_count", dbrs_records_count );
+			n_oDBDriver.resolve( "dbrs_id", dbrs_id );
+			n_oDBDriver.resolve( "rs_column_name", rs_column_name );
+			n_oDBDriver.resolve( "db_connect", db_connect );
+			}
+		catch ( HPluginException& e )
+			{
 			M_THROW ( _ ( "can not load database driver" ), n_iDataBaseDriver );
+			}
+		if ( db_connect != autoloader_db_connect )
+			fprintf( stderr, g_pcDone );
 		}
 	else
 		{

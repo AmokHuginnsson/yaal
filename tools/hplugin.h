@@ -27,6 +27,8 @@ Copyright:
 #ifndef __YAAL_TOOLS_HPLUGIN_H
 #define __YAAL_TOOLS_HPLUGIN_H
 
+#include "hcore/hexception.h"
+
 namespace yaal
 {
 
@@ -35,14 +37,41 @@ namespace tools
 
 class HPlugin
 	{
+	template<typename tType>
+	union caster_t
+		{
+		void* f_pvObjectPointer;
+		tType FUNCTION_POINTER;
+		};
+	typedef HPlugin self_t;
 	void* f_pvHandle;
 public:
 	HPlugin( void );
 	~HPlugin( void );
+	void load( char const* const );
+	void unload( void );
+	bool is_loaded( void ) const;
+	char const* const error_message( int );
+	template<typename name_t>
+	void resolve( char const* const, name_t& );
+	void* resolve( char const* const );
 private:
 	HPlugin( HPlugin const& );
 	HPlugin const& operator = ( HPlugin const& );
 	};
+
+template<typename name_t>
+void HPlugin::resolve( char const* const a_pcName, name_t& handle )
+	{
+	M_PROLOG
+	caster_t<name_t> l_xCaster;
+	l_xCaster.f_pvObjectPointer = resolve( a_pcName );
+	handle = l_xCaster.FUNCTION_POINTER;
+	return;
+	M_EPILOG
+	}
+
+typedef yaal::hcore::HExceptionT<HPlugin> HPluginException;
 
 }
 

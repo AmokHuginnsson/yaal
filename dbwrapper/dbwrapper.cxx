@@ -68,9 +68,7 @@ struct DB_DRIVER
 void dbwrapper_error ( void );
 void dbwrapper_exit ( void ) __attribute__  ((noreturn));
 
-extern void * n_pvDlHandle;
-
-int		n_iDataBaseDriver = 0;
+int	n_iDataBaseDriver = 0;
 
 OOption n_psVariables[] =
 	{
@@ -136,26 +134,6 @@ void dbwrapper_init ( void )
 	}
 
 extern char const * g_pcDone;
-
-void dbwrapper_fini ( void ); __attribute__ ( ( destructor ) )
-void dbwrapper_fini ( void )
-	{
-	if ( dbwrapper::n_pvDlHandle )
-		{
-		fprintf ( stderr, "Unloading dynamic database driver ... " );
-#ifndef __HOST_OS_TYPE_FREEBSD__
-		if ( dlclose ( dbwrapper::n_pvDlHandle ) )
-			{
-			dbwrapper_error();
-			dbwrapper_exit();
-			}
-		else
-#endif /* not __HOST_OS_TYPE_FREEBSD__ */
-			fprintf ( stderr, g_pcDone );
-		}
-	dbwrapper::n_pvDlHandle = NULL;
-	return;
-	}
 
 static char const g_pcDynamicLinkerPath [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;

@@ -69,7 +69,7 @@ HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( tr
 	uid_t l_iUid = 0;
 	f_psStream = tmpfile();
 	if ( ! f_psStream )
-		M_THROW( "tmpfile returned", reinterpret_cast<int>( f_psStream ) );
+		M_THROW( "tmpfile returned", reinterpret_cast<int long>( f_psStream ) );
 	::fprintf( f_psStream, "%-10xProcess started (%d).\n",
 			LOG_TYPE::D_NOTICE, getpid() );
 	l_iUid = getuid();
@@ -118,7 +118,7 @@ void HLog::rehash ( FILE * a_psStream,
 	if ( a_pcProcessName )
 		f_pcProcessName = ::basename( a_pcProcessName );
 	if ( ! a_psStream )
-		M_THROW ( "file parameter is", reinterpret_cast < int > ( a_psStream ) );
+		M_THROW ( "file parameter is", reinterpret_cast<int long>( a_psStream ) );
 	if ( f_psStream )
 		{
 		fseek ( f_psStream, 0, SEEK_SET );
@@ -162,7 +162,7 @@ void HLog::rehash ( char const * const a_pcLogFileName,
 	M_PROLOG
 	if ( ! a_pcLogFileName )
 		M_THROW ( "new file name argument is",
-				reinterpret_cast < int > ( a_pcLogFileName ) );
+				reinterpret_cast<int long>( a_pcLogFileName ) );
 	rehash ( fopen ( a_pcLogFileName, "a" ), a_pcProcessName );
 	do_flush();
 	return;
@@ -206,7 +206,7 @@ void HLog::timestamp ( FILE * a_psStream )
 	M_EPILOG
 	}
 
-int HLog::operator() ( char const * const a_pcFormat, va_list const a_xAp )
+int HLog::operator() ( char const* const a_pcFormat, va_list const a_xAp )
 	{
 	M_PROLOG
 	int l_iErr = 0;
@@ -235,16 +235,16 @@ int HLog::operator() ( char const * const a_pcFormat, ... )
 	va_list l_xAp;
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 		{
-		va_start ( l_xAp, a_pcFormat );
-		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
-		va_end ( l_xAp );
+		va_start( l_xAp, a_pcFormat );
+		l_iErr = ( *this ) ( a_pcFormat, l_xAp );
+		va_end( l_xAp );
 		}
 	return ( l_iErr );
 	M_EPILOG
 	}
 
 int HLog::operator() ( int long const a_lType,
-		char const * const a_pcFormat, ... )
+		char const* const a_pcFormat, ... )
 	{
 	M_PROLOG
 	int l_iErr = 0;
@@ -252,9 +252,9 @@ int HLog::operator() ( int long const a_lType,
 	f_lType = a_lType;
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 		{
-		va_start ( l_xAp, a_pcFormat );
-		l_iErr = ( * this ) ( a_pcFormat, l_xAp );
-		va_end ( l_xAp );
+		va_start( l_xAp, a_pcFormat );
+		l_iErr = ( *this ) ( a_pcFormat, l_xAp );
+		va_end( l_xAp );
 		}
 	return ( l_iErr );
 	M_EPILOG
