@@ -54,11 +54,11 @@ public:
 protected:
 	bool f_bModified;
 	DOCUMENT::mode_t f_eDocumentMode;
-	HDataControl * f_poMainControl;
-	OResource * f_psResourcesArray;
-	hconsole::HItem * f_poSyncStore;
-	hcore::HList < HDataControl * > f_oViewModeControls;
-	hcore::HList < HDataControl * > f_oEditModeControls;
+	HDataControl* f_poMainControl;
+	OResource* f_psResourcesArray;
+	hconsole::HItem* f_poSyncStore;
+	hcore::HList<HDataControl*> f_oViewModeControls;
+	hcore::HList<HDataControl*> f_oEditModeControls;
 public:
 	HDataWindow ( char const *, dbwrapper::HDataBase * = NULL, OResource * = NULL );
 	virtual ~HDataWindow ( void );

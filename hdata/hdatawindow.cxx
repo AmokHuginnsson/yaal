@@ -52,18 +52,18 @@ HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase* /* FIXME a_poDataB
 	f_oViewModeControls(), f_oEditModeControls()
 	{
 	M_PROLOG
-	register_postprocess_handler ( KEY < 'n' >::command, NULL,
-			& HDataWindow::handler_add_new );
-	register_postprocess_handler ( KEY < 'e' >::command, NULL,
-			& HDataWindow::handler_edit );
-	register_postprocess_handler ( KEY < 'd' >::command, NULL,
-			& HDataWindow::handler_delete );
-	register_postprocess_handler ( KEY < 'w' >::command, NULL,
-			& HDataWindow::handler_save );
-	register_postprocess_handler ( KEY < 'r' >::ctrl, NULL,
-			& HDataWindow::handler_requery );
-	register_postprocess_handler ( KEY_CODES::D_ESC, NULL,
-			& HDataWindow::handler_cancel );
+	register_postprocess_handler( KEY<'n'>::command, NULL,
+			&HDataWindow::handler_add_new );
+	register_postprocess_handler( KEY<'e'>::command, NULL,
+			&HDataWindow::handler_edit );
+	register_postprocess_handler( KEY<'d'>::command, NULL,
+			&HDataWindow::handler_delete );
+	register_postprocess_handler( KEY<'w'>::command, NULL,
+			&HDataWindow::handler_save );
+	register_postprocess_handler( KEY<'r'>::ctrl, NULL,
+			&HDataWindow::handler_requery );
+	register_postprocess_handler( KEY_CODES::D_ESC, NULL,
+			&HDataWindow::handler_cancel );
 	return;
 	M_EPILOG
 	}
@@ -139,7 +139,7 @@ int HDataWindow::init ( void )
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psLCR = static_cast<OListControlResource*>( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				HDataListControl* l_poList = NULL;
-				l_poDataControl = l_poList = new HDataListControl( /* FIXME this */ NULL, this, M_SETUP_STANDARD );
+				l_poDataControl = l_poList = new HDataListControl( /* FIXME this */ HSQLDescriptor::ptr_t(), this, M_SETUP_STANDARD );
 				l_poList->set_flags( ( l_psLCR->f_bCheckable ? HListControl::FLAGS::D_CHECKABLE : HListControl::FLAGS::D_NONE )
 						| ( l_psLCR->f_bSortable ? HListControl::FLAGS::D_SORTABLE : HListControl::FLAGS::D_NONE )
 						| ( l_psLCR->f_bEditable ? HListControl::FLAGS::D_EDITABLE : HListControl::FLAGS::D_NONE )
@@ -148,7 +148,7 @@ int HDataWindow::init ( void )
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_TREE ):
-				l_poDataControl = new HDataTreeControl ( /* FIXME this */ NULL, this, M_SETUP_STANDARD );
+				l_poDataControl = new HDataTreeControl ( /* FIXME this */ HSQLDescriptor::ptr_t(), this, M_SETUP_STANDARD );
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_COMBO ):
 			break;

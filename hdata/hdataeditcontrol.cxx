@@ -53,7 +53,7 @@ HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 										a_pcMask, a_bReplace, a_bMultiLine,
 										a_bReadOnly, a_bRightAligned,
 										a_bPassword, a_iMaxHistoryLevel ),
-									HDataControl ( NULL )
+									HDataControl( HSQLDescriptor::ptr_t() )
 	{
 	M_PROLOG
 	return;

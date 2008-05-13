@@ -83,6 +83,20 @@ bool HRecordSet::is_empty( void ) const
 	return ( ! f_iSetSize );
 	}
 
+int HRecordSet::field_count( void ) const
+	{
+	return ( f_iFieldCount );
+	}
+
+int long HRecordSet::insert_id( void ) const
+	{
+	M_PROLOG
+	if ( ! f_pvResult )
+		M_THROW ( "no result", errno );
+	return ( dbwrapper::dbrs_id( &*f_oDataBase, f_pvResult ) );
+	M_EPILOG
+	}
+
 HRecordSet::iterator HRecordSet::begin( void )
 	{
 	return ( iterator( this, 0 ) );
@@ -260,15 +274,6 @@ int long HRecordSet::update ( void )
 	f_eMode = D_NORMAL;
 	requery();
 	return ( l_iRetVal );
-	M_EPILOG
-	}
-
-int long HDataBase::insert_id ( void )
-	{
-	M_PROLOG
-	if ( ! f_pvResult )
-		M_THROW ( "not connected to database", errno );
-	return ( dbwrapper::dbrs_id( f_pvResult, f_pvLastResult ) );
 	M_EPILOG
 	}
 

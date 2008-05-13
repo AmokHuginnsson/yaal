@@ -39,13 +39,13 @@ namespace yaal
 namespace hdata
 {
 
-HDataTreeControl::HDataTreeControl ( HRecordSet * a_poRecordSet,
+HDataTreeControl::HDataTreeControl ( HSQLDescriptor::ptr_t a_oSQL,
 		HDataWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
 		int a_iWidth, char const * a_pcTitle )
 								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
 										a_iWidth, a_pcTitle ),
-								HTreeControl ( NULL, 0, 0, 0, 0, NULL ),
-								HDataControl ( a_poRecordSet )
+								HTreeControl( NULL, 0, 0, 0, 0, NULL ),
+								HDataControl( a_oSQL )
 	{
 	M_PROLOG
 	return;

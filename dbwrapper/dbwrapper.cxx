@@ -114,20 +114,9 @@ bool const set_dbwrapper_variables ( HString & a_roOption, HString & a_roValue )
 	}
 
 extern "C"
-void dbwrapper_init ( void ); __attribute__ ( ( constructor ) )
-void dbwrapper_init ( void )
+void dbwrapper_init( void ) __attribute__ ( ( constructor ) );
+void dbwrapper_init( void )
 	{
-	dbwrapper::db_connect = dbwrapper::autoloader_db_connect;
-	dbwrapper::db_disconnect = dbwrapper::autoloader_db_disconnect;
-	dbwrapper::db_errno = dbwrapper::autoloader_db_errno;
-	dbwrapper::db_error = dbwrapper::autoloader_db_error;
-	dbwrapper::db_query = dbwrapper::autoloader_db_query;
-	dbwrapper::db_unquery = dbwrapper::autoloader_db_unquery;
-	dbwrapper::rs_get = dbwrapper::autoloader_rs_get;
-	dbwrapper::rs_fields_count = dbwrapper::autoloader_rs_fields_count;
-	dbwrapper::dbrs_records_count = dbwrapper::autoloader_dbrs_records_count;
-	dbwrapper::dbrs_id = dbwrapper::autoloader_dbrs_id;
-	dbwrapper::rs_column_name = dbwrapper::autoloader_rs_column_name;
 	rc_file::process_rc_file ( "yaal", "dbwrapper", n_psVariables,
 			set_dbwrapper_variables );
 	return;

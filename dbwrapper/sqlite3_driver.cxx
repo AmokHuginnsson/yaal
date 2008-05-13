@@ -48,64 +48,64 @@ typedef struct
 	{
 	int f_iRows;
 	int f_iColumns;
-	char * * f_ppcData;
+	char** f_ppcData;
 	} OSQLiteResult;
 
-OSQLite * g_psBrokenDB = NULL;
+OSQLite* g_psBrokenDB = NULL;
 
-void * db_query ( void *, char const * );
-void db_unquery ( void * );
-void db_disconnect ( void * );
+void* db_query( void*, char const* );
+void db_unquery( void* );
+void db_disconnect( void* );
 
 /* sqlite3 driver uses convention that database file name should have
  * .sqlite3 or .db3 extension, and this default extension is added
  * to user supplied database name by driver during db_connect. */
 
-void * db_connect ( char const * a_pcDataBase,
-		char const *, char const * )
+void* db_connect( char const* a_pcDataBase,
+		char const*, char const* )
 	{
 	int l_iNmLnght = 0;
-	void * l_pvPtr = NULL;
-	char * l_pcDataBase = NULL;
-	char const l_pcFileNameExt [ ] = ".sqlite3";
+	void* l_pvPtr = NULL;
+	char* l_pcDataBase = NULL;
+	char const l_pcFileNameExt[] = ".sqlite3";
 	struct stat l_sStat;
-	OSQLite * l_psSQLite = NULL;
+	OSQLite* l_psSQLite = NULL;
 	if ( g_psBrokenDB )
 		{
-		db_disconnect ( g_psBrokenDB );
+		db_disconnect( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psSQLite = xcalloc < OSQLite > ( 1 );
-	l_iNmLnght = strlen ( a_pcDataBase );
-	l_pcDataBase = xcalloc < char > ( l_iNmLnght + strlen ( l_pcFileNameExt ) + 1 );
-	strcpy ( l_pcDataBase, a_pcDataBase );
-	strcat ( l_pcDataBase, l_pcFileNameExt );
-	if ( stat ( l_pcDataBase, & l_sStat ) )
+	l_psSQLite = xcalloc< OSQLite>( 1 );
+	l_iNmLnght = ::strlen( a_pcDataBase );
+	l_pcDataBase = xcalloc<char>( l_iNmLnght + ::strlen( l_pcFileNameExt ) + 1 );
+	::strcpy( l_pcDataBase, a_pcDataBase );
+	::strcat( l_pcDataBase, l_pcFileNameExt );
+	if ( ::stat( l_pcDataBase, &l_sStat ) )
 		{
-		strcpy ( l_pcDataBase + l_iNmLnght, ".db3" );
-		if ( stat ( l_pcDataBase, & l_sStat ) )
+		::strcpy( l_pcDataBase + l_iNmLnght, ".db3" );
+		if ( ::stat( l_pcDataBase, &l_sStat ) )
 			{
-			asprintf ( & l_psSQLite->f_pcErrorMessage,
+			::asprintf( &l_psSQLite->f_pcErrorMessage,
 					"Database file `%s' does not exists.", l_pcDataBase );
-			xfree ( l_pcDataBase );
+			xfree( l_pcDataBase );
 			g_psBrokenDB = l_psSQLite;
 			return ( NULL );
 			}
 		}
-	l_psSQLite->f_iErrorCode = sqlite3_open ( l_pcDataBase,
+	l_psSQLite->f_iErrorCode = ::sqlite3_open( l_pcDataBase,
 			& l_psSQLite->f_psDB );
-	xfree ( l_pcDataBase );
+	xfree( l_pcDataBase );
 	if ( l_psSQLite->f_iErrorCode )
 		{
-		l_psSQLite->f_pcErrorMessage = xstrdup ( sqlite3_errmsg ( l_psSQLite->f_psDB ) );
+		l_psSQLite->f_pcErrorMessage = xstrdup( ::sqlite3_errmsg( l_psSQLite->f_psDB ) );
 		g_psBrokenDB = l_psSQLite;
 		l_psSQLite = NULL;
 		}
 	else
 		{
-		l_pvPtr = db_query ( l_psSQLite, "PRAGMA empty_result_callbacks = ON;" );
+		l_pvPtr = db_query( l_psSQLite, "PRAGMA empty_result_callbacks = ON;" );
 		if ( l_pvPtr )
-			db_unquery ( l_pvPtr );
+			db_unquery( l_pvPtr );
 		else
 			g_psBrokenDB = l_psSQLite, l_psSQLite = NULL;
 		}
@@ -123,9 +123,9 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno ( void * a_pvData )
+int db_errno( void const* a_pvData )
 	{
-	OSQLite * l_psSQLite = static_cast < OSQLite * > ( a_pvData );
+	OSQLite const* l_psSQLite = static_cast<OSQLite const*>( a_pvData );
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
 	if ( l_psSQLite )
@@ -137,9 +137,9 @@ int db_errno ( void * a_pvData )
 	return ( errno );
 	}
 
-char const * db_error  ( void * a_pvData )
+char const* db_error( void const* a_pvData )
 	{
-	OSQLite * l_psSQLite = static_cast < OSQLite * > ( a_pvData );
+	OSQLite const* l_psSQLite = static_cast<OSQLite const*>( a_pvData );
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
 	if ( l_psSQLite )
@@ -151,7 +151,7 @@ char const * db_error  ( void * a_pvData )
 	return ( "" );
 	}
 
-void * db_query ( void * a_pvData, char const * a_pcQuery )
+void* db_query( void* a_pvData, char const * a_pcQuery )
 	{
 	OSQLite * l_psSQLite = ( OSQLite * ) a_pvData;
 	OSQLiteResult * l_psResult = NULL;
@@ -174,35 +174,35 @@ void db_unquery ( void * a_pvData )
 	return;
 	}
 
-char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
+char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
 	{
-	char * * l_ppcData = NULL;
-	OSQLiteResult * l_psResult = static_cast < OSQLiteResult * > ( a_pvData );
+	char** l_ppcData = NULL;
+	OSQLiteResult* l_psResult = static_cast<OSQLiteResult*>( a_pvData );
 	l_ppcData = l_psResult->f_ppcData;
 	return ( l_ppcData [ ( a_iRow + 1 ) * l_psResult->f_iColumns + a_iColumn ] );
 	}
 
-int rs_fields_count ( void * a_pvData )
+int rs_fields_count( void const* a_pvData )
 	{
-	return ( static_cast < OSQLiteResult * > ( a_pvData )->f_iColumns );
+	return ( static_cast<OSQLiteResult const*>( a_pvData )->f_iColumns );
 	}
 
-int long dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
+int long dbrs_records_count( void const* a_pvDataB, void const* a_pvDataR )
 	{
 	if ( a_pvDataR )
-		return ( static_cast < OSQLiteResult * > ( a_pvDataR )->f_iRows );
+		return ( static_cast<OSQLiteResult const*>( a_pvDataR )->f_iRows );
 	else
-		return ( sqlite3_changes ( static_cast < OSQLite * > ( a_pvDataB )->f_psDB ) );
+		return ( ::sqlite3_changes( static_cast<OSQLite const*>( a_pvDataB )->f_psDB ) );
 	}
 
-int long dbrs_id ( void * a_pvDataB, void * )
+int long dbrs_id ( void const* a_pvDataB, void const* )
 	{
-	return ( sqlite3_last_insert_rowid ( static_cast < OSQLite * > ( a_pvDataB )->f_psDB ) );
+	return ( sqlite3_last_insert_rowid( static_cast<OSQLite const*>( a_pvDataB )->f_psDB ) );
 	}
 
-char * rs_column_name ( void * a_pvDataR, int a_iField )
+char* rs_column_name( void const* a_pvDataR, int a_iField )
 	{
-	return ( static_cast < OSQLiteResult * > ( a_pvDataR )->f_ppcData [ a_iField ] );
+	return ( static_cast<OSQLiteResult const*>( a_pvDataR )->f_ppcData [ a_iField ] );
 	}
 
 }

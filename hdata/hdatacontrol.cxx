@@ -38,8 +38,8 @@ namespace yaal
 namespace hdata
 {
 
-HDataControl::HDataControl ( HRecordSet * a_poRecordSet )
-						: HControl ( NULL, 0, 0, 0, 0, NULL ), f_poRecordSet ( a_poRecordSet )
+HDataControl::HDataControl( HSQLDescriptor::ptr_t )
+						: HControl ( NULL, 0, 0, 0, 0, NULL ), f_oSQL()
 	{
 	M_PROLOG
 	return;
@@ -49,7 +49,6 @@ HDataControl::HDataControl ( HRecordSet * a_poRecordSet )
 HDataControl::~HDataControl ( void )
 	{
 	M_PROLOG
-	f_poRecordSet = NULL;
 	return;
 	M_EPILOG
 	}

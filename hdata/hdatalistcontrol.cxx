@@ -40,14 +40,14 @@ namespace yaal
 namespace hdata
 {
 
-HDataListControl::HDataListControl ( HRecordSet * a_poRecordSet,
+HDataListControl::HDataListControl( HSQLDescriptor::ptr_t a_oSQL,
 		HDataWindow * a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
 		int a_iWidth, char const * a_pcTitle )
 								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
 										a_iWidth, a_pcTitle ),
 								HSearchableControl ( true ),
 								HListControl ( NULL, 0, 0, 0, 0, NULL ),
-								HDataControl ( a_poRecordSet ), f_oDataControler( f_oControler )
+								HDataControl ( a_oSQL ), f_oDataControler( f_oControler )
 	{
 	M_PROLOG
 	return;

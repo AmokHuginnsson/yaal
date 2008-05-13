@@ -41,7 +41,7 @@ Copyright:
 extern "C"
 {
 
-MYSQL * g_psBrokenDB = NULL;
+MYSQL* g_psBrokenDB = NULL;
 
 void db_disconnect ( void * );
 
@@ -72,62 +72,62 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno ( void * a_pvData )
+int db_errno( void const* a_pvData )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
-	return ( mysql_errno ( ( MYSQL * ) a_pvData ) );
+	return ( ::mysql_errno( static_cast<MYSQL const*>( a_pvData ) ) );
 	}
 
-char const * db_error  ( void * a_pvData )
+char const* db_error( void const* a_pvData )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
-	return ( mysql_error ( ( MYSQL * ) a_pvData ) );
+	return ( ::mysql_error( static_cast<MYSQL const*>( a_pvData ) ) );
 	}
 
 void * db_query ( void * a_pvData, char const * a_pcQuery )
 	{
-	mysql_query ( ( MYSQL * ) a_pvData, a_pcQuery );
-	return ( mysql_store_result ( ( MYSQL * ) a_pvData ) );
+	mysql_query ( static_cast<MYSQL *>( a_pvData ), a_pcQuery );
+	return ( mysql_store_result ( static_cast<MYSQL *>( a_pvData ) ) );
 	}
 
 void db_unquery ( void * a_pvData )
 	{
-	mysql_free_result ( ( MYSQL_RES * ) a_pvData );
+	mysql_free_result( static_cast<MYSQL_RES *>( a_pvData ) );
 	return;
 	}
 
-char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
+char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
 	{
 	MYSQL_ROW l_ppcRow;
-	mysql_data_seek ( ( MYSQL_RES * ) a_pvData, a_iRow );
-	l_ppcRow = mysql_fetch_row ( ( MYSQL_RES * ) a_pvData );
+	mysql_data_seek( static_cast<MYSQL_RES*>( a_pvData ), a_iRow );
+	l_ppcRow = mysql_fetch_row( static_cast<MYSQL_RES*>( a_pvData ) );
 	return ( l_ppcRow [ a_iColumn ] );
 	}
 
-int rs_fields_count ( void * a_pvData )
+int rs_fields_count( void const* a_pvData )
 	{
-	return ( mysql_num_fields ( ( MYSQL_RES * ) a_pvData ) );
+	return ( ::mysql_num_fields( static_cast<MYSQL_RES const*>( a_pvData ) ) );
 	}
 
-int long dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
+int long dbrs_records_count( void const* a_pvDataB, void const* a_pvDataR )
 	{
 	if ( a_pvDataR )
-		return ( mysql_num_rows ( ( MYSQL_RES * ) a_pvDataR ) );
+		return ( mysql_num_rows( static_cast<MYSQL_RES const*>( a_pvDataR ) ) );
 	else
-		return ( mysql_affected_rows ( ( MYSQL * ) a_pvDataB ) );
+		return ( mysql_affected_rows( static_cast<MYSQL const*>( a_pvDataB ) ) );
 	}
 
-int long dbrs_id ( void * a_pvDataB, void * )
+int long dbrs_id( void const* a_pvDataB, void const* )
 	{
-	return ( mysql_insert_id ( ( MYSQL * ) a_pvDataB ) );
+	return ( mysql_insert_id ( static_cast<MYSQL const*>( a_pvDataB ) ) );
 	}
 
-char * rs_column_name ( void * a_pvDataR, int a_iField )
+char* rs_column_name ( void const* a_pvDataR, int a_iField )
 	{
-	MYSQL_FIELD * l_psField = NULL;
-	l_psField = mysql_fetch_field_direct ( ( MYSQL_RES * ) a_pvDataR, a_iField );
+	MYSQL_FIELD* l_psField = NULL;
+	l_psField = mysql_fetch_field_direct( static_cast<MYSQL_RES const*>( a_pvDataR ), a_iField );
 	return ( l_psField->name );
 	}
 

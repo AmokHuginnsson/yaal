@@ -147,39 +147,39 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno ( void * a_pvData )
+int db_errno ( void const* a_pvData )
 	{
 	int l_iError = 0;
-	OOracle * l_psOracle = NULL;
+	OOracle const* l_psOracle = NULL;
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
 	if ( ! a_pvData )
 		return ( 0 );
-	l_psOracle = static_cast < OOracle * > ( a_pvData );
+	l_psOracle = static_cast<OOracle const*>( a_pvData );
 	if ( ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO )
 			&& ( l_psOracle->f_iStatus != OCI_ERROR ) )
 		return ( l_psOracle->f_iStatus );
-	OCIErrorGet ( l_psOracle->f_psError, 1, NULL, & l_iError, NULL, 0,
+	OCIErrorGet( l_psOracle->f_psError, 1, NULL, & l_iError, NULL, 0,
 			OCI_HTYPE_ERROR );
 	return ( l_iError );
 	}
 
-char const * db_error  ( void * a_pvData )
+char const * db_error( void const* a_pvData )
 	{
 	sb4 code = 0;
 	static char l_pcTextBuffer [ OCI_ERROR_MAXMSG_SIZE ];
-	OOracle * l_psOracle = NULL;
+	OOracle const* l_psOracle = NULL;
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
 	if ( ! a_pvData )
 		return ( "fatal" );
-	l_psOracle = static_cast < OOracle * > ( a_pvData );
+	l_psOracle = static_cast<OOracle const*>( a_pvData );
 	switch ( l_psOracle->f_iStatus )
 		{
 		case ( OCI_SUCCESS_WITH_INFO ):
 		case ( OCI_ERROR ):
-			OCIErrorGet ( l_psOracle->f_psError, 1, NULL, & code,
-					reinterpret_cast < OraText * > ( l_pcTextBuffer ),
+			OCIErrorGet( l_psOracle->f_psError, 1, NULL, & code,
+					reinterpret_cast<OraText*>( l_pcTextBuffer ),
 					OCI_ERROR_MAXMSG_SIZE - 2, OCI_HTYPE_ERROR );
 		break;
 		case ( OCI_NEED_DATA ):
@@ -254,7 +254,7 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 void db_unquery ( void * a_pvData )
 	{
 	OAllocator * l_psAllocator = NULL;
-	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvData );
+	OQuery* l_psQuery = static_cast<OQuery*>( a_pvData );
 	if ( ( ( * l_psQuery->f_piStatus ) == OCI_SUCCESS )
 			|| ( ( * l_psQuery->f_piStatus ) == OCI_SUCCESS_WITH_INFO ) )
 		( * l_psQuery->f_piStatus ) = OCIStmtRelease ( l_psQuery->f_psStatement,
@@ -273,24 +273,24 @@ void db_unquery ( void * a_pvData )
 	return;
 	}
 
-char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
+char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
 	{
 	int l_iSize = 0;
-	char * l_pcData = NULL;
-	OAllocator * l_psAllocator;
-	OCIParam * l_psParameter = NULL;
-	OCIDefine * l_psResult = NULL;
-	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvData );
-	if ( ( ( * l_psQuery->f_piStatus ) = OCIParamGet ( l_psQuery->f_psStatement,
+	char* l_pcData = NULL;
+	OAllocator* l_psAllocator;
+	OCIParam* l_psParameter = NULL;
+	OCIDefine* l_psResult = NULL;
+	OQuery* l_psQuery = static_cast<OQuery*>( a_pvData );
+	if ( ( ( * l_psQuery->f_piStatus ) = OCIParamGet( l_psQuery->f_psStatement,
 					OCI_HTYPE_STMT, l_psQuery->f_psError,
 					reinterpret_cast < void * * > ( & l_psParameter ), a_iColumn + 1 ) ) == OCI_SUCCESS )
 		{
-		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psParameter,
+		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet( l_psParameter,
 						OCI_DTYPE_PARAM, & l_iSize, 0, OCI_ATTR_DATA_SIZE,
 						l_psQuery->f_psError ) ) == OCI_SUCCESS )
 			{
 			l_pcData = xcalloc < char > ( l_iSize + 1 );
-			if ( ( ( * l_psQuery->f_piStatus ) = OCIDefineByPos ( l_psQuery->f_psStatement,
+			if ( ( ( * l_psQuery->f_piStatus ) = OCIDefineByPos( l_psQuery->f_psStatement,
 							& l_psResult, l_psQuery->f_psError, a_iColumn + 1, l_pcData, l_iSize + 1,
 							SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT ) ) == OCI_SUCCESS )
 				{
@@ -298,7 +298,7 @@ char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
 								l_psQuery->f_psError, 1, OCI_FETCH_ABSOLUTE, a_iRow,
 								OCI_DEFAULT ) ) == OCI_SUCCESS )
 					{
-					l_psAllocator = xcalloc < OAllocator > ( 1 );
+					l_psAllocator = xcalloc<OAllocator>( 1 );
 					l_psAllocator->f_pcBuffer = l_pcData;
 					if ( l_psQuery->f_psAllocator )
 						l_psQuery->f_psAllocator->f_psNext = l_psAllocator;
@@ -311,25 +311,25 @@ char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
 			}
 		}
 	if ( l_psParameter )
-		OCIDescriptorFree ( l_psParameter, OCI_DTYPE_PARAM );
+		OCIDescriptorFree( l_psParameter, OCI_DTYPE_PARAM );
 	return ( NULL );
 	}
 
-int rs_fields_count ( void * a_pvData )
+int rs_fields_count( void const* a_pvData )
 	{
 	int l_iFields = - 1;
-	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvData );
-	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
+	OQuery const* l_psQuery = static_cast<OQuery const*>( a_pvData );
+	if ( ( ( *l_psQuery->f_piStatus ) = OCIAttrGet( l_psQuery->f_psStatement,
 					OCI_HTYPE_STMT, & l_iFields, 0, OCI_ATTR_PARAM_COUNT,
 					l_psQuery->f_psError ) ) != OCI_SUCCESS )
 		l_iFields = - 1;
 	return ( l_iFields );
 	}
 
-int long dbrs_records_count ( void *, void * a_pvDataR )
+int long dbrs_records_count ( void const*, void const* a_pvDataR )
 	{
 	int l_iRows = 0;
-	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvDataR );
+	OQuery const* l_psQuery = static_cast<OQuery const*>( a_pvDataR );
 	( * l_psQuery->f_piStatus ) = OCIStmtFetch2 ( l_psQuery->f_psStatement,
 																								 l_psQuery->f_psError, 1,
 																								 OCI_FETCH_LAST, 0,
@@ -352,13 +352,13 @@ int long dbrs_records_count ( void *, void * a_pvDataR )
 	return ( l_iRows );
 	}
 
-int long dbrs_id ( void *, void * a_pvDataR )
+int long dbrs_id( void const*, void const* a_pvDataR )
 	{
 	int l_iNameLength = 0;
 	int long l_lId = 0;
 	HString l_oSQL;
 	text * l_pcName = NULL;
-	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvDataR );
+	OQuery const* l_psQuery = static_cast<OQuery const*>( a_pvDataR );
 	OQuery * l_psAutonumber = NULL;
 	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
 					OCI_HTYPE_STMT, & l_pcName,
@@ -370,17 +370,17 @@ int long dbrs_id ( void *, void * a_pvDataR )
 				reinterpret_cast < char * > ( l_pcName ) );
 		l_psAutonumber = static_cast < OQuery * > ( db_query ( l_psAutonumber, l_oSQL ) );
 		l_lId = strtol ( rs_get ( l_psAutonumber, 0, 0 ), NULL, 10 );
-		db_unquery ( l_psAutonumber );
+		db_unquery( l_psAutonumber );
 		}
 	return ( l_lId );
 	}
 
-char * rs_column_name ( void * a_pvDataR, int a_iField )
+char * rs_column_name ( void const* a_pvDataR, int a_iField )
 	{
 	int l_iNameLength = 0;
 	text * l_pcName = NULL;
 	OCIParam * l_psParameter = NULL;
-	OQuery * l_psQuery = static_cast < OQuery * > ( a_pvDataR );
+	OQuery const* l_psQuery = static_cast<OQuery const*>( a_pvDataR );
 	if ( ( ( * l_psQuery->f_piStatus ) = OCIParamGet ( l_psQuery->f_psStatement,
 					OCI_HTYPE_STMT, l_psQuery->f_psError,
 					reinterpret_cast < void * * > ( & l_psParameter ), a_iField + 1 ) ) == OCI_SUCCESS )

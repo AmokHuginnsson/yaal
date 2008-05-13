@@ -46,29 +46,29 @@ namespace LOG_TYPE
 namespace dbwrapper
 	{
 
-extern void * ( * db_connect ) ( char const *, char const *, char const * );
-extern void ( * db_disconnect ) ( void * );
-extern int ( * db_errno ) ( void * );
-extern char const * ( * db_error ) ( void * );
-extern void * ( * db_query ) ( void *, char const * );
-extern void ( * db_unquery ) ( void * );
-extern char * ( * rs_get ) ( void *, int, int );
-extern int ( * rs_fields_count ) ( void * );
-extern int long ( * dbrs_records_count ) ( void *, void * );
-extern int long ( * dbrs_id ) ( void *, void * );
-extern char * ( * rs_column_name ) ( void *, int );
+typedef void* ( * db_connect_t )( char const*, char const*, char const* );
+typedef void ( * db_disconnect_t )( void* );
+typedef int ( * db_errno_t )( void const* );
+typedef char const* ( * db_error_t )( void const* );
+typedef void* ( * db_query_t )( void*, char const* );
+typedef void ( * db_unquery_t )( void* );
+typedef char* ( * rs_get_t )( void*, int, int );
+typedef int ( * rs_fields_count_t )( void const* );
+typedef int long ( * dbrs_records_count_t )( void const*, void const* );
+typedef int long ( * dbrs_id_t )( void const*, void const* );
+typedef char* ( * rs_column_name_t )( void const*, int );
 
-void * autoloader_db_connect ( char const *, char const *, char const * );
-void autoloader_db_disconnect ( void * );
-int autoloader_db_errno ( void * );
-char const * autoloader_db_error ( void * );
-void * autoloader_db_query ( void *, char const * );
-void autoloader_db_unquery ( void * );
-char * autoloader_rs_get ( void *, int, int );
-int autoloader_rs_fields_count ( void * );
-int long autoloader_dbrs_records_count ( void *, void * );
-int long autoloader_dbrs_id ( void *, void * );
-char * autoloader_rs_column_name ( void *, int );
+extern db_connect_t db_connect;
+extern db_disconnect_t db_disconnect;
+extern db_errno_t db_errno;
+extern db_error_t db_error;
+extern db_query_t db_query;
+extern db_unquery_t db_unquery;
+extern rs_get_t rs_get;
+extern rs_fields_count_t rs_fields_count;
+extern dbrs_records_count_t dbrs_records_count;
+extern dbrs_id_t dbrs_id;
+extern rs_column_name_t rs_column_name;
 
 	}
 

@@ -39,9 +39,9 @@ namespace hdata
 class HDataControl : public virtual hconsole::HControl
 	{
 protected:
-	dbwrapper::HRecordSet * f_poRecordSet;
+	dbwrapper::HSQLDescriptor::ptr_t f_oSQL;
 public:
-	HDataControl ( dbwrapper::HRecordSet * );
+	HDataControl ( dbwrapper::HSQLDescriptor::ptr_t );
 	virtual ~HDataControl ( void );
 	virtual void load ( int long = 0 );
 	virtual int long get_current_id ( void );

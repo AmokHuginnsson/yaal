@@ -118,9 +118,9 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno ( void * a_pvData )
+int db_errno( void const* a_pvData )
 	{
-	OSQLite * l_psSQLite = static_cast < OSQLite * > ( a_pvData );
+	OSQLite const* l_psSQLite = static_cast<OSQLite const*>( a_pvData );
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
 	if ( l_psSQLite )
@@ -129,9 +129,9 @@ int db_errno ( void * a_pvData )
 	return ( errno );
 	}
 
-char const * db_error  ( void * a_pvData )
+char const* db_error( void const* a_pvData )
 	{
-	OSQLite * l_psSQLite = static_cast < OSQLite * > ( a_pvData );
+	OSQLite const* l_psSQLite = static_cast<OSQLite const*>( a_pvData );
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
 	if ( l_psSQLite )
@@ -139,10 +139,10 @@ char const * db_error  ( void * a_pvData )
 	return ( "" );
 	}
 
-void * db_query ( void * a_pvData, char const * a_pcQuery )
+void* db_query( void * a_pvData, char const * a_pcQuery )
 	{
-	OSQLite * l_psSQLite = static_cast < OSQLite * > ( a_pvData );
-	OSQLiteResult * l_psResult = NULL;
+	OSQLite* l_psSQLite = static_cast < OSQLite * > ( a_pvData );
+	OSQLiteResult* l_psResult = NULL;
 	l_psResult = xcalloc < OSQLiteResult > ( 1 );
 	l_psResult->f_iColumns = 0;
 	l_psResult->f_iRows = 0;
@@ -155,42 +155,42 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 	return ( l_psResult );
 	}
 
-void db_unquery ( void * a_pvData )
+void db_unquery( void* a_pvData )
 	{
 	sqlite_free_table ( static_cast < OSQLiteResult * > ( a_pvData )->f_ppcData );
 	xfree ( a_pvData );
 	return;
 	}
 
-char * rs_get ( void * a_pvData, int a_iRow, int a_iColumn )
+char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
 	{
-	char * * l_ppcData = NULL;
-	OSQLiteResult * l_psResult = static_cast < OSQLiteResult * > ( a_pvData );
+	char** l_ppcData = NULL;
+	OSQLiteResult* l_psResult = static_cast<OSQLiteResult*>( a_pvData );
 	l_ppcData = l_psResult->f_ppcData;
 	return ( l_ppcData [ ( a_iRow + 1 ) * l_psResult->f_iColumns + a_iColumn ] );
 	}
 
-int rs_fields_count ( void * a_pvData )
+int rs_fields_count( void const* a_pvData )
 	{
-	return ( static_cast < OSQLiteResult * > ( a_pvData )->f_iColumns );
+	return ( static_cast<OSQLiteResult const*>( a_pvData )->f_iColumns );
 	}
 
-int long dbrs_records_count ( void * a_pvDataB, void * a_pvDataR )
+int long dbrs_records_count( void const* a_pvDataB, void const* a_pvDataR )
 	{
 	if ( a_pvDataR )
-		return ( static_cast < OSQLiteResult * > ( a_pvDataR )->f_iRows );
+		return ( static_cast<OSQLiteResult const*>( a_pvDataR )->f_iRows );
 	else
-		return ( sqlite_changes ( static_cast < OSQLite * > ( a_pvDataB )->f_psDB ) );
+		return ( sqlite_changes ( static_cast<OSQLite const*>( a_pvDataB )->f_psDB ) );
 	}
 
-int long dbrs_id ( void * a_pvDataB, void * )
+int long dbrs_id( void const* a_pvDataB, void const* )
 	{
-	return ( sqlite_last_insert_rowid ( static_cast < OSQLite * > ( a_pvDataB )->f_psDB ) );
+	return ( sqlite_last_insert_rowid( static_cast<OSQLite const*>( a_pvDataB )->f_psDB ) );
 	}
 
-char * rs_column_name ( void * a_pvDataR, int a_iField )
+char* rs_column_name( void const* a_pvDataR, int a_iField )
 	{
-	return ( static_cast < OSQLiteResult * > ( a_pvDataR )->f_ppcData [ a_iField ] );
+	return ( static_cast <OSQLiteResult const*>( a_pvDataR )->f_ppcData [ a_iField ] );
 	}
 
 }

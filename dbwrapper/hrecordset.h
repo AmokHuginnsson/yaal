@@ -65,6 +65,8 @@ public:
 	iterator rbegin( void );
 	iterator rend( void );
 	bool is_empty( void ) const;
+	int field_count( void ) const;
+	int long insert_id( void ) const;
 	};
 
 class HRecordSet::HIterator
@@ -91,6 +93,7 @@ class HSQLDescriptor
 	{
 public:
 	typedef HSQLDescriptor self_t;
+	typedef yaal::hcore::HPointer<self_t> ptr_t;
 	struct MODE
 		{
 		typedef enum
