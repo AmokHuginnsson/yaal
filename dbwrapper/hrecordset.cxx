@@ -88,7 +88,7 @@ int HRecordSet::field_count( void ) const
 	return ( f_iFieldCount );
 	}
 
-int long HRecordSet::insert_id( void ) const
+int long HRecordSet::insert_id( void )
 	{
 	M_PROLOG
 	if ( ! f_pvResult )

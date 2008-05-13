@@ -123,9 +123,9 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno( void const* a_pvData )
+int db_errno( void* a_pvData )
 	{
-	OSQLite const* l_psSQLite = static_cast<OSQLite const*>( a_pvData );
+	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
 	if ( l_psSQLite )
@@ -137,9 +137,9 @@ int db_errno( void const* a_pvData )
 	return ( errno );
 	}
 
-char const* db_error( void const* a_pvData )
+char const* db_error( void* a_pvData )
 	{
-	OSQLite const* l_psSQLite = static_cast<OSQLite const*>( a_pvData );
+	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
 	if ( l_psSQLite )
@@ -182,27 +182,27 @@ char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
 	return ( l_ppcData [ ( a_iRow + 1 ) * l_psResult->f_iColumns + a_iColumn ] );
 	}
 
-int rs_fields_count( void const* a_pvData )
+int rs_fields_count( void* a_pvData )
 	{
-	return ( static_cast<OSQLiteResult const*>( a_pvData )->f_iColumns );
+	return ( static_cast<OSQLiteResult*>( a_pvData )->f_iColumns );
 	}
 
-int long dbrs_records_count( void const* a_pvDataB, void const* a_pvDataR )
+int long dbrs_records_count( void* a_pvDataB, void* a_pvDataR )
 	{
 	if ( a_pvDataR )
-		return ( static_cast<OSQLiteResult const*>( a_pvDataR )->f_iRows );
+		return ( static_cast<OSQLiteResult*>( a_pvDataR )->f_iRows );
 	else
-		return ( ::sqlite3_changes( static_cast<OSQLite const*>( a_pvDataB )->f_psDB ) );
+		return ( ::sqlite3_changes( static_cast<OSQLite*>( a_pvDataB )->f_psDB ) );
 	}
 
-int long dbrs_id ( void const* a_pvDataB, void const* )
+int long dbrs_id ( void* a_pvDataB, void* )
 	{
-	return ( sqlite3_last_insert_rowid( static_cast<OSQLite const*>( a_pvDataB )->f_psDB ) );
+	return ( sqlite3_last_insert_rowid( static_cast<OSQLite*>( a_pvDataB )->f_psDB ) );
 	}
 
-char* rs_column_name( void const* a_pvDataR, int a_iField )
+char* rs_column_name( void* a_pvDataR, int a_iField )
 	{
-	return ( static_cast<OSQLiteResult const*>( a_pvDataR )->f_ppcData [ a_iField ] );
+	return ( static_cast<OSQLiteResult*>( a_pvDataR )->f_ppcData [ a_iField ] );
 	}
 
 }

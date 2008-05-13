@@ -72,18 +72,18 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno( void const* a_pvData )
+int db_errno( void* a_pvData )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
-	return ( ::mysql_errno( static_cast<MYSQL const*>( a_pvData ) ) );
+	return ( ::mysql_errno( static_cast<MYSQL*>( a_pvData ) ) );
 	}
 
-char const* db_error( void const* a_pvData )
+char const* db_error( void* a_pvData )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
-	return ( ::mysql_error( static_cast<MYSQL const*>( a_pvData ) ) );
+	return ( ::mysql_error( static_cast<MYSQL*>( a_pvData ) ) );
 	}
 
 void * db_query ( void * a_pvData, char const * a_pcQuery )
@@ -106,28 +106,28 @@ char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
 	return ( l_ppcRow [ a_iColumn ] );
 	}
 
-int rs_fields_count( void const* a_pvData )
+int rs_fields_count( void* a_pvData )
 	{
-	return ( ::mysql_num_fields( static_cast<MYSQL_RES const*>( a_pvData ) ) );
+	return ( ::mysql_num_fields( static_cast<MYSQL_RES*>( a_pvData ) ) );
 	}
 
-int long dbrs_records_count( void const* a_pvDataB, void const* a_pvDataR )
+int long dbrs_records_count( void* a_pvDataB, void* a_pvDataR )
 	{
 	if ( a_pvDataR )
-		return ( mysql_num_rows( static_cast<MYSQL_RES const*>( a_pvDataR ) ) );
+		return ( mysql_num_rows( static_cast<MYSQL_RES*>( a_pvDataR ) ) );
 	else
-		return ( mysql_affected_rows( static_cast<MYSQL const*>( a_pvDataB ) ) );
+		return ( mysql_affected_rows( static_cast<MYSQL*>( a_pvDataB ) ) );
 	}
 
-int long dbrs_id( void const* a_pvDataB, void const* )
+int long dbrs_id( void* a_pvDataB, void* )
 	{
-	return ( mysql_insert_id ( static_cast<MYSQL const*>( a_pvDataB ) ) );
+	return ( mysql_insert_id( static_cast<MYSQL*>( a_pvDataB ) ) );
 	}
 
-char* rs_column_name ( void const* a_pvDataR, int a_iField )
+char* rs_column_name( void* a_pvDataR, int a_iField )
 	{
 	MYSQL_FIELD* l_psField = NULL;
-	l_psField = mysql_fetch_field_direct( static_cast<MYSQL_RES const*>( a_pvDataR ), a_iField );
+	l_psField = mysql_fetch_field_direct( static_cast<MYSQL_RES*>( a_pvDataR ), a_iField );
 	return ( l_psField->name );
 	}
 

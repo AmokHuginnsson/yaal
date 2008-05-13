@@ -84,13 +84,13 @@ void null_db_disconnect( void* )
 	return;
 	}
 
-int null_db_errno( void const* )
+int null_db_errno( void* )
 	{
 	log( LOG_TYPE::D_ERROR ) << etag << "(db_errno)" << eend << endl;
 	return ( 0 );
 	}
 
-char const* null_db_error( void const* )
+char const* null_db_error( void* )
 	{
 	log( LOG_TYPE::D_ERROR ) << etag << "db_error)" << eend << endl;
 	return ( _( "null database driver loaded" ) );
@@ -114,25 +114,25 @@ char* null_rs_get( void*, int, int )
 	return ( NULL );
 	}
 
-int null_rs_fields_count( void const* )
+int null_rs_fields_count( void* )
 	{
 	log( LOG_TYPE::D_ERROR ) << etag << "(rs_fields_count)" << eend << endl;
 	return ( 0 );
 	}
 
-int long null_dbrs_records_count( void const*, void const* )
+int long null_dbrs_records_count( void*, void* )
 	{
 	log( LOG_TYPE::D_ERROR ) << etag << "(dbrs_records_count)" << eend << endl;
 	return ( 0 );
 	}
 
-int long null_dbrs_id( void const*, void const* )
+int long null_dbrs_id( void*, void* )
 	{
 	log( LOG_TYPE::D_ERROR ) << etag << "(dbrs_id)" << eend << endl;
 	return ( 0 );
 	}
 
-char* null_rs_column_name( void const*, int )
+char* null_rs_column_name( void*, int )
 	{
 	log( LOG_TYPE::D_ERROR ) << etag << "(rs_column_name)" << eend << endl;
 	return ( NULL );
@@ -250,13 +250,13 @@ void autoloader_db_disconnect( void* a_pvDataBase )
 	return;
 	}
 
-int autoloader_db_errno( void const* a_pvDataBase )
+int autoloader_db_errno( void* a_pvDataBase )
 	{
 	load_driver();
 	return ( db_errno( a_pvDataBase ) );
 	}
 
-char const* autoloader_db_error( void const* a_pvDataBase )
+char const* autoloader_db_error( void* a_pvDataBase )
 	{
 	load_driver();
 	return ( db_error( a_pvDataBase ) );
@@ -281,26 +281,26 @@ char* autoloader_rs_get( void* a_pvResult, int a_iRow, int a_iCol )
 	return ( rs_get( a_pvResult, a_iRow, a_iCol ) );
 	}
 
-int autoloader_rs_fields_count( void const* a_pvResult )
+int autoloader_rs_fields_count( void* a_pvResult )
 	{
 	load_driver();
 	return ( rs_fields_count( a_pvResult ) );
 	}
 
-int long autoloader_dbrs_records_count( void const* a_pvDataBase,
-		void const* a_pvResult )
+int long autoloader_dbrs_records_count( void* a_pvDataBase,
+		void* a_pvResult )
 	{
 	load_driver();
 	return ( dbrs_records_count( a_pvDataBase, a_pvResult ) );
 	}
 
-int long autoloader_dbrs_id( void const* a_pvDataBase, void const* a_pvResult )
+int long autoloader_dbrs_id( void* a_pvDataBase, void* a_pvResult )
 	{
 	load_driver();
 	return ( dbrs_id( a_pvDataBase, a_pvResult ) );
 	}
 
-char* autoloader_rs_column_name( void const* a_pvResult, int a_iColumn )
+char* autoloader_rs_column_name( void* a_pvResult, int a_iColumn )
 	{
 	load_driver();
 	return ( rs_column_name( a_pvResult, a_iColumn ) );

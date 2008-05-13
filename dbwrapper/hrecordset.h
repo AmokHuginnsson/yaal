@@ -66,7 +66,7 @@ public:
 	iterator rend( void );
 	bool is_empty( void ) const;
 	int field_count( void ) const;
-	int long insert_id( void ) const;
+	int long insert_id( void );
 	};
 
 class HRecordSet::HIterator

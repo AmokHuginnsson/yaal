@@ -48,15 +48,15 @@ namespace dbwrapper
 
 typedef void* ( * db_connect_t )( char const*, char const*, char const* );
 typedef void ( * db_disconnect_t )( void* );
-typedef int ( * db_errno_t )( void const* );
-typedef char const* ( * db_error_t )( void const* );
+typedef int ( * db_errno_t )( void* );
+typedef char const* ( * db_error_t )( void* );
 typedef void* ( * db_query_t )( void*, char const* );
 typedef void ( * db_unquery_t )( void* );
 typedef char* ( * rs_get_t )( void*, int, int );
-typedef int ( * rs_fields_count_t )( void const* );
-typedef int long ( * dbrs_records_count_t )( void const*, void const* );
-typedef int long ( * dbrs_id_t )( void const*, void const* );
-typedef char* ( * rs_column_name_t )( void const*, int );
+typedef int ( * rs_fields_count_t )( void* );
+typedef int long ( * dbrs_records_count_t )( void*, void* );
+typedef int long ( * dbrs_id_t )( void*, void* );
+typedef char* ( * rs_column_name_t )( void*, int );
 
 extern db_connect_t db_connect;
 extern db_disconnect_t db_disconnect;

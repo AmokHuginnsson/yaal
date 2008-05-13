@@ -76,16 +76,16 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno( void const* )
+int db_errno( void* )
 	{
 	return ( errno );
 	}
 
-char const* db_error( void const* a_pvData )
+char const* db_error( void* a_pvData )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
-	return ( ::PQerrorMessage( static_cast<PGconn const*>( a_pvData ) ) );
+	return ( ::PQerrorMessage( static_cast<PGconn*>( a_pvData ) ) );
 	}
 
 void * db_query ( void * a_pvData, char const * a_pcQuery )
@@ -104,28 +104,28 @@ char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
 	return ( ::PQgetvalue( static_cast<PGresult*>( a_pvData ), a_iRow, a_iColumn ) );
 	}
 
-int rs_fields_count( void const* a_pvData )
+int rs_fields_count( void* a_pvData )
 	{
-	return ( ::PQnfields( static_cast<PGresult const*>( a_pvData ) ) );
+	return ( ::PQnfields( static_cast<PGresult*>( a_pvData ) ) );
 	}
 
-int long dbrs_records_count( void const*, void const* a_pvDataR )
+int long dbrs_records_count( void*, void* a_pvDataR )
 	{
-	char* l_pcTmp = ::PQcmdTuples( static_cast<PGresult const*>( a_pvDataR ) );
+	char* l_pcTmp = ::PQcmdTuples( static_cast<PGresult*>( a_pvDataR ) );
 	if ( l_pcTmp && l_pcTmp [ 0 ] )
 		return ( ::strtol( l_pcTmp, NULL, 10 ) );
 	else
-		return ( ::PQntuples( static_cast<PGresult const*>( a_pvDataR ) ) );
+		return ( ::PQntuples( static_cast<PGresult*>( a_pvDataR ) ) );
 	}
 
-int long dbrs_id( void const*, void const* a_pvDataR )
+int long dbrs_id( void*, void* a_pvDataR )
 	{
-	return ( ::PQoidValue( static_cast<PGresult const*>( a_pvDataR ) ) );
+	return ( ::PQoidValue( static_cast<PGresult*>( a_pvDataR ) ) );
 	}
 
-char* rs_column_name( void const* a_pvDataR, int a_iField )
+char* rs_column_name( void* a_pvDataR, int a_iField )
 	{
-	return ( ::PQfname( static_cast<PGresult const*>( a_pvDataR ), a_iField ) );
+	return ( ::PQfname( static_cast<PGresult*>( a_pvDataR ), a_iField ) );
 	}
 
 }
