@@ -148,9 +148,9 @@ HString::HString ( int const a_iInt ) : f_pcBuffer ( NULL ), f_iSize ( 0 )
 	M_PROLOG
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
-	l_iSize = snprintf ( l_pcMeasureBuffer, 1, "%d", a_iInt ) + 1;
+	l_iSize = snprintf( l_pcMeasureBuffer, 1, "%d", a_iInt ) + 1;
 	hs_realloc ( l_iSize );
-	M_ENSURE ( snprintf ( f_pcBuffer, l_iSize, "%d", a_iInt ) < l_iSize );
+	M_ENSURE( ::snprintf( f_pcBuffer, l_iSize, "%d", a_iInt ) < l_iSize );
 	return;
 	M_EPILOG
 	}
@@ -541,7 +541,7 @@ void HString::swap( HString& left, HString& right )
 	return;
 	}
 
-HString& HString::format ( char const* const a_pcFormat, ... )
+HString& HString::format( char const* const a_pcFormat, ... )
 	{
 	M_PROLOG
 	va_list ap;
@@ -560,17 +560,20 @@ HString& HString::format ( char const* const a_pcFormat, ... )
 	M_EPILOG
 	}
 
-HString & HString::vformat ( char const * const a_pcFormat, void* a_xAp )
+HString & HString::vformat( char const * const a_pcFormat, void* a_xAp )
 	{
 	M_PROLOG
 	int l_iSize = 0;
 	char l_pcMeasureBuffer [ 3 ] = "\0\0";
 	if ( ! a_pcFormat )
 		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
-	l_iSize = vsnprintf ( l_pcMeasureBuffer, 1, a_pcFormat, *static_cast<va_list*>( a_xAp ) ) + 1;
+	va_list orig;
+	__va_copy( orig, *static_cast<va_list*>( a_xAp ) );
+	l_iSize = vsnprintf( l_pcMeasureBuffer, 1, a_pcFormat, *static_cast<va_list*>( a_xAp ) ) + 1;
 	hs_realloc ( l_iSize );
-	M_ENSURE ( vsnprintf ( f_pcBuffer, l_iSize, a_pcFormat, *static_cast<va_list*>( a_xAp ) ) < l_iSize );
-	return ( * this );
+	M_ENSURE ( vsnprintf( f_pcBuffer, l_iSize, a_pcFormat, orig ) < l_iSize );
+	va_end( orig );
+	return ( *this );
 	M_EPILOG
 	}
 
