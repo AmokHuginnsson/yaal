@@ -105,6 +105,7 @@ public:
 			} mode_t;
 		};
 private:
+	MODE::mode_t f_eMode;
 	yaal::hcore::HString f_oVarTmpBuffer;
 	yaal::hcore::HString f_oSQL;
 	yaal::hcore::HString f_oTable;			/* table name */
@@ -115,8 +116,21 @@ private:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
 	fields_t f_oFields;
 	values_t f_oValues;
+	database_ptr_t f_oDataBase;
 public:
+	void set_table( char const* const );
+	void set_columns( char const* const );
+	void set_filter( char const* const );
+	void set_sort( char const* const );
+	yaal::hcore::HString get_table( void ) const;
+	yaal::hcore::HString get_columns( void ) const;
+	yaal::hcore::HString get_filter( void ) const;
+	yaal::hcore::HString get_sort( void ) const;
+	void sync( int, int long& );
+	void sync( int, yaal::hcore::HString& );
 	HSQLDescriptor( void );
+	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );
+	virtual ~HSQLDescriptor( void );
 	yaal::hcore::HString const& build_sql( MODE::mode_t const& );
 	};
 
@@ -127,3 +141,4 @@ typedef yaal::hcore::HExceptionT<HRecordSet> HRecordSetException;
 }
 
 #endif /* not __YAAL_DBWRAPPER_HRECORDSET_H */
+

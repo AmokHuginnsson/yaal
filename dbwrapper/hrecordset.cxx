@@ -118,10 +118,21 @@ HRecordSet::iterator HRecordSet::rend( void )
 	}
 
 HSQLDescriptor::HSQLDescriptor( void )
-	: f_oVarTmpBuffer(), f_oSQL(), f_oTable(), f_oColumns ( "*" ),
-	f_oFilter(), f_oSort(), f_oFields(), f_oValues()
+	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(), f_oColumns ( "*" ),
+	f_oFilter(), f_oSort(), f_oFields(), f_oValues(), f_oDataBase()
 	{
 	return;
+	}
+
+HSQLDescriptor::HSQLDescriptor( database_ptr_t a_oDataBase )
+	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(), f_oColumns ( "*" ),
+	f_oFilter(), f_oSort(), f_oFields(), f_oValues(), f_oDataBase( a_oDataBase )
+	{
+	return;
+	}
+
+HSQLDescriptor::~HSQLDescriptor( void )
+	{
 	}
 
 HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
@@ -201,6 +212,62 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 		}
 	return ( f_oSQL );
 	M_EPILOG
+	}
+
+void HSQLDescriptor::sync( int a_iField, HString& value )
+	{
+	if ( f_eMode == MODE::D_SELECT )
+		value = f_oValues[ a_iField ];
+	else
+		f_oValues[ a_iField ] = value;
+	}
+
+void HSQLDescriptor::sync( int a_iField, int long& value )
+	{
+	if ( f_eMode == MODE::D_SELECT )
+		value = lexical_cast<int>( f_oValues[ a_iField ] );
+	else
+		f_oValues[ a_iField ] = value;
+	}
+
+void HSQLDescriptor::set_table( char const* const a_pcTable )
+	{
+	f_oTable = a_pcTable;
+	}
+
+void HSQLDescriptor::set_columns( char const* const a_pcColumns )
+	{
+	f_oColumns = a_pcColumns;
+	}
+
+void HSQLDescriptor::set_filter( char const* const a_pcFilter )
+	{
+	f_oFilter = a_pcFilter;
+	}
+
+void HSQLDescriptor::set_sort( char const* const a_pcSort )
+	{
+	f_oSort = a_pcSort;
+	}
+
+HString HSQLDescriptor::get_table( void ) const
+	{
+	return ( f_oTable );
+	}
+
+HString HSQLDescriptor::get_columns( void ) const
+	{
+	return ( f_oColumns );
+	}
+
+HString HSQLDescriptor::get_filter( void ) const
+	{
+	return ( f_oFilter );
+	}
+
+HString HSQLDescriptor::get_sort( void ) const
+	{
+	return ( f_oSort );
 	}
 
 HRecordSet::HIterator::HIterator( HRecordSet* a_poOwner, int const& a_iPosition )

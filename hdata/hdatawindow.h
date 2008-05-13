@@ -27,7 +27,7 @@ Copyright:
 #ifndef __YAAL_HDATA_HDATAWINDOW_H
 #define __YAAL_HDATA_HDATAWINDOW_H
 
-#include "dbwrapper/hrecordset.h"
+#include "dbwrapper/hdatabase.h"
 #include "hconsole/hwindow.h"
 #include "hconsole/hlistcontrol.h"
 #include "hdata/hdatacontrol.h"
@@ -56,14 +56,15 @@ protected:
 	DOCUMENT::mode_t f_eDocumentMode;
 	HDataControl* f_poMainControl;
 	OResource* f_psResourcesArray;
-	hconsole::HItem* f_poSyncStore;
-	hcore::HList<HDataControl*> f_oViewModeControls;
-	hcore::HList<HDataControl*> f_oEditModeControls;
+	yaal::hconsole::HItem* f_poSyncStore;
+	yaal::hcore::HList<HDataControl*> f_oViewModeControls;
+	yaal::hcore::HList<HDataControl*> f_oEditModeControls;
+	yaal::dbwrapper::database_ptr_t f_oDataBase;
 public:
-	HDataWindow ( char const *, dbwrapper::HDataBase * = NULL, OResource * = NULL );
-	virtual ~HDataWindow ( void );
-	virtual int init ( void );
-	virtual hconsole::HStatusBarControl * init_bar ( char const * );
+	HDataWindow( char const*, dbwrapper::HDataBase::ptr_t = dbwrapper::HDataBase::ptr_t(), OResource* = NULL );
+	virtual ~HDataWindow( void );
+	virtual int init( void );
+	virtual hconsole::HStatusBarControl* init_bar( char const* );
 	void set_sync_store ( hconsole::HItem * = NULL );
 	bool is_modified ( void ) const;
 	void set_modified ( bool = true );

@@ -44,12 +44,12 @@ namespace yaal
 namespace hdata
 {
 
-HDataWindow::HDataWindow ( char const * a_pcTitle, HDataBase* /* FIXME a_poDataBase */,
+HDataWindow::HDataWindow( char const* a_pcTitle, HDataBase::ptr_t a_oDataBase,
 		OResource* a_psDataControlInfo )
-	: HWindow ( a_pcTitle ),
-	f_bModified ( false ), f_eDocumentMode ( DOCUMENT::D_VIEW ), f_poMainControl ( NULL ),
-	f_psResourcesArray ( a_psDataControlInfo ), f_poSyncStore ( NULL ),
-	f_oViewModeControls(), f_oEditModeControls()
+	: HWindow( a_pcTitle ),
+	f_bModified ( false ), f_eDocumentMode( DOCUMENT::D_VIEW ), f_poMainControl( NULL ),
+	f_psResourcesArray( a_psDataControlInfo ), f_poSyncStore( NULL ),
+	f_oViewModeControls(), f_oEditModeControls(), f_oDataBase( a_oDataBase )
 	{
 	M_PROLOG
 	register_postprocess_handler( KEY<'n'>::command, NULL,
