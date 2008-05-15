@@ -44,19 +44,13 @@ namespace dbwrapper
 char n_pcEMode [ ] = "record set is not in appropriate mode for operation";
 
 HRecordSet::HRecordSet( database_ptr_t a_oDataBase, void* a_pvReuslt )
-	: f_oDataBase( a_oDataBase ), f_pvResult( a_pvReuslt ),
-	f_iFieldCount( dbwrapper::rs_fields_count( f_pvResult ) ),
-	f_iSetSize( dbwrapper::dbrs_records_count( &*f_oDataBase, f_pvResult ) ),
-	f_oColumnNames( f_iFieldCount )
+	: f_oDataBase( a_oDataBase ), f_pvResult( a_pvReuslt )
 	{
 	M_PROLOG
-	if ( f_iSetSize < 0 )
+	if ( get_size() < 0 )
 		log ( LOG_TYPE::D_ERROR ) << "SQL error (query): " << f_oDataBase->get_error() << endl;
-	if ( f_iFieldCount < 0 )
+	if ( get_field_count() < 0 )
 		log ( LOG_TYPE::D_ERROR ) << "SQL error (fiels count): " << f_oDataBase->get_error() << endl;
-	for ( int l_iCtr = 0; l_iCtr < f_iFieldCount; ++ l_iCtr )
-		f_oColumnNames[ l_iCtr ] = dbwrapper::rs_column_name( f_pvResult,
-				l_iCtr );
 	return;
 	M_EPILOG
 	}
@@ -78,17 +72,27 @@ void HRecordSet::clear( void )
 	M_EPILOG
 	}
 
-bool HRecordSet::is_empty( void ) const
+bool HRecordSet::is_empty( void )
 	{
-	return ( ! f_iSetSize );
+	return ( ! get_size() );
 	}
 
-int HRecordSet::field_count( void ) const
+int HRecordSet::get_field_count( void ) const
 	{
-	return ( f_iFieldCount );
+	return ( dbwrapper::rs_fields_count( f_pvResult ) );
 	}
 
-int long HRecordSet::insert_id( void )
+int HRecordSet::get_size( void )
+	{
+	return ( dbwrapper::dbrs_records_count( &*f_oDataBase, f_pvResult ) );
+	}
+
+char const* const HRecordSet::get_column_name( int a_iColumn )
+	{
+	return ( dbwrapper::rs_column_name( f_pvResult, a_iColumn ) );
+	}
+
+int long HRecordSet::get_insert_id( void )
 	{
 	M_PROLOG
 	if ( ! f_pvResult )
@@ -104,12 +108,12 @@ HRecordSet::iterator HRecordSet::begin( void )
 
 HRecordSet::iterator HRecordSet::end( void )
 	{
-	return ( iterator( this, f_iSetSize ) );
+	return ( iterator( this, get_size() ) );
 	}
 
 HRecordSet::iterator HRecordSet::rbegin( void )
 	{
-	return ( iterator( this, f_iSetSize - 1 ) );
+	return ( iterator( this, get_size() - 1 ) );
 	}
 
 HRecordSet::iterator HRecordSet::rend( void )
@@ -118,15 +122,17 @@ HRecordSet::iterator HRecordSet::rend( void )
 	}
 
 HSQLDescriptor::HSQLDescriptor( void )
-	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(), f_oColumns ( "*" ),
-	f_oFilter(), f_oSort(), f_oFields(), f_oValues(), f_oDataBase()
+	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(),
+	f_oColumns ( "*" ), f_oFilter(), f_oSort(), f_oFields(), f_iFieldCount( 0 ),
+	f_iSetSize( 0 ), f_oValues(), f_oDataBase()
 	{
 	return;
 	}
 
 HSQLDescriptor::HSQLDescriptor( database_ptr_t a_oDataBase )
-	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(), f_oColumns ( "*" ),
-	f_oFilter(), f_oSort(), f_oFields(), f_oValues(), f_oDataBase( a_oDataBase )
+	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(),
+	f_oColumns ( "*" ), f_oFilter(), f_oSort(), f_oFields(), f_iFieldCount( 0 ),
+	f_iSetSize( 0 ), f_oValues(), f_oDataBase( a_oDataBase )
 	{
 	return;
 	}
@@ -317,11 +323,26 @@ HRecordSet::HIterator HRecordSet::HIterator::operator ++ ( int )
 	return ( it );
 	}
 
-yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& a_iField )
+yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& a_iField ) const
 	{
 	M_ASSERT( f_poOwner );
-	return ( dbwrapper::rs_get ( f_poOwner->f_pvResult, f_iCursorPosition,
+	return ( dbwrapper::rs_get( f_poOwner->f_pvResult, f_iCursorPosition,
 			a_iField ) );
+	}
+
+HRecordSet HSQLDescriptor::execute( MODE::mode_t const& a_eMode, char const* const a_pcQuery )
+	{
+	HRecordSet rs = f_oDataBase->query( a_pcQuery ? HString( a_pcQuery ) : build_sql( a_eMode ) );
+	for ( int l_iCtr = 0; l_iCtr < f_iFieldCount; ++ l_iCtr )
+		f_oFields[ l_iCtr ] = rs.get_column_name( l_iCtr ); 
+	f_iSetSize = rs.get_size();
+	return ( rs );
+	}
+
+void HSQLDescriptor::sync( HRecordSet::iterator const& it )
+	{
+	for ( int l_iCtr = 0; l_iCtr < f_iFieldCount; ++ l_iCtr )
+		f_oFields[ l_iCtr ] = it[ l_iCtr ];
 	}
 
 #if 0
