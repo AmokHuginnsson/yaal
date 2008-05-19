@@ -43,7 +43,7 @@ mrproper: clean
 	@echo -n "Purging ... "; \
 	/bin/rm -f $(PRJNAME) version.h src/.gt_* src/tags 1exec.core; \
 	/bin/rm -rf src/1exec.core $(DIR_BUILD); \
-	$(FIND) . -name 'tags' -or -name '.depend' -or -name '*.a' \
+	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
 	echo "done."
 
