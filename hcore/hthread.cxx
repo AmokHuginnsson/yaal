@@ -42,13 +42,23 @@ namespace yaal
 namespace hcore
 {
 
+void do_pthread_attr_destroy( void* attr )
+	{
+	M_PROLOG
+	M_ENSURE( ::pthread_attr_destroy( static_cast<pthread_attr_t*>( attr ) ) == 0 );
+	return;
+	M_EPILOG
+	}
+
 HThread::HThread( void )
 	: f_eStatus( D_DEAD ), f_oAttributes( xcalloc<pthread_attr_t>( 1 ) ),
-	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::D_RECURSIVE ), f_oSemaphore()
+	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::D_RECURSIVE ),
+	f_oSemaphore(), f_oAttrDS()
 	{
 	M_PROLOG
 	pthread_attr_t* attr = f_oAttributes.get<pthread_attr_t>();
-	M_ENSURE( ::pthread_attr_init( attr ) == 0 ); /* FIXME resource leak possible */
+	M_ENSURE( ::pthread_attr_init( attr ) == 0 );
+	f_oAttrDS.set_destruction_scheme( attr, do_pthread_attr_destroy );
 	M_ENSURE( ::pthread_attr_setdetachstate( attr, PTHREAD_CREATE_JOINABLE ) == 0 );
 	M_ENSURE( ::pthread_attr_setinheritsched( attr, PTHREAD_INHERIT_SCHED ) == 0 );
 	return;
@@ -66,7 +76,6 @@ HThread::~HThread( void )
 		f_oMutex.lock();
 		}
 	M_ASSERT( f_eStatus == D_DEAD );
-	M_ENSURE( ::pthread_attr_destroy( f_oAttributes.get<pthread_attr_t>() ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -102,10 +111,10 @@ int HThread::finish( void )
 	if ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) && ( f_eStatus != D_SPAWNING ) )
 		M_THROW( _( "thread is not running" ), f_eStatus );
 	schedule_finish();
-	void* l_pvReturn = NULL;
 	f_oMutex.unlock();
 	f_oSemaphore.wait();
 	f_oMutex.lock();
+	void* l_pvReturn = NULL;
 	M_ENSURE( ::pthread_join( *f_oThread.get<pthread_t>(), &l_pvReturn ) == 0 );
 	f_eStatus = D_DEAD;
 	return ( reinterpret_cast<int long>( l_pvReturn ) );
@@ -182,15 +191,21 @@ int HThread::run( void )
 	M_EPILOG
 	}
 
+void do_pthread_mutexattr_destroy( void* attr )
+	{
+	::pthread_mutexattr_destroy( static_cast<pthread_mutexattr_t*>( attr ) );
+	}
+
 HMutex::HMutex( TYPE::mutex_type_t const a_eType ) : f_eType ( a_eType ),
 	f_oAttributes( xcalloc<pthread_mutexattr_t>( 1 ) ),
-	f_oMutex( xcalloc<pthread_mutex_t>( 1 ) )
+	f_oMutex( xcalloc<pthread_mutex_t>( 1 ) ), f_oAttrDS()
 	{
 	M_PROLOG
 	if ( f_eType == TYPE::D_DEFAULT )
 		f_eType = TYPE::D_NON_RECURSIVE;
 	pthread_mutexattr_t* attr = f_oAttributes.get<pthread_mutexattr_t>();
-	::pthread_mutexattr_init( attr ); /* FIXME resource leak possible */
+	::pthread_mutexattr_init( attr );
+	f_oAttrDS.set_destruction_scheme( attr, do_pthread_mutexattr_destroy );
 	M_ENSURE( ::pthread_mutexattr_settype( attr,
 				f_eType & TYPE::D_RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
 	::pthread_mutex_init( f_oMutex.get<pthread_mutex_t>(), attr );
@@ -205,7 +220,6 @@ HMutex::~HMutex( void )
 	while ( ( l_iError = ::pthread_mutex_destroy( f_oMutex.get<pthread_mutex_t>() ) ) == EBUSY )
 		;
 	M_ENSURE( l_iError == 0 );
-	::pthread_mutexattr_destroy( f_oAttributes.get<pthread_mutexattr_t>() );
 	return;
 	M_EPILOG
 	}

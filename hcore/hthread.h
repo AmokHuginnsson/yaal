@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_HCORE_HTHREAD_H
 
 #include "hcore/hchunk.h"
+#include "hcore/hrawdestructor.h"
 
 namespace yaal
 {
@@ -48,11 +49,12 @@ public:
 			D_NON_RECURSIVE = 2
 			} mutex_type_t;
 		};
-protected:
+private:
 	/*{*/
 	TYPE::mutex_type_t f_eType;
 	HChunk f_oAttributes;
 	HChunk f_oMutex;
+	HRawDestructor f_oAttrDS;
 	/*}*/
 public:
 	/*{*/
@@ -95,9 +97,9 @@ class HThread
 	status_t f_eStatus;
 	HChunk f_oAttributes;
 	HChunk f_oThread;
-protected:
 	mutable HMutex f_oMutex;
 	HSemaphore f_oSemaphore;
+	HRawDestructor f_oAttrDS;
 public:
 	HThread( void );
 	virtual ~HThread( void );
