@@ -59,6 +59,16 @@ private:
 
 class HWorkFlow : public HWorkFlowInterface
 	{
+public:
+	struct MODE
+		{
+		typedef enum
+			{
+			D_FLAT,
+			D_PIPE
+			} mode_t;
+		};
+private:
 	class HTask;
 	typedef yaal::hcore::HPointer<HTask> task_ptr_t;
 	typedef yaal::hcore::HCallInterface::ptr_t call_t;
@@ -66,6 +76,7 @@ class HWorkFlow : public HWorkFlowInterface
 	typedef yaal::hcore::HThreadT<HWorkFlow> work_flow_t;
 	typedef yaal::hcore::HMap<HTaskInterface*, task_ptr_t> pool_t;
 	typedef yaal::hcore::HList<HTaskInterface*> join_queue_t;
+	MODE::mode_t f_eMode;
 	bool f_bLoop;
 	/*! Task queue.
 	 */
@@ -80,7 +91,7 @@ class HWorkFlow : public HWorkFlowInterface
 	yaal::hcore::HMutex f_oMutex;
 	work_flow_t f_oWorkFlow;
 public:
-	HWorkFlow( int = 1 );
+	HWorkFlow( MODE::mode_t const&, int = 1 );
 	virtual ~HWorkFlow( void );
 	void run( void );
 	void push_task( call_t );

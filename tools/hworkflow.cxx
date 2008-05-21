@@ -44,14 +44,16 @@ void HWorkFlowInterface::task_finished( HTaskInterface* a_poTask )
 	M_EPILOG
 	}
 
-HWorkFlow::HWorkFlow( int a_iWorkerPoolSize ) : f_bLoop( true ), f_oQueue(),
+HWorkFlow::HWorkFlow( MODE::mode_t const& a_eMode, int a_iWorkerPoolSize )
+	: f_eMode( a_eMode ), f_bLoop( a_eMode == MODE::D_PIPE ), f_oQueue(),
 	f_iWorkerPoolSize( a_iWorkerPoolSize ), f_iActiveWorkers( 0 ),
 	f_oPool(), f_oJoinQueue(),
 	f_oSemaphore(), f_oMutex(), f_oWorkFlow( *this )
 	{
 	M_PROLOG
 	M_ASSERT( f_iWorkerPoolSize > 0 );
-	f_oWorkFlow.spawn();
+	if ( f_eMode == MODE::D_PIPE )
+		f_oWorkFlow.spawn();
 	return;
 	M_EPILOG
 	}
@@ -59,10 +61,12 @@ HWorkFlow::HWorkFlow( int a_iWorkerPoolSize ) : f_bLoop( true ), f_oQueue(),
 HWorkFlow::~HWorkFlow( void )
 	{
 	M_PROLOG
-	/* FIXME we have to wait til no task is running. */
-	f_bLoop = false;
-	f_oSemaphore.signal();
-	f_oWorkFlow.finish();
+	if ( f_eMode == MODE::D_PIPE )
+		{
+		f_bLoop = false;
+		f_oSemaphore.signal();
+		f_oWorkFlow.finish();
+		}
 	return;
 	M_EPILOG
 	}
@@ -70,7 +74,7 @@ HWorkFlow::~HWorkFlow( void )
 int HWorkFlow::operator()( yaal::hcore::HThread const* )
 	{
 	M_PROLOG
-	while ( f_bLoop )
+	while ( f_bLoop || ( ! f_bLoop && ( ! f_oQueue.is_empty() || f_iActiveWorkers ) ) )
 		{
 		f_oSemaphore.wait();
 			{
@@ -82,7 +86,7 @@ int HWorkFlow::operator()( yaal::hcore::HThread const* )
 				f_oPool.remove( *it );
 				}
 			f_oJoinQueue.clear();
-			if ( ! f_bLoop )
+			if ( ! f_bLoop && ( f_eMode == MODE::D_PIPE ) )
 				break;
 			if ( ! f_oQueue.is_empty() && ( f_iActiveWorkers < f_iWorkerPoolSize ) )
 				{
@@ -98,6 +102,11 @@ int HWorkFlow::operator()( yaal::hcore::HThread const* )
 		it->first->finish();
 	return ( 0 );
 	M_EPILOG
+	}
+
+void HWorkFlow::run( void )
+	{
+	operator()( NULL );
 	}
 
 void HWorkFlow::push_task( call_t a_oCall )
