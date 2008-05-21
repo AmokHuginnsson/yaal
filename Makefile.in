@@ -177,7 +177,7 @@ clean: clean-dep
 mrproper: clean
 	@echo -n "Purging ... "; \
 	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD) make.log; \
-	$(FIND) . -name 'tags' -or -name '.depend' -or -name '*.a' \
+	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
 	echo "done."
 
