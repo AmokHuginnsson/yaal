@@ -143,7 +143,7 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		}
 	else /* D_UNBUFFERED_READS */
 		{
-		l_iLength = read_until( a_roLine, HStreamInterface::eols, false );
+		l_iLength = read_until( a_roLine, HStreamInterface::eols, false ).octets;
 		if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
 			M_THROW( _( "line too long" ), l_iLength );
 		}
@@ -217,10 +217,10 @@ void HFile::do_flush( void ) const
 	M_EPILOG
 	}
 
-HFile::operator opcm_t const ( void ) const
+bool HFile::operator ! ( void ) const
 	{
 	M_PROLOG
-	return ( f_pvHandle ? &OPointerConversion::f_iValid : NULL );
+	return ( ! f_pvHandle );
 	M_EPILOG
 	}
 

@@ -44,7 +44,7 @@ namespace hcore
 namespace rc_file
 {
 
-typedef bool const ( * RC_CALLBACK_t )( HString&, HString& );
+typedef bool ( * RC_CALLBACK_t )( HString&, HString& );
 
 int reload_configuration( void );
 int process_rc_file_internal( char const* const, char const* const,

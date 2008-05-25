@@ -43,7 +43,7 @@ int lexical_cast( HString const& val )
 	return ( ::strtol( val, NULL, 10 ) );
 	}
 
-char const* const error_message( int a_iCode )
+char const* error_message( int a_iCode )
 	{
 	return ( strerror( a_iCode ) );
 	}

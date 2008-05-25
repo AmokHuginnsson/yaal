@@ -177,9 +177,9 @@ public:
 		{ return ( f_oEngine.operator*<typename map_t::map_elem_t>() ); }
 	const_qual_t& operator* ( void ) const
 		{ return ( f_oEngine.operator*<typename map_t::map_elem_t>() ); }
-	const_qual_t* const operator-> ( void )
+	const_qual_t* operator-> ( void )
 		{ return ( &f_oEngine.operator*<typename map_t::map_elem_t>() ); }
-	const_qual_t* const operator-> ( void ) const
+	const_qual_t* operator-> ( void ) const
 		{ return ( &f_oEngine.operator*<typename map_t::map_elem_t>() ); }
 	template<typename other_const_qual_t>
 	bool operator == ( HIterator<other_const_qual_t> const& it ) const

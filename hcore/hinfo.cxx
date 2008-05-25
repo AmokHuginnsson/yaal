@@ -146,7 +146,7 @@ void HInfo::purge( void )
 char HInfo::operator [] ( int const a_iIndex )
 	{
 	M_PROLOG
-	return ( f_oString [ a_iIndex ] );
+	return ( f_oString[ a_iIndex ] );
 	M_EPILOG
 	}
 
@@ -188,7 +188,7 @@ HInfo& HInfo::operator () ( HInfo const& a_roInfo )
 	}
 
 template<>
-int const HInfo::get<int>( void ) const
+int HInfo::get<int>( void ) const
 	{
 	M_PROLOG
 	return ( f_iInt );
@@ -196,7 +196,7 @@ int const HInfo::get<int>( void ) const
 	}
 
 template<>
-int long const HInfo::get<int long>( void ) const
+int long HInfo::get<int long>( void ) const
 	{
 	M_PROLOG
 	return ( f_lLongInt );
@@ -204,7 +204,7 @@ int long const HInfo::get<int long>( void ) const
 	}
 
 template<>
-double const HInfo::get<double>( void ) const
+double HInfo::get<double>( void ) const
 	{
 	M_PROLOG
 	return ( f_dDouble );
@@ -212,10 +212,10 @@ double const HInfo::get<double>( void ) const
 	}
 
 template<>
-char const* const HInfo::get<char const* const>( void ) const
+char const* HInfo::get<char const*>( void ) const
 	{
 	M_PROLOG
-	return ( static_cast < char const * const > ( f_oString ) );
+	return ( static_cast<char const*>( f_oString ) );
 	M_EPILOG
 	}
 
@@ -236,7 +236,7 @@ HTime const& HInfo::get<HTime const&>( void ) const
 	}
 
 template<>
-void* const HInfo::get<void*>( void ) const
+void* HInfo::get<void*>( void ) const
 	{
 	M_PROLOG
 	void* l_pvTmp = f_pvPointer;
@@ -244,10 +244,10 @@ void* const HInfo::get<void*>( void ) const
 	M_EPILOG
 	}
 
-HInfo::operator opcm_t const ( void ) const
+bool HInfo::operator ! ( void ) const
 	{
 	M_PROLOG
-	return ( f_lLongInt || f_dDouble || f_oString ? &OPointerConversion::f_iValid : NULL );
+	return ( ! ( f_lLongInt || f_dDouble || f_oString ) );
 	M_EPILOG
 	}
 

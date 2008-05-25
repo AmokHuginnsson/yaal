@@ -39,8 +39,6 @@ namespace hcore
 
 class HInfo
 	{
-	struct OPointerConversion { int f_iValid; };
-	typedef int OPointerConversion::* opcm_t;
 	type_t		f_eType;
 	int				f_iInt;
 	int long	f_lLongInt;
@@ -62,9 +60,9 @@ public:
 	char operator [] ( int const );
 	HInfo& operator = ( HInfo const& );
 	HInfo& operator() ( HInfo const& );
-	template < typename tType >
-	tType const get( void ) const;
-	operator opcm_t const ( void ) const;
+	template<typename tType>
+	tType get( void ) const;
+	bool operator ! ( void ) const;
 private:
 	void purge( void );
 	};

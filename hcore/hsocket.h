@@ -72,7 +72,7 @@ public:
 	void listen( char const* const, int const = 0 );
 	ptr_t accept( void );
 	void connect( char const* const, int const = 0 );
-	int const get_port( void ) const;
+	int get_port( void ) const;
 	void shutdown( void );
 	void shutdown_client( int );
 	ptr_t get_client( int ) const;

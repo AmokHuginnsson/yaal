@@ -66,7 +66,7 @@ bool eq ( double const & a_dLeft, double const & a_dRight )
 					: ( ( a_dRight ) - ( a_dLeft ) ) ) < D_EPSILON ) );
 	}
 
-bool const set_hcore_variables ( HString & a_roOption, HString & a_roValue )
+bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	M_PROLOG
 	int l_iCtr = 0;

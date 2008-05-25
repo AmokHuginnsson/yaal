@@ -55,7 +55,6 @@ public:
 		int octets;
 		code_t code;
 		STATUS( void ) : octets( 0 ), code( D_OK ) {}
-		operator int const ( void ) const { return ( octets ); }
 		};
 protected:
 	typedef yaal::hcore::HPool<char> cache_t;

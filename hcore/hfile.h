@@ -38,8 +38,6 @@ namespace hcore
 
 class HFile : public HStreamInterface
 	{
-	struct OPointerConversion { int f_iValid; };
-	typedef int OPointerConversion::* opcm_t;
 public:
 	typedef enum
 		{
@@ -71,7 +69,7 @@ public:
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	virtual void flush( void ) const;
-	operator opcm_t const ( void ) const;
+	bool operator ! ( void ) const;
 private:
 	virtual int do_write( void const* const, int const );
 	virtual void do_flush( void ) const;

@@ -80,7 +80,7 @@ public:
 	void reset( void );
 	int size( void ) const;
 	static void swap( HPool<tType>&, HPool<tType>& );
-	tType const* const raw( void ) const;
+	tType const* raw( void ) const;
 	tType* raw( void );
 	const_iterator begin( void ) const;
 	iterator begin( void );
@@ -230,7 +230,7 @@ void HPool<tType>::swap( HPool<tType>& left, HPool<tType>& right )
 	}
 
 template<typename tType>
-tType const* const HPool<tType>::raw( void ) const
+tType const* HPool<tType>::raw( void ) const
 	{
 	return ( f_ptPool );
 	}

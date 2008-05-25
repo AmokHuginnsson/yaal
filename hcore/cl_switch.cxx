@@ -50,7 +50,7 @@ namespace hcore
 namespace cl_switch
 {
 
-char const * const make_short_opts ( OOption * const & a_rpsOptions, int a_iCount, HString & a_roBuffer )
+char const* make_short_opts ( OOption* const& a_rpsOptions, int a_iCount, HString& a_roBuffer )
 	{
 	int l_iCtr = 0;
 	a_roBuffer = "";

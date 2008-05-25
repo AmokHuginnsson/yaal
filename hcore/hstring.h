@@ -82,8 +82,8 @@ public:
 	bool operator < ( char const* const ) const;
 	/* add_* functions in HList needs operator
 		 bool() operator char * works fine here */
-	operator char const* const ( void ) const;
-	char const* const raw( void ) const;
+	operator char const* ( void ) const;
+	char const* raw( void ) const;
 	bool is_empty( void ) const;
 	bool empty( void ) const;
 	void clear( void );
