@@ -40,10 +40,10 @@ class HNumber
 	{
 private:
 	typedef HPool<char> canonical_t;
-	int long f_iPrecision;
+	int long f_lPrecision;
 	bool f_bNegative;
-	int long f_iDigitCount;
-	int long f_iIntegralPartSize;
+	int long f_lDigitCount;
+	int long f_lIntegralPartSize;
 	canonical_t f_oCanonical;
 public:
 	static int D_DEFAULT_PRECISION;
@@ -104,17 +104,17 @@ public:
 	HNumber operator / ( HNumber const& ) const;
 	HNumber operator ^ ( int long unsigned ) const;
 	static void swap( HNumber&, HNumber& );
-	void set_precision( int );
-	int get_precision( void ) const;
+	void set_precision( int long );
+	int long get_precision( void ) const;
 	double long to_double( void ) const;
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
 private:
 	bool mutate_addition( char*, int long, char const* const[], int long*, int long*, bool, bool ) const;
-	int absolute_lower( HNumber const& ) const;
+	int long absolute_lower( HNumber const& ) const;
 	void karatsuba( canonical_t&, char const*, int long, char const*, int long ) const;
-	int integral_length( void ) const;
-	int decimal_length( void ) const;
+	int long integral_length( void ) const;
+	int long decimal_length( void ) const;
 	void from_string( HString const& );
 	void from_double( double long );
 	void normalize( void );

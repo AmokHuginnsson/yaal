@@ -83,9 +83,9 @@ private:
 	HLog( void );
 	virtual ~HLog( void );
 	void timestamp ( FILE * = NULL );
-	virtual int do_write( void const* const, int const );
+	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;
-	virtual int do_read( void* const, int const );
+	virtual int long do_read( void* const, int long const& );
 	HLog( HLog const& );
 	HLog& operator= ( HLog const& );
 	friend class yaal::hcore::HSingleton<HLog>;

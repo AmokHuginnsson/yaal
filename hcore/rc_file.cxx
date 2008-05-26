@@ -316,7 +316,7 @@ void strip_comment( HString& a_roLine )
 	{
 	M_PROLOG
 	bool l_bApostrophe = false, l_bQuotation = false;
-	int l_iCtr = 0, l_iLenght = a_roLine.get_length();
+	int long l_iCtr = 0, l_iLenght = a_roLine.get_length();
 	for ( l_iCtr = 0; l_iCtr < l_iLenght; l_iCtr ++ )
 		{
 		switch ( a_roLine[ l_iCtr ] )
@@ -348,7 +348,7 @@ int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
 		int& a_riLine )
 	{
 	M_PROLOG
-	int l_iIndex = 0, l_iLenght = 0, l_iEnd = 0;
+	int long l_iIndex = 0, l_iLenght = 0, l_iEnd = 0;
 	a_roOption = a_roValue = "";
 	while ( a_roFile.read_line( a_roOption, HFile::D_STRIP_NEWLINES ) >= 0 )
 		{
@@ -374,7 +374,7 @@ int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
 			{
 			/* we have found a whitespace, so there is probability that */
 			/* have a value :-o */
-			int l_iEndOfOption = l_iIndex;
+			int long l_iEndOfOption = l_iIndex;
 			l_iIndex = a_roOption.find_other_than( n_pcWhiteSpace, l_iIndex );
 			if ( ( l_iIndex > 0 ) && a_roOption[ l_iIndex ] )
 				{
@@ -413,9 +413,9 @@ void rc_set_variable( char const * const a_pcValue, char ** a_ppcVariable )
 	return;
 	}
 
-void rc_set_variable( char const* const a_pcValue, int & a_riVariable )
+void rc_set_variable( char const* const a_pcValue, int& a_riVariable )
 	{
-	a_riVariable = to_int( a_pcValue );
+	a_riVariable = static_cast<int>( to_int( a_pcValue ) );
 	}
 
 void rc_set_variable( char const* const a_pcValue, char & a_rcVariable )

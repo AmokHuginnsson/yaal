@@ -60,17 +60,17 @@ int HPipe::get_reader_fd( void ) const
 	return ( f_piPipe[ 0 ] );
 	}
 
-int HPipe::do_read( void* const a_pcBuffer, int const a_iSize )
+int long HPipe::do_read( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	return ( ::read( f_piPipe[ 0 ], a_pcBuffer, a_iSize ) );
+	return ( ::read( f_piPipe[ 0 ], a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}
 
-int HPipe::do_write( void const* const a_pcBuffer, int const a_iSize )
+int long HPipe::do_write( void const* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	int iWritten = -1;
+	int long iWritten = -1;
 	if ( HRawFile::is_write_ready( f_piPipe[ 1 ] ) )
 		{
 		iWritten = 0;
@@ -78,9 +78,9 @@ int HPipe::do_write( void const* const a_pcBuffer, int const a_iSize )
 			{
 			iWritten += TEMP_FAILURE_RETRY( ::write( f_piPipe[ 1 ],
 						static_cast<char const* const>( a_pcBuffer ) + iWritten,
-						a_iSize - iWritten ) );
+						a_lSize - iWritten ) );
 			}
-		while ( iWritten < a_iSize );
+		while ( iWritten < a_lSize );
 		}
 	return ( iWritten );
 	M_EPILOG

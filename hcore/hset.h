@@ -139,7 +139,7 @@ public:
 		}
 	tType const& operator * ( void )
 		{	return ( f_oEngine.operator*<tType>() );	}
-	tType const* const operator -> ( void )
+	tType const* operator -> ( void )
 		{ return ( &f_oEngine.operator*<tType>() );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( f_oEngine == it.f_oEngine ); }

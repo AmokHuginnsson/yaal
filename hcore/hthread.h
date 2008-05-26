@@ -104,7 +104,7 @@ public:
 	HThread( void );
 	virtual ~HThread( void );
 	int spawn( void );
-	int finish( void );
+	int long finish( void );
 	void schedule_finish( void );
  	bool is_alive( void ) const;
 private:

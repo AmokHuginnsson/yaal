@@ -109,7 +109,7 @@ int HFile::close( void )
 	M_EPILOG
 	}
 
-int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
+int long HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		int const a_iMaximumLength )
 	{
 	M_PROLOG
@@ -124,7 +124,7 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		a_eMode |= D_BUFFERED_READS;
 	if ( ! f_pvHandle )
 		M_THROW ( _ ( "no file is opened" ), errno );
-	int l_iLength = -1;
+	int long l_iLength = -1;
 	if ( a_eMode & D_BUFFERED_READS )
 		{
 		l_iLength = get_line_length();
@@ -163,17 +163,17 @@ int HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 	M_EPILOG
 	}
 
-int HFile::get_line_length( void )
+int long HFile::get_line_length( void )
 	{
 	M_PROLOG
 	static int const D_SCAN_BUFFER_SIZE = 8;
-	int l_iLength = 0, l_iSize = 0;
+	int long l_iLength = 0, l_iSize = 0;
 	char l_pcBuffer [ D_SCAN_BUFFER_SIZE ];
 	char const * l_pcPtr = NULL;
 	do
 		{
-		l_iSize = fread ( l_pcBuffer, sizeof ( char ),
-				D_SCAN_BUFFER_SIZE, static_cast < FILE * > ( f_pvHandle ) );
+		l_iSize = ::fread( l_pcBuffer, sizeof ( char ),
+				D_SCAN_BUFFER_SIZE, static_cast<FILE*>( f_pvHandle ) );
 		l_iLength += l_iSize;
 		l_pcPtr = static_cast < char * > ( memchr ( l_pcBuffer,
 					'\n', l_iSize ) );
@@ -224,18 +224,18 @@ bool HFile::operator ! ( void ) const
 	M_EPILOG
 	}
 
-int HFile::do_read( void* const a_pcBuffer, int a_iSize )
+int long HFile::do_read( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	return ( ::fread ( a_pcBuffer, sizeof ( char ), a_iSize,
+	return ( ::fread( a_pcBuffer, sizeof ( char ), a_lSize,
 				static_cast<FILE*>( f_pvHandle ) ) );
 	M_EPILOG
 	}
 
-int HFile::do_write( void const* const a_pcString, int const a_iSize )
+int long HFile::do_write( void const* const a_pcString, int long const& a_lSize )
 	{
 	M_PROLOG
-	return ( ::fwrite( a_pcString, sizeof ( char ), a_iSize, static_cast<FILE*>( f_pvHandle ) ) );
+	return ( ::fwrite( a_pcString, sizeof ( char ), a_lSize, static_cast<FILE*>( f_pvHandle ) ) );
 	M_EPILOG
 	}
 

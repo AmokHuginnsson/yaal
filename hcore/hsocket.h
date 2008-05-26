@@ -78,7 +78,7 @@ public:
 	ptr_t get_client( int ) const;
 	bool get_client_next( int&, ptr_t& ) const;
 	void rewind_client_list( void ) const;
-	int write_until_eos( HString const& );
+	int long write_until_eos( HString const& );
 	int get_client_count( void ) const;
 	HString const& get_host_name( void );
 protected:

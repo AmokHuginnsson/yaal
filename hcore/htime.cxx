@@ -291,7 +291,7 @@ bool HTime::operator > ( time_t const & a_rxTime ) const
 HTime::operator char const* ( void ) const
 	{
 	M_PROLOG
-	int l_iSize = 0;
+	int long l_iSize = 0;
 #ifdef HAVE_SMART_STRFTIME
 	l_iSize = strftime ( NULL, 1024, f_oFormat, & f_sBroken ) + 1;
 	if ( l_iSize < 2 )

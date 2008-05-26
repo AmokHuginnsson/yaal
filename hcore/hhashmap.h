@@ -76,8 +76,8 @@ class HHashMap
 		/*}*/
 		friend class HHashMap<tType, ttType>;
 		};
-	int unsigned f_uiPrime;
-	int unsigned f_uiIndex;
+	int long unsigned f_ulPrime;
+	int long unsigned f_ulIndex;
 	int f_iSize;
 	HAtom* f_poAtomPtr;
 	HAtom** f_ppoAtomArray;
@@ -113,8 +113,8 @@ HHashMap<tType, ttType>::HAtom::~HAtom( void )
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
-HHashMap<tType, ttType>::HHashMap ( size_t a_uiSize ) : f_uiPrime ( 0 ), f_uiIndex ( 0 ),
+template<typename tType, typename ttType>
+HHashMap<tType, ttType>::HHashMap ( size_t a_uiSize ) : f_ulPrime ( 0 ), f_ulIndex ( 0 ),
 	f_iSize ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
 	M_PROLOG
@@ -126,14 +126,14 @@ HHashMap<tType, ttType>::HHashMap ( size_t a_uiSize ) : f_uiPrime ( 0 ), f_uiInd
 		a_uiSize >>= 1;
 		l_uiCtr ++;
 		}
-	f_uiPrime = g_pulPrimes [ l_uiCtr - 1 ];
-	f_ppoAtomArray = xcalloc < HAtom * > ( f_uiPrime );
+	f_ulPrime = g_pulPrimes[ l_uiCtr - 1 ];
+	f_ppoAtomArray = xcalloc < HAtom * > ( f_ulPrime );
 	return;
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
-HHashMap<tType, ttType>::HHashMap ( HHashMap const & a_roMap ) :  f_uiPrime ( 0 ), f_uiIndex ( 0 ),
+template<typename tType, typename ttType>
+HHashMap<tType, ttType>::HHashMap ( HHashMap const & a_roMap ) :  f_ulPrime ( 0 ), f_ulIndex ( 0 ),
 	f_iSize ( 0 ), f_poAtomPtr ( NULL ), f_ppoAtomArray ( NULL )
 	{
 	M_PROLOG
@@ -142,7 +142,7 @@ HHashMap<tType, ttType>::HHashMap ( HHashMap const & a_roMap ) :  f_uiPrime ( 0 
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
+template<typename tType, typename ttType>
 HHashMap<tType, ttType>::~HHashMap ( void )
 	{
 	M_PROLOG
@@ -154,7 +154,7 @@ HHashMap<tType, ttType>::~HHashMap ( void )
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
+template<typename tType, typename ttType>
 HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const & a_roMap )
 	{
 	M_PROLOG
@@ -167,11 +167,11 @@ HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const &
 		if ( f_ppoAtomArray )
 			xfree ( f_ppoAtomArray );
 		f_ppoAtomArray = NULL;
-		f_uiPrime = a_roMap.f_uiPrime;
-		f_uiIndex = a_roMap.f_uiIndex;
+		f_ulPrime = a_roMap.f_ulPrime;
+		f_ulIndex = a_roMap.f_ulIndex;
 		f_iSize = a_roMap.f_iSize;
-		f_ppoAtomArray = xcalloc < HAtom * > ( f_uiPrime );
-		for ( l_iCtr = 0; l_iCtr < f_uiPrime; ++ l_iCtr )
+		f_ppoAtomArray = xcalloc < HAtom * > ( f_ulPrime );
+		for ( l_iCtr = 0; l_iCtr < f_ulPrime; ++ l_iCtr )
 			{
 			l_poAtom =  a_roMap.f_ppoAtomArray [ l_iCtr ];
 			l_ppoAtom = & f_ppoAtomArray [ l_iCtr ];
@@ -191,13 +191,13 @@ HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const &
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
+template<typename tType, typename ttType>
 void HHashMap<tType, ttType>::clear ( void )
 	{
 	M_PROLOG
 	int unsigned l_uiCtr = 0;
 	HAtom * l_poAtom = NULL;
-	for ( l_uiCtr = 0; l_uiCtr < f_uiPrime; l_uiCtr ++ )
+	for ( l_uiCtr = 0; l_uiCtr < f_ulPrime; l_uiCtr ++ )
 		while ( f_ppoAtomArray [ l_uiCtr ] )
 			{
 			l_poAtom = f_ppoAtomArray [ l_uiCtr ]->f_poNext;
@@ -218,13 +218,13 @@ int HHashMap<tType, ttType>::size( void ) const
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
+template<typename tType, typename ttType>
 ttType & HHashMap<tType, ttType>::operator [ ] ( tType const & a_rtKey )
 	{
 	M_PROLOG
-	int l_iHash = - 1;
+	int long l_iHash = - 1;
 	HAtom * l_poAtom = NULL;
-	l_iHash = hash ( a_rtKey ) % f_uiPrime;
+	l_iHash = hash ( a_rtKey ) % f_ulPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
 	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		l_poAtom = l_poAtom->f_poNext;
@@ -246,13 +246,13 @@ template<typename tType, typename ttType>
 void HHashMap<tType, ttType>::rewind( void )
 	{
 	M_PROLOG
-	f_uiIndex = 0;
+	f_ulIndex = 0;
 	f_poAtomPtr = NULL;
 	return;
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
+template<typename tType, typename ttType>
 bool HHashMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 	{
 	M_PROLOG
@@ -260,14 +260,14 @@ bool HHashMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 		{
 		f_poAtomPtr = f_poAtomPtr->f_poNext;
 		if ( ! f_poAtomPtr )
-			f_uiIndex ++;
+			f_ulIndex ++;
 		}
 	if ( ! f_poAtomPtr )
 		{
-		while ( ( f_uiIndex < f_uiPrime ) && ! f_ppoAtomArray [ f_uiIndex ] )
-			f_uiIndex ++;
-		if ( f_uiIndex < f_uiPrime )
-			f_poAtomPtr = f_ppoAtomArray [ f_uiIndex ];
+		while ( ( f_ulIndex < f_ulPrime ) && ! f_ppoAtomArray [ f_ulIndex ] )
+			f_ulIndex ++;
+		if ( f_ulIndex < f_ulPrime )
+			f_poAtomPtr = f_ppoAtomArray [ f_ulIndex ];
 		}
 	if ( f_poAtomPtr )
 		{
@@ -278,13 +278,13 @@ bool HHashMap<tType, ttType>::iterate ( tType & a_rtKey, ttType & a_rtValue )
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
+template<typename tType, typename ttType>
 bool HHashMap<tType, ttType>::has_key ( tType const & a_rtKey ) const
 	{
 	M_PROLOG
-	int l_iHash = - 1;
+	int long l_iHash = - 1;
 	HAtom * l_poAtom = NULL;
-	l_iHash = hash ( a_rtKey ) % f_uiPrime;
+	l_iHash = hash ( a_rtKey ) % f_ulPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
 	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		l_poAtom = l_poAtom->f_poNext;
@@ -292,13 +292,13 @@ bool HHashMap<tType, ttType>::has_key ( tType const & a_rtKey ) const
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
-bool HHashMap<tType, ttType>::get ( tType const & a_rtKey, ttType & a_rtValue ) const
+template<typename tType, typename ttType>
+bool HHashMap<tType, ttType>::get( tType const & a_rtKey, ttType & a_rtValue ) const
 	{
 	M_PROLOG
-	int l_iHash = - 1;
+	int long l_iHash = -1;
 	HAtom * l_poAtom = NULL;
-	l_iHash = hash ( a_rtKey ) % f_uiPrime;
+	l_iHash = hash( a_rtKey ) % f_ulPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
 	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		l_poAtom = l_poAtom->f_poNext;
@@ -308,13 +308,13 @@ bool HHashMap<tType, ttType>::get ( tType const & a_rtKey, ttType & a_rtValue ) 
 	M_EPILOG
 	}
 
-template < typename tType, typename ttType >
+template<typename tType, typename ttType>
 bool HHashMap<tType, ttType>::remove ( tType const & a_rtKey )
 	{
 	M_PROLOG
-	int l_iHash = - 1;
+	int long l_iHash = -1;
 	HAtom * l_poAtom = NULL, * l_poAncestor = NULL;
-	l_iHash = hash ( a_rtKey ) % f_uiPrime;
+	l_iHash = hash ( a_rtKey ) % f_ulPrime;
 	l_poAtom = f_ppoAtomArray [ l_iHash ];
 	while ( l_poAtom && ( l_poAtom->f_tKey != a_rtKey ) )
 		{

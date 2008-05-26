@@ -172,7 +172,7 @@ void HLog::rehash ( char const * const a_pcLogFileName,
 void HLog::timestamp ( FILE * a_psStream )
 	{
 	M_PROLOG
-	int l_iSize = 0;
+	int long l_iSize = 0;
 	char l_pcBuffer [ D_TIMESTAMP_SIZE ];
 	time_t l_xCurrentTime;
 	if ( ! a_psStream )
@@ -192,7 +192,7 @@ void HLog::timestamp ( FILE * a_psStream )
 	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
-	l_iSize = strftime ( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
+	l_iSize = strftime( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
 			l_psBrokenTime );
 	if ( l_iSize > D_TIMESTAMP_SIZE )
 		M_THROW( _( "strftime returned more than D_TIMESTAMP_SIZE" ), l_iSize );
@@ -268,7 +268,7 @@ HLog & HLog::operator() ( int long const a_lType )
 	M_EPILOG
 	}
 
-int HLog::do_write( void const* const a_pcString, int const a_iSize )
+int long HLog::do_write( void const* const a_pcString, int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( ! a_pcString )
@@ -280,7 +280,7 @@ int HLog::do_write( void const* const a_pcString, int const a_iSize )
 		if ( f_bNewLine )
 			timestamp();
 		len = fprintf ( f_psStream, str );
-		if ( str [ a_iSize - 1 ] != '\n' )
+		if ( str[ a_lSize - 1 ] != '\n' )
 			f_bNewLine = false;
 		else
 			{
@@ -301,7 +301,7 @@ void HLog::do_flush( void ) const
 	M_EPILOG
 	}
 
-int HLog::do_read( void* const, int )
+int long HLog::do_read( void* const, int long const& )
 	{
 	return ( 0 );
 	}

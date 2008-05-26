@@ -54,7 +54,7 @@ namespace openssl_helper
 
 HString& format_error_message( HString& a_oBuffer, int err = 0 )
 	{
-	int l_iCode = 0;
+	int long l_iCode = 0;
 	a_oBuffer = err ? ERR_error_string( err, NULL ) : "";
 	while ( ( l_iCode = ERR_get_error() ) )
 		( a_oBuffer += ( a_oBuffer.is_empty() ? "" : "\n" ) ) += ERR_error_string( l_iCode, NULL );
@@ -202,7 +202,7 @@ void HOpenSSL::check_err( int code ) const
 	M_EPILOG
 	}
 
-int HOpenSSL::read( void* const a_pvBuffer, int const a_iSize )
+int long HOpenSSL::read( void* const a_pvBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	M_ASSERT( f_pvSSL );
@@ -211,7 +211,7 @@ int HOpenSSL::read( void* const a_pvBuffer, int const a_iSize )
 	int nRead = -1;
 	if ( ! f_bPendingOperation )
 		{
-		nRead = SSL_read( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize );
+		nRead = SSL_read( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, static_cast<int>( a_lSize ) );
 		if ( nRead <= 0 )
 			check_err( nRead );
 		}
@@ -219,7 +219,7 @@ int HOpenSSL::read( void* const a_pvBuffer, int const a_iSize )
 	M_EPILOG
 	}
 
-int HOpenSSL::write( void const* const a_pvBuffer, int const a_iSize )
+int long HOpenSSL::write( void const* const a_pvBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	M_ASSERT( f_pvSSL );
@@ -228,7 +228,7 @@ int HOpenSSL::write( void const* const a_pvBuffer, int const a_iSize )
 	int nWritten = 0;
 	if ( ! f_bPendingOperation )
 		{
-		nWritten = SSL_write( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, a_iSize );
+		nWritten = SSL_write( static_cast<SSL*>( f_pvSSL ), a_pvBuffer, static_cast<int>( a_lSize ) );
 		if ( nWritten <= 0 )
 			check_err( nWritten );
 		}

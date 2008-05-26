@@ -58,37 +58,37 @@ HPattern::~HPattern ( void )
 	}
 
 int HPattern::parse ( char const * const a_pcPattern,
-		int short unsigned * const a_puhFlags, int const a_iFlagsCount )
+		int short unsigned* const a_puhFlags, int const a_iFlagsCount )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	bool l_bLocalCopyIgnoreCase = false, l_bLocalCopyExtended = false;
-	int l_iCtr = 0, l_iCtrLoc = 0, l_iBegin = 0, l_iEnd = 0;
-	HArray < int short unsigned > l_oLocalCopyFlags ( a_iFlagsCount );
+	HArray<int short unsigned> l_oLocalCopyFlags( a_iFlagsCount );
 	char const * const l_pcPattern = f_oPatternInput = a_pcPattern;
 	f_oError = "";
 /* making copy of flags */
 	l_bLocalCopyIgnoreCase = f_bIgnoreCase;
 	l_bLocalCopyExtended = f_bExtended;
-	for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
-		l_oLocalCopyFlags [ l_iCtrLoc ] = a_puhFlags [ l_iCtrLoc ];
+	for ( int i = 0; i < a_iFlagsCount; i ++ )
+		l_oLocalCopyFlags [ i ] = a_puhFlags [ i ];
 /* end of copy */
 /* clear all flags */
 	f_bIgnoreCase = f_bIgnoreCaseDefault;
 	f_bExtended = false;
-	for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
-		a_puhFlags [ l_iCtrLoc ] &= 0x00ff;
+	static int short unsigned const D_FLAG_MASK = 0x00ff;
+	for ( int i = 0; i < a_iFlagsCount; ++ i )
+		a_puhFlags[ i ] &= D_FLAG_MASK;
 /* end of clearing */
 /* look for switches at the beginnig of pattern */
-	l_iCtr = 0;
+	int long l_iCtr = 0;
 	while ( l_pcPattern [ l_iCtr ] == '\\' )
 		{
 		if ( set_switch ( l_pcPattern [ ++ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
 			{
 			f_bIgnoreCase = l_bLocalCopyIgnoreCase;
 			f_bExtended = l_bLocalCopyExtended;
-			for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
-				a_puhFlags [ l_iCtrLoc ] = l_oLocalCopyFlags [ l_iCtrLoc ];
+			for ( int i = 0; i < a_iFlagsCount; i ++ )
+				a_puhFlags [ i ] = l_oLocalCopyFlags [ i ];
 			l_iError = 1;
 			f_oError.format ( "bad search option '%c'", l_pcPattern [ l_iCtr ] );
 			return ( l_iError );
@@ -97,16 +97,16 @@ int HPattern::parse ( char const * const a_pcPattern,
 		}
 	if ( l_pcPattern [ l_iCtr ] == '/' )
 		l_iCtr ++;
-	l_iBegin = l_iCtr;
+	int long l_iBegin = l_iCtr;
 /* end of looking at begin */
 /* making copy of flags */
 	l_bLocalCopyIgnoreCase = f_bIgnoreCase;
 	l_bLocalCopyExtended = f_bExtended;
-	for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
-		l_oLocalCopyFlags [ l_iCtrLoc ] = a_puhFlags [ l_iCtrLoc ];
+	for ( int i = 0; i < a_iFlagsCount; ++ i )
+		l_oLocalCopyFlags[ i ] = a_puhFlags[ i ];
 /* end of copy */
 /* look for switches at the end of pattern */
-	l_iEnd = l_iCtr = f_oPatternInput.get_length() - 1;
+	int long l_iEnd = l_iCtr = f_oPatternInput.get_length() - 1;
 	if ( l_iEnd < 0 )
 		return ( true );
 	while ( ( l_iCtr > 0 ) && ( l_pcPattern [ l_iCtr ] != '/' ) )
@@ -115,8 +115,8 @@ int HPattern::parse ( char const * const a_pcPattern,
 			{
 			f_bIgnoreCase = l_bLocalCopyIgnoreCase;
 			f_bExtended = l_bLocalCopyExtended;
-			for ( l_iCtrLoc = 0; l_iCtrLoc < a_iFlagsCount; l_iCtrLoc ++ )
-				a_puhFlags [ l_iCtrLoc ] = l_oLocalCopyFlags [ l_iCtrLoc ];
+			for ( int i = 0; i < a_iFlagsCount; ++ i )
+				a_puhFlags[ i ] = l_oLocalCopyFlags[ i ];
 			l_iCtr = 1;
 			}
 		l_iCtr --;
@@ -124,9 +124,9 @@ int HPattern::parse ( char const * const a_pcPattern,
 	if ( l_iCtr )
 		l_iEnd = l_iCtr - 1;
 /* end of looking at end */
-	f_oError = f_oPatternReal = f_oPatternInput.mid ( l_iBegin,
+	f_oError = f_oPatternReal = f_oPatternInput.mid( l_iBegin,
 			( l_iEnd - l_iBegin ) + 1 );
-	f_iSimpleMatchLength = f_oPatternReal.get_length();
+	f_iSimpleMatchLength = static_cast<int>( f_oPatternReal.get_length() );
 	if ( ! f_iSimpleMatchLength )
 		{
 		l_iError = - 1;
@@ -160,7 +160,7 @@ int HPattern::parse_re ( char const * const a_pcPattern )
 	M_EPILOG
 	}
 
-char const * HPattern::error ( void ) const
+char const* HPattern::error( void ) const
 	{
 	return ( f_oError );
 	}
@@ -248,7 +248,7 @@ void HPattern::prepare_error_message ( int const a_iError,
 		char const * const a_pcString )
 	{
 	M_PROLOG
-	int l_iSize = ::regerror( a_iError, &f_sCompiled, NULL, 0 ) + 1;
+	int long l_iSize = ::regerror( a_iError, &f_sCompiled, NULL, 0 ) + 1;
 	HPool<char> l_oBuffer( l_iSize + 1 );
 	M_ENSURE( static_cast<int>( ::regerror( a_iError, &f_sCompiled,
 					l_oBuffer.raw(), l_iSize ) ) < l_iSize );

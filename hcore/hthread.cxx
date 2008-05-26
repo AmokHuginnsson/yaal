@@ -104,7 +104,7 @@ void HThread::schedule_finish( void )
 	M_EPILOG
 	}
 
-int HThread::finish( void )
+int long HThread::finish( void )
 	{
 	M_PROLOG
 	HLock l_oLock( f_oMutex );

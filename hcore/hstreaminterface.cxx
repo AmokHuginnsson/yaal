@@ -146,8 +146,8 @@ HStreamInterface::STATUS const& HStreamInterface::read_until( HString& a_roMessa
 		char const* const a_pcStopSet, bool a_bStripDelim )
 	{
 	M_PROLOG
-	int nRead = 0;
-	int iPoolSize = f_oCache.size();
+	int long nRead = 0;
+	int long iPoolSize = f_oCache.size();
 	char* l_pcBuffer = f_oCache.raw();
 	do
 		{
@@ -184,17 +184,17 @@ HStreamInterface::STATUS const& HStreamInterface::read_until( HString& a_roMessa
 	M_EPILOG
 	}
 
-int HStreamInterface::read( void* const a_pvBuffer, int const a_iSize )
+int long HStreamInterface::read( void* const a_pvBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	return ( do_read( a_pvBuffer, a_iSize ) );
+	return ( do_read( a_pvBuffer, a_lSize ) );
 	M_EPILOG
 	}
 
-int HStreamInterface::write( void const* const a_pvBuffer, int const a_iSize )
+int long HStreamInterface::write( void const* const a_pvBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	return ( do_write( a_pvBuffer, a_iSize ) );
+	return ( do_write( a_pvBuffer, a_lSize ) );
 	M_EPILOG
 	}
 

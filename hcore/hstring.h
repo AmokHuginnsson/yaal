@@ -39,13 +39,13 @@ class HString
 	{
 private:
 	char*	f_pcBuffer;
-	int	f_iSize;
+	int	long f_lSize;
 public:
 	HString( void );
 	HString( HString const& );
 	HString( int const, bool const ); /* initialize immediately with size */
-	virtual ~HString ( void ) ;
-	void hs_realloc ( int const );
+	virtual ~HString( void ) ;
+	void hs_realloc( int long const );
 	HString( char const* const );
 	HString( char const );
 	HString( int const );
@@ -67,7 +67,8 @@ public:
 	HString operator + ( double long const ) const;
 	HString operator + ( void const* const ) const;
 	char operator[] ( int const );
-	char set_at( int, char );
+	char operator[] ( int long const );
+	char set_at( int long, char );
 	bool operator == ( HString const& ) const;
 	bool operator == ( char const* const ) const;
 	bool operator != ( HString const& ) const;
@@ -87,34 +88,34 @@ public:
 	bool is_empty( void ) const;
 	bool empty( void ) const;
 	void clear( void );
-	int get_length( void ) const;
+	int long get_length( void ) const;
 	static void swap( HString&, HString& );
 	HString& format( char const* const, ... );
 	HString& vformat( char const* const, void* );
-	int find( char const, int = 0 ) const;
-	int find( char const* const, int = 0 ) const;
-	int nfind( char const* const, int, int = 0 ) const;
-	int reverse_find( char const, int = 0 ) const;
-	int find_one_of( char const* const, int = 0 ) const;
-	int reverse_find_one_of( char const* const, int = 0 ) const;
-	int find_other_than( char const* const, int = 0 ) const;
-	int reverse_find_other_than( char const* const, int = 0 ) const;
+	int long find( char const, int long = 0 ) const;
+	int long find( char const* const, int long = 0 ) const;
+	int long nfind( char const* const, int long, int long = 0 ) const;
+	int long reverse_find( char const, int long = 0 ) const;
+	int long find_one_of( char const* const, int long = 0 ) const;
+	int long reverse_find_one_of( char const* const, int long = 0 ) const;
+	int long find_other_than( char const* const, int long = 0 ) const;
+	int long reverse_find_other_than( char const* const, int long = 0 ) const;
 	HString& replace( char const* const, char const* const );
 	HString& upper( void );
 	HString& lower( void );
 	HString& reverse( void );
 	HString left( int const ) const;
-	HString mid( int, int /* no const - reused */ = INT_MAX ) const;
-	HString right( int /* not const - reused */ ) const;
+	HString mid( int long, int long /* no const - reused */ = INT_MAX ) const;
+	HString right( int long /* not const - reused */ ) const;
 	HString& trim_left( char const* const = " \t\r\n" );
 	HString& trim_right( char const* const = " \t\r\n" );
-	HString& shift_left( int const );
-	HString& shift_right( int const, char const = ' ' );
+	HString& shift_left( int long const );
+	HString& shift_right( int long const, char const = ' ' );
 	HString split( char const* const, int const ) const;
-	HString& fill( char = '\0', int = 0, int = 0 );
-	HString& fillz( char = '\0', int = 0, int = 0 );
-	HString& erase( int, int );
-	HString& insert( int, int, char const* = NULL );
+	HString& fill( char = '\0', int long = 0, int long = 0 );
+	HString& fillz( char = '\0', int long = 0, int long = 0 );
+	HString& erase( int long, int long );
+	HString& insert( int long, int long, char const* = NULL );
 	};
 
 HString operator + ( char const*, HString const& );

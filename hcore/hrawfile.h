@@ -41,8 +41,8 @@ typedef int file_descriptor_t;
 class HRawFile : public HStreamInterface
 	{
 protected:
-	typedef int ( HRawFile::* READER_t )( void* const, int const );
-	typedef int ( HRawFile::* WRITER_t )( void const* const, int const );
+	typedef int long ( HRawFile::* READER_t )( void* const, int long const& );
+	typedef int long ( HRawFile::* WRITER_t )( void const* const, int long const& );
 	typedef int ( HRawFile::* CLOSER_t )( void );
 	struct TYPE
 		{
@@ -80,14 +80,14 @@ protected:
 	virtual int do_close( void );
 	int close_plain( void );
 	int close_ssl( void );
-	int read_plain( void* const, int const );
-	int write_plain( void const* const, int const );
-	int read_ssl_loader( void* const, int const );
-	int write_ssl_loader( void const* const, int const );
-	int read_ssl( void* const, int const );
-	int write_ssl( void const* const, int const );
-	virtual int do_write( void const* const, int const );
-	virtual int do_read( void* const, int const );
+	int long read_plain( void* const, int long const& );
+	int long write_plain( void const* const, int long const& );
+	int long read_ssl_loader( void* const, int long const& );
+	int long write_ssl_loader( void const* const, int long const& );
+	int long read_ssl( void* const, int long const& );
+	int long write_ssl( void const* const, int long const& );
+	virtual int long do_write( void const* const, int long const& );
+	virtual int long do_read( void* const, int long const& );
 	virtual void do_flush( void ) const;
 private:
 	bool wait_for( ACTION::action_t const&, void* );

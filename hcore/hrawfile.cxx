@@ -97,7 +97,7 @@ int HRawFile::do_close ( void )
 	int l_iError = 0;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW( "file is not opened", errno );
-	l_iError = TEMP_FAILURE_RETRY( ::close( f_iFileDescriptor ) );
+	l_iError = static_cast<int>( TEMP_FAILURE_RETRY( ::close( f_iFileDescriptor ) ) );
 	f_iFileDescriptor = -1;
 	return ( l_iError );
 	M_EPILOG
@@ -110,32 +110,32 @@ file_descriptor_t HRawFile::get_file_descriptor ( void ) const
 	M_EPILOG
 	}
 
-int HRawFile::read_plain( void* const a_pcBuffer, int const a_iSize )
+int long HRawFile::read_plain( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, errno );
-	return ( ::read( f_iFileDescriptor, a_pcBuffer, a_iSize ) );
+	return ( ::read( f_iFileDescriptor, a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}
 
-int HRawFile::read_ssl( void* const a_pcBuffer, int const a_iSize )
+int long HRawFile::read_ssl( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, errno );
-	return ( f_oSSL->read( a_pcBuffer, a_iSize ) );
+	return ( f_oSSL->read( a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}
 
-int HRawFile::read_ssl_loader( void* const a_pcBuffer, int const a_iSize )
+int long HRawFile::read_ssl_loader( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	f_oSSL = HOpenSSL::ptr_t( new HOpenSSL( f_iFileDescriptor, f_eType & TYPE::D_SSL_SERVER ? HOpenSSL::TYPE::D_SERVER : HOpenSSL::TYPE::D_CLIENT ) );
 	reader = &HRawFile::read_ssl;
 	writer = &HRawFile::write_ssl;
 	closer = &HRawFile::close_ssl;
-	return ( read_ssl( a_pcBuffer, a_iSize ) );
+	return ( read_ssl( a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}
 
@@ -148,11 +148,11 @@ bool HRawFile::is_write_ready( int a_iFileDescriptor )
 	return ( ( poll( &l_sWriter, 1, 0 ) == 1 ) && ( l_sWriter.revents & POLLOUT ) && ! ( l_sWriter.revents & POLLHUP ) );
 	}
 
-int HRawFile::do_write( void const* const a_pcBuffer, int const a_iSize )
+int long HRawFile::do_write( void const* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( is_write_ready( f_iFileDescriptor ) )
-		return ( (this->*writer)( a_pcBuffer, a_iSize ) ); 
+		return ( (this->*writer)( a_pcBuffer, a_lSize ) ); 
 	return ( -1 );
 	M_EPILOG
 	}
@@ -166,10 +166,10 @@ bool HRawFile::wait_for( ACTION::action_t const& a_eAction, void* a_pvTime )
 		{
 		FD_ZERO( & l_xFdSet );
 		FD_SET( f_iFileDescriptor, &l_xFdSet );
-		l_iError = TEMP_FAILURE_RETRY( ::select( FD_SETSIZE,
-					( a_eAction == ACTION::D_READ ) ? &l_xFdSet : NULL,
-					( a_eAction == ACTION::D_WRITE ) ? &l_xFdSet : NULL,
-					NULL, l_pxWait ) );
+		l_iError = static_cast<int>( TEMP_FAILURE_RETRY( ::select( FD_SETSIZE,
+						( a_eAction == ACTION::D_READ ) ? &l_xFdSet : NULL,
+						( a_eAction == ACTION::D_WRITE ) ? &l_xFdSet : NULL,
+						NULL, l_pxWait ) ) );
 		if ( l_iError < 0 )
 			break;
 		else if ( ( l_iError > 0 )
@@ -181,20 +181,20 @@ bool HRawFile::wait_for( ACTION::action_t const& a_eAction, void* a_pvTime )
 	return ( l_iError <= 0 );
 	}
 
-int HRawFile::write_plain( void const* const a_pcBuffer, int const a_iSize )
+int long HRawFile::write_plain( void const* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
 		M_THROW( n_pcError, errno );
-	int iWritten = 0;
+	int long iWritten = 0;
 	timeval tv = { f_iTimeOut, 0 };
 	do
 		{
 		if ( ( f_iTimeOut > 0 ) && wait_for( ACTION::D_WRITE, &tv ) )
 			throw HStreamInterfaceException( _( "timeout on write" ) );
-		int ret = TEMP_FAILURE_RETRY( ::write( f_iFileDescriptor,
+		int long ret = TEMP_FAILURE_RETRY( ::write( f_iFileDescriptor,
 					static_cast<char const* const>( a_pcBuffer ) + iWritten,
-					a_iSize - iWritten ) );
+					a_lSize - iWritten ) );
 		if ( ret < 0 )
 			{
 			iWritten = ret;
@@ -203,23 +203,23 @@ int HRawFile::write_plain( void const* const a_pcBuffer, int const a_iSize )
 		else
 			iWritten += ret;
 		}
-	while ( iWritten < a_iSize );
+	while ( iWritten < a_lSize );
 	return ( iWritten );
 	M_EPILOG
 	}
 
-int HRawFile::write_ssl( void const* const a_pcBuffer, int const a_iSize )
+int long HRawFile::write_ssl( void const* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
 		M_THROW( n_pcError, errno );
 	HClock clk;
-	int nWritten = 0;
+	int long nWritten = 0;
 	do
 		{
 		if ( f_iTimeOut  && ( clk.get_time_elapsed() > f_iTimeOut ) )
 			throw HStreamInterfaceException( _( "timeout on write" ) );
-		int ret = f_oSSL->write( static_cast<char const* const>( a_pcBuffer ) + nWritten, a_iSize );
+		int long ret = f_oSSL->write( static_cast<char const* const>( a_pcBuffer ) + nWritten, a_lSize );
 		if ( ! ret )
 			{
 			nWritten = ret;
@@ -228,26 +228,26 @@ int HRawFile::write_ssl( void const* const a_pcBuffer, int const a_iSize )
 		else if ( ret > 0 )
 			nWritten += ret;
 		}
-	while ( nWritten < a_iSize );
+	while ( nWritten < a_lSize );
 	return ( nWritten );
 	M_EPILOG
 	}
 
-int HRawFile::write_ssl_loader( void const* const a_pcBuffer, int const a_iSize )
+int long HRawFile::write_ssl_loader( void const* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	f_oSSL = HOpenSSL::ptr_t( new HOpenSSL( f_iFileDescriptor, f_eType & TYPE::D_SSL_SERVER ? HOpenSSL::TYPE::D_SERVER : HOpenSSL::TYPE::D_CLIENT ) );
 	reader = &HRawFile::read_ssl;
 	writer = &HRawFile::write_ssl;
 	closer = &HRawFile::close_ssl;
-	return ( write_ssl( a_pcBuffer, a_iSize ) );
+	return ( write_ssl( a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}
 
-int HRawFile::do_read( void* const a_pcBuffer, int const a_iSize )
+int long HRawFile::do_read( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	return ( (this->*reader)( a_pcBuffer, a_iSize ) );
+	return ( (this->*reader)( a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}
 

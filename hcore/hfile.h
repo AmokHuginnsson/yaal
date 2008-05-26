@@ -65,16 +65,16 @@ public:
 	virtual ~HFile ( void );
 	int open( char const* const );
 	int close( void );
-	int read_line( HString&, mode_read_t = D_DEFAULTS, int const = 0 );
+	int long read_line( HString&, mode_read_t = D_DEFAULTS, int const = 0 );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	virtual void flush( void ) const;
 	bool operator ! ( void ) const;
 private:
-	virtual int do_write( void const* const, int const );
+	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;
-	virtual int do_read( void* const, int const );
-	int get_line_length( void );
+	virtual int long do_read( void* const, int long const& );
+	int long get_line_length( void );
 	HFile( HFile const& );
 	HFile& operator = ( HFile const& );
 	};

@@ -173,7 +173,7 @@ void hcore_init( void )
 	errno = 0;
 	l_pcEnv = ::getenv( "YAAL_DEBUG" );
 	if ( l_pcEnv )
-		n_iDebugLevel = to_int( l_pcEnv );
+		n_iDebugLevel = static_cast<int>( to_int( l_pcEnv ) );
 	rc_file::process_rc_file( "yaal", "core",
 				n_psHCoreVariables, set_hcore_variables );
 	return;

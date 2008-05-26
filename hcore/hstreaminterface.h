@@ -81,12 +81,12 @@ public:
 	 * \return Number of characters avctualy read.
 	 */
 	STATUS const& read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
-	int read( void* const, int const );
-	int write( void const* const, int const );
+	int long read( void* const, int long const& );
+	int long write( void const* const, int long const& );
 	static char const* const eols;
 private:
-	virtual int do_write( void const* const, int const ) = 0;
-	virtual int do_read( void* const, int const ) = 0;
+	virtual int long do_write( void const* const, int long const& ) = 0;
+	virtual int long do_read( void* const, int long const& ) = 0;
 	virtual void do_flush( void ) const = 0;
 	friend HStreamInterface& endl( HStreamInterface& );
 	friend HStreamInterface& flush( HStreamInterface& );

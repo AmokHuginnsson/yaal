@@ -289,7 +289,7 @@ void HSocket::make_address( char const* const a_pcAddress, int const a_iPort )
 		::strncpy( l_psAddressFile->sun_path, a_pcAddress,
 				sizeof ( l_psAddressFile->sun_path ) );
 		l_psAddressFile->sun_path[ sizeof ( l_psAddressFile->sun_path ) - 1 ] = 0;
-		f_iAddressSize = SUN_LEN( l_psAddressFile );
+		f_iAddressSize = static_cast<int>( SUN_LEN( l_psAddressFile ) );
 		}
 	f_oHostName = a_pcAddress;
 	return;
@@ -339,14 +339,14 @@ void HSocket::rewind_client_list ( void ) const
 	M_EPILOG
 	}
 
-int HSocket::write_until_eos( HString const& a_roMessage )
+int long HSocket::write_until_eos( HString const& a_roMessage )
 	{
 	M_PROLOG
-	int l_iSize = 0;
-	l_iSize = a_roMessage.get_length();
-	if ( l_iSize > 0 )
-		l_iSize = write( a_roMessage, l_iSize );
-	return ( l_iSize );
+	int long nSize = 0;
+	nSize = a_roMessage.get_length();
+	if ( nSize > 0 )
+		nSize = write( a_roMessage, nSize );
+	return ( nSize );
 	M_EPILOG
 	}
 

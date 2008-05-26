@@ -38,7 +38,7 @@ namespace yaal
 {
 
 template<>
-int lexical_cast( HString const& val )
+int long lexical_cast( HString const& val )
 	{
 	return ( ::strtol( val, NULL, 10 ) );
 	}
