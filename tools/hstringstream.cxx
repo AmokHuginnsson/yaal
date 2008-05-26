@@ -54,7 +54,7 @@ yaal::hcore::HString const& HStringStream::string( void ) const
 	return ( f_oBuffer );
 	}
 
-int HStringStream::do_write( void const* const a_pvBuffer, int const a_iSize )
+int long HStringStream::do_write( void const* const a_pvBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( f_bUsed )
@@ -62,8 +62,8 @@ int HStringStream::do_write( void const* const a_pvBuffer, int const a_iSize )
 		f_oBuffer.clear();
 		f_bUsed = false;
 		}
-	f_oBuffer.insert( f_oBuffer.get_length(), a_iSize, static_cast<char const* const>( a_pvBuffer ) );
-	return ( a_iSize );
+	f_oBuffer.insert( f_oBuffer.get_length(), a_lSize, static_cast<char const* const>( a_pvBuffer ) );
+	return ( a_lSize );
 	M_EPILOG
 	}
 
@@ -72,11 +72,11 @@ void HStringStream::do_flush( void ) const
 	f_oBuffer.clear();
 	}
 
-int HStringStream::do_read( void* const a_pvBuffer, int const a_iSize )
+int long HStringStream::do_read( void* const a_pvBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	int l_iLength = f_oBuffer.get_length();
-	l_iLength = ( l_iLength < a_iSize ? l_iLength : a_iSize );
+	int long l_iLength = f_oBuffer.get_length();
+	l_iLength = ( l_iLength < a_lSize ? l_iLength : a_lSize );
 	strncpy( static_cast<char* const>( a_pvBuffer ), f_oBuffer, l_iLength );
 	return ( l_iLength );
 	M_EPILOG

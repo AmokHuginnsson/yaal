@@ -98,26 +98,26 @@ void HPipedChild::spawn( char const* const a_pcImage )
 	M_EPILOG
 	}
 
-int HPipedChild::do_read( void* const a_pcBuffer, int const a_iSize )
+int long HPipedChild::do_read( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	M_ASSERT( f_iPipeIn >= 0 );
-	return ( ::read( f_iPipeIn, a_pcBuffer, a_iSize ) );
+	return ( ::read( f_iPipeIn, a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}
 
-int HPipedChild::do_write( void const* const a_pcString, int const a_iSize )
+int long HPipedChild::do_write( void const* const a_pcString, int long const& a_lSize )
 	{
 	M_PROLOG
 	M_ASSERT( f_iPipeOut >= 0 );
-	int iWritten = 0;
+	int long iWritten = 0;
 	do
 		{
 		iWritten += TEMP_FAILURE_RETRY( ::write( f_iPipeOut,
 					static_cast<char const* const>( a_pcString ) + iWritten,
-					a_iSize - iWritten ) );
+					a_lSize - iWritten ) );
 		}
-	while ( iWritten < a_iSize );
+	while ( iWritten < a_lSize );
 	return ( iWritten );
 	M_EPILOG
 	}

@@ -48,9 +48,9 @@ public:
 	void finish( void );
 	bool is_running( void );
 private:
-	virtual int do_write( void const* const, int const );
+	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;
-	virtual int do_read( void* const, int const );
+	virtual int long do_read( void* const, int long const& );
 	HPipedChild( HPipedChild const& );
 	HPipedChild& operator = ( HPipedChild const& );
 	};
