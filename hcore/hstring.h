@@ -41,6 +41,7 @@ private:
 	char*	f_pcBuffer;
 	int	long f_lSize;
 public:
+	typedef char const* iterator;
 	HString( void );
 	HString( HString const& );
 	HString( int const, bool const ); /* initialize immediately with size */
@@ -85,6 +86,8 @@ public:
 		 bool() operator char * works fine here */
 	operator char const* ( void ) const;
 	char const* raw( void ) const;
+	iterator begin( void ) const;
+	iterator end( void ) const;
 	bool is_empty( void ) const;
 	bool empty( void ) const;
 	void clear( void );
