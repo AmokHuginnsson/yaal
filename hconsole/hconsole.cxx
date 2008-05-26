@@ -156,7 +156,7 @@ void set_color ( HString & a_roValue, int & a_riAttribute )
 	return;
 	}
 
-bool const set_hconsole_variables ( HString & a_roOption, HString & a_roValue )
+bool set_hconsole_variables( HString& a_roOption, HString& a_roValue )
 	{
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )
 		set_env ( a_roValue );

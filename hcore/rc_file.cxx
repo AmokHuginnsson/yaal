@@ -109,7 +109,7 @@ int rc_open( char const* const a_pcRcName,
 	M_PROLOG
 	int l_iError = 0;
 	HString l_oRcPath = make_path ( a_pcRcName, a_ePlacament );
-	if ( a_roFile )
+	if ( !! a_roFile )
 		a_roFile.close();
 	l_iError = a_roFile.open ( l_oRcPath );
 	if ( l_iError )
@@ -282,7 +282,7 @@ int process_rc_file_internal( char const* const a_pcRcName,
 				}
 			}
 		}
-	if ( l_oRc )
+	if ( !! l_oRc )
 		l_oRc.close();
 	log << "done." << endl;
 	return ( 0 );

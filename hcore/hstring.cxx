@@ -476,12 +476,12 @@ bool HString::operator < ( HString const & a_roString ) const
 	M_EPILOG
 	}
 
-bool HString::operator < ( char const * const a_pcStr ) const
+bool HString::operator < ( char const* const a_pcStr ) const
 	{
 	M_PROLOG
 	int l_iCmp = 0;
 	if ( ! ( f_pcBuffer && a_pcStr ) )
-		M_THROW ( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
+		M_THROW( n_ppcErrMsgHString[ E_NULL_PTR ], errno );
 	l_iCmp = ::strcoll( f_pcBuffer, a_pcStr );
 	if ( l_iCmp < 0 )
 		return ( true );
@@ -490,14 +490,14 @@ bool HString::operator < ( char const * const a_pcStr ) const
 	M_EPILOG
 	}
 
-HString::operator char const * const ( void ) const
+HString::operator char const* ( void ) const
 	{
 	M_PROLOG
 	return ( f_pcBuffer );
 	M_EPILOG
 	}
 
-char const* const HString::raw( void ) const
+char const* HString::raw( void ) const
 	{
 	return ( f_pcBuffer );
 	}

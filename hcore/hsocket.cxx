@@ -296,7 +296,7 @@ void HSocket::make_address( char const* const a_pcAddress, int const a_iPort )
 	M_EPILOG
 	}
 
-int const HSocket::get_port( void ) const
+int HSocket::get_port( void ) const
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )

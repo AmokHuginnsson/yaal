@@ -70,7 +70,7 @@ extern char n_pcTransTableStripPL [ 256 ];
 	}
 
 /* return true means error occured, false - every thing ok */
-bool const set_tools_variables ( HString & a_roOption, HString & a_roValue )
+bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	int l_iBaudRate = 0, l_iCtr = 0;
 	HString l_oStr;
