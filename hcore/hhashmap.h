@@ -93,17 +93,17 @@ public:
 	iterator begin( void );
 	const_iterator end( void ) const;
 	iterator end( void );
-	const_iterator rbegin( void ) const;
-	iterator rbegin( void );
-	const_iterator rend( void ) const;
-	iterator rend( void );
-	void insert( tType const&, ttType const& );
+	const_iterator find( tType const& ) const;
+	iterator find( tType const& );
+	iterator insert( tType const&, ttType const& );
 	void erase( iterator );
 	bool has_key( tType const& ) const;
 	bool get( tType const&, ttType& ) const;
 	bool remove( tType const& );
 	void clear( void );
 	int size( void ) const;
+private:
+	bool find( tType const&, int long unsigned&, HAtom*& ) const;
 	};
 
 template<typename tType, typename ttType>
@@ -111,7 +111,7 @@ template<typename const_qual_t>
 class HHashMap<tType, ttType>::HIterator
 	{
 	typedef HHashMap<tType, ttType> owner_t;
-	owner_t* f_poOwner;
+	owner_t const* f_poOwner;
 	int long unsigned f_ulIndex;
 	HAtom* f_poAtomPtr;
 public:
@@ -189,7 +189,7 @@ public:
 		{ return ( ! operator == ( it ) ); }
 private:
 	friend class HHashMap<tType, ttType>;
-	explicit HIterator( owner_t* a_poOwner, int unsigned long a_ulIndex, HAtom* a_poAtomPtr )
+	explicit HIterator( owner_t const* a_poOwner, int unsigned long a_ulIndex, HAtom* a_poAtomPtr )
 		: f_poOwner( a_poOwner ), f_ulIndex( a_ulIndex ), f_poAtomPtr( a_poAtomPtr ) {};
 	};
 
@@ -283,7 +283,7 @@ HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const &
 	}
 
 template<typename tType, typename ttType>
-void HHashMap<tType, ttType>::clear ( void )
+void HHashMap<tType, ttType>::clear( void )
 	{
 	M_PROLOG
 	int unsigned l_uiCtr = 0;
@@ -309,25 +309,32 @@ int HHashMap<tType, ttType>::size( void ) const
 	}
 
 template<typename tType, typename ttType>
-ttType& HHashMap<tType, ttType>::operator [] ( tType const& a_rtKey )
+ttType& HHashMap<tType, ttType>::operator [] ( tType const& a_tKey )
 	{
 	M_PROLOG
-	int long l_iHash = - 1;
-	HAtom * l_poAtom = NULL;
-	l_iHash = hash ( a_rtKey ) % f_ulPrime;
-	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom && ( l_poAtom->key != a_rtKey ) )
-		l_poAtom = l_poAtom->f_poNext;
-	if ( ! l_poAtom )
+	iterator it = insert( a_tKey, ttType() );
+	return ( it->value );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType>
+typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::insert( tType const& a_tKey, ttType const& a_tValue )
+	{
+	M_PROLOG
+	iterator it = find( a_tKey );
+	if ( it == end() )
 		{
-		l_poAtom = new ( std::nothrow ) HAtom( a_rtKey );
+		HAtom* l_poAtom = new ( std::nothrow ) HAtom( a_tKey );
 		if ( ! l_poAtom )
 			M_THROW ( "memory allocation error", errno );
+		int long unsigned l_ulHash = hash( a_tKey ) % f_ulPrime;
+		l_poAtom->f_poNext = f_ppoAtomArray[ l_ulHash ];
+		f_ppoAtomArray[ l_ulHash ] = l_poAtom;
 		f_ulSize ++;
-		l_poAtom->f_poNext = f_ppoAtomArray [ l_iHash ];
-		f_ppoAtomArray[ l_iHash ] = l_poAtom;
+		it = iterator( this, l_ulHash, l_poAtom );
+		it->value = a_tValue;
 		}
-	return ( l_poAtom->value );
+	return ( it );
 	M_EPILOG
 	}
 
@@ -335,7 +342,8 @@ template<typename tType, typename ttType>
 typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::begin( void )
 	{
 	M_PROLOG
-	return ( iterator( this, 0, NULL ) );
+	iterator it( this, 0, NULL );
+	return ( ++ it );
 	M_EPILOG
 	}
 
@@ -348,58 +356,108 @@ typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::end( void )
 	}
 
 template<typename tType, typename ttType>
-bool HHashMap<tType, ttType>::has_key ( tType const & a_rtKey ) const
+typename HHashMap<tType, ttType>::const_iterator HHashMap<tType, ttType>::begin( void ) const
 	{
 	M_PROLOG
-	int long l_iHash = - 1;
-	HAtom * l_poAtom = NULL;
-	l_iHash = hash ( a_rtKey ) % f_ulPrime;
-	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom && ( l_poAtom->key != a_rtKey ) )
-		l_poAtom = l_poAtom->f_poNext;
-	return ( l_poAtom ? true : false );
+	const_iterator it( this, 0, NULL );
+	return ( ++ it );
 	M_EPILOG
 	}
 
 template<typename tType, typename ttType>
-bool HHashMap<tType, ttType>::get( tType const & a_rtKey, ttType & a_rtValue ) const
+typename HHashMap<tType, ttType>::const_iterator HHashMap<tType, ttType>::end( void ) const
 	{
 	M_PROLOG
-	int long l_iHash = -1;
-	HAtom * l_poAtom = NULL;
-	l_iHash = hash( a_rtKey ) % f_ulPrime;
-	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom && ( l_poAtom->key != a_rtKey ) )
-		l_poAtom = l_poAtom->f_poNext;
-	if ( l_poAtom )
-		a_rtValue = l_poAtom->value;
-	return ( l_poAtom ? true : false );
+	return ( const_iterator( this, f_ulPrime, NULL ) );
 	M_EPILOG
 	}
 
 template<typename tType, typename ttType>
-bool HHashMap<tType, ttType>::remove ( tType const & a_rtKey )
+bool HHashMap<tType, ttType>::has_key( tType const& a_rtKey ) const
 	{
 	M_PROLOG
-	int long l_iHash = -1;
-	HAtom * l_poAtom = NULL, * l_poAncestor = NULL;
-	l_iHash = hash ( a_rtKey ) % f_ulPrime;
-	l_poAtom = f_ppoAtomArray [ l_iHash ];
-	while ( l_poAtom && ( l_poAtom->key != a_rtKey ) )
+	return ( find( a_rtKey ) != end() );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType>
+typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::find( tType const& a_tKey )
+	{
+	M_PROLOG
+	int long unsigned idx = 0;
+	HAtom* l_poAtom = NULL;
+	return ( find( a_tKey, idx, l_poAtom ) ? iterator( this, idx, l_poAtom ) : end() );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType>
+typename HHashMap<tType, ttType>::const_iterator HHashMap<tType, ttType>::find( tType const& a_tKey ) const
+	{
+	M_PROLOG
+	int long unsigned idx = 0;
+	HAtom* l_poAtom = NULL;
+	return ( find( a_tKey, idx, l_poAtom ) ? const_iterator( this, idx, l_poAtom ) : end() );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType>
+bool HHashMap<tType, ttType>::find( tType const& a_rtKey, int long unsigned& a_rulIndex, HAtom*& a_rpoAtom ) const
+	{
+	M_PROLOG
+	a_rulIndex = hash( a_rtKey ) % f_ulPrime;
+	a_rpoAtom = f_ppoAtomArray[ a_rulIndex ];
+	while ( a_rpoAtom && ( a_rpoAtom->key != a_rtKey ) )
+		a_rpoAtom = a_rpoAtom->f_poNext;
+	return ( a_rpoAtom ? true : false );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType>
+bool HHashMap<tType, ttType>::get( tType const& a_rtKey, ttType& a_rtValue ) const
+	{
+	M_PROLOG
+	const_iterator it = find( a_rtKey );
+	bool found = false;
+	if ( it != end() )
 		{
-		l_poAncestor = l_poAtom;
-		l_poAtom = l_poAtom->f_poNext;
+		a_rtValue = it->value;
+		found = true;
 		}
+	return ( found );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType>
+void HHashMap<tType, ttType>::erase( iterator it )
+	{
+	M_PROLOG
+	HAtom* l_poAtom = f_ppoAtomArray[ it.f_ulIndex ];
+	HAtom* l_poAncestor = NULL;
+	M_ASSERT( l_poAtom );
+	while ( l_poAtom != it.f_poAtomPtr )
+		l_poAncestor = l_poAtom, l_poAtom = l_poAtom->f_poNext;
 	if ( l_poAtom )
 		{
 		if ( l_poAncestor )
 			l_poAncestor->f_poNext = l_poAtom->f_poNext;
 		else
-			f_ppoAtomArray [ l_iHash ] = NULL;
+			f_ppoAtomArray[ it.f_ulIndex ] = NULL;
 		delete l_poAtom;
 		f_ulSize --;
 		}
-	return ( l_poAtom ? true : false );
+	return;
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType>
+bool HHashMap<tType, ttType>::remove( tType const& a_tKey )
+	{
+	M_PROLOG
+	iterator it = find( a_tKey );
+	bool erased = it != end();
+	if ( erased )
+		erase( it );
+	return ( erased );
 	M_EPILOG
 	}
 
