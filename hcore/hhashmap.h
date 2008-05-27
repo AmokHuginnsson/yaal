@@ -144,6 +144,8 @@ public:
 			if ( f_ulIndex < f_poOwner->f_ulPrime )
 				f_poAtomPtr = f_poOwner->f_ppoAtomArray[ f_ulIndex ];
 			}
+		if ( ! f_poAtomPtr )
+			f_ulIndex = f_poOwner->f_ulPrime;
 		return ( *this );
 		}
 	HIterator const operator ++ ( int )
@@ -334,6 +336,14 @@ typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::begin( void 
 	{
 	M_PROLOG
 	return ( iterator( this, 0, NULL ) );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType>
+typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::end( void )
+	{
+	M_PROLOG
+	return ( iterator( this, f_ulPrime, NULL ) );
 	M_EPILOG
 	}
 
