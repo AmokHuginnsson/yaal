@@ -139,9 +139,9 @@ public:
 			}
 		if ( ! f_poAtomPtr )
 			{
-			while ( ( f_ulIndex < f_ulPrime ) && ! f_poOwner->f_ppoAtomArray[ f_ulIndex ] )
+			while ( ( f_ulIndex < f_poOwner->f_ulPrime ) && ! f_poOwner->f_ppoAtomArray[ f_ulIndex ] )
 				f_ulIndex ++;
-			if ( f_ulIndex < f_ulPrime )
+			if ( f_ulIndex < f_poOwner->f_ulPrime )
 				f_poAtomPtr = f_poOwner->f_ppoAtomArray[ f_ulIndex ];
 			}
 		return ( *this );
@@ -192,8 +192,8 @@ private:
 	};
 
 template<typename tType, typename ttType>
-HHashMap<tType, ttType>::HAtom::HAtom( tType const& a_tKey ) : key( a_tKey ), value(),
-																						 f_poNext( NULL )
+HHashMap<tType, ttType>::HAtom::HAtom( tType const& a_tKey )
+	: f_poNext( NULL ), key( a_tKey ), value()
 	{
 	M_PROLOG
 	return;
@@ -222,7 +222,7 @@ HHashMap<tType, ttType>::HHashMap ( size_t a_uiSize ) : f_ulPrime( 0 ),
 		l_uiCtr ++;
 		}
 	f_ulPrime = g_pulPrimes[ l_uiCtr - 1 ];
-	f_ppoAtomArray = xcalloc < HAtom * > ( f_ulPrime );
+	f_ppoAtomArray = xcalloc<HAtom*>( f_ulPrime );
 	return;
 	M_EPILOG
 	}
@@ -330,7 +330,7 @@ ttType& HHashMap<tType, ttType>::operator [] ( tType const& a_rtKey )
 	}
 
 template<typename tType, typename ttType>
-HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::begin( void )
+typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::begin( void )
 	{
 	M_PROLOG
 	return ( iterator( this, 0, NULL ) );

@@ -111,17 +111,14 @@ int HProcess::unregister_file_descriptor_handler( int a_iFileDescriptor )
 int HProcess::reconstruct_fdset( void )
 	{
 	M_PROLOG
-	int l_iFileDes = 0;
-	process_handler_filedes_t DUMMY = NULL;
 	f_sLatency.tv_sec = f_iLatencySeconds;
 	f_sLatency.tv_usec = f_iLatencyMicroseconds;
 	FD_ZERO ( & f_xFileDescriptorSet );
 	if ( ! f_oFileDescriptorHandlers.size() )
 		return ( -1 );
-	f_oFileDescriptorHandlers.rewind();
 /* FD_SET is a macro and first argument is evaluated twice ! */
-	while ( f_oFileDescriptorHandlers.iterate ( l_iFileDes, DUMMY ) )
-		FD_SET ( l_iFileDes, & f_xFileDescriptorSet );
+	for ( process_filedes_map_t::iterator it = f_oFileDescriptorHandlers.begin(); it != f_oFileDescriptorHandlers.end(); ++ it )
+		FD_SET ( it->key, & f_xFileDescriptorSet );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -130,7 +127,6 @@ int HProcess::run( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	int l_iFileDes = 0;
 	process_handler_filedes_t HANDLER = NULL;
 	do_init();
 	if ( ! f_bInitialised )
@@ -148,12 +144,12 @@ int HProcess::run( void )
 				continue;
 			if ( l_iError < 0 )
 				M_THROW ( "select() returned", l_iError );
-			f_oFileDescriptorHandlers.rewind();
-			while ( f_oFileDescriptorHandlers.iterate( l_iFileDes, HANDLER ) )
+			for ( process_filedes_map_t::iterator it = f_oFileDescriptorHandlers.begin();
+					it != f_oFileDescriptorHandlers.end(); ++ it )
 				{
-				if ( FD_ISSET( l_iFileDes, &f_xFileDescriptorSet ) )
+				if ( FD_ISSET( it->key, &f_xFileDescriptorSet ) )
 					{
-					static_cast<void>( ( this->*HANDLER )( l_iFileDes ) );
+					static_cast<void>( ( this->*HANDLER )( it->key ) );
 					f_iIdleCycles = 0;
 					}
 				}

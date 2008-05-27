@@ -76,8 +76,8 @@ public:
 	void shutdown( void );
 	void shutdown_client( int );
 	ptr_t get_client( int ) const;
-	bool get_client_next( int&, ptr_t& ) const;
-	void rewind_client_list( void ) const;
+	clients_t::const_iterator begin( void ) const;
+	clients_t::const_iterator end( void ) const;
 	int long write_until_eos( HString const& );
 	int get_client_count( void ) const;
 	HString const& get_host_name( void );

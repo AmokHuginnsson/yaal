@@ -309,33 +309,34 @@ int HSocket::get_port( void ) const
 	M_EPILOG
 	}
 
-HSocket::ptr_t HSocket::get_client ( int const a_iFileDescriptor ) const
+HSocket::ptr_t HSocket::get_client( int const a_iFileDescriptor ) const
 	{
 	M_PROLOG
 	ptr_t l_oClient;
 	if ( ! f_poClients )
 		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
-	f_poClients->get ( a_iFileDescriptor, l_oClient );
+	f_poClients->get( a_iFileDescriptor, l_oClient );
 	return ( l_oClient );
 	M_EPILOG
 	}
 
-bool HSocket::get_client_next ( int& a_riFileDescriptor, ptr_t& a_rpoClient ) const
+HSocket::clients_t::const_iterator HSocket::begin( void ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )
-		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
-	return ( f_poClients->iterate ( a_riFileDescriptor, a_rpoClient ) );
+		M_THROW ( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+	clients_t const* c = f_poClients;
+	return ( c->begin() );
 	M_EPILOG
 	}
 
-void HSocket::rewind_client_list ( void ) const
+HSocket::clients_t::const_iterator HSocket::end( void ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )
-		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
-	f_poClients->rewind();
-	return;
+		M_THROW ( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+	clients_t const* c = f_poClients;
+	return ( c->end() );
 	M_EPILOG
 	}
 
