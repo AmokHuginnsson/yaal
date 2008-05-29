@@ -127,7 +127,6 @@ int HProcess::run( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	process_handler_filedes_t HANDLER = NULL;
 	do_init();
 	if ( ! f_bInitialised )
 		M_THROW( _ ( "you have to call HProcess::init() first, dumbass" ), errno );
@@ -149,7 +148,7 @@ int HProcess::run( void )
 				{
 				if ( FD_ISSET( it->key, &f_xFileDescriptorSet ) )
 					{
-					static_cast<void>( ( this->*HANDLER )( it->key ) );
+					static_cast<void>( ( this->*(it->value) )( it->key ) );
 					f_iIdleCycles = 0;
 					}
 				}
