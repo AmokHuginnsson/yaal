@@ -567,16 +567,16 @@ int HEditControl::do_process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-void HEditControl::set ( HInfo const & a_roInfo )
+void HEditControl::set( HInfo const& a_roInfo )
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
 	int l_iLength = 0;
-	char const * l_pcString = a_roInfo.get < char const * const >();
+	char const* l_pcString = a_roInfo.get<char const *>();
 	HString l_oErrorMessage;
-	f_oPattern.matches ( l_pcString, NULL, & l_iErrorCode );
+	f_oPattern.matches( l_pcString, NULL, &l_iErrorCode );
 	if ( l_iErrorCode )
-		M_THROW ( f_oPattern.error(), l_iErrorCode );
+		M_THROW( f_oPattern.error(), l_iErrorCode );
 	f_oString = l_pcString;
 	l_iLength = f_oString.get_length();
 	f_iControlOffset = 0;
