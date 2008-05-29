@@ -161,8 +161,9 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 		case ( MODE::D_UPDATE ):
 			{
 			f_oSQL = "UPDATE " + f_oTable + " SET ";
-			M_ENSURE( f_oFields.size() == f_oValues.size() );
-			for ( int i = 0; i < f_oValues.size(); ++ i )
+			M_ENSURE( f_oFields.get_size() == f_oValues.get_size() );
+			int const size = f_oValues.get_size();
+			for ( int i = 0; i < size; ++ i )
 				{
 				if ( i > 0 )
 					f_oSQL += ", ";
@@ -182,15 +183,16 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 		case ( MODE::D_INSERT ):
 			{
 			f_oSQL = "INSERT INTO " + f_oTable + " ( ";
-			M_ENSURE( f_oFields.size() == f_oValues.size() );
-			for ( int i = 0; i < f_oFields.size(); ++ i )
+			M_ENSURE( f_oFields.get_size() == f_oValues.get_size() );
+			int const size = f_oFields.get_size();
+			for ( int i = 0; i < size; ++ i )
 				{
 				if ( i > 0 )
 					f_oSQL += ", ";
 				f_oSQL += f_oFields[ i ];
 				}
 			f_oSQL += " ) VALUES ( ";
-			for ( int i = 0; i < f_oValues.size(); ++ i )
+			for ( int i = 0; i < size; ++ i )
 				{
 				if ( i > 0 )
 					f_oSQL += ", ";
