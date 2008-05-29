@@ -43,6 +43,12 @@ int long lexical_cast( HString const& val )
 	return ( ::strtol( val, NULL, 10 ) );
 	}
 
+template<>
+int lexical_cast( HString const& val )
+	{
+	return ( static_cast<int>( lexical_cast<int long>( val ) ) );
+	}
+
 char const* error_message( int a_iCode )
 	{
 	return ( strerror( a_iCode ) );

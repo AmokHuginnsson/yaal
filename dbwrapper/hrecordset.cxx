@@ -231,7 +231,7 @@ void HSQLDescriptor::sync( int a_iField, HString& value )
 void HSQLDescriptor::sync( int a_iField, int long& value )
 	{
 	if ( f_eMode == MODE::D_SELECT )
-		value = lexical_cast<int>( f_oValues[ a_iField ] );
+		value = lexical_cast<int long>( f_oValues[ a_iField ] );
 	else
 		f_oValues[ a_iField ] = value;
 	}
