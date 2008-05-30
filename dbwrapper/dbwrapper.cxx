@@ -25,9 +25,9 @@ Copyright:
 */
 
 #include <dlfcn.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 
 #include "config.h"
 
@@ -124,10 +124,10 @@ void dbwrapper_init( void )
 
 extern char const * g_pcDone;
 
-static char const g_pcDynamicLinkerPath [ ]
+static char const g_pcDynamicLinkerPath[]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
-void yaal_dbwrapper_banner ( void )
+void yaal_dbwrapper_banner( void )
 	{
 	fprintf ( stdout, "\tdbwrapper\n" );
 	return;
@@ -137,14 +137,13 @@ extern "C"
 void yaal_dbwrapper_main( void ) __attribute__(( __noreturn__ ));
 void yaal_dbwrapper_main( void )
 	{
-	if ( g_pcDynamicLinkerPath [ 0 ] )
+	if ( g_pcDynamicLinkerPath[ 0 ] )
 		{
 		yaal_hcore_banner();
 		yaal_tools_banner();
-		yaal_hconsole_banner();
 		yaal_dbwrapper_banner();
 		}
-	exit ( 0 );
+	exit( 0 );
 	}
 
 }
