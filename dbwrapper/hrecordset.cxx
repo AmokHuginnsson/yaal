@@ -340,6 +340,9 @@ HRecordSet::ptr_t HSQLDescriptor::execute( MODE::mode_t const& a_eMode, char con
 	{
 	M_PROLOG
 	HRecordSet::ptr_t rs = f_oDataBase->query( a_pcQuery ? HString( a_pcQuery ) : build_sql( a_eMode ) );
+	f_iFieldCount = rs->get_field_count();
+	f_oFields = fields_t( f_iFieldCount );
+	f_oValues = values_t( f_iFieldCount );
 	for ( int l_iCtr = 0; l_iCtr < f_iFieldCount; ++ l_iCtr )
 		f_oFields[ l_iCtr ] = rs->get_column_name( l_iCtr ); 
 	f_iSetSize = rs->get_size();
