@@ -69,7 +69,7 @@ int HDataBase::connect( char const* a_pcDataBase, char const* a_pcLogin,
 	M_EPILOG
 	}
 
-HRecordSet HDataBase::query( char const* a_pcQuery )
+HRecordSet::ptr_t HDataBase::query( char const* a_pcQuery )
 	{
 	M_PROLOG
 	if ( ! f_pvCoreData )
@@ -79,7 +79,8 @@ HRecordSet HDataBase::query( char const* a_pcQuery )
 	void* l_pvResult = dbwrapper::db_query( f_pvCoreData, a_pcQuery );
 	if ( ! l_pvResult )
 		throw HSQLException( HString( "SQL error: " ) + dbwrapper::db_error ( f_pvCoreData ) );
-	return ( HRecordSet( get_pointer(), l_pvResult ) );
+	HRecordSet::ptr_t rs( new HRecordSet( get_pointer(), l_pvResult ) );
+	return ( rs );
 	M_EPILOG
 	}
 

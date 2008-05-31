@@ -46,7 +46,7 @@ public:
 							char const*,		/* login */
 							char const* );	/* password */
 	void disconnect( void );
-	HRecordSet query( char const* );
+	HRecordSet::ptr_t query( char const* );
 	char const* get_error( void ) const;
 	static ptr_t get_connector( void );
 private:

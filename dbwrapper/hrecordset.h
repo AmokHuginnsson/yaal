@@ -44,6 +44,7 @@ typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
 class HRecordSet
 	{
 public:
+	typedef yaal::hcore::HPointer<HRecordSet> ptr_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
 	class HIterator;
 	typedef HIterator iterator;
@@ -53,8 +54,6 @@ private:
 public:
 	HRecordSet( database_ptr_t, void* );
 	virtual ~HRecordSet( void );
-	HRecordSet( HRecordSet const& );
-	HRecordSet& operator = ( HRecordSet const& );
 	void clear( void );
 	iterator begin( void );
 	iterator end( void );
@@ -65,6 +64,9 @@ public:
 	int get_size( void );
 	char const* const get_column_name( int );
 	int long get_insert_id( void );
+private:
+	HRecordSet( HRecordSet const& );
+	HRecordSet& operator = ( HRecordSet const& );
 	};
 
 class HRecordSet::HIterator
@@ -132,7 +134,7 @@ public:
 	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );
 	virtual ~HSQLDescriptor( void );
 	yaal::hcore::HString const& build_sql( MODE::mode_t const& );
-	HRecordSet execute( MODE::mode_t const&, char const* const = NULL );
+	HRecordSet::ptr_t execute( MODE::mode_t const&, char const* const = NULL );
 	};
 
 typedef yaal::hcore::HExceptionT<HRecordSet> HRecordSetException;

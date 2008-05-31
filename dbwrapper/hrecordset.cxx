@@ -224,18 +224,22 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 
 void HSQLDescriptor::sync( int a_iField, HString& value )
 	{
+	M_PROLOG
 	if ( f_eMode == MODE::D_SELECT )
 		value = f_oValues[ a_iField ];
 	else
 		f_oValues[ a_iField ] = value;
+	M_EPILOG
 	}
 
 void HSQLDescriptor::sync( int a_iField, int long& value )
 	{
+	M_PROLOG
 	if ( f_eMode == MODE::D_SELECT )
 		value = lexical_cast<int long>( f_oValues[ a_iField ] );
 	else
 		f_oValues[ a_iField ] = value;
+	M_EPILOG
 	}
 
 void HSQLDescriptor::set_table( char const* const a_pcTable )
@@ -332,19 +336,23 @@ yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& a_iField ) c
 			a_iField ) );
 	}
 
-HRecordSet HSQLDescriptor::execute( MODE::mode_t const& a_eMode, char const* const a_pcQuery )
+HRecordSet::ptr_t HSQLDescriptor::execute( MODE::mode_t const& a_eMode, char const* const a_pcQuery )
 	{
-	HRecordSet rs = f_oDataBase->query( a_pcQuery ? HString( a_pcQuery ) : build_sql( a_eMode ) );
+	M_PROLOG
+	HRecordSet::ptr_t rs = f_oDataBase->query( a_pcQuery ? HString( a_pcQuery ) : build_sql( a_eMode ) );
 	for ( int l_iCtr = 0; l_iCtr < f_iFieldCount; ++ l_iCtr )
-		f_oFields[ l_iCtr ] = rs.get_column_name( l_iCtr ); 
-	f_iSetSize = rs.get_size();
+		f_oFields[ l_iCtr ] = rs->get_column_name( l_iCtr ); 
+	f_iSetSize = rs->get_size();
 	return ( rs );
+	M_EPILOG
 	}
 
 void HSQLDescriptor::sync( HRecordSet::iterator const& it )
 	{
+	M_PROLOG
 	for ( int l_iCtr = 0; l_iCtr < f_iFieldCount; ++ l_iCtr )
-		f_oFields[ l_iCtr ] = it[ l_iCtr ];
+		f_oValues[ l_iCtr ] = it[ l_iCtr ];
+	M_EPILOG
 	}
 
 #if 0
