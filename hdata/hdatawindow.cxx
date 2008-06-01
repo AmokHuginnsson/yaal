@@ -175,10 +175,10 @@ int HDataWindow::init ( void )
 				f_oColumns = f_psResourcesArray [ l_iCtr ].f_pcColumns;
 				f_oFilter = f_psResourcesArray [ l_iCtr ].f_pcFilter;
 				f_oSort = f_psResourcesArray [ l_iCtr ].f_pcSort;
+				*/
 				f_poMainControl = l_poDataControl;
 				f_oViewModeControls.add_tail ( & l_poDataControl );
 				l_poDataControl->enable ( true );
-				*/
 				}
 			break;
 			case ( DATACONTROL_BITS::ROLE::D_DATA ):

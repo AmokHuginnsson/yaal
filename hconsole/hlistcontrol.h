@@ -414,7 +414,7 @@ int long HListControler<tType>::size( void )
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::begin( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( f_oList->begin() ) ) ) );
+	return ( HModelIteratorWrapper( f_oList->begin() != f_oList->end() ? iterator_ptr_t( new HModelIterator( f_oList->begin() ) ) : iterator_ptr_t() ) );
 	}
 
 template<typename tType>
