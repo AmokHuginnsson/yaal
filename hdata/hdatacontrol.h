@@ -41,12 +41,13 @@ class HDataControl : public virtual hconsole::HControl
 protected:
 	dbwrapper::HSQLDescriptor::ptr_t f_oSQL;
 public:
-	HDataControl( dbwrapper::HSQLDescriptor::ptr_t );
-	virtual ~HDataControl ( void );
-	virtual void load ( int long = 0 );
-	virtual int long get_current_id ( void );
-	virtual void add_new ( void );
-	virtual void cancel_new ( void );
+	HDataControl( void );
+	virtual ~HDataControl( void );
+	void set_dbd( dbwrapper::HSQLDescriptor::ptr_t );
+	virtual void load( int long = 0 );
+	virtual int long get_current_id( void );
+	virtual void add_new( void );
+	virtual void cancel_new( void );
 private:
 	HDataControl ( HDataControl const & );
 	HDataControl & operator = ( HDataControl const & );

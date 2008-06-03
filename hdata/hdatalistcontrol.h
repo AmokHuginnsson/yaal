@@ -42,12 +42,12 @@ class HDataListControl : public HDataControl, public virtual yaal::hconsole::HLi
 	{
 public:
 	yaal::hconsole::list_control_helper::HListControler<>::ptr_t f_oDataControler;
-	HDataListControl( dbwrapper::HSQLDescriptor::ptr_t, HDataWindow *, int, int, int, int, char const * );
-	virtual ~HDataListControl ( void );
-	virtual void load ( int long );
-	virtual int long get_current_id ( void );
-	virtual void add_new ( void );
-	virtual void cancel_new ( void );
+	HDataListControl( HDataWindow*, int, int, int, int, char const* );
+	virtual ~HDataListControl( void );
+	virtual void load( int long );
+	virtual int long get_current_id( void );
+	virtual void add_new( void );
+	virtual void cancel_new( void );
 	};
 
 }

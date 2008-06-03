@@ -41,9 +41,9 @@ class HDataWindow;
 class HDataTreeControl : public HDataControl, public virtual hconsole::HTreeControl
 	{
 public:
-	HDataTreeControl ( dbwrapper::HSQLDescriptor::ptr_t, HDataWindow *, int, int, int, int, char const * );
-	virtual ~HDataTreeControl ( void );
-	virtual void load ( int long );
+	HDataTreeControl( HDataWindow*, int, int, int, int, char const* );
+	virtual ~HDataTreeControl( void );
+	virtual void load( int long );
 	};
 
 }

@@ -48,9 +48,9 @@ HRecordSet::HRecordSet( database_ptr_t a_oDataBase, void* a_pvReuslt )
 	{
 	M_PROLOG
 	if ( get_size() < 0 )
-		log ( LOG_TYPE::D_ERROR ) << "SQL error (query): " << f_oDataBase->get_error() << endl;
+		log( LOG_TYPE::D_ERROR ) << "SQL error (query): " << f_oDataBase->get_error() << endl;
 	if ( get_field_count() < 0 )
-		log ( LOG_TYPE::D_ERROR ) << "SQL error (fiels count): " << f_oDataBase->get_error() << endl;
+		log( LOG_TYPE::D_ERROR ) << "SQL error (fiels count): " << f_oDataBase->get_error() << endl;
 	return;
 	M_EPILOG
 	}
@@ -280,6 +280,16 @@ HString HSQLDescriptor::get_filter( void ) const
 HString HSQLDescriptor::get_sort( void ) const
 	{
 	return ( f_oSort );
+	}
+
+HSQLDescriptor::MODE::mode_t HSQLDescriptor::get_mode( void ) const
+	{
+	return ( f_eMode );
+	}
+
+int HSQLDescriptor::get_size( void ) const
+	{
+	return ( f_iSetSize );
 	}
 
 HRecordSet::HIterator::HIterator( HRecordSet* a_poOwner, int const& a_iPosition )

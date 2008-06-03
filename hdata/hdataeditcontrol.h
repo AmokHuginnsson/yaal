@@ -39,7 +39,7 @@ namespace hdata
 class HDataEditControl : public HDataControl, public virtual hconsole::HEditControl
 	{
 public:
-	HDataEditControl ( HDataWindow *,					/* parent */
+	HDataEditControl( HDataWindow *,					/* parent */
 								int,								/* top ( parent relative ) */
 								int,								/* left */
 								int,								/* height */

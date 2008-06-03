@@ -127,6 +127,8 @@ public:
 	yaal::hcore::HString get_columns( void ) const;
 	yaal::hcore::HString get_filter( void ) const;
 	yaal::hcore::HString get_sort( void ) const;
+	MODE::mode_t get_mode( void ) const;
+	int get_size( void ) const;
 	void sync( int, int long& );
 	void sync( int, yaal::hcore::HString& );
 	void sync( HRecordSet::iterator const& );

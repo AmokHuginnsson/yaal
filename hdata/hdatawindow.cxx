@@ -140,7 +140,7 @@ int HDataWindow::init ( void )
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psLCR = static_cast<OListControlResource*>( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				HDataListControl* l_poList = NULL;
-				l_poDataControl = l_poList = new HDataListControl( /* FIXME this */ HSQLDescriptor::ptr_t(), this, M_SETUP_STANDARD );
+				l_poDataControl = l_poList = new HDataListControl( this, M_SETUP_STANDARD );
 				l_poList->set_flags( ( l_psLCR->f_bCheckable ? HListControl::FLAGS::D_CHECKABLE : HListControl::FLAGS::D_NONE )
 						| ( l_psLCR->f_bSortable ? HListControl::FLAGS::D_SORTABLE : HListControl::FLAGS::D_NONE )
 						| ( l_psLCR->f_bEditable ? HListControl::FLAGS::D_EDITABLE : HListControl::FLAGS::D_NONE )
@@ -149,7 +149,7 @@ int HDataWindow::init ( void )
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_TREE ):
-				l_poDataControl = new HDataTreeControl( /* FIXME this */ HSQLDescriptor::ptr_t(), this, M_SETUP_STANDARD );
+				l_poDataControl = new HDataTreeControl( this, M_SETUP_STANDARD );
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_COMBO ):
 			break;
@@ -171,12 +171,12 @@ int HDataWindow::init ( void )
 			{
 			case ( DATACONTROL_BITS::ROLE::D_MAIN ):
 				{
-				/* FIXME
-				f_oTable = f_psResourcesArray [ l_iCtr ].f_pcTable;
-				f_oColumns = f_psResourcesArray [ l_iCtr ].f_pcColumns;
-				f_oFilter = f_psResourcesArray [ l_iCtr ].f_pcFilter;
-				f_oSort = f_psResourcesArray [ l_iCtr ].f_pcSort;
-				*/
+				
+				f_oDB->set_table( f_psResourcesArray[ l_iCtr ].f_pcTable );
+				f_oDB->set_columns( f_psResourcesArray[ l_iCtr ].f_pcColumns );
+				f_oDB->set_filter( f_psResourcesArray[ l_iCtr ].f_pcFilter );
+				f_oDB->set_sort( f_psResourcesArray[ l_iCtr ].f_pcSort );
+				l_poDataControl->set_dbd( f_oDB );
 				f_poMainControl = l_poDataControl;
 				f_oViewModeControls.add_tail( &l_poDataControl );
 				l_poDataControl->enable( true );
@@ -282,7 +282,7 @@ void HDataWindow::set_mode( DOCUMENT::mode_t a_eMode )
 	M_EPILOG
 	}
 
-void HDataWindow::sync ( void )
+void HDataWindow::sync( void )
 	{
 	M_PROLOG
 /* FIXME
@@ -309,70 +309,70 @@ void HDataWindow::sync ( void )
 	M_EPILOG
 	}
 
-void HDataWindow::set_sync_store ( HItem * a_poItem )
+void HDataWindow::set_sync_store( HItem* a_poItem )
 	{
 	f_poSyncStore = a_poItem;
 	return;
 	}
 
-int HDataWindow::handler_add_new ( int, void const* )
+int HDataWindow::handler_add_new( int, void const* )
 	{
 	M_PROLOG
-/* FIXME
-	if ( f_eMode != D_OPEN )
+	if ( f_oDB->get_mode() != HSQLDescriptor::MODE::D_SELECT )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not add new rocord now." ) );
 		return ( 0 );
 		}
+/* FIXME
 	add_new();
+*/
 	if ( f_poMainControl )
 		f_poMainControl->add_new();
-	set_mode ( DOCUMENT::D_EDIT );
-*/
+	set_mode( DOCUMENT::D_EDIT );
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HDataWindow::handler_edit ( int, void const* )
+int HDataWindow::handler_edit( int, void const* )
 	{
 	M_PROLOG
-/* FIXME
-	if ( f_eMode != D_NORMAL )
+	if ( f_oDB->get_mode() != HSQLDescriptor::MODE::D_SELECT )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not start editing of this record." ) );
 		return ( 0 );
 		}
-	if ( ! f_iSetQuantity )
+	if ( ! f_oDB->get_size() )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "There is nothing to edit." ) );
 		return ( 0 );
 		}
 	set_mode ( DOCUMENT::D_EDIT );
+/* FIXME
 	edit();
 */
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HDataWindow::handler_delete ( int, void const* )
+int HDataWindow::handler_delete( int, void const* )
 	{
 	M_PROLOG
-/* FIXME
-	if ( f_eMode != D_NORMAL )
+	if ( f_oDB->get_mode() != HSQLDescriptor::MODE::D_SELECT )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "You can not delete this record." ) );
 		return ( 0 );
 		}
-	if ( ! f_iSetQuantity )
+	if ( ! f_oDB->get_size() )
 		{
 		f_oStatusBar->message ( COLORS::D_FG_BRIGHTRED,
 				_ ( "There is nothing to remove." ) );
 		return ( 0 );
 		}
+/* FIXME
 	if ( f_poMainControl )
 		m_lId = f_poMainControl->get_current_id();
 	remove();
@@ -382,7 +382,7 @@ int HDataWindow::handler_delete ( int, void const* )
 	M_EPILOG
 	}
 
-int HDataWindow::handler_save ( int, void const* )
+int HDataWindow::handler_save( int, void const* )
 	{
 	M_PROLOG
 /* FIXME
@@ -394,7 +394,7 @@ int HDataWindow::handler_save ( int, void const* )
 	m_lId = update();
 	f_bModified = false;
 	f_poMainControl->load();
-	set_mode ( DOCUMENT::D_VIEW );
+	set_mode( DOCUMENT::D_VIEW );
 */
 	return ( 0 );
 	M_EPILOG
