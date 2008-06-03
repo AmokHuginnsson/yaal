@@ -40,6 +40,8 @@ namespace yaal
 namespace hdata
 {
 
+class HDataProcess;
+
 class HDataWindow : public hconsole::HWindow
 	{
 public:
@@ -59,9 +61,10 @@ protected:
 	yaal::hconsole::HItem* f_poSyncStore;
 	yaal::hcore::HList<HDataControl*> f_oViewModeControls;
 	yaal::hcore::HList<HDataControl*> f_oEditModeControls;
-	yaal::dbwrapper::database_ptr_t f_oDataBase;
+	HDataProcess* f_poOwner;
+	yaal::dbwrapper::HSQLDescriptor::ptr_t f_oDB;
 public:
-	HDataWindow( char const*, dbwrapper::HDataBase::ptr_t = dbwrapper::HDataBase::ptr_t(), OResource* = NULL );
+	HDataWindow( char const*, HDataProcess*, OResource* = NULL );
 	virtual ~HDataWindow( void );
 	virtual int init( void );
 	virtual hconsole::HStatusBarControl* init_bar( char const* );

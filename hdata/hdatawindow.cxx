@@ -44,12 +44,12 @@ namespace yaal
 namespace hdata
 {
 
-HDataWindow::HDataWindow( char const* a_pcTitle, HDataBase::ptr_t a_oDataBase,
+HDataWindow::HDataWindow( char const* a_pcTitle, HDataProcess* a_poOwner,
 		OResource* a_psDataControlInfo )
 	: HWindow( a_pcTitle ),
 	f_bModified ( false ), f_eDocumentMode( DOCUMENT::D_VIEW ), f_poMainControl( NULL ),
 	f_psResourcesArray( a_psDataControlInfo ), f_poSyncStore( NULL ),
-	f_oViewModeControls(), f_oEditModeControls(), f_oDataBase( a_oDataBase )
+	f_oViewModeControls(), f_oEditModeControls(), f_poOwner( a_poOwner ), f_oDB( new HSQLDescriptor() )
 	{
 	M_PROLOG
 	register_postprocess_handler( KEY<'n'>::command, NULL,
@@ -78,36 +78,37 @@ HDataWindow::~HDataWindow ( void )
 	M_EPILOG
 	}
 
-#define M_SETUP_STANDARD	f_psResourcesArray [ l_iCtr ].f_iRow,\
-						f_psResourcesArray [ l_iCtr ].f_iColumn,\
-						f_psResourcesArray [ l_iCtr ].f_iHeight,\
-						f_psResourcesArray [ l_iCtr ].f_iWidth,\
-						f_psResourcesArray [ l_iCtr ].f_pcLabel
+#define M_SETUP_STANDARD	f_psResourcesArray[ l_iCtr ].f_iRow,\
+						f_psResourcesArray[ l_iCtr ].f_iColumn,\
+						f_psResourcesArray[ l_iCtr ].f_iHeight,\
+						f_psResourcesArray[ l_iCtr ].f_iWidth,\
+						f_psResourcesArray[ l_iCtr ].f_pcLabel
 
 int HDataWindow::init ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	char l_pcValue [ ] = "";
-	char const * l_pcMask = n_pcMaskDefault;
-	HDataControl * l_poDataControl = NULL;
-	OAttributes l_sAttributes, * l_psAttr = & l_sAttributes;
+	char const* l_pcMask = n_pcMaskDefault;
+	HDataControl* l_poDataControl = NULL;
+	OAttributes l_sAttributes;
+	OAttributes* l_psAttr = &l_sAttributes;
 	OEditControlResource l_sEditControlResource;
 	OListControlResource l_sListControlResource;
 /* ECR stands for EditControlResource */
-	OEditControlResource * l_psECR = & l_sEditControlResource;
+	OEditControlResource* l_psECR = &l_sEditControlResource;
 /* LCR stands for ListControlResource */
-	OListControlResource * l_psLCR = & l_sListControlResource;
+	OListControlResource* l_psLCR = &l_sListControlResource;
 	l_sAttributes.f_bDrawLabel = true;
 	l_sAttributes.f_iDisabledAttribute = -1;
 	l_sAttributes.f_iEnabledAttribute = -1;
 	l_sAttributes.f_iFocusedAttribute = -1;
 	HWindow::init();
-	while ( f_psResourcesArray [ l_iCtr ].f_pcLabel )
+	while ( f_psResourcesArray[ l_iCtr ].f_pcLabel )
 		{
-		if ( f_psResourcesArray [ l_iCtr ].f_psAttributes )
-			l_psAttr = f_psResourcesArray [ l_iCtr ].f_psAttributes;
-		switch ( f_psResourcesArray [ l_iCtr ].f_eType )
+		if ( f_psResourcesArray[ l_iCtr ].f_psAttributes )
+			l_psAttr = f_psResourcesArray[ l_iCtr ].f_psAttributes;
+		switch ( f_psResourcesArray[ l_iCtr ].f_eType )
 			{
 			case ( DATACONTROL_BITS::TYPE::D_EDIT ):
 				{
@@ -122,7 +123,7 @@ int HDataWindow::init ( void )
 				l_sEditControlResource.f_iMaxHistoryLevel = 8;
 				if ( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific )
 					l_psECR = static_cast<OEditControlResource*>( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
-				l_poDataControl = new HDataEditControl ( this,
+				l_poDataControl = new HDataEditControl( this,
 						M_SETUP_STANDARD, l_psECR->f_iMaxStringSize, l_psECR->f_pcValue,
 						l_psECR->f_pcMask, l_psECR->f_bReplace,
 						l_psECR->f_bMultiLine, l_psECR->f_bReadOnly, 
@@ -148,7 +149,7 @@ int HDataWindow::init ( void )
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_TREE ):
-				l_poDataControl = new HDataTreeControl ( /* FIXME this */ HSQLDescriptor::ptr_t(), this, M_SETUP_STANDARD );
+				l_poDataControl = new HDataTreeControl( /* FIXME this */ HSQLDescriptor::ptr_t(), this, M_SETUP_STANDARD );
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_COMBO ):
 			break;
@@ -166,7 +167,7 @@ int HDataWindow::init ( void )
 					l_psAttr->f_iEnabledAttribute,
 					l_psAttr->f_iFocusedAttribute );
 			}
-		switch ( f_psResourcesArray [ l_iCtr ].f_eRole )
+		switch ( f_psResourcesArray[ l_iCtr ].f_eRole )
 			{
 			case ( DATACONTROL_BITS::ROLE::D_MAIN ):
 				{
@@ -177,21 +178,21 @@ int HDataWindow::init ( void )
 				f_oSort = f_psResourcesArray [ l_iCtr ].f_pcSort;
 				*/
 				f_poMainControl = l_poDataControl;
-				f_oViewModeControls.add_tail ( & l_poDataControl );
-				l_poDataControl->enable ( true );
+				f_oViewModeControls.add_tail( &l_poDataControl );
+				l_poDataControl->enable( true );
 				}
 			break;
 			case ( DATACONTROL_BITS::ROLE::D_DATA ):
-				link ( l_iCtr, l_poDataControl );
-				f_oEditModeControls.add_tail ( & l_poDataControl );
+				link( l_iCtr, l_poDataControl );
+				f_oEditModeControls.add_tail( &l_poDataControl );
 			break;
 			case ( DATACONTROL_BITS::ROLE::D_FILTER ):
 				l_poDataControl->enable ( true );
-				f_oViewModeControls.add_tail ( & l_poDataControl );
+				f_oViewModeControls.add_tail( &l_poDataControl );
 			break;
 			default :
 				M_THROW ( "unknown resource purpouse",
-						f_psResourcesArray [ l_iCtr ].f_eRole );
+						f_psResourcesArray[ l_iCtr ].f_eRole );
 			}
 		l_iCtr ++;
 		}
@@ -206,14 +207,14 @@ int HDataWindow::init ( void )
 	M_EPILOG
 	}
 
-HStatusBarControl * HDataWindow::init_bar ( char const * a_pcLabel )
+HStatusBarControl* HDataWindow::init_bar( char const* a_pcLabel )
 	{
 	M_PROLOG
-	return ( new HDataStatusBarControl ( this, a_pcLabel ) );
+	return ( new HDataStatusBarControl( this, a_pcLabel ) );
 	M_EPILOG
 	}
 
-void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
+void HDataWindow::link( int a_iChild, HDataControl* a_poDataControl )
 	{
 	M_PROLOG
 	int l_iParent = 0;
@@ -244,7 +245,7 @@ void HDataWindow::link ( int a_iChild, HDataControl * a_poDataControl )
 	M_EPILOG
 	}
 
-void HDataWindow::set_mode ( DOCUMENT::mode_t a_eMode )
+void HDataWindow::set_mode( DOCUMENT::mode_t a_eMode )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iCount = 0;
