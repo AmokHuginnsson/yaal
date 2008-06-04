@@ -216,8 +216,9 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 			}
 		break;
 		default :
-			M_THROW ( n_pcEMode, a_eMode );
+			M_THROW( n_pcEMode, a_eMode );
 		}
+	f_eMode = a_eMode;
 	return ( f_oSQL );
 	M_EPILOG
 	}
@@ -346,10 +347,10 @@ yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& a_iField ) c
 			a_iField ) );
 	}
 
-HRecordSet::ptr_t HSQLDescriptor::execute( MODE::mode_t const& a_eMode, char const* const a_pcQuery )
+HRecordSet::ptr_t HSQLDescriptor::execute( void )
 	{
 	M_PROLOG
-	HRecordSet::ptr_t rs = f_oDataBase->query( a_pcQuery ? HString( a_pcQuery ) : build_sql( a_eMode ) );
+	HRecordSet::ptr_t rs = f_oDataBase->query( f_oSQL );
 	f_iFieldCount = rs->get_field_count();
 	f_oFields = fields_t( f_iFieldCount );
 	f_oValues = values_t( f_iFieldCount );
@@ -357,6 +358,22 @@ HRecordSet::ptr_t HSQLDescriptor::execute( MODE::mode_t const& a_eMode, char con
 		f_oFields[ l_iCtr ] = rs->get_column_name( l_iCtr ); 
 	f_iSetSize = rs->get_size();
 	return ( rs );
+	M_EPILOG
+	}
+
+HRecordSet::ptr_t HSQLDescriptor::execute( MODE::mode_t const& a_eMode )
+	{
+	M_PROLOG
+	build_sql( a_eMode );
+	return ( execute() );
+	M_EPILOG
+	}
+
+HRecordSet::ptr_t HSQLDescriptor::execute( char const* const a_pcQuery )
+	{
+	M_PROLOG
+	f_oSQL = a_pcQuery;
+	return ( execute() );
 	M_EPILOG
 	}
 

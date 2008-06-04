@@ -64,20 +64,17 @@ HDataListControl::~HDataListControl ( void )
 void HDataListControl::load( int long /*a_iId*/ )
 	{
 	M_PROLOG
-/* FIXME
+	f_oSQL->set_filter( "" );
 	int l_iCount = 0, l_iCtr = 0, l_iSize = f_oDataControler->size();
 	HItem l_oItem( f_oHeader.size() );
-	HDataWindow * l_poParent = dynamic_cast<HDataWindow*> ( f_poParent );
+	HDataWindow* l_poParent = dynamic_cast<HDataWindow*>( f_poParent );
 	M_ASSERT ( l_poParent );
-	l_poParent->set_sync_store( & l_oItem );
-	if ( f_poRecordSet->is_open() )
-		l_iCount = f_poRecordSet->requery();
-	else
-		l_iCount = f_poRecordSet->open();
+	l_poParent->set_sync_store( &l_oItem );
+	HRecordSet::ptr_t rs = f_oSQL->execute( HSQLDescriptor::MODE::D_SELECT );
 	l_poParent->status_bar()->init_progress ( static_cast<double>( l_iCount ), "Collecting ..." );
 	HListControler<>::model_ptr_t l_oModel = f_oDataControler->get_model();
 	HListControler<>::model_t::iterator it = l_oModel->begin();
-	while ( ! f_poRecordSet->is_eof() )
+	for ( HRecordSet::iterator row = rs->begin(); row != rs->end(); ++ row )
 		{
 		l_poParent->status_bar()->update_progress();
 		if ( it != l_oModel->end() )
@@ -87,14 +84,12 @@ void HDataListControl::load( int long /*a_iId*/ )
 			}
 		else
 			l_oModel->push_back( l_oItem );
-		f_poRecordSet->move_next();
 		++ l_iCtr;
 		}
 	while ( l_iCtr ++ < l_iSize )
 		f_oDataControler->remove_tail();
 	reset();
 	l_poParent->set_sync_store();
-*/
 	return;
 	M_EPILOG
 	}

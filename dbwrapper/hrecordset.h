@@ -136,7 +136,9 @@ public:
 	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );
 	virtual ~HSQLDescriptor( void );
 	yaal::hcore::HString const& build_sql( MODE::mode_t const& );
-	HRecordSet::ptr_t execute( MODE::mode_t const&, char const* const = NULL );
+	HRecordSet::ptr_t execute( MODE::mode_t const& );
+	HRecordSet::ptr_t execute( char const* const );
+	HRecordSet::ptr_t execute( void );
 	};
 
 typedef yaal::hcore::HExceptionT<HRecordSet> HRecordSetException;

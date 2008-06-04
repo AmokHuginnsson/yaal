@@ -59,33 +59,35 @@ protected:
 	HDataControl* f_poMainControl;
 	OResource* f_psResourcesArray;
 	yaal::hconsole::HItem* f_poSyncStore;
-	yaal::hcore::HList<HDataControl*> f_oViewModeControls;
-	yaal::hcore::HList<HDataControl*> f_oEditModeControls;
+	typedef yaal::hcore::HList<HDataControl*> controls_t;
+	controls_t f_oViewModeControls;
+	controls_t f_oEditModeControls;
 	HDataProcess* f_poOwner;
 	yaal::dbwrapper::HSQLDescriptor::ptr_t f_oDB;
+	yaal::dbwrapper::HSQLDescriptor::MODE::mode_t f_eMode;
 public:
 	HDataWindow( char const*, HDataProcess*, OResource* = NULL );
 	virtual ~HDataWindow( void );
 	virtual int init( void );
 	virtual hconsole::HStatusBarControl* init_bar( char const* );
-	void set_sync_store ( hconsole::HItem * = NULL );
-	bool is_modified ( void ) const;
-	void set_modified ( bool = true );
+	void set_sync_store( hconsole::HItem* = NULL );
+	bool is_modified( void ) const;
+	void set_modified( bool = true );
 protected:
-	void link ( int, HDataControl * );
-	void set_mode ( DOCUMENT::mode_t );
-	virtual void sync ( void );
-	void sync ( int, hconsole::HEditControl & );
-	void sync ( int, HDataListControl & );
-	int handler_add_new ( int, void const* );
-	int handler_edit ( int, void const* );
-	int handler_delete ( int, void const* );
-	int handler_save ( int, void const* );
-	int handler_requery ( int, void const* );
-	int handler_cancel ( int, void const* );
+	void link( int, HDataControl* );
+	void set_mode( DOCUMENT::mode_t );
+	virtual void sync( void );
+	void sync( int, hconsole::HEditControl & );
+	void sync( int, HDataListControl & );
+	int handler_add_new( int, void const* );
+	int handler_edit( int, void const* );
+	int handler_delete( int, void const* );
+	int handler_save( int, void const* );
+	int handler_requery( int, void const* );
+	int handler_cancel( int, void const* );
 private:
-	HDataWindow ( HDataWindow const & );
-	HDataWindow & operator = ( HDataWindow const & );
+	HDataWindow( HDataWindow const& );
+	HDataWindow& operator = ( HDataWindow const& );
 	};
 
 }
