@@ -90,23 +90,23 @@ HException::~HException ( void )
 	try
 		{
 		if ( ! f_bLocal )
-			hcore::log (
+			hcore::log(
 					"Exception registers: c:0x%02x i:%d l:%ld d:%f pv:%p pc:%s\n",
 					f_cChar, f_iInt, f_lLong, f_dDouble, f_pvVoidPtr, f_pcCharPtr );
 		}
 	catch ( ... )
 		{
-		fprintf ( static_cast<FILE*>( ERROR_STREAM ), _ ( "CRITICAL FAILURE (~HException) !\n" ) );
-		exit ( - 1 );
+		::fprintf( static_cast<FILE*>( ERROR_STREAM ), _( "CRITICAL FAILURE (~HException) !\n" ) );
+		::exit( - 1 );
 		}
 	if ( f_pcCharPtr )
-		xfree ( f_pcCharPtr );
+		xfree( f_pcCharPtr );
 	if ( f_pcFunctionName )
-		xfree ( f_pcFunctionName );
+		xfree( f_pcFunctionName );
 	if ( f_pcFileName )
-		xfree ( f_pcFileName );
+		xfree( f_pcFileName );
 	if ( f_pcMessage )
-		xfree ( f_pcMessage );
+		xfree( f_pcMessage );
 	return;
 	}
 
@@ -119,9 +119,9 @@ void HException::set ( char const a_cChar, int const a_iInt,
 	f_lLong = a_lLong;
 	f_dDouble = a_dDouble;
 	if ( f_pcCharPtr )
-		xfree ( f_pcCharPtr );
+		xfree( f_pcCharPtr );
 	if ( a_pcStr )
-		f_pcCharPtr = xstrdup ( a_pcStr );
+		f_pcCharPtr = xstrdup( a_pcStr );
 	f_pvVoidPtr = a_pvVoidPtr;
 	return;
 	}

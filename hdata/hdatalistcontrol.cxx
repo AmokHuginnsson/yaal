@@ -76,6 +76,7 @@ void HDataListControl::load( int long /*a_iId*/ )
 	HListControler<>::model_t::iterator it = l_oModel->begin();
 	for ( HRecordSet::iterator row = rs->begin(); row != rs->end(); ++ row )
 		{
+		l_poParent->sync( row );
 		l_poParent->status_bar()->update_progress();
 		if ( it != l_oModel->end() )
 			{	
@@ -94,31 +95,31 @@ void HDataListControl::load( int long /*a_iId*/ )
 	M_EPILOG
 	}
 
-int long HDataListControl::get_current_id ( void )
+int long HDataListControl::get_current_id( void )
 	{
 	M_PROLOG
 	return ( f_oCursor->get_id() );
 	M_EPILOG
 	}
 
-void HDataListControl::add_new ( void )
+void HDataListControl::add_new( void )
 	{
 	M_PROLOG
 	f_oDataControler->add_tail( HItem( f_oHeader.size() ) );
-	process_input ( KEY_CODES::D_HOME );
-	process_input ( KEY_CODES::D_END );
+	process_input( KEY_CODES::D_HOME );
+	process_input( KEY_CODES::D_END );
 	return;
 	M_EPILOG
 	}
 
-void HDataListControl::cancel_new ( void )
+void HDataListControl::cancel_new( void )
 	{
 	M_PROLOG
 	f_oDataControler->remove_tail();
 	if ( f_oDataControler->size() )
 		{
-		process_input ( KEY_CODES::D_HOME );
-		process_input ( KEY_CODES::D_END );
+		process_input( KEY_CODES::D_HOME );
+		process_input( KEY_CODES::D_END );
 		}
 	return;
 	M_EPILOG

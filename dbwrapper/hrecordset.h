@@ -119,6 +119,9 @@ private:
 	values_t f_oValues;
 	database_ptr_t f_oDataBase;
 public:
+	HSQLDescriptor( void );
+	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );
+	virtual ~HSQLDescriptor( void );
 	void set_table( char const* const );
 	void set_columns( char const* const );
 	void set_filter( char const* const );
@@ -132,9 +135,7 @@ public:
 	void sync( int, int long& );
 	void sync( int, yaal::hcore::HString& );
 	void sync( HRecordSet::iterator const& );
-	HSQLDescriptor( void );
-	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );
-	virtual ~HSQLDescriptor( void );
+	yaal::hcore::HString& operator[]( int );
 	yaal::hcore::HString const& build_sql( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( char const* const );

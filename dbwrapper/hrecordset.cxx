@@ -96,7 +96,7 @@ int long HRecordSet::get_insert_id( void )
 	{
 	M_PROLOG
 	if ( ! f_pvResult )
-		M_THROW ( "no result", errno );
+		M_THROW( "no result", errno );
 	return ( dbwrapper::dbrs_id( &*f_oDataBase, f_pvResult ) );
 	M_EPILOG
 	}
@@ -385,27 +385,13 @@ void HSQLDescriptor::sync( HRecordSet::iterator const& it )
 	M_EPILOG
 	}
 
-#if 0
-
-int long HRecordSet::update ( void )
+HString& HSQLDescriptor::operator[]( int a_iColumn )
 	{
 	M_PROLOG
-	int long l_iRetVal = 0;
-	if ( ( f_eMode != D_ADDING ) && ( f_eMode != D_EDITING ) )
-		M_THROW ( n_pcEMode, f_eMode );
-	sync();
-	build_sql();
-	f_oDataBase->query( f_oSQL );
-	if ( f_eMode == D_ADDING )
-		l_iRetVal = f_oDataBase->insert_id();
-	f_oDataBase->free_result();
-	f_eMode = D_NORMAL;
-	requery();
-	return ( l_iRetVal );
+	M_ASSERT( ( a_iColumn >= 0 ) && ( a_iColumn <= f_iFieldCount ) );
+	return ( f_oValues[ a_iColumn ] );
 	M_EPILOG
 	}
-
-#endif
 
 }
 

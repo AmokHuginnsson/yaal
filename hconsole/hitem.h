@@ -41,7 +41,7 @@ namespace hconsole
 {
 
 template <typename tType = yaal::hcore::HInfo>
-class HItem_t : public hcore::HArray < tType >
+class HItem_t : public hcore::HArray<tType>
 	{
 public:
 	int long	m_lId;
@@ -73,12 +73,12 @@ HItem_t<tType>::HItem_t ( HItem_t const & a_roItem, int ) : hcore::HArray<tType>
 	}
 
 template <typename tType>
-HItem_t<tType> & HItem_t<tType>::operator= ( HItem_t<tType> const & a_roItem )
+HItem_t<tType> & HItem_t<tType>::operator = ( HItem_t<tType> const & a_roItem )
 	{
 	M_PROLOG
 	if ( this != & a_roItem )
 		{
-		(*this).hcore::HArray<tType>::operator= ( a_roItem );
+		(*this).hcore::HArray<tType>::operator = ( a_roItem );
 		m_lId = a_roItem.m_lId;
 		m_bChecked = a_roItem.m_bChecked;
 		}

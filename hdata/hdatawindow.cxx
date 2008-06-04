@@ -33,6 +33,7 @@ M_VCSID ( "$Id$" )
 #include "hdatatreecontrol.h"
 #include "hdataeditcontrol.h"
 #include "hdatastatusbarcontrol.h"
+#include "hdataprocess.h"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;
@@ -49,7 +50,7 @@ HDataWindow::HDataWindow( char const* a_pcTitle, HDataProcess* a_poOwner,
 	: HWindow( a_pcTitle ),
 	f_bModified( false ), f_eDocumentMode( DOCUMENT::D_VIEW ), f_poMainControl( NULL ),
 	f_psResourcesArray( a_psDataControlInfo ), f_poSyncStore( NULL ),
-	f_oViewModeControls(), f_oEditModeControls(), f_poOwner( a_poOwner ), f_oDB( new HSQLDescriptor() ),
+	f_oViewModeControls(), f_oEditModeControls(), f_poOwner( a_poOwner ), f_oDB( new HSQLDescriptor( a_poOwner->data_base() ) ),
 	f_eMode( HSQLDescriptor::MODE::D_SELECT )
 	{
 	M_PROLOG
@@ -172,7 +173,6 @@ int HDataWindow::init ( void )
 			{
 			case ( DATACONTROL_BITS::ROLE::D_MAIN ):
 				{
-				
 				f_oDB->set_table( f_psResourcesArray[ l_iCtr ].f_pcTable );
 				f_oDB->set_columns( f_psResourcesArray[ l_iCtr ].f_pcColumns );
 				f_oDB->set_filter( f_psResourcesArray[ l_iCtr ].f_pcFilter );
@@ -274,29 +274,22 @@ void HDataWindow::set_mode( DOCUMENT::mode_t a_eMode )
 	M_EPILOG
 	}
 
-void HDataWindow::sync( void )
+void HDataWindow::sync( HRecordSet::iterator it )
 	{
 	M_PROLOG
-/* FIXME
 	int l_iCtr = 0, l_iCount = 0;
-	HRecordSet::sync();
 	if ( f_poSyncStore )
 		{
 		l_iCount = f_poSyncStore->get_size();
-		if ( f_oValues.size() >= l_iCount )
-			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-				( * f_poSyncStore ) [ l_iCtr ] ( static_cast < char const * > ( f_oValues [ l_iCtr ] ) );
-		( * f_poSyncStore ).m_lId = m_lId;
+		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+			( *f_poSyncStore )[ l_iCtr ]( static_cast<char const*>( it[ l_iCtr ] ) );
 		}
-	else if ( ( f_eMode == D_ADDING ) || ( f_eMode == D_EDITING ) )
+	else if ( f_eDocumentMode == DOCUMENT::D_EDIT )
 		{
 		l_iCount = f_oEditModeControls.size();
-		if ( f_oValues.size() >= l_iCount )
-			for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-				f_oValues [ l_iCtr ] = f_oEditModeControls [ l_iCtr ]->get().get < HString const & >();
-		m_lId = f_poMainControl->get_current_id();
+		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+			(*f_oDB)[ l_iCtr ] = f_oEditModeControls[ l_iCtr ]->get().get<HString const&>();
 		}
-*/
 	return;
 	M_EPILOG
 	}

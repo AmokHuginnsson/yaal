@@ -73,12 +73,12 @@ public:
 	void set_sync_store( hconsole::HItem* = NULL );
 	bool is_modified( void ) const;
 	void set_modified( bool = true );
+	void sync( yaal::dbwrapper::HRecordSet::iterator );
 protected:
 	void link( int, HDataControl* );
 	void set_mode( DOCUMENT::mode_t );
-	virtual void sync( void );
-	void sync( int, hconsole::HEditControl & );
-	void sync( int, HDataListControl & );
+	void sync( int, hconsole::HEditControl& );
+	void sync( int, HDataListControl& );
 	int handler_add_new( int, void const* );
 	int handler_edit( int, void const* );
 	int handler_delete( int, void const* );
