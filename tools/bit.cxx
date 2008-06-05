@@ -59,36 +59,42 @@ int long unsigned g_pulMaskBitClear [ ] =
 char unsigned g_pucMaskBitSet [ ] = {128, 64, 32, 16, 8, 4, 2, 1};
 char unsigned g_pucMaskBitClear [ ] = {127, 191, 223, 239, 247, 251, 253, 254};
 
-int getbit ( void * a_pvAddress, int long unsigned a_ulNumber )
+int getbit( void* a_pvAddress, int long unsigned a_ulNumber )
 	{
 	int short l_hState = 0, l_iOffset = 0;
-	char * l_pcAddress = NULL;
+	char* l_pcAddress = NULL;
 	int long unsigned l_ulDword;
-	l_pcAddress = static_cast < char * > ( a_pvAddress );
+	l_pcAddress = static_cast<char*>( a_pvAddress );
 	l_ulDword = a_ulNumber >> 3;
-	l_iOffset = static_cast < short > ( a_ulNumber ) & 7;
-	l_hState = * ( l_pcAddress + l_ulDword ) & g_pucMaskBitSet [ l_iOffset ];
+	l_iOffset = static_cast<short>( a_ulNumber & 7 );
+	l_hState = static_cast<short>( *( l_pcAddress + l_ulDword ) & g_pucMaskBitSet[ l_iOffset ] );
 	if ( l_hState )
 		l_hState = 1;
 	return ( l_hState );
 	}
 	
-void setbit ( void * a_pvAddress, int long unsigned a_ulNumber, int a_iState )
+void setbit( void* a_pvAddress, int long unsigned a_ulNumber, int a_iState )
 	{
 	int l_iOffset;
-	char unsigned * l_pcAddress;
+	char unsigned* l_pcAddress;
 	int long unsigned l_ulDword;
-	l_pcAddress = static_cast < char unsigned * > ( a_pvAddress );
+	l_pcAddress = static_cast<char unsigned*>( a_pvAddress );
 	l_ulDword = a_ulNumber >> 3;
 	l_iOffset = a_ulNumber & 7;
+	/* FIXME g++-4.3 bug
 	if ( a_iState )
-		* ( l_pcAddress + l_ulDword ) |= g_pucMaskBitSet [ l_iOffset ];
+		*( l_pcAddress + l_ulDword ) |= g_pucMaskBitSet[ l_iOffset ];
 	else
-		* ( l_pcAddress + l_ulDword ) &= g_pucMaskBitClear [ l_iOffset ];
+		*( l_pcAddress + l_ulDword ) &= g_pucMaskBitClear[ l_iOffset ];
+	*/
+	if ( a_iState )
+		*( l_pcAddress + l_ulDword ) = static_cast<char unsigned>( *( l_pcAddress + l_ulDword ) | g_pucMaskBitSet[ l_iOffset ] );
+	else
+		*( l_pcAddress + l_ulDword ) = static_cast<char unsigned>( *( l_pcAddress + l_ulDword ) & g_pucMaskBitClear[ l_iOffset ] );
 	return ;
 	}
 	
-void ror ( char unsigned * a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
+void ror( char unsigned* a_pucTmpBuf, int a_iStart, int a_iLen, int a_iVal )
 	{
 	int l_i, l_iSize;
 	char unsigned * l_pucTmp = 0;

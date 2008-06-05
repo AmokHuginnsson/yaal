@@ -87,7 +87,7 @@ int HRecordSet::get_size( void )
 	return ( dbwrapper::dbrs_records_count( &*f_oDataBase, f_pvResult ) );
 	}
 
-char const* const HRecordSet::get_column_name( int a_iColumn )
+char const* HRecordSet::get_column_name( int a_iColumn )
 	{
 	return ( dbwrapper::rs_column_name( f_pvResult, a_iColumn ) );
 	}

@@ -138,7 +138,7 @@ char n_pppcKoncowka [ ] [ 3 ] [ 6 ] =
 
 HString n_oLastErrorMessage;
 
-HString kwota_slownie ( double a_dKwota )
+HString kwota_slownie( double a_dKwota )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iLength = 0, l_iForma = 0, l_iSub = 0;
@@ -160,7 +160,7 @@ HString kwota_slownie ( double a_dKwota )
 			}
 		if ( l_iCtr == 2 )
 			continue;
-		l_cCyfra = l_oString [ ( l_iLength - l_iCtr ) - 1 ] - '0';
+		l_cCyfra = static_cast<char>( l_oString[ ( l_iLength - l_iCtr ) - 1 ] - '0' );
 		switch ( l_iCtr % 3 )
 			{
 			case ( 0 ) :
@@ -294,7 +294,7 @@ bool verify_IBAN ( char const * a_pcIBAN )
 	return ( true );
 	}
 
-char const * const get_last_error ( void )
+char const* get_last_error ( void )
 	{
 	if ( n_oLastErrorMessage )
 		return ( n_oLastErrorMessage );

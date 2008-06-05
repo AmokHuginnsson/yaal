@@ -169,7 +169,7 @@ int console_mouse_open ( void )
 	l_sGpm.pid = ::getpid();
 	l_sGpm.vc = l_iVC = hunt_tty( 0 );
 	l_sGpm.eventMask = static_cast<int>( GPM_UP );
-	l_sGpm.defaultMask = ~ l_sGpm.eventMask;
+	l_sGpm.defaultMask = static_cast<int short unsigned>( ~l_sGpm.eventMask );
 	gpm_zerobased = true;
 	if ( Gpm_Open ( & l_sGpm, l_iVC ) == -1 )
 		{

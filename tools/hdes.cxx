@@ -142,56 +142,58 @@ void HDes::_des ( uc_t * a_pcBlock, int a_iSide, int a_iPart )
 	uc_t l_pcBuf [ DES::D_BLOCK_SIZE ], l_pcBufT [ DES::D_BLOCK_SIZE ];
 	uc_t l_pcBufL [ DES::D_BLOCK_SIZE ], l_pcBufR [ DES::D_BLOCK_SIZE ];
 	uc_t l_cMask = 0, * l_pcEndKey = NULL;
-	reinterpret_cast < uli_t * > ( l_pcBufL ) [ 0 ] = reinterpret_cast < uli_t * > ( a_pcBlock ) [ 0 ];
-	reinterpret_cast < uli_t * > ( l_pcBufR ) [ 0 ] = reinterpret_cast < uli_t * > ( a_pcBlock ) [ 1 ];
-	reinterpret_cast < uli_t * > ( l_pcBufT ) [ 0 ] = reinterpret_cast < uli_t * > ( a_pcBlock ) [ 1 ];
+	reinterpret_cast<uli_t*>( l_pcBufL )[ 0 ] = reinterpret_cast<uli_t*>( a_pcBlock )[ 0 ];
+	reinterpret_cast<uli_t*>( l_pcBufR )[ 0 ] = reinterpret_cast<uli_t*>( a_pcBlock )[ 1 ];
+	reinterpret_cast<uli_t*>( l_pcBufT )[ 0 ] = reinterpret_cast<uli_t*>( a_pcBlock )[ 1 ];
 	for ( l_iCycle = 0; l_iCycle < DES::D_IKEYS_COUNT; l_iCycle ++ )
 		{
-		reinterpret_cast < uli_t * > ( l_pcBuf ) [ 0 ] = 0;
+		reinterpret_cast<uli_t*>( l_pcBuf )[ 0 ] = 0;
 		if ( a_iSide )
-			l_pcEndKey = f_pppcIKeys [ a_iPart ] [ l_iCycle ];
+			l_pcEndKey = f_pppcIKeys[ a_iPart ][ l_iCycle ];
 		else
-			l_pcEndKey = f_pppcIKeys [ a_iPart ] [ 15 - l_iCycle ];
-		permutate ( l_pcBufT, n_pcPermutationOfExpanding, 48 );
-		reinterpret_cast < uli_t * > ( l_pcBufT ) [ 0 ] = reinterpret_cast < uli_t * > ( l_pcBufT ) [ 0 ]
-																											^ reinterpret_cast < uli_t * > ( l_pcEndKey ) [ 0 ];
-		reinterpret_cast < usi_t * > ( l_pcBufT ) [ 2 ] = reinterpret_cast < usi_t * > ( l_pcBufT ) [ 2 ]
-																											^ reinterpret_cast < usi_t * > ( l_pcEndKey ) [ 2 ];
+			l_pcEndKey = f_pppcIKeys[ a_iPart ][ 15 - l_iCycle ];
+		permutate( l_pcBufT, n_pcPermutationOfExpanding, 48 );
+		reinterpret_cast<uli_t*>( l_pcBufT )[ 0 ] = reinterpret_cast<uli_t*>( l_pcBufT )[ 0 ]
+																											^ reinterpret_cast<uli_t*>( l_pcEndKey )[ 0 ];
+		reinterpret_cast<usi_t*>( l_pcBufT )[ 2 ] = static_cast<usi_t>( reinterpret_cast<usi_t*>( l_pcBufT )[ 2 ]
+				^ reinterpret_cast<usi_t*>( l_pcEndKey )[ 2 ] );
 		for ( l_iCtr = 0; l_iCtr < DES::D_BLOCK_SIZE; l_iCtr ++ )
 			{
 			l_iCol = l_iRow = 0;
-			setbit ( & l_iRow, 6, getbit ( l_pcBufT, static_cast < uli_t > ( l_iCtr ) * 6 ) );
-			setbit ( & l_iRow, 7, getbit ( l_pcBufT, static_cast < uli_t > ( l_iCtr ) * 6 + 5 ) );
+			setbit ( & l_iRow, 6, getbit ( l_pcBufT, static_cast<uli_t>( l_iCtr ) * 6 ) );
+			setbit ( & l_iRow, 7, getbit ( l_pcBufT, static_cast<uli_t>( l_iCtr ) * 6 + 5 ) );
 			for ( l_iCtrLoc = 0; l_iCtrLoc < 4; l_iCtrLoc ++ )
-				setbit ( & l_iCol, static_cast < uli_t > ( l_iCtrLoc ) + 4,
-						getbit ( l_pcBufT, static_cast < uli_t > ( l_iCtr ) * 6 + l_iCtrLoc + 1 ) );
+				setbit ( & l_iCol, static_cast<uli_t>( l_iCtrLoc ) + 4,
+						getbit ( l_pcBufT, static_cast<uli_t>( l_iCtr ) * 6 + l_iCtrLoc + 1 ) );
 			l_cMask = n_pppcSBlock [ l_iCtr ] [ l_iRow ] [ l_iCol ];
 			if ( ! ( l_iCtr & 1 ) )
-				l_cMask <<= 4;
-			l_pcBuf [ l_iCtr >> 1 ] |= l_cMask;
+				l_cMask = static_cast<char>( l_cMask << 4 );
+				/* FIXME g++ 4.3 bug *///l_cMask <<= 4;
+			l_pcBuf[ l_iCtr >> 1 ] = static_cast<char>( l_pcBuf[ l_iCtr >> 1 ] | l_cMask );
+			/* FIXME g++ 4.3 bug *///l_pcBuf[ l_iCtr >> 1 ] |= l_cMask;
 			}
 		permutate ( l_pcBuf, n_pcPBlockPermutation, 32 );
-		reinterpret_cast < uli_t * > ( l_pcBufT ) [ 0 ] = reinterpret_cast < uli_t * > ( l_pcBuf ) [ 0 ]
-																											^ reinterpret_cast < uli_t * > ( l_pcBufL ) [ 0 ];
-		reinterpret_cast < uli_t * > ( l_pcBufL ) [ 0 ] = reinterpret_cast < uli_t * > ( l_pcBufR ) [ 0 ];
-		reinterpret_cast < uli_t * > ( l_pcBufR ) [ 0 ] = reinterpret_cast < uli_t * > ( l_pcBufT ) [ 0 ];
+		reinterpret_cast<uli_t*>( l_pcBufT )[ 0 ] = reinterpret_cast<uli_t*>( l_pcBuf )[ 0 ]
+																											^ reinterpret_cast<uli_t*>( l_pcBufL )[ 0 ];
+		reinterpret_cast<uli_t*>( l_pcBufL )[ 0 ] = reinterpret_cast<uli_t*>( l_pcBufR )[ 0 ];
+		reinterpret_cast<uli_t*>( l_pcBufR )[ 0 ] = reinterpret_cast<uli_t*>( l_pcBufT )[ 0 ];
 		}
-	reinterpret_cast < uli_t * > ( a_pcBlock ) [ 0 ] = reinterpret_cast < uli_t * > ( l_pcBufR ) [ 0 ];
-	reinterpret_cast < uli_t * > ( a_pcBlock ) [ 1 ] = reinterpret_cast < uli_t * > ( l_pcBufL ) [ 0 ];
+	reinterpret_cast<uli_t*>( a_pcBlock )[ 0 ] = reinterpret_cast<uli_t*>( l_pcBufR )[ 0 ];
+	reinterpret_cast<uli_t*>( a_pcBlock )[ 1 ] = reinterpret_cast<uli_t*>( l_pcBufL )[ 0 ];
 	return;
 	}
 
-void HDes::permutate ( uc_t * a_pcBuffer, const uc_t * a_pcTab, int a_iLen ) const
+void HDes::permutate( uc_t* a_pcBuffer, const uc_t* a_pcTab, int a_iLen ) const
 	{
 	int l_iCtr = 0;
 	uc_t l_pcBufTmp [ DES::D_BLOCK_SIZE ];
-	reinterpret_cast < uli_t * > ( l_pcBufTmp ) [ 0 ] = 0;
-	reinterpret_cast < uli_t * > ( l_pcBufTmp ) [ 1 ] = 0;
+	reinterpret_cast<uli_t*>( l_pcBufTmp ) [ 0 ] = 0;
+	reinterpret_cast<uli_t*>( l_pcBufTmp ) [ 1 ] = 0;
 	for ( l_iCtr = 0; l_iCtr < a_iLen; l_iCtr ++ )
-		setbit ( l_pcBufTmp, static_cast < uli_t > ( l_iCtr ),
-				getbit ( a_pcBuffer,  static_cast < uli_t > ( a_pcTab [ l_iCtr ] ) ) );
-	reinterpret_cast < uli_t * > ( a_pcBuffer ) [ 0 ] = reinterpret_cast < uli_t * > ( l_pcBufTmp ) [ 0 ];
-	reinterpret_cast < uli_t * > ( a_pcBuffer ) [ 1 ] = reinterpret_cast < uli_t * > ( l_pcBufTmp ) [ 1 ];
+		setbit ( l_pcBufTmp, static_cast<uli_t>( l_iCtr ),
+				getbit ( a_pcBuffer,  static_cast<uli_t>( a_pcTab [ l_iCtr ] ) ) );
+	reinterpret_cast<uli_t*>( a_pcBuffer ) [ 0 ] = reinterpret_cast<uli_t*>( l_pcBufTmp ) [ 0 ];
+	reinterpret_cast<uli_t*>( a_pcBuffer ) [ 1 ] = reinterpret_cast<uli_t*>( l_pcBufTmp ) [ 1 ];
 	return;
 	}	
 	

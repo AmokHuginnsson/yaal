@@ -45,7 +45,7 @@ yaal::hcore::HString kwota_slownie( double );
 void usun_ogonki( char* );
 double atof_ex( char const*, bool = false );
 bool verify_IBAN( char const* );
-char const* const get_last_error( void );
+char const* get_last_error( void );
 void show_help( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const = NULL );
 void failure( int, char const* const, ... ) __attribute__(( __noreturn__ ));
 
@@ -64,7 +64,7 @@ int second( int, bool = false );
 namespace distance
 {
 
-int levenshtein_damerau ( char const* const, char const* const, bool = true );
+int levenshtein_damerau( char const* const, char const* const, bool = true );
 
 }
 

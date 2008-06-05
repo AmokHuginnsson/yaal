@@ -38,64 +38,65 @@ namespace yaal
 namespace hcore
 {
 
-HPattern::HPattern ( bool const a_bIgnoreCase ) : f_bInitialized ( false ),
-	f_bIgnoreCaseDefault ( a_bIgnoreCase ), f_bIgnoreCase ( false ),
-	f_bExtended ( false ), f_iSimpleMatchLength ( 0 ), f_sCompiled(),
+HPattern::HPattern( bool const a_bIgnoreCase ) : f_bInitialized( false ),
+	f_bIgnoreCaseDefault( a_bIgnoreCase ), f_bIgnoreCase( false ),
+	f_bExtended( false ), f_iSimpleMatchLength( 0 ), f_sCompiled(),
 	f_oPatternInput(), f_oPatternReal(), f_oError()
 	{
 	M_PROLOG
-	memset ( & f_sCompiled, 0, sizeof ( f_sCompiled ) );
+	memset( &f_sCompiled, 0, sizeof ( f_sCompiled ) );
 	return;
 	M_EPILOG
 	}
 
-HPattern::~HPattern ( void )
+HPattern::~HPattern( void )
 	{
 	M_PROLOG
-	regfree ( & f_sCompiled );
+	regfree( &f_sCompiled );
 	return;
 	M_EPILOG
 	}
 
-int HPattern::parse ( char const * const a_pcPattern,
+int HPattern::parse( char const* const a_pcPattern,
 		int short unsigned* const a_puhFlags, int const a_iFlagsCount )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	bool l_bLocalCopyIgnoreCase = false, l_bLocalCopyExtended = false;
 	HArray<int short unsigned> l_oLocalCopyFlags( a_iFlagsCount );
-	char const * const l_pcPattern = f_oPatternInput = a_pcPattern;
+	char const* const l_pcPattern = f_oPatternInput = a_pcPattern;
 	f_oError = "";
 /* making copy of flags */
 	l_bLocalCopyIgnoreCase = f_bIgnoreCase;
 	l_bLocalCopyExtended = f_bExtended;
 	for ( int i = 0; i < a_iFlagsCount; i ++ )
-		l_oLocalCopyFlags [ i ] = a_puhFlags [ i ];
+		l_oLocalCopyFlags[ i ] = a_puhFlags[ i ];
 /* end of copy */
 /* clear all flags */
 	f_bIgnoreCase = f_bIgnoreCaseDefault;
 	f_bExtended = false;
 	static int short unsigned const D_FLAG_MASK = 0x00ff;
 	for ( int i = 0; i < a_iFlagsCount; ++ i )
-		a_puhFlags[ i ] &= D_FLAG_MASK;
+		a_puhFlags[ i ] = static_cast<int short unsigned>( a_puhFlags[ i ] & D_FLAG_MASK );
+/* FIXME g++ 4.3 bug *///		a_puhFlags[ i ] &= D_FLAG_MASK;
 /* end of clearing */
 /* look for switches at the beginnig of pattern */
 	int long l_iCtr = 0;
-	while ( l_pcPattern [ l_iCtr ] == '\\' )
+	while ( l_pcPattern[ l_iCtr ] == '\\' )
 		{
-		if ( set_switch ( l_pcPattern [ ++ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
+		if ( set_switch( l_pcPattern[ ++ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
 			{
 			f_bIgnoreCase = l_bLocalCopyIgnoreCase;
 			f_bExtended = l_bLocalCopyExtended;
-			for ( int i = 0; i < a_iFlagsCount; i ++ )
-				a_puhFlags [ i ] = l_oLocalCopyFlags [ i ];
+			for ( int i = 0; i < a_iFlagsCount; ++ i )
+				a_puhFlags[ i ] = l_oLocalCopyFlags[ i ];
 			l_iError = 1;
-			f_oError.format ( "bad search option '%c'", l_pcPattern [ l_iCtr ] );
+			f_oError.format( "bad search option '%c'", l_pcPattern[ l_iCtr ] );
 			return ( l_iError );
 			}
 		l_iCtr ++;
 		}
-	if ( l_pcPattern [ l_iCtr ] == '/' )
+	if ( l_pcPattern[ l_iCtr ] == '/' )
 		l_iCtr ++;
 	int long l_iBegin = l_iCtr;
 /* end of looking at begin */
@@ -109,9 +110,9 @@ int HPattern::parse ( char const * const a_pcPattern,
 	int long l_iEnd = l_iCtr = f_oPatternInput.get_length() - 1;
 	if ( l_iEnd < 0 )
 		return ( true );
-	while ( ( l_iCtr > 0 ) && ( l_pcPattern [ l_iCtr ] != '/' ) )
+	while ( ( l_iCtr > 0 ) && ( l_pcPattern[ l_iCtr ] != '/' ) )
 		{
-		if ( set_switch ( l_pcPattern [ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
+		if ( set_switch( l_pcPattern[ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
 			{
 			f_bIgnoreCase = l_bLocalCopyIgnoreCase;
 			f_bExtended = l_bLocalCopyExtended;
@@ -134,20 +135,20 @@ int HPattern::parse ( char const * const a_pcPattern,
 		}
 	f_bInitialized = ! l_iError;
 	if ( f_bInitialized && f_bExtended )
-		l_iError = parse_re ( f_oPatternReal );
+		l_iError = parse_re( f_oPatternReal );
 	return ( l_iError );
 	M_EPILOG
 	}
 
-int HPattern::parse_re ( char const * const a_pcPattern )
+int HPattern::parse_re( char const* const a_pcPattern )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	regfree ( & f_sCompiled );
-	if ( ( l_iError = regcomp ( & f_sCompiled, a_pcPattern,
+	if ( ( l_iError = regcomp( &f_sCompiled, a_pcPattern,
 					f_bIgnoreCase ? REG_ICASE : 0 ) ) )
 		{
-		prepare_error_message ( l_iError, a_pcPattern );
+		prepare_error_message( l_iError, a_pcPattern );
 		f_bInitialized = false;
 		}
 	else
@@ -165,8 +166,8 @@ char const* HPattern::error( void ) const
 	return ( f_oError );
 	}
 
-bool HPattern::set_switch ( char const a_cSwitch,
-		int short unsigned * const a_puhFlags,
+bool HPattern::set_switch( char const a_cSwitch,
+		int short unsigned* const a_puhFlags,
 		int const a_iFlagsCount )
 	{
 	M_PROLOG
@@ -180,9 +181,9 @@ bool HPattern::set_switch ( char const a_cSwitch,
 		default :
 			{
 			for ( l_iCtr = 0; l_iCtr < a_iFlagsCount; l_iCtr ++ )
-				if ( a_cSwitch == ( a_puhFlags [ l_iCtr ] & 0x00ff ) )
+				if ( a_cSwitch == ( a_puhFlags[ l_iCtr ] & 0x00ff ) )
 					{
-					a_puhFlags [ l_iCtr ] |= 0x0100;
+					a_puhFlags[ l_iCtr ] |= 0x0100;
 					break;
 					}
 			if ( l_iCtr >= a_iFlagsCount )

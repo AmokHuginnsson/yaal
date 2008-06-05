@@ -63,7 +63,7 @@ void HPlugin::unload( void )
 	M_EPILOG
 	}
 
-char const* const HPlugin::error_message( int )
+char const* HPlugin::error_message( int )
 	{
 	return ( dlerror() );
 	}

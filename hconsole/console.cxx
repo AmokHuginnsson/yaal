@@ -84,15 +84,15 @@ namespace hconsole
  */
 struct ATTR
 	{
-	inline static int const value ( int const a_iAttr )
+	inline static int value( int const a_iAttr )
 		{
 		return ( COLOR_PAIR(
 					( ( a_iAttr & 0x70 ) >> 1 )             /* background */
-					|   a_iAttr & 0x07 )                    /* foreground */
+					| ( a_iAttr & 0x07 ) )                  /* foreground */
 				| ( ( a_iAttr & 0x08 ) ? A_BOLD : 0 )     /* brighter foreground */
 				| ( ( a_iAttr & 0x80 ) ? A_BLINK : 0 ) ); /* brighter background */
 		}
-	inline static int const value_fix ( int const a_iAttr )
+	inline static int value_fix( int const a_iAttr )
 		{
 		if ( a_iAttr & 0x80 )
 			return ( COLOR_PAIR(
@@ -580,7 +580,7 @@ char unsigned HConsole::get_attr( void ) const
 	if ( ! f_bEnabled )
 		M_THROW( "not in curses mode", errno );
 	attr_t l_xAttr;
-	short l_hColor = 0;
+	int l_hColor = 0;
 	int l_iAttribute = 0;
 	static_cast<void>( attr_get( &l_xAttr, &l_hColor, NULL ) ); /* Ugly macro */
 	l_iAttribute = ( l_hColor << 1 ) & 56;

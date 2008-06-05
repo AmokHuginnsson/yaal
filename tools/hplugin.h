@@ -51,7 +51,7 @@ public:
 	void load( char const* const );
 	void unload( void );
 	bool is_loaded( void ) const;
-	char const* const error_message( int );
+	char const* error_message( int );
 	template<typename name_t>
 	void resolve( char const* const, name_t& );
 	void* resolve( char const* const );

@@ -195,9 +195,10 @@ int long dbrs_records_count( void* a_pvDataB, void* a_pvDataR )
 		return ( ::sqlite3_changes( static_cast<OSQLite*>( a_pvDataB )->f_psDB ) );
 	}
 
-int long dbrs_id ( void* a_pvDataB, void* )
+int long dbrs_id( void* a_pvDataB, void* )
 	{
-	return ( sqlite3_last_insert_rowid( static_cast<OSQLite*>( a_pvDataB )->f_psDB ) );
+	/* FIXME change driver interface to allow 64bit insert row id (from autoincrement) */
+	return ( static_cast<int long>( sqlite3_last_insert_rowid( static_cast<OSQLite*>( a_pvDataB )->f_psDB ) ) );
 	}
 
 char* rs_column_name( void* a_pvDataR, int a_iField )

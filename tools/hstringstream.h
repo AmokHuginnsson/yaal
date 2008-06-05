@@ -43,18 +43,18 @@ class HStringStream : public yaal::hcore::HStreamInterface
 public:
 	HStringStream( void );
 	HStringStream( char const* const );
-	char const* const raw( void ) const;
+	char const* raw( void ) const;
 	yaal::hcore::HString const& string( void ) const;
 	void use( void ) const;
 	void clear( void );
-	char const* const consume( void ) const;
+	char const* consume( void ) const;
 private:
 	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;
 	virtual int long do_read( void* const, int long const& );
 	};
 
-char const* const operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& );
+char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& );
 
 }
 

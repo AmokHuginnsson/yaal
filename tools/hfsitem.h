@@ -73,7 +73,7 @@ public:
 	HIterator& operator ++ ( void );
 	HIterator const operator ++ ( int );
 	HFSItem const& operator* ( void );
-	HFSItem const* const operator->( void );
+	HFSItem const* operator->( void );
 	bool operator == ( HIterator const& it ) const;
 	bool operator != ( HIterator const& it ) const;
 private:

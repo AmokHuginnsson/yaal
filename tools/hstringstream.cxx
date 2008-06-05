@@ -44,7 +44,7 @@ HStringStream::HStringStream( char const* const a_pcInit ) : f_bUsed( false ), f
 	{
 	}
 
-char const* const HStringStream::raw( void ) const
+char const* HStringStream::raw( void ) const
 	{
 	return ( f_oBuffer.raw() );
 	}
@@ -95,13 +95,13 @@ void HStringStream::clear( void )
 	M_EPILOG
 	}
 
-char const* const HStringStream::consume( void ) const
+char const* HStringStream::consume( void ) const
 	{
 	use();
 	return ( f_oBuffer.raw() );
 	}
 
-char const* const operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream )
+char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream )
 	{
 	stream.use();
 	return ( stream.raw() );

@@ -232,7 +232,7 @@ HFSItem const& HFSItem::HIterator::operator* ( void )
 	M_EPILOG
 	}
 
-HFSItem const* const HFSItem::HIterator::operator->( void )
+HFSItem const* HFSItem::HIterator::operator->( void )
 	{
 	M_PROLOG
 	M_ASSERT( f_pvDir );

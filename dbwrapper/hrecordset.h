@@ -62,7 +62,7 @@ public:
 	bool is_empty( void );
 	int get_field_count( void ) const;
 	int get_size( void );
-	char const* const get_column_name( int );
+	char const* get_column_name( int );
 	int long get_insert_id( void );
 private:
 	HRecordSet( HRecordSet const& );

@@ -132,17 +132,17 @@ template < int code = 0 >
 struct KEY
 	{
 	static int const meta = code + KEY_CODES::D_META_BASE;
-	static int const meta_r ( int a_iCode )
+	static int meta_r( int a_iCode )
 		{
 		return ( a_iCode + KEY_CODES::D_META_BASE );
 		}
 	static int const ctrl = code - 96;
-	static int const ctrl_r ( int a_iCode )
+	static int ctrl_r( int a_iCode )
 		{
 		return ( a_iCode - 96 );
 		}
 	static int const command = code + KEY_CODES::D_COMMAND_BASE;
-	static int const command_r ( int a_iCode )
+	static int command_r( int a_iCode )
 		{
 		return ( a_iCode + KEY_CODES::D_COMMAND_BASE );
 		}
