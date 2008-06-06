@@ -113,9 +113,13 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 	return ( false );
 	}
 
-extern "C"
-void dbwrapper_init( void ) __attribute__ ( ( constructor ) );
-void dbwrapper_init( void )
+class HDBWrapperInitDeinit
+	{
+public:
+	HDBWrapperInitDeinit( void );
+	} initDeinit;
+
+HDBWrapperInitDeinit::HDBWrapperInitDeinit( void )
 	{
 	rc_file::process_rc_file ( "yaal", "dbwrapper", n_psVariables,
 			set_dbwrapper_variables );

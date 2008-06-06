@@ -142,9 +142,14 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	return ( false );
 	}
 
-extern "C"
-void tools_init ( void ); __attribute__ ( ( constructor ) )
-void tools_init ( void )
+class HToolsInitDeinit
+	{
+public:
+	HToolsInitDeinit( void );
+	~HToolsInitDeinit( void );
+	} initDeinit;
+
+HToolsInitDeinit::HToolsInitDeinit( void )
 	{
 	int l_iCtr = 0;
 	errno = 0;
@@ -173,8 +178,7 @@ void tools_init ( void )
 	return;
 	}
 
-void tools_fini ( void ); __attribute__ ( ( destructor ) )
-void tools_fini ( void )
+HToolsInitDeinit::~HToolsInitDeinit( void )
 	{
 	if ( tools::n_pcSerialDevice )
 		xfree ( tools::n_pcSerialDevice );

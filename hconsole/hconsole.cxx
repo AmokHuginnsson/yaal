@@ -175,9 +175,14 @@ bool set_hconsole_variables( HString& a_roOption, HString& a_roValue )
 	return ( false );
 	}
 
-extern "C"
-void hconsole_init ( void ) __attribute__(( constructor ));
-void hconsole_init ( void )
+class HConsoleInitDeinit
+	{
+public:
+	HConsoleInitDeinit( void );
+	} initDeinit;
+
+
+HConsoleInitDeinit::HConsoleInitDeinit( void )
 	{
 	errno = 0;
 	rc_file::process_rc_file ( "yaal", "console",

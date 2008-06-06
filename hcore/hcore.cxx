@@ -164,12 +164,16 @@ double long to_double( char const* const a_pcValue )
 	return ( ::strtold( a_pcValue, NULL ) );
 	}
 
-extern "C"
-void hcore_init( void ) __attribute__(( constructor ));
-void hcore_init( void )
+class HCoreInitDeinit
 	{
-	char * l_pcEnv = NULL;
-	STATIC_ASSERT( sizeof ( int ) >= 4 );
+public:
+	HCoreInitDeinit( void );
+	} initDeinit;
+
+HCoreInitDeinit::HCoreInitDeinit( void )
+	{
+	char* l_pcEnv = NULL;
+	STATIC_ASSERT( sizeof( int ) >= 4 );
 	errno = 0;
 	l_pcEnv = ::getenv( "YAAL_DEBUG" );
 	if ( l_pcEnv )
@@ -181,7 +185,7 @@ void hcore_init( void )
 
 void yaal_hcore_banner ( void )
 	{
-	fprintf ( stdout,
+	fprintf( stdout,
 			"%s\n"
 			"Available libraries:\n"
 			"\thcore\n", COPYRIGHT );
