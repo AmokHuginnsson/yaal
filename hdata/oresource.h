@@ -101,10 +101,11 @@ class HDataControl;
 struct OResource
 	{
 /* data part */
-	char const *	f_pcTable;			/* name of table in database asociated with contorl */
-	char const *	f_pcColumns;		/* what columns from record-set we are looking for */
-	char const *	f_pcFilter;			/* additional filter for record-set (WHERE clause) */
-	char const *	f_pcSort;				/* additional sort for record-set (ORDER BY clause) */
+	char const*	f_pcTable;   /* name of table in database asociated with contorl */
+	char const*	f_pcColumns; /* what columns from record-set we are looking for */
+	char const* f_pcId;      /* ID column name */
+	char const*	f_pcFilter;  /* additional filter for record-set (WHERE clause) */
+	char const*	f_pcSort;    /* additional sort for record-set (ORDER BY clause) */
 /* control part */
 	int			f_iRow;								/* top coordinate of contorl */
 	int			f_iColumn;						/* left coordinate of contorl */
