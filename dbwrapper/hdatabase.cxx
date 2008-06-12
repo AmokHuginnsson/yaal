@@ -84,10 +84,17 @@ HRecordSet::ptr_t HDataBase::query( char const* a_pcQuery )
 	M_EPILOG
 	}
 
-char const * HDataBase::get_error ( void ) const
+char const* HDataBase::get_error( void ) const
 	{
 	M_PROLOG
 	return ( dbwrapper::db_error( f_pvCoreData ) );
+	M_EPILOG
+	}
+
+int HDataBase::get_errno( void ) const
+	{
+	M_PROLOG
+	return ( dbwrapper::db_errno( f_pvCoreData ) );
 	M_EPILOG
 	}
 

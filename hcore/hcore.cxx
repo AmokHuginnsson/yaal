@@ -66,7 +66,7 @@ bool eq ( double const & a_dLeft, double const & a_dRight )
 					: ( ( a_dRight ) - ( a_dLeft ) ) ) < D_EPSILON ) );
 	}
 
-bool set_hcore_variables ( HString & a_roOption, HString & a_roValue )
+bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -183,7 +183,7 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	return;
 	}
 
-void yaal_hcore_banner ( void )
+void yaal_hcore_banner( void )
 	{
 	fprintf( stdout,
 			"%s\n"
@@ -196,8 +196,8 @@ static char const g_pcDynamicLinkerPath [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 extern "C"
-void yaal_hcore_main ( void ) __attribute__(( __noreturn__ ));
-void yaal_hcore_main ( void )
+void yaal_hcore_main( void ) __attribute__(( __noreturn__ ));
+void yaal_hcore_main( void )
 	{
 	if ( g_pcDynamicLinkerPath [ 0 ] )
 		yaal_hcore_banner();

@@ -28,6 +28,7 @@ Copyright:
 
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
+#include "hcore/hcore.h"
 #include "hdatawindow.h"
 #include "hdatalistcontrol.h"
 #include "hdatatreecontrol.h"
@@ -70,7 +71,7 @@ HDataWindow::HDataWindow( char const* a_pcTitle, HDataProcess* a_poOwner,
 	M_EPILOG
 	}
 
-HDataWindow::~HDataWindow ( void )
+HDataWindow::~HDataWindow( void )
 	{
 	M_PROLOG
 	f_poMainControl = NULL;
@@ -168,6 +169,7 @@ int HDataWindow::init ( void )
 			l_poDataControl->set_attributes( l_psAttr->f_iDisabledAttribute,
 					l_psAttr->f_iEnabledAttribute,
 					l_psAttr->f_iFocusedAttribute );
+			l_poDataControl->set_resource( &f_psResourcesArray[ l_iCtr ] );
 			}
 		switch ( f_psResourcesArray[ l_iCtr ].f_eRole )
 			{
@@ -278,25 +280,30 @@ void HDataWindow::sync( HRecordSet::iterator it )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iCount = 0;
-	if ( f_poSyncStore )
-		{
-		l_iCount = f_poSyncStore->get_size();
-		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-			( *f_poSyncStore )[ l_iCtr ]( static_cast<char const*>( it[ l_iCtr ] ) );
-		}
-	else if ( f_eDocumentMode == DOCUMENT::D_EDIT )
-		{
-		l_iCount = f_oEditModeControls.size();
-		for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
-			(*f_oDB)[ l_iCtr ] = f_oEditModeControls[ l_iCtr ]->get().get<HString const&>();
-		}
+	M_ASSERT( f_poSyncStore );
+	M_ASSERT( f_eDocumentMode == DOCUMENT::D_VIEW );
+	l_iCount = f_poSyncStore->f_oItem.get_size();
+	for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+		f_poSyncStore->f_oItem[ l_iCtr ]( static_cast<char const*>( it[ l_iCtr ] ) );
+	if ( f_poSyncStore->f_iIdColNo >= 0 )
+		f_poSyncStore->f_oItem.m_lId = to_int( it[ f_poSyncStore->f_iIdColNo ] );
+	M_EPILOG
+	}
+
+void HDataWindow::sync( void )
+	{
+	M_PROLOG
+	M_ASSERT( f_eDocumentMode == DOCUMENT::D_EDIT );
+	int l_iCount = f_oEditModeControls.size();
+	for ( int l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+		(*f_oDB)[ l_iCtr ] = f_oEditModeControls[ l_iCtr ]->get().get<HString const&>();
 	return;
 	M_EPILOG
 	}
 
-void HDataWindow::set_sync_store( HItem* a_poItem )
+void HDataWindow::set_sync_store( ORowBuffer* a_poRB )
 	{
-	f_poSyncStore = a_poItem;
+	f_poSyncStore = a_poRB;
 	return;
 	}
 
@@ -379,10 +386,16 @@ int HDataWindow::handler_save( int, void const* )
 		filter.format( "id = %ld", f_poMainControl->get_current_id() );
 		f_oDB->set_filter( filter );
 		}
-	f_oDB->execute( f_eMode );
-	f_bModified = false;
-	f_poMainControl->load();
-	set_mode( DOCUMENT::D_VIEW );
+	sync();
+	HRecordSet::ptr_t rs = f_oDB->execute( f_eMode );
+	if ( rs->get_size() != 1 )
+		f_oStatusBar->message( COLORS::D_FG_BRIGHTRED, rs->get_error() );
+	else
+		{
+		f_bModified = false;
+		set_mode( DOCUMENT::D_VIEW );
+		f_poMainControl->load();
+		}
 	return ( 0 );
 	M_EPILOG
 	}

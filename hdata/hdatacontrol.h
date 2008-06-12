@@ -29,6 +29,7 @@ Copyright:
 
 #include "dbwrapper/hrecordset.h"
 #include "hconsole/hcontrol.h"
+#include "hdata/oresource.h"
 
 namespace yaal
 {
@@ -39,10 +40,12 @@ namespace hdata
 class HDataControl : public virtual hconsole::HControl
 	{
 protected:
+	OResource const* f_psResource;
 	dbwrapper::HSQLDescriptor::ptr_t f_oSQL;
 public:
 	HDataControl( void );
 	virtual ~HDataControl( void );
+	void set_resource( OResource const* );
 	void set_dbd( dbwrapper::HSQLDescriptor::ptr_t );
 	virtual void load( int long = 0 );
 	virtual int long get_current_id( void );

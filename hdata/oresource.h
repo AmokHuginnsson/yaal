@@ -111,14 +111,14 @@ struct OResource
 	int			f_iColumn;						/* left coordinate of contorl */
 	int			f_iHeight;						/* height of control */
 	int			f_iWidth;							/* width of control */
-	char const *	f_pcLabel;			/* control label */
-	OAttributes *	f_psAttributes;	/* control's attributes */
+	char const*	f_pcLabel;			/* control label */
+	OAttributes*	f_psAttributes;	/* control's attributes */
 /* relative functionality configuration options */
 	DATACONTROL_BITS::ROLE::role_t	f_eRole;							/* tell how control should be treaded */
 	DATACONTROL_BITS::TYPE::type_t	f_eType;							/* predefined type of control */
-	void *	f_pvTypeSpecific;			/* additional initialization values control
+	void*	f_pvTypeSpecific;			/* additional initialization values control
 																	 type specific */
-	OColumnInfo * f_psColumnInfo;	/* if this control is a child control this field
+	OColumnInfo* f_psColumnInfo;	/* if this control is a child control this field
 																	 holds initialization information about
 																	 parent's record's field-column */
 	int			f_iParent;						/* index of parent control (tree data structure) */

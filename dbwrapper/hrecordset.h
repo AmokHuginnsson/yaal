@@ -49,8 +49,8 @@ public:
 	class HIterator;
 	typedef HIterator iterator;
 private:
-	database_ptr_t f_oDataBase; /* data-base that this record-set belongs to */
-	void* f_pvResult;	/* very internal for this class used only in base cla */
+	mutable database_ptr_t f_oDataBase; /* data-base that this record-set belongs to */
+	mutable void* f_pvResult;	/* very internal for this class used only in base cla */
 public:
 	HRecordSet( database_ptr_t, void* );
 	virtual ~HRecordSet( void );
@@ -59,11 +59,13 @@ public:
 	iterator end( void );
 	iterator rbegin( void );
 	iterator rend( void );
-	bool is_empty( void );
+	bool is_empty( void ) const;
 	int get_field_count( void ) const;
-	int get_size( void );
-	char const* get_column_name( int );
-	int long get_insert_id( void );
+	int get_size( void ) const;
+	char const* get_column_name( int ) const;
+	int long get_insert_id( void ) const;
+	char const* get_error( void ) const;
+	int get_errno( void ) const;
 private:
 	HRecordSet( HRecordSet const& );
 	HRecordSet& operator = ( HRecordSet const& );

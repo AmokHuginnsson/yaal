@@ -48,6 +48,7 @@ public:
 	void disconnect( void );
 	HRecordSet::ptr_t query( char const* );
 	char const* get_error( void ) const;
+	int get_errno( void ) const;
 	static ptr_t get_connector( void );
 private:
 	HDataBase( void );

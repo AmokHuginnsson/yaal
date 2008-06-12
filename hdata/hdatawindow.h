@@ -53,12 +53,18 @@ public:
 			D_EDIT
 			} mode_t;
 		};
+	struct ORowBuffer
+		{
+		int f_iIdColNo;
+		yaal::hconsole::HItem f_oItem;
+		ORowBuffer( int a_iIdColNo, int a_iSize ) : f_iIdColNo( a_iIdColNo ), f_oItem( a_iSize ) {}
+		};
 protected:
 	bool f_bModified;
 	DOCUMENT::mode_t f_eDocumentMode;
 	HDataControl* f_poMainControl;
 	OResource* f_psResourcesArray;
-	yaal::hconsole::HItem* f_poSyncStore;
+	ORowBuffer* f_poSyncStore;
 	typedef yaal::hcore::HList<HDataControl*> controls_t;
 	controls_t f_oViewModeControls;
 	controls_t f_oEditModeControls;
@@ -70,13 +76,14 @@ public:
 	virtual ~HDataWindow( void );
 	virtual int init( void );
 	virtual hconsole::HStatusBarControl* init_bar( char const* );
-	void set_sync_store( hconsole::HItem* = NULL );
+	void set_sync_store( ORowBuffer* = NULL );
 	bool is_modified( void ) const;
 	void set_modified( bool = true );
 	void sync( yaal::dbwrapper::HRecordSet::iterator );
 protected:
 	void link( int, HDataControl* );
 	void set_mode( DOCUMENT::mode_t );
+	void sync( void );
 	void sync( int, hconsole::HEditControl& );
 	void sync( int, HDataListControl& );
 	int handler_add_new( int, void const* );

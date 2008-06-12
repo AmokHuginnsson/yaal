@@ -39,7 +39,7 @@ namespace hdata
 {
 
 HDataControl::HDataControl( void )
-						: HControl( NULL, 0, 0, 0, 0, NULL ), f_oSQL()
+						: HControl( NULL, 0, 0, 0, 0, NULL ), f_psResource( NULL ), f_oSQL()
 	{
 	M_PROLOG
 	return;
@@ -50,6 +50,13 @@ HDataControl::~HDataControl( void )
 	{
 	M_PROLOG
 	return;
+	M_EPILOG
+	}
+
+void HDataControl::set_resource( OResource const* a_psResource )
+	{
+	M_PROLOG
+	f_psResource = a_psResource;
 	M_EPILOG
 	}
 

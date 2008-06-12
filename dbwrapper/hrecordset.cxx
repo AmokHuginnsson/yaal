@@ -72,7 +72,7 @@ void HRecordSet::clear( void )
 	M_EPILOG
 	}
 
-bool HRecordSet::is_empty( void )
+bool HRecordSet::is_empty( void ) const
 	{
 	return ( ! get_size() );
 	}
@@ -82,22 +82,36 @@ int HRecordSet::get_field_count( void ) const
 	return ( dbwrapper::rs_fields_count( f_pvResult ) );
 	}
 
-int HRecordSet::get_size( void )
+int HRecordSet::get_size( void ) const
 	{
 	return ( dbwrapper::dbrs_records_count( &*f_oDataBase, f_pvResult ) );
 	}
 
-char const* HRecordSet::get_column_name( int a_iColumn )
+char const* HRecordSet::get_column_name( int a_iColumn ) const
 	{
 	return ( dbwrapper::rs_column_name( f_pvResult, a_iColumn ) );
 	}
 
-int long HRecordSet::get_insert_id( void )
+int long HRecordSet::get_insert_id( void ) const
 	{
 	M_PROLOG
 	if ( ! f_pvResult )
 		M_THROW( "no result", errno );
 	return ( dbwrapper::dbrs_id( &*f_oDataBase, f_pvResult ) );
+	M_EPILOG
+	}
+
+char const* HRecordSet::get_error( void ) const
+	{
+	M_PROLOG
+	return ( f_oDataBase->get_error() );
+	M_EPILOG
+	}
+
+int HRecordSet::get_errno( void ) const
+	{
+	M_PROLOG
+	return ( f_oDataBase->get_errno() );
 	M_EPILOG
 	}
 
