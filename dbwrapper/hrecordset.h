@@ -115,11 +115,13 @@ private:
 	yaal::hcore::HString f_oSort;			/* additional constant sort (ORDER BY clause) */
 	typedef yaal::hcore::HArray<yaal::hcore::HString> fields_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
+	typedef yaal::hcore::HArray<bool> mutated_t;
 	fields_t f_oFields;
 	int f_iFieldCount;		/* number of columns returned by last query */
 	int f_iSetSize;		/* number of records returned by last query */
 	values_t f_oValues;
 	database_ptr_t f_oDataBase;
+	mutated_t f_oMutated;
 public:
 	HSQLDescriptor( void );
 	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );

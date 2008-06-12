@@ -388,7 +388,7 @@ int HDataWindow::handler_save( int, void const* )
 		}
 	sync();
 	HRecordSet::ptr_t rs = f_oDB->execute( f_eMode );
-	if ( rs->get_size() != 1 )
+	if ( rs->get_errno() )
 		f_oStatusBar->message( COLORS::D_FG_BRIGHTRED, rs->get_error() );
 	else
 		{
