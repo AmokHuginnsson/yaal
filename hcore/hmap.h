@@ -77,6 +77,8 @@ public:
 		{ return ( f_oEngine.size() );	}
 	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
+	bool is_empty( void ) const
+		{ return ( f_oEngine.empty() );	}
 	iterator insert( map_elem_t const& e )
 		{	return ( iterator( f_oEngine.insert<map_elem_t, helper_t>( e ) ) );	}
 	iterator insert( key_t const& key, value_t const& value )
