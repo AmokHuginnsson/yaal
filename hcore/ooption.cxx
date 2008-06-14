@@ -60,7 +60,7 @@ void set_option( OOption const& a_sOption, char const* const a_pcValue )
 			rc_set_variable( a_pcValue,
 					*static_cast<int *>( a_sOption.f_pvValue ) );
 		break;
-		case ( D_CHAR_POINTER ):
+		case ( D_CHAR_PTR ):
 			rc_set_variable( a_pcValue,
 					static_cast<char **>( a_sOption.f_pvValue ) );
 		break;

@@ -938,7 +938,7 @@ bool HListControl::get_text_for_cell( iterator_t& a_oIt, int a_iColumn, type_t a
 	HAbstractRow& l_oItem = *a_oIt;
 	switch ( a_eType )
 		{
-		case ( D_LONG_INT ):
+		case ( D_INT_LONG ):
 			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_long();
 		break;
 		case ( D_DOUBLE ):
@@ -1029,7 +1029,7 @@ bool compare_cells( HInfo const& a_oLeft, HInfo const& a_oRight, OSortHelper& a_
 		a_roSortHelper.progress();
 	switch ( a_roSortHelper.f_eType )
 		{
-		case ( D_LONG_INT ):
+		case ( D_INT_LONG ):
 			return ( a_oLeft.get<long>() < a_oRight.get<long>() );
 		case ( D_DOUBLE ):
 			l_dDifference = a_oLeft.get<double>() - a_oRight.get<double>();

@@ -41,7 +41,7 @@ class HInfo
 	{
 	type_t		f_eType;
 	int				f_iInt;
-	int long	f_lLongInt;
+	int long	f_lIntLong;
 	double		f_dDouble;
 	void*		f_pvPointer;
 	HString		f_oString;

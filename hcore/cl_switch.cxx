@@ -50,13 +50,15 @@ namespace hcore
 namespace cl_switch
 {
 
-char const* make_short_opts ( OOption* const& a_rpsOptions, int a_iCount, HString& a_roBuffer )
+char const* make_short_opts( OOption* const& a_rpsOptions, int a_iCount, HString& a_roBuffer )
 	{
 	int l_iCtr = 0;
 	a_roBuffer = "";
 	for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 		{
-		a_roBuffer += static_cast<char>( a_rpsOptions [ l_iCtr ].f_pcShortForm[0] );
+		if ( ! a_rpsOptions[ l_iCtr ].f_pcShortForm )
+			continue;
+		a_roBuffer += static_cast<char>( a_rpsOptions[ l_iCtr ].f_pcShortForm[0] );
 		switch ( a_rpsOptions [ l_iCtr ].f_eSwitchType )
 			{
 			case ( OOption::D_REQUIRED ):
@@ -95,7 +97,8 @@ option* make_option_array( OOption* const& a_rpsOptions, int a_iCount, HChunk& a
 			default :
 				l_psOptions [ l_iCtr ].has_arg = no_argument;
 			}
-		l_psOptions[ l_iCtr ].val = a_rpsOptions[ l_iCtr ].f_pcShortForm[0];
+		if ( a_rpsOptions[ l_iCtr ].f_pcShortForm )
+			l_psOptions[ l_iCtr ].val = a_rpsOptions[ l_iCtr ].f_pcShortForm[0];
 		}
 	return ( l_psOptions );
 	M_EPILOG
@@ -113,16 +116,17 @@ int decode_switches( int const a_iArgc, char* const* const a_ppcArgv,
 	HString l_oShortOptBuffer;
 	HChunk l_oLongOptBuffer( xcalloc<option>( a_iCount ) );
 	hcore::log << "Decoding switches ... ";
-	l_pcShortOpts = make_short_opts ( a_rpsOptions, a_iCount, l_oShortOptBuffer );
-	l_psOptionArray = make_option_array ( a_rpsOptions, a_iCount,
+	l_pcShortOpts = make_short_opts( a_rpsOptions, a_iCount, l_oShortOptBuffer );
+	l_psOptionArray = make_option_array( a_rpsOptions, a_iCount,
 			l_oLongOptBuffer );
-	while ( ( l_iChar = getopt_long ( a_iArgc, a_ppcArgv, l_pcShortOpts,
+	while ( ( l_iChar = ::getopt_long( a_iArgc, a_ppcArgv, l_pcShortOpts,
 					l_psOptionArray, NULL ) ) != EOF )
 		{
 		l_bValidSwitch = false;
 		for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 			{
-			if ( a_rpsOptions[ l_iCtr ].f_pcShortForm[0] == l_iChar )
+			if ( a_rpsOptions[ l_iCtr ].f_pcShortForm
+					&& ( a_rpsOptions[ l_iCtr ].f_pcShortForm[0] == l_iChar ) )
 				l_bValidSwitch = true, set_option( a_rpsOptions[ l_iCtr ], optarg );
 			}
 		if ( ! l_bValidSwitch && a_piUnknown )

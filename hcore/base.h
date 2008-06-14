@@ -288,21 +288,24 @@ inline tType const operator ~ ( tType const& e )
 
 typedef enum
 	{
-	D_VOID					= 0x0000,
-	D_BOOL					= 0x0001,
-	D_CHAR					= 0x0002,
-	D_SHORT					= 0x0004,
-	D_INT						= 0x0008,
-	D_LONG_INT			= 0x0010,
-	D_DOUBLE				= 0x0020,
-	D_POINTER				= 0x0040,
-	D_CHAR_POINTER	= 0x0080,
-	D_HSTRING				= 0x0100,
-	D_HINFO					= 0x0200,
-	D_HHASHMAP			= 0x0400,
-	D_HLIST					= 0x0800,
-	D_HTIME					= 0x1000,
-	D_MASK					= 0xffff
+	D_VOID        = 0x0000,
+	D_BOOL        = 0x0001,
+	D_CHAR        = 0x0002,
+	D_INT_SHORT   = 0x0004,
+	D_INT         = 0x0008,
+	D_INT_LONG    = 0x0010,
+	D_FLOAT       = 0x0020,
+	D_DOUBLE      = 0x0040,
+	D_DOUBLE_LONG = 0x0080,
+	D_VOID_PTR    = 0x0100,
+	D_CHAR_PTR    = 0x0280,
+	D_HSTRING     = 0x0400,
+	D_HNUMBER     = 0x0800,
+	D_HINFO       = 0x1000,
+	D_HHASHMAP    = 0x2000,
+	D_HLIST       = 0x4000,
+	D_HTIME       = 0x8000,
+	D_MASK        = 0xffff
 	} type_t;
 
 template<typename tType>

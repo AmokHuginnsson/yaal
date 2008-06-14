@@ -323,10 +323,12 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 		}
 	HString desc;
 	char const* description = NULL;
+	/* display each option description */
 	for ( int i = 0; i < a_iCount; ++ i )
 		{
 		OOption& o = a_psOptions[ i ];
 		HString sf;
+		/* if short form char exist, build full form of short form */
 		if ( o.f_pcShortForm )
 			{
 			sf = "-";
@@ -335,6 +337,7 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 		char const* coma = o.f_pcShortForm && o.f_pcName ? "," : " ";
 		if ( ! description )
 			description = o.f_pcDescription;
+		/* if long form word exist, build full form of long form */
 		HString lf;
 		if ( o.f_pcName )
 			{
@@ -349,7 +352,7 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 			if ( o.f_eSwitchType == OOption::D_OPTIONAL )
 				lf += "]";
 			}
-		if ( i > 0 )
+		if ( i > 0 ) /* subsequent options */
 			{
 			OOption& p = a_psOptions[ i - 1 ];
 			if ( o.f_pcName && p.f_pcName && ( ! ::strcmp( o.f_pcName, p.f_pcName ) ) )
@@ -369,12 +372,11 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 				static_cast<int>( l_iLongestShortLength ), sf.raw(), coma,
 				static_cast<int>( l_iLongestLongLength ), lf.raw() );
 		int cols = 80 - ( l_iLongestLongLength + l_iLongestShortLength + 7 );
-		int eol = 0;
 		desc = description;
 		bool loop = true;
 		do
 			{
-			eol = 0;
+			int eol = 0;
 			while ( ( eol < cols ) && ( eol >= 0 ) )
 				{
 				eol = desc.find_one_of( n_pcWhiteSpace, eol );
@@ -412,6 +414,112 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 	if ( a_pcNotes )
 		::printf( "\n%s\n", a_pcNotes );
 	return;
+	}
+
+void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
+	{
+	M_PROLOG
+	a_pcProgramName && ::printf( "# this is configuration file for: `%s' programme\n", a_pcProgramName );
+	a_pcIntro && ::printf( "# %s\n", a_pcIntro );
+	if ( a_pcProgramName || a_pcIntro )
+		::printf( "\n" );
+	::printf(
+"# comments begin with `#' char and continues until end of line\n"
+"# option names are case insensitive\n"
+"# in most cases option values are case insensitive also\n"
+"# syntax for settings is:\n"
+"# ^{option}{white}(['\"]){value1 value2 ... valuen}\\1{white}# comment$\n"
+"# value may be surrounded by apostrophes or quotation marks\n"
+"# one level of this surrounding is stripped\n"
+"# we currently distinguish between four kind of value types:\n"
+"# bool   - (true|yes|on|false|no|off)\n"
+"# char   - [a-z]\n"
+"# int    - [0-1]+\n"
+"# string - .+\n"
+"#\n"
+"# example:\n"
+"# log_path ${HOME}/var/log/programme.log\n\n"
+	);
+	HString desc;
+	char const* description = NULL;
+	for ( int i = 0; i < a_iCount; ++ i )
+		{
+		OOption& o = a_psOptions[ i ];
+		if ( ! o.f_pcName )
+			continue;
+		if ( i > 0 ) /* subsequent options */
+			{
+			OOption& p = a_psOptions[ i - 1 ];
+			if ( o.f_pcName && p.f_pcName
+					&& ( ! ::strcmp( o.f_pcName, p.f_pcName ) )
+					&& ( o.f_pcDescription == description ) )
+				description = "";
+			if ( o.f_pcShortForm && p.f_pcShortForm
+					&& ( ! ::strcmp( o.f_pcShortForm, p.f_pcShortForm ) )
+					&& ( o.f_pcDescription == description ) )
+				description = "";
+			}
+		static int const D_MAXIMUM_LINE_LENGTH = 72;
+		if ( ! description )
+			description = o.f_pcDescription;
+		desc = description;
+		bool loop = true;
+		do
+			{
+			int eol = 0;
+			while ( ( eol < D_MAXIMUM_LINE_LENGTH ) && ( eol >= 0 ) )
+				{
+				eol = desc.find_one_of( n_pcWhiteSpace, eol );
+				if ( ( eol < 0 ) || ( eol > D_MAXIMUM_LINE_LENGTH ) )
+					break;
+				eol = desc.find_other_than( n_pcWhiteSpace, eol );
+				}
+			if ( eol >= D_MAXIMUM_LINE_LENGTH )
+				{
+				printf( "# %.*s\n", eol, desc.raw() );
+				desc.shift_left( eol );
+				desc.trim_left();
+				description = desc.raw();
+				}
+			else
+				{
+				printf( "# %s\n", desc.raw() );
+				description = NULL;
+				loop = false;
+				}
+			}
+		while ( loop );
+		::printf( "%s", o.f_pcName );
+		if ( o.f_pvValue )
+			{
+			switch ( o.f_eValueType )
+				{
+				case ( D_HSTRING ):
+					{
+					HString& s = *static_cast<HString*>( o.f_pvValue );
+					if ( ! s.is_empty() )
+						::printf( " %s", s.raw() );
+					}
+				break;
+				case ( D_CHAR_PTR ):
+					::printf( " %s", static_cast<char*>( o.f_pvValue ) );
+				break;
+				case ( D_INT ):
+					::printf( " %d", *static_cast<int*>( o.f_pvValue ) );
+				break;
+				case ( D_INT_LONG ):
+					::printf( " %ld", *static_cast<int long*>( o.f_pvValue ) );
+				break;
+				default:
+					;
+				}
+			}
+		::printf( "\n\n" );
+		}
+	a_pcNotes && ::printf( "# %s\n", a_pcNotes );
+	::printf( "\n# vim: ft=conf\n" );
+	return;
+	M_EPILOG
 	}
 
 void failure ( int a_iExitStatus, char const * const a_pcFormat, ... )

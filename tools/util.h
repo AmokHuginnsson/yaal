@@ -46,7 +46,22 @@ void usun_ogonki( char* );
 double atof_ex( char const*, bool = false );
 bool verify_IBAN( char const* );
 char const* get_last_error( void );
+
 void show_help( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const = NULL );
+void dump_configuration( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const = NULL );
+typedef void ( * OPTION_PROCESSOR_t )( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const );
+struct OOptionInfo
+	{
+	yaal::hcore::OOption* _opt;
+	int _size;
+	OPTION_PROCESSOR_t PROC;
+	OOptionInfo( yaal::hcore::OOption* opt, int const& size, OPTION_PROCESSOR_t const& a_PROC )
+		: _opt( opt ), _size( size ), PROC( a_PROC ) {}
+private:
+	OOptionInfo( OOptionInfo const& );
+	OOptionInfo& operator = ( OOptionInfo const& );
+	};
+
 void failure( int, char const* const, ... ) __attribute__(( __noreturn__ ));
 
 /*! \brief Various convinient sleep functions.
