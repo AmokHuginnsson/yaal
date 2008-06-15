@@ -52,6 +52,7 @@ namespace cl_switch
 
 char const* make_short_opts( OOption* const& a_rpsOptions, int a_iCount, HString& a_roBuffer )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
 	a_roBuffer = "";
 	for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
@@ -73,6 +74,7 @@ char const* make_short_opts( OOption* const& a_rpsOptions, int a_iCount, HString
 			}
 		}
 	return ( a_roBuffer.raw() );
+	M_EPILOG
 	}
 
 option* make_option_array( OOption* const& a_rpsOptions, int a_iCount, HChunk& a_roBuffer )

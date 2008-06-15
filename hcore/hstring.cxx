@@ -879,6 +879,7 @@ HString& HString::trim_right( char const* const a_pcSet )
 
 HString& HString::shift_left( int long const a_iShift )
 	{
+	M_PROLOG
 	int long l_iLenght = 0;
 	if ( a_iShift < 0 )
 		M_THROW ( "bad left shift lenght", a_iShift );
@@ -891,10 +892,12 @@ HString& HString::shift_left( int long const a_iShift )
 			f_pcBuffer[ 0 ] = 0;
 		}
 	return ( *this );
+	M_EPILOG
 	}
 
 HString& HString::shift_right( int long const a_iShift, char const a_cFiller )
 	{
+	M_PROLOG
 	int long l_iLenght = 0;
 	if ( a_iShift < 0 )
 		M_THROW ( "bad right shift lenght", a_iShift );
@@ -906,6 +909,7 @@ HString& HString::shift_right( int long const a_iShift, char const a_cFiller )
 		fill( a_cFiller, a_iShift );
 		}
 	return ( * this );
+	M_EPILOG
 	}
 
 HString HString::split( char const* const a_pcAt, int const a_iPart ) const

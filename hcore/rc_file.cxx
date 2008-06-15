@@ -68,6 +68,7 @@ int read_rc_line( HString&, HString&, HFile&, int& );
 HString make_path ( char const * const a_pcRcName,
 		RC_PATHER::placement_t a_ePlacement )
 	{
+	M_PROLOG
 	HString l_oRcPath;
 	switch ( a_ePlacement )
 		{
@@ -100,6 +101,7 @@ HString make_path ( char const * const a_pcRcName,
 		break;
 		}
 	return ( l_oRcPath );
+	M_EPILOG
 	}
 
 int rc_open( char const* const a_pcRcName,
@@ -126,6 +128,7 @@ int rc_open( char const* const a_pcRcName,
 
 bool substitute_environment( HString& a_roString )
 	{
+	M_PROLOG
 	int l_iLength = 0;
 	char const* l_pcStart = NULL;
 	HString l_oName;
@@ -143,6 +146,7 @@ bool substitute_environment( HString& a_roString )
 			}
 		}
 	return ( envVarRefFound );
+	M_EPILOG
 	}
 
 namespace

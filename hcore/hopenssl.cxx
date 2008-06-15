@@ -102,6 +102,7 @@ void HOpenSSL::OSSLContext::init( void )
 
 HOpenSSL::OSSLContext::~OSSLContext( void )
 	{
+	M_PROLOG
 	HLock l_oLock( f_oMutex );
 	if ( f_pvContext )
 		SSL_CTX_free( static_cast<SSL_CTX*>( f_pvContext ) );
@@ -118,6 +119,7 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 		CRYPTO_cleanup_all_ex_data();
 		}
 	return;
+	M_EPILOG
 	}
 
 HOpenSSL::OSSLContextServer::OSSLContextServer( void )

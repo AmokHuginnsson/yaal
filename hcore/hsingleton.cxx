@@ -46,13 +46,16 @@ int HSingletonInterface::life_time( int a_iLifeTime )
 
 void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int const& a_iLifeTime )
 	{
+	M_PROLOG
 	HLock l_oLock( f_oMutex );
 	f_oDestructors.push_back( a_iLifeTime, a_oDestructor );
 	M_ENSURE( atexit( HLifeTimeTracker::destruct ) == 0 );
+	M_EPILOG
 	}
 
 void HLifeTimeTracker::destruct( void )
 	{
+	M_PROLOG
 	HLock l_oLock( f_oMutex );
 	map_stack_t::iterator it = f_oDestructors.begin();
 	M_ASSERT( it != f_oDestructors.end() );
@@ -61,6 +64,7 @@ void HLifeTimeTracker::destruct( void )
 	f_oDestructors.erase( it );
 	destructor->destruct();
 	return;
+	M_EPILOG
 	}
 
 }

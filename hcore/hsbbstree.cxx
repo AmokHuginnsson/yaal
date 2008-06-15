@@ -182,8 +182,10 @@ HSBBSTree::HSBBSTree( void ) : f_poRoot( NULL ), f_lSize( 0 )
 
 HSBBSTree::~HSBBSTree( void )
 	{
+	M_PROLOG
 	clear();
 	return;
+	M_EPILOG
 	}
 
 void HSBBSTree::clear( void )

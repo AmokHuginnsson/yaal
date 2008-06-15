@@ -99,7 +99,7 @@ bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
 	M_EPILOG
 	}
 
-void set_env ( char const * const a_pcVarValue )
+void set_env( char const* const a_pcVarValue )
 	{
 	M_PROLOG
 	char * l_pcPtr = NULL;
@@ -128,27 +128,29 @@ void set_env ( char const * const a_pcVarValue )
 
 bool to_bool( char const* const a_pcValue )
 	{
+	M_PROLOG
 	static HString l_oMessage;
 	bool bVal = false;
-	if ( ! strcasecmp ( a_pcValue, "yes" ) )
+	if ( ! ::strcasecmp( a_pcValue, "yes" ) )
 		bVal = true;
-	else if ( ! strcasecmp ( a_pcValue, "no" ) )
+	else if ( ! ::strcasecmp( a_pcValue, "no" ) )
 		bVal = false;
-	else if ( ! strcasecmp ( a_pcValue, "true" ) )
+	else if ( ! ::strcasecmp( a_pcValue, "true" ) )
 		bVal = true;
-	else if ( ! strcasecmp ( a_pcValue, "false" ) )
+	else if ( ! ::strcasecmp( a_pcValue, "false" ) )
 		bVal = false;
-	else if ( ! strcasecmp ( a_pcValue, "on" ) )
+	else if ( ! ::strcasecmp( a_pcValue, "on" ) )
 		bVal = true;
-	else if ( ! strcasecmp ( a_pcValue, "off" ) )
+	else if ( ! ::strcasecmp( a_pcValue, "off" ) )
 		bVal = false;
 	else
 		{
 		l_oMessage = "bad value: ";
 		l_oMessage += a_pcValue;
-		M_THROW ( l_oMessage, bVal );
+		M_THROW( l_oMessage, bVal );
 		}
 	return ( bVal );
+	M_EPILOG
 	}
 
 int long to_int( char const* const a_pcValue )

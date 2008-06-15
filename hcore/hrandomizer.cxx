@@ -74,10 +74,12 @@ namespace randomizer_helper
 
 void init_randomizer_from_time( HRandomizer& rnd )
 	{
+	M_PROLOG
 	struct timeval tv;
 	M_ENSURE( gettimeofday( &tv, NULL ) == 0 );
 	rnd.set( tv.tv_sec + tv.tv_usec );
 	return;
+	M_EPILOG
 	}
 
 }

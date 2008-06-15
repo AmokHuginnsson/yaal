@@ -489,6 +489,7 @@ bool HNumber::mutate_addition( char* res, int long ressize,
 
 HNumber HNumber::operator + ( HNumber const& element ) const
 	{
+	M_PROLOG
 	int long ips = max( f_lIntegralPartSize, element.f_lIntegralPartSize );
 	int long dps = max( decimal_length(), element.decimal_length() );
 	HNumber n;
@@ -521,29 +522,37 @@ HNumber HNumber::operator + ( HNumber const& element ) const
 	if ( n.f_lDigitCount == 0 )
 		n.f_bNegative = false;
 	return ( n );
+	M_EPILOG
 	}
 
 HNumber& HNumber::operator += ( HNumber const& element )
 	{
+	M_PROLOG
 	operator = ( *this + element );
 	return ( *this );
+	M_EPILOG
 	}
 
 HNumber HNumber::operator - ( HNumber const& element ) const
 	{
+	M_PROLOG
 	HNumber n( *this );
 	n -= element;
 	return ( n );
+	M_EPILOG
 	}
 
 HNumber& HNumber::operator -= ( HNumber const& element )
 	{
+	M_PROLOG
 	operator = ( *this + -element );
 	return ( *this );
+	M_EPILOG
 	}
 
 HNumber HNumber::operator * ( HNumber const& factor ) const
 	{
+	M_PROLOG
 	HNumber n;
 	if ( factor.f_lDigitCount < f_lDigitCount )
 		n = factor * ( *this );
@@ -558,16 +567,20 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 		n.f_bNegative = ! ( ( f_bNegative && factor.f_bNegative ) || ! ( f_bNegative || factor.f_bNegative ) );
 		}
 	return ( n );
+	M_EPILOG
 	}
 
 HNumber& HNumber::operator *= ( HNumber const& factor )
 	{
+	M_PROLOG
 	operator = ( *this * factor );
 	return ( *this );
+	M_EPILOG
 	}
 
 HNumber HNumber::operator / ( HNumber const& denominator ) const
 	{
+	M_PROLOG
 	M_ENSURE( denominator.f_lDigitCount != 0 )
 	HNumber n;
 	if ( f_lDigitCount )
@@ -658,24 +671,30 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 		n.f_bNegative = ! ( ( f_bNegative && denominator.f_bNegative ) || ! ( f_bNegative || denominator.f_bNegative ) );
 		}
 	return ( n );
+	M_EPILOG
 	}
 
 HNumber& HNumber::operator /= ( HNumber const& factor )
 	{
+	M_PROLOG
 	operator = ( *this / factor );
 	return ( *this );
+	M_EPILOG
 	}
 
 HNumber HNumber::operator - ( void ) const
 	{
+	M_PROLOG
 	HNumber n( *this );
 	if ( f_lDigitCount )
 		n.f_bNegative = ! n.f_bNegative;
 	return ( n );
+	M_EPILOG
 	}
 
 HNumber HNumber::operator ^ ( int long unsigned exp ) const
 	{
+	M_PROLOG
 	HNumber n( *this );
 	int long unsigned p = exp >> 1;
 	if ( p > 2 )
@@ -684,16 +703,20 @@ HNumber HNumber::operator ^ ( int long unsigned exp ) const
 		while ( -- p )
 			n *= *this;
 	return ( ( exp % 2 ) ? ( n * n * *this ) : ( n * n ) );
+	M_EPILOG
 	}
 
 HNumber& HNumber::operator ^= ( int long unsigned exp )
 	{
+	M_PROLOG
 	operator = ( *this ^ exp );
 	return ( *this );
+	M_EPILOG
 	}
 
 void HNumber::normalize( void )
 	{
+	M_PROLOG
 	char* res = f_oCanonical.raw();
 	int shift = 0;
 	while ( ( shift < f_lIntegralPartSize ) && ( res[ shift ] == 0 ) )
@@ -708,6 +731,7 @@ void HNumber::normalize( void )
 		-- f_lDigitCount;
 	if ( f_lDigitCount == ( f_lIntegralPartSize + f_lPrecision ) )
 		++ f_lPrecision;
+	M_EPILOG
 	return;
 	}
 
