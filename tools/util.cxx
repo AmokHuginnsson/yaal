@@ -327,6 +327,8 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 	for ( int i = 0; i < a_iCount; ++ i )
 		{
 		OOption& o = a_psOptions[ i ];
+		if ( ! ( o.f_pcShortForm || o.f_pcName ) )
+			continue;
 		HString sf;
 		/* if short form char exist, build full form of short form */
 		if ( o.f_pcShortForm )
@@ -369,8 +371,8 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 				}
 			}
 		printf( "  %*s%s %-*s ",
-				static_cast<int>( l_iLongestShortLength ), sf.raw(), coma,
-				static_cast<int>( l_iLongestLongLength ), lf.raw() );
+				static_cast<int>( l_iLongestShortLength ), sf.raw() ? sf.raw() : "", coma,
+				static_cast<int>( l_iLongestLongLength ), lf.raw() ? lf.raw() : "" );
 		int cols = 80 - ( l_iLongestLongLength + l_iLongestShortLength + 7 );
 		desc = description;
 		bool loop = true;
@@ -460,6 +462,15 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 				description = "";
 			}
 		static int const D_MAXIMUM_LINE_LENGTH = 72;
+		::printf( "# %s, type: ", o.f_pcName );
+		switch( o.f_eValueType )
+			{
+			case ( D_BOOL ): ::printf( "boolean\n" ); break;
+			case ( D_INT ): case ( D_INT_SHORT ): case ( D_INT_LONG ): ::printf( "integer\n" ); break;
+			case ( D_FLOAT ): case ( D_DOUBLE ): case ( D_DOUBLE_LONG ): ::printf( "floating point\n" ); break;
+			case ( D_CHAR_PTR ): case ( D_HSTRING ): ::printf( "character string\n" ); break;
+			default: ::printf( "special\n" ); break;
+			}
 		if ( ! description )
 			description = o.f_pcDescription;
 		desc = description;
@@ -489,35 +500,39 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 				}
 			}
 		while ( loop );
-		::printf( "%s", o.f_pcName );
 		if ( o.f_pvValue )
 			{
 			switch ( o.f_eValueType )
 				{
+				case ( D_BOOL ):
+					::printf( "%s %s\n", o.f_pcName, *static_cast<bool*>( o.f_pvValue ) ? "true" : "false" );
+				break;
 				case ( D_HSTRING ):
 					{
 					HString& s = *static_cast<HString*>( o.f_pvValue );
-					if ( ! s.is_empty() )
-						::printf( " %s", s.raw() );
+					::printf( "%s%s %s\n", ! s.is_empty() ? "" : "# ", o.f_pcName, s.raw() ? s.raw() : "" );
 					}
 				break;
 				case ( D_CHAR_PTR ):
-					::printf( " %s", static_cast<char*>( o.f_pvValue ) );
+					{
+					char* ptr = static_cast<char*>( o.f_pvValue );
+					::printf( "%s%s %s\n", ptr && ptr[ 0 ] ? "" : "# ", o.f_pcName, ptr );
+					}
 				break;
 				case ( D_INT ):
-					::printf( " %d", *static_cast<int*>( o.f_pvValue ) );
+					::printf( "%s %d\n", o.f_pcName, *static_cast<int*>( o.f_pvValue ) );
 				break;
 				case ( D_INT_LONG ):
-					::printf( " %ld", *static_cast<int long*>( o.f_pvValue ) );
+					::printf( "%s %ld", o.f_pcName, *static_cast<int long*>( o.f_pvValue ) );
 				break;
 				default:
 					;
 				}
 			}
-		::printf( "\n\n" );
+		::printf( "\n" );
 		}
-	a_pcNotes && ::printf( "# %s\n", a_pcNotes );
-	::printf( "\n# vim: ft=conf\n" );
+	a_pcNotes && ::printf( "# %s\n\n", a_pcNotes );
+	::printf( "# vim: ft=conf\n" );
 	return;
 	M_EPILOG
 	}
