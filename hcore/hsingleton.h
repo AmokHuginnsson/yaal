@@ -99,7 +99,7 @@ template<typename tType>
 class HSingleton
 	{
 	static tType* f_ptInstance;
-	static void create_instance( int const& );
+	static tType* create_instance( int const& );
 public:
 	static tType& get_instance( int const& = 0 );
 	};
@@ -108,25 +108,29 @@ template<typename tType>
 tType* HSingleton<tType>::f_ptInstance = NULL;
 
 template<typename tType>
-void HSingleton<tType>::create_instance( int const& a_iLifeTime )
+tType* HSingleton<tType>::create_instance( int const& a_iLifeTime )
 	{
+	M_PROLOG
 	M_ASSERT( ! f_ptInstance );
 	HLifeTimeTracker::destructor_ptr_t p( new HDestructor<tType>( f_ptInstance ) );
 	HLifeTimeTracker::register_destructor( p, tType::life_time( a_iLifeTime ) );
-	f_ptInstance = new tType();
+	return ( new tType() );
+	M_EPILOG
 	}
 
 template<typename tType>
 tType& HSingleton<tType>::get_instance( int const& a_iLifeTime )
 	{
+	M_PROLOG
 	if ( ! f_ptInstance )
 		{
 		static HMutex l_oMutex;
 		HLock l( l_oMutex );
 		if ( ! f_ptInstance )
-			create_instance( a_iLifeTime );
+			f_ptInstance = create_instance( a_iLifeTime );
 		}
 	return ( *f_ptInstance );
+	M_EPILOG
 	}
 
 }
