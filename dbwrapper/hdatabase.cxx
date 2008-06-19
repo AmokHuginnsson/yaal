@@ -100,7 +100,9 @@ int HDataBase::get_errno( void ) const
 
 HDataBase::ptr_t HDataBase::get_connector( void )
 	{
+	M_PROLOG
 	return ( ptr_t( new HDataBase() ) );
+	M_EPILOG
 	}
 
 }

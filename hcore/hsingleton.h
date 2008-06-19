@@ -84,15 +84,19 @@ HDestructor<tType>::HDestructor( tType*& a_rptObject ) : HAbstractDestructor(), 
 template<typename tType>
 HDestructor<tType>::~HDestructor( void )
 	{
+	M_PROLOG
 	destruct();
+	M_EPILOG
 	}
 
 template<typename tType>
 void HDestructor<tType>::destruct( void )
 	{
+	M_PROLOG
 	if ( f_rptObject )
 		delete f_rptObject;
 	f_rptObject = NULL;
+	M_EPILOG
 	}
 
 template<typename tType>

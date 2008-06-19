@@ -133,6 +133,7 @@ HFSItem::HIterator HFSItem::end( void )
 
 HFSItem::HIterator::HIterator( HString const& a_oPath ) : f_oPath( a_oPath ), f_pvDir( NULL ), f_oDirEnt(), f_oItem( "" )
 	{
+	M_PROLOG
 	if ( ! f_oPath.is_empty() )
 		{
 		f_pvDir = opendir( f_oPath );
@@ -140,6 +141,7 @@ HFSItem::HIterator::HIterator( HString const& a_oPath ) : f_oPath( a_oPath ), f_
 		operator ++();
 		}
 	return;
+	M_EPILOG
 	}
 
 HFSItem::HIterator::HIterator( HIterator const& a_oIt ) : f_oPath(), f_pvDir( NULL ), f_oDirEnt(), f_oItem( "" )
@@ -152,8 +154,10 @@ HFSItem::HIterator::HIterator( HIterator const& a_oIt ) : f_oPath(), f_pvDir( NU
 
 HFSItem::HIterator::~HIterator( void )
 	{
+	M_PROLOG
 	cleanup();
 	return;
+	M_EPILOG
 	}
 
 HFSItem::HIterator& HFSItem::HIterator::operator = ( HFSItem::HIterator const& a_oFSItemIterator )
@@ -179,6 +183,7 @@ HFSItem::HIterator& HFSItem::HIterator::operator = ( HFSItem::HIterator const& a
 
 bool HFSItem::HIterator::operator == ( HIterator const& it ) const
 	{
+	M_PROLOG
 	bool same = false;
 	if ( f_oPath == it.f_oPath )
 		{
@@ -188,6 +193,7 @@ bool HFSItem::HIterator::operator == ( HIterator const& it ) const
 			same = ( f_oDirEnt->get<dirent>()->d_fileno == it.f_oDirEnt->get<dirent>()->d_fileno );
 		}
 	return ( same );
+	M_EPILOG
 	}
 
 bool HFSItem::HIterator::operator != ( HIterator const& it ) const

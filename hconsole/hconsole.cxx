@@ -92,7 +92,7 @@ OOption n_psVariables[] =
 		{ NULL, D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
 	};
 
-void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )
+void set_color_bits( int & a_riWord, int a_iBits, int a_iWhat )
 	{
 	int unsigned l_uiMask = 0x000f;
 	if ( a_iWhat )
@@ -106,9 +106,10 @@ void set_color_bits ( int & a_riWord, int a_iBits, int a_iWhat )
 	return;
 	}
 
-int get_color_bits ( HString & a_roValue, int a_iWhat )
+int get_color_bits( HString& a_roValue, int a_iWhat )
 	{
-	HString l_oStr = a_roValue.split ( " \t", a_iWhat );
+	M_PROLOG
+	HString l_oStr = a_roValue.split( " \t", a_iWhat );
 	if ( l_oStr.is_empty() )
 		return ( 0 );
 	if ( ! strcasecmp ( l_oStr, "BLACK" ) )
@@ -144,20 +145,24 @@ int get_color_bits ( HString & a_roValue, int a_iWhat )
 	else if ( ! strcasecmp ( l_oStr, "WHITE" ) )
 		return ( COLORS::D_FG_WHITE );
 	return ( 0 );
+	M_EPILOG
 	}
 
 void set_color ( HString & a_roValue, int & a_riAttribute )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
 	int l_piTab [ 4 ] = { 2, 3, 0, 1 };
 	for ( l_iCtr = 0; l_iCtr < 4; l_iCtr ++ )
 		set_color_bits ( a_riAttribute,
 				get_color_bits ( a_roValue, l_iCtr ), l_piTab [ l_iCtr ] );
 	return;
+	M_EPILOG
 	}
 
 bool set_hconsole_variables( HString& a_roOption, HString& a_roValue )
 	{
+	M_PROLOG
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )
 		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "attribute_disabled" ) )
@@ -173,6 +178,7 @@ bool set_hconsole_variables( HString& a_roOption, HString& a_roValue )
 	else
 		return ( true );
 	return ( false );
+	M_EPILOG
 	}
 
 class HConsoleInitDeinit
@@ -184,10 +190,12 @@ public:
 
 HConsoleInitDeinit::HConsoleInitDeinit( void )
 	{
+	M_PROLOG
 	errno = 0;
-	rc_file::process_rc_file ( "yaal", "console",
+	rc_file::process_rc_file( "yaal", "console",
 				n_psVariables, set_hconsole_variables );
 	return;
+	M_EPILOG
 	}
 
 static char const g_pcDynamicLinkerPath [ ]

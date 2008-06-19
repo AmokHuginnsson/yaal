@@ -921,6 +921,7 @@ void HListControl::go_to_match_previous ( void )
 
 void HListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t a_eMask )
 	{
+	M_PROLOG
 	if ( a_eMask & FLAGS::D_SORTABLE )
 		f_bSortable = a_eFlags & FLAGS::D_SORTABLE;
 	if ( a_eMask & FLAGS::D_CHECKABLE )
@@ -930,10 +931,12 @@ void HListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t
 	if ( a_eMask & FLAGS::D_DRAW_HEADER )
 		f_bDrawHeader = a_eFlags & FLAGS::D_DRAW_HEADER;
 	return;
+	M_EPILOG
 	}
 
 bool HListControl::get_text_for_cell( iterator_t& a_oIt, int a_iColumn, type_t a_eType )
 	{
+	M_PROLOG
 	M_ASSERT( a_oIt.is_valid() );
 	HAbstractRow& l_oItem = *a_oIt;
 	switch ( a_eType )
@@ -954,6 +957,7 @@ bool HListControl::get_text_for_cell( iterator_t& a_oIt, int a_iColumn, type_t a
 			M_THROW ( "unknown type", a_eType );
 		}
 	return ( l_oItem.get_checked() );
+	M_EPILOG
 	}
 
 list_control_helper::HAbstractControler::ptr_t& HListControl::get_controler( void )
@@ -994,6 +998,7 @@ void HListControl::remove_current_row ( void )
 
 void HListControl::do_update( void )
 	{
+	M_PROLOG
 	if ( f_oControler->size() )
 		{
 		f_iControlOffset = f_iCursorPosition = 0;
@@ -1001,6 +1006,7 @@ void HListControl::do_update( void )
 		f_oCursor = f_oControler->begin();
 		}
 	return;
+	M_EPILOG
 	}
 
 type_t HListControl::get_column_type( int a_iColumn )
@@ -1015,15 +1021,18 @@ namespace list_control_helper
 
 void OSortHelper::progress( void )
 	{
+	M_PROLOG
 	++ f_lComparedItems;
 	if ( ( f_iSize > 1024 ) && ! ( f_lComparedItems % 1024 ) )
 		f_poWindow->status_bar()->update_progress( static_cast<double>( f_lComparedItems ) );
 	return;
+	M_EPILOG
 	}
 
 template<>
 bool compare_cells( HInfo const& a_oLeft, HInfo const& a_oRight, OSortHelper& a_roSortHelper )
 	{
+	M_PROLOG
 	double l_dDifference = 0;
 	if ( a_roSortHelper.f_poWindow )
 		a_roSortHelper.progress();
@@ -1044,6 +1053,7 @@ bool compare_cells( HInfo const& a_oLeft, HInfo const& a_oRight, OSortHelper& a_
 			break;
 		}
 	return ( l_dDifference < 0 ? true : false );
+	M_EPILOG
 	}
 
 template<>
@@ -1081,25 +1091,33 @@ void HAbstractControler::add_tail( void )
 template<>
 yaal::hcore::HString const HCell<>::get_long( void )
 	{
+	M_PROLOG
 	return ( HString ( (*f_rtData)[ f_iColumn ].get<int long>() ) );
+	M_EPILOG
 	}
 
 template<>
 yaal::hcore::HString const HCell<>::get_double( void )
 	{
+	M_PROLOG
 	return ( HString ( (*f_rtData)[ f_iColumn ].get<double>() ) );
+	M_EPILOG
 	}
 
 template<>
 yaal::hcore::HString const HCell<>::get_string( void )
 	{
+	M_PROLOG
 	return ( (*f_rtData)[ f_iColumn ].get<yaal::hcore::HString const &>() );
+	M_EPILOG
 	}
 
 template<>
 char const * HCell<>::get_time( void )
 	{
+	M_PROLOG
 	return ( (*f_rtData)[ f_iColumn ].get<yaal::hcore::HTime const &>() );
+	M_EPILOG
 	}
 
 HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( void ) : f_oIteratorPtr()
@@ -1119,12 +1137,16 @@ bool HAbstractControler::HModelIteratorWrapper::is_valid( void ) const
 
 bool HAbstractControler::HModelIteratorWrapper::operator==( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
+	M_PROLOG
 	return ( f_oIteratorPtr.raw() ? f_oIteratorPtr->is_equal( *a_oIt.f_oIteratorPtr ) : a_oIt.f_oIteratorPtr.raw() == NULL );
+	M_EPILOG
 	}
 
 bool HAbstractControler::HModelIteratorWrapper::operator!=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
+	M_PROLOG
 	return ( f_oIteratorPtr.raw() ? f_oIteratorPtr->is_not_equal( *a_oIt.f_oIteratorPtr ) : a_oIt.f_oIteratorPtr.raw() != NULL );
+	M_EPILOG
 	}
 
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator++( void )
@@ -1158,12 +1180,14 @@ HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( HAbstractContr
 
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
 	{
+	M_PROLOG
 	if ( &a_oIt != this )
 		{
 		if ( a_oIt.f_oIteratorPtr.raw() )
 			a_oIt.f_oIteratorPtr->assign_to( f_oIteratorPtr );
 		}
 	return ( *this );
+	M_EPILOG
 	}
 
 HAbstractControler::iterator_ptr_t& HAbstractControler::HModelIteratorWrapper::raw( void )
@@ -1208,10 +1232,12 @@ int long HRow<>::get_id( void )
 template<>
 HRow<>::HRow( iterator_t& a_oIt ) : f_roIterator( a_oIt ), f_oCells( a_oIt->get_size() )
 	{
+	M_PROLOG
 	int l_iCellCount = a_oIt->get_size();
 	for ( int i = 0; i < l_iCellCount; ++ i )
 		f_oCells[ i ] = HCell<>::ptr_t( new HCell<>( f_roIterator, i ) );
 	return;
+	M_EPILOG
 	}
 
 HAbstractCell::~HAbstractCell( void )
@@ -1222,9 +1248,11 @@ HAbstractCell::~HAbstractCell( void )
 template<>
 void HCell<>::set_child_control_data( HControl* a_poControl )
 	{
+	M_PROLOG
 	a_poControl->set( (*f_rtData)[ f_iColumn ] );
 	a_poControl->refresh();
 	return;
+	M_EPILOG
 	}
 
 template<>

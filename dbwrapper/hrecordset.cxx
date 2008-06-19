@@ -264,22 +264,34 @@ void HSQLDescriptor::sync( int a_iField, int long& value )
 
 void HSQLDescriptor::set_table( char const* const a_pcTable )
 	{
+	M_PROLOG
 	f_oTable = a_pcTable;
+	return;
+	M_EPILOG
 	}
 
 void HSQLDescriptor::set_columns( char const* const a_pcColumns )
 	{
+	M_PROLOG
 	f_oColumns = a_pcColumns;
+	return;
+	M_EPILOG
 	}
 
 void HSQLDescriptor::set_filter( char const* const a_pcFilter )
 	{
+	M_PROLOG
 	f_oFilter = a_pcFilter;
+	return;
+	M_EPILOG
 	}
 
 void HSQLDescriptor::set_sort( char const* const a_pcSort )
 	{
+	M_PROLOG
 	f_oSort = a_pcSort;
+	return;
+	M_EPILOG
 	}
 
 HString HSQLDescriptor::get_table( void ) const
@@ -334,36 +346,46 @@ HRecordSet::HIterator& HRecordSet::HIterator::operator = ( HIterator const& it )
 
 bool HRecordSet::HIterator::operator == ( HIterator const& it ) const
 	{
+	M_PROLOG
 	M_ASSERT( it.f_poOwner == f_poOwner );
 	return ( it.f_iCursorPosition == f_iCursorPosition );
+	M_EPILOG
 	}
 
 bool HRecordSet::HIterator::operator != ( HIterator const& it ) const
 	{
+	M_PROLOG
 	M_ASSERT( it.f_poOwner == f_poOwner );
 	return ( it.f_iCursorPosition != f_iCursorPosition );
+	M_EPILOG
 	}
 
 HRecordSet::HIterator& HRecordSet::HIterator::operator ++ ( void )
 	{
+	M_PROLOG
 	M_ASSERT( f_poOwner );
 	++ f_iCursorPosition;
 	return ( *this );
+	M_EPILOG
 	}
 
 HRecordSet::HIterator HRecordSet::HIterator::operator ++ ( int )
 	{
+	M_PROLOG
 	M_ASSERT( f_poOwner );
 	HIterator it( *this );
 	++ f_iCursorPosition;
 	return ( it );
+	M_EPILOG
 	}
 
 yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& a_iField ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poOwner );
 	return ( dbwrapper::rs_get( f_poOwner->f_pvResult, f_iCursorPosition,
 			a_iField ) );
+	M_EPILOG
 	}
 
 HRecordSet::ptr_t HSQLDescriptor::execute( void )

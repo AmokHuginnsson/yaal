@@ -42,8 +42,10 @@ HPlugin::HPlugin( void ) : f_pvHandle( NULL )
 
 HPlugin::~HPlugin( void )
 	{
+	M_PROLOG
 	if ( f_pvHandle )
 		unload();
+	M_EPILOG
 	}
 
 void HPlugin::load( char const* const a_pcPath )
@@ -65,7 +67,9 @@ void HPlugin::unload( void )
 
 char const* HPlugin::error_message( int )
 	{
+	M_PROLOG
 	return ( dlerror() );
+	M_EPILOG
 	}
 
 void* HPlugin::resolve( char const* const a_pcSymbolName )

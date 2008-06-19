@@ -89,8 +89,11 @@ HXmlParserG::HXmlParserG( void )
 
 HXmlParserG::~HXmlParserG( void )
 	{
+	M_PROLOG
 	xmlCleanupParser();
 	xmlCleanupCharEncodingHandlers();
+	return;
+	M_EPILOG
 	}
 
 class HXsltParserG : public HSingletonInterface
@@ -111,7 +114,10 @@ HXsltParserG::HXsltParserG( void )
 
 HXsltParserG::~HXsltParserG( void )
 	{
+	M_PROLOG
 	xsltCleanupGlobals();
+	return;
+	M_EPILOG
 	}
 
 struct HXml::OConvert
@@ -142,6 +148,7 @@ struct HXml::OConvert
 		}
 	void init( char const* const a_pcEncoding )
 		{
+		M_PROLOG
 		xmlCharEncodingHandlerPtr encoder = xmlFindCharEncodingHandler( a_pcEncoding );
 		if ( ! encoder )
 			M_THROW( _( "cannot enable internal convertion" ), errno );
@@ -149,9 +156,11 @@ struct HXml::OConvert
 				new encoder_resource_t( encoder, xmlCharEncCloseFunc ) );
 		f_xIconvToExternal = (*f_oEncoder).get()->iconv_in;
 		f_xIconvToInternal = (*f_oEncoder).get()->iconv_out;
+		M_EPILOG
 		}
 	void init( char const* const a_pcEncoding, xmlNodePtr a_psRoot, char const* const a_pcFileName )
 		{
+		M_PROLOG
 		xmlCharEncodingHandlerPtr encoder = NULL;
 		if ( a_pcEncoding )
 			encoder = xmlFindCharEncodingHandler( a_pcEncoding );
@@ -173,6 +182,7 @@ struct HXml::OConvert
 				new encoder_resource_t( encoder, xmlCharEncCloseFunc ) );
 		f_xIconvToExternal = (*f_oEncoder).get()->iconv_in;
 		f_xIconvToInternal = (*f_oEncoder).get()->iconv_out;
+		M_EPILOG
 		}
 	bool operator ! ( void ) const
 		{
@@ -550,6 +560,7 @@ void HXml::do_save( void ) const
 
 void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const
 	{
+	M_PROLOG
 	writer_resource_t& writer = *static_cast<writer_resource_t*>( writer_p );
 	HString const& str = node.get_name();
 	int rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const* const>( str.raw() ) );
@@ -583,6 +594,7 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const
 	if ( rc < 0 )
 		throw HXmlException( HString( "Unable to write end element: " ) + str );
 	return;
+	M_EPILOG
 	}
 
 void HXml::create_root( char const* const a_pcName, char const* const a_pcEncoding )
@@ -661,210 +673,276 @@ HXml::HConstNodeProxy& HXml::HConstNodeProxy::operator = ( HConstNodeProxy const
 
 int HXml::HNodeProxy::get_level( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode );
 	return ( f_poNode->get_level() );
+	M_EPILOG
 	}
 
 int HXml::HConstNodeProxy::get_level( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode );
 	return ( f_poNode->get_level() );
+	M_EPILOG
 	}
 
 HXml::HNode::TYPE::type_t HXml::HNodeProxy::get_type( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode );
 	return ( (**f_poNode).f_eType );
+	M_EPILOG
 	}
 
 HXml::HNode::TYPE::type_t HXml::HConstNodeProxy::get_type( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode );
 	return ( (**f_poNode).f_eType );
+	M_EPILOG
 	}
 
 HString const& HXml::HNodeProxy::get_name( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( (**f_poNode).f_oText );
+	M_EPILOG
 	}
 
 HString const& HXml::HConstNodeProxy::get_name( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( (**f_poNode).f_oText );
+	M_EPILOG
 	}
 
 HString const& HXml::HNodeProxy::get_value( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_CONTENT ) );
 	return ( (**f_poNode).f_oText );
+	M_EPILOG
 	}
 
 HString const& HXml::HConstNodeProxy::get_value( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_CONTENT ) );
 	return ( (**f_poNode).f_oText );
+	M_EPILOG
 	}
 
 HXml::HNode::properties_t& HXml::HNodeProxy::properties( void )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( (**f_poNode).f_oProperties );
+	M_EPILOG
 	}
 
 HXml::HNode::properties_t const& HXml::HNodeProxy::properties( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( (**f_poNode).f_oProperties );
+	M_EPILOG
 	}
 
 HXml::HNode::properties_t const& HXml::HConstNodeProxy::properties( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( (**f_poNode).f_oProperties );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& a_eType, char const* const a_pcName )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	tree_t::iterator it = f_poNode->add_node();
 	(**it).f_oText = a_pcName;
 	(**it).f_eType = a_eType;
 	return ( HXml::HIterator( this, it ) );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, HXml::HNode::TYPE::type_t const& a_eType, char const* const a_pcName )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	tree_t::iterator newIt = f_poNode->insert_node( it.f_oIterator, HNode() );
 	(**newIt).f_oText = a_pcName;
 	(**newIt).f_eType = a_eType;
 	return ( HXml::HIterator( this, newIt ) );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::move_node( HXml::HIterator it, HXml::HNodeProxy node )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	tree_t::iterator newIt = f_poNode->move_node( it.f_oIterator, node.f_poNode );
 	return ( HXml::HIterator( this, newIt ) );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	tree_t::iterator newIt = f_poNode->move_node( node.f_poNode );
 	return ( HXml::HIterator( this, newIt ) );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProxy node )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	tree_t::iterator newIt = f_poNode->copy_node( it.f_oIterator, node.f_poNode );
 	return ( HXml::HIterator( this, newIt ) );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HNodeProxy node )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	tree_t::iterator newIt = f_poNode->copy_node( node.f_poNode );
 	return ( HXml::HIterator( this, newIt ) );
+	M_EPILOG
 	}
 
 bool HXml::HNodeProxy::has_childs( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( f_poNode->has_childs() );
+	M_EPILOG
 	}
 
 bool HXml::HConstNodeProxy::has_childs( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( f_poNode->has_childs() );
+	M_EPILOG
 	}
 
 int HXml::HNodeProxy::child_count( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( f_poNode->child_count() );
+	M_EPILOG
 	}
 
 int HXml::HConstNodeProxy::child_count( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( f_poNode->child_count() );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::begin( void )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HIterator( this, f_poNode->begin() ) );
+	M_EPILOG
 	}
 
 HXml::HIterator const HXml::HNodeProxy::begin( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HIterator( this, f_poNode->begin() ) );
+	M_EPILOG
 	}
 
 HXml::HConstIterator const HXml::HConstNodeProxy::begin( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HConstIterator( this, f_poNode->begin() ) );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::end( void )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HIterator( this, f_poNode->end() ) );
+	M_EPILOG
 	}
 
 HXml::HIterator const HXml::HNodeProxy::end( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HIterator( this, f_poNode->end() ) );
+	M_EPILOG
 	}
 
 HXml::HConstIterator const HXml::HConstNodeProxy::end( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HConstIterator( this, f_poNode->end() ) );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::rbegin( void )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HIterator( this, f_poNode->rbegin() ) );
+	M_EPILOG
 	}
 
 HXml::HIterator const HXml::HNodeProxy::rbegin( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HIterator( this, f_poNode->rbegin() ) );
+	M_EPILOG
 	}
 
 HXml::HConstIterator const HXml::HConstNodeProxy::rbegin( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HConstIterator( this, f_poNode->rbegin() ) );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::rend( void )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HIterator( this, f_poNode->rend() ) );
+	M_EPILOG
 	}
 
 HXml::HIterator const HXml::HNodeProxy::rend( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HIterator( this, f_poNode->rend() ) );
+	M_EPILOG
 	}
 
 HXml::HConstIterator const HXml::HConstNodeProxy::rend( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	return ( HXml::HConstIterator( this, f_poNode->rend() ) );
+	M_EPILOG
 	}
 
 bool HXml::HNodeProxy::operator ! ( void ) const
@@ -939,20 +1017,25 @@ bool HXml::HConstIterator::operator != ( HXml::HConstIterator const& other ) con
 
 HXml::HNodeProxy HXml::HIterator::operator* ( void )
 	{
+	M_PROLOG
 	M_ASSERT( f_poOwner );
 	M_ASSERT( f_oIterator != f_poOwner->f_poNode->end() );
 	return ( HXml::HNodeProxy( &*f_oIterator ) );
+	M_EPILOG
 	}
 
 HXml::HConstNodeProxy const HXml::HConstIterator::operator* ( void ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poOwner );
 	M_ASSERT( f_oIterator != f_poOwner->f_poNode->end() );
 	return ( HXml::HConstNodeProxy( &*f_oIterator ) );
+	M_EPILOG
 	}
 
 void HXml::apply_style( char const* const a_pcPath )
 	{
+	M_PROLOG
 	M_ASSERT( f_poXml->f_oDoc.get() );
 	HXsltParserGlobal::get_instance();
 	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( a_pcPath ) ), xsltFreeStylesheet );
@@ -962,10 +1045,12 @@ void HXml::apply_style( char const* const a_pcPath )
 	f_poXml->clear();
 	doc_resource_t::swap( f_poXml->f_oDoc, doc );
 	style_resource_t::swap( f_poXml->f_oStyle, style );
+	M_EPILOG
 	}
 
 HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& node, char const* const id ) const
 	{
+	M_PROLOG
 	const_xml_element_t result = NULL;
 	HXml::HNode::properties_t::const_iterator idIt = (*node)->f_oProperties.find( "id" );
 	if ( ( idIt != (*node)->f_oProperties.end() ) && ( idIt->second == id ) )
@@ -973,28 +1058,36 @@ HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& no
 	for ( tree_t::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
 		result = get_element_by_id( &*it, id );
 	return ( result );
+	M_EPILOG
 	}
 
 HXml::HNodeProxy HXml::get_element_by_id( char const* const id )
 	{
+	M_PROLOG
 	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_id( f_oDOM.get_root(), id ) ) ) );
+	M_EPILOG
 	}
 
 HXml::HConstNodeProxy const HXml::get_element_by_id( char const* const id ) const
 	{
+	M_PROLOG
 	return ( HConstNodeProxy( get_element_by_id( f_oDOM.get_root(), id ) ) );
+	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it )
 	{
+	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
 	tree_t::iterator newIt = f_poNode->remove_node( it.f_oIterator );
 	return ( HXml::HIterator( this, newIt ) );
+	M_EPILOG
 	}
 
 HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& node,
 		HString const& path, int const& part ) const
 	{
+	M_PROLOG
 	const_xml_element_t result = NULL;
 	HString name = path.split( "/", part );
 	if ( ! name.is_empty() )
@@ -1014,16 +1107,21 @@ HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& 
 			result = node;
 		}
 	return ( result );
+	M_EPILOG
 	}
 
 HXml::HNodeProxy HXml::get_element_by_path( char const* const path )
 	{
+	M_PROLOG
 	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_path( f_oDOM.get_root(), path, 1 ) ) ) );
+	M_EPILOG
 	}
 
 HXml::HConstNodeProxy const HXml::get_element_by_path( char const* const path ) const
 	{
+	M_PROLOG
 	return ( HConstNodeProxy( get_element_by_path( f_oDOM.get_root(), path, 1 ) ) );
+	M_EPILOG
 	}
 
 }

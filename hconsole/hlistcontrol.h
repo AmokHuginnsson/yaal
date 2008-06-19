@@ -531,16 +531,20 @@ HCell<tType>::~HCell( void )
 template<typename tType>
 void HListControler<tType>::sort( list_control_helper::OSortHelper& a_roHelper )
 	{
+	M_PROLOG
 	f_oList->sort( CompareListControlItems<tType> ( a_roHelper ) );
 	f_poControl->invalidate();
+	M_EPILOG
 	}
 
 template<typename tType>
 void HListControler<tType>::erase( HAbstractControler::HModelIteratorWrapper& a_oIt )
 	{
+	M_PROLOG
 	typename HListControler<tType>::iterator_ptr_t l_oIt = a_oIt.raw();
 	f_oList->erase( l_oIt->raw() );
 	return;
+	M_EPILOG
 	}
 
 template<typename tType>

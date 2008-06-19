@@ -199,11 +199,13 @@ public:
 		{ f_oEngine.clear(); }
 	int long count( key_t const& key ) const
 		{
+		M_PROLOG
 		typename multimap_engine_t::const_iterator major = f_oEngine.find( key );
 		int long cnt = 0;
 		if ( major != f_oEngine.end() )
 			cnt = major->second->size();
 		return ( cnt );
+		M_EPILOG
 		}
 
 private:
@@ -234,7 +236,7 @@ class HMultiMap<key_t, value_t, helper_t>::HIterator
 public:
 	HIterator( void ) : f_poOwner( NULL ), f_oMajor(), f_oMinor() {}
 	HIterator( HIterator const& a_oIt ) : f_poOwner( a_oIt.f_poOwner ), f_oMajor( a_oIt.f_oMajor ), f_oMinor( a_oIt.f_oMinor ) {}
-	HIterator& operator= ( HIterator const& a_oIt )
+	HIterator& operator = ( HIterator const& a_oIt )
 		{
 		if ( &a_oIt != this )
 			{

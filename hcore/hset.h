@@ -73,10 +73,12 @@ public:
 		{	f_oEngine.remove<tType, tType, ttType>( e );	}
 	HIterator erase( HIterator const& it )
 		{
+		M_PROLOG
 		HIterator newIt( it );
 		++ newIt;
 		f_oEngine.remove( it.f_oEngine );
 		return ( newIt );
+		M_EPILOG
 		}
 	HIterator find( tType const& e ) const
 		{ return ( HIterator( f_oEngine.find<tType, tType, ttType>( e ) ) ); }

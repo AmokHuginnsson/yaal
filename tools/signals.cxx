@@ -189,9 +189,11 @@ void HSignalService::lock_on( int a_iSigNo )
 
 void HSignalService::schedule_exit( int a_iExitStatus )
 	{
+	M_PROLOG
 	f_iExitStatus = a_iExitStatus;
 	signal( SIGALRM, HSignalService::exit );
 	alarm( 1 );
+	M_EPILOG
 	}
 
 void HSignalService::exit( int )
@@ -211,18 +213,24 @@ namespace
 
 void HBaseSignalHandlers::unlock( int a_iSigNo )
 	{
+	M_PROLOG
 	sigset_t set;
 	sigemptyset( &set );
 	sigaddset( &set, a_iSigNo );
 	pthread_sigmask( SIG_UNBLOCK, &set, NULL );
+	return;
+	M_EPILOG
 	}
 
 void HBaseSignalHandlers::lock( int a_iSigNo )
 	{
+	M_PROLOG
 	sigset_t set;
 	sigemptyset( &set );
 	sigaddset( &set, a_iSigNo );
 	pthread_sigmask( SIG_BLOCK, &set, NULL );
+	return;
+	M_EPILOG
 	}
 
 int HBaseSignalHandlers::signal_INT ( int a_iSignum )

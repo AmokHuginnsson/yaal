@@ -200,6 +200,7 @@ HString kwota_slownie( double a_dKwota )
 
 void usun_ogonki ( char * a_pcString )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
 	while ( a_pcString [ l_iCtr ] )
 		{
@@ -207,10 +208,12 @@ void usun_ogonki ( char * a_pcString )
 		l_iCtr ++;
 		}
 	return;
+	M_EPILOG
 	}
 
 double atof_ex ( char const * a_pcString, bool a_bParse )
 	{
+	M_PROLOG
 	static HAnalyser l_oAnalyser;
 	HString l_oStr = a_pcString;
 	l_oStr.replace ( ",", "." );
@@ -219,10 +222,12 @@ double atof_ex ( char const * a_pcString, bool a_bParse )
 	if ( a_bParse && l_oAnalyser.analyse ( l_oStr ) )
 		return ( l_oAnalyser.count() );
 	return ( strtod ( l_oStr, NULL ) );
+	M_EPILOG
 	}
 
 int modulo_ASCII ( char const * const a_pcASCIINumber, int a_iModulo )
 	{
+	M_PROLOG
 	int l_iCtr = 0, l_iNumber = 0, l_iStep = 0, l_iTmpLength = 0;
 	int l_iLength = strlen ( a_pcASCIINumber );
 	HString l_oTmpString, l_oTmpNumber = a_pcASCIINumber;
@@ -243,11 +248,13 @@ int modulo_ASCII ( char const * const a_pcASCIINumber, int a_iModulo )
 			l_oTmpNumber.set_at( l_iCtr, l_oTmpString[ l_iCtr ] );
 /*		M_LOG ( l_oTmpNumber ); */
 		}
-	return ( strtol ( l_oTmpNumber, NULL, 10 ) % a_iModulo );
+	return ( ::strtol( l_oTmpNumber, NULL, 10 ) % a_iModulo );
+	M_EPILOG
 	}
 
 bool verify_IBAN ( char const * a_pcIBAN )
 	{
+	M_PROLOG
 	int l_iCtr = 0, l_iLength = strlen ( a_pcIBAN );
 	char l_pcPattern [ 2 ] = "\0";
 	HString l_oIBAN, l_oTmpString;
@@ -292,6 +299,7 @@ bool verify_IBAN ( char const * a_pcIBAN )
 		return ( false );
 	n_oLastErrorMessage.format ( "IBAN: bad checksum: %d", l_iCtr );
 	return ( true );
+	M_EPILOG
 	}
 
 char const* get_last_error ( void )
@@ -303,6 +311,7 @@ char const* get_last_error ( void )
 
 void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
 	{
+	M_PROLOG
 	::printf(
 "Usage: %s [OPTION]... [FILE]...\n"
 "%s - %s\n\n"
@@ -416,6 +425,7 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 	if ( a_pcNotes )
 		::printf( "\n%s\n", a_pcNotes );
 	return;
+	M_EPILOG
 	}
 
 void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
@@ -539,6 +549,7 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 
 void failure ( int a_iExitStatus, char const * const a_pcFormat, ... )
 	{
+	M_PROLOG
 	va_list l_xAp;
 	va_start ( l_xAp, a_pcFormat );
 	vfprintf ( stderr, a_pcFormat, l_xAp );
@@ -546,6 +557,7 @@ void failure ( int a_iExitStatus, char const * const a_pcFormat, ... )
 	log ( a_pcFormat, l_xAp );
 	va_end ( l_xAp );
 	throw ( a_iExitStatus );
+	M_EPILOG
 	}
 
 namespace sleep
@@ -599,6 +611,7 @@ namespace distance
 
 int levenshtein_damerau ( char const * const a_pcOne, char const * const a_pcTwo, bool a_bDamerau )
 	{
+	M_PROLOG
 	int l_iCost = 0;
 	int l_iIndexOne = 0, l_iIndexTwo = 0;
 	int l_iLengthOne = ::strlen( a_pcOne );
@@ -642,6 +655,7 @@ int levenshtein_damerau ( char const * const a_pcOne, char const * const a_pcTwo
 			}
 		}
 	return ( l_ppiDistanceMatrix[ l_iLengthOne ][ l_iLengthTwo ] );
+	M_EPILOG
 	}
 
 }

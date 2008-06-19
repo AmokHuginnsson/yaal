@@ -66,6 +66,7 @@ HProcess::~HProcess( void )
 
 int HProcess::do_init( void )
 	{
+	M_PROLOG
 	if ( f_bInitialised )
 		M_THROW ( "you can initialise your main process only once, dumbass",
 				errno );
@@ -76,6 +77,7 @@ int HProcess::do_init( void )
 	register_file_descriptor_handler( f_oEvent.get_reader_fd(), &HProcess::process_interrupt );
 	f_bInitialised = true;
 	return ( 0 );
+	M_EPILOG
 	}
 
 int HProcess::init( int a_iLatencySeconds, int a_iLatencyMicroseconds )

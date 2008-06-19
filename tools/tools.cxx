@@ -72,6 +72,7 @@ extern char n_pcTransTableStripPL [ 256 ];
 /* return true means error occured, false - every thing ok */
 bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
+	M_PROLOG
 	int l_iBaudRate = 0, l_iCtr = 0;
 	HString l_oStr;
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )
@@ -140,6 +141,7 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 			}
 		}
 	return ( false );
+	M_EPILOG
 	}
 
 class HToolsInitDeinit
@@ -151,6 +153,7 @@ public:
 
 HToolsInitDeinit::HToolsInitDeinit( void )
 	{
+	M_PROLOG
 	int l_iCtr = 0;
 	errno = 0;
 	rc_file::process_rc_file ( "yaal", "tools", tools::n_psVariables,
@@ -176,6 +179,7 @@ HToolsInitDeinit::HToolsInitDeinit( void )
 	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¿' ) ] = 'z';
 	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¯' ) ] = 'Z';
 	return;
+	M_EPILOG
 	}
 
 HToolsInitDeinit::~HToolsInitDeinit( void )

@@ -320,12 +320,12 @@ void HConsole::set_attr( int a_iAttr ) const
 
 int HConsole::c_move( int const& a_iRow, int const& a_iColumn )
 	{
-	return ( ::move ( a_iRow, a_iColumn ) );
+	return ( ::move( a_iRow, a_iColumn ) );
 	}
 
 CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &a_eCursor ) const
 	{
-	int l_iCursor = ::curs_set ( a_eCursor == CURSOR::D_VISIBLE ? 1 : ( a_eCursor == CURSOR::D_INVISIBLE ? 0 : 2 ) );
+	int l_iCursor = ::curs_set( a_eCursor == CURSOR::D_VISIBLE ? 1 : ( a_eCursor == CURSOR::D_INVISIBLE ? 0 : 2 ) );
 	if ( l_iCursor == 1 )
 		return ( CURSOR::D_VISIBLE );
 	else if ( l_iCursor == 2 )
@@ -335,7 +335,7 @@ CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &a_eCursor ) const
 
 int HConsole::c_addch( int const& a_iChar )
 	{
-	return ( ::addch ( a_iChar ) );
+	return ( ::addch( a_iChar ) );
 	}
 
 int HConsole::c_refresh( void )
@@ -350,14 +350,16 @@ int HConsole::endwin ( void )
 
 void HConsole::c_getmaxyx( void )
 	{
+	M_PROLOG
 	getmaxyx( stdscr, f_iHeight, f_iWidth );
 	log( LOG_TYPE::D_INFO ) << "New terminal dimenstions: " << f_iHeight << "x" << f_iWidth << "." << endl;
 	return;
+	M_EPILOG
 	}
 
 void HConsole::c_getyx( int& a_riHeight, int& a_riWidth )
 	{
-	getyx ( stdscr, a_riHeight, a_riWidth );
+	getyx( stdscr, a_riHeight, a_riWidth );
 	return;
 	}
 
@@ -390,6 +392,7 @@ int HConsole::get_event_fd( void ) const
 int HConsole::c_vmvprintf( int a_iRow, int a_iColumn,
 							 char const* const a_pcFormat, void* a_pxAp ) const
 	{
+	M_PROLOG
 	int l_iOrigRow = 0;
 	int l_iOrigColumn = 0;
 	int l_iError = 0;
@@ -411,6 +414,7 @@ int HConsole::c_vmvprintf( int a_iRow, int a_iColumn,
 	l_iError = vw_printw ( stdscr, a_pcFormat, l_rxAp );
 	M_ENSURE( move( l_iOrigRow, l_iOrigColumn ) != ERR );
 	return ( l_iError );
+	M_EPILOG
 	}
 
 int HConsole::c_vcmvprintf( int a_iRow, int a_iColumn, int a_iAttribute,
@@ -443,23 +447,27 @@ int HConsole::c_vprintf ( char const* const a_pcFormat, void* a_pxAp ) const
 
 int HConsole::c_printf( char const* const a_pcFormat, ... ) const
 	{
+	M_PROLOG
 	int l_iError = 0;
 	va_list l_xAp;
 	va_start( l_xAp, a_pcFormat );
 	l_iError = c_vprintf( a_pcFormat, &l_xAp );
 	va_end( l_xAp );
 	return ( l_iError );
+	M_EPILOG
 	}
 
 int HConsole::c_mvprintf( int a_iRow, int a_iColumn, char const* const a_pcFormat,
 		... ) const
 	{
+	M_PROLOG
 	int l_iError = 0;
 	va_list l_xAp;
 	va_start( l_xAp, a_pcFormat );
 	l_iError = c_vmvprintf( a_iRow, a_iColumn, a_pcFormat, &l_xAp );
 	va_end( l_xAp );
 	return ( l_iError );
+	M_EPILOG
 	}
 
 int HConsole::c_cmvprintf( int a_iRow, int a_iColumn, int a_iAttribute,
@@ -477,7 +485,7 @@ int HConsole::c_cmvprintf( int a_iRow, int a_iColumn, int a_iAttribute,
 
 int HConsole::ungetch( int a_iCode ) const
 	{
-	return ( ::ungetch ( a_iCode ) );
+	return ( ::ungetch( a_iCode ) );
 	}
 
 int HConsole::get_key( void ) const
@@ -614,6 +622,7 @@ bool HConsole::is_enabled( void ) const
 int HConsole::wait_for_user_input( int& a_iKey, mouse::OMouse& a_rsMouse,
 		int a_iTimeOutSec, int a_iTimeOutUsec ) const
 	{
+	M_PROLOG
 	int l_iError = - 1, l_iEventType = 0;
 	timeval l_xWait;
 	fd_set l_xFdSet;
@@ -642,6 +651,7 @@ int HConsole::wait_for_user_input( int& a_iKey, mouse::OMouse& a_rsMouse,
 			l_iEventType |= EVENT::D_MOUSE, static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
 		}
 	return ( l_iEventType );
+	M_EPILOG
 	}
 
 void HConsole::bell( void ) const

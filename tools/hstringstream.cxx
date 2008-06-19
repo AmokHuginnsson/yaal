@@ -69,7 +69,10 @@ int long HStringStream::do_write( void const* const a_pvBuffer, int long const& 
 
 void HStringStream::do_flush( void ) const
 	{
+	M_PROLOG
 	f_oBuffer.clear();
+	return;
+	M_EPILOG
 	}
 
 int long HStringStream::do_read( void* const a_pvBuffer, int long const& a_lSize )
@@ -85,6 +88,7 @@ int long HStringStream::do_read( void* const a_pvBuffer, int long const& a_lSize
 void HStringStream::use( void ) const
 	{
 	f_bUsed = true;
+	return;
 	}
 
 void HStringStream::clear( void )
@@ -97,14 +101,18 @@ void HStringStream::clear( void )
 
 char const* HStringStream::consume( void ) const
 	{
+	M_PROLOG
 	use();
 	return ( f_oBuffer.raw() );
+	M_EPILOG
 	}
 
 char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream )
 	{
+	M_PROLOG
 	stream.use();
 	return ( stream.raw() );
+	M_EPILOG
 	}
 
 }

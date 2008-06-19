@@ -315,33 +315,40 @@ tType const* HTree<tType>::HNode::operator->( void ) const
 template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::add_node( tType const& value )
 	{
+	M_PROLOG
 	node_t n = NULL;
 	f_oBranch.push_back( n = new HNode( this ) );
 	**n = value;
 	return ( iterator( this, f_oBranch.rbegin() ) );
+	M_EPILOG
 	}
 
 template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::add_node( void )
 	{
+	M_PROLOG
 	node_t n = NULL;
 	f_oBranch.push_back( n = new HNode( this ) );
 	return ( iterator( this, f_oBranch.rbegin() ) );
+	M_EPILOG
 	}
 
 template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::insert_node( HTree<tType>::iterator const& pos, tType const& value )
 	{
+	M_PROLOG
 	node_t n = NULL;
 	M_ASSERT( pos.f_poOwner == this );
 	iterator it( this, f_oBranch.insert( pos.f_oIterator, n = new HNode( this ) ) );
 	**it = value;
 	return ( it );
+	M_EPILOG
 	}
 
 template<typename tType>
 void HTree<tType>::HNode::disjointed( HTree<tType>::iterator const& pos, HTree<tType>::HNode* node ) const
 	{
+	M_PROLOG
 	HNode* p = f_poTrunk;
 	while ( p )
 		{
@@ -350,11 +357,13 @@ void HTree<tType>::HNode::disjointed( HTree<tType>::iterator const& pos, HTree<t
 		}
 	M_ASSERT( pos.f_poOwner == this );
 	return;
+	M_EPILOG
 	}
 
 template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::replace_node( HTree<tType>::iterator pos, HTree<tType>::HNode* node )
 	{
+	M_PROLOG
 #if not defined(NDEBUG)
 	disjointed( pos, node );
 #endif
@@ -367,18 +376,22 @@ typename HTree<tType>::iterator HTree<tType>::HNode::replace_node( HTree<tType>:
 		delete wasted;
 		}
 	return ( pos );
+	M_EPILOG
 	}
 
 template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::remove_node( HTree<tType>::iterator pos )
 	{
+	M_PROLOG
 	delete *pos.f_oIterator;
 	return ( iterator( this, f_oBranch.erase( pos.f_oIterator ) ) );
+	M_EPILOG
 	}
 
 template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::move_node( HTree<tType>::iterator const& pos, HTree<tType>::HNode* node )
 	{
+	M_PROLOG
 #if not defined(NDEBUG)
 	disjointed( pos, node );
 #endif
@@ -390,11 +403,13 @@ typename HTree<tType>::iterator HTree<tType>::HNode::move_node( HTree<tType>::it
 		node->f_poTrunk = this;
 		}
 	return ( it );
+	M_EPILOG
 	}
 
 template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::move_node( HTree<tType>::HNode* node )
 	{
+	M_PROLOG
 #if not defined(NDEBUG)
 	disjointed( begin(), node );
 #endif
@@ -407,32 +422,38 @@ typename HTree<tType>::iterator HTree<tType>::HNode::move_node( HTree<tType>::HN
 		node->f_poTrunk = this;
 		}
 	return ( it );
+	M_EPILOG
 	}
 
 template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::copy_node( HTree<tType>::iterator const& pos, HTree<tType>::HNode* node )
 	{
+	M_PROLOG
 #if not defined(NDEBUG)
 	disjointed( pos, node );
 #endif
 	iterator it( this, f_oBranch.insert( pos.f_oIterator, node->clone( this ) ) );
 	return ( it );
+	M_EPILOG
 	}
 
 template<typename tType>
 typename HTree<tType>::iterator HTree<tType>::HNode::copy_node( HTree<tType>::HNode* node )
 	{
+	M_PROLOG
 #if not defined(NDEBUG)
 	disjointed( rbegin(), node );
 #endif
 	f_oBranch.push_back( node->clone( this ) );
 	iterator it( this, f_oBranch.rbegin() );
 	return ( it );
+	M_EPILOG
 	}
 
 template<typename tType>
 typename HTree<tType>::node_t HTree<tType>::HNode::clone( HNode* parent ) const
 	{
+	M_PROLOG
 	node_t node = new HNode( f_tData );
 	node->f_poTrunk = parent;
 	typename branch_t::const_iterator endIt = f_oBranch.end();
@@ -440,6 +461,7 @@ typename HTree<tType>::node_t HTree<tType>::HNode::clone( HNode* parent ) const
 			it != endIt; ++ it )
 		node->f_oBranch.push_back( (*it)->clone( node ) );
 	return ( node );
+	M_EPILOG
 	}
 
 template<typename tType>
@@ -457,6 +479,7 @@ typename HTree<tType>::const_node_t HTree<tType>::HNode::get_parent( void ) cons
 template<typename tType>
 void HTree<tType>::HNode::detach( void )
 	{
+	M_PROLOG
 	if ( f_poTree )
 		{
 		f_poTree->f_poRoot = NULL;
@@ -477,16 +500,19 @@ void HTree<tType>::HNode::detach( void )
 			}
 		}
 	return;
+	M_EPILOG
 	}
 
 template<typename tType>
 int HTree<tType>::HNode::get_level( void ) const
 	{
+	M_PROLOG
 	int level = 0;
 	HNode const* p = this;
 	while ( ( p = p->f_poTrunk ) )
 		++ level;
 	return ( level );
+	M_EPILOG
 	}
 
 template<typename tType>
@@ -519,12 +545,14 @@ template<typename tType>
 template<typename const_qual_t>
 typename HTree<tType>::template HIterator<const_qual_t>& HTree<tType>::HIterator<const_qual_t>::operator = ( HTree<tType>::HIterator<const_qual_t> const& it )
 	{
+	M_PROLOG
 	if ( &it != this )
 		{
 		f_poOwner = it.f_poOwner;
 		f_oIterator = it.f_oIterator;
 		}
 	return ( *this );
+	M_EPILOG
 	}
 
 template<typename tType>
@@ -552,16 +580,20 @@ template<typename tType>
 template<typename const_qual_t>
 bool HTree<tType>::HIterator<const_qual_t>::operator == ( HTree<tType>::HIterator<const_qual_t> const& it ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poOwner == it.f_poOwner );
 	return ( f_oIterator == it.f_oIterator );
+	M_EPILOG
 	}
 
 template<typename tType>
 template<typename const_qual_t>
 bool HTree<tType>::HIterator<const_qual_t>::operator != ( HTree<tType>::HIterator<const_qual_t> const& it ) const
 	{
+	M_PROLOG
 	M_ASSERT( f_poOwner == it.f_poOwner );
 	return ( f_oIterator != it.f_oIterator );
+	M_EPILOG
 	}
 
 template<typename tType>

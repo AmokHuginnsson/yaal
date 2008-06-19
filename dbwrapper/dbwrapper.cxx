@@ -77,6 +77,7 @@ OOption n_psVariables[] =
 
 bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 	{
+	M_PROLOG
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )
 		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
@@ -111,6 +112,7 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 	else
 		return ( true );
 	return ( false );
+	M_EPILOG
 	}
 
 class HDBWrapperInitDeinit
@@ -121,9 +123,11 @@ public:
 
 HDBWrapperInitDeinit::HDBWrapperInitDeinit( void )
 	{
-	rc_file::process_rc_file ( "yaal", "dbwrapper", n_psVariables,
+	M_PROLOG
+	rc_file::process_rc_file( "yaal", "dbwrapper", n_psVariables,
 			set_dbwrapper_variables );
 	return;
+	M_EPILOG
 	}
 
 extern char const * g_pcDone;

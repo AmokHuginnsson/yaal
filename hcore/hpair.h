@@ -48,12 +48,14 @@ public:
 	HPair( HPair const& pair ) : first( pair.first ), second( pair.second ) {}
 	HPair& operator = ( HPair const& pair )
 		{
+		M_PROLOG
 		if ( &pair != this )
 			{
 			first = pair.first;
 			second = pair.second;
 			}
 		return ( *this );
+		M_EPILOG
 		}
 	bool operator == ( HPair const& pair ) const
 		{	return ( ( first == pair.first ) && ( second == pair.second ) );	}

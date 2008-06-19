@@ -83,19 +83,23 @@ public:
 		{	return ( iterator( f_oEngine.insert<map_elem_t, helper_t>( e ) ) );	}
 	iterator insert( key_t const& key, value_t const& value )
 		{	return ( iterator( f_oEngine.insert<map_elem_t, helper_t>( map_elem_t( key, value ) ) ) );	}
-	void remove( key_t const& e )
+	void remove( key_t const& key )
 		{
-		iterator it = find( e );
+		M_PROLOG
+		iterator it = find( key );
 		if ( it != end() )
 			f_oEngine.remove( it.f_oEngine );
 		return;
+		M_EPILOG
 		}
 	iterator erase( iterator const& it )
 		{
+		M_PROLOG
 		iterator newIt( it );
 		++ newIt;
 		f_oEngine.remove( it.f_oEngine );
 		return ( newIt );
+		M_EPILOG
 		}
 	iterator find( key_t const& e )
 		{ return ( iterator( f_oEngine.find<map_elem_t, key_t, helper_t>( e ) ) ); }
@@ -119,10 +123,12 @@ public:
 		{ return ( const_iterator( f_oEngine.rend() ) ); }
 	value_t& operator[] ( key_t const& key )
 		{
+		M_PROLOG
 		iterator it = find( key );
 		if ( it == end() )
 			it = insert( map_elem_t( key, value_t() ) );
 		return ( it->second );
+		M_EPILOG
 		}
 	void clear( void )
 		{ f_oEngine.clear(); }
@@ -133,8 +139,10 @@ public:
 		}
 	void copy_from( HMap<key_t, value_t, helper_t> const& source )
 		{
+		M_PROLOG
 		if ( &source != this )
 			f_oEngine.copy_from<map_elem_t, helper_t>( source.f_oEngine );
+		M_EPILOG
 		}
 	};
 

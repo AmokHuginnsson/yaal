@@ -77,15 +77,19 @@ namespace list_control_helper
 template<>
 yaal::hcore::HString const HCell<HWindow::ptr_t>::get_string( void )
 	{
+	M_PROLOG
 	return ( f_rtData->get_title() );
+	M_EPILOG
 	}
 
 template<>
 bool compare_cells( HWindow::ptr_t const& a_oLeft, HWindow::ptr_t const& a_oRight, OSortHelper & a_roSortHelper )
 	{
+	M_PROLOG
 	a_roSortHelper.progress();
 	return ( strcasecmp ( a_oLeft->get_title(),
 			 a_oRight->get_title() ) > 0 );
+	M_EPILOG
 	}
 
 typedef yaal::hcore::HList<HWindow::ptr_t>::iterator window_iterator_t;
@@ -130,7 +134,9 @@ yaal::hcore::HString const HCell<window_iterator_t>::get_double( void )
 template<>
 yaal::hcore::HString const HCell<window_iterator_t>::get_string( void )
 	{
+	M_PROLOG
 	return ( (*f_rtData)->get_title() );
+	M_EPILOG
 	}
 
 template<>

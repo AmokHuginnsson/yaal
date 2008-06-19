@@ -47,13 +47,16 @@ HPipedChild::HPipedChild( void )
 
 HPipedChild::~HPipedChild( void )
 	{
+	M_PROLOG
 	if ( f_iPid > 0 )
 		finish();
 	return;
+	M_EPILOG
 	}
 
 void HPipedChild::finish( void )
 	{
+	M_PROLOG
 	if ( f_iPipeOut >= 0 )
 		TEMP_FAILURE_RETRY( ::close( f_iPipeOut ) );
 	f_iPipeOut = -1;
@@ -66,6 +69,7 @@ void HPipedChild::finish( void )
 		::waitpid( f_iPid, NULL, 0 );
 		}
 	f_iPid = 0;
+	M_EPILOG
 	}
 
 void HPipedChild::spawn( char const* const a_pcImage )
@@ -128,6 +132,7 @@ void HPipedChild::do_flush( void ) const
 
 bool HPipedChild::read_poll( void* a_pvTime )
 	{
+	M_PROLOG
 	int l_iError = - 1;
 	fd_set l_xFdSet;
 	timeval* l_pxWait = static_cast<timeval*>( a_pvTime );
@@ -145,6 +150,7 @@ bool HPipedChild::read_poll( void* a_pvTime )
 			break;
 		}
 	return ( l_iError <= 0 );
+	M_EPILOG
 	}
 
 bool HPipedChild::is_running( void )

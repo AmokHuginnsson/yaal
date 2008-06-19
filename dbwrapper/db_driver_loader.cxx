@@ -74,79 +74,103 @@ HPlugin n_oDBDriver;
 
 void* null_db_connect( char const*, char const*, char const* )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(db_connect)" << eend << endl;
 	return ( NULL );
+	M_EPILOG
 	}
 
 void null_db_disconnect( void* )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(db_disconnect)" << eend << endl;
 	return;
+	M_EPILOG
 	}
 
 int null_db_errno( void* )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(db_errno)" << eend << endl;
 	return ( 0 );
+	M_EPILOG
 	}
 
 char const* null_db_error( void* )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "db_error)" << eend << endl;
 	return ( _( "null database driver loaded" ) );
+	M_EPILOG
 	}
 
 void* null_db_query( void*, char const* )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(db_query)" << eend << endl;
 	return ( NULL );
+	M_EPILOG
 	}
 
 void null_db_unquery( void* )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(db_unquery)" << eend << endl;
 	return;
+	M_EPILOG
 	}
 
 char* null_rs_get( void*, int, int )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(rs_get)" << eend << endl;
 	return ( NULL );
+	M_EPILOG
 	}
 
 int null_rs_fields_count( void* )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(rs_fields_count)" << eend << endl;
 	return ( 0 );
+	M_EPILOG
 	}
 
 int long null_dbrs_records_count( void*, void* )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(dbrs_records_count)" << eend << endl;
 	return ( 0 );
+	M_EPILOG
 	}
 
 int long null_dbrs_id( void*, void* )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(dbrs_id)" << eend << endl;
 	return ( 0 );
+	M_EPILOG
 	}
 
 char* null_rs_column_name( void*, int )
 	{
+	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(rs_column_name)" << eend << endl;
 	return ( NULL );
+	M_EPILOG
 	}
 
 /* end of null-dummy driver */
 
 void dbwrapper_error( void )
 	{
+	M_PROLOG
 	HString l_oMessage;
 	l_oMessage = dlerror();
 	log( LOG_TYPE::D_ERROR ) << l_oMessage << endl;
 	::fprintf( stderr, "(%s), ", static_cast<char const* const>( l_oMessage ) );
 	return;
+	M_EPILOG
 	}
 
 void dbwrapper_exit ( void ) __attribute__  ((noreturn));
@@ -160,8 +184,10 @@ void load_driver( void );
 void* autoloader_db_connect( char const* a_pcDataBase,
 		char const* a_pcLogin, char const* a_pcPassword )
 	{
+	M_PROLOG
 	load_driver();
 	return ( db_connect( a_pcDataBase, a_pcLogin, a_pcPassword ) );
+	M_EPILOG
 	}
 
 void load_driver( void )
@@ -245,65 +271,85 @@ void load_driver( void )
 
 void autoloader_db_disconnect( void* a_pvDataBase )
 	{
+	M_PROLOG
 	load_driver();
 	db_disconnect( a_pvDataBase );
 	return;
+	M_EPILOG
 	}
 
 int autoloader_db_errno( void* a_pvDataBase )
 	{
+	M_PROLOG
 	load_driver();
 	return ( db_errno( a_pvDataBase ) );
+	M_EPILOG
 	}
 
 char const* autoloader_db_error( void* a_pvDataBase )
 	{
+	M_PROLOG
 	load_driver();
 	return ( db_error( a_pvDataBase ) );
+	M_EPILOG
 	}
 
 void* autoloader_db_query( void* a_pvDataBase, char const* a_pcQuery )
 	{
+	M_PROLOG
 	load_driver();
 	return ( db_query( a_pvDataBase, a_pcQuery ) );
+	M_EPILOG
 	}
 
 void autoloader_db_unquery( void* a_pvDataBase )
 	{
+	M_PROLOG
 	load_driver();
 	db_unquery( a_pvDataBase );
 	return;
+	M_EPILOG
 	}
 
 char* autoloader_rs_get( void* a_pvResult, int a_iRow, int a_iCol )
 	{
+	M_PROLOG
 	load_driver();
 	return ( rs_get( a_pvResult, a_iRow, a_iCol ) );
+	M_EPILOG
 	}
 
 int autoloader_rs_fields_count( void* a_pvResult )
 	{
+	M_PROLOG
 	load_driver();
 	return ( rs_fields_count( a_pvResult ) );
+	M_EPILOG
 	}
 
 int long autoloader_dbrs_records_count( void* a_pvDataBase,
 		void* a_pvResult )
 	{
+	M_PROLOG
 	load_driver();
 	return ( dbrs_records_count( a_pvDataBase, a_pvResult ) );
+	M_EPILOG
 	}
 
 int long autoloader_dbrs_id( void* a_pvDataBase, void* a_pvResult )
 	{
+	M_PROLOG
 	load_driver();
 	return ( dbrs_id( a_pvDataBase, a_pvResult ) );
+	M_EPILOG
 	}
 
 char* autoloader_rs_column_name( void* a_pvResult, int a_iColumn )
 	{
+	M_PROLOG
 	load_driver();
 	return ( rs_column_name( a_pvResult, a_iColumn ) );
+	M_EPILOG
 	}
 
 db_connect_t db_connect = autoloader_db_connect;
