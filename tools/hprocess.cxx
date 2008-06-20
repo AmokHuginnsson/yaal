@@ -48,7 +48,8 @@ HProcess::HProcess( size_t a_uiFileHandlers )
 	: f_bInitialised( false ), f_bLoop( true ), f_iIdleCycles( 0 ),
 	f_iLatencySeconds( 0 ), f_iLatencyMicroseconds( 0 ),
 	f_sLatency(), f_xFileDescriptorSet(),
-	f_oFileDescriptorHandlers( a_uiFileHandlers ), f_oEvent()
+	f_oFileDescriptorHandlers( a_uiFileHandlers ), f_oDroppedFd( a_uiFileHandlers, dropped_fd_t::D_AUTO_GROW ),
+	f_bCallbackContext( false ), f_oEvent()
 	{
 	M_PROLOG
 	memset ( & f_sLatency, 0, sizeof ( f_sLatency ) );
@@ -106,7 +107,12 @@ int HProcess::register_file_descriptor_handler_internal( int a_iFileDescriptor,
 int HProcess::unregister_file_descriptor_handler( int a_iFileDescriptor )
 	{
 	M_PROLOG
-	return ( f_oFileDescriptorHandlers.remove( a_iFileDescriptor ) );
+	int ret = -1;
+	if ( f_bCallbackContext )
+		f_oDroppedFd.push_back( a_iFileDescriptor );
+	else
+		ret = f_oFileDescriptorHandlers.remove( a_iFileDescriptor );
+	return ( ret );
 	M_EPILOG
 	}
 
@@ -136,6 +142,7 @@ int HProcess::run( void )
 		M_THROW( _ ( "there is no file descriptor to check activity on" ), errno );
 	while ( f_bLoop )
 		{
+		f_bCallbackContext = true;
 		handler_alert( 0 );
 		reconstruct_fdset();
 		if ( ( l_iError = ::select( FD_SETSIZE, &f_xFileDescriptorSet,
@@ -157,6 +164,13 @@ int HProcess::run( void )
 			}
 		else
 			handler_idle( 0 );
+		f_bCallbackContext = false;
+		if ( ! f_oDroppedFd.is_empty() )
+			{
+			for ( dropped_fd_t::iterator it = f_oDroppedFd.begin(); it != f_oDroppedFd.end(); ++ it )
+				unregister_file_descriptor_handler( *it );
+			f_oDroppedFd.reset();
+			}
 		}
 	do_cleanup();
 	return ( 0 );

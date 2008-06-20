@@ -68,7 +68,7 @@ public:
 	typedef tType const* const_iterator;
 private:
 	pool_type_t f_ePoolType;
-	int long f_lAllocedBytes;	/* size of allocated memory buffer */
+	int long f_lAllocedObjects;	/* size of allocated memory buffer */
 	int long f_lSize; /*! size of container */
 	tType* f_ptPool;	/* pointer to allocated memory pool */
 public:
@@ -78,7 +78,11 @@ public:
 	tType& operator[] ( int long ) const;
 	void push_back( tType const& );
 	void reset( void );
+	void clear( void );
+	bool empty( void ) const;
+	bool is_empty( void ) const;
 	int long size( void ) const;
+	int long get_size( void ) const;
 	static void swap( HPool<tType>&, HPool<tType>& );
 	tType const* raw( void ) const;
 	tType* raw( void );
@@ -96,7 +100,7 @@ public:
 
 template<typename tType>
 HPool<tType>::HPool( int long a_ulNewSize, pool_type_t a_ePoolType )
-	: f_ePoolType( a_ePoolType ), f_lAllocedBytes( 0 ), f_lSize( 0 ),
+	: f_ePoolType( a_ePoolType ), f_lAllocedObjects( 0 ), f_lSize( 0 ),
 	f_ptPool( NULL )
 	{
 	M_PROLOG
@@ -108,7 +112,7 @@ HPool<tType>::HPool( int long a_ulNewSize, pool_type_t a_ePoolType )
 
 template<typename tType>
 HPool<tType>::HPool( HPool<tType> const& source )
-	: f_ePoolType( source.f_ePoolType ), f_lAllocedBytes( 0 ), f_lSize( 0 ),
+	: f_ePoolType( source.f_ePoolType ), f_lAllocedObjects( 0 ), f_lSize( 0 ),
 	f_ptPool( NULL )
 	{
 	M_PROLOG
@@ -144,7 +148,7 @@ HPool<tType>::~HPool( void )
 	M_PROLOG
 	if ( f_ptPool )
 		xfree( f_ptPool );
-	f_lAllocedBytes = 0;
+	f_lAllocedObjects = 0;
 	f_lSize = 0;
 	return;
 	M_EPILOG
@@ -158,25 +162,25 @@ void HPool<tType>::pool_realloc( const int long a_ulNewSize )
 		M_THROW( g_ppcErrMsgHPool[ ERROR::E_BADSIZE ], a_ulNewSize );
 	if ( f_ePoolType == D_AUTO_GROW )
 		{
-		if ( a_ulNewSize > f_lAllocedBytes )
+		if ( a_ulNewSize > f_lAllocedObjects )
 			{
-			f_lAllocedBytes = 1;
-			while ( f_lAllocedBytes < a_ulNewSize )
-				f_lAllocedBytes <<= 1;
-			f_ptPool = xrealloc<tType>( f_ptPool, f_lAllocedBytes );
+			f_lAllocedObjects = 1;
+			while ( f_lAllocedObjects < a_ulNewSize )
+				f_lAllocedObjects <<= 1;
+			f_ptPool = xrealloc<tType>( f_ptPool, f_lAllocedObjects );
 			::memset( f_ptPool + f_lSize, 0,
-					( f_lAllocedBytes - f_lSize ) * sizeof ( tType ) );
+					( f_lAllocedObjects - f_lSize ) * sizeof ( tType ) );
 			}
 		}
-	else if ( f_lAllocedBytes != a_ulNewSize )
+	else if ( f_lAllocedObjects != a_ulNewSize )
 		{
 		if ( f_ptPool && ( f_ePoolType == D_FIXED_SIZE ) )
-			M_THROW( g_ppcErrMsgHPool[ ERROR::E_REALLOC_FIXED ], f_lAllocedBytes );
-		f_lAllocedBytes = a_ulNewSize;
-		f_ptPool = xrealloc<tType>( f_ptPool, f_lAllocedBytes );
+			M_THROW( g_ppcErrMsgHPool[ ERROR::E_REALLOC_FIXED ], f_lAllocedObjects );
+		f_lAllocedObjects = a_ulNewSize;
+		f_ptPool = xrealloc<tType>( f_ptPool, f_lAllocedObjects );
 		if ( a_ulNewSize > f_lSize )
 			::memset( f_ptPool + f_lSize, 0,
-					( f_lAllocedBytes - f_lSize ) * sizeof ( tType ) );
+					( f_lAllocedObjects - f_lSize ) * sizeof ( tType ) );
 		}
 	f_lSize = a_ulNewSize;
 	return;
@@ -213,7 +217,25 @@ void HPool<tType>::reset( void )
 template<typename tType>
 int long HPool<tType>::size( void ) const
 	{
+	return ( get_size() );
+	}
+
+template<typename tType>
+int long HPool<tType>::get_size( void ) const
+	{
 	return ( f_lSize );
+	}
+
+template<typename tType>
+bool HPool<tType>::is_empty( void ) const
+	{
+	return ( ! f_lSize );
+	}
+
+template<typename tType>
+bool HPool<tType>::empty( void ) const
+	{
+	return ( is_empty() );
 	}
 
 template<typename tType>
@@ -222,7 +244,7 @@ void HPool<tType>::swap( HPool<tType>& left, HPool<tType>& right )
 	if ( &left != &right )
 		{
 		yaal::swap( left.f_ePoolType, right.f_ePoolType );
-		yaal::swap( left.f_lAllocedBytes, right.f_lAllocedBytes );
+		yaal::swap( left.f_lAllocedObjects, right.f_lAllocedObjects );
 		yaal::swap( left.f_lSize, right.f_lSize );
 		yaal::swap( left.f_ptPool, right.f_ptPool );
 		}
