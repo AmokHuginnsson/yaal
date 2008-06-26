@@ -52,6 +52,8 @@ HProcess::HProcess( size_t a_uiFileHandlers )
 	f_bCallbackContext( false ), f_oEvent()
 	{
 	M_PROLOG
+	f_oDroppedFd.reset();
+	M_ASSERT( f_oDroppedFd.is_empty() );
 	memset ( & f_sLatency, 0, sizeof ( f_sLatency ) );
 	FD_ZERO ( & f_xFileDescriptorSet );
 	return;
@@ -104,15 +106,17 @@ int HProcess::register_file_descriptor_handler_internal( int a_iFileDescriptor,
 	M_EPILOG
 	}
 
-int HProcess::unregister_file_descriptor_handler( int a_iFileDescriptor )
+void HProcess::unregister_file_descriptor_handler( int a_iFileDescriptor )
 	{
 	M_PROLOG
-	int ret = -1;
 	if ( f_bCallbackContext )
 		f_oDroppedFd.push_back( a_iFileDescriptor );
 	else
-		ret = f_oFileDescriptorHandlers.remove( a_iFileDescriptor );
-	return ( ret );
+		{
+		bool fail = f_oFileDescriptorHandlers.remove( a_iFileDescriptor );
+		M_ASSERT( ! fail );
+		}
+	return;
 	M_EPILOG
 	}
 

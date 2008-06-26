@@ -69,7 +69,7 @@ protected:
 		return ( register_file_descriptor_handler_internal( a_iFileDes, static_cast<process_handler_filedes_t>( HANDLER ) ) );
 		}
 	int register_file_descriptor_handler_internal( int, process_handler_filedes_t );
-	int unregister_file_descriptor_handler( int );
+	void unregister_file_descriptor_handler( int );
 	/*! \brief Process incoming events from interrupt socket.
 	 */
 	int process_interrupt( int );

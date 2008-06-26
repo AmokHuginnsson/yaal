@@ -53,6 +53,8 @@ inline int long unsigned hash( tType const& a_rtKey )
 	return ( static_cast<int long unsigned>( a_rtKey ) );
 	}
 
+/*! \brief Hash map container implementation.
+ */
 template<typename tType, typename ttType>
 class HHashMap
 	{
@@ -99,7 +101,13 @@ public:
 	void erase( iterator );
 	bool has_key( tType const& ) const;
 	bool get( tType const&, ttType& ) const;
-	bool remove( tType const& );
+
+	/*! \brief  Remove given key from map.
+	 *
+	 * \param  key Key to be removed.
+	 * \return  True in case of failure.
+	 */
+	bool remove( tType const& key );
 	void clear( void );
 	int size( void ) const;
 private:
@@ -457,7 +465,7 @@ bool HHashMap<tType, ttType>::remove( tType const& a_tKey )
 	bool erased = it != end();
 	if ( erased )
 		erase( it );
-	return ( erased );
+	return ( ! erased );
 	M_EPILOG
 	}
 
