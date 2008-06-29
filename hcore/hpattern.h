@@ -27,10 +27,7 @@ Copyright:
 #ifndef __YAAL_HCORE_HPATTERN_H
 #define __YAAL_HCORE_HPATTERN_H
 
-#include <sys/types.h>	/* why? - because POSIX says so :/ */
-#include <regex.h>			/* this one is obvious */
-
-#include "hcore/harray.h"
+#include "hcore/hchunk.h"
 #include "hcore/hstring.h"
 
 namespace yaal
@@ -46,26 +43,26 @@ class HPattern
 	bool		f_bIgnoreCase;				/* self explanary */
 	bool		f_bExtended;					/* simple strstr or extended RE */
 	int			f_iSimpleMatchLength;	/* length of simple strstr pattern */
-	regex_t	f_sCompiled;					/* compiled regular expression for
+	HChunk	f_oCompiled;					/* compiled regular expression for
 																	 search patterns */
 	HString	f_oPatternInput;			/* current search pattern */
 	HString	f_oPatternReal;				/* pattern with stripped switches */
 	HString f_oError;							/* error message of last operation */
 public:
-	HPattern ( bool = false /* default ignore case state */ );
-	virtual ~HPattern ( void );
-	int parse ( char const * const /* pattern input */,
-							 int short unsigned * const = NULL /*additional flags to parse*/,
+	HPattern( bool = false /* default ignore case state */ );
+	virtual ~HPattern( void );
+	int parse( char const* const /* pattern input */,
+							 int short unsigned* const = NULL /*additional flags to parse*/,
 							 int const = 0 /* number of additional flags */ );
-	int parse_re ( char const * const );
-	char const * error ( void ) const;
-	char const * matches ( char const * const,
-			int * const = NULL /* match length */,
-			int * const = NULL /* error code */ );
-	int count ( char const * const );
+	int parse_re( char const* const );
+	char const* error( void ) const;
+	char const* matches( char const* const,
+			int* const = NULL /* match length */,
+			int* const = NULL /* error code */ );
+	int count( char const* const );
 private:
-	void prepare_error_message ( int const, char const * const );
-	bool set_switch ( char const, int short unsigned * const, int const );
+	void prepare_error_message( int const, char const* const );
+	bool set_switch( char const, int short unsigned* const, int const );
 	};
 
 }

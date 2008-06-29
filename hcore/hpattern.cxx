@@ -25,11 +25,14 @@ Copyright:
 */
 
 #include <cstring>
+#include <sys/types.h>	/* why? - because POSIX says so :/ */
+#include <regex.h>			/* this one is obvious */
 #include <libintl.h>
 
 #include "hexception.h"
 M_VCSID ( "$Id$" )
 #include "hpattern.h"
+#include "harray.h"
 #include "hpool.h"
 
 namespace yaal
@@ -40,11 +43,11 @@ namespace hcore
 
 HPattern::HPattern( bool const a_bIgnoreCase ) : f_bInitialized( false ),
 	f_bIgnoreCaseDefault( a_bIgnoreCase ), f_bIgnoreCase( false ),
-	f_bExtended( false ), f_iSimpleMatchLength( 0 ), f_sCompiled(),
+	f_bExtended( false ), f_iSimpleMatchLength( 0 ), f_oCompiled( xcalloc<regex_t>( 1 ) ),
 	f_oPatternInput(), f_oPatternReal(), f_oError()
 	{
 	M_PROLOG
-	memset( &f_sCompiled, 0, sizeof ( f_sCompiled ) );
+	memset( &f_oCompiled, 0, sizeof ( f_oCompiled ) );
 	return;
 	M_EPILOG
 	}
@@ -52,7 +55,7 @@ HPattern::HPattern( bool const a_bIgnoreCase ) : f_bInitialized( false ),
 HPattern::~HPattern( void )
 	{
 	M_PROLOG
-	regfree( &f_sCompiled );
+	regfree( f_oCompiled.get<regex_t>() );
 	return;
 	M_EPILOG
 	}
@@ -144,8 +147,8 @@ int HPattern::parse_re( char const* const a_pcPattern )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	regfree ( & f_sCompiled );
-	if ( ( l_iError = regcomp( &f_sCompiled, a_pcPattern,
+	regfree ( f_oCompiled.get<regex_t>() );
+	if ( ( l_iError = regcomp( f_oCompiled.get<regex_t>(), a_pcPattern,
 					f_bIgnoreCase ? REG_ICASE : 0 ) ) )
 		{
 		prepare_error_message( l_iError, a_pcPattern );
@@ -195,8 +198,8 @@ bool HPattern::set_switch( char const a_cSwitch,
 	M_EPILOG
 	}
 
-char const * HPattern::matches ( char const * const a_pcString,
-		int * const a_piMatchLength, int * const a_piError )
+char const* HPattern::matches( char const* const a_pcString,
+		int* const a_piMatchLength, int* const a_piError )
 	{
 	M_PROLOG
 	char const * l_pcPtr = NULL;
@@ -207,51 +210,51 @@ char const * HPattern::matches ( char const * const a_pcString,
 		{
 		if ( f_bExtended )
 			{
-			if ( ! ( l_iError = regexec ( & f_sCompiled, a_pcString, 1, & l_sMatch, 0 ) ) )
+			if ( ! ( l_iError = ::regexec( f_oCompiled.get<regex_t>(), a_pcString, 1, & l_sMatch, 0 ) ) )
 				{
 				l_iMatchLength = l_sMatch.rm_eo - l_sMatch.rm_so;
 				if ( l_iMatchLength > 0 )
-					l_pcPtr = const_cast < char * > ( a_pcString ) + l_sMatch.rm_so;
+					l_pcPtr = const_cast<char*>( a_pcString ) + l_sMatch.rm_so;
 				}
 			else
-				prepare_error_message ( l_iError, f_oPatternReal );
+				prepare_error_message( l_iError, f_oPatternReal );
 			}
 		else
 			{
 			if ( f_bIgnoreCase )
-				l_pcPtr = strcasestr ( a_pcString, f_oPatternReal );
+				l_pcPtr = ::strcasestr( a_pcString, f_oPatternReal );
 			else
-				l_pcPtr = strstr ( a_pcString, f_oPatternReal );
+				l_pcPtr = ::strstr( a_pcString, f_oPatternReal );
 			if ( l_pcPtr )
 				l_iMatchLength = f_iSimpleMatchLength;
 			}
 		}
 	if ( a_piMatchLength )
-		( * a_piMatchLength ) = l_iMatchLength;
+		( *a_piMatchLength ) = l_iMatchLength;
 	if ( a_piError )
-		( * a_piError ) = l_iError;
+		( *a_piError ) = l_iError;
 	return ( l_pcPtr );
 	M_EPILOG
 	}
 
-int HPattern::count ( char const * const a_pcString )
+int HPattern::count( char const* const a_pcString )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	char const * l_pcPtr = a_pcString;
-	while ( ( l_pcPtr = matches ( l_pcPtr ) ) )
+	char const* l_pcPtr = a_pcString;
+	while ( ( l_pcPtr = matches( l_pcPtr ) ) )
 		l_iCtr ++, l_pcPtr ++;
 	return ( l_iCtr );
 	M_EPILOG
 	}
 
-void HPattern::prepare_error_message ( int const a_iError,
-		char const * const a_pcString )
+void HPattern::prepare_error_message( int const a_iError,
+		char const* const a_pcString )
 	{
 	M_PROLOG
-	int long l_iSize = ::regerror( a_iError, &f_sCompiled, NULL, 0 ) + 1;
+	int long l_iSize = ::regerror( a_iError, f_oCompiled.get<regex_t>(), NULL, 0 ) + 1;
 	HPool<char> l_oBuffer( l_iSize + 1 );
-	M_ENSURE( static_cast<int>( ::regerror( a_iError, &f_sCompiled,
+	M_ENSURE( static_cast<int>( ::regerror( a_iError, f_oCompiled.get<regex_t>(),
 					l_oBuffer.raw(), l_iSize ) ) < l_iSize );
 	f_oError = l_oBuffer.raw();
 	if ( a_pcString )
