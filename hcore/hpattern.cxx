@@ -47,7 +47,7 @@ HPattern::HPattern( bool const a_bIgnoreCase ) : f_bInitialized( false ),
 	f_oPatternInput(), f_oPatternReal(), f_oError()
 	{
 	M_PROLOG
-	memset( &f_oCompiled, 0, sizeof ( f_oCompiled ) );
+	memset( f_oCompiled.get<regex_t>(), 0, sizeof ( f_oCompiled ) );
 	return;
 	M_EPILOG
 	}
