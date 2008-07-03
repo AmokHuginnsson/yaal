@@ -855,8 +855,9 @@ HString HString::right( int long /* reused */ a_iFromEnd ) const
 HString& HString::trim_left( char const* const a_pcSet )
 	{
 	M_PROLOG
+	M_ASSERT( f_pcBuffer );
 	int l_iCut = 0;
-	while ( ::strchr( a_pcSet, f_pcBuffer[ l_iCut ] ) )
+	while ( f_pcBuffer[ l_iCut ] && ::strchr( a_pcSet, f_pcBuffer[ l_iCut ] ) )
 		++ l_iCut;
 	if ( l_iCut )
 		shift_left( l_iCut );
@@ -867,9 +868,10 @@ HString& HString::trim_left( char const* const a_pcSet )
 HString& HString::trim_right( char const* const a_pcSet )
 	{
 	M_PROLOG
-	int long l_iCut = 0, l_iLenght;
-	l_iLenght = ::strlen( f_pcBuffer );
-	while ( ::strchr( a_pcSet, f_pcBuffer[ l_iLenght - l_iCut ] ) )
+	M_ASSERT( f_pcBuffer );
+	int long l_iCut = 0;
+	int long l_iLenght = ::strlen( f_pcBuffer );
+	while ( ( l_iCut <= l_iLenght ) && ::strchr( a_pcSet, f_pcBuffer[ l_iLenght - l_iCut ] ) )
 		l_iCut ++;
 	if ( l_iCut )
 		f_pcBuffer[ ( l_iLenght - l_iCut ) + 1 ] = 0;

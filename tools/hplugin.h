@@ -28,6 +28,7 @@ Copyright:
 #define __YAAL_TOOLS_HPLUGIN_H
 
 #include "hcore/hexception.h"
+#include "hcore/hpointer.h"
 
 namespace yaal
 {
@@ -46,6 +47,7 @@ class HPlugin
 	typedef HPlugin self_t;
 	void* f_pvHandle;
 public:
+	typedef yaal::hcore::HPointer<HPlugin> ptr_t;
 	HPlugin( void );
 	~HPlugin( void );
 	void load( char const* const );
