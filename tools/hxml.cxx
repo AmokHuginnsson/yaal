@@ -770,6 +770,23 @@ HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& a_e
 	M_EPILOG
 	}
 
+HXml::HIterator HXml::HNodeProxy::add_node( char const* const a_pcName, char const* const a_pcValue )
+	{
+	M_PROLOG
+	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
+	tree_t::iterator it = f_poNode->add_node();
+	(**it).f_oText = a_pcName;
+	(**it).f_eType = HXml::HNode::TYPE::D_NODE;
+	if ( a_pcValue )
+		{
+		tree_t::iterator value = it->add_node();
+		(**value).f_oText = a_pcValue;
+		(**value).f_eType = HXml::HNode::TYPE::D_CONTENT;
+		}
+	return ( HXml::HIterator( this, it ) );
+	M_EPILOG
+	}
+
 HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, HXml::HNode::TYPE::type_t const& a_eType, char const* const a_pcName )
 	{
 	M_PROLOG
@@ -777,6 +794,23 @@ HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, HXml::HNode::
 	tree_t::iterator newIt = f_poNode->insert_node( it.f_oIterator, HNode() );
 	(**newIt).f_oText = a_pcName;
 	(**newIt).f_eType = a_eType;
+	return ( HXml::HIterator( this, newIt ) );
+	M_EPILOG
+	}
+
+HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, char const* const a_pcName, char const* const a_pcValue )
+	{
+	M_PROLOG
+	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
+	tree_t::iterator newIt = f_poNode->insert_node( it.f_oIterator, HNode() );
+	(**newIt).f_oText = a_pcName;
+	(**newIt).f_eType = HXml::HNode::TYPE::D_NODE;;
+	if ( a_pcValue )
+		{
+		tree_t::iterator value = newIt->add_node();
+		(**value).f_oText = a_pcValue;
+		(**value).f_eType = HXml::HNode::TYPE::D_CONTENT;
+		}
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 	}
@@ -953,6 +987,16 @@ bool HXml::HNodeProxy::operator ! ( void ) const
 bool HXml::HConstNodeProxy::operator ! ( void ) const
 	{
 	return ( ! f_poNode );
+	}
+
+HXml::HIterator::HIterator( void )
+	: f_poOwner( NULL ), f_oIterator()
+	{
+	}
+
+HXml::HConstIterator::HConstIterator( void )
+	: f_poOwner( NULL ), f_oIterator()
+	{
 	}
 
 HXml::HIterator::HIterator( HXml::HNodeProxy const* a_poOwner, HXml::tree_t::iterator const& it )
