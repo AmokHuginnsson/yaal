@@ -45,7 +45,7 @@ public:
 	HString( void );
 	HString( HString const& );
 	HString( int const, bool const ); /* initialize immediately with size */
-	virtual ~HString( void ) ;
+	~HString( void ) ;
 	void hs_realloc( int long const );
 	HString( char const* const );
 	HString( char const );

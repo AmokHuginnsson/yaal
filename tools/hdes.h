@@ -35,14 +35,14 @@ namespace tools
 
 struct DES
 	{
-	static int const D_SIDES_COUNT		= 2;
-	static int const D_IKEY_SIZE			= 6;
-	static int const D_BLOCK_SIZE			= 8;
-	static int const D_IKEYS_COUNT		= 16;
-	static int const D_PASSWORD_SIZE	= 16;
+	static int const D_BITS_IN_BYTE  = yaal::power<2,3>::value;
+	static int const D_SIDES_COUNT   = 2;
+	static int const D_IKEY_SIZE     = 6;
+	static int const D_BLOCK_SIZE    = 8;
+	static int const D_IKEYS_COUNT   = 16;
+	static int const D_PASSWORD_SIZE = 16;
+	static int const D_HALF_KEY_SIZE = 28;
 	};
-
-typedef char unsigned uc_t;
 
 /*! \brief Cryptography interface.
  * 
@@ -50,18 +50,17 @@ typedef char unsigned uc_t;
  */
 class HDes
 	{
-	uc_t f_pppcIKeys [ DES::D_SIDES_COUNT ]
-		[ DES::D_IKEYS_COUNT ] [ DES::D_IKEY_SIZE ];
+	u8_t f_pppcIKeys[ DES::D_SIDES_COUNT ][ DES::D_IKEYS_COUNT ][ DES::D_IKEY_SIZE ];
 public:
-	HDes ( void );
-	virtual ~HDes ( void );
-	void crypt ( uc_t *, int, int );
-	void generate_keys ( uc_t * );
-	void flush_keys ( void );
+	HDes( void );
+	virtual ~HDes( void );
+	void crypt( u8_t*, int, int );
+	void generate_keys( u8_t* );
+	void flush_keys( void );
 private:
-	void _des ( uc_t * /* block */, int /* side */, int /* part */ );
-	void _3des ( uc_t * /* block */, int /* side */ );
-	void permutate ( uc_t * /* buffer */, const uc_t * /* tab */, int /* len */ ) const;
+	void _des( u8_t* /* block */, int /* side */, int /* part */ );
+	void _3des( u8_t* /* block */, int /* side */ );
+	void permutate( u8_t* /* buffer */, const u8_t* /* tab */, int /* len */ ) const;
 	};
 
 }

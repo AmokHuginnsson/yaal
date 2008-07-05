@@ -176,6 +176,12 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	{
 	char* l_pcEnv = NULL;
 	STATIC_ASSERT( sizeof( int ) >= 4 );
+	STATIC_ASSERT( sizeof( u8_t ) == 1 );
+	STATIC_ASSERT( sizeof( u16_t ) == 2 );
+	STATIC_ASSERT( sizeof( u32_t ) == 4 );
+#if 0
+	STATIC_ASSERT( sizeof( u64_t ) == 8 );
+#endif
 	errno = 0;
 	l_pcEnv = ::getenv( "YAAL_DEBUG" );
 	if ( l_pcEnv )

@@ -308,6 +308,19 @@ typedef enum
 	D_MASK        = 0xffff
 	} type_t;
 
+typedef char unsigned u8_t;
+typedef int short unsigned u16_t;
+typedef int unsigned u32_t;
+#if 0
+typedef int long unsigned u64_t;
+#endif
+typedef char i8_t;
+typedef int short i16_t;
+typedef int i32_t;
+#if 0
+typedef int long i64_t;
+#endif
+
 template<typename tType>
 tType& clone( tType& object )
 	{

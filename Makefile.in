@@ -147,7 +147,7 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 		printf "#include <yaal/%s>\n", substr($$0,RSTART+1,RLENGTH-1) }; \
 		!/^#include "/' $$FILE > $(DIR_HEADERS)/$$FILE; \
 	done; \
-	head -26 $(DIR_HEADERS)/tools/bit.h \
+	head -26 $(DIR_HEADERS)/hcore/base.h \
 | sed -e s/bit/yaal/ > $(DIR_HEADERS)/yaal.h; \
 	echo '#ifndef __YAAL_H' >> $(DIR_HEADERS)/yaal.h; \
 	echo '#define __YAAL_H' >> $(DIR_HEADERS)/yaal.h; \
