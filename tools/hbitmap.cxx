@@ -118,21 +118,76 @@ void HBitmap::use( void* a_pvBlock, int long const& a_lSize )
 
 int long unsigned g_pulMaskBitSet[] = 
 	{
-	2147483648u, 1073741824, 536870912, 268435456, 134217728, 67108864, 33554432,
-	16777216, 8388608, 4194304, 2097152, 1048576, 524288, 262144, 131072, 65536,
-	32768, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1
+	yaal::power<2,31>::value,
+	yaal::power<2,30>::value,
+	yaal::power<2,29>::value,
+	yaal::power<2,28>::value,
+	yaal::power<2,27>::value,
+	yaal::power<2,26>::value,
+	yaal::power<2,25>::value,
+	yaal::power<2,24>::value,
+	yaal::power<2,23>::value,
+	yaal::power<2,22>::value,
+	yaal::power<2,21>::value,
+	yaal::power<2,20>::value,
+	yaal::power<2,19>::value,
+	yaal::power<2,18>::value,
+	yaal::power<2,17>::value,
+	yaal::power<2,16>::value,
+	yaal::power<2,15>::value,
+	yaal::power<2,14>::value,
+	yaal::power<2,13>::value,
+	yaal::power<2,12>::value,
+	yaal::power<2,11>::value,
+	yaal::power<2,10>::value,
+	yaal::binary<1000000000>::value,
+	yaal::binary<100000000>::value,
+	yaal::binary<10000000>::value,
+	yaal::binary<1000000>::value,
+	yaal::binary<100000>::value,
+	yaal::binary<10000>::value,
+	yaal::binary<1000>::value,
+	yaal::binary<100>::value,
+	yaal::binary<10>::value,
+	yaal::binary<1>::value
 	};
-                                     
-int long unsigned g_pulMaskBitClear [ ] =
+
+int long unsigned g_pulMaskBitClear[] =
 	{
-	2147483647, 3221225471u, 3758096383u, 4026531839u, 4160749567u, 4227858431u,
-	4261412863u, 4278190079u, 4286578687u, 4290772991u, 4292870143u, 4293918719u,
-	4294443007u, 4294705151u, 4294836223u, 4294901759u, 4294934527u, 4294950911u,
-	4294959103u, 4294963199u, 4294965247u, 4294966271u, 4294966783u, 4294967039u,
-	4294967167u, 4294967231u, 4294967263u, 4294967279u, 4294967287u, 4294967291u,
-	4294967293u, 4294967294u
+	0xffffffff - yaal::power<2,31>::value,
+	0xffffffff - yaal::power<2,30>::value,
+	0xffffffff - yaal::power<2,29>::value,
+	0xffffffff - yaal::power<2,28>::value,
+	0xffffffff - yaal::power<2,27>::value,
+	0xffffffff - yaal::power<2,26>::value,
+	0xffffffff - yaal::power<2,25>::value,
+	0xffffffff - yaal::power<2,24>::value,
+	0xffffffff - yaal::power<2,23>::value,
+	0xffffffff - yaal::power<2,22>::value,
+	0xffffffff - yaal::power<2,21>::value,
+	0xffffffff - yaal::power<2,20>::value,
+	0xffffffff - yaal::power<2,19>::value,
+	0xffffffff - yaal::power<2,18>::value,
+	0xffffffff - yaal::power<2,17>::value,
+	0xffffffff - yaal::power<2,16>::value,
+	0xffffffff - yaal::power<2,15>::value,
+	0xffffffff - yaal::power<2,14>::value,
+	0xffffffff - yaal::power<2,13>::value,
+	0xffffffff - yaal::power<2,12>::value,
+	0xffffffff - yaal::power<2,11>::value,
+	0xffffffff - yaal::power<2,10>::value,
+	0xffffffff - yaal::binary<1000000000>::value,
+	0xffffffff - yaal::binary<100000000>::value,
+	0xffffffff - yaal::binary<10000000>::value,
+	0xffffffff - yaal::binary<1000000>::value,
+	0xffffffff - yaal::binary<100000>::value,
+	0xffffffff - yaal::binary<10000>::value,
+	0xffffffff - yaal::binary<1000>::value,
+	0xffffffff - yaal::binary<100>::value,
+	0xffffffff - yaal::binary<10>::value,
+	0xffffffff - yaal::binary<1>::value
 	};
-                                       
+
 char unsigned g_pucMaskBitSet[] =
 	{
 	yaal::binary<10000000>::value,
@@ -142,7 +197,7 @@ char unsigned g_pucMaskBitSet[] =
 	yaal::binary<1000>::value,
 	yaal::binary<100>::value,
 	yaal::binary<10>::value,
-	yaal::binary<1>::value 
+	yaal::binary<1>::value
 	};
 char unsigned g_pucMaskBitClear[] =
 	{
