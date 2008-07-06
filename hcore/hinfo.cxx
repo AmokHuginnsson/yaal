@@ -215,7 +215,7 @@ template<>
 char const* HInfo::get<char const*>( void ) const
 	{
 	M_PROLOG
-	return ( static_cast<char const*>( f_oString ) );
+	return ( f_oString.raw() );
 	M_EPILOG
 	}
 
@@ -247,7 +247,7 @@ void* HInfo::get<void*>( void ) const
 bool HInfo::operator ! ( void ) const
 	{
 	M_PROLOG
-	return ( ! ( f_lIntLong || f_dDouble || f_oString ) );
+	return ( ! ( f_lIntLong || f_dDouble || ! f_oString.empty() ) );
 	M_EPILOG
 	}
 

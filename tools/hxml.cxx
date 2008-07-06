@@ -146,10 +146,10 @@ struct HXml::OConvert
 			}
 		return ( *this );
 		}
-	void init( char const* const a_pcEncoding )
+	void init( HString const& a_oEncoding )
 		{
 		M_PROLOG
-		xmlCharEncodingHandlerPtr encoder = xmlFindCharEncodingHandler( a_pcEncoding );
+		xmlCharEncodingHandlerPtr encoder = ::xmlFindCharEncodingHandler( a_oEncoding.raw() );
 		if ( ! encoder )
 			M_THROW( _( "cannot enable internal convertion" ), errno );
 		f_oEncoder = encoder_resource_ptr_t(
@@ -267,11 +267,11 @@ HXml::~HXml ( void )
 #	define D_YAAL_TOOLS_HXML_ICONV_CONST /**/
 #endif /* not HAVE_ICONV_INPUT_CONST */
 
-char const* HXml::convert( char const* a_pcData, way_t a_eWay ) const
+HString const& HXml::convert( HString const& a_oData, way_t a_eWay ) const
 	{
 	M_PROLOG
-	M_ASSERT( a_pcData );
-	char D_YAAL_TOOLS_HXML_ICONV_CONST* source = const_cast<char D_YAAL_TOOLS_HXML_ICONV_CONST*>( a_pcData );
+	M_ASSERT( ! a_oData.is_empty() );
+	char D_YAAL_TOOLS_HXML_ICONV_CONST* source = const_cast<char D_YAAL_TOOLS_HXML_ICONV_CONST*>( a_oData.raw() );
 	iconv_t l_xCD = static_cast<iconv_t>( 0 );
 	switch ( a_eWay )
 		{
@@ -319,7 +319,7 @@ int HXml::get_node_set_by_path( char const* a_pcPath )
 		while ( ! f_oVarTmpBuffer.is_empty() )
 			{
 			objPtr = xmlXPathEvalExpression(
-					reinterpret_cast<xmlChar const*>( static_cast<char const* const>( f_oVarTmpBuffer ) ),
+					reinterpret_cast<xmlChar const*>( f_oVarTmpBuffer.raw() ),
 					ctx.get() );
 			if ( objPtr )
 				break;
@@ -512,7 +512,8 @@ void HXml::save( int const& a_iFileDes ) const
 		}
 	else
 		{
-		if ( xmlSaveFileTo( xmlOutputBufferCreateFd( a_iFileDes, NULL ), f_poXml->f_oDoc.get(), f_oEncoding ) == -1 )
+		if ( ::xmlSaveFileTo( ::xmlOutputBufferCreateFd( a_iFileDes, NULL ),
+					f_poXml->f_oDoc.get(), f_oEncoding.raw() ) == -1 )
 			throw HXmlException( HString( "Cannot connect to file descriptor: " ) + a_iFileDes );
 		}
 	return;
@@ -532,7 +533,7 @@ void HXml::do_save( void ) const
 			throw HXmlException( _( "Cannot create the xml DOC writer." ) );
 		doc_resource_t dummy( pDoc, xmlFreeDoc );
 		doc_resource_t::swap( doc, dummy );
-		int rc = xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding, "yes" );
+		int rc = ::xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding.raw(), "yes" );
 		if ( rc < 0 )
 			throw HXmlException( HString( "Unable to start document with encoding: " ) + f_oEncoding );
 		rc = xmlTextWriterSetIndent( writer.get(), 1 );
@@ -573,7 +574,7 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const
 		HString const& pvalue = it->second;
 		rc = xmlTextWriterWriteAttribute( writer.get(),
 				reinterpret_cast<xmlChar const* const>( pname.raw() ),
-				reinterpret_cast<xmlChar const* const>( convert( pvalue.raw(), D_TO_EXTERNAL ) ) );
+				reinterpret_cast<xmlChar const* const>( convert( pvalue.raw(), D_TO_EXTERNAL ).raw() ) );
 		if ( rc < 0 )
 			throw HXmlException( HString( "Unable to write a property: " ) + str + ", with value: " + pvalue );
 		}
@@ -585,7 +586,7 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const
 			{
 			HString const& value = (*it).get_value();
 			rc = xmlTextWriterWriteString( writer.get(),
-					reinterpret_cast<xmlChar const*>( convert( value, D_TO_EXTERNAL ) ) );
+					reinterpret_cast<xmlChar const*>( convert( value, D_TO_EXTERNAL ).raw() ) );
 			if ( rc < 0 )
 				throw HXmlException( HString( "Unable to write a node value: " ) + value );
 			}

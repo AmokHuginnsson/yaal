@@ -62,8 +62,8 @@ private:
 	bool f_bExternal;
 public:
 	HFile( mode_open_t const = D_READING, void* const = NULL );
-	virtual ~HFile ( void );
-	int open( char const* const );
+	virtual ~HFile( void );
+	int open( HString const& );
 	int close( void );
 	int long read_line( HString&, mode_read_t = D_DEFAULTS, int const = 0 );
 	HString const& get_path( void ) const;

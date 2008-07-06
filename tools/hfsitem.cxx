@@ -84,7 +84,9 @@ bool HFSItem::is_executable() const
 void HFSItem::do_stat( void* buf ) const
 	{
 	M_PROLOG
-	M_ENSURE( ( ::stat( f_oPath, static_cast<struct stat*>( buf ) ) == 0 ) || ( ::lstat( f_oPath, static_cast<struct stat*>( buf ) ) == 0 ) );
+	M_ENSURE( ( ::stat( f_oPath.raw(),
+					static_cast<struct stat*>( buf ) ) == 0 ) || ( ::lstat( f_oPath.raw(),
+					static_cast<struct stat*>( buf ) ) == 0 ) );
 	return;
 	M_EPILOG
 	}
@@ -113,7 +115,9 @@ void HFSItem::set_path( HString const& a_oPath, int a_iNameLen )
 bool HFSItem::operator ! ( void ) const
 	{
 	struct stat dummy;
-	return ( ! ( ( ::stat( f_oPath, &dummy ) == 0 ) || ( ::lstat( f_oPath, &dummy ) == 0 ) ) );
+	return ( ! ( ( ::stat( f_oPath.raw(),
+						&dummy ) == 0 ) || ( ::lstat( f_oPath.raw(),
+							&dummy ) == 0 ) ) );
 	}
 
 HFSItem::HIterator HFSItem::begin( void )
@@ -136,7 +140,7 @@ HFSItem::HIterator::HIterator( HString const& a_oPath ) : f_oPath( a_oPath ), f_
 	M_PROLOG
 	if ( ! f_oPath.is_empty() )
 		{
-		f_pvDir = opendir( f_oPath );
+		f_pvDir = ::opendir( f_oPath.raw() );
 		f_oDirEnt = HChunk::ptr_t( new HChunk( xcalloc<dirent>( 1 ) ) );
 		operator ++();
 		}
@@ -169,7 +173,7 @@ HFSItem::HIterator& HFSItem::HIterator::operator = ( HFSItem::HIterator const& a
 		f_oPath = a_oFSItemIterator.f_oPath;
 		if ( a_oFSItemIterator.f_pvDir )
 			{
-			f_pvDir = opendir( f_oPath );
+			f_pvDir = ::opendir( f_oPath.raw() );
 			if ( !! f_oDirEnt )
 				f_oDirEnt = HChunk::ptr_t( new HChunk( xcalloc<dirent>( 1 ) ) );
 			seekdir( static_cast<DIR*>( f_pvDir ), telldir( static_cast<DIR*>( a_oFSItemIterator.f_pvDir ) ) );

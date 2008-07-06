@@ -55,7 +55,7 @@ typedef struct
 	simple_callback_t* CALLBACK;
 	} OOption;
 
-void set_option( OOption const&, char const* const );
+void set_option( OOption const&, HString const& );
 
 }
 

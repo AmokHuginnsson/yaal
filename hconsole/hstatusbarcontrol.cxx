@@ -107,8 +107,8 @@ void HStatusBarControl::do_refresh ( void )
 		cons.c_getyx( l_iOrigRow, l_iOrigColumn );
 	if ( f_iPromptLength )
 		{
-		cons.set_attr ( f_iStatusBarAttribute >> 8 );
-		cons.c_mvprintf ( f_iRowRaw, 0, f_oPrompt );
+		cons.set_attr( f_iStatusBarAttribute >> 8 );
+		cons.c_mvprintf( f_iRowRaw, 0, f_oPrompt.raw() );
 		}
 	HEditControl::do_refresh();
 	if ( ! f_bFocused )
@@ -244,14 +244,14 @@ void HStatusBarControl::update_progress( double a_dStep,
 		if ( f_bEstimate )
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", l_iMaxBar );
-			f_oString.format ( f_oVarTmpBuffer, "-",
+			f_oString.format( f_oVarTmpBuffer.raw(), "-",
 					( a_dStep ? ( static_cast<char const *>( l_oLeft ) ) : "(?\?:?\?:?\?)" ),
 					static_cast<char const *>( l_oStoper ),	l_iNextPercent, "%%" );
 			}
 		else
 			{
 			f_oVarTmpBuffer.format ( "|%%-%ds|%%s[%%3d%%s]", l_iMaxBar );
-			f_oString.format ( f_oVarTmpBuffer, "-",
+			f_oString.format( f_oVarTmpBuffer.raw(), "-",
 					static_cast<char const*>( l_oStoper ), l_iNextPercent, "%%" );
 			}
 		f_oString.fill ( '-', l_iMaxBar, 1 );
@@ -263,7 +263,7 @@ void HStatusBarControl::update_progress( double a_dStep,
 			f_oString.erase( l_iLength - 6, 5 );
 			f_oString.insert( l_iLength - 6, 4, "done" );
 			}
-		cons.c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oString );
+		cons.c_mvprintf( f_iRowRaw, f_iColumnRaw, f_oString.raw() );
 		f_oString = "";
 		f_iLastProgress = l_iNextStep;
 		f_iLastPercent = l_iNextPercent;
@@ -316,7 +316,7 @@ void HStatusBarControl::message( char const* a_pcFormat, ... )
 	M_EPILOG
 	}
 
-void HStatusBarControl::bar ( char const * a_pcBar )
+void HStatusBarControl::bar( char const* a_pcBar )
 	{
 	M_PROLOG
 	HConsole& cons = HCons::get_instance();
@@ -325,10 +325,10 @@ void HStatusBarControl::bar ( char const * a_pcBar )
 		{
 		f_oVarTmpBuffer.format ( " %%-%ds ",
 				( cons.get_width() - f_iLabelLength ) - ( f_bSingleLine ? 2 : 1 ) );
-		f_oMessage.format ( f_oVarTmpBuffer, a_pcBar );
+		f_oMessage.format( f_oVarTmpBuffer.raw(), a_pcBar );
 		}
-	cons.c_mvprintf ( cons.get_height() - 2,
-			f_iLabelLength - ( f_bSingleLine ? 0 : 1 ), f_oMessage );
+	cons.c_mvprintf( cons.get_height() - 2,
+			f_iLabelLength - ( f_bSingleLine ? 0 : 1 ), f_oMessage.raw() );
 	return;
 	M_EPILOG
 	}

@@ -152,13 +152,12 @@ int HTUIProcess::process_stdin( int a_iCode )
 		{
 		if ( !! (*f_oForegroundWindow) )
 			f_oCommand = (*f_oForegroundWindow)->get_command();
-		if ( f_oCommand && static_cast<char const* const>( f_oCommand )[ 0 ] )
+		if ( ! f_oCommand.is_empty() )
 			l_oCommand = process_command();
-		if ( l_oCommand && static_cast<char const* const>( l_oCommand )[ 0 ]
+		if ( ! l_oCommand.is_empty()
 				&& !! (*f_oForegroundWindow) )
 			(*f_oForegroundWindow)->status_bar()->message( COLORS::D_FG_RED,
-					"unknown command: `%s'",
-					static_cast<char const* const>( l_oCommand ) );
+					"unknown command: `%s'", l_oCommand.raw() );
 		}
 	if ( n_bNeedRepaint )
 		refresh();
@@ -216,7 +215,7 @@ int HTUIProcess::handler_idle( int a_iCode, void const* )
 	HConsole& cons = HCons::get_instance();
 	HString l_oClock( static_cast<char const *>( HTime() ) );
 	cons.c_cmvprintf( 0, cons.get_width() - l_oClock.get_length(),
-			COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, l_oClock );
+			COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, l_oClock.raw() );
 	n_bNeedRepaint = true;
 #endif /* __DEBUG__ */
 	if ( !! (*f_oForegroundWindow) )

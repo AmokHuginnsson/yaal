@@ -136,7 +136,7 @@ void HTreeControl::do_refresh( void )
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	f_oVarTmpBuffer.fillz( '_', f_iWidthRaw );
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		cons.c_mvprintf( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer );
+		cons.c_mvprintf( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer.raw() );
 	if ( f_oTree.get_root() )
 		draw_node( f_oTree.get_root(), f_iRowRaw );
 	return;
@@ -165,7 +165,7 @@ int HTreeControl::draw_node( tree_t::node_t a_poNode, int a_iRow )
 		if ( a_poNode == f_poSelected )
 			cons.set_attr( f_bEnabled ? ( f_bFocused ? ~f_uiAttributeFocused
 						: ~ f_uiAttributeEnabled ) : ~ f_uiAttributeDisabled );
-		cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw + 1, str );
+		cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw + 1, str.raw() );
 		}
 	if ( a_poNode->has_childs() && ( (**a_poNode).f_bUnfolded || ! a_poNode->get_level() ) )
 		{

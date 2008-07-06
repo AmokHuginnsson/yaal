@@ -153,9 +153,9 @@ HString kwota_slownie( double a_dKwota )
 		if ( ( l_iCtr % 3 ) == 0 )
 			{
 			l_iSub = ( ( l_iLength - l_iCtr ) > 1 ? 2 : 1 );
-			l_iForma = atoi ( l_oString.mid ( ( l_iLength - l_iCtr ) - l_iSub, l_iSub ) );
+			l_iForma = lexical_cast<int>( l_oString.mid ( ( l_iLength - l_iCtr ) - l_iSub, l_iSub ) );
 			if ( ( l_iCtr > 5 ) && ( ( l_iLength - l_iCtr ) > 2 ) &&
-					! strncmp ( static_cast < char const * const > ( l_oString ) + ( l_iLength - l_iCtr ) - 3, "000", 3 ) )
+					! ::strncmp( l_oString.raw() + ( l_iLength - l_iCtr ) - 3, "000", 3 ) )
 				continue;
 			}
 		if ( l_iCtr == 2 )
@@ -211,35 +211,35 @@ void usun_ogonki ( char * a_pcString )
 	M_EPILOG
 	}
 
-double atof_ex ( char const * a_pcString, bool a_bParse )
+double atof_ex( HString const& a_oString, bool a_bParse )
 	{
 	M_PROLOG
 	static HAnalyser l_oAnalyser;
-	HString l_oStr = a_pcString;
+	HString l_oStr = a_oString;
 	l_oStr.replace ( ",", "." );
 	l_oStr.replace ( " ", "" );
 	l_oStr.replace ( "\t", "" );
-	if ( a_bParse && l_oAnalyser.analyse ( l_oStr ) )
+	if ( a_bParse && l_oAnalyser.analyse( l_oStr ) )
 		return ( l_oAnalyser.count() );
-	return ( strtod ( l_oStr, NULL ) );
+	return ( lexical_cast<double>( l_oStr ) );
 	M_EPILOG
 	}
 
-int modulo_ASCII ( char const * const a_pcASCIINumber, int a_iModulo )
+int modulo_ASCII( HString const& a_oASCIINumber, int a_iModulo )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iNumber = 0, l_iStep = 0, l_iTmpLength = 0;
-	int l_iLength = strlen ( a_pcASCIINumber );
-	HString l_oTmpString, l_oTmpNumber = a_pcASCIINumber;
+	int l_iLength = a_oASCIINumber.get_length();
+	HString l_oTmpString, l_oTmpNumber = a_oASCIINumber;
 	if ( l_iLength < 0 )
 		M_THROW ( "bad ASCII number length", l_iLength );
 	if ( ! a_iModulo )
 		M_THROW ( "zero denominatior", a_iModulo );
 	while ( l_oTmpNumber.get_length() > D_STEP_LENGTH )
 		{
-		l_oTmpString = l_oTmpNumber.mid ( l_iStep * D_STEP_LENGTH, D_STEP_LENGTH );
+		l_oTmpString = l_oTmpNumber.mid( l_iStep * D_STEP_LENGTH, D_STEP_LENGTH );
 		l_iTmpLength = l_oTmpString.get_length();
-		l_iNumber = strtol ( l_oTmpString, NULL, 10 );
+		l_iNumber = lexical_cast<int>( l_oTmpString );
 		l_iNumber %= a_iModulo;
 		l_oTmpString.format ( "%d", l_iNumber );
 		l_oTmpNumber.shift_left ( l_iTmpLength - l_oTmpString.get_length() );
@@ -248,14 +248,14 @@ int modulo_ASCII ( char const * const a_pcASCIINumber, int a_iModulo )
 			l_oTmpNumber.set_at( l_iCtr, l_oTmpString[ l_iCtr ] );
 /*		M_LOG ( l_oTmpNumber ); */
 		}
-	return ( ::strtol( l_oTmpNumber, NULL, 10 ) % a_iModulo );
+	return ( lexical_cast<int>( l_oTmpNumber ) % a_iModulo );
 	M_EPILOG
 	}
 
-bool verify_IBAN ( char const * a_pcIBAN )
+bool verify_IBAN( HString const& a_oIBAN )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iLength = strlen ( a_pcIBAN );
+	int l_iCtr = 0, l_iLength = a_oIBAN.get_length();
 	char l_pcPattern [ 2 ] = "\0";
 	HString l_oIBAN, l_oTmpString;
 	if ( l_iLength < D_MIN_IBAN_LENGTH )
@@ -265,8 +265,8 @@ bool verify_IBAN ( char const * a_pcIBAN )
 		}
 	l_oIBAN.hs_realloc ( l_iLength );
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
-		if ( isalnum ( a_pcIBAN [ l_iCtr ] ) )
-			l_oIBAN += a_pcIBAN [ l_iCtr ];
+		if ( isalnum ( a_oIBAN[ l_iCtr ] ) )
+			l_oIBAN += a_oIBAN[ l_iCtr ];
 	l_iLength = l_oIBAN.get_length();
 	if ( l_iLength < D_MIN_IBAN_LENGTH )
 		{
@@ -294,7 +294,7 @@ bool verify_IBAN ( char const * a_pcIBAN )
 			}
 		}
 /*	M_LOG ( l_oIBAN ); */
-	l_iCtr = modulo_ASCII ( l_oIBAN, 97 );
+	l_iCtr = modulo_ASCII( l_oIBAN, 97 );
 	if ( l_iCtr == 1 )
 		return ( false );
 	n_oLastErrorMessage.format ( "IBAN: bad checksum: %d", l_iCtr );
@@ -302,10 +302,10 @@ bool verify_IBAN ( char const * a_pcIBAN )
 	M_EPILOG
 	}
 
-char const* get_last_error ( void )
+char const* get_last_error( void )
 	{
-	if ( n_oLastErrorMessage )
-		return ( n_oLastErrorMessage );
+	if ( ! n_oLastErrorMessage.is_empty() )
+		return ( n_oLastErrorMessage.raw() );
 	return ( "" );
 	}
 

@@ -168,7 +168,7 @@ void dbwrapper_error( void )
 	HString l_oMessage;
 	l_oMessage = dlerror();
 	log( LOG_TYPE::D_ERROR ) << l_oMessage << endl;
-	::fprintf( stderr, "(%s), ", static_cast<char const* const>( l_oMessage ) );
+	::fprintf( stderr, "(%s), ", l_oMessage.raw() );
 	return;
 	M_EPILOG
 	}

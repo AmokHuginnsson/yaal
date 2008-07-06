@@ -49,9 +49,13 @@ public:
 	HBitmap& operator |= ( HBitmap const& );
 	HBitmap& operator &= ( HBitmap const& );
 	HBitmap& operator ^= ( HBitmap const& );
+	HBitmap& operator <<= ( int long const& );
+	HBitmap& operator >>= ( int long const& );
 	HBitmap operator | ( HBitmap const& ) const;
 	HBitmap operator & ( HBitmap const& ) const;
 	HBitmap operator ^ ( HBitmap const& ) const;
+	HBitmap operator << ( int long const& );
+	HBitmap operator >> ( int long const& );
 	void clear( void );
 	int long get_size( void ) const;
 	int long size( void ) const;
@@ -62,6 +66,8 @@ public:
 	void set( int long const&, bool const& );
 	void rotate_left( int long const&, int long const&, int long const& );
 	void rotate_right( int long const&, int long const&, int long const& );
+private:
+	int long octets_for_bits( int long const& ) const;
 	};
 
 }

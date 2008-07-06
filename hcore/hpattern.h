@@ -51,17 +51,17 @@ class HPattern
 public:
 	HPattern( bool = false /* default ignore case state */ );
 	virtual ~HPattern( void );
-	int parse( char const* const /* pattern input */,
+	int parse( HString const& /* pattern input */,
 							 int short unsigned* const = NULL /*additional flags to parse*/,
 							 int const = 0 /* number of additional flags */ );
 	int parse_re( char const* const );
-	char const* error( void ) const;
-	char const* matches( char const* const,
+	HString const& error( void ) const;
+	char const* matches( HString const&,
 			int* const = NULL /* match length */,
 			int* const = NULL /* error code */ );
 	int count( char const* const );
 private:
-	void prepare_error_message( int const, char const* const );
+	void prepare_error_message( int const, HString const& );
 	bool set_switch( char const, int short unsigned* const, int const );
 	};
 

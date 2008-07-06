@@ -113,11 +113,11 @@ void * db_connect ( char const * /* In Oracle user name is name of schema. */,
 		}
 	if ( ( l_psOracle->f_iStatus = OCILogon ( l_psOracle->f_psEnvironment,
 				l_psOracle->f_psError, & l_psOracle->f_psServiceContext,
-				reinterpret_cast < OraText const * > ( a_pcLogin ),
+				reinterpret_cast<OraText const*>( a_pcLogin ),
 				strlen ( a_pcLogin ),
-				reinterpret_cast < OraText const * > ( a_pcPassword ),
+				reinterpret_cast<OraText const*>( a_pcPassword ),
 				strlen ( a_pcPassword ),
-				reinterpret_cast < OraText const * > ( static_cast < char const * > ( g_oInstanceName ) ),
+				reinterpret_cast<OraText const*>( g_oInstanceName.raw() ),
 				g_oInstanceName.get_length() ) ) != OCI_SUCCESS )
 		{
 		g_psBrokenDB = l_psOracle;
@@ -368,7 +368,7 @@ int long dbrs_id( void*, void* a_pvDataR )
 		l_pcName [ l_iNameLength ] = 0;
 		l_oSQL.format ( "SELECT %s_sequence.currval FROM dual;",
 				reinterpret_cast < char * > ( l_pcName ) );
-		l_psAutonumber = static_cast < OQuery * > ( db_query ( l_psAutonumber, l_oSQL ) );
+		l_psAutonumber = static_cast<OQuery*>( db_query( l_psAutonumber, l_oSQL.raw() ) );
 		l_lId = strtol ( rs_get ( l_psAutonumber, 0, 0 ), NULL, 10 );
 		db_unquery( l_psAutonumber );
 		}

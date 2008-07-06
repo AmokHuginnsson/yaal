@@ -40,7 +40,10 @@ namespace yaal
 template<>
 int long lexical_cast( HString const& val )
 	{
-	return ( ::strtol( val, NULL, 10 ) );
+	int l_iBase = 10;
+	if ( ( val.get_length() > 2 ) && ( val[ 1 ] == 'x' ) )
+		l_iBase = 16;
+	return ( ::strtol( val.raw(), NULL, l_iBase ) );
 	}
 
 template<>
@@ -49,9 +52,33 @@ int lexical_cast( HString const& val )
 	return ( static_cast<int>( lexical_cast<int long>( val ) ) );
 	}
 
+template<>
+int lexical_cast( char const* const& val )
+	{
+	return ( static_cast<int>( lexical_cast<int long, HString>( val ) ) );
+	}
+
+template<>
+int lexical_cast( char* const& val )
+	{
+	return ( static_cast<int>( lexical_cast<int long, HString>( val ) ) );
+	}
+
+template<>
+double long lexical_cast( HString const& val )
+	{
+	return ( ::strtold( val.raw(), NULL ) );
+	}
+
+template<>
+double lexical_cast( HString const& val )
+	{
+	return ( static_cast<double>( lexical_cast<double long>( val ) ) );
+	}
+
 char const* error_message( int a_iCode )
 	{
-	return ( strerror( a_iCode ) );
+	return ( ::strerror( a_iCode ) );
 	}
 
 }

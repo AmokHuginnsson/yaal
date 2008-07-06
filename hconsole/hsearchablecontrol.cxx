@@ -62,7 +62,7 @@ void HSearchableControl::search( HString const& a_oPattern, bool a_bBackwards )
 	f_bSearchActived = ! f_oPattern.parse( a_oPattern, &l_uhFlag,
 			sizeof ( l_uhFlag ) / sizeof ( int short unsigned ) );
 	if ( ! f_bSearchActived )
-		f_poParent->status_bar()->message ( f_oPattern.error() );
+		f_poParent->status_bar()->message ( f_oPattern.error().raw() );
 	else
 		{
 		f_bFiltered = ( l_uhFlag & 0xff00 ) ? true : false;

@@ -92,15 +92,15 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 		if ( ! ( strcasecmp ( a_roValue, "none" )
 					&& strcasecmp ( a_roValue, "null" ) ) )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_NONE;
-		else if ( ! strcmp ( a_roValue, "SQLite3" ) )
+		else if ( a_roValue == "SQLite3" )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_SQLITE3;
-		else if ( ! strcmp ( a_roValue, "SQLite" ) )
+		else if ( a_roValue == "SQLite" )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_SQLITE;
-		else if ( ! strcmp ( a_roValue, "MySQL" ) )
+		else if ( a_roValue == "MySQL" )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_MYSQL;
-		else if ( ! strcmp ( a_roValue, "PostgreSQL" ) )
+		else if ( a_roValue == "PostgreSQL" )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_POSTGRESQL;
-		else if ( ! strcmp ( a_roValue, "Oracle" ) )
+		else if ( a_roValue == "Oracle" )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_ORACLE;
 		else
 			{

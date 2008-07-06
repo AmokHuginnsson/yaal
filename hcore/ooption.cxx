@@ -42,30 +42,30 @@ namespace yaal
 namespace hcore
 {
 
-void set_option( OOption const& a_sOption, char const* const a_pcValue )
+void set_option( OOption const& a_sOption, HString const& a_oValue )
 	{
 	M_PROLOG
 	switch ( a_sOption.f_eValueType )
 		{
 		case ( D_BOOL ):
-			rc_set_variable( ( a_pcValue && a_pcValue[ 0 ] ) ? a_pcValue : "true",
+			rc_set_variable( ! a_oValue.is_empty() ? a_oValue.raw() : "true",
 					*static_cast<bool *>( a_sOption.f_pvValue ) );
 		break;
 		case ( D_CHAR ):
-			if ( a_pcValue )
-				rc_set_variable( a_pcValue,
+			if ( ! a_oValue.is_empty() )
+				rc_set_variable( a_oValue.raw(),
 						*static_cast<char *>( a_sOption.f_pvValue ) );
 		break;
 		case ( D_INT ):
-			rc_set_variable( a_pcValue,
+			rc_set_variable( a_oValue.raw(),
 					*static_cast<int *>( a_sOption.f_pvValue ) );
 		break;
 		case ( D_CHAR_PTR ):
-			rc_set_variable( a_pcValue,
+			rc_set_variable( a_oValue.raw(),
 					static_cast<char **>( a_sOption.f_pvValue ) );
 		break;
 		case ( D_HSTRING ):
-			( *static_cast<HString*>( a_sOption.f_pvValue ) ) = a_pcValue;
+			( *static_cast<HString*>( a_sOption.f_pvValue ) ) = a_oValue;
 		break;
 		case ( D_VOID ):
 			break;

@@ -279,14 +279,12 @@ int HBaseSignalHandlers::signal_QUIT ( int a_iSignum )
 	M_PROLOG
 	if ( tools::n_bIgnoreSignalSIGQUIT )
 		return ( 0 );
-	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
 	l_oMessage = "Abnormal program quit forced: ";
-	l_oMessage += strsignal ( a_iSignum );
+	l_oMessage += ::strsignal( a_iSignum );
 	l_oMessage += '.';
-	l_pcSignalMessage = l_oMessage;
 	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
-	fprintf ( stderr, "\n%s\n", l_pcSignalMessage );
+	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	abort();
 	M_EPILOG
 	}

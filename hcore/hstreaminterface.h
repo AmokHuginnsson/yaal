@@ -64,6 +64,7 @@ protected:
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
+	HStreamInterface& operator << ( HString const& );
 	HStreamInterface& operator << ( char const* const );
 	HStreamInterface& operator << ( char const );
 	HStreamInterface& operator << ( int const );

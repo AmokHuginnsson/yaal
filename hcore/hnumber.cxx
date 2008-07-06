@@ -283,7 +283,7 @@ HString HNumber::to_string( void ) const
 double long HNumber::to_double( void ) const
 	{
 	M_PROLOG
-	return ( strtold( to_string(), NULL ) );
+	return ( lexical_cast<double>( to_string() ) );
 	M_EPILOG
 	}
 

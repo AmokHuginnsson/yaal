@@ -68,19 +68,37 @@ HException::HException( char const* const a_pcFileName,
 	return;
 	}
 
-HException::HException ( HException const & a_roException )
-	: f_bLocal ( false ), f_cChar ( a_roException.f_cChar ),
-	f_iInt ( a_roException.f_iInt ), f_lLong ( a_roException.f_lLong ),
-	f_dDouble ( a_roException.f_dDouble ), f_pcCharPtr ( NULL ),
-	f_pvVoidPtr ( a_roException.f_pvVoidPtr ),
-	f_iFrame ( a_roException.f_iFrame ), f_pcFileName ( NULL ),
-	f_pcFunctionName ( NULL ), f_iCode ( a_roException.f_iCode ),
-	f_pcMessage ( NULL )
+HException::HException( char const* const a_pcFileName,
+												 char const* const a_pcFunctionName,
+												 int const a_iLine, HString const& a_oMessage,
+												 int const a_iCode )
+	: f_bLocal( false ), f_cChar( 0 ), f_iInt( 0 ), f_lLong( 0 ),
+	f_dDouble( 0 ), f_pcCharPtr( NULL ), f_pvVoidPtr( NULL ), f_iFrame( 0 ),
+	f_pcFileName( NULL ), f_pcFunctionName( NULL ),
+	f_iCode( a_iCode ), f_pcMessage( NULL )
 	{
-	f_pcCharPtr = xstrdup ( a_roException.f_pcCharPtr );
-	f_pcMessage = xstrdup ( a_roException.f_pcMessage );
-	f_pcFileName = xstrdup ( a_roException.f_pcFileName );
-	f_pcFunctionName = xstrdup ( a_roException.f_pcFunctionName );
+	f_pcMessage = xstrdup( a_oMessage.raw() );
+	f_pcFileName = xstrdup( a_pcFileName );
+	f_pcFunctionName = xstrdup( a_pcFunctionName );
+	hcore::log << "Exception: " << f_pcMessage << ", code: " << f_iCode;
+	hcore::log << '.' << endl;
+	log( a_pcFileName, a_pcFunctionName, a_iLine );
+	return;
+	}
+
+HException::HException( HException const& a_roException )
+	: f_bLocal( false ), f_cChar( a_roException.f_cChar ),
+	f_iInt( a_roException.f_iInt ), f_lLong( a_roException.f_lLong ),
+	f_dDouble( a_roException.f_dDouble ), f_pcCharPtr( NULL ),
+	f_pvVoidPtr( a_roException.f_pvVoidPtr ),
+	f_iFrame( a_roException.f_iFrame ), f_pcFileName( NULL ),
+	f_pcFunctionName( NULL ), f_iCode( a_roException.f_iCode ),
+	f_pcMessage( NULL )
+	{
+	f_pcCharPtr = xstrdup( a_roException.f_pcCharPtr );
+	f_pcMessage = xstrdup( a_roException.f_pcMessage );
+	f_pcFileName = xstrdup( a_roException.f_pcFileName );
+	f_pcFunctionName = xstrdup( a_roException.f_pcFunctionName );
 	a_roException.f_bLocal = true;
 	return;
 	}
@@ -132,6 +150,15 @@ void HException::set( char const* const a_pcStr )
 		xfree( f_pcCharPtr );
 	if ( a_pcStr )
 		f_pcCharPtr = xstrdup( a_pcStr );
+	return;
+	}
+
+void HException::set( HString const& a_oStr )
+	{
+	if ( f_pcCharPtr )
+		xfree( f_pcCharPtr );
+	if ( ! a_oStr.is_empty() )
+		f_pcCharPtr = xstrdup( a_oStr.raw() );
 	return;
 	}
 

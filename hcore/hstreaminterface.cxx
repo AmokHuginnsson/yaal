@@ -49,6 +49,15 @@ HStreamInterface::~HStreamInterface( void )
 	return;
 	}
 
+HStreamInterface& HStreamInterface::operator << ( HString const& a_oString )
+	{
+	M_PROLOG
+	if ( ! a_oString.is_empty() )
+		do_write( a_oString.raw(), a_oString.get_length() );
+	return ( *this );
+	M_EPILOG
+	}
+
 HStreamInterface& HStreamInterface::operator << ( char const* const a_pcString )
 	{
 	M_PROLOG
@@ -62,7 +71,7 @@ HStreamInterface& HStreamInterface::operator << ( char const a_cChar )
 	{
 	M_PROLOG
 	HString str( a_cChar );
-	do_write( str, sizeof ( char const ) );
+	do_write( str.raw(), sizeof ( char const ) );
 	return ( *this );
 	M_EPILOG
 	}
@@ -87,7 +96,7 @@ HStreamInterface& HStreamInterface::operator << ( int long const a_lLongInteger 
 	{
 	M_PROLOG
 	HString str( a_lLongInteger );
-	do_write( str, str.get_length() );
+	do_write( str.raw(), str.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -96,7 +105,7 @@ HStreamInterface& HStreamInterface::operator << ( int long unsigned const a_ulUn
 	{
 	M_PROLOG
 	HString str( a_ulUnsignedLongInteger );
-	do_write( str, str.get_length() );
+	do_write( str.raw(), str.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -105,7 +114,7 @@ HStreamInterface& HStreamInterface::operator << ( double const a_dDouble )
 	{
 	M_PROLOG
 	HString str( a_dDouble );
-	do_write( str, str.get_length() );
+	do_write( str.raw(), str.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -114,7 +123,7 @@ HStreamInterface& HStreamInterface::operator << ( void const* const a_pvPtr )
 	{
 	M_PROLOG
 	HString str( a_pvPtr );
-	do_write( str, str.get_length() );
+	do_write( str.raw(), str.get_length() );
 	return ( *this );
 	M_EPILOG
 	}

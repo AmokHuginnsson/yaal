@@ -74,8 +74,8 @@ int HWindow::init( void )
 	M_PROLOG
 	HString l_oString;
 	n_bNeedRepaint = true;
-	l_oString.format( " [%s]& \n", static_cast< char const* const>( f_oTitle ) );
-	new HStatusBarControl( this, l_oString );
+	l_oString.format( " [%s]& \n", f_oTitle.raw() );
+	new HStatusBarControl( this, l_oString.raw() );
 	/*
 	 * After line above window has 1 (one) control which is HStatusBarControl.
 	 * This only control has a focus.
@@ -96,7 +96,7 @@ int HWindow::process_input( int a_iCode )
 		a_iCode = (*f_oFocusedChild)->process_input ( a_iCode );
 	if ( a_iCode )
 		a_iCode = process_input_with_handlers ( a_iCode, f_oPostprocessHandlers );
-	if ( f_oCommand && static_cast < char const * const > ( f_oCommand ) [ 0 ] )
+	if ( ! f_oCommand.is_empty() )
 		process_command();
 	return ( a_iCode );
 	M_EPILOG

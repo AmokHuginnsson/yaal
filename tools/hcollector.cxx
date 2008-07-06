@@ -86,18 +86,18 @@ bool HCollector::test_char ( char const * a_pcBuffer, int a_iIndex ) const
 							);
 	}
 
-int HCollector::send_line ( char const * a_pcLine )
+int HCollector::send_line( char const* a_pcLine )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	int l_iCRC = 0;
 	int l_iError = -1;
-	int l_iLength = strlen ( a_pcLine );
+	int l_iLength = ::strlen( a_pcLine );
 	HString l_oLine, l_oLocalCopy;
 	if ( l_iLength < 1 )
 		return ( 0 );
 	l_oLocalCopy = a_pcLine;
-	if ( a_pcLine [ l_iLength - 1 ] == '\n' )
+	if ( a_pcLine[ l_iLength - 1 ] == '\n' )
 		{
 		l_iLength --;
 		l_oLocalCopy.set_at( l_iLength, 0 );
@@ -105,18 +105,18 @@ int HCollector::send_line ( char const * a_pcLine )
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
 		l_iCRC += l_oLocalCopy[ l_iCtr ];
 	l_oLine.format ( "%s%02x%02x%s\n", PROTOCOL::D_DTA,
-			l_iLength & 0x0ff, l_iCRC & 0x0ff, static_cast<char const* const>( l_oLocalCopy ) );
-	memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-	l_iLength += strlen ( PROTOCOL::D_DTA );
+			l_iLength & 0x0ff, l_iCRC & 0x0ff, l_oLocalCopy.raw() );
+	::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
+	l_iLength += ::strlen( PROTOCOL::D_DTA );
 	l_iLength += ( 2 /* for lenght */ + 2 /* for crc */ + 1 /* for newline */ );
-	while ( strncmp ( f_pcReadBuf, PROTOCOL::D_ACK, strlen ( PROTOCOL::D_ACK ) ) )
+	while ( ::strncmp( f_pcReadBuf, PROTOCOL::D_ACK, ::strlen( PROTOCOL::D_ACK ) ) )
 		{
 		flush ( TCOFLUSH );
-		l_iCtr = HRawFile::write ( l_oLine, l_iLength );
+		l_iCtr = HRawFile::write( l_oLine.raw(), l_iLength );
 		wait_for_eot();
-		memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-		HRawFile::read ( f_pcReadBuf, PROTOCOL::D_RECV_BUF_SIZE );
-		flush ( TCIFLUSH );
+		::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
+		HRawFile::read( f_pcReadBuf, PROTOCOL::D_RECV_BUF_SIZE );
+		flush( TCIFLUSH );
 		l_iError ++;
 		}
 	return ( l_iError + l_iLength - l_iCtr );
@@ -151,13 +151,13 @@ int HCollector::receive_line ( HString& a_oLine )
 			l_iCRC += a_oLine[ l_iCtr ];
 		l_iLength &= 0x0ff;
 		l_iCRC &= 0x0ff;
-		memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-		strncpy ( f_pcReadBuf, static_cast < char const * const > ( f_oLine ) + strlen ( PROTOCOL::D_DTA ), 2 );
+		::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
+		::strncpy( f_pcReadBuf, f_oLine.raw() + ::strlen( PROTOCOL::D_DTA ), 2 );
 		l_iPLength = strtol ( f_pcReadBuf, NULL, 0x10 );
-		memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-		strncpy ( f_pcReadBuf, static_cast < char const * const > ( f_oLine )
-				+ strlen ( PROTOCOL::D_DTA ) + 2 /* for Plength */, 2 );
-		l_iPCRC = strtol ( f_pcReadBuf, NULL, 0x10 );
+		::memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
+		::strncpy( f_pcReadBuf, f_oLine.raw()
+				+ ::strlen( PROTOCOL::D_DTA ) + 2 /* for Plength */, 2 );
+		l_iPCRC = ::strtol( f_pcReadBuf, NULL, 0x10 );
 		if ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
 			l_iError += ( l_iErrLenght - HRawFile::write ( PROTOCOL::D_ERR, l_iErrLenght ) );
 		l_iError ++;
@@ -235,9 +235,9 @@ int HCollector::read_collector ( void ( *process_line )( char const* const, int 
 		{
 		l_iError += receive_line( l_oLine );
 		/* '\n' is stripped from each line so we need to FIN treat special */
-		if ( ! ::strncmp( l_oLine, PROTOCOL::D_FIN, sizeof ( PROTOCOL::D_FIN ) ) )
+		if ( ! ::strncmp( l_oLine.raw(), PROTOCOL::D_FIN, sizeof ( PROTOCOL::D_FIN ) ) )
 			break;
-		process_line( l_oLine, f_iLines );
+		process_line( l_oLine.raw(), f_iLines );
 		}
 	return ( l_iError );
 	M_EPILOG

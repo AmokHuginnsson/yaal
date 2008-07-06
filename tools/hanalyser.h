@@ -74,13 +74,13 @@ public:
 	/*{*/
 	HAnalyser( void );
 	virtual ~HAnalyser( void );
-	double* analyse( char const* );
+	double* analyse( yaal::hcore::HString const& );
 	double& operator [] ( int );
 	double count( void );
 	char const* get_error( void ) const;
 	int get_error_token( void ) const;
 private:
-	bool translate( char const* );
+	bool translate( yaal::hcore::HString const& );
 	bool addition_production( tree_t::node_t );
 	bool multiplication_production( tree_t::node_t );
 	bool power_production( tree_t::node_t );

@@ -39,6 +39,7 @@ class HString
 	{
 private:
 	char*	f_pcBuffer;
+	int	long f_lAllocatedBytes;
 	int	long f_lSize;
 public:
 	typedef char const* iterator;
@@ -58,52 +59,34 @@ public:
 	HString( void const* const );
 	HString& operator = ( HString const& );
 	HString& operator += ( HString const& );
-	HString operator + ( HString const& ) const;
-	HString operator + ( char const* ) const;
-	HString operator + ( char const ) const;
-	HString operator + ( int const ) const;
-	HString operator + ( int long const ) const;
-	HString operator + ( size_t const ) const;
-	HString operator + ( double const ) const;
-	HString operator + ( double long const ) const;
-	HString operator + ( void const* const ) const;
-	char operator[] ( int const );
-	char operator[] ( int long const );
+	char operator[] ( int const ) const;
+	char operator[] ( int long const ) const;
 	char set_at( int long, char );
-	bool operator == ( HString const& ) const;
-	bool operator == ( char const* const ) const;
-	bool operator != ( HString const& ) const;
-	bool operator != ( char const* const ) const;
-	bool operator >= ( HString const& ) const;
-	bool operator >= ( char const* const ) const;
-	bool operator <= ( HString const& ) const;
-	bool operator <= ( char const* const ) const;
-	bool operator > ( HString const& ) const;
-	bool operator > ( char const* const ) const;
-	bool operator < ( HString const& ) const;
-	bool operator < ( char const* const ) const;
 	/* add_* functions in HList needs operator
 		 bool() operator char * works fine here */
-	operator char const* ( void ) const;
 	char const* raw( void ) const;
+//	operator char const* ( void ) const;
 	iterator begin( void ) const;
 	iterator end( void ) const;
 	bool is_empty( void ) const;
 	bool empty( void ) const;
 	void clear( void );
+	int long length( void ) const;
+	int long size( void ) const;
 	int long get_length( void ) const;
+	int long capacity( void ) const;
 	static void swap( HString&, HString& );
 	HString& format( char const* const, ... );
 	HString& vformat( char const* const, void* );
 	int long find( char const, int long = 0 ) const;
-	int long find( char const* const, int long = 0 ) const;
-	int long nfind( char const* const, int long, int long = 0 ) const;
+	int long find( HString const&, int long = 0 ) const;
+	int long nfind( HString const&, int long, int long = 0 ) const;
 	int long reverse_find( char const, int long = 0 ) const;
 	int long find_one_of( char const* const, int long = 0 ) const;
 	int long reverse_find_one_of( char const* const, int long = 0 ) const;
 	int long find_other_than( char const* const, int long = 0 ) const;
 	int long reverse_find_other_than( char const* const, int long = 0 ) const;
-	HString& replace( char const* const, char const* const );
+	HString& replace( HString const&, HString const& );
 	HString& upper( void );
 	HString& lower( void );
 	HString& reverse( void );
@@ -121,19 +104,14 @@ public:
 	HString& insert( int long, int long, char const* = NULL );
 	};
 
-HString operator + ( char const*, HString const& );
-HString operator + ( char const, HString const& );
-HString operator + ( int const, HString const& );
-HString operator + ( int long const, HString const& );
-HString operator + ( double const, HString const& );
-HString operator + ( double long const, HString const& );
-HString operator + ( void const* const, HString const& );
-bool operator == ( char const* const, HString const& );
-bool operator != ( char const* const, HString const& );
-bool operator >= ( char const* const, HString const& );
-bool operator <= ( char const* const, HString const& );
-bool operator > ( char const* const, HString const& );
-bool operator < ( char const* const, HString const& );
+HString operator + ( HString const&, HString const& );
+int strcasecmp( HString const&, HString const& );
+bool operator == ( HString const&, HString const& );
+bool operator != ( HString const&, HString const& );
+bool operator >= ( HString const&, HString const& );
+bool operator <= ( HString const&, HString const& );
+bool operator > ( HString const&, HString const& );
+bool operator < ( HString const&, HString const& );
 
 extern char const n_pcWhiteSpace[];
 

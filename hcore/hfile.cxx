@@ -38,7 +38,7 @@ namespace yaal
 namespace hcore
 {
 
-HFile::HFile ( mode_open_t const a_eMode, void* const a_pvHandle )
+HFile::HFile( mode_open_t const a_eMode, void* const a_pvHandle )
 	: HStreamInterface(), f_eMode( a_eMode ),
 	f_pvHandle( a_pvHandle ), f_oPath(), f_oError(),
 	f_bExternal( a_pvHandle ? true : false )
@@ -52,7 +52,7 @@ HFile::HFile ( mode_open_t const a_eMode, void* const a_pvHandle )
 	M_EPILOG
 	}
 
-HFile::~HFile ( void )
+HFile::~HFile( void )
 	{
 	M_PROLOG
 	if ( f_pvHandle && ! f_bExternal )
@@ -61,7 +61,7 @@ HFile::~HFile ( void )
 	M_EPILOG
 	}
 
-int HFile::open( char const* const a_pcPath )
+int HFile::open( HString const& a_oPath )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -80,12 +80,12 @@ int HFile::open( char const* const a_pcPath )
 		l_pcMode = "a+";
 	else
 		M_THROW ( "unexpected mode setting", f_eMode );
-	f_oPath = a_pcPath;
-	f_pvHandle = fopen ( a_pcPath, l_pcMode );
+	f_oPath = a_oPath;
+	f_pvHandle = fopen( a_oPath.raw(), l_pcMode );
 	if ( ! f_pvHandle )
 		{
 		l_iError = errno;
-		f_oError = strerror ( l_iError );
+		f_oError = ::strerror( l_iError );
 		return ( l_iError );
 		}
 	return ( 0 );

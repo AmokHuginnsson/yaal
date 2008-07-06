@@ -71,23 +71,23 @@ bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
 	M_PROLOG
 	int l_iCtr = 0;
 	HString l_oStr;
-	if ( ! strcasecmp ( a_roOption, "set_env" ) )
-		set_env ( a_roValue );
-	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
+	if ( ! strcasecmp( a_roOption, "set_env" ) )
+		set_env( a_roValue );
+	else if ( ! strcasecmp( a_roOption, "log_mask" ) )
 		{
 		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty() )
 			{
-			if ( ! strcasecmp ( l_oStr, "LOG_DEBUG" ) )
+			if ( ! strcasecmp( l_oStr, "LOG_DEBUG" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_DEBUG;
-			else if ( ! strcasecmp ( l_oStr, "LOG_INFO" ) )
+			else if ( ! strcasecmp( l_oStr, "LOG_INFO" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_INFO;
-			else if ( ! strcasecmp ( l_oStr, "LOG_NOTICE" ) )
+			else if ( ! strcasecmp( l_oStr, "LOG_NOTICE" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_NOTICE;
-			else if ( ! strcasecmp ( l_oStr, "LOG_WARNING" ) )
+			else if ( ! strcasecmp( l_oStr, "LOG_WARNING" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_WARNING;
-			else if ( ! strcasecmp ( l_oStr, "LOG_ERROR" ) )
+			else if ( ! strcasecmp( l_oStr, "LOG_ERROR" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_ERROR;
-			else if ( ! strcasecmp ( l_oStr, "LOG_CVSHEADER" ) )
+			else if ( ! strcasecmp( l_oStr, "LOG_CVSHEADER" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_CVSHEADER;
 			else
 				return ( true );
@@ -99,29 +99,28 @@ bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
 	M_EPILOG
 	}
 
-void set_env( char const* const a_pcVarValue )
+void set_env( HString line )
 	{
 	M_PROLOG
-	char * l_pcPtr = NULL;
-	if ( ( strlen ( a_pcVarValue ) < 3 )
-			|| ( ( ! ( l_pcPtr = const_cast < char * > ( strpbrk ( a_pcVarValue,
-								" \t" ) ) ) ) ) )
+	int eon = 0;
+	if ( ( line.length() < 3 )
+			|| ( ( eon = line.find_one_of( " \t" ) ) == -1 ) )
 		{
 		log ( LOG_TYPE::D_ERROR ) << "bad set_env argument: `";
-		log << a_pcVarValue << '\'' << endl;
+		log << line << '\'' << endl;
 		return;
 		}
-	* l_pcPtr ++ = 0;
-	while ( ( * l_pcPtr == ' ' ) || ( * l_pcPtr == '\t' ) )
-		l_pcPtr ++;
-	if ( ! ( * l_pcPtr ) )
+	int valPos = line.find_other_than( " \t", eon );
+	if ( valPos < 0 )
 		{
 		log ( LOG_TYPE::D_ERROR ) << "no value for environment variable in set_env: `";
-		log << a_pcVarValue << '\'' << endl;
+		log << line << '\'' << endl;
 		return;
 		}
 	int const D_TRUE = 1;
-	M_ENSURE ( setenv ( a_pcVarValue, l_pcPtr, D_TRUE ) == 0 );
+	HString val = line.mid( valPos );
+	line.set_at( eon, '\0' );
+	M_ENSURE( ::setenv( line.raw(), val.raw(), D_TRUE ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -153,19 +152,6 @@ bool to_bool( char const* const a_pcValue )
 	M_EPILOG
 	}
 
-int long to_int( char const* const a_pcValue )
-	{
-	int l_iBase = 10;
-	if ( ( ::strlen( a_pcValue ) > 2 ) && ( a_pcValue[ 1 ] == 'x' ) )
-		l_iBase = 16;
-	return ( ::strtol( a_pcValue, NULL, l_iBase ) );
-	}
-
-double long to_double( char const* const a_pcValue )
-	{
-	return ( ::strtold( a_pcValue, NULL ) );
-	}
-
 class HCoreInitDeinit
 	{
 public:
@@ -185,7 +171,7 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	errno = 0;
 	l_pcEnv = ::getenv( "YAAL_DEBUG" );
 	if ( l_pcEnv )
-		n_iDebugLevel = static_cast<int>( to_int( l_pcEnv ) );
+		n_iDebugLevel = lexical_cast<int>( l_pcEnv );
 	rc_file::process_rc_file( "yaal", "core",
 				n_psHCoreVariables, set_hcore_variables );
 	return;

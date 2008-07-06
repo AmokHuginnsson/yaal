@@ -665,17 +665,15 @@ void HConsole::bell( void ) const
 int HConsole::on_terminal_resize( int a_iSignum )
 	{
 	M_PROLOG
-	char const * l_pcSignalMessage = NULL;
 	HString l_oMessage;
 	l_oMessage = "Terminal size changed: ";
 	l_oMessage += strsignal ( a_iSignum );
 	l_oMessage += '.';
-	l_pcSignalMessage = l_oMessage;
 	log << l_oMessage << endl;
 	if ( is_enabled() )
 		*f_oEvent << 'r';
 	else
-		fprintf ( stderr, "\n%s", l_pcSignalMessage );
+		::fprintf( stderr, "\n%s", l_oMessage.raw() );
 	return ( 0 );
 	M_EPILOG
 	}

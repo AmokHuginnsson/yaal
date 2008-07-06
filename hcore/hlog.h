@@ -72,7 +72,7 @@ public:
 	/* already opened file */
 	void rehash( FILE* = stderr, char const* const = NULL );
 	/* log file name */
-	void rehash( char const* const, char const* const = NULL );
+	void rehash( HString const&, char const* const = NULL );
 	int operator()( char const* const, va_list );
 	int operator()( char const* const, ... ); /* log ( "data %d", x );
 																									 will look nice */

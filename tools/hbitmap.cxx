@@ -65,7 +65,7 @@ void HBitmap::clear( void )
 	}
 
 HBitmap::HBitmap( int long const& a_lSize )
-	: f_lAllocatedBytes( ( a_lSize >> 3 ) + ( ( a_lSize & 7 ) ? 1 : 0 ) ),
+	: f_lAllocatedBytes( octets_for_bits( a_lSize ) ),
 	f_lSize( a_lSize ), f_pvBlock( NULL )
 	{
 	M_PROLOG
@@ -90,16 +90,10 @@ HBitmap& HBitmap::operator = ( HBitmap const& b )
 	M_PROLOG
 	if ( &b != this )
 		{
-		clear();
-		f_lAllocatedBytes = b.f_lAllocatedBytes;
-		f_lSize = b.f_lSize;
-		f_pvBlock = f_lAllocatedBytes ? xcalloc<char>( f_lAllocatedBytes ) : b.f_pvBlock;
-		M_ENSURE( ! f_lSize || f_pvBlock );
-		if ( f_pvBlock )
-			{
-			int long unsigned copyBytes = ( ( f_lSize >> 3 ) + ( ( f_lSize & 7 ) ? 1 : 0 ) );
-			::memcpy( f_pvBlock, b.f_pvBlock, copyBytes );
-			}
+		if ( b.f_lAllocatedBytes )
+			copy( b.f_pvBlock, b.f_lSize );
+		else
+			use( b.f_pvBlock, b.f_lSize );
 		}
 	return ( *this );
 	M_EPILOG
@@ -113,6 +107,65 @@ void HBitmap::use( void* a_pvBlock, int long const& a_lSize )
 	f_lSize = a_lSize;
 	f_pvBlock = a_pvBlock;
 	return;
+	M_EPILOG
+	}
+
+void HBitmap::copy( void const* a_pvBlock, int long const& a_lSize )
+	{
+	M_PROLOG
+	M_ASSERT( a_lSize > 0 );
+	clear();
+	int long unsigned copyBytes = octets_for_bits( a_lSize );
+	f_pvBlock = xcalloc<char>( copyBytes );
+	M_ENSURE( f_pvBlock );
+	f_lSize = a_lSize;
+	f_lAllocatedBytes = copyBytes;
+	::memcpy( f_pvBlock, a_pvBlock, copyBytes );
+	return;
+	M_EPILOG
+	}
+
+int long HBitmap::octets_for_bits( int long const& bits ) const
+	{
+	return ( ( ( bits >> 3 ) + ( ( bits & 7 ) ? 1 : 0 ) ) );
+	}
+
+bool HBitmap::operator == ( HBitmap const& b ) const
+	{
+	M_PROLOG
+	M_ASSERT( f_lSize == b.f_lSize );
+	return ( ( f_pvBlock == b.f_pvBlock ) || ! ::memcmp( f_pvBlock, b.f_pvBlock, octets_for_bits( f_lSize ) ) );
+	M_EPILOG
+	}
+
+bool HBitmap::operator != ( HBitmap const& b ) const
+	{
+	M_PROLOG
+	return ( ! operator == ( b ) );
+	M_EPILOG
+	}
+
+HBitmap& HBitmap::operator |= ( HBitmap const& b )
+	{
+	M_PROLOG
+	M_ASSERT( f_lSize == b.f_lSize );
+	return ( *this );
+	M_EPILOG
+	}
+
+HBitmap& HBitmap::operator &= ( HBitmap const& b )
+	{
+	M_PROLOG
+	M_ASSERT( f_lSize == b.f_lSize );
+	return ( *this );
+	M_EPILOG
+	}
+
+HBitmap& HBitmap::operator ^= ( HBitmap const& b )
+	{
+	M_PROLOG
+	M_ASSERT( f_lSize == b.f_lSize );
+	return ( *this );
 	M_EPILOG
 	}
 

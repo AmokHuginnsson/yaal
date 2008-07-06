@@ -126,10 +126,10 @@ public:
 	HSQLDescriptor( void );
 	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );
 	virtual ~HSQLDescriptor( void );
-	void set_table( char const* const );
-	void set_columns( char const* const );
-	void set_filter( char const* const );
-	void set_sort( char const* const );
+	void set_table( yaal::hcore::HString const& );
+	void set_columns( yaal::hcore::HString const& );
+	void set_filter( yaal::hcore::HString const& );
+	void set_sort( yaal::hcore::HString const& );
 	yaal::hcore::HString get_table( void ) const;
 	yaal::hcore::HString get_columns( void ) const;
 	yaal::hcore::HString get_filter( void ) const;

@@ -105,8 +105,8 @@ HLog::~HLog( void )
 	M_EPILOG
 	}
 
-void HLog::rehash ( FILE * a_psStream,
-		char const * const a_pcProcessName )
+void HLog::rehash( FILE* a_psStream,
+		char const* const a_pcProcessName )
 	{
 	M_PROLOG
 #ifndef HAVE_GETLINE
@@ -156,20 +156,19 @@ void HLog::rehash ( FILE * a_psStream,
 	M_EPILOG
 	}
 
-void HLog::rehash ( char const * const a_pcLogFileName,
-		char const * const a_pcProcessName )
+void HLog::rehash( HString const& a_oLogFileName,
+		char const* const a_pcProcessName )
 	{
 	M_PROLOG
-	if ( ! a_pcLogFileName )
-		M_THROW ( "new file name argument is",
-				reinterpret_cast<int long>( a_pcLogFileName ) );
-	rehash ( fopen ( a_pcLogFileName, "a" ), a_pcProcessName );
+	if ( a_oLogFileName.is_empty() )
+		M_THROW ( "new file name argument is", a_oLogFileName.get_length() );
+	rehash( ::fopen( a_oLogFileName.raw(), "a" ), a_pcProcessName );
 	do_flush();
 	return;
 	M_EPILOG
 	}
 
-void HLog::timestamp ( FILE * a_psStream )
+void HLog::timestamp( FILE* a_psStream )
 	{
 	M_PROLOG
 	int long l_iSize = 0;

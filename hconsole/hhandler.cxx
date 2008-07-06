@@ -97,12 +97,12 @@ HString HHandler::process_command ( void )
 	M_PROLOG
 	HANDLER_t HANDLER = NULL;
 	HString l_oCommand;
-	if ( f_oCommand )
+	if ( ! f_oCommand.is_empty() )
 		{
 		l_oCommand = f_oCommand.split ( " \t", 0 );
 		if ( f_oCommandHandlers.get( l_oCommand, HANDLER ) )
 			{
-			static_cast < void > ( ( this->*HANDLER ) ( 0, static_cast<char const* const>( f_oCommand ) ) );
+			static_cast<void>( ( this->*HANDLER )( 0, f_oCommand.raw() ) );
 			f_oCommand = "";
 			}
 		}

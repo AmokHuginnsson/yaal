@@ -69,14 +69,14 @@ int HDataBase::connect( char const* a_pcDataBase, char const* a_pcLogin,
 	M_EPILOG
 	}
 
-HRecordSet::ptr_t HDataBase::query( char const* a_pcQuery )
+HRecordSet::ptr_t HDataBase::query( HString const& a_oQuery )
 	{
 	M_PROLOG
 	if ( ! f_pvCoreData )
 		M_THROW( "not connected to database", errno );
 	if ( HLog::f_lLogMask & LOG_TYPE::D_SQL )
-		log << "SQL: " << a_pcQuery << endl;
-	void* l_pvResult = dbwrapper::db_query( f_pvCoreData, a_pcQuery );
+		log << "SQL: " << a_oQuery << endl;
+	void* l_pvResult = dbwrapper::db_query( f_pvCoreData, a_oQuery.raw() );
 	if ( ! l_pvResult )
 		throw HSQLException( HString( "SQL error: " ) + dbwrapper::db_error ( f_pvCoreData ) );
 	HRecordSet::ptr_t rs( new HRecordSet( get_pointer(), l_pvResult ) );

@@ -200,9 +200,9 @@ void HListControl::draw_header( int a_iColumns )
 				f_oVarTmpBuffer.format( "%%-%ds",
 							l_poColumnInfo->f_iWidthRaw );
 				M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw + l_iColumnOffset,
-							f_oVarTmpBuffer, static_cast<char const * const>(
+							f_oVarTmpBuffer.raw(),
 								l_poColumnInfo->f_oName.left(
-									l_poColumnInfo->f_iWidthRaw ) ) ) != C_ERR );
+									l_poColumnInfo->f_iWidthRaw ).raw() ) != C_ERR );
 				set_attr_shortcut();
 				M_ENSURE( cons.c_mvprintf( f_iRowRaw,
 							f_iColumnRaw + l_iColumnOffset + l_poColumnInfo->f_iShortcutIndex,
@@ -239,7 +239,7 @@ void HListControl::draw_background( int a_iFrom )
 	f_oVarTmpBuffer.fillz ( '.', f_iWidthRaw );
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		M_ENSURE( HCons::get_instance().c_mvprintf( f_iRowRaw + l_iCtr, f_iColumnRaw,
-					f_oVarTmpBuffer ) != C_ERR );
+					f_oVarTmpBuffer.raw() ) != C_ERR );
 	return;
 	M_EPILOG
 	}
@@ -335,7 +335,7 @@ void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int 
 			set_attr_data();
 		}
 	M_ENSURE( cons.c_mvprintf( f_iRowRaw + a_iRow,
-				f_iColumnRaw + a_iColumnOffset, f_oVarTmpBuffer	) != C_ERR );
+				f_iColumnRaw + a_iColumnOffset, f_oVarTmpBuffer.raw()	) != C_ERR );
 	if ( f_bSearchActived )
 		highlight( f_iRowRaw + a_iRow,
 				f_iColumnRaw + a_iColumnOffset, f_sMatch.f_iMatchNumber,
@@ -589,7 +589,7 @@ int HListControl::do_process_input( int a_iCode )
 	if ( ! l_iErrorCode )
 		{
 		schedule_refresh();
-		f_poParent->status_bar()->message( COLORS::D_FG_LIGHTGRAY, f_oVarTmpBuffer );
+		f_poParent->status_bar()->message( COLORS::D_FG_LIGHTGRAY, f_oVarTmpBuffer.raw() );
 		}
 	return ( a_iCode );
 	M_EPILOG
@@ -759,9 +759,9 @@ void HListControl::go_to_match( void )
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
 			{
 			get_text_for_cell( f_oCursor, l_iCtr, D_HSTRING );
-			l_pcHighlightStart = static_cast<char const* const>( f_oVarTmpBuffer );
+			l_pcHighlightStart = f_oVarTmpBuffer.raw();
 			l_iCtrLoc = 0;
-			while ( ( l_pcHighlightStart = f_oPattern.matches ( l_pcHighlightStart ) ) )
+			while ( ( l_pcHighlightStart = f_oPattern.matches( l_pcHighlightStart ) ) )
 				{
 				if ( l_iCtrLoc > f_sMatch.f_iMatchNumber )
 					break;
@@ -841,7 +841,7 @@ void HListControl::go_to_match_previous ( void )
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
 			{
 			get_text_for_cell( f_oCursor, l_iCtr, D_HSTRING );
-			l_pcHighlightStart = static_cast<char const* const>( f_oVarTmpBuffer );
+			l_pcHighlightStart = f_oVarTmpBuffer.raw();
 			l_iCtrLoc = 0;
 			if ( f_sMatch.f_iMatchNumber < 0 )
 				f_sMatch.f_iMatchNumber = f_oPattern.count ( l_pcHighlightStart );

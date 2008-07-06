@@ -346,7 +346,7 @@ int long HSocket::write_until_eos( HString const& a_roMessage )
 	int long nSize = 0;
 	nSize = a_roMessage.get_length();
 	if ( nSize > 0 )
-		nSize = write( a_roMessage, nSize );
+		nSize = write( a_roMessage.raw(), nSize );
 	return ( nSize );
 	M_EPILOG
 	}

@@ -35,7 +35,7 @@ namespace yaal
 namespace hcore
 {
 
-int long unsigned const x_tag_g_pulPrimes [ 32 ] =
+int long unsigned const x_tag_g_pulPrimes[ 32 ] =
 	{
 	1,					3,					7,					13,					31,					61,					
 	127,				251,				509,				1021,				2039,				4093,
@@ -45,14 +45,14 @@ int long unsigned const x_tag_g_pulPrimes [ 32 ] =
 	2147483647,	0
 	}, * const g_pulPrimes = x_tag_g_pulPrimes;
 
-int long unsigned hash ( HString const & a_roString )
+int long unsigned hash( HString const& a_roString )
 	{
-	char const * const l_pcBuffer = a_roString;
+	char const* const l_pcBuffer = a_roString.raw();
 	int long l_iSize = a_roString.get_length();
 	int long unsigned l_ulHash = 0;
 	while ( l_iSize -- )
 		{
-		l_ulHash += static_cast < char unsigned > ( l_pcBuffer [ l_iSize ] );
+		l_ulHash += static_cast<char unsigned>( l_pcBuffer[ l_iSize ] );
 		l_ulHash <<= 3;
 		}
 	return ( l_ulHash );

@@ -92,7 +92,7 @@ int HDataEditControl::do_process_input ( int a_iCode )
 				l_bNoChange = true;
 		break;
 		case ( KEY_CODES::D_DELETE ):
-			if ( ! static_cast < char const * const > ( f_oString ) [ 0 ] )
+			if ( f_oString.is_empty() )
 				l_bNoChange = true;
 		break;
 		default:
@@ -101,7 +101,7 @@ int HDataEditControl::do_process_input ( int a_iCode )
 	a_iCode = HEditControl::do_process_input ( a_iCode );
 	if ( ! ( a_iCode || l_bNoChange ) )
 		{
-		l_poWindow = dynamic_cast < HDataWindow * > ( f_poParent );
+		l_poWindow = dynamic_cast<HDataWindow*>( f_poParent );
 		M_ASSERT ( l_poWindow );
 		l_poWindow->set_modified();
 		}

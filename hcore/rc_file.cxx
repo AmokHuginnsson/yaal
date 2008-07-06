@@ -65,7 +65,7 @@ struct RC_PATHER
 
 int read_rc_line( HString&, HString&, HFile&, int& );
 
-HString make_path ( char const * const a_pcRcName,
+HString make_path( HString const& a_oRcName,
 		RC_PATHER::placement_t a_ePlacement )
 	{
 	M_PROLOG
@@ -75,7 +75,7 @@ HString make_path ( char const * const a_pcRcName,
 		case ( RC_PATHER::D_ETC ):
 			{
 			l_oRcPath = "/etc/";
-			l_oRcPath += a_pcRcName;
+			l_oRcPath += a_oRcName;
 			l_oRcPath += "rc";
 			}
 		break;
@@ -93,7 +93,7 @@ HString make_path ( char const * const a_pcRcName,
 				l_oRcPath += "/etc/conf/";
 			else
 				l_oRcPath += "/.";
-			l_oRcPath += a_pcRcName;
+			l_oRcPath += a_oRcName;
 			l_oRcPath += "rc";
 			}
 		break;
@@ -104,16 +104,16 @@ HString make_path ( char const * const a_pcRcName,
 	M_EPILOG
 	}
 
-int rc_open( char const* const a_pcRcName,
+int rc_open( HString const& a_oRcName,
 		RC_PATHER::placement_t const a_ePlacament,
 		HFile& a_roFile )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	HString l_oRcPath = make_path ( a_pcRcName, a_ePlacament );
+	HString l_oRcPath = make_path( a_oRcName, a_ePlacament );
 	if ( !! a_roFile )
 		a_roFile.close();
-	l_iError = a_roFile.open ( l_oRcPath );
+	l_iError = a_roFile.open( l_oRcPath );
 	if ( l_iError )
 		l_oRcPath +=	" not found, ";
 	else
@@ -131,17 +131,17 @@ bool substitute_environment( HString& a_roString )
 	M_PROLOG
 	int l_iLength = 0;
 	char const* l_pcStart = NULL;
-	HString l_oName;
 	HPattern l_oPattern;
 	bool envVarRefFound = false;
-	if ( a_roString )
+	if ( ! a_roString.is_empty() )
 		{
 		M_ENSURE( l_oPattern.parse_re( "${[^{}]\\+}" ) == 0 );
 		if ( ( l_pcStart = l_oPattern.matches( a_roString, &l_iLength ) ) )
 			{
-			l_oName = a_roString.mid( l_pcStart - static_cast<char const* const>( a_roString ), l_iLength );
-			l_pcStart = ::getenv( l_oName.mid( 2, l_iLength - 3 ) );
-			a_roString.replace( l_oName, l_pcStart ? l_pcStart : "" );
+			HString l_oVar = a_roString.mid( l_pcStart - a_roString.raw(), l_iLength );
+			HString l_oName = l_oVar.mid( 2, l_iLength - 3 );
+			l_pcStart = ::getenv( l_oName.raw() );
+			a_roString.replace( l_oVar, l_pcStart ? l_pcStart : "" );
 			envVarRefFound = true;
 			}
 		}
@@ -162,11 +162,11 @@ struct ORCLoader
  	ORCLoader( void ) :
 		f_oPath(), f_oSection(), f_psVaraibles( NULL ),
 		f_iCount( 0 ), rc_callback( NULL ) { }
- 	ORCLoader( char const* const a_pcRcName,
-		char const* const a_pcSection,
+ 	ORCLoader( HString const& a_oRcName,
+		HString const& a_oSection,
 		OOption const* const a_psOptions, int const a_iCount,
 		RC_CALLBACK_t callback ) :
-		f_oPath( a_pcRcName ), f_oSection( a_pcSection ), f_psVaraibles( a_psOptions ),
+		f_oPath( a_oRcName ), f_oSection( a_oSection ), f_psVaraibles( a_psOptions ),
 		f_iCount( a_iCount ), rc_callback( callback ) { }
  	ORCLoader( ORCLoader const& loader ) :
 		f_oPath(), f_oSection(), f_psVaraibles( NULL ),
@@ -201,14 +201,14 @@ public:
 
 }
 
-int process_rc_file_internal( char const* const a_pcRcName,
-		char const* const a_pcSection,
+int process_rc_file_internal( HString const& a_oRcName,
+		HString const& a_oSection,
 		OOption const* const a_psOptions, int const a_iCount,
 		RC_CALLBACK_t rc_callback )
 	{
 	M_PROLOG
 	if ( ! n_bRCLoadersLocked )
-		n_oRCLoades.push_back( ORCLoader( a_pcRcName, a_pcSection, a_psOptions, a_iCount, rc_callback ) );
+		n_oRCLoades.push_back( ORCLoader( a_oRcName, a_oSection, a_psOptions, a_iCount, rc_callback ) );
 	struct OPlacement
 		{
 		RC_PATHER::placement_t f_ePlacement;
@@ -233,22 +233,21 @@ int process_rc_file_internal( char const* const a_pcRcName,
 			continue;
 		if ( l_eSuccessStory & RC_PATHER::D_LOCAL )
 			break;
-		if ( ! rc_open ( a_pcRcName, l_psPlacementTab [ l_iCtrOut ].f_ePlacement, l_oRc ) )
+		if ( ! rc_open( a_oRcName, l_psPlacementTab [ l_iCtrOut ].f_ePlacement, l_oRc ) )
 			{
 			l_eSuccessStory |= l_psPlacementTab [ l_iCtrOut ].f_ePlacementBit;
 			while ( read_rc_line ( l_oOption, l_oValue, l_oRc, l_iLine ) )
 				{
-				if ( a_pcSection )
+				if ( ! a_oSection.is_empty() )
 					{
 					if ( l_oValue.is_empty() )
 						{
-						l_oValue.format ( "[%s]", a_pcSection );
+						l_oValue.format( "[%s]", a_oSection.raw() );
 						if ( l_oOption == l_oValue )
 							{
 							if ( n_iDebugLevel )
-								::fprintf( stderr, "section: [%s]\n",
-										static_cast<char const * const>( l_oOption ) );
-							log << "section: " << a_pcSection << ", ";
+								::fprintf( stderr, "section: [%s]\n", l_oOption.raw() );
+							log << "section: " << a_oSection << ", ";
 							l_bSection = true;
 							continue;
 							}
@@ -262,13 +261,12 @@ int process_rc_file_internal( char const* const a_pcRcName,
 					;
 				if ( n_iDebugLevel )
 					::fprintf( stderr, "option: [%s], value [%s]\n",
-							static_cast<char const * const>( l_oOption ),
-							static_cast<char const * const>( l_oValue ) );
+							l_oOption.raw(), l_oValue.raw() );
 				l_iCtr = 0;
 				l_bOptionOK = false;
 				while ( ( l_iCtr < a_iCount ) && a_psOptions[ l_iCtr ].f_pcName )
 					{
-					if ( ! ::strcasecmp( l_oOption, a_psOptions[ l_iCtr ].f_pcName ) )
+					if ( ! strcasecmp( l_oOption, a_psOptions[ l_iCtr ].f_pcName ) )
 						l_bOptionOK = true, set_option( a_psOptions[ l_iCtr ], l_oValue );
 					l_iCtr ++;
 					}
@@ -278,10 +276,9 @@ int process_rc_file_internal( char const* const a_pcRcName,
 					log << "failed." << endl;
 					l_oMessage.format ( "Error: unknown option found: `%s', "
 								"with value: `%s', on line %d.\n",
-								static_cast<char const *>( l_oOption ),
-								static_cast<char const *>( l_oValue ), l_iLine );
+								l_oOption.raw(), l_oValue.raw(), l_iLine );
 					log ( LOG_TYPE::D_ERROR ) << l_oMessage;
-					fprintf ( stderr, l_oMessage );
+					::fprintf( stderr, l_oMessage.raw() );
 					}
 				}
 			}
@@ -419,7 +416,7 @@ void rc_set_variable( char const * const a_pcValue, char ** a_ppcVariable )
 
 void rc_set_variable( char const* const a_pcValue, int& a_riVariable )
 	{
-	a_riVariable = static_cast<int>( to_int( a_pcValue ) );
+	a_riVariable = lexical_cast<int>( a_pcValue );
 	}
 
 void rc_set_variable( char const* const a_pcValue, char & a_rcVariable )

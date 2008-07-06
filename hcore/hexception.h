@@ -38,6 +38,7 @@ Copyright:
 #	include "config.h"
 #endif /* __YAAL_BUILD__ */
 #include "hcore/base.h"
+#include "hcore/hstring.h"
 
 namespace yaal
 {
@@ -66,11 +67,14 @@ protected:
 public:
 	HException( char const* const, char const* const, int const,
 			char const* const, int const = 0 );
+	HException( char const* const, char const* const, int const,
+			HString const&, int const = 0 );
 	HException( HException const& );
 	virtual ~HException( void ) ;
 	void set( char const = 0, int const = 0, long const = 0, double const = 0,
 			char const* const = 0, void* const = 0 );
 	void set( char const* );
+	void set( HString const& );
 	void print_error( bool const ) const;
 	static void dump_call_stack( int const );
 	void log( char const* const, char const* const, int const );
@@ -91,12 +95,21 @@ template<typename tType>
 class HExceptionT : public HException
 	{
 public:
-	HExceptionT( char const* const a_pcReason, char* ptr = get_type_name( typeid( tType ).name() ) ) : HException( n_pcExceptionType, ptr, 0, a_pcReason, errno )
+	HExceptionT( char const* const a_pcReason, char* ptr = get_type_name( typeid( tType ).name() ) )
+		: HException( n_pcExceptionType, ptr, 0, a_pcReason, errno )
+		{ cleanup( ptr );	}
+	HExceptionT( HString const& a_oReason, char* ptr = get_type_name( typeid( tType ).name() ) )
+		: HException( n_pcExceptionType, ptr, 0, a_oReason, errno )
 		{ cleanup( ptr );	}
 	HExceptionT( char const* const a_pcFileName,
 			char const* const a_pcFunctionName, int const a_iLine,
 			char const* const a_pcReason, int const a_iCode )
 		: HException( a_pcFileName, a_pcFunctionName, a_iLine, a_pcReason, a_iCode )
+		{	}
+	HExceptionT( char const* const a_pcFileName,
+			char const* const a_pcFunctionName, int const a_iLine,
+			HString const& a_oReason, int const a_iCode )
+		: HException( a_pcFileName, a_pcFunctionName, a_iLine, a_oReason, a_iCode )
 		{	}
 	};
 

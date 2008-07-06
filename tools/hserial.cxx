@@ -88,7 +88,7 @@ bool HSerial::open( void )
 		M_THROW( n_pcEAlreadyOpened, errno );
 	compile();
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
-	f_iFileDescriptor = ::open( f_oDevicePath, O_RDWR | O_NOCTTY | O_NONBLOCK );
+	f_iFileDescriptor = ::open( f_oDevicePath.raw(), O_RDWR | O_NOCTTY | O_NONBLOCK );
 	if ( f_iFileDescriptor < 0 )
 		M_THROW( ::strerror( errno ), errno );
 	if ( ! isatty ( f_iFileDescriptor ) )

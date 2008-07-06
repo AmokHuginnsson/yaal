@@ -80,7 +80,7 @@ int long HStringStream::do_read( void* const a_pvBuffer, int long const& a_lSize
 	M_PROLOG
 	int long l_iLength = f_oBuffer.get_length();
 	l_iLength = ( l_iLength < a_lSize ? l_iLength : a_lSize );
-	strncpy( static_cast<char* const>( a_pvBuffer ), f_oBuffer, l_iLength );
+	::strncpy( static_cast<char* const>( a_pvBuffer ), f_oBuffer.raw(), l_iLength );
 	return ( l_iLength );
 	M_EPILOG
 	}

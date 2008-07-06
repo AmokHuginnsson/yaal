@@ -75,7 +75,7 @@ protected:
 	hcore::HTime		f_oStart;
 	/* end of progress bar data */
 public:
-	HStatusBarControl( HWindow*, char const*, int = -1 );
+	HStatusBarControl( HWindow*, char const* const, int = -1 );
 	virtual ~HStatusBarControl ( void );
 	void setup( char const*, char const*, int );
 	void set_prompt( char const * = NULL, PROMPT::mode_t = PROMPT::D_NORMAL,

@@ -60,14 +60,15 @@ HPattern::~HPattern( void )
 	M_EPILOG
 	}
 
-int HPattern::parse( char const* const a_pcPattern,
+int HPattern::parse( HString const& a_oPattern,
 		int short unsigned* const a_puhFlags, int const a_iFlagsCount )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	bool l_bLocalCopyIgnoreCase = false, l_bLocalCopyExtended = false;
 	HArray<int short unsigned> l_oLocalCopyFlags( a_iFlagsCount );
-	char const* const l_pcPattern = f_oPatternInput = a_pcPattern;
+	char const* const l_pcPattern = a_oPattern.raw();
+	f_oPatternInput = a_oPattern;
 	f_oError = "";
 /* making copy of flags */
 	l_bLocalCopyIgnoreCase = f_bIgnoreCase;
@@ -138,7 +139,7 @@ int HPattern::parse( char const* const a_pcPattern,
 		}
 	f_bInitialized = ! l_iError;
 	if ( f_bInitialized && f_bExtended )
-		l_iError = parse_re( f_oPatternReal );
+		l_iError = parse_re( f_oPatternReal.raw() );
 	return ( l_iError );
 	M_EPILOG
 	}
@@ -147,8 +148,8 @@ int HPattern::parse_re( char const* const a_pcPattern )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	regfree ( f_oCompiled.get<regex_t>() );
-	if ( ( l_iError = regcomp( f_oCompiled.get<regex_t>(), a_pcPattern,
+	::regfree( f_oCompiled.get<regex_t>() );
+	if ( ( l_iError = ::regcomp( f_oCompiled.get<regex_t>(), a_pcPattern,
 					f_bIgnoreCase ? REG_ICASE : 0 ) ) )
 		{
 		prepare_error_message( l_iError, a_pcPattern );
@@ -164,7 +165,7 @@ int HPattern::parse_re( char const* const a_pcPattern )
 	M_EPILOG
 	}
 
-char const* HPattern::error( void ) const
+HString const& HPattern::error( void ) const
 	{
 	return ( f_oError );
 	}
@@ -198,7 +199,7 @@ bool HPattern::set_switch( char const a_cSwitch,
 	M_EPILOG
 	}
 
-char const* HPattern::matches( char const* const a_pcString,
+char const* HPattern::matches( HString const& a_oString,
 		int* const a_piMatchLength, int* const a_piError )
 	{
 	M_PROLOG
@@ -210,11 +211,11 @@ char const* HPattern::matches( char const* const a_pcString,
 		{
 		if ( f_bExtended )
 			{
-			if ( ! ( l_iError = ::regexec( f_oCompiled.get<regex_t>(), a_pcString, 1, & l_sMatch, 0 ) ) )
+			if ( ! ( l_iError = ::regexec( f_oCompiled.get<regex_t>(), a_oString.raw(), 1, &l_sMatch, 0 ) ) )
 				{
 				l_iMatchLength = l_sMatch.rm_eo - l_sMatch.rm_so;
 				if ( l_iMatchLength > 0 )
-					l_pcPtr = const_cast<char*>( a_pcString ) + l_sMatch.rm_so;
+					l_pcPtr = a_oString.raw() + l_sMatch.rm_so;
 				}
 			else
 				prepare_error_message( l_iError, f_oPatternReal );
@@ -222,9 +223,9 @@ char const* HPattern::matches( char const* const a_pcString,
 		else
 			{
 			if ( f_bIgnoreCase )
-				l_pcPtr = ::strcasestr( a_pcString, f_oPatternReal );
+				l_pcPtr = ::strcasestr( a_oString.raw(), f_oPatternReal.raw() );
 			else
-				l_pcPtr = ::strstr( a_pcString, f_oPatternReal );
+				l_pcPtr = ::strstr( a_oString.raw(), f_oPatternReal.raw() );
 			if ( l_pcPtr )
 				l_iMatchLength = f_iSimpleMatchLength;
 			}
@@ -249,7 +250,7 @@ int HPattern::count( char const* const a_pcString )
 	}
 
 void HPattern::prepare_error_message( int const a_iError,
-		char const* const a_pcString )
+		HString const& a_oString )
 	{
 	M_PROLOG
 	int long l_iSize = ::regerror( a_iError, f_oCompiled.get<regex_t>(), NULL, 0 ) + 1;
@@ -257,10 +258,10 @@ void HPattern::prepare_error_message( int const a_iError,
 	M_ENSURE( static_cast<int>( ::regerror( a_iError, f_oCompiled.get<regex_t>(),
 					l_oBuffer.raw(), l_iSize ) ) < l_iSize );
 	f_oError = l_oBuffer.raw();
-	if ( a_pcString )
+	if ( ! a_oString.empty() )
 		{
 		f_oError += ": `";
-		f_oError += a_pcString;
+		f_oError += a_oString;
 		f_oError += "'";
 		}
 	return;

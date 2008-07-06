@@ -226,10 +226,10 @@ void HControl::do_draw_label( void )
 		return;
 		}
 	set_attr_label();
-	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw, f_oLabel ) != C_ERR );
+	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw, f_oLabel.raw() ) != C_ERR );
 	set_attr_shortcut();
 	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
-				"%c", f_oLabel [ f_iShortcutIndex ] ) != C_ERR );
+				"%c", f_oLabel[ f_iShortcutIndex ] ) != C_ERR );
 	set_attr_data();
 	if ( f_bSingleLine )
 		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;

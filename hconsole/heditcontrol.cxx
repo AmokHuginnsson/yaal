@@ -131,10 +131,10 @@ void HEditControl::do_refresh( void )
 		f_oVarTmpBuffer.set_at( f_oVarTmpBuffer.get_length(), ' ' );
 		}
 	f_oVarTmpBuffer.set_at( f_iWidthRaw, 0 );
-	M_ENSURE( cons.c_mvprintf ( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer ) != C_ERR );
+	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer.raw() ) != C_ERR );
 	if ( f_bFocused )
 		{
-		M_ENSURE( cons.c_move ( f_iRowRaw,
+		M_ENSURE( cons.c_move( f_iRowRaw,
 					f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) ) != C_ERR );
 		cons.curs_set( f_bReplace ? CURSOR::D_VERY_VISIBLE : CURSOR::D_VISIBLE );
 		}
@@ -142,14 +142,14 @@ void HEditControl::do_refresh( void )
 	M_EPILOG
 	}
 
-HInfo HEditControl::get ( void )
+HInfo HEditControl::get( void )
 	{
 	M_PROLOG
-	return ( HInfo ( f_oString ) );
+	return ( HInfo( f_oString ) );
 	M_EPILOG
 	}
 
-void HEditControl::set_flags ( bool a_bReplace, bool a_bPassword )
+void HEditControl::set_flags( bool a_bReplace, bool a_bPassword )
 	{
 	M_PROLOG
 	f_bReplace = a_bReplace;
@@ -548,7 +548,7 @@ int HEditControl::do_process_input ( int a_iCode )
 		{
 		f_oPattern.matches( f_oVarTmpBuffer, NULL, &l_iErrorCode );
 		if ( l_iErrorCode )
-			f_poParent->status_bar()->message ( COLORS::D_BG_BROWN, f_oPattern.error() );
+			f_poParent->status_bar()->message( COLORS::D_BG_BROWN, f_oPattern.error().raw() );
 		else
 			{
 			a_iCode = l_iErrorCode;

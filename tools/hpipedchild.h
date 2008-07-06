@@ -43,7 +43,7 @@ class HPipedChild : public yaal::hcore::HStreamInterface
 public:
 	HPipedChild( void );
 	~HPipedChild( void );
-	void spawn( char const* const );
+	void spawn( yaal::hcore::HString const& );
 	bool read_poll( void* );
 	void finish( void );
 	bool is_running( void );

@@ -163,8 +163,8 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 		{
 		case ( MODE::D_SELECT ):
 			{
-			f_oSQL.format ( "SELECT %s FROM %s", static_cast < char const * > ( f_oColumns ),
-					static_cast < char const * > ( f_oTable ) );
+			f_oSQL.format( "SELECT %s FROM %s", f_oColumns.raw(),
+					f_oTable.raw() );
 			if ( ! f_oFilter.is_empty() )
 				f_oSQL += ( " WHERE " + f_oFilter );
 			if ( ! f_oSort.is_empty() )
@@ -262,34 +262,34 @@ void HSQLDescriptor::sync( int a_iField, int long& value )
 	M_EPILOG
 	}
 
-void HSQLDescriptor::set_table( char const* const a_pcTable )
+void HSQLDescriptor::set_table( yaal::hcore::HString const& a_oTable )
 	{
 	M_PROLOG
-	f_oTable = a_pcTable;
+	f_oTable = a_oTable;
 	return;
 	M_EPILOG
 	}
 
-void HSQLDescriptor::set_columns( char const* const a_pcColumns )
+void HSQLDescriptor::set_columns( yaal::hcore::HString const& a_oColumns )
 	{
 	M_PROLOG
-	f_oColumns = a_pcColumns;
+	f_oColumns = a_oColumns;
 	return;
 	M_EPILOG
 	}
 
-void HSQLDescriptor::set_filter( char const* const a_pcFilter )
+void HSQLDescriptor::set_filter( yaal::hcore::HString const& a_oFilter )
 	{
 	M_PROLOG
-	f_oFilter = a_pcFilter;
+	f_oFilter = a_oFilter;
 	return;
 	M_EPILOG
 	}
 
-void HSQLDescriptor::set_sort( char const* const a_pcSort )
+void HSQLDescriptor::set_sort( yaal::hcore::HString const& a_oSort )
 	{
 	M_PROLOG
-	f_oSort = a_pcSort;
+	f_oSort = a_oSort;
 	return;
 	M_EPILOG
 	}

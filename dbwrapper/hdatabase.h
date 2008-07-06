@@ -46,7 +46,7 @@ public:
 							char const*,		/* login */
 							char const* );	/* password */
 	void disconnect( void );
-	HRecordSet::ptr_t query( char const* );
+	HRecordSet::ptr_t query( yaal::hcore::HString const& );
 	char const* get_error( void ) const;
 	int get_errno( void ) const;
 	static ptr_t get_connector( void );

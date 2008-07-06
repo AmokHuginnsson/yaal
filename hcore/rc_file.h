@@ -47,15 +47,15 @@ namespace rc_file
 typedef bool ( * RC_CALLBACK_t )( HString&, HString& );
 
 int reload_configuration( void );
-int process_rc_file_internal( char const* const, char const* const,
+int process_rc_file_internal( HString const&, HString const&,
 		OOption const* const, int const, RC_CALLBACK_t = NULL );
 
 template<typename tType>
-int process_rc_file( char const* const a_pcConfigName,
-		char const* const a_pcSection,
+int process_rc_file( HString const& a_oConfigName,
+		HString const& a_oSection,
 		tType const& a_tData, RC_CALLBACK_t CALLBACK  = NULL )
 	{
-	return ( process_rc_file_internal( a_pcConfigName, a_pcSection, a_tData,
+	return ( process_rc_file_internal( a_oConfigName, a_oSection, a_tData,
 			( sizeof ( tType ) / sizeof ( OOption ) ) - 1, CALLBACK ) );
 	}
 

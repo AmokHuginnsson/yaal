@@ -33,6 +33,8 @@ Copyright:
 M_VCSID ( "$Id$" )
 #include "hpipedchild.h"
 
+using namespace yaal::hcore;
+
 namespace yaal
 {
 
@@ -72,7 +74,7 @@ void HPipedChild::finish( void )
 	M_EPILOG
 	}
 
-void HPipedChild::spawn( char const* const a_pcImage )
+void HPipedChild::spawn( HString const& a_oImage )
 	{
 	M_PROLOG
 	int l_piFileDesLeft [ 2 ], l_piFileDesRight [ 2 ];
@@ -88,7 +90,7 @@ void HPipedChild::spawn( char const* const a_pcImage )
 		if ( ( ::dup2( l_piFileDesRight [ 0 ], ::fileno( stdin ) ) < 0 )
 				|| ( ::dup2( l_piFileDesLeft [ 1 ], ::fileno( stdout ) ) < 0 ) )
 			M_THROW( "dup2", errno );
-		::execl( a_pcImage, a_pcImage, NULL );
+		::execl( a_oImage.raw(), a_oImage.raw(), NULL );
 		M_THROW( "execlp", errno );
 		}
 	else

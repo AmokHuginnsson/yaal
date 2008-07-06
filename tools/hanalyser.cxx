@@ -361,20 +361,20 @@ double HAnalyser::bracket( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-bool HAnalyser::translate( char const* a_pcFormula )
+bool HAnalyser::translate( HString const& a_oFormula )
 	{
 	M_PROLOG
 	int l_iIndex = 0, l_iRealIndex = 0, l_iCtr = 0, l_iLength = 0;
-	l_iLength = strlen ( a_pcFormula );
-	f_oTerminalIndexes.pool_realloc ( l_iLength + 1 );
+	l_iLength = a_oFormula.get_length();
+	f_oTerminalIndexes.pool_realloc( l_iLength + 1 );
 	while ( l_iIndex < l_iLength )
 		{
-		f_oTerminalIndexes [ l_iRealIndex ] = l_iIndex;
-		if ( ( a_pcFormula [ l_iIndex ] >= 'a' )
-				&& ( a_pcFormula [ l_iIndex ] <= 'z' ) )
+		f_oTerminalIndexes[ l_iRealIndex ] = l_iIndex;
+		if ( ( a_oFormula[ l_iIndex ] >= 'a' )
+				&& ( a_oFormula[ l_iIndex ] <= 'z' ) )
 			{
 			for ( l_iCtr = 0; l_iCtr < 16; l_iCtr++ )
-				if ( strncmp( a_pcFormula + l_iIndex,
+				if ( strncmp( a_oFormula.raw() + l_iIndex,
 							n_ppcFunctionsMnemonics[ l_iCtr ],
 							n_piFunctionMnemonicsLength[ l_iCtr ] ) == 0 )
 				{
@@ -395,7 +395,7 @@ bool HAnalyser::translate( char const* a_pcFormula )
 			}
 		else
 			{
-			f_oFormula.set_at( l_iRealIndex, a_pcFormula[ l_iIndex ] );
+			f_oFormula.set_at( l_iRealIndex, a_oFormula[ l_iIndex ] );
 			l_iIndex ++;
 			l_iRealIndex ++;
 			}
@@ -634,7 +634,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 				return ( true );
 				}
 			}
-		l_dValue = strtod ( static_cast < char const * const > ( f_oFormula ) + l_iOffset, NULL );
+		l_dValue = ::strtod( f_oFormula.raw() + l_iOffset, NULL );
 		f_oConstantsPool.push_back( l_dValue );
 		/* We save variables as positive indexes and constants as negative
 		 * indexes, positive and negative 0 index would conflict so
@@ -650,20 +650,20 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 	M_EPILOG
 	}
 
-double* HAnalyser::analyse( char const* a_pcFormula )
+double* HAnalyser::analyse( HString const& a_oFormula )
 	{
 	M_PROLOG
 	int l_iLength = 0;
 	f_iIndex = 0;
 	f_eError = E_OK;
-	l_iLength = strlen ( a_pcFormula );
+	l_iLength = a_oFormula.get_length();
 	if ( l_iLength == 0 )
 		{
 		f_eError = E_PREMATURE_TERMINATION;
 		return ( NULL );
 		}
-	f_oFormula.hs_realloc ( l_iLength + 1 ); /* + 1 for trailing null */
-	if ( translate ( a_pcFormula ) )
+	f_oFormula.hs_realloc( l_iLength + 1 ); /* + 1 for trailing null */
+	if ( translate( a_oFormula ) )
 		return ( NULL );
 	f_oConstantsPool.reset();
 	tree_t::node_t root = f_oEquationTree.create_new_root();

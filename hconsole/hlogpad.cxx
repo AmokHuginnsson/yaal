@@ -80,7 +80,8 @@ void HLogPad::do_refresh ( void )
 	f_oVarTmpBuffer.fillz(  ' ', f_iWidthRaw );
 	f_iAttribute = COLORS::D_ATTR_NORMAL | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		cons.c_cmvprintf ( f_iRowRaw + l_iCtr, f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer );
+		cons.c_cmvprintf( f_iRowRaw + l_iCtr,
+				f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer.raw() );
 	if ( f_oContents.size() )
 		{
 		l_iCtr = 0;
@@ -98,8 +99,9 @@ void HLogPad::do_refresh ( void )
 						f_oVarTmpBuffer = it->f_oText;
 					if ( ( l_iCursor + f_oVarTmpBuffer.get_length() ) >= f_iWidthRaw )
 						f_oVarTmpBuffer.set_at( f_iWidthRaw - l_iCursor, 0 );
-					if ( f_oVarTmpBuffer [ 0 ] )
-						cons.c_cmvprintf ( f_iRowRaw + l_iRow, f_iColumnRaw + l_iCursor, f_iAttribute, f_oVarTmpBuffer );
+					if ( f_oVarTmpBuffer[ 0 ] )
+						cons.c_cmvprintf( f_iRowRaw + l_iRow,
+								f_iColumnRaw + l_iCursor, f_iAttribute, f_oVarTmpBuffer.raw() );
 					}
 				else
 					f_oVarTmpBuffer = "";
@@ -149,17 +151,17 @@ void HLogPad::add ( char const * const a_pcText )
 		it->f_oText = "";
 		}
 	f_oVarTmpBuffer = a_pcText;
-	while ( static_cast < char const * const > ( f_oVarTmpBuffer ) [ 0 ] )
+	while ( ! f_oVarTmpBuffer.is_empty() )
 		{
-		l_iIndexNL = f_oVarTmpBuffer.find_one_of ( "\r\n" );
+		l_iIndexNL = f_oVarTmpBuffer.find_one_of( "\r\n" );
 		if ( l_iIndexNL >= 0 )
 			{
-			it->f_oText += f_oVarTmpBuffer.left ( l_iIndexNL );
+			it->f_oText += f_oVarTmpBuffer.left( l_iIndexNL );
 			it->f_eType = HLogLine::D_TEXT_EOL;
 			f_iLines ++;
-			l_iIndexChar = f_oVarTmpBuffer.find_other_than ( "\r\n", l_iIndexNL + 1 );
+			l_iIndexChar = f_oVarTmpBuffer.find_other_than( "\r\n", l_iIndexNL + 1 );
 			if ( l_iIndexChar >= 0 )
-				f_oVarTmpBuffer = f_oVarTmpBuffer.mid ( l_iIndexChar );
+				f_oVarTmpBuffer = f_oVarTmpBuffer.mid( l_iIndexChar );
 			else
 				f_oVarTmpBuffer = "";
 			}
