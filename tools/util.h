@@ -79,7 +79,7 @@ int second( int, bool = false );
 namespace distance
 {
 
-int levenshtein_damerau( char const* const, char const* const, bool = true );
+int levenshtein_damerau( yaal::hcore::HString const&, yaal::hcore::HString const&, bool = true );
 
 }
 

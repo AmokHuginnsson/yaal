@@ -609,13 +609,13 @@ int min ( int a, int b )
 namespace distance
 {
 
-int levenshtein_damerau ( char const * const a_pcOne, char const * const a_pcTwo, bool a_bDamerau )
+int levenshtein_damerau( yaal::hcore::HString const& a_oOne, yaal::hcore::HString const& a_oTwo, bool a_bDamerau )
 	{
 	M_PROLOG
 	int l_iCost = 0;
 	int l_iIndexOne = 0, l_iIndexTwo = 0;
-	int l_iLengthOne = ::strlen( a_pcOne );
-	int l_iLengthTwo = ::strlen( a_pcTwo );
+	int l_iLengthOne = a_oOne.length();
+	int l_iLengthTwo = a_oTwo.length();
 	int** l_ppiDistanceMatrix = NULL;
 	if ( ! l_iLengthTwo )
 		return ( l_iLengthOne );
@@ -640,15 +640,15 @@ int levenshtein_damerau ( char const * const a_pcOne, char const * const a_pcTwo
 		for ( l_iIndexTwo = 0; l_iIndexTwo < l_iLengthTwo; ++ l_iIndexTwo )
 			{
 			l_iCost = 0;
-			if ( a_pcOne [ l_iIndexOne ] != a_pcTwo [ l_iIndexTwo ] )
+			if ( a_oOne [ l_iIndexOne ] != a_oTwo [ l_iIndexTwo ] )
 				l_iCost = 1;
 			l_ppiDistanceMatrix[ l_iIndexOne + 1 ][ l_iIndexTwo + 1 ] = min3(
 					l_ppiDistanceMatrix[ l_iIndexOne ][ l_iIndexTwo + 1 ] + 1,
 					l_ppiDistanceMatrix[ l_iIndexOne + 1 ][ l_iIndexTwo ] + 1,
 					l_ppiDistanceMatrix[ l_iIndexOne ][ l_iIndexTwo ] + l_iCost );
 			if ( a_bDamerau && ( l_iIndexOne > 0 ) && ( l_iIndexTwo > 0 )
-					&& ( a_pcOne[ l_iIndexOne - 1 ] == a_pcTwo[ l_iIndexTwo ] )
-					&& ( a_pcOne[ l_iIndexOne ] == a_pcTwo[ l_iIndexTwo - 1 ] ) )
+					&& ( a_oOne[ l_iIndexOne - 1 ] == a_oTwo[ l_iIndexTwo ] )
+					&& ( a_oOne[ l_iIndexOne ] == a_oTwo[ l_iIndexTwo - 1 ] ) )
 				l_ppiDistanceMatrix[ l_iIndexOne + 1 ][ l_iIndexTwo + 1 ] = min(
 						l_ppiDistanceMatrix[ l_iIndexOne + 1 ][ l_iIndexTwo + 1 ],
 						l_ppiDistanceMatrix[ l_iIndexOne - 1 ][ l_iIndexTwo - 1 ] + l_iCost );
