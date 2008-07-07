@@ -42,9 +42,9 @@ private:
 	void* f_pvCoreData;	/* very internal for this class used only in base cla */
 public:
 	typedef yaal::hcore::HPointer<HDataBase> ptr_t;
-	int connect( char const*,		/* database */
-							char const*,		/* login */
-							char const* );	/* password */
+	int connect( yaal::hcore::HString const&,		/* database */
+							yaal::hcore::HString const&,		/* login */
+							yaal::hcore::HString const& );	/* password */
 	void disconnect( void );
 	HRecordSet::ptr_t query( yaal::hcore::HString const& );
 	char const* get_error( void ) const;

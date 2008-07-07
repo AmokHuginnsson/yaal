@@ -57,11 +57,11 @@ HDataBase::~HDataBase( void )
 	M_EPILOG
 	}
 
-int HDataBase::connect( char const* a_pcDataBase, char const* a_pcLogin,
-		char const* a_pcPassword )
+int HDataBase::connect( yaal::hcore::HString const& a_oDataBase, yaal::hcore::HString const& a_oLogin,
+		yaal::hcore::HString const& a_oPassword )
 	{
 	M_PROLOG
-	f_pvCoreData = dbwrapper::db_connect( a_pcDataBase, a_pcLogin, a_pcPassword );
+	f_pvCoreData = dbwrapper::db_connect( a_oDataBase.raw(), a_oLogin.raw(), a_oPassword.raw() );
 	if ( ! f_pvCoreData )
 		M_THROW( dbwrapper::db_error( f_pvCoreData ),
 				dbwrapper::db_errno( f_pvCoreData ) );
