@@ -61,6 +61,7 @@ public:
 	HString& operator += ( HString const& );
 	char operator[] ( int const ) const;
 	char operator[] ( int long const ) const;
+	bool operator ! ( void ) const;
 	char set_at( int long, char );
 	/* add_* functions in HList needs operator
 		 bool() operator char * works fine here */

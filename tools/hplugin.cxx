@@ -30,6 +30,8 @@ Copyright:
 M_VCSID ( "$Id$" )
 #include "hplugin.h"
 
+using namespace yaal::hcore;
+
 namespace yaal
 {
 
@@ -48,10 +50,10 @@ HPlugin::~HPlugin( void )
 	M_EPILOG
 	}
 
-void HPlugin::load( char const* const a_pcPath )
+void HPlugin::load( HString const& a_oPath )
 	{
 	M_PROLOG
-	M_ENSURE( ( f_pvHandle = dlopen( a_pcPath, RTLD_NOW | RTLD_GLOBAL ) ) != NULL );
+	M_ENSURE( ( f_pvHandle = dlopen( a_oPath.raw(), RTLD_NOW | RTLD_GLOBAL ) ) != NULL );
 	return;
 	M_EPILOG
 	}
@@ -72,12 +74,12 @@ char const* HPlugin::error_message( int )
 	M_EPILOG
 	}
 
-void* HPlugin::resolve( char const* const a_pcSymbolName )
+void* HPlugin::resolve( HString const& a_oSymbolName )
 	{
 	M_PROLOG
 	M_ASSERT( f_pvHandle );
 	void* sym = NULL;
-	M_ENSURE( ( sym = dlsym( f_pvHandle, a_pcSymbolName ) ) != NULL );
+	M_ENSURE( ( sym = dlsym( f_pvHandle, a_oSymbolName.raw() ) ) != NULL );
 	return ( sym );
 	M_EPILOG
 	}

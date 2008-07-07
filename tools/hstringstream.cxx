@@ -30,6 +30,8 @@ Copyright:
 M_VCSID ( "$Id$" )
 #include "hstringstream.h"
 
+using namespace yaal::hcore;
+
 namespace yaal
 {
 
@@ -40,8 +42,15 @@ HStringStream::HStringStream( void ) : f_bUsed( false ), f_oBuffer( "" )
 	{
 	}
 
-HStringStream::HStringStream( char const* const a_pcInit ) : f_bUsed( false ), f_oBuffer( a_pcInit )
+HStringStream::HStringStream( HString const& a_oInit ) : f_bUsed( false ), f_oBuffer( a_oInit )
 	{
+	}
+
+HStringStream& HStringStream::operator = ( HString const& s )
+	{
+	f_oBuffer = s;
+	f_bUsed = false;
+	return ( *this );
 	}
 
 char const* HStringStream::raw( void ) const

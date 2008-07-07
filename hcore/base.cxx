@@ -76,6 +76,46 @@ double lexical_cast( HString const& val )
 	return ( static_cast<double>( lexical_cast<double long>( val ) ) );
 	}
 
+template<>
+bool lexical_cast( char const* const& a_pcValue )
+	{
+	M_PROLOG
+	static HString l_oMessage;
+	bool bVal = false;
+	if ( ! ::strcasecmp( a_pcValue, "yes" ) )
+		bVal = true;
+	else if ( ! ::strcasecmp( a_pcValue, "no" ) )
+		bVal = false;
+	else if ( ! ::strcasecmp( a_pcValue, "true" ) )
+		bVal = true;
+	else if ( ! ::strcasecmp( a_pcValue, "false" ) )
+		bVal = false;
+	else if ( ! ::strcasecmp( a_pcValue, "on" ) )
+		bVal = true;
+	else if ( ! ::strcasecmp( a_pcValue, "off" ) )
+		bVal = false;
+	else
+		{
+		l_oMessage = "bad value: ";
+		l_oMessage += a_pcValue;
+		M_THROW( l_oMessage, bVal );
+		}
+	return ( bVal );
+	M_EPILOG
+	}
+
+template<>
+bool lexical_cast( char* const& a_pcValue )
+	{
+	return ( lexical_cast<bool,char const*>( a_pcValue ) );
+	}
+
+template<>
+bool lexical_cast( HString const& a_oValue )
+	{
+	return ( lexical_cast<bool>( a_oValue.raw() ) );
+	}
+
 char const* error_message( int a_iCode )
 	{
 	return ( ::strerror( a_iCode ) );

@@ -50,24 +50,24 @@ public:
 	typedef yaal::hcore::HPointer<HPlugin> ptr_t;
 	HPlugin( void );
 	~HPlugin( void );
-	void load( char const* const );
+	void load( yaal::hcore::HString const& );
 	void unload( void );
 	bool is_loaded( void ) const;
 	char const* error_message( int );
 	template<typename name_t>
-	void resolve( char const* const, name_t& );
-	void* resolve( char const* const );
+	void resolve( yaal::hcore::HString const&, name_t& );
+	void* resolve( yaal::hcore::HString const& );
 private:
 	HPlugin( HPlugin const& );
 	HPlugin const& operator = ( HPlugin const& );
 	};
 
 template<typename name_t>
-void HPlugin::resolve( char const* const a_pcName, name_t& handle )
+void HPlugin::resolve( yaal::hcore::HString const& a_oName, name_t& handle )
 	{
 	M_PROLOG
 	caster_t<name_t> l_xCaster;
-	l_xCaster.f_pvObjectPointer = resolve( a_pcName );
+	l_xCaster.f_pvObjectPointer = resolve( a_oName );
 	handle = l_xCaster.FUNCTION_POINTER;
 	return;
 	M_EPILOG

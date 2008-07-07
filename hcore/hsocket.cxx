@@ -163,7 +163,7 @@ void HSocket::shutdown_client( int a_iFileDescriptor )
 	M_EPILOG
 	}
 
-void HSocket::listen( char const* const a_pcAddress, int const a_iPort )
+void HSocket::listen( yaal::hcore::HString const& a_oAddress, int const a_iPort )
 	{
 	M_PROLOG
 	int l_iReuseAddr = 1;
@@ -173,7 +173,7 @@ void HSocket::listen( char const* const a_pcAddress, int const a_iPort )
 		M_THROW( n_ppcErrMsgHSocket [ E_ALREADY_LISTENING ], f_iFileDescriptor );
 	if ( f_iMaximumNumberOfClients < 1 )
 		M_THROW( _( "bad maximum number of clients" ), f_iMaximumNumberOfClients );
-	make_address ( a_pcAddress, a_iPort );
+	make_address ( a_oAddress, a_iPort );
 	M_ENSURE( ::setsockopt( f_iFileDescriptor, SOL_SOCKET, SO_REUSEADDR,
 				&l_iReuseAddr, sizeof ( int ) ) == 0 );
 	M_ENSURE( ::bind( f_iFileDescriptor,
@@ -231,12 +231,12 @@ HSocket::ptr_t HSocket::accept( void )
 	M_EPILOG
 	}
 
-void HSocket::connect( char const* const a_pcAddress, int const a_iPort )
+void HSocket::connect( yaal::hcore::HString const& a_oAddress, int const a_iPort )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
 		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
-	make_address( a_pcAddress, a_iPort );
+	make_address( a_oAddress, a_iPort );
 	M_ENSURE( ::connect( f_iFileDescriptor,
 				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 );
 	f_bNeedShutdown = true;
@@ -244,7 +244,7 @@ void HSocket::connect( char const* const a_pcAddress, int const a_iPort )
 	M_EPILOG
 	}
 
-void HSocket::make_address( char const* const a_pcAddress, int const a_iPort )
+void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_iPort )
 	{
 	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	M_PROLOG
@@ -266,19 +266,19 @@ void HSocket::make_address( char const* const a_pcAddress, int const a_iPort )
 #ifdef HAVE_GETHOSTBYNAME_R
 		f_iAddressSize = D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
 		f_oCache.pool_realloc( f_iAddressSize );
-		while ( ::gethostbyname_r( a_pcAddress, & l_sHostName,
+		while ( ::gethostbyname_r( a_oAddress.raw(), &l_sHostName,
 					f_oCache.raw(), f_iAddressSize,
 					&l_psHostName, &l_iError ) == ERANGE )
 			f_oCache.pool_realloc ( f_iAddressSize <<= 1 );
 		errno = l_iError;
-		M_ENSURE ( l_psHostName );
+		M_ENSURE( l_psHostName );
 		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>(
 				l_sHostName.h_addr_list [ 0 ] )->s_addr;
 #else /* HAVE_GETHOSTBYNAME_R */
-		l_iError = getaddrinfo ( a_pcAddress, NULL, NULL, & l_psAddrInfo );
-		M_ENSURE ( ! l_iError && l_psAddrInfo );
+		l_iError = ::getaddrinfo( a_oAddress.raw(), NULL, NULL, &l_psAddrInfo );
+		M_ENSURE( ! l_iError && l_psAddrInfo );
 		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>( l_psAddrInfo->ai_addr )->s_addr;
-		freeaddrinfo ( l_psAddrInfo );
+		::freeaddrinfo( l_psAddrInfo );
 #endif /* not HAVE_GETHOSTBYNAME_R */
 		f_iAddressSize = sizeof ( sockaddr_in );
 		}
@@ -286,12 +286,12 @@ void HSocket::make_address( char const* const a_pcAddress, int const a_iPort )
 		{
 		l_psAddressFile = static_cast<sockaddr_un*>( f_pvAddress );
 		l_psAddressFile->sun_family = AF_LOCAL;
-		::strncpy( l_psAddressFile->sun_path, a_pcAddress,
+		::strncpy( l_psAddressFile->sun_path, a_oAddress.raw(),
 				sizeof ( l_psAddressFile->sun_path ) );
 		l_psAddressFile->sun_path[ sizeof ( l_psAddressFile->sun_path ) - 1 ] = 0;
 		f_iAddressSize = static_cast<int>( SUN_LEN( l_psAddressFile ) );
 		}
-	f_oHostName = a_pcAddress;
+	f_oHostName = a_oAddress;
 	return;
 	M_EPILOG
 	}

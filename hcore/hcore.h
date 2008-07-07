@@ -41,7 +41,6 @@ namespace hcore
 bool eq( double const&, double const& );
 void set_env( HString );
 void yaal_hcore_banner( void );
-bool to_bool( char const* const );
 
 	}
 

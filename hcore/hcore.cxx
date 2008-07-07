@@ -125,33 +125,6 @@ void set_env( HString line )
 	M_EPILOG
 	}
 
-bool to_bool( char const* const a_pcValue )
-	{
-	M_PROLOG
-	static HString l_oMessage;
-	bool bVal = false;
-	if ( ! ::strcasecmp( a_pcValue, "yes" ) )
-		bVal = true;
-	else if ( ! ::strcasecmp( a_pcValue, "no" ) )
-		bVal = false;
-	else if ( ! ::strcasecmp( a_pcValue, "true" ) )
-		bVal = true;
-	else if ( ! ::strcasecmp( a_pcValue, "false" ) )
-		bVal = false;
-	else if ( ! ::strcasecmp( a_pcValue, "on" ) )
-		bVal = true;
-	else if ( ! ::strcasecmp( a_pcValue, "off" ) )
-		bVal = false;
-	else
-		{
-		l_oMessage = "bad value: ";
-		l_oMessage += a_pcValue;
-		M_THROW( l_oMessage, bVal );
-		}
-	return ( bVal );
-	M_EPILOG
-	}
-
 class HCoreInitDeinit
 	{
 public:

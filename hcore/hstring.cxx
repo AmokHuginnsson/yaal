@@ -356,6 +356,11 @@ bool HString::is_empty( void ) const
 	return ( ! ( f_pcBuffer && f_pcBuffer[ 0 ] ) );
 	}
 
+bool HString::operator ! ( void ) const
+	{
+	return ( is_empty() );
+	}
+
 void HString::clear( void )
 	{
 	if ( f_pcBuffer )

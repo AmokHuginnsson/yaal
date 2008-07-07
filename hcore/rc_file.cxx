@@ -400,17 +400,17 @@ int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
 void rc_set_variable( char const* const a_pcValue, bool& a_rbVariable )
 	{
 	M_PROLOG
-	a_rbVariable = to_bool( a_pcValue );
+	a_rbVariable = lexical_cast<bool>( a_pcValue );
 	M_EPILOG
 	return;
 	}
 
 void rc_set_variable( char const * const a_pcValue, char ** a_ppcVariable )
 	{
-	if ( * a_ppcVariable )
-		xfree ( * a_ppcVariable );
+	if ( *a_ppcVariable )
+		xfree( *a_ppcVariable );
 	*a_ppcVariable = NULL;
-	*a_ppcVariable = xstrdup ( a_pcValue );
+	*a_ppcVariable = xstrdup( a_pcValue );
 	return;
 	}
 

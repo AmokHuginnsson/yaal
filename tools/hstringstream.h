@@ -42,7 +42,8 @@ class HStringStream : public yaal::hcore::HStreamInterface
 	mutable yaal::hcore::HString f_oBuffer;
 public:
 	HStringStream( void );
-	HStringStream( char const* const );
+	HStringStream( yaal::hcore::HString const& );
+	HStringStream& operator = ( yaal::hcore::HString const& );
 	char const* raw( void ) const;
 	yaal::hcore::HString const& string( void ) const;
 	void use( void ) const;
