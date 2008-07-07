@@ -50,20 +50,20 @@ namespace tools
 
 namespace
 	{
-	char const * const n_pcEAlreadyOpened = _ ( "serial port already openend" );
-	char const * const n_pcENotOpened = _ ( "serial port not opened" );
+	char const* const n_pcEAlreadyOpened = _( "serial port already openend" );
+	char const* const n_pcENotOpened = _( "serial port not opened" );
 	}
 
 HSerial::flags_t HSerial::D_FLAGS_TEXT = HSerial::D_FLAGS_DEFAULT | HSerial::D_FLAGS_CANONICAL | HSerial::D_FLAGS_CR2NL;
 
-HSerial::HSerial ( char const * const a_pcDevice )
-				: HRawFile(), f_eSpeed ( D_SPEED_DEFAULT ),
-	f_eFlags ( D_FLAGS_DEFAULT ), f_oDevicePath(),
-	f_oTIO ( xcalloc<termios>( 1 ) ), f_oBackUpTIO ( xcalloc<termios>( 1 ) )
+HSerial::HSerial( HString const& a_oDevicePath )
+				: HRawFile(), f_eSpeed( D_SPEED_DEFAULT ),
+	f_eFlags( D_FLAGS_DEFAULT ), f_oDevicePath(),
+	f_oTIO( xcalloc<termios>( 1 ) ), f_oBackUpTIO( xcalloc<termios>( 1 ) )
 	{
 	M_PROLOG
-	if ( a_pcDevice )
-		f_oDevicePath = a_pcDevice;
+	if ( !! a_oDevicePath )
+		f_oDevicePath = a_oDevicePath;
 	else
 		f_oDevicePath = tools::n_pcSerialDevice;
 	compile();

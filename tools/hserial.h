@@ -88,7 +88,7 @@ protected:
 	hcore::HChunk f_oTIO;
 	hcore::HChunk f_oBackUpTIO;
 public:
-	HSerial( char const* const = NULL ); /* device path */
+	HSerial( yaal::hcore::HString const& = yaal::hcore::HString() ); /* device path */
 	virtual ~HSerial( void );
 	bool open( void );
 	void set_speed( speed_t );
