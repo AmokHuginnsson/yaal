@@ -136,7 +136,7 @@ void HLogPad::add ( int a_iAttribute )
 	M_EPILOG
 	}
 
-void HLogPad::add ( char const * const a_pcText )
+void HLogPad::add ( yaal::hcore::HString const& a_oText )
 	{
 	M_PROLOG
 	int l_iIndexNL = 0, l_iIndexChar = 0;
@@ -150,7 +150,7 @@ void HLogPad::add ( char const * const a_pcText )
 		it->f_eType = HLogLine::D_TEXT;
 		it->f_oText = "";
 		}
-	f_oVarTmpBuffer = a_pcText;
+	f_oVarTmpBuffer = a_oText;
 	while ( ! f_oVarTmpBuffer.is_empty() )
 		{
 		l_iIndexNL = f_oVarTmpBuffer.find_one_of( "\r\n" );
@@ -183,11 +183,11 @@ void HLogPad::add ( char const * const a_pcText )
 	M_EPILOG
 	}
 
-void HLogPad::add ( int a_iAttribute, char const * const a_pcText )
+void HLogPad::add ( int a_iAttribute, yaal::hcore::HString const& a_oText )
 	{
 	M_PROLOG
 	add ( a_iAttribute );
-	add ( a_pcText );
+	add ( a_oText );
 	return;
 	M_EPILOG
 	}

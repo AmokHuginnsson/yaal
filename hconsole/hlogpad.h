@@ -62,11 +62,11 @@ class HLogPad : public HControl
 	int f_iAttribute;
 	contents_t f_oContents;
 public:
-	HLogPad ( HWindow *, int, int, int, int, char const * const );
-	virtual ~HLogPad ( void );
-	void add ( int, char const * const );
-	void add ( char const * const );
-	void add ( int );
+	HLogPad( HWindow*, int, int, int, int, char const * const );
+	virtual ~HLogPad( void );
+	void add( int, yaal::hcore::HString const& );
+	void add( yaal::hcore::HString const& );
+	void add( int );
 protected:
 	virtual int do_process_input ( int );
 	virtual void do_refresh ( void );
