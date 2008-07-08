@@ -48,6 +48,7 @@ public:
 	HString( int const, bool const ); /* initialize immediately with size */
 	~HString( void ) ;
 	void hs_realloc( int long const );
+	void materialize( void );
 	HString( char const* const );
 	HString( char const );
 	HString( int const );
