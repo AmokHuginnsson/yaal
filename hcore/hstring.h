@@ -93,8 +93,8 @@ public:
 	HString& lower( void );
 	HString& reverse( void );
 	HString left( int const ) const;
-	HString mid( int long, int long /* no const - reused */ = INT_MAX ) const;
-	HString right( int long /* not const - reused */ ) const;
+	HString mid( int long, int long = INT_MAX ) const;
+	HString right( int long const& ) const;
 	HString& trim_left( char const* const = " \t\r\n" );
 	HString& trim_right( char const* const = " \t\r\n" );
 	HString& shift_left( int long const );

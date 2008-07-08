@@ -386,7 +386,8 @@ int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
 							|| ( a_roOption[ l_iEnd ] == '"' ) )
 						&& ( a_roOption[ l_iEnd ] == a_roOption[ l_iIndex ] ) )
 					l_iIndex ++, l_iEnd --;
-				a_roOption.set_at( l_iEnd + 1, 0 );
+				if ( ( l_iEnd + 1 ) < l_iLenght )
+					a_roOption.set_at( l_iEnd + 1, 0 );
 				a_roValue = a_roOption.mid( l_iIndex );
 				}
 			a_roOption.set_at( l_iEndOfOption, 0 );
