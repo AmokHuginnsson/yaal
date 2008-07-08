@@ -364,8 +364,10 @@ double HAnalyser::bracket( tree_t::const_node_t a_roNode )
 bool HAnalyser::translate( HString const& a_oFormula )
 	{
 	M_PROLOG
-	int l_iIndex = 0, l_iRealIndex = 0, l_iCtr = 0, l_iLength = 0;
-	l_iLength = a_oFormula.get_length();
+	int l_iIndex = 0, l_iRealIndex = 0, l_iCtr = 0;
+	int long l_iLength = a_oFormula.get_length();
+	f_oFormula.hs_realloc( l_iLength + 1 ); /* + 1 for trailing null */
+	f_oFormula.fillz( '\0', l_iLength );
 	f_oTerminalIndexes.pool_realloc( l_iLength + 1 );
 	while ( l_iIndex < l_iLength )
 		{
@@ -402,7 +404,6 @@ bool HAnalyser::translate( HString const& a_oFormula )
 		f_iLength = l_iRealIndex;
 		}
 	f_oTerminalIndexes[ l_iRealIndex ] = l_iIndex;
-	f_oFormula.set_at( l_iRealIndex, 0 );
 	return ( false );
 	M_EPILOG
 	}
@@ -662,7 +663,6 @@ double* HAnalyser::analyse( HString const& a_oFormula )
 		f_eError = E_PREMATURE_TERMINATION;
 		return ( NULL );
 		}
-	f_oFormula.hs_realloc( l_iLength + 1 ); /* + 1 for trailing null */
 	if ( translate( a_oFormula ) )
 		return ( NULL );
 	f_oConstantsPool.reset();
