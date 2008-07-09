@@ -28,13 +28,13 @@ $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 	@echo -n "Compiling \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... "; \
 	echo -n "$$(@:.$$(OS)=.$$(DS)) " > $$(@:.$$(OS)=.$$(DS)); \
 	/bin/rm -f "$$(@)"; \
-	$$(DXX) $$(CXXFLAGS) -MM $$(<) -MT $$(@) | grep -v '^#' >> $$(@:.$$(OS)=.$$(DS)); \
-	$$(CXX) $$(CXXFLAGS) $(COMPILER_FLAGS_$(1)) $$(PCH_$(1)) $$(<) -c -o $$(@) 2>&1 | tee -a make.log; \
+	$$(DXX) $$(CXXFLAGS) -MM $$(<) -MT $$(@) | grep -v '^#' >> $$(@:.$$(OS)=.$$(DS)) && test $$$${PIPESTATUS} == 0 && \
+	$$(CXX) $$(CXXFLAGS) $(COMPILER_FLAGS_$(1)) $$(PCH_$(1)) $$(<) -c -o $$(@) 2>&1 | tee -a make.log && test $$$${PIPESTATUS} == 0 && \
 	echo $$(NONL) "done.$$(CL)"
 
 $$(REAL_TARGET): $$($(1))/header.gch $$(OBJS_$(1))
 	@echo -n "Linking \`$$(@)' ... "
-	@$(LXX) $(LINKER_FLAGS) $(LINKER_FLAGS_$(1)) -o $$(@) $$(OBJS_$(1)) $$(LIBS) 2>&1 | tee -a make.log
+	@$(LXX) $(LINKER_FLAGS) $(LINKER_FLAGS_$(1)) -o $$(@) $$(OBJS_$(1)) $$(LIBS) 2>&1 | tee -a make.log && test $$$${PIPESTATUS} == 0
 ifdef NODEBUG
 	@strip $$(REAL_TARGET)
 endif
@@ -42,7 +42,7 @@ endif
 
 $$($(1))/header.gch: $$(DIR_ROOT)/$$(SRC_$(1))/header $$(HDRS_$(1))
 	@echo -n "Generating precompiled header \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... "; \
-	$$(CXX) -xc++-header $$(subst -include $$(SRC_$(1))/header,,$$(CXXFLAGS)) $$(<) -o $$(@) ;\
+	$$(CXX) -xc++-header $$(subst -include $$(SRC_$(1))/header,,$$(CXXFLAGS)) $$(<) -o $$(@) && \
 	echo $$(NONL) "done.$$(CL)"
 
 endef
