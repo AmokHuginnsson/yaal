@@ -124,13 +124,13 @@ void HEditControl::do_refresh( void )
 	HConsole& cons = HCons::get_instance();
 	draw_label();
 	f_oVarTmpBuffer.hs_realloc( f_iWidthRaw + 1 );
-	f_oVarTmpBuffer.fill( ' ', f_iWidthRaw );
 	if ( ! f_bPassword )
-		{
 		f_oVarTmpBuffer = f_oString.mid( f_iControlOffset, f_iWidthRaw );
-		f_oVarTmpBuffer.set_at( f_oVarTmpBuffer.get_length(), ' ' );
-		}
-	f_oVarTmpBuffer.set_at( f_iWidthRaw, 0 );
+	else
+		f_oVarTmpBuffer.clear();
+	int long len = f_oVarTmpBuffer.get_length();
+	if ( len < f_iWidthRaw )
+		f_oVarTmpBuffer.fill( ' ', f_iWidthRaw - len, len );
 	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer.raw() ) != C_ERR );
 	if ( f_bFocused )
 		{

@@ -149,13 +149,15 @@ int long HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 		}
 	if ( l_iLength > 0 )
 		{
-		if ( ( a_eMode & D_STRIP_NEWLINES ) && ( l_iLength > 0 ) )
+		int long newLen = l_iLength;
+		if ( ( a_eMode & D_STRIP_NEWLINES ) && ( newLen > 0 ) )
 			{
-			l_iLength --;
-			if ( ( l_iLength > 0 ) && ( a_roLine[ l_iLength - 1 ] == '\r' ) )
-				l_iLength --;
+			-- newLen;
+			if ( ( newLen > 0 ) && ( a_roLine[ newLen - 1 ] == '\r' ) )
+				-- newLen;
 			}
-		a_roLine.set_at( l_iLength, 0 );
+		if ( newLen < l_iLength )
+			a_roLine.set_at( newLen, 0 );
 		}
 	else
 		l_iLength = -1;

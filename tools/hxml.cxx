@@ -270,16 +270,15 @@ HXml::~HXml ( void )
 HString const& HXml::convert( HString const& a_oData, way_t a_eWay ) const
 	{
 	M_PROLOG
-	M_ASSERT( ! a_oData.is_empty() );
 	char D_YAAL_TOOLS_HXML_ICONV_CONST* source = const_cast<char D_YAAL_TOOLS_HXML_ICONV_CONST*>( a_oData.raw() );
 	iconv_t l_xCD = static_cast<iconv_t>( 0 );
 	switch ( a_eWay )
 		{
 		case ( D_TO_EXTERNAL ): { l_xCD = ( *f_oConvert ).f_xIconvToExternal; break; }
 		case ( D_TO_INTERNAL ): { l_xCD = ( *f_oConvert ).f_xIconvToInternal; break; }
-		default :
+		default:
 			{
-			M_ASSERT( ! _( "unknown convertion way" ) );
+			M_ASSERT( ! _( "unknown conversion way" ) );
 			}
 		}
 	size_t l_uiSizeOut = 0, l_uiSizeIn = ::strlen( source );

@@ -821,10 +821,11 @@ HString& HString::fill( char a_cFiller, int long a_iLength, int long a_iOffset )
 	if ( ( a_iOffset + a_iLength ) >= f_lAllocatedBytes )
 		M_THROW( _( "overflow" ), a_iOffset + a_iLength );
 	if ( a_iLength == 0 )
-		f_lSize = f_lAllocatedBytes - a_iOffset;
-	else
-		f_lSize = a_iLength;
-	::memset( f_pcBuffer + a_iOffset, a_cFiller, f_lSize );
+		a_iLength = f_lAllocatedBytes - a_iOffset;
+	if ( ( a_iLength + a_iOffset ) > f_lSize )
+		f_lSize = a_iLength + a_iOffset;
+	::memset( f_pcBuffer + a_iOffset, a_cFiller, a_iLength );
+	f_pcBuffer[ f_lSize ] = 0;
 	return ( *this );
 	M_EPILOG
 	}
@@ -833,7 +834,7 @@ HString& HString::fillz( char a_cFiller, int long a_iLength, int long a_iOffset 
 	{
 	M_PROLOG
 	fill( a_cFiller, a_iLength, a_iOffset );
-	f_pcBuffer[ f_lSize ] = 0;
+	f_pcBuffer[ a_iLength + a_iOffset ] = 0;
 	return ( *this );
 	M_EPILOG
 	}
