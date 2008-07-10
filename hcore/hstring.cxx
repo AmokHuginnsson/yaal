@@ -604,14 +604,13 @@ HString& HString::replace( HString const& a_oPattern,
 			l_lSize += l_iSubWP;
 			l_iIndex += l_iLenPattern;
 			}
-		yaal::swap( f_lSize, l_lSize );
 		HString s;
 		HString* src = NULL;
 		if ( l_iSubWP > 0 ) /* replacement is longer than pattern */
 			{
 			s = *this;
 			s.materialize();
-			hs_realloc( f_lSize + 1 );
+			hs_realloc( l_lSize + 1 );
 			src = &s;
 			}
 		else /* replacement is shorter than pattern */
@@ -633,8 +632,9 @@ HString& HString::replace( HString const& a_oPattern,
 			newIdx += l_iLenWith;
 			l_iIndex += l_iLenPattern;
 			}
-		if ( newIdx && ( ( l_lSize - oldIdx ) != l_iLenPattern ) )
-			::memmove( f_pcBuffer + newIdx, src->f_pcBuffer + oldIdx + l_iLenPattern, ( l_lSize - oldIdx ) - l_iLenPattern );
+		if ( newIdx && ( ( f_lSize - oldIdx ) != l_iLenPattern ) )
+			::memmove( f_pcBuffer + newIdx, src->f_pcBuffer + oldIdx + l_iLenPattern, ( f_lSize - oldIdx ) - l_iLenPattern );
+		yaal::swap( f_lSize, l_lSize );
 		}
 	f_pcBuffer[ f_lSize ] = 0;
 	return ( *this );
