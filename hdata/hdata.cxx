@@ -56,8 +56,8 @@ void yaal_hdata_banner( void )
 	}
 
 extern "C"
-void yaal_hdata_main( void ) __attribute__(( __noreturn__ ));
-void yaal_hdata_main( void )
+int yaal_hdata_main( int, char** ) __attribute__(( __noreturn__ ));
+int yaal_hdata_main( int, char** )
 	{
 	if ( g_pcDynamicLinkerPath[ 0 ] )
 		{
@@ -67,7 +67,7 @@ void yaal_hdata_main( void )
 		yaal_hconsole_banner();
 		yaal_hdata_banner();
 		}
-	exit( 0 );
+	::exit( 0 );
 	}
 
 }

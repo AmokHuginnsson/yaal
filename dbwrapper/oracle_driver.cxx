@@ -24,9 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdio.h>
+#include <cstdio>
+#include <cstdlib>
 #include <errno.h>
-#include <string.h>
+#include <cstring>
 #include <sys/stat.h>
 #include <stdlib.h> /* strtol */
 
@@ -404,6 +405,12 @@ void oracle_init ( void )
 	{
 	rc_file::process_rc_file ( "yaal", "oracle", n_psVariables, NULL );
 	return;
+	}
+
+int yaal_oracle_driver_main( int, char** ) __attribute__(( __noreturn__ ));
+int yaal_oracle_driver_main( int, char** )
+	{
+	::exit( 0 );
 	}
 
 }

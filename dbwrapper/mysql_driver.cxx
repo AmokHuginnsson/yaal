@@ -25,8 +25,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 
 #include "hcore/xalloc.h"
 
@@ -129,6 +130,12 @@ char* rs_column_name( void* a_pvDataR, int a_iField )
 	MYSQL_FIELD* l_psField = NULL;
 	l_psField = mysql_fetch_field_direct( static_cast<MYSQL_RES*>( a_pvDataR ), a_iField );
 	return ( l_psField->name );
+	}
+
+int yaal_mysql_driver_main( int, char** ) __attribute__(( __noreturn__ ));
+int yaal_mysql_driver_main( int, char** )
+	{
+	::exit( 0 );
 	}
 
 }

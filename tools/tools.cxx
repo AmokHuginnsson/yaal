@@ -200,15 +200,15 @@ void yaal_tools_banner ( void )
 	}
 
 extern "C"
-void yaal_tools_main ( void ) __attribute__(( __noreturn__ ));
-void yaal_tools_main ( void )
+int yaal_tools_main( int, char** ) __attribute__(( __noreturn__ ));
+int yaal_tools_main( int, char** )
 	{
-	if ( g_pcDynamicLinkerPath [ 0 ] )
+	if ( g_pcDynamicLinkerPath[ 0 ] )
 		{
 		yaal_hcore_banner();
 		yaal_tools_banner();
 		}
-	exit ( 0 );
+	::exit( 0 );
 	}
 
 }

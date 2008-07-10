@@ -25,8 +25,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <errno.h>
 
 #include "config.h"
@@ -126,6 +126,12 @@ int long dbrs_id( void*, void* a_pvDataR )
 char* rs_column_name( void* a_pvDataR, int a_iField )
 	{
 	return ( ::PQfname( static_cast<PGresult*>( a_pvDataR ), a_iField ) );
+	}
+
+int yaal_postgresql_driver_main( int, char** ) __attribute__(( __noreturn__ ));
+int yaal_postgresql_driver_main( int, char** )
+	{
+	::exit( 0 );
 	}
 
 }

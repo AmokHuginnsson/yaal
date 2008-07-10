@@ -24,9 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <stdio.h>
+#include <cstdio>
 #include <errno.h>
-#include <string.h>
+#include <cstring>
+#include <cstdlib>
 #include <sys/stat.h>
 #include <sqlite.h>
 
@@ -191,6 +192,12 @@ int long dbrs_id( void* a_pvDataB, void* )
 char* rs_column_name( void* a_pvDataR, int a_iField )
 	{
 	return ( static_cast <OSQLiteResult*>( a_pvDataR )->f_ppcData [ a_iField ] );
+	}
+
+int yaal_sqlite_driver_main( int, char** ) __attribute__(( __noreturn__ ));
+int yaal_sqlite_driver_main( int, char** )
+	{
+	::exit( 0 );
 	}
 
 }

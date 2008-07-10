@@ -163,12 +163,12 @@ static char const g_pcDynamicLinkerPath [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 extern "C"
-void yaal_hcore_main( void ) __attribute__(( __noreturn__ ));
-void yaal_hcore_main( void )
+int yaal_hcore_main( int, char** ) __attribute__(( __noreturn__ ));
+int yaal_hcore_main( int, char** )
 	{
-	if ( g_pcDynamicLinkerPath [ 0 ] )
+	if ( g_pcDynamicLinkerPath[ 0 ] )
 		yaal_hcore_banner();
-	exit ( 0 );
+	::exit( 0 );
 	}
 
 }
