@@ -49,6 +49,7 @@ public:
 	void use( void ) const;
 	void clear( void );
 	char const* consume( void ) const;
+	bool is_empty( void ) const;
 private:
 	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;

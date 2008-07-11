@@ -37,16 +37,29 @@ namespace tools
 
 class HPipedChild : public yaal::hcore::HStreamInterface
 	{
+public:
+	struct STREAM
+		{
+		typedef enum
+			{
+			D_OUT,
+			D_ERR
+			} stream_t;
+		};
+private:
 	int f_iPid;
 	int f_iPipeIn;
 	int f_iPipeOut;
+	int f_iPipeErr;
+	STREAM::stream_t f_eCSOI; /* Current Stream Of Interest */
 public:
 	HPipedChild( void );
 	~HPipedChild( void );
-	void spawn( yaal::hcore::HString const& );
+	void spawn( yaal::hcore::HString const&, char* const[] = NULL );
 	bool read_poll( void* );
 	void finish( void );
 	bool is_running( void );
+	void set_csoi( STREAM::stream_t const& );
 private:
 	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;

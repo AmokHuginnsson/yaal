@@ -124,6 +124,11 @@ char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream co
 	M_EPILOG
 	}
 
+bool HStringStream::is_empty( void ) const
+	{
+	return ( f_bUsed || f_oBuffer.is_empty() );
+	}
+
 }
 
 }
