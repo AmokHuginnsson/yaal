@@ -149,6 +149,8 @@ HBitmap& HBitmap::operator |= ( HBitmap const& b )
 	{
 	M_PROLOG
 	M_ASSERT( f_lSize == b.f_lSize );
+	for ( int long i = 0; i < f_lSize; ++ i )
+		static_cast<char*>( f_pvBlock )[ i ] = static_cast<char>( static_cast<char*>( f_pvBlock )[ i ] | static_cast<char*>( b.f_pvBlock )[ i ] );
 	return ( *this );
 	M_EPILOG
 	}
@@ -157,6 +159,8 @@ HBitmap& HBitmap::operator &= ( HBitmap const& b )
 	{
 	M_PROLOG
 	M_ASSERT( f_lSize == b.f_lSize );
+	for ( int long i = 0; i < f_lSize; ++ i )
+		static_cast<char*>( f_pvBlock )[ i ] = static_cast<char>( static_cast<char*>( f_pvBlock )[ i ] & static_cast<char*>( b.f_pvBlock )[ i ] );
 	return ( *this );
 	M_EPILOG
 	}
@@ -165,7 +169,36 @@ HBitmap& HBitmap::operator ^= ( HBitmap const& b )
 	{
 	M_PROLOG
 	M_ASSERT( f_lSize == b.f_lSize );
+	for ( int long i = 0; i < f_lSize; ++ i )
+		static_cast<char*>( f_pvBlock )[ i ] = static_cast<char>( static_cast<char*>( f_pvBlock )[ i ] ^ static_cast<char*>( b.f_pvBlock )[ i ] );
 	return ( *this );
+	M_EPILOG
+	}
+
+HBitmap HBitmap::operator | ( HBitmap const& b ) const
+	{
+	M_PROLOG
+	HBitmap m( *this );
+	m |= b;
+	return ( m );
+	M_EPILOG
+	}
+
+HBitmap HBitmap::operator & ( HBitmap const& b ) const
+	{
+	M_PROLOG
+	HBitmap m( *this );
+	m &= b;
+	return ( m );
+	M_EPILOG
+	}
+
+HBitmap HBitmap::operator ^ ( HBitmap const& b ) const
+	{
+	M_PROLOG
+	HBitmap m( *this );
+	m ^= b;
+	return ( m );
 	M_EPILOG
 	}
 
