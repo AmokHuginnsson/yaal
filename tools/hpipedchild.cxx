@@ -32,6 +32,7 @@ Copyright:
 #include "hcore/hexception.h"
 M_VCSID ( "$Id$" )
 #include "hpipedchild.h"
+#include "hfsitem.h"
 
 using namespace yaal::hcore;
 
@@ -83,8 +84,10 @@ void HPipedChild::spawn( HString const& a_oImage, char* const a_ppvArgs[] )
 	{
 	M_PROLOG
 	int l_piFileDesIn[ 2 ], l_piFileDesOut[ 2 ], l_piFileDesErr[ 2 ];
+	HFSItem image( a_oImage );
+	M_ENSURE( !! image && image.is_executable() );
 	if ( ::pipe( l_piFileDesIn ) || ::pipe ( l_piFileDesOut ) || ::pipe( l_piFileDesErr ) )
-		M_THROW ( "pipe", errno );
+		M_THROW( "pipe", errno );
 	f_iPid = ::fork();
 	if ( f_iPid < 0 )
 		M_THROW( "fork", errno );
