@@ -54,6 +54,21 @@ HBitmap::~HBitmap( void )
 	M_EPILOG
 	}
 
+int long HBitmap::get_size( void ) const
+	{
+	return ( f_lSize );
+	}
+
+int long HBitmap::size( void ) const
+	{
+	return ( f_lSize );
+	}
+
+void const* HBitmap::raw( void ) const
+	{
+	return ( f_pvBlock );
+	}
+
 void HBitmap::clear( void )
 	{
 	if ( f_lAllocatedBytes )

@@ -123,6 +123,22 @@ void copy( src_it_type_t src, src_it_type_t const& end, dst_it_type_t dst )
 	return;
 	}
 
+template<typename dst_it_type_t, typename filler_t>
+void fill( dst_it_type_t it, dst_it_type_t end, filler_t const& filler )
+	{
+	for ( ; it != end; ++ it )
+		*it = filler;
+	return;
+	}
+
+template<typename dst_it_type_t, typename filler_t>
+void fill_n( dst_it_type_t it, int long const& count, filler_t const& filler )
+	{
+	for ( int long i = 0; i < count; ++ i, ++ it )
+		*it = filler;
+	return;
+	}
+
 template<typename iterator_t, typename generator_t>
 void generate( iterator_t it, iterator_t const& end, generator_t generator )
 	{

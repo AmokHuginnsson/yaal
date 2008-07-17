@@ -24,14 +24,18 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <yaal/yaal.h>
 #include "hcore/hexception.h"
 M_VCSID( "$Id$" )
 #include "hbitsource.h"
 
-namespace prj
+namespace yaal
 {
 
+namespace tools
+{
+
+
+}
 
 }
 

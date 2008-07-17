@@ -34,7 +34,7 @@ endif
 COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe \
 																-D_GNU_SOURCE
 ifdef NODEBUG
-	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
+	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations -DNDEBUG
 else
 	COMPILER_DEBUG_FLAGS				= -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
 endif
