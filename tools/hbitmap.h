@@ -35,6 +35,14 @@ namespace tools
 
 class HBitmap
 	{
+public:
+	class HBit;
+	class HConstBit;
+	template<typename const_qual_t>
+	class HIterator;
+	typedef HIterator<HConstBit> const_iterator;
+	typedef HIterator<HBit> iterator;
+private:
 	int long f_lAllocatedBytes;
 	int long f_lSize;
 	void* f_pvBlock;
@@ -62,12 +70,85 @@ public:
 	void const* raw( void ) const;
 	void copy( void const*, int long const& );
 	void use( void*, int long const& );
+	const_iterator begin( void ) const;
+	const_iterator find( int long const& ) const;
+	const_iterator end( void ) const;
+	iterator begin( void );
+	iterator find( int long const& );
+	iterator end( void );
 	bool get( int long const& ) const;
 	void set( int long const&, bool const& );
 	void rotate_left( int long const&, int long const&, int long const& );
 	void rotate_right( int long const&, int long const&, int long const& );
 private:
 	int long octets_for_bits( int long const& ) const;
+	};
+
+template<typename const_qual_t>
+class HBitmap::HIterator
+	{
+	HBitmap::HBitmap const* f_poOwner;
+	int long f_lIndex;
+public:
+	HIterator( void );
+	HIterator( HIterator const& );
+	HIterator& operator ++ ( void )
+		{
+		++ f_lIndex;
+		return ( *this );
+		}
+	HIterator operator ++ ( int )
+		{
+		HIterator it( *this );
+		++ f_lIndex;
+		return ( it );
+		}
+	HIterator& operator -- ( void )
+		{
+		-- f_lIndex;
+		return ( *this );
+		}
+	HIterator operator -- ( int )
+		{
+		HIterator it( *this );
+		-- f_lIndex;
+		return ( it );
+		}
+	HIterator& operator = ( HIterator const& );
+	bool operator == ( HIterator const& ) const;
+	bool operator != ( HIterator const& ) const;
+	const_qual_t operator* ( void ) const;
+	const_qual_t operator* ( void );
+private:
+	friend class HBitmap::HBitmap;
+	HIterator( HBitmap::HBitmap const*, int long const& );
+	};
+
+class HConstBit
+	{
+	int long f_lIndex;
+public:
+	HConstBit( HConstBit const& );
+	HConstBit( HBitmap::HBit const& );
+	bool operator == ( HConstBit const& ) const;
+	bool operator != ( HConstBit const& ) const;
+	operator bool ( void ) const;
+private:
+	HConstBit( int long const& );
+	};
+
+class HBit
+	{
+	int long f_lIndex;
+public:
+	HBit( HBit const& );
+	HBit& operator = ( HBit const& );
+	HBit& operator = ( bool const& );
+	bool operator == ( HBitmap::HConstBit const& ) const;
+	bool operator != ( HBitmap::HConstBit const& ) const;
+	operator bool ( void ) const;
+private:
+	HBit( int long const& );
 	};
 
 }
