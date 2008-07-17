@@ -52,7 +52,7 @@ typedef int ( * db_errno_t )( void* );
 typedef char const* ( * db_error_t )( void* );
 typedef void* ( * db_query_t )( void*, char const* );
 typedef void ( * db_unquery_t )( void* );
-typedef char* ( * rs_get_t )( void*, int, int );
+typedef char* ( * rs_get_t )( void*, int long, int );
 typedef int ( * rs_fields_count_t )( void* );
 typedef int long ( * dbrs_records_count_t )( void*, void* );
 typedef int long ( * dbrs_id_t )( void*, void* );

@@ -55,7 +55,7 @@ int HWindowListControl::do_process_input( int a_iCode )
 	{
 	M_PROLOG
 	a_iCode = HListControl::do_process_input( a_iCode );
-	int l_iSize = f_oControler->size();
+	int l_iSize = static_cast<int>( f_oControler->size() );
 	if ( l_iSize > 0 )
 		{
 		if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )

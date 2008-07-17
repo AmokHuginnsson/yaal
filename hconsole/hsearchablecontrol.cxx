@@ -93,8 +93,8 @@ void HSearchableControl::highlight( int a_iRow, int a_iColumn,
 			cons.set_attr( n_iAttributeSearchHighlight >> 8 );
 		else
 			cons.set_attr( n_iAttributeSearchHighlight );
-		cons.c_mvprintf( a_iRow, a_iColumn
-				+ ( l_pcHighlightStart - f_oVarTmpBuffer.raw() ),
+		cons.c_mvprintf( a_iRow,
+				static_cast<int>( a_iColumn + ( l_pcHighlightStart - f_oVarTmpBuffer.raw() ) ),
 				"%.*s", l_iHighlightLength, l_pcHighlightStart );
 		l_pcHighlightStart ++;
 		l_iCtr ++;

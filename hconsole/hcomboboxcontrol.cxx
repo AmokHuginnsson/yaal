@@ -108,7 +108,7 @@ void HComboboxControl::do_refresh ( void )
 		l_iHeight = f_iHeight;
 		l_iWidth = f_iWidth;
 		f_iWidth = f_iDroppedWidth;
-		int size = f_oControler->size();
+		int size = static_cast<int>( f_oControler->size() );
 		int l_iHR = ( f_bDrawLabel ? 1 : 0 ) + ( f_bDrawHeader && ! f_bSingleLine ? 1 : 0 );
 		if ( size < ( f_iHeight - l_iHR ) )
 			f_iHeight = size + l_iHR;

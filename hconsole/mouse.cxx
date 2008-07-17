@@ -76,19 +76,19 @@ int hunt_tty ( int a_iOffset )
 	char * l_pcTtyName = NULL, * l_pcPtr = NULL;
 	l_pcTtyName = ttyname ( STDIN_FILENO );
 	if ( l_pcTtyName && ! strncmp ( l_pcTtyName, "/dev/ttyv", 8 + a_iOffset ) )
-		l_iVC = strtol ( l_pcTtyName + 8 + a_iOffset, NULL, 10 );
+		l_iVC = lexical_cast<int>( l_pcTtyName + 8 + a_iOffset );
 	else
 		{
 		l_pcTtyName = ::getenv ( "STY" );
 		if ( l_pcTtyName )
 			{
 			if ( ( l_pcPtr = strstr ( l_pcTtyName, ".tty" ) ) )
-				l_iVC = strtol ( l_pcPtr + 4 + a_iOffset, NULL, 10 );
+				l_iVC = lexical_cast<int>( l_pcPtr + 4 + a_iOffset );
 			else if ( ( l_pcPtr = strstr ( l_pcTtyName, ".pts" ) ) )
-				l_iVC = strtol ( l_pcPtr + 4 + a_iOffset, NULL, 10 );
+				l_iVC = lexical_cast<int>( l_pcPtr + 4 + a_iOffset );
 			}
 		else
-			M_THROW ( "can not find controling virtual console", errno );
+			M_THROW( "can not find controling virtual console", errno );
 		}
 	return ( l_iVC );
 	M_EPILOG
@@ -252,7 +252,7 @@ int x_mouse_open( void )
 		{
 		HString l_oError;
 		HException l_oException( __FILE__, __PRETTY_FUNCTION__, __LINE__, "could not set up apropriate mask",
-				l_xMouseMask );
+				static_cast<int>( l_xMouseMask ) );
 		l_oError.format( "1 = %d, 2 = %d, 3 = %d",
 				l_xMouseMask & BUTTON1_CLICKED, l_xMouseMask & BUTTON2_CLICKED,
 				l_xMouseMask & BUTTON3_CLICKED );
@@ -271,7 +271,7 @@ int x_mouse_get( OMouse& a_rsMouse )
 		M_THROW ( "can not get mouse data", errno );
 	else
 		{
-		a_rsMouse.f_iButtons = l_sMouse.bstate;
+		a_rsMouse.f_iButtons = static_cast<int>( l_sMouse.bstate );
 		a_rsMouse.f_iRow = l_sMouse.y;
 		a_rsMouse.f_iColumn = l_sMouse.x;
 		}

@@ -143,7 +143,7 @@ void HLog::rehash( FILE* a_psStream,
 			if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 				{
 				timestamp( a_psStream );
-				::fprintf( a_psStream, buf + 10 );
+				::fputs( buf + 10, a_psStream );
 				}
 			}
 		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
@@ -214,7 +214,7 @@ int HLog::operator() ( char const* const a_pcFormat, va_list a_xAp )
 	char* buf = f_oBuffer.get<char>();
 	::memset( buf, 0, f_iBufferSize );
 	l_iErr = ::vsnprintf( buf, f_iBufferSize, a_pcFormat, a_xAp );
-	fprintf( f_psStream, buf );
+	::fputs( buf, f_psStream );
 	if ( buf[ ::strlen( buf ) - 1 ] != '\n' )
 		f_bNewLine = false;
 	else
@@ -278,7 +278,7 @@ int long HLog::do_write( void const* const a_pcString, int long const& a_lSize )
 		{
 		if ( f_bNewLine )
 			timestamp();
-		len = fprintf ( f_psStream, str );
+		len = ::fputs( str, f_psStream );
 		if ( str[ a_lSize - 1 ] != '\n' )
 			f_bNewLine = false;
 		else

@@ -61,7 +61,7 @@ public:
 	iterator rend( void );
 	bool is_empty( void ) const;
 	int get_field_count( void ) const;
-	int get_size( void ) const;
+	int long get_size( void ) const;
 	char const* get_column_name( int ) const;
 	int long get_insert_id( void ) const;
 	char const* get_error( void ) const;
@@ -74,7 +74,7 @@ private:
 class HRecordSet::HIterator
 	{
 	HRecordSet* f_poOwner;
-	int f_iCursorPosition; /* cursor position in record-set */
+	int long f_lCursorPosition; /* cursor position in record-set */
 public:
 	HIterator( HIterator const& );
 	HIterator& operator = ( HIterator const& );
@@ -86,7 +86,7 @@ public:
 	bool operator != ( HIterator const& ) const;
 	yaal::hcore::HString operator[] ( int const& ) const;
 private:
-	HIterator( HRecordSet*, int const& );
+	HIterator( HRecordSet*, int long const& );
 	friend class HRecordSet;
 	};
 
@@ -118,7 +118,7 @@ private:
 	typedef yaal::hcore::HArray<bool> mutated_t;
 	fields_t f_oFields;
 	int f_iFieldCount;		/* number of columns returned by last query */
-	int f_iSetSize;		/* number of records returned by last query */
+	int long f_lSetSize;		/* number of records returned by last query */
 	values_t f_oValues;
 	database_ptr_t f_oDataBase;
 	mutated_t f_oMutated;
@@ -135,7 +135,7 @@ public:
 	yaal::hcore::HString get_filter( void ) const;
 	yaal::hcore::HString get_sort( void ) const;
 	MODE::mode_t get_mode( void ) const;
-	int get_size( void ) const;
+	int long get_size( void ) const;
 	void sync( int, int long& );
 	void sync( int, yaal::hcore::HString& );
 	void sync( HRecordSet::iterator const& );

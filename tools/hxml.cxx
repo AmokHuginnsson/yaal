@@ -308,7 +308,7 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& a_oPath )
 	{
 	M_PROLOG
 	f_oVarTmpBuffer = a_oPath;
-	int l_iLength = f_oVarTmpBuffer.get_length() - 1;
+	int long l_iLength = f_oVarTmpBuffer.get_length() - 1;
 	xpath_context_resource_t ctx( xmlXPathNewContext( f_poXml->f_oDoc.get() ), xmlXPathFreeContext );
 	int setSize = 0;
 	f_poXml->f_psNodeSet = NULL;
@@ -867,7 +867,7 @@ bool HXml::HConstNodeProxy::has_childs( void ) const
 	M_EPILOG
 	}
 
-int HXml::HNodeProxy::child_count( void ) const
+int long HXml::HNodeProxy::child_count( void ) const
 	{
 	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );
@@ -875,7 +875,7 @@ int HXml::HNodeProxy::child_count( void ) const
 	M_EPILOG
 	}
 
-int HXml::HConstNodeProxy::child_count( void ) const
+int long HXml::HConstNodeProxy::child_count( void ) const
 	{
 	M_PROLOG
 	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::D_NODE ) );

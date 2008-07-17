@@ -77,7 +77,7 @@ void* db_connect( char const* a_pcDataBase,
 		g_psBrokenDB = NULL;
 		}
 	l_psSQLite = xcalloc< OSQLite>( 1 );
-	l_iNmLnght = ::strlen( a_pcDataBase );
+	l_iNmLnght = static_cast<int>( ::strlen( a_pcDataBase ) );
 	l_pcDataBase = xcalloc<char>( l_iNmLnght + ::strlen( l_pcFileNameExt ) + 1 );
 	::strcpy( l_pcDataBase, a_pcDataBase );
 	::strcat( l_pcDataBase, l_pcFileNameExt );
@@ -175,12 +175,12 @@ void db_unquery ( void * a_pvData )
 	return;
 	}
 
-char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
+char* rs_get( void* a_pvData, int long a_iRow, int a_iColumn )
 	{
 	char** l_ppcData = NULL;
 	OSQLiteResult* l_psResult = static_cast<OSQLiteResult*>( a_pvData );
 	l_ppcData = l_psResult->f_ppcData;
-	return ( l_ppcData [ ( a_iRow + 1 ) * l_psResult->f_iColumns + a_iColumn ] );
+	return ( l_ppcData[ ( a_iRow + 1 ) * l_psResult->f_iColumns + a_iColumn ] );
 	}
 
 int rs_fields_count( void* a_pvData )

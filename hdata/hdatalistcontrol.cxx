@@ -65,7 +65,7 @@ void HDataListControl::load( int long /*a_iId*/ )
 	{
 	M_PROLOG
 	f_oSQL->set_filter( "" );
-	int l_iCount = 0, l_iCtr = 0, l_iSize = f_oDataControler->size();
+	int l_iCount = 0, l_iCtr = 0, l_iSize = static_cast<int>( f_oDataControler->size() );
 	HDataWindow* l_poParent = dynamic_cast<HDataWindow*>( f_poParent );
 	M_ASSERT ( l_poParent );
 	HRecordSet::ptr_t rs = f_oSQL->execute( HSQLDescriptor::MODE::D_SELECT );

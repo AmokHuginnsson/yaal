@@ -166,7 +166,7 @@ void HStatusBarControl::set_prompt ( char const * a_pcPrompt, PROMPT::mode_t a_e
 	if ( a_pcPrompt )
 		{
 		f_oPrompt = a_pcPrompt;
-		f_iPromptLength = f_oPrompt.get_length();
+		f_iPromptLength = static_cast<int>( f_oPrompt.get_length() );
 		}
 	HEditControl::set ( "" ); /* refresh call inside */
 	return;
@@ -221,7 +221,7 @@ void HStatusBarControl::update_progress( double a_dStep,
 	if ( f_bEstimate )
 		{
 		if ( a_dStep )
-			l_oNow.set ( static_cast<time_t>( ( f_dProgressSize / a_dStep ) * l_oStoper ) );
+			l_oNow.set( static_cast<time_t>( ( f_dProgressSize / a_dStep ) * static_cast<double>( l_oStoper ) ) );
 		l_oLeft = l_oNow - l_oStoper;
 		}
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
@@ -259,7 +259,7 @@ void HStatusBarControl::update_progress( double a_dStep,
 			f_oString.fill ( '=', l_iNextStep, 1 );
 		if ( f_bDone )
 			{
-			int l_iLength = f_oString.get_length();
+			int l_iLength = static_cast<int>( f_oString.get_length() );
 			f_oString.erase( l_iLength - 6, 5 );
 			f_oString.insert( l_iLength - 6, 4, "done" );
 			}

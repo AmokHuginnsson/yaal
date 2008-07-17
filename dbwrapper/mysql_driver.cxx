@@ -99,7 +99,7 @@ void db_unquery ( void * a_pvData )
 	return;
 	}
 
-char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
+char* rs_get( void* a_pvData, int long a_iRow, int a_iColumn )
 	{
 	MYSQL_ROW l_ppcRow;
 	mysql_data_seek( static_cast<MYSQL_RES*>( a_pvData ), a_iRow );

@@ -115,8 +115,8 @@ void HLogPad::do_refresh ( void )
 					}
 				else
 					{
-					l_iCursor += f_oVarTmpBuffer.get_length();
-					l_iColumn += it->f_oText.get_length();
+					l_iCursor += static_cast<int>( f_oVarTmpBuffer.get_length() );
+					l_iColumn += static_cast<int>( it->f_oText.get_length() );
 					}
 				}
 			}
@@ -153,13 +153,13 @@ void HLogPad::add ( yaal::hcore::HString const& a_oText )
 	f_oVarTmpBuffer = a_oText;
 	while ( ! f_oVarTmpBuffer.is_empty() )
 		{
-		l_iIndexNL = f_oVarTmpBuffer.find_one_of( "\r\n" );
+		l_iIndexNL = static_cast<int>( f_oVarTmpBuffer.find_one_of( "\r\n" ) );
 		if ( l_iIndexNL >= 0 )
 			{
 			it->f_oText += f_oVarTmpBuffer.left( l_iIndexNL );
 			it->f_eType = HLogLine::D_TEXT_EOL;
 			f_iLines ++;
-			l_iIndexChar = f_oVarTmpBuffer.find_other_than( "\r\n", l_iIndexNL + 1 );
+			l_iIndexChar = static_cast<int>( f_oVarTmpBuffer.find_other_than( "\r\n", l_iIndexNL + 1 ) );
 			if ( l_iIndexChar >= 0 )
 				f_oVarTmpBuffer = f_oVarTmpBuffer.mid( l_iIndexChar );
 			else

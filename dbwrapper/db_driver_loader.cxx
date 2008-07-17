@@ -120,7 +120,7 @@ void null_db_unquery( void* )
 	M_EPILOG
 	}
 
-char* null_rs_get( void*, int, int )
+char* null_rs_get( void*, int long, int )
 	{
 	M_PROLOG
 	log( LOG_TYPE::D_ERROR ) << etag << "(rs_get)" << eend << endl;
@@ -311,7 +311,7 @@ void autoloader_db_unquery( void* a_pvDataBase )
 	M_EPILOG
 	}
 
-char* autoloader_rs_get( void* a_pvResult, int a_iRow, int a_iCol )
+char* autoloader_rs_get( void* a_pvResult, int long a_iRow, int a_iCol )
 	{
 	M_PROLOG
 	load_driver();

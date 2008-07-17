@@ -81,7 +81,7 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		{
 		if ( ( a_roValue.get_length() > 1 ) && ( a_roValue [ 0 ] == 'B' ) )
 			{
-			l_iBaudRate = ::strtol( a_roValue.raw() + 1, NULL, 10 );
+			l_iBaudRate = lexical_cast<int>( a_roValue.raw() + 1 );
 			switch ( l_iBaudRate )
 				{
 				case ( 115200 ): n_eBaudRate = HSerial::D_SPEED_B115200; break;

@@ -151,7 +151,7 @@ public:
 	HXml::HConstIterator const query( yaal::hcore::HString const& ) const;
 	HXml::HNode::TYPE::type_t get_type() const;
 	bool has_childs( void ) const;
-	int child_count( void ) const;
+	int long child_count( void ) const;
 	int get_level( void ) const;
 	yaal::hcore::HString const& get_name( void ) const;
 	yaal::hcore::HString const& get_value( void ) const;
@@ -182,7 +182,7 @@ public:
 	HXml::HIterator const query( yaal::hcore::HString const& ) const;
 	HXml::HNode::TYPE::type_t get_type() const;
 	bool has_childs( void ) const;
-	int child_count( void ) const;
+	int long child_count( void ) const;
 	int get_level( void ) const;
 	yaal::hcore::HString const& get_name( void ) const;
 	yaal::hcore::HString const& get_value( void ) const;

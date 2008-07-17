@@ -141,7 +141,9 @@ HString n_oLastErrorMessage;
 HString kwota_slownie( double a_dKwota )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iLength = 0, l_iForma = 0, l_iSub = 0;
+	int l_iCtr = 0;
+	int long l_iLength = 0;
+	int l_iForma = 0, l_iSub = 0;
 	char l_cCyfra = 0;
 	HString l_oSlownie;
 	HString l_oString;
@@ -228,8 +230,9 @@ double atof_ex( HString const& a_oString, bool a_bParse )
 int modulo_ASCII( HString const& a_oASCIINumber, int a_iModulo )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iNumber = 0, l_iStep = 0, l_iTmpLength = 0;
-	int l_iLength = a_oASCIINumber.get_length();
+	int l_iCtr = 0, l_iNumber = 0, l_iStep = 0;
+	int long l_iTmpLength = 0;
+	int long l_iLength = a_oASCIINumber.get_length();
 	HString l_oTmpString, l_oTmpNumber = a_oASCIINumber;
 	if ( l_iLength < 0 )
 		M_THROW ( "bad ASCII number length", l_iLength );
@@ -255,7 +258,8 @@ int modulo_ASCII( HString const& a_oASCIINumber, int a_iModulo )
 bool verify_IBAN( HString const& a_oIBAN )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iLength = a_oIBAN.get_length();
+	int l_iCtr = 0;
+	int long l_iLength = a_oIBAN.get_length();
 	char l_pcPattern [ 2 ] = "\0";
 	HString l_oIBAN, l_oTmpString;
 	if ( l_iLength < D_MIN_IBAN_LENGTH )
@@ -263,7 +267,7 @@ bool verify_IBAN( HString const& a_oIBAN )
 		n_oLastErrorMessage.format ( "IBAN: Number too short (%d).", l_iLength );
 		return ( true );
 		}
-	l_oIBAN.hs_realloc ( l_iLength );
+	l_oIBAN.hs_realloc( l_iLength );
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
 		if ( isalnum ( a_oIBAN[ l_iCtr ] ) )
 			l_oIBAN += a_oIBAN[ l_iCtr ];
@@ -382,7 +386,7 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 		printf( "  %*s%s %-*s ",
 				static_cast<int>( l_iLongestShortLength ), sf.raw() ? sf.raw() : "", coma,
 				static_cast<int>( l_iLongestLongLength ), lf.raw() ? lf.raw() : "" );
-		int cols = 80 - ( l_iLongestLongLength + l_iLongestShortLength + 7 );
+		int cols = static_cast<int>( 80 - ( l_iLongestLongLength + l_iLongestShortLength + 7 ) );
 		desc = description;
 		bool loop = true;
 		do
@@ -390,10 +394,10 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 			int eol = 0;
 			while ( ( eol < cols ) && ( eol >= 0 ) )
 				{
-				eol = desc.find_one_of( n_pcWhiteSpace, eol );
+				eol = static_cast<int>( desc.find_one_of( n_pcWhiteSpace, eol ) );
 				if ( ( eol < 0 ) || ( eol > cols ) )
 					break;
-				eol = desc.find_other_than( n_pcWhiteSpace, eol );
+				eol = static_cast<int>( desc.find_other_than( n_pcWhiteSpace, eol ) );
 				}
 			if ( eol >= cols )
 				{
@@ -490,10 +494,10 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 			int eol = 0;
 			while ( ( eol < D_MAXIMUM_LINE_LENGTH ) && ( eol >= 0 ) )
 				{
-				eol = desc.find_one_of( n_pcWhiteSpace, eol );
+				eol = static_cast<int>( desc.find_one_of( n_pcWhiteSpace, eol ) );
 				if ( ( eol < 0 ) || ( eol > D_MAXIMUM_LINE_LENGTH ) )
 					break;
-				eol = desc.find_other_than( n_pcWhiteSpace, eol );
+				eol = static_cast<int>( desc.find_other_than( n_pcWhiteSpace, eol ) );
 				}
 			if ( eol >= D_MAXIMUM_LINE_LENGTH )
 				{
@@ -614,8 +618,8 @@ int levenshtein_damerau( yaal::hcore::HString const& a_oOne, yaal::hcore::HStrin
 	M_PROLOG
 	int l_iCost = 0;
 	int l_iIndexOne = 0, l_iIndexTwo = 0;
-	int l_iLengthOne = a_oOne.length();
-	int l_iLengthTwo = a_oTwo.length();
+	int l_iLengthOne = static_cast<int>( a_oOne.length() );
+	int l_iLengthTwo = static_cast<int>( a_oTwo.length() );
 	int** l_ppiDistanceMatrix = NULL;
 	if ( ! l_iLengthTwo )
 		return ( l_iLengthOne );

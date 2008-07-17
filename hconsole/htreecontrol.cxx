@@ -156,7 +156,7 @@ int HTreeControl::draw_node( tree_t::node_t a_poNode, int a_iRow )
 		HString const& str = info.get<HString const&>();
 		(**a_poNode).f_iRowRaw = l_iRow;
 		(**a_poNode).f_iColumnRaw = f_iColumnRaw + a_poNode->get_level() * 2 - 1; 
-		(**a_poNode).f_iWidthRaw = str.get_length() + 2;
+		(**a_poNode).f_iWidthRaw = static_cast<int>( str.get_length() ) + 2;
 		set_attr_data();
 		if ( ! ( (**a_poNode).f_bUnfolded || ! a_poNode->has_childs() ) )
 			cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw, "+" );

@@ -102,7 +102,7 @@ bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
 void set_env( HString line )
 	{
 	M_PROLOG
-	int eon = 0;
+	int long eon = 0;
 	if ( ( line.length() < 3 )
 			|| ( ( eon = line.find_one_of( " \t" ) ) == -1 ) )
 		{
@@ -110,7 +110,7 @@ void set_env( HString line )
 		log << line << '\'' << endl;
 		return;
 		}
-	int valPos = line.find_other_than( " \t", eon );
+	int long valPos = line.find_other_than( " \t", eon );
 	if ( valPos < 0 )
 		{
 		log ( LOG_TYPE::D_ERROR ) << "no value for environment variable in set_env: `";

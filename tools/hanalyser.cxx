@@ -643,7 +643,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 		 * 2 becomes -3, and so on and so forth.
 		 * HPool::size() returns current access/addition peak for revelant pool,
 		 * so to get index of lately added value we need to decrement size by 1. */
-		(**a_roNode).f_oVariables.push_back( - ( f_oConstantsPool.size() - 1 ) - 1 );
+		(**a_roNode).f_oVariables.push_back( static_cast<int>( - ( f_oConstantsPool.size() - 1 ) - 1 ) );
 		return ( false );
 		}
 	f_eError = E_UNEXPECTED_TOKEN;
@@ -654,7 +654,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 double* HAnalyser::analyse( HString const& a_oFormula )
 	{
 	M_PROLOG
-	int l_iLength = 0;
+	int long l_iLength = 0;
 	f_iIndex = 0;
 	f_eError = E_OK;
 	l_iLength = a_oFormula.get_length();

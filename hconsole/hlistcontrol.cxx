@@ -126,7 +126,7 @@ void HListControl::do_refresh ( void )
 	int l_iTmp = 0;
 	int l_iColumns = f_oHeader.size();
 	int l_iHR = f_bDrawHeader ? 1 : 0; /* HR stands for header row */
-	int l_iSize = f_oControler->size();
+	int l_iSize = static_cast<int>( f_oControler->size() );
 	HColumnInfo * l_poColumnInfo = NULL;
 	HConsole& cons = HCons::get_instance();
 	l_iTmp = f_iWidthRaw;
@@ -248,7 +248,7 @@ void HListControl::draw_scroll( int a_iPosX )
 	{
 	M_PROLOG
 	double l_dScaled = 0;
-	int l_iSize = f_oControler->size();
+	int l_iSize = static_cast<int>( f_oControler->size() );
 	HConsole& cons = HCons::get_instance();
 	if ( f_iControlOffset )
 		{
@@ -276,7 +276,7 @@ void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int 
 	M_PROLOG
 	int l_iTmp = 0;
 	HConsole& cons = HCons::get_instance();
-	l_iTmp = f_oVarTmpBuffer.get_length();
+	l_iTmp = static_cast<int>( f_oVarTmpBuffer.get_length() );
 	switch ( a_poColumnInfo->f_eAlign )
 		{
 		case ( BITS::ALIGN::D_LEFT ):
@@ -294,7 +294,7 @@ void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int 
 				{
 				f_oVarTmpBuffer.insert( 0, ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
 				f_oVarTmpBuffer.fill( '_', ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
-				l_iTmp = f_oVarTmpBuffer.get_length();
+				l_iTmp = static_cast<int>( f_oVarTmpBuffer.get_length() );
 				f_oVarTmpBuffer.fillz( '_', a_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
 				}
 			}
@@ -413,7 +413,7 @@ void HListControl::handle_key_page_up( void )
 
 void HListControl::handle_key_page_down( void )
 	{
-	int l_iSize = f_oControler->size();
+	int l_iSize = static_cast<int>( f_oControler->size() );
 	if ( l_iSize >= f_iHeightRaw )
 		{
 		if ( f_iCursorPosition == ( f_iHeightRaw - 1 ) )
@@ -481,7 +481,7 @@ void HListControl::handle_key_home( void )
 
 void HListControl::handle_key_end( void )
 	{
-	int l_iSize = f_oControler->size();
+	int l_iSize = static_cast<int>( f_oControler->size() );
 	f_oCursor = f_oControler->rbegin();
 	if ( l_iSize >= f_iHeightRaw )
 		{
@@ -602,11 +602,11 @@ void HListControl::add_column( int const& a_riColumn, char const* a_pcName,
 	M_PROLOG
 	int l_iShortcutIndex = 0;
 	HColumnInfo l_oColumnInfo;
-	int l_iSize = f_oControler->size();
+	int l_iSize = static_cast<int>( f_oControler->size() );
 	if ( l_iSize )
 		M_THROW ( "can not add new column when list not empty", l_iSize );
 	f_oVarTmpBuffer = a_pcName;
-	l_iShortcutIndex = f_oVarTmpBuffer.find( '&' );
+	l_iShortcutIndex = static_cast<int>( f_oVarTmpBuffer.find( '&' ) );
 	if ( l_iShortcutIndex > -1 )
 		{
 		f_oVarTmpBuffer.set_at( l_iShortcutIndex, 0 );
@@ -743,7 +743,9 @@ void HListControl::go_to_match( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iSize = f_oControler->size(), l_iCount = l_iSize + 1, l_iColumns = f_oHeader.size();
+	int l_iSize = static_cast<int>( f_oControler->size() );
+	int l_iCount = l_iSize + 1;
+	int l_iColumns = static_cast<int>( f_oHeader.size() );
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
 	char const * l_pcOutcome = NULL;
@@ -825,7 +827,9 @@ void HListControl::go_to_match_previous ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iSize = f_oControler->size(), l_iCount = l_iSize + 1, l_iColumns = f_oHeader.size();
+	int l_iSize = static_cast<int>( f_oControler->size() );
+	int l_iCount = l_iSize + 1;
+	int l_iColumns = static_cast<int>( f_oHeader.size() );
 	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
 	char const * l_pcHighlightStart = NULL;
 	char const * l_pcOutcome = NULL;
@@ -1033,26 +1037,28 @@ template<>
 bool compare_cells( HInfo const& a_oLeft, HInfo const& a_oRight, OSortHelper& a_roSortHelper )
 	{
 	M_PROLOG
-	double l_dDifference = 0;
 	if ( a_roSortHelper.f_poWindow )
 		a_roSortHelper.progress();
+	bool lower = false;
 	switch ( a_roSortHelper.f_eType )
 		{
 		case ( D_INT_LONG ):
-			return ( a_oLeft.get<long>() < a_oRight.get<long>() );
+			lower = a_oLeft.get<long>() < a_oRight.get<long>();
+		break;
 		case ( D_DOUBLE ):
-			l_dDifference = a_oLeft.get<double>() - a_oRight.get<double>();
+			lower = a_oLeft.get<double>() < a_oRight.get<double>();
 		break;
 		case ( D_HSTRING ):
-			return ( strcasecmp ( a_oLeft.get<HString const &>(),
-					 a_oRight.get<HString const&>() ) < 0 );
+			lower = strcasecmp( a_oLeft.get<HString const &>(),
+					 a_oRight.get<HString const&>() ) < 0;
+		break;
 		case ( D_HTIME ):
-			l_dDifference = static_cast<time_t>( a_oLeft.get<HTime const&>() ) - static_cast<time_t>( a_oRight.get<HTime const&>() );
+			lower = static_cast<time_t>( a_oLeft.get<HTime const&>() ) < static_cast<time_t>( a_oRight.get<HTime const&>() );
 		break;
 		default:
 			break;
 		}
-	return ( l_dDifference < 0 ? true : false );
+	return ( lower );
 	M_EPILOG
 	}
 

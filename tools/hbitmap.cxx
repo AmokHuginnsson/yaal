@@ -334,7 +334,7 @@ void HBitmap::set( int long const& a_lNumber, bool const& a_bState )
 	M_PROLOG
 	M_ASSERT( a_lNumber >= 0 );
 	M_ASSERT( a_lNumber < f_lSize );
-	int l_iOffset;
+	int long l_iOffset;
 	int long l_lDword;
 	char unsigned* l_pcAddress = static_cast<char unsigned*>( f_pvBlock );
 	l_lDword = a_lNumber >> 3;

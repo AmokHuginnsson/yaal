@@ -278,7 +278,7 @@ int process_rc_file_internal( HString const& a_oRcName,
 								"with value: `%s', on line %d.\n",
 								l_oOption.raw(), l_oValue.raw(), l_iLine );
 					log ( LOG_TYPE::D_ERROR ) << l_oMessage;
-					::fprintf( stderr, l_oMessage.raw() );
+					::fputs( l_oMessage.raw(), stderr );
 					}
 				}
 			}

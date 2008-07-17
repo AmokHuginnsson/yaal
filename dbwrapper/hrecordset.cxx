@@ -82,7 +82,7 @@ int HRecordSet::get_field_count( void ) const
 	return ( dbwrapper::rs_fields_count( f_pvResult ) );
 	}
 
-int HRecordSet::get_size( void ) const
+int long HRecordSet::get_size( void ) const
 	{
 	return ( dbwrapper::dbrs_records_count( &*f_oDataBase, f_pvResult ) );
 	}
@@ -138,7 +138,7 @@ HRecordSet::iterator HRecordSet::rend( void )
 HSQLDescriptor::HSQLDescriptor( void )
 	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(),
 	f_oColumns ( "*" ), f_oFilter(), f_oSort(), f_oFields(), f_iFieldCount( 0 ),
-	f_iSetSize( 0 ), f_oValues(), f_oDataBase(), f_oMutated()
+	f_lSetSize( 0 ), f_oValues(), f_oDataBase(), f_oMutated()
 	{
 	return;
 	}
@@ -146,7 +146,7 @@ HSQLDescriptor::HSQLDescriptor( void )
 HSQLDescriptor::HSQLDescriptor( database_ptr_t a_oDataBase )
 	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(),
 	f_oColumns ( "*" ), f_oFilter(), f_oSort(), f_oFields(), f_iFieldCount( 0 ),
-	f_iSetSize( 0 ), f_oValues(), f_oDataBase( a_oDataBase ), f_oMutated()
+	f_lSetSize( 0 ), f_oValues(), f_oDataBase( a_oDataBase ), f_oMutated()
 	{
 	return;
 	}
@@ -319,18 +319,18 @@ HSQLDescriptor::MODE::mode_t HSQLDescriptor::get_mode( void ) const
 	return ( f_eMode );
 	}
 
-int HSQLDescriptor::get_size( void ) const
+int long HSQLDescriptor::get_size( void ) const
 	{
-	return ( f_iSetSize );
+	return ( f_lSetSize );
 	}
 
-HRecordSet::HIterator::HIterator( HRecordSet* a_poOwner, int const& a_iPosition )
-	: f_poOwner( a_poOwner ), f_iCursorPosition( a_iPosition )
+HRecordSet::HIterator::HIterator( HRecordSet* a_poOwner, int long const& a_iPosition )
+	: f_poOwner( a_poOwner ), f_lCursorPosition( a_iPosition )
 	{
 	}
 
 HRecordSet::HIterator::HIterator( HIterator const& it )
-	: f_poOwner( it.f_poOwner ), f_iCursorPosition( it.f_iCursorPosition )
+	: f_poOwner( it.f_poOwner ), f_lCursorPosition( it.f_lCursorPosition )
 	{
 	}
 
@@ -339,7 +339,7 @@ HRecordSet::HIterator& HRecordSet::HIterator::operator = ( HIterator const& it )
 	if ( &it != this )
 		{
 		f_poOwner = it.f_poOwner;
-		f_iCursorPosition = it.f_iCursorPosition;
+		f_lCursorPosition = it.f_lCursorPosition;
 		}
 	return ( *this );
 	}
@@ -348,7 +348,7 @@ bool HRecordSet::HIterator::operator == ( HIterator const& it ) const
 	{
 	M_PROLOG
 	M_ASSERT( it.f_poOwner == f_poOwner );
-	return ( it.f_iCursorPosition == f_iCursorPosition );
+	return ( it.f_lCursorPosition == f_lCursorPosition );
 	M_EPILOG
 	}
 
@@ -356,7 +356,7 @@ bool HRecordSet::HIterator::operator != ( HIterator const& it ) const
 	{
 	M_PROLOG
 	M_ASSERT( it.f_poOwner == f_poOwner );
-	return ( it.f_iCursorPosition != f_iCursorPosition );
+	return ( it.f_lCursorPosition != f_lCursorPosition );
 	M_EPILOG
 	}
 
@@ -364,7 +364,7 @@ HRecordSet::HIterator& HRecordSet::HIterator::operator ++ ( void )
 	{
 	M_PROLOG
 	M_ASSERT( f_poOwner );
-	++ f_iCursorPosition;
+	++ f_lCursorPosition;
 	return ( *this );
 	M_EPILOG
 	}
@@ -374,7 +374,7 @@ HRecordSet::HIterator HRecordSet::HIterator::operator ++ ( int )
 	M_PROLOG
 	M_ASSERT( f_poOwner );
 	HIterator it( *this );
-	++ f_iCursorPosition;
+	++ f_lCursorPosition;
 	return ( it );
 	M_EPILOG
 	}
@@ -383,7 +383,7 @@ yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& a_iField ) c
 	{
 	M_PROLOG
 	M_ASSERT( f_poOwner );
-	return ( dbwrapper::rs_get( f_poOwner->f_pvResult, f_iCursorPosition,
+	return ( dbwrapper::rs_get( f_poOwner->f_pvResult, f_lCursorPosition,
 			a_iField ) );
 	M_EPILOG
 	}
@@ -404,7 +404,7 @@ HRecordSet::ptr_t HSQLDescriptor::execute( void )
 		f_oFields[ l_iCtr ] = rs->get_column_name( l_iCtr ); 
 		f_oMutated[ l_iCtr ] = false;
 		}
-	f_iSetSize = rs->get_size();
+	f_lSetSize = rs->get_size();
 	return ( rs );
 	M_EPILOG
 	}

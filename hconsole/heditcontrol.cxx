@@ -75,7 +75,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 		M_THROW( _( "buffer size is ridiculously low" ), a_iBufferSize );
 	if ( a_pcValue )
 		{
-		l_iLength = strlen ( a_pcValue );
+		l_iLength = static_cast<int>( ::strlen( a_pcValue ) );
 		if ( l_iLength > a_iBufferSize )
 			M_THROW( _( "initial value too big" ), l_iLength - a_iBufferSize );
 		}
@@ -90,7 +90,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	f_oPattern.matches ( a_pcValue, NULL, & l_iErrorCode );
 	if ( l_iErrorCode )
 		M_THROW ( f_oPattern.error(), l_iErrorCode );
-	l_iLength = f_oString.get_length();
+	l_iLength = static_cast<int>( f_oString.get_length() );
 /* this is part of draw_label() method, we can not wait with setting up
  * f_iWidthRaw until draw_label(), which is called from refresh()
  * because ... see next comment */
@@ -163,10 +163,10 @@ char const n_pcWordSeparator [ ] = " \t\n`-=[]\\;',./~!@#$%^&*()+{}|:\"<>?";
 int HEditControl::find_eow( int a_iLength )
 	{
 	M_PROLOG
-	int l_iIndex = f_oString.find_other_than( n_pcWordSeparator, f_iControlOffset + f_iCursorPosition );
+	int l_iIndex = static_cast<int>( f_oString.find_other_than( n_pcWordSeparator, f_iControlOffset + f_iCursorPosition ) );
 	if ( l_iIndex >= 0 )
 		{
-		l_iIndex = f_oString.find_one_of( n_pcWordSeparator, l_iIndex );
+		l_iIndex = static_cast<int>( f_oString.find_one_of( n_pcWordSeparator, l_iIndex ) );
 		if ( l_iIndex < 0 )
 			l_iIndex = a_iLength;
 		}
@@ -301,10 +301,10 @@ int HEditControl::kill_char( void )
 int HEditControl::find_bow( int a_iLength )
 	{
 	M_PROLOG
-	int l_iIndex = f_oString.reverse_find_other_than( n_pcWordSeparator, a_iLength - ( f_iControlOffset + f_iCursorPosition ) );
+	int l_iIndex = static_cast<int>( f_oString.reverse_find_other_than( n_pcWordSeparator, a_iLength - ( f_iControlOffset + f_iCursorPosition ) ) );
 	if ( l_iIndex >= 0 )
 		{
-		l_iIndex = f_oString.reverse_find_one_of( n_pcWordSeparator, l_iIndex );
+		l_iIndex = static_cast<int>( f_oString.reverse_find_one_of( n_pcWordSeparator, l_iIndex ) );
 		if ( l_iIndex < 0 )
 			l_iIndex = 0;
 		else
@@ -427,7 +427,7 @@ int HEditControl::update_from_history( void )
 	M_PROLOG
 	if ( ! f_oHistory.is_empty() && ( f_oHistoryIt != f_oHistory.end() ) )
 		f_oVarTmpBuffer = *f_oHistoryIt;
-	int l_iLength = f_oVarTmpBuffer.get_length();
+	int l_iLength = static_cast<int>( f_oVarTmpBuffer.get_length() );
 	if ( l_iLength >= f_iWidthRaw )
 		{
 		f_iCursorPosition = f_iWidthRaw - 1;
@@ -456,7 +456,7 @@ int HEditControl::do_process_input ( int a_iCode )
 	f_oVarTmpBuffer = f_oString;
 	l_iOldControlOffset = f_iControlOffset;
 	l_iOldCursorPosition = f_iCursorPosition;
-	l_iLength = f_oVarTmpBuffer.get_length();
+	l_iLength = static_cast<int>( f_oVarTmpBuffer.get_length() );
 	switch ( a_iCode )
 		{
 		case ( KEY_CODES::D_PAGE_UP ):
@@ -578,7 +578,7 @@ void HEditControl::set( HInfo const& a_roInfo )
 	if ( l_iErrorCode )
 		M_THROW( f_oPattern.error(), l_iErrorCode );
 	f_oString = l_pcString;
-	l_iLength = f_oString.get_length();
+	l_iLength = static_cast<int>( f_oString.get_length() );
 	f_iControlOffset = 0;
 	if ( l_iLength >= f_iWidthRaw )
 		{

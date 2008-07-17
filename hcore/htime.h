@@ -38,7 +38,7 @@ namespace yaal
 namespace hcore
 {
 
-extern char const * const n_pcDefaultTimeFormat;
+extern char const* const n_pcDefaultTimeFormat;
 
 class HTime
 	{
@@ -48,36 +48,36 @@ class HTime
 	time_t	f_xValue;
 	tm			f_sBroken;
 public:
-	HTime ( void );
-	HTime ( HTime const & );
-	HTime ( char const * const );
-	HTime ( time_t const & );
-	HTime ( int const, int const, int const, int const = 0, int const = 0,
+	HTime( void );
+	HTime( HTime const& );
+	HTime( char const* const );
+	HTime( time_t const& );
+	HTime( int const, int const, int const, int const = 0, int const = 0,
 			int const = 0 );
 	virtual ~HTime ( void );
-	void set_now ( void );
-	void set ( time_t const & );
-	void format ( char const * const = n_pcDefaultTimeFormat );
-	void set_time ( int const = 0, int const = 0, int const = 0 );
-	void set_date ( int const, int const = 1, int const = 1 );
-	void set_datetime ( int const, int const = 1, int const = 1,
+	void set_now( void );
+	void set( time_t const& );
+	void format( char const* const = n_pcDefaultTimeFormat );
+	void set_time( int const = 0, int const = 0, int const = 0 );
+	void set_date( int const, int const = 1, int const = 1 );
+	void set_datetime( int const, int const = 1, int const = 1,
 						 int const = 0, int const = 0, int const = 0 );
-	int get_year ( void ) const;
-	int get_month ( void ) const;
-	int get_day ( void ) const;
-	int get_hour ( void ) const;
-	int get_minute ( void ) const;
-	int get_second ( void ) const;
-	HTime & operator = ( HTime const & );
-	HTime operator - ( HTime const & ) const;
-	HTime & operator -= ( HTime const & );
-	bool operator == ( time_t const & ) const;
-	bool operator != ( time_t const & ) const;
-	bool operator <= ( time_t const & ) const;
-	bool operator >= ( time_t const & ) const;
-	bool operator < ( time_t const & ) const;
-	bool operator > ( time_t const & ) const;
-	operator char const * ( void ) const;
+	int get_year( void ) const;
+	int get_month( void ) const;
+	int get_day( void ) const;
+	int get_hour( void ) const;
+	int get_minute( void ) const;
+	int get_second( void ) const;
+	HTime& operator = ( HTime const& );
+	HTime operator - ( HTime const& ) const;
+	HTime& operator -= ( HTime const& );
+	bool operator == ( time_t const& ) const;
+	bool operator != ( time_t const& ) const;
+	bool operator <= ( time_t const& ) const;
+	bool operator >= ( time_t const& ) const;
+	bool operator < ( time_t const& ) const;
+	bool operator > ( time_t const& ) const;
+	operator char const* ( void ) const;
 	operator time_t ( void ) const;
 	};
 

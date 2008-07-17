@@ -163,7 +163,7 @@ void db_unquery( void* a_pvData )
 	return;
 	}
 
-char* rs_get( void* a_pvData, int a_iRow, int a_iColumn )
+char* rs_get( void* a_pvData, int long a_iRow, int a_iColumn )
 	{
 	char** l_ppcData = NULL;
 	OSQLiteResult* l_psResult = static_cast<OSQLiteResult*>( a_pvData );

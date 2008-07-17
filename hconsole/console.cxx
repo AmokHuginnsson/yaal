@@ -86,20 +86,20 @@ struct ATTR
 	{
 	inline static int value( int const a_iAttr )
 		{
-		return ( COLOR_PAIR(
-					( ( a_iAttr & 0x70 ) >> 1 )             /* background */
-					| ( a_iAttr & 0x07 ) )                  /* foreground */
-				| ( ( a_iAttr & 0x08 ) ? A_BOLD : 0 )     /* brighter foreground */
-				| ( ( a_iAttr & 0x80 ) ? A_BLINK : 0 ) ); /* brighter background */
+		return ( static_cast<int>( COLOR_PAIR(
+						( ( a_iAttr & 0x70 ) >> 1 )             /* background */
+						| ( a_iAttr & 0x07 ) )                  /* foreground */
+					| ( ( a_iAttr & 0x08 ) ? A_BOLD : 0 )     /* brighter foreground */
+					| ( ( a_iAttr & 0x80 ) ? A_BLINK : 0 ) ) ); /* brighter background */
 		}
 	inline static int value_fix( int const a_iAttr )
 		{
 		if ( a_iAttr & 0x80 )
-			return ( COLOR_PAIR(
-						( (   a_iAttr & 0x07 ) << 3 )
+			return ( static_cast<int>( COLOR_PAIR(
+							( (   a_iAttr & 0x07 ) << 3 )
 						| ( ( a_iAttr & 0x70 ) >> 4 ) )
-					| ( (   a_iAttr & 0x08 ) ? A_BLINK : 0 )
-					| A_BOLD | A_REVERSE );
+						| ( (   a_iAttr & 0x08 ) ? A_BLINK : 0 )
+						| A_BOLD | A_REVERSE ) );
 		return ( value( a_iAttr ) );
 		}
 	};
@@ -255,9 +255,9 @@ void HConsole::enter_curses( void )
 						" and we did not recived file descriptor" ), errno );
 		}
 #ifdef HAVE_ASCII_GRAPHICS
-	GLYPHS::D_DOWN_ARROW		= ACS_DARROW;
-	GLYPHS::D_UP_ARROW			= ACS_UARROW;
-	GLYPHS::D_VERTICAL_LINE	= ACS_VLINE;
+	GLYPHS::D_DOWN_ARROW		= static_cast<int>( ACS_DARROW );
+	GLYPHS::D_UP_ARROW			= static_cast<int>( ACS_UARROW );
+	GLYPHS::D_VERTICAL_LINE	= static_cast<int>( ACS_VLINE );
 #else /* than HAVE_ASCII_GRAPHICS */
 	GLYPHS::D_DOWN_ARROW		= 'v';
 	GLYPHS::D_UP_ARROW			= '^';
@@ -589,8 +589,10 @@ char unsigned HConsole::get_attr( void ) const
 		M_THROW( "not in curses mode", errno );
 	attr_t l_xAttr;
 	int l_hColor = 0;
-	int l_iAttribute = 0;
-	static_cast<void>( attr_get( &l_xAttr, &l_hColor, NULL ) ); /* Ugly macro */
+	int* pc = &l_hColor;
+	attr_t l_iAttribute = 0;
+	attr_t* pa = &l_iAttribute;
+	static_cast<void>( attr_get( pa, pc, NULL ) ); /* Ugly macro */
 	l_iAttribute = ( l_hColor << 1 ) & 56;
 	l_iAttribute |= ( l_hColor & 7 );
 	if ( l_xAttr & A_BOLD )

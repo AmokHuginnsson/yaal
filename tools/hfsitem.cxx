@@ -43,7 +43,8 @@ namespace yaal
 namespace tools
 {
 
-HFSItem::HFSItem( HString const& a_oRoot ) : f_iNameLen( a_oRoot.get_length() ), f_oPath( a_oRoot )
+HFSItem::HFSItem( HString const& a_oRoot )
+	: f_iNameLen( static_cast<int>( a_oRoot.get_length() ) ), f_oPath( a_oRoot )
 	{
 	M_PROLOG
 	return;
@@ -219,7 +220,7 @@ void HFSItem::HIterator::update( void )
 	{
 	M_PROLOG
 	dirent* ent = f_oDirEnt->get<dirent>();
-	f_oItem.set_path( f_oPath + "/" + ent->d_name, strlen( ent->d_name ) );
+	f_oItem.set_path( f_oPath + "/" + ent->d_name, static_cast<int>( ::strlen( ent->d_name ) ) );
 	return;
 	M_EPILOG
 	}

@@ -358,8 +358,8 @@ int HSerial::timed_read ( void * const a_pcBuffer, int const a_iSize,
 	FD_SET ( f_iFileDescriptor, & l_xFdSet );
 	l_iError = select ( FD_SETSIZE, & l_xFdSet, NULL, NULL, & l_xWait );
 	if ( ( l_iError > 0 ) && FD_ISSET ( f_iFileDescriptor, & l_xFdSet ) )
-		return ( HRawFile::read ( a_pcBuffer, a_iSize ) );
-	return ( - 1 );
+		return ( static_cast<int>( HRawFile::read( a_pcBuffer, a_iSize ) ) );
+	return ( -1 );
 	M_EPILOG
 	}
 

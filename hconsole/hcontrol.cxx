@@ -44,23 +44,23 @@ namespace yaal
 namespace hconsole
 {
 
-HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-										 int a_iHeight, int a_iWidth, char const * a_pcLabel )
-	: f_bEnabled ( false ), f_bFocused ( false ), f_bDrawLabel ( true ),
-	f_bSingleLine ( false ), f_uiAttributeDisabled ( n_iAttributeDisabled ),
-	f_uiAttributeEnabled ( n_iAttributeEnabled ),
-	f_uiAttributeFocused ( n_iAttributeFocused ), f_iRow ( a_iRow ), f_iColumn ( a_iColumn ),
-	f_iHeight ( a_iHeight ), f_iWidth ( a_iWidth ), f_iRowRaw ( 0 ),
-	f_iColumnRaw ( 0 ), f_iHeightRaw ( 0 ), f_iWidthRaw ( 0 ),
-	f_oLabel ( a_pcLabel ), f_oVarTmpBuffer(), f_poParent ( a_poParent ),
-	f_iLabelLength ( 0 ), f_iShortcutIndex ( 0 ), f_bValid( false ), f_bNeedRepaint( false )
+HControl::HControl( HWindow* a_poParent, int a_iRow, int a_iColumn,
+										 int a_iHeight, int a_iWidth, char const* a_pcLabel )
+	: f_bEnabled( false ), f_bFocused( false ), f_bDrawLabel( true ),
+	f_bSingleLine( false ), f_uiAttributeDisabled( n_iAttributeDisabled ),
+	f_uiAttributeEnabled( n_iAttributeEnabled ),
+	f_uiAttributeFocused( n_iAttributeFocused ), f_iRow( a_iRow ), f_iColumn( a_iColumn ),
+	f_iHeight( a_iHeight ), f_iWidth( a_iWidth ), f_iRowRaw( 0 ),
+	f_iColumnRaw( 0 ), f_iHeightRaw( 0 ), f_iWidthRaw( 0 ),
+	f_oLabel( a_pcLabel ), f_oVarTmpBuffer(), f_poParent( a_poParent ),
+	f_iLabelLength( 0 ), f_iShortcutIndex( 0 ), f_bValid( false ), f_bNeedRepaint( false )
 	{
 	M_PROLOG
 	if ( ! HCons::get_instance().is_enabled() )
 		M_THROW ( "not in curses mode.", errno );
 	if ( ! a_poParent )
 		M_THROW ( "no parent window.", reinterpret_cast<int long>( a_poParent ) );
-	f_iShortcutIndex = f_oLabel.find ( '&' );
+	f_iShortcutIndex = static_cast<int>( f_oLabel.find( '&' ) );
 	if ( f_iShortcutIndex > -1 )
 		{
 		f_oLabel.set_at( f_iShortcutIndex, 0 );
@@ -68,10 +68,10 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		}
 	else
 		f_iShortcutIndex = 0;
-	f_iLabelLength = a_pcLabel ? f_oLabel.get_length() : 0;
+	f_iLabelLength = a_pcLabel ? static_cast<int>( f_oLabel.get_length() ) : 0;
 	if ( f_iLabelLength )
 		{
-		if ( f_oLabel [ f_iLabelLength - 1 ] != '\n' )
+		if ( f_oLabel[ f_iLabelLength - 1 ] != '\n' )
 			f_bSingleLine = true;
 		else
 			{
@@ -81,7 +81,7 @@ HControl::HControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
 		}
 	else
 		f_bSingleLine = true;
-	f_poParent->add_control ( HControl::ptr_t ( this ),
+	f_poParent->add_control( HControl::ptr_t ( this ),
 				KEY<>::meta_r ( f_oLabel [ f_iShortcutIndex ] ) );
 	return;
 	M_EPILOG

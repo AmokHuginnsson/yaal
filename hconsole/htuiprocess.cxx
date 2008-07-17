@@ -214,7 +214,7 @@ int HTUIProcess::handler_idle( int a_iCode, void const* )
 #ifdef __DEBUG__
 	HConsole& cons = HCons::get_instance();
 	HString l_oClock( static_cast<char const *>( HTime() ) );
-	cons.c_cmvprintf( 0, cons.get_width() - l_oClock.get_length(),
+	cons.c_cmvprintf( 0, static_cast<int>( cons.get_width() - l_oClock.get_length() ),
 			COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, l_oClock.raw() );
 	n_bNeedRepaint = true;
 #endif /* __DEBUG__ */
