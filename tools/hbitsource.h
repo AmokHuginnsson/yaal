@@ -51,6 +51,7 @@ class HBitSourceBase : public HBitSourceInterface
 
 class HBitSourceBase::HIterator
 	{
+public:
 	};
 
 
