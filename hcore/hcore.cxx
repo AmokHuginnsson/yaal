@@ -30,7 +30,7 @@ char const COPYRIGHT [ ] =
 #include <cstring>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hcore.h"
 #include "hlog.h"
 #include "hstring.h"

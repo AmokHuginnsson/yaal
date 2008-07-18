@@ -27,7 +27,7 @@ Copyright:
 #include <time.h>
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hscheduledasynccaller.h"
 
 using namespace yaal::hcore;

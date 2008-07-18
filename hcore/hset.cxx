@@ -25,7 +25,7 @@ Copyright:
 */
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hset.h"
 M_VCSTID ( D_VCSID_HSET_H )
 

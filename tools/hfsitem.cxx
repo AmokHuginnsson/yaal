@@ -28,7 +28,7 @@ Copyright:
 #include <sys/stat.h>
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hfsitem.h"
 #include "hcore/xalloc.h"
 

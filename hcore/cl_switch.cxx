@@ -28,7 +28,7 @@ Copyright:
 #include <getopt.h>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "cl_switch.h"
 #include "rc_file.h"
 #include "hstring.h"

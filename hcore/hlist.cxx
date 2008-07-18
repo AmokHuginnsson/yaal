@@ -27,7 +27,7 @@ Copyright:
 #include <libintl.h>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hlist.h"
 M_VCSTID ( D_VCSID_HLIST_H )
 

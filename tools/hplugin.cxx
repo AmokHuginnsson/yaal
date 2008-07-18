@@ -27,7 +27,7 @@ Copyright:
 #include <dlfcn.h>
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hplugin.h"
 
 using namespace yaal::hcore;

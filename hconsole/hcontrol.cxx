@@ -27,7 +27,7 @@ Copyright:
 #include <cstring>
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hcontrol.h"
 #include "hconsole.h"
 #include "hwindow.h"

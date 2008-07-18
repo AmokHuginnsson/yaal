@@ -36,7 +36,7 @@ Copyright:
 #endif /* _STDIO_H */
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "xalloc.h"
 #include "hlog.h"
 

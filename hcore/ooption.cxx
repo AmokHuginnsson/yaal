@@ -27,7 +27,7 @@ Copyright:
 #include <cstdlib>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "ooption.h"
 #include "rc_file.h"
 #include "hstring.h"

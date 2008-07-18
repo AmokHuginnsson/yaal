@@ -30,7 +30,7 @@ Copyright:
 #include <cstdarg>
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hpointer.h"
 #include "util.h"
 #include "hanalyser.h"

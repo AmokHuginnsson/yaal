@@ -27,7 +27,7 @@ Copyright:
 #include <cstdlib>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hsingleton.h"
 
 namespace yaal

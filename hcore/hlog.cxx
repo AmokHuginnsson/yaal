@@ -39,7 +39,7 @@ Copyright:
 #endif /* HAVE_BASE_NAME_IN_LIBGEN */
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hlog.h"
 #include "xalloc.h"
 

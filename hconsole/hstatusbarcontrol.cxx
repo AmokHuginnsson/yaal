@@ -29,7 +29,7 @@ Copyright:
 #include <cstdio>
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hstatusbarcontrol.h"
 #include "hwindow.h"
 #include "hconsole.h"

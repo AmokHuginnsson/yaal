@@ -27,7 +27,7 @@ Copyright:
 #include <unistd.h>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hpipe.h"
 
 #include "hrawfile.h"

@@ -34,7 +34,7 @@ Copyright:
 #include <libintl.h>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hsocket.h"
 #include "xalloc.h"
 #include "hstring.h"

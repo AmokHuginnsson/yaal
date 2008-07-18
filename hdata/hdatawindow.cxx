@@ -27,7 +27,7 @@ Copyright:
 #include <libintl.h>
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hcore.h"
 #include "hdatawindow.h"
 #include "hdatalistcontrol.h"

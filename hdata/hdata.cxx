@@ -28,7 +28,7 @@ Copyright:
 #include <cstdlib>
 
 #include "hcore/hexception.h"
-M_VCSID( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hcore.h"
 #include "hconsole/hconsole.h"
 #include "tools/tools.h"

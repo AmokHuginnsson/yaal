@@ -29,7 +29,7 @@ Copyright:
 #include "config.h"
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "htime.h"
 
 namespace yaal

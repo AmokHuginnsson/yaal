@@ -25,7 +25,7 @@ Copyright:
 */
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hdatacontrol.h"
 
 using namespace yaal::hcore;

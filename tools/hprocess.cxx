@@ -31,7 +31,7 @@ Copyright:
 #include <signal.h>
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hprocess.h"
 
 #include "hcore/rc_file.h"

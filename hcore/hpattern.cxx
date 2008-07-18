@@ -30,7 +30,7 @@ Copyright:
 #include <libintl.h>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hpattern.h"
 #include "harray.h"
 #include "hpool.h"

@@ -27,7 +27,7 @@ Copyright:
 #include <cmath>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hcomplex.h"
 #include "hcore.h"
 

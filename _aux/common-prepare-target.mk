@@ -29,7 +29,7 @@ $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 	echo -n "$$(@:.$$(OS)=.$$(DS)) " > $$(@:.$$(OS)=.$$(DS)); \
 	/bin/rm -f "$$(@)"; \
 	$$(DXX) $$(CXXFLAGS) $(COMPILER_FLAGS_$(1)) -MM $$(<) -MT $$(@) | grep -v '^#' >> $$(@:.$$(OS)=.$$(DS)) && test $$$${PIPESTATUS} == 0 && \
-	$$(CXX) $$(CXXFLAGS) $(COMPILER_FLAGS_$(1)) $$(PCH_$(1)) $$(<) -c -o $$(@) 2>&1 | tee -a make.log && test $$$${PIPESTATUS} == 0 && \
+	$$(CXX) $$(CXXFLAGS) $(COMPILER_FLAGS_$(1)) -D__ID__="\"$$(<) $$(shell git id ../$$(subst $$(DIR_ROOT)/,,$$(<)))\"" $$(PCH_$(1)) $$(<) -c -o $$(@) 2>&1 | tee -a make.log && test $$$${PIPESTATUS} == 0 && \
 	echo $$(NONL) "done.$$(CL)"
 
 $$(REAL_TARGET): $$($(1))/header.gch $$(OBJS_$(1))

@@ -47,7 +47,7 @@ Copyright:
 #endif /* HAVE_GPM_H */
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "mouse.h"
 #include "console.h"
 #include "hcore/hstring.h"

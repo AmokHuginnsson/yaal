@@ -33,7 +33,7 @@ Copyright:
 #include "config.h"
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hserial.h"
 #include "tools.h"
 

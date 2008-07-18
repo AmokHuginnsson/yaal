@@ -27,7 +27,7 @@ Copyright:
 #include <cstdio>
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hstringstream.h"
 
 using namespace yaal::hcore;

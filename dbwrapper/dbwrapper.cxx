@@ -32,7 +32,7 @@ Copyright:
 #include "config.h"
 
 #include "hcore/hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hlog.h"
 #include "hcore/hstring.h"
 #include "hcore/rc_file.h"

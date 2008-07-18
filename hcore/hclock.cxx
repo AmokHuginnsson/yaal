@@ -27,7 +27,7 @@ Copyright:
 #include <ctime>
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "hclock.h"
 
 namespace yaal

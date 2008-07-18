@@ -30,7 +30,7 @@ Copyright:
 #include <libintl.h> /* gettext() */
 
 #include "hexception.h"
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 #include "rc_file.h"
 #include "xalloc.h"
 #include "hlog.h"
