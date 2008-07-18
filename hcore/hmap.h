@@ -73,7 +73,7 @@ private:
 	HSBBSTree f_oEngine;
 public:
 	HMap( void ) : f_oEngine() {};
-	size_t size( void ) const
+	int long size( void ) const
 		{ return ( f_oEngine.size() );	}
 	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
