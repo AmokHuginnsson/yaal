@@ -378,7 +378,94 @@ void HBitmap::rotate_left( int long const& a_iStart,
 		set( a_iStart + ( i + a_iVal ) % a_iLen, tmp.get( a_iStart + i ) );
 	return ;
 	}
-	
+
+HBitmap::const_iterator HBitmap::begin( void ) const
+	{
+	return ( const_iterator( this, 0 ) );
+	}
+
+HBitmap::const_iterator HBitmap::find( int long const& idx ) const
+	{
+	M_ASSERT( ( idx >= 0 ) && ( idx < f_lSize ) );
+	return ( const_iterator( this, idx ) );
+	}
+
+HBitmap::const_iterator HBitmap::end( void ) const
+	{
+	return ( const_iterator( this, f_lSize ) );
+	}
+
+HBitmap::iterator HBitmap::begin( void )
+	{
+	return ( iterator( this, 0 ) );
+	}
+
+HBitmap::iterator HBitmap::find( int long const& idx )
+	{
+	M_ASSERT( ( idx >= 0 ) && ( idx < f_lSize ) );
+	return ( iterator( this, idx ) );
+	}
+
+HBitmap::iterator HBitmap::end( void )
+	{
+	return ( iterator( this, f_lSize ) );
+	}
+
+template<>
+bool HBitmap::HIterator<bool>::operator* ( void )
+	{
+	M_ASSERT( f_poOwner );
+	return ( f_poOwner->get( f_lIndex ) );
+	}
+
+template<>
+HBitmap::HBit HBitmap::HIterator<HBitmap::HBit>::operator* ( void )
+	{
+	M_ASSERT( f_poOwner );
+	return ( HBitmap::HBit( f_poOwner, f_lIndex ) );
+	}
+
+HBitmap::HBit::HBit( HBitmap* a_poOwner, int long const& idx )
+	: f_poOwner( a_poOwner ), f_lIndex( idx )
+	{
+	}
+
+HBitmap::HBit::HBit( HBit const& bit )
+	: f_poOwner( bit.f_poOwner ), f_lIndex( bit.f_lIndex )
+	{
+	}
+
+HBitmap::HBit& HBitmap::HBit::operator = ( HBitmap::HBit const& bit )
+	{
+	if ( &bit != this )
+		{
+		f_poOwner = bit.f_poOwner;
+		f_lIndex = bit.f_lIndex;
+		}
+	return ( *this );
+	}
+
+bool HBitmap::HBit::operator == ( bool const& bit ) const
+	{
+	return ( f_poOwner->get( f_lIndex ) == bit );
+	}
+
+bool HBitmap::HBit::operator != ( bool const& bit ) const
+	{
+	return ( f_poOwner->get( f_lIndex ) != bit );
+	}
+
+HBitmap::HBit::operator bool ( void ) const
+	{
+	return ( f_poOwner->get( f_lIndex ) );
+	}
+
+HBitmap::HBit& HBitmap::HBit::operator = ( bool const& bit )
+	{
+	f_poOwner->set( f_lIndex, bit );
+	return ( *this );
+	}
+
 }
 
 }
