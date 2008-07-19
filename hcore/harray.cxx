@@ -26,9 +26,8 @@ Copyright:
 
 #include <libintl.h>
 
-#include "hexception.h"
-M_VCSID( "$Id: "__ID__" $" )
 #include "harray.h"
+M_VCSID( "$Id: "__ID__" $" )
 M_VCSTID ( D_VCSID_YAAL_HCORE_HARRAY_H )
 
 namespace yaal

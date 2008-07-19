@@ -26,7 +26,7 @@ Copyright:
 
 #include <dlfcn.h>
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hplugin.h"
 

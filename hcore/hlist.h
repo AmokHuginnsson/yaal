@@ -87,6 +87,7 @@ struct OListBits
 template<typename tType> 
 class HList : public OListBits
 	{
+	typedef HList<tType> self_t;
 private:
 	class HElement;
 	int f_iSize;					/* how many elements this list contains */

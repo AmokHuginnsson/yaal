@@ -46,7 +46,7 @@ Copyright:
 #	include <gpm.h>
 #endif /* HAVE_GPM_H */
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "mouse.h"
 #include "console.h"

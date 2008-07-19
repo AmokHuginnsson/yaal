@@ -30,7 +30,7 @@ Copyright:
 #include <cstdarg>
 #include <libintl.h>
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hstring.h"
 #include "xalloc.h"

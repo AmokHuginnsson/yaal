@@ -26,7 +26,7 @@ Copyright:
 
 #include <ctime>
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hclock.h"
 

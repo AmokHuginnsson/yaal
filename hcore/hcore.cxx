@@ -29,7 +29,7 @@ char const COPYRIGHT [ ] =
 #include <cstdlib>
 #include <cstring>
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore.h"
 #include "hlog.h"

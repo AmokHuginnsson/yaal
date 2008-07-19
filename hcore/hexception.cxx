@@ -35,8 +35,9 @@ Copyright:
 #include <cxxabi.h>
 #endif /* _STDIO_H */
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
+#include "hexception.h"
 #include "xalloc.h"
 #include "hlog.h"
 
@@ -128,9 +129,9 @@ HException::~HException ( void )
 	return;
 	}
 
-void HException::set ( char const a_cChar, int const a_iInt,
-		long const a_lLong, double const a_dDouble, char const * const a_pcStr,
-		void * const a_pvVoidPtr )
+void HException::set( char const a_cChar, int const a_iInt,
+		long const a_lLong, double const a_dDouble, char const* const a_pcStr,
+		void* const a_pvVoidPtr )
 	{
 	f_cChar = a_cChar;
 	f_iInt = a_iInt;

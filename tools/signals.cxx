@@ -32,7 +32,7 @@ Copyright:
 
 #include "config.h"
 
-#include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
+#include "hcore/base.h" /* M_PROLOG, M_EPILOG */
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/xalloc.h"
 #include "hcore/hlog.h"       /* log object */

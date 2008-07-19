@@ -28,7 +28,7 @@ Copyright:
 #include <libintl.h>
 #include <cstdio>
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hstatusbarcontrol.h"
 #include "hwindow.h"

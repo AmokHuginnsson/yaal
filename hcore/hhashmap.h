@@ -58,6 +58,7 @@ inline int long unsigned hash( tType const& a_rtKey )
 template<typename tType, typename ttType>
 class HHashMap
 	{
+	typedef HHashMap<tType, ttType> self_t;
 	class HAtom
 		{
 	private:

@@ -26,7 +26,7 @@ Copyright:
 
 #include <libintl.h>
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hmatrix.h"
 M_VCSTID ( D_VCSID_HMATRIX_H )

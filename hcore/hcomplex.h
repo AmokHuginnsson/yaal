@@ -35,6 +35,7 @@ namespace hcore
 
 class HComplex
 	{
+	typedef HComplex self_t;
 	double f_dReal;
 	double f_dImaginary;
 public:

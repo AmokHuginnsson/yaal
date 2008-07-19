@@ -37,7 +37,6 @@ Copyright:
 #ifdef __YAAL_BUILD__
 #	include "config.h"
 #endif /* __YAAL_BUILD__ */
-#include "hcore/base.h"
 #include "hcore/hstring.h"
 
 namespace yaal
@@ -91,27 +90,87 @@ private:
 
 extern char const* const n_pcExceptionType;
 
-template<typename tType>
-class HExceptionT : public HException
+template<typename tType, typename hier_t = HException>
+class HExceptionT : public hier_t
 	{
 public:
-	HExceptionT( char const* const a_pcReason, char* ptr = get_type_name( typeid( tType ).name() ) )
-		: HException( n_pcExceptionType, ptr, 0, a_pcReason, errno )
-		{ cleanup( ptr );	}
-	HExceptionT( HString const& a_oReason, char* ptr = get_type_name( typeid( tType ).name() ) )
-		: HException( n_pcExceptionType, ptr, 0, a_oReason, errno )
-		{ cleanup( ptr );	}
+	HExceptionT( char const* const a_pcReason, char* ptr = hier_t::get_type_name( typeid( tType ).name() ) )
+		: hier_t( n_pcExceptionType, ptr, 0, a_pcReason, errno )
+		{ hier_t::cleanup( ptr );	}
+	HExceptionT( HString const& a_oReason, char* ptr = hier_t::get_type_name( typeid( tType ).name() ) )
+		: hier_t( n_pcExceptionType, ptr, 0, a_oReason, errno )
+		{ hier_t::cleanup( ptr );	}
 	HExceptionT( char const* const a_pcFileName,
 			char const* const a_pcFunctionName, int const a_iLine,
 			char const* const a_pcReason, int const a_iCode )
-		: HException( a_pcFileName, a_pcFunctionName, a_iLine, a_pcReason, a_iCode )
+		: hier_t( a_pcFileName, a_pcFunctionName, a_iLine, a_pcReason, a_iCode )
 		{	}
 	HExceptionT( char const* const a_pcFileName,
 			char const* const a_pcFunctionName, int const a_iLine,
 			HString const& a_oReason, int const a_iCode )
-		: HException( a_pcFileName, a_pcFunctionName, a_iLine, a_oReason, a_iCode )
+		: hier_t( a_pcFileName, a_pcFunctionName, a_iLine, a_oReason, a_iCode )
 		{	}
 	};
+
+/*
+ * A,     AE,      AE = ET<A, E>
+ * B : A, BE : AE, BE = ET<B, AE>
+ * C : B, CE : BE, CE = ET<C, BE>
+ */
+typedef void self_t;
+typedef void hier_t;
+
+namespace exception_auto_hierarchy
+{
+
+template<typename tType>
+struct void_to_exception
+	{
+	typedef tType exception_t;
+	};
+
+template<>
+struct void_to_exception<void>
+	{
+	typedef yaal::hcore::HException exception_t;
+	};
+
+template<typename tType>
+struct parent_exception
+	{
+	template<typename type_hier_t>
+	struct context_hier : public type_hier_t
+		{
+		typedef hier_t type;
+		};
+	typedef typename context_hier<tType>::type proposed_type_hier_t;
+	typedef typename void_to_exception<proposed_type_hier_t>::exception_t type_hier_t;
+	typedef typename yaal::hcore::HExceptionT<tType, type_hier_t> parent_exception_t;
+	};
+
+template<>
+struct parent_exception<void>
+	{
+	typedef yaal::hcore::HException parent_exception_t;
+	};
+
+}
+
+template<typename tType, typename hier_t, typename message_t, typename code_t>
+void throw_exception( char const* const&, char const* const&, int const&, message_t const&, code_t const&, char const* const& = NULL ) __attribute__(( __noreturn__ ));
+template<typename tType, typename hier_t, typename message_t, typename code_t>
+void throw_exception( char const* const& file, char const* const& function, int const& line, message_t const& message, code_t const& code, char const* const& reason )
+	{
+	typedef typename exception_auto_hierarchy::parent_exception<hier_t>::parent_exception_t parent_exception_t;
+	typedef typename yaal::hcore::HExceptionT<self_t, parent_exception_t> exception_t;
+	if ( reason )
+		{
+		exception_t e( file, function, line, message, static_cast<int>( code ) );
+	 	e.set( reason );
+		throw e;
+		}
+	throw exception_t( file, function, line, message, static_cast<int>( code ) );
+	}
 
 }
 

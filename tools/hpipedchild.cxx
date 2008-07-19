@@ -29,7 +29,7 @@ Copyright:
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hpipedchild.h"
 #include "hfsitem.h"

@@ -57,6 +57,8 @@ class HLog;
 
 class HLog : public HStreamInterface, private HSingletonInterface
 	{
+	typedef HLog self_t;
+	typedef HStreamInterface hier_t;
 	bool			f_bRealMode;
 	bool			f_bNewLine;
 	int long	f_lType;
@@ -92,6 +94,7 @@ private:
 	friend class yaal::hcore::HDestructor<HLog>;
 	};
 
+typedef HExceptionT<HLog, HStreamInterfaceException> HLogException;
 extern HLog& log;
 
 }

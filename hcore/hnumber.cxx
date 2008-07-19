@@ -26,10 +26,9 @@ Copyright:
 
 #include <cstdlib>
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hnumber.h"
-#include "base.h"
 
 namespace yaal
 {

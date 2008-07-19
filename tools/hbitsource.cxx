@@ -24,9 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hbitsource.h"
+
+using namespace yaal;
+using namespace yaal::hcore;
 
 namespace yaal
 {
@@ -34,6 +37,31 @@ namespace yaal
 namespace tools
 {
 
+HBitmap	HBitSourceInterface::get_nth_block( int long const& block, int long const& size ) const
+	{
+	return ( do_get_nth_block( block, size ) );
+	}
+
+HBitSourceFile::HBitSourceFile( HString const& a_oPath )
+	: HBitSourceInterface(), f_oPath( a_oPath ), f_oFile()
+	{
+	}
+
+HBitSourceFile::~HBitSourceFile( void )
+	{
+	}
+
+HBitmap HBitSourceFile::do_get_nth_block( int long const&, int long const& size ) const
+	{
+	M_PROLOG
+	M_ASSERT( size > 0 );
+	if ( size & 7 )
+		M_THROW( "reading fractions of octet not supported", static_cast<int>( size & 7 ) );
+	if ( ! f_oFile )
+		M_ENSURE( f_oFile.open( f_oPath ) == 0 );
+	return ( HBitmap() );
+	M_EPILOG
+	}
 
 }
 

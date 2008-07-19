@@ -29,7 +29,7 @@ Copyright:
 #include <cstdio>   /* fopen() */
 #include <libintl.h> /* gettext() */
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "rc_file.h"
 #include "xalloc.h"

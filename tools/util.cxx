@@ -29,7 +29,7 @@ Copyright:
 #include <cctype>
 #include <cstdarg>
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hpointer.h"
 #include "util.h"

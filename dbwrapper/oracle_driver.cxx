@@ -35,7 +35,7 @@ Copyright:
 #include <oci.h>
 
 #include "hcore/xalloc.h"
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 #include "hcore/hstring.h"
 #include "hcore/rc_file.h"
 #include "hcore/hlog.h"

@@ -27,7 +27,7 @@ Copyright:
 #include <cstdlib>
 #include <getopt.h>
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "cl_switch.h"
 #include "rc_file.h"

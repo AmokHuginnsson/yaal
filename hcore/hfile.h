@@ -38,6 +38,8 @@ namespace hcore
 
 class HFile : public HStreamInterface
 	{
+	typedef HFile self_t;
+	typedef HStreamInterface hier_t;
 public:
 	typedef enum
 		{
@@ -78,6 +80,8 @@ private:
 	HFile( HFile const& );
 	HFile& operator = ( HFile const& );
 	};
+
+typedef HExceptionT<HFile, HStreamInterfaceException> HFileException;
 
 }
 

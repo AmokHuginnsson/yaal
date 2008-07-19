@@ -39,6 +39,8 @@ namespace tools
 
 class HSerial : public hcore::HRawFile
 	{
+	typedef HSerial self_t;
+	typedef HRawFile hier_t;
 public:
 	typedef enum
 		{
@@ -104,6 +106,8 @@ private:
 	void compile_speed( void );
 	void compile_flags( void );
 	};
+
+typedef yaal::hcore::HExceptionT<HSerial, yaal::hcore::HRawFileException> HSerialException;
 
 }
 

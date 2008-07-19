@@ -44,7 +44,7 @@ Copyright:
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hxml.h"
 #include "hcore/hsingleton.h"

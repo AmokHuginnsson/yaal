@@ -38,7 +38,7 @@ Copyright:
 #	include <libgen.h>
 #endif /* HAVE_BASE_NAME_IN_LIBGEN */
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hlog.h"
 #include "xalloc.h"

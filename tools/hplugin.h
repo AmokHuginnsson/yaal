@@ -27,7 +27,7 @@ Copyright:
 #ifndef __YAAL_TOOLS_HPLUGIN_H
 #define __YAAL_TOOLS_HPLUGIN_H
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 #include "hcore/hpointer.h"
 
 namespace yaal

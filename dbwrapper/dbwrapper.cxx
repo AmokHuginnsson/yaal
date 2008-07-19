@@ -31,7 +31,7 @@ Copyright:
 
 #include "config.h"
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hlog.h"
 #include "hcore/hstring.h"

@@ -36,7 +36,7 @@ Copyright:
 
 #include <iostream>
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hopenssl.h"
 #include "hlog.h"

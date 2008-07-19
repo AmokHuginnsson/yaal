@@ -38,6 +38,7 @@ namespace hcore
 
 class HNumber
 	{
+	typedef HNumber self_t;
 private:
 	typedef HPool<char> canonical_t;
 	int long f_lPrecision;
@@ -119,6 +120,8 @@ private:
 	void from_double( double long );
 	void normalize( void );
 	};
+
+typedef HExceptionT<HNumber> HNumberException;
 
 }
 

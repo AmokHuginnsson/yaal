@@ -33,7 +33,7 @@ Copyright:
 
 #include <new>
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 
 namespace yaal
 {
@@ -46,6 +46,7 @@ extern char const* const n_ppcErrMsgHArray[];
 template<typename tType>
 class HArray
 	{
+	typedef HArray<tType> self_t;
 public:
 	struct ERROR
 		{

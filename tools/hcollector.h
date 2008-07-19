@@ -38,6 +38,8 @@ namespace tools
 
 class HCollector : public HSerial
 	{
+	typedef HCollector self_t;
+	typedef HSerial hier_t;
 public:
 	struct PROTOCOL
 		{
@@ -63,6 +65,8 @@ public:
 private:
 	bool test_char( char const*, int ) const;
 	};
+
+typedef yaal::hcore::HExceptionT<HCollector, HSerialException> HCollectorException;
 
 }
 

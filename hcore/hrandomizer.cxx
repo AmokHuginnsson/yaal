@@ -26,7 +26,7 @@ Copyright:
 
 #include <sys/time.h>
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hrandomizer.h"
 

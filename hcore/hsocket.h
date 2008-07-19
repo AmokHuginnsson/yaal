@@ -42,6 +42,7 @@ class HSocket : public HRawFile
 	{
 public:
 	typedef HSocket self_t;
+	typedef HRawFile hier_t;
 	typedef HPointer<HSocket> ptr_t;
 	static bool f_bResolveHostnames;
 	struct TYPE
@@ -89,7 +90,7 @@ private:
 	HSocket& operator = ( HSocket const& );
 	};
 
-typedef HExceptionT<HSocket> HSocketException;
+typedef HExceptionT<HSocket, HRawFileException> HSocketException;
 
 }
 

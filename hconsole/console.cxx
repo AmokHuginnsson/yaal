@@ -42,7 +42,7 @@ Copyright:
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_CURSES_H */
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hlog.h"
 #include "tools/tools.h"

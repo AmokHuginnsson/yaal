@@ -29,7 +29,7 @@ Copyright:
 #include <regex.h>			/* this one is obvious */
 #include <libintl.h>
 
-#include "hexception.h"
+#include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hpattern.h"
 #include "harray.h"

@@ -29,7 +29,7 @@ Copyright:
 #include <cstdio>	 /* perror function */
 #include <libintl.h> /* gettext */
 
-#include "hcore/hexception.h" /* M_PROLOG, M_EPILOG */
+#include "hcore/base.h" /* M_PROLOG, M_EPILOG */
 M_VCSID( "$Id: "__ID__" $" )
 #include "tools.h"
 #include "hcore/hcore.h"

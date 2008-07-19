@@ -30,7 +30,7 @@ Copyright:
 #include <unistd.h>
 #include <libintl.h>
 
-#include "hcore/hexception.h"
+#include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "heditcontrol.h"
 #include "hwindow.h"

@@ -43,8 +43,10 @@ namespace hcore
 extern char const * const g_ppcErrMsgHMatrix [ ];
 
 template<typename tType>
-class HMatrix : public HArray < HVector<tType> >
+class HMatrix : public HArray<HVector<tType> >
 	{
+	typedef HMatrix<tType> self_t;
+	typedef HArray<HVector<tType> > hier_t;
 public:
 	struct ERROR
 		{
@@ -135,7 +137,7 @@ private:
 		M_EPILOG
 		}
 	};
-	
+
 template<typename tType>
 HVector<tType> T ( HMatrix<tType> const &, HVector<tType> const & );
 
