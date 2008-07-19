@@ -96,7 +96,8 @@ HException::HException( HException const& a_roException )
 	f_pcFunctionName( NULL ), f_iCode( a_roException.f_iCode ),
 	f_pcMessage( NULL )
 	{
-	f_pcCharPtr = xstrdup( a_roException.f_pcCharPtr );
+	if ( a_roException.f_pcCharPtr )
+		f_pcCharPtr = xstrdup( a_roException.f_pcCharPtr );
 	f_pcMessage = xstrdup( a_roException.f_pcMessage );
 	f_pcFileName = xstrdup( a_roException.f_pcFileName );
 	f_pcFunctionName = xstrdup( a_roException.f_pcFunctionName );
