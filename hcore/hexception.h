@@ -124,9 +124,12 @@ namespace exception_auto_hierarchy
 {
 
 template<typename tType>
+struct parent_exception;
+
+template<typename tType>
 struct void_to_exception
 	{
-	typedef tType exception_t;
+	typedef typename parent_exception<tType>::parent_exception_t exception_t;
 	};
 
 template<>
