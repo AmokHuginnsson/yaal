@@ -38,16 +38,16 @@ namespace yaal
 namespace hcore
 {
 
-HFile::HFile( mode_open_t const a_eMode, void* const a_pvHandle )
-	: HStreamInterface(), f_eMode( a_eMode ),
+HFile::HFile( OPEN::open_t const& a_eOpen, void* const a_pvHandle )
+	: HStreamInterface(), f_eOpen( a_eOpen ),
 	f_pvHandle( a_pvHandle ), f_oPath(), f_oError(),
 	f_bExternal( a_pvHandle ? true : false )
 	{
 	M_PROLOG
-	if ( ( ( a_eMode & D_APPEND ) && ( a_eMode & D_TRUNCATE ) )
-			|| ( ( a_eMode & D_READING ) && ( a_eMode & D_TRUNCATE ) )
-			|| ( ( a_eMode & D_READING ) && ( a_eMode & D_APPEND ) ) )
-		M_THROW ( _ ( "inconsistient mode flags" ), a_eMode );
+	if ( ( ( a_eOpen & OPEN::D_APPEND ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
+			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
+			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_APPEND ) ) )
+		M_THROW ( _ ( "inconsistient mode flags" ), a_eOpen );
 	return;
 	M_EPILOG
 	}
@@ -66,22 +66,22 @@ int HFile::open( HString const& a_oPath )
 	M_PROLOG
 	int l_iError = 0;
 	char const * l_pcMode = NULL;
-	if ( f_eMode == D_READING )
+	if ( f_eOpen == OPEN::D_READING )
 		l_pcMode = "r";
-	else if ( ( f_eMode == D_WRITING ) || ( f_eMode == ( D_WRITING | D_TRUNCATE ) ) )
+	else if ( ( f_eOpen == OPEN::D_WRITING ) || ( f_eOpen == ( OPEN::D_WRITING | OPEN::D_TRUNCATE ) ) )
 		l_pcMode = "w";
-	else if ( f_eMode == ( D_WRITING | D_APPEND ) )
+	else if ( f_eOpen == ( OPEN::D_WRITING | OPEN::D_APPEND ) )
 		l_pcMode = "a";
-	else if ( f_eMode == ( D_READING | D_WRITING ) )
+	else if ( f_eOpen == ( OPEN::D_READING | OPEN::D_WRITING ) )
 		l_pcMode = "r+";
-	else if ( f_eMode == ( D_READING | D_WRITING | D_TRUNCATE ) )
+	else if ( f_eOpen == ( OPEN::D_READING | OPEN::D_WRITING | OPEN::D_TRUNCATE ) )
 		l_pcMode = "w+";
-	else if ( f_eMode == ( D_READING | D_WRITING | D_APPEND ) )
+	else if ( f_eOpen == ( OPEN::D_READING | OPEN::D_WRITING | OPEN::D_APPEND ) )
 		l_pcMode = "a+";
 	else
-		M_THROW ( "unexpected mode setting", f_eMode );
+		M_THROW ( "unexpected mode setting", f_eOpen );
 	f_oPath = a_oPath;
-	f_pvHandle = fopen( a_oPath.raw(), l_pcMode );
+	f_pvHandle = ::fopen( a_oPath.raw(), l_pcMode );
 	if ( ! f_pvHandle )
 		{
 		l_iError = errno;
@@ -109,23 +109,61 @@ int HFile::close( void )
 	M_EPILOG
 	}
 
-int long HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
+int long HFile::tell( void ) const
+	{
+	M_PROLOG
+	if ( ! f_pvHandle )
+		M_THROW( _( "no file is opened" ), errno );
+	int long pos = 0;
+	M_ENSURE( ( pos = ::ftell( static_cast<FILE*>( f_pvHandle ) ) ) >= 0 );
+	return ( pos );
+	M_EPILOG
+	}
+
+void HFile::seek( int long const& pos, SEEK::seek_t const& a_eSeek )
+	{
+	M_PROLOG
+	if ( ! f_pvHandle )
+		M_THROW( _( "no file is opened" ), errno );
+	int s = 0;
+	switch ( a_eSeek )
+		{
+		case ( SEEK::D_SET ):
+			s = SEEK_SET;
+		break;
+		case ( SEEK::D_CUR ):
+			s = SEEK_CUR;
+		break;
+		case ( SEEK::D_END ):
+			s = SEEK_END;
+		break;
+		default:
+			M_ASSERT( ! "bad seek type" );
+		break;
+		}
+	M_ENSURE( ::fseek( static_cast<FILE*>( f_pvHandle ), pos, s ) == 0 );
+	return;
+	M_EPILOG
+	}
+
+int long HFile::read_line( HString& a_roLine, READ::read_t const& a_eRead,
 		int const a_iMaximumLength )
 	{
 	M_PROLOG
-	char * l_pcPtr = NULL;
-	if ( ( a_eMode & D_KEEP_NEWLINES ) && ( a_eMode & D_STRIP_NEWLINES ) )
-		M_THROW ( _ ( "bad newlines setting" ), a_eMode );
-	if ( ! ( a_eMode & ( D_KEEP_NEWLINES | D_STRIP_NEWLINES ) ) )
-		a_eMode |= D_KEEP_NEWLINES;
-	if ( ( a_eMode & D_BUFFERED_READS ) && ( a_eMode & D_UNBUFFERED_READS ) )
-		M_THROW ( _ ( "bad buffering setting" ), a_eMode );
-	if ( ! ( a_eMode & ( D_BUFFERED_READS | D_UNBUFFERED_READS ) ) )
-		a_eMode |= D_BUFFERED_READS;
+	READ::read_t l_eRead = a_eRead;
+	if ( ( l_eRead & READ::D_KEEP_NEWLINES ) && ( l_eRead & READ::D_STRIP_NEWLINES ) )
+		M_THROW ( _ ( "bad newlines setting" ), l_eRead );
+	if ( ! ( l_eRead & ( READ::D_KEEP_NEWLINES | READ::D_STRIP_NEWLINES ) ) )
+		l_eRead |= READ::D_KEEP_NEWLINES;
+	if ( ( l_eRead & READ::D_BUFFERED_READS ) && ( l_eRead & READ::D_UNBUFFERED_READS ) )
+		M_THROW ( _ ( "bad buffering setting" ), l_eRead );
+	if ( ! ( l_eRead & ( READ::D_BUFFERED_READS | READ::D_UNBUFFERED_READS ) ) )
+		l_eRead |= READ::D_BUFFERED_READS;
 	if ( ! f_pvHandle )
-		M_THROW ( _ ( "no file is opened" ), errno );
+		M_THROW( _( "no file is opened" ), errno );
+	char * l_pcPtr = NULL;
 	int long l_iLength = -1;
-	if ( a_eMode & D_BUFFERED_READS )
+	if ( l_eRead & READ::D_BUFFERED_READS )
 		{
 		l_iLength = get_line_length();
 		if ( l_iLength )
@@ -150,7 +188,7 @@ int long HFile::read_line( HString& a_roLine, mode_read_t a_eMode,
 	if ( l_iLength > 0 )
 		{
 		int long newLen = l_iLength;
-		if ( ( a_eMode & D_STRIP_NEWLINES ) && ( newLen > 0 ) )
+		if ( ( l_eRead & READ::D_STRIP_NEWLINES ) && ( newLen > 0 ) )
 			{
 			-- newLen;
 			if ( ( newLen > 0 ) && ( a_roLine[ newLen - 1 ] == '\r' ) )
@@ -214,7 +252,7 @@ void HFile::flush( void ) const
 void HFile::do_flush( void ) const
 	{
 	M_PROLOG
-	M_ENSURE ( fflush ( static_cast < FILE * > ( f_pvHandle ) ) == 0 );
+	M_ENSURE( ::fflush( static_cast<FILE*>( f_pvHandle ) ) == 0 );
 	return;
 	M_EPILOG
 	}

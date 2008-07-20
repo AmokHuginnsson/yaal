@@ -41,33 +41,50 @@ class HFile : public HStreamInterface
 	typedef HFile self_t;
 	typedef HStreamInterface hier_t;
 public:
-	typedef enum
+	struct OPEN
 		{
-		D_READING = 1,
-		D_WRITING = 2,
-		D_APPEND = 4,
-		D_TRUNCATE = 8
-		} mode_open_t;
-	typedef enum
+		typedef enum
+			{
+			D_READING = 1,
+			D_WRITING = 2,
+			D_APPEND = 4,
+			D_TRUNCATE = 8
+			} open_t;
+		};
+	struct READ
 		{
-		D_DEFAULTS = 0, /* D_KEEP_NEWLINES | D_BUFFERED_READS */
-		D_KEEP_NEWLINES = 1,
-		D_STRIP_NEWLINES = 2,
-		D_BUFFERED_READS = 4,
-		D_UNBUFFERED_READS = 8
-		} mode_read_t;
+		typedef enum
+			{
+			D_DEFAULTS = 0, /* D_KEEP_NEWLINES | D_BUFFERED_READS */
+			D_KEEP_NEWLINES = 1,
+			D_STRIP_NEWLINES = 2,
+			D_BUFFERED_READS = 4,
+			D_UNBUFFERED_READS = 8
+			} read_t;
+		};
+	struct SEEK
+		{
+		typedef enum
+			{
+			D_SET,
+			D_CUR,
+			D_END
+			} seek_t;
+		};
 private:
-	mode_open_t f_eMode;
+	OPEN::open_t f_eOpen;
 	void* f_pvHandle;
 	HString f_oPath;
 	HString f_oError;
 	bool f_bExternal;
 public:
-	HFile( mode_open_t const = D_READING, void* const = NULL );
+	HFile( OPEN::open_t const& = OPEN::D_READING, void* const = NULL );
 	virtual ~HFile( void );
 	int open( HString const& );
 	int close( void );
-	int long read_line( HString&, mode_read_t = D_DEFAULTS, int const = 0 );
+	int long read_line( HString&, READ::read_t const& = READ::D_DEFAULTS, int const = 0 );
+	int long tell( void ) const;
+	void seek( int long const&, SEEK::seek_t const& = SEEK::D_SET );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	virtual void flush( void ) const;

@@ -351,7 +351,7 @@ int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
 	M_PROLOG
 	int long l_iIndex = 0, l_iLenght = 0, l_iEnd = 0;
 	a_roOption = a_roValue = "";
-	while ( a_roFile.read_line( a_roOption, HFile::D_STRIP_NEWLINES ) >= 0 )
+	while ( a_roFile.read_line( a_roOption, HFile::READ::D_STRIP_NEWLINES ) >= 0 )
 		{
 		a_riLine ++;
 		l_iIndex = 0;
