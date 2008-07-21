@@ -159,13 +159,13 @@ struct parent_exception<void>
 
 }
 
-template<typename tType, typename hier_t, typename message_t, typename code_t>
+template<typename tType, typename message_t, typename code_t>
 void throw_exception( char const* const&, char const* const&, int const&, message_t const&, code_t const&, char const* const& = NULL ) __attribute__(( __noreturn__ ));
-template<typename tType, typename hier_t, typename message_t, typename code_t>
+template<typename tType, typename message_t, typename code_t>
 void throw_exception( char const* const& file, char const* const& function, int const& line, message_t const& message, code_t const& code, char const* const& reason )
 	{
-	typedef typename exception_auto_hierarchy::parent_exception<hier_t>::parent_exception_t parent_exception_t;
-	typedef typename yaal::hcore::HExceptionT<self_t, parent_exception_t> exception_t;
+	typedef typename exception_auto_hierarchy::parent_exception<tType>::parent_exception_t parent_exception_t;
+	typedef typename yaal::hcore::HExceptionT<tType, parent_exception_t> exception_t;
 	if ( reason )
 		{
 		exception_t e( file, function, line, message, static_cast<int>( code ) );
