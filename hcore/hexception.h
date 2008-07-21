@@ -215,14 +215,7 @@ void throw_exception( char const* const& file, char const* const& function, int 
 		throw e;
 		}
 	else
-		{
-		exception_t e( file, function, line, message, static_cast<int>( code ) );
-		char*  ptr = NULL;
-	 	e.set( ptr = HException::get_type_name( typeid( exception_t ).name() ) );
-		HException::cleanup( ptr );
-		throw e;
-		}
-//	throw exception_t( file, function, line, message, static_cast<int>( code ) );
+		throw exception_t( file, function, line, message, static_cast<int>( code ) );
 	}
 
 }
