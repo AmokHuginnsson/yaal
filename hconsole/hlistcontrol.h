@@ -246,6 +246,9 @@ public:
 
 class HListControl : virtual public HSearchableControl
 	{
+protected:
+	typedef HListControl self_t;
+	typedef HSearchableControl hier_t;
 public:
 	typedef list_control_helper::HAbstractControler::HModelIteratorWrapper iterator_t;
 	struct FLAGS

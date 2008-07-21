@@ -40,6 +40,9 @@ namespace hconsole
 
 class HTUIProcess : public HHandler, public yaal::tools::HProcess
 	{
+protected:
+	typedef HTUIProcess self_t;
+	typedef yaal::tools::HProcess hier_t;
 public:
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;

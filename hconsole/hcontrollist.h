@@ -40,6 +40,7 @@ class HControl;
 
 class HControlList
 	{
+	typedef HControlList self_t;
 public:
 	typedef hcore::HList<HControl::ptr_t> model_t;
 private:

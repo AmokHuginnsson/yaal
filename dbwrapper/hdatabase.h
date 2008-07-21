@@ -38,6 +38,7 @@ namespace dbwrapper
 
 class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase>
 	{
+	typedef HDataBase self_t;
 private:
 	void* f_pvCoreData;	/* very internal for this class used only in base cla */
 public:

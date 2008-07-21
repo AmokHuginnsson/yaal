@@ -44,6 +44,9 @@ class HDataProcess;
 
 class HDataWindow : public hconsole::HWindow
 	{
+protected:
+	typedef HDataWindow self_t;
+	typedef HWindow hier_t;
 public:
 	struct DOCUMENT
 		{

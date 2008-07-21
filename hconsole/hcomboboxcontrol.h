@@ -39,6 +39,9 @@ namespace hconsole
 class HComboboxControl : public virtual HEditControl,
 	public virtual HListControl
 	{
+protected:
+	typedef HComboboxControl self_t;
+	typedef HListControl hier_t;
 public:
 	struct MODE
 		{

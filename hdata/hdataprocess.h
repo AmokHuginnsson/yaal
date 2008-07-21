@@ -51,6 +51,8 @@ typedef yaal::hcore::HHashMap<yaal::hcore::HString,
 class HDataProcess : public hconsole::HTUIProcess
 	{
 protected:
+	typedef HDataProcess self_t;
+	typedef HTUIProcess hier_t;
 	dbwrapper::database_ptr_t f_oDataBase;
 private:
 	yaal::hconsole::OMenuItem* f_psRootMenu;

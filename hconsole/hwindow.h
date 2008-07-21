@@ -43,6 +43,9 @@ class HControlList;
 
 class HWindow : public HHandler
 	{
+protected:
+	typedef HWindow self_t;
+	typedef HHandler hier_t;
 public:
 	typedef yaal::hcore::HPointer<HWindow> ptr_t;
 protected:

@@ -162,6 +162,10 @@ extern bool n_bNeedRepaint;
 
 class HConsole : public yaal::tools::HSignalHandlerInterface, private yaal::hcore::HSingletonInterface
 	{
+protected:
+	typedef HConsole self_t;
+	typedef HSignalHandlerInterface hier_t;
+private:
 	bool f_bInitialized;
 	int f_iWidth;
 	int f_iHeight;

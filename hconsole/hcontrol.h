@@ -46,6 +46,7 @@ class HWindow;
  */
 class HControl
 	{
+	typedef HControl self_t;
 public:
 	struct BITS
 		{
