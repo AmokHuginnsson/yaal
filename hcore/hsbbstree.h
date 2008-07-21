@@ -45,6 +45,7 @@ extern char const * const n_ppcErrMsgHSBBSTree [ ];
 
 class HSBBSTree
 	{
+	typedef HSBBSTree self_t;
 public:
 	struct ERROR
 		{

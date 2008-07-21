@@ -39,6 +39,7 @@ namespace hcore
 class HCondition;
 class HMutex
 	{
+	typedef HMutex self_t;
 public:
 	struct TYPE
 		{
@@ -74,6 +75,7 @@ private:
 
 class HSemaphore
 	{
+	typedef HSemaphore self_t;
 	HChunk f_oSemaphore;
 public:
 	HSemaphore( void );
@@ -87,6 +89,7 @@ private:
 
 class HThread
 	{
+	typedef HThread self_t;
 	typedef enum
 		{
 		D_DEAD,
@@ -139,6 +142,7 @@ private:
 
 class HCondition
 	{
+	typedef HCondition self_t;
 	HChunk f_oAttributes;
 	HChunk f_oCondition;
 	HMutex& f_roMutex;

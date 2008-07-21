@@ -38,6 +38,7 @@ namespace tools
 
 class HCollector : public HSerial
 	{
+protected:
 	typedef HCollector self_t;
 	typedef HSerial hier_t;
 public:

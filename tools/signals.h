@@ -50,6 +50,7 @@ public:
 
 class HSignalService
 	{
+	typedef HSignalService self_t;
 public:
 	class HHandlerGeneric
 		{

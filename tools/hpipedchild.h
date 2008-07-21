@@ -37,6 +37,9 @@ namespace tools
 
 class HPipedChild : public yaal::hcore::HStreamInterface
 	{
+protected:
+	typedef HPipedChild self_t;
+	typedef HStreamInterface hier_t;
 public:
 	struct STREAM
 		{

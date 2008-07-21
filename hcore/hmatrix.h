@@ -45,6 +45,7 @@ extern char const * const g_ppcErrMsgHMatrix [ ];
 template<typename tType>
 class HMatrix : public HArray<HVector<tType> >
 	{
+protected:
 	typedef HMatrix<tType> self_t;
 	typedef HArray<HVector<tType> > hier_t;
 public:

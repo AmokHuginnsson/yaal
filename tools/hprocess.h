@@ -42,6 +42,8 @@ namespace tools
 class HProcess : public yaal::tools::HSignalHandlerInterface
 	{
 protected:
+	typedef HProcess self_t;
+	typedef HSignalHandlerInterface hier_t;
 	typedef int ( HProcess::* process_handler_filedes_t ) ( int );
 	typedef yaal::hcore::HHashMap<int, process_handler_filedes_t> process_filedes_map_t;
 	typedef yaal::hcore::HPool<int> dropped_fd_t;

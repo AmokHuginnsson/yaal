@@ -38,6 +38,7 @@ namespace hcore
 
 class HFile : public HStreamInterface
 	{
+protected:
 	typedef HFile self_t;
 	typedef HStreamInterface hier_t;
 public:

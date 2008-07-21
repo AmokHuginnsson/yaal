@@ -43,6 +43,7 @@ class HXmlData;
 
 class HXml
 	{
+	typedef HXml self_t;
 public:
 	class HNode;
 	class HNodeProxy;

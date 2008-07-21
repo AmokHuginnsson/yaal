@@ -37,6 +37,7 @@ namespace hcore
 
 class HString
 	{
+	typedef HString self_t;
 private:
 	char*	f_pcBuffer;
 	int	long f_lAllocatedBytes;

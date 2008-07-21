@@ -43,11 +43,14 @@ namespace hcore
 #define D_VCSID_HVECTOR_H "$Id$"
 
 
-extern char const * g_ppcErrMsgHVector [ ];
+extern char const* g_ppcErrMsgHVector[];
 
-template < typename tType >
-class HVector : public HArray < tType >
+template<typename tType>
+class HVector : public HArray<tType>
 	{
+protected:
+	typedef HVector<tType> self_t;
+	typedef HArray<tType> hier_t;
 public:
 	struct ERROR
 		{

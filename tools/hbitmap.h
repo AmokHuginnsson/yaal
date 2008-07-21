@@ -35,6 +35,7 @@ namespace tools
 
 class HBitmap
 	{
+	typedef HBitmap self_t;
 public:
 	class HBit;
 	template<typename const_qual_t>

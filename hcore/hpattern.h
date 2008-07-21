@@ -38,6 +38,7 @@ namespace hcore
 
 class HPattern
 	{
+	typedef HPattern self_t;
 	bool		f_bInitialized;				/* is pattern initialized */
 	bool		f_bIgnoreCaseDefault;	/* default value for ignore case switch */
 	bool		f_bIgnoreCase;				/* self explanary */

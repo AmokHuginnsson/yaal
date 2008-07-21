@@ -129,7 +129,8 @@ struct parent_exception;
 template<typename tType>
 struct void_to_exception
 	{
-	typedef typename parent_exception<tType>::parent_exception_t exception_t;
+	typedef typename parent_exception<tType>::parent_exception_t parent_exception_t;
+	typedef HExceptionT<tType, parent_exception_t> exception_t;
 	};
 
 template<>
@@ -138,17 +139,58 @@ struct void_to_exception<void>
 	typedef yaal::hcore::HException exception_t;
 	};
 
+template<typename tType, typename base_t>
+struct void_to_base
+	{
+	typedef tType type;
+	};
+
+template<typename base_t>
+struct void_to_base<void, base_t>
+	{
+	typedef base_t type;
+	};
+
+typedef char YES;
+typedef struct { char x[2]; } NO;
+
+template<int const, typename>
+struct existing_hier;
+
+template<typename tType>
+struct context_hier
+	{
+	template<typename T>
+	static YES has_hier( typename T::hier_t* );
+	template<typename T>
+	static NO has_hier( ... );
+	typedef typename existing_hier<sizeof ( has_hier<tType>( 0 ) ), tType>::type type;
+	};
+
+template<typename T>
+struct existing_hier<1, T>
+	{
+	template<typename Q>
+	struct get_protected_typedef : public Q
+		{
+		typedef typename Q::hier_t type;
+		};
+	typedef typename get_protected_typedef<T>::type type;
+	};
+
+template<typename T>
+struct existing_hier<2, T>
+	{
+	typedef hier_t type;
+	};
+
+
+
 template<typename tType>
 struct parent_exception
 	{
-	template<typename type_hier_t>
-	struct context_hier : public type_hier_t
-		{
-		typedef hier_t type;
-		};
 	typedef typename context_hier<tType>::type proposed_type_hier_t;
-	typedef typename void_to_exception<proposed_type_hier_t>::exception_t type_hier_t;
-	typedef typename yaal::hcore::HExceptionT<tType, type_hier_t> parent_exception_t;
+	typedef typename void_to_exception<proposed_type_hier_t>::exception_t parent_exception_t;
 	};
 
 template<>
@@ -172,7 +214,15 @@ void throw_exception( char const* const& file, char const* const& function, int 
 	 	e.set( reason );
 		throw e;
 		}
-	throw exception_t( file, function, line, message, static_cast<int>( code ) );
+	else
+		{
+		exception_t e( file, function, line, message, static_cast<int>( code ) );
+		char*  ptr = NULL;
+	 	e.set( ptr = HException::get_type_name( typeid( exception_t ).name() ) );
+		HException::cleanup( ptr );
+		throw e;
+		}
+//	throw exception_t( file, function, line, message, static_cast<int>( code ) );
 	}
 
 }

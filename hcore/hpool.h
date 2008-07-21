@@ -46,6 +46,7 @@ extern char const * g_ppcErrMsgHPool [ ];
 template<typename tType>
 class HPool
 	{
+	typedef HPool<tType> self_t;
 public:
 	struct ERROR
 		{

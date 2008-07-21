@@ -42,6 +42,7 @@ extern char const* const n_pcDefaultTimeFormat;
 
 class HTime
 	{
+	typedef HTime self_t;
 	typedef yaal::hcore::HPool<char> cache_t;
 	HString	f_oFormat;
 	mutable cache_t f_oCache;

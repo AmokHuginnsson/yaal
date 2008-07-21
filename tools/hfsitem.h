@@ -39,6 +39,7 @@ namespace tools
 
 class HFSItem
 	{
+	typedef HFSItem self_t;
 	int f_iNameLen;
 	yaal::hcore::HString f_oPath;
 public:

@@ -57,8 +57,10 @@ class HLog;
 
 class HLog : public HStreamInterface, private HSingletonInterface
 	{
+protected:
 	typedef HLog self_t;
 	typedef HStreamInterface hier_t;
+private:
 	bool			f_bRealMode;
 	bool			f_bNewLine;
 	int long	f_lType;

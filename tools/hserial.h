@@ -39,6 +39,7 @@ namespace tools
 
 class HSerial : public hcore::HRawFile
 	{
+protected:
 	typedef HSerial self_t;
 	typedef HRawFile hier_t;
 public:

@@ -39,6 +39,7 @@ namespace tools
 
 class HAnalyser
 	{
+	typedef HAnalyser self_t;
 	typedef enum
 		{
 		E_OK = 0,
