@@ -63,6 +63,31 @@ HBitmap HBitSourceFile::do_get_nth_block( int long const&, int long const& size 
 	M_EPILOG
 	}
 
+HBitSourceMemory::HBitSourceMemory( void const* a_pvMemory, int long a_lSize )
+	: HBitSourceInterface(), f_pvMemory( a_pvMemory ), f_lSIze( a_lSize )
+	{
+	}
+
+HBitSourceMemory::~HBitSourceMemory( void )
+	{
+	}
+
+HBitmap HBitSourceMemory::do_get_nth_block( int long const& block, int long const& size ) const
+	{
+	M_PROLOG
+	M_ASSERT( size > 0 );
+	if ( size & 7 )
+		M_THROW( "reading fractions of octet not supported", static_cast<int>( size & 7 ) );
+	int long offset = ( block * size ) >> 3;
+	M_ASSERT( offset < f_lSIze );
+	int long left = ( f_lSIze - offset ) << 3;
+	int long toCopy = size < left ? size : left;
+	HBitmap bmp( toCopy );
+	bmp.copy( static_cast<char const*>( f_pvMemory ) + offset, toCopy );
+	return ( bmp );
+	M_EPILOG
+	}
+
 }
 
 }

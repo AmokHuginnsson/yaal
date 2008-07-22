@@ -28,6 +28,8 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hash.h"
 
+using namespace yaal::hcore;
+
 namespace yaal
 {
 
@@ -39,8 +41,38 @@ namespace hash
 
 yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 	{
-	bitSource.get_nth_block( 0l, 0l );
-	return ( "" );
+	static int const D_BLOCK_SIZE = 512;
+	static int const D_MESSAGE_LENGTH_SIZE = 64;
+	static int const D_SUPPLEMENT_SIZE = 1;
+	static int const D_STATE_SIZE = 4;
+	static u32_t const D_S0 = 0x67452301;
+	static u32_t const D_S1 = 0xefcdab89;
+	static u32_t const D_S2 = 0x98badcfe;
+	static u32_t const D_S3 = 0x10325476;
+	int long block = 0;
+	HBitmap bmp( D_BLOCK_SIZE );
+	int last = 0;
+	int long total = 0;
+	int long state[ D_STATE_SIZE ] = { D_S0, D_S1, D_S2, D_S3 };
+	do
+		{
+		bmp = bitSource.get_nth_block( block, D_BLOCK_SIZE );
+		last = bmp.get_size();
+		total += last;
+		if ( last < ( ( D_BLOCK_SIZE - D_MESSAGE_LENGTH_SIZE ) - D_SUPPLEMENT_SIZE ) )
+			{
+			}
+		else if ( last < D_BLOCK_SIZE )
+			{
+			}
+		else
+			{
+			}
+		}
+	while ( last == D_BLOCK_SIZE );
+	HString result;
+	result.format( "%x%x%x%x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
+	return ( result );
 	}
 
 }

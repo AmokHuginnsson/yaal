@@ -129,12 +129,15 @@ void HBitmap::copy( void const* a_pvBlock, int long const& a_lSize )
 	{
 	M_PROLOG
 	M_ASSERT( a_lSize > 0 );
-	clear();
-	int long unsigned copyBytes = octets_for_bits( a_lSize );
-	f_pvBlock = xcalloc<char>( copyBytes );
-	M_ENSURE( f_pvBlock );
+	int long copyBytes = octets_for_bits( a_lSize );
+	if ( copyBytes > f_lAllocatedBytes )
+		{
+		clear();
+		f_pvBlock = xcalloc<char>( copyBytes );
+		M_ENSURE( f_pvBlock );
+		f_lAllocatedBytes = copyBytes;
+		}
 	f_lSize = a_lSize;
-	f_lAllocatedBytes = copyBytes;
 	::memcpy( f_pvBlock, a_pvBlock, copyBytes );
 	return;
 	M_EPILOG

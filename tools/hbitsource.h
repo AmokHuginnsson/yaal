@@ -27,6 +27,7 @@ Copyright:
 #ifndef __YAAL_TOOLS_HBITSOURCE_H
 #define __YAAL_TOOLS_HBITSOURCE_H
 
+#include "hcore/base.h"
 #include "hcore/hstring.h"
 #include "hcore/hfile.h"
 #include "tools/hbitmap.h"
@@ -46,7 +47,7 @@ private:
 	virtual HBitmap do_get_nth_block( int long const&, int long const& ) const = 0;
 	};
 
-class HBitSourceFile : public HBitSourceInterface
+class HBitSourceFile : public HBitSourceInterface, private yaal::HNonCopyable
 	{
 	typedef HBitSourceFile self_t;
 	yaal::hcore::HString f_oPath;
@@ -58,7 +59,22 @@ private:
 	virtual HBitmap do_get_nth_block( int long const&, int long const& ) const;
 	};
 
+class HBitSourceMemory : public HBitSourceInterface, private yaal::HNonCopyable
+	{
+	typedef HBitSourceMemory self_t;
+	void const* f_pvMemory;
+	int long f_lSIze;
+public:
+	HBitSourceMemory( void const*, int long );
+	virtual ~HBitSourceMemory( void );
+private:
+	virtual HBitmap do_get_nth_block( int long const&, int long const& ) const;
+	HBitSourceMemory( HBitSourceMemory const& );
+	HBitSourceMemory& operator = ( HBitSourceMemory const& );
+	};
+
 typedef yaal::hcore::HExceptionT<HBitSourceFile> HBitSourceFileException;
+typedef yaal::hcore::HExceptionT<HBitSourceMemory> HBitSourceMemoryException;
 
 }
 
