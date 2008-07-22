@@ -184,8 +184,6 @@ struct existing_hier<2, T>
 	typedef hier_t type;
 	};
 
-
-
 template<typename tType>
 struct parent_exception
 	{
