@@ -33,8 +33,38 @@ AC_CONFIG_AUX_DIR([_aux])
 dnl yaal is not Free Software.
 AC_COPYRIGHT([[yaal (c) 2004 All rights reserved.]])
 
+AC_PATH_PROG(HAS_BASH,[bash],[],[/bin])
+AC_MSG_CHECKING([bash version])
+if test ["${HAS_BASH}"] = ["/bin/bash"] ; then
+	MAJOR=`/bin/bash -c 'echo ${BASH_VERSINFO[[0]]}'`
+	MINOR=`/bin/bash -c 'echo ${BASH_VERSINFO[[1]]}'`
+	AC_MSG_CHECKING([bash version])
+	if test ${MAJOR} -ge 3 -o \( ${MAJOR} -ge 2 -a ${MINOR} -ge 95 \) ; then
+		AC_MSG_RESULT([ok])
+	else
+		AC_MSG_ERROR([insufficient bash version [${MAJOR}].[${MINOR}]])
+	fi
+else
+	AC_MSG_ERROR([you need /bin/bash to build YAAL])
+fi
+
+AC_CHECK_PROG(HAS_GIT,[git-log],["true"],["false"])
+AC_MSG_CHECKING([git id sub-command])
+AC_SUBST(GITID,[true])
+if test ["$HAS_GIT"] = ["true"] ; then
+	THIS_ID=`git id configure.ac 2> /dev/null`
+	if test ["x${THIS_ID}"] != ["x"] ; then
+		AC_SUBST(GITID,["git id"])
+		AC_MSG_RESULT([ok])
+	else
+		AC_MSG_WARN([not present])
+	fi
+else
+	AC_MSG_WARN([no git in the first place])
+fi
+
 dnl yaal is still in alpha stage.
-AC_REVISION([[$Id$]])
+AC_REVISION(${THIS_ID})
 
 dnl We select default language.
 AC_LANG([C++])

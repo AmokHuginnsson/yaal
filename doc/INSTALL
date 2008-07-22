@@ -4,12 +4,14 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 
 * System requirements:
 
-	libraries:
-    - pthread
-    - ssl
-    - rt
-		- libxml2
-		- ncurses
+	libraries for:
+    - pthread (libpthread)
+    - ssl (libssl)
+    - rt (librt)
+		- xml (libxml2)
+		- xslt (libxslt1)
+		- dl (libdl)
+		- ncurses (ncurses)
 	
 	optional libraries:
 		- SQLite3
@@ -43,13 +45,13 @@ Let installation begin.
 
 # common step for all cases
 	$ cd /path/to/yaal/
-	$ svn up
+	$ git pull
 
 # first case (FreeBSD/update/expert)
 	$ make
 
 # second case (FreeBSD/update/non-expert)
-	$ make purge
+	$ make purge # it may fail
 	$ make
 
 # third case (FreeBSD/fresh install)
@@ -65,7 +67,7 @@ Let installation begin.
 	$ make
 
 # fifth case (non-FreeBSD/update/non-expert)
-	$ make purge
+	$ make purge # it may fail
 	$ autoconf
 	$ ./configure
 	$ make mrproper

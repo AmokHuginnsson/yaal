@@ -37,6 +37,7 @@ DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/yaal.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
 CTAGS	= @CTAGS@
+GITID = @GITID@
 include $(DIR_ROOT)/_aux/common-basic.mk
 include $(DIR_ROOT)/_aux/common-term.mk
 include $(DIR_ROOT)/_aux/common-suffix.mk
