@@ -55,11 +55,11 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 
 #define M_VCSID(id) namespace { static char const* wrapper_VCSID( void ) { wrapper_VCSID(); return id; } }
 #define M_VCSTID(id) namespace { static char const* wrapper_VCSTID( void ) { wrapper_VCSTID(); return id; } }
-#define M_THROW( msg, e_no ) throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, e_no )
+#define M_THROW( msg, e_no ) yaal::hcore::throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, e_no )
 #define M_PROLOG try{
 #define M_EPILOG } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
 #define M_FINAL } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error( true ); } catch ( int const& error_code ) { exit( error_code ); }
-#define M_ENSURE( condition ) do { if ( ! ( condition ) ){ throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno, error_message( errno ) ); } } while ( 0 );
+#define M_ENSURE( condition ) do { if ( ! ( condition ) ){ yaal::hcore::throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno, error_message( errno ) ); } } while ( 0 );
 #ifndef NDEBUG
 #	define M_ASSERT( condition ) do { if ( ! ( condition ) )yaal::hcore::HException::failed_assert( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition ); } while ( 0 );
 #else /* NDEBUG */

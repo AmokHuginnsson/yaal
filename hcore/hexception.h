@@ -39,6 +39,9 @@ Copyright:
 #endif /* __YAAL_BUILD__ */
 #include "hcore/hstring.h"
 
+typedef void self_t;
+typedef void hier_t;
+
 namespace yaal
 {
 
@@ -117,8 +120,6 @@ public:
  * B : A, BE : AE, BE = ET<B, AE>
  * C : B, CE : BE, CE = ET<C, BE>
  */
-typedef void self_t;
-typedef void hier_t;
 
 namespace exception_auto_hierarchy
 {
