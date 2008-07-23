@@ -45,7 +45,7 @@ public:
 private:
 	int long f_lAllocatedBytes;
 	int long f_lSize;
-	void* f_pvBlock;
+	void* f_pvData;
 public:
 	HBitmap( void );
 	~HBitmap( void );
@@ -64,7 +64,10 @@ public:
 	HBitmap operator ^ ( HBitmap const& ) const;
 	HBitmap operator << ( int long const& );
 	HBitmap operator >> ( int long const& );
+	HBitmap& operator += ( HBitmap const& );
 	void clear( void );
+	void fill( bool const& );
+	void push_back( bool const& );
 	int long get_size( void ) const;
 	int long size( void ) const;
 	void const* raw( void ) const;
@@ -73,15 +76,22 @@ public:
 	const_iterator begin( void ) const;
 	const_iterator find( int long const& ) const;
 	const_iterator end( void ) const;
+	const_iterator rbegin( void ) const;
+	const_iterator rend( void ) const;
 	iterator begin( void );
 	iterator find( int long const& );
 	iterator end( void );
+	iterator rbegin( void );
+	iterator rend( void );
 	bool get( int long const& ) const;
 	void set( int long const&, bool const& );
 	void rotate_left( int long const&, int long const&, int long const& );
 	void rotate_right( int long const&, int long const&, int long const& );
 private:
+	void ensure_pool( int long const& );
 	int long octets_for_bits( int long const& ) const;
+	void* block( void );
+	void const* block( void ) const;
 	};
 
 namespace bitmap_type_helper

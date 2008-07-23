@@ -73,10 +73,10 @@ private:
 	int long f_lSize; /*! size of container */
 	tType* f_ptPool;	/* pointer to allocated memory pool */
 public:
-	HPool( int long, pool_type_t = D_FIXED_SIZE );
+	HPool( int long const&, pool_type_t const& = D_FIXED_SIZE );
 	virtual ~HPool( void );
-	void pool_realloc( int long );
-	tType& operator[] ( int long ) const;
+	void pool_realloc( int long const& );
+	tType& operator[] ( int long const& ) const;
 	void push_back( tType const& );
 	void reset( void );
 	void clear( void );
@@ -100,7 +100,7 @@ public:
 	};
 
 template<typename tType>
-HPool<tType>::HPool( int long a_ulNewSize, pool_type_t a_ePoolType )
+HPool<tType>::HPool( int long const& a_ulNewSize, pool_type_t const& a_ePoolType )
 	: f_ePoolType( a_ePoolType ), f_lAllocedObjects( 0 ), f_lSize( 0 ),
 	f_ptPool( NULL )
 	{
@@ -156,7 +156,7 @@ HPool<tType>::~HPool( void )
 	}
 
 template<typename tType>
-void HPool<tType>::pool_realloc( const int long a_ulNewSize )
+void HPool<tType>::pool_realloc( int long const& a_ulNewSize )
 	{
 	M_PROLOG
 	if ( a_ulNewSize < 1 )
@@ -189,7 +189,7 @@ void HPool<tType>::pool_realloc( const int long a_ulNewSize )
 	}
 
 template<typename tType>
-tType& HPool<tType>::operator[]( int long a_iIndex ) const
+tType& HPool<tType>::operator[]( int long const& a_iIndex ) const
 	{
 	M_PROLOG
 	if ( ( a_iIndex < 0 ) || ( a_iIndex >= f_lSize ) )

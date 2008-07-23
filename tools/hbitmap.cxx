@@ -30,7 +30,9 @@ Copyright:
 #include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hbitmap.h"
-#include "hcore/xalloc.h"
+#include "hcore/hpool.h"
+
+typedef yaal::hcore::HPool<char*> mem_pool_t;
 
 using namespace yaal::hcore;
 
@@ -40,8 +42,22 @@ namespace yaal
 namespace tools
 {
 
+template<>
+bool HBitmap::HIterator<bool>::operator* ( void )
+	{
+	M_ASSERT( f_poOwner );
+	return ( f_poOwner->get( f_lIndex ) );
+	}
+
+template<>
+HBitmap::HBit HBitmap::HIterator<HBitmap::HBit>::operator* ( void )
+	{
+	M_ASSERT( f_poOwner );
+	return ( HBitmap::HBit( f_poOwner, f_lIndex ) );
+	}
+
 HBitmap::HBitmap( void )
-	: f_lAllocatedBytes( 0 ), f_lSize( 0 ), f_pvBlock( NULL )
+	: f_lAllocatedBytes( 0 ), f_lSize( 0 ), f_pvData( NULL )
 	{
 	return;
 	}
@@ -66,33 +82,31 @@ int long HBitmap::size( void ) const
 
 void const* HBitmap::raw( void ) const
 	{
-	return ( f_pvBlock );
+	return ( block() );
 	}
 
 void HBitmap::clear( void )
 	{
 	if ( f_lAllocatedBytes )
-		xfree( f_pvBlock );
-	f_pvBlock = NULL;
+		delete static_cast<mem_pool_t*>( f_pvData );
+	f_pvData = NULL;
 	f_lAllocatedBytes = 0;
 	f_lSize = 0;
 	return;
 	}
 
 HBitmap::HBitmap( int long const& a_lSize )
-	: f_lAllocatedBytes( octets_for_bits( a_lSize ) ),
-	f_lSize( a_lSize ), f_pvBlock( NULL )
+	: f_lAllocatedBytes( 0 ), f_lSize( 0 ), f_pvData( NULL )
 	{
 	M_PROLOG
 	M_ASSERT( a_lSize > 0 );
-	f_pvBlock = xcalloc<char>( f_lAllocatedBytes );
-	M_ENSURE( f_pvBlock );
+	ensure_pool( a_lSize );
 	return;
 	M_EPILOG
 	}
 
 HBitmap::HBitmap( HBitmap const& b )
-	: f_lAllocatedBytes( 0 ), f_lSize( 0 ), f_pvBlock( NULL )
+	: f_lAllocatedBytes( 0 ), f_lSize( 0 ), f_pvData( NULL )
 	{
 	M_PROLOG
 	operator = ( b );
@@ -106,9 +120,15 @@ HBitmap& HBitmap::operator = ( HBitmap const& b )
 	if ( &b != this )
 		{
 		if ( b.f_lAllocatedBytes )
-			copy( b.f_pvBlock, b.f_lSize );
+			copy( b.block(), b.f_lSize );
 		else
-			use( b.f_pvBlock, b.f_lSize );
+			{
+			/*
+			 * The source is just reference to some external memory,
+			 * so it is meant to be writeable.
+			 */
+			use( const_cast<void*>( b.block() ), b.f_lSize );
+			}
 		}
 	return ( *this );
 	M_EPILOG
@@ -120,7 +140,7 @@ void HBitmap::use( void* a_pvBlock, int long const& a_lSize )
 	M_ASSERT( a_lSize > 0 );
 	clear();
 	f_lSize = a_lSize;
-	f_pvBlock = a_pvBlock;
+	f_pvData = a_pvBlock;
 	return;
 	M_EPILOG
 	}
@@ -130,16 +150,43 @@ void HBitmap::copy( void const* a_pvBlock, int long const& a_lSize )
 	M_PROLOG
 	M_ASSERT( a_lSize > 0 );
 	int long copyBytes = octets_for_bits( a_lSize );
-	if ( copyBytes > f_lAllocatedBytes )
-		{
-		clear();
-		f_pvBlock = xcalloc<char>( copyBytes );
-		M_ENSURE( f_pvBlock );
-		f_lAllocatedBytes = copyBytes;
-		}
-	f_lSize = a_lSize;
-	::memcpy( f_pvBlock, a_pvBlock, copyBytes );
+	ensure_pool( a_lSize );
+	::memcpy( block(), a_pvBlock, copyBytes );
 	return;
+	M_EPILOG
+	}
+
+void* HBitmap::block( void )
+	{
+	return ( f_lAllocatedBytes ? static_cast<mem_pool_t*>( f_pvData )->raw() : f_pvData );
+	}
+
+void const* HBitmap::block( void ) const
+	{
+	return ( f_lAllocatedBytes ? static_cast<mem_pool_t*>( f_pvData )->raw() : f_pvData );
+	}
+
+void HBitmap::ensure_pool( int long const& newSize )
+	{
+	M_PROLOG
+	f_lSize = newSize;
+	int long newPoolSize = octets_for_bits( f_lSize );
+	if ( f_lAllocatedBytes )
+		static_cast<mem_pool_t*>( f_pvData )->pool_realloc( newPoolSize );
+	else
+		f_pvData = new mem_pool_t( newPoolSize, mem_pool_t::D_AUTO_GROW );
+	f_lAllocatedBytes = newPoolSize;
+	M_ENSURE( f_pvData );
+	return;
+	M_EPILOG
+	}
+
+void HBitmap::push_back( bool const& bit )
+	{
+	M_PROLOG
+	M_ASSERT( f_lAllocatedBytes || ! f_pvData );
+	ensure_pool( ++ f_lSize );
+	set( f_lSize - 1, bit );
 	M_EPILOG
 	}
 
@@ -152,7 +199,7 @@ bool HBitmap::operator == ( HBitmap const& b ) const
 	{
 	M_PROLOG
 	M_ASSERT( f_lSize == b.f_lSize );
-	return ( ( f_pvBlock == b.f_pvBlock ) || ! ::memcmp( f_pvBlock, b.f_pvBlock, octets_for_bits( f_lSize ) ) );
+	return ( ( f_pvData == b.f_pvData ) || ! ::memcmp( block(), b.block(), octets_for_bits( f_lSize ) ) );
 	M_EPILOG
 	}
 
@@ -167,8 +214,10 @@ HBitmap& HBitmap::operator |= ( HBitmap const& b )
 	{
 	M_PROLOG
 	M_ASSERT( f_lSize == b.f_lSize );
+	char* dst = static_cast<char*>( block() );
+	char const* src = static_cast<char const*>( b.block() );
 	for ( int long i = 0; i < f_lSize; ++ i )
-		static_cast<char*>( f_pvBlock )[ i ] = static_cast<char>( static_cast<char*>( f_pvBlock )[ i ] | static_cast<char*>( b.f_pvBlock )[ i ] );
+		dst[ i ] = static_cast<char>( dst[ i ] | src[ i ] );
 	return ( *this );
 	M_EPILOG
 	}
@@ -177,8 +226,10 @@ HBitmap& HBitmap::operator &= ( HBitmap const& b )
 	{
 	M_PROLOG
 	M_ASSERT( f_lSize == b.f_lSize );
+	char* dst = static_cast<char*>( block() );
+	char const* src = static_cast<char const*>( b.block() );
 	for ( int long i = 0; i < f_lSize; ++ i )
-		static_cast<char*>( f_pvBlock )[ i ] = static_cast<char>( static_cast<char*>( f_pvBlock )[ i ] & static_cast<char*>( b.f_pvBlock )[ i ] );
+		dst[ i ] = static_cast<char>( dst[ i ] & src[ i ] );
 	return ( *this );
 	M_EPILOG
 	}
@@ -187,8 +238,10 @@ HBitmap& HBitmap::operator ^= ( HBitmap const& b )
 	{
 	M_PROLOG
 	M_ASSERT( f_lSize == b.f_lSize );
+	char* dst = static_cast<char*>( block() );
+	char const* src = static_cast<char const*>( b.block() );
 	for ( int long i = 0; i < f_lSize; ++ i )
-		static_cast<char*>( f_pvBlock )[ i ] = static_cast<char>( static_cast<char*>( f_pvBlock )[ i ] ^ static_cast<char*>( b.f_pvBlock )[ i ] );
+		dst[ i ] = static_cast<char>( dst[ i ] ^ src[ i ] );
 	return ( *this );
 	M_EPILOG
 	}
@@ -217,6 +270,16 @@ HBitmap HBitmap::operator ^ ( HBitmap const& b ) const
 	HBitmap m( *this );
 	m ^= b;
 	return ( m );
+	M_EPILOG
+	}
+
+HBitmap& HBitmap::operator += ( HBitmap const& bmp )
+	{
+	M_PROLOG
+	/* Super slow !!! FIXME */
+	for ( HBitmap::const_iterator it = bmp.begin(); it != bmp.end(); ++ it )
+		push_back( *it );
+	return ( *this );
 	M_EPILOG
 	}
 
@@ -322,7 +385,7 @@ bool HBitmap::get( int long const& a_lNumber ) const
 	M_ASSERT( a_lNumber < f_lSize );
 	int short l_hState = 0, l_iOffset = 0;
 	int long l_lDword;
-	char* l_pcAddress = static_cast<char*>( f_pvBlock );
+	char const* l_pcAddress = static_cast<char const*>( block() );
 	l_lDword = a_lNumber >> 3;
 	l_iOffset = static_cast<short>( a_lNumber & 7 );
 	l_hState = static_cast<short>( *( l_pcAddress + l_lDword ) & g_pucMaskBitSet[ l_iOffset ] );
@@ -339,7 +402,7 @@ void HBitmap::set( int long const& a_lNumber, bool const& a_bState )
 	M_ASSERT( a_lNumber < f_lSize );
 	int long l_iOffset;
 	int long l_lDword;
-	char unsigned* l_pcAddress = static_cast<char unsigned*>( f_pvBlock );
+	char unsigned* l_pcAddress = static_cast<char unsigned*>( block() );
 	l_lDword = a_lNumber >> 3;
 	l_iOffset = a_lNumber & 7;
 	/* FIXME g++-4.3 bug
@@ -398,6 +461,16 @@ HBitmap::const_iterator HBitmap::end( void ) const
 	return ( const_iterator( this, f_lSize ) );
 	}
 
+HBitmap::const_iterator HBitmap::rbegin( void ) const
+	{
+	return ( const_iterator( this, f_lSize - 1 ) );
+	}
+
+HBitmap::const_iterator HBitmap::rend( void ) const
+	{
+	return ( const_iterator( this, -1 ) );
+	}
+
 HBitmap::iterator HBitmap::begin( void )
 	{
 	return ( iterator( this, 0 ) );
@@ -414,18 +487,14 @@ HBitmap::iterator HBitmap::end( void )
 	return ( iterator( this, f_lSize ) );
 	}
 
-template<>
-bool HBitmap::HIterator<bool>::operator* ( void )
+HBitmap::iterator HBitmap::rbegin( void )
 	{
-	M_ASSERT( f_poOwner );
-	return ( f_poOwner->get( f_lIndex ) );
+	return ( iterator( this, f_lSize - 1 ) );
 	}
 
-template<>
-HBitmap::HBit HBitmap::HIterator<HBitmap::HBit>::operator* ( void )
+HBitmap::iterator HBitmap::rend( void )
 	{
-	M_ASSERT( f_poOwner );
-	return ( HBitmap::HBit( f_poOwner, f_lIndex ) );
+	return ( iterator( this, -1 ) );
 	}
 
 HBitmap::HBit::HBit( HBitmap* a_poOwner, int long const& idx )

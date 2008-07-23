@@ -157,7 +157,7 @@ int HCollector::receive_line( HString& a_oLine )
 		::memset ( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
 		::strncpy( f_pcReadBuf, f_oLine.raw()
 				+ ::strlen( PROTOCOL::D_DTA ) + 2 /* for Plength */, 2 );
-		l_iPCRC = lexical_cast<int>( f_pcReadBuf );
+		l_iPCRC = lexical_cast<int, char const*>( f_pcReadBuf );
 		if ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
 			l_iError += ( l_iErrLenght - HRawFile::write ( PROTOCOL::D_ERR, l_iErrLenght ) );
 		l_iError ++;
