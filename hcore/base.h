@@ -211,6 +211,18 @@ struct binary<0>
 	static int long unsigned const value = 0;
 	};
 
+template<int long unsigned const input>
+struct obinary
+	{
+	static int long unsigned const value = ( obinary<(input >> 3)>::value << 1 ) + ( input & 7 );
+	};
+
+template<>
+struct obinary<0>
+	{
+	static int long unsigned const value = 0;
+	};
+
 template<int long unsigned const base, int long unsigned const exponent, int long unsigned const helper = 1>
 struct power
 	{

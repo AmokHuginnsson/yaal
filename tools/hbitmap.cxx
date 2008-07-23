@@ -127,7 +127,10 @@ HBitmap& HBitmap::operator = ( HBitmap const& b )
 			 * The source is just reference to some external memory,
 			 * so it is meant to be writeable.
 			 */
-			use( const_cast<void*>( b.block() ), b.f_lSize );
+			if ( b.f_lSize )
+				use( const_cast<void*>( b.block() ), b.f_lSize );
+			else
+				clear();
 			}
 		}
 	return ( *this );
@@ -193,6 +196,74 @@ void HBitmap::push_back( bool const& bit )
 int long HBitmap::octets_for_bits( int long const& bits ) const
 	{
 	return ( ( ( bits >> 3 ) + ( ( bits & 7 ) ? 1 : 0 ) ) );
+	}
+
+void HBitmap::fill( bool const& bit )
+	{
+	M_PROLOG
+	fill( 0, f_lSize, bit );
+	return;
+	M_EPILOG
+	}
+
+u8_t g_pucMaskBitKeepLeft[ 8 ] =
+	{
+	yaal::obinary<010000000>::value,
+	yaal::obinary<011000000>::value,
+	yaal::obinary<011100000>::value,
+	yaal::obinary<011110000>::value,
+	yaal::obinary<011111000>::value,
+	yaal::obinary<011111100>::value,
+	yaal::obinary<011111110>::value,
+	yaal::obinary<011111111>::value
+	};
+
+u8_t g_pucMaskBitKeepRight[ 8 ] =
+	{
+	yaal::obinary<011111111>::value,
+	yaal::obinary<001111111>::value,
+	yaal::obinary<000111111>::value,
+	yaal::obinary<000011111>::value,
+	yaal::obinary<000001111>::value,
+	yaal::obinary<000000111>::value,
+	yaal::obinary<000000011>::value,
+	yaal::obinary<000000001>::value
+	};
+
+void HBitmap::fill( int long const& offset, int long const& amount, bool const& bit )
+	{
+	M_PROLOG
+	int long byteOffset = octets_for_bits( offset );
+	int long til = offset + amount;
+	int long byteAmount = ( octets_for_bits( offset + amount ) - byteOffset ) - ( ( offset & 7 ) ? 1 : 0 ) - ( ( til & 7 ) ? 1 : 0 );
+	u8_t filler = static_cast<u8_t>( bit ? 0xff : 0 );
+	char* data = static_cast<char*>( block() );
+	if ( byteAmount > 0 )
+		::memset( data + byteOffset, filler, byteAmount );
+	if ( offset & 7 )
+		{
+		if ( bit )
+			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] | g_pucMaskBitKeepRight[ ( offset & 7 ) - 1 ] );
+		else
+			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] & g_pucMaskBitKeepLeft[ ( offset & 7 ) - 1 ] );
+		}
+	if ( til & 7 )
+		{
+		if ( bit )
+			data[ byteOffset + byteAmount ] = static_cast<u8_t>( data[ byteOffset - 1 ] | g_pucMaskBitKeepLeft[ ( til & 7 ) - 1 ] );
+		else
+			data[ byteOffset + byteOffset ] = static_cast<u8_t>( data[ byteOffset - 1 ] & g_pucMaskBitKeepRight[ ( til & 7 ) - 1 ] );
+		}
+	return;
+	M_EPILOG
+	}
+
+void HBitmap::reserve( int long const& a_lSize )
+	{
+	M_PROLOG
+	ensure_pool( a_lSize );
+	return;
+	M_EPILOG
 	}
 
 bool HBitmap::operator == ( HBitmap const& b ) const
@@ -283,7 +354,7 @@ HBitmap& HBitmap::operator += ( HBitmap const& bmp )
 	M_EPILOG
 	}
 
-int long unsigned g_pulMaskBitSet[] = 
+u32_t g_pulMaskBitSet[ 32 ] = 
 	{
 	yaal::power<2,31>::value,
 	yaal::power<2,30>::value,
@@ -306,20 +377,20 @@ int long unsigned g_pulMaskBitSet[] =
 	yaal::power<2,13>::value,
 	yaal::power<2,12>::value,
 	yaal::power<2,11>::value,
-	yaal::power<2,10>::value,
-	yaal::binary<1000000000>::value,
-	yaal::binary<100000000>::value,
-	yaal::binary<10000000>::value,
-	yaal::binary<1000000>::value,
-	yaal::binary<100000>::value,
-	yaal::binary<10000>::value,
-	yaal::binary<1000>::value,
-	yaal::binary<100>::value,
-	yaal::binary<10>::value,
-	yaal::binary<1>::value
+	yaal::obinary<010000000000>::value,
+	yaal::obinary<01000000000>::value,
+	yaal::obinary<0100000000>::value,
+	yaal::obinary<010000000>::value,
+	yaal::obinary<01000000>::value,
+	yaal::obinary<0100000>::value,
+	yaal::obinary<010000>::value,
+	yaal::obinary<01000>::value,
+	yaal::obinary<0100>::value,
+	yaal::obinary<010>::value,
+	yaal::obinary<01>::value
 	};
 
-int long unsigned g_pulMaskBitClear[] =
+u32_t g_pulMaskBitClear[ 32 ] =
 	{
 	0xffffffff - yaal::power<2,31>::value,
 	0xffffffff - yaal::power<2,30>::value,
@@ -342,40 +413,41 @@ int long unsigned g_pulMaskBitClear[] =
 	0xffffffff - yaal::power<2,13>::value,
 	0xffffffff - yaal::power<2,12>::value,
 	0xffffffff - yaal::power<2,11>::value,
-	0xffffffff - yaal::power<2,10>::value,
-	0xffffffff - yaal::binary<1000000000>::value,
-	0xffffffff - yaal::binary<100000000>::value,
-	0xffffffff - yaal::binary<10000000>::value,
-	0xffffffff - yaal::binary<1000000>::value,
-	0xffffffff - yaal::binary<100000>::value,
-	0xffffffff - yaal::binary<10000>::value,
-	0xffffffff - yaal::binary<1000>::value,
-	0xffffffff - yaal::binary<100>::value,
-	0xffffffff - yaal::binary<10>::value,
-	0xffffffff - yaal::binary<1>::value
+	0xffffffff - yaal::obinary<010000000000>::value,
+	0xffffffff - yaal::obinary<01000000000>::value,
+	0xffffffff - yaal::obinary<0100000000>::value,
+	0xffffffff - yaal::obinary<010000000>::value,
+	0xffffffff - yaal::obinary<01000000>::value,
+	0xffffffff - yaal::obinary<0100000>::value,
+	0xffffffff - yaal::obinary<010000>::value,
+	0xffffffff - yaal::obinary<01000>::value,
+	0xffffffff - yaal::obinary<0100>::value,
+	0xffffffff - yaal::obinary<010>::value,
+	0xffffffff - yaal::obinary<01>::value
 	};
 
-char unsigned g_pucMaskBitSet[] =
+u8_t g_pucMaskBitSet[ 8 ] =
 	{
-	yaal::binary<10000000>::value,
-	yaal::binary<1000000>::value,
-	yaal::binary<100000>::value,
-	yaal::binary<10000>::value,
-	yaal::binary<1000>::value,
-	yaal::binary<100>::value,
-	yaal::binary<10>::value,
-	yaal::binary<1>::value
+	yaal::obinary<010000000>::value,
+	yaal::obinary<01000000>::value,
+	yaal::obinary<0100000>::value,
+	yaal::obinary<010000>::value,
+	yaal::obinary<01000>::value,
+	yaal::obinary<0100>::value,
+	yaal::obinary<010>::value,
+	yaal::obinary<01>::value
 	};
-char unsigned g_pucMaskBitClear[] =
+
+u8_t g_pucMaskBitClear[ 8 ] =
 	{
-	yaal::binary<1111111>::value,
-	yaal::binary<10111111>::value,
-	yaal::binary<11011111>::value,
-	yaal::binary<11101111>::value,
-	yaal::binary<11110111>::value,
-	yaal::binary<11111011>::value,
-	yaal::binary<11111101>::value,
-	yaal::binary<11111110>::value
+	yaal::obinary<01111111>::value,
+	yaal::obinary<010111111>::value,
+	yaal::obinary<011011111>::value,
+	yaal::obinary<011101111>::value,
+	yaal::obinary<011110111>::value,
+	yaal::obinary<011111011>::value,
+	yaal::obinary<011111101>::value,
+	yaal::obinary<011111110>::value
 	};
 
 bool HBitmap::get( int long const& a_lNumber ) const

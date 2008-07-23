@@ -67,12 +67,14 @@ public:
 	HBitmap& operator += ( HBitmap const& );
 	void clear( void );
 	void fill( bool const& );
+	void fill( int long const&, int long const&, bool const& );
 	void push_back( bool const& );
 	int long get_size( void ) const;
 	int long size( void ) const;
 	void const* raw( void ) const;
 	void copy( void const*, int long const& );
 	void use( void*, int long const& );
+	void reserve( int long const& );
 	const_iterator begin( void ) const;
 	const_iterator find( int long const& ) const;
 	const_iterator end( void ) const;

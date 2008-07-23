@@ -43,7 +43,7 @@ HBitmap	HBitSourceInterface::get_nth_block( int long const& block, int long cons
 	}
 
 HBitSourceFile::HBitSourceFile( HString const& a_oPath )
-	: HBitSourceInterface(), f_oPath( a_oPath ), f_oFile()
+	: HBitSourceInterface(), f_oPath( a_oPath ), f_oFile(), f_lLastBit( -1 )
 	{
 	}
 
@@ -51,7 +51,7 @@ HBitSourceFile::~HBitSourceFile( void )
 	{
 	}
 
-HBitmap HBitSourceFile::do_get_nth_block( int long const&, int long const& size ) const
+HBitmap HBitSourceFile::do_get_nth_block( int long const& block, int long const& size ) const
 	{
 	M_PROLOG
 	M_ASSERT( size > 0 );
@@ -59,7 +59,13 @@ HBitmap HBitSourceFile::do_get_nth_block( int long const&, int long const& size 
 		M_THROW( "reading fractions of octet not supported", static_cast<int>( size & 7 ) );
 	if ( ! f_oFile )
 		M_ENSURE( f_oFile.open( f_oPath ) == 0 );
-	return ( HBitmap() );
+	int long startBit = block * size;
+	if ( startBit != ( f_lLastBit + 1 ) )
+		f_oFile.seek( startBit >> 3, HFile::SEEK::D_SET );
+	HBitmap bmp( size );
+	bmp.reserve( f_oFile.read( const_cast<void*>( bmp.raw() ), size >> 3 ) << 3 );
+	f_lLastBit = ( startBit + size ) - 1;
+	return ( bmp );
 	M_EPILOG
 	}
 
@@ -79,11 +85,14 @@ HBitmap HBitSourceMemory::do_get_nth_block( int long const& block, int long cons
 	if ( size & 7 )
 		M_THROW( "reading fractions of octet not supported", static_cast<int>( size & 7 ) );
 	int long offset = ( block * size ) >> 3;
-	M_ASSERT( offset < f_lSIze );
-	int long left = ( f_lSIze - offset ) << 3;
-	int long toCopy = size < left ? size : left;
-	HBitmap bmp( toCopy );
-	bmp.copy( static_cast<char const*>( f_pvMemory ) + offset, toCopy );
+	HBitmap bmp;
+	if ( offset < f_lSIze )
+		{
+		int long left = ( f_lSIze - offset ) << 3;
+		int long toCopy = size < left ? size : left;
+		bmp.reserve( toCopy );
+		bmp.copy( static_cast<char const*>( f_pvMemory ) + offset, toCopy );
+		}
 	return ( bmp );
 	M_EPILOG
 	}

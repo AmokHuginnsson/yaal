@@ -52,6 +52,7 @@ class HBitSourceFile : public HBitSourceInterface, private yaal::HNonCopyable
 	typedef HBitSourceFile self_t;
 	yaal::hcore::HString f_oPath;
 	mutable yaal::hcore::HFile f_oFile;
+	mutable int long f_lLastBit;
 public:
 	HBitSourceFile( yaal::hcore::HString const& );
 	virtual ~HBitSourceFile( void );

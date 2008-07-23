@@ -30,6 +30,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hash.h"
 
+using namespace std;
 using namespace yaal::hcore;
 
 namespace yaal
@@ -41,7 +42,8 @@ namespace tools
 namespace hash
 {
 
-void update_md5_state( u32_t[4], HBitmap const& );
+void update_md5_state( u32_t*, HBitmap const& );
+void change_endianess( u32_t*, int long );
 
 yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 	{
@@ -60,27 +62,22 @@ yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 	u32_t state[ D_STATE_SIZE ] = { D_S0, D_S1, D_S2, D_S3 };
 	do
 		{
-		bmp = bitSource.get_nth_block( block, D_BLOCK_SIZE );
+		bmp = bitSource.get_nth_block( block ++, D_BLOCK_SIZE );
 		last = static_cast<int>( bmp.get_size() );
 		total += last;
 		if ( last < D_BLOCK_SIZE )
 			{
-			bmp.push_back( true );
-			HBitmap empty( ( D_BLOCK_SIZE - last ) - 1 );
-			bmp += empty;
+			bmp.reserve( D_BLOCK_SIZE );
+			bmp.fill( last, D_BLOCK_SIZE - last, false );
+			u32_t* x = const_cast<u32_t*>( static_cast<u32_t const*>( bmp.raw() ) );
+			bmp.set( last, true );
 			if ( last >= ( ( D_BLOCK_SIZE - D_MESSAGE_LENGTH_SIZE ) - D_SUPPLEMENT_SIZE ) )
 				{
 				update_md5_state( state, bmp );
 				bmp.fill( false );
 				}
-			u32_t msgSize = htonl( static_cast<u32_t>( total ) );
-			u32_t* x = const_cast<u32_t*>( static_cast<u32_t const*>( bmp.raw() ) );
-			x[ ( D_BLOCK_SIZE >> 2 ) - 1 ] = msgSize;
-//			HBitmap b;
-//			b.use( &msgSize, sizeof ( msgSize ) << 3 );
-//			int i = 0;
-//			for ( HBitmap::iterator it = b.rbegin(); it != b.rend(); -- it )
-//				bmp.set( ( D_BLOCK_SIZE - D_MESSAGE_LENGTH_SIZE ) + i ++, *it );
+			x[ 14 ] = total;
+			M_ASSERT( x[ 15 ] == 0 );
 			update_md5_state( state, bmp );
 			}
 		else
@@ -88,10 +85,13 @@ yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 		}
 	while ( last == D_BLOCK_SIZE );
 	HString result;
-	result.format( "%x%x%x%x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
+	change_endianess( state, 4 );
+	result.format( "%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
 	return ( result );
 	}
 
+void update_md5_state( u32_t* state, HBitmap const& bmp )
+	{
 #define F(x, y, z) (((x)&(y)) | (~(x)&(z)))
 #define G(x, y, z) (((x)&(z)) | ((y)&~(z)))
 #define H(x, y, z) ((x)^(y)^(z))
@@ -132,14 +132,12 @@ yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 #define S42 10
 #define S43 15
 #define S44 21
-
-void update_md5_state( u32_t state[4], HBitmap const& bmp )
-	{
 	u32_t a = state[ 0 ];
 	u32_t b = state[ 1 ];
 	u32_t c = state[ 2 ];
 	u32_t d = state[ 3 ];
 	u32_t* x = const_cast<u32_t*>( static_cast<u32_t const*>( bmp.raw() ) );
+/*	change_endianess( x, 16 ); */
 	/* Cycle 1 */
 	FF(a, b, c, d, x[ 0], S11, 0xd76aa478); /* 1 */
 	FF(d, a, b, c, x[ 1], S12, 0xe8c7b756); /* 2 */
@@ -218,6 +216,26 @@ void update_md5_state( u32_t state[4], HBitmap const& bmp )
 	state[ 3 ] += d;
 
 	return;
+
+#undef F
+#undef G
+#undef H
+#undef I
+#undef FF
+#undef GG
+#undef HH
+#undef II
+#undef ROTATE_LEFT
+	}
+
+void change_endianess( u32_t* mem, int long size )
+	{
+	while ( size -- )
+		mem[ size ] =
+			  ( ( mem[ size ] & 0xff000000 ) >> 24 )
+			| ( ( mem[ size ] & 0x00ff0000 ) >> 8 )
+			| ( ( mem[ size ] & 0x0000ff00 ) << 8 )
+			| ( ( mem[ size ] & 0x000000ff ) << 24 );
 	}
 
 }
