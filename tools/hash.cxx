@@ -42,8 +42,8 @@ namespace tools
 namespace hash
 {
 
-void update_md5_state( u32_t*, HBitmap const& );
 void change_endianess( u32_t*, int long );
+void update_md5_state( u32_t*, HBitmap& );
 
 yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 	{
@@ -85,17 +85,59 @@ yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 		}
 	while ( last == D_BLOCK_SIZE );
 	HString result;
-	change_endianess( state, 4 );
+	change_endianess( state, D_STATE_SIZE );
 	result.format( "%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
 	return ( result );
 	}
 
-yaal::hcore::HString sha1( HBitSourceInterface const& )
+void update_sha1_state( u32_t*, HBitmap const& );
+
+yaal::hcore::HString sha1( HBitSourceInterface const& bitSource )
 	{
-	return ( "" );
+	static int const D_BLOCK_SIZE = 512;
+	static int const D_MESSAGE_LENGTH_SIZE = 64;
+	static int const D_SUPPLEMENT_SIZE = 1;
+	static int const D_STATE_SIZE = 5;
+	static u32_t const D_S0 = 0x67452301;
+	static u32_t const D_S1 = 0xefcdab89;
+	static u32_t const D_S2 = 0x98badcfe;
+	static u32_t const D_S3 = 0x10325476;
+	static u32_t const D_S4 = 0xc3d2e1f0;
+	int long block = 0;
+	HBitmap bmp( D_BLOCK_SIZE );
+	int last = 0;
+	int long total = 0;
+	u32_t state[ D_STATE_SIZE ] = { D_S0, D_S1, D_S2, D_S3, D_S4 };
+	do
+		{
+		bmp = bitSource.get_nth_block( block ++, D_BLOCK_SIZE );
+		last = static_cast<int>( bmp.get_size() );
+		total += last;
+		if ( last < D_BLOCK_SIZE )
+			{
+			bmp.reserve( D_BLOCK_SIZE );
+			bmp.fill( last, D_BLOCK_SIZE - last, false );
+			u32_t* x = const_cast<u32_t*>( static_cast<u32_t const*>( bmp.raw() ) );
+			bmp.set( last, true );
+			if ( last >= ( ( D_BLOCK_SIZE - D_MESSAGE_LENGTH_SIZE ) - D_SUPPLEMENT_SIZE ) )
+				{
+				update_sha1_state( state, bmp );
+				bmp.fill( false );
+				}
+			x[ 15 ] = static_cast<u32_t>( total );
+			change_endianess( x + 15, 1 );
+			update_sha1_state( state, bmp );
+			}
+		else
+			update_sha1_state( state, bmp );
+		}
+	while ( last == D_BLOCK_SIZE );
+	HString result;
+	result.format( "%08x%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ] );
+	return ( result );
 	}
 
-void update_md5_state( u32_t* state, HBitmap const& bmp )
+void update_md5_state( u32_t* state, HBitmap& bmp )
 	{
 #define F(x, y, z) (((x)&(y)) | (~(x)&(z)))
 #define G(x, y, z) (((x)&(z)) | ((y)&~(z)))
@@ -142,7 +184,6 @@ void update_md5_state( u32_t* state, HBitmap const& bmp )
 	u32_t c = state[ 2 ];
 	u32_t d = state[ 3 ];
 	u32_t* x = const_cast<u32_t*>( static_cast<u32_t const*>( bmp.raw() ) );
-/*	change_endianess( x, 16 ); */
 	/* Cycle 1 */
 	FF(a, b, c, d, x[ 0], S11, 0xd76aa478); /* 1 */
 	FF(d, a, b, c, x[ 1], S12, 0xe8c7b756); /* 2 */
@@ -230,6 +271,63 @@ void update_md5_state( u32_t* state, HBitmap const& bmp )
 #undef GG
 #undef HH
 #undef II
+#undef ROTATE_LEFT
+	}
+
+void update_sha1_state( u32_t* state, HBitmap const& bmp )
+	{
+#define ROTATE_LEFT( x, s ) ( ( ( x ) << ( s ) ) | ( ( x ) >> ( 32 - ( s ) ) ) )
+	static int const D_WORK_BUFFER_SIZE = 80;
+	static int const D_INPUT_CHUNK_SIZE = 16;
+	u32_t a = state[ 0 ];
+	u32_t b = state[ 1 ];
+	u32_t c = state[ 2 ];
+	u32_t d = state[ 3 ];
+	u32_t e = state[ 4 ];
+	u32_t x[ D_WORK_BUFFER_SIZE ];
+	::memcpy( x, bmp.raw(), D_INPUT_CHUNK_SIZE * sizeof ( u32_t ) );
+	u32_t tmp = 0;
+	change_endianess( x, D_INPUT_CHUNK_SIZE );
+	for ( int i = D_INPUT_CHUNK_SIZE; i < D_WORK_BUFFER_SIZE; ++ i )
+		tmp = x[ i - 3 ] ^ x[ i - 8 ] ^ x[ i - 14 ] ^ x[ i - 16 ], x[ i ] = ROTATE_LEFT( tmp, 1 );
+  for ( int i = 0; i < D_WORK_BUFFER_SIZE; ++ i )
+		{
+		u32_t f;
+		u32_t k;
+		if ( ( 0 <= i ) && ( i <= 19 ) )
+			{
+			f = ( b & c ) | ( ( ~ b ) & d );
+			k = 0x5a827999;
+			}
+		else if ( ( 20 <= i ) && ( i <= 39 ) )
+			{
+			f = b ^ c ^ d;
+			k = 0x6ed9eba1;
+			}
+		else if ( ( 40 <= i ) && ( i <= 59 ) )
+			{
+			f = ( b & c ) | ( b & d ) | ( c & d );
+			k = 0x8f1bbcdc;
+			}
+		else
+			{
+			f = b ^ c ^ d;
+			k = 0xca62c1d6;
+			}
+		
+		tmp = ROTATE_LEFT( a, 5 ) + f + e + k + x[ i ];
+		e = d;
+		d = c;
+		c = ROTATE_LEFT( b, 30 );
+		b = a;
+		a = tmp;
+		}
+	state[ 0 ] += a;
+	state[ 1 ] += b;
+	state[ 2 ] += c;
+	state[ 3 ] += d;
+	state[ 4 ] += e;
+	return;
 #undef ROTATE_LEFT
 	}
 
