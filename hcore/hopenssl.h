@@ -41,6 +41,7 @@ namespace hcore
 
 class HOpenSSL
 	{
+	typedef HOpenSSL self_t;
 public:
 	static yaal::hcore::HString f_oSSLKey;
 	static yaal::hcore::HString f_oSSLCert;
@@ -103,7 +104,7 @@ private:
 	};
 
 typedef HExceptionT<HOpenSSL> HOpenSSLException;
-typedef HExceptionT<HOpenSSLException> HOpenSSLFatalException;
+typedef HExceptionT<HOpenSSL, HOpenSSLException> HOpenSSLFatalException;
 
 }
 

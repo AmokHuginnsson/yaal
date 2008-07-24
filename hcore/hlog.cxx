@@ -52,7 +52,7 @@ namespace hcore
 namespace
 	{
 	static int const D_BUFFER_SIZE		= 1024;
-	static int const D_HOSTNAME_SIZE	= 16;
+	static int const D_HOSTNAME_SIZE	= 128;
 	static int const D_TIMESTAMP_SIZE	= 16;
 	static int const D_LOGIN_NAME_MAX	= 8;
 	}
