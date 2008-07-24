@@ -163,22 +163,22 @@ void update_md5_state( u32_t* state, HBitmap& bmp )
 
 #define ROTATE_LEFT(x, s) ((x << s) | (x >> (32 - s)))
 
-#define S11 7
-#define S12 12
-#define S13 17
-#define S14 22
-#define S21 5
-#define S22 9
-#define S23 14
-#define S24 20
-#define S31 4
-#define S32 11
-#define S33 16
-#define S34 23
-#define S41 6
-#define S42 10
-#define S43 15
-#define S44 21
+	static int const S11 = 7;
+	static int const S12 = 12;
+	static int const S13 = 17;
+	static int const S14 = 22;
+	static int const S21 = 5;
+	static int const S22 = 9;
+	static int const S23 = 14;
+	static int const S24 = 20;
+	static int const S31 = 4;
+	static int const S32 = 11;
+	static int const S33 = 16;
+	static int const S34 = 23;
+	static int const S41 = 6;
+	static int const S42 = 10;
+	static int const S43 = 15;
+	static int const S44 = 21;
 	u32_t a = state[ 0 ];
 	u32_t b = state[ 1 ];
 	u32_t c = state[ 2 ];
