@@ -76,7 +76,7 @@ yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 				update_md5_state( state, bmp );
 				bmp.fill( false );
 				}
-			x[ 14 ] = total;
+			x[ 14 ] = static_cast<u32_t>( total );
 			M_ASSERT( x[ 15 ] == 0 );
 			update_md5_state( state, bmp );
 			}
@@ -88,6 +88,11 @@ yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 	change_endianess( state, 4 );
 	result.format( "%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
 	return ( result );
+	}
+
+yaal::hcore::HString sha1( HBitSourceInterface const& )
+	{
+	return ( "" );
 	}
 
 void update_md5_state( u32_t* state, HBitmap const& bmp )
