@@ -47,10 +47,10 @@ public:
 			} unit_t;
 		};
 private:
-	int long f_lMoment[2];
+	mutable int long f_lMoment[2];
 public:
 	HClock( void );
-	int long get_time_elapsed( UNIT::unit_t const& = UNIT::D_SECOND ) const;
+	int long get_time_elapsed( UNIT::unit_t const& = UNIT::D_SECOND, bool const& = false ) const;
 	};
 
 }
