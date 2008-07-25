@@ -43,6 +43,7 @@ HStreamInterface& flush( HStreamInterface& );
 
 class HStreamInterface
 	{
+	typedef HStreamInterface self_t;
 public:
 	struct STATUS
 		{
