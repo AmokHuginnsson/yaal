@@ -44,6 +44,7 @@ private:
 	int	long f_lSize;
 public:
 	typedef char const* iterator;
+	typedef char const* const_iterator;
 	HString( void );
 	HString( HString const& );
 	HString( int const, bool const ); /* initialize immediately with size */
@@ -65,12 +66,13 @@ public:
 	char operator[] ( int long const ) const;
 	bool operator ! ( void ) const;
 	char set_at( int long, char );
-	/* add_* functions in HList needs operator
-		 bool() operator char * works fine here */
 	char const* raw( void ) const;
-//	operator char const* ( void ) const;
+/*
 	iterator begin( void ) const;
 	iterator end( void ) const;
+*/
+	const_iterator begin( void ) const;
+	const_iterator end( void ) const;
 	bool is_empty( void ) const;
 	bool empty( void ) const;
 	void clear( void );

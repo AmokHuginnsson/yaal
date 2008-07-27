@@ -91,30 +91,29 @@ HString::HString( HString const& a_roString )
 	M_EPILOG
 	}
 
-HString::HString( int const a_iSize, bool const )
-	: f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( a_iSize )
+HString::HString( int const a_lPreallocate, bool const )
+	: f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( 0 )
 	{
 	M_PROLOG
-	hs_realloc( a_iSize + 1 );
-	::memset( f_pcBuffer, 0, a_iSize + 1 );
+	hs_realloc( a_lPreallocate );
+	::memset( f_pcBuffer, 0, a_lPreallocate );
 	return;
 	M_EPILOG
 	}
 
-void HString::hs_realloc( int long const a_iSize )
+void HString::hs_realloc( int long const a_lPreallocate )
 	{
 	M_PROLOG
-	int long l_lOldLength = 0;
-	if ( a_iSize < 1 )
-		M_THROW( _( "bad new buffer size requested" ), a_iSize );
-	if ( a_iSize > f_lAllocatedBytes )
+	if ( a_lPreallocate < 1 )
+		M_THROW( _( "bad new buffer size requested" ), a_lPreallocate );
+	if ( a_lPreallocate > f_lAllocatedBytes )
 		{
-		l_lOldLength = f_lAllocatedBytes;
+		int long l_lOldAllocation = f_lAllocatedBytes;
 		f_lAllocatedBytes = 1;
-		while ( f_lAllocatedBytes < a_iSize )
+		while ( f_lAllocatedBytes < a_lPreallocate )
 			f_lAllocatedBytes <<= 1;
 		f_pcBuffer = xrealloc<char>( f_pcBuffer, f_lAllocatedBytes );
-		::memset( f_pcBuffer + l_lOldLength, 0, f_lAllocatedBytes - l_lOldLength );
+		::memset( f_pcBuffer + l_lOldAllocation, 0, f_lAllocatedBytes - l_lOldAllocation );
 		}
 	return;
 	M_EPILOG
@@ -345,12 +344,12 @@ char const* HString::raw( void ) const
 	return ( f_pcBuffer ? f_pcBuffer : "" );
 	}
 
-HString::iterator HString::begin( void ) const
+HString::const_iterator HString::begin( void ) const
 	{
 	return ( f_pcBuffer );
 	}
 
-HString::iterator HString::end( void ) const
+HString::const_iterator HString::end( void ) const
 	{
 	return ( f_pcBuffer + get_length() );
 	}
