@@ -798,9 +798,9 @@ HString HString::split( char const* const a_pcAt, int const a_iPart ) const
 	if ( f_lAllocatedBytes )
 		{
 		int long l_iBegining = 0;
-		for ( int l_iCtr = 0;	f_pcBuffer[ l_iBegining ] && ( l_iCtr < a_iPart ); ++ l_iCtr )
+		for ( int long l_iCtr = 0; ( l_iBegining < f_lSize ) && ( l_iCtr < a_iPart ); ++ l_iCtr )
 			l_iBegining += strcspn( f_pcBuffer + l_iBegining, a_pcAt ) + 1;
-		if ( f_pcBuffer[ l_iBegining ] )
+		if ( l_iBegining < f_lSize )
 			{
 			int long l_iSize = ::strcspn( f_pcBuffer + l_iBegining, a_pcAt );
 			return ( mid( l_iBegining, l_iSize ) );
