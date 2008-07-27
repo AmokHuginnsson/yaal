@@ -621,8 +621,8 @@ HString& HString::replace( HString const& a_oPattern,
 			{
 			if ( newIdx && ( ( l_iIndex - oldIdx ) != l_iLenPattern ) )
 				{
-				newIdx += ( ( l_iIndex - oldIdx ) - l_iLenPattern );
 				::memmove( f_pcBuffer + newIdx, src->f_pcBuffer + oldIdx + l_iLenPattern, ( l_iIndex - oldIdx ) - l_iLenPattern );
+				newIdx += ( ( l_iIndex - oldIdx ) - l_iLenPattern );
 				}
 			else if ( ! newIdx )
 				newIdx = l_iIndex;
@@ -871,8 +871,9 @@ HString& HString::insert( int long a_iFrom, int long a_iLength, char const* a_pc
 		}
 	if ( ( a_iLength > 0 ) && ( a_iFrom <= f_lSize ) )
 		{
-		if ( a_pcChunk && ( static_cast<size_t>( a_iLength ) > ::strlen( a_pcChunk ) ) )
-			M_THROW( "length too big for this chunk", a_iLength );
+		int long chunkLen = static_cast<int long>( ::strlen( a_pcChunk ) );
+		if ( a_pcChunk && ( a_iLength > chunkLen ) )
+			M_THROW( "length too big for this chunk (by)", a_iLength - chunkLen );
 		int long oldSize = f_lSize;
 		f_lSize += a_iLength;
 		hs_realloc( f_lSize + 1 );
