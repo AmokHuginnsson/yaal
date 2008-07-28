@@ -632,6 +632,16 @@ HXml::HConstNodeProxy const HXml::get_root( void ) const
 	M_EPILOG
 	}
 
+HXml::HNodeProxy::HNodeProxy( void )
+	: f_poNode( NULL )
+	{
+	}
+
+HXml::HConstNodeProxy::HConstNodeProxy( void )
+	: f_poNode( NULL )
+	{
+	}
+
 HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t a_poNode )
 	: f_poNode( a_poNode )
 	{

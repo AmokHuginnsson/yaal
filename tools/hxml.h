@@ -157,6 +157,7 @@ public:
 	yaal::hcore::HString const& get_name( void ) const;
 	yaal::hcore::HString const& get_value( void ) const;
 	HXml::HNode::properties_t const& properties( void ) const;
+	HConstNodeProxy( void );
 	HConstNodeProxy( HConstNodeProxy const& );
 	HConstNodeProxy( HNodeProxy const& );
 	HConstNodeProxy& operator = ( HConstNodeProxy const& );
@@ -201,6 +202,7 @@ public:
 	HXml::HIterator move_node( HXml::HNodeProxy );
 	HXml::HIterator copy_node( HXml::HIterator, HXml::HNodeProxy );
 	HXml::HIterator copy_node( HXml::HNodeProxy );
+	HNodeProxy( void );
 	HNodeProxy( HNodeProxy const& );
 	HNodeProxy& operator = ( HNodeProxy const& );
 	bool operator ! ( void ) const;
