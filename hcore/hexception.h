@@ -115,6 +115,14 @@ public:
 		{	}
 	};
 
+class HFailedAssertion
+	{
+	char const* f_pcWhat;
+public:
+	HFailedAssertion( char const* const a_pcWhat ) : f_pcWhat( a_pcWhat ) {}
+	char const* what( void ) { return ( f_pcWhat ); }
+	};
+
 /*
  * A,     AE,      AE = ET<A, E>
  * B : A, BE : AE, BE = ET<B, AE>
