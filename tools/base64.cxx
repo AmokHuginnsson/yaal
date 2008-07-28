@@ -50,7 +50,7 @@ public:
 		}
 	} base64DecodeTableInit;
 
-void do_buf_3_to_4( HString& out, u32_t const& in, int pad = 0 )
+void do_buf_3_to_4( HString& out, u32_t const& in, int long pad = 0 )
 	{
 	char buf[ 5 ] = { 0, 0, 0, 0, 0 };
 	buf[ 0 ] = n_pcBase64EncodeTable[ ( in >> 18 ) & 63 ];
