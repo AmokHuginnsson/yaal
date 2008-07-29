@@ -144,6 +144,8 @@ public:
 	bool operator != ( HIterator const& ) const;
 	template<typename tType>
 	tType& operator* ( void );
+	template<typename tType>
+	tType const& operator* ( void ) const;
 private:
 	friend class HSBBSTree;
 	explicit HIterator( HAbstractNode* const );
@@ -151,6 +153,15 @@ private:
 
 template<typename tType>
 tType& HSBBSTree::HIterator::operator* ( void )
+	{
+	M_PROLOG
+	M_ASSERT( f_poCurrent );
+	return ( static_cast<HNode<tType>*>( f_poCurrent )->f_tKey );
+	M_EPILOG
+	}
+
+template<typename tType>
+tType const& HSBBSTree::HIterator::operator* ( void ) const
 	{
 	M_PROLOG
 	M_ASSERT( f_poCurrent );
