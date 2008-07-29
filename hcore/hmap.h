@@ -63,8 +63,8 @@ inline static bool less( HPair<key_t, value_t> const& left, key_t const& right )
 template<typename key_t, typename value_t, typename helper_t = map_helper<key_t const, value_t> >
 class HMap
 	{
-	typedef HPair<key_t const, value_t> map_elem_t;
 public:
+	typedef HPair<key_t const, value_t> map_elem_t;
 	template<typename const_qual_t>
 	class HIterator;
 	typedef HIterator<map_elem_t> iterator;
