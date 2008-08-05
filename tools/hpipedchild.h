@@ -49,6 +49,21 @@ public:
 			D_ERR
 			} stream_t;
 		};
+	struct STATUS
+		{
+		struct TYPE
+			{
+			typedef enum
+				{
+				D_NORMAL,
+				D_ABORT,
+				D_NOT_SPAWNED
+				} type_t;
+			};
+		TYPE::type_t type;
+		int value;
+		STATUS( void ) : type( TYPE::D_NOT_SPAWNED ), value( 0 ) {}
+		};
 private:
 	int f_iPid;
 	int f_iPipeIn;
@@ -60,7 +75,7 @@ public:
 	~HPipedChild( void );
 	void spawn( yaal::hcore::HString const&, char* const[] = NULL );
 	bool read_poll( void* );
-	void finish( void );
+	STATUS finish( void );
 	bool is_running( void );
 	void set_csoi( STREAM::stream_t const& );
 private:

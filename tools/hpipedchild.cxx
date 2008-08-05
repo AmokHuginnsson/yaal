@@ -59,7 +59,7 @@ HPipedChild::~HPipedChild( void )
 	M_EPILOG
 	}
 
-void HPipedChild::finish( void )
+HPipedChild::STATUS HPipedChild::finish( void )
 	{
 	M_PROLOG
 	if ( f_iPipeErr >= 0 )
@@ -71,12 +71,25 @@ void HPipedChild::finish( void )
 	if ( f_iPipeIn >= 0 )
 		TEMP_FAILURE_RETRY( ::close( f_iPipeIn ) );
 	f_iPipeIn = -1;
+	STATUS s;
 	if ( f_iPid > 0 )
 		{
 		::kill( f_iPid, SIGKILL );
-		::waitpid( f_iPid, NULL, 0 );
+		int status = 0;
+		::waitpid( f_iPid, &status, 0 );
+		if ( WIFEXITED( status ) )
+			{
+			s.type = STATUS::TYPE::D_NORMAL;
+			s.value = WEXITSTATUS( status );
+			}
+		else if ( WIFSIGNALED( status ) )
+			{
+			s.type = STATUS::TYPE::D_ABORT;
+			s.value = WTERMSIG( status );
+			}
 		}
 	f_iPid = 0;
+	return ( s );
 	M_EPILOG
 	}
 
