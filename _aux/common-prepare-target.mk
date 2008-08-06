@@ -16,8 +16,6 @@ VPATH := $$(DIR_ROOT)
 HDRS_$(1) = $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) -H ./$$(SRC_$(1)) -name '*.$(HS)')))
 SRCS_$(1) = $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) -H ./$$(SRC_$(1)) -name '*.$(SS)')))
 OBJS_$(1) = $$(subst ./$$(SRC_$(1))/,./$$($(1))/,$$(patsubst %.$(SS),%.$(OS),$$(SRCS_$(1))))
-USE_PCH_$(1) = -include ./$$(SRC_$(1))/header
-PCH_$(1) = $$($$(COMPILER_PCH_FLAGS)_PCH_$(1))
 OBJS := $$(OBJS) $$(OBJS_$(1))
 
 endif
@@ -32,18 +30,13 @@ $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 	$$(CXX) $$(CXXFLAGS) $(COMPILER_FLAGS_$(1)) -D__ID__="\"$$(<) $$(shell $$(GITID) ../$$(subst $$(DIR_ROOT)/,,$$(<)))\"" $$(PCH_$(1)) $$(<) -c -o $$(@) 2>&1 | tee -a make.log && test $$$${PIPESTATUS} -eq 0 && \
 	echo $$(NONL) "done.$$(CL)"
 
-$$(REAL_TARGET): $$($(1))/header.gch $$(OBJS_$(1))
+$$(REAL_TARGET): $$(OBJS_$(1))
 	@echo -n "Linking \`$$(@)' ... "
 	@$(LXX) $(LINKER_FLAGS) $(LINKER_FLAGS_$(1)) -o $$(@) $$(OBJS_$(1)) $$(LIBS) $(LIBS_$(1)) 2>&1 | tee -a make.log && test $$$${PIPESTATUS} -eq 0
 ifdef NODEBUG
 	@strip $$(REAL_TARGET)
 endif
 	@echo $$(NONL) "done.$$(CL)"
-
-$$($(1))/header.gch: $$(DIR_ROOT)/$$(SRC_$(1))/header $$(HDRS_$(1))
-	@echo -n "Generating precompiled header \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... "; \
-	$$(CXX) -xc++-header $$(subst -include $$(SRC_$(1))/header,,$$(CXXFLAGS)) $$(<) -o $$(@) && \
-	echo $$(NONL) "done.$$(CL)"
 
 endef
 
