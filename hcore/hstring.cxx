@@ -871,7 +871,7 @@ HString& HString::insert( int long a_iFrom, int long a_iLength, char const* a_pc
 		}
 	if ( ( a_iLength > 0 ) && ( a_iFrom <= f_lSize ) )
 		{
-		int long chunkLen = static_cast<int long>( ::strlen( a_pcChunk ) );
+		int long chunkLen = a_pcChunk ? static_cast<int long>( ::strlen( a_pcChunk ) ) : 0;
 		if ( a_pcChunk && ( a_iLength > chunkLen ) )
 			M_THROW( "length too big for this chunk (by)", a_iLength - chunkLen );
 		int long oldSize = f_lSize;
