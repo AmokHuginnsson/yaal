@@ -1,4 +1,4 @@
-.PHONY: all
+.PHONY: all nodebug prof cov install dep clean tags stats mrproper purge environment doc
 
 .DEFAULT:
 	@$(MAKE) -f Makefile $(<)
