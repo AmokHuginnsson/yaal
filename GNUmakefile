@@ -5,7 +5,7 @@
 .DEFAULT:
 	@$(MAKE) -f Makefile $(@)
 
-all nodebug prof cov install dep clean tags stats mrproper purge environment doc:
+all nodebug prof cov install dep clean tags stats mrproper purge environment doc: Makefile
 	@$(MAKE) -f Makefile $(@)
 
 Makefile: configure
