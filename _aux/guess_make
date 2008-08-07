@@ -1,0 +1,31 @@
+#! /bin/bash
+
+OS=$(uname -o)
+
+if [ "x${OS}" = "x" ] ; then
+	echo "Cannot guess your make type."
+	exit 1
+fi
+
+MAKE="make"
+
+case "x${OS}" in
+	xGNU/Linux)
+	;;
+	xFreeBSD)
+		MAKE="gmake"
+	;;
+	*)
+		echo "Your make type is a wild guess."
+	;;
+esac
+
+if [ ! -f .my_make ] ; then
+	echo "MAKE=${MAKE}" > .my_make
+else
+	echo "your make type already set:"
+	cat .my_make
+	exit 1
+fi
+
+exit 0

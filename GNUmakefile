@@ -1,13 +1,19 @@
+-include .my_make
+
 .PHONY: all nodebug prof cov install dep clean tags stats mrproper purge environment doc
 
 .DEFAULT:
-	@$(MAKE) -f Makefile $(<)
+	@$(MAKE) -f Makefile $(@)
 
-all: Makefile
-	@$(MAKE) -f Makefile all
+all nodebug prof cov install dep clean tags stats mrproper purge environment doc:
+	@$(MAKE) -f Makefile $(@)
 
 Makefile: configure
 	@./configure
 
 configure: configure.ac
 	@autoconf
+
+.my_make:
+	@./_aux/guess_make
+
