@@ -184,7 +184,7 @@ mrproper: clean
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile config.h yaalrc config.log doc/dox
+	/bin/rm -rf configure Makefile config.h config.h.in yaalrc config.log doc/dox
 
 include $(DIR_ROOT)/_aux/common-target-tags.mk
 

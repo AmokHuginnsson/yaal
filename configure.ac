@@ -82,7 +82,7 @@ if test ["$DYNAMIC_LINKER"] = [""] ; then
 	AC_MSG_ERROR([not found])
 else
 	AC_MSG_RESULT([$DYNAMIC_LINKER])
-	AC_DEFINE_UNQUOTED([__DYNAMIC_LINKER__],["$DYNAMIC_LINKER"])
+	AC_DEFINE_UNQUOTED([__DYNAMIC_LINKER__],["$DYNAMIC_LINKER"],[Path to your dynamic linker.])
 fi
 
 dnl Testing presence of c compiler
@@ -111,16 +111,16 @@ dnl We need to know what operating system yaal will be compiled on.
 AC_MSG_RESULT([--- Guessing host operating system ... ---              [[58%]]])
 AC_CHECK_FILE(
 	[[/etc/rc]],
-	[AC_DEFINE([[__HOST_OS_TYPE_FREEBSD__]]) _HOST________=['FreeBSD. ---  ']],
+	[AC_DEFINE([__HOST_OS_TYPE_FREEBSD__],[],[Your operating system is FreeBSD.]) _HOST________=['FreeBSD. ---  ']],
 	[AC_CHECK_FILE(
 		[[/etc/debconf.conf]],
-		[AC_DEFINE([[__HOST_OS_TYPE_DEBIAN__]]) _HOST________=['Debian. ---   ']],
+		[AC_DEFINE([__HOST_OS_TYPE_DEBIAN__],[],[Your operating system is Debian.]) _HOST________=['Debian. ---   ']],
 		[AC_CHECK_FILE(
 			[[/etc/poldek/poldek.conf]],
-			[AC_DEFINE([[__HOST_OS_TYPE_PLD__]]) _HOST________=['PLD. ---      ']],
+			[AC_DEFINE([__HOST_OS_TYPE_PLD__],[],[Your operating system is PLD.]) _HOST________=['PLD. ---      ']],
 			[AC_CHECK_FILE(
 				[[/etc/random-seed]],
-				[AC_DEFINE([[__HOST_OS_TYPE_SLACKWARE__]]) _HOST________=['Slackware. ---']],
+				[AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__],[],[Your operating system is Slackware.]) _HOST________=['Slackware. ---']],
 				[AC_MSG_ERROR([Cannot recognize host operating system type!])]
 			)]
 		)]
@@ -165,7 +165,7 @@ AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
 
 AC_MSG_RESULT([--- Additional checks ... ---                           [[67%]]])
 AC_SUBST([SERIAL_DEVICE],['null'])
-AC_CHECK_FILE([[/dev/cuaa0]],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
+AC_CHECK_FILE([/dev/cuaa0],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
 	[AC_CHECK_FILE([/dev/ttyS0],[AC_SUBST([SERIAL_DEVICE],['ttyS0'])])])
 
 dnl Test if dynamic loader is in libc or in separate library dl.
@@ -209,7 +209,7 @@ int main ( int, char const * const * const )
 	localtime_r ( & t, & broken );
 	size = strftime ( NULL, 1024, "%F %T", & broken );
 	return ( ! size );
-	}], [AC_DEFINE([HAVE_SMART_STRFTIME])] [RESULT=["yes"]])
+	}], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether contents of input buffer for iconv() is const])
@@ -224,7 +224,7 @@ int main ( int, char const * const * const )
 	char * out = NULL;
 	iconv ( conv, & in, & size, & out, & size );
 	return ( 0 );
-	}], [AC_DEFINE([HAVE_ICONV_INPUT_CONST])] RESULT=["yes"])
+	}], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 DEFAULT_DRIVER=["null"]
@@ -300,10 +300,10 @@ fi
 AC_MSG_RESULT([--- All needed libraries found. ---                     [[76%]]])
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
-AC_CHECK_HEADERS([[openssl/ssl.h]],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
+AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
 _CONSOLE_MOUSE=[""];
-AC_CHECK_HEADERS([[sys/consio.h]],_CONSOLE_MOUSE=["moused"])
-AC_CHECK_HEADERS([[gpm.h]],_CONSOLE_MOUSE=["gpm"])
+AC_CHECK_HEADERS([sys/consio.h],_CONSOLE_MOUSE=["moused"])
+AC_CHECK_HEADERS([gpm.h],_CONSOLE_MOUSE=["gpm"])
 if test ["$_CONSOLE_MOUSE"] = [""] -a ["$CONSOLE_MOUSE"] = ["yes"] ; then
 	AC_MSG_ERROR([Cannot continue without console mouse support.])
 fi
@@ -323,13 +323,13 @@ AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
 	])
 CXXFLAGS=$CXXFLAGS_ORIG
 CPPFLAGS=$CPPFLAGS_ORIG
-AC_CHECK_HEADERS([[ncurses/curses.h]],_NCURSES_HEADER=['ncurses/curses.h'],
-	[AC_CHECK_HEADERS([[curses.h]],_NCURSES_HEADER=['curses.h'],
+AC_CHECK_HEADERS([ncurses/curses.h],_NCURSES_HEADER=['ncurses/curses.h'],
+	[AC_CHECK_HEADERS([curses.h],_NCURSES_HEADER=['curses.h'],
 			[AC_MSG_ERROR([Cannot continue without ncurses devel!])])])
 if test ["$ORACLE"] != ["no"] ; then
 	CXXFLAGS=["$CXXFLAGS -I$ORACLE_HOME/rdbms/public"]
 	CPPFLAGS=["$CXXFLAGS"]
-	AC_CHECK_HEADERS([[oci.h]],
+	AC_CHECK_HEADERS([oci.h],
 		[AC_SUBST([DO_ORACLE_DRIVER],["oracle"])
 		 AC_SUBST([ORACLE_SID],["$ORACLE_SID"])
 			EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I\$(ORACLE_HOME)/rdbms/public"]
@@ -341,10 +341,10 @@ if test ["$ORACLE"] != ["no"] ; then
 	CPPFLAGS=$CPPFLAGS_ORIG
 fi
 if test ["$POSTGRES"] != ["no"] ; then
-	AC_CHECK_HEADERS([[postgresql/libpq-fe.h]],
+	AC_CHECK_HEADERS([postgresql/libpq-fe.h],
 		[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
 			DEFAULT_DRIVER=["PostgreSQL"]],
-		[AC_CHECK_HEADERS([[libpq-fe.h]],
+		[AC_CHECK_HEADERS([libpq-fe.h],
 			[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
 			DEFAULT_DRIVER=["PostgreSQL"]],
 				[if test ["$POSTGRES"] = ["yes"] ; then
@@ -352,7 +352,7 @@ if test ["$POSTGRES"] != ["no"] ; then
 				fi;POSTGRES=["no"]])])
 fi
 if test ["$MYSQL"] != ["no"] ; then
-	AC_CHECK_HEADERS([[mysql/mysql.h]],
+	AC_CHECK_HEADERS([mysql/mysql.h],
 		[AC_SUBST([DO_MYSQL_DRIVER],["mysql"])
 			DEFAULT_DRIVER=["MySQL"]],
 				[if test ["$MYSQL"] = ["yes"] ; then
@@ -360,7 +360,7 @@ if test ["$MYSQL"] != ["no"] ; then
 				fi;MYSQL=["no"]])
 fi
 if test ["$SQLITE"] != ["no"] ; then
-	AC_CHECK_HEADERS([[sqlite.h]],
+	AC_CHECK_HEADERS([sqlite.h],
 		[AC_SUBST([DO_SQLITE_DRIVER],["sqlite"])
 			DEFAULT_DRIVER=["SQLite"]],
 				[if test ["$SQLITE"] = ["yes"] ; then
@@ -368,7 +368,7 @@ if test ["$SQLITE"] != ["no"] ; then
 				fi;SQLITE=["no"]])
 fi
 if test ["$SQLITE3"] != ["no"] ; then
-	AC_CHECK_HEADERS([[sqlite3.h]],
+	AC_CHECK_HEADERS([sqlite3.h],
 		[AC_SUBST([DO_SQLITE3_DRIVER],["sqlite3"])
 			DEFAULT_DRIVER=["SQLite3"]],
 				[if test ["$SQLITE3"] = ["yes"] ; then
@@ -382,7 +382,7 @@ AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 
 AC_CHECK_FUNCS([getline gethostbyname_r gethostbyaddr_r],[],[])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
-AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASE_NAME_IN_LIBGEN])],[#include <string.h>])
+AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASE_NAME_IN_LIBGEN],[],[Does your basename() is included in libgen library?])],[#include <string.h>])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
@@ -398,7 +398,8 @@ AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
 		AC_MSG_ERROR([Cannot continue with seriously brain-damaged ncurses.])])
 AC_MSG_CHECKING([if your ncurses is damaged about char-subscripts in ncurses (acs_map)])
 AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
-[addch(ACS_DARROW);],[AC_DEFINE([HAVE_ASCII_GRAPHICS]) AC_MSG_RESULT([[no :)]])],
+	[addch(ACS_DARROW);],
+	[AC_DEFINE([HAVE_ASCII_GRAPHICS],[],[Does your ncurses installation support ASCII graphic chars?]) AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_WARN([You will not have pretty ascii graphics.])])
 
@@ -421,6 +422,15 @@ AC_SUBST([EXTRA_LIB_PATHS], ["$EXTRA_LIB_PATHS"])
 AC_SUBST([EXTRA_INCLUDE_PATHS], ["$EXTRA_INCLUDE_PATHS"])
 AC_SUBST([DEFAULT_DRIVER], ["$DEFAULT_DRIVER"])
 AC_SUBST([MYSQL_SOCKET],["$MYSQL_SOCKET"])
+AH_TOP([/* $Id$ */
+
+#ifndef __YAAL_CONFIG_H
+#define __YAAL_CONFIG_H
+
+/* Define core behavior here. */])
+AH_BOTTOM([
+#endif /* not __YAAL_CONFIG_H */
+])
 
 dnl We have to set up proper compiler/linker flags.
 AC_OUTPUT([Makefile yaalrc])

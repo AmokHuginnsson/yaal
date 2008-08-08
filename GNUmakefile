@@ -12,7 +12,7 @@ Makefile: configure
 	@./configure
 
 configure: configure.ac
-	@autoconf
+	@autoreconf
 
 .my_make:
 	@./_aux/guess_make

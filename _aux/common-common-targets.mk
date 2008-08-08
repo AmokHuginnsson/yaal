@@ -49,7 +49,7 @@ mrproper: clean
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile config.h config.log
+	/bin/rm -rf configure Makefile config.h config.h.in config.log
 
 bin:
 	@( NODEBUG="true" $(MAKE) ; make clean )
