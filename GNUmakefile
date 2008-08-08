@@ -8,7 +8,7 @@
 all nodebug prof cov install dep clean tags stats mrproper purge environment doc: Makefile
 	@$(MAKE) -f Makefile $(@)
 
-Makefile: configure
+Makefile: configure Makefile.in
 	@./configure
 
 configure: configure.ac
