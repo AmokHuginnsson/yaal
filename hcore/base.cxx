@@ -70,9 +70,21 @@ double long lexical_cast( HString const& val )
 	}
 
 template<>
+double long lexical_cast( char const* const& val )
+	{
+	return ( lexical_cast<double long, HString>( val ) );
+	}
+
+template<>
 double lexical_cast( HString const& val )
 	{
 	return ( static_cast<double>( lexical_cast<double long>( val ) ) );
+	}
+
+template<>
+double lexical_cast( char const* const& val )
+	{
+	return ( lexical_cast<double, HString>( val ) );
 	}
 
 template<>
