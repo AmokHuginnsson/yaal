@@ -1,5 +1,5 @@
 #phony targets
-.PHONY: all dep static prof clean clean-dep tags mrproper purge bin install environment
+.PHONY: all bin clean clean-dep cov dep doc environment install mrproper nodebug prof purge static stats tags 
 
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment

@@ -1,11 +1,11 @@
 -include .my_make
 
-.PHONY: all nodebug prof cov install dep clean clean-dep tags stats mrproper purge environment doc
+.PHONY: all bin clean clean-dep cov dep doc environment install mrproper nodebug prof purge static stats tags 
 
 .DEFAULT:
 	@$(MAKE) -f Makefile $(@)
 
-all nodebug prof cov install dep clean clean-dep tags stats mrproper purge environment doc: Makefile
+all bin clean clean-dep cov dep doc environment install mrproper nodebug prof purge static stats tags: Makefile
 	@$(MAKE) -f Makefile $(@)
 
 Makefile: configure Makefile.in
