@@ -1,9 +1,9 @@
-include $(DIR_ROOT)/_aux/mk/flags-post.mk
-include $(DIR_ROOT)/_aux/mk/int-libs.mk
-include $(DIR_ROOT)/_aux/mk/func.mk
-include $(DIR_ROOT)/_aux/mk/prepare-target.mk
-include $(DIR_ROOT)/_aux/mk/mk/targets.mk
-include $(DIR_ROOT)/_aux/mk/filenames.mk
-include $(DIR_ROOT)/_aux/mk/target-default.mk
-include $(DIR_ROOT)/_aux/mk/target-tags.mk
+include $(DIR_ROOT)/_aux/mk/7_flags-post.mk
+include $(DIR_ROOT)/_aux/mk/8_int-libs.mk
+include $(DIR_ROOT)/_aux/mk/9_func.mk
+include $(DIR_ROOT)/_aux/mk/a_prepare-target.mk
+include $(DIR_ROOT)/_aux/mk/b_common-targets.mk
+include $(DIR_ROOT)/_aux/mk/c_filenames.mk
+include $(DIR_ROOT)/_aux/mk/e_target-default.mk
+include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
 

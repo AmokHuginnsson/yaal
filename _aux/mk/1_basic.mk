@@ -1,0 +1,5 @@
+SHELL					= /bin/bash
+RELEASE				= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
+DIR_BUILD			= $(DIR_ROOT)/build
+FIND	= find
+ARFLAGS = r

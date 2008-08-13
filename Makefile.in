@@ -38,11 +38,11 @@ HAPI_HEADER		= $(DIR_HEADERS)/yaal.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
 CTAGS	= @CTAGS@
 GITID = @GITID@
-include $(DIR_ROOT)/_aux/mk/basic.mk
-include $(DIR_ROOT)/_aux/mk/term.mk
-include $(DIR_ROOT)/_aux/mk/suffix.mk
-include $(DIR_ROOT)/_aux/mk/wrapper.mk
-include $(DIR_ROOT)/_aux/mk/flags.mk
+include $(DIR_ROOT)/_aux/mk/1_basic.mk
+include $(DIR_ROOT)/_aux/mk/2_term.mk
+include $(DIR_ROOT)/_aux/mk/3_suffix.mk
+include $(DIR_ROOT)/_aux/mk/4_wrapper.mk
+include $(DIR_ROOT)/_aux/mk/5_flags.mk
 CWARNING_FLAGS								+= @PEDANTIC_ERRORS@ @EXTRA_WARNINGS@ @WARN_SHADOW@
 COMPILER_PRIME_FLAGS					+= -D__YAAL_BUILD__ -fPIC @DEFS@
 COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I/usr/local/include \
@@ -57,8 +57,8 @@ LINKER_PRIME_FLAGS +=	-shared\
 								@SPECIAL_LINKER_FLAGS@\
 								-Wl,-soname,
 
-include $(DIR_ROOT)/_aux/mk/flags-post.mk
-include $(DIR_ROOT)/_aux/mk/func.mk
+include $(DIR_ROOT)/_aux/mk/7_flags-post.mk
+include $(DIR_ROOT)/_aux/mk/9_func.mk
 
 $(foreach IT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(IT))))
 SRCS := $(filter-out %_driver.$(SS),$(SRCS))
@@ -106,10 +106,10 @@ lib%.so.$(RELEASE):
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so; \
 	else exit 1; fi; echo $(NONL) "done.$(CL)"
 
-include $(DIR_ROOT)/_aux/mk/implicit-compile.mk
+include $(DIR_ROOT)/_aux/mk/d_implicit-compile.mk
 #------------------------------------------------------------------------
 
-include $(DIR_ROOT)/_aux/mk/target-default.mk
+include $(DIR_ROOT)/_aux/mk/e_target-default.mk
 
 #phony targets
 .PHONY: all nodebug prof cov install dep clean tags stats mrproper purge environment doc
@@ -186,7 +186,7 @@ purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
 	/bin/rm -rf configure Makefile config.h config.h.in yaalrc config.log doc/dox
 
-include $(DIR_ROOT)/_aux/mk/target-tags.mk
+include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
 
 doc: $(SRCS) $(HDRS)
 	@doxygen _aux/doxygenrc
