@@ -17,3 +17,6 @@ configure: configure.ac
 .my_make:
 	@./_aux/guess_make
 
+-include local.mk
+
+local.mk:
