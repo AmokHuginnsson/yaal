@@ -70,6 +70,8 @@ private:
 	int f_iPipeOut;
 	int f_iPipeErr;
 	STREAM::stream_t f_eCSOI; /* Current Stream Of Interest */
+	yaal::hcore::HStreamInterface::cache_t f_oSecondLineCache;
+	int f_iSecondLineOffset;
 public:
 	HPipedChild( void );
 	~HPipedChild( void );
