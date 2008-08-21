@@ -63,8 +63,14 @@ HBitmap HBitSourceFile::do_get_nth_block( int long const& block, int long const&
 	if ( startBit != ( f_lLastBit + 1 ) )
 		f_oFile.seek( startBit >> 3, HFile::SEEK::D_SET );
 	HBitmap bmp( size );
-	bmp.reserve( f_oFile.read( const_cast<void*>( bmp.raw() ), size >> 3 ) << 3 );
-	f_lLastBit = ( startBit + size ) - 1;
+	int long readOctets = f_oFile.read( const_cast<void*>( bmp.raw() ), size >> 3 );
+	if ( readOctets > 0 )
+		{
+		bmp.reserve( readOctets << 3 );
+		f_lLastBit = ( startBit + size ) - 1;
+		}
+	else
+		bmp = HBitmap();
 	return ( bmp );
 	M_EPILOG
 	}
@@ -89,6 +95,7 @@ HBitmap HBitSourceMemory::do_get_nth_block( int long const& block, int long cons
 	if ( offset < f_lSIze )
 		{
 		int long left = ( f_lSIze - offset ) << 3;
+		M_ASSERT( left > 0 );
 		int long toCopy = size < left ? size : left;
 		bmp.reserve( toCopy );
 		bmp.copy( static_cast<char const*>( f_pvMemory ) + offset, toCopy );
