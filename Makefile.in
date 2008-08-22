@@ -112,7 +112,7 @@ include $(DIR_ROOT)/_aux/mk/d_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/e_target-default.mk
 
 #phony targets
-.PHONY: all nodebug prof cov install dep clean tags stats mrproper purge environment doc
+.PHONY: all release prof cov install dep clean tags stats mrproper purge environment doc
 
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment
@@ -128,8 +128,8 @@ $(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 
 environment: $(DIRS) $(LD_CACHE)
 
-nodebug:
-	NODEBUG="yes" $(MAKE) -e all
+release:
+	DO_RELEASE=1 $(MAKE) -e all
 
 prof:
 	DO_PROFILING=1 $(MAKE) -e all

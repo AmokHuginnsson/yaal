@@ -261,8 +261,8 @@ void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_
 		{
 		l_psAddressNetwork = static_cast < sockaddr_in * > ( f_pvAddress );
 		l_psAddressNetwork->sin_family = AF_INET;
-		l_psAddressNetwork->sin_port = htons (
-				static_cast < int short unsigned > ( a_iPort ) );
+		l_psAddressNetwork->sin_port = htons(
+				static_cast<int short unsigned>( a_iPort ) );
 #ifdef HAVE_GETHOSTBYNAME_R
 		f_iAddressSize = D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
 		f_oCache.pool_realloc( f_iAddressSize );
@@ -305,7 +305,7 @@ int HSocket::get_port( void ) const
 	if ( ! ( f_eType & TYPE::D_NETWORK ) )
 		M_THROW( _( "unix socket has not a port attribute" ), f_eType );
 	l_psAddressNetwork = static_cast<sockaddr_in*>( f_pvAddress );
-	return ( ::ntohs( l_psAddressNetwork->sin_port ) );
+	return ( ntohs( l_psAddressNetwork->sin_port ) );
 	M_EPILOG
 	}
 

@@ -1,5 +1,5 @@
 #phony targets
-.PHONY: all bin clean clean-dep cov dep doc environment install mrproper nodebug prof purge static stats tags 
+.PHONY: all bin clean clean-dep cov dep doc environment install mrproper release prof purge static stats tags 
 
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment
@@ -52,7 +52,7 @@ purge: mrproper
 	/bin/rm -rf configure Makefile config.h config.h.in config.log
 
 bin:
-	@( NODEBUG="true" $(MAKE) ; make clean )
+	@( DO_RELEASE=1 $(MAKE) ; make clean )
 
 install: $(TARGET)
 	@echo "i: you need to become root to do this"

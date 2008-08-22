@@ -33,7 +33,7 @@ $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 $$(REAL_TARGET): $$(OBJS_$(1))
 	@echo -n "Linking \`$$(@)' ... "
 	@$(LXX) $(LINKER_FLAGS) $(LINKER_FLAGS_$(1)) -o $$(@) $$(OBJS_$(1)) $$(LIBS) $(LIBS_$(1)) 2>&1 | tee -a make.log && test $$$${PIPESTATUS} -eq 0
-ifdef NODEBUG
+ifdef DO_RELEASE
 	@strip $$(REAL_TARGET)
 endif
 	@echo $$(NONL) "done.$$(CL)"

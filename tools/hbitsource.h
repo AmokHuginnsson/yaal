@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/base.h"
 #include "hcore/hstring.h"
 #include "hcore/hfile.h"
+#include "hcore/hchunk.h"
 #include "tools/hbitmap.h"
 
 namespace yaal
@@ -42,9 +43,9 @@ class HBitSourceInterface
 	{
 public:
 	virtual ~HBitSourceInterface( void ){}
-	HBitmap get_nth_block( int long const&, int long const& ) const;
+	HBitmap const& get_nth_block( int long const&, int long const& ) const;
 private:
-	virtual HBitmap do_get_nth_block( int long const&, int long const& ) const = 0;
+	virtual HBitmap const& do_get_nth_block( int long const&, int long const& ) const = 0;
 	};
 
 class HBitSourceFile : public HBitSourceInterface, private yaal::HNonCopyable
@@ -52,12 +53,15 @@ class HBitSourceFile : public HBitSourceInterface, private yaal::HNonCopyable
 	typedef HBitSourceFile self_t;
 	yaal::hcore::HString f_oPath;
 	mutable yaal::hcore::HFile f_oFile;
-	mutable int long f_lLastBit;
+	mutable yaal::hcore::HChunk f_oBuffer;
+	mutable int long f_lBufferOffset;
+	mutable int long f_lBufferSize;
+	mutable HBitmap f_oBitmap;
 public:
 	HBitSourceFile( yaal::hcore::HString const& );
 	virtual ~HBitSourceFile( void );
 private:
-	virtual HBitmap do_get_nth_block( int long const&, int long const& ) const;
+	virtual HBitmap const& do_get_nth_block( int long const&, int long const& ) const;
 	};
 
 class HBitSourceMemory : public HBitSourceInterface, private yaal::HNonCopyable
@@ -65,11 +69,12 @@ class HBitSourceMemory : public HBitSourceInterface, private yaal::HNonCopyable
 	typedef HBitSourceMemory self_t;
 	void const* f_pvMemory;
 	int long f_lSIze;
+	mutable HBitmap f_oBitmap;
 public:
 	HBitSourceMemory( void const*, int long );
 	virtual ~HBitSourceMemory( void );
 private:
-	virtual HBitmap do_get_nth_block( int long const&, int long const& ) const;
+	virtual HBitmap const& do_get_nth_block( int long const&, int long const& ) const;
 	HBitSourceMemory( HBitSourceMemory const& );
 	HBitSourceMemory& operator = ( HBitSourceMemory const& );
 	};
