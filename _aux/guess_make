@@ -1,6 +1,6 @@
-#! /bin/bash
+#! /bin/sh
 
-OS=$(uname -o)
+OS=$(uname)
 
 if [ "x${OS}" = "x" ] ; then
 	echo "Cannot guess your make type."
