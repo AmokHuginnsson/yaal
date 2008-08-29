@@ -10,7 +10,7 @@ fi
 MAKE="make"
 
 case "x${OS}" in
-	xGNU/Linux)
+	xLinux)
 	;;
 	xFreeBSD)
 		MAKE="gmake"
