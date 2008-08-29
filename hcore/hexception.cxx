@@ -32,8 +32,8 @@ Copyright:
 
 #ifdef _STDIO_H
 #include <execinfo.h>
-#include <cxxabi.h>
 #endif /* _STDIO_H */
+#include <cxxabi.h>
 
 #include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
