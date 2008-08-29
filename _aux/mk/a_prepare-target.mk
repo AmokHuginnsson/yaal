@@ -24,7 +24,6 @@ endif
 
 $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 	@echo -n "Compiling \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... "; \
-	echo -n "$$(@:.$$(OS)=.$$(DS)) " > $$(@:.$$(OS)=.$$(DS)); \
 	/bin/rm -f "$$(@)"; \
 	$$(DXX) $$(CXXFLAGS) $(COMPILER_FLAGS_$(1)) -MM $$(<) -MT $$(@) -MT $$(@:.$$(OS)=.$$(DS)) -MF $$(@:.$$(OS)=.$$(DS)) && \
 	$$(CXX) $$(CXXFLAGS) $(COMPILER_FLAGS_$(1)) -D__ID__="\"$$(<) $$(shell $$(GITID) ../$$(subst $$(DIR_ROOT)/,,$$(<)))\"" $$(<) -c -o $$(@) 2>&1 | tee -a make.log && \
@@ -32,14 +31,14 @@ $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 	echo $$(NONL) "done.$$(CL)"
 
 $$(REAL_TARGET): $$(OBJS_$(1))
-	@echo -n "Linking \`$$(@)' ... "
+	@echo -n "Linking \`$$(@)' ... "; \
 	/bin/rm -f "$$(@)"; \
-	@$(LXX) $(LINKER_FLAGS) $(LINKER_FLAGS_$(1)) -o $$(@) $$(OBJS_$(1)) $$(LIBS) $(LIBS_$(1)) 2>&1 | tee -a make.log
+	$(LXX) $(LINKER_FLAGS) $(LINKER_FLAGS_$(1)) -o $$(@) $$(OBJS_$(1)) $$(LIBS) $(LIBS_$(1)) 2>&1 | tee -a make.log
 ifdef DO_RELEASE
 	@strip $$(REAL_TARGET)
 endif
-	test -f $$(@) && \
-	@echo $$(NONL) "done.$$(CL)"
+	@test -f $$(@) && \
+	echo $$(NONL) "done.$$(CL)"
 
 endef
 

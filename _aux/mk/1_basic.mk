@@ -1,4 +1,4 @@
-SHELL					= /bin/bash
+SHELL					= /bin/sh
 RELEASE				= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 DIR_BUILD			= $(DIR_ROOT)/build
 FIND	= find
