@@ -52,6 +52,19 @@ namespace tools
 namespace
 {
 
+static void dummy_signal_handler( int ) __attribute__(( __noreturn__ ));
+static void dummy_signal_handler( int )
+	{
+	log << "fatal error: dummy_signal_handler invoked, aborting ..." << endl;
+	abort();
+	}
+
+void ready( )
+	{
+
+	return;
+	}
+
 class HBaseSignalHandlers : public HSignalHandlerInterface
 	{
 public:
@@ -184,6 +197,19 @@ void HSignalService::lock_on( int a_iSigNo )
 	M_PROLOG
 	M_ENSURE( sigaddset( f_oLocker.get<sigset_t>(), a_iSigNo ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_BLOCK, f_oLocker.get<sigset_t>(), NULL ) == 0 );
+
+	/*
+	 * FreeBSD does not wake sigwait on signal with installed
+	 * default hadlers with INGORE action.
+	 * FreeBSD does not wake sigwait even if one specify INGNORED
+	 * signal as blocked.
+	 */
+	struct sigaction act;
+	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
+	M_ENSURE( sigaddset( &act.sa_mask, a_iSigNo ) == 0 );
+	act.sa_handler = dummy_signal_handler;
+	act.sa_flags = SA_RESTART;
+	M_ENSURE( sigaction( a_iSigNo, &act, NULL ) == 0 );
 	return;
 	M_EPILOG
 	}
