@@ -26,8 +26,15 @@ Copyright:
 
 /* compatibility header for various platforms */
 
+#ifndef __YAAL_HCORE_COMPAT_H
+#define __YAAL_HCORE_COMPAT_H
+
+#ifdef __YAAL_BUILD__
 #include "config.h"
+#endif /* __YAAL_BUILD__ */
 
 #ifndef HAVE_DECL_TEMP_FAILURE_RETRY
 #define TEMP_FAILURE_RETRY(x) (x)
 #endif /* not HAVE_DECL_TEMP_FAILURE_RETRY */
+
+#endif /* not __YAAL_HCORE_COMPAT_H */
