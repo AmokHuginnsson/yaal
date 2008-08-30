@@ -170,20 +170,20 @@ void HSerial::compile_speed ( void )
 		{
 		case ( D_SPEED_B230400 ): l_iBaudRate = B230400; break;
 		case ( D_SPEED_B115200 ): l_iBaudRate = B115200; break;
-#if ( HAVE_DECL_B76800 )
+#if defined( HAVE_DECL_B76800 ) && ( HAVE_DECL_B76800 == 1 )
 		case ( D_SPEED_B76800 ): l_iBaudRate = B76800; break;
 #endif /* HAVE_DECL_B76800 */
 		case ( D_SPEED_B57600 ): l_iBaudRate = B57600; break;
 		case ( D_SPEED_B38400 ): l_iBaudRate = B38400; break;
-#if ( HAVE_DECL_B28800 )
+#if defined( HAVE_DECL_B28800 ) && ( HAVE_DECL_B28800 == 1 )
 		case ( D_SPEED_B28800 ): l_iBaudRate = B28800; break;
 #endif /* HAVE_DECL_B28800 */
 		case ( D_SPEED_B19200 ): l_iBaudRate = B19200; break;
-#if ( HAVE_DECL_B14400 )
+#if defined( HAVE_DECL_B14400 ) && ( HAVE_DECL_B14400 == 1 )
 		case ( D_SPEED_B14400 ): l_iBaudRate = B14400; break;
 #endif /* HAVE_DECL_B14400 */
 		case ( D_SPEED_B9600 ): l_iBaudRate = B9600; break;
-#if ( HAVE_DECL_B7200 )
+#if defined( HAVE_DECL_B7200 ) && ( HAVE_DECL_B7200 == 1 )
 		case ( D_SPEED_B7200 ): l_iBaudRate = B7200; break;
 #endif /* HAVE_DECL_B7200 */
 		case ( D_SPEED_B4800 ): l_iBaudRate = B4800; break;

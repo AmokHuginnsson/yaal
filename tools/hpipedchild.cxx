@@ -28,6 +28,7 @@ Copyright:
 #include <cstdlib>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <signal.h> /* for FreeBSD */
 
 #include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
@@ -110,9 +111,9 @@ void HPipedChild::spawn( HString const& a_oImage, char* const a_ppvArgs[] )
 				|| TEMP_FAILURE_RETRY( ::close( l_piFileDesOut[ 0 ] ) )
 				|| TEMP_FAILURE_RETRY( ::close( l_piFileDesErr[ 0 ] ) ) )
 			M_THROW( "close", errno );
-		if ( ( ::dup2( l_piFileDesIn[ 0 ], ::fileno( stdin ) ) < 0 )
-				|| ( ::dup2( l_piFileDesOut[ 1 ], ::fileno( stdout ) ) < 0 )
-				|| ( ::dup2( l_piFileDesErr[ 1 ], ::fileno( stderr ) ) < 0 ) )
+		if ( ( ::dup2( l_piFileDesIn[ 0 ], fileno( stdin ) ) < 0 )
+				|| ( ::dup2( l_piFileDesOut[ 1 ], fileno( stdout ) ) < 0 )
+				|| ( ::dup2( l_piFileDesErr[ 1 ], fileno( stderr ) ) < 0 ) )
 			M_THROW( "dup2", errno );
 		::execv( a_oImage.raw(), a_ppvArgs );
 		M_THROW( "execlp", errno );
