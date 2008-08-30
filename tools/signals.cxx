@@ -24,11 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <cstring>  /* strsignal */
-#include <cstdio>	  /* perror function */
-#include <csignal>  /* signal handling */
-#include <unistd.h> /* kill function */
-#include <cstdlib>  /* exit */
+#include <cstring>   /* strsignal */
+#include <cstdio>	   /* perror function */
+#include <csignal>   /* signal handling */
+#include <unistd.h>  /* kill function */
+#include <cstdlib>   /* exit */
+#include <pthread.h> /* pthread_sigmask (in FreeBSD) */
 
 #include "config.h"
 
