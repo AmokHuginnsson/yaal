@@ -32,6 +32,7 @@ Copyright:
 #define __YAAL_HCORE_BASE_H
 
 #include "hcore/hexception.h"
+#include "hcore/compat.h"
 
 /*! \brief All library API belongs here.
  *

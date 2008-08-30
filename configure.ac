@@ -369,6 +369,7 @@ AC_CHECK_FUNCS([getline gethostbyname_r gethostbyaddr_r],[],[])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASE_NAME_IN_LIBGEN],[],[Does your basename() is included in libgen library?])],[#include <string.h>])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
+AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 
