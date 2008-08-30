@@ -28,6 +28,7 @@ Copyright:
 #include <cstring>
 #include <cctype>
 #include <cstdarg>
+#include <sys/time.h> /* timeval (for FreeBSD) */
 
 #include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
