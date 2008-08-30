@@ -33,7 +33,7 @@ Copyright:
 #include "config.h"
 #endif /* __YAAL_BUILD__ */
 
-#ifndef HAVE_DECL_TEMP_FAILURE_RETRY
+#if not defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 )
 #define TEMP_FAILURE_RETRY(x) (x)
 #endif /* not HAVE_DECL_TEMP_FAILURE_RETRY */
 
