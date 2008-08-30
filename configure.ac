@@ -365,7 +365,7 @@ AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 
 AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 
-AC_CHECK_FUNCS([getline gethostbyname_r gethostbyaddr_r],[],[])
+AC_CHECK_FUNCS([getline gethostbyname_r gethostbyaddr_r memrchr],[],[])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASE_NAME_IN_LIBGEN],[],[Does your basename() is included in libgen library?])],[#include <string.h>])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])

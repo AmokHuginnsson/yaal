@@ -37,4 +37,8 @@ Copyright:
 #define TEMP_FAILURE_RETRY(x) (x)
 #endif /* not HAVE_DECL_TEMP_FAILURE_RETRY */
 
+#if not defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
+#define memrchr( s, c, n ) strrchr( ( s ), ( c ) )
+#endif /* not HAVE_MEMRCHR */
+
 #endif /* not __YAAL_HCORE_COMPAT_H */
