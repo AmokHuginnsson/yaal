@@ -52,12 +52,12 @@ namespace tools
 namespace
 {
 
-static void dummy_signal_handler( int ) __attribute__(( __noreturn__ ));
+/*
+ * dummy_signal_handler is called even if signal is masked in sigwait,
+ * so it is best to have this handler as simple and non-intrusive as possible.
+ */
 static void dummy_signal_handler( int )
-	{
-	log << "fatal error: dummy_signal_handler invoked, aborting ..." << endl;
-	abort();
-	}
+	{ }
 
 void ready( )
 	{
