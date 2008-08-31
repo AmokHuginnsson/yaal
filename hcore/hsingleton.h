@@ -60,11 +60,19 @@ private:
 	typedef yaal::hcore::HList<destructor_ptr_t> destructor_list_t;
 	typedef yaal::hcore::HPointer<destructor_list_t> destructor_list_ptr_t;
 	typedef yaal::hcore::HMultiMap<int, destructor_ptr_t> map_stack_t;
-	static yaal::hcore::HMutex f_oMutex;
-	static map_stack_t f_oDestructors;
+	yaal::hcore::HMutex f_oMutex;
+	map_stack_t f_oDestructors;
+	HLifeTimeTracker( void );
+	void do_destruct( void );
 public:
-	static void register_destructor( destructor_ptr_t, int const& );
+	~HLifeTimeTracker( void );
+	static HLifeTimeTracker& get_instance( void );
+	void register_destructor( destructor_ptr_t, int const& );
+#if not defined( __HOST_OS_TYPE_FREEBSD__ ) || ( __HOST_OS_TYPE_FREEBSD__ == 0 )
 	static void destruct( void );
+#else /* not __HOST_OS_TYPE_FREEBSD__ */
+	static void destruct( void* );
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
 	};
 
 template<typename tType>
@@ -118,8 +126,9 @@ tType* HSingleton<tType>::create_instance( int const& a_iLifeTime )
 	{
 	M_PROLOG
 	M_ASSERT( ! f_ptInstance );
+	HLifeTimeTracker& lt = HLifeTimeTracker::get_instance();
 	HLifeTimeTracker::destructor_ptr_t p( new HDestructor<tType>( f_ptInstance ) );
-	HLifeTimeTracker::register_destructor( p, tType::life_time( a_iLifeTime ) );
+	lt.register_destructor( p, tType::life_time( a_iLifeTime ) );
 	return ( new tType() );
 	M_EPILOG
 	}

@@ -36,24 +36,28 @@ namespace yaal
 namespace hcore
 {
 
-HMutex HLifeTimeTracker::f_oMutex;
-HLifeTimeTracker::map_stack_t HLifeTimeTracker::f_oDestructors;
+HLifeTimeTracker::HLifeTimeTracker( void )
+	: f_oMutex(), f_oDestructors()
+	{
+	}
+
+HLifeTimeTracker::~HLifeTimeTracker( void )
+	{
+	M_ASSERT( f_oDestructors.size() == 0 );
+	}
+
+HLifeTimeTracker& HLifeTimeTracker::get_instance( void )
+	{
+	static HLifeTimeTracker lifeTimeTracker;
+	return ( lifeTimeTracker );
+	}
 
 int HSingletonInterface::life_time( int a_iLifeTime )
 	{
 	return ( a_iLifeTime );
 	}
 
-void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int const& a_iLifeTime )
-	{
-	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	f_oDestructors.push_back( a_iLifeTime, a_oDestructor );
-	M_ENSURE( atexit( HLifeTimeTracker::destruct ) == 0 );
-	M_EPILOG
-	}
-
-void HLifeTimeTracker::destruct( void )
+void HLifeTimeTracker::do_destruct( void )
 	{
 	M_PROLOG
 	HLock l_oLock( f_oMutex );
@@ -64,6 +68,46 @@ void HLifeTimeTracker::destruct( void )
 	f_oDestructors.erase( it );
 	destructor->destruct();
 	return;
+	M_EPILOG
+	}
+
+#if not defined( __HOST_OS_TYPE_FREEBSD__ ) || ( __HOST_OS_TYPE_FREEBSD__ == 0 )
+void HLifeTimeTracker::destruct( void )
+	{
+	M_PROLOG
+	HLifeTimeTracker& lt = get_instance();
+	lt.do_destruct();
+	M_EPILOG
+	}
+#else /* not __HOST_OS_TYPE_FREEBSD__ */
+void HLifeTimeTracker::destruct( void* )
+	{
+	M_PROLOG
+	HLifeTimeTracker& lt = get_instance();
+	lt.do_destruct();
+	M_EPILOG
+	}
+
+typedef void ( *cxa_handle_t )( void* );
+extern "C" int __cxa_atexit( cxa_handle_t, void*, void* );
+extern "C" void* __dso_handle;		
+
+inline void safe_atexit( cxa_handle_t cxa_handle )
+	{
+	return ( __cxa_atexit( cxa_handle, 0, __dso_handle ) );
+	}
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
+
+void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int const& a_iLifeTime )
+	{
+	M_PROLOG
+	HLock l_oLock( f_oMutex );
+	f_oDestructors.push_back( a_iLifeTime, a_oDestructor );
+#if not defined( __HOST_OS_TYPE_FREEBSD__ ) || ( __HOST_OS_TYPE_FREEBSD__ == 0 )
+	M_ENSURE( atexit( HLifeTimeTracker::destruct ) == 0 );
+#else /* not __HOST_OS_TYPE_FREEBSD__ */
+	M_ENSURE( safe_atexit( HLifeTimeTracker::destruct ) == 0 );
+#endif /* __HOST_OS_TYPE_FREEBSD__ */
 	M_EPILOG
 	}
 
