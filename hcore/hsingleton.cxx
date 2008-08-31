@@ -71,7 +71,7 @@ void HLifeTimeTracker::do_destruct( void )
 	M_EPILOG
 	}
 
-#if not defined( __HOST_OS_TYPE_FREEBSD__ ) || ( __HOST_OS_TYPE_FREEBSD__ == 0 )
+#if not defined( __HOST_OS_TYPE_FREEBSD__ )
 void HLifeTimeTracker::destruct( void )
 	{
 	M_PROLOG
@@ -92,7 +92,7 @@ typedef void ( *cxa_handle_t )( void* );
 extern "C" int __cxa_atexit( cxa_handle_t, void*, void* );
 extern "C" void* __dso_handle;		
 
-inline void safe_atexit( cxa_handle_t cxa_handle )
+inline int safe_atexit( cxa_handle_t cxa_handle )
 	{
 	return ( __cxa_atexit( cxa_handle, 0, __dso_handle ) );
 	}
@@ -103,7 +103,7 @@ void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int 
 	M_PROLOG
 	HLock l_oLock( f_oMutex );
 	f_oDestructors.push_back( a_iLifeTime, a_oDestructor );
-#if not defined( __HOST_OS_TYPE_FREEBSD__ ) || ( __HOST_OS_TYPE_FREEBSD__ == 0 )
+#if not defined( __HOST_OS_TYPE_FREEBSD__ )
 	M_ENSURE( atexit( HLifeTimeTracker::destruct ) == 0 );
 #else /* not __HOST_OS_TYPE_FREEBSD__ */
 	M_ENSURE( safe_atexit( HLifeTimeTracker::destruct ) == 0 );
