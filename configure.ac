@@ -62,9 +62,10 @@ dnl Cheching for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
 AC_CANONICAL_HOST()
 AC_MSG_CHECKING([host dynamic linker])
-DYNAMIC_LINKER=`readelf -l /usr/bin/readelf | awk 'BEGIN{FS=":"};/program interp/{gsub("[[]] ]","",$2);print $2}'`
+READELF=`whereis -b readelf | awk '{print $2}'`
+DYNAMIC_LINKER=`test "x${READELF}" != "x" && ${READELF} -l /usr/bin/readelf | awk 'BEGIN{FS=":"};/program interp/{gsub("[[]] ]","",$2);print $2}'`
 if test ["$DYNAMIC_LINKER"] = [""] ; then
-	AC_MSG_ERROR([not found])
+	AC_MSG_WARN([not found])
 else
 	AC_MSG_RESULT([$DYNAMIC_LINKER])
 	AC_DEFINE_UNQUOTED([__DYNAMIC_LINKER__],["$DYNAMIC_LINKER"],[Path to your dynamic linker.])

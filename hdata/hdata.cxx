@@ -46,6 +46,7 @@ namespace yaal
 namespace hdata
 {
 
+#if defined( __DYNAMIC_LINKER__ )
 static char const g_pcDynamicLinkerPath[]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
@@ -69,6 +70,7 @@ int yaal_hdata_main( int, char** )
 		}
 	::exit( 0 );
 	}
+#endif /* __DYNAMIC_LINKER__ */
 
 }
 

@@ -150,6 +150,7 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	return;
 	}
 
+#if defined( __DYNAMIC_LINKER__ )
 void yaal_hcore_banner( void )
 	{
 	fprintf( stdout,
@@ -170,6 +171,7 @@ int yaal_hcore_main( int, char** )
 		yaal_hcore_banner();
 	::exit( 0 );
 	}
+#endif /* __DYNAMIC_LINKER__ */
 
 }
 

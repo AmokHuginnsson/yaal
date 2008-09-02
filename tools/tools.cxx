@@ -190,6 +190,7 @@ HToolsInitDeinit::~HToolsInitDeinit( void )
 	return;
 	}
 
+#if defined( __DYNAMIC_LINKER__ )
 static char const g_pcDynamicLinkerPath [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
@@ -210,11 +211,9 @@ int yaal_tools_main( int, char** )
 		}
 	::exit( 0 );
 	}
+#endif /* __DYNAMIC_LINKER__ */
 
 }
 
 }
-
-/* older versions of g++ fail to handle __attribute__((constructor))
-   if no static object exists */
 

@@ -132,6 +132,7 @@ HDBWrapperInitDeinit::HDBWrapperInitDeinit( void )
 
 extern char const * g_pcDone;
 
+#if defined( __DYNAMIC_LINKER__ )
 static char const g_pcDynamicLinkerPath[]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
@@ -153,6 +154,7 @@ int yaal_dbwrapper_main( int, char** )
 		}
 	::exit( 0 );
 	}
+#endif /* __DYNAMIC_LINKER__ */
 
 }
 
