@@ -66,6 +66,8 @@ private:
 	bool set_switch( char const, int short unsigned* const, int const );
 	};
 
+typedef HExceptionT<HPattern> HPatternException;
+
 }
 
 }

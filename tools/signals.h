@@ -42,11 +42,14 @@ namespace tools
 
 class HSignalHandlerInterface
 	{
+	typedef HSignalHandlerInterface self_t;
 public:
 	typedef yaal::hcore::HPointer<HSignalHandlerInterface> ptr_t;
 	virtual ~HSignalHandlerInterface() { }
 	typedef int ( HSignalHandlerInterface::* HANDLER_t )( int );
 	};
+
+typedef yaal::hcore::HExceptionT<HSignalHandlerInterface> HSignalHandlerInterfaceException;
 
 class HSignalService
 	{
@@ -109,6 +112,7 @@ private:
 	};
 
 typedef yaal::hcore::HSingleton<HSignalService> HSignalServiceFactory;
+typedef yaal::hcore::HExceptionT<HSignalService> HSignalServiceException;
 
 }
 

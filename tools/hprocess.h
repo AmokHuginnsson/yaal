@@ -87,6 +87,8 @@ private:
 	HProcess& operator = ( HProcess const& );
 	};
 
+typedef yaal::hcore::HExceptionT<HProcess, HSignalHandlerInterfaceException> Exception;
+
 }
 
 }

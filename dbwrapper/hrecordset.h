@@ -43,6 +43,7 @@ typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
 
 class HRecordSet
 	{
+	typedef HRecordSet self_t;
 public:
 	typedef yaal::hcore::HPointer<HRecordSet> ptr_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
@@ -147,6 +148,7 @@ public:
 	};
 
 typedef yaal::hcore::HExceptionT<HRecordSet> HRecordSetException;
+typedef yaal::hcore::HExceptionT<HSQLDescriptor> HSQLDescriptorException;
 
 }
 

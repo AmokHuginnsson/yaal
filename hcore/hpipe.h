@@ -54,6 +54,8 @@ protected:
 	virtual void do_flush( void ) const;
 	};
 
+typedef HExceptionT<HPipe,HStreamInterfaceException> HPipeException;
+
 }
 
 }

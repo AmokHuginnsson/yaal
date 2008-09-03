@@ -96,6 +96,8 @@ private:
 	void const* block( void ) const;
 	};
 
+typedef yaal::hcore::HExceptionT<HBitmap> HBitmapException;
+
 namespace bitmap_type_helper
 {
 

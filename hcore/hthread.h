@@ -73,6 +73,8 @@ private:
 	/*}*/
 	};
 
+typedef HExceptionT<HMutex> HMutexException;
+
 class HSemaphore
 	{
 	typedef HSemaphore self_t;
@@ -86,6 +88,8 @@ private:
 	HSemaphore( HSemaphore const& );
 	HSemaphore& operator = ( HSemaphore const& );
 	};
+
+typedef HExceptionT<HSemaphore> HSemaphoreException;
 
 class HThread
 	{
@@ -117,6 +121,8 @@ private:
 	HThread( HThread const& );
 	HThread& operator = ( HThread const& );
 	};
+
+typedef HExceptionT<HThread> HThreadException;
 
 template<typename tType>
 class HThreadT : public HThread
@@ -161,6 +167,8 @@ private:
 	HCondition( HCondition const& );
 	HCondition& operator = ( HCondition const& );
 	};
+
+typedef HExceptionT<HCondition> HConditionException;
 
 }
 

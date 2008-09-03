@@ -82,6 +82,8 @@ public:
 	operator time_t ( void ) const;
 	};
 
+typedef HExceptionT<HTime> HTimeException;
+
 }
 
 }

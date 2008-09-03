@@ -61,6 +61,8 @@ private:
 	friend class HIterator;
 	};
 
+typedef yaal::hcore::HExceptionT<HFSItem> HFSItemException;
+
 class HFSItem::HIterator
 	{
 	yaal::hcore::HString f_oPath;

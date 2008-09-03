@@ -115,6 +115,8 @@ public:
 		{	}
 	};
 
+typedef HExceptionT<HString> HStringException;
+
 class HFailedAssertion
 	{
 	char const* f_pcWhat;

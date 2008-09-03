@@ -97,6 +97,8 @@ private:
 	void shorten_the_branch( tree_t::node_t );
 	};
 
+typedef yaal::hcore::HExceptionT<HAnalyser> HAnalyserException;
+
 }
 
 }
