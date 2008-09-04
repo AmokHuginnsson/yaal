@@ -67,6 +67,9 @@ void ready( )
 
 class HBaseSignalHandlers : public HSignalHandlerInterface
 	{
+	typedef HBaseSignalHandlers self_t;
+protected:
+	typedef HSignalHandlerInterface hier_t;
 public:
 	void unlock( int );
 	void lock( int );
