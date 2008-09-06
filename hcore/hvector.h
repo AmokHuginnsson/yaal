@@ -159,12 +159,11 @@ int long HVector<tType>::dim( void ) const
 	}
 
 template<typename tType>
-HVector<tType>& 
-HVector<tType>::operator = ( HVector const& a_roVector )
+HVector<tType>& HVector<tType>::operator = ( HVector const& a_roVector )
 	{
 	M_PROLOG
 	int long size = a_roVector.f_oData.size();
-	if ( size )
+	if ( f_oData.size() && size )
 		check_dimensions( size );
 	f_oData = a_roVector.f_oData;
 	return ( *this );
