@@ -30,13 +30,12 @@ Copyright:
 void* memrchr( void const* ptr, int what, int from )
 	{
 	char const* str = static_cast<char const*>( ptr );
-	while ( from >= 0 )
+	while ( -- from >= 0 )
 		{
 		if ( str[ from ] == what )
 			break;
-		-- from;
 		}
-	return ( const_cast<char*>( str + from ) );
+	return ( from >= 0 ? const_cast<char*>( str + from ) : 0 );
 	}
 #endif /* not HAVE_MEMRCHR */
 
