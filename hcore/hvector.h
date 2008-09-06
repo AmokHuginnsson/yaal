@@ -45,11 +45,11 @@ namespace hcore
 extern char const* g_ppcErrMsgHVector[];
 
 template<typename tType>
-class HVector : public HArray<tType>
+class HVector
 	{
-protected:
+	typedef HArray<tType> data_t;
 	typedef HVector<tType> self_t;
-	typedef HArray<tType> hier_t;
+	data_t f_oData;
 public:
 	struct ERROR
 		{
@@ -59,177 +59,172 @@ public:
 			E_DIMNOTMATCH
 			} error_t;
 		};
-	HVector ( int = 0 );
-	HVector ( HVector const & );
-	virtual ~HVector ( void );
-	int dim ( void );
-	int set ( tType const * );
-	int normalize ( void );
-	tType norm ( void ) const;
+	HVector( int long const& = 0 );
+	HVector( HVector const& );
+	~HVector( void );
+	void set( data_t const& );
+	bool normalize( void );
+	int long dim( void ) const;
+	tType norm( void ) const;
 	HVector& operator = ( HVector const& );
-	HVector& operator = ( tType const );
+	HVector& operator = ( tType const& );
 	HVector operator + ( HVector const& ) const;
 	HVector operator - ( HVector const& ) const;
 	HVector operator - ( void ) const;
-	HVector operator * ( tType const ) const;
-	HVector operator / ( tType const ) const;
+	HVector operator * ( tType const& ) const;
+	HVector operator / ( tType const& ) const;
 	HVector& operator += ( HVector const& );
 	HVector& operator -= ( HVector const& );
-	HVector& operator *= ( tType const );
-	HVector& operator /= ( tType const );
+	HVector& operator *= ( tType const& );
+	HVector& operator /= ( tType const& );
 	tType operator | ( HVector const& ) const;
 	tType operator ! ( void ) const;
+	tType const& operator[] ( int long const& ) const;
+	tType& operator[] ( int long const& );
 	bool operator == ( HVector const& ) const;
 	bool operator != ( HVector const& ) const;
-	template < typename ttType >
-	friend HVector<ttType> operator * ( ttType const,
-			HVector<ttType> const& );
 private:
-	inline void check_dimensions ( int a_iSizeAnother ) const
+	inline void check_dimensions( int a_iSizeAnother ) const
 		{
 		M_PROLOG
-		if ( this->f_lSize != a_iSizeAnother )
-			M_THROW ( g_ppcErrMsgHVector [ ERROR::E_DIMNOTMATCH ],
-					this->f_lSize - a_iSizeAnother );
+		if ( f_oData.size() != a_iSizeAnother )
+			M_THROW( g_ppcErrMsgHVector[ ERROR::E_DIMNOTMATCH ],
+					f_oData.size() - a_iSizeAnother );
 		return;
 		M_EPILOG
 		}
 	};
 
-template < typename tType >
-HVector < tType > ::HVector ( int const a_iDimension )
-				: HArray < tType > ( a_iDimension )
-	{
-	M_PROLOG
-	int l_iCtr = 0;
-	for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ )
-		this->f_ptArray [ l_iCtr ] = 0;
-	return ;
-	M_EPILOG
-	}
-
-template < typename tType >
-HVector < tType > ::~HVector ( void )
+template<typename tType>
+HVector<tType>::HVector( int long const& a_lDimension ) : f_oData( a_lDimension, 0.0 )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > ::HVector ( HVector const & a_roVector )
-				: HArray < tType > ( a_roVector )
+template<typename tType>
+HVector<tType>::~HVector( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-int HVector < tType > ::set ( tType const * a_pdBody )
+template<typename tType>
+HVector<tType>::HVector( HVector const& a_roVector ) : f_oData( a_roVector.f_oData )
 	{
 	M_PROLOG
-	for ( int l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ )
-		this->f_ptArray [ l_iCtr ] = a_pdBody [ l_iCtr ];
-	return ( 0 );
+	return;
 	M_EPILOG
 	}
 
-template < typename tType >
-tType HVector < tType > ::norm ( void ) const
+template<typename tType>
+void HVector<tType>::set( data_t const& rawData )
 	{
 	M_PROLOG
-	int l_iCtr;
-	tType l_tScalar = 0;
-	for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ )
-		l_tScalar += ( this->f_ptArray [ l_iCtr ] * this->f_ptArray [ l_iCtr ] );
-	return ( sqrt ( l_tScalar ) );
+	f_oData = rawData;
 	M_EPILOG
 	}
 
-template < typename tType >
-int HVector < tType > ::normalize ( void )
+template<typename tType>
+tType HVector<tType>::norm( void ) const
 	{
 	M_PROLOG
-	int l_iCtr;
-	tType l_tLenght;
-	l_tLenght = norm();
+	tType l_tScalar = accumulate( f_oData.begin(), f_oData.end(), 0.0 );
+	return ( sqrt( l_tScalar ) );
+	M_EPILOG
+	}
+
+template<typename tType>
+bool HVector<tType>::normalize( void )
+	{
+	M_PROLOG
+	tType l_tLenght = norm();
 	if ( ! l_tLenght )
-		return ( 1 );
-	for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ )
-		this->f_ptArray [ l_iCtr ] /= l_tLenght;
-	return ( 0 );
+		return ( true );
+	int long size = f_oData.size();
+	for ( int long i = 0; i < size; ++ i )
+		f_oData[ i ] /= l_tLenght;
+	return ( false );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > & 
-HVector < tType > ::operator = ( HVector const & a_roVector )
+template<typename tType>
+int long HVector<tType>::dim( void ) const
 	{
 	M_PROLOG
-	if ( this->f_lSize )
-		check_dimensions ( a_roVector.f_lSize );
-	( * this ).HArray < tType > ::operator = ( a_roVector );
-	return ( * this );
+	return ( f_oData.size() );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > & HVector < tType > ::operator = ( tType const a_tScalar )
+template<typename tType>
+HVector<tType>& 
+HVector<tType>::operator = ( HVector const& a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr;
-	for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ )
-		this->f_ptArray [ l_iCtr ] = a_tScalar;
+	int long size = a_roVector.f_oData.size();
+	if ( size )
+		check_dimensions( size );
+	f_oData = a_roVector.f_oData;
 	return ( *this );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > HVector < tType > ::operator + ( HVector const & a_roVector ) const
+template<typename tType>
+HVector<tType>& HVector<tType>::operator = ( tType const& a_tScalar )
 	{
 	M_PROLOG
-	check_dimensions ( a_roVector.f_lSize );
-	HVector l_oVector ( * this );
+	fill( f_oData.begin(), f_oData.end(), a_tScalar );
+	return ( *this );
+	M_EPILOG
+	}
+
+template<typename tType>
+HVector<tType> HVector<tType>::operator + ( HVector const& a_roVector ) const
+	{
+	M_PROLOG
+	check_dimensions( a_roVector.f_oData.size() );
+	HVector l_oVector ( *this );
 	l_oVector += a_roVector;
 	return ( l_oVector );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > HVector < tType > ::operator - ( HVector const & a_roVector ) const
+template<typename tType>
+HVector<tType> HVector<tType>::operator - ( HVector const& a_roVector ) const
 	{
 	M_PROLOG
-	check_dimensions ( a_roVector.f_lSize );
-	HVector l_oVector ( * this );
+	check_dimensions( a_roVector.f_oData.size() );
+	HVector l_oVector( *this );
 	l_oVector -= a_roVector;
 	return ( l_oVector );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > HVector < tType > ::operator - ( void ) const
+template<typename tType>
+HVector<tType> HVector<tType>::operator - ( void ) const
 	{
 	M_PROLOG
-	HVector l_oVector ( this->f_lSize );
+	HVector l_oVector( f_oData.size() );
 	l_oVector = 0;
-	l_oVector -= ( * this );
+	l_oVector -= ( *this );
 	return ( l_oVector );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > HVector < tType > ::operator * ( tType const a_tScalar ) const
+template<typename tType>
+HVector<tType> HVector<tType>::operator * ( tType const& a_tScalar ) const
 	{
 	M_PROLOG
-	HVector l_oVector ( * this );
+	HVector l_oVector( *this );
 	l_oVector *= a_tScalar;
 	return ( l_oVector );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > HVector < tType > ::operator / ( tType const a_tScalar ) const
+template<typename tType>
+HVector<tType>HVector<tType>::operator / ( tType const& a_tScalar ) const
 	{
 	M_PROLOG
 	HVector l_oVector ( * this );
@@ -238,101 +233,117 @@ HVector < tType > HVector < tType > ::operator / ( tType const a_tScalar ) const
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > & HVector < tType > ::operator += ( HVector const & a_roVector )
+template<typename tType>
+HVector<tType>& HVector<tType>::operator += ( HVector const& a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	check_dimensions ( a_roVector.f_lSize );
-	for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ ) 
-		this->f_ptArray [ l_iCtr ] += a_roVector.f_ptArray [ l_iCtr ];
+	int long size = a_roVector.f_oData.size();
+	check_dimensions( size );
+	for ( int long i = 0; i < size; i ++ ) 
+		f_oData[ i ] += a_roVector.f_oData[ i ];
 	return ( *this );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > & HVector < tType > ::operator -= ( HVector const & a_roVector )
+template<typename tType>
+HVector<tType>& HVector<tType>::operator -= ( HVector const& a_roVector )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	check_dimensions ( a_roVector.f_lSize );
-	for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ )
-		this->f_ptArray [ l_iCtr ] -= a_roVector.f_ptArray [ l_iCtr ];
+	int long size = a_roVector.f_oData.size();
+	check_dimensions( size );
+	for ( int long i = 0; i < size; i ++ )
+		f_oData[ i ] -= a_roVector.f_oData[ i ];
 	return ( *this );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > & HVector < tType > ::operator *= ( tType const a_tScalar )
+template<typename tType>
+HVector<tType>& HVector<tType>::operator *= ( tType const& a_tScalar )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ )
-		this->f_ptArray [ l_iCtr ] *= a_tScalar;
+	int long size = f_oData.size();
+	for ( int long i = 0; i < size; ++ i )
+		f_oData[ i ] *= a_tScalar;
 	return ( *this );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > & HVector < tType > ::operator /= ( tType const a_tScalar )
+template<typename tType>
+HVector<tType>& HVector<tType>::operator /= ( tType const& a_tScalar )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
+	int long size = f_oData.size();
 	if ( a_tScalar )
-		for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ )
-			this->f_ptArray [ l_iCtr ] /= a_tScalar;
+		for ( int long i = 0; i < size; i ++ )
+			f_oData[ i ] /= a_tScalar;
 	return ( *this );
 	M_EPILOG
 	}
 
-template < typename tType >
-tType HVector < tType > ::operator | ( HVector const & a_roVector ) const
+template<typename tType>
+tType HVector<tType>::operator | ( HVector const& a_roVector ) const
 	{
 	M_PROLOG
+	int long size = a_roVector.f_oData.size();
+	check_dimensions ( size );
 	tType l_tScalar = 0;
-	int l_iCtr = 0;
-	check_dimensions ( a_roVector.f_lSize );
-	for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ ) 
-		l_tScalar += ( this->f_ptArray [ l_iCtr ] * a_roVector.f_ptArray [ l_iCtr ] );
+	for ( int long i = 0; i < size; i ++ ) 
+		l_tScalar += ( f_oData[ i ] * a_roVector.f_oData[ i ] );
 	return ( l_tScalar );
 	M_EPILOG
 	}
 
-template < typename tType >
-tType HVector < tType > ::operator ! ( void ) const
+template<typename tType>
+tType HVector<tType>::operator ! ( void ) const
 	{
 	M_PROLOG
 	return ( norm() );
 	M_EPILOG
 	}
 
-template < typename tType >
-bool HVector < tType > ::operator == ( HVector const & a_roVector ) const
+template<typename tType>
+tType const& HVector<tType>::operator[] ( int long const& idx ) const
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	check_dimensions ( a_roVector.f_lSize );
-	for ( l_iCtr = 0; l_iCtr < this->f_lSize; l_iCtr ++ ) 
-		if ( this->f_ptArray [ l_iCtr ] != a_roVector.f_ptArray [ l_iCtr ] )
+	return ( f_oData[ idx ] );
+	M_EPILOG
+	}
+
+template<typename tType>
+tType& HVector<tType>::operator[] ( int long const& idx )
+	{
+	M_PROLOG
+	return ( f_oData[ idx ] );
+	M_EPILOG
+	}
+
+template<typename tType>
+bool HVector<tType>::operator == ( HVector const& a_roVector ) const
+	{
+	M_PROLOG
+	int long size = a_roVector.f_oData.size();
+	check_dimensions( size );
+	for ( int long i = 0; i < size; ++ i ) 
+		if ( f_oData[ i ] != a_roVector.f_oData[ i ] )
 			return ( false );
 	return ( true );
 	M_EPILOG
 	}
 
-template < typename tType >
-bool HVector < tType > ::operator != ( HVector const & a_roVector ) const
+template<typename tType>
+bool HVector<tType>::operator != ( HVector const & a_roVector ) const
 	{
 	M_PROLOG
 	return ( ! ( * this == a_roVector ) );
 	M_EPILOG
 	}
 
-template < typename tType >
-HVector < tType > operator * ( tType const a_tScalar,
-		HVector < tType > const & a_roVector )
+template<typename tType>
+HVector<tType> operator * ( tType const a_tScalar,
+		HVector<tType>const & a_roVector )
 	{
 	M_PROLOG
-	HVector < tType > l_oVector ( a_roVector );
+	HVector<tType>l_oVector( a_roVector );
 	l_oVector *= a_tScalar;
 	return ( l_oVector );
 	M_EPILOG

@@ -66,8 +66,8 @@ public:
 	class HIterator;
 	typedef HIterator<tType> iterator;
 	typedef HIterator<tType const> const_iterator;
-	HArray( int const& = 0 );
-	HArray( int const&, tType const& );
+	HArray( int long const& = 0 );
+	HArray( int long const&, tType const& );
 	virtual ~HArray( void );
 	HArray( HArray const& );
 	HArray& operator = ( HArray const& );
@@ -150,38 +150,37 @@ private:
 	};
 
 template<typename tType>
-HArray<tType>::HArray( int const& a_iSize ) : f_lSize( 0 ), f_ptArray( NULL )
+HArray<tType>::HArray( int long const& a_lSize ) : f_lSize( 0 ), f_ptArray( NULL )
 	{
 	M_PROLOG
-	if ( a_iSize < 0 )
-		M_THROW ( n_ppcErrMsgHArray[ ERROR::E_BADSIZE ], a_iSize );
-	f_lSize = a_iSize;
-	if ( a_iSize )
+	if ( a_lSize < 0 )
+		M_THROW ( n_ppcErrMsgHArray[ ERROR::E_BADSIZE ], a_lSize );
+	f_lSize = a_lSize;
+	if ( a_lSize )
 		{
 		f_ptArray = new ( std::nothrow ) tType[ f_lSize ];
 		if ( ! f_ptArray )
-			M_THROW( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_iSize );
+			M_THROW( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_lSize );
 		}
 	return;
 	M_EPILOG
 	}
 
 template<typename tType>
-HArray<tType>::HArray( int const& a_iSize, tType const& a_tFillWith )
+HArray<tType>::HArray( int long const& a_lSize, tType const& a_tFillWith )
 	: f_lSize( 0 ), f_ptArray( NULL )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	if ( a_iSize < 0 )
-		M_THROW( n_ppcErrMsgHArray[ ERROR::E_BADSIZE ], a_iSize );
-	f_lSize = a_iSize;
-	if ( a_iSize )
+	if ( a_lSize < 0 )
+		M_THROW( n_ppcErrMsgHArray[ ERROR::E_BADSIZE ], a_lSize );
+	f_lSize = a_lSize;
+	if ( a_lSize )
 		{
 		f_ptArray = new ( std::nothrow ) tType[ f_lSize ];
 		if ( ! f_ptArray )
-			M_THROW ( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_iSize );
-		for ( l_iCtr = 0; l_iCtr < f_lSize; l_iCtr ++ )
-			f_ptArray[ l_iCtr ] = a_tFillWith;
+			M_THROW ( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_lSize );
+		fill( begin(), end(), a_tFillWith );
 		}
 	return;
 	M_EPILOG

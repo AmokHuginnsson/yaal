@@ -147,6 +147,14 @@ void generate( iterator_t it, iterator_t const& end, generator_t generator )
 	return;
 	}
 
+template<typename iterator_t, typename return_t>
+return_t accumulate( iterator_t it, iterator_t end, return_t ret )
+	{
+	for ( ; it != end; ++ it )
+		ret += *it;
+	return ( ret );
+	}
+
 namespace trait
 {
 
