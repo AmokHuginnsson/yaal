@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	compat.h - this file is integral part of `yaal' project.
+	compat.cxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,21 +24,19 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-/* compatibility header for various platforms */
-
-#ifndef __YAAL_HCORE_COMPAT_H
-#define __YAAL_HCORE_COMPAT_H
-
-#ifdef __YAAL_BUILD__
-#include "config.h"
-#endif /* __YAAL_BUILD__ */
-
-#if not defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 )
-#define TEMP_FAILURE_RETRY(x) (x)
-#endif /* not HAVE_DECL_TEMP_FAILURE_RETRY */
+#include "compat.h"
 
 #if not defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
-void* memrchr( void const*, int, int );
+void* memrchr( void const* ptr, int what, int from )
+	{
+	char const* str = static_cast<char const*>( ptr );
+	while ( from >= 0 )
+		{
+		if ( str[ from ] == what )
+			break;
+		-- from;
+		}
+	return ( const_cast<char*>( str + from ) );
+	}
 #endif /* not HAVE_MEMRCHR */
 
-#endif /* not __YAAL_HCORE_COMPAT_H */
