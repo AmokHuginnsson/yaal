@@ -59,35 +59,106 @@ public:
 			} error_t;
 		};
 protected:
-	int f_iSize;
+	int long f_lSize;
 	tType* f_ptArray;
 public:
+	template<typename const_qual_t>
+	class HIterator;
+	typedef HIterator<tType> iterator;
+	typedef HIterator<tType const> const_iterator;
 	HArray( int const& = 0 );
 	HArray( int const&, tType const& );
 	virtual ~HArray( void );
 	HArray( HArray const& );
 	HArray& operator = ( HArray const& );
-	tType& operator [] ( int );
-	tType const& operator [] ( int ) const;
-	int get_size( void ) const;
-	int size( void ) const;
+	tType& operator [] ( int long const& );
+	tType const& operator [] ( int long const& ) const;
+	int long get_size( void ) const;
+	int long size( void ) const;
 	void clear( void );
 	bool operator ! ( void ) const;
+	iterator begin( void );
+	iterator find( int long const& );
+	iterator end( void );
+	const_iterator begin( void ) const;
+	const_iterator find( int long const& ) const;
+	const_iterator end( void ) const;
 	static void swap( HArray&, HArray& );
 private:
-	tType& get( int ) const;
+	tType& get( int long const& ) const;
 	};
 
 template<typename tType>
-HArray<tType>::HArray( int const& a_iSize ) : f_iSize( 0 ), f_ptArray( NULL )
+template<typename const_qual_t>
+class HArray<tType>::HIterator
+	{
+	typedef HArray<tType> array_t;
+	array_t const* f_poOwner;
+	int long f_lIndex;
+public:
+	HIterator( void ) : f_poOwner( NULL ), f_lIndex( 0 ) {}
+	HIterator( HIterator const& a_oIt ) : f_poOwner( a_oIt.f_poOwner ), f_lIndex( a_oIt.f_lIndex ) {}
+	HIterator& operator= ( HIterator const& a_oIt )
+		{
+		if ( &a_oIt != this )
+			{
+			f_poOwner = a_oIt.f_poOwner;
+			f_lIndex = a_oIt.f_lIndex;
+			}
+		return ( *this );
+		}
+	HIterator& operator ++ ( void )
+		{
+		++ f_lIndex;
+		return ( *this );
+		}
+	HIterator const operator ++ ( int )
+		{
+		HIterator it( f_lIndex );
+		++ f_lIndex;
+		return ( it );
+		}
+	HIterator& operator -- ( void )
+		{
+		-- f_lIndex;
+		return ( *this );
+		}
+	HIterator const operator -- ( int )
+		{
+		HIterator it( f_lIndex );
+		-- f_lIndex;
+		return ( it );
+		}
+	const_qual_t& operator* ( void )
+		{ return ( f_poOwner->f_ptArray[ f_lIndex ] ); }
+	const_qual_t& operator* ( void ) const
+		{ return ( f_poOwner->f_ptArray[ f_lIndex ] ); }
+	const_qual_t* operator-> ( void )
+		{ return ( &f_poOwner->f_ptArray[ f_lIndex ] ); }
+	const_qual_t* operator-> ( void ) const
+		{ return ( &f_poOwner->f_ptArray[ f_lIndex ] ); }
+	template<typename other_const_qual_t>
+	bool operator == ( HIterator<other_const_qual_t> const& it ) const
+		{ return ( f_lIndex == it.f_lIndex ); }
+	template<typename other_const_qual_t>
+	bool operator != ( HIterator<other_const_qual_t> const& it ) const
+		{ return ( f_lIndex != it.f_lIndex ); }
+private:
+	friend class HArray<tType>;
+	explicit HIterator( array_t const* a_poOwner, int long const& idx )
+		: f_poOwner( a_poOwner ), f_lIndex( idx ) {};
+	};
+
+template<typename tType>
+HArray<tType>::HArray( int const& a_iSize ) : f_lSize( 0 ), f_ptArray( NULL )
 	{
 	M_PROLOG
 	if ( a_iSize < 0 )
 		M_THROW ( n_ppcErrMsgHArray[ ERROR::E_BADSIZE ], a_iSize );
-	f_iSize = a_iSize;
+	f_lSize = a_iSize;
 	if ( a_iSize )
 		{
-		f_ptArray = new ( std::nothrow ) tType[ f_iSize ];
+		f_ptArray = new ( std::nothrow ) tType[ f_lSize ];
 		if ( ! f_ptArray )
 			M_THROW( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_iSize );
 		}
@@ -97,19 +168,19 @@ HArray<tType>::HArray( int const& a_iSize ) : f_iSize( 0 ), f_ptArray( NULL )
 
 template<typename tType>
 HArray<tType>::HArray( int const& a_iSize, tType const& a_tFillWith )
-	: f_iSize( 0 ), f_ptArray( NULL )
+	: f_lSize( 0 ), f_ptArray( NULL )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iSize < 0 )
 		M_THROW( n_ppcErrMsgHArray[ ERROR::E_BADSIZE ], a_iSize );
-	f_iSize = a_iSize;
+	f_lSize = a_iSize;
 	if ( a_iSize )
 		{
-		f_ptArray = new ( std::nothrow ) tType[ f_iSize ];
+		f_ptArray = new ( std::nothrow ) tType[ f_lSize ];
 		if ( ! f_ptArray )
 			M_THROW ( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_iSize );
-		for ( l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
+		for ( l_iCtr = 0; l_iCtr < f_lSize; l_iCtr ++ )
 			f_ptArray[ l_iCtr ] = a_tFillWith;
 		}
 	return;
@@ -131,14 +202,14 @@ void HArray<tType>::clear( void )
 	M_PROLOG
 	if ( f_ptArray )
 		delete [] f_ptArray;
-	f_iSize = 0;
+	f_lSize = 0;
 	f_ptArray = NULL;
 	return;
 	M_EPILOG
 	}
 
 template<typename tType>
-HArray<tType>::HArray( HArray const& a_roArray ) : f_iSize( 0 ), f_ptArray( NULL )
+HArray<tType>::HArray( HArray const& a_roArray ) : f_lSize( 0 ), f_ptArray( NULL )
 	{
 	M_PROLOG
 	( *this ) = a_roArray;
@@ -152,23 +223,23 @@ HArray<tType>& HArray<tType>::operator = ( HArray const& a_roArray )
 	M_PROLOG
 	if ( this != & a_roArray )
 		{
-		if ( a_roArray.f_iSize != f_iSize )
+		if ( a_roArray.f_lSize != f_lSize )
 			{
 			if ( f_ptArray )
 				{
 				delete [] f_ptArray;
 				f_ptArray = NULL;
-				f_iSize = 0;
+				f_lSize = 0;
 				}
-			f_iSize = a_roArray.f_iSize;
+			f_lSize = a_roArray.f_lSize;
 			}
-		if ( f_iSize && ! f_ptArray )
+		if ( f_lSize && ! f_ptArray )
 			{
-			f_ptArray = new ( std::nothrow ) tType [ f_iSize ];
+			f_ptArray = new ( std::nothrow ) tType [ f_lSize ];
 			if ( ! f_ptArray )
-				M_THROW( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], f_iSize );
+				M_THROW( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], f_lSize );
 			}
-		for ( int l_iCtr = 0; l_iCtr < f_iSize; l_iCtr ++ )
+		for ( int l_iCtr = 0; l_iCtr < f_lSize; l_iCtr ++ )
 			f_ptArray[ l_iCtr ] = a_roArray.f_ptArray[ l_iCtr ];
 		}
 	return ( *this );
@@ -176,30 +247,29 @@ HArray<tType>& HArray<tType>::operator = ( HArray const& a_roArray )
 	}
 
 template<typename tType>
-tType& HArray<tType>::get( int a_iIndex ) const
+tType& HArray<tType>::get( int long const& a_lIndex ) const
 	{
 	M_PROLOG
-	if ( a_iIndex < 0 )
-		a_iIndex += f_iSize;
-	if ( ( a_iIndex >= f_iSize ) || ( a_iIndex < 0 ) )
-		M_THROW( n_ppcErrMsgHArray[ ERROR::E_BADINDEX ], a_iIndex );
-	return ( f_ptArray[ a_iIndex ] );
+	int long idx = ( a_lIndex < 0 ) ? a_lIndex + f_lSize : a_lIndex;
+	if ( ( idx >= f_lSize ) || ( idx < 0 ) )
+		M_THROW( n_ppcErrMsgHArray[ ERROR::E_BADINDEX ], idx );
+	return ( f_ptArray[ idx ] );
 	M_EPILOG
 	}
 
 template<typename tType>
-tType& HArray<tType>::operator[] ( int a_iIndex )
+tType& HArray<tType>::operator[] ( int long const& a_lIndex )
 	{
 	M_PROLOG
-	return ( get( a_iIndex ) );
+	return ( get( a_lIndex ) );
 	M_EPILOG
 	}
 
 template<typename tType>
-tType const& HArray<tType>::operator[] ( int a_iIndex ) const
+tType const& HArray<tType>::operator[] ( int long const& a_lIndex ) const
 	{
 	M_PROLOG
-	return ( get( a_iIndex ) );
+	return ( get( a_lIndex ) );
 	M_EPILOG
 	}
 
@@ -212,18 +282,62 @@ bool HArray<tType>::operator ! ( void ) const
 	}
 
 template<typename tType>
-int HArray<tType>::get_size( void ) const
+int long HArray<tType>::get_size( void ) const
 	{
 	M_PROLOG
-	return ( f_iSize );
+	return ( f_lSize );
 	M_EPILOG
+	}
+
+template<typename tType>
+int long HArray<tType>::size( void ) const
+	{
+	M_PROLOG
+	return ( f_lSize );
+	M_EPILOG
+	}
+
+template<typename tType>
+typename HArray<tType>::iterator HArray<tType>::begin( void )
+	{
+	return ( iterator( this, 0 ) );
+	}
+
+template<typename tType>
+typename HArray<tType>::iterator HArray<tType>::find( int long const& idx )
+	{
+	return ( iterator( this, min( idx, f_lSize ) ) );
+	}
+
+template<typename tType>
+typename HArray<tType>::iterator HArray<tType>::end( void )
+	{
+	return ( iterator( this, f_lSize ) );
+	}
+
+template<typename tType>
+typename HArray<tType>::const_iterator HArray<tType>::begin( void ) const
+	{
+	return ( const_iterator( this, 0 ) );
+	}
+
+template<typename tType>
+typename HArray<tType>::const_iterator HArray<tType>::find( int long const& idx ) const
+	{
+	return ( const_iterator( this, min( idx, f_lSize ) ) );
+	}
+
+template<typename tType>
+typename HArray<tType>::const_iterator HArray<tType>::end( void ) const
+	{
+	return ( const_iterator( this, f_lSize ) );
 	}
 
 template<typename tType>
 void HArray<tType>::swap( HArray& left, HArray& right )
 	{
 	yaal::swap( left.f_ptArray, right.f_ptArray );
-	yaal::swap( left.f_iSize, right.f_iSize );
+	yaal::swap( left.f_lSize, right.f_lSize );
 	return;
 	}
 

@@ -27,6 +27,7 @@ Copyright:
 #ifndef __YAAL_TOOLS_PIPEDCHILD_H
 #define __YAAL_TOOLS_PIPEDCHILD_H
 
+#include "hcore/harray.h"
 #include "hcore/hstreaminterface.h"
 
 namespace yaal
@@ -64,6 +65,7 @@ public:
 		int value;
 		STATUS( void ) : type( TYPE::D_NOT_SPAWNED ), value( 0 ) {}
 		};
+	typedef yaal::hcore::HArray<yaal::hcore::HString> argv_t;
 private:
 	int f_iPid;
 	int f_iPipeIn;
@@ -75,7 +77,7 @@ private:
 public:
 	HPipedChild( void );
 	~HPipedChild( void );
-	void spawn( yaal::hcore::HString const&, char* const[] = NULL );
+	void spawn( yaal::hcore::HString const&, argv_t const& = argv_t() );
 	bool read_poll( void* );
 	STATUS finish( void );
 	bool is_running( void );

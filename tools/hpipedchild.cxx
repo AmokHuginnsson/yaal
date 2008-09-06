@@ -94,7 +94,7 @@ HPipedChild::STATUS HPipedChild::finish( void )
 	M_EPILOG
 	}
 
-void HPipedChild::spawn( HString const& a_oImage, char* const a_ppvArgs[] )
+void HPipedChild::spawn( HString const& a_oImage, argv_t const& a_oArgv )
 	{
 	M_PROLOG
 	int l_piFileDesIn[ 2 ], l_piFileDesOut[ 2 ], l_piFileDesErr[ 2 ];
@@ -115,7 +115,12 @@ void HPipedChild::spawn( HString const& a_oImage, char* const a_ppvArgs[] )
 				|| ( ::dup2( l_piFileDesOut[ 1 ], fileno( stdout ) ) < 0 )
 				|| ( ::dup2( l_piFileDesErr[ 1 ], fileno( stderr ) ) < 0 ) )
 			M_THROW( "dup2", errno );
-		::execv( a_oImage.raw(), a_ppvArgs );
+		char** argv = xcalloc<char*>( a_oArgv.size() + 2 );
+		argv[ 0 ] = xstrdup( a_oImage.raw() );
+		int i = 1;
+		for ( argv_t::const_iterator it = a_oArgv.begin(); it != a_oArgv.end(); ++ it, ++ i )
+			argv[ i ] = xstrdup( it->raw() );
+		::execv( a_oImage.raw(), argv );
 		M_THROW( "execlp", errno );
 		}
 	else
