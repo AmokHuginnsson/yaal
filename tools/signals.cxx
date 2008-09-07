@@ -130,7 +130,7 @@ HSignalService::HSignalService( void )
 	register_handler( SIGIOT, fatal );
 	register_handler( SIGTRAP, fatal );
 	register_handler( SIGSYS, fatal );
-	register_handler( SIGPIPE, fatal );
+	lock_on( SIGPIPE );
 	lock_on( SIGURG );
 	f_oWorker.spawn();
 	return;
@@ -179,7 +179,7 @@ int HSignalService::operator()( HThread const* )
 				}
 			}
 		else
-			M_ENSURE( l_iSigNo == SIGURG );
+			M_ENSURE( ( l_iSigNo == SIGURG ) || ( l_iSigNo == SIGPIPE ) );
 		}
 	return ( 0 );
 	M_EPILOG
