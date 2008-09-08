@@ -94,26 +94,39 @@ AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])
 AC_HEADER_MAJOR
 
 dnl We need to know what operating system yaal will be compiled on.
-AC_MSG_RESULT([--- Guessing host operating system ... ---              [[58%]]])
-AC_CHECK_FILE(
-	[[/etc/rc]],
-	[AC_DEFINE([__HOST_OS_TYPE_FREEBSD__],[],[Your operating system is FreeBSD.]) _HOST________=['FreeBSD. ---  ']],
-	[AC_CHECK_FILE(
-		[[/etc/debconf.conf]],
-		[AC_DEFINE([__HOST_OS_TYPE_DEBIAN__],[],[Your operating system is Debian.]) _HOST________=['Debian. ---   ']],
-		[AC_CHECK_FILE(
-			[[/etc/poldek/poldek.conf]],
-			[AC_DEFINE([__HOST_OS_TYPE_PLD__],[],[Your operating system is PLD.]) _HOST________=['PLD. ---      ']],
-			[AC_CHECK_FILE(
-				[[/etc/random-seed]],
-				[AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__],[],[Your operating system is Slackware.]) _HOST________=['Slackware. ---']],
-				[AC_MSG_ERROR([Cannot recognize host operating system type!])]
-			)]
-		)]
-	) AC_SUBST([SERIAL_DEVICE],['ttyS0'])]
-)
+AC_MSG_CHECKING([host operating system])
+HOST_OS_TYPE=""
+if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] ; then
+	AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your operating system is Debian.])
+	HOST_OS_TYPE=[Debian]
+fi
+if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
+	if test -f [/etc/rc] ; then
+		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [],
+							 [Your operating system is FreeBSD.])
+		HOST_OS_TYPE=[FreeBSD]
+	else
+		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
+	fi
+fi
+if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] ; then
+	AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your operating system is PLD.])
+	HOST_OS_TYPE=[PLD]
+fi
+if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] ; then
+	AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your operating system is Slackware.])
+	HOST_OS_TYPE=[Slackware]
+fi
+if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/dfs/dfstab] ; then
+	AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
+	HOST_OS_TYPE=[Solaris]
+fi
 
-AC_MSG_RESULT([--- Guessed host operating system is $_HOST________     [[62%]]])
+if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
+	AC_MSG_ERROR([Cannot recognize host operating system type!])
+else
+	AC_MSG_RESULT([$HOST_OS_TYPE])
+fi
 
 dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[63%]]])
