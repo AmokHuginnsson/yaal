@@ -89,7 +89,7 @@ HSocket::HSocket( TYPE::socket_type_t const a_eSocketType,
 	if ( f_iMaximumNumberOfClients >= 0 )
 		{
 		M_ENSURE( ( f_iFileDescriptor = ::socket(
-						( f_eType & TYPE::D_NETWORK ) ? PF_INET : PF_LOCAL,
+						( f_eType & TYPE::D_NETWORK ) ? PF_INET : PF_UNIX,
 						static_cast<int>( SOCK_STREAM ),
 						0 /* info libc "Creating a Socket"
 								 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
@@ -285,7 +285,7 @@ void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_
 	else /* f_eType & TYPE::D_FILE */
 		{
 		l_psAddressFile = static_cast<sockaddr_un*>( f_pvAddress );
-		l_psAddressFile->sun_family = AF_LOCAL;
+		l_psAddressFile->sun_family = AF_UNIX;
 		::strncpy( l_psAddressFile->sun_path, a_oAddress.raw(),
 				sizeof ( l_psAddressFile->sun_path ) );
 		l_psAddressFile->sun_path[ sizeof ( l_psAddressFile->sun_path ) - 1 ] = 0;
