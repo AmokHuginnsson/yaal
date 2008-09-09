@@ -176,7 +176,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 			{
 			f_oSQL = "UPDATE " + f_oTable + " SET ";
 			M_ENSURE( f_oFields.get_size() == f_oValues.get_size() );
-			int const size = f_oValues.get_size();
+			int long const size = f_oValues.get_size();
 			bool hasField = false;
 			for ( int i = 0; i < size; ++ i )
 				{
@@ -203,7 +203,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 			{
 			f_oSQL = "INSERT INTO " + f_oTable + " ( ";
 			M_ENSURE( f_oFields.get_size() == f_oValues.get_size() );
-			int const size = f_oFields.get_size();
+			int long const size = f_oFields.get_size();
 			for ( int i = 0; i < size; ++ i )
 				{
 				if ( i > 0 )

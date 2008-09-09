@@ -279,11 +279,10 @@ void HDataWindow::set_mode( DOCUMENT::mode_t a_eMode )
 void HDataWindow::sync( HRecordSet::iterator it )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iCount = 0;
 	M_ASSERT( f_poSyncStore );
 	M_ASSERT( f_eDocumentMode == DOCUMENT::D_VIEW );
-	l_iCount = f_poSyncStore->f_oItem.get_size();
-	for ( l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
+	int long l_iCount = f_poSyncStore->f_oItem.get_size();
+	for ( int l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 		f_poSyncStore->f_oItem[ l_iCtr ]( it[ l_iCtr ].raw() );
 	if ( f_poSyncStore->f_iIdColNo >= 0 )
 		f_poSyncStore->f_oItem.m_lId = lexical_cast<int>( it[ f_poSyncStore->f_iIdColNo ] );

@@ -1239,7 +1239,7 @@ template<>
 HRow<>::HRow( iterator_t& a_oIt ) : f_roIterator( a_oIt ), f_oCells( a_oIt->get_size() )
 	{
 	M_PROLOG
-	int l_iCellCount = a_oIt->get_size();
+	int long l_iCellCount = a_oIt->get_size();
 	for ( int i = 0; i < l_iCellCount; ++ i )
 		f_oCells[ i ] = HCell<>::ptr_t( new HCell<>( f_roIterator, i ) );
 	return;
