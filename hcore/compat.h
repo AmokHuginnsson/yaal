@@ -37,6 +37,14 @@ Copyright:
 #define __PRETTY_FUNCTION__ ""
 #endif
 
+#if defined( __HOST_OS_TYPE_SOLARIS__ )
+#define basename( x ) basename( const_cast<char*>( x ) )
+#endif /* __HOST_OS_TYPE_SOLARIS__ */
+
+#if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
+char* strcasestr( char const*, char const* );
+#endif /* not HAVE_STRCASESTR */
+
 #if ! defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 )
 #define TEMP_FAILURE_RETRY(x) (x)
 #endif /* not HAVE_DECL_TEMP_FAILURE_RETRY */

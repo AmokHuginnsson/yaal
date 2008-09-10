@@ -30,9 +30,9 @@ Copyright:
 #include <csignal>
 #include <libintl.h>
 
-#ifdef _STDIO_H
+#if defined( HAVE_EXECINFO_H )
 #include <execinfo.h>
-#endif /* _STDIO_H */
+#endif /* HAVE_EXECINFO_H */
 #include <cxxabi.h>
 
 #include "base.h"

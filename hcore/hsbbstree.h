@@ -82,6 +82,7 @@ private:
 		HAbstractNode& operator = ( HAbstractNode const & );
 		void set_child( HAbstractNode*, HAbstractNode* );
 		friend class HSBBSTree;
+		friend class HSBBSTree::HIterator;
 		};
 	template<typename tType>
 	class HNode : public HAbstractNode
@@ -91,6 +92,7 @@ private:
 		HNode( HNode const& );
 		HNode& operator = ( HNode const& );
 		friend class HSBBSTree;
+		friend class HSBBSTree::HIterator;
 		};
 	HAbstractNode* f_poRoot;
 	int long f_lSize;

@@ -24,9 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "compat.h"
+#include <cstring>
 
-#if not defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
+#include "compat.h"
+#include "hstring.h"
+
+#if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
 void* memrchr( void const* ptr, int what, int from )
 	{
 	char const* str = static_cast<char const*>( ptr );
@@ -39,3 +42,10 @@ void* memrchr( void const* ptr, int what, int from )
 	}
 #endif /* not HAVE_MEMRCHR */
 
+#if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
+char* strcasestr( char const* haystack, char const* needle )
+	{
+	int long idx = ::yaal::hcore::string_helper::kmpcasesearch( ( haystack ), ::std::strlen( haystack ), ( needle ), ::std::strlen( needle ) );
+	return ( idx >= 0 ? const_cast<char*>( haystack ) + idx : 0 );
+	}
+#endif /* not HAVE_STRCASESTR */

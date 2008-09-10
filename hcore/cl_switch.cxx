@@ -86,7 +86,7 @@ option* make_option_array( OOption* const& a_rpsOptions, int a_iCount, HChunk& a
 	for ( l_iCtr = 0; l_iCtr < a_iCount; l_iCtr ++ )
 		{
 		memset( &l_psOptions[ l_iCtr ], 0, sizeof( option ) );
-		l_psOptions[ l_iCtr ].name = a_rpsOptions[ l_iCtr ].f_pcName;
+		l_psOptions[ l_iCtr ].name = const_cast<char*>( a_rpsOptions[ l_iCtr ].f_pcName );
 		switch ( a_rpsOptions [ l_iCtr ].f_eSwitchType )
 			{
 			case ( OOption::D_REQUIRED ):

@@ -118,6 +118,13 @@ bool operator <= ( HString const&, HString const& );
 bool operator > ( HString const&, HString const& );
 bool operator < ( HString const&, HString const& );
 
+namespace string_helper
+{
+
+int long kmpcasesearch( char const* const, int long const&, char const* const, int long const& );
+
+}
+
 extern char const n_pcWhiteSpace[];
 
 }
