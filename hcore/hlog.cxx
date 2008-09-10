@@ -71,7 +71,7 @@ HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( tr
 	if ( ! f_psStream )
 		M_THROW( "tmpfile returned", reinterpret_cast<int long>( f_psStream ) );
 	::fprintf( f_psStream, "%-10xProcess started (%ld).\n",
-			LOG_TYPE::D_NOTICE, getpid() );
+			LOG_TYPE::D_NOTICE, static_cast<int long>( getpid() ) );
 	l_iUid = getuid();
 	passwd l_sPasswd;
 	long bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
@@ -82,7 +82,8 @@ HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( tr
 	else
 		{
 		f_oLoginName.set( xcalloc<char>( D_LOGIN_NAME_MAX + 1 ) );
-		M_ENSURE( ::snprintf( f_oLoginName.get<char>(), D_LOGIN_NAME_MAX, "%ld", l_iUid ) <= D_LOGIN_NAME_MAX );
+		M_ENSURE( ::snprintf( f_oLoginName.get<char>(), D_LOGIN_NAME_MAX, "%ld",
+					static_cast<int long>( l_iUid ) ) <= D_LOGIN_NAME_MAX );
 		}
 	M_ENSURE( ::gethostname( f_oHostName.get<char>(), D_HOSTNAME_SIZE - 1 ) == 0 );
 	return;
