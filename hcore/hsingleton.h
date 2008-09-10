@@ -68,7 +68,7 @@ public:
 	~HLifeTimeTracker( void );
 	static HLifeTimeTracker& get_instance( void );
 	void register_destructor( destructor_ptr_t, int const& );
-#if not defined( __HOST_OS_TYPE_FREEBSD__ )
+#if ! defined( __HOST_OS_TYPE_FREEBSD__ )
 	static void destruct( void );
 #else /* not __HOST_OS_TYPE_FREEBSD__ */
 	static void destruct( void* );

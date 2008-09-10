@@ -27,6 +27,7 @@ Copyright:
 #ifndef __YAAL_HCORE_HLOG_H
 #define __YAAL_HCORE_HLOG_H
 
+#include <cstdarg>
 #include <cstdio>
 
 #include "hcore/hsingleton.h"

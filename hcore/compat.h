@@ -33,11 +33,15 @@ Copyright:
 #include "config.h"
 #endif /* __YAAL_BUILD__ */
 
-#if not defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 )
+#if ! defined( __PRETTY_FUNCTION__ )
+#define __PRETTY_FUNCTION__ ""
+#endif
+
+#if ! defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 )
 #define TEMP_FAILURE_RETRY(x) (x)
 #endif /* not HAVE_DECL_TEMP_FAILURE_RETRY */
 
-#if not defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
+#if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
 void* memrchr( void const*, int, int );
 #endif /* not HAVE_MEMRCHR */
 
