@@ -42,7 +42,7 @@ namespace yaal
 namespace hcore
 {
 
-namespace
+namespace string_helper
 	{
 	enum
 		{
@@ -441,7 +441,7 @@ HString& HString::vformat( char const* const a_pcFormat, void* a_xAp )
 	M_PROLOG
 	char l_pcMeasureBuffer[ 3 ] = "\0\0";
 	if ( ! a_pcFormat )
-		M_THROW( n_ppcErrMsgHString [ E_NULL_PTR ], errno );
+		M_THROW( n_ppcErrMsgHString[ string_helper::E_NULL_PTR ], errno );
 	::std::va_list orig;
 	__va_copy( orig, *static_cast< ::std::va_list*>( a_xAp ) );
 	f_lSize = vsnprintf( l_pcMeasureBuffer, 1, a_pcFormat, *static_cast< ::std::va_list*>( a_xAp ) );
@@ -485,7 +485,8 @@ int long HString::nfind( HString const& a_oPattern, int long a_iPatternLength, i
 	if ( ( ! a_iPatternLength )
 			|| ( f_lSize < ( a_lAfter + a_iPatternLength ) ) )
 		return ( -1 );
-	int long idx = kmpsearch( f_pcBuffer + a_lAfter, f_lSize - a_lAfter, a_oPattern.raw(), a_iPatternLength );
+	int long idx = string_helper::kmpsearch( f_pcBuffer + a_lAfter,
+			f_lSize - a_lAfter, a_oPattern.raw(), a_iPatternLength );
 	return ( idx >= 0 ? idx + a_lAfter : -1 );
 	M_EPILOG
 	}
@@ -518,7 +519,8 @@ int long HString::reverse_find_one_of( char const* const a_pcSet,
 		a_iBefore = 0;
 	if ( ( ! ::std::strlen( a_pcSet ) ) || ( f_lSize <= a_iBefore ) )
 		return ( - 1 );
-	char* l_pcStr = strrnpbrk( f_pcBuffer, a_pcSet, f_lSize - a_iBefore );
+	char* l_pcStr = string_helper::strrnpbrk( f_pcBuffer,
+			a_pcSet, f_lSize - a_iBefore );
 	if ( ! l_pcStr )
 		return ( - 1 );
 	return ( ( f_lSize - 1 ) - ( l_pcStr - f_pcBuffer ) );
@@ -556,7 +558,8 @@ int long HString::reverse_find_other_than( char const* const a_pcSet,
 		return ( 0 );
 	if ( f_lSize <= a_iBefore )
 		return ( -1 );
-	int long l_iIndex = strrnspn( f_pcBuffer, a_pcSet, f_lSize - a_iBefore );
+	int long l_iIndex = string_helper::strrnspn( f_pcBuffer,
+			a_pcSet, f_lSize - a_iBefore );
 	if ( l_iIndex >= ( f_lSize - a_iBefore ) )
 		return ( - 1 );
 	return ( ( f_lSize - 1 ) - l_iIndex );
