@@ -49,15 +49,22 @@ namespace yaal
 namespace tools
 {
 
-namespace
+struct OPERATOR
 	{
-	static int const D_ADD = 0;
-	static int const D_SUBSTRACT = 1;
-	static int const D_MULTIPLY = 0;
-	static int const D_DIVIDE = 1;
-	}
+	static int const D_ADD;
+	static int const D_SUBSTRACT;
+	static int const D_MULTIPLY;
+	static int const D_DIVIDE;
+	static int const D_MODULO;
+	};
 
-struct FUNCTIONS
+int const OPERATOR::D_ADD = '+';
+int const OPERATOR::D_SUBSTRACT = '-';
+int const OPERATOR::D_MULTIPLY = '*';
+int const OPERATOR::D_DIVIDE = '/';
+int const OPERATOR::D_MODULO = '%';
+
+struct FUNCTION
 	{
 	static int const D_FUNCTIONS;
 	static int const D_SIN;
@@ -84,29 +91,29 @@ struct FUNCTIONS
 	static int const D_BRACKET;
 	};
 
-int const FUNCTIONS::D_FUNCTIONS = 0;
-int const FUNCTIONS::D_SIN = 2;
-int const FUNCTIONS::D_SINH = 1;
-int const FUNCTIONS::D_COS = 4;
-int const FUNCTIONS::D_COSH = 3;
-int const FUNCTIONS::D_TG = 6;
-int const FUNCTIONS::D_TGH = 5;
-int const FUNCTIONS::D_CTG = 8;
-int const FUNCTIONS::D_CTGH = 7;
-int const FUNCTIONS::D_ARCSIN = 9;
-int const FUNCTIONS::D_ARCCOS = 10;
-int const FUNCTIONS::D_ARCTG = 11;
-int const FUNCTIONS::D_ARCCTG = 12;
-int const FUNCTIONS::D_EXP = 13;
-int const FUNCTIONS::D_SQRT = 14;
-int const FUNCTIONS::D_LN = 15;
-int const FUNCTIONS::D_LOG = 16;
-int const FUNCTIONS::D_ABS = 17;
-int const FUNCTIONS::D_ADDITION = 1;
-int const FUNCTIONS::D_MULTIPLICATION = 2;
-int const FUNCTIONS::D_POWER = 3;
-int const FUNCTIONS::D_SIGNUM = 4;
-int const FUNCTIONS::D_BRACKET = 5;
+int const FUNCTION::D_FUNCTIONS = 0;
+int const FUNCTION::D_SIN = 2;
+int const FUNCTION::D_SINH = 1;
+int const FUNCTION::D_COS = 4;
+int const FUNCTION::D_COSH = 3;
+int const FUNCTION::D_TG = 6;
+int const FUNCTION::D_TGH = 5;
+int const FUNCTION::D_CTG = 8;
+int const FUNCTION::D_CTGH = 7;
+int const FUNCTION::D_ARCSIN = 9;
+int const FUNCTION::D_ARCCOS = 10;
+int const FUNCTION::D_ARCTG = 11;
+int const FUNCTION::D_ARCCTG = 12;
+int const FUNCTION::D_EXP = 13;
+int const FUNCTION::D_SQRT = 14;
+int const FUNCTION::D_LN = 15;
+int const FUNCTION::D_LOG = 16;
+int const FUNCTION::D_ABS = 17;
+int const FUNCTION::D_ADDITION = 1;
+int const FUNCTION::D_MULTIPLICATION = 2;
+int const FUNCTION::D_POWER = 3;
+int const FUNCTION::D_SIGNUM = 4;
+int const FUNCTION::D_BRACKET = 5;
 	
 
 char n_ppcFunctionsMnemonics [ ] [ 8 ] = 
@@ -121,21 +128,6 @@ int n_piFunctionMnemonicsLength [ 16 ] =
 	{
 	4, 3, 4, 3, 3, 2, 4, 3, 6, 6, 5, 6, 3, 4, 2, 3
 	};
-
-/*
-HAnalyser::tree_t::iterator& HAnalyser::HAnalyserNode::grow_up_branch( int a_iFlag )
-	{
-	M_PROLOG
-	tree_t::iterator& l_poNode = NULL;
-	if ( a_iFlag == FILL::D_NEW_AUTO )
-		l_poNode = new HAnalyserNode( this );
-	else
-		l_poNode = 0;
-	f_oBranch.add_tail( reinterpret_cast<ANALYZER_NODE_PTR_t*>( &l_poNode ) );
-	return ( l_poNode );
-	M_EPILOG
-	}
-*/
 
 HAnalyser::HAnalyser( void ) : f_iIndex( 0 ), f_iLength( 0 ),
 			f_eError( E_OK ), f_oConstantsPool ( 0, HPool<double>::D_AUTO_GROW ),
@@ -163,14 +155,14 @@ double HAnalyser::count_branch( tree_t::const_node_t a_roNode )
 	int l_iIndex = 0;
 	double l_dValue = 0;
 	if ( a_roNode->has_childs() )
-		l_dValue = ( this->* ( (*a_roNode)->METHOD ) ) ( a_roNode );
+		l_dValue = ( this->*( (*a_roNode)->METHOD ) )( a_roNode );
 	else
 		{
 		l_iIndex = (*a_roNode)->f_oVariables.head();
 		if ( l_iIndex >= 0 )
-			l_dValue = f_pdVariables [ l_iIndex ];
+			l_dValue = f_pdVariables[ l_iIndex ];
 		else
-			l_dValue = f_oConstantsPool [ - 1 - l_iIndex ];
+			l_dValue = f_oConstantsPool[ - 1 - l_iIndex ];
 		}
 	return ( l_dValue );
 	M_EPILOG
@@ -184,88 +176,88 @@ double HAnalyser::functions( tree_t::const_node_t a_roNode )
 	l_dLeftValue = count_branch( &*a_roNode->begin() );
 	switch ( l_iFunction )
 		{
-		case ( FUNCTIONS::D_SIN ):
-			return ( sin ( l_dLeftValue ) );
-		case ( FUNCTIONS::D_SINH ):
-			return ( sinh ( l_dLeftValue ) );
-		case ( FUNCTIONS::D_COS ):
-			return ( cos ( l_dLeftValue ) );
-		case ( FUNCTIONS::D_COSH ):
-			return ( cosh ( l_dLeftValue ) );
-		case ( FUNCTIONS::D_TG	):
+		case ( FUNCTION::D_SIN ):
+			return ( ::std::sin( l_dLeftValue ) );
+		case ( FUNCTION::D_SINH ):
+			return ( ::std::sinh( l_dLeftValue ) );
+		case ( FUNCTION::D_COS ):
+			return ( ::std::cos( l_dLeftValue ) );
+		case ( FUNCTION::D_COSH ):
+			return ( ::std::cosh( l_dLeftValue ) );
+		case ( FUNCTION::D_TG	):
 			{
-			if ( eq ( floor ( l_dLeftValue / M_PI + .5 ),
+			if ( eq( ::std::floor( l_dLeftValue / M_PI + .5 ),
 						( l_dLeftValue / M_PI + .5 ) ) )
-				return ( 0 );
-			return ( tan ( l_dLeftValue ) );
+				throw HAnalyserException( "tg: argument not in domain" );
+			return ( ::std::tan( l_dLeftValue ) );
 			}
-		case ( FUNCTIONS::D_TGH ):
-			return ( tanh ( l_dLeftValue ) );
-		case ( FUNCTIONS::D_CTG ):
+		case ( FUNCTION::D_TGH ):
+			return ( ::std::tanh( l_dLeftValue ) );
+		case ( FUNCTION::D_CTG ):
 			{
-			if ( eq ( floor( l_dLeftValue / M_PI ),
+			if ( eq( ::std::floor( l_dLeftValue / M_PI ),
 						( l_dLeftValue / M_PI ) ) )
-				return ( 0 );
-			l_dLeftValue = tan ( l_dLeftValue );
+				throw HAnalyserException( "ctg: argument not in domain" );
+			l_dLeftValue = ::std::tan( l_dLeftValue );
 			if ( l_dLeftValue == 0 )
 				return ( 0 );
 			return ( 1. / l_dLeftValue );
 			}
-		case ( FUNCTIONS::D_CTGH ):
+		case ( FUNCTION::D_CTGH ):
 			{
-			l_dLeftValue = tanh( l_dLeftValue );
+			l_dLeftValue = ::std::tanh( l_dLeftValue );
 			if ( l_dLeftValue == 0 )
 				return ( 0 );
 			return ( 1. / l_dLeftValue );
 			}
-		case ( FUNCTIONS::D_ARCSIN ):
+		case ( FUNCTION::D_ARCSIN ):
 			{
 			if ( ( l_dLeftValue < - M_PI / 2 ) || ( l_dLeftValue > M_PI / 2 ) )
 				return ( 0 );
-			return ( asin ( l_dLeftValue ) );
+			return ( ::std::asin( l_dLeftValue ) );
 			}
-		case ( FUNCTIONS::D_ARCCOS ):
+		case ( FUNCTION::D_ARCCOS ):
 			{
 			if ( ( l_dLeftValue < - M_PI / 2 ) || ( l_dLeftValue > M_PI / 2 ) )
 				return ( 0 );
-			return ( acos ( l_dLeftValue ) );
+			return ( ::std::acos( l_dLeftValue ) );
 			}
-		case ( FUNCTIONS::D_ARCTG ):
-			return ( atan ( l_dLeftValue ) );
-		case ( FUNCTIONS::D_ARCCTG ):
-			return ( M_PI - atan ( l_dLeftValue ) );
-		case ( FUNCTIONS::D_EXP ):
-			return ( exp ( l_dLeftValue ) );
-		case ( FUNCTIONS::D_SQRT ):
+		case ( FUNCTION::D_ARCTG ):
+			return ( ::std::atan( l_dLeftValue ) );
+		case ( FUNCTION::D_ARCCTG ):
+			return ( M_PI - std::atan( l_dLeftValue ) );
+		case ( FUNCTION::D_EXP ):
+			return ( ::std::exp( l_dLeftValue ) );
+		case ( FUNCTION::D_SQRT ):
 			{
 			if ( l_dLeftValue < 0 )
-				return ( sqrt ( - l_dLeftValue ) );
-			return ( sqrt ( l_dLeftValue ) );
+				return ( ::std::sqrt( - l_dLeftValue ) );
+			return ( ::std::sqrt( l_dLeftValue ) );
 			}
-		case ( FUNCTIONS::D_LN ):
+		case ( FUNCTION::D_LN ):
 			{
 			if ( l_dLeftValue == 0 )
 				return ( -1000 );
 			if ( l_dLeftValue < 0 )
-				return ( ::log ( -l_dLeftValue ) );
-			return ( ::log ( l_dLeftValue ) );
+				return ( ::std::log( -l_dLeftValue ) );
+			return ( ::std::log( l_dLeftValue ) );
 			}
-		case ( FUNCTIONS::D_LOG ):
+		case ( FUNCTION::D_LOG ):
 			{
 			if ( l_dLeftValue == 0 )
-				return ( - 1000 );
+				throw HAnalyserException( "log: argument not in domain" );
 			if ( l_dLeftValue < 0 )
-				return ( log10 ( - l_dLeftValue ) );
-			return ( log10 ( l_dLeftValue ) );
+				return ( ::std::log10( - l_dLeftValue ) );
+			return ( ::std::log10( l_dLeftValue ) );
 			}
-		case ( FUNCTIONS::D_ABS ):
+		case ( FUNCTION::D_ABS ):
 			{
 			if ( l_dLeftValue < 0 )
 				return ( - l_dLeftValue );
 			return ( l_dLeftValue );
 			}
 		default:
-			M_THROW ( _ ( "unknown function type" ), l_iFunction );
+			M_THROW( _( "unknown function type" ), l_iFunction );
 		}
 	M_EPILOG
 	}
@@ -285,14 +277,14 @@ double HAnalyser::addition( tree_t::const_node_t a_roNode )
 		l_dRightValue = count_branch( &*it );
 		switch ( l_iOperator )
 			{
-			case ( D_ADD ) :
+			case ( OPERATOR::D_ADD ) :
 				l_dLeftValue += l_dRightValue;
 			break;
-			case ( D_SUBSTRACT ) :
+			case ( OPERATOR::D_SUBSTRACT ) :
 				l_dLeftValue -= l_dRightValue;
 			break;
 			default:
-				M_THROW ( _ ( "unknown addition operator" ), l_iOperator );
+				M_THROW( _( "unknown addition operator" ), l_iOperator );
 			}
 		}
 	return ( l_dLeftValue );
@@ -314,15 +306,21 @@ double HAnalyser::multiplication( tree_t::const_node_t a_roNode )
 		l_dRightValue = count_branch( &*it );
 		switch ( l_iOperator )
 			{
-			case ( D_MULTIPLY ) :
+			case ( OPERATOR::D_MULTIPLY ) :
 				l_dLeftValue *= l_dRightValue;
 			break;
-			case ( D_DIVIDE ) :
-				if ( l_dRightValue )
-					l_dLeftValue /= l_dRightValue;
+			case ( OPERATOR::D_DIVIDE ) :
+				if ( ! l_dRightValue )
+					throw HAnalyserException( "divide by 0" );
+				l_dLeftValue /= l_dRightValue;
+			break;
+			case ( OPERATOR::D_MODULO ) :
+				if ( ! static_cast<int long>( l_dRightValue ) )
+					throw HAnalyserException( "modulo by 0" );
+				l_dLeftValue = static_cast<int long>( l_dLeftValue ) % static_cast<int long>( l_dRightValue );
 			break;
 			default:
-				M_THROW ( _ ( "unknown multiplication operator" ), l_iOperator );
+				M_THROW( _( "unknown multiplication operator" ), l_iOperator );
 			}
 		}
 	return ( l_dLeftValue );
@@ -411,7 +409,6 @@ bool HAnalyser::translate( HString const& a_oFormula )
 bool HAnalyser::addition_production( tree_t::node_t a_roNode )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	M_ASSERT ( a_roNode );
 	if ( multiplication_production( &*a_roNode->add_node() ) )
 		return ( true );
@@ -421,16 +418,16 @@ bool HAnalyser::addition_production( tree_t::node_t a_roNode )
 		return ( true );
 		}
 	(**a_roNode).METHOD = &HAnalyser::addition;
-	if ( ( f_oFormula[ f_iIndex ] != '+' ) && ( f_oFormula[ f_iIndex ] != '-' ) )
+	if ( ( f_oFormula[ f_iIndex ] != OPERATOR::D_ADD )
+			&& ( f_oFormula[ f_iIndex ] != OPERATOR::D_SUBSTRACT ) )
 		{
 		shorten_the_branch( a_roNode );
 		return ( false );
 		}
-	while ( ( f_oFormula [ f_iIndex ] == '+' )
-			|| ( f_oFormula [ f_iIndex ] == '-' ) )
+	while ( ( f_oFormula [ f_iIndex ] == OPERATOR::D_ADD )
+			|| ( f_oFormula [ f_iIndex ] == OPERATOR::D_SUBSTRACT ) )
 		{
-		l_iCtr = ( f_oFormula [ f_iIndex ++ ] == '+' ) ? D_ADD : D_SUBSTRACT;
-		(**a_roNode).f_oVariables.add_tail( &l_iCtr );
+		(**a_roNode).f_oVariables.push_back( f_oFormula[ f_iIndex ++ ] );
 		if ( multiplication_production( &*a_roNode->add_node() ) )
 			return ( true );
 		}
@@ -441,7 +438,6 @@ bool HAnalyser::addition_production( tree_t::node_t a_roNode )
 bool HAnalyser::multiplication_production( tree_t::node_t a_roNode )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	if ( power_production( &*a_roNode->add_node() ) )
 		return ( true );
 	if ( f_iIndex > f_iLength )
@@ -450,16 +446,18 @@ bool HAnalyser::multiplication_production( tree_t::node_t a_roNode )
 		return ( true );
 		}
 	(**a_roNode).METHOD = &HAnalyser::multiplication;
-	if ( ( f_oFormula[ f_iIndex ] != '*' ) && ( f_oFormula[ f_iIndex ] != '/' ) )
+	if ( ( f_oFormula[ f_iIndex ] != OPERATOR::D_MULTIPLY )
+			&& ( f_oFormula[ f_iIndex ] != OPERATOR::D_DIVIDE )
+			&& ( f_oFormula[ f_iIndex ] != OPERATOR::D_MODULO ) )
 		{
 		shorten_the_branch( a_roNode );
 		return ( false );
 		}
-	while ( ( f_oFormula[ f_iIndex ] == '*' )
-			|| ( f_oFormula[ f_iIndex ] == '/' ) )
+	while ( ( f_oFormula[ f_iIndex ] == OPERATOR::D_MULTIPLY )
+			|| ( f_oFormula[ f_iIndex ] == OPERATOR::D_DIVIDE )
+			|| ( f_oFormula[ f_iIndex ] == OPERATOR::D_MODULO ) )
 		{
-		l_iCtr = ( f_oFormula[ f_iIndex ++ ] == '*' ) ? D_MULTIPLY : D_DIVIDE;
-		(**a_roNode).f_oVariables.add_tail( &l_iCtr );
+		(**a_roNode).f_oVariables.push_back( f_oFormula[ f_iIndex ++ ] );
 		if ( power_production( &*a_roNode->add_node() ) )
 			return ( true );
 		}
@@ -563,7 +561,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 			if ( addition_production ( &*a_roNode->add_node() ) )
 				return ( true );
 			(**a_roNode).METHOD = &HAnalyser::functions;
-			(**a_roNode).f_oVariables.push_back( FUNCTIONS::D_ABS );
+			(**a_roNode).f_oVariables.push_back( FUNCTION::D_ABS );
 			if ( f_oFormula[ f_iIndex ] != '|' )
 				{
 				f_eError = E_CLOSING_ABSOLUTE_EXPECTED;
@@ -582,8 +580,8 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 		(**a_roNode).f_oVariables.push_back( f_oFormula[ f_iIndex ++ ] - 'A' );
 		return ( false );
 		}
-	if ( ( f_oFormula[ f_iIndex ] > FUNCTIONS::D_FUNCTIONS )
-			&& ( f_oFormula[ f_iIndex ] < FUNCTIONS::D_ABS ) )
+	if ( ( f_oFormula[ f_iIndex ] > FUNCTION::D_FUNCTIONS )
+			&& ( f_oFormula[ f_iIndex ] < FUNCTION::D_ABS ) )
 		{
 		f_iIndex ++;
 		if ( f_oFormula[ f_iIndex ] == '(' )
@@ -680,17 +678,19 @@ double* HAnalyser::analyse( HString const& a_oFormula )
 	M_EPILOG
 	}
 
-double& HAnalyser::operator [ ] ( int a_iIndex )
+double& HAnalyser::operator[]( int a_iIndex )
 	{
 	M_PROLOG
 	if ( ( a_iIndex >= 'a' ) && ( a_iIndex <= 'a' ) )
 		a_iIndex = ( a_iIndex - 'a' ) + 'A';
+	double* val = NULL;
 	if ( ( a_iIndex >= 0 ) && ( a_iIndex < 26 ) )
-		return ( f_pdVariables [ a_iIndex ] );
+		val = &f_pdVariables[ a_iIndex ];
 	else if ( ( a_iIndex >= 'A' ) && ( a_iIndex <= 'Z' ) )
-		return ( f_pdVariables [ a_iIndex - 'A' ] );
+		val = &f_pdVariables[ a_iIndex - 'A' ];
 	else
-		M_THROW ( "index out of range", a_iIndex );
+		M_THROW( "index out of range", a_iIndex );
+	return ( *val );
 	M_EPILOG
 	}
 
@@ -699,7 +699,7 @@ double HAnalyser::count( void )
 	M_PROLOG
 	tree_t::const_node_t root = f_oEquationTree.get_root();
 	if ( ! root )
-		M_THROW ( "logic tree is not compiled", f_eError );
+		M_THROW( "logic tree is not compiled", f_eError );
 	return ( ( this->* ( (*root)->METHOD ) ) ( root ) );
 	M_EPILOG
 	}
