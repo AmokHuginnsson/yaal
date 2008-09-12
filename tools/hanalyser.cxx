@@ -213,13 +213,13 @@ double HAnalyser::functions( tree_t::const_node_t a_roNode )
 		case ( FUNCTION::D_ARCSIN ):
 			{
 			if ( ( l_dLeftValue < - M_PI / 2 ) || ( l_dLeftValue > M_PI / 2 ) )
-				return ( 0 );
+				throw HAnalyserException( "arcsin: argument not in domain" );
 			return ( ::std::asin( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ARCCOS ):
 			{
 			if ( ( l_dLeftValue < - M_PI / 2 ) || ( l_dLeftValue > M_PI / 2 ) )
-				return ( 0 );
+				throw HAnalyserException( "arccos: argument not in domain" );
 			return ( ::std::acos( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ARCTG ):
@@ -231,23 +231,19 @@ double HAnalyser::functions( tree_t::const_node_t a_roNode )
 		case ( FUNCTION::D_SQRT ):
 			{
 			if ( l_dLeftValue < 0 )
-				return ( ::std::sqrt( - l_dLeftValue ) );
+				throw HAnalyserException( "sqrt: argument not in domain" );
 			return ( ::std::sqrt( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_LN ):
 			{
-			if ( l_dLeftValue == 0 )
-				return ( -1000 );
-			if ( l_dLeftValue < 0 )
-				return ( ::std::log( -l_dLeftValue ) );
+			if ( l_dLeftValue <= 0 )
+				throw HAnalyserException( "ln: argument not in domain" );
 			return ( ::std::log( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_LOG ):
 			{
-			if ( l_dLeftValue == 0 )
+			if ( l_dLeftValue <= 0 )
 				throw HAnalyserException( "log: argument not in domain" );
-			if ( l_dLeftValue < 0 )
-				return ( ::std::log10( - l_dLeftValue ) );
 			return ( ::std::log10( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ABS ):
