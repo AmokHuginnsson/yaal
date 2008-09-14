@@ -148,6 +148,10 @@ public:
 	iterator n_th( int );
 	tType& operator[] ( int );
 	tType const& operator[] ( int ) const;
+	tType& front( void );
+	tType const& front( void ) const;
+	tType& back( void );
+	tType const& back( void ) const;
 	tType& head( void );
 	tType const& head( void ) const;
 	tType& tail( void );
@@ -977,12 +981,30 @@ void HList<tType>::exchange( iterator const& left, iterator const& right )
 	}
 
 template<typename tType>
-tType& HList<tType>::head( void )
+tType& HList<tType>::front( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
 		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
 	return ( f_poHook->f_tObject );
+	M_EPILOG
+	}
+
+template<typename tType>
+tType const& HList<tType>::front( void ) const
+	{
+	M_PROLOG
+	if ( f_poHook == 0 )
+		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+	return ( f_poHook->f_tObject );
+	M_EPILOG
+	}
+
+template<typename tType>
+tType& HList<tType>::head( void )
+	{
+	M_PROLOG
+	return ( front() );
 	M_EPILOG
 	}
 
@@ -990,9 +1012,27 @@ template<typename tType>
 tType const& HList<tType>::head( void ) const
 	{
 	M_PROLOG
+	return ( front() );
+	M_EPILOG
+	}
+
+template<typename tType>
+tType& HList<tType>::back( void )
+	{
+	M_PROLOG
 	if ( f_poHook == 0 )
 		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
-	return ( f_poHook->f_tObject );
+	return ( f_poHook->f_poPrevious->f_tObject );
+	M_EPILOG
+	}
+
+template<typename tType>
+tType const& HList<tType>::back( void ) const
+	{
+	M_PROLOG
+	if ( f_poHook == 0 )
+		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+	return ( f_poHook->f_poPrevious->f_tObject );
 	M_EPILOG
 	}
 
@@ -1000,9 +1040,7 @@ template<typename tType>
 tType& HList<tType>::tail( void )
 	{
 	M_PROLOG
-	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
-	return ( f_poHook->f_poPrevious->f_tObject );
+	return ( back() );
 	M_EPILOG
 	}
 
@@ -1010,9 +1048,7 @@ template<typename tType>
 tType const& HList<tType>::tail( void ) const
 	{
 	M_PROLOG
-	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
-	return ( f_poHook->f_poPrevious->f_tObject );
+	return ( back() );
 	M_EPILOG
 	}
 

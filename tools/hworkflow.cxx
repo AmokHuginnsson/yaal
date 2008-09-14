@@ -36,18 +36,17 @@ namespace yaal
 namespace tools
 {
 
-void HWorkFlowInterface::task_finished( HTaskInterface* a_poTask )
+HWorkFlowInterface::task_t HWorkFlowInterface::pop_task( void )
 	{
 	M_PROLOG
-	do_task_finished( a_poTask );
-	return;
+	return ( do_pop_task() );
 	M_EPILOG
 	}
 
 HWorkFlow::HWorkFlow( MODE::mode_t const& a_eMode, int a_iWorkerPoolSize )
-	: f_eMode( a_eMode ), f_bLoop( a_eMode == MODE::D_PIPE ), f_oQueue(),
+	: f_eMode( a_eMode ), f_bLoop( a_eMode == MODE::D_PIPE ),
 	f_iWorkerPoolSize( a_iWorkerPoolSize ), f_iActiveWorkers( 0 ),
-	f_oPool(), f_oJoinQueue(),
+	f_oPool(), f_oQueue(),
 	f_oSemaphore(), f_oMutex(), f_oWorkFlow( *this )
 	{
 	M_PROLOG
@@ -74,32 +73,25 @@ HWorkFlow::~HWorkFlow( void )
 int HWorkFlow::operator()( yaal::hcore::HThread const* )
 	{
 	M_PROLOG
-	while ( f_bLoop || ( ! f_bLoop && ( ! f_oQueue.is_empty() || f_iActiveWorkers ) ) )
+	bool l_bLoop = false;
 		{
-		f_oSemaphore.wait();
+		HLock l( f_oMutex );
+		l_bLoop = f_bLoop || ( ! f_bLoop && ( ! f_oQueue.is_empty() || f_iActiveWorkers ) );
+		}
+	while ( l_bLoop )
+		{
+		HLock l( f_oMutex );
+		if ( ! f_oQueue.is_empty() && ( f_iActiveWorkers < f_iWorkerPoolSize ) )
 			{
-			HLock l( f_oMutex );
-			for ( join_queue_t::iterator it = f_oJoinQueue.begin(); it != f_oJoinQueue.end(); ++ it )
-				{
-				(*it)->finish();
-				-- f_iActiveWorkers;
-				f_oPool.remove( *it );
-				}
-			f_oJoinQueue.clear();
-			if ( ! f_bLoop && ( f_eMode == MODE::D_PIPE ) )
-				break;
-			if ( ! f_oQueue.is_empty() && ( f_iActiveWorkers < f_iWorkerPoolSize ) )
-				{
-				task_ptr_t t( new HTask( this, f_oQueue.head() ) );
-				f_oQueue.pop_front();
-				f_oPool.insert( t.raw(), t );
-				++ f_iActiveWorkers;
-				t->spawn();
-				}
+			worker_ptr_t w( new HWorker( this ) );
+			f_oPool.push_back( w );
+			++ f_iActiveWorkers;
+			w->spawn();
 			}
+		l_bLoop = f_bLoop || ( ( f_eMode != MODE::D_PIPE ) && ( ! f_oQueue.is_empty() || f_iActiveWorkers ) );
 		}
 	for ( pool_t::iterator it = f_oPool.begin(); it != f_oPool.end(); ++ it )
-		it->first->finish();
+		(*it)->finish();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -109,7 +101,7 @@ void HWorkFlow::run( void )
 	operator()( NULL );
 	}
 
-void HWorkFlow::push_task( call_t a_oCall )
+void HWorkFlow::push_task( task_t a_oCall )
 	{
 	M_PROLOG
 	HLock l( f_oMutex );
@@ -119,31 +111,36 @@ void HWorkFlow::push_task( call_t a_oCall )
 	M_EPILOG
 	}
 
-void HWorkFlow::do_task_finished( HTaskInterface* a_poTask )
+HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void )
 	{
 	M_PROLOG
 	HLock l( f_oMutex );
-	f_oJoinQueue.push_back( a_poTask );
-	f_oSemaphore.signal();
-	return;
+	f_oSemaphore.wait();
+	HWorkFlow::task_t t;
+	if ( ! f_oQueue.is_empty() )
+		{
+		t = f_oQueue.front();
+		f_oQueue.pop_front();
+		}
+	return ( t );
 	M_EPILOG
 	}
 
-HWorkFlow::HTask::HTask( HWorkFlowInterface* a_poWorkFlow, HWorkFlow::call_t a_oCall )
-	: f_poWorkFlow( a_poWorkFlow ), f_oCall( a_oCall ), f_oTask( *this )
+HWorkFlow::HWorker::HWorker( HWorkFlowInterface* a_poWorkFlow )
+	: f_poWorkFlow( a_poWorkFlow ), f_oWorker( *this )
 	{
 	return;
 	}
 
-void HWorkFlow::HTask::spawn( void )
+void HWorkFlow::HWorker::spawn( void )
 	{
 	M_PROLOG
-	f_oTask.spawn();
+	f_oWorker.spawn();
 	return;
 	M_EPILOG
 	}
 
-void HTaskInterface::finish( void )
+void HWorkerInterface::finish( void )
 	{
 	M_PROLOG
 	do_finish();
@@ -151,19 +148,20 @@ void HTaskInterface::finish( void )
 	M_EPILOG
 	}
 
-void HWorkFlow::HTask::do_finish( void )
+void HWorkFlow::HWorker::do_finish( void )
 	{
 	M_PROLOG
-	f_oTask.finish();
+	f_oWorker.finish();
 	return;
 	M_EPILOG
 	}
 
-int HWorkFlow::HTask::operator()( yaal::hcore::HThread const* )
+int HWorkFlow::HWorker::operator()( yaal::hcore::HThread const* )
 	{
 	M_PROLOG
-	f_oCall->invoke();
-	f_poWorkFlow->task_finished( this );
+	HWorkFlow::task_t t;
+	while ( !! ( t = f_poWorkFlow->pop_task() ) )	
+		t->invoke();
 	return ( 0 );
 	M_EPILOG
 	}

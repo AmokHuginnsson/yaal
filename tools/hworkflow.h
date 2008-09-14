@@ -31,7 +31,6 @@ Copyright:
 #include "hcore/hcall.h"
 #include "hcore/hthread.h"
 #include "hcore/hlist.h"
-#include "hcore/hmap.h"
 
 namespace yaal
 {
@@ -39,10 +38,10 @@ namespace yaal
 namespace tools
 {
 
-class HTaskInterface
+class HWorkerInterface
 	{
 public:
-	virtual ~HTaskInterface( void ){}
+	virtual ~HWorkerInterface( void ){}
 	void finish( void );
 protected:
 	virtual void do_finish( void ) = 0;
@@ -51,10 +50,11 @@ protected:
 class HWorkFlowInterface
 	{
 public:
+	typedef yaal::hcore::HCallInterface::ptr_t task_t;
 	virtual ~HWorkFlowInterface( void ){}
-	void task_finished( HTaskInterface* );
+	task_t pop_task( void );
 private:
-	virtual void do_task_finished( HTaskInterface* ) = 0;
+	virtual task_t do_pop_task( void ) = 0;
 	};
 
 class HWorkFlow : public HWorkFlowInterface
@@ -69,24 +69,21 @@ public:
 			} mode_t;
 		};
 private:
-	class HTask;
-	typedef yaal::hcore::HPointer<HTask> task_ptr_t;
-	typedef yaal::hcore::HCallInterface::ptr_t call_t;
-	typedef yaal::hcore::HList<call_t> queue_t;
+	class HWorker;
 	typedef yaal::hcore::HThreadT<HWorkFlow> work_flow_t;
-	typedef yaal::hcore::HMap<HTaskInterface*, task_ptr_t> pool_t;
-	typedef yaal::hcore::HList<HTaskInterface*> join_queue_t;
+	typedef yaal::hcore::HPointer<HWorker> worker_ptr_t;
+	typedef yaal::hcore::HList<worker_ptr_t> pool_t;
+	typedef yaal::hcore::HList<task_t> queue_t;
 	MODE::mode_t f_eMode;
 	bool f_bLoop;
+	int f_iWorkerPoolSize;
+	int f_iActiveWorkers;
+	/*! Tasks executors.
+	 */
+	pool_t f_oPool;
 	/*! Task queue.
 	 */
 	queue_t f_oQueue;
-	int f_iWorkerPoolSize;
-	int f_iActiveWorkers;
-	/*! Running tasks executors.
-	 */
-	pool_t f_oPool;
-	join_queue_t f_oJoinQueue;
 	yaal::hcore::HSemaphore f_oSemaphore;
 	yaal::hcore::HMutex f_oMutex;
 	work_flow_t f_oWorkFlow;
@@ -94,29 +91,28 @@ public:
 	HWorkFlow( MODE::mode_t const&, int = 1 );
 	virtual ~HWorkFlow( void );
 	void run( void );
-	void push_task( call_t );
+	void push_task( task_t );
 private:
-	virtual void do_task_finished( HTaskInterface* );
+	virtual task_t do_pop_task( void );
 	int operator()( yaal::hcore::HThread const* );
 	friend class yaal::hcore::HThreadT<HWorkFlow>;
 	};
 
-class HWorkFlow::HTask : public HTaskInterface
+class HWorkFlow::HWorker : public HWorkerInterface
 	{
 private:
-	typedef yaal::hcore::HThreadT<HWorkFlow::HTask> task_t;
+	typedef yaal::hcore::HThreadT<HWorkFlow::HWorker> worker_t;
 	HWorkFlowInterface* f_poWorkFlow;
-	call_t f_oCall;
-	task_t f_oTask;
+	worker_t f_oWorker;
 public:
-	HTask( HWorkFlowInterface*, call_t );
+	HWorker( HWorkFlowInterface* );
 	void spawn( void );
 	virtual void do_finish( void );
 private:
 	int operator()( yaal::hcore::HThread const* );
-	friend class yaal::hcore::HThreadT<HTask>;
-	HTask( HTask const& );
-	HTask& operator = ( HTask const& );
+	friend class yaal::hcore::HThreadT<HWorker>;
+	HWorker( HWorker const& );
+	HWorker& operator = ( HWorker const& );
 	};
 
 }
