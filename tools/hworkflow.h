@@ -38,15 +38,6 @@ namespace yaal
 namespace tools
 {
 
-class HWorkerInterface
-	{
-public:
-	virtual ~HWorkerInterface( void ){}
-	void finish( void );
-protected:
-	virtual void do_finish( void ) = 0;
-	};
-
 class HWorkFlowInterface
 	{
 public:
@@ -59,25 +50,14 @@ private:
 
 class HWorkFlow : public HWorkFlowInterface
 	{
-public:
-	struct MODE
-		{
-		typedef enum
-			{
-			D_FLAT,
-			D_PIPE
-			} mode_t;
-		};
 private:
 	class HWorker;
-	typedef yaal::hcore::HThreadT<HWorkFlow> work_flow_t;
 	typedef yaal::hcore::HPointer<HWorker> worker_ptr_t;
 	typedef yaal::hcore::HList<worker_ptr_t> pool_t;
 	typedef yaal::hcore::HList<task_t> queue_t;
-	MODE::mode_t f_eMode;
-	bool f_bLoop;
 	int f_iWorkerPoolSize;
 	int f_iActiveWorkers;
+	int f_iBusyWorkers;
 	/*! Tasks executors.
 	 */
 	pool_t f_oPool;
@@ -86,19 +66,15 @@ private:
 	queue_t f_oQueue;
 	yaal::hcore::HSemaphore f_oSemaphore;
 	yaal::hcore::HMutex f_oMutex;
-	work_flow_t f_oWorkFlow;
 public:
-	HWorkFlow( MODE::mode_t const&, int = 1 );
+	HWorkFlow( int = 1 );
 	virtual ~HWorkFlow( void );
-	void run( void );
 	void push_task( task_t );
 private:
 	virtual task_t do_pop_task( void );
-	int operator()( yaal::hcore::HThread const* );
-	friend class yaal::hcore::HThreadT<HWorkFlow>;
 	};
 
-class HWorkFlow::HWorker : public HWorkerInterface
+class HWorkFlow::HWorker
 	{
 private:
 	typedef yaal::hcore::HThreadT<HWorkFlow::HWorker> worker_t;
@@ -107,7 +83,7 @@ private:
 public:
 	HWorker( HWorkFlowInterface* );
 	void spawn( void );
-	virtual void do_finish( void );
+	void finish( void );
 private:
 	int operator()( yaal::hcore::HThread const* );
 	friend class yaal::hcore::HThreadT<HWorker>;

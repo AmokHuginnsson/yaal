@@ -43,16 +43,12 @@ HWorkFlowInterface::task_t HWorkFlowInterface::pop_task( void )
 	M_EPILOG
 	}
 
-HWorkFlow::HWorkFlow( MODE::mode_t const& a_eMode, int a_iWorkerPoolSize )
-	: f_eMode( a_eMode ), f_bLoop( a_eMode == MODE::D_PIPE ),
-	f_iWorkerPoolSize( a_iWorkerPoolSize ), f_iActiveWorkers( 0 ),
-	f_oPool(), f_oQueue(),
-	f_oSemaphore(), f_oMutex(), f_oWorkFlow( *this )
+HWorkFlow::HWorkFlow( int a_iWorkerPoolSize )
+	: f_iWorkerPoolSize( a_iWorkerPoolSize ), f_iActiveWorkers( 0 ),
+	f_iBusyWorkers( 0 ), f_oPool(), f_oQueue(), f_oSemaphore(), f_oMutex()
 	{
 	M_PROLOG
 	M_ASSERT( f_iWorkerPoolSize > 0 );
-	if ( f_eMode == MODE::D_PIPE )
-		f_oWorkFlow.spawn();
 	return;
 	M_EPILOG
 	}
@@ -60,51 +56,32 @@ HWorkFlow::HWorkFlow( MODE::mode_t const& a_eMode, int a_iWorkerPoolSize )
 HWorkFlow::~HWorkFlow( void )
 	{
 	M_PROLOG
-	if ( f_eMode == MODE::D_PIPE )
 		{
-		f_bLoop = false;
+		HLock l( f_oMutex );
+		f_iWorkerPoolSize = 0;
+		}
+	for ( pool_t::iterator it = f_oPool.begin(); it != f_oPool.end(); ++ it )
+		{
 		f_oSemaphore.signal();
-		f_oWorkFlow.finish();
+		(*it)->finish();
 		}
 	return;
 	M_EPILOG
-	}
-
-int HWorkFlow::operator()( yaal::hcore::HThread const* )
-	{
-	M_PROLOG
-	bool l_bLoop = false;
-		{
-		HLock l( f_oMutex );
-		l_bLoop = f_bLoop || ( ! f_bLoop && ( ! f_oQueue.is_empty() || f_iActiveWorkers ) );
-		}
-	while ( l_bLoop )
-		{
-		HLock l( f_oMutex );
-		if ( ! f_oQueue.is_empty() && ( f_iActiveWorkers < f_iWorkerPoolSize ) )
-			{
-			worker_ptr_t w( new HWorker( this ) );
-			f_oPool.push_back( w );
-			++ f_iActiveWorkers;
-			w->spawn();
-			}
-		l_bLoop = f_bLoop || ( ( f_eMode != MODE::D_PIPE ) && ( ! f_oQueue.is_empty() || f_iActiveWorkers ) );
-		}
-	for ( pool_t::iterator it = f_oPool.begin(); it != f_oPool.end(); ++ it )
-		(*it)->finish();
-	return ( 0 );
-	M_EPILOG
-	}
-
-void HWorkFlow::run( void )
-	{
-	operator()( NULL );
 	}
 
 void HWorkFlow::push_task( task_t a_oCall )
 	{
 	M_PROLOG
 	HLock l( f_oMutex );
+	M_ASSERT( f_iBusyWorkers <= f_iActiveWorkers );
+	if ( ( f_iBusyWorkers == f_iActiveWorkers ) && ( f_iActiveWorkers < f_iWorkerPoolSize ) )
+		{
+		worker_ptr_t w( new HWorker( this ) );
+		f_oPool.push_back( w );
+		++ f_iActiveWorkers;
+		++ f_iBusyWorkers;
+		w->spawn();
+		}
 	f_oQueue.push_back( a_oCall );
 	f_oSemaphore.signal();
 	return;
@@ -114,13 +91,21 @@ void HWorkFlow::push_task( task_t a_oCall )
 HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void )
 	{
 	M_PROLOG
+	bool running = true;
+		{
+		HLock l( f_oMutex );
+		-- f_iBusyWorkers;
+		running = f_iWorkerPoolSize ? true : false;
+		}
+	if ( running )
+		f_oSemaphore.wait();
 	HLock l( f_oMutex );
-	f_oSemaphore.wait();
 	HWorkFlow::task_t t;
 	if ( ! f_oQueue.is_empty() )
 		{
 		t = f_oQueue.front();
 		f_oQueue.pop_front();
+		++ f_iBusyWorkers;
 		}
 	return ( t );
 	M_EPILOG
@@ -140,15 +125,7 @@ void HWorkFlow::HWorker::spawn( void )
 	M_EPILOG
 	}
 
-void HWorkerInterface::finish( void )
-	{
-	M_PROLOG
-	do_finish();
-	return;
-	M_EPILOG
-	}
-
-void HWorkFlow::HWorker::do_finish( void )
+void HWorkFlow::HWorker::finish( void )
 	{
 	M_PROLOG
 	f_oWorker.finish();
@@ -160,7 +137,7 @@ int HWorkFlow::HWorker::operator()( yaal::hcore::HThread const* )
 	{
 	M_PROLOG
 	HWorkFlow::task_t t;
-	while ( !! ( t = f_poWorkFlow->pop_task() ) )	
+	while ( !! ( t = f_poWorkFlow->pop_task() ) )
 		t->invoke();
 	return ( 0 );
 	M_EPILOG

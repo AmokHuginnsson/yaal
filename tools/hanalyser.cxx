@@ -313,7 +313,7 @@ double HAnalyser::multiplication( tree_t::const_node_t a_roNode )
 			case ( OPERATOR::D_MODULO ) :
 				if ( ! static_cast<int long>( l_dRightValue ) )
 					throw HAnalyserException( "modulo by 0" );
-				l_dLeftValue = static_cast<int long>( l_dLeftValue ) % static_cast<int long>( l_dRightValue );
+				l_dLeftValue = static_cast<double>( static_cast<int long>( l_dLeftValue ) % static_cast<int long>( l_dRightValue ) );
 			break;
 			default:
 				M_THROW( _( "unknown multiplication operator" ), l_iOperator );
