@@ -129,7 +129,7 @@ else
 fi
 
 dnl What special compiler flags we can set?
-AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[63%]]])
+AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[53%]]])
 _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
 CPPFLAGS_ORIG=$CPPFLAGS;
@@ -161,6 +161,36 @@ if test ["$_FLAGS"] = [""] ; then
 	_FLAGS='unfortunetely none. ---         [[68%]]'
 fi
 AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
+
+
+dnl Checks for which function macros exist
+AC_MSG_CHECKING(whether $CC implements __PRETTY_FUNCTION__)
+AC_CACHE_VAL(yaal_cv_have_func,
+						 [AC_TRY_LINK([#include <stdio.h>],[printf("%s", __PRETTY_FUNCTION__);],
+						 yaal_cv_have_func=yes, yaal_cv_have_func=no)])
+AC_MSG_RESULT($yaal_cv_have_func)
+if test "$yaal_cv_have_func" = yes; then
+	AC_DEFINE(HAVE_PRETTY_FUNCTION,[],[Does the compiler understand __PRETTY_FUNCTION__])
+else
+	AC_MSG_CHECKING(whether $CC implements __FUNCTION__)
+	AC_CACHE_VAL(yaal_cv_have_pretty_function,
+							 [AC_TRY_LINK([#include <stdio.h>],[printf("%s", __FUNCTION__);],
+							 yaal_cv_have_pretty_function=yes, yaal_cv_have_pretty_function=no)])
+	AC_MSG_RESULT($yaal_cv_have_pretty_function)
+	if test "$yaal_cv_have_pretty_function" = yes; then
+		AC_DEFINE(HAVE_FUNCTION,[],[Does compiler understand __FUNCTION__])
+	else
+		AC_MSG_CHECKING(whether $CC implements __func__)
+		AC_CACHE_VAL(yaal_cv_have_function,
+								 [AC_TRY_LINK([#include <stdio.h>],[printf("%s", __func__);],
+								 yaal_cv_have_function=yes, yaal_cv_have_function=no)])
+		AC_MSG_RESULT($yaal_cv_have_function)
+		if test "$yaal_cv_have_function" = yes; then
+			AC_DEFINE(HAVE_FUNC,[],[Does compiler understand __func__])
+		fi
+	fi
+fi
+
 
 AC_MSG_RESULT([--- Additional checks ... ---                           [[67%]]])
 AC_SUBST([SERIAL_DEVICE],['null'])

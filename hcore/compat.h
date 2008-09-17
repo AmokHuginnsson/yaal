@@ -33,8 +33,12 @@ Copyright:
 #include "config.h"
 #endif /* __YAAL_BUILD__ */
 
-#if ! defined( __PRETTY_FUNCTION__ )
+#if ! defined( HAVE_PRETTY_FUNCTION )
+#if ! defined( HAVE_FUNCTION )
+#if ! defined( HAVE_FUNC )
 #define __PRETTY_FUNCTION__ ""
+#endif
+#endif
 #endif
 
 #if defined( __HOST_OS_TYPE_SOLARIS__ )
