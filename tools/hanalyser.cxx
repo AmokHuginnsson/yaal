@@ -669,7 +669,7 @@ double* HAnalyser::analyse( HString const& a_oFormula )
 	else if ( f_iIndex >= f_iLength )
 		f_eError = E_UNEXPECTED_TERMINATION;
 	if ( f_eError != E_OK )
-		return ( NULL );
+		throw HAnalyserException( "syntax error" );
 	return ( f_pdVariables );
 	M_EPILOG
 	}
