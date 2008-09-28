@@ -217,7 +217,7 @@ void usun_ogonki ( char * a_pcString )
 double long atof_ex( HString const& a_oString, bool a_bParse )
 	{
 	M_PROLOG
-	static HAnalyser l_oAnalyser;
+	HAnalyser l_oAnalyser;
 	HString l_oStr = a_oString;
 	l_oStr.replace ( ",", "." );
 	l_oStr.replace ( " ", "" );

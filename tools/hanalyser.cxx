@@ -116,6 +116,7 @@ int const FUNCTION::D_SIGNUM = 4;
 int const FUNCTION::D_BRACKET = 5;
 	
 
+char const* const n_pcSyntaxError = _( "syntax error" );
 char n_ppcFunctionsMnemonics [ ] [ 8 ] = 
 	{
 	"sinh\0\0\0", "sin\0\0\0\0", "cosh\0\0\0", "cos\0\0\0\0",
@@ -190,7 +191,7 @@ double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 			{
 			if ( eq( ::std::floor( l_dLeftValue / D_PI + .5 ),
 						( l_dLeftValue / D_PI + .5 ) ) )
-				throw HAnalyserException( "tg: argument not in domain" );
+				throw HAnalyserException( _( "tg: argument not in domain" ) );
 			return ( ::std::tan( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_TGH ):
@@ -199,7 +200,7 @@ double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 			{
 			if ( eq( ::std::floor( l_dLeftValue / D_PI ),
 						( l_dLeftValue / D_PI ) ) )
-				throw HAnalyserException( "ctg: argument not in domain" );
+				throw HAnalyserException( _( "ctg: argument not in domain" ) );
 			l_dLeftValue = ::std::tan( l_dLeftValue );
 			if ( l_dLeftValue == 0 )
 				return ( 0 );
@@ -215,13 +216,13 @@ double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 		case ( FUNCTION::D_ARCSIN ):
 			{
 			if ( ( l_dLeftValue < - D_PI / 2 ) || ( l_dLeftValue > D_PI / 2 ) )
-				throw HAnalyserException( "arcsin: argument not in domain" );
+				throw HAnalyserException( _( "arcsin: argument not in domain" ) );
 			return ( ::std::asin( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ARCCOS ):
 			{
 			if ( ( l_dLeftValue < - D_PI / 2 ) || ( l_dLeftValue > D_PI / 2 ) )
-				throw HAnalyserException( "arccos: argument not in domain" );
+				throw HAnalyserException( _( "arccos: argument not in domain" ) );
 			return ( ::std::acos( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ARCTG ):
@@ -233,19 +234,19 @@ double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 		case ( FUNCTION::D_SQRT ):
 			{
 			if ( l_dLeftValue < 0 )
-				throw HAnalyserException( "sqrt: argument not in domain" );
+				throw HAnalyserException( _( "sqrt: argument not in domain" ) );
 			return ( ::std::sqrt( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_LN ):
 			{
 			if ( l_dLeftValue <= 0 )
-				throw HAnalyserException( "ln: argument not in domain" );
+				throw HAnalyserException( _( "ln: argument not in domain" ) );
 			return ( ::std::log( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_LOG ):
 			{
 			if ( l_dLeftValue <= 0 )
-				throw HAnalyserException( "log: argument not in domain" );
+				throw HAnalyserException( _( "log: argument not in domain" ) );
 			return ( ::std::log10( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ABS ):
@@ -309,12 +310,12 @@ double long HAnalyser::multiplication( tree_t::const_node_t a_roNode )
 			break;
 			case ( OPERATOR::D_DIVIDE ) :
 				if ( ! l_dRightValue )
-					throw HAnalyserException( "divide by 0" );
+					throw HAnalyserException( _( "divide by 0" ) );
 				l_dLeftValue /= l_dRightValue;
 			break;
 			case ( OPERATOR::D_MODULO ) :
 				if ( ! static_cast<int long>( l_dRightValue ) )
-					throw HAnalyserException( "modulo by 0" );
+					throw HAnalyserException( _( "modulo by 0" ) );
 				l_dLeftValue = static_cast<double long>( static_cast<int long>( l_dLeftValue ) % static_cast<int long>( l_dRightValue ) );
 			break;
 			default:
@@ -657,10 +658,10 @@ double long* HAnalyser::analyse( HString const& a_oFormula )
 	if ( l_iLength == 0 )
 		{
 		f_eError = E_PREMATURE_TERMINATION;
-		return ( NULL );
+		throw HAnalyserException( n_pcSyntaxError );
 		}
 	if ( translate( a_oFormula ) )
-		return ( NULL );
+		throw HAnalyserException( n_pcSyntaxError );
 	f_oConstantsPool.reset();
 	tree_t::node_t root = f_oEquationTree.create_new_root();
 	if ( ! addition_production( root ) )
@@ -671,7 +672,7 @@ double long* HAnalyser::analyse( HString const& a_oFormula )
 	else if ( f_iIndex >= f_iLength )
 		f_eError = E_UNEXPECTED_TERMINATION;
 	if ( f_eError != E_OK )
-		throw HAnalyserException( "syntax error" );
+		throw HAnalyserException( n_pcSyntaxError );
 	return ( f_pdVariables );
 	M_EPILOG
 	}

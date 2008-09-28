@@ -84,25 +84,33 @@ int lexical_cast( char* const& val )
 template<>
 double long lexical_cast( HString const& val )
 	{
+	M_PROLOG
 	return ( extendable::my_strtold( val ) );
+	M_EPILOG
 	}
 
 template<>
 double long lexical_cast( char const* const& val )
 	{
+	M_PROLOG
 	return ( lexical_cast<double long, HString>( val ) );
+	M_EPILOG
 	}
 
 template<>
 double lexical_cast( HString const& val )
 	{
+	M_PROLOG
 	return ( static_cast<double>( lexical_cast<double long>( val ) ) );
+	M_EPILOG
 	}
 
 template<>
 double lexical_cast( char const* const& val )
 	{
+	M_PROLOG
 	return ( lexical_cast<double, HString>( val ) );
+	M_EPILOG
 	}
 
 template<>
@@ -136,13 +144,17 @@ bool lexical_cast( char const* const& a_pcValue )
 template<>
 bool lexical_cast( char* const& a_pcValue )
 	{
+	M_PROLOG
 	return ( lexical_cast<bool,char const*>( a_pcValue ) );
+	M_EPILOG
 	}
 
 template<>
 bool lexical_cast( HString const& a_oValue )
 	{
+	M_PROLOG
 	return ( lexical_cast<bool>( a_oValue.raw() ) );
+	M_EPILOG
 	}
 
 char const* error_message( int a_iCode )

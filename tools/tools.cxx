@@ -49,7 +49,9 @@ namespace
 
 double long smart_strtold( HString const& str )
 	{
+	M_PROLOG
 	return ( tools::util::atof_ex( str, true ) );
+	M_EPILOG
 	}
 
 }
