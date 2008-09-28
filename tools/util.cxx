@@ -538,7 +538,13 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 					::printf( "%s %d\n", o.f_pcName, *static_cast<int*>( o.f_pvValue ) );
 				break;
 				case ( D_INT_LONG ):
-					::printf( "%s %ld", o.f_pcName, *static_cast<int long*>( o.f_pvValue ) );
+					::printf( "%s %ld\n", o.f_pcName, *static_cast<int long*>( o.f_pvValue ) );
+				break;
+				case ( D_DOUBLE_LONG ):
+					::printf( "%s %Lf\n", o.f_pcName, *static_cast<double long*>( o.f_pvValue ) );
+				break;
+				case ( D_DOUBLE ):
+					::printf( "%s %f\n", o.f_pcName, *static_cast<double*>( o.f_pvValue ) );
 				break;
 				default:
 					;
