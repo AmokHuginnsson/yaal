@@ -229,14 +229,14 @@ int process_rc_file_internal( HString const& a_oRcName,
 	for ( l_iCtrOut = 0; l_iCtrOut < ( sizeof ( l_psPlacementTab ) / sizeof ( OPlacement ) ); l_iCtrOut ++ )
 		{
 		if ( ( l_eSuccessStory & RC_PATHER::D_GLOBAL )
-				&& ( l_psPlacementTab [ l_iCtrOut ].f_ePlacementBit == RC_PATHER::D_GLOBAL ) )
+				&& ( l_psPlacementTab[ l_iCtrOut ].f_ePlacementBit == RC_PATHER::D_GLOBAL ) )
 			continue;
 		if ( l_eSuccessStory & RC_PATHER::D_LOCAL )
 			break;
 		if ( ! rc_open( a_oRcName, l_psPlacementTab [ l_iCtrOut ].f_ePlacement, l_oRc ) )
 			{
 			l_eSuccessStory |= l_psPlacementTab [ l_iCtrOut ].f_ePlacementBit;
-			while ( read_rc_line ( l_oOption, l_oValue, l_oRc, l_iLine ) )
+			while ( read_rc_line( l_oOption, l_oValue, l_oRc, l_iLine ) )
 				{
 				if ( ! a_oSection.is_empty() )
 					{
@@ -270,7 +270,7 @@ int process_rc_file_internal( HString const& a_oRcName,
 						l_bOptionOK = true, set_option( a_psOptions[ l_iCtr ], l_oValue );
 					l_iCtr ++;
 					}
-				if ( rc_callback && rc_callback ( l_oOption, l_oValue )
+				if ( rc_callback && rc_callback( l_oOption, l_oValue )
 						&& ! l_bOptionOK )
 					{
 					log << "failed." << endl;
@@ -406,7 +406,7 @@ void rc_set_variable( char const* const a_pcValue, bool& a_rbVariable )
 	return;
 	}
 
-void rc_set_variable( char const * const a_pcValue, char ** a_ppcVariable )
+void rc_set_variable( char const * const a_pcValue, char** a_ppcVariable )
 	{
 	if ( *a_ppcVariable )
 		xfree( *a_ppcVariable );
@@ -420,7 +420,17 @@ void rc_set_variable( char const* const a_pcValue, int& a_riVariable )
 	a_riVariable = lexical_cast<int>( a_pcValue );
 	}
 
-void rc_set_variable( char const* const a_pcValue, char & a_rcVariable )
+void rc_set_variable( char const* const a_pcValue, double long& a_rdVariable )
+	{
+	a_rdVariable = lexical_cast<double long>( a_pcValue );
+	}
+
+void rc_set_variable( char const* const a_pcValue, double& a_rdVariable )
+	{
+	a_rdVariable = lexical_cast<double>( a_pcValue );
+	}
+
+void rc_set_variable( char const* const a_pcValue, char& a_rcVariable )
 	{
 	a_rcVariable = a_pcValue[ 0 ];
 	}

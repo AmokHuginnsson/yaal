@@ -214,7 +214,7 @@ void usun_ogonki ( char * a_pcString )
 	M_EPILOG
 	}
 
-double atof_ex( HString const& a_oString, bool a_bParse )
+double long atof_ex( HString const& a_oString, bool a_bParse )
 	{
 	M_PROLOG
 	static HAnalyser l_oAnalyser;
@@ -224,7 +224,7 @@ double atof_ex( HString const& a_oString, bool a_bParse )
 	l_oStr.replace ( "\t", "" );
 	if ( a_bParse && l_oAnalyser.analyse( l_oStr ) )
 		return ( l_oAnalyser.count() );
-	return ( lexical_cast<double>( l_oStr ) );
+	return ( lexical_cast<double long>( l_oStr ) );
 	M_EPILOG
 	}
 

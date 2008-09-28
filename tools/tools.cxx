@@ -37,11 +37,30 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/rc_file.h"    /* read conf from rc */
 #include "hcore/hlog.h"       /* log object */
 #include "hcore/hstring.h"    /* HString class */
+#include "util.h" /* atof_ex */
 
 using namespace yaal::hcore;
 
 namespace yaal
 {
+
+namespace
+{
+
+double long smart_strtold( HString const& str )
+	{
+	return ( tools::util::atof_ex( str, true ) );
+	}
+
+}
+
+namespace extendable
+{
+
+typedef double long ( *my_strtold_t )( HString const& );
+extern my_strtold_t my_strtold;
+
+}
 
 namespace tools
 {
@@ -156,6 +175,7 @@ HToolsInitDeinit::HToolsInitDeinit( void )
 	M_PROLOG
 	int l_iCtr = 0;
 	errno = 0;
+	extendable::my_strtold = smart_strtold;
 	rc_file::process_rc_file ( "yaal", "tools", tools::n_psVariables,
 			set_tools_variables );
 	for ( l_iCtr = 0; l_iCtr < 256; l_iCtr ++ )

@@ -58,8 +58,8 @@ OOption n_psHCoreVariables[] =
 	};
 
 /* mathematical macros */
-static double const D_EPSILON = 0.000001;
-bool eq ( double const & a_dLeft, double const & a_dRight )
+static double long const D_EPSILON = 0.000001;
+bool eq( double long const& a_dLeft, double long const& a_dRight )
 	{
 	return ( ( ( ( ( a_dLeft ) > ( a_dRight ) )
 					? ( ( a_dLeft ) - ( a_dRight ) )

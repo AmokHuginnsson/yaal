@@ -59,10 +59,12 @@ int process_rc_file( HString const& a_oConfigName,
 			( sizeof ( tType ) / sizeof ( OOption ) ) - 1, CALLBACK ) );
 	}
 
-void rc_set_variable ( char const * const, bool & );
-void rc_set_variable ( char const * const, char & );
-void rc_set_variable ( char const * const, char ** );
-void rc_set_variable ( char const * const, int & );
+void rc_set_variable ( char const* const, bool& );
+void rc_set_variable ( char const* const, char& );
+void rc_set_variable ( char const* const, char** );
+void rc_set_variable ( char const* const, int& );
+void rc_set_variable ( char const* const, double& );
+void rc_set_variable ( char const* const, double long& );
 
 }
 

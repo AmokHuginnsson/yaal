@@ -43,7 +43,7 @@ namespace util
 
 yaal::hcore::HString kwota_slownie( double );
 void usun_ogonki( char* );
-double atof_ex( yaal::hcore::HString const&, bool = false );
+double long atof_ex( yaal::hcore::HString const&, bool = false );
 bool verify_IBAN( yaal::hcore::HString const& );
 char const* get_last_error( void );
 

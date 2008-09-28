@@ -49,23 +49,31 @@ void set_option( OOption const& a_sOption, HString const& a_oValue )
 		{
 		case ( D_BOOL ):
 			rc_set_variable( ! a_oValue.is_empty() ? a_oValue.raw() : "true",
-					*static_cast<bool *>( a_sOption.f_pvValue ) );
+					*static_cast<bool*>( a_sOption.f_pvValue ) );
 		break;
 		case ( D_CHAR ):
 			if ( ! a_oValue.is_empty() )
 				rc_set_variable( a_oValue.raw(),
-						*static_cast<char *>( a_sOption.f_pvValue ) );
+						*static_cast<char*>( a_sOption.f_pvValue ) );
 		break;
 		case ( D_INT ):
 			rc_set_variable( a_oValue.raw(),
-					*static_cast<int *>( a_sOption.f_pvValue ) );
+					*static_cast<int*>( a_sOption.f_pvValue ) );
 		break;
 		case ( D_CHAR_PTR ):
 			rc_set_variable( a_oValue.raw(),
-					static_cast<char **>( a_sOption.f_pvValue ) );
+					static_cast<char**>( a_sOption.f_pvValue ) );
 		break;
 		case ( D_HSTRING ):
 			( *static_cast<HString*>( a_sOption.f_pvValue ) ) = a_oValue;
+		break;
+		case (  D_DOUBLE_LONG ):
+			rc_set_variable( a_oValue.raw(),
+					*static_cast<double long*>( a_sOption.f_pvValue ) );
+		break;
+		case (  D_DOUBLE ):
+			rc_set_variable( a_oValue.raw(),
+					*static_cast<double*>( a_sOption.f_pvValue ) );
 		break;
 		case ( D_VOID ):
 			break;

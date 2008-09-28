@@ -129,8 +129,10 @@ int n_piFunctionMnemonicsLength [ 16 ] =
 	4, 3, 4, 3, 3, 2, 4, 3, 6, 6, 5, 6, 3, 4, 2, 3
 	};
 
+static double long D_PI = 3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196;
+
 HAnalyser::HAnalyser( void ) : f_iIndex( 0 ), f_iLength( 0 ),
-			f_eError( E_OK ), f_oConstantsPool ( 0, HPool<double>::D_AUTO_GROW ),
+			f_eError( E_OK ), f_oConstantsPool ( 0, HPool<double long>::D_AUTO_GROW ),
 			f_oTerminalIndexes( 0, HPool<int>::D_AUTO_GROW ), f_oFormula(),
 			f_oEquationTree()
 	{
@@ -149,11 +151,11 @@ HAnalyser::~HAnalyser( void )
 	M_EPILOG
 	}
 
-double HAnalyser::count_branch( tree_t::const_node_t a_roNode )
+double long HAnalyser::count_branch( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	int l_iIndex = 0;
-	double l_dValue = 0;
+	double long l_dValue = 0;
 	if ( a_roNode->has_childs() )
 		l_dValue = ( this->*( (*a_roNode)->METHOD ) )( a_roNode );
 	else
@@ -168,11 +170,11 @@ double HAnalyser::count_branch( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double HAnalyser::functions( tree_t::const_node_t a_roNode )
+double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	int l_iFunction = (*a_roNode)->f_oVariables.tail();
-	double l_dLeftValue = 0;
+	double long l_dLeftValue = 0;
 	l_dLeftValue = count_branch( &*a_roNode->begin() );
 	switch ( l_iFunction )
 		{
@@ -186,8 +188,8 @@ double HAnalyser::functions( tree_t::const_node_t a_roNode )
 			return ( ::std::cosh( l_dLeftValue ) );
 		case ( FUNCTION::D_TG	):
 			{
-			if ( eq( ::std::floor( l_dLeftValue / M_PI + .5 ),
-						( l_dLeftValue / M_PI + .5 ) ) )
+			if ( eq( ::std::floor( l_dLeftValue / D_PI + .5 ),
+						( l_dLeftValue / D_PI + .5 ) ) )
 				throw HAnalyserException( "tg: argument not in domain" );
 			return ( ::std::tan( l_dLeftValue ) );
 			}
@@ -195,8 +197,8 @@ double HAnalyser::functions( tree_t::const_node_t a_roNode )
 			return ( ::std::tanh( l_dLeftValue ) );
 		case ( FUNCTION::D_CTG ):
 			{
-			if ( eq( ::std::floor( l_dLeftValue / M_PI ),
-						( l_dLeftValue / M_PI ) ) )
+			if ( eq( ::std::floor( l_dLeftValue / D_PI ),
+						( l_dLeftValue / D_PI ) ) )
 				throw HAnalyserException( "ctg: argument not in domain" );
 			l_dLeftValue = ::std::tan( l_dLeftValue );
 			if ( l_dLeftValue == 0 )
@@ -212,20 +214,20 @@ double HAnalyser::functions( tree_t::const_node_t a_roNode )
 			}
 		case ( FUNCTION::D_ARCSIN ):
 			{
-			if ( ( l_dLeftValue < - M_PI / 2 ) || ( l_dLeftValue > M_PI / 2 ) )
+			if ( ( l_dLeftValue < - D_PI / 2 ) || ( l_dLeftValue > D_PI / 2 ) )
 				throw HAnalyserException( "arcsin: argument not in domain" );
 			return ( ::std::asin( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ARCCOS ):
 			{
-			if ( ( l_dLeftValue < - M_PI / 2 ) || ( l_dLeftValue > M_PI / 2 ) )
+			if ( ( l_dLeftValue < - D_PI / 2 ) || ( l_dLeftValue > D_PI / 2 ) )
 				throw HAnalyserException( "arccos: argument not in domain" );
 			return ( ::std::acos( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ARCTG ):
 			return ( ::std::atan( l_dLeftValue ) );
 		case ( FUNCTION::D_ARCCTG ):
-			return ( M_PI - std::atan( l_dLeftValue ) );
+			return ( D_PI - std::atan( l_dLeftValue ) );
 		case ( FUNCTION::D_EXP ):
 			return ( ::std::exp( l_dLeftValue ) );
 		case ( FUNCTION::D_SQRT ):
@@ -258,11 +260,11 @@ double HAnalyser::functions( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double HAnalyser::addition( tree_t::const_node_t a_roNode )
+double long HAnalyser::addition( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	int l_iOperator = 0;
-	double l_dLeftValue = 0, l_dRightValue = 0;
+	double long l_dLeftValue = 0, l_dRightValue = 0;
 	tree_t::const_iterator it = a_roNode->begin();
 	int_list_t::const_iterator var = (*a_roNode)->f_oVariables.begin();
 	l_dLeftValue = count_branch( &*it );
@@ -287,11 +289,11 @@ double HAnalyser::addition( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double HAnalyser::multiplication( tree_t::const_node_t a_roNode )
+double long HAnalyser::multiplication( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	int l_iOperator = 0;
-	double l_dLeftValue = 0, l_dRightValue = 0;
+	double long l_dLeftValue = 0, l_dRightValue = 0;
 	tree_t::const_iterator it = a_roNode->begin();
 	int_list_t::const_iterator var = (*a_roNode)->f_oVariables.begin();
 	l_dLeftValue = count_branch( &*it );
@@ -313,7 +315,7 @@ double HAnalyser::multiplication( tree_t::const_node_t a_roNode )
 			case ( OPERATOR::D_MODULO ) :
 				if ( ! static_cast<int long>( l_dRightValue ) )
 					throw HAnalyserException( "modulo by 0" );
-				l_dLeftValue = static_cast<double>( static_cast<int long>( l_dLeftValue ) % static_cast<int long>( l_dRightValue ) );
+				l_dLeftValue = static_cast<double long>( static_cast<int long>( l_dLeftValue ) % static_cast<int long>( l_dRightValue ) );
 			break;
 			default:
 				M_THROW( _( "unknown multiplication operator" ), l_iOperator );
@@ -323,33 +325,33 @@ double HAnalyser::multiplication( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double HAnalyser::power( tree_t::const_node_t a_roNode )
+double long HAnalyser::power( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
-	double l_dLeftValue, l_dRightValue;
+	double long l_dLeftValue, l_dRightValue;
 	tree_t::const_iterator it = a_roNode->begin();
 	l_dLeftValue = count_branch ( &*it );
 	l_dRightValue = count_branch ( &*( ++ it ) );
 	if ( ( l_dLeftValue < 0 )
-			&& ( ! eq ( l_dRightValue, floor( l_dRightValue ) ) ) )
+			&& ( ! eq( l_dRightValue, ::floorl( l_dRightValue ) ) ) )
 		return ( 0 );
-	return ( pow( l_dLeftValue, l_dRightValue ) );
+	return ( powl( l_dLeftValue, l_dRightValue ) );
 	M_EPILOG
 	}
 
-double HAnalyser::signum( tree_t::const_node_t a_roNode )
+double long HAnalyser::signum( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
-	double l_dLeftValue;
+	double long l_dLeftValue;
 	l_dLeftValue = count_branch( &*a_roNode->begin() );
 	return ( -l_dLeftValue );
 	M_EPILOG
 	}
 
-double HAnalyser::bracket( tree_t::const_node_t a_roNode )
+double long HAnalyser::bracket( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
-	double l_dLeftValue;
+	double long l_dLeftValue;
 	l_dLeftValue = count_branch( &*a_roNode->begin() );
 	return ( l_dLeftValue );
 	M_EPILOG
@@ -605,7 +607,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 	if ( ( f_oFormula [ f_iIndex ] >= '0' )
 			&& ( f_oFormula [ f_iIndex ] <= '9' ) )
 		{
-		double l_dValue = 0;
+		double long l_dValue = 0;
 		int l_iOffset = f_iIndex;
 		if ( f_iIndex > f_iLength )
 			{
@@ -645,7 +647,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 	M_EPILOG
 	}
 
-double* HAnalyser::analyse( HString const& a_oFormula )
+double long* HAnalyser::analyse( HString const& a_oFormula )
 	{
 	M_PROLOG
 	int long l_iLength = 0;
@@ -674,12 +676,12 @@ double* HAnalyser::analyse( HString const& a_oFormula )
 	M_EPILOG
 	}
 
-double& HAnalyser::operator[]( int a_iIndex )
+double long& HAnalyser::operator[]( int a_iIndex )
 	{
 	M_PROLOG
 	if ( ( a_iIndex >= 'a' ) && ( a_iIndex <= 'a' ) )
 		a_iIndex = ( a_iIndex - 'a' ) + 'A';
-	double* val = NULL;
+	double long* val = NULL;
 	if ( ( a_iIndex >= 0 ) && ( a_iIndex < 26 ) )
 		val = &f_pdVariables[ a_iIndex ];
 	else if ( ( a_iIndex >= 'A' ) && ( a_iIndex <= 'Z' ) )
@@ -690,7 +692,7 @@ double& HAnalyser::operator[]( int a_iIndex )
 	M_EPILOG
 	}
 
-double HAnalyser::count( void )
+double long HAnalyser::count( void )
 	{
 	M_PROLOG
 	tree_t::const_node_t root = f_oEquationTree.get_root();

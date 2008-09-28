@@ -38,7 +38,7 @@ namespace yaal
 namespace hcore
 	{
 
-bool eq( double const&, double const& );
+bool eq( double long const&, double long const& );
 void set_env( HString );
 void yaal_hcore_banner( void );
 

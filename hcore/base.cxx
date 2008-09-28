@@ -36,6 +36,24 @@ using namespace yaal::hcore;
 namespace yaal
 {
 
+namespace
+{
+
+double long dumb_strtold( HString const& str )
+	{
+	return ( ::strtold( str.raw(), NULL ) );
+	}
+
+}
+
+namespace extendable
+{
+
+typedef double long ( *my_strtold_t )( HString const& );
+my_strtold_t my_strtold = dumb_strtold;
+
+}
+
 template<>
 int long lexical_cast( HString const& val )
 	{
@@ -66,7 +84,7 @@ int lexical_cast( char* const& val )
 template<>
 double long lexical_cast( HString const& val )
 	{
-	return ( ::strtold( val.raw(), NULL ) );
+	return ( extendable::my_strtold( val ) );
 	}
 
 template<>
