@@ -52,7 +52,7 @@ char* strcasestr( char const* haystack, char const* needle )
 	}
 #endif /* not HAVE_STRCASESTR */
 
-#if ! defined( HAVE_GNU_GETHOSTBYNAME_R ) || ( HAVE_GNU_GETHOSTBYNAME_R == 0 )
+#if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
 int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, size_t a3, struct hostent**, int* a5 )
 	{
 	hostent* h = ::gethostbyname_r( a0, a1, a2, a3, a5 );
@@ -60,7 +60,7 @@ int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, size_t a3, st
 	}
 #endif /* not HAVE_GNU_GETHOSTBYNAME_R */
 
-#if ! defined( HAVE_GNU_GETHOSTBYADDR_R ) || ( HAVE_GNU_GETHOSTBYADDR_R == 0 )
+#if ! defined( HAVE_GNU_GETHOSTBYADDR_R )
 int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a4, size_t a5, struct hostent**, int* a7 )
 	{
 	hostent* h = ::gethostbyaddr_r( static_cast<char const*>( a0 ), a1, a2, a3, a4, a5, a7 );
