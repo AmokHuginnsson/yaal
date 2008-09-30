@@ -336,7 +336,7 @@ double long HAnalyser::power( tree_t::const_node_t a_roNode )
 	if ( ( l_dLeftValue < 0 )
 			&& ( ! eq( l_dRightValue, ::floorl( l_dRightValue ) ) ) )
 		return ( 0 );
-	return ( ::std::powl( l_dLeftValue, l_dRightValue ) );
+	return ( ::powl( l_dLeftValue, l_dRightValue ) );
 	M_EPILOG
 	}
 

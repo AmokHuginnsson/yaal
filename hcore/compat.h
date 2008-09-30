@@ -69,9 +69,9 @@ int gethostbyname_r( char const*, struct hostent*, char*, size_t, struct hostent
 int gethostbyaddr_r( void const*, int, int, struct hostent*, char*, size_t, struct hostent**, int* );
 #endif /* not HAVE_GNU_GETHOSTBYADDR_R */
 
-#if ! defined( HAVE_STD_POWL ) || ( HAVE_STD_POWL == 0 )
-namespace std { double long powl( double long, double long ); }
-#endif /* not HAVE_STD_POWL */
+#if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 )
+double long powl( double long, double long );
+#endif /* not HAVE_POWL */
 
 #endif /* not __YAAL_HCORE_COMPAT_H */
 

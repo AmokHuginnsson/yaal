@@ -69,15 +69,10 @@ int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a
 	}
 #endif /* not HAVE_GNU_GETHOSTBYADDR_R */
 
-#if ! defined( HAVE_STD_POWL ) || ( HAVE_STD_POWL == 0 )
-namespace std
-{
-
+#if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 )
 double long powl( double long a, double long b )
 	{
 	return ( ::std::pow( a, b ) );
 	}
-
-}
-#endif /* not HAVE_STD_POWL */
+#endif /* not HAVE_POWL */
 

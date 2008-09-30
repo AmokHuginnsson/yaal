@@ -407,8 +407,8 @@ AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
 AC_CHECK_DECLS([SUN_LEN],[],[],[#include <sys/un.h>])
 AC_COMPILE_IFELSE([#include<cmath>
-									 void f(){ ::std::powl( 0., 0. ); }],
-	[AC_DEFINE([HAVE_STD_POWL],,[We have powl in std namespace.])])
+									 void f(){ ::powl( 0., 0. ); }],
+	[AC_DEFINE([HAVE_POWL],[1],[We have ::powl().])])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 
