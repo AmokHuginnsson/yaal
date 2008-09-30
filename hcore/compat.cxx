@@ -26,6 +26,7 @@ Copyright:
 
 #include <errno.h>
 #include <netdb.h>
+#include <cmath>
 #include <cstring>
 
 #include "compat.h"
@@ -67,4 +68,16 @@ int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a
 	return ( h ? 0 : errno );
 	}
 #endif /* not HAVE_GNU_GETHOSTBYADDR_R */
+
+#if ! defined( HAVE_STD_POWL ) || ( HAVE_STD_POWL == 0 )
+namespace std
+{
+
+double long powl( double long a, double long b )
+	{
+	return ( ::std::pow( a, b ) );
+	}
+
+}
+#endif /* not HAVE_STD_POWL */
 

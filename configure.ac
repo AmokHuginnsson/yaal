@@ -136,17 +136,17 @@ CPPFLAGS_ORIG=$CPPFLAGS;
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])
 RESULT=["no"]
-AC_TRY_COMPILE([],[],[AC_SUBST([EXTRA_WARNINGS],[-Wextra])] [RESULT=["yes"]],
+AC_COMPILE_IFELSE([ ],[AC_SUBST([EXTRA_WARNINGS],[-Wextra])] [RESULT=["yes"]],
 							[AC_SUBST([EXTRA_WARNINGS],[-W])])
 AC_MSG_RESULT([$RESULT])
 CXXFLAGS=["-Wshadow -Werror"]
-AC_TRY_COMPILE([#include <pthread.h>],[],
+AC_COMPILE_IFELSE([#include <pthread.h>],
 							[AC_SUBST([WARN_SHADOW],[-Wshadow])
 							_FLAGS=["-Wshadow"]],
 							[AC_MSG_WARN([[Cannot use -Wshadow!]])])
 CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["-pedantic-errors"]
-AC_TRY_COMPILE([#include <stdlib.h>],[],
+AC_COMPILE_IFELSE([#include <stdlib.h>],
 							[AC_SUBST([PEDANTIC_ERRORS],	[-pedantic-errors])
 							_FLAGS=["$_FLAGS -pedantic-errors"]],
 							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
@@ -310,7 +310,7 @@ int main( int, char const* const* const )
 	int i = 0;
 	char* p = NULL;
 	struct hostent h, * ph = NULL;
-	::gethostbyaddr_r( NULL, 0, AF_INET, &h, p, 0, &ph, &i );
+	::gethostbyaddr_r( NULL, 0, 0, &h, p, 0, &ph, &i );
 	return ( 0 );
 	}], [AC_DEFINE([HAVE_GNU_GETHOSTBYADDR_R],[],[Is gethostbyaddr_r a GNU flavour?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
@@ -406,6 +406,9 @@ AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASE_NAME_IN_LIBGEN],[],[Does your 
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
 AC_CHECK_DECLS([SUN_LEN],[],[],[#include <sys/un.h>])
+AC_COMPILE_IFELSE([#include<cmath>
+									 void f(){ ::std::powl( 0., 0. ); }],
+	[AC_DEFINE([HAVE_STD_POWL],,[We have powl in std namespace.])])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 
@@ -414,13 +417,14 @@ AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
 AC_MSG_CHECKING([if your ncurses-devel is seriously brain-damaged])
 CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["$EXTRA_WARNINGS -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
-AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
-[printw("x");],[AC_MSG_RESULT([[no :)]])],
+AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
+									 void f(){ printw("x");}],
+	[AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_ERROR([Cannot continue with seriously brain-damaged ncurses.])])
 AC_MSG_CHECKING([if your ncurses is damaged about char-subscripts in ncurses (acs_map)])
-AC_TRY_COMPILE([#include <$_NCURSES_HEADER>],
-	[addch(ACS_DARROW);],
+AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
+									 void f(){ addch(ACS_DARROW); }],
 	[AC_DEFINE([HAVE_ASCII_GRAPHICS],[],[Does your ncurses installation support ASCII graphic chars?]) AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_WARN([You will not have pretty ascii graphics.])])
