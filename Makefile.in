@@ -65,11 +65,11 @@ SRCS := $(filter-out %_driver.$(SS),$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.$(OS),$(OBJS_dbwrapper))
 $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT))))
 
-LIBS_hcore			=	"-lrt -lpthread -lssl @GETTEXT_LIB@"
+LIBS_hcore			=	"-lrt -lpthread -lssl @HCORE_LIBS@"
 DEPS_tools			= $(TARGET_hcore)
-LIBS_tools			= "-rdynamic -lxml2 -lxslt -lhcore @DLOPEN_IN@"
+LIBS_tools			= "-rdynamic -lxml2 -lxslt @TOOLS_LIBS@ -lhcore"
 DEPS_hconsole		= $(TARGET_hcore) $(TARGET_tools)
-LIBS_hconsole		= "-lncurses @MOUSE_LIB@ -lhcore -ltools"
+LIBS_hconsole		= "-lncurses @HCONSOLE_LIBS@ -lhcore -ltools"
 DEPS_dbwrapper	= $(TARGET_hcore) $(TARGET_tools)
 LIBS_dbwrapper	= "-lhcore -ltools"
 DEPS_hdata			= $(TARGET_dbwrapper) $(TARGET_hconsole)

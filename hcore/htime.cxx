@@ -59,7 +59,7 @@ HTime::HTime( char const* const a_pcStrTime )
 		l_pcErr = ::strptime( a_pcStrTime, "%F %T", &f_sBroken );
 	if ( ! l_pcErr )
 		M_THROW( ::strerror( errno ), errno );
-	f_xValue = ::timelocal( &f_sBroken );
+	f_xValue = ::mktime( &f_sBroken );
 	return;
 	M_EPILOG
 	}
@@ -77,7 +77,7 @@ HTime::HTime ( time_t const & a_rxTime ) : f_oFormat ( n_pcDefaultTimeFormat ),
 	f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue ( a_rxTime ), f_sBroken()
 	{
 	M_PROLOG
-	M_ENSURE ( localtime_r ( & f_xValue, & f_sBroken ) );
+	M_ENSURE ( localtime_r( & f_xValue, & f_sBroken ) );
 	return;
 	M_EPILOG
 	}
@@ -104,7 +104,7 @@ void HTime::set ( time_t const & a_rxTime )
 	{
 	M_PROLOG
 	f_xValue = a_rxTime;
-	M_ENSURE ( localtime_r ( & f_xValue, & f_sBroken ) );
+	M_ENSURE ( localtime_r( & f_xValue, & f_sBroken ) );
 	return;
 	M_EPILOG
 	}
@@ -113,7 +113,7 @@ void HTime::set_now ( void )
 	{
 	M_PROLOG
 	f_xValue = time ( NULL );
-	M_ENSURE ( localtime_r ( & f_xValue, & f_sBroken ) );
+	M_ENSURE ( localtime_r( & f_xValue, & f_sBroken ) );
 	return;
 	M_EPILOG
 	}

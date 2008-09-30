@@ -102,8 +102,7 @@ if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] ; then
 fi
 if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
 	if test -f [/etc/rc] ; then
-		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [],
-							 [Your operating system is FreeBSD.])
+		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
 		HOST_OS_TYPE=[FreeBSD]
 	else
 		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
@@ -158,7 +157,7 @@ AC_LINK_IFELSE([[extern int my_undefined_symbol;void foo(void){my_undefined_symb
 								[[-Wl,--no-undefined]]) _FLAGS=["$_FLAGS -Wl,--no-undefined."]],
 							[AC_MSG_WARN([[Cannot use -Wl,--no-undefined!]])])
 if test ["$_FLAGS"] = [""] ; then
-	_FLAGS='unfortunetely none. ---         [[68%]]'
+	_FLAGS='unfortunetely none. ---         [[63%]]'
 fi
 AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
 
@@ -191,97 +190,21 @@ else
 	fi
 fi
 
-
-AC_MSG_RESULT([--- Additional checks ... ---                           [[67%]]])
-AC_SUBST([SERIAL_DEVICE],['null'])
-AC_CHECK_FILE([/dev/cuaa0],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
-	[AC_CHECK_FILE([/dev/ttyS0],[AC_SUBST([SERIAL_DEVICE],['ttyS0'])])])
-
-dnl Test if dynamic loader is in libc or in separate library dl.
-AC_MSG_CHECKING([whether dl library is inside libc])
-RESULT=["no"]
-CXXFLAGS=$CXXFLAGS_ORIG
-CXXFLAGS=["-ldl"]
-AC_LINK_IFELSE([[#include <dlfcn.h>
-int main()
-	{
-	dlopen("",0);
-	return(0);
-	}
-]],[AC_SUBST([DLOPEN_IN],[-ldl])],[RESULT=["yes"]])
-AC_MSG_RESULT([$RESULT])
-
-dnl Test if gettext is in libc or in separate library intl.
-AC_MSG_CHECKING([whether intl(gettext) library is inside libc])
-RESULT=["no"]
-CXXFLAGS=$CXXFLAGS_ORIG
-CXXFLAGS=["-lintl"]
-AC_LINK_IFELSE([[#include <libintl.h>
-int main()
-	{
-	gettext("");
-	return(0);
-	}
-]],[AC_SUBST([GETTEXT_LIB],[-lintl])],[RESULT=["yes"]])
-AC_MSG_RESULT([$RESULT])
-
-CXXFLAGS=$CXXFLAGS_ORIG
-AC_MSG_CHECKING([whether strftime() returns required buffer size])
-RESULT=["no"]
-AC_TRY_RUN([#include <time.h>
-#define NULL	0
-int main ( int, char const * const * const )
-	{
-	int size = 0;
-	time_t t = time ( NULL );
-	struct tm broken;
-	localtime_r ( & t, & broken );
-	size = strftime ( NULL, 1024, "%F %T", & broken );
-	return ( ! size );
-	}], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
-AC_MSG_RESULT([$RESULT])
-
-AC_MSG_CHECKING([whether contents of input buffer for iconv() is const])
-RESULT=["no"]
-AC_COMPILE_IFELSE([#include<iconv.h>
-#define NULL	0
-int main ( int, char const * const * const )
-	{
-	iconv_t conv = 0;
-	size_t size = 0;
-	char const * in = NULL;
-	char * out = NULL;
-	iconv ( conv, & in, & size, & out, & size );
-	return ( 0 );
-	}], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
-AC_MSG_RESULT([$RESULT])
-
-DEFAULT_DRIVER=["null"]
-
 dnl Now we can look for all needed libraries.
-AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[70%]]])
+AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
 CXXFLAGS=$CXXFLAGS_ORIG;
 CPPFLAGS=$CXXFLAGS_ORIG;
-AC_CHECK_LIB([pthread],[pthread_create],
-						 [],[AC_MSG_ERROR([Cannot build without threading library.])])
-LIBS=""
-AC_CHECK_LIB([rt],[clock_gettime],
-						 [],[AC_MSG_ERROR([Cannot continue without rt library.])])
-LIBS=""
-AC_CHECK_LIB([ssl],[SSL_load_error_strings],
-						 [],[AC_MSG_ERROR([Cannot continue without OpenSSL library.])])
-LIBS=""
-AC_CHECK_LIB([xml2],[xmlParseFile],
-						 [],[AC_MSG_ERROR([Cannot continue without XML library.])])
-LIBS=""
-AC_CHECK_LIB([xslt],[xsltParseStylesheetFile],
-						 [],[AC_MSG_ERROR([Cannot continue without XSLT library.])])
-LIBS=""
-AC_CHECK_LIB([ncurses],[initscr],
-						 [],[AC_MSG_ERROR([Cannot continue without ncurses.])])
-LIBS=""
-AC_CHECK_LIB([gpm],[Gpm_Open],[AC_SUBST([MOUSE_LIB],[-lgpm])])
-LIBS=""
+AC_CHECK_LIB([pthread],[pthread_create],,[AC_MSG_ERROR([Cannot build without threading library.])]) LIBS=""
+AC_CHECK_LIB([rt],[clock_gettime],,[AC_MSG_ERROR([Cannot continue without rt library.])]) LIBS=""
+AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
+AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+AC_CHECK_LIB([xml2],[xmlParseFile],,[AC_MSG_ERROR([Cannot continue without XML library.])]) LIBS=""
+AC_CHECK_LIB([xslt],[xsltParseStylesheetFile],,[AC_MSG_ERROR([Cannot continue without XSLT library.])]) LIBS=""
+AC_SEARCH_LIBS([dlopen],[dl],,[AC_MSG_ERROR([Cannot continue without dynamic dynamic linker library.])]) TOOLS_LIBS="${TOOLS_LIBS} ${LIBS}" LIBS=""
+AC_CHECK_LIB([ncurses],[initscr],,[AC_MSG_ERROR([Cannot continue without ncurses.])]) LIBS=""
+AC_CHECK_LIB([gpm],[Gpm_Open]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
+
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_LIB([pq],[PQsetdbLogin],
 								[],[if test ["$POSTGRES"] = ["yes"] ; then
@@ -326,7 +249,74 @@ if test ["$MYSQL"] != ["no"] ; then
 	LIBS=""
 fi
 
-AC_MSG_RESULT([--- All needed libraries found. ---                     [[76%]]])
+AC_MSG_RESULT([--- All needed libraries found. ---                     [[70%]]])
+
+AC_MSG_RESULT([--- Additional checks ... ---                           [[71%]]])
+AC_SUBST([SERIAL_DEVICE],['null'])
+AC_CHECK_FILE([/dev/cuaa0],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
+	[AC_CHECK_FILE([/dev/ttyS0],[AC_SUBST([SERIAL_DEVICE],['ttyS0'])])])
+
+CXXFLAGS=$CXXFLAGS_ORIG
+AC_MSG_CHECKING([whether strftime() returns required buffer size])
+RESULT=["no"]
+AC_TRY_RUN([#include <time.h>
+#define NULL	0
+int main( int, char const* const* const )
+	{
+	int size = 0;
+	time_t t = time( NULL );
+	struct tm broken;
+	localtime_r ( &t, &broken );
+	size = strftime( NULL, 1024, "%F %T", &broken );
+	return ( ! size );
+	}], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
+AC_MSG_RESULT([$RESULT])
+
+AC_MSG_CHECKING([whether contents of input buffer for iconv() is const])
+RESULT=["no"]
+AC_COMPILE_IFELSE([#include<iconv.h>
+#define NULL	0
+int main( int, char const* const* const )
+	{
+	iconv_t conv = 0;
+	size_t size = 0;
+	char const* in = NULL;
+	char* out = NULL;
+	iconv( conv, &in, &size, &out, &size );
+	return ( 0 );
+	}], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
+AC_MSG_RESULT([$RESULT])
+
+AC_MSG_CHECKING([whether gethostbyname_r is GNU variant])
+RESULT=["no"]
+AC_COMPILE_IFELSE([#include<netdb.h>
+#define NULL	0
+int main( int, char const* const* const )
+	{
+	int i = 0;
+	char* p = NULL;
+	struct hostent h, * ph = NULL;
+	::gethostbyname_r( "", &h, p, 0, &ph, &i );
+	return ( 0 );
+	}], [AC_DEFINE([HAVE_GNU_GETHOSTBYNAME_R],[],[Is gethostbyname_r a GNU flavour?])] RESULT=["yes"])
+AC_MSG_RESULT([$RESULT])
+
+AC_MSG_CHECKING([whether gethostbyaddr_r is GNU variant])
+RESULT=["no"]
+AC_COMPILE_IFELSE([#include<netdb.h>
+#define NULL	0
+int main( int, char const* const* const )
+	{
+	int i = 0;
+	char* p = NULL;
+	struct hostent h, * ph = NULL;
+	::gethostbyaddr_r( NULL, 0, AF_INET, &h, p, 0, &ph, &i );
+	return ( 0 );
+	}], [AC_DEFINE([HAVE_GNU_GETHOSTBYADDR_R],[],[Is gethostbyaddr_r a GNU flavour?])] RESULT=["yes"])
+AC_MSG_RESULT([$RESULT])
+
+DEFAULT_DRIVER=["null"]
+
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
 AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
@@ -409,12 +399,13 @@ fi
 AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 
 AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
-
-AC_CHECK_FUNCS([getline gethostbyname_r gethostbyaddr_r memrchr strcasestr],[],[])
+LIBS="${HCORE_LIBS}"
+AC_CHECK_FUNCS([getline memrchr gethostbyname_r gethostbyaddr_r strcasestr])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASE_NAME_IN_LIBGEN],[],[Does your basename() is included in libgen library?])],[#include <string.h>])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
+AC_CHECK_DECLS([SUN_LEN],[],[],[#include <sys/un.h>])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 
@@ -453,6 +444,9 @@ AC_SUBST([EXTRA_LIB_PATHS], ["$EXTRA_LIB_PATHS"])
 AC_SUBST([EXTRA_INCLUDE_PATHS], ["$EXTRA_INCLUDE_PATHS"])
 AC_SUBST([DEFAULT_DRIVER], ["$DEFAULT_DRIVER"])
 AC_SUBST([MYSQL_SOCKET],["$MYSQL_SOCKET"])
+AC_SUBST([HCORE_LIBS],[${HCORE_LIBS}])
+AC_SUBST([TOOLS_LIBS],[${TOOLS_LIBS}])
+AC_SUBST([HCONSOLE_LIBS],[${HCONSOLE_LIBS}])
 AH_TOP([/* $Id$ */
 
 #ifndef __YAAL_CONFIG_H
