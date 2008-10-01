@@ -1,0 +1,42 @@
+#! /bin/sh
+
+if [ -z "${DIR_ROOT}" -o -z "${HDRS}" -o -z "${DIR_HEADERS}" ] ; then
+	echo "Core settings not found!"
+	exit 1
+fi
+
+umask 022
+
+cd ${DIR_ROOT}
+
+echo -n "Making headers ... "
+
+for FILE in ${HDRS}; do
+	mkdir -p ${DIR_HEADERS}/`dirname ${FILE}`
+	awk '/^#include "/ {match($0,"\"[a-z_./-]+"); printf "#include <yaal/%s>\n", substr($0,RSTART+1,RLENGTH-1) }; !/^#include "/' ${FILE} > ${DIR_HEADERS}/${FILE}
+done
+
+head -26 ${DIR_HEADERS}/hcore/base.h | sed -e s/bit/yaal/ > ${DIR_HEADERS}/yaal.h
+
+cat << EOF >> ${DIR_HEADERS}/yaal.h
+#ifndef __YAAL_H
+#define __YAAL_H
+
+EOF
+
+cat config.h >> ${DIR_HEADERS}/yaal.h
+cat << EOF >> ${DIR_HEADERS}/yaal.h
+#ifndef GET_YAAL_CONFIG
+
+EOF
+
+find ${DIR_HEADERS} ! -name 'yaal.h' -type f | awk '{printf "#include <%s>\n", substr ($1,match($1,"yaal"),255)}' | sort >> ${DIR_HEADERS}/yaal.h
+
+cat << EOF >> ${DIR_HEADERS}/yaal.h
+
+#endif /* not GET_YAAL_CONFIG */
+
+#endif /* not __YAAL_H */
+
+EOF
+

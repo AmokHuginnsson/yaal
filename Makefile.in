@@ -141,24 +141,7 @@ install: all
 	@./_aux/msh
 
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
-	@umask 022;cd $(DIR_ROOT); echo -n "Making headers ... "; \
-	for FILE in $(HDRS); do \
-		mkdir -p $(DIR_HEADERS)/`dirname $$FILE` ; \
-		awk '/^#include "/ {match($$0,"\"[a-z_./-]+"); \
-		printf "#include <yaal/%s>\n", substr($$0,RSTART+1,RLENGTH-1) }; \
-		!/^#include "/' $$FILE > $(DIR_HEADERS)/$$FILE; \
-	done; \
-	head -26 $(DIR_HEADERS)/hcore/base.h \
-| sed -e s/bit/yaal/ > $(DIR_HEADERS)/yaal.h; \
-	echo '#ifndef __YAAL_H' >> $(DIR_HEADERS)/yaal.h; \
-	echo '#define __YAAL_H' >> $(DIR_HEADERS)/yaal.h; \
-	echo '' >> $(DIR_HEADERS)/yaal.h; \
-	cat config.h >> $(DIR_HEADERS)/yaal.h; \
-	find $(DIR_HEADERS) ! -name 'yaal.h' -type f \
-| awk '{printf "#include <%s>\n", substr ($$1,match($$1,"yaal"),255)}' \
-| sort >> $(DIR_HEADERS)/yaal.h; \
-	echo '' >> $(DIR_HEADERS)/yaal.h; \
-	echo '#endif /* not __YAAL_H */' >> $(DIR_HEADERS)/yaal.h; \
+	@env DIR_ROOT="$(DIR_ROOT)" DIR_HEADERS="$(DIR_HEADERS)" HDRS="$(HDRS)" $(DIR_ROOT)/_aux/mkheaders; \
 	echo $(NONL) "done.$(CL)$(BOLD)"; \
 	echo "All OK!$(RS)";
 
