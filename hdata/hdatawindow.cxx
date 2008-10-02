@@ -51,7 +51,8 @@ HDataWindow::HDataWindow( char const* a_pcTitle, HDataProcess* a_poOwner,
 	: HWindow( a_pcTitle ),
 	f_bModified( false ), f_eDocumentMode( DOCUMENT::D_VIEW ), f_poMainControl( NULL ),
 	f_psResourcesArray( a_psDataControlInfo ), f_poSyncStore( NULL ),
-	f_oViewModeControls(), f_oEditModeControls(), f_poOwner( a_poOwner ), f_oDB( new HSQLDescriptor( a_poOwner->data_base() ) ),
+	f_oViewModeControls(), f_oEditModeControls(), f_poOwner( a_poOwner ),
+	f_oDB( new HSQLDescriptor( a_poOwner->data_base() ) ),
 	f_eMode( HSQLDescriptor::MODE::D_SELECT )
 	{
 	M_PROLOG
@@ -87,7 +88,7 @@ HDataWindow::~HDataWindow( void )
 						f_psResourcesArray[ l_iCtr ].f_iWidth,\
 						f_psResourcesArray[ l_iCtr ].f_pcLabel
 
-int HDataWindow::init ( void )
+int HDataWindow::init( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;

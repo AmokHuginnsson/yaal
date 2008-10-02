@@ -40,17 +40,19 @@ namespace hconsole
 struct OMenuItem
 	{
 public: /* All is public for simpler usage. */
-	typedef int ( HTUIProcess::* HANDLER_t ) ( void );
-	OMenuItem * f_psSubMenu;
+	typedef int ( HTUIProcess::* HANDLER_t )( void* );
+	OMenuItem* f_psSubMenu;
 	HANDLER_t HANDLER;
+	void* f_pvParam;
 	yaal::hcore::HString f_oLabel;
 /* Methods */
-	OMenuItem ( void );
-	OMenuItem ( OMenuItem * const, HANDLER_t const,
-			yaal::hcore::HString const & );
-	OMenuItem ( OMenuItem const & );
-	OMenuItem & operator = ( OMenuItem const & );
-	void reset ( void );
+	OMenuItem( void );
+	OMenuItem( OMenuItem* const, HANDLER_t const, void*, yaal::hcore::HString const& );
+	OMenuItem( OMenuItem const& );
+	OMenuItem& operator = ( OMenuItem const& );
+	void reset( void );
+	void call( HTUIProcess* );
+	static void swap( OMenuItem&, OMenuItem& );
 	};
 
 }

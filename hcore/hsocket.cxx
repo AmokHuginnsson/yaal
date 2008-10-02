@@ -155,7 +155,7 @@ void HSocket::shutdown_client( int a_iFileDescriptor )
 	ptr_t l_oClient;
 	if ( ! f_poClients )
 		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
-	if ( ! f_poClients->get( a_iFileDescriptor, l_oClient ) )
+	if ( f_poClients->get( a_iFileDescriptor, l_oClient ) )
 		M_THROW( _( "no such client" ), a_iFileDescriptor );
 	M_ASSERT( !! l_oClient );
 	f_poClients->remove( a_iFileDescriptor );
@@ -314,7 +314,7 @@ HSocket::ptr_t HSocket::get_client( int const a_iFileDescriptor ) const
 	M_PROLOG
 	ptr_t l_oClient;
 	if ( ! f_poClients )
-		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
 	f_poClients->get( a_iFileDescriptor, l_oClient );
 	return ( l_oClient );
 	M_EPILOG
@@ -324,7 +324,7 @@ HSocket::clients_t::const_iterator HSocket::begin( void ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )
-		M_THROW ( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
 	clients_t const* c = f_poClients;
 	return ( c->begin() );
 	M_EPILOG
@@ -334,7 +334,7 @@ HSocket::clients_t::const_iterator HSocket::end( void ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )
-		M_THROW ( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
 	clients_t const* c = f_poClients;
 	return ( c->end() );
 	M_EPILOG

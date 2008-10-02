@@ -44,7 +44,7 @@ int HMenuControl::load_sub_menu( tree_t::node_t node, OMenuItem* a_psSubMenu )
 	M_PROLOG
 	int l_iCtr = 0;
 	HString str;
-	while ( ! a_psSubMenu [ l_iCtr ].f_oLabel.is_empty() )
+	while ( ! a_psSubMenu[ l_iCtr ].f_oLabel.is_empty() )
 		{
 		HNodeControl info( 1 );
 		info[ 0 ]( a_psSubMenu [ l_iCtr ].f_oLabel );
@@ -58,13 +58,12 @@ int HMenuControl::load_sub_menu( tree_t::node_t node, OMenuItem* a_psSubMenu )
 	M_EPILOG
 	}
 
-HMenuControl::HMenuControl ( HWindow * a_poParent,
+HMenuControl::HMenuControl( HWindow* a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
-		char const * a_pcLabel )
-						: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-								a_iWidth, a_pcLabel ),
-								HTreeControl ( a_poParent, a_iRow, a_iColumn,
-										a_iHeight, a_iWidth, a_pcLabel ), f_poProcess ( NULL )
+		char const* a_pcLabel )
+	: HControl( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcLabel ),
+	HTreeControl( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcLabel ),
+	f_poProcess( NULL )
 	{
 	M_PROLOG
 	return;
@@ -104,15 +103,15 @@ void HMenuControl::init( HTUIProcess* a_poProcess, OMenuItem* a_psMenu )
 int HMenuControl::do_process_input( int a_iCode )
 	{
 	M_PROLOG
-	OMenuItem const * l_psMenu = NULL;
+	OMenuItem* l_psMenu = NULL;
 	if ( ! f_oTree.get_root() )
 		M_THROW ( _ ( "menu not initialized" ), errno );
 	a_iCode = HTreeControl::do_process_input ( a_iCode );
 	if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
 		{
-		l_psMenu = static_cast<OMenuItem const*>( (**f_poSelected)[ 0 ].get<void*>() );
+		l_psMenu = static_cast<OMenuItem*>( (**f_poSelected)[ 0 ].get<void*>() );
 		if ( l_psMenu->HANDLER )
-			static_cast<void>( ( f_poProcess->* ( l_psMenu->HANDLER ) )() );
+			l_psMenu->call( f_poProcess );
 		a_iCode = 0;
 		}
 	return ( a_iCode );

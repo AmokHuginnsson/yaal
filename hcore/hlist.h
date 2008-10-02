@@ -412,10 +412,10 @@ bool HList<tType>::HIterator<const_qual_t, treatment>::is_valid( void ) const
 //============================================================================
 
 template<typename tType>
-HList<tType>::HList ( int a_iSize )
-	: OListBits(), f_iSize ( 0 ),
-	f_poHook ( NULL ), f_eOrder ( D_UNSORTED ),
-	f_iIndex ( 0 ), f_poIndex ( NULL )
+HList<tType>::HList( int a_iSize )
+	: OListBits(), f_iSize( 0 ),
+	f_poHook( NULL ), f_eOrder( D_UNSORTED ),
+	f_iIndex( 0 ), f_poIndex( NULL )
 	{
 	M_PROLOG
 	while ( a_iSize -- )
@@ -425,22 +425,22 @@ HList<tType>::HList ( int a_iSize )
 	}
 
 template<typename tType>
-HList<tType>::~HList ( void )
+HList<tType>::~HList( void )
 	{
 	M_PROLOG
-	HList::clear ();
+	HList::clear();
 	return ;
 	M_EPILOG
 	}
 
 template<typename tType>
-HList<tType>::HList ( HList<tType> const & a_roList )
-	: OListBits(), f_iSize ( 0 ),
-	f_poHook ( NULL ), f_eOrder ( D_UNSORTED ),
-	f_iIndex ( 0 ), f_poIndex ( NULL )
+HList<tType>::HList( HList<tType> const& a_roList )
+	: OListBits(), f_iSize( 0 ),
+	f_poHook( NULL ), f_eOrder( D_UNSORTED ),
+	f_iIndex( 0 ), f_poIndex( NULL )
 	{
 	M_PROLOG
-	( * this ) = a_roList;
+	( *this ) = a_roList;
 	return;
 	M_EPILOG
 	}

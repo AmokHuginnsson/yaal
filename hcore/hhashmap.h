@@ -432,7 +432,7 @@ bool HHashMap<tType, ttType>::get( tType const& a_rtKey, ttType& a_rtValue ) con
 		a_rtValue = it->value;
 		found = true;
 		}
-	return ( found );
+	return ( ! found );
 	M_EPILOG
 	}
 

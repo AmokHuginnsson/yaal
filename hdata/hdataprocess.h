@@ -47,13 +47,18 @@ namespace hdata
 
 typedef yaal::hcore::HHashMap<yaal::hcore::HString,
 				yaal::hconsole::OMenuItem::HANDLER_t> menu_handlers_map_t;
+struct OResource;
 
 class HDataProcess : public hconsole::HTUIProcess
 	{
 protected:
 	typedef HDataProcess self_t;
 	typedef HTUIProcess hier_t;
+	typedef yaal::hcore::HList<yaal::hcore::HString> param_cache_t;
+	typedef yaal::hconsole::HWindow::ptr_t ( *window_factory_t )( yaal::hcore::HString const&, HDataProcess*, OResource* );
 	dbwrapper::database_ptr_t f_oDataBase;
+	menu_handlers_map_t f_oAutoHandlers;
+	yaal::tools::HXml f_oResource;
 private:
 	yaal::hconsole::OMenuItem* f_psRootMenu;
 public:
@@ -65,11 +70,12 @@ public:
 protected:
 	virtual int handler_quit( int, void const* = NULL );
 	virtual int handler_close_window( int, void const* = NULL );
-	yaal::hconsole::OMenuItem* build_sub_menu( yaal::tools::HXml::HNodeProxy const&,
+	yaal::hconsole::OMenuItem* build_sub_menu( yaal::tools::HXml::HConstNodeProxy const&,
 			menu_handlers_map_t const& );
-	void build_menu_item( yaal::tools::HXml::HNodeProxy const&,
+	void build_menu_item( yaal::tools::HXml::HConstNodeProxy const&,
 			yaal::hconsole::OMenuItem&, menu_handlers_map_t const& );
 	void destroy_menu( yaal::hconsole::OMenuItem* );
+	int create_window( void* );
 private:
 	HDataProcess( HDataProcess const& );
 	HDataProcess& operator = ( HDataProcess const& );

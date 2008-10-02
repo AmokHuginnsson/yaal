@@ -82,17 +82,17 @@ int HHandler::register_postprocess_handler_internal ( int a_iCodeCount, int cons
 	M_EPILOG
 	}
 
-int HHandler::process_input_with_handlers ( int a_iCode, const process_handler_key_map_t & a_oMap )
+int HHandler::process_input_with_handlers( int a_iCode, const process_handler_key_map_t & a_oMap )
 	{
 	M_PROLOG
 	HANDLER_t HANDLER = NULL;
-	if ( a_oMap.get ( a_iCode, HANDLER ) )
-		a_iCode = ( this->*HANDLER ) ( a_iCode, NULL );
+	if ( ! a_oMap.get( a_iCode, HANDLER ) )
+		a_iCode = ( this->*HANDLER )( a_iCode, NULL );
 	return ( a_iCode );
 	M_EPILOG
 	}
 
-HString HHandler::process_command ( void )
+HString HHandler::process_command( void )
 	{
 	M_PROLOG
 	HANDLER_t HANDLER = NULL;
@@ -100,7 +100,7 @@ HString HHandler::process_command ( void )
 	if ( ! f_oCommand.is_empty() )
 		{
 		l_oCommand = f_oCommand.split ( " \t", 0 );
-		if ( f_oCommandHandlers.get( l_oCommand, HANDLER ) )
+		if ( ! f_oCommandHandlers.get( l_oCommand, HANDLER ) )
 			{
 			static_cast<void>( ( this->*HANDLER )( 0, f_oCommand.raw() ) );
 			f_oCommand = "";

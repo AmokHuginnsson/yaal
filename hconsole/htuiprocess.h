@@ -55,24 +55,24 @@ public:
 	virtual ~HTUIProcess ( void );
 	int init_tui( char const* = "", HWindow::ptr_t = HWindow::ptr_t() );
 protected:
-	int process_stdin ( int );
-	int process_mouse ( int );
+	int process_stdin( int );
+	int process_mouse( int );
 	int process_terminal_event( int );
-	int process_commands ( void );
-	int add_window ( HWindow::ptr_t );
+	int process_commands( void );
+	int add_window( HWindow::ptr_t );
 	void select( HWindow const* const );
 	void refresh( bool = false );
-	virtual int handler_alert ( int, void const* = NULL );
-	virtual int handler_idle ( int, void const* = NULL );
-	virtual int handler_mouse ( int, void const* = NULL );
-	virtual int handler_refresh ( int, void const* = NULL );
-	virtual int handler_quit ( int, void const* = NULL );
-	virtual int handler_jump_meta_tab ( int, void const* = NULL );
-	virtual int handler_jump_meta_direct ( int, void const* = NULL );
-	virtual int handler_close_window ( int, void const* = NULL );
+	virtual int handler_alert( int, void const* = NULL );
+	virtual int handler_idle( int, void const* = NULL );
+	virtual int handler_mouse( int, void const* = NULL );
+	virtual int handler_refresh( int, void const* = NULL );
+	virtual int handler_quit( int, void const* = NULL );
+	virtual int handler_jump_meta_tab( int, void const* = NULL );
+	virtual int handler_jump_meta_direct( int, void const* = NULL );
+	virtual int handler_close_window( int, void const* = NULL );
 private:
-	HTUIProcess ( HTUIProcess const & );
-	HTUIProcess & operator = ( HTUIProcess const & );
+	HTUIProcess( HTUIProcess const& );
+	HTUIProcess& operator = ( HTUIProcess const& );
 	};
 
 }
