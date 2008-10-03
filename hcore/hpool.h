@@ -73,6 +73,7 @@ private:
 	int long f_lSize; /*! size of container */
 	tType* f_ptPool;	/* pointer to allocated memory pool */
 public:
+	HPool( void );
 	HPool( int long const&, pool_type_t const& = D_FIXED_SIZE );
 	virtual ~HPool( void );
 	void pool_realloc( int long const& );
@@ -98,6 +99,16 @@ public:
 	HPool( HPool const& );
 	HPool& operator = ( HPool const& );
 	};
+
+template<typename tType>
+HPool<tType>::HPool( void )
+	: f_ePoolType( D_DUMB ), f_lAllocatedObjects( 0 ),
+	f_lSize( 0 ), f_ptPool( NULL )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
 
 template<typename tType>
 HPool<tType>::HPool( int long const& a_ulNewSize, pool_type_t const& a_ePoolType )

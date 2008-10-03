@@ -59,12 +59,6 @@ namespace
 static void dummy_signal_handler( int )
 	{ }
 
-void ready( )
-	{
-
-	return;
-	}
-
 class HBaseSignalHandlers : public HSignalHandlerInterface
 	{
 	typedef HBaseSignalHandlers self_t;

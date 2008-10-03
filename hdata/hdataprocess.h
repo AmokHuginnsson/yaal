@@ -48,6 +48,7 @@ namespace hdata
 typedef yaal::hcore::HHashMap<yaal::hcore::HString,
 				yaal::hconsole::OMenuItem::HANDLER_t> menu_handlers_map_t;
 struct OResource;
+struct OColumnInfo;
 
 class HDataProcess : public hconsole::HTUIProcess
 	{
@@ -56,9 +57,15 @@ protected:
 	typedef HTUIProcess hier_t;
 	typedef yaal::hcore::HList<yaal::hcore::HString> param_cache_t;
 	typedef yaal::hconsole::HWindow::ptr_t ( *window_factory_t )( yaal::hcore::HString const&, HDataProcess*, OResource* );
+	typedef yaal::hcore::HPool<OResource> resource_pool_t;
+	typedef yaal::hcore::HMap<yaal::hcore::HString, resource_pool_t> resource_cache_t;
+	typedef yaal::hcore::HPool<OColumnInfo> column_pool_t;
+	typedef yaal::hcore::HList<column_pool_t> column_cache_t;
 	dbwrapper::database_ptr_t f_oDataBase;
 	menu_handlers_map_t f_oAutoHandlers;
 	yaal::tools::HXml f_oResource;
+	resource_cache_t f_oResourceCache;
+	column_cache_t f_oColumnCache;
 private:
 	yaal::hconsole::OMenuItem* f_psRootMenu;
 public:
@@ -70,11 +77,14 @@ public:
 protected:
 	virtual int handler_quit( int, void const* = NULL );
 	virtual int handler_close_window( int, void const* = NULL );
+private:
 	yaal::hconsole::OMenuItem* build_sub_menu( yaal::tools::HXml::HConstNodeProxy const&,
 			menu_handlers_map_t const& );
 	void build_menu_item( yaal::tools::HXml::HConstNodeProxy const&,
 			yaal::hconsole::OMenuItem&, menu_handlers_map_t const& );
 	void destroy_menu( yaal::hconsole::OMenuItem* );
+	OResource* get_resource( yaal::hcore::HString const&, yaal::tools::HXml::HConstNodeProxy const& );
+	OResource* build_resource( yaal::hcore::HString const&, yaal::tools::HXml::HConstNodeProxy const& );
 	int create_window( void* );
 private:
 	HDataProcess( HDataProcess const& );

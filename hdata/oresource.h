@@ -128,8 +128,8 @@ struct OResource
 struct OEditControlResource
 	{
 	int			f_iMaxStringSize;		/* maximum length of contained string */
-	char const *	f_pcValue;		/* initial value for control */
-	char const *	f_pcMask;			/* tell what can be inserted into control */
+	char const*	f_pcValue;		/* initial value for control */
+	char const*	f_pcMask;			/* tell what can be inserted into control */
 	bool		f_bReplace;					/* is control in replace mode? */
 	bool		f_bMultiLine;				/* is this contorl a multiline edit? */
 	bool		f_bReadOnly;				/* should editing be disabled ? */
