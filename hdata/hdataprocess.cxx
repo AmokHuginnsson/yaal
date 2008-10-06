@@ -95,7 +95,8 @@ char const* attr_val( HXml::HConstIterator const& it, char const* const name )
 HDataProcess::HDataProcess( void )
 	: HTUIProcess(), f_oDataBase( HDataBase::get_connector() ),
 	f_oAutoHandlers( D_MENU_HANDLERS_MAP_SIZE ),
-	f_oResource(), f_oResourceCache(), f_oColumnCache(), f_psRootMenu( NULL )
+	f_oResource(), f_oResourceCache(), f_oColumnCache(),
+	f_oEditCache(), f_oListCache(), f_psRootMenu( NULL )
 	{
 	M_PROLOG
 	menu_handlers_map_t& l_oHandlers = f_oAutoHandlers;
@@ -332,12 +333,14 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 		if ( typeIt->second == "list" )
 			{
 			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_LIST;
-			r[ i ].f_pvTypeSpecific = xcalloc<OListControlResource>( 1 );
+			f_oListCache.push_back( OListControlResource() );
+			r[ i ].f_pvTypeSpecific = &f_oListCache.tail();
 			}
 		else if ( typeIt->second == "edit" )
 			{
 			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_EDIT;
-			r[ i ].f_pvTypeSpecific = xcalloc<OEditControlResource>( 1 );
+			f_oEditCache.push_back( OEditControlResource() );
+			r[ i ].f_pvTypeSpecific = &f_oEditCache.tail();
 			}
 		else if ( typeIt->second == "tree" )
 			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_TREE;

@@ -31,6 +31,7 @@ Copyright:
 #include "hconsole/omenuitem.h"
 #include "tools/hxml.h"
 #include "dbwrapper/hdatabase.h"
+#include "hdata/oresource.h"
 
 namespace yaal
 {
@@ -47,8 +48,6 @@ namespace hdata
 
 typedef yaal::hcore::HHashMap<yaal::hcore::HString,
 				yaal::hconsole::OMenuItem::HANDLER_t> menu_handlers_map_t;
-struct OResource;
-struct OColumnInfo;
 
 class HDataProcess : public hconsole::HTUIProcess
 	{
@@ -60,12 +59,16 @@ protected:
 	typedef yaal::hcore::HPool<OResource> resource_pool_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, resource_pool_t> resource_cache_t;
 	typedef yaal::hcore::HPool<OColumnInfo> column_pool_t;
+	typedef yaal::hcore::HList<OEditControlResource> edit_cache_t;
+	typedef yaal::hcore::HList<OListControlResource> list_cache_t;
 	typedef yaal::hcore::HList<column_pool_t> column_cache_t;
 	dbwrapper::database_ptr_t f_oDataBase;
 	menu_handlers_map_t f_oAutoHandlers;
 	yaal::tools::HXml f_oResource;
 	resource_cache_t f_oResourceCache;
 	column_cache_t f_oColumnCache;
+	edit_cache_t f_oEditCache;
+	list_cache_t f_oListCache;
 private:
 	yaal::hconsole::OMenuItem* f_psRootMenu;
 public:
