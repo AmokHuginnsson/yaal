@@ -588,18 +588,17 @@ char unsigned HConsole::get_attr( void ) const
 	if ( ! f_bEnabled )
 		M_THROW( "not in curses mode", errno );
 	attr_t l_xAttr;
+	attr_t* pa = &l_xAttr;
 	int l_hColor = 0;
 	int* pc = &l_hColor;
-	attr_t l_iAttribute = 0;
-	attr_t* pa = &l_iAttribute;
 	static_cast<void>( attr_get( pa, pc, NULL ) ); /* Ugly macro */
-	l_iAttribute = ( l_hColor << 1 ) & 56;
-	l_iAttribute |= ( l_hColor & 7 );
+	int unsigned l_uiAttribute = ( l_hColor << 1 ) & 56;
+	l_uiAttribute |= ( l_hColor & 7 );
 	if ( l_xAttr & A_BOLD )
-		l_iAttribute |= 8;
+		l_uiAttribute |= 8;
 	if ( l_xAttr & A_BLINK )
-		l_iAttribute |= 128;
-	return ( static_cast<char unsigned>( l_iAttribute ) );
+		l_uiAttribute |= 128;
+	return ( static_cast<char unsigned>( l_uiAttribute ) );
 	M_EPILOG
 	}
 	

@@ -316,6 +316,10 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 	M_PROLOG
 	resource_pool_t r( w.child_count() + 1 );
 	int i = 0;
+	typedef HMap<int,char const*> int_to_str_t;
+	typedef HMap<HString,int> str_to_int_t;
+	int_to_str_t i2s;
+	str_to_int_t s2i;
 	for ( HXml::HConstIterator it = w.begin(); it != w.end(); ++ it, ++ i )
 		{
 		M_ENSURE( (*it).get_type() == HXml::HNode::TYPE::D_NODE );
@@ -323,6 +327,7 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 		HXml::HNode::properties_t const& controlProps = (*it).properties();
 		HXml::HNode::properties_t::const_iterator roleIt = controlProps.find( "role" );
 		HXml::HNode::properties_t::const_iterator typeIt = controlProps.find( "type" );
+		HXml::HNode::properties_t::const_iterator refidIt = controlProps.find( "refid" );
 		M_ENSURE( ( roleIt != controlProps.end() ) && ( typeIt != controlProps.end() ) );
 		if ( roleIt->second == "main" )
 			r[ i ].f_eRole = DATACONTROL_BITS::ROLE::D_MAIN;
@@ -352,6 +357,8 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_DATE;
 		else
 			M_THROW( _( "unknown type" ), i );
+		if ( refidIt != controlProps.end() )
+			s2i[ refidIt->second ] = i;
 		int columnNo = 0;
 		int attrNo = 0;
 		for ( HXml::HConstIterator attr = (*it).begin(); attr != (*it).end(); ++ attr, ++ attrNo )
@@ -380,6 +387,10 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 				r[ i ].f_iColumn = lexical_cast<int>( attr_val( attr, "column" ) );
 				r[ i ].f_iHeight = lexical_cast<int>( attr_val( attr, "height" ) );
 				r[ i ].f_iWidth = lexical_cast<int>( attr_val( attr, "width" ) );
+				}
+			else if ( attrName == "parent" )
+				{
+				i2s[ i ] = attr_val( attr, "refid" );
 				}
 			else if ( r[ i ].f_eType == DATACONTROL_BITS::TYPE::D_LIST )
 				{
@@ -456,6 +467,16 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 			}
 		}
 	OResource* pr = r.raw();
+	for ( int n = 0; n < i; ++ i )
+		{
+		int_to_str_t::iterator child = i2s.find( i );
+		if ( child != i2s.end() )
+			{
+			str_to_int_t::iterator parentIt = s2i.find( child->second );
+			M_ENSURE( parentIt != s2i.end() );
+			pr[ n ].f_iParent = parentIt->second;
+			}
+		}
 	resource_pool_t::swap( f_oResourceCache[ resourceName ], r );
 	return ( pr );
 	M_EPILOG
