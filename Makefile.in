@@ -92,19 +92,19 @@ LIBS_oracle			= "-lclntsh -lhcore"
 
 lib%.so.$(RELEASE):
 	@if [ "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
-	echo -n "Linking \`$(@) ... $(BOLD)$(RED)"; \
-	$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
-			-Wl,--entry="yaal_$(NAME)_main" \
-			-Wl,-\( $(OBJS_$(NAME)) -Wl,-\) 2>&1 | tee -a make.log; echo -n $(RS); \
+	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
+	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
+			-Wl$(COMA)--entry="yaal_$(NAME)_main" \
+			-Wl$(COMA)-\( $(OBJS_$(NAME)) -Wl$(COMA)-\) 2>&1 | tee -a make.log;) $(call msg, echo -n $(RS);) \
 	if [ -f $(@) ] ; then \
 	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 \
 | grep -v '^ar: creating ' | tee -a make.log; \
-	/bin/mv -f $(@) lib$(NAME).a $(DIR_TARGET)/; echo -n "making cache ... "; \
+	/bin/mv -f $(@) lib$(NAME).a $(DIR_TARGET)/; $(call msg,echo -n "making cache ... ";) \
 	cd $(DIR_TARGET); $(DIR_TARGET)/mkcache; \
 	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION); \
 	ln -sf lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so; \
-	else exit 1; fi; echo $(NONL) "done.$(CL)"
+	else exit 1; fi; $(call msg,echo $(NONL) "done.$(CL)")
 
 include $(DIR_ROOT)/_aux/mk/d_implicit-compile.mk
 #------------------------------------------------------------------------
