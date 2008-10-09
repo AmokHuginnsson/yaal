@@ -3,7 +3,7 @@
 .DEFAULT:
 	@$(MAKE) -f Makefile $(@)
 
-all bin clean clean-dep cov dep doc environment install mrproper release prof purge static stats tags: Makefile
+all bin clean clean-dep cov dep doc environment install mrproper release prof purge static stats tags: Makefile .my_make
 	@$(MAKE) -f Makefile $(@)
 
 Makefile: configure Makefile.in
