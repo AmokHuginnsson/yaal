@@ -467,14 +467,15 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 			}
 		}
 	OResource* pr = r.raw();
-	for ( int n = 0; n < i; ++ i )
+	for ( int n = 0; n < i; ++ n )
 		{
-		int_to_str_t::iterator child = i2s.find( i );
+		int_to_str_t::iterator child = i2s.find( n );
 		if ( child != i2s.end() )
 			{
 			str_to_int_t::iterator parentIt = s2i.find( child->second );
 			M_ENSURE( parentIt != s2i.end() );
 			pr[ n ].f_iParent = parentIt->second;
+			pr[ n ].f_psColumnInfo = &pr[ parentIt->second ].f_psColumnInfo[ n - ( parentIt->second + 1 ) ];
 			}
 		}
 	resource_pool_t::swap( f_oResourceCache[ resourceName ], r );
