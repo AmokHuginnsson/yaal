@@ -34,7 +34,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hpointer.h"
 #include "util.h"
-#include "hanalyser.h"
+#include "hexpression.h"
 #include "hcore/hlog.h"
 
 using namespace yaal::hcore;
@@ -217,13 +217,13 @@ void usun_ogonki ( char * a_pcString )
 double long atof_ex( HString const& a_oString, bool a_bParse )
 	{
 	M_PROLOG
-	HAnalyser l_oAnalyser;
+	HExpression l_oAnalyser;
 	HString l_oStr = a_oString;
 	l_oStr.replace ( ",", "." );
 	l_oStr.replace ( " ", "" );
 	l_oStr.replace ( "\t", "" );
-	if ( a_bParse && l_oAnalyser.analyse( l_oStr ) )
-		return ( l_oAnalyser.count() );
+	if ( a_bParse && l_oAnalyser.compile( l_oStr ) )
+		return ( l_oAnalyser.evaluate() );
 	return ( lexical_cast<double long>( l_oStr ) );
 	M_EPILOG
 	}

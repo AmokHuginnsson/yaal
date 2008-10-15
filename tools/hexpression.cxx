@@ -34,11 +34,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/xalloc.h"
 #include "hcore/htree.h"
 #include "hcore/hcore.h"
-#include "hanalyser.h"
-
-#ifdef __DEBUGGER_BABUNI__
-#include "hcore/hlog.h"
-#endif /* __DEBUGGER_BABUNI__ */
+#include "hexpression.h"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -132,7 +128,7 @@ int n_piFunctionMnemonicsLength [ 16 ] =
 
 static double long D_PI = 3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196;
 
-HAnalyser::HAnalyser( void ) : f_iIndex( 0 ), f_iLength( 0 ),
+HExpression::HExpression( void ) : f_iIndex( 0 ), f_iLength( 0 ),
 			f_eError( E_OK ), f_oConstantsPool ( 0, HPool<double long>::D_AUTO_GROW ),
 			f_oTerminalIndexes( 0, HPool<int>::D_AUTO_GROW ), f_oFormula(),
 			f_oEquationTree()
@@ -145,14 +141,14 @@ HAnalyser::HAnalyser( void ) : f_iIndex( 0 ), f_iLength( 0 ),
 	M_EPILOG
 	}
 
-HAnalyser::~HAnalyser( void )
+HExpression::~HExpression( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-double long HAnalyser::count_branch( tree_t::const_node_t a_roNode )
+double long HExpression::count_branch( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	int l_iIndex = 0;
@@ -171,7 +167,7 @@ double long HAnalyser::count_branch( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double long HAnalyser::functions( tree_t::const_node_t a_roNode )
+double long HExpression::functions( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	int l_iFunction = (*a_roNode)->f_oVariables.tail();
@@ -191,7 +187,7 @@ double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 			{
 			if ( eq( ::std::floor( l_dLeftValue / D_PI + .5 ),
 						( l_dLeftValue / D_PI + .5 ) ) )
-				throw HAnalyserException( _( "tg: argument not in domain" ) );
+				throw HExpressionException( _( "tg: argument not in domain" ) );
 			return ( ::std::tan( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_TGH ):
@@ -200,7 +196,7 @@ double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 			{
 			if ( eq( ::std::floor( l_dLeftValue / D_PI ),
 						( l_dLeftValue / D_PI ) ) )
-				throw HAnalyserException( _( "ctg: argument not in domain" ) );
+				throw HExpressionException( _( "ctg: argument not in domain" ) );
 			l_dLeftValue = ::std::tan( l_dLeftValue );
 			if ( l_dLeftValue == 0 )
 				return ( 0 );
@@ -216,13 +212,13 @@ double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 		case ( FUNCTION::D_ARCSIN ):
 			{
 			if ( ( l_dLeftValue < - D_PI / 2 ) || ( l_dLeftValue > D_PI / 2 ) )
-				throw HAnalyserException( _( "arcsin: argument not in domain" ) );
+				throw HExpressionException( _( "arcsin: argument not in domain" ) );
 			return ( ::std::asin( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ARCCOS ):
 			{
 			if ( ( l_dLeftValue < - D_PI / 2 ) || ( l_dLeftValue > D_PI / 2 ) )
-				throw HAnalyserException( _( "arccos: argument not in domain" ) );
+				throw HExpressionException( _( "arccos: argument not in domain" ) );
 			return ( ::std::acos( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ARCTG ):
@@ -234,19 +230,19 @@ double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 		case ( FUNCTION::D_SQRT ):
 			{
 			if ( l_dLeftValue < 0 )
-				throw HAnalyserException( _( "sqrt: argument not in domain" ) );
+				throw HExpressionException( _( "sqrt: argument not in domain" ) );
 			return ( ::std::sqrt( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_LN ):
 			{
 			if ( l_dLeftValue <= 0 )
-				throw HAnalyserException( _( "ln: argument not in domain" ) );
+				throw HExpressionException( _( "ln: argument not in domain" ) );
 			return ( ::std::log( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_LOG ):
 			{
 			if ( l_dLeftValue <= 0 )
-				throw HAnalyserException( _( "log: argument not in domain" ) );
+				throw HExpressionException( _( "log: argument not in domain" ) );
 			return ( ::std::log10( l_dLeftValue ) );
 			}
 		case ( FUNCTION::D_ABS ):
@@ -261,7 +257,7 @@ double long HAnalyser::functions( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double long HAnalyser::addition( tree_t::const_node_t a_roNode )
+double long HExpression::addition( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	int l_iOperator = 0;
@@ -290,7 +286,7 @@ double long HAnalyser::addition( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double long HAnalyser::multiplication( tree_t::const_node_t a_roNode )
+double long HExpression::multiplication( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	int l_iOperator = 0;
@@ -310,12 +306,12 @@ double long HAnalyser::multiplication( tree_t::const_node_t a_roNode )
 			break;
 			case ( OPERATOR::D_DIVIDE ) :
 				if ( ! l_dRightValue )
-					throw HAnalyserException( _( "divide by 0" ) );
+					throw HExpressionException( _( "divide by 0" ) );
 				l_dLeftValue /= l_dRightValue;
 			break;
 			case ( OPERATOR::D_MODULO ) :
 				if ( ! static_cast<int long>( l_dRightValue ) )
-					throw HAnalyserException( _( "modulo by 0" ) );
+					throw HExpressionException( _( "modulo by 0" ) );
 				l_dLeftValue = static_cast<double long>( static_cast<int long>( l_dLeftValue ) % static_cast<int long>( l_dRightValue ) );
 			break;
 			default:
@@ -326,7 +322,7 @@ double long HAnalyser::multiplication( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double long HAnalyser::power( tree_t::const_node_t a_roNode )
+double long HExpression::power( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	double long l_dLeftValue, l_dRightValue;
@@ -340,7 +336,7 @@ double long HAnalyser::power( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double long HAnalyser::signum( tree_t::const_node_t a_roNode )
+double long HExpression::signum( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	double long l_dLeftValue;
@@ -349,7 +345,7 @@ double long HAnalyser::signum( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-double long HAnalyser::bracket( tree_t::const_node_t a_roNode )
+double long HExpression::bracket( tree_t::const_node_t a_roNode )
 	{
 	M_PROLOG
 	double long l_dLeftValue;
@@ -358,7 +354,7 @@ double long HAnalyser::bracket( tree_t::const_node_t a_roNode )
 	M_EPILOG
 	}
 
-bool HAnalyser::translate( HString const& a_oFormula )
+bool HExpression::translate( HString const& a_oFormula )
 	{
 	M_PROLOG
 	int l_iIndex = 0, l_iRealIndex = 0, l_iCtr = 0;
@@ -405,7 +401,7 @@ bool HAnalyser::translate( HString const& a_oFormula )
 	M_EPILOG
 	}
 
-bool HAnalyser::addition_production( tree_t::node_t a_roNode )
+bool HExpression::addition_production( tree_t::node_t a_roNode )
 	{
 	M_PROLOG
 	M_ASSERT ( a_roNode );
@@ -416,7 +412,7 @@ bool HAnalyser::addition_production( tree_t::node_t a_roNode )
 		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
 		}
-	(**a_roNode).METHOD = &HAnalyser::addition;
+	(**a_roNode).METHOD = &HExpression::addition;
 	if ( ( f_oFormula[ f_iIndex ] != OPERATOR::D_ADD )
 			&& ( f_oFormula[ f_iIndex ] != OPERATOR::D_SUBSTRACT ) )
 		{
@@ -434,7 +430,7 @@ bool HAnalyser::addition_production( tree_t::node_t a_roNode )
 	M_EPILOG
 	}
 
-bool HAnalyser::multiplication_production( tree_t::node_t a_roNode )
+bool HExpression::multiplication_production( tree_t::node_t a_roNode )
 	{
 	M_PROLOG
 	if ( power_production( &*a_roNode->add_node() ) )
@@ -444,7 +440,7 @@ bool HAnalyser::multiplication_production( tree_t::node_t a_roNode )
 		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
 		}
-	(**a_roNode).METHOD = &HAnalyser::multiplication;
+	(**a_roNode).METHOD = &HExpression::multiplication;
 	if ( ( f_oFormula[ f_iIndex ] != OPERATOR::D_MULTIPLY )
 			&& ( f_oFormula[ f_iIndex ] != OPERATOR::D_DIVIDE )
 			&& ( f_oFormula[ f_iIndex ] != OPERATOR::D_MODULO ) )
@@ -464,7 +460,7 @@ bool HAnalyser::multiplication_production( tree_t::node_t a_roNode )
 	M_EPILOG
 	}
 
-void HAnalyser::shorten_the_branch( tree_t::node_t a_poNode )
+void HExpression::shorten_the_branch( tree_t::node_t a_poNode )
 	{
 	M_PROLOG
 	tree_t::node_t parent = a_poNode->get_parent();
@@ -484,7 +480,7 @@ void HAnalyser::shorten_the_branch( tree_t::node_t a_poNode )
 	M_EPILOG
 	}
 
-bool HAnalyser::power_production( tree_t::node_t a_roNode )
+bool HExpression::power_production( tree_t::node_t a_roNode )
 	{
 	M_PROLOG
 	if ( signum_production( &*a_roNode->add_node() ) )
@@ -494,13 +490,13 @@ bool HAnalyser::power_production( tree_t::node_t a_roNode )
 		f_eError = E_UNEXPECTED_TERMINATION;
 		return ( true );
 		}
-	(**a_roNode).METHOD = &HAnalyser::bracket;
+	(**a_roNode).METHOD = &HExpression::bracket;
 	if ( f_oFormula[ f_iIndex ] == '^' )
 		{
 		f_iIndex ++;
 		if ( power_production( &*a_roNode->add_node() ) )
 			return ( true );
-		(**a_roNode).METHOD = &HAnalyser::power;
+		(**a_roNode).METHOD = &HExpression::power;
 		}
 	else
 		shorten_the_branch( a_roNode );
@@ -508,7 +504,7 @@ bool HAnalyser::power_production( tree_t::node_t a_roNode )
 	M_EPILOG
 	}
 
-bool HAnalyser::signum_production( tree_t::node_t a_roNode )
+bool HExpression::signum_production( tree_t::node_t a_roNode )
 	{
 	M_PROLOG
 	if ( f_iIndex > f_iLength )
@@ -521,7 +517,7 @@ bool HAnalyser::signum_production( tree_t::node_t a_roNode )
 		f_iIndex ++;
 		if ( terminal_production( &*a_roNode->add_node() ) )
 			return ( true );
-		(**a_roNode).METHOD = &HAnalyser::signum;
+		(**a_roNode).METHOD = &HExpression::signum;
 		}
 	else
 		if ( terminal_production( a_roNode ) )
@@ -530,7 +526,7 @@ bool HAnalyser::signum_production( tree_t::node_t a_roNode )
 	M_EPILOG
 	}
 
-bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
+bool HExpression::terminal_production( tree_t::node_t a_roNode )
 	{
 	M_PROLOG
 	if ( f_iIndex > f_iLength )
@@ -559,7 +555,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 			f_iIndex ++;
 			if ( addition_production ( &*a_roNode->add_node() ) )
 				return ( true );
-			(**a_roNode).METHOD = &HAnalyser::functions;
+			(**a_roNode).METHOD = &HExpression::functions;
 			(**a_roNode).f_oVariables.push_back( FUNCTION::D_ABS );
 			if ( f_oFormula[ f_iIndex ] != '|' )
 				{
@@ -586,7 +582,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 		if ( f_oFormula[ f_iIndex ] == '(' )
 			{
 			f_iIndex ++;
-			(**a_roNode).METHOD = &HAnalyser::functions;
+			(**a_roNode).METHOD = &HExpression::functions;
 			(**a_roNode).f_oVariables.push_back ( static_cast<int>( f_oFormula[ f_iIndex - 2 ] ) );
 			if ( addition_production ( &*a_roNode->add_node() ) )
 				return ( true );
@@ -648,7 +644,7 @@ bool HAnalyser::terminal_production( tree_t::node_t a_roNode )
 	M_EPILOG
 	}
 
-double long* HAnalyser::analyse( HString const& a_oFormula )
+double long* HExpression::compile( HString const& a_oFormula )
 	{
 	M_PROLOG
 	int long l_iLength = 0;
@@ -658,10 +654,10 @@ double long* HAnalyser::analyse( HString const& a_oFormula )
 	if ( l_iLength == 0 )
 		{
 		f_eError = E_PREMATURE_TERMINATION;
-		throw HAnalyserException( n_pcSyntaxError );
+		throw HExpressionException( n_pcSyntaxError );
 		}
 	if ( translate( a_oFormula ) )
-		throw HAnalyserException( n_pcSyntaxError );
+		throw HExpressionException( n_pcSyntaxError );
 	f_oConstantsPool.reset();
 	tree_t::node_t root = f_oEquationTree.create_new_root();
 	if ( ! addition_production( root ) )
@@ -672,12 +668,12 @@ double long* HAnalyser::analyse( HString const& a_oFormula )
 	else if ( f_iIndex >= f_iLength )
 		f_eError = E_UNEXPECTED_TERMINATION;
 	if ( f_eError != E_OK )
-		throw HAnalyserException( n_pcSyntaxError );
+		throw HExpressionException( n_pcSyntaxError );
 	return ( f_pdVariables );
 	M_EPILOG
 	}
 
-double long& HAnalyser::operator[]( int a_iIndex )
+double long& HExpression::operator[]( int a_iIndex )
 	{
 	M_PROLOG
 	if ( ( a_iIndex >= 'a' ) && ( a_iIndex <= 'a' ) )
@@ -693,7 +689,7 @@ double long& HAnalyser::operator[]( int a_iIndex )
 	M_EPILOG
 	}
 
-double long HAnalyser::count( void )
+double long HExpression::evaluate( void )
 	{
 	M_PROLOG
 	tree_t::const_node_t root = f_oEquationTree.get_root();
@@ -703,7 +699,7 @@ double long HAnalyser::count( void )
 	M_EPILOG
 	}
 
-char const* HAnalyser::get_error( void ) const
+char const* HExpression::get_error( void ) const
 	{
 	M_PROLOG
 	switch ( f_eError )
@@ -734,7 +730,7 @@ char const* HAnalyser::get_error( void ) const
 	M_EPILOG
 	}
 
-int HAnalyser::get_error_token( void ) const
+int HExpression::get_error_token( void ) const
 	{
 	M_PROLOG
 	if ( f_iLength > f_iIndex )

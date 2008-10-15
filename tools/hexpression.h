@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	analyser.h - this file is integral part of `yaal' project.
+	hexpression.h - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __YAAL_TOOLS_HANALYSER_H
-#define __YAAL_TOOLS_HANALYSER_H
+#ifndef __YAAL_TOOLS_HEXPRESSION_H
+#define __YAAL_TOOLS_HEXPRESSION_H
 
 #include "hcore/hstring.h"
 #include "hcore/htree.h"
@@ -37,9 +37,9 @@ namespace yaal
 namespace tools
 {
 
-class HAnalyser
+class HExpression
 	{
-	typedef HAnalyser self_t;
+	typedef HExpression self_t;
 	typedef enum
 		{
 		E_OK = 0,
@@ -58,7 +58,7 @@ class HAnalyser
 	typedef hcore::HTree<OEquationElement> tree_t;
 	struct OEquationElement
 		{
-		typedef double long ( HAnalyser::* METHOD_t ) ( tree_t::const_node_t );
+		typedef double long ( HExpression::* METHOD_t ) ( tree_t::const_node_t );
 		METHOD_t METHOD;
 		int_list_t f_oVariables;
 		OEquationElement() : METHOD(), f_oVariables() {}
@@ -73,11 +73,11 @@ class HAnalyser
 	tree_t f_oEquationTree;
 public:
 	/*{*/
-	HAnalyser( void );
-	virtual ~HAnalyser( void );
-	double long* analyse( yaal::hcore::HString const& );
+	HExpression( void );
+	virtual ~HExpression( void );
+	double long* compile( yaal::hcore::HString const& );
 	double long& operator [] ( int );
-	double long count( void );
+	double long evaluate( void );
 	char const* get_error( void ) const;
 	int get_error_token( void ) const;
 private:
@@ -97,10 +97,10 @@ private:
 	void shorten_the_branch( tree_t::node_t );
 	};
 
-typedef yaal::hcore::HExceptionT<HAnalyser> HAnalyserException;
+typedef yaal::hcore::HExceptionT<HExpression> HExpressionException;
 
 }
 
 }
 
-#endif /* not __YAAL_TOOLS_HANALYSER_H */
+#endif /* not __YAAL_TOOLS_HEXPRESSION_H */
