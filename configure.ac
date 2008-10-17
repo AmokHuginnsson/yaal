@@ -6,7 +6,7 @@ dnl Initialization data.
 pushdef([AC_VERSION],esyscmd(awk '/^VERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
 pushdef([AC_SUBVERSION],esyscmd(awk '/^SUBVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
 pushdef([AC_EXTRAVERSION],esyscmd(awk '/^EXTRAVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
-m4_include([acinclude.m4])
+m4_include([_aux/aclib.m4])
 AC_INIT([[yaal]],[AC_VERSION.AC_SUBVERSION.AC_EXTRAVERSION],[[amok@codestation.org]])
 
 AC_MSG_RESULT([--- Welcome to yaal configurator ---                     [[0%]]])
