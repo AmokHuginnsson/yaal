@@ -94,39 +94,7 @@ dnl Looking for main libc headers
 AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])
 AC_HEADER_MAJOR
 
-dnl We need to know what operating system yaal will be compiled on.
-AC_MSG_CHECKING([host operating system])
-HOST_OS_TYPE=""
-if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] ; then
-	AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your operating system is Debian.])
-	HOST_OS_TYPE=[Debian]
-fi
-if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
-	if test -f [/etc/rc] ; then
-		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
-		HOST_OS_TYPE=[FreeBSD]
-	else
-		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
-	fi
-fi
-if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] ; then
-	AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your operating system is PLD.])
-	HOST_OS_TYPE=[PLD]
-fi
-if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] ; then
-	AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your operating system is Slackware.])
-	HOST_OS_TYPE=[Slackware]
-fi
-if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/dfs/dfstab] ; then
-	AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
-	HOST_OS_TYPE=[Solaris]
-fi
-
-if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
-	AC_MSG_ERROR([Cannot recognize host operating system type!])
-else
-	AC_MSG_RESULT([$HOST_OS_TYPE])
-fi
+YAAL_DETECT_OPERATING_SYSTEM
 
 dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[53%]]])
@@ -163,41 +131,14 @@ if test ["$_FLAGS"] = [""] ; then
 fi
 AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
 
-
-dnl Checks for which function macros exist
-AC_MSG_CHECKING(whether $CC implements __PRETTY_FUNCTION__)
-AC_CACHE_VAL(yaal_cv_have_func,
-						 [AC_TRY_LINK([#include <stdio.h>],[printf("%s", __PRETTY_FUNCTION__);],
-						 yaal_cv_have_func=yes, yaal_cv_have_func=no)])
-AC_MSG_RESULT($yaal_cv_have_func)
-if test "$yaal_cv_have_func" = yes; then
-	AC_DEFINE(HAVE_PRETTY_FUNCTION,[],[Does the compiler understand __PRETTY_FUNCTION__])
-else
-	AC_MSG_CHECKING(whether $CC implements __FUNCTION__)
-	AC_CACHE_VAL(yaal_cv_have_pretty_function,
-							 [AC_TRY_LINK([#include <stdio.h>],[printf("%s", __FUNCTION__);],
-							 yaal_cv_have_pretty_function=yes, yaal_cv_have_pretty_function=no)])
-	AC_MSG_RESULT($yaal_cv_have_pretty_function)
-	if test "$yaal_cv_have_pretty_function" = yes; then
-		AC_DEFINE(HAVE_FUNCTION,[],[Does compiler understand __FUNCTION__])
-	else
-		AC_MSG_CHECKING(whether $CC implements __func__)
-		AC_CACHE_VAL(yaal_cv_have_function,
-								 [AC_TRY_LINK([#include <stdio.h>],[printf("%s", __func__);],
-								 yaal_cv_have_function=yes, yaal_cv_have_function=no)])
-		AC_MSG_RESULT($yaal_cv_have_function)
-		if test "$yaal_cv_have_function" = yes; then
-			AC_DEFINE(HAVE_FUNC,[],[Does compiler understand __func__])
-		fi
-	fi
-fi
+YAAL_DETECT_FUNCTION_MACRO
 
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
 CXXFLAGS=$CXXFLAGS_ORIG;
 CPPFLAGS=$CXXFLAGS_ORIG;
 AC_CHECK_LIB([pthread],[pthread_create],,[AC_MSG_ERROR([Cannot build without threading library.])]) LIBS=""
-AC_CHECK_LIB([rt],[clock_gettime],,[AC_MSG_ERROR([Cannot continue without rt library.])]) LIBS=""
+AC_SEARCH_LIBS([clock_gettime],[rt],,[AC_MSG_ERROR([Cannot continue without rt library.])]) LIBS=""
 AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
 AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
@@ -287,6 +228,18 @@ int main( int, char const* const* const )
 	iconv( conv, &in, &size, &out, &size );
 	return ( 0 );
 	}], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
+AC_MSG_RESULT([$RESULT])
+
+AC_MSG_CHECKING([whether arg for basename is const])
+RESULT=["no"]
+AC_COMPILE_IFELSE([#include<libgen.h>
+#define NULL	0
+int main( int, char const* const* const )
+	{
+	char const* const p = NULL;
+	basename( p );
+	return ( 0 );
+	}], [AC_DEFINE([HAVE_BASENAME_ARG_CONST],[],[Is your argument to basename a pointer to const?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether gethostbyname_r is GNU variant])
@@ -402,9 +355,9 @@ AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 
 AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 LIBS="${HCORE_LIBS}"
-AC_CHECK_FUNCS([getline memrchr gethostbyname_r gethostbyaddr_r strcasestr])
+AC_CHECK_FUNCS([getline memrchr gethostbyname_r gethostbyaddr_r strcasestr strtold])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
-AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASE_NAME_IN_LIBGEN],[],[Does your basename() is included in libgen library?])],[#include <string.h>])
+AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASENAME_IN_LIBGEN],[],[Does your basename() is included in libgen library?])],[#include <string.h>])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
 AC_CHECK_DECLS([SUN_LEN],[],[],[#include <sys/un.h>])

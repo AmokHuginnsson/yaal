@@ -28,6 +28,7 @@ Copyright:
 #include <netdb.h>
 #include <cmath>
 #include <cstring>
+#include <cstdlib>
 
 #include "compat.h"
 #include "hstring.h"
@@ -53,6 +54,7 @@ char* strcasestr( char const* haystack, char const* needle )
 	}
 #endif /* not HAVE_STRCASESTR */
 
+#if defined( HAVE_GETHOSTBYNAME_R )
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
 int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, size_t a3, struct hostent**, int* a5 )
 	{
@@ -60,7 +62,9 @@ int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, size_t a3, st
 	return ( h ? 0 : errno );
 	}
 #endif /* not HAVE_GNU_GETHOSTBYNAME_R */
+#endif /* HAVE_GETHOSTBYNAME_R */
 
+#if defined( HAVE_GETHOSTBYADDR_R )
 #if ! defined( HAVE_GNU_GETHOSTBYADDR_R )
 int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a4, size_t a5, struct hostent**, int* a7 )
 	{
@@ -68,11 +72,19 @@ int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a
 	return ( h ? 0 : errno );
 	}
 #endif /* not HAVE_GNU_GETHOSTBYADDR_R */
+#endif /* HAVE_GETHOSTBYADDR_R */
 
 #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 )
 double long powl( double long a, double long b )
 	{
 	return ( ::std::pow( a, b ) );
+	}
+#endif /* not HAVE_POWL */
+
+#if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
+double long strtold( char const* str, char** tail )
+	{
+	return ( strtod( str, tail ) );
 	}
 #endif /* not HAVE_POWL */
 

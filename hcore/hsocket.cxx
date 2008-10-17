@@ -246,12 +246,12 @@ void HSocket::connect( yaal::hcore::HString const& a_oAddress, int const a_iPort
 
 void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_iPort )
 	{
-	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	M_PROLOG
 	int l_iError = 0;
 	sockaddr_in* l_psAddressNetwork = NULL;
 	sockaddr_un* l_psAddressFile = NULL;
 #ifdef HAVE_GETHOSTBYNAME_R
+	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	hostent l_sHostName;
 	hostent* l_psHostName = NULL;
 #else /* HAVE_GETHOSTBYNAME_R */

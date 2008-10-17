@@ -287,6 +287,12 @@ void HException::cleanup( char* a_pcPtr )
 	return;
 	}
 
+void HFailedAssertion::swap( HFailedAssertion& left, HFailedAssertion& right )
+	{
+	yaal::swap( left.f_pcWhat, right.f_pcWhat );
+	return;
+	}
+
 }
 
 }

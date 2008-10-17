@@ -151,7 +151,7 @@ public:
 private:
 	bool release( void ) throw();
 	template<typename hier_t, template<typename> class alien_access_t>
-	HPointer& acquire( HPointer<hier_t, pointer_type_t, alien_access_t> const& );
+	void acquire( HPointer<hier_t, pointer_type_t, alien_access_t> const& );
 	void assign( tType*&, tType* );
 	template<typename hier_t>
 	void assign( tType*&, hier_t* );
@@ -303,7 +303,8 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<tType, pointer_type_t, access_type_t> const& a_roPointer )
 	{
-	return ( acquire( a_roPointer ) );
+	acquire( a_roPointer );
+	return ( *this );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
@@ -311,13 +312,14 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 template<typename hier_t, template<typename>class alien_access_t>
 HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<hier_t, pointer_type_t, alien_access_t> const& a_roPointer )
 	{
-	return ( acquire( a_roPointer ) );
+	acquire( a_roPointer );
+	return ( *this );
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 template<typename hier_t, template<typename>class alien_access_t>
-HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::acquire( HPointer<hier_t, pointer_type_t, alien_access_t> const& from )
+void HPointer<tType, pointer_type_t, access_type_t>::acquire( HPointer<hier_t, pointer_type_t, alien_access_t> const& from )
 	{
 	HPointer const& alien = reinterpret_cast<HPointer const&>( from );
 	if ( ( &alien != this ) && ( f_poShared != alien.f_poShared ) )
@@ -339,7 +341,7 @@ HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, 
 			f_ptObject = NULL;
 			}
 		}
-	return ( *this );
+	return;
 	}
 
 template<typename tType, template<typename, typename>class pointer_type_t,

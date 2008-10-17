@@ -122,7 +122,19 @@ class HFailedAssertion
 	char const* f_pcWhat;
 public:
 	HFailedAssertion( char const* const a_pcWhat ) : f_pcWhat( a_pcWhat ) {}
+	HFailedAssertion( HFailedAssertion const& fa ) : f_pcWhat( fa.f_pcWhat ) {}
+	HFailedAssertion& operator = ( HFailedAssertion const& fa )
+		{
+		if ( &fa != this )
+			{
+			HFailedAssertion n( fa );
+			HFailedAssertion::swap( n, *this );
+			}
+		return ( *this );
+		}
 	char const* what( void ) { return ( f_pcWhat ); }
+private:
+	static void swap( HFailedAssertion& left, HFailedAssertion& right );
 	};
 
 /*

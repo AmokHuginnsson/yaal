@@ -41,9 +41,9 @@ Copyright:
 #endif
 #endif
 
-#if defined( __HOST_OS_TYPE_SOLARIS__ )
+#if ! defined( HAVE_BASENAME_ARG_CONST )
 #define basename( x ) basename( const_cast<char*>( x ) )
-#endif /* __HOST_OS_TYPE_SOLARIS__ */
+#endif /* not HAVE_BASENAME_ARG_CONST */
 
 #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
 char* strcasestr( char const*, char const* );
@@ -71,6 +71,10 @@ int gethostbyaddr_r( void const*, int, int, struct hostent*, char*, size_t, stru
 
 #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 )
 double long powl( double long, double long );
+#endif /* not HAVE_POWL */
+
+#if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
+double long strtold( char const*, char** );
 #endif /* not HAVE_POWL */
 
 #endif /* not __YAAL_HCORE_COMPAT_H */

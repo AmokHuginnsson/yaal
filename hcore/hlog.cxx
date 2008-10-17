@@ -34,9 +34,9 @@ Copyright:
 
 #include "config.h"
 
-#ifdef HAVE_BASE_NAME_IN_LIBGEN
+#ifdef HAVE_BASENAME_IN_LIBGEN
 #	include <libgen.h>
-#endif /* HAVE_BASE_NAME_IN_LIBGEN */
+#endif /* HAVE_BASENAME_IN_LIBGEN */
 
 #include "base.h"
 M_VCSID( "$Id: "__ID__" $" )

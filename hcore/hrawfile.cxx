@@ -28,6 +28,7 @@ Copyright:
 #include <poll.h>
 #include <cstdlib>
 #include <libintl.h>
+#include <sys/time.h> /* timeval */
 
 #include "base.h"
 M_VCSID( "$Id: "__ID__" $" )

@@ -64,6 +64,16 @@ private:
 		HAbstractNode* f_poNode;
 		bool f_bExists;
 		ONodePtr( void ) : f_poNode( NULL ), f_bExists( false ) { }
+		ONodePtr( ONodePtr const& np ) : f_poNode( np.f_poNode ), f_bExists( np.f_bExists ) {}
+		ONodePtr& operator = ( ONodePtr const& np )
+			{
+			if ( &np != this )
+				{
+				f_poNode = np.f_poNode;
+				f_bExists = np.f_bExists;
+				}
+			return ( *this );
+			}
 		};
 	class HAbstractNode
 		{
