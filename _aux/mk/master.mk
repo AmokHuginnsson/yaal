@@ -9,7 +9,7 @@ all bin clean clean-dep cov dep doc environment install mrproper release prof pu
 Makefile: configure Makefile.in
 	@./configure
 
-configure: configure.ac
+configure: configure.ac _aux/aclib.m4
 	@autoreconf
 
 .my_make:
