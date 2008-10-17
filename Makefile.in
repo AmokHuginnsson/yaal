@@ -44,7 +44,7 @@ include $(DIR_ROOT)/_aux/mk/3_suffix.mk
 include $(DIR_ROOT)/_aux/mk/4_wrapper.mk
 include $(DIR_ROOT)/_aux/mk/5_flags.mk
 CWARNING_FLAGS								+= @PEDANTIC_ERRORS@ @EXTRA_WARNINGS@ @WARN_SHADOW@
-COMPILER_PRIME_FLAGS					+= -D__YAAL_BUILD__ -fPIC @DEFS@
+COMPILER_PRIME_FLAGS					+= -D__YAAL_BUILD__ @YAAL_CXXFLAGS@ @DEFS@
 COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I/usr/local/include \
 																@EXTRA_INCLUDE_PATHS@
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \

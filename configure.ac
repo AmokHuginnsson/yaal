@@ -6,6 +6,7 @@ dnl Initialization data.
 pushdef([AC_VERSION],esyscmd(awk '/^VERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
 pushdef([AC_SUBVERSION],esyscmd(awk '/^SUBVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
 pushdef([AC_EXTRAVERSION],esyscmd(awk '/^EXTRAVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
+m4_include([acinclude.m4])
 AC_INIT([[yaal]],[AC_VERSION.AC_SUBVERSION.AC_EXTRAVERSION],[[amok@codestation.org]])
 
 AC_MSG_RESULT([--- Welcome to yaal configurator ---                     [[0%]]])
@@ -133,6 +134,7 @@ _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
 CPPFLAGS_ORIG=$CPPFLAGS;
 
+YAAL_DETECT_FLAGS(YAAL_CXXFLAGS, [-fPIC], [C++])
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])
 RESULT=["no"]
@@ -448,6 +450,7 @@ AC_SUBST([EXTRA_LIB_PATHS], ["$EXTRA_LIB_PATHS"])
 AC_SUBST([EXTRA_INCLUDE_PATHS], ["$EXTRA_INCLUDE_PATHS"])
 AC_SUBST([DEFAULT_DRIVER], ["$DEFAULT_DRIVER"])
 AC_SUBST([MYSQL_SOCKET],["$MYSQL_SOCKET"])
+AC_SUBST([YAAL_CXXFLAGS],[${YAAL_CXXFLAGS}])
 AC_SUBST([HCORE_LIBS],[${HCORE_LIBS}])
 AC_SUBST([TOOLS_LIBS],[${TOOLS_LIBS}])
 AC_SUBST([HCONSOLE_LIBS],[${HCONSOLE_LIBS}])
