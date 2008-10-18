@@ -182,7 +182,7 @@ HStreamInterface::STATUS const& HStreamInterface::read_until( HString& a_roMessa
 		f_iOffset = 0;
 		if ( ! nRead )
 			f_sStatus.code = STATUS::D_ERROR;
-		else if ( f_sStatus.octets == 0 )
+		else if ( ( f_sStatus.octets == 0 ) && ! a_bStripDelim )
 			f_sStatus.code = STATUS::D_REPEAT;
 		else
 			f_sStatus.code = STATUS::D_OK;
