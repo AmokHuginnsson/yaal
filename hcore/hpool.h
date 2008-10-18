@@ -18,7 +18,7 @@ Copyright:
      for this software.
      You can not even demand cost of the carrier (CD for example).
   5. You can not include it to any commercial enterprise (for example 
-     as a free push_back-on to payed software or payed newspaper).
+     as a free add-on to payed software or payed newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
@@ -41,7 +41,7 @@ namespace yaal
 namespace hcore
 {
 
-extern char const * g_ppcErrMsgHPool [ ];
+extern char const * n_ppcErrMsgHPool [ ];
 
 template<typename tType>
 class HPool
@@ -69,7 +69,7 @@ public:
 	typedef tType const* const_iterator;
 private:
 	pool_type_t f_ePoolType;
-	int long f_lAllocatedObjects;	/* size of allocated memory buffer */
+	int long f_lCapacity;	/* size of allocated memory buffer */
 	int long f_lSize; /*! size of container */
 	tType* f_ptPool;	/* pointer to allocated memory pool */
 public:
@@ -85,7 +85,9 @@ public:
 	bool is_empty( void ) const;
 	int long size( void ) const;
 	int long get_size( void ) const;
-	static void swap( HPool<tType>&, HPool<tType>& );
+	int long capacity( void ) const;
+	int long get_capacity( void ) const;
+	void swap( HPool<tType>& );
 	tType const* raw( void ) const;
 	tType* raw( void );
 	const_iterator begin( void ) const;
@@ -102,7 +104,7 @@ public:
 
 template<typename tType>
 HPool<tType>::HPool( void )
-	: f_ePoolType( D_DUMB ), f_lAllocatedObjects( 0 ),
+	: f_ePoolType( D_DUMB ), f_lCapacity( 0 ),
 	f_lSize( 0 ), f_ptPool( NULL )
 	{
 	M_PROLOG
@@ -112,7 +114,7 @@ HPool<tType>::HPool( void )
 
 template<typename tType>
 HPool<tType>::HPool( int long const& a_ulNewSize, pool_type_t const& a_ePoolType )
-	: f_ePoolType( a_ePoolType ), f_lAllocatedObjects( 0 ), f_lSize( 0 ),
+	: f_ePoolType( a_ePoolType ), f_lCapacity( 0 ), f_lSize( 0 ),
 	f_ptPool( NULL )
 	{
 	M_PROLOG
@@ -124,7 +126,7 @@ HPool<tType>::HPool( int long const& a_ulNewSize, pool_type_t const& a_ePoolType
 
 template<typename tType>
 HPool<tType>::HPool( HPool<tType> const& source )
-	: f_ePoolType( source.f_ePoolType ), f_lAllocatedObjects( 0 ), f_lSize( 0 ),
+	: f_ePoolType( source.f_ePoolType ), f_lCapacity( 0 ), f_lSize( 0 ),
 	f_ptPool( NULL )
 	{
 	M_PROLOG
@@ -160,7 +162,7 @@ HPool<tType>::~HPool( void )
 	M_PROLOG
 	if ( f_ptPool )
 		xfree( f_ptPool );
-	f_lAllocatedObjects = 0;
+	f_lCapacity = 0;
 	f_lSize = 0;
 	return;
 	M_EPILOG
@@ -171,28 +173,28 @@ void HPool<tType>::pool_realloc( int long const& a_ulNewSize )
 	{
 	M_PROLOG
 	if ( a_ulNewSize < 1 )
-		M_THROW( g_ppcErrMsgHPool[ ERROR::E_BADSIZE ], a_ulNewSize );
+		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BADSIZE ], a_ulNewSize );
 	if ( f_ePoolType == D_AUTO_GROW )
 		{
-		if ( a_ulNewSize > f_lAllocatedObjects )
+		if ( a_ulNewSize > f_lCapacity )
 			{
-			f_lAllocatedObjects = 1;
-			while ( f_lAllocatedObjects < a_ulNewSize )
-				f_lAllocatedObjects <<= 1;
-			f_ptPool = xrealloc<tType>( f_ptPool, f_lAllocatedObjects );
+			f_lCapacity = 1;
+			while ( f_lCapacity < a_ulNewSize )
+				f_lCapacity <<= 1;
+			f_ptPool = xrealloc<tType>( f_ptPool, f_lCapacity );
 			::memset( f_ptPool + f_lSize, 0,
-					( f_lAllocatedObjects - f_lSize ) * sizeof ( tType ) );
+					( f_lCapacity - f_lSize ) * sizeof ( tType ) );
 			}
 		}
-	else if ( f_lAllocatedObjects != a_ulNewSize )
+	else if ( f_lCapacity != a_ulNewSize )
 		{
 		if ( f_ptPool && ( f_ePoolType == D_FIXED_SIZE ) )
-			M_THROW( g_ppcErrMsgHPool[ ERROR::E_REALLOC_FIXED ], f_lAllocatedObjects );
-		f_lAllocatedObjects = a_ulNewSize;
-		f_ptPool = xrealloc<tType>( f_ptPool, f_lAllocatedObjects );
+			M_THROW( n_ppcErrMsgHPool[ ERROR::E_REALLOC_FIXED ], f_lCapacity );
+		f_lCapacity = a_ulNewSize;
+		f_ptPool = xrealloc<tType>( f_ptPool, f_lCapacity );
 		if ( a_ulNewSize > f_lSize )
 			::memset( f_ptPool + f_lSize, 0,
-					( f_lAllocatedObjects - f_lSize ) * sizeof ( tType ) );
+					( f_lCapacity - f_lSize ) * sizeof ( tType ) );
 		}
 	f_lSize = a_ulNewSize;
 	return;
@@ -204,7 +206,7 @@ tType& HPool<tType>::operator[]( int long const& a_iIndex ) const
 	{
 	M_PROLOG
 	if ( ( a_iIndex < 0 ) || ( a_iIndex >= f_lSize ) )
-		M_THROW( g_ppcErrMsgHPool[ ERROR::E_BADINDEX ], a_iIndex );
+		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BADINDEX ], a_iIndex );
 	return ( f_ptPool[ a_iIndex ] );
 	M_EPILOG
 	}
@@ -239,6 +241,18 @@ int long HPool<tType>::get_size( void ) const
 	}
 
 template<typename tType>
+int long HPool<tType>::capacity( void ) const
+	{
+	return ( get_capacity() );
+	}
+
+template<typename tType>
+int long HPool<tType>::get_capacity( void ) const
+	{
+	return ( f_lCapacity );
+	}
+
+template<typename tType>
 bool HPool<tType>::is_empty( void ) const
 	{
 	return ( ! f_lSize );
@@ -251,14 +265,15 @@ bool HPool<tType>::empty( void ) const
 	}
 
 template<typename tType>
-void HPool<tType>::swap( HPool<tType>& left, HPool<tType>& right )
+void HPool<tType>::swap( HPool<tType>& other )
 	{
-	if ( &left != &right )
+	if ( &other != this )
 		{
-		yaal::swap( left.f_ePoolType, right.f_ePoolType );
-		yaal::swap( left.f_lAllocatedObjects, right.f_lAllocatedObjects );
-		yaal::swap( left.f_lSize, right.f_lSize );
-		yaal::swap( left.f_ptPool, right.f_ptPool );
+		using yaal::swap;
+		swap( f_ePoolType, other.f_ePoolType );
+		swap( f_lCapacity, other.f_lCapacity );
+		swap( f_lSize, other.f_lSize );
+		swap( f_ptPool, other.f_ptPool );
 		}
 	return;
 	}
@@ -324,6 +339,10 @@ typename HPool<tType>::iterator HPool<tType>::rend( void )
 	}
 
 }
+
+template<typename tType>
+inline void swap( yaal::hcore::HPool<tType>& a, yaal::hcore::HPool<tType>& b )
+	{ a.swap( b ); }
 
 }
 

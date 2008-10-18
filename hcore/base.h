@@ -68,7 +68,7 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 #endif /* not NDEBUG */
 
 template<typename tType>
-void swap( tType& left, tType& right )
+inline void swap( tType& left, tType& right )
 	{
 	if ( &left != &right )
 		{
@@ -115,24 +115,32 @@ void for_each( iterator_t it, iterator_t const& end, call_t& CALL )
 		CALL( *it );
 	}
 
-template<typename src_it_type_t, typename dst_it_type_t>
-void copy( src_it_type_t src, src_it_type_t const& end, dst_it_type_t dst )
+template<typename src_it_t, typename dst_it_t>
+void copy( src_it_t src, src_it_t const& end, dst_it_t dst )
 	{
 	for ( ; src != end; ++ src )
 		*dst = *src, ++ dst;
 	return;
 	}
 
-template<typename dst_it_type_t, typename filler_t>
-void fill( dst_it_type_t it, dst_it_type_t end, filler_t const& filler )
+template<typename first_it_t, typename second_it_t>
+void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second )
+	{
+	for ( ; first != end; ++ first, ++ second )
+		swap( *first, *second ) ;
+	return;
+	}
+
+template<typename dst_it_t, typename filler_t>
+void fill( dst_it_t it, dst_it_t end, filler_t const& filler )
 	{
 	for ( ; it != end; ++ it )
 		*it = filler;
 	return;
 	}
 
-template<typename dst_it_type_t, typename filler_t>
-void fill_n( dst_it_type_t it, int long const& count, filler_t const& filler )
+template<typename dst_it_t, typename filler_t>
+void fill_n( dst_it_t it, int long const& count, filler_t const& filler )
 	{
 	for ( int long i = 0; i < count; ++ i, ++ it )
 		*it = filler;

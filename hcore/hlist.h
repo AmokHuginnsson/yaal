@@ -121,7 +121,7 @@ public:
 	const_iterator rbegin( void ) const;
 	void clear( void );
 	int size( void ) const;
-	static void swap( HList<tType>&, HList<tType>& );
+	void swap( HList<tType>& );
 	/*!
 	 * Adds new element at specified position.
 	 */
@@ -589,15 +589,16 @@ int HList<tType>::size( void ) const
 	}
 
 template<typename tType>
-void HList<tType>::swap( HList<tType>& left, HList<tType>& right )
+void HList<tType>::swap( HList<tType>& other )
 	{
-	if ( &left != &right )
+	if ( &other != this )
 		{
-		yaal::swap( left.f_iSize, right.f_iSize );
-		yaal::swap( left.f_iIndex, right.f_iIndex );
-		yaal::swap( left.f_eOrder, right.f_eOrder );
-		yaal::swap( left.f_poHook, right.f_poHook );
-		yaal::swap( left.f_poIndex, right.f_poIndex );
+		using yaal::swap;
+		swap( f_iSize, other.f_iSize );
+		swap( f_iIndex, other.f_iIndex );
+		swap( f_eOrder, other.f_eOrder );
+		swap( f_poHook, other.f_poHook );
+		swap( f_poIndex, other.f_poIndex );
 		}
 	return;
 	}
@@ -1285,6 +1286,10 @@ void HList<tType>::sort( T const& less, sort_order_t a_eOrder )
 	}
 
 }
+
+template<typename tType> 
+inline void swap( yaal::hcore::HList<tType>& a, yaal::hcore::HList<tType>& b )
+	{ a.swap( b ); }
 
 }
 

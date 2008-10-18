@@ -406,13 +406,14 @@ int long HString::capacity( void ) const
 	M_EPILOG
 	}
 
-void HString::swap( HString& left, HString& right )
+void HString::swap( HString& other )
 	{
-	if ( &left != &right )
+	if ( &other != this )
 		{
-		yaal::swap( left.f_pcBuffer, right.f_pcBuffer );
-		yaal::swap( left.f_lAllocatedBytes, right.f_lAllocatedBytes );
-		yaal::swap( left.f_lSize, right.f_lSize );
+		using yaal::swap;
+		swap( f_pcBuffer, other.f_pcBuffer );
+		swap( f_lAllocatedBytes, other.f_lAllocatedBytes );
+		swap( f_lSize, other.f_lSize );
 		}
 	return;
 	}
@@ -636,7 +637,8 @@ HString& HString::replace( HString const& a_oPattern,
 			}
 		if ( newIdx && ( ( f_lSize - oldIdx ) != l_iLenPattern ) )
 			::std::memmove( f_pcBuffer + newIdx, src->f_pcBuffer + oldIdx + l_iLenPattern, ( f_lSize - oldIdx ) - l_iLenPattern );
-		yaal::swap( f_lSize, l_lSize );
+		using yaal::swap;
+		swap( f_lSize, l_lSize );
 		}
 	f_pcBuffer[ f_lSize ] = 0;
 	return ( *this );

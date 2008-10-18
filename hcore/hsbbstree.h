@@ -120,7 +120,7 @@ public:
 	bool empty( void ) const;
 	bool is_empty( void ) const;
 	void clear( void );
-	static void swap( HSBBSTree&, HSBBSTree& );
+	void swap( HSBBSTree& );
 	template<typename tType, typename ttType>
 	void copy_from( HSBBSTree const& );
 	HIterator begin( void ) const;
@@ -306,6 +306,9 @@ void HSBBSTree::copy_from( HSBBSTree const& source )
 	}
 
 }
+
+inline void swap( yaal::hcore::HSBBSTree& a, yaal::hcore::HSBBSTree& b )
+	{ a.swap( b );	}
 
 }
 

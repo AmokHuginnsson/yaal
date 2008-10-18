@@ -53,7 +53,7 @@ inline static bool less( key_t const& left, key_t const& right )
 
 };
 
-template<typename tType, typename ttType = set_helper<tType> >
+template<typename tType, typename helper_t = set_helper<tType> >
 class HSet
 	{
 public:
@@ -68,9 +68,9 @@ public:
 	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
 	HIterator insert( tType const& e )
-		{	return ( HIterator( f_oEngine.insert<tType, ttType>( e ) ) );	}
+		{	return ( HIterator( f_oEngine.insert<tType, helper_t>( e ) ) );	}
 	void remove( tType const& e )
-		{	f_oEngine.remove<tType, tType, ttType>( e );	}
+		{	f_oEngine.remove<tType, tType, helper_t>( e );	}
 	HIterator erase( HIterator const& it )
 		{
 		M_PROLOG
@@ -81,7 +81,7 @@ public:
 		M_EPILOG
 		}
 	HIterator find( tType const& e ) const
-		{ return ( HIterator( f_oEngine.find<tType, tType, ttType>( e ) ) ); }
+		{ return ( HIterator( f_oEngine.find<tType, tType, helper_t>( e ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( f_oEngine.begin() ) ); }
 	HIterator end( void ) const
@@ -92,20 +92,20 @@ public:
 		{ return ( HIterator( f_oEngine.rend() ) ); }
 	void clear( void )
 		{ f_oEngine.clear(); }
-	static void swap( HSet<tType, ttType>& left, HSet<tType, ttType>& right )
+	void swap( HSet<tType, helper_t>& other )
 		{
-		if ( &left != &right )
-			HSBBSTree::swap( left.f_oEngine, right.f_oEngine );
+		if ( &other != this )
+			f_oEngine.swap( other.f_oEngine );
 		}
-	void copy_from( HSet<tType, ttType> const& source )
+	void copy_from( HSet<tType, helper_t> const& source )
 		{
 		if ( &source != this )
-			f_oEngine.copy_from<tType, ttType>( source.f_oEngine );
+			f_oEngine.copy_from<tType, helper_t>( source.f_oEngine );
 		}
 	};
 
-template<typename tType, typename ttType = set_helper<tType> >
-class HSet<tType, ttType>::HIterator
+template<typename tType, typename helper_t = set_helper<tType> >
+class HSet<tType, helper_t>::HIterator
 	{
 	HSBBSTree::HIterator f_oEngine;
 public:
@@ -148,11 +148,15 @@ public:
 	bool operator != ( HIterator const& it ) const
 		{ return ( f_oEngine != it.f_oEngine ); }
 private:
-	friend class HSet<tType, ttType>;
+	friend class HSet<tType, helper_t>;
 	explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 	};
 
 }
+
+template<typename tType, typename helper_t>
+inline void swap( yaal::hcore::HSet<tType, helper_t>& a, yaal::hcore::HSet<tType, helper_t>& b )
+	{ a.swap( b ); }
 
 }
 

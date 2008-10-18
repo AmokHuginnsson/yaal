@@ -169,16 +169,17 @@ HNumber& HNumber::operator = ( HNumber const& source )
 	M_EPILOG
 	}
 
-void HNumber::swap( HNumber& left, HNumber& right )
+void HNumber::swap( HNumber& other )
 	{
 	M_PROLOG
-	if ( &left != &right )
+	if ( &other != this )
 		{
-		yaal::swap( left.f_lPrecision, right.f_lPrecision );
-		yaal::swap( left.f_bNegative, right.f_bNegative );
-		yaal::swap( left.f_lDigitCount, right.f_lDigitCount );
-		yaal::swap( left.f_lIntegralPartSize, right.f_lIntegralPartSize );
-		canonical_t::swap( left.f_oCanonical, right.f_oCanonical );
+		using yaal::swap;
+		swap( f_lPrecision, other.f_lPrecision );
+		swap( f_bNegative, other.f_bNegative );
+		swap( f_lDigitCount, other.f_lDigitCount );
+		swap( f_lIntegralPartSize, other.f_lIntegralPartSize );
+		swap( f_oCanonical, other.f_oCanonical );
 		}
 	return;
 	M_EPILOG

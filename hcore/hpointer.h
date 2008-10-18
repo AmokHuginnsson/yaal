@@ -148,6 +148,7 @@ public:
 	tType const* raw ( void ) const;
 	tType* raw ( void );
 	bool operator! ( void ) const;
+	void swap( HPointer& );
 private:
 	bool release( void ) throw();
 	template<typename hier_t, template<typename> class alien_access_t>

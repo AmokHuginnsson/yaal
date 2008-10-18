@@ -128,13 +128,13 @@ public:
 		if ( &fa != this )
 			{
 			HFailedAssertion n( fa );
-			HFailedAssertion::swap( n, *this );
+			swap( n );
 			}
 		return ( *this );
 		}
 	char const* what( void ) { return ( f_pcWhat ); }
 private:
-	static void swap( HFailedAssertion& left, HFailedAssertion& right );
+	void swap( HFailedAssertion& );
 	};
 
 /*

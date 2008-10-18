@@ -402,7 +402,8 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 						column_pool_t c( ( (*it).child_count() - attrNo ) + 1 );
 						f_oColumnCache.push_back( column_pool_t() );
 						r[ i ].f_psColumnInfo = c.raw();
-						column_pool_t::swap( f_oColumnCache.tail(), c );
+						using yaal::swap;
+						swap( f_oColumnCache.tail(), c );
 						}
 					r[ i ].f_psColumnInfo[ columnNo ].f_iPlacement = lexical_cast<int>( attr_val( attr, "placement" ) );
 					r[ i ].f_psColumnInfo[ columnNo ].f_pcName = attr_val( attr, "name" );
@@ -478,7 +479,7 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 			pr[ n ].f_psColumnInfo = &pr[ parentIt->second ].f_psColumnInfo[ n - ( parentIt->second + 1 ) ];
 			}
 		}
-	resource_pool_t::swap( f_oResourceCache[ resourceName ], r );
+	swap( f_oResourceCache[ resourceName ], r );
 	return ( pr );
 	M_EPILOG
 	}

@@ -202,8 +202,9 @@ void HPipedChild::set_csoi( STREAM::stream_t const& a_eCSOI )
 	M_ASSERT( ( a_eCSOI == STREAM::D_OUT ) || ( a_eCSOI == STREAM::D_ERR ) );
 	if ( a_eCSOI != f_eCSOI )
 		{
-		HStreamInterface::cache_t::swap( f_oCache, f_oSecondLineCache );
-		yaal::swap( f_iOffset, f_iSecondLineOffset );
+		using yaal::swap;
+		swap( f_iOffset, f_iSecondLineOffset );
+		swap( f_oCache, f_oSecondLineCache );
 		}
 	f_eCSOI = a_eCSOI;
 	return;

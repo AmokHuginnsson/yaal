@@ -80,7 +80,7 @@ public:
 	int long size( void ) const;
 	int long get_length( void ) const;
 	int long capacity( void ) const;
-	static void swap( HString&, HString& );
+	void swap( HString& );
 	HString& format( char const* const, ... );
 	HString& vformat( char const* const, void* );
 	int long find( char const, int long = 0 ) const;
@@ -128,6 +128,9 @@ int long kmpcasesearch( char const* const, int long const&, char const* const, i
 extern char const n_pcWhiteSpace[];
 
 }
+
+inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b )
+	{ a.swap( b ); }
 
 }
 

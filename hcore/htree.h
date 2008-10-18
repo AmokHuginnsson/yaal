@@ -66,7 +66,7 @@ public:
 	node_t create_new_root( void );
 	node_t set_new_root( HNode* );
 	void clear( void );
-	static void swap( HTree<tType>&, HTree<tType>& );
+	void swap( HTree<tType>& );
 private:
 	HTree( HTree const& );
 	HTree& operator = ( HTree const& );
@@ -625,14 +625,15 @@ void HTree<tType>::clear( void )
 	}
 
 template<typename tType>
-void HTree<tType>::swap( HTree<tType>& left, HTree<tType>& right )
+void HTree<tType>::swap( HTree<tType>& other )
 	{
-	if ( &left != &right )
+	if ( &other != this )
 		{
-		yaal::swap( left.f_poRoot, right.f_poRoot );
+		using yaal::swap;
+		swap( f_poRoot, other.f_poRoot );
 		/* after swap */
-		left.f_poRoot->f_poTree = &left;
-		right.f_poRoot->f_poTree = &right;
+		f_poRoot->f_poTree = this;
+		other.f_poRoot->f_poTree = &other;
 		}
 	return;
 	}
@@ -677,6 +678,10 @@ typename HTree<tType>::const_node_t HTree<tType>::get_root( void ) const
 	}
 
 }
+
+template<typename tType>
+inline void swap( yaal::hcore::HTree<tType>& a, yaal::hcore::HTree<tType>& b )
+	{ a.swap( b ); }
 
 }
 

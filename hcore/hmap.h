@@ -132,10 +132,10 @@ public:
 		}
 	void clear( void )
 		{ f_oEngine.clear(); }
-	static void swap( HMap<key_t, value_t, helper_t>& left, HMap<key_t, value_t, helper_t>& right )
+	void swap( HMap<key_t, value_t, helper_t>& other )
 		{
-		if ( &left != &right )
-			HSBBSTree::swap( left.f_oEngine, right.f_oEngine );
+		if ( &other != this )
+			f_oEngine.swap( other.f_oEngine );
 		}
 	void copy_from( HMap<key_t, value_t, helper_t> const& source )
 		{
@@ -203,6 +203,10 @@ private:
 	};
 
 }
+
+template<typename key_t, typename value_t, typename helper_t>
+inline void swap( yaal::hcore::HMap<key_t, value_t, helper_t>& a, yaal::hcore::HMap<key_t, value_t, helper_t>& b )
+	{ a.swap( b ); }
 
 }
 

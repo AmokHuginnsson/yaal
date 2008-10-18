@@ -104,7 +104,7 @@ public:
 	HNumber operator - ( void ) const;
 	HNumber operator / ( HNumber const& ) const;
 	HNumber operator ^ ( int long unsigned ) const;
-	static void swap( HNumber&, HNumber& );
+	void swap( HNumber& );
 	void set_precision( int long );
 	int long get_precision( void ) const;
 	double long to_double( void ) const;
@@ -124,6 +124,9 @@ private:
 typedef HExceptionT<HNumber> HNumberException;
 
 }
+
+inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b )
+	{ a.swap( b ); }
 
 }
 

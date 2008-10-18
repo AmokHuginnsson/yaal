@@ -470,12 +470,13 @@ bool HSBBSTree::is_empty( void ) const
 	return ( ! f_poRoot );
 	}
 
-void HSBBSTree::swap( HSBBSTree& left, HSBBSTree& right )
+void HSBBSTree::swap( HSBBSTree& other )
 	{
-	if ( &left != &right )
+	if ( &other != this )
 		{
-		yaal::swap( left.f_lSize, right.f_lSize );
-		yaal::swap( left.f_poRoot, right.f_poRoot );
+		using yaal::swap;
+		swap( f_lSize, other.f_lSize );
+		swap( f_poRoot, other.f_poRoot );
 		}
 	return;
 	}

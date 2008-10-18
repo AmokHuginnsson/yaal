@@ -38,7 +38,7 @@ namespace yaal
 namespace hcore
 {
 
-char const * g_ppcErrMsgHPool [ 5 ] =
+char const * n_ppcErrMsgHPool [ 5 ] =
 	{
 	_ ( "ok" ),
 /* HPool::ERROR::E_BADSIZE */				_ ( "bad size" ),

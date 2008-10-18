@@ -59,13 +59,14 @@ public:
 		}
 	resource_t get( void ) const
 		{ return ( f_tResource ); }
-	static void swap( HResource& left, HResource& right )
+	void swap( HResource& other )
 		{
-		if ( &left != &right )
+		if ( &other != this )
 			{
-			yaal::swap( left.f_tResource, right.f_tResource );
-			yaal::swap( left.ALLOCATED, right.ALLOCATED );
-			yaal::swap( left.FREE, right.FREE );
+			using yaal::swap;
+			swap( f_tResource, other.f_tResource );
+			swap( ALLOCATED, other.ALLOCATED );
+			swap( FREE, other.FREE );
 			}
 		}
 private:
@@ -74,6 +75,10 @@ private:
 	};
 
 }
+
+template<typename resource_t, typename free_t, typename allocated_t>
+inline void swap( yaal::hcore::HResource<resource_t, free_t, allocated_t>& a, yaal::hcore::HResource<resource_t, free_t, allocated_t>& b )
+	{ a.swap( b ); }
 
 }
 

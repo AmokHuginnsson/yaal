@@ -41,6 +41,8 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "xalloc.h"
 #include "hlog.h"
 
+using namespace yaal;
+
 namespace yaal
 {
 
@@ -287,9 +289,11 @@ void HException::cleanup( char* a_pcPtr )
 	return;
 	}
 
-void HFailedAssertion::swap( HFailedAssertion& left, HFailedAssertion& right )
+void HFailedAssertion::swap( HFailedAssertion& other )
 	{
-	yaal::swap( left.f_pcWhat, right.f_pcWhat );
+	using yaal::swap;
+	if ( &other != this )
+		swap( f_pcWhat, other.f_pcWhat );
 	return;
 	}
 

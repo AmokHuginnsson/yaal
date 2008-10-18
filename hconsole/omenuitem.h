@@ -52,10 +52,13 @@ public: /* All is public for simpler usage. */
 	OMenuItem& operator = ( OMenuItem const& );
 	void reset( void );
 	void call( HTUIProcess* );
-	static void swap( OMenuItem&, OMenuItem& );
+	void swap( OMenuItem& );
 	};
 
 }
+
+inline void swap( yaal::hconsole::OMenuItem& a, yaal::hconsole::OMenuItem& b )
+	{ a.swap( b ); }
 
 }
 

@@ -29,7 +29,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "omenuitem.h"
 M_VCSTID ( D_VCSID_OMENUITEM_H )
 
-
+using namespace yaal;
 using namespace yaal::hcore;
 
 namespace yaal
@@ -71,7 +71,7 @@ OMenuItem& OMenuItem::operator = ( OMenuItem const& a_roMenuItem )
 	if ( &a_roMenuItem != this )
 		{
 		OMenuItem item( a_roMenuItem );
-		OMenuItem::swap( *this, item );
+		swap( item );
 		}
 	return ( *this );
 	M_EPILOG
@@ -96,18 +96,17 @@ void OMenuItem::call( HTUIProcess* proc )
 	M_EPILOG
 	}
 
-void OMenuItem::swap( OMenuItem& left, OMenuItem& right )
+void OMenuItem::swap( OMenuItem& other )
 	{
 	M_PROLOG
-	OMenuItem tmp( right );
-	right.f_psSubMenu = left.f_psSubMenu;
-	right.HANDLER = left.HANDLER;
-	right.f_pvParam = left.f_pvParam;
-	right.f_oLabel = left.f_oLabel;
-	left.f_psSubMenu = tmp.f_psSubMenu;
-	left.HANDLER = tmp.HANDLER;
-	left.f_pvParam = tmp.f_pvParam;
-	left.f_oLabel = tmp.f_oLabel;
+	if ( &other != this )
+		{
+		using yaal::swap;
+		swap( f_psSubMenu, other.f_psSubMenu );
+		swap( HANDLER, other.HANDLER );
+		swap( f_pvParam, other.f_pvParam );
+		swap( f_oLabel, other.f_oLabel );
+		}
 	return;
 	M_EPILOG
 	}
