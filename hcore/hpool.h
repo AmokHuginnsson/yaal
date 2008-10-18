@@ -75,9 +75,12 @@ private:
 public:
 	HPool( void );
 	HPool( int long const&, pool_type_t const& = D_FIXED_SIZE );
+	HPool( HPool const& );
+	HPool& operator = ( HPool const& );
 	virtual ~HPool( void );
 	void pool_realloc( int long const& );
-	tType& operator[] ( int long const& ) const;
+	tType const& operator[] ( int long const& ) const;
+	tType& operator[] ( int long const& );
 	void push_back( tType const& );
 	void reset( void );
 	void clear( void );
@@ -98,8 +101,8 @@ public:
 	iterator rbegin( void );
 	const_iterator rend( void ) const;
 	iterator rend( void );
-	HPool( HPool const& );
-	HPool& operator = ( HPool const& );
+private:
+	tType& get( int long const& ) const;
 	};
 
 template<typename tType>
@@ -202,12 +205,28 @@ void HPool<tType>::pool_realloc( int long const& a_ulNewSize )
 	}
 
 template<typename tType>
-tType& HPool<tType>::operator[]( int long const& a_iIndex ) const
+tType const& HPool<tType>::operator[]( int long const& a_lIndex ) const
 	{
 	M_PROLOG
-	if ( ( a_iIndex < 0 ) || ( a_iIndex >= f_lSize ) )
-		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BADINDEX ], a_iIndex );
-	return ( f_ptPool[ a_iIndex ] );
+	return ( get( a_lIndex ) );
+	M_EPILOG
+	}
+
+template<typename tType>
+tType& HPool<tType>::operator[]( int long const& a_lIndex )
+	{
+	M_PROLOG
+	return ( get( a_lIndex ) );
+	M_EPILOG
+	}
+
+template<typename tType>
+tType& HPool<tType>::get( int long const& a_lIndex ) const
+	{
+	M_PROLOG
+	if ( ( a_lIndex < 0 ) || ( a_lIndex >= f_lSize ) )
+		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BADINDEX ], a_lIndex );
+	return ( f_ptPool[ a_lIndex ] );
 	M_EPILOG
 	}
 
