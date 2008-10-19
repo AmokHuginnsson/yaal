@@ -118,8 +118,8 @@ void for_each( iterator_t it, iterator_t const& end, call_t& CALL )
 template<typename src_it_t, typename dst_it_t>
 void copy( src_it_t src, src_it_t const& end, dst_it_t dst )
 	{
-	for ( ; src != end; ++ src )
-		*dst = *src, ++ dst;
+	for ( ; src != end; ++ src, ++ dst )
+		*dst = *src;
 	return;
 	}
 
