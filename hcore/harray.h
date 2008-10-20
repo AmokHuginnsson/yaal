@@ -70,6 +70,8 @@ public:
 	virtual ~HArray( void );
 	HArray( HArray const& );
 	HArray& operator = ( HArray const& );
+	void resize( int long const& );
+	void resize( int long const&, tType const& );
 	void reserve( int long const& );
 	tType& operator [] ( int long const& );
 	tType const& operator [] ( int long const& ) const;
@@ -243,6 +245,28 @@ HArray<tType>& HArray<tType>::operator = ( HArray const& a_roArray )
 	}
 
 template<typename tType>
+void HArray<tType>::resize( int long const& a_lSize )
+	{
+	M_PROLOG
+	reserve( a_lSize );
+	f_lSize = a_lSize;
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+void HArray<tType>::resize( int long const& a_lSize, tType const& t )
+	{
+	M_PROLOG
+	reserve( a_lSize );
+	if ( a_lSize > f_lSize )
+		yaal::fill( f_ptArray + f_lSize, f_ptArray + a_lSize, t );
+	f_lSize = a_lSize;
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
 void HArray<tType>::reserve( int long const& a_lSize )
 	{
 	M_PROLOG
@@ -261,7 +285,6 @@ void HArray<tType>::reserve( int long const& a_lSize )
 			M_THROW( n_ppcErrMsgHArray[ ERROR::E_NOMEM ], a_lSize );
 		swap_ranges( tmpArray.begin(), tmpArray.end(), begin() );
 		}
-	f_lSize = a_lSize;
 	return;
 	M_EPILOG
 	}
