@@ -168,7 +168,7 @@ HArray<tType>::HArray( int long const& a_lSize ) : f_lSize( 0 ), f_lCapacity( 0 
 	{
 	M_PROLOG
 	if ( a_lSize )
-		reserve( a_lSize );
+		resize( a_lSize );
 	return;
 	M_EPILOG
 	}
@@ -180,7 +180,7 @@ HArray<tType>::HArray( int long const& a_lSize, tType const& a_tFillWith )
 	M_PROLOG
 	if ( a_lSize )
 		{
-		reserve( a_lSize );
+		resize( a_lSize );
 		fill( begin(), end(), a_tFillWith );
 		}
 	return;
@@ -215,7 +215,7 @@ HArray<tType>::HArray( HArray const& a_roArray ) : f_lSize( 0 ), f_lCapacity( 0 
 	M_PROLOG
 	if ( a_roArray.f_lSize )
 		{
-		reserve( a_roArray.f_lSize );
+		resize( a_roArray.f_lSize );
 		copy( a_roArray.begin(), a_roArray.end(), begin() );
 		}
 	return;
@@ -403,7 +403,7 @@ void HArray<tType>::push_back( tType const& a_tPod )
 	{
 	M_PROLOG
 	int long l_iOldTop = f_lSize;
-	reserve( f_lSize + 1 );
+	resize( f_lSize + 1 );
 	f_ptArray[ l_iOldTop ] = a_tPod;
 	return;
 	M_EPILOG
