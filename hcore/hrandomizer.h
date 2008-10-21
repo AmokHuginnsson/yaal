@@ -33,18 +33,45 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Pseudo=random number generator.
+ *
+ * Congurent pseudo random number generator class.
+ */
 class HRandomizer
 	{
 	int long unsigned f_ulSeed;
 public:
-	HRandomizer( int long unsigned const = 1 );
-	void set( int long unsigned const );
-	int rnd( int = 0 );
+/*! \brief Construct new randomizer.
+ *
+ * \param seed - initialize pseudo-random numebr generator with seed.
+ */
+	HRandomizer( int long unsigned const seed = 1 );
+
+/*! \brief Set current seed.
+ *
+ * \param seed - new seed for this generator.
+ */
+	void set( int long unsigned const seed );
+
+/*! \brief Generate next random number.
+ *
+ * \param cap - upper limit for generated numer.
+ * \return next random number (capped or not)
+ */
+	int rnd( int cap = 0 );
 	};
 
+/*! \brief Helper namespace for HRandomizer related utils.
+ */
 namespace randomizer_helper
 	{
-	void init_randomizer_from_time( HRandomizer& );
+
+/*! \brief Initialize pseudo-random number generator with random seed.
+ *
+ * \param[in,out] gen - pseudo-random number generator to initialize.
+ */
+	void init_randomizer_from_time( HRandomizer& gen );
+
 	}
 
 }

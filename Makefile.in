@@ -172,7 +172,7 @@ purge: mrproper
 include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
 
 doc: $(SRCS) $(HDRS)
-	@doxygen _aux/doxygenrc
+	@doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'
 
 stats:
 	@_aux/stats

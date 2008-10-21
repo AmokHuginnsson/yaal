@@ -50,6 +50,11 @@ namespace hcore
 
 extern int n_iDebugLevel;
 
+/*! \brief Base exception class for YAAL software.
+ *
+ * This class is base class for all exceptions used (generated)
+ * in \e yaal library.
+ */
 class HException
 	{
 	mutable bool f_bLocal;
@@ -93,6 +98,8 @@ private:
 
 extern char const* const n_pcExceptionType;
 
+/*! \brief Template used to create type specyfic exceptions.
+ */
 template<typename tType, typename hier_t = HException>
 class HExceptionT : public hier_t
 	{
@@ -117,6 +124,11 @@ public:
 
 typedef HExceptionT<HString> HStringException;
 
+/*! \brief Failed assertion exception.
+ *
+ * In \e DEBUG build failuers in assertions does not abort the
+ * process, insead the throw instance of HFailedAssertion.
+ */
 class HFailedAssertion
 	{
 	char const* f_pcWhat;
@@ -143,6 +155,10 @@ private:
  * C : B, CE : BE, CE = ET<C, BE>
  */
 
+/*! \brief Helper tools for automatic creation for (YEH) yaal exception hierarchy.
+ *
+ * Non of members of this util namespace should be used directly.
+ */
 namespace exception_auto_hierarchy
 {
 
@@ -190,9 +206,19 @@ struct context_hier
 	typedef typename existing_hier<sizeof ( has_hier<tType>( 0 ) ), tType>::type type;
 	};
 
+/*! \brief Get type of existing parent (in hierarchy) of a type.
+ *
+ * \tparam T - child type in hierarchy.
+ * \retval type - parent in hierarchy.
+ */
 template<typename T>
 struct existing_hier<1, T>
 	{
+	/*! \brief Meta-function, get typedef from protected section of a type.
+	 *
+	 * \tparam Q - type to infiltrate.
+	 * \retval type - parent in hierarchy.
+	 */
 	template<typename Q>
 	struct get_protected_typedef : public Q
 		{
@@ -201,12 +227,18 @@ struct existing_hier<1, T>
 	typedef typename get_protected_typedef<T>::type type;
 	};
 
+/*! \cond */
 template<typename T>
 struct existing_hier<2, T>
 	{
 	typedef hier_t type;
 	};
+/*! \endcond */
 
+/*! \brief Meta-function to retrieve parent exception of given exception.
+ *
+ * \tparam tType - childe exception type.
+ */
 template<typename tType>
 struct parent_exception
 	{
@@ -214,11 +246,13 @@ struct parent_exception
 	typedef typename void_to_exception<proposed_type_hier_t>::exception_t parent_exception_t;
 	};
 
+/*! \cond */
 template<>
 struct parent_exception<void>
 	{
 	typedef yaal::hcore::HException parent_exception_t;
 	};
+/*! \endcond */
 
 }
 

@@ -163,56 +163,85 @@ return_t accumulate( iterator_t it, iterator_t end, return_t ret )
 	return ( ret );
 	}
 
+/*! \brief Type trait alteration utilities.
+ */
 namespace trait
 {
 
+/*! \brief Meta function used to strip reference from type.
+ *
+ * \tparam T - type to strip reference from.
+ */
 template<typename T>
 struct strip_reference
 	{
 	typedef T type;
 	};
 
+/*! \cond */
 template<typename T>
 struct strip_reference<T&>
 	{
 	typedef T type;
 	};
+/*! \endcond */
 
+/*! \brief Meta function used to strip const from type.
+ *
+ * \tparam T - type to strip const from.
+ */
 template<typename T>
 struct strip_const
 	{
 	typedef T type;
 	};
 
+/*! \cond */
 template<typename T>
 struct strip_const<T const>
 	{
 	typedef T type;
 	};
+/*! \endcond */
 
+/*! \brief Meta function used to add const to a type.
+ *
+ * Add const to at type under condition that this type is not a reference.
+ *
+ * \tparam T - type to strip const from.
+ */
 template<typename T>
 struct add_const_if_not_reference
 	{
 	typedef T const type;
 	};
 
+/*! \cond */
 template<typename T>
 struct add_const_if_not_reference<T&>
 	{
 	typedef T type;
 	};
+/*! \endcond */
 
+/*! \brief Copy constness (or lack of it) from on type to another.
+ *
+ * \tparam source - get constness from this type.
+ * \tparam destination - apply constness to this type.
+ */
 template<typename source, typename destination>
 struct copy_const
 	{
 	typedef destination type;
 	};
 
+/*! \cond */
 template<typename source, typename destination>
 struct copy_const<source const, destination>
 	{
 	typedef destination const type;
 	};
+/*! \endcond */
 
 }
 

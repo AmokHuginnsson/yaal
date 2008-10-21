@@ -48,19 +48,25 @@ class HControl
 	{
 	typedef HControl self_t;
 public:
+/*! \brief Various configuration bits for HControl hierarchy.
+ */
 	struct BITS
 		{
+		/*! \brief Possible alignment types of text in HControl.
+		 */
 		struct ALIGN
 			{
+			/*! \brief Align type.
+			 */
 			typedef enum
 				{
-				D_LEFT,
-				D_CENTER,
-				D_RIGHT
+				D_LEFT, /*!< text ought to be left aligned */
+				D_CENTER, /*!< text ought to be centered */
+				D_RIGHT /*!< text ought to be right aligned */
 				} align_t;
 			};
 		};
-	static int const D_DEFAULT_ATTRS = -1;
+	static int const D_DEFAULT_ATTRS = -1; /*!< Default HControl attribites (colors of label and data fore/back-ground) */
 	typedef yaal::hcore::HPointer<HControl> ptr_t;
 protected:
 	bool			f_bEnabled;						/*!< Tells if control is enabled, focus can go only to enabled control. */
