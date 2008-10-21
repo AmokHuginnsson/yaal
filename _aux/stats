@@ -24,7 +24,7 @@ else
 #	TMP_FILE=`mktemp`
 	TMP_FILE=`mktemp -t yaal-stats.XXXXXX`
 
-	cat ${SOURCES} ${HEADERS} | grep -v '^[ \t]*$\|^[ \t]*/\*' > ${TMP_FILE}
+	cat ${SOURCES} ${HEADERS} | grep -v '^[ \t]*$\|^[ \t]*/\*\|^[ \t]*\*' > ${TMP_FILE}
 
 	LINES=`wc -l ${TMP_FILE}|${AWK} '{print $1}'`
 	LINES=$((${LINES}-${TOTAL}*21))
