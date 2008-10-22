@@ -45,25 +45,25 @@ namespace hdata
 
 struct DATACONTROL_BITS
 	{
-/* control flags */
+/*! \brief control role flags
+ */
 	struct ROLE
 		{
+		/*! \brief the flags
+		 */
 		typedef enum
 			{
 			D_INVALID,
-/* main control of a window, contents of this control holds
-	 data of main record-set of a window */
-			D_MAIN,
+			D_MAIN,		/*!< main control of a window, contents of this control holds
+										 data of main record-set of a window */
 
-/* this kind of control is meant to setup filter for main
-	 control for `view mode' */
-			D_FILTER,
-
-/* this kind of control is used to store record-set data in `edit mode' */
-			D_DATA
+			D_FILTER,	/*!< this kind of control is meant to setup filter for main
+										control for `view mode' */
+			D_DATA		/*!< this kind of control is used to store record-set data in `edit mode' */
 			} role_t;
 		};
-/* control types */
+/*! \brief control types
+ */
 	struct TYPE
 		{
 		typedef enum
@@ -81,70 +81,75 @@ struct DATACONTROL_BITS
 
 struct OAttributes
 	{
-	bool	f_bDrawLabel;				/* should be label driven */
-	int		f_iDisabledAttribute;	/* attribute of control in disabled state */
-	int		f_iEnabledAttribute;	/* attribute of control in enabled state */
-	int		f_iFocusedAttribute;	/* attribute of control in focused state */
+	bool	f_bDrawLabel;					/*!< should be label driven */
+	int		f_iDisabledAttribute;	/*!< attribute of control in disabled state */
+	int		f_iEnabledAttribute;	/*!< attribute of control in enabled state */
+	int		f_iFocusedAttribute;	/*!< attribute of control in focused state */
 	};
 
 struct OColumnInfo
 	{
-	int f_iPlacement; 			/* what place should this new column take */
-	char const * f_pcName;	/* column name */
-	int f_iWidth;						/* column width */
-	yaal::hconsole::HControl::BITS::ALIGN::align_t f_eAlign;	/* column alignment */
-	type_t f_eType;					/* data type stored in that column */
+	int f_iPlacement; 			/*!< what place should this new column take */
+	char const * f_pcName;	/*!< column name */
+	int f_iWidth;						/*!< column width */
+	yaal::hconsole::HControl::BITS::ALIGN::align_t f_eAlign;	/*!< column alignment */
+	type_t f_eType;					/*!< data type stored in that column */
 	};
 
 class HDataControl;
 
+/*! \brief Text mode user interface binary description.
+ */
 struct OResource
 	{
 /* data part */
-	char const*	f_pcTable;   /* name of table in database asociated with contorl */
-	char const*	f_pcColumns; /* what columns from record-set we are looking for */
-	char const* f_pcId;      /* ID column name */
-	char const*	f_pcFilter;  /* additional filter for record-set (WHERE clause) */
-	char const*	f_pcSort;    /* additional sort for record-set (ORDER BY clause) */
+	char const*	f_pcTable;   /*!< name of table in database asociated with control */
+	char const*	f_pcColumns; /*!< what columns from record-set we are looking for */
+	char const* f_pcId;      /*!< ID column name */
+	char const*	f_pcFilter;  /*!< additional filter for record-set (WHERE clause) */
+	char const*	f_pcSort;    /*!< additional sort for record-set (ORDER BY clause) */
 /* control part */
-	int			f_iRow;								/* top coordinate of contorl */
-	int			f_iColumn;						/* left coordinate of contorl */
-	int			f_iHeight;						/* height of control */
-	int			f_iWidth;							/* width of control */
-	char const*	f_pcLabel;			/* control label */
-	OAttributes*	f_psAttributes;	/* control's attributes */
+	int			f_iRow;								/*!< top coordinate of control */
+	int			f_iColumn;						/*!< left coordinate of control */
+	int			f_iHeight;						/*!< height of control */
+	int			f_iWidth;							/*!< width of control */
+	char const*	f_pcLabel;			/*!< control label */
+	OAttributes*	f_psAttributes;	/*!< control's attributes */
 /* relative functionality configuration options */
-	DATACONTROL_BITS::ROLE::role_t	f_eRole;							/* tell how control should be treaded */
-	DATACONTROL_BITS::TYPE::type_t	f_eType;							/* predefined type of control */
-	void*	f_pvTypeSpecific;			/* additional initialization values control
-																	 type specific */
-	OColumnInfo* f_psColumnInfo;	/* if this control is a child control this field
+	DATACONTROL_BITS::ROLE::role_t	f_eRole;		/*!< tell how control should be treaded */
+	DATACONTROL_BITS::TYPE::type_t	f_eType;		/*!< predefined type of control */
+	void*	f_pvTypeSpecific;				/*!< additional initialization values control
+																		 type specific */
+	OColumnInfo* f_psColumnInfo;	/*!< if this control is a child control this field
 																	 holds initialization information about
 																	 parent's record's field-column */
-	int			f_iParent;						/* index of parent control (tree data structure) */
+	int			f_iParent;						/*!< index of parent control (tree data structure) */
 	};
 
-/* control type specific */
+/*! \brief edit control type specific data
+ */
 struct OEditControlResource
 	{
-	int			f_iMaxStringSize;		/* maximum length of contained string */
-	char const*	f_pcValue;		/* initial value for control */
-	char const*	f_pcMask;			/* tell what can be inserted into control */
-	bool		f_bReplace;					/* is control in replace mode? */
-	bool		f_bMultiLine;				/* is this contorl a multiline edit? */
-	bool		f_bReadOnly;				/* should editing be disabled ? */
-	bool		f_bRightAligned;		/* is control content right aligned */
-	bool		f_bPassword;				/* is control in password mode? (no echo) */
-	int			f_iMaxHistoryLevel;	/* history buffer size */
+	int			f_iMaxStringSize;		/*!< maximum length of contained string */
+	char const*	f_pcValue;			/*!< initial value for control */
+	char const*	f_pcMask;				/*!< tell what can be inserted into control */
+	bool		f_bReplace;					/*!< is control in replace mode? */
+	bool		f_bMultiLine;				/*!< is this control a multiline edit? */
+	bool		f_bReadOnly;				/*!< should editing be disabled ? */
+	bool		f_bRightAligned;		/*!< is control content right aligned */
+	bool		f_bPassword;				/*!< is control in password mode? (no echo) */
+	int			f_iMaxHistoryLevel;	/*!< history buffer size */
 	};
 
+/*! \brief list control type specific data
+ */
 struct OListControlResource
 	{
-	bool	f_bCheckable;					/* can control items be checked/unchecked */
-	bool	f_bSortable;					/* is control content sortable */
-	bool	f_bSearchable;				/* can be item searched */
+	bool	f_bCheckable;					/*!< can control items be checked/unchecked */
+	bool	f_bSortable;					/*!< is control content sortable */
+	bool	f_bSearchable;				/*!< can be item searched */
 	bool	f_bEditable;
-	bool	f_bDrawHeader;				/* should be header droven */
+	bool	f_bDrawHeader;				/*!< should be header droven */
 	};
 
 }

@@ -40,6 +40,8 @@ namespace hcore
 
 extern char const* const n_pcDefaultTimeFormat;
 
+/*! \brief Date and time handling class.
+ */
 class HTime
 	{
 	typedef HTime self_t;

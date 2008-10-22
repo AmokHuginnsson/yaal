@@ -36,12 +36,16 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief File manipulation class.
+ */
 class HFile : public HStreamInterface
 	{
 protected:
 	typedef HFile self_t;
 	typedef HStreamInterface hier_t;
 public:
+	/*! \brief Bits user for specyfying the way files are opened.
+	 */
 	struct OPEN
 		{
 		typedef enum

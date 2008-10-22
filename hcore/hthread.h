@@ -37,6 +37,8 @@ namespace hcore
 {
 
 class HCondition;
+/*! \brief Implementation of multi-threaded synchronizing prymitive - Mutex.
+ */
 class HMutex
 	{
 	typedef HMutex self_t;

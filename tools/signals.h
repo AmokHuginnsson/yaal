@@ -64,6 +64,9 @@ class HSignalService
 	{
 	typedef HSignalService self_t;
 public:
+	/*! \brief Generic signal hadler that can be installed
+	 * as default hadler.
+	 */
 	class HHandlerGeneric
 		{
 		HSignalHandlerInterface::HANDLER_t HANDLER;

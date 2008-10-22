@@ -39,6 +39,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Class that provision framework for creation of multiplexing based applications.
+ */
 class HProcess : public yaal::tools::HSignalHandlerInterface
 	{
 protected:

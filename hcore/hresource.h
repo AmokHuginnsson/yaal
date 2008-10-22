@@ -33,6 +33,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Resource lifetime tracking helper.
+ */
 struct OResourceHelper
 	{
 	static bool non_null( void* value )
@@ -43,6 +45,8 @@ struct OResourceHelper
 		{ return ( value >= than ); }
 	};
 
+/*! \brief Raw resource life time tracker.
+ */
 template<typename resource_t, typename free_t, typename allocated_t = typeof( &OResourceHelper::non_null )>
 class HResource
 	{

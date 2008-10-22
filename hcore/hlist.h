@@ -179,6 +179,8 @@ private:
 	friend class HList<tType>::const_cyclic_iterator;
 	};
 
+/*! \brief HList<> element class provisions basic building block for doubly-linked list.
+ */
 template<typename tType>
 class HList<tType>::HElement
 	{
