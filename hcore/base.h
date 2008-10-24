@@ -108,11 +108,42 @@ HBinder<function_t, value_t> bind2nd( function_t func, value_t value )
 	return ( HBinder<function_t, value_t>( func, value ) );
 	}
 
+template<typename res_t, typename arg_t>
+struct unary_function
+	{
+	typedef res_t result_t;
+	typedef arg_t argument_t;
+	};
+
+template<typename res_t, typename arg1st_t, typename arg2nd_t>
+struct binary_function
+	{
+	typedef res_t result_t;
+	typedef arg1st_t argument1st_t;
+	typedef arg2nd_t argument2nd_t;
+	};
+
+template<typename operation_t>
+struct binder1st : public unary_function<typename operation_t::result_t, typename operation_t::argument2nd_t>
+	{
+	typename operation_t::argument2nd_t const _bound;
+	binder1st( typename operation_t::argument2nd_t const& bound ) : _bound( bound ) {}
+	typename operation_t::result_t operator()( typename operation_t::argument1st_t const& arg )
+		{ return ( operation_t( arg, _bound ) ); }
+	};
+
 template<typename iterator_t, typename call_t>
 void for_each( iterator_t it, iterator_t const& end, call_t& CALL )
 	{
 	for ( ; it != end; ++ it )
 		CALL( *it );
+	}
+
+template<typename src_iter_t, typename dst_iter_t, typename operation_t>
+void transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op )
+	{
+	for ( ; it != end; ++ it, ++ dst )
+		*dst = op( *it );
 	}
 
 template<typename src_it_t, typename dst_it_t>
@@ -298,6 +329,20 @@ tType abs( tType val )
 	{
 	return ( val >= 0 ? val : - val );
 	}
+
+template<typename tType>
+struct plus : public binary_function<tType, tType, tType>
+	{
+	tType operator()( tType const& a, tType const& b ) const
+		{ return ( a + b ); }
+	};
+
+template<typename tType>
+struct multiply : public binary_function<tType, tType, tType>
+	{
+	tType operator()( tType const& a, tType const& b ) const
+		{ return ( a * b ); }
+	};
 
 template<typename tType>
 bool less( tType const& a_rtLeft, tType const& a_rtRight )

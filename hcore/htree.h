@@ -60,6 +60,8 @@ private:
 	HNode* f_poRoot;			/* self explanary */
 public:
 	HTree ( void );
+	HTree( HTree const& );
+	HTree& operator = ( HTree const& );
 	virtual ~HTree();
 	node_t get_root( void );
 	const_node_t get_root( void ) const;
@@ -68,8 +70,6 @@ public:
 	void clear( void );
 	void swap( HTree<tType>& );
 private:
-	HTree( HTree const& );
-	HTree& operator = ( HTree const& );
 	friend class HTree<tType>::HNode;
 	};
 

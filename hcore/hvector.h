@@ -59,6 +59,9 @@ public:
 			E_DIMNOTMATCH
 			} error_t;
 		};
+	typedef typename data_t::iterator iterator;
+	typedef typename data_t::const_iterator const_iterator;
+public:
 	HVector( int long const& = 0 );
 	HVector( HVector const& );
 	~HVector( void );
@@ -83,6 +86,10 @@ public:
 	tType& operator[] ( int long const& );
 	bool operator == ( HVector const& ) const;
 	bool operator != ( HVector const& ) const;
+	iterator begin( void );
+	const_iterator begin( void ) const;
+	iterator end( void );
+	const_iterator end( void ) const;
 private:
 	inline void check_dimensions( int a_iSizeAnother ) const
 		{
@@ -156,6 +163,30 @@ int long HVector<tType>::dim( void ) const
 	M_PROLOG
 	return ( f_oData.size() );
 	M_EPILOG
+	}
+
+template<typename tType>
+typename HVector<tType>::iterator HVector<tType>::begin( void )
+	{
+	return ( f_oData.begin() );
+	}
+
+template<typename tType>
+typename HVector<tType>::const_iterator HVector<tType>::begin( void ) const
+	{
+	return ( f_oData.begin() );
+	}
+
+template<typename tType>
+typename HVector<tType>::iterator HVector<tType>::end( void )
+	{
+	return ( f_oData.end() );
+	}
+
+template<typename tType>
+typename HVector<tType>::const_iterator HVector<tType>::end( void ) const
+	{
+	return ( f_oData.end() );
 	}
 
 template<typename tType>

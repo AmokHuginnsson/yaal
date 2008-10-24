@@ -128,15 +128,27 @@ int n_piFunctionMnemonicsLength [ 16 ] =
 
 static double long D_PI = 3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196;
 
-HExpression::HExpression( void ) : f_iIndex( 0 ), f_iLength( 0 ),
-			f_eError( E_OK ), f_oConstantsPool ( 0, HPool<double long>::D_AUTO_GROW ),
-			f_oTerminalIndexes( 0, HPool<int>::D_AUTO_GROW ), f_oFormula(),
-			f_oEquationTree()
+HExpression::HExpression( void )
+	: f_iIndex( 0 ), f_iLength( 0 ), f_eError( E_OK ),
+	f_oConstantsPool( 0, HPool<double long>::D_AUTO_GROW ),
+	f_oTerminalIndexes( 0, HPool<int>::D_AUTO_GROW ), f_oFormula(),
+	f_oEquationTree()
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	for ( l_iCtr = 0; l_iCtr < 26; l_iCtr ++ )
-		f_pdVariables [ l_iCtr ] = 0;
+	yaal::fill( f_pdVariables, f_pdVariables + 26, 0 );
+	return;
+	M_EPILOG
+	}
+
+HExpression::HExpression( HString const& formula )
+	: f_iIndex( 0 ), f_iLength( 0 ), f_eError( E_OK ),
+	f_oConstantsPool( 0, HPool<double long>::D_AUTO_GROW ),
+	f_oTerminalIndexes( 0, HPool<int>::D_AUTO_GROW ), f_oFormula(),
+	f_oEquationTree()
+	{
+	M_PROLOG
+	yaal::fill( f_pdVariables, f_pdVariables + 26, 0 );
+	compile( formula );
 	return;
 	M_EPILOG
 	}
@@ -144,6 +156,48 @@ HExpression::HExpression( void ) : f_iIndex( 0 ), f_iLength( 0 ),
 HExpression::~HExpression( void )
 	{
 	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+HExpression::HExpression( HExpression const& ex )
+	: f_iIndex( ex.f_iIndex ), f_iLength( ex.f_iLength ), f_eError( ex.f_eError ),
+	f_oConstantsPool( ex.f_oConstantsPool ),
+	f_oTerminalIndexes( ex.f_oTerminalIndexes ), f_oFormula( ex.f_oFormula ),
+	f_oEquationTree( ex.f_oEquationTree )
+	{
+	M_PROLOG
+	yaal::copy( ex.f_pdVariables, ex.f_pdVariables + 26, f_pdVariables );
+	return;
+	M_EPILOG
+	}
+
+HExpression& HExpression::operator = ( HExpression const& ex )
+	{
+	M_PROLOG
+	if ( &ex != this )
+		{
+		HExpression tmp( ex );
+		swap( tmp );
+		}
+	return ( *this );
+	M_EPILOG
+	}
+
+void HExpression::swap( HExpression& ex )
+	{
+	M_PROLOG
+	if ( &ex != this )
+		{
+		using yaal::swap;
+		swap( f_iIndex, ex.f_iIndex );
+		swap( f_iLength, ex.f_iLength );
+		swap( f_eError, ex.f_eError );
+		f_oConstantsPool.swap( f_oConstantsPool );
+		f_oTerminalIndexes.swap( f_oTerminalIndexes );
+		f_oFormula.swap( f_oFormula );
+		f_oEquationTree.swap( f_oEquationTree );
+		}
 	return;
 	M_EPILOG
 	}
@@ -673,6 +727,14 @@ double long* HExpression::compile( HString const& a_oFormula )
 	M_EPILOG
 	}
 
+double long* HExpression::variables( void )
+	{
+	M_PROLOG
+	M_ASSERT( f_eError == E_OK );
+	return ( f_pdVariables );
+	M_EPILOG
+	}
+
 double long& HExpression::operator[]( int a_iIndex )
 	{
 	M_PROLOG
@@ -742,6 +804,9 @@ int HExpression::get_error_token( void ) const
 	}
 
 }
+
+void swap( yaal::tools::HExpression& a, yaal::tools::HExpression& b )
+	{ a.swap( b ); }
 
 }
 

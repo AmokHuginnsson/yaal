@@ -74,8 +74,13 @@ class HExpression
 public:
 	/*{*/
 	HExpression( void );
+	HExpression( yaal::hcore::HString const& );
+	HExpression( HExpression const& );
+	HExpression& operator = ( HExpression const& );
 	virtual ~HExpression( void );
+	void swap( HExpression& );
 	double long* compile( yaal::hcore::HString const& );
+	double long* variables( void );
 	double long& operator [] ( int );
 	double long evaluate( void );
 	char const* get_error( void ) const;
