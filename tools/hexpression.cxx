@@ -197,6 +197,7 @@ void HExpression::swap( HExpression& ex )
 		f_oTerminalIndexes.swap( f_oTerminalIndexes );
 		f_oFormula.swap( f_oFormula );
 		f_oEquationTree.swap( f_oEquationTree );
+		yaal::swap_ranges( f_pdVariables, f_pdVariables + 26, ex.f_pdVariables );
 		}
 	return;
 	M_EPILOG

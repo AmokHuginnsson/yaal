@@ -59,7 +59,7 @@ public:
 private:
 	HNode* f_poRoot;			/* self explanary */
 public:
-	HTree ( void );
+	HTree( void );
 	HTree( HTree const& );
 	HTree& operator = ( HTree const& );
 	virtual ~HTree();
@@ -610,7 +610,30 @@ HTree<tType>::~HTree( void )
 	{
 	M_PROLOG
 	clear();
-	return ;
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+HTree<tType>::HTree( HTree const& t )
+	: f_poRoot( t.f_poRoot->clone( NULL ) )
+	{
+	M_PROLOG
+	f_poRoot->f_poTree = this;
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+HTree<tType>& HTree<tType>::operator = ( HTree const& t )
+	{
+	M_PROLOG
+	if ( &t != this )
+		{
+		HTree<tType> tmp( t );
+		swap( tmp );
+		}
+	return ( *this );
 	M_EPILOG
 	}
 
@@ -654,12 +677,12 @@ typename HTree<tType>::node_t HTree<tType>::set_new_root( HTree<tType>::HNode* n
 	M_PROLOG
 	if ( node != f_poRoot )
 		{
-		node->detach();
 		HNode* wasted = f_poRoot;
+		node->detach();
 		f_poRoot = node;
-		delete wasted;
 		node->f_poTree = this;
 		node->f_poTrunk = NULL;
+		delete wasted;
 		}
 	return ( node );
 	M_EPILOG
