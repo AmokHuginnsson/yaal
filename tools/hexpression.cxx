@@ -193,10 +193,10 @@ void HExpression::swap( HExpression& ex )
 		swap( f_iIndex, ex.f_iIndex );
 		swap( f_iLength, ex.f_iLength );
 		swap( f_eError, ex.f_eError );
-		f_oConstantsPool.swap( f_oConstantsPool );
-		f_oTerminalIndexes.swap( f_oTerminalIndexes );
-		f_oFormula.swap( f_oFormula );
-		f_oEquationTree.swap( f_oEquationTree );
+		f_oConstantsPool.swap( ex.f_oConstantsPool );
+		f_oTerminalIndexes.swap( ex.f_oTerminalIndexes );
+		f_oFormula.swap( ex.f_oFormula );
+		f_oEquationTree.swap( ex.f_oEquationTree );
 		yaal::swap_ranges( f_pdVariables, f_pdVariables + 26, ex.f_pdVariables );
 		}
 	return;

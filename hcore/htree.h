@@ -656,7 +656,8 @@ void HTree<tType>::swap( HTree<tType>& other )
 		swap( f_poRoot, other.f_poRoot );
 		/* after swap */
 		f_poRoot->f_poTree = this;
-		other.f_poRoot->f_poTree = &other;
+		if ( other.f_poRoot )
+			other.f_poRoot->f_poTree = &other;
 		}
 	return;
 	}
