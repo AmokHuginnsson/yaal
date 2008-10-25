@@ -449,7 +449,7 @@ template<typename tType>
 HMatrix<tType> HMatrix<tType>::operator * ( tType const a_tScalar ) const
 	{
 	M_PROLOG
-	HMatrix l_oMatrix ( * this );
+	HMatrix l_oMatrix ( *this );
 	l_oMatrix *= a_tScalar;
 	return ( l_oMatrix );
 	M_EPILOG
@@ -459,7 +459,7 @@ template<typename tType>
 HMatrix<tType> HMatrix<tType>::operator / ( tType const a_tScalar ) const
 	{
 	M_PROLOG
-	HMatrix l_oMatrix ( * this );
+	HMatrix l_oMatrix ( *this );
 	l_oMatrix /= a_tScalar;
 	return ( l_oMatrix );
 	M_EPILOG
@@ -473,7 +473,7 @@ HMatrix<tType> & HMatrix<tType>::operator += ( HMatrix const& a_roMatrix )
 	int l_iCtr = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr ++ )
 		f_oData[ l_iCtr ] += a_roMatrix.f_oData[ l_iCtr ];
-	return ( * this );
+	return ( *this );
 	M_EPILOG
 	}
 
@@ -485,29 +485,29 @@ HMatrix<tType> & HMatrix<tType>::operator -= ( HMatrix const & a_roMatrix )
 	int l_iCtr = 0;
 	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
 		f_oData[ l_iCtr ] -= a_roMatrix.f_oData[ l_iCtr ];
-	return ( * this );
+	return ( *this );
 	M_EPILOG
 	}
 
 template<typename tType>
-HMatrix<tType> & HMatrix<tType>::operator *= ( HMatrix const & a_roMatrix )
+HMatrix<tType>& HMatrix<tType>::operator *= ( HMatrix const& a_roMatrix )
 	{
 	M_PROLOG
-	check_dimensions_columns_rows ( a_roMatrix.f_iRows );
+	check_dimensions_columns_rows( a_roMatrix.f_iRows );
 	if ( a_roMatrix.f_iRows != a_roMatrix.f_iColumns )
-		M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_DIMNOTMATCH_COLUMNSROWSCOLUMNS ],
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIMNOTMATCH_COLUMNSROWSCOLUMNS ],
 				a_roMatrix.f_iRows - a_roMatrix.f_iColumns );
-	( * this ) = ( * this ) * a_roMatrix;
-	return ( * this );
+	( *this ) = ( *this ) * a_roMatrix;
+	return ( *this );
 	M_EPILOG
 	}
 
 template<typename tType>
-HMatrix<tType> & HMatrix<tType>::operator *= ( tType const a_tScalar )
+HMatrix<tType>& HMatrix<tType>::operator *= ( tType const a_tScalar )
 	{
 	M_PROLOG
 	for ( typename data_t::iterator it = f_oData.begin(); it != f_oData.end(); ++ it )
-		yaal::transform( it->begin(), it->end(), it->begin(), bind2nd( yaal::multiply<tType>(), a_tScalar ) );
+		yaal::transform( it->begin(), it->end(), it->begin(), bind2nd( yaal::multiplies<tType>(), a_tScalar ) );
 	return ( *this );
 	M_EPILOG
 	}
@@ -589,8 +589,8 @@ HVector<tType> operator * ( HVector<tType> const & a_roVector,
 	}
 
 template<typename tType>
-HVector<tType> operator *= ( HVector<tType> const & a_roVector,
-		HMatrix<tType> const & a_roMatrix )
+HVector<tType> operator *= ( HVector<tType> const& a_roVector,
+		HMatrix<tType> const& a_roMatrix )
 	{
 	M_PROLOG
 	if ( a_roVector.dim() == a_roMatrix.f_iRows == a_roMatrix.f_iColumns )
@@ -604,7 +604,7 @@ HVector<tType> operator *= ( HVector<tType> const & a_roVector,
 
 template<typename tType>
 HMatrix<tType> operator * ( tType const a_tScalar,
-		HMatrix<tType> const & a_roMatrix )
+		HMatrix<tType> const& a_roMatrix )
 	{
 	M_PROLOG
 	HMatrix<tType> l_oMatrix ( a_roMatrix );
@@ -614,8 +614,8 @@ HMatrix<tType> operator * ( tType const a_tScalar,
 	}
 
 template<typename tType>
-HVector<tType> T ( HMatrix<tType> const & a_roMatrix,
-		HVector<tType> const & a_roVector )
+HVector<tType> T ( HMatrix<tType> const& a_roMatrix,
+		HVector<tType> const& a_roVector )
 	{
 	M_PROLOG
 	HMatrix<tType> l_oMatrix = a_roMatrix.T();

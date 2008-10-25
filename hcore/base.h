@@ -146,6 +146,13 @@ void transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op )
 		*dst = op( *it );
 	}
 
+template<typename src_iter_t, typename arg_iter_t, typename dst_iter_t, typename operation_t>
+void transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t dst, operation_t op )
+	{
+	for ( ; it != end; ++ it, ++ arg, ++ dst )
+		*dst = op( *arg, *it );
+	}
+
 template<typename src_it_t, typename dst_it_t>
 void copy( src_it_t src, src_it_t const& end, dst_it_t dst )
 	{
@@ -338,10 +345,24 @@ struct plus : public binary_function<tType, tType, tType>
 	};
 
 template<typename tType>
-struct multiply : public binary_function<tType, tType, tType>
+struct minus : public binary_function<tType, tType, tType>
+	{
+	tType operator()( tType const& a, tType const& b ) const
+		{ return ( a + b ); }
+	};
+
+template<typename tType>
+struct multiplies : public binary_function<tType, tType, tType>
 	{
 	tType operator()( tType const& a, tType const& b ) const
 		{ return ( a * b ); }
+	};
+
+template<typename tType>
+struct divides : public binary_function<tType, tType, tType>
+	{
+	tType operator()( tType const& a, tType const& b ) const
+		{ return ( a / b ); }
 	};
 
 template<typename tType>

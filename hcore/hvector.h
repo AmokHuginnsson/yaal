@@ -269,8 +269,7 @@ HVector<tType>& HVector<tType>::operator += ( HVector const& a_roVector )
 	M_PROLOG
 	int long size = a_roVector.f_oData.size();
 	check_dimensions( size );
-	for ( int long i = 0; i < size; i ++ ) 
-		f_oData[ i ] += a_roVector.f_oData[ i ];
+	yaal::transform( f_oData.begin(), f_oData.end(), a_roVector.f_oData.begin(), f_oData.begin(), yaal::plus<tType>() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -281,8 +280,7 @@ HVector<tType>& HVector<tType>::operator -= ( HVector const& a_roVector )
 	M_PROLOG
 	int long size = a_roVector.f_oData.size();
 	check_dimensions( size );
-	for ( int long i = 0; i < size; i ++ )
-		f_oData[ i ] -= a_roVector.f_oData[ i ];
+	yaal::transform( f_oData.begin(), f_oData.end(), a_roVector.f_oData.begin(), f_oData.begin(), yaal::minus<tType>() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -291,9 +289,7 @@ template<typename tType>
 HVector<tType>& HVector<tType>::operator *= ( tType const& a_tScalar )
 	{
 	M_PROLOG
-	int long size = f_oData.size();
-	for ( int long i = 0; i < size; ++ i )
-		f_oData[ i ] *= a_tScalar;
+	yaal::transform( f_oData.begin(), f_oData.end(), f_oData.begin(), bind2nd( yaal::multiplies<tType>(), a_tScalar ) );
 	return ( *this );
 	M_EPILOG
 	}
@@ -304,8 +300,7 @@ HVector<tType>& HVector<tType>::operator /= ( tType const& a_tScalar )
 	M_PROLOG
 	int long size = f_oData.size();
 	if ( a_tScalar )
-		for ( int long i = 0; i < size; i ++ )
-			f_oData[ i ] /= a_tScalar;
+		yaal::transform( f_oData.begin(), f_oData.end(), f_oData.begin(), bind2nd( yaal::divides<tType>(), a_tScalar ) );
 	return ( *this );
 	M_EPILOG
 	}
@@ -315,7 +310,7 @@ tType HVector<tType>::operator | ( HVector const& a_roVector ) const
 	{
 	M_PROLOG
 	int long size = a_roVector.f_oData.size();
-	check_dimensions ( size );
+	check_dimensions( size );
 	tType l_tScalar = 0;
 	for ( int long i = 0; i < size; i ++ ) 
 		l_tScalar += ( f_oData[ i ] * a_roVector.f_oData[ i ] );
@@ -361,16 +356,16 @@ bool HVector<tType>::operator == ( HVector const& a_roVector ) const
 	}
 
 template<typename tType>
-bool HVector<tType>::operator != ( HVector const & a_roVector ) const
+bool HVector<tType>::operator != ( HVector const& a_roVector ) const
 	{
 	M_PROLOG
-	return ( ! ( * this == a_roVector ) );
+	return ( ! ( *this == a_roVector ) );
 	M_EPILOG
 	}
 
 template<typename tType>
 HVector<tType> operator * ( tType const a_tScalar,
-		HVector<tType>const & a_roVector )
+		HVector<tType>const& a_roVector )
 	{
 	M_PROLOG
 	HVector<tType>l_oVector( a_roVector );
