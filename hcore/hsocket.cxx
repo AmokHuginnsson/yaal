@@ -33,6 +33,10 @@ Copyright:
 #include <unistd.h>
 #include <libintl.h>
 
+#if ! defined( HAVE_DECL_GETADDRINFO ) || ( HAVE_DECL_GETADDRINFO == 0 )
+#	include <getaddrinfo.h>
+#endif /* not HAVE_DECL_GETADDRINFO */
+
 #include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hsocket.h"

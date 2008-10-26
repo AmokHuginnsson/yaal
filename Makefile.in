@@ -65,7 +65,7 @@ SRCS := $(filter-out %_driver.$(SS),$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.$(OS),$(OBJS_dbwrapper))
 $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT))))
 
-LIBS_hcore			=	"-lrt -lpthread -lssl @HCORE_LIBS@"
+LIBS_hcore			=	"-lpthread -lssl -lcrypto @HCORE_LIBS@"
 DEPS_tools			= $(TARGET_hcore)
 LIBS_tools			= "-rdynamic -lxml2 -lxslt @TOOLS_LIBS@ -lhcore"
 DEPS_hconsole		= $(TARGET_hcore) $(TARGET_tools)
@@ -95,7 +95,7 @@ lib%.so.$(RELEASE):
 	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
 			-Wl$(COMA)--entry="yaal_$(NAME)_main" \
-			-Wl$(COMA)-\( $(OBJS_$(NAME)) -Wl$(COMA)-\) 2>&1 | tee -a make.log;) $(call msg, echo -n $(RS);) \
+			-Wl$(COMA)-\( $(OBJS_$(NAME)) -Wl$(COMA)-\) $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n $(RS);) \
 	if [ -f $(@) ] ; then \
 	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 \
 | grep -v '^ar: creating ' | tee -a make.log; \
