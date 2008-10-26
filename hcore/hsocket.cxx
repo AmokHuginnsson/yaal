@@ -32,6 +32,7 @@ Copyright:
 #include <fcntl.h>
 #include <unistd.h>
 #include <libintl.h>
+#include <config.h>
 
 #if ! defined( HAVE_DECL_GETADDRINFO ) || ( HAVE_DECL_GETADDRINFO == 0 )
 #	include <getaddrinfo.h>
