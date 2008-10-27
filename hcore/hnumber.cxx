@@ -581,7 +581,7 @@ HNumber& HNumber::operator *= ( HNumber const& factor )
 HNumber HNumber::operator / ( HNumber const& denominator ) const
 	{
 	M_PROLOG
-	M_ENSURE( denominator.f_lDigitCount != 0 )
+	M_ENSURE( denominator.f_lDigitCount != 0 );
 	HNumber n;
 	if ( f_lDigitCount )
 		{

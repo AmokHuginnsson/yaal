@@ -53,7 +53,7 @@ HPlugin::~HPlugin( void )
 void HPlugin::load( HString const& a_oPath )
 	{
 	M_PROLOG
-	M_ENSURE( ( f_pvHandle = dlopen( a_oPath.raw(), RTLD_NOW | RTLD_GLOBAL ) ) != NULL );
+	M_ENSURE( ( f_pvHandle = dlopen( ! a_oPath.is_empty() ? a_oPath.raw() : NULL, RTLD_NOW | RTLD_GLOBAL ) ) != NULL );
 	return;
 	M_EPILOG
 	}
