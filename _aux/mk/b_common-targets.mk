@@ -3,7 +3,7 @@
 
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment
-	@test -t 1 && export TERMINAL="TERM" ; \
+	@test -t 1 && TERMINAL=TERM export TERMINAL ; \
 	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile
 else
 all: $(REAL_TARGETS)

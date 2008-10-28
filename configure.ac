@@ -141,8 +141,8 @@ AC_CHECK_LIB([pthread],[pthread_create],,[AC_MSG_ERROR([Cannot build without thr
 AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
 AC_SEARCH_LIBS([clock_gettime],[rt],,[AC_MSG_ERROR([Cannot continue without rt library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+AC_SEARCH_LIBS([getaddrinfo],[socket getaddrinfo],,[AC_MSG_ERROR([Cannot continue without getaddrinfo feature.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
-AC_SEARCH_LIBS([getaddrinfo],[getaddrinfo],,[AC_MSG_ERROR([Cannot continue without getaddrinfo feature.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([xml2],[xmlParseFile],,[AC_MSG_ERROR([Cannot continue without XML library.])]) LIBS=""
 AC_CHECK_LIB([xslt],[xsltParseStylesheetFile],,[AC_MSG_ERROR([Cannot continue without XSLT library.])]) LIBS=""
 AC_SEARCH_LIBS([dlopen],[dl],,[AC_MSG_ERROR([Cannot continue without dynamic dynamic linker library.])]) TOOLS_LIBS="${TOOLS_LIBS} ${LIBS}" LIBS=""
@@ -356,7 +356,7 @@ AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 
 AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 LIBS="${HCORE_LIBS}"
-AC_CHECK_FUNCS([getline memrchr gethostbyname_r gethostbyaddr_r strcasestr strtold])
+AC_CHECK_FUNCS([getline memrchr gethostbyname_r gethostbyaddr_r strcasestr strtold asprintf])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASENAME_IN_LIBGEN],[],[Does your basename() is included in libgen library?])],[#include <string.h>])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])

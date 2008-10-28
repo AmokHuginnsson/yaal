@@ -34,9 +34,11 @@ Copyright:
 #include <libintl.h>
 #include <config.h>
 
+#if ! defined( HAVE_GETHOSTBYNAME_R ) || ( HAVE_GETHOSTBYNAME_R == 0 )
 #if ! defined( HAVE_DECL_GETADDRINFO ) || ( HAVE_DECL_GETADDRINFO == 0 )
 #	include <getaddrinfo.h>
 #endif /* not HAVE_DECL_GETADDRINFO */
+#endif /* not HAVE_GETHOSTBYNAME_R */
 
 #include "base.h"
 M_VCSID( "$Id: "__ID__" $" )

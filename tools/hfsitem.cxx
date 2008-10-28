@@ -195,7 +195,7 @@ bool HFSItem::HIterator::operator == ( HIterator const& it ) const
 		if ( ! ( f_pvDir || it.f_pvDir ) )
 			same = true;
 		else if ( f_pvDir && it.f_pvDir )
-			same = ( f_oDirEnt->get<dirent>()->d_fileno == it.f_oDirEnt->get<dirent>()->d_fileno );
+			same = ( f_oDirEnt->get<dirent>()->d_ino == it.f_oDirEnt->get<dirent>()->d_ino );
 		}
 	return ( same );
 	M_EPILOG

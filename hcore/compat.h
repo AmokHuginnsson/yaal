@@ -77,5 +77,9 @@ double long powl( double long, double long );
 double long strtold( char const*, char** );
 #endif /* not HAVE_POWL */
 
+#if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 )
+int asprintf( char**, char const*, ... );
+#endif /* not HAVE_ASPRINTF */
+
 #endif /* not __YAAL_HCORE_COMPAT_H */
 
