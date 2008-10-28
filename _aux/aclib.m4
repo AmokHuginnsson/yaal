@@ -62,6 +62,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 [
 	AC_MSG_CHECKING([host operating system])
 	HOST_OS_TYPE=""
+	SYMBOL_PREFIX=['""']
 	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your operating system is Debian.])
 		HOST_OS_TYPE=[Debian]
@@ -88,8 +89,11 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 	fi
 	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -d [c:/windows] ; then
 		AC_DEFINE([__HOST_OS_TYPE_WINDOWS__], [], [Your operating system is MS Windows.])
+		AC_SUBST([SYMBOL_PREFIX],[_])
+		SYMBOL_PREFIX=['"_"']
 		HOST_OS_TYPE=[Windows]
 	fi
+	AC_DEFINE_UNQUOTED([SYMBOL_PREFIX],${SYMBOL_PREFIX},[Symbol prefix used on this platform.])
 
 	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
 		AC_MSG_ERROR([Cannot recognize host operating system type!])

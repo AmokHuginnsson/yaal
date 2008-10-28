@@ -84,12 +84,19 @@ double long powl( double long a, double long b )
 	}
 #endif /* not HAVE_POWL */
 
+#if ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 )
+double long floorl( double long x )
+	{
+	return ( ::std::floor( x ) );
+	}
+#endif /* not HAVE_DECL_FLOORL */
+
 #if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
 double long strtold( char const* str, char** tail )
 	{
 	return ( strtod( str, tail ) );
 	}
-#endif /* not HAVE_POWL */
+#endif /* not HAVE_STRTOLD */
 
 #if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 )
 int asprintf( char** pbuf, char const* fmt, ... )

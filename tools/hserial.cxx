@@ -28,6 +28,7 @@ Copyright:
 #include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/time.h> /* timeval */
 #include <libintl.h>
 
 #include "config.h"

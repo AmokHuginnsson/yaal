@@ -94,7 +94,7 @@ lib%.so.$(RELEASE):
 	@if [ "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
 	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
-			-Wl$(COMA)--entry="yaal_$(NAME)_main" \
+			-Wl$(COMA)--entry="@SYMBOL_PREFIX@yaal_$(NAME)_main" \
 			-Wl$(COMA)-\( $(OBJS_$(NAME)) -Wl$(COMA)-\) $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n $(RS);) \
 	if [ -f $(@) ] ; then \
 	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 \

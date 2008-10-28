@@ -230,17 +230,17 @@ void load_driver( void )
 		fprintf ( stderr, "Linking symbols ... " );
 		try
 			{
-			n_oDBDriver.resolve( "db_disconnect", db_disconnect );
-			n_oDBDriver.resolve( "db_errno", db_errno );
-			n_oDBDriver.resolve( "db_error", db_error );
-			n_oDBDriver.resolve( "db_query", db_query );
-			n_oDBDriver.resolve( "db_unquery", db_unquery );
-			n_oDBDriver.resolve( "rs_get", rs_get );
-			n_oDBDriver.resolve( "rs_fields_count", rs_fields_count );
-			n_oDBDriver.resolve( "dbrs_records_count", dbrs_records_count );
-			n_oDBDriver.resolve( "dbrs_id", dbrs_id );
-			n_oDBDriver.resolve( "rs_column_name", rs_column_name );
-			n_oDBDriver.resolve( "db_connect", db_connect );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"db_disconnect", db_disconnect );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"db_errno", db_errno );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"db_error", db_error );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"db_query", db_query );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"db_unquery", db_unquery );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"rs_get", rs_get );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"rs_fields_count", rs_fields_count );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"dbrs_records_count", dbrs_records_count );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"dbrs_id", dbrs_id );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"rs_column_name", rs_column_name );
+			n_oDBDriver.resolve( SYMBOL_PREFIX"db_connect", db_connect );
 			}
 		catch ( HPluginException& e )
 			{

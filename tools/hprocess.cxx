@@ -27,8 +27,9 @@ Copyright:
 #include <cstring>
 #include <cstdio>
 #include <unistd.h>
-#include <libintl.h>
 #include <signal.h>
+#include <sys/time.h> /* timeval */
+#include <libintl.h>
 
 #include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )

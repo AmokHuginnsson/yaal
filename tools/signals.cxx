@@ -121,7 +121,9 @@ HSignalService::HSignalService( void )
 	register_handler( SIGABRT, fatal );
 	register_handler( SIGILL, fatal );
 	register_handler( SIGFPE, fatal );
+#if defined( HAVE_DECL_SIGIOT ) && ( HAVE_DECL_SIGIOT == 1 )
 	register_handler( SIGIOT, fatal );
+#endif /* HAVE_DECL_SIGIOT */
 	register_handler( SIGTRAP, fatal );
 	register_handler( SIGSYS, fatal );
 	lock_on( SIGPIPE );
