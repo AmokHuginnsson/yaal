@@ -36,8 +36,8 @@ extern "C"
 
 void db_disconnect( void* );
 
-void* db_connect( char const* /*a_pcDataBase*/
-		char const* /*a_pcLogin*/ char const* /*a_pcPassword*/)
+void* db_connect( char const* /*a_pcDataBase*/,
+		char const* /*a_pcLogin*/, char const* /*a_pcPassword*/ )
 	{
 	return ( NULL );
 	}
@@ -52,42 +52,42 @@ int db_errno( void* /*a_pvData*/ )
 	return ( errno );
 	}
 
-char const* dbrs_error( void* /*a_pvDataB*/ void* /*a_pvDataR*/)
+char const* dbrs_error( void* /*a_pvDataB*/, void* /*a_pvDataR*/ )
 	{
 	return ( "" );
 	}
 
-void* dbrs_query( void* /*a_pvData*/ char const* /*a_pcQuery*/)
+void* dbrs_query( void* /*a_pvData*/, char const* /*a_pcQuery*/ )
 	{
 	return ( NULL );
 	}
 
-void db_unquery( void* /*a_pvData*/)
+void db_unquery( void* /*a_pvData*/ )
 	{
 	return;
 	}
 
-char* rs_get( void* /*a_pvData*/ int long /*a_iRow*/ int /*a_iColumn*/)
+char* rs_get( void* /*a_pvData*/, int long /*a_iRow*/, int /*a_iColumn*/ )
 	{
 	return ( NULL );
 	}
 
-int rs_fields_count( void* /*a_pvData*/)
+int rs_fields_count( void* /*a_pvData*/ )
 	{
 	return ( 0 );
 	}
 
-int long dbrs_records_count( void* /*a_pvDataB*/ void* /*a_pvDataR*/)
+int long dbrs_records_count( void* /*a_pvDataB*/, void* /*a_pvDataR*/ )
 	{
 	return ( 0 );
 	}
 
-int long dbrs_id( void* /*a_pvDataB*/ void* /*a_pvDataR*/)
+int long dbrs_id( void* /*a_pvDataB*/, void* /*a_pvDataR*/ )
 	{
 	return ( 0 );
 	}
 
-char* rs_column_name( void* /*a_pvDataR*/ int /*a_iField*/)
+char* rs_column_name( void* /*a_pvDataR*/, int /*a_iField*/ )
 	{
 	return ( NULL );
 	}

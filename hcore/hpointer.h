@@ -172,7 +172,7 @@ public:
 	ptr_t const get_pointer( void ) const;
 protected:
 	void initialize_observer( ptr_t const& );
-	friend class HPointerStrict<tType>;
+	friend struct HPointerStrict<tType>;
 	};
 
 template<typename tType>
