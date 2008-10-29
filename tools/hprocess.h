@@ -27,6 +27,7 @@ Copyright:
 #ifndef __YAAL_TOOLS_HPROCESS_H
 #define __YAAL_TOOLS_HPROCESS_H
 
+#include <sys/time.h> /* timeval */
 #include <sys/types.h>
 
 #include "hcore/hhashmap.h"

@@ -30,6 +30,7 @@ Copyright:
 #include <csignal>  /* signal handling */
 #include <unistd.h>
 #include <termios.h>
+#include <sys/time.h> /* timeval */
 #include <libintl.h>
 
 #include "config.h"
@@ -167,7 +168,9 @@ void HConsole::init( void )
 	signalService.register_handler( SIGABRT, cleanup );
 	signalService.register_handler( SIGILL, cleanup );
 	signalService.register_handler( SIGFPE, cleanup );
+#if defined( HAVE_DECL_SIGIOT ) && ( HAVE_DECL_SIGIOT == 1 )
 	signalService.register_handler( SIGIOT, cleanup );
+#endif /* HAVE_DECL_SIGIOT */
 	signalService.register_handler( SIGTRAP, cleanup );
 	signalService.register_handler( SIGSYS, cleanup );
 	signalService.register_handler( SIGPIPE, cleanup );
