@@ -58,12 +58,12 @@ namespace
 {
 /* char schema_err[] = "bad xml schema"; */
 char const* const D_DEFAULT_ENCODING = "iso-8859-2";
-typedef HResource<xmlDocPtr, typeof( &xmlFreeDoc )> doc_resource_t;
-typedef HResource<xmlTextWriterPtr, typeof( &xmlFreeTextWriter )> writer_resource_t;
-typedef HResource<xmlCharEncodingHandlerPtr, typeof( &xmlCharEncCloseFunc )> encoder_resource_t;
-typedef HResource<xsltStylesheetPtr, typeof( &xsltFreeStylesheet )> style_resource_t;
-typedef HResource<xmlXPathContextPtr, typeof( &xmlXPathFreeContext )> xpath_context_resource_t;
-typedef HResource<xmlXPathObjectPtr, typeof( &xmlXPathFreeObject )> xpath_object_resource_t;
+typedef HResource<xmlDocPtr, __decltype( &xmlFreeDoc )> doc_resource_t;
+typedef HResource<xmlTextWriterPtr, __decltype( &xmlFreeTextWriter )> writer_resource_t;
+typedef HResource<xmlCharEncodingHandlerPtr, __decltype( &xmlCharEncCloseFunc )> encoder_resource_t;
+typedef HResource<xsltStylesheetPtr, __decltype( &xsltFreeStylesheet )> style_resource_t;
+typedef HResource<xmlXPathContextPtr, __decltype( &xmlXPathFreeContext )> xpath_context_resource_t;
+typedef HResource<xmlXPathObjectPtr, __decltype( &xmlXPathFreeObject )> xpath_object_resource_t;
 typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 }
 

@@ -41,7 +41,7 @@ namespace hdata
 
 #define M_REGISTER_MENU_HANDLER( handler ) \
 	{ \
-	typedef typeof ( *this ) this_t; \
+	typedef yaal::trait::strip_pointer<__decltype( this )>::type this_t; \
 	l_oHandlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
 			&this_t::handler ); \
 	}

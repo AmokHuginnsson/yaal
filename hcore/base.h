@@ -86,7 +86,7 @@ class HBinder
 	struct type_of
 		{
 		static func_t _type_provider;
-		typedef typeof( _type_provider( arga_t(), argb_t() ) ) type;
+		typedef __decltype( _type_provider( arga_t(), argb_t() ) ) type;
 		};
 	function_t CALLER;
 	value_t f_tValue;
@@ -219,6 +219,25 @@ struct strip_reference
 /*! \cond */
 template<typename T>
 struct strip_reference<T&>
+	{
+	typedef T type;
+	};
+/*! \endcond */
+
+/*! \brief Meta function used to strip one level of pointer from type.
+ *
+ * \tparam T - type to strip pointer from.
+ * \retval type - stripped new type 
+ */
+template<typename T>
+struct strip_pointer
+	{
+	typedef T type;
+	};
+
+/*! \cond */
+template<typename T>
+struct strip_pointer<T*>
 	{
 	typedef T type;
 	};
@@ -463,7 +482,7 @@ typedef int long i64_t;
 template<typename tType>
 tType& clone( tType& object )
 	{
-	typedef typeof( *object ) ttType;
+	typedef __decltype( *object ) ttType;
 	return ( tType( new ttType( *object ) ) );
 	}
 
