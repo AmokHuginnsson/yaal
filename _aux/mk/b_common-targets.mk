@@ -23,10 +23,10 @@ static:
 	@$(MAKE) LIBS="$(STATICLIBS)"
 
 prof:
-	@DO_PROFILING=1 $(MAKE) static
+	@$(MAKE) DO_PROFILING=1 static
 
 cov:
-	@DO_COVERAGE=1 $(MAKE) static
+	@$(MAKE) DO_COVERAGE=1 static
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f

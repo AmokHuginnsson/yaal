@@ -1,8 +1,8 @@
-STATICLIBS = $(patsubst %, ~/usr/lib/lib%.a, $(LIBS))
-STATICLIBS := $(subst lib-l%, %, $(STATICLIBS))
+STATICLIBS := $(foreach SL,$(patsubst %,\%%.a,$(LIBS)),$(filter $(SL),$(wildcard ~/usr/lib/lib*.a)))
+SHAREDLIBS := $(patsubst %, -l%,$(filter-out $(patsubst ${HOME}/usr/lib/lib%.a,%,$(STATICLIBS)),$(LIBS)))
 LIBS := $(patsubst %, -l%, $(LIBS))
 
-STATICLIBS += -rdynamic -ldl -lssl -lxml2 -lpthread -lrt
-STATICLIBS += -lncurses -lgpm
+STATICLIBS += -rdynamic -ldl -lssl -lxslt -lxml2 -lpthread -lrt
+STATICLIBS += -lncurses -lgpm $(SHAREDLIBS)
 #STATICLIBS += -lccmalloc
 
