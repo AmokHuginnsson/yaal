@@ -98,7 +98,7 @@ VERBATIM_HEADERS       = NO
 # configuration options related to the alphabetical class index
 #---------------------------------------------------------------------------
 ALPHABETICAL_INDEX     = YES
-COLS_IN_ALPHA_INDEX    = 5
+COLS_IN_ALPHA_INDEX    = 3
 IGNORE_PREFIX          = H O
 #---------------------------------------------------------------------------
 # configuration options related to the HTML output
@@ -110,6 +110,7 @@ HTML_HEADER            =
 HTML_FOOTER            = 
 HTML_STYLESHEET        = 
 HTML_ALIGN_MEMBERS     = YES
+HTML_DYNAMIC_SECTIONS  = NO
 GENERATE_HTMLHELP      = NO
 CHM_FILE               = 
 HHC_LOCATION           = 
