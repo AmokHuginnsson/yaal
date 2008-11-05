@@ -89,5 +89,9 @@ int asprintf( char**, char const*, ... );
 #define __DYNAMIC_LINKER__ ""
 #endif /* not __DYNAMIC_LINKER__ */
 
+#if ! defined( HAVE_DECLTYPE )
+#define __decltype typeof
+#endif /* not HAVE_DECLTYPE */
+
 #endif /* not __YAAL_HCORE_COMPAT_H */
 

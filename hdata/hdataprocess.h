@@ -39,12 +39,21 @@ namespace yaal
 namespace hdata
 {
 
+#if defined( HAVE_DECLTYPE )
 #define M_REGISTER_MENU_HANDLER( handler ) \
 	{ \
 	typedef yaal::trait::strip_pointer<__decltype( this )>::type this_t; \
 	l_oHandlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
 			&this_t::handler ); \
 	}
+#else /* HAVE_DECLTYPE */
+#define M_REGISTER_MENU_HANDLER( handler ) \
+	{ \
+	typedef __decltype( *this ) this_t; \
+	l_oHandlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
+			&this_t::handler ); \
+	}
+#endif /* not HAVE_DECLTYPE */
 
 typedef yaal::hcore::HHashMap<yaal::hcore::HString,
 				yaal::hconsole::OMenuItem::HANDLER_t> menu_handlers_map_t;

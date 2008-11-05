@@ -201,6 +201,12 @@ AC_CHECK_FILE([/dev/cuaa0],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
 	[AC_CHECK_FILE([/dev/ttyS0],[AC_SUBST([SERIAL_DEVICE],['ttyS0'])])])
 
 CXXFLAGS=$CXXFLAGS_ORIG
+
+AC_MSG_CHECKING([whether C++ compiler supports __decltype])
+RESULT=["no"]
+AC_COMPILE_IFELSE([int main( int, char const* const* const ) { int a = 0; typedef __decltype( a ) a_t; a_t b; return ( 0 );	}], [AC_DEFINE([HAVE_DECLTYPE],[],[Is __decltype available?])] RESULT=["yes"])
+AC_MSG_RESULT([$RESULT])
+
 AC_MSG_CHECKING([whether strftime() returns required buffer size])
 RESULT=["no"]
 AC_TRY_RUN([#include <time.h>
