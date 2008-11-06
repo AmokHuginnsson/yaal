@@ -38,12 +38,16 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Interface for all client to singleton pattern.
+ */
 class HSingletonInterface : private HNonCopyable
 	{
 public:
 	static int life_time( int );
 	};
 
+/*! \brief Interface for automatic destruction used by HLifeTimeTracker.
+ */
 class HAbstractDestructor
 	{
 public:

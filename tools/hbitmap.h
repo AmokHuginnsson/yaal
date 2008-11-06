@@ -33,6 +33,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Abstract for bit pool bit operations.
+ */
 class HBitmap
 	{
 	typedef HBitmap self_t;
@@ -118,6 +120,8 @@ struct owner_const_qual_from_type<HBitmap::HBit>
 
 }
 
+/*! \brief Bit iterator, allows access to single bits in sequence.
+ */
 template<typename const_qual_t>
 class HBitmap::HIterator
 	{

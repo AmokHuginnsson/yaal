@@ -36,33 +36,45 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Run process and access its std(in/out/err).
+ */
 class HPipedChild : public yaal::hcore::HStreamInterface
 	{
 protected:
 	typedef HPipedChild self_t;
 	typedef HStreamInterface hier_t;
 public:
+	/*! \brief Child process output stream types.
+	 */
 	struct STREAM
 		{
+		/*! \brief Output type flags.
+		 */
 		typedef enum
 			{
-			D_OUT,
-			D_ERR
+			D_OUT, /*!< Output stream is of interest. */
+			D_ERR /*!< Error stream is of interest. */
 			} stream_t;
 		};
+	/*! \brief Status of this child process.
+	 */
 	struct STATUS
 		{
+		/*! \brief Status flags.
+		 */
 		struct TYPE
 			{
+			/*! \brief Status flags.
+			 */
 			typedef enum
 				{
-				D_NORMAL,
-				D_ABORT,
-				D_NOT_SPAWNED
+				D_NORMAL, /*!< process is running. */
+				D_ABORT, /*!< process has been stopped. */
+				D_NOT_SPAWNED /*!< process has not been spawned yet. */
 				} type_t;
 			};
-		TYPE::type_t type;
-		int value;
+		TYPE::type_t type; /*!< child process current status. */
+		int value; /*!< exit value of finished child process. */
 		STATUS( void ) : type( TYPE::D_NOT_SPAWNED ), value( 0 ) {}
 		};
 	typedef yaal::hcore::HArray<yaal::hcore::HString> argv_t;

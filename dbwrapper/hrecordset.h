@@ -41,6 +41,8 @@ namespace dbwrapper
 class HDataBase;
 typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
 
+/*! \brief Relational database query result representation.
+ */
 class HRecordSet
 	{
 	typedef HRecordSet self_t;

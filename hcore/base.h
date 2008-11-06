@@ -209,6 +209,7 @@ namespace trait
 /*! \brief Meta function used to strip reference from type.
  *
  * \tparam T - type to strip reference from.
+ * \retval type - a type T without reference trait.
  */
 template<typename T>
 struct strip_reference
@@ -246,6 +247,7 @@ struct strip_pointer<T*>
 /*! \brief Meta function used to strip const from type.
  *
  * \tparam T - type to strip const from.
+ * \retval type - a type without constness trait.
  */
 template<typename T>
 struct strip_const
@@ -266,6 +268,7 @@ struct strip_const<T const>
  * Add const to at type under condition that this type is not a reference.
  *
  * \tparam T - type to strip const from.
+ * \retval type - a type with constness added (if original type was not a reference).
  */
 template<typename T>
 struct add_const_if_not_reference
@@ -285,6 +288,7 @@ struct add_const_if_not_reference<T&>
  *
  * \tparam source - get constness from this type.
  * \tparam destination - apply constness to this type.
+ * \retval type - a destination type with constness of source type.
  */
 template<typename source, typename destination>
 struct copy_const
@@ -308,11 +312,13 @@ struct binary
 	static int long unsigned const value = ( binary<input / 10>::value << 1 ) + ( input % 10 );
 	};
 
+/*! \cond */
 template<>
 struct binary<0>
 	{
 	static int long unsigned const value = 0;
 	};
+/*! \endcond */
 
 template<int long unsigned const input>
 struct obinary
@@ -320,11 +326,13 @@ struct obinary
 	static int long unsigned const value = ( obinary<(input >> 3)>::value << 1 ) + ( input & 7 );
 	};
 
+/*! \cond */
 template<>
 struct obinary<0>
 	{
 	static int long unsigned const value = 0;
 	};
+/*! \endcond */
 
 template<int long unsigned const base, int long unsigned const exponent, int long unsigned const helper = 1>
 struct power
@@ -370,16 +378,36 @@ struct minus : public binary_function<tType, tType, tType>
 		{ return ( a + b ); }
 	};
 
+/*! \brief A functor performing multiplication operation.
+ *
+ * \tparam tType - type of multiplied objects.
+ */
 template<typename tType>
 struct multiplies : public binary_function<tType, tType, tType>
 	{
+	/*! \brief Functor executor.
+	 *
+	 * \param a - first factor of multiplication.
+	 * \param b - second factor of multiplication.
+	 * \return result of multiplication a times b.
+	 */
 	tType operator()( tType const& a, tType const& b ) const
 		{ return ( a * b ); }
 	};
 
+/*! \brief A functor performing division operation.
+ *
+ * \tparam tType - type of divided/ing objects.
+ */
 template<typename tType>
 struct divides : public binary_function<tType, tType, tType>
 	{
+	/*! \brief Functor executor.
+	 *
+	 * \param a - dividend part of division.
+	 * \param b - divisor part of division.
+	 * \return quotient of a divided by b.
+	 */
 	tType operator()( tType const& a, tType const& b ) const
 		{ return ( a / b ); }
 	};
@@ -400,6 +428,7 @@ inline tType const operator | ( tType const& left,
 	return ( static_cast<tType>( static_cast<int long unsigned>( left )
 				| static_cast<int long unsigned>( right ) ) );
 	}
+
 template<typename tType>
 inline tType& operator |= ( tType& left, tType const& right )
 	{
@@ -407,6 +436,7 @@ inline tType& operator |= ( tType& left, tType const& right )
 			| static_cast<int long unsigned>( right ) );
 	return ( left );
 	}
+
 template<typename tType>
 inline tType const operator & ( tType const& left,
 		tType const& right )
@@ -414,6 +444,7 @@ inline tType const operator & ( tType const& left,
 	return ( static_cast<tType>( static_cast<int long unsigned>( left )
 				& static_cast<int long unsigned>( right ) ) );
 	}
+
 template<typename tType>
 inline tType& operator &= ( tType& left, tType const& right )
 	{
@@ -421,6 +452,7 @@ inline tType& operator &= ( tType& left, tType const& right )
 			& static_cast<int long unsigned>( right ) );
 	return ( left );
 	}
+
 template<typename tType>
 inline tType const operator ^ ( tType const& left,
 		tType const& right )
@@ -428,6 +460,7 @@ inline tType const operator ^ ( tType const& left,
 	return ( static_cast<tType>( static_cast<int long unsigned>( left )
 				^ static_cast<int long unsigned>( right ) ) );
 	}
+
 template<typename tType>
 inline tType& operator ^= ( tType& left, tType const& right )
 	{
@@ -435,6 +468,7 @@ inline tType& operator ^= ( tType& left, tType const& right )
 			^ static_cast<int long unsigned>( right ) );
 	return ( left );
 	}
+
 template<typename tType>
 inline tType const operator ~ ( tType const& e )
 	{
@@ -501,3 +535,4 @@ char const* error_message( int );
 }
 
 #endif /* not __YAAL_HCORE_BASE_H */
+

@@ -33,6 +33,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief High resolution time mesurement tool.
+ */
 class HClock
 	{
 public:

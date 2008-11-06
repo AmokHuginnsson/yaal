@@ -42,6 +42,10 @@ namespace hcore
 class HCallInterface
 	{
 public:
+	/*! \brief A dummy class.
+	 *
+	 * Dummy used for template metaprogramming trick in HFunctor and HCall implementation.
+	 */
 	class HPseudoType {};
 	typedef yaal::hcore::HPointer<HCallInterface> ptr_t;
 	virtual ~HCallInterface( void ) {}

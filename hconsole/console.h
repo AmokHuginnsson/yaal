@@ -88,6 +88,8 @@ struct CURSOR
 		} cursor_t;
 	};
 
+/*! \brief TUI colors definitions.
+ */
 struct COLORS
 	{
 	static int const D_FG_BLACK					= 0;
