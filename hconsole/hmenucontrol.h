@@ -37,6 +37,10 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Implementation of TUI Menu control class.
+ *
+ * Menu control displays menu and automatically spawns apropriate actions.
+ */
 class HMenuControl : public HTreeControl
 	{
 protected:

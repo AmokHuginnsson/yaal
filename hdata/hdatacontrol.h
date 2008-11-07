@@ -37,6 +37,8 @@ namespace yaal
 namespace hdata
 {
 
+/*! \brief Base class for database connected TUI controls.
+ */
 class HDataControl : public virtual hconsole::HControl
 	{
 protected:

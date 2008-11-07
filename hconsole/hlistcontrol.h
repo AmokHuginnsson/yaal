@@ -43,7 +43,7 @@ namespace hconsole
 
 class HListControl;
 
-/*! \brief Pack of helpers "list control" concept.
+/*! \brief Pack of helpers for "list control" concept.
  *
  * List control helpers are provided as a means of customization
  * of HListControler class.
@@ -177,7 +177,8 @@ private:
 	HAbstractControler& operator=( HAbstractControler const& );
 	};
 
-/*
+/*! \brief Controler of HListControl in MVC idiom.
+ *
  * We can decide to give user possibility to choose "model record type"
  * or we can assume that each model record is made of some kind of array
  * and allow user to specify type of elements stored in this array.
@@ -188,8 +189,9 @@ private:
  * of plain list of window pointers, wide HWindowListControl).
  *
  * We will go for the former.
+ *
+ * \tparam tType - basic unit of data held in list model.
  */
-
 template<typename tType = HItem>
 class HListControler : public HAbstractControler
 	{
@@ -244,6 +246,11 @@ public:
 
 }
 
+/*! \brief Implementation of TUI List control class.
+ *
+ * List control allows fancy representation of row based data with handful
+ * of display alteration methods.
+ */
 class HListControl : virtual public HSearchableControl
 	{
 protected:
@@ -283,28 +290,30 @@ public:
 		static int const D_ADD_AT_THE_END = -1;
 		};
 protected:
-	bool				f_bCheckable;					/* can items be checked/unchecked */
-	bool        f_bSortable;					/* can control content be sorted */
-	bool				f_bDrawHeader;				/* should be header driven */
-	bool				f_bEditable;					/* is list interactively editable */
-	int					f_iControlOffset;			/* when content is bigger than control
-																			 size this variable keeps
-																			 offset of first row shown */
-	int					f_iCursorPosition;		/* cursor position relative to control
-																			 begining */
-	int					f_iSumForOne;					/* sum of percentage columns width */
-	yaal::hcore::HList<HColumnInfo>	f_oHeader;	/* list header info */
+	bool f_bCheckable;      /*!< can items be checked/unchecked */
+	bool f_bSortable;       /*!< can control content be sorted */
+	bool f_bDrawHeader;     /*!< should be header driven */
+	bool f_bEditable;       /*!< is list interactively editable */
+	int  f_iControlOffset;  /*!< when content is bigger than control
+														size this variable keeps
+														offset of first row shown */
+	int  f_iCursorPosition; /*!< cursor position relative to control
+														begining */
+	int  f_iSumForOne;      /*!< sum of percentage columns width */
+	yaal::hcore::HList<HColumnInfo> f_oHeader; /*!< list header info */
 /* for internal use only */
-	int					f_iSortColumn;				/* column used for current sort operation */
+	int  f_iSortColumn;     /*!< column used for current sort operation */
+	/*! \brief HListControl search match description.
+	 */
 	struct match_t
 		{
 		int f_iColumnWithMatch;
 		int f_iMatchNumber;
-		iterator_t	f_oCurrentMatch;		/* row that has current pattern match */
-		match_t() : f_iColumnWithMatch ( 0 ), f_iMatchNumber ( - 1 ), f_oCurrentMatch() { }
+		iterator_t f_oCurrentMatch; /*!< row that has current pattern match */
+		match_t() : f_iColumnWithMatch( 0 ), f_iMatchNumber( -1 ), f_oCurrentMatch() { }
 		} f_sMatch;
-	iterator_t	f_oCursor; /* current row highlight (selection or mark or what ever you name it) */
-	iterator_t	f_oFirstVisibleRow;	/* pointer to first visible row */
+	iterator_t f_oCursor; /*!< current row highlight (selection or mark or what ever you name it) */
+	iterator_t f_oFirstVisibleRow;	/*!< pointer to first visible row */
 	list_control_helper::HAbstractControler::ptr_t f_oControler;
 public:
 	HListControl ( HWindow*,		 	/* parent */

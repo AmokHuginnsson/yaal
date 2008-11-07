@@ -39,6 +39,11 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Secure Socket Layer utility class.
+ *
+ * One can create both SSL server and SSL client
+ * IO wrappers.
+ */
 class HOpenSSL
 	{
 	typedef HOpenSSL self_t;

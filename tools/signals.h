@@ -64,8 +64,9 @@ class HSignalService
 	{
 	typedef HSignalService self_t;
 public:
-	/*! \brief Generic signal hadler that can be installed
-	 * as default hadler.
+	/*! \brief Signal hadler interface.
+	 *
+	 * HHandlerGeneric is base for all registrable handler types.
 	 */
 	class HHandlerGeneric
 		{
@@ -77,6 +78,8 @@ public:
 		virtual HSignalHandlerInterface* get_base() = 0;
 		int invoke( int );
 		};
+	/*! \brief Create handler as method in your class.
+	 */
 	class HHandlerInternal : public HHandlerGeneric
 		{
 		HSignalHandlerInterface::ptr_t f_oBase;
@@ -86,6 +89,8 @@ public:
 			: HHandlerGeneric( static_cast<HSignalHandlerInterface::HANDLER_t>( handle ) ), f_oBase( a_oBase ) { }
 		virtual HSignalHandlerInterface* get_base();
 		};
+	/*! \brief Create handle as free standing function.
+	 */
 	class HHandlerExternal : public HHandlerGeneric
 		{
 		HSignalHandlerInterface* f_poBase;

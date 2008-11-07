@@ -93,6 +93,12 @@ struct HPointerArray
 	static tType& object_at( tType*, int );
 	};
 
+/*! \brief Smart pointer, reference counting implementation.
+ *
+ * \tparam tType - object type which life time will be guarded.
+ * \tparam pointer_type_t - select pointer type, one of HPointerScalar or HPointerArray.
+ * \tparam access_type_t - defines pointer kind, one of HPointerStrict or HPointerWeak.
+ */
 template<typename tType, template<typename, typename>class pointer_type_t = HPointerScalar,
 				 template<typename>class access_type_t = HPointerStrict>
 class HPointer

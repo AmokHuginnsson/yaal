@@ -61,12 +61,12 @@ enum
 	E_ALREADY_LISTENING
 	};
 
-char const * const n_ppcErrMsgHSocket [ 4 ] =
+char const* const n_ppcErrMsgHSocket[ 4 ] =
 	{
-	_ ( "ok" ),
-	_ ( "socket not initialized" ),
-	_ ( "socket is not a server" ),
-	_ ( "already listening" )
+	_( "ok" ),
+	_( "socket not initialized" ),
+	_( "socket is not a server" ),
+	_( "already listening" )
 	};
 
 bool HSocket::f_bResolveHostnames = true;

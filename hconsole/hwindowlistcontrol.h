@@ -38,6 +38,11 @@ namespace hconsole
 
 class HWindow;
 
+/*! \brief Implementation of TUI Window List control class.
+ *
+ * Window List control displays list of currently opened windows,
+ * and allows visual navigation for them.
+ */
 class HWindowListControl : public HListControl
 	{
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
