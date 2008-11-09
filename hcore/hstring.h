@@ -79,15 +79,51 @@ public:
 	 * Used in copy-on-write implementation.
 	 */
 	void materialize( void );
-	HString( char const* const );
-	HString( char const );
-	HString( int const );
-	HString( int unsigned const );
-	HString( int long const );
-	HString( int long unsigned const );
-	HString( double const );
-	HString( double long const );
-	HString( void const* const );
+	/*! \brief Construct string based on raw old style C string.
+	 *
+	 * str - old style C string to base new HString on.
+	 */
+	HString( char const* const str );
+	/*! \brief Construct new HString from single character.
+	 *
+	 * ch - character to initialize new string with.
+	 */
+	HString( char const ch );
+	/*! \brief Construct new HString from integer.
+	 *
+	 * integer - an integer to initialize new string with.
+	 */
+	HString( int const integer );
+	/*! \brief Construct new HString from unsigned integer.
+	 *
+	 * unsignedInteger - an unsigned integer to initialize new string with.
+	 */
+	HString( int unsigned const unsignedInteger );
+	/*! \brief Construct new HString from long integer.
+	 *
+	 * longInteger - a long integer to initialize new string with.
+	 */
+	HString( int long const longInteger );
+	/*! \brief Construct new HString from unsigned long integer.
+	 *
+	 * unsignedLongInteger - a long integer to initialize new string with.
+	 */
+	HString( int long unsigned const unsignedLongInteger );
+	/*! \brief Construct new HString from double.
+	 *
+	 * real - a double to initialize new string with.
+	 */
+	HString( double const real );
+	/*! \brief Construct new HString from long double.
+	 *
+	 * longDouble - a double to initialize new string with.
+	 */
+	HString( double long const longDouble );
+	/*! \brief Construct new HString from pointer.
+	 *
+	 * pointer - an pointer to initialize new string with.
+	 */
+	HString( void const* const pointer );
 	HString& operator = ( HString const& );
 	HString& operator += ( HString const& );
 	char operator[] ( int const ) const;

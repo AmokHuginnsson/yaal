@@ -56,6 +56,8 @@ public:
 			D_TRUNCATE = 8
 			} open_t;
 		};
+	/*! \brief Read operation modifiers.
+	 */
 	struct READ
 		{
 		typedef enum
@@ -67,6 +69,8 @@ public:
 			D_UNBUFFERED_READS = 8
 			} read_t;
 		};
+	/*! \brief Kinds of seek operation.
+	 */
 	struct SEEK
 		{
 		typedef enum

@@ -101,6 +101,8 @@ public:
 	virtual void set_child_control_data( HControl* );
 	};
 
+/*! \brief Interface for row based access to data (model) in HListControl.
+ */
 class HAbstractRow
 	{
 public:
@@ -111,6 +113,10 @@ public:
 	virtual HAbstractCell& operator[]( int ) = 0;
 	};
 
+/*! \brief Concretization of HAbstractRow.
+ *
+ * \tparam tType - iterator to basic unit of data held in list model.
+ */
 template<typename tType = yaal::hcore::HList<HItem>::iterator>
 class HRow : public HAbstractRow
 	{
