@@ -41,12 +41,18 @@ namespace hcore
 
 extern char const * const n_ppcErrMsgHSBBSTree [ ];
 
-/* HSBBSTree stands for: Self-balancing binary search tree. */
-
+/*! \brief HSBBSTree stands for: Self-balancing binary search tree.
+ *
+ * HSBBSTree is implementation of self balancing binary search tree data structure.
+ * Implementation of core engine for HMap<> and HSet<> classes.
+ * HSBBSTree is not ment to be used directly.
+ */
 class HSBBSTree
 	{
 	typedef HSBBSTree self_t;
 public:
+	/*! \brief HSBBSTree operation error types.
+	 */
 	struct ERROR
 		{
 		typedef enum

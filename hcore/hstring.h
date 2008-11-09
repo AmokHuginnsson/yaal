@@ -35,21 +35,49 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Implementation of high level string operations.
+ */
 class HString
 	{
 	typedef HString self_t;
 private:
-	char*	f_pcBuffer;
-	int	long f_lAllocatedBytes;
-	int	long f_lSize;
+	char*	f_pcBuffer; /*!< memory buffer pointer */
+	int	long f_lAllocatedBytes; /*!< size of memory buffer */
+	int	long f_lSize; /*!< lenght of string */
 public:
-	typedef char const* iterator;
-	typedef char const* const_iterator;
+	typedef char const* iterator; /*!< mutable iterator for string characters */
+	typedef char const* const_iterator; /*!< const iterator for string characters */
+	/*! \brief Trivial constructor.
+	 *
+	 * \post Empty string is constructed.
+	 */
 	HString( void );
-	HString( HString const& );
-	HString( int const, bool const ); /* initialize immediately with size */
-	~HString( void ) ;
-	void hs_realloc( int long const );
+	/*! \brief Copy constructor.
+	 *
+	 * \param str - construct new string based on \e str.
+	 */
+	HString( HString const& str );
+	/*! \brief Size based constructor.
+	 *
+	 * initialize immediately with size
+	 *
+	 * \param size - capacity of newly constructed string.
+	 */
+	HString( int const size, bool const );
+	~HString( void );
+	/*! \brief Increases string capacity.
+	 *
+	 * String capacity is always size of 2^n.
+	 *
+	 * \param size - new size capacity.
+	 *
+	 * \post String capacity has value of smallest 2^n greater or equal to \e size.
+	 */
+	void hs_realloc( int long const size );
+	/*! \brief Materialize string.
+	 *
+	 * Used in copy-on-write implementation.
+	 */
 	void materialize( void );
 	HString( char const* const );
 	HString( char const );

@@ -42,12 +42,16 @@ namespace hdata
 
 class HDataProcess;
 
+/*! \brief Data connected TUI Window implementation.
+ */
 class HDataWindow : public hconsole::HWindow
 	{
 protected:
 	typedef HDataWindow self_t;
 	typedef HWindow hier_t;
 public:
+	/*! \brief Data window work mode.
+	 */
 	struct DOCUMENT
 		{
 		typedef enum

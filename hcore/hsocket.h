@@ -38,6 +38,11 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Network socket primitive.
+ *
+ * HSocket implements both server (listening) and client (connecting)
+ * network connectivity and data tranfer operations.
+ */
 class HSocket : public HRawFile
 	{
 public:

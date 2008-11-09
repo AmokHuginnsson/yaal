@@ -51,6 +51,10 @@ class HListControl;
 namespace list_control_helper
 {
 
+/*! \brief HListControler sort helper.
+ *
+ * OSortHelper abstracts compare operation.
+ */
 struct OSortHelper
 	{
 	int f_iSortColumn;
@@ -64,6 +68,8 @@ struct OSortHelper
 template<typename tType>
 bool compare_cells( tType const&, tType const&, OSortHelper& );
 
+/*! \brief Interface for basic type of model for HListControl.
+ */
 class HAbstractCell
 	{
 public:
@@ -76,6 +82,10 @@ public:
 	virtual void set_child_control_data( HControl* ) = 0;
 	};
 
+/*! \brief Concretization of HAbstractCell.
+ *
+ * \tparam tType - basic unit of data held in list model.
+ */
 template<typename tType = yaal::hcore::HList<HItem>::iterator>
 class HCell : public HAbstractCell
 	{

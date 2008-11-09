@@ -137,6 +137,10 @@ private:
 		{ return ( call( const_cast<HThreadT const* const>( this ) ) ); }
 	};
 
+/*! \brief HLock Implementats automatic multi-threaded synchronizing prymitive.
+ *
+ * Scope based automation of locking and unlocking of Mutexes.
+ */
 class HLock
 	{
 	HMutex& f_roMutex;

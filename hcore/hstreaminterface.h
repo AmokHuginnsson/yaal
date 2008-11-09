@@ -41,10 +41,14 @@ class HStreamInterface;
 HStreamInterface& endl( HStreamInterface& );
 HStreamInterface& flush( HStreamInterface& );
 
+/*! \brief Interface for stream based IO.
+ */
 class HStreamInterface
 	{
 	typedef HStreamInterface self_t;
 public:
+	/*! \brief Status of given IO stream.
+	 */
 	struct STATUS
 		{
 		typedef enum
@@ -53,8 +57,8 @@ public:
 			D_REPEAT,
 			D_ERROR
 			} code_t;
-		int octets;
-		code_t code;
+		int octets; /*!< number of octets read during last read operation */
+		code_t code; /*!< return code for last read operation */
 		STATUS( void ) : octets( 0 ), code( D_OK ) {}
 		};
 protected:

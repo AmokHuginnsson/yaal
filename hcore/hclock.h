@@ -38,6 +38,8 @@ namespace hcore
 class HClock
 	{
 public:
+	/*! \brief Resolution units for time mesurement.
+	 */
 	struct UNIT
 		{
 		typedef enum

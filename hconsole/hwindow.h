@@ -41,6 +41,8 @@ namespace hconsole
 
 class HControlList;
 
+/*! \brief TUI Window implementation.
+ */
 class HWindow : public HHandler
 	{
 protected:

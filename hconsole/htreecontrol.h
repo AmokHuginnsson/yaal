@@ -37,6 +37,11 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Implementation of TUI Tree control class.
+ *
+ * Tree control allows fancy representation of tree based data with handful
+ * of display alteration methods.
+ */
 class HTreeControl : public virtual HControl
 	{
 protected:
