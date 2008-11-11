@@ -38,6 +38,8 @@ namespace hdata
 
 class HDataWindow;
 
+/*! \brief Database connected tree based TUI control.
+ */
 class HDataTreeControl : public HDataControl, public virtual hconsole::HTreeControl
 	{
 public:

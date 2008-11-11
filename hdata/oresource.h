@@ -81,6 +81,8 @@ struct DATACONTROL_BITS
 		};
 	};
 
+/*! \brief TUI control attributes description.
+ */
 struct OAttributes
 	{
 	bool	f_bDrawLabel;					/*!< should be label driven */
@@ -89,6 +91,8 @@ struct OAttributes
 	int		f_iFocusedAttribute;	/*!< attribute of control in focused state */
 	};
 
+/*! \brief Description of HListControl column.
+ */
 struct OColumnInfo
 	{
 	int f_iPlacement; 			/*!< what place should this new column take */

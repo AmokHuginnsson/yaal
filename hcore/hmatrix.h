@@ -40,8 +40,10 @@ namespace hcore
 
 #define D_VCSID_HMATRIX_H "$Id$"
 
-extern char const * const g_ppcErrMsgHMatrix [ ];
+extern char const* const g_ppcErrMsgHMatrix[];
 
+/*! \brief Abstraction of Matrix, and all relevant algebraic operations.
+ */
 template<typename tType>
 class HMatrix
 	{

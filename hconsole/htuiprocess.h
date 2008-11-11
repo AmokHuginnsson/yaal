@@ -38,6 +38,8 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief A backbone of TUI based application.
+ */
 class HTUIProcess : public HHandler, public yaal::tools::HProcess
 	{
 protected:

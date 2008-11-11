@@ -52,6 +52,8 @@ namespace hconsole
 extern int const C_OK;
 extern int const C_ERR;
 
+/*! \brief Special key codes.
+ */
 struct KEY_CODES
 	{
 	static int const D_ESC					= 27;
@@ -71,6 +73,8 @@ struct KEY_CODES
 	static int const D_COMMAND_BASE	= 0x08000;
 	};
 
+/*! \brief Quasi graphic glyphs.
+ */
 struct GLYPHS
 	{
 	static int D_DOWN_ARROW;
@@ -78,6 +82,8 @@ struct GLYPHS
 	static int D_VERTICAL_LINE;
 	};
 
+/*! \brief Cursor visibility types.
+ */
 struct CURSOR
 	{
 	typedef enum
@@ -150,6 +156,8 @@ struct KEY
 		}
 	};
 
+/*! \brief TUI input events types.
+ */
 struct EVENT
 	{
 	enum
@@ -162,6 +170,8 @@ struct EVENT
 
 extern bool n_bNeedRepaint;
 
+/*! \brief Low level TUI description and modifier.
+ */
 class HConsole : public yaal::tools::HSignalHandlerInterface, private yaal::hcore::HSingletonInterface
 	{
 protected:

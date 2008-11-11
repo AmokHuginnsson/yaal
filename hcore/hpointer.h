@@ -55,6 +55,8 @@ template<typename tType, template<typename, typename>class pointer_type_t,
 				 template<typename>class access_type_t>
 class HPointer;
 
+/*! \brief Pointer life time tracker access policy.
+ */
 template<typename tType>
 struct HPointerStrict
 	{
@@ -70,6 +72,8 @@ struct HPointerStrict
 	static void dec_reference_counter( int* );
 	};
 
+/*! \brief Pointer's observer access policy.
+ */
 template<typename tType>
 struct HPointerWeak
 	{
@@ -79,6 +83,8 @@ struct HPointerWeak
 	static void dec_reference_counter( int* );
 	};
 
+/*! \brief Pointer to scalar deletion policy.
+ */
 template<typename tType, typename access_type_t>
 struct HPointerScalar
 	{
@@ -86,6 +92,8 @@ struct HPointerScalar
 	static tType* raw( tType* );
 	};
 
+/*! \brief Pointer to array deletion policy.
+ */
 template<typename tType, typename access_type_t>
 struct HPointerArray
 	{

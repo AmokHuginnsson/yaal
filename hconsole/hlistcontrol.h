@@ -274,6 +274,8 @@ protected:
 	typedef HSearchableControl hier_t;
 public:
 	typedef list_control_helper::HAbstractControler::HModelIteratorWrapper iterator_t;
+	/*! \brief HListControl settings flags.
+	 */
 	struct FLAGS
 		{
 		typedef enum

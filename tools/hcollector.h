@@ -42,6 +42,8 @@ protected:
 	typedef HCollector self_t;
 	typedef HSerial hier_t;
 public:
+	/*! \brief Protocol description for Collector device.
+	 */
 	struct PROTOCOL
 		{
 		static char const* const D_SYN;
