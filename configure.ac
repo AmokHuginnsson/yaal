@@ -103,6 +103,7 @@ CXXFLAGS_ORIG=$CXXFLAGS;
 CPPFLAGS_ORIG=$CPPFLAGS;
 
 YAAL_DETECT_FLAGS(YAAL_CXXFLAGS, [-fPIC], [C++])
+YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])
 RESULT=["no"]
@@ -123,8 +124,7 @@ AC_COMPILE_IFELSE([#include <stdlib.h>],
 CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["$CXXFLAGS -fPIC -shared -Wl,--no-undefined -Wl,--fatal-warnings -Wl,-soname,conftest"]
 AC_LINK_IFELSE([[extern int my_undefined_symbol;void foo(void){my_undefined_symbol=0;}]],
-							[AC_SUBST([SPECIAL_LINKER_FLAGS],
-								[[-Wl,--no-undefined]]) _FLAGS=["$_FLAGS -Wl,--no-undefined."]],
+							[SPECIAL_LINKER_FLAGS=["$SPECIAL_LINKER_FLAGS -Wl,--no-undefined"] _FLAGS=["$_FLAGS -Wl,--no-undefined."]],
 							[AC_MSG_WARN([[Cannot use -Wl,--no-undefined!]])])
 if test ["$_FLAGS"] = [""] ; then
 	_FLAGS='unfortunetely none. ---         [[63%]]'
@@ -411,11 +411,13 @@ if test ["$ORACLE"] = ["no"] -a ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a
                     unusable for most professional purpouses.])
 fi
 
+AC_SUBST([SPECIAL_LINKER_FLAGS],["$SPECIAL_LINKER_FLAGS"])
 AC_SUBST([EXTRA_LIB_PATHS], ["$EXTRA_LIB_PATHS"])
 AC_SUBST([EXTRA_INCLUDE_PATHS], ["$EXTRA_INCLUDE_PATHS"])
 AC_SUBST([DEFAULT_DRIVER], ["$DEFAULT_DRIVER"])
 AC_SUBST([MYSQL_SOCKET],["$MYSQL_SOCKET"])
 AC_SUBST([YAAL_CXXFLAGS],[${YAAL_CXXFLAGS}])
+AC_SUBST([RDYNAMIC],[${RDYNAMIC}])
 AC_SUBST([HCORE_LIBS],[${HCORE_LIBS}])
 AC_SUBST([TOOLS_LIBS],[${TOOLS_LIBS}])
 AC_SUBST([HCONSOLE_LIBS],[${HCONSOLE_LIBS}])

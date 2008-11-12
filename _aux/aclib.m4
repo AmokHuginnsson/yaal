@@ -91,6 +91,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 		AC_DEFINE([__HOST_OS_TYPE_WINDOWS__], [], [Your operating system is MS Windows.])
 		AC_SUBST([SYMBOL_PREFIX],[_])
 		SYMBOL_PREFIX=['"_"']
+		SPECIAL_LINKER_FLAGS=["-shared -Wl,--export-all-symbols -Wl,--enable-auto-import"]
 		HOST_OS_TYPE=[Windows]
 	fi
 	AC_DEFINE_UNQUOTED([SYMBOL_PREFIX],${SYMBOL_PREFIX},[Symbol prefix used on this platform.])

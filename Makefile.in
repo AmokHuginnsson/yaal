@@ -67,7 +67,7 @@ $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT))))
 
 LIBS_hcore			=	"-lpthread -lssl -lcrypto @HCORE_LIBS@"
 DEPS_tools			= $(TARGET_hcore)
-LIBS_tools			= "-rdynamic -lxml2 -lxslt @TOOLS_LIBS@ -lhcore"
+LIBS_tools			= "@RDYNAMIC@ -lxml2 -lxslt @TOOLS_LIBS@ -lhcore"
 DEPS_hconsole		= $(TARGET_hcore) $(TARGET_tools)
 LIBS_hconsole		= "-lncurses @HCONSOLE_LIBS@ -lhcore -ltools"
 DEPS_dbwrapper	= $(TARGET_hcore) $(TARGET_tools)
