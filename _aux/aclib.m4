@@ -20,6 +20,7 @@ AC_DEFUN([YAAL_DETECT_FLAGS],
 			fi
 		fi
 	done
+	undefine([COMPILER],[FLAGS])
 	AC_LANG_POP(ifelse( "x$3", "xC++", $3, C ))
 ])
 
@@ -55,6 +56,7 @@ AC_DEFUN([YAAL_DETECT_FUNCTION_MACRO],
 		fi
 	fi
 ])
+
 
 dnl We need to know what operating system yaal will be compiled on.
 dnl --------------------------------------------------------------------------
