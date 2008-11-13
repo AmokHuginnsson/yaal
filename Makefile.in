@@ -36,6 +36,14 @@ VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/yaal.h
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
+LIB_PREFIX = @LIB_PREFIX@
+ifeq ($(LIB_PREFIX),lib)
+LIB_SUFFIX = so.$(RELEASE)
+LIB_ARCHIVE_SUFFIX = a
+else
+LIB_SUFFIX = dll
+LIB_ARCHIVE_SUFFIX = dll.a
+endif
 CTAGS	= @CTAGS@
 GITID = @GITID@
 include $(DIR_ROOT)/_aux/mk/1_basic.mk
@@ -90,19 +98,19 @@ LIBS_oracle			= "-lclntsh -lhcore"
 
 #	this is "rule" for linking libs
 
-lib%.so.$(RELEASE):
+$(LIB_PREFIX)%.$(LIB_SUFFIX):
 	@if [ "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
 	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
 			-Wl$(COMA)--entry="@SYMBOL_PREFIX@yaal_$(NAME)_main" \
 			-Wl$(COMA)-\( $(OBJS_$(NAME)) -Wl$(COMA)-\) $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n $(RS);) \
 	if [ -f $(@) ] ; then \
-	$(AR) $(ARFLAGS) lib$(NAME).a $(OBJS_$(NAME)) 2>&1 \
+	$(AR) $(ARFLAGS) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(NAME)) 2>&1 \
 | grep -v '^ar: creating ' | tee -a make.log; \
-	/bin/mv -f $(@) lib$(NAME).a $(DIR_TARGET)/; $(call msg,echo -n "making cache ... ";) \
-	cd $(DIR_TARGET); $(DIR_TARGET)/mkcache; \
-	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION); \
-	ln -sf lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION); \
+	/bin/mv -f $(@) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(DIR_TARGET)/; $(call msg,echo -n "making cache ... ";) \
+	cd $(DIR_TARGET) && $(DIR_TARGET)/mkcache && \
+	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION) && \
+	ln -sf lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) && \
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so; \
 	else exit 1; fi; $(call msg,echo $(NONL) "done.$(CL)")
 

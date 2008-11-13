@@ -64,6 +64,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 [
 	AC_MSG_CHECKING([host operating system])
 	HOST_OS_TYPE=""
+	LIB_PREFIX="lib"
 	SYMBOL_PREFIX=['""']
 	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your operating system is Debian.])
@@ -95,6 +96,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 		SYMBOL_PREFIX=['"_"']
 		SPECIAL_LINKER_FLAGS=["-shared -Wl,--export-all-symbols -Wl,--enable-auto-import"]
 		HOST_OS_TYPE=[Windows]
+		LIB_PREFIX="cyg"
 	fi
 	AC_DEFINE_UNQUOTED([SYMBOL_PREFIX],${SYMBOL_PREFIX},[Symbol prefix used on this platform.])
 
