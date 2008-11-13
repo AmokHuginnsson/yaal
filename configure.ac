@@ -403,12 +403,9 @@ FILES=["$FILES /usr/local/etc/mysql/mysqld.conf"]
 MYSQL_SOCKET=[`grep -s "^socket" $FILES|awk '{sub(".*=[ \\t]+","");print;exit}'`]
 
 AC_MSG_RESULT([--- Creating appropriate links.  ---                    [[97%]]])
-AC_CONFIG_COMMANDS_PRE([cd doc/html;
-												ln -sf yaal_toc.html index.html;cd ../..])
 
 if test ["$ORACLE"] = ["no"] -a ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a ["$SQLITE"] = ["no"] -a ["SQLITE3"] = ["no"] ; then
-	AC_MSG_WARN([yaal without any data base driver will be
-                    unusable for most professional purpouses.])
+	AC_MSG_WARN([yaal without any data base driver will be unusable for most professional purpouses.])
 fi
 
 AC_SUBST([SPECIAL_LINKER_FLAGS],["$SPECIAL_LINKER_FLAGS"])
