@@ -146,6 +146,7 @@ AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localiza
 AC_CHECK_LIB([xml2],[xmlParseFile],,[AC_MSG_ERROR([Cannot continue without XML library.])]) LIBS=""
 AC_CHECK_LIB([xslt],[xsltParseStylesheetFile],,[AC_MSG_ERROR([Cannot continue without XSLT library.])]) LIBS=""
 AC_SEARCH_LIBS([dlopen],[dl],,[AC_MSG_ERROR([Cannot continue without dynamic dynamic linker library.])]) TOOLS_LIBS="${TOOLS_LIBS} ${LIBS}" LIBS=""
+AC_SEARCH_LIBS([libiconv],[iconv],,[AC_MSG_ERROR([Cannot continue without character set conversion library.])]) TOOLS_LIBS="${TOOLS_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ncurses],[initscr],,[AC_MSG_ERROR([Cannot continue without ncurses.])]) LIBS=""
 AC_CHECK_LIB([gpm],[Gpm_Open]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
 

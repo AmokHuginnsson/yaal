@@ -94,7 +94,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 		AC_DEFINE([__HOST_OS_TYPE_WINDOWS__], [], [Your operating system is MS Windows.])
 		AC_SUBST([SYMBOL_PREFIX],[_])
 		SYMBOL_PREFIX=['"_"']
-		SPECIAL_LINKER_FLAGS=["-shared -Wl,--export-all-symbols -Wl,--enable-auto-import"]
+		SPECIAL_LINKER_FLAGS=["-shared -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(NAME).\$(LIB_ARCHIVE_SUFFIX)"]
 		HOST_OS_TYPE=[Windows]
 		LIB_PREFIX="cyg"
 	fi
