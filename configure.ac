@@ -209,14 +209,14 @@ AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether strftime() returns required buffer size])
 RESULT=["no"]
-AC_TRY_RUN([#include <time.h>
+AC_RUN_IFELSE([#include <time.h>
 #define NULL	0
 int main( int, char const* const* const )
 	{
 	int size = 0;
 	time_t t = time( NULL );
 	struct tm broken;
-	localtime_r ( &t, &broken );
+	localtime_r( &t, &broken );
 	size = strftime( NULL, 1024, "%F %T", &broken );
 	return ( ! size );
 	}], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
