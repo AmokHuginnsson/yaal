@@ -5,8 +5,8 @@ AC_DEFUN([YAAL_DETECT_FLAGS],
 [
 	$1=
 	AC_LANG_PUSH(ifelse( "x$3", "xC++", $3, C ))
-	define(FLAGS, ifelse( "x$3", "xC++", CXXFLAGS, CFLAGS ))
-	define(COMPILER, ifelse( "x$3", "xC++", C++, C ))
+	define([FLAGS], ifelse( "x$3", "xC++", CXXFLAGS, CFLAGS ))
+	define([COMPILER], ifelse( "x$3", "xC++", C++, C ))
 	for flag in $2; do
 		if test -z "[$]$1"; then
 			$1_save_FLAGS="$FLAGS"
