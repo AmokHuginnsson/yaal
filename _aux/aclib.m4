@@ -97,6 +97,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 		SPECIAL_LINKER_FLAGS=["-shared -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(NAME).\$(LIB_ARCHIVE_SUFFIX)"]
 		HOST_OS_TYPE=[Windows]
 		LIB_PREFIX="cyg"
+		TOOLS_LIBS=["${TOOLS_LIBS} -liconv"]
 	fi
 	AC_DEFINE_UNQUOTED([SYMBOL_PREFIX],${SYMBOL_PREFIX},[Symbol prefix used on this platform.])
 

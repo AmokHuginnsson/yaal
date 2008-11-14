@@ -115,7 +115,7 @@ ifeq ($(LIB_PREFIX),lib)
 	ln -sf lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) && \
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so
 endif
-	$(call msg,echo $(NONL) "done.$(CL)")
+	@$(call msg,echo $(NONL) "done.$(CL)")
 
 include $(DIR_ROOT)/_aux/mk/d_implicit-compile.mk
 #------------------------------------------------------------------------
