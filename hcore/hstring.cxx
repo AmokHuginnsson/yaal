@@ -221,9 +221,13 @@ HString::HString( void const* const a_pvPtrVoid )
 	{
 	M_PROLOG
 	char l_pcMeasureBuffer[ 3 ] = "\0\0";
-	f_lSize = ::snprintf( l_pcMeasureBuffer, 1, "%p", a_pvPtrVoid );
+	/*
+	 * Solaris libc omits 0x in %p conversion.
+	 * Well, that sucks.
+	 */
+	f_lSize = ::snprintf( l_pcMeasureBuffer, 1, "0x%lx", reinterpret_cast<int long>( a_pvPtrVoid ) );
 	hs_realloc( f_lSize + 1 );
-	M_ENSURE( ::snprintf( f_pcBuffer, f_lSize + 1, "%p", a_pvPtrVoid ) == f_lSize );
+	M_ENSURE( ::snprintf( f_pcBuffer, f_lSize + 1, "0x%lx", reinterpret_cast<int long>( a_pvPtrVoid ) ) == f_lSize );
 	return;
 	M_EPILOG
 	}
