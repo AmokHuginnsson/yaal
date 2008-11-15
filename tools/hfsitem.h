@@ -55,6 +55,7 @@ public:
 	HIterator begin( void );
 	HIterator end( void );
 	bool operator ! ( void ) const;
+	void swap( HFSItem& );
 private:
 	void do_stat( void* ) const;
 	void set_path( yaal::hcore::HString const&, int );
@@ -79,6 +80,7 @@ public:
 	HFSItem const* operator->( void );
 	bool operator == ( HIterator const& it ) const;
 	bool operator != ( HIterator const& it ) const;
+	void swap( HIterator& );
 private:
 	void update( void );
 	void cleanup( void );
@@ -87,6 +89,11 @@ private:
 	};
 
 }
+
+inline void swap( yaal::tools::HFSItem& a, yaal::tools::HFSItem& b )
+	{ a.swap( b ); }
+inline void swap( yaal::tools::HFSItem::HIterator& a, yaal::tools::HFSItem::HIterator& b )
+	{ a.swap( b ); }
 
 }
 

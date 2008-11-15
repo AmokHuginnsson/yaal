@@ -121,6 +121,17 @@ bool HFSItem::operator ! ( void ) const
 							&dummy ) == 0 ) ) );
 	}
 
+void HFSItem::swap( HFSItem& o )
+	{
+	if ( &o != this )
+		{
+		using yaal::swap;
+		swap( f_iNameLen, o.f_iNameLen );
+		swap( f_oPath, o.f_oPath );
+		}
+	return;
+	}
+
 HFSItem::HIterator HFSItem::begin( void )
 	{
 	M_PROLOG
@@ -149,10 +160,20 @@ HFSItem::HIterator::HIterator( HString const& a_oPath ) : f_oPath( a_oPath ), f_
 	M_EPILOG
 	}
 
-HFSItem::HIterator::HIterator( HIterator const& a_oIt ) : f_oPath(), f_pvDir( NULL ), f_oDirEnt(), f_oItem( "" )
+HFSItem::HIterator::HIterator( HIterator const& a_oIt ) : f_oPath( a_oIt.f_oPath ), f_pvDir( NULL ), f_oDirEnt(), f_oItem( "" )
 	{
 	M_PROLOG
-	operator = ( a_oIt );
+	if ( a_oIt.f_pvDir )
+		{
+		f_pvDir = ::opendir( f_oPath.raw() );
+		seekdir( static_cast<DIR*>( f_pvDir ), telldir( static_cast<DIR*>( a_oIt.f_pvDir ) ) );
+		if ( !! a_oIt.f_oDirEnt )
+			{
+			f_oDirEnt = HChunk::ptr_t( new HChunk( xcalloc<dirent>( 1 ) ) );
+			::memcpy( f_oDirEnt->get<void>(), a_oIt.f_oDirEnt->get<void>(), sizeof ( dirent ) );
+			}
+		f_oItem.set_path( a_oIt.f_oItem.f_oPath, a_oIt.f_oItem.f_iNameLen );
+		}
 	return;
 	M_EPILOG
 	}
@@ -170,19 +191,24 @@ HFSItem::HIterator& HFSItem::HIterator::operator = ( HFSItem::HIterator const& a
 	M_PROLOG
 	if ( &a_oFSItemIterator != this )
 		{
-		cleanup();
-		f_oPath = a_oFSItemIterator.f_oPath;
-		if ( a_oFSItemIterator.f_pvDir )
-			{
-			f_pvDir = ::opendir( f_oPath.raw() );
-			if ( !! f_oDirEnt )
-				f_oDirEnt = HChunk::ptr_t( new HChunk( xcalloc<dirent>( 1 ) ) );
-			seekdir( static_cast<DIR*>( f_pvDir ), telldir( static_cast<DIR*>( a_oFSItemIterator.f_pvDir ) ) );
-			::memcpy( f_oDirEnt->get<void>(), a_oFSItemIterator.f_oDirEnt->get<void>(), sizeof ( dirent ) );
-			f_oItem.set_path( a_oFSItemIterator.f_oItem.f_oPath, a_oFSItemIterator.f_oItem.f_iNameLen );
-			}
+		HIterator tmp( a_oFSItemIterator );
+		swap( tmp );
 		}
 	return ( *this );
+	M_EPILOG
+	}
+
+void HFSItem::HIterator::swap( HFSItem::HIterator& o )
+	{
+	M_PROLOG
+	if ( &o != this )
+		{
+		using yaal::swap;
+		swap( f_oPath, o.f_oPath );
+		swap( f_pvDir, o.f_pvDir );
+		swap( f_oDirEnt, o.f_oDirEnt );
+		swap( f_oItem, o.f_oItem );
+		}
 	M_EPILOG
 	}
 
