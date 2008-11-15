@@ -114,7 +114,9 @@ HException::~HException ( void )
 		if ( ! f_bLocal )
 			hcore::log(
 					"Exception registers: c:0x%02x i:%d l:%ld d:%f pv:0x%lx pc:%s\n",
-					f_cChar, f_iInt, f_lLong, f_dDouble, reinterpret_cast<int long>( f_pvVoidPtr ), f_pcCharPtr );
+					f_cChar, f_iInt, f_lLong, f_dDouble,
+					reinterpret_cast<int long>( f_pvVoidPtr ),
+					f_pcCharPtr ? f_pcCharPtr : "(null)" );
 		}
 	catch ( ... )
 		{
@@ -172,7 +174,9 @@ void HException::print_error( bool const a_bFull ) const
 	if ( a_bFull )
 		fprintf ( static_cast<FILE*>( ERROR_STREAM ),
 				"Exception registers:\nc:0x%02x\ti:%d\tl:%ld\td:%f\tpv:0x%lx\npc:%s\n",
-				f_cChar, f_iInt, f_lLong, f_dDouble, reinterpret_cast<int long>( f_pvVoidPtr ), f_pcCharPtr );
+				f_cChar, f_iInt, f_lLong, f_dDouble,
+				reinterpret_cast<int long>( f_pvVoidPtr ),
+				f_pcCharPtr ? f_pcCharPtr : "(null)" );
 	return;
 	}
 
