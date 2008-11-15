@@ -148,7 +148,7 @@ int HSocket::do_close( void )
 	if ( f_bNeedShutdown && ( f_iFileDescriptor >= 0 ) )
 		{
 		if ( is_write_ready( f_iFileDescriptor ) )
-			M_ENSURE( ( ::shutdown( f_iFileDescriptor, SHUT_RDWR ) == 0 ) || ( errno == ECONNRESET ) );
+			M_ENSURE( ( ::shutdown( f_iFileDescriptor, SHUT_RDWR ) == 0 ) || ( errno == ENOTCONN ) || ( errno == ECONNRESET ) );
 		HRawFile::do_close();
 		f_bNeedShutdown = false;
 		}
@@ -175,9 +175,9 @@ void HSocket::listen( yaal::hcore::HString const& a_oAddress, int const a_iPort 
 	M_PROLOG
 	int l_iReuseAddr = 1;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket [ E_NOT_INITIALIZED ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
 	if ( f_poClients )
-		M_THROW( n_ppcErrMsgHSocket [ E_ALREADY_LISTENING ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ E_ALREADY_LISTENING ], f_iFileDescriptor );
 	if ( f_iMaximumNumberOfClients < 1 )
 		M_THROW( _( "bad maximum number of clients" ), f_iMaximumNumberOfClients );
 	make_address ( a_oAddress, a_iPort );
@@ -358,16 +358,16 @@ int long HSocket::write_until_eos( HString const& a_roMessage )
 	M_EPILOG
 	}
 
-int HSocket::get_client_count ( void ) const
+int HSocket::get_client_count( void ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )
-		M_THROW ( n_ppcErrMsgHSocket [ E_NOT_A_SERVER ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
 	return ( f_poClients->size() );
 	M_EPILOG
 	}
 
-HString const & HSocket::get_host_name ( void )
+HString const& HSocket::get_host_name ( void )
 	{
 	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	M_PROLOG
