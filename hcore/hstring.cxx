@@ -86,7 +86,12 @@ HString::HString( HString const& a_roString )
 	: f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( 0 )
 	{
 	M_PROLOG
-	( *this ) = a_roString;
+	if ( a_roString.f_lSize )
+		{
+		f_lSize = a_roString.f_lSize;
+		hs_realloc( f_lSize + 1 );
+		::std::strcpy( f_pcBuffer, a_roString.f_pcBuffer );
+		}
 	return;
 	M_EPILOG
 	}
@@ -237,14 +242,11 @@ HString& HString::operator = ( HString const& a_roString )
 	M_PROLOG
 	if ( this != &a_roString )
 		{
-		if ( a_roString.f_pcBuffer )
-			{
-			f_lSize = a_roString.f_lSize;
+		f_lSize = a_roString.f_lSize;
+		if ( f_lSize >= f_lAllocatedBytes )
 			hs_realloc( f_lSize + 1 );
+		if ( f_lSize )
 			::std::strcpy( f_pcBuffer, a_roString.f_pcBuffer );
-			}
-		else
-			clear();
 		}
 	return ( *this );
 	M_EPILOG
