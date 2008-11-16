@@ -75,13 +75,13 @@ $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT))))
 
 LIBS_hcore			=	"-lpthread -lssl -lcrypto @HCORE_LIBS@"
 DEPS_tools			= $(TARGET_hcore)
-LIBS_tools			= "-lhcore -lxml2 -lxslt @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@"
+LIBS_tools			= "-lhcore -lxml2 -lxslt @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@ @HCORE_LIBS@"
 DEPS_dbwrapper	= $(TARGET_hcore) $(TARGET_tools)
-LIBS_dbwrapper	= "-ltools -lhcore"
+LIBS_dbwrapper	= "-ltools -lhcore @HCORE_LIBS@"
 DEPS_hconsole		= $(TARGET_hcore) $(TARGET_tools)
-LIBS_hconsole		= "-ltools -lhcore -lncurses @HCONSOLE_LIBS@"
+LIBS_hconsole		= "-ltools -lhcore -lncurses @HCONSOLE_LIBS@ @HCORE_LIBS@"
 DEPS_hdata			= $(TARGET_dbwrapper) $(TARGET_hconsole)
-LIBS_hdata			= "-lhconsole -ldbwrapper -ltools -lhcore -lncurses"
+LIBS_hdata			= "-lhconsole -ldbwrapper -ltools -lhcore -lncurses @HCORE_LIBS@"
 
 DEPS_sqlite3		= $(TARGET_hcore)
 LIBS_sqlite3		= "-lsqlite3 -lhcore"
@@ -102,7 +102,6 @@ $(LIB_PREFIX)%.$(LIB_SUFFIX):
 	@if [ "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
 	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
-			-Wl$(COMA)--entry="@SYMBOL_PREFIX@yaal_$(NAME)_main" \
 			-Wl$(COMA)-\( $(OBJS_$(NAME)) -Wl$(COMA)-\) $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n $(RS);)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)
