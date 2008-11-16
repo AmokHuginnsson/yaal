@@ -125,10 +125,10 @@ public:
 	/*!
 	 * Adds new element at specified position.
 	 */
-	template<OListBits::treatment_t treatment>
-	HIterator<tType, treatment> insert( HIterator<tType, treatment> const&, tType const* = NULL );
-	template<OListBits::treatment_t treatment>
-	HIterator<tType, treatment> insert( HIterator<tType, treatment> const&, tType const& );
+	template<OListBits::treatment_t const treatment>
+	typename HList<tType>::template HIterator<tType, treatment> insert( HIterator<tType, treatment> const&, tType const* = NULL );
+	template<OListBits::treatment_t const treatment>
+	typename HList<tType>::template HIterator<tType, treatment> insert( HIterator<tType, treatment> const&, tType const& );
 	tType& add_head( tType const* = NULL );    /* adds new element at beggining of the list */
 	tType& add_tail( tType const* = NULL );	/* adds new element at end of the list */
 	void push_back( tType const& );
@@ -142,8 +142,8 @@ public:
 	tType& add_orderly( tType const&, T const&, sort_order_t = D_ASCENDING );
 	status_t remove_head( tType** = NULL );
 	status_t remove_tail( tType** = NULL );
-	template<OListBits::treatment_t treatment>
-	HIterator<tType, treatment> erase( HIterator<tType, treatment> const& );
+	template<OListBits::treatment_t const treatment>
+	typename HList<tType>::template HIterator<tType, treatment> erase( HIterator<tType, treatment> const& );
 	/* sets cursor at specified index or number */
 	iterator n_th( int );
 	tType& operator[] ( int );
@@ -173,10 +173,10 @@ private:
 	HElement* element_by_index ( int );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
-	friend class HList<tType>::iterator;
-	friend class HList<tType>::const_iterator;
-	friend class HList<tType>::cyclic_iterator;
-	friend class HList<tType>::const_cyclic_iterator;
+	friend class HList<tType>::HIterator<tType, OListBits::D_TREAT_AS_OPENED>;
+	friend class HList<tType>::HIterator<tType const, OListBits::D_TREAT_AS_OPENED>;
+	friend class HList<tType>::HIterator<tType, OListBits::D_TREAT_AS_CLOSED>;
+	friend class HList<tType>::HIterator<tType const, OListBits::D_TREAT_AS_CLOSED>;
 	};
 
 /*! \brief HList<> element class provisions basic building block for doubly-linked list.
@@ -193,10 +193,10 @@ private:
 	HElement ( HElement const & );
 	HElement& operator = ( HElement const& );
 	friend class HList<tType>;
-	friend class HList<tType>::iterator;
-	friend class HList<tType>::const_iterator;
-	friend class HList<tType>::cyclic_iterator;
-	friend class HList<tType>::const_cyclic_iterator;
+	friend class HList<tType>::HIterator<tType, OListBits::D_TREAT_AS_OPENED>;
+	friend class HList<tType>::HIterator<tType const, OListBits::D_TREAT_AS_OPENED>;
+	friend class HList<tType>::HIterator<tType, OListBits::D_TREAT_AS_CLOSED>;
+	friend class HList<tType>::HIterator<tType const, OListBits::D_TREAT_AS_CLOSED>;
 	};
 
 template<typename tType>
@@ -254,7 +254,7 @@ public:
 		M_EPILOG
 		}
 	template<OListBits::treatment_t family>
-	HIterator& operator = ( HIterator<const_qual_t, family> const& );
+	typename HList<tType>::template HIterator<const_qual_t, treatment>& operator = ( HIterator<const_qual_t, family> const& );
 	bool operator == ( HIterator const & ) const;
 	bool operator != ( HIterator const & ) const;
 	const_qual_t& operator* ( void );

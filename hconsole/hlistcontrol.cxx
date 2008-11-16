@@ -73,8 +73,7 @@ HListControl::HColumnInfo::HColumnInfo( HColumnInfo const& a_roColumnInfo )
 	M_EPILOG
 	}
 
-HListControl::HColumnInfo & 
-	HListControl::HColumnInfo::operator = ( HColumnInfo const& a_roColumnInfo )
+HListControl::HColumnInfo& HListControl::HColumnInfo::operator = ( HColumnInfo const& a_roColumnInfo )
 	{
 	M_PROLOG
 	if ( this != & a_roColumnInfo )
@@ -111,12 +110,12 @@ HListControl::HListControl( HWindow* a_poParent, int a_iRow, int a_iColumn,
 	M_EPILOG
 	}
 
-HListControl::~HListControl ( void )
+HListControl::~HListControl( void )
 	{
 	return;
 	}
 
-void HListControl::do_refresh ( void )
+void HListControl::do_refresh( void )
 	{
 	M_PROLOG
 	bool l_bChecked = false;
