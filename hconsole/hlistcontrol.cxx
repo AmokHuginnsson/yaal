@@ -926,13 +926,13 @@ void HListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t
 	{
 	M_PROLOG
 	if ( a_eMask & FLAGS::D_SORTABLE )
-		f_bSortable = a_eFlags & FLAGS::D_SORTABLE;
+		f_bSortable = a_eFlags & FLAGS::D_SORTABLE ? true : false;
 	if ( a_eMask & FLAGS::D_CHECKABLE )
-		f_bCheckable = a_eFlags & FLAGS::D_CHECKABLE;
+		f_bCheckable = a_eFlags & FLAGS::D_CHECKABLE ? true : false;
 	if ( a_eMask & FLAGS::D_EDITABLE )
-		f_bEditable = a_eFlags & FLAGS::D_EDITABLE;
+		f_bEditable = a_eFlags & FLAGS::D_EDITABLE ? true : false;
 	if ( a_eMask & FLAGS::D_DRAW_HEADER )
-		f_bDrawHeader = a_eFlags & FLAGS::D_DRAW_HEADER;
+		f_bDrawHeader = a_eFlags & FLAGS::D_DRAW_HEADER ? true : false;
 	return;
 	M_EPILOG
 	}

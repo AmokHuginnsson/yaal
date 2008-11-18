@@ -136,7 +136,6 @@ class HAbstractControler
 	{
 public:
 	class HModelIteratorWrapper;
-private:
 	class HAbstractModelIterator;
 	typedef yaal::hcore::HPointer<HAbstractModelIterator> iterator_ptr_t;
 	class HAbstractModelIterator
@@ -227,7 +226,7 @@ private:
 		virtual HAbstractRow* call( void );
 		virtual void next( void );
 		virtual void previous( void );
-		virtual void assign_to( iterator_ptr_t& ) const;
+		virtual void assign_to( HAbstractControler::iterator_ptr_t& ) const;
 		virtual bool is_equal( HAbstractModelIterator const& ) const;
 		virtual bool is_not_equal( HAbstractModelIterator const& ) const;
 		virtual bool is_valid( void ) const;
@@ -516,13 +515,13 @@ HAbstractRow* HListControler<tType>::HModelIterator::call( void )
 	}
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_equal( HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
+bool HListControler<tType>::HModelIterator::is_equal( typename HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
 	{
 	return ( f_oIterator == static_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator );
 	}
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_not_equal( HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
+bool HListControler<tType>::HModelIterator::is_not_equal( typename HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
 	{
 	return ( f_oIterator != static_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator );
 	}

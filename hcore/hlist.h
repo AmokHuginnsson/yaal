@@ -47,6 +47,9 @@ extern char const * const g_ppcErrMsgHList [ ];
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+template<typename tType> 
+class HList;
+
 struct OListBits
 	{
 	struct ERROR
@@ -81,8 +84,14 @@ struct OListBits
 		D_ASCENDING,
 		D_DESCENDING
 		} sort_order_t;
-	virtual ~OListBits ( void ) { } 
+	virtual ~OListBits( void ) { } 
+	template<typename T, OListBits::treatment_t Q>
+	struct iterator
+		{
+		typedef typename HList<T>::template HIterator<T,Q> type;
+		};
 	};
+
 
 template<typename tType> 
 class HList : public OListBits
@@ -126,9 +135,9 @@ public:
 	 * Adds new element at specified position.
 	 */
 	template<OListBits::treatment_t const treatment>
-	typename HList<tType>::template HIterator<tType, treatment> insert( HIterator<tType, treatment> const&, tType const* = NULL );
+	typename OListBits::iterator<tType, treatment>::type insert( HIterator<tType, treatment> const&, tType const* = NULL );
 	template<OListBits::treatment_t const treatment>
-	typename HList<tType>::template HIterator<tType, treatment> insert( HIterator<tType, treatment> const&, tType const& );
+	typename OListBits::iterator<tType, treatment>::type insert( HIterator<tType, treatment> const&, tType const& );
 	tType& add_head( tType const* = NULL );    /* adds new element at beggining of the list */
 	tType& add_tail( tType const* = NULL );	/* adds new element at end of the list */
 	void push_back( tType const& );
@@ -143,7 +152,7 @@ public:
 	status_t remove_head( tType** = NULL );
 	status_t remove_tail( tType** = NULL );
 	template<OListBits::treatment_t const treatment>
-	typename HList<tType>::template HIterator<tType, treatment> erase( HIterator<tType, treatment> const& );
+	typename OListBits::iterator<tType, treatment>::type erase( HIterator<tType, treatment> const& );
 	/* sets cursor at specified index or number */
 	iterator n_th( int );
 	tType& operator[] ( int );
@@ -607,12 +616,12 @@ void HList<tType>::swap( HList<tType>& other )
 
 template<typename tType>
 template<OListBits::treatment_t const treatment>
-typename HList<tType>::template HIterator<tType, treatment> HList<tType>::insert( HIterator<tType, treatment> const& a_oPositon,
+typename OListBits::iterator<tType, treatment>::type HList<tType>::insert( HIterator<tType, treatment> const& it,
 		tType const* a_ptObject )
 	{
 	M_PROLOG
-	HElement* l_poElement = new HElement( a_oPositon.f_poCurrent );
-	if ( ( f_iSize == 0 ) || ( ( a_oPositon.f_poCurrent == f_poHook ) && ( treatment == D_TREAT_AS_OPENED ) ) )
+	HElement* l_poElement = new HElement( it.f_poCurrent );
+	if ( ( f_iSize == 0 ) || ( ( it.f_poCurrent == f_poHook ) && ( treatment == D_TREAT_AS_OPENED ) ) )
 		f_poHook = l_poElement;
 	f_iSize ++;
 	f_iIndex = 0;
@@ -625,11 +634,11 @@ typename HList<tType>::template HIterator<tType, treatment> HList<tType>::insert
 
 template<typename tType>
 template<OListBits::treatment_t const treatment>
-typename HList<tType>::template HIterator<tType, treatment> HList<tType>::insert( HIterator<tType, treatment> const& a_oPositon,
+typename OListBits::iterator<tType, treatment>::type HList<tType>::insert( HIterator<tType, treatment> const& it,
 		tType const& val )
 	{
 	M_PROLOG
-	return ( insert( a_oPositon, &val ) );
+	return ( insert( it, &val ) );
 	M_EPILOG
 	}
 
@@ -770,7 +779,7 @@ tType& HList<tType>::add_orderly( tType const& a_rtObject,
 
 template<typename tType>
 template<OListBits::treatment_t const treatment>
-typename HList<tType>::template HIterator<tType, treatment>
+typename OListBits::iterator<tType, treatment>::type
 HList<tType>::erase( HIterator<tType, treatment> const& a_roIterator )
 	{
 	M_PROLOG
