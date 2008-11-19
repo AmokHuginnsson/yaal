@@ -174,7 +174,7 @@ public:
 		}
 	const_qual_t operator* ( void );
 private:
-	friend class yaal::tools::HBitmap::HBitmap;
+	friend class yaal::tools::HBitmap;
 	HIterator( owner_t a_poOwner, int long const& idx )
 		: f_poOwner( a_poOwner ), f_lIndex( idx ) {}
 	};

@@ -347,19 +347,19 @@ struct power<base,0,helper>
 	};
 
 template<typename tType>
-tType min( tType left, tType right )
+inline tType min( tType const& left, tType const& right )
 	{
 	return ( left < right ? left : right );
 	}
 
 template<typename tType>
-tType max( tType left, tType right )
+inline tType max( tType const& left, tType const& right )
 	{
 	return ( left >= right ? left : right );
 	}
 
 template<typename tType>
-tType abs( tType val )
+inline tType abs( tType const& val )
 	{
 	return ( val >= 0 ? val : - val );
 	}
@@ -422,7 +422,7 @@ template<typename to_t, typename from_t>
 to_t lexical_cast( from_t const& );
 
 template<typename tType>
-inline tType const operator | ( tType const& left,
+inline tType operator | ( tType const& left,
 		tType const& right )
 	{
 	return ( static_cast<tType>( static_cast<int long unsigned>( left )
@@ -438,7 +438,7 @@ inline tType& operator |= ( tType& left, tType const& right )
 	}
 
 template<typename tType>
-inline tType const operator & ( tType const& left,
+inline tType operator & ( tType const& left,
 		tType const& right )
 	{
 	return ( static_cast<tType>( static_cast<int long unsigned>( left )
@@ -454,7 +454,7 @@ inline tType& operator &= ( tType& left, tType const& right )
 	}
 
 template<typename tType>
-inline tType const operator ^ ( tType const& left,
+inline tType operator ^ ( tType const& left,
 		tType const& right )
 	{
 	return ( static_cast<tType>( static_cast<int long unsigned>( left )
@@ -470,7 +470,7 @@ inline tType& operator ^= ( tType& left, tType const& right )
 	}
 
 template<typename tType>
-inline tType const operator ~ ( tType const& e )
+inline tType operator ~ ( tType const& e )
 	{
 	return ( static_cast<tType>( ~ static_cast<int long unsigned>( e ) ) );
 	}
