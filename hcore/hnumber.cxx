@@ -484,7 +484,7 @@ bool HNumber::mutate_addition( char* res, int long ressize,
 		}
 	if ( carrier && ! sub )
 		++ res[ 0 ];
-	return ( carrier );
+	return ( carrier ? true : false );
 	}
 
 HNumber HNumber::operator + ( HNumber const& element ) const

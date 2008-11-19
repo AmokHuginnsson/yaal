@@ -93,12 +93,13 @@ private:
 		HAbstractNode* f_poLeft;
 		HAbstractNode* f_poRight;
 		HAbstractNode( void );
-		virtual ~HAbstractNode( void );
 		HAbstractNode( HAbstractNode const& );
 		HAbstractNode& operator = ( HAbstractNode const & );
 		void set_child( HAbstractNode*, HAbstractNode* );
 		friend class HSBBSTree;
 		friend class HSBBSTree::HIterator;
+	public:
+		virtual ~HAbstractNode( void );
 		};
 	template<typename tType>
 	class HNode : public HAbstractNode

@@ -126,7 +126,7 @@ int n_piFunctionMnemonicsLength [ 16 ] =
 	4, 3, 4, 3, 3, 2, 4, 3, 6, 6, 5, 6, 3, 4, 2, 3
 	};
 
-static double long D_PI = 3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196;
+static double long D_PI = 3.141592653589793238462643383279502884197069399375105820974944592307816406286208998628034825342117067982148086513282306647093844;
 
 HExpression::HExpression( void )
 	: f_iIndex( 0 ), f_iLength( 0 ), f_eError( E_OK ),
@@ -228,25 +228,32 @@ double long HExpression::functions( tree_t::const_node_t a_roNode )
 	int l_iFunction = (*a_roNode)->f_oVariables.tail();
 	double long l_dLeftValue = 0;
 	l_dLeftValue = count_branch( &*a_roNode->begin() );
+	double long retVal = 0;
 	switch ( l_iFunction )
 		{
 		case ( FUNCTION::D_SIN ):
-			return ( ::std::sin( l_dLeftValue ) );
+			retVal = ::std::sin( l_dLeftValue );
+		break;
 		case ( FUNCTION::D_SINH ):
-			return ( ::std::sinh( l_dLeftValue ) );
+			retVal = ::std::sinh( l_dLeftValue );
+		break;
 		case ( FUNCTION::D_COS ):
-			return ( ::std::cos( l_dLeftValue ) );
+			retVal = ::std::cos( l_dLeftValue );
+		break;
 		case ( FUNCTION::D_COSH ):
-			return ( ::std::cosh( l_dLeftValue ) );
+			retVal = ::std::cosh( l_dLeftValue );
+		break;
 		case ( FUNCTION::D_TG	):
 			{
 			if ( eq( ::std::floor( l_dLeftValue / D_PI + .5 ),
 						( l_dLeftValue / D_PI + .5 ) ) )
 				throw HExpressionException( _( "tg: argument not in domain" ) );
-			return ( ::std::tan( l_dLeftValue ) );
+			retVal = ::std::tan( l_dLeftValue );
 			}
+		break;
 		case ( FUNCTION::D_TGH ):
-			return ( ::std::tanh( l_dLeftValue ) );
+			retVal = ::std::tanh( l_dLeftValue );
+		break;
 		case ( FUNCTION::D_CTG ):
 			{
 			if ( eq( ::std::floor( l_dLeftValue / D_PI ),
@@ -254,61 +261,69 @@ double long HExpression::functions( tree_t::const_node_t a_roNode )
 				throw HExpressionException( _( "ctg: argument not in domain" ) );
 			l_dLeftValue = ::std::tan( l_dLeftValue );
 			if ( l_dLeftValue == 0 )
-				return ( 0 );
-			return ( 1. / l_dLeftValue );
+				retVal = 0;
+			retVal = 1. / l_dLeftValue;
 			}
+		break;
 		case ( FUNCTION::D_CTGH ):
 			{
 			l_dLeftValue = ::std::tanh( l_dLeftValue );
 			if ( l_dLeftValue == 0 )
-				return ( 0 );
-			return ( 1. / l_dLeftValue );
+				retVal = 0;
+			retVal = 1. / l_dLeftValue;
 			}
+		break;
 		case ( FUNCTION::D_ARCSIN ):
 			{
 			if ( ( l_dLeftValue < - D_PI / 2 ) || ( l_dLeftValue > D_PI / 2 ) )
 				throw HExpressionException( _( "arcsin: argument not in domain" ) );
-			return ( ::std::asin( l_dLeftValue ) );
+			retVal = ::std::asin( l_dLeftValue );
 			}
+		break;
 		case ( FUNCTION::D_ARCCOS ):
 			{
 			if ( ( l_dLeftValue < - D_PI / 2 ) || ( l_dLeftValue > D_PI / 2 ) )
 				throw HExpressionException( _( "arccos: argument not in domain" ) );
-			return ( ::std::acos( l_dLeftValue ) );
+			retVal = ::std::acos( l_dLeftValue );
 			}
+		break;
 		case ( FUNCTION::D_ARCTG ):
-			return ( ::std::atan( l_dLeftValue ) );
+			retVal = ::std::atan( l_dLeftValue );
+		break;
 		case ( FUNCTION::D_ARCCTG ):
-			return ( D_PI - std::atan( l_dLeftValue ) );
+			retVal = D_PI - std::atan( l_dLeftValue );
+		break;
 		case ( FUNCTION::D_EXP ):
-			return ( ::std::exp( l_dLeftValue ) );
+			retVal = ::std::exp( l_dLeftValue );
+		break;
 		case ( FUNCTION::D_SQRT ):
 			{
 			if ( l_dLeftValue < 0 )
 				throw HExpressionException( _( "sqrt: argument not in domain" ) );
-			return ( ::std::sqrt( l_dLeftValue ) );
+			retVal = ::std::sqrt( l_dLeftValue );
 			}
+		break;
 		case ( FUNCTION::D_LN ):
 			{
 			if ( l_dLeftValue <= 0 )
 				throw HExpressionException( _( "ln: argument not in domain" ) );
-			return ( ::std::log( l_dLeftValue ) );
+			retVal = ::std::log( l_dLeftValue );
 			}
+		break;
 		case ( FUNCTION::D_LOG ):
 			{
 			if ( l_dLeftValue <= 0 )
 				throw HExpressionException( _( "log: argument not in domain" ) );
-			return ( ::std::log10( l_dLeftValue ) );
+			retVal = ::std::log10( l_dLeftValue );
 			}
+		break;
 		case ( FUNCTION::D_ABS ):
-			{
-			if ( l_dLeftValue < 0 )
-				return ( - l_dLeftValue );
-			return ( l_dLeftValue );
-			}
+			retVal = ( l_dLeftValue < 0 ) ? -l_dLeftValue : l_dLeftValue;
+		break;
 		default:
 			M_THROW( _( "unknown function type" ), l_iFunction );
 		}
+	return ( retVal );
 	M_EPILOG
 	}
 
@@ -768,28 +783,29 @@ char const* HExpression::get_error( void ) const
 	switch ( f_eError )
 		{
 		case ( E_OK ):
-			return ( _ ( "succesful" ) );
+			return ( _( "succesful" ) );
 		case ( E_UNKNOWN_MNEMONIC ):
-			return ( _ ( "unknown mnemonic" ) );
+			return ( _( "unknown mnemonic" ) );
 		case ( E_UNEXPECTED_TERMINATION ):
-			return ( _ ( "unexpected termination" ) );
+			return ( _( "unexpected termination" ) );
 		case ( E_CLOSING_BRACKET_EXPECTED ):
-			return ( _ ( "closing bracket expected" ) );
+			return ( _( "closing bracket expected" ) );
 		case ( E_CLOSING_ABSOLUTE_EXPECTED ):
-			return ( _ ( "closing absolute bracket expected" ) );
+			return ( _( "closing absolute bracket expected" ) );
 		case ( E_CLOSING_FUNCTION_BRACKET_EXPECTED ):
-			return ( _ ( "closing function bracket expected" ) );
+			return ( _( "closing function bracket expected" ) );
 		case ( E_OPENING_FUNCTION_BRACKET_EXPECTED ):
-			return ( _ ( "opening function bracket expected" ) );
+			return ( _( "opening function bracket expected" ) );
 		case ( E_DIGIT_EXPECTED ):
-			return ( _ ( "digit expected" ) );
+			return ( _( "digit expected" ) );
 		case ( E_UNEXPECTED_TOKEN ):
-			return ( _ ( "unexpected token" ) );
+			return ( _( "unexpected token" ) );
 		case ( E_PREMATURE_TERMINATION ):
-			return ( _ ( "premature termination" ) );
+			return ( _( "premature termination" ) );
 		default :
-			M_THROW ( _ ( "enknown error code" ), f_eError );
+			M_THROW ( _( "enknown error code" ), f_eError );
 		}
+	return ( NULL );
 	M_EPILOG
 	}
 

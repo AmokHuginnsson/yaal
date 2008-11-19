@@ -54,7 +54,7 @@ void HControlList::next_enabled( char a_cShorcut )
 		++ f_roFocused;
 		if ( dynamic_cast<HStatusBarControl*>( &(*(*f_roFocused))) )
 			continue;
-		l_bLoop = (*f_roFocused)->set_focus( a_cShorcut );
+		l_bLoop = (*f_roFocused)->set_focus( a_cShorcut ) ? true : false;
 		if ( f_roFocused == it )
 			l_bLoop = false;
 		}

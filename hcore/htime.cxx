@@ -73,18 +73,18 @@ HTime::HTime( HTime const& a_roTime ) : f_oFormat( n_pcDefaultTimeFormat ),
 	M_EPILOG
 	}
 
-HTime::HTime ( time_t const & a_rxTime ) : f_oFormat ( n_pcDefaultTimeFormat ),
-	f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue ( a_rxTime ), f_sBroken()
+HTime::HTime( time_t const& a_rxTime ) : f_oFormat( n_pcDefaultTimeFormat ),
+	f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue( a_rxTime ), f_sBroken()
 	{
 	M_PROLOG
-	M_ENSURE ( localtime_r( & f_xValue, & f_sBroken ) );
+	M_ENSURE( localtime_r( &f_xValue, &f_sBroken ) );
 	return;
 	M_EPILOG
 	}
 
-HTime::HTime ( int const a_iYear, int const a_iMonth, int const a_iDay,
+HTime::HTime( int const a_iYear, int const a_iMonth, int const a_iDay,
 							 int const a_iHour, int const a_iMinute, int const a_iSecond )
-	: f_oFormat ( n_pcDefaultTimeFormat ), f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue(),
+	: f_oFormat( n_pcDefaultTimeFormat ), f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue(),
 	f_sBroken()
 	{
 	M_PROLOG
