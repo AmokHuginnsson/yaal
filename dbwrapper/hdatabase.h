@@ -56,7 +56,7 @@ private:
 	virtual ~HDataBase( void );
 	HDataBase( HDataBase const& );
 	HDataBase& operator = ( HDataBase const& );
-	friend struct yaal::hcore::HPointerStrict<HDataBase>;
+	friend struct yaal::hcore::HPointerScalar<HDataBase>;
 	};
 
 typedef yaal::hcore::HExceptionT<HDataBase> HDataBaseException;
