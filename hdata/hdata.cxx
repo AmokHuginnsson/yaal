@@ -67,8 +67,9 @@ int yaal_hdata_main( int, char** )
 		yaal_dbwrapper_banner();
 		yaal_hconsole_banner();
 		yaal_hdata_banner();
+		::exit( 0 );
 		}
-	::exit( 0 );
+	return ( 0 );
 	}
 #endif /* __DYNAMIC_LINKER__ */
 

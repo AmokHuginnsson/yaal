@@ -32,7 +32,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "tools/hplugin.h"
 #include "hconsole/hmainwindow.h"
 #include "dbwrapper/db_driver_loader.h"
-#include "hdataprocess.h"
+#include "hdata/hdataprocess.h"
 #include "hdatawindow.h"
 #include "oresource.h"
 

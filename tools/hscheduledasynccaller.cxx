@@ -78,7 +78,7 @@ int HScheduledAsyncCaller::do_work( void )
 			{
 			time_t delay = 0;
 			if ( ( delay = ( (*it).first - time( NULL ) ) ) > 0 )
-				f_oCondition.wait( delay, 0 );
+				f_oCondition.wait( static_cast<int long unsigned>( delay ), 0 );
 			}
 		else
 			f_oCondition.wait( 10000, 0 );

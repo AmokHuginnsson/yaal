@@ -230,8 +230,9 @@ int yaal_tools_main( int, char** )
 		{
 		yaal_hcore_banner();
 		yaal_tools_banner();
+		::exit( 0 );
 		}
-	::exit( 0 );
+	return ( 0 );
 	}
 #endif /* __DYNAMIC_LINKER__ */
 

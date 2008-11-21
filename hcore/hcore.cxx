@@ -168,8 +168,11 @@ int yaal_hcore_main( int, char** ) __attribute__(( __noreturn__ ));
 int yaal_hcore_main( int, char** )
 	{
 	if ( g_pcDynamicLinkerPath[ 0 ] )
+		{
 		yaal_hcore_banner();
-	::exit( 0 );
+		::exit( 0 );
+		}
+	return ( 0 );
 	}
 #endif /* __DYNAMIC_LINKER__ */
 

@@ -78,7 +78,7 @@ bool HFSItem::is_executable() const
 	M_PROLOG
 	struct stat l_sStat;
 	do_stat( &l_sStat );
-	return ( l_sStat.st_mode & ( S_IXUSR | S_IXGRP | S_IXOTH ) );
+	return ( ( l_sStat.st_mode & ( S_IXUSR | S_IXGRP | S_IXOTH ) ) ? true : false );
 	M_EPILOG
 	}
 
