@@ -143,7 +143,6 @@ void yaal_dbwrapper_banner( void )
 	}
 
 extern "C"
-int yaal_dbwrapper_main( int, char** ) __attribute__(( __noreturn__ ));
 int yaal_dbwrapper_main( int, char** )
 	{
 	if ( g_pcDynamicLinkerPath[ 0 ] )
@@ -151,8 +150,9 @@ int yaal_dbwrapper_main( int, char** )
 		yaal_hcore_banner();
 		yaal_tools_banner();
 		yaal_dbwrapper_banner();
+		::exit( 0 );
 		}
-	::exit( 0 );
+	return ( 0 );
 	}
 #endif /* __DYNAMIC_LINKER__ */
 

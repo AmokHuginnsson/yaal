@@ -57,7 +57,6 @@ void yaal_hdata_banner( void )
 	}
 
 extern "C"
-int yaal_hdata_main( int, char** ) __attribute__(( __noreturn__ ));
 int yaal_hdata_main( int, char** )
 	{
 	if ( g_pcDynamicLinkerPath[ 0 ] )

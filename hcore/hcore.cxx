@@ -164,7 +164,6 @@ static char const g_pcDynamicLinkerPath [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 extern "C"
-int yaal_hcore_main( int, char** ) __attribute__(( __noreturn__ ));
 int yaal_hcore_main( int, char** )
 	{
 	if ( g_pcDynamicLinkerPath[ 0 ] )
