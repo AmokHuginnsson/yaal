@@ -34,6 +34,11 @@ Copyright:
 #include "hcore/hexception.h"
 #include "hcore/compat.h"
 
+/*! \mainpage yaal library documentation.
+ *
+ * \htmlinclude ./main.xml
+ */
+
 /*! \brief All library API belongs here.
  *
  * This namaspace contains all yaal library API and code.
@@ -115,6 +120,14 @@ struct unary_function
 	typedef arg_t argument_t;
 	};
 
+/*! \brief Meta-data for binary function functors.
+ *
+ * Type descriptions:
+ *
+ * \tparam res_t - result type of binary function.
+ * \tparam arg1st_t - first argument type of binary function.
+ * \tparam arg2nd_t - second argument type of binary function.
+ */
 template<typename res_t, typename arg1st_t, typename arg2nd_t>
 struct binary_function
 	{

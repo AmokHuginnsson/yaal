@@ -36,6 +36,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Base64 encoding/decoding functionality.
+ */
 struct base64
 	{
 	typedef base64 self_t;

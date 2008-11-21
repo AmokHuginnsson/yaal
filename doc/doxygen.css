@@ -1,0 +1,38 @@
+/* ================================================================================================= */
+
+table.yaal {
+	border-collapse: collapse;
+	border-style: solid;
+	border-color: #000;
+	border-width: 1px;
+}
+table.yaal th, table.yaal td {
+	padding-left: 8px;
+	padding-right: 8px;
+}
+table.yaal td {
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #888;
+}
+table.yaal td.good, table.yaal td.fine, table.yaal td.average, table.yaal td.fail {
+	text-align: center;
+}
+table.yaal td.good {
+	background: #0f0;
+	color: #000;
+}
+table.yaal td.fine {
+	background: #be0;
+	color: #000;
+}
+table.yaal td.average {
+	background: #ff0;
+	color: #000;
+}
+table.yaal td.fail {
+	background: #f22;
+	color: #000;
+}
+
+/* ================================================================================================= */

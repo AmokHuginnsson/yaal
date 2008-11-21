@@ -2,8 +2,15 @@
 
 * Supported platforms:
 
-	- FreeBSD 7
 	- Debian Sid
+	- Ubuntu Intrepid Ibex
+	- Centos 5.2
+	- FreeBSD 7
+	- Solaris 5.10
+	- Windows XP SP3 with Cygwin
+
+[For more detailed information regarding plartofm support
+please look into HTML documantation.]
 
 If your platform is not on above list, it is very likely that yaal
 will not compile/link/work.

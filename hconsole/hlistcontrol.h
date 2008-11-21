@@ -138,6 +138,8 @@ public:
 	class HModelIteratorWrapper;
 	class HAbstractModelIterator;
 	typedef yaal::hcore::HPointer<HAbstractModelIterator> iterator_ptr_t;
+	/*! \brief Interface for HListControl mode iterator.
+	 */
 	class HAbstractModelIterator
 		{
 		HAbstractModelIterator( HAbstractModelIterator const& );

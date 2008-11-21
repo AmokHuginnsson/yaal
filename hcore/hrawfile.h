@@ -56,6 +56,8 @@ protected:
 			D_SSL_CLIENT	= 4
 			} raw_file_type_t;
 		};
+	/*! \brief HRawFile event type that HRawFile user can wait for.
+	 */
 	struct ACTION
 		{
 		typedef enum

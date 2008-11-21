@@ -1,0 +1,35 @@
+<p>
+	<span>yaal</span> compatibility details.
+</p>
+<table class="yaal">
+	<tr>
+		<th>Platform</th><th>Compilation</th><th>Best case</th><th>Ultimate</th>
+	</tr>
+	<tr>
+		<td>Debian Sid</td><td class="good">100%</td><td class="good">100%</td><td class="good">100%</td>
+	</tr>
+	<tr>
+		<td>Ubuntu Intrepid Ibex</td><td class="good">100%</td><td class="good">100%</td><td class="good">100%</td>
+	</tr>
+	<tr>
+		<td>Centos 5.2</td><td class="good">100%</td><td class="good">100%</td><td class="good">100%</td>
+	</tr>
+	<tr>
+		<td>FreeBSD 7</td><td class="good">100%</td><td class="good">100%</td><td class="fail">0%</td>
+	</tr>
+	<tr>
+		<td>Solaris 5.10</td><td class="good">100%</td><td class="fine">90%</td><td class="fail">0%</td>
+	</tr>
+	<tr>
+		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="average">80%</td><td class="fail">0%</td>
+	</tr>
+	<tr>
+		<td>Windows XP SP3 with Visual Studio C++ 2008 with SFU 3.5</td><td class="average">80%</td><td class="fail">0%</td><td class="fail">0%</td>
+	</tr>
+</table>
+<ul>
+	<li>Platform - description of platform where tests were performed.</li>
+	<li>Compilation - amount of code that actually compiles.</li>
+	<li>Best case - amount of unit and regression tests that actually passed in best case very gentle run.</li>
+	<li>Ultimate - amount of unit and regression test that actually passed during heavy burden run.</li>
+</ul>

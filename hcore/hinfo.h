@@ -37,6 +37,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Type agnostic data container.
+ */
 class HInfo
 	{
 	type_t		f_eType;

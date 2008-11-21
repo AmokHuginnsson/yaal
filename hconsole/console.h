@@ -136,7 +136,14 @@ struct COLORS
 	static int const D_ATTR_DEFAULT			= -1;
 	};
 
-template < int code = 0 >
+/*! \brief Get special key code values.
+ *
+ * \tparam code - basic input code.
+ * \retval meta - META modified code.
+ * \retval ctrl - CONTROL modified code.
+ * \retval commercial - CONTROL-x modified code (command).
+ */
+template<int code = 0>
 struct KEY
 	{
 	static int const meta = code + KEY_CODES::D_META_BASE;

@@ -48,6 +48,8 @@ private:
 	virtual task_t do_pop_task( void ) = 0;
 	};
 
+/*! \brief Thread pool idiom implementation.
+ */
 class HWorkFlow : public HWorkFlowInterface
 	{
 private:
@@ -74,6 +76,8 @@ private:
 	virtual task_t do_pop_task( void );
 	};
 
+/*! \brief Finest unit of working capacity.
+ */
 class HWorkFlow::HWorker
 	{
 private:

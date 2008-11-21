@@ -64,6 +64,8 @@ private:
 
 typedef yaal::hcore::HExceptionT<HFSItem> HFSItemException;
 
+/*! \brief File system iterator.
+ */
 class HFSItem::HIterator
 	{
 	yaal::hcore::HString f_oPath;

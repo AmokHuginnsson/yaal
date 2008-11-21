@@ -196,6 +196,8 @@ typedef struct { char x[2]; } NO;
 template<int const, typename>
 struct existing_hier;
 
+/*! \brief Get parent hierarchy is one exists, predefined value otherwise.
+ */
 template<typename tType>
 struct context_hier
 	{

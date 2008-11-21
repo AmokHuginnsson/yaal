@@ -38,6 +38,8 @@ namespace hconsole
 	
 class HLogPad : public HControl
 	{
+	/*! \brief Basic unit of data for HLogPad display.
+	 */
 	class HLogLine
 		{
 		typedef enum

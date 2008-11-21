@@ -85,6 +85,12 @@ struct OListBits
 		D_DESCENDING
 		} sort_order_t;
 	virtual ~OListBits( void ) { } 
+	/*! \brief HList<>::iterator type constructor.
+	 *
+	 * \tparam T - type of elements stored in HList<>.
+	 * \tparam Q - iterator bahavior.
+	 * \retval type - new iterator type.
+	 */
 	template<typename T, OListBits::treatment_t Q>
 	struct iterator
 		{
