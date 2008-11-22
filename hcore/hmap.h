@@ -208,6 +208,8 @@ public:
 		{ return ( f_oEngine != it.f_oEngine ); }
 private:
 	friend class HMap<key_t, value_t, helper_t>;
+	template<typename other_const_qual_t>
+	friend class HIterator;
 	explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 	};
 

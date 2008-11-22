@@ -81,6 +81,8 @@ private:
 			return ( *this );
 			}
 		};
+	template<typename tType>
+	class HNode;
 	class HAbstractNode
 		{
 		typedef enum
@@ -93,23 +95,14 @@ private:
 		HAbstractNode* f_poLeft;
 		HAbstractNode* f_poRight;
 		HAbstractNode( void );
+		virtual ~HAbstractNode( void );
 		HAbstractNode( HAbstractNode const& );
 		HAbstractNode& operator = ( HAbstractNode const & );
 		void set_child( HAbstractNode*, HAbstractNode* );
 		friend class HSBBSTree;
 		friend class HSBBSTree::HIterator;
-	public:
-		virtual ~HAbstractNode( void );
-		};
-	template<typename tType>
-	class HNode : public HAbstractNode
-		{
-		tType f_tKey;
-		HNode( tType const& );
-		HNode( HNode const& );
-		HNode& operator = ( HNode const& );
-		friend class HSBBSTree;
-		friend class HSBBSTree::HIterator;
+		template<typename any_t>
+		friend class HNode;
 		};
 	HAbstractNode* f_poRoot;
 	int long f_lSize;
@@ -168,6 +161,18 @@ public:
 private:
 	friend class HSBBSTree;
 	explicit HIterator( HAbstractNode* const );
+	};
+
+template<typename tType>
+class	HSBBSTree::HNode : public HAbstractNode
+	{
+	tType f_tKey;
+	HNode( tType const& );
+	HNode( HNode const& );
+	HNode& operator = ( HNode const& );
+	friend class HSBBSTree;
+	friend tType& HSBBSTree::HIterator::operator*<tType>( void );
+	friend tType const& HSBBSTree::HIterator::operator*<tType>( void ) const;
 	};
 
 template<typename tType>

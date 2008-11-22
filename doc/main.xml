@@ -3,7 +3,7 @@
 </p>
 <table class="yaal">
 	<tr>
-		<th>Platform</th><th>Compilation</th><th>Best case</th><th>Ultimate</th>
+		<th>Platform <a class="note" href="#note_compiler">1)</a></th><th>Compilation</th><th>Best case</th><th>Ultimate</th>
 	</tr>
 	<tr>
 		<td>Debian Sid</td><td class="good">100%</td><td class="good">100%</td><td class="good">100%</td>
@@ -18,7 +18,10 @@
 		<td>FreeBSD 7</td><td class="good">100%</td><td class="good">100%</td><td class="fail">0%</td>
 	</tr>
 	<tr>
-		<td>Solaris 5.10</td><td class="good">100%</td><td class="fine">90%</td><td class="fail">0%</td>
+		<td>Solaris 5.10 with GCC with Sun ld</td><td class="good">100%</td><td class="fine">90%</td><td class="fail">0%</td>
+	</tr>
+	<tr>
+		<td>Solaris 5.10 with Sun Studio Express 2008/11</td><td class="fail">0%</td><td class="fail">0%</td><td class="fail">0%</td>
 	</tr>
 	<tr>
 		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="average">80%</td><td class="fail">0%</td>
@@ -27,6 +30,7 @@
 		<td>Windows XP SP3 with Visual Studio C++ 2008 with SFU 3.5</td><td class="average">80%</td><td class="fail">0%</td><td class="fail">0%</td>
 	</tr>
 </table>
+<i><a name="note_compiler">1)</a> - Unless specified otherwise GCC is used for compilation.</i>
 <ul>
 	<li>Platform - description of platform where tests were performed.</li>
 	<li>Compilation - amount of code that actually compiles.</li>

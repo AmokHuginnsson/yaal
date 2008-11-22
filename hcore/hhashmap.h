@@ -59,6 +59,10 @@ template<typename tType, typename ttType>
 class HHashMap
 	{
 	typedef HHashMap<tType, ttType> self_t;
+public:
+	template<typename const_qual_t>
+	class HIterator;
+private:
 	class HAtom
 		{
 	private:
@@ -78,13 +82,13 @@ class HHashMap
 		HAtom& operator = ( HAtom const& );
 		/*}*/
 		friend class HHashMap<tType, ttType>;
+		template<typename const_qual_t>
+		friend class HIterator;
 		};
 	int long unsigned f_ulPrime;
 	int f_ulSize;
 	HAtom** f_ppoAtomArray;
 public:
-	template<typename const_qual_t>
-	class HIterator;
 	typedef HIterator<HAtom> iterator;
 	typedef HIterator<HAtom const> const_iterator;
 	HHashMap( size_t ); /* Lower bound of size of map's table */
