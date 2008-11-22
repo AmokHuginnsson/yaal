@@ -29,15 +29,6 @@ Copyright:
 #include <unistd.h>
 #include <libintl.h>
 
-#include "config.h"
-
-#ifdef HAVE_CURSES_H
-#	include <curses.h>
-#elif defined ( HAVE_NCURSES_CURSES_H )
-#	include <ncurses/curses.h>
-#else /* HAVE_NCURSES_CURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_CURSES_H */
 #ifdef HAVE_SYS_CONSIO_H
 #	include <sys/consio.h>
 #	include <csignal>
@@ -46,12 +37,22 @@ Copyright:
 #	include <gpm.h>
 #endif /* HAVE_GPM_H */
 
+#include "config.h"
+
 #include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "mouse.h"
 #include "console.h"
 #include "hcore/hstring.h"
 #include "hcore/hlog.h"
+
+#ifdef HAVE_CURSES_H
+#	include <curses.h>
+#elif defined ( HAVE_NCURSES_CURSES_H )
+#	include <ncurses/curses.h>
+#else /* HAVE_NCURSES_CURSES_H */
+#	error "No ncurses header available."
+#endif /* not HAVE_NCURSES_CURSES_H */
 
 using namespace yaal::hcore;
 

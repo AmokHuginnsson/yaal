@@ -35,6 +35,13 @@ Copyright:
 
 #include "config.h"
 
+#include "hcore/base.h"
+M_VCSID( "$Id: "__ID__" $" )
+#include "hcore/hlog.h"
+#include "tools/tools.h"
+#include "hconsole.h"
+#include "console.h"
+
 #ifdef HAVE_CURSES_H
 #	include <curses.h>
 #elif defined ( HAVE_NCURSES_CURSES_H )
@@ -42,13 +49,6 @@ Copyright:
 #else /* HAVE_NCURSES_CURSES_H */
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_CURSES_H */
-
-#include "hcore/base.h"
-M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hlog.h"
-#include "tools/tools.h"
-#include "hconsole.h"
-#include "console.h"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -181,20 +181,20 @@ void HConsole::init( void )
 void HConsole::enter_curses( void )
 	{
 	M_PROLOG
-	short l_piColors [ ] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+	short l_piColors[] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
 		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
 	int l_iFg = 0, l_iBg = 0;
 	termios l_sTermios;
 /*	def_shell_mode(); */
 /* this is done automaticly by initscr(), read man next time */
-	if ( ! isatty ( STDIN_FILENO ) )
-		M_THROW ( "stdin in not a tty", 0 );
+	if ( ! isatty( STDIN_FILENO ) )
+		M_THROW( "stdin in not a tty", 0 );
 	if ( ! f_bInitialized )
 		init();
 	if ( n_bDisableXON )
 		{
-		M_ENSURE ( tcgetattr ( STDIN_FILENO, & f_sTermios ) == 0 );
-		M_ENSURE ( tcgetattr ( STDIN_FILENO, & l_sTermios ) == 0 );
+		M_ENSURE( tcgetattr( STDIN_FILENO, &f_sTermios ) == 0 );
+		M_ENSURE( tcgetattr( STDIN_FILENO, &l_sTermios ) == 0 );
 		l_sTermios.c_iflag &= ~IXON;
 		if ( n_bLeaveCtrlC )
 			l_sTermios.c_cc [ VINTR ] = 0;
@@ -206,55 +206,55 @@ void HConsole::enter_curses( void )
 			l_sTermios.c_cc [ VSTART ] = 0;
 		if ( n_bLeaveCtrlBackSlash )
 			l_sTermios.c_cc [ VQUIT ] = 0;
-		M_ENSURE ( tcsetattr ( STDIN_FILENO, TCSAFLUSH, & l_sTermios ) == 0 );
+		M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &l_sTermios ) == 0 );
 		}
-	use_env ( true );
+	use_env( true );
 	if ( ! f_psWindow )
 		f_psWindow = initscr();
-	M_ENSURE ( cbreak() != ERR );
-	M_ENSURE ( start_color() != ERR );
+	M_ENSURE( cbreak() != ERR );
+	M_ENSURE( start_color() != ERR );
 	standout(); /* Macro, returned value without meaning */
-	M_ENSURE ( nonl() == OK );
-	M_ENSURE ( keypad ( stdscr, true ) != ERR );
-	M_ENSURE ( intrflush ( stdscr, false ) != ERR );
-	M_ENSURE ( scrollok ( stdscr, false ) != ERR );
-	M_ENSURE ( leaveok ( stdscr, false ) != ERR );
-	immedok ( stdscr, false );
-	M_ENSURE ( fflush ( NULL ) == 0 );
+	M_ENSURE( nonl() == OK );
+	M_ENSURE( keypad ( stdscr, true ) != ERR );
+	M_ENSURE( intrflush ( stdscr, false ) != ERR );
+	M_ENSURE( scrollok ( stdscr, false ) != ERR );
+	M_ENSURE( leaveok ( stdscr, false ) != ERR );
+	immedok( stdscr, false );
+	M_ENSURE( fflush ( NULL ) == 0 );
 	flushinp(); /* Always returns OK */
-	curs_set ( CURSOR::D_INVISIBLE );
-	M_ENSURE ( refresh() != ERR );
+	curs_set( CURSOR::D_INVISIBLE );
+	M_ENSURE( refresh() != ERR );
 	/* init color pairs */
-	M_ENSURE ( assume_default_colors ( COLOR_BLACK, COLOR_BLACK ) == OK );
+	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
 	for ( l_iBg = 0; l_iBg < 8; l_iBg ++ )
 		for ( l_iFg = 0; l_iFg < 8; l_iFg ++ )
-			init_pair ( static_cast < short > ( l_iBg * 8 + l_iFg ),
-					l_piColors [ l_iFg ], l_piColors [ l_iBg ] );
-	attrset ( COLOR_PAIR( 7 ) );
+			init_pair( static_cast<short>( l_iBg * 8 + l_iFg ),
+					l_piColors[ l_iFg ], l_piColors[ l_iBg ] );
+	attrset( COLOR_PAIR( 7 ) );
 	bkgd( ' ' | ATTR::value( COLORS::D_FG_BLACK | COLORS::D_BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
 	f_bBrokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
 	f_bEnabled = true;
-	getmaxyx ( stdscr, f_iHeight, f_iWidth );
-	if ( getenv ( "YAAL_NO_MOUSE" ) )
+	getmaxyx( stdscr, f_iHeight, f_iWidth );
+	if ( getenv( "YAAL_NO_MOUSE" ) )
 		n_bUseMouse = false;
-	if ( n_bUseMouse)
+	if ( n_bUseMouse )
 		{
-		if ( ::getenv ( "DISPLAY" ) )
+		if ( ::getenv( "DISPLAY" ) )
 			{
-			log ( LOG_TYPE::D_INFO ) << _ ( "using ncurses mouse support" ) << endl;
+			log( LOG_TYPE::D_INFO ) << _( "using ncurses mouse support" ) << endl;
 			mouse::mouse_open = mouse::x_mouse_open;
 			mouse::mouse_get = mouse::x_mouse_get;
 			mouse::mouse_close = mouse::x_mouse_close;
 			}
 		else
 			{
-			log ( LOG_TYPE::D_INFO ) << _ ( "using console mouse support" ) << endl;
+			log( LOG_TYPE::D_INFO ) << _( "using console mouse support" ) << endl;
 			mouse::mouse_open = mouse::console_mouse_open;
 			mouse::mouse_get = mouse::console_mouse_get;
 			mouse::mouse_close = mouse::console_mouse_close;
 			}
 		if ( ( f_iMouseDes = mouse::mouse_open() ) < 0 )
-			M_THROW ( _ ( "mouse is console type"
+			M_THROW( _( "mouse is console type"
 						" and we did not recived file descriptor" ), errno );
 		}
 #ifdef HAVE_ASCII_GRAPHICS
@@ -274,23 +274,23 @@ void HConsole::leave_curses( void )
 	{
 	M_PROLOG
 	if ( ! f_bEnabled )
-		M_THROW ( "not in curses mode", errno );
+		M_THROW( "not in curses mode", errno );
 	if ( n_bUseMouse )
-		static_cast < void > ( mouse::mouse_close() );
+		static_cast<void>( mouse::mouse_close() );
 	bkgd( ' ' | ATTR::value( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) );
-	M_ENSURE ( use_default_colors() == OK );
-	M_ENSURE ( printw ( "" ) != ERR );
-	M_ENSURE ( fflush ( NULL ) == 0 );
+	M_ENSURE( use_default_colors() == OK );
+	M_ENSURE( printw ( "" ) != ERR );
+	M_ENSURE( fflush ( NULL ) == 0 );
 	flushinp(); /* Always returns OK */
-	M_ENSURE ( intrflush ( stdscr, true ) != ERR );
-	leaveok ( stdscr, false ); /* Always OK */
-	immedok ( stdscr, true ); /* Always OK */
-	M_ENSURE ( refresh() != ERR );
+	M_ENSURE( intrflush ( stdscr, true ) != ERR );
+	leaveok( stdscr, false ); /* Always OK */
+	immedok( stdscr, true ); /* Always OK */
+	M_ENSURE( refresh() != ERR );
 	nl(); /* Always OK */
 	standend();
-	M_ENSURE ( keypad ( stdscr, false ) != ERR );
-	M_ENSURE ( nocbreak() != ERR );
-	curs_set ( CURSOR::D_VISIBLE );
+	M_ENSURE( keypad ( stdscr, false ) != ERR );
+	M_ENSURE( nocbreak() != ERR );
+	curs_set( CURSOR::D_VISIBLE );
 /*	reset_shell_mode(); */
 /* see comment near def_shell_mode(), ( automagicly by endwin() ) */
 /*
@@ -298,9 +298,9 @@ void HConsole::leave_curses( void )
 	delwin ( f_psWindow );
 	f_psWindow = NULL;
 */
-	M_ENSURE ( endwin() == OK );
+	M_ENSURE( endwin() == OK );
 	if ( n_bDisableXON )
-		M_ENSURE ( tcsetattr ( STDIN_FILENO, TCSAFLUSH, & f_sTermios ) == 0 );
+		M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &f_sTermios ) == 0 );
 	f_bEnabled = false;
 	return;
 	M_EPILOG
@@ -311,13 +311,13 @@ void HConsole::set_attr( int a_iAttr ) const
 	M_PROLOG
 	char unsigned l_ucByte = 0;
 	if ( ! f_bEnabled )
-		M_THROW ( "not in curses mode", errno );
-	l_ucByte = static_cast < char unsigned > ( a_iAttr );
+		M_THROW( "not in curses mode", errno );
+	l_ucByte = static_cast<char unsigned>( a_iAttr );
 	if ( f_bBrokenBrightBackground )
-		attrset ( ATTR::value_fix ( l_ucByte ) );
+		attrset( ATTR::value_fix( l_ucByte ) );
 	else
-		attrset ( ATTR::value ( l_ucByte ) );
-	return ;
+		attrset( ATTR::value( l_ucByte ) );
+	return;
 	M_EPILOG
 	}
 

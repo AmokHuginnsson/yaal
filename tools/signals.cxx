@@ -312,6 +312,7 @@ int HBaseSignalHandlers::signal_QUIT ( int a_iSignum )
 	log( LOG_TYPE::D_INFO ) << l_oMessage << endl;
 	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	abort();
+	return ( 0 );
 	M_EPILOG
 	}
 

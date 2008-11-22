@@ -24,7 +24,6 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <dlfcn.h>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -65,8 +64,8 @@ struct DB_DRIVER
 		};
 	};
 
-void dbwrapper_error ( void );
-void dbwrapper_exit ( void ) __attribute__  ((noreturn));
+void dbwrapper_error( void );
+void dbwrapper_exit( void ) __attribute__(( __noreturn__ ));
 
 int	n_iDataBaseDriver = 0;
 
@@ -78,11 +77,11 @@ OOption n_psVariables[] =
 bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 	{
 	M_PROLOG
-	if ( ! strcasecmp ( a_roOption, "set_env" ) )
-		set_env ( a_roValue );
-	else if ( ! strcasecmp ( a_roOption, "log_mask" ) )
+	if ( ! strcasecmp( a_roOption, "set_env" ) )
+		set_env( a_roValue );
+	else if ( ! strcasecmp( a_roOption, "log_mask" ) )
 		{
-		if ( ! strcasecmp ( a_roValue, "LOG_SQL" ) )
+		if ( ! strcasecmp( a_roValue, "LOG_SQL" ) )
 			HLog::f_lLogMask |= LOG_TYPE::D_SQL;
 		else
 			return ( true );
@@ -104,9 +103,9 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_ORACLE;
 		else
 			{
-			log ( LOG_TYPE::D_ERROR ) << "Error: `" << a_roValue;
+			log( LOG_TYPE::D_ERROR ) << "Error: `" << a_roValue;
 			log << "' is unknown driver." << endl;
-			exit ( 1 );
+			exit( 1 );
 			}
 		}
 	else

@@ -208,10 +208,9 @@ char* rs_column_name( void* a_pvDataR, int a_iField )
 	return ( static_cast<OSQLiteResult*>( a_pvDataR )->f_ppcData [ a_iField ] );
 	}
 
-int yaal_sqlite3_driver_main( int, char** ) __attribute__(( __noreturn__ ));
 int yaal_sqlite3_driver_main( int, char** )
 	{
-	::exit( 0 );
+	return ( 0 );
 	}
 
 }

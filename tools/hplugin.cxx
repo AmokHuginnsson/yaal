@@ -61,7 +61,7 @@ void HPlugin::load( HString const& a_oPath )
 void HPlugin::unload( void )
 	{
 	M_PROLOG
-#if not defined( __HOST_OS_TYPE_FREEBSD__ )
+#if ! defined( __HOST_OS_TYPE_FREEBSD__ )
 	M_ENSURE( dlclose( f_pvHandle ) == 0 );
 #else /* not __HOST_OS_TYPE_FREEBSD__ */
 	dlclose( f_pvHandle );
@@ -90,7 +90,7 @@ void* HPlugin::resolve( HString const& a_oSymbolName )
 
 bool HPlugin::is_loaded( void ) const
 	{
-	return ( f_pvHandle );
+	return ( f_pvHandle ? true : false );
 	}
 
 }

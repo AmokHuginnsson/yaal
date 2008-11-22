@@ -29,14 +29,6 @@ Copyright:
 
 #include "config.h"
 
-#ifdef HAVE_CURSES_H
-#	include <curses.h>
-#elif defined ( HAVE_NCURSES_CURSES_H )
-#	include <ncurses/curses.h>
-#else /* HAVE_NCURSES_CURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_CURSES_H */
-
 #include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hcore.h"
@@ -44,6 +36,14 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/rc_file.h"
 #include "tools/tools.h"
 #include "console.h"
+
+#ifdef HAVE_CURSES_H
+#	include <curses.h>
+#elif defined ( HAVE_NCURSES_CURSES_H )
+#	include <ncurses/curses.h>
+#else /* HAVE_NCURSES_CURSES_H */
+#	error "No ncurses header available."
+#endif /* not HAVE_NCURSES_CURSES_H */
 
 using namespace yaal::hcore;
 using namespace yaal::tools;

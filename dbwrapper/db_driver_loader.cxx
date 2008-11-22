@@ -242,7 +242,7 @@ void load_driver( void )
 			n_oDBDriver.resolve( SYMBOL_PREFIX"rs_column_name", rs_column_name );
 			n_oDBDriver.resolve( SYMBOL_PREFIX"db_connect", db_connect );
 			}
-		catch ( HPluginException& e )
+		catch ( HPluginException& )
 			{
 			M_THROW( _( "can not load database driver" ), n_iDataBaseDriver );
 			}
