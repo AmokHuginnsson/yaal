@@ -29,6 +29,8 @@ Copyright:
 #include <unistd.h>
 #include <libintl.h>
 
+#include "config.h"
+
 #ifdef HAVE_SYS_CONSIO_H
 #	include <sys/consio.h>
 #	include <csignal>
@@ -36,8 +38,6 @@ Copyright:
 #elif defined ( HAVE_GPM_H )
 #	include <gpm.h>
 #endif /* HAVE_GPM_H */
-
-#include "config.h"
 
 #include "hcore/base.h"
 M_VCSID( "$Id: "__ID__" $" )
