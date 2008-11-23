@@ -98,42 +98,45 @@ struct CURSOR
  */
 struct COLORS
 	{
-	static int const D_FG_BLACK					= 0;
-	static int const D_FG_RED						= 1;
-	static int const D_FG_GREEN					= 2;
-	static int const D_FG_BROWN					= 3;
-	static int const D_FG_BLUE					= 4;
-	static int const D_FG_MAGENTA				= 5;
-	static int const D_FG_CYAN					= 6;
-	static int const D_FG_LIGHTGRAY			= 7;
-	static int const D_FG_GRAY					= 8;
-	static int const D_FG_BRIGHTRED			= 9;
-	static int const D_FG_BRIGHTGREEN		= 10;
-	static int const D_FG_YELLOW				= 11;
-	static int const D_FG_BRIGHTBLUE		= 12;
-	static int const D_FG_BRIGHTMAGENTA	= 13;
-	static int const D_FG_BRIGHTCYAN		= 14;
-	static int const D_FG_WHITE					= 15;
+	enum
+		{
+		D_FG_BLACK         = 0,
+		D_FG_RED           = 1,
+		D_FG_GREEN         = 2,
+		D_FG_BROWN         = 3,
+		D_FG_BLUE          = 4,
+		D_FG_MAGENTA       = 5,
+		D_FG_CYAN          = 6,
+		D_FG_LIGHTGRAY     = 7,
+		D_FG_GRAY          = 8,
+		D_FG_BRIGHTRED     = 9,
+		D_FG_BRIGHTGREEN   = 10,
+		D_FG_YELLOW        = 11,
+		D_FG_BRIGHTBLUE    = 12,
+		D_FG_BRIGHTMAGENTA = 13,
+		D_FG_BRIGHTCYAN    = 14,
+		D_FG_WHITE         = 15,
 
-	static int const D_BG_BLACK					= 0;
-	static int const D_BG_RED						= 16;
-	static int const D_BG_GREEN					= 32;
-	static int const D_BG_BROWN					= 48;
-	static int const D_BG_BLUE					= 64;
-	static int const D_BG_MAGENTA				= 80;
-	static int const D_BG_CYAN					= 96;
-	static int const D_BG_LIGHTGRAY			= 112;
-	static int const D_BG_BLINK					= 128;
-	static int const D_BG_GRAY					= D_BG_BLINK;
-	static int const D_BG_BRIGHTRED			= 16 | D_BG_BLINK;
-	static int const D_BG_BRIGHTGREEN		= 32 | D_BG_BLINK;
-	static int const D_BG_YELLOW				= 48 | D_BG_BLINK;
-	static int const D_BG_BRIGHTBLUE		= 64 | D_BG_BLINK;
-	static int const D_BG_BRIGHTMAGENTA	= 80 | D_BG_BLINK;
-	static int const D_BG_BRIGHTCYAN		= 96 | D_BG_BLINK;
-	static int const D_BG_WHITE					= 112 | D_BG_BLINK;
-	static int const D_ATTR_NORMAL			= ( D_FG_LIGHTGRAY | D_BG_BLACK );
-	static int const D_ATTR_DEFAULT			= -1;
+		D_BG_BLACK         = 0,
+		D_BG_RED           = 16,
+		D_BG_GREEN         = 32,
+		D_BG_BROWN         = 48,
+		D_BG_BLUE          = 64,
+		D_BG_MAGENTA       = 80,
+		D_BG_CYAN          = 96,
+		D_BG_LIGHTGRAY     = 112,
+		D_BG_BLINK         = 128,
+		D_BG_GRAY          = D_BG_BLINK,
+		D_BG_BRIGHTRED     = 16 | D_BG_BLINK,
+		D_BG_BRIGHTGREEN   = 32 | D_BG_BLINK,
+		D_BG_YELLOW        = 48 | D_BG_BLINK,
+		D_BG_BRIGHTBLUE    = 64 | D_BG_BLINK,
+		D_BG_BRIGHTMAGENTA = 80 | D_BG_BLINK,
+		D_BG_BRIGHTCYAN    = 96 | D_BG_BLINK,
+		D_BG_WHITE         = 112 | D_BG_BLINK,
+		D_ATTR_NORMAL      = ( D_FG_LIGHTGRAY | D_BG_BLACK ),
+		D_ATTR_DEFAULT     = -1
+		};
 	};
 
 /*! \brief Get special key code values.

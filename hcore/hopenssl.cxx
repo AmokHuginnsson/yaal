@@ -34,8 +34,6 @@ Copyright:
 #include <openssl/engine.h>
 #include <unistd.h>
 
-#include <iostream>
-
 #include "base.h"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hopenssl.h"
