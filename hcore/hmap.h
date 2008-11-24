@@ -66,7 +66,7 @@ inline static bool less( HPair<key_t, value_t> const& left, key_t const& right )
  * data structure that holds pairs of keys and values.
  *
  * \tparam key_t - type of key held in map.
- * \tparam values - type of value held in map.
+ * \tparam value_t - type of value held in map.
  * \tparam helper_t - HSBBSTree plugable code.
  */
 template<typename key_t, typename value_t, typename helper_t = map_helper<key_t const, value_t> >

@@ -177,6 +177,8 @@ private:
 	void assign( tType*&, hier_t* );
 	};
 
+/*! \brief Interface for concept of getting smart pointer from `this'.
+ */
 template<typename tType>
 class HPointerFromThisInterface
 	{

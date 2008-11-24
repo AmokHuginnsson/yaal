@@ -126,6 +126,8 @@ private:
 
 typedef HExceptionT<HThread> HThreadException;
 
+/*! \brief Interface to basic multi-threading privitive - Thread.
+ */
 template<typename tType>
 class HThreadT : public HThread
 	{

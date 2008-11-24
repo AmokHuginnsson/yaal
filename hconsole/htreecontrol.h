@@ -47,6 +47,8 @@ class HTreeControl : public virtual HControl
 protected:
 	class HNodeControl;
 	friend class HNodeControl;
+	/*! \brief Basic operatable element of TUI Tree control representing single tree node.
+	 */
 	class HNodeControl
 		{
 	protected:

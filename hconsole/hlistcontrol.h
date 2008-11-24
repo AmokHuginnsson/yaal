@@ -132,6 +132,8 @@ public:
 	virtual bool get_checked( void );
 	};
 
+/*! \brief Interface for HListControl controler from MVC pattern.
+ */
 class HAbstractControler
 	{
 public:

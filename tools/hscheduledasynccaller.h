@@ -35,6 +35,11 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Task scheduler.
+ *
+ * HScheduledAsyncCaller is capable of invocation of any method of any class
+ * at precisely specified moment in time.
+ */
 class HScheduledAsyncCaller : public HAbstractAsyncCaller
 	{
 	yaal::hcore::HCondition f_oCondition;

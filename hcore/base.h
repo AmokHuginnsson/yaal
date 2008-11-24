@@ -120,7 +120,7 @@ struct unary_function
 	typedef arg_t argument_t;
 	};
 
-/*! \brief Meta-data for binary function functors.
+/*! \brief Meta-data definition for binary function functors.
  *
  * Type descriptions:
  *
@@ -136,6 +136,13 @@ struct binary_function
 	typedef arg2nd_t argument2nd_t;
 	};
 
+/*! \brief Meta-function functor for binding given invariable argument as second argument.
+ *
+ * Type descriptions:
+ *
+ * \tparam result_t - result type of resulting unary function.
+ * \tparam argument2nd_t - type of invariant argument.
+ */
 template<typename operation_t>
 struct binder1st : public unary_function<typename operation_t::result_t, typename operation_t::argument2nd_t>
 	{

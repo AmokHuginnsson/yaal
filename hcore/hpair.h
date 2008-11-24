@@ -37,6 +37,11 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Implementation of ordered pair concept.
+ *
+ * \tparam tType - type of first pair element.
+ * \tparam ttType - type of second pair element.
+ */
 template<typename tType, typename ttType>
 class HPair
 	{

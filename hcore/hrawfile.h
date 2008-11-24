@@ -46,14 +46,18 @@ protected:
 	typedef int long ( HRawFile::* READER_t )( void* const, int long const& );
 	typedef int long ( HRawFile::* WRITER_t )( void const* const, int long const& );
 	typedef int ( HRawFile::* CLOSER_t )( void );
+	/*! \brief Type of underneath file descriptor.
+	 */
 	struct TYPE
 		{
+		/*! \brief Fd type flags.
+		 */
 		typedef enum
 			{
-			D_DEFAULT			= 0, /* means plain */
-			D_PLAIN				= 1,
-			D_SSL_SERVER	= 2,
-			D_SSL_CLIENT	= 4
+			D_DEFAULT			= 0, /*!< means plain */
+			D_PLAIN				= 1, /*!< fd represents plain raw IO */
+			D_SSL_SERVER	= 2, /*!< fd represents SSL server part of IO */
+			D_SSL_CLIENT	= 4  /*!< fd represents SSL client part of IO */
 			} raw_file_type_t;
 		};
 	/*! \brief HRawFile event type that HRawFile user can wait for.

@@ -103,10 +103,17 @@ typedef yaal::hcore::HExceptionT<HBitmap> HBitmapException;
 namespace bitmap_type_helper
 {
 
+/*! \brief Get owner constness based on child type.
+ *
+ * \tparam input - child type.
+ * \retval owner_t - const qualified owner type.
+ */
 template<typename input>
 struct owner_const_qual_from_type
 	{
 	};
+
+/*! \cond */
 template<>
 struct owner_const_qual_from_type<bool>
 	{
@@ -117,6 +124,7 @@ struct owner_const_qual_from_type<HBitmap::HBit>
 	{
 	typedef HBitmap* owner_t;
 	};
+/*! \endcond */
 
 }
 

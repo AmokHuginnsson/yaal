@@ -178,17 +178,27 @@ struct void_to_exception<void>
 	typedef yaal::hcore::HException exception_t;
 	};
 
+/*! \brief exception auto-hierarchy helper
+ *
+ * void_to_base metafunction resolves non void tType type to type and void to base.
+ *
+ * \tparam tType - main type for type resolving.
+ * \tparam base_t - base type for type resolving.
+ * \retval type - resolved type of base exception.
+ */
 template<typename tType, typename base_t>
 struct void_to_base
 	{
 	typedef tType type;
 	};
 
+/*! \cond */
 template<typename base_t>
 struct void_to_base<void, base_t>
 	{
 	typedef base_t type;
 	};
+/*! \endcond */
 
 typedef char YES;
 typedef struct { char x[2]; } NO;

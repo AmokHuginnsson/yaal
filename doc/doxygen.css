@@ -34,5 +34,9 @@ table.yaal td.fail {
 	background: #f22;
 	color: #000;
 }
+.note {
+	vertical-align: super;
+	font-size: smaller;
+}
 
 /* ================================================================================================= */

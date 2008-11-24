@@ -39,6 +39,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Interface to abstration of any-method of any-class invocation.
+ */
 class HCallInterface
 	{
 public:
@@ -108,6 +110,14 @@ public:
 		{ call(); }
 	};
 
+/*! \brief Implementation of abstration of any-method of any-class invocation.
+ *
+ * \tparam CLASS_t - class on which this invocation will operate.
+ * \tparam METHOD_t - method of given class CLASS_t that shall be invoked.
+ * \tparam a0_t - first argument to given METHOD_t of CLASS_t.
+ * \tparam a1_t - second argument to given METHOD_t of CLASS_t.
+ * \tparam aN_t - N-th argument to given METHOD_t of CLASS_t.
+ */
 template<typename CLASS_t, typename METHOD_t,
 	typename a0_t = HCallInterface::HPseudoType,
 	typename a1_t = HCallInterface::HPseudoType,

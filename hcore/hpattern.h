@@ -36,6 +36,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Regular expression string searcher.
+ */
 class HPattern
 	{
 	typedef HPattern self_t;

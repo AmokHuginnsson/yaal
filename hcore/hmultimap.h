@@ -37,6 +37,15 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Binary tree based map with relation one-to-many on keys to values.
+ *
+ * HMultiMap<> is a template representing self balancing binary search tree
+ * data structure that holds pairs of keys and lists of values.
+ *
+ * \tparam key_t - type of key held in map.
+ * \tparam value_t - type of value held in map.
+ * \tparam helper_t - HSBBSTree plugable code.
+ */
 template<typename key_t, typename value_t, typename helper_t = map_helper<key_t const, HPointer<HList<value_t> > > >
 class HMultiMap
 	{

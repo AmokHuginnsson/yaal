@@ -35,7 +35,11 @@ namespace yaal
 	
 namespace hconsole
 {
-	
+
+/*! \brief Implementation of TUI LogPad control class.
+ *
+ * LogPad is read only TUI control that is able to display formatted text.
+ */
 class HLogPad : public HControl
 	{
 	/*! \brief Basic unit of data for HLogPad display.

@@ -51,12 +51,16 @@ class HVector
 	typedef HVector<tType> self_t;
 	data_t f_oData;
 public:
+	/*! \brief Error type of HVector<> operations.
+	 */
 	struct ERROR
 		{
+		/*! \brief Error type flags.
+		 */
 		typedef enum
 			{
-			E_OK = 0,
-			E_DIMNOTMATCH
+			E_OK = 0, /*!< no error. */
+			E_DIMNOTMATCH /*!< binary operation applied to two vectors with different dimensions. */
 			} error_t;
 		};
 	typedef typename data_t::iterator iterator;
