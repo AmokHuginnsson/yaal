@@ -4,9 +4,9 @@
 <table class="yaal">
 	<tr>
 		<th>Platform <a class="note" href="#note_platform">1)</a></th>
-		<th>Compilation <a class="note" href="note_compilation">2)</a></th>
+		<th>Compilation <a class="note" href="#note_compilation">2)</a></th>
 		<th>Best case</th>
-		<th>Ultimate <a class="note" href="note_ultimate">3)</a></th>
+		<th>Ultimate <a class="note" href="#note_ultimate">3)</a></th>
 	</tr>
 	<tr>
 		<td>Debian Sid</td><td class="good">100%</td><td class="good">100%</td><td class="good">100%</td>

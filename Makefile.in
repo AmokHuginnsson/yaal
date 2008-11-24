@@ -177,12 +177,13 @@ mrproper: clean
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile config.h config.h.in yaalrc config.log doc/dox
+	/bin/rm -rf configure Makefile config.h config.h.in yaalrc config.log doc/html
 
 include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
 
 doc: $(SRCS) $(HDRS)
-	@doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'
+	@doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'; \
+	cat doc/doxygen.css >> doc/html/doxygen.css
 
 stats:
 	@_aux/stats
