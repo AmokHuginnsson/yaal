@@ -73,6 +73,8 @@ private:
 	friend class HTree<tType>::HNode;
 	};
 
+/*! \brief Basic building block of HTree<>.
+ */
 template<typename tType>
 class HTree<tType>::HNode
 	{

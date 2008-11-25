@@ -33,18 +33,22 @@ namespace yaal
 namespace hconsole
 {
 
-/*! \brief Console and X mouse handling.
+/*! \brief Console (TUI) and X mouse handling.
  */
 namespace mouse
 {
 
+/*! \brief Meta-data for mouse interface.
+ */
 struct MOUSE_BITS
 	{
+	/*! \brief Mouse button identifiers.
+	 */
 	struct BUTTONS
 		{
-		static int const D_ONE 		= 1;
-		static int const D_TWO		= 2;
-		static int const D_THREE	= 4;
+		static int const D_ONE 		= 1; /*!< Button 1. */
+		static int const D_TWO		= 2; /*!< Button 2. */
+		static int const D_THREE	= 4; /*!< Button 3. */
 		};
 	};
 

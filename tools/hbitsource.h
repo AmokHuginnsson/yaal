@@ -64,6 +64,8 @@ private:
 	virtual HBitmap const& do_get_nth_block( int long const&, int long const& ) const;
 	};
 
+/*! \brief Memory based data source.
+ */
 class HBitSourceMemory : public HBitSourceInterface, private yaal::HNonCopyable
 	{
 	typedef HBitSourceMemory self_t;

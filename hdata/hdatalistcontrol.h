@@ -38,6 +38,10 @@ namespace hdata
 
 class HDataWindow;
 
+/*! \brief Database enabled list based TUI control.
+ *
+ * This TUI control support automatic display of database content.
+ */
 class HDataListControl : public HDataControl, public virtual yaal::hconsole::HListControl
 	{
 public:

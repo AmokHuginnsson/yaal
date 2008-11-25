@@ -232,6 +232,8 @@ private:
 		}
 	};
 
+/*! \brief Forward iterator for HMultiMap<>.
+ */
 template<typename key_t, typename value_t, typename helper_t>
 template<typename const_qual_t>
 class HMultiMap<key_t, value_t, helper_t>::HIterator

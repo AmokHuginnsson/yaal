@@ -140,6 +140,8 @@ private:
 	friend class HXml;
 	};
 
+/*! \brief Immutable XML document node.
+ */
 class HXml::HConstNodeProxy
 	{
 	HXml::tree_t::const_node_t f_poNode;

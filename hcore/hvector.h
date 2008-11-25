@@ -44,6 +44,8 @@ namespace hcore
 
 extern char const* g_ppcErrMsgHVector[];
 
+/*! \brief Vector class for linear algebra calculus.
+ */
 template<typename tType>
 class HVector
 	{

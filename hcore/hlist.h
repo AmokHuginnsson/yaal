@@ -50,20 +50,22 @@ extern char const * const g_ppcErrMsgHList [ ];
 template<typename tType> 
 class HList;
 
+/*! \brief Meta-data definition for HList<> class.
+ */
 struct OListBits
 	{
+	/*! \brief Error codes for HList<> operations.
+	 */
 	struct ERROR
 		{
+		/*! \brief Error flags.
+		 */
 		typedef enum
 			{
-			E_OK = 0,
-			E_EMPTYELEMENT,
-			E_BADINDEX,
-			E_BADFLAG,
-			E_EMPTY,
-			E_BADOFFSET,
-			E_BADNUMBER,
-			E_BADORDER
+			E_OK = 0,    /*!< No error. */
+			E_BAD_INDEX, /*!< Bad elements index used. */
+			E_EMPTY,     /*!< List is empty. */
+			E_BAD_ORDER  /*!< Bad order flag. */
 			} error_t;
 		};
 	typedef enum
@@ -740,7 +742,7 @@ tType& HList<tType>::add_orderly( tType const& a_rtObject,
 	HElement * l_poElement = new HElement ( NULL );
 	l_poElement->f_tObject = a_rtObject;
 	if ( ( f_eOrder != D_UNSORTED ) && ( f_eOrder != a_eOrder ) )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], a_eOrder );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BAD_ORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
 	typedef bool ( *comp_t )( tType const&, tType const&, T const& );
 	comp_t my_comp;
@@ -905,7 +907,7 @@ typename HList<tType>::HElement* HList<tType>::element_by_index( int a_iIndex )
 	if ( a_iIndex < 0 )
 		a_iIndex += f_iSize;
 	if ( ( a_iIndex >= f_iSize ) || ( a_iIndex < 0 ) )
-		M_THROW( g_ppcErrMsgHList[ ERROR::E_BADINDEX ], a_iIndex );
+		M_THROW( g_ppcErrMsgHList[ ERROR::E_BAD_INDEX ], a_iIndex );
 	if ( ! f_poIndex )
 		f_poIndex = f_poHook;
 /*
@@ -1288,7 +1290,7 @@ void HList<tType>::sort( T const& less, sort_order_t a_eOrder )
 	M_PROLOG
 	f_eOrder = a_eOrder;
 	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BADORDER ], f_eOrder );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BAD_ORDER ], f_eOrder );
 	if ( f_iSize > 1 )
 		{
 		HElement* first = f_poHook;

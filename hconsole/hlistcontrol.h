@@ -291,6 +291,8 @@ public:
 			D_ALL = -1
 			} list_flags_t;
 		};
+	/*! \brief Description of HListControl column meta-data.
+	 */
 	class HColumnInfo
 		{
 		bool f_bDescending;

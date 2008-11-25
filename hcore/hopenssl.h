@@ -50,12 +50,16 @@ class HOpenSSL
 public:
 	static yaal::hcore::HString f_oSSLKey;
 	static yaal::hcore::HString f_oSSLCert;
+	/*! \brief SSL object types.
+	 */
 	struct TYPE
 		{
+		/*! \brief Types.
+		 */
 		typedef enum
 			{
-			D_SERVER,
-			D_CLIENT
+			D_SERVER, /*!< Server side of SSL connection. */
+			D_CLIENT  /*!< Client side of SSL connection. */
 			} ssl_context_type_t;
 		};
 private:

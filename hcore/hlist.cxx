@@ -37,16 +37,12 @@ namespace yaal
 namespace hcore
 {
 
-char const * const g_ppcErrMsgHList [ 8 ] =
+char const* const g_ppcErrMsgHList[ 8 ] =
 	{
-	_ ( "ok" ),
-/* HList::ERROR::E_EMPTYELEMENT */	_ ( "nothing stored yet, so nothing to get" ),
-/* HList::ERROR::E_BADINDEX */			_ ( "index excides list size" ),
-/* HList::ERROR::E_BADFLAG */				_ ( "unknown flag" ),
-/* HList::ERROR::E_EMPTY */					_ ( "list was empty" ),
-/* HList::ERROR::E_BADOFFSET */			_ ( "incorrect offset" ),
-/* HList::ERROR::E_BADNUMBER */			_ ( "wrong number" ),
-/* HList::ERROR::E_BADORDER */			_ ( "inconsistient sort order" )
+	_( "ok" ),
+/* HList::ERROR::E_BAD_INDEX */ _( "index excides list size" ),
+/* HList::ERROR::E_EMPTY */     _( "list was empty" ),
+/* HList::ERROR::E_BAD_ORDER */ _( "inconsistient sort order" )
 	};
 
 }

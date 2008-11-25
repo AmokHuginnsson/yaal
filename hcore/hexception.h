@@ -200,8 +200,10 @@ struct void_to_base<void, base_t>
 	};
 /*! \endcond */
 
+/*! \cond */
 typedef char YES;
 typedef struct { char x[2]; } NO;
+/*! \endcond */
 
 template<int const, typename>
 struct existing_hier;
