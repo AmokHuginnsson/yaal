@@ -1,5 +1,6 @@
-doc/html/index.html
-doc/dox
+doc/html
 yaalrc
+yaal.*
+Doxyfile
 .my_make
 .svn
