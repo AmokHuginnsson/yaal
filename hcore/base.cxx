@@ -46,6 +46,8 @@ double long dumb_strtold( HString const& str )
 
 }
 
+/*! \brief Extend features of one library in another library.
+ */
 namespace extendable
 {
 

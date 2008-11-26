@@ -162,6 +162,8 @@ protected:
 	HListControl* f_poControl;
 public:
 	typedef yaal::hcore::HPointer<HAbstractControler> ptr_t;
+	/*! \brief Model iterator proxy.
+	 */
 	class HModelIteratorWrapper
 		{
 		iterator_ptr_t f_oIteratorPtr;

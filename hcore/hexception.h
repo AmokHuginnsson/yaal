@@ -155,7 +155,7 @@ private:
  * C : B, CE : BE, CE = ET<C, BE>
  */
 
-/*! \brief Helper tools for automatic creation for (YEH) yaal exception hierarchy.
+/*! \brief Helper %tools for automatic creation for (YEH) yaal exception hierarchy.
  *
  * Non of members of this util namespace should be used directly.
  */
@@ -165,6 +165,8 @@ namespace exception_auto_hierarchy
 template<typename tType>
 struct parent_exception;
 
+/*! \brief Meta-function, parent_exception helper, gets existing parent exception or creates newone.
+ */
 template<typename tType>
 struct void_to_exception
 	{
@@ -172,11 +174,13 @@ struct void_to_exception
 	typedef HExceptionT<tType, parent_exception_t> exception_t;
 	};
 
+/*! \cond */
 template<>
 struct void_to_exception<void>
 	{
 	typedef yaal::hcore::HException exception_t;
 	};
+/*! \endcond */
 
 /*! \brief exception auto-hierarchy helper
  *

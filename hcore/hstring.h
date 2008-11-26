@@ -182,6 +182,8 @@ bool operator <= ( HString const&, HString const& );
 bool operator > ( HString const&, HString const& );
 bool operator < ( HString const&, HString const& );
 
+/*! \brief HString class helpers, utility functions.
+ */
 namespace string_helper
 {
 

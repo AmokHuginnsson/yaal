@@ -38,6 +38,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Interface for asynchronous call providers.
+ */
 class HAbstractAsyncCaller
 	{
 protected:
@@ -65,6 +67,8 @@ private:
 	friend class yaal::hcore::HThreadT<HAbstractAsyncCaller>;
 	};
 
+/*! \brief Invoke function or method asynchronously.
+ */
 class HAsyncCaller : public HAbstractAsyncCaller
 	{
 	yaal::hcore::HSemaphore f_oSemaphore;

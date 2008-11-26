@@ -38,6 +38,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Interface for HWorkFlow class to be used by HWorker class.
+ */
 class HWorkFlowInterface
 	{
 public:

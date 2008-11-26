@@ -37,6 +37,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief File system object representation.
+ */
 class HFSItem
 	{
 	typedef HFSItem self_t;

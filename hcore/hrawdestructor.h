@@ -33,6 +33,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Automatic scope based custom destruction function to free resources.
+ */
 class HRawDestructor
 	{
 public:

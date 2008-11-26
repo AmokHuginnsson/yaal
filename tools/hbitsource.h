@@ -39,6 +39,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Interface data source providers.
+ */
 class HBitSourceInterface
 	{
 public:
@@ -48,6 +50,8 @@ private:
 	virtual HBitmap const& do_get_nth_block( int long const&, int long const& ) const = 0;
 	};
 
+/*! \brief File based data source.
+ */
 class HBitSourceFile : public HBitSourceInterface, private yaal::HNonCopyable
 	{
 	typedef HBitSourceFile self_t;

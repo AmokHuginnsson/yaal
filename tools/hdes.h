@@ -33,6 +33,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief DES algorithm constants.
+ */
 struct DES
 	{
 	static int const D_BITS_IN_BYTE  = yaal::power<2,3>::value;

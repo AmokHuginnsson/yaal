@@ -93,19 +93,25 @@ private:
 	friend class HRecordSet;
 	};
 
+/*! \brief Build a SQL query based on user supplied meta-data.
+ */
 class HSQLDescriptor
 	{
 public:
 	typedef HSQLDescriptor self_t;
 	typedef yaal::hcore::HPointer<self_t> ptr_t;
+	/*! \brief Query types.
+	 */
 	struct MODE
 		{
+		/*! \brief Query types.
+		 */
 		typedef enum
 			{
-			D_SELECT,
-			D_UPDATE,
-			D_INSERT,
-			D_DELETE
+			D_SELECT, /*!< SELECT query. */
+			D_UPDATE, /*!< Data update query. */
+			D_INSERT, /*!< INSERT new data query. */
+			D_DELETE  /*!< DELETER data query. */
 			} mode_t;
 		};
 private:

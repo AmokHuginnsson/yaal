@@ -43,6 +43,8 @@ namespace hcore
 template<typename tType>
 class HTree;
 
+/*! \brief Tree based data structure and operations.
+ */
 template<typename tType>
 class HTree
 	{

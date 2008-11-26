@@ -100,6 +100,8 @@ private:
 
 typedef yaal::hcore::HExceptionT<HBitmap> HBitmapException;
 
+/*! \brief HBitmap class helpers, utility functions.
+ */
 namespace bitmap_type_helper
 {
 

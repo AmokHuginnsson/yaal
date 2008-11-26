@@ -36,11 +36,24 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Hashing functions.
+ */
 namespace hash
 {
 
-yaal::hcore::HString md5( HBitSourceInterface const& );
-yaal::hcore::HString sha1( HBitSourceInterface const& );
+/*! \brief Calculate md5 hash of data.
+ *
+ * \param source - data source of data which sum is to ba calculated.
+ * \return Calculated hash.
+ */
+yaal::hcore::HString md5( HBitSourceInterface const& source );
+
+/*! \brief Calculate md5 hash of data.
+ *
+ * \param source - data source of data which sum is to ba calculated.
+ * \return Calculated hash.
+ */
+yaal::hcore::HString sha1( HBitSourceInterface const& source );
 
 }
 

@@ -37,12 +37,16 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Serial port handling class.
+ */
 class HSerial : public hcore::HRawFile
 	{
 protected:
 	typedef HSerial self_t;
 	typedef HRawFile hier_t;
 public:
+	/*! \brief Serial port configuration flags.
+	 */
 	typedef enum
 		{
 		D_FLAGS_DEFAULT								= 0x0001,
@@ -60,6 +64,8 @@ public:
 		D_FLAGS_ECHO									= 0x1000,
 		D_FLAGS_CR2NL									= 0x2000
 		} flags_t;
+	/*! \brief Serial port data trnsmission speeds.
+	 */
 	typedef enum
 		{
 		D_SPEED_DEFAULT,

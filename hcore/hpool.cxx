@@ -38,13 +38,12 @@ namespace yaal
 namespace hcore
 {
 
-char const * n_ppcErrMsgHPool [ 5 ] =
+char const* n_ppcErrMsgHPool[ 5 ] =
 	{
-	_ ( "ok" ),
-/* HPool::ERROR::E_BADSIZE */				_ ( "bad size" ),
-/* HPool::ERROR::E_NOMEM */					_ ( "can not alloc memory with new" ),
-/* HPool::ERROR::E_REALLOC_FIXED */ _ ( "can not realloc fixed size pool" ),
-/* HPool::ERROR::E_BADINDEX */			_ ( "index does not fit into array" )
+	_( "ok" ),
+/* HPool::ERROR::E_BAD_SIZE */      _( "bad size" ),
+/* HPool::ERROR::E_REALLOC_FIXED */ _( "can not realloc fixed size pool" ),
+/* HPool::ERROR::E_BAD_INDEX */			_( "index does not fit into array" )
 	};
 
 }

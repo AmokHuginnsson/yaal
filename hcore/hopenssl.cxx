@@ -47,9 +47,17 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief OpenSSL libraary wrapper helpers.
+ */
 namespace openssl_helper
 {
 
+/*! \brief Format OpenSSL related error.
+ *
+ * \param a_oBuffer - buffer for error message.
+ * \param err - error code to translate to message.
+ * \return Error message.
+ */
 HString& format_error_message( HString& a_oBuffer, int err = 0 )
 	{
 	int long l_iCode = 0;

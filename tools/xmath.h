@@ -37,6 +37,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Meta-function (template) implementation of various math functions.
+ */
 namespace xmath
 {
 

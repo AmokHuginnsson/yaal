@@ -43,13 +43,17 @@ class HMutex
 	{
 	typedef HMutex self_t;
 public:
+	/*! \brief Mutex types.
+	 */
 	struct TYPE
 		{
+		/*! \brief Mutex types.
+		 */
 		typedef enum
 			{
-			D_DEFAULT = 0,
-			D_RECURSIVE = 1,
-			D_NON_RECURSIVE = 2
+			D_DEFAULT = 0,      /*!< Default mutex type (non-recursive). */
+			D_RECURSIVE = 1,    /*!< Recursive mutex type. */
+			D_NON_RECURSIVE = 2 /*!< Implicit non-recursive mutex type. */
 			} mutex_type_t;
 		};
 private:

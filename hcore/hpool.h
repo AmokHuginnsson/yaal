@@ -43,35 +43,42 @@ namespace hcore
 
 extern char const * n_ppcErrMsgHPool [ ];
 
+/*! \brief Raw memory (malloc/free) pools manager.
+ */
 template<typename tType>
 class HPool
 	{
 	typedef HPool<tType> self_t;
 public:
+	/*! \brief Error codes for HPool<> operations.
+	 */
 	struct ERROR
 		{
+		/*! \brief Codes.
+		 */
 		typedef enum
 			{
-			E_OK = 0,
-			E_BADSIZE,
-			E_NOMEM,
-			E_REALLOC_FIXED,
-			E_BADINDEX
+			E_OK = 0,        /*!< No error. */
+			E_BAD_SIZE,      /*!< Bad size specified. */
+			E_REALLOC_FIXED, /*!< Resizing of fixed size pool. */
+			E_BAD_INDEX      /*!< Out of bounds dereferencing. */
 			} error_t;
 		};
+	/*! \brief Types of pool memory allocation policies.
+	 */
 	typedef enum
 		{
-		D_FIXED_SIZE,
-		D_AUTO_GROW,
-		D_DUMB
+		D_FIXED_SIZE, /*!< Fixed pool size. */
+		D_AUTO_GROW,  /*!< Grow size automatically (geometric grow). */
+		D_DUMB        /*!< Set pool size to precize requwested value. */
 		} pool_type_t;
 	typedef tType* iterator;
 	typedef tType const* const_iterator;
 private:
-	pool_type_t f_ePoolType;
-	int long f_lCapacity;	/* size of allocated memory buffer */
-	int long f_lSize; /*! size of container */
-	tType* f_ptPool;	/* pointer to allocated memory pool */
+	pool_type_t f_ePoolType; /*!< Type of memory allocation policy. */
+	int long f_lCapacity;	/*!< size of allocated memory buffer */
+	int long f_lSize; /*!< size of container */
+	tType* f_ptPool;	/*!< pointer to allocated memory pool */
 public:
 	HPool( void );
 	HPool( int long const&, pool_type_t const& = D_FIXED_SIZE );
@@ -176,7 +183,7 @@ void HPool<tType>::pool_realloc( int long const& a_ulNewSize )
 	{
 	M_PROLOG
 	if ( a_ulNewSize < 1 )
-		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BADSIZE ], a_ulNewSize );
+		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BAD_SIZE ], a_ulNewSize );
 	if ( f_ePoolType == D_AUTO_GROW )
 		{
 		if ( a_ulNewSize > f_lCapacity )
@@ -225,7 +232,7 @@ tType& HPool<tType>::get( int long const& a_lIndex ) const
 	{
 	M_PROLOG
 	if ( ( a_lIndex < 0 ) || ( a_lIndex >= f_lSize ) )
-		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BADINDEX ], a_lIndex );
+		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BAD_INDEX ], a_lIndex );
 	return ( f_ptPool[ a_lIndex ] );
 	M_EPILOG
 	}

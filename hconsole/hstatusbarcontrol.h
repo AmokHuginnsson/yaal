@@ -36,6 +36,11 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Implementation of TUI Statusbar control class.
+ *
+ * Statusbar control provides display of progress bars, allows
+ * invocation of commands and specyfing search patterns.
+ */
 class HStatusBarControl : public HEditControl
 	{
 public:

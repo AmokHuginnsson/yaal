@@ -36,6 +36,12 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Implementation of TUI Combobox control class.
+ *
+ * Combobox control allows fancy representation of row based data with handful
+ * of display alteration methods and convenient text editing together with
+ * advanced automatic text operations.
+ */
 class HComboboxControl : public virtual HEditControl,
 	public virtual HListControl
 	{

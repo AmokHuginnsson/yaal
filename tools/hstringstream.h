@@ -36,6 +36,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Perform stream operations on character string.
+ */
 class HStringStream : public yaal::hcore::HStreamInterface
 	{
 	mutable bool f_bUsed;

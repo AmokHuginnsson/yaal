@@ -38,6 +38,8 @@ namespace hcore
 
 typedef int file_descriptor_t;
 
+/*! \brief Raw low level IO operations abstraction.
+ */
 class HRawFile : public HStreamInterface
 	{
 protected:

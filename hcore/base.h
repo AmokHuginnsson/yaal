@@ -53,7 +53,14 @@ Copyright:
 namespace yaal
 {
 
+/*! \cond */
 template<bool> struct static_assert_failure;
+/*! \endcond */
+/*! \brief Static assert.
+ *
+ * If static condition that is specified as a parameter is not met
+ * then compilation of an unit fails.
+ */
 template<> struct static_assert_failure<true> { enum { value = 1 }; };
 #define STATIC_ASSERT( condition ) { typedef char SAF##__LINE__ [ static_assert_failure<( condition )>::value ]; }
 
@@ -540,6 +547,8 @@ tType& clone( tType& object )
 	return ( tType( new ttType( *object ) ) );
 	}
 
+/*! \brief Interface preventing copying of objects.
+ */
 class HNonCopyable
 	{
 public:
