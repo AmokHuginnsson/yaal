@@ -33,6 +33,7 @@ Copyright:
 #endif /* not HAVE_MEMRCHR */
 
 #if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 )
+#include <cstdio>
 #include <cstdarg>
 #endif /* not HAVE_ASPRINTF */
 
