@@ -100,21 +100,20 @@ struct OListBits
 		};
 	};
 
-
+/*! \brief Doubly-linked list data structure and its operations.
+ */
 template<typename tType> 
 class HList : public OListBits
 	{
 	typedef HList<tType> self_t;
 private:
 	class HElement;
-	int f_iSize;					/* how many elements this list contains */
-	HElement* f_poHook;			/* "begining" of the list ( "first" element ) */
+	int f_iSize;           /*!< how many elements this list contains */
+	HElement* f_poHook;    /*!< "begining" of the list ( "first" element ) */
 /* for internal use only */
-	sort_order_t f_eOrder;		/* last-to-current sort order */
-	int f_iIndex;							/* this two fiels will allow boost operator [ ],
-															 int holds last */
-	HElement* f_poIndex;			/* index and HElement * holds pointer to this
-															 last element */
+	sort_order_t f_eOrder; /*!< last-to-current sort order */
+	int f_iIndex;          /*!< this two fiels will allow boost operator[], int holds last */
+	HElement* f_poIndex;   /*!< index and HElement * holds pointer to this last element */
 public:
 	template<typename const_qual_t, OListBits::treatment_t const treatment>
 	class HIterator;
@@ -139,21 +138,23 @@ public:
 	void clear( void );
 	int size( void ) const;
 	void swap( HList<tType>& );
-	/*!
-	 * Adds new element at specified position.
+	/*! \brief Adds new element at specified position.
 	 */
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<tType, treatment>::type insert( HIterator<tType, treatment> const&, tType const* = NULL );
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<tType, treatment>::type insert( HIterator<tType, treatment> const&, tType const& );
-	tType& add_head( tType const* = NULL );    /* adds new element at beggining of the list */
-	tType& add_tail( tType const* = NULL );	/* adds new element at end of the list */
+	/*! \brief Adds new element at beggining of the list
+	 */
+	tType& add_head( tType const* = NULL );
+	/*! \brief Adds new element at end of the list
+	 */
+	tType& add_tail( tType const* = NULL );
 	void push_back( tType const& );
 	void pop_back( void );
 	void push_front( tType const& );
 	void pop_front( void );
-	/*!
-	 * Add element in the way that keeps order.
+	/*! \brief Add element in the way that keeps order.
 	 */
 	template<typename T>
 	tType& add_orderly( tType const&, T const&, sort_order_t = D_ASCENDING );
@@ -161,7 +162,8 @@ public:
 	status_t remove_tail( tType** = NULL );
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<tType, treatment>::type erase( HIterator<tType, treatment> const& );
-	/* sets cursor at specified index or number */
+	/*! \brief Sets cursor at specified index or number
+	 */
 	iterator n_th( int );
 	tType& operator[] ( int );
 	tType const& operator[] ( int ) const;
@@ -204,7 +206,7 @@ class HList<tType>::HElement
 private:
 	HElement* f_poPrevious;
 	HElement* f_poNext;
-	tType f_tObject; /* The Object itself. */
+	tType f_tObject; /*!< The Object itself. */
 	explicit HElement ( HElement* );
 	virtual ~HElement ();
 	HElement ( HElement const & );
@@ -216,6 +218,8 @@ private:
 	friend class HList<tType>::HIterator<tType const, OListBits::D_TREAT_AS_CLOSED>;
 	};
 
+/*! \brief Iterator for HList<> data structure.
+ */
 template<typename tType>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
 class HList<tType>::HIterator

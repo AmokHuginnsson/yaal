@@ -42,6 +42,8 @@ namespace hcore
 /* Due to extream vitality of this struct,
  * none of the methods are guarded. */
 
+/*! \brief Types of reference counters.
+ */
 struct REFERENCE_COUNTER_TYPE
 	{
 	static int const D_STRICT = 0;

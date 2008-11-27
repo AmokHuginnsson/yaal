@@ -37,6 +37,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Mathematical expression analyser and evaluator.
+ */
 class HExpression
 	{
 	typedef HExpression self_t;

@@ -40,6 +40,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief HSBBSTree util, a helper for HMap<> instatiations.
+ */
 template<typename key_t, typename value_t>
 struct map_helper
 {
@@ -155,6 +157,8 @@ public:
 		}
 	};
 
+/*! \brief Iterator for HMap<> data structure.
+ */
 template<typename key_t, typename value_t, typename helper_t>
 template<typename const_qual_t>
 class HMap<key_t, value_t, helper_t>::HIterator

@@ -49,22 +49,25 @@ class HMatrix
 	{
 	typedef HMatrix<tType> self_t;
 public:
+	/*! \brief Error codes for HMatrix<> operations.
+	 */
 	struct ERROR
 		{
+		/*! \brief Error codes for HMatrix<> operations.
+		 */
 		typedef enum
 			{
-			E_OK = 0,
-			E_BADROWS,
-			E_BADCOLUMNS,
-			E_NEWRETURNEDNULL,
-			E_DIMNOTMATCH_ROWS,
-			E_DIMNOTMATCH_COLUMNS,
-			E_NOTASQUARE,
-			E_ODD,
-			E_DIMNOTMATCH_COLUMNSROWS,
-			E_DIMNOTMATCH_COLUMNSROWSCOLUMNS,
-			E_ROW_OUTOFRANGE,
-			E_COLUMN_OUTOFRANGE
+			E_OK = 0,       /*!< No error. */
+			E_BAD_ROWS,     /*!< Bad row index. */
+			E_BAD_COLUMNS,  /*!< Bad column index. */
+			E_DIM_NOT_MATCH_ROWS, /*!< Number of rows do not match for binary operation. */
+			E_DIM_NOT_MATCH_COLUMNS, /*!< Number of columns do not match for binary operation. */
+			E_NOT_A_SQUARE, /*!< Non-square matrix used where square necessary. */
+			E_ODD,          /*!< Odd matrix while counting inverse. */
+			E_DIM_NOT_MATCH_COLUMNS_ROWS, /*!< Number of rows does not match numbers of columns. */
+			E_DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS,
+			E_ROW_OUT_OF_RANGE,
+			E_COLUMN_OUT_OF_RANGE
 			} error_t;
 		};
 	typedef HVector<tType> row_t;
@@ -117,7 +120,7 @@ private:
 		{
 		M_PROLOG
 		if ( f_iColumns != a_iRowsAnother )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIMNOTMATCH_COLUMNSROWS ],
+			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIM_NOT_MATCH_COLUMNS_ROWS ],
 					f_iColumns - a_iRowsAnother );
 		return;
 		M_EPILOG
@@ -127,10 +130,10 @@ private:
 		{
 		M_PROLOG
 		if ( f_iRows != a_iRowsAnother )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIMNOTMATCH_ROWS ],
+			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIM_NOT_MATCH_ROWS ],
 					f_iRows - a_iRowsAnother );
 		if ( f_iColumns != a_iColumnsAnother )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIMNOTMATCH_COLUMNS ],
+			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIM_NOT_MATCH_COLUMNS ],
 					f_iColumns - a_iColumnsAnother );
 		return;
 		M_EPILOG
@@ -139,7 +142,7 @@ private:
 		{
 		M_PROLOG
 		if ( f_iRows != f_iColumns )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_NOTASQUARE ], f_iRows - f_iColumns );
+			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_NOT_A_SQUARE ], f_iRows - f_iColumns );
 		return;
 		M_EPILOG
 		}
@@ -156,11 +159,11 @@ HMatrix<tType>::HMatrix( int const a_iRows, int const a_iColumns )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iRows < 1 )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_BADROWS ], a_iRows );
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_BAD_ROWS ], a_iRows );
 	else
 		f_iRows = a_iRows;
 	if ( a_iColumns < 1 )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_BADCOLUMNS ], a_iColumns );
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_BAD_COLUMNS ], a_iColumns );
 	else
 		f_iColumns = a_iColumns;
 	return ;
@@ -280,9 +283,9 @@ tType HMatrix<tType>::M( int const a_iRow, int const a_iColumn )
 	check_dimensions_square();
 	int l_iCtrRow = 0, l_iCtrColumn = 0, l_iCtrRowVirtual = 0, l_iCtrColumnVirtual = 0;
 	if ( a_iRow >= f_iRows )
-		M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_ROW_OUTOFRANGE ], a_iRow - f_iRows );
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_ROW_OUT_OF_RANGE ], a_iRow - f_iRows );
 	if ( a_iColumn >= f_iColumns )
-		M_THROW ( g_ppcErrMsgHMatrix [ ERROR::E_COLUMN_OUTOFRANGE ], a_iColumn - f_iColumns );
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_COLUMN_OUT_OF_RANGE ], a_iColumn - f_iColumns );
 	if ( f_iRows == 1 )
 		return ( 0 );
 	HMatrix l_oMatrix ( f_iRows - 1, f_iColumns - 1 );
@@ -497,7 +500,7 @@ HMatrix<tType>& HMatrix<tType>::operator *= ( HMatrix const& a_roMatrix )
 	M_PROLOG
 	check_dimensions_columns_rows( a_roMatrix.f_iRows );
 	if ( a_roMatrix.f_iRows != a_roMatrix.f_iColumns )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIMNOTMATCH_COLUMNSROWSCOLUMNS ],
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS ],
 				a_roMatrix.f_iRows - a_roMatrix.f_iColumns );
 	( *this ) = ( *this ) * a_roMatrix;
 	return ( *this );

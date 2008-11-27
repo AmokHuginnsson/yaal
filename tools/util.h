@@ -50,6 +50,8 @@ char const* get_last_error( void );
 void show_help( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const = NULL );
 void dump_configuration( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const = NULL );
 typedef void ( * OPTION_PROCESSOR_t )( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const );
+/*! \brief Helper structure for displaing program help and current configuration.
+ */
 struct OOptionInfo
 	{
 	yaal::hcore::OOption* _opt;

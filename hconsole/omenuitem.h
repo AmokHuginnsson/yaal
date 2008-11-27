@@ -37,6 +37,8 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief TUI menu node.
+ */
 struct OMenuItem
 	{
 public: /* All is public for simpler usage. */

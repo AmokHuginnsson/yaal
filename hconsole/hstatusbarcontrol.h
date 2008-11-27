@@ -45,8 +45,12 @@ class HStatusBarControl : public HEditControl
 	{
 public:
 	typedef yaal::hcore::HPointer<HStatusBarControl> ptr_t;
+	/*! \brief HStatusBarControl prompt configuration.
+	 */
 	struct PROMPT
 		{
+		/*! \brief HStatusBarControl prompt context.
+		 */
 		typedef enum
 			{
 			D_NORMAL,
@@ -54,6 +58,8 @@ public:
 			D_SEARCH,
 			D_MENU
 			} mode_t;
+		/*! \brief HStatusBarControl prompt type.
+		 */
 		typedef enum
 			{
 			D_RELAXED,

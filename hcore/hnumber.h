@@ -36,6 +36,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Finite precision calculation units (numbers).
+ */
 class HNumber
 	{
 	typedef HNumber self_t;

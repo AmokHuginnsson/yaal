@@ -43,6 +43,8 @@ namespace hdata
 class HDataProcess;
 
 /*! \brief Data connected TUI Window implementation.
+ *
+ * This class automates DML operations.
  */
 class HDataWindow : public hconsole::HWindow
 	{
@@ -50,16 +52,20 @@ protected:
 	typedef HDataWindow self_t;
 	typedef HWindow hier_t;
 public:
-	/*! \brief Data window work mode.
+	/*! \brief Data window operation mode.
 	 */
 	struct DOCUMENT
 		{
+		/*! \brief Data window operation mode.
+		 */
 		typedef enum
 			{
-			D_VIEW,
-			D_EDIT
+			D_VIEW, /*!< Browse data. */
+			D_EDIT  /*!< Edit current record. */
 			} mode_t;
 		};
+	/*! \brief DML helper, buffer for currently edited row.
+	 */
 	struct ORowBuffer
 		{
 		int f_iIdColNo;

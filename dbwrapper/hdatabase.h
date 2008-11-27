@@ -36,6 +36,8 @@ namespace yaal
 namespace dbwrapper
 {
 
+/*! \brief Data base access abstraction layer.
+ */
 class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase>
 	{
 	typedef HDataBase self_t;

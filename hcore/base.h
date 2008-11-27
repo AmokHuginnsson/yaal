@@ -391,6 +391,10 @@ inline tType abs( tType const& val )
 	return ( val >= 0 ? val : - val );
 	}
 
+/*! \brief Meta function functor plus operator.
+ *
+ * \tparam tType - type of added objects.
+ */
 template<typename tType>
 struct plus : public binary_function<tType, tType, tType>
 	{
@@ -398,6 +402,10 @@ struct plus : public binary_function<tType, tType, tType>
 		{ return ( a + b ); }
 	};
 
+/*! \brief Meta function function minus operator.
+ *
+ * \tparam tType - type of substracted objects.
+ */
 template<typename tType>
 struct minus : public binary_function<tType, tType, tType>
 	{

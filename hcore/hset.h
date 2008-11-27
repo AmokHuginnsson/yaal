@@ -39,6 +39,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief HSBBSTree util, a helper for HSet<> instatiations.
+ */
 template<typename tType>
 struct set_helper
 {
@@ -53,6 +55,14 @@ inline static bool less( key_t const& left, key_t const& right )
 
 };
 
+/*! \brief Binary tree based set.
+ *
+ * HSet<> is a template representing self balancing binary search tree
+ * data structure that holds set of keys.
+ *
+ * \tparam key_t - type of key held in map.
+ * \tparam helper_t - HSBBSTree plugable code.
+ */
 template<typename tType, typename helper_t = set_helper<tType> >
 class HSet
 	{

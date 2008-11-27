@@ -36,11 +36,15 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Implementation of TUI Time control class.
+ *
+ * Time control allows setting and/or getting dates and time.
+ */
 class HTimeControl : public hcore::HTime, public HControl
 	{
 public:
-	HTimeControl ( HWindow *, int, int, int, int, char const * );
-	virtual ~HTimeControl ( void );
+	HTimeControl( HWindow*, int, int, int, int, char const* );
+	virtual ~HTimeControl( void );
 	};
 
 }

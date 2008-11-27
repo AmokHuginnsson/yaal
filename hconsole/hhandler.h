@@ -37,6 +37,8 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Interface for callback based control flows.
+ */
 class HHandler
 	{
 protected:

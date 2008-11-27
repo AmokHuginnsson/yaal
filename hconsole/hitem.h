@@ -40,6 +40,8 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Basic data unit stored in HListControl and HTreeControl.
+ */
 template <typename tType = yaal::hcore::HInfo>
 class HItem_t : public hcore::HArray<tType>
 	{

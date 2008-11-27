@@ -57,6 +57,8 @@ public:
 	virtual void const* id( void ) = 0;
 	};
 
+/*! \brief Make a functor from any standalone function.
+ */
 template<typename call_t,
 	typename a0_t = HCallInterface::HPseudoType,
 	typename a1_t = HCallInterface::HPseudoType,

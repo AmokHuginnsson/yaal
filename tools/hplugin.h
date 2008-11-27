@@ -36,6 +36,8 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Dynamically load and use shared libraries.
+ */
 class HPlugin
 	{
 	template<typename tType>

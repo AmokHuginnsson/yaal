@@ -38,6 +38,8 @@ namespace hconsole
 
 class HControl;
 
+/*! \brief Keep list of TUI controls for a given window.
+ */
 class HControlList
 	{
 	typedef HControlList self_t;
@@ -47,12 +49,12 @@ private:
 	model_t f_oList;
 	model_t::cyclic_iterator& f_roFocused;
 public:
-	HControlList ( model_t::cyclic_iterator & );
+	HControlList( model_t::cyclic_iterator& );
 	/* find next enabled control in window, if short cut char is specified */
-	void next_enabled ( char = 0 ); /* enabled and match shortcut char */
+	void next_enabled( char = 0 ); /* enabled and match shortcut char */
 	void pop_front( void );
-	void select ( HControl const* );	/* this one should be private :( */
-	void select ( HControl::ptr_t const& );	/* this one should be private :( */
+	void select( HControl const* );	/* this one should be private :( */
+	void select( HControl::ptr_t const& );	/* this one should be private :( */
 	void add_control( HControl::ptr_t );
 	void refresh_all( bool );
 	void update_all( void );

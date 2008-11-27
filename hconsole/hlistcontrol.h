@@ -391,9 +391,13 @@ private:
 	HListControl& operator = ( HListControl const& );
 	};
 
+/*! \brief HListControl helper utilities.
+ */
 namespace list_control_helper
 {
 
+/*! \brief HListControl sort helper functor.
+ */
 template<typename tType = HItem>
 class CompareListControlItems
 	{

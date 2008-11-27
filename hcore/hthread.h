@@ -81,6 +81,8 @@ private:
 
 typedef HExceptionT<HMutex> HMutexException;
 
+/*! \brief Multi-threaded synchronizing prymitive - Semaphore.
+ */
 class HSemaphore
 	{
 	typedef HSemaphore self_t;
@@ -97,6 +99,8 @@ private:
 
 typedef HExceptionT<HSemaphore> HSemaphoreException;
 
+/*! \brief Core multi-threading primitive - Thread.
+ */
 class HThread
 	{
 	typedef HThread self_t;
@@ -130,7 +134,7 @@ private:
 
 typedef HExceptionT<HThread> HThreadException;
 
-/*! \brief Interface to basic multi-threading privitive - Thread.
+/*! \brief Interface to basic multi-threading primitive - Thread.
  */
 template<typename tType>
 class HThreadT : public HThread

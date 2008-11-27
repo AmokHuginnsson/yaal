@@ -141,6 +141,8 @@ private:
 	HSBBSTree& operator = ( HSBBSTree const& );
 	};
 
+/*! \brief Iterator for HSBBSTree data structure.
+ */
 class HSBBSTree::HIterator
 	{
 	HAbstractNode* f_poCurrent;

@@ -39,18 +39,17 @@ namespace hcore
 
 char const * const g_ppcErrMsgHMatrix [ 12 ] =
 	{
-	_ ( "ok" ),
-/* HMatrix::ERROR::E_BADROWS */													_ ( "rows < 1" ),
-/* HMatrix::ERROR::E_BADCOLUMNS */											_ ( "columns < 1" ),
-/* HMatrix::ERROR::E_NEWRETURNEDNULL */									_ ( "new returned NULL" ),
-/* HMatrix::ERROR::E_DIMNOTMATCH_ROWS */								_ ( "rows dimensions do not match" ),
-/* HMatrix::ERROR::E_DIMNOTMATCH_COLUMNS */							_ ( "columns dimensions do not match" ),
-/* HMatrix::ERROR::E_NOTASQUARE */											_ ( "matrix is not square" ),
-/* HMatrix::ERROR::E_ODD */															_ ( "matrix is odd" ),
-/* HMatrix::ERROR::E_DIMNOTMATCH_COLUMNSROWS */					_ ( "columns does not match rows" ),
-/* HMatrix::ERROR::E_DIMNOTMATCH_COLUMNSROWSCOLUMNS */	_ ( "columns does not match rows and columns" ),
-/* HMatrix::ERROR::E_ROW_OUTOFRANGE */									_ ( "row too big for minor" ),
-/* HMatrix::ERROR::E_COLUMN_OUTOFRANGE */								_ ( "column too big for minor" )
+	_( "ok" ),
+/* HMatrix::ERROR::E_BAD_ROWS */                           _( "rows < 1" ),
+/* HMatrix::ERROR::E_BAD_COLUMNS */                        _( "columns < 1" ),
+/* HMatrix::ERROR::E_DIM_NOT_MATCH_ROWS */                 _( "rows dimensions do not match" ),
+/* HMatrix::ERROR::E_DIM_NOT_MATCH_COLUMNS */              _( "columns dimensions do not match" ),
+/* HMatrix::ERROR::E_NOT_A_SQUARE */                       _( "matrix is not square" ),
+/* HMatrix::ERROR::E_ODD */                                _( "matrix is odd" ),
+/* HMatrix::ERROR::E_DIM_NOT_MATCH_COLUMNS_ROWS */         _( "columns does not match rows" ),
+/* HMatrix::ERROR::E_DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS */ _( "columns does not match rows and columns" ),
+/* HMatrix::ERROR::E_ROW_OUT_OF_RANGE */                   _( "row too big for minor" ),
+/* HMatrix::ERROR::E_COLUMN_OUT_OF_RANGE */                _( "column too big for minor" )
 	};
 
 }

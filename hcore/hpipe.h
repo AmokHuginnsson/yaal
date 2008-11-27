@@ -36,6 +36,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Unnamed pipe C++ wrapper.
+ */
 class HPipe : public yaal::hcore::HStreamInterface
 	{
 protected:

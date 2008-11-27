@@ -119,6 +119,8 @@ private:
 	bool find( tType const&, int long unsigned&, HAtom*& ) const;
 	};
 
+/*! \brief Iterator for HHashMap<> data structure.
+ */
 template<typename tType, typename ttType>
 template<typename const_qual_t>
 class HHashMap<tType, ttType>::HIterator

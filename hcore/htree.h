@@ -128,6 +128,8 @@ private:
 	friend class HList<HNode*>;
 	};
 
+/*! \brief Iterator for HTree<> data structure.
+ */
 template<typename tType>
 template<typename const_qual_t>
 class HTree<tType>::HIterator

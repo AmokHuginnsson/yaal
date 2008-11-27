@@ -79,6 +79,8 @@ public:
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
 	};
 
+/*! \brief HLifeTimeTracker utility used to destroy guarded objects.
+ */
 template<typename tType>
 class HDestructor : public HAbstractDestructor
 	{

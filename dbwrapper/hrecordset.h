@@ -74,6 +74,8 @@ private:
 	HRecordSet& operator = ( HRecordSet const& );
 	};
 
+/*! \brief Query result iterator.
+ */
 class HRecordSet::HIterator
 	{
 	HRecordSet* f_poOwner;

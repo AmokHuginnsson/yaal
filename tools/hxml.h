@@ -41,6 +41,8 @@ namespace tools
 
 class HXmlData;
 
+/*! \brief XML document operation wrapper.
+ */
 class HXml
 	{
 	typedef HXml self_t;

@@ -56,6 +56,8 @@ namespace LOG_TYPE
 
 class HLog;
 
+/*! \brief Logging utility.
+ */
 class HLog : public HStreamInterface, private HSingletonInterface
 	{
 protected:
