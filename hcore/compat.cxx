@@ -24,8 +24,6 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <errno.h>
-
 #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 ) || ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 )
 #include <cmath>
 #endif /* not HAVE_POWL *//* not HAVE_DECL_FLOORL */
@@ -34,11 +32,16 @@ Copyright:
 #include <cstring>
 #endif /* not HAVE_MEMRCHR */
 
-#include <cstdlib>
+#if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 )
 #include <cstdarg>
-#include <cstdio>
+#endif /* not HAVE_ASPRINTF */
+
+#if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
+#include <cstdlib>
+#endif /* not HAVE_STRTOLD */
 
 #if ( defined( HAVE_GETHOSTBYNAME_R ) && ( ! defined( HAVE_GNU_GETHOSTBYNAME_R ) ) ) || ( defined( HAVE_GETHOSTBYADDR_R ) && ( ! defined( HAVE_GNU_GETHOSTBYADDR_R ) ) )
+#include <cerrno>
 #include <netdb.h>
 #endif /* ( HAVE_GETHOSTBYNAME_R && not HAVE_GNU_GETHOSTBYNAME_R ) || ( HAVE_GETHOSTBYADDR_R && not HAVE_GNU_GETHOSTBYADDR_R ) */
 
