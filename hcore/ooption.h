@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/ooption.h
+ * \brief Declaration of OOption structure.
+ */
 
 #ifndef __YAAL_HCORE_OOPTION_H
 #define __YAAL_HCORE_OOPTION_H
@@ -38,6 +41,8 @@ namespace hcore
 typedef void ( *param_callback_t )( void* );
 typedef yaal::hcore::HPair<param_callback_t, void*> simple_callback_t; 
 
+/*! \brief Basic program configuration item.
+ */
 typedef struct
 	{
 	char const* const f_pcName;

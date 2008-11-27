@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hdata/hdataprocess.h
+ * \brief Declaration of HDataProcess class.
+ */
 
 #ifndef __YAAL_HDATA_HDATAPROCESS_H
 #define __YAAL_HDATA_HDATAPROCESS_H
@@ -58,6 +61,11 @@ namespace hdata
 typedef yaal::hcore::HHashMap<yaal::hcore::HString,
 				yaal::hconsole::OMenuItem::HANDLER_t> menu_handlers_map_t;
 
+/*! \brief A backbone of database enabled TUI based application.
+ *
+ * HDataProcess enables rapid building of database connected TUI
+ * applications with simple XML resource files.
+ */
 class HDataProcess : public hconsole::HTUIProcess
 	{
 protected:

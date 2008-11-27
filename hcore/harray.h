@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/harray.h
+ * \brief Declaration of HArray<> class.
+ */
 
 #ifndef __YAAL_HCORE_HARRAY_H
 #define __YAAL_HCORE_HARRAY_H
@@ -108,6 +111,8 @@ inline void swap( yaal::hcore::HArray<tType>& a, yaal::hcore::HArray<tType>& b )
 namespace hcore
 {
 
+/*! \brief Iterator for HArray<> data structure.
+ */
 template<typename tType>
 template<typename const_qual_t>
 class HArray<tType>::HIterator

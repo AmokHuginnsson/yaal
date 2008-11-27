@@ -52,11 +52,13 @@ struct MOUSE_BITS
 		};
 	};
 
+/*! \brief Mouse input event data.
+ */
 typedef struct
 	{
-	int f_iButtons;
-	int f_iRow;
-	int f_iColumn;
+	int f_iButtons; /*!< Button state mask. */
+	int f_iRow;     /*!< Cursor Y position. */
+	int f_iColumn;  /*!< Cursor X position. */
 	} OMouse;
 
 typedef int ( * fun_console_mouse_open_t ) ( void );

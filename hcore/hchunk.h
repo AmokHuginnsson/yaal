@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hchunk.h
+ * \brief Declaration of HChunk class.
+ */
 
 #ifndef __YAAL_HCORE_HCHUNK_H
 #define __YAAL_HCORE_HCHUNK_H
@@ -35,6 +38,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Simplest raw memory provisioner.
+ */
 class HChunk
 	{
 	void* f_pvData;

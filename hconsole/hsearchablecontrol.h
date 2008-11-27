@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hconsole/hsearchablecontrol.h
+ * \brief Declaration of HSearchableControl class.
+ */
 
 #ifndef __YAAL_HCONSOLE_HSEARCHABLECONTROL_H
 #define __YAAL_HCONSOLE_HSEARCHABLECONTROL_H
@@ -36,6 +39,8 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Provision H*Control classes with search capabilities.
+ */
 class HSearchableControl : public virtual HControl
 	{
 protected:

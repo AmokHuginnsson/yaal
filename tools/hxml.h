@@ -23,6 +23,11 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file tools/hxml.h
+ * \brief Declaration of XML related classes.
+ *
+ * HXml, HXml::HNodeProxy, HXml::HConstNodeProxy, HXml::HIterator, HXml::HConstIterator.
+ */
 
 #ifndef __YAAL_TOOLS_HXML_H
 #define __YAAL_TOOLS_HXML_H
@@ -97,15 +102,21 @@ private:
 	HXml& operator = ( HXml const& );
 	};
 
+/*! \brief Basic building block of XML document.
+ */
 class HXml::HNode
 	{
 public:
+	/*! \brief XML node types.
+	 */
 	struct TYPE
 		{
+		/*! \brief XML node types.
+		 */
 		typedef enum
 			{
-			D_NODE,
-			D_CONTENT
+			D_NODE,   /*!< XML node. */
+			D_CONTENT /*!< XML node content. */
 			} type_t;
 		};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
@@ -172,6 +183,8 @@ private:
 	HConstNodeProxy( HXml::tree_t::const_node_t );
 	};
 
+/*! \brief XML document node.
+ */
 class HXml::HNodeProxy
 	{
 	mutable HXml::tree_t::node_t f_poNode;
@@ -216,6 +229,8 @@ private:
 	HNodeProxy( HXml::tree_t::node_t );
 	};
 
+/*! \brief XML node iterator.
+ */
 class HXml::HIterator
 	{
 	HXml::HNodeProxy const* f_poOwner;
@@ -255,6 +270,8 @@ private:
 	HIterator( HXml::HNodeProxy const*, HXml::tree_t::iterator const& );
 	};
 
+/*! \brief XML immutable node iterator.
+ */
 class HXml::HConstIterator
 	{
 	HXml::HConstNodeProxy const* f_poOwner;

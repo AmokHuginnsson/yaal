@@ -23,6 +23,11 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hthread.h
+ * \brief Declaration of threading related classes.
+ *
+ * HThread, HThreadT<>, HMutex, HLock, HSemaphore, HCondition.
+ */
 
 #ifndef __YAAL_HCORE_HTHREAD_H
 #define __YAAL_HCORE_HTHREAD_H
@@ -162,6 +167,8 @@ private:
 	HLock& operator = ( HLock const& );
 	};
 
+/*! \brief Multi-threaded synchronizing prymitive - Conditional Variable.
+ */
 class HCondition
 	{
 	typedef HCondition self_t;

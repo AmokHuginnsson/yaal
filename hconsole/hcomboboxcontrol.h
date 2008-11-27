@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hconsole/hcomboboxcontrol.h
+ * \brief Declaration of HComboboxControl class.
+ */
 
 #ifndef __YAAL_HCONSOLE_HCOMBOBOXCONTROL_H
 #define __YAAL_HCONSOLE_HCOMBOBOXCONTROL_H
@@ -49,12 +52,16 @@ protected:
 	typedef HComboboxControl self_t;
 	typedef HListControl hier_t;
 public:
+	/*! \brief Current combobox state.
+	 */
 	struct MODE
 		{
+		/*! \brief Current combobox state.
+		 */
 		typedef enum
 			{
-			D_EDITCONTROL,
-			D_LISTCONTROL
+			D_EDITCONTROL, /*!< Combobox retracted. */
+			D_LISTCONTROL  /*!< Combobox expanded. */
 			} mode_t;
 		};
 protected:

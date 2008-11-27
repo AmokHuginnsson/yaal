@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hconsole/hmainwindow.h
+ * \brief Declaration of HMainWindow class.
+ */
 
 #ifndef __YAAL_HCONSOLE_HMAINWINDOW_H
 #define __YAAL_HCONSOLE_HMAINWINDOW_H
@@ -38,6 +41,10 @@ namespace yaal
 namespace hconsole
 {
 
+/*! \brief Main window of TUI application.
+ *
+ * Main window of TUI application consists of menu and active window list.
+ */
 class HMainWindow : public HWindow
 	{
 	HMenuControl* f_poMenu;

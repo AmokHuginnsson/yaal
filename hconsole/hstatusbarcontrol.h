@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hconsole/hstatusbarcontrol.h
+ * \brief Declaration of HStatusBarControl class.
+ */
 
 #ifndef __YAAL_HCONSOLE_HSTATUSBARCONTROL_H
 #define __YAAL_HCONSOLE_HSTATUSBARCONTROL_H

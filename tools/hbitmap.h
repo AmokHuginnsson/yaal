@@ -23,6 +23,11 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file tools/hbitmap.h
+ * \brief Declaration of HBitmap related classes.
+ *
+ * HBitmap, HBitmap::HIterator, HBitmap::HBit.
+ */
 
 #ifndef __YAAL_TOOLS_HBITMAP_H
 #define __YAAL_TOOLS_HBITMAP_H
@@ -189,6 +194,8 @@ private:
 		: f_poOwner( a_poOwner ), f_lIndex( idx ) {}
 	};
 
+/*! \brief Writtable bit reference interface.
+ */
 class HBitmap::HBit
 	{
 	HBitmap* f_poOwner;

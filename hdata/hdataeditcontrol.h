@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hdata/hdataeditcontrol.h
+ * \brief Declaration of HDataEditControl class.
+ */
 
 #ifndef __YAAL_HDATA_HDATAEDITCONTROL_H
 #define __YAAL_HDATA_HDATAEDITCONTROL_H
@@ -36,6 +39,10 @@ namespace yaal
 namespace hdata
 {
 
+/*! \brief Database enabled TUI Edit control.
+ *
+ * This TUI control support automatic synchronization with document query column.
+ */
 class HDataEditControl : public HDataControl, public virtual hconsole::HEditControl
 	{
 public:

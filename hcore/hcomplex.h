@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hcomplex.h
+ * \brief Declaration of HComplex class.
+ */
 
 #ifndef __YAAL_HCORE_HCOMPLEX_H
 #define __YAAL_HCORE_HCOMPLEX_H
@@ -33,6 +36,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Complex number representation.
+ */
 class HComplex
 	{
 	typedef HComplex self_t;

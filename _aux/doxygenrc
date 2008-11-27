@@ -56,7 +56,7 @@ ENABLED_SECTIONS       =
 MAX_INITIALIZER_LINES  = 30
 SHOW_USED_FILES        = NO
 SHOW_DIRECTORIES       = NO
-SHOW_FILES             = NO
+SHOW_FILES             = YES
 FILE_VERSION_FILTER    = 
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages

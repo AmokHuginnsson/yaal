@@ -91,6 +91,15 @@ inline void swap( tType& left, tType& right )
 	return;
 	}
 
+/*! \brief Meta-function functor for binding given invariable argument as second argument to any function.
+ *
+ * Invariable argument may be bound to meta-function functor as well as old style C free standing function.
+ *
+ * Type descriptions:
+ *
+ * \tparam function_t - type of function to be bound.
+ * \tparam value_t - type of invariable argument to be bound.
+ */
 template<typename function_t, typename value_t>
 class HBinder
 	{
@@ -120,6 +129,13 @@ HBinder<function_t, value_t> bind2nd( function_t func, value_t value )
 	return ( HBinder<function_t, value_t>( func, value ) );
 	}
 
+/*! \brief Meta-data definition for unary function functors.
+ *
+ * Type descriptions:
+ *
+ * \tparam res_t - result type of unary function.
+ * \tparam arg_t - argument type of unary function.
+ */
 template<typename res_t, typename arg_t>
 struct unary_function
 	{
@@ -333,6 +349,11 @@ struct copy_const<source const, destination>
 
 }
 
+/*! \brief Simulate binary literal.
+ *
+ * \tparam input - a number in decimal form consisting only 0s and 1s.
+ * \retval value - a number of value of binary interpretation of input.
+ */
 template<int long unsigned const input>
 struct binary
 	{
@@ -347,6 +368,11 @@ struct binary<0>
 	};
 /*! \endcond */
 
+/*! \brief Simulate binary literal.
+ *
+ * \tparam input - a number in octal form consisting only 0s and 1s.
+ * \retval value - a number of value of binary interpretation of input.
+ */
 template<int long unsigned const input>
 struct obinary
 	{
@@ -361,17 +387,25 @@ struct obinary<0>
 	};
 /*! \endcond */
 
+/*! \brief Compile time power finction calculator.
+ *
+ * \tparam base - base of power function.
+ * \tparam exponent - exponent of power function.
+ * \retval value - base**exponent.
+ */
 template<int long unsigned const base, int long unsigned const exponent, int long unsigned const helper = 1>
 struct power
 	{
 	static int long unsigned const value = power<base, exponent - 1, helper * base>::value;
 	};
 
+/*! \cond */
 template<int long unsigned const base, int long unsigned const helper>
 struct power<base,0,helper>
 	{
 	static int long unsigned const value = helper;
 	};
+/*! \endcond */
 
 template<typename tType>
 inline tType min( tType const& left, tType const& right )

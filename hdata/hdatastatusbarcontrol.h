@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hdata/hdatastatusbarcontrol.h
+ * \brief Declaration of HDataStatusBarControl class.
+ */
 
 #ifndef __YAAL_HDATA_HDATASTATUSBARCONTROL_H
 #define __YAAL_HDATA_HDATASTATUSBARCONTROL_H
@@ -36,6 +39,12 @@ namespace yaal
 namespace hdata
 {
 
+/*! \brief Implementation of database enabled TUI Statusbar control class.
+ *
+ * DataStatusBar Control provides display of progress bars, allows
+ * invocation of commands and specyfing search patterns.
+ * Additionally it provides document status presentation.
+ */
 class HDataStatusBarControl : public hconsole::HStatusBarControl
 	{
 public:

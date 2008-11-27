@@ -23,6 +23,11 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hsingleton.h
+ * \brief Declaration of HSingleton related classes.
+ *
+ * HSingleton<>, HSingletonInterface, HAbstractDestructor, HDestructor<>, HLifeTimeTracker.
+ */
 
 #ifndef __YAAL_HCORE_HSINGLETON_H
 #define __YAAL_HCORE_HSINGLETON_H
@@ -55,6 +60,8 @@ public:
 	virtual void destruct( void ) = 0;
 	};
 
+/*! \brief Singleton deleter engine.
+ */
 class HLifeTimeTracker
 	{
 	typedef HLifeTimeTracker self_t;
@@ -114,6 +121,8 @@ void HDestructor<tType>::destruct( void )
 	M_EPILOG
 	}
 
+/*! \brief Singleton pattern implementation.
+ */
 template<typename tType>
 class HSingleton
 	{

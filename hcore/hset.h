@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hset.h
+ * \brief Declaration of HSet<> class.
+ */
 
 #ifndef __YAAL_HCORE_HSET_H
 #define __YAAL_HCORE_HSET_H
@@ -114,6 +117,8 @@ public:
 		}
 	};
 
+/*! \brief Iterator for HSet<> data structure.
+ */
 template<typename tType, typename helper_t = set_helper<tType> >
 class HSet<tType, helper_t>::HIterator
 	{

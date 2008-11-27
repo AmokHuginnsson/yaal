@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hsocket.h
+ * \brief Declaration of HSocket class.
+ */
 
 #ifndef __YAAL_HCORE_HSOCKET_H
 #define __YAAL_HCORE_HSOCKET_H
@@ -50,8 +53,12 @@ public:
 	typedef HRawFile hier_t;
 	typedef HPointer<HSocket> ptr_t;
 	static bool f_bResolveHostnames;
+	/*! \brief Socket types.
+	 */
 	struct TYPE
 		{
+		/*! \brief Socket types.
+		 */
 		typedef enum
 			{
 			D_DEFAULT			= 0x00,
