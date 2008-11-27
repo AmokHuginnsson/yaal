@@ -182,7 +182,7 @@ void HSocket::listen( yaal::hcore::HString const& a_oAddress, int const a_iPort 
 		M_THROW( _( "bad maximum number of clients" ), f_iMaximumNumberOfClients );
 	make_address ( a_oAddress, a_iPort );
 	M_ENSURE( ::setsockopt( f_iFileDescriptor, SOL_SOCKET, SO_REUSEADDR,
-				&l_iReuseAddr, sizeof ( int ) ) == 0 );
+				reinterpret_cast<char*>( &l_iReuseAddr ), sizeof ( l_iReuseAddr ) ) == 0 );
 	M_ENSURE( ::bind( f_iFileDescriptor,
 				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 );
 	M_ENSURE( ::listen( f_iFileDescriptor, f_iMaximumNumberOfClients ) == 0 );
