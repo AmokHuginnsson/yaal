@@ -401,7 +401,7 @@ HString const& HSocket::get_host_name ( void )
 							l_iSize, &l_psHostName, &l_iCode ) ) == ERANGE )
 					f_oCache.pool_realloc( l_iSize <<= 1 );
 				if ( l_iCode )
-					log_trace << ::hstrerror( l_iCode ) << endl;
+					log_trace << error_message( l_iCode ) << endl;
 				errno = l_iError;
 				M_ENSURE( l_iError == 0 );
 				if ( l_psHostName )

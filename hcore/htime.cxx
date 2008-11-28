@@ -57,8 +57,7 @@ HTime::HTime( char const* const a_pcStrTime )
 	char* l_pcErr = ::strptime( a_pcStrTime, f_oFormat.raw(), &f_sBroken );
 	if ( ! l_pcErr )
 		l_pcErr = ::strptime( a_pcStrTime, "%F %T", &f_sBroken );
-	if ( ! l_pcErr )
-		M_THROW( ::strerror( errno ), errno );
+	M_ENSURE( l_pcErr );
 	f_xValue = ::mktime( &f_sBroken );
 	return;
 	M_EPILOG

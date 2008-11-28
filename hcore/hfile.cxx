@@ -85,7 +85,7 @@ int HFile::open( HString const& a_oPath )
 	if ( ! f_pvHandle )
 		{
 		l_iError = errno;
-		f_oError = ::strerror( l_iError );
+		f_oError = error_message( l_iError );
 		return ( l_iError );
 		}
 	return ( 0 );
@@ -97,11 +97,11 @@ int HFile::close( void )
 	M_PROLOG
 	int l_iError = 0;
 	if ( ! f_pvHandle )
-		M_THROW ( "file is not opened", errno );
-	l_iError = fclose ( static_cast < FILE * > ( f_pvHandle ) );
+		M_THROW( "file is not opened", errno );
+	l_iError = ::std::fclose( static_cast < FILE * > ( f_pvHandle ) );
 	if ( l_iError )
 		{
-		f_oError = strerror ( l_iError );
+		f_oError = error_message( l_iError );
 		return ( l_iError );
 		}
 	f_pvHandle = NULL;
@@ -115,7 +115,7 @@ int long HFile::tell( void ) const
 	if ( ! f_pvHandle )
 		M_THROW( _( "no file is opened" ), errno );
 	int long pos = 0;
-	M_ENSURE( ( pos = ::ftell( static_cast<FILE*>( f_pvHandle ) ) ) >= 0 );
+	M_ENSURE( ( pos = ::std::ftell( static_cast<FILE*>( f_pvHandle ) ) ) >= 0 );
 	return ( pos );
 	M_EPILOG
 	}

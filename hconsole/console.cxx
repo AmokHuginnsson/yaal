@@ -26,7 +26,6 @@ Copyright:
 
 #include <cstdlib> /* getenv */
 #include <cstdio>
-#include <cstring> /* strerror */
 #include <csignal>  /* signal handling */
 #include <unistd.h>
 #include <termios.h>

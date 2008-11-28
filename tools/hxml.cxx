@@ -348,7 +348,7 @@ void HXml::init( HString const& a_oFileName )
 	doc_resource_t doc( ::xmlParseFile( a_oFileName.raw() ), xmlFreeDoc );
 	if ( errno )
 		{
-		log( LOG_TYPE::D_WARNING ) << ::strerror( errno ) << ": " << a_oFileName;
+		log( LOG_TYPE::D_WARNING ) << error_message( errno ) << ": " << a_oFileName;
 		log << ", code: " << errno << '.' << endl;
 		}
 	errno = l_iSavedErrno;

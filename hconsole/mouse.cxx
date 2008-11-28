@@ -114,13 +114,14 @@ int console_mouse_open( void )
 	n_iMouse = ::open( l_pcTty, O_RDWR );
 	if ( n_iMouse < 0 )
 		{
-		l_oError.format( _( "can not open mouse, %s" ), ::strerror( errno ) );
+		l_oError.format( _( "can not open mouse, %s" ), error_message( errno ) );
 		M_THROW( l_oError, l_iVC );
 		}
-	if ( ::ioctl( n_iMouse, CONS_MOUSECTL, & l_sMouse ) < 0 )
+	if ( ::ioctl( n_iMouse, CONS_MOUSECTL, &l_sMouse ) < 0 )
 		{
-		TEMP_FAILURE_RETRY( ::close ( n_iMouse ) );
-		M_THROW( _( "can not setup mouse mode" ), errno );
+		l_oError.format( _( "can not setup mouse mode, %s" ), error_message( errno ) );
+		TEMP_FAILURE_RETRY( ::close( n_iMouse ) );
+		M_THROW( l_oError, errno );
 		}
 
 	log( LOG_TYPE::D_INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
@@ -172,10 +173,9 @@ int console_mouse_open ( void )
 	l_sGpm.eventMask = static_cast<int>( GPM_UP );
 	l_sGpm.defaultMask = static_cast<int short unsigned>( ~l_sGpm.eventMask );
 	gpm_zerobased = true;
-	if ( Gpm_Open ( & l_sGpm, l_iVC ) == -1 )
+	if ( Gpm_Open( &l_sGpm, l_iVC ) == -1 )
 		{
-		l_oError.format( "Can't open mouse connection: %s",
-				::strerror( errno ) );
+		l_oError.format( "Can't open mouse connection: %s", error_message( errno ) );
 		M_THROW( l_oError, l_iVC );
 		}
 	log( LOG_TYPE::D_INFO ) << "i have opened device: `" << l_iVC << '\'' << endl;
@@ -183,7 +183,7 @@ int console_mouse_open ( void )
 	M_EPILOG
 	}
 
-int console_mouse_get ( OMouse & a_rsMouse )
+int console_mouse_get( OMouse& a_rsMouse )
 	{
 	M_PROLOG
 	Gpm_Event l_sEvent;
