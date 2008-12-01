@@ -43,7 +43,6 @@ Copyright:
 
 #if ( defined( HAVE_GETHOSTBYNAME_R ) && ( ! defined( HAVE_GNU_GETHOSTBYNAME_R ) ) ) || ( defined( HAVE_GETHOSTBYADDR_R ) && ( ! defined( HAVE_GNU_GETHOSTBYADDR_R ) ) )
 #include <cerrno>
-#include <netdb.h>
 #endif /* ( HAVE_GETHOSTBYNAME_R && not HAVE_GNU_GETHOSTBYNAME_R ) || ( HAVE_GETHOSTBYADDR_R && not HAVE_GNU_GETHOSTBYADDR_R ) */
 
 #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
