@@ -142,7 +142,7 @@ AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue with
 AC_SEARCH_LIBS([clock_gettime],[rt],,[AC_MSG_ERROR([Cannot continue without rt library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([getaddrinfo],[socket getaddrinfo],,[AC_MSG_ERROR([Cannot continue without getaddrinfo feature.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
-AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+AC_SEARCH_LIBS([libintl_gettext],[intl],,[AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([xml2],[xmlParseFile],,[AC_MSG_ERROR([Cannot continue without XML library.])]) LIBS=""
 AC_CHECK_LIB([xslt],[xsltParseStylesheetFile],,[AC_MSG_ERROR([Cannot continue without XSLT library.])]) LIBS=""
 AC_SEARCH_LIBS([dlopen],[dl],,[AC_MSG_ERROR([Cannot continue without dynamic dynamic linker library.])]) TOOLS_LIBS="${TOOLS_LIBS} ${LIBS}" LIBS=""
