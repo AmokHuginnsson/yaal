@@ -80,8 +80,9 @@ private:
 template<typename tType>
 class HTree<tType>::HNode
 	{
-private:
+public:
 	typedef HList<node_t> branch_t;
+private:
 	tType f_tData;			/* object itself */
 	branch_t f_oBranch;	/* list of next level nodes */
 	HNode* f_poTrunk;	/* self explanary */
@@ -137,8 +138,7 @@ class HTree<tType>::HIterator
 	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
 	typedef typename trait::copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;
 	typedef typename HTree<tType>::const_node_t owner_t;
-	typedef typename HTree<tType>::HNode::branch_t::template HIterator<const_qual_node_ptr_t,
-					OListBits::D_TREAT_AS_OPENED> list_it_t;
+	typedef typename HTree<tType>::HNode::branch_t::template HIterator<const_qual_node_ptr_t, OListBits::D_TREAT_AS_OPENED> list_it_t;
 	owner_t f_poOwner;
 	list_it_t f_oIterator;
 public:

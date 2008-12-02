@@ -287,6 +287,8 @@ public:
 protected:
 	/*{*/
 	friend class HList<tType>;
+	template<typename same_const_qual_t, OListBits::treatment_t const family>
+	friend class HIterator;
 	HIterator( HList<tType> const* const, HElement* const );
 	/*}*/
 	};

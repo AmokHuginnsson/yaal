@@ -151,6 +151,8 @@ private:
 		M_EPILOG
 		}
 	friend class HXml;
+	friend class HXml::HNodeProxy;
+	friend class HXml::HConstNodeProxy;
 	};
 
 /*! \brief Immutable XML document node.
@@ -226,6 +228,7 @@ public:
 private:
 	friend class HXml;
 	friend class HXml::HIterator;
+	friend class HXml::HConstNodeProxy;
 	HNodeProxy( HXml::tree_t::node_t );
 	};
 
