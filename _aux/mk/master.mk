@@ -10,13 +10,13 @@ Makefile: configure Makefile.in
 	@./configure
 
 config.h: configure config.h.in
-	@./configure
+	@./configure && touch $(@)
 
 yaalrc: configure yaalrc.in
 	@./configure
 
 configure config.h.in: configure.ac _aux/aclib.m4
-	@autoreconf
+	@autoreconf && touch $(@)
 
 .my_make:
 	@./_aux/guess_make
