@@ -7,10 +7,10 @@ all bin clean clean-dep cov dep doc environment install mrproper release prof pu
 	@$(MAKE) -f Makefile $(@)
 
 Makefile: configure Makefile.in
-	@./configure && touch config.hxx Makefile yaalrc
+	@./configure && touch config.hxx Makefile
 
 config.hxx: configure config.hxx.in
-	@./configure && touch config.hxx Makefile yaalrc
+	@./configure && touch config.hxx Makefile
 
 yaalrc: configure yaalrc.in
 	@./configure && touch config.hxx Makefile yaalrc
