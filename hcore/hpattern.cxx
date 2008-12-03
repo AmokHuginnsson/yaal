@@ -29,11 +29,11 @@ Copyright:
 #include <regex.h>			/* this one is obvious */
 #include <libintl.h>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hpattern.h"
-#include "harray.h"
-#include "hpool.h"
+#include "hpattern.hxx"
+#include "harray.hxx"
+#include "hpool.hxx"
 
 namespace yaal
 {

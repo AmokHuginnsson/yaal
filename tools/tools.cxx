@@ -29,15 +29,15 @@ Copyright:
 #include <cstdio>	 /* perror function */
 #include <libintl.h> /* gettext */
 
-#include "hcore/base.h" /* M_PROLOG, M_EPILOG */
+#include "hcore/base.hxx" /* M_PROLOG, M_EPILOG */
 M_VCSID( "$Id: "__ID__" $" )
-#include "tools.h"
-#include "hcore/hcore.h"
-#include "hcore/xalloc.h"
-#include "hcore/rc_file.h"    /* read conf from rc */
-#include "hcore/hlog.h"       /* log object */
-#include "hcore/hstring.h"    /* HString class */
-#include "util.h" /* atof_ex */
+#include "tools.hxx"
+#include "hcore/hcore.hxx"
+#include "hcore/xalloc.hxx"
+#include "hcore/rc_file.hxx"    /* read conf from rc */
+#include "hcore/hlog.hxx"       /* log object */
+#include "hcore/hstring.hxx"    /* HString class */
+#include "util.hxx" /* atof_ex */
 
 using namespace yaal::hcore;
 

@@ -31,15 +31,15 @@ Copyright:
 #include <cstdlib>   /* exit */
 #include <pthread.h> /* pthread_sigmask (in FreeBSD) */
 
-#include "config.h"
+#include "config.hxx"
 
-#include "hcore/base.h" /* M_PROLOG, M_EPILOG */
+#include "hcore/base.hxx" /* M_PROLOG, M_EPILOG */
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/xalloc.h"
-#include "hcore/hlog.h"       /* log object */
-#include "hcore/hstring.h"    /* HString class */
-#include "signals.h"
-#include "tools.h"                /* tools namespace */
+#include "hcore/xalloc.hxx"
+#include "hcore/hlog.hxx"       /* log object */
+#include "hcore/hstring.hxx"    /* HString class */
+#include "signals.hxx"
+#include "tools.hxx"                /* tools namespace */
 
 using namespace yaal::hcore;
 

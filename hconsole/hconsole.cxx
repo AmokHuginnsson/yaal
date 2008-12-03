@@ -27,15 +27,15 @@ Copyright:
 #include <cstdlib>
 #include <cstring>
 
-#include "config.h"
+#include "config.hxx"
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hcore.h"
-#include "hcore/hlog.h"
-#include "hcore/rc_file.h"
-#include "tools/tools.h"
-#include "console.h"
+#include "hcore/hcore.hxx"
+#include "hcore/hlog.hxx"
+#include "hcore/rc_file.hxx"
+#include "tools/tools.hxx"
+#include "console.hxx"
 
 #ifdef HAVE_CURSES_H
 #	include <curses.h>

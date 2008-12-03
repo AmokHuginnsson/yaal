@@ -29,12 +29,12 @@ Copyright:
 #include <cstdlib>
 #include <libintl.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/xalloc.h"
-#include "hcore/htree.h"
-#include "hcore/hcore.h"
-#include "hexpression.h"
+#include "hcore/xalloc.hxx"
+#include "hcore/htree.hxx"
+#include "hcore/hcore.hxx"
+#include "hexpression.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

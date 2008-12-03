@@ -26,7 +26,7 @@ Copyright:
 
 #include <cstdlib>
 
-#include "compat.h"
+#include "compat.hxx"
 
 #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 ) || ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 )
 #include <cmath>
@@ -46,10 +46,10 @@ Copyright:
 #endif /* ( HAVE_GETHOSTBYNAME_R && not HAVE_GNU_GETHOSTBYNAME_R ) || ( HAVE_GETHOSTBYADDR_R && not HAVE_GNU_GETHOSTBYADDR_R ) */
 
 #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
-#include "hstring.h"
+#include "hstring.hxx"
 #endif /* not HAVE_STRCASESTR */
 
-#include "xalloc.h"
+#include "xalloc.hxx"
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
 void* memrchr( void const* ptr, int what, int from )

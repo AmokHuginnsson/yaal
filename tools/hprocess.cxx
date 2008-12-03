@@ -30,11 +30,11 @@ Copyright:
 #include <signal.h>
 #include <libintl.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hprocess.h"
+#include "hprocess.hxx"
 
-#include "hcore/rc_file.h"
+#include "hcore/rc_file.hxx"
 
 using namespace yaal::hcore;
 

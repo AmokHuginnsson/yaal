@@ -30,10 +30,10 @@ Copyright:
 #include <unistd.h>
 #include <signal.h> /* for FreeBSD */
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hpipedchild.h"
-#include "hfsitem.h"
+#include "hpipedchild.hxx"
+#include "hfsitem.hxx"
 
 using namespace yaal::hcore;
 

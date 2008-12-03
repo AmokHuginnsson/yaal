@@ -26,9 +26,9 @@ Copyright:
 
 #include <dlfcn.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hplugin.h"
+#include "hplugin.hxx"
 
 using namespace yaal::hcore;
 

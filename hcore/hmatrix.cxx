@@ -26,9 +26,9 @@ Copyright:
 
 #include <libintl.h>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hmatrix.h"
+#include "hmatrix.hxx"
 M_VCSTID ( D_VCSID_HMATRIX_H )
 
 namespace yaal

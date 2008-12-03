@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hpair.h"
+#include "hpair.hxx"
 M_VCSTID ( D_VCSID_YAAL_HCORE_HPAIR_H )
 

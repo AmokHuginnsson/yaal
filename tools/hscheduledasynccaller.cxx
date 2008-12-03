@@ -26,9 +26,9 @@ Copyright:
 
 #include <time.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hscheduledasynccaller.h"
+#include "hscheduledasynccaller.hxx"
 
 using namespace yaal::hcore;
 

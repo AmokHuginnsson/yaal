@@ -35,11 +35,11 @@ Copyright:
 #endif /* HAVE_EXECINFO_H */
 #include <cxxabi.h>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hexception.h"
-#include "xalloc.h"
-#include "hlog.h"
+#include "hexception.hxx"
+#include "xalloc.hxx"
+#include "hlog.hxx"
 
 using namespace yaal;
 

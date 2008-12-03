@@ -44,12 +44,12 @@ Copyright:
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hxml.h"
-#include "hcore/hsingleton.h"
-#include "hcore/hresource.h"
-#include "hcore/hlog.h"
+#include "hxml.hxx"
+#include "hcore/hsingleton.hxx"
+#include "hcore/hresource.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;

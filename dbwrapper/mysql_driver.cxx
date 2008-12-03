@@ -29,9 +29,9 @@ Copyright:
 #include <cstring>
 #include <cstdlib>
 
-#include "hcore/xalloc.h"
+#include "hcore/xalloc.hxx"
 
-#include "config.h"
+#include "config.hxx"
 
 #ifdef __HOST_OS_TYPE_FREEBSD__
 #	define TO_BE_INCLUDED_LATER 1

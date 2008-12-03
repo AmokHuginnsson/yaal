@@ -16,27 +16,27 @@ for FILE in ${HDRS}; do
 	awk '/^#include "/ {match($0,"\"[a-z_./-]+"); printf "#include <yaal/%s>\n", substr($0,RSTART+1,RLENGTH-1) }; !/^#include "/' ${FILE} > ${DIR_HEADERS}/${FILE}
 done
 
-head -26 ${DIR_HEADERS}/hcore/base.h | sed -e s/bit/yaal/ > ${DIR_HEADERS}/yaal.h
+head -26 ${DIR_HEADERS}/hcore/base.hxx | sed -e s/bit/yaal/ > ${DIR_HEADERS}/yaal.hxx
 
-cat << EOF >> ${DIR_HEADERS}/yaal.h
-#ifndef __YAAL_H
-#define __YAAL_H
+cat << EOF >> ${DIR_HEADERS}/yaal.hxx
+#ifndef YAAL_HXX_INCLUDED
+#define YAAL_HXX_INCLUDED
 
 EOF
 
-cat config.h >> ${DIR_HEADERS}/yaal.h
-cat << EOF >> ${DIR_HEADERS}/yaal.h
+cat config.hxx >> ${DIR_HEADERS}/yaal.hxx
+cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 #ifndef GET_YAAL_CONFIG
 
 EOF
 
-find ${DIR_HEADERS} ! -name 'yaal.h' -type f | awk '{printf "#include <%s>\n", substr ($1,match($1,"yaal"),255)}' | sort >> ${DIR_HEADERS}/yaal.h
+find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{printf "#include <%s>\n", substr ($1,match($1,"yaal"),255)}' | sort >> ${DIR_HEADERS}/yaal.hxx
 
-cat << EOF >> ${DIR_HEADERS}/yaal.h
+cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
 #endif /* not GET_YAAL_CONFIG */
 
-#endif /* not __YAAL_H */
+#endif /* not YAAL_HXX_INCLUDED */
 
 EOF
 

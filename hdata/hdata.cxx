@@ -27,13 +27,13 @@ Copyright:
 #include <cstdio>
 #include <cstdlib>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hcore.h"
-#include "hconsole/hconsole.h"
-#include "tools/tools.h"
-#include "dbwrapper/dbwrapper.h"
-#include "hdata.h"
+#include "hcore/hcore.hxx"
+#include "hconsole/hconsole.hxx"
+#include "tools/tools.hxx"
+#include "dbwrapper/dbwrapper.hxx"
+#include "hdata.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;

@@ -26,9 +26,9 @@ Copyright:
 
 #include <cstring>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "htreecontrol.h"
+#include "htreecontrol.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole::mouse;

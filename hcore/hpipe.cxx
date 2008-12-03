@@ -26,11 +26,11 @@ Copyright:
 
 #include <unistd.h>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hpipe.h"
+#include "hpipe.hxx"
 
-#include "hrawfile.h"
+#include "hrawfile.hxx"
 
 namespace yaal
 {

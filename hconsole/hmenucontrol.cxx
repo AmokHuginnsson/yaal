@@ -26,10 +26,10 @@ Copyright:
 
 #include <libintl.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hlog.h"
-#include "hmenucontrol.h"
+#include "hcore/hlog.hxx"
+#include "hmenucontrol.hxx"
 
 using namespace yaal::hcore;
 

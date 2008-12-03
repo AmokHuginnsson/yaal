@@ -27,12 +27,12 @@ Copyright:
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hfsitem.h"
-#include "hcore/xalloc.h"
+#include "hfsitem.hxx"
+#include "hcore/xalloc.hxx"
 
-#include "hcore/hlog.h"
+#include "hcore/hlog.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

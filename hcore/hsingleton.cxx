@@ -26,9 +26,9 @@ Copyright:
 
 #include <cstdlib>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hsingleton.h"
+#include "hsingleton.hxx"
 
 namespace yaal
 {

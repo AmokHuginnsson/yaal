@@ -26,11 +26,11 @@ Copyright:
 
 #include <cstdlib>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "ooption.h"
-#include "rc_file.h"
-#include "hstring.h"
+#include "ooption.hxx"
+#include "rc_file.hxx"
+#include "hstring.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

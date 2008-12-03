@@ -28,15 +28,15 @@ Copyright:
 #include <libintl.h>
 #include <cstdio>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hstatusbarcontrol.h"
-#include "hwindow.h"
-#include "hconsole.h"
-#include "hsearchablecontrol.h"
+#include "hstatusbarcontrol.hxx"
+#include "hwindow.hxx"
+#include "hconsole.hxx"
+#include "hsearchablecontrol.hxx"
 
 //#ifdef __DEBUGGER_BABUNI__
-#include "hcore/hlog.h"
+#include "hcore/hlog.hxx"
 //#endif /* __DEBUGGER_BABUNI__ */
 
 using namespace yaal::hcore;

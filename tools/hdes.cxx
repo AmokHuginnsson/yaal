@@ -26,10 +26,10 @@ Copyright:
 
 #include <cstring>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hdes.h"
-#include "hbitmap.h"
+#include "hdes.hxx"
+#include "hbitmap.hxx"
 
 using namespace yaal::hcore;
 

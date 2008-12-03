@@ -26,9 +26,9 @@ Copyright:
 
 #include <cstdio>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hstringstream.h"
+#include "hstringstream.hxx"
 
 using namespace yaal::hcore;
 

@@ -27,10 +27,10 @@ Copyright:
 #include <cstdlib>
 #include <cstdio>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hbitmap.h"
-#include "hcore/hpool.h"
+#include "hbitmap.hxx"
+#include "hcore/hpool.hxx"
 
 typedef yaal::hcore::HPool<char*> mem_pool_t;
 

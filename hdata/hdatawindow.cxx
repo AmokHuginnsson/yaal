@@ -26,15 +26,15 @@ Copyright:
 
 #include <libintl.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hcore.h"
-#include "hdatawindow.h"
-#include "hdatalistcontrol.h"
-#include "hdatatreecontrol.h"
-#include "hdataeditcontrol.h"
-#include "hdatastatusbarcontrol.h"
-#include "hdataprocess.h"
+#include "hcore/hcore.hxx"
+#include "hdatawindow.hxx"
+#include "hdatalistcontrol.hxx"
+#include "hdatatreecontrol.hxx"
+#include "hdataeditcontrol.hxx"
+#include "hdatastatusbarcontrol.hxx"
+#include "hdataprocess.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;

@@ -5,8 +5,8 @@
 +fcp
 +ffn
 +fnn
-+cpp(c)
-+cpp(h)
++cpp(cxx)
++cpp(hxx)
 +libclass(angle)
 //-passes(6)
 -t2	/* tab size */

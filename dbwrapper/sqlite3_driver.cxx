@@ -31,8 +31,8 @@ Copyright:
 #include <sys/stat.h>
 #include <sqlite3.h>
 
-#include "hcore/compat.h"
-#include "hcore/xalloc.h"
+#include "hcore/compat.hxx"
+#include "hcore/xalloc.hxx"
 
 using namespace yaal::hcore;
 

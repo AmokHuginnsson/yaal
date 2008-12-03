@@ -29,7 +29,7 @@ Copyright:
 #include <unistd.h>
 #include <libintl.h>
 
-#include "config.h"
+#include "config.hxx"
 
 #ifdef HAVE_SYS_CONSIO_H
 #	include <sys/consio.h>
@@ -39,12 +39,12 @@ Copyright:
 #	include <gpm.h>
 #endif /* HAVE_GPM_H */
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "mouse.h"
-#include "console.h"
-#include "hcore/hstring.h"
-#include "hcore/hlog.h"
+#include "mouse.hxx"
+#include "console.hxx"
+#include "hcore/hstring.hxx"
+#include "hcore/hlog.hxx"
 
 #ifdef HAVE_CURSES_H
 #	include <curses.h>

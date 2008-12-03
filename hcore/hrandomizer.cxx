@@ -26,9 +26,9 @@ Copyright:
 
 #include <sys/time.h>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hrandomizer.h"
+#include "hrandomizer.hxx"
 
 namespace yaal
 {

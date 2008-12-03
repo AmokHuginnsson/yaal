@@ -28,18 +28,18 @@ Copyright:
 #include <cstring>
 #include <cstdlib>
 
-#include "config.h"
+#include "config.hxx"
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hlog.h"
-#include "hcore/hstring.h"
-#include "hcore/rc_file.h"
-#include "hcore/hcore.h"
-#include "hconsole/hconsole.h"
-#include "tools/tools.h"
-#include "dbwrapper.h"
-#include "db_driver_loader.h"
+#include "hcore/hlog.hxx"
+#include "hcore/hstring.hxx"
+#include "hcore/rc_file.hxx"
+#include "hcore/hcore.hxx"
+#include "hconsole/hconsole.hxx"
+#include "tools/tools.hxx"
+#include "dbwrapper.hxx"
+#include "db_driver_loader.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;

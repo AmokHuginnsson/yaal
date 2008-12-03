@@ -29,13 +29,13 @@ Copyright:
 #include <cstdio>   /* fopen() */
 #include <libintl.h> /* gettext() */
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "rc_file.h"
-#include "xalloc.h"
-#include "hlog.h"
-#include "hpattern.h"
-#include "hcore.h"
+#include "rc_file.hxx"
+#include "xalloc.hxx"
+#include "hlog.hxx"
+#include "hpattern.hxx"
+#include "hcore.hxx"
 
 namespace yaal
 {

@@ -26,13 +26,13 @@ Copyright:
 
 #include <libintl.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hwindow.h"
-#include "console.h"
+#include "hwindow.hxx"
+#include "console.hxx"
 
 #ifdef __DEBUGGER_BABUNI__
-#include "hcore/hlog.h"
+#include "hcore/hlog.hxx"
 #endif /* __DEBUGGER_BABUNI__ */
 
 using namespace yaal::hcore;

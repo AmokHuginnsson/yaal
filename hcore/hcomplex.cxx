@@ -26,10 +26,10 @@ Copyright:
 
 #include <cmath>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcomplex.h"
-#include "hcore.h"
+#include "hcomplex.hxx"
+#include "hcore.hxx"
 
 namespace yaal
 {

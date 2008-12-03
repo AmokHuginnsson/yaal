@@ -32,14 +32,14 @@ Copyright:
 #include <sys/time.h> /* timeval */
 #include <libintl.h>
 
-#include "config.h"
+#include "config.hxx"
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hlog.h"
-#include "tools/tools.h"
-#include "hconsole.h"
-#include "console.h"
+#include "hcore/hlog.hxx"
+#include "tools/tools.hxx"
+#include "hconsole.hxx"
+#include "console.hxx"
 
 #ifdef HAVE_CURSES_H
 #	include <curses.h>

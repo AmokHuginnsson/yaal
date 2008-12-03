@@ -34,11 +34,11 @@ Copyright:
 #define __STRICT_ANSI__
 #include <oci.h>
 
-#include "hcore/xalloc.h"
-#include "hcore/base.h"
-#include "hcore/hstring.h"
-#include "hcore/rc_file.h"
-#include "hcore/hlog.h"
+#include "hcore/xalloc.hxx"
+#include "hcore/base.hxx"
+#include "hcore/hstring.hxx"
+#include "hcore/rc_file.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

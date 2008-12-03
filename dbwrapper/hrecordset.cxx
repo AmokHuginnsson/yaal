@@ -26,12 +26,12 @@ Copyright:
 
 #include <stdlib.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hlog.h"
-#include "hrecordset.h"
-#include "hdatabase.h"
-#include "db_driver_loader.h"
+#include "hcore/hlog.hxx"
+#include "hrecordset.hxx"
+#include "hdatabase.hxx"
+#include "db_driver_loader.hxx"
 
 using namespace yaal::hcore;
 

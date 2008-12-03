@@ -34,7 +34,7 @@ DIR_TARGET		= $(HOME)/usr/lib
 DIR_HEADERS		= $(HOME)/usr/include/yaal/
 VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
-HAPI_HEADER		= $(DIR_HEADERS)/yaal.h
+HAPI_HEADER		= $(DIR_HEADERS)/yaal.hxx
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
 LIB_PREFIX = @LIB_PREFIX@
 ifeq ($(LIB_PREFIX),lib)

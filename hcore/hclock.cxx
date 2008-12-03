@@ -26,9 +26,9 @@ Copyright:
 
 #include <ctime>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hclock.h"
+#include "hclock.hxx"
 
 namespace yaal
 {

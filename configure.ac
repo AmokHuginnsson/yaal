@@ -57,7 +57,7 @@ AC_LANG([C++])
 CXXFLAGS=["-L/usr/local/lib -I/usr/local/include"]
 
 dnl Set up how configure will handle header checks.
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([config.hxx])
 
 dnl Cheching for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
@@ -421,12 +421,12 @@ AC_SUBST([TOOLS_LIBS],[${TOOLS_LIBS}])
 AC_SUBST([HCONSOLE_LIBS],[${HCONSOLE_LIBS}])
 AH_TOP([/* $Id$ */
 
-#ifndef __YAAL_CONFIG_H
-#define __YAAL_CONFIG_H
+#ifndef YAAL_CONFIG_HXX_INCLUDED
+#define YAAL_CONFIG_HXX_INCLUDED
 
 /* Define core behavior here. */])
 AH_BOTTOM([
-#endif /* not __YAAL_CONFIG_H */
+#endif /* not YAAL_CONFIG_HXX_INCLUDED */
 ])
 
 dnl We have to set up proper compiler/linker flags.

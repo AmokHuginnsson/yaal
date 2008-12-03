@@ -30,12 +30,12 @@ Copyright:
 #include <cstdarg>
 #include <sys/time.h> /* timeval (for FreeBSD) */
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hpointer.h"
-#include "util.h"
-#include "hexpression.h"
-#include "hcore/hlog.h"
+#include "hcore/hpointer.hxx"
+#include "util.hxx"
+#include "hexpression.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
 

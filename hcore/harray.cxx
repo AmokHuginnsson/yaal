@@ -26,7 +26,7 @@ Copyright:
 
 #include <libintl.h>
 
-#include "harray.h"
+#include "harray.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSTID ( D_VCSID_YAAL_HCORE_HARRAY_H )
 

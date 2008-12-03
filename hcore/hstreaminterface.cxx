@@ -24,11 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hstreaminterface.h"
+#include "hstreaminterface.hxx"
 
-#include "hcore/hstring.h"
+#include "hcore/hstring.hxx"
 
 namespace yaal
 {

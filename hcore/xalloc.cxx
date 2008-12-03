@@ -29,9 +29,9 @@ Copyright:
 #include <cstring>
 #include <libintl.h>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "xalloc.h"
+#include "xalloc.hxx"
 
 namespace yaal
 {

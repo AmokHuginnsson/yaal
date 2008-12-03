@@ -31,15 +31,15 @@ Copyright:
 #include <sys/time.h> /* timeval */
 #include <libintl.h>
 
-#include "config.h"
+#include "config.hxx"
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hserial.h"
-#include "tools.h"
+#include "hserial.hxx"
+#include "tools.hxx"
 
-#include "hcore/xalloc.h"
-#include "hcore/hlog.h"
+#include "hcore/xalloc.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
 

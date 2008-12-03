@@ -34,12 +34,12 @@ Copyright:
 #include <openssl/engine.h>
 #include <unistd.h>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hopenssl.h"
-#include "hlog.h"
+#include "hopenssl.hxx"
+#include "hlog.hxx"
 
-#include "hcore.h"
+#include "hcore.hxx"
 
 namespace yaal
 {

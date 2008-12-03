@@ -26,11 +26,11 @@ Copyright:
 
 #include <cstring>
 
-#include "config.h"
+#include "config.hxx"
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "htime.h"
+#include "htime.hxx"
 
 namespace yaal
 {

@@ -30,10 +30,10 @@ Copyright:
 #include <libintl.h>
 #include <sys/time.h> /* timeval */
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hrawfile.h"
-#include "hclock.h"
+#include "hrawfile.hxx"
+#include "hclock.hxx"
 
 namespace yaal
 {

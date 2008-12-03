@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hdatalistcontrol.h"
-#include "hdatawindow.h"
+#include "hdatalistcontrol.hxx"
+#include "hdatawindow.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;

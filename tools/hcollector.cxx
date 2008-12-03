@@ -30,11 +30,11 @@ Copyright:
 #include <sys/types.h> /* FD_* macros */
 #include <libintl.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hlog.h"
-#include "tools.h"
-#include "hcollector.h"
+#include "hcore/hlog.hxx"
+#include "tools.hxx"
+#include "hcollector.hxx"
 
 using namespace yaal::hcore;
 

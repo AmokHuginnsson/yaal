@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hmainwindow.h"
+#include "hmainwindow.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole::list_control_helper;

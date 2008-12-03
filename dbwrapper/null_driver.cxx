@@ -29,7 +29,7 @@ Copyright:
 #include <string.h>
 #include <sys/stat.h>
 
-#include "hcore/xalloc.h"
+#include "hcore/xalloc.hxx"
 
 extern "C"
 {

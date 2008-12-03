@@ -30,11 +30,11 @@ Copyright:
 #include <unistd.h>
 #include <libintl.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "heditcontrol.h"
-#include "hwindow.h"
-#include "hcore/hlog.h"
+#include "heditcontrol.hxx"
+#include "hwindow.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
 

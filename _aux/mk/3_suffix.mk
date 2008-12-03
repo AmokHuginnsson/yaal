@@ -1,5 +1,5 @@
 # suffixes
-HS = h
+HS = hxx
 SS = cxx
 OS = o
 DS = d

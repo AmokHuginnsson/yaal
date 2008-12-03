@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hitem.h"
+#include "hitem.hxx"
 M_VCSTID ( D_VCSID_HCONSOLE_HITEM_H )
 
 using namespace yaal::hcore;

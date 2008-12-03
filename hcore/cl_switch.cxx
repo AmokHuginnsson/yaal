@@ -27,14 +27,14 @@ Copyright:
 #include <cstdlib>
 #include <getopt.h>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "cl_switch.h"
-#include "rc_file.h"
-#include "hstring.h"
-#include "hchunk.h"
-#include "xalloc.h"
-#include "hlog.h"
+#include "cl_switch.hxx"
+#include "rc_file.hxx"
+#include "hstring.hxx"
+#include "hchunk.hxx"
+#include "xalloc.hxx"
+#include "hlog.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

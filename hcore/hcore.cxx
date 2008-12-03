@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config.hxx"
 char const COPYRIGHT [ ] =
 "/*\n"
 "---           `yaal' "PACKAGE_VERSION" (c) 1978 by Marcin 'Amok' Konarski            ---\n"
@@ -29,15 +29,15 @@ char const COPYRIGHT [ ] =
 #include <cstdlib>
 #include <cstring>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore.h"
-#include "hlog.h"
-#include "hstring.h"
-#include "rc_file.h"
-#include "hsingleton.h"
-#include "hopenssl.h"
-#include "hsocket.h"
+#include "hcore.hxx"
+#include "hlog.hxx"
+#include "hstring.hxx"
+#include "rc_file.hxx"
+#include "hsingleton.hxx"
+#include "hopenssl.hxx"
+#include "hsocket.hxx"
 
 namespace yaal
 {

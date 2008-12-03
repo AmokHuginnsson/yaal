@@ -14,7 +14,7 @@ environment: $(DIR_BUILD) $(DIRS)
 $(DIR_BUILD):
 	@/bin/mkdir -p $(@); \
 	echo "Program version $(RELEASE)-`date +%Y%m%d`."; \
-	echo "#define VER \"$(RELEASE)-`date +%Y%m%d`\"" > $(DIR_BUILD)/version.h
+	echo "#define VER \"$(RELEASE)-`date +%Y%m%d`\"" > $(DIR_BUILD)/version.hxx
 
 $(PRJNAME).info : src/$(PRJNAME).texinfo
 	@makeinfo src/$(PRJNAME).texinfo
@@ -41,7 +41,7 @@ clean: clean-dep
 
 mrproper: clean
 	@echo -n "Purging ... "; \
-	/bin/rm -f $(PRJNAME) version.h src/.gt_* src/tags 1exec.core; \
+	/bin/rm -f $(PRJNAME) version.hxx src/.gt_* src/tags 1exec.core; \
 	/bin/rm -rf src/1exec.core $(DIR_BUILD); \
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
@@ -49,7 +49,7 @@ mrproper: clean
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile config.h config.h.in config.log
+	/bin/rm -rf configure Makefile config.hxx config.hxx.in config.log
 
 bin:
 	@( DO_RELEASE=1 $(MAKE) ; make clean )

@@ -28,11 +28,11 @@ Copyright:
 #include <cctype>
 #include <libintl.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hlog.h"
-#include "hlistcontrol.h"
-#include "hconsole.h"
+#include "hcore/hlog.hxx"
+#include "hlistcontrol.hxx"
+#include "hconsole.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

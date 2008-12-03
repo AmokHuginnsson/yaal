@@ -32,16 +32,16 @@ Copyright:
 #include <pwd.h>
 #include <libintl.h>
 
-#include "config.h"
+#include "config.hxx"
 
 #ifdef HAVE_BASENAME_IN_LIBGEN
 #	include <libgen.h>
 #endif /* HAVE_BASENAME_IN_LIBGEN */
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hlog.h"
-#include "xalloc.h"
+#include "hlog.hxx"
+#include "xalloc.hxx"
 
 namespace yaal
 {

@@ -26,10 +26,10 @@ Copyright:
 
 #include <cstdlib>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 
-#include "hstring.h"
+#include "hstring.hxx"
 
 using namespace yaal::hcore;
 

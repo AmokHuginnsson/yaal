@@ -30,13 +30,13 @@ Copyright:
 #include <dlfcn.h>
 #include <libintl.h>
 
-#include "hcore/base.h"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hcore/hstring.h"
-#include "hcore/hlog.h"
-#include "tools/hplugin.h"
-#include "db_driver_loader.h"
-#include "dbwrapper.h"
+#include "hcore/hstring.hxx"
+#include "hcore/hlog.hxx"
+#include "tools/hplugin.hxx"
+#include "db_driver_loader.hxx"
+#include "dbwrapper.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;

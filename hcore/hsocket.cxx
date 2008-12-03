@@ -32,7 +32,7 @@ Copyright:
 #include <fcntl.h>
 #include <unistd.h>
 #include <libintl.h>
-#include <config.h>
+#include <config.hxx>
 
 #if ! defined( HAVE_GETHOSTBYNAME_R ) || ( HAVE_GETHOSTBYNAME_R == 0 )
 #if ! defined( HAVE_DECL_GETADDRINFO ) || ( HAVE_DECL_GETADDRINFO == 0 )
@@ -40,12 +40,12 @@ Copyright:
 #endif /* not HAVE_DECL_GETADDRINFO */
 #endif /* not HAVE_GETHOSTBYNAME_R */
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hsocket.h"
-#include "xalloc.h"
-#include "hstring.h"
-#include "hlog.h"
+#include "hsocket.hxx"
+#include "xalloc.hxx"
+#include "hstring.hxx"
+#include "hlog.hxx"
 
 namespace yaal
 {

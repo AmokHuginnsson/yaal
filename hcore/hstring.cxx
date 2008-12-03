@@ -30,11 +30,11 @@ Copyright:
 #include <cstdarg>
 #include <libintl.h>
 
-#include "base.h"
+#include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "hstring.h"
-#include "xalloc.h"
-#include "hpool.h"
+#include "hstring.hxx"
+#include "xalloc.hxx"
+#include "hpool.hxx"
 
 namespace yaal
 {
