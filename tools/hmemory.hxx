@@ -35,8 +35,32 @@ namespace yaal
 namespace tools
 {
 
+/*! \brief Stream based access to raw memory block.
+ *
+ * This stream based memory accessor wrapper does not own the memory block.
+ */
 class HMemory : public yaal::hcore::HStreamInterface
 	{
+	void* f_pvBlock;
+	int long f_lSize;
+public:
+	/*! \brief Create new memory accessor.
+	 *
+	 * \param ptr - pointer to memory block to be wrapped.
+	 * \param size - size of memoru block in octets.
+	 */
+	HMemory( void* ptr, int long const& size );
+	/*! \brief Copy constructor.
+	 *
+	 * \param src - original HMemory object to be copied.
+	 */
+	HMemory( HMemory const& src );
+	/*! \brief Assign operator.
+	 *
+	 * \param src - original HMemory object to be copied.
+	 * \return Self.
+	 */
+	HMemory& operator = ( HMemory const& src );
 	};
 
 }

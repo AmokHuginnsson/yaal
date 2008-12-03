@@ -14,8 +14,9 @@ table.yaal td {
 	border-top-width: 1px;
 	border-top-style: solid;
 	border-top-color: #888;
+	height: 24pt;
 }
-table.yaal td.good, table.yaal td.fine, table.yaal td.average, table.yaal td.fail {
+table.yaal td.good, table.yaal td.fine, table.yaal td.average, table.yaal td.fail, table.yaal td.envbug {
 	text-align: center;
 }
 table.yaal td.good {
@@ -34,9 +35,16 @@ table.yaal td.fail {
 	background: #f22;
 	color: #000;
 }
+table.yaal td.envbug {
+	background: #ffe8e8;
+	color: #000;
+}
 .note {
 	vertical-align: super;
-	font-size: smaller;
+	font-size: 6pt;
+}
+ol {
+	list-style: decimal;
 }
 
 /* ================================================================================================= */
