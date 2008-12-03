@@ -47,7 +47,22 @@ HFile::HFile( OPEN::open_t const& a_eOpen, void* const a_pvHandle )
 	if ( ( ( a_eOpen & OPEN::D_APPEND ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
 			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
 			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_APPEND ) ) )
-		M_THROW ( _ ( "inconsistient mode flags" ), a_eOpen );
+		M_THROW( _( "inconsistient mode flags" ), a_eOpen );
+	return;
+	M_EPILOG
+	}
+
+HFile::HFile( yaal::hcore::HString const& path, OPEN::open_t const& a_eOpen )
+	: HStreamInterface(), f_eOpen( a_eOpen ),
+	f_pvHandle( NULL ), f_oPath(), f_oError(),
+	f_bExternal( false )
+	{
+	M_PROLOG
+	if ( ( ( a_eOpen & OPEN::D_APPEND ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
+			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
+			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_APPEND ) ) )
+		M_THROW( _( "inconsistient mode flags" ), a_eOpen );
+	open( path );
 	return;
 	M_EPILOG
 	}

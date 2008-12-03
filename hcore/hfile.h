@@ -88,6 +88,12 @@ private:
 	bool f_bExternal;
 public:
 	HFile( OPEN::open_t const& = OPEN::D_READING, void* const = NULL );
+	/*! \brief Create new file stream and open file item immediatelly.
+	 *
+	 * \param path - path to file item to be opened.
+	 * \param mode - open mode.
+	 */
+	HFile( yaal::hcore::HString const& path, OPEN::open_t const& mode = OPEN::D_READING );
 	virtual ~HFile( void );
 	int open( HString const& );
 	int close( void );
