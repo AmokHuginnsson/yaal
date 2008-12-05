@@ -1,7 +1,7 @@
 /*
 ---           hanalyser.h 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hash.h - this file is integral part of hanalyser.h project.
+	hash.hxx - this file is integral part of hanalyser.h project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -28,7 +28,7 @@ Copyright:
 #define YAAL_TOOLS_HASH_HXX_INCLUDED
 
 #include "hcore/hstring.hxx"
-#include "tools/hbitsource.hxx"
+#include "hcore/hstreaminterface.hxx"
 
 namespace yaal
 {
@@ -46,14 +46,14 @@ namespace hash
  * \param source - data source of data which sum is to ba calculated.
  * \return Calculated hash.
  */
-yaal::hcore::HString md5( HBitSourceInterface const& source );
+yaal::hcore::HString md5( yaal::hcore::HStreamInterface const& source );
 
 /*! \brief Calculate md5 hash of data.
  *
  * \param source - data source of data which sum is to ba calculated.
  * \return Calculated hash.
  */
-yaal::hcore::HString sha1( HBitSourceInterface const& source );
+yaal::hcore::HString sha1( yaal::hcore::HStreamInterface const& source );
 
 }
 

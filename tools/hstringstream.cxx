@@ -38,17 +38,20 @@ namespace yaal
 namespace tools
 {
 
-HStringStream::HStringStream( void ) : f_bUsed( false ), f_oBuffer( "" )
+HStringStream::HStringStream( void )
+	: f_bUsed( false ), f_lOffset( 0 ), f_oBuffer( "" )
 	{
 	}
 
-HStringStream::HStringStream( HString const& a_oInit ) : f_bUsed( false ), f_oBuffer( a_oInit )
+HStringStream::HStringStream( HString const& a_oInit )
+	: f_bUsed( false ), f_lOffset( 0 ), f_oBuffer( a_oInit )
 	{
 	}
 
 HStringStream& HStringStream::operator = ( HString const& s )
 	{
 	f_oBuffer = s;
+	f_lOffset = 0;
 	f_bUsed = false;
 	return ( *this );
 	}
@@ -87,9 +90,10 @@ void HStringStream::do_flush( void ) const
 int long HStringStream::do_read( void* const a_pvBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	int long l_iLength = f_oBuffer.get_length();
-	l_iLength = ( l_iLength < a_lSize ? l_iLength : a_lSize );
-	::strncpy( static_cast<char* const>( a_pvBuffer ), f_oBuffer.raw(), l_iLength );
+	int long l_iLength = yaal::min( f_oBuffer.get_length() - f_lOffset, a_lSize );
+	if ( l_iLength > 0 )
+		::strncpy( static_cast<char* const>( a_pvBuffer ), f_oBuffer.raw() + f_lOffset, l_iLength );
+	f_lOffset += l_iLength;
 	return ( l_iLength );
 	M_EPILOG
 	}

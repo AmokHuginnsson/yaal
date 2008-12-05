@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hchunk.h - this file is integral part of `yaal' project.
+	hchunk.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -48,7 +48,10 @@ public:
 	HChunk( void* );
 	~HChunk( void );
 	template<typename tType>
-	tType* get() const
+	tType const* get() const
+		{ return ( static_cast<tType*>( f_pvData ) ); }
+	template<typename tType>
+	tType* get()
 		{ return ( static_cast<tType*>( f_pvData ) ); }
 	void set( void* );
 	void clear( void );

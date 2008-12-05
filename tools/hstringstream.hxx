@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hstringstream.h - this file is integral part of `yaal' project.
+	hstringstream.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -40,7 +40,8 @@ namespace tools
  */
 class HStringStream : public yaal::hcore::HStreamInterface
 	{
-	mutable bool f_bUsed;
+	mutable bool f_bUsed; /* FIXME Confirm mutable is necesarry here. */
+	mutable int long f_lOffset;
 	mutable yaal::hcore::HString f_oBuffer;
 public:
 	HStringStream( void );

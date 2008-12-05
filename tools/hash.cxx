@@ -27,6 +27,8 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hash.hxx"
+#include "hstreamblockiterator.hxx"
+#include "hbitmap.hxx"
 
 using namespace std;
 using namespace yaal::hcore;
@@ -41,9 +43,9 @@ namespace hash
 {
 
 void change_endianess( u32_t*, int long );
-void update_md5_state( u32_t*, HBitmap& );
+void update_md5_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
-yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
+yaal::hcore::HString md5( HStreamInterface const& stream )
 	{
 	static int const D_BLOCK_SIZE = 512;
 	static int const D_MESSAGE_LENGTH_SIZE = 64;
@@ -53,33 +55,34 @@ yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 	static u32_t const D_S1 = 0xefcdab89;
 	static u32_t const D_S2 = 0x98badcfe;
 	static u32_t const D_S3 = 0x10325476;
-	int long block = 0;
-	HBitmap bmp( D_BLOCK_SIZE );
+	HStreamBlockIterator source( stream, D_BLOCK_SIZE >> 3 );
 	int last = 0;
 	int long total = 0;
 	u32_t state[ D_STATE_SIZE ] = { D_S0, D_S1, D_S2, D_S3 };
 	do
 		{
-		bmp = bitSource.get_nth_block( block ++, D_BLOCK_SIZE );
-		last = static_cast<int>( bmp.get_size() );
+		HStreamBlockIterator::HBlock block = *source;
+		++ source;
+		last = static_cast<int>( block.octets() << 3 );
 		total += last;
 		if ( last < D_BLOCK_SIZE )
 			{
-			bmp.reserve( D_BLOCK_SIZE );
+			u32_t* x = static_cast<u32_t*>( block.data() );
+			HBitmap bmp;
+			bmp.use( block.data(), D_BLOCK_SIZE );
 			bmp.fill( last, D_BLOCK_SIZE - last, false );
-			u32_t* x = const_cast<u32_t*>( static_cast<u32_t const*>( bmp.raw() ) );
 			bmp.set( last, true );
 			if ( last >= ( ( D_BLOCK_SIZE - D_MESSAGE_LENGTH_SIZE ) - D_SUPPLEMENT_SIZE ) )
 				{
-				update_md5_state( state, bmp );
-				bmp.fill( false );
+				update_md5_state( state, block );
+				yaal::fill( x, x + ( D_BLOCK_SIZE >> 5 ), 0 );
 				}
 			x[ 14 ] = static_cast<u32_t>( total );
-			M_ASSERT( x[ 15 ] == 0 );
-			update_md5_state( state, bmp );
+			x[ 15 ] = static_cast<u32_t>( total >> 32 );
+			update_md5_state( state, block );
 			}
 		else
-			update_md5_state( state, bmp );
+			update_md5_state( state, block );
 		}
 	while ( last == D_BLOCK_SIZE );
 	HString result;
@@ -88,9 +91,9 @@ yaal::hcore::HString md5( HBitSourceInterface const& bitSource )
 	return ( result );
 	}
 
-void update_sha1_state( u32_t*, HBitmap const& );
+void update_sha1_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
-yaal::hcore::HString sha1( HBitSourceInterface const& bitSource )
+yaal::hcore::HString sha1( HStreamInterface const& stream )
 	{
 	static int const D_BLOCK_SIZE = 512;
 	static int const D_MESSAGE_LENGTH_SIZE = 64;
@@ -101,33 +104,34 @@ yaal::hcore::HString sha1( HBitSourceInterface const& bitSource )
 	static u32_t const D_S2 = 0x98badcfe;
 	static u32_t const D_S3 = 0x10325476;
 	static u32_t const D_S4 = 0xc3d2e1f0;
-	int long block = 0;
-	HBitmap bmp( D_BLOCK_SIZE );
+	HStreamBlockIterator source( stream, D_BLOCK_SIZE >> 3 );
 	int last = 0;
 	int long total = 0;
 	u32_t state[ D_STATE_SIZE ] = { D_S0, D_S1, D_S2, D_S3, D_S4 };
 	do
 		{
-		bmp = bitSource.get_nth_block( block ++, D_BLOCK_SIZE );
-		last = static_cast<int>( bmp.get_size() );
+		HStreamBlockIterator::HBlock block = *source;
+		++ source;
+		last = static_cast<int>( block.octets() << 3 );
 		total += last;
 		if ( last < D_BLOCK_SIZE )
 			{
-			bmp.reserve( D_BLOCK_SIZE );
+			u32_t* x = static_cast<u32_t*>( block.data() );
+			HBitmap bmp;
+			bmp.use( block.data(),D_BLOCK_SIZE );
 			bmp.fill( last, D_BLOCK_SIZE - last, false );
-			u32_t* x = const_cast<u32_t*>( static_cast<u32_t const*>( bmp.raw() ) );
 			bmp.set( last, true );
 			if ( last >= ( ( D_BLOCK_SIZE - D_MESSAGE_LENGTH_SIZE ) - D_SUPPLEMENT_SIZE ) )
 				{
-				update_sha1_state( state, bmp );
-				bmp.fill( false );
+				update_sha1_state( state, block );
+				yaal::fill( x, x + ( D_BLOCK_SIZE >> 5 ), 0 );
 				}
 			x[ 15 ] = static_cast<u32_t>( total );
 			change_endianess( x + 15, 1 );
-			update_sha1_state( state, bmp );
+			update_sha1_state( state, block );
 			}
 		else
-			update_sha1_state( state, bmp );
+			update_sha1_state( state, block );
 		}
 	while ( last == D_BLOCK_SIZE );
 	HString result;
@@ -135,7 +139,7 @@ yaal::hcore::HString sha1( HBitSourceInterface const& bitSource )
 	return ( result );
 	}
 
-void update_md5_state( u32_t* state, HBitmap& bmp )
+void update_md5_state( u32_t* state, HStreamBlockIterator::HBlock const& block )
 	{
 #define F(x, y, z) (((x)&(y)) | (~(x)&(z)))
 #define G(x, y, z) (((x)&(z)) | ((y)&~(z)))
@@ -181,7 +185,7 @@ void update_md5_state( u32_t* state, HBitmap& bmp )
 	u32_t b = state[ 1 ];
 	u32_t c = state[ 2 ];
 	u32_t d = state[ 3 ];
-	u32_t* x = const_cast<u32_t*>( static_cast<u32_t const*>( bmp.raw() ) );
+	u32_t* x = reinterpret_cast<u32_t*>( block.data() );
 	/* Cycle 1 */
 	FF(a, b, c, d, x[ 0], S11, 0xd76aa478); /* 1 */
 	FF(d, a, b, c, x[ 1], S12, 0xe8c7b756); /* 2 */
@@ -272,7 +276,7 @@ void update_md5_state( u32_t* state, HBitmap& bmp )
 #undef ROTATE_LEFT
 	}
 
-void update_sha1_state( u32_t* state, HBitmap const& bmp )
+void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block )
 	{
 #define ROTATE_LEFT( x, s ) ( ( ( x ) << ( s ) ) | ( ( x ) >> ( 32 - ( s ) ) ) )
 	static int const D_WORK_BUFFER_SIZE = 80;
@@ -283,7 +287,7 @@ void update_sha1_state( u32_t* state, HBitmap const& bmp )
 	u32_t d = state[ 3 ];
 	u32_t e = state[ 4 ];
 	u32_t x[ D_WORK_BUFFER_SIZE ];
-	::memcpy( x, bmp.raw(), D_INPUT_CHUNK_SIZE * sizeof ( u32_t ) );
+	::memcpy( x, block.data(), D_INPUT_CHUNK_SIZE * sizeof ( u32_t ) );
 	u32_t tmp = 0;
 	change_endianess( x, D_INPUT_CHUNK_SIZE );
 	for ( int i = D_INPUT_CHUNK_SIZE; i < D_WORK_BUFFER_SIZE; ++ i )
