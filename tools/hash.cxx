@@ -57,13 +57,16 @@ yaal::hcore::HString md5( HStreamInterface const& stream )
 	static u32_t const D_S3 = 0x10325476;
 	HStreamBlockIterator source( stream, D_BLOCK_SIZE >> 3 );
 	int last = 0;
-	int long total = 0;
+	u32_t total = 0;
+	u32_t totalH = 0;
 	u32_t state[ D_STATE_SIZE ] = { D_S0, D_S1, D_S2, D_S3 };
 	do
 		{
 		HStreamBlockIterator::HBlock block = *source;
 		++ source;
 		last = static_cast<int>( block.octets() << 3 );
+		if ( ( total + last ) < total )
+			++ totalH;
 		total += last;
 		if ( last < D_BLOCK_SIZE )
 			{
@@ -77,8 +80,8 @@ yaal::hcore::HString md5( HStreamInterface const& stream )
 				update_md5_state( state, block );
 				yaal::fill( x, x + ( D_BLOCK_SIZE >> 5 ), 0 );
 				}
-			x[ 14 ] = static_cast<u32_t>( total );
-			x[ 15 ] = static_cast<u32_t>( total >> 32 );
+			x[ 14 ] = total;
+			x[ 15 ] = totalH;
 			update_md5_state( state, block );
 			}
 		else
@@ -106,13 +109,16 @@ yaal::hcore::HString sha1( HStreamInterface const& stream )
 	static u32_t const D_S4 = 0xc3d2e1f0;
 	HStreamBlockIterator source( stream, D_BLOCK_SIZE >> 3 );
 	int last = 0;
-	int long total = 0;
+	u32_t total = 0;
+	u32_t totalH = 0;
 	u32_t state[ D_STATE_SIZE ] = { D_S0, D_S1, D_S2, D_S3, D_S4 };
 	do
 		{
 		HStreamBlockIterator::HBlock block = *source;
 		++ source;
 		last = static_cast<int>( block.octets() << 3 );
+		if ( ( total + last ) < total )
+			++ totalH;
 		total += last;
 		if ( last < D_BLOCK_SIZE )
 			{
@@ -126,7 +132,7 @@ yaal::hcore::HString sha1( HStreamInterface const& stream )
 				update_sha1_state( state, block );
 				yaal::fill( x, x + ( D_BLOCK_SIZE >> 5 ), 0 );
 				}
-			x[ 15 ] = static_cast<u32_t>( total );
+			x[ 15 ] = total;
 			change_endianess( x + 15, 1 );
 			update_sha1_state( state, block );
 			}
