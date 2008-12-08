@@ -132,8 +132,9 @@ yaal::hcore::HString sha1( HStreamInterface const& stream )
 				update_sha1_state( state, block );
 				yaal::fill( x, x + ( D_BLOCK_SIZE >> 5 ), 0 );
 				}
+			x[ 14 ] = totalH;
 			x[ 15 ] = total;
-			change_endianess( x + 15, 1 );
+			change_endianess( x + 14, 2 );
 			update_sha1_state( state, block );
 			}
 		else
