@@ -66,6 +66,7 @@ typedef HResource<xmlCharEncodingHandlerPtr, __decltype( &xmlCharEncCloseFunc )>
 typedef HResource<xsltStylesheetPtr, __decltype( &xsltFreeStylesheet )> style_resource_t;
 typedef HResource<xmlXPathContextPtr, __decltype( &xmlXPathFreeContext )> xpath_context_resource_t;
 typedef HResource<xmlXPathObjectPtr, __decltype( &xmlXPathFreeObject )> xpath_object_resource_t;
+typedef HResource<xmlOutputBufferPtr, __decltype( &xmlOutputBufferClose )> outputbuffer_resource_t;
 typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 
 HString get_stream_id( HStreamInterface* stream )
@@ -529,12 +530,16 @@ void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream ) const
 		swap( f_poXml->f_oDoc, doc );
 	M_ASSERT( f_poXml->f_oDoc.get() );
 	if ( f_poXml->f_oStyle.get() )
-		M_ENSURE( ::xsltSaveResultTo( ::xmlOutputBufferCreateIO( writer_callback,
-						NULL, stream.raw(), f_oConvert->f_oEncoder->get() ),
+		{
+		outputbuffer_resource_t obuf( ::xmlOutputBufferCreateIO( writer_callback,
+							NULL, stream.raw(), ::xmlFindCharEncodingHandler( f_oEncoding.raw() ) ),
+				xmlOutputBufferClose );
+		M_ENSURE( ::xsltSaveResultTo( obuf.get(),
 					f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get() ) != -1 );
+		}
 	else
 		M_ENSURE( ::xmlSaveFileTo( ::xmlOutputBufferCreateIO( writer_callback,
-						NULL, stream.raw(), f_oConvert->f_oEncoder->get() ),
+						NULL, stream.raw(), ::xmlFindCharEncodingHandler( f_oEncoding.raw() ) ),
 					f_poXml->f_oDoc.get(), f_oEncoding.raw() ) != -1 );
 	return;
 	M_EPILOG
