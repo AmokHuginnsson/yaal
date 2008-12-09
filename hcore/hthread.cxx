@@ -137,7 +137,6 @@ void* HThread::SPAWN( void* a_pvThread )
 void* HThread::control( void )
 	{
 	M_PROLOG
-	void* l_pvReturn = NULL;
 	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
 	M_ENSURE( ::pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
 	f_eStatus = D_ALIVE;
@@ -165,7 +164,7 @@ void* HThread::control( void )
 	 * That is why we have to deliver interface that allows users to not specify
 	 * any useful or meaningful int run();
 	 */
-	l_pvReturn = reinterpret_cast<void*>( run() );
+	void* l_pvReturn = reinterpret_cast<void*>( run() );
 	f_eStatus = D_ZOMBIE;
 	f_oSemaphore.signal();
 	return ( l_pvReturn );

@@ -23,7 +23,7 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/ooption.h
+/*! \file hcore/ooption.hxx
  * \brief Declaration of OOption structure.
  */
 

@@ -23,7 +23,7 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hsbbstree.h
+/*! \file hcore/hsbbstree.hxx
  * \brief Declaration of HSBBSTree related classes.
  */
 

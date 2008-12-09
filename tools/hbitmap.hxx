@@ -23,7 +23,7 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file tools/hbitmap.h
+/*! \file tools/hbitmap.hxx
  * \brief Declaration of HBitmap related classes.
  *
  * HBitmap, HBitmap::HIterator, HBitmap::HBit.

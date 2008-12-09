@@ -50,6 +50,8 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hsingleton.hxx"
 #include "hcore/hresource.hxx"
 #include "hcore/hlog.hxx"
+#include "hcore/hfile.hxx"
+#include "hcore/hsocket.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -65,6 +67,13 @@ typedef HResource<xsltStylesheetPtr, __decltype( &xsltFreeStylesheet )> style_re
 typedef HResource<xmlXPathContextPtr, __decltype( &xmlXPathFreeContext )> xpath_context_resource_t;
 typedef HResource<xmlXPathObjectPtr, __decltype( &xmlXPathFreeObject )> xpath_object_resource_t;
 typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
+
+HString get_stream_id( HStreamInterface* stream )
+	{
+	HFile* f = dynamic_cast<HFile*>( stream );
+	HSocket* s = dynamic_cast<HSocket*>( stream );
+	return ( f ? f->get_path() : ( s ? s->get_host_name() : "anonymous stream" ) );
+	}
 }
 
 namespace yaal
@@ -338,23 +347,26 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& a_oPath )
 	M_EPILOG
 	}
 
-void HXml::init( HString const& a_oFileName )
+void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream )
 	{
 	M_PROLOG
 	int l_iSavedErrno = errno;
 	HString l_oError;
 	HXmlParserGlobal::get_instance();
 	errno = 0;
-	doc_resource_t doc( ::xmlParseFile( a_oFileName.raw() ), xmlFreeDoc );
+	HString streamId = get_stream_id( stream.raw() );
+	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, stream.raw(), streamId.raw(), NULL,
+				XML_PARSE_NOENT | XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_NSCLEAN ),
+			xmlFreeDoc );
 	if ( errno )
 		{
-		log( LOG_TYPE::D_WARNING ) << error_message( errno ) << ": " << a_oFileName;
+		log( LOG_TYPE::D_WARNING ) << error_message( errno ) << ": " << streamId;
 		log << ", code: " << errno << '.' << endl;
 		}
 	errno = l_iSavedErrno;
 	if ( ! doc.get() )
 		{
-		l_oError.format( _( "cannot parse `%s'" ), a_oFileName.raw() );
+		l_oError.format( _( "cannot parse `%s'" ), streamId.raw() );
 		throw HXmlException( l_oError );
 		}
 	if ( xmlXIncludeProcess( doc.get() ) < 0 )
@@ -366,7 +378,7 @@ void HXml::init( HString const& a_oFileName )
 	fprintf ( stdout, "%s\n", root->name );
 #endif /* __DEBUGGER_BABUNI__ */
 	(*f_oConvert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
-			root, a_oFileName );
+			root, streamId );
 	swap( f_poXml->f_oDoc, doc );
 	return;
 	M_EPILOG
@@ -471,55 +483,16 @@ void HXml::parse( HString a_oXPath, bool a_bStripEmpty )
 	M_EPILOG
 	}
 
-void HXml::load( yaal::hcore::HString const& a_oPath )
+void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream )
 	{
 	M_PROLOG
-	init( a_oPath );
+	init( stream );
 	parse( HString(), true );
 	return;
 	M_EPILOG
 	}
 
-void HXml::save( yaal::hcore::HString const& a_oPath ) const
-	{
-	M_PROLOG
-	do_save();
-	M_ASSERT( f_poXml->f_oDoc.get() );
-	if ( f_poXml->f_oStyle.get() )
-		{
-		if ( ::xsltSaveResultToFilename( a_oPath.raw(), f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get(), 0 ) == -1 )
-			throw HXmlException( HString( "Cannot open file for writting: " ) + a_oPath );
-		}
-	else
-		{
-		if ( ::xmlSaveFile( a_oPath.raw(), f_poXml->f_oDoc.get() ) == -1 )
-			throw HXmlException( HString( "Cannot open file for writting: " ) + a_oPath );
-		}
-	return;
-	M_EPILOG
-	}
-
-void HXml::save( int const& a_iFileDes ) const
-	{
-	M_PROLOG
-	do_save();
-	M_ASSERT( f_poXml->f_oDoc.get() );
-	if ( f_poXml->f_oStyle.get() )
-		{
-		if ( xsltSaveResultToFd( a_iFileDes, f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get() ) == -1 )
-			throw HXmlException( HString( "Cannot connect to file descriptor: " ) + a_iFileDes );
-		}
-	else
-		{
-		if ( ::xmlSaveFileTo( ::xmlOutputBufferCreateFd( a_iFileDes, NULL ),
-					f_poXml->f_oDoc.get(), f_oEncoding.raw() ) == -1 )
-			throw HXmlException( HString( "Cannot connect to file descriptor: " ) + a_iFileDes );
-		}
-	return;
-	M_EPILOG
-	}
-
-void HXml::do_save( void ) const
+void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream ) const
 	{
 	M_PROLOG
 	doc_resource_t doc( NULL, xmlFreeDoc );
@@ -554,8 +527,27 @@ void HXml::do_save( void ) const
 		xmlFreeNode( xmlDocSetRootElement( f_poXml->f_oDoc.get(), xmlDocGetRootElement( doc.get() ) ) );
 	else
 		swap( f_poXml->f_oDoc, doc );
+	M_ASSERT( f_poXml->f_oDoc.get() );
+	if ( f_poXml->f_oStyle.get() )
+		M_ENSURE( ::xsltSaveResultTo( ::xmlOutputBufferCreateIO( writer_callback,
+						NULL, stream.raw(), f_oConvert->f_oEncoder->get() ),
+					f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get() ) != -1 );
+	else
+		M_ENSURE( ::xmlSaveFileTo( ::xmlOutputBufferCreateIO( writer_callback,
+						NULL, stream.raw(), f_oConvert->f_oEncoder->get() ),
+					f_poXml->f_oDoc.get(), f_oEncoding.raw() ) != -1 );
 	return;
 	M_EPILOG
+	}
+
+int HXml::writer_callback( void* stream, char const* buf, int len )
+	{
+	return ( static_cast<int>( static_cast<HStreamInterface*>( stream )->write( buf, len ) ) );
+	}
+
+int HXml::reader_callback( void* stream, char* buf, int len )
+	{
+	return ( static_cast<int>( static_cast<HStreamInterface*>( stream )->read( buf, len ) ) );
 	}
 
 void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const

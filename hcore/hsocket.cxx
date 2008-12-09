@@ -367,7 +367,7 @@ int HSocket::get_client_count( void ) const
 	M_EPILOG
 	}
 
-HString const& HSocket::get_host_name ( void )
+HString const& HSocket::get_host_name( void )
 	{
 	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	M_PROLOG

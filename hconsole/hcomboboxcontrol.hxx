@@ -23,7 +23,7 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hconsole/hcomboboxcontrol.h
+/*! \file hconsole/hcomboboxcontrol.hxx
  * \brief Declaration of HComboboxControl class.
  */
 

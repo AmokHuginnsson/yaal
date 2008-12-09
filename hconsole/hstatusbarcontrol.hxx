@@ -23,7 +23,7 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hconsole/hstatusbarcontrol.h
+/*! \file hconsole/hstatusbarcontrol.hxx
  * \brief Declaration of HStatusBarControl class.
  */
 

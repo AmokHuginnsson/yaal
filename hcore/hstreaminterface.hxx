@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hpool.hxx"
 #include "hcore/hexception.hxx"
+#include "hcore/hpointer.hxx"
 
 namespace yaal
 {
@@ -61,6 +62,7 @@ public:
 		code_t code; /*!< return code for last read operation */
 		STATUS( void ) : octets( 0 ), code( D_OK ) {}
 		};
+	typedef HPointer<HStreamInterface> ptr_t;
 protected:
 	typedef yaal::hcore::HPool<char> cache_t;
 	cache_t f_oCache;

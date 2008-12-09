@@ -29,6 +29,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hlog.hxx"
+#include "hcore/hfile.hxx"
 #include "tools/hplugin.hxx"
 #include "hconsole/hmainwindow.hxx"
 #include "dbwrapper/db_driver_loader.hxx"
@@ -126,7 +127,7 @@ int HDataProcess::init_xrc( char const* a_pcProcessName,
 	HMainWindow* l_poMainWindow = NULL;
 	if ( ! dbwrapper::db_connect )
 		M_THROW( "no database driver loaded", errno );
-	f_oResource.load( a_pcResource );
+	f_oResource.load( HStreamInterface::ptr_t( new HFile( a_pcResource ) ) );
 	HXml::HNodeProxy const node = f_oResource.get_element_by_path( "/resource/menu" );
 	f_psRootMenu = build_sub_menu( node, a_roHandlers );
 	M_ASSERT( f_oForegroundWindow.is_valid() );

@@ -23,7 +23,7 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hsingleton.h
+/*! \file hcore/hsingleton.hxx
  * \brief Declaration of HSingleton related classes.
  *
  * HSingleton<>, HSingletonInterface, HAbstractDestructor, HDestructor<>, HLifeTimeTracker.

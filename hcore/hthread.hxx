@@ -23,7 +23,7 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hthread.h
+/*! \file hcore/hthread.hxx
  * \brief Declaration of threading related classes.
  *
  * HThread, HThreadT<>, HMutex, HLock, HSemaphore, HCondition.

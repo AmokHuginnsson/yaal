@@ -23,7 +23,7 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file tools/hxml.h
+/*! \file tools/hxml.hxx
  * \brief Declaration of XML related classes.
  *
  * HXml, HXml::HNodeProxy, HXml::HConstNodeProxy, HXml::HIterator, HXml::HConstIterator.
@@ -37,6 +37,7 @@ Copyright:
 #include "hcore/hlist.hxx"
 #include "hcore/htree.hxx"
 #include "hcore/hpointer.hxx"
+#include "hcore/hstreaminterface.hxx"
 
 namespace yaal
 {
@@ -75,14 +76,13 @@ public:
 	typedef tree_t::const_node_t const_xml_element_t;
 	HXml( void );
 	virtual ~HXml( void );
-	void init( yaal::hcore::HString const& );
+	void init( yaal::hcore::HStreamInterface::ptr_t );
 	void apply_style( yaal::hcore::HString const& );
 	void parse( yaal::hcore::HString = yaal::hcore::HString(), bool = true );
 	HNodeProxy get_root( void );
 	HConstNodeProxy const get_root( void ) const;
-	void load( yaal::hcore::HString const& );
-	void save( yaal::hcore::HString const& ) const;
-	void save( int const& ) const;
+	void load( yaal::hcore::HStreamInterface::ptr_t );
+	void save( yaal::hcore::HStreamInterface::ptr_t ) const;
 	void create_root( yaal::hcore::HString const&, yaal::hcore::HString const& = yaal::hcore::HString() );
 	void clear( void );
 	HNodeProxy get_element_by_id( yaal::hcore::HString const& );
@@ -90,6 +90,8 @@ public:
 	HNodeProxy get_element_by_path( yaal::hcore::HString const& );
 	HConstNodeProxy const get_element_by_path( yaal::hcore::HString const& ) const;
 private:
+	static int writer_callback( void*, char const*, int );
+	static int reader_callback( void*, char*, int );
 	void do_save( void ) const;
 	void parse( xml_node_ptr_t, tree_t::node_t, bool );
 	void dump_node( void*, HConstNodeProxy const& ) const;

@@ -166,8 +166,8 @@ public:
 	bool operator != ( hier_t const* const ) const;
 	tType const* operator->( void ) const;
 	tType* operator->( void );
-	tType const* raw ( void ) const;
-	tType* raw ( void );
+	tType const* raw( void ) const;
+	tType* raw( void );
 	bool operator! ( void ) const;
 	void swap( HPointer& );
 private:

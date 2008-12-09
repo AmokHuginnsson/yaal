@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-/*! \file hcore/base.h
+/*! \file hcore/base.hxx
  * \brief Basic declarations used across whole library.
  */
 
