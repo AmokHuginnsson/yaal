@@ -46,14 +46,28 @@ namespace hash
  * \param source - data source of data which sum is to ba calculated.
  * \return Calculated hash.
  */
-yaal::hcore::HString md5( yaal::hcore::HStreamInterface const& source );
+yaal::hcore::HString md5( yaal::hcore::HStreamInterface& source );
 
 /*! \brief Calculate md5 hash of data.
  *
  * \param source - data source of data which sum is to ba calculated.
  * \return Calculated hash.
  */
-yaal::hcore::HString sha1( yaal::hcore::HStreamInterface const& source );
+yaal::hcore::HString md5( yaal::hcore::HStreamInterface::ptr_t source );
+
+/*! \brief Calculate md5 hash of data.
+ *
+ * \param source - data source of data which sum is to ba calculated.
+ * \return Calculated hash.
+ */
+yaal::hcore::HString sha1( yaal::hcore::HStreamInterface& source );
+
+/*! \brief Calculate md5 hash of data.
+ *
+ * \param source - data source of data which sum is to ba calculated.
+ * \return Calculated hash.
+ */
+yaal::hcore::HString sha1( yaal::hcore::HStreamInterface::ptr_t source );
 
 }
 

@@ -45,8 +45,9 @@ namespace hash
 void change_endianess( u32_t*, int long );
 void update_md5_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
-yaal::hcore::HString md5( HStreamInterface const& stream )
+yaal::hcore::HString md5( HStreamInterface& stream )
 	{
+	M_PROLOG
 	static int const D_BLOCK_SIZE = 512;
 	static int const D_MESSAGE_LENGTH_SIZE = 64;
 	static int const D_SUPPLEMENT_SIZE = 1;
@@ -92,12 +93,21 @@ yaal::hcore::HString md5( HStreamInterface const& stream )
 	change_endianess( state, D_STATE_SIZE );
 	result.format( "%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
 	return ( result );
+	M_EPILOG
+	}
+
+yaal::hcore::HString md5( HStreamInterface::ptr_t stream )
+	{
+	M_PROLOG
+	return ( md5( *stream ) );
+	M_EPILOG
 	}
 
 void update_sha1_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
-yaal::hcore::HString sha1( HStreamInterface const& stream )
+yaal::hcore::HString sha1( HStreamInterface& stream )
 	{
+	M_PROLOG
 	static int const D_BLOCK_SIZE = 512;
 	static int const D_MESSAGE_LENGTH_SIZE = 64;
 	static int const D_SUPPLEMENT_SIZE = 1;
@@ -144,6 +154,14 @@ yaal::hcore::HString sha1( HStreamInterface const& stream )
 	HString result;
 	result.format( "%08x%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ] );
 	return ( result );
+	M_EPILOG
+	}
+
+yaal::hcore::HString sha1( HStreamInterface::ptr_t stream )
+	{
+	M_PROLOG
+	return ( sha1( *stream ) );
+	M_EPILOG
 	}
 
 void update_md5_state( u32_t* state, HStreamBlockIterator::HBlock const& block )

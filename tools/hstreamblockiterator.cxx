@@ -44,9 +44,9 @@ static int long const D_BUFFER_SIZE = yaal::power<2,20>::value;
 
 }
 
-HStreamBlockIterator::HStreamBlockIterator( HStreamInterface const& a_oStream, int long a_lSize )
+HStreamBlockIterator::HStreamBlockIterator( HStreamInterface& a_roStream, int long a_lSize )
 	: f_oBuffer( D_BUFFER_SIZE ), f_lIndex( 0 ), f_lSize( a_lSize ),
-	f_lBufferOffset( 0 ), f_lBufferSize( 0 ), f_oStream( a_oStream )
+	f_lBufferOffset( 0 ), f_lBufferSize( 0 ), f_roStream( a_roStream )
 	{
 	M_ASSERT( f_lSize > 0 );
 	if ( f_lSize > D_BUFFER_SIZE )
@@ -72,7 +72,7 @@ HStreamBlockIterator::HBlock HStreamBlockIterator::operator* ( void )
 	if ( ( firstOctet >= ( f_lBufferOffset + f_lBufferSize ) ) && ( ( f_lBufferSize == D_BUFFER_SIZE ) || ! f_lBufferSize ) )
 		{
 		f_lBufferOffset = firstOctet;
-		f_lBufferSize = const_cast<HStreamInterface&>( f_oStream ).read( f_oBuffer.raw(), D_BUFFER_SIZE );
+		f_lBufferSize = f_roStream.read( f_oBuffer.raw(), D_BUFFER_SIZE );
 		}
 	return ( HBlock( ( f_oBuffer.raw() + firstOctet ) - f_lBufferOffset, min( f_lBufferSize - ( firstOctet - f_lBufferOffset ), f_lSize ) ) );
 	M_EPILOG

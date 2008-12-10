@@ -76,12 +76,15 @@ public:
 	typedef tree_t::const_node_t const_xml_element_t;
 	HXml( void );
 	virtual ~HXml( void );
+	void init( yaal::hcore::HStreamInterface& );
 	void init( yaal::hcore::HStreamInterface::ptr_t );
 	void apply_style( yaal::hcore::HString const& );
 	void parse( yaal::hcore::HString = yaal::hcore::HString(), bool = true );
 	HNodeProxy get_root( void );
 	HConstNodeProxy const get_root( void ) const;
+	void load( yaal::hcore::HStreamInterface& );
 	void load( yaal::hcore::HStreamInterface::ptr_t );
+	void save( yaal::hcore::HStreamInterface& ) const;
 	void save( yaal::hcore::HStreamInterface::ptr_t ) const;
 	void create_root( yaal::hcore::HString const&, yaal::hcore::HString const& = yaal::hcore::HString() );
 	void clear( void );

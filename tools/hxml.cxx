@@ -348,15 +348,15 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& a_oPath )
 	M_EPILOG
 	}
 
-void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream )
+void HXml::init( yaal::hcore::HStreamInterface& stream )
 	{
 	M_PROLOG
 	int l_iSavedErrno = errno;
 	HString l_oError;
 	HXmlParserGlobal::get_instance();
 	errno = 0;
-	HString streamId = get_stream_id( stream.raw() );
-	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, stream.raw(), streamId.raw(), NULL,
+	HString streamId = get_stream_id( &stream );
+	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, streamId.raw(), NULL,
 				XML_PARSE_NOENT | XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_NSCLEAN ),
 			xmlFreeDoc );
 	if ( errno )
@@ -381,6 +381,14 @@ void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream )
 	(*f_oConvert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
 			root, streamId );
 	swap( f_poXml->f_oDoc, doc );
+	return;
+	M_EPILOG
+	}
+
+void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream )
+	{
+	M_PROLOG
+	init( *stream );
 	return;
 	M_EPILOG
 	}
@@ -484,7 +492,7 @@ void HXml::parse( HString a_oXPath, bool a_bStripEmpty )
 	M_EPILOG
 	}
 
-void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream )
+void HXml::load( yaal::hcore::HStreamInterface& stream )
 	{
 	M_PROLOG
 	init( stream );
@@ -493,7 +501,14 @@ void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream )
 	M_EPILOG
 	}
 
-void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream ) const
+void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream )
+	{
+	M_PROLOG
+	return ( load( *stream ) );
+	M_EPILOG
+	}
+
+void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 	{
 	M_PROLOG
 	doc_resource_t doc( NULL, xmlFreeDoc );
@@ -532,15 +547,23 @@ void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream ) const
 	if ( f_poXml->f_oStyle.get() )
 		{
 		outputbuffer_resource_t obuf( ::xmlOutputBufferCreateIO( writer_callback,
-							NULL, stream.raw(), ::xmlFindCharEncodingHandler( f_oEncoding.raw() ) ),
+							NULL, &stream, ::xmlFindCharEncodingHandler( f_oEncoding.raw() ) ),
 				xmlOutputBufferClose );
 		M_ENSURE( ::xsltSaveResultTo( obuf.get(),
 					f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get() ) != -1 );
 		}
 	else
 		M_ENSURE( ::xmlSaveFileTo( ::xmlOutputBufferCreateIO( writer_callback,
-						NULL, stream.raw(), ::xmlFindCharEncodingHandler( f_oEncoding.raw() ) ),
+						NULL, &stream, ::xmlFindCharEncodingHandler( f_oEncoding.raw() ) ),
 					f_poXml->f_oDoc.get(), f_oEncoding.raw() ) != -1 );
+	return;
+	M_EPILOG
+	}
+
+void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream ) const
+	{
+	M_PROLOG
+	save( *stream );
 	return;
 	M_EPILOG
 	}

@@ -84,14 +84,14 @@ private:
 	int long f_lSize; /*!< requested size of IO block */
 	int long f_lBufferOffset;
 	int long f_lBufferSize;
-	yaal::hcore::HStreamInterface const& f_oStream;
+	yaal::hcore::HStreamInterface& f_roStream;
 public:
 	/*! \brief Construct new block based stream reader.
 	 *
 	 * \param stream - data source stream.
 	 * \param size - size of IO block.
 	 */
-	HStreamBlockIterator( yaal::hcore::HStreamInterface const& stream, int long size );
+	HStreamBlockIterator( yaal::hcore::HStreamInterface& stream, int long size );
 	~HStreamBlockIterator( void );
 	HStreamBlockIterator& operator ++ ( void );
 	HBlock operator* ( void );
