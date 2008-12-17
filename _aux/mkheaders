@@ -16,6 +16,8 @@ for FILE in ${HDRS}; do
 	awk '/^#include "/ {match($0,"\"[a-z_./-]+"); printf "#include <yaal/%s>\n", substr($0,RSTART+1,RLENGTH-1) }; !/^#include "/' ${FILE} > ${DIR_HEADERS}/${FILE}
 done
 
+cp -f config.hxx ${DIR_HEADERS}/
+
 head -26 ${DIR_HEADERS}/hcore/base.hxx | sed -e s/bit/yaal/ > ${DIR_HEADERS}/yaal.hxx
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
@@ -24,17 +26,9 @@ cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
 EOF
 
-cat config.hxx >> ${DIR_HEADERS}/yaal.hxx
-cat << EOF >> ${DIR_HEADERS}/yaal.hxx
-#ifndef GET_YAAL_CONFIG
-
-EOF
-
 find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{printf "#include <%s>\n", substr ($1,match($1,"yaal"),255)}' | sort >> ${DIR_HEADERS}/yaal.hxx
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
-
-#endif /* not GET_YAAL_CONFIG */
 
 #endif /* not YAAL_HXX_INCLUDED */
 
