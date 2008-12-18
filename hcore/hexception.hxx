@@ -212,42 +212,42 @@ typedef struct { char x[2]; } NO;
 template<int const, typename>
 struct existing_hier;
 
-/*! \brief Get parent hierarchy is one exists, predefined value otherwise.
+/*! \brief Get superclass in hierarchy if one exists, predefined value otherwise.
  */
 template<typename tType>
 struct context_hier
 	{
-	template<typename T>
-	static YES has_hier( typename T::hier_t* );
-	template<typename T>
+	template<typename real_class>
+	static YES has_hier( typename real_class::hier_t* );
+	template<typename real_class>
 	static NO has_hier( ... );
 	typedef typename existing_hier<sizeof ( has_hier<tType>( 0 ) ), tType>::type type;
 	};
 
-/*! \brief Get type of existing parent (in hierarchy) of a type.
+/*! \brief Get type of existing superclass (in hierarchy) of a type.
  *
- * \tparam T - child type in hierarchy.
- * \retval type - parent in hierarchy.
+ * \tparam subclass - subclass type in hierarchy.
+ * \retval type - superclass in hierarchy.
  */
-template<typename T>
-struct existing_hier<1, T>
+template<typename subclass_t>
+struct existing_hier<1, subclass_t>
 	{
 	/*! \brief Meta-function, get typedef from protected section of a type.
 	 *
-	 * \tparam Q - type to infiltrate.
-	 * \retval type - parent in hierarchy.
+	 * \tparam hermetic - type to infiltrate.
+	 * \retval type - superclass in hierarchy.
 	 */
-	template<typename Q>
-	struct get_protected_typedef : public Q
+	template<typename hermetic>
+	struct get_protected_typedef : public hermetic
 		{
-		typedef typename Q::hier_t type;
+		typedef typename hermetic::hier_t type;
 		};
-	typedef typename get_protected_typedef<T>::type type;
+	typedef typename get_protected_typedef<subclass_t>::type type;
 	};
 
 /*! \cond */
-template<typename T>
-struct existing_hier<2, T>
+template<typename subclass>
+struct existing_hier<2, subclass>
 	{
 	typedef hier_t type;
 	};
