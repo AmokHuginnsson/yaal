@@ -27,7 +27,7 @@ Copyright:
 #ifndef YAAL_TOOLS_HPROCESS_HXX_INCLUDED
 #define YAAL_TOOLS_HPROCESS_HXX_INCLUDED
 
-#include <sys/time.h> /* timeval */
+#include <time.h> /* timeval */
 #include <sys/types.h>
 
 #include "hcore/hhashmap.hxx"
