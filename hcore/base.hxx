@@ -176,7 +176,7 @@ struct binder1st : public unary_function<typename operation_t::result_t, typenam
 	};
 
 template<typename iterator_t, typename call_t>
-void for_each( iterator_t it, iterator_t const& end, call_t& CALL )
+void for_each( iterator_t it, iterator_t const& end, call_t CALL )
 	{
 	for ( ; it != end; ++ it )
 		CALL( *it );
@@ -347,7 +347,35 @@ struct copy_const<source const, destination>
 	};
 /*! \endcond */
 
+/*! \brief A reference type wrapper.
+ * 
+ * Pass arguments by reference instead of by value with this trait.
+ *
+ * \tparam basic_t - type to be wrapper as reference.
+ */
+template<typename basic_t>
+class reference
+	{
+	basic_t* _ref;
+public:
+	explicit reference( basic_t& obj ) : _ref( &obj ) {}
+	operator basic_t& ( void ) const
+		{ return ( *_ref ); }
+	};
+
 }
+
+template<typename basic_t>
+trait::reference<basic_t> ref( basic_t& obj )
+	{
+	return ( trait::reference<basic_t>( obj ) );
+	}
+
+template<typename basic_t>
+trait::reference<basic_t const> cref( basic_t const& obj )
+	{
+	return ( trait::reference<basic_t const>( obj ) );
+	}
 
 /*! \brief Simulate binary literal.
  *

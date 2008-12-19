@@ -225,7 +225,7 @@ HTree<tType>::HNode::~HNode( void )
 		static void deleter( HNode*& node )
 			{ delete node; }
 		};
-	for_each( f_oBranch.begin(), f_oBranch.end(), tool::deleter );
+	for_each( f_oBranch.begin(), f_oBranch.end(), cref( tool::deleter ) );
 	return;
 	M_EPILOG
 	}

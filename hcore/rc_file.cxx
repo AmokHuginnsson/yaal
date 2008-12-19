@@ -304,7 +304,7 @@ int reload_configuration( void )
 	M_PROLOG
 	HLocker lock( n_bRCLoadersLocked );
 	log << "Reloading configuration." << endl;
-	for_each( n_oRCLoades.begin(), n_oRCLoades.end(), process_loader );
+	for_each( n_oRCLoades.begin(), n_oRCLoades.end(), cref( process_loader ) );
 	return ( 0 );
 	M_EPILOG
 	}

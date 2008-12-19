@@ -79,7 +79,9 @@ public:
 	int long size( void ) const
 		{ return ( f_oEngine.size() );	}
 	bool empty( void ) const
-		{ return ( f_oEngine.empty() );	}
+		{ return ( f_oEngine.is_empty() );	}
+	bool is_empty( void ) const
+		{ return ( f_oEngine.is_empty() );	}
 	HIterator insert( tType const& e )
 		{	return ( HIterator( f_oEngine.insert<tType, helper_t>( e ) ) );	}
 	void remove( tType const& e )

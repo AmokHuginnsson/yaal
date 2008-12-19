@@ -27,6 +27,7 @@ Copyright:
 #ifndef YAAL_TOOLS_UTIL_HXX_INCLUDED
 #define YAAL_TOOLS_UTIL_HXX_INCLUDED
 
+#include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/ooption.hxx"
 
@@ -40,6 +41,14 @@ namespace tools
  */
 namespace util
 	{
+
+template<typename iter_t, typename pred_t>
+iter_t find_local( iter_t it, iter_t end, pred_t pred )
+	{
+	for ( ; it != end; ++ it )
+		pred( it );
+	return ( pred() );
+	}
 
 yaal::hcore::HString kwota_slownie( double );
 void usun_ogonki( char* );
@@ -89,6 +98,41 @@ namespace distance
  * \return calculated Levenshtein(-Damerau) distance between strings.
  */
 int levenshtein_damerau( yaal::hcore::HString const& first, yaal::hcore::HString const& second, bool damerau = true );
+
+/*! \brief Predicate for find_local algorithm.
+ *
+ * HAlike looks for most string similiar to a given string.
+ *
+ * \tparam iter_t - type of an iterator that will be used to traverse collection.
+ * \tparam item_t - type of iterm to look for.
+ */
+template<typename iter_t, typename item_t>
+class HAlike 
+	{
+	item_t const& _item;
+	iter_t _iter;
+	int long _best;
+	bool _damerau;
+public:
+	HAlike( iter_t it, item_t const& item, bool damerau = true ) : _item( item ), _iter( it ), _best( LONG_MAX ), _damerau( damerau ) {}
+	void operator()( iter_t it )
+		{
+		int long dist = levenshtein_damerau( _item, *it, _damerau );
+		if ( dist < _best )
+			{
+			_best = dist;
+			_iter = it;
+			}
+		}
+	iter_t operator()( void )
+		{ return ( _iter ); }
+	};
+
+template<typename iter_t, typename item_t>
+HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, bool damerau = true )
+	{
+	return ( HAlike<iter_t, item_t>( iter, item, damerau ) );
+	}
 
 }
 
