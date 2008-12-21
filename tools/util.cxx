@@ -585,8 +585,8 @@ int sleep_real( timeval& a_xTime, bool a_bIgnoreInterrrupt )
 int milisecond( int a_iQuantity, bool a_bIgnoreInterrrupt )
 	{
 	timeval wait;
-	wait.tv_sec = 0;
-	wait.tv_usec = a_iQuantity * 1000;
+	wait.tv_sec = a_iQuantity / 1000;
+	wait.tv_usec = ( a_iQuantity %  1000 ) * 1000;
 	return ( sleep_real( wait, a_bIgnoreInterrrupt ) );
 	}
 
