@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file tools/util.hxx
+ * \brief Simple single function utilities.
+ */
 
 #ifndef YAAL_TOOLS_UTIL_HXX_INCLUDED
 #define YAAL_TOOLS_UTIL_HXX_INCLUDED
@@ -101,10 +104,10 @@ int levenshtein_damerau( yaal::hcore::HString const& first, yaal::hcore::HString
 
 /*! \brief Predicate for find_local algorithm.
  *
- * HAlike looks for most string similiar to a given string.
+ * HAlike looks for string most similiar to a given string.
  *
  * \tparam iter_t - type of an iterator that will be used to traverse collection.
- * \tparam item_t - type of iterm to look for.
+ * \tparam item_t - type of item to look for.
  */
 template<typename iter_t, typename item_t>
 class HAlike 
