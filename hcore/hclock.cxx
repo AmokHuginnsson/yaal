@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hclock.cxx
+ * \brief Implementation of HClock class.
+ */
 
 #include <ctime>
 
@@ -38,14 +41,17 @@ namespace hcore
 
 HClock::HClock( void ) : f_lMoment()
 	{
+	M_PROLOG
 	timespec l_sTime;
-	clock_gettime( CLOCK_REALTIME, &l_sTime );
+	M_ENSURE( clock_gettime( CLOCK_REALTIME, &l_sTime ) == 0 );
 	f_lMoment[ UNIT::D_SECOND ] = l_sTime.tv_sec;
 	f_lMoment[ UNIT::D_NANOSECOND ] = l_sTime.tv_nsec;
+	M_EPILOG
 	}
 
 int long HClock::get_time_elapsed( UNIT::unit_t const& unit, bool const& reset ) const
 	{
+	M_PROLOG
 	static int long const D_NANO_IN_WHOLE = power<10, 9>::value;
 	static int long const D_MICRO_IN_WHOLE = power<10, 6>::value;
 	static int long const D_NANO_IN_MILI = power<10, 6>::value;
@@ -53,16 +59,15 @@ int long HClock::get_time_elapsed( UNIT::unit_t const& unit, bool const& reset )
 	static int long const D_NANO_IN_MICRO = power<10, 3>::value;
 	timespec l_sTime;
 	timespec l_sReset;
-	clock_gettime( CLOCK_REALTIME, &l_sTime );
-	::memcpy( &l_sReset, &l_sTime, sizeof ( l_sReset ) );
-	l_sTime.tv_sec -= f_lMoment[ UNIT::D_SECOND ];
-	if ( l_sTime.tv_nsec < f_lMoment[ UNIT::D_NANOSECOND ] )
+	M_ENSURE( clock_gettime( CLOCK_REALTIME, &l_sReset ) == 0 );
+	l_sTime.tv_sec = l_sReset.tv_sec - f_lMoment[ UNIT::D_SECOND ];
+	if ( l_sReset.tv_nsec < f_lMoment[ UNIT::D_NANOSECOND ] )
 		{
 		-- l_sTime.tv_sec;
-		l_sTime.tv_nsec = D_NANO_IN_WHOLE - l_sTime.tv_nsec;
+		l_sTime.tv_nsec = D_NANO_IN_WHOLE - ( f_lMoment[ UNIT::D_NANOSECOND ] - l_sReset.tv_nsec );
 		}
 	else
-		l_sTime.tv_nsec -= f_lMoment[ UNIT::D_NANOSECOND ];
+		l_sTime.tv_nsec = l_sReset.tv_nsec - f_lMoment[ UNIT::D_NANOSECOND ];
 	int long elapsed = 0;
 	switch ( unit )
 		{
@@ -78,6 +83,7 @@ int long HClock::get_time_elapsed( UNIT::unit_t const& unit, bool const& reset )
 		f_lMoment[ UNIT::D_NANOSECOND ] = l_sReset.tv_nsec;
 		}
 	return ( elapsed );
+	M_EPILOG
 	}
 
 }

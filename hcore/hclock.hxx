@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hclock.hxx
+ * \brief Declaration of HClock class.
+ */
 
 #ifndef HCLOCK_HXX_INCLUDED
 #define HCLOCK_HXX_INCLUDED
