@@ -102,6 +102,13 @@ private:
 
 typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
 
+/*! \brief Iterator adaptor for streams.
+ *
+ * This helper may be useful in algorithms.
+ *
+ * \tparam stream_t - type of stream wrapped by this iterator.
+ * \tparam delim_t - type of optional delimiter separating each iteration.
+ */
 template<typename stream_t, typename delim_t>
 class HStreamIterator
 	{
