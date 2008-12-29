@@ -102,6 +102,33 @@ private:
 
 typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
 
+template<typename stream_t, typename delim_t>
+class HStreamIterator
+	{
+	stream_t& _stream;
+	delim_t _delim;
+public:
+	explicit HStreamIterator( stream_t& stream, delim_t const& delim = delim_t() ) : _stream( stream ), _delim( delim ) {}
+	HStreamIterator& operator* ( void )
+		{ return ( *this ); }
+	template<typename item_t>
+	HStreamIterator& operator = ( item_t const& item )
+		{
+		_stream << item << _delim;
+		return ( *this );
+		}
+	HStreamIterator& operator ++ ( void )
+		{ return ( *this ); }
+	};
+
+template<typename stream_t, typename delim_t>
+HStreamIterator<stream_t, delim_t> stream_iterator( stream_t& stream, delim_t const& delim )
+	{ return ( HStreamIterator<stream_t, delim_t>( stream, delim ) ); }
+
+template<typename stream_t>
+HStreamIterator<stream_t, char const*> stream_iterator( stream_t& stream )
+	{ return ( HStreamIterator<stream_t, char const*>( stream, "" ) ); }
+
 }
 
 }
