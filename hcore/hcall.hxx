@@ -51,10 +51,18 @@ public:
 	class HPseudoType {};
 	typedef yaal::hcore::HPointer<HCallInterface> ptr_t;
 	virtual ~HCallInterface( void ) {}
-	virtual void invoke( void ) = 0;
-	virtual void invoke( void ) const = 0;
-	virtual void operator()( void ) = 0;
-	virtual void const* id( void ) = 0;
+	void operator()( void )
+		{ invoke(); }
+	void invoke( void )
+		{ do_invoke(); }
+	void invoke( void ) const
+		{ do_invoke(); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual void do_invoke( void ) = 0;
+	virtual void do_invoke( void ) const = 0;
+	virtual void const* do_id( void ) const = 0;
 	};
 
 /*! \brief Make a functor from any standalone function.
@@ -112,6 +120,19 @@ public:
 		{ call(); }
 	};
 
+template<typename CLASS_t, typename METHOD_t>
+class HCallBase : public HCallInterface
+	{
+protected:
+	CLASS_t f_oObject;
+	METHOD_t METHOD;
+public:
+	HCallBase( CLASS_t obj, METHOD_t A_METHOD ) : f_oObject( obj ), METHOD( A_METHOD ) {}
+protected:
+	virtual void const* do_id( void ) const
+		{ return ( &f_oObject ); }
+	};
+
 /*! \brief Implementation of abstration of any-method of any-class invocation.
  *
  * \tparam CLASS_t - class on which this invocation will operate.
@@ -131,11 +152,310 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a7_t = HCallInterface::HPseudoType,
 	typename a8_t = HCallInterface::HPseudoType,
 	typename a9_t = HCallInterface::HPseudoType>
-class HCall : public HCallInterface
+class HCall;
+
+template<typename CLASS_t, typename METHOD_t>
+class HCall<CLASS_t, METHOD_t,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
 	{
-	typedef HCallInterface::HPseudoType* __;
-	CLASS_t f_oObiect;
-	METHOD_t METHOD;
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD )
+		: base_t( obj, A_METHOD ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)(); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)(); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t>
+class HCall<CLASS_t, METHOD_t,
+	a0_t,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
+	a0_t f_xArg0;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0 ); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t, typename a1_t>
+class HCall<CLASS_t, METHOD_t,
+	a0_t, a1_t,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
+	a0_t f_xArg0;
+	a1_t f_xArg1;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0, a1_t a1 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ), f_xArg1( a1 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1 ); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t, typename a1_t, typename a2_t>
+class HCall<CLASS_t, METHOD_t,
+	a0_t, a1_t, a2_t,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
+	a0_t f_xArg0;
+	a1_t f_xArg1;
+	a2_t f_xArg2;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0, a1_t a1,
+			a2_t a2 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2 ); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+class HCall<CLASS_t, METHOD_t,
+	a0_t, a1_t, a2_t, a3_t,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
+	a0_t f_xArg0;
+	a1_t f_xArg1;
+	a2_t f_xArg2;
+	a3_t f_xArg3;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3 ); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t>
+class HCall<CLASS_t, METHOD_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
+	a0_t f_xArg0;
+	a1_t f_xArg1;
+	a2_t f_xArg2;
+	a3_t f_xArg3;
+	a4_t f_xArg4;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4 ); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t>
+class HCall<CLASS_t, METHOD_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
+	a0_t f_xArg0;
+	a1_t f_xArg1;
+	a2_t f_xArg2;
+	a3_t f_xArg3;
+	a4_t f_xArg4;
+	a5_t f_xArg5;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
+		f_xArg5( a5 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5 ); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t>
+class HCall<CLASS_t, METHOD_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
+	a0_t f_xArg0;
+	a1_t f_xArg1;
+	a2_t f_xArg2;
+	a3_t f_xArg3;
+	a4_t f_xArg4;
+	a5_t f_xArg5;
+	a6_t f_xArg6;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
+		f_xArg5( a5 ), f_xArg6( a6 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6 ); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+class HCall<CLASS_t, METHOD_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+	HCallInterface::HPseudoType,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
+	a0_t f_xArg0;
+	a1_t f_xArg1;
+	a2_t f_xArg2;
+	a3_t f_xArg3;
+	a4_t f_xArg4;
+	a5_t f_xArg5;
+	a6_t f_xArg6;
+	a7_t f_xArg7;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
+		f_xArg5( a5 ), f_xArg6( a6 ), f_xArg7( a7 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7 ); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t>
+class HCall<CLASS_t, METHOD_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
+	a0_t f_xArg0;
+	a1_t f_xArg1;
+	a2_t f_xArg2;
+	a3_t f_xArg3;
+	a4_t f_xArg4;
+	a5_t f_xArg5;
+	a6_t f_xArg6;
+	a7_t f_xArg7;
+	a8_t f_xArg8;
+public:
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
+			a8_t a8 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
+		f_xArg5( a5 ), f_xArg6( a6 ), f_xArg7( a7 ), f_xArg8( a8 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8 ); }
+	};
+
+template<typename CLASS_t, typename METHOD_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t>
+class HCall : public HCallBase<CLASS_t, METHOD_t>
+	{
+	typedef HCallBase<CLASS_t, METHOD_t> base_t;
+protected:
 	a0_t f_xArg0;
 	a1_t f_xArg1;
 	a2_t f_xArg2;
@@ -147,145 +467,18 @@ class HCall : public HCallInterface
 	a8_t f_xArg8;
 	a9_t f_xArg9;
 public:
-	HCall(
-			CLASS_t, METHOD_t,
-			a0_t = a0_t(), a1_t = a1_t(), a2_t = a2_t(), a3_t = a3_t(),
-			a4_t = a4_t(), a5_t = a5_t(), a6_t = a6_t(), a7_t = a7_t(),
-			a8_t = a8_t(), a9_t = a9_t()
-			);
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, a6_t const*, a7_t const*, a8_t const*, a9_t const* )
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, a6_t const*, a7_t const*, a8_t const*, a9_t const* ) const
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, a6_t const*, a7_t const*, a8_t const*, __ )
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6, f_xArg7, f_xArg8 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, a6_t const*, a7_t const*, a8_t const*, __ ) const
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6, f_xArg7, f_xArg8 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, a6_t const*, a7_t const*, __, __ )
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6, f_xArg7 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, a6_t const*, a7_t const*, __, __ ) const
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6, f_xArg7 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, a6_t const*, __, __, __ )
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, a6_t const*, __, __, __ ) const
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5, f_xArg6 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, __, __, __, __ )
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			a5_t const*, __, __, __, __ ) const
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4,
-				f_xArg5 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			__, __, __, __, __ )
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4 ); }
-	void invoke( 
-			a0_t const*, a1_t const*, a2_t const*, a3_t const*, a4_t const*,
-			__, __, __, __, __ ) const
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4 ); }
-	void invoke( a0_t const*, a1_t const*, a2_t const*, a3_t const*, __,
-			__, __, __, __, __ )
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3 ); }
-	void invoke( a0_t const*, a1_t const*, a2_t const*, a3_t const*, __,
-			__, __, __, __, __ ) const
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3 ); }
-	void invoke( a0_t const*, a1_t const*, a2_t const*, __, __, __, __,
-			__, __, __ )
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2 ); }
-	void invoke( a0_t const*, a1_t const*, a2_t const*, __, __, __, __,
-			__, __, __ ) const
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1, f_xArg2 ); }
-	void invoke( a0_t const*, a1_t const*, __, __, __, __, __, __, __, __ )
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1 ); }
-	void invoke( a0_t const*, a1_t const*, __, __, __, __, __, __, __, __ ) const
-		{ (f_oObiect.*METHOD)( f_xArg0, f_xArg1 ); }
-	void invoke( a0_t const*, __, __, __, __, __, __, __, __, __ )
-		{ (f_oObiect.*METHOD)( f_xArg0 ); }
-	void invoke( a0_t const*, __, __, __, __, __, __, __, __, __ ) const
-		{ (f_oObiect.*METHOD)( f_xArg0 ); }
-	void invoke( __, __, __, __, __, __, __, __, __, __ )
-		{ (f_oObiect.*METHOD)(); }
-	void invoke( __, __, __, __, __, __, __, __, __, __ ) const
-		{ (f_oObiect.*METHOD)(); }
-	virtual void invoke( void )
-		{
-		invoke(
-				static_cast<a0_t*>( NULL ),
-				static_cast<a1_t*>( NULL ),
-				static_cast<a2_t*>( NULL ),
-				static_cast<a3_t*>( NULL ),
-				static_cast<a4_t*>( NULL ),
-				static_cast<a5_t*>( NULL ),
-				static_cast<a6_t*>( NULL ),
-				static_cast<a7_t*>( NULL ),
-				static_cast<a8_t*>( NULL ),
-				static_cast<a9_t*>( NULL ) );
-		}
-	virtual void invoke( void ) const
-		{
-		invoke(
-				static_cast<a0_t*>( NULL ),
-				static_cast<a1_t*>( NULL ),
-				static_cast<a2_t*>( NULL ),
-				static_cast<a3_t*>( NULL ),
-				static_cast<a4_t*>( NULL ),
-				static_cast<a5_t*>( NULL ),
-				static_cast<a6_t*>( NULL ),
-				static_cast<a7_t*>( NULL ),
-				static_cast<a8_t*>( NULL ),
-				static_cast<a9_t*>( NULL ) );
-		}
-	virtual void operator()( void )
-		{ invoke(); }
-	virtual void const* id( void )
-		{ return ( &f_oObiect ); }
+	HCall( CLASS_t obj, METHOD_t A_METHOD, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
+			a8_t a8, a9_t a9 )
+		: base_t( obj, A_METHOD ),
+		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
+		f_xArg5( a5 ), f_xArg6( a6 ), f_xArg7( a7 ), f_xArg8( a8 ), f_xArg9( a9 ) {}
+protected:
+	virtual void do_invoke( void )
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 ); }
+	virtual void do_invoke( void ) const
+		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 ); }
 	};
-
-template<typename CLASS_t, typename METHOD_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t, typename a9_t>
-HCall<CLASS_t, METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::HCall(
-			CLASS_t a_oObject, METHOD_t A_METHOD,
-			a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3,
-			a4_t a4, a5_t a5,
-			a6_t a6, a7_t a7,
-			a8_t a8, a9_t a9
-			) : f_oObiect( a_oObject ), METHOD( A_METHOD ),
-	f_xArg0( a0 ), f_xArg1( a1 ),
-	f_xArg2( a2 ), f_xArg3( a3 ),
-	f_xArg4( a4 ), f_xArg5( a5 ),
-	f_xArg6( a6 ), f_xArg7( a7 ),
-	f_xArg8( a8 ), f_xArg9( a9 ) {}
 
 }
 
