@@ -120,6 +120,8 @@ public:
 		{ call(); }
 	};
 
+/*! \brief Base class for HCall<1..10>.
+ */
 template<typename CLASS_t, typename METHOD_t>
 class HCallBase : public HCallInterface
 	{
@@ -133,14 +135,6 @@ protected:
 		{ return ( &f_oObject ); }
 	};
 
-/*! \brief Implementation of abstration of any-method of any-class invocation.
- *
- * \tparam CLASS_t - class on which this invocation will operate.
- * \tparam METHOD_t - method of given class CLASS_t that shall be invoked.
- * \tparam a0_t - first argument to given METHOD_t of CLASS_t.
- * \tparam a1_t - second argument to given METHOD_t of CLASS_t.
- * \tparam aN_t - N-th argument to given METHOD_t of CLASS_t.
- */
 template<typename CLASS_t, typename METHOD_t,
 	typename a0_t = HCallInterface::HPseudoType,
 	typename a1_t = HCallInterface::HPseudoType,
@@ -154,6 +148,7 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a9_t = HCallInterface::HPseudoType>
 class HCall;
 
+/*! \cond */
 template<typename CLASS_t, typename METHOD_t>
 class HCall<CLASS_t, METHOD_t,
 	HCallInterface::HPseudoType,
@@ -447,7 +442,16 @@ protected:
 	virtual void do_invoke( void ) const
 		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8 ); }
 	};
+/*! \endcond */
 
+/*! \brief Implementation of abstration of any-method of any-class invocation.
+ *
+ * \tparam CLASS_t - class on which this invocation will operate.
+ * \tparam METHOD_t - method of given class CLASS_t that shall be invoked.
+ * \tparam a0_t - first argument to given METHOD_t of CLASS_t.
+ * \tparam a1_t - second argument to given METHOD_t of CLASS_t.
+ * \tparam aN_t - N-th argument to given METHOD_t of CLASS_t.
+ */
 template<typename CLASS_t, typename METHOD_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
