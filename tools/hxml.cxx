@@ -1198,6 +1198,49 @@ HXml::HConstNodeProxy const HXml::get_element_by_path( yaal::hcore::HString cons
 	M_EPILOG
 	}
 
+namespace xml
+{
+
+char const* node_val( HXml::HConstNodeProxy const& node )
+	{
+	M_PROLOG
+	HXml::HConstIterator it = node.begin();
+	char const* t = "";
+	if ( it != node.end() )
+		{
+		if ( (*it).get_type() == HXml::HNode::TYPE::D_CONTENT )
+			t = (*it).get_value().raw();
+		}
+	return ( t );
+	M_EPILOG
+	}
+
+char const* node_val( HXml::HConstIterator const& it )
+	{
+	M_PROLOG
+	return ( node_val( *it ) );
+	M_EPILOG
+	}
+
+char const* attr_val( HXml::HConstNodeProxy const& node, char const* const name )
+	{
+	M_PROLOG
+	HXml::HNode::properties_t const& props = node.properties();
+	HXml::HNode::properties_t::const_iterator prop = props.find( name );
+	M_ENSURE( prop != props.end() );
+	return ( prop->second.raw() );
+	M_EPILOG
+	}
+
+char const* attr_val( HXml::HConstIterator const& it, char const* const name )
+	{
+	M_PROLOG
+	return ( attr_val( *it, name ) );
+	M_EPILOG
+	}
+
+}
+
 }
 
 }

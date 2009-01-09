@@ -320,6 +320,18 @@ private:
 
 typedef yaal::hcore::HExceptionT<HXml> HXmlException;
 
+/*! \brief HXml related convenience and helper functions.
+ */
+namespace xml
+{
+
+char const* node_val( HXml::HConstNodeProxy const& node );
+char const* node_val( HXml::HConstIterator const& it );
+char const* attr_val( HXml::HConstNodeProxy const& node, char const* const name );
+char const* attr_val( HXml::HConstIterator const& it, char const* const name );
+
+}
+
 }
 
 }

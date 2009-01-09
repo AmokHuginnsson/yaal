@@ -50,49 +50,6 @@ namespace hdata
 
 static int const D_MENU_HANDLERS_MAP_SIZE = 32;
 
-namespace
-{
-
-char const* node_val( HXml::HConstNodeProxy const& node )
-	{
-	M_PROLOG
-	HXml::HConstIterator it = node.begin();
-	char const* t = "";
-	if ( it != node.end() )
-		{
-		if ( (*it).get_type() == HXml::HNode::TYPE::D_CONTENT )
-			t = (*it).get_value().raw();
-		}
-	return ( t );
-	M_EPILOG
-	}
-
-char const* node_val( HXml::HConstIterator const& it )
-	{
-	M_PROLOG
-	return ( node_val( *it ) );
-	M_EPILOG
-	}
-
-char const* attr_val( HXml::HConstNodeProxy const& node, char const* const name )
-	{
-	M_PROLOG
-	HXml::HNode::properties_t const& props = node.properties();
-	HXml::HNode::properties_t::const_iterator prop = props.find( name );
-	M_ENSURE( prop != props.end() );
-	return ( prop->second.raw() );
-	M_EPILOG
-	}
-
-char const* attr_val( HXml::HConstIterator const& it, char const* const name )
-	{
-	M_PROLOG
-	return ( attr_val( *it, name ) );
-	M_EPILOG
-	}
-
-}
-
 HDataProcess::HDataProcess( void )
 	: HTUIProcess(), f_oDataBase( HDataBase::get_connector() ),
 	f_oAutoHandlers( D_MENU_HANDLERS_MAP_SIZE ),
@@ -367,16 +324,16 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 			M_ENSURE( (*attr).get_type() == HXml::HNode::TYPE::D_NODE );
 			HString const attrName = (*attr).get_name();
 			if ( attrName == "label" )
-				r[ i ].f_pcLabel = node_val( attr );
+				r[ i ].f_pcLabel = xml::node_val( attr );
 			else if ( attrName == "db" )
 				{
 				M_ENSURE( r[ i ].f_eRole == DATACONTROL_BITS::ROLE::D_MAIN );
 				HXml::HNode::properties_t const& db = (*attr).properties();
 				HXml::HNode::properties_t::const_iterator filterIt = db.find( "filter" );
 				HXml::HNode::properties_t::const_iterator sortIt = db.find( "sort" );
-				r[ i ].f_pcTable = attr_val( attr, "table" ); 
-				r[ i ].f_pcColumns = attr_val( attr, "column" );
-				r[ i ].f_pcId = attr_val( attr, "id_column" );
+				r[ i ].f_pcTable = xml::attr_val( attr, "table" ); 
+				r[ i ].f_pcColumns = xml::attr_val( attr, "column" );
+				r[ i ].f_pcId = xml::attr_val( attr, "id_column" );
 				if ( filterIt != db.end() )
 					r[ i ].f_pcFilter = filterIt->second.raw();
 				if ( sortIt != db.end() )
@@ -384,14 +341,14 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 				}
 			else if ( attrName == "position" )
 				{
-				r[ i ].f_iRow = lexical_cast<int>( attr_val( attr, "row" ) );
-				r[ i ].f_iColumn = lexical_cast<int>( attr_val( attr, "column" ) );
-				r[ i ].f_iHeight = lexical_cast<int>( attr_val( attr, "height" ) );
-				r[ i ].f_iWidth = lexical_cast<int>( attr_val( attr, "width" ) );
+				r[ i ].f_iRow = lexical_cast<int>( xml::attr_val( attr, "row" ) );
+				r[ i ].f_iColumn = lexical_cast<int>( xml::attr_val( attr, "column" ) );
+				r[ i ].f_iHeight = lexical_cast<int>( xml::attr_val( attr, "height" ) );
+				r[ i ].f_iWidth = lexical_cast<int>( xml::attr_val( attr, "width" ) );
 				}
 			else if ( attrName == "parent" )
 				{
-				i2s[ i ] = attr_val( attr, "refid" );
+				i2s[ i ] = xml::attr_val( attr, "refid" );
 				}
 			else if ( r[ i ].f_eType == DATACONTROL_BITS::TYPE::D_LIST )
 				{
@@ -406,9 +363,9 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 						using yaal::swap;
 						swap( f_oColumnCache.tail(), c );
 						}
-					r[ i ].f_psColumnInfo[ columnNo ].f_iPlacement = lexical_cast<int>( attr_val( attr, "placement" ) );
-					r[ i ].f_psColumnInfo[ columnNo ].f_pcName = attr_val( attr, "name" );
-					r[ i ].f_psColumnInfo[ columnNo ].f_iWidth = lexical_cast<int>( attr_val( attr, "width" ) );
+					r[ i ].f_psColumnInfo[ columnNo ].f_iPlacement = lexical_cast<int>( xml::attr_val( attr, "placement" ) );
+					r[ i ].f_psColumnInfo[ columnNo ].f_pcName = xml::attr_val( attr, "name" );
+					r[ i ].f_psColumnInfo[ columnNo ].f_iWidth = lexical_cast<int>( xml::attr_val( attr, "width" ) );
 					HXml::HNode::properties_t const& col = (*attr).properties();
 					HXml::HNode::properties_t::const_iterator alignIt = col.find( "align" );
 					HXml::HNode::properties_t::const_iterator colTypeIt = col.find( "type" );
@@ -428,15 +385,15 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 					++ columnNo;
 					}
 				else if ( attrName == "checkable" )
-					l->f_bCheckable = lexical_cast<bool>( node_val( attr ) );
+					l->f_bCheckable = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "sortable" )
-					l->f_bSortable = lexical_cast<bool>( node_val( attr ) );
+					l->f_bSortable = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "searchable" )
-					l->f_bSearchable = lexical_cast<bool>( node_val( attr ) );
+					l->f_bSearchable = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "editable" )
-					l->f_bEditable = lexical_cast<bool>( node_val( attr ) );
+					l->f_bEditable = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "draw_header" )
-					l->f_bDrawHeader = lexical_cast<bool>( node_val( attr ) );
+					l->f_bDrawHeader = lexical_cast<bool>( xml::node_val( attr ) );
 				else
 					M_THROW( _( "unknown list attribute name" ), i );
 				}
@@ -444,23 +401,23 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 				{
 				OEditControlResource* e = static_cast<OEditControlResource*>( r[ i ].f_pvTypeSpecific );
 				if ( attrName == "max_string_size" )
-					e->f_iMaxStringSize = lexical_cast<int>( node_val( attr ) );
+					e->f_iMaxStringSize = lexical_cast<int>( xml::node_val( attr ) );
 				else if ( attrName == "value" )
-					e->f_pcValue = node_val( attr );
+					e->f_pcValue = xml::node_val( attr );
 				else if ( attrName == "mask" )
-					e->f_pcMask = node_val( attr );
+					e->f_pcMask = xml::node_val( attr );
 				else if ( attrName == "replace" )
-					e->f_bReplace = lexical_cast<bool>( node_val( attr ) );
+					e->f_bReplace = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "multi_line" )
-					e->f_bMultiLine = lexical_cast<bool>( node_val( attr ) );
+					e->f_bMultiLine = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "read_only" )
-					e->f_bReadOnly = lexical_cast<bool>( node_val( attr ) );
+					e->f_bReadOnly = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "right_aligned" )
-					e->f_bRightAligned = lexical_cast<bool>( node_val( attr ) );
+					e->f_bRightAligned = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "password" )
-					e->f_bPassword = lexical_cast<bool>( node_val( attr ) );
+					e->f_bPassword = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "max_history_level" )
-					e->f_iMaxHistoryLevel = lexical_cast<int>( node_val( attr ) );
+					e->f_iMaxHistoryLevel = lexical_cast<int>( xml::node_val( attr ) );
 				else
 					M_THROW( _( "unknown edit attribute name" ), i );
 				}
