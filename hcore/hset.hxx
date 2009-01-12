@@ -30,8 +30,6 @@ Copyright:
 #ifndef YAAL_HCORE_HSET_HXX_INCLUDED
 #define YAAL_HCORE_HSET_HXX_INCLUDED
 
-#line 31
-
 #define D_VCSID_HSET_H "$Id$"
 
 #include "hcore/hsbbstree.hxx"
@@ -82,8 +80,11 @@ public:
 		{ return ( f_oEngine.is_empty() );	}
 	bool is_empty( void ) const
 		{ return ( f_oEngine.is_empty() );	}
-	HIterator insert( tType const& e )
-		{	return ( HIterator( f_oEngine.insert<tType, helper_t>( e ) ) );	}
+	HPair<HIterator, bool> insert( tType const& e )
+		{
+		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<tType, helper_t>( e );
+		return ( make_pair( HIterator( p.first ), p.second ) );
+		}
 	void remove( tType const& e )
 		{	f_oEngine.remove<tType, tType, helper_t>( e );	}
 	HIterator erase( HIterator const& it )

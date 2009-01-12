@@ -35,6 +35,7 @@ Copyright:
 #define D_VCSID_HSBBSTREE_H "$Id$"
 
 #include "hcore/hexception.hxx"
+#include "hcore/hpair.hxx"
 
 namespace yaal
 {
@@ -113,7 +114,7 @@ public:
 	HSBBSTree( void );
 	virtual ~HSBBSTree( void );
 	template<typename tType, typename ttType>
-	HIterator insert( tType const& );
+	HPair<HIterator, bool> insert( tType const& );
 	template<typename tType, typename ttType, typename tttType>
 	void remove( ttType const& );
 	void remove( HIterator const& );
@@ -208,7 +209,7 @@ HSBBSTree::HNode<tType>::HNode( tType const& a_tKey )
 	}
 
 template<typename tType, typename ttType>
-HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
+HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& a_tKey )
 	{
 	M_PROLOG
 	ONodePtr l_oNode;
@@ -247,7 +248,7 @@ HSBBSTree::HIterator HSBBSTree::insert( tType const& a_tKey )
 		}
 	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_poParent == NULL ) );
 	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_eColor == HAbstractNode::D_BLACK ) );
-	return ( HIterator( l_poNode ) );
+	return ( make_pair( HIterator( l_poNode ), ! l_oNode.f_bExists ) );
 	M_EPILOG
 	}
 

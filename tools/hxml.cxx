@@ -137,12 +137,12 @@ struct HXml::OConvert
 	iconv_t f_xIconvToInternal;
 	OConvert( void ) 
 		: f_oEncoder(),
-		f_xIconvToExternal ( static_cast<iconv_t>( 0 ) ),
-		f_xIconvToInternal ( static_cast<iconv_t>( 0 ) ) { }
+		f_xIconvToExternal( static_cast<iconv_t>( 0 ) ),
+		f_xIconvToInternal( static_cast<iconv_t>( 0 ) ) { }
 	OConvert( OConvert const& a_roConvert )
 		: f_oEncoder(),
-		f_xIconvToExternal ( static_cast<iconv_t>( 0 ) ),
-		f_xIconvToInternal ( static_cast<iconv_t>( 0 ) )
+		f_xIconvToExternal( static_cast<iconv_t>( 0 ) ),
+		f_xIconvToInternal( static_cast<iconv_t>( 0 ) )
 		{
 		operator = ( a_roConvert );
 		}

@@ -39,18 +39,20 @@ namespace hcore
 
 /*! \brief Implementation of ordered pair concept.
  *
- * \tparam tType - type of first pair element.
- * \tparam ttType - type of second pair element.
+ * \tparam first_t - type of first pair element.
+ * \tparam second_t - type of second pair element.
  */
-template<typename tType, typename ttType>
+template<typename first_t, typename second_t>
 class HPair
 	{
 public:
-	tType first;
-	ttType second;
+	first_t first;
+	second_t second;
 	HPair( void ) : first(), second() {}
-	HPair( tType key, ttType value ) : first( key ), second( value ) {}
+	HPair( first_t const& key, second_t const& value ) : first( key ), second( value ) {}
 	HPair( HPair const& pair ) : first( pair.first ), second( pair.second ) {}
+	template<typename alt_first_t, typename alt_second_t>
+	HPair( HPair<alt_first_t, alt_second_t> const& p ) : first( p.first ), second( p.second ) {}
 	HPair& operator = ( HPair const& pair )
 		{
 		M_PROLOG
@@ -72,6 +74,10 @@ public:
 				|| ( ! ( pair.first < first ) && ( second < pair.second ) ) );
 		}
 	};
+
+template<typename first_t, typename second_t>
+HPair<first_t, second_t> make_pair( first_t const& first, second_t const& second )
+	{ return ( HPair<first_t, second_t>( first, second ) ); }
 
 }
 

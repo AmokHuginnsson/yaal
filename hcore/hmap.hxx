@@ -90,10 +90,11 @@ public:
 		{ return ( f_oEngine.empty() );	}
 	bool is_empty( void ) const
 		{ return ( f_oEngine.empty() );	}
-	iterator insert( map_elem_t const& e )
-		{	return ( iterator( f_oEngine.insert<map_elem_t, helper_t>( e ) ) );	}
-	iterator insert( key_t const& key, value_t const& value )
-		{	return ( iterator( f_oEngine.insert<map_elem_t, helper_t>( map_elem_t( key, value ) ) ) );	}
+	HPair<iterator, bool> insert( map_elem_t const& e )
+		{
+		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<map_elem_t, helper_t>( e );
+		return ( make_pair( iterator( p.first ), p.second ) );
+		}
 	void remove( key_t const& key )
 		{
 		M_PROLOG
@@ -137,7 +138,7 @@ public:
 		M_PROLOG
 		iterator it = find( key );
 		if ( it == end() )
-			it = insert( map_elem_t( key, value_t() ) );
+			it = insert( map_elem_t( key, value_t() ) ).first;
 		return ( it->second );
 		M_EPILOG
 		}
@@ -168,7 +169,7 @@ class HMap<key_t, value_t, helper_t>::HIterator
 public:
 	HIterator( void ) : f_oEngine() {}
 	HIterator( HIterator const& a_oIt ) : f_oEngine( a_oIt.f_oEngine ) {}
-	HIterator& operator= ( HIterator const& a_oIt )
+	HIterator& operator = ( HIterator const& a_oIt )
 		{
 		if ( &a_oIt != this )
 			f_oEngine = a_oIt.f_oEngine;
