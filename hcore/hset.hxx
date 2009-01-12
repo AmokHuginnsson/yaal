@@ -47,10 +47,6 @@ struct set_helper
 {
 
 template<typename key_t>
-inline static void update( key_t&, key_t const& )
-	{	}
-
-template<typename key_t>
 inline static bool less( key_t const& left, key_t const& right )
 	{	return ( left < right );	}
 

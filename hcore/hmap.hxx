@@ -46,11 +46,6 @@ template<typename key_t, typename value_t>
 struct map_helper
 {
 
-inline static void update( HPair<key_t, value_t>& left, HPair<key_t, value_t> const& right )
-	{
-	left.second = right.second;
-	}
-
 inline static bool less( HPair<key_t, value_t> const& left, HPair<key_t, value_t> const& right )
 	{	return ( left.first < right.first );	}
 

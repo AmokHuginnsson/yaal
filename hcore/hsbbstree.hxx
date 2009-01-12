@@ -217,10 +217,7 @@ HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& a_tKey )
 	if ( f_poRoot )
 		l_oNode = find_node<tType, tType, ttType>( a_tKey );
 	if ( l_oNode.f_bExists )
-		{
 		l_poNode = static_cast<HNode<tType>*>( l_oNode.f_poNode );
-		ttType::update( l_poNode->f_tKey, a_tKey );
-		}
 	else
 		{
 		l_poNode = new HNode<tType>( a_tKey );
