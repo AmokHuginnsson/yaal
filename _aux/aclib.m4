@@ -31,7 +31,8 @@ AC_DEFUN([YAAL_DETECT_FUNCTION_MACRO],
 [
 	AC_MSG_CHECKING(whether $CC implements __PRETTY_FUNCTION__)
 	AC_CACHE_VAL(yaal_cv_have_func,
-							 [AC_TRY_LINK([#include <stdio.h>],[printf("%s", __PRETTY_FUNCTION__);],
+							 [AC_COMPILE_IFELSE([#include <stdio.h>
+int main( int, char** ){ printf("%s", __PRETTY_FUNCTION__); return ( 0 );}],
 							 yaal_cv_have_func=yes, yaal_cv_have_func=no)])
 	AC_MSG_RESULT($yaal_cv_have_func)
 	if test "$yaal_cv_have_func" = yes; then
@@ -39,7 +40,8 @@ AC_DEFUN([YAAL_DETECT_FUNCTION_MACRO],
 	else
 		AC_MSG_CHECKING(whether $CC implements __FUNCTION__)
 		AC_CACHE_VAL(yaal_cv_have_pretty_function,
-								 [AC_TRY_LINK([#include <stdio.h>],[printf("%s", __FUNCTION__);],
+								 [AC_COMPILE_IFELSE([#include <stdio.h>
+int main( int, char** ){ printf("%s", __FUNCTION__); return ( 0 );}],
 								 yaal_cv_have_pretty_function=yes, yaal_cv_have_pretty_function=no)])
 		AC_MSG_RESULT($yaal_cv_have_pretty_function)
 		if test "$yaal_cv_have_pretty_function" = yes; then
@@ -47,7 +49,8 @@ AC_DEFUN([YAAL_DETECT_FUNCTION_MACRO],
 		else
 			AC_MSG_CHECKING(whether $CC implements __func__)
 			AC_CACHE_VAL(yaal_cv_have_function,
-									 [AC_TRY_LINK([#include <stdio.h>],[printf("%s", __func__);],
+									 [AC_COMPILE_IFELSE([#include <stdio.h>
+int main( int, char** ){ printf("%s", __func__); return ( 0 );}],
 									 yaal_cv_have_function=yes, yaal_cv_have_function=no)])
 			AC_MSG_RESULT($yaal_cv_have_function)
 			if test "$yaal_cv_have_function" = yes; then
