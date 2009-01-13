@@ -131,10 +131,7 @@ public:
 	value_t& operator[] ( key_t const& key )
 		{
 		M_PROLOG
-		iterator it = find( key );
-		if ( it == end() )
-			it = insert( map_elem_t( key, value_t() ) ).first;
-		return ( it->second );
+		return ( insert( map_elem_t( key, value_t() ) ).first->second );
 		M_EPILOG
 		}
 	void clear( void )
