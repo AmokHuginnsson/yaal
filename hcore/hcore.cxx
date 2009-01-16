@@ -144,7 +144,7 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int const& )
 	void** l_ppvPointer =	NULL;
 
 	l_ppvPointer = xcalloc<void*>( a_iLevel + 1 );
-	l_iSize = backtrace( l_ppvPointer, 1000 );
+	l_iSize = backtrace( l_ppvPointer, a_iLevel );
 	l_ppcStrings = backtrace_symbols( l_ppvPointer, l_iSize );
 
 	if ( a_iLevel < l_iSize )
