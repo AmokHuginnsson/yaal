@@ -74,7 +74,7 @@ void HDataListControl::load( int long /*a_iId*/ )
 	for ( int i = 0; i < colCount; ++ i )
 		if ( ! ::strcmp( rs->get_column_name( i ), f_psResource->f_pcId ) )
 			idColNo = i;
-	HDataWindow::ORowBuffer rb( idColNo, f_oHeader.size() );
+	HDataWindow::ORowBuffer rb( idColNo, static_cast<int>( f_oHeader.size() ) );
 	l_poParent->set_sync_store( &rb );
 	l_poParent->status_bar()->init_progress ( static_cast<double>( l_iCount ), "Collecting ..." );
 	HListControler<>::model_ptr_t l_oModel = f_oDataControler->get_model();
@@ -110,7 +110,7 @@ int long HDataListControl::get_current_id( void )
 void HDataListControl::add_new( void )
 	{
 	M_PROLOG
-	f_oDataControler->add_tail( HItem( f_oHeader.size() ) );
+	f_oDataControler->add_tail( HItem( static_cast<int>( f_oHeader.size() ) ) );
 	process_input( KEY_CODES::D_HOME );
 	process_input( KEY_CODES::D_END );
 	return;

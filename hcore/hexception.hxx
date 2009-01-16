@@ -83,7 +83,6 @@ public:
 	void set( char const* );
 	void set( HString const& );
 	void print_error( bool const ) const;
-	static void dump_call_stack( int const );
 	void log( char const* const, char const* const, int const );
 	char const* what( void ) const;
 	int code( void ) const;

@@ -136,7 +136,8 @@ public:
 	const_iterator rend( void ) const;
 	const_iterator rbegin( void ) const;
 	void clear( void );
-	int size( void ) const;
+	int long size( void ) const;
+	int long get_size( void ) const;
 	void swap( HList<tType>& );
 	/*! \brief Adds new element at specified position.
 	 */
@@ -606,7 +607,15 @@ bool HList<tType>::empty( void ) const
 	}
 
 template<typename tType>
-int HList<tType>::size( void ) const
+int long HList<tType>::size( void ) const
+	{
+	M_PROLOG
+	return ( f_iSize );
+	M_EPILOG
+	}
+
+template<typename tType>
+int long HList<tType>::get_size( void ) const
 	{
 	M_PROLOG
 	return ( f_iSize );

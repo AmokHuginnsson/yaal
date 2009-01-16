@@ -62,10 +62,10 @@ private:
 	multimap_engine_t f_oEngine;
 public:
 	HMultiMap( void ) : f_oEngine() {};
-	size_t size( void ) const
+	int long size( void ) const
 		{
 		M_PROLOG
-		int l_iSize = 0;
+		int long l_iSize = 0;
 		for ( typename multimap_engine_t::const_iterator it = f_oEngine.begin(); it != f_oEngine.end(); ++ it )
 			l_iSize += it->second->size();
 		return ( l_iSize );

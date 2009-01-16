@@ -29,10 +29,6 @@ Copyright:
 #include <cstdlib>
 #include <csignal>
 #include <libintl.h>
-
-#if defined( HAVE_EXECINFO_H )
-#include <execinfo.h>
-#endif /* HAVE_EXECINFO_H */
 #include <cxxabi.h>
 
 #include "base.hxx"
@@ -209,50 +205,6 @@ char const* HException::what( void ) const
 int HException::code( void ) const
 	{
 	return ( f_iCode );
-	}
-
-#ifdef _EXECINFO_H
-void HException::dump_call_stack( int const a_iLevel )
-#else /* _EXECINFO_H */
-void HException::dump_call_stack( int const )
-#endif /* not _EXECINFO_H */
-	{
-#ifdef _EXECINFO_H
-	int l_iCtr = 0, l_iSize = 0;
-	char** l_ppcStrings = NULL;
-	void** l_ppvPointer =	NULL;
-
-	l_ppvPointer = xcalloc<void*>( a_iLevel + 1 );
-	l_iSize = backtrace( l_ppvPointer, 1000 );
-	l_ppcStrings = backtrace_symbols( l_ppvPointer, l_iSize );
-
-	hcore::log << "Obtained " << l_iSize << " stack frames." << endl;
-	if ( a_iLevel < l_iSize )
-		l_iSize = a_iLevel;
-	char* ptr = NULL;
-	char* end = NULL;
-	int status = 0;
-	for ( l_iCtr = 0; l_iCtr < l_iSize; l_iCtr ++ )
-		{
-		ptr = strchr( l_ppcStrings[ l_iCtr ], '(' );
-		if ( ptr )
-			{
-			end = strchr( ptr, '+' );
-			if ( end )
-				(*end) = 0;
-			ptr = abi::__cxa_demangle( ptr + 1, 0, 0, &status );
-			if ( ptr )
-				{
-				hcore::log << ptr << endl;
-				xfree( ptr );
-				}
-			}
-		}
-
-	xfree( l_ppcStrings );
-	xfree( l_ppvPointer );
-#endif /* _EXECINFO_H */
-	return;
 	}
 
 void HException::failed_assert( char const* const a_pcFileName,

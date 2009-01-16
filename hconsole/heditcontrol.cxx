@@ -481,7 +481,7 @@ int HEditControl::do_process_input ( int a_iCode )
 		/* enter works like tab without focus movement */
 		case ( '\r' ):
 			{
-			l_iErrorCode = f_oHistory.size();
+			l_iErrorCode = static_cast<int>( f_oHistory.size() );
 			l_iErrorCode ++;
 			while ( -- l_iErrorCode )
 				if ( ( *( ++ f_oHistoryIt ) ) == f_oString )
@@ -489,7 +489,7 @@ int HEditControl::do_process_input ( int a_iCode )
 			if ( f_oString.get_length() && ( ! l_iErrorCode ) )
 				{
 				f_oHistory.add_head( &f_oString );
-				l_iErrorCode = f_oHistory.size();
+				l_iErrorCode = static_cast<int>( f_oHistory.size() );
 				while ( l_iErrorCode -- > f_iMaxHistoryLevel )
 					f_oHistory.pop_back(); /* FIXME investigate if it actually work */
 				f_oHistoryIt = f_oHistory.hook();

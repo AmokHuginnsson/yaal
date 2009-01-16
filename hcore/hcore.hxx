@@ -30,6 +30,8 @@ Copyright:
 #ifndef YAAL_HCORE_HCORE_HXX_INCLUDED
 #define YAAL_HCORE_HCORE_HXX_INCLUDED
 
+#include "hcore/hpointer.hxx"
+#include "hcore/hlist.hxx"
 #include "hcore/hstring.hxx"
 
 namespace yaal
@@ -40,6 +42,13 @@ namespace hcore
 
 bool eq( double long const&, double long const& );
 void set_env( HString );
+struct execution_info
+	{
+	typedef HList<HString> strings_t;
+	typedef HPointer<strings_t> strings_ptr_t;
+	static strings_ptr_t get_call_stack( int const& );
+	};
+void dump_call_stack( int const& );
 void yaal_hcore_banner( void );
 
 	}

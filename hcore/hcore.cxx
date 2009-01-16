@@ -29,6 +29,12 @@ char const COPYRIGHT [ ] =
 #include <cstdlib>
 #include <cstring>
 
+#include "config.hxx"
+#if defined( HAVE_EXECINFO_H )
+#include <execinfo.h>
+#endif /* HAVE_EXECINFO_H */
+#include <cxxabi.h>
+
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore.hxx"
@@ -123,6 +129,57 @@ void set_env( HString line )
 	M_ENSURE( ::setenv( line.raw(), val.raw(), D_TRUE ) == 0 );
 	return;
 	M_EPILOG
+	}
+
+#ifdef _EXECINFO_H
+execution_info::strings_ptr_t execution_info::get_call_stack( int const& a_iLevel )
+#else /* _EXECINFO_H */
+execution_info::strings_ptr_t execution_info::get_call_stack( int const& )
+#endif /* not _EXECINFO_H */
+	{
+#ifdef _EXECINFO_H
+	strings_ptr_t frames( new strings_t );
+	int l_iCtr = 0, l_iSize = 0;
+	char** l_ppcStrings = NULL;
+	void** l_ppvPointer =	NULL;
+
+	l_ppvPointer = xcalloc<void*>( a_iLevel + 1 );
+	l_iSize = backtrace( l_ppvPointer, 1000 );
+	l_ppcStrings = backtrace_symbols( l_ppvPointer, l_iSize );
+
+	if ( a_iLevel < l_iSize )
+		l_iSize = a_iLevel;
+	char* ptr = NULL;
+	char* end = NULL;
+	int status = 0;
+	for ( l_iCtr = 0; l_iCtr < l_iSize; l_iCtr ++ )
+		{
+		ptr = strchr( l_ppcStrings[ l_iCtr ], '(' );
+		if ( ptr )
+			{
+			end = strchr( ptr, '+' );
+			if ( end )
+				(*end) = 0;
+			ptr = abi::__cxa_demangle( ptr + 1, 0, 0, &status );
+			if ( ptr )
+				{
+				frames->push_back( ptr );
+				xfree( ptr );
+				}
+			}
+		}
+
+	xfree( l_ppcStrings );
+	xfree( l_ppvPointer );
+#endif /* _EXECINFO_H */
+	return ( frames );
+	}
+
+void dump_call_stack( int const& no )
+	{
+	execution_info::strings_ptr_t frames = execution_info::get_call_stack( no );
+	hcore::log << "Obtained " << frames->get_size() << " stack frames." << endl;
+	yaal::copy( frames->begin(), frames->end(), stream_iterator( hcore::log, hcore::endl ) );
 	}
 
 class HCoreInitDeinit

@@ -129,12 +129,12 @@ public:
 	};
 
 template<typename stream_t, typename delim_t>
-HStreamIterator<stream_t, delim_t> stream_iterator( stream_t& stream, delim_t const& delim )
-	{ return ( HStreamIterator<stream_t, delim_t>( stream, delim ) ); }
+HStreamIterator<stream_t, delim_t const&> stream_iterator( stream_t& stream, delim_t const& delim )
+	{ return ( HStreamIterator<stream_t, delim_t const&>( stream, delim ) ); }
 
 template<typename stream_t>
-HStreamIterator<stream_t, char const*> stream_iterator( stream_t& stream )
-	{ return ( HStreamIterator<stream_t, char const*>( stream, "" ) ); }
+HStreamIterator<stream_t, char const* const> stream_iterator( stream_t& stream )
+	{ return ( HStreamIterator<stream_t, char const* const>( stream, "" ) ); }
 
 }
 

@@ -294,7 +294,7 @@ void HDataWindow::sync( void )
 	{
 	M_PROLOG
 	M_ASSERT( f_eDocumentMode == DOCUMENT::D_EDIT );
-	int l_iCount = f_oEditModeControls.size();
+	int l_iCount = static_cast<int>( f_oEditModeControls.size() );
 	for ( int l_iCtr = 0; l_iCtr < l_iCount; l_iCtr ++ )
 		(*f_oDB)[ l_iCtr ] = f_oEditModeControls[ l_iCtr ]->get().get<HString const&>();
 	return;

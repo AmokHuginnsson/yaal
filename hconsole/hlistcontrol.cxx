@@ -123,7 +123,7 @@ void HListControl::do_refresh( void )
 	int l_iCtrLoc = 0;
 	int l_iColumnOffset = 0;
 	int l_iTmp = 0;
-	int l_iColumns = f_oHeader.size();
+	int l_iColumns = static_cast<int>( f_oHeader.size() );
 	int l_iHR = f_bDrawHeader ? 1 : 0; /* HR stands for header row */
 	int l_iSize = static_cast<int>( f_oControler->size() );
 	HColumnInfo * l_poColumnInfo = NULL;
@@ -570,7 +570,7 @@ int HListControl::do_process_input( int a_iCode )
  * to another control */
 		default :
 			{
-			l_iErrorCode = f_oHeader.size();
+			l_iErrorCode = static_cast<int>( f_oHeader.size() );
 			for ( l_iCtr = 0; l_iCtr < l_iErrorCode; l_iCtr ++ )
 				if ( tolower( a_iCode ) == tolower( f_oHeader[ l_iCtr ].f_cShortcut ) )
 					break;
@@ -645,7 +645,7 @@ void HListControl::recalculate_column_widths( void )
 	int l_iColumns = 0;
 	int l_iColumnOffset = 0;
 	int l_iNewWidth = 0;
-	l_iColumns = f_oHeader.size();
+	l_iColumns = static_cast<int>( f_oHeader.size() );
 	for ( l_iCtr = 0; l_iCtr < l_iColumns; l_iCtr ++ )
 		{
 		l_iNewWidth = f_oHeader [ l_iCtr ].f_iWidth;
@@ -693,7 +693,7 @@ int HListControl::do_click( mouse::OMouse& a_rsMouse )
 	{
 	M_PROLOG
 	int l_iRow = 0, l_iColumn = 0, l_iCtr = 0;
-	int l_iWidth = 0, l_iColumns = f_oHeader.size();
+	int l_iWidth = 0, l_iColumns = static_cast<int>( f_oHeader.size() );
 	HColumnInfo* l_poColumnInfo = NULL;
 	if ( ! HControl::do_click( a_rsMouse ) )
 		return ( 1 );
