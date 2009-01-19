@@ -137,8 +137,8 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int const& a_iLeve
 execution_info::strings_ptr_t execution_info::get_call_stack( int const& )
 #endif /* not _EXECINFO_H */
 	{
-#ifdef _EXECINFO_H
 	strings_ptr_t frames( new strings_t );
+#ifdef _EXECINFO_H
 	int l_iCtr = 0, l_iSize = 0;
 	char** l_ppcStrings = NULL;
 	void** l_ppvPointer =	NULL;
