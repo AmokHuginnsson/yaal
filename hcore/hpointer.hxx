@@ -383,6 +383,19 @@ void HPointer<tType, pointer_type_t, access_type_t>::assign( tType*& to, tType* 
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
+void HPointer<tType, pointer_type_t, access_type_t>::swap( HPointer& p )
+	{
+	if ( &p != this )
+		{
+		using yaal::swap;
+		swap( f_poShared, p.f_poShared );
+		swap( f_ptObject, p.f_ptObject );
+		}
+	return;
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
 bool HPointer<tType, pointer_type_t, access_type_t>::release( void ) throw()
 	{
 	M_ASSERT( f_poShared );
@@ -555,6 +568,10 @@ typename HPointerFromThisInterface<tType>::ptr_t const HPointerFromThisInterface
 	}
 
 }
+
+template<typename tType, template<typename>class pointer_type_t, template<typename, typename>class access_type_t>
+inline void swap( yaal::hcore::HPointer<hier_t, pointer_type_t, access_type_t>& a, yaal::hcore::HPointer<hier_t, pointer_type_t, access_type_t>& b )
+	{ a.swap( b ); }
 
 }
 
