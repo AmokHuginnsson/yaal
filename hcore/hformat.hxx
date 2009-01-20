@@ -55,6 +55,7 @@ class HFormat
 	format_impl_ptr_t _impl;
 public:
 	HFormat( char const* const = "" );
+	HFormat( format_impl_ptr_t );
 	HFormat( HFormat const& );
 	HFormat& operator = ( HFormat const& );
 	void swap( HFormat& );

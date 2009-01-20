@@ -75,8 +75,13 @@ HFormat::HFormat( char const* const fmt )
 	{
 	}
 
+HFormat::HFormat( format_impl_ptr_t fi )
+	: _impl( fi )
+	{
+	}
+
 HFormat::HFormat( HFormat const& fi )
-	: _impl( fi._impl )
+	: _impl( new HFormat::HFormatImpl( *(fi._impl) ) )
 	{
 	}
 
@@ -118,7 +123,7 @@ HFormat HFormat::operator % ( int const& )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	return ( *this );
+	return ( _impl );
 	M_EPILOG
 	}
 
