@@ -34,6 +34,37 @@ namespace yaal
 namespace hcore
 {
 
+class HFormat::HFormatImpl
+	{
+	struct CONVERSION
+		{
+		typedef enum
+			{
+			D_EMPTY,
+			D_INT,
+			D_FLOAT,
+			D_DOUBLE,
+			D_STRING,
+			D_POINTER,
+			D_CONSTANT
+			} converion_t;
+		};
+	struct OToken
+		{
+		CONVERSION::converion_t _conversion;
+		OToken( void ) : _conversion( CONVERSION::D_EMPTY ) {}
+		};
+	int _tokenIndex;
+	HString _format;
+	HString _string;
+	HFormatImpl( char const* const = "" );
+	HFormatImpl( HFormatImpl const& );
+	HFormatImpl& operator = ( HFormatImpl const& );
+	void swap( HFormatImpl& );
+	OToken next_token( void );
+	friend class HFormat;
+	};
+
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
 	: _tokenIndex( 0 ), _format( fmt ), _string()
 	{
@@ -119,18 +150,21 @@ HString HFormat::format( void ) const
 	return ( _impl->_format );
 	}
 
-HFormat HFormat::operator % ( int const& )
+HFormat HFormat::operator % ( int const& i )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
+	HFormatImpl::OToken t = _impl->next_token();
+	M_ENSURE( t._conversion == HFormatImpl::CONVERSION::D_INT );
+	_impl->_string += i;
 	return ( _impl );
 	M_EPILOG
 	}
 
-void HFormat::next_token( void )
+HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_token( void )
 	{
 	M_PROLOG
-	return;
+	return ( OToken() );
 	M_EPILOG
 	}
 

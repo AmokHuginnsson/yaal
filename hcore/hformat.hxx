@@ -40,17 +40,7 @@ namespace hcore
 class HFormat
 	{
 	typedef HFormat self_t;
-	class HFormatImpl
-		{
-		int _tokenIndex;
-		HString _format;
-		HString _string;
-		HFormatImpl( char const* const = "" );
-		HFormatImpl( HFormatImpl const& );
-		HFormatImpl& operator = ( HFormatImpl const& );
-		void swap( HFormatImpl& );
-		friend class HFormat;
-		};
+	class HFormatImpl;
 	typedef HPointer<HFormatImpl> format_impl_ptr_t;
 	format_impl_ptr_t _impl;
 public:
@@ -74,8 +64,6 @@ public:
 	HFormat operator % ( void const* const& );
 	HString string( void ) const;
 	HString format( void ) const;
-private:
-	void next_token( void );
 	};
 
 typedef HExceptionT<HFormat> HFormatException;
