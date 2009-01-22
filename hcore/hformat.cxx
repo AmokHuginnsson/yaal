@@ -27,6 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hformat.hxx"
+#include "hlist.hxx"
 
 namespace yaal
 {
@@ -54,6 +55,8 @@ class HFormat::HFormatImpl
 		CONVERSION::converion_t _conversion;
 		OToken( void ) : _conversion( CONVERSION::D_EMPTY ) {}
 		};
+	typedef HList<OToken> tokens_t;
+	typedef HPointer<tokens_t> tokens_ptr_t;
 	int _tokenIndex;
 	HString _format;
 	HString _string;
@@ -101,9 +104,23 @@ void HFormat::HFormatImpl::swap( HFormat::HFormatImpl& fi )
 	M_EPILOG
 	}
 
-HFormat::HFormat( char const* const fmt )
-	: _impl( new HFormatImpl( fmt ) )
+HFormat::HFormat( char const* const aFmt )
+	: _impl()
 	{
+	HString fmt( aFmt );
+	HFormatImpl::tokens_ptr_t tokens( new HFormatImpl::tokens_t );
+	HFormatImpl::OToken t;
+	do
+		{
+		t = HFormatImpl::OToken();
+		do
+			{
+			fmt.find( "%" );
+			}
+		while ( 0 );
+		tokens->push_back( t );
+		}
+	while ( t._conversion != HFormatImpl::CONVERSION::D_EMPTY );
 	}
 
 HFormat::HFormat( format_impl_ptr_t fi )
