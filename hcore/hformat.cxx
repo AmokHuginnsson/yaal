@@ -53,7 +53,8 @@ class HFormat::HFormatImpl
 	struct OToken
 		{
 		CONVERSION::converion_t _conversion;
-		OToken( void ) : _conversion( CONVERSION::D_EMPTY ) {}
+		HString _const;
+		OToken( void ) : _conversion( CONVERSION::D_EMPTY ), _const() {}
 		};
 	typedef HList<OToken> tokens_t;
 	typedef HPointer<tokens_t> tokens_ptr_t;
@@ -66,6 +67,10 @@ class HFormat::HFormatImpl
 	void swap( HFormatImpl& );
 	OToken next_token( void );
 	friend class HFormat;
+	static bool has_conversion( HString const&, int const& );
+	static OToken next_conversion( HString const&, int& );
+	static bool has_constant( HString const&, int const& );
+	static OToken next_constant( HString const&, int& );
 	};
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
@@ -107,20 +112,22 @@ void HFormat::HFormatImpl::swap( HFormat::HFormatImpl& fi )
 HFormat::HFormat( char const* const aFmt )
 	: _impl()
 	{
+	M_PROLOG
 	HString fmt( aFmt );
 	HFormatImpl::tokens_ptr_t tokens( new HFormatImpl::tokens_t );
 	HFormatImpl::OToken t;
+	int idx = -1;
 	do
 		{
 		t = HFormatImpl::OToken();
-		do
-			{
-			fmt.find( "%" );
-			}
-		while ( 0 );
+		if ( HFormatImpl::has_conversion( fmt, idx ) )
+			t = HFormatImpl::next_conversion( fmt, idx );
+		else if ( HFormatImpl::has_constant( fmt, idx ) )
+			t = HFormatImpl::next_constant( fmt, idx );
 		tokens->push_back( t );
 		}
 	while ( t._conversion != HFormatImpl::CONVERSION::D_EMPTY );
+	M_EPILOG
 	}
 
 HFormat::HFormat( format_impl_ptr_t fi )
@@ -192,6 +199,35 @@ HStreamInterface& operator << ( HStreamInterface& stream, HFormat const& format 
 	M_EPILOG
 	}
 
+bool HFormat::HFormatImpl::has_conversion( HString const& s, int const& i )
+	{
+	M_PROLOG
+	return ( ( i < s.get_length() ) && ( s[ i ] == '%' ) );
+	M_EPILOG
+	}
+
+HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_conversion( HString const&, int& )
+	{
+	M_PROLOG
+	OToken t;
+	return ( t );
+	M_EPILOG
+	}
+
+bool HFormat::HFormatImpl::has_constant( HString const& s, int const& i )
+	{
+	M_PROLOG
+	return ( ( i < s.get_length() ) && ( s[ i ] != '%' ) );
+	M_EPILOG
+	}
+
+HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_constant( HString const&, int& )
+	{
+	M_PROLOG
+	OToken t;
+	return ( t );
+	M_EPILOG
+	}
 
 }
 
