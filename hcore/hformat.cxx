@@ -50,11 +50,27 @@ class HFormat::HFormatImpl
 			D_CONSTANT
 			} converion_t;
 		};
+	struct FLAG
+		{
+		typedef enum
+			{
+			D_NONE = 0,
+			D_ALTERNATE = 1,
+			D_ZERO_PADDED = 2,
+			D_LEFT_ADJUST = 4,
+			D_SPACE_PADDED = 8,
+			D_SIGN_PREFIX = 16
+			} flag_t;
+		};
 	struct OToken
 		{
 		CONVERSION::converion_t _conversion;
+		FLAG::flag_t _flag;
+		int _position;
+		int _width;
+		int _precision;
 		HString _const;
-		OToken( void ) : _conversion( CONVERSION::D_EMPTY ), _const() {}
+		OToken( void ) : _conversion( CONVERSION::D_EMPTY ), _flag( FLAG::D_NONE ), _position( 0 ), _width( 0 ), _precision( 0 ), _const() {}
 		};
 	typedef HList<OToken> tokens_t;
 	typedef HPointer<tokens_t> tokens_ptr_t;
@@ -71,6 +87,15 @@ class HFormat::HFormatImpl
 	static OToken next_conversion( HString const&, int& );
 	static bool has_constant( HString const&, int const& );
 	static OToken next_constant( HString const&, int& );
+	static bool has_position( HString const&, int const& );
+	static int get_position( HString const&, int& );
+	static bool has_flag( HString const&, int const& );
+	static FLAG::flag_t get_flag( HString const&, int& );
+	static bool has_width( HString const&, int const& );
+	static int get_width( HString const&, int& );
+	static bool has_precision( HString const&, int const& );
+	static int get_precision( HString const&, int& );
+	static CONVERSION::converion_t get_conversion( HString const&, int& );
 	};
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
@@ -206,10 +231,20 @@ bool HFormat::HFormatImpl::has_conversion( HString const& s, int const& i )
 	M_EPILOG
 	}
 
-HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_conversion( HString const&, int& )
+HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_conversion( HString const& s, int& i )
 	{
 	M_PROLOG
 	OToken t;
+	++ i;
+	if ( has_position( s, i ) )
+		t._position = get_position( s, i );
+	if ( has_flag( s, i ) )
+		t._flag = get_flag( s, i );
+	if ( has_width( s, i ) )
+		t._width = get_width( s, i );
+	if ( has_precision( s, i ) )
+		t._precision = get_precision( s, i );
+	t._conversion = get_conversion( s, i );
 	return ( t );
 	M_EPILOG
 	}
@@ -226,6 +261,73 @@ HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_constant( HString const&
 	M_PROLOG
 	OToken t;
 	return ( t );
+	M_EPILOG
+	}
+
+bool HFormat::HFormatImpl::has_flag( HString const& s, int const& i )
+	{
+	M_PROLOG
+	HString flags = "#0- +";
+	return ( ( i < s.get_length() ) && ( flags.find( s[ i ] ) >= 0 ) );
+	M_EPILOG
+	}
+
+bool HFormat::HFormatImpl::has_precision( HString const& s, int const& i )
+	{
+	M_PROLOG
+	return ( ( i < s.get_length() ) && ( s[ i ] == '.' ) );
+	M_EPILOG
+	}
+
+bool HFormat::HFormatImpl::has_position( HString const& s, int const& i )
+	{
+	M_PROLOG
+	if ( ( i + 1 ) < s.get_length() )
+		{
+		}
+	return ( false );
+	M_EPILOG
+	}
+
+bool HFormat::HFormatImpl::has_width( HString const&, int const& )
+	{
+	M_PROLOG
+	return ( false );
+	M_EPILOG
+	}
+
+int HFormat::HFormatImpl::get_position( HString const&, int& )
+	{
+	M_PROLOG
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HFormat::HFormatImpl::get_width( HString const&, int& )
+	{
+	M_PROLOG
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HFormat::HFormatImpl::get_precision( HString const&, int& )
+	{
+	M_PROLOG
+	return ( 0 );
+	M_EPILOG
+	}
+
+HFormat::HFormatImpl::CONVERSION::converion_t HFormat::HFormatImpl::get_conversion( HString const&, int& )
+	{
+	M_PROLOG
+	return ( CONVERSION::D_EMPTY );
+	M_EPILOG
+	}
+
+HFormat::HFormatImpl::FLAG::flag_t HFormat::HFormatImpl::get_flag( HString const&, int& )
+	{
+	M_PROLOG
+	return ( FLAG::D_NONE );
 	M_EPILOG
 	}
 

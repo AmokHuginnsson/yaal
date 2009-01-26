@@ -31,6 +31,8 @@ Copyright:
 #ifndef YAAL_HCORE_BASE_HXX_INCLUDED
 #define YAAL_HCORE_BASE_HXX_INCLUDED
 
+#include <limits>
+
 #include "hcore/hexception.hxx"
 #include "hcore/compat.hxx"
 
@@ -376,6 +378,27 @@ trait::reference<basic_t const> cref( basic_t const& obj )
 	{
 	return ( trait::reference<basic_t const>( obj ) );
 	}
+
+/*! \brief Staticaly calculate maximul of a set.
+ */
+template<int long a0, int long a1,
+	int long a2 = LONG_MIN, int long a3 = LONG_MIN,
+	int long a4 = LONG_MIN, int long a5 = LONG_MIN,
+	int long a6 = LONG_MIN, int long a7 = LONG_MIN,
+	int long a8 = LONG_MIN, int long a9 = LONG_MIN>
+struct static_max
+	{
+	static int long const b0 = a0 > a1 ? a0 : a1;
+	static int long const b1 = b0 > a2 ? b0 : a2;
+	static int long const b2 = b1 > a3 ? b1 : a3;
+	static int long const b3 = b2 > a4 ? b2 : a4;
+	static int long const b4 = b3 > a5 ? b3 : a5;
+	static int long const b5 = b4 > a6 ? b4 : a6;
+	static int long const b6 = b5 > a7 ? b5 : a7;
+	static int long const b7 = b6 > a8 ? b6 : a8;
+	static int long const b8 = b7 > a9 ? b7 : a9;
+	static int long const value = b5 > a7 ? b5 : a7;
+	};
 
 /*! \brief Simulate binary literal.
  *
