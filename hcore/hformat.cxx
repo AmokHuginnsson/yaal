@@ -73,11 +73,11 @@ class HFormat::HFormatImpl
 		OToken( void ) : _conversion( CONVERSION::D_EMPTY ), _flag( FLAG::D_NONE ), _position( 0 ), _width( 0 ), _precision( 0 ), _const() {}
 		};
 	typedef HList<OToken> tokens_t;
-	typedef HPointer<tokens_t> tokens_ptr_t;
 	int _tokenIndex;
 	HString _format;
 	HString _string;
-	HFormatImpl( char const* const = "" );
+	tokens_t _tokens;
+	HFormatImpl( char const* const );
 	HFormatImpl( HFormatImpl const& );
 	HFormatImpl& operator = ( HFormatImpl const& );
 	void swap( HFormatImpl& );
@@ -99,12 +99,12 @@ class HFormat::HFormatImpl
 	};
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
-	: _tokenIndex( 0 ), _format( fmt ), _string()
+	: _tokenIndex( 0 ), _format( fmt ), _string(), _tokens()
 	{
 	}
 
 HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
-	: _tokenIndex( fi._tokenIndex ), _format( fi._format ), _string( fi._string )
+	: _tokenIndex( fi._tokenIndex ), _format( fi._format ), _string( fi._string ), _tokens( fi._tokens )
 	{
 	}
 
@@ -135,11 +135,10 @@ void HFormat::HFormatImpl::swap( HFormat::HFormatImpl& fi )
 	}
 
 HFormat::HFormat( char const* const aFmt )
-	: _impl()
+	: _impl( new HFormatImpl( aFmt ) )
 	{
 	M_PROLOG
 	HString fmt( aFmt );
-	HFormatImpl::tokens_ptr_t tokens( new HFormatImpl::tokens_t );
 	HFormatImpl::OToken t;
 	int idx = -1;
 	do
@@ -149,7 +148,7 @@ HFormat::HFormat( char const* const aFmt )
 			t = HFormatImpl::next_conversion( fmt, idx );
 		else if ( HFormatImpl::has_constant( fmt, idx ) )
 			t = HFormatImpl::next_constant( fmt, idx );
-		tokens->push_back( t );
+		_impl->_tokens.push_back( t );
 		}
 	while ( t._conversion != HFormatImpl::CONVERSION::D_EMPTY );
 	M_EPILOG
@@ -299,35 +298,51 @@ bool HFormat::HFormatImpl::has_position( HString const& s, int const& i )
 	M_EPILOG
 	}
 
-bool HFormat::HFormatImpl::has_width( HString const&, int const& )
+bool HFormat::HFormatImpl::has_width( HString const& s, int const& i )
 	{
 	M_PROLOG
-	return ( false );
+	return ( ( i < s.get_length() ) && ( ( s[ i ] == '*' ) || ( ( s[ i ] >= '0' ) && ( s[ i ] <= '9' ) ) ) );
 	M_EPILOG
 	}
 
 int HFormat::HFormatImpl::get_position( HString const& s, int& i )
 	{
 	M_PROLOG
+	M_ENSURE( ( i + 1 ) < s.get_length() );
 	int position = lexical_cast<int>( s.mid( i ) );
 	while ( ( s[ i ] >= '0' ) && ( s[ i ] <= '9' ) )
 		++ i;
-	++ i; /* for '$' character */
+	++ i; /* for '$' character. */
 	return ( position );
 	M_EPILOG
 	}
 
-int HFormat::HFormatImpl::get_width( HString const&, int& )
+int HFormat::HFormatImpl::get_width( HString const& s, int& i )
 	{
 	M_PROLOG
-	return ( 0 );
+	int width = 0;
+	if ( s[ i ] == '*' )
+		{
+		++ i; /* skip '*' character. */
+		if ( has_position( s, i ) )
+			width = - ( get_position( s, i ) + 1 );
+		else
+			width = -1;
+		}
+	else
+		{
+		width = get_position( s, i );
+		-- i; /* width is in place, no '$' character at the end of width. */
+		}
+	return ( width );
 	M_EPILOG
 	}
 
-int HFormat::HFormatImpl::get_precision( HString const&, int& )
+int HFormat::HFormatImpl::get_precision( HString const& s, int& i )
 	{
 	M_PROLOG
-	return ( 0 );
+	++ i; /* skip '.' character */
+	return ( get_width( s, i ) );
 	M_EPILOG
 	}
 
