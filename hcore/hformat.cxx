@@ -57,7 +57,7 @@ class HFormat::HFormatImpl
 			D_NONE = 0,
 			D_ALTERNATE = 1,
 			D_ZERO_PADDED = 2,
-			D_LEFT_ADJUST = 4,
+			D_LEFT_ALIGNED = 4,
 			D_SPACE_PADDED = 8,
 			D_SIGN_PREFIX = 16
 			} flag_t;
@@ -256,10 +256,13 @@ bool HFormat::HFormatImpl::has_constant( HString const& s, int const& i )
 	M_EPILOG
 	}
 
-HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_constant( HString const&, int& )
+HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_constant( HString const& s, int& i )
 	{
 	M_PROLOG
 	OToken t;
+	int token = static_cast<int>( s.find( '%' ) );
+	t._const = s.mid( i, token > 0 ? token - i : INT_MAX );
+	i += static_cast<int>( t._const.get_length() );
 	return ( t );
 	M_EPILOG
 	}
@@ -282,10 +285,17 @@ bool HFormat::HFormatImpl::has_precision( HString const& s, int const& i )
 bool HFormat::HFormatImpl::has_position( HString const& s, int const& i )
 	{
 	M_PROLOG
-	if ( ( i + 1 ) < s.get_length() )
+	bool hasPosition = false;
+	int long len = s.get_length();
+	if ( ( i + 1 ) < len ) /* + 1 is for '$' character */
 		{
+		int k = i;
+		while ( ( s[ k ] >= '0' ) && ( s[ k ] <= '9' ) && ( k < len ) )
+			++ k;
+		if ( ( k < len ) && ( s[ k ] == '$' ) )
+			hasPosition = true;
 		}
-	return ( false );
+	return ( hasPosition );
 	M_EPILOG
 	}
 
@@ -296,10 +306,14 @@ bool HFormat::HFormatImpl::has_width( HString const&, int const& )
 	M_EPILOG
 	}
 
-int HFormat::HFormatImpl::get_position( HString const&, int& )
+int HFormat::HFormatImpl::get_position( HString const& s, int& i )
 	{
 	M_PROLOG
-	return ( 0 );
+	int position = lexical_cast<int>( s.mid( i ) );
+	while ( ( s[ i ] >= '0' ) && ( s[ i ] <= '9' ) )
+		++ i;
+	++ i; /* for '$' character */
+	return ( position );
 	M_EPILOG
 	}
 
@@ -317,17 +331,35 @@ int HFormat::HFormatImpl::get_precision( HString const&, int& )
 	M_EPILOG
 	}
 
-HFormat::HFormatImpl::CONVERSION::converion_t HFormat::HFormatImpl::get_conversion( HString const&, int& )
+HFormat::HFormatImpl::CONVERSION::converion_t HFormat::HFormatImpl::get_conversion( HString const& s, int& i )
 	{
 	M_PROLOG
+	M_ENSURE( i < s.get_length() );
 	return ( CONVERSION::D_EMPTY );
 	M_EPILOG
 	}
 
-HFormat::HFormatImpl::FLAG::flag_t HFormat::HFormatImpl::get_flag( HString const&, int& )
+HFormat::HFormatImpl::FLAG::flag_t HFormat::HFormatImpl::get_flag( HString const& s, int& i )
 	{
 	M_PROLOG
-	return ( FLAG::D_NONE );
+	int long len = s.get_length();
+	FLAG::flag_t flag = FLAG::D_NONE;
+	bool done = false;
+	for ( ; ! done && ( i < len ); ++ i )
+		{
+		switch ( s[ i ] )
+			{
+			case ( '#' ): flag |= FLAG::D_ALTERNATE; break;
+			case ( '0' ): flag |= FLAG::D_ZERO_PADDED; break;
+			case ( '-' ): flag |= FLAG::D_LEFT_ALIGNED; break;
+			case ( ' ' ): flag |= FLAG::D_SPACE_PADDED; break;
+			case ( '+' ): flag |= FLAG::D_SIGN_PREFIX; break;
+			default:
+				done = true;
+			break;
+			}
+		}
+	return ( flag );
 	M_EPILOG
 	}
 

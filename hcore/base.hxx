@@ -31,8 +31,6 @@ Copyright:
 #ifndef YAAL_HCORE_BASE_HXX_INCLUDED
 #define YAAL_HCORE_BASE_HXX_INCLUDED
 
-#include <limits>
-
 #include "hcore/hexception.hxx"
 #include "hcore/compat.hxx"
 

@@ -159,8 +159,14 @@ public:
 	HString& upper( void );
 	HString& lower( void );
 	HString& reverse( void );
-	HString left( int const ) const;
-	HString mid( int long, int long = INT_MAX ) const;
+	HString left( int const& ) const;
+	/*! \brief Get substring of this string by start position and length.
+	 *
+	 * \param start - position for begining of a substring.
+	 * \param length - length of a substring.
+	 * \return Substring.
+	 */
+	HString mid( int long start, int long length = INT_MAX ) const;
 	HString right( int long const& ) const;
 	HString& trim_left( char const* const = " \t\r\n" );
 	HString& trim_right( char const* const = " \t\r\n" );
