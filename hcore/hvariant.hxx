@@ -33,7 +33,6 @@ namespace yaal
 namespace hcore
 {
 
-template<int N>
 struct HNoType {};
 
 /*! \brief Multi type container.
@@ -43,11 +42,11 @@ struct HNoType {};
  *
  * \tparam t0_t, t1_t, ... t9_t - component types.
  */
-template<typename t0_t, typename t1_t = HNoType<1>,
-	typename t2_t = HNoType<2>, typename t3_t = HNoType<3>,
-	typename t4_t = HNoType<4>, typename t5_t = HNoType<5>,
-	typename t6_t = HNoType<6>, typename t7_t = HNoType<7>,
-	typename t8_t = HNoType<8>, typename t9_t = HNoType<9> >
+template<typename t0_t, typename t1_t = HNoType,
+	typename t2_t = HNoType, typename t3_t = HNoType,
+	typename t4_t = HNoType, typename t5_t = HNoType,
+	typename t6_t = HNoType, typename t7_t = HNoType,
+	typename t8_t = HNoType, typename t9_t = HNoType>
 class HVariant
 	{
 	template<typename tType, int>	struct type_no;
@@ -118,6 +117,7 @@ HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::HVariant( 
 		case ( 7 ): new ( _mem ) t7_t( *reinterpret_cast<t7_t const*>( v._mem ) ); break;
 		case ( 8 ): new ( _mem ) t8_t( *reinterpret_cast<t8_t const*>( v._mem ) ); break;
 		case ( 9 ): new ( _mem ) t9_t( *reinterpret_cast<t9_t const*>( v._mem ) ); break;
+		default: M_ASSERT( ! "Absurd type number." ); break;
 		}
 	}
 
@@ -140,6 +140,7 @@ HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::~HVariant(
 		case ( 7 ): reinterpret_cast<t7_t*>( _mem )->~t7_t(); break;
 		case ( 8 ): reinterpret_cast<t8_t*>( _mem )->~t8_t(); break;
 		case ( 9 ): reinterpret_cast<t9_t*>( _mem )->~t9_t(); break;
+		default: M_ASSERT( ! "Absurd type number." ); break;
 		}
 	}
 
@@ -196,7 +197,7 @@ template<typename t0_t, typename t1_t,
 template<typename tType>
 tType& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::get( void )
 	{
-	M_ASSERT(( _type = type_no<tType, 0>::value ));
+	M_ASSERT(( _type == type_no<tType, 0>::value ));
 	return ( *reinterpret_cast<tType*>( _mem ) );
 	}
 
