@@ -85,6 +85,7 @@ public:
 	void swap( HVariant& );
 	template<typename tType>
 	tType& get( void );
+	int type( void ) const;
 	};
 
 template<typename t0_t, typename t1_t,
@@ -199,6 +200,16 @@ tType& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::get
 	{
 	M_ASSERT(( _type == type_no<tType, 0>::value ));
 	return ( *reinterpret_cast<tType*>( _mem ) );
+	}
+
+template<typename t0_t, typename t1_t,
+	typename t2_t, typename t3_t,
+	typename t4_t, typename t5_t,
+	typename t6_t, typename t7_t,
+	typename t8_t, typename t9_t>
+int HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::type( void ) const
+	{
+	return ( _type );
 	}
 
 }
