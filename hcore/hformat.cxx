@@ -24,10 +24,13 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hformat.hxx"
 #include "hlist.hxx"
+#include "hvariant.hxx"
 
 namespace yaal
 {
@@ -41,13 +44,20 @@ class HFormat::HFormatImpl
 		{
 		typedef enum
 			{
-			D_EMPTY,
-			D_INT,
-			D_FLOAT,
-			D_DOUBLE,
-			D_STRING,
-			D_POINTER,
-			D_CONSTANT
+			D_EMPTY =       0x0000,
+			D_INT =         0x0001,
+			D_DOUBLE =      0x0002,
+			D_STRING =      0x0004,
+			D_CHAR =        0x0008,
+			D_POINTER =     0x0010,
+			D_CONSTANT =    0x0020,
+			D_BYTE =        0x0040,
+			D_SHORT =       0x0080,
+			D_LONG =        0x0100,
+			D_LONG_LONG =   0x0200,
+			D_UNSIGNED =    0x0400,
+			D_OCTAL =       0x0800,
+			D_HEXADECIMAL = 0x1000
 			} converion_t;
 		};
 	struct FLAG
@@ -73,10 +83,13 @@ class HFormat::HFormatImpl
 		OToken( void ) : _conversion( CONVERSION::D_EMPTY ), _flag( FLAG::D_NONE ), _position( 0 ), _width( 0 ), _precision( 0 ), _const() {}
 		};
 	typedef HList<OToken> tokens_t;
+	typedef HVariant<bool, char, int short, int, int long, void*, double, double long, HString> format_arg_t;
+	typedef HList<format_arg_t> args_t;
 	int _tokenIndex;
 	HString _format;
 	HString _string;
 	tokens_t _tokens;
+	args_t _args;
 	HFormatImpl( char const* const );
 	HFormatImpl( HFormatImpl const& );
 	HFormatImpl& operator = ( HFormatImpl const& );
@@ -99,12 +112,12 @@ class HFormat::HFormatImpl
 	};
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
-	: _tokenIndex( 0 ), _format( fmt ), _string(), _tokens()
+	: _tokenIndex( 0 ), _format( fmt ), _string(), _tokens(), _args()
 	{
 	}
 
 HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
-	: _tokenIndex( fi._tokenIndex ), _format( fi._format ), _string( fi._string ), _tokens( fi._tokens )
+	: _tokenIndex( fi._tokenIndex ), _format( fi._format ), _string( fi._string ), _tokens( fi._tokens ), _args( fi._args )
 	{
 	}
 
@@ -129,6 +142,8 @@ void HFormat::HFormatImpl::swap( HFormat::HFormatImpl& fi )
 		swap( _tokenIndex, fi._tokenIndex );
 		swap( _format, fi._format );
 		swap( _string, fi._string );
+		swap( _tokens, fi._tokens );
+		swap( _args, fi._args );
 		}
 	return;
 	M_EPILOG
@@ -203,8 +218,9 @@ HFormat HFormat::operator % ( int const& i )
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
 	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( t._conversion == HFormatImpl::CONVERSION::D_INT );
+	M_ENSURE( t._conversion & HFormatImpl::CONVERSION::D_INT );
 	_impl->_string += i;
+	_impl->_args.push_back( i );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -349,8 +365,92 @@ int HFormat::HFormatImpl::get_precision( HString const& s, int& i )
 HFormat::HFormatImpl::CONVERSION::converion_t HFormat::HFormatImpl::get_conversion( HString const& s, int& i )
 	{
 	M_PROLOG
+	CONVERSION::converion_t conversion = CONVERSION::D_EMPTY;
 	M_ENSURE( i < s.get_length() );
-	return ( CONVERSION::D_EMPTY );
+	struct
+		{
+		char const* _label;
+		CONVERSION::converion_t _converion;
+		} length[] = { { "hh", CONVERSION::D_BYTE },
+				{ "h", CONVERSION::D_SHORT },
+				{ "ll", CONVERSION::D_LONG_LONG },
+				{ "l", CONVERSION::D_LONG },
+				{ "L", CONVERSION::D_LONG } };
+	int lenMod = -1;
+	for ( size_t k = 0; k < ( sizeof ( length ) / sizeof ( char const* ) ); ++ k )
+		{
+		if ( s.find( length[ k ]._label, i ) == i )
+			{
+			i += static_cast<int>( ::std::strlen( length[ k ]._label ) );
+			lenMod = static_cast<int>( k );
+			break;
+			}
+		}
+	M_ENSURE( i < s.get_length() );
+	switch ( s[ i ] )
+		{
+		case ( 'd' ):
+		case ( 'i' ):
+			conversion = CONVERSION::D_INT;
+		break;
+		case ( 'u' ):
+			conversion = CONVERSION::D_INT | CONVERSION::D_UNSIGNED;
+		break;
+		case ( 'o' ):
+			conversion = CONVERSION::D_INT | CONVERSION::D_OCTAL;
+		break;
+		case ( 'x' ):
+		case ( 'X' ):
+			conversion = CONVERSION::D_INT | CONVERSION::D_HEXADECIMAL;
+		break;
+		case ( 'f' ):
+		case ( 'F' ):
+		case ( 'e' ):
+		case ( 'E' ):
+		case ( 'g' ):
+		case ( 'G' ):
+			conversion = CONVERSION::D_DOUBLE;
+		break;
+		case ( 'c' ):
+			conversion = CONVERSION::D_CHAR;
+		break;
+		case ( 's' ):
+			conversion = CONVERSION::D_STRING;
+		break;
+		case ( 'p' ):
+			conversion = CONVERSION::D_POINTER;
+		break;
+		case ( '%' ):
+			{
+			if ( s[ i - 1 ] == '%' )
+				break;
+			}
+		default: M_THROW( "bad conversion", s[ i ]  ); break;
+		}
+	char const* const E_BAD_LEN_MOD = _( "bad length mod." );
+	switch ( lenMod )
+		{
+		case ( 0 ):
+		case ( 1 ):
+		case ( 2 ):
+		case ( 3 ):
+			{
+			if ( conversion & CONVERSION::D_INT )
+				conversion |= length[ lenMod ]._converion;
+			else
+				M_THROW( E_BAD_LEN_MOD, lenMod );
+			}
+		case ( 4 ):
+			{
+			if ( conversion & CONVERSION::D_DOUBLE )
+				conversion |= CONVERSION::D_LONG;
+			else
+				M_THROW( E_BAD_LEN_MOD, lenMod );
+			}
+		break;
+		}
+	++ i;
+	return ( conversion );
 	M_EPILOG
 	}
 

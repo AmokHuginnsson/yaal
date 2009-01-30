@@ -394,8 +394,7 @@ struct static_max
 	static int long const b5 = b4 > a6 ? b4 : a6;
 	static int long const b6 = b5 > a7 ? b5 : a7;
 	static int long const b7 = b6 > a8 ? b6 : a8;
-	static int long const b8 = b7 > a9 ? b7 : a9;
-	static int long const value = b5 > a7 ? b5 : a7;
+	static int long const value = b7 > a9 ? b7 : a9;
 	};
 
 /*! \brief Simulate binary literal.

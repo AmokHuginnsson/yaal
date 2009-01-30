@@ -27,6 +27,8 @@ Copyright:
 #ifndef YAAL_HCORE_HVARIANT_HXX_INCLUDED
 #define YAAL_HCORE_HVARIANT_HXX_INCLUDED
 
+#include <new> /* holly shit */
+
 namespace yaal
 {
 
@@ -108,6 +110,7 @@ HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::HVariant( 
 	{
 	switch ( _type )
 		{
+		case ( -1 ): break;
 		case ( 0 ): new ( _mem ) t0_t( *reinterpret_cast<t0_t const*>( v._mem ) ); break;
 		case ( 1 ): new ( _mem ) t1_t( *reinterpret_cast<t1_t const*>( v._mem ) ); break;
 		case ( 2 ): new ( _mem ) t2_t( *reinterpret_cast<t2_t const*>( v._mem ) ); break;
@@ -131,6 +134,7 @@ HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::~HVariant(
 	{
 	switch ( _type )
 		{
+		case ( -1 ): break;
 		case ( 0 ): reinterpret_cast<t0_t*>( _mem )->~t0_t(); break;
 		case ( 1 ): reinterpret_cast<t1_t*>( _mem )->~t1_t(); break;
 		case ( 2 ): reinterpret_cast<t2_t*>( _mem )->~t2_t(); break;
