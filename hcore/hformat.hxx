@@ -61,6 +61,7 @@ public:
 	HFormat operator % ( double const& );
 	HFormat operator % ( double long const& );
 	HFormat operator % ( char const* const& );
+	HFormat operator % ( HString const& );
 	HFormat operator % ( void const* const& );
 	HString string( void ) const;
 	HString format( void ) const;
