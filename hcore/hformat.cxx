@@ -167,6 +167,17 @@ HFormat::HFormat( char const* const aFmt )
 		_impl->_tokens.push_back( t );
 		}
 	while ( t._conversion != HFormatImpl::CONVERSION::D_EMPTY );
+	bool hasIndex = false;
+	bool first = true;
+	for ( HFormatImpl::tokens_t::iterator it = _impl->_tokens.begin(); it != _impl->_tokens.end(); ++ it )
+		{
+		bool tokenIdx = ( it->_position > 0 ) || ( it->_width < -1 ) || ( it->_precision < -1 );
+		M_ENSURE( ! tokenIdx || ( tokenIdx && ( it->_position > 0 ) && ( it->_width < -1 ) && ( it->_precision < -1 ) ) );
+		M_ENSURE( first || ( hasIndex && tokenIdx ) );
+		if ( first )
+			hasIndex = tokenIdx;
+		first = false;
+		}
 	M_EPILOG
 	}
 
