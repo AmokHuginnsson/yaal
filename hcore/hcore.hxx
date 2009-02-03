@@ -42,6 +42,9 @@ namespace hcore
 
 bool eq( double long const&, double long const& );
 void set_env( HString );
+
+/*! \brief Low-level run-time information regarding program execution.
+ */
 struct execution_info
 	{
 	typedef HList<HString> strings_t;

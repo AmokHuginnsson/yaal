@@ -35,6 +35,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Dummy type used as a type stub in default template type argument declaration.
+ */
 struct HNoType {};
 
 /*! \brief Multi type container.

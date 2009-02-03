@@ -190,6 +190,7 @@ HFormat::HFormat( char const* const aFmt )
 	int last = 0;
 	for ( idx_t::iterator it = idxs.begin(); it != idxs.end(); ++ it, ++ last )
 		M_ENSURE( *it == ( last + 1 ) );
+	return;
 	M_EPILOG
 	}
 
