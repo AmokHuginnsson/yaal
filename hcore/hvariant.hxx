@@ -53,17 +53,6 @@ template<typename t0_t, typename t1_t = HNoType,
 	typename t8_t = HNoType, typename t9_t = HNoType>
 class HVariant
 	{
-	template<typename tType, int>	struct type_no;
-	template<int K> struct type_no<t0_t, K> { static int const value = 0; };
-	template<int K> struct type_no<t1_t, K> { static int const value = 1; };
-	template<int K> struct type_no<t2_t, K> { static int const value = 2; };
-	template<int K> struct type_no<t3_t, K> { static int const value = 3; };
-	template<int K> struct type_no<t4_t, K> { static int const value = 4; };
-	template<int K> struct type_no<t5_t, K> { static int const value = 5; };
-	template<int K> struct type_no<t6_t, K> { static int const value = 6; };
-	template<int K> struct type_no<t7_t, K> { static int const value = 7; };
-	template<int K> struct type_no<t8_t, K> { static int const value = 8; };
-	template<int K> struct type_no<t9_t, K> { static int const value = 9; };
 protected:
 	typedef HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t> self_t;
 	static int const D_SIZE = yaal::static_max<
@@ -108,9 +97,9 @@ template<typename t0_t, typename t1_t,
 	typename t6_t, typename t7_t,
 	typename t8_t, typename t9_t>
 HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::HVariant( HVariant const& v )
-	: _mem(), _type( v._type )
+	: _mem(), _type( -1 )
 	{
-	switch ( _type )
+	switch ( v._type )
 		{
 		case ( -1 ): break;
 		case ( 0 ): new ( _mem ) t0_t( *reinterpret_cast<t0_t const*>( v._mem ) ); break;
@@ -125,6 +114,7 @@ HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::HVariant( 
 		case ( 9 ): new ( _mem ) t9_t( *reinterpret_cast<t9_t const*>( v._mem ) ); break;
 		default: M_ASSERT( ! "Absurd type number." ); break;
 		}
+	_type = v._type;
 	}
 
 template<typename t0_t, typename t1_t,
@@ -158,10 +148,11 @@ template<typename t0_t, typename t1_t,
 	typename t8_t, typename t9_t>
 template<typename tType>
 HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::HVariant( tType const& obj )
-	: _mem(), _type( type_no<tType, 0>::value )
+	: _mem(), _type( -1 )
 	{
-	M_ASSERT( ( _type >= 0 ) && ( _type <= 9 ) );
 	new ( _mem ) tType( obj );
+	_type = yaal::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value;
+	M_ASSERT( ( _type >= 0 ) && ( _type <= 9 ) );
 	}
 
 template<typename t0_t, typename t1_t,
@@ -204,7 +195,7 @@ template<typename t0_t, typename t1_t,
 template<typename tType>
 tType& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::get( void )
 	{
-	M_ASSERT(( _type == type_no<tType, 0>::value ));
+	M_ASSERT(( _type == yaal::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value ));
 	return ( *reinterpret_cast<tType*>( _mem ) );
 	}
 
