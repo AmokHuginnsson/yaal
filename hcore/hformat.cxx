@@ -82,7 +82,9 @@ class HFormat::HFormatImpl
 		int _width;
 		int _precision;
 		HString _const;
-		OToken( void ) : _conversion( CONVERSION::D_EMPTY ), _flag( FLAG::D_NONE ), _position( 0 ), _width( 0 ), _precision( 0 ), _const() {}
+		OToken( void )
+			: _conversion( CONVERSION::D_EMPTY ), _flag( FLAG::D_NONE ),
+			_position( 0 ), _width( 0 ), _precision( 0 ), _const() {}
 		};
 	typedef HList<OToken> tokens_t;
 	typedef HVariant<bool, char, int short, int, int long, void const*, double, double long, HString> format_arg_t;
@@ -119,7 +121,8 @@ HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
 	}
 
 HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
-	: _tokenIndex( fi._tokenIndex ), _format( fi._format ), _string( fi._string ), _tokens( fi._tokens ), _args( fi._args )
+	: _tokenIndex( fi._tokenIndex ), _format( fi._format ),
+	_string( fi._string ), _tokens( fi._tokens ), _args( fi._args )
 	{
 	}
 
@@ -157,17 +160,19 @@ HFormat::HFormat( char const* const aFmt )
 	M_PROLOG
 	HString fmt( aFmt );
 	HFormatImpl::OToken t;
-	int idx = -1;
-	do
+	int idx = 0;
+	while ( true )
 		{
 		t = HFormatImpl::OToken();
 		if ( HFormatImpl::has_conversion( fmt, idx ) )
 			t = HFormatImpl::next_conversion( fmt, idx );
 		else if ( HFormatImpl::has_constant( fmt, idx ) )
 			t = HFormatImpl::next_constant( fmt, idx );
-		_impl->_tokens.push_back( t );
+		if ( t._conversion != HFormatImpl::CONVERSION::D_EMPTY )
+			_impl->_tokens.push_back( t );
+		else
+			break;
 		}
-	while ( t._conversion != HFormatImpl::CONVERSION::D_EMPTY );
 	bool hasIndex = false;
 	bool first = true;
 	typedef HSet<int> idx_t;
@@ -243,7 +248,8 @@ HFormat HFormat::operator % ( int short const& is )
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
 	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT ) && ( t._conversion && HFormatImpl::CONVERSION::D_SHORT ) );
+	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
+			&& ( t._conversion && HFormatImpl::CONVERSION::D_SHORT ) );
 	_impl->_args.push_back( is );
 	return ( _impl );
 	M_EPILOG
@@ -254,7 +260,9 @@ HFormat HFormat::operator % ( int short unsigned const& isu )
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
 	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT ) && ( t._conversion & HFormatImpl::CONVERSION::D_SHORT ) && ( t._conversion & HFormatImpl::CONVERSION::D_UNSIGNED ) );
+	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
+			&& ( t._conversion & HFormatImpl::CONVERSION::D_SHORT )
+			&& ( t._conversion & HFormatImpl::CONVERSION::D_UNSIGNED ) );
 	_impl->_args.push_back( static_cast<int short>( isu ) );
 	return ( _impl );
 	M_EPILOG
@@ -276,7 +284,8 @@ HFormat HFormat::operator % ( int unsigned const& iu )
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
 	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT ) && ( t._conversion & HFormatImpl::CONVERSION::D_UNSIGNED ) );
+	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
+			&& ( t._conversion & HFormatImpl::CONVERSION::D_UNSIGNED ) );
 	_impl->_args.push_back( static_cast<int>( iu ) );
 	return ( _impl );
 	M_EPILOG
@@ -287,7 +296,8 @@ HFormat HFormat::operator % ( int long const& il )
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
 	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT ) && ( t._conversion & HFormatImpl::CONVERSION::D_LONG ) );
+	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
+			&& ( t._conversion & HFormatImpl::CONVERSION::D_LONG ) );
 	_impl->_args.push_back( il );
 	return ( _impl );
 	M_EPILOG
@@ -298,7 +308,9 @@ HFormat HFormat::operator % ( int long unsigned const& ilu )
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
 	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT ) && ( t._conversion & HFormatImpl::CONVERSION::D_LONG ) && ( t._conversion & HFormatImpl::CONVERSION::D_UNSIGNED ) );
+	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
+			&& ( t._conversion & HFormatImpl::CONVERSION::D_LONG )
+			&& ( t._conversion & HFormatImpl::CONVERSION::D_UNSIGNED ) );
 	_impl->_args.push_back( static_cast<int long>( ilu ) );
 	return ( _impl );
 	M_EPILOG
@@ -320,7 +332,8 @@ HFormat HFormat::operator % ( double long const& dl )
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
 	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_DOUBLE ) && ( t._conversion & HFormatImpl::CONVERSION::D_LONG ) );
+	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_DOUBLE )
+			&& ( t._conversion & HFormatImpl::CONVERSION::D_LONG ) );
 	_impl->_args.push_back( dl );
 	return ( _impl );
 	M_EPILOG
@@ -420,9 +433,10 @@ HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_constant( HString const&
 	{
 	M_PROLOG
 	OToken t;
-	int token = static_cast<int>( s.find( '%' ) );
+	int token = static_cast<int>( s.find( '%', i ) );
 	t._const = s.mid( i, token > 0 ? token - i : INT_MAX );
 	i += static_cast<int>( t._const.get_length() );
+	t._conversion = CONVERSION::D_CONSTANT;
 	return ( t );
 	M_EPILOG
 	}
@@ -512,7 +526,7 @@ HFormat::HFormatImpl::CONVERSION::converion_t HFormat::HFormatImpl::get_conversi
 	M_PROLOG
 	CONVERSION::converion_t conversion = CONVERSION::D_EMPTY;
 	M_ENSURE( i < s.get_length() );
-	struct
+	struct OLength
 		{
 		char const* _label;
 		CONVERSION::converion_t _converion;
@@ -522,7 +536,7 @@ HFormat::HFormatImpl::CONVERSION::converion_t HFormat::HFormatImpl::get_conversi
 				{ "l", CONVERSION::D_LONG },
 				{ "L", CONVERSION::D_LONG } };
 	int lenMod = -1;
-	for ( size_t k = 0; k < ( sizeof ( length ) / sizeof ( char const* ) ); ++ k )
+	for ( size_t k = 0; k < ( sizeof ( length ) / sizeof ( OLength ) ); ++ k )
 		{
 		if ( s.find( length[ k ]._label, i ) == i )
 			{
