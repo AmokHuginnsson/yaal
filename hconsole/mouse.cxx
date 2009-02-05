@@ -11,13 +11,13 @@ Copyright:
 
  You are free to use this program as is, you can redistribute binary
  package freely but:
-  1. You can not use any part of sources of this software.
-  2. You can not redistribute any part of sources of this software.
+  1. You cannot use any part of sources of this software.
+  2. You cannot redistribute any part of sources of this software.
   3. No reverse engineering is allowed.
-  4. If you want redistribute binary package you can not demand any fees
+  4. If you want redistribute binary package you cannot demand any fees
      for this software.
-     You can not even demand cost of the carrier (CD for example).
-  5. You can not include it to any commercial enterprise (for example 
+     You cannot even demand cost of the carrier (CD for example).
+  5. You cannot include it to any commercial enterprise (for example 
      as a free add-on to payed software or payed newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -89,7 +89,7 @@ int hunt_tty ( int a_iOffset )
 				l_iVC = lexical_cast<int>( l_pcPtr + 4 + a_iOffset );
 			}
 		else
-			M_THROW( "can not find controling virtual console", errno );
+			M_THROW( "cannot find controling virtual console", errno );
 		}
 	return ( l_iVC );
 	M_EPILOG
@@ -114,12 +114,12 @@ int console_mouse_open( void )
 	n_iMouse = ::open( l_pcTty, O_RDWR );
 	if ( n_iMouse < 0 )
 		{
-		l_oError.format( _( "can not open mouse, %s" ), error_message( errno ) );
+		l_oError.format( _( "cannot open mouse, %s" ), error_message( errno ) );
 		M_THROW( l_oError, l_iVC );
 		}
 	if ( ::ioctl( n_iMouse, CONS_MOUSECTL, &l_sMouse ) < 0 )
 		{
-		l_oError.format( _( "can not setup mouse mode, %s" ), error_message( errno ) );
+		l_oError.format( _( "cannot setup mouse mode, %s" ), error_message( errno ) );
 		TEMP_FAILURE_RETRY( ::close( n_iMouse ) );
 		M_THROW( l_oError, errno );
 		}
@@ -136,7 +136,7 @@ int console_mouse_get ( OMouse & a_rsMouse )
 	mouse_info l_sMouse;
 	l_sMouse.operation = MOUSE_GETINFO;
 	if ( ::ioctl( n_iMouse, CONS_MOUSECTL, &l_sMouse ) < 0 )
-		M_THROW( "can not get mouse data", errno );
+		M_THROW( "cannot get mouse data", errno );
 	else
 		{
 		a_rsMouse.f_iButtons = l_sMouse.u.data.buttons;
@@ -188,7 +188,7 @@ int console_mouse_get( OMouse& a_rsMouse )
 	M_PROLOG
 	Gpm_Event l_sEvent;
 	if ( Gpm_GetEvent( &l_sEvent ) != 1 )
-		M_THROW( _( "can not retrieve event") , errno );
+		M_THROW( _( "cannot retrieve event") , errno );
 	a_rsMouse.f_iButtons = l_sEvent.buttons;
 	a_rsMouse.f_iRow = l_sEvent.y;
 	a_rsMouse.f_iColumn = l_sEvent.x;
@@ -230,7 +230,7 @@ int console_mouse_get( OMouse& )
 int console_mouse_close( void )
 	{
 	M_PROLOG
-/*	I can not throw exception here bacause exception was probably
+/*	I cannot throw exception here bacause exception was probably
  *	thrown by console_mouse_open in enter_curses and now this
  *	function is probably called from leave_curses from exception
  *	catch block, so new exception would be recursive and would
@@ -269,7 +269,7 @@ int x_mouse_get( OMouse& a_rsMouse )
 	M_PROLOG
 	MEVENT l_sMouse;
 	if ( getmouse( &l_sMouse ) != OK )
-		M_THROW ( "can not get mouse data", errno );
+		M_THROW ( "cannot get mouse data", errno );
 	else
 		{
 		a_rsMouse.f_iButtons = static_cast<int>( l_sMouse.bstate );

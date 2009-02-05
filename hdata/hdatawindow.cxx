@@ -11,13 +11,13 @@ Copyright:
 
  You are free to use this program as is, you can redistribute binary
  package freely but:
-  1. You can not use any part of sources of this software.
-  2. You can not redistribute any part of sources of this software.
+  1. You cannot use any part of sources of this software.
+  2. You cannot redistribute any part of sources of this software.
   3. No reverse engineering is allowed.
-  4. If you want redistribute binary package you can not demand any fees
+  4. If you want redistribute binary package you cannot demand any fees
      for this software.
-     You can not even demand cost of the carrier (CD for example).
-  5. You can not include it to any commercial enterprise (for example 
+     You cannot even demand cost of the carrier (CD for example).
+  5. You cannot include it to any commercial enterprise (for example 
      as a free add-on to payed software or payed newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -313,7 +313,7 @@ int HDataWindow::handler_add_new( int, void const* )
 	if ( f_eDocumentMode != DOCUMENT::D_VIEW )
 		{
 		f_oStatusBar->message( COLORS::D_FG_BRIGHTRED,
-				_ ( "You can not add new rocord now." ) );
+				_ ( "You cannot add new rocord now." ) );
 		return ( 0 );
 		}
 	f_eMode = HSQLDescriptor::MODE::D_INSERT;
@@ -330,7 +330,7 @@ int HDataWindow::handler_edit( int, void const* )
 	if ( f_eDocumentMode != DOCUMENT::D_VIEW )
 		{
 		f_oStatusBar->message( COLORS::D_FG_BRIGHTRED,
-				_ ( "You can not start editing of this record." ) );
+				_ ( "You cannot start editing of this record." ) );
 		return ( 0 );
 		}
 	if ( ! f_oDB->get_size() )
@@ -351,7 +351,7 @@ int HDataWindow::handler_delete( int, void const* )
 	if ( f_eDocumentMode != DOCUMENT::D_VIEW )
 		{
 		f_oStatusBar->message( COLORS::D_FG_BRIGHTRED,
-				_( "You can not delete this record." ) );
+				_( "You cannot delete this record." ) );
 		return ( 0 );
 		}
 	if ( ! f_oDB->get_size() )

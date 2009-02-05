@@ -11,13 +11,13 @@ Copyright:
 
  You are free to use this program as is, you can redistribute binary
  package freely but:
-  1. You can not use any part of sources of this software.
-  2. You can not redistribute any part of sources of this software.
+  1. You cannot use any part of sources of this software.
+  2. You cannot redistribute any part of sources of this software.
   3. No reverse engineering is allowed.
-  4. If you want redistribute binary package you can not demand any fees
+  4. If you want redistribute binary package you cannot demand any fees
      for this software.
-     You can not even demand cost of the carrier (CD for example).
-  5. You can not include it to any commercial enterprise (for example 
+     You cannot even demand cost of the carrier (CD for example).
+  5. You cannot include it to any commercial enterprise (for example 
      as a free add-on to payed software or payed newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -603,7 +603,7 @@ void HListControl::add_column( int const& a_riColumn, char const* a_pcName,
 	HColumnInfo l_oColumnInfo;
 	int l_iSize = static_cast<int>( f_oControler->size() );
 	if ( l_iSize )
-		M_THROW ( "can not add new column when list not empty", l_iSize );
+		M_THROW ( "cannot add new column when list not empty", l_iSize );
 	f_oVarTmpBuffer = a_pcName;
 	l_iShortcutIndex = static_cast<int>( f_oVarTmpBuffer.find( '&' ) );
 	if ( l_iShortcutIndex > -1 )

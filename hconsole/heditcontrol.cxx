@@ -11,13 +11,13 @@ Copyright:
 
  You are free to use this program as is, you can redistribute binary
  package freely but:
-  1. You can not use any part of sources of this software.
-  2. You can not redistribute any part of sources of this software.
+  1. You cannot use any part of sources of this software.
+  2. You cannot redistribute any part of sources of this software.
   3. No reverse engineering is allowed.
-  4. If you want redistribute binary package you can not demand any fees
+  4. If you want redistribute binary package you cannot demand any fees
      for this software.
-     You can not even demand cost of the carrier (CD for example).
-  5. You can not include it to any commercial enterprise (for example 
+     You cannot even demand cost of the carrier (CD for example).
+  5. You cannot include it to any commercial enterprise (for example 
      as a free add-on to payed software or payed newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -91,7 +91,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	if ( l_iErrorCode )
 		M_THROW ( f_oPattern.error(), l_iErrorCode );
 	l_iLength = static_cast<int>( f_oString.get_length() );
-/* this is part of draw_label() method, we can not wait with setting up
+/* this is part of draw_label() method, we cannot wait with setting up
  * f_iWidthRaw until draw_label(), which is called from refresh()
  * because ... see next comment */
 	f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
