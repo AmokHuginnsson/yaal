@@ -439,7 +439,7 @@ struct find_type
 		+ 6 * same_type<t6_t, tType>::value
 		+ 7 * same_type<t7_t, tType>::value
 		+ 8 * same_type<t8_t, tType>::value
-		+ 8 * same_type<t9_t, tType>::value;
+		+ 9 * same_type<t9_t, tType>::value;
 	};
 
 /*! \brief Simulate binary literal.
