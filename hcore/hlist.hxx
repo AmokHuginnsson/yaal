@@ -121,10 +121,18 @@ public:
 	typedef HIterator<tType const, OListBits::D_TREAT_AS_OPENED> const_iterator;
 	typedef HIterator<tType, OListBits::D_TREAT_AS_CLOSED> cyclic_iterator;
 	typedef HIterator<tType const, OListBits::D_TREAT_AS_CLOSED> const_cyclic_iterator;
-	HList( int = 0 );                 /* Creates list, with specified size */
+	/*! \brief Creates list, with specified size.
+	 *
+	 * \param count - number of element for newly created list.
+	 */
+	HList( int count = 0 );
 	virtual ~HList( void );
 	HList( HList const& );
 	HList& operator = ( HList const& );
+	/*! \brief Creates list, from range of elements.
+	 */
+	template<typename iter_t>
+	HList( iter_t, iter_t );
 	cyclic_iterator hook( void );
 	const_cyclic_iterator hook( void ) const;
 	iterator begin( void );
@@ -445,8 +453,8 @@ HList<tType>::HList( int a_iSize )
 	{
 	M_PROLOG
 	while ( a_iSize -- )
-		HList::add_tail();
-	return ;
+		add_tail();
+	return;
 	M_EPILOG
 	}
 
@@ -454,8 +462,8 @@ template<typename tType>
 HList<tType>::~HList( void )
 	{
 	M_PROLOG
-	HList::clear();
-	return ;
+	clear();
+	return;
 	M_EPILOG
 	}
 
@@ -467,6 +475,20 @@ HList<tType>::HList( HList<tType> const& a_roList )
 	{
 	M_PROLOG
 	( *this ) = a_roList;
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+template<typename iter_t>
+HList<tType>::HList( iter_t i, iter_t endIt )
+	: OListBits(), f_iSize( 0 ),
+	f_poHook( NULL ), f_eOrder( D_UNSORTED ),
+	f_iIndex( 0 ), f_poIndex( NULL )
+	{
+	M_PROLOG
+	for ( ; i != endIt; ++ i )
+		push_back( *i );
 	return;
 	M_EPILOG
 	}

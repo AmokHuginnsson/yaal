@@ -76,10 +76,21 @@ public:
 		{ return ( f_oEngine.is_empty() );	}
 	bool is_empty( void ) const
 		{ return ( f_oEngine.is_empty() );	}
-	HPair<HIterator, bool> insert( tType const& e )
+	HPair<HIterator, bool> insert( tType const& elem )
 		{
-		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<tType, helper_t>( e );
+		M_PROLOG
+		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<tType, helper_t>( elem );
 		return ( make_pair( HIterator( p.first ), p.second ) );
+		M_EPILOG
+		}
+	template<typename iter_t>
+	void insert( iter_t i, iter_t endIt )
+		{
+		M_PROLOG
+		for ( ; i != endIt; ++ i )
+			insert( *i );
+		return;
+		M_EPILOG
 		}
 	void remove( tType const& e )
 		{	f_oEngine.remove<tType, tType, helper_t>( e );	}

@@ -82,6 +82,15 @@ public:
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 		}
+	template<typename iter_t>
+	void push_back( iter_t i, iter_t endIt )
+		{
+		M_PROLOG
+		for ( ; i != endIt; ++ i )
+			push_back( *i );
+		return;
+		M_EPILOG
+		}
 	iterator push_front( key_t const& key, value_t const& value )
 		{
 		M_PROLOG
@@ -89,6 +98,15 @@ public:
 		major->second->push_front( value );
 		typename value_list_t::iterator minor = major->second->begin();
 		return ( iterator( this, major, minor ) );
+		M_EPILOG
+		}
+	template<typename iter_t>
+	void push_front( iter_t i, iter_t endIt )
+		{
+		M_PROLOG
+		for ( ; i != endIt; ++ i )
+			push_front( *i );
+		return;
 		M_EPILOG
 		}
 	void remove_set( key_t const& key )

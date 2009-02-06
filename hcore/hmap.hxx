@@ -90,6 +90,15 @@ public:
 		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<map_elem_t, helper_t>( e );
 		return ( make_pair( iterator( p.first ), p.second ) );
 		}
+	template<typename iter_t>
+	void insert( iter_t i, iter_t endIt )
+		{
+		M_PROLOG
+		for ( ; i != endIt; ++ i )
+			insert( *i );
+		return;
+		M_EPILOG
+		}
 	void remove( key_t const& key )
 		{
 		M_PROLOG
