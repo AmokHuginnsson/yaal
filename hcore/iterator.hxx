@@ -34,50 +34,33 @@ namespace hcore
 {
 
 template<typename tType>
-class HBackInsertIterator
+class HBackInsertionConcept
 	{
-	tType& _coll;
 public:
-	HBackInsertIterator( tType& coll ) : _coll( coll ) {}
-	HBackInsertIterator& operator ++ ( void )
-		{ return ( *this ); }
-	HBackInsertIterator& operator* ( void )
-		{ return ( *this ); }
-	template<typename arg_t>
-	HBackInsertIterator& operator = ( arg_t const& elem )
-		{
-		_coll.push_back( elem );
-		return ( *this );
-		}
+	template<typename elem_t>
+	static void insert( tType& coll, elem_t const& elem )
+		{ coll.push_back( elem ); }
 	};
 
 template<typename tType>
-HBackInsertIterator<tType> back_insert_iterator( tType& coll )
-	{ return ( HBackInsertIterator<tType>( coll ) ); }
-
-template<typename tType>
-class HFrontInsertIterator
+class HFrontInsertionConcept
 	{
-	tType& _coll;
 public:
-	HFrontInsertIterator( tType& coll ) : _coll( coll ) {}
-	HFrontInsertIterator& operator ++ ( void )
-		{ return ( *this ); }
-	HFrontInsertIterator& operator* ( void )
-		{ return ( *this ); }
-	template<typename arg_t>
-	HFrontInsertIterator& operator = ( arg_t const& elem )
-		{
-		_coll.front_back( elem );
-		return ( *this );
-		}
+	template<typename elem_t>
+	static void insert( tType& coll, elem_t const& elem )
+		{ coll.push_front( elem ); }
 	};
 
 template<typename tType>
-HFrontInsertIterator<tType> front_insert_iterator( tType& coll )
-	{ return ( HFrontInsertIterator<tType>( coll ) ); }
+class HInsertionConcept
+	{
+public:
+	template<typename elem_t>
+	static void insert( tType& coll, elem_t const& elem )
+		{ coll.insert( elem ); }
+	};
 
-template<typename tType>
+template<typename tType, typename inserter>
 class HInsertIterator
 	{
 	tType& _coll;
@@ -90,14 +73,22 @@ public:
 	template<typename arg_t>
 	HInsertIterator& operator = ( arg_t const& elem )
 		{
-		_coll.insert( elem );
+		inserter::insert( _coll, elem );
 		return ( *this );
 		}
 	};
 
 template<typename tType>
-HInsertIterator<tType> insert_iterator( tType& coll )
-	{ return ( HInsertIterator<tType>( coll ) ); }
+HInsertIterator<tType, HBackInsertionConcept<tType> > back_insert_iterator( tType& coll )
+	{ return ( HInsertIterator<tType, HBackInsertionConcept<tType> >( coll ) ); }
+
+template<typename tType>
+HInsertIterator<tType, HFrontInsertionConcept<tType> > front_insert_iterator( tType& coll )
+	{ return ( HInsertIterator<tType, HFrontInsertionConcept<tType> >( coll ) ); }
+
+template<typename tType>
+HInsertIterator<tType, HInsertionConcept<tType> > insert_iterator( tType& coll )
+	{ return ( HInsertIterator<tType, HInsertionConcept<tType> >( coll ) ); }
 
 }
 
