@@ -33,6 +33,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "harray.hxx"
 #include "hset.hxx"
 #include "hvariant.hxx"
+#include "iterator.hxx"
 
 namespace yaal
 {
@@ -177,6 +178,8 @@ HFormat::HFormat( char const* const aFmt )
 	bool first = true;
 	typedef HSet<int> idx_t;
 	idx_t idxs;
+	idx_t widthIdxs;
+	idx_t precIdxs;
 	for ( HFormatImpl::tokens_t::iterator it = _impl->_tokens.begin(); it != _impl->_tokens.end(); ++ it )
 		{
 		bool tokenIdx = ( it->_position > 0 ) || ( it->_width < -1 ) || ( it->_precision < -1 );
@@ -185,14 +188,16 @@ HFormat::HFormat( char const* const aFmt )
 		if ( it->_position > 0 )
 			idxs.insert( it->_position );
 		if ( it->_width < -1 )
-			idxs.insert( - ( it->_width + 1 ) );
+			widthIdxs.insert( - ( it->_width + 1 ) );
 		if ( it->_precision < -1 )
-			idxs.insert( - ( it->_precision + 1 ) );
+			precIdxs.insert( - ( it->_precision + 1 ) );
 		if ( first )
 			hasIndex = tokenIdx;
 		first = false;
 		}
 	int last = 0;
+	copy( widthIdxs.begin(), widthIdxs.end(), insert_iterator( idxs ) );
+	copy( precIdxs.begin(), precIdxs.end(), insert_iterator( idxs ) );
 	for ( idx_t::iterator it = idxs.begin(); it != idxs.end(); ++ it, ++ last )
 		M_ENSURE( *it == ( last + 1 ) );
 	return;
