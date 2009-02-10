@@ -204,6 +204,87 @@ void copy( src_it_t src, src_it_t const& end, dst_it_t dst )
 	return;
 	}
 
+template<typename iter1_t, typename iter2_t>
+bool equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
+	{
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
+		;
+	return ( ( it1 == end1 ) && ( it2 == end2 ) );
+	}
+
+template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
+iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out )
+	{
+	for ( ; it1 != end1; ++ it1, ++ out )
+		{
+		for ( ; ( it2 != end2 ) && ( *it2 < *it1 ); ++ it2, ++ out )
+			*out = *it2;
+		*out = *it1;
+		}
+	for ( ; it2 != end2; ++ it2, ++ out )
+		*out = *it2;
+	return ( out );
+	}
+
+template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
+iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out )
+	{
+	while ( ( it1 != end1 ) || ( it2 != end2 ) )
+		{
+		if ( it1 != end1 )
+			{
+			if ( it2 != end2 )
+				{
+				if ( *it1 < *it2 )
+					{
+					*out = *it1;
+					++ it1;
+					}
+				else if ( *it2 < *it1 )
+					{
+					*out = *it2;
+					++ it2;
+					}
+				else
+					{
+					*out = *it1;
+					++ it1;
+					++ it2;
+					}
+				}
+			else
+				{
+				*out = *it1;
+				++ it1;
+				}
+			}
+		else if ( it2 != end2 )
+			{
+			*out = *it2;
+			++ it2;
+			}
+		++ out;
+		}
+	return ( out );
+	}
+
+template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
+iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out )
+	{
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ); ++ it1 )
+		{
+		for ( ; ( it2 != end2 ) && ( *it2 < *it1 ); ++ it2 )
+			;
+		if ( ( it2 != end2 ) && ! ( *it1 < *it2 ) )
+			{
+			*out = *it1;
+			++ out;
+			++ it2;
+			}
+		}
+	return ( out );
+	}
+
 template<typename first_it_t, typename second_it_t>
 void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second )
 	{
