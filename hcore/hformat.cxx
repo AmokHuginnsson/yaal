@@ -155,6 +155,29 @@ void HFormat::HFormatImpl::swap( HFormat::HFormatImpl& fi )
 	M_EPILOG
 	}
 
+namespace
+{
+
+class common
+	{
+	int long _count;
+public:
+	common( int long count = 0 ) : _count( count ) {}
+	common& operator = ( int ) { return ( *this ); }
+	common& operator* ( void ) { return ( *this ); }
+	common& operator ++ ( void ) { ++ _count; return ( *this ); }
+	int long operator()( void ) { return ( _count ); }
+	void operator() ( int long count ) { _count = count; }
+	} c;
+
+template<typename iter1_t, typename iter2_t>
+bool does_intersect( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
+	{
+	return ( set_intersection( it1, end1, it2, end2, c )() > 0 );
+	}
+
+}
+
 HFormat::HFormat( char const* const aFmt )
 	: _impl( new HFormatImpl( aFmt ) )
 	{
@@ -196,6 +219,9 @@ HFormat::HFormat( char const* const aFmt )
 		first = false;
 		}
 	int last = 0;
+	M_ENSURE( ! does_intersect( widthIdxs.begin(), widthIdxs.end(), precIdxs.begin(), precIdxs.end() ) );
+	M_ENSURE( ! does_intersect( widthIdxs.begin(), widthIdxs.end(), idxs.begin(), idxs.end() ) );
+	M_ENSURE( ! does_intersect( idxs.begin(), idxs.end(), precIdxs.begin(), precIdxs.end() ) );
 	copy( widthIdxs.begin(), widthIdxs.end(), insert_iterator( idxs ) );
 	copy( precIdxs.begin(), precIdxs.end(), insert_iterator( idxs ) );
 	for ( idx_t::iterator it = idxs.begin(); it != idxs.end(); ++ it, ++ last )
