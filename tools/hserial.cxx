@@ -191,17 +191,17 @@ void HSerial::compile_speed ( void )
 		case ( D_SPEED_DEFAULT ): break;
 		default :
 			{
-			M_THROW ( _ ( "unknown speed" ), f_eSpeed );
+			M_THROW( _( "unknown speed" ), f_eSpeed );
 			break;
 			}
 		}
-	cfsetispeed ( & l_sTIO, l_iBaudRate );
-	cfsetospeed ( & l_sTIO, l_iBaudRate );
+	cfsetispeed( &l_sTIO, l_iBaudRate );
+	cfsetospeed( &l_sTIO, l_iBaudRate );
 	return;
 	M_EPILOG
 	}
 
-void HSerial::set_flags ( flags_t a_eFlags )
+void HSerial::set_flags( flags_t a_eFlags )
 	{
 	M_PROLOG
 	f_eFlags = a_eFlags;
@@ -209,11 +209,11 @@ void HSerial::set_flags ( flags_t a_eFlags )
 	M_EPILOG
 	}
 
-void HSerial::compile_flags ( void )
+void HSerial::compile_flags( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		M_THROW ( n_pcEAlreadyOpened, errno );
+		M_THROW( n_pcEAlreadyOpened, errno );
 	termios& l_sTIO = *f_oTIO.get<termios>();
 	int l_iCtr = 0;
 	if ( f_eFlags & D_FLAGS_DEFAULT )
@@ -332,18 +332,18 @@ void HSerial::flush ( int a_iType )
 	M_EPILOG
 	}
 
-void HSerial::wait_for_eot ( void )
+void HSerial::wait_for_eot( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcENotOpened, errno );
-	if ( tcdrain ( f_iFileDescriptor ) )
-		M_THROW ( "tcdrain", errno );
+		M_THROW( n_pcENotOpened, errno );
+	if ( tcdrain( f_iFileDescriptor ) )
+		M_THROW( "tcdrain", errno );
 	return;
 	M_EPILOG
 	}
 
-int HSerial::timed_read ( void * const a_pcBuffer, int const a_iSize,
+int HSerial::timed_read( void* const a_pcBuffer, int const a_iSize,
 		int const a_iTimeOutSec, int const a_iTimeOutUsec )
 	{
 	M_PROLOG

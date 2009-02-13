@@ -657,7 +657,7 @@ int HConsole::on_terminal_resize( int a_iSignum )
 	M_PROLOG
 	HString l_oMessage;
 	l_oMessage = "Terminal size changed: ";
-	l_oMessage += strsignal ( a_iSignum );
+	l_oMessage += strsignal( a_iSignum );
 	l_oMessage += '.';
 	log << l_oMessage << endl;
 	if ( is_enabled() )

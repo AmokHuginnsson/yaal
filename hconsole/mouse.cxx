@@ -74,18 +74,19 @@ int hunt_tty ( int a_iOffset )
 	M_PROLOG
 	/* this hack allows to guess current controling virtual terminal screen */
 	int l_iVC = 0;
-	char * l_pcTtyName = NULL, * l_pcPtr = NULL;
-	l_pcTtyName = ttyname ( STDIN_FILENO );
-	if ( l_pcTtyName && ! strncmp ( l_pcTtyName, "/dev/ttyv", 8 + a_iOffset ) )
+	char const* l_pcTtyName = NULL;
+	char const* l_pcPtr = NULL;
+	l_pcTtyName = ttyname( STDIN_FILENO );
+	if ( l_pcTtyName && ! ::strncmp( l_pcTtyName, "/dev/ttyv", 8 + a_iOffset ) )
 		l_iVC = lexical_cast<int>( l_pcTtyName + 8 + a_iOffset );
 	else
 		{
-		l_pcTtyName = ::getenv ( "STY" );
+		l_pcTtyName = ::getenv( "STY" );
 		if ( l_pcTtyName )
 			{
-			if ( ( l_pcPtr = strstr ( l_pcTtyName, ".tty" ) ) )
+			if ( ( l_pcPtr = ::strstr( l_pcTtyName, ".tty" ) ) )
 				l_iVC = lexical_cast<int>( l_pcPtr + 4 + a_iOffset );
-			else if ( ( l_pcPtr = strstr ( l_pcTtyName, ".pts" ) ) )
+			else if ( ( l_pcPtr = ::strstr( l_pcTtyName, ".pts" ) ) )
 				l_iVC = lexical_cast<int>( l_pcPtr + 4 + a_iOffset );
 			}
 		else
@@ -269,7 +270,7 @@ int x_mouse_get( OMouse& a_rsMouse )
 	M_PROLOG
 	MEVENT l_sMouse;
 	if ( getmouse( &l_sMouse ) != OK )
-		M_THROW ( "cannot get mouse data", errno );
+		M_THROW( "cannot get mouse data", errno );
 	else
 		{
 		a_rsMouse.f_iButtons = static_cast<int>( l_sMouse.bstate );
