@@ -197,26 +197,27 @@ HFormat::HFormat( char const* const aFmt )
 		else
 			break;
 		}
-	bool hasIndex = false;
-	bool first = true;
+	bool anyTokenHaveIndex = false;
+	bool firstToken = true;
 	typedef HSet<int> idx_t;
 	idx_t idxs;
 	idx_t widthIdxs;
 	idx_t precIdxs;
 	for ( HFormatImpl::tokens_t::iterator it = _impl->_tokens.begin(); it != _impl->_tokens.end(); ++ it )
 		{
-		bool tokenIdx = ( it->_position > 0 ) || ( it->_width < -1 ) || ( it->_precision < -1 );
-		M_ENSURE( ! tokenIdx || ( tokenIdx && ( it->_position > 0 ) && ( it->_width != -1 ) && ( it->_precision != -1 ) ) );
-		M_ENSURE( first || ( hasIndex && tokenIdx ) );
+		bool thisTokenHasIndex = ( it->_position > 0 ) || ( it->_width < -1 ) || ( it->_precision < -1 );
+		M_ENSURE( ! thisTokenHasIndex
+				|| ( thisTokenHasIndex && ( it->_position > 0 ) && ( it->_width != -1 ) && ( it->_precision != -1 ) ) );
+		M_ENSURE( firstToken || ( anyTokenHaveIndex && thisTokenHasIndex ) || ( ! ( anyTokenHaveIndex || thisTokenHasIndex ) ) );
 		if ( it->_position > 0 )
 			idxs.insert( it->_position );
 		if ( it->_width < -1 )
 			widthIdxs.insert( - ( it->_width + 1 ) );
 		if ( it->_precision < -1 )
 			precIdxs.insert( - ( it->_precision + 1 ) );
-		if ( first )
-			hasIndex = tokenIdx;
-		first = false;
+		if ( firstToken )
+			anyTokenHaveIndex = thisTokenHasIndex;
+		firstToken = false;
 		}
 	int last = 0;
 	M_ENSURE( ! does_intersect( widthIdxs.begin(), widthIdxs.end(), precIdxs.begin(), precIdxs.end() ) );
