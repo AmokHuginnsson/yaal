@@ -241,8 +241,8 @@ private:
 public:
 	/*{*/
 	HIterator( void );
-	template<OListBits::treatment_t family>
-	HIterator( HIterator<const_qual_t, family> const& );
+	template<typename other_const_qual_t, OListBits::treatment_t family>
+	HIterator( HIterator<other_const_qual_t, family> const& );
 	HIterator& operator ++ ( void )
 		{
 		M_PROLOG
@@ -283,8 +283,7 @@ public:
 		return ( l_oIterator );
 		M_EPILOG
 		}
-	template<OListBits::treatment_t family>
-	typename HList<tType>::template HIterator<const_qual_t, treatment>& operator = ( HIterator<const_qual_t, family> const& );
+	typename HList<tType>::template HIterator<const_qual_t, treatment>& operator = ( HIterator const& );
 	bool operator == ( HIterator const & ) const;
 	bool operator != ( HIterator const & ) const;
 	const_qual_t& operator* ( void );
@@ -346,12 +345,12 @@ HList<tType>::HIterator<const_qual_t, treatment>::HIterator( void )
 
 template<typename tType>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-template<OListBits::treatment_t family>
-HList<tType>::HIterator<const_qual_t, treatment>::HIterator( HIterator<const_qual_t, family> const& a_roIterator )
-	: f_poOwner( NULL ), f_poCurrent( NULL )
+template<typename other_const_qual_t, OListBits::treatment_t family>
+HList<tType>::HIterator<const_qual_t, treatment>::HIterator( HIterator<other_const_qual_t, family> const& a_roIterator )
+	: f_poOwner( a_roIterator.f_poOwner ), f_poCurrent( a_roIterator.f_poCurrent )
 	{
 	M_PROLOG
-	operator = ( a_roIterator );
+	STATIC_ASSERT(( same_type<const_qual_t, other_const_qual_t>::value || same_type<const_qual_t, other_const_qual_t const>::value ));
 	return;
 	M_EPILOG
 	}
@@ -367,9 +366,8 @@ HList<tType>::HIterator<const_qual_t, treatment>::HIterator( HList<tType> const*
 
 template<typename tType>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-template<OListBits::treatment_t family>
 typename HList<tType>::template HIterator<const_qual_t, treatment>&
-HList<tType>::HIterator<const_qual_t, treatment>::operator = ( HIterator<const_qual_t, family> const& a_roIterator )
+HList<tType>::HIterator<const_qual_t, treatment>::operator = ( HIterator const& a_roIterator )
 	{
 	M_PROLOG
 	if ( reinterpret_cast<HIterator<const_qual_t, treatment> const*>( &a_roIterator ) != this )

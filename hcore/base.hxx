@@ -62,7 +62,7 @@ template<bool> struct static_assert_failure;
  * then compilation of an unit fails.
  */
 template<> struct static_assert_failure<true> { enum { value = 1 }; };
-#define STATIC_ASSERT( condition ) { typedef char SAF##__LINE__ [ static_assert_failure<( condition )>::value ]; }
+#define STATIC_ASSERT( condition ) { typedef char SAF##__LINE__[ static_assert_failure<( condition )>::value ]; }
 
 #define _(string) gettext (string)
 
@@ -323,6 +323,22 @@ return_t accumulate( iterator_t it, iterator_t end, return_t ret )
 	for ( ; it != end; ++ it )
 		ret += *it;
 	return ( ret );
+	}
+
+template<typename iter_t>
+int long distance( iter_t first, iter_t last )
+	{
+	int long dist = 0;
+	while ( first != last )
+		++ first, ++ dist;
+	return ( dist );
+	}
+
+template<typename iter_t>
+void advance( iter_t& it, int long const& dist )
+	{
+	for ( int long i = 0; i < dist; ++ i, ++ it )
+		;
 	}
 
 /*! \brief Type trait alteration utilities.

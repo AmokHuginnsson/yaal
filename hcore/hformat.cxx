@@ -94,6 +94,7 @@ class HFormat::HFormatImpl
 	HString _format;
 	HString _string;
 	tokens_t _tokens;
+	tokens_t::const_iterator _token;
 	args_t _args;
 	HFormatImpl( char const* const );
 	HFormatImpl( HFormatImpl const& );
@@ -117,14 +118,15 @@ class HFormat::HFormatImpl
 	};
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
-	: _tokenIndex( 0 ), _format( fmt ), _string(), _tokens(), _args()
+	: _tokenIndex( 0 ), _format( fmt ), _string(), _tokens(), _token(), _args()
 	{
 	}
 
 HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
 	: _tokenIndex( fi._tokenIndex ), _format( fi._format ),
-	_string( fi._string ), _tokens( fi._tokens ), _args( fi._args )
+	_string( fi._string ), _tokens( fi._tokens ), _token( _tokens.begin() ), _args( fi._args )
 	{
+	advance( _token, distance( fi._tokens.begin(), fi._token ) );
 	}
 
 HFormat::HFormatImpl& HFormat::HFormatImpl::operator = ( HFormat::HFormatImpl const& fi )
@@ -227,6 +229,7 @@ HFormat::HFormat( char const* const aFmt )
 	copy( precIdxs.begin(), precIdxs.end(), insert_iterator( idxs ) );
 	for ( idx_t::iterator it = idxs.begin(); it != idxs.end(); ++ it, ++ last )
 		M_ENSURE( *it == ( last + 1 ) );
+	_impl->_token = _impl->_tokens.begin();
 	return;
 	M_EPILOG
 	}
@@ -418,7 +421,10 @@ HFormat HFormat::operator % ( HString const& s )
 HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_token( void )
 	{
 	M_PROLOG
-	return ( OToken() );
+	M_ASSERT( _token != _tokens.end() );
+	tokens_t::const_iterator it = _token;
+	++ _token;
+	return ( *it );
 	M_EPILOG
 	}
 
