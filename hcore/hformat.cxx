@@ -92,9 +92,10 @@ class HFormat::HFormatImpl
 	typedef HArray<format_arg_t> args_t;
 	int _tokenIndex;
 	HString _format;
-	HString _string;
+	HString _buffer;
+	mutable HString _string;
 	tokens_t _tokens;
-	tokens_t::const_iterator _token;
+	mutable tokens_t::const_iterator _token;
 	args_t _args;
 	HFormatImpl( char const* const );
 	HFormatImpl( HFormatImpl const& );
@@ -118,12 +119,12 @@ class HFormat::HFormatImpl
 	};
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
-	: _tokenIndex( 0 ), _format( fmt ), _string(), _tokens(), _token(), _args()
+	: _tokenIndex( 0 ), _format( fmt ), _buffer(), _string(), _tokens(), _token(), _args()
 	{
 	}
 
 HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
-	: _tokenIndex( fi._tokenIndex ), _format( fi._format ),
+	: _tokenIndex( fi._tokenIndex ), _format( fi._format ), _buffer( fi._buffer ),
 	_string( fi._string ), _tokens( fi._tokens ), _token( _tokens.begin() ), _args( fi._args )
 	{
 	advance( _token, distance( fi._tokens.begin(), fi._token ) );
@@ -149,8 +150,10 @@ void HFormat::HFormatImpl::swap( HFormat::HFormatImpl& fi )
 		using yaal::swap;
 		swap( _tokenIndex, fi._tokenIndex );
 		swap( _format, fi._format );
+		swap( _buffer, fi._buffer );
 		swap( _string, fi._string );
 		swap( _tokens, fi._tokens );
+		swap( _token, fi._token );
 		swap( _args, fi._args );
 		}
 	return;
@@ -270,6 +273,12 @@ void HFormat::swap( HFormat& fi )
 
 HString HFormat::string( void ) const
 	{
+	if ( _impl->_token != _impl->_tokens.end() )
+		{
+		M_ENSURE( _impl->_token->_conversion == HFormatImpl::CONVERSION::D_CONSTANT );
+		_impl->_string += _impl->_token->_const;
+		++ _impl->_token;
+		}
 	return ( _impl->_string );
 	}
 
@@ -370,6 +379,8 @@ HFormat HFormat::operator % ( double long const& dl )
 	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_DOUBLE )
 			&& ( t._conversion & HFormatImpl::CONVERSION::D_LONG ) );
 	_impl->_args.push_back( dl );
+	_impl->_buffer.format( "%Lf", dl );
+	_impl->_string += _impl->_buffer;
 	return ( _impl );
 	M_EPILOG
 	}
@@ -421,8 +432,15 @@ HFormat HFormat::operator % ( HString const& s )
 HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_token( void )
 	{
 	M_PROLOG
-	M_ASSERT( _token != _tokens.end() );
-	tokens_t::const_iterator it = _token;
+	tokens_t::const_iterator it;
+	while (  _token->_conversion == CONVERSION::D_CONSTANT )
+		{
+		M_ENSURE( _token != _tokens.end() );
+		_string += _token->_const;
+		++ _token;
+		}
+	M_ENSURE( _token != _tokens.end() );
+	it = _token;
 	++ _token;
 	return ( *it );
 	M_EPILOG
