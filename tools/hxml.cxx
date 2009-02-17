@@ -30,17 +30,9 @@ Copyright:
 #include <new>
 
 #include <iconv.h>
-#include <libxml/xmlversion.h>
-#include <libxml/xmlstring.h>
-#include <libxml/xmlmemory.h>
-#include <libxml/encoding.h>
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
 #include <libxml/xmlreader.h>
 #include <libxml/xmlwriter.h>
 #include <libxml/xinclude.h>
-#include <libxslt/xslt.h>
-#include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
