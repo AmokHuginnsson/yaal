@@ -30,7 +30,6 @@ Copyright:
 #include <new>
 
 #include <iconv.h>
-#include <libxml/xmlreader.h>
 #include <libxml/xmlwriter.h>
 #include <libxml/xinclude.h>
 #include <libxslt/transform.h>
