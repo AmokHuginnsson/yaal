@@ -1,0 +1,10 @@
+LINKER_FLAGS := $(filter-out -Wl$(COMA)--fatal-warnings,$(LINKER_FLAGS))
+LINKER_FLAGS := $(filter-out -Wl$(COMA)--export-dynamic,$(LINKER_FLAGS))
+LINKER_FLAGS := $(filter-out -Wl$(COMA)-soname$(COMA),$(LINKER_FLAGS))
+SONAME_hcore =
+SONAME_tools =
+SONAME_dbwrapper =
+SONAME_hconsole =
+SONAME_hdata =
+GROUP_START =
+GROUP_END =

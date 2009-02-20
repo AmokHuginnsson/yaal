@@ -50,3 +50,7 @@ LINKER_PRIME_FLAGS						= \
 								-Wl,--fatal-warnings \
 								-Wl,--demangle
 
+GROUP_START = -Wl,-\(
+GROUP_END = -Wl,-\)
+
+# vim: ft=make
