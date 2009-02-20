@@ -38,7 +38,7 @@ namespace yaal
 namespace hcore
 {
 
-char const * const n_pcDefaultTimeFormat = "%a, %d %b %Y %T %z";
+char const * const n_pcDefaultTimeFormat = "%a, %d %b %Y %H:%M:%S %z";
 
 HTime::HTime( void ) : f_oFormat ( n_pcDefaultTimeFormat ),
 	f_oCache( 1, cache_t::D_AUTO_GROW ), f_xValue(), f_sBroken()
