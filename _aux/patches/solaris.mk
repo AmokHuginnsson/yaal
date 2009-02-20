@@ -1,6 +1,8 @@
 LINKER_FLAGS := $(filter-out -Wl$(COMA)--fatal-warnings,$(LINKER_FLAGS))
 LINKER_FLAGS := $(filter-out -Wl$(COMA)--export-dynamic,$(LINKER_FLAGS))
 LINKER_FLAGS := $(filter-out -Wl$(COMA)-soname$(COMA),$(LINKER_FLAGS))
+# LINKER_FLAGS := $(subst -Wl$(COMA),,$(LINKER_FLAGS)) # if you want to force linker
+# LIBS_tools := $(subst -rdynamic,,$(LIBS_tools)) # if you want to force linker
 SONAME_hcore =
 SONAME_tools =
 SONAME_dbwrapper =
