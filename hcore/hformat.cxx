@@ -30,7 +30,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hformat.hxx"
 #include "hlist.hxx"
-#include "harray.hxx"
+#include "hmap.hxx"
 #include "hset.hxx"
 #include "hvariant.hxx"
 #include "iterator.hxx"
@@ -88,20 +88,24 @@ class HFormat::HFormatImpl
 			_position( 0 ), _width( 0 ), _precision( 0 ), _const() {}
 		};
 	typedef HList<OToken> tokens_t;
+	typedef HMap<int, OToken*> positions_t;
+	typedef HPointer<positions_t> positions_ptr_t;
 	typedef HVariant<bool, char, int short, int, int long, void const*, double, double long, HString> format_arg_t;
-	typedef HArray<format_arg_t> args_t;
+	typedef HMap<int, format_arg_t> args_t;
+	typedef HPointer<args_t> args_ptr_t;
 	int _tokenIndex;
 	HString _format;
-	HString _buffer;
+	mutable HString _buffer;
 	mutable HString _string;
 	tokens_t _tokens;
-	mutable tokens_t::const_iterator _token;
-	args_t _args;
+	positions_ptr_t _positions;
+	tokens_t::const_iterator _token;
+	args_ptr_t _args;
 	HFormatImpl( char const* const );
 	HFormatImpl( HFormatImpl const& );
 	HFormatImpl& operator = ( HFormatImpl const& );
 	void swap( HFormatImpl& );
-	OToken next_token( void );
+	int next_token( CONVERSION::converion_t const& );
 	friend class HFormat;
 	static bool has_conversion( HString const&, int const& );
 	static OToken next_conversion( HString const&, int& );
@@ -119,15 +123,19 @@ class HFormat::HFormatImpl
 	};
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
-	: _tokenIndex( 0 ), _format( fmt ), _buffer(), _string(), _tokens(), _token(), _args()
+	: _tokenIndex( 0 ), _format( fmt ), _buffer(), _string(), _tokens(),
+	_positions( new positions_t ), _token(), _args( new args_t )
 	{
 	}
 
 HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
 	: _tokenIndex( fi._tokenIndex ), _format( fi._format ), _buffer( fi._buffer ),
-	_string( fi._string ), _tokens( fi._tokens ), _token( _tokens.begin() ), _args( fi._args )
+	_string( fi._string ), _tokens( fi._tokens ), _positions( new positions_t ),
+	_token( _tokens.begin() ), _args( new args_t )
 	{
 	advance( _token, distance( fi._tokens.begin(), fi._token ) );
+	_positions->copy_from( *fi._positions );
+	_args->copy_from( *fi._args );
 	}
 
 HFormat::HFormatImpl& HFormat::HFormatImpl::operator = ( HFormat::HFormatImpl const& fi )
@@ -208,21 +216,43 @@ HFormat::HFormat( char const* const aFmt )
 	idx_t idxs;
 	idx_t widthIdxs;
 	idx_t precIdxs;
-	for ( HFormatImpl::tokens_t::iterator it = _impl->_tokens.begin(); it != _impl->_tokens.end(); ++ it )
+	int pos = 0;
+	for ( HFormatImpl::tokens_t::iterator it = _impl->_tokens.begin(), end = _impl->_tokens.end(); it != end; ++ it, ++ pos )
 		{
+		if ( it->_conversion == HFormatImpl::CONVERSION::D_CONSTANT )
+			{
+			-- pos;
+			continue;
+			}
 		bool thisTokenHasIndex = ( it->_position > 0 ) || ( it->_width < -1 ) || ( it->_precision < -1 );
 		M_ENSURE( ! thisTokenHasIndex
 				|| ( thisTokenHasIndex && ( it->_position > 0 ) && ( it->_width != -1 ) && ( it->_precision != -1 ) ) );
 		M_ENSURE( firstToken || ( anyTokenHaveIndex && thisTokenHasIndex ) || ( ! ( anyTokenHaveIndex || thisTokenHasIndex ) ) );
 		if ( it->_position > 0 )
 			idxs.insert( it->_position );
+		else
+			{
+			it->_position = pos;
+			++ pos;
+			}
+		if ( it->_width == -1 )
+			{
+			it->_width = ( - pos ) - 1;
+			++ pos;
+			}
 		if ( it->_width < -1 )
 			widthIdxs.insert( - ( it->_width + 1 ) );
+		if ( it->_precision == -1 )
+			{
+			it->_precision = ( - pos ) - 1;
+			++ pos;
+			}
 		if ( it->_precision < -1 )
 			precIdxs.insert( - ( it->_precision + 1 ) );
 		if ( firstToken )
 			anyTokenHaveIndex = thisTokenHasIndex;
 		firstToken = false;
+		++ pos;
 		}
 	int last = 0;
 	M_ENSURE( ! does_intersect( widthIdxs.begin(), widthIdxs.end(), precIdxs.begin(), precIdxs.end() ) );
@@ -271,13 +301,117 @@ void HFormat::swap( HFormat& fi )
 	M_EPILOG
 	}
 
+namespace
+{
+
+template<typename T>
+struct variant_shell
+	{
+	static T get( HFormat::HFormatImpl::args_t const& args, int const& idx )
+		{
+		HFormat::HFormatImpl::args_t::const_iterator it = args.find( idx );
+		M_ASSERT( it != args.end() );
+		return ( it->second.get<T>() );
+		}
+	};
+
+}
+
 HString HFormat::string( void ) const
 	{
-	if ( _impl->_token != _impl->_tokens.end() )
+	HString fmt;
+	for ( HFormatImpl::tokens_t::const_iterator it = _impl->_tokens.begin(), end = _impl->_tokens.end(); it != end; ++ it )
 		{
-		M_ENSURE( _impl->_token->_conversion == HFormatImpl::CONVERSION::D_CONSTANT );
-		_impl->_string += _impl->_token->_const;
-		++ _impl->_token;
+		HFormatImpl::CONVERSION::converion_t conv = it->_conversion;
+		if ( conv == HFormatImpl::CONVERSION::D_CONSTANT )
+			_impl->_string += it->_const;
+		else
+			{
+			fmt = "%";
+			if ( it->_flag & HFormatImpl::FLAG::D_ALTERNATE )
+				fmt += "#";
+			if ( it->_flag & HFormatImpl::FLAG::D_ZERO_PADDED )
+				fmt += "0";
+			if ( it->_flag & HFormatImpl::FLAG::D_SPACE_PADDED )
+				fmt += " ";
+			if ( it->_flag & HFormatImpl::FLAG::D_SIGN_PREFIX )
+				fmt += "+";
+			if ( it->_flag & HFormatImpl::FLAG::D_LEFT_ALIGNED )
+				fmt += "-";
+			if ( it->_width > 0 )
+				fmt += it->_width;
+			else if ( it->_width < 0 )
+				{
+				M_ASSERT( it->_width < -1 );
+				fmt += variant_shell<int>::get( *_impl->_args, - ( it->_width + 1 ) );
+				}
+			if ( it->_precision )
+				fmt += ".";
+			if ( it->_precision > 0 )
+				fmt += it->_precision;
+			else if ( it->_precision < 0 )
+				{
+				M_ASSERT( it->_precision < -1 );
+				fmt += variant_shell<int>::get( *_impl->_args, - ( it->_precision + 1 ) );
+				}
+			if ( conv & HFormatImpl::CONVERSION::D_BYTE )
+				fmt += "hh";
+			if ( conv & HFormatImpl::CONVERSION::D_SHORT )
+				fmt += "h";
+			if ( conv & HFormatImpl::CONVERSION::D_LONG )
+				{
+				if ( conv & HFormatImpl::CONVERSION::D_INT )
+					fmt += "l";
+				else
+					{
+					M_ASSERT( conv & HFormatImpl::CONVERSION::D_DOUBLE );
+					fmt += "L";
+					}
+				}
+			if ( conv & HFormatImpl::CONVERSION::D_LONG_LONG )
+				fmt += "ll";
+			if ( conv & HFormatImpl::CONVERSION::D_OCTAL )
+				fmt += "o";
+			else if ( conv & HFormatImpl::CONVERSION::D_HEXADECIMAL )
+				fmt += "x";
+			else if ( conv & HFormatImpl::CONVERSION::D_UNSIGNED )
+				fmt += "u";
+			else if ( conv & HFormatImpl::CONVERSION::D_INT )
+				fmt += "d";
+			if ( conv & HFormatImpl::CONVERSION::D_DOUBLE )
+				fmt += "f";
+			if ( conv & HFormatImpl::CONVERSION::D_STRING )
+				fmt += "s";
+			if ( conv & HFormatImpl::CONVERSION::D_CHAR )
+				fmt += "c";
+			if ( conv & ( HFormatImpl::CONVERSION::D_LONG | HFormatImpl::CONVERSION::D_LONG_LONG ) )
+				{
+				if ( conv & HFormatImpl::CONVERSION::D_DOUBLE )
+					_impl->_buffer.format( fmt.raw(), variant_shell<double long>::get( *_impl->_args, it->_position ) );
+				else
+					{
+					M_ASSERT( conv & HFormatImpl::CONVERSION::D_INT );
+					_impl->_buffer.format( fmt.raw(), variant_shell<int long>::get( *_impl->_args, it->_position ) );
+					}
+				}
+			else
+				{
+				if ( conv & HFormatImpl::CONVERSION::D_INT )
+					{
+					if ( conv & HFormatImpl::CONVERSION::D_SHORT )
+						_impl->_buffer.format( fmt.raw(), variant_shell<int short>::get( *_impl->_args, it->_position ) );
+					else
+						_impl->_buffer.format( fmt.raw(), variant_shell<int>::get( *_impl->_args, it->_position ) );
+					}
+				else if ( conv & HFormatImpl::CONVERSION::D_STRING )
+					_impl->_buffer.format( fmt.raw(), variant_shell<HString>::get( *_impl->_args, it->_position ).raw() );
+				else if ( conv & HFormatImpl::CONVERSION::D_POINTER )
+					_impl->_buffer.format( fmt.raw(), variant_shell<void*>::get( *_impl->_args, it->_position ) );
+				else if ( conv & HFormatImpl::CONVERSION::D_CHAR )
+					_impl->_buffer.format( fmt.raw(), variant_shell<char>::get( *_impl->_args, it->_position ) );
+				}
+			_impl->_string += _impl->_buffer;
+			}
 		}
 	return ( _impl->_string );
 	}
@@ -291,10 +425,8 @@ HFormat HFormat::operator % ( int short const& is )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
-			&& ( t._conversion && HFormatImpl::CONVERSION::D_SHORT ) );
-	_impl->_args.push_back( is );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_INT | HFormatImpl::CONVERSION::D_SHORT );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( is ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -303,11 +435,8 @@ HFormat HFormat::operator % ( int short unsigned const& isu )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
-			&& ( t._conversion & HFormatImpl::CONVERSION::D_SHORT )
-			&& ( t._conversion & HFormatImpl::CONVERSION::D_UNSIGNED ) );
-	_impl->_args.push_back( static_cast<int short>( isu ) );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_INT | HFormatImpl::CONVERSION::D_SHORT | HFormatImpl::CONVERSION::D_UNSIGNED );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( isu ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -316,9 +445,8 @@ HFormat HFormat::operator % ( int const& i )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( t._conversion & HFormatImpl::CONVERSION::D_INT );
-	_impl->_args.push_back( i );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_INT );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( i ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -327,10 +455,8 @@ HFormat HFormat::operator % ( int unsigned const& iu )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
-			&& ( t._conversion & HFormatImpl::CONVERSION::D_UNSIGNED ) );
-	_impl->_args.push_back( static_cast<int>( iu ) );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_INT | HFormatImpl::CONVERSION::D_UNSIGNED );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( iu ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -339,10 +465,8 @@ HFormat HFormat::operator % ( int long const& il )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
-			&& ( t._conversion & HFormatImpl::CONVERSION::D_LONG ) );
-	_impl->_args.push_back( il );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_INT | HFormatImpl::CONVERSION::D_LONG );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( il ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -351,11 +475,8 @@ HFormat HFormat::operator % ( int long unsigned const& ilu )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_INT )
-			&& ( t._conversion & HFormatImpl::CONVERSION::D_LONG )
-			&& ( t._conversion & HFormatImpl::CONVERSION::D_UNSIGNED ) );
-	_impl->_args.push_back( static_cast<int long>( ilu ) );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_INT | HFormatImpl::CONVERSION::D_LONG | HFormatImpl::CONVERSION::D_UNSIGNED );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( ilu ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -364,9 +485,8 @@ HFormat HFormat::operator % ( double const& d )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( t._conversion & HFormatImpl::CONVERSION::D_DOUBLE );
-	_impl->_args.push_back( d );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_DOUBLE );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( d ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -375,12 +495,8 @@ HFormat HFormat::operator % ( double long const& dl )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( ( t._conversion & HFormatImpl::CONVERSION::D_DOUBLE )
-			&& ( t._conversion & HFormatImpl::CONVERSION::D_LONG ) );
-	_impl->_args.push_back( dl );
-	_impl->_buffer.format( "%Lf", dl );
-	_impl->_string += _impl->_buffer;
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_DOUBLE | HFormatImpl::CONVERSION::D_LONG );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( dl ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -389,9 +505,8 @@ HFormat HFormat::operator % ( float const& f )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( t._conversion & HFormatImpl::CONVERSION::D_DOUBLE );
-	_impl->_args.push_back( static_cast<double>( f ) );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_DOUBLE );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( f ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -400,9 +515,8 @@ HFormat HFormat::operator % ( char const* const& s )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( t._conversion & HFormatImpl::CONVERSION::D_STRING );
-	_impl->_args.push_back( HString( s ) );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_STRING );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( s ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -411,9 +525,8 @@ HFormat HFormat::operator % ( void const* const& p )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( t._conversion & HFormatImpl::CONVERSION::D_POINTER );
-	_impl->_args.push_back( p );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_POINTER );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( p ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -422,27 +535,26 @@ HFormat HFormat::operator % ( HString const& s )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	HFormatImpl::OToken t = _impl->next_token();
-	M_ENSURE( t._conversion & HFormatImpl::CONVERSION::D_STRING );
-	_impl->_args.push_back( s );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_STRING );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( s ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
 
-HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_token( void )
+int HFormat::HFormatImpl::next_token( HFormatImpl::CONVERSION::converion_t const& conv )
 	{
 	M_PROLOG
-	tokens_t::const_iterator it;
-	while (  _token->_conversion == CONVERSION::D_CONSTANT )
-		{
-		M_ENSURE( _token != _tokens.end() );
-		_string += _token->_const;
-		++ _token;
-		}
 	M_ENSURE( _token != _tokens.end() );
-	it = _token;
+	while ( _token->_conversion == CONVERSION::D_CONSTANT )
+		{
+		++ _token;
+		M_ENSURE( _token != _tokens.end() );
+		}
+	M_ENSURE( conv == _token->_conversion );
 	++ _token;
-	return ( *it );
+	int idx = _tokenIndex;
+	++ _tokenIndex;
+	return ( idx );
 	M_EPILOG
 	}
 
@@ -689,6 +801,7 @@ HFormat::HFormatImpl::FLAG::flag_t HFormat::HFormatImpl::get_flag( HString const
 			break;
 			}
 		}
+	-- i;
 	return ( flag );
 	M_EPILOG
 	}

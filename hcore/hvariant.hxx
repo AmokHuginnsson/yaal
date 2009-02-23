@@ -78,6 +78,8 @@ public:
 	void swap( HVariant& );
 	template<typename tType>
 	tType& get( void );
+	template<typename tType>
+	tType const& get( void ) const;
 	int type( void ) const;
 	};
 
@@ -197,6 +199,18 @@ tType& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::get
 	{
 	M_ASSERT(( _type == yaal::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value ));
 	return ( *reinterpret_cast<tType*>( _mem ) );
+	}
+
+template<typename t0_t, typename t1_t,
+	typename t2_t, typename t3_t,
+	typename t4_t, typename t5_t,
+	typename t6_t, typename t7_t,
+	typename t8_t, typename t9_t>
+template<typename tType>
+tType const& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::get( void ) const
+	{
+	M_ASSERT(( _type == yaal::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value ));
+	return ( *reinterpret_cast<tType const*>( _mem ) );
 	}
 
 template<typename t0_t, typename t1_t,

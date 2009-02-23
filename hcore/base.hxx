@@ -527,16 +527,17 @@ template<typename t0_t, typename t1_t,
 	typename t8_t, typename t9_t, typename tType>
 struct find_type
 	{
-	static int const value = -1 + same_type<t0_t, tType>::value
-		+ 1 * same_type<t1_t, tType>::value
-		+ 2 * same_type<t2_t, tType>::value
-		+ 3 * same_type<t3_t, tType>::value
-		+ 4 * same_type<t4_t, tType>::value
-		+ 5 * same_type<t5_t, tType>::value
-		+ 6 * same_type<t6_t, tType>::value
-		+ 7 * same_type<t7_t, tType>::value
-		+ 8 * same_type<t8_t, tType>::value
-		+ 9 * same_type<t9_t, tType>::value;
+	static int const value = -1
+		+ 1 * same_type<t0_t, tType>::value
+		+ 2 * same_type<t1_t, tType>::value
+		+ 3 * same_type<t2_t, tType>::value
+		+ 4 * same_type<t3_t, tType>::value
+		+ 5 * same_type<t4_t, tType>::value
+		+ 6 * same_type<t5_t, tType>::value
+		+ 7 * same_type<t6_t, tType>::value
+		+ 8 * same_type<t7_t, tType>::value
+		+ 9 * same_type<t8_t, tType>::value
+		+ 10 * same_type<t9_t, tType>::value;
 	};
 
 /*! \brief Simulate binary literal.

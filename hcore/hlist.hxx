@@ -436,6 +436,13 @@ const_qual_t* HList<tType>::HIterator<const_qual_t, treatment>::operator->( void
 
 template<typename tType>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
+const_qual_t* HList<tType>::HIterator<const_qual_t, treatment>::operator->( void ) const
+	{
+	return ( &f_poCurrent->f_tObject );
+	}
+
+template<typename tType>
+template<typename const_qual_t, OListBits::treatment_t const treatment>
 bool HList<tType>::HIterator<const_qual_t, treatment>::is_valid( void ) const
 	{
 	return ( f_poOwner && f_poOwner->f_poHook && f_poCurrent );
