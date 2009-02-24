@@ -295,6 +295,7 @@ int long HFile::do_write( void const* const a_pcString, int long const& a_lSize 
 	}
 
 HFile cout( HFile::OPEN::D_WRITING, stdout );
+HFile cerr( HFile::OPEN::D_WRITING, stderr );
 
 }
 
