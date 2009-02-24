@@ -82,7 +82,6 @@ int long HStringStream::do_write( void const* const a_pvBuffer, int long const& 
 void HStringStream::do_flush( void ) const
 	{
 	M_PROLOG
-	f_oBuffer.clear();
 	return;
 	M_EPILOG
 	}

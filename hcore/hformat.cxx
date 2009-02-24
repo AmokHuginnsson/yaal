@@ -232,7 +232,7 @@ HFormat::HFormat( char const* const aFmt )
 		if ( it->_width < 0 )
 			{
 			widthIdxs.insert( - ( it->_width + 2 ) );
-			_impl->_positions->insert( make_pair( - ( it->_width + 2 ), &*it ) );
+			_impl->_positions->insert( make_pair( - ( it->_width + 2 ), static_cast<HFormatImpl::OToken*>( NULL ) ) );
 			++ pos;
 			}
 		if ( it->_precision == -1 )
@@ -240,7 +240,7 @@ HFormat::HFormat( char const* const aFmt )
 		if ( it->_precision < 0 )
 			{
 			precIdxs.insert( - ( it->_precision + 2 ) );
-			_impl->_positions->insert( make_pair( - ( it->_precision + 2 ), &*it ) );
+			_impl->_positions->insert( make_pair( - ( it->_precision + 2 ), static_cast<HFormatImpl::OToken*>( NULL ) ) );
 			++ pos;
 			}
 		if ( it->_position > 0 )
@@ -317,6 +317,7 @@ struct variant_shell
 HString HFormat::string( void ) const
 	{
 	HString fmt;
+	M_ENSURE( _impl->_positions->size() == _impl->_args->size() );
 	for ( HFormatImpl::tokens_t::const_iterator it = _impl->_tokens.begin(), end = _impl->_tokens.end(); it != end; ++ it )
 		{
 		HFormatImpl::CONVERSION::converion_t conv = it->_conversion;
@@ -534,20 +535,26 @@ HFormat HFormat::operator % ( HString const& s )
 int HFormat::HFormatImpl::next_token( HFormatImpl::CONVERSION::converion_t const& conv )
 	{
 	M_PROLOG
+	if ( ! _string.empty() )
+		{
+		_positionIndex = 0;
+		_string.clear();
+		_args->clear();
+		}
 	positions_t::const_iterator it = _positions->find( _positionIndex );
 	M_ENSURE( it != _positions->end() );
 	OToken* t = it->second;
-	M_ENSURE( ( conv == t->_conversion ) || ( ( conv == HFormatImpl::CONVERSION::D_INT ) && ( ( t->_width < 0 ) || ( t->_precision < 0 ) ) ) );
+	M_ENSURE( ( t && ( conv == t->_conversion ) ) || ( ! t && ( conv == HFormatImpl::CONVERSION::D_INT ) ) );
 	int idx = _positionIndex;
 	++ _positionIndex;
 	return ( idx );
 	M_EPILOG
 	}
 
-HStreamInterface& operator << ( HStreamInterface& stream, HFormat const& format )
+HStreamFormatProxy operator << ( HStreamInterface& stream, HFormat const& format )
 	{
 	M_PROLOG
-	return ( stream << format.string() );
+	return ( HStreamFormatProxy( stream, format ) );
 	M_EPILOG
 	}
 

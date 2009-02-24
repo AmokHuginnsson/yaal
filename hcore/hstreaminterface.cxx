@@ -58,7 +58,7 @@ HStreamInterface& HStreamInterface::operator << ( HString const& a_oString )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( char const* const a_pcString )
+HStreamInterface& HStreamInterface::operator << ( char const* const& a_pcString )
 	{
 	M_PROLOG
 	if ( a_pcString )
@@ -67,7 +67,7 @@ HStreamInterface& HStreamInterface::operator << ( char const* const a_pcString )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( char const a_cChar )
+HStreamInterface& HStreamInterface::operator << ( char const& a_cChar )
 	{
 	M_PROLOG
 	HString str( a_cChar );
@@ -76,7 +76,23 @@ HStreamInterface& HStreamInterface::operator << ( char const a_cChar )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int const a_iInteger )
+HStreamInterface& HStreamInterface::operator << ( int short const& a_iShortInteger )
+	{
+	M_PROLOG
+	int long l_lTmp = a_iShortInteger;
+	return ( operator << ( l_lTmp ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::operator << ( int short unsigned const& a_uiUnsignedShortInteger )
+	{
+	M_PROLOG
+	int long unsigned l_ulTmp = a_uiUnsignedShortInteger;
+	return ( operator << ( l_ulTmp ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::operator << ( int const& a_iInteger )
 	{
 	M_PROLOG
 	int long l_lTmp = a_iInteger;
@@ -84,7 +100,7 @@ HStreamInterface& HStreamInterface::operator << ( int const a_iInteger )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int unsigned const a_uiUnsignedInteger )
+HStreamInterface& HStreamInterface::operator << ( int unsigned const& a_uiUnsignedInteger )
 	{
 	M_PROLOG
 	int long unsigned l_ulTmp = a_uiUnsignedInteger;
@@ -92,7 +108,7 @@ HStreamInterface& HStreamInterface::operator << ( int unsigned const a_uiUnsigne
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int long const a_lLongInteger )
+HStreamInterface& HStreamInterface::operator << ( int long const& a_lLongInteger )
 	{
 	M_PROLOG
 	HString str( a_lLongInteger );
@@ -101,7 +117,7 @@ HStreamInterface& HStreamInterface::operator << ( int long const a_lLongInteger 
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int long unsigned const a_ulUnsignedLongInteger )
+HStreamInterface& HStreamInterface::operator << ( int long unsigned const& a_ulUnsignedLongInteger )
 	{
 	M_PROLOG
 	HString str( a_ulUnsignedLongInteger );
@@ -110,7 +126,7 @@ HStreamInterface& HStreamInterface::operator << ( int long unsigned const a_ulUn
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( double const a_dDouble )
+HStreamInterface& HStreamInterface::operator << ( double const& a_dDouble )
 	{
 	M_PROLOG
 	HString str( a_dDouble );
@@ -119,7 +135,25 @@ HStreamInterface& HStreamInterface::operator << ( double const a_dDouble )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( void const* const a_pvPtr )
+HStreamInterface& HStreamInterface::operator << ( double long const& a_dLongDouble )
+	{
+	M_PROLOG
+	HString str( a_dLongDouble );
+	do_write( str.raw(), str.get_length() );
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::operator << ( float const& a_dFloat )
+	{
+	M_PROLOG
+	HString str( a_dFloat );
+	do_write( str.raw(), str.get_length() );
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::operator << ( void const* const& a_pvPtr )
 	{
 	M_PROLOG
 	HString str( a_pvPtr );

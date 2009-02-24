@@ -115,6 +115,8 @@ private:
 
 typedef HExceptionT<HFile, HStreamInterfaceException> HFileException;
 
+extern HFile cout;
+
 }
 
 }

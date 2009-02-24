@@ -72,14 +72,18 @@ public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
 	HStreamInterface& operator << ( HString const& );
-	HStreamInterface& operator << ( char const* const );
-	HStreamInterface& operator << ( char const );
-	HStreamInterface& operator << ( int const );
-	HStreamInterface& operator << ( int unsigned const );
-	HStreamInterface& operator << ( int long const );
-	HStreamInterface& operator << ( int long unsigned const );
-	HStreamInterface& operator << ( double const );
-	HStreamInterface& operator << ( void const* const );
+	HStreamInterface& operator << ( char const* const& );
+	HStreamInterface& operator << ( char const& );
+	HStreamInterface& operator << ( int short const& );
+	HStreamInterface& operator << ( int short unsigned const& );
+	HStreamInterface& operator << ( int const& );
+	HStreamInterface& operator << ( int unsigned const& );
+	HStreamInterface& operator << ( int long const& );
+	HStreamInterface& operator << ( int long unsigned const& );
+	HStreamInterface& operator << ( double const& );
+	HStreamInterface& operator << ( double long const& );
+	HStreamInterface& operator << ( float const& );
+	HStreamInterface& operator << ( void const* const& );
 	HStreamInterface& operator << ( HStreamInterface& ( *const )( HStreamInterface& ) );
 	/*! \brief Read data from stream until end of it or until delimiter is encountered.
 	 *

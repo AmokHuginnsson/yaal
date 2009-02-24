@@ -69,7 +69,38 @@ public:
 
 typedef HExceptionT<HFormat> HFormatException;
 
-HStreamInterface& operator << ( HStreamInterface&, HFormat const& );
+class HStreamFormatProxy
+	{
+	class HStreamFormatProxyImpl
+		{
+		HFormat _format;
+		HStreamInterface& _stream;
+		HStreamFormatProxyImpl( HStreamInterface& s, HFormat const& f ) : _format( f ), _stream( s ) {}
+		friend class HStreamFormatProxy;
+		};
+	typedef HPointer<HStreamFormatProxyImpl> stream_format_proxy_impl_t;
+	stream_format_proxy_impl_t _impl;
+public:
+	HStreamFormatProxy( HStreamInterface& s, HFormat const& f ) : _impl( new HStreamFormatProxyImpl( s, f ) ) {}
+	template<typename tType>
+	HStreamFormatProxy operator % ( tType const& v )
+		{
+		M_PROLOG
+		_impl->_format % v;
+		return ( *this );
+		M_EPILOG
+		}
+	template<typename tType>
+	HStreamInterface& operator << ( tType const& v )
+		{
+		M_PROLOG
+		_impl->_stream << _impl->_format.string() << v;
+		return ( _impl->_stream );
+		M_EPILOG
+		}
+	};
+
+HStreamFormatProxy operator << ( HStreamInterface&, HFormat const& );
 
 }
 
