@@ -172,7 +172,7 @@ private:
 /*! \brief True HSBBSTree contents.
  */
 template<typename tType>
-class	HSBBSTree::HNode : public HAbstractNode
+class	HSBBSTree::HNode : public HSBBSTree::HAbstractNode
 	{
 	tType f_tKey;
 	HNode( tType const& );

@@ -93,13 +93,12 @@ class HFormat::HFormatImpl
 	typedef HVariant<bool, char, int short, int, int long, void const*, double, double long, HString> format_arg_t;
 	typedef HMap<int, format_arg_t> args_t;
 	typedef HPointer<args_t> args_ptr_t;
-	int _tokenIndex;
+	int _positionIndex;
 	HString _format;
 	mutable HString _buffer;
 	mutable HString _string;
 	tokens_t _tokens;
 	positions_ptr_t _positions;
-	tokens_t::const_iterator _token;
 	args_ptr_t _args;
 	HFormatImpl( char const* const );
 	HFormatImpl( HFormatImpl const& );
@@ -123,17 +122,16 @@ class HFormat::HFormatImpl
 	};
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
-	: _tokenIndex( 0 ), _format( fmt ), _buffer(), _string(), _tokens(),
-	_positions( new positions_t ), _token(), _args( new args_t )
+	: _positionIndex( 0 ), _format( fmt ), _buffer(), _string(), _tokens(),
+	_positions( new positions_t ), _args( new args_t )
 	{
 	}
 
 HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
-	: _tokenIndex( fi._tokenIndex ), _format( fi._format ), _buffer( fi._buffer ),
+	: _positionIndex( fi._positionIndex ), _format( fi._format ), _buffer( fi._buffer ),
 	_string( fi._string ), _tokens( fi._tokens ), _positions( new positions_t ),
-	_token( _tokens.begin() ), _args( new args_t )
+	_args( new args_t )
 	{
-	advance( _token, distance( fi._tokens.begin(), fi._token ) );
 	_positions->copy_from( *fi._positions );
 	_args->copy_from( *fi._args );
 	}
@@ -156,12 +154,12 @@ void HFormat::HFormatImpl::swap( HFormat::HFormatImpl& fi )
 	if ( &fi != this )
 		{
 		using yaal::swap;
-		swap( _tokenIndex, fi._tokenIndex );
+		swap( _positionIndex, fi._positionIndex );
 		swap( _format, fi._format );
 		swap( _buffer, fi._buffer );
 		swap( _string, fi._string );
 		swap( _tokens, fi._tokens );
-		swap( _token, fi._token );
+		swap( _positions, fi._positions );
 		swap( _args, fi._args );
 		}
 	return;
@@ -210,13 +208,14 @@ HFormat::HFormat( char const* const aFmt )
 		else
 			break;
 		}
-	bool anyTokenHaveIndex = false;
+	bool anyTokenHaveExplicitIndex = false;
 	bool firstToken = true;
 	typedef HSet<int> idx_t;
 	idx_t idxs;
 	idx_t widthIdxs;
 	idx_t precIdxs;
 	int pos = 0;
+	/* positions are 1 based, but we want to index argument 0 based */
 	for ( HFormatImpl::tokens_t::iterator it = _impl->_tokens.begin(), end = _impl->_tokens.end(); it != end; ++ it, ++ pos )
 		{
 		if ( it->_conversion == HFormatImpl::CONVERSION::D_CONSTANT )
@@ -224,45 +223,43 @@ HFormat::HFormat( char const* const aFmt )
 			-- pos;
 			continue;
 			}
-		bool thisTokenHasIndex = ( it->_position > 0 ) || ( it->_width < -1 ) || ( it->_precision < -1 );
-		M_ENSURE( ! thisTokenHasIndex
-				|| ( thisTokenHasIndex && ( it->_position > 0 ) && ( it->_width != -1 ) && ( it->_precision != -1 ) ) );
-		M_ENSURE( firstToken || ( anyTokenHaveIndex && thisTokenHasIndex ) || ( ! ( anyTokenHaveIndex || thisTokenHasIndex ) ) );
-		if ( it->_position > 0 )
-			idxs.insert( it->_position );
-		else
-			{
-			it->_position = pos;
-			++ pos;
-			}
+		bool thisTokenHasExplicitIndex = ( it->_position > 0 ) || ( it->_width < -1 ) || ( it->_precision < -1 );
+		M_ENSURE( ! thisTokenHasExplicitIndex
+				|| ( thisTokenHasExplicitIndex && ( it->_position > 0 ) && ( it->_width != -1 ) && ( it->_precision != -1 ) ) );
+		M_ENSURE( firstToken || ( anyTokenHaveExplicitIndex && thisTokenHasExplicitIndex ) || ( ! ( anyTokenHaveExplicitIndex || thisTokenHasExplicitIndex ) ) );
 		if ( it->_width == -1 )
+			it->_width = ( - pos ) - 2;
+		if ( it->_width < 0 )
 			{
-			it->_width = ( - pos ) - 1;
+			widthIdxs.insert( - ( it->_width + 2 ) );
+			_impl->_positions->insert( make_pair( - ( it->_width + 2 ), &*it ) );
 			++ pos;
 			}
-		if ( it->_width < -1 )
-			widthIdxs.insert( - ( it->_width + 1 ) );
 		if ( it->_precision == -1 )
+			it->_precision = ( - pos ) - 2;
+		if ( it->_precision < 0 )
 			{
-			it->_precision = ( - pos ) - 1;
+			precIdxs.insert( - ( it->_precision + 2 ) );
+			_impl->_positions->insert( make_pair( - ( it->_precision + 2 ), &*it ) );
 			++ pos;
 			}
-		if ( it->_precision < -1 )
-			precIdxs.insert( - ( it->_precision + 1 ) );
+		if ( it->_position > 0 )
+			idxs.insert( -- it->_position );
+		else
+			it->_position = pos;
+		_impl->_positions->insert( make_pair( it->_position, &*it ) );
 		if ( firstToken )
-			anyTokenHaveIndex = thisTokenHasIndex;
+			anyTokenHaveExplicitIndex = thisTokenHasExplicitIndex;
 		firstToken = false;
-		++ pos;
 		}
-	int last = 0;
 	M_ENSURE( ! does_intersect( widthIdxs.begin(), widthIdxs.end(), precIdxs.begin(), precIdxs.end() ) );
 	M_ENSURE( ! does_intersect( widthIdxs.begin(), widthIdxs.end(), idxs.begin(), idxs.end() ) );
 	M_ENSURE( ! does_intersect( idxs.begin(), idxs.end(), precIdxs.begin(), precIdxs.end() ) );
 	copy( widthIdxs.begin(), widthIdxs.end(), insert_iterator( idxs ) );
 	copy( precIdxs.begin(), precIdxs.end(), insert_iterator( idxs ) );
+	int last = -1;
 	for ( idx_t::iterator it = idxs.begin(); it != idxs.end(); ++ it, ++ last )
 		M_ENSURE( *it == ( last + 1 ) );
-	_impl->_token = _impl->_tokens.begin();
 	return;
 	M_EPILOG
 	}
@@ -341,19 +338,13 @@ HString HFormat::string( void ) const
 			if ( it->_width > 0 )
 				fmt += it->_width;
 			else if ( it->_width < 0 )
-				{
-				M_ASSERT( it->_width < -1 );
-				fmt += variant_shell<int>::get( *_impl->_args, - ( it->_width + 1 ) );
-				}
+				fmt += variant_shell<int>::get( *_impl->_args, - ( it->_width + 2 ) );
 			if ( it->_precision )
 				fmt += ".";
 			if ( it->_precision > 0 )
 				fmt += it->_precision;
 			else if ( it->_precision < 0 )
-				{
-				M_ASSERT( it->_precision < -1 );
-				fmt += variant_shell<int>::get( *_impl->_args, - ( it->_precision + 1 ) );
-				}
+				fmt += variant_shell<int>::get( *_impl->_args, - ( it->_precision + 2 ) );
 			if ( conv & HFormatImpl::CONVERSION::D_BYTE )
 				fmt += "hh";
 			if ( conv & HFormatImpl::CONVERSION::D_SHORT )
@@ -384,31 +375,30 @@ HString HFormat::string( void ) const
 				fmt += "s";
 			if ( conv & HFormatImpl::CONVERSION::D_CHAR )
 				fmt += "c";
-			if ( conv & ( HFormatImpl::CONVERSION::D_LONG | HFormatImpl::CONVERSION::D_LONG_LONG ) )
+			if ( conv & HFormatImpl::CONVERSION::D_INT )
 				{
-				if ( conv & HFormatImpl::CONVERSION::D_DOUBLE )
-					_impl->_buffer.format( fmt.raw(), variant_shell<double long>::get( *_impl->_args, it->_position ) );
+				if ( conv & HFormatImpl::CONVERSION::D_SHORT )
+					_impl->_buffer.format( fmt.raw(), variant_shell<int short>::get( *_impl->_args, it->_position ) );
+				else if ( conv & ( HFormatImpl::CONVERSION::D_LONG | HFormatImpl::CONVERSION::D_LONG_LONG ) )
+					_impl->_buffer.format( fmt.raw(), variant_shell<int long>::get( *_impl->_args, it->_position ) );
 				else
 					{
 					M_ASSERT( conv & HFormatImpl::CONVERSION::D_INT );
-					_impl->_buffer.format( fmt.raw(), variant_shell<int long>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.raw(), variant_shell<int>::get( *_impl->_args, it->_position ) );
 					}
 				}
-			else
+			else if ( conv & HFormatImpl::CONVERSION::D_STRING )
+				_impl->_buffer.format( fmt.raw(), variant_shell<HString>::get( *_impl->_args, it->_position ).raw() );
+			else if ( conv & HFormatImpl::CONVERSION::D_POINTER )
+				_impl->_buffer.format( fmt.raw(), variant_shell<void const*>::get( *_impl->_args, it->_position ) );
+			else if ( conv & HFormatImpl::CONVERSION::D_CHAR )
+				_impl->_buffer.format( fmt.raw(), variant_shell<char>::get( *_impl->_args, it->_position ) );
+			else if ( conv & HFormatImpl::CONVERSION::D_DOUBLE )
 				{
-				if ( conv & HFormatImpl::CONVERSION::D_INT )
-					{
-					if ( conv & HFormatImpl::CONVERSION::D_SHORT )
-						_impl->_buffer.format( fmt.raw(), variant_shell<int short>::get( *_impl->_args, it->_position ) );
-					else
-						_impl->_buffer.format( fmt.raw(), variant_shell<int>::get( *_impl->_args, it->_position ) );
-					}
-				else if ( conv & HFormatImpl::CONVERSION::D_STRING )
-					_impl->_buffer.format( fmt.raw(), variant_shell<HString>::get( *_impl->_args, it->_position ).raw() );
-				else if ( conv & HFormatImpl::CONVERSION::D_POINTER )
-					_impl->_buffer.format( fmt.raw(), variant_shell<void*>::get( *_impl->_args, it->_position ) );
-				else if ( conv & HFormatImpl::CONVERSION::D_CHAR )
-					_impl->_buffer.format( fmt.raw(), variant_shell<char>::get( *_impl->_args, it->_position ) );
+				if ( conv & ( HFormatImpl::CONVERSION::D_LONG ) )
+					_impl->_buffer.format( fmt.raw(), variant_shell<double long>::get( *_impl->_args, it->_position ) );
+				else
+					_impl->_buffer.format( fmt.raw(), variant_shell<double>::get( *_impl->_args, it->_position ) );
 				}
 			_impl->_string += _impl->_buffer;
 			}
@@ -516,7 +506,7 @@ HFormat HFormat::operator % ( char const* const& s )
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
 	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_STRING );
-	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( s ) ) );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( HString( s ) ) ) );
 	return ( _impl );
 	M_EPILOG
 	}
@@ -544,16 +534,12 @@ HFormat HFormat::operator % ( HString const& s )
 int HFormat::HFormatImpl::next_token( HFormatImpl::CONVERSION::converion_t const& conv )
 	{
 	M_PROLOG
-	M_ENSURE( _token != _tokens.end() );
-	while ( _token->_conversion == CONVERSION::D_CONSTANT )
-		{
-		++ _token;
-		M_ENSURE( _token != _tokens.end() );
-		}
-	M_ENSURE( conv == _token->_conversion );
-	++ _token;
-	int idx = _tokenIndex;
-	++ _tokenIndex;
+	positions_t::const_iterator it = _positions->find( _positionIndex );
+	M_ENSURE( it != _positions->end() );
+	OToken* t = it->second;
+	M_ENSURE( ( conv == t->_conversion ) || ( ( conv == HFormatImpl::CONVERSION::D_INT ) && ( ( t->_width < 0 ) || ( t->_precision < 0 ) ) ) );
+	int idx = _positionIndex;
+	++ _positionIndex;
 	return ( idx );
 	M_EPILOG
 	}
