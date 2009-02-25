@@ -131,9 +131,13 @@ class HHashMap<tType, ttType>::HIterator
 	HAtom* f_poAtomPtr;
 public:
 	HIterator( void ) : f_poOwner( NULL ), f_ulIndex( 0 ), f_poAtomPtr( NULL ) {}
-	HIterator( HIterator const& a_oIt )
+	template<typename other_const_qual_t>
+	HIterator( HIterator<other_const_qual_t> const& a_oIt )
 		: f_poOwner( a_oIt.f_poOwner ), f_ulIndex( a_oIt.f_ulIndex ),
-		f_poAtomPtr( a_oIt.f_poAtomPtr ) {}
+		f_poAtomPtr( a_oIt.f_poAtomPtr )
+		{
+		STATIC_ASSERT(( same_type<const_qual_t, other_const_qual_t>::value || same_type<const_qual_t, other_const_qual_t const>::value ));
+		}
 	HIterator& operator = ( HIterator const& a_oIt )
 		{
 		if ( &a_oIt != this )
