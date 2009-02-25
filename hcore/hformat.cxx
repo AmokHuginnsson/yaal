@@ -119,6 +119,16 @@ class HFormat::HFormatImpl
 	static bool has_precision( HString const&, int const& );
 	static int get_precision( HString const&, int& );
 	static CONVERSION::converion_t get_conversion( HString const&, int& );
+	template<typename T>
+	struct variant_shell
+		{
+		static T get( HFormat::HFormatImpl::args_t const& args, int const& idx )
+			{
+			HFormat::HFormatImpl::args_t::const_iterator it = args.find( idx );
+			M_ASSERT( it != args.end() );
+			return ( it->second.get<T>() );
+			}
+		};
 	};
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
@@ -298,22 +308,6 @@ void HFormat::swap( HFormat& fi )
 	M_EPILOG
 	}
 
-namespace
-{
-
-template<typename T>
-struct variant_shell
-	{
-	static T get( HFormat::HFormatImpl::args_t const& args, int const& idx )
-		{
-		HFormat::HFormatImpl::args_t::const_iterator it = args.find( idx );
-		M_ASSERT( it != args.end() );
-		return ( it->second.get<T>() );
-		}
-	};
-
-}
-
 HString HFormat::string( void ) const
 	{
 	HString fmt;
@@ -339,13 +333,13 @@ HString HFormat::string( void ) const
 			if ( it->_width > 0 )
 				fmt += it->_width;
 			else if ( it->_width < 0 )
-				fmt += variant_shell<int>::get( *_impl->_args, - ( it->_width + 2 ) );
+				fmt += HFormatImpl::variant_shell<int>::get( *_impl->_args, - ( it->_width + 2 ) );
 			if ( it->_precision )
 				fmt += ".";
 			if ( it->_precision > 0 )
 				fmt += it->_precision;
 			else if ( it->_precision < 0 )
-				fmt += variant_shell<int>::get( *_impl->_args, - ( it->_precision + 2 ) );
+				fmt += HFormatImpl::variant_shell<int>::get( *_impl->_args, - ( it->_precision + 2 ) );
 			if ( conv & HFormatImpl::CONVERSION::D_BYTE )
 				fmt += "hh";
 			if ( conv & HFormatImpl::CONVERSION::D_SHORT )
@@ -379,27 +373,27 @@ HString HFormat::string( void ) const
 			if ( conv & HFormatImpl::CONVERSION::D_INT )
 				{
 				if ( conv & HFormatImpl::CONVERSION::D_SHORT )
-					_impl->_buffer.format( fmt.raw(), variant_shell<int short>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int short>::get( *_impl->_args, it->_position ) );
 				else if ( conv & ( HFormatImpl::CONVERSION::D_LONG | HFormatImpl::CONVERSION::D_LONG_LONG ) )
-					_impl->_buffer.format( fmt.raw(), variant_shell<int long>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int long>::get( *_impl->_args, it->_position ) );
 				else
 					{
 					M_ASSERT( conv & HFormatImpl::CONVERSION::D_INT );
-					_impl->_buffer.format( fmt.raw(), variant_shell<int>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
 					}
 				}
 			else if ( conv & HFormatImpl::CONVERSION::D_STRING )
-				_impl->_buffer.format( fmt.raw(), variant_shell<HString>::get( *_impl->_args, it->_position ).raw() );
+				_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<HString>::get( *_impl->_args, it->_position ).raw() );
 			else if ( conv & HFormatImpl::CONVERSION::D_POINTER )
-				_impl->_buffer.format( fmt.raw(), variant_shell<void const*>::get( *_impl->_args, it->_position ) );
+				_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<void const*>::get( *_impl->_args, it->_position ) );
 			else if ( conv & HFormatImpl::CONVERSION::D_CHAR )
-				_impl->_buffer.format( fmt.raw(), variant_shell<char>::get( *_impl->_args, it->_position ) );
+				_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
 			else if ( conv & HFormatImpl::CONVERSION::D_DOUBLE )
 				{
 				if ( conv & ( HFormatImpl::CONVERSION::D_LONG ) )
-					_impl->_buffer.format( fmt.raw(), variant_shell<double long>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
 				else
-					_impl->_buffer.format( fmt.raw(), variant_shell<double>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<double>::get( *_impl->_args, it->_position ) );
 				}
 			_impl->_string += _impl->_buffer;
 			}
