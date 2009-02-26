@@ -6,3 +6,9 @@ yaal.*
 Doxyfile
 .my_make
 .svn
+CMakeCache.txt
+CMakeFiles
+Debug
+VisualStudio
+cmake_install.cmake
+static
