@@ -157,8 +157,7 @@ HString::HString( char const a_cChar ) : f_pcBuffer( NULL ), f_lAllocatedBytes( 
 HString::HString( int const a_iInt ) : f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( 0 )
 	{
 	M_PROLOG
-	char l_pcMeasureBuffer[ 3 ] = "\0\0";
-	f_lSize = ::snprintf( l_pcMeasureBuffer, 1, "%d", a_iInt );
+	f_lSize = ::snprintf( NULL, 0, "%d", a_iInt );
 	hs_realloc( f_lSize + 1 );
 	M_ENSURE( ::snprintf( f_pcBuffer, f_lSize + 1, "%d", a_iInt ) == f_lSize );
 	return;
@@ -168,8 +167,7 @@ HString::HString( int const a_iInt ) : f_pcBuffer( NULL ), f_lAllocatedBytes( 0 
 HString::HString( int long const a_lLong ) : f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( 0 )
 	{
 	M_PROLOG
-	char l_pcMeasureBuffer[ 3 ] = "\0\0";
-	f_lSize = ::snprintf( l_pcMeasureBuffer, 1, "%ld", a_lLong );
+	f_lSize = ::snprintf( NULL, 0, "%ld", a_lLong );
 	hs_realloc( f_lSize + 1 );
 	M_ENSURE( ::snprintf( f_pcBuffer, f_lSize + 1, "%ld", a_lLong ) == f_lSize );
 	return;
@@ -179,8 +177,7 @@ HString::HString( int long const a_lLong ) : f_pcBuffer( NULL ), f_lAllocatedByt
 HString::HString( int long unsigned const a_lLong ) : f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( 0 )
 	{
 	M_PROLOG
-	char l_pcMeasureBuffer[ 3 ] = "\0\0";
-	f_lSize = ::snprintf( l_pcMeasureBuffer, 1, "%lu", a_lLong );
+	f_lSize = ::snprintf( NULL, 0, "%lu", a_lLong );
 	hs_realloc( f_lSize + 1 );
 	M_ENSURE( ::snprintf( f_pcBuffer, f_lSize + 1, "%lu", a_lLong ) == f_lSize );
 	return;
@@ -190,8 +187,7 @@ HString::HString( int long unsigned const a_lLong ) : f_pcBuffer( NULL ), f_lAll
 HString::HString( int unsigned const a_ulLong ) : f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( 0 )
 	{
 	M_PROLOG
-	char l_pcMeasureBuffer [ 3 ] = "\0\0";
-	f_lSize = ::snprintf( l_pcMeasureBuffer, 1, "%u", a_ulLong );
+	f_lSize = ::snprintf( NULL, 0, "%u", a_ulLong );
 	hs_realloc( f_lSize + 1 );
 	M_ENSURE( ::snprintf( f_pcBuffer, f_lSize + 1, "%u", a_ulLong ) == f_lSize );
 	return;
@@ -201,8 +197,7 @@ HString::HString( int unsigned const a_ulLong ) : f_pcBuffer( NULL ), f_lAllocat
 HString::HString( double const a_dDouble ) : f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( 0 )
 	{
 	M_PROLOG
-	char l_pcMeasureBuffer[ 3 ] = "\0\0";
-	f_lSize = ::snprintf( l_pcMeasureBuffer, 1, "%f", a_dDouble );
+	f_lSize = ::snprintf( NULL, 0, "%f", a_dDouble );
 	hs_realloc( f_lSize + 1 );
 	M_ENSURE( ::snprintf( f_pcBuffer, f_lSize + 1, "%f", a_dDouble ) == f_lSize );
 	return;
@@ -212,8 +207,7 @@ HString::HString( double const a_dDouble ) : f_pcBuffer( NULL ), f_lAllocatedByt
 HString::HString( double long const a_dDouble ) : f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( 0 )
 	{
 	M_PROLOG
-	char l_pcMeasureBuffer[ 3 ] = "\0\0";
-	f_lSize = ::snprintf( l_pcMeasureBuffer, 1, "%.12Lf", a_dDouble );
+	f_lSize = ::snprintf( NULL, 0, "%.12Lf", a_dDouble );
 	hs_realloc( f_lSize + 1 );
 	M_ENSURE( ::snprintf( f_pcBuffer, f_lSize + 1, "%.12Lf", a_dDouble ) == f_lSize );
 	return;
@@ -224,12 +218,11 @@ HString::HString( void const* const a_pvPtrVoid )
 	: f_pcBuffer( NULL ), f_lAllocatedBytes( 0 ), f_lSize( 0 )
 	{
 	M_PROLOG
-	char l_pcMeasureBuffer[ 3 ] = "\0\0";
 	/*
 	 * Solaris libc omits 0x in %p conversion.
 	 * Well, that sucks.
 	 */
-	f_lSize = ::snprintf( l_pcMeasureBuffer, 1, "0x%lx", reinterpret_cast<int long>( a_pvPtrVoid ) );
+	f_lSize = ::snprintf( NULL, 0, "0x%lx", reinterpret_cast<int long>( a_pvPtrVoid ) );
 	hs_realloc( f_lSize + 1 );
 	M_ENSURE( ::snprintf( f_pcBuffer, f_lSize + 1, "0x%lx", reinterpret_cast<int long>( a_pvPtrVoid ) ) == f_lSize );
 	return;
@@ -447,12 +440,11 @@ HString& HString::format( char const* const a_pcFormat, ... )
 HString& HString::vformat( char const* const a_pcFormat, void* a_xAp )
 	{
 	M_PROLOG
-	char l_pcMeasureBuffer[ 3 ] = "\0\0";
 	if ( ! a_pcFormat )
 		M_THROW( n_ppcErrMsgHString[ string_helper::E_NULL_PTR ], errno );
 	::std::va_list orig;
 	__va_copy( orig, *static_cast< ::std::va_list*>( a_xAp ) );
-	f_lSize = vsnprintf( l_pcMeasureBuffer, 1, a_pcFormat, *static_cast< ::std::va_list*>( a_xAp ) );
+	f_lSize = vsnprintf( NULL, 0, a_pcFormat, *static_cast< ::std::va_list*>( a_xAp ) );
 	hs_realloc( f_lSize + 1 );
 	M_ENSURE ( vsnprintf( f_pcBuffer, f_lSize + 1, a_pcFormat, orig ) == f_lSize );
 	va_end( orig );
