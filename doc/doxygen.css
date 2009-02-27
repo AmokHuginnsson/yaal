@@ -14,7 +14,7 @@ table.yaal td {
 	border-top-width: 1px;
 	border-top-style: solid;
 	border-top-color: #888;
-	height: 24pt;
+	height: 20pt;
 }
 table.yaal td.good, table.yaal td.fine, table.yaal td.average, table.yaal td.fail, table.yaal td.envbug {
 	text-align: center;
@@ -40,7 +40,7 @@ table.yaal td.envbug {
 	color: #000;
 }
 .note {
-	vertical-align: super;
+	vertical-align: 2px;
 	font-size: 6pt;
 }
 ol {

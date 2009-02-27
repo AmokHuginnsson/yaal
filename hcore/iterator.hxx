@@ -33,6 +33,10 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief (Back)Insertion concept for HInsertIterator.
+ *
+ * May be used for collections that support back insertion.
+ */
 template<typename tType>
 class HBackInsertionConcept
 	{
@@ -42,6 +46,10 @@ public:
 		{ coll.push_back( elem ); }
 	};
 
+/*! \brief (Front)Insertion concept for HInsertIterator.
+ *
+ * May be used for collections that support front insertion.
+ */
 template<typename tType>
 class HFrontInsertionConcept
 	{
@@ -51,6 +59,10 @@ public:
 		{ coll.push_front( elem ); }
 	};
 
+/*! \brief Insertion concept for HInsertIterator.
+ *
+ * Shall be used when insertion to sets/maps is required.
+ */
 template<typename tType>
 class HInsertionConcept
 	{
@@ -60,6 +72,11 @@ public:
 		{ coll.insert( elem ); }
 	};
 
+/*! \brief Iterator class that allows extending existing collections.
+ *
+ * \tparam tType - collection type.
+ * \tparam inserter - insertion concept, tell how collection shall be extended.
+ */
 template<typename tType, typename inserter>
 class HInsertIterator
 	{

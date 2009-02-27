@@ -69,6 +69,8 @@ public:
 
 typedef HExceptionT<HFormat> HFormatException;
 
+/*! \brief Proxy between HFormat and HStreamInterface classes.
+ */
 class HStreamFormatProxy
 	{
 	class HStreamFormatProxyImpl
