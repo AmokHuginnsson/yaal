@@ -18,7 +18,7 @@ done
 
 cp -f config.hxx ${DIR_HEADERS}/
 
-head -26 ${DIR_HEADERS}/hcore/base.hxx | sed -e s/bit/yaal/ > ${DIR_HEADERS}/yaal.hxx
+head -26 ${DIR_HEADERS}/hcore/hstreaminterface.hxx | sed -e s/hstreaminterface/yaal/ > ${DIR_HEADERS}/yaal.hxx
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 #ifndef YAAL_HXX_INCLUDED
@@ -26,7 +26,7 @@ cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
 EOF
 
-find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{printf "#include <%s>\n", substr ($1,match($1,"yaal"),255)}' | sort >> ${DIR_HEADERS}/yaal.hxx
+find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{ printf "#include <%s>\n", substr( $1, match( $1, "yaal" ), 255 ) }' | sort >> ${DIR_HEADERS}/yaal.hxx
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
