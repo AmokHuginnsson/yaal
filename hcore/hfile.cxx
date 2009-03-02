@@ -82,21 +82,21 @@ int HFile::open( HString const& a_oPath )
 	int l_iError = 0;
 	char const * l_pcMode = NULL;
 	if ( f_eOpen == OPEN::D_READING )
-		l_pcMode = "r";
+		l_pcMode = "rb";
 	else if ( ( f_eOpen == OPEN::D_WRITING ) || ( f_eOpen == ( OPEN::D_WRITING | OPEN::D_TRUNCATE ) ) )
-		l_pcMode = "w";
+		l_pcMode = "wb";
 	else if ( f_eOpen == ( OPEN::D_WRITING | OPEN::D_APPEND ) )
-		l_pcMode = "a";
+		l_pcMode = "ab";
 	else if ( f_eOpen == ( OPEN::D_READING | OPEN::D_WRITING ) )
-		l_pcMode = "r+";
+		l_pcMode = "r+b";
 	else if ( f_eOpen == ( OPEN::D_READING | OPEN::D_WRITING | OPEN::D_TRUNCATE ) )
-		l_pcMode = "w+";
+		l_pcMode = "w+b";
 	else if ( f_eOpen == ( OPEN::D_READING | OPEN::D_WRITING | OPEN::D_APPEND ) )
-		l_pcMode = "a+";
+		l_pcMode = "a+b";
 	else
-		M_THROW ( "unexpected mode setting", f_eOpen );
+		M_THROW( "unexpected mode setting", f_eOpen );
 	f_oPath = a_oPath;
-	f_pvHandle = ::fopen( a_oPath.raw(), l_pcMode );
+	f_pvHandle = ::std::fopen( a_oPath.raw(), l_pcMode );
 	if ( ! f_pvHandle )
 		{
 		l_iError = errno;
@@ -156,7 +156,7 @@ void HFile::seek( int long const& pos, SEEK::seek_t const& a_eSeek )
 			M_ASSERT( ! "bad seek type" );
 		break;
 		}
-	M_ENSURE( ::fseek( static_cast<FILE*>( f_pvHandle ), pos, s ) == 0 );
+	M_ENSURE( ::std::fseek( static_cast<FILE*>( f_pvHandle ), pos, s ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -167,11 +167,11 @@ int long HFile::read_line( HString& a_roLine, READ::read_t const& a_eRead,
 	M_PROLOG
 	READ::read_t l_eRead = a_eRead;
 	if ( ( l_eRead & READ::D_KEEP_NEWLINES ) && ( l_eRead & READ::D_STRIP_NEWLINES ) )
-		M_THROW ( _ ( "bad newlines setting" ), l_eRead );
+		M_THROW( _( "bad newlines setting" ), l_eRead );
 	if ( ! ( l_eRead & ( READ::D_KEEP_NEWLINES | READ::D_STRIP_NEWLINES ) ) )
 		l_eRead |= READ::D_KEEP_NEWLINES;
 	if ( ( l_eRead & READ::D_BUFFERED_READS ) && ( l_eRead & READ::D_UNBUFFERED_READS ) )
-		M_THROW ( _ ( "bad buffering setting" ), l_eRead );
+		M_THROW( _( "bad buffering setting" ), l_eRead );
 	if ( ! ( l_eRead & ( READ::D_BUFFERED_READS | READ::D_UNBUFFERED_READS ) ) )
 		l_eRead |= READ::D_BUFFERED_READS;
 	if ( ! f_pvHandle )
@@ -187,7 +187,7 @@ int long HFile::read_line( HString& a_roLine, READ::read_t const& a_eRead,
 				M_THROW( _( "line too long" ), l_iLength );
 			f_oCache.pool_realloc( l_iLength );
 			l_pcPtr = f_oCache.raw();
-			M_ENSURE( static_cast<int>( ::fread( l_pcPtr,
+			M_ENSURE( static_cast<int>( ::std::fread( l_pcPtr,
 							sizeof ( char ), l_iLength,
 							static_cast<FILE*>( f_pvHandle ) ) ) == l_iLength );
 			l_pcPtr[ l_iLength ] = 0;
@@ -223,18 +223,18 @@ int long HFile::get_line_length( void )
 	M_PROLOG
 	static int const D_SCAN_BUFFER_SIZE = 8;
 	int long l_iLength = 0, l_iSize = 0;
-	char l_pcBuffer [ D_SCAN_BUFFER_SIZE ];
+	char l_pcBuffer[ D_SCAN_BUFFER_SIZE ];
 	char const * l_pcPtr = NULL;
 	do
 		{
-		l_iSize = ::fread( l_pcBuffer, sizeof ( char ),
+		l_iSize = ::std::fread( l_pcBuffer, sizeof ( char ),
 				D_SCAN_BUFFER_SIZE, static_cast<FILE*>( f_pvHandle ) );
 		l_iLength += l_iSize;
-		l_pcPtr = static_cast < char * > ( memchr ( l_pcBuffer,
+		l_pcPtr = static_cast<char*>( ::std::memchr( l_pcBuffer,
 					'\n', l_iSize ) );
 		}
 	while ( ! l_pcPtr && ( l_iSize == D_SCAN_BUFFER_SIZE ) );
-	M_ENSURE ( fseek ( static_cast < FILE * > ( f_pvHandle ),
+	M_ENSURE( ::std::fseek( static_cast<FILE*>( f_pvHandle ),
 				- l_iLength, SEEK_CUR ) == 0 );
 	if ( l_pcPtr )
 		l_iLength -= ( l_iSize - ( l_pcPtr + 1 - l_pcBuffer ) ); /* + 1 for \n */
@@ -267,7 +267,7 @@ void HFile::flush( void ) const
 void HFile::do_flush( void ) const
 	{
 	M_PROLOG
-	M_ENSURE( ::fflush( static_cast<FILE*>( f_pvHandle ) ) == 0 );
+	M_ENSURE( ::std::fflush( static_cast<FILE*>( f_pvHandle ) ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -282,7 +282,7 @@ bool HFile::operator ! ( void ) const
 int long HFile::do_read( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	return ( ::fread( a_pcBuffer, sizeof ( char ), a_lSize,
+	return ( ::std::fread( a_pcBuffer, sizeof ( char ), a_lSize,
 				static_cast<FILE*>( f_pvHandle ) ) );
 	M_EPILOG
 	}
@@ -290,7 +290,7 @@ int long HFile::do_read( void* const a_pcBuffer, int long const& a_lSize )
 int long HFile::do_write( void const* const a_pcString, int long const& a_lSize )
 	{
 	M_PROLOG
-	return ( ::fwrite( a_pcString, sizeof ( char ), a_lSize, static_cast<FILE*>( f_pvHandle ) ) );
+	return ( ::std::fwrite( a_pcString, sizeof ( char ), a_lSize, static_cast<FILE*>( f_pvHandle ) ) );
 	M_EPILOG
 	}
 

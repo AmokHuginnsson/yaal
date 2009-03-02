@@ -41,81 +41,81 @@ extern "C"
 typedef struct
 	{
 	int f_iErrorCode;
-	char * f_pcErrorMessage;
-	sqlite * f_psDB;
+	char* f_pcErrorMessage;
+	sqlite* f_psDB;
 	} OSQLite;
 	
 typedef struct
 	{
 	int f_iRows;
 	int f_iColumns;
-	char * * f_ppcData;
+	char** f_ppcData;
 	} OSQLiteResult;
 
-OSQLite * g_psBrokenDB = NULL;
+OSQLite* g_psBrokenDB = NULL;
 
-void * db_query ( void *, char const * );
-void db_unquery ( void * );
-void db_disconnect ( void * );
+void* db_query( void*, char const* );
+void db_unquery( void* );
+void db_disconnect( void* );
 
 /* sqlite driver uses convention that database file name should have
  * .sqlite or .db extension, and this default extension is added
  * to user supplied database name by driver during db_connect. */
 
-void * db_connect ( char const * a_pcDataBase,
-		char const *, char const * )
+void* db_connect( char const* a_pcDataBase,
+		char const*, char const* )
 	{
 	int l_iNmLnght = 0;
-	void * l_pvPtr = NULL;
-	char * l_pcDataBase = NULL;
-	char const l_pcFileNameExt [ ] = ".sqlite";
+	void* l_pvPtr = NULL;
+	char* l_pcDataBase = NULL;
+	char const l_pcFileNameExt[] = ".sqlite";
 	struct stat l_sStat;
-	OSQLite * l_psSQLite = NULL;
+	OSQLite* l_psSQLite = NULL;
 	if ( g_psBrokenDB )
 		{
-		db_disconnect ( g_psBrokenDB );
+		db_disconnect( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psSQLite = xcalloc < OSQLite > ( 1 );
-	l_iNmLnght = strlen ( a_pcDataBase );
-	l_pcDataBase = xcalloc < char > ( l_iNmLnght + strlen ( l_pcFileNameExt ) + 1 );
-	strcpy ( l_pcDataBase, a_pcDataBase );
-	strcat ( l_pcDataBase, l_pcFileNameExt );
-	if ( stat ( l_pcDataBase, & l_sStat ) )
+	l_psSQLite = xcalloc<OSQLite>( 1 );
+	l_iNmLnght = strlen( a_pcDataBase );
+	l_pcDataBase = xcalloc<char>( l_iNmLnght + ::strlen( l_pcFileNameExt ) + 1 );
+	strcpy( l_pcDataBase, a_pcDataBase );
+	strcat( l_pcDataBase, l_pcFileNameExt );
+	if ( stat( l_pcDataBase, &l_sStat ) )
 		{
-		strcpy ( l_pcDataBase + l_iNmLnght, ".db" );
-		if ( stat ( l_pcDataBase, & l_sStat ) )
+		strcpy( l_pcDataBase + l_iNmLnght, ".db" );
+		if ( stat( l_pcDataBase, &l_sStat ) )
 			{
-			asprintf ( & l_psSQLite->f_pcErrorMessage,
+			asprintf( &l_psSQLite->f_pcErrorMessage,
 					"Database file `%s' does not exists.", l_pcDataBase );
-			xfree ( l_pcDataBase );
+			xfree( l_pcDataBase );
 			g_psBrokenDB = l_psSQLite;
 			return ( NULL );
 			}
 		}
-	l_psSQLite->f_psDB = sqlite_open ( l_pcDataBase, 0,
-			& l_psSQLite->f_pcErrorMessage );
-	xfree ( l_pcDataBase );
+	l_psSQLite->f_psDB = sqlite_open( l_pcDataBase, 0,
+			&l_psSQLite->f_pcErrorMessage );
+	xfree( l_pcDataBase );
 	if ( ! l_psSQLite->f_psDB )
 		g_psBrokenDB = l_psSQLite, l_psSQLite = NULL;
 	else
 		{
-		l_pvPtr = db_query ( l_psSQLite, "PRAGMA empty_result_callbacks = ON;" );
+		l_pvPtr = db_query( l_psSQLite, "PRAGMA empty_result_callbacks = ON;" );
 		if ( l_pvPtr )
-			db_unquery ( l_pvPtr );
+			db_unquery( l_pvPtr );
 		else
 			g_psBrokenDB = l_psSQLite, l_psSQLite = NULL;
 		}
 	return ( l_psSQLite );
 	}
 
-void db_disconnect ( void * a_pvData )
+void db_disconnect( void* a_pvData )
 	{
-	OSQLite * l_psSQLite = static_cast < OSQLite * > ( a_pvData );
+	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
 	sqlite_close ( l_psSQLite->f_psDB );
 	if ( l_psSQLite->f_pcErrorMessage )
-		xfree ( l_psSQLite->f_pcErrorMessage );
-	xfree ( l_psSQLite );
+		xfree( l_psSQLite->f_pcErrorMessage );
+	xfree( l_psSQLite );
 	return;
 	}
 
@@ -140,25 +140,25 @@ char const* db_error( void* a_pvData )
 	return ( "" );
 	}
 
-void* db_query( void * a_pvData, char const * a_pcQuery )
+void* db_query( void* a_pvData, char const* a_pcQuery )
 	{
-	OSQLite* l_psSQLite = static_cast < OSQLite * > ( a_pvData );
+	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
 	OSQLiteResult* l_psResult = NULL;
-	l_psResult = xcalloc < OSQLiteResult > ( 1 );
+	l_psResult = xcalloc<OSQLiteResult>( 1 );
 	l_psResult->f_iColumns = 0;
 	l_psResult->f_iRows = 0;
 	l_psResult->f_ppcData = NULL;
 	if ( l_psSQLite->f_pcErrorMessage )
 		xfree ( l_psSQLite->f_pcErrorMessage );
 	l_psSQLite->f_iErrorCode = sqlite_get_table ( l_psSQLite->f_psDB, a_pcQuery,
-			& l_psResult->f_ppcData, & l_psResult->f_iRows,
-			& l_psResult->f_iColumns, & l_psSQLite->f_pcErrorMessage );
+			&l_psResult->f_ppcData, &l_psResult->f_iRows,
+			&l_psResult->f_iColumns, &l_psSQLite->f_pcErrorMessage );
 	return ( l_psResult );
 	}
 
 void db_unquery( void* a_pvData )
 	{
-	sqlite_free_table ( static_cast < OSQLiteResult * > ( a_pvData )->f_ppcData );
+	sqlite_free_table( static_cast<OSQLiteResult*>( a_pvData )->f_ppcData );
 	xfree ( a_pvData );
 	return;
 	}

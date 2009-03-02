@@ -42,8 +42,8 @@ extern "C"
 typedef struct
 	{
 	int f_iErrorCode;
-	char * f_pcErrorMessage;
-	sqlite3 * f_psDB;
+	char* f_pcErrorMessage;
+	sqlite3* f_psDB;
 	} OSQLite;
 	
 typedef struct
@@ -77,7 +77,7 @@ void* db_connect( char const* a_pcDataBase,
 		db_disconnect( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psSQLite = xcalloc< OSQLite>( 1 );
+	l_psSQLite = xcalloc<OSQLite>( 1 );
 	l_iNmLnght = static_cast<int>( ::strlen( a_pcDataBase ) );
 	l_pcDataBase = xcalloc<char>( l_iNmLnght + ::strlen( l_pcFileNameExt ) + 1 );
 	::strcpy( l_pcDataBase, a_pcDataBase );
@@ -95,7 +95,7 @@ void* db_connect( char const* a_pcDataBase,
 			}
 		}
 	l_psSQLite->f_iErrorCode = ::sqlite3_open( l_pcDataBase,
-			& l_psSQLite->f_psDB );
+			&l_psSQLite->f_psDB );
 	xfree( l_pcDataBase );
 	if ( l_psSQLite->f_iErrorCode )
 		{
@@ -114,9 +114,9 @@ void* db_connect( char const* a_pcDataBase,
 	return ( l_psSQLite );
 	}
 
-void db_disconnect ( void * a_pvData )
+void db_disconnect( void* a_pvData )
 	{
-	OSQLite * l_psSQLite = static_cast < OSQLite * > ( a_pvData );
+	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
 	if ( l_psSQLite->f_psDB )
 		sqlite3_close ( l_psSQLite->f_psDB );
 	if ( l_psSQLite->f_pcErrorMessage )
@@ -148,31 +148,31 @@ char const* db_error( void* a_pvData )
 		{
 		if ( l_psSQLite->f_pcErrorMessage )
 			return ( l_psSQLite->f_pcErrorMessage );
-		return ( sqlite3_errmsg ( l_psSQLite->f_psDB ) );
+		return ( sqlite3_errmsg( l_psSQLite->f_psDB ) );
 		}
 	return ( "" );
 	}
 
-void* db_query( void* a_pvData, char const * a_pcQuery )
+void* db_query( void* a_pvData, char const* a_pcQuery )
 	{
-	OSQLite * l_psSQLite = ( OSQLite * ) a_pvData;
+	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
 	OSQLiteResult * l_psResult = NULL;
-	l_psResult = xcalloc < OSQLiteResult > ( 1 );
+	l_psResult = xcalloc<OSQLiteResult>( 1 );
 	l_psResult->f_iColumns = 0;
 	l_psResult->f_iRows = 0;
 	l_psResult->f_ppcData = NULL;
 	if ( l_psSQLite->f_pcErrorMessage )
 		xfree ( l_psSQLite->f_pcErrorMessage );
 	l_psSQLite->f_iErrorCode = sqlite3_get_table ( l_psSQLite->f_psDB,
-			a_pcQuery, & l_psResult->f_ppcData, & l_psResult->f_iRows,
-			& l_psResult->f_iColumns, & l_psSQLite->f_pcErrorMessage );
+			a_pcQuery, &l_psResult->f_ppcData, &l_psResult->f_iRows,
+			&l_psResult->f_iColumns, &l_psSQLite->f_pcErrorMessage );
 	return ( l_psResult );
 	}
 
-void db_unquery ( void * a_pvData )
+void db_unquery( void* a_pvData )
 	{
-	sqlite3_free_table ( static_cast < OSQLiteResult * > ( a_pvData )->f_ppcData );
-	xfree ( a_pvData );
+	sqlite3_free_table( static_cast<OSQLiteResult*>( a_pvData )->f_ppcData );
+	xfree( a_pvData );
 	return;
 	}
 

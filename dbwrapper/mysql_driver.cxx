@@ -44,32 +44,32 @@ extern "C"
 
 MYSQL* g_psBrokenDB = NULL;
 
-void db_disconnect ( void * );
+void db_disconnect ( void* );
 
-void * db_connect ( char const * a_pcDataBase,
-		char const * a_pcLogin, char const * a_pcPassword )
+void* db_connect ( char const* a_pcDataBase,
+		char const* a_pcLogin, char const * a_pcPassword )
 	{
-	MYSQL * l_psMySQL = NULL;
+	MYSQL* l_psMySQL = NULL;
 	if ( g_psBrokenDB )
 		{
-		db_disconnect ( g_psBrokenDB );
+		db_disconnect( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psMySQL = mysql_init ( NULL );
+	l_psMySQL = mysql_init( NULL );
 	if ( l_psMySQL )
 		{
-		if ( mysql_options ( l_psMySQL, MYSQL_OPT_NAMED_PIPE, NULL ) )
+		if ( mysql_options( l_psMySQL, MYSQL_OPT_NAMED_PIPE, NULL ) )
 			g_psBrokenDB = l_psMySQL, l_psMySQL = NULL;
-		else if ( ! mysql_real_connect ( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
+		else if ( ! mysql_real_connect( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
 				a_pcDataBase, 0, NULL, CLIENT_IGNORE_SPACE ) )
 			g_psBrokenDB = l_psMySQL, l_psMySQL = NULL;
 		}
 	return ( l_psMySQL );
 	}
 
-void db_disconnect ( void * a_pvData )
+void db_disconnect( void* a_pvData )
 	{
-	mysql_close ( ( MYSQL * ) a_pvData );
+	mysql_close( static_cast<MYSQL*>( a_pvData ) );
 	return;
 	}
 

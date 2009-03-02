@@ -67,7 +67,8 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 [
 	AC_MSG_CHECKING([host operating system])
 	HOST_OS_TYPE=""
-	LIB_PREFIX="lib"
+	LIB_PREFIX=["lib"]
+	LIB_EXT=['"so"']
 	SYMBOL_PREFIX=['""']
 	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your operating system is Debian.])
@@ -103,10 +104,13 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 		SPECIAL_LINKER_FLAGS=["-shared -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(NAME).\$(LIB_ARCHIVE_SUFFIX)"]
 		TARGET_LINKER_FLAGS=["-Wl\$(COMA)--enable-auto-import"]
 		HOST_OS_TYPE=[Windows]
-		LIB_PREFIX="cyg"
+		LIB_PREFIX=["cyg"]
+		LIB_EXT=['"dll"']
 		TOOLS_LIBS=["${TOOLS_LIBS} -liconv"]
 	fi
 	AC_DEFINE_UNQUOTED([SYMBOL_PREFIX],${SYMBOL_PREFIX},[Symbol prefix used on this platform.])
+	AC_DEFINE_UNQUOTED([LIB_PREFIX],"${LIB_PREFIX}",[Dynamic library file name prefix used on this platform.])
+	AC_DEFINE_UNQUOTED([LIB_EXT],${LIB_EXT},[Dynamic library file name extension used on this platform.])
 
 	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
 		AC_MSG_ERROR([Cannot recognize host operating system type!])

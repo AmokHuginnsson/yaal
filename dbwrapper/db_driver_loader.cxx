@@ -60,11 +60,11 @@ char const* const g_pcDone = "done.\r\n";
 static char const* g_ppcDriver[ 7 ] =
 	{
 	NULL,
-	"libsqlite3_driver.so",
-	"libsqlite_driver.so",
-	"libmysql_driver.so",
-	"libpostgresql_driver.so",
-	"liboracle_driver.so",
+	LIB_PREFIX"sqlite3_driver."LIB_EXT,
+	LIB_PREFIX"sqlite_driver."LIB_EXT,
+	LIB_PREFIX"mysql_driver."LIB_EXT,
+	LIB_PREFIX"postgresql_driver."LIB_EXT,
+	LIB_PREFIX"oracle_driver."LIB_EXT,
 	NULL
 	};
 
