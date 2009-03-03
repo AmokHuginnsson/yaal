@@ -326,21 +326,18 @@ HMatrix<tType> HMatrix<tType>::_1( void )
 	check_dimensions_square();
 	tType l_tScalar = 0;
 	int l_iCtrRow = 0, l_iCtrColumn = 0;
-	if ( ( l_tScalar = det() ) != 0 )
-		{
-		HMatrix l_oMatrix ( * this );
-		for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
-			{
-			for ( l_iCtrColumn = 0; l_iCtrColumn < f_iColumns; l_iCtrColumn ++ )
-				{
-				l_oMatrix.f_oData[ l_iCtrRow ][ l_iCtrColumn ] = M( l_iCtrRow,
-						l_iCtrColumn ) * ( ( ( l_iCtrRow + l_iCtrColumn ) % 2 ) ? -1 : 1 );
-				}
-			}
-		return ( l_oMatrix.T() / l_tScalar );
-		}
-	else
+	if ( ! ( l_tScalar = det() ) )
 		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_ODD ], 0 );
+	HMatrix l_oMatrix( *this );
+	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
+		{
+		for ( l_iCtrColumn = 0; l_iCtrColumn < f_iColumns; l_iCtrColumn ++ )
+			{
+			l_oMatrix.f_oData[ l_iCtrRow ][ l_iCtrColumn ] = M( l_iCtrRow,
+					l_iCtrColumn ) * ( ( ( l_iCtrRow + l_iCtrColumn ) % 2 ) ? -1 : 1 );
+			}
+		}
+	return ( l_oMatrix.T() / l_tScalar );
 	M_EPILOG
 	}
 
