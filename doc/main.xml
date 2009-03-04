@@ -12,6 +12,9 @@
 		<td>Debian Sid</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
+		<td>Debian Stable</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+	</tr>
+	<tr>
 		<td>Ubuntu Jaunty Jackalope</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
@@ -48,13 +51,13 @@
 <ul>
 	<li>Platform - description of platform where tests were performed.</li>
 	<li>Compilation - amount of code that actually compiles.</li>
-	<li>Best case - amount of unit and regression tests that actually passed in best case very gentle run.</li>
-	<li>Ultimate - amount of unit and regression test that actually passed during heavy burden run.</li>
+	<li>Best case - amount of unit and regression tests that actually passed in best case in a single run.</li>
+	<li>Ultimate - "Pass" only when all tests always pass.</li>
 </ul>
 <ol>
 	<li><i><a name="note_platform"></a>Unless specified otherwise GCC is used for compilation.</i></li>
 	<li><i><a name="note_compilation"></a>Compilation gets 100% score only when both library and all unit test can be build. On the other hand, compilation gets 0% score if non of the library components could be linked.</i></li>
-	<li><i><a name="note_fork"></a>Many important features are missing from this port due to lack of POSIX compatibility in MS Windows environment.</i></li>
+	<li><i><a name="note_fork"></a>Many important features are missing from this port due to lack of POSIX compatibility in MS Windows environment. Moreover you need a special super project <b>msvcxx</b> (git clone http://codestation.org/repo/msvcxx.git msvcxx) to be able to build both <b>yaal</b> and <b>tress</b>.</i></li>
 	<li><i><a name="note_sunld"></a><a href="http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id=6735939" target="_blank">A bug in Sun ld.</a></i></li>
 	<li><i><a name="note_suncc"></a><a href="http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=21c0039e011eafffffffff0c6ce30fa20474?bug_id=6688172" target="_blank">A bug in Sun Studio C++ compiler.</a></i></li>
 	<li><i><a name="note_SFU"></a>SFU is a joke, really, no C++, cannot mix with msvcrt.</li>
