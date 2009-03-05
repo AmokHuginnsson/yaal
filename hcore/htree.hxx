@@ -622,10 +622,10 @@ HTree<tType>::~HTree( void )
 
 template<typename tType>
 HTree<tType>::HTree( HTree const& t )
-	: f_poRoot( t.f_poRoot->clone( NULL ) )
+	: f_poRoot( t.f_poRoot ? t.f_poRoot->clone( NULL ) : NULL )
 	{
 	M_PROLOG
-	f_poRoot->f_poTree = this;
+	f_poRoot && ( f_poRoot->f_poTree = this );
 	return;
 	M_EPILOG
 	}
@@ -661,9 +661,8 @@ void HTree<tType>::swap( HTree<tType>& other )
 		using yaal::swap;
 		swap( f_poRoot, other.f_poRoot );
 		/* after swap */
-		f_poRoot->f_poTree = this;
-		if ( other.f_poRoot )
-			other.f_poRoot->f_poTree = &other;
+		f_poRoot && ( f_poRoot->f_poTree = this );
+		other.f_poRoot && ( other.f_poRoot->f_poTree = &other );
 		}
 	return;
 	}
