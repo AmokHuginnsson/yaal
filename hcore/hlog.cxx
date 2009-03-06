@@ -120,39 +120,39 @@ void HLog::rehash( FILE* a_psStream,
 		f_pcProcessName = ::basename( a_pcProcessName );
 	if ( ! a_psStream )
 		M_THROW ( "file parameter is", reinterpret_cast<int long>( a_psStream ) );
-	if ( f_psStream )
+	l_psTmpFile = f_psStream;
+	f_psStream = a_psStream;
+	if ( l_psTmpFile )
 		{
-		fseek ( f_psStream, 0, SEEK_SET );
+		::fseek( l_psTmpFile, 0, SEEK_SET );
 		char* buf = f_oBuffer.get<char>();
 #ifdef HAVE_GETLINE 
-		while ( getline( &buf, &f_iBufferSize, f_psStream ) > 0 )
+		while ( ::getline( &buf, &f_iBufferSize, l_psTmpFile ) > 0 )
 #else /* HAVE_GETLINE */
-		while ( ( l_iLen = fread ( buf, sizeof ( char ), f_iBufferSize, f_psStream ) ) )
+		while ( ( l_iLen = ::fread( buf, sizeof ( char ), f_iBufferSize, l_psTmpFile ) ) )
 #endif /* not HAVE_GETLINE */
 			{
 #ifndef HAVE_GETLINE
 			l_pcPtr = static_cast<char*>( ::memchr( buf, '\n', l_iLen ) );
 			if ( ! l_pcPtr )
 				{
-				fprintf( a_psStream, buf );
+				::fprintf( f_psStream, buf );
 				continue;
 				}
 			* ++ l_pcPtr = 0;
-			::fseek( f_psStream, l_pcPtr - buf - l_iLen, SEEK_CUR );
+			::fseek( l_psTmpFile, l_pcPtr - buf - l_iLen, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
 			f_lType = ::strtol( buf, NULL, 0x10 );
 			if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 				{
-				timestamp( a_psStream );
-				::fputs( buf + 10, a_psStream );
+				timestamp();
+				::fputs( buf + 10, f_psStream );
 				}
 			}
 		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
 			f_lType = 0;
-		l_psTmpFile = f_psStream;
-		fclose ( l_psTmpFile );
+		::fclose( l_psTmpFile );
 		}
-	f_psStream = a_psStream;
 	return;
 	M_EPILOG
 	}
@@ -169,38 +169,33 @@ void HLog::rehash( HString const& a_oLogFileName,
 	M_EPILOG
 	}
 
-void HLog::timestamp( FILE* a_psStream )
+void HLog::timestamp( void )
 	{
 	M_PROLOG
-	int long l_iSize = 0;
-	char l_pcBuffer [ D_TIMESTAMP_SIZE ];
-	time_t l_xCurrentTime;
-	if ( ! a_psStream )
-		a_psStream = f_psStream;
 	if ( ! f_bRealMode )
 		{
 		if ( f_psStream )
-			fprintf ( f_psStream, "%-10lx", f_lType );
+			::fprintf( f_psStream, "%-10lx", f_lType );
 		return;
 		}
-	tm * l_psBrokenTime = 0;
-	l_xCurrentTime = time ( NULL );
-	l_psBrokenTime = localtime ( & l_xCurrentTime );
-	memset ( l_pcBuffer, 0, D_TIMESTAMP_SIZE );
+	time_t l_xCurrentTime = ::time( NULL );
+	tm* l_psBrokenTime = ::localtime( &l_xCurrentTime );
+	char l_pcBuffer[ D_TIMESTAMP_SIZE ];
+	::memset( l_pcBuffer, 0, D_TIMESTAMP_SIZE );
 	/* ISO C++ does not support the `%e' strftime format */
 	/* `%e': The day of the month like with `%d', but padded with blank */
 	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
-	l_iSize = strftime( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
+	int long l_iSize = ::strftime( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
 			l_psBrokenTime );
 	if ( l_iSize > D_TIMESTAMP_SIZE )
 		M_THROW( _( "strftime returned more than D_TIMESTAMP_SIZE" ), l_iSize );
 	if ( f_pcProcessName )
-		fprintf( a_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_oLoginName.get<char>(),
+		::fprintf( f_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_oLoginName.get<char>(),
 				f_oHostName.get<char>(), f_pcProcessName );
 	else
-		fprintf( a_psStream, "%s %s@%s: ", l_pcBuffer, f_oLoginName.get<char>(),
+		::fprintf( f_psStream, "%s %s@%s: ", l_pcBuffer, f_oLoginName.get<char>(),
 			f_oHostName.get<char>() );
 	return;
 	M_EPILOG

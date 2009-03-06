@@ -89,7 +89,7 @@ public:
 private:
 	HLog( void );
 	virtual ~HLog( void );
-	void timestamp ( FILE * = NULL );
+	void timestamp( void );
 	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;
 	virtual int long do_read( void* const, int long const& );
