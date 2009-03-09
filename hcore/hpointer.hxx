@@ -356,6 +356,7 @@ void HPointer<tType, pointer_type_t, access_type_t>::acquire( HPointer<hier_t, p
 			access_type_t<tType, pointer_type_t<tType> >::inc_reference_counter( alien.f_poShared->f_piReferenceCounter );
 			f_poShared = alien.f_poShared;
 			assign( f_ptObject, reinterpret_cast<hier_t*>( alien.f_ptObject ) );
+			f_poShared->DELETER = &pointer_type_t<tType>::template delete_pointee<tType>;
 			}
 		else
 			{

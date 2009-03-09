@@ -117,10 +117,10 @@ private:
 public:
 	template<typename const_qual_t, OListBits::treatment_t const treatment>
 	class HIterator;
-	typedef HIterator<tType, OListBits::D_TREAT_AS_OPENED> iterator;
-	typedef HIterator<tType const, OListBits::D_TREAT_AS_OPENED> const_iterator;
-	typedef HIterator<tType, OListBits::D_TREAT_AS_CLOSED> cyclic_iterator;
-	typedef HIterator<tType const, OListBits::D_TREAT_AS_CLOSED> const_cyclic_iterator;
+	typedef class HIterator<tType, OListBits::D_TREAT_AS_OPENED> iterator;
+	typedef class HIterator<tType const, OListBits::D_TREAT_AS_OPENED> const_iterator;
+	typedef class HIterator<tType, OListBits::D_TREAT_AS_CLOSED> cyclic_iterator;
+	typedef class HIterator<tType const, OListBits::D_TREAT_AS_CLOSED> const_cyclic_iterator;
 	/*! \brief Creates list, with specified size.
 	 *
 	 * \param count - number of element for newly created list.
@@ -201,10 +201,10 @@ private:
 	HElement* element_by_index ( int );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
-	friend class HList<tType>::HIterator<tType, OListBits::D_TREAT_AS_OPENED>;
-	friend class HList<tType>::HIterator<tType const, OListBits::D_TREAT_AS_OPENED>;
-	friend class HList<tType>::HIterator<tType, OListBits::D_TREAT_AS_CLOSED>;
-	friend class HList<tType>::HIterator<tType const, OListBits::D_TREAT_AS_CLOSED>;
+	friend class HIterator<tType, OListBits::D_TREAT_AS_OPENED>;
+	friend class HIterator<tType const, OListBits::D_TREAT_AS_OPENED>;
+	friend class HIterator<tType, OListBits::D_TREAT_AS_CLOSED>;
+	friend class HIterator<tType const, OListBits::D_TREAT_AS_CLOSED>;
 	};
 
 /*! \brief HList<> element class provisions basic building block for doubly-linked list.
@@ -221,10 +221,8 @@ private:
 	HElement ( HElement const & );
 	HElement& operator = ( HElement const& );
 	friend class HList<tType>;
-	friend class HList<tType>::HIterator<tType, OListBits::D_TREAT_AS_OPENED>;
-	friend class HList<tType>::HIterator<tType const, OListBits::D_TREAT_AS_OPENED>;
-	friend class HList<tType>::HIterator<tType, OListBits::D_TREAT_AS_CLOSED>;
-	friend class HList<tType>::HIterator<tType const, OListBits::D_TREAT_AS_CLOSED>;
+	template<typename const_qual_t, OListBits::treatment_t const treatment>
+	friend class HList<tType>::HIterator;
 	};
 
 /*! \brief Iterator for HList<> data structure.
