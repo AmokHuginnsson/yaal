@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hfile.hxx
+ * \brief HFile class declaration.
+ */
 
 #ifndef YAAL_HCORE_HFILE_HXX_INCLUDED
 #define YAAL_HCORE_HFILE_HXX_INCLUDED

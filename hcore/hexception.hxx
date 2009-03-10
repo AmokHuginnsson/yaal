@@ -23,9 +23,11 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-
-/* This file holds (except HException class declaration) main #defines,
-	 macros and global variables used acros whole yaal */
+/*! \file hcore/hexception.hxx
+ * \brief HException and HExceptionT<> class declaration.
+ *
+ * Auto-exception-hierachy stuff is decalred here.
+ */
 
 #ifndef YAAL_HCORE_HEXCEPTION_HXX_INCLUDED
 #define YAAL_HCORE_HEXCEPTION_HXX_INCLUDED

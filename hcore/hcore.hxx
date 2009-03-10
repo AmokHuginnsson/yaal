@@ -23,9 +23,12 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-
-/* This file holds (except HException class declaration) main #defines,
-	 macros and global variables used acros whole yaal */
+/*! \file hcore/hcore.hxx
+ * \brief Basic system level stuff.
+ *
+ * This file holds (except HException class declaration) main #defines,
+ * macros and global variables used acros whole yaal.
+ */
 
 #ifndef YAAL_HCORE_HCORE_HXX_INCLUDED
 #define YAAL_HCORE_HCORE_HXX_INCLUDED

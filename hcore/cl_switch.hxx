@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/*! \file hcore/cl_switch.hxx
+ * \brief Declaration of command line hadling routines.
+ */
+
 #ifndef YAAL_HCORE_CL_SWITCH_HXX_INCLUDED
 #define YAAL_HCORE_CL_SWITCH_HXX_INCLUDED
 

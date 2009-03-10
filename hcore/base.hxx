@@ -26,6 +26,9 @@ Copyright:
 
 /*! \file hcore/base.hxx
  * \brief Basic declarations used across whole library.
+ *
+ * This file holds main #defines, macros and global variables
+ * used acros whole yaal.
  */
 
 #ifndef YAAL_HCORE_BASE_HXX_INCLUDED
@@ -64,16 +67,35 @@ template<bool> struct static_assert_failure;
 template<> struct static_assert_failure<true> { enum { value = 1 }; };
 #define STATIC_ASSERT( condition ) { typedef char SAF##__LINE__[ static_assert_failure<( condition )>::value ]; }
 
+/*! \brief gettext library API convenience macro.
+ */
 #define _(string) gettext (string)
 
+/*! \brief Create object file identifier for ident(1) program.
+ */
 #define M_VCSID(id) namespace { static char const* wrapper_VCSID( void ) { wrapper_VCSID(); return id; } }
+/*! \cond */
 #define M_VCSTID(id) namespace { static char const* wrapper_VCSTID( void ) { wrapper_VCSTID(); return id; } }
+/*! \endcond */
 #define M_THROW( msg, e_no ) yaal::hcore::throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, e_no )
 #define M_PROLOG try{
 #define M_EPILOG } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
 #define M_FINAL } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error( true ); } catch ( yaal::hcore::HFailedAssertion& ) { exit( -1 ); } catch ( int const& retVal ) { return ( retVal ); }
+/*! \brief Throw HExceptionT<> is condition is not met.
+ *
+ * Use this macro to test return status of low-level system function calls.
+ *
+ * \param condition - condition to be tested.
+ */
 #define M_ENSURE( condition ) do { if ( ! ( condition ) ){ yaal::hcore::throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno, error_message( errno ) ); } } while ( 0 )
 #ifndef NDEBUG
+/*! \brief Run-time assertion tester.
+ *
+ * This macro has meaning only in debug build.
+ *
+ * \param condition - condition to be tested.
+ * \post Normal progam flow is continued only if condition is met, otherwise HFailedAssertion exception is thrown.
+ */
 #	define M_ASSERT( condition ) do { if ( ! ( condition ) )yaal::hcore::HException::failed_assert( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition ); } while ( 0 )
 #else /* NDEBUG */
 #	define M_ASSERT( c ) /**/

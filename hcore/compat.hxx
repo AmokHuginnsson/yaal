@@ -24,7 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-/* compatibility header for various platforms */
+/*! \file hcore/compat.hxx
+ * \brief Compatibility header for various platforms.
+ */
 
 #ifndef YAAL_HCORE_COMPAT_HXX_INCLUDED
 #define YAAL_HCORE_COMPAT_HXX_INCLUDED

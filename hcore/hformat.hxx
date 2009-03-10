@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hformat.hxx
+ * \brief HFormat and HStreamFormatProxy classes declarations.
+ */
 
 #ifndef YAAL_HCORE_HFORMAT_HXX_INCLUDED
 #define YAAL_HCORE_HFORMAT_HXX_INCLUDED
