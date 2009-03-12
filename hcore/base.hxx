@@ -113,6 +113,13 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
 
+/*! \brief Swap contents of two variables.
+ *
+ * \param left - first variable to be swapped.
+ * \param right - second variable to be swapped.
+ *
+ * \post After the call left holds value of right from before call, and right holds value of left from before call.
+ */
 template<typename tType>
 inline void swap( tType& left, tType& right )
 	{
@@ -157,6 +164,12 @@ HBinder<function_t, value_t>::HBinder( function_t func, value_t value )
 	: CALLER( func ), f_tValue( value )
 	{ }
 
+/*! \brief Convenience function to construct HBinder<> object.
+ *
+ * \param func - function to bind argument to.
+ * \param value - a bound value.
+ * \return HBinder<>, a function object that encapsulates func function and its bound value.
+ */
 template<typename function_t, typename value_t>
 HBinder<function_t, value_t> bind2nd( function_t func, value_t value )
 	{
@@ -209,6 +222,12 @@ struct binder1st : public unary_function<typename operation_t::result_t, typenam
 		{ return ( operation_t( arg, _bound ) ); }
 	};
 
+/*! \brief For each element in range pass its value into function.
+ *
+ * \param it - begining of the range.
+ * \param end - one past the end of range.
+ * \param CALL - invoke this function and pass values from range to it.
+ */
 template<typename iterator_t, typename call_t>
 void for_each( iterator_t it, iterator_t const& end, call_t CALL )
 	{
@@ -230,6 +249,12 @@ void transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t dst, o
 		*dst = op( *arg, *it );
 	}
 
+/*! \brief Copy range of values onto another range.
+ *
+ * \param src - begining of source range of elements.
+ * \param end - one past the end of source range of elements.
+ * \param dst - begining of destination range.
+ */
 template<typename src_it_t, typename dst_it_t>
 void copy( src_it_t src, src_it_t const& end, dst_it_t dst )
 	{
@@ -238,6 +263,14 @@ void copy( src_it_t src, src_it_t const& end, dst_it_t dst )
 	return;
 	}
 
+/*! \brief Checks if two ranges are same size and have same set of values.
+ * 
+ * \param it1 - begining of first range.
+ * \param end1 - one past last element of first range.
+ * \param it2 - begining of second range.
+ * \param end2 - one past last element of second range.
+ * \return true if and only if ranges have same size and same contents.
+ */
 template<typename iter1_t, typename iter2_t>
 bool equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
 	{
@@ -327,6 +360,12 @@ void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second )
 	return;
 	}
 
+/*! \brief Fill range of elements with given value.
+ *
+ * \param it - begining of range to fill.
+ * \param end - one past the end of range.
+ * \param filler - value to be set for all elements in range.
+ */
 template<typename dst_it_t, typename filler_t>
 void fill( dst_it_t it, dst_it_t end, filler_t const& filler )
 	{
@@ -335,6 +374,12 @@ void fill( dst_it_t it, dst_it_t end, filler_t const& filler )
 	return;
 	}
 
+/*! \brief Fill specified amount of elements with given value.
+ *
+ * \param it - begining of range to fill.
+ * \param count - amount of elements to set.
+ * \param filler - value to be set for all elements in range.
+ */
 template<typename dst_it_t, typename filler_t>
 void fill_n( dst_it_t it, int long const& count, filler_t const& filler )
 	{
@@ -366,6 +411,12 @@ return_t accumulate( iterator_t it, iterator_t end, return_t ret )
 	return ( ret );
 	}
 
+/*! \brief Calculate distance between two iterators.
+ *
+ * \param first - iterator.
+ * \param last - iterator.
+ * \return last - first.
+ */
 template<typename iter_t>
 int long distance( iter_t first, iter_t last )
 	{
@@ -514,6 +565,10 @@ trait::reference<basic_t> ref( basic_t& obj )
 	return ( trait::reference<basic_t>( obj ) );
 	}
 
+/*! \brief Convenience function, returns trait::reference<const> object.
+ *
+ * \param obj - object that trait::reference<const> shall be based on.
+ */
 template<typename basic_t>
 trait::reference<basic_t const> cref( basic_t const& obj )
 	{
@@ -823,13 +878,6 @@ typedef int signed i32_t; /*!< 32 bit signed integer. */
 typedef int long signed i64_t; /*!< 64 bit signed integer. */
 #endif
 
-template<typename tType>
-tType& clone( tType& object )
-	{
-	typedef __decltype( *object ) ttType;
-	return ( tType( new ttType( *object ) ) );
-	}
-
 /*! \brief Interface preventing copying of objects.
  */
 class HNonCopyable
@@ -842,7 +890,12 @@ private:
 	HNonCopyable& operator = ( HNonCopyable const& );
 	};
 
-char const* error_message( int );
+/*! \brief Generate error message (possibly human readable) based on error code.
+ *
+ * \param code - error code to describe.
+ * \return Message string describing error of given error code.
+ */
+char const* error_message( int code );
 
 }
 
