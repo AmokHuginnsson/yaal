@@ -73,6 +73,11 @@ public:
 typedef HExceptionT<HFormat> HFormatException;
 
 /*! \brief Proxy between HFormat and HStreamInterface classes.
+ *
+ * Example usage:
+ * \code
+ * cout << HFormat( "%.15Lf" ) % 3.141592653589793 << endl;
+ * \endcode
  */
 class HStreamFormatProxy
 	{

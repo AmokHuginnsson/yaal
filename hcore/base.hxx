@@ -65,6 +65,12 @@ template<bool> struct static_assert_failure;
  * then compilation of an unit fails.
  */
 template<> struct static_assert_failure<true> { enum { value = 1 }; };
+/*! \brief Perform static (compile time) code check.
+ *
+ * \param condition - condition to be check during compilation.
+ *
+ * \post Unmet condition will make compilation fail on line where STATIC_ASSERT is used.
+ */
 #define STATIC_ASSERT( condition ) { typedef char SAF##__LINE__[ static_assert_failure<( condition )>::value ]; }
 
 /*! \brief gettext library API convenience macro.
@@ -78,8 +84,14 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 #define M_VCSTID(id) namespace { static char const* wrapper_VCSTID( void ) { wrapper_VCSTID(); return id; } }
 /*! \endcond */
 #define M_THROW( msg, e_no ) yaal::hcore::throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, e_no )
+/*! \brief First statement of every exception guarder function/method.
+ */
 #define M_PROLOG try{
+/*! \brief Last statement of every exception guarder function/method.
+ */
 #define M_EPILOG } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
+/*! \brief Last statement in <tt>int main( int, char** )</tt>.
+ */
 #define M_FINAL } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error( true ); } catch ( yaal::hcore::HFailedAssertion& ) { exit( -1 ); } catch ( int const& retVal ) { return ( retVal ); }
 /*! \brief Throw HExceptionT<> is condition is not met.
  *
@@ -339,6 +351,13 @@ void generate( iterator_t it, iterator_t const& end, generator_t generator )
 	return;
 	}
 
+/*! \brief Calculate sum of elements in range.
+ *
+ * \param it - begining of range of eleemnts to summed up.
+ * \param end - one past last element of range to be summed up.
+ * \param ret - starting value for sum operation.
+ * \return sum of all elements in [it, end) + ret.
+ */
 template<typename iterator_t, typename return_t>
 return_t accumulate( iterator_t it, iterator_t end, return_t ret )
 	{
@@ -356,6 +375,11 @@ int long distance( iter_t first, iter_t last )
 	return ( dist );
 	}
 
+/*! \brief Move iterator forward.
+ *
+ * \param it - iterator to be moved.
+ * \param dist - how far iterator shall be moved.
+ */
 template<typename iter_t>
 void advance( iter_t& it, int long const& dist )
 	{
@@ -632,6 +656,11 @@ inline tType max( tType const& left, tType const& right )
 	return ( left >= right ? left : right );
 	}
 
+/*! \brief Calculate absolute value of a number.
+ *
+ * \param val - a number which absolute value shall be calculated.
+ * \return |val|
+ */
 template<typename tType>
 inline tType abs( tType const& val )
 	{
@@ -757,9 +786,8 @@ inline tType operator ~ ( tType const& e )
 	return ( static_cast<tType>( ~ static_cast<int long unsigned>( e ) ) );
 	}
 
-/* those types definitions were in hinfo.h but this file (hexception.h)
- * is included into more files, we assume that sizeof ( int ) >= 4 */
-
+/*! \brief POD type symbols. (Some non-POD yaal types included too).
+ */
 typedef enum
 	{
 	D_VOID        = 0x0000,
@@ -782,17 +810,17 @@ typedef enum
 	D_MASK        = 0xffff
 	} type_t;
 
-typedef char unsigned u8_t;
-typedef int short unsigned u16_t;
-typedef int unsigned u32_t;
+typedef char unsigned u8_t; /*!< 8 bit unsigned integer. */
+typedef int short unsigned u16_t; /*!< 16 bit unsigned integer. */
+typedef int unsigned u32_t; /*!< 32 bit unsigned integer. */
 #if 0
-typedef int long unsigned u64_t;
+typedef int long unsigned u64_t; /*!< 64 bit unsigned integer. */
 #endif
-typedef char i8_t;
-typedef int short i16_t;
-typedef int i32_t;
+typedef char signed i8_t; /*!< 8 bit signed integer. */
+typedef int short signed i16_t; /*!< 16 bit signed integer. */
+typedef int signed i32_t; /*!< 32 bit signed integer. */
 #if 0
-typedef int long i64_t;
+typedef int long signed i64_t; /*!< 64 bit signed integer. */
 #endif
 
 template<typename tType>
