@@ -235,6 +235,13 @@ void for_each( iterator_t it, iterator_t const& end, call_t CALL )
 		CALL( *it );
 	}
 
+/*! \brief Replace elements in destination container by transformed elements from source range.
+ *
+ * \param it - begining of source range.
+ * \param end - one past the end of source range.
+ * \param dst - begining of destination container.
+ * \param op - transforming operation, an unary function.
+ */
 template<typename src_iter_t, typename dst_iter_t, typename operation_t>
 void transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op )
 	{
@@ -242,6 +249,14 @@ void transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op )
 		*dst = op( *it );
 	}
 
+/*! \brief Replace elements in destination container by elements resulting from transformation of elements from source range and another container.
+ *
+ * \param it - begining of source range.
+ * \param end - one past the end of source range.
+ * \param arg - begining of second source container.
+ * \param dst - begining of destination container.
+ * \param op - transforming operation, a binary function.
+ */
 template<typename src_iter_t, typename arg_iter_t, typename dst_iter_t, typename operation_t>
 void transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t dst, operation_t op )
 	{
@@ -279,6 +294,14 @@ bool equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
 	return ( ( it1 == end1 ) && ( it2 == end2 ) );
 	}
 
+/*! \brief Joins two sorted ranges of elements into one sorted range of elements.
+ *
+ * \param it1 - begining of first range.
+ * \param end1 - one past the end of first range.
+ * \param it2 - begining of second range.
+ * \param end2 - one past the end of second range.
+ * \param out - destination container extender functor.
+ */
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
 iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out )
 	{
@@ -293,6 +316,14 @@ iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t en
 	return ( out );
 	}
 
+/*! \brief Create union of two sorted ranges of elements.
+ *
+ * \param it1 - begining of first range.
+ * \param end1 - one past the end of first range.
+ * \param it2 - begining of second range.
+ * \param end2 - one past the end of second range.
+ * \param out - destination container extender functor.
+ */
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
 iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out )
 	{
@@ -335,6 +366,14 @@ iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_
 	return ( out );
 	}
 
+/*! \brief Create intersection of two sorted ranges of elements.
+ *
+ * \param it1 - begining of first range.
+ * \param end1 - one past the end of first range.
+ * \param it2 - begining of second range.
+ * \param end2 - one past the end of second range.
+ * \param out - destination container extender functor.
+ */
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
 iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out )
 	{
@@ -559,6 +598,11 @@ public:
 
 }
 
+/*! \brief Convenience function, returns trait::reference<> object.
+ *
+ * \param obj - object that trait::reference<> shall be based on.
+ * \return trait::reference<> wrapper of \e obj object.
+ */
 template<typename basic_t>
 trait::reference<basic_t> ref( basic_t& obj )
 	{
@@ -568,6 +612,7 @@ trait::reference<basic_t> ref( basic_t& obj )
 /*! \brief Convenience function, returns trait::reference<const> object.
  *
  * \param obj - object that trait::reference<const> shall be based on.
+ * \return trait::reference<const> wrapper of \e obj object.
  */
 template<typename basic_t>
 trait::reference<basic_t const> cref( basic_t const& obj )
@@ -576,6 +621,9 @@ trait::reference<basic_t const> cref( basic_t const& obj )
 	}
 
 /*! \brief Staticaly calculate maximul of a set.
+ *
+ * \tparam a0, a1, ..., a9 - list of integers to find maximum.
+ * \retval value - maximum integer from given set.
  */
 template<int long a0, int long a1,
 	int long a2 = LONG_MIN, int long a3 = LONG_MIN,
@@ -699,12 +747,24 @@ struct power<base,0,helper>
 	};
 /*! \endcond */
 
+/*! \brief Get smaller of two values.
+ *
+ * \param left - first value to be considered as smaller.
+ * \param right -  second value to be considered as smaller.
+ * \return Smaller of two values.
+ */
 template<typename tType>
 inline tType min( tType const& left, tType const& right )
 	{
 	return ( left < right ? left : right );
 	}
 
+/*! \brief Get bigger of two values.
+ *
+ * \param left - first value to be considered as bigger.
+ * \param right -  second value to be considered as bigger.
+ * \return Bigger of two values.
+ */
 template<typename tType>
 inline tType max( tType const& left, tType const& right )
 	{
@@ -778,14 +838,26 @@ struct divides : public binary_function<tType, tType, tType>
 		{ return ( a / b ); }
 	};
 
+/*! \brief Generic less (object ordering) operator.
+ *
+ * \param a_rtLeft - first of the objects to compare.
+ * \param a_rtRight - second of the objects to compare.
+ * \return True iff (if and only if) a_rtLeft < a_rtRight - first objects is lesser than second object.
+ */
 template<typename tType>
 bool less( tType const& a_rtLeft, tType const& a_rtRight )
 	{
 	return ( a_rtLeft < a_rtRight );
 	}
 
+/*! \brief Convert between distinct datatypes.
+ *
+ * \tparam to_t - destination type.
+ * \param val - value to be converted to destination type.
+ * \return val equvalent in to_t representation.
+ */
 template<typename to_t, typename from_t>
-to_t lexical_cast( from_t const& );
+to_t lexical_cast( from_t const& val );
 
 template<typename tType>
 inline tType operator | ( tType const& left,

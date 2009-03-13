@@ -158,7 +158,7 @@ public:
 			++ major;
 		typename value_list_t::const_iterator minor;
 		if ( major != f_oEngine.end() )
-			minor = major->second->rbegin();
+			minor = major->second->begin();
 		return ( const_iterator( this, major, minor ) );
 		M_EPILOG
 		}
@@ -170,7 +170,7 @@ public:
 			++ major;
 		typename value_list_t::iterator minor;
 		if ( major != f_oEngine.end() )
-			minor = major->second->rbegin();
+			minor = major->second->begin();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 		}

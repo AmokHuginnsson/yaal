@@ -24,19 +24,19 @@
 		<td>Centos 5.2</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>FreeBSD 8-CURRENT</td><td class="good">100%</td><td class="good">100%</td><td class="fail">Fail</td>
+		<td>FreeBSD 8-CURRENT</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>FreeBSD 7</td><td class="good">100%</td><td class="good">100%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Solaris 5.10 with GCC with GCC ld</td><td class="good">100%</td><td class="fine">90%</td><td class="fail">Fail</td>
+		<td>Solaris 5.10 with GCC with GCC ld</td><td class="good">100%</td><td class="fine">95%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="average">80%</td><td class="fail">Fail</td>
+		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="average">90%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">3)</a></td><td class="good">100%</td><td class="fail">0%</td><td class="fail">Fail</td>
+		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">3)</a></td><td class="good">100%</td><td class="average">80%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
 		<td>Solaris 5.10 with GCC with Sun ld<a class="note" href="#note_sunld">4)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
