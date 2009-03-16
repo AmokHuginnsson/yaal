@@ -45,40 +45,40 @@ namespace hcore
 void set_option( OOption const& a_sOption, HString const& a_oValue )
 	{
 	M_PROLOG
-	switch ( a_sOption.f_eValueType )
+	switch ( a_sOption.f_eValueType.value() )
 		{
-		case ( D_BOOL ):
+		case ( TYPE::D_BOOL ):
 			rc_set_variable( ! a_oValue.is_empty() ? a_oValue.raw() : "true",
 					*static_cast<bool*>( a_sOption.f_pvValue ) );
 		break;
-		case ( D_CHAR ):
+		case ( TYPE::D_CHAR ):
 			if ( ! a_oValue.is_empty() )
 				rc_set_variable( a_oValue.raw(),
 						*static_cast<char*>( a_sOption.f_pvValue ) );
 		break;
-		case ( D_INT ):
+		case ( TYPE::D_INT ):
 			rc_set_variable( a_oValue.raw(),
 					*static_cast<int*>( a_sOption.f_pvValue ) );
 		break;
-		case ( D_CHAR_PTR ):
+		case ( TYPE::D_CHAR_PTR ):
 			rc_set_variable( a_oValue.raw(),
 					static_cast<char**>( a_sOption.f_pvValue ) );
 		break;
-		case ( D_HSTRING ):
+		case ( TYPE::D_HSTRING ):
 			( *static_cast<HString*>( a_sOption.f_pvValue ) ) = a_oValue;
 		break;
-		case (  D_DOUBLE_LONG ):
+		case ( TYPE::D_DOUBLE_LONG ):
 			rc_set_variable( a_oValue.raw(),
 					*static_cast<double long*>( a_sOption.f_pvValue ) );
 		break;
-		case (  D_DOUBLE ):
+		case ( TYPE::D_DOUBLE ):
 			rc_set_variable( a_oValue.raw(),
 					*static_cast<double*>( a_sOption.f_pvValue ) );
 		break;
-		case ( D_VOID ):
+		case ( TYPE::D_VOID ):
 			break;
 		default:
-			M_THROW( "unknown type", a_sOption.f_eValueType );
+			M_THROW( "unknown type", a_sOption.f_eValueType.value() );
 		}
 	if ( a_sOption.CALLBACK )
 		a_sOption.CALLBACK->first( a_sOption.CALLBACK->second );

@@ -38,30 +38,30 @@ namespace yaal
 namespace hcore
 {
 
-HFile::HFile( OPEN::open_t const& a_eOpen, void* const a_pvHandle )
+HFile::HFile( open_t const& a_eOpen, void* const a_pvHandle )
 	: HStreamInterface(), f_eOpen( a_eOpen ),
 	f_pvHandle( a_pvHandle ), f_oPath(), f_oError(),
 	f_bExternal( a_pvHandle ? true : false )
 	{
 	M_PROLOG
-	if ( ( ( a_eOpen & OPEN::D_APPEND ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
-			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
-			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_APPEND ) ) )
-		M_THROW( _( "inconsistient mode flags" ), a_eOpen );
+	if ( ( ( !!( a_eOpen & OPEN::D_APPEND ) ) && ( !!( a_eOpen & OPEN::D_TRUNCATE ) ) )
+			|| ( ( !!( a_eOpen & OPEN::D_READING ) ) && ( !!( a_eOpen & OPEN::D_TRUNCATE ) ) )
+			|| ( ( !!( a_eOpen & OPEN::D_READING ) ) && ( !!( a_eOpen & OPEN::D_APPEND ) ) ) )
+		M_THROW( _( "inconsistient mode flags" ), a_eOpen.value() );
 	return;
 	M_EPILOG
 	}
 
-HFile::HFile( yaal::hcore::HString const& path, OPEN::open_t const& a_eOpen )
+HFile::HFile( yaal::hcore::HString const& path, open_t const& a_eOpen )
 	: HStreamInterface(), f_eOpen( a_eOpen ),
 	f_pvHandle( NULL ), f_oPath(), f_oError(),
 	f_bExternal( false )
 	{
 	M_PROLOG
-	if ( ( ( a_eOpen & OPEN::D_APPEND ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
-			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_TRUNCATE ) )
-			|| ( ( a_eOpen & OPEN::D_READING ) && ( a_eOpen & OPEN::D_APPEND ) ) )
-		M_THROW( _( "inconsistient mode flags" ), a_eOpen );
+	if ( ( ( !!( a_eOpen & OPEN::D_APPEND ) ) && ( !!( a_eOpen & OPEN::D_TRUNCATE ) ) )
+			|| ( ( !!( a_eOpen & OPEN::D_READING ) ) && ( !!( a_eOpen & OPEN::D_TRUNCATE ) ) )
+			|| ( ( !!( a_eOpen & OPEN::D_READING ) ) && ( !!( a_eOpen & OPEN::D_APPEND ) ) ) )
+		M_THROW( _( "inconsistient mode flags" ), a_eOpen.value() );
 	open( path );
 	return;
 	M_EPILOG
@@ -80,21 +80,21 @@ int HFile::open( HString const& a_oPath )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	char const * l_pcMode = NULL;
+	char const* l_pcMode = NULL;
 	if ( f_eOpen == OPEN::D_READING )
 		l_pcMode = "rb";
-	else if ( ( f_eOpen == OPEN::D_WRITING ) || ( f_eOpen == ( OPEN::D_WRITING | OPEN::D_TRUNCATE ) ) )
+	else if ( ( f_eOpen == OPEN::D_WRITING ) || ( f_eOpen == ( open_t( OPEN::D_WRITING ) | open_t( OPEN::D_TRUNCATE ) ) ) )
 		l_pcMode = "wb";
-	else if ( f_eOpen == ( OPEN::D_WRITING | OPEN::D_APPEND ) )
+	else if ( f_eOpen == ( open_t( OPEN::D_WRITING ) | open_t( OPEN::D_APPEND ) ) )
 		l_pcMode = "ab";
-	else if ( f_eOpen == ( OPEN::D_READING | OPEN::D_WRITING ) )
+	else if ( f_eOpen == ( open_t( OPEN::D_READING ) | open_t( OPEN::D_WRITING ) ) )
 		l_pcMode = "r+b";
-	else if ( f_eOpen == ( OPEN::D_READING | OPEN::D_WRITING | OPEN::D_TRUNCATE ) )
+	else if ( f_eOpen == ( open_t( OPEN::D_READING ) | open_t( OPEN::D_WRITING ) | open_t( OPEN::D_TRUNCATE ) ) )
 		l_pcMode = "w+b";
-	else if ( f_eOpen == ( OPEN::D_READING | OPEN::D_WRITING | OPEN::D_APPEND ) )
+	else if ( f_eOpen == ( open_t( OPEN::D_READING ) | open_t( OPEN::D_WRITING ) | open_t( OPEN::D_APPEND ) ) )
 		l_pcMode = "a+b";
 	else
-		M_THROW( "unexpected mode setting", f_eOpen );
+		M_THROW( "unexpected mode setting", f_eOpen.value() );
 	f_oPath = a_oPath;
 	f_pvHandle = ::std::fopen( a_oPath.raw(), l_pcMode );
 	if ( ! f_pvHandle )
@@ -113,7 +113,7 @@ int HFile::close( void )
 	int l_iError = 0;
 	if ( ! f_pvHandle )
 		M_THROW( "file is not opened", errno );
-	l_iError = ::std::fclose( static_cast < FILE * > ( f_pvHandle ) );
+	l_iError = ::std::fclose( static_cast<FILE*>( f_pvHandle ) );
 	if ( l_iError )
 		{
 		f_oError = error_message( l_iError );
@@ -135,13 +135,13 @@ int long HFile::tell( void ) const
 	M_EPILOG
 	}
 
-void HFile::seek( int long const& pos, SEEK::seek_t const& a_eSeek )
+void HFile::seek( int long const& pos, seek_t const& a_eSeek )
 	{
 	M_PROLOG
 	if ( ! f_pvHandle )
 		M_THROW( _( "no file is opened" ), errno );
 	int s = 0;
-	switch ( a_eSeek )
+	switch ( a_eSeek.value() )
 		{
 		case ( SEEK::D_SET ):
 			s = SEEK_SET;
@@ -161,24 +161,24 @@ void HFile::seek( int long const& pos, SEEK::seek_t const& a_eSeek )
 	M_EPILOG
 	}
 
-int long HFile::read_line( HString& a_roLine, READ::read_t const& a_eRead,
+int long HFile::read_line( HString& a_roLine, read_t const& a_eRead,
 		int const a_iMaximumLength )
 	{
 	M_PROLOG
-	READ::read_t l_eRead = a_eRead;
-	if ( ( l_eRead & READ::D_KEEP_NEWLINES ) && ( l_eRead & READ::D_STRIP_NEWLINES ) )
-		M_THROW( _( "bad newlines setting" ), l_eRead );
-	if ( ! ( l_eRead & ( READ::D_KEEP_NEWLINES | READ::D_STRIP_NEWLINES ) ) )
+	read_t l_eRead = a_eRead;
+	if ( ( !!( l_eRead & READ::D_KEEP_NEWLINES ) ) && ( !!( l_eRead & READ::D_STRIP_NEWLINES ) ) )
+		M_THROW( _( "bad newlines setting" ), l_eRead.value() );
+	if ( ! ( ( !!( l_eRead & READ::D_KEEP_NEWLINES ) ) || ( !!( l_eRead & READ::D_STRIP_NEWLINES ) ) ) )
 		l_eRead |= READ::D_KEEP_NEWLINES;
-	if ( ( l_eRead & READ::D_BUFFERED_READS ) && ( l_eRead & READ::D_UNBUFFERED_READS ) )
-		M_THROW( _( "bad buffering setting" ), l_eRead );
-	if ( ! ( l_eRead & ( READ::D_BUFFERED_READS | READ::D_UNBUFFERED_READS ) ) )
+	if ( ( !!( l_eRead & READ::D_BUFFERED_READS ) ) && ( !!( l_eRead & READ::D_UNBUFFERED_READS ) ) )
+		M_THROW( _( "bad buffering setting" ), l_eRead.value() );
+	if ( ! ( ( !!( l_eRead & READ::D_BUFFERED_READS ) ) || ( !!( l_eRead & READ::D_UNBUFFERED_READS ) ) ) )
 		l_eRead |= READ::D_BUFFERED_READS;
 	if ( ! f_pvHandle )
 		M_THROW( _( "no file is opened" ), errno );
 	char * l_pcPtr = NULL;
 	int long l_iLength = -1;
-	if ( l_eRead & READ::D_BUFFERED_READS )
+	if ( !!( l_eRead & READ::D_BUFFERED_READS ) )
 		{
 		l_iLength = get_line_length();
 		if ( l_iLength )
@@ -203,7 +203,7 @@ int long HFile::read_line( HString& a_roLine, READ::read_t const& a_eRead,
 	if ( l_iLength > 0 )
 		{
 		int long newLen = l_iLength;
-		if ( ( l_eRead & READ::D_STRIP_NEWLINES ) && ( newLen > 0 ) )
+		if ( ( !!( l_eRead & READ::D_STRIP_NEWLINES ) ) && ( newLen > 0 ) )
 			{
 			-- newLen;
 			if ( ( newLen > 0 ) && ( a_roLine[ newLen - 1 ] == '\r' ) )
@@ -224,7 +224,7 @@ int long HFile::get_line_length( void )
 	static int const D_SCAN_BUFFER_SIZE = 8;
 	int long l_iLength = 0, l_iSize = 0;
 	char l_pcBuffer[ D_SCAN_BUFFER_SIZE ];
-	char const * l_pcPtr = NULL;
+	char const* l_pcPtr = NULL;
 	do
 		{
 		l_iSize = ::std::fread( l_pcBuffer, sizeof ( char ),

@@ -57,10 +57,10 @@ HLog& log = HLogService::get_instance( 1000 );
 
 OOption n_psHCoreVariables[] =
 	{
-		{ "ssl_key", D_HSTRING, &HOpenSSL::f_oSSLKey, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL private key file.", NULL },
-		{ "ssl_cert", D_HSTRING, &HOpenSSL::f_oSSLCert, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL certificate file.", NULL },
-		{ "resolve_hostnames", D_BOOL, &HSocket::f_bResolveHostnames, 0, OOption::D_REQUIRED, NULL, "Resolve IP address into host names.", NULL },
-		{ NULL, D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
+		{ "ssl_key", TYPE::D_HSTRING, &HOpenSSL::f_oSSLKey, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL private key file.", NULL },
+		{ "ssl_cert", TYPE::D_HSTRING, &HOpenSSL::f_oSSLCert, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL certificate file.", NULL },
+		{ "resolve_hostnames", TYPE::D_BOOL, &HSocket::f_bResolveHostnames, 0, OOption::D_REQUIRED, NULL, "Resolve IP address into host names.", NULL },
+		{ NULL, TYPE::D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
 	};
 
 /* mathematical macros */

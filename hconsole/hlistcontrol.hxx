@@ -281,7 +281,7 @@ public:
 	typedef list_control_helper::HAbstractControler::HModelIteratorWrapper iterator_t;
 	/*! \brief HListControl settings flags.
 	 */
-	struct FLAGS
+	struct FLAG
 		{
 		typedef enum
 			{
@@ -291,8 +291,9 @@ public:
 			D_EDITABLE = 4,
 			D_DRAW_HEADER = 8,
 			D_ALL = -1
-			} list_flags_t;
+			} enum_t;
 		};
+	typedef yaal::hcore::HStrongEnum<FLAG> flag_t;
 	/*! \brief Description of HListControl column meta-data.
 	 */
 	class HColumnInfo
@@ -307,9 +308,9 @@ public:
 		hcore::HString f_oName;
 		HControl * f_poControl;
 	public:
-		HColumnInfo ( void );
-		virtual ~HColumnInfo ( void );
-		HColumnInfo ( HColumnInfo const& );
+		HColumnInfo( void );
+		virtual ~HColumnInfo( void );
+		HColumnInfo( HColumnInfo const& );
 		HColumnInfo& operator = ( HColumnInfo const& );
 		friend class HListControl;
 		static int const D_ADD_AT_THE_END = -1;
@@ -348,14 +349,14 @@ public:
 								 int,						/* width */
 								 char const*, list_control_helper::HAbstractControler::ptr_t const& = list_control_helper::HListControler<>::ptr_t( new list_control_helper::HListControler<>( list_control_helper::HListControler<>::model_ptr_t( new list_control_helper::HListControler<>::model_t() ) ) ) );	/* label */
 	virtual ~HListControl ( void );
-	void add_column ( int const&,									/* at position */
-										char const*,									/* column name */
-										int const&,									/* width */
-										BITS::ALIGN::align_t const& = BITS::ALIGN::D_LEFT,		/* align */
-										const type_t& = D_HSTRING,	/* type */
-										HControl * = NULL );					/* control associated */
-	virtual int set_focus ( char = 0 );
-	void set_flags ( FLAGS::list_flags_t, FLAGS::list_flags_t );
+	void add_column( int const&,									/* at position */
+			char const*,									/* column name */
+			int const&,									/* width */
+			BITS::ALIGN::align_t const& = BITS::ALIGN::D_LEFT,		/* align */
+			const type_t& = TYPE::D_HSTRING,	/* type */
+			HControl * = NULL );					/* control associated */
+	virtual int set_focus( char = 0 );
+	void set_flags( flag_t, flag_t );
 	void reset( void );
 	list_control_helper::HAbstractControler::ptr_t& get_controler ( void );
 	void remove_current_row();
@@ -363,31 +364,31 @@ public:
 	type_t get_column_type( int );
 protected:
 	virtual bool get_text_for_cell( iterator_t&, int, type_t );
-	virtual void do_refresh ( void );
-	void draw_cell ( iterator_t&, int, int, int, HColumnInfo const* const, bool );
+	virtual void do_refresh( void );
+	void draw_cell( iterator_t&, int, int, int, HColumnInfo const* const, bool );
 	virtual int do_process_input( int );
-	virtual bool is_searchable ( void );
+	virtual bool is_searchable( void );
 	virtual void do_update( void );
-	virtual int do_click ( mouse::OMouse& );
-	virtual void go_to_match ( void );
-	virtual void go_to_match_previous ( void );
-	void handle_key_page_up ( void );
-	void handle_key_page_down ( void );
-	void handle_key_up ( void );
-	void handle_key_home ( void );
-	void handle_key_end ( void );
-	void handle_key_down ( void );
-	void handle_key_ctrl_n ( void );
-	void handle_key_ctrl_p ( void );
-	void handle_key_space ( void );
-	void handle_key_tab ( void );
+	virtual int do_click( mouse::OMouse& );
+	virtual void go_to_match( void );
+	virtual void go_to_match_previous( void );
+	void handle_key_page_up( void );
+	void handle_key_page_down( void );
+	void handle_key_up( void );
+	void handle_key_home( void );
+	void handle_key_end( void );
+	void handle_key_down( void );
+	void handle_key_ctrl_n( void );
+	void handle_key_ctrl_p( void );
+	void handle_key_space( void );
+	void handle_key_tab( void );
 private:
-	void sort_by_column ( int, hcore::OListBits::sort_order_t = hcore::OListBits::D_ASCENDING );
-	void recalculate_column_widths ( void );
+	void sort_by_column( int, hcore::OListBits::sort_order_t = hcore::OListBits::D_ASCENDING );
+	void recalculate_column_widths( void );
 	void draw_background( int );
 	void draw_header( int );
 	void draw_scroll( int );
-	HListControl ( HListControl const& );
+	HListControl( HListControl const& );
 	HListControl& operator = ( HListControl const& );
 	};
 

@@ -96,10 +96,14 @@ struct OAttributes
 struct OColumnInfo
 	{
 	int f_iPlacement; 			/*!< what place should this new column take */
-	char const * f_pcName;	/*!< column name */
+	char const* f_pcName;	/*!< column name */
 	int f_iWidth;						/*!< column width */
 	yaal::hconsole::HControl::BITS::ALIGN::align_t f_eAlign;	/*!< column alignment */
 	type_t f_eType;					/*!< data type stored in that column */
+	OColumnInfo( void )
+		: f_iPlacement( 0 ), f_pcName( NULL ), f_iWidth( 0 ),
+		f_eAlign( yaal::hconsole::HControl::BITS::ALIGN::D_LEFT ),
+		f_eType( TYPE::D_HSTRING ) {}
 	};
 
 class HDataControl;

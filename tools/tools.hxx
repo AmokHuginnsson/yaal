@@ -40,14 +40,14 @@ namespace yaal
 namespace tools
 	{
 	
-extern char * n_pcSerialDevice;
+extern char* n_pcSerialDevice;
 extern HSerial::speed_t n_eBaudRate;
-extern HSerial::flags_t n_eSerialFlags;
+extern HSerial::flag_t n_eSerialFlags;
 extern int n_iCollectorConnectionTimeOut;
 extern bool n_bIgnoreSignalSIGINT;
 extern bool n_bIgnoreSignalSIGTSTP;
 extern bool n_bIgnoreSignalSIGQUIT;
-void yaal_tools_banner ( void );
+void yaal_tools_banner( void );
 
 	}
 

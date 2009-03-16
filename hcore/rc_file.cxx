@@ -60,8 +60,10 @@ struct RC_PATHER
 		D_NONE = 0,
 		D_GLOBAL = 1,
 		D_LOCAL = 2
-		} placement_bit_t;
+		} enum_t;
 	};
+
+typedef HStrongEnum<RC_PATHER> placement_bit_t;
 
 int read_rc_line( HString&, HString&, HFile&, int& );
 
@@ -212,14 +214,14 @@ int process_rc_file_internal( HString const& a_oRcName,
 	struct OPlacement
 		{
 		RC_PATHER::placement_t f_ePlacement;
-		RC_PATHER::placement_bit_t f_ePlacementBit;
+		placement_bit_t f_ePlacementBit;
 		} l_psPlacementTab [ ] = {
 				{ RC_PATHER::D_ETC, RC_PATHER::D_GLOBAL },
 				{ RC_PATHER::D_HOME_ETC, RC_PATHER::D_LOCAL },
 				{ RC_PATHER::D_HOME, RC_PATHER::D_LOCAL } };
 	bool l_bSection = false, l_bOptionOK;
 	int l_iCtr = 0, l_iLine = 0;
-	RC_PATHER::placement_bit_t l_eSuccessStory = RC_PATHER::D_NONE;
+	placement_bit_t l_eSuccessStory( RC_PATHER::D_NONE );
 	size_t l_iCtrOut = 0;
 	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
@@ -228,10 +230,10 @@ int process_rc_file_internal( HString const& a_oRcName,
 		M_THROW ( _ ( "bad variable count" ), a_iCount );
 	for ( l_iCtrOut = 0; l_iCtrOut < ( sizeof ( l_psPlacementTab ) / sizeof ( OPlacement ) ); l_iCtrOut ++ )
 		{
-		if ( ( l_eSuccessStory & RC_PATHER::D_GLOBAL )
+		if ( ( !!( l_eSuccessStory & RC_PATHER::D_GLOBAL ) )
 				&& ( l_psPlacementTab[ l_iCtrOut ].f_ePlacementBit == RC_PATHER::D_GLOBAL ) )
 			continue;
-		if ( l_eSuccessStory & RC_PATHER::D_LOCAL )
+		if ( !! ( l_eSuccessStory & RC_PATHER::D_LOCAL ) )
 			break;
 		if ( ! rc_open( a_oRcName, l_psPlacementTab [ l_iCtrOut ].f_ePlacement, l_oRc ) )
 			{

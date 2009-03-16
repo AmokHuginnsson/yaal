@@ -66,7 +66,7 @@ HCollector::HCollector( char const* a_pcDevicePath )
 	 * So we have additional one byte for string terminator (0).
 	 */
 	f_pcReadBuf[ PROTOCOL::D_RECV_BUF_SIZE ] = 0;
-	set_flags( HSerial::D_FLAGS_TEXT );
+	set_flags( HSerial::D_FLAG_TEXT );
 	return;
 	M_EPILOG
 	}

@@ -77,19 +77,19 @@ int		n_iCommandComposeDelay = 16;
 
 OOption n_psVariables[] =
 	{
-		{ "use_mouse", D_BOOL, &n_bUseMouse, 0, OOption::D_OPTIONAL, NULL, "enable mouse support", NULL },
-		{ "disable_XON", D_BOOL, &n_bDisableXON, 0, OOption::D_OPTIONAL, NULL, "disable flow control events", NULL },
-		{ "leave_ctrl_c", D_BOOL, &n_bLeaveCtrlC, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+C sequence", NULL },
-		{ "leave_ctrl_z", D_BOOL, &n_bLeaveCtrlZ, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+Z sequence", NULL },
-		{ "leave_ctrl_s", D_BOOL, &n_bLeaveCtrlS, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+S sequence", NULL },
-		{ "leave_ctrl_q", D_BOOL, &n_bLeaveCtrlQ, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+Q sequence", NULL },
-		{ "leave_ctrl_\\", D_BOOL, &n_bLeaveCtrlBackSlash, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+\\ sequence", NULL },
-		{ "esc_delay", D_INT, &ESCDELAY, 0, OOption::D_REQUIRED, NULL, "ncurses escape sequence time span", NULL }, /* defined inside ncurses lib */
-		{ "latency", D_INT, &n_iLatency, 0, OOption::D_REQUIRED, NULL, "how often invoke idle event", NULL },
-		{ "command_compose_character", D_CHAR, &n_cCommandComposeCharacter, 0, OOption::D_REQUIRED, NULL,
+		{ "use_mouse", TYPE::D_BOOL, &n_bUseMouse, 0, OOption::D_OPTIONAL, NULL, "enable mouse support", NULL },
+		{ "disable_XON", TYPE::D_BOOL, &n_bDisableXON, 0, OOption::D_OPTIONAL, NULL, "disable flow control events", NULL },
+		{ "leave_ctrl_c", TYPE::D_BOOL, &n_bLeaveCtrlC, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+C sequence", NULL },
+		{ "leave_ctrl_z", TYPE::D_BOOL, &n_bLeaveCtrlZ, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+Z sequence", NULL },
+		{ "leave_ctrl_s", TYPE::D_BOOL, &n_bLeaveCtrlS, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+S sequence", NULL },
+		{ "leave_ctrl_q", TYPE::D_BOOL, &n_bLeaveCtrlQ, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+Q sequence", NULL },
+		{ "leave_ctrl_\\", TYPE::D_BOOL, &n_bLeaveCtrlBackSlash, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+\\ sequence", NULL },
+		{ "esc_delay", TYPE::D_INT, &ESCDELAY, 0, OOption::D_REQUIRED, NULL, "ncurses escape sequence time span", NULL }, /* defined inside ncurses lib */
+		{ "latency", TYPE::D_INT, &n_iLatency, 0, OOption::D_REQUIRED, NULL, "how often invoke idle event", NULL },
+		{ "command_compose_character", TYPE::D_CHAR, &n_cCommandComposeCharacter, 0, OOption::D_REQUIRED, NULL,
 			"character that shall be uses as command composition base", NULL },
-		{ "command_compose_delay", D_INT, &n_iCommandComposeDelay, 0, OOption::D_REQUIRED, NULL, "command composition time span", NULL },
-		{ NULL, D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
+		{ "command_compose_delay", TYPE::D_INT, &n_iCommandComposeDelay, 0, OOption::D_REQUIRED, NULL, "command composition time span", NULL },
+		{ NULL, TYPE::D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
 	};
 
 void set_color_bits( int & a_riWord, int a_iBits, int a_iWhat )

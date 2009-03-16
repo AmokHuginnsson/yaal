@@ -68,19 +68,20 @@ public:
 			D_NONBLOCKING	= 0x08,
 			D_SSL_SERVER	= 0x10,
 			D_SSL_CLIENT	= 0x20
-			} socket_type_t;
+			} enum_t;
 		};
+	typedef HStrongEnum<TYPE> socket_type_t;
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;
 	bool f_bNeedShutdown;
-	TYPE::socket_type_t f_eType;
+	socket_type_t f_eType;
 	int f_iMaximumNumberOfClients;
 	int f_iAddressSize;
 	void* f_pvAddress;
 	clients_t* f_poClients;
 	HString f_oHostName;
 public:
-	HSocket( TYPE::socket_type_t const = TYPE::D_DEFAULT, int const = 0 );
+	HSocket( socket_type_t const = TYPE::D_DEFAULT, int const = 0 );
 	virtual ~HSocket( void );
 	void listen( yaal::hcore::HString const&, int const = 0 );
 	ptr_t accept( void );

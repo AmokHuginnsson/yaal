@@ -379,7 +379,7 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 					else
 						M_THROW( _( "unknown align type" ), i );
 					if ( colTypeIt->second == "string" )
-						r[ i ].f_psColumnInfo[ columnNo ].f_eType = D_HSTRING;
+						r[ i ].f_psColumnInfo[ columnNo ].f_eType = TYPE::D_HSTRING;
 					else
 						M_THROW( _( "unknown column type" ), i );
 					++ columnNo;

@@ -149,14 +149,14 @@ HString kwota_slownie( double a_dKwota )
 	HString l_oSlownie;
 	HString l_oString;
 	HString l_oPrzypadek;
-	l_oString.format ( "%.2f", a_dKwota );
+	l_oString.format( "%.2f", a_dKwota );
 	l_iLength = l_oString.get_length();
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
 		{
 		if ( ( l_iCtr % 3 ) == 0 )
 			{
 			l_iSub = ( ( l_iLength - l_iCtr ) > 1 ? 2 : 1 );
-			l_iForma = lexical_cast<int>( l_oString.mid ( ( l_iLength - l_iCtr ) - l_iSub, l_iSub ) );
+			l_iForma = lexical_cast<int>( l_oString.mid( ( l_iLength - l_iCtr ) - l_iSub, l_iSub ) );
 			if ( ( l_iCtr > 5 ) && ( ( l_iLength - l_iCtr ) > 2 ) &&
 					! ::strncmp( l_oString.raw() + ( l_iLength - l_iCtr ) - 3, "000", 3 ) )
 				continue;
@@ -168,30 +168,30 @@ HString kwota_slownie( double a_dKwota )
 			{
 			case ( 0 ) :
 				{
-				l_oPrzypadek = n_ppcTemat [ l_iCtr / 3 ];
+				l_oPrzypadek = n_ppcTemat[ l_iCtr / 3 ];
 				if ( l_iForma == 1 )
-					l_oPrzypadek += n_pppcKoncowka [ l_iCtr / 3 ] [ 0 ];
+					l_oPrzypadek += n_pppcKoncowka[ l_iCtr / 3 ] [ 0 ];
 				else if ( ( ( ( l_iForma % 10 ) > 1 ) && ( ( l_iForma % 10 ) < 5 ) )
 						&& ( ( l_iForma < 10 ) || ( l_iForma > 20 ) ) )
-					l_oPrzypadek += n_pppcKoncowka [ l_iCtr / 3 ] [ 1 ];
+					l_oPrzypadek += n_pppcKoncowka[ l_iCtr / 3 ] [ 1 ];
 				else
-					l_oPrzypadek += n_pppcKoncowka [ l_iCtr / 3 ] [ 2 ];
+					l_oPrzypadek += n_pppcKoncowka[ l_iCtr / 3 ] [ 2 ];
 				l_oSlownie = l_oPrzypadek + l_oSlownie;
 				if ( ( l_iForma < 20 ) &&  ( l_iForma > 9 ) )
-					l_oSlownie = n_ppcJednNastki [ l_iForma ] + l_oSlownie;
+					l_oSlownie = n_ppcJednNastki[ l_iForma ] + l_oSlownie;
 				else if ( l_cCyfra )
-					l_oSlownie = n_ppcJednNastki [ static_cast < int > ( l_cCyfra ) ] + l_oSlownie;
+					l_oSlownie = n_ppcJednNastki[ static_cast<int>( l_cCyfra ) ] + l_oSlownie;
 				else if ( ! l_iForma && ( ( l_iCtr < 3 ) || ( a_dKwota < 1 ) ) )
-					l_oSlownie = n_ppcJednNastki [ 0 ] + l_oSlownie;
+					l_oSlownie = n_ppcJednNastki[ 0 ] + l_oSlownie;
 				}
 			break;
 			case ( 1 ) :
 				if ( l_iForma > 19 )
-					l_oSlownie = n_ppcDzies [ static_cast < int > ( l_cCyfra ) ] + l_oSlownie;
+					l_oSlownie = n_ppcDzies[ static_cast<int>( l_cCyfra ) ] + l_oSlownie;
 			break;
 			case ( 2 ) :
 				if ( l_cCyfra )
-					l_oSlownie = n_ppcSetki [ static_cast < int > ( l_cCyfra ) ] + l_oSlownie;
+					l_oSlownie = n_ppcSetki[ static_cast<int>( l_cCyfra ) ] + l_oSlownie;
 			break;
 			default:
 			break;
@@ -478,12 +478,12 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 			}
 		static int const D_MAXIMUM_LINE_LENGTH = 72;
 		::printf( "# %s, type: ", o.f_pcName );
-		switch( o.f_eValueType )
+		switch( o.f_eValueType.value() )
 			{
-			case ( D_BOOL ): ::printf( "boolean\n" ); break;
-			case ( D_INT ): case ( D_INT_SHORT ): case ( D_INT_LONG ): ::printf( "integer\n" ); break;
-			case ( D_FLOAT ): case ( D_DOUBLE ): case ( D_DOUBLE_LONG ): ::printf( "floating point\n" ); break;
-			case ( D_CHAR_PTR ): case ( D_HSTRING ): ::printf( "character string\n" ); break;
+			case ( TYPE::D_BOOL ): ::printf( "boolean\n" ); break;
+			case ( TYPE::D_INT ): case ( TYPE::D_INT_SHORT ): case ( TYPE::D_INT_LONG ): ::printf( "integer\n" ); break;
+			case ( TYPE::D_FLOAT ): case ( TYPE::D_DOUBLE ): case ( TYPE::D_DOUBLE_LONG ): ::printf( "floating point\n" ); break;
+			case ( TYPE::D_CHAR_PTR ): case ( TYPE::D_HSTRING ): ::printf( "character string\n" ); break;
 			default: ::printf( "special\n" ); break;
 			}
 		if ( ! description )
@@ -517,33 +517,33 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 		while ( loop );
 		if ( o.f_pvValue )
 			{
-			switch ( o.f_eValueType )
+			switch ( o.f_eValueType.value() )
 				{
-				case ( D_BOOL ):
+				case ( TYPE::D_BOOL ):
 					::printf( "%s %s\n", o.f_pcName, *static_cast<bool*>( o.f_pvValue ) ? "true" : "false" );
 				break;
-				case ( D_HSTRING ):
+				case ( TYPE::D_HSTRING ):
 					{
 					HString& s = *static_cast<HString*>( o.f_pvValue );
 					::printf( "%s%s %s\n", ! s.is_empty() ? "" : "# ", o.f_pcName, s.raw() ? s.raw() : "" );
 					}
 				break;
-				case ( D_CHAR_PTR ):
+				case ( TYPE::D_CHAR_PTR ):
 					{
 					char* ptr = static_cast<char*>( o.f_pvValue );
 					::printf( "%s%s %s\n", ptr && ptr[ 0 ] ? "" : "# ", o.f_pcName, ptr );
 					}
 				break;
-				case ( D_INT ):
+				case ( TYPE::D_INT ):
 					::printf( "%s %d\n", o.f_pcName, *static_cast<int*>( o.f_pvValue ) );
 				break;
-				case ( D_INT_LONG ):
+				case ( TYPE::D_INT_LONG ):
 					::printf( "%s %ld\n", o.f_pcName, *static_cast<int long*>( o.f_pvValue ) );
 				break;
-				case ( D_DOUBLE_LONG ):
+				case ( TYPE::D_DOUBLE_LONG ):
 					::printf( "%s %Lf\n", o.f_pcName, *static_cast<double long*>( o.f_pvValue ) );
 				break;
-				case ( D_DOUBLE ):
+				case ( TYPE::D_DOUBLE ):
 					::printf( "%s %f\n", o.f_pcName, *static_cast<double*>( o.f_pvValue ) );
 				break;
 				default:

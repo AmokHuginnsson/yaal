@@ -46,7 +46,7 @@ namespace hconsole
 
 HListControl::HColumnInfo::HColumnInfo( void )
 	: f_bDescending( false ), f_iWidthRaw( 0 ), f_iWidth( 0 ), f_eAlign( BITS::ALIGN::D_LEFT ),
-	f_iShortcutIndex( 0 ), f_cShortcut( 0 ), f_eType( D_HSTRING ), f_oName(),
+	f_iShortcutIndex( 0 ), f_cShortcut( 0 ), f_eType( TYPE::D_HSTRING ), f_oName(),
 	f_poControl( NULL )
 	{
 	M_PROLOG
@@ -64,7 +64,7 @@ HListControl::HColumnInfo::~HColumnInfo( void )
 
 HListControl::HColumnInfo::HColumnInfo( HColumnInfo const& a_roColumnInfo )
 	: f_bDescending( false ), f_iWidthRaw( 0 ), f_iWidth( 0 ), f_eAlign( BITS::ALIGN::D_LEFT ),
-	f_iShortcutIndex( 0 ), f_cShortcut( 0 ), f_eType( D_HSTRING ), f_oName(),
+	f_iShortcutIndex( 0 ), f_cShortcut( 0 ), f_eType( TYPE::D_HSTRING ), f_oName(),
 	f_poControl( NULL )
 	{
 	M_PROLOG
@@ -759,7 +759,7 @@ void HListControl::go_to_match( void )
 		{
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
 			{
-			get_text_for_cell( f_oCursor, l_iCtr, D_HSTRING );
+			get_text_for_cell( f_oCursor, l_iCtr, TYPE::D_HSTRING );
 			l_pcHighlightStart = f_oVarTmpBuffer.raw();
 			l_iCtrLoc = 0;
 			while ( ( l_pcHighlightStart = f_oPattern.matches( l_pcHighlightStart ) ) )
@@ -843,7 +843,7 @@ void HListControl::go_to_match_previous ( void )
 		{
 		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
 			{
-			get_text_for_cell( f_oCursor, l_iCtr, D_HSTRING );
+			get_text_for_cell( f_oCursor, l_iCtr, TYPE::D_HSTRING );
 			l_pcHighlightStart = f_oVarTmpBuffer.raw();
 			l_iCtrLoc = 0;
 			if ( f_sMatch.f_iMatchNumber < 0 )
@@ -922,17 +922,17 @@ void HListControl::go_to_match_previous ( void )
 	M_EPILOG
 	}
 
-void HListControl::set_flags ( FLAGS::list_flags_t a_eFlags, FLAGS::list_flags_t a_eMask )
+void HListControl::set_flags( flag_t a_eFlags, flag_t a_eMask )
 	{
 	M_PROLOG
-	if ( a_eMask & FLAGS::D_SORTABLE )
-		f_bSortable = a_eFlags & FLAGS::D_SORTABLE ? true : false;
-	if ( a_eMask & FLAGS::D_CHECKABLE )
-		f_bCheckable = a_eFlags & FLAGS::D_CHECKABLE ? true : false;
-	if ( a_eMask & FLAGS::D_EDITABLE )
-		f_bEditable = a_eFlags & FLAGS::D_EDITABLE ? true : false;
-	if ( a_eMask & FLAGS::D_DRAW_HEADER )
-		f_bDrawHeader = a_eFlags & FLAGS::D_DRAW_HEADER ? true : false;
+	if ( !!( a_eMask & FLAG::D_SORTABLE ) )
+		f_bSortable = !!( a_eFlags & FLAG::D_SORTABLE ) ? true : false;
+	if ( !!( a_eMask & FLAG::D_CHECKABLE ) )
+		f_bCheckable = !!( a_eFlags & FLAG::D_CHECKABLE ) ? true : false;
+	if ( !!( a_eMask & FLAG::D_EDITABLE ) )
+		f_bEditable = !!( a_eFlags & FLAG::D_EDITABLE ) ? true : false;
+	if ( !!( a_eMask & FLAG::D_DRAW_HEADER ) )
+		f_bDrawHeader = !!( a_eFlags & FLAG::D_DRAW_HEADER ) ? true : false;
 	return;
 	M_EPILOG
 	}
@@ -942,22 +942,22 @@ bool HListControl::get_text_for_cell( iterator_t& a_oIt, int a_iColumn, type_t a
 	M_PROLOG
 	M_ASSERT( a_oIt.is_valid() );
 	HAbstractRow& l_oItem = *a_oIt;
-	switch ( a_eType )
+	switch ( a_eType.value() )
 		{
-		case ( D_INT_LONG ):
+		case ( TYPE::D_INT_LONG ):
 			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_long();
 		break;
-		case ( D_DOUBLE ):
+		case ( TYPE::D_DOUBLE ):
 			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_double();
 		break;
-		case ( D_HSTRING ):
+		case ( TYPE::D_HSTRING ):
 			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_string();
 		break;
-		case ( D_HTIME ):
+		case ( TYPE::D_HTIME ):
 			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_time();
 		break;
 		default :
-			M_THROW ( "unknown type", a_eType );
+			M_THROW( "unknown type", a_eType.value() );
 		}
 	return ( l_oItem.get_checked() );
 	M_EPILOG
@@ -1039,19 +1039,19 @@ bool compare_cells( HInfo const& a_oLeft, HInfo const& a_oRight, OSortHelper& a_
 	if ( a_roSortHelper.f_poWindow )
 		a_roSortHelper.progress();
 	bool lower = false;
-	switch ( a_roSortHelper.f_eType )
+	switch ( a_roSortHelper.f_eType.value() )
 		{
-		case ( D_INT_LONG ):
+		case ( TYPE::D_INT_LONG ):
 			lower = a_oLeft.get<long>() < a_oRight.get<long>();
 		break;
-		case ( D_DOUBLE ):
+		case ( TYPE::D_DOUBLE ):
 			lower = a_oLeft.get<double>() < a_oRight.get<double>();
 		break;
-		case ( D_HSTRING ):
+		case ( TYPE::D_HSTRING ):
 			lower = strcasecmp( a_oLeft.get<HString const &>(),
 					 a_oRight.get<HString const&>() ) < 0;
 		break;
-		case ( D_HTIME ):
+		case ( TYPE::D_HTIME ):
 			lower = static_cast<time_t>( a_oLeft.get<HTime const&>() ) < static_cast<time_t>( a_oRight.get<HTime const&>() );
 		break;
 		default:

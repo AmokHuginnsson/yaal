@@ -68,8 +68,8 @@ namespace tools
 {
 
 char * n_pcSerialDevice = NULL;
-HSerial::speed_t n_eBaudRate = HSerial::D_SPEED_B115200;
-HSerial::flags_t n_eSerialFlags = HSerial::D_FLAGS_FLOW_CONTROL_HARDWARE | HSerial::D_FLAGS_BITS_PER_BYTE_8;
+HSerial::speed_t n_eBaudRate = HSerial::SPEED::D_B115200;
+HSerial::flag_t n_eSerialFlags = HSerial::flag_t( HSerial::FLAG::D_FLOW_CONTROL_HARDWARE ) | HSerial::FLAG::D_BITS_PER_BYTE_8;
 int n_iCollectorConnectionTimeOut = 9999;
 bool n_bIgnoreSignalSIGINT = false;
 bool n_bIgnoreSignalSIGTSTP = false;
@@ -77,12 +77,12 @@ bool n_bIgnoreSignalSIGQUIT = false;
 
 OOption n_psVariables [ ] =
 	{
-		{ "ignore_signal_SIGINT", D_BOOL, &n_bIgnoreSignalSIGINT, 0, OOption::D_OPTIONAL, NULL, "ignore INT (interrupt) signal", NULL },
-		{ "ignore_signal_SIGTSTP", D_BOOL, &n_bIgnoreSignalSIGTSTP, 0, OOption::D_OPTIONAL, NULL, "ignore TSTP (terminal stop, suspend) signal", NULL },
-		{ "ignore_signal_SIGQUIT", D_BOOL, &n_bIgnoreSignalSIGQUIT, 0, OOption::D_OPTIONAL, NULL, "ignore QUIT, core dump signal", NULL },
-		{ "serial_device", D_CHAR_PTR, &n_pcSerialDevice, 0, OOption::D_REQUIRED, NULL, "path to serial device", NULL },
-		{ "collector_connection_timeout", D_INT, &n_iCollectorConnectionTimeOut, 0, OOption::D_REQUIRED, NULL, "timeout on collector device read", NULL },
-		{ NULL, D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
+		{ "ignore_signal_SIGINT", TYPE::D_BOOL, &n_bIgnoreSignalSIGINT, 0, OOption::D_OPTIONAL, NULL, "ignore INT (interrupt) signal", NULL },
+		{ "ignore_signal_SIGTSTP", TYPE::D_BOOL, &n_bIgnoreSignalSIGTSTP, 0, OOption::D_OPTIONAL, NULL, "ignore TSTP (terminal stop, suspend) signal", NULL },
+		{ "ignore_signal_SIGQUIT", TYPE::D_BOOL, &n_bIgnoreSignalSIGQUIT, 0, OOption::D_OPTIONAL, NULL, "ignore QUIT, core dump signal", NULL },
+		{ "serial_device", TYPE::D_CHAR_PTR, &n_pcSerialDevice, 0, OOption::D_REQUIRED, NULL, "path to serial device", NULL },
+		{ "collector_connection_timeout", TYPE::D_INT, &n_iCollectorConnectionTimeOut, 0, OOption::D_REQUIRED, NULL, "timeout on collector device read", NULL },
+		{ NULL, TYPE::D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
 	};
 	
 namespace util
@@ -105,25 +105,25 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 			l_iBaudRate = lexical_cast<int>( a_roValue.raw() + 1 );
 			switch ( l_iBaudRate )
 				{
-				case ( 115200 ): n_eBaudRate = HSerial::D_SPEED_B115200; break;
+				case ( 115200 ): n_eBaudRate = HSerial::SPEED::D_B115200; break;
 #if ( HAVE_DECL_B76800 )
-				case (  76800 ): n_eBaudRate = HSerial::D_SPEED_B76800;  break;
+				case (  76800 ): n_eBaudRate = HSerial::SPEED::D_B76800;  break;
 #endif /* HAVE_DECL_B76800 */
-				case (  57600 ): n_eBaudRate = HSerial::D_SPEED_B57600;  break;
-				case (  38400 ): n_eBaudRate = HSerial::D_SPEED_B38400;  break;
+				case (  57600 ): n_eBaudRate = HSerial::SPEED::D_B57600;  break;
+				case (  38400 ): n_eBaudRate = HSerial::SPEED::D_B38400;  break;
 #if ( HAVE_DECL_B28800 )
-				case (  28800 ): n_eBaudRate = HSerial::D_SPEED_B28800;  break;
+				case (  28800 ): n_eBaudRate = HSerial::SPEED::D_B28800;  break;
 #endif /* HAVE_DECL_B28800 */
-				case (  19200 ): n_eBaudRate = HSerial::D_SPEED_B19200;  break;
+				case (  19200 ): n_eBaudRate = HSerial::SPEED::D_B19200;  break;
 #if ( HAVE_DECL_B14400 )
-				case (  14400 ): n_eBaudRate = HSerial::D_SPEED_B14400;  break;
+				case (  14400 ): n_eBaudRate = HSerial::SPEED::D_B14400;  break;
 #endif /* HAVE_DECL_B14400 */
-				case (   9600 ): n_eBaudRate = HSerial::D_SPEED_B9600;   break;
+				case (   9600 ): n_eBaudRate = HSerial::SPEED::D_B9600;   break;
 #if ( HAVE_DECL_B7200 )
-				case (   7200 ): n_eBaudRate = HSerial::D_SPEED_B7200;   break;
+				case (   7200 ): n_eBaudRate = HSerial::SPEED::D_B7200;   break;
 #endif /* HAVE_DECL_B7200 */
-				case (   4800 ): n_eBaudRate = HSerial::D_SPEED_B4800;   break;
-				case (   2400 ): n_eBaudRate = HSerial::D_SPEED_B2400;   break;
+				case (   4800 ): n_eBaudRate = HSerial::SPEED::D_B4800;   break;
+				case (   2400 ): n_eBaudRate = HSerial::SPEED::D_B2400;   break;
 				default:
 					M_THROW ( _ ( "unknown baud rate" ), l_iBaudRate );
 				}
@@ -134,29 +134,29 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty() )
 			{
 			if ( ! strcasecmp ( l_oStr, "FLOW_CONTROL_HARDWARE" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_FLOW_CONTROL_HARDWARE;
+				n_eSerialFlags = HSerial::FLAG::D_FLOW_CONTROL_HARDWARE;
 			else if ( ! strcasecmp ( l_oStr, "SOFTWARE_CONTROL_SOFTWARE" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_FLOW_CONTROL_SOFTWARE;
+				n_eSerialFlags = HSerial::FLAG::D_FLOW_CONTROL_SOFTWARE;
 			else if ( ! strcasecmp ( l_oStr, "ECHO" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_ECHO;
+				n_eSerialFlags = HSerial::FLAG::D_ECHO;
 			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_8" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_BITS_PER_BYTE_8;
+				n_eSerialFlags = HSerial::FLAG::D_BITS_PER_BYTE_8;
 			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_7" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_BITS_PER_BYTE_7;
+				n_eSerialFlags = HSerial::FLAG::D_BITS_PER_BYTE_7;
 			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_6" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_BITS_PER_BYTE_6;
+				n_eSerialFlags = HSerial::FLAG::D_BITS_PER_BYTE_6;
 			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_5" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_BITS_PER_BYTE_5;
+				n_eSerialFlags = HSerial::FLAG::D_BITS_PER_BYTE_5;
 			else if ( ! strcasecmp ( l_oStr, "CANONICAL" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_CANONICAL;
+				n_eSerialFlags = HSerial::FLAG::D_CANONICAL;
 			else if ( ! strcasecmp ( l_oStr, "STOP_BITS_1" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_STOP_BITS_1;
+				n_eSerialFlags = HSerial::FLAG::D_STOP_BITS_1;
 			else if ( ! strcasecmp ( l_oStr, "STOP_BITS_2" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_STOP_BITS_2;
+				n_eSerialFlags = HSerial::FLAG::D_STOP_BITS_2;
 			else if ( ! strcasecmp ( l_oStr, "PARITY_CHECK" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_PARITY_CHECK;
+				n_eSerialFlags = HSerial::FLAG::D_PARITY_CHECK;
 			else if ( ! strcasecmp ( l_oStr, "PARITY_ODD" ) )
-				n_eSerialFlags = HSerial::D_FLAGS_PARITY_ODD;
+				n_eSerialFlags = HSerial::FLAG::D_PARITY_ODD;
 			else
 				return ( true );
 			}

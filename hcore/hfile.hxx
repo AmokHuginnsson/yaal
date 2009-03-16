@@ -57,8 +57,9 @@ public:
 			D_WRITING = 2,
 			D_APPEND = 4,
 			D_TRUNCATE = 8
-			} open_t;
+			} enum_t;
 		};
+	typedef HStrongEnum<OPEN> open_t;
 	/*! \brief Read operation modifiers.
 	 */
 	struct READ
@@ -70,8 +71,9 @@ public:
 			D_STRIP_NEWLINES = 2,
 			D_BUFFERED_READS = 4,
 			D_UNBUFFERED_READS = 8
-			} read_t;
+			} enum_t;
 		};
+	typedef HStrongEnum<READ> read_t;
 	/*! \brief Kinds of seek operation.
 	 */
 	struct SEEK
@@ -81,28 +83,29 @@ public:
 			D_SET,
 			D_CUR,
 			D_END
-			} seek_t;
+			} enum_t;
 		};
+	typedef HStrongEnum<SEEK> seek_t;
 private:
-	OPEN::open_t f_eOpen;
+	open_t f_eOpen;
 	void* f_pvHandle;
 	HString f_oPath;
 	HString f_oError;
 	bool f_bExternal;
 public:
-	HFile( OPEN::open_t const& = OPEN::D_READING, void* const = NULL );
+	HFile( open_t const& = OPEN::D_READING, void* const = NULL );
 	/*! \brief Create new file stream and open file item immediatelly.
 	 *
 	 * \param path - path to file item to be opened.
 	 * \param mode - open mode.
 	 */
-	HFile( yaal::hcore::HString const& path, OPEN::open_t const& mode = OPEN::D_READING );
+	HFile( yaal::hcore::HString const& path, open_t const& mode = OPEN::D_READING );
 	virtual ~HFile( void );
 	int open( HString const& );
 	int close( void );
-	int long read_line( HString&, READ::read_t const& = READ::D_DEFAULTS, int const = 0 );
+	int long read_line( HString&, read_t const& = READ::D_DEFAULTS, int const = 0 );
 	int long tell( void ) const;
-	void seek( int long const&, SEEK::seek_t const& = SEEK::D_SET );
+	void seek( int long const&, seek_t const& = SEEK::D_SET );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	virtual void flush( void ) const;

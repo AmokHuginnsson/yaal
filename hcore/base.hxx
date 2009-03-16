@@ -35,6 +35,7 @@ Copyright:
 #define YAAL_HCORE_BASE_HXX_INCLUDED
 
 #include "hcore/hexception.hxx"
+#include "hcore/hstrongenum.hxx"
 #include "hcore/compat.hxx"
 
 /*! \mainpage yaal library documentation.
@@ -859,83 +860,33 @@ bool less( tType const& a_rtLeft, tType const& a_rtRight )
 template<typename to_t, typename from_t>
 to_t lexical_cast( from_t const& val );
 
-template<typename tType>
-inline tType operator | ( tType const& left,
-		tType const& right )
-	{
-	return ( static_cast<tType>( static_cast<int long unsigned>( left )
-				| static_cast<int long unsigned>( right ) ) );
-	}
-
-template<typename tType>
-inline tType& operator |= ( tType& left, tType const& right )
-	{
-	left = static_cast<tType>( static_cast<int long unsigned>( left )
-			| static_cast<int long unsigned>( right ) );
-	return ( left );
-	}
-
-template<typename tType>
-inline tType operator & ( tType const& left,
-		tType const& right )
-	{
-	return ( static_cast<tType>( static_cast<int long unsigned>( left )
-				& static_cast<int long unsigned>( right ) ) );
-	}
-
-template<typename tType>
-inline tType& operator &= ( tType& left, tType const& right )
-	{
-	left = static_cast<tType>( static_cast<int long unsigned>( left )
-			& static_cast<int long unsigned>( right ) );
-	return ( left );
-	}
-
-template<typename tType>
-inline tType operator ^ ( tType const& left,
-		tType const& right )
-	{
-	return ( static_cast<tType>( static_cast<int long unsigned>( left )
-				^ static_cast<int long unsigned>( right ) ) );
-	}
-
-template<typename tType>
-inline tType& operator ^= ( tType& left, tType const& right )
-	{
-	left = static_cast<tType>( static_cast<int long unsigned>( left )
-			^ static_cast<int long unsigned>( right ) );
-	return ( left );
-	}
-
-template<typename tType>
-inline tType operator ~ ( tType const& e )
-	{
-	return ( static_cast<tType>( ~ static_cast<int long unsigned>( e ) ) );
-	}
-
 /*! \brief POD type symbols. (Some non-POD yaal types included too).
  */
-typedef enum
+struct TYPE
 	{
-	D_VOID        = 0x0000,
-	D_BOOL        = 0x0001,
-	D_CHAR        = 0x0002,
-	D_INT_SHORT   = 0x0004,
-	D_INT         = 0x0008,
-	D_INT_LONG    = 0x0010,
-	D_FLOAT       = 0x0020,
-	D_DOUBLE      = 0x0040,
-	D_DOUBLE_LONG = 0x0080,
-	D_VOID_PTR    = 0x0100,
-	D_CHAR_PTR    = 0x0280,
-	D_HSTRING     = 0x0400,
-	D_HNUMBER     = 0x0800,
-	D_HINFO       = 0x1000,
-	D_HHASHMAP    = 0x2000,
-	D_HLIST       = 0x4000,
-	D_HTIME       = 0x8000,
-	D_MASK        = 0xffff
-	} type_t;
+	typedef enum
+		{
+		D_VOID        = 0x0000,
+		D_BOOL        = 0x0001,
+		D_CHAR        = 0x0002,
+		D_INT_SHORT   = 0x0004,
+		D_INT         = 0x0008,
+		D_INT_LONG    = 0x0010,
+		D_FLOAT       = 0x0020,
+		D_DOUBLE      = 0x0040,
+		D_DOUBLE_LONG = 0x0080,
+		D_VOID_PTR    = 0x0100,
+		D_CHAR_PTR    = 0x0280,
+		D_HSTRING     = 0x0400,
+		D_HNUMBER     = 0x0800,
+		D_HINFO       = 0x1000,
+		D_HHASHMAP    = 0x2000,
+		D_HLIST       = 0x4000,
+		D_HTIME       = 0x8000,
+		D_MASK        = 0xffff
+		} enum_t;
+	};
+typedef yaal::hcore::HStrongEnum<TYPE> type_t;
 
 typedef char unsigned u8_t; /*!< 8 bit unsigned integer. */
 typedef int short unsigned u16_t; /*!< 16 bit unsigned integer. */

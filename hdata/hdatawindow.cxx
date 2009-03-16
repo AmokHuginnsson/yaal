@@ -145,11 +145,11 @@ int HDataWindow::init( void )
 					l_psLCR = static_cast<OListControlResource*>( f_psResourcesArray [ l_iCtr ].f_pvTypeSpecific );
 				HDataListControl* l_poList = NULL;
 				l_poDataControl = l_poList = new HDataListControl( this, M_SETUP_STANDARD );
-				l_poList->set_flags( ( l_psLCR->f_bCheckable ? HListControl::FLAGS::D_CHECKABLE : HListControl::FLAGS::D_NONE )
-						| ( l_psLCR->f_bSortable ? HListControl::FLAGS::D_SORTABLE : HListControl::FLAGS::D_NONE )
-						| ( l_psLCR->f_bEditable ? HListControl::FLAGS::D_EDITABLE : HListControl::FLAGS::D_NONE )
-						| ( l_psLCR->f_bDrawHeader ? HListControl::FLAGS::D_DRAW_HEADER : HListControl::FLAGS::D_NONE ),
-						HListControl::FLAGS::D_ALL );
+				l_poList->set_flags( HListControl::flag_t( l_psLCR->f_bCheckable ? HListControl::FLAG::D_CHECKABLE : HListControl::FLAG::D_NONE )
+						| ( l_psLCR->f_bSortable ? HListControl::FLAG::D_SORTABLE : HListControl::FLAG::D_NONE )
+						| ( l_psLCR->f_bEditable ? HListControl::FLAG::D_EDITABLE : HListControl::FLAG::D_NONE )
+						| ( l_psLCR->f_bDrawHeader ? HListControl::FLAG::D_DRAW_HEADER : HListControl::FLAG::D_NONE ),
+						HListControl::FLAG::D_ALL );
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::D_TREE ):
@@ -230,13 +230,13 @@ void HDataWindow::link( int a_iChild, HDataControl* a_poDataControl )
 	l_psCI->f_pcName = l_pcName;
 	l_psCI->f_iWidth = 1; 				/* width is awlays proportional */
 	l_psCI->f_eAlign = HControl::BITS::ALIGN::D_LEFT;
-	l_psCI->f_eType = D_HSTRING;
+	l_psCI->f_eType = TYPE::D_HSTRING;
 	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
 	if ( f_psResourcesArray [ l_iParent ].f_eType == DATACONTROL_BITS::TYPE::D_LIST )
 		{
 		l_poPDC = dynamic_cast<HDataListControl*>( f_oControls.get_control_by_no( l_iParent + 1 /* 1 stands for offset caused by 'status bar' */ ) );
 		if ( ! l_poPDC )
-			M_THROW ( "wrong control resource order",
+			M_THROW( "wrong control resource order",
 					l_iParent );
 		if ( f_psResourcesArray[ a_iChild ].f_psColumnInfo )
 			l_psCI = f_psResourcesArray[ a_iChild ].f_psColumnInfo;
@@ -244,7 +244,7 @@ void HDataWindow::link( int a_iChild, HDataControl* a_poDataControl )
 				l_psCI->f_iWidth, l_psCI->f_eAlign, l_psCI->f_eType, a_poDataControl );
 		}
 	else
-		M_THROW( "unknown parent type", f_psResourcesArray [ l_iParent ].f_eType );
+		M_THROW( "unknown parent type", f_psResourcesArray[ l_iParent ].f_eType );
 	return;
 	M_EPILOG
 	}

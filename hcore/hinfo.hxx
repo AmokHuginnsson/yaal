@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/htime.hxx"
 #include "hcore/hexception.hxx" /* types definitions */
+#include "hcore/hstrongenum.hxx"
 
 namespace yaal
 {
