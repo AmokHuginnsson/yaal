@@ -26,6 +26,6 @@ Copyright:
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: "__TID__" $" )
 #include "xmath.hxx"
-M_VCSTID( D_VCSID_XMATH_H )
 

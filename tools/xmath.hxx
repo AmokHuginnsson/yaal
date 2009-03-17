@@ -29,8 +29,6 @@ Copyright:
 
 #line 31
 
-#define D_VCSID_XMATH_H "$Id$"
-
 namespace yaal
 {
 

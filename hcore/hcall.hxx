@@ -32,8 +32,6 @@ Copyright:
 
 #line 31
 
-#define D_VCSID_YAAL_HCORE_HCALL_H "$Id$"
-
 #include "hcore/hpointer.hxx"
 
 namespace yaal

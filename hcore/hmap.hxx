@@ -29,8 +29,6 @@ Copyright:
 
 #line 31
 
-#define D_VCSID_YAAL_HCORE_HMAP_H "$Id$"
-
 #include "hcore/hsbbstree.hxx"
 #include "hcore/hpair.hxx"
 

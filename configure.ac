@@ -34,7 +34,7 @@ AC_CONFIG_AUX_DIR([_aux])
 dnl yaal is not Free Software.
 AC_COPYRIGHT([[yaal (c) 2004 All rights reserved.]])
 
-AC_CHECK_PROG(HAS_GIT,[git-log],["true"],["false"])
+AC_CHECK_PROG(HAS_GIT,[git],["true"],["false"])
 AC_MSG_CHECKING([git id sub-command])
 AC_SUBST(GITID,[true])
 if test ["$HAS_GIT"] = ["true"] ; then

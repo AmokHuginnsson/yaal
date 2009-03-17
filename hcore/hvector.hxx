@@ -40,8 +40,6 @@ namespace yaal
 namespace hcore
 {
 
-#define D_VCSID_HVECTOR_H "$Id$"
-
 extern char const* g_ppcErrMsgHVector[];
 
 /*! \brief Vector class for linear algebra calculus.

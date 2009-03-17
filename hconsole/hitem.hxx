@@ -29,8 +29,6 @@ Copyright:
 
 #line 31
 
-#define D_VCSID_HCONSOLE_HITEM_H "$Id$"
-
 #include "hcore/harray.hxx"
 #include "hcore/hinfo.hxx"
 

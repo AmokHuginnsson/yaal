@@ -28,8 +28,8 @@ Copyright:
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: "__TID__" $" )
 #include "hvector.hxx"
-M_VCSTID ( D_VCSID_HVECTOR_H )
 
 namespace yaal
 {

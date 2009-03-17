@@ -30,8 +30,6 @@ Copyright:
 #ifndef YAAL_HCORE_HARRAY_HXX_INCLUDED
 #define YAAL_HCORE_HARRAY_HXX_INCLUDED
 
-#define D_VCSID_YAAL_HCORE_HARRAY_H "$Id$"
-
 #include <new>
 
 #include "hcore/base.hxx"

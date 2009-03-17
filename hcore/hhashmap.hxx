@@ -29,8 +29,6 @@ Copyright:
 
 #line 31
 
-#define D_VCSID_HHASHMAP_H "$Id$"
-
 #include <cstddef>
 #include <cstdlib>
 #include <new>

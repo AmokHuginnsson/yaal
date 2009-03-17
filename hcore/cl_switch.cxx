@@ -106,15 +106,15 @@ option* make_option_array( OOption* const& a_rpsOptions, int a_iCount, HChunk& a
 	M_EPILOG
 	}
 
-int decode_switches( int const a_iArgc, char* const* const a_ppcArgv,
-		OOption* const& a_rpsOptions, int const a_iCount,
+int decode_switches( int const& a_iArgc, char* const* const a_ppcArgv,
+		OOption* const& a_rpsOptions, int const& a_iCount,
 		int* const a_piUnknown )
 	{
 	M_PROLOG
 	bool l_bValidSwitch = false;
 	int l_iChar = 0, l_iCtr = 0;
-	char const * l_pcShortOpts = NULL;
-	option * l_psOptionArray = NULL;
+	char const* l_pcShortOpts = NULL;
+	option* l_psOptionArray = NULL;
 	HString l_oShortOptBuffer;
 	HChunk l_oLongOptBuffer( xcalloc<option>( a_iCount ) );
 	hcore::log << "Decoding switches ... ";

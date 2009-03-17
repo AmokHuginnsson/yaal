@@ -29,8 +29,6 @@ Copyright:
 
 #line 31
 
-#define D_VCSID_YAAL_HCORE_HPOINTER_H "$Id$"
-
 #include "hcore/base.hxx"
 
 namespace yaal

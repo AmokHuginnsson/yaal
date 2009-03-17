@@ -26,8 +26,8 @@ Copyright:
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: "__TID__" $" )
 #include "hitem.hxx"
-M_VCSTID ( D_VCSID_HCONSOLE_HITEM_H )
 
 using namespace yaal::hcore;
 

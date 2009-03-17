@@ -31,8 +31,6 @@ Copyright:
 
 #include <cstring>
 
-#define D_VCSID_HPOOL_H "$Id$"
-
 #include "hcore/xalloc.hxx"
 
 namespace yaal

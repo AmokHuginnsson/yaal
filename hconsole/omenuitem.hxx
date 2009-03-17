@@ -27,8 +27,6 @@ Copyright:
 #ifndef YAAL_HCONSOLE_OMENUITEM_HXX_INCLUDED
 #define YAAL_HCONSOLE_OMENUITEM_HXX_INCLUDED
 
-#define D_VCSID_OMENUITEM_H "$Id$"
-
 #include "hconsole/htuiprocess.hxx"
 
 namespace yaal

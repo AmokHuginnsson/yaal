@@ -41,8 +41,6 @@ namespace yaal
 namespace hdata
 {
 
-#define D_VCSID_ORESOURCE_H "$Id$"
-
 /*! \brief Database connected TUI controls flags and configuration bits.
  */
 struct DATACONTROL_BITS

@@ -29,8 +29,6 @@ Copyright:
 
 #line 31
 
-#define D_VCSID_HLIST_H "$Id$"
-
 #include "hcore/hexception.hxx"
 
 namespace yaal

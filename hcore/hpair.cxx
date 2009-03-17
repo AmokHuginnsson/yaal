@@ -26,6 +26,6 @@ Copyright:
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: "__TID__" $" )
 #include "hpair.hxx"
-M_VCSTID ( D_VCSID_YAAL_HCORE_HPAIR_H )
 

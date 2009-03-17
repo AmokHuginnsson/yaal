@@ -30,8 +30,6 @@ Copyright:
 #ifndef YAAL_HCORE_HSET_HXX_INCLUDED
 #define YAAL_HCORE_HSET_HXX_INCLUDED
 
-#define D_VCSID_HSET_H "$Id$"
-
 #include "hcore/hsbbstree.hxx"
 
 namespace yaal

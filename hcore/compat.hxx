@@ -35,6 +35,7 @@ Copyright:
 #include "config.hxx"
 #endif /* __YAAL_BUILD__ */
 
+/*! \cond */
 #if ! defined( HAVE_PRETTY_FUNCTION )
 #if ! defined( HAVE_FUNCTION )
 #if ! defined( HAVE_FUNC )
@@ -100,6 +101,7 @@ int asprintf( char**, char const*, ... );
 #if ! defined( HAVE_DECLTYPE )
 #define __decltype typeof
 #endif /* not HAVE_DECLTYPE */
+/*! \endcond */
 
 #endif /* not YAAL_HCORE_COMPAT_HXX_INCLUDED */
 

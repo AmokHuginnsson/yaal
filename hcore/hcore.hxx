@@ -52,9 +52,18 @@ struct execution_info
 	{
 	typedef HList<HString> strings_t;
 	typedef HPointer<strings_t> strings_ptr_t;
-	static strings_ptr_t get_call_stack( int const& );
+	/*! \brief Get current call stack information.
+	 *
+	 * \param frames - number of frames to get.
+	 * \return Current call stack as list of strings.
+	 */
+	static strings_ptr_t get_call_stack( int const& frames );
 	};
-void dump_call_stack( int const& );
+/*! \brief Print current call stack on the console.
+ *
+ * \param frames - numbers of frames to print.
+ */
+void dump_call_stack( int const& frames );
 void yaal_hcore_banner( void );
 
 	}

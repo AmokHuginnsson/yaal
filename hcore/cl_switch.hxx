@@ -47,8 +47,16 @@ namespace hcore
 namespace cl_switch
 	{
 
-int decode_switches ( int const, char* const* const,
-		OOption* const&, int const, int* const = NULL );
+/*! \brief Parse command line options and set program setup variables.
+ *
+ * \param argc - argument count, number of arguments on command line.
+ * \param argv - table of arguments from command line.
+ * \param setup - array of supported program options descriptions.
+ * \param count - number of supported program options.
+ * \param[out] unknown - index of first unknown option in \e argv.
+ */
+int decode_switches( int const& argc, char* const* const argv,
+		OOption* const& setup, int const& count, int* const unknown = NULL );
 
 	}
 

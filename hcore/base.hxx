@@ -78,12 +78,24 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
  */
 #define _(string) gettext (string)
 
+/*! \cond */
+#define M_CONCAT_REAL( a, b ) a ## b
+/*! \endcond */
+/*! \brief Create uniqe C++ identifier from two other identifier.
+ *
+ * \param a - first part of identifier.
+ * \param b - second part of identifier (usually __LINE__ or __COUNTER__).
+ * \return EVAL(a)EVAL(b) - where EVAL(x) is x preprocessed by CPP.
+ */
+#define M_CONCAT( a, b ) M_CONCAT_REAL( a, b )
 /*! \brief Create object file identifier for ident(1) program.
  */
-#define M_VCSID(id) namespace { static char const* wrapper_VCSID( void ) { wrapper_VCSID(); return id; } }
-/*! \cond */
-#define M_VCSTID(id) namespace { static char const* wrapper_VCSTID( void ) { wrapper_VCSTID(); return id; } }
-/*! \endcond */
+#define M_VCSID(id) namespace { static char const* M_CONCAT(wrapper_VCSID, __LINE__)( void ) { M_CONCAT( wrapper_VCSID, __LINE__)(); return ( id ); } }
+/*! \brief Throw auto generated exception.
+ *
+ * \param msg - message for exception.
+ * \param e_no - error code for exception.
+ */
 #define M_THROW( msg, e_no ) yaal::hcore::throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, e_no )
 /*! \brief First statement of every exception guarder function/method.
  */
@@ -392,6 +404,12 @@ iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, it
 	return ( out );
 	}
 
+/*! \brief Swap contents (values) of two ranges of elements.
+ *
+ * \param first - begining of first range.
+ * \param end - one past the end of first range.
+ * \param second - begining of second range.
+ */
 template<typename first_it_t, typename second_it_t>
 void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second )
 	{
@@ -428,6 +446,12 @@ void fill_n( dst_it_t it, int long const& count, filler_t const& filler )
 	return;
 	}
 
+/*! \brief Fill specified range with run-time generared values.
+ *
+ * \param it - begining of the range.
+ * \param end - one past last element in range.
+ * \param generator - function object that creates new values for range.
+ */
 template<typename iterator_t, typename generator_t>
 void generate( iterator_t it, iterator_t const& end, generator_t generator )
 	{
@@ -886,7 +910,7 @@ struct TYPE
 		D_MASK        = 0xffff
 		} enum_t;
 	};
-typedef yaal::hcore::HStrongEnum<TYPE> type_t;
+typedef yaal::hcore::HStrongEnum<TYPE> type_t; /*!< Strong enumeration of PODs. */
 
 typedef char unsigned u8_t; /*!< 8 bit unsigned integer. */
 typedef int short unsigned u16_t; /*!< 16 bit unsigned integer. */
