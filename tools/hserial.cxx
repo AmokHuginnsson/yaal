@@ -55,11 +55,11 @@ namespace
 	char const* const n_pcENotOpened = _( "serial port not opened" );
 	}
 
-HSerial::flag_t HSerial::D_FLAG_TEXT = HSerial::flag_t( HSerial::FLAG::FLAG::D_DEFAULT ) | HSerial::FLAG::FLAG::D_CANONICAL | HSerial::FLAG::FLAG::D_CR2NL;
+HSerial::flag_t HSerial::D_FLAG_TEXT = HSerial::flag_t( HSerial::FLAG::D_DEFAULT ) | HSerial::FLAG::D_CANONICAL | HSerial::FLAG::D_CR2NL;
 
 HSerial::HSerial( HString const& a_oDevicePath )
-				: HRawFile(), f_eSpeed( SPEED::SPEED::D_DEFAULT ),
-	f_eFlags( FLAG::FLAG::D_DEFAULT ), f_oDevicePath(),
+				: HRawFile(), f_eSpeed( SPEED::D_DEFAULT ),
+	f_eFlags( FLAG::D_DEFAULT ), f_oDevicePath(),
 	f_oTIO( xcalloc<termios>( 1 ) ), f_oBackUpTIO( xcalloc<termios>( 1 ) )
 	{
 	M_PROLOG
