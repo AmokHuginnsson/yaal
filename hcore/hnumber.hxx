@@ -125,6 +125,9 @@ private:
 
 typedef HExceptionT<HNumber> HNumberException;
 
+class HStreamInterface;
+HStreamInterface& operator << ( HStreamInterface&, HNumber const& );
+
 }
 
 inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b )

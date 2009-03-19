@@ -29,6 +29,7 @@ Copyright:
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hnumber.hxx"
+#include "hfile.hxx"
 
 namespace yaal
 {
@@ -886,6 +887,12 @@ void HNumber::karatsuba( canonical_t& result, char const* fx, int long fxs, char
 			}
 		}
 	return;
+	}
+
+HStreamInterface& operator << ( HStreamInterface& out, HNumber const& n )
+	{
+	out << n.to_string();
+	return ( out );
 	}
 
 }

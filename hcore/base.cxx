@@ -66,6 +66,18 @@ int long lexical_cast( HString const& val )
 	}
 
 template<>
+int long lexical_cast( char const* const& val )
+	{
+	return ( lexical_cast<int long, HString>( val ) );
+	}
+
+template<>
+int long lexical_cast( char* const& val )
+	{
+	return ( lexical_cast<int long, HString>( val ) );
+	}
+
+template<>
 int lexical_cast( HString const& val )
 	{
 	return ( static_cast<int>( lexical_cast<int long>( val ) ) );
