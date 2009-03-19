@@ -2,7 +2,7 @@
 #
 #---        `yaal' (c) 1978 by Marcin 'Amok' Konarski             ---
 #
-#	Makefile - this file is integral part of `yaal' project.
+#	Makefile.mk - this file is integral part of `yaal' project.
 #
 #	i.  You may not make any changes in Copyright information.
 #	ii. You must attach Copyright information to any part of every copy
@@ -129,7 +129,7 @@ include $(DIR_ROOT)/_aux/mk/e_target-default.mk
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
-	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile
+	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile.mk
 else
 all: $(TARGETS) $(HAPI_HEADER)
 endif
@@ -179,7 +179,7 @@ mrproper: clean
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile config.h config.h.in yaalrc config.log doc/html
+	/bin/rm -rf configure Makefile.mk config.h config.h.in yaalrc config.log doc/html
 
 include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
 

@@ -3,9 +3,9 @@ dnl configure.ac is integral part of yaal project.
 
 dnl Initialization data.
 
-pushdef([AC_VERSION],esyscmd(awk '/^VERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
-pushdef([AC_SUBVERSION],esyscmd(awk '/^SUBVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
-pushdef([AC_EXTRAVERSION],esyscmd(awk '/^EXTRAVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.in))
+pushdef([AC_VERSION],esyscmd(awk '/^VERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.mk.in))
+pushdef([AC_SUBVERSION],esyscmd(awk '/^SUBVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.mk.in))
+pushdef([AC_EXTRAVERSION],esyscmd(awk '/^EXTRAVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.mk.in))
 m4_include([_aux/aclib.m4])
 AC_INIT([[yaal]],[AC_VERSION.AC_SUBVERSION.AC_EXTRAVERSION],[[amok@codestation.org]])
 
@@ -430,7 +430,7 @@ AH_BOTTOM([
 ])
 
 dnl We have to set up proper compiler/linker flags.
-AC_OUTPUT([Makefile yaalrc])
+AC_OUTPUT([Makefile.mk yaalrc])
 AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
 AC_MSG_RESULT([[Now you can type \`make'.]])
 

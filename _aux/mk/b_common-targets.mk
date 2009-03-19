@@ -4,7 +4,7 @@
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment
 	@test -t 1 && TERMINAL=TERM export TERMINAL ; \
-	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile
+	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile.mk
 else
 all: $(REAL_TARGETS)
 endif
@@ -49,7 +49,7 @@ mrproper: clean
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile config.hxx config.hxx.in config.log
+	/bin/rm -rf configure Makefile.mk config.hxx config.hxx.in config.log
 
 bin:
 	@( DO_RELEASE=1 $(MAKE) ; make clean )
