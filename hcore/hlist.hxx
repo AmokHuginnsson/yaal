@@ -219,8 +219,10 @@ private:
 	HElement ( HElement const & );
 	HElement& operator = ( HElement const& );
 	friend class HList<tType>;
-	template<typename const_qual_t, OListBits::treatment_t const treatment>
-	friend class HList<tType>::HIterator;
+	friend class HIterator<tType, OListBits::D_TREAT_AS_OPENED>;
+	friend class HIterator<tType const, OListBits::D_TREAT_AS_OPENED>;
+	friend class HIterator<tType, OListBits::D_TREAT_AS_CLOSED>;
+	friend class HIterator<tType const, OListBits::D_TREAT_AS_CLOSED>;
 	};
 
 /*! \brief Iterator for HList<> data structure.
