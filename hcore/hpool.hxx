@@ -29,8 +29,7 @@ Copyright:
 
 #line 31
 
-#include <cstring>
-
+#include "hcore/base.hxx"
 #include "hcore/xalloc.hxx"
 
 namespace yaal
