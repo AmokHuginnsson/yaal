@@ -102,6 +102,7 @@ private:
 	int get_node_set_by_path( yaal::hcore::HString const& );
 	const_xml_element_t get_element_by_id( const_xml_element_t const&, yaal::hcore::HString const& ) const;
 	const_xml_element_t get_element_by_path( const_xml_element_t const&, yaal::hcore::HString const&, int const& ) const;
+	char const* error_message( int const& ) const;
 private:
 	HXml( HXml const& );
 	HXml& operator = ( HXml const& );

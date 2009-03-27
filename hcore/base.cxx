@@ -171,7 +171,7 @@ bool lexical_cast( HString const& a_oValue )
 	M_EPILOG
 	}
 
-char const* error_message( int a_iCode )
+char const* error_message( int const& a_iCode )
 	{
 	return ( ::strerror( a_iCode ) );
 	}

@@ -942,7 +942,7 @@ private:
  * \param code - error code to describe.
  * \return Message string describing error of given error code.
  */
-char const* error_message( int code );
+char const* error_message( int const& code );
 
 }
 

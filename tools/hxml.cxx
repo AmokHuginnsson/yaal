@@ -1189,6 +1189,26 @@ HXml::HConstNodeProxy const HXml::get_element_by_path( yaal::hcore::HString cons
 	M_EPILOG
 	}
 
+char const* HXml::error_message( int const& code ) const
+	{
+	M_PROLOG
+	char const* msg = "Unknow error code";
+	switch ( code )
+		{
+		case ( EILSEQ ):
+			msg = "An invalid multibyte sequence has been encountered in the input.";
+		break;
+		case ( EINVAL ):
+			msg = "An incomplete multibyte sequence has been encountered in the input.";
+		break;
+		case ( 0 ):
+			msg = "No error.";
+		break;
+		}
+	return ( msg );
+	M_EPILOG
+	}
+
 namespace xml
 {
 
