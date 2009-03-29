@@ -525,7 +525,15 @@ void HProgramOptionsHandler::set_option( OOption& a_sOption, HString const& a_oV
 	{
 	M_PROLOG
 	if ( !! a_sOption.f_oValue )
-		a_sOption.f_oValue->set( a_oValue );
+		{
+		if ( a_sOption.f_eSwitchType == OOption::TYPE::D_NONE )
+			{
+			M_ENSURE( a_sOption.f_oValue->get_type() == TYPE::D_BOOL );
+			a_sOption.f_oValue->set( "true" );
+			}
+		else
+			a_sOption.f_oValue->set( a_oValue );
+		}
 	if ( a_sOption.CALLBACK )
 		a_sOption.CALLBACK->first( a_sOption.CALLBACK->second );
 	return;

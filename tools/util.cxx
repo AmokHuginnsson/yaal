@@ -17,7 +17,7 @@ Copyright:
   4. If you want redistribute binary package you cannot demand any fees
      for this software.
      You cannot even demand cost of the carrier (CD for example).
-  5. You cannot include it to any commercial enterprise (for example 
+  5. You cannot include it to any commercial enterprise (for example
      as a free add-on to payed software or payed newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -483,14 +483,19 @@ void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, ch
 			}
 		static int const D_MAXIMUM_LINE_LENGTH = 72;
 		::printf( "# %s, type: ", o.f_pcName );
-		switch( o.f_oValue->get_type().value() )
+		if ( !! o.f_oValue )
 			{
-			case ( TYPE::D_BOOL ): ::printf( "boolean\n" ); break;
-			case ( TYPE::D_INT ): case ( TYPE::D_INT_SHORT ): case ( TYPE::D_INT_LONG ): ::printf( "integer\n" ); break;
-			case ( TYPE::D_FLOAT ): case ( TYPE::D_DOUBLE ): case ( TYPE::D_DOUBLE_LONG ): ::printf( "floating point\n" ); break;
-			case ( TYPE::D_CHAR_PTR ): case ( TYPE::D_HSTRING ): ::printf( "character string\n" ); break;
-			default: ::printf( "special\n" ); break;
+			switch( o.f_oValue->get_type().value() )
+				{
+				case ( TYPE::D_BOOL ): ::printf( "boolean\n" ); break;
+				case ( TYPE::D_INT ): case ( TYPE::D_INT_SHORT ): case ( TYPE::D_INT_LONG ): ::printf( "integer\n" ); break;
+				case ( TYPE::D_FLOAT ): case ( TYPE::D_DOUBLE ): case ( TYPE::D_DOUBLE_LONG ): ::printf( "floating point\n" ); break;
+				case ( TYPE::D_CHAR_PTR ): case ( TYPE::D_HSTRING ): ::printf( "character string\n" ); break;
+				default: ::printf( "special\n" ); break;
+				}
 			}
+		else
+			::printf( "boolean\n" );
 		if ( ! description )
 			description = o.f_pcDescription;
 		desc = description;
