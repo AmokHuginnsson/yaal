@@ -314,7 +314,7 @@ char const* get_last_error( void )
 	return ( "" );
 	}
 
-void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
+void show_help( HProgramOptionsHandler::options_t const& a_oOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
 	{
 	M_PROLOG
 	::printf(
@@ -327,12 +327,12 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 	size_t l_iLongestShortLength = 0;
 	for ( int i = 0; i < a_iCount; ++ i )
 		{
-		OOption& o = a_psOptions[ i ];
-		size_t tmp = ( o.f_pcName ? ::strlen( o.f_pcName ) + 2 : 0 ) + ( o.f_pcArgument ? ::strlen( o.f_pcArgument ) + 1 : 0 ) + ( o.f_eSwitchType == OOption::D_OPTIONAL ? 2 : 1 );
+		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
+		size_t tmp = ( o.f_pcName ? ::strlen( o.f_pcName ) + 2 : 0 ) + ( o.f_pcArgument ? ::strlen( o.f_pcArgument ) + 1 : 0 ) + ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL ? 2 : 1 );
 		if ( tmp > l_iLongestLongLength )
 			l_iLongestLongLength = tmp;
 		tmp = 0;
-		if ( a_psOptions[ i ].f_pcShortForm && ( ( tmp = ::strlen( a_psOptions[ i ].f_pcShortForm ) + 1 ) > l_iLongestShortLength ) )
+		if ( a_oOptions[ i ].f_pcShortForm && ( ( tmp = ::strlen( a_oOptions[ i ].f_pcShortForm ) + 1 ) > l_iLongestShortLength ) )
 			l_iLongestShortLength = tmp;
 		}
 	HString desc;
@@ -340,7 +340,7 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 	/* display each option description */
 	for ( int i = 0; i < a_iCount; ++ i )
 		{
-		OOption& o = a_psOptions[ i ];
+		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
 		if ( ! ( o.f_pcShortForm || o.f_pcName ) )
 			continue;
 		HString sf;
@@ -362,15 +362,15 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 			}
 		if ( o.f_pcArgument )
 			{
-			if ( o.f_eSwitchType == OOption::D_OPTIONAL )
+			if ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL )
 				lf += "[";
 			( lf += "=" ) += o.f_pcArgument;
-			if ( o.f_eSwitchType == OOption::D_OPTIONAL )
+			if ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL )
 				lf += "]";
 			}
 		if ( i > 0 ) /* subsequent options */
 			{
-			OOption& p = a_psOptions[ i - 1 ];
+			HProgramOptionsHandler::OOption const& p = a_oOptions[ i - 1 ];
 			if ( o.f_pcName && p.f_pcName && ( ! ::strcmp( o.f_pcName, p.f_pcName ) ) )
 				{
 				lf = "", coma = " ";
@@ -408,7 +408,7 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 				desc.insert( 0, 2, "  " );
 				if ( i < ( a_iCount - 1 ) )
 					{
-					OOption& n = a_psOptions[ i + 1 ];
+					HProgramOptionsHandler::OOption const& n = a_oOptions[ i + 1 ];
 					if ( ( o.f_pcName && n.f_pcName && ( ! ::strcmp( o.f_pcName, n.f_pcName ) ) )
 							|| ( o.f_pcShortForm && n.f_pcShortForm && ( ! ::strcmp( o.f_pcShortForm, n.f_pcShortForm ) ) ) )
 						{
@@ -433,10 +433,10 @@ void show_help( OOption* a_psOptions, int a_iCount, char const* const a_pcProgra
 	M_EPILOG
 	}
 
-void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
+void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
 	{
 	M_PROLOG
-	a_pcProgramName && ::printf( "# this is configuration file for: `%s' programme\n", a_pcProgramName );
+	a_pcProgramName && ::printf( "# this is configuration file for: `%s' program\n", a_pcProgramName );
 	a_pcIntro && ::printf( "# %s\n", a_pcIntro );
 	if ( a_pcProgramName || a_pcIntro )
 		::printf( "\n" );
@@ -455,18 +455,18 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 "# string - .+\n"
 "#\n"
 "# example:\n"
-"# log_path ${HOME}/var/log/programme.log\n\n"
+"# log_path ${HOME}/var/log/program.log\n\n"
 	);
 	HString desc;
 	char const* description = NULL;
 	for ( int i = 0; i < a_iCount; ++ i )
 		{
-		OOption& o = a_psOptions[ i ];
+		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
 		if ( ! o.f_pcName )
 			continue;
 		if ( i > 0 ) /* subsequent options */
 			{
-			OOption& p = a_psOptions[ i - 1 ];
+			HProgramOptionsHandler::OOption const& p = a_oOptions[ i - 1 ];
 			if ( o.f_pcName && p.f_pcName
 					&& ( ! ::strcmp( o.f_pcName, p.f_pcName ) )
 					&& ( o.f_pcDescription == description ) )
@@ -478,7 +478,7 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 			}
 		static int const D_MAXIMUM_LINE_LENGTH = 72;
 		::printf( "# %s, type: ", o.f_pcName );
-		switch( o.f_eValueType.value() )
+		switch( o.f_oValue->get_type().value() )
 			{
 			case ( TYPE::D_BOOL ): ::printf( "boolean\n" ); break;
 			case ( TYPE::D_INT ): case ( TYPE::D_INT_SHORT ): case ( TYPE::D_INT_LONG ): ::printf( "integer\n" ); break;
@@ -515,36 +515,36 @@ void dump_configuration( OOption* a_psOptions, int a_iCount, char const* const a
 				}
 			}
 		while ( loop );
-		if ( o.f_pvValue )
+		if ( !! o.f_oValue )
 			{
-			switch ( o.f_eValueType.value() )
+			switch ( o.f_oValue->get_type().value() )
 				{
 				case ( TYPE::D_BOOL ):
-					::printf( "%s %s\n", o.f_pcName, *static_cast<bool*>( o.f_pvValue ) ? "true" : "false" );
+					::printf( "%s %s\n", o.f_pcName, o.f_oValue->get<bool>() ? "true" : "false" );
 				break;
 				case ( TYPE::D_HSTRING ):
 					{
-					HString& s = *static_cast<HString*>( o.f_pvValue );
+					HString const& s = o.f_oValue->get<HString>();
 					::printf( "%s%s %s\n", ! s.is_empty() ? "" : "# ", o.f_pcName, s.raw() ? s.raw() : "" );
 					}
 				break;
 				case ( TYPE::D_CHAR_PTR ):
 					{
-					char* ptr = static_cast<char*>( o.f_pvValue );
+					char* ptr = o.f_oValue->get<char*>();
 					::printf( "%s%s %s\n", ptr && ptr[ 0 ] ? "" : "# ", o.f_pcName, ptr );
 					}
 				break;
 				case ( TYPE::D_INT ):
-					::printf( "%s %d\n", o.f_pcName, *static_cast<int*>( o.f_pvValue ) );
+					::printf( "%s %d\n", o.f_pcName, o.f_oValue->get<int>() );
 				break;
 				case ( TYPE::D_INT_LONG ):
-					::printf( "%s %ld\n", o.f_pcName, *static_cast<int long*>( o.f_pvValue ) );
+					::printf( "%s %ld\n", o.f_pcName, o.f_oValue->get<int long>() );
 				break;
 				case ( TYPE::D_DOUBLE_LONG ):
-					::printf( "%s %Lf\n", o.f_pcName, *static_cast<double long*>( o.f_pvValue ) );
+					::printf( "%s %Lf\n", o.f_pcName, o.f_oValue->get<double long>() );
 				break;
 				case ( TYPE::D_DOUBLE ):
-					::printf( "%s %f\n", o.f_pcName, *static_cast<double*>( o.f_pvValue ) );
+					::printf( "%s %f\n", o.f_pcName, o.f_oValue->get<double>() );
 				break;
 				default:
 					;

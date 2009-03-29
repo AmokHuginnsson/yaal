@@ -36,13 +36,15 @@ Copyright:
 #include "hcore/hpointer.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/hprogramoptionshandler.hxx"
 
 namespace yaal
 {
 
 namespace hcore
-	{
+{
 
+extern HProgramOptionsHandler yaalOptions;
 bool eq( double long const&, double long const& );
 void set_env( HString );
 
@@ -66,7 +68,7 @@ struct execution_info
 void dump_call_stack( int const& frames );
 void yaal_hcore_banner( void );
 
-	}
+}
 
 }
 

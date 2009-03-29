@@ -33,8 +33,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hprocess.hxx"
-
-#include "hcore/rc_file.hxx"
+#include "hcore/hprogramoptionshandler.hxx"
 
 using namespace yaal::hcore;
 
@@ -189,7 +188,7 @@ int HProcess::process_interrupt( int )
 	if ( l_iSigNo == SIGINT )
 		f_bLoop = false;
 	else if ( l_iSigNo == SIGHUP )
-		rc_file::reload_configuration();
+		program_options_helper::reload_configuration();
 	return ( 0 );
 	M_EPILOG
 	}

@@ -87,6 +87,8 @@ public:
 	int long size( void ) const;
 	int long get_capacity( void ) const;
 	int long capacity( void ) const;
+	bool empty( void ) const;
+	bool is_empty( void ) const;
 	void clear( void );
 	bool operator ! ( void ) const;
 	iterator begin( void );
@@ -346,6 +348,22 @@ int long HArray<tType>::size( void ) const
 	{
 	M_PROLOG
 	return ( f_lSize );
+	M_EPILOG
+	}
+
+template<typename tType>
+bool HArray<tType>::is_empty( void ) const
+	{
+	M_PROLOG
+	return ( f_lSize ? false : true );
+	M_EPILOG
+	}
+
+template<typename tType>
+bool HArray<tType>::empty( void ) const
+	{
+	M_PROLOG
+	return ( f_lSize ? false : true );
 	M_EPILOG
 	}
 

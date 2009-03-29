@@ -1,7 +1,7 @@
 /*
 ---         `yaal' (c) 1978 by Marcin 'Amok' Konarski           ---
 
-	rc_file.cxx - this file is integral part of `yaal' project.
+	hprogramoptionshandler.cxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -27,23 +27,28 @@ Copyright:
 #include <cstdlib>  /* getenv() */
 #include <cstring>  /* strcpy(), strcat() */
 #include <cstdio>   /* fopen() */
+#include <getopt.h>
 #include <libintl.h> /* gettext() */
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
-#include "rc_file.hxx"
+#include "hprogramoptionshandler.hxx"
 #include "xalloc.hxx"
 #include "hlog.hxx"
 #include "hpattern.hxx"
 #include "hcore.hxx"
+#include "hstring.hxx"
+#include "hchunk.hxx"
+#include "xalloc.hxx"
+#include "hlog.hxx"
+
+using namespace yaal;
+using namespace yaal::hcore;
 
 namespace yaal
 {
 
 namespace hcore
-{
-
-namespace rc_file
 {
 
 struct RC_PATHER
@@ -156,31 +161,28 @@ namespace
 
 struct ORCLoader
 	{
+	HProgramOptionsHandler* f_poOptionHandler;
 	HString f_oPath;
 	HString f_oSection;
-	OOption const* f_psVaraibles;
-	int f_iCount;
-	RC_CALLBACK_t rc_callback;
+	HProgramOptionsHandler::RC_CALLBACK_t rc_callback;
  	ORCLoader( void ) :
-		f_oPath(), f_oSection(), f_psVaraibles( NULL ),
-		f_iCount( 0 ), rc_callback( NULL ) { }
- 	ORCLoader( HString const& a_oRcName,
-		HString const& a_oSection,
-		OOption const* const a_psOptions, int const a_iCount,
-		RC_CALLBACK_t callback ) :
-		f_oPath( a_oRcName ), f_oSection( a_oSection ), f_psVaraibles( a_psOptions ),
-		f_iCount( a_iCount ), rc_callback( callback ) { }
- 	ORCLoader( ORCLoader const& loader ) :
-		f_oPath(), f_oSection(), f_psVaraibles( NULL ),
-		f_iCount( 0 ), rc_callback( NULL ) { operator = ( loader ); }
+		f_poOptionHandler( NULL ), f_oPath(), f_oSection(), rc_callback( NULL ) { }
+ 	ORCLoader( HProgramOptionsHandler* a_poOptionHandler, HString const& a_oRcName,
+		HString const& a_oSection, HProgramOptionsHandler::RC_CALLBACK_t callback )
+		: f_poOptionHandler( a_poOptionHandler ),
+		f_oPath( a_oRcName ), f_oSection( a_oSection ),
+		rc_callback( callback ) { }
+ 	ORCLoader( ORCLoader const& loader )
+		: f_poOptionHandler( loader.f_poOptionHandler ),
+		f_oPath( loader.f_oPath ), f_oSection( loader.f_oSection ),
+		rc_callback( loader.rc_callback ) {}
 	ORCLoader& operator = ( ORCLoader const& loader )
 		{
 		if ( &loader != this )
 			{
+			f_poOptionHandler = loader.f_poOptionHandler;
 			f_oPath = loader.f_oPath;
 			f_oSection = loader.f_oSection;
-			f_psVaraibles = loader.f_psVaraibles;
-			f_iCount = loader.f_iCount;
 			rc_callback = loader.rc_callback;
 			}
 		return ( *this );
@@ -190,6 +192,8 @@ struct ORCLoader
 typedef HList<ORCLoader> rc_loaders_t;
 rc_loaders_t n_oRCLoades;
 bool n_bRCLoadersLocked = false;
+
+}
 
 class HLocker
 	{
@@ -201,16 +205,12 @@ public:
 		{ f_rbLock = false; }
 	};
 
-}
-
-int process_rc_file_internal( HString const& a_oRcName,
-		HString const& a_oSection,
-		OOption const* const a_psOptions, int const a_iCount,
-		RC_CALLBACK_t rc_callback )
+int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
+		HString const& a_oSection, RC_CALLBACK_t rc_callback )
 	{
 	M_PROLOG
 	if ( ! n_bRCLoadersLocked )
-		n_oRCLoades.push_back( ORCLoader( a_oRcName, a_oSection, a_psOptions, a_iCount, rc_callback ) );
+		n_oRCLoades.push_back( ORCLoader( this, a_oRcName, a_oSection, rc_callback ) );
 	struct OPlacement
 		{
 		RC_PATHER::placement_t f_ePlacement;
@@ -220,14 +220,13 @@ int process_rc_file_internal( HString const& a_oRcName,
 				{ RC_PATHER::D_HOME_ETC, RC_PATHER::D_LOCAL },
 				{ RC_PATHER::D_HOME, RC_PATHER::D_LOCAL } };
 	bool l_bSection = false, l_bOptionOK;
-	int l_iCtr = 0, l_iLine = 0;
 	placement_bit_t l_eSuccessStory( RC_PATHER::D_NONE );
 	size_t l_iCtrOut = 0;
 	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
 	log ( LOG_TYPE::D_INFO ) << "process_rc_file(): ";
-	if ( a_iCount < 0 )
-		M_THROW ( _ ( "bad variable count" ), a_iCount );
+	if ( f_oOptions.is_empty() )
+		M_THROW( _( "bad variable count" ), f_oOptions.size() );
 	for ( l_iCtrOut = 0; l_iCtrOut < ( sizeof ( l_psPlacementTab ) / sizeof ( OPlacement ) ); l_iCtrOut ++ )
 		{
 		if ( ( !!( l_eSuccessStory & RC_PATHER::D_GLOBAL ) )
@@ -238,6 +237,7 @@ int process_rc_file_internal( HString const& a_oRcName,
 		if ( ! rc_open( a_oRcName, l_psPlacementTab [ l_iCtrOut ].f_ePlacement, l_oRc ) )
 			{
 			l_eSuccessStory |= l_psPlacementTab [ l_iCtrOut ].f_ePlacementBit;
+			int l_iLine = 0;
 			while ( read_rc_line( l_oOption, l_oValue, l_oRc, l_iLine ) )
 				{
 				if ( ! a_oSection.is_empty() )
@@ -264,13 +264,11 @@ int process_rc_file_internal( HString const& a_oRcName,
 				if ( n_iDebugLevel )
 					::fprintf( stderr, "option: [%s], value [%s]\n",
 							l_oOption.raw(), l_oValue.raw() );
-				l_iCtr = 0;
 				l_bOptionOK = false;
-				while ( ( l_iCtr < a_iCount ) && a_psOptions[ l_iCtr ].f_pcName )
+				for ( options_t::iterator it = f_oOptions.begin(), end = f_oOptions.end(); it != end; ++ it )
 					{
-					if ( ! strcasecmp( l_oOption, a_psOptions[ l_iCtr ].f_pcName ) )
-						l_bOptionOK = true, set_option( a_psOptions[ l_iCtr ], l_oValue );
-					l_iCtr ++;
+					if ( ! strcasecmp( l_oOption, it->f_pcName ) )
+						l_bOptionOK = true, set_option( *it, l_oValue );
 					}
 				if ( rc_callback && rc_callback( l_oOption, l_oValue )
 						&& ! l_bOptionOK )
@@ -292,11 +290,21 @@ int process_rc_file_internal( HString const& a_oRcName,
 	M_EPILOG
 	}
 
+HProgramOptionsHandler& HProgramOptionsHandler::operator()( char const* name, HOptionValueInterface::ptr_t value, char const*, OOption::TYPE::enum_t const&, char const*, char const*, simple_callback_t* )
+	{
+	M_PROLOG
+	OOption o;
+	o.f_pcName = name;
+	o.f_oValue = value;
+	f_oOptions.push_back( o );
+	return ( *this );
+	M_EPILOG
+	}
+
 void process_loader( ORCLoader& loader )
 	{
 	M_PROLOG
-	process_rc_file_internal( loader.f_oPath, loader.f_oSection,
-			loader.f_psVaraibles, loader.f_iCount, loader.rc_callback );
+	loader.f_poOptionHandler->process_rc_file( loader.f_oPath, loader.f_oSection, loader.rc_callback );
 	return;
 	M_EPILOG
 	}
@@ -437,7 +445,104 @@ void rc_set_variable( char const* const a_pcValue, char& a_rcVariable )
 	a_rcVariable = a_pcValue[ 0 ];
 	}
 
-}
+void HProgramOptionsHandler::set_option( OOption& a_sOption, HString const& a_oValue )
+	{
+	M_PROLOG
+	if ( !! a_sOption.f_oValue )
+		a_sOption.f_oValue->set( a_oValue );
+	if ( a_sOption.CALLBACK )
+		a_sOption.CALLBACK->first( a_sOption.CALLBACK->second );
+	return;
+	M_EPILOG
+	}
+
+char const* make_short_opts( HProgramOptionsHandler::options_t const& a_oOptions, HString& a_roBuffer )
+	{
+	M_PROLOG
+	a_roBuffer = "";
+	for ( HProgramOptionsHandler::options_t::const_iterator it = a_oOptions.begin(),
+			end = a_oOptions.end(); it != end; ++ it )
+		{
+		if ( ! it->f_pcShortForm )
+			continue;
+		a_roBuffer += static_cast<char>( it->f_pcShortForm[0] );
+		switch ( it->f_eSwitchType )
+			{
+			case ( HProgramOptionsHandler::OOption::TYPE::D_REQUIRED ):
+				a_roBuffer += ':';
+			break;
+			case ( HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL ):
+				a_roBuffer += "::";
+			break;
+			case ( HProgramOptionsHandler::OOption::TYPE::D_NONE ):
+			default :
+				break;
+			}
+		}
+	return ( a_roBuffer.raw() );
+	M_EPILOG
+	}
+
+option* make_option_array( HProgramOptionsHandler::options_t const& a_oOptions, HChunk& a_roBuffer )
+	{
+	M_PROLOG
+	option* l_psOptions = NULL;
+	l_psOptions = a_roBuffer.get<option>();
+	int l_iCtr = 0;
+	for ( HProgramOptionsHandler::options_t::const_iterator it = a_oOptions.begin(),
+			end = a_oOptions.end(); it != end; ++ it, ++ l_iCtr )
+		{
+		memset( &l_psOptions[ l_iCtr ], 0, sizeof ( option ) );
+		l_psOptions[ l_iCtr ].name = it->f_pcName;
+		switch ( it->f_eSwitchType )
+			{
+			case ( HProgramOptionsHandler::OOption::TYPE::D_REQUIRED ):
+				l_psOptions [ l_iCtr ].has_arg = required_argument;
+			break;
+			case ( HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL ):
+				l_psOptions [ l_iCtr ].has_arg = optional_argument;
+			break;
+			case ( HProgramOptionsHandler::OOption::TYPE::D_NONE ):
+			default :
+				l_psOptions [ l_iCtr ].has_arg = no_argument;
+			}
+		if ( it->f_pcShortForm )
+			l_psOptions[ l_iCtr ].val = it->f_pcShortForm[0];
+		}
+	return ( l_psOptions );
+	M_EPILOG
+	}
+
+int HProgramOptionsHandler::process_command_line( int const& a_iArgc,
+		char* const* const a_ppcArgv,
+		int* const a_piUnknown )
+	{
+	M_PROLOG
+	bool l_bValidSwitch = false;
+	int l_iChar = 0;
+	char const* l_pcShortOpts = NULL;
+	option* l_psOptionArray = NULL;
+	HString l_oShortOptBuffer;
+	HChunk l_oLongOptBuffer( xcalloc<option>( f_oOptions.size() ) );
+	hcore::log << "Decoding switches ... ";
+	l_pcShortOpts = make_short_opts( f_oOptions, l_oShortOptBuffer );
+	l_psOptionArray = make_option_array( f_oOptions, l_oLongOptBuffer );
+	while ( ( l_iChar = ::getopt_long( a_iArgc, a_ppcArgv, l_pcShortOpts,
+					l_psOptionArray, NULL ) ) != EOF )
+		{
+		l_bValidSwitch = false;
+		for ( options_t::iterator it = f_oOptions.begin(), end = f_oOptions.end(); it != end; ++ it )
+			{
+			if ( it->f_pcShortForm && ( it->f_pcShortForm[0] == l_iChar ) )
+				l_bValidSwitch = true, set_option( *it, optarg );
+			}
+		if ( ! l_bValidSwitch && a_piUnknown )
+			( *a_piUnknown ) ++;
+		}
+	hcore::log << "done." << endl;
+	return ( optind );
+	M_EPILOG
+	}
 
 }
 

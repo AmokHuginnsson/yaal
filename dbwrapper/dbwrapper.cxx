@@ -34,7 +34,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hlog.hxx"
 #include "hcore/hstring.hxx"
-#include "hcore/rc_file.hxx"
+#include "hcore/hprogramoptionshandler.hxx"
 #include "hcore/hcore.hxx"
 #include "hconsole/hconsole.hxx"
 #include "tools/tools.hxx"
@@ -68,11 +68,6 @@ void dbwrapper_error( void );
 void dbwrapper_exit( void ) __attribute__(( __noreturn__ ));
 
 int	n_iDataBaseDriver = 0;
-
-OOption n_psVariables[] =
-	{
-		{ NULL, TYPE::D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
-	};
 
 bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 	{
@@ -123,8 +118,7 @@ public:
 HDBWrapperInitDeinit::HDBWrapperInitDeinit( void )
 	{
 	M_PROLOG
-	rc_file::process_rc_file( "yaal", "dbwrapper", n_psVariables,
-			set_dbwrapper_variables );
+	yaalOptions.process_rc_file( "yaal", "dbwrapper", set_dbwrapper_variables );
 	return;
 	M_EPILOG
 	}

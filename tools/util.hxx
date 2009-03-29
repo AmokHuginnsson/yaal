@@ -32,7 +32,7 @@ Copyright:
 
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
-#include "hcore/ooption.hxx"
+#include "hcore/hprogramoptionshandler.hxx"
 
 namespace yaal
 {
@@ -59,18 +59,17 @@ double long atof_ex( yaal::hcore::HString const&, bool = false );
 bool verify_IBAN( yaal::hcore::HString const& );
 char const* get_last_error( void );
 
-void show_help( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const = NULL );
-void dump_configuration( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const = NULL );
-typedef void ( * OPTION_PROCESSOR_t )( yaal::hcore::OOption*, int, char const* const, char const* const, char const* const );
+void show_help( yaal::hcore::HProgramOptionsHandler::options_t const&, int, char const* const, char const* const, char const* const = NULL );
+void dump_configuration( yaal::hcore::HProgramOptionsHandler::options_t const&, int, char const* const, char const* const, char const* const = NULL );
+typedef void ( * OPTION_PROCESSOR_t )( yaal::hcore::HProgramOptionsHandler::options_t const&, int, char const* const, char const* const, char const* const );
 /*! \brief Helper structure for displaing program help and current configuration.
  */
 struct OOptionInfo
 	{
-	yaal::hcore::OOption* _opt;
-	int _size;
+	yaal::hcore::HProgramOptionsHandler::options_t const& _opt;
 	OPTION_PROCESSOR_t PROC;
-	OOptionInfo( yaal::hcore::OOption* opt, int const& size, OPTION_PROCESSOR_t const& a_PROC )
-		: _opt( opt ), _size( size ), PROC( a_PROC ) {}
+	OOptionInfo( yaal::hcore::HProgramOptionsHandler::options_t const& opt, OPTION_PROCESSOR_t const& a_PROC )
+		: _opt( opt ), PROC( a_PROC ) {}
 private:
 	OOptionInfo( OOptionInfo const& );
 	OOptionInfo& operator = ( OOptionInfo const& );

@@ -33,7 +33,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hcore.hxx"
 #include "hcore/hlog.hxx"
-#include "hcore/rc_file.hxx"
+#include "hcore/hprogramoptionshandler.hxx"
 #include "tools/tools.hxx"
 #include "console.hxx"
 
@@ -74,23 +74,6 @@ bool	n_bLeaveCtrlQ = false;
 bool	n_bLeaveCtrlBackSlash = false;
 char	n_cCommandComposeCharacter = 'x';
 int		n_iCommandComposeDelay = 16;
-
-OOption n_psVariables[] =
-	{
-		{ "use_mouse", TYPE::D_BOOL, &n_bUseMouse, 0, OOption::D_OPTIONAL, NULL, "enable mouse support", NULL },
-		{ "disable_XON", TYPE::D_BOOL, &n_bDisableXON, 0, OOption::D_OPTIONAL, NULL, "disable flow control events", NULL },
-		{ "leave_ctrl_c", TYPE::D_BOOL, &n_bLeaveCtrlC, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+C sequence", NULL },
-		{ "leave_ctrl_z", TYPE::D_BOOL, &n_bLeaveCtrlZ, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+Z sequence", NULL },
-		{ "leave_ctrl_s", TYPE::D_BOOL, &n_bLeaveCtrlS, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+S sequence", NULL },
-		{ "leave_ctrl_q", TYPE::D_BOOL, &n_bLeaveCtrlQ, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+Q sequence", NULL },
-		{ "leave_ctrl_\\", TYPE::D_BOOL, &n_bLeaveCtrlBackSlash, 0, OOption::D_OPTIONAL, NULL, "disable special handling of CTRL+\\ sequence", NULL },
-		{ "esc_delay", TYPE::D_INT, &ESCDELAY, 0, OOption::D_REQUIRED, NULL, "ncurses escape sequence time span", NULL }, /* defined inside ncurses lib */
-		{ "latency", TYPE::D_INT, &n_iLatency, 0, OOption::D_REQUIRED, NULL, "how often invoke idle event", NULL },
-		{ "command_compose_character", TYPE::D_CHAR, &n_cCommandComposeCharacter, 0, OOption::D_REQUIRED, NULL,
-			"character that shall be uses as command composition base", NULL },
-		{ "command_compose_delay", TYPE::D_INT, &n_iCommandComposeDelay, 0, OOption::D_REQUIRED, NULL, "command composition time span", NULL },
-		{ NULL, TYPE::D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
-	};
 
 void set_color_bits( int & a_riWord, int a_iBits, int a_iWhat )
 	{
@@ -192,8 +175,19 @@ HConsoleInitDeinit::HConsoleInitDeinit( void )
 	{
 	M_PROLOG
 	errno = 0;
-	rc_file::process_rc_file( "yaal", "console",
-				n_psVariables, set_hconsole_variables );
+	yaalOptions( "use_mouse", program_options_helper::option_value( n_bUseMouse ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "enable mouse support", NULL )
+		( "disable_XON", program_options_helper::option_value( n_bDisableXON ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable flow control events", NULL )
+		( "leave_ctrl_c", program_options_helper::option_value( n_bLeaveCtrlC ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+C sequence", NULL )
+		( "leave_ctrl_z", program_options_helper::option_value( n_bLeaveCtrlZ ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+Z sequence", NULL )
+		( "leave_ctrl_s", program_options_helper::option_value( n_bLeaveCtrlS ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+S sequence", NULL )
+		( "leave_ctrl_q", program_options_helper::option_value( n_bLeaveCtrlQ ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+Q sequence", NULL )
+		( "leave_ctrl_\\", program_options_helper::option_value( n_bLeaveCtrlBackSlash ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+\\ sequence", NULL )
+		( "esc_delay", program_options_helper::option_value( ESCDELAY ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "ncurses escape sequence time span", NULL ) /* defined inside ncurses lib */
+		( "latency", program_options_helper::option_value( n_iLatency ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "how often invoke idle event", NULL )
+		( "command_compose_character", program_options_helper::option_value( n_cCommandComposeCharacter ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL,
+			"character that shall be uses as command composition base", NULL )
+		( "command_compose_delay", program_options_helper::option_value( n_iCommandComposeDelay ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "command composition time span", NULL );
+	yaalOptions.process_rc_file( "yaal", "console", set_hconsole_variables );
 	return;
 	M_EPILOG
 	}

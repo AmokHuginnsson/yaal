@@ -37,7 +37,8 @@ Copyright:
 #include "hcore/xalloc.hxx"
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
-#include "hcore/rc_file.hxx"
+#include "hcore/hprogramoptionshandler.hxx"
+#include "hcore/hcore.hxx"
 #include "hcore/hlog.hxx"
 
 using namespace yaal;
@@ -49,11 +50,6 @@ extern "C"
 static char const * const g_pcLogTag = "Oracle: ";
 
 HString g_oInstanceName;
-OOption n_psVariables [ ] =
-	{
-		{ "instance_name", TYPE::D_HSTRING, &g_oInstanceName, NULL, OOption::D_REQUIRED, "name", "name of the Oracle database instance", NULL },
-		{ NULL, TYPE::D_VOID, NULL, NULL, OOption::D_NONE, NULL, NULL, NULL }
-	};
 
 struct OAllocator
 	{
@@ -403,7 +399,8 @@ char * rs_column_name ( void* a_pvDataR, int a_iField )
 void oracle_init ( void ) __attribute__((__constructor__));
 void oracle_init ( void )
 	{
-	rc_file::process_rc_file ( "yaal", "oracle", n_psVariables, NULL );
+	yaalOptions( "instance_name", program_options_helper::option_value( g_oInstanceName ), NULL, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "name", "name of the Oracle database instance", NULL );
+	yaalOptions.process_rc_file( "yaal", "oracle", NULL );
 	return;
 	}
 

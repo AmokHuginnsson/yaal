@@ -34,7 +34,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "tools.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/xalloc.hxx"
-#include "hcore/rc_file.hxx"    /* read conf from rc */
+#include "hcore/hprogramoptionshandler.hxx"    /* read conf from rc */
 #include "hcore/hlog.hxx"       /* log object */
 #include "hcore/hstring.hxx"    /* HString class */
 #include "util.hxx" /* atof_ex */
@@ -74,16 +74,6 @@ int n_iCollectorConnectionTimeOut = 9999;
 bool n_bIgnoreSignalSIGINT = false;
 bool n_bIgnoreSignalSIGTSTP = false;
 bool n_bIgnoreSignalSIGQUIT = false;
-
-OOption n_psVariables [ ] =
-	{
-		{ "ignore_signal_SIGINT", TYPE::D_BOOL, &n_bIgnoreSignalSIGINT, 0, OOption::D_OPTIONAL, NULL, "ignore INT (interrupt) signal", NULL },
-		{ "ignore_signal_SIGTSTP", TYPE::D_BOOL, &n_bIgnoreSignalSIGTSTP, 0, OOption::D_OPTIONAL, NULL, "ignore TSTP (terminal stop, suspend) signal", NULL },
-		{ "ignore_signal_SIGQUIT", TYPE::D_BOOL, &n_bIgnoreSignalSIGQUIT, 0, OOption::D_OPTIONAL, NULL, "ignore QUIT, core dump signal", NULL },
-		{ "serial_device", TYPE::D_CHAR_PTR, &n_pcSerialDevice, 0, OOption::D_REQUIRED, NULL, "path to serial device", NULL },
-		{ "collector_connection_timeout", TYPE::D_INT, &n_iCollectorConnectionTimeOut, 0, OOption::D_REQUIRED, NULL, "timeout on collector device read", NULL },
-		{ NULL, TYPE::D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
-	};
 	
 namespace util
 	{
@@ -175,11 +165,15 @@ public:
 HToolsInitDeinit::HToolsInitDeinit( void )
 	{
 	M_PROLOG
+	yaalOptions( "ignore_signal_SIGINT", program_options_helper::option_value( n_bIgnoreSignalSIGINT ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "ignore INT (interrupt) signal", NULL )
+			( "ignore_signal_SIGTSTP", program_options_helper::option_value( n_bIgnoreSignalSIGTSTP ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "ignore TSTP (terminal stop, suspend) signal", NULL )
+			( "ignore_signal_SIGQUIT", program_options_helper::option_value( n_bIgnoreSignalSIGQUIT ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "ignore QUIT, core dump signal", NULL )
+			( "serial_device", program_options_helper::option_value( n_pcSerialDevice ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "path to serial device", NULL )
+			( "collector_connection_timeout", program_options_helper::option_value( n_iCollectorConnectionTimeOut ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "timeout on collector device read", NULL );
 	int l_iCtr = 0;
 	errno = 0;
 	extendable::my_strtold = smart_strtold;
-	rc_file::process_rc_file ( "yaal", "tools", tools::n_psVariables,
-			set_tools_variables );
+	yaalOptions.process_rc_file ( "yaal", "tools", set_tools_variables );
 	for ( l_iCtr = 0; l_iCtr < 256; l_iCtr ++ )
 		util::n_pcTransTableStripPL[ l_iCtr ] = static_cast<char>( l_iCtr );
 	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '±' ) ] = 'a';

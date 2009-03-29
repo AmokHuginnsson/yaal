@@ -40,7 +40,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore.hxx"
 #include "hlog.hxx"
 #include "hstring.hxx"
-#include "rc_file.hxx"
+#include "hprogramoptionshandler.hxx"
 #include "hsingleton.hxx"
 #include "hopenssl.hxx"
 #include "hsocket.hxx"
@@ -55,13 +55,7 @@ int n_iDebugLevel = 0;
 typedef HSingleton<HLog> HLogService;
 HLog& log = HLogService::get_instance( 1000 );
 
-OOption n_psHCoreVariables[] =
-	{
-		{ "ssl_key", TYPE::D_HSTRING, &HOpenSSL::f_oSSLKey, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL private key file.", NULL },
-		{ "ssl_cert", TYPE::D_HSTRING, &HOpenSSL::f_oSSLCert, 0, OOption::D_REQUIRED, NULL, "Path to the OpenSSL certificate file.", NULL },
-		{ "resolve_hostnames", TYPE::D_BOOL, &HSocket::f_bResolveHostnames, 0, OOption::D_REQUIRED, NULL, "Resolve IP address into host names.", NULL },
-		{ NULL, TYPE::D_VOID, NULL, 0, OOption::D_NONE, NULL, NULL, NULL }
-	};
+HProgramOptionsHandler yaalOptions;
 
 /* mathematical macros */
 static double long const D_EPSILON = 0.000001;
@@ -190,20 +184,21 @@ public:
 
 HCoreInitDeinit::HCoreInitDeinit( void )
 	{
-	char* l_pcEnv = NULL;
 	STATIC_ASSERT( sizeof( int ) >= 4 );
 	STATIC_ASSERT( sizeof( u8_t ) == 1 );
 	STATIC_ASSERT( sizeof( u16_t ) == 2 );
 	STATIC_ASSERT( sizeof( u32_t ) == 4 );
+	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::f_oSSLKey ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Path to the OpenSSL private key file.", NULL )
+		( "ssl_cert", program_options_helper::option_value( HOpenSSL::f_oSSLCert ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Path to the OpenSSL certificate file.", NULL )
+		( "resolve_hostnames", program_options_helper::option_value( HSocket::f_bResolveHostnames ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Resolve IP address into host names.", NULL );
 #if 0
 	STATIC_ASSERT( sizeof( u64_t ) == 8 );
 #endif
 	errno = 0;
-	l_pcEnv = ::getenv( "YAAL_DEBUG" );
+	char* l_pcEnv = ::getenv( "YAAL_DEBUG" );
 	if ( l_pcEnv )
 		n_iDebugLevel = lexical_cast<int>( l_pcEnv );
-	rc_file::process_rc_file( "yaal", "core",
-				n_psHCoreVariables, set_hcore_variables );
+	yaalOptions.process_rc_file( "yaal", "core", set_hcore_variables );
 	return;
 	}
 

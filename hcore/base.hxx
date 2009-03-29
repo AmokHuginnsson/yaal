@@ -890,7 +890,7 @@ struct TYPE
 	{
 	typedef enum
 		{
-		D_VOID        = 0x0000,
+		D_UNKNOWN     = 0x0000,
 		D_BOOL        = 0x0001,
 		D_CHAR        = 0x0002,
 		D_INT_SHORT   = 0x0004,
@@ -904,13 +904,21 @@ struct TYPE
 		D_HSTRING     = 0x0400,
 		D_HNUMBER     = 0x0800,
 		D_HINFO       = 0x1000,
-		D_HHASHMAP    = 0x2000,
-		D_HLIST       = 0x4000,
-		D_HTIME       = 0x8000,
-		D_MASK        = 0xffff
+		D_HTIME       = 0x2000,
+		D_CONTAINER   = 0x4000,
+		D_VOID        = 0x8000
 		} enum_t;
+	template<typename tType>
+	struct symbolic;
 	};
 typedef yaal::hcore::HStrongEnum<TYPE> type_t; /*!< Strong enumeration of PODs. */
+template<>
+struct TYPE::symbolic<void>
+	{ static enum_t const type = D_VOID; };
+
+template<typename tType>
+struct TYPE::symbolic
+	{ static enum_t const type = D_UNKNOWN; };
 
 typedef char unsigned u8_t; /*!< 8 bit unsigned integer. */
 typedef int short unsigned u16_t; /*!< 16 bit unsigned integer. */
