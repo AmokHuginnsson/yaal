@@ -81,13 +81,18 @@ public:
 				} enum_t;
 			};
 		char const* f_pcName;
-		TYPE::enum_t f_eSwitchType;
 		HOptionValueInterface::ptr_t f_oValue;
 		char const* f_pcShortForm;
+		TYPE::enum_t f_eSwitchType;
 		char const* f_pcArgument;
 		char const* f_pcDescription;
 		simple_callback_t* CALLBACK;
 		OOption( void );
+		OOption(
+				char const*, HOptionValueInterface::ptr_t,
+				char const*, TYPE::enum_t,
+				char const*, char const*,
+				HProgramOptionsHandler::simple_callback_t* );
 		OOption( OOption const& );
 		OOption& operator = ( OOption const& );
 		void swap( OOption& );
@@ -124,6 +129,8 @@ public:
 	 * that are common in Unix world.
 	 */
 	int process_rc_file( HString const&, HString const&, RC_CALLBACK_t = NULL );
+	options_t const& get_options( void ) const
+		{ return ( f_oOptions ); }
 private:
 	void set_option( OOption&, HString const& );
 	};
@@ -171,6 +178,14 @@ protected:
 		}
 	};
 
+template<typename tType>
+tType const& HProgramOptionsHandler::HOptionValueInterface::get( void ) const
+	{
+	M_PROLOG
+	return ( *static_cast<tType const*>( do_get() ) );
+	M_EPILOG
+	}
+
 namespace program_options_helper
 {
 
@@ -182,6 +197,8 @@ HProgramOptionsHandler::HOptionValueInterface::ptr_t option_value( tType& instan
 	HProgramOptionsHandler::HOptionValueInterface::ptr_t value( new HProgramOptionsHandler::HOptionValue<tType>( instance ) );
 	return ( value );
 	}
+
+static HProgramOptionsHandler::HOptionValueInterface::ptr_t no_value;
 
 int reload_configuration( void );
 

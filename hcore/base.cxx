@@ -171,6 +171,30 @@ bool lexical_cast( HString const& a_oValue )
 	M_EPILOG
 	}
 
+template<>
+char lexical_cast( HString const& val )
+	{
+	M_PROLOG
+	return ( val.is_empty() ? static_cast<char>( 0 ) : val[ 0 ] );
+	M_EPILOG
+	}
+
+template<>
+char const* lexical_cast( HString const& val )
+	{
+	M_PROLOG
+	return ( val.raw() );
+	M_EPILOG
+	}
+
+template<>
+HString lexical_cast( HString const& val )
+	{
+	M_PROLOG
+	return ( val );
+	M_EPILOG
+	}
+
 char const* error_message( int const& a_iCode )
 	{
 	return ( ::strerror( a_iCode ) );

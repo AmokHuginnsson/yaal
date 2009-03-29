@@ -205,6 +205,76 @@ public:
 		{ f_rbLock = false; }
 	};
 
+HProgramOptionsHandler::OOption::OOption( void )
+	: f_pcName( NULL ), f_oValue(),
+	f_pcShortForm( NULL ), f_eSwitchType( TYPE::D_NONE ),
+	f_pcArgument( NULL ), f_pcDescription( NULL ),
+	CALLBACK( NULL ) {}
+
+HProgramOptionsHandler::OOption::OOption(
+		char const* a_pcName,
+		HOptionValueInterface::ptr_t a_oValue,
+		char const* a_pcShortForm,
+		TYPE::enum_t a_eSwitchType,
+		char const* a_pcArgument,
+		char const* a_pcDescription,
+		HProgramOptionsHandler::simple_callback_t* a_CALLBACK )
+	: f_pcName( a_pcName ), f_oValue( a_oValue ),
+	f_pcShortForm( a_pcShortForm ), f_eSwitchType( a_eSwitchType ),
+	f_pcArgument( a_pcArgument ), f_pcDescription( a_pcDescription ),
+	CALLBACK( a_CALLBACK ) {}
+
+HProgramOptionsHandler::OOption::OOption( HProgramOptionsHandler::OOption const& o )
+	: f_pcName( o.f_pcName ), f_oValue( o.f_oValue ),
+	f_pcShortForm( o.f_pcShortForm ), f_eSwitchType( o.f_eSwitchType ),
+	f_pcArgument( o.f_pcArgument ), f_pcDescription( o.f_pcDescription ),
+	CALLBACK( o.CALLBACK ) {}
+
+HProgramOptionsHandler::OOption& HProgramOptionsHandler::OOption::operator = ( HProgramOptionsHandler::OOption const& o )
+	{
+	M_PROLOG
+	if ( &o != this )
+		{
+		OOption tmp( o );
+		swap( tmp );
+		}
+	return ( *this );
+	M_EPILOG
+	}
+
+void HProgramOptionsHandler::OOption::swap( HProgramOptionsHandler::OOption& o )
+	{
+	M_PROLOG
+	if ( &o != this )
+		{
+		using yaal::swap;
+		swap( f_pcName, o.f_pcName );
+		swap( f_oValue, o.f_oValue );
+		swap( f_pcShortForm, o.f_pcShortForm );
+		swap( f_eSwitchType, o.f_eSwitchType );
+		swap( f_pcArgument, o.f_pcArgument );
+		swap( f_pcDescription, o.f_pcDescription );
+		swap( CALLBACK, o.CALLBACK );
+		}
+	return;
+	M_EPILOG
+	}
+
+void HProgramOptionsHandler::HOptionValueInterface::set( HString const& val )
+	{
+	M_PROLOG
+	do_set( val );
+	return;
+	M_EPILOG
+	}
+
+type_t HProgramOptionsHandler::HOptionValueInterface::get_type( void ) const
+	{
+	M_PROLOG
+	return ( do_get_type() );
+	M_EPILOG
+	}
+
 int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 		HString const& a_oSection, RC_CALLBACK_t rc_callback )
 	{
@@ -290,12 +360,13 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 	M_EPILOG
 	}
 
-HProgramOptionsHandler& HProgramOptionsHandler::operator()( char const* name, HOptionValueInterface::ptr_t value, char const*, OOption::TYPE::enum_t const&, char const*, char const*, simple_callback_t* )
+HProgramOptionsHandler& HProgramOptionsHandler::operator()(
+		char const* name, HOptionValueInterface::ptr_t value,
+		char const* shortForm, OOption::TYPE::enum_t const& type,
+		char const* arg, char const* desc, simple_callback_t* callback )
 	{
 	M_PROLOG
-	OOption o;
-	o.f_pcName = name;
-	o.f_oValue = value;
+	OOption o( name, value, shortForm, type, arg, desc, callback );
 	f_oOptions.push_back( o );
 	return ( *this );
 	M_EPILOG
@@ -309,6 +380,9 @@ void process_loader( ORCLoader& loader )
 	M_EPILOG
 	}
 
+namespace program_options_helper
+{
+
 int reload_configuration( void )
 	{
 	M_PROLOG
@@ -318,6 +392,8 @@ int reload_configuration( void )
 	return ( 0 );
 	M_EPILOG
 	}
+
+}
 
 /* Reads one line from a_psFile, stores beginning of line in a_roOption, 
  * stores rest of line in a_pcValue, returns 1 if there are more lines

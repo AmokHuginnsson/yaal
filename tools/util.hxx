@@ -59,9 +59,9 @@ double long atof_ex( yaal::hcore::HString const&, bool = false );
 bool verify_IBAN( yaal::hcore::HString const& );
 char const* get_last_error( void );
 
-void show_help( yaal::hcore::HProgramOptionsHandler::options_t const&, int, char const* const, char const* const, char const* const = NULL );
-void dump_configuration( yaal::hcore::HProgramOptionsHandler::options_t const&, int, char const* const, char const* const, char const* const = NULL );
-typedef void ( * OPTION_PROCESSOR_t )( yaal::hcore::HProgramOptionsHandler::options_t const&, int, char const* const, char const* const, char const* const );
+void show_help( yaal::hcore::HProgramOptionsHandler::options_t const&, char const* const, char const* const, char const* const = NULL );
+void dump_configuration( yaal::hcore::HProgramOptionsHandler::options_t const&, char const* const, char const* const, char const* const = NULL );
+typedef void ( * OPTION_PROCESSOR_t )( yaal::hcore::HProgramOptionsHandler::options_t const&, char const* const, char const* const, char const* const );
 /*! \brief Helper structure for displaing program help and current configuration.
  */
 struct OOptionInfo

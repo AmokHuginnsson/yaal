@@ -314,7 +314,9 @@ char const* get_last_error( void )
 	return ( "" );
 	}
 
-void show_help( HProgramOptionsHandler::options_t const& a_oOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
+void show_help( HProgramOptionsHandler::options_t const& a_oOptions,
+		char const* const a_pcProgramName, char const* const a_pcIntro,
+		char const* const a_pcNotes )
 	{
 	M_PROLOG
 	::printf(
@@ -325,20 +327,22 @@ void show_help( HProgramOptionsHandler::options_t const& a_oOptions, int a_iCoun
 			a_pcProgramName, a_pcProgramName, a_pcIntro );
 	size_t l_iLongestLongLength = 0;
 	size_t l_iLongestShortLength = 0;
-	for ( int i = 0; i < a_iCount; ++ i )
+	for ( HProgramOptionsHandler::options_t::const_iterator it = a_oOptions.begin(), end = a_oOptions.end();
+			it != end; ++ it )
 		{
-		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
+		HProgramOptionsHandler::OOption const& o = *it;
 		size_t tmp = ( o.f_pcName ? ::strlen( o.f_pcName ) + 2 : 0 ) + ( o.f_pcArgument ? ::strlen( o.f_pcArgument ) + 1 : 0 ) + ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL ? 2 : 1 );
 		if ( tmp > l_iLongestLongLength )
 			l_iLongestLongLength = tmp;
 		tmp = 0;
-		if ( a_oOptions[ i ].f_pcShortForm && ( ( tmp = ::strlen( a_oOptions[ i ].f_pcShortForm ) + 1 ) > l_iLongestShortLength ) )
+		if ( it->f_pcShortForm && ( ( tmp = ::strlen( it->f_pcShortForm ) + 1 ) > l_iLongestShortLength ) )
 			l_iLongestShortLength = tmp;
 		}
 	HString desc;
 	char const* description = NULL;
 	/* display each option description */
-	for ( int i = 0; i < a_iCount; ++ i )
+	int const COUNT = a_oOptions.size();
+	for ( int i = 0; i < COUNT; ++ i )
 		{
 		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
 		if ( ! ( o.f_pcShortForm || o.f_pcName ) )
@@ -406,7 +410,7 @@ void show_help( HProgramOptionsHandler::options_t const& a_oOptions, int a_iCoun
 				desc.shift_left( eol );
 				desc.trim_left();
 				desc.insert( 0, 2, "  " );
-				if ( i < ( a_iCount - 1 ) )
+				if ( i < ( COUNT - 1 ) )
 					{
 					HProgramOptionsHandler::OOption const& n = a_oOptions[ i + 1 ];
 					if ( ( o.f_pcName && n.f_pcName && ( ! ::strcmp( o.f_pcName, n.f_pcName ) ) )
@@ -433,7 +437,7 @@ void show_help( HProgramOptionsHandler::options_t const& a_oOptions, int a_iCoun
 	M_EPILOG
 	}
 
-void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, int a_iCount, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
+void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
 	{
 	M_PROLOG
 	a_pcProgramName && ::printf( "# this is configuration file for: `%s' program\n", a_pcProgramName );
@@ -459,7 +463,8 @@ void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, in
 	);
 	HString desc;
 	char const* description = NULL;
-	for ( int i = 0; i < a_iCount; ++ i )
+	int const COUNT = a_oOptions.size();
+	for ( int i = 0; i < COUNT; ++ i )
 		{
 		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
 		if ( ! o.f_pcName )
@@ -530,7 +535,7 @@ void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, in
 				break;
 				case ( TYPE::D_CHAR_PTR ):
 					{
-					char* ptr = o.f_oValue->get<char*>();
+					char const* ptr = o.f_oValue->get<char const*>();
 					::printf( "%s%s %s\n", ptr && ptr[ 0 ] ? "" : "# ", o.f_pcName, ptr );
 					}
 				break;

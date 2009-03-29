@@ -66,7 +66,7 @@ HSerial::HSerial( HString const& a_oDevicePath )
 	if ( !! a_oDevicePath )
 		f_oDevicePath = a_oDevicePath;
 	else
-		f_oDevicePath = tools::n_pcSerialDevice;
+		f_oDevicePath = tools::n_oSerialDevice;
 	compile();
 	return;
 	M_EPILOG

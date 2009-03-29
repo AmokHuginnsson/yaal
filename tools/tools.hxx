@@ -40,7 +40,7 @@ namespace yaal
 namespace tools
 	{
 	
-extern char* n_pcSerialDevice;
+extern yaal::hcore::HString n_oSerialDevice;
 extern HSerial::speed_t n_eBaudRate;
 extern HSerial::flag_t n_eSerialFlags;
 extern int n_iCollectorConnectionTimeOut;
