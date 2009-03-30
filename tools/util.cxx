@@ -341,7 +341,7 @@ void show_help( HProgramOptionsHandler::options_t const& a_oOptions,
 	HString desc;
 	char const* description = NULL;
 	/* display each option description */
-	int const COUNT = a_oOptions.size();
+	int const COUNT = static_cast<int>( a_oOptions.size() );
 	for ( int i = 0; i < COUNT; ++ i )
 		{
 		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
@@ -463,7 +463,7 @@ void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, ch
 	);
 	HString desc;
 	char const* description = NULL;
-	int const COUNT = a_oOptions.size();
+	int const COUNT = static_cast<int>( a_oOptions.size() );
 	for ( int i = 0; i < COUNT; ++ i )
 		{
 		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
