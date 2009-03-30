@@ -399,7 +399,7 @@ char * rs_column_name ( void* a_pvDataR, int a_iField )
 void oracle_init ( void ) __attribute__((__constructor__));
 void oracle_init ( void )
 	{
-	yaalOptions( "instance_name", program_options_helper::option_value( g_oInstanceName ), NULL, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "name", "name of the Oracle database instance", NULL );
+	yaalOptions( "instance_name", program_options_helper::option_value( g_oInstanceName ), NULL, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "name", "name of the Oracle database instance" );
 	yaalOptions.process_rc_file( "yaal", "oracle", NULL );
 	return;
 	}

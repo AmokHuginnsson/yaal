@@ -209,7 +209,7 @@ HProgramOptionsHandler::OOption::OOption( void )
 	: f_pcName( NULL ), f_oValue(),
 	f_pcShortForm( NULL ), f_eSwitchType( TYPE::D_NONE ),
 	f_pcArgument( NULL ), f_pcDescription( NULL ),
-	CALLBACK( NULL ) {}
+	CALLBACK() {}
 
 HProgramOptionsHandler::OOption::OOption(
 		char const* a_pcName,
@@ -218,7 +218,7 @@ HProgramOptionsHandler::OOption::OOption(
 		TYPE::enum_t a_eSwitchType,
 		char const* a_pcArgument,
 		char const* a_pcDescription,
-		HProgramOptionsHandler::simple_callback_t* a_CALLBACK )
+		HProgramOptionsHandler::simple_callback_t const& a_CALLBACK )
 	: f_pcName( a_pcName ), f_oValue( a_oValue ),
 	f_pcShortForm( a_pcShortForm ), f_eSwitchType( a_eSwitchType ),
 	f_pcArgument( a_pcArgument ), f_pcDescription( a_pcDescription ),
@@ -363,7 +363,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 		char const* name, HOptionValueInterface::ptr_t value,
 		char const* shortForm, OOption::TYPE::enum_t const& type,
-		char const* arg, char const* desc, simple_callback_t* callback )
+		char const* arg, char const* desc, simple_callback_t const& callback )
 	{
 	M_PROLOG
 	OOption o( name, value, shortForm, type, arg, desc, callback );
@@ -534,8 +534,8 @@ void HProgramOptionsHandler::set_option( OOption& a_sOption, HString const& a_oV
 		else
 			a_sOption.f_oValue->set( a_oValue );
 		}
-	if ( a_sOption.CALLBACK )
-		a_sOption.CALLBACK->first( a_sOption.CALLBACK->second );
+	if ( a_sOption.CALLBACK.first )
+		a_sOption.CALLBACK.first( a_sOption.CALLBACK.second );
 	return;
 	M_EPILOG
 	}

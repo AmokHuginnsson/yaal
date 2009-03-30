@@ -50,7 +50,7 @@ namespace hcore
 class HProgramOptionsHandler
 	{
 public:
-	typedef bool ( * RC_CALLBACK_t )( HString&, HString& );
+	typedef bool ( *RC_CALLBACK_t )( HString&, HString& );
 	typedef void ( *param_callback_t )( void* );
 	typedef yaal::hcore::HPair<param_callback_t, void*> simple_callback_t; 
 	class HOptionValueInterface
@@ -86,13 +86,13 @@ public:
 		TYPE::enum_t f_eSwitchType;
 		char const* f_pcArgument;
 		char const* f_pcDescription;
-		simple_callback_t* CALLBACK;
+		simple_callback_t CALLBACK;
 		OOption( void );
 		OOption(
 				char const*, HOptionValueInterface::ptr_t,
 				char const*, TYPE::enum_t,
 				char const*, char const*,
-				HProgramOptionsHandler::simple_callback_t* );
+				HProgramOptionsHandler::simple_callback_t const& );
 		OOption( OOption const& );
 		OOption& operator = ( OOption const& );
 		void swap( OOption& );
@@ -110,7 +110,7 @@ public:
 	 *
 	 * \param name - option name.
 	 */
-	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t, char const*, OOption::TYPE::enum_t const&, char const*, char const*, simple_callback_t* );
+	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t, char const*, OOption::TYPE::enum_t const&, char const*, char const*, simple_callback_t const& = simple_callback_t( NULL, NULL ) );
 	/*! \brief Parse command line options and set program setup variables.
 	 *
 	 * process_command_line gives easy to use API for interpreting and handling
@@ -199,6 +199,11 @@ HProgramOptionsHandler::HOptionValueInterface::ptr_t option_value( tType& instan
 	}
 
 static HProgramOptionsHandler::HOptionValueInterface::ptr_t no_value;
+
+inline yaal::hcore::HProgramOptionsHandler::simple_callback_t callback( yaal::hcore::HProgramOptionsHandler::param_callback_t func, void* param )
+	{
+	return ( HProgramOptionsHandler::simple_callback_t( func, param ) );
+	}
 
 int reload_configuration( void );
 

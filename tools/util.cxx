@@ -314,20 +314,20 @@ char const* get_last_error( void )
 	return ( "" );
 	}
 
-void show_help( HProgramOptionsHandler::options_t const& a_oOptions,
-		char const* const a_pcProgramName, char const* const a_pcIntro,
-		char const* const a_pcNotes )
+void show_help( void* arg )
 	{
 	M_PROLOG
+	OOptionInfo& info = *static_cast<OOptionInfo*>( arg );
 	::printf(
 "Usage: %s [OPTION]... [FILE]...\n"
 "%s - %s\n\n"
 "Mandatory arguments to long options are mandatory for short options too.\n"
 "Options:\n",
-			a_pcProgramName, a_pcProgramName, a_pcIntro );
+			info._name, info._name, info._intro );
 	size_t l_iLongestLongLength = 0;
 	size_t l_iLongestShortLength = 0;
-	for ( HProgramOptionsHandler::options_t::const_iterator it = a_oOptions.begin(), end = a_oOptions.end();
+	HProgramOptionsHandler::options_t const& opts = info._opt.get_options();
+	for ( HProgramOptionsHandler::options_t::const_iterator it = opts.begin(), end = opts.end();
 			it != end; ++ it )
 		{
 		HProgramOptionsHandler::OOption const& o = *it;
@@ -341,10 +341,10 @@ void show_help( HProgramOptionsHandler::options_t const& a_oOptions,
 	HString desc;
 	char const* description = NULL;
 	/* display each option description */
-	int const COUNT = static_cast<int>( a_oOptions.size() );
+	int const COUNT = static_cast<int>( opts.size() );
 	for ( int i = 0; i < COUNT; ++ i )
 		{
-		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
+		HProgramOptionsHandler::OOption const& o = opts[ i ];
 		if ( ! ( o.f_pcShortForm || o.f_pcName ) )
 			continue;
 		HString sf;
@@ -374,7 +374,7 @@ void show_help( HProgramOptionsHandler::options_t const& a_oOptions,
 			}
 		if ( i > 0 ) /* subsequent options */
 			{
-			HProgramOptionsHandler::OOption const& p = a_oOptions[ i - 1 ];
+			HProgramOptionsHandler::OOption const& p = opts[ i - 1 ];
 			if ( o.f_pcName && p.f_pcName && ( ! ::strcmp( o.f_pcName, p.f_pcName ) ) )
 				{
 				lf = "", coma = " ";
@@ -412,7 +412,7 @@ void show_help( HProgramOptionsHandler::options_t const& a_oOptions,
 				desc.insert( 0, 2, "  " );
 				if ( i < ( COUNT - 1 ) )
 					{
-					HProgramOptionsHandler::OOption const& n = a_oOptions[ i + 1 ];
+					HProgramOptionsHandler::OOption const& n = opts[ i + 1 ];
 					if ( ( o.f_pcName && n.f_pcName && ( ! ::strcmp( o.f_pcName, n.f_pcName ) ) )
 							|| ( o.f_pcShortForm && n.f_pcShortForm && ( ! ::strcmp( o.f_pcShortForm, n.f_pcShortForm ) ) ) )
 						{
@@ -431,18 +431,19 @@ void show_help( HProgramOptionsHandler::options_t const& a_oOptions,
 			}
 		while ( loop );
 		}
-	if ( a_pcNotes )
-		::printf( "\n%s\n", a_pcNotes );
+	if ( info._note )
+		::printf( "\n%s\n", info._note );
 	return;
 	M_EPILOG
 	}
 
-void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, char const* const a_pcProgramName, char const* const a_pcIntro, char const* const a_pcNotes )
+void dump_configuration( void* arg )
 	{
 	M_PROLOG
-	a_pcProgramName && ::printf( "# this is configuration file for: `%s' program\n", a_pcProgramName );
-	a_pcIntro && ::printf( "# %s\n", a_pcIntro );
-	if ( a_pcProgramName || a_pcIntro )
+	OOptionInfo& info = *static_cast<OOptionInfo*>( arg );
+	info._name && ::printf( "# this is configuration file for: `%s' program\n", info._name );
+	info._intro && ::printf( "# %s\n", info._intro );
+	if ( info._name || info._intro )
 		::printf( "\n" );
 	::printf(
 "# comments begin with `#' char and continues until end of line\n"
@@ -463,15 +464,16 @@ void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, ch
 	);
 	HString desc;
 	char const* description = NULL;
-	int const COUNT = static_cast<int>( a_oOptions.size() );
+	HProgramOptionsHandler::options_t const& opts = info._opt.get_options();
+	int const COUNT = static_cast<int>( opts.size() );
 	for ( int i = 0; i < COUNT; ++ i )
 		{
-		HProgramOptionsHandler::OOption const& o = a_oOptions[ i ];
+		HProgramOptionsHandler::OOption const& o = opts[ i ];
 		if ( ! o.f_pcName )
 			continue;
 		if ( i > 0 ) /* subsequent options */
 			{
-			HProgramOptionsHandler::OOption const& p = a_oOptions[ i - 1 ];
+			HProgramOptionsHandler::OOption const& p = opts[ i - 1 ];
 			if ( o.f_pcName && p.f_pcName
 					&& ( ! ::strcmp( o.f_pcName, p.f_pcName ) )
 					&& ( o.f_pcDescription == description ) )
@@ -562,7 +564,7 @@ void dump_configuration( HProgramOptionsHandler::options_t const& a_oOptions, ch
 			}
 		::printf( "\n" );
 		}
-	a_pcNotes && ::printf( "# %s\n\n", a_pcNotes );
+	info._note && ::printf( "# %s\n\n", info._note );
 	::printf( "# vim: ft=conf\n" );
 	return;
 	M_EPILOG

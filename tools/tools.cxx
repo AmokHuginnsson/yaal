@@ -165,11 +165,11 @@ public:
 HToolsInitDeinit::HToolsInitDeinit( void )
 	{
 	M_PROLOG
-	yaalOptions( "ignore_signal_SIGINT", program_options_helper::option_value( n_bIgnoreSignalSIGINT ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "ignore INT (interrupt) signal", NULL )
-			( "ignore_signal_SIGTSTP", program_options_helper::option_value( n_bIgnoreSignalSIGTSTP ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "ignore TSTP (terminal stop, suspend) signal", NULL )
-			( "ignore_signal_SIGQUIT", program_options_helper::option_value( n_bIgnoreSignalSIGQUIT ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "ignore QUIT, core dump signal", NULL )
-			( "serial_device", program_options_helper::option_value( n_oSerialDevice ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "path to serial device", NULL )
-			( "collector_connection_timeout", program_options_helper::option_value( n_iCollectorConnectionTimeOut ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "timeout on collector device read", NULL );
+	yaalOptions( "ignore_signal_SIGINT", program_options_helper::option_value( n_bIgnoreSignalSIGINT ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "ignore INT (interrupt) signal" )
+			( "ignore_signal_SIGTSTP", program_options_helper::option_value( n_bIgnoreSignalSIGTSTP ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "ignore TSTP (terminal stop, suspend) signal" )
+			( "ignore_signal_SIGQUIT", program_options_helper::option_value( n_bIgnoreSignalSIGQUIT ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "ignore QUIT, core dump signal" )
+			( "serial_device", program_options_helper::option_value( n_oSerialDevice ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "path to serial device" )
+			( "collector_connection_timeout", program_options_helper::option_value( n_iCollectorConnectionTimeOut ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "timeout on collector device read" );
 	int l_iCtr = 0;
 	errno = 0;
 	extendable::my_strtold = smart_strtold;

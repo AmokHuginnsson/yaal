@@ -43,7 +43,7 @@ namespace tools
 /*! \brief Small but useful utils.
  */
 namespace util
-	{
+{
 
 template<typename iter_t, typename pred_t>
 iter_t find_local( iter_t it, iter_t end, pred_t pred )
@@ -59,21 +59,23 @@ double long atof_ex( yaal::hcore::HString const&, bool = false );
 bool verify_IBAN( yaal::hcore::HString const& );
 char const* get_last_error( void );
 
-void show_help( yaal::hcore::HProgramOptionsHandler::options_t const&, char const* const, char const* const, char const* const = NULL );
-void dump_configuration( yaal::hcore::HProgramOptionsHandler::options_t const&, char const* const, char const* const, char const* const = NULL );
-typedef void ( * OPTION_PROCESSOR_t )( yaal::hcore::HProgramOptionsHandler::options_t const&, char const* const, char const* const, char const* const );
 /*! \brief Helper structure for displaing program help and current configuration.
  */
 struct OOptionInfo
 	{
-	yaal::hcore::HProgramOptionsHandler::options_t const& _opt;
-	OPTION_PROCESSOR_t PROC;
-	OOptionInfo( yaal::hcore::HProgramOptionsHandler::options_t const& opt, OPTION_PROCESSOR_t const& a_PROC )
-		: _opt( opt ), PROC( a_PROC ) {}
+	yaal::hcore::HProgramOptionsHandler const& _opt;
+	char const* _name;
+	char const* _intro;
+	char const* _note;
+	OOptionInfo( yaal::hcore::HProgramOptionsHandler const& opt, char const* const name, char const* const intro, char const* const note )
+		: _opt( opt ), _name( name ), _intro( intro ), _note( note ) {}
 private:
 	OOptionInfo( OOptionInfo const& );
 	OOptionInfo& operator = ( OOptionInfo const& );
 	};
+
+void show_help( void* );
+void dump_configuration( void* );
 
 void failure( int, char const* const, ... ) __attribute__(( __noreturn__ ));
 
@@ -138,7 +140,7 @@ HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, bool damerau = tr
 
 }
 
-	}
+}
 
 }
 
