@@ -152,9 +152,8 @@ bool HRawFile::is_write_ready( int a_iFileDescriptor )
 int long HRawFile::do_write( void const* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	if ( is_write_ready( f_iFileDescriptor ) )
-		return ( (this->*writer)( a_pcBuffer, a_lSize ) ); 
-	return ( -1 );
+	int long done = ( f_iTimeOut || is_write_ready( f_iFileDescriptor ) ) ? (this->*writer)( a_pcBuffer, a_lSize ) : -1;
+	return ( done );
 	M_EPILOG
 	}
 
