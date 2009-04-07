@@ -188,9 +188,6 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	STATIC_ASSERT( sizeof( u8_t ) == 1 );
 	STATIC_ASSERT( sizeof( u16_t ) == 2 );
 	STATIC_ASSERT( sizeof( u32_t ) == 4 );
-	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::f_oSSLKey ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Path to the OpenSSL private key file." )
-		( "ssl_cert", program_options_helper::option_value( HOpenSSL::f_oSSLCert ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Path to the OpenSSL certificate file." )
-		( "resolve_hostnames", program_options_helper::option_value( HSocket::f_bResolveHostnames ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Resolve IP address into host names." );
 #if 0
 	STATIC_ASSERT( sizeof( u64_t ) == 8 );
 #endif
@@ -198,6 +195,9 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	char* l_pcEnv = ::getenv( "YAAL_DEBUG" );
 	if ( l_pcEnv )
 		n_iDebugLevel = lexical_cast<int>( l_pcEnv );
+	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::f_oSSLKey ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Path to the OpenSSL private key file." )
+		( "ssl_cert", program_options_helper::option_value( HOpenSSL::f_oSSLCert ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Path to the OpenSSL certificate file." )
+		( "resolve_hostnames", program_options_helper::option_value( HSocket::f_bResolveHostnames ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Resolve IP address into host names." );
 	yaalOptions.process_rc_file( "yaal", "core", set_hcore_variables );
 	return;
 	}

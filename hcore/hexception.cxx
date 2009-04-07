@@ -47,6 +47,7 @@ namespace hcore
 
 void* HException::ERROR_STREAM = stderr;
 
+static int const D_DEBUG_LEVEL_HELPER = 5; /* FIXME */
 char const* const n_pcExceptionType = _( "Exception type" );
 
 HException::HException( char const* const a_pcFileName,
@@ -179,7 +180,6 @@ void HException::print_error( bool const a_bFull ) const
 void HException::log( char const* const a_pcFileName,
 											 char const* const a_pcFunctionName, int const a_iLine )
 	{
-	static int const D_DEBUG_LEVEL_HELPER = 5; /* FIXME */
 	size_t l_uiLength = ::strlen( a_pcFileName );
 	if ( f_iFrame
 			&& ! ( ::strcmp( f_pcFileName, a_pcFileName )
@@ -217,8 +217,8 @@ void HException::failed_assert( char const* const a_pcFileName,
 			a_pcMessage, a_pcFileName, a_iLine, a_pcFunctionName );
 	if ( ! errno )
 		++ errno;
-	if ( getenv( "YAAL_DUMP_ON_FAILED_ASSERTION" ) )
-		abort();
+	if ( n_iDebugLevel > D_DEBUG_LEVEL_HELPER )
+		::abort();
 	throw ( HFailedAssertion( a_pcMessage ) );
 	M_EPILOG
 	}

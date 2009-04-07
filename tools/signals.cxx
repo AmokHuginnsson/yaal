@@ -108,7 +108,8 @@ HSignalService::HSignalService( void )
 	M_PROLOG
 	M_ENSURE( sigemptyset( f_oLocker.get<sigset_t>() ) == 0 );
 	HSignalHandlerInterface::ptr_t base( new HBaseSignalHandlers() );
-	register_handler( SIGINT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_INT ) ) );
+	if ( ! n_iDebugLevel )
+		register_handler( SIGINT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_INT ) ) );
 	register_handler( SIGHUP, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_HUP ) ) );
 	register_handler( SIGTERM, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_TERM ) ) );
 	register_handler( SIGQUIT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_QUIT ) ) );
