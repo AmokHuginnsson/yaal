@@ -30,6 +30,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 
 #include "hstring.hxx"
+#include "hformat.hxx"
 
 using namespace yaal::hcore;
 
@@ -192,6 +193,14 @@ HString lexical_cast( HString const& val )
 	{
 	M_PROLOG
 	return ( val );
+	M_EPILOG
+	}
+
+template<>
+HString lexical_cast( HFormat const& f )
+	{
+	M_PROLOG
+	return ( f.string() );
 	M_EPILOG
 	}
 

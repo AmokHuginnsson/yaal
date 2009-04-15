@@ -32,19 +32,23 @@ Copyright:
 #include <sqlite3.h>
 
 #include "hcore/compat.hxx"
-#include "hcore/xalloc.hxx"
+#include "hcore/hstring.hxx"
 
 using namespace yaal::hcore;
 
 extern "C"
 {
 
-typedef struct
+struct OSQLite
 	{
 	int f_iErrorCode;
-	char* f_pcErrorMessage;
+	HString f_oErrorMessage;
 	sqlite3* f_psDB;
-	} OSQLite;
+	OSQLite( void ) : f_iErrorCode( 0 ), f_oErrorMessage(), f_psDB( NULL ) {}
+private:
+	OSQLite( OSQLite const& );
+	OSQLite& operator = ( OSQLite const& );
+	};
 	
 typedef struct
 	{
@@ -66,9 +70,7 @@ void db_disconnect( void* );
 void* db_connect( char const* a_pcDataBase,
 		char const*, char const* )
 	{
-	int l_iNmLnght = 0;
 	void* l_pvPtr = NULL;
-	char* l_pcDataBase = NULL;
 	char const l_pcFileNameExt[] = ".sqlite3";
 	struct stat l_sStat;
 	OSQLite* l_psSQLite = NULL;
@@ -77,29 +79,25 @@ void* db_connect( char const* a_pcDataBase,
 		db_disconnect( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psSQLite = xcalloc<OSQLite>( 1 );
-	l_iNmLnght = static_cast<int>( ::strlen( a_pcDataBase ) );
-	l_pcDataBase = xcalloc<char>( l_iNmLnght + ::strlen( l_pcFileNameExt ) + 1 );
-	::strcpy( l_pcDataBase, a_pcDataBase );
-	::strcat( l_pcDataBase, l_pcFileNameExt );
-	if ( ::stat( l_pcDataBase, &l_sStat ) )
+	l_psSQLite = new OSQLite;
+	HString l_oDataBase( a_pcDataBase );
+	l_oDataBase += l_pcFileNameExt; 
+	if ( ::stat( l_oDataBase.raw(), &l_sStat ) )
 		{
-		::strcpy( l_pcDataBase + l_iNmLnght, ".db3" );
-		if ( ::stat( l_pcDataBase, &l_sStat ) )
+		l_oDataBase = a_pcDataBase;
+		l_oDataBase += ".db3";
+		if ( ::stat( l_oDataBase.raw(), &l_sStat ) )
 			{
-			::asprintf( &l_psSQLite->f_pcErrorMessage,
-					"Database file `%s' does not exists.", l_pcDataBase );
-			xfree( l_pcDataBase );
+			l_psSQLite->f_oErrorMessage.format( "Database file `%s' does not exists.", l_oDataBase.raw() );
 			g_psBrokenDB = l_psSQLite;
 			return ( NULL );
 			}
 		}
-	l_psSQLite->f_iErrorCode = ::sqlite3_open( l_pcDataBase,
+	l_psSQLite->f_iErrorCode = ::sqlite3_open( l_oDataBase.raw(),
 			&l_psSQLite->f_psDB );
-	xfree( l_pcDataBase );
 	if ( l_psSQLite->f_iErrorCode )
 		{
-		l_psSQLite->f_pcErrorMessage = xstrdup( ::sqlite3_errmsg( l_psSQLite->f_psDB ) );
+		l_psSQLite->f_oErrorMessage = ::sqlite3_errmsg( l_psSQLite->f_psDB );
 		g_psBrokenDB = l_psSQLite;
 		l_psSQLite = NULL;
 		}
@@ -118,10 +116,8 @@ void db_disconnect( void* a_pvData )
 	{
 	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
 	if ( l_psSQLite->f_psDB )
-		sqlite3_close ( l_psSQLite->f_psDB );
-	if ( l_psSQLite->f_pcErrorMessage )
-		xfree ( l_psSQLite->f_pcErrorMessage );
-	xfree ( l_psSQLite );
+		sqlite3_close( l_psSQLite->f_psDB );
+	delete l_psSQLite;
 	return;
 	}
 
@@ -146,8 +142,8 @@ char const* db_error( void* a_pvData )
 		l_psSQLite = g_psBrokenDB;
 	if ( l_psSQLite )
 		{
-		if ( l_psSQLite->f_pcErrorMessage )
-			return ( l_psSQLite->f_pcErrorMessage );
+		if ( ! l_psSQLite->f_oErrorMessage.is_empty() )
+			return ( l_psSQLite->f_oErrorMessage.raw() );
 		return ( sqlite3_errmsg( l_psSQLite->f_psDB ) );
 		}
 	return ( "" );
@@ -157,22 +153,23 @@ void* db_query( void* a_pvData, char const* a_pcQuery )
 	{
 	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
 	OSQLiteResult * l_psResult = NULL;
-	l_psResult = xcalloc<OSQLiteResult>( 1 );
+	l_psResult = new OSQLiteResult;
 	l_psResult->f_iColumns = 0;
 	l_psResult->f_iRows = 0;
 	l_psResult->f_ppcData = NULL;
-	if ( l_psSQLite->f_pcErrorMessage )
-		xfree ( l_psSQLite->f_pcErrorMessage );
-	l_psSQLite->f_iErrorCode = sqlite3_get_table ( l_psSQLite->f_psDB,
+	char* errmsg = NULL;
+	l_psSQLite->f_iErrorCode = sqlite3_get_table( l_psSQLite->f_psDB,
 			a_pcQuery, &l_psResult->f_ppcData, &l_psResult->f_iRows,
-			&l_psResult->f_iColumns, &l_psSQLite->f_pcErrorMessage );
+			&l_psResult->f_iColumns, &errmsg );
+	l_psSQLite->f_oErrorMessage = errmsg;
 	return ( l_psResult );
 	}
 
 void db_unquery( void* a_pvData )
 	{
-	sqlite3_free_table( static_cast<OSQLiteResult*>( a_pvData )->f_ppcData );
-	xfree( a_pvData );
+	OSQLiteResult* pr = static_cast<OSQLiteResult*>( a_pvData );
+	sqlite3_free_table( pr->f_ppcData );
+	delete pr;
 	return;
 	}
 

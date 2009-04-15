@@ -57,7 +57,6 @@ struct DB_DRIVER
 		{
 		D_NONE = 0,
 		D_SQLITE3,
-		D_SQLITE,
 		D_MYSQL, 
 		D_POSTGRESQL,
 		D_ORACLE
@@ -88,8 +87,6 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_NONE;
 		else if ( a_roValue == "SQLite3" )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_SQLITE3;
-		else if ( a_roValue == "SQLite" )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_SQLITE;
 		else if ( a_roValue == "MySQL" )
 			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_MYSQL;
 		else if ( a_roValue == "PostgreSQL" )
