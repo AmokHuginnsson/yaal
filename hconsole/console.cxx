@@ -395,7 +395,7 @@ int HConsole::c_vmvprintf( int a_iRow, int a_iColumn,
 	getyx( stdscr, l_iOrigRow, l_iOrigColumn );
 	if ( a_iColumn < 0 )
 		{
-		M_ENSURE( move ( a_iRow, 0 ) != ERR );
+		M_ENSURE( move( a_iRow, 0 ) != ERR );
 		clrtoeol(); /* Always OK */
 		}
 	else

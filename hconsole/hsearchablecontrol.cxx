@@ -38,10 +38,10 @@ namespace yaal
 namespace hconsole
 {
 
-HSearchableControl::HSearchableControl ( bool a_bSearchable )
-									: HControl ( NULL, 0, 0, 0, 0, NULL ),
-	f_bSearchable ( a_bSearchable ), f_bSearchActived ( false ),
-	f_bFiltered ( false ), f_bBackwards ( false ), f_oPattern()
+HSearchableControl::HSearchableControl( bool a_bSearchable )
+									: HControl( NULL, 0, 0, 0, 0, NULL ),
+	f_bSearchable( a_bSearchable ), f_bSearchActived( false ),
+	f_bFiltered( false ), f_bBackwards( false ), f_oPattern()
 	{
 	M_PROLOG
 	return;
@@ -58,14 +58,13 @@ HSearchableControl::~HSearchableControl ( void )
 void HSearchableControl::search( HString const& a_oPattern, bool a_bBackwards )
 	{
 	M_PROLOG
-	int short unsigned l_uhFlag = 'f';
-	f_bSearchActived = ! f_oPattern.parse( a_oPattern, &l_uhFlag,
-			sizeof ( l_uhFlag ) / sizeof ( int short unsigned ) );
+	HPattern::pluggable_flags_t pf;
+	pf.push_back( make_pair( 'f', &f_bFiltered ) );
+	f_bSearchActived = ! f_oPattern.parse( a_oPattern, &pf );
 	if ( ! f_bSearchActived )
-		f_poParent->status_bar()->message ( f_oPattern.error().raw() );
+		f_poParent->status_bar()->message( f_oPattern.error().raw() );
 	else
 		{
-		f_bFiltered = ( l_uhFlag & 0xff00 ) ? true : false;
 		f_bBackwards = a_bBackwards;
 		if ( f_bBackwards )
 			go_to_match_previous();

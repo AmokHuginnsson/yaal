@@ -29,6 +29,8 @@ Copyright:
 
 #include "hcore/hchunk.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/hpair.hxx"
+#include "hcore/harray.hxx"
 
 namespace yaal
 {
@@ -40,23 +42,37 @@ namespace hcore
  */
 class HPattern
 	{
-	typedef HPattern self_t;
-	bool		f_bInitialized;				/* is pattern initialized */
-	bool		f_bIgnoreCaseDefault;	/* default value for ignore case switch */
-	bool		f_bIgnoreCase;				/* self explanary */
-	bool		f_bExtended;					/* simple strstr or extended RE */
-	int			f_iSimpleMatchLength;	/* length of simple strstr pattern */
-	HChunk	f_oCompiled;					/* compiled regular expression for
-																	 search patterns */
-	HString	f_oPatternInput;			/* current search pattern */
-	HString	f_oPatternReal;				/* pattern with stripped switches */
-	HString f_oError;							/* error message of last operation */
 public:
-	HPattern( bool = false /* default ignore case state */ );
+	class HMatch;
+	class HMatchIterator;
+	typedef HMatchIterator iterator;
+	typedef HPair<char, bool*> flag_desc_t;
+	typedef HArray<flag_desc_t> pluggable_flags_t;
+private:
+	typedef HPattern self_t;
+	bool		f_bInitialized;				/*!< is pattern initialized */
+	bool		f_bIgnoreCaseDefault;	/*!< default value for ignore case switch */
+	bool		f_bIgnoreCase;				/*!< self explanary */
+	bool		f_bExtended;					/*!< simple strstr or extended RE */
+	int			f_iSimpleMatchLength;	/*!< length of simple strstr pattern */
+	HChunk	f_oCompiled;					/*!< compiled regular expression for
+																	 search patterns */
+	HString	f_oPatternInput;			/*!< current search pattern */
+	HString	f_oPatternReal;				/*!< pattern with stripped switches */
+	HString f_oError;							/*!< error message of last operation */
+public:
+	/*! \brief Construct pattern.
+	 *
+	 * caseSentitive - shall defualt match policy be: case matters, default ignore case state
+	 */
+	HPattern( bool caseSentitive = false );
 	virtual ~HPattern( void );
-	int parse( HString const& /* pattern input */,
-							 int short unsigned* const = NULL /*additional flags to parse*/,
-							 int const = 0 /* number of additional flags */ );
+	/*! \brief Parse regular expression patten and prepare for matches retrieval.
+	 *
+	 * pattern - regular expression pattern to match against.
+	 * externalFlags - set of external flags that may by set by pattern extra arguments.
+	 */
+	int parse( HString const& pattern, pluggable_flags_t* externalFlags = NULL );
 	int parse_re( char const* const );
 	HString const& error( void ) const;
 	char const* matches( HString const&,
@@ -65,7 +81,17 @@ public:
 	int count( char const* const );
 private:
 	void prepare_error_message( int const, HString const& );
-	bool set_switch( char const, int short unsigned* const, int const );
+	bool set_switch( char const, pluggable_flags_t* );
+	void save_state( void*, pluggable_flags_t* );
+	void restore_state( void*, pluggable_flags_t* );
+	};
+
+class HPattern::HMatchIterator
+	{
+	};
+
+class HPattern::HMatch
+	{
 	};
 
 typedef HExceptionT<HPattern> HPatternException;

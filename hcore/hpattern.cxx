@@ -41,13 +41,20 @@ namespace yaal
 namespace hcore
 {
 
+struct OPatternState
+	{
+	bool f_bIgnoreCase;
+	bool f_bExtended;
+	HPattern::pluggable_flags_t f_oFlags;
+	OPatternState( void ) : f_bIgnoreCase( false ), f_bExtended( false ), f_oFlags() {}
+	};
+
 HPattern::HPattern( bool const a_bIgnoreCase ) : f_bInitialized( false ),
 	f_bIgnoreCaseDefault( a_bIgnoreCase ), f_bIgnoreCase( false ),
 	f_bExtended( false ), f_iSimpleMatchLength( 0 ), f_oCompiled( xcalloc<regex_t>( 1 ) ),
 	f_oPatternInput(), f_oPatternReal(), f_oError()
 	{
 	M_PROLOG
-	memset( f_oCompiled.get<regex_t>(), 0, sizeof ( f_oCompiled ) );
 	return;
 	M_EPILOG
 	}
@@ -60,40 +67,58 @@ HPattern::~HPattern( void )
 	M_EPILOG
 	}
 
-int HPattern::parse( HString const& a_oPattern,
-		int short unsigned* const a_puhFlags, int const a_iFlagsCount )
+void HPattern::save_state( void* sp, pluggable_flags_t* f )
+	{
+	M_PROLOG
+	OPatternState& s = *static_cast<OPatternState*>( sp );
+	s.f_bIgnoreCase = f_bIgnoreCase;
+	s.f_bExtended = f_bExtended;
+	if ( f )
+		s.f_oFlags = *f;
+	return;
+	M_EPILOG
+	}
+
+void HPattern::restore_state( void* sp, pluggable_flags_t* f )
+	{
+	M_PROLOG
+	OPatternState& s = *static_cast<OPatternState*>( sp );
+	f_bIgnoreCase = s.f_bIgnoreCase;
+	f_bExtended = s.f_bExtended;
+	if ( f )
+		*f = s.f_oFlags;
+	return;
+	M_EPILOG
+	}
+
+int HPattern::parse( HString const& a_oPattern, pluggable_flags_t* externalFlags ) 
 	{
 	M_PROLOG
 	int l_iError = 0;
-	bool l_bLocalCopyIgnoreCase = false, l_bLocalCopyExtended = false;
-	HArray<int short unsigned> l_oLocalCopyFlags( a_iFlagsCount );
 	char const* const l_pcPattern = a_oPattern.raw();
 	f_oPatternInput = a_oPattern;
 	f_oError = "";
 /* making copy of flags */
-	l_bLocalCopyIgnoreCase = f_bIgnoreCase;
-	l_bLocalCopyExtended = f_bExtended;
-	for ( int i = 0; i < a_iFlagsCount; i ++ )
-		l_oLocalCopyFlags[ i ] = a_puhFlags[ i ];
+	OPatternState savePoint;
+	save_state( &savePoint, externalFlags );
 /* end of copy */
 /* clear all flags */
 	f_bIgnoreCase = f_bIgnoreCaseDefault;
 	f_bExtended = false;
-	static int short unsigned const D_FLAG_MASK = 0x00ff;
-	for ( int i = 0; i < a_iFlagsCount; ++ i )
-		a_puhFlags[ i ] = static_cast<int short unsigned>( a_puhFlags[ i ] & D_FLAG_MASK );
+	if ( externalFlags )
+		{
+		for ( pluggable_flags_t::iterator it = externalFlags->begin(), end = externalFlags->end(); it != end; ++ it )
+			*it->second = false;
+		}
 /* FIXME g++ 4.3 bug *///		a_puhFlags[ i ] &= D_FLAG_MASK;
 /* end of clearing */
 /* look for switches at the beginnig of pattern */
 	int long l_iCtr = 0;
 	while ( l_pcPattern[ l_iCtr ] == '\\' )
 		{
-		if ( set_switch( l_pcPattern[ ++ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
+		if ( set_switch( l_pcPattern[ ++ l_iCtr ], externalFlags ) )
 			{
-			f_bIgnoreCase = l_bLocalCopyIgnoreCase;
-			f_bExtended = l_bLocalCopyExtended;
-			for ( int i = 0; i < a_iFlagsCount; ++ i )
-				a_puhFlags[ i ] = l_oLocalCopyFlags[ i ];
+			restore_state( &savePoint, externalFlags );
 			l_iError = 1;
 			f_oError.format( "bad search option '%c'", l_pcPattern[ l_iCtr ] );
 			return ( l_iError );
@@ -105,10 +130,7 @@ int HPattern::parse( HString const& a_oPattern,
 	int long l_iBegin = l_iCtr;
 /* end of looking at begin */
 /* making copy of flags */
-	l_bLocalCopyIgnoreCase = f_bIgnoreCase;
-	l_bLocalCopyExtended = f_bExtended;
-	for ( int i = 0; i < a_iFlagsCount; ++ i )
-		l_oLocalCopyFlags[ i ] = a_puhFlags[ i ];
+	save_state( &savePoint, externalFlags );
 /* end of copy */
 /* look for switches at the end of pattern */
 	int long l_iEnd = l_iCtr = f_oPatternInput.get_length() - 1;
@@ -116,12 +138,9 @@ int HPattern::parse( HString const& a_oPattern,
 		return ( true );
 	while ( ( l_iCtr > 0 ) && ( l_pcPattern[ l_iCtr ] != '/' ) )
 		{
-		if ( set_switch( l_pcPattern[ l_iCtr ], a_puhFlags, a_iFlagsCount ) )
+		if ( set_switch( l_pcPattern[ l_iCtr ], externalFlags ) )
 			{
-			f_bIgnoreCase = l_bLocalCopyIgnoreCase;
-			f_bExtended = l_bLocalCopyExtended;
-			for ( int i = 0; i < a_iFlagsCount; ++ i )
-				a_puhFlags[ i ] = l_oLocalCopyFlags[ i ];
+			restore_state( &savePoint, externalFlags );
 			l_iCtr = 1;
 			}
 		l_iCtr --;
@@ -135,7 +154,7 @@ int HPattern::parse( HString const& a_oPattern,
 	if ( ! f_iSimpleMatchLength )
 		{
 		l_iError = - 1;
-		f_oError = _ ( "empty pattern" );
+		f_oError = _( "empty pattern" );
 		}
 	f_bInitialized = ! l_iError;
 	if ( f_bInitialized && f_bExtended )
@@ -170,12 +189,10 @@ HString const& HPattern::error( void ) const
 	return ( f_oError );
 	}
 
-bool HPattern::set_switch( char const a_cSwitch,
-		int short unsigned* const a_puhFlags,
-		int const a_iFlagsCount )
+bool HPattern::set_switch( char const a_cSwitch, pluggable_flags_t* externalFlags ) 
 	{
 	M_PROLOG
-	int l_iCtr = 0;
+	bool ok( true );
 	switch ( a_cSwitch )
 		{
 		case ( 'i' ):{f_bIgnoreCase = ! f_bIgnoreCase;break;}
@@ -184,18 +201,20 @@ bool HPattern::set_switch( char const a_cSwitch,
 		case ( 'C' ):{f_bIgnoreCase = false;break;}
 		default :
 			{
-			for ( l_iCtr = 0; l_iCtr < a_iFlagsCount; l_iCtr ++ )
-				if ( a_cSwitch == ( a_puhFlags[ l_iCtr ] & 0x00ff ) )
+			if ( externalFlags )
+				{
+				ok = false;
+				for ( pluggable_flags_t::iterator it = externalFlags->begin(), end = externalFlags->end(); it != end; ++ it )
 					{
-					a_puhFlags[ l_iCtr ] |= 0x0100;
+					if ( a_cSwitch == it->first )
+						*it->second = ok = true;
 					break;
 					}
-			if ( l_iCtr >= a_iFlagsCount )
-				return ( true );
+				}
 			break;
 			}
 		}
-	return ( false );
+	return ( ! ok );
 	M_EPILOG
 	}
 
