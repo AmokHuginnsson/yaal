@@ -75,7 +75,7 @@ public:
 	int parse( HString const& pattern, pluggable_flags_t* externalFlags = NULL );
 	int parse_re( char const* const );
 	HString const& error( void ) const;
-	char const* matches( HString const&,
+	char const* matches( char const* const,
 			int* const = NULL /* match length */,
 			int* const = NULL /* error code */ );
 	int count( char const* const );

@@ -546,7 +546,7 @@ int HEditControl::do_process_input ( int a_iCode )
 		l_iErrorCode = update_from_history();
 	if ( ! l_iErrorCode )
 		{
-		f_oPattern.matches( f_oVarTmpBuffer, NULL, &l_iErrorCode );
+		f_oPattern.matches( f_oVarTmpBuffer.raw(), NULL, &l_iErrorCode );
 		if ( l_iErrorCode )
 			f_poParent->status_bar()->message( COLORS::D_BG_BROWN, f_oPattern.error().raw() );
 		else

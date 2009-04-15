@@ -143,7 +143,7 @@ bool substitute_environment( HString& a_roString )
 	if ( ! a_roString.is_empty() )
 		{
 		M_ENSURE( l_oPattern.parse_re( "${[^{}]\\{1,\\}}" ) == 0 );
-		if ( ( l_pcStart = l_oPattern.matches( a_roString, &l_iLength ) ) )
+		if ( ( l_pcStart = l_oPattern.matches( a_roString.raw(), &l_iLength ) ) )
 			{
 			HString l_oVar = a_roString.mid( l_pcStart - a_roString.raw(), l_iLength );
 			HString l_oName = l_oVar.mid( 2, l_iLength - 3 );

@@ -218,11 +218,11 @@ bool HPattern::set_switch( char const a_cSwitch, pluggable_flags_t* externalFlag
 	M_EPILOG
 	}
 
-char const* HPattern::matches( HString const& a_oString,
+char const* HPattern::matches( char const* const a_pcString,
 		int* const a_piMatchLength, int* const a_piError )
 	{
 	M_PROLOG
-	char const * l_pcPtr = NULL;
+	char const* l_pcPtr = NULL;
 	int l_iError = 0;
 	int l_iMatchLength = 0;
 	regmatch_t l_sMatch;
@@ -230,11 +230,11 @@ char const* HPattern::matches( HString const& a_oString,
 		{
 		if ( f_bExtended )
 			{
-			if ( ! ( l_iError = ::regexec( f_oCompiled.get<regex_t>(), a_oString.raw(), 1, &l_sMatch, 0 ) ) )
+			if ( ! ( l_iError = ::regexec( f_oCompiled.get<regex_t>(), a_pcString, 1, &l_sMatch, 0 ) ) )
 				{
 				l_iMatchLength = l_sMatch.rm_eo - l_sMatch.rm_so;
 				if ( l_iMatchLength > 0 )
-					l_pcPtr = a_oString.raw() + l_sMatch.rm_so;
+					l_pcPtr = a_pcString + l_sMatch.rm_so;
 				}
 			else
 				prepare_error_message( l_iError, f_oPatternReal );
@@ -242,9 +242,9 @@ char const* HPattern::matches( HString const& a_oString,
 		else
 			{
 			if ( f_bIgnoreCase )
-				l_pcPtr = ::strcasestr( a_oString.raw(), f_oPatternReal.raw() );
+				l_pcPtr = ::strcasestr( a_pcString, f_oPatternReal.raw() );
 			else
-				l_pcPtr = ::strstr( a_oString.raw(), f_oPatternReal.raw() );
+				l_pcPtr = ::strstr( a_pcString, f_oPatternReal.raw() );
 			if ( l_pcPtr )
 				l_iMatchLength = f_iSimpleMatchLength;
 			}
