@@ -77,12 +77,11 @@ public:
 	int parse_re( char const* const );
 	HString const& error( void ) const;
 	int error_code( void ) const;
-	int count( char const* const );
 	HMatchIterator find( char const* const ) const;
 	HMatchIterator end( void ) const;
+private:
 	char const* matches( char const* const,
 			int long* const = NULL /* match length */ ) const;
-private:
 	void prepare_error_message( HString const& ) const;
 	bool set_switch( char const, pluggable_flags_t* );
 	void save_state( void*, pluggable_flags_t* );

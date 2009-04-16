@@ -258,17 +258,6 @@ char const* HPattern::matches( char const* const a_pcString,
 	M_EPILOG
 	}
 
-int HPattern::count( char const* const a_pcString )
-	{
-	M_PROLOG
-	int l_iCtr = 0;
-	char const* l_pcPtr = a_pcString;
-	while ( ( l_pcPtr = matches( l_pcPtr ) ) )
-		l_iCtr ++, l_pcPtr ++;
-	return ( l_iCtr );
-	M_EPILOG
-	}
-
 void HPattern::prepare_error_message( HString const& a_oString ) const
 	{
 	M_PROLOG
