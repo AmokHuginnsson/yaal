@@ -80,12 +80,10 @@ void HSearchableControl::highlight( int a_iRow, int a_iColumn,
 		int a_iCurrent, bool a_bCurrent )
 	{
 	M_PROLOG
-	int l_iHighlightLength = 0, l_iCtr = 0;
-	char const* l_pcHighlightStart = NULL;
+	int long l_iCtr = 0;
 	HConsole& cons = HCons::get_instance();
-	l_pcHighlightStart = f_oVarTmpBuffer.raw();
-	while ( ( l_pcHighlightStart = const_cast<char*>( f_oPattern.matches( l_pcHighlightStart,
-			&l_iHighlightLength ) ) ) )
+	for ( HPattern::HMatchIterator it = f_oPattern.find( f_oVarTmpBuffer.raw() ),
+			end = f_oPattern.end(); it != end; ++ it )
 		{
 		if ( ( f_bFocused && ( ( a_iCurrent != l_iCtr ) || ! a_bCurrent ) )
 				|| ( ! f_bFocused && ( a_iCurrent == l_iCtr ) && a_bCurrent ) )
@@ -93,9 +91,8 @@ void HSearchableControl::highlight( int a_iRow, int a_iColumn,
 		else
 			cons.set_attr( n_iAttributeSearchHighlight );
 		cons.c_mvprintf( a_iRow,
-				static_cast<int>( a_iColumn + ( l_pcHighlightStart - f_oVarTmpBuffer.raw() ) ),
-				"%.*s", l_iHighlightLength, l_pcHighlightStart );
-		l_pcHighlightStart ++;
+				static_cast<int>( a_iColumn + ( it->raw() - f_oVarTmpBuffer.raw() ) ),
+				"%.*s", it->size(), it->raw() );
 		l_iCtr ++;
 		}
 	return;

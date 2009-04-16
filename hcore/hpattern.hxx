@@ -59,7 +59,8 @@ private:
 																	 search patterns */
 	HString	f_oPatternInput;			/*!< current search pattern */
 	HString	f_oPatternReal;				/*!< pattern with stripped switches */
-	HString f_oError;							/*!< error message of last operation */
+	mutable int f_iLastError;
+	mutable HString f_oVarTmpBuffer;	/*!< error message of last operation */
 public:
 	/*! \brief Construct pattern.
 	 *
@@ -75,23 +76,44 @@ public:
 	int parse( HString const& pattern, pluggable_flags_t* externalFlags = NULL );
 	int parse_re( char const* const );
 	HString const& error( void ) const;
-	char const* matches( char const* const,
-			int* const = NULL /* match length */,
-			int* const = NULL /* error code */ );
+	int error_code( void ) const;
 	int count( char const* const );
+	HMatchIterator find( char const* const ) const;
+	HMatchIterator end( void ) const;
+	char const* matches( char const* const,
+			int long* const = NULL /* match length */ ) const;
 private:
-	void prepare_error_message( int const, HString const& );
+	void prepare_error_message( HString const& ) const;
 	bool set_switch( char const, pluggable_flags_t* );
 	void save_state( void*, pluggable_flags_t* );
 	void restore_state( void*, pluggable_flags_t* );
 	};
 
-class HPattern::HMatchIterator
-	{
-	};
-
 class HPattern::HMatch
 	{
+	int long _size;
+	char const* _start;
+public:
+	int long size() const;
+	char const* raw() const;
+private:
+	HMatch( char const* const&, int long const& );
+	friend class HPattern::HMatchIterator;
+	};
+
+class HPattern::HMatchIterator
+	{
+	HPattern const* _owner;
+	HPattern::HMatch _match;
+public:
+	HMatch const* operator->( void ) const;
+	HMatch const& operator*( void ) const;
+	bool operator != ( HMatchIterator const& ) const;
+	bool operator == ( HMatchIterator const& ) const;
+	HMatchIterator& operator ++ ( void );
+private:
+	HMatchIterator( HPattern const*, char const*, int long const& );
+	friend class HPattern;
 	};
 
 typedef HExceptionT<HPattern> HPatternException;

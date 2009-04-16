@@ -136,18 +136,17 @@ int rc_open( HString const& a_oRcName,
 bool substitute_environment( HString& a_roString )
 	{
 	M_PROLOG
-	int l_iLength = 0;
-	char const* l_pcStart = NULL;
-	HPattern l_oPattern;
 	bool envVarRefFound = false;
 	if ( ! a_roString.is_empty() )
 		{
+		HPattern l_oPattern;
 		M_ENSURE( l_oPattern.parse_re( "${[^{}]\\{1,\\}}" ) == 0 );
-		if ( ( l_pcStart = l_oPattern.matches( a_roString.raw(), &l_iLength ) ) )
+		HPattern::HMatchIterator it = l_oPattern.find( a_roString.raw() );
+		if ( it != l_oPattern.end() )
 			{
-			HString l_oVar = a_roString.mid( l_pcStart - a_roString.raw(), l_iLength );
-			HString l_oName = l_oVar.mid( 2, l_iLength - 3 );
-			l_pcStart = ::getenv( l_oName.raw() );
+			HString l_oVar = a_roString.mid( it->raw() - a_roString.raw(), it->size() );
+			HString l_oName = l_oVar.mid( 2, it->size() - 3 );
+			char const* l_pcStart = ::getenv( l_oName.raw() );
 			a_roString.replace( l_oVar, l_pcStart ? l_pcStart : "" );
 			envVarRefFound = true;
 			}

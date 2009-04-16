@@ -52,7 +52,7 @@ struct OPatternState
 HPattern::HPattern( bool const a_bIgnoreCase ) : f_bInitialized( false ),
 	f_bIgnoreCaseDefault( a_bIgnoreCase ), f_bIgnoreCase( false ),
 	f_bExtended( false ), f_iSimpleMatchLength( 0 ), f_oCompiled( xcalloc<regex_t>( 1 ) ),
-	f_oPatternInput(), f_oPatternReal(), f_oError()
+	f_oPatternInput(), f_oPatternReal(), f_iLastError( 0 ), f_oVarTmpBuffer()
 	{
 	M_PROLOG
 	return;
@@ -97,7 +97,7 @@ int HPattern::parse( HString const& a_oPattern, pluggable_flags_t* externalFlags
 	int l_iError = 0;
 	char const* const l_pcPattern = a_oPattern.raw();
 	f_oPatternInput = a_oPattern;
-	f_oError = "";
+	f_oVarTmpBuffer = "";
 /* making copy of flags */
 	OPatternState savePoint;
 	save_state( &savePoint, externalFlags );
@@ -107,7 +107,7 @@ int HPattern::parse( HString const& a_oPattern, pluggable_flags_t* externalFlags
 	f_bExtended = false;
 	if ( externalFlags )
 		{
-		for ( pluggable_flags_t::iterator it = externalFlags->begin(), end = externalFlags->end(); it != end; ++ it )
+		for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it )
 			*it->second = false;
 		}
 /* FIXME g++ 4.3 bug *///		a_puhFlags[ i ] &= D_FLAG_MASK;
@@ -120,7 +120,7 @@ int HPattern::parse( HString const& a_oPattern, pluggable_flags_t* externalFlags
 			{
 			restore_state( &savePoint, externalFlags );
 			l_iError = 1;
-			f_oError.format( "bad search option '%c'", l_pcPattern[ l_iCtr ] );
+			f_oVarTmpBuffer.format( "bad search option '%c'", l_pcPattern[ l_iCtr ] );
 			return ( l_iError );
 			}
 		l_iCtr ++;
@@ -148,13 +148,13 @@ int HPattern::parse( HString const& a_oPattern, pluggable_flags_t* externalFlags
 	if ( l_iCtr )
 		l_iEnd = l_iCtr - 1;
 /* end of looking at end */
-	f_oError = f_oPatternReal = f_oPatternInput.mid( l_iBegin,
+	f_oVarTmpBuffer = f_oPatternReal = f_oPatternInput.mid( l_iBegin,
 			( l_iEnd - l_iBegin ) + 1 );
 	f_iSimpleMatchLength = static_cast<int>( f_oPatternReal.get_length() );
 	if ( ! f_iSimpleMatchLength )
 		{
 		l_iError = - 1;
-		f_oError = _( "empty pattern" );
+		f_oVarTmpBuffer = _( "empty pattern" );
 		}
 	f_bInitialized = ! l_iError;
 	if ( f_bInitialized && f_bExtended )
@@ -166,12 +166,11 @@ int HPattern::parse( HString const& a_oPattern, pluggable_flags_t* externalFlags
 int HPattern::parse_re( char const* const a_pcPattern )
 	{
 	M_PROLOG
-	int l_iError = 0;
 	::regfree( f_oCompiled.get<regex_t>() );
-	if ( ( l_iError = ::regcomp( f_oCompiled.get<regex_t>(), a_pcPattern,
+	if ( ( f_iLastError = ::regcomp( f_oCompiled.get<regex_t>(), a_pcPattern,
 					f_bIgnoreCase ? REG_ICASE : 0 ) ) )
 		{
-		prepare_error_message( l_iError, a_pcPattern );
+		prepare_error_message( a_pcPattern );
 		f_bInitialized = false;
 		}
 	else
@@ -180,13 +179,18 @@ int HPattern::parse_re( char const* const a_pcPattern )
 		f_bExtended = true;
 		f_iSimpleMatchLength = 1; /* it is not really a simple pattern */
 		}
-	return ( l_iError );
+	return ( f_iLastError );
 	M_EPILOG
 	}
 
 HString const& HPattern::error( void ) const
 	{
-	return ( f_oError );
+	return ( f_oVarTmpBuffer );
+	}
+
+int HPattern::error_code( void ) const
+	{
+	return ( f_iLastError );
 	}
 
 bool HPattern::set_switch( char const a_cSwitch, pluggable_flags_t* externalFlags ) 
@@ -204,7 +208,7 @@ bool HPattern::set_switch( char const a_cSwitch, pluggable_flags_t* externalFlag
 			if ( externalFlags )
 				{
 				ok = false;
-				for ( pluggable_flags_t::iterator it = externalFlags->begin(), end = externalFlags->end(); it != end; ++ it )
+				for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it )
 					{
 					if ( a_cSwitch == it->first )
 						*it->second = ok = true;
@@ -219,25 +223,24 @@ bool HPattern::set_switch( char const a_cSwitch, pluggable_flags_t* externalFlag
 	}
 
 char const* HPattern::matches( char const* const a_pcString,
-		int* const a_piMatchLength, int* const a_piError )
+		int long* const a_piMatchLength ) const
 	{
 	M_PROLOG
 	char const* l_pcPtr = NULL;
-	int l_iError = 0;
 	int l_iMatchLength = 0;
 	regmatch_t l_sMatch;
 	if ( f_iSimpleMatchLength )
 		{
 		if ( f_bExtended )
 			{
-			if ( ! ( l_iError = ::regexec( f_oCompiled.get<regex_t>(), a_pcString, 1, &l_sMatch, 0 ) ) )
+			if ( ! ( f_iLastError = ::regexec( f_oCompiled.get<regex_t>(), a_pcString, 1, &l_sMatch, 0 ) ) )
 				{
 				l_iMatchLength = l_sMatch.rm_eo - l_sMatch.rm_so;
 				if ( l_iMatchLength > 0 )
 					l_pcPtr = a_pcString + l_sMatch.rm_so;
 				}
 			else
-				prepare_error_message( l_iError, f_oPatternReal );
+				prepare_error_message( f_oPatternReal );
 			}
 		else
 			{
@@ -251,8 +254,6 @@ char const* HPattern::matches( char const* const a_pcString,
 		}
 	if ( a_piMatchLength )
 		( *a_piMatchLength ) = l_iMatchLength;
-	if ( a_piError )
-		( *a_piError ) = l_iError;
 	return ( l_pcPtr );
 	M_EPILOG
 	}
@@ -268,22 +269,84 @@ int HPattern::count( char const* const a_pcString )
 	M_EPILOG
 	}
 
-void HPattern::prepare_error_message( int const a_iError,
-		HString const& a_oString )
+void HPattern::prepare_error_message( HString const& a_oString ) const
 	{
 	M_PROLOG
-	int long l_iSize = ::regerror( a_iError, f_oCompiled.get<regex_t>(), NULL, 0 ) + 1;
+	int long l_iSize = ::regerror( f_iLastError, f_oCompiled.get<regex_t>(), NULL, 0 ) + 1;
 	HPool<char> l_oBuffer( l_iSize + 1 );
-	M_ENSURE( static_cast<int>( ::regerror( a_iError, f_oCompiled.get<regex_t>(),
+	M_ENSURE( static_cast<int>( ::regerror( f_iLastError, f_oCompiled.get<regex_t>(),
 					l_oBuffer.raw(), l_iSize ) ) < l_iSize );
-	f_oError = l_oBuffer.raw();
+	f_oVarTmpBuffer = l_oBuffer.raw();
 	if ( ! a_oString.empty() )
 		{
-		f_oError += ": `";
-		f_oError += a_oString;
-		f_oError += "'";
+		f_oVarTmpBuffer += ": `";
+		f_oVarTmpBuffer += a_oString;
+		f_oVarTmpBuffer += "'";
 		}
 	return;
+	M_EPILOG
+	}
+
+HPattern::HMatchIterator HPattern::find( char const* str_ ) const
+	{
+	int long len = 0;
+	char const* start = matches( str_, &len );
+	HMatchIterator it( this, start, len );
+	return ( it );
+	}
+
+HPattern::HMatchIterator HPattern::end( void ) const
+	{
+	return ( HMatchIterator( this, NULL, 0 ) );
+	}
+
+HPattern::HMatch::HMatch( char const* const& start_, int long const& size_ )
+	: _size( size_ ), _start( start_ )
+	{
+	}
+
+int long HPattern::HMatch::size( void ) const
+	{
+	return ( _size );
+	}
+
+char const* HPattern::HMatch::raw( void ) const
+	{
+	return ( _start );
+	}
+
+HPattern::HMatchIterator::HMatchIterator( HPattern const* owner_, char const* const start_, int long const& len_ )
+	: _owner( owner_ ), _match( start_, len_ )
+	{
+	}
+
+HPattern::HMatch const* HPattern::HMatchIterator::operator->( void ) const
+	{
+	return ( &_match );
+	}
+
+bool HPattern::HMatchIterator::operator != ( HMatchIterator const& mi_ ) const
+	{
+	M_PROLOG
+	M_ASSERT( mi_._owner == _owner );
+	return ( mi_._match._start != _match._start );
+	M_EPILOG
+	}
+
+bool HPattern::HMatchIterator::operator == ( HMatchIterator const& mi_ ) const
+	{
+	M_PROLOG
+	M_ASSERT( mi_._owner == _owner );
+	return ( mi_._match._start == _match._start );
+	M_EPILOG
+	}
+
+HPattern::HMatchIterator& HPattern::HMatchIterator::operator ++ ( void )
+	{
+	M_PROLOG
+	M_ASSERT( _match._start );
+	_match._start = _owner->matches( _match._start + 1, &_match._size );
+	return ( *this );
 	M_EPILOG
 	}
 

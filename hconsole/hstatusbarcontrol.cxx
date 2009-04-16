@@ -47,17 +47,17 @@ namespace yaal
 namespace hconsole
 {
 
-HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
-		char const * a_pcLabel, int a_iStatusBarAttribute )
-								 : HControl ( a_poParent, - 2, 0, 2, - 1, a_pcLabel ),
-									HEditControl ( NULL, 0, 0, 0, 0, NULL, 127, "", n_pcMaskLoose,
-											false, false, false, false, false, 255 ),
-	f_iStatusBarAttribute ( 0 ), f_iPromptLength ( 0 ),
-	f_eMode ( PROMPT::D_NORMAL ), f_eRestrict ( PROMPT::D_RELAXED ),
-	f_oPrompt(), f_bDone ( false ), f_bEstimate ( false ), f_dProgressSize ( 1 ),
-	f_iLastProgress ( - 1 ), f_iLastPercent ( - 1 ), f_iLastMinute ( 0 ),
-	f_iLastSecond ( 0 ), f_iLastStep ( 0 ),
-	f_oMessage ( "" ), /* initialization of this field is required by bar() meth */
+HStatusBarControl::HStatusBarControl( HWindow* a_poParent,
+		char const* a_pcLabel, int a_iStatusBarAttribute )
+	: HControl( a_poParent, - 2, 0, 2, - 1, a_pcLabel ),
+	HEditControl( NULL, 0, 0, 0, 0, NULL, 127, "", n_pcMaskLoose,
+			false, false, false, false, false, 255 ),
+	f_iStatusBarAttribute( 0 ), f_iPromptLength( 0 ),
+	f_eMode( PROMPT::D_NORMAL ), f_eRestrict( PROMPT::D_RELAXED ),
+	f_oPrompt(), f_bDone( false ), f_bEstimate( false ), f_dProgressSize( 1 ),
+	f_iLastProgress( -1 ), f_iLastPercent( - 1 ), f_iLastMinute( 0 ),
+	f_iLastSecond( 0 ), f_iLastStep( 0 ),
+	f_oMessage( "" ), /* initialization of this field is required by bar() meth */
 	f_oStart()
 	{
 	M_PROLOG
@@ -75,14 +75,14 @@ HStatusBarControl::HStatusBarControl ( HWindow * a_poParent,
 	M_EPILOG
 	}
 
-HStatusBarControl::~HStatusBarControl ( void )
+HStatusBarControl::~HStatusBarControl( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-void HStatusBarControl::do_draw_label ( void )
+void HStatusBarControl::do_draw_label( void )
 	{
 	M_PROLOG
 	HConsole& cons = HCons::get_instance();
@@ -97,7 +97,7 @@ void HStatusBarControl::do_draw_label ( void )
 	M_EPILOG
 	}
 
-void HStatusBarControl::do_refresh ( void )
+void HStatusBarControl::do_refresh( void )
 	{
 	M_PROLOG
 	int l_iOrigRow = 0;
@@ -123,7 +123,7 @@ void HStatusBarControl::do_refresh ( void )
 	M_EPILOG
 	}
 
-int HStatusBarControl::do_process_input ( int a_iCode )
+int HStatusBarControl::do_process_input( int a_iCode )
 	{
 	M_PROLOG
 	if ( ( a_iCode == KEY_CODES::D_BACKSPACE )
@@ -153,7 +153,7 @@ int HStatusBarControl::do_process_input ( int a_iCode )
 	M_EPILOG
 	}
 
-void HStatusBarControl::set_prompt ( char const * a_pcPrompt, PROMPT::mode_t a_eMode,
+void HStatusBarControl::set_prompt( char const* a_pcPrompt, PROMPT::mode_t a_eMode,
 		PROMPT::restrict_t a_eRestrict )
 	{
 	M_PROLOG
@@ -173,7 +173,7 @@ void HStatusBarControl::set_prompt ( char const * a_pcPrompt, PROMPT::mode_t a_e
 	M_EPILOG
 	}
 
-int HStatusBarControl::verify ( void )
+int HStatusBarControl::verify( void )
 	{
 	M_PROLOG
 	int l_iLength = 0;
@@ -184,7 +184,7 @@ int HStatusBarControl::verify ( void )
 	M_EPILOG
 	}
 
-void HStatusBarControl::init_progress ( double a_dMax, char const * a_pcTitle,
+void HStatusBarControl::init_progress( double a_dMax, char const* a_pcTitle,
 		bool a_bEstimate )
 	{
 	M_PROLOG
@@ -333,8 +333,8 @@ void HStatusBarControl::bar( char const* a_pcBar )
 	M_EPILOG
 	}
 
-int HStatusBarControl::ask ( char const * a_pcQuestion,
-		char const * a_pcPrompt )
+int HStatusBarControl::ask( char const* a_pcQuestion,
+		char const* a_pcPrompt )
 	{
 	M_PROLOG
 	bar ( a_pcQuestion );
@@ -343,7 +343,7 @@ int HStatusBarControl::ask ( char const * a_pcQuestion,
 	M_EPILOG
 	}
 
-bool HStatusBarControl::confirm ( char const * a_pcQuestion )
+bool HStatusBarControl::confirm( char const* a_pcQuestion )
 	{
 	M_PROLOG
 	ask ( a_pcQuestion, "[yes/no]: " );
@@ -351,7 +351,7 @@ bool HStatusBarControl::confirm ( char const * a_pcQuestion )
 	M_EPILOG
 	}
 
-int HStatusBarControl::process_input_normal ( int a_iCode )
+int HStatusBarControl::process_input_normal( int a_iCode )
 	{
 	M_PROLOG
 	bool l_bBackwards = false;
@@ -385,14 +385,14 @@ int HStatusBarControl::process_input_normal ( int a_iCode )
 	M_EPILOG
 	}
 
-int HStatusBarControl::process_input_menu  ( int a_iCode )
+int HStatusBarControl::process_input_menu ( int a_iCode )
 	{
 	M_PROLOG
 	return ( a_iCode );
 	M_EPILOG
 	}
 
-void HStatusBarControl::end_prompt ( void )
+void HStatusBarControl::end_prompt( void )
 	{
 	M_PROLOG
 	f_eMode = PROMPT::D_NORMAL;

@@ -85,11 +85,11 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	f_oString = a_pcValue;
 	f_oHistory.push_back ( "" );
 	f_oHistoryIt = f_oHistory.hook();
-	if ( ( l_iErrorCode = f_oPattern.parse_re ( a_pcMask ) ) )
-		M_THROW ( f_oPattern.error(), l_iErrorCode );
-	f_oPattern.matches ( a_pcValue, NULL, & l_iErrorCode );
+	if ( ( l_iErrorCode = f_oPattern.parse_re( a_pcMask ) ) )
+		M_THROW( f_oPattern.error(), l_iErrorCode );
+	( f_oPattern.find( a_pcValue ) == f_oPattern.end() ) && ( l_iErrorCode = f_oPattern.error_code() );
 	if ( l_iErrorCode )
-		M_THROW ( f_oPattern.error(), l_iErrorCode );
+		M_THROW( f_oPattern.error(), l_iErrorCode );
 	l_iLength = static_cast<int>( f_oString.get_length() );
 /* this is part of draw_label() method, we cannot wait with setting up
  * f_iWidthRaw until draw_label(), which is called from refresh()
@@ -546,7 +546,8 @@ int HEditControl::do_process_input ( int a_iCode )
 		l_iErrorCode = update_from_history();
 	if ( ! l_iErrorCode )
 		{
-		f_oPattern.matches( f_oVarTmpBuffer.raw(), NULL, &l_iErrorCode );
+		f_oPattern.find( f_oVarTmpBuffer.raw() );
+		l_iErrorCode = f_oPattern.error_code();
 		if ( l_iErrorCode )
 			f_poParent->status_bar()->message( COLORS::D_BG_BROWN, f_oPattern.error().raw() );
 		else
@@ -570,11 +571,11 @@ int HEditControl::do_process_input ( int a_iCode )
 void HEditControl::set( HInfo const& a_roInfo )
 	{
 	M_PROLOG
-	int l_iErrorCode = 0;
 	int l_iLength = 0;
 	char const* l_pcString = a_roInfo.get<char const *>();
 	HString l_oErrorMessage;
-	f_oPattern.matches( l_pcString, NULL, &l_iErrorCode );
+	f_oPattern.find( l_pcString );
+	int l_iErrorCode = f_oPattern.error_code();
 	if ( l_iErrorCode )
 		M_THROW( f_oPattern.error(), l_iErrorCode );
 	f_oString = l_pcString;
