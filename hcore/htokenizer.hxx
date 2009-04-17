@@ -23,6 +23,11 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/htokenizer.hxx
+ * \brief HTokenizer class related declarations.
+ *
+ * HTokenizer::HIterator class is included here.
+ */
 
 #ifndef YAAL_HCORE_HTOKENIZER_HXX_INCLUDED
 #define YAAL_HCORE_HTOKENIZER_HXX_INCLUDED
@@ -35,8 +40,11 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Convenient interface for splitting strings into tokens.
+ */
 class HTokenizer
 	{
+	typedef HTokenizer self_t;
 public:
 	typedef enum
 		{
@@ -45,8 +53,8 @@ public:
 		} behavoir_t;
 private:
 	behavoir_t _behavior;
-	HString const& _string;
-	HString const& _delimiter;
+	HString _string;
+	HString _delimiter;
 	mutable HString _buffer;
 public:
 	class HIterator;
@@ -59,8 +67,11 @@ private:
 	friend class HIterator;
 	};
 
+/*! \brief Interface for itertion thru tokens from given string.
+ */
 class HTokenizer::HIterator
 	{
+	typedef HTokenizer::HIterator self_t;
 	HTokenizer const* _owner;
 	int long _start;
 	mutable HString _buffer;
@@ -74,6 +85,8 @@ private:
 	HIterator( HTokenizer const*, int long const& );
 	friend class HTokenizer;
 	};
+
+typedef HExceptionT<HTokenizer> HTokenizerException;
 
 }
 

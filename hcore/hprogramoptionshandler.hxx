@@ -49,12 +49,14 @@ namespace hcore
  */
 class HProgramOptionsHandler
 	{
+	typedef HProgramOptionsHandler self_t;
 public:
 	typedef bool ( *RC_CALLBACK_t )( HString&, HString& );
 	typedef void ( *param_callback_t )( void* );
 	typedef yaal::hcore::HPair<param_callback_t, void*> simple_callback_t; 
 	class HOptionValueInterface
 		{
+		typedef HOptionValueInterface self_t;
 	public:
 		typedef HPointer<HOptionValueInterface> ptr_t;
 		virtual ~HOptionValueInterface( void ) {}
@@ -135,6 +137,8 @@ private:
 	void set_option( OOption&, HString const& );
 	};
 
+typedef HExceptionT<HProgramOptionsHandler> HProgramOptionsHandlerException;
+
 /*! \brief Helper functions for program options handling infrastructure.
  */
 namespace program_options_helper
@@ -157,6 +161,9 @@ template<typename tType>
 class HProgramOptionsHandler::HOptionValue : public HProgramOptionsHandler::HOptionValueInterface, private HNonCopyable
 	{
 	tType& _instance;
+	typedef HProgramOptionsHandler::HOptionValue<tType> self_t;
+protected:
+	typedef HProgramOptionsHandler::HOptionValueInterface hier_t;
 public:
 	HOptionValue( tType& instance ) : _instance( instance ) {}
 protected:

@@ -53,6 +53,7 @@ HString const& HTokenizer::operator[] ( int long const& nth_ ) const
 			break;
 			}
 		}
+	M_ENSURE( ( _behavior == HTokenizer::D_INCLUDE_EMPTY ) || ! _buffer.is_empty() );
 	return ( _buffer );
 	M_EPILOG
 	}
@@ -81,7 +82,7 @@ HTokenizer::HIterator& HTokenizer::HIterator::operator ++ ( void )
 	{
 	M_PROLOG
 	M_ENSURE( _start >= 0 );
-	_start = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start + 1 );
+	_start = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start );
 	if ( _start >= 0 )
 		{
 		if ( ( _owner->_behavior == HTokenizer::D_INCLUDE_EMPTY ) )
@@ -99,7 +100,8 @@ HString const& HTokenizer::HIterator::operator* ( void ) const
 	M_ENSURE( _start >= 0 );
 	_buffer.clear();
 	int long end = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start );
-	_buffer = _owner->_string.mid( _start, end >= 0 ? ( end - _start ) - ( end > _start ? 1 : 0 ) : INT_MAX );
+	_buffer = _owner->_string.mid( _start, end >= 0 ? ( end - _start ) : INT_MAX );
+	M_ASSERT( ( _owner->_behavior == HTokenizer::D_INCLUDE_EMPTY ) || ! _buffer.is_empty()  );
 	return ( _buffer );
 	M_EPILOG
 	}

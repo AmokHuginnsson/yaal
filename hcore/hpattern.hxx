@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hpattern.hxx - this file is integral part of `yaal' project.
+	hcore/hpattern.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -23,6 +23,11 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/hpattern.hxx
+ * \brief HPattern class related declarations.
+ *
+ * HPattern::HMatchIterator and HPattern::HMatch classes are included here.
+ */
 
 #ifndef YAAL_HCORE_HPATTERN_HXX_INCLUDED
 #define YAAL_HCORE_HPATTERN_HXX_INCLUDED
@@ -88,6 +93,8 @@ private:
 	void restore_state( void*, pluggable_flags_t* );
 	};
 
+/*! \brief Instance of single match for given pattern.
+ */
 class HPattern::HMatch
 	{
 	int long _size;
@@ -100,6 +107,8 @@ private:
 	friend class HPattern::HMatchIterator;
 	};
 
+/*! \brief Pattern matches iterator.
+ */
 class HPattern::HMatchIterator
 	{
 	HPattern const* _owner;
