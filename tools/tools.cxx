@@ -37,6 +37,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hprogramoptionshandler.hxx"    /* read conf from rc */
 #include "hcore/hlog.hxx"       /* log object */
 #include "hcore/hstring.hxx"    /* HString class */
+#include "hcore/htokenizer.hxx" /* HTokenizer class */
 #include "util.hxx" /* atof_ex */
 
 using namespace yaal::hcore;
@@ -84,8 +85,7 @@ extern char n_pcTransTableStripPL [ 256 ];
 bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 	{
 	M_PROLOG
-	int l_iBaudRate = 0, l_iCtr = 0;
-	HString l_oStr;
+	int l_iBaudRate = 0;
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )
 		set_env ( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "serial_baudrate" ) )
@@ -121,31 +121,32 @@ bool set_tools_variables ( HString & a_roOption, HString & a_roValue )
 		}
 	else if ( ! strcasecmp ( a_roOption, "serial_flags" ) )
 		{
-		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty() )
+		HTokenizer t( a_roValue, " \t" );
+		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it )
 			{
-			if ( ! strcasecmp ( l_oStr, "FLOW_CONTROL_HARDWARE" ) )
+			if ( ! strcasecmp ( *it, "FLOW_CONTROL_HARDWARE" ) )
 				n_eSerialFlags = HSerial::FLAG::D_FLOW_CONTROL_HARDWARE;
-			else if ( ! strcasecmp ( l_oStr, "SOFTWARE_CONTROL_SOFTWARE" ) )
+			else if ( ! strcasecmp ( *it, "SOFTWARE_CONTROL_SOFTWARE" ) )
 				n_eSerialFlags = HSerial::FLAG::D_FLOW_CONTROL_SOFTWARE;
-			else if ( ! strcasecmp ( l_oStr, "ECHO" ) )
+			else if ( ! strcasecmp ( *it, "ECHO" ) )
 				n_eSerialFlags = HSerial::FLAG::D_ECHO;
-			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_8" ) )
+			else if ( ! strcasecmp ( *it, "BITS_PER_BYTE_8" ) )
 				n_eSerialFlags = HSerial::FLAG::D_BITS_PER_BYTE_8;
-			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_7" ) )
+			else if ( ! strcasecmp ( *it, "BITS_PER_BYTE_7" ) )
 				n_eSerialFlags = HSerial::FLAG::D_BITS_PER_BYTE_7;
-			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_6" ) )
+			else if ( ! strcasecmp ( *it, "BITS_PER_BYTE_6" ) )
 				n_eSerialFlags = HSerial::FLAG::D_BITS_PER_BYTE_6;
-			else if ( ! strcasecmp ( l_oStr, "BITS_PER_BYTE_5" ) )
+			else if ( ! strcasecmp ( *it, "BITS_PER_BYTE_5" ) )
 				n_eSerialFlags = HSerial::FLAG::D_BITS_PER_BYTE_5;
-			else if ( ! strcasecmp ( l_oStr, "CANONICAL" ) )
+			else if ( ! strcasecmp ( *it, "CANONICAL" ) )
 				n_eSerialFlags = HSerial::FLAG::D_CANONICAL;
-			else if ( ! strcasecmp ( l_oStr, "STOP_BITS_1" ) )
+			else if ( ! strcasecmp ( *it, "STOP_BITS_1" ) )
 				n_eSerialFlags = HSerial::FLAG::D_STOP_BITS_1;
-			else if ( ! strcasecmp ( l_oStr, "STOP_BITS_2" ) )
+			else if ( ! strcasecmp ( *it, "STOP_BITS_2" ) )
 				n_eSerialFlags = HSerial::FLAG::D_STOP_BITS_2;
-			else if ( ! strcasecmp ( l_oStr, "PARITY_CHECK" ) )
+			else if ( ! strcasecmp ( *it, "PARITY_CHECK" ) )
 				n_eSerialFlags = HSerial::FLAG::D_PARITY_CHECK;
-			else if ( ! strcasecmp ( l_oStr, "PARITY_ODD" ) )
+			else if ( ! strcasecmp ( *it, "PARITY_ODD" ) )
 				n_eSerialFlags = HSerial::FLAG::D_PARITY_ODD;
 			else
 				return ( true );

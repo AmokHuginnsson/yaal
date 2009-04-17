@@ -27,6 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hhandler.hxx"
+#include "hcore/htokenizer.hxx"
 
 using namespace yaal::hcore;
 
@@ -99,7 +100,7 @@ HString HHandler::process_command( void )
 	HString l_oCommand;
 	if ( ! f_oCommand.is_empty() )
 		{
-		l_oCommand = f_oCommand.split ( " \t", 0 );
+		l_oCommand = HTokenizer( f_oCommand, " \t" )[ 0 ];
 		if ( ! f_oCommandHandlers.get( l_oCommand, HANDLER ) )
 			{
 			static_cast<void>( ( this->*HANDLER )( 0, f_oCommand.raw() ) );

@@ -170,9 +170,8 @@ public:
 	HString right( int long const& ) const;
 	HString& trim_left( char const* const = " \t\r\n" );
 	HString& trim_right( char const* const = " \t\r\n" );
-	HString& shift_left( int long const );
-	HString& shift_right( int long const, char const = ' ' );
-	HString split( char const* const, int const ) const;
+	HString& shift_left( int long const& );
+	HString& shift_right( int long const&, char const = ' ' );
 	HString& fill( char = '\0', int long = 0, int long = 0 );
 	HString& fillz( char = '\0', int long = 0, int long = 0 );
 	HString& erase( int long, int long );

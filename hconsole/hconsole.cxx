@@ -34,6 +34,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hcore.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
+#include "hcore/htokenizer.hxx"
 #include "tools/tools.hxx"
 #include "console.hxx"
 
@@ -92,53 +93,54 @@ void set_color_bits( int & a_riWord, int a_iBits, int a_iWhat )
 int get_color_bits( HString& a_roValue, int a_iWhat )
 	{
 	M_PROLOG
-	HString l_oStr = a_roValue.split( " \t", a_iWhat );
+	HTokenizer t( a_roValue, " \t" );
+	HString l_oStr = t[ a_iWhat ];
 	if ( l_oStr.is_empty() )
 		return ( 0 );
-	if ( ! strcasecmp ( l_oStr, "BLACK" ) )
+	if ( ! strcasecmp( l_oStr, "BLACK" ) )
 		return ( COLORS::D_FG_BLACK );
-	else if ( ! strcasecmp ( l_oStr, "RED" ) )
+	else if ( ! strcasecmp( l_oStr, "RED" ) )
 		return ( COLORS::D_FG_RED );
-	else if ( ! strcasecmp ( l_oStr, "GREEN" ) )
+	else if ( ! strcasecmp( l_oStr, "GREEN" ) )
 		return ( COLORS::D_FG_GREEN );
-	else if ( ! strcasecmp ( l_oStr, "BROWN" ) )
+	else if ( ! strcasecmp( l_oStr, "BROWN" ) )
 		return ( COLORS::D_FG_BROWN );
-	else if ( ! strcasecmp ( l_oStr, "BLUE" ) )
+	else if ( ! strcasecmp( l_oStr, "BLUE" ) )
 		return ( COLORS::D_FG_BLUE );
-	else if ( ! strcasecmp ( l_oStr, "MAGENTA" ) )
+	else if ( ! strcasecmp( l_oStr, "MAGENTA" ) )
 		return ( COLORS::D_FG_MAGENTA );
-	else if ( ! strcasecmp ( l_oStr, "CYAN" ) )
+	else if ( ! strcasecmp( l_oStr, "CYAN" ) )
 		return ( COLORS::D_FG_CYAN );
-	else if ( ! strcasecmp ( l_oStr, "LIGHTGRAY" ) )
+	else if ( ! strcasecmp( l_oStr, "LIGHTGRAY" ) )
 		return ( COLORS::D_FG_LIGHTGRAY );
-	else if ( ! strcasecmp ( l_oStr, "GRAY" ) )
+	else if ( ! strcasecmp( l_oStr, "GRAY" ) )
 		return ( COLORS::D_FG_GRAY );
-	else if ( ! strcasecmp ( l_oStr, "BRGIHTRED" ) )
+	else if ( ! strcasecmp( l_oStr, "BRGIHTRED" ) )
 		return ( COLORS::D_FG_BRIGHTRED );
-	else if ( ! strcasecmp ( l_oStr, "BRIGHTGREEN" ) )
+	else if ( ! strcasecmp( l_oStr, "BRIGHTGREEN" ) )
 		return ( COLORS::D_FG_BRIGHTGREEN );
-	else if ( ! strcasecmp ( l_oStr, "YELLOW" ) )
+	else if ( ! strcasecmp( l_oStr, "YELLOW" ) )
 		return ( COLORS::D_FG_YELLOW );
-	else if ( ! strcasecmp ( l_oStr, "BRIGHTBLUE" ) )
+	else if ( ! strcasecmp( l_oStr, "BRIGHTBLUE" ) )
 		return ( COLORS::D_FG_BRIGHTBLUE );
-	else if ( ! strcasecmp ( l_oStr, "BRIGHTMAGENTA" ) )
+	else if ( ! strcasecmp( l_oStr, "BRIGHTMAGENTA" ) )
 		return ( COLORS::D_FG_BRIGHTMAGENTA );
-	else if ( ! strcasecmp ( l_oStr, "BRIGHTCYAN" ) )
+	else if ( ! strcasecmp( l_oStr, "BRIGHTCYAN" ) )
 		return ( COLORS::D_FG_BRIGHTCYAN );
-	else if ( ! strcasecmp ( l_oStr, "WHITE" ) )
+	else if ( ! strcasecmp( l_oStr, "WHITE" ) )
 		return ( COLORS::D_FG_WHITE );
 	return ( 0 );
 	M_EPILOG
 	}
 
-void set_color ( HString & a_roValue, int & a_riAttribute )
+void set_color( HString& a_roValue, int& a_riAttribute )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	int l_piTab [ 4 ] = { 2, 3, 0, 1 };
+	int l_piTab[ 4 ] = { 2, 3, 0, 1 };
 	for ( l_iCtr = 0; l_iCtr < 4; l_iCtr ++ )
-		set_color_bits ( a_riAttribute,
-				get_color_bits ( a_roValue, l_iCtr ), l_piTab [ l_iCtr ] );
+		set_color_bits( a_riAttribute,
+				get_color_bits( a_roValue, l_iCtr ), l_piTab [ l_iCtr ] );
 	return;
 	M_EPILOG
 	}

@@ -756,7 +756,7 @@ HString& HString::trim_right( char const* const a_pcSet )
 	M_EPILOG
 	}
 
-HString& HString::shift_left( int long const a_iShift )
+HString& HString::shift_left( int long const& a_iShift )
 	{
 	M_PROLOG
 	if ( a_iShift < 0 )
@@ -778,7 +778,7 @@ HString& HString::shift_left( int long const a_iShift )
 	M_EPILOG
 	}
 
-HString& HString::shift_right( int long const a_iShift, char const a_cFiller )
+HString& HString::shift_right( int long const& a_iShift, char const a_cFiller )
 	{
 	M_PROLOG
 	if ( a_iShift < 0 )
@@ -793,24 +793,6 @@ HString& HString::shift_right( int long const a_iShift, char const a_cFiller )
 		f_lSize = oldSize + a_iShift;
 		}
 	return ( * this );
-	M_EPILOG
-	}
-
-HString HString::split( char const* const a_pcAt, int const a_iPart ) const
-	{
-	M_PROLOG
-	if ( f_lAllocatedBytes )
-		{
-		int long l_iBegining = 0;
-		for ( int long l_iCtr = 0; ( l_iBegining < f_lSize ) && ( l_iCtr < a_iPart ); ++ l_iCtr )
-			l_iBegining += ::std::strcspn( f_pcBuffer + l_iBegining, a_pcAt ) + 1;
-		if ( l_iBegining < f_lSize )
-			{
-			int long l_iSize = ::std::strcspn( f_pcBuffer + l_iBegining, a_pcAt );
-			return ( mid( l_iBegining, l_iSize ) );
-			}
-		}
-	return ( "" );
 	M_EPILOG
 	}
 

@@ -40,6 +40,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore.hxx"
 #include "hlog.hxx"
 #include "hstring.hxx"
+#include "htokenizer.hxx"
 #include "hprogramoptionshandler.hxx"
 #include "hsingleton.hxx"
 #include "hopenssl.hxx"
@@ -69,25 +70,24 @@ bool eq( double long const& a_dLeft, double long const& a_dRight )
 bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	HString l_oStr;
 	if ( ! strcasecmp( a_roOption, "set_env" ) )
 		set_env( a_roValue );
 	else if ( ! strcasecmp( a_roOption, "log_mask" ) )
 		{
-		while ( ! ( l_oStr = a_roValue.split ( " \t", l_iCtr ++ ) ).is_empty() )
+		HTokenizer t( a_roValue, " \t" );
+		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it )
 			{
-			if ( ! strcasecmp( l_oStr, "LOG_DEBUG" ) )
+			if ( ! strcasecmp( *it, "LOG_DEBUG" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_DEBUG;
-			else if ( ! strcasecmp( l_oStr, "LOG_INFO" ) )
+			else if ( ! strcasecmp( *it, "LOG_INFO" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_INFO;
-			else if ( ! strcasecmp( l_oStr, "LOG_NOTICE" ) )
+			else if ( ! strcasecmp( *it, "LOG_NOTICE" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_NOTICE;
-			else if ( ! strcasecmp( l_oStr, "LOG_WARNING" ) )
+			else if ( ! strcasecmp( *it, "LOG_WARNING" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_WARNING;
-			else if ( ! strcasecmp( l_oStr, "LOG_ERROR" ) )
+			else if ( ! strcasecmp( *it, "LOG_ERROR" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_ERROR;
-			else if ( ! strcasecmp( l_oStr, "LOG_CVSHEADER" ) )
+			else if ( ! strcasecmp( *it, "LOG_CVSHEADER" ) )
 				HLog::f_lLogMask |= LOG_TYPE::D_CVSHEADER;
 			else
 				return ( true );

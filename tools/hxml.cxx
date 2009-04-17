@@ -38,6 +38,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hxml.hxx"
+#include "hcore/htokenizer.hxx"
 #include "hcore/hsingleton.hxx"
 #include "hcore/hresource.hxx"
 #include "hcore/hlog.hxx"
@@ -1154,7 +1155,8 @@ HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& 
 	{
 	M_PROLOG
 	const_xml_element_t result = NULL;
-	HString name = path.split( "/", part );
+	HTokenizer t( path, "/" );
+	HString name = t[ part ];
 	if ( ! name.is_empty() )
 		{
 		if ( (**node).f_oText == name )
