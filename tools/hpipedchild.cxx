@@ -121,7 +121,7 @@ void HPipedChild::spawn( HString const& a_oImage, argv_t const& a_oArgv )
 		for ( argv_t::const_iterator it = a_oArgv.begin(); it != a_oArgv.end(); ++ it, ++ i )
 			argv[ i ] = xstrdup( it->raw() );
 		::execv( a_oImage.raw(), argv );
-		M_THROW( "execlp", errno );
+		M_ENSURE( !"execv" );
 		}
 	else
 		{
