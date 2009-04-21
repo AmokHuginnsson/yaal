@@ -576,7 +576,10 @@ option* make_option_array( HProgramOptionsHandler::options_t const& a_oOptions, 
 			end = a_oOptions.end(); it != end; ++ it, ++ l_iCtr )
 		{
 		memset( &l_psOptions[ l_iCtr ], 0, sizeof ( option ) );
-		l_psOptions[ l_iCtr ].name = it->f_pcName;
+		/* Solaris version of `struct option' is braindead broken.
+		 * Another proof that Solaris sucks big time.
+		 */
+		l_psOptions[ l_iCtr ].name = const_cast<char*>( it->f_pcName );
 		switch ( it->f_eSwitchType )
 			{
 			case ( HProgramOptionsHandler::OOption::TYPE::D_REQUIRED ):
