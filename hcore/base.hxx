@@ -291,6 +291,20 @@ void copy( src_it_t src, src_it_t const& end, dst_it_t dst )
 	return;
 	}
 
+/*! \brief Copy given number of elements from range of values onto another range.
+ *
+ * \param src - begining of source range of elements.
+ * \param count - number of elements to copy.
+ * \param dst - begining of destination range.
+ */
+template<typename src_it_t, typename dst_it_t>
+void copy_n( src_it_t src, int long const& count, dst_it_t dst )
+	{
+	for ( int long i = 0; i < count; ++ i, ++ src, ++ dst )
+		*dst = *src;
+	return;
+	}
+
 /*! \brief Checks if two ranges are same size and have same set of values.
  * 
  * \param it1 - begining of first range.
