@@ -129,6 +129,7 @@ public:
 	int long finish( void );
 	void schedule_finish( void );
  	bool is_alive( void ) const;
+	static int long get_id( void );
 private:
 	virtual int run( void );
 	void* control( void );

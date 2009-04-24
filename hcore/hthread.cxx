@@ -190,6 +190,11 @@ int HThread::run( void )
 	M_EPILOG
 	}
 
+int long HThread::get_id( void )
+	{
+	return ( pthread_self() );
+	}
+
 void do_pthread_mutexattr_destroy( void* attr )
 	{
 	::pthread_mutexattr_destroy( static_cast<pthread_mutexattr_t*>( attr ) );
