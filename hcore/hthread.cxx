@@ -192,7 +192,7 @@ int HThread::run( void )
 
 int long HThread::get_id( void )
 	{
-	return ( pthread_self() );
+	return ( reinterpret_cast<int long>( pthread_self() ) );
 	}
 
 void do_pthread_mutexattr_destroy( void* attr )
