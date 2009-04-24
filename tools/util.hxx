@@ -58,6 +58,7 @@ void usun_ogonki( char* );
 double long atof_ex( yaal::hcore::HString const&, bool = false );
 bool verify_IBAN( yaal::hcore::HString const& );
 char const* get_last_error( void );
+yaal::hcore::HString get_token( yaal::hcore::HString const&, yaal::hcore::HString const&, int long );
 
 /*! \brief Helper structure for displaing program help and current configuration.
  */

@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hpointer.hxx"
+#include "hcore/htokenizer.hxx"
 #include "util.hxx"
 #include "hexpression.hxx"
 #include "hcore/hlog.hxx"
@@ -312,6 +313,14 @@ char const* get_last_error( void )
 	if ( ! n_oLastErrorMessage.is_empty() )
 		return ( n_oLastErrorMessage.raw() );
 	return ( "" );
+	}
+
+HString get_token( yaal::hcore::HString const& s, yaal::hcore::HString const& d, int long i )
+	{
+	M_PROLOG
+	HTokenizer t( s, d );
+	return ( t[ i ] );
+	M_EPILOG
 	}
 
 void show_help( void* arg )
