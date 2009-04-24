@@ -52,6 +52,8 @@ number_t factorial( number_t a_iNumber )
 template<typename number_t>
 number_t binomial_coefficient( number_t a_iCardinal, number_t a_iSubCardinal )
 	{
+	if ( a_iSubCardinal > ( a_iCardinal / 2 ) )
+		a_iSubCardinal = a_iCardinal - a_iSubCardinal;
 	return ( factorial( a_iCardinal ) / ( factorial( a_iSubCardinal ) * factorial( a_iCardinal - a_iSubCardinal ) ) );
 	}
 

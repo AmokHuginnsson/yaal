@@ -82,6 +82,13 @@ public:
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 		}
+	iterator insert( map_elem_t const& e )
+		{
+		typename multimap_engine_t::iterator major = ensure_key( e.first );
+		major->second->push_back( e.second );
+		typename value_list_t::iterator minor = major->second->rbegin();
+		return ( iterator( this, major, minor ) );
+		}
 	template<typename iter_t>
 	void push_back( iter_t i, iter_t endIt )
 		{
@@ -264,7 +271,11 @@ class HMultiMap<key_t, value_t, helper_t>::HIterator
 	value_iterator_t f_oMinor;
 public:
 	HIterator( void ) : f_poOwner( NULL ), f_oMajor(), f_oMinor() {}
-	HIterator( HIterator const& a_oIt ) : f_poOwner( a_oIt.f_poOwner ), f_oMajor( a_oIt.f_oMajor ), f_oMinor( a_oIt.f_oMinor ) {}
+	template<typename other_const_qual_t>
+	HIterator( HIterator<other_const_qual_t> const& a_oIt ) : f_poOwner( a_oIt.f_poOwner ), f_oMajor( a_oIt.f_oMajor ), f_oMinor( a_oIt.f_oMinor )
+		{
+		STATIC_ASSERT(( same_type<const_qual_t, other_const_qual_t>::value || same_type<const_qual_t, other_const_qual_t const>::value ));
+		}
 	HIterator& operator = ( HIterator const& a_oIt )
 		{
 		if ( &a_oIt != this )
@@ -316,9 +327,9 @@ public:
 	map_elem_t operator* ( void )
 		{	return ( map_elem_t( f_oMajor->first, *f_oMinor ) );	}
 	bool operator == ( HIterator const& it ) const
-		{ return ( ( f_oMinor == it.f_oMinor ) && ( f_oMajor == it.f_oMajor ) ); }
+		{ return ( ( f_oMajor == it.f_oMajor ) && ( f_oMinor == it.f_oMinor ) ); }
 	bool operator != ( HIterator const& it ) const
-		{ return ( ( f_oMinor != it.f_oMinor ) || ( f_oMajor != it.f_oMajor ) ); }
+		{ return ( ! ( ( f_oMajor == it.f_oMajor ) && ( f_oMinor == it.f_oMinor ) ) ); }
 private:
 	friend class HMultiMap<key_t, value_t, helper_t>;
 	explicit HIterator( multi_map_t const* const a_poOwner,
