@@ -94,23 +94,50 @@ HPipedChild::STATUS HPipedChild::finish( void )
 	M_EPILOG
 	}
 
+struct OPipeResGuard
+	{
+	int _res[2];
+	OPipeResGuard( void ) : _res()
+		{
+		_res[ 0 ] = _res[ 1 ] = -1;
+		}
+	~OPipeResGuard( void )
+		{
+		if ( _res[ 0 ] >= 0 )
+			TEMP_FAILURE_RETRY( ::close( _res[ 0 ] ) );
+		if ( _res[ 1 ] >= 0 )
+			TEMP_FAILURE_RETRY( ::close( _res[ 1 ] ) );
+		}
+	};
+
+static void close_and_invalidate( int& fd_ )
+	{
+	M_PROLOG
+	if ( fd_ >= 0 )
+		M_ENSURE( TEMP_FAILURE_RETRY( ::close( fd_ ) ) == 0 );
+	fd_ = -1;
+	return;
+	M_EPILOG
+	}
+
 void HPipedChild::spawn( HString const& a_oImage, argv_t const& a_oArgv )
 	{
 	M_PROLOG
-	int l_piFileDesIn[ 2 ], l_piFileDesOut[ 2 ], l_piFileDesErr[ 2 ];
+	OPipeResGuard pipeIn, pipeOut, pipeErr;
+	int* l_piFileDesIn = pipeIn._res;
+	int* l_piFileDesOut = pipeOut._res;
+	int* l_piFileDesErr = pipeErr._res;
 	HFSItem image( a_oImage );
 	M_ENSURE( !! image && image.is_executable() );
-	if ( ::pipe( l_piFileDesIn ) || ::pipe ( l_piFileDesOut ) || ::pipe( l_piFileDesErr ) )
-		M_THROW( "pipe", errno );
+	M_ENSURE( ( ! ::pipe( l_piFileDesIn ) ) && ( ! ::pipe( l_piFileDesOut ) ) && ( ! ::pipe( l_piFileDesErr ) ) );
 	f_iPid = ::fork();
 	if ( f_iPid < 0 )
 		M_THROW( "fork", errno );
 	if ( ! f_iPid )
 		{
-		if ( TEMP_FAILURE_RETRY( ::close( l_piFileDesIn[ 1 ] ) )
-				|| TEMP_FAILURE_RETRY( ::close( l_piFileDesOut[ 0 ] ) )
-				|| TEMP_FAILURE_RETRY( ::close( l_piFileDesErr[ 0 ] ) ) )
-			M_THROW( "close", errno );
+		close_and_invalidate( l_piFileDesIn[ 1 ] );
+		close_and_invalidate( l_piFileDesOut[ 0 ] );
+		close_and_invalidate( l_piFileDesErr[ 0 ] );
 		if ( ( ::dup2( l_piFileDesIn[ 0 ], fileno( stdin ) ) < 0 )
 				|| ( ::dup2( l_piFileDesOut[ 1 ], fileno( stdout ) ) < 0 )
 				|| ( ::dup2( l_piFileDesErr[ 1 ], fileno( stderr ) ) < 0 ) )
@@ -125,13 +152,12 @@ void HPipedChild::spawn( HString const& a_oImage, argv_t const& a_oArgv )
 		}
 	else
 		{
-		if ( TEMP_FAILURE_RETRY( ::close( l_piFileDesIn[ 0 ] ) )
-				|| TEMP_FAILURE_RETRY( ::close( l_piFileDesOut[ 1 ] ) )
-				|| TEMP_FAILURE_RETRY( ::close( l_piFileDesErr[ 1 ] ) ) )
-			M_THROW( "close", errno );
-		f_iPipeIn = l_piFileDesIn[ 1 ];
-		f_iPipeOut = l_piFileDesOut[ 0 ];
-		f_iPipeErr = l_piFileDesErr[ 0 ];
+		close_and_invalidate( l_piFileDesIn[ 0 ] );
+		close_and_invalidate( l_piFileDesOut[ 1 ] );
+		close_and_invalidate( l_piFileDesErr[ 1 ] );
+		swap( f_iPipeIn, l_piFileDesIn[ 1 ] );
+		swap( f_iPipeOut, l_piFileDesOut[ 0 ] );
+		swap( f_iPipeErr, l_piFileDesErr[ 0 ] );
 		}
 	return;
 	M_EPILOG
