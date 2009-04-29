@@ -678,7 +678,7 @@ HString& HString::reverse( void )
 	M_EPILOG
 	}
 
-HString HString::left( int const& a_iTo ) const
+HString HString::left( int long const& a_iTo ) const
 	{
 	M_PROLOG
 	HString l_oStr;

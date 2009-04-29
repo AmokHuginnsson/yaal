@@ -159,7 +159,7 @@ public:
 	HString& upper( void );
 	HString& lower( void );
 	HString& reverse( void );
-	HString left( int const& ) const;
+	HString left( int long const& ) const;
 	/*! \brief Get substring of this string by start position and length.
 	 *
 	 * \param start - position for begining of a substring.
