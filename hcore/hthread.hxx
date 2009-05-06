@@ -56,9 +56,9 @@ public:
 		 */
 		typedef enum
 			{
-			D_DEFAULT = 0,      /*!< Default mutex type (non-recursive). */
-			D_RECURSIVE = 1,    /*!< Recursive mutex type. */
-			D_NON_RECURSIVE = 2 /*!< Implicit non-recursive mutex type. */
+			DEFAULT = 0,      /*!< Default mutex type (non-recursive). */
+			RECURSIVE = 1,    /*!< Recursive mutex type. */
+			NON_RECURSIVE = 2 /*!< Implicit non-recursive mutex type. */
 			} mutex_type_t;
 		};
 private:
@@ -70,7 +70,7 @@ private:
 	/*}*/
 public:
 	/*{*/
-	HMutex( TYPE::mutex_type_t const /* recursive | fair */ = TYPE::D_DEFAULT );
+	HMutex( TYPE::mutex_type_t const /* recursive | fair */ = TYPE::DEFAULT );
 	virtual ~HMutex( void );
 	void lock( void );
 	bool try_lock( void );
@@ -111,10 +111,10 @@ class HThread
 	typedef HThread self_t;
 	typedef enum
 		{
-		D_DEAD,
-		D_SPAWNING,
-		D_ALIVE,
-		D_ZOMBIE
+		DEAD,
+		SPAWNING,
+		ALIVE,
+		ZOMBIE
 		} status_t;
 	status_t f_eStatus;
 	HChunk f_oAttributes;
@@ -179,9 +179,9 @@ class HCondition
 public:
 	typedef enum
 		{
-		D_OK,
-		D_TIMEOUT,
-		D_INTERRUPT
+		OK,
+		TIMEOUT,
+		INTERRUPT
 		} status_t;
 	HCondition( HMutex& );
 	virtual ~HCondition( void );

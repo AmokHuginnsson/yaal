@@ -59,8 +59,8 @@ public:
 		 */
 		typedef enum
 			{
-			E_OK = 0, /*!< no error. */
-			E_DIMNOTMATCH /*!< binary operation applied to two vectors with different dimensions. */
+			OK = 0, /*!< no error. */
+			DIMNOTMATCH /*!< binary operation applied to two vectors with different dimensions. */
 			} error_t;
 		};
 	typedef typename data_t::iterator iterator;
@@ -99,7 +99,7 @@ private:
 		{
 		M_PROLOG
 		if ( f_oData.size() != a_iSizeAnother )
-			M_THROW( g_ppcErrMsgHVector[ ERROR::E_DIMNOTMATCH ],
+			M_THROW( g_ppcErrMsgHVector[ ERROR::DIMNOTMATCH ],
 					f_oData.size() - a_iSizeAnother );
 		return;
 		M_EPILOG

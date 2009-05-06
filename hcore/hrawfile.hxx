@@ -56,10 +56,10 @@ protected:
 		 */
 		typedef enum
 			{
-			D_DEFAULT			= 0, /*!< means plain */
-			D_PLAIN				= 1, /*!< fd represents plain raw IO */
-			D_SSL_SERVER	= 2, /*!< fd represents SSL server part of IO */
-			D_SSL_CLIENT	= 4  /*!< fd represents SSL client part of IO */
+			DEFAULT			= 0, /*!< means plain */
+			PLAIN				= 1, /*!< fd represents plain raw IO */
+			SSL_SERVER	= 2, /*!< fd represents SSL server part of IO */
+			SSL_CLIENT	= 4  /*!< fd represents SSL client part of IO */
 			} raw_file_type_t;
 		};
 	/*! \brief HRawFile event type that HRawFile user can wait for.
@@ -68,8 +68,8 @@ protected:
 		{
 		typedef enum
 			{
-			D_READ,
-			D_WRITE
+			READ,
+			WRITE
 			} action_t;
 		};
 	TYPE::raw_file_type_t f_eType;
@@ -77,7 +77,7 @@ protected:
 	int f_iTimeOut;
 	HOpenSSL::ptr_t f_oSSL;
 public:
-	HRawFile( TYPE::raw_file_type_t = TYPE::D_DEFAULT );
+	HRawFile( TYPE::raw_file_type_t = TYPE::DEFAULT );
 	virtual ~HRawFile( void );
 	int close( void );
 	file_descriptor_t get_file_descriptor( void ) const;

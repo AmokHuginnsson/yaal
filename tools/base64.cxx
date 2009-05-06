@@ -77,8 +77,8 @@ yaal::hcore::HString base64::encode( yaal::hcore::HString const& message )
 	{
 	M_PROLOG
 	int shifts[] = { 16, 8, 0 };
-	static int const D_PREALLOCATE = 128;
-	HString output( D_PREALLOCATE, true );
+	static int const PREALLOCATE = 128;
+	HString output( PREALLOCATE, true );
 	u32_t coder = 0;
 	char const* ptr = message.raw();
 	int long length = message.get_length();
@@ -102,8 +102,8 @@ yaal::hcore::HString base64::decode( yaal::hcore::HString const& message )
 	{
 	M_PROLOG
 	int shifts[] = { 18, 12, 6, 0 };
-	static int const D_PREALLOCATE = 128;
-	HString output( D_PREALLOCATE, true );
+	static int const PREALLOCATE = 128;
+	HString output( PREALLOCATE, true );
 	u32_t coder = 0;
 	char const* ptr = message.raw();
 	int long length = message.get_length();

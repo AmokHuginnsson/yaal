@@ -44,8 +44,8 @@ namespace hcore
  */
 struct REFERENCE_COUNTER_TYPE
 	{
-	static int const D_STRICT = 0;
-	static int const D_WEAK = 1;
+	static int const STRICT = 0;
+	static int const WEAK = 1;
 	};
 
 template<typename tType>
@@ -120,8 +120,8 @@ class HPointer
 		DELETER_t DELETER;
 		HShared( DELETER_t const& a_DELETER ) : f_piReferenceCounter(), DELETER( a_DELETER )
 			{
-			f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] = 0;
-			f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] = 0;
+			f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 0;
+			f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 0;
 			}
 		friend class HPointer;
 		};
@@ -218,30 +218,30 @@ tType* HPointerStrict<tType, pointer_type_t>::raw( tType* a_ptPointer )
 template<typename tType, typename pointer_type_t>
 void HPointerStrict<tType, pointer_type_t>::inc_reference_counter( int* a_piReferenceCounter )
 	{
-	++ a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ];
-	++ a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
+	++ a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ];
+	++ a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ];
 	}
 
 template<typename tType, typename pointer_type_t>
 void HPointerWeak<tType, pointer_type_t>::inc_reference_counter( int* a_piReferenceCounter )
 	{
-	++ a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
+	++ a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ];
 	}
 
 template<typename tType, typename pointer_type_t>
 void HPointerStrict<tType, pointer_type_t>::dec_reference_counter( int* a_piReferenceCounter )
 	{
-	M_ASSERT( a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 );
-	M_ASSERT( a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] > 0 );
-	-- a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ];
-	-- a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
+	M_ASSERT( a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 );
+	M_ASSERT( a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] > 0 );
+	-- a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ];
+	-- a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ];
 	}
 
 template<typename tType, typename pointer_type_t>
 void HPointerWeak<tType, pointer_type_t>::dec_reference_counter( int* a_piReferenceCounter )
 	{
-	M_ASSERT( a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] > 0 );
-	-- a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ];
+	M_ASSERT( a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] > 0 );
+	-- a_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ];
 	}
 
 template<typename tType>
@@ -286,8 +286,8 @@ template<typename real_t>
 HPointer<tType, pointer_type_t, access_type_t>::HPointer( real_t* const a_ptPointer )
 	: f_ptObject( a_ptPointer ), f_poShared( new HShared( pointer_type_t<tType>::template delete_pointee<real_t> ) )
 	{
-	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] = 1;
-	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] = 1;
+	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
+	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
 	access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( a_ptPointer, *this );
 	return;
 	}
@@ -349,7 +349,7 @@ void HPointer<tType, pointer_type_t, access_type_t>::acquire( HPointer<hier_t, p
 					&& ( f_ptObject != reinterpret_cast<hier_t*>( alien.f_ptObject ) ) ) );
 		if ( f_poShared )
 			release();
-		if ( alien.f_poShared && ( alien.f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 ) )
+		if ( alien.f_poShared && ( alien.f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) )
 			{
 			access_type_t<tType, pointer_type_t<tType> >::inc_reference_counter( alien.f_poShared->f_piReferenceCounter );
 			f_poShared = alien.f_poShared;
@@ -398,22 +398,22 @@ template<typename tType, template<typename>class pointer_type_t,
 bool HPointer<tType, pointer_type_t, access_type_t>::release( void ) throw()
 	{
 	M_ASSERT( f_poShared );
-	if ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] == 1 )
+	if ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] == 1 )
 		access_type_t<tType, pointer_type_t<tType> >::delete_pointee( f_poShared->DELETER, f_ptObject );
 	access_type_t<tType, pointer_type_t<tType> >::dec_reference_counter( f_poShared->f_piReferenceCounter );
-	if ( ! f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_WEAK ] )
+	if ( ! f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] )
 		{
 		delete f_poShared;
 		f_poShared = NULL;
 		}
-	return ( ! ( f_poShared && f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] ) );
+	return ( ! ( f_poShared && f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] ) );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 tType const& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) const
 	{
-	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 ) );
+	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	return ( *f_ptObject );
 	}
 
@@ -421,7 +421,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 tType& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void )
 	{
-	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 ) );
+	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	return ( *f_ptObject );
 	}
 
@@ -429,7 +429,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 tType const& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex ) const
 	{
-	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 ) );
+	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	M_ASSERT( a_iIndex >= 0 );
 	return ( access_type_t<tType, pointer_type_t<tType> >::object_at( f_ptObject, a_iIndex ) );
 	}
@@ -438,7 +438,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 tType& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex )
 	{
-	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 ) );
+	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	M_ASSERT( a_iIndex >= 0 );
 	return ( access_type_t<tType, pointer_type_t<tType> >::object_at( f_ptObject, a_iIndex ) );
 	}
@@ -494,7 +494,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 tType const* HPointer<tType, pointer_type_t, access_type_t>::operator->( void ) const
 	{
-	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 ) );
+	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	return ( access_type_t<tType, pointer_type_t<tType> >::raw( f_ptObject ) );
 	}
 
@@ -502,7 +502,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 tType* HPointer<tType, pointer_type_t, access_type_t>::operator->( void )
 	{
-	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::D_STRICT ] > 0 ) );
+	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	return ( access_type_t<tType, pointer_type_t<tType> >::raw( f_ptObject ) );
 	}
 

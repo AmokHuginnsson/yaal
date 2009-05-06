@@ -54,13 +54,13 @@ public:
 		{
 		typedef enum
 			{
-			D_OK,
-			D_REPEAT,
-			D_ERROR
+			OK,
+			REPEAT,
+			ERROR
 			} code_t;
 		int octets; /*!< number of octets read during last read operation */
 		code_t code; /*!< return code for last read operation */
-		STATUS( void ) : octets( 0 ), code( D_OK ) {}
+		STATUS( void ) : octets( 0 ), code( OK ) {}
 		};
 	typedef HPointer<HStreamInterface> ptr_t;
 protected:

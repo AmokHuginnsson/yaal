@@ -48,8 +48,8 @@ class HTokenizer
 public:
 	typedef enum
 		{
-		D_SKIP_EMPTY,
-		D_INCLUDE_EMPTY
+		SKIP_EMPTY,
+		INCLUDE_EMPTY
 		} behavoir_t;
 private:
 	behavoir_t _behavior;
@@ -59,7 +59,7 @@ private:
 public:
 	class HIterator;
 public:
-	HTokenizer( HString const&, HString const&, behavoir_t const& = D_INCLUDE_EMPTY );
+	HTokenizer( HString const&, HString const&, behavoir_t const& = INCLUDE_EMPTY );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
 	HString const& operator[] ( int long const& ) const;

@@ -47,17 +47,17 @@ public:
 		{
 		typedef enum
 			{
-			D_SECOND = 0,
-			D_NANOSECOND = 1,
-			D_MICROSECOND = 2,
-			D_MILISECOND = 3
+			SECOND = 0,
+			NANOSECOND = 1,
+			MICROSECOND = 2,
+			MILISECOND = 3
 			} unit_t;
 		};
 private:
 	mutable int long f_lMoment[2];
 public:
 	HClock( void );
-	int long get_time_elapsed( UNIT::unit_t const& = UNIT::D_SECOND, bool const& = false ) const;
+	int long get_time_elapsed( UNIT::unit_t const& = UNIT::SECOND, bool const& = false ) const;
 	};
 
 }

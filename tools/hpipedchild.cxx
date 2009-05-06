@@ -46,7 +46,7 @@ namespace tools
 HPipedChild::HPipedChild( void )
 	: HStreamInterface(), f_iPid( 0 ),
 	f_iPipeIn( -1 ), f_iPipeOut( -1 ), f_iPipeErr( -1 ),
-	f_eCSOI( STREAM::D_OUT ), f_oSecondLineCache( f_oCache ), f_iSecondLineOffset( f_iOffset )
+	f_eCSOI( STREAM::OUT ), f_oSecondLineCache( f_oCache ), f_iSecondLineOffset( f_iOffset )
 	{
 	return;
 	}
@@ -80,12 +80,12 @@ HPipedChild::STATUS HPipedChild::finish( void )
 		::waitpid( f_iPid, &status, 0 );
 		if ( WIFEXITED( status ) )
 			{
-			s.type = STATUS::TYPE::D_NORMAL;
+			s.type = STATUS::TYPE::NORMAL;
 			s.value = WEXITSTATUS( status );
 			}
 		else if ( WIFSIGNALED( status ) )
 			{
-			s.type = STATUS::TYPE::D_ABORT;
+			s.type = STATUS::TYPE::ABORT;
 			s.value = WTERMSIG( status );
 			}
 		}
@@ -167,7 +167,7 @@ int long HPipedChild::do_read( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	M_ASSERT( ( f_iPipeOut >= 0 ) && ( f_iPipeErr >= 0 ) );
-	int fd = ( ( f_eCSOI == STREAM::D_OUT ) ? f_iPipeOut : f_iPipeErr );
+	int fd = ( ( f_eCSOI == STREAM::OUT ) ? f_iPipeOut : f_iPipeErr );
 	return ( ::read( fd, a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}
@@ -198,7 +198,7 @@ bool HPipedChild::read_poll( void* a_pvTime )
 	int l_iError = - 1;
 	fd_set l_xFdSet;
 	timeval* l_pxWait = static_cast<timeval*>( a_pvTime );
-	int fd = ( ( f_eCSOI == STREAM::D_OUT ) ? f_iPipeOut : f_iPipeErr );
+	int fd = ( ( f_eCSOI == STREAM::OUT ) ? f_iPipeOut : f_iPipeErr );
 	do
 		{
 		FD_ZERO( &l_xFdSet );
@@ -225,7 +225,7 @@ bool HPipedChild::is_running( void )
 void HPipedChild::set_csoi( STREAM::stream_t const& a_eCSOI )
 	{
 	M_PROLOG
-	M_ASSERT( ( a_eCSOI == STREAM::D_OUT ) || ( a_eCSOI == STREAM::D_ERR ) );
+	M_ASSERT( ( a_eCSOI == STREAM::OUT ) || ( a_eCSOI == STREAM::ERR ) );
 	if ( a_eCSOI != f_eCSOI )
 		{
 		using yaal::swap;

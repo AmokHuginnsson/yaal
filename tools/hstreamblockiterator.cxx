@@ -40,16 +40,16 @@ namespace tools
 namespace
 {
 
-static int long const D_BUFFER_SIZE = yaal::power<2,20>::value;
+static int long const BUFFER_SIZE = yaal::power<2,20>::value;
 
 }
 
 HStreamBlockIterator::HStreamBlockIterator( HStreamInterface& a_roStream, int long a_lSize )
-	: f_oBuffer( D_BUFFER_SIZE ), f_lIndex( 0 ), f_lSize( a_lSize ),
+	: f_oBuffer( BUFFER_SIZE ), f_lIndex( 0 ), f_lSize( a_lSize ),
 	f_lBufferOffset( 0 ), f_lBufferSize( 0 ), f_roStream( a_roStream )
 	{
 	M_ASSERT( f_lSize > 0 );
-	if ( f_lSize > D_BUFFER_SIZE )
+	if ( f_lSize > BUFFER_SIZE )
 		M_THROW( "so large stream blocks are not supported", f_lSize );
 	}
 
@@ -69,10 +69,10 @@ HStreamBlockIterator::HBlock HStreamBlockIterator::operator* ( void )
 	{
 	M_PROLOG
 	int long firstOctet = f_lIndex * f_lSize;
-	if ( ( firstOctet >= ( f_lBufferOffset + f_lBufferSize ) ) && ( ( f_lBufferSize == D_BUFFER_SIZE ) || ! f_lBufferSize ) )
+	if ( ( firstOctet >= ( f_lBufferOffset + f_lBufferSize ) ) && ( ( f_lBufferSize == BUFFER_SIZE ) || ! f_lBufferSize ) )
 		{
 		f_lBufferOffset = firstOctet;
-		f_lBufferSize = f_roStream.read( f_oBuffer.raw(), D_BUFFER_SIZE );
+		f_lBufferSize = f_roStream.read( f_oBuffer.raw(), BUFFER_SIZE );
 		}
 	return ( HBlock( ( f_oBuffer.raw() + firstOctet ) - f_lBufferOffset, min( f_lBufferSize - ( firstOctet - f_lBufferOffset ), f_lSize ) ) );
 	M_EPILOG

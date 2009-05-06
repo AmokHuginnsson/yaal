@@ -146,11 +146,11 @@ HOpenSSL::OSSLContextClient::OSSLContextClient( void )
 
 HOpenSSL::HOpenSSL( int a_iFileDescriptor, TYPE::ssl_context_type_t a_eType )
 	: f_bPendingOperation( false ), f_pvSSL( NULL ),
-	do_accept_or_connect( ( a_eType == TYPE::D_SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect )
+	do_accept_or_connect( ( a_eType == TYPE::SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect )
 	{
 	M_PROLOG
 	HString l_oBuffer;
-	OSSLContext* context = ( ( a_eType == TYPE::D_SERVER ) ? static_cast<OSSLContext*>( &OSSLContextServerInstance::get_instance() ) : static_cast<OSSLContext*>( &OSSLContextClientInstance::get_instance() ) );
+	OSSLContext* context = ( ( a_eType == TYPE::SERVER ) ? static_cast<OSSLContext*>( &OSSLContextServerInstance::get_instance() ) : static_cast<OSSLContext*>( &OSSLContextClientInstance::get_instance() ) );
 	SSL* ssl = NULL;
 	f_pvSSL = ssl = SSL_new( static_cast<SSL_CTX*>( context->f_pvContext ) );
 	if ( ! f_pvSSL )

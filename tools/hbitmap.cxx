@@ -177,7 +177,7 @@ void HBitmap::ensure_pool( int long const& newSize )
 	if ( f_lAllocatedBytes )
 		static_cast<mem_pool_t*>( f_pvData )->pool_realloc( newPoolSize );
 	else
-		f_pvData = new mem_pool_t( newPoolSize, mem_pool_t::D_AUTO_GROW );
+		f_pvData = new mem_pool_t( newPoolSize, mem_pool_t::AUTO_GROW );
 	f_lAllocatedBytes = newPoolSize;
 	M_ENSURE( f_pvData );
 	return;

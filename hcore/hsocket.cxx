@@ -55,10 +55,10 @@ namespace hcore
 
 enum
 	{
-	E_OK = 0,
-	E_NOT_INITIALIZED,
-	E_NOT_A_SERVER,
-	E_ALREADY_LISTENING
+	OK = 0,
+	NOT_INITIALIZED,
+	NOT_A_SERVER,
+	ALREADY_LISTENING
 	};
 
 char const* const n_ppcErrMsgHSocket[ 4 ] =
@@ -73,37 +73,37 @@ bool HSocket::f_bResolveHostnames = true;
 
 HSocket::HSocket( socket_type_t const a_eSocketType,
 		int const a_iMaximumNumberOfClients )
-	: HRawFile( !!( a_eSocketType & TYPE::D_SSL_SERVER )
-			? HRawFile::TYPE::D_SSL_SERVER
-			: ( ( ( a_eSocketType == TYPE::D_DEFAULT ) || ( !!( a_eSocketType & TYPE::D_SSL_CLIENT ) ) )
-				? HRawFile::TYPE::D_SSL_CLIENT : HRawFile::TYPE::D_DEFAULT ) ),
+	: HRawFile( !!( a_eSocketType & TYPE::SSL_SERVER )
+			? HRawFile::TYPE::SSL_SERVER
+			: ( ( ( a_eSocketType == TYPE::DEFAULT ) || ( !!( a_eSocketType & TYPE::SSL_CLIENT ) ) )
+				? HRawFile::TYPE::SSL_CLIENT : HRawFile::TYPE::DEFAULT ) ),
 	f_bNeedShutdown( false ), f_eType( a_eSocketType ),
 	f_iMaximumNumberOfClients( a_iMaximumNumberOfClients ),
 	f_iAddressSize( 0 ), f_pvAddress( NULL ), f_poClients( NULL ),
 	f_oHostName()
 	{
 	M_PROLOG
-	if ( f_eType == TYPE::D_DEFAULT )
-		f_eType |= TYPE::D_SSL_CLIENT;
-	if ( ( !!( a_eSocketType & TYPE::D_FILE ) ) && ( !!( a_eSocketType & TYPE::D_NETWORK ) ) )
+	if ( f_eType == TYPE::DEFAULT )
+		f_eType |= TYPE::SSL_CLIENT;
+	if ( ( !!( a_eSocketType & TYPE::FILE ) ) && ( !!( a_eSocketType & TYPE::NETWORK ) ) )
 		M_THROW( _( "bad socket namespace setting" ), a_eSocketType.value() );
-	if ( ! ( a_eSocketType & ( socket_type_t( TYPE::D_FILE ) | TYPE::D_NETWORK ) ) )
-		f_eType |= TYPE::D_NETWORK;
-	if ( ( !!( a_eSocketType & TYPE::D_BLOCKING ) ) && ( !!( a_eSocketType & TYPE::D_NONBLOCKING ) ) )
+	if ( ! ( a_eSocketType & ( socket_type_t( TYPE::FILE ) | TYPE::NETWORK ) ) )
+		f_eType |= TYPE::NETWORK;
+	if ( ( !!( a_eSocketType & TYPE::BLOCKING ) ) && ( !!( a_eSocketType & TYPE::NONBLOCKING ) ) )
 		M_THROW( _( "bad socket option" ), a_eSocketType.value() );
-	if ( ! ( a_eSocketType & ( socket_type_t( TYPE::D_BLOCKING ) | TYPE::D_NONBLOCKING ) ) )
-		f_eType |= TYPE::D_BLOCKING;
+	if ( ! ( a_eSocketType & ( socket_type_t( TYPE::BLOCKING ) | TYPE::NONBLOCKING ) ) )
+		f_eType |= TYPE::BLOCKING;
 	if ( f_iMaximumNumberOfClients >= 0 )
 		{
 		M_ENSURE( ( f_iFileDescriptor = ::socket(
-						!!( f_eType & TYPE::D_NETWORK ) ? PF_INET : PF_UNIX,
+						!!( f_eType & TYPE::NETWORK ) ? PF_INET : PF_UNIX,
 						static_cast<int>( SOCK_STREAM ),
 						0 /* info libc "Creating a Socket"
 								 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
-		if ( !!( f_eType & TYPE::D_NONBLOCKING ) )
+		if ( !!( f_eType & TYPE::NONBLOCKING ) )
 			M_ENSURE( ::fcntl( f_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 		}
-	if ( !!( f_eType & TYPE::D_NETWORK ) )
+	if ( !!( f_eType & TYPE::NETWORK ) )
 		f_pvAddress = xcalloc<sockaddr_in>( 1 );
 	else
 		f_pvAddress = xcalloc<sockaddr_un>( 1 );
@@ -138,7 +138,7 @@ int HSocket::do_close( void )
 		{
 		delete f_poClients;
 		f_poClients = NULL;
-		if ( ( !!( f_eType & TYPE::D_FILE ) ) && ( f_pvAddress ) )
+		if ( ( !!( f_eType & TYPE::FILE ) ) && ( f_pvAddress ) )
 			{
 			l_psAddressFile = static_cast<sockaddr_un*>( f_pvAddress );
 			if ( l_psAddressFile->sun_path [ 0 ] )
@@ -161,7 +161,7 @@ void HSocket::shutdown_client( int a_iFileDescriptor )
 	M_PROLOG
 	ptr_t l_oClient;
 	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
 	if ( f_poClients->get( a_iFileDescriptor, l_oClient ) )
 		M_THROW( _( "no such client" ), a_iFileDescriptor );
 	M_ASSERT( !! l_oClient );
@@ -175,9 +175,9 @@ void HSocket::listen( yaal::hcore::HString const& a_oAddress, int const a_iPort 
 	M_PROLOG
 	int l_iReuseAddr = 1;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
 	if ( f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ E_ALREADY_LISTENING ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ ALREADY_LISTENING ], f_iFileDescriptor );
 	if ( f_iMaximumNumberOfClients < 1 )
 		M_THROW( _( "bad maximum number of clients" ), f_iMaximumNumberOfClients );
 	make_address ( a_oAddress, a_iPort );
@@ -201,10 +201,10 @@ HSocket::ptr_t HSocket::accept( void )
 	sockaddr_un l_sAddressFile;
 	sockaddr* l_psAddress;
 	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
 	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
-	if ( !!( f_eType & TYPE::D_NETWORK ) )
+		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
+	if ( !!( f_eType & TYPE::NETWORK ) )
 		{
 		l_psAddress = static_cast<sockaddr*>(
 				static_cast<void*>( &l_sAddressNetwork ) );
@@ -218,12 +218,12 @@ HSocket::ptr_t HSocket::accept( void )
 		}
 	M_ENSURE( ( l_iFileDescriptor = ::accept( f_iFileDescriptor,
 					l_psAddress, &l_iAddressSize ) ) >= 0 );
-	if ( !!( f_eType & TYPE::D_NONBLOCKING ) )
+	if ( !!( f_eType & TYPE::NONBLOCKING ) )
 		M_ENSURE( ::fcntl( l_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 	/* - 1 means that constructor shall not create socket */
 	socket_type_t l_eType = f_eType;
-	if ( !!( f_eType & ( socket_type_t( TYPE::D_SSL_SERVER  ) | TYPE::D_SSL_CLIENT ) ) )
-		l_eType &= ~socket_type_t( TYPE::D_SSL_CLIENT ), l_eType |= TYPE::D_SSL_SERVER;
+	if ( !!( f_eType & ( socket_type_t( TYPE::SSL_SERVER  ) | TYPE::SSL_CLIENT ) ) )
+		l_eType &= ~socket_type_t( TYPE::SSL_CLIENT ), l_eType |= TYPE::SSL_SERVER;
 	ptr_t l_oSocket = ptr_t( new HSocket( l_eType, -1 ) );
 	M_ASSERT( ! l_oSocket->f_oSSL );
 	l_oSocket->f_iFileDescriptor = l_iFileDescriptor;
@@ -242,7 +242,7 @@ void HSocket::connect( yaal::hcore::HString const& a_oAddress, int const a_iPort
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
 	make_address( a_oAddress, a_iPort );
 	M_ENSURE( ::connect( f_iFileDescriptor,
 				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 );
@@ -258,20 +258,20 @@ void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_
 	sockaddr_in* l_psAddressNetwork = NULL;
 	sockaddr_un* l_psAddressFile = NULL;
 #ifdef HAVE_GETHOSTBYNAME_R
-	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
+	static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	hostent l_sHostName;
 	hostent* l_psHostName = NULL;
 #else /* HAVE_GETHOSTBYNAME_R */
 	addrinfo* l_psAddrInfo = NULL;
 #endif /* ! HAVE_GETHOSTBYNAME_R */
-	if ( !!( f_eType & TYPE::D_NETWORK ) )
+	if ( !!( f_eType & TYPE::NETWORK ) )
 		{
 		l_psAddressNetwork = static_cast < sockaddr_in * > ( f_pvAddress );
 		l_psAddressNetwork->sin_family = AF_INET;
 		l_psAddressNetwork->sin_port = htons(
 				static_cast<int short unsigned>( a_iPort ) );
 #ifdef HAVE_GETHOSTBYNAME_R
-		f_iAddressSize = D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
+		f_iAddressSize = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
 		f_oCache.pool_realloc( f_iAddressSize );
 		while ( ::gethostbyname_r( a_oAddress.raw(), &l_sHostName,
 					f_oCache.raw(), f_iAddressSize,
@@ -289,7 +289,7 @@ void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_
 #endif /* not HAVE_GETHOSTBYNAME_R */
 		f_iAddressSize = sizeof ( sockaddr_in );
 		}
-	else /* f_eType & TYPE::D_FILE */
+	else /* f_eType & TYPE::FILE */
 		{
 		l_psAddressFile = static_cast<sockaddr_un*>( f_pvAddress );
 		l_psAddressFile->sun_family = AF_UNIX;
@@ -307,9 +307,9 @@ int HSocket::get_port( void ) const
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
 	sockaddr_in* l_psAddressNetwork = NULL;
-	if ( ! ( f_eType & TYPE::D_NETWORK ) )
+	if ( ! ( f_eType & TYPE::NETWORK ) )
 		M_THROW( _( "unix socket has not a port attribute" ), f_eType.value() );
 	l_psAddressNetwork = static_cast<sockaddr_in*>( f_pvAddress );
 	return ( ntohs( l_psAddressNetwork->sin_port ) );
@@ -321,7 +321,7 @@ HSocket::ptr_t HSocket::get_client( int const a_iFileDescriptor ) const
 	M_PROLOG
 	ptr_t l_oClient;
 	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
 	f_poClients->get( a_iFileDescriptor, l_oClient );
 	return ( l_oClient );
 	M_EPILOG
@@ -331,7 +331,7 @@ HSocket::clients_t::const_iterator HSocket::begin( void ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
 	clients_t const* c = f_poClients;
 	return ( c->begin() );
 	M_EPILOG
@@ -341,7 +341,7 @@ HSocket::clients_t::const_iterator HSocket::end( void ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
 	clients_t const* c = f_poClients;
 	return ( c->end() );
 	M_EPILOG
@@ -362,17 +362,17 @@ int HSocket::get_client_count( void ) const
 	{
 	M_PROLOG
 	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_A_SERVER ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
 	return ( f_poClients->size() );
 	M_EPILOG
 	}
 
 HString const& HSocket::get_host_name( void )
 	{
-	static int const D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
+	static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	M_PROLOG
 	int l_iError = 0;
-	int l_iSize = D_GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
+	int l_iSize = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
 	sockaddr_in* l_psAddressNetwork = NULL;
 	sockaddr_un* l_psAddressFile = NULL;
 #ifdef HAVE_GETHOSTBYNAME_R
@@ -383,10 +383,10 @@ HString const& HSocket::get_host_name( void )
 	l_iSize = NI_MAXHOST;
 #endif /* ! HAVE_GETHOSTBYNAME_R */
 	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ E_NOT_INITIALIZED ], f_iFileDescriptor );
+		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
 	if ( f_oHostName.is_empty() )
 		{
-		if ( !!( f_eType & TYPE::D_NETWORK ) )
+		if ( !!( f_eType & TYPE::NETWORK ) )
 			{
 			char const* name = NULL;
 			f_oCache.pool_realloc( l_iSize );

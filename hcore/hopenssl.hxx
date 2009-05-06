@@ -58,8 +58,8 @@ public:
 		 */
 		typedef enum
 			{
-			D_SERVER, /*!< Server side of SSL connection. */
-			D_CLIENT  /*!< Client side of SSL connection. */
+			SERVER, /*!< Server side of SSL connection. */
+			CLIENT  /*!< Client side of SSL connection. */
 			} ssl_context_type_t;
 		};
 private:

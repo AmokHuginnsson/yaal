@@ -39,9 +39,9 @@ namespace hcore
 char const * const n_ppcErrMsgHArray [ 4 ] =
 	{
 	_( "ok" ),
-/* HArray::ERROR::E_BAD_SIZE */      _( "bad size" ),
-/* HArray::ERROR::E_OUT_OF_MEMORY */ _( "cannot alloc memory with new" ),
-/* HArray::ERROR::E_BAD_INDEX */     _( "index does not fit into array" )
+/* HArray::ERROR::BAD_SIZE */      _( "bad size" ),
+/* HArray::ERROR::OUT_OF_MEMORY */ _( "cannot alloc memory with new" ),
+/* HArray::ERROR::BAD_INDEX */     _( "index does not fit into array" )
 	};
 
 }

@@ -61,13 +61,13 @@ public:
 		 */
 		typedef enum
 			{
-			D_DEFAULT			= 0x00,
-			D_FILE				= 0x01,
-			D_NETWORK			= 0x02,
-			D_BLOCKING		= 0x04,
-			D_NONBLOCKING	= 0x08,
-			D_SSL_SERVER	= 0x10,
-			D_SSL_CLIENT	= 0x20
+			DEFAULT			= 0x00,
+			FILE				= 0x01,
+			NETWORK			= 0x02,
+			BLOCKING		= 0x04,
+			NONBLOCKING	= 0x08,
+			SSL_SERVER	= 0x10,
+			SSL_CLIENT	= 0x20
 			} enum_t;
 		};
 	typedef HStrongEnum<TYPE> socket_type_t;
@@ -81,7 +81,7 @@ protected:
 	clients_t* f_poClients;
 	HString f_oHostName;
 public:
-	HSocket( socket_type_t const = TYPE::D_DEFAULT, int const = 0 );
+	HSocket( socket_type_t const = TYPE::DEFAULT, int const = 0 );
 	virtual ~HSocket( void );
 	void listen( yaal::hcore::HString const&, int const = 0 );
 	ptr_t accept( void );

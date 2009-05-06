@@ -49,7 +49,7 @@ private:
 	int long f_lIntegralPartSize;
 	canonical_t f_oCanonical;
 public:
-	static int D_DEFAULT_PRECISION;
+	static int DEFAULT_PRECISION;
 public:
 	HNumber( void );
 	HNumber( double long );

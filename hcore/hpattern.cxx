@@ -110,7 +110,7 @@ int HPattern::parse( HString const& a_oPattern, pluggable_flags_t* externalFlags
 		for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it )
 			*it->second = false;
 		}
-/* FIXME g++ 4.3 bug *///		a_puhFlags[ i ] &= D_FLAG_MASK;
+/* FIXME g++ 4.3 bug *///		a_puhFlags[ i ] &= FLAG_MASK;
 /* end of clearing */
 /* look for switches at the beginnig of pattern */
 	int long l_iCtr = 0;

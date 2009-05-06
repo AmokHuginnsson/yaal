@@ -47,7 +47,7 @@ namespace hcore
 
 void* HException::ERROR_STREAM = stderr;
 
-static int const D_DEBUG_LEVEL_HELPER = 5; /* FIXME */
+static int const DEBUG_LEVEL_HELPER = 5; /* FIXME */
 char const* const n_pcExceptionType = _( "Exception type" );
 
 HException::HException( char const* const a_pcFileName,
@@ -189,7 +189,7 @@ void HException::log( char const* const a_pcFileName,
 				"Exception frame %2d: %16s : %4d : %s\n", f_iFrame,\
 				a_pcFileName + ( l_uiLength > 16 ? l_uiLength - 16 : 0 ),\
 				a_iLine, a_pcFunctionName
-	if ( n_iDebugLevel > D_DEBUG_LEVEL_HELPER )
+	if ( n_iDebugLevel > DEBUG_LEVEL_HELPER )
 		fprintf( static_cast<FILE*>( ERROR_STREAM ), M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA );
 	hcore::log( M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA );
 	++ f_iFrame;
@@ -217,7 +217,7 @@ void HException::failed_assert( char const* const a_pcFileName,
 			a_pcMessage, a_pcFileName, a_iLine, a_pcFunctionName );
 	if ( ! errno )
 		++ errno;
-	if ( n_iDebugLevel > D_DEBUG_LEVEL_HELPER )
+	if ( n_iDebugLevel > DEBUG_LEVEL_HELPER )
 		::abort();
 	throw ( HFailedAssertion( a_pcMessage ) );
 	M_EPILOG

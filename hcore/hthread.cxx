@@ -51,8 +51,8 @@ void do_pthread_attr_destroy( void* attr )
 	}
 
 HThread::HThread( void )
-	: f_eStatus( D_DEAD ), f_oAttributes( xcalloc<pthread_attr_t>( 1 ) ),
-	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::D_RECURSIVE ),
+	: f_eStatus( DEAD ), f_oAttributes( xcalloc<pthread_attr_t>( 1 ) ),
+	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::RECURSIVE ),
 	f_oSemaphore(), f_oAttrDS()
 	{
 	M_PROLOG
@@ -69,13 +69,13 @@ HThread::~HThread( void )
 	{
 	M_PROLOG
 	HLock l_oLock( f_oMutex );
-	if ( f_eStatus != D_DEAD )
+	if ( f_eStatus != DEAD )
 		{
 		f_oMutex.unlock();
 		finish();
 		f_oMutex.lock();
 		}
-	M_ASSERT( f_eStatus == D_DEAD );
+	M_ASSERT( f_eStatus == DEAD );
 	return;
 	M_EPILOG
 	}
@@ -84,9 +84,9 @@ int HThread::spawn( void )
 	{
 	M_PROLOG
 	HLock l_oLock( f_oMutex );
-	if ( f_eStatus != D_DEAD )
+	if ( f_eStatus != DEAD )
 		M_THROW( _( "thread is already running or spawning" ), f_eStatus );
-	f_eStatus = D_SPAWNING;
+	f_eStatus = SPAWNING;
 	M_ENSURE( ::pthread_create( f_oThread.get<pthread_t>(),
 				f_oAttributes.get<pthread_attr_t>(), SPAWN, this ) == 0 );
 	f_oSemaphore.wait();
@@ -98,8 +98,8 @@ void HThread::schedule_finish( void )
 	{
 	M_PROLOG
 	HLock l_oLock( f_oMutex );
-	if ( f_eStatus != D_DEAD )
-		f_eStatus = D_ZOMBIE;
+	if ( f_eStatus != DEAD )
+		f_eStatus = ZOMBIE;
 	return;
 	M_EPILOG
 	}
@@ -108,7 +108,7 @@ int long HThread::finish( void )
 	{
 	M_PROLOG
 	HLock l_oLock( f_oMutex );
-	if ( ( f_eStatus != D_ALIVE ) && ( f_eStatus != D_ZOMBIE ) && ( f_eStatus != D_SPAWNING ) )
+	if ( ( f_eStatus != ALIVE ) && ( f_eStatus != ZOMBIE ) && ( f_eStatus != SPAWNING ) )
 		M_THROW( _( "thread is not running" ), f_eStatus );
 	schedule_finish();
 	f_oMutex.unlock();
@@ -116,7 +116,7 @@ int long HThread::finish( void )
 	f_oMutex.lock();
 	void* l_pvReturn = NULL;
 	M_ENSURE( ::pthread_join( *f_oThread.get<pthread_t>(), &l_pvReturn ) == 0 );
-	f_eStatus = D_DEAD;
+	f_eStatus = DEAD;
 	return ( reinterpret_cast<int long>( l_pvReturn ) );
 	M_EPILOG
 	}
@@ -139,7 +139,7 @@ void* HThread::control( void )
 	M_PROLOG
 	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
 	M_ENSURE( ::pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
-	f_eStatus = D_ALIVE;
+	f_eStatus = ALIVE;
 	f_oSemaphore.signal();
 	/*
 	 * Setting int run(); as pure virtual exposed us to undefined behavior
@@ -165,7 +165,7 @@ void* HThread::control( void )
 	 * any useful or meaningful int run();
 	 */
 	void* l_pvReturn = reinterpret_cast<void*>( run() );
-	f_eStatus = D_ZOMBIE;
+	f_eStatus = ZOMBIE;
 	f_oSemaphore.signal();
 	return ( l_pvReturn );
 	M_EPILOG
@@ -175,7 +175,7 @@ bool HThread::is_alive( void ) const
 	{
 	M_PROLOG
 	HLock l_oLock( f_oMutex );
-	return ( f_eStatus == D_ALIVE );
+	return ( f_eStatus == ALIVE );
 	M_EPILOG
 	}
 
@@ -205,13 +205,13 @@ HMutex::HMutex( TYPE::mutex_type_t const a_eType ) : f_eType ( a_eType ),
 	f_oMutex( xcalloc<pthread_mutex_t>( 1 ) ), f_oAttrDS()
 	{
 	M_PROLOG
-	if ( f_eType == TYPE::D_DEFAULT )
-		f_eType = TYPE::D_NON_RECURSIVE;
+	if ( f_eType == TYPE::DEFAULT )
+		f_eType = TYPE::NON_RECURSIVE;
 	pthread_mutexattr_t* attr = f_oAttributes.get<pthread_mutexattr_t>();
 	::pthread_mutexattr_init( attr );
 	f_oAttrDS.set_destruction_scheme( attr, do_pthread_mutexattr_destroy );
 	M_ENSURE( ::pthread_mutexattr_settype( attr,
-				f_eType & TYPE::D_RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
+				f_eType & TYPE::RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
 	::pthread_mutex_init( f_oMutex.get<pthread_mutex_t>(), attr );
 	return;
 	M_EPILOG
@@ -232,7 +232,7 @@ void HMutex::lock( void )
 	{
 	M_PROLOG
 	int l_iError = ::pthread_mutex_lock( f_oMutex.get<pthread_mutex_t>() );
-	if ( ! ( f_eType & TYPE::D_RECURSIVE ) )
+	if ( ! ( f_eType & TYPE::RECURSIVE ) )
 		M_ENSURE( l_iError != EDEADLK );
 	return;
 	M_EPILOG
@@ -242,7 +242,7 @@ void HMutex::unlock( void )
 	{
 	M_PROLOG
 	int l_iError = ::pthread_mutex_unlock( f_oMutex.get<pthread_mutex_t>() );
-	if ( ! ( f_eType & TYPE::D_RECURSIVE ) )
+	if ( ! ( f_eType & TYPE::RECURSIVE ) )
 		M_ENSURE( l_iError != EPERM );
 	return;
 	M_EPILOG
@@ -337,18 +337,18 @@ HCondition::status_t HCondition::wait( int long unsigned const& a_ulTimeOutSecon
 	int l_iError = 0;
 	timespec l_sTimeOut;
 	clock_gettime( CLOCK_REALTIME, &l_sTimeOut );
-	static int long const D_NANO_IN_WHOLE = power<10, 9>::value;
+	static int long const NANO_IN_WHOLE = power<10, 9>::value;
 	l_sTimeOut.tv_sec += a_ulTimeOutSeconds;
 	l_sTimeOut.tv_nsec += a_ulTimeOutNanoSeconds;
-	if ( l_sTimeOut.tv_nsec >= D_NANO_IN_WHOLE )
+	if ( l_sTimeOut.tv_nsec >= NANO_IN_WHOLE )
 		{
 		++ l_sTimeOut.tv_sec;
-		l_sTimeOut.tv_nsec -= D_NANO_IN_WHOLE;
+		l_sTimeOut.tv_nsec -= NANO_IN_WHOLE;
 		}
 	l_iError = ::pthread_cond_timedwait( f_oCondition.get<pthread_cond_t>(),
 				f_roMutex.f_oMutex.get<pthread_mutex_t>(), &l_sTimeOut );
 	M_ENSURE ( ( l_iError == 0 ) || ( l_iError == EINTR ) || ( l_iError == ETIMEDOUT ) );
-	return ( ( l_iError == 0 ) ? D_OK : ( ( l_iError == EINTR ) ? D_INTERRUPT : D_TIMEOUT ) );
+	return ( ( l_iError == 0 ) ? OK : ( ( l_iError == EINTR ) ? INTERRUPT : TIMEOUT ) );
 	M_EPILOG
 	}
 

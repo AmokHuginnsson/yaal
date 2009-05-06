@@ -55,7 +55,7 @@ class HVariant
 	{
 protected:
 	typedef HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t> self_t;
-	static int const D_SIZE = yaal::static_max<
+	static int const SIZE = yaal::static_max<
 		sizeof ( t0_t ),
 		sizeof ( t1_t ),
 		sizeof ( t2_t ),
@@ -66,7 +66,7 @@ protected:
 		sizeof ( t7_t ),
 		sizeof ( t8_t ),
 		sizeof ( t9_t )>::value;
-	char _mem[ D_SIZE ];
+	char _mem[ SIZE ];
 	int _type;
 public:
 	HVariant( void );
@@ -184,7 +184,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::swap(
 		{
 		using yaal::swap;
 		swap( _type, v._type );
-		yaal::swap_ranges( _mem, _mem + D_SIZE, v._mem );
+		yaal::swap_ranges( _mem, _mem + SIZE, v._mem );
 		}
 	return;
 	}

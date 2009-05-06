@@ -77,48 +77,48 @@ HDes::~HDes ( void )
 void HDes::generate_keys( u8_t* a_pcPassword )
 	{
 	int l_iCtr = 0, l_iCtrLoc = 0;
-	u8_t l_pcIKeyLow[ DES::D_BLOCK_SIZE ];
-	u8_t l_pcIKeyHigh[ DES::D_BLOCK_SIZE ];
-	u8_t l_pcTmpKey[ DES::D_BLOCK_SIZE ];
+	u8_t l_pcIKeyLow[ DES::BLOCK_SIZE ];
+	u8_t l_pcIKeyHigh[ DES::BLOCK_SIZE ];
+	u8_t l_pcTmpKey[ DES::BLOCK_SIZE ];
 	flush_keys();
-	for ( l_iCtr = 0; l_iCtr < DES::D_BLOCK_SIZE; ++ l_iCtr )
+	for ( l_iCtr = 0; l_iCtr < DES::BLOCK_SIZE; ++ l_iCtr )
 		{
 		l_pcIKeyHigh[ l_iCtr ] = a_pcPassword[ l_iCtr ];
-		l_pcIKeyLow[ l_iCtr ] = a_pcPassword[ l_iCtr + DES::D_BLOCK_SIZE ];
+		l_pcIKeyLow[ l_iCtr ] = a_pcPassword[ l_iCtr + DES::BLOCK_SIZE ];
 		}
 	permutate( l_pcIKeyHigh, n_pcKeyPermutation, 56 );
 	permutate( l_pcIKeyLow, n_pcKeyPermutation, 56 );
 	HBitmap hi;
 	HBitmap low;
-	hi.use( l_pcIKeyHigh, 2 * DES::D_HALF_KEY_SIZE );
-	low.use( l_pcIKeyHigh, 2 * DES::D_HALF_KEY_SIZE );
-	for ( l_iCtr = 0; l_iCtr < DES::D_IKEYS_COUNT; l_iCtr ++ )
+	hi.use( l_pcIKeyHigh, 2 * DES::HALF_KEY_SIZE );
+	low.use( l_pcIKeyHigh, 2 * DES::HALF_KEY_SIZE );
+	for ( l_iCtr = 0; l_iCtr < DES::IKEYS_COUNT; l_iCtr ++ )
 		{
 		hi.rotate_left( 0, 28, n_pcCountOfMoves[ l_iCtr ] );
 		low.rotate_left( 0, 28, n_pcCountOfMoves[ l_iCtr ] );
 		hi.rotate_left( 28, 28, n_pcCountOfMoves[ l_iCtr ] );
 		low.rotate_left( 28, 28, n_pcCountOfMoves[ l_iCtr ] );
-		for ( l_iCtrLoc = 0; l_iCtrLoc < DES::D_BLOCK_SIZE; l_iCtrLoc ++ )
+		for ( l_iCtrLoc = 0; l_iCtrLoc < DES::BLOCK_SIZE; l_iCtrLoc ++ )
 			l_pcTmpKey[ l_iCtrLoc ] = l_pcIKeyHigh[ l_iCtrLoc ];
 		permutate( l_pcTmpKey, n_pcPermutationOfCompresion, 48 );
 		for ( l_iCtrLoc = 0; l_iCtrLoc < 6; l_iCtrLoc ++ )
 			f_pppcIKeys[ 0 ][ l_iCtr ][ l_iCtrLoc ] = l_pcTmpKey[ l_iCtrLoc ];
-		for ( l_iCtrLoc = 0; l_iCtrLoc < DES::D_BLOCK_SIZE; l_iCtrLoc ++ )
+		for ( l_iCtrLoc = 0; l_iCtrLoc < DES::BLOCK_SIZE; l_iCtrLoc ++ )
 			l_pcTmpKey[ l_iCtrLoc ] = l_pcIKeyLow[ l_iCtrLoc ];
 		permutate( l_pcTmpKey, n_pcPermutationOfCompresion, 48 );
 		for ( l_iCtrLoc = 0; l_iCtrLoc < 6; l_iCtrLoc ++ )
 			f_pppcIKeys[ 1 ][ l_iCtr ][ l_iCtrLoc ] = l_pcTmpKey[ l_iCtrLoc ];
 		}
-	memset ( a_pcPassword, 0, DES::D_PASSWORD_SIZE );
+	memset ( a_pcPassword, 0, DES::PASSWORD_SIZE );
 	return ;
 	}
 
 void HDes::flush_keys ( void )
 	{
 	int l_iCtr = 0, l_iCtrLoc = 0;
-	for ( l_iCtr = 0; l_iCtr < DES::D_SIDES_COUNT; l_iCtr ++ )
-		for ( l_iCtrLoc = 0; l_iCtrLoc < DES::D_IKEYS_COUNT; l_iCtrLoc ++ )
-			memset ( f_pppcIKeys[ l_iCtr ][ l_iCtrLoc ], 0, DES::D_IKEY_SIZE );
+	for ( l_iCtr = 0; l_iCtr < DES::SIDES_COUNT; l_iCtr ++ )
+		for ( l_iCtrLoc = 0; l_iCtrLoc < DES::IKEYS_COUNT; l_iCtrLoc ++ )
+			memset ( f_pppcIKeys[ l_iCtr ][ l_iCtrLoc ], 0, DES::IKEY_SIZE );
 	return;
 	}
 
@@ -143,8 +143,8 @@ void HDes::_3des( u8_t* a_pcBlock, int a_iSide )
 void HDes::_des( u8_t* a_pcBlock, int a_iSide, int a_iPart )
 	{
 	int l_iCycle = 0, l_iCtr = 0, l_iCtrLoc, l_iCol, l_iRow;
-	u8_t l_pcBuf[ DES::D_BLOCK_SIZE ], l_pcBufT[ DES::D_BLOCK_SIZE ];
-	u8_t l_pcBufL[ DES::D_BLOCK_SIZE ], l_pcBufR[ DES::D_BLOCK_SIZE ];
+	u8_t l_pcBuf[ DES::BLOCK_SIZE ], l_pcBufT[ DES::BLOCK_SIZE ];
+	u8_t l_pcBufL[ DES::BLOCK_SIZE ], l_pcBufR[ DES::BLOCK_SIZE ];
 	u8_t l_cMask = 0, * l_pcEndKey = NULL;
 	reinterpret_cast<u32_t*>( l_pcBufL )[ 0 ] = reinterpret_cast<u32_t*>( a_pcBlock )[ 0 ];
 	reinterpret_cast<u32_t*>( l_pcBufR )[ 0 ] = reinterpret_cast<u32_t*>( a_pcBlock )[ 1 ];
@@ -152,10 +152,10 @@ void HDes::_des( u8_t* a_pcBlock, int a_iSide, int a_iPart )
 	HBitmap src;
 	HBitmap row;
 	HBitmap col;
-	src.use( l_pcBufT, DES::D_BLOCK_SIZE * DES::D_BITS_IN_BYTE );
-	row.use( &l_iRow, sizeof ( l_iRow ) * DES::D_BITS_IN_BYTE );
-	col.use( &l_iCol, sizeof ( l_iCol ) * DES::D_BITS_IN_BYTE );
-	for ( l_iCycle = 0; l_iCycle < DES::D_IKEYS_COUNT; l_iCycle ++ )
+	src.use( l_pcBufT, DES::BLOCK_SIZE * DES::BITS_IN_BYTE );
+	row.use( &l_iRow, sizeof ( l_iRow ) * DES::BITS_IN_BYTE );
+	col.use( &l_iCol, sizeof ( l_iCol ) * DES::BITS_IN_BYTE );
+	for ( l_iCycle = 0; l_iCycle < DES::IKEYS_COUNT; l_iCycle ++ )
 		{
 		reinterpret_cast<u32_t*>( l_pcBuf )[ 0 ] = 0;
 		if ( a_iSide )
@@ -167,7 +167,7 @@ void HDes::_des( u8_t* a_pcBlock, int a_iSide, int a_iPart )
 																											^ reinterpret_cast<u32_t*>( l_pcEndKey )[ 0 ];
 		reinterpret_cast<u16_t*>( l_pcBufT )[ 2 ] = static_cast<u16_t>( reinterpret_cast<u16_t*>( l_pcBufT )[ 2 ]
 				^ reinterpret_cast<u16_t*>( l_pcEndKey )[ 2 ] );
-		for ( l_iCtr = 0; l_iCtr < DES::D_BLOCK_SIZE; l_iCtr ++ )
+		for ( l_iCtr = 0; l_iCtr < DES::BLOCK_SIZE; l_iCtr ++ )
 			{
 			l_iCol = l_iRow = 0;
 			row.set( 6, src.get( static_cast<u32_t>( l_iCtr ) * 6 ) );
@@ -196,16 +196,16 @@ void HDes::_des( u8_t* a_pcBlock, int a_iSide, int a_iPart )
 void HDes::permutate( u8_t* a_pcBuffer, const u8_t* a_pcTab, int a_iLen ) const
 	{
 	int l_iCtr = 0;
-	u8_t l_pcBufTmp[ DES::D_BLOCK_SIZE ];
-	::memset( l_pcBufTmp, 0, DES::D_BLOCK_SIZE );
+	u8_t l_pcBufTmp[ DES::BLOCK_SIZE ];
+	::memset( l_pcBufTmp, 0, DES::BLOCK_SIZE );
 	HBitmap src;
 	HBitmap dst;
-	src.use( a_pcBuffer, DES::D_BLOCK_SIZE * DES::D_BITS_IN_BYTE );
-	dst.use( l_pcBufTmp, DES::D_BLOCK_SIZE * DES::D_BITS_IN_BYTE );
+	src.use( a_pcBuffer, DES::BLOCK_SIZE * DES::BITS_IN_BYTE );
+	dst.use( l_pcBufTmp, DES::BLOCK_SIZE * DES::BITS_IN_BYTE );
 	for ( l_iCtr = 0; l_iCtr < a_iLen; l_iCtr ++ )
 		dst.set( static_cast<u32_t>( l_iCtr ),
 				src.get( static_cast<u32_t>( a_pcTab[ l_iCtr ] ) ) );
-	::memcpy( a_pcBuffer, l_pcBufTmp, DES::D_BLOCK_SIZE );
+	::memcpy( a_pcBuffer, l_pcBufTmp, DES::BLOCK_SIZE );
 	return;
 	}	
 	

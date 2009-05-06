@@ -46,9 +46,9 @@ namespace string_helper
 	{
 	enum
 		{
-		E_OK = 0,
-		E_NULL_PTR,
-		E_UNINITIALIZED
+		OK = 0,
+		NULL_PTR,
+		UNINITIALIZED
 		};
 
 /* Useful helpers */
@@ -441,7 +441,7 @@ HString& HString::vformat( char const* const a_pcFormat, void* a_xAp )
 	{
 	M_PROLOG
 	if ( ! a_pcFormat )
-		M_THROW( n_ppcErrMsgHString[ string_helper::E_NULL_PTR ], errno );
+		M_THROW( n_ppcErrMsgHString[ string_helper::NULL_PTR ], errno );
 	::std::va_list orig;
 	__va_copy( orig, *static_cast< ::std::va_list*>( a_xAp ) );
 	f_lSize = vsnprintf( NULL, 0, a_pcFormat, *static_cast< ::std::va_list*>( a_xAp ) );

@@ -55,19 +55,19 @@ public:
 		 */
 		typedef enum
 			{
-			E_OK = 0,        /*!< No error. */
-			E_BAD_SIZE,      /*!< Bad size specified. */
-			E_REALLOC_FIXED, /*!< Resizing of fixed size pool. */
-			E_BAD_INDEX      /*!< Out of bounds dereferencing. */
+			OK = 0,        /*!< No error. */
+			BAD_SIZE,      /*!< Bad size specified. */
+			REALLOC_FIXED, /*!< Resizing of fixed size pool. */
+			BAD_INDEX      /*!< Out of bounds dereferencing. */
 			} error_t;
 		};
 	/*! \brief Types of pool memory allocation policies.
 	 */
 	typedef enum
 		{
-		D_FIXED_SIZE, /*!< Fixed pool size. */
-		D_AUTO_GROW,  /*!< Grow size automatically (geometric grow). */
-		D_DUMB        /*!< Set pool size to precize requwested value. */
+		FIXED_SIZE, /*!< Fixed pool size. */
+		AUTO_GROW,  /*!< Grow size automatically (geometric grow). */
+		DUMB        /*!< Set pool size to precize requwested value. */
 		} pool_type_t;
 	typedef tType* iterator;
 	typedef tType const* const_iterator;
@@ -78,7 +78,7 @@ private:
 	tType* f_ptPool;	/*!< pointer to allocated memory pool */
 public:
 	HPool( void );
-	HPool( int long const&, pool_type_t const& = D_FIXED_SIZE );
+	HPool( int long const&, pool_type_t const& = FIXED_SIZE );
 	HPool( HPool const& );
 	HPool& operator = ( HPool const& );
 	virtual ~HPool( void );
@@ -111,7 +111,7 @@ private:
 
 template<typename tType>
 HPool<tType>::HPool( void )
-	: f_ePoolType( D_DUMB ), f_lCapacity( 0 ),
+	: f_ePoolType( DUMB ), f_lCapacity( 0 ),
 	f_lSize( 0 ), f_ptPool( NULL )
 	{
 	M_PROLOG
@@ -180,8 +180,8 @@ void HPool<tType>::pool_realloc( int long const& a_ulNewSize )
 	{
 	M_PROLOG
 	if ( a_ulNewSize < 1 )
-		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BAD_SIZE ], a_ulNewSize );
-	if ( f_ePoolType == D_AUTO_GROW )
+		M_THROW( n_ppcErrMsgHPool[ ERROR::BAD_SIZE ], a_ulNewSize );
+	if ( f_ePoolType == AUTO_GROW )
 		{
 		if ( a_ulNewSize > f_lCapacity )
 			{
@@ -195,8 +195,8 @@ void HPool<tType>::pool_realloc( int long const& a_ulNewSize )
 		}
 	else if ( f_lCapacity != a_ulNewSize )
 		{
-		if ( f_ptPool && ( f_ePoolType == D_FIXED_SIZE ) )
-			M_THROW( n_ppcErrMsgHPool[ ERROR::E_REALLOC_FIXED ], f_lCapacity );
+		if ( f_ptPool && ( f_ePoolType == FIXED_SIZE ) )
+			M_THROW( n_ppcErrMsgHPool[ ERROR::REALLOC_FIXED ], f_lCapacity );
 		f_lCapacity = a_ulNewSize;
 		f_ptPool = xrealloc<tType>( f_ptPool, f_lCapacity );
 		if ( a_ulNewSize > f_lSize )
@@ -229,7 +229,7 @@ tType& HPool<tType>::get( int long const& a_lIndex ) const
 	{
 	M_PROLOG
 	if ( ( a_lIndex < 0 ) || ( a_lIndex >= f_lSize ) )
-		M_THROW( n_ppcErrMsgHPool[ ERROR::E_BAD_INDEX ], a_lIndex );
+		M_THROW( n_ppcErrMsgHPool[ ERROR::BAD_INDEX ], a_lIndex );
 	return ( f_ptPool[ a_lIndex ] );
 	M_EPILOG
 	}

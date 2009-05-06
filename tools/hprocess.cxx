@@ -47,7 +47,7 @@ HProcess::HProcess( size_t a_uiFileHandlers )
 	: f_bInitialised( false ), f_bLoop( true ), f_iIdleCycles( 0 ),
 	f_iLatencySeconds( 0 ), f_iLatencyMicroseconds( 0 ),
 	f_sLatency(), f_xFileDescriptorSet(),
-	f_oFileDescriptorHandlers( a_uiFileHandlers ), f_oDroppedFd( a_uiFileHandlers, dropped_fd_t::D_AUTO_GROW ),
+	f_oFileDescriptorHandlers( a_uiFileHandlers ), f_oDroppedFd( a_uiFileHandlers, dropped_fd_t::AUTO_GROW ),
 	f_bCallbackContext( false ), f_oEvent()
 	{
 	M_PROLOG

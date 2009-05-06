@@ -37,13 +37,13 @@ namespace tools
  */
 struct DES
 	{
-	static int const D_BITS_IN_BYTE  = yaal::power<2,3>::value;
-	static int const D_SIDES_COUNT   = 2;
-	static int const D_IKEY_SIZE     = 6;
-	static int const D_BLOCK_SIZE    = 8;
-	static int const D_IKEYS_COUNT   = 16;
-	static int const D_PASSWORD_SIZE = 16;
-	static int const D_HALF_KEY_SIZE = 28;
+	static int const BITS_IN_BYTE  = yaal::power<2,3>::value;
+	static int const SIDES_COUNT   = 2;
+	static int const IKEY_SIZE     = 6;
+	static int const BLOCK_SIZE    = 8;
+	static int const IKEYS_COUNT   = 16;
+	static int const PASSWORD_SIZE = 16;
+	static int const HALF_KEY_SIZE = 28;
 	};
 
 /*! \brief Cryptography interface.
@@ -52,7 +52,7 @@ struct DES
  */
 class HDes
 	{
-	u8_t f_pppcIKeys[ DES::D_SIDES_COUNT ][ DES::D_IKEYS_COUNT ][ DES::D_IKEY_SIZE ];
+	u8_t f_pppcIKeys[ DES::SIDES_COUNT ][ DES::IKEYS_COUNT ][ DES::IKEY_SIZE ];
 public:
 	HDes( void );
 	virtual ~HDes( void );

@@ -60,10 +60,10 @@ struct OListBits
 		 */
 		typedef enum
 			{
-			E_OK = 0,    /*!< No error. */
-			E_BAD_INDEX, /*!< Bad elements index used. */
-			E_EMPTY,     /*!< List is empty. */
-			E_BAD_ORDER  /*!< Bad order flag. */
+			OK = 0,    /*!< No error. */
+			BAD_INDEX, /*!< Bad elements index used. */
+			EMPTY,     /*!< List is empty. */
+			BAD_ORDER  /*!< Bad order flag. */
 			} error_t;
 		};
 	typedef enum
@@ -782,7 +782,7 @@ tType& HList<tType>::add_orderly( tType const& a_rtObject,
 	HElement * l_poElement = new HElement ( NULL );
 	l_poElement->f_tObject = a_rtObject;
 	if ( ( f_eOrder != UNSORTED ) && ( f_eOrder != a_eOrder ) )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BAD_ORDER ], a_eOrder );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::BAD_ORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
 	typedef bool ( *comp_t )( tType const&, tType const&, T const& );
 	comp_t my_comp;
@@ -834,7 +834,7 @@ HList<tType>::erase( HIterator<tType, treatment> const& a_roIterator )
 	HIterator<tType, treatment> it = a_roIterator;
 	++ it;
 	if ( ! f_iSize )
-		M_THROW( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	/*
 	 * What iterator shall be returned.
 	 *
@@ -884,7 +884,7 @@ OListBits::status_t HList<tType>::remove_head( tType** a_pptObject )
 		f_poHook = f_poHook->f_poNext;
 		}
 	else
-		M_THROW( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	if ( f_poIndex )
 		f_poIndex = f_poIndex->f_poNext;
 	delete l_poElement;
@@ -925,7 +925,7 @@ OListBits::status_t HList<tType>::remove_tail( tType** a_pptObject )
 			}
 		}
 	else
-		M_THROW( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	return ( l_eError );
 	M_EPILOG
 	}
@@ -943,11 +943,11 @@ typename HList<tType>::HElement* HList<tType>::element_by_index( int a_iIndex )
 	{
 	M_PROLOG
 	if ( f_iSize == 0 )
-		M_THROW( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	if ( a_iIndex < 0 )
 		a_iIndex += f_iSize;
 	if ( ( a_iIndex >= f_iSize ) || ( a_iIndex < 0 ) )
-		M_THROW( g_ppcErrMsgHList[ ERROR::E_BAD_INDEX ], a_iIndex );
+		M_THROW( g_ppcErrMsgHList[ ERROR::BAD_INDEX ], a_iIndex );
 	if ( ! f_poIndex )
 		f_poIndex = f_poHook;
 /*
@@ -1045,7 +1045,7 @@ tType& HList<tType>::front( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+		M_THROW ( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	return ( f_poHook->f_tObject );
 	M_EPILOG
 	}
@@ -1055,7 +1055,7 @@ tType const& HList<tType>::front( void ) const
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+		M_THROW ( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	return ( f_poHook->f_tObject );
 	M_EPILOG
 	}
@@ -1081,7 +1081,7 @@ tType& HList<tType>::back( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+		M_THROW ( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	return ( f_poHook->f_poPrevious->f_tObject );
 	M_EPILOG
 	}
@@ -1091,7 +1091,7 @@ tType const& HList<tType>::back( void ) const
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::E_EMPTY ], errno );
+		M_THROW ( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	return ( f_poHook->f_poPrevious->f_tObject );
 	M_EPILOG
 	}
@@ -1330,7 +1330,7 @@ void HList<tType>::sort( T const& less, sort_order_t a_eOrder )
 	M_PROLOG
 	f_eOrder = a_eOrder;
 	if ( ( f_eOrder != ASCENDING ) && ( f_eOrder != DESCENDING ) )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BAD_ORDER ], f_eOrder );
+		M_THROW ( g_ppcErrMsgHList [ ERROR::BAD_ORDER ], f_eOrder );
 	if ( f_iSize > 1 )
 		{
 		HElement* first = f_poHook;

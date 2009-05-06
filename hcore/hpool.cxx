@@ -40,9 +40,9 @@ namespace hcore
 char const* n_ppcErrMsgHPool[ 5 ] =
 	{
 	_( "ok" ),
-/* HPool::ERROR::E_BAD_SIZE */      _( "bad size" ),
-/* HPool::ERROR::E_REALLOC_FIXED */ _( "cannot realloc fixed size pool" ),
-/* HPool::ERROR::E_BAD_INDEX */			_( "index does not fit into array" )
+/* HPool::ERROR::BAD_SIZE */      _( "bad size" ),
+/* HPool::ERROR::REALLOC_FIXED */ _( "cannot realloc fixed size pool" ),
+/* HPool::ERROR::BAD_INDEX */			_( "index does not fit into array" )
 	};
 
 }

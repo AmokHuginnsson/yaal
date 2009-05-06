@@ -216,14 +216,14 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 	if ( ( l_psOracle->f_iStatus != OCI_SUCCESS )
 			&& ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO ) )
 		{
-		log ( LOG_TYPE::D_ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to prepare statement." << endl;
+		log ( LOG_TYPE::ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to prepare statement." << endl;
 		db_unquery ( l_psQuery );
 		l_psQuery = NULL;
 		}
 	else
 		{
 		if ( l_psOracle->f_iStatus == OCI_SUCCESS_WITH_INFO )
-			log ( LOG_TYPE::D_INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error ( l_psOracle ) << endl;
+			log ( LOG_TYPE::INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error ( l_psOracle ) << endl;
 		l_oQuery.upper();
 		if ( l_oQuery.find ( "INSERT" ) == 0 )
 			l_iIters = 1;
@@ -238,12 +238,12 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 		if ( ( l_psOracle->f_iStatus != OCI_SUCCESS )
 				&& ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO ) )
 			{
-			log ( LOG_TYPE::D_ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to execute statement." << endl;
+			log ( LOG_TYPE::ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to execute statement." << endl;
 			db_unquery ( l_psQuery );
 			l_psQuery = NULL;
 			}
 		else if ( l_psOracle->f_iStatus == OCI_SUCCESS_WITH_INFO )
-			log ( LOG_TYPE::D_INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error ( l_psOracle ) << endl;
+			log ( LOG_TYPE::INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error ( l_psOracle ) << endl;
 		}
 	return ( l_psQuery );
 	}
@@ -334,7 +334,7 @@ int long dbrs_records_count ( void*, void* a_pvDataR )
 	if ( ( ( * l_psQuery->f_piStatus ) != OCI_SUCCESS )
 			&& ( ( * l_psQuery->f_piStatus ) != OCI_SUCCESS_WITH_INFO ) )
 		{
-		log ( LOG_TYPE::D_ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to fetch last row." << endl;
+		log ( LOG_TYPE::ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to fetch last row." << endl;
 		return ( - 1 );
 		}
 	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
@@ -399,7 +399,7 @@ char * rs_column_name ( void* a_pvDataR, int a_iField )
 void oracle_init ( void ) __attribute__((__constructor__));
 void oracle_init ( void )
 	{
-	yaalOptions( "instance_name", program_options_helper::option_value( g_oInstanceName ), NULL, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "name", "name of the Oracle database instance" );
+	yaalOptions( "instance_name", program_options_helper::option_value( g_oInstanceName ), NULL, HProgramOptionsHandler::OOption::TYPE::REQUIRED, "name", "name of the Oracle database instance" );
 	yaalOptions.process_rc_file( "yaal", "oracle", NULL );
 	return;
 	}

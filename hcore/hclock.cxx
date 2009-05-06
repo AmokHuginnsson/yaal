@@ -44,43 +44,43 @@ HClock::HClock( void ) : f_lMoment()
 	M_PROLOG
 	timespec l_sTime;
 	M_ENSURE( clock_gettime( CLOCK_REALTIME, &l_sTime ) == 0 );
-	f_lMoment[ UNIT::D_SECOND ] = l_sTime.tv_sec;
-	f_lMoment[ UNIT::D_NANOSECOND ] = l_sTime.tv_nsec;
+	f_lMoment[ UNIT::SECOND ] = l_sTime.tv_sec;
+	f_lMoment[ UNIT::NANOSECOND ] = l_sTime.tv_nsec;
 	M_EPILOG
 	}
 
 int long HClock::get_time_elapsed( UNIT::unit_t const& unit, bool const& reset ) const
 	{
 	M_PROLOG
-	static int long const D_NANO_IN_WHOLE = power<10, 9>::value;
-	static int long const D_MICRO_IN_WHOLE = power<10, 6>::value;
-	static int long const D_NANO_IN_MILI = power<10, 6>::value;
-	static int long const D_MILI_IN_WHOLE = power<10, 3>::value;
-	static int long const D_NANO_IN_MICRO = power<10, 3>::value;
+	static int long const NANO_IN_WHOLE = power<10, 9>::value;
+	static int long const MICRO_IN_WHOLE = power<10, 6>::value;
+	static int long const NANO_IN_MILI = power<10, 6>::value;
+	static int long const MILI_IN_WHOLE = power<10, 3>::value;
+	static int long const NANO_IN_MICRO = power<10, 3>::value;
 	timespec l_sTime;
 	timespec l_sReset;
 	M_ENSURE( clock_gettime( CLOCK_REALTIME, &l_sReset ) == 0 );
-	l_sTime.tv_sec = l_sReset.tv_sec - f_lMoment[ UNIT::D_SECOND ];
-	if ( l_sReset.tv_nsec < f_lMoment[ UNIT::D_NANOSECOND ] )
+	l_sTime.tv_sec = l_sReset.tv_sec - f_lMoment[ UNIT::SECOND ];
+	if ( l_sReset.tv_nsec < f_lMoment[ UNIT::NANOSECOND ] )
 		{
 		-- l_sTime.tv_sec;
-		l_sTime.tv_nsec = D_NANO_IN_WHOLE - ( f_lMoment[ UNIT::D_NANOSECOND ] - l_sReset.tv_nsec );
+		l_sTime.tv_nsec = NANO_IN_WHOLE - ( f_lMoment[ UNIT::NANOSECOND ] - l_sReset.tv_nsec );
 		}
 	else
-		l_sTime.tv_nsec = l_sReset.tv_nsec - f_lMoment[ UNIT::D_NANOSECOND ];
+		l_sTime.tv_nsec = l_sReset.tv_nsec - f_lMoment[ UNIT::NANOSECOND ];
 	int long elapsed = 0;
 	switch ( unit )
 		{
-		case ( UNIT::D_SECOND ): elapsed = l_sTime.tv_sec; break;
-		case ( UNIT::D_NANOSECOND ): elapsed = l_sTime.tv_sec * D_NANO_IN_WHOLE + l_sTime.tv_nsec; break;
-		case ( UNIT::D_MICROSECOND ): elapsed = l_sTime.tv_sec * D_MICRO_IN_WHOLE + l_sTime.tv_nsec / D_NANO_IN_MICRO; break;
-		case ( UNIT::D_MILISECOND ): elapsed = l_sTime.tv_sec * D_MILI_IN_WHOLE + l_sTime.tv_nsec / D_NANO_IN_MILI; break;
+		case ( UNIT::SECOND ): elapsed = l_sTime.tv_sec; break;
+		case ( UNIT::NANOSECOND ): elapsed = l_sTime.tv_sec * NANO_IN_WHOLE + l_sTime.tv_nsec; break;
+		case ( UNIT::MICROSECOND ): elapsed = l_sTime.tv_sec * MICRO_IN_WHOLE + l_sTime.tv_nsec / NANO_IN_MICRO; break;
+		case ( UNIT::MILISECOND ): elapsed = l_sTime.tv_sec * MILI_IN_WHOLE + l_sTime.tv_nsec / NANO_IN_MILI; break;
 		default: M_ASSERT( ! "bad HClock::UNIT!" );
 		}
 	if ( reset )
 		{
-		f_lMoment[ UNIT::D_SECOND ] = l_sReset.tv_sec;
-		f_lMoment[ UNIT::D_NANOSECOND ] = l_sReset.tv_nsec;
+		f_lMoment[ UNIT::SECOND ] = l_sReset.tv_sec;
+		f_lMoment[ UNIT::NANOSECOND ] = l_sReset.tv_nsec;
 		}
 	return ( elapsed );
 	M_EPILOG

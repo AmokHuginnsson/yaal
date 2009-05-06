@@ -55,17 +55,17 @@ public:
 		 */
 		typedef enum
 			{
-			E_OK = 0,       /*!< No error. */
-			E_BAD_ROWS,     /*!< Bad row index. */
-			E_BAD_COLUMNS,  /*!< Bad column index. */
-			E_DIM_NOT_MATCH_ROWS, /*!< Number of rows do not match for binary operation. */
-			E_DIM_NOT_MATCH_COLUMNS, /*!< Number of columns do not match for binary operation. */
-			E_NOT_A_SQUARE, /*!< Non-square matrix used where square necessary. */
-			E_ODD,          /*!< Odd matrix while counting inverse. */
-			E_DIM_NOT_MATCH_COLUMNS_ROWS, /*!< Number of rows does not match numbers of columns. */
-			E_DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS,
-			E_ROW_OUT_OF_RANGE,
-			E_COLUMN_OUT_OF_RANGE
+			OK = 0,       /*!< No error. */
+			BAD_ROWS,     /*!< Bad row index. */
+			BAD_COLUMNS,  /*!< Bad column index. */
+			DIM_NOT_MATCH_ROWS, /*!< Number of rows do not match for binary operation. */
+			DIM_NOT_MATCH_COLUMNS, /*!< Number of columns do not match for binary operation. */
+			NOT_A_SQUARE, /*!< Non-square matrix used where square necessary. */
+			ODD,          /*!< Odd matrix while counting inverse. */
+			DIM_NOT_MATCH_COLUMNS_ROWS, /*!< Number of rows does not match numbers of columns. */
+			DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS,
+			ROW_OUT_OF_RANGE,
+			COLUMN_OUT_OF_RANGE
 			} error_t;
 		};
 	typedef HVector<tType> row_t;
@@ -118,7 +118,7 @@ private:
 		{
 		M_PROLOG
 		if ( f_iColumns != a_iRowsAnother )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIM_NOT_MATCH_COLUMNS_ROWS ],
+			M_THROW( g_ppcErrMsgHMatrix[ ERROR::DIM_NOT_MATCH_COLUMNS_ROWS ],
 					f_iColumns - a_iRowsAnother );
 		return;
 		M_EPILOG
@@ -128,10 +128,10 @@ private:
 		{
 		M_PROLOG
 		if ( f_iRows != a_iRowsAnother )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIM_NOT_MATCH_ROWS ],
+			M_THROW( g_ppcErrMsgHMatrix[ ERROR::DIM_NOT_MATCH_ROWS ],
 					f_iRows - a_iRowsAnother );
 		if ( f_iColumns != a_iColumnsAnother )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIM_NOT_MATCH_COLUMNS ],
+			M_THROW( g_ppcErrMsgHMatrix[ ERROR::DIM_NOT_MATCH_COLUMNS ],
 					f_iColumns - a_iColumnsAnother );
 		return;
 		M_EPILOG
@@ -140,7 +140,7 @@ private:
 		{
 		M_PROLOG
 		if ( f_iRows != f_iColumns )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_NOT_A_SQUARE ], f_iRows - f_iColumns );
+			M_THROW( g_ppcErrMsgHMatrix[ ERROR::NOT_A_SQUARE ], f_iRows - f_iColumns );
 		return;
 		M_EPILOG
 		}
@@ -157,11 +157,11 @@ HMatrix<tType>::HMatrix( int const a_iRows, int const a_iColumns )
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_iRows < 1 )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_BAD_ROWS ], a_iRows );
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::BAD_ROWS ], a_iRows );
 	else
 		f_iRows = a_iRows;
 	if ( a_iColumns < 1 )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_BAD_COLUMNS ], a_iColumns );
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::BAD_COLUMNS ], a_iColumns );
 	else
 		f_iColumns = a_iColumns;
 	return ;
@@ -281,9 +281,9 @@ tType HMatrix<tType>::M( int const a_iRow, int const a_iColumn )
 	check_dimensions_square();
 	int l_iCtrRow = 0, l_iCtrColumn = 0, l_iCtrRowVirtual = 0, l_iCtrColumnVirtual = 0;
 	if ( a_iRow >= f_iRows )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_ROW_OUT_OF_RANGE ], a_iRow - f_iRows );
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::ROW_OUT_OF_RANGE ], a_iRow - f_iRows );
 	if ( a_iColumn >= f_iColumns )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_COLUMN_OUT_OF_RANGE ], a_iColumn - f_iColumns );
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::COLUMN_OUT_OF_RANGE ], a_iColumn - f_iColumns );
 	if ( f_iRows == 1 )
 		return ( 0 );
 	HMatrix l_oMatrix ( f_iRows - 1, f_iColumns - 1 );
@@ -325,7 +325,7 @@ HMatrix<tType> HMatrix<tType>::_1( void )
 	tType l_tScalar = 0;
 	int l_iCtrRow = 0, l_iCtrColumn = 0;
 	if ( ! ( l_tScalar = det() ) )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_ODD ], 0 );
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::ODD ], 0 );
 	HMatrix l_oMatrix( *this );
 	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
 		{
@@ -495,7 +495,7 @@ HMatrix<tType>& HMatrix<tType>::operator *= ( HMatrix const& a_roMatrix )
 	M_PROLOG
 	check_dimensions_columns_rows( a_roMatrix.f_iRows );
 	if ( a_roMatrix.f_iRows != a_roMatrix.f_iColumns )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::E_DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS ],
+		M_THROW( g_ppcErrMsgHMatrix[ ERROR::DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS ],
 				a_roMatrix.f_iRows - a_roMatrix.f_iColumns );
 	( *this ) = ( *this ) * a_roMatrix;
 	return ( *this );

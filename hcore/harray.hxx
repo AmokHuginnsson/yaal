@@ -57,10 +57,10 @@ public:
 		 */
 		typedef enum
 			{
-			E_OK = 0,        /*!< No error. */
-			E_BAD_SIZE,      /*!< Bad size. */
-			E_OUT_OF_MEMORY, /*!< Cannot allocate new memory. */
-			E_BAD_INDEX      /*!< Index of of bounds. */
+			OK = 0,        /*!< No error. */
+			BAD_SIZE,      /*!< Bad size. */
+			OUT_OF_MEMORY, /*!< Cannot allocate new memory. */
+			BAD_INDEX      /*!< Index of of bounds. */
 			} error_t;
 		};
 protected:
@@ -282,7 +282,7 @@ void HArray<tType>::reserve( int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( a_lSize < 1 )
-		M_THROW( n_ppcErrMsgHArray[ ERROR::E_BAD_SIZE ], a_lSize );
+		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_SIZE ], a_lSize );
 	if ( a_lSize > f_lCapacity )
 		{
 		f_lCapacity = 1;
@@ -293,7 +293,7 @@ void HArray<tType>::reserve( int long const& a_lSize )
 		swap( tmpArray, *this );
 		f_ptArray = new ( std::nothrow ) tType[ a_lSize ];
 		if ( ! f_ptArray )
-			M_THROW( n_ppcErrMsgHArray[ ERROR::E_OUT_OF_MEMORY ], a_lSize );
+			M_THROW( n_ppcErrMsgHArray[ ERROR::OUT_OF_MEMORY ], a_lSize );
 		swap_ranges( tmpArray.begin(), tmpArray.end(), begin() );
 		}
 	return;
@@ -306,7 +306,7 @@ tType& HArray<tType>::get( int long const& a_lIndex ) const
 	M_PROLOG
 	int long idx = ( a_lIndex < 0 ) ? a_lIndex + f_lSize : a_lIndex;
 	if ( ( idx >= f_lSize ) || ( idx < 0 ) )
-		M_THROW( n_ppcErrMsgHArray[ ERROR::E_BAD_INDEX ], idx );
+		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_INDEX ], idx );
 	return ( f_ptArray[ idx ] );
 	M_EPILOG
 	}

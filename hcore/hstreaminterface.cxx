@@ -39,7 +39,7 @@ namespace hcore
 char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
-	: f_oCache( 1, cache_t::D_AUTO_GROW ), f_iOffset( 0 ), f_sStatus()
+	: f_oCache( 1, cache_t::AUTO_GROW ), f_iOffset( 0 ), f_sStatus()
 	{
 	return;
 	}
@@ -215,14 +215,14 @@ HStreamInterface::STATUS const& HStreamInterface::read_until( HString& a_roMessa
 		f_sStatus.octets = f_iOffset;
 		f_iOffset = 0;
 		if ( ! nRead )
-			f_sStatus.code = STATUS::D_ERROR;
+			f_sStatus.code = STATUS::ERROR;
 		else if ( ( f_sStatus.octets == 0 ) && ! a_bStripDelim )
-			f_sStatus.code = STATUS::D_REPEAT;
+			f_sStatus.code = STATUS::REPEAT;
 		else
-			f_sStatus.code = STATUS::D_OK;
+			f_sStatus.code = STATUS::OK;
 		}
 	else
-		f_sStatus.code = STATUS::D_REPEAT;
+		f_sStatus.code = STATUS::REPEAT;
 	return ( f_sStatus );
 	M_EPILOG
 	}

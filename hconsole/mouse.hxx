@@ -46,9 +46,9 @@ struct MOUSE_BITS
 	 */
 	struct BUTTONS
 		{
-		static int const D_ONE 		= 1; /*!< Button 1. */
-		static int const D_TWO		= 2; /*!< Button 2. */
-		static int const D_THREE	= 4; /*!< Button 3. */
+		static int const ONE 		= 1; /*!< Button 1. */
+		static int const TWO		= 2; /*!< Button 2. */
+		static int const THREE	= 4; /*!< Button 3. */
 		};
 	};
 

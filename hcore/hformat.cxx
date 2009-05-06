@@ -47,20 +47,20 @@ class HFormat::HFormatImpl
 		{
 		typedef enum
 			{
-			D_EMPTY =       0x0000,
-			D_INT =         0x0001,
-			D_DOUBLE =      0x0002,
-			D_STRING =      0x0004,
-			D_CHAR =        0x0008,
-			D_POINTER =     0x0010,
-			D_CONSTANT =    0x0020,
-			D_BYTE =        0x0040,
-			D_SHORT =       0x0080,
-			D_LONG =        0x0100,
-			D_LONG_LONG =   0x0200,
-			D_UNSIGNED =    0x0400,
-			D_OCTAL =       0x0800,
-			D_HEXADECIMAL = 0x1000
+			EMPTY =       0x0000,
+			INT =         0x0001,
+			DOUBLE =      0x0002,
+			STRING =      0x0004,
+			CHAR =        0x0008,
+			POINTER =     0x0010,
+			CONSTANT =    0x0020,
+			BYTE =        0x0040,
+			SHORT =       0x0080,
+			LONG =        0x0100,
+			LONG_LONG =   0x0200,
+			UNSIGNED =    0x0400,
+			OCTAL =       0x0800,
+			HEXADECIMAL = 0x1000
 			} enum_t;
 		};
 	typedef HStrongEnum<CONVERSION> conversion_t;
@@ -68,12 +68,12 @@ class HFormat::HFormatImpl
 		{
 		typedef enum
 			{
-			D_NONE = 0,
-			D_ALTERNATE = 1,
-			D_ZERO_PADDED = 2,
-			D_LEFT_ALIGNED = 4,
-			D_SPACE_PADDED = 8,
-			D_SIGN_PREFIX = 16
+			NONE = 0,
+			ALTERNATE = 1,
+			ZERO_PADDED = 2,
+			LEFT_ALIGNED = 4,
+			SPACE_PADDED = 8,
+			SIGN_PREFIX = 16
 			} enum_t;
 		};
 	typedef HStrongEnum<FLAG> flag_t;
@@ -86,7 +86,7 @@ class HFormat::HFormatImpl
 		int _precision;
 		HString _const;
 		OToken( void )
-			: _conversion( CONVERSION::D_EMPTY ), _flag( FLAG::D_NONE ),
+			: _conversion( CONVERSION::EMPTY ), _flag( FLAG::NONE ),
 			_position( 0 ), _width( 0 ), _precision( 0 ), _const() {}
 		};
 	typedef HList<OToken> tokens_t;
@@ -215,7 +215,7 @@ HFormat::HFormat( char const* const aFmt )
 			t = HFormatImpl::next_conversion( fmt, idx );
 		else if ( HFormatImpl::has_constant( fmt, idx ) )
 			t = HFormatImpl::next_constant( fmt, idx );
-		if ( t._conversion != HFormatImpl::CONVERSION::D_EMPTY )
+		if ( t._conversion != HFormatImpl::CONVERSION::EMPTY )
 			_impl->_tokens.push_back( t );
 		else
 			break;
@@ -230,7 +230,7 @@ HFormat::HFormat( char const* const aFmt )
 	/* positions are 1 based, but we want to index argument 0 based */
 	for ( HFormatImpl::tokens_t::iterator it = _impl->_tokens.begin(), end = _impl->_tokens.end(); it != end; ++ it, ++ pos )
 		{
-		if ( it->_conversion == HFormatImpl::CONVERSION::D_CONSTANT )
+		if ( it->_conversion == HFormatImpl::CONVERSION::CONSTANT )
 			{
 			-- pos;
 			continue;
@@ -317,20 +317,20 @@ HString HFormat::string( void ) const
 	for ( HFormatImpl::tokens_t::const_iterator it = _impl->_tokens.begin(), end = _impl->_tokens.end(); it != end; ++ it )
 		{
 		HFormatImpl::conversion_t conv = it->_conversion;
-		if ( conv == HFormatImpl::CONVERSION::D_CONSTANT )
+		if ( conv == HFormatImpl::CONVERSION::CONSTANT )
 			_impl->_string += it->_const;
 		else
 			{
 			fmt = "%";
-			if ( !!( it->_flag & HFormatImpl::FLAG::D_ALTERNATE ) )
+			if ( !!( it->_flag & HFormatImpl::FLAG::ALTERNATE ) )
 				fmt += "#";
-			if ( !!( it->_flag & HFormatImpl::FLAG::D_ZERO_PADDED ) )
+			if ( !!( it->_flag & HFormatImpl::FLAG::ZERO_PADDED ) )
 				fmt += "0";
-			if ( !!( it->_flag & HFormatImpl::FLAG::D_SPACE_PADDED ) )
+			if ( !!( it->_flag & HFormatImpl::FLAG::SPACE_PADDED ) )
 				fmt += " ";
-			if ( !!( it->_flag & HFormatImpl::FLAG::D_SIGN_PREFIX ) )
+			if ( !!( it->_flag & HFormatImpl::FLAG::SIGN_PREFIX ) )
 				fmt += "+";
-			if ( !!( it->_flag & HFormatImpl::FLAG::D_LEFT_ALIGNED ) )
+			if ( !!( it->_flag & HFormatImpl::FLAG::LEFT_ALIGNED ) )
 				fmt += "-";
 			if ( it->_width > 0 )
 				fmt += it->_width;
@@ -342,57 +342,57 @@ HString HFormat::string( void ) const
 				fmt += it->_precision;
 			else if ( it->_precision < 0 )
 				fmt += HFormatImpl::variant_shell<int>::get( *_impl->_args, - ( it->_precision + 2 ) );
-			if ( !!( conv & HFormatImpl::CONVERSION::D_BYTE ) )
+			if ( !!( conv & HFormatImpl::CONVERSION::BYTE ) )
 				fmt += "hh";
-			if ( !!( conv & HFormatImpl::CONVERSION::D_SHORT ) )
+			if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) )
 				fmt += "h";
-			if ( !!( conv & HFormatImpl::CONVERSION::D_LONG ) )
+			if ( !!( conv & HFormatImpl::CONVERSION::LONG ) )
 				{
-				if ( !!( conv & HFormatImpl::CONVERSION::D_INT ) )
+				if ( !!( conv & HFormatImpl::CONVERSION::INT ) )
 					fmt += "l";
 				else
 					{
-					M_ASSERT( !!( conv & HFormatImpl::CONVERSION::D_DOUBLE ) );
+					M_ASSERT( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) );
 					fmt += "L";
 					}
 				}
-			if ( !!( conv & HFormatImpl::CONVERSION::D_LONG_LONG ) )
+			if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) )
 				fmt += "ll";
-			if ( !!( conv & HFormatImpl::CONVERSION::D_OCTAL ) )
+			if ( !!( conv & HFormatImpl::CONVERSION::OCTAL ) )
 				fmt += "o";
-			else if ( !!( conv & HFormatImpl::CONVERSION::D_HEXADECIMAL ) )
+			else if ( !!( conv & HFormatImpl::CONVERSION::HEXADECIMAL ) )
 				fmt += "x";
-			else if ( !!( conv & HFormatImpl::CONVERSION::D_UNSIGNED ) )
+			else if ( !!( conv & HFormatImpl::CONVERSION::UNSIGNED ) )
 				fmt += "u";
-			else if ( !!( conv & HFormatImpl::CONVERSION::D_INT ) )
+			else if ( !!( conv & HFormatImpl::CONVERSION::INT ) )
 				fmt += "d";
-			if ( !!( conv & HFormatImpl::CONVERSION::D_DOUBLE ) )
+			if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) )
 				fmt += "f";
-			if ( !!( conv & HFormatImpl::CONVERSION::D_STRING ) )
+			if ( !!( conv & HFormatImpl::CONVERSION::STRING ) )
 				fmt += "s";
-			if ( !!( conv & HFormatImpl::CONVERSION::D_CHAR ) )
+			if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) )
 				fmt += "c";
-			if ( !!( conv & HFormatImpl::CONVERSION::D_INT ) )
+			if ( !!( conv & HFormatImpl::CONVERSION::INT ) )
 				{
-				if ( !!( conv & HFormatImpl::CONVERSION::D_SHORT ) )
+				if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) )
 					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int short>::get( *_impl->_args, it->_position ) );
-				else if ( !!( conv & ( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_LONG ) | HFormatImpl::CONVERSION::D_LONG_LONG ) ) )
+				else if ( !!( conv & ( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::LONG ) | HFormatImpl::CONVERSION::LONG_LONG ) ) )
 					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int long>::get( *_impl->_args, it->_position ) );
 				else
 					{
-					M_ASSERT( conv & HFormatImpl::CONVERSION::D_INT );
+					M_ASSERT( conv & HFormatImpl::CONVERSION::INT );
 					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
 					}
 				}
-			else if ( !!( conv & HFormatImpl::CONVERSION::D_STRING ) )
+			else if ( !!( conv & HFormatImpl::CONVERSION::STRING ) )
 				_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<HString>::get( *_impl->_args, it->_position ).raw() );
-			else if ( !!( conv & HFormatImpl::CONVERSION::D_POINTER ) )
+			else if ( !!( conv & HFormatImpl::CONVERSION::POINTER ) )
 				_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<void const*>::get( *_impl->_args, it->_position ) );
-			else if ( !!( conv & HFormatImpl::CONVERSION::D_CHAR ) )
+			else if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) )
 				_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
-			else if ( !!( conv & HFormatImpl::CONVERSION::D_DOUBLE ) )
+			else if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) )
 				{
-				if ( !!( conv & ( HFormatImpl::CONVERSION::D_LONG ) ) )
+				if ( !!( conv & ( HFormatImpl::CONVERSION::LONG ) ) )
 					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
 				else
 					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<double>::get( *_impl->_args, it->_position ) );
@@ -412,7 +412,7 @@ HFormat HFormat::operator % ( int short const& is )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_INT ) | HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_SHORT ) );
+	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT ) | HFormatImpl::conversion_t( HFormatImpl::CONVERSION::SHORT ) );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( is ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -422,8 +422,8 @@ HFormat HFormat::operator % ( int short unsigned const& isu )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_INT )
-			| HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_SHORT ) | HFormatImpl::CONVERSION::D_UNSIGNED );
+	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT )
+			| HFormatImpl::conversion_t( HFormatImpl::CONVERSION::SHORT ) | HFormatImpl::CONVERSION::UNSIGNED );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( isu ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -433,7 +433,7 @@ HFormat HFormat::operator % ( int const& i )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_INT );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::INT );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( i ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -443,7 +443,7 @@ HFormat HFormat::operator % ( int unsigned const& iu )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_INT ) | HFormatImpl::CONVERSION::D_UNSIGNED );
+	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT ) | HFormatImpl::CONVERSION::UNSIGNED );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( iu ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -453,7 +453,7 @@ HFormat HFormat::operator % ( int long const& il )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_INT ) | HFormatImpl::CONVERSION::D_LONG );
+	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT ) | HFormatImpl::CONVERSION::LONG );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( il ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -463,8 +463,8 @@ HFormat HFormat::operator % ( int long unsigned const& ilu )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_INT )
-			| HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_LONG ) | HFormatImpl::CONVERSION::D_UNSIGNED );
+	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT )
+			| HFormatImpl::conversion_t( HFormatImpl::CONVERSION::LONG ) | HFormatImpl::CONVERSION::UNSIGNED );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( ilu ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -474,7 +474,7 @@ HFormat HFormat::operator % ( double const& d )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_DOUBLE );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::DOUBLE );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( d ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -484,7 +484,7 @@ HFormat HFormat::operator % ( double long const& dl )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::D_DOUBLE ) | HFormatImpl::CONVERSION::D_LONG );
+	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::DOUBLE ) | HFormatImpl::CONVERSION::LONG );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( dl ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -494,7 +494,7 @@ HFormat HFormat::operator % ( float const& f )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_DOUBLE );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::DOUBLE );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( f ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -504,7 +504,7 @@ HFormat HFormat::operator % ( char const* const& s )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_STRING );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::STRING );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( HString( s ) ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -514,7 +514,7 @@ HFormat HFormat::operator % ( void const* const& p )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_POINTER );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::POINTER );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( p ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -524,7 +524,7 @@ HFormat HFormat::operator % ( HString const& s )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::CONVERSION::D_STRING );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::STRING );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( s ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -542,7 +542,7 @@ int HFormat::HFormatImpl::next_token( HFormatImpl::conversion_t const& conv )
 	positions_t::const_iterator it = _positions->find( _positionIndex );
 	M_ENSURE( it != _positions->end() );
 	OToken* t = it->second;
-	M_ENSURE( ( t && ( conv == t->_conversion ) ) || ( ! t && ( conv == HFormatImpl::CONVERSION::D_INT ) ) );
+	M_ENSURE( ( t && ( conv == t->_conversion ) ) || ( ! t && ( conv == HFormatImpl::CONVERSION::INT ) ) );
 	int idx = _positionIndex;
 	++ _positionIndex;
 	return ( idx );
@@ -595,7 +595,7 @@ HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_constant( HString const&
 	int token = static_cast<int>( s.find( '%', i ) );
 	t._const = s.mid( i, token > 0 ? token - i : INT_MAX );
 	i += static_cast<int>( t._const.get_length() );
-	t._conversion = CONVERSION::D_CONSTANT;
+	t._conversion = CONVERSION::CONSTANT;
 	return ( t );
 	M_EPILOG
 	}
@@ -683,17 +683,17 @@ int HFormat::HFormatImpl::get_precision( HString const& s, int& i )
 HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString const& s, int& i )
 	{
 	M_PROLOG
-	conversion_t conversion = CONVERSION::D_EMPTY;
+	conversion_t conversion = CONVERSION::EMPTY;
 	M_ENSURE( i < s.get_length() );
 	struct OLength
 		{
 		char const* _label;
 		conversion_t _converion;
-		} length[] = { { "hh", CONVERSION::D_BYTE },
-				{ "h", CONVERSION::D_SHORT },
-				{ "ll", CONVERSION::D_LONG_LONG },
-				{ "l", CONVERSION::D_LONG },
-				{ "L", CONVERSION::D_LONG } };
+		} length[] = { { "hh", CONVERSION::BYTE },
+				{ "h", CONVERSION::SHORT },
+				{ "ll", CONVERSION::LONG_LONG },
+				{ "l", CONVERSION::LONG },
+				{ "L", CONVERSION::LONG } };
 	int lenMod = -1;
 	for ( size_t k = 0; k < ( sizeof ( length ) / sizeof ( OLength ) ); ++ k )
 		{
@@ -709,17 +709,17 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		{
 		case ( 'd' ):
 		case ( 'i' ):
-			conversion = CONVERSION::D_INT;
+			conversion = CONVERSION::INT;
 		break;
 		case ( 'u' ):
-			conversion = conversion_t( CONVERSION::D_INT ) | CONVERSION::D_UNSIGNED;
+			conversion = conversion_t( CONVERSION::INT ) | CONVERSION::UNSIGNED;
 		break;
 		case ( 'o' ):
-			conversion = conversion_t( CONVERSION::D_INT ) | CONVERSION::D_OCTAL;
+			conversion = conversion_t( CONVERSION::INT ) | CONVERSION::OCTAL;
 		break;
 		case ( 'x' ):
 		case ( 'X' ):
-			conversion = conversion_t( CONVERSION::D_INT ) | CONVERSION::D_HEXADECIMAL;
+			conversion = conversion_t( CONVERSION::INT ) | CONVERSION::HEXADECIMAL;
 		break;
 		case ( 'f' ):
 		case ( 'F' ):
@@ -727,16 +727,16 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		case ( 'E' ):
 		case ( 'g' ):
 		case ( 'G' ):
-			conversion = CONVERSION::D_DOUBLE;
+			conversion = CONVERSION::DOUBLE;
 		break;
 		case ( 'c' ):
-			conversion = CONVERSION::D_CHAR;
+			conversion = CONVERSION::CHAR;
 		break;
 		case ( 's' ):
-			conversion = CONVERSION::D_STRING;
+			conversion = CONVERSION::STRING;
 		break;
 		case ( 'p' ):
-			conversion = CONVERSION::D_POINTER;
+			conversion = CONVERSION::POINTER;
 		break;
 		case ( '%' ):
 			{
@@ -745,7 +745,7 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 			}
 		default: M_THROW( "bad conversion", s[ i ]  ); break;
 		}
-	char const* const E_BAD_LEN_MOD = _( "bad length mod." );
+	char const* const BAD_LEN_MOD = _( "bad length mod." );
 	switch ( lenMod )
 		{
 		case ( 0 ):
@@ -753,17 +753,17 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		case ( 2 ):
 		case ( 3 ):
 			{
-			if ( !!( conversion & CONVERSION::D_INT ) )
+			if ( !!( conversion & CONVERSION::INT ) )
 				conversion |= length[ lenMod ]._converion;
 			else
-				M_THROW( E_BAD_LEN_MOD, lenMod );
+				M_THROW( BAD_LEN_MOD, lenMod );
 			}
 		case ( 4 ):
 			{
-			if ( !!( conversion & CONVERSION::D_DOUBLE ) )
-				conversion |= CONVERSION::D_LONG;
+			if ( !!( conversion & CONVERSION::DOUBLE ) )
+				conversion |= CONVERSION::LONG;
 			else
-				M_THROW( E_BAD_LEN_MOD, lenMod );
+				M_THROW( BAD_LEN_MOD, lenMod );
 			}
 		break;
 		}
@@ -776,17 +776,17 @@ HFormat::HFormatImpl::flag_t HFormat::HFormatImpl::get_flag( HString const& s, i
 	{
 	M_PROLOG
 	int long len = s.get_length();
-	flag_t flag = FLAG::D_NONE;
+	flag_t flag = FLAG::NONE;
 	bool done = false;
 	for ( ; ! done && ( i < len ); ++ i )
 		{
 		switch ( s[ i ] )
 			{
-			case ( '#' ): flag |= FLAG::D_ALTERNATE; break;
-			case ( '0' ): flag |= FLAG::D_ZERO_PADDED; break;
-			case ( '-' ): flag |= FLAG::D_LEFT_ALIGNED; break;
-			case ( ' ' ): flag |= FLAG::D_SPACE_PADDED; break;
-			case ( '+' ): flag |= FLAG::D_SIGN_PREFIX; break;
+			case ( '#' ): flag |= FLAG::ALTERNATE; break;
+			case ( '0' ): flag |= FLAG::ZERO_PADDED; break;
+			case ( '-' ): flag |= FLAG::LEFT_ALIGNED; break;
+			case ( ' ' ): flag |= FLAG::SPACE_PADDED; break;
+			case ( '+' ): flag |= FLAG::SIGN_PREFIX; break;
 			default:
 				done = true;
 			break;
