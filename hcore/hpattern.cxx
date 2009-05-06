@@ -226,6 +226,7 @@ char const* HPattern::matches( char const* const a_pcString,
 		int long* const a_piMatchLength ) const
 	{
 	M_PROLOG
+	M_ASSERT( a_pcString );
 	char const* l_pcPtr = NULL;
 	int l_iMatchLength = 0;
 	regmatch_t l_sMatch;
@@ -278,6 +279,7 @@ void HPattern::prepare_error_message( HString const& a_oString ) const
 
 HPattern::HMatchIterator HPattern::find( char const* str_ ) const
 	{
+	M_ASSERT( str_ );
 	int long len = 0;
 	char const* start = matches( str_, &len );
 	HMatchIterator it( this, start, len );

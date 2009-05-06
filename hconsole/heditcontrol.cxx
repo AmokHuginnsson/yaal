@@ -44,28 +44,28 @@ namespace yaal
 namespace hconsole
 {
 
-char const * const n_pcMaskLetters  = "^[a-zA-Z±¡æÆêÊ³£ñÑóÓ¶¦¼¬¿¯]*$";
-char const * const n_pcMaskDigits   = "^[0-9]*$";
-char const * const n_pcMaskAlpha    = "^[a-zA-Z0-9]*$";
-char const * const n_pcMaskExtended = "^[0-9a-zA-Z±¡æÆêÊ³£ñÑóÓ¶¦¼¬¿¯\\.\\(\\) -]*$";
-char const * const n_pcMaskLoose    = ".*";
-char const * const n_pcMaskDefault  = n_pcMaskLetters;
+char const* const n_pcMaskLetters  = "^[a-zA-Z±¡æÆêÊ³£ñÑóÓ¶¦¼¬¿¯]*$";
+char const* const n_pcMaskDigits   = "^[0-9]*$";
+char const* const n_pcMaskAlpha    = "^[a-zA-Z0-9]*$";
+char const* const n_pcMaskExtended = "^[0-9a-zA-Z±¡æÆêÊ³£ñÑóÓ¶¦¼¬¿¯\\.\\(\\) -]*$";
+char const* const n_pcMaskLoose    = ".*";
+char const* const n_pcMaskDefault  = n_pcMaskLetters;
 
-HEditControl::HEditControl( HWindow * a_poParent,
+HEditControl::HEditControl( HWindow* a_poParent,
 		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
-		char const * a_pcLabel, int a_iBufferSize, char const * a_pcValue,
-		char const * a_pcMask, bool a_bReplace, bool a_bRightAligned,
+		char const* a_pcLabel, int a_iBufferSize, char const * a_pcValue,
+		char const* a_pcMask, bool a_bReplace, bool a_bRightAligned,
 		bool a_bMultiLine, bool a_bReadOnly, bool a_bPassword,
 		int a_iMaxHistoryLevel )
-					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
+					: HControl( a_poParent, a_iRow, a_iColumn, a_iHeight,
 							a_iWidth, a_pcLabel ),
-					f_bReplace ( a_bReplace ),
-					f_bMultiLine ( a_bMultiLine || ( a_iHeight > 1 ) ? true : false ),
-					f_bReadOnly ( a_bReadOnly ), f_bRightAligned ( a_bRightAligned ),
-					f_bPassword ( a_bPassword ),
-					f_iMaxStringSize ( a_iBufferSize ), f_iCursorPosition ( 0 ),
-					f_iControlOffset ( 0 ), f_iMaxHistoryLevel ( a_iMaxHistoryLevel ),
-					f_oPattern(), f_oString ( a_iBufferSize, true ), f_oHistory(), f_oHistoryIt()
+					f_bReplace( a_bReplace ),
+					f_bMultiLine( a_bMultiLine || ( a_iHeight > 1 ) ? true : false ),
+					f_bReadOnly( a_bReadOnly ), f_bRightAligned( a_bRightAligned ),
+					f_bPassword( a_bPassword ),
+					f_iMaxStringSize( a_iBufferSize ), f_iCursorPosition ( 0 ),
+					f_iControlOffset( 0 ), f_iMaxHistoryLevel( a_iMaxHistoryLevel ),
+					f_oPattern(), f_oString( a_iBufferSize, true ), f_oHistory(), f_oHistoryIt()
 	{
 	M_PROLOG
 	int l_iErrorCode = 0;
@@ -87,7 +87,7 @@ HEditControl::HEditControl( HWindow * a_poParent,
 	f_oHistoryIt = f_oHistory.hook();
 	if ( ( l_iErrorCode = f_oPattern.parse_re( a_pcMask ) ) )
 		M_THROW( f_oPattern.error(), l_iErrorCode );
-	( f_oPattern.find( a_pcValue ) == f_oPattern.end() ) && ( l_iErrorCode = f_oPattern.error_code() );
+	( f_oPattern.find( a_pcValue ? a_pcValue : "" ) == f_oPattern.end() ) && ( l_iErrorCode = f_oPattern.error_code() );
 	if ( l_iErrorCode )
 		M_THROW( f_oPattern.error(), l_iErrorCode );
 	l_iLength = static_cast<int>( f_oString.get_length() );
