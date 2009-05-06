@@ -904,44 +904,44 @@ struct TYPE
 	{
 	typedef enum
 		{
-		D_UNKNOWN     = 0x0000,
-		D_BOOL        = 0x0001,
-		D_CHAR        = 0x0002,
-		D_INT_SHORT   = 0x0004,
-		D_INT         = 0x0008,
-		D_INT_LONG    = 0x0010,
-		D_FLOAT       = 0x0020,
-		D_DOUBLE      = 0x0040,
-		D_DOUBLE_LONG = 0x0080,
-		D_VOID_PTR    = 0x0100,
-		D_CHAR_PTR    = 0x0280,
-		D_HSTRING     = 0x0400,
-		D_HNUMBER     = 0x0800,
-		D_HINFO       = 0x1000,
-		D_HTIME       = 0x2000,
-		D_CONTAINER   = 0x4000,
-		D_VOID        = 0x8000
+		UNKNOWN     = 0x0000,
+		BOOL        = 0x0001,
+		CHAR        = 0x0002,
+		INT_SHORT   = 0x0004,
+		INT         = 0x0008,
+		INT_LONG    = 0x0010,
+		FLOAT       = 0x0020,
+		DOUBLE      = 0x0040,
+		DOUBLE_LONG = 0x0080,
+		VOID_PTR    = 0x0100,
+		CHAR_PTR    = 0x0280,
+		HSTRING     = 0x0400,
+		HNUMBER     = 0x0800,
+		HINFO       = 0x1000,
+		HTIME       = 0x2000,
+		CONTAINER   = 0x4000,
+		VOID        = 0x8000
 		} enum_t;
 	template<typename tType>
 	struct symbolic;
 	};
 typedef yaal::hcore::HStrongEnum<TYPE> type_t; /*!< Strong enumeration of PODs. */
-template<> struct TYPE::symbolic<void> { static enum_t const type = D_VOID; };
-template<> struct TYPE::symbolic<bool> { static enum_t const type = D_BOOL; };
-template<> struct TYPE::symbolic<char> { static enum_t const type = D_CHAR; };
-template<> struct TYPE::symbolic<int short> { static enum_t const type = D_INT_SHORT; };
-template<> struct TYPE::symbolic<int> { static enum_t const type = D_INT; };
-template<> struct TYPE::symbolic<int long> { static enum_t const type = D_INT_LONG; };
-template<> struct TYPE::symbolic<float> { static enum_t const type = D_FLOAT; };
-template<> struct TYPE::symbolic<double> { static enum_t const type = D_DOUBLE; };
-template<> struct TYPE::symbolic<double long> { static enum_t const type = D_DOUBLE_LONG; };
-template<> struct TYPE::symbolic<void*> { static enum_t const type = D_VOID_PTR; };
-template<> struct TYPE::symbolic<char*> { static enum_t const type = D_CHAR_PTR; };
-template<> struct TYPE::symbolic<yaal::hcore::HString> { static enum_t const type = D_HSTRING; };
+template<> struct TYPE::symbolic<void> { static enum_t const type = VOID; };
+template<> struct TYPE::symbolic<bool> { static enum_t const type = BOOL; };
+template<> struct TYPE::symbolic<char> { static enum_t const type = CHAR; };
+template<> struct TYPE::symbolic<int short> { static enum_t const type = INT_SHORT; };
+template<> struct TYPE::symbolic<int> { static enum_t const type = INT; };
+template<> struct TYPE::symbolic<int long> { static enum_t const type = INT_LONG; };
+template<> struct TYPE::symbolic<float> { static enum_t const type = FLOAT; };
+template<> struct TYPE::symbolic<double> { static enum_t const type = DOUBLE; };
+template<> struct TYPE::symbolic<double long> { static enum_t const type = DOUBLE_LONG; };
+template<> struct TYPE::symbolic<void*> { static enum_t const type = VOID_PTR; };
+template<> struct TYPE::symbolic<char*> { static enum_t const type = CHAR_PTR; };
+template<> struct TYPE::symbolic<yaal::hcore::HString> { static enum_t const type = HSTRING; };
 
 template<typename tType>
 struct TYPE::symbolic
-	{ static enum_t const type = D_UNKNOWN; };
+	{ static enum_t const type = UNKNOWN; };
 
 typedef char unsigned u8_t; /*!< 8 bit unsigned integer. */
 typedef int short unsigned u16_t; /*!< 16 bit unsigned integer. */

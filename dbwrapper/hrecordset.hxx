@@ -110,10 +110,10 @@ public:
 		 */
 		typedef enum
 			{
-			D_SELECT, /*!< SELECT query. */
-			D_UPDATE, /*!< Data update query. */
-			D_INSERT, /*!< INSERT new data query. */
-			D_DELETE  /*!< DELETER data query. */
+			SELECT, /*!< SELECT query. */
+			UPDATE, /*!< Data update query. */
+			INSERT, /*!< INSERT new data query. */
+			DELETE  /*!< DELETER data query. */
 			} mode_t;
 		};
 private:

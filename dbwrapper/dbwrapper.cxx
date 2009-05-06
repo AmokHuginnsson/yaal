@@ -55,11 +55,11 @@ struct DB_DRIVER
 	{
 	enum
 		{
-		D_NONE = 0,
-		D_SQLITE3,
-		D_MYSQL, 
-		D_POSTGRESQL,
-		D_ORACLE
+		NONE = 0,
+		SQLITE3,
+		MYSQL, 
+		POSTGRESQL,
+		ORACLE
 		};
 	};
 
@@ -76,7 +76,7 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 	else if ( ! strcasecmp( a_roOption, "log_mask" ) )
 		{
 		if ( ! strcasecmp( a_roValue, "LOG_SQL" ) )
-			HLog::f_lLogMask |= LOG_TYPE::D_SQL;
+			HLog::f_lLogMask |= LOG_TYPE::SQL;
 		else
 			return ( true );
 		}
@@ -84,18 +84,18 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 		{
 		if ( ! ( strcasecmp ( a_roValue, "none" )
 					&& strcasecmp ( a_roValue, "null" ) ) )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_NONE;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::NONE;
 		else if ( a_roValue == "SQLite3" )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_SQLITE3;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::SQLITE3;
 		else if ( a_roValue == "MySQL" )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_MYSQL;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::MYSQL;
 		else if ( a_roValue == "PostgreSQL" )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_POSTGRESQL;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::POSTGRESQL;
 		else if ( a_roValue == "Oracle" )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::D_ORACLE;
+			dbwrapper::n_iDataBaseDriver = DB_DRIVER::ORACLE;
 		else
 			{
-			log( LOG_TYPE::D_ERROR ) << "Error: `" << a_roValue;
+			log( LOG_TYPE::ERROR ) << "Error: `" << a_roValue;
 			log << "' is unknown driver." << endl;
 			exit( 1 );
 			}

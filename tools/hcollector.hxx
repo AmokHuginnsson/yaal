@@ -51,17 +51,17 @@ public:
 	 */
 	struct PROTOCOL
 		{
-		static char const* const D_SYN;
-		static char const* const D_ACK;
-		static char const* const D_DTA; /* warrning! no endline */
-		static char const* const D_FIN; /* warrning! no endline, but \0 at end,
+		static char const* const SYN;
+		static char const* const ACK;
+		static char const* const DTA; /* warrning! no endline */
+		static char const* const FIN; /* warrning! no endline, but \0 at end,
 																							 so sizeof() retruns 4 */
-		static char const* const D_ERR;
-		static int const D_RECV_BUF_SIZE = 8; /* 5 should be enought but you never know */
+		static char const* const ERR;
+		static int const RECV_BUF_SIZE = 8; /* 5 should be enought but you never know */
 		};
 private:
 	int			f_iLines;
-	char		f_pcReadBuf [ PROTOCOL::D_RECV_BUF_SIZE + 1 /* for \0 - the terminator */ ];
+	char		f_pcReadBuf [ PROTOCOL::RECV_BUF_SIZE + 1 /* for \0 - the terminator */ ];
 	hcore::HString	f_oLine;
 public:
 	HCollector( char const* = NULL ); /* device path */

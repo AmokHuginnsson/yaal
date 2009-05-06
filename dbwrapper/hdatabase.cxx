@@ -74,7 +74,7 @@ HRecordSet::ptr_t HDataBase::query( HString const& a_oQuery )
 	M_PROLOG
 	if ( ! f_pvCoreData )
 		M_THROW( "not connected to database", errno );
-	if ( HLog::f_lLogMask & LOG_TYPE::D_SQL )
+	if ( HLog::f_lLogMask & LOG_TYPE::SQL )
 		log << "SQL: " << a_oQuery << endl;
 	void* l_pvResult = dbwrapper::db_query( f_pvCoreData, a_oQuery.raw() );
 	if ( ! l_pvResult )

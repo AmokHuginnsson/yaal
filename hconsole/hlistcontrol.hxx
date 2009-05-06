@@ -251,7 +251,7 @@ private:
 public:
 	HListControler( model_ptr_t = model_ptr_t() );
 	void add_tail( tType const& );
-	void add_orderly( tType const&, int, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::D_ASCENDING );
+	void add_orderly( tType const&, int, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::ASCENDING );
 	void remove_tail( void );
 	model_ptr_t get_model( void );
 	virtual void sort( list_control_helper::OSortHelper& );
@@ -285,12 +285,12 @@ public:
 		{
 		typedef enum
 			{
-			D_NONE = 0,
-			D_CHECKABLE = 1,
-			D_SORTABLE = 2,
-			D_EDITABLE = 4,
-			D_DRAW_HEADER = 8,
-			D_ALL = -1
+			NONE = 0,
+			CHECKABLE = 1,
+			SORTABLE = 2,
+			EDITABLE = 4,
+			DRAW_HEADER = 8,
+			ALL = -1
 			} enum_t;
 		};
 	typedef yaal::hcore::HStrongEnum<FLAG> flag_t;
@@ -313,7 +313,7 @@ public:
 		HColumnInfo( HColumnInfo const& );
 		HColumnInfo& operator = ( HColumnInfo const& );
 		friend class HListControl;
-		static int const D_ADD_AT_THE_END = -1;
+		static int const ADD_AT_THE_END = -1;
 		};
 protected:
 	bool f_bCheckable;      /*!< can items be checked/unchecked */
@@ -352,8 +352,8 @@ public:
 	void add_column( int const&,									/* at position */
 			char const*,									/* column name */
 			int const&,									/* width */
-			BITS::ALIGN::align_t const& = BITS::ALIGN::D_LEFT,		/* align */
-			const type_t& = TYPE::D_HSTRING,	/* type */
+			BITS::ALIGN::align_t const& = BITS::ALIGN::LEFT,		/* align */
+			const type_t& = TYPE::HSTRING,	/* type */
 			HControl * = NULL );					/* control associated */
 	virtual int set_focus( char = 0 );
 	void set_flags( flag_t, flag_t );
@@ -383,7 +383,7 @@ protected:
 	void handle_key_space( void );
 	void handle_key_tab( void );
 private:
-	void sort_by_column( int, hcore::OListBits::sort_order_t = hcore::OListBits::D_ASCENDING );
+	void sort_by_column( int, hcore::OListBits::sort_order_t = hcore::OListBits::ASCENDING );
 	void recalculate_column_widths( void );
 	void draw_background( int );
 	void draw_header( int );

@@ -30,6 +30,8 @@ Copyright:
 #include <sys/types.h> /* FD_* macros */
 #include <libintl.h>
 
+#undef ECHO
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hlog.hxx"
@@ -44,14 +46,14 @@ namespace yaal
 namespace tools
 {
 
-char const* const HCollector::PROTOCOL::D_SYN = "SYN\n";
-char const* const HCollector::PROTOCOL::D_ACK = "ACK\n";
-char const* const HCollector::PROTOCOL::D_DTA = "DTA"; /* warrning! no endline */
-char const* const HCollector::PROTOCOL::D_FIN = "FIN"; /* warrning! no endline, but \0 at end,
+char const* const HCollector::PROTOCOL::SYN = "SYN\n";
+char const* const HCollector::PROTOCOL::ACK = "ACK\n";
+char const* const HCollector::PROTOCOL::DTA = "DTA"; /* warrning! no endline */
+char const* const HCollector::PROTOCOL::FIN = "FIN"; /* warrning! no endline, but \0 at end,
 																																	so sizeof() retruns 4 */
-char const* const HCollector::PROTOCOL::D_ERR = "ERR\n";
+char const* const HCollector::PROTOCOL::ERR = "ERR\n";
 
-int const HCollector::PROTOCOL::D_RECV_BUF_SIZE; /* 5 should be enought but you never know */
+int const HCollector::PROTOCOL::RECV_BUF_SIZE; /* 5 should be enought but you never know */
 
 char const* const n_pcError = _( "collector device not opened" );
 
@@ -60,13 +62,13 @@ HCollector::HCollector( char const* a_pcDevicePath )
 						f_oLine()
 	{
 	M_PROLOG
-	memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
+	memset( f_pcReadBuf, 0, PROTOCOL::RECV_BUF_SIZE );
 	/*
-	 * Actual f_pcReadBuf buffer size is equal to PROTOCOL::D_RECV_BUF_SIZE + 1.
+	 * Actual f_pcReadBuf buffer size is equal to PROTOCOL::RECV_BUF_SIZE + 1.
 	 * So we have additional one byte for string terminator (0).
 	 */
-	f_pcReadBuf[ PROTOCOL::D_RECV_BUF_SIZE ] = 0;
-	set_flags( HSerial::D_FLAG_TEXT );
+	f_pcReadBuf[ PROTOCOL::RECV_BUF_SIZE ] = 0;
+	set_flags( HSerial::FLAG_TEXT );
 	return;
 	M_EPILOG
 	}
@@ -104,18 +106,18 @@ int HCollector::send_line( char const* a_pcLine )
 		}
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
 		l_iCRC += l_oLocalCopy[ l_iCtr ];
-	l_oLine.format ( "%s%02x%02x%s\n", PROTOCOL::D_DTA,
+	l_oLine.format ( "%s%02x%02x%s\n", PROTOCOL::DTA,
 			l_iLength & 0x0ff, l_iCRC & 0x0ff, l_oLocalCopy.raw() );
-	::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-	l_iLength += ::strlen( PROTOCOL::D_DTA );
+	::memset( f_pcReadBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+	l_iLength += ::strlen( PROTOCOL::DTA );
 	l_iLength += ( 2 /* for lenght */ + 2 /* for crc */ + 1 /* for newline */ );
-	while ( ::strncmp( f_pcReadBuf, PROTOCOL::D_ACK, ::strlen( PROTOCOL::D_ACK ) ) )
+	while ( ::strncmp( f_pcReadBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) )
 		{
 		flush( TCOFLUSH );
 		l_iCtr = HRawFile::write( l_oLine.raw(), l_iLength );
 		wait_for_eot();
-		::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-		HRawFile::read( f_pcReadBuf, PROTOCOL::D_RECV_BUF_SIZE );
+		::memset( f_pcReadBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+		HRawFile::read( f_pcReadBuf, PROTOCOL::RECV_BUF_SIZE );
 		flush( TCIFLUSH );
 		l_iError ++;
 		}
@@ -130,40 +132,40 @@ int HCollector::receive_line( HString& a_oLine )
 	int l_iCtr = 0;
 	int l_iCRC = 0, l_iPCRC = -1;
 	int long l_iLength = 0, l_iPLength = -1;
-	int l_iAckLenght = ::strlen( PROTOCOL::D_ACK );
-	int l_iErrLenght = ::strlen( PROTOCOL::D_ERR );
+	int l_iAckLenght = ::strlen( PROTOCOL::ACK );
+	int l_iErrLenght = ::strlen( PROTOCOL::ERR );
 	/* P prefix means sender transmission side data */
 	while ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
 		{
 		f_oLine = "";
 		f_pcReadBuf[ 0 ] = 0;
-		while ( strlen( f_pcReadBuf ) < static_cast<size_t>( PROTOCOL::D_RECV_BUF_SIZE ) )
+		while ( strlen( f_pcReadBuf ) < static_cast<size_t>( PROTOCOL::RECV_BUF_SIZE ) )
 			{
-			::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-			HRawFile::read( f_pcReadBuf, PROTOCOL::D_RECV_BUF_SIZE );
+			::memset( f_pcReadBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+			HRawFile::read( f_pcReadBuf, PROTOCOL::RECV_BUF_SIZE );
 			f_oLine += f_pcReadBuf;
 			}
 		flush( TCIFLUSH );
 		a_oLine = f_oLine;
-		a_oLine.shift_left(	::strlen( PROTOCOL::D_DTA ) + 2 /* for lenght */ + 2 /* for crc */ );
+		a_oLine.shift_left(	::strlen( PROTOCOL::DTA ) + 2 /* for lenght */ + 2 /* for crc */ );
 		l_iLength = a_oLine.get_length() - 1;
 		for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
 			l_iCRC += a_oLine[ l_iCtr ];
 		l_iLength &= 0x0ff;
 		l_iCRC &= 0x0ff;
-		::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-		::strncpy( f_pcReadBuf, f_oLine.raw() + ::strlen( PROTOCOL::D_DTA ), 2 );
+		::memset( f_pcReadBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+		::strncpy( f_pcReadBuf, f_oLine.raw() + ::strlen( PROTOCOL::DTA ), 2 );
 		l_iPLength = strtol ( f_pcReadBuf, NULL, 0x10 );
-		::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
+		::memset( f_pcReadBuf, 0, PROTOCOL::RECV_BUF_SIZE );
 		::strncpy( f_pcReadBuf, f_oLine.raw()
-				+ ::strlen( PROTOCOL::D_DTA ) + 2 /* for Plength */, 2 );
+				+ ::strlen( PROTOCOL::DTA ) + 2 /* for Plength */, 2 );
 		l_iPCRC = lexical_cast<int, char const*>( f_pcReadBuf );
 		if ( ( l_iPCRC != l_iCRC ) || ( l_iPLength != l_iLength ) )
-			l_iError += ( l_iErrLenght - HRawFile::write( PROTOCOL::D_ERR, l_iErrLenght ) );
+			l_iError += ( l_iErrLenght - HRawFile::write( PROTOCOL::ERR, l_iErrLenght ) );
 		l_iError ++;
 		}
 	flush( TCOFLUSH );
-	l_iError += ( l_iAckLenght - HRawFile::write( PROTOCOL::D_ACK, l_iAckLenght ) );
+	l_iError += ( l_iAckLenght - HRawFile::write( PROTOCOL::ACK, l_iAckLenght ) );
 	wait_for_eot();
 	f_iLines ++;
 	return ( static_cast<int>( l_iError ) );
@@ -179,26 +181,26 @@ int HCollector::establish_connection ( int a_iTimeOut )
 	 Either waiting part runs before initializing part (the easy case),
 	 or initializing part runs before waiting part (here comes the trouble).
 */
-	int l_iLenght = ::strlen( PROTOCOL::D_SYN ), l_iError = -1;
+	int l_iLenght = ::strlen( PROTOCOL::SYN ), l_iError = -1;
 	if ( f_iFileDescriptor < 0 )
 		M_THROW( n_pcError, f_iFileDescriptor );
-	::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-	while ( ::strncmp( f_pcReadBuf, PROTOCOL::D_ACK, ::strlen( PROTOCOL::D_ACK ) ) )
+	::memset( f_pcReadBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+	while ( ::strncmp( f_pcReadBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) )
 		{
 		flush( TCOFLUSH );
-		if ( HRawFile::write( PROTOCOL::D_SYN, l_iLenght ) != l_iLenght )
+		if ( HRawFile::write( PROTOCOL::SYN, l_iLenght ) != l_iLenght )
 			M_THROW( "write", l_iLenght );
 		wait_for_eot();
 		if ( tcsendbreak( f_iFileDescriptor, 0 ) )
 			M_THROW( "tcsendbreak", errno );
-		memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-		timed_read( f_pcReadBuf, PROTOCOL::D_RECV_BUF_SIZE, 1 );
+		memset( f_pcReadBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+		timed_read( f_pcReadBuf, PROTOCOL::RECV_BUF_SIZE, 1 );
 		flush( TCIFLUSH );
 		l_iError ++;
 		if ( l_iError > a_iTimeOut )
 			return ( -1 );
 		}
-	::log( LOG_TYPE::D_DEBUG ) << "Collector: Connected ! (estab)" << endl;
+	::log( LOG_TYPE::DEBUG ) << "Collector: Connected ! (estab)" << endl;
 	return ( l_iError );
 	M_EPILOG
 	}
@@ -207,19 +209,19 @@ int HCollector::wait_for_connection ( int a_iTimeOut )
 	{
 	M_PROLOG
 	int l_iError = - 1;
-	int l_iLenght = ::strlen( PROTOCOL::D_ACK );
+	int l_iLenght = ::strlen( PROTOCOL::ACK );
 	if ( f_iFileDescriptor < 0 )
 		M_THROW ( n_pcError, f_iFileDescriptor );
-	::memset( f_pcReadBuf, 0, PROTOCOL::D_RECV_BUF_SIZE );
-	while ( ::strncmp( f_pcReadBuf, PROTOCOL::D_SYN, strlen ( PROTOCOL::D_SYN ) ) )
+	::memset( f_pcReadBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+	while ( ::strncmp( f_pcReadBuf, PROTOCOL::SYN, strlen ( PROTOCOL::SYN ) ) )
 		{
-		if ( timed_read( f_pcReadBuf, PROTOCOL::D_RECV_BUF_SIZE, a_iTimeOut ) >= 0 )
+		if ( timed_read( f_pcReadBuf, PROTOCOL::RECV_BUF_SIZE, a_iTimeOut ) >= 0 )
 			l_iError ++;
 		else
 			return ( -1 );
 		}
-	l_iError += static_cast<int>( l_iLenght - HRawFile::write( PROTOCOL::D_ACK, l_iLenght ) );
-	::log( LOG_TYPE::D_DEBUG ) << "Collector: Connected ! (wait)" << endl;
+	l_iError += static_cast<int>( l_iLenght - HRawFile::write( PROTOCOL::ACK, l_iLenght ) );
+	::log( LOG_TYPE::DEBUG ) << "Collector: Connected ! (wait)" << endl;
 	return ( l_iError );
 	M_EPILOG
 	}
@@ -235,7 +237,7 @@ int HCollector::read_collector ( void ( *process_line )( char const* const, int 
 		{
 		l_iError += receive_line( l_oLine );
 		/* '\n' is stripped from each line so we need to FIN treat special */
-		if ( ! ::strncmp( l_oLine.raw(), PROTOCOL::D_FIN, sizeof ( PROTOCOL::D_FIN ) ) )
+		if ( ! ::strncmp( l_oLine.raw(), PROTOCOL::FIN, sizeof ( PROTOCOL::FIN ) ) )
 			break;
 		process_line( l_oLine.raw(), f_iLines );
 		}

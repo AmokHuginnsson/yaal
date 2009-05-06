@@ -34,7 +34,7 @@ namespace hcore
 {
 namespace LOG_TYPE
 	{
-	static int const D_SQL = 1073741824;
+	static int const SQL = 1073741824;
 	}
 }
 

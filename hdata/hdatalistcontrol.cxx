@@ -68,7 +68,7 @@ void HDataListControl::load( int long /*a_iId*/ )
 	int l_iCount = 0, l_iCtr = 0, l_iSize = static_cast<int>( f_oDataControler->size() );
 	HDataWindow* l_poParent = dynamic_cast<HDataWindow*>( f_poParent );
 	M_ASSERT ( l_poParent );
-	HRecordSet::ptr_t rs = f_oSQL->execute( HSQLDescriptor::MODE::D_SELECT );
+	HRecordSet::ptr_t rs = f_oSQL->execute( HSQLDescriptor::MODE::SELECT );
 	int idColNo = -1;
 	int const colCount = rs->get_field_count();
 	for ( int i = 0; i < colCount; ++ i )
@@ -111,8 +111,8 @@ void HDataListControl::add_new( void )
 	{
 	M_PROLOG
 	f_oDataControler->add_tail( HItem( static_cast<int>( f_oHeader.size() ) ) );
-	process_input( KEY_CODES::D_HOME );
-	process_input( KEY_CODES::D_END );
+	process_input( KEY_CODES::HOME );
+	process_input( KEY_CODES::END );
 	return;
 	M_EPILOG
 	}
@@ -123,8 +123,8 @@ void HDataListControl::cancel_new( void )
 	f_oDataControler->remove_tail();
 	if ( f_oDataControler->size() )
 		{
-		process_input( KEY_CODES::D_HOME );
-		process_input( KEY_CODES::D_END );
+		process_input( KEY_CODES::HOME );
+		process_input( KEY_CODES::END );
 		}
 	return;
 	M_EPILOG

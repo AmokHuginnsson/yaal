@@ -46,12 +46,12 @@ namespace hcore
  */
 namespace LOG_TYPE
 	{
-	static int const D_DEBUG			= 1; 
-	static int const D_INFO				= 2; 
-	static int const D_NOTICE			= 4; 
-	static int const D_WARNING		= 8;
-	static int const D_ERROR			= 16; 
-	static int const D_CVSHEADER	= 32;
+	static int const DEBUG			= 1; 
+	static int const INFO				= 2; 
+	static int const NOTICE			= 4; 
+	static int const WARNING		= 8;
+	static int const ERROR			= 16; 
+	static int const VCSHEADER	= 32;
 	}
 
 class HLog;

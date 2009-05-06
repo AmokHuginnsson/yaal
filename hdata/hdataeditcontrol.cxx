@@ -69,29 +69,29 @@ int HDataEditControl::do_process_input ( int a_iCode )
 		{
 		case ( '\t' ):
 		case ( '\r' ):
-		case ( KEY_CODES::D_LEFT ):
-		case ( KEY_CODES::D_RIGHT ):
+		case ( KEY_CODES::LEFT ):
+		case ( KEY_CODES::RIGHT ):
 		case ( KEY < 'a' >::ctrl ):
-		case ( KEY_CODES::D_HOME ):
+		case ( KEY_CODES::HOME ):
 		case ( KEY < 'e' >::ctrl ):
-		case ( KEY_CODES::D_END ):
-		case ( KEY_CODES::D_INSERT ):
+		case ( KEY_CODES::END ):
+		case ( KEY_CODES::INSERT ):
 		case ( KEY < 'f' >::meta ):
 		case ( KEY < 'b' >::meta ):
 			l_bNoChange = true;
 		break;
-		case ( KEY_CODES::D_PAGE_UP ):
-		case ( KEY_CODES::D_PAGE_DOWN ):
-		case ( KEY_CODES::D_UP ):
-		case ( KEY_CODES::D_DOWN ):
+		case ( KEY_CODES::PAGE_UP ):
+		case ( KEY_CODES::PAGE_DOWN ):
+		case ( KEY_CODES::UP ):
+		case ( KEY_CODES::DOWN ):
 			if ( f_bMultiLine )
 				l_bNoChange = true;
 		break;
-		case ( KEY_CODES::D_BACKSPACE ):
+		case ( KEY_CODES::BACKSPACE ):
 			if ( ! ( f_iControlOffset + f_iCursorPosition ) )
 				l_bNoChange = true;
 		break;
-		case ( KEY_CODES::D_DELETE ):
+		case ( KEY_CODES::DELETE ):
 			if ( f_oString.is_empty() )
 				l_bNoChange = true;
 		break;

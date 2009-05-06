@@ -68,21 +68,21 @@ struct OListBits
 		};
 	typedef enum
 		{
-		D_TREAT_AS_CLOSED = 1,
-		D_TREAT_AS_OPENED = 2
+		TREAT_AS_CLOSED = 1,
+		TREAT_AS_OPENED = 2
 		} treatment_t;
 	typedef enum
 		{
-		D_OK = 0,
-		D_ERROR = 1,
-		D_FINAL_REACHED = 2,
-		D_NOT_FOUND = 4
+		OK = 0,
+		ERROR = 1,
+		FINAL_REACHED = 2,
+		NOT_FOUND = 4
 		} status_t;
 	typedef enum
 		{
-		D_UNSORTED,
-		D_ASCENDING,
-		D_DESCENDING
+		UNSORTED,
+		ASCENDING,
+		DESCENDING
 		} sort_order_t;
 	virtual ~OListBits( void ) { } 
 	/*! \brief HList<>::iterator type constructor.
@@ -115,10 +115,10 @@ private:
 public:
 	template<typename const_qual_t, OListBits::treatment_t const treatment>
 	class HIterator;
-	typedef class HIterator<tType, OListBits::D_TREAT_AS_OPENED> iterator;
-	typedef class HIterator<tType const, OListBits::D_TREAT_AS_OPENED> const_iterator;
-	typedef class HIterator<tType, OListBits::D_TREAT_AS_CLOSED> cyclic_iterator;
-	typedef class HIterator<tType const, OListBits::D_TREAT_AS_CLOSED> const_cyclic_iterator;
+	typedef class HIterator<tType, OListBits::TREAT_AS_OPENED> iterator;
+	typedef class HIterator<tType const, OListBits::TREAT_AS_OPENED> const_iterator;
+	typedef class HIterator<tType, OListBits::TREAT_AS_CLOSED> cyclic_iterator;
+	typedef class HIterator<tType const, OListBits::TREAT_AS_CLOSED> const_cyclic_iterator;
 	/*! \brief Creates list, with specified size.
 	 *
 	 * \param count - number of element for newly created list.
@@ -164,7 +164,7 @@ public:
 	/*! \brief Add element in the way that keeps order.
 	 */
 	template<typename T>
-	tType& add_orderly( tType const&, T const&, sort_order_t = D_ASCENDING );
+	tType& add_orderly( tType const&, T const&, sort_order_t = ASCENDING );
 	status_t remove_head( tType** = NULL );
 	status_t remove_tail( tType** = NULL );
 	template<OListBits::treatment_t const treatment>
@@ -183,9 +183,9 @@ public:
 	tType& tail( void );
 	tType const& tail( void ) const;
 	void exchange( iterator const&, iterator const& );
-	void sort( sort_order_t = D_ASCENDING );
+	void sort( sort_order_t = ASCENDING );
 	template<typename T>
-	void sort( T const&, sort_order_t = D_ASCENDING );
+	void sort( T const&, sort_order_t = ASCENDING );
 	bool empty( void ) const;
 	bool is_empty( void ) const;
 private:
@@ -199,10 +199,10 @@ private:
 	HElement* element_by_index ( int );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
-	friend class HIterator<tType, OListBits::D_TREAT_AS_OPENED>;
-	friend class HIterator<tType const, OListBits::D_TREAT_AS_OPENED>;
-	friend class HIterator<tType, OListBits::D_TREAT_AS_CLOSED>;
-	friend class HIterator<tType const, OListBits::D_TREAT_AS_CLOSED>;
+	friend class HIterator<tType, OListBits::TREAT_AS_OPENED>;
+	friend class HIterator<tType const, OListBits::TREAT_AS_OPENED>;
+	friend class HIterator<tType, OListBits::TREAT_AS_CLOSED>;
+	friend class HIterator<tType const, OListBits::TREAT_AS_CLOSED>;
 	};
 
 /*! \brief HList<> element class provisions basic building block for doubly-linked list.
@@ -219,10 +219,10 @@ private:
 	HElement ( HElement const & );
 	HElement& operator = ( HElement const& );
 	friend class HList<tType>;
-	friend class HIterator<tType, OListBits::D_TREAT_AS_OPENED>;
-	friend class HIterator<tType const, OListBits::D_TREAT_AS_OPENED>;
-	friend class HIterator<tType, OListBits::D_TREAT_AS_CLOSED>;
-	friend class HIterator<tType const, OListBits::D_TREAT_AS_CLOSED>;
+	friend class HIterator<tType, OListBits::TREAT_AS_OPENED>;
+	friend class HIterator<tType const, OListBits::TREAT_AS_OPENED>;
+	friend class HIterator<tType, OListBits::TREAT_AS_CLOSED>;
+	friend class HIterator<tType const, OListBits::TREAT_AS_CLOSED>;
 	};
 
 /*! \brief Iterator for HList<> data structure.
@@ -247,7 +247,7 @@ public:
 		if ( f_poCurrent )
 			{
 			f_poCurrent = f_poCurrent->f_poNext;
-			if ( ( treatment == OListBits::D_TREAT_AS_OPENED ) && ( f_poCurrent == f_poOwner->f_poHook ) )
+			if ( ( treatment == OListBits::TREAT_AS_OPENED ) && ( f_poCurrent == f_poOwner->f_poHook ) )
 				f_poCurrent = NULL;
 			}
 		return ( *this );
@@ -267,7 +267,7 @@ public:
 		if ( f_poCurrent )
 			{
 			f_poCurrent = f_poCurrent->f_poPrevious;
-			if ( ( treatment == OListBits::D_TREAT_AS_OPENED ) && ( f_poCurrent == f_poOwner->f_poHook->f_poPrevious ) )
+			if ( ( treatment == OListBits::TREAT_AS_OPENED ) && ( f_poCurrent == f_poOwner->f_poHook->f_poPrevious ) )
 				f_poCurrent = NULL;
 			}
 		return ( *this );
@@ -451,7 +451,7 @@ bool HList<tType>::HIterator<const_qual_t, treatment>::is_valid( void ) const
 template<typename tType>
 HList<tType>::HList( int a_iSize )
 	: OListBits(), f_iSize( 0 ),
-	f_poHook( NULL ), f_eOrder( D_UNSORTED ),
+	f_poHook( NULL ), f_eOrder( UNSORTED ),
 	f_iIndex( 0 ), f_poIndex( NULL )
 	{
 	M_PROLOG
@@ -473,7 +473,7 @@ HList<tType>::~HList( void )
 template<typename tType>
 HList<tType>::HList( HList<tType> const& a_roList )
 	: OListBits(), f_iSize( 0 ),
-	f_poHook( NULL ), f_eOrder( D_UNSORTED ),
+	f_poHook( NULL ), f_eOrder( UNSORTED ),
 	f_iIndex( 0 ), f_poIndex( NULL )
 	{
 	M_PROLOG
@@ -486,7 +486,7 @@ template<typename tType>
 template<typename iter_t>
 HList<tType>::HList( iter_t i, iter_t endIt )
 	: OListBits(), f_iSize( 0 ),
-	f_poHook( NULL ), f_eOrder( D_UNSORTED ),
+	f_poHook( NULL ), f_eOrder( UNSORTED ),
 	f_iIndex( 0 ), f_poIndex( NULL )
 	{
 	M_PROLOG
@@ -669,7 +669,7 @@ typename OListBits::iterator<tType, treatment>::type HList<tType>::insert( HIter
 	{
 	M_PROLOG
 	HElement* l_poElement = new HElement( it.f_poCurrent );
-	if ( ( f_iSize == 0 ) || ( ( it.f_poCurrent == f_poHook ) && ( treatment == D_TREAT_AS_OPENED ) ) )
+	if ( ( f_iSize == 0 ) || ( ( it.f_poCurrent == f_poHook ) && ( treatment == TREAT_AS_OPENED ) ) )
 		f_poHook = l_poElement;
 	f_iSize ++;
 	f_iIndex = 0;
@@ -781,12 +781,12 @@ tType& HList<tType>::add_orderly( tType const& a_rtObject,
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iSize;
 	HElement * l_poElement = new HElement ( NULL );
 	l_poElement->f_tObject = a_rtObject;
-	if ( ( f_eOrder != D_UNSORTED ) && ( f_eOrder != a_eOrder ) )
+	if ( ( f_eOrder != UNSORTED ) && ( f_eOrder != a_eOrder ) )
 		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BAD_ORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
 	typedef bool ( *comp_t )( tType const&, tType const&, T const& );
 	comp_t my_comp;
-	if ( f_eOrder == D_ASCENDING )
+	if ( f_eOrder == ASCENDING )
 		my_comp = asc_less<tType, T>;
 	else
 		my_comp = desc_less<tType, T>;
@@ -874,7 +874,7 @@ template<typename tType>
 OListBits::status_t HList<tType>::remove_head( tType** a_pptObject )
 	{
 	M_PROLOG
-	status_t l_eError = D_OK;
+	status_t l_eError = OK;
 	HElement * l_poElement = NULL;
 	if ( f_iSize > 0 )
 		{
@@ -903,7 +903,7 @@ template<typename tType>
 OListBits::status_t HList<tType>::remove_tail( tType** a_pptObject )
 	{
 	M_PROLOG
-	status_t l_eError = D_OK;
+	status_t l_eError = OK;
 	HElement * l_poElement = NULL;
 	if ( f_iSize > 0 )
 		{
@@ -1132,16 +1132,16 @@ void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less 
 		rightIt = rightIt->f_poPrevious;
 		++ stepsRight;
 		}
-	int const D_ARBITRARILY_CHOSEN_THRESHOLD = 7;
-	if ( ( stepsLeft + stepsRight + 2 ) < D_ARBITRARILY_CHOSEN_THRESHOLD )
+	int const ARBITRARILY_CHOSEN_THRESHOLD = 7;
+	if ( ( stepsLeft + stepsRight + 2 ) < ARBITRARILY_CHOSEN_THRESHOLD )
 		insert_sort( left, right, less );
 	else
 		{
-		if ( stepsLeft < D_ARBITRARILY_CHOSEN_THRESHOLD )
+		if ( stepsLeft < ARBITRARILY_CHOSEN_THRESHOLD )
 			insert_sort( left, leftIt, less );
 		else
 			merge_sort( left, leftIt, less );
-		if ( stepsRight < D_ARBITRARILY_CHOSEN_THRESHOLD )
+		if ( stepsRight < ARBITRARILY_CHOSEN_THRESHOLD )
 			insert_sort( rightIt, right, less );
 		else
 			merge_sort( rightIt, right, less );
@@ -1149,7 +1149,7 @@ void HList<tType>::merge_sort( HElement*& left, HElement*& right, T const& less 
 		++ stepsLeft;
 		typedef bool ( *comp_t )( tType const&, tType const&, T const& );
 		comp_t my_comp;
-		if ( f_eOrder == D_ASCENDING )
+		if ( f_eOrder == ASCENDING )
 			my_comp = asc_less<tType, T>;
 		else
 			my_comp = desc_less<tType, T>;
@@ -1201,7 +1201,7 @@ void HList<tType>::insert_sort(
 		HElement* top = a_rpoBaseLower;
 		typedef bool ( *comp_t )( tType const&, tType const&, T const& );
 		comp_t my_comp;
-		if ( f_eOrder == D_ASCENDING )
+		if ( f_eOrder == ASCENDING )
 			my_comp = asc_less<tType, T>;
 		else
 			my_comp = desc_less<tType, T>;
@@ -1269,7 +1269,7 @@ void HList<tType>::select_sort(
 	int ctr = distance;
 	typedef bool ( *comp_t )( tType const&, tType const&, T const& );
 	comp_t my_comp;
-	if ( f_eOrder == D_ASCENDING )
+	if ( f_eOrder == ASCENDING )
 		my_comp = asc_less<tType, T>;
 	else
 		my_comp = desc_less<tType, T>;
@@ -1329,7 +1329,7 @@ void HList<tType>::sort( T const& less, sort_order_t a_eOrder )
 	{
 	M_PROLOG
 	f_eOrder = a_eOrder;
-	if ( ( f_eOrder != D_ASCENDING ) && ( f_eOrder != D_DESCENDING ) )
+	if ( ( f_eOrder != ASCENDING ) && ( f_eOrder != DESCENDING ) )
 		M_THROW ( g_ppcErrMsgHList [ ERROR::E_BAD_ORDER ], f_eOrder );
 	if ( f_iSize > 1 )
 		{

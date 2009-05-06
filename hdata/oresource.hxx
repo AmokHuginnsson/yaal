@@ -53,13 +53,13 @@ struct DATACONTROL_BITS
 		 */
 		typedef enum
 			{
-			D_INVALID,
-			D_MAIN,		/*!< main control of a window, contents of this control holds
+			INVALID,
+			MAIN,		/*!< main control of a window, contents of this control holds
 										 data of main record-set of a window */
 
-			D_FILTER,	/*!< this kind of control is meant to setup filter for main
+			FILTER,	/*!< this kind of control is meant to setup filter for main
 										control for `view mode' */
-			D_DATA		/*!< this kind of control is used to store record-set data in `edit mode' */
+			DATA		/*!< this kind of control is used to store record-set data in `edit mode' */
 			} role_t;
 		};
 /*! \brief control types
@@ -68,13 +68,13 @@ struct DATACONTROL_BITS
 		{
 		typedef enum
 			{
-			D_INVALID,
-			D_EDIT,
-			D_LIST,
-			D_TREE,
-			D_COMBO,
-			D_DATE,
-			D_CHECK
+			INVALID,
+			EDIT,
+			LIST,
+			TREE,
+			COMBO,
+			DATE,
+			CHECK
 			} type_t; 
 		};
 	};
@@ -100,8 +100,8 @@ struct OColumnInfo
 	type_t f_eType;					/*!< data type stored in that column */
 	OColumnInfo( void )
 		: f_iPlacement( 0 ), f_pcName( NULL ), f_iWidth( 0 ),
-		f_eAlign( yaal::hconsole::HControl::BITS::ALIGN::D_LEFT ),
-		f_eType( TYPE::D_HSTRING ) {}
+		f_eAlign( yaal::hconsole::HControl::BITS::ALIGN::LEFT ),
+		f_eType( TYPE::HSTRING ) {}
 	};
 
 class HDataControl;

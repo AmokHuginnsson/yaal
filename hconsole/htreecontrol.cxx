@@ -131,7 +131,7 @@ void HTreeControl::do_refresh( void )
 	int l_iCtr = 0;
 	HConsole& cons = HCons::get_instance();
 	if ( f_bFocused )
-		cons.curs_set ( CURSOR::D_INVISIBLE );
+		cons.curs_set ( CURSOR::INVISIBLE );
 	draw_label();
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	f_oVarTmpBuffer.fillz( '_', f_iWidthRaw );
@@ -185,21 +185,21 @@ int HTreeControl::do_process_input( int a_iCode )
 	tree_t::node_t l_poNode = f_poSelected;
 	switch ( a_iCode )
 		{
-		case ( KEY_CODES::D_HOME ):
+		case ( KEY_CODES::HOME ):
 			l_poNode = f_oTree.get_root();
 			if ( l_poNode->has_childs() )
 				f_poSelected = &*l_poNode->begin();
 		break;
-		case ( KEY_CODES::D_END ):
+		case ( KEY_CODES::END ):
 			l_poNode = f_oTree.get_root();
 			if ( l_poNode->has_childs() )
 				f_poSelected = &*l_poNode->rbegin();
 		break;
-		case ( KEY_CODES::D_PAGE_UP ):
+		case ( KEY_CODES::PAGE_UP ):
 			break;
-		case ( KEY_CODES::D_PAGE_DOWN ):
+		case ( KEY_CODES::PAGE_DOWN ):
 			break;
-		case ( KEY_CODES::D_UP ):
+		case ( KEY_CODES::UP ):
 			{
 			f_poSelected = previous( l_poNode );
 			if ( f_poSelected == l_poNode )
@@ -223,7 +223,7 @@ int HTreeControl::do_process_input( int a_iCode )
 				}
 			}
 		break;
-		case ( KEY_CODES::D_RIGHT ):
+		case ( KEY_CODES::RIGHT ):
 			{
 			l_bWasFolded = ! (**l_poNode).f_bUnfolded;
 			if ( l_poNode->has_childs() )
@@ -234,7 +234,7 @@ int HTreeControl::do_process_input( int a_iCode )
 				}
 			}
 		/* when node is unfolded, right key works as down key */
-		case ( KEY_CODES::D_DOWN ):
+		case ( KEY_CODES::DOWN ):
 			{
 			if ( (**l_poNode).f_bUnfolded )
 				{
@@ -258,7 +258,7 @@ int HTreeControl::do_process_input( int a_iCode )
 				}
 			}
 		break;
-		case ( KEY_CODES::D_LEFT ):
+		case ( KEY_CODES::LEFT ):
 			if ( (**l_poNode).f_bUnfolded && l_poNode->get_level() )
 				(**l_poNode).f_bUnfolded = false;
 			else if ( l_poNode->get_level() > 1 )
@@ -282,7 +282,7 @@ int HTreeControl::do_process_input( int a_iCode )
 	if ( ! l_iErrorCode )
 		{
 		schedule_refresh();
-		f_poParent->status_bar()->message( COLORS::D_FG_LIGHTGRAY, "" );
+		f_poParent->status_bar()->message( COLORS::FG_LIGHTGRAY, "" );
 		}
 	return ( a_iCode );
 	M_EPILOG

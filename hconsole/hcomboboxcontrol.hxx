@@ -60,12 +60,12 @@ public:
 		 */
 		typedef enum
 			{
-			D_EDITCONTROL, /*!< Combobox retracted. */
-			D_LISTCONTROL  /*!< Combobox expanded. */
+			EDITCONTROL, /*!< Combobox retracted. */
+			LISTCONTROL  /*!< Combobox expanded. */
 			} mode_t;
 		};
 protected:
-	MODE::mode_t f_eMode; /* operating mode (D_MODE_EDITCONTROL|D_MODE_LISTCONTROL) */
+	MODE::mode_t f_eMode; /* operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
 	int f_iDroppedWidth;	/* width of dropped list */
 public:
 	HComboboxControl ( HWindow *,			/* parent */

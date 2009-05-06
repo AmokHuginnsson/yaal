@@ -77,9 +77,9 @@ public:
 			{
 			typedef enum
 				{
-				D_NONE,
-				D_OPTIONAL,
-				D_REQUIRED
+				NONE,
+				OPTIONAL,
+				REQUIRED
 				} enum_t;
 			};
 		char const* f_pcName;

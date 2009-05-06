@@ -53,7 +53,7 @@ HStatusBarControl::HStatusBarControl( HWindow* a_poParent,
 	HEditControl( NULL, 0, 0, 0, 0, NULL, 127, "", n_pcMaskLoose,
 			false, false, false, false, false, 255 ),
 	f_iStatusBarAttribute( 0 ), f_iPromptLength( 0 ),
-	f_eMode( PROMPT::D_NORMAL ), f_eRestrict( PROMPT::D_RELAXED ),
+	f_eMode( PROMPT::NORMAL ), f_eRestrict( PROMPT::RELAXED ),
 	f_oPrompt(), f_bDone( false ), f_bEstimate( false ), f_dProgressSize( 1 ),
 	f_iLastProgress( -1 ), f_iLastPercent( - 1 ), f_iLastMinute( 0 ),
 	f_iLastSecond( 0 ), f_iLastStep( 0 ),
@@ -126,9 +126,9 @@ void HStatusBarControl::do_refresh( void )
 int HStatusBarControl::do_process_input( int a_iCode )
 	{
 	M_PROLOG
-	if ( ( a_iCode == KEY_CODES::D_BACKSPACE )
-			&& ( f_eRestrict == PROMPT::D_RELAXED )
-			&& ( f_eMode != PROMPT::D_MENU )
+	if ( ( a_iCode == KEY_CODES::BACKSPACE )
+			&& ( f_eRestrict == PROMPT::RELAXED )
+			&& ( f_eMode != PROMPT::MENU )
 			&& ! f_oString.get_length() )
 		{
 		end_prompt();
@@ -138,12 +138,12 @@ int HStatusBarControl::do_process_input( int a_iCode )
 		a_iCode = HEditControl::do_process_input ( a_iCode );
 	switch ( f_eMode )
 		{
-		case ( PROMPT::D_NORMAL ):
-		case ( PROMPT::D_COMMAND ):
-		case ( PROMPT::D_SEARCH ):
+		case ( PROMPT::NORMAL ):
+		case ( PROMPT::COMMAND ):
+		case ( PROMPT::SEARCH ):
 			a_iCode = process_input_normal ( a_iCode );
 		break;
-		case ( PROMPT::D_MENU ):
+		case ( PROMPT::MENU ):
 			a_iCode = process_input_menu ( a_iCode );
 		break;
 		default :
@@ -365,9 +365,9 @@ int HStatusBarControl::process_input_normal( int a_iCode )
 			{
 			l_bBackwards = ( f_oPrompt [ 0 ] == '?' );
 			end_prompt();
-			if ( l_eMode == PROMPT::D_COMMAND )
+			if ( l_eMode == PROMPT::COMMAND )
 				f_poParent->f_oCommand = f_oString;
-			else if ( l_eMode == PROMPT::D_SEARCH )
+			else if ( l_eMode == PROMPT::SEARCH )
 				{
 				l_poSearchableControl = dynamic_cast < HSearchableControl * > ( &(*(*f_poParent->f_oPreviousFocusedChild)) );
 				if ( l_poSearchableControl )
@@ -395,7 +395,7 @@ int HStatusBarControl::process_input_menu ( int a_iCode )
 void HStatusBarControl::end_prompt( void )
 	{
 	M_PROLOG
-	f_eMode = PROMPT::D_NORMAL;
+	f_eMode = PROMPT::NORMAL;
 	f_oPrompt = "";
 	f_iPromptLength = 0;
 	f_poParent->f_oFocusedChild = f_poParent->f_oPreviousFocusedChild;

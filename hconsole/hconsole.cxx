@@ -56,16 +56,16 @@ namespace hconsole
 {
 
 int n_iLatency = 1;
-int n_iAttributeDisabled = ( COLORS::D_FG_GREEN | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK ) << 8
-															| ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK );
-int n_iAttributeEnabled = ( COLORS::D_FG_BRIGHTGREEN | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK ) << 8
-															| ( COLORS::D_FG_WHITE | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK );
-int n_iAttributeFocused = ( COLORS::D_FG_BRIGHTGREEN | COLORS::D_BG_BLACK | COLORS::D_BG_BLINK ) << 8
-															| ( COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY ); 
-int n_iAttributeStatusBar = ( COLORS::D_FG_WHITE | COLORS::D_BG_BLACK ) << 8
-															| ( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK );
-int n_iAttributeSearchHighlight = ( COLORS::D_FG_BLACK | COLORS::D_BG_BROWN | COLORS::D_BG_BLINK ) << 8
-																		| ( COLORS::D_FG_BLACK | COLORS::D_BG_BROWN );
+int n_iAttributeDisabled = ( COLORS::FG_GREEN | COLORS::BG_BLACK | COLORS::BG_BLINK ) << 8
+															| ( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK | COLORS::BG_BLINK );
+int n_iAttributeEnabled = ( COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK ) << 8
+															| ( COLORS::FG_WHITE | COLORS::BG_BLACK | COLORS::BG_BLINK );
+int n_iAttributeFocused = ( COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK ) << 8
+															| ( COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY ); 
+int n_iAttributeStatusBar = ( COLORS::FG_WHITE | COLORS::BG_BLACK ) << 8
+															| ( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK );
+int n_iAttributeSearchHighlight = ( COLORS::FG_BLACK | COLORS::BG_BROWN | COLORS::BG_BLINK ) << 8
+																		| ( COLORS::FG_BLACK | COLORS::BG_BROWN );
 bool	n_bUseMouse = false;
 bool	n_bDisableXON = false;
 bool	n_bLeaveCtrlC = false;
@@ -98,37 +98,37 @@ int get_color_bits( HString& a_roValue, int a_iWhat )
 	if ( l_oStr.is_empty() )
 		return ( 0 );
 	if ( ! strcasecmp( l_oStr, "BLACK" ) )
-		return ( COLORS::D_FG_BLACK );
+		return ( COLORS::FG_BLACK );
 	else if ( ! strcasecmp( l_oStr, "RED" ) )
-		return ( COLORS::D_FG_RED );
+		return ( COLORS::FG_RED );
 	else if ( ! strcasecmp( l_oStr, "GREEN" ) )
-		return ( COLORS::D_FG_GREEN );
+		return ( COLORS::FG_GREEN );
 	else if ( ! strcasecmp( l_oStr, "BROWN" ) )
-		return ( COLORS::D_FG_BROWN );
+		return ( COLORS::FG_BROWN );
 	else if ( ! strcasecmp( l_oStr, "BLUE" ) )
-		return ( COLORS::D_FG_BLUE );
+		return ( COLORS::FG_BLUE );
 	else if ( ! strcasecmp( l_oStr, "MAGENTA" ) )
-		return ( COLORS::D_FG_MAGENTA );
+		return ( COLORS::FG_MAGENTA );
 	else if ( ! strcasecmp( l_oStr, "CYAN" ) )
-		return ( COLORS::D_FG_CYAN );
+		return ( COLORS::FG_CYAN );
 	else if ( ! strcasecmp( l_oStr, "LIGHTGRAY" ) )
-		return ( COLORS::D_FG_LIGHTGRAY );
+		return ( COLORS::FG_LIGHTGRAY );
 	else if ( ! strcasecmp( l_oStr, "GRAY" ) )
-		return ( COLORS::D_FG_GRAY );
+		return ( COLORS::FG_GRAY );
 	else if ( ! strcasecmp( l_oStr, "BRGIHTRED" ) )
-		return ( COLORS::D_FG_BRIGHTRED );
+		return ( COLORS::FG_BRIGHTRED );
 	else if ( ! strcasecmp( l_oStr, "BRIGHTGREEN" ) )
-		return ( COLORS::D_FG_BRIGHTGREEN );
+		return ( COLORS::FG_BRIGHTGREEN );
 	else if ( ! strcasecmp( l_oStr, "YELLOW" ) )
-		return ( COLORS::D_FG_YELLOW );
+		return ( COLORS::FG_YELLOW );
 	else if ( ! strcasecmp( l_oStr, "BRIGHTBLUE" ) )
-		return ( COLORS::D_FG_BRIGHTBLUE );
+		return ( COLORS::FG_BRIGHTBLUE );
 	else if ( ! strcasecmp( l_oStr, "BRIGHTMAGENTA" ) )
-		return ( COLORS::D_FG_BRIGHTMAGENTA );
+		return ( COLORS::FG_BRIGHTMAGENTA );
 	else if ( ! strcasecmp( l_oStr, "BRIGHTCYAN" ) )
-		return ( COLORS::D_FG_BRIGHTCYAN );
+		return ( COLORS::FG_BRIGHTCYAN );
 	else if ( ! strcasecmp( l_oStr, "WHITE" ) )
-		return ( COLORS::D_FG_WHITE );
+		return ( COLORS::FG_WHITE );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -177,18 +177,18 @@ HConsoleInitDeinit::HConsoleInitDeinit( void )
 	{
 	M_PROLOG
 	errno = 0;
-	yaalOptions( "use_mouse", program_options_helper::option_value( n_bUseMouse ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "enable mouse support" )
-		( "disable_XON", program_options_helper::option_value( n_bDisableXON ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable flow control events" )
-		( "leave_ctrl_c", program_options_helper::option_value( n_bLeaveCtrlC ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+C sequence" )
-		( "leave_ctrl_z", program_options_helper::option_value( n_bLeaveCtrlZ ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+Z sequence" )
-		( "leave_ctrl_s", program_options_helper::option_value( n_bLeaveCtrlS ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+S sequence" )
-		( "leave_ctrl_q", program_options_helper::option_value( n_bLeaveCtrlQ ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+Q sequence" )
-		( "leave_ctrl_\\", program_options_helper::option_value( n_bLeaveCtrlBackSlash ), 0, HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL, NULL, "disable special handling of CTRL+\\ sequence" )
-		( "esc_delay", program_options_helper::option_value( ESCDELAY ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "ncurses escape sequence time span" ) /* defined inside ncurses lib */
-		( "latency", program_options_helper::option_value( n_iLatency ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "how often invoke idle event" )
-		( "command_compose_character", program_options_helper::option_value( n_cCommandComposeCharacter ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL,
+	yaalOptions( "use_mouse", program_options_helper::option_value( n_bUseMouse ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "enable mouse support" )
+		( "disable_XON", program_options_helper::option_value( n_bDisableXON ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable flow control events" )
+		( "leave_ctrl_c", program_options_helper::option_value( n_bLeaveCtrlC ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+C sequence" )
+		( "leave_ctrl_z", program_options_helper::option_value( n_bLeaveCtrlZ ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+Z sequence" )
+		( "leave_ctrl_s", program_options_helper::option_value( n_bLeaveCtrlS ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+S sequence" )
+		( "leave_ctrl_q", program_options_helper::option_value( n_bLeaveCtrlQ ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+Q sequence" )
+		( "leave_ctrl_\\", program_options_helper::option_value( n_bLeaveCtrlBackSlash ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+\\ sequence" )
+		( "esc_delay", program_options_helper::option_value( ESCDELAY ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "ncurses escape sequence time span" ) /* defined inside ncurses lib */
+		( "latency", program_options_helper::option_value( n_iLatency ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "how often invoke idle event" )
+		( "command_compose_character", program_options_helper::option_value( n_cCommandComposeCharacter ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL,
 			"character that shall be uses as command composition base" )
-		( "command_compose_delay", program_options_helper::option_value( n_iCommandComposeDelay ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "command composition time span" );
+		( "command_compose_delay", program_options_helper::option_value( n_iCommandComposeDelay ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "command composition time span" );
 	yaalOptions.process_rc_file( "yaal", "console", set_hconsole_variables );
 	return;
 	M_EPILOG

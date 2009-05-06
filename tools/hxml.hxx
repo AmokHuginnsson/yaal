@@ -64,7 +64,7 @@ public:
 protected:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
-	typedef enum { D_TO_EXTERNAL, D_TO_INTERNAL } way_t;
+	typedef enum { TO_EXTERNAL, TO_INTERNAL } way_t;
 	mutable yaal::hcore::HPointer<OConvert> f_oConvert;
 	mutable yaal::hcore::HString	f_oConvertedString;
 	yaal::hcore::HString	f_oVarTmpBuffer;
@@ -98,7 +98,7 @@ private:
 	void do_save( void ) const;
 	void parse( xml_node_ptr_t, tree_t::node_t, bool );
 	void dump_node( void*, HConstNodeProxy const& ) const;
-	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t = D_TO_INTERNAL ) const;
+	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t = TO_INTERNAL ) const;
 	int get_node_set_by_path( yaal::hcore::HString const& );
 	const_xml_element_t get_element_by_id( const_xml_element_t const&, yaal::hcore::HString const& ) const;
 	const_xml_element_t get_element_by_path( const_xml_element_t const&, yaal::hcore::HString const&, int const& ) const;
@@ -121,8 +121,8 @@ public:
 		 */
 		typedef enum
 			{
-			D_NODE,   /*!< XML node. */
-			D_CONTENT /*!< XML node content. */
+			NODE,   /*!< XML node. */
+			CONTENT /*!< XML node content. */
 			} type_t;
 		};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
@@ -131,7 +131,7 @@ private:
 	yaal::hcore::HString f_oText;
 	properties_t f_oProperties;
 public:
-	HNode( void ) : f_eType( TYPE::D_NODE ), f_oText(), f_oProperties() { }
+	HNode( void ) : f_eType( TYPE::NODE ), f_oText(), f_oProperties() { }
 	HNode( TYPE::type_t const& type, yaal::hcore::HString const& value ) : f_eType( type ), f_oText( value ), f_oProperties() {}
 	HNode( HNode const& source ) : f_eType( source.f_eType ), f_oText( source.f_oText ), f_oProperties()
 		{ f_oProperties.copy_from( source.f_oProperties ); }

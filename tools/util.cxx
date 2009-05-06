@@ -51,8 +51,8 @@ namespace util
 
 namespace
 	{
-	static int const D_MIN_IBAN_LENGTH = 20;
-	static int const D_STEP_LENGTH = 4;
+	static int const MIN_IBAN_LENGTH = 20;
+	static int const STEP_LENGTH = 4;
 	}
 
 char n_pcTransTableStripPL [ 256 ];
@@ -240,9 +240,9 @@ int modulo_ASCII( HString const& a_oASCIINumber, int a_iModulo )
 		M_THROW ( "bad ASCII number length", l_iLength );
 	if ( ! a_iModulo )
 		M_THROW ( "zero denominatior", a_iModulo );
-	while ( l_oTmpNumber.get_length() > D_STEP_LENGTH )
+	while ( l_oTmpNumber.get_length() > STEP_LENGTH )
 		{
-		l_oTmpString = l_oTmpNumber.mid( l_iStep * D_STEP_LENGTH, D_STEP_LENGTH );
+		l_oTmpString = l_oTmpNumber.mid( l_iStep * STEP_LENGTH, STEP_LENGTH );
 		l_iTmpLength = l_oTmpString.get_length();
 		l_iNumber = lexical_cast<int>( l_oTmpString );
 		l_iNumber %= a_iModulo;
@@ -264,7 +264,7 @@ bool verify_IBAN( HString const& a_oIBAN )
 	int long l_iLength = a_oIBAN.get_length();
 	char l_pcPattern [ 2 ] = "\0";
 	HString l_oIBAN, l_oTmpString;
-	if ( l_iLength < D_MIN_IBAN_LENGTH )
+	if ( l_iLength < MIN_IBAN_LENGTH )
 		{
 		n_oLastErrorMessage.format ( "IBAN: Number too short (%d).", l_iLength );
 		return ( true );
@@ -274,7 +274,7 @@ bool verify_IBAN( HString const& a_oIBAN )
 		if ( isalnum ( a_oIBAN[ l_iCtr ] ) )
 			l_oIBAN += a_oIBAN[ l_iCtr ];
 	l_iLength = l_oIBAN.get_length();
-	if ( l_iLength < D_MIN_IBAN_LENGTH )
+	if ( l_iLength < MIN_IBAN_LENGTH )
 		{
 		n_oLastErrorMessage.format ( "IBAN: Number too short (%d).", l_iLength );
 		return ( true );
@@ -340,7 +340,7 @@ void show_help( void* arg )
 			it != end; ++ it )
 		{
 		HProgramOptionsHandler::OOption const& o = *it;
-		size_t tmp = ( o.f_pcName ? ::strlen( o.f_pcName ) + 2 : 0 ) + ( o.f_pcArgument ? ::strlen( o.f_pcArgument ) + 1 : 0 ) + ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL ? 2 : 1 );
+		size_t tmp = ( o.f_pcName ? ::strlen( o.f_pcName ) + 2 : 0 ) + ( o.f_pcArgument ? ::strlen( o.f_pcArgument ) + 1 : 0 ) + ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL ? 2 : 1 );
 		if ( tmp > l_iLongestLongLength )
 			l_iLongestLongLength = tmp;
 		tmp = 0;
@@ -375,10 +375,10 @@ void show_help( void* arg )
 			}
 		if ( o.f_pcArgument )
 			{
-			if ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL )
+			if ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL )
 				lf += "[";
 			( lf += "=" ) += o.f_pcArgument;
-			if ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL )
+			if ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL )
 				lf += "]";
 			}
 		if ( i > 0 ) /* subsequent options */
@@ -492,16 +492,16 @@ void dump_configuration( void* arg )
 					&& ( o.f_pcDescription == description ) )
 				description = "";
 			}
-		static int const D_MAXIMUM_LINE_LENGTH = 72;
+		static int const MAXIMUM_LINE_LENGTH = 72;
 		::printf( "# %s, type: ", o.f_pcName );
 		if ( !! o.f_oValue )
 			{
 			switch( o.f_oValue->get_type().value() )
 				{
-				case ( TYPE::D_BOOL ): ::printf( "boolean\n" ); break;
-				case ( TYPE::D_INT ): case ( TYPE::D_INT_SHORT ): case ( TYPE::D_INT_LONG ): ::printf( "integer\n" ); break;
-				case ( TYPE::D_FLOAT ): case ( TYPE::D_DOUBLE ): case ( TYPE::D_DOUBLE_LONG ): ::printf( "floating point\n" ); break;
-				case ( TYPE::D_CHAR_PTR ): case ( TYPE::D_HSTRING ): ::printf( "character string\n" ); break;
+				case ( TYPE::BOOL ): ::printf( "boolean\n" ); break;
+				case ( TYPE::INT ): case ( TYPE::INT_SHORT ): case ( TYPE::INT_LONG ): ::printf( "integer\n" ); break;
+				case ( TYPE::FLOAT ): case ( TYPE::DOUBLE ): case ( TYPE::DOUBLE_LONG ): ::printf( "floating point\n" ); break;
+				case ( TYPE::CHAR_PTR ): case ( TYPE::HSTRING ): ::printf( "character string\n" ); break;
 				default: ::printf( "special\n" ); break;
 				}
 			}
@@ -514,14 +514,14 @@ void dump_configuration( void* arg )
 		do
 			{
 			int eol = 0;
-			while ( ( eol < D_MAXIMUM_LINE_LENGTH ) && ( eol >= 0 ) )
+			while ( ( eol < MAXIMUM_LINE_LENGTH ) && ( eol >= 0 ) )
 				{
 				eol = static_cast<int>( desc.find_one_of( n_pcWhiteSpace, eol ) );
-				if ( ( eol < 0 ) || ( eol > D_MAXIMUM_LINE_LENGTH ) )
+				if ( ( eol < 0 ) || ( eol > MAXIMUM_LINE_LENGTH ) )
 					break;
 				eol = static_cast<int>( desc.find_other_than( n_pcWhiteSpace, eol ) );
 				}
-			if ( eol >= D_MAXIMUM_LINE_LENGTH )
+			if ( eol >= MAXIMUM_LINE_LENGTH )
 				{
 				printf( "# %.*s\n", eol, desc.raw() );
 				desc.shift_left( eol );
@@ -540,31 +540,31 @@ void dump_configuration( void* arg )
 			{
 			switch ( o.f_oValue->get_type().value() )
 				{
-				case ( TYPE::D_BOOL ):
+				case ( TYPE::BOOL ):
 					::printf( "%s %s\n", o.f_pcName, o.f_oValue->get<bool>() ? "true" : "false" );
 				break;
-				case ( TYPE::D_HSTRING ):
+				case ( TYPE::HSTRING ):
 					{
 					HString const& s = o.f_oValue->get<HString>();
 					::printf( "%s%s %s\n", ! s.is_empty() ? "" : "# ", o.f_pcName, s.raw() ? s.raw() : "" );
 					}
 				break;
-				case ( TYPE::D_CHAR_PTR ):
+				case ( TYPE::CHAR_PTR ):
 					{
 					char const* ptr = o.f_oValue->get<char const*>();
 					::printf( "%s%s %s\n", ptr && ptr[ 0 ] ? "" : "# ", o.f_pcName, ptr );
 					}
 				break;
-				case ( TYPE::D_INT ):
+				case ( TYPE::INT ):
 					::printf( "%s %d\n", o.f_pcName, o.f_oValue->get<int>() );
 				break;
-				case ( TYPE::D_INT_LONG ):
+				case ( TYPE::INT_LONG ):
 					::printf( "%s %ld\n", o.f_pcName, o.f_oValue->get<int long>() );
 				break;
-				case ( TYPE::D_DOUBLE_LONG ):
+				case ( TYPE::DOUBLE_LONG ):
 					::printf( "%s %Lf\n", o.f_pcName, o.f_oValue->get<double long>() );
 				break;
-				case ( TYPE::D_DOUBLE ):
+				case ( TYPE::DOUBLE ):
 					::printf( "%s %f\n", o.f_pcName, o.f_oValue->get<double>() );
 				break;
 				default:

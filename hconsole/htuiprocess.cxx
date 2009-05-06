@@ -75,10 +75,10 @@ HTUIProcess::~HTUIProcess( void )
 int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWindow )
 	{
 	M_PROLOG
-	static int const D_CTRLS_COUNT = 2;
-	static int const D_ALTS_COUNT = 10;
+	static int const CTRLS_COUNT = 2;
+	static int const ALTS_COUNT = 10;
 	int l_iCtr = 0;
-	int l_piAlts[ D_ALTS_COUNT ];
+	int l_piAlts[ ALTS_COUNT ];
 	int l_piCtrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t l_oMainWindow;
 	HProcess::init( n_iLatency );
@@ -88,12 +88,12 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 	if ( n_bUseMouse && l_iMouseDes )
 		register_file_descriptor_handler( l_iMouseDes, &HTUIProcess::process_mouse );
 	register_file_descriptor_handler( cons.get_event_fd(), &HTUIProcess::process_terminal_event );
-	register_postprocess_handler( D_CTRLS_COUNT, l_piCtrls,
+	register_postprocess_handler( CTRLS_COUNT, l_piCtrls,
 			& HTUIProcess::handler_refresh );
 	register_postprocess_handler( KEY<'x'>::command, NULL,
 			& HTUIProcess::handler_quit );
 	if ( n_bUseMouse )
-		register_postprocess_handler( KEY_CODES::D_MOUSE, NULL,
+		register_postprocess_handler( KEY_CODES::MOUSE, NULL,
 				& HTUIProcess::handler_mouse );
 	if ( !! a_oMainWindow )
 		l_oMainWindow = a_oMainWindow;
@@ -104,9 +104,9 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 				&HTUIProcess::handler_jump_meta_tab );
 		register_postprocess_handler( KEY<'q'>::command, NULL,
 				&HTUIProcess::handler_close_window );
-		for ( l_iCtr = 0; l_iCtr < D_ALTS_COUNT; l_iCtr ++ )
+		for ( l_iCtr = 0; l_iCtr < ALTS_COUNT; l_iCtr ++ )
 			l_piAlts[ l_iCtr ] = KEY<>::meta_r( '0' + l_iCtr );
-		register_postprocess_handler( D_ALTS_COUNT, l_piAlts,
+		register_postprocess_handler( ALTS_COUNT, l_piAlts,
 			&HTUIProcess::handler_jump_meta_direct );
 		}
 	f_oMainWindow = l_oMainWindow;
@@ -156,7 +156,7 @@ int HTUIProcess::process_stdin( int a_iCode )
 			l_oCommand = process_command();
 		if ( ! l_oCommand.is_empty()
 				&& !! (*f_oForegroundWindow) )
-			(*f_oForegroundWindow)->status_bar()->message( COLORS::D_FG_RED,
+			(*f_oForegroundWindow)->status_bar()->message( COLORS::FG_RED,
 					"unknown command: `%s'", l_oCommand.raw() );
 		}
 	if ( n_bNeedRepaint )
@@ -166,31 +166,31 @@ int HTUIProcess::process_stdin( int a_iCode )
 	if ( a_iCode )
 		{
 		if ( a_iCode > KEY<KEY<0>::meta>::command )
-			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"COMMAND-META-%c: %5d       ",
 					a_iCode - KEY<KEY<0>::meta>::command, a_iCode );
 		else if ( a_iCode > KEY<0>::command )
-			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"     COMMAND-%c: %5d       ",
 					a_iCode - KEY<0>::command, a_iCode );
 		else if ( a_iCode > KEY<0>::meta )
-			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"        META-%c: %5d       ",
 					a_iCode - KEY<0>::meta, a_iCode );
-		else if ( a_iCode < KEY_CODES::D_ESC )
-			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+		else if ( a_iCode < KEY_CODES::ESC )
+			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"        CTRL-%c: %5d       ",
 					a_iCode + 96, a_iCode);
 		else
-			cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN,
+			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"             %c: %5d       ",
 					a_iCode, a_iCode );
 		}
 	else
-		cons.c_cmvprintf ( 0, 0, COLORS::D_FG_GREEN, "                           " );
+		cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( a_iCode && !! (*f_oForegroundWindow) )
-		(*f_oForegroundWindow)->status_bar()->message ( COLORS::D_FG_RED,
+		(*f_oForegroundWindow)->status_bar()->message ( COLORS::FG_RED,
 				"unknown function, err code(%d)", a_iCode );
 	return ( a_iCode );
 	M_EPILOG
@@ -215,7 +215,7 @@ int HTUIProcess::handler_idle( int a_iCode, void const* )
 	HConsole& cons = HCons::get_instance();
 	HString l_oClock( static_cast<char const *>( HTime() ) );
 	cons.c_cmvprintf( 0, static_cast<int>( cons.get_width() - l_oClock.get_length() ),
-			COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, l_oClock.raw() );
+			COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, l_oClock.raw() );
 	n_bNeedRepaint = true;
 #endif /* __DEBUG__ */
 	if ( !! (*f_oForegroundWindow) )
@@ -248,7 +248,7 @@ int HTUIProcess::handler_mouse( int a_iCode, void const* )
 	if ( n_bNeedRepaint )
 		refresh();
 #ifdef __DEBUGGER_BABUNI__
-	HCons::get_instance().c_cmvprintf( 0, 0,	COLORS::D_FG_BLACK | COLORS::D_BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
+	HCons::get_instance().c_cmvprintf( 0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );
 	n_bNeedRepaint = true;
 #endif /* __DEBUGGER_BABUNI__ */

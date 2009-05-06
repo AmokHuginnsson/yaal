@@ -59,9 +59,9 @@ public:
 		{
 		typedef enum
 			{
-			E_OK = 0,
-			E_NON_EXISTING_KEY,
-			E_NIL_ITERATOR
+			OK = 0,
+			NON_EXISTING_KEY,
+			NIL_ITERATOR
 			} error_t;
 		};
 	class HIterator;
@@ -89,8 +89,8 @@ private:
 		{
 		typedef enum
 			{
-			D_RED,
-			D_BLACK
+			RED,
+			BLACK
 			} color_t;
 		color_t f_eColor;
 		HAbstractNode* f_poParent;
@@ -238,11 +238,11 @@ HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& a_tKey )
 		else
 			{
 			f_poRoot = l_poNode;
-			f_poRoot->f_eColor = HAbstractNode::D_BLACK;
+			f_poRoot->f_eColor = HAbstractNode::BLACK;
 			}
 		}
 	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_poParent == NULL ) );
-	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_eColor == HAbstractNode::D_BLACK ) );
+	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_eColor == HAbstractNode::BLACK ) );
 	return ( make_pair( HIterator( l_poNode ), ! l_oNode.f_bExists ) );
 	M_EPILOG
 	}
@@ -260,8 +260,8 @@ void HSBBSTree::remove( ttType const& a_tKey )
 			return;
 			}
 		}
-	M_THROW( n_ppcErrMsgHSBBSTree [ ERROR::E_NON_EXISTING_KEY ],
-			static_cast<int>( ERROR::E_NON_EXISTING_KEY ) );
+	M_THROW( n_ppcErrMsgHSBBSTree [ ERROR::NON_EXISTING_KEY ],
+			static_cast<int>( ERROR::NON_EXISTING_KEY ) );
 	M_EPILOG
 	}
 

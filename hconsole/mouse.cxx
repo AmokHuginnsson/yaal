@@ -125,7 +125,7 @@ int console_mouse_open( void )
 		M_THROW( l_oError, errno );
 		}
 
-	log( LOG_TYPE::D_INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
+	log( LOG_TYPE::INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
 
 	return ( 0 );
 	M_EPILOG
@@ -179,7 +179,7 @@ int console_mouse_open ( void )
 		l_oError.format( "Can't open mouse connection: %s", error_message( errno ) );
 		M_THROW( l_oError, l_iVC );
 		}
-	log( LOG_TYPE::D_INFO ) << "i have opened device: `" << l_iVC << '\'' << endl;
+	log( LOG_TYPE::INFO ) << "i have opened device: `" << l_iVC << '\'' << endl;
 	return ( gpm_fd );
 	M_EPILOG
 	}

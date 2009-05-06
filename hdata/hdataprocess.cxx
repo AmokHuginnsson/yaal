@@ -48,11 +48,11 @@ namespace yaal
 namespace hdata
 {
 
-static int const D_MENU_HANDLERS_MAP_SIZE = 32;
+static int const MENU_HANDLERS_MAP_SIZE = 32;
 
 HDataProcess::HDataProcess( void )
 	: HTUIProcess(), f_oDataBase( HDataBase::get_connector() ),
-	f_oAutoHandlers( D_MENU_HANDLERS_MAP_SIZE ),
+	f_oAutoHandlers( MENU_HANDLERS_MAP_SIZE ),
 	f_oResource(), f_oResourceCache(), f_oColumnCache(),
 	f_oEditCache(), f_oListCache(), f_psRootMenu( NULL )
 	{
@@ -145,7 +145,7 @@ void HDataProcess::build_menu_item( HXml::HConstNodeProxy const& a_rsNode,
 			{
 			HString const& name = (*it).get_name();
 			HXml::HConstIterator handlerIt = (*it).begin();
-			HString contents = ( ( handlerIt != (*it).end() ) && ( (*handlerIt).get_type() == HXml::HNode::TYPE::D_CONTENT ) ) ? (*(*it).begin()).get_value() : "";
+			HString contents = ( ( handlerIt != (*it).end() ) && ( (*handlerIt).get_type() == HXml::HNode::TYPE::CONTENT ) ) ? (*(*it).begin()).get_value() : "";
 			if ( name == "label" )
 				a_rsMenuItem.f_oLabel = contents;
 			else if ( name == "handler" )
@@ -280,7 +280,7 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 	str_to_int_t s2i;
 	for ( HXml::HConstIterator it = w.begin(); it != w.end(); ++ it, ++ i )
 		{
-		M_ENSURE( (*it).get_type() == HXml::HNode::TYPE::D_NODE );
+		M_ENSURE( (*it).get_type() == HXml::HNode::TYPE::NODE );
 		M_ENSURE( (*it).get_name() == "control" );
 		HXml::HNode::properties_t const& controlProps = (*it).properties();
 		HXml::HNode::properties_t::const_iterator roleIt = controlProps.find( "role" );
@@ -288,31 +288,31 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 		HXml::HNode::properties_t::const_iterator refidIt = controlProps.find( "refid" );
 		M_ENSURE( ( roleIt != controlProps.end() ) && ( typeIt != controlProps.end() ) );
 		if ( roleIt->second == "main" )
-			r[ i ].f_eRole = DATACONTROL_BITS::ROLE::D_MAIN;
+			r[ i ].f_eRole = DATACONTROL_BITS::ROLE::MAIN;
 		else if ( roleIt->second == "data" )
-			r[ i ].f_eRole = DATACONTROL_BITS::ROLE::D_DATA;
+			r[ i ].f_eRole = DATACONTROL_BITS::ROLE::DATA;
 		else
 			M_THROW( _( "unknown role" ), i );
 		if ( typeIt->second == "list" )
 			{
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_LIST;
+			r[ i ].f_eType = DATACONTROL_BITS::TYPE::LIST;
 			f_oListCache.push_back( OListControlResource() );
 			r[ i ].f_pvTypeSpecific = &f_oListCache.tail();
 			}
 		else if ( typeIt->second == "edit" )
 			{
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_EDIT;
+			r[ i ].f_eType = DATACONTROL_BITS::TYPE::EDIT;
 			f_oEditCache.push_back( OEditControlResource() );
 			r[ i ].f_pvTypeSpecific = &f_oEditCache.tail();
 			}
 		else if ( typeIt->second == "tree" )
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_TREE;
+			r[ i ].f_eType = DATACONTROL_BITS::TYPE::TREE;
 		else if ( typeIt->second == "combo" )
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_COMBO;
+			r[ i ].f_eType = DATACONTROL_BITS::TYPE::COMBO;
 		else if ( typeIt->second == "check" )
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_CHECK;
+			r[ i ].f_eType = DATACONTROL_BITS::TYPE::CHECK;
 		else if ( typeIt->second == "date" )
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::D_DATE;
+			r[ i ].f_eType = DATACONTROL_BITS::TYPE::DATE;
 		else
 			M_THROW( _( "unknown type" ), i );
 		if ( refidIt != controlProps.end() )
@@ -321,13 +321,13 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 		int attrNo = 0;
 		for ( HXml::HConstIterator attr = (*it).begin(); attr != (*it).end(); ++ attr, ++ attrNo )
 			{
-			M_ENSURE( (*attr).get_type() == HXml::HNode::TYPE::D_NODE );
+			M_ENSURE( (*attr).get_type() == HXml::HNode::TYPE::NODE );
 			HString const attrName = (*attr).get_name();
 			if ( attrName == "label" )
 				r[ i ].f_pcLabel = xml::node_val( attr );
 			else if ( attrName == "db" )
 				{
-				M_ENSURE( r[ i ].f_eRole == DATACONTROL_BITS::ROLE::D_MAIN );
+				M_ENSURE( r[ i ].f_eRole == DATACONTROL_BITS::ROLE::MAIN );
 				HXml::HNode::properties_t const& db = (*attr).properties();
 				HXml::HNode::properties_t::const_iterator filterIt = db.find( "filter" );
 				HXml::HNode::properties_t::const_iterator sortIt = db.find( "sort" );
@@ -350,7 +350,7 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 				{
 				i2s[ i ] = xml::attr_val( attr, "refid" );
 				}
-			else if ( r[ i ].f_eType == DATACONTROL_BITS::TYPE::D_LIST )
+			else if ( r[ i ].f_eType == DATACONTROL_BITS::TYPE::LIST )
 				{
 				OListControlResource* l = static_cast<OListControlResource*>( r[ i ].f_pvTypeSpecific );
 				if ( attrName == "column" )
@@ -371,15 +371,15 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 					HXml::HNode::properties_t::const_iterator colTypeIt = col.find( "type" );
 					M_ENSURE( ( alignIt != col.end() ) && ( colTypeIt != col.end() ) );
 					if ( alignIt->second == "left" )
-						r[ i ].f_psColumnInfo[ columnNo ].f_eAlign = HControl::BITS::ALIGN::D_LEFT;
+						r[ i ].f_psColumnInfo[ columnNo ].f_eAlign = HControl::BITS::ALIGN::LEFT;
 					else if ( alignIt->second == "center" )
-						r[ i ].f_psColumnInfo[ columnNo ].f_eAlign = HControl::BITS::ALIGN::D_CENTER;
+						r[ i ].f_psColumnInfo[ columnNo ].f_eAlign = HControl::BITS::ALIGN::CENTER;
 					else if ( alignIt->second == "right" )
-						r[ i ].f_psColumnInfo[ columnNo ].f_eAlign = HControl::BITS::ALIGN::D_RIGHT;
+						r[ i ].f_psColumnInfo[ columnNo ].f_eAlign = HControl::BITS::ALIGN::RIGHT;
 					else
 						M_THROW( _( "unknown align type" ), i );
 					if ( colTypeIt->second == "string" )
-						r[ i ].f_psColumnInfo[ columnNo ].f_eType = TYPE::D_HSTRING;
+						r[ i ].f_psColumnInfo[ columnNo ].f_eType = TYPE::HSTRING;
 					else
 						M_THROW( _( "unknown column type" ), i );
 					++ columnNo;
@@ -397,7 +397,7 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 				else
 					M_THROW( _( "unknown list attribute name" ), i );
 				}
-			else if ( r[ i ].f_eType == DATACONTROL_BITS::TYPE::D_EDIT )
+			else if ( r[ i ].f_eType == DATACONTROL_BITS::TYPE::EDIT )
 				{
 				OEditControlResource* e = static_cast<OEditControlResource*>( r[ i ].f_pvTypeSpecific );
 				if ( attrName == "max_string_size" )

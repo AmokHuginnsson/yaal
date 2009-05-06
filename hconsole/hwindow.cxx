@@ -148,7 +148,7 @@ int HWindow::handler_jump_direct( int a_iCode, void const* )
 	M_PROLOG
 	/* call below is _magic_, HControlList::next_enabled() takes char as an
 	 * argument, so a_iCode & 0x0ff is passed into the function,
-	 * a_iCode is consrtructed from ordinary char by D_KEY_META_ macro,
+	 * a_iCode is consrtructed from ordinary char by KEY_META_ macro,
 	 * see console.h for details */
 	HControlList::model_t::cyclic_iterator it = f_oFocusedChild;
 	if ( a_iCode & 0x0ff00 )
@@ -178,7 +178,7 @@ int HWindow::handler_command( int a_iCode, void const* )
 	{
 	M_PROLOG
 	a_iCode = 0;
-	f_oStatusBar->set_prompt ( ":", HStatusBarControl::PROMPT::D_COMMAND );
+	f_oStatusBar->set_prompt ( ":", HStatusBarControl::PROMPT::COMMAND );
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -189,10 +189,10 @@ int HWindow::handler_search( int a_iCode, void const* )
 	char l_pcPrompt [ ] = "/\0";
 	if ( ! (*f_oFocusedChild)->is_searchable() )
 		return ( a_iCode );
-	if ( a_iCode >= KEY_CODES::D_COMMAND_BASE )
-		a_iCode -= KEY_CODES::D_COMMAND_BASE;
+	if ( a_iCode >= KEY_CODES::COMMAND_BASE )
+		a_iCode -= KEY_CODES::COMMAND_BASE;
 	l_pcPrompt [ 0 ] = static_cast < char > ( a_iCode );
-	f_oStatusBar->set_prompt ( l_pcPrompt, HStatusBarControl::PROMPT::D_SEARCH );
+	f_oStatusBar->set_prompt ( l_pcPrompt, HStatusBarControl::PROMPT::SEARCH );
 	a_iCode = 0;
 	return ( a_iCode );
 	M_EPILOG

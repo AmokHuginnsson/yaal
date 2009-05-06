@@ -136,7 +136,7 @@ void HEditControl::do_refresh( void )
 		{
 		M_ENSURE( cons.c_move( f_iRowRaw,
 					f_iColumnRaw + ( f_bPassword ? 0 : f_iCursorPosition ) ) != C_ERR );
-		cons.curs_set( f_bReplace ? CURSOR::D_VERY_VISIBLE : CURSOR::D_VISIBLE );
+		cons.curs_set( f_bReplace ? CURSOR::VERY_VISIBLE : CURSOR::VISIBLE );
 		}
 	return;
 	M_EPILOG
@@ -445,8 +445,8 @@ int HEditControl::update_from_history( void )
 int HEditControl::do_process_input ( int a_iCode )
 	{
 	M_PROLOG
-	static int const D_HISTORY_OPERATION = -1;
-	static int const D_DATA_ENTER = -2;
+	static int const HISTORY_OPERATION = -1;
+	static int const DATA_ENTER = -2;
 	int l_iLength = 0;
 	int l_iErrorCode = 0;
 	int l_iOldControlOffset = 0;
@@ -459,22 +459,22 @@ int HEditControl::do_process_input ( int a_iCode )
 	l_iLength = static_cast<int>( f_oVarTmpBuffer.get_length() );
 	switch ( a_iCode )
 		{
-		case ( KEY_CODES::D_PAGE_UP ):
+		case ( KEY_CODES::PAGE_UP ):
 			f_oHistoryIt = f_oHistory.hook();
-			l_iErrorCode = D_HISTORY_OPERATION;
+			l_iErrorCode = HISTORY_OPERATION;
 		break;
-		case ( KEY_CODES::D_PAGE_DOWN ):
+		case ( KEY_CODES::PAGE_DOWN ):
 			f_oHistoryIt = f_oHistory.hook();
 			-- f_oHistoryIt;
-			l_iErrorCode = D_HISTORY_OPERATION;
+			l_iErrorCode = HISTORY_OPERATION;
 		break;
-		case ( KEY_CODES::D_UP ):
+		case ( KEY_CODES::UP ):
 			++ f_oHistoryIt;
-			l_iErrorCode = D_HISTORY_OPERATION;
+			l_iErrorCode = HISTORY_OPERATION;
 		break;
-		case ( KEY_CODES::D_DOWN ):
+		case ( KEY_CODES::DOWN ):
 			-- f_oHistoryIt;
-			l_iErrorCode = D_HISTORY_OPERATION;
+			l_iErrorCode = HISTORY_OPERATION;
 		break;
 		case ( '\t' ):
 			f_bFocused = false;
@@ -497,34 +497,34 @@ int HEditControl::do_process_input ( int a_iCode )
 				}
 			else
 				-- f_oHistoryIt;
-			l_iErrorCode = D_DATA_ENTER;
+			l_iErrorCode = DATA_ENTER;
 			}
 		break;
-		case ( KEY_CODES::D_LEFT ):
+		case ( KEY_CODES::LEFT ):
 			l_iErrorCode = move_left();
 		break;
 		case ( KEY<'a'>::ctrl ):
-		case ( KEY_CODES::D_HOME ):
+		case ( KEY_CODES::HOME ):
 			f_iCursorPosition = 0;
 			f_iControlOffset = 0;
 		break;
 		case ( KEY<'e'>::ctrl ):
-		case ( KEY_CODES::D_END ):
+		case ( KEY_CODES::END ):
 			l_iErrorCode = go_to_end( l_iLength );
 		break;
-		case ( KEY_CODES::D_RIGHT ):
+		case ( KEY_CODES::RIGHT ):
 			l_iErrorCode = move_right( l_iLength );
 		break;
 		case ( KEY<'u'>::ctrl ):
 			l_iErrorCode = kill_line();
 		break;
-		case ( KEY_CODES::D_DELETE ):
+		case ( KEY_CODES::DELETE ):
 			l_iErrorCode = delete_char( l_iLength );
 		break;
-		case ( KEY_CODES::D_BACKSPACE ):
+		case ( KEY_CODES::BACKSPACE ):
 			l_iErrorCode = kill_char();
 		break;
-		case ( KEY_CODES::D_INSERT ):
+		case ( KEY_CODES::INSERT ):
 			f_bReplace = ! f_bReplace;
 		break;
 		case ( KEY<'f'>::meta ):
@@ -542,23 +542,23 @@ int HEditControl::do_process_input ( int a_iCode )
 		default:
 			l_iErrorCode = insert_char( a_iCode, l_iLength );
 		}
-	if ( l_iErrorCode == D_HISTORY_OPERATION )
+	if ( l_iErrorCode == HISTORY_OPERATION )
 		l_iErrorCode = update_from_history();
 	if ( ! l_iErrorCode )
 		{
 		f_oPattern.find( f_oVarTmpBuffer.raw() );
 		l_iErrorCode = f_oPattern.error_code();
 		if ( l_iErrorCode )
-			f_poParent->status_bar()->message( COLORS::D_BG_BROWN, f_oPattern.error().raw() );
+			f_poParent->status_bar()->message( COLORS::BG_BROWN, f_oPattern.error().raw() );
 		else
 			{
 			a_iCode = l_iErrorCode;
 			f_oString = f_oVarTmpBuffer;
-			f_poParent->status_bar()->message ( COLORS::D_FG_LIGHTGRAY, "" );
+			f_poParent->status_bar()->message ( COLORS::FG_LIGHTGRAY, "" );
 			schedule_refresh();
 			}
 		}
-	if ( l_iErrorCode && ( l_iErrorCode != D_DATA_ENTER ) )
+	if ( l_iErrorCode && ( l_iErrorCode != DATA_ENTER ) )
 		{
 		f_iControlOffset = l_iOldControlOffset;
 		f_iCursorPosition = l_iOldCursorPosition;

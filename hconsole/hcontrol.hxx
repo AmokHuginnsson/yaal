@@ -60,13 +60,13 @@ public:
 			 */
 			typedef enum
 				{
-				D_LEFT, /*!< text ought to be left aligned */
-				D_CENTER, /*!< text ought to be centered */
-				D_RIGHT /*!< text ought to be right aligned */
+				LEFT, /*!< text ought to be left aligned */
+				CENTER, /*!< text ought to be centered */
+				RIGHT /*!< text ought to be right aligned */
 				} align_t;
 			};
 		};
-	static int const D_DEFAULT_ATTRS = -1; /*!< Default HControl attribites (colors of label and data fore/back-ground) */
+	static int const DEFAULT_ATTRS = -1; /*!< Default HControl attribites (colors of label and data fore/back-ground) */
 	typedef yaal::hcore::HPointer<HControl> ptr_t;
 protected:
 	bool			f_bEnabled;						/*!< Tells if control is enabled, focus can go only to enabled control. */
@@ -225,7 +225,7 @@ public:
  * \param enabled - Colors for control in enabled state.
  * \param focused - Colors for control while its focused.
  */
-	void set_attributes( int disabled = D_DEFAULT_ATTRS, int enabled = D_DEFAULT_ATTRS, int focused = D_DEFAULT_ATTRS );
+	void set_attributes( int disabled = DEFAULT_ATTRS, int enabled = DEFAULT_ATTRS, int focused = DEFAULT_ATTRS );
 
 /*! \brief Decide if label shall be drawn for this particular instance of a control.
  *

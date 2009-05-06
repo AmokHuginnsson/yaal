@@ -243,15 +243,15 @@ void HControl::set_attributes( int a_iAttributeDisabled,
 		int a_iAttributeEnabled, int a_iAttributeFocused )
 	{
 	M_PROLOG
-	if ( a_iAttributeDisabled == D_DEFAULT_ATTRS )
+	if ( a_iAttributeDisabled == DEFAULT_ATTRS )
 		f_uiAttributeDisabled = n_iAttributeDisabled;
 	else
 		f_uiAttributeDisabled = a_iAttributeDisabled;
-	if ( a_iAttributeEnabled == D_DEFAULT_ATTRS )
+	if ( a_iAttributeEnabled == DEFAULT_ATTRS )
 		f_uiAttributeEnabled = n_iAttributeEnabled;
 	else
 		f_uiAttributeEnabled = a_iAttributeEnabled;
-	if ( a_iAttributeFocused == D_DEFAULT_ATTRS )
+	if ( a_iAttributeFocused == DEFAULT_ATTRS )
 		f_uiAttributeFocused = n_iAttributeFocused;
 	else
 		f_uiAttributeFocused = a_iAttributeFocused;

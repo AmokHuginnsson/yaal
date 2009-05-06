@@ -32,6 +32,8 @@ Copyright:
 #include <sys/time.h> /* timeval */
 #include <libintl.h>
 
+#undef ECHO
+
 #include "config.hxx"
 
 #include "hcore/base.hxx"
@@ -58,7 +60,7 @@ namespace yaal
 namespace hconsole
 {
 
-int GLYPHS::D_DOWN_ARROW, GLYPHS::D_UP_ARROW, GLYPHS::D_VERTICAL_LINE;
+int GLYPHS::DOWN_ARROW, GLYPHS::UP_ARROW, GLYPHS::VERTICAL_LINE;
 
 /* Bbbbffff
  * B - blink
@@ -208,7 +210,7 @@ void HConsole::enter_curses( void )
 	immedok( stdscr, false );
 	M_ENSURE( fflush ( NULL ) == 0 );
 	flushinp(); /* Always returns OK */
-	curs_set( CURSOR::D_INVISIBLE );
+	curs_set( CURSOR::INVISIBLE );
 	M_ENSURE( refresh() != ERR );
 	/* init color pairs */
 	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
@@ -217,7 +219,7 @@ void HConsole::enter_curses( void )
 			init_pair( static_cast<short>( l_iBg * 8 + l_iFg ),
 					l_piColors[ l_iFg ], l_piColors[ l_iBg ] );
 	attrset( COLOR_PAIR( 7 ) );
-	bkgd( ' ' | ATTR::value( COLORS::D_FG_BLACK | COLORS::D_BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
+	bkgd( ' ' | ATTR::value( COLORS::FG_BLACK | COLORS::BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
 	f_bBrokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
 	f_bEnabled = true;
 	getmaxyx( stdscr, f_iHeight, f_iWidth );
@@ -227,14 +229,14 @@ void HConsole::enter_curses( void )
 		{
 		if ( ::getenv( "DISPLAY" ) )
 			{
-			log( LOG_TYPE::D_INFO ) << _( "using ncurses mouse support" ) << endl;
+			log( LOG_TYPE::INFO ) << _( "using ncurses mouse support" ) << endl;
 			mouse::mouse_open = mouse::x_mouse_open;
 			mouse::mouse_get = mouse::x_mouse_get;
 			mouse::mouse_close = mouse::x_mouse_close;
 			}
 		else
 			{
-			log( LOG_TYPE::D_INFO ) << _( "using console mouse support" ) << endl;
+			log( LOG_TYPE::INFO ) << _( "using console mouse support" ) << endl;
 			mouse::mouse_open = mouse::console_mouse_open;
 			mouse::mouse_get = mouse::console_mouse_get;
 			mouse::mouse_close = mouse::console_mouse_close;
@@ -244,13 +246,13 @@ void HConsole::enter_curses( void )
 						" and we did not recived file descriptor" ), errno );
 		}
 #ifdef HAVE_ASCII_GRAPHICS
-	GLYPHS::D_DOWN_ARROW		= static_cast<int>( ACS_DARROW );
-	GLYPHS::D_UP_ARROW			= static_cast<int>( ACS_UARROW );
-	GLYPHS::D_VERTICAL_LINE	= static_cast<int>( ACS_VLINE );
+	GLYPHS::DOWN_ARROW		= static_cast<int>( ACS_DARROW );
+	GLYPHS::UP_ARROW			= static_cast<int>( ACS_UARROW );
+	GLYPHS::VERTICAL_LINE	= static_cast<int>( ACS_VLINE );
 #else /* than HAVE_ASCII_GRAPHICS */
-	GLYPHS::D_DOWN_ARROW		= 'v';
-	GLYPHS::D_UP_ARROW			= '^';
-	GLYPHS::D_VERTICAL_LINE	= '|';
+	GLYPHS::DOWN_ARROW		= 'v';
+	GLYPHS::UP_ARROW			= '^';
+	GLYPHS::VERTICAL_LINE	= '|';
 #endif /* not HAVE_ASCII_GRAPHICS */
 	return;
 	M_EPILOG
@@ -263,7 +265,7 @@ void HConsole::leave_curses( void )
 		M_THROW( "not in curses mode", errno );
 	if ( n_bUseMouse )
 		static_cast<void>( mouse::mouse_close() );
-	bkgd( ' ' | ATTR::value( COLORS::D_FG_LIGHTGRAY | COLORS::D_BG_BLACK ) );
+	bkgd( ' ' | ATTR::value( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK ) );
 	M_ENSURE( use_default_colors() == OK );
 	M_ENSURE( printw ( "" ) != ERR );
 	M_ENSURE( fflush ( NULL ) == 0 );
@@ -276,7 +278,7 @@ void HConsole::leave_curses( void )
 	standend();
 	M_ENSURE( keypad ( stdscr, false ) != ERR );
 	M_ENSURE( nocbreak() != ERR );
-	curs_set( CURSOR::D_VISIBLE );
+	curs_set( CURSOR::VISIBLE );
 /*	reset_shell_mode(); */
 /* see comment near def_shell_mode(), ( automagicly by endwin() ) */
 /*
@@ -314,12 +316,12 @@ int HConsole::c_move( int const& a_iRow, int const& a_iColumn )
 
 CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &a_eCursor ) const
 	{
-	int l_iCursor = ::curs_set( a_eCursor == CURSOR::D_VISIBLE ? 1 : ( a_eCursor == CURSOR::D_INVISIBLE ? 0 : 2 ) );
+	int l_iCursor = ::curs_set( a_eCursor == CURSOR::VISIBLE ? 1 : ( a_eCursor == CURSOR::INVISIBLE ? 0 : 2 ) );
 	if ( l_iCursor == 1 )
-		return ( CURSOR::D_VISIBLE );
+		return ( CURSOR::VISIBLE );
 	else if ( l_iCursor == 2 )
-		return ( CURSOR::D_VERY_VISIBLE );
-	return ( CURSOR::D_INVISIBLE );
+		return ( CURSOR::VERY_VISIBLE );
+	return ( CURSOR::INVISIBLE );
 	}
 
 int HConsole::c_addch( int const& a_iChar )
@@ -341,7 +343,7 @@ void HConsole::c_getmaxyx( void )
 	{
 	M_PROLOG
 	getmaxyx( stdscr, f_iHeight, f_iWidth );
-	log( LOG_TYPE::D_INFO ) << "New terminal dimenstions: " << f_iHeight << "x" << f_iWidth << "." << endl;
+	log( LOG_TYPE::INFO ) << "New terminal dimenstions: " << f_iHeight << "x" << f_iWidth << "." << endl;
 	return;
 	M_EPILOG
 	}
@@ -482,26 +484,26 @@ int HConsole::get_key( void ) const
 	M_PROLOG
 	int l_iKey = 0;
 	int l_iChar = 0;
-	CURSOR::cursor_t l_eOrigCursState = CURSOR::D_INVISIBLE;
+	CURSOR::cursor_t l_eOrigCursState = CURSOR::INVISIBLE;
 	if ( ! f_bEnabled )
 		M_THROW ( "not in curses mode", errno );
 	M_ENSURE ( noecho() != ERR );
 	M_ENSURE ( fflush( NULL ) == 0 );
 	l_iKey = getch();
-	if ( l_iKey == KEY_CODES::D_ESC )
+	if ( l_iKey == KEY_CODES::ESC )
 		{
 		M_ENSURE ( nodelay ( stdscr, true ) != ERR );
 		l_iKey = getch();
 		M_ENSURE ( nodelay ( stdscr, false ) != ERR );
 		if ( l_iKey == ERR )
-			l_iKey = KEY_CODES::D_ESC;
+			l_iKey = KEY_CODES::ESC;
 		else
 			l_iKey = KEY<>::meta_r ( l_iKey );
 		}
 	if ( l_iKey == KEY<>::ctrl_r ( n_cCommandComposeCharacter ) )
 		{
-		l_eOrigCursState = curs_set ( CURSOR::D_INVISIBLE );
-		c_cmvprintf ( f_iHeight - 1, -1, COLORS::D_FG_WHITE, "ctrl-%c",
+		l_eOrigCursState = curs_set ( CURSOR::INVISIBLE );
+		c_cmvprintf ( f_iHeight - 1, -1, COLORS::FG_WHITE, "ctrl-%c",
 					n_cCommandComposeCharacter );
 		timeout ( n_iCommandComposeDelay * 100 );
 		l_iKey = getch();
@@ -509,46 +511,46 @@ int HConsole::get_key( void ) const
 		if ( l_iKey == ERR )
 			{
 			l_iKey = KEY<>::ctrl_r ( n_cCommandComposeCharacter );
-			c_cmvprintf ( f_iHeight - 1, 0, COLORS::D_FG_LIGHTGRAY, "      " );
+			c_cmvprintf ( f_iHeight - 1, 0, COLORS::FG_LIGHTGRAY, "      " );
 			}
 		else
 			{
-			if ( l_iKey < KEY_CODES::D_ESC )
+			if ( l_iKey < KEY_CODES::ESC )
 				l_iKey = KEY<>::command_r ( l_iChar = l_iKey + 96 );
-			else if ( l_iKey == KEY_CODES::D_ESC )
+			else if ( l_iKey == KEY_CODES::ESC )
 				{
 				M_ENSURE ( nodelay ( stdscr, true ) != ERR );
 				l_iKey = getch();
 				M_ENSURE ( nodelay ( stdscr, false ) != ERR );
 				if ( l_iKey == ERR )
-					l_iKey = KEY<>::command_r (l_iChar = KEY_CODES::D_ESC);
+					l_iKey = KEY<>::command_r (l_iChar = KEY_CODES::ESC);
 				else
 					l_iKey = KEY<>::command_r (KEY<>::meta_r ( l_iChar = l_iKey ) );
 				}
 			else
 				l_iKey = KEY<>::command_r ( l_iChar = l_iKey );
-			c_cmvprintf ( f_iHeight - 1, 6, COLORS::D_FG_WHITE, " %c", l_iChar );
+			c_cmvprintf ( f_iHeight - 1, 6, COLORS::FG_WHITE, " %c", l_iChar );
 			}
 		curs_set ( l_eOrigCursState );
 		}
 	M_ENSURE ( echo() != ERR );
 	switch ( l_iKey )
 		{
-		case ( KEY_NPAGE ):			l_iKey = KEY_CODES::D_PAGE_DOWN;	break;
-		case ( KEY_PPAGE ):			l_iKey = KEY_CODES::D_PAGE_UP;		break;
-		case ( KEY_HOME ):			l_iKey = KEY_CODES::D_HOME;				break;
+		case ( KEY_NPAGE ):			l_iKey = KEY_CODES::PAGE_DOWN;	break;
+		case ( KEY_PPAGE ):			l_iKey = KEY_CODES::PAGE_UP;		break;
+		case ( KEY_HOME ):			l_iKey = KEY_CODES::HOME;				break;
 		case ( 347 ):
-		case ( KEY_END ):				l_iKey = KEY_CODES::D_END;				break;
+		case ( KEY_END ):				l_iKey = KEY_CODES::END;				break;
 		case ( 8 ):
 		case ( 127 ):
-		case ( KEY_BACKSPACE ):	l_iKey = KEY_CODES::D_BACKSPACE;	break;
-		case ( KEY_UP ):				l_iKey = KEY_CODES::D_UP;					break;
-		case ( KEY_DOWN ):			l_iKey = KEY_CODES::D_DOWN;				break;
-		case ( KEY_LEFT ):			l_iKey = KEY_CODES::D_LEFT;				break;
-		case ( KEY_RIGHT ):			l_iKey = KEY_CODES::D_RIGHT;			break;
-		case ( KEY_DC ):				l_iKey = KEY_CODES::D_DELETE;			break;
-		case ( KEY_IC ):				l_iKey = KEY_CODES::D_INSERT;			break;
-		case ( KEY_MOUSE ):			l_iKey = KEY_CODES::D_MOUSE;			break;
+		case ( KEY_BACKSPACE ):	l_iKey = KEY_CODES::BACKSPACE;	break;
+		case ( KEY_UP ):				l_iKey = KEY_CODES::UP;					break;
+		case ( KEY_DOWN ):			l_iKey = KEY_CODES::DOWN;				break;
+		case ( KEY_LEFT ):			l_iKey = KEY_CODES::LEFT;				break;
+		case ( KEY_RIGHT ):			l_iKey = KEY_CODES::RIGHT;			break;
+		case ( KEY_DC ):				l_iKey = KEY_CODES::DELETE;			break;
+		case ( KEY_IC ):				l_iKey = KEY_CODES::INSERT;			break;
+		case ( KEY_MOUSE ):			l_iKey = KEY_CODES::MOUSE;			break;
 		default:
 		break;
 		}
@@ -632,13 +634,13 @@ int HConsole::wait_for_user_input( int& a_iKey, mouse::OMouse& a_rsMouse,
 		{
 		if ( FD_ISSET ( STDIN_FILENO, & l_xFdSet ) )
 			{
-			a_iKey = get_key(), l_iEventType = EVENT::D_KEYBOARD;
+			a_iKey = get_key(), l_iEventType = EVENT::KEYBOARD;
 			if ( a_iKey == KEY_MOUSE )
 				l_iEventType = 0;
 			}
 		if ( ( a_iKey == KEY_MOUSE )
 				|| ( f_iMouseDes && FD_ISSET ( f_iMouseDes, & l_xFdSet ) ) )
-			l_iEventType |= EVENT::D_MOUSE, static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
+			l_iEventType |= EVENT::MOUSE, static_cast < void > ( mouse::mouse_get ( a_rsMouse ) );
 		}
 	return ( l_iEventType );
 	M_EPILOG
@@ -685,7 +687,7 @@ int HConsole::on_quit( int )
 	if ( is_enabled() )
 		{
 		if ( tools::n_bIgnoreSignalSIGQUIT )
-			c_cmvprintf ( get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
+			c_cmvprintf ( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
 					"Hard Quit is disabled by yaal configuration." );
 		else
 			leave_curses();
@@ -700,7 +702,7 @@ int HConsole::on_tstp( int )
 	if ( is_enabled() )
 		{
 		if ( tools::n_bIgnoreSignalSIGTSTP )
-			c_cmvprintf ( get_height() - 1, 0, COLORS::D_FG_BRIGHTRED,
+			c_cmvprintf ( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
 					"Suspend is disabled by yaal configuration." );
 		else
 			leave_curses();

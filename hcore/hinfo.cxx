@@ -35,7 +35,7 @@ namespace hcore
 {
 
 HInfo::HInfo( void )
-	: f_eType( TYPE::D_VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
+	: f_eType( TYPE::VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	return;
@@ -43,77 +43,77 @@ HInfo::HInfo( void )
 	}
 
 HInfo::HInfo( int const& a_riInt )
-	: f_eType( TYPE::D_VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
+	: f_eType( TYPE::VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
-	f_eType = TYPE::D_INT;
+	f_eType = TYPE::INT;
 	f_iInt = a_riInt;
 	return;
 	M_EPILOG
 	}
 
 HInfo::HInfo( int long const& a_rlLongInt )
-	: f_eType( TYPE::D_VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
+	: f_eType( TYPE::VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
-	f_eType = TYPE::D_INT_LONG;
+	f_eType = TYPE::INT_LONG;
 	f_lIntLong = a_rlLongInt;
 	return;
 	M_EPILOG
 	}
 
 HInfo::HInfo ( double const& a_rdDouble )
-	: f_eType( TYPE::D_VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
+	: f_eType( TYPE::VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
-	f_eType = TYPE::D_DOUBLE;
+	f_eType = TYPE::DOUBLE;
 	f_dDouble = a_rdDouble;
 	return;
 	M_EPILOG
 	}
 
 HInfo::HInfo( void* const a_pvPointer )
-	: f_eType( TYPE::D_VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
+	: f_eType( TYPE::VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
-	f_eType = TYPE::D_VOID_PTR;
+	f_eType = TYPE::VOID_PTR;
 	f_pvPointer = a_pvPointer;
 	return;
 	M_EPILOG
 	}
 
 HInfo::HInfo( char const* const a_pcBuffer )
-	: f_eType( TYPE::D_VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
+	: f_eType( TYPE::VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
-	f_eType = TYPE::D_HSTRING;
+	f_eType = TYPE::HSTRING;
 	f_oString = a_pcBuffer;
 	return;
 	M_EPILOG
 	}
 
 HInfo::HInfo( HString const& a_roString )
-	: f_eType( TYPE::D_VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
+	: f_eType( TYPE::VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
-	f_eType = TYPE::D_HSTRING;
+	f_eType = TYPE::HSTRING;
 	f_oString = a_roString;
 	return;
 	M_EPILOG
 	}
 
 HInfo::HInfo( HTime const& a_roTime )
-	: f_eType( TYPE::D_VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
+	: f_eType( TYPE::VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
-	f_eType = TYPE::D_HTIME;
+	f_eType = TYPE::HTIME;
 	f_oTime = a_roTime;
 	return;
 	M_EPILOG
 	}
 
 HInfo::HInfo( HInfo const& a_roInfo )
-	: f_eType( TYPE::D_VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
+	: f_eType( TYPE::VOID ), f_iInt( 0 ), f_lIntLong( 0 ), f_dDouble( 0 ), f_pvPointer( NULL ), f_oString( "" ), f_oTime( )
 	{
 	M_PROLOG
 	( * this ) = a_roInfo;
@@ -132,7 +132,7 @@ HInfo::~HInfo( void )
 void HInfo::purge( void )
 	{
 	M_PROLOG
-	f_eType = TYPE::D_VOID;
+	f_eType = TYPE::VOID;
 	f_iInt = 0;
 	f_lIntLong = 0;
 	f_dDouble = 0;
@@ -170,17 +170,17 @@ HInfo& HInfo::operator = ( HInfo const& a_roInfo )
 HInfo& HInfo::operator () ( HInfo const& a_roInfo )
 	{
 	M_PROLOG
-	if ( !!( a_roInfo.f_eType & TYPE::D_INT ) )
+	if ( !!( a_roInfo.f_eType & TYPE::INT ) )
 		f_iInt = a_roInfo.f_iInt;
-	if ( !!( a_roInfo.f_eType & TYPE::D_INT_LONG ) )
+	if ( !!( a_roInfo.f_eType & TYPE::INT_LONG ) )
 		f_lIntLong = a_roInfo.f_lIntLong;
-	if ( !!( a_roInfo.f_eType & TYPE::D_DOUBLE ) )
+	if ( !!( a_roInfo.f_eType & TYPE::DOUBLE ) )
 		f_dDouble = a_roInfo.f_dDouble;
-	if ( !!( a_roInfo.f_eType & TYPE::D_HSTRING ) )
+	if ( !!( a_roInfo.f_eType & TYPE::HSTRING ) )
 		f_oString = a_roInfo.f_oString;
-	if ( !!( a_roInfo.f_eType & TYPE::D_HTIME ) )
+	if ( !!( a_roInfo.f_eType & TYPE::HTIME ) )
 		f_oTime = a_roInfo.f_oTime;
-	if ( !!( a_roInfo.f_eType & TYPE::D_VOID_PTR ) )
+	if ( !!( a_roInfo.f_eType & TYPE::VOID_PTR ) )
 		f_pvPointer = a_roInfo.f_pvPointer;
 	f_eType |= a_roInfo.f_eType;
 	return ( * this );

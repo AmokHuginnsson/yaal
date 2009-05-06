@@ -48,9 +48,9 @@ HRecordSet::HRecordSet( database_ptr_t a_oDataBase, void* a_pvReuslt )
 	{
 	M_PROLOG
 	if ( get_size() < 0 )
-		log( LOG_TYPE::D_ERROR ) << "SQL error (query): " << f_oDataBase->get_error() << endl;
+		log( LOG_TYPE::ERROR ) << "SQL error (query): " << f_oDataBase->get_error() << endl;
 	if ( get_field_count() < 0 )
-		log( LOG_TYPE::D_ERROR ) << "SQL error (fiels count): " << f_oDataBase->get_error() << endl;
+		log( LOG_TYPE::ERROR ) << "SQL error (fiels count): " << f_oDataBase->get_error() << endl;
 	return;
 	M_EPILOG
 	}
@@ -136,7 +136,7 @@ HRecordSet::iterator HRecordSet::rend( void )
 	}
 
 HSQLDescriptor::HSQLDescriptor( void )
-	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(),
+	: f_eMode( MODE::SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(),
 	f_oColumns ( "*" ), f_oFilter(), f_oSort(), f_oFields(), f_iFieldCount( 0 ),
 	f_lSetSize( 0 ), f_oValues(), f_oDataBase(), f_oMutated()
 	{
@@ -144,7 +144,7 @@ HSQLDescriptor::HSQLDescriptor( void )
 	}
 
 HSQLDescriptor::HSQLDescriptor( database_ptr_t a_oDataBase )
-	: f_eMode( MODE::D_SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(),
+	: f_eMode( MODE::SELECT ), f_oVarTmpBuffer(), f_oSQL(), f_oTable(),
 	f_oColumns ( "*" ), f_oFilter(), f_oSort(), f_oFields(), f_iFieldCount( 0 ),
 	f_lSetSize( 0 ), f_oValues(), f_oDataBase( a_oDataBase ), f_oMutated()
 	{
@@ -161,7 +161,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 	f_oVarTmpBuffer = "";
 	switch ( a_eMode )
 		{
-		case ( MODE::D_SELECT ):
+		case ( MODE::SELECT ):
 			{
 			f_oSQL.format( "SELECT %s FROM %s", f_oColumns.raw(),
 					f_oTable.raw() );
@@ -172,7 +172,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 			f_oSQL += ';';
 			}
 		break;
-		case ( MODE::D_UPDATE ):
+		case ( MODE::UPDATE ):
 			{
 			f_oSQL = "UPDATE " + f_oTable + " SET ";
 			M_ENSURE( f_oFields.get_size() == f_oValues.get_size() );
@@ -199,7 +199,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 			f_oSQL += ';';
 			}
 		break;
-		case ( MODE::D_INSERT ):
+		case ( MODE::INSERT ):
 			{
 			f_oSQL = "INSERT INTO " + f_oTable + " ( ";
 			M_ENSURE( f_oFields.get_size() == f_oValues.get_size() );
@@ -222,7 +222,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 			f_oSQL += " );";
 			}
 		break;
-		case ( MODE::D_DELETE ):
+		case ( MODE::DELETE ):
 			{
 			f_oSQL = "DELETE FROM ";
 			f_oSQL += f_oTable;
@@ -245,7 +245,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& a_eMode )
 void HSQLDescriptor::sync( int a_iField, HString& value )
 	{
 	M_PROLOG
-	if ( f_eMode == MODE::D_SELECT )
+	if ( f_eMode == MODE::SELECT )
 		value = f_oValues[ a_iField ];
 	else
 		f_oValues[ a_iField ] = value;
@@ -255,7 +255,7 @@ void HSQLDescriptor::sync( int a_iField, HString& value )
 void HSQLDescriptor::sync( int a_iField, int long& value )
 	{
 	M_PROLOG
-	if ( f_eMode == MODE::D_SELECT )
+	if ( f_eMode == MODE::SELECT )
 		value = lexical_cast<int long>( f_oValues[ a_iField ] );
 	else
 		f_oValues[ a_iField ] = value;

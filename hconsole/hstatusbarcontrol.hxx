@@ -56,18 +56,18 @@ public:
 		 */
 		typedef enum
 			{
-			D_NORMAL,
-			D_COMMAND,
-			D_SEARCH,
-			D_MENU
+			NORMAL,
+			COMMAND,
+			SEARCH,
+			MENU
 			} mode_t;
 		/*! \brief HStatusBarControl prompt type.
 		 */
 		typedef enum
 			{
-			D_RELAXED,
-			D_ONLY_ENTER_CAN_QUIT,
-			D_MUST_CANCEL
+			RELAXED,
+			ONLY_ENTER_CAN_QUIT,
+			MUST_CANCEL
 			} restrict_t;
 		};
 protected:
@@ -92,8 +92,8 @@ public:
 	HStatusBarControl( HWindow*, char const* const, int = -1 );
 	virtual ~HStatusBarControl ( void );
 	void setup( char const*, char const*, int );
-	void set_prompt( char const * = NULL, PROMPT::mode_t = PROMPT::D_NORMAL,
-			PROMPT::restrict_t = PROMPT::D_RELAXED );
+	void set_prompt( char const * = NULL, PROMPT::mode_t = PROMPT::NORMAL,
+			PROMPT::restrict_t = PROMPT::RELAXED );
 	void end_prompt( void );
 	void init_progress( double, char const*, bool = true );
 	void update_progress( double = -1, char const * = NULL );

@@ -51,20 +51,20 @@ public:
 		{
 		typedef enum
 			{
-			D_DEFAULT								= 0x0001,
-			D_FLOW_CONTROL_HARDWARE = 0x0002,
-			D_FLOW_CONTROL_SOFTWARE = 0x0004,
-			D_STOP_BITS_1						= 0x0008,
-			D_STOP_BITS_2						= 0x0010,
-			D_PARITY_CHECK					= 0x0020,
-			D_PARITY_ODD						= 0x0040,
-			D_BITS_PER_BYTE_8				= 0x0080,
-			D_BITS_PER_BYTE_7				= 0x0100,
-			D_BITS_PER_BYTE_6				= 0x0200,
-			D_BITS_PER_BYTE_5				= 0x0400,
-			D_CANONICAL							= 0x0800,
-			D_ECHO									= 0x1000,
-			D_CR2NL									= 0x2000
+			DEFAULT								= 0x0001,
+			FLOW_CONTROL_HARDWARE = 0x0002,
+			FLOW_CONTROL_SOFTWARE = 0x0004,
+			STOP_BITS_1						= 0x0008,
+			STOP_BITS_2						= 0x0010,
+			PARITY_CHECK					= 0x0020,
+			PARITY_ODD						= 0x0040,
+			BITS_PER_BYTE_8				= 0x0080,
+			BITS_PER_BYTE_7				= 0x0100,
+			BITS_PER_BYTE_6				= 0x0200,
+			BITS_PER_BYTE_5				= 0x0400,
+			CANONICAL							= 0x0800,
+			ECHO									= 0x1000,
+			CR2NL									= 0x2000
 			} enum_t;
 		};
 	typedef yaal::hcore::HStrongEnum<FLAG> flag_t;
@@ -74,27 +74,27 @@ public:
 		{
 		typedef enum
 			{
-			D_DEFAULT,
-			D_B230400,
-			D_B115200,
+			DEFAULT,
+			B_230400,
+			B_115200,
 #if defined( HAVE_DECL_B76800 ) && ( HAVE_DECL_B76800 == 1 )
-			D_B76800,
+			B_76800,
 #endif /* HAVE_DECL_B76800 */
-			D_B57600,
-			D_B38400,
+			B_57600,
+			B_38400,
 #if defined( HAVE_DECL_B28800 ) && ( HAVE_DECL_B28800 == 1 )
-			D_B28800,
+			B_28800,
 #endif /* HAVE_DECL_B28800 */
-			D_B19200,
+			B_19200,
 #if defined( HAVE_DECL_B14400 ) && ( HAVE_DECL_B14400 == 1 )
-			D_B14400,
+			B_14400,
 #endif /* HAVE_DECL_B14400 */
-			D_B9600,
+			B_9600,
 #if defined( HAVE_DECL_B7200 ) && ( HAVE_DECL_B7200 == 1 )
-			D_B7200,
+			B_7200,
 #endif /* HAVE_DECL_B7200 */
-			D_B4800,
-			D_B2400
+			B_4800,
+			B_2400
 			} enum_t;
 		};
 	typedef yaal::hcore::HStrongEnum<SPEED> speed_t;
@@ -113,7 +113,7 @@ public:
 	void flush( int );
 	void wait_for_eot( void );
 	int timed_read( void* const, int const, int const, int const = 0 );
-	static flag_t D_FLAG_TEXT; /* flags for textmode operation */
+	static flag_t FLAG_TEXT; /* flags for textmode operation */
 protected:
 	virtual int do_close( void );
 private:

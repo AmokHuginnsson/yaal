@@ -37,7 +37,7 @@ namespace hconsole
 {
 
 HLogPad::HLogLine::HLogLine ( void )
-	: f_eType ( D_NONE ), f_iAttribute ( COLORS::D_ATTR_NORMAL ), f_oText()
+	: f_eType ( NONE ), f_iAttribute ( COLORS::ATTR_NORMAL ), f_oText()
 	{
 	M_PROLOG
 	return;
@@ -73,12 +73,12 @@ void HLogPad::do_refresh ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0, l_iRow = 0, l_iCursor = 0, l_iColumn = 0;
-	int l_iBG = f_bFocused ? COLORS::D_BG_GRAY : COLORS::D_BG_BLACK;
+	int l_iBG = f_bFocused ? COLORS::BG_GRAY : COLORS::BG_BLACK;
 	HConsole& cons = HCons::get_instance();
 	draw_label();
 	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
 	f_oVarTmpBuffer.fillz(  ' ', f_iWidthRaw );
-	f_iAttribute = COLORS::D_ATTR_NORMAL | l_iBG;
+	f_iAttribute = COLORS::ATTR_NORMAL | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		cons.c_cmvprintf( f_iRowRaw + l_iCtr,
 				f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer.raw() );
@@ -87,7 +87,7 @@ void HLogPad::do_refresh ( void )
 		l_iCtr = 0;
 		for ( contents_t::iterator it = f_oContents.begin(); ( it != f_oContents.end() ) && ( l_iRow < f_iHeightRaw ); ++ it )
 			{
-			if ( it->f_eType == HLogLine::D_ATTRIBUTE )
+			if ( it->f_eType == HLogLine::ATTRIBUTE )
 				f_iAttribute = it->f_iAttribute | l_iBG;
 			else
 				{
@@ -105,7 +105,7 @@ void HLogPad::do_refresh ( void )
 					}
 				else
 					f_oVarTmpBuffer = "";
-				if ( it->f_eType == HLogLine::D_TEXT_EOL )
+				if ( it->f_eType == HLogLine::TEXT_EOL )
 					{
 					l_iCursor = 0;
 					l_iColumn = 0;
@@ -129,7 +129,7 @@ void HLogPad::add ( int a_iAttribute )
 	{
 	M_PROLOG
 	HLogLine l_oLogLine;
-	l_oLogLine.f_eType = HLogLine::D_ATTRIBUTE;
+	l_oLogLine.f_eType = HLogLine::ATTRIBUTE;
 	l_oLogLine.f_iAttribute = a_iAttribute;
 	f_oContents.push_back ( l_oLogLine );
 	return;
@@ -144,10 +144,10 @@ void HLogPad::add ( yaal::hcore::HString const& a_oText )
 	HLogLine * it = NULL;
 	if ( f_oContents.size() )
 		it = & f_oContents.tail();
-	if ( ! it || ( it->f_eType != HLogLine::D_TEXT ) )
+	if ( ! it || ( it->f_eType != HLogLine::TEXT ) )
 		{
 		it = & l_oLogLine;
-		it->f_eType = HLogLine::D_TEXT;
+		it->f_eType = HLogLine::TEXT;
 		it->f_oText = "";
 		}
 	f_oVarTmpBuffer = a_oText;
@@ -157,7 +157,7 @@ void HLogPad::add ( yaal::hcore::HString const& a_oText )
 		if ( l_iIndexNL >= 0 )
 			{
 			it->f_oText += f_oVarTmpBuffer.left( l_iIndexNL );
-			it->f_eType = HLogLine::D_TEXT_EOL;
+			it->f_eType = HLogLine::TEXT_EOL;
 			f_iLines ++;
 			l_iIndexChar = static_cast<int>( f_oVarTmpBuffer.find_other_than( "\r\n", l_iIndexNL + 1 ) );
 			if ( l_iIndexChar >= 0 )
@@ -173,7 +173,7 @@ void HLogPad::add ( yaal::hcore::HString const& a_oText )
 		if ( it == & l_oLogLine )
 			f_oContents.add_tail ( it );
 		it = & l_oLogLine;
-		it->f_eType = HLogLine::D_TEXT;
+		it->f_eType = HLogLine::TEXT;
 		it->f_oText = "";
 		}
 	if ( f_iLines > f_iHeightRaw )
@@ -198,28 +198,28 @@ int HLogPad::do_process_input ( int a_iCode )
 	int l_iCode = 0;
 	switch ( a_iCode )
 		{
-		case ( KEY_CODES::D_DOWN ):
+		case ( KEY_CODES::DOWN ):
 			if ( f_iLines > ( f_iHeightRaw + f_iOffsetRow ) )
 				f_iOffsetRow ++;
 		break;
-		case ( KEY_CODES::D_UP ):
+		case ( KEY_CODES::UP ):
 			if ( f_iOffsetRow > 0 )
 				f_iOffsetRow --;
 		break;
-		case ( KEY_CODES::D_LEFT ):
+		case ( KEY_CODES::LEFT ):
 			if ( f_iOffsetColumn > 0 )
 				f_iOffsetColumn --;
 		break;
-		case ( KEY_CODES::D_RIGHT ):
+		case ( KEY_CODES::RIGHT ):
 			f_iOffsetColumn ++;
 			if ( f_iOffsetColumn < 0 )
 				f_iOffsetColumn = 0;
 		break;
-		case ( KEY_CODES::D_HOME ):
+		case ( KEY_CODES::HOME ):
 			f_iOffsetRow = 0;
 			f_iOffsetColumn = 0;
 		break;
-		case ( KEY_CODES::D_END ):
+		case ( KEY_CODES::END ):
 			f_iOffsetColumn = 0;
 			if ( f_iLines > f_iHeightRaw )
 				f_iOffsetRow = f_iLines - f_iHeightRaw;

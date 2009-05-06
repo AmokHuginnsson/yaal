@@ -51,18 +51,17 @@ namespace hcore
 
 namespace
 	{
-	static int const D_BUFFER_SIZE		= 1024;
-	static int const D_HOSTNAME_SIZE	= 128;
-	static int const D_TIMESTAMP_SIZE	= 16;
-	static int const D_LOGIN_NAME_MAX	= 8;
+	static int const BUFFER_SIZE		= 1024;
+	static int const HOSTNAME_SIZE	= 128;
+	static int const TIMESTAMP_SIZE	= 16;
 	}
 
 int long HLog::f_lLogMask = 0;
 
 HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( true ),
-	f_lType ( 0 ), f_iBufferSize ( D_BUFFER_SIZE ),
+	f_lType ( 0 ), f_iBufferSize ( BUFFER_SIZE ),
 	f_psStream ( NULL ), f_pcProcessName( NULL ),
-	f_oLoginName ( NULL ), f_oHostName( xcalloc<char>( D_HOSTNAME_SIZE ) ),
+	f_oLoginName ( NULL ), f_oHostName( xcalloc<char>( HOSTNAME_SIZE ) ),
 	f_oBuffer ( xcalloc<char>( f_iBufferSize ) )
 	{
 	M_PROLOG
@@ -71,7 +70,7 @@ HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( tr
 	if ( ! f_psStream )
 		M_THROW( "tmpfile returned", reinterpret_cast<int long>( f_psStream ) );
 	::fprintf( f_psStream, "%-10xProcess started (%ld).\n",
-			LOG_TYPE::D_NOTICE, static_cast<int long>( getpid() ) );
+			LOG_TYPE::NOTICE, static_cast<int long>( getpid() ) );
 	l_iUid = getuid();
 	passwd l_sPasswd;
 	long bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
@@ -81,11 +80,11 @@ HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( tr
 		f_oLoginName.set( xstrdup( l_sPasswd.pw_name ) );
 	else
 		{
-		f_oLoginName.set( xcalloc<char>( D_LOGIN_NAME_MAX + 1 ) );
-		M_ENSURE( ::snprintf( f_oLoginName.get<char>(), D_LOGIN_NAME_MAX, "%ld",
-					static_cast<int long>( l_iUid ) ) <= D_LOGIN_NAME_MAX );
+		f_oLoginName.set( xcalloc<char>( LOGIN_NAME_MAX + 1 ) );
+		M_ENSURE( ::snprintf( f_oLoginName.get<char>(), LOGIN_NAME_MAX, "%ld",
+					static_cast<int long>( l_iUid ) ) <= LOGIN_NAME_MAX );
 		}
-	M_ENSURE( ::gethostname( f_oHostName.get<char>(), D_HOSTNAME_SIZE - 1 ) == 0 );
+	M_ENSURE( ::gethostname( f_oHostName.get<char>(), HOSTNAME_SIZE - 1 ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -93,7 +92,7 @@ HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( tr
 HLog::~HLog( void )
 	{
 	M_PROLOG
-	if ( f_lLogMask & LOG_TYPE::D_NOTICE )
+	if ( f_lLogMask & LOG_TYPE::NOTICE )
 		{
 		if ( f_bNewLine )
 			timestamp();
@@ -180,17 +179,17 @@ void HLog::timestamp( void )
 		}
 	time_t l_xCurrentTime = ::time( NULL );
 	tm* l_psBrokenTime = ::localtime( &l_xCurrentTime );
-	char l_pcBuffer[ D_TIMESTAMP_SIZE ];
-	::memset( l_pcBuffer, 0, D_TIMESTAMP_SIZE );
+	char l_pcBuffer[ TIMESTAMP_SIZE ];
+	::memset( l_pcBuffer, 0, TIMESTAMP_SIZE );
 	/* ISO C++ does not support the `%e' strftime format */
 	/* `%e': The day of the month like with `%d', but padded with blank */
 	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
-	int long l_iSize = ::strftime( l_pcBuffer, D_TIMESTAMP_SIZE, "%b %d %H:%M:%S",
+	int long l_iSize = ::strftime( l_pcBuffer, TIMESTAMP_SIZE, "%b %d %H:%M:%S",
 			l_psBrokenTime );
-	if ( l_iSize > D_TIMESTAMP_SIZE )
-		M_THROW( _( "strftime returned more than D_TIMESTAMP_SIZE" ), l_iSize );
+	if ( l_iSize > TIMESTAMP_SIZE )
+		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), l_iSize );
 	if ( f_pcProcessName )
 		::fprintf( f_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_oLoginName.get<char>(),
 				f_oHostName.get<char>(), f_pcProcessName );

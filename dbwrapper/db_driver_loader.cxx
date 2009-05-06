@@ -75,7 +75,7 @@ HPlugin n_oDBDriver;
 void* null_db_connect( char const*, char const*, char const* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(db_connect)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(db_connect)" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -83,7 +83,7 @@ void* null_db_connect( char const*, char const*, char const* )
 void null_db_disconnect( void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(db_disconnect)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(db_disconnect)" << eend << endl;
 	return;
 	M_EPILOG
 	}
@@ -91,7 +91,7 @@ void null_db_disconnect( void* )
 int null_db_errno( void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(db_errno)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(db_errno)" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -99,7 +99,7 @@ int null_db_errno( void* )
 char const* null_db_error( void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "db_error)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_error)" << eend << endl;
 	return ( _( "null database driver loaded" ) );
 	M_EPILOG
 	}
@@ -107,7 +107,7 @@ char const* null_db_error( void* )
 void* null_db_query( void*, char const* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(db_query)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(db_query)" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -115,7 +115,7 @@ void* null_db_query( void*, char const* )
 void null_db_unquery( void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(db_unquery)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(db_unquery)" << eend << endl;
 	return;
 	M_EPILOG
 	}
@@ -123,7 +123,7 @@ void null_db_unquery( void* )
 char* null_rs_get( void*, int long, int )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(rs_get)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(rs_get)" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -131,7 +131,7 @@ char* null_rs_get( void*, int long, int )
 int null_rs_fields_count( void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(rs_fields_count)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(rs_fields_count)" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -139,7 +139,7 @@ int null_rs_fields_count( void* )
 int long null_dbrs_records_count( void*, void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(dbrs_records_count)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(dbrs_records_count)" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -147,7 +147,7 @@ int long null_dbrs_records_count( void*, void* )
 int long null_dbrs_id( void*, void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(dbrs_id)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(dbrs_id)" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -155,7 +155,7 @@ int long null_dbrs_id( void*, void* )
 char* null_rs_column_name( void*, int )
 	{
 	M_PROLOG
-	log( LOG_TYPE::D_ERROR ) << etag << "(rs_column_name)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(rs_column_name)" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -167,7 +167,7 @@ void dbwrapper_error( void )
 	M_PROLOG
 	HString l_oMessage;
 	l_oMessage = dlerror();
-	log( LOG_TYPE::D_ERROR ) << l_oMessage << endl;
+	log( LOG_TYPE::ERROR ) << l_oMessage << endl;
 	::fprintf( stderr, "(%s), ", l_oMessage.raw() );
 	return;
 	M_EPILOG
@@ -223,7 +223,7 @@ void load_driver( void )
 			dbwrapper_exit();
 		else
 			{
-			log ( LOG_TYPE::D_NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
+			log ( LOG_TYPE::NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
 			log << "] driver." << endl;
 			}
 		fprintf ( stderr, g_pcDone );

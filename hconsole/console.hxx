@@ -56,30 +56,30 @@ extern int const C_ERR;
  */
 struct KEY_CODES
 	{
-	static int const D_ESC					= 27;
-	static int const D_PAGE_UP			= 256;
-	static int const D_PAGE_DOWN		= D_PAGE_UP		+ 1;
-	static int const D_DOWN					= D_PAGE_DOWN	+ 1;
-	static int const D_UP						= D_DOWN			+ 1;
-	static int const D_LEFT					= D_UP				+ 1;
-	static int const D_RIGHT				= D_LEFT			+ 1;
-	static int const D_HOME					= D_RIGHT			+ 1;
-	static int const D_END					= D_HOME			+ 1;
-	static int const D_DELETE				= D_END				+ 1;
-	static int const D_INSERT				= D_DELETE		+ 1;
-	static int const D_BACKSPACE		= D_INSERT		+ 1;
-	static int const D_MOUSE				=	D_BACKSPACE	+ 1;
-	static int const D_META_BASE		= 0x04000;
-	static int const D_COMMAND_BASE	= 0x08000;
+	static int const ESC					= 27;
+	static int const PAGE_UP			= 256;
+	static int const PAGE_DOWN		= PAGE_UP		+ 1;
+	static int const DOWN					= PAGE_DOWN	+ 1;
+	static int const UP						= DOWN			+ 1;
+	static int const LEFT					= UP				+ 1;
+	static int const RIGHT				= LEFT			+ 1;
+	static int const HOME					= RIGHT			+ 1;
+	static int const END					= HOME			+ 1;
+	static int const DELETE				= END				+ 1;
+	static int const INSERT				= DELETE		+ 1;
+	static int const BACKSPACE		= INSERT		+ 1;
+	static int const MOUSE				=	BACKSPACE	+ 1;
+	static int const META_BASE		= 0x04000;
+	static int const COMMAND_BASE	= 0x08000;
 	};
 
 /*! \brief Quasi graphic glyphs.
  */
 struct GLYPHS
 	{
-	static int D_DOWN_ARROW;
-	static int D_UP_ARROW;
-	static int D_VERTICAL_LINE;
+	static int DOWN_ARROW;
+	static int UP_ARROW;
+	static int VERTICAL_LINE;
 	};
 
 /*! \brief Cursor visibility types.
@@ -88,9 +88,9 @@ struct CURSOR
 	{
 	typedef enum
 		{
-		D_INVISIBLE, 
-		D_VISIBLE, 
-		D_VERY_VISIBLE
+		INVISIBLE, 
+		VISIBLE, 
+		VERY_VISIBLE
 		} cursor_t;
 	};
 
@@ -100,42 +100,42 @@ struct COLORS
 	{
 	enum
 		{
-		D_FG_BLACK         = 0,
-		D_FG_RED           = 1,
-		D_FG_GREEN         = 2,
-		D_FG_BROWN         = 3,
-		D_FG_BLUE          = 4,
-		D_FG_MAGENTA       = 5,
-		D_FG_CYAN          = 6,
-		D_FG_LIGHTGRAY     = 7,
-		D_FG_GRAY          = 8,
-		D_FG_BRIGHTRED     = 9,
-		D_FG_BRIGHTGREEN   = 10,
-		D_FG_YELLOW        = 11,
-		D_FG_BRIGHTBLUE    = 12,
-		D_FG_BRIGHTMAGENTA = 13,
-		D_FG_BRIGHTCYAN    = 14,
-		D_FG_WHITE         = 15,
+		FG_BLACK         = 0,
+		FG_RED           = 1,
+		FG_GREEN         = 2,
+		FG_BROWN         = 3,
+		FG_BLUE          = 4,
+		FG_MAGENTA       = 5,
+		FG_CYAN          = 6,
+		FG_LIGHTGRAY     = 7,
+		FG_GRAY          = 8,
+		FG_BRIGHTRED     = 9,
+		FG_BRIGHTGREEN   = 10,
+		FG_YELLOW        = 11,
+		FG_BRIGHTBLUE    = 12,
+		FG_BRIGHTMAGENTA = 13,
+		FG_BRIGHTCYAN    = 14,
+		FG_WHITE         = 15,
 
-		D_BG_BLACK         = 0,
-		D_BG_RED           = 16,
-		D_BG_GREEN         = 32,
-		D_BG_BROWN         = 48,
-		D_BG_BLUE          = 64,
-		D_BG_MAGENTA       = 80,
-		D_BG_CYAN          = 96,
-		D_BG_LIGHTGRAY     = 112,
-		D_BG_BLINK         = 128,
-		D_BG_GRAY          = D_BG_BLINK,
-		D_BG_BRIGHTRED     = 16 | D_BG_BLINK,
-		D_BG_BRIGHTGREEN   = 32 | D_BG_BLINK,
-		D_BG_YELLOW        = 48 | D_BG_BLINK,
-		D_BG_BRIGHTBLUE    = 64 | D_BG_BLINK,
-		D_BG_BRIGHTMAGENTA = 80 | D_BG_BLINK,
-		D_BG_BRIGHTCYAN    = 96 | D_BG_BLINK,
-		D_BG_WHITE         = 112 | D_BG_BLINK,
-		D_ATTR_NORMAL      = ( D_FG_LIGHTGRAY | D_BG_BLACK ),
-		D_ATTR_DEFAULT     = -1
+		BG_BLACK         = 0,
+		BG_RED           = 16,
+		BG_GREEN         = 32,
+		BG_BROWN         = 48,
+		BG_BLUE          = 64,
+		BG_MAGENTA       = 80,
+		BG_CYAN          = 96,
+		BG_LIGHTGRAY     = 112,
+		BG_BLINK         = 128,
+		BG_GRAY          = BG_BLINK,
+		BG_BRIGHTRED     = 16 | BG_BLINK,
+		BG_BRIGHTGREEN   = 32 | BG_BLINK,
+		BG_YELLOW        = 48 | BG_BLINK,
+		BG_BRIGHTBLUE    = 64 | BG_BLINK,
+		BG_BRIGHTMAGENTA = 80 | BG_BLINK,
+		BG_BRIGHTCYAN    = 96 | BG_BLINK,
+		BG_WHITE         = 112 | BG_BLINK,
+		ATTR_NORMAL      = ( FG_LIGHTGRAY | BG_BLACK ),
+		ATTR_DEFAULT     = -1
 		};
 	};
 
@@ -149,20 +149,20 @@ struct COLORS
 template<int code = 0>
 struct KEY
 	{
-	static int const meta = code + KEY_CODES::D_META_BASE;
+	static int const meta = code + KEY_CODES::META_BASE;
 	static int meta_r( int a_iCode )
 		{
-		return ( a_iCode + KEY_CODES::D_META_BASE );
+		return ( a_iCode + KEY_CODES::META_BASE );
 		}
 	static int const ctrl = code - 96;
 	static int ctrl_r( int a_iCode )
 		{
 		return ( a_iCode - 96 );
 		}
-	static int const command = code + KEY_CODES::D_COMMAND_BASE;
+	static int const command = code + KEY_CODES::COMMAND_BASE;
 	static int command_r( int a_iCode )
 		{
-		return ( a_iCode + KEY_CODES::D_COMMAND_BASE );
+		return ( a_iCode + KEY_CODES::COMMAND_BASE );
 		}
 	};
 
@@ -172,9 +172,9 @@ struct EVENT
 	{
 	enum
 		{
-		D_ERROR,
-		D_KEYBOARD,
-		D_MOUSE
+		ERROR,
+		KEYBOARD,
+		MOUSE
 		};
 	};
 

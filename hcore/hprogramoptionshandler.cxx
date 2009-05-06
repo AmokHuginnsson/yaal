@@ -55,16 +55,16 @@ struct RC_PATHER
 	{
 	typedef enum
 		{
-		D_ETC,
-		D_HOME_ETC,
-		D_HOME
+		ETC,
+		HOME_ETC,
+		HOME
 		} placement_t;
 
 	typedef enum
 		{
-		D_NONE = 0,
-		D_GLOBAL = 1,
-		D_LOCAL = 2
+		NONE = 0,
+		GLOBAL = 1,
+		LOCAL = 2
 		} enum_t;
 	};
 
@@ -79,15 +79,15 @@ HString make_path( HString const& a_oRcName,
 	HString l_oRcPath;
 	switch ( a_ePlacement )
 		{
-		case ( RC_PATHER::D_ETC ):
+		case ( RC_PATHER::ETC ):
 			{
 			l_oRcPath = "/etc/";
 			l_oRcPath += a_oRcName;
 			l_oRcPath += "rc";
 			}
 		break;
-		case ( RC_PATHER::D_HOME_ETC ):
-		case ( RC_PATHER::D_HOME ):
+		case ( RC_PATHER::HOME_ETC ):
+		case ( RC_PATHER::HOME ):
 			{
 			char * l_pcHomePath = getenv( "HOME" );
 			if ( ! l_pcHomePath )
@@ -96,7 +96,7 @@ HString make_path( HString const& a_oRcName,
 				abort();
 				}
 			l_oRcPath = l_pcHomePath;
-			if ( a_ePlacement == RC_PATHER::D_HOME_ETC )
+			if ( a_ePlacement == RC_PATHER::HOME_ETC )
 				l_oRcPath += "/etc/conf/";
 			else
 				l_oRcPath += "/.";
@@ -206,7 +206,7 @@ public:
 
 HProgramOptionsHandler::OOption::OOption( void )
 	: f_pcName( NULL ), f_oValue(),
-	f_pcShortForm( NULL ), f_eSwitchType( TYPE::D_NONE ),
+	f_pcShortForm( NULL ), f_eSwitchType( TYPE::NONE ),
 	f_pcArgument( NULL ), f_pcDescription( NULL ),
 	CALLBACK() {}
 
@@ -285,23 +285,23 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 		RC_PATHER::placement_t f_ePlacement;
 		placement_bit_t f_ePlacementBit;
 		} l_psPlacementTab [ ] = {
-				{ RC_PATHER::D_ETC, RC_PATHER::D_GLOBAL },
-				{ RC_PATHER::D_HOME_ETC, RC_PATHER::D_LOCAL },
-				{ RC_PATHER::D_HOME, RC_PATHER::D_LOCAL } };
+				{ RC_PATHER::ETC, RC_PATHER::GLOBAL },
+				{ RC_PATHER::HOME_ETC, RC_PATHER::LOCAL },
+				{ RC_PATHER::HOME, RC_PATHER::LOCAL } };
 	bool l_bSection = false, l_bOptionOK;
-	placement_bit_t l_eSuccessStory( RC_PATHER::D_NONE );
+	placement_bit_t l_eSuccessStory( RC_PATHER::NONE );
 	size_t l_iCtrOut = 0;
 	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
-	log ( LOG_TYPE::D_INFO ) << "process_rc_file(): ";
+	log ( LOG_TYPE::INFO ) << "process_rc_file(): ";
 	if ( f_oOptions.is_empty() )
 		M_THROW( _( "bad variable count" ), f_oOptions.size() );
 	for ( l_iCtrOut = 0; l_iCtrOut < ( sizeof ( l_psPlacementTab ) / sizeof ( OPlacement ) ); l_iCtrOut ++ )
 		{
-		if ( ( !!( l_eSuccessStory & RC_PATHER::D_GLOBAL ) )
-				&& ( l_psPlacementTab[ l_iCtrOut ].f_ePlacementBit == RC_PATHER::D_GLOBAL ) )
+		if ( ( !!( l_eSuccessStory & RC_PATHER::GLOBAL ) )
+				&& ( l_psPlacementTab[ l_iCtrOut ].f_ePlacementBit == RC_PATHER::GLOBAL ) )
 			continue;
-		if ( !! ( l_eSuccessStory & RC_PATHER::D_LOCAL ) )
+		if ( !! ( l_eSuccessStory & RC_PATHER::LOCAL ) )
 			break;
 		if ( ! rc_open( a_oRcName, l_psPlacementTab [ l_iCtrOut ].f_ePlacement, l_oRc ) )
 			{
@@ -346,7 +346,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 					l_oMessage.format ( "Error: unknown option found: `%s', "
 								"with value: `%s', on line %d.\n",
 								l_oOption.raw(), l_oValue.raw(), l_iLine );
-					log ( LOG_TYPE::D_ERROR ) << l_oMessage;
+					log ( LOG_TYPE::ERROR ) << l_oMessage;
 					::fputs( l_oMessage.raw(), stderr );
 					}
 				}
@@ -436,7 +436,7 @@ int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
 	M_PROLOG
 	int long l_iIndex = 0, l_iLenght = 0, l_iEnd = 0;
 	a_roOption = a_roValue = "";
-	while ( a_roFile.read_line( a_roOption, HFile::READ::D_STRIP_NEWLINES ) >= 0 )
+	while ( a_roFile.read_line( a_roOption, HFile::READ::STRIP_NEWLINES ) >= 0 )
 		{
 		a_riLine ++;
 		l_iIndex = 0;
@@ -525,9 +525,9 @@ void HProgramOptionsHandler::set_option( OOption& a_sOption, HString const& a_oV
 	M_PROLOG
 	if ( !! a_sOption.f_oValue )
 		{
-		if ( a_sOption.f_eSwitchType == OOption::TYPE::D_NONE )
+		if ( a_sOption.f_eSwitchType == OOption::TYPE::NONE )
 			{
-			M_ENSURE( a_sOption.f_oValue->get_type() == TYPE::D_BOOL );
+			M_ENSURE( a_sOption.f_oValue->get_type() == TYPE::BOOL );
 			a_sOption.f_oValue->set( "true" );
 			}
 		else
@@ -551,13 +551,13 @@ char const* make_short_opts( HProgramOptionsHandler::options_t const& a_oOptions
 		a_roBuffer += static_cast<char>( it->f_pcShortForm[0] );
 		switch ( it->f_eSwitchType )
 			{
-			case ( HProgramOptionsHandler::OOption::TYPE::D_REQUIRED ):
+			case ( HProgramOptionsHandler::OOption::TYPE::REQUIRED ):
 				a_roBuffer += ':';
 			break;
-			case ( HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL ):
+			case ( HProgramOptionsHandler::OOption::TYPE::OPTIONAL ):
 				a_roBuffer += "::";
 			break;
-			case ( HProgramOptionsHandler::OOption::TYPE::D_NONE ):
+			case ( HProgramOptionsHandler::OOption::TYPE::NONE ):
 			default :
 				break;
 			}
@@ -582,13 +582,13 @@ option* make_option_array( HProgramOptionsHandler::options_t const& a_oOptions, 
 		l_psOptions[ l_iCtr ].name = const_cast<char*>( it->f_pcName );
 		switch ( it->f_eSwitchType )
 			{
-			case ( HProgramOptionsHandler::OOption::TYPE::D_REQUIRED ):
+			case ( HProgramOptionsHandler::OOption::TYPE::REQUIRED ):
 				l_psOptions [ l_iCtr ].has_arg = required_argument;
 			break;
-			case ( HProgramOptionsHandler::OOption::TYPE::D_OPTIONAL ):
+			case ( HProgramOptionsHandler::OOption::TYPE::OPTIONAL ):
 				l_psOptions [ l_iCtr ].has_arg = optional_argument;
 			break;
-			case ( HProgramOptionsHandler::OOption::TYPE::D_NONE ):
+			case ( HProgramOptionsHandler::OOption::TYPE::NONE ):
 			default :
 				l_psOptions [ l_iCtr ].has_arg = no_argument;
 			}

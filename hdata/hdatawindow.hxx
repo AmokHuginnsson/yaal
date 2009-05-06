@@ -60,8 +60,8 @@ public:
 		 */
 		typedef enum
 			{
-			D_VIEW, /*!< Browse data. */
-			D_EDIT  /*!< Edit current record. */
+			VIEW, /*!< Browse data. */
+			EDIT  /*!< Edit current record. */
 			} mode_t;
 		};
 	/*! \brief DML helper, buffer for currently edited row.

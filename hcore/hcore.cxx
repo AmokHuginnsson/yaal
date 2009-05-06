@@ -59,12 +59,12 @@ HLog& log = HLogService::get_instance( 1000 );
 HProgramOptionsHandler yaalOptions;
 
 /* mathematical macros */
-static double long const D_EPSILON = 0.000001;
+static double long const EPSILON = 0.000001;
 bool eq( double long const& a_dLeft, double long const& a_dRight )
 	{
 	return ( ( ( ( ( a_dLeft ) > ( a_dRight ) )
 					? ( ( a_dLeft ) - ( a_dRight ) )
-					: ( ( a_dRight ) - ( a_dLeft ) ) ) < D_EPSILON ) );
+					: ( ( a_dRight ) - ( a_dLeft ) ) ) < EPSILON ) );
 	}
 
 bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
@@ -78,17 +78,17 @@ bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
 		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it )
 			{
 			if ( ! strcasecmp( *it, "LOG_DEBUG" ) )
-				HLog::f_lLogMask |= LOG_TYPE::D_DEBUG;
+				HLog::f_lLogMask |= LOG_TYPE::DEBUG;
 			else if ( ! strcasecmp( *it, "LOG_INFO" ) )
-				HLog::f_lLogMask |= LOG_TYPE::D_INFO;
+				HLog::f_lLogMask |= LOG_TYPE::INFO;
 			else if ( ! strcasecmp( *it, "LOG_NOTICE" ) )
-				HLog::f_lLogMask |= LOG_TYPE::D_NOTICE;
+				HLog::f_lLogMask |= LOG_TYPE::NOTICE;
 			else if ( ! strcasecmp( *it, "LOG_WARNING" ) )
-				HLog::f_lLogMask |= LOG_TYPE::D_WARNING;
+				HLog::f_lLogMask |= LOG_TYPE::WARNING;
 			else if ( ! strcasecmp( *it, "LOG_ERROR" ) )
-				HLog::f_lLogMask |= LOG_TYPE::D_ERROR;
-			else if ( ! strcasecmp( *it, "LOG_CVSHEADER" ) )
-				HLog::f_lLogMask |= LOG_TYPE::D_CVSHEADER;
+				HLog::f_lLogMask |= LOG_TYPE::ERROR;
+			else if ( ! strcasecmp( *it, "LOG_VCSHEADER" ) )
+				HLog::f_lLogMask |= LOG_TYPE::VCSHEADER;
 			else
 				return ( true );
 			}
@@ -106,21 +106,21 @@ void set_env( HString line )
 	if ( ( line.length() < 3 )
 			|| ( ( eon = line.find_one_of( " \t" ) ) == -1 ) )
 		{
-		log ( LOG_TYPE::D_ERROR ) << "bad set_env argument: `";
+		log ( LOG_TYPE::ERROR ) << "bad set_env argument: `";
 		log << line << '\'' << endl;
 		return;
 		}
 	int long valPos = line.find_other_than( " \t", eon );
 	if ( valPos < 0 )
 		{
-		log ( LOG_TYPE::D_ERROR ) << "no value for environment variable in set_env: `";
+		log ( LOG_TYPE::ERROR ) << "no value for environment variable in set_env: `";
 		log << line << '\'' << endl;
 		return;
 		}
-	int const D_TRUE = 1;
+	int const TRUE = 1;
 	HString val = line.mid( valPos );
 	line.set_at( eon, '\0' );
-	M_ENSURE( ::setenv( line.raw(), val.raw(), D_TRUE ) == 0 );
+	M_ENSURE( ::setenv( line.raw(), val.raw(), TRUE ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -195,9 +195,9 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	char* l_pcEnv = ::getenv( "YAAL_DEBUG" );
 	if ( l_pcEnv )
 		n_iDebugLevel = lexical_cast<int>( l_pcEnv );
-	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::f_oSSLKey ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Path to the OpenSSL private key file." )
-		( "ssl_cert", program_options_helper::option_value( HOpenSSL::f_oSSLCert ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Path to the OpenSSL certificate file." )
-		( "resolve_hostnames", program_options_helper::option_value( HSocket::f_bResolveHostnames ), 0, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, NULL, "Resolve IP address into host names." );
+	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::f_oSSLKey ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "Path to the OpenSSL private key file." )
+		( "ssl_cert", program_options_helper::option_value( HOpenSSL::f_oSSLCert ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "Path to the OpenSSL certificate file." )
+		( "resolve_hostnames", program_options_helper::option_value( HSocket::f_bResolveHostnames ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "Resolve IP address into host names." );
 	yaalOptions.process_rc_file( "yaal", "core", set_hcore_variables );
 	return;
 	}

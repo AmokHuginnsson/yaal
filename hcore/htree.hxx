@@ -136,7 +136,7 @@ class HTree<tType>::HIterator
 	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
 	typedef typename trait::copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;
 	typedef typename HTree<tType>::const_node_t owner_t;
-	typedef typename HTree<tType>::HNode::branch_t::template HIterator<const_qual_node_ptr_t, OListBits::D_TREAT_AS_OPENED> list_it_t;
+	typedef typename HTree<tType>::HNode::branch_t::template HIterator<const_qual_node_ptr_t, OListBits::TREAT_AS_OPENED> list_it_t;
 	owner_t f_poOwner;
 	list_it_t f_oIterator;
 public:
@@ -172,7 +172,7 @@ public:
 	const_qual_node_t* operator->( void );
 private:
 	friend class HTree<tType>::HNode;
-	HIterator( const_node_t, typename HTree<tType>::HNode::branch_t::template HIterator<const_qual_node_ptr_t, OListBits::D_TREAT_AS_OPENED> const& );
+	HIterator( const_node_t, typename HTree<tType>::HNode::branch_t::template HIterator<const_qual_node_ptr_t, OListBits::TREAT_AS_OPENED> const& );
 	};
 
 template<typename tType>
@@ -531,7 +531,7 @@ template<typename tType>
 template<typename const_qual_t>
 HTree<tType>::HIterator<const_qual_t>::HIterator( const_node_t a_poOwner,
 		typename HTree<tType>::HNode::branch_t::template HIterator<const_qual_node_ptr_t,
-		OListBits::D_TREAT_AS_OPENED> const& a_oIterator )
+		OListBits::TREAT_AS_OPENED> const& a_oIterator )
 	: f_poOwner( a_poOwner ), f_oIterator( a_oIterator )
 	{
 	return;

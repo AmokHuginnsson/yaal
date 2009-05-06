@@ -48,10 +48,10 @@ class HLogPad : public HControl
 		{
 		typedef enum
 			{
-			D_NONE,
-			D_ATTRIBUTE,
-			D_TEXT,
-			D_TEXT_EOL
+			NONE,
+			ATTRIBUTE,
+			TEXT,
+			TEXT_EOL
 			} type_t;
 		type_t f_eType;
 		int f_iAttribute;
