@@ -33,8 +33,8 @@
 # log_mask can occur in all yaalrc's sections and flag are
 # additive across all sections
 # argument to log_mask can be any combination of flags:
-# LOG_DEBUG, LOG_INFO, LOG_NOTICE, LOG_WARNING, LOG_ERROR, LOG_CVSHEADER
-log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_CVSHEADER
+# LOG_DEBUG, LOG_INFO, LOG_NOTICE, LOG_WARNING, LOG_ERROR, LOG_VCSHEADER
+log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_VCSHEADER
 
 # resolve_hostnames
 # type: bool, default true

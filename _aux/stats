@@ -1,9 +1,8 @@
 #! /bin/sh
 
 if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
-	find . ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<[DE]_[A-Z_]\+"
 	find . ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<M_[A-Z_]\+"
-	find . ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "\<E_\|\<D_\|\<M_\|_HXX_INCLUDED\>" | grep --color " [a-zA-Z_]\+"
+	find . ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "\<M_\|_HXX_INCLUDED\>" | grep --color " [a-zA-Z_]\+"
 	find . ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) | xargs grep -En --color "(\<reinterpret_cast\>|\<const_cast\>|\<dynamic_cast\>)"
 	exit 0
 else
@@ -29,7 +28,6 @@ else
 	LINES=`wc -l ${TMP_FILE}|${AWK} '{print $1}'`
 	LINES=`expr ${LINES} - \( ${TOTAL} \* 21 \)`
 
-	PROG_DE="/VCSID|_HXX_INCLUDED\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"[ \t](D_|E_)[A-Z_]*\"),RLENGTH)}"
 	PROG_M="/VCSID|_HXX_INCLUDED\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"[ \t]M_[A-Z_]*\"),RLENGTH)}"
 	PROG_O="/_HXX_INCLUDED\>|\<D_|\<E_|\<M_/{next}/^#[ \t]*define[ \t]+/"
 
@@ -47,10 +45,6 @@ else
 
 	printf "	macros:            %8d\n" ${MACROS}
 
-	DEFINES=`${AWK} "${PROG_DE}" ${TMP_FILE}|sort -u|grep -v '^$'|wc -l`
-
-	printf "	defines:           %8d\n" ${DEFINES}
-	
 	SNEAKY=`${AWK} "${PROG_O}" ${TMP_FILE}|sort -u|grep -v '^$'|wc -l`
 
 	printf "	sneaky:            %8d\n" ${SNEAKY}
