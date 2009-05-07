@@ -94,6 +94,10 @@ double long strtold( char const*, char** );
 int asprintf( char**, char const*, ... );
 #endif /* not HAVE_ASPRINTF */
 
+#if ! defined( LOGIN_NAME_MAX )
+static int const LOGIN_NAME_MAX = 16;
+#endif /* not LOGIN_NAME_MAX */
+
 #if ! defined( __DYNAMIC_LINKER__ )
 #define __DYNAMIC_LINKER__ ""
 #endif /* not __DYNAMIC_LINKER__ */
