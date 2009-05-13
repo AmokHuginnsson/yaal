@@ -17,7 +17,7 @@ Copyright:
   4. If you want redistribute binary package you cannot demand any fees
      for this software.
      You cannot even demand cost of the carrier (CD for example).
-  5. You cannot include it to any commercial enterprise (for example 
+  5. You cannot include it to any commercial enterprise (for example
      as a free add-on to payed software or payed newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -92,7 +92,7 @@ HString make_path( HString const& a_oRcName,
 			char * l_pcHomePath = getenv( "HOME" );
 			if ( ! l_pcHomePath )
 				{
-				perror ( "rc_open: getenv()" );
+				perror( "rc_open: getenv()" );
 				abort();
 				}
 			l_oRcPath = l_pcHomePath;
@@ -293,7 +293,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 	size_t l_iCtrOut = 0;
 	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
-	log ( LOG_TYPE::INFO ) << "process_rc_file(): ";
+	log( LOG_TYPE::INFO ) << "process_rc_file(): ";
 	if ( f_oOptions.is_empty() )
 		M_THROW( _( "bad variable count" ), f_oOptions.size() );
 	for ( l_iCtrOut = 0; l_iCtrOut < ( sizeof ( l_psPlacementTab ) / sizeof ( OPlacement ) ); l_iCtrOut ++ )
@@ -343,10 +343,10 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 						&& ! l_bOptionOK )
 					{
 					log << "failed." << endl;
-					l_oMessage.format ( "Error: unknown option found: `%s', "
+					l_oMessage.format( "Error: unknown option found: `%s', "
 								"with value: `%s', on line %d.\n",
 								l_oOption.raw(), l_oValue.raw(), l_iLine );
-					log ( LOG_TYPE::ERROR ) << l_oMessage;
+					log( LOG_TYPE::ERROR ) << l_oMessage;
 					::fputs( l_oMessage.raw(), stderr );
 					}
 				}
@@ -394,7 +394,7 @@ int reload_configuration( void )
 
 }
 
-/* Reads one line from a_psFile, stores beginning of line in a_roOption, 
+/* Reads one line from a_psFile, stores beginning of line in a_roOption,
  * stores rest of line in a_pcValue, returns 1 if there are more lines
  * to read and 0 in other case. */
 
@@ -482,7 +482,7 @@ int read_rc_line( HString& a_roOption, HString& a_roValue, HFile& a_roFile,
 	return ( 0 );
 	M_EPILOG
 	}
-	
+
 void rc_set_variable( char const* const a_pcValue, bool& a_rbVariable )
 	{
 	M_PROLOG
@@ -583,14 +583,14 @@ option* make_option_array( HProgramOptionsHandler::options_t const& a_oOptions, 
 		switch ( it->f_eSwitchType )
 			{
 			case ( HProgramOptionsHandler::OOption::TYPE::REQUIRED ):
-				l_psOptions [ l_iCtr ].has_arg = required_argument;
+				l_psOptions[ l_iCtr ].has_arg = required_argument;
 			break;
 			case ( HProgramOptionsHandler::OOption::TYPE::OPTIONAL ):
-				l_psOptions [ l_iCtr ].has_arg = optional_argument;
+				l_psOptions[ l_iCtr ].has_arg = optional_argument;
 			break;
 			case ( HProgramOptionsHandler::OOption::TYPE::NONE ):
 			default :
-				l_psOptions [ l_iCtr ].has_arg = no_argument;
+				l_psOptions[ l_iCtr ].has_arg = no_argument;
 			}
 		if ( it->f_pcShortForm )
 			l_psOptions[ l_iCtr ].val = it->f_pcShortForm[0];
