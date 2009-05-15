@@ -37,6 +37,18 @@ namespace yaal
 namespace hcore
 {
 
+struct MULTIMAP_STORAGE
+	{
+	template<typename key_t, typename value_t>
+	struct PACKED
+		{
+		};
+	template<typename key_t, typename value_t>
+	struct TRANSPARENT
+		{
+		};
+	};
+
 /*! \brief Binary tree based map with relation one-to-many on keys to values.
  *
  * HMultiMap<> is a template representing self balancing binary search tree
