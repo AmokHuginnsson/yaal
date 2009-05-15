@@ -214,9 +214,9 @@ private:
 	HElement* f_poPrevious;
 	HElement* f_poNext;
 	tType f_tObject; /*!< The Object itself. */
-	explicit HElement ( HElement* );
+	explicit HElement( HElement*, tType const* );
 	virtual ~HElement ();
-	HElement ( HElement const & );
+	HElement( HElement const & );
 	HElement& operator = ( HElement const& );
 	friend class HList<tType>;
 	friend class HIterator<tType, OListBits::TREAT_AS_OPENED>;
@@ -306,8 +306,8 @@ protected:
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 template<typename tType>
-HList<tType>::HElement::HElement( HElement* a_poElement )
-	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject()
+HList<tType>::HElement::HElement( HElement* a_poElement, tType const* a_poValue )
+	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject( a_poValue ? *a_poValue : tType() )
 	{
 	if ( a_poElement == 0 )
 		{
@@ -668,14 +668,12 @@ typename OListBits::iterator<tType, treatment>::type HList<tType>::insert( HIter
 		tType const* a_ptObject )
 	{
 	M_PROLOG
-	HElement* l_poElement = new HElement( it.f_poCurrent );
+	HElement* l_poElement = new HElement( it.f_poCurrent, a_ptObject );
 	if ( ( f_iSize == 0 ) || ( ( it.f_poCurrent == f_poHook ) && ( treatment == TREAT_AS_OPENED ) ) )
 		f_poHook = l_poElement;
 	f_iSize ++;
 	f_iIndex = 0;
 	f_poIndex = NULL;
-	if ( a_ptObject )
-		l_poElement->f_tObject = *a_ptObject;
 	return ( iterator( this, l_poElement ) );
 	M_EPILOG
 	}
@@ -694,12 +692,10 @@ template<typename tType>
 tType& HList<tType>::add_head( tType const* a_ptObject )
 	{
 	M_PROLOG
-	f_poHook = new HElement ( f_poHook );
+	f_poHook = new HElement( f_poHook, a_ptObject );
 	f_iSize ++;
 	if ( f_poIndex )
 		f_poIndex = f_poIndex->f_poPrevious;
-	if ( a_ptObject )
-		f_poHook->f_tObject = *a_ptObject;
 	return ( f_poHook->f_tObject );
 	M_EPILOG
 	}
@@ -708,12 +704,10 @@ template<typename tType>
 tType& HList<tType>::add_tail( tType const* a_ptObject )
 	{
 	M_PROLOG
-	HElement* l_poElement = new HElement( f_poHook );
+	HElement* l_poElement = new HElement( f_poHook, a_ptObject );
 	if ( f_iSize == 0 )
 		f_poHook = l_poElement;
 	f_iSize ++;
-	if ( a_ptObject )
-		l_poElement->f_tObject = *a_ptObject;
 	return ( l_poElement->f_tObject );
 	M_EPILOG
 	}
@@ -779,8 +773,7 @@ tType& HList<tType>::add_orderly( tType const& a_rtObject,
 	M_PROLOG
 	bool l_bBefore = false;
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iSize;
-	HElement * l_poElement = new HElement ( NULL );
-	l_poElement->f_tObject = a_rtObject;
+	HElement* l_poElement = new HElement( NULL, &a_rtObject );
 	if ( ( f_eOrder != UNSORTED ) && ( f_eOrder != a_eOrder ) )
 		M_THROW ( g_ppcErrMsgHList [ ERROR::BAD_ORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
@@ -875,7 +868,7 @@ OListBits::status_t HList<tType>::remove_head( tType** a_pptObject )
 	{
 	M_PROLOG
 	status_t l_eError = OK;
-	HElement * l_poElement = NULL;
+	HElement* l_poElement = NULL;
 	if ( f_iSize > 0 )
 		{
 		l_poElement = f_poHook;

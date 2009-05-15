@@ -44,19 +44,27 @@ struct HMultiMapStorage
 		{
 		typedef value_t value_type_t;
 		typedef yaal::hcore::HPair<key_t, value_t> elem_t;
+		typedef elem_t accessor_t;
 		static value_type_t value( key_t const&, value_t const& val_ )
 			{ return ( val_ ); }
 		static value_type_t value( elem_t const& elem_ )
 			{ return ( elem_.second ); }
+		template<typename key_provider_t, typename value_provider_t>
+		static accessor_t accessor( key_provider_t const& key_, value_provider_t& val_ )
+			{ return ( accessor_t( key_, val_ ) ); }
 		};
 	template<typename key_t, typename value_t>
 	struct HTransparent
 		{
 		typedef yaal::hcore::HPair<key_t, value_t> value_type_t;
+		typedef value_type_t& accessor_t;
 		static value_type_t value( key_t const& key_, value_t const& val_ )
 			{ return ( value_type_t( key_, val_ ) ); }
 		static value_type_t value( value_type_t const& elem_ )
 			{ return ( elem_ ); }
+		template<typename key_provider_t, typename value_provider_t>
+		static accessor_t accessor( key_provider_t const&, value_provider_t& val_ )
+			{ return ( val_ ); }
 		};
 	};
 
@@ -350,8 +358,8 @@ public:
 		-- f_oEngine;
 		return ( it );
 		}
-	map_elem_t operator* ( void )
-		{	return ( map_elem_t( f_oMajor->first, *f_oMinor ) );	}
+	typename multi_map_t::storage_t::accessor_t operator* ( void )
+		{	return ( multi_map_t::storage_t::accessor( f_oMajor->first, *f_oMinor ) );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( ( f_oMajor == it.f_oMajor ) && ( f_oMinor == it.f_oMinor ) ); }
 	bool operator != ( HIterator const& it ) const
