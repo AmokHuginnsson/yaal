@@ -633,6 +633,14 @@ public:
 	explicit reference( basic_t& obj ) : _ref( &obj ) {}
 	operator basic_t& ( void ) const
 		{ return ( *_ref ); }
+	basic_t& operator->( void )
+		{ return ( *_ref ); }
+	template<typename basic_assgnable_t>
+	basic_t& operator = ( basic_assgnable_t const& v )
+		{
+		*_ref = v;
+		return ( *_ref );
+		}
 	};
 
 }
@@ -699,6 +707,30 @@ template<typename T1>
 struct same_type<T1, T1>
 	{
 	static int const value = 1;
+	};
+/* \endcond */
+
+/*! \brief Perform compile time ternary operator on types.
+ *
+ * \tparam condition - staticly checkable condition that tells which type will be used.
+ * \tparam type_for_true - type to be used if condition is true.
+ * \tparam type_for_false - type to be used if condition is false.
+ * \retval type - conditional type.
+ */
+template<bool const condition, typename type_for_true, typename type_for_false>
+struct ternary;
+
+/* \cond */
+template<typename type_for_true, typename type_for_false>
+struct ternary<true, type_for_true, type_for_false>
+	{
+	typedef type_for_true type;
+	};
+
+template<typename type_for_true, typename type_for_false>
+struct ternary<false, type_for_true, type_for_false>
+	{
+	typedef type_for_false type;
 	};
 /* \endcond */
 

@@ -44,27 +44,40 @@ struct HMultiMapStorage
 		{
 		typedef value_t value_type_t;
 		typedef yaal::hcore::HPair<key_t, value_t> elem_t;
-		typedef elem_t accessor_t;
+		typedef yaal::hcore::HPair<key_t, trait::reference<value_t> > accessor_elem_t;
+		template<typename const_qual_t>
+		struct const_aware_type
+			{
+			typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+							elem_t const,
+							accessor_elem_t>::type accessor_t;
+			template<typename key_provider_t, typename value_provider_t>
+			static accessor_t accessor( key_provider_t const& key_, value_provider_t& val_ )
+				{ return ( accessor_t( key_, ref( val_ ) ) ); }
+			};
 		static value_type_t value( key_t const&, value_t const& val_ )
 			{ return ( val_ ); }
 		static value_type_t value( elem_t const& elem_ )
 			{ return ( elem_.second ); }
-		template<typename key_provider_t, typename value_provider_t>
-		static accessor_t accessor( key_provider_t const& key_, value_provider_t& val_ )
-			{ return ( accessor_t( key_, val_ ) ); }
 		};
 	template<typename key_t, typename value_t>
 	struct HTransparent
 		{
 		typedef yaal::hcore::HPair<key_t, value_t> value_type_t;
-		typedef value_type_t& accessor_t;
+		template<typename const_qual_t>
+		struct const_aware_type
+			{
+			typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+							value_type_t const&,
+							value_type_t&>::type accessor_t;
+			template<typename key_provider_t, typename value_provider_t>
+			static accessor_t accessor( key_provider_t const&, value_provider_t& val_ )
+				{ return ( val_ ); }
+			};
 		static value_type_t value( key_t const& key_, value_t const& val_ )
 			{ return ( value_type_t( key_, val_ ) ); }
 		static value_type_t value( value_type_t const& elem_ )
 			{ return ( elem_ ); }
-		template<typename key_provider_t, typename value_provider_t>
-		static accessor_t accessor( key_provider_t const&, value_provider_t& val_ )
-			{ return ( val_ ); }
 		};
 	};
 
@@ -174,7 +187,7 @@ public:
 	const_iterator find( key_t const& key ) const
 		{
 		M_PROLOG
-		typename multimap_engine_t::cons_iterator major = f_oEngine.find( key );
+		typename multimap_engine_t::const_iterator major = f_oEngine.find( key );
 		typename value_list_t::const_iterator minor;
 		if ( major != f_oEngine.end() )
 			minor = major->second->begin();
@@ -298,8 +311,12 @@ template<typename const_qual_t>
 class HMultiMap<key_t, value_t, storage_policy_t, helper_t>::HIterator
 	{
 	typedef HMultiMap<key_t, value_t, storage_policy_t, helper_t> multi_map_t;
-	typedef typename multi_map_t::multimap_engine_t::iterator key_iterator_t;
-	typedef typename value_list_t::iterator value_iterator_t;
+	typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+					typename multi_map_t::multimap_engine_t::const_iterator,
+					typename multi_map_t::multimap_engine_t::iterator>::type key_iterator_t;
+	typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+					typename value_list_t::const_iterator,
+					typename value_list_t::iterator>::type value_iterator_t;
 	multi_map_t const* f_poOwner;
 	key_iterator_t f_oMajor;
 	value_iterator_t f_oMinor;
@@ -358,8 +375,10 @@ public:
 		-- f_oEngine;
 		return ( it );
 		}
-	typename multi_map_t::storage_t::accessor_t operator* ( void )
-		{	return ( multi_map_t::storage_t::accessor( f_oMajor->first, *f_oMinor ) );	}
+	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void )
+		{	return ( multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( f_oMajor->first, *f_oMinor ) );	}
+	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void ) const
+		{	return ( multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( f_oMajor->first, *f_oMinor ) );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( ( f_oMajor == it.f_oMajor ) && ( f_oMinor == it.f_oMinor ) ); }
 	bool operator != ( HIterator const& it ) const
