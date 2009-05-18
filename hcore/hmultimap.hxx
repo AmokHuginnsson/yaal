@@ -51,6 +51,7 @@ struct HMultiMapStorage
 			typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
 							elem_t const,
 							accessor_elem_t>::type accessor_t;
+			typedef accessor_t accessor_ptr_t;
 			template<typename key_provider_t, typename value_provider_t>
 			static accessor_t accessor( key_provider_t const& key_, value_provider_t& val_ )
 				{ return ( accessor_t( key_, ref( val_ ) ) ); }
@@ -70,6 +71,9 @@ struct HMultiMapStorage
 			typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
 							value_type_t const&,
 							value_type_t&>::type accessor_t;
+			typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+							value_type_t const*,
+							value_type_t*>::type accessor_ptr_t;
 			template<typename key_provider_t, typename value_provider_t>
 			static accessor_t accessor( key_provider_t const&, value_provider_t& val_ )
 				{ return ( val_ ); }
@@ -91,7 +95,7 @@ struct HMultiMapStorage
  * \tparam helper_t - HSBBSTree plugable code.
  */
 template<typename key_t, typename value_t,
-	template<typename, typename>class storage_policy_t = HMultiMapStorage::HPacked,
+	template<typename, typename>class storage_policy_t = HMultiMapStorage::HTransparent,
 	typename helper_t = map_helper<key_t const, HPointer<HList<typename storage_policy_t<key_t const, value_t>::value_type_t > > > >
 class HMultiMap
 	{
@@ -149,7 +153,7 @@ public:
 		{
 		M_PROLOG
 		typename multimap_engine_t::iterator major = ensure_key( key );
-		major->second->push_front( value );
+		major->second->push_front( storage_t::value( key, value ) );
 		typename value_list_t::iterator minor = major->second->begin();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
@@ -379,6 +383,10 @@ public:
 		{	return ( multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( f_oMajor->first, *f_oMinor ) );	}
 	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void ) const
 		{	return ( multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( f_oMajor->first, *f_oMinor ) );	}
+	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_ptr_t operator->( void )
+		{	return ( &multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( f_oMajor->first, *f_oMinor ) );	}
+	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_ptr_t operator->( void ) const
+		{	return ( &multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( f_oMajor->first, *f_oMinor ) );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( ( f_oMajor == it.f_oMajor ) && ( f_oMinor == it.f_oMinor ) ); }
 	bool operator != ( HIterator const& it ) const
