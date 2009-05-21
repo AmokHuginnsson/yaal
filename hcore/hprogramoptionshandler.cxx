@@ -316,7 +316,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 						l_oValue.format( "[%s]", a_oSection.raw() );
 						if ( l_oOption == l_oValue )
 							{
-							if ( n_iDebugLevel )
+							if ( n_iDebugLevel >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS )
 								::fprintf( stderr, "section: [%s]\n", l_oOption.raw() );
 							log << "section: " << a_oSection << ", ";
 							l_bSection = true;
@@ -330,7 +330,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 					}
 				while ( substitute_environment( l_oValue ) )
 					;
-				if ( n_iDebugLevel )
+				if ( n_iDebugLevel >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS )
 					::fprintf( stderr, "option: [%s], value [%s]\n",
 							l_oOption.raw(), l_oValue.raw() );
 				l_bOptionOK = false;

@@ -53,8 +53,8 @@ HProcess::HProcess( size_t a_uiFileHandlers )
 	M_PROLOG
 	f_oDroppedFd.reset();
 	M_ASSERT( f_oDroppedFd.is_empty() );
-	memset ( & f_sLatency, 0, sizeof ( f_sLatency ) );
-	FD_ZERO ( & f_xFileDescriptorSet );
+	::memset( &f_sLatency, 0, sizeof ( f_sLatency ) );
+	FD_ZERO( &f_xFileDescriptorSet );
 	return;
 	M_EPILOG
 	}
@@ -70,11 +70,12 @@ int HProcess::do_init( void )
 	{
 	M_PROLOG
 	if ( f_bInitialised )
-		M_THROW ( "you can initialise your main process only once, dumbass",
+		M_THROW( "you can initialise your main process only once, dumbass",
 				errno );
 	HSignalService& ss = HSignalServiceFactory::get_instance();
 	HSignalService::HHandlerGeneric::ptr_t handler( new HSignalService::HHandlerExternal( this, &HProcess::handler_interrupt ) );
-	ss.register_handler( SIGINT, handler );
+	if ( n_iDebugLevel < DEBUG_LEVEL::GDB )
+		ss.register_handler( SIGINT, handler );
 	ss.register_handler( SIGHUP, handler );
 	register_file_descriptor_handler( f_oEvent.get_reader_fd(), &HProcess::process_interrupt );
 	f_bInitialised = true;
