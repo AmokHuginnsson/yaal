@@ -55,8 +55,8 @@ struct DEBUG_LEVEL
 	{
 	static int const PRINT_PROGRAM_OPTIONS = 3;
 	static int const PRINT_EXCEPTION_STACK = 5;
-	static int const ABORT_ON_ASSERT = 7;
-	static int const GDB = 10;
+	static int const GDB = 7;
+	static int const ABORT_ON_ASSERT = 10;
 	};
 
 /*! \brief Base exception class for YAAL software.
