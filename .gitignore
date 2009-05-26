@@ -1,11 +1,6 @@
 doc/html
 yaalrc
 yaal.*
-.cproject
-.project
-Doxyfile
-.my_make
-.svn
 Debug
 VisualStudio
 static
