@@ -36,6 +36,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hexception.hxx"
 #include "xalloc.hxx"
 #include "hlog.hxx"
+#include "hfile.hxx"
 
 using namespace yaal;
 
@@ -250,6 +251,23 @@ void HFailedAssertion::swap( HFailedAssertion& other )
 	if ( &other != this )
 		swap( f_pcWhat, other.f_pcWhat );
 	return;
+	}
+
+void HGlobalScopeExceptionHandlingPolicy::hadle_exception( void )
+	{
+	try
+		{
+		throw;
+		}
+	catch ( HException const& e )
+		{
+		cerr << "Exception `" << e.what() << "' thrown from outside of main() scope." << endl;
+		}
+	catch ( ... )
+		{
+		cerr << "Exception of unknown type thrown from outside of main() scope." << endl;
+		}
+	exit( 1 );
 	}
 
 }
