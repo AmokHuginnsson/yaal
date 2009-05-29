@@ -131,9 +131,11 @@ public:
  	bool is_alive( void ) const;
 	static int long get_id( void );
 private:
-	virtual int run( void );
+	virtual int do_run( void );
+	virtual void do_cleanup( void );
 	void* control( void );
 	static void* SPAWN( void* );
+	static void CLEANUP( void* );
 	HThread( HThread const& );
 	HThread& operator = ( HThread const& );
 	};
@@ -149,7 +151,7 @@ class HThreadT : public HThread
 public:
 	HThreadT( tType& callee ) : call( callee ) {}
 private:
-	virtual int run( void )
+	virtual int do_run( void )
 		{ return ( call( const_cast<HThreadT const* const>( this ) ) ); }
 	};
 

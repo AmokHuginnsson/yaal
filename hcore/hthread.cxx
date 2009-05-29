@@ -134,11 +134,26 @@ void* HThread::SPAWN( void* a_pvThread )
 	M_EPILOG
 	}
 
+void HThread::CLEANUP( void* a_pvThread )
+	{
+	M_PROLOG
+	reinterpret_cast<HThread*>( a_pvThread )->do_cleanup();
+	return;
+	M_EPILOG
+	}
+
 void* HThread::control( void )
 	{
 	M_PROLOG
-	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL ) == 0 );
+	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
 	M_ENSURE( ::pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
+	/* pthread_cleanup_push and pthread_cleanup_pop are macros that need
+	 * to be treated as { and } brackets which means that variables
+	 * declared between pthread_cleanup_push and pthread_cleanup_pop
+	 * are not visible after pthread_cleanup_pop.
+	 */
+	void* l_pvReturn( NULL );
+	pthread_cleanup_push( CLEANUP, this );
 	f_eStatus = ALIVE;
 	f_oSemaphore.signal();
 	/*
@@ -164,7 +179,8 @@ void* HThread::control( void )
 	 * That is why we have to deliver interface that allows users to not specify
 	 * any useful or meaningful int run();
 	 */
-	void* l_pvReturn = reinterpret_cast<void*>( run() );
+	l_pvReturn = reinterpret_cast<void*>( do_run() );
+	pthread_cleanup_pop( 0 );
 	f_eStatus = ZOMBIE;
 	f_oSemaphore.signal();
 	return ( l_pvReturn );
@@ -179,7 +195,7 @@ bool HThread::is_alive( void ) const
 	M_EPILOG
 	}
 
-int HThread::run( void )
+int HThread::do_run( void )
 	{
 	M_PROLOG
 	/*
@@ -187,6 +203,13 @@ int HThread::run( void )
 	 */
 	log << "Pure virtual call - ignored." << endl;
 	return( -1 );
+	M_EPILOG
+	}
+
+void HThread::do_cleanup( void )
+	{
+	M_PROLOG
+	return;
 	M_EPILOG
 	}
 
