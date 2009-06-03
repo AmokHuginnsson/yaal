@@ -366,8 +366,29 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 	{
 	M_PROLOG
 	OOption o( name, value, shortForm, type, arg, desc, callback );
+	if ( ! ( name || shortForm ) )
+		throw HProgramOptionsHandlerException( "unnamed option encountered" );
+	if ( ( ! value ) && ( ! callback.first ) )
+		throw HProgramOptionsHandlerException( HString( "unused option: " ) + ( name ? name : shortForm ) );
+	for ( options_t::const_iterator it( f_oOptions.begin() ), end( f_oOptions.end() ); it != end; ++ it )
+		{
+		if ( ( !! value && ! it->f_oValue ) || ( ! value && !! it->f_oValue ) || ( !! value && ( value->id() != it->f_oValue->id() ) ) || ( callback != it->CALLBACK ) )
+			{
+			if ( name && it->f_pcName && ! ::strcasecmp( it->f_pcName, name ) )
+				throw HProgramOptionsHandlerException( HString( "duplicated long option: " ) + name );
+			if ( shortForm && it->f_pcShortForm && ! ::strcmp( it->f_pcShortForm, shortForm ) )
+				throw HProgramOptionsHandlerException( HString( "duplicated short option: " ) + shortForm );
+			}
+		}
 	f_oOptions.push_back( o );
 	return ( *this );
+	M_EPILOG
+	}
+
+void const* HProgramOptionsHandler::HOptionValueInterface::id( void ) const
+	{
+	M_PROLOG
+	return ( do_get() );
 	M_EPILOG
 	}
 

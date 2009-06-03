@@ -122,7 +122,11 @@ class HArray<tType>::HIterator
 	int long f_lIndex;
 public:
 	HIterator( void ) : f_poOwner( NULL ), f_lIndex( 0 ) {}
-	HIterator( HIterator const& a_oIt ) : f_poOwner( a_oIt.f_poOwner ), f_lIndex( a_oIt.f_lIndex ) {}
+	template<typename other_const_qual_t>
+	HIterator( HIterator<other_const_qual_t> const& a_oIt ) : f_poOwner( a_oIt.f_poOwner ), f_lIndex( a_oIt.f_lIndex )
+		{
+		STATIC_ASSERT(( same_type<const_qual_t, other_const_qual_t>::value || same_type<const_qual_t, other_const_qual_t const>::value ));
+		}
 	HIterator& operator= ( HIterator const& a_oIt )
 		{
 		if ( &a_oIt != this )

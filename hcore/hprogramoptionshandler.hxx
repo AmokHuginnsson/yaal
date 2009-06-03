@@ -64,6 +64,7 @@ public:
 		type_t get_type( void ) const;
 		template<typename tType>
 		tType const& get( void ) const;
+		void const* id( void ) const;
 	protected:
 		virtual void do_set( HString const& ) = 0;
 		virtual type_t do_get_type( void ) const = 0;
