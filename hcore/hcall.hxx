@@ -30,8 +30,6 @@ Copyright:
 #ifndef YAAL_HCORE_HCALL_HXX_INCLUDED
 #define YAAL_HCORE_HCALL_HXX_INCLUDED
 
-#line 31
-
 #include "hcore/hpointer.hxx"
 
 namespace yaal
@@ -484,6 +482,95 @@ protected:
 	virtual void do_invoke( void ) const
 		{ (base_t::f_oObject.*base_t::METHOD)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 ); }
 	};
+
+template<typename CLASS_t, typename METHOD_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t>(
+					obj, A_METHOD ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t>(
+					obj, A_METHOD, a0 ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t,
+	typename a1_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0, a1_t a1 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t, a1_t>(
+					obj, A_METHOD, a0, a1 ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t,
+	typename a1_t,
+	typename a2_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0, a1_t a1, a2_t a2 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t, a1_t, a2_t>(
+					obj, A_METHOD, a0, a1, a2 ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t,
+	typename a1_t, typename a2_t, typename a3_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t, a1_t, a2_t, a3_t>(
+					obj, A_METHOD, a0, a1, a2, a3 ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t,
+	typename a1_t, typename a2_t, typename a3_t, typename a4_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>(
+					obj, A_METHOD, a0, a1, a2, a3, a4 ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>(
+					obj, A_METHOD, a0, a1, a2, a3, a4, a5 ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>(
+					obj, A_METHOD, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
+	typename a7_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>(
+					obj, A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
+	typename a7_t, typename a8_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>(
+					obj, A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+
+template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
+	typename a7_t, typename a8_t, typename a9_t>
+HCallInterface::ptr_t call( CLASS_t obj, METHOD_t A_METHOD,
+		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+	{ return ( HCallInterface::ptr_t(
+				new HCall<CLASS_t, METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>(
+					obj, A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 
 }
 
