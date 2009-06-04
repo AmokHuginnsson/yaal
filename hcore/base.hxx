@@ -643,6 +643,54 @@ public:
 		}
 	};
 
+template<typename T>
+struct is_member
+	{ static bool const value = false; };
+
+template<typename return_t, typename class_t>
+struct is_member<return_t ( class_t::* )( void )>
+	{ static bool const value = true; };
+
+template<typename return_t, typename class_t, typename a0_t>
+struct is_member<return_t ( class_t::* )( a0_t )>
+	{ static bool const value = true; };
+
+template<typename return_t, typename class_t, typename a0_t, typename a1_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t )>
+	{ static bool const value = true; };
+
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t )>
+	{ static bool const value = true; };
+
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t )>
+	{ static bool const value = true; };
+
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t )>
+	{ static bool const value = true; };
+
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t )>
+	{ static bool const value = true; };
+
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t, typename a7_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t )>
+	{ static bool const value = true; };
+
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
+	{ static bool const value = true; };
+
 }
 
 /*! \brief Convenience function, returns trait::reference<> object.

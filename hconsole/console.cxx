@@ -302,9 +302,9 @@ void HConsole::set_attr( int a_iAttr ) const
 		M_THROW( "not in curses mode", errno );
 	l_ucByte = static_cast<char unsigned>( a_iAttr );
 	if ( f_bBrokenBrightBackground )
-		attrset( ATTR::value_fix( l_ucByte ) );
+		static_cast<void>( attrset( ATTR::value_fix( l_ucByte ) ) );
 	else
-		attrset( ATTR::value( l_ucByte ) );
+		static_cast<void>( attrset( ATTR::value( l_ucByte ) ) );
 	return;
 	M_EPILOG
 	}
