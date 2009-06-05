@@ -27,9 +27,8 @@ Copyright:
 #ifndef YAAL_HCORE_HLIST_HXX_INCLUDED
 #define YAAL_HCORE_HLIST_HXX_INCLUDED
 
-#line 31
-
-#include "hcore/hexception.hxx"
+#include "hcore/base.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal
 {

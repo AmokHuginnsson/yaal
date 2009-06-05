@@ -33,6 +33,7 @@ Copyright:
 #include <new>
 
 #include "hcore/base.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal
 {

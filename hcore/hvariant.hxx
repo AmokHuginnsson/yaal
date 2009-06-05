@@ -29,6 +29,8 @@ Copyright:
 
 #include <new> /* holly shit */
 
+#include "hcore/algorithm.hxx"
+
 namespace yaal
 {
 

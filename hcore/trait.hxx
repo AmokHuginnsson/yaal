@@ -31,6 +31,8 @@ Copyright:
 #ifndef YAAL_HCORE_TRAIT_HXX_INCLUDED
 #define YAAL_HCORE_TRAIT_HXX_INCLUDED
 
+#include "hcore/numeric.hxx"
+
 namespace yaal
 {
 
@@ -48,14 +50,14 @@ namespace trait
 template<typename T1, typename T2>
 struct same_type
 	{
-	static int const value = 0;
+	static bool const value = false;
 	};
 
 /* \cond */
 template<typename T1>
 struct same_type<T1, T1>
 	{
-	static int const value = 1;
+	static bool const value = true;
 	};
 /* \endcond */
 
@@ -97,16 +99,42 @@ template<typename t0_t, typename t1_t,
 struct find_type
 	{
 	static int const value = -1
-		+ 1 * same_type<t0_t, tType>::value
-		+ 2 * same_type<t1_t, tType>::value
-		+ 3 * same_type<t2_t, tType>::value
-		+ 4 * same_type<t3_t, tType>::value
-		+ 5 * same_type<t4_t, tType>::value
-		+ 6 * same_type<t5_t, tType>::value
-		+ 7 * same_type<t6_t, tType>::value
-		+ 8 * same_type<t7_t, tType>::value
-		+ 9 * same_type<t8_t, tType>::value
-		+ 10 * same_type<t9_t, tType>::value;
+		+ 1 * to_int<same_type<t0_t, tType>::value>::value
+		+ 2 * to_int<same_type<t1_t, tType>::value>::value
+		+ 3 * to_int<same_type<t2_t, tType>::value>::value
+		+ 4 * to_int<same_type<t3_t, tType>::value>::value
+		+ 5 * to_int<same_type<t4_t, tType>::value>::value
+		+ 6 * to_int<same_type<t5_t, tType>::value>::value
+		+ 7 * to_int<same_type<t6_t, tType>::value>::value
+		+ 8 * to_int<same_type<t7_t, tType>::value>::value
+		+ 9 * to_int<same_type<t8_t, tType>::value>::value
+		+ 10 * to_int<same_type<t9_t, tType>::value>::value;
+	};
+
+/*! \brief Count occurences of a type.
+ *
+ * \tparam t0_t, t1_t, ..., t9_t - list of types to search.
+ * \tparam tType - look for number of occurences of this type in given type set.
+ * \retval value - number of occurences of given type in given list of types.
+ */
+template<typename t0_t, typename t1_t,
+	typename t2_t, typename t3_t,
+	typename t4_t, typename t5_t,
+	typename t6_t, typename t7_t,
+	typename t8_t, typename t9_t, typename tType>
+struct count_type
+	{
+	static int const value =
+		+ to_int<same_type<t0_t, tType>::value>::value
+		+ to_int<same_type<t1_t, tType>::value>::value
+		+ to_int<same_type<t2_t, tType>::value>::value
+		+ to_int<same_type<t3_t, tType>::value>::value
+		+ to_int<same_type<t4_t, tType>::value>::value
+		+ to_int<same_type<t5_t, tType>::value>::value
+		+ to_int<same_type<t6_t, tType>::value>::value
+		+ to_int<same_type<t7_t, tType>::value>::value
+		+ to_int<same_type<t8_t, tType>::value>::value
+		+ to_int<same_type<t9_t, tType>::value>::value;
 	};
 
 /*! \brief Meta function used to strip reference from type.

@@ -26,6 +26,7 @@ Copyright:
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
+#include "hcore/algorithm.hxx"
 #include "hstreamblockiterator.hxx"
 
 using namespace yaal;
