@@ -236,65 +236,108 @@ struct is_member
 template<typename return_t, typename class_t>
 struct is_member<return_t ( class_t::* )( void )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t>
 struct is_member<return_t ( class_t::* )( void ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t>
+struct is_member<return_t ( class_t::* )( void ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t>
+struct is_member<return_t ( class_t::* )( void ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t>
 struct is_member<return_t ( class_t::* )( a0_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t>
 struct is_member<return_t ( class_t::* )( a0_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t>
+struct is_member<return_t ( class_t::* )( a0_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t>
+struct is_member<return_t ( class_t::* )( a0_t ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
@@ -302,11 +345,20 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a6_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
@@ -314,11 +366,20 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t, typename a7_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t, typename a7_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
@@ -326,11 +387,20 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t, typename a8_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t, typename a7_t, typename a8_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t, typename a7_t, typename a8_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const volatile>
 	{ static bool const value = true; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
@@ -338,11 +408,20 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
 	{ static bool const value = true; };
-
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
+	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
+struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
 	{ static bool const value = true; };
 
 }
