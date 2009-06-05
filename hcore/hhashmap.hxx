@@ -134,7 +134,7 @@ public:
 		: f_poOwner( a_oIt.f_poOwner ), f_ulIndex( a_oIt.f_ulIndex ),
 		f_poAtomPtr( a_oIt.f_poAtomPtr )
 		{
-		STATIC_ASSERT(( same_type<const_qual_t, other_const_qual_t>::value || same_type<const_qual_t, other_const_qual_t const>::value ));
+		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
 	HIterator& operator = ( HIterator const& a_oIt )
 		{

@@ -48,7 +48,7 @@ struct HMultiMapStorage
 		template<typename const_qual_t>
 		struct const_aware_type
 			{
-			typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+			typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
 							elem_t const,
 							accessor_elem_t>::type accessor_t;
 			typedef accessor_t accessor_ptr_t;
@@ -68,10 +68,10 @@ struct HMultiMapStorage
 		template<typename const_qual_t>
 		struct const_aware_type
 			{
-			typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+			typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
 							value_type_t const&,
 							value_type_t&>::type accessor_t;
-			typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+			typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
 							value_type_t const*,
 							value_type_t*>::type accessor_ptr_t;
 			template<typename key_provider_t, typename value_provider_t>
@@ -315,10 +315,10 @@ template<typename const_qual_t>
 class HMultiMap<key_t, value_t, storage_policy_t, helper_t>::HIterator
 	{
 	typedef HMultiMap<key_t, value_t, storage_policy_t, helper_t> multi_map_t;
-	typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+	typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
 					typename multi_map_t::multimap_engine_t::const_iterator,
 					typename multi_map_t::multimap_engine_t::iterator>::type key_iterator_t;
-	typedef typename ternary<same_type<const_qual_t, const_qual_t const>::value,
+	typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
 					typename value_list_t::const_iterator,
 					typename value_list_t::iterator>::type value_iterator_t;
 	multi_map_t const* f_poOwner;
@@ -329,7 +329,7 @@ public:
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& a_oIt ) : f_poOwner( a_oIt.f_poOwner ), f_oMajor( a_oIt.f_oMajor ), f_oMinor( a_oIt.f_oMinor )
 		{
-		STATIC_ASSERT(( same_type<const_qual_t, other_const_qual_t>::value || same_type<const_qual_t, other_const_qual_t const>::value ));
+		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
 	HIterator& operator = ( HIterator const& a_oIt )
 		{

@@ -153,7 +153,7 @@ HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::HVariant( 
 	: _mem(), _type( -1 )
 	{
 	new ( _mem ) tType( obj );
-	_type = yaal::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value;
+	_type = yaal::trait::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value;
 	M_ASSERT( ( _type >= 0 ) && ( _type <= 9 ) );
 	}
 
@@ -197,7 +197,7 @@ template<typename t0_t, typename t1_t,
 template<typename tType>
 tType& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::get( void )
 	{
-	M_ASSERT(( _type == yaal::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value ));
+	M_ASSERT(( _type == yaal::trait::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value ));
 	return ( *reinterpret_cast<tType*>( _mem ) );
 	}
 
@@ -209,7 +209,7 @@ template<typename t0_t, typename t1_t,
 template<typename tType>
 tType const& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::get( void ) const
 	{
-	M_ASSERT(( _type == yaal::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value ));
+	M_ASSERT(( _type == yaal::trait::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value ));
 	return ( *reinterpret_cast<tType const*>( _mem ) );
 	}
 

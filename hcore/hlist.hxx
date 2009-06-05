@@ -348,7 +348,7 @@ HList<tType>::HIterator<const_qual_t, treatment>::HIterator( HIterator<other_con
 	: f_poOwner( a_roIterator.f_poOwner ), f_poCurrent( a_roIterator.f_poCurrent )
 	{
 	M_PROLOG
-	STATIC_ASSERT(( same_type<const_qual_t, other_const_qual_t>::value || same_type<const_qual_t, other_const_qual_t const>::value ));
+	STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 	return;
 	M_EPILOG
 	}
