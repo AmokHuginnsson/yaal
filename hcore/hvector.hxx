@@ -27,12 +27,11 @@ Copyright:
 #ifndef YAAL_HCORE_HVECTOR_HXX_INCLUDED
 #define YAAL_HCORE_HVECTOR_HXX_INCLUDED
 
-#line 31
-
 #include <cmath>
 
 #include "hcore/harray.hxx"
 #include "hcore/hexception.hxx"
+#include "hcore/functional.hxx"
 
 namespace yaal
 {

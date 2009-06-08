@@ -31,6 +31,7 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 #include "hcore/hlist.hxx"
+#include "hcore/functional.hxx"
 
 namespace yaal
 {

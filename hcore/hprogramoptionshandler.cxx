@@ -33,14 +33,13 @@ Copyright:
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hprogramoptionshandler.hxx"
+#include "functional.hxx"
 #include "xalloc.hxx"
-#include "hlog.hxx"
-#include "hpattern.hxx"
-#include "hcore.hxx"
 #include "hstring.hxx"
 #include "hchunk.hxx"
-#include "xalloc.hxx"
+#include "hpattern.hxx"
 #include "hlog.hxx"
+#include "hcore.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
