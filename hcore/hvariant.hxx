@@ -37,10 +37,6 @@ namespace yaal
 namespace hcore
 {
 
-/*! \brief Dummy type used as a type stub in default template type argument declaration.
- */
-struct HNoType {};
-
 /*! \brief Multi type container.
  *
  * A variant type without non-empty guarantee.
@@ -48,11 +44,11 @@ struct HNoType {};
  *
  * \tparam t0_t, t1_t, ... t9_t - component types.
  */
-template<typename t0_t, typename t1_t = HNoType,
-	typename t2_t = HNoType, typename t3_t = HNoType,
-	typename t4_t = HNoType, typename t5_t = HNoType,
-	typename t6_t = HNoType, typename t7_t = HNoType,
-	typename t8_t = HNoType, typename t9_t = HNoType>
+template<typename t0_t, typename t1_t = trait::no_type,
+	typename t2_t = trait::no_type, typename t3_t = trait::no_type,
+	typename t4_t = trait::no_type, typename t5_t = trait::no_type,
+	typename t6_t = trait::no_type, typename t7_t = trait::no_type,
+	typename t8_t = trait::no_type, typename t9_t = trait::no_type>
 class HVariant
 	{
 protected:
@@ -155,7 +151,7 @@ HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::HVariant( 
 	: _mem(), _type( -1 )
 	{
 	new ( _mem ) tType( obj );
-	_type = yaal::trait::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value;
+	_type = yaal::trait::find_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::value;
 	M_ASSERT( ( _type >= 0 ) && ( _type <= 9 ) );
 	}
 
@@ -199,7 +195,7 @@ template<typename t0_t, typename t1_t,
 template<typename tType>
 tType& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::get( void )
 	{
-	M_ASSERT(( _type == yaal::trait::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value ));
+	M_ASSERT(( _type == yaal::trait::find_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::value ));
 	return ( *reinterpret_cast<tType*>( _mem ) );
 	}
 
@@ -211,7 +207,7 @@ template<typename t0_t, typename t1_t,
 template<typename tType>
 tType const& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::get( void ) const
 	{
-	M_ASSERT(( _type == yaal::trait::find_type<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, tType>::value ));
+	M_ASSERT(( _type == yaal::trait::find_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::value ));
 	return ( *reinterpret_cast<tType const*>( _mem ) );
 	}
 

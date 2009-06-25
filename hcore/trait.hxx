@@ -41,6 +41,12 @@ namespace yaal
 namespace trait
 {
 
+/*! \brief A dummy class.
+ *
+ * Dummy used for template metaprogramming tricks.
+ */
+class no_type {};
+
 /*! \brief Meta function, tells if two types are the same.
  *
  * \tparam T1 - first of two types to compare.
@@ -87,15 +93,15 @@ struct ternary<false, type_for_true, type_for_false>
 
 /*! \brief Search for given type in a type list.
  *
- * \tparam t0_t, t1_t, ..., t9_t - list of types to search.
  * \tparam tType - look for this type in given type set.
+ * \tparam t0_t, t1_t, ..., t9_t - list of types to search.
  * \retval value - index of given type in given list of types, -1 if no matching type had been found.
  */
-template<typename t0_t, typename t1_t,
-	typename t2_t, typename t3_t,
-	typename t4_t, typename t5_t,
-	typename t6_t, typename t7_t,
-	typename t8_t, typename t9_t, typename tType>
+template<typename tType, typename t0_t, typename t1_t = no_type,
+	typename t2_t = no_type, typename t3_t = no_type,
+	typename t4_t = no_type, typename t5_t = no_type,
+	typename t6_t = no_type, typename t7_t = no_type,
+	typename t8_t = no_type, typename t9_t = no_type>
 struct find_type
 	{
 	static int const value = -1
@@ -117,11 +123,11 @@ struct find_type
  * \tparam tType - look for number of occurences of this type in given type set.
  * \retval value - number of occurences of given type in given list of types.
  */
-template<typename t0_t, typename t1_t,
-	typename t2_t, typename t3_t,
-	typename t4_t, typename t5_t,
-	typename t6_t, typename t7_t,
-	typename t8_t, typename t9_t, typename tType>
+template<typename tType, typename t0_t, typename t1_t = no_type,
+	typename t2_t = no_type, typename t3_t = no_type,
+	typename t4_t = no_type, typename t5_t = no_type,
+	typename t6_t = no_type, typename t7_t = no_type,
+	typename t8_t = no_type, typename t9_t = no_type>
 struct count_type
 	{
 	static int const value =
@@ -136,6 +142,10 @@ struct count_type
 		+ to_int<same_type<t8_t, tType>::value>::value
 		+ to_int<same_type<t9_t, tType>::value>::value;
 	};
+template<typename tType, typename t0_t, typename t1_t,
+	typename t2_t, typename t3_t, typename t4_t, typename t5_t,
+	typename t6_t, typename t7_t, typename t8_t, typename t9_t>
+int const count_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::value;
 
 /*! \brief Meta function used to strip reference from type.
  *

@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCORE_HCALL_HXX_INCLUDED
 
 #include "hcore/hpointer.hxx"
+#include "hcore/trait.hxx"
 
 namespace yaal
 {
@@ -43,11 +44,6 @@ namespace hcore
 class HCallInterface
 	{
 public:
-	/*! \brief A dummy class.
-	 *
-	 * Dummy used for template metaprogramming trick in HFunctor and HCall implementation.
-	 */
-	class HPseudoType {};
 	typedef yaal::hcore::HPointer<HCallInterface> ptr_t;
 	virtual ~HCallInterface( void ) {}
 	void operator()( void )
@@ -67,16 +63,16 @@ protected:
 /*! \brief Make a functor from any standalone function.
  */
 template<typename call_t,
-	typename a0_t = HCallInterface::HPseudoType,
-	typename a1_t = HCallInterface::HPseudoType,
-	typename a2_t = HCallInterface::HPseudoType,
-	typename a3_t = HCallInterface::HPseudoType,
-	typename a4_t = HCallInterface::HPseudoType,
-	typename a5_t = HCallInterface::HPseudoType,
-	typename a6_t = HCallInterface::HPseudoType,
-	typename a7_t = HCallInterface::HPseudoType,
-	typename a8_t = HCallInterface::HPseudoType,
-	typename a9_t = HCallInterface::HPseudoType>
+	typename a0_t = trait::no_type,
+	typename a1_t = trait::no_type,
+	typename a2_t = trait::no_type,
+	typename a3_t = trait::no_type,
+	typename a4_t = trait::no_type,
+	typename a5_t = trait::no_type,
+	typename a6_t = trait::no_type,
+	typename a7_t = trait::no_type,
+	typename a8_t = trait::no_type,
+	typename a9_t = trait::no_type>
 class HFunctor
 	{
 	call_t& call;
@@ -135,31 +131,31 @@ protected:
 	};
 
 template<typename CLASS_t, typename METHOD_t,
-	typename a0_t = HCallInterface::HPseudoType,
-	typename a1_t = HCallInterface::HPseudoType,
-	typename a2_t = HCallInterface::HPseudoType,
-	typename a3_t = HCallInterface::HPseudoType,
-	typename a4_t = HCallInterface::HPseudoType,
-	typename a5_t = HCallInterface::HPseudoType,
-	typename a6_t = HCallInterface::HPseudoType,
-	typename a7_t = HCallInterface::HPseudoType,
-	typename a8_t = HCallInterface::HPseudoType,
-	typename a9_t = HCallInterface::HPseudoType>
+	typename a0_t = trait::no_type,
+	typename a1_t = trait::no_type,
+	typename a2_t = trait::no_type,
+	typename a3_t = trait::no_type,
+	typename a4_t = trait::no_type,
+	typename a5_t = trait::no_type,
+	typename a6_t = trait::no_type,
+	typename a7_t = trait::no_type,
+	typename a8_t = trait::no_type,
+	typename a9_t = trait::no_type>
 class HCall;
 
 /*! \cond */
 template<typename CLASS_t, typename METHOD_t>
 class HCall<CLASS_t, METHOD_t,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 public:
@@ -176,15 +172,15 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a0_t>
 class HCall<CLASS_t, METHOD_t,
 	a0_t,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 protected:
@@ -204,14 +200,14 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a0_t, typename a1_t>
 class HCall<CLASS_t, METHOD_t,
 	a0_t, a1_t,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 protected:
@@ -232,13 +228,13 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a0_t, typename a1_t, typename a2_t>
 class HCall<CLASS_t, METHOD_t,
 	a0_t, a1_t, a2_t,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 protected:
@@ -261,12 +257,12 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 class HCall<CLASS_t, METHOD_t,
 	a0_t, a1_t, a2_t, a3_t,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 protected:
@@ -291,11 +287,11 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a4_t>
 class HCall<CLASS_t, METHOD_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 protected:
@@ -321,10 +317,10 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a4_t, typename a5_t>
 class HCall<CLASS_t, METHOD_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 protected:
@@ -352,9 +348,9 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HCall<CLASS_t, METHOD_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type,
+	trait::no_type,
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 protected:
@@ -383,8 +379,8 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 class HCall<CLASS_t, METHOD_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
-	HCallInterface::HPseudoType,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type,
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 protected:
@@ -415,7 +411,7 @@ template<typename CLASS_t, typename METHOD_t,
 	typename a8_t>
 class HCall<CLASS_t, METHOD_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
-	HCallInterface::HPseudoType> : public HCallBase<CLASS_t, METHOD_t>
+	trait::no_type> : public HCallBase<CLASS_t, METHOD_t>
 	{
 	typedef HCallBase<CLASS_t, METHOD_t> base_t;
 protected:
