@@ -37,7 +37,7 @@ clean: clean-dep
 	@/bin/rm -f src/core src/$(TARGET).core src/1exec.core
 	@/bin/rm -f $(OBJS_TARGET)
 	@/bin/rm -f $(DIR_BUILD)/$(TARGET)/$(EXEC_NAME)
-	@cln .
+	@sh -c '. _aux/clean-lib.sh && clean .'
 
 mrproper: clean
 	@echo -n "Purging ... "; \
