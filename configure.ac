@@ -17,8 +17,6 @@ AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, d
 dnl `
 AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, default is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
 dnl `
-AC_ARG_WITH([sqlite],[AC_HELP_STRING([--with-sqlite],[Compile with SQLite driver, default is `yes' if SQLite can be found.])],[SQLITE=$withval],[SQLITE="auto"])
-dnl `
 AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, default is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
 dnl `
 AC_ARG_WITH([oracle],[AC_HELP_STRING([--with-oracle],[Compile with Oralce driver, default is `yes' if Oracle can be found.])],[ORACLE=$withval],[ORACLE="auto"])
@@ -154,13 +152,6 @@ if test ["$POSTGRES"] != ["no"] ; then
 								[],[if test ["$POSTGRES"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without PostgreSQL.])
 										fi;POSTGRES=["no"]])
-	LIBS=""
-fi
-if test ["$SQLITE"] != ["no"] ; then
-	AC_CHECK_LIB([sqlite],[sqlite_open],
-								[],[if test ["$SQLITE"] = ["yes"] ; then
-											AC_MSG_ERROR([Cannot continue without SQLite.])
-										fi;SQLITE=["no"]])
 	LIBS=""
 fi
 if test ["$SQLITE3"] != ["no"] ; then
@@ -340,14 +331,6 @@ if test ["$MYSQL"] != ["no"] ; then
 				[if test ["$MYSQL"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without MySQL devel(client)!]])
 				fi;MYSQL=["no"]])
-fi
-if test ["$SQLITE"] != ["no"] ; then
-	AC_CHECK_HEADERS([sqlite.h],
-		[AC_SUBST([DO_SQLITE_DRIVER],["sqlite"])
-			DEFAULT_DRIVER=["SQLite"]],
-				[if test ["$SQLITE"] = ["yes"] ; then
-					AC_MSG_ERROR([[Cannot continue without SQLite devel(client)!]])
-				fi;SQLITE=["no"]])
 fi
 if test ["$SQLITE3"] != ["no"] ; then
 	AC_CHECK_HEADERS([sqlite3.h],

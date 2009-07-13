@@ -111,11 +111,11 @@ void * db_connect ( char const * /* In Oracle user name is name of schema. */,
 	if ( ( l_psOracle->f_iStatus = OCILogon ( l_psOracle->f_psEnvironment,
 				l_psOracle->f_psError, & l_psOracle->f_psServiceContext,
 				reinterpret_cast<OraText const*>( a_pcLogin ),
-				strlen ( a_pcLogin ),
+				static_cast<ub4>( ::strlen( a_pcLogin ) ),
 				reinterpret_cast<OraText const*>( a_pcPassword ),
-				strlen ( a_pcPassword ),
+				static_cast<ub4>( ::strlen( a_pcPassword ) ),
 				reinterpret_cast<OraText const*>( g_oInstanceName.raw() ),
-				g_oInstanceName.get_length() ) ) != OCI_SUCCESS )
+				static_cast<ub4>( g_oInstanceName.get_length() ) ) ) != OCI_SUCCESS )
 		{
 		g_psBrokenDB = l_psOracle;
 		return ( NULL );
@@ -202,15 +202,15 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 	OQuery * l_psQuery = xcalloc < OQuery > ( 1 );
 	HString l_oQuery = a_pcQuery;
 	int l_iIters = 0;
-	int l_iLength = strlen ( a_pcQuery );
-	char * l_pcEnd = ( const_cast < char * > ( a_pcQuery ) + l_iLength ) - 1;
+	int l_iLength = static_cast<int>( ::strlen( a_pcQuery ) );
+	char * l_pcEnd = ( const_cast<char*>( a_pcQuery ) + l_iLength ) - 1;
 	
 	if ( ( * l_pcEnd ) == ';' )
 		( * l_pcEnd ) = 0;
 	l_psOracle->f_iStatus = OCIStmtPrepare2 ( l_psOracle->f_psServiceContext,
 			& l_psQuery->f_psStatement, l_psOracle->f_psError,
-			reinterpret_cast < const OraText * > ( a_pcQuery ),
-			strlen ( a_pcQuery ), NULL, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
+			reinterpret_cast<OraText const*>( a_pcQuery ),
+			static_cast<int>( ::strlen( a_pcQuery ) ), NULL, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
 	l_psQuery->f_piStatus = & l_psOracle->f_iStatus;
 	l_psQuery->f_psError = l_psOracle->f_psError;
 	if ( ( l_psOracle->f_iStatus != OCI_SUCCESS )
@@ -278,21 +278,21 @@ char* rs_get( void* a_pvData, int long a_iRow, int a_iColumn )
 	OCIParam* l_psParameter = NULL;
 	OCIDefine* l_psResult = NULL;
 	OQuery* l_psQuery = static_cast<OQuery*>( a_pvData );
-	if ( ( ( * l_psQuery->f_piStatus ) = OCIParamGet( l_psQuery->f_psStatement,
+	if ( ( ( *l_psQuery->f_piStatus ) = OCIParamGet( l_psQuery->f_psStatement,
 					OCI_HTYPE_STMT, l_psQuery->f_psError,
-					reinterpret_cast < void * * > ( & l_psParameter ), a_iColumn + 1 ) ) == OCI_SUCCESS )
+					reinterpret_cast<void**>( &l_psParameter ), a_iColumn + 1 ) ) == OCI_SUCCESS )
 		{
 		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet( l_psParameter,
-						OCI_DTYPE_PARAM, & l_iSize, 0, OCI_ATTR_DATA_SIZE,
+						OCI_DTYPE_PARAM, &l_iSize, 0, OCI_ATTR_DATA_SIZE,
 						l_psQuery->f_psError ) ) == OCI_SUCCESS )
 			{
-			l_pcData = xcalloc < char > ( l_iSize + 1 );
-			if ( ( ( * l_psQuery->f_piStatus ) = OCIDefineByPos( l_psQuery->f_psStatement,
-							& l_psResult, l_psQuery->f_psError, a_iColumn + 1, l_pcData, l_iSize + 1,
+			l_pcData = xcalloc<char>( l_iSize + 1 );
+			if ( ( ( *l_psQuery->f_piStatus ) = OCIDefineByPos( l_psQuery->f_psStatement,
+							&l_psResult, l_psQuery->f_psError, a_iColumn + 1, l_pcData, l_iSize + 1,
 							SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT ) ) == OCI_SUCCESS )
 				{
-				if ( ( ( * l_psQuery->f_piStatus ) = OCIStmtFetch2 ( l_psQuery->f_psStatement,
-								l_psQuery->f_psError, 1, OCI_FETCH_ABSOLUTE, a_iRow,
+				if ( ( ( *l_psQuery->f_piStatus ) = OCIStmtFetch2( l_psQuery->f_psStatement,
+								l_psQuery->f_psError, 1, OCI_FETCH_ABSOLUTE, static_cast<ub4>( a_iRow ),
 								OCI_DEFAULT ) ) == OCI_SUCCESS )
 					{
 					l_psAllocator = xcalloc<OAllocator>( 1 );

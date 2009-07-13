@@ -29,7 +29,7 @@ VERSION				= 0
 SUBVERSION		= 0
 EXTRAVERSION	= 16
 COMPONENTS		= hcore tools dbwrapper hconsole hdata
-DRIVERS				= @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE_DRIVER@ @DO_SQLITE3_DRIVER@
+DRIVERS				= @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 DIR_TARGET		= $(HOME)/usr/lib
 DIR_HEADERS		= $(HOME)/usr/include/yaal/
 VPATH					= $(DIR_ROOT)
@@ -85,8 +85,6 @@ LIBS_hdata			= "-lhconsole -ldbwrapper -ltools -lhcore -lncurses @HCORE_LIBS@"
 
 DEPS_sqlite3		= $(TARGET_hcore)
 LIBS_sqlite3		= "-lsqlite3 -lhcore"
-DEPS_sqlite			= $(TARGET_hcore)
-LIBS_sqlite			= "-lsqlite -lhcore"
 DEPS_mysql			= $(TARGET_hcore)
 LIBS_mysql			= "-lmysqlclient -lhcore"
 DEPS_postgresql	= $(TARGET_hcore)
