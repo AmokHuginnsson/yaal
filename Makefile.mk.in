@@ -168,7 +168,7 @@ clean-dep:
 
 clean: clean-dep
 	@/bin/rm -f $(OBJS); \
-	cln .
+	sh -c '. _aux/clean-lib.sh && clean .'
 
 mrproper: clean
 	@echo -n "Purging ... "; \
