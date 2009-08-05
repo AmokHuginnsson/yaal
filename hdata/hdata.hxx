@@ -1,7 +1,7 @@
 /*
----           hdata.h 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           yaal 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hdata.hxx - this file is integral part of hdata.h project.
+	hdata.hxx - this file is integral part of yaal project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
