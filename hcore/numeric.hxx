@@ -127,6 +127,30 @@ struct power<base,0,helper>
 	};
 /*! \endcond */
 
+/*! \brief Perform compile time ternary operator on integers.
+ *
+ * \tparam condition - staticly checkable condition that tells which type will be used.
+ * \tparam value_for_true - value to be used if condition is true.
+ * \tparam value_for_false - value to be used if condition is false.
+ * \retval value - conditional value.
+ */
+template<bool const condition, int long value_for_true, int long value_for_false>
+struct ternary;
+
+/* \cond */
+template<int long value_for_true, int long value_for_false>
+struct ternary<true, value_for_true, value_for_false>
+	{
+	static int long const value = value_for_true;
+	};
+
+template<int long value_for_true, int long value_for_false>
+struct ternary<false, value_for_true, value_for_false>
+	{
+	static int long const value = value_for_false;
+	};
+/* \endcond */
+
 }
 
 #endif /* not YAAL_HCORE_NUMERIC_HXX_INCLUDED */

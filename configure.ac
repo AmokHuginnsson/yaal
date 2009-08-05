@@ -347,7 +347,10 @@ AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 LIBS="${HCORE_LIBS}"
 AC_CHECK_FUNCS([getline memrchr gethostbyname_r gethostbyaddr_r strcasestr strtold asprintf])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
-AC_CHECK_DECL([basename],[],[AC_DEFINE([HAVE_BASENAME_IN_LIBGEN],[],[Does your basename() is included in libgen library?])],[#include <string.h>])
+AC_MSG_CHECKING([whether basename is declared in string.h])
+AC_COMPILE_IFELSE([#include <string.h>
+									 int main( int, char** ){ char* p = NULL; basename( p ); return ( 0 ); }],[AC_MSG_RESULT([yes])],
+									 [AC_DEFINE([HAVE_BASENAME_IN_LIBGEN],[1],[Does your basename() is included in libgen library?]) AC_MSG_RESULT([no])])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
 AC_CHECK_DECLS([floorl],[],[],[#include <cmath>])
@@ -356,9 +359,10 @@ AC_CHECK_DECLS([SUN_LEN],[],[],[#include <sys/un.h>])
 AC_CHECK_DECLS([getaddrinfo],[],[],[#include <netdb.h>
 								#include<netinet/in.h>
 								#include<sys/socket.h>])
+AC_MSG_CHECKING([whether powl is available])
 AC_COMPILE_IFELSE([#include<cmath>
 									 void f(){ ::powl( 0., 0. ); }],
-	[AC_DEFINE([HAVE_POWL],[1],[We have ::powl().])])
+	[AC_DEFINE([HAVE_POWL],[1],[We have ::powl().]) AC_MSG_RESULT([yes])], AC_MSG_RESULT([no]))
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 
