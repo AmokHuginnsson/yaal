@@ -41,6 +41,11 @@ namespace yaal
 namespace trait
 {
 
+/*! \cond */
+typedef char YES;
+typedef struct { char x[2]; } NO;
+/*! \endcond */
+
 /*! \brief A dummy class.
  *
  * Dummy used for template metaprogramming tricks.
@@ -265,6 +270,20 @@ public:
 		*_ref = v;
 		return ( *_ref );
 		}
+	};
+
+/*! \brief Check if given class has been derived from another given class.
+ *
+ * \tparam derived_t - suspected derived type.
+ * \tparam base_t - suspected base type.
+ * \retval value - true iff derived_t is derived from base_t.
+ */
+template<typename derived_t, typename base_t>
+struct is_kind_of
+	{
+	static YES calc( base_t const* );
+	static NO calc( ... );
+	static bool const value = sizeof ( calc( static_cast<derived_t const*>( NULL ) ) ) == sizeof ( YES );
 	};
 
 template<typename T>

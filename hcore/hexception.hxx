@@ -39,6 +39,7 @@ Copyright:
 #ifdef __YAAL_BUILD__
 #	include "config.hxx"
 #endif /* __YAAL_BUILD__ */
+#include "hcore/trait.hxx"
 #include "hcore/hstring.hxx"
 
 typedef void self_t;
@@ -235,11 +236,6 @@ struct void_to_base<void, base_t>
 	};
 /*! \endcond */
 
-/*! \cond */
-typedef char YES;
-typedef struct { char x[2]; } NO;
-/*! \endcond */
-
 template<int const, typename>
 struct existing_hier;
 
@@ -249,9 +245,9 @@ template<typename tType>
 struct context_hier
 	{
 	template<typename real_class>
-	static YES has_hier( typename real_class::hier_t* );
+	static trait::YES has_hier( typename real_class::hier_t* );
 	template<typename real_class>
-	static NO has_hier( ... );
+	static trait::NO has_hier( ... );
 	typedef typename existing_hier<sizeof ( has_hier<tType>( 0 ) ), tType>::type type;
 	};
 

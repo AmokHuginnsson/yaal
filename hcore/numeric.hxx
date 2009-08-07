@@ -31,6 +31,8 @@ Copyright:
 #ifndef YAAL_HCORE_NUMERIC_HXX_INCLUDED
 #define YAAL_HCORE_NUMERIC_HXX_INCLUDED
 
+#include <limits.h>
+
 namespace yaal
 {
 
