@@ -71,31 +71,6 @@ static const free_standing_call_args::arg<10> _10;
 
 }
 
-template<typename CLASS_t, typename METHOD_t,
-	typename a0_t = trait::no_type, typename a1_t = trait::no_type,
-	typename a2_t = trait::no_type, typename a3_t = trait::no_type,
-	typename a4_t = trait::no_type, typename a5_t = trait::no_type,
-	typename a6_t = trait::no_type, typename a7_t = trait::no_type,
-	typename a8_t = trait::no_type, typename a9_t = trait::no_type>
-struct call_calculator
-	{
-	struct free_standing_args
-		{
-		static int const value =
-			ternary<trait::is_kind_of<a0_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a1_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a2_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a3_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a4_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a5_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a6_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a7_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a8_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a9_t, free_standing_call_args::arg_base>::value, 1, 0>::value;
-		};
-	};
-
-
 /*! \brief Interface to abstration of any-method of any-class invocation.
  */
 class HBoundCallInterface
@@ -311,16 +286,16 @@ class HBoundCall<CALL_t,
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
+	a0_t _a0;
 public:
 	HBoundCall( CALL_t call_, a0_t a0 )
 		: base_t( call_ ),
-		f_xArg0( a0 ) {}
+		_a0( a0 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0 ); }
+		{ (base_t::_call)( _a0 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0 ); }
+		{ (base_t::_call)( _a0 ); }
 	};
 
 template<typename CALL_t,
@@ -338,17 +313,17 @@ class HBoundCall<CALL_t,
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
-	a1_t f_xArg1;
+	a0_t _a0;
+	a1_t _a1;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1 )
 		: base_t( call_ ),
-		f_xArg0( a0 ), f_xArg1( a1 ) {}
+		_a0( a0 ), _a1( a1 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0, f_xArg1 ); }
+		{ (base_t::_call)( _a0, _a1 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0, f_xArg1 ); }
+		{ (base_t::_call)( _a0, _a1 ); }
 	};
 
 template<typename CALL_t,
@@ -365,19 +340,19 @@ class HBoundCall<CALL_t,
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
-	a1_t f_xArg1;
-	a2_t f_xArg2;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2 )
 		: base_t( call_ ),
-		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ) {}
+		_a0( a0 ), _a1( a1 ), _a2( a2 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2 ); }
+		{ (base_t::_call)( _a0, _a1, _a2 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2 ); }
+		{ (base_t::_call)( _a0, _a1, _a2 ); }
 	};
 
 template<typename CALL_t,
@@ -393,20 +368,20 @@ class HBoundCall<CALL_t,
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
-	a1_t f_xArg1;
-	a2_t f_xArg2;
-	a3_t f_xArg3;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3 )
 		: base_t( call_ ),
-		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ) {}
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3 ); }
 	};
 
 template<typename CALL_t,
@@ -422,21 +397,21 @@ class HBoundCall<CALL_t,
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
-	a1_t f_xArg1;
-	a2_t f_xArg2;
-	a3_t f_xArg3;
-	a4_t f_xArg4;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4 )
 		: base_t( call_ ),
-		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ) {}
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ); }
 	};
 
 template<typename CALL_t,
@@ -451,23 +426,23 @@ class HBoundCall<CALL_t,
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
-	a1_t f_xArg1;
-	a2_t f_xArg2;
-	a3_t f_xArg3;
-	a4_t f_xArg4;
-	a5_t f_xArg5;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
 		: base_t( call_ ),
-		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
-		f_xArg5( a5 ) {}
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ); }
 	};
 
 template<typename CALL_t,
@@ -481,24 +456,24 @@ class HBoundCall<CALL_t,
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
-	a1_t f_xArg1;
-	a2_t f_xArg2;
-	a3_t f_xArg3;
-	a4_t f_xArg4;
-	a5_t f_xArg5;
-	a6_t f_xArg6;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
 		: base_t( call_ ),
-		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
-		f_xArg5( a5 ), f_xArg6( a6 ) {}
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ), _a6( a6 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ); }
 	};
 
 template<typename CALL_t,
@@ -511,25 +486,25 @@ class HBoundCall<CALL_t,
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
-	a1_t f_xArg1;
-	a2_t f_xArg2;
-	a3_t f_xArg3;
-	a4_t f_xArg4;
-	a5_t f_xArg5;
-	a6_t f_xArg6;
-	a7_t f_xArg7;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
 		: base_t( call_ ),
-		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
-		f_xArg5( a5 ), f_xArg6( a6 ), f_xArg7( a7 ) {}
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ), _a6( a6 ), _a7( a7 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ); }
 	};
 
 template<typename CALL_t,
@@ -542,27 +517,27 @@ class HBoundCall<CALL_t,
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
-	a1_t f_xArg1;
-	a2_t f_xArg2;
-	a3_t f_xArg3;
-	a4_t f_xArg4;
-	a5_t f_xArg5;
-	a6_t f_xArg6;
-	a7_t f_xArg7;
-	a8_t f_xArg8;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
 			a8_t a8 )
 		: base_t( call_ ),
-		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
-		f_xArg5( a5 ), f_xArg6( a6 ), f_xArg7( a7 ), f_xArg8( a8 ) {}
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ); }
 	};
 /*! \endcond */
 
@@ -582,28 +557,28 @@ class HBoundCall : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
-	a0_t f_xArg0;
-	a1_t f_xArg1;
-	a2_t f_xArg2;
-	a3_t f_xArg3;
-	a4_t f_xArg4;
-	a5_t f_xArg5;
-	a6_t f_xArg6;
-	a7_t f_xArg7;
-	a8_t f_xArg8;
-	a9_t f_xArg9;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+	a8_t _a8;
+	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
 			a8_t a8, a9_t a9 )
 		: base_t( call_ ),
-		f_xArg0( a0 ), f_xArg1( a1 ), f_xArg2( a2 ), f_xArg3( a3 ), f_xArg4( a4 ),
-		f_xArg5( a5 ), f_xArg6( a6 ), f_xArg7( a7 ), f_xArg8( a8 ), f_xArg9( a9 ) {}
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
 protected:
 	virtual void do_invoke( void )
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ); }
 	virtual void do_invoke( void ) const
-		{ (base_t::_call)( f_xArg0, f_xArg1, f_xArg2, f_xArg3, f_xArg4, f_xArg5, f_xArg6, f_xArg7, f_xArg8, f_xArg9 ); }
+		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ); }
 	};
 
 template<typename CLASS_t, typename METHOD_t>
@@ -694,6 +669,370 @@ HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
 	{ return ( HBoundCallInterface::ptr_t(
 				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>(
 					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
+
+template<typename return_t, typename CALL_t,
+	typename a0_t = trait::no_type,
+	typename a1_t = trait::no_type,
+	typename a2_t = trait::no_type,
+	typename a3_t = trait::no_type,
+	typename a4_t = trait::no_type,
+	typename a5_t = trait::no_type,
+	typename a6_t = trait::no_type,
+	typename a7_t = trait::no_type,
+	typename a8_t = trait::no_type,
+	typename a9_t = trait::no_type>
+class HCall;
+
+template<typename METHOD_t,
+	typename a0_t = trait::no_type, typename a1_t = trait::no_type,
+	typename a2_t = trait::no_type, typename a3_t = trait::no_type,
+	typename a4_t = trait::no_type, typename a5_t = trait::no_type,
+	typename a6_t = trait::no_type, typename a7_t = trait::no_type,
+	typename a8_t = trait::no_type, typename a9_t = trait::no_type, typename a10_t = trait::no_type>
+struct call_calculator
+	{
+	struct free_standing_args
+		{
+		static int const value =
+			ternary<trait::is_kind_of<typename trait::ternary<trait::is_member<METHOD_t>::value,a10_t,a0_t>::type, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ ternary<trait::is_kind_of<a1_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ ternary<trait::is_kind_of<a2_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ ternary<trait::is_kind_of<a3_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ ternary<trait::is_kind_of<a4_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ ternary<trait::is_kind_of<a5_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ ternary<trait::is_kind_of<a6_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ ternary<trait::is_kind_of<a7_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ ternary<trait::is_kind_of<a8_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ ternary<trait::is_kind_of<a9_t, free_standing_call_args::arg_base>::value, 1, 0>::value;
+		};
+	typedef typename trait::ternary<trait::is_member<METHOD_t>::value,
+					HCall<typename trait::return_type<METHOD_t>::type, HFunctor<a0_t, METHOD_t>, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
+					HCall<typename trait::return_type<METHOD_t>::type, METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t> >::type type;
+	};
+
+/*! \cond */
+template<typename return_t, typename CALL_t>
+class HCall<return_t, CALL_t,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+public:
+	HCall( CALL_t call_ )
+		: _call( call_ ) {}
+	return_t operator()( void )
+		{ return ( _call() ); }
+	return_t operator()( void ) const
+		{ return ( _call() ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t>
+class HCall<return_t, CALL_t,
+	a0_t,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+public:
+	HCall( CALL_t call_, a0_t a0 )
+		: _call( call_ ),
+		_a0( a0 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t>
+class HCall<return_t, CALL_t,
+	a0_t, a1_t,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type>
+	{
+protected:
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1 )
+		: _call( call_ ),
+		_a0( a0 ), _a1( a1 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0, _a1 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0, _a1 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t>
+class HCall<return_t, CALL_t,
+	a0_t, a1_t, a2_t,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2 )
+		: _call( call_ ),
+		_a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0, _a1, _a2 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0, _a1, _a2 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+class HCall<return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3 )
+		: _call( call_ ),
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0, _a1, _a2, _a3 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0, _a1, _a2, _a3 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t>
+class HCall<return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4 )
+		: _call( call_ ),
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t>
+class HCall<return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		: _call( call_ ),
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t>
+class HCall<return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+	trait::no_type,
+	trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+		: _call( call_ ),
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ), _a6( a6 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+class HCall<return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+	trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+		: _call( call_ ),
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t>
+class HCall<return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+	a8_t _a8;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
+			a8_t a8 )
+		: _call( call_ ),
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
+	};
+/*! \endcond */
+
+/*! \brief Implementation of abstration of any-method of any-class invocation.
+ *
+ * \tparam CALL_t - class on which this invocation will operate.
+ * \tparam METHOD_t - method of given class CALL_t that shall be invoked.
+ * \tparam a0_t - first argument to given METHOD_t of CALL_t.
+ * \tparam a1_t - second argument to given METHOD_t of CALL_t.
+ * \tparam aN_t - N-th argument to given METHOD_t of CALL_t.
+ */
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t>
+class HCall
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+	a8_t _a8;
+	a9_t _a9;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
+			a8_t a8, a9_t a9 )
+		: _call( call_ ),
+		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
+		_a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	return_t operator()( void )
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
+	return_t operator()( void ) const
+		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
+	};
+
+template<typename METHOD_t>
+typename call_calculator<METHOD_t>::type call( METHOD_t A_METHOD )
+	{ return ( typename call_calculator<METHOD_t>::type( A_METHOD ) ); }
+
+template<typename METHOD_t, typename a0_t>
+typename call_calculator<METHOD_t, a0_t>::type call( METHOD_t A_METHOD, a0_t a0 )
+	{ return ( typename call_calculator<METHOD_t, a0_t>::type( A_METHOD, a0 ) ); }
 
 }
 
