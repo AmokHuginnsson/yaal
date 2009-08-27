@@ -233,31 +233,21 @@ protected:
 	};
 
 template<typename CALL_t,
-	typename a0_t = trait::no_type,
-	typename a1_t = trait::no_type,
-	typename a2_t = trait::no_type,
-	typename a3_t = trait::no_type,
-	typename a4_t = trait::no_type,
-	typename a5_t = trait::no_type,
-	typename a6_t = trait::no_type,
-	typename a7_t = trait::no_type,
-	typename a8_t = trait::no_type,
-	typename a9_t = trait::no_type>
+	typename a0_t = trait::no_type,	typename a1_t = trait::no_type,
+	typename a2_t = trait::no_type,	typename a3_t = trait::no_type,
+	typename a4_t = trait::no_type,	typename a5_t = trait::no_type,
+	typename a6_t = trait::no_type,	typename a7_t = trait::no_type,
+	typename a8_t = trait::no_type,	typename a9_t = trait::no_type>
 class HBoundCall;
 
 /*! \cond */
 template<typename CALL_t>
 class HBoundCall<CALL_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type> : public HBoundCallBase<CALL_t>
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type> : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 public:
@@ -274,14 +264,10 @@ template<typename CALL_t,
 	typename a0_t>
 class HBoundCall<CALL_t,
 	a0_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
 	trait::no_type> : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
@@ -302,14 +288,10 @@ template<typename CALL_t,
 	typename a0_t, typename a1_t>
 class HBoundCall<CALL_t,
 	a0_t, a1_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type> : public HBoundCallBase<CALL_t>
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type> : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
@@ -330,12 +312,9 @@ template<typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
 class HBoundCall<CALL_t,
 	a0_t, a1_t, a2_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
 	trait::no_type> : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
@@ -359,12 +338,9 @@ template<typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 class HBoundCall<CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type> : public HBoundCallBase<CALL_t>
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type> : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
@@ -389,10 +365,8 @@ template<typename CALL_t,
 	typename a4_t>
 class HBoundCall<CALL_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
 	trait::no_type> : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
@@ -419,10 +393,8 @@ template<typename CALL_t,
 	typename a4_t, typename a5_t>
 class HBoundCall<CALL_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type> : public HBoundCallBase<CALL_t>
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type> : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
@@ -450,8 +422,7 @@ template<typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<CALL_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,
-	trait::no_type,
+	trait::no_type,	trait::no_type,
 	trait::no_type> : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
@@ -481,8 +452,7 @@ template<typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 class HBoundCall<CALL_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
-	trait::no_type,
-	trait::no_type> : public HBoundCallBase<CALL_t>
+	trait::no_type,	trait::no_type> : public HBoundCallBase<CALL_t>
 	{
 	typedef HBoundCallBase<CALL_t> base_t;
 protected:
@@ -671,16 +641,11 @@ HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
 					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 
 template<typename return_t, typename CALL_t,
-	typename a0_t = trait::no_type,
-	typename a1_t = trait::no_type,
-	typename a2_t = trait::no_type,
-	typename a3_t = trait::no_type,
-	typename a4_t = trait::no_type,
-	typename a5_t = trait::no_type,
-	typename a6_t = trait::no_type,
-	typename a7_t = trait::no_type,
-	typename a8_t = trait::no_type,
-	typename a9_t = trait::no_type>
+	typename a0_t = trait::no_type,	typename a1_t = trait::no_type,
+	typename a2_t = trait::no_type,	typename a3_t = trait::no_type,
+	typename a4_t = trait::no_type,	typename a5_t = trait::no_type,
+	typename a6_t = trait::no_type,	typename a7_t = trait::no_type,
+	typename a8_t = trait::no_type,	typename a9_t = trait::no_type>
 class HCall;
 
 template<typename METHOD_t,
@@ -713,16 +678,11 @@ struct call_calculator
 /*! \cond */
 template<typename return_t, typename CALL_t>
 class HCall<return_t, CALL_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type>
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type>
 	{
 	CALL_t _call;
 public:
@@ -738,14 +698,10 @@ template<typename return_t, typename CALL_t,
 	typename a0_t>
 class HCall<return_t, CALL_t,
 	a0_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -764,14 +720,10 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t>
 class HCall<return_t, CALL_t,
 	a0_t, a1_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type>
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type>
 	{
 protected:
 	CALL_t _call;
@@ -791,12 +743,9 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
 class HCall<return_t, CALL_t,
 	a0_t, a1_t, a2_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -818,12 +767,9 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 class HCall<return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type>
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -846,10 +792,8 @@ template<typename return_t, typename CALL_t,
 	typename a4_t>
 class HCall<return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -874,10 +818,8 @@ template<typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t>
 class HCall<return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type,
-	trait::no_type>
+	trait::no_type,	trait::no_type,
+	trait::no_type,	trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -903,8 +845,7 @@ template<typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HCall<return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,
-	trait::no_type,
+	trait::no_type,	trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
