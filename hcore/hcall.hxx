@@ -53,6 +53,35 @@ struct arg : public arg_base
 	{
 	};
 
+template<bool same, int, typename, typename>
+struct getter;
+
+template<int arg_no, typename arg_t, typename free_arg_t>
+struct arg_resolve
+	{
+	typedef typename trait::ternary<trait::same_type<arg<arg_no>, arg_t>::value, free_arg_t, arg_t>::type return_t;
+	inline static return_t get( arg_t a, free_arg_t fa )
+		{
+		return ( getter<trait::same_type<arg<arg_no>, arg_t>::value, arg_no, arg_t, free_arg_t>::get( a, fa ) );
+		}
+	};
+
+template<>
+template<int arg_no, typename arg_t, typename free_arg_t>
+struct getter<true, arg_no, arg_t, free_arg_t>
+	{
+	inline static typename arg_resolve<arg_no, arg_t, free_arg_t>::return_t get( arg_t, free_arg_t fa )
+		{ return ( fa ); }
+	};
+
+template<>
+template<int arg_no, typename arg_t, typename free_arg_t>
+struct getter<false, arg_no, arg_t, free_arg_t>
+	{
+	inline static typename arg_resolve<arg_no, arg_t, free_arg_t>::return_t get( arg_t a, free_arg_t )
+		{ return ( a ); }
+	};
+
 }
 
 namespace
@@ -640,7 +669,16 @@ HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
 				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>(
 					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 
-template<typename return_t, typename CALL_t,
+/*! \brief Implementation of abstration of any-method of any-class invocation.
+ *
+ * \tparam free_args - how many free standing args this call have.
+ * \tparam return_t - call result type.
+ * \tparam CALL_t - method or function to be invoked.
+ * \tparam a0_t - first argument to given METHOD_t of CALL_t.
+ * \tparam a1_t - second argument to given METHOD_t of CALL_t.
+ * \tparam aN_t - N-th argument to given METHOD_t of CALL_t.
+ */
+template<int free_args, typename return_t, typename CALL_t,
 	typename a0_t = trait::no_type,	typename a1_t = trait::no_type,
 	typename a2_t = trait::no_type,	typename a3_t = trait::no_type,
 	typename a4_t = trait::no_type,	typename a5_t = trait::no_type,
@@ -670,105 +708,130 @@ struct call_calculator
 			+ ternary<trait::is_kind_of<a8_t, free_standing_call_args::arg_base>::value, 1, 0>::value
 			+ ternary<trait::is_kind_of<a9_t, free_standing_call_args::arg_base>::value, 1, 0>::value;
 		};
-	typedef typename trait::ternary<trait::is_member<METHOD_t>::value,
-					HCall<typename trait::return_type<METHOD_t>::type, HFunctor<a0_t, METHOD_t>, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-					HCall<typename trait::return_type<METHOD_t>::type, METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t> >::type type;
+	struct functor
+		{
+		typedef HFunctor<a0_t, METHOD_t> functor_t;
+		typedef HCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
+						functor_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> type;
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8, a9 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return type( functor_t( a0, m ), a1, a2, a3 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
+			{ return type( functor_t( a0, m ), a1, a2 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1 )
+			{ return type( functor_t( a0, m ), a1 ); }
+		inline static type make( METHOD_t m, a0_t a0 )
+			{ return type( functor_t( a0, m ) ); }
+		};
+	struct function
+		{
+		typedef HCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
+						METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t> type;
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+			{ return type( m, a0, a1, a2, a3, a4, a5, a6, a7 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+			{ return type( m, a0, a1, a2, a3, a4, a5, a6 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+			{ return type( m, a0, a1, a2, a3, a4, a5 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return type( m, a0, a1, a2, a3, a4 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return type( m, a0, a1, a2, a3 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
+			{ return type( m, a0, a1, a2 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1 )
+			{ return type( m, a0, a1 ); }
+		inline static type make( METHOD_t m, a0_t a0 )
+			{ return type( m, a0 ); }
+		inline static type make( METHOD_t m )
+			{ return type( m ); }
+		};
+	typedef typename trait::ternary<trait::is_member<METHOD_t>::value, functor, function>::type type;
 	};
 
 /*! \cond */
 template<typename return_t, typename CALL_t>
-class HCall<return_t, CALL_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
+class HCall<0, return_t, CALL_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type,	trait::no_type>
 	{
 	CALL_t _call;
 public:
 	HCall( CALL_t call_ )
 		: _call( call_ ) {}
-	return_t operator()( void )
-		{ return ( _call() ); }
-	return_t operator()( void ) const
-		{ return ( _call() ); }
+	return_t operator()( void ) { return ( _call() ); }
+	return_t operator()( void ) const { return ( _call() ); }
 	};
 
-template<typename return_t, typename CALL_t,
-	typename a0_t>
-class HCall<return_t, CALL_t,
-	a0_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
+template<typename return_t, typename CALL_t, typename a0_t>
+class HCall<0, return_t, CALL_t, a0_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
 public:
 	HCall( CALL_t call_, a0_t a0 )
-		: _call( call_ ),
-		_a0( a0 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0 ) ); }
+		: _call( call_ ), _a0( a0 ) {}
+	return_t operator()( void ) { return ( _call( _a0 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0 ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
-	typename a0_t, typename a1_t>
-class HCall<return_t, CALL_t,
-	a0_t, a1_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type>
+template<typename return_t, typename CALL_t, typename a0_t, typename a1_t>
+class HCall<0, return_t, CALL_t, a0_t, a1_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
 	{
-protected:
 	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: _call( call_ ),
-		_a0( a0 ), _a1( a1 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0, _a1 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0, _a1 ) ); }
+		: _call( call_ ), _a0( a0 ), _a1( a1 ) {}
+	return_t operator()( void ) { return ( _call( _a0, _a1 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0, _a1 ) ); }
 	};
 
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
-class HCall<return_t, CALL_t,
-	a0_t, a1_t, a2_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type>
+class HCall<0, return_t, CALL_t, a0_t, a1_t, a2_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
 public:
-	HCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2 )
-		: _call( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0, _a1, _a2 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0, _a1, _a2 ) ); }
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+	return_t operator()( void ) { return ( _call( _a0, _a1, _a2 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2 ) ); }
 	};
 
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HCall<return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
+class HCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type,	trait::no_type>
 	{
 	CALL_t _call;
@@ -777,23 +840,17 @@ class HCall<return_t, CALL_t,
 	a2_t _a2;
 	a3_t _a3;
 public:
-	HCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3 )
-		: _call( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0, _a1, _a2, _a3 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0, _a1, _a2, _a3 ) ); }
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3 ) ); }
 	};
 
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HCall<return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
+class HCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -803,23 +860,17 @@ class HCall<return_t, CALL_t,
 	a3_t _a3;
 	a4_t _a4;
 public:
-	HCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4 )
-		: _call( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4 ) ); }
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4 ) ); }
 	};
 
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HCall<return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type>
+class HCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -829,24 +880,17 @@ class HCall<return_t, CALL_t,
 	a4_t _a4;
 	a5_t _a5;
 public:
-	HCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: _call( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
 	};
 
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HCall<return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type>
+class HCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+	trait::no_type,	trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -859,22 +903,16 @@ class HCall<return_t, CALL_t,
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: _call( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ), _a6( a6 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
 	};
 
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HCall<return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
-	trait::no_type,
-	trait::no_type>
+class HCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+	trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -888,21 +926,16 @@ class HCall<return_t, CALL_t,
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
 	};
 
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HCall<return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -916,32 +949,17 @@ class HCall<return_t, CALL_t,
 	a7_t _a7;
 	a8_t _a8;
 public:
-	HCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
-			a8_t a8 )
-		: _call( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
 	};
-/*! \endcond */
 
-/*! \brief Implementation of abstration of any-method of any-class invocation.
- *
- * \tparam CALL_t - class on which this invocation will operate.
- * \tparam METHOD_t - method of given class CALL_t that shall be invoked.
- * \tparam a0_t - first argument to given METHOD_t of CALL_t.
- * \tparam a1_t - second argument to given METHOD_t of CALL_t.
- * \tparam aN_t - N-th argument to given METHOD_t of CALL_t.
- */
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HCall
+class HCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -955,25 +973,421 @@ class HCall
 	a8_t _a8;
 	a9_t _a9;
 public:
-	HCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
-			a8_t a8, a9_t a9 )
-		: _call( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	return_t operator()( void )
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
-	return_t operator()( void ) const
-		{ return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
+	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
 	};
 
+template<typename return_t, typename CALL_t, typename a0_t>
+class HCall<1, return_t, CALL_t, a0_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+public:
+	HCall( CALL_t call_, a0_t a0 )
+		: _call( call_ ), _a0( a0 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call( a0 ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call( a0 ) ); }
+	};
+
+template<typename T1, typename T2>
+struct rt
+	{
+	};
+
+template<typename return_t, typename CALL_t, typename a0_t, typename a1_t>
+class HCall<1, return_t, CALL_t, a0_t, a1_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ) ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ) ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t>
+class HCall<1, return_t, CALL_t, a0_t, a1_t, a2_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ) ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ) ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+class HCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ) ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ) ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t>
+class HCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ) ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ) ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t>
+class HCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ) ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ) ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t>
+class HCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ),
+				free_standing_call_args::arg_resolve<1, a6_t, fa0_t>::get( _a6, a0 ) ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ),
+				free_standing_call_args::arg_resolve<1, a6_t, fa0_t>::get( _a6, a0 ) ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+class HCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+	trait::no_type, trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ),
+				free_standing_call_args::arg_resolve<1, a6_t, fa0_t>::get( _a6, a0 ),
+				free_standing_call_args::arg_resolve<1, a7_t, fa0_t>::get( _a7, a0 ) ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ),
+				free_standing_call_args::arg_resolve<1, a6_t, fa0_t>::get( _a6, a0 ),
+				free_standing_call_args::arg_resolve<1, a7_t, fa0_t>::get( _a7, a0 ) ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t>
+class HCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+	trait::no_type>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+	a8_t _a8;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ),
+				free_standing_call_args::arg_resolve<1, a6_t, fa0_t>::get( _a6, a0 ),
+				free_standing_call_args::arg_resolve<1, a7_t, fa0_t>::get( _a7, a0 ),
+				free_standing_call_args::arg_resolve<1, a8_t, fa0_t>::get( _a8, a0 ) ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ),
+				free_standing_call_args::arg_resolve<1, a6_t, fa0_t>::get( _a6, a0 ),
+				free_standing_call_args::arg_resolve<1, a7_t, fa0_t>::get( _a7, a0 ),
+				free_standing_call_args::arg_resolve<1, a8_t, fa0_t>::get( _a8, a0 ) ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t>
+class HCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+	{
+	CALL_t _call;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+	a8_t _a8;
+	a9_t _a9;
+public:
+	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ),
+				free_standing_call_args::arg_resolve<1, a6_t, fa0_t>::get( _a6, a0 ),
+				free_standing_call_args::arg_resolve<1, a7_t, fa0_t>::get( _a7, a0 ),
+				free_standing_call_args::arg_resolve<1, a8_t, fa0_t>::get( _a8, a0 ),
+				free_standing_call_args::arg_resolve<1, a9_t, fa0_t>::get( _a9, a0 ) ) ); }
+	template<typename fa0_t>
+	return_t operator()( fa0_t a0 ) const { return ( _call(
+				free_standing_call_args::arg_resolve<1, a0_t, fa0_t>::get( _a0, a0 ),
+				free_standing_call_args::arg_resolve<1, a1_t, fa0_t>::get( _a1, a0 ),
+				free_standing_call_args::arg_resolve<1, a2_t, fa0_t>::get( _a2, a0 ),
+				free_standing_call_args::arg_resolve<1, a3_t, fa0_t>::get( _a3, a0 ),
+				free_standing_call_args::arg_resolve<1, a4_t, fa0_t>::get( _a4, a0 ),
+				free_standing_call_args::arg_resolve<1, a5_t, fa0_t>::get( _a5, a0 ),
+				free_standing_call_args::arg_resolve<1, a6_t, fa0_t>::get( _a6, a0 ),
+				free_standing_call_args::arg_resolve<1, a7_t, fa0_t>::get( _a7, a0 ),
+				free_standing_call_args::arg_resolve<1, a8_t, fa0_t>::get( _a8, a0 ),
+				free_standing_call_args::arg_resolve<1, a9_t, fa0_t>::get( _a9, a0 ) ) ); }
+	};
+
+/*! \endcond */
+
 template<typename METHOD_t>
-typename call_calculator<METHOD_t>::type call( METHOD_t A_METHOD )
-	{ return ( typename call_calculator<METHOD_t>::type( A_METHOD ) ); }
+typename call_calculator<METHOD_t>::type::type call( METHOD_t A_METHOD )
+	{ return ( call_calculator<METHOD_t>::type::make( A_METHOD ) ); }
 
 template<typename METHOD_t, typename a0_t>
-typename call_calculator<METHOD_t, a0_t>::type call( METHOD_t A_METHOD, a0_t a0 )
-	{ return ( typename call_calculator<METHOD_t, a0_t>::type( A_METHOD, a0 ) ); }
+typename call_calculator<METHOD_t, a0_t>::type::type call( METHOD_t A_METHOD, a0_t a0 )
+	{ return ( call_calculator<METHOD_t, a0_t>::type::make( A_METHOD, a0 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t>
+typename call_calculator<METHOD_t, a0_t, a1_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1 )
+	{ return ( call_calculator<METHOD_t, a0_t, a1_t>::type::make( A_METHOD, a0, a1 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t>
+typename call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2 )
+	{ return ( call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::make( A_METHOD, a0, a1, a2 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t>
+typename call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+	{ return ( call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::make( A_METHOD, a0, a1, a2, a3 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t>
+typename call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+	{ return ( call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::make( A_METHOD, a0, a1, a2, a3, a4 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t>
+typename call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::type call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+	{ return ( call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t>
+typename call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::type call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+	{ return ( call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+typename call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::type call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+	{ return ( call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t>
+typename call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::type call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+	{ return ( call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t>
+typename call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::type call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+	{ return ( call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t, typename a10_t>
+typename call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::type call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+	{ return ( call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
 
 }
 
