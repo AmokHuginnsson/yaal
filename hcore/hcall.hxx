@@ -128,11 +128,11 @@ struct resolve_3_arg
 	typedef typename trait::ternary<trait::same_type<arg<1>, arg_t>::value, fa0_t,
 					typename trait::ternary<trait::same_type<arg<2>, arg_t>::value, fa1_t,
 					typename trait::ternary<trait::same_type<arg<3>, arg_t>::value, fa2_t, arg_t>::type>::type>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1 )
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
 		{
 		return ( getter<3, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
 				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
-				ternary<trait::same_type<arg<3>, arg_t>::value, 2, 3>::value>::value>::value, arg_t, fa0_t, fa1_t>::get( a, fa0, fa1 ) );
+				ternary<trait::same_type<arg<3>, arg_t>::value, 2, 3>::value>::value>::value, arg_t, fa0_t, fa1_t>::get( a, fa0, fa1, fa2 ) );
 		}
 	};
 
@@ -176,13 +176,13 @@ struct resolve_4_arg
 					typename trait::ternary<trait::same_type<arg<3>, arg_t>::value, fa2_t,
 					typename trait::ternary<trait::same_type<arg<4>, arg_t>::value, fa3_t,
 					arg_t>::type>::type>::type>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3 )
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
 		{
 		return ( getter<4, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
 				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
 				ternary<trait::same_type<arg<3>, arg_t>::value, 2,
 				ternary<trait::same_type<arg<4>, arg_t>::value, 3, 4>::value>::value>::value>::value,
-				arg_t, fa0_t, fa1_t, fa3_t>::get( a, fa0, fa1, fa3 ) );
+				arg_t, fa0_t, fa1_t, fa3_t>::get( a, fa0, fa1, fa2, fa3 ) );
 		}
 	};
 
@@ -235,14 +235,14 @@ struct resolve_5_arg
 					typename trait::ternary<trait::same_type<arg<4>, arg_t>::value, fa3_t,
 					typename trait::ternary<trait::same_type<arg<5>, arg_t>::value, fa4_t,
 					arg_t>::type>::type>::type>::type>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4 )
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
 		{
 		return ( getter<5, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
 				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
 				ternary<trait::same_type<arg<3>, arg_t>::value, 2,
 				ternary<trait::same_type<arg<4>, arg_t>::value, 3,
 				ternary<trait::same_type<arg<5>, arg_t>::value, 4, 5>::value>::value>::value>::value>::value,
-				arg_t, fa0_t, fa1_t, fa3_t, fa4_t>::get( a, fa0, fa1, fa3, fa4 ) );
+				arg_t, fa0_t, fa1_t, fa3_t, fa4_t>::get( a, fa0, fa1, fa2, fa3, fa4 ) );
 		}
 	};
 
@@ -304,7 +304,7 @@ struct resolve_6_arg
 					typename trait::ternary<trait::same_type<arg<5>, arg_t>::value, fa4_t,
 					typename trait::ternary<trait::same_type<arg<6>, arg_t>::value, fa5_t,
 					arg_t>::type>::type>::type>::type>::type>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
 		{
 		return ( getter<6, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
 				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
@@ -312,7 +312,7 @@ struct resolve_6_arg
 				ternary<trait::same_type<arg<4>, arg_t>::value, 3,
 				ternary<trait::same_type<arg<5>, arg_t>::value, 4,
 				ternary<trait::same_type<arg<6>, arg_t>::value, 5, 6>::value>::value>::value>::value>::value>::value,
-				arg_t, fa0_t, fa1_t, fa3_t, fa4_t, fa5_t>::get( a, fa0, fa1, fa3, fa4, fa5 ) );
+				arg_t, fa0_t, fa1_t, fa3_t, fa4_t, fa5_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5 ) );
 		}
 	};
 
@@ -383,7 +383,7 @@ struct resolve_7_arg
 					typename trait::ternary<trait::same_type<arg<6>, arg_t>::value, fa5_t,
 					typename trait::ternary<trait::same_type<arg<7>, arg_t>::value, fa6_t,
 					arg_t>::type>::type>::type>::type>::type>::type>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
 		{
 		return ( getter<7, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
 				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
@@ -392,7 +392,7 @@ struct resolve_7_arg
 				ternary<trait::same_type<arg<5>, arg_t>::value, 4,
 				ternary<trait::same_type<arg<6>, arg_t>::value, 5,
 				ternary<trait::same_type<arg<7>, arg_t>::value, 6, 7>::value>::value>::value>::value>::value>::value>::value,
-				arg_t, fa0_t, fa1_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( a, fa0, fa1, fa3, fa4, fa5, fa6 ) );
+				arg_t, fa0_t, fa1_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) );
 		}
 	};
 
@@ -472,7 +472,7 @@ struct resolve_8_arg
 					typename trait::ternary<trait::same_type<arg<7>, arg_t>::value, fa6_t,
 					typename trait::ternary<trait::same_type<arg<8>, arg_t>::value, fa7_t,
 					arg_t>::type>::type>::type>::type>::type>::type>::type>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
 		{
 		return ( getter<8, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
 				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
@@ -482,7 +482,7 @@ struct resolve_8_arg
 				ternary<trait::same_type<arg<6>, arg_t>::value, 5,
 				ternary<trait::same_type<arg<7>, arg_t>::value, 6,
 				ternary<trait::same_type<arg<8>, arg_t>::value, 7, 8>::value>::value>::value>::value>::value>::value>::value>::value,
-				arg_t, fa0_t, fa1_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( a, fa0, fa1, fa3, fa4, fa5, fa6, fa7 ) );
+				arg_t, fa0_t, fa1_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) );
 		}
 	};
 
@@ -571,7 +571,7 @@ struct resolve_9_arg
 					typename trait::ternary<trait::same_type<arg<8>, arg_t>::value, fa7_t,
 					typename trait::ternary<trait::same_type<arg<9>, arg_t>::value, fa8_t,
 					arg_t>::type>::type>::type>::type>::type>::type>::type>::type>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
 		{
 		return ( getter<9, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
 				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
@@ -582,7 +582,7 @@ struct resolve_9_arg
 				ternary<trait::same_type<arg<7>, arg_t>::value, 6,
 				ternary<trait::same_type<arg<8>, arg_t>::value, 7,
 				ternary<trait::same_type<arg<9>, arg_t>::value, 8, 9>::value>::value>::value>::value>::value>::value>::value>::value>::value,
-				arg_t, fa0_t, fa1_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( a, fa0, fa1, fa3, fa4, fa5, fa6, fa7, fa8 ) );
+				arg_t, fa0_t, fa1_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) );
 		}
 	};
 
