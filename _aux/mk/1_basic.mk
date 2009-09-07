@@ -1,8 +1,8 @@
-SHELL					= /bin/sh
-RELEASE				= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
-DIR_BUILD			= $(DIR_ROOT)/build
-FIND	= find
-ARFLAGS = r
+SHELL     = /bin/sh
+RELEASE   = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
+DIR_BUILD ?= $(CURDIR)
+FIND      = find
+ARFLAGS   = r
 
 COMA=,
 ifeq ($(VERBOSE),yes)

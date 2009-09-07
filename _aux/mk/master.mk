@@ -1,9 +1,9 @@
-.PHONY: all bin clean clean-dep cov dep doc environment install mrproper release prof purge static stats tags 
+.PHONY: all bin clean clean-dep cov debug dep doc environment install mrproper release prof purge static stats tags 
 
 .DEFAULT:
 	@$(MAKE) -f Makefile.mk $(@)
 
-all bin clean clean-dep cov dep doc environment install mrproper release prof purge static stats tags: Makefile.mk config.hxx .my_make
+all bin clean clean-dep cov debug dep doc environment install mrproper release prof purge static stats tags: Makefile.mk config.hxx .my_make
 	@$(MAKE) -f Makefile.mk $(@)
 
 Makefile.mk: configure Makefile.mk.in

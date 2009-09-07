@@ -24,7 +24,7 @@
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 
-export DIR_ROOT	?= $(CURDIR)
+$(foreach DIR,$(subst /, ,$(CURDIR)), $(eval $(eval DIR_ROOT_TEST=$(DIR_ROOT_TEST)/$(DIR)) $(if $(realpath $(DIR_ROOT_TEST)/_aux/mk/0_paths.mk),export DIR_ROOT ?= $(DIR_ROOT_TEST))))
 VERSION				= 0
 SUBVERSION		= 0
 EXTRAVERSION	= 16
@@ -32,7 +32,6 @@ COMPONENTS		= hcore tools dbwrapper hconsole hdata
 DRIVERS				= @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 DIR_TARGET		= $(HOME)/usr/lib
 DIR_HEADERS		= $(HOME)/usr/include/yaal/
-VPATH					= $(DIR_ROOT)
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/yaal.hxx
 LD_CACHE			= $(DIR_TARGET)/ld.so.cache
@@ -46,6 +45,7 @@ LIB_ARCHIVE_SUFFIX = dll.a
 endif
 CTAGS	= @CTAGS@
 GITID = @GITID@
+include $(DIR_ROOT)/_aux/mk/0_paths.mk
 include $(DIR_ROOT)/_aux/mk/1_basic.mk
 include $(DIR_ROOT)/_aux/mk/2_term.mk
 include $(DIR_ROOT)/_aux/mk/3_suffix.mk
@@ -60,9 +60,9 @@ LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \
 
 # WARNING!! -Wl,soname, must be last option, and last character of it,
 # meaning "," must be immediately followed by end of line
-LINKER_PRIME_FLAGS +=	-shared\
-								-Wl,--export-dynamic\
-								@SPECIAL_LINKER_FLAGS@\
+LINKER_PRIME_FLAGS +=	-shared \
+								-Wl,--export-dynamic \
+								@SPECIAL_LINKER_FLAGS@ \
 								-Wl,-soname,
 
 include $(DIR_ROOT)/_aux/mk/7_flags-post.mk
@@ -127,25 +127,25 @@ include $(DIR_ROOT)/_aux/mk/e_target-default.mk
 ifneq ($(CURDIR),$(DIR_BUILD))
 all: environment
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
-	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile.mk
+	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f Makefile.mk
 else
-all: $(TARGETS) $(HAPI_HEADER)
+all: environment $(TARGETS) $(HAPI_HEADER)
 endif
 
+$(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 $(foreach IT,$(COMPONENTS),$(eval $(call BUILD_TARGET_LIB,$(IT),$(DEPS_$(IT)),$(LIBS_$(IT)))))
 $(foreach IT,$(DRIVERS),$(eval $(call BUILD_TARGET_LIB,$(IT)_driver,$(DEPS_$(IT)),$(LIBS_$(IT)))))
-$(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 
 environment: $(DIRS) $(LD_CACHE)
 
 release:
-	DO_RELEASE=1 $(MAKE) -e all
+	DO_RELEASE=1 $(MAKE) -f Makefile.mk -e all
 
 prof:
-	DO_PROFILING=1 $(MAKE) -e all
+	DO_PROFILING=1 $(MAKE) -f Makefile.mk -e all
 
 cov:
-	DO_COVERAGE=1 $(MAKE) -e all
+	DO_COVERAGE=1 $(MAKE) -f Makefile.mk -e all
 
 install: all
 	@./_aux/msh
@@ -158,7 +158,7 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 $(LD_CACHE):
 	@echo -n "Making environment ... "; \
 	echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf; \
-	/bin/cp -f ./_aux/mkcache $(DIR_TARGET); \
+	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_TARGET); \
 	echo $(NONL) "done.$(CL)"
 
 clean-dep:
@@ -170,7 +170,7 @@ clean: clean-dep
 
 mrproper: clean
 	@echo -n "Purging ... "; \
-	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD) make.log; \
+	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) build make.log; \
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
 	echo "done."

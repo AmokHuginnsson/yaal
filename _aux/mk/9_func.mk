@@ -30,6 +30,6 @@ endef
 
 define BUILD_TARGET_LIB
 $$(TARGET_$(1)): $$(OBJS_$(1)) $(2)
-	@$$(MAKE) -f ../Makefile.mk --no-print-directory $$(LIB_PREFIX)$(1).$$(LIB_SUFFIX) NAME=$(1) LIBS=$(3)
+	@$$(MAKE) -f Makefile.mk --no-print-directory $$(LIB_PREFIX)$(1).$$(LIB_SUFFIX) NAME=$(1) LIBS=$(3)
 endef
 
