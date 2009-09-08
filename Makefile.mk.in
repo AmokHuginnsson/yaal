@@ -23,7 +23,6 @@
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
-
 $(foreach DIR,$(subst /, ,$(CURDIR)), $(eval $(eval DIR_ROOT_TEST=$(DIR_ROOT_TEST)/$(DIR)) $(if $(realpath $(DIR_ROOT_TEST)/_aux/mk/0_paths.mk),export DIR_ROOT ?= $(DIR_ROOT_TEST))))
 VERSION				= 0
 SUBVERSION		= 0
@@ -99,7 +98,7 @@ LIBS_oracle			= "-lclntsh -lhcore"
 #	this is "rule" for linking libs
 
 $(LIB_PREFIX)%.$(LIB_SUFFIX):
-	@if [ "$(NAME)" = "" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
+	@if [ "x$(NAME)" = "x" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
 	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
 			$(GROUP_START) $(OBJS_$(NAME)) $(GROUP_END) $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n "$(RS)";)
@@ -122,15 +121,9 @@ include $(DIR_ROOT)/_aux/mk/d_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/e_target-default.mk
 
 #phony targets
-.PHONY: all release prof cov install dep clean tags stats mrproper purge environment doc
+.PHONY: all bin clean clean-dep cov debug dep doc environment install install-environment mrproper release prof purge static stats tags 
 
-ifneq ($(CURDIR),$(DIR_BUILD))
-all: environment
-	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
-	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f Makefile.mk
-else
-all: environment $(TARGETS) $(HAPI_HEADER)
-endif
+all debug release cov prof: $(TARGETS) $(HAPI_HEADER)
 
 $(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 $(foreach IT,$(COMPONENTS),$(eval $(call BUILD_TARGET_LIB,$(IT),$(DEPS_$(IT)),$(LIBS_$(IT)))))
@@ -138,16 +131,7 @@ $(foreach IT,$(DRIVERS),$(eval $(call BUILD_TARGET_LIB,$(IT)_driver,$(DEPS_$(IT)
 
 environment: $(DIRS) $(LD_CACHE)
 
-release:
-	DO_RELEASE=1 $(MAKE) -f Makefile.mk -e all
-
-prof:
-	DO_PROFILING=1 $(MAKE) -f Makefile.mk -e all
-
-cov:
-	DO_COVERAGE=1 $(MAKE) -f Makefile.mk -e all
-
-install: all
+install-environment:
 	@./_aux/msh
 
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
@@ -166,18 +150,14 @@ clean-dep:
 
 clean: clean-dep
 	@/bin/rm -f $(OBJS); \
-	sh -c '. _aux/clean-lib.sh && clean .'
+	sh -c '. $(DIR_ROOT)/_aux/clean-lib.sh && clean .'
 
 mrproper: clean
 	@echo -n "Purging ... "; \
-	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) build make.log; \
+	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) make.log; \
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
 	echo "done."
-
-purge: mrproper
-	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile.mk config.h config.h.in yaalrc config.log doc/html
 
 include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
 

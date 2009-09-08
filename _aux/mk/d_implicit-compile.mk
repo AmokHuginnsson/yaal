@@ -1,7 +1,7 @@
 # implict pattern rule
 
 define IDENT_HELPER
-	X=$$(foreach IT,$$(subst /, ,$$(subst $$(DIR_ROOT),,$(1))),$$(eval DIR_PREFIX=$$(DIR_PREFIX)/..))
+	DIR_PREFIX=$$(subst . /,./,$$(foreach IT,$$(subst /, ,$$(subst $$(DIR_ROOT),,$(1))),/..))
 	HEADER=$$(addsuffix .hxx,$$(basename $(1)))
 	ID="\"$(1) $$(shell $$(GITID) ./$$(DIR_PREFIX)/$$(subst $$(DIR_ROOT)/,,$(1)))\""
 	TID="\"$$(HEADER) $$(if $$(wildcard $$(HEADER)),$$(shell $$(GITID) ./$$(DIR_PREFIX)/$$(subst $$(DIR_ROOT)/,,$$(HEADER))),)\""

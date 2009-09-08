@@ -1,24 +1,63 @@
+-include .my_make
+
+define PREPARE_MAIN_TARGET
+$(1): build/$(1)/Makefile.mk build/$(1)/config.hxx build/$(1)/yaalrc
+	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
+	cd $$(dir $$(<)) && $(2) $$(MAKE) --no-print-directory -f Makefile.mk -e environment $$(@)
+
+mrproper-$(1): clean-$(1)
+	@$$(if $$(realpath build/$(1)),cd build/$(1) && make -f Makefile.mk mrproper && cd - && cd build && /bin/rm -rf $(1))
+
+clean-$(1):
+	@$$(if $$(realpath build/$(1)),cd build/$(1) && make -f Makefile.mk clean)
+
+endef
+
+MAIN_TARGETS=debug release prof cov
+OPT_release=DO_RELEASE=1
+OPT_prof=DO_COVERAGE=1
+OPT_cov=DO_PROFILING=1
+
 .PHONY: all bin clean clean-dep cov debug dep doc environment install mrproper release prof purge static stats tags 
 
 .DEFAULT:
-	@$(MAKE) -f Makefile.mk $(@)
+	@$(MAKE) -f Makefile.mk.in $(@)
 
-all bin clean clean-dep cov debug dep doc environment install mrproper release prof purge static stats tags: Makefile.mk config.hxx .my_make
-	@$(MAKE) -f Makefile.mk $(@)
+all: debug
 
-Makefile.mk: configure Makefile.mk.in
-	@./configure && touch config.hxx Makefile.mk
+bin clean clean-dep dep doc environment install static stats tags: debug .my_make
 
-config.hxx: configure config.hxx.in
-	@./configure && touch config.hxx Makefile.mk
+clean-dep dep doc environment install stats tags: debug
+	@$(MAKE) -f build/debug/Makefile.mk $(@)
 
-yaalrc: configure yaalrc.in
-	@./configure && touch config.hxx Makefile.mk yaalrc
+$(foreach T, $(MAIN_TARGETS), $(eval $(call PREPARE_MAIN_TARGET,$(T),$(OPT_$(T)))))
+
+build/%/Makefile.mk: configure Makefile.mk.in
+	@$(eval DIR = $(dir $(@))) \
+	mkdir -p $(DIR) && cd $(DIR) && ../../configure && touch config.hxx Makefile.mk
+
+build/%/config.hxx: configure config.hxx.in
+	@$(eval DIR = $(dir $(@))) \
+	mkdir -p $(DIR) && cd $(DIR) && ../../configure && touch config.hxx Makefile.mk
+
+build/%/yaalrc: configure yaalrc.in
+	@$(eval DIR = $(dir $(@))) \
+	mkdir -p $(DIR) && cd $(DIR) && ../../configure && touch config.hxx Makefile.mk yaalrc
 
 configure config.hxx.in: configure.ac _aux/aclib.m4
 	@autoreconf && touch configure config.hxx.in
+
+mrproper: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
+
+clean: $(foreach T, $(MAIN_TARGETS), clean-$(T))
+
+purge: mrproper
+	/bin/rm -rf autom4te.cache build config.cache config.status configure.lineno; \
+	/bin/rm -rf configure Makefile.mk config.h config.h.in yaalrc config.log doc/html
 
 .my_make:
 	@./_aux/guess_make
 
 local.mk:
+
+-include local.mk
