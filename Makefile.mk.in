@@ -33,7 +33,7 @@ DIR_TARGET		= $(HOME)/usr/lib
 DIR_HEADERS		= $(HOME)/usr/include/yaal/
 DIRS					= $(DIR_TARGET) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER		= $(DIR_HEADERS)/yaal.hxx
-LD_CACHE			= $(DIR_TARGET)/ld.so.cache
+LD_SO_CONF			= $(DIR_TARGET)/ld.so.conf
 LIB_PREFIX = @LIB_PREFIX@
 ifeq ($(LIB_PREFIX),lib)
 LIB_SUFFIX = so.$(RELEASE)
@@ -121,15 +121,15 @@ include $(DIR_ROOT)/_aux/mk/d_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/e_target-default.mk
 
 #phony targets
-.PHONY: all bin clean clean-dep cov debug dep doc environment install install-environment mrproper release prof purge static stats tags 
+.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags 
 
-all debug release cov prof: $(TARGETS) $(HAPI_HEADER)
+all debug release cov prof: environment $(TARGETS) $(HAPI_HEADER)
 
 $(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 $(foreach IT,$(COMPONENTS),$(eval $(call BUILD_TARGET_LIB,$(IT),$(DEPS_$(IT)),$(LIBS_$(IT)))))
 $(foreach IT,$(DRIVERS),$(eval $(call BUILD_TARGET_LIB,$(IT)_driver,$(DEPS_$(IT)),$(LIBS_$(IT)))))
 
-environment: $(DIRS) $(LD_CACHE)
+environment: $(DIRS) $(LD_SO_CONF)
 
 install-environment:
 	@./_aux/msh
@@ -139,7 +139,7 @@ $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	echo $(NONL) "done.$(CL)$(BOLD)"; \
 	echo "All OK!$(RS)";
 
-$(LD_CACHE):
+$(LD_SO_CONF): $(DIR_ROOT)/_aux/mkcache
 	@echo -n "Making environment ... "; \
 	echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf; \
 	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_TARGET); \

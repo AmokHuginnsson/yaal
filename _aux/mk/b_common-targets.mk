@@ -1,19 +1,17 @@
 #phony targets
-.PHONY: all bin clean clean-dep cov dep doc environment install mrproper release prof purge static stats tags 
+.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags 
 
-ifneq ($(CURDIR),$(DIR_BUILD))
-all: environment
-	@test -t 1 && TERMINAL=TERM export TERMINAL ; \
-	$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile.mk
-else
-all: $(REAL_TARGETS)
-endif
+all: debug
 
-environment: $(DIR_BUILD) $(DIRS)
+debug: environment $(REAL_TARGETS)
+
+environment: $(DIR_BUILD) $(DIRS) $(DIR_BUILD)/version.hxx
 
 $(DIR_BUILD):
-	@/bin/mkdir -p $(@); \
-	echo "Program version $(RELEASE)-`date +%Y%m%d`."; \
+	@/bin/mkdir -p $(@)
+
+$(DIR_BUILD)/version.hxx:
+	@echo "Program version $(RELEASE)-`date +%Y%m%d`."; \
 	echo "#define VER \"$(RELEASE)-`date +%Y%m%d`\"" > $(DIR_BUILD)/version.hxx
 
 $(PRJNAME).info : src/$(PRJNAME).texinfo
@@ -21,12 +19,6 @@ $(PRJNAME).info : src/$(PRJNAME).texinfo
 
 static:
 	@$(MAKE) LIBS="$(STATICLIBS)"
-
-prof:
-	@$(MAKE) DO_PROFILING=1 static
-
-cov:
-	@$(MAKE) DO_COVERAGE=1 static
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
@@ -37,12 +29,12 @@ clean: clean-dep
 	@/bin/rm -f src/core src/$(TARGET).core src/1exec.core
 	@/bin/rm -f $(OBJS_TARGET)
 	@/bin/rm -f $(DIR_BUILD)/$(TARGET)/$(EXEC_NAME)
-	@sh -c '. _aux/clean-lib.sh && clean .'
+	@sh -c '. $(DIR_ROOT)/_aux/clean-lib.sh && clean .'
 
 mrproper: clean
 	@echo -n "Purging ... "; \
-	/bin/rm -f $(PRJNAME) version.hxx src/.gt_* src/tags 1exec.core; \
-	/bin/rm -rf src/1exec.core $(DIR_BUILD); \
+	/bin/rm -f version.hxx src/.gt_* src/tags 1exec.core; \
+	/bin/rm -rf src/1exec.core $(PRJNAME) $(DIR_BUILD); \
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
 	echo "done."
