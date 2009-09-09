@@ -6,10 +6,10 @@ $(1): build/$(1)/Makefile.mk build/$(1)/config.hxx
 	$(2) $$(MAKE) -C $$(dir $$(<)) --no-print-directory -f Makefile.mk -e $$(@)
 
 mrproper-$(1): clean-$(1)
-	@$$(if $$(wildcard build/$(1)*), $$(MAKE) -C build/$(1) -f Makefile.mk -e mrproper && cd - && cd build && /bin/rm -rf $(1))
+	@$$(if $$(wildcard build/$(1)), $$(MAKE) -C build/$(1) -f Makefile.mk -e mrproper && cd - && cd build && /bin/rm -rf $(1))
 
 clean-$(1):
-	@$$(if $$(wildcard build/$(1)*), $$(MAKE) -C build/$(1) -f Makefile.mk -e clean)
+	@$$(if $$(wildcard build/$(1)), $$(MAKE) -C build/$(1) -f Makefile.mk -e clean)
 
 endef
 
