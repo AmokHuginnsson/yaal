@@ -1,6 +1,6 @@
 #! /bin/sh
 
-if [ -z "${DIR_ROOT}" -o -z "${HDRS}" -o -z "${DIR_HEADERS}" ] ; then
+if [ -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" -o -z "${DIR_HEADERS}" ] ; then
 	echo "Core settings not found!"
 	exit 1
 fi
@@ -16,7 +16,7 @@ for FILE in ${HDRS}; do
 	awk '/^#include "/ {match($0,"\"[a-z_./-]+"); printf "#include <yaal/%s>\n", substr($0,RSTART+1,RLENGTH-1) }; !/^#include "/' ${FILE} > ${DIR_HEADERS}/${FILE}
 done
 
-cp -f config.hxx ${DIR_HEADERS}/
+cp -f "${DIR_BUILD}/config.hxx" ${DIR_HEADERS}/
 
 head -26 ${DIR_HEADERS}/hcore/hstreaminterface.hxx | sed -e s/hstreaminterface/yaal/ > ${DIR_HEADERS}/yaal.hxx
 
