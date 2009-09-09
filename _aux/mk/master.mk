@@ -3,13 +3,13 @@
 define PREPARE_MAIN_TARGET
 $(1): build/$(1)/Makefile.mk build/$(1)/config.hxx build/$(1)/yaalrc
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
-	cd $$(dir $$(<)) && $(2) $$(MAKE) --no-print-directory -f Makefile.mk -e environment $$(@)
+	$(2) $$(MAKE) -C $$(dir $$(<)) --no-print-directory -f Makefile.mk -e environment $$(@)
 
 mrproper-$(1): clean-$(1)
-	@$$(if $$(realpath build/$(1)),cd build/$(1) && make -f Makefile.mk mrproper && cd - && cd build && /bin/rm -rf $(1))
+	@$$(if $$(realpath build/$(1)), $$(MAKE) -C build/$(1) -f Makefile.mk -e mrproper && cd - && cd build && /bin/rm -rf $(1))
 
 clean-$(1):
-	@$$(if $$(realpath build/$(1)),cd build/$(1) && make -f Makefile.mk clean)
+	@$$(if $$(realpath build/$(1)), $$(MAKE) -C build/$(1) -f Makefile.mk -e clean)
 
 endef
 
@@ -18,16 +18,14 @@ OPT_release=DO_RELEASE=1
 OPT_prof=DO_COVERAGE=1
 OPT_cov=DO_PROFILING=1
 
-.PHONY: all bin clean clean-dep cov debug dep doc environment install mrproper release prof purge static stats tags 
+.PHONY: all bin clean clean-cov clean-debug clean-prof clean-release clean-dep cov debug dep doc environment install mrproper mrproper-cov mrproper-debug mrproper-prof mrproper-release release prof purge static stats tags 
 
 .DEFAULT:
 	@$(MAKE) -f Makefile.mk.in $(@)
 
 all: debug
 
-bin clean clean-dep dep doc environment install static stats tags: debug .my_make
-
-clean-dep dep doc environment install stats tags: debug
+bin clean-dep dep doc environment install static stats tags: debug .my_make
 	@$(MAKE) -f build/debug/Makefile.mk $(@)
 
 $(foreach T, $(MAIN_TARGETS), $(eval $(call PREPARE_MAIN_TARGET,$(T),$(OPT_$(T)))))
