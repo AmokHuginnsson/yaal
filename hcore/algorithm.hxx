@@ -280,7 +280,7 @@ void fill_n( dst_it_t it, int long const& count, filler_t const& filler )
 	return;
 	}
 
-/*! \brief Fill specified range with run-time generared values.
+/*! \brief Fill specified range with run-time generated values.
  *
  * \param it - begining of the range.
  * \param end - one past last element in range.
@@ -290,6 +290,20 @@ template<typename iterator_t, typename generator_t>
 void generate( iterator_t it, iterator_t const& end, generator_t generator )
 	{
 	for ( ; it != end; ++ it )
+		*it = generator();
+	return;
+	}
+
+/*! \brief Fill specified range with n run-time generated values.
+ *
+ * \param it - begining of the container.
+ * \param count - numer of the elements to be generated.
+ * \param generator - function object that creates new values for range.
+ */
+template<typename iterator_t, typename generator_t>
+void generate_n( iterator_t it, int long const& count, generator_t generator )
+	{
+	for ( int long i = 0; i < count; ++ i, ++ it )
 		*it = generator();
 	return;
 	}
