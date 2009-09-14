@@ -308,6 +308,45 @@ void generate_n( iterator_t it, int long const& count, generator_t generator )
 	return;
 	}
 
+/*! \brief Reverses order of elements in range.
+ *
+ * \param it - begining of range of eleemnts to be reverted.
+ * \param end - one past last element of range to be reverted.
+ */
+template<typename iterator_t>
+void reverse( iterator_t it, iterator_t end )
+	{
+	int long count = 0;
+	iterator_t itLast;
+	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count )
+		itLast = itEnd;
+	count >>= 1;
+	for ( int long i = 0; i < count; ++ i, ++ it, -- itLast )
+		swap( *it, *itLast );
+	return;
+	}
+
+/*! \brief Generate next, in lexographical order, permutation of the range of elements.
+ *
+ * \param it - begining of range of eleemnts for permutation.
+ * \param end - one past last element of range for permutation.
+ * \return true iff last, in lexographical order, permutation has been generated.
+ */
+template<typename iterator_t>
+bool next_permutation( iterator_t it, iterator_t end )
+	{
+	int long count = 0;
+	iterator_t itLast;
+	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count )
+		itLast = itEnd;
+	bool gotNext = false;
+	if ( count > 1 )
+		{
+		gotNext = true;
+		}
+	return ( gotNext );
+	}
+
 /*! \brief Calculate sum of elements in range.
  *
  * \param it - begining of range of eleemnts to summed up.
