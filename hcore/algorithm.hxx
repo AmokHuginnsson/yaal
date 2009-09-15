@@ -372,6 +372,52 @@ bool next_permutation( iterator_t it, iterator_t end )
 	return ( gotNext );
 	}
 
+/*! \brief Generate previous, in lexographical order, permutation of the range of elements.
+ *
+ * \param it - begining of range of eleemnts for permutation.
+ * \param end - one past last element of range for permutation.
+ * \return true iff first, in lexographical order, permutation has been generated.
+ */
+template<typename iterator_t>
+bool prev_permutation( iterator_t it, iterator_t end )
+	{
+	int long count = 0;
+	iterator_t itLast;
+	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count )
+		itLast = itEnd;
+	bool gotPrev = false;
+	if ( count > 1 )
+		{
+		do
+			{
+			iterator_t i = itLast;
+			-- i;
+			-- count;
+			iterator_t ie = itLast;
+			while ( *i <= * ie )
+				{
+				-- count;
+				if ( ! count )
+					break;
+				-- i, -- ie;
+				}
+			if ( ! count )
+				break;
+			iterator_t j = itLast;
+			while ( *j >= *i )
+				-- j;
+			swap( *i, *j );
+			++ i;
+			reverse( i, end );
+			gotPrev = true;
+			}
+		while ( 0 );
+		if ( ! gotPrev )
+			reverse( it, end );
+		}
+	return ( gotPrev );
+	}
+
 /*! \brief Calculate sum of elements in range.
  *
  * \param it - begining of range of eleemnts to summed up.
