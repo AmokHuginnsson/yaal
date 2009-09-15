@@ -342,7 +342,32 @@ bool next_permutation( iterator_t it, iterator_t end )
 	bool gotNext = false;
 	if ( count > 1 )
 		{
-		gotNext = true;
+		do
+			{
+			iterator_t i = itLast;
+			-- i;
+			-- count;
+			iterator_t ie = itLast;
+			while ( *i >= * ie )
+				{
+				-- count;
+				if ( ! count )
+					break;
+				-- i, -- ie;
+				}
+			if ( ! count )
+				break;
+			iterator_t j = itLast;
+			while ( *j <= *i )
+				-- j;
+			swap( *i, *j );
+			++ i;
+			reverse( i, end );
+			gotNext = true;
+			}
+		while ( 0 );
+		if ( ! gotNext )
+			reverse( it, end );
 		}
 	return ( gotNext );
 	}
