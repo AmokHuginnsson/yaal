@@ -25,7 +25,7 @@ Copyright:
 */
 
 /*! \file hcore/algorithm.hxx
- * \brief Basic alogrithms defienitions.
+ * \brief Basic alogrithms definitions.
  */
 
 #ifndef YAAL_HCORE_ALGORITHM_HXX_INCLUDED
@@ -66,6 +66,21 @@ template<typename iterator_t, typename value_t>
 iterator_t find( iterator_t it, iterator_t end, value_t const& v )
 	{
 	for ( ; ( it != end ) && ( *it != v ); ++ it )
+		;
+	return ( it );
+	}
+
+/*! \brief Find first element in range that meets a given condition.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param cond - condition which must be satified.
+ * \return iterator pointing to found element or end of range.
+ */
+template<typename iterator_t, typename condition_t>
+iterator_t find_if( iterator_t it, iterator_t end, condition_t cond )
+	{
+	for ( ; ( it != end ) && ( ! cond( *it ) ); ++ it )
 		;
 	return ( it );
 	}
