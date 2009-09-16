@@ -55,6 +55,21 @@ inline void swap( tType& left, tType& right )
 	return;
 	}
 
+/*! \brief Find first occurence of given value in given range of elements.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param v - look for this value in given range.
+ * \return iterator pointing to found value or end of range.
+ */
+template<typename iterator_t, typename value_t>
+iterator_t find( iterator_t it, iterator_t end, value_t const& v )
+	{
+	for ( ; ( it != end ) && ( *it != v ); ++ it )
+		;
+	return ( it );
+	}
+
 /*! \brief For each element in range pass its value into function.
  *
  * \param it - begining of the range.

@@ -144,7 +144,7 @@ public:
 		}
 	HIterator const operator ++ ( int )
 		{
-		HIterator it( f_lIndex );
+		HIterator it( f_poOwner, f_lIndex );
 		++ f_lIndex;
 		return ( it );
 		}
@@ -155,9 +155,34 @@ public:
 		}
 	HIterator const operator -- ( int )
 		{
-		HIterator it( f_lIndex );
+		HIterator it( f_poOwner, f_lIndex );
 		-- f_lIndex;
 		return ( it );
+		}
+	HIterator operator + ( int long const& off_ ) const
+		{
+		HIterator it( f_poOwner, f_lIndex + off_ );
+		return ( it );
+		}
+	HIterator& operator += ( int long const& off_ )
+		{
+		f_lIndex += off_;
+		return ( *this );
+		}
+	HIterator operator - ( int long const& off_ ) const
+		{
+		HIterator it( f_poOwner, f_lIndex - off_ );
+		return ( it );
+		}
+	HIterator& operator -= ( int long const& off_ )
+		{
+		f_lIndex -= off_;
+		return ( *this );
+		}
+	int long operator - ( HIterator const& it ) const
+		{
+		M_ASSERT( f_poOwner == it.f_poOwner );
+		return ( f_lIndex - it.f_lIndex );
 		}
 	const_qual_t& operator* ( void )
 		{ return ( f_poOwner->f_ptArray[ f_lIndex ] ); }
