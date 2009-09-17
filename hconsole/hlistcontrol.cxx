@@ -186,12 +186,12 @@ void HListControl::draw_header( int a_iColumns )
 	int l_iColumnOffset = 0;
 	int l_iHR = f_bDrawHeader ? 1 : 0; /* HR stands for header row */
 	HColumnInfo * l_poColumnInfo = NULL;
+	HConsole& cons = HCons::get_instance();
 	for ( l_iCtr = 0; l_iCtr < a_iColumns; l_iCtr ++ )
 		{
 		l_poColumnInfo = & f_oHeader[ l_iCtr ];
 		if ( l_poColumnInfo->f_iWidthRaw )
 			{
-			HConsole& cons = HCons::get_instance();
 			if ( f_bDrawHeader )
 				{
 				f_oVarTmpBuffer = l_poColumnInfo->f_oName;
@@ -224,6 +224,15 @@ void HListControl::draw_header( int a_iColumns )
 					M_ENSURE( cons.c_addch( GLYPHS::VERTICAL_LINE ) != C_ERR );
 					}
 				}
+			}
+		}
+	if ( ! f_bSingleLine )
+		{
+		f_oVarTmpBuffer.format( " %d/%d ", f_iControlOffset + f_iCursorPosition + 1, static_cast<int>( f_oControler->size() ) );
+		if ( f_iLabelLength < f_iWidthRaw )
+			{
+			int clip = static_cast<int>( ( ( f_iWidthRaw - f_iLabelLength ) < f_oVarTmpBuffer.get_length() ) ? f_oVarTmpBuffer.get_length() - ( f_iWidthRaw - f_iLabelLength ) : 0 );
+			cons.c_mvprintf( f_iRowRaw - 1, static_cast<int>( f_iColumnRaw + f_iWidthRaw + clip - f_oVarTmpBuffer.get_length() ), f_oVarTmpBuffer.raw() + clip );
 			}
 		}
 	return;

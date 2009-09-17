@@ -76,7 +76,7 @@ HControl::HControl( HWindow* a_poParent, int a_iRow, int a_iColumn,
 		else
 			{
 			f_bSingleLine = false;
-			f_oLabel.set_at( f_iLabelLength - 1, 0 );
+			f_oLabel.set_at( -- f_iLabelLength, 0 );
 			}
 		}
 	else
