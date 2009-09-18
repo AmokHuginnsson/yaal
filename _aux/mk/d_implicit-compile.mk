@@ -8,7 +8,7 @@ define IDENT_HELPER
 endef
 
 %.$(OS): %.$(SS)
-	@$(eval $(call IDENT_HELPER,$(<))) $(call msg,echo -n "Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... ";) \
+	@$(eval $(call IDENT_HELPER,$(<))) $(call msg,echo -n "Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... " && ) \
 	/bin/rm -f "$(@)" && \
 	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) -MT $(@:.$(OS)=.$(DS)) -MF $(@:.$(OS)=.$(DS)) && \
 	$(call invoke,$(CXX) $(CXXFLAGS) -D__ID__=$(ID) -D__TID__=$(TID) $(<) -c -o $(@) 2>&1 | tee -a make.log) && \
