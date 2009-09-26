@@ -119,3 +119,28 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 	fi
 ])
 
+
+dnl Detect amount of physical memory on this system.
+dnl --------------------------------------------------------------------------
+AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY],
+[
+	AC_MSG_CHECKING([for amount for physical memory])
+	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
+		AC_MSG_ERROR([[You need to use YAAL_DETECT_OPERATING_SYSTEM first!]])
+	fi
+	PHYS_MEM="0"
+	case "x${HOST_OS_TYPE}" in
+		xDebian|xPLD|xSlackware)
+			PHYS_MEM=`free -m | awk '/^Mem:/{print [$]2}'`
+		;;
+		xFreeBSD)
+		;;
+		xSolaris)
+		;;
+		xWindows)
+		;;
+	esac
+	AC_DEFINE_UNQUOTED([__PHYSICAL_MEMORY__], ${PHYS_MEM}, [Amount of physical memory on this system.])
+	AC_MSG_RESULT([${PHYS_MEM}])
+])
+

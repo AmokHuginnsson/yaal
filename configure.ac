@@ -93,6 +93,7 @@ AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])
 AC_HEADER_MAJOR
 
 YAAL_DETECT_OPERATING_SYSTEM
+YAAL_DETECT_PHYSICAL_MEMORY
 
 dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[53%]]])
