@@ -21,10 +21,13 @@ endif
 
 # implict pattern rule
 
+$$($(1))/%.$$(DS): $$(SRC_$(1))/%.$$(SS)
+	@/bin/rm -f "$$(@)"; \
+	$$(DXX) $$(CXXFLAGS) $$(COMPILER_FLAGS_$(1)) -MM $$(<) -MT $$(@:.$$(DS)=.$$(OS)) -MT $$(@) -MF $$(@)
+
 $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 	@$$(call msg,echo -n "Compiling \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... " && ) \
 	/bin/rm -f "$$(@)"; \
-	$$(DXX) $$(CXXFLAGS) $$(COMPILER_FLAGS_$(1)) -MM $$(<) -MT $$(@) -MT $$(@:.$$(OS)=.$$(DS)) -MF $$(@:.$$(OS)=.$$(DS)) && \
 	$$(call invoke,$$(CXX) $$(CXXFLAGS) $$(COMPILER_FLAGS_$(1)) -D__ID__="\"$$(<) $$(shell $$(GITID) ./$$(subst . /,./,$$(foreach IT,$$(subst /, ,$$(subst $$(DIR_ROOT),,$$(DIR_BUILD))),/..))/$$(subst $$(DIR_ROOT)/,,$$(<)))\"" $$(<) -c -o $$(@) 2>&1 | tee -a make.log ) && \
 	test -f $$(@) \
 	$$(call msg,&& echo $$(NONL) "done.$$(CL)")

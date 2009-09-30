@@ -18,6 +18,9 @@ OPT_release=DO_RELEASE=1
 OPT_prof=DO_COVERAGE=1
 OPT_cov=DO_PROFILING=1
 
+DS=d
+FIND=find
+
 .PHONY: all bin clean clean-cov clean-debug clean-prof clean-release clean-dep cov debug dep doc install mrproper mrproper-cov mrproper-debug mrproper-prof mrproper-release release prof purge static stats tags 
 
 .DEFAULT:
@@ -25,7 +28,7 @@ OPT_cov=DO_PROFILING=1
 
 all: debug
 
-bin clean-dep dep doc environment install static stats tags: debug .my_make
+bin dep doc environment install static stats tags: debug .my_make
 	@$(MAKE) -f build/debug/Makefile.mk $(@)
 
 $(foreach T, $(MAIN_TARGETS), $(eval $(call PREPARE_MAIN_TARGET,$(T),$(OPT_$(T)))))
@@ -52,6 +55,9 @@ clean: $(foreach T, $(MAIN_TARGETS), clean-$(T))
 purge: mrproper
 	/bin/rm -rf autom4te.cache build config.cache config.status configure.lineno; \
 	/bin/rm -rf configure Makefile.mk config.h config.h.in yaalrc config.log doc/html
+
+clean-dep:
+	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
 
 .my_make:
 	@./_aux/guess_make

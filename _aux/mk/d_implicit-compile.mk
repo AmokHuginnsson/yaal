@@ -7,10 +7,13 @@ define IDENT_HELPER
 	TID="\"$$(HEADER) $$(if $$(wildcard $$(HEADER)),$$(shell $$(GITID) ./$$(DIR_PREFIX)/$$(subst $$(DIR_ROOT)/,,$$(HEADER))),)\""
 endef
 
+%.$(DS): %.$(SS)
+	@/bin/rm -f "$(@)" && \
+	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@:.$(DS)=.$(OS)) -MT $(@) -MF $(@)
+
 %.$(OS): %.$(SS)
 	@$(eval $(call IDENT_HELPER,$(<))) $(call msg,echo -n "Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... " && ) \
 	/bin/rm -f "$(@)" && \
-	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) -MT $(@:.$(OS)=.$(DS)) -MF $(@:.$(OS)=.$(DS)) && \
 	$(call invoke,$(CXX) $(CXXFLAGS) -D__ID__=$(ID) -D__TID__=$(TID) $(<) -c -o $(@) 2>&1 | tee -a make.log) && \
 	test -f $(@) \
 	$(call msg,&& echo $(NONL) "done.$(CL)")
