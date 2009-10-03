@@ -6,4 +6,5 @@ include $(DIR_ROOT)/_aux/mk/b_common-targets.mk
 include $(DIR_ROOT)/_aux/mk/c_filenames.mk
 include $(DIR_ROOT)/_aux/mk/e_target-default.mk
 include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
+include $(DIR_ROOT)/_aux/mk/g_deps.mk
 
