@@ -1,8 +1,10 @@
+ifeq ($(strip $(foreach GOAL,clean mrproper stats,$(findstring $(GOAL),$(MAKECMDGOALS)))),)
 ifeq ($(CURDIR),$(DIR_BUILD))
-$(firstword $(OBJS:.$(OS)=.$(DS))) $(lastword $(OBJS:.$(OS)=.$(DS))): $(DIRS) $(DIR_BUILD)/version.hxx
+$(firstword $(OBJS:.$(OS)=.$(DS))) $(lastword $(OBJS:.$(OS)=.$(DS))): $(DIRS)
 
 -include $(OBJS:.$(OS)=.$(DS))
 -include $(AOBJS:.$(AOS)=.$(ADS))
+endif
 endif
 
 # vim: ft=make

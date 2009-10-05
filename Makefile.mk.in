@@ -175,10 +175,6 @@ flint:
 						hdata/*.$(SS) \
 | awk '{gsub(" \\(compare with line [^)]+\\)","");print}'|head -20
 
-ifeq ($(CURDIR),$(DIR_BUILD))
-$(firstword $(OBJS:.$(OS)=.$(DS))) $(lastword $(OBJS:.$(OS)=.$(DS))): $(DIRS)
-
--include $(OBJS:.$(OS)=.$(DS))
-endif
+include $(DIR_ROOT)/_aux/mk/g_deps.mk
 
 # vim:ts=2
