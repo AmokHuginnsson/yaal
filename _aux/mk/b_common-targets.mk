@@ -5,7 +5,7 @@ all: debug
 
 debug: environment $(REAL_TARGETS)
 
-environment: $(DIR_BUILD) $(DIRS) $(DIR_BUILD)/version.hxx
+environment: $(DIR_BUILD) $(DIRS)
 
 $(DIR_BUILD):
 	@/bin/mkdir -p $(@)
