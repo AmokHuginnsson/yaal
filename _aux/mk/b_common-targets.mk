@@ -10,10 +10,6 @@ environment: $(DIR_BUILD) $(DIRS) $(DIR_BUILD)/version.hxx
 $(DIR_BUILD):
 	@/bin/mkdir -p $(@)
 
-$(DIR_BUILD)/version.hxx:
-	@echo "Program version $(RELEASE)-`date +%Y%m%d`."; \
-	echo "#define VER \"$(RELEASE)-`date +%Y%m%d`\"" > $(DIR_BUILD)/version.hxx
-
 $(PRJNAME).info : src/$(PRJNAME).texinfo
 	@makeinfo src/$(PRJNAME).texinfo
 
