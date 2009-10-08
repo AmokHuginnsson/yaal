@@ -110,9 +110,8 @@ int HFile::open( HString const& a_oPath )
 int HFile::close( void )
 	{
 	M_PROLOG
+	M_ASSERT( f_pvHandle );
 	int l_iError = 0;
-	if ( ! f_pvHandle )
-		M_THROW( "file is not opened", errno );
 	l_iError = ::std::fclose( static_cast<FILE*>( f_pvHandle ) );
 	if ( l_iError )
 		{
@@ -127,8 +126,7 @@ int HFile::close( void )
 int long HFile::tell( void ) const
 	{
 	M_PROLOG
-	if ( ! f_pvHandle )
-		M_THROW( _( "no file is opened" ), errno );
+	M_ASSERT( f_pvHandle );
 	int long pos = 0;
 	M_ENSURE( ( pos = ::std::ftell( static_cast<FILE*>( f_pvHandle ) ) ) >= 0 );
 	return ( pos );
@@ -138,8 +136,7 @@ int long HFile::tell( void ) const
 void HFile::seek( int long const& pos, seek_t const& a_eSeek )
 	{
 	M_PROLOG
-	if ( ! f_pvHandle )
-		M_THROW( _( "no file is opened" ), errno );
+	M_ASSERT( f_pvHandle );
 	int s = 0;
 	switch ( a_eSeek.value() )
 		{
@@ -165,6 +162,7 @@ int long HFile::read_line( HString& a_roLine, read_t const& a_eRead,
 		int const a_iMaximumLength )
 	{
 	M_PROLOG
+	M_ASSERT( f_pvHandle );
 	read_t l_eRead = a_eRead;
 	if ( ( !!( l_eRead & READ::KEEP_NEWLINES ) ) && ( !!( l_eRead & READ::STRIP_NEWLINES ) ) )
 		M_THROW( _( "bad newlines setting" ), l_eRead.value() );
@@ -221,6 +219,7 @@ int long HFile::read_line( HString& a_roLine, read_t const& a_eRead,
 int long HFile::get_line_length( void )
 	{
 	M_PROLOG
+	M_ASSERT( f_pvHandle );
 	static int const SCAN_BUFFER_SIZE = 8;
 	int long l_iLength = 0, l_iSize = 0;
 	char l_pcBuffer[ SCAN_BUFFER_SIZE ];
@@ -267,6 +266,7 @@ void HFile::flush( void ) const
 void HFile::do_flush( void ) const
 	{
 	M_PROLOG
+	M_ASSERT( f_pvHandle );
 	M_ENSURE( ::std::fflush( static_cast<FILE*>( f_pvHandle ) ) == 0 );
 	return;
 	M_EPILOG
@@ -290,7 +290,15 @@ int long HFile::do_read( void* const a_pcBuffer, int long const& a_lSize )
 int long HFile::do_write( void const* const a_pcString, int long const& a_lSize )
 	{
 	M_PROLOG
+	M_ASSERT( f_pvHandle );
 	return ( ::std::fwrite( a_pcString, sizeof ( char ), a_lSize, static_cast<FILE*>( f_pvHandle ) ) );
+	M_EPILOG
+	}
+
+bool HFile::do_is_valid( void ) const
+	{
+	M_PROLOG
+	return ( f_pvHandle != NULL );
 	M_EPILOG
 	}
 

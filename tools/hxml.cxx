@@ -487,6 +487,7 @@ void HXml::parse( HString a_oXPath, bool a_bStripEmpty )
 void HXml::load( yaal::hcore::HStreamInterface& stream )
 	{
 	M_PROLOG
+	M_ENSURE( stream.is_valid() );
 	init( stream );
 	parse( HString(), true );
 	return;
@@ -496,6 +497,7 @@ void HXml::load( yaal::hcore::HStreamInterface& stream )
 void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream )
 	{
 	M_PROLOG
+	M_ENSURE( stream->is_valid() );
 	return ( load( *stream ) );
 	M_EPILOG
 	}
@@ -503,6 +505,7 @@ void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream )
 void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 	{
 	M_PROLOG
+	M_ENSURE( stream.is_valid() );
 	doc_resource_t doc( NULL, xmlFreeDoc );
 	/* flush writer to DOM. */
 	M_ENSURE( !! get_root() );
@@ -555,6 +558,7 @@ void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream ) const
 	{
 	M_PROLOG
+	M_ENSURE( stream->is_valid() );
 	save( *stream );
 	return;
 	M_EPILOG

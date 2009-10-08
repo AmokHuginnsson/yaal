@@ -114,6 +114,7 @@ private:
 	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;
 	virtual int long do_read( void* const, int long const& );
+	virtual bool do_is_valid( void ) const;
 	int long get_line_length( void );
 	HFile( HFile const& );
 	HFile& operator = ( HFile const& );

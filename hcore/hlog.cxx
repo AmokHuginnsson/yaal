@@ -300,6 +300,13 @@ int long HLog::do_read( void* const, int long const& )
 	return ( 0 );
 	}
 
+bool HLog::do_is_valid( void ) const
+	{
+	M_PROLOG
+	return ( f_psStream != NULL );
+	M_EPILOG
+	}
+
 }
 
 }

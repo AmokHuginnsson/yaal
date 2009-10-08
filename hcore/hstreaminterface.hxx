@@ -96,10 +96,12 @@ public:
 	int long read( void* const, int long const& );
 	int long write( void const* const, int long const& );
 	static char const* const eols;
+	bool is_valid( void ) const;
 private:
 	virtual int long do_write( void const* const, int long const& ) = 0;
 	virtual int long do_read( void* const, int long const& ) = 0;
 	virtual void do_flush( void ) const = 0;
+	virtual bool do_is_valid( void ) const = 0;
 	friend HStreamInterface& endl( HStreamInterface& );
 	friend HStreamInterface& flush( HStreamInterface& );
 	};

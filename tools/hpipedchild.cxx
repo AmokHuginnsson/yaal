@@ -237,6 +237,13 @@ void HPipedChild::set_csoi( STREAM::stream_t const& a_eCSOI )
 	M_EPILOG
 	}
 
+bool HPipedChild::do_is_valid( void ) const
+	{
+	M_PROLOG
+	return ( ( f_iPid > 0 ) && ( f_iPipeIn >= 0 ) && ( f_iPipeOut >= 0 ) && ( f_iPipeErr >= 0 ) );
+	M_EPILOG
+	}
+
 }
 
 }

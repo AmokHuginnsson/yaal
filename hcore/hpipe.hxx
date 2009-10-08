@@ -54,6 +54,7 @@ protected:
 	virtual int long do_write( void const* const, int long const& );
 	virtual int long do_read( void* const, int long const& );
 	virtual void do_flush( void ) const;
+	virtual bool do_is_valid( void ) const;
 	};
 
 typedef HExceptionT<HPipe,HStreamInterfaceException> HPipeException;

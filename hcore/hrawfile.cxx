@@ -261,6 +261,13 @@ void HRawFile::set_timeout( int a_iTimeout )
 	return;
 	}
 
+bool HRawFile::do_is_valid( void ) const
+	{
+	M_PROLOG
+	return ( f_iFileDescriptor >= 0 );
+	M_EPILOG
+	}
+
 }
 
 }

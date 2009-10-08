@@ -130,7 +130,16 @@ char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream co
 
 bool HStringStream::is_empty( void ) const
 	{
+	M_PROLOG
 	return ( f_bUsed || f_oBuffer.is_empty() );
+	M_EPILOG
+	}
+
+bool HStringStream::do_is_valid( void ) const
+	{
+	M_PROLOG
+	return ( true );
+	M_EPILOG
 	}
 
 }

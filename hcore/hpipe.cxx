@@ -90,6 +90,13 @@ void HPipe::do_flush( void ) const
 	{
 	}
 
+bool HPipe::do_is_valid( void ) const
+	{
+	M_PROLOG
+	return ( ( f_piPipe[ 0 ] >= 0 ) && ( f_piPipe[ 1 ] >= 0 ) );
+	M_EPILOG
+	}
+
 }
 
 }

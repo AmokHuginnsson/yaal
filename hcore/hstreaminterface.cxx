@@ -241,6 +241,13 @@ int long HStreamInterface::write( void const* const a_pvBuffer, int long const& 
 	M_EPILOG
 	}
 
+bool HStreamInterface::is_valid( void ) const
+	{
+	M_PROLOG
+	return ( do_is_valid() );
+	M_EPILOG
+	}
+
 }
 
 }
