@@ -177,18 +177,18 @@ HConsoleInitDeinit::HConsoleInitDeinit( void )
 	{
 	M_PROLOG
 	errno = 0;
-	yaalOptions( "use_mouse", program_options_helper::option_value( n_bUseMouse ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "enable mouse support" )
-		( "disable_XON", program_options_helper::option_value( n_bDisableXON ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable flow control events" )
-		( "leave_ctrl_c", program_options_helper::option_value( n_bLeaveCtrlC ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+C sequence" )
-		( "leave_ctrl_z", program_options_helper::option_value( n_bLeaveCtrlZ ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+Z sequence" )
-		( "leave_ctrl_s", program_options_helper::option_value( n_bLeaveCtrlS ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+S sequence" )
-		( "leave_ctrl_q", program_options_helper::option_value( n_bLeaveCtrlQ ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+Q sequence" )
-		( "leave_ctrl_\\", program_options_helper::option_value( n_bLeaveCtrlBackSlash ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "disable special handling of CTRL+\\ sequence" )
-		( "esc_delay", program_options_helper::option_value( ESCDELAY ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "ncurses escape sequence time span" ) /* defined inside ncurses lib */
-		( "latency", program_options_helper::option_value( n_iLatency ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "how often invoke idle event" )
-		( "command_compose_character", program_options_helper::option_value( n_cCommandComposeCharacter ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL,
-			"character that shall be uses as command composition base" )
-		( "command_compose_delay", program_options_helper::option_value( n_iCommandComposeDelay ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "command composition time span" );
+	yaalOptions( "use_mouse", program_options_helper::option_value( n_bUseMouse ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "enable mouse support" )
+		( "disable_XON", program_options_helper::option_value( n_bDisableXON ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable flow control events" )
+		( "leave_ctrl_c", program_options_helper::option_value( n_bLeaveCtrlC ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+C sequence" )
+		( "leave_ctrl_z", program_options_helper::option_value( n_bLeaveCtrlZ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+Z sequence" )
+		( "leave_ctrl_s", program_options_helper::option_value( n_bLeaveCtrlS ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+S sequence" )
+		( "leave_ctrl_q", program_options_helper::option_value( n_bLeaveCtrlQ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+Q sequence" )
+		( "leave_ctrl_\\", program_options_helper::option_value( n_bLeaveCtrlBackSlash ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+\\ sequence" )
+		( "esc_delay", program_options_helper::option_value( ESCDELAY ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "ncurses escape sequence time span", "seconds" ) /* defined inside ncurses lib */
+		( "latency", program_options_helper::option_value( n_iLatency ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "how often invoke idle event", "seconds" )
+		( "command_compose_character", program_options_helper::option_value( n_cCommandComposeCharacter ), HProgramOptionsHandler::OOption::TYPE::REQUIRED,
+			"character that shall be uses as command composition base", "character" )
+		( "command_compose_delay", program_options_helper::option_value( n_iCommandComposeDelay ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "command composition time span", "seconds" );
 	yaalOptions.process_rc_file( "yaal", "console", set_hconsole_variables );
 	return;
 	M_EPILOG

@@ -195,9 +195,9 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	char* l_pcEnv = ::getenv( "YAAL_DEBUG" );
 	if ( l_pcEnv )
 		n_iDebugLevel = lexical_cast<int>( l_pcEnv );
-	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::f_oSSLKey ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "Path to the OpenSSL private key file." )
-		( "ssl_cert", program_options_helper::option_value( HOpenSSL::f_oSSLCert ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "Path to the OpenSSL certificate file." )
-		( "resolve_hostnames", program_options_helper::option_value( HSocket::f_bResolveHostnames ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "Resolve IP address into host names." );
+	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::f_oSSLKey ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL private key file.", "path" )
+		( "ssl_cert", program_options_helper::option_value( HOpenSSL::f_oSSLCert ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL certificate file.", "path" )
+		( "resolve_hostnames", program_options_helper::option_value( HSocket::f_bResolveHostnames ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Resolve IP address into host names." );
 	yaalOptions.process_rc_file( "yaal", "core", set_hcore_variables );
 	return;
 	}

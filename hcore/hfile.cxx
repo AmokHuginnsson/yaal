@@ -101,6 +101,7 @@ int HFile::open( HString const& a_oPath )
 		{
 		l_iError = errno;
 		f_oError = error_message( l_iError );
+		f_oError += ": " + a_oPath;
 		return ( l_iError );
 		}
 	return ( 0 );

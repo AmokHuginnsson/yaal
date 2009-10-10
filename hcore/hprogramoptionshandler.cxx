@@ -205,27 +205,27 @@ public:
 
 HProgramOptionsHandler::OOption::OOption( void )
 	: f_pcName( NULL ), f_oValue(),
-	f_pcShortForm( NULL ), f_eSwitchType( TYPE::NONE ),
-	f_pcArgument( NULL ), f_pcDescription( NULL ),
+	f_iShortForm( 0 ), f_eSwitchType( TYPE::NONE ),
+	f_pcDescription( NULL ), f_pcArgument( NULL ),
 	CALLBACK() {}
 
 HProgramOptionsHandler::OOption::OOption(
 		char const* a_pcName,
 		HOptionValueInterface::ptr_t a_oValue,
-		char const* a_pcShortForm,
+		int const& a_iShortForm,
 		TYPE::enum_t a_eSwitchType,
 		char const* a_pcArgument,
 		char const* a_pcDescription,
 		HProgramOptionsHandler::simple_callback_t const& a_CALLBACK )
 	: f_pcName( a_pcName ), f_oValue( a_oValue ),
-	f_pcShortForm( a_pcShortForm ), f_eSwitchType( a_eSwitchType ),
-	f_pcArgument( a_pcArgument ), f_pcDescription( a_pcDescription ),
+	f_iShortForm( a_iShortForm ), f_eSwitchType( a_eSwitchType ),
+	f_pcDescription( a_pcDescription ), f_pcArgument( a_pcArgument ),
 	CALLBACK( a_CALLBACK ) {}
 
 HProgramOptionsHandler::OOption::OOption( HProgramOptionsHandler::OOption const& o )
 	: f_pcName( o.f_pcName ), f_oValue( o.f_oValue ),
-	f_pcShortForm( o.f_pcShortForm ), f_eSwitchType( o.f_eSwitchType ),
-	f_pcArgument( o.f_pcArgument ), f_pcDescription( o.f_pcDescription ),
+	f_iShortForm( o.f_iShortForm ), f_eSwitchType( o.f_eSwitchType ),
+	f_pcDescription( o.f_pcDescription ), f_pcArgument( o.f_pcArgument ),
 	CALLBACK( o.CALLBACK ) {}
 
 HProgramOptionsHandler::OOption& HProgramOptionsHandler::OOption::operator = ( HProgramOptionsHandler::OOption const& o )
@@ -248,10 +248,10 @@ void HProgramOptionsHandler::OOption::swap( HProgramOptionsHandler::OOption& o )
 		using yaal::swap;
 		swap( f_pcName, o.f_pcName );
 		swap( f_oValue, o.f_oValue );
-		swap( f_pcShortForm, o.f_pcShortForm );
+		swap( f_iShortForm, o.f_iShortForm );
 		swap( f_eSwitchType, o.f_eSwitchType );
-		swap( f_pcArgument, o.f_pcArgument );
 		swap( f_pcDescription, o.f_pcDescription );
+		swap( f_pcArgument, o.f_pcArgument );
 		swap( CALLBACK, o.CALLBACK );
 		}
 	return;
@@ -360,27 +360,74 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 		char const* name, HOptionValueInterface::ptr_t value,
-		char const* shortForm, OOption::TYPE::enum_t const& type,
-		char const* arg, char const* desc, simple_callback_t const& callback )
+		int const& shortForm, OOption::TYPE::enum_t const& type,
+		char const* desc, char const* arg,
+		simple_callback_t const& callback )
 	{
 	M_PROLOG
-	OOption o( name, value, shortForm, type, arg, desc, callback );
-	if ( ! ( name || shortForm ) )
+	/* If user does not specify short form by hand an automatic short form value will by assigned.
+	 * Automatic short form value must be outside of byte range.
+	 */
+	int sf = shortForm ? shortForm : static_cast<int>( f_oOptions.size() ) + UCHAR_MAX + 1;
+	OOption o( name, value, sf, type, arg, desc, callback );
+	if ( ! ( name || sf ) )
 		throw HProgramOptionsHandlerException( "unnamed option encountered" );
 	if ( ( ! value ) && ( ! callback.first ) )
-		throw HProgramOptionsHandlerException( HString( "unused option: " ) + ( name ? name : shortForm ) );
+		throw HProgramOptionsHandlerException( HString( "unused option: " ) + ( name ? HString( name ) : HString( static_cast<char>( sf ) ) ) );
 	for ( options_t::const_iterator it( f_oOptions.begin() ), end( f_oOptions.end() ); it != end; ++ it )
 		{
 		if ( ( !! value && ! it->f_oValue ) || ( ! value && !! it->f_oValue ) || ( !! value && ( value->id() != it->f_oValue->id() ) ) || ( callback != it->CALLBACK ) )
 			{
 			if ( name && it->f_pcName && ! ::strcasecmp( it->f_pcName, name ) )
 				throw HProgramOptionsHandlerException( HString( "duplicated long option: " ) + name );
-			if ( shortForm && it->f_pcShortForm && ! ::strcmp( it->f_pcShortForm, shortForm ) )
-				throw HProgramOptionsHandlerException( HString( "duplicated short option: " ) + shortForm );
+			if ( it->f_iShortForm == sf )
+				throw HProgramOptionsHandlerException( HString( "duplicated short option: " ) + static_cast<char>( sf ) );
 			}
 		}
 	f_oOptions.push_back( o );
 	return ( *this );
+	M_EPILOG
+	}
+
+HProgramOptionsHandler& HProgramOptionsHandler::operator()(
+		char const* name, HOptionValueInterface::ptr_t value,
+		char const* shortForm, OOption::TYPE::enum_t const& type,
+		char const* desc, char const* arg,
+		simple_callback_t const& callback )
+	{
+	M_PROLOG
+	return ( operator()( name, value, shortForm[0], type, desc, arg, callback ) );
+	M_EPILOG
+	}
+
+HProgramOptionsHandler& HProgramOptionsHandler::operator()(
+		char const* name, HOptionValueInterface::ptr_t value,
+		int const& shortForm, OOption::TYPE::enum_t const& type,
+		char const* desc, simple_callback_t const& callback )
+	{
+	M_PROLOG
+	return ( operator()( name, value, shortForm, type, desc, NULL, callback ) );
+	M_EPILOG
+	}
+
+HProgramOptionsHandler& HProgramOptionsHandler::operator()(
+		char const* name, HOptionValueInterface::ptr_t value,
+		OOption::TYPE::enum_t const& type,
+		char const* desc, simple_callback_t const& callback )
+	{
+	M_PROLOG
+	return ( operator()( name, value, 0, type, desc, NULL, callback ) );
+	M_EPILOG
+	}
+
+HProgramOptionsHandler& HProgramOptionsHandler::operator()(
+		char const* name, HOptionValueInterface::ptr_t value,
+		OOption::TYPE::enum_t const& type,
+		char const* desc, char const* arg,
+		simple_callback_t const& callback )
+	{
+	M_PROLOG
+	return ( operator()( name, value, 0, type, desc, arg, callback ) );
 	M_EPILOG
 	}
 
@@ -566,9 +613,9 @@ char const* make_short_opts( HProgramOptionsHandler::options_t const& a_oOptions
 	for ( HProgramOptionsHandler::options_t::const_iterator it = a_oOptions.begin(),
 			end = a_oOptions.end(); it != end; ++ it )
 		{
-		if ( ! it->f_pcShortForm )
+		if ( it->f_iShortForm > UCHAR_MAX )
 			continue;
-		a_roBuffer += static_cast<char>( it->f_pcShortForm[0] );
+		a_roBuffer += static_cast<char>( it->f_iShortForm );
 		switch ( it->f_eSwitchType )
 			{
 			case ( HProgramOptionsHandler::OOption::TYPE::REQUIRED ):
@@ -612,8 +659,7 @@ option* make_option_array( HProgramOptionsHandler::options_t const& a_oOptions, 
 			default :
 				l_psOptions[ l_iCtr ].has_arg = no_argument;
 			}
-		if ( it->f_pcShortForm )
-			l_psOptions[ l_iCtr ].val = it->f_pcShortForm[0];
+		l_psOptions[ l_iCtr ].val = it->f_iShortForm;
 		}
 	return ( l_psOptions );
 	M_EPILOG
@@ -625,7 +671,7 @@ int HProgramOptionsHandler::process_command_line( int const& a_iArgc,
 	{
 	M_PROLOG
 	bool l_bValidSwitch = false;
-	int l_iChar = 0;
+	int l_iVal = 0;
 	char const* l_pcShortOpts = NULL;
 	option* l_psOptionArray = NULL;
 	HString l_oShortOptBuffer;
@@ -633,13 +679,13 @@ int HProgramOptionsHandler::process_command_line( int const& a_iArgc,
 	hcore::log << "Decoding switches ... ";
 	l_pcShortOpts = make_short_opts( f_oOptions, l_oShortOptBuffer );
 	l_psOptionArray = make_option_array( f_oOptions, l_oLongOptBuffer );
-	while ( ( l_iChar = ::getopt_long( a_iArgc, a_ppcArgv, l_pcShortOpts,
+	while ( ( l_iVal = ::getopt_long( a_iArgc, a_ppcArgv, l_pcShortOpts,
 					l_psOptionArray, NULL ) ) != EOF )
 		{
 		l_bValidSwitch = false;
 		for ( options_t::iterator it = f_oOptions.begin(), end = f_oOptions.end(); it != end; ++ it )
 			{
-			if ( it->f_pcShortForm && ( it->f_pcShortForm[0] == l_iChar ) )
+			if ( it->f_iShortForm == l_iVal )
 				l_bValidSwitch = true, set_option( *it, optarg );
 			}
 		if ( ! l_bValidSwitch && a_piUnknown )

@@ -85,15 +85,15 @@ public:
 			};
 		char const* f_pcName;
 		HOptionValueInterface::ptr_t f_oValue;
-		char const* f_pcShortForm;
+		int f_iShortForm;
 		TYPE::enum_t f_eSwitchType;
-		char const* f_pcArgument;
 		char const* f_pcDescription;
+		char const* f_pcArgument;
 		simple_callback_t CALLBACK;
 		OOption( void );
 		OOption(
 				char const*, HOptionValueInterface::ptr_t,
-				char const*, TYPE::enum_t,
+				int const&, TYPE::enum_t,
 				char const*, char const*,
 				HProgramOptionsHandler::simple_callback_t const& );
 		OOption( OOption const& );
@@ -112,8 +112,32 @@ public:
 	/*! \brief Add new option descriptor to option handler.
 	 *
 	 * \param name - option name.
+	 * \param value - value storage helper.
+	 * \param shortForm - a short form of option name.
+	 * \param argType - type of option with respect to requirements of addtional arguments.
+	 * \param desc - option descrition for help generation.
+	 * \param argName - name of addtional option argument for generated help message.
+	 * \param callback - a function invoked when option is encountered.
 	 */
-	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t, char const*, OOption::TYPE::enum_t const&, char const*, char const*, simple_callback_t const& = simple_callback_t( NULL, NULL ) );
+	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
+			int const& shortForm, OOption::TYPE::enum_t const& argType,
+			char const* desc = NULL, char const* argName = NULL,
+			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
+	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
+			int const& shortForm, OOption::TYPE::enum_t const& argType,
+			char const* desc,
+			simple_callback_t const& callback );
+	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
+			OOption::TYPE::enum_t const& argType, char const* desc,
+			simple_callback_t const& callback );
+	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
+			char const* shortForm, OOption::TYPE::enum_t const& argType,
+			char const* desc = NULL, char const* argName = NULL,
+			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
+	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
+			OOption::TYPE::enum_t const& argType,
+			char const* desc = NULL, char const* argName = NULL,
+			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
 	/*! \brief Parse command line options and set program setup variables.
 	 *
 	 * process_command_line gives easy to use API for interpreting and handling

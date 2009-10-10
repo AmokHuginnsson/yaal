@@ -52,7 +52,7 @@ static char const g_pcDynamicLinkerPath[]
 
 void yaal_hdata_banner( void )
 	{
-	fprintf ( stdout, "\thdata\n" );
+	fprintf( stdout, "\thdata\n" );
 	return;
 	}
 

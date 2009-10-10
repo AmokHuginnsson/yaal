@@ -166,11 +166,11 @@ public:
 HToolsInitDeinit::HToolsInitDeinit( void )
 	{
 	M_PROLOG
-	yaalOptions( "ignore_signal_SIGINT", program_options_helper::option_value( n_bIgnoreSignalSIGINT ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "ignore INT (interrupt) signal" )
-			( "ignore_signal_SIGTSTP", program_options_helper::option_value( n_bIgnoreSignalSIGTSTP ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "ignore TSTP (terminal stop, suspend) signal" )
-			( "ignore_signal_SIGQUIT", program_options_helper::option_value( n_bIgnoreSignalSIGQUIT ), 0, HProgramOptionsHandler::OOption::TYPE::OPTIONAL, NULL, "ignore QUIT, core dump signal" )
-			( "serial_device", program_options_helper::option_value( n_oSerialDevice ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "path to serial device" )
-			( "collector_connection_timeout", program_options_helper::option_value( n_iCollectorConnectionTimeOut ), 0, HProgramOptionsHandler::OOption::TYPE::REQUIRED, NULL, "timeout on collector device read" );
+	yaalOptions( "ignore_signal_SIGINT", program_options_helper::option_value( n_bIgnoreSignalSIGINT ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore INT (interrupt) signal" )
+			( "ignore_signal_SIGTSTP", program_options_helper::option_value( n_bIgnoreSignalSIGTSTP ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore TSTP (terminal stop, suspend) signal" )
+			( "ignore_signal_SIGQUIT", program_options_helper::option_value( n_bIgnoreSignalSIGQUIT ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore QUIT, core dump signal" )
+			( "serial_device", program_options_helper::option_value( n_oSerialDevice ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to serial device", "path" )
+			( "collector_connection_timeout", program_options_helper::option_value( n_iCollectorConnectionTimeOut ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "timeout on collector device read", "seconds" );
 	int l_iCtr = 0;
 	errno = 0;
 	extendable::my_strtold = smart_strtold;

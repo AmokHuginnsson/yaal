@@ -271,7 +271,7 @@ bool verify_IBAN( HString const& a_oIBAN )
 		}
 	l_oIBAN.hs_realloc( l_iLength );
 	for ( l_iCtr = 0; l_iCtr < l_iLength; l_iCtr ++ )
-		if ( isalnum ( a_oIBAN[ l_iCtr ] ) )
+		if ( isalnum( a_oIBAN[ l_iCtr ] ) )
 			l_oIBAN += a_oIBAN[ l_iCtr ];
 	l_iLength = l_oIBAN.get_length();
 	if ( l_iLength < MIN_IBAN_LENGTH )
@@ -323,6 +323,11 @@ HString get_token( yaal::hcore::HString const& s, yaal::hcore::HString const& d,
 	M_EPILOG
 	}
 
+bool is_byte( int value )
+	{
+	return ( value <= UCHAR_MAX );
+	}
+
 void show_help( void* arg )
 	{
 	M_PROLOG
@@ -343,9 +348,8 @@ void show_help( void* arg )
 		size_t tmp = ( o.f_pcName ? ::strlen( o.f_pcName ) + 2 : 0 ) + ( o.f_pcArgument ? ::strlen( o.f_pcArgument ) + 1 : 0 ) + ( o.f_eSwitchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL ? 2 : 1 );
 		if ( tmp > l_iLongestLongLength )
 			l_iLongestLongLength = tmp;
-		tmp = 0;
-		if ( it->f_pcShortForm && ( ( tmp = ::strlen( it->f_pcShortForm ) + 1 ) > l_iLongestShortLength ) )
-			l_iLongestShortLength = tmp;
+		if ( is_byte( it->f_iShortForm ) )
+			l_iLongestShortLength = 2;
 		}
 	HString desc;
 	char const* description = NULL;
@@ -354,16 +358,16 @@ void show_help( void* arg )
 	for ( int i = 0; i < COUNT; ++ i )
 		{
 		HProgramOptionsHandler::OOption const& o = opts[ i ];
-		if ( ! ( o.f_pcShortForm || o.f_pcName ) )
+		if ( ! ( is_byte( o.f_iShortForm ) || o.f_pcName ) )
 			continue;
 		HString sf;
 		/* if short form char exist, build full form of short form */
-		if ( o.f_pcShortForm )
+		if ( is_byte( o.f_iShortForm ) )
 			{
 			sf = "-";
-			sf += o.f_pcShortForm;
+			sf += static_cast<char>( o.f_iShortForm );
 			}
-		char const* coma = o.f_pcShortForm && o.f_pcName ? "," : " ";
+		char const* coma = is_byte( o.f_iShortForm ) && o.f_pcName ? "," : " ";
 		if ( ! description )
 			description = o.f_pcDescription;
 		/* if long form word exist, build full form of long form */
@@ -390,7 +394,7 @@ void show_help( void* arg )
 				if ( description == o.f_pcDescription )
 					description = "";
 				}
-			if ( o.f_pcShortForm && p.f_pcShortForm && ( ! ::strcmp( o.f_pcShortForm, p.f_pcShortForm ) ) )
+			if ( is_byte( o.f_iShortForm ) && is_byte( p.f_iShortForm ) && (  o.f_iShortForm == p.f_iShortForm ) )
 				{
 				sf = "", coma = " ";
 				if ( description == o.f_pcDescription )
@@ -423,7 +427,7 @@ void show_help( void* arg )
 					{
 					HProgramOptionsHandler::OOption const& n = opts[ i + 1 ];
 					if ( ( o.f_pcName && n.f_pcName && ( ! ::strcmp( o.f_pcName, n.f_pcName ) ) )
-							|| ( o.f_pcShortForm && n.f_pcShortForm && ( ! ::strcmp( o.f_pcShortForm, n.f_pcShortForm ) ) ) )
+							|| ( is_byte( o.f_iShortForm ) && is_byte( n.f_iShortForm ) && ( o.f_iShortForm == n.f_iShortForm ) ) )
 						{
 						description = desc.raw();
 						break;
@@ -487,8 +491,8 @@ void dump_configuration( void* arg )
 					&& ( ! ::strcmp( o.f_pcName, p.f_pcName ) )
 					&& ( o.f_pcDescription == description ) )
 				description = "";
-			if ( o.f_pcShortForm && p.f_pcShortForm
-					&& ( ! ::strcmp( o.f_pcShortForm, p.f_pcShortForm ) )
+			if ( is_byte( o.f_iShortForm ) && is_byte( p.f_iShortForm )
+					&& ( o.f_iShortForm == p.f_iShortForm )
 					&& ( o.f_pcDescription == description ) )
 				description = "";
 			}
