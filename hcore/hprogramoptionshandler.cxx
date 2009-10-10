@@ -402,6 +402,16 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 		char const* name, HOptionValueInterface::ptr_t value,
+		char const* shortForm, OOption::TYPE::enum_t const& type,
+		char const* desc, simple_callback_t const& callback )
+	{
+	M_PROLOG
+	return ( operator()( name, value, shortForm[0], type, desc, NULL, callback ) );
+	M_EPILOG
+	}
+
+HProgramOptionsHandler& HProgramOptionsHandler::operator()(
+		char const* name, HOptionValueInterface::ptr_t value,
 		int const& shortForm, OOption::TYPE::enum_t const& type,
 		char const* desc, simple_callback_t const& callback )
 	{

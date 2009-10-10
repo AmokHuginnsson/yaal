@@ -135,6 +135,9 @@ public:
 			char const* desc = NULL, char const* argName = NULL,
 			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
 	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
+			char const* shortForm, OOption::TYPE::enum_t const& argType,
+			char const* desc, simple_callback_t const& callback );
+	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
 			OOption::TYPE::enum_t const& argType,
 			char const* desc = NULL, char const* argName = NULL,
 			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
