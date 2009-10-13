@@ -389,6 +389,165 @@ protected:
 	virtual void const* do_id( void ) const = 0;
 	};
 
+struct object_resolver
+	{
+	typedef enum { REF, PTR, FREE } object_type_t;
+	template<typename CLASS_t>
+	struct object_type
+		{
+		static object_type_t const value = static_cast<object_type_t>( ternary<trait::is_pointer<CLASS_t>::value, PTR, REF>::value );
+		};
+	template<typename return_t, object_type_t>
+	struct invoke;
+
+	template<typename return_t>
+	struct invoke<return_t, REF>
+		{
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+			typename a8_t, typename a9_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+			typename a8_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5, a6 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2 )
+			{ return ( (object_.*method_)( a0, a1, a2 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1 )
+			{ return ( (object_.*method_)( a0, a1 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0 )
+			{ return ( (object_.*method_)( a0 ) ); }
+		template<typename METHOD_t, typename CLASS_t>
+		static return_t go( METHOD_t method_, CLASS_t object_ )
+			{ return ( (object_.*method_)() ); }
+		template<typename CLASS_t>
+		static CLASS_t* id( CLASS_t& object_ )
+			{ return ( &object_ ); }
+		};
+	template<typename return_t>
+	struct invoke<return_t, PTR>
+		{
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+			typename a8_t, typename a9_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+			typename a8_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5, a6 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2 )
+			{ return ( (object_->*method_)( a0, a1, a2 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t, typename a1_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0, a1_t a1 )
+			{ return ( (object_->*method_)( a0, a1 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t a0 )
+			{ return ( (object_->*method_)( a0 ) ); }
+		template<typename METHOD_t, typename CLASS_t>
+		static return_t go( METHOD_t method_, CLASS_t object_ )
+			{ return ( (object_->*method_)() ); }
+		template<typename CLASS_t>
+		static CLASS_t id( CLASS_t object_ )
+			{ return ( object_ ); }
+		};
+	};
+
 /*! \brief Make a functor from any (class, method) pair.
  */
 template<typename CLASS_t, typename METHOD_t>
@@ -405,104 +564,104 @@ public:
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 		typename a8_t, typename a9_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 		typename a8_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5, a6, a7, a8 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 		typename a8_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5, a6, a7, a8 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7 )
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5, a6, a7 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7 ) const
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5, a6, a7 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6 )
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5, a6 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6 ) const
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5, a6 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5 )
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5 ) const
-		{ (_object.*_method)( a0, a1, a2, a3, a4, a5 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		{ (_object.*_method)( a0, a1, a2, a3, a4 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
-		{ (_object.*_method)( a0, a1, a2, a3, a4 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		{ (_object.*_method)( a0, a1, a2, a3 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 ) const
-		{ (_object.*_method)( a0, a1, a2, a3 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t>
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2 )
-		{ (_object.*_method)( a0, a1, a2 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t>
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2 ) const
-		{ (_object.*_method)( a0, a1, a2 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2 ) ); }
 	template<typename a0_t, typename a1_t>
 	return_t operator()( a0_t a0, a1_t a1 )
-		{ (_object.*_method)( a0, a1 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1 ) ); }
 	template<typename a0_t, typename a1_t>
 	return_t operator()( a0_t a0, a1_t a1 ) const
-		{ (_object.*_method)( a0, a1 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1 ) ); }
 	template<typename a0_t>
 	return_t operator()( a0_t a0 )
-		{ (_object.*_method)( a0 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0 ) ); }
 	template<typename a0_t>
 	return_t operator()( a0_t a0 ) const
-		{ (_object.*_method)( a0 ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0 ) ); }
 	return_t operator()( void )
-		{ (_object.*_method)(); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object ) ); }
 	return_t operator()( void ) const
-		{ (_object.*_method)(); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object ) ); }
 	void const* id( void ) const
-		{ return ( &_object ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::id( _object ) ); }
 	};
 
 template<typename CLASS_t, typename METHOD_t>
@@ -846,94 +1005,140 @@ protected:
 		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ); }
 	};
 
-template<typename CLASS_t, typename METHOD_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t> >(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ) ) ) ); }
+template<typename METHOD_t,
+	typename a0_t = trait::no_type, typename a1_t = trait::no_type,
+	typename a2_t = trait::no_type, typename a3_t = trait::no_type,
+	typename a4_t = trait::no_type, typename a5_t = trait::no_type,
+	typename a6_t = trait::no_type, typename a7_t = trait::no_type,
+	typename a8_t = trait::no_type, typename a9_t = trait::no_type, typename a10_t = trait::no_type>
+struct bound_call_calculator
+	{
+	struct functor
+		{
+		typedef HFunctor<a0_t, METHOD_t> functor_t;
+		typedef HBoundCall<functor_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> type;
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1, a2, a3, a4, a5 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1, a2, a3, a4 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1, a2, a3 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1, a2 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ), a1 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0 )
+			{ return ( HBoundCallInterface::ptr_t( new type( functor_t( a0, m ) ) ) ); }
+		};
+	struct function
+		{
+		typedef HBoundCall<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t> type;
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0, a1, a2, a3, a4, a5 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0, a1, a2, a3, a4 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0, a1, a2, a3 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0, a1, a2 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0, a1_t a1 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0, a1 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m, a0_t a0 )
+			{ return ( HBoundCallInterface::ptr_t( new type( m, a0 ) ) ); }
+		inline static HBoundCallInterface::ptr_t make( METHOD_t m )
+			{ return ( HBoundCallInterface::ptr_t( new type( m ) ) ); }
+		};
+	typedef typename trait::ternary<trait::is_member<METHOD_t>::value, functor, function>::type type;
+	};
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0 ) ) ); }
+template<typename METHOD_t>
+HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD )
+	{ return ( bound_call_calculator<METHOD_t>::type::make( A_METHOD ) ); }
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t,
-	typename a1_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0, a1_t a1 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1 ) ) ); }
+template<typename METHOD_t, typename a0_t>
+HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t>::type::make( A_METHOD, a0 ) ); }
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t,
-	typename a1_t,
-	typename a2_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0, a1_t a1, a2_t a2 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2 ) ) ); }
+template<typename METHOD_t, typename a0_t, typename a1_t>
+HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t>::type::make( A_METHOD, a0, a1 ) ); }
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t,
-	typename a1_t, typename a2_t, typename a3_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t, a3_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3 ) ) ); }
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t>
+HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::make( A_METHOD, a0, a1, a2 ) ); }
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t,
-	typename a1_t, typename a2_t, typename a3_t, typename a4_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t, a3_t, a4_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3, a4 ) ) ); }
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t>
+HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::make( A_METHOD, a0, a1, a2, a3 ) ); }
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
-	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3, a4, a5 ) ) ); }
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t>
+HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::make( A_METHOD, a0, a1, a2, a3, a4 ) ); }
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
-	typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t>
+HBoundCallInterface::ptr_t bound_call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+	{ return ( bound_call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5 ) ); }
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
-	typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
-	typename a7_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t>
+HBoundCallInterface::ptr_t bound_call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+	{ return ( bound_call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6 ) ); }
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
-	typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
-	typename a7_t, typename a8_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+HBoundCallInterface::ptr_t bound_call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+	{ return ( bound_call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
 
-template<typename CLASS_t, typename METHOD_t, typename a0_t, typename a1_t,
-	typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
-	typename a7_t, typename a8_t, typename a9_t>
-HBoundCallInterface::ptr_t bound_call( CLASS_t obj, METHOD_t A_METHOD,
-		a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-	{ return ( HBoundCallInterface::ptr_t(
-				new HBoundCall<HFunctor<CLASS_t, METHOD_t>, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>(
-					HFunctor<CLASS_t, METHOD_t>( obj, A_METHOD ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t>
+HBoundCallInterface::ptr_t bound_call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+	{ return ( bound_call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t>
+HBoundCallInterface::ptr_t bound_call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+	{ return ( bound_call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+
+template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
+	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t, typename a10_t>
+HBoundCallInterface::ptr_t bound_call(
+						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+	{ return ( bound_call_calculator<METHOD_t,
+			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
 
 /*! \brief Implementation of abstration of any-method of any-class invocation.
  *

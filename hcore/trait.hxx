@@ -209,9 +209,28 @@ struct strip_const<T const>
 	};
 /*! \endcond */
 
-/*! \brief Test is type is a reference type.
+/*! \brief Test if type is a pointer type.
  *
- * \tparam T - type to check for reference triat.
+ * \tparam T - type to check for pointer trait.
+ * \retval value - true iff T is a pointer type.
+ */
+template<typename T>
+struct is_pointer
+	{
+	static bool const value = false;
+	};
+
+/*! \cond */
+template<typename T>
+struct is_pointer<T*>
+	{
+	static bool const value = true;
+	};
+/*! \endcond */
+
+/*! \brief Test if type is a reference type.
+ *
+ * \tparam T - type to check for reference trait.
  * \retval value - true iff T is a reference type.
  */
 template<typename T>
