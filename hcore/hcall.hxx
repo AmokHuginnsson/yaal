@@ -71,9 +71,9 @@ template<typename arg_t, typename fa0_t>
 struct resolve_arg<1, arg_t, fa0_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
 	typedef typename trait::ternary<trait::same_type<arg<1>, arg_t>::value, fa0_t, arg_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa )
+	inline static return_t get( arg_t a, fa0_t fa0 )
 		{
-		return ( getter<1, ternary<trait::same_type<arg<1>, arg_t>::value, 0, -1>::value, arg_t, fa0_t>::get( a, fa ) );
+		return ( getter<1, trait::find_type<arg_t, arg<1> >::value, arg_t, fa0_t>::get( a, fa0 ) );
 		}
 	};
 
@@ -84,8 +84,7 @@ struct resolve_arg<2, arg_t, fa0_t, fa1_t, trait::no_type, trait::no_type, trait
 					typename trait::ternary<trait::same_type<arg<2>, arg_t>::value, fa1_t, arg_t>::type>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1 )
 		{
-		return ( getter<2, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
-				ternary<trait::same_type<arg<2>, arg_t>::value, 1, -1>::value>::value, arg_t, fa0_t, fa1_t>::get( a, fa0, fa1 ) );
+		return ( getter<2, trait::find_type<arg_t, arg<1>, arg<2> >::value, arg_t, fa0_t, fa1_t>::get( a, fa0, fa1 ) );
 		}
 	};
 
@@ -97,9 +96,7 @@ struct resolve_arg<3, arg_t, fa0_t, fa1_t, fa2_t, trait::no_type, trait::no_type
 					typename trait::ternary<trait::same_type<arg<3>, arg_t>::value, fa2_t, arg_t>::type>::type>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
 		{
-		return ( getter<3, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
-				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
-				ternary<trait::same_type<arg<3>, arg_t>::value, 2, -1>::value>::value>::value, arg_t, fa0_t, fa1_t, fa2_t>::get( a, fa0, fa1, fa2 ) );
+		return ( getter<3, trait::find_type<arg_t, arg<1>, arg<2>, arg<3> >::value, arg_t, fa0_t, fa1_t, fa2_t>::get( a, fa0, fa1, fa2 ) );
 		}
 	};
 
@@ -113,10 +110,7 @@ struct resolve_arg<4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, trait::no_type, trait::
 					arg_t>::type>::type>::type>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
 		{
-		return ( getter<4, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
-				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
-				ternary<trait::same_type<arg<3>, arg_t>::value, 2,
-				ternary<trait::same_type<arg<4>, arg_t>::value, 3, -1>::value>::value>::value>::value,
+		return ( getter<4, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( a, fa0, fa1, fa2, fa3 ) );
 		}
 	};
@@ -132,11 +126,7 @@ struct resolve_arg<5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, trait::no_type, 
 					arg_t>::type>::type>::type>::type>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
 		{
-		return ( getter<5, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
-				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
-				ternary<trait::same_type<arg<3>, arg_t>::value, 2,
-				ternary<trait::same_type<arg<4>, arg_t>::value, 3,
-				ternary<trait::same_type<arg<5>, arg_t>::value, 4, -1>::value>::value>::value>::value>::value,
+		return ( getter<5, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( a, fa0, fa1, fa2, fa3, fa4 ) );
 		}
 	};
@@ -153,12 +143,7 @@ struct resolve_arg<6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, trait::no
 					arg_t>::type>::type>::type>::type>::type>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
 		{
-		return ( getter<6, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
-				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
-				ternary<trait::same_type<arg<3>, arg_t>::value, 2,
-				ternary<trait::same_type<arg<4>, arg_t>::value, 3,
-				ternary<trait::same_type<arg<5>, arg_t>::value, 4,
-				ternary<trait::same_type<arg<6>, arg_t>::value, 5, -1>::value>::value>::value>::value>::value>::value,
+		return ( getter<6, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5 ) );
 		}
 	};
@@ -176,13 +161,7 @@ struct resolve_arg<7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, tr
 					arg_t>::type>::type>::type>::type>::type>::type>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
 		{
-		return ( getter<7, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
-				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
-				ternary<trait::same_type<arg<3>, arg_t>::value, 2,
-				ternary<trait::same_type<arg<4>, arg_t>::value, 3,
-				ternary<trait::same_type<arg<5>, arg_t>::value, 4,
-				ternary<trait::same_type<arg<6>, arg_t>::value, 5,
-				ternary<trait::same_type<arg<7>, arg_t>::value, 6, -1>::value>::value>::value>::value>::value>::value>::value,
+		return ( getter<7, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6>, arg<7> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) );
 		}
 	};
@@ -201,14 +180,7 @@ struct resolve_arg<8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa
 					arg_t>::type>::type>::type>::type>::type>::type>::type>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
 		{
-		return ( getter<8, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
-				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
-				ternary<trait::same_type<arg<3>, arg_t>::value, 2,
-				ternary<trait::same_type<arg<4>, arg_t>::value, 3,
-				ternary<trait::same_type<arg<5>, arg_t>::value, 4,
-				ternary<trait::same_type<arg<6>, arg_t>::value, 5,
-				ternary<trait::same_type<arg<7>, arg_t>::value, 6,
-				ternary<trait::same_type<arg<8>, arg_t>::value, 7, -1>::value>::value>::value>::value>::value>::value>::value>::value,
+		return ( getter<8, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6>, arg<7>, arg<8> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) );
 		}
 	};
@@ -228,15 +200,7 @@ struct resolve_arg<9, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa
 					arg_t>::type>::type>::type>::type>::type>::type>::type>::type>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
 		{
-		return ( getter<9, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
-				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
-				ternary<trait::same_type<arg<3>, arg_t>::value, 2,
-				ternary<trait::same_type<arg<4>, arg_t>::value, 3,
-				ternary<trait::same_type<arg<5>, arg_t>::value, 4,
-				ternary<trait::same_type<arg<6>, arg_t>::value, 5,
-				ternary<trait::same_type<arg<7>, arg_t>::value, 6,
-				ternary<trait::same_type<arg<8>, arg_t>::value, 7,
-				ternary<trait::same_type<arg<9>, arg_t>::value, 8, -1>::value>::value>::value>::value>::value>::value>::value>::value>::value,
+		return ( getter<9, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6>, arg<7>, arg<8>, arg<9> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) );
 		}
 	};
@@ -257,16 +221,7 @@ struct resolve_arg<10, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, f
 					arg_t>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
 		{
-		return ( getter<10, ternary<trait::same_type<arg<1>, arg_t>::value, 0,
-				ternary<trait::same_type<arg<2>, arg_t>::value, 1,
-				ternary<trait::same_type<arg<3>, arg_t>::value, 2,
-				ternary<trait::same_type<arg<4>, arg_t>::value, 3,
-				ternary<trait::same_type<arg<5>, arg_t>::value, 4,
-				ternary<trait::same_type<arg<6>, arg_t>::value, 5,
-				ternary<trait::same_type<arg<7>, arg_t>::value, 6,
-				ternary<trait::same_type<arg<8>, arg_t>::value, 7,
-				ternary<trait::same_type<arg<9>, arg_t>::value, 8,
-				ternary<trait::same_type<arg<10>, arg_t>::value, 9, -1>::value>::value>::value>::value>::value>::value>::value>::value>::value>::value,
+		return ( getter<10, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6>, arg<7>, arg<8>, arg<9>, arg<10> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( a, fa0, fa1, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) );
 		}
 	};
@@ -395,7 +350,8 @@ struct object_resolver
 	template<typename CLASS_t>
 	struct object_type
 		{
-		static object_type_t const value = static_cast<object_type_t>( ternary<trait::is_pointer<CLASS_t>::value, PTR, REF>::value );
+		static object_type_t const value = static_cast<object_type_t>( meta::ternary<trait::same_type<CLASS_t, free_standing_call_args::arg<1> >::value,
+				FREE, meta::ternary<trait::is_pointer<CLASS_t>::value, PTR, REF>::value>::value );
 		};
 	template<typename return_t, object_type_t>
 	struct invoke;
@@ -541,6 +497,79 @@ struct object_resolver
 			{ return ( (object_->*method_)( a0 ) ); }
 		template<typename METHOD_t, typename CLASS_t>
 		static return_t go( METHOD_t method_, CLASS_t object_ )
+			{ return ( (object_->*method_)() ); }
+		template<typename CLASS_t>
+		static CLASS_t id( CLASS_t object_ )
+			{ return ( object_ ); }
+		};
+	template<typename return_t>
+	struct invoke<return_t, FREE>
+		{
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+			typename a8_t, typename a9_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+			typename a8_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5, a6 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4, a5 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3, a4 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return ( (object_->*method_)( a0, a1, a2, a3 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2 )
+			{ return ( (object_->*method_)( a0, a1, a2 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1 )
+			{ return ( (object_->*method_)( a0, a1 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0 )
+			{ return ( (object_->*method_)( a0 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_ )
 			{ return ( (object_->*method_)() ); }
 		template<typename CLASS_t>
 		static CLASS_t id( CLASS_t object_ )
@@ -1168,18 +1197,47 @@ struct call_calculator
 	struct free_standing_args
 		{
 		static int const value =
-			ternary<trait::is_kind_of<typename trait::ternary<trait::is_member<METHOD_t>::value,a10_t,a0_t>::type, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a1_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a2_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a3_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a4_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a5_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a6_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a7_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a8_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ ternary<trait::is_kind_of<a9_t, free_standing_call_args::arg_base>::value, 1, 0>::value;
+			+ meta::ternary<trait::is_kind_of<a0_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a1_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a2_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a3_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a4_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a5_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a6_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a7_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a8_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a9_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<a10_t, free_standing_call_args::arg_base>::value, 1, 0>::value;
 		};
 	struct functor
+		{
+		typedef HFunctor<a0_t, METHOD_t> functor_t;
+		typedef HCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
+						functor_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> type;
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8, a9 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4, a5 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return type( functor_t( a0, m ), a1, a2, a3, a4 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return type( functor_t( a0, m ), a1, a2, a3 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
+			{ return type( functor_t( a0, m ), a1, a2 ); }
+		inline static type make( METHOD_t m, a0_t a0, a1_t a1 )
+			{ return type( functor_t( a0, m ), a1 ); }
+		inline static type make( METHOD_t m, a0_t a0 )
+			{ return type( functor_t( a0, m ) ); }
+		};
+	struct functor_this
 		{
 		typedef HFunctor<a0_t, METHOD_t> functor_t;
 		typedef HCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
@@ -1234,7 +1292,19 @@ struct call_calculator
 		inline static type make( METHOD_t m )
 			{ return type( m ); }
 		};
-	typedef typename trait::ternary<trait::is_member<METHOD_t>::value, functor, function>::type type;
+	typedef typename trait::ternary<trait::is_member<METHOD_t>::value,
+					typename trait::ternary<meta::greater<trait::find_type<a0_t,
+					free_standing_call_args::arg<1>,
+					free_standing_call_args::arg<2>,
+					free_standing_call_args::arg<3>,
+					free_standing_call_args::arg<4>,
+					free_standing_call_args::arg<5>,
+					free_standing_call_args::arg<6>,
+					free_standing_call_args::arg<7>,
+					free_standing_call_args::arg<8>,
+					free_standing_call_args::arg<9>,
+					free_standing_call_args::arg<10> >::value, -1>::value, functor_this, functor>::type,
+					function>::type type;
 	};
 
 /*! \cond */

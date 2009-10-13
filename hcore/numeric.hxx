@@ -36,6 +36,11 @@ Copyright:
 namespace yaal
 {
 
+/*! \brief Compile time numerical calculus functions belong here.
+ */
+namespace meta
+{
+
 template<bool boolean>
 struct to_int
 	{
@@ -58,7 +63,7 @@ template<int long a0, int long a1,
 	int long a4 = LONG_MIN, int long a5 = LONG_MIN,
 	int long a6 = LONG_MIN, int long a7 = LONG_MIN,
 	int long a8 = LONG_MIN, int long a9 = LONG_MIN>
-struct static_max
+struct max
 	{
 	static int long const b0 = a0 > a1 ? a0 : a1;
 	static int long const b1 = b0 > a2 ? b0 : a2;
@@ -152,6 +157,43 @@ struct ternary<false, value_for_true, value_for_false>
 	static int long const value = value_for_false;
 	};
 /* \endcond */
+
+/*! \brief Perform a logical negation.
+ *
+ * \tparam value_in - value to be negated.
+ * \retval value - conditional value.
+ */
+template<bool const value_in>
+struct boolean_not
+	{
+	static bool const value = ! value_in;
+	};
+
+/*! \brief Check if one value is greater than another.
+ *
+ * \tparam val1 - first value for comparision.
+ * \tparam val2 - second value for comparision.
+ * \retval value - true iff val1 > val2.
+ */
+template<int long const val1, int long const val2>
+struct greater
+	{
+	static bool const value = val1 > val2;
+	};
+
+/*! \brief Check if one value is less than another.
+ *
+ * \tparam val1 - first value for comparision.
+ * \tparam val2 - second value for comparision.
+ * \retval value - true iff val1 < val2.
+ */
+template<int long const val1, int long const val2>
+struct less
+	{
+	static bool const value = val1 < val2;
+	};
+
+}
 
 }
 

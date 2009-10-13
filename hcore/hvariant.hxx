@@ -53,7 +53,7 @@ class HVariant
 	{
 protected:
 	typedef HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t> self_t;
-	static int const SIZE = yaal::static_max<
+	static int const SIZE = yaal::meta::max<
 		sizeof ( t0_t ),
 		sizeof ( t1_t ),
 		sizeof ( t2_t ),

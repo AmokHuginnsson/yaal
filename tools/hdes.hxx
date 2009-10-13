@@ -37,7 +37,7 @@ namespace tools
  */
 struct DES
 	{
-	static int const BITS_IN_BYTE  = yaal::power<2,3>::value;
+	static int const BITS_IN_BYTE  = yaal::meta::power<2,3>::value;
 	static int const SIDES_COUNT   = 2;
 	static int const IKEY_SIZE     = 6;
 	static int const BLOCK_SIZE    = 8;

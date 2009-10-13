@@ -106,20 +106,22 @@ template<typename tType, typename t0_t, typename t1_t = no_type,
 	typename t2_t = no_type, typename t3_t = no_type,
 	typename t4_t = no_type, typename t5_t = no_type,
 	typename t6_t = no_type, typename t7_t = no_type,
-	typename t8_t = no_type, typename t9_t = no_type>
+	typename t8_t = no_type, typename t9_t = no_type,
+	typename t10_t = no_type>
 struct find_type
 	{
 	static int const value = -1
-		+ 1 * to_int<same_type<t0_t, tType>::value>::value
-		+ 2 * to_int<same_type<t1_t, tType>::value>::value
-		+ 3 * to_int<same_type<t2_t, tType>::value>::value
-		+ 4 * to_int<same_type<t3_t, tType>::value>::value
-		+ 5 * to_int<same_type<t4_t, tType>::value>::value
-		+ 6 * to_int<same_type<t5_t, tType>::value>::value
-		+ 7 * to_int<same_type<t6_t, tType>::value>::value
-		+ 8 * to_int<same_type<t7_t, tType>::value>::value
-		+ 9 * to_int<same_type<t8_t, tType>::value>::value
-		+ 10 * to_int<same_type<t9_t, tType>::value>::value;
+		+ 1 * meta::to_int<same_type<t0_t, tType>::value>::value
+		+ 2 * meta::to_int<same_type<t1_t, tType>::value>::value
+		+ 3 * meta::to_int<same_type<t2_t, tType>::value>::value
+		+ 4 * meta::to_int<same_type<t3_t, tType>::value>::value
+		+ 5 * meta::to_int<same_type<t4_t, tType>::value>::value
+		+ 6 * meta::to_int<same_type<t5_t, tType>::value>::value
+		+ 7 * meta::to_int<same_type<t6_t, tType>::value>::value
+		+ 8 * meta::to_int<same_type<t7_t, tType>::value>::value
+		+ 9 * meta::to_int<same_type<t8_t, tType>::value>::value
+		+ 10 * meta::to_int<same_type<t9_t, tType>::value>::value
+		+ 11 * meta::to_int<same_type<t10_t, tType>::value>::value;
 	};
 
 /*! \brief Count occurences of a type.
@@ -132,25 +134,26 @@ template<typename tType, typename t0_t, typename t1_t = no_type,
 	typename t2_t = no_type, typename t3_t = no_type,
 	typename t4_t = no_type, typename t5_t = no_type,
 	typename t6_t = no_type, typename t7_t = no_type,
-	typename t8_t = no_type, typename t9_t = no_type>
+	typename t8_t = no_type, typename t9_t = no_type, typename t10_t = no_type>
 struct count_type
 	{
 	static int const value =
-		+ to_int<same_type<t0_t, tType>::value>::value
-		+ to_int<same_type<t1_t, tType>::value>::value
-		+ to_int<same_type<t2_t, tType>::value>::value
-		+ to_int<same_type<t3_t, tType>::value>::value
-		+ to_int<same_type<t4_t, tType>::value>::value
-		+ to_int<same_type<t5_t, tType>::value>::value
-		+ to_int<same_type<t6_t, tType>::value>::value
-		+ to_int<same_type<t7_t, tType>::value>::value
-		+ to_int<same_type<t8_t, tType>::value>::value
-		+ to_int<same_type<t9_t, tType>::value>::value;
+		+ meta::to_int<same_type<t0_t, tType>::value>::value
+		+ meta::to_int<same_type<t1_t, tType>::value>::value
+		+ meta::to_int<same_type<t2_t, tType>::value>::value
+		+ meta::to_int<same_type<t3_t, tType>::value>::value
+		+ meta::to_int<same_type<t4_t, tType>::value>::value
+		+ meta::to_int<same_type<t5_t, tType>::value>::value
+		+ meta::to_int<same_type<t6_t, tType>::value>::value
+		+ meta::to_int<same_type<t7_t, tType>::value>::value
+		+ meta::to_int<same_type<t8_t, tType>::value>::value
+		+ meta::to_int<same_type<t9_t, tType>::value>::value
+		+ meta::to_int<same_type<t10_t, tType>::value>::value;
 	};
 template<typename tType, typename t0_t, typename t1_t,
 	typename t2_t, typename t3_t, typename t4_t, typename t5_t,
-	typename t6_t, typename t7_t, typename t8_t, typename t9_t>
-int const count_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t>::value;
+	typename t6_t, typename t7_t, typename t8_t, typename t9_t, typename t10_t>
+int const count_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t>::value;
 
 /*! \brief Meta function used to strip reference from type.
  *

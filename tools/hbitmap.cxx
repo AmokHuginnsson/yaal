@@ -35,6 +35,7 @@ M_VCSID( "$Id: "__ID__" $" )
 typedef yaal::hcore::HPool<char*> mem_pool_t;
 
 using namespace yaal::hcore;
+using namespace yaal::meta;
 
 namespace yaal
 {
@@ -208,26 +209,26 @@ void HBitmap::fill( bool const& bit )
 
 u8_t g_pucMaskBitKeepLeft[ 8 ] =
 	{
-	yaal::obinary<010000000>::value,
-	yaal::obinary<011000000>::value,
-	yaal::obinary<011100000>::value,
-	yaal::obinary<011110000>::value,
-	yaal::obinary<011111000>::value,
-	yaal::obinary<011111100>::value,
-	yaal::obinary<011111110>::value,
-	yaal::obinary<011111111>::value
+	obinary<010000000>::value,
+	obinary<011000000>::value,
+	obinary<011100000>::value,
+	obinary<011110000>::value,
+	obinary<011111000>::value,
+	obinary<011111100>::value,
+	obinary<011111110>::value,
+	obinary<011111111>::value
 	};
 
 u8_t g_pucMaskBitKeepRight[ 8 ] =
 	{
-	yaal::obinary<011111111>::value,
-	yaal::obinary<001111111>::value,
-	yaal::obinary<000111111>::value,
-	yaal::obinary<000011111>::value,
-	yaal::obinary<000001111>::value,
-	yaal::obinary<000000111>::value,
-	yaal::obinary<000000011>::value,
-	yaal::obinary<000000001>::value
+	obinary<011111111>::value,
+	obinary<001111111>::value,
+	obinary<000111111>::value,
+	obinary<000011111>::value,
+	obinary<000001111>::value,
+	obinary<000000111>::value,
+	obinary<000000011>::value,
+	obinary<000000001>::value
 	};
 
 void HBitmap::fill( int long const& offset, int long const& amount, bool const& bit )
@@ -356,98 +357,98 @@ HBitmap& HBitmap::operator += ( HBitmap const& bmp )
 
 u32_t g_pulMaskBitSet[ 32 ] = 
 	{
-	yaal::power<2,31>::value,
-	yaal::power<2,30>::value,
-	yaal::power<2,29>::value,
-	yaal::power<2,28>::value,
-	yaal::power<2,27>::value,
-	yaal::power<2,26>::value,
-	yaal::power<2,25>::value,
-	yaal::power<2,24>::value,
-	yaal::power<2,23>::value,
-	yaal::power<2,22>::value,
-	yaal::power<2,21>::value,
-	yaal::power<2,20>::value,
-	yaal::power<2,19>::value,
-	yaal::power<2,18>::value,
-	yaal::power<2,17>::value,
-	yaal::power<2,16>::value,
-	yaal::power<2,15>::value,
-	yaal::power<2,14>::value,
-	yaal::power<2,13>::value,
-	yaal::power<2,12>::value,
-	yaal::power<2,11>::value,
-	yaal::obinary<010000000000>::value,
-	yaal::obinary<01000000000>::value,
-	yaal::obinary<0100000000>::value,
-	yaal::obinary<010000000>::value,
-	yaal::obinary<01000000>::value,
-	yaal::obinary<0100000>::value,
-	yaal::obinary<010000>::value,
-	yaal::obinary<01000>::value,
-	yaal::obinary<0100>::value,
-	yaal::obinary<010>::value,
-	yaal::obinary<01>::value
+	power<2,31>::value,
+	power<2,30>::value,
+	power<2,29>::value,
+	power<2,28>::value,
+	power<2,27>::value,
+	power<2,26>::value,
+	power<2,25>::value,
+	power<2,24>::value,
+	power<2,23>::value,
+	power<2,22>::value,
+	power<2,21>::value,
+	power<2,20>::value,
+	power<2,19>::value,
+	power<2,18>::value,
+	power<2,17>::value,
+	power<2,16>::value,
+	power<2,15>::value,
+	power<2,14>::value,
+	power<2,13>::value,
+	power<2,12>::value,
+	power<2,11>::value,
+	obinary<010000000000>::value,
+	obinary<01000000000>::value,
+	obinary<0100000000>::value,
+	obinary<010000000>::value,
+	obinary<01000000>::value,
+	obinary<0100000>::value,
+	obinary<010000>::value,
+	obinary<01000>::value,
+	obinary<0100>::value,
+	obinary<010>::value,
+	obinary<01>::value
 	};
 
 u32_t g_pulMaskBitClear[ 32 ] =
 	{
-	0xffffffff - yaal::power<2,31>::value,
-	0xffffffff - yaal::power<2,30>::value,
-	0xffffffff - yaal::power<2,29>::value,
-	0xffffffff - yaal::power<2,28>::value,
-	0xffffffff - yaal::power<2,27>::value,
-	0xffffffff - yaal::power<2,26>::value,
-	0xffffffff - yaal::power<2,25>::value,
-	0xffffffff - yaal::power<2,24>::value,
-	0xffffffff - yaal::power<2,23>::value,
-	0xffffffff - yaal::power<2,22>::value,
-	0xffffffff - yaal::power<2,21>::value,
-	0xffffffff - yaal::power<2,20>::value,
-	0xffffffff - yaal::power<2,19>::value,
-	0xffffffff - yaal::power<2,18>::value,
-	0xffffffff - yaal::power<2,17>::value,
-	0xffffffff - yaal::power<2,16>::value,
-	0xffffffff - yaal::power<2,15>::value,
-	0xffffffff - yaal::power<2,14>::value,
-	0xffffffff - yaal::power<2,13>::value,
-	0xffffffff - yaal::power<2,12>::value,
-	0xffffffff - yaal::power<2,11>::value,
-	0xffffffff - yaal::obinary<010000000000>::value,
-	0xffffffff - yaal::obinary<01000000000>::value,
-	0xffffffff - yaal::obinary<0100000000>::value,
-	0xffffffff - yaal::obinary<010000000>::value,
-	0xffffffff - yaal::obinary<01000000>::value,
-	0xffffffff - yaal::obinary<0100000>::value,
-	0xffffffff - yaal::obinary<010000>::value,
-	0xffffffff - yaal::obinary<01000>::value,
-	0xffffffff - yaal::obinary<0100>::value,
-	0xffffffff - yaal::obinary<010>::value,
-	0xffffffff - yaal::obinary<01>::value
+	0xffffffff - power<2,31>::value,
+	0xffffffff - power<2,30>::value,
+	0xffffffff - power<2,29>::value,
+	0xffffffff - power<2,28>::value,
+	0xffffffff - power<2,27>::value,
+	0xffffffff - power<2,26>::value,
+	0xffffffff - power<2,25>::value,
+	0xffffffff - power<2,24>::value,
+	0xffffffff - power<2,23>::value,
+	0xffffffff - power<2,22>::value,
+	0xffffffff - power<2,21>::value,
+	0xffffffff - power<2,20>::value,
+	0xffffffff - power<2,19>::value,
+	0xffffffff - power<2,18>::value,
+	0xffffffff - power<2,17>::value,
+	0xffffffff - power<2,16>::value,
+	0xffffffff - power<2,15>::value,
+	0xffffffff - power<2,14>::value,
+	0xffffffff - power<2,13>::value,
+	0xffffffff - power<2,12>::value,
+	0xffffffff - power<2,11>::value,
+	0xffffffff - obinary<010000000000>::value,
+	0xffffffff - obinary<01000000000>::value,
+	0xffffffff - obinary<0100000000>::value,
+	0xffffffff - obinary<010000000>::value,
+	0xffffffff - obinary<01000000>::value,
+	0xffffffff - obinary<0100000>::value,
+	0xffffffff - obinary<010000>::value,
+	0xffffffff - obinary<01000>::value,
+	0xffffffff - obinary<0100>::value,
+	0xffffffff - obinary<010>::value,
+	0xffffffff - obinary<01>::value
 	};
 
 u8_t g_pucMaskBitSet[ 8 ] =
 	{
-	yaal::obinary<010000000>::value,
-	yaal::obinary<01000000>::value,
-	yaal::obinary<0100000>::value,
-	yaal::obinary<010000>::value,
-	yaal::obinary<01000>::value,
-	yaal::obinary<0100>::value,
-	yaal::obinary<010>::value,
-	yaal::obinary<01>::value
+	obinary<010000000>::value,
+	obinary<01000000>::value,
+	obinary<0100000>::value,
+	obinary<010000>::value,
+	obinary<01000>::value,
+	obinary<0100>::value,
+	obinary<010>::value,
+	obinary<01>::value
 	};
 
 u8_t g_pucMaskBitClear[ 8 ] =
 	{
-	yaal::obinary<01111111>::value,
-	yaal::obinary<010111111>::value,
-	yaal::obinary<011011111>::value,
-	yaal::obinary<011101111>::value,
-	yaal::obinary<011110111>::value,
-	yaal::obinary<011111011>::value,
-	yaal::obinary<011111101>::value,
-	yaal::obinary<011111110>::value
+	obinary<01111111>::value,
+	obinary<010111111>::value,
+	obinary<011011111>::value,
+	obinary<011101111>::value,
+	obinary<011110111>::value,
+	obinary<011111011>::value,
+	obinary<011111101>::value,
+	obinary<011111110>::value
 	};
 
 bool HBitmap::get( int long const& a_lNumber ) const

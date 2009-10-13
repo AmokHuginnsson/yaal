@@ -360,7 +360,7 @@ HCondition::status_t HCondition::wait( int long unsigned const& a_ulTimeOutSecon
 	int l_iError = 0;
 	timespec l_sTimeOut;
 	clock_gettime( CLOCK_REALTIME, &l_sTimeOut );
-	static int long const NANO_IN_WHOLE = power<10, 9>::value;
+	static int long const NANO_IN_WHOLE = meta::power<10, 9>::value;
 	l_sTimeOut.tv_sec += a_ulTimeOutSeconds;
 	l_sTimeOut.tv_nsec += a_ulTimeOutNanoSeconds;
 	if ( l_sTimeOut.tv_nsec >= NANO_IN_WHOLE )

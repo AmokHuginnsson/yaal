@@ -41,7 +41,7 @@ namespace tools
 namespace
 {
 
-static int long const BUFFER_SIZE = yaal::power<2,20>::value;
+static int long const BUFFER_SIZE = yaal::meta::power<2,20>::value;
 
 }
 
