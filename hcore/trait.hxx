@@ -111,7 +111,7 @@ template<typename tType, typename t0_t, typename t1_t = no_type,
 struct find_type
 	{
 	static int const value = -1
-		+ 1 * meta::to_int<same_type<t0_t, tType>::value>::value
+		+ meta::ternary<same_type<tType, no_type>::value, 0, 1 * meta::to_int<same_type<t0_t, tType>::value>::value
 		+ 2 * meta::to_int<same_type<t1_t, tType>::value>::value
 		+ 3 * meta::to_int<same_type<t2_t, tType>::value>::value
 		+ 4 * meta::to_int<same_type<t3_t, tType>::value>::value
@@ -121,7 +121,7 @@ struct find_type
 		+ 8 * meta::to_int<same_type<t7_t, tType>::value>::value
 		+ 9 * meta::to_int<same_type<t8_t, tType>::value>::value
 		+ 10 * meta::to_int<same_type<t9_t, tType>::value>::value
-		+ 11 * meta::to_int<same_type<t10_t, tType>::value>::value;
+		+ 11 * meta::to_int<same_type<t10_t, tType>::value>::value>::value;
 	};
 
 /*! \brief Count occurences of a type.
