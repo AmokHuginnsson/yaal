@@ -4,7 +4,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 PROJECT_NAME           = yaal
-PROJECT_NUMBER         = 0.0.16.0
+PROJECT_NUMBER         = 0.0.17.0
 OUTPUT_DIRECTORY       = doc
 CREATE_SUBDIRS         = YES
 OUTPUT_LANGUAGE        = English
@@ -179,9 +179,9 @@ ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = NO
 EXPAND_ONLY_PREDEF     = NO
 SEARCH_INCLUDES        = YES
-INCLUDE_PATH           = 
+INCLUDE_PATH           = build/debug .
 INCLUDE_FILE_PATTERNS  = 
-PREDEFINED             = 
+PREDEFINED             = __YAAL_BUILD__
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------

@@ -32,7 +32,8 @@ Copyright:
 #include <fcntl.h>
 #include <unistd.h>
 #include <libintl.h>
-#include <config.hxx>
+
+#include "config.hxx"
 
 #if ! defined( HAVE_GETHOSTBYNAME_R ) || ( HAVE_GETHOSTBYNAME_R == 0 )
 #if ! defined( HAVE_DECL_GETADDRINFO ) || ( HAVE_DECL_GETADDRINFO == 0 )
