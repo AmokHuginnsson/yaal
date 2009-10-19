@@ -37,13 +37,15 @@ namespace hcore
 
 /*! \brief Implementation of ordered pair concept.
  *
- * \tparam first_t - type of first pair element.
- * \tparam second_t - type of second pair element.
+ * \tparam first_type - type of first pair element.
+ * \tparam second_type - type of second pair element.
  */
-template<typename first_t, typename second_t>
+template<typename first_type, typename second_type>
 class HPair
 	{
 public:
+	typedef first_type first_t;
+	typedef second_type second_t;
 	first_t first;
 	second_t second;
 	HPair( void ) : first(), second() {}

@@ -52,13 +52,14 @@ struct OResourceHelper
 
 /*! \brief Raw resource life time tracker.
  */
-template<typename resource_t, typename free_t, typename allocated_t = __decltype( &OResourceHelper::non_null )>
+template<typename resource_type, typename free_t, typename allocated_t = __decltype( &OResourceHelper::non_null )>
 class HResource
 	{
-	resource_t f_tResource;
+	resource_type f_tResource;
 	allocated_t ALLOCATED;
 	free_t FREE;
 public:
+	typedef resource_type resource_t;
 	HResource( resource_t resource, free_t free, allocated_t allocated = OResourceHelper::non_null )
 		: f_tResource( resource ), ALLOCATED( allocated ), FREE( free ) {}
 	~HResource( void )

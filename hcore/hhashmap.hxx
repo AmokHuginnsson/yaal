@@ -45,19 +45,21 @@ namespace hcore
 
 extern int long unsigned const* const g_pulPrimes;
 
-template<typename tType>
-inline int long unsigned hash( tType const& a_rtKey )
+template<typename key_type>
+inline int long unsigned hash( key_type const& a_rtKey )
 	{
 	return ( static_cast<int long unsigned>( a_rtKey ) );
 	}
 
 /*! \brief Hash map container implementation.
  */
-template<typename tType, typename ttType>
+template<typename key_type, typename value_type>
 class HHashMap
 	{
-	typedef HHashMap<tType, ttType> self_t;
+	typedef HHashMap<key_type, value_type> self_t;
 public:
+	typedef key_type key_t;
+	typedef value_type value_t;
 	template<typename const_qual_t>
 	class HIterator;
 private:
@@ -69,9 +71,9 @@ private:
 		/*}*/
 	public:
 		/*{*/
-		tType const	key;
-		ttType	value;
-		HAtom( tType const& );
+		key_type const	key;
+		value_type	value;
+		HAtom( key_type const& );
 		virtual ~HAtom( void );
 		/*}*/
 	private:
@@ -79,7 +81,7 @@ private:
 		HAtom( HAtom const& );
 		HAtom& operator = ( HAtom const& );
 		/*}*/
-		friend class HHashMap<tType, ttType>;
+		friend class HHashMap<key_type, value_type>;
 		template<typename const_qual_t>
 		friend class HIterator;
 		};
@@ -93,41 +95,43 @@ public:
 	HHashMap( HHashMap const& );
 	virtual ~HHashMap( void );
 	HHashMap& operator = ( HHashMap const& );
-	ttType& operator [] ( tType const& );
+	value_type& operator [] ( key_type const& );
 	const_iterator begin( void ) const;
 	iterator begin( void );
 	const_iterator end( void ) const;
 	iterator end( void );
-	const_iterator find( tType const& ) const;
-	iterator find( tType const& );
-	iterator insert( tType const&, ttType const& );
+	const_iterator find( key_type const& ) const;
+	iterator find( key_type const& );
+	iterator insert( key_type const&, value_type const& );
 	void erase( iterator );
-	bool has_key( tType const& ) const;
-	bool get( tType const&, ttType& ) const;
+	bool has_key( key_type const& ) const;
+	bool get( key_type const&, value_type& ) const;
 
 	/*! \brief  Remove given key from map.
 	 *
 	 * \param  key Key to be removed.
 	 * \return  True in case of failure.
 	 */
-	bool remove( tType const& key );
+	bool remove( key_type const& key );
 	void clear( void );
 	int size( void ) const;
 private:
-	bool find( tType const&, int long unsigned&, HAtom*& ) const;
+	bool find( key_type const&, int long unsigned&, HAtom*& ) const;
 	};
 
 /*! \brief Iterator for HHashMap<> data structure.
  */
-template<typename tType, typename ttType>
+template<typename key_type, typename value_type>
 template<typename const_qual_t>
-class HHashMap<tType, ttType>::HIterator
+class HHashMap<key_type, value_type>::HIterator
 	{
-	typedef HHashMap<tType, ttType> owner_t;
+	typedef HHashMap<key_type, value_type> owner_t;
 	owner_t const* f_poOwner;
 	int long unsigned f_ulIndex;
 	HAtom* f_poAtomPtr;
 public:
+	typedef key_type key_t;
+	typedef value_type value_t;
 	HIterator( void ) : f_poOwner( NULL ), f_ulIndex( 0 ), f_poAtomPtr( NULL ) {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& a_oIt )
@@ -205,13 +209,13 @@ public:
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( ! operator == ( it ) ); }
 private:
-	friend class HHashMap<tType, ttType>;
+	friend class HHashMap<key_type, value_type>;
 	explicit HIterator( owner_t const* a_poOwner, int unsigned long a_ulIndex, HAtom* a_poAtomPtr )
 		: f_poOwner( a_poOwner ), f_ulIndex( a_ulIndex ), f_poAtomPtr( a_poAtomPtr ) {};
 	};
 
-template<typename tType, typename ttType>
-HHashMap<tType, ttType>::HAtom::HAtom( tType const& a_tKey )
+template<typename key_type, typename value_type>
+HHashMap<key_type, value_type>::HAtom::HAtom( key_type const& a_tKey )
 	: f_poNext( NULL ), key( a_tKey ), value()
 	{
 	M_PROLOG
@@ -219,16 +223,16 @@ HHashMap<tType, ttType>::HAtom::HAtom( tType const& a_tKey )
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-HHashMap<tType, ttType>::HAtom::~HAtom( void )
+template<typename key_type, typename value_type>
+HHashMap<key_type, value_type>::HAtom::~HAtom( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-HHashMap<tType, ttType>::HHashMap ( size_t a_uiSize ) : f_ulPrime( 0 ),
+template<typename key_type, typename value_type>
+HHashMap<key_type, value_type>::HHashMap ( size_t a_uiSize ) : f_ulPrime( 0 ),
 	f_ulSize( 0 ), f_ppoAtomArray( NULL )
 	{
 	M_PROLOG
@@ -246,8 +250,8 @@ HHashMap<tType, ttType>::HHashMap ( size_t a_uiSize ) : f_ulPrime( 0 ),
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-HHashMap<tType, ttType>::HHashMap( HHashMap const& a_roMap ) : f_ulPrime( 0 ),
+template<typename key_type, typename value_type>
+HHashMap<key_type, value_type>::HHashMap( HHashMap const& a_roMap ) : f_ulPrime( 0 ),
 	f_ulSize( 0 ), f_ppoAtomArray( NULL )
 	{
 	M_PROLOG
@@ -256,8 +260,8 @@ HHashMap<tType, ttType>::HHashMap( HHashMap const& a_roMap ) : f_ulPrime( 0 ),
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-HHashMap<tType, ttType>::~HHashMap ( void )
+template<typename key_type, typename value_type>
+HHashMap<key_type, value_type>::~HHashMap ( void )
 	{
 	M_PROLOG
 	clear();
@@ -268,8 +272,8 @@ HHashMap<tType, ttType>::~HHashMap ( void )
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const & a_roMap )
+template<typename key_type, typename value_type>
+HHashMap<key_type, value_type> & HHashMap<key_type, value_type>::operator = ( HHashMap const & a_roMap )
 	{
 	M_PROLOG
 	int unsigned l_iCtr = 0;
@@ -299,8 +303,8 @@ HHashMap<tType, ttType> & HHashMap<tType, ttType>::operator = ( HHashMap const &
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-void HHashMap<tType, ttType>::clear( void )
+template<typename key_type, typename value_type>
+void HHashMap<key_type, value_type>::clear( void )
 	{
 	M_PROLOG
 	int unsigned l_uiCtr = 0;
@@ -317,25 +321,25 @@ void HHashMap<tType, ttType>::clear( void )
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-int HHashMap<tType, ttType>::size( void ) const
+template<typename key_type, typename value_type>
+int HHashMap<key_type, value_type>::size( void ) const
 	{
 	M_PROLOG
 	return ( f_ulSize );
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-ttType& HHashMap<tType, ttType>::operator [] ( tType const& a_tKey )
+template<typename key_type, typename value_type>
+value_type& HHashMap<key_type, value_type>::operator [] ( key_type const& a_tKey )
 	{
 	M_PROLOG
-	iterator it = insert( a_tKey, ttType() );
+	iterator it = insert( a_tKey, value_type() );
 	return ( it->value );
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::insert( tType const& a_tKey, ttType const& a_tValue )
+template<typename key_type, typename value_type>
+typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>::insert( key_type const& a_tKey, value_type const& a_tValue )
 	{
 	M_PROLOG
 	iterator it = find( a_tKey );
@@ -355,8 +359,8 @@ typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::insert( tTyp
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::begin( void )
+template<typename key_type, typename value_type>
+typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>::begin( void )
 	{
 	M_PROLOG
 	iterator it( this, 0, NULL );
@@ -364,16 +368,16 @@ typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::begin( void 
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::end( void )
+template<typename key_type, typename value_type>
+typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>::end( void )
 	{
 	M_PROLOG
 	return ( iterator( this, f_ulPrime, NULL ) );
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-typename HHashMap<tType, ttType>::const_iterator HHashMap<tType, ttType>::begin( void ) const
+template<typename key_type, typename value_type>
+typename HHashMap<key_type, value_type>::const_iterator HHashMap<key_type, value_type>::begin( void ) const
 	{
 	M_PROLOG
 	const_iterator it( this, 0, NULL );
@@ -381,24 +385,24 @@ typename HHashMap<tType, ttType>::const_iterator HHashMap<tType, ttType>::begin(
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-typename HHashMap<tType, ttType>::const_iterator HHashMap<tType, ttType>::end( void ) const
+template<typename key_type, typename value_type>
+typename HHashMap<key_type, value_type>::const_iterator HHashMap<key_type, value_type>::end( void ) const
 	{
 	M_PROLOG
 	return ( const_iterator( this, f_ulPrime, NULL ) );
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-bool HHashMap<tType, ttType>::has_key( tType const& a_rtKey ) const
+template<typename key_type, typename value_type>
+bool HHashMap<key_type, value_type>::has_key( key_type const& a_rtKey ) const
 	{
 	M_PROLOG
 	return ( find( a_rtKey ) != end() );
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::find( tType const& a_tKey )
+template<typename key_type, typename value_type>
+typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>::find( key_type const& a_tKey )
 	{
 	M_PROLOG
 	int long unsigned idx = 0;
@@ -407,8 +411,8 @@ typename HHashMap<tType, ttType>::iterator HHashMap<tType, ttType>::find( tType 
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-typename HHashMap<tType, ttType>::const_iterator HHashMap<tType, ttType>::find( tType const& a_tKey ) const
+template<typename key_type, typename value_type>
+typename HHashMap<key_type, value_type>::const_iterator HHashMap<key_type, value_type>::find( key_type const& a_tKey ) const
 	{
 	M_PROLOG
 	int long unsigned idx = 0;
@@ -417,8 +421,8 @@ typename HHashMap<tType, ttType>::const_iterator HHashMap<tType, ttType>::find( 
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-bool HHashMap<tType, ttType>::find( tType const& a_rtKey, int long unsigned& a_rulIndex, HAtom*& a_rpoAtom ) const
+template<typename key_type, typename value_type>
+bool HHashMap<key_type, value_type>::find( key_type const& a_rtKey, int long unsigned& a_rulIndex, HAtom*& a_rpoAtom ) const
 	{
 	M_PROLOG
 	a_rulIndex = hash( a_rtKey ) % f_ulPrime;
@@ -429,8 +433,8 @@ bool HHashMap<tType, ttType>::find( tType const& a_rtKey, int long unsigned& a_r
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-bool HHashMap<tType, ttType>::get( tType const& a_rtKey, ttType& a_rtValue ) const
+template<typename key_type, typename value_type>
+bool HHashMap<key_type, value_type>::get( key_type const& a_rtKey, value_type& a_rtValue ) const
 	{
 	M_PROLOG
 	const_iterator it = find( a_rtKey );
@@ -444,8 +448,8 @@ bool HHashMap<tType, ttType>::get( tType const& a_rtKey, ttType& a_rtValue ) con
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-void HHashMap<tType, ttType>::erase( iterator it )
+template<typename key_type, typename value_type>
+void HHashMap<key_type, value_type>::erase( iterator it )
 	{
 	M_PROLOG
 	HAtom* l_poAtom = f_ppoAtomArray[ it.f_ulIndex ];
@@ -466,8 +470,8 @@ void HHashMap<tType, ttType>::erase( iterator it )
 	M_EPILOG
 	}
 
-template<typename tType, typename ttType>
-bool HHashMap<tType, ttType>::remove( tType const& a_tKey )
+template<typename key_type, typename value_type>
+bool HHashMap<key_type, value_type>::remove( key_type const& a_tKey )
 	{
 	M_PROLOG
 	iterator it = find( a_tKey );

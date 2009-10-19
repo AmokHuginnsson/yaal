@@ -90,15 +90,17 @@ struct HMultiMapStorage
  * HMultiMap<> is a template representing self balancing binary search tree
  * data structure that holds pairs of keys and lists of values.
  *
- * \tparam key_t - type of key held in map.
- * \tparam value_t - type of value held in map.
+ * \tparam key_type - type of key held in map.
+ * \tparam value_type - type of value held in map.
  * \tparam helper_t - HSBBSTree plugable code.
  */
-template<typename key_t, typename value_t,
+template<typename key_type, typename value_type,
 	template<typename, typename>class storage_policy_t = HMultiMapStorage::HTransparent,
-	typename helper_t = map_helper<key_t const, HPointer<HList<typename storage_policy_t<key_t const, value_t>::value_type_t > > > >
+	typename helper_t = map_helper<key_type const, HPointer<HList<typename storage_policy_t<key_type const, value_type>::value_type_t > > > >
 class HMultiMap
 	{
+	typedef key_type key_t;
+	typedef value_type value_t;
 	typedef storage_policy_t<key_t const, value_t> storage_t;
 	typedef HList<typename storage_t::value_type_t> value_list_t;
 	typedef HPointer<value_list_t> value_list_ptr_t;
@@ -310,10 +312,12 @@ private:
 
 /*! \brief Forward iterator for HMultiMap<>.
  */
-template<typename key_t, typename value_t, template<typename, typename> class storage_policy_t, typename helper_t>
+template<typename key_type, typename value_type, template<typename, typename> class storage_policy_t, typename helper_t>
 template<typename const_qual_t>
-class HMultiMap<key_t, value_t, storage_policy_t, helper_t>::HIterator
+class HMultiMap<key_type, value_type, storage_policy_t, helper_t>::HIterator
 	{
+	typedef key_type key_t;
+	typedef value_type value_t;
 	typedef HMultiMap<key_t, value_t, storage_policy_t, helper_t> multi_map_t;
 	typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
 					typename multi_map_t::multimap_engine_t::const_iterator,

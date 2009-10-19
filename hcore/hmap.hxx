@@ -60,14 +60,16 @@ inline static bool less( HPair<key_t, value_t> const& left, key_t const& right )
  * HMap<> is a template representing self balancing binary search tree
  * data structure that holds pairs of keys and values.
  *
- * \tparam key_t - type of key held in map.
- * \tparam value_t - type of value held in map.
+ * \tparam key_type - type of key held in map.
+ * \tparam value_type - type of value held in map.
  * \tparam helper_t - HSBBSTree plugable code.
  */
-template<typename key_t, typename value_t, typename helper_t = map_helper<key_t const, value_t> >
+template<typename key_type, typename value_type, typename helper_t = map_helper<key_type const, value_type> >
 class HMap
 	{
 public:
+	typedef key_type key_t;
+	typedef value_type value_t;
 	typedef HPair<key_t const, value_t> map_elem_t;
 	template<typename const_qual_t>
 	class HIterator;
@@ -159,10 +161,12 @@ public:
 
 /*! \brief Iterator for HMap<> data structure.
  */
-template<typename key_t, typename value_t, typename helper_t>
+template<typename key_type, typename value_type, typename helper_t>
 template<typename const_qual_t>
-class HMap<key_t, value_t, helper_t>::HIterator
+class HMap<key_type, value_type, helper_t>::HIterator
 	{
+	typedef key_type key_t;
+	typedef value_type value_t;
 	typedef HMap<key_t, value_t, helper_t> map_t;
 	HSBBSTree::HIterator f_oEngine;
 public:

@@ -43,13 +43,14 @@ extern char const* g_ppcErrMsgHVector[];
 
 /*! \brief Vector class for linear algebra calculus.
  */
-template<typename tType>
+template<typename value_type>
 class HVector
 	{
-	typedef HArray<tType> data_t;
-	typedef HVector<tType> self_t;
+	typedef HArray<value_type> data_t;
+	typedef HVector<value_type> self_t;
 	data_t f_oData;
 public:
+	typedef value_type value_t;
 	/*! \brief Error type of HVector<> operations.
 	 */
 	struct ERROR
@@ -71,22 +72,22 @@ public:
 	void set( data_t const& );
 	bool normalize( void );
 	int long dim( void ) const;
-	tType norm( void ) const;
+	value_type norm( void ) const;
 	HVector& operator = ( HVector const& );
-	HVector& operator = ( tType const& );
+	HVector& operator = ( value_type const& );
 	HVector operator + ( HVector const& ) const;
 	HVector operator - ( HVector const& ) const;
 	HVector operator - ( void ) const;
-	HVector operator * ( tType const& ) const;
-	HVector operator / ( tType const& ) const;
+	HVector operator * ( value_type const& ) const;
+	HVector operator / ( value_type const& ) const;
 	HVector& operator += ( HVector const& );
 	HVector& operator -= ( HVector const& );
-	HVector& operator *= ( tType const& );
-	HVector& operator /= ( tType const& );
-	tType operator | ( HVector const& ) const;
-	tType operator ! ( void ) const;
-	tType const& operator[] ( int long const& ) const;
-	tType& operator[] ( int long const& );
+	HVector& operator *= ( value_type const& );
+	HVector& operator /= ( value_type const& );
+	value_type operator | ( HVector const& ) const;
+	value_type operator ! ( void ) const;
+	value_type const& operator[] ( int long const& ) const;
+	value_type& operator[] ( int long const& );
 	bool operator == ( HVector const& ) const;
 	bool operator != ( HVector const& ) const;
 	iterator begin( void );
@@ -105,52 +106,52 @@ private:
 		}
 	};
 
-template<typename tType>
-HVector<tType>::HVector( int long const& a_lDimension ) : f_oData( a_lDimension, 0.0 )
+template<typename value_type>
+HVector<value_type>::HVector( int long const& a_lDimension ) : f_oData( a_lDimension, 0.0 )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType>::~HVector( void )
+template<typename value_type>
+HVector<value_type>::~HVector( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType>::HVector( HVector const& a_roVector ) : f_oData( a_roVector.f_oData )
+template<typename value_type>
+HVector<value_type>::HVector( HVector const& a_roVector ) : f_oData( a_roVector.f_oData )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template<typename tType>
-void HVector<tType>::set( data_t const& rawData )
+template<typename value_type>
+void HVector<value_type>::set( data_t const& rawData )
 	{
 	M_PROLOG
 	f_oData = rawData;
 	M_EPILOG
 	}
 
-template<typename tType>
-tType HVector<tType>::norm( void ) const
+template<typename value_type>
+value_type HVector<value_type>::norm( void ) const
 	{
 	M_PROLOG
-	tType l_tScalar = accumulate( f_oData.begin(), f_oData.end(), 0.0 );
+	value_type l_tScalar = accumulate( f_oData.begin(), f_oData.end(), 0.0 );
 	return ( sqrt( l_tScalar ) );
 	M_EPILOG
 	}
 
-template<typename tType>
-bool HVector<tType>::normalize( void )
+template<typename value_type>
+bool HVector<value_type>::normalize( void )
 	{
 	M_PROLOG
-	tType l_tLenght = norm();
+	value_type l_tLenght = norm();
 	if ( ! l_tLenght )
 		return ( true );
 	int long size = f_oData.size();
@@ -160,40 +161,40 @@ bool HVector<tType>::normalize( void )
 	M_EPILOG
 	}
 
-template<typename tType>
-int long HVector<tType>::dim( void ) const
+template<typename value_type>
+int long HVector<value_type>::dim( void ) const
 	{
 	M_PROLOG
 	return ( f_oData.size() );
 	M_EPILOG
 	}
 
-template<typename tType>
-typename HVector<tType>::iterator HVector<tType>::begin( void )
+template<typename value_type>
+typename HVector<value_type>::iterator HVector<value_type>::begin( void )
 	{
 	return ( f_oData.begin() );
 	}
 
-template<typename tType>
-typename HVector<tType>::const_iterator HVector<tType>::begin( void ) const
+template<typename value_type>
+typename HVector<value_type>::const_iterator HVector<value_type>::begin( void ) const
 	{
 	return ( f_oData.begin() );
 	}
 
-template<typename tType>
-typename HVector<tType>::iterator HVector<tType>::end( void )
+template<typename value_type>
+typename HVector<value_type>::iterator HVector<value_type>::end( void )
 	{
 	return ( f_oData.end() );
 	}
 
-template<typename tType>
-typename HVector<tType>::const_iterator HVector<tType>::end( void ) const
+template<typename value_type>
+typename HVector<value_type>::const_iterator HVector<value_type>::end( void ) const
 	{
 	return ( f_oData.end() );
 	}
 
-template<typename tType>
-HVector<tType>& HVector<tType>::operator = ( HVector const& a_roVector )
+template<typename value_type>
+HVector<value_type>& HVector<value_type>::operator = ( HVector const& a_roVector )
 	{
 	M_PROLOG
 	int long size = a_roVector.f_oData.size();
@@ -204,8 +205,8 @@ HVector<tType>& HVector<tType>::operator = ( HVector const& a_roVector )
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType>& HVector<tType>::operator = ( tType const& a_tScalar )
+template<typename value_type>
+HVector<value_type>& HVector<value_type>::operator = ( value_type const& a_tScalar )
 	{
 	M_PROLOG
 	fill( f_oData.begin(), f_oData.end(), a_tScalar );
@@ -213,8 +214,8 @@ HVector<tType>& HVector<tType>::operator = ( tType const& a_tScalar )
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType> HVector<tType>::operator + ( HVector const& a_roVector ) const
+template<typename value_type>
+HVector<value_type> HVector<value_type>::operator + ( HVector const& a_roVector ) const
 	{
 	M_PROLOG
 	check_dimensions( a_roVector.f_oData.size() );
@@ -224,8 +225,8 @@ HVector<tType> HVector<tType>::operator + ( HVector const& a_roVector ) const
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType> HVector<tType>::operator - ( HVector const& a_roVector ) const
+template<typename value_type>
+HVector<value_type> HVector<value_type>::operator - ( HVector const& a_roVector ) const
 	{
 	M_PROLOG
 	check_dimensions( a_roVector.f_oData.size() );
@@ -235,8 +236,8 @@ HVector<tType> HVector<tType>::operator - ( HVector const& a_roVector ) const
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType> HVector<tType>::operator - ( void ) const
+template<typename value_type>
+HVector<value_type> HVector<value_type>::operator - ( void ) const
 	{
 	M_PROLOG
 	HVector l_oVector( f_oData.size() );
@@ -246,8 +247,8 @@ HVector<tType> HVector<tType>::operator - ( void ) const
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType> HVector<tType>::operator * ( tType const& a_tScalar ) const
+template<typename value_type>
+HVector<value_type> HVector<value_type>::operator * ( value_type const& a_tScalar ) const
 	{
 	M_PROLOG
 	HVector l_oVector( *this );
@@ -256,8 +257,8 @@ HVector<tType> HVector<tType>::operator * ( tType const& a_tScalar ) const
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType>HVector<tType>::operator / ( tType const& a_tScalar ) const
+template<typename value_type>
+HVector<value_type>HVector<value_type>::operator / ( value_type const& a_tScalar ) const
 	{
 	M_PROLOG
 	HVector l_oVector ( * this );
@@ -266,87 +267,87 @@ HVector<tType>HVector<tType>::operator / ( tType const& a_tScalar ) const
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType>& HVector<tType>::operator += ( HVector const& a_roVector )
+template<typename value_type>
+HVector<value_type>& HVector<value_type>::operator += ( HVector const& a_roVector )
 	{
 	M_PROLOG
 	int long size = a_roVector.f_oData.size();
 	check_dimensions( size );
-	yaal::transform( f_oData.begin(), f_oData.end(), a_roVector.f_oData.begin(), f_oData.begin(), yaal::plus<tType>() );
+	yaal::transform( f_oData.begin(), f_oData.end(), a_roVector.f_oData.begin(), f_oData.begin(), yaal::plus<value_type>() );
 	return ( *this );
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType>& HVector<tType>::operator -= ( HVector const& a_roVector )
+template<typename value_type>
+HVector<value_type>& HVector<value_type>::operator -= ( HVector const& a_roVector )
 	{
 	M_PROLOG
 	int long size = a_roVector.f_oData.size();
 	check_dimensions( size );
-	yaal::transform( f_oData.begin(), f_oData.end(), a_roVector.f_oData.begin(), f_oData.begin(), yaal::minus<tType>() );
+	yaal::transform( f_oData.begin(), f_oData.end(), a_roVector.f_oData.begin(), f_oData.begin(), yaal::minus<value_type>() );
 	return ( *this );
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType>& HVector<tType>::operator *= ( tType const& a_tScalar )
+template<typename value_type>
+HVector<value_type>& HVector<value_type>::operator *= ( value_type const& a_tScalar )
 	{
 	M_PROLOG
-	yaal::transform( f_oData.begin(), f_oData.end(), f_oData.begin(), bind2nd( yaal::multiplies<tType>(), a_tScalar ) );
+	yaal::transform( f_oData.begin(), f_oData.end(), f_oData.begin(), bind2nd( yaal::multiplies<value_type>(), a_tScalar ) );
 	return ( *this );
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType>& HVector<tType>::operator /= ( tType const& a_tScalar )
+template<typename value_type>
+HVector<value_type>& HVector<value_type>::operator /= ( value_type const& a_tScalar )
 	{
 	M_PROLOG
 	int long size = f_oData.size();
 	if ( a_tScalar )
-		yaal::transform( f_oData.begin(), f_oData.end(), f_oData.begin(), bind2nd( yaal::divides<tType>(), a_tScalar ) );
+		yaal::transform( f_oData.begin(), f_oData.end(), f_oData.begin(), bind2nd( yaal::divides<value_type>(), a_tScalar ) );
 	return ( *this );
 	M_EPILOG
 	}
 
-template<typename tType>
-tType HVector<tType>::operator | ( HVector const& a_roVector ) const
+template<typename value_type>
+value_type HVector<value_type>::operator | ( HVector const& a_roVector ) const
 	{
 	M_PROLOG
 	int long size = a_roVector.f_oData.size();
 	check_dimensions( size );
-	tType l_tScalar = 0;
+	value_type l_tScalar = 0;
 	for ( int long i = 0; i < size; i ++ ) 
 		l_tScalar += ( f_oData[ i ] * a_roVector.f_oData[ i ] );
 	return ( l_tScalar );
 	M_EPILOG
 	}
 
-template<typename tType>
-tType HVector<tType>::operator ! ( void ) const
+template<typename value_type>
+value_type HVector<value_type>::operator ! ( void ) const
 	{
 	M_PROLOG
 	return ( norm() );
 	M_EPILOG
 	}
 
-template<typename tType>
-tType const& HVector<tType>::operator[] ( int long const& idx ) const
+template<typename value_type>
+value_type const& HVector<value_type>::operator[] ( int long const& idx ) const
 	{
 	M_PROLOG
 	return ( f_oData[ idx ] );
 	M_EPILOG
 	}
 
-template<typename tType>
-tType& HVector<tType>::operator[] ( int long const& idx )
+template<typename value_type>
+value_type& HVector<value_type>::operator[] ( int long const& idx )
 	{
 	M_PROLOG
 	return ( f_oData[ idx ] );
 	M_EPILOG
 	}
 
-template<typename tType>
-bool HVector<tType>::operator == ( HVector const& a_roVector ) const
+template<typename value_type>
+bool HVector<value_type>::operator == ( HVector const& a_roVector ) const
 	{
 	M_PROLOG
 	int long size = a_roVector.f_oData.size();
@@ -358,20 +359,20 @@ bool HVector<tType>::operator == ( HVector const& a_roVector ) const
 	M_EPILOG
 	}
 
-template<typename tType>
-bool HVector<tType>::operator != ( HVector const& a_roVector ) const
+template<typename value_type>
+bool HVector<value_type>::operator != ( HVector const& a_roVector ) const
 	{
 	M_PROLOG
 	return ( ! ( *this == a_roVector ) );
 	M_EPILOG
 	}
 
-template<typename tType>
-HVector<tType> operator * ( tType const a_tScalar,
-		HVector<tType>const& a_roVector )
+template<typename value_type>
+HVector<value_type> operator * ( value_type const a_tScalar,
+		HVector<value_type>const& a_roVector )
 	{
 	M_PROLOG
-	HVector<tType>l_oVector( a_roVector );
+	HVector<value_type>l_oVector( a_roVector );
 	l_oVector *= a_tScalar;
 	return ( l_oVector );
 	M_EPILOG

@@ -42,11 +42,12 @@ extern char const * n_ppcErrMsgHPool [ ];
 
 /*! \brief Raw memory (malloc/free) pools manager.
  */
-template<typename tType>
+template<typename value_type>
 class HPool
 	{
-	typedef HPool<tType> self_t;
+	typedef HPool<value_type> self_t;
 public:
+	typedef value_type value_t;
 	/*! \brief Error codes for HPool<> operations.
 	 */
 	struct ERROR
@@ -69,13 +70,13 @@ public:
 		AUTO_GROW,  /*!< Grow size automatically (geometric grow). */
 		DUMB        /*!< Set pool size to precize requwested value. */
 		} pool_type_t;
-	typedef tType* iterator;
-	typedef tType const* const_iterator;
+	typedef value_t* iterator;
+	typedef value_t const* const_iterator;
 private:
 	pool_type_t f_ePoolType; /*!< Type of memory allocation policy. */
 	int long f_lCapacity;	/*!< size of allocated memory buffer */
 	int long f_lSize; /*!< size of container */
-	tType* f_ptPool;	/*!< pointer to allocated memory pool */
+	value_t* f_ptPool;	/*!< pointer to allocated memory pool */
 public:
 	HPool( void );
 	HPool( int long const&, pool_type_t const& = FIXED_SIZE );
@@ -83,9 +84,9 @@ public:
 	HPool& operator = ( HPool const& );
 	virtual ~HPool( void );
 	void pool_realloc( int long const& );
-	tType const& operator[] ( int long const& ) const;
-	tType& operator[] ( int long const& );
-	void push_back( tType const& );
+	value_t const& operator[] ( int long const& ) const;
+	value_t& operator[] ( int long const& );
+	void push_back( value_t const& );
 	void reset( void );
 	void clear( void );
 	bool empty( void ) const;
@@ -94,9 +95,9 @@ public:
 	int long get_size( void ) const;
 	int long capacity( void ) const;
 	int long get_capacity( void ) const;
-	void swap( HPool<tType>& );
-	tType const* raw( void ) const;
-	tType* raw( void );
+	void swap( HPool<value_t>& );
+	value_t const* raw( void ) const;
+	value_t* raw( void );
 	const_iterator begin( void ) const;
 	iterator begin( void );
 	const_iterator end( void ) const;
@@ -106,11 +107,11 @@ public:
 	const_iterator rend( void ) const;
 	iterator rend( void );
 private:
-	tType& get( int long const& ) const;
+	value_t& get( int long const& ) const;
 	};
 
-template<typename tType>
-HPool<tType>::HPool( void )
+template<typename value_t>
+HPool<value_t>::HPool( void )
 	: f_ePoolType( DUMB ), f_lCapacity( 0 ),
 	f_lSize( 0 ), f_ptPool( NULL )
 	{
@@ -119,8 +120,8 @@ HPool<tType>::HPool( void )
 	M_EPILOG
 	}
 
-template<typename tType>
-HPool<tType>::HPool( int long const& a_ulNewSize, pool_type_t const& a_ePoolType )
+template<typename value_t>
+HPool<value_t>::HPool( int long const& a_ulNewSize, pool_type_t const& a_ePoolType )
 	: f_ePoolType( a_ePoolType ), f_lCapacity( 0 ), f_lSize( 0 ),
 	f_ptPool( NULL )
 	{
@@ -131,8 +132,8 @@ HPool<tType>::HPool( int long const& a_ulNewSize, pool_type_t const& a_ePoolType
 	M_EPILOG
 	}
 
-template<typename tType>
-HPool<tType>::HPool( HPool<tType> const& source )
+template<typename value_t>
+HPool<value_t>::HPool( HPool<value_t> const& source )
 	: f_ePoolType( source.f_ePoolType ), f_lCapacity( 0 ), f_lSize( 0 ),
 	f_ptPool( NULL )
 	{
@@ -140,14 +141,14 @@ HPool<tType>::HPool( HPool<tType> const& source )
 	if ( source.f_lSize )
 		{
 		pool_realloc( source.f_lSize );
-		memcpy( f_ptPool, source.f_ptPool, f_lSize * sizeof ( tType ) );
+		memcpy( f_ptPool, source.f_ptPool, f_lSize * sizeof ( value_t ) );
 		}
 	return;
 	M_EPILOG
 	}
 
-template<typename tType>
-HPool<tType>& HPool<tType>::operator = ( HPool<tType> const& source )
+template<typename value_t>
+HPool<value_t>& HPool<value_t>::operator = ( HPool<value_t> const& source )
 	{
 	M_PROLOG
 	if ( &source != this )
@@ -156,15 +157,15 @@ HPool<tType>& HPool<tType>::operator = ( HPool<tType> const& source )
 		if ( source.f_lSize )
 			{
 			pool_realloc( source.f_lSize );
-			memcpy( f_ptPool, source.f_ptPool, f_lSize * sizeof ( tType ) );
+			memcpy( f_ptPool, source.f_ptPool, f_lSize * sizeof ( value_t ) );
 			}
 		}
 	return ( *this );
 	M_EPILOG
 	}
 
-template<typename tType>
-HPool<tType>::~HPool( void )
+template<typename value_t>
+HPool<value_t>::~HPool( void )
 	{
 	M_PROLOG
 	if ( f_ptPool )
@@ -175,8 +176,8 @@ HPool<tType>::~HPool( void )
 	M_EPILOG
 	}
 
-template<typename tType>
-void HPool<tType>::pool_realloc( int long const& a_ulNewSize )
+template<typename value_t>
+void HPool<value_t>::pool_realloc( int long const& a_ulNewSize )
 	{
 	M_PROLOG
 	if ( a_ulNewSize < 1 )
@@ -188,9 +189,9 @@ void HPool<tType>::pool_realloc( int long const& a_ulNewSize )
 			f_lCapacity = 1;
 			while ( f_lCapacity < a_ulNewSize )
 				f_lCapacity <<= 1;
-			f_ptPool = xrealloc<tType>( f_ptPool, f_lCapacity );
+			f_ptPool = xrealloc<value_t>( f_ptPool, f_lCapacity );
 			::memset( f_ptPool + f_lSize, 0,
-					( f_lCapacity - f_lSize ) * sizeof ( tType ) );
+					( f_lCapacity - f_lSize ) * sizeof ( value_t ) );
 			}
 		}
 	else if ( f_lCapacity != a_ulNewSize )
@@ -198,34 +199,34 @@ void HPool<tType>::pool_realloc( int long const& a_ulNewSize )
 		if ( f_ptPool && ( f_ePoolType == FIXED_SIZE ) )
 			M_THROW( n_ppcErrMsgHPool[ ERROR::REALLOC_FIXED ], f_lCapacity );
 		f_lCapacity = a_ulNewSize;
-		f_ptPool = xrealloc<tType>( f_ptPool, f_lCapacity );
+		f_ptPool = xrealloc<value_t>( f_ptPool, f_lCapacity );
 		if ( a_ulNewSize > f_lSize )
 			::memset( f_ptPool + f_lSize, 0,
-					( f_lCapacity - f_lSize ) * sizeof ( tType ) );
+					( f_lCapacity - f_lSize ) * sizeof ( value_t ) );
 		}
 	f_lSize = a_ulNewSize;
 	return;
 	M_EPILOG
 	}
 
-template<typename tType>
-tType const& HPool<tType>::operator[]( int long const& a_lIndex ) const
+template<typename value_t>
+value_t const& HPool<value_t>::operator[]( int long const& a_lIndex ) const
 	{
 	M_PROLOG
 	return ( get( a_lIndex ) );
 	M_EPILOG
 	}
 
-template<typename tType>
-tType& HPool<tType>::operator[]( int long const& a_lIndex )
+template<typename value_t>
+value_t& HPool<value_t>::operator[]( int long const& a_lIndex )
 	{
 	M_PROLOG
 	return ( get( a_lIndex ) );
 	M_EPILOG
 	}
 
-template<typename tType>
-tType& HPool<tType>::get( int long const& a_lIndex ) const
+template<typename value_t>
+value_t& HPool<value_t>::get( int long const& a_lIndex ) const
 	{
 	M_PROLOG
 	if ( ( a_lIndex < 0 ) || ( a_lIndex >= f_lSize ) )
@@ -234,8 +235,8 @@ tType& HPool<tType>::get( int long const& a_lIndex ) const
 	M_EPILOG
 	}
 
-template<typename tType>
-void HPool<tType>::push_back( tType const& a_tPod )
+template<typename value_t>
+void HPool<value_t>::push_back( value_t const& a_tPod )
 	{
 	M_PROLOG
 	int long l_iOldTop = f_lSize;
@@ -245,50 +246,50 @@ void HPool<tType>::push_back( tType const& a_tPod )
 	M_EPILOG
 	}
 
-template<typename tType>
-void HPool<tType>::reset( void )
+template<typename value_t>
+void HPool<value_t>::reset( void )
 	{
 	f_lSize = 0;
 	}
 
-template<typename tType>
-int long HPool<tType>::size( void ) const
+template<typename value_t>
+int long HPool<value_t>::size( void ) const
 	{
 	return ( get_size() );
 	}
 
-template<typename tType>
-int long HPool<tType>::get_size( void ) const
+template<typename value_t>
+int long HPool<value_t>::get_size( void ) const
 	{
 	return ( f_lSize );
 	}
 
-template<typename tType>
-int long HPool<tType>::capacity( void ) const
+template<typename value_t>
+int long HPool<value_t>::capacity( void ) const
 	{
 	return ( get_capacity() );
 	}
 
-template<typename tType>
-int long HPool<tType>::get_capacity( void ) const
+template<typename value_t>
+int long HPool<value_t>::get_capacity( void ) const
 	{
 	return ( f_lCapacity );
 	}
 
-template<typename tType>
-bool HPool<tType>::is_empty( void ) const
+template<typename value_t>
+bool HPool<value_t>::is_empty( void ) const
 	{
 	return ( ! f_lSize );
 	}
 
-template<typename tType>
-bool HPool<tType>::empty( void ) const
+template<typename value_t>
+bool HPool<value_t>::empty( void ) const
 	{
 	return ( is_empty() );
 	}
 
-template<typename tType>
-void HPool<tType>::swap( HPool<tType>& other )
+template<typename value_t>
+void HPool<value_t>::swap( HPool<value_t>& other )
 	{
 	if ( &other != this )
 		{
@@ -301,70 +302,70 @@ void HPool<tType>::swap( HPool<tType>& other )
 	return;
 	}
 
-template<typename tType>
-tType const* HPool<tType>::raw( void ) const
+template<typename value_t>
+value_t const* HPool<value_t>::raw( void ) const
 	{
 	return ( f_ptPool );
 	}
 
-template<typename tType>
-tType* HPool<tType>::raw( void )
+template<typename value_t>
+value_t* HPool<value_t>::raw( void )
 	{
 	return ( f_ptPool );
 	}
 
-template<typename tType>
-typename HPool<tType>::const_iterator HPool<tType>::begin( void ) const
+template<typename value_t>
+typename HPool<value_t>::const_iterator HPool<value_t>::begin( void ) const
 	{
 	return ( f_ptPool );
 	}
 
-template<typename tType>
-typename HPool<tType>::iterator HPool<tType>::begin( void )
+template<typename value_t>
+typename HPool<value_t>::iterator HPool<value_t>::begin( void )
 	{
 	return ( f_ptPool );
 	}
 
-template<typename tType>
-typename HPool<tType>::const_iterator HPool<tType>::end( void ) const
+template<typename value_t>
+typename HPool<value_t>::const_iterator HPool<value_t>::end( void ) const
 	{
 	return ( f_ptPool + f_lSize );
 	}
 
-template<typename tType>
-typename HPool<tType>::iterator HPool<tType>::end( void )
+template<typename value_t>
+typename HPool<value_t>::iterator HPool<value_t>::end( void )
 	{
 	return ( f_ptPool + f_lSize );
 	}
 
-template<typename tType>
-typename HPool<tType>::const_iterator HPool<tType>::rbegin( void ) const
+template<typename value_t>
+typename HPool<value_t>::const_iterator HPool<value_t>::rbegin( void ) const
 	{
 	return ( f_ptPool + f_lSize - 1 );
 	}
 
-template<typename tType>
-typename HPool<tType>::iterator HPool<tType>::rbegin( void )
+template<typename value_t>
+typename HPool<value_t>::iterator HPool<value_t>::rbegin( void )
 	{
 	return ( f_ptPool + f_lSize - 1 );
 	}
 
-template<typename tType>
-typename HPool<tType>::const_iterator HPool<tType>::rend( void ) const
+template<typename value_t>
+typename HPool<value_t>::const_iterator HPool<value_t>::rend( void ) const
 	{
 	return ( f_ptPool - 1 );
 	}
 
-template<typename tType>
-typename HPool<tType>::iterator HPool<tType>::rend( void )
+template<typename value_t>
+typename HPool<value_t>::iterator HPool<value_t>::rend( void )
 	{
 	return ( f_ptPool - 1 );
 	}
 
 }
 
-template<typename tType>
-inline void swap( yaal::hcore::HPool<tType>& a, yaal::hcore::HPool<tType>& b )
+template<typename value_t>
+inline void swap( yaal::hcore::HPool<value_t>& a, yaal::hcore::HPool<value_t>& b )
 	{ a.swap( b ); }
 
 }

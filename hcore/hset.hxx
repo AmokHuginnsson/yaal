@@ -40,7 +40,7 @@ namespace hcore
 
 /*! \brief HSBBSTree util, a helper for HSet<> instatiations.
  */
-template<typename tType>
+template<typename value_t>
 struct set_helper
 {
 
@@ -55,14 +55,15 @@ inline static bool less( key_t const& left, key_t const& right )
  * HSet<> is a template representing self balancing binary search tree
  * data structure that holds set of keys.
  *
- * \tparam key_t - type of key held in map.
+ * \tparam value_type - type of values held in set.
  * \tparam helper_t - HSBBSTree plugable code.
  */
-template<typename tType, typename helper_t = set_helper<tType> >
+template<typename value_type, typename helper_t = set_helper<value_type> >
 class HSet
 	{
 public:
 	class HIterator;
+	typedef value_type value_t;
 	typedef HIterator iterator;
 private:
 	HSBBSTree f_oEngine;
@@ -74,10 +75,10 @@ public:
 		{ return ( f_oEngine.is_empty() );	}
 	bool is_empty( void ) const
 		{ return ( f_oEngine.is_empty() );	}
-	HPair<HIterator, bool> insert( tType const& elem )
+	HPair<HIterator, bool> insert( value_t const& elem )
 		{
 		M_PROLOG
-		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<tType, helper_t>( elem );
+		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<value_t, helper_t>( elem );
 		return ( make_pair( HIterator( p.first ), p.second ) );
 		M_EPILOG
 		}
@@ -90,8 +91,8 @@ public:
 		return;
 		M_EPILOG
 		}
-	void remove( tType const& e )
-		{	f_oEngine.remove<tType, tType, helper_t>( e );	}
+	void remove( value_t const& e )
+		{	f_oEngine.remove<value_t, value_t, helper_t>( e );	}
 	HIterator erase( HIterator const& it )
 		{
 		M_PROLOG
@@ -101,8 +102,8 @@ public:
 		return ( newIt );
 		M_EPILOG
 		}
-	HIterator find( tType const& e ) const
-		{ return ( HIterator( f_oEngine.find<tType, tType, helper_t>( e ) ) ); }
+	HIterator find( value_t const& e ) const
+		{ return ( HIterator( f_oEngine.find<value_t, value_t, helper_t>( e ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( f_oEngine.begin() ) ); }
 	HIterator end( void ) const
@@ -113,22 +114,22 @@ public:
 		{ return ( HIterator( f_oEngine.rend() ) ); }
 	void clear( void )
 		{ f_oEngine.clear(); }
-	void swap( HSet<tType, helper_t>& other )
+	void swap( HSet<value_t, helper_t>& other )
 		{
 		if ( &other != this )
 			f_oEngine.swap( other.f_oEngine );
 		}
-	void copy_from( HSet<tType, helper_t> const& source )
+	void copy_from( HSet<value_t, helper_t> const& source )
 		{
 		if ( &source != this )
-			f_oEngine.copy_from<tType, helper_t>( source.f_oEngine );
+			f_oEngine.copy_from<value_t, helper_t>( source.f_oEngine );
 		}
 	};
 
 /*! \brief Iterator for HSet<> data structure.
  */
-template<typename tType, typename helper_t = set_helper<tType> >
-class HSet<tType, helper_t>::HIterator
+template<typename value_t, typename helper_t = set_helper<value_t> >
+class HSet<value_t, helper_t>::HIterator
 	{
 	HSBBSTree::HIterator f_oEngine;
 public:
@@ -162,23 +163,23 @@ public:
 		-- f_oEngine;
 		return ( it );
 		}
-	tType const& operator * ( void )
-		{	return ( f_oEngine.operator*<tType>() );	}
-	tType const* operator -> ( void )
-		{ return ( &f_oEngine.operator*<tType>() );	}
+	value_t const& operator * ( void )
+		{	return ( f_oEngine.operator*<value_t>() );	}
+	value_t const* operator -> ( void )
+		{ return ( &f_oEngine.operator*<value_t>() );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( f_oEngine == it.f_oEngine ); }
 	bool operator != ( HIterator const& it ) const
 		{ return ( f_oEngine != it.f_oEngine ); }
 private:
-	friend class HSet<tType, helper_t>;
+	friend class HSet<value_t, helper_t>;
 	explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 	};
 
 }
 
-template<typename tType, typename helper_t>
-inline void swap( yaal::hcore::HSet<tType, helper_t>& a, yaal::hcore::HSet<tType, helper_t>& b )
+template<typename value_t, typename helper_t>
+inline void swap( yaal::hcore::HSet<value_t, helper_t>& a, yaal::hcore::HSet<value_t, helper_t>& b )
 	{ a.swap( b ); }
 
 }
