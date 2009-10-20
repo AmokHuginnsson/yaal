@@ -308,10 +308,16 @@ struct is_kind_of
 	static bool const value = sizeof ( calc( static_cast<derived_t const*>( NULL ) ) ) == sizeof ( YES );
 	};
 
+/*! \brief Check if given type is a member type.
+ *
+ * \tparam T - type to check for being a member.
+ * \retval value - true iff given type is a member type.
+ */
 template<typename T>
 struct is_member
 	{ static bool const value = false; };
 
+/*! \cond */
 template<typename return_t, typename class_t>
 struct is_member<return_t ( class_t::* )( void )>
 	{ static bool const value = true; };
@@ -503,9 +509,17 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
 	{ static bool const value = true; };
 
+/*! \endcond */
+
+/*! \brief Get return type of member or function.
+ *
+ * \tparam T - type of member or function.
+ * \retval return_type - return type of given member or function.
+ */
 template<typename T>
 struct return_type;
 
+/*! \cond */
 template<typename return_t, typename class_t>
 struct return_type<return_t ( class_t::* )( void )>
 	{ typedef return_t type; };
@@ -752,6 +766,8 @@ template<typename return_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 struct return_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
 	{ typedef return_t type; };
+
+/*! \endcond */
 
 }
 

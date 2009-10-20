@@ -34,6 +34,17 @@ namespace yaal
 namespace tools
 {
 
+HMemory::HMemory( void* ptr, int long const& size ) : f_pvBlock( ptr ), f_lSize( size )
+	{
+	M_ASSERT( size >= 0 );
+	}
+
+bool HMemory::operator == ( HMemory const& other ) const
+	{
+	M_PROLOG
+	return ( ( other.f_lSize == f_lSize ) && ( ! memcmp( other.f_pvBlock, f_pvBlock, f_lSize ) ) );
+	M_EPILOG
+	}
 
 }
 

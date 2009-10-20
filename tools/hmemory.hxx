@@ -61,6 +61,12 @@ public:
 	 * \return Self.
 	 */
 	HMemory& operator = ( HMemory const& src );
+	/*! \brief Check if two blocks of memory have identical contents.
+	 *
+	 * \param other - check for equality with this block.
+	 * \return true iff other has same contents as this.
+	 */
+	bool operator == ( HMemory const& other ) const;
 	};
 
 }
