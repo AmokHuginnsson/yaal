@@ -122,6 +122,7 @@ private:
 
 typedef HExceptionT<HFile, HStreamInterfaceException> HFileException;
 
+extern HFile cin;
 extern HFile cout;
 extern HFile cerr;
 

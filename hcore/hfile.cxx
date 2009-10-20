@@ -303,6 +303,7 @@ bool HFile::do_is_valid( void ) const
 	M_EPILOG
 	}
 
+HFile cin( HFile::OPEN::READING, stdin );
 HFile cout( HFile::OPEN::WRITING, stdout );
 HFile cerr( HFile::OPEN::WRITING, stderr );
 

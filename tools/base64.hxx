@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/hstreaminterface.hxx"
 
 namespace yaal
 {
@@ -41,8 +42,10 @@ namespace tools
 struct base64
 	{
 	typedef base64 self_t;
-	static yaal::hcore::HString encode( yaal::hcore::HString const& );
-	static yaal::hcore::HString decode( yaal::hcore::HString const& );
+	static yaal::hcore::HString encode( yaal::hcore::HString const&, bool = false );
+	static yaal::hcore::HString decode( yaal::hcore::HString const&, bool = false );
+	static void encode( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, bool = false );
+	static void decode( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, bool = false );
 	};
 
 typedef yaal::hcore::HExceptionT<base64> HBase64Exception;
