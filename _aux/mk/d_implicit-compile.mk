@@ -12,7 +12,7 @@ endef
 	/bin/rm -f "$(@)" && \
 	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@:.$(DS)=.$(OS)) -MT $(@) -MF $(@) \
 	$(call msg,&& echo -n "$(DEP_CL)")
-	
+
 %.$(OS): %.$(SS)
 	@$(eval $(call IDENT_HELPER,$(<))) $(call msg,echo -n "$($(CURR_PROGRESS_INDICATOR))$(eval $(call PROGRESS_INDICATOR))Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... " && ) \
 	/bin/rm -f "$(@)" && \
