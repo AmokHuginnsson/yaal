@@ -8,11 +8,13 @@ define IDENT_HELPER
 endef
 
 %.$(DS): %.$(SS)
-	@/bin/rm -f "$(@)" && \
-	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@:.$(DS)=.$(OS)) -MT $(@) -MF $(@)
-
+	@$(call msg,echo -n "$($(CURR_DEP_PROGRESS_INDICATOR))$(DEP_PROGRESS_INDICATOR_SUFFIX)$(eval $(call PROGRESS_INDICATOR))" && ) \
+	/bin/rm -f "$(@)" && \
+	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@:.$(DS)=.$(OS)) -MT $(@) -MF $(@) \
+	$(call msg,&& echo -n "$(DEP_CL)")
+	
 %.$(OS): %.$(SS)
-	@$(eval $(call IDENT_HELPER,$(<))) $(call msg,echo -n "Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... " && ) \
+	@$(eval $(call IDENT_HELPER,$(<))) $(call msg,echo -n "$($(CURR_PROGRESS_INDICATOR))$(eval $(call PROGRESS_INDICATOR))Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... " && ) \
 	/bin/rm -f "$(@)" && \
 	$(call invoke,$(CXX) $(CXXFLAGS) -D__ID__=$(ID) -D__TID__=$(TID) $(<) -c -o $(@) 2>&1 | tee -a make.log) && \
 	test -f $(@) \
