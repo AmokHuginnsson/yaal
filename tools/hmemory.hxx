@@ -45,8 +45,9 @@ class HMemory : public yaal::hcore::HStreamInterface
 	int long f_lSize;
 	int long f_lCursorRead;
 	int long f_lCursorWrite;
-	typedef HMemory self_t;
 public:
+	typedef HMemory self_t;
+	typedef yaal::hcore::HStreamInterface hier_t;
 	/*! \brief Create new memory accessor.
 	 *
 	 * \param ptr - pointer to memory block to be wrapped.
