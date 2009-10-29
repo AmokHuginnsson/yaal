@@ -34,15 +34,53 @@ namespace yaal
 namespace tools
 {
 
-HMemory::HMemory( void* ptr, int long const& size ) : f_pvBlock( ptr ), f_lSize( size )
+HMemory::HMemory( void* ptr, int long const& size ) : f_pvBlock( ptr ), f_lSize( size ), f_lCursorRead( 0 ), f_lCursorWrite( 0 )
 	{
 	M_ASSERT( size >= 0 );
+	return;
+	}
+
+HMemory::~HMemory( void )
+	{
+	return;
 	}
 
 bool HMemory::operator == ( HMemory const& other ) const
 	{
 	M_PROLOG
 	return ( ( other.f_lSize == f_lSize ) && ( ! memcmp( other.f_pvBlock, f_pvBlock, f_lSize ) ) );
+	M_EPILOG
+	}
+
+int long HMemory::do_write( void const* const src, int long const& size )
+	{
+	M_PROLOG
+	M_ENSURE( f_lCursorWrite + size < f_lSize );
+	::memcpy( static_cast<char*>( f_pvBlock ) + f_lCursorWrite, src, size );
+	f_lCursorWrite += size;
+	return ( size );
+	M_EPILOG
+	}
+
+void HMemory::do_flush( void ) const
+	{
+	return;
+	}
+
+int long HMemory::do_read( void* const dest, int long const& size )
+	{
+	M_PROLOG
+	M_ENSURE( f_lCursorRead + size < f_lSize );
+	::memcpy( dest, static_cast<char const* const>( f_pvBlock ) + f_lCursorRead, size );
+	f_lCursorRead += size;
+	return ( size );
+	M_EPILOG
+	}
+
+bool HMemory::do_is_valid( void ) const
+	{
+	M_PROLOG
+	return ( ( f_lCursorRead < f_lSize ) && ( f_lCursorWrite < f_lSize ) );
 	M_EPILOG
 	}
 

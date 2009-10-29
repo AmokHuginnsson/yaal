@@ -43,6 +43,9 @@ class HMemory : public yaal::hcore::HStreamInterface
 	{
 	void* f_pvBlock;
 	int long f_lSize;
+	int long f_lCursorRead;
+	int long f_lCursorWrite;
+	typedef HMemory self_t;
 public:
 	/*! \brief Create new memory accessor.
 	 *
@@ -60,6 +63,7 @@ public:
 	 * \param src - original HMemory object to be copied.
 	 * \return Self.
 	 */
+	virtual ~HMemory( void );
 	HMemory& operator = ( HMemory const& src );
 	/*! \brief Check if two blocks of memory have identical contents.
 	 *
@@ -67,7 +71,14 @@ public:
 	 * \return true iff other has same contents as this.
 	 */
 	bool operator == ( HMemory const& other ) const;
+private:
+	virtual int long do_write( void const* const, int long const& );
+	virtual void do_flush( void ) const;
+	virtual int long do_read( void* const, int long const& );
+	virtual bool do_is_valid( void ) const;
 	};
+
+typedef yaal::hcore::HExceptionT<HMemory> HMemoryException;
 
 }
 
