@@ -45,6 +45,7 @@ class HMemory : public yaal::hcore::HStreamInterface
 	int long f_lSize;
 	int long f_lCursorRead;
 	int long f_lCursorWrite;
+	bool f_bFlip; /*!< which cursor is after which */
 public:
 	typedef HMemory self_t;
 	typedef yaal::hcore::HStreamInterface hier_t;

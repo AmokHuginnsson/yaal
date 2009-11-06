@@ -34,9 +34,11 @@ namespace yaal
 namespace tools
 {
 
-HMemory::HMemory( void* ptr, int long const& size ) : f_pvBlock( ptr ), f_lSize( size ), f_lCursorRead( 0 ), f_lCursorWrite( 0 )
+HMemory::HMemory( void* ptr, int long const& size )
+	: f_pvBlock( ptr ), f_lSize( size ), f_lCursorRead( 0 ), f_lCursorWrite( 0 ), f_bFlip( false )
 	{
-	M_ASSERT( size >= 0 );
+	M_ASSERT( size > 0 );
+	M_ASSERT( ptr );
 	return;
 	}
 
