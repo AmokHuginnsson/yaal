@@ -12,6 +12,7 @@ define NEW_TARGET
 	COMPILER_FLAGS_TARGET_$(1) := $(3)
 	LINKER_FLAGS_TARGET_$(1) := $(4)
 	LIBS_TARGET_$(1) := $(5)
+	EXTRA_DEPS_TARGET_$(1) := $(6)
 	TARGETS := $$(TARGETS) TARGET_$(1)
 endef
 

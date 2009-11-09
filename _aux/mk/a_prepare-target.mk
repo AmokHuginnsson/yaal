@@ -34,7 +34,7 @@ $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 	test -f $$(@) \
 	$$(call msg,&& echo $$(NONL) "done.$$(CL)")
 
-$$(REAL_TARGET): $$(OBJS_$(1))
+$$(REAL_TARGET): $$(OBJS_$(1)) $$(EXTRA_DEPS_$(1))
 	@$$(call msg,echo -n "Linking \`$$(@)' ... " && ) \
 	/bin/rm -f "$$(@)"; \
 	$$(call invoke,$$(LXX) $$(LINKER_FLAGS) $$(LINKER_FLAGS_$(1)) -o $$(@) $$(OBJS_$(1)) $$(LIBS) $$(LIBS_$(1)) 2>&1 | tee -a make.log )
