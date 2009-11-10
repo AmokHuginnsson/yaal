@@ -58,16 +58,17 @@ public:
 			REPEAT,
 			ERROR
 			} code_t;
-		int octets; /*!< number of octets read during last read operation */
+		int octets; /*!< cumultative number of octets read together with last successful read operation */
 		code_t code; /*!< return code for last read operation */
 		STATUS( void ) : octets( 0 ), code( OK ) {}
 		};
 	typedef HPointer<HStreamInterface> ptr_t;
 protected:
 	typedef yaal::hcore::HPool<char> cache_t;
-	cache_t f_oCache;
-	int f_iOffset;
-	STATUS f_sStatus;
+	cache_t f_oCache; /*!< read buffer */
+	int f_iOffset; /*!< position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes */
+	STATUS f_sStatus /*!< status of last read_until operation */;
+	HString f_oWordCache; /*!< cache for operator >> () */
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
@@ -85,12 +86,25 @@ public:
 	HStreamInterface& operator << ( float const& );
 	HStreamInterface& operator << ( void const* const& );
 	HStreamInterface& operator << ( HStreamInterface& ( *const )( HStreamInterface& ) );
+	HStreamInterface& operator >> ( HString& );
+	HStreamInterface& operator >> ( char& );
+	HStreamInterface& operator >> ( int short& );
+	HStreamInterface& operator >> ( int short unsigned& );
+	HStreamInterface& operator >> ( int& );
+	HStreamInterface& operator >> ( int unsigned& );
+	HStreamInterface& operator >> ( int long& );
+	HStreamInterface& operator >> ( int long unsigned& );
+	HStreamInterface& operator >> ( double& );
+	HStreamInterface& operator >> ( double long& );
+	HStreamInterface& operator >> ( float& );
+	HStreamInterface& operator >> ( void const*& );
 	/*! \brief Read data from stream until end of it or until delimiter is encountered.
 	 *
 	 * \param store - Store read date here.
 	 * \param delim - Stop reading data at any character in this set.
 	 * \param strip - Remove delimiting stop char from output buffer.
-	 * \return Number of characters avctualy read.
+	 * \retval code - status of operation.
+	 * \retval octets - number of bytes erad so far.
 	 */
 	STATUS const& read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
 	int long read( void* const, int long const& );
@@ -98,6 +112,7 @@ public:
 	static char const* const eols;
 	bool is_valid( void ) const;
 private:
+	bool read_word( void );
 	virtual int long do_write( void const* const, int long const& ) = 0;
 	virtual int long do_read( void* const, int long const& ) = 0;
 	virtual void do_flush( void ) const = 0;

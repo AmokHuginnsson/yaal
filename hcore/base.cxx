@@ -58,6 +58,27 @@ my_strtold_t my_strtold = dumb_strtold;
 }
 
 template<>
+int long unsigned lexical_cast( HString const& val )
+	{
+	int l_iBase = 10;
+	if ( ( val.get_length() > 2 ) && ( val[ 1 ] == 'x' ) )
+		l_iBase = 16;
+	return ( ::strtoul( val.raw(), NULL, l_iBase ) );
+	}
+
+template<>
+int unsigned lexical_cast( HString const& val )
+	{
+	return ( static_cast<int unsigned>( lexical_cast<int long unsigned>( val ) ) );
+	}
+
+template<>
+int short unsigned lexical_cast( HString const& val )
+	{
+	return ( static_cast<int short unsigned>( lexical_cast<int long unsigned>( val ) ) );
+	}
+
+template<>
 int long lexical_cast( HString const& val )
 	{
 	int l_iBase = 10;
@@ -85,6 +106,12 @@ int lexical_cast( HString const& val )
 	}
 
 template<>
+int short lexical_cast( HString const& val )
+	{
+	return ( static_cast<int short>( lexical_cast<int long>( val ) ) );
+	}
+
+template<>
 int lexical_cast( char const* const& val )
 	{
 	return ( static_cast<int>( lexical_cast<int long, HString>( val ) ) );
@@ -101,6 +128,14 @@ double long lexical_cast( HString const& val )
 	{
 	M_PROLOG
 	return ( extendable::my_strtold( val ) );
+	M_EPILOG
+	}
+
+template<>
+float lexical_cast( HString const& val )
+	{
+	M_PROLOG
+	return ( static_cast<float>( lexical_cast<double long>( val ) ) );
 	M_EPILOG
 	}
 

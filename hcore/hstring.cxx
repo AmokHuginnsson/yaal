@@ -59,8 +59,8 @@ int long strrnspn( char const* const, char const* const, int long const );
 int long kmpsearch( char const* const, int long const&, char const* const, int long const& );
 	}
 
-char const n_pcWhiteSpace[] = " \t\n\v\f\r";
-char const * n_ppcErrMsgHString [ 3 ] =
+char const n_pcWhiteSpace[] = "\a\b \t\v\f\r\n";
+char const* n_ppcErrMsgHString[ 3 ] =
 	{
 	_( "ok" ),
 	_( "NULL pointer used for string operations" ),
