@@ -104,7 +104,7 @@ public:
 	 * \param delim - Stop reading data at any character in this set.
 	 * \param strip - Remove delimiting stop char from output buffer.
 	 * \retval code - status of operation.
-	 * \retval octets - number of bytes erad so far.
+	 * \retval octets - number of bytes read so far.
 	 */
 	STATUS const& read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
 	int long read( void* const, int long const& );
