@@ -1,9 +1,12 @@
 cmake_minimum_required( VERSION 2.6 )
 project( yaal )
 set( COMPONENTS hcore tools dbwrapper hconsole hdata )
+get_filename_component( yaal_SOURCE_DIR ${yaal_SOURCE_DIR}/../ ABSOLUTE )
 include_directories( "${yaal_SOURCE_DIR}" )
 
+message( "yaal_SOURCE_DIR: " ${yaal_SOURCE_DIR} )
 macro( yaal_make_component name )
+	message( "Processing component: " ${name} )
 	file( GLOB SRCS ${yaal_SOURCE_DIR}/${name}/*.cxx )
 	add_library( ${name} SHARED ${SRCS} )
 	set_target_properties( ${name} PROPERTIES LINKER_LANGUAGE CXX )
