@@ -53,8 +53,11 @@ mrproper: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
 clean: $(foreach T, $(MAIN_TARGETS), clean-$(T))
 
 purge: mrproper
-	/bin/rm -rf autom4te.cache build config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile.mk config.h config.h.in yaalrc config.log doc/html
+	/bin/rm -rf autom4te.cache build config.cache config.status \
+		configure.lineno configure Makefile.mk config.hxx config.hxx.in \
+		config.h config.h.in yaalrc config.log doc/html \
+		CMakeFiles Makefile CMakeCache.txt cmake_install.cmake \
+		tags GPATH GRTAGS GSYMS GTAGS make.log
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f

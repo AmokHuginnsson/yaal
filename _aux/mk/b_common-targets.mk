@@ -36,8 +36,11 @@ mrproper: clean
 	echo "done."
 
 purge: mrproper
-	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
-	/bin/rm -rf configure Makefile.mk config.hxx config.hxx.in config.log
+	/bin/rm -rf autom4te.cache build config.cache config.status \
+		configure.lineno configure Makefile.mk config.hxx config.hxx.in \
+		config.h config.h.in yaalrc config.log doc/html \
+		CMakeFiles Makefile CMakeCache.txt cmake_install.cmake \
+		tags GPATH GRTAGS GSYMS GTAGS make.log
 
 bin:
 	@( DO_RELEASE=1 $(MAKE) ; make clean )
