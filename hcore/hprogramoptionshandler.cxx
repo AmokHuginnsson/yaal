@@ -623,7 +623,7 @@ char const* make_short_opts( HProgramOptionsHandler::options_t const& a_oOptions
 	for ( HProgramOptionsHandler::options_t::const_iterator it = a_oOptions.begin(),
 			end = a_oOptions.end(); it != end; ++ it )
 		{
-		if ( it->f_iShortForm > UCHAR_MAX )
+		if ( it->f_iShortForm > static_cast<int>( UCHAR_MAX ) )
 			continue;
 		a_roBuffer += static_cast<char>( it->f_iShortForm );
 		switch ( it->f_eSwitchType )
