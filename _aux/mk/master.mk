@@ -55,11 +55,11 @@ clean: $(foreach T, $(MAIN_TARGETS), clean-$(T))
 purge: mrproper
 	/bin/rm -rf autom4te.cache build config.cache config.status \
 		configure.lineno configure Makefile.mk config.hxx config.hxx.in \
-		config.h config.h.in yaalrc config.log doc/html \
+		config.h config.h.in yaalrc config.log dirs.d doc/html \
 		CMakeFiles CMakeCache.txt cmake_install.cmake \
 		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj \
 		yaal.sln yaal.suo yaal.ncb *.dir debug release && \
-	if [ "x${OSTYPE}" != "xcygwin" ] ; then /bin/rm Makefile ; fi
+	if [ "x${OSTYPE}" != "xcygwin" ] ; then /bin/rm -f Makefile ; fi
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
