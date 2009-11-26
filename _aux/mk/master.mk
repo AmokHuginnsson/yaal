@@ -6,7 +6,7 @@ $(1): build/$(1)/Makefile.mk build/$(1)/config.hxx
 	$(2) $$(MAKE) -C $$(dir $$(<)) --no-print-directory -f Makefile.mk -e $$(@)
 
 mrproper-$(1): clean-$(1)
-	@$$(if $$(wildcard build/$(1)), $$(MAKE) -C build/$(1) -f Makefile.mk -e mrproper && cd - && cd build && /bin/rm -rf $(1))
+	@$$(if $$(wildcard build/$(1)), $$(MAKE) -C build/$(1) -f Makefile.mk -e mrproper && cd build && /bin/rm -rf $(1))
 
 clean-$(1):
 	@$$(if $$(wildcard build/$(1)), $$(MAKE) -C build/$(1) -f Makefile.mk -e clean)
@@ -56,8 +56,10 @@ purge: mrproper
 	/bin/rm -rf autom4te.cache build config.cache config.status \
 		configure.lineno configure Makefile.mk config.hxx config.hxx.in \
 		config.h config.h.in yaalrc config.log doc/html \
-		CMakeFiles Makefile CMakeCache.txt cmake_install.cmake \
-		tags GPATH GRTAGS GSYMS GTAGS make.log
+		CMakeFiles CMakeCache.txt cmake_install.cmake \
+		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj \
+		yaal.sln yaal.suo yaal.ncb *.dir debug release && \
+	if [ "x${OSTYPE}" != "xcygwin" ] ; then /bin/rm Makefile ; fi
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
