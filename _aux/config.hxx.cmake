@@ -1,5 +1,15 @@
+#define PACKAGE_VERSION "0.0.0"
 #cmakedefine01 HAVE_STRCASESTR
 #cmakedefine01 HAVE_ASPRINTF
+#cmakedefine01 HAVE_STRTOLD
+#cmakedefine01 HAVE_POWL
+#cmakedefine01 HAVE_DECL_TEMP_FAILURE_RETRY
+#cmakedefine01 HAVE_DECL_FLOORL
+#cmakedefine01 HAVE_GETHOSTBYNAME_R
+#cmakedefine01 HAVE_DECL_GETADDRINFO
+#cmakedefine01 HAVE_GNU_GETHOSTBYNAME_R
+#cmakedefine01 HAVE_DECL_SUN_LEN
+#cmakedefine01 HAVE_MEMRCHR
 #define LIB_PREFIX @LIB_PREFIX@
 #define LIB_EXT @LIB_EXT@
 #define SYMBOL_PREFIX @SYMBOL_PREFIX@
@@ -11,7 +21,7 @@
 #cmakedefine01 HAVE_OPENSSL_SSL_H
 #cmakedefine01 HAVE_LIBXML2_LIBXML_XMLVERSION_H
 #cmakedefine01 HAVE_EXECINFO_H
-#cmakedefine01 HAVE_SYS_CONSIO_H
+#cmakedefine HAVE_SYS_CONSIO_H
 #cmakedefine01 HAVE_GPM_H
 #cmakedefine01 HAVE_NCURSES_CURSES_H
 #cmakedefine01 HAVE_CURSES_H

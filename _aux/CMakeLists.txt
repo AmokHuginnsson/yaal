@@ -1,11 +1,11 @@
 cmake_minimum_required( VERSION 2.6 )
-project( yaal )
+enable_language( C )
+project( yaal CXX )
 set( COMPONENTS hcore tools dbwrapper hconsole hdata )
 get_filename_component( yaal_SOURCE_DIR ${yaal_SOURCE_DIR}/../ ABSOLUTE )
 message( "yaal_SOURCE_DIR: " ${yaal_SOURCE_DIR} )
 include_directories( "${yaal_SOURCE_DIR}" )
-add_definitions( -D__YAAL_BUILD__ -D__ID__="" )
-
+add_definitions( -D__YAAL_BUILD__ -D__ID__="" -D__TID__="" )
 if ( CMAKE_HOST_WIN32 )
 	set( LIB_PREFIX "\"\"" )
 	set( LIB_EXT "\"dll\"" )
@@ -18,6 +18,15 @@ endif ( CMAKE_HOST_WIN32 )
 include( CheckFunctionExists )
 check_function_exists( strcasestr HAVE_STRCASESTR )
 check_function_exists( asprintf HAVE_ASPRINTF )
+check_function_exists( strtold HAVE_STRTOLD )
+check_function_exists( gethostbyname_r HAVE_GETHOSTBYNAME_R )
+check_function_exists( memrchr HAVE_MEMRCHR )
+include( CheckSymbolExists )
+set( CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE )
+check_symbol_exists(TEMP_FAILURE_RETRY unistd.h HAVE_DECL_TEMP_FAILURE_RETRY)
+check_symbol_exists( getaddrinfo  netdb.h;netinet/in.h;sys/socket.h HAVE_DECL_GETADDRINFO )
+check_symbol_exists(SUN_LEN sys/un.h HAVE_DECL_SUN_LEN)
+set( CMAKE_REQUIRED_DEFINITIONS )
 include( CheckIncludeFileCXX )
 check_include_file_cxx( sqlite3.h HAVE_SQLITE3_H )
 check_include_file_cxx( postgresql/libpq-fe.h HAVE_POSTGRESQL_LIBPQ_FE_H )
@@ -34,11 +43,28 @@ check_include_file_cxx( sys/consio.h HAVE_SYS_CONSIO_H )
 check_include_file_cxx( gpm.h HAVE_GPM_H )
 check_include_file_cxx( ncurses/curses.h HAVE_NCURSES_CURSES_H )
 check_include_file_cxx( curses.h HAVE_CURSES_H )
+include( CheckCXXSourceCompiles )
+check_cxx_source_compiles("#include<cmath>
+	int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }" HAVE_POWL )
+check_cxx_source_compiles("#include<cmath>
+	int main( int, char** ) { ::floorl( 0. ); return ( 0 ); }" HAVE_DECL_FLOORL )
+check_cxx_source_compiles("#include<netdb.h>
+#define NULL	0
+int main( int, char const* const* const )
+	{
+	int i = 0;
+	char* p = NULL;
+	struct hostent h, * ph = NULL;
+	::gethostbyname_r( \"\", &h, p, 0, &ph, &i );
+	return ( 0 );
+	}" HAVE_GNU_GETHOSTBYNAME_R )
 configure_file( ${yaal_SOURCE_DIR}/_aux/config.hxx.cmake config.hxx )
 
 macro( yaal_make_component name )
 	message( "Processing component: " ${name} )
 	file( GLOB SRCS ${yaal_SOURCE_DIR}/${name}/*.cxx )
+	file( GLOB DRIVER ${yaal_SOURCE_DIR}/${name}/*_driver.cxx )
+	list( REMOVE_ITEM SRCS ${DRIVER} dummy_item )
 	add_library( ${name} SHARED ${SRCS} )
 	set_target_properties( ${name} PROPERTIES LINKER_LANGUAGE CXX )
 endmacro( yaal_make_component )
@@ -46,3 +72,4 @@ endmacro( yaal_make_component )
 foreach( COMPONENT ${COMPONENTS} )
 	yaal_make_component( "${COMPONENT}" )
 endforeach( COMPONENT )
+
