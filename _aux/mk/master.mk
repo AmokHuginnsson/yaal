@@ -58,7 +58,7 @@ purge: mrproper
 		config.h config.h.in yaalrc config.log dirs.d doc/html \
 		CMakeFiles CMakeCache.txt cmake_install.cmake \
 		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj \
-		yaal.sln yaal.suo yaal.ncb *.dir debug release && \
+		yaal.sln yaal.suo yaal.ncb *.dir debug release *.so && \
 	if [ "x${OSTYPE}" != "xcygwin" ] ; then /bin/rm -f Makefile ; fi
 
 clean-dep:
