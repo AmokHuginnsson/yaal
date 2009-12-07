@@ -78,7 +78,7 @@ HRecordSet::ptr_t HDataBase::query( HString const& a_oQuery )
 		log << "SQL: " << a_oQuery << endl;
 	void* l_pvResult = dbwrapper::db_query( f_pvCoreData, a_oQuery.raw() );
 	if ( ! l_pvResult )
-		throw HSQLException( HString( "SQL error: " ) + dbwrapper::db_error ( f_pvCoreData ) );
+		throw HSQLException( HString( "SQL error: " ) + dbwrapper::db_error( f_pvCoreData ) );
 	HRecordSet::ptr_t rs( new HRecordSet( get_pointer(), l_pvResult ) );
 	return ( rs );
 	M_EPILOG

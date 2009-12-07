@@ -87,15 +87,15 @@ char const* db_error( void* a_pvData )
 	return ( ::mysql_error( static_cast<MYSQL*>( a_pvData ) ) );
 	}
 
-void * db_query ( void * a_pvData, char const * a_pcQuery )
+void* db_query( void* a_pvData, char const* a_pcQuery )
 	{
-	mysql_query ( static_cast<MYSQL *>( a_pvData ), a_pcQuery );
-	return ( mysql_store_result ( static_cast<MYSQL *>( a_pvData ) ) );
+	mysql_query( static_cast<MYSQL*>( a_pvData ), a_pcQuery );
+	return ( mysql_store_result( static_cast<MYSQL*>( a_pvData ) ) );
 	}
 
-void db_unquery ( void * a_pvData )
+void db_unquery ( void* a_pvData )
 	{
-	mysql_free_result( static_cast<MYSQL_RES *>( a_pvData ) );
+	mysql_free_result( static_cast<MYSQL_RES*>( a_pvData ) );
 	return;
 	}
 
