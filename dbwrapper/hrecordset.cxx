@@ -67,7 +67,7 @@ void HRecordSet::clear( void )
 	{
 	M_PROLOG
 	if ( f_pvResult )
-		dbwrapper::db_unquery( f_pvResult );
+		(f_oDataBase->connector().db_unquery)( f_pvResult );
 	f_pvResult = NULL;
 	M_EPILOG
 	}
@@ -79,17 +79,17 @@ bool HRecordSet::is_empty( void ) const
 
 int HRecordSet::get_field_count( void ) const
 	{
-	return ( dbwrapper::rs_fields_count( f_pvResult ) );
+	return ( (f_oDataBase->connector().rs_fields_count)( f_pvResult ) );
 	}
 
 int long HRecordSet::get_size( void ) const
 	{
-	return ( dbwrapper::dbrs_records_count( &*f_oDataBase, f_pvResult ) );
+	return ( (f_oDataBase->connector().dbrs_records_count)( &*f_oDataBase, f_pvResult ) );
 	}
 
 char const* HRecordSet::get_column_name( int a_iColumn ) const
 	{
-	return ( dbwrapper::rs_column_name( f_pvResult, a_iColumn ) );
+	return ( (f_oDataBase->connector().rs_column_name)( f_pvResult, a_iColumn ) );
 	}
 
 int long HRecordSet::get_insert_id( void ) const
@@ -97,7 +97,7 @@ int long HRecordSet::get_insert_id( void ) const
 	M_PROLOG
 	if ( ! f_pvResult )
 		M_THROW( "no result", errno );
-	return ( dbwrapper::dbrs_id( &*f_oDataBase, f_pvResult ) );
+	return ( (f_oDataBase->connector().dbrs_id)( &*f_oDataBase, f_pvResult ) );
 	M_EPILOG
 	}
 
@@ -383,8 +383,8 @@ yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& a_iField ) c
 	{
 	M_PROLOG
 	M_ASSERT( f_poOwner );
-	return ( dbwrapper::rs_get( f_poOwner->f_pvResult, f_lCursorPosition,
-			a_iField ) );
+	return ( (f_poOwner->f_oDataBase->connector().rs_get)( f_poOwner->f_pvResult,
+				f_lCursorPosition, a_iField ) );
 	M_EPILOG
 	}
 

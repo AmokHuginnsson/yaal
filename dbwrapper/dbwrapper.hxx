@@ -27,16 +27,18 @@ Copyright:
 #ifndef YAAL_DBWRAPPER_DBWRAPPER_HXX_INCLUDED
 #define YAAL_DBWRAPPER_DBWRAPPER_HXX_INCLUDED
 
+#include "dbwrapper/db_driver_loader.hxx"
+
 namespace yaal
 {
 
 namespace dbwrapper
-	{
+{
 
-extern int	n_iDataBaseDriver;
-void yaal_dbwrapper_banner ( void );
+extern ODBConnector::DRIVER::enum_t n_eDataBaseDriver;
+void yaal_dbwrapper_banner( void );
 
-	}
+}
 
 }
 

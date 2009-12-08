@@ -68,7 +68,8 @@ static char const* g_ppcDriver[ 7 ] =
 	NULL
 	};
 
-HPlugin n_oDBDriver;
+typedef HMap<ODBConnector::DRIVER::enum_t, HPlugin::ptr_t> drivers_t;
+drivers_t n_oDBDrivers;
 
 /* Null driver */
 
@@ -173,198 +174,98 @@ void dbwrapper_error( void )
 	M_EPILOG
 	}
 
-void dbwrapper_exit ( void ) __attribute__  ((noreturn));
-void dbwrapper_exit ( void )
+void dbwrapper_exit( void ) __attribute__ ((noreturn));
+void dbwrapper_exit( void )
 	{
 	::fprintf( stderr, "failed.\r\n" );
-	exit ( 1 );
+	exit( 1 );
 	}
 
-void load_driver( void );
-void* autoloader_db_connect( char const* a_pcDataBase,
-		char const* a_pcLogin, char const* a_pcPassword )
-	{
-	M_PROLOG
-	load_driver();
-	return ( db_connect( a_pcDataBase, a_pcLogin, a_pcPassword ) );
-	M_EPILOG
-	}
-
-void load_driver( void )
+bool load_driver( ODBConnector& connector_, ODBConnector::DRIVER::enum_t const& driverId_ )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	errno = 0;
 	fprintf ( stderr, "Loading dynamic database driver ... " );
-	if ( dbwrapper::n_iDataBaseDriver )
+	bool fail = false;
+	if ( driverId_ != ODBConnector::DRIVER::NONE )
 		{
-		l_iCtr = dbwrapper::n_iDataBaseDriver;
-		try
+		if ( driverId_ == ODBConnector::DRIVER::AUTO )
 			{
-			n_oDBDriver.load( g_ppcDriver [ l_iCtr ++ ] );
+			for ( int i = 1; i < ODBConnector::DRIVER::TERMINATOR; ++ i )
+				if ( ! load_driver( connector_, static_cast<ODBConnector::DRIVER::enum_t>( i ) ) )
+					break;
 			}
-		catch ( HPluginException& )
+		else
 			{
-			}
-		while ( ! n_oDBDriver.is_loaded() && g_ppcDriver[ l_iCtr ] )
-			{
-			if ( ( l_iCtr == dbwrapper::n_iDataBaseDriver ) && l_iCtr ++ )
-				continue;
-			dbwrapper_error();
+			drivers_t::const_iterator it = n_oDBDrivers.find( driverId_ );
+			HPlugin::ptr_t driver;
+			if ( it == n_oDBDrivers.end() )
+				{
+				try
+					{
+					driver = HPlugin::ptr_t( new HPlugin() );
+					driver->load( g_ppcDriver[ driverId_ ] );
+					n_oDBDrivers.insert( make_pair( driverId_, driver ) );
+					}
+				catch ( HPluginException& )
+					{
+					fail = true;
+					}
+				}
+			else
+				driver = it->second;
+			if ( ! driver->is_loaded() )
+				dbwrapper_exit();
+			else
+				{
+				log ( LOG_TYPE::NOTICE ) << "Loading [" << g_ppcDriver[ l_iCtr - 1 ];
+				log << "] driver." << endl;
+				}
+			fprintf( stderr, g_pcDone );
+			fprintf( stderr, "Linking symbols ... " );
 			try
 				{
-				n_oDBDriver.load( g_ppcDriver [ l_iCtr ++ ] );
+				driver->resolve( SYMBOL_PREFIX"db_disconnect", connector_.db_disconnect );
+				driver->resolve( SYMBOL_PREFIX"db_errno", connector_.db_errno );
+				driver->resolve( SYMBOL_PREFIX"db_error", connector_.db_error );
+				driver->resolve( SYMBOL_PREFIX"db_query", connector_.db_query );
+				driver->resolve( SYMBOL_PREFIX"db_unquery", connector_.db_unquery );
+				driver->resolve( SYMBOL_PREFIX"rs_get", connector_.rs_get );
+				driver->resolve( SYMBOL_PREFIX"rs_fields_count", connector_.rs_fields_count );
+				driver->resolve( SYMBOL_PREFIX"dbrs_records_count", connector_.dbrs_records_count );
+				driver->resolve( SYMBOL_PREFIX"dbrs_id", connector_.dbrs_id );
+				driver->resolve( SYMBOL_PREFIX"rs_column_name", connector_.rs_column_name );
+				driver->resolve( SYMBOL_PREFIX"db_connect", connector_.db_connect );
 				}
 			catch ( HPluginException& )
 				{
+				M_THROW( _( "cannot load database driver" ), n_eDataBaseDriver );
 				}
+			if ( connector_.db_connect != null_db_connect )
+				fprintf( stderr, g_pcDone );
 			}
-		if ( ! n_oDBDriver.is_loaded() )
-			dbwrapper_exit();
-		else
-			{
-			log ( LOG_TYPE::NOTICE ) << "Loading [" << g_ppcDriver [ l_iCtr - 1 ];
-			log << "] driver." << endl;
-			}
-		fprintf ( stderr, g_pcDone );
-		fprintf ( stderr, "Linking symbols ... " );
-		try
-			{
-			n_oDBDriver.resolve( SYMBOL_PREFIX"db_disconnect", db_disconnect );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"db_errno", db_errno );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"db_error", db_error );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"db_query", db_query );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"db_unquery", db_unquery );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"rs_get", rs_get );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"rs_fields_count", rs_fields_count );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"dbrs_records_count", dbrs_records_count );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"dbrs_id", dbrs_id );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"rs_column_name", rs_column_name );
-			n_oDBDriver.resolve( SYMBOL_PREFIX"db_connect", db_connect );
-			}
-		catch ( HPluginException& )
-			{
-			M_THROW( _( "cannot load database driver" ), n_iDataBaseDriver );
-			}
-		if ( db_connect != autoloader_db_connect )
-			fprintf( stderr, g_pcDone );
 		}
-	else
-		{
-		db_connect = null_db_connect;
-		db_disconnect = null_db_disconnect;
-		db_errno = null_db_errno;
-		db_error = null_db_error;
-		db_query = null_db_query;
-		db_unquery = null_db_unquery;
-		rs_get = null_rs_get;
-		rs_fields_count = null_rs_fields_count;
-		dbrs_records_count = null_dbrs_records_count;
-		dbrs_id = null_dbrs_id;
-		rs_column_name = null_rs_column_name;
-		}
-	return;
+	return ( fail );
 	M_EPILOG
 	}
 
-/* Driver autoloaders ... */
-
-void autoloader_db_disconnect( void* a_pvDataBase )
+ODBConnector::ODBConnector( void )
+	: db_connect( null_db_connect ),
+	db_disconnect( null_db_disconnect ),
+	db_errno( null_db_errno ),
+	db_error( null_db_error ),
+	db_query( null_db_query ),
+	db_unquery( null_db_unquery ),
+	rs_get( null_rs_get ),
+	rs_fields_count( null_rs_fields_count ),
+	dbrs_records_count( null_dbrs_records_count ),
+	dbrs_id( null_dbrs_id ),
+	rs_column_name( null_rs_column_name )
 	{
-	M_PROLOG
-	load_driver();
-	db_disconnect( a_pvDataBase );
-	return;
-	M_EPILOG
 	}
 
-int autoloader_db_errno( void* a_pvDataBase )
-	{
-	M_PROLOG
-	load_driver();
-	return ( db_errno( a_pvDataBase ) );
-	M_EPILOG
-	}
-
-char const* autoloader_db_error( void* a_pvDataBase )
-	{
-	M_PROLOG
-	load_driver();
-	return ( db_error( a_pvDataBase ) );
-	M_EPILOG
-	}
-
-void* autoloader_db_query( void* a_pvDataBase, char const* a_pcQuery )
-	{
-	M_PROLOG
-	load_driver();
-	return ( db_query( a_pvDataBase, a_pcQuery ) );
-	M_EPILOG
-	}
-
-void autoloader_db_unquery( void* a_pvDataBase )
-	{
-	M_PROLOG
-	load_driver();
-	db_unquery( a_pvDataBase );
-	return;
-	M_EPILOG
-	}
-
-char* autoloader_rs_get( void* a_pvResult, int long a_iRow, int a_iCol )
-	{
-	M_PROLOG
-	load_driver();
-	return ( rs_get( a_pvResult, a_iRow, a_iCol ) );
-	M_EPILOG
-	}
-
-int autoloader_rs_fields_count( void* a_pvResult )
-	{
-	M_PROLOG
-	load_driver();
-	return ( rs_fields_count( a_pvResult ) );
-	M_EPILOG
-	}
-
-int long autoloader_dbrs_records_count( void* a_pvDataBase,
-		void* a_pvResult )
-	{
-	M_PROLOG
-	load_driver();
-	return ( dbrs_records_count( a_pvDataBase, a_pvResult ) );
-	M_EPILOG
-	}
-
-int long autoloader_dbrs_id( void* a_pvDataBase, void* a_pvResult )
-	{
-	M_PROLOG
-	load_driver();
-	return ( dbrs_id( a_pvDataBase, a_pvResult ) );
-	M_EPILOG
-	}
-
-char* autoloader_rs_column_name( void* a_pvResult, int a_iColumn )
-	{
-	M_PROLOG
-	load_driver();
-	return ( rs_column_name( a_pvResult, a_iColumn ) );
-	M_EPILOG
-	}
-
-db_connect_t db_connect = autoloader_db_connect;
-db_disconnect_t db_disconnect = autoloader_db_disconnect;
-db_errno_t db_errno = autoloader_db_errno;
-db_error_t db_error = autoloader_db_error;
-db_query_t db_query = autoloader_db_query;
-db_unquery_t db_unquery = autoloader_db_unquery;
-rs_get_t rs_get = autoloader_rs_get;
-rs_fields_count_t rs_fields_count = autoloader_rs_fields_count;
-dbrs_records_count_t dbrs_records_count = autoloader_dbrs_records_count;
-dbrs_id_t dbrs_id = autoloader_dbrs_id;
-rs_column_name_t rs_column_name = autoloader_rs_column_name;
-
-/* end of driver autoloader section */
+/* end of driver null section */
 
 } /* namespace dbwrapper */
 

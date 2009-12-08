@@ -27,15 +27,20 @@ Copyright:
 #ifndef YAAL_DBWRAPPER_DB_DRIVER_LOADER_HXX_INCLUDED
 #define YAAL_DBWRAPPER_DB_DRIVER_LOADER_HXX_INCLUDED
 
+#include "hcore/hmap.hxx"
+#include "tools/hplugin.hxx"
+
 namespace yaal
 {
 
 namespace hcore
 {
 namespace LOG_TYPE
-	{
-	static int const SQL = 1073741824;
-	}
+{
+
+static int const SQL = 1073741824;
+
+}
 }
 
 /*! \brief Wrapper for standarized database access.
@@ -44,33 +49,54 @@ namespace LOG_TYPE
  * any kind of relational database that are available for Unix.
  */
 namespace dbwrapper
+{
+
+struct ODBConnector
 	{
+	struct DRIVER
+		{
+		typedef enum
+			{
+			AUTO = -1,
+			NONE = 0,
+			DUMMY = 0,
+			SQLITE3,
+			MYSQL, 
+			POSTGRESQL,
+			ORACLE,
+			TERMINATOR
+			} enum_t;
+		};
+	typedef void* ( * db_connect_t )( char const*, char const*, char const* );
+	typedef void ( * db_disconnect_t )( void* );
+	typedef int ( * db_errno_t )( void* );
+	typedef char const* ( * db_error_t )( void* );
+	typedef void* ( * db_query_t )( void*, char const* );
+	typedef void ( * db_unquery_t )( void* );
+	typedef char* ( * rs_get_t )( void*, int long, int );
+	typedef int ( * rs_fields_count_t )( void* );
+	typedef int long ( * dbrs_records_count_t )( void*, void* );
+	typedef int long ( * dbrs_id_t )( void*, void* );
+	typedef char* ( * rs_column_name_t )( void*, int );
+	db_connect_t db_connect;
+	db_disconnect_t db_disconnect;
+	db_errno_t db_errno;
+	db_error_t db_error;
+	db_query_t db_query;
+	db_unquery_t db_unquery;
+	rs_get_t rs_get;
+	rs_fields_count_t rs_fields_count;
+	dbrs_records_count_t dbrs_records_count;
+	dbrs_id_t dbrs_id;
+	rs_column_name_t rs_column_name;
+	ODBConnector( void );
+	};
 
-typedef void* ( * db_connect_t )( char const*, char const*, char const* );
-typedef void ( * db_disconnect_t )( void* );
-typedef int ( * db_errno_t )( void* );
-typedef char const* ( * db_error_t )( void* );
-typedef void* ( * db_query_t )( void*, char const* );
-typedef void ( * db_unquery_t )( void* );
-typedef char* ( * rs_get_t )( void*, int long, int );
-typedef int ( * rs_fields_count_t )( void* );
-typedef int long ( * dbrs_records_count_t )( void*, void* );
-typedef int long ( * dbrs_id_t )( void*, void* );
-typedef char* ( * rs_column_name_t )( void*, int );
+bool load_driver( ODBConnector&, ODBConnector::DRIVER::enum_t const& );
+typedef yaal::hcore::HMap<ODBConnector::DRIVER::enum_t, yaal::tools::HPlugin::ptr_t> drivers_t;
+extern drivers_t n_oDBDrivers;
 
-extern db_connect_t db_connect;
-extern db_disconnect_t db_disconnect;
-extern db_errno_t db_errno;
-extern db_error_t db_error;
-extern db_query_t db_query;
-extern db_unquery_t db_unquery;
-extern rs_get_t rs_get;
-extern rs_fields_count_t rs_fields_count;
-extern dbrs_records_count_t dbrs_records_count;
-extern dbrs_id_t dbrs_id;
-extern rs_column_name_t rs_column_name;
-
-	}
+}
 
 }
 

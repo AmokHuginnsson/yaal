@@ -82,7 +82,7 @@ int HDataProcess::init_xrc( char const* a_pcProcessName,
 	M_PROLOG
 	int l_iError = HTUIProcess::init_tui( a_pcProcessName );
 	HMainWindow* l_poMainWindow = NULL;
-	if ( ! dbwrapper::db_connect )
+	if ( dbwrapper::n_oDBDrivers.is_empty() )
 		M_THROW( "no database driver loaded", errno );
 	f_oResource.load( HStreamInterface::ptr_t( new HFile( a_pcResource ) ) );
 	HXml::HNodeProxy const node = f_oResource.get_element_by_path( "/resource/menu" );

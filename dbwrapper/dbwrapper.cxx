@@ -51,22 +51,10 @@ namespace yaal
 namespace dbwrapper
 {
 
-struct DB_DRIVER
-	{
-	enum
-		{
-		NONE = 0,
-		SQLITE3,
-		MYSQL, 
-		POSTGRESQL,
-		ORACLE
-		};
-	};
-
 void dbwrapper_error( void );
 void dbwrapper_exit( void ) __attribute__(( __noreturn__ ));
 
-int	n_iDataBaseDriver = 0;
+ODBConnector::DRIVER::enum_t n_eDataBaseDriver = ODBConnector::DRIVER::NONE;
 
 bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 	{
@@ -82,17 +70,18 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 		}
 	else if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
 		{
-		if ( ! ( strcasecmp ( a_roValue, "none" )
-					&& strcasecmp ( a_roValue, "null" ) ) )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::NONE;
+		if ( ! ( strcasecmp( a_roValue, "none" )
+					&& strcasecmp( a_roValue, "null" )
+					&& strcasecmp( a_roValue, "dummy" ) ) )
+			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::NONE;
 		else if ( a_roValue == "SQLite3" )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::SQLITE3;
+			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::SQLITE3;
 		else if ( a_roValue == "MySQL" )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::MYSQL;
+			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::MYSQL;
 		else if ( a_roValue == "PostgreSQL" )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::POSTGRESQL;
+			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::POSTGRESQL;
 		else if ( a_roValue == "Oracle" )
-			dbwrapper::n_iDataBaseDriver = DB_DRIVER::ORACLE;
+			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::ORACLE;
 		else
 			{
 			log( LOG_TYPE::ERROR ) << "Error: `" << a_roValue;

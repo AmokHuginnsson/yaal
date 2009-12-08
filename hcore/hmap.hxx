@@ -27,8 +27,6 @@ Copyright:
 #ifndef YAAL_HCORE_HMAP_HXX_INCLUDED
 #define YAAL_HCORE_HMAP_HXX_INCLUDED
 
-#line 31
-
 #include "hcore/hsbbstree.hxx"
 #include "hcore/hpair.hxx"
 

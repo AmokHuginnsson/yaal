@@ -28,6 +28,7 @@ Copyright:
 #define YAAL_DBWRAPPER_HDATABASE_HXX_INCLUDED
 
 #include "hcore/hpointer.hxx"
+#include "dbwrapper/db_driver_loader.hxx"
 #include "dbwrapper/hrecordset.hxx"
 
 namespace yaal
@@ -42,17 +43,25 @@ class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase>
 	{
 	typedef HDataBase self_t;
 private:
-	void* f_pvCoreData;	/* very internal for this class used only in base cla */
+	ODBConnector const* _connector;
+	void* f_pvCoreData;	/*!< very internal for this class used only in base class */
 public:
 	typedef yaal::hcore::HPointer<HDataBase> ptr_t;
-	int connect( yaal::hcore::HString const&,		/* database */
-							yaal::hcore::HString const&,		/* login */
-							yaal::hcore::HString const& );	/* password */
+	/*! \brief Connect to database.
+	 *
+	 * \param database - database to connect to.
+	 * \param login - authenticate to database with given login
+	 * \param password - password for given login
+	 */
+	int connect( yaal::hcore::HString const& database,
+							yaal::hcore::HString const& login,
+							yaal::hcore::HString const& password );
 	void disconnect( void );
 	HRecordSet::ptr_t query( yaal::hcore::HString const& );
 	char const* get_error( void ) const;
 	int get_errno( void ) const;
-	static ptr_t get_connector( void );
+	static ptr_t get_connector( ODBConnector::DRIVER::enum_t const& = ODBConnector::DRIVER::AUTO );
+	ODBConnector const& connector( void ) const;
 private:
 	HDataBase( void );
 	virtual ~HDataBase( void );
