@@ -43,8 +43,10 @@ namespace dbwrapper
 
 char n_pcEMode [ ] = "record set is not in appropriate mode for operation";
 
-HRecordSet::HRecordSet( database_ptr_t a_oDataBase, void* a_pvReuslt )
-	: f_oDataBase( a_oDataBase ), f_pvResult( a_pvReuslt )
+HRecordSet::HRecordSet( database_ptr_t a_oDataBase,
+		ODBConnector const* connector_, void* a_pvReuslt )
+	: f_oDataBase( a_oDataBase ), _connector( connector_ ),
+	f_pvResult( a_pvReuslt )
 	{
 	M_PROLOG
 	if ( get_size() < 0 )
@@ -67,7 +69,7 @@ void HRecordSet::clear( void )
 	{
 	M_PROLOG
 	if ( f_pvResult )
-		(f_oDataBase->connector().db_unquery)( f_pvResult );
+		(_connector->db_unquery)( f_pvResult );
 	f_pvResult = NULL;
 	M_EPILOG
 	}
@@ -79,17 +81,17 @@ bool HRecordSet::is_empty( void ) const
 
 int HRecordSet::get_field_count( void ) const
 	{
-	return ( (f_oDataBase->connector().rs_fields_count)( f_pvResult ) );
+	return ( (_connector->rs_fields_count)( f_pvResult ) );
 	}
 
 int long HRecordSet::get_size( void ) const
 	{
-	return ( (f_oDataBase->connector().dbrs_records_count)( &*f_oDataBase, f_pvResult ) );
+	return ( (_connector->dbrs_records_count)( &*f_oDataBase, f_pvResult ) );
 	}
 
 char const* HRecordSet::get_column_name( int a_iColumn ) const
 	{
-	return ( (f_oDataBase->connector().rs_column_name)( f_pvResult, a_iColumn ) );
+	return ( (_connector->rs_column_name)( f_pvResult, a_iColumn ) );
 	}
 
 int long HRecordSet::get_insert_id( void ) const
@@ -97,7 +99,7 @@ int long HRecordSet::get_insert_id( void ) const
 	M_PROLOG
 	if ( ! f_pvResult )
 		M_THROW( "no result", errno );
-	return ( (f_oDataBase->connector().dbrs_id)( &*f_oDataBase, f_pvResult ) );
+	return ( (_connector->dbrs_id)( &*f_oDataBase, f_pvResult ) );
 	M_EPILOG
 	}
 
@@ -383,7 +385,7 @@ yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& a_iField ) c
 	{
 	M_PROLOG
 	M_ASSERT( f_poOwner );
-	return ( (f_poOwner->f_oDataBase->connector().rs_get)( f_poOwner->f_pvResult,
+	return ( (f_poOwner->_connector->rs_get)( f_poOwner->f_pvResult,
 				f_lCursorPosition, a_iField ) );
 	M_EPILOG
 	}

@@ -31,6 +31,7 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hpointer.hxx"
+#include "dbwrapper/db_driver_loader.hxx"
 
 namespace yaal
 {
@@ -52,10 +53,11 @@ public:
 	class HIterator;
 	typedef HIterator iterator;
 private:
-	mutable database_ptr_t f_oDataBase; /* data-base that this record-set belongs to */
-	mutable void* f_pvResult;	/* very internal for this class used only in base cla */
+	mutable database_ptr_t f_oDataBase; /*!< data-base that this record-set belongs to */
+	mutable ODBConnector const* _connector; /*!< low level database engine connector */
+	mutable void* f_pvResult;	/*!< very internal for this class used only in base cla */
 public:
-	HRecordSet( database_ptr_t, void* );
+	HRecordSet( database_ptr_t, ODBConnector const*, void* );
 	virtual ~HRecordSet( void );
 	void clear( void );
 	iterator begin( void );

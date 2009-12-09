@@ -61,7 +61,7 @@ public:
 	char const* get_error( void ) const;
 	int get_errno( void ) const;
 	static ptr_t get_connector( ODBConnector::DRIVER::enum_t const& = ODBConnector::DRIVER::AUTO );
-	ODBConnector const& connector( void ) const;
+	ODBConnector const* connector( void ) const;
 private:
 	HDataBase( void );
 	virtual ~HDataBase( void );

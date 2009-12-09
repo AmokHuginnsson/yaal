@@ -68,7 +68,6 @@ static char const* g_ppcDriver[ 7 ] =
 	NULL
 	};
 
-typedef HMap<ODBConnector::DRIVER::enum_t, HPlugin::ptr_t> drivers_t;
 drivers_t n_oDBDrivers;
 
 /* Null driver */
@@ -181,72 +180,73 @@ void dbwrapper_exit( void )
 	exit( 1 );
 	}
 
-bool load_driver( ODBConnector& connector_, ODBConnector::DRIVER::enum_t const& driverId_ )
+ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t const& driverId_ )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
 	errno = 0;
 	fprintf ( stderr, "Loading dynamic database driver ... " );
-	bool fail = false;
+	ODBConnector const* pConnector( NULL );
 	if ( driverId_ != ODBConnector::DRIVER::NONE )
 		{
 		if ( driverId_ == ODBConnector::DRIVER::AUTO )
 			{
 			for ( int i = 1; i < ODBConnector::DRIVER::TERMINATOR; ++ i )
-				if ( ! load_driver( connector_, static_cast<ODBConnector::DRIVER::enum_t>( i ) ) )
+				{
+				if ( ( pConnector = load_driver( static_cast<ODBConnector::DRIVER::enum_t>( i ) ) ) )
 					break;
+				}
 			}
 		else
 			{
 			drivers_t::const_iterator it = n_oDBDrivers.find( driverId_ );
-			HPlugin::ptr_t driver;
+			driver_t driver;
 			if ( it == n_oDBDrivers.end() )
 				{
 				try
 					{
-					driver = HPlugin::ptr_t( new HPlugin() );
-					driver->load( g_ppcDriver[ driverId_ ] );
+					driver = make_pair( HPlugin::ptr_t( new HPlugin() ), ODBConnector() );
+					driver.first->load( g_ppcDriver[ driverId_ ] );
 					n_oDBDrivers.insert( make_pair( driverId_, driver ) );
+					pConnector = &driver.second;
 					}
 				catch ( HPluginException& )
 					{
-					fail = true;
 					}
 				}
 			else
 				driver = it->second;
-			if ( ! driver->is_loaded() )
+			if ( ! driver.first->is_loaded() )
 				dbwrapper_exit();
 			else
 				{
-				log ( LOG_TYPE::NOTICE ) << "Loading [" << g_ppcDriver[ l_iCtr - 1 ];
+				log ( LOG_TYPE::NOTICE ) << "Loading [" << g_ppcDriver[ driverId_ ];
 				log << "] driver." << endl;
 				}
 			fprintf( stderr, g_pcDone );
 			fprintf( stderr, "Linking symbols ... " );
 			try
 				{
-				driver->resolve( SYMBOL_PREFIX"db_disconnect", connector_.db_disconnect );
-				driver->resolve( SYMBOL_PREFIX"db_errno", connector_.db_errno );
-				driver->resolve( SYMBOL_PREFIX"db_error", connector_.db_error );
-				driver->resolve( SYMBOL_PREFIX"db_query", connector_.db_query );
-				driver->resolve( SYMBOL_PREFIX"db_unquery", connector_.db_unquery );
-				driver->resolve( SYMBOL_PREFIX"rs_get", connector_.rs_get );
-				driver->resolve( SYMBOL_PREFIX"rs_fields_count", connector_.rs_fields_count );
-				driver->resolve( SYMBOL_PREFIX"dbrs_records_count", connector_.dbrs_records_count );
-				driver->resolve( SYMBOL_PREFIX"dbrs_id", connector_.dbrs_id );
-				driver->resolve( SYMBOL_PREFIX"rs_column_name", connector_.rs_column_name );
-				driver->resolve( SYMBOL_PREFIX"db_connect", connector_.db_connect );
+				driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second.db_disconnect );
+				driver.first->resolve( SYMBOL_PREFIX"db_errno", driver.second.db_errno );
+				driver.first->resolve( SYMBOL_PREFIX"db_error", driver.second.db_error );
+				driver.first->resolve( SYMBOL_PREFIX"db_query", driver.second.db_query );
+				driver.first->resolve( SYMBOL_PREFIX"db_unquery", driver.second.db_unquery );
+				driver.first->resolve( SYMBOL_PREFIX"rs_get", driver.second.rs_get );
+				driver.first->resolve( SYMBOL_PREFIX"rs_fields_count", driver.second.rs_fields_count );
+				driver.first->resolve( SYMBOL_PREFIX"dbrs_records_count", driver.second.dbrs_records_count );
+				driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second.dbrs_id );
+				driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second.rs_column_name );
+				driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second.db_connect );
 				}
 			catch ( HPluginException& )
 				{
 				M_THROW( _( "cannot load database driver" ), n_eDataBaseDriver );
 				}
-			if ( connector_.db_connect != null_db_connect )
+			if ( pConnector->db_connect != null_db_connect )
 				fprintf( stderr, g_pcDone );
 			}
 		}
-	return ( fail );
+	return ( pConnector );
 	M_EPILOG
 	}
 

@@ -80,7 +80,7 @@ HRecordSet::ptr_t HDataBase::query( HString const& a_oQuery )
 	void* l_pvResult = (_connector->db_query)( f_pvCoreData, a_oQuery.raw() );
 	if ( ! l_pvResult )
 		throw HSQLException( HString( "SQL error: " ) + (_connector->db_error)( f_pvCoreData ) );
-	HRecordSet::ptr_t rs( new HRecordSet( get_pointer(), l_pvResult ) );
+	HRecordSet::ptr_t rs( new HRecordSet( get_pointer(), _connector, l_pvResult ) );
 	return ( rs );
 	M_EPILOG
 	}
@@ -108,7 +108,7 @@ HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t const& d
 	M_EPILOG
 	}
 
-ODBConnector const& HDataBase::connector( void ) const
+ODBConnector const* HDataBase::connector( void ) const
 	{
 	return ( _connector );
 	}

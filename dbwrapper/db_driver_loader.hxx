@@ -92,8 +92,9 @@ struct ODBConnector
 	ODBConnector( void );
 	};
 
-bool load_driver( ODBConnector&, ODBConnector::DRIVER::enum_t const& );
-typedef yaal::hcore::HMap<ODBConnector::DRIVER::enum_t, yaal::tools::HPlugin::ptr_t> drivers_t;
+ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t const& );
+typedef yaal::hcore::HPair<yaal::tools::HPlugin::ptr_t, ODBConnector> driver_t;
+typedef yaal::hcore::HMap<ODBConnector::DRIVER::enum_t, driver_t> drivers_t;
 extern drivers_t n_oDBDrivers;
 
 }
