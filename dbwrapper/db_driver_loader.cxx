@@ -24,17 +24,16 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <cstdio>
-#include <cstring>
 #include <cstdlib>
-#include <dlfcn.h>
 #include <libintl.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hstring.hxx"
 #include "hcore/hlog.hxx"
+#include "hcore/hfile.hxx"
 #include "tools/hplugin.hxx"
+#include "tools/hstringstream.hxx"
 #include "db_driver_loader.hxx"
 #include "dbwrapper.hxx"
 
@@ -59,11 +58,11 @@ char const* const g_pcDone = "done.\r\n";
 
 static char const* g_ppcDriver[ 7 ] =
 	{
-	NULL,
+	"default",
+	"null",
 	LIB_PREFIX"sqlite3_driver."LIB_EXT,
-	LIB_PREFIX"sqlite_driver."LIB_EXT,
-	LIB_PREFIX"mysql_driver."LIB_EXT,
 	LIB_PREFIX"postgresql_driver."LIB_EXT,
+	LIB_PREFIX"mysql_driver."LIB_EXT,
 	LIB_PREFIX"oracle_driver."LIB_EXT,
 	NULL
 	};
@@ -75,7 +74,7 @@ drivers_t n_oDBDrivers;
 void* null_db_connect( char const*, char const*, char const* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(db_connect)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_connect" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -91,7 +90,7 @@ void null_db_disconnect( void* )
 int null_db_errno( void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(db_errno)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_errno" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -99,7 +98,7 @@ int null_db_errno( void* )
 char const* null_db_error( void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "db_error)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_error" << eend << endl;
 	return ( _( "null database driver loaded" ) );
 	M_EPILOG
 	}
@@ -107,7 +106,7 @@ char const* null_db_error( void* )
 void* null_db_query( void*, char const* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(db_query)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_query" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -115,7 +114,7 @@ void* null_db_query( void*, char const* )
 void null_db_unquery( void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(db_unquery)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_unquery" << eend << endl;
 	return;
 	M_EPILOG
 	}
@@ -123,7 +122,7 @@ void null_db_unquery( void* )
 char* null_rs_get( void*, int long, int )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(rs_get)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "rs_get" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -131,7 +130,7 @@ char* null_rs_get( void*, int long, int )
 int null_rs_fields_count( void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(rs_fields_count)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "rs_fields_count" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -139,7 +138,7 @@ int null_rs_fields_count( void* )
 int long null_dbrs_records_count( void*, void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(dbrs_records_count)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "dbrs_records_count" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -147,7 +146,7 @@ int long null_dbrs_records_count( void*, void* )
 int long null_dbrs_id( void*, void* )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(dbrs_id)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "dbrs_id" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -155,7 +154,7 @@ int long null_dbrs_id( void*, void* )
 char* null_rs_column_name( void*, int )
 	{
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(rs_column_name)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "rs_column_name" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -166,7 +165,7 @@ void dbwrapper_error( void )
 	{
 	M_PROLOG
 	HString l_oMessage;
-	l_oMessage = dlerror();
+	l_oMessage = HPlugin().error_message( 0 );
 	log( LOG_TYPE::ERROR ) << l_oMessage << endl;
 	::fprintf( stderr, "(%s), ", l_oMessage.raw() );
 	return;
@@ -176,76 +175,77 @@ void dbwrapper_error( void )
 void dbwrapper_exit( void ) __attribute__ ((noreturn));
 void dbwrapper_exit( void )
 	{
-	::fprintf( stderr, "failed.\r\n" );
+	cerr << "failed." << endl;
 	exit( 1 );
+	}
+
+ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t const& driverId_ )
+	{
+	M_PROLOG
+	M_ENSURE( ( driverId_ >= ODBConnector::DRIVER::SQLITE3 ) && ( driverId_ < ODBConnector::DRIVER::TERMINATOR ) );
+	drivers_t::const_iterator it = n_oDBDrivers.find( driverId_ );
+	driver_t driver;
+	if ( it == n_oDBDrivers.end() ) /* given driver has not been loaded yet */
+		{
+		try
+			{
+			driver = make_pair( HPlugin::ptr_t( new HPlugin() ), ODBConnector() );
+			log( LOG_TYPE::NOTICE ) << "Loading [" << g_ppcDriver[ driverId_ + 1 ] << "] driver ... ";
+			driver.first->load( g_ppcDriver[ driverId_ + 1 ] );
+			cerr << "(linking symbols ...) " << flush;
+			driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second.db_disconnect );
+			driver.first->resolve( SYMBOL_PREFIX"db_errno", driver.second.db_errno );
+			driver.first->resolve( SYMBOL_PREFIX"db_error", driver.second.db_error );
+			driver.first->resolve( SYMBOL_PREFIX"db_query", driver.second.db_query );
+			driver.first->resolve( SYMBOL_PREFIX"db_unquery", driver.second.db_unquery );
+			driver.first->resolve( SYMBOL_PREFIX"rs_get", driver.second.rs_get );
+			driver.first->resolve( SYMBOL_PREFIX"rs_fields_count", driver.second.rs_fields_count );
+			driver.first->resolve( SYMBOL_PREFIX"dbrs_records_count", driver.second.dbrs_records_count );
+			driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second.dbrs_id );
+			driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second.rs_column_name );
+			driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second.db_connect );
+			it = n_oDBDrivers.insert( make_pair( driverId_, driver ) ).first;
+			}
+		catch ( HPluginException& e )
+			{
+			log( LOG_TYPE::NOTICE ) << "fail." << endl;
+			HStringStream reason;
+			reason << _( "cannot load database driver: " ) << e.what();
+			M_THROW( reason.string(), n_eDataBaseDriver );
+			}
+		if ( driver.first->is_loaded() )
+			log( LOG_TYPE::NOTICE ) << "success." << endl;
+		else
+			{
+			dbwrapper_error();
+			dbwrapper_exit();
+			}
+		}
+	return ( &it->second.second );
+	M_EPILOG
 	}
 
 ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t const& driverId_ )
 	{
 	M_PROLOG
 	errno = 0;
-	fprintf ( stderr, "Loading dynamic database driver ... " );
+	cerr << "Loading dynamic database driver [" << g_ppcDriver[ driverId_ + 1 ] << "] ... " << flush;
 	ODBConnector const* pConnector( NULL );
 	if ( driverId_ != ODBConnector::DRIVER::NONE )
 		{
-		if ( driverId_ == ODBConnector::DRIVER::AUTO )
+		if ( driverId_ == ODBConnector::DRIVER::DEFAULT )
 			{
 			for ( int i = 1; i < ODBConnector::DRIVER::TERMINATOR; ++ i )
 				{
-				if ( ( pConnector = load_driver( static_cast<ODBConnector::DRIVER::enum_t>( i ) ) ) )
+				if ( ( pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( i ) ) ) )
 					break;
 				}
 			}
 		else
-			{
-			drivers_t::const_iterator it = n_oDBDrivers.find( driverId_ );
-			driver_t driver;
-			if ( it == n_oDBDrivers.end() )
-				{
-				try
-					{
-					driver = make_pair( HPlugin::ptr_t( new HPlugin() ), ODBConnector() );
-					driver.first->load( g_ppcDriver[ driverId_ ] );
-					n_oDBDrivers.insert( make_pair( driverId_, driver ) );
-					pConnector = &driver.second;
-					}
-				catch ( HPluginException& )
-					{
-					}
-				}
-			else
-				driver = it->second;
-			if ( ! driver.first->is_loaded() )
-				dbwrapper_exit();
-			else
-				{
-				log ( LOG_TYPE::NOTICE ) << "Loading [" << g_ppcDriver[ driverId_ ];
-				log << "] driver." << endl;
-				}
-			fprintf( stderr, g_pcDone );
-			fprintf( stderr, "Linking symbols ... " );
-			try
-				{
-				driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second.db_disconnect );
-				driver.first->resolve( SYMBOL_PREFIX"db_errno", driver.second.db_errno );
-				driver.first->resolve( SYMBOL_PREFIX"db_error", driver.second.db_error );
-				driver.first->resolve( SYMBOL_PREFIX"db_query", driver.second.db_query );
-				driver.first->resolve( SYMBOL_PREFIX"db_unquery", driver.second.db_unquery );
-				driver.first->resolve( SYMBOL_PREFIX"rs_get", driver.second.rs_get );
-				driver.first->resolve( SYMBOL_PREFIX"rs_fields_count", driver.second.rs_fields_count );
-				driver.first->resolve( SYMBOL_PREFIX"dbrs_records_count", driver.second.dbrs_records_count );
-				driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second.dbrs_id );
-				driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second.rs_column_name );
-				driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second.db_connect );
-				}
-			catch ( HPluginException& )
-				{
-				M_THROW( _( "cannot load database driver" ), n_eDataBaseDriver );
-				}
-			if ( pConnector->db_connect != null_db_connect )
-				fprintf( stderr, g_pcDone );
-			}
+			pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( driverId_ ) );
 		}
+	if ( pConnector->db_connect != null_db_connect )
+		cerr << g_pcDone << flush;
 	return ( pConnector );
 	M_EPILOG
 	}

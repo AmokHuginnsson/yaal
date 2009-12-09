@@ -76,10 +76,10 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::NONE;
 		else if ( a_roValue == "SQLite3" )
 			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::SQLITE3;
-		else if ( a_roValue == "MySQL" )
-			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::MYSQL;
 		else if ( a_roValue == "PostgreSQL" )
 			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::POSTGRESQL;
+		else if ( a_roValue == "MySQL" )
+			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::MYSQL;
 		else if ( a_roValue == "Oracle" )
 			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::ORACLE;
 		else

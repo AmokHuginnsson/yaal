@@ -57,12 +57,12 @@ struct ODBConnector
 		{
 		typedef enum
 			{
-			AUTO = -1,
+			DEFAULT = -1,
 			NONE = 0,
 			DUMMY = 0,
 			SQLITE3,
-			MYSQL, 
 			POSTGRESQL,
+			MYSQL, 
 			ORACLE,
 			TERMINATOR
 			} enum_t;
