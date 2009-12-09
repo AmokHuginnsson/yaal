@@ -44,9 +44,9 @@ extern "C"
 
 MYSQL* g_psBrokenDB = NULL;
 
-void db_disconnect ( void* );
+void db_disconnect( void* );
 
-void* db_connect ( char const* a_pcDataBase,
+void* db_connect( char const* a_pcDataBase,
 		char const* a_pcLogin, char const * a_pcPassword )
 	{
 	MYSQL* l_psMySQL = NULL;
@@ -58,7 +58,8 @@ void* db_connect ( char const* a_pcDataBase,
 	l_psMySQL = mysql_init( NULL );
 	if ( l_psMySQL )
 		{
-		if ( mysql_options( l_psMySQL, MYSQL_OPT_NAMED_PIPE, NULL ) )
+		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
+		if ( mysql_options( l_psMySQL, MYSQL_OPT_PROTOCOL, &protocol ) )
 			g_psBrokenDB = l_psMySQL, l_psMySQL = NULL;
 		else if ( ! mysql_real_connect( l_psMySQL, NULL, a_pcLogin, a_pcPassword,
 				a_pcDataBase, 0, NULL, CLIENT_IGNORE_SPACE ) )

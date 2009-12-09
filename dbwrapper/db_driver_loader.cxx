@@ -229,7 +229,7 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t const& driverId_ )
 	{
 	M_PROLOG
 	errno = 0;
-	cerr << "Loading dynamic database driver [" << g_ppcDriver[ driverId_ + 1 ] << "] ... " << flush;
+	cerr << "Using dynamic database driver [" << g_ppcDriver[ driverId_ + 1 ] << "] ... " << flush;
 	ODBConnector const* pConnector( NULL );
 	if ( driverId_ != ODBConnector::DRIVER::NONE )
 		{
