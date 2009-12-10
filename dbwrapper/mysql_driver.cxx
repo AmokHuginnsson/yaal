@@ -74,14 +74,14 @@ void db_disconnect( void* a_pvData )
 	return;
 	}
 
-int db_errno( void* a_pvData )
+int dbrs_errno( void* a_pvData, void* )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
 	return ( ::mysql_errno( static_cast<MYSQL*>( a_pvData ) ) );
 	}
 
-char const* db_error( void* a_pvData )
+char const* dbrs_error( void* a_pvData, void* )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
@@ -94,7 +94,7 @@ void* db_query( void* a_pvData, char const* a_pcQuery )
 	return ( mysql_store_result( static_cast<MYSQL*>( a_pvData ) ) );
 	}
 
-void db_unquery ( void* a_pvData )
+void rs_unquery ( void* a_pvData )
 	{
 	mysql_free_result( static_cast<MYSQL_RES*>( a_pvData ) );
 	return;

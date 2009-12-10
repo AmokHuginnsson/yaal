@@ -1,4 +1,3 @@
-
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
@@ -44,12 +43,12 @@ Copyright:
 extern "C"
 {
 
-PGconn * g_psBrokenDB = NULL;
+PGconn* g_psBrokenDB = NULL;
 
-void db_disconnect ( void * );
+void db_disconnect( void* );
 
-void * db_connect ( char const * a_pcDataBase,
-		char const * a_pcLogin, char const * a_pcPassword )
+void* db_connect( char const* a_pcDataBase,
+		char const* a_pcLogin, char const* a_pcPassword )
 	{
 	PGconn * l_psConnection = NULL;
 	if ( g_psBrokenDB )
@@ -57,45 +56,42 @@ void * db_connect ( char const * a_pcDataBase,
 		db_disconnect ( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psConnection = PQsetdbLogin ( NULL,	/* host */
-																	NULL,					/* port */
-																	NULL,					/* options */
-																	NULL,					/* debugging tty */
-																	a_pcDataBase, 
-																	a_pcLogin, 
-																	a_pcPassword );
-	if ( PQstatus ( l_psConnection ) != CONNECTION_OK )
+	l_psConnection = PQsetdbLogin( NULL /* host */,
+			NULL /* port */, NULL /* options */,
+			NULL /* debugging tty */,
+			a_pcDataBase, a_pcLogin, a_pcPassword );
+	if ( PQstatus( l_psConnection ) != CONNECTION_OK )
 		g_psBrokenDB = l_psConnection, l_psConnection = NULL;
 	return ( l_psConnection );
 	}
 
-void db_disconnect ( void * a_pvData )
+void db_disconnect( void* a_pvData )
 	{
 	if ( a_pvData )
-		PQfinish ( ( PGconn * ) a_pvData );
+		PQfinish( static_cast<PGconn*>( a_pvData ) );
 	return;
 	}
 
-int db_errno( void* )
+int dbrs_errno( void*, void* )
 	{
 	return ( errno );
 	}
 
-char const* db_error( void* a_pvData )
+char const* dbrs_error( void* a_pvData, void* )
 	{
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
 	return ( ::PQerrorMessage( static_cast<PGconn*>( a_pvData ) ) );
 	}
 
-void * db_query ( void * a_pvData, char const * a_pcQuery )
+void* db_query( void* a_pvData, char const* a_pcQuery )
 	{
-	return ( PQexec ( ( PGconn * ) a_pvData, a_pcQuery ) );
+	return ( PQexec( static_cast<PGconn*>( a_pvData ), a_pcQuery ) );
 	}
 
-void db_unquery ( void * a_pvData )
+void rs_unquery( void* a_pvData )
 	{
-	PQclear ( ( PGresult * ) a_pvData );
+	PQclear( static_cast<PGresult*>( a_pvData ) );
 	return;
 	}
 

@@ -87,7 +87,7 @@ void null_db_disconnect( void* )
 	M_EPILOG
 	}
 
-int null_db_errno( void* )
+int null_dbrs_errno( void*, void* )
 	{
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_errno" << eend << endl;
@@ -95,7 +95,7 @@ int null_db_errno( void* )
 	M_EPILOG
 	}
 
-char const* null_db_error( void* )
+char const* null_dbrs_error( void*, void* )
 	{
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_error" << eend << endl;
@@ -111,7 +111,7 @@ void* null_db_query( void*, char const* )
 	M_EPILOG
 	}
 
-void null_db_unquery( void* )
+void null_rs_unquery( void* )
 	{
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_unquery" << eend << endl;
@@ -194,10 +194,10 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t const& driverI
 			driver.first->load( g_ppcDriver[ driverId_ + 1 ] );
 			cerr << "(linking symbols ...) " << flush;
 			driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second.db_disconnect );
-			driver.first->resolve( SYMBOL_PREFIX"db_errno", driver.second.db_errno );
-			driver.first->resolve( SYMBOL_PREFIX"db_error", driver.second.db_error );
+			driver.first->resolve( SYMBOL_PREFIX"dbrs_errno", driver.second.dbrs_errno );
+			driver.first->resolve( SYMBOL_PREFIX"dbrs_error", driver.second.dbrs_error );
 			driver.first->resolve( SYMBOL_PREFIX"db_query", driver.second.db_query );
-			driver.first->resolve( SYMBOL_PREFIX"db_unquery", driver.second.db_unquery );
+			driver.first->resolve( SYMBOL_PREFIX"rs_unquery", driver.second.rs_unquery );
 			driver.first->resolve( SYMBOL_PREFIX"rs_get", driver.second.rs_get );
 			driver.first->resolve( SYMBOL_PREFIX"rs_fields_count", driver.second.rs_fields_count );
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_records_count", driver.second.dbrs_records_count );
@@ -253,10 +253,10 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t const& driverId_ )
 ODBConnector::ODBConnector( void )
 	: db_connect( null_db_connect ),
 	db_disconnect( null_db_disconnect ),
-	db_errno( null_db_errno ),
-	db_error( null_db_error ),
+	dbrs_errno( null_dbrs_errno ),
+	dbrs_error( null_dbrs_error ),
 	db_query( null_db_query ),
-	db_unquery( null_db_unquery ),
+	rs_unquery( null_rs_unquery ),
 	rs_get( null_rs_get ),
 	rs_fields_count( null_rs_fields_count ),
 	dbrs_records_count( null_dbrs_records_count ),

@@ -69,7 +69,7 @@ void HRecordSet::clear( void )
 	{
 	M_PROLOG
 	if ( f_pvResult )
-		(_connector->db_unquery)( f_pvResult );
+		(_connector->rs_unquery)( f_pvResult );
 	f_pvResult = NULL;
 	M_EPILOG
 	}

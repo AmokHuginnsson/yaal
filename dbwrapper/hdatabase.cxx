@@ -64,8 +64,8 @@ int HDataBase::connect( yaal::hcore::HString const& a_oDataBase, yaal::hcore::HS
 	M_PROLOG
 	f_pvCoreData = (_connector->db_connect)( a_oDataBase.raw(), a_oLogin.raw(), a_oPassword.raw() );
 	if ( ! f_pvCoreData )
-		M_THROW( (_connector->db_error)( f_pvCoreData ),
-				(_connector->db_errno)( f_pvCoreData ) );
+		M_THROW( (_connector->dbrs_error)( f_pvCoreData, NULL ),
+				(_connector->dbrs_errno)( f_pvCoreData, NULL ) );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -78,9 +78,9 @@ HRecordSet::ptr_t HDataBase::query( HString const& a_oQuery )
 	if ( HLog::f_lLogMask & LOG_TYPE::SQL )
 		log << "SQL: " << a_oQuery << endl;
 	void* l_pvResult = (_connector->db_query)( f_pvCoreData, a_oQuery.raw() );
-	if ( ! l_pvResult )
-		throw HSQLException( HString( "SQL error: " ) + (_connector->db_error)( f_pvCoreData ) );
-	HRecordSet::ptr_t rs( new HRecordSet( get_pointer(), _connector, l_pvResult ) );
+	if ( (_connector->dbrs_errno)( f_pvCoreData, l_pvResult ) )
+		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( f_pvCoreData, l_pvResult ) );
+	HRecordSet::ptr_t rs( l_pvResult ? new HRecordSet( get_pointer(), _connector, l_pvResult ) : NULL );
 	return ( rs );
 	M_EPILOG
 	}
@@ -88,14 +88,14 @@ HRecordSet::ptr_t HDataBase::query( HString const& a_oQuery )
 char const* HDataBase::get_error( void ) const
 	{
 	M_PROLOG
-	return ( (_connector->db_error)( f_pvCoreData ) );
+	return ( (_connector->dbrs_error)( f_pvCoreData, NULL ) );
 	M_EPILOG
 	}
 
 int HDataBase::get_errno( void ) const
 	{
 	M_PROLOG
-	return ( (_connector->db_errno)( f_pvCoreData ) );
+	return ( (_connector->dbrs_errno)( f_pvCoreData, NULL ) );
 	M_EPILOG
 	}
 

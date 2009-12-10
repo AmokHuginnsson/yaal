@@ -121,7 +121,7 @@ void db_disconnect( void* a_pvData )
 	return;
 	}
 
-int db_errno( void* a_pvData )
+int dbrs_errno( void* a_pvData, void* )
 	{
 	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
 	if ( ! l_psSQLite )
@@ -135,9 +135,9 @@ int db_errno( void* a_pvData )
 	return ( errno );
 	}
 
-char const* db_error( void* a_pvData )
+char const* dbrs_error( void* a_pvDataB, void* )
 	{
-	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
+	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvDataB );
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
 	if ( l_psSQLite )
@@ -165,7 +165,7 @@ void* db_query( void* a_pvData, char const* a_pcQuery )
 	return ( l_psResult );
 	}
 
-void db_unquery( void* a_pvData )
+void rs_unquery( void* a_pvData )
 	{
 	OSQLiteResult* pr = static_cast<OSQLiteResult*>( a_pvData );
 	sqlite3_free_table( pr->f_ppcData );

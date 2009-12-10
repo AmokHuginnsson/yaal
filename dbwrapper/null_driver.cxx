@@ -47,7 +47,7 @@ void db_disconnect( void* /*a_pvData*/ )
 	return;
 	}
 
-int db_errno( void* /*a_pvData*/ )
+int dbrs_errno( void* /*a_pvDataB*/, void* /*a_pvDataR*/ )
 	{
 	return ( errno );
 	}
@@ -57,12 +57,12 @@ char const* dbrs_error( void* /*a_pvDataB*/, void* /*a_pvDataR*/ )
 	return ( "" );
 	}
 
-void* dbrs_query( void* /*a_pvData*/, char const* /*a_pcQuery*/ )
+void* db_query( void* /*a_pvData*/, char const* /*a_pcQuery*/ )
 	{
 	return ( NULL );
 	}
 
-void db_unquery( void* /*a_pvData*/ )
+void rs_unquery( void* /*a_pvData*/ )
 	{
 	return;
 	}
