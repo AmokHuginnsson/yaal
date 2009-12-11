@@ -53,7 +53,7 @@ HPlugin::~HPlugin( void )
 void HPlugin::load( HString const& a_oPath )
 	{
 	M_PROLOG
-	M_ENSURE( ( f_pvHandle = dlopen( ! a_oPath.is_empty() ? a_oPath.raw() : NULL, RTLD_NOW | RTLD_GLOBAL ) ) != NULL );
+	M_ENSURE_EX( ( ( f_pvHandle = dlopen( ! a_oPath.is_empty() ? a_oPath.raw() : NULL, RTLD_NOW | RTLD_GLOBAL ) ) != NULL ), a_oPath );
 	return;
 	M_EPILOG
 	}
@@ -83,7 +83,7 @@ void* HPlugin::resolve( HString const& a_oSymbolName )
 	M_PROLOG
 	M_ASSERT( f_pvHandle );
 	void* sym = NULL;
-	M_ENSURE( ( sym = dlsym( f_pvHandle, a_oSymbolName.raw() ) ) != NULL );
+	M_ENSURE_EX( ( ( sym = dlsym( f_pvHandle, a_oSymbolName.raw() ) ) != NULL ), a_oSymbolName );
 	return ( sym );
 	M_EPILOG
 	}

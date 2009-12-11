@@ -237,9 +237,9 @@ int modulo_ASCII( HString const& a_oASCIINumber, int a_iModulo )
 	int long l_iLength = a_oASCIINumber.get_length();
 	HString l_oTmpString, l_oTmpNumber = a_oASCIINumber;
 	if ( l_iLength < 0 )
-		M_THROW ( "bad ASCII number length", l_iLength );
+		M_THROW( "bad ASCII number length", l_iLength );
 	if ( ! a_iModulo )
-		M_THROW ( "zero denominatior", a_iModulo );
+		M_THROW( "zero denominatior", a_iModulo );
 	while ( l_oTmpNumber.get_length() > STEP_LENGTH )
 		{
 		l_oTmpString = l_oTmpNumber.mid( l_iStep * STEP_LENGTH, STEP_LENGTH );

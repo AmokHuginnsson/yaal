@@ -783,7 +783,7 @@ HString& HString::shift_right( int long const& a_iShift, char const a_cFiller )
 	{
 	M_PROLOG
 	if ( a_iShift < 0 )
-		M_THROW ( "bad right shift lenght", a_iShift );
+		M_THROW( "bad right shift lenght", a_iShift );
 	if ( a_iShift )
 		{
 		int long oldSize = f_lSize;

@@ -129,7 +129,7 @@ int HTUIProcess::add_window( HWindow::ptr_t a_oWindow )
 	M_ASSERT( f_oForegroundWindow.is_valid() );
 	f_oMainWindow->update_all();
 	if ( ! (*f_oForegroundWindow)->is_initialised() )
-		M_THROW ( _( "window has not been initialised" ), errno );
+		M_THROW( _( "window has not been initialised" ), errno );
 	refresh( true );
 	return ( 0 );
 	M_EPILOG

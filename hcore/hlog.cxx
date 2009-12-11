@@ -118,7 +118,7 @@ void HLog::rehash( FILE* a_psStream,
 	if ( a_pcProcessName )
 		f_pcProcessName = ::basename( a_pcProcessName );
 	if ( ! a_psStream )
-		M_THROW ( "file parameter is", reinterpret_cast<int long>( a_psStream ) );
+		M_THROW( "file parameter is", reinterpret_cast<int long>( a_psStream ) );
 	l_psTmpFile = f_psStream;
 	f_psStream = a_psStream;
 	if ( l_psTmpFile )
@@ -161,7 +161,7 @@ void HLog::rehash( HString const& a_oLogFileName,
 	{
 	M_PROLOG
 	if ( a_oLogFileName.is_empty() )
-		M_THROW ( "new file name argument is", a_oLogFileName.get_length() );
+		M_THROW( "new file name argument is", a_oLogFileName.get_length() );
 	rehash( ::fopen( a_oLogFileName.raw(), "a" ), a_pcProcessName );
 	do_flush();
 	return;

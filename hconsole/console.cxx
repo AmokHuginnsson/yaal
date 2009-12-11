@@ -486,15 +486,15 @@ int HConsole::get_key( void ) const
 	int l_iChar = 0;
 	CURSOR::cursor_t l_eOrigCursState = CURSOR::INVISIBLE;
 	if ( ! f_bEnabled )
-		M_THROW ( "not in curses mode", errno );
-	M_ENSURE ( noecho() != ERR );
-	M_ENSURE ( fflush( NULL ) == 0 );
+		M_THROW( "not in curses mode", errno );
+	M_ENSURE( noecho() != ERR );
+	M_ENSURE( fflush( NULL ) == 0 );
 	l_iKey = getch();
 	if ( l_iKey == KEY_CODES::ESC )
 		{
-		M_ENSURE ( nodelay ( stdscr, true ) != ERR );
+		M_ENSURE( nodelay ( stdscr, true ) != ERR );
 		l_iKey = getch();
-		M_ENSURE ( nodelay ( stdscr, false ) != ERR );
+		M_ENSURE( nodelay ( stdscr, false ) != ERR );
 		if ( l_iKey == ERR )
 			l_iKey = KEY_CODES::ESC;
 		else
@@ -519,9 +519,9 @@ int HConsole::get_key( void ) const
 				l_iKey = KEY<>::command_r ( l_iChar = l_iKey + 96 );
 			else if ( l_iKey == KEY_CODES::ESC )
 				{
-				M_ENSURE ( nodelay ( stdscr, true ) != ERR );
+				M_ENSURE( nodelay ( stdscr, true ) != ERR );
 				l_iKey = getch();
-				M_ENSURE ( nodelay ( stdscr, false ) != ERR );
+				M_ENSURE( nodelay ( stdscr, false ) != ERR );
 				if ( l_iKey == ERR )
 					l_iKey = KEY<>::command_r (l_iChar = KEY_CODES::ESC);
 				else
@@ -533,7 +533,7 @@ int HConsole::get_key( void ) const
 			}
 		curs_set ( l_eOrigCursState );
 		}
-	M_ENSURE ( echo() != ERR );
+	M_ENSURE( echo() != ERR );
 	switch ( l_iKey )
 		{
 		case ( KEY_NPAGE ):			l_iKey = KEY_CODES::PAGE_DOWN;	break;
@@ -563,10 +563,10 @@ int HConsole::kbhit( void ) const
 	M_PROLOG
 	int l_iKey;
 	if ( ! f_bEnabled )
-		M_THROW ( "not in curses mode", errno );
-	M_ENSURE ( nodelay( stdscr, true ) != ERR );
+		M_THROW( "not in curses mode", errno );
+	M_ENSURE( nodelay( stdscr, true ) != ERR );
 	l_iKey = get_key();
-	M_ENSURE ( nodelay( stdscr, false ) != ERR );
+	M_ENSURE( nodelay( stdscr, false ) != ERR );
 	if ( l_iKey == ERR )
 		return ( 0 );
 	return ( l_iKey );
@@ -597,9 +597,9 @@ void HConsole::clrscr( void ) const
 	{
 	M_PROLOG
 	if ( ! f_bEnabled )
-		M_THROW ( "not in curses mode", errno );
+		M_THROW( "not in curses mode", errno );
 	clear(); /* Always returns OK */
-	M_ENSURE ( refresh() != ERR );
+	M_ENSURE( refresh() != ERR );
 	return;
 	M_EPILOG
 	}
@@ -649,7 +649,7 @@ int HConsole::wait_for_user_input( int& a_iKey, mouse::OMouse& a_rsMouse,
 void HConsole::bell( void ) const
 	{
 	M_PROLOG
-	M_ENSURE ( putchar ( '\a' ) == '\a' );
+	M_ENSURE( putchar( '\a' ) == '\a' );
 	return;
 	M_EPILOG
 	}

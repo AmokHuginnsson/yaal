@@ -41,7 +41,7 @@ namespace yaal
 namespace hcore
 {
 
-char const * const n_pcError = _( "file is not opened" );
+char const* const n_pcError = _( "file is not opened" );
 
 HRawFile::HRawFile ( TYPE::raw_file_type_t a_eType )
 	: f_eType( a_eType ), f_iFileDescriptor( -1 ), f_iTimeOut( 0 ), f_oSSL(),
@@ -115,7 +115,7 @@ int long HRawFile::read_plain( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, errno );
+		M_THROW( n_pcError, errno );
 	return ( ::read( f_iFileDescriptor, a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}
@@ -124,7 +124,7 @@ int long HRawFile::read_ssl( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcError, errno );
+		M_THROW( n_pcError, errno );
 	return ( f_oSSL->read( a_pcBuffer, a_lSize ) );
 	M_EPILOG
 	}

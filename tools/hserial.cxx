@@ -164,7 +164,7 @@ void HSerial::compile_speed ( void )
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor >= 0 )
-		M_THROW ( n_pcEAlreadyOpened, errno );
+		M_THROW( n_pcEAlreadyOpened, errno );
 	termios& l_sTIO = *f_oTIO.get<termios>();
 	int l_iBaudRate = 0;
 	if ( f_eSpeed == SPEED::DEFAULT )
@@ -351,7 +351,7 @@ int HSerial::timed_read( void* const a_pcBuffer, int const a_iSize,
 	{
 	M_PROLOG
 	if ( f_iFileDescriptor < 0 )
-		M_THROW ( n_pcENotOpened, errno );
+		M_THROW( n_pcENotOpened, errno );
 	int l_iError = 0;
 	timeval l_xWait;
 	fd_set l_xFdSet;

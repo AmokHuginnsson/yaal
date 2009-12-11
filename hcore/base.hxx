@@ -114,6 +114,7 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
  * \param condition - condition to be tested.
  */
 #define M_ENSURE( condition ) do { if ( ! ( condition ) ){ yaal::hcore::throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno, error_message( errno ) ); } } while ( 0 )
+#define M_ENSURE_EX( condition, comment ) do { if ( ! ( condition ) ){ yaal::hcore::throw_exception<self_t>( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno, error_message( errno ), comment ); } } while ( 0 )
 #ifndef NDEBUG
 /*! \brief Run-time assertion tester.
  *

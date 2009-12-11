@@ -770,7 +770,7 @@ value_type& HList<value_type>::add_orderly( value_type const& a_rtObject,
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iSize;
 	HElement* l_poElement = new HElement( NULL, &a_rtObject );
 	if ( ( f_eOrder != UNSORTED ) && ( f_eOrder != a_eOrder ) )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::BAD_ORDER ], a_eOrder );
+		M_THROW( g_ppcErrMsgHList [ ERROR::BAD_ORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
 	typedef bool ( *comp_t )( value_type const&, value_type const&, T const& );
 	comp_t my_comp;
@@ -1033,7 +1033,7 @@ value_type& HList<value_type>::front( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
+		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	return ( f_poHook->f_tObject );
 	M_EPILOG
 	}
@@ -1043,7 +1043,7 @@ value_type const& HList<value_type>::front( void ) const
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
+		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	return ( f_poHook->f_tObject );
 	M_EPILOG
 	}
@@ -1069,7 +1069,7 @@ value_type& HList<value_type>::back( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
+		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	return ( f_poHook->f_poPrevious->f_tObject );
 	M_EPILOG
 	}
@@ -1079,7 +1079,7 @@ value_type const& HList<value_type>::back( void ) const
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
-		M_THROW ( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
+		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
 	return ( f_poHook->f_poPrevious->f_tObject );
 	M_EPILOG
 	}
@@ -1318,7 +1318,7 @@ void HList<value_type>::sort( T const& less, sort_order_t a_eOrder )
 	M_PROLOG
 	f_eOrder = a_eOrder;
 	if ( ( f_eOrder != ASCENDING ) && ( f_eOrder != DESCENDING ) )
-		M_THROW ( g_ppcErrMsgHList [ ERROR::BAD_ORDER ], f_eOrder );
+		M_THROW( g_ppcErrMsgHList [ ERROR::BAD_ORDER ], f_eOrder );
 	if ( f_iSize > 1 )
 		{
 		HElement* first = f_poHook;

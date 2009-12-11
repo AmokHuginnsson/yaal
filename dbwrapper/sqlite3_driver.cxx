@@ -60,7 +60,7 @@ typedef struct
 OSQLite* g_psBrokenDB = NULL;
 
 void* db_query( void*, char const* );
-void db_unquery( void* );
+void rs_unquery( void* );
 void db_disconnect( void* );
 
 /* sqlite3 driver uses convention that database file name should have
@@ -105,7 +105,7 @@ void* db_connect( char const* a_pcDataBase,
 		{
 		l_pvPtr = db_query( l_psSQLite, "PRAGMA empty_result_callbacks = ON;" );
 		if ( l_pvPtr )
-			db_unquery( l_pvPtr );
+			rs_unquery( l_pvPtr );
 		else
 			g_psBrokenDB = l_psSQLite, l_psSQLite = NULL;
 		}

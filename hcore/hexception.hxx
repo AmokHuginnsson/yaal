@@ -318,6 +318,18 @@ void throw_exception( char const* const& file, char const* const& function, int 
 		throw exception_t( file, function, line, message, static_cast<int>( code ) );
 	}
 
+template<typename tType, typename message_t, typename code_t>
+void throw_exception( char const* const&, char const* const&, int const&, message_t const&, code_t const&, HString const&, HString const& ) __attribute__(( __noreturn__ ));
+template<typename tType, typename message_t, typename code_t>
+void throw_exception( char const* const& file, char const* const& function, int const& line, message_t const& message, code_t const& code, HString const& reason, HString const& comment )
+	{
+	typedef typename exception_auto_hierarchy::parent_exception<tType>::parent_exception_t parent_exception_t;
+	typedef typename yaal::hcore::HExceptionT<tType, parent_exception_t> exception_t;
+	exception_t e( file, function, line, message, static_cast<int>( code ) );
+	e.set( reason + ": " + comment );
+	throw e;
+	}
+
 }
 
 }

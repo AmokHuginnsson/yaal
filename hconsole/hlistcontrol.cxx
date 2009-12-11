@@ -612,7 +612,7 @@ void HListControl::add_column( int const& a_riColumn, char const* a_pcName,
 	HColumnInfo l_oColumnInfo;
 	int l_iSize = static_cast<int>( f_oControler->size() );
 	if ( l_iSize )
-		M_THROW ( "cannot add new column when list not empty", l_iSize );
+		M_THROW( "cannot add new column when list not empty", l_iSize );
 	f_oVarTmpBuffer = a_pcName;
 	l_iShortcutIndex = static_cast<int>( f_oVarTmpBuffer.find( '&' ) );
 	if ( l_iShortcutIndex > -1 )
@@ -661,7 +661,7 @@ void HListControl::recalculate_column_widths( void )
 		if ( l_iNewWidth )
 			{
 			if ( ! f_iSumForOne )
-				M_THROW ( "width of all columns equals 0", f_iSumForOne );
+				M_THROW( "width of all columns equals 0", f_iSumForOne );
 			l_iNewWidth *= f_iWidthRaw;
 			l_iNewWidth /= f_iSumForOne;
 			l_iCtrLoc = l_iCtr; /* last one with non zero width */

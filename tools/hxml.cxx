@@ -366,9 +366,9 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 		throw HXmlException( "processing XInclude failed" );
 	xmlNodePtr root = xmlDocGetRootElement( doc.get() );
 	if ( ! root )
-		M_THROW ( _ ( "empty doc" ), errno );
+		M_THROW( _( "empty doc" ), errno );
 #ifdef __DEBUGGER_BABUNI__
-	fprintf ( stdout, "%s\n", root->name );
+	cout << root->name << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	(*f_oConvert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
 			root, streamId );

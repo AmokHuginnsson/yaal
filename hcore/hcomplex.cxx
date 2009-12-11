@@ -116,7 +116,7 @@ double HComplex::argument ( void ) const
 	{
 	M_PROLOG
 	if ( ! f_dReal )
-		M_THROW ( "I cannot count complex argument, real part equals to 0.",
+		M_THROW( "I cannot count complex argument, real part equals to 0.",
 				errno );
 	return ( atan ( f_dImaginary  / f_dReal ) );
 	M_EPILOG
@@ -261,7 +261,7 @@ HComplex HComplex::operator / ( HComplex const & a_roComplex )
 	double l_dDenominator = a_roComplex.f_dReal * a_roComplex.f_dReal
 													+ a_roComplex.f_dImaginary * a_roComplex.f_dImaginary;
 	if ( ! l_dDenominator )
-		M_THROW ( "denominator equals 0", errno );
+		M_THROW( "denominator equals 0", errno );
 	l_oComplex.f_dReal = ( f_dReal * a_roComplex.f_dReal
 			+ f_dImaginary * a_roComplex.f_dImaginary ) / l_dDenominator;
 	l_oComplex.f_dImaginary = ( a_roComplex.f_dReal * f_dImaginary
@@ -275,7 +275,7 @@ HComplex HComplex::operator / ( double const a_dValue )
 	M_PROLOG
 	HComplex l_oComplex ( f_dReal, f_dImaginary );
 	if ( ! a_dValue )
-		M_THROW ( "denominator equals 0", errno );
+		M_THROW( "denominator equals 0", errno );
 	l_oComplex.f_dReal /= a_dValue;
 	l_oComplex.f_dImaginary /= a_dValue;
 	return ( l_oComplex );

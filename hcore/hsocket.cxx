@@ -143,7 +143,7 @@ int HSocket::do_close( void )
 			{
 			l_psAddressFile = static_cast<sockaddr_un*>( f_pvAddress );
 			if ( l_psAddressFile->sun_path [ 0 ] )
-				M_ENSURE( ::unlink( l_psAddressFile->sun_path ) == 0 );
+				M_ENSURE_EX( ( ::unlink( l_psAddressFile->sun_path ) == 0 ), l_psAddressFile->sun_path );
 			}
 		}
 	if ( f_bNeedShutdown && ( f_iFileDescriptor >= 0 ) )
@@ -181,12 +181,12 @@ void HSocket::listen( yaal::hcore::HString const& a_oAddress, int const a_iPort 
 		M_THROW( n_ppcErrMsgHSocket[ ALREADY_LISTENING ], f_iFileDescriptor );
 	if ( f_iMaximumNumberOfClients < 1 )
 		M_THROW( _( "bad maximum number of clients" ), f_iMaximumNumberOfClients );
-	make_address ( a_oAddress, a_iPort );
+	make_address( a_oAddress, a_iPort );
 	M_ENSURE( ::setsockopt( f_iFileDescriptor, SOL_SOCKET, SO_REUSEADDR,
 				reinterpret_cast<char*>( &l_iReuseAddr ), sizeof ( l_iReuseAddr ) ) == 0 );
-	M_ENSURE( ::bind( f_iFileDescriptor,
-				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 );
-	M_ENSURE( ::listen( f_iFileDescriptor, f_iMaximumNumberOfClients ) == 0 );
+	M_ENSURE_EX( ( ::bind( f_iFileDescriptor,
+				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 ), a_oAddress );
+	M_ENSURE_EX( ( ::listen( f_iFileDescriptor, f_iMaximumNumberOfClients ) == 0 ), a_oAddress );
 	f_poClients = new clients_t( f_iMaximumNumberOfClients );
 	f_bNeedShutdown = true;
 	return;
@@ -245,8 +245,8 @@ void HSocket::connect( yaal::hcore::HString const& a_oAddress, int const a_iPort
 	if ( f_iFileDescriptor < 0 )
 		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
 	make_address( a_oAddress, a_iPort );
-	M_ENSURE( ::connect( f_iFileDescriptor,
-				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 );
+	M_ENSURE_EX( ( ::connect( f_iFileDescriptor,
+				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 ), a_oAddress );
 	f_bNeedShutdown = true;
 	return;
 	M_EPILOG
@@ -277,7 +277,7 @@ void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_
 		while ( ::gethostbyname_r( a_oAddress.raw(), &l_sHostName,
 					f_oCache.raw(), f_iAddressSize,
 					&l_psHostName, &l_iError ) == ERANGE )
-			f_oCache.pool_realloc ( f_iAddressSize <<= 1 );
+			f_oCache.pool_realloc( f_iAddressSize <<= 1 );
 		errno = l_iError;
 		M_ENSURE( l_psHostName );
 		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>(

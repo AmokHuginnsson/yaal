@@ -302,7 +302,7 @@ HTime::operator char const* ( void ) const
 	f_oCache.pool_realloc( 64 ); /* FIXME that is pretty dumb hack */
 	l_iSize = ::strftime( f_oCache.raw(), 63, f_oFormat.raw(), &f_sBroken ) + 1;
 	if ( l_iSize < 2 )
-		M_THROW ( "bad format", errno );
+		M_THROW( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */
 	return ( f_oCache.raw() );
 	M_EPILOG
