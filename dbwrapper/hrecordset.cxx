@@ -50,9 +50,9 @@ HRecordSet::HRecordSet( database_ptr_t a_oDataBase,
 	{
 	M_PROLOG
 	if ( get_size() < 0 )
-		log( LOG_TYPE::ERROR ) << "SQL error (query): " << f_oDataBase->get_error() << endl;
+		log( LOG_TYPE::ERROR ) << "SQL error (query): " << (_connector->dbrs_error)( f_oDataBase->f_pvCoreData, f_pvResult ) << endl;
 	if ( get_field_count() < 0 )
-		log( LOG_TYPE::ERROR ) << "SQL error (fiels count): " << f_oDataBase->get_error() << endl;
+		log( LOG_TYPE::ERROR ) << "SQL error (fiels count): " << (_connector->dbrs_error)( f_oDataBase->f_pvCoreData, f_pvResult ) << endl;
 	return;
 	M_EPILOG
 	}
@@ -86,7 +86,7 @@ int HRecordSet::get_field_count( void ) const
 
 int long HRecordSet::get_size( void ) const
 	{
-	return ( (_connector->dbrs_records_count)( &*f_oDataBase, f_pvResult ) );
+	return ( (_connector->dbrs_records_count)( f_oDataBase->f_pvCoreData, f_pvResult ) );
 	}
 
 char const* HRecordSet::get_column_name( int a_iColumn ) const
@@ -99,21 +99,21 @@ int long HRecordSet::get_insert_id( void ) const
 	M_PROLOG
 	if ( ! f_pvResult )
 		M_THROW( "no result", errno );
-	return ( (_connector->dbrs_id)( &*f_oDataBase, f_pvResult ) );
+	return ( (_connector->dbrs_id)( f_oDataBase->f_pvCoreData, f_pvResult ) );
 	M_EPILOG
 	}
 
 char const* HRecordSet::get_error( void ) const
 	{
 	M_PROLOG
-	return ( f_oDataBase->get_error() );
+	return ( (_connector->dbrs_error)( f_oDataBase->f_pvCoreData, f_pvResult ) );
 	M_EPILOG
 	}
 
 int HRecordSet::get_errno( void ) const
 	{
 	M_PROLOG
-	return ( f_oDataBase->get_errno() );
+	return ( (_connector->dbrs_errno)( f_oDataBase->f_pvCoreData, f_pvResult ) );
 	M_EPILOG
 	}
 

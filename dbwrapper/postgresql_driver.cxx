@@ -72,16 +72,17 @@ void db_disconnect( void* a_pvData )
 	return;
 	}
 
-int dbrs_errno( void*, void* )
+int dbrs_errno( void*, void* result_ )
 	{
-	return ( errno );
+	ExecStatusType status = PQresultStatus( static_cast<PGresult*>( result_ ) );
+	return ( ! ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) );
 	}
 
-char const* dbrs_error( void* a_pvData, void* )
+char const* dbrs_error( void* db_, void* result_ )
 	{
-	if ( ! a_pvData )
-		a_pvData = g_psBrokenDB;
-	return ( ::PQerrorMessage( static_cast<PGconn*>( a_pvData ) ) );
+	if ( ! db_ )
+		db_ = g_psBrokenDB;
+	return ( result_ ? ::PQresultErrorMessage( static_cast<PGresult*>( result_ ) ) : ::PQerrorMessage( static_cast<PGconn*>( db_ ) ) );
 	}
 
 void* db_query( void* a_pvData, char const* a_pcQuery )

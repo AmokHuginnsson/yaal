@@ -44,18 +44,27 @@ struct OSQLite
 	int f_iErrorCode;
 	HString f_oErrorMessage;
 	sqlite3* f_psDB;
-	OSQLite( void ) : f_iErrorCode( 0 ), f_oErrorMessage(), f_psDB( NULL ) {}
+	OSQLite( void )
+		: f_iErrorCode( 0 ), f_oErrorMessage(), f_psDB( NULL ) {}
 private:
 	OSQLite( OSQLite const& );
 	OSQLite& operator = ( OSQLite const& );
 	};
 	
-typedef struct
+struct OSQLiteResult
 	{
 	int f_iRows;
 	int f_iColumns;
 	char** f_ppcData;
-	} OSQLiteResult;
+	int f_iErrorCode;
+	HString f_oErrorMessage;
+	OSQLiteResult( void )
+		: f_iRows( 0 ), f_iColumns( 0 ), f_ppcData( NULL ),
+		f_iErrorCode( 0 ), f_oErrorMessage() {}
+private:
+	OSQLiteResult( OSQLiteResult const& );
+	OSQLiteResult& operator = ( OSQLiteResult const& );
+	};
 
 OSQLite* g_psBrokenDB = NULL;
 
@@ -121,32 +130,41 @@ void db_disconnect( void* a_pvData )
 	return;
 	}
 
-int dbrs_errno( void* a_pvData, void* )
+int dbrs_errno( void* db_, void* result_ )
 	{
-	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
+	OSQLite* l_psSQLite = static_cast<OSQLite*>( db_ );
+	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
-	if ( l_psSQLite )
+	int code( errno );
+	if ( r && r->f_iErrorCode )
+		code = r->f_iErrorCode;
+	else if ( l_psSQLite )
 		{
 		if ( l_psSQLite->f_iErrorCode )
-			return ( l_psSQLite->f_iErrorCode );
-		return ( sqlite3_errcode ( l_psSQLite->f_psDB ) );
+			code = l_psSQLite->f_iErrorCode;
+		else
+			code = sqlite3_errcode( l_psSQLite->f_psDB );
 		}
-	return ( errno );
+	return ( code );
 	}
 
-char const* dbrs_error( void* a_pvDataB, void* )
+char const* dbrs_error( void* db_, void* result_ )
 	{
-	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvDataB );
+	OSQLite* l_psSQLite = static_cast<OSQLite*>( db_ );
+	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
 	if ( ! l_psSQLite )
 		l_psSQLite = g_psBrokenDB;
-	if ( l_psSQLite )
+	char const* msg( "" );
+	if ( r && ! r->f_oErrorMessage.is_empty() )
+		msg = r->f_oErrorMessage.raw();
+	else if ( l_psSQLite )
 		{
 		if ( ! l_psSQLite->f_oErrorMessage.is_empty() )
 			return ( l_psSQLite->f_oErrorMessage.raw() );
 		return ( sqlite3_errmsg( l_psSQLite->f_psDB ) );
 		}
-	return ( "" );
+	return ( msg );
 	}
 
 void* db_query( void* a_pvData, char const* a_pcQuery )
@@ -158,10 +176,10 @@ void* db_query( void* a_pvData, char const* a_pcQuery )
 	l_psResult->f_iRows = 0;
 	l_psResult->f_ppcData = NULL;
 	char* errmsg = NULL;
-	l_psSQLite->f_iErrorCode = sqlite3_get_table( l_psSQLite->f_psDB,
+	l_psResult->f_iErrorCode = sqlite3_get_table( l_psSQLite->f_psDB,
 			a_pcQuery, &l_psResult->f_ppcData, &l_psResult->f_iRows,
 			&l_psResult->f_iColumns, &errmsg );
-	l_psSQLite->f_oErrorMessage = errmsg;
+	l_psResult->f_oErrorMessage = errmsg;
 	return ( l_psResult );
 	}
 

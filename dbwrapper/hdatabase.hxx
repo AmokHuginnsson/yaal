@@ -68,6 +68,7 @@ private:
 	HDataBase( HDataBase const& );
 	HDataBase& operator = ( HDataBase const& );
 	friend struct yaal::hcore::HPointerScalar<HDataBase>;
+	friend class HRecordSet;
 	};
 
 typedef yaal::hcore::HExceptionT<HDataBase> HDataBaseException;
