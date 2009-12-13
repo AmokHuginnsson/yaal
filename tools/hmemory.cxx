@@ -27,6 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hmemory.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal
 {
@@ -34,10 +35,12 @@ namespace yaal
 namespace tools
 {
 
-HMemory::HMemory( void* ptr, int long const& size )
-	: f_pvBlock( ptr ), f_lSize( size ), f_lCursorRead( 0 ), f_lCursorWrite( 0 ), f_bFlip( false )
+HMemory::HMemory( void* ptr, int long const& size_, INITIAL_STATE::enum_t const& initialState_ )
+	: f_pvBlock( ptr ), f_lSize( size_ ),
+	f_lValid( initialState_ == INITIAL_STATE::AUTO ? -1 : ( initialState_ == INITIAL_STATE::VALID ? size_ : 0 ) ),
+	f_lCursorRead( 0 ), f_lCursorWrite( 0 )
 	{
-	M_ASSERT( size > 0 );
+	M_ASSERT( size_ > 0 );
 	M_ASSERT( ptr );
 	return;
 	}
@@ -54,12 +57,17 @@ bool HMemory::operator == ( HMemory const& other ) const
 	M_EPILOG
 	}
 
-int long HMemory::do_write( void const* const src, int long const& size )
+int long HMemory::do_write( void const* const src_, int long const& size_ )
 	{
 	M_PROLOG
-	M_ENSURE( f_lCursorWrite + size < f_lSize );
-	::memcpy( static_cast<char*>( f_pvBlock ) + f_lCursorWrite, src, size );
+	M_ENSURE( size_ < f_lSize );
+	if ( f_lValid == -1 ) /* First data access. */
+		f_lValid = 0;
+	int long maxWrite( f_lSize - f_lValid );
+	int long size( min( size_, maxWrite ) );
+	::memcpy( static_cast<char*>( f_pvBlock ) + f_lCursorWrite, src_, size );
 	f_lCursorWrite += size;
+	f_lValid += size;
 	return ( size );
 	M_EPILOG
 	}
@@ -69,12 +77,16 @@ void HMemory::do_flush( void ) const
 	return;
 	}
 
-int long HMemory::do_read( void* const dest, int long const& size )
+int long HMemory::do_read( void* const dest_, int long const& size_ )
 	{
 	M_PROLOG
-	M_ENSURE( f_lCursorRead + size < f_lSize );
-	::memcpy( dest, static_cast<char const* const>( f_pvBlock ) + f_lCursorRead, size );
+	M_ENSURE( size_ < f_lSize );
+	if ( f_lValid == -1 ) /* First data access. */
+		f_lValid = f_lSize;
+	int long size( min( size_, f_lValid ) );
+	::memcpy( dest_, static_cast<char const* const>( f_pvBlock ) + f_lCursorRead, size );
 	f_lCursorRead += size;
+	f_lValid -= size;
 	return ( size );
 	M_EPILOG
 	}

@@ -41,20 +41,31 @@ namespace tools
  */
 class HMemory : public yaal::hcore::HStreamInterface
 	{
-	void* f_pvBlock;
-	int long f_lSize;
-	int long f_lCursorRead;
-	int long f_lCursorWrite;
-	bool f_bFlip; /*!< which cursor is after which */
 public:
 	typedef HMemory self_t;
 	typedef yaal::hcore::HStreamInterface hier_t;
+	struct INITIAL_STATE
+		{
+		typedef enum
+			{
+			AUTO,
+			VALID,
+			INVALID
+			} enum_t;
+		};
+private:
+	void* f_pvBlock;
+	int long f_lSize;
+	int long f_lValid;
+	int long f_lCursorRead;
+	int long f_lCursorWrite;
+public:
 	/*! \brief Create new memory accessor.
 	 *
 	 * \param ptr - pointer to memory block to be wrapped.
 	 * \param size - size of memoru block in octets.
 	 */
-	HMemory( void* ptr, int long const& size );
+	HMemory( void* ptr, int long const& size, INITIAL_STATE::enum_t const& = INITIAL_STATE::AUTO );
 	/*! \brief Copy constructor.
 	 *
 	 * \param src - original HMemory object to be copied.
@@ -80,7 +91,7 @@ private:
 	virtual bool do_is_valid( void ) const;
 	};
 
-typedef yaal::hcore::HExceptionT<HMemory> HMemoryException;
+typedef yaal::hcore::HExceptionT<HMemory, yaal::hcore::HStreamInterfaceException> HMemoryException;
 
 }
 
