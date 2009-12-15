@@ -93,7 +93,12 @@ private:
 	HString f_oError;
 	bool f_bExternal;
 public:
-	HFile( open_t const& = OPEN::READING, void* const = NULL );
+	/*! \brief Create closed (or based on low level interface) file stream.
+	 *
+	 * \param mode - open mode.
+	 * \param raw - low level interface stream handler.
+	 */
+	HFile( open_t const& mode = OPEN::READING, void* const raw = NULL );
 	/*! \brief Create new file stream and open file item immediatelly.
 	 *
 	 * \param path - path to file item to be opened.
