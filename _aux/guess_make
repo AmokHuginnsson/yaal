@@ -23,9 +23,11 @@ esac
 if [ ! -f .my_make ] ; then
 	echo "MAKE=${MAKE}" > .my_make
 else
-	echo "your make type already set:"
-	cat .my_make
-	exit 1
+	if [ ${#} -lt 1 -o "x${1}" != "x-q" ] ; then
+		echo "your make type already set:"
+		cat .my_make
+		exit 1
+	fi
 fi
 
 exit 0
