@@ -22,6 +22,7 @@ DS=d
 FIND=find
 
 .PHONY: all bin clean clean-cov clean-debug clean-prof clean-release clean-dep cov debug dep doc install mrproper mrproper-cov mrproper-debug mrproper-prof mrproper-release release prof purge static stats tags
+.NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc configure config.hxx.in
 
 .DEFAULT:
 	@$(MAKE) -f Makefile.mk.in $(@)
