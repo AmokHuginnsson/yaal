@@ -122,6 +122,7 @@ include $(DIR_ROOT)/_aux/mk/e_target-default.mk
 
 #phony targets
 .PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags 
+.NOTPARALLEL: $(HAPI_HEADER) $(LD_SO_CONF)
 
 all debug release cov prof: environment $(TARGETS) $(HAPI_HEADER)
 
