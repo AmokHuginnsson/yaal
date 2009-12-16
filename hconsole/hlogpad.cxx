@@ -76,8 +76,8 @@ void HLogPad::do_refresh ( void )
 	int l_iBG = f_bFocused ? COLORS::BG_GRAY : COLORS::BG_BLACK;
 	HConsole& cons = HCons::get_instance();
 	draw_label();
-	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
-	f_oVarTmpBuffer.fillz(  ' ', f_iWidthRaw );
+	f_oVarTmpBuffer.hs_realloc( f_iWidthRaw + 1 );
+	f_oVarTmpBuffer.fillz( ' ', 0, f_iWidthRaw );
 	f_iAttribute = COLORS::ATTR_NORMAL | l_iBG;
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		cons.c_cmvprintf( f_iRowRaw + l_iCtr,

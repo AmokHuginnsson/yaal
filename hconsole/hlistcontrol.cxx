@@ -244,7 +244,7 @@ void HListControl::draw_background( int a_iFrom )
 	M_PROLOG
 	int l_iCtr = a_iFrom;
 	set_attr_data();
-	f_oVarTmpBuffer.fillz ( '.', f_iWidthRaw );
+	f_oVarTmpBuffer.fillz( '.', 0, f_iWidthRaw );
 	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		M_ENSURE( HCons::get_instance().c_mvprintf( f_iRowRaw + l_iCtr, f_iColumnRaw,
 					f_oVarTmpBuffer.raw() ) != C_ERR );
@@ -290,7 +290,7 @@ void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int 
 		case ( BITS::ALIGN::LEFT ):
 			{
 			if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
-				f_oVarTmpBuffer.fillz( '_', a_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
+				f_oVarTmpBuffer.fillz( '_', l_iTmp, a_poColumnInfo->f_iWidthRaw - l_iTmp );
 			}
 		break;
 		case ( BITS::ALIGN::CENTER ):
@@ -300,10 +300,9 @@ void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int 
 						a_poColumnInfo->f_iWidthRaw );
 			else if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
 				{
-				f_oVarTmpBuffer.insert( 0, ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
-				f_oVarTmpBuffer.fill( '_', ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2 );
+				f_oVarTmpBuffer.insert( 0, ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2, '_' );
 				l_iTmp = static_cast<int>( f_oVarTmpBuffer.get_length() );
-				f_oVarTmpBuffer.fillz( '_', a_poColumnInfo->f_iWidthRaw - l_iTmp, l_iTmp );
+				f_oVarTmpBuffer.fillz( '_', l_iTmp, a_poColumnInfo->f_iWidthRaw - l_iTmp );
 				}
 			}
 		break;
@@ -312,10 +311,7 @@ void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int 
 			if ( l_iTmp > a_poColumnInfo->f_iWidthRaw )
 				f_oVarTmpBuffer.erase( 0, l_iTmp - a_poColumnInfo->f_iWidthRaw );
 			else if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
-				{
-				f_oVarTmpBuffer.insert( 0, ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1 );
-				f_oVarTmpBuffer.fill( '_', ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1 );
-				}
+				f_oVarTmpBuffer.insert( 0, ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1, '_' );
 			}
 		break;
 		default :

@@ -130,7 +130,7 @@ void HEditControl::do_refresh( void )
 		f_oVarTmpBuffer.clear();
 	int long len = f_oVarTmpBuffer.get_length();
 	if ( len < f_iWidthRaw )
-		f_oVarTmpBuffer.fill( ' ', f_iWidthRaw - len, len );
+		f_oVarTmpBuffer.fill( ' ', len, f_iWidthRaw - len );
 	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw, f_oVarTmpBuffer.raw() ) != C_ERR );
 	if ( f_bFocused )
 		{

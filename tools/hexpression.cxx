@@ -430,7 +430,7 @@ bool HExpression::translate( HString const& a_oFormula )
 	int l_iIndex = 0, l_iRealIndex = 0, l_iCtr = 0;
 	int long l_iLength = a_oFormula.get_length();
 	f_oFormula.hs_realloc( l_iLength + 1 ); /* + 1 for trailing null */
-	f_oFormula.fillz( '\0', l_iLength );
+	f_oFormula.fillz( '\0', 0, l_iLength );
 	f_oTerminalIndexes.pool_realloc( l_iLength + 1 );
 	while ( l_iIndex < l_iLength )
 		{

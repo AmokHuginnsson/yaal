@@ -254,9 +254,9 @@ void HStatusBarControl::update_progress( double a_dStep,
 			f_oString.format( f_oVarTmpBuffer.raw(), "-",
 					static_cast<char const*>( l_oStoper ), l_iNextPercent, "%%" );
 			}
-		f_oString.fill ( '-', l_iMaxBar, 1 );
+		f_oString.fill( '-', 1, l_iMaxBar );
 		if ( l_iNextStep > 0 )
-			f_oString.fill ( '=', l_iNextStep, 1 );
+			f_oString.fill( '=', 1, l_iNextStep );
 		if ( f_bDone )
 			{
 			int l_iLength = static_cast<int>( f_oString.get_length() );

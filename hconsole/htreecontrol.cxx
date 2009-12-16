@@ -133,8 +133,8 @@ void HTreeControl::do_refresh( void )
 	if ( f_bFocused )
 		cons.curs_set ( CURSOR::INVISIBLE );
 	draw_label();
-	f_oVarTmpBuffer.hs_realloc ( f_iWidthRaw + 1 );
-	f_oVarTmpBuffer.fillz( '_', f_iWidthRaw );
+	f_oVarTmpBuffer.hs_realloc( f_iWidthRaw + 1 );
+	f_oVarTmpBuffer.fillz( '_', 0, f_iWidthRaw );
 	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
 		cons.c_mvprintf( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer.raw() );
 	if ( f_oTree.get_root() )

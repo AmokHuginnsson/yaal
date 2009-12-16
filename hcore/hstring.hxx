@@ -172,10 +172,31 @@ public:
 	HString& trim_right( char const* const = " \t\r\n" );
 	HString& shift_left( int long const& );
 	HString& shift_right( int long const&, char const = ' ' );
-	HString& fill( char = '\0', int long = 0, int long = 0 );
-	HString& fillz( char = '\0', int long = 0, int long = 0 );
+	/*! \brief Fill portion of string with constatnt value.
+	 *
+	 * \param value - use this value as a filler.
+	 * \param position - start at this position.
+	 * \param count - fill that many bytes.
+	 */
+	HString& fill( char value = '\0', int long position = 0, int long lenght = 0 );
+	/*! \brief Fill portion of string with constatnt value and finish with \0 (zero) byte.
+	 *
+	 * \param value - use this value as a filler.
+	 * \param position - start at this position.
+	 * \param count - fill that many bytes.
+	 */
+	HString& fillz( char value = '\0', int long position = 0, int long count = 0 );
 	HString& erase( int long, int long );
 	HString& insert( int long, int long, char const* = NULL );
+	HString& insert( int long, char const* = NULL );
+	HString& insert( int long, char const*, int long );
+	/*! \brief Insert n copies of value before given position.
+	 *
+	 * \param postition - where put inserted block.
+	 * \param n - number of bytes to insert.
+	 * \param value - copies of this value shall be inserted.
+	 */
+	HString& insert( int long postition, int long n, char const& value );
 	};
 
 HString operator + ( HString const&, HString const& );

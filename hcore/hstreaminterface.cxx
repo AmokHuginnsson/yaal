@@ -70,8 +70,8 @@ HStreamInterface& HStreamInterface::operator << ( char const* const& a_pcString 
 HStreamInterface& HStreamInterface::operator << ( char const& a_cChar )
 	{
 	M_PROLOG
-	HString str( a_cChar );
-	do_write( str.raw(), sizeof ( char const ) );
+	char copy( a_cChar );
+	do_write( &copy, sizeof ( copy ) );
 	return ( *this );
 	M_EPILOG
 	}
@@ -111,8 +111,8 @@ HStreamInterface& HStreamInterface::operator << ( int unsigned const& a_uiUnsign
 HStreamInterface& HStreamInterface::operator << ( int long const& a_lLongInteger )
 	{
 	M_PROLOG
-	HString str( a_lLongInteger );
-	do_write( str.raw(), str.get_length() );
+	f_oWordCache.format( "%ld", a_lLongInteger );
+	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -120,8 +120,8 @@ HStreamInterface& HStreamInterface::operator << ( int long const& a_lLongInteger
 HStreamInterface& HStreamInterface::operator << ( int long unsigned const& a_ulUnsignedLongInteger )
 	{
 	M_PROLOG
-	HString str( a_ulUnsignedLongInteger );
-	do_write( str.raw(), str.get_length() );
+	f_oWordCache.format( "%lu", a_ulUnsignedLongInteger );
+	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -129,8 +129,8 @@ HStreamInterface& HStreamInterface::operator << ( int long unsigned const& a_ulU
 HStreamInterface& HStreamInterface::operator << ( double const& a_dDouble )
 	{
 	M_PROLOG
-	HString str( a_dDouble );
-	do_write( str.raw(), str.get_length() );
+	f_oWordCache.format( "%f", a_dDouble );
+	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -138,8 +138,8 @@ HStreamInterface& HStreamInterface::operator << ( double const& a_dDouble )
 HStreamInterface& HStreamInterface::operator << ( double long const& a_dLongDouble )
 	{
 	M_PROLOG
-	HString str( a_dLongDouble );
-	do_write( str.raw(), str.get_length() );
+	f_oWordCache.format( "%.12Lf", a_dLongDouble );
+	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -147,8 +147,8 @@ HStreamInterface& HStreamInterface::operator << ( double long const& a_dLongDoub
 HStreamInterface& HStreamInterface::operator << ( float const& a_dFloat )
 	{
 	M_PROLOG
-	HString str( a_dFloat );
-	do_write( str.raw(), str.get_length() );
+	f_oWordCache.format( "%f", a_dFloat );
+	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
@@ -156,8 +156,8 @@ HStreamInterface& HStreamInterface::operator << ( float const& a_dFloat )
 HStreamInterface& HStreamInterface::operator << ( void const* const& a_pvPtr )
 	{
 	M_PROLOG
-	HString str( a_pvPtr );
-	do_write( str.raw(), str.get_length() );
+	f_oWordCache.format( "0x%lx", a_pvPtr );
+	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
 	return ( *this );
 	M_EPILOG
 	}
