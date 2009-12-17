@@ -807,7 +807,7 @@ HString& HString::fill( char a_cFiller, int long a_iOffset, int long a_iCount )
 	if ( ( a_iOffset + a_iCount ) >= f_lAllocatedBytes )
 		M_THROW( _( "overflow" ), a_iOffset + a_iCount );
 	if ( a_iCount == 0 )
-		a_iCount = f_lAllocatedBytes - a_iOffset;
+		a_iCount = ( f_lAllocatedBytes - a_iOffset ) - 1; /* we maintain zero terminator (even though it is not fillz()) hence - 1 */
 	if ( ( a_iCount + a_iOffset ) > f_lSize )
 		f_lSize = a_iCount + a_iOffset;
 	::std::memset( f_pcBuffer + a_iOffset, a_cFiller, a_iCount );
