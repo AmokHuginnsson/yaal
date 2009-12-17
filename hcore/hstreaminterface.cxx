@@ -39,7 +39,8 @@ namespace hcore
 char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
-	: f_oCache( 1, cache_t::AUTO_GROW ), f_iOffset( 0 ), f_sStatus(), f_oWordCache()
+	: f_oCache( 1, cache_t::AUTO_GROW ), f_iOffset( 0 ),
+	f_sStatus(), f_oWordCache(), _fill( ' ' ), _width( 0 ), _base( BASES::DEC )
 	{
 	return;
 	}
@@ -111,9 +112,27 @@ HStreamInterface& HStreamInterface::operator << ( int unsigned const& a_uiUnsign
 HStreamInterface& HStreamInterface::operator << ( int long const& a_lLongInteger )
 	{
 	M_PROLOG
-	f_oWordCache.format( "%ld", a_lLongInteger );
-	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
+	f_oWordCache.format( _base == BASES::DEC ? "%ld" : ( _base == BASES::HEX ) ? "%lx" : "%lo", a_lLongInteger );
+	int long len( reformat() );
+	do_write( f_oWordCache.raw(), len );
 	return ( *this );
+	M_EPILOG
+	}
+
+int long HStreamInterface::reformat( void )
+	{
+	M_PROLOG
+	int long len( f_oWordCache.get_length() );
+	if ( _width )
+		{
+		if ( _width > len )
+			{
+			f_oWordCache.insert( 0, _width - len, static_cast<char>( _fill ) );
+			len = _width;
+			}
+		_width = 0;
+		}
+	return ( len );
 	M_EPILOG
 	}
 
@@ -121,7 +140,8 @@ HStreamInterface& HStreamInterface::operator << ( int long unsigned const& a_ulU
 	{
 	M_PROLOG
 	f_oWordCache.format( "%lu", a_ulUnsignedLongInteger );
-	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
+	int long len( reformat() );
+	do_write( f_oWordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -130,7 +150,8 @@ HStreamInterface& HStreamInterface::operator << ( double const& a_dDouble )
 	{
 	M_PROLOG
 	f_oWordCache.format( "%f", a_dDouble );
-	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
+	int long len( reformat() );
+	do_write( f_oWordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -139,7 +160,8 @@ HStreamInterface& HStreamInterface::operator << ( double long const& a_dLongDoub
 	{
 	M_PROLOG
 	f_oWordCache.format( "%.12Lf", a_dLongDouble );
-	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
+	int long len( reformat() );
+	do_write( f_oWordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -148,7 +170,8 @@ HStreamInterface& HStreamInterface::operator << ( float const& a_dFloat )
 	{
 	M_PROLOG
 	f_oWordCache.format( "%f", a_dFloat );
-	do_write( f_oWordCache.raw(), f_oWordCache.get_length() );
+	int long len( reformat() );
+	do_write( f_oWordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -169,6 +192,14 @@ HStreamInterface& HStreamInterface::operator << ( HStreamInterface& ( *const HFI
 	M_EPILOG
 	}
 
+HStreamInterface& HStreamInterface::operator << ( HManipulator const& manipulator_ )
+	{
+	M_PROLOG
+	manipulator_( *this );
+	return ( *this );
+	M_EPILOG
+	}
+
 HStreamInterface& endl( HStreamInterface& a_roFile )
 	{
 	M_PROLOG
@@ -182,6 +213,41 @@ HStreamInterface& flush( HStreamInterface& a_roFile )
 	M_PROLOG
 	a_roFile.do_flush();
 	return ( a_roFile );
+	M_EPILOG
+	}
+
+HStreamInterface& dec( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_base( HStreamInterface::BASES::DEC ) );
+	M_EPILOG
+	}
+
+HStreamInterface& hex( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_base( HStreamInterface::BASES::HEX ) );
+	M_EPILOG
+	}
+
+HStreamInterface& oct( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_base( HStreamInterface::BASES::OCT ) );
+	M_EPILOG
+	}
+
+HStreamInterface::HManipulator setw( int width_ )
+	{
+	M_PROLOG
+	return ( HStreamInterface::HManipulator( width_, &HStreamInterface::HManipulator::set_width ) );
+	M_EPILOG
+	}
+
+HStreamInterface::HManipulator setfill( int fill_ )
+	{
+	M_PROLOG
+	return ( HStreamInterface::HManipulator( fill_, &HStreamInterface::HManipulator::set_fill ) );
 	M_EPILOG
 	}
 
@@ -379,6 +445,59 @@ bool HStreamInterface::is_valid( void ) const
 	{
 	M_PROLOG
 	return ( do_is_valid() );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::set_fill( int fill_ )
+	{
+	M_PROLOG
+	_fill = fill_;
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::set_width( int width_ )
+	{
+	M_PROLOG
+	_width = width_;
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::set_base( BASES::enum_t base_ )
+	{
+	M_PROLOG
+	_base = base_;
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface::HManipulator::HManipulator( int value_, ACTION_t action_ )
+	: _value( value_ ), _action( action_ )
+	{
+	}
+
+void HStreamInterface::HManipulator::operator()( HStreamInterface& iface_ ) const
+	{
+	M_PROLOG
+	(this->*_action)( iface_ );
+	return;
+	M_EPILOG
+	}
+
+void HStreamInterface::HManipulator::set_fill( HStreamInterface& iface_ ) const
+	{
+	M_PROLOG
+	iface_.set_fill( _value );
+	return;
+	M_EPILOG
+	}
+
+void HStreamInterface::HManipulator::set_width( HStreamInterface& iface_ ) const
+	{
+	M_PROLOG
+	iface_.set_width( _value );
+	return;
 	M_EPILOG
 	}
 

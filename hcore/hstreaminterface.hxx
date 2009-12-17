@@ -41,6 +41,9 @@ namespace hcore
 class HStreamInterface;
 HStreamInterface& endl( HStreamInterface& );
 HStreamInterface& flush( HStreamInterface& );
+HStreamInterface& dec( HStreamInterface& );
+HStreamInterface& hex( HStreamInterface& );
+HStreamInterface& oct( HStreamInterface& );
 
 /*! \brief Interface for stream based IO.
  */
@@ -62,13 +65,36 @@ public:
 		code_t code; /*!< return code for last read operation */
 		STATUS( void ) : octets( 0 ), code( OK ) {}
 		};
+	class HManipulator
+		{
+		int _value;
+		typedef void ( HManipulator::* ACTION_t )( HStreamInterface& ) const;
+		ACTION_t _action;
+	public:
+		HManipulator( int, ACTION_t );
+		void operator()( HStreamInterface& ) const;
+		void set_fill( HStreamInterface& ) const;
+		void set_width( HStreamInterface& ) const;
+		};
 	typedef HPointer<HStreamInterface> ptr_t;
+	struct BASES
+		{
+		typedef enum
+			{
+			DEC,
+			HEX,
+			OCT
+			} enum_t;
+		};
 protected:
 	typedef yaal::hcore::HPool<char> cache_t;
-	cache_t f_oCache; /*!< read buffer */
-	int f_iOffset; /*!< position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes */
-	STATUS f_sStatus /*!< status of last read_until operation */;
-	HString f_oWordCache; /*!< cache for operator >> () */
+	cache_t f_oCache; /*!< Read buffer. */
+	int f_iOffset; /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
+	STATUS f_sStatus /*!< Status of last read_until operation. */;
+	HString f_oWordCache; /*!< Cache for operator >> () and operator << (). */
+	int _fill; /*!< Fill character for output operations. */
+	int _width; /*!< Next output operation width. */
+	BASES::enum_t _base;
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
@@ -86,6 +112,7 @@ public:
 	HStreamInterface& operator << ( float const& );
 	HStreamInterface& operator << ( void const* const& );
 	HStreamInterface& operator << ( HStreamInterface& ( *const )( HStreamInterface& ) );
+	HStreamInterface& operator << ( HManipulator const& );
 	HStreamInterface& operator >> ( HString& );
 	HStreamInterface& operator >> ( char& );
 	HStreamInterface& operator >> ( int short& );
@@ -111,8 +138,12 @@ public:
 	int long write( void const* const, int long const& );
 	static char const* const eols;
 	bool is_valid( void ) const;
+	HStreamInterface& set_fill( int );
+	HStreamInterface& set_width( int );
+	HStreamInterface& set_base( BASES::enum_t );
 private:
 	bool read_word( void );
+	int long reformat( void );
 	virtual int long do_write( void const* const, int long const& ) = 0;
 	virtual int long do_read( void* const, int long const& ) = 0;
 	virtual void do_flush( void ) const = 0;
@@ -120,6 +151,9 @@ private:
 	friend HStreamInterface& endl( HStreamInterface& );
 	friend HStreamInterface& flush( HStreamInterface& );
 	};
+
+HStreamInterface::HManipulator setfill( int );
+HStreamInterface::HManipulator setw( int );
 
 typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
 
