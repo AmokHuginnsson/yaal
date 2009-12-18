@@ -195,7 +195,7 @@ int long HFile::read_line( HString& a_roLine, read_t const& a_eRead,
 		}
 	else /* UNBUFFERED_READS */
 		{
-		l_iLength = read_until( a_roLine, HStreamInterface::eols, false ).octets;
+		l_iLength = read_until( a_roLine, HStreamInterface::eols, false );
 		if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
 			M_THROW( _( "line too long" ), l_iLength );
 		}
@@ -283,8 +283,8 @@ bool HFile::operator ! ( void ) const
 int long HFile::do_read( void* const a_pcBuffer, int long const& a_lSize )
 	{
 	M_PROLOG
-	return ( ::std::fread( a_pcBuffer, sizeof ( char ), a_lSize,
-				static_cast<FILE*>( f_pvHandle ) ) );
+	int long len( ::std::fread( a_pcBuffer, sizeof ( char ), a_lSize, static_cast<FILE*>( f_pvHandle ) ) );
+	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( f_pvHandle ) ) ? -1 : len ) );
 	M_EPILOG
 	}
 
@@ -292,7 +292,8 @@ int long HFile::do_write( void const* const a_pcString, int long const& a_lSize 
 	{
 	M_PROLOG
 	M_ASSERT( f_pvHandle );
-	return ( ::std::fwrite( a_pcString, sizeof ( char ), a_lSize, static_cast<FILE*>( f_pvHandle ) ) );
+	int long len( ::std::fwrite( a_pcString, sizeof ( char ), a_lSize, static_cast<FILE*>( f_pvHandle ) ) );
+	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( f_pvHandle ) ) ? -1 : len ) );
 	M_EPILOG
 	}
 

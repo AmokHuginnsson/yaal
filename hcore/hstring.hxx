@@ -145,6 +145,7 @@ public:
 	int long get_length( void ) const;
 	int long capacity( void ) const;
 	void swap( HString& );
+	HString& assign( char const* const, int long );
 	HString& format( char const* const, ... );
 	HString& vformat( char const* const, void* );
 	int long find( char const, int long = 0 ) const;

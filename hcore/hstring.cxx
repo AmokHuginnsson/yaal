@@ -419,6 +419,21 @@ void HString::swap( HString& other )
 	return;
 	}
 
+HString& HString::assign( char const* const data_, int long length_ )
+	{
+	M_PROLOG
+	if ( ! data_ )
+		M_THROW( n_ppcErrMsgHString[ string_helper::NULL_PTR ], errno );
+	if ( length_ < 0 )
+		M_THROW( _( "bad length" ), length_ );
+	f_lSize = length_;
+	hs_realloc( f_lSize + 1 );
+	::memcpy( f_pcBuffer, data_, f_lSize );
+	f_pcBuffer[ f_lSize ] = 0;
+	return ( *this );
+	M_EPILOG
+	}
+
 HString& HString::format( char const* const a_pcFormat, ... )
 	{
 	M_PROLOG

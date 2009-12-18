@@ -172,10 +172,9 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	char buf[BASE64LINELEN];
 	int long size( 0 );
 	HString line;
-	HStreamInterface::STATUS s;
-	while ( ( s = in.read_until( line ) ).code == HStreamInterface::STATUS::OK )
+	while ( in.read_until( line ) )
 		{
-		if ( ! s.octets )
+		if ( line.is_empty() )
 			continue;
 		M_ENSURE( line.get_length() <= BASE64LINELEN );
 		size = base64_raw_decode( line, buf, sizeof ( buf ), standardCompliantMode );

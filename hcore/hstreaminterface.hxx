@@ -51,20 +51,6 @@ class HStreamInterface
 	{
 	typedef HStreamInterface self_t;
 public:
-	/*! \brief Status of given IO stream.
-	 */
-	struct STATUS
-		{
-		typedef enum
-			{
-			OK,
-			REPEAT,
-			ERROR
-			} code_t;
-		int octets; /*!< cumultative number of octets read together with last successful read operation */
-		code_t code; /*!< return code for last read operation */
-		STATUS( void ) : octets( 0 ), code( OK ) {}
-		};
 	class HManipulator
 		{
 		int _value;
@@ -90,7 +76,6 @@ protected:
 	typedef yaal::hcore::HPool<char> cache_t;
 	cache_t f_oCache; /*!< Read buffer. */
 	int f_iOffset; /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
-	STATUS f_sStatus /*!< Status of last read_until operation. */;
 	HString f_oWordCache; /*!< Cache for operator >> () and operator << (). */
 	int _fill; /*!< Fill character for output operations. */
 	int _width; /*!< Next output operation width. */
@@ -133,7 +118,7 @@ public:
 	 * \retval code - status of operation.
 	 * \retval octets - number of bytes read so far.
 	 */
-	STATUS const& read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
+	int long read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
 	int long read( void* const, int long const& );
 	int long write( void const* const, int long const& );
 	static char const* const eols;

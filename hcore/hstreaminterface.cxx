@@ -40,7 +40,7 @@ char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
 	: f_oCache( 1, cache_t::AUTO_GROW ), f_iOffset( 0 ),
-	f_sStatus(), f_oWordCache(), _fill( ' ' ), _width( 0 ), _base( BASES::DEC )
+	f_oWordCache(), _fill( ' ' ), _width( 0 ), _base( BASES::DEC )
 	{
 	return;
 	}
@@ -251,7 +251,7 @@ HStreamInterface::HManipulator setfill( int fill_ )
 	M_EPILOG
 	}
 
-HStreamInterface::STATUS const& HStreamInterface::read_until( HString& a_roMessage,
+int long HStreamInterface::read_until( HString& a_roMessage,
 		char const* const a_pcStopSet, bool a_bStripDelim )
 	{
 	M_PROLOG
@@ -281,33 +281,13 @@ HStreamInterface::STATUS const& HStreamInterface::read_until( HString& a_roMessa
 	while ( ( nRead > 0 ) && ! ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ++ ] ) );
 	if ( nRead >= 0 )
 		{
-		/* Stripping delimiting character means that read is one byte shorter,
-		 * we will zero-terminate later.
-		 */
-		if ( a_bStripDelim )
-			-- f_iOffset;
-		if ( f_iOffset >= 0 )
-			{
-			/* We can zero-terminate and update client buffer.
-			 */
-			l_pcBuffer[ f_iOffset ] = 0;
-			a_roMessage = l_pcBuffer;
-			}
-		/* This read_until cycle has been completed,
-		 * next read_until call will start a new cycle.
-		 */
-		f_sStatus.octets = f_iOffset;
+		M_ASSERT( f_iOffset >= 0 );
+		a_roMessage.assign( l_pcBuffer, f_iOffset - ( ( f_iOffset > 0 ) && a_bStripDelim ? 1 : 0 ) );
 		f_iOffset = 0;
-		if ( ! nRead ) /* Nothing was read, not even a stop character, this means trouble, I mean error. */
-			f_sStatus.code = STATUS::ERROR;
-		else if ( ( f_sStatus.octets == 0 ) && a_bStripDelim ) /* only stop character has been found in the stream */
-			f_sStatus.code = STATUS::REPEAT;
-		else /* We have got some meaningful bytes. ayea! */
-			f_sStatus.code = STATUS::OK;
 		}
 	else
-		f_sStatus.code = STATUS::REPEAT;
-	return ( f_sStatus );
+		a_roMessage.clear();
+	return ( nRead >= 0 ? f_iOffset : nRead );
 	M_EPILOG
 	}
 
@@ -323,7 +303,7 @@ HStreamInterface& HStreamInterface::operator >> ( HString& word )
 bool HStreamInterface::read_word( void )
 	{
 	M_PROLOG
-	while ( read_until( f_oWordCache, n_pcWhiteSpace, true ).code == STATUS::REPEAT )
+	while ( read_until( f_oWordCache, n_pcWhiteSpace, true ) < 0 )
 		;
 	return ( f_oWordCache.get_length() > 0 );
 	M_EPILOG
