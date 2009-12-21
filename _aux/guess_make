@@ -7,21 +7,25 @@ if [ "x${OS}" = "x" ] ; then
 	exit 1
 fi
 
-MAKE="make"
+MY_MAKE="make"
 
 case "x${OS}" in
 	xLinux)
 	;;
 	xFreeBSD|xSunOS)
-		MAKE="gmake"
+		MY_MAKE="gmake"
 	;;
 	*)
 		echo "Your make type is a wild guess."
 	;;
 esac
 
-if [ ! -f .my_make ] ; then
-	echo "MAKE=${MAKE}" > .my_make
+if [ -f ./.my_make ] ; then
+	eval `grep MAKE ./.my_make`
+fi
+
+if [ -z "${MAKE}" ] ; then
+	echo "MAKE=${MY_MAKE}" >> .my_make
 else
 	if [ ${#} -lt 1 -o "x${1}" != "x-q" ] ; then
 		echo "your make type already set:"
@@ -31,3 +35,4 @@ else
 fi
 
 exit 0
+
