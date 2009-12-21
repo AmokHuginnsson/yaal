@@ -3,6 +3,7 @@ dnl Detect if the compiler supports a set of flags
 dnl --------------------------------------------------------------------------
 AC_DEFUN([YAAL_DETECT_FLAGS],
 [
+	ORIG=[$]$1
 	$1=
 	AC_LANG_PUSH(ifelse( "x$3", "xC++", $3, C ))
 	define([FLAGS], ifelse( "x$3", "xC++", CXXFLAGS, CFLAGS ))
@@ -12,11 +13,11 @@ AC_DEFUN([YAAL_DETECT_FLAGS],
 			$1_save_FLAGS="$FLAGS"
 			FLAGS="$FLAGS $flag -Werror"
 			AC_MSG_CHECKING([whether COMPILER compiler understands [$]flag])
-			AC_COMPILE_IFELSE([ ], [$1_works=yes], [$1_works=no])
+			AC_LINK_IFELSE([int main( int, char** ) { return ( 0 ); }], [$1_works=yes], [$1_works=no])
 			AC_MSG_RESULT([$]$1_works)
 			FLAGS="[$]$1_save_FLAGS"
 			if test "x[$]$1_works" = "xyes"; then
-				$1="$flag"
+				$1="$ORIG $flag"
 			fi
 		fi
 	done

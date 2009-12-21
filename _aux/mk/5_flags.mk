@@ -47,8 +47,7 @@ ifdef DO_COVERAGE
 	LINKER_COVERAGE_FLAGS = --coverage
 endif
 LINKER_PRIME_FLAGS						= \
-								-Wl,--demangle \
-								-Wl,--no-undefined
+								-Wl,--demangle
 
 GROUP_START = -Wl,-\(
 GROUP_END = -Wl,-\)

@@ -106,6 +106,7 @@ YAAL_DETECT_FLAGS(YAAL_CXXFLAGS, [-fPIC], [C++])
 YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
 YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--fatal-warnings], [C++])
 YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--export-dynamic], [C++])
+YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--no-undefined], [C++])
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])
 RESULT=["no"]
