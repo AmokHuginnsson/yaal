@@ -60,8 +60,7 @@ LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \
 # WARNING!! -Wl,soname, must be last option, and last character of it,
 # meaning "," must be immediately followed by end of line
 LINKER_PRIME_FLAGS +=	-shared \
-								-Wl,--export-dynamic \
-								@SPECIAL_LINKER_FLAGS@ \
+								@YAAL_LXXFLAGS@ \
 								-Wl,-soname,
 
 include $(DIR_ROOT)/_aux/mk/7_flags-post.mk
@@ -74,7 +73,7 @@ $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT))))
 
 LIBS_hcore			=	"-lpthread -lssl -lcrypto @HCORE_LIBS@"
 DEPS_tools			= $(TARGET_hcore)
-LIBS_tools			= "-lhcore -lxml2 -lxslt @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@ @HCORE_LIBS@"
+LIBS_tools			= "-lhcore -lpthread -lxml2 -lxslt @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@ @HCORE_LIBS@"
 DEPS_dbwrapper	= $(TARGET_hcore) $(TARGET_tools)
 LIBS_dbwrapper	= "-ltools -lhcore @HCORE_LIBS@"
 DEPS_hconsole		= $(TARGET_hcore) $(TARGET_tools)

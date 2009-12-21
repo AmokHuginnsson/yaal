@@ -64,6 +64,10 @@ void* memrchr( void const*, int, int );
 #define SUN_LEN(x) ( ::std::strlen( x->sun_path ) + sizeof ( x->sun_family ) )
 #endif /* not HAVE_DECL_SUN_LEN */
 
+#if defined( ERR )
+#undef ERR
+#endif /* HAVE_DECL_SUN_LEN */
+
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
 #ifdef __YAAL_BUILD__
 #include <netdb.h>
