@@ -100,7 +100,7 @@ $(LIB_PREFIX)%.$(LIB_SUFFIX):
 	@if [ "x$(NAME)" = "x" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
 	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
-			$(GROUP_START) $(OBJS_$(NAME)) $(GROUP_END) $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n "$(RS)";)
+			@START_GROUP@ $(OBJS_$(NAME)) @END_GROUP@ $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n "$(RS)";)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)
 	@$(AR) $(ARFLAGS) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log;

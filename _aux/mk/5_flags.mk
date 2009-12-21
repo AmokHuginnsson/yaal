@@ -49,7 +49,4 @@ endif
 LINKER_PRIME_FLAGS						= \
 								-Wl,--demangle
 
-GROUP_START = -Wl,-\(
-GROUP_END = -Wl,-\)
-
 # vim: ft=make
