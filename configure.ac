@@ -109,9 +109,13 @@ YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--export-dynamic], [C++])
 YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--no-undefined], [C++])
 YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--enable-auto-import], [C++])
 YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
+YAAL_DETECT_FLAGS(SONAME_FLAG, [-Wl,-soname,foo], [C++])
 if test ["x${START_GROUP}"] != ["x"] ; then
 	START_GROUP="-Wl\$(COMA)--start-group"
 	END_GROUP="-Wl\$(COMA)--end-group"
+fi
+if test ["x${SONAME_FLAG}"] != ["x"] ; then
+	SONAME_FLAG="-Wl\$(COMA)-soname\$(COMA)\$(SONAME_\$(NAME))"
 fi
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])
@@ -412,6 +416,7 @@ AC_SUBST([YAAL_CXXFLAGS],[${YAAL_CXXFLAGS}])
 AC_SUBST([YAAL_LXXFLAGS],[${YAAL_LXXFLAGS}])
 AC_SUBST([START_GROUP],[${START_GROUP}])
 AC_SUBST([END_GROUP],[${END_GROUP}])
+AC_SUBST([SONAME_FLAG],[${SONAME_FLAG}])
 AC_SUBST([LIB_PREFIX],[${LIB_PREFIX}])
 AC_SUBST([RDYNAMIC],[${RDYNAMIC}])
 AC_SUBST([HCORE_LIBS],[${HCORE_LIBS}])

@@ -56,12 +56,7 @@ COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I$(DIR_BUILD) -I/usr/local/include \
 																@EXTRA_INCLUDE_PATHS@
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \
 																@EXTRA_LIB_PATHS@
-
-# WARNING!! -Wl,soname, must be last option, and last character of it,
-# meaning "," must be immediately followed by end of line
-LINKER_PRIME_FLAGS +=	-shared \
-								@YAAL_LXXFLAGS@ \
-								-Wl,-soname,
+LINKER_PRIME_FLAGS +=	-shared @YAAL_LXXFLAGS@
 
 include $(DIR_ROOT)/_aux/mk/7_flags-post.mk
 include $(DIR_ROOT)/_aux/mk/9_func.mk
@@ -99,7 +94,7 @@ LIBS_oracle			= "-lclntsh -lhcore"
 $(LIB_PREFIX)%.$(LIB_SUFFIX):
 	@if [ "x$(NAME)" = "x" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
 	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
-	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS)$(SONAME_$(NAME)) -o $(@) \
+	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS) @SONAME_FLAG@ -o $(@) \
 			@START_GROUP@ $(OBJS_$(NAME)) @END_GROUP@ $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n "$(RS)";)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)

@@ -18,6 +18,8 @@ AC_DEFUN([YAAL_DETECT_FLAGS],
 			FLAGS="[$]$1_save_FLAGS"
 			if test "x[$]$1_works" = "xyes"; then
 				$1="$ORIG $flag"
+			else
+				$1="$ORIG"
 			fi
 		fi
 	done
