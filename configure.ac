@@ -107,6 +107,7 @@ YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
 YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--fatal-warnings], [C++])
 YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--export-dynamic], [C++])
 YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--no-undefined], [C++])
+YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--enable-auto-import], [C++])
 YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
 if test ["x${START_GROUP}"] != ["x"] ; then
 	START_GROUP="-Wl\$(COMA)--start-group"
