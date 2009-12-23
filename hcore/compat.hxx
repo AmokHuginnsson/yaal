@@ -64,7 +64,8 @@ void* memrchr( void const*, int, int );
 #define SUN_LEN(x) ( ::std::strlen( x->sun_path ) + sizeof ( x->sun_family ) )
 #endif /* not HAVE_DECL_SUN_LEN */
 
-#if defined( ERR )
+#if ( HAVE_DECL_ERR == 1 )
+#include <cstdlib>
 #undef ERR
 #endif /* HAVE_DECL_SUN_LEN */
 

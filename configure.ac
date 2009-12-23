@@ -367,7 +367,7 @@ AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
 AC_CHECK_DECLS([floorl],[],[],[#include <cmath>])
 AC_CHECK_DECLS([SIGIOT],[],[],[#include <csignal>])
 AC_CHECK_DECLS([SUN_LEN],[],[],[#include <sys/un.h>])
-AC_CHECK_DECLS([ERR],[],[],[#include <limits.h>])
+AC_CHECK_DECLS([ERR],[],[],[#include <cstdlib>])
 AC_CHECK_DECLS([getaddrinfo],[],[],[#include <netdb.h>
 								#include<netinet/in.h>
 								#include<sys/socket.h>])

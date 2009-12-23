@@ -34,10 +34,10 @@ Copyright:
 #ifndef YAAL_HCORE_BASE_HXX_INCLUDED
 #define YAAL_HCORE_BASE_HXX_INCLUDED
 
+#include "hcore/compat.hxx"
 #include "hcore/hexception.hxx"
 #include "hcore/hstrongenum.hxx"
 #include "hcore/trait.hxx"
-#include "hcore/compat.hxx"
 
 /*! \mainpage yaal library documentation.
  *
