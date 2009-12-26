@@ -76,7 +76,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your operating system is Debian.])
 		HOST_OS_TYPE=[Debian]
-		SPECIAL_LINKER_FLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
+		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
 	fi
 	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
 		if test -f [/etc/rc] ; then
@@ -89,12 +89,12 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] ; then
 		AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your operating system is PLD.])
 		HOST_OS_TYPE=[PLD]
-		SPECIAL_LINKER_FLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
+		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
 	fi
 	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your operating system is Slackware.])
 		HOST_OS_TYPE=[Slackware]
-		SPECIAL_LINKER_FLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
+		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
 	fi
 	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/dfs/dfstab] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
@@ -104,8 +104,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 		AC_DEFINE([__HOST_OS_TYPE_WINDOWS__], [], [Your operating system is MS Windows.])
 		AC_SUBST([SYMBOL_PREFIX],[_])
 		SYMBOL_PREFIX=['"_"']
-		SPECIAL_LINKER_FLAGS=["-shared -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(NAME).\$(LIB_ARCHIVE_SUFFIX)"]
-		TARGET_LINKER_FLAGS=["-Wl\$(COMA)--enable-auto-import"]
+		YAAL_LXXGLAGS=["${YAAL_LXXGLAGS} -Wl,--export-all-symbols -Wl,--out-implib=lib\$(NAME).\$(LIB_ARCHIVE_SUFFIX)"]
 		HOST_OS_TYPE=[Windows]
 		LIB_PREFIX=["cyg"]
 		LIB_EXT=['"dll"']

@@ -50,3 +50,16 @@ LINKER_PRIME_FLAGS						= \
 								-Wl,--demangle
 
 # vim: ft=make
+COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I$(DIR_BUILD) -I$(VPATH) \
+																-I/usr/local/include
+LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib
+
+CXXFLAGS += $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
+						$(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) \
+						$(COMPILER_PROFILING_FLAGS) $(COMPILER_COVERAGE_FLAGS) \
+						$(COMPILER_PATH_FLAGS) $(CFLAGS) $(COMPILER_PRIME_FLAGS)
+
+# WARNING!! $(LINKER_PRIME_FLAGS) must be last option,
+# must be immediately followed by end of line
+LXXFLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PROFILING_FLAGS) \
+						$(LINKER_COVERAGE_FLAGS) $(LDFLAGS) $(LINKER_PRIME_FLAGS)

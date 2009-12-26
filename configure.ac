@@ -102,36 +102,37 @@ _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
 CPPFLAGS_ORIG=$CPPFLAGS;
 
-YAAL_DETECT_FLAGS(YAAL_CXXFLAGS, [-fPIC], [C++])
+YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
 YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
-YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--fatal-warnings], [C++])
-YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--export-dynamic], [C++])
-YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--no-undefined], [C++])
-YAAL_DETECT_FLAGS(YAAL_LXXFLAGS, [-Wl,--enable-auto-import], [C++])
+YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--fatal-warnings], [C++])
+YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--export-dynamic], [C++])
+YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--no-undefined], [C++])
+YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--enable-auto-import], [C++])
 YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
 YAAL_DETECT_FLAGS(SONAME_FLAG, [-Wl,-soname,foo], [C++])
 if test ["x${START_GROUP}"] != ["x"] ; then
-	START_GROUP="-Wl\$(COMA)--start-group"
-	END_GROUP="-Wl\$(COMA)--end-group"
+	END_GROUP="-Wl,--end-group"
 fi
 if test ["x${SONAME_FLAG}"] != ["x"] ; then
-	SONAME_FLAG="-Wl\$(COMA)-soname\$(COMA)\$(SONAME_\$(NAME))"
+	SONAME_FLAG="-Wl,-soname,\$(SONAME_\$(NAME))"
 fi
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])
 RESULT=["no"]
-AC_COMPILE_IFELSE([ ],[AC_SUBST([EXTRA_WARNINGS],[-Wextra])] [RESULT=["yes"]],
-							[AC_SUBST([EXTRA_WARNINGS],[-W])])
+AC_COMPILE_IFELSE([ ],
+							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -Wextra"]]
+							[RESULT=["yes"]],
+							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -W]"])
 AC_MSG_RESULT([$RESULT])
 CXXFLAGS=["-Wshadow -Werror"]
 AC_COMPILE_IFELSE([#include <pthread.h>],
-							[AC_SUBST([WARN_SHADOW],[-Wshadow])
+							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -Wshadow"]
 							_FLAGS=["-Wshadow"]],
 							[AC_MSG_WARN([[Cannot use -Wshadow!]])])
 CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["-pedantic-errors"]
 AC_COMPILE_IFELSE([#include <stdlib.h>],
-							[AC_SUBST([PEDANTIC_ERRORS],	[-pedantic-errors])
+							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors"]
 							_FLAGS=["$_FLAGS -pedantic-errors"]],
 							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
 CXXFLAGS=$CXXFLAGS_ORIG
@@ -382,7 +383,7 @@ dnl We need to check if out ncurses devel is not brain-damaged.
 AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
 AC_MSG_CHECKING([if your ncurses-devel is seriously brain-damaged])
 CXXFLAGS=$CXXFLAGS_ORIG
-CXXFLAGS=["$EXTRA_WARNINGS -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
+CXXFLAGS=["${EXTRA_CXXFLAGS} -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
 AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
 									 void f(){ printw("x");}],
 	[AC_MSG_RESULT([[no :)]])],
@@ -407,12 +408,12 @@ if test ["$ORACLE"] = ["no"] -a ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a
 	AC_MSG_WARN([yaal without any data base driver will be unusable for most professional purpouses.])
 fi
 
-AC_SUBST([SPECIAL_LINKER_FLAGS],["$SPECIAL_LINKER_FLAGS"])
-AC_SUBST([EXTRA_LIB_PATHS], ["$EXTRA_LIB_PATHS"])
-AC_SUBST([EXTRA_INCLUDE_PATHS], ["$EXTRA_INCLUDE_PATHS"])
-AC_SUBST([DEFAULT_DRIVER], ["$DEFAULT_DRIVER"])
-AC_SUBST([MYSQL_SOCKET],["$MYSQL_SOCKET"])
-AC_SUBST([YAAL_CXXFLAGS],[${YAAL_CXXFLAGS}])
+AC_SUBST([EXTRA_LIB_PATHS], [${EXTRA_LIB_PATHS}])
+AC_SUBST([EXTRA_INCLUDE_PATHS], [${EXTRA_INCLUDE_PATHS}])
+AC_SUBST([DEFAULT_DRIVER], [${DEFAULT_DRIVER}])
+AC_SUBST([MYSQL_SOCKET],[${MYSQL_SOCKET}])
+AC_SUBST([EXTRA_CXXFLAGS],[${EXTRA_CXXFLAGS}])
+AC_SUBST([EXTRA_LXXFLAGS],[${EXTRA_LXXFLAGS}])
 AC_SUBST([YAAL_LXXFLAGS],[${YAAL_LXXFLAGS}])
 AC_SUBST([START_GROUP],[${START_GROUP}])
 AC_SUBST([END_GROUP],[${END_GROUP}])

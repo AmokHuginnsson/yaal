@@ -50,16 +50,12 @@ include $(DIR_ROOT)/_aux/mk/2_term.mk
 include $(DIR_ROOT)/_aux/mk/3_suffix.mk
 include $(DIR_ROOT)/_aux/mk/4_wrapper.mk
 include $(DIR_ROOT)/_aux/mk/5_flags.mk
-CWARNING_FLAGS								+= @PEDANTIC_ERRORS@ @EXTRA_WARNINGS@ @WARN_SHADOW@
-COMPILER_PRIME_FLAGS					+= -D__YAAL_BUILD__ @YAAL_CXXFLAGS@ @DEFS@
-COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I$(DIR_BUILD) -I/usr/local/include \
-																@EXTRA_INCLUDE_PATHS@
-LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib \
-																@EXTRA_LIB_PATHS@
-LINKER_PRIME_FLAGS +=	-shared @YAAL_LXXFLAGS@
+CXXFLAGS+= -D__YAAL_BUILD__ @EXTRA_CXXFLAGS@ @DEFS@ \
+					-I$(DIR_ROOT) -I$(DIR_BUILD) -I/usr/local/include \
+					@EXTRA_INCLUDE_PATHS@
+LXXFLAGS+= -L. -L$(DIR_TARGET) -L/usr/local/lib @EXTRA_LIB_PATHS@ -shared @EXTRA_LXXFLAGS@ @YAAL_LXXFLAGS@
 
-include $(DIR_ROOT)/_aux/mk/7_flags-post.mk
-include $(DIR_ROOT)/_aux/mk/9_func.mk
+include $(DIR_ROOT)/_aux/mk/7_func.mk
 
 $(foreach IT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(IT))))
 SRCS := $(filter-out %_driver.$(SS),$(SRCS))
@@ -94,7 +90,7 @@ LIBS_oracle			= "-lclntsh -lhcore"
 $(LIB_PREFIX)%.$(LIB_SUFFIX):
 	@if [ "x$(NAME)" = "x" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
 	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
-	$(call invoke,$(LXX) $(LIBS) $(LINKER_FLAGS) @SONAME_FLAG@ -o $(@) \
+	$(call invoke,$(LXX) $(LIBS) $(LXXFLAGS) @SONAME_FLAG@ -o $(@) \
 			@START_GROUP@ $(OBJS_$(NAME)) @END_GROUP@ $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n "$(RS)";)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)
@@ -109,10 +105,10 @@ ifeq ($(LIB_PREFIX),lib)
 endif
 	@$(call msg,echo $(NONL) "done.$(CL)")
 
-include $(DIR_ROOT)/_aux/mk/d_implicit-compile.mk
+include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 #------------------------------------------------------------------------
 
-include $(DIR_ROOT)/_aux/mk/e_target-default.mk
+include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 
 #phony targets
 .PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags 
@@ -154,7 +150,7 @@ mrproper: clean
 | xargs /bin/rm -f; \
 	echo "done."
 
-include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
+include $(DIR_ROOT)/_aux/mk/d_target-tags.mk
 
 doc: $(SRCS) $(HDRS)
 	@doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'; \
@@ -170,6 +166,6 @@ flint:
 						hdata/*.$(SS) \
 | awk '{gsub(" \\(compare with line [^)]+\\)","");print}'|head -20
 
-include $(DIR_ROOT)/_aux/mk/g_deps.mk
+include $(DIR_ROOT)/_aux/mk/e_deps.mk
 
 # vim:ts=2
