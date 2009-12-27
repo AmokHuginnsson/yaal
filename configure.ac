@@ -137,9 +137,9 @@ AC_COMPILE_IFELSE([#include <cstdlib>],
 							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
 CXXFLAGS=$CXXFLAGS_ORIG
 if test ["$_FLAGS"] = [""] ; then
-	_FLAGS='unfortunetely none. ---         [[63%]]'
+	_FLAGS='none. ---                      [[76%]]'
 fi
-AC_MSG_RESULT([--- Guessed fetures are $_FLAGS])
+AC_MSG_RESULT([--- Guessed fetures are: $_FLAGS])
 
 YAAL_DETECT_FUNCTION_MACRO
 
