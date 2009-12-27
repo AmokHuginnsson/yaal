@@ -37,7 +37,7 @@ $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
 $$(REAL_TARGET): $$(OBJS_$(1)) $$(EXTRA_DEPS_$(1))
 	@$$(call msg,echo -n "Linking \`$$(@)' ... " && ) \
 	/bin/rm -f "$$(@)"; \
-	$$(call invoke,$$(LXX) $$(LINKER_FLAGS) $$(LINKER_FLAGS_$(1)) -o $$(@) $$(START_GROUP) $$(OBJS_$(1)) $$(END_GROUP) $$(LIBS) $$(LIBS_$(1)) 2>&1 | tee -a make.log )
+	$$(call invoke,$$(LXX) $$(LXXFLAGS) $$(LXXFLAGS_$(1)) -o $$(@) $$(START_GROUP) $$(OBJS_$(1)) $$(END_GROUP) $$(LIBS) $$(LIBS_$(1)) 2>&1 | tee -a make.log )
 ifdef DO_RELEASE
 	@strip $$(REAL_TARGET)
 endif

@@ -131,7 +131,7 @@ AC_COMPILE_IFELSE([#include <pthread.h>],
 							[AC_MSG_WARN([[Cannot use -Wshadow!]])])
 CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["-pedantic-errors"]
-AC_COMPILE_IFELSE([#include <stdlib.h>],
+AC_COMPILE_IFELSE([#include <cstdlib>],
 							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors"]
 							_FLAGS=["$_FLAGS -pedantic-errors"]],
 							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])

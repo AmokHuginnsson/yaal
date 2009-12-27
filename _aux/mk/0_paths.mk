@@ -10,7 +10,7 @@ define NEW_TARGET
 	TARGET_$(1) := $(1)
 	SRC_TARGET_$(1) := $(2)
 	COMPILER_FLAGS_TARGET_$(1) := $(3)
-	LINKER_FLAGS_TARGET_$(1) := $(4)
+	LXXFLAGS_TARGET_$(1) := $(4)
 	LIBS_TARGET_$(1) := $(5)
 	EXTRA_DEPS_TARGET_$(1) := $(6)
 	TARGETS := $$(TARGETS) TARGET_$(1)
