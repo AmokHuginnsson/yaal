@@ -60,7 +60,6 @@ AC_CONFIG_HEADERS([config.hxx])
 
 dnl Cheching for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
-AC_CANONICAL_HOST()
 AC_MSG_CHECKING([host dynamic linker])
 READELF=`whereis -b readelf | awk '{print $2}'`
 DYNAMIC_LINKER=`test "x${READELF}" != "x" && ${READELF} -l /usr/bin/readelf | awk 'BEGIN{FS=":"};/program interp/{gsub("[[]] ]","",$2);print $2}'`
@@ -281,7 +280,6 @@ int main( int, char const* const* const )
 AC_MSG_RESULT([$RESULT])
 
 DEFAULT_DRIVER=["null"]
-
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
 AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])

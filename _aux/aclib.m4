@@ -69,6 +69,7 @@ dnl --------------------------------------------------------------------------
 AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 [
 	AC_MSG_CHECKING([host operating system])
+	AC_CANONICAL_HOST
 	HOST_OS_TYPE=""
 	LIB_PREFIX=["lib"]
 	LIB_EXT=['"so"']
@@ -146,3 +147,20 @@ AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY],
 	AC_MSG_RESULT([${PHYS_MEM}])
 ])
 
+AC_DEFUN([YAAL_CHECK_GIT],
+[
+	AC_CHECK_PROG(HAS_GIT,[git],["true"],["false"])
+	AC_MSG_CHECKING([git id sub-command])
+	AC_SUBST(GITID,[true])
+	if test ["$HAS_GIT"] = ["true"] ; then
+		THIS_ID=`git id ${0}.ac 2> /dev/null`
+		if test ["x${THIS_ID}"] != ["x"] ; then
+			AC_SUBST(GITID,["git id"])
+			AC_MSG_RESULT([ok])
+		else
+			AC_MSG_WARN([not present])
+		fi
+	else
+		AC_MSG_WARN([no git in the first place])
+	fi
+])
