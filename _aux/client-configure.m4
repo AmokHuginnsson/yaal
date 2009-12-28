@@ -11,13 +11,10 @@ if test ["$CC"] = ["colorgcc"] ; then
 	CC=["gcc"]
 fi
 
-define([CLIENT_CONFIGURE_PROJECT_NAME],[])
-
 AC_DEFUN_ONCE([YAAL_CONFIGURE_CLIENT_INIT],
 [
 dnl Initialization data.
 
-define([CLIENT_CONFIGURE_PROJECT_NAME],[$1])
 define([CLIENT_CONFIGURE_PROJECT_NAME_UC],m4_toupper([$1]))
 
 dnl Unique file in project: projectnamerc is sample configuration file.
@@ -74,7 +71,7 @@ YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
 if test ["x${START_GROUP}"] != ["x"] ; then
 	END_GROUP="-Wl,--end-group"
 fi
-_FLAGS=''
+
 CXXFLAGS_ORIG=$CXXFLAGS;
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])
