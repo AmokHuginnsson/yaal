@@ -71,6 +71,7 @@ void* memrchr( void const*, int, int );
 
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
 #ifdef __YAAL_BUILD__
+#include <cstdlib>
 #include <netdb.h>
 int gethostbyname_r( char const*, struct hostent*, char*, size_t, struct hostent**, int* );
 #endif /* __YAAL_BUILD__ */
@@ -78,6 +79,7 @@ int gethostbyname_r( char const*, struct hostent*, char*, size_t, struct hostent
 
 #if ! defined( HAVE_GNU_GETHOSTBYADDR_R )
 #ifdef __YAAL_BUILD__
+#include <cstdlib>
 #include <netdb.h>
 int gethostbyaddr_r( void const*, int, int, struct hostent*, char*, size_t, struct hostent**, int* );
 #endif /* __YAAL_BUILD__ */
