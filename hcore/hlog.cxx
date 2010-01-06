@@ -273,14 +273,14 @@ int long HLog::do_write( void const* const a_pcString, int long const& a_lSize )
 		{
 		if ( f_bNewLine )
 			timestamp();
-		len = ::fputs( str, f_psStream );
+		len = static_cast<int>( ::std::fwrite( str, sizeof ( char ), a_lSize, f_psStream ) );
 		if ( str[ a_lSize - 1 ] != '\n' )
 			f_bNewLine = false;
 		else
 			{
 			f_bNewLine = true;
 			f_lType = 0;
-			M_ENSURE( ::fflush ( f_psStream ) == 0 );
+			M_ENSURE( ::std::fflush( f_psStream ) == 0 );
 			}
 		}
 	return ( len );
@@ -290,7 +290,7 @@ int long HLog::do_write( void const* const a_pcString, int long const& a_lSize )
 void HLog::do_flush( void ) const
 	{
 	M_PROLOG
-	M_ENSURE( ::fflush ( f_psStream ) == 0 );
+	M_ENSURE( ::std::fflush( f_psStream ) == 0 );
 	return;
 	M_EPILOG
 	}
