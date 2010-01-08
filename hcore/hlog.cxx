@@ -73,10 +73,10 @@ HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( tr
 			LOG_TYPE::NOTICE, static_cast<int long>( getpid() ) );
 	l_iUid = getuid();
 	passwd l_sPasswd;
-	long bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
+	long int bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
 	HChunk buf( xcalloc<char>( bsize + 1 ) );
 	passwd* any;
-	if ( ! getpwuid_r( l_iUid, &l_sPasswd, buf.get<char>(), bsize, &any ) )
+	if ( ! getpwuid_r( l_iUid, &l_sPasswd, buf.get<char>(), static_cast<int>( bsize ), &any ) )
 		f_oLoginName.set( xstrdup( l_sPasswd.pw_name ) );
 	else
 		{
@@ -128,7 +128,7 @@ void HLog::rehash( FILE* a_psStream,
 #ifdef HAVE_GETLINE 
 		while ( ::getline( &buf, &f_iBufferSize, l_psTmpFile ) > 0 )
 #else /* HAVE_GETLINE */
-		while ( ( l_iLen = ::fread( buf, sizeof ( char ), f_iBufferSize, l_psTmpFile ) ) )
+		while ( ( l_iLen = static_cast<int>( ::fread( buf, sizeof ( char ), f_iBufferSize, l_psTmpFile ) ) ) )
 #endif /* not HAVE_GETLINE */
 			{
 #ifndef HAVE_GETLINE
