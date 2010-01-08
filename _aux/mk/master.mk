@@ -25,12 +25,12 @@ FIND=find
 .NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc configure config.hxx.in
 
 .DEFAULT:
-	@$(MAKE) -f Makefile.mk.in $(@)
+	@$(MAKE) -f $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./_aux/empty) $(@)
 
 all: debug
 
-bin dep doc environment install static stats tags: debug .my_make
-	@$(MAKE) -f build/debug/Makefile.mk $(@)
+bin dep doc environment install static stats tags: .my_make
+	@$(MAKE) -f $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./_aux/empty) $(@)
 
 $(foreach T, $(MAIN_TARGETS), $(eval $(call PREPARE_MAIN_TARGET,$(T),$(OPT_$(T)))))
 
