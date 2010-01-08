@@ -226,6 +226,7 @@ public:
 	int on_tstp( int );
 	int on_cont( int );
 	int on_mouse( int );
+	static void set_escdelay( int );
 protected:
 	int c_vmvprintf ( int, int, char const* const, void* ) const;
 	int c_vcmvprintf ( int, int, int, char const* const, void* ) const;

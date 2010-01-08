@@ -27,8 +27,6 @@ Copyright:
 #include <cstdlib>
 #include <cstring>
 
-#include "config.hxx"
-
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hcore.hxx"
@@ -37,14 +35,6 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/htokenizer.hxx"
 #include "tools/tools.hxx"
 #include "console.hxx"
-
-#ifdef HAVE_CURSES_H
-#	include <curses.h>
-#elif defined ( HAVE_NCURSES_CURSES_H )
-#	include <ncurses/curses.h>
-#else /* HAVE_NCURSES_CURSES_H */
-#	error "No ncurses header available."
-#endif /* not HAVE_NCURSES_CURSES_H */
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -149,17 +139,17 @@ bool set_hconsole_variables( HString& a_roOption, HString& a_roValue )
 	{
 	M_PROLOG
 	if ( ! strcasecmp ( a_roOption, "set_env" ) )
-		set_env ( a_roValue );
+		set_env( a_roValue );
 	else if ( ! strcasecmp ( a_roOption, "attribute_disabled" ) )
-		set_color ( a_roValue, n_iAttributeDisabled );
+		set_color( a_roValue, n_iAttributeDisabled );
 	else if ( ! strcasecmp ( a_roOption, "attribute_enabled" ) )
-		set_color ( a_roValue, n_iAttributeEnabled );
+		set_color( a_roValue, n_iAttributeEnabled );
 	else if ( ! strcasecmp ( a_roOption, "attribute_focused" ) )
-		set_color ( a_roValue, n_iAttributeFocused );
+		set_color( a_roValue, n_iAttributeFocused );
 	else if ( ! strcasecmp ( a_roOption, "attribute_statusbar" ) )
-		set_color ( a_roValue, n_iAttributeStatusBar );
+		set_color( a_roValue, n_iAttributeStatusBar );
 	else if ( ! strcasecmp ( a_roOption, "attribute_search_highlight" ) )
-		set_color ( a_roValue, n_iAttributeSearchHighlight );
+		set_color( a_roValue, n_iAttributeSearchHighlight );
 	else
 		return ( true );
 	return ( false );
@@ -177,6 +167,7 @@ HConsoleInitDeinit::HConsoleInitDeinit( void )
 	{
 	M_PROLOG
 	errno = 0;
+	int escdelay( 0 );
 	yaalOptions( "use_mouse", program_options_helper::option_value( n_bUseMouse ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "enable mouse support" )
 		( "disable_XON", program_options_helper::option_value( n_bDisableXON ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable flow control events" )
 		( "leave_ctrl_c", program_options_helper::option_value( n_bLeaveCtrlC ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+C sequence" )
@@ -184,21 +175,22 @@ HConsoleInitDeinit::HConsoleInitDeinit( void )
 		( "leave_ctrl_s", program_options_helper::option_value( n_bLeaveCtrlS ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+S sequence" )
 		( "leave_ctrl_q", program_options_helper::option_value( n_bLeaveCtrlQ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+Q sequence" )
 		( "leave_ctrl_\\", program_options_helper::option_value( n_bLeaveCtrlBackSlash ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+\\ sequence" )
-		( "esc_delay", program_options_helper::option_value( ESCDELAY ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "ncurses escape sequence time span", "seconds" ) /* defined inside ncurses lib */
+		( "esc_delay", program_options_helper::option_value( escdelay ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "ncurses escape sequence time span", "seconds" ) /* defined inside ncurses lib */
 		( "latency", program_options_helper::option_value( n_iLatency ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "how often invoke idle event", "seconds" )
 		( "command_compose_character", program_options_helper::option_value( n_cCommandComposeCharacter ), HProgramOptionsHandler::OOption::TYPE::REQUIRED,
 			"character that shall be uses as command composition base", "character" )
 		( "command_compose_delay", program_options_helper::option_value( n_iCommandComposeDelay ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "command composition time span", "seconds" );
 	yaalOptions.process_rc_file( "yaal", "console", set_hconsole_variables );
+	HConsole::set_escdelay( escdelay );
 	return;
 	M_EPILOG
 	}
 
 #if defined( __DYNAMIC_LINKER__ )
-static char const g_pcDynamicLinkerPath [ ]
+static char const g_pcDynamicLinkerPath[]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
-void yaal_hconsole_banner ( void )
+void yaal_hconsole_banner( void )
 	{
 	fprintf ( stdout, "\thconsole\n" );
 	return;

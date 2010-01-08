@@ -43,6 +43,10 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hconsole.hxx"
 #include "console.hxx"
 
+/* curses system header is poluted with huge number of macros
+ * though it cannot be included at hte top together with rest of sane
+ * system headers. */
+
 #ifdef HAVE_CURSES_H
 #	include <curses.h>
 #elif defined ( HAVE_NCURSES_CURSES_H )
@@ -50,6 +54,8 @@ M_VCSID( "$Id: "__ID__" $" )
 #else /* HAVE_NCURSES_CURSES_H */
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_CURSES_H */
+
+#undef COLORS
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -736,6 +742,14 @@ int HConsole::on_mouse( int )
 	if ( is_enabled() )
 		leave_curses();
 	return ( 0 );
+	M_EPILOG
+	}
+
+void HConsole::set_escdelay( int escdelay_ )
+	{
+	M_PROLOG
+	ESCDELAY = escdelay_;
+	return;
 	M_EPILOG
 	}
 
