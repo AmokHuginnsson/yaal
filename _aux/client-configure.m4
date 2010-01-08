@@ -63,8 +63,9 @@ dnl What special compiler flags we can set?
 
 YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
 YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--fatal-warnings], [C++])
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--export-dynamic], [C++])
+YAAL_DETECT_FLAGS(FATAL_WARNINGS, [-Wl,--fatal-warnings], [C++])
+EXTRA_LXXFLAGS="${EXTRA_LXXFLAGS} ${FATAL_WARNINGS}"
+YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--export-dynamic], [C++], [${FATAL_WARNINGS}])
 YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--no-undefined], [C++])
 YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--enable-auto-import], [C++])
 YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])

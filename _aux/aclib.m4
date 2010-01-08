@@ -11,7 +11,7 @@ AC_DEFUN([YAAL_DETECT_FLAGS],
 	for flag in $2; do
 		if test -z "[$]$1"; then
 			$1_save_FLAGS="$FLAGS"
-			FLAGS="$FLAGS $flag -Werror"
+			FLAGS="$FLAGS $flag -Werror $4"
 			AC_MSG_CHECKING([whether COMPILER compiler understands [$]flag])
 			AC_LINK_IFELSE([int main( int, char** ) { return ( 0 ); }], [$1_works=yes], [$1_works=no])
 			AC_MSG_RESULT([$]$1_works)
