@@ -373,7 +373,7 @@ AC_CHECK_DECLS([getaddrinfo],[],[],[#include <netdb.h>
 								#include<sys/socket.h>])
 AC_MSG_CHECKING([whether powl is available])
 AC_COMPILE_IFELSE([#include<cmath>
-									 void f(){ ::powl( 0., 0. ); }],
+									 int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }],
 	[AC_DEFINE([HAVE_POWL],[1],[We have ::powl().]) AC_MSG_RESULT([yes])], AC_MSG_RESULT([no]))
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
@@ -384,16 +384,24 @@ AC_MSG_CHECKING([if your ncurses-devel is seriously brain-damaged])
 CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["${EXTRA_CXXFLAGS} -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
 AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
-									 void f(){ printw("x");}],
+									 int main( int, char** ) { printw("x"); return ( 0 ); }],
 	[AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_ERROR([Cannot continue with seriously brain-damaged ncurses.])])
 AC_MSG_CHECKING([if your ncurses is damaged about char-subscripts in ncurses (acs_map)])
 AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
-									 void f(){ addch(ACS_DARROW); }],
+									 int main( int, char** ) { addch(ACS_DARROW); return ( 0 ); }],
 	[AC_DEFINE([HAVE_ASCII_GRAPHICS],[],[Does your ncurses installation support ASCII graphic chars?]) AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_WARN([You will not have pretty ascii graphics.])])
+AC_MSG_CHECKING([type of attr_get second argument])
+AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
+									 int main( int, char** ){ attr_t a; int short p; attr_get( &a, &p, NULL ); return( 0 ); }],
+	[AC_DEFINE_UNQUOTED([NCURSES_ATTR_GET_SECOND_ARG_TYPE],[int short],[Type of second argument of attr_get() of ncurses library..]) AC_MSG_RESULT([[int short]])],
+	[AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
+	 int main( int, char** ){ attr_t a; int p; attr_get( &a, &p, NULL ); return( 0 ); }],
+	[AC_DEFINE_UNQUOTED([NCURSES_ATTR_GET_SECOND_ARG_TYPE],[int],[Type of second argument of attr_get() of ncurses library..]) AC_MSG_RESULT([[int]])],
+	[AC_MSG_ERROR([unknown type for second argument of attr_get in ncurses library!])])])
 
 FILES=["/etc/my.cnf /etc/mysql/my.cnf /usr/local/etc/my.cnf"]
 FILES=["$FILES /usr/local/etc/mysql/my.cnf /etc/mysqld.conf"]
