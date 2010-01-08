@@ -61,6 +61,7 @@ AC_MSG_RESULT([major $GCC_MAJOR, minor $GCC_MINOR. ])
 
 dnl What special compiler flags we can set?
 
+YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-m64], [C++])
 YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
 YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
 YAAL_DETECT_FLAGS(FATAL_WARNINGS, [-Wl,--fatal-warnings], [C++])
