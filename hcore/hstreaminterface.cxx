@@ -283,11 +283,12 @@ int long HStreamInterface::read_until( HString& a_roMessage,
 		{
 		M_ASSERT( f_iOffset >= 0 );
 		a_roMessage.assign( l_pcBuffer, f_iOffset - ( ( f_iOffset > 0 ) && a_bStripDelim ? 1 : 0 ) );
+		nRead = f_iOffset;
 		f_iOffset = 0;
 		}
 	else
 		a_roMessage.clear();
-	return ( nRead >= 0 ? f_iOffset : nRead );
+	return ( nRead );
 	M_EPILOG
 	}
 
