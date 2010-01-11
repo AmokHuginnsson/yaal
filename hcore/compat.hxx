@@ -57,7 +57,7 @@ char* strcasestr( char const*, char const* );
 #endif /* not HAVE_DECL_TEMP_FAILURE_RETRY */
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
-void* memrchr( void const*, int, int );
+void* memrchr( void const*, int, int long );
 #endif /* not HAVE_MEMRCHR */
 
 #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 )

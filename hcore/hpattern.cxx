@@ -228,7 +228,7 @@ char const* HPattern::matches( char const* const a_pcString,
 	M_PROLOG
 	M_ASSERT( a_pcString );
 	char const* l_pcPtr = NULL;
-	int l_iMatchLength = 0;
+	int long l_iMatchLength = 0;
 	regmatch_t l_sMatch;
 	if ( f_iSimpleMatchLength )
 		{

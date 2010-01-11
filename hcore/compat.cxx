@@ -52,7 +52,7 @@ Copyright:
 #include "xalloc.hxx"
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
-void* memrchr( void const* ptr, int what, int from )
+void* memrchr( void const* ptr, int what, int long from )
 	{
 	char const* str = static_cast<char const*>( ptr );
 	while ( -- from >= 0 )
