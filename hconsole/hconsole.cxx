@@ -138,17 +138,17 @@ void set_color( HString& a_roValue, int& a_riAttribute )
 bool set_hconsole_variables( HString& a_roOption, HString& a_roValue )
 	{
 	M_PROLOG
-	if ( ! strcasecmp ( a_roOption, "set_env" ) )
-		set_env( a_roValue );
-	else if ( ! strcasecmp ( a_roOption, "attribute_disabled" ) )
+	if ( ! strcasecmp( a_roOption, "set_env" ) )
+		decode_set_env( a_roValue );
+	else if ( ! strcasecmp( a_roOption, "attribute_disabled" ) )
 		set_color( a_roValue, n_iAttributeDisabled );
-	else if ( ! strcasecmp ( a_roOption, "attribute_enabled" ) )
+	else if ( ! strcasecmp( a_roOption, "attribute_enabled" ) )
 		set_color( a_roValue, n_iAttributeEnabled );
-	else if ( ! strcasecmp ( a_roOption, "attribute_focused" ) )
+	else if ( ! strcasecmp( a_roOption, "attribute_focused" ) )
 		set_color( a_roValue, n_iAttributeFocused );
-	else if ( ! strcasecmp ( a_roOption, "attribute_statusbar" ) )
+	else if ( ! strcasecmp( a_roOption, "attribute_statusbar" ) )
 		set_color( a_roValue, n_iAttributeStatusBar );
-	else if ( ! strcasecmp ( a_roOption, "attribute_search_highlight" ) )
+	else if ( ! strcasecmp( a_roOption, "attribute_search_highlight" ) )
 		set_color( a_roValue, n_iAttributeSearchHighlight );
 	else
 		return ( true );

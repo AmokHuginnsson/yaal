@@ -71,7 +71,7 @@ bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
 	{
 	M_PROLOG
 	if ( ! strcasecmp( a_roOption, "set_env" ) )
-		set_env( a_roValue );
+		decode_set_env( a_roValue );
 	else if ( ! strcasecmp( a_roOption, "log_mask" ) )
 		{
 		HTokenizer t( a_roValue, " \t" );
@@ -99,7 +99,17 @@ bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
 	M_EPILOG
 	}
 
-void set_env( HString line )
+void set_env( HString const& name_, HString const& value_, bool overwrite_ )
+	{
+	M_PROLOG
+	int const TRUE = 1;
+	int const FALSE = 0;
+	M_ENSURE( ::setenv( name_.raw(), value_.raw(), overwrite_ ? TRUE : FALSE ) == 0 );
+	return;
+	M_EPILOG
+	}
+
+void decode_set_env( HString line )
 	{
 	M_PROLOG
 	int long eon = 0;
@@ -117,10 +127,9 @@ void set_env( HString line )
 		log << line << '\'' << endl;
 		return;
 		}
-	int const TRUE = 1;
 	HString val = line.mid( valPos );
 	line.set_at( eon, '\0' );
-	M_ENSURE( ::setenv( line.raw(), val.raw(), TRUE ) == 0 );
+	set_env( line, val );
 	return;
 	M_EPILOG
 	}

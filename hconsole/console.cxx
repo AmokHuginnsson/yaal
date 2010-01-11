@@ -39,6 +39,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hlog.hxx"
+#include "hcore/hcore.hxx"
 #include "tools/tools.hxx"
 #include "hconsole.hxx"
 #include "console.hxx"
@@ -746,7 +747,7 @@ int HConsole::on_mouse( int )
 void HConsole::set_escdelay( int escdelay_ )
 	{
 	M_PROLOG
-	ESCDELAY = escdelay_;
+	set_env( "ESCDELAY", escdelay_ );
 	return;
 	M_EPILOG
 	}

@@ -46,7 +46,8 @@ namespace hcore
 
 extern HProgramOptionsHandler yaalOptions;
 bool eq( double long const&, double long const& );
-void set_env( HString );
+void set_env( HString const&, HString const&, bool = true );
+void decode_set_env( HString );
 
 /*! \brief Low-level run-time information regarding program execution.
  */

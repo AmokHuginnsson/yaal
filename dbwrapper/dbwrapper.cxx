@@ -60,7 +60,7 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 	{
 	M_PROLOG
 	if ( ! strcasecmp( a_roOption, "set_env" ) )
-		set_env( a_roValue );
+		decode_set_env( a_roValue );
 	else if ( ! strcasecmp( a_roOption, "log_mask" ) )
 		{
 		if ( ! strcasecmp( a_roValue, "LOG_SQL" ) )
@@ -68,7 +68,7 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 		else
 			return ( true );
 		}
-	else if ( ! strcasecmp ( a_roOption, "data_base_driver" ) )
+	else if ( ! strcasecmp( a_roOption, "data_base_driver" ) )
 		{
 		if ( ! ( strcasecmp( a_roValue, "none" )
 					&& strcasecmp( a_roValue, "null" )
