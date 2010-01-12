@@ -691,9 +691,10 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		conversion_t _converion;
 		} length[] = { { "hh", CONVERSION::BYTE },
 				{ "h", CONVERSION::SHORT },
-				{ "ll", CONVERSION::LONG_LONG },
 				{ "l", CONVERSION::LONG },
-				{ "L", CONVERSION::LONG } };
+				{ "ll", CONVERSION::LONG_LONG },
+				{ "q", CONVERSION::LONG_LONG },
+				{ "L", CONVERSION::LONG_LONG } };
 	int lenMod = -1;
 	for ( size_t k = 0; k < ( sizeof ( length ) / sizeof ( OLength ) ); ++ k )
 		{
@@ -752,16 +753,20 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		case ( 1 ):
 		case ( 2 ):
 		case ( 3 ):
+		case ( 4 ):
 			{
 			if ( !!( conversion & CONVERSION::INT ) )
 				conversion |= length[ lenMod ]._converion;
 			else
 				M_THROW( BAD_LEN_MOD, lenMod );
 			}
-		case ( 4 ):
+		break;
+		case ( 5 ):
 			{
-			if ( !!( conversion & CONVERSION::DOUBLE ) )
+			if ( !!( conversion & CONVERSION::DOUBLE ) ) 
 				conversion |= CONVERSION::LONG;
+			else if ( !!( conversion & CONVERSION::INT ) )
+				conversion |= CONVERSION::LONG_LONG;
 			else
 				M_THROW( BAD_LEN_MOD, lenMod );
 			}
