@@ -77,7 +77,7 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 
 /*! \brief gettext library API convenience macro.
  */
-#define _(string) gettext( string )
+#define _(string) dgettext( PACKAGE_NAME, string )
 
 /*! \cond */
 #define M_CONCAT_REAL( a, b ) a ## b

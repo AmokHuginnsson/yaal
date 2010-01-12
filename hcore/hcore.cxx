@@ -28,8 +28,8 @@ char const COPYRIGHT [ ] =
 
 #include <cstdlib>
 #include <cstring>
+#include <libintl.h>
 
-#include "config.hxx"
 #if defined( HAVE_EXECINFO_H )
 #include <execinfo.h>
 #endif /* HAVE_EXECINFO_H */
@@ -201,7 +201,10 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	STATIC_ASSERT( sizeof( u64_t ) == 8 );
 #endif
 	errno = 0;
-	char* l_pcEnv = ::getenv( "YAAL_DEBUG" );
+	char* l_pcGettextPath( ::getenv( "GETTEXT_PATH" ) );
+	if ( l_pcGettextPath )
+		bindtextdomain( PACKAGE_NAME, l_pcGettextPath );
+	char* l_pcEnv( ::getenv( "YAAL_DEBUG" ) );
 	if ( l_pcEnv )
 		n_iDebugLevel = lexical_cast<int>( l_pcEnv );
 	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::f_oSSLKey ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL private key file.", "path" )
