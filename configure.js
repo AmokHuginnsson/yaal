@@ -11,9 +11,10 @@ var globalMessageBuffer = "";
 var fs = null;
 var dirRoot = null;
 var withUt = false;
-var	ForReading = 1;
-var	ForWriting = 2;
-var	ForAppending = 8;
+var ForReading = 1;
+var ForWriting = 2;
+var ForAppending = 8;
+var FAST = 0;
 
 function checkKey( key ) {
 	var has = false;
@@ -120,9 +121,13 @@ function makeBoostDesc( boostInfo ) {
 }
 
 function msg( str ) {
-	globalMessageBuffer += str;
-	if ( str.charAt( str.length - 1 ) != '\n' )
-		globalMessageBuffer += "\n";
+	if ( ! FAST ) {
+		globalMessageBuffer += str;
+		if ( str.charAt( str.length - 1 ) != '\n' )
+			globalMessageBuffer += "\n";
+	} else {
+		WScript.echo( str );
+	}
 }
 
 function terminate( code ) {
@@ -159,8 +164,8 @@ try {
 	var BOOST_VERSION = null;
 	var EXTRA_INCLUDE_PATH = "";
 	var EXTRA_LIBRARY_PATH = "";
-	var SILENT    = 0;
-	var VISUAL_STUDIO_VERSION    = vcVersion();
+	var SILENT = 0;
+	var VISUAL_STUDIO_VERSION = vcVersion();
 
 	try {
 		var conf = fs.openTextFile( "local.js", ForReading );
@@ -183,6 +188,9 @@ try {
 			break;
 			case "BOOST_INSTALL_PATH":
 				BOOST_INSTALL_PATH = parts[1];
+			break;
+			case "VISUAL_STUDIO_VERSION":
+				VISUAL_STUDIO_VERSION = parts[1];
 			break;
 			case "SILENT":
 				SILENT=1;
@@ -222,7 +230,9 @@ try {
 	var env = shell.Environment( "USER" );
 	env( "CMAKE_INCLUDE_PATH" ) = EXTRA_INCLUDE_PATH;
 	env( "CMAKE_LIBRARY_PATH" ) = EXTRA_LIBRARY_PATH;
-	cmd = shell.exec( "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" " + CMAKELISTS_PATH );
+	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" " + CMAKELISTS_PATH;
+	msg( "Executing: " + cmdline );
+	cmd = shell.exec( cmdline );
 	msg( cmd.stdout.readAll() );
 	msg( cmd.stderr.readAll() );
 	if ( ! SILENT ) {
