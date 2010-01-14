@@ -191,6 +191,23 @@ public:
 	HCoreInitDeinit( void );
 	} initDeinit;
 
+void init_locale( char const* const package_ )
+	{
+	M_PROLOG
+	char* l_pcGettextPath( ::getenv( "GETTEXT_PATH" ) );
+	if ( l_pcGettextPath )
+		{
+		bindtextdomain( package_ ? package_ : PACKAGE_NAME, l_pcGettextPath );
+		if ( package_ )
+			{
+			textdomain( package_ );
+			setlocale( LC_ALL, "" );
+			}
+		}
+	return;
+	M_EPILOG
+	}
+
 HCoreInitDeinit::HCoreInitDeinit( void )
 	{
 	STATIC_ASSERT( sizeof( int ) >= 4 );
@@ -201,9 +218,7 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	STATIC_ASSERT( sizeof( u64_t ) == 8 );
 #endif
 	errno = 0;
-	char* l_pcGettextPath( ::getenv( "GETTEXT_PATH" ) );
-	if ( l_pcGettextPath )
-		bindtextdomain( PACKAGE_NAME, l_pcGettextPath );
+	init_locale();
 	char* l_pcEnv( ::getenv( "YAAL_DEBUG" ) );
 	if ( l_pcEnv )
 		n_iDebugLevel = lexical_cast<int>( l_pcEnv );

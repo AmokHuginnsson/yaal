@@ -67,6 +67,7 @@ struct execution_info
  * \param frames - numbers of frames to print.
  */
 void dump_call_stack( int const& frames );
+void init_locale( char const* const = NULL );
 void yaal_hcore_banner( void );
 
 }
