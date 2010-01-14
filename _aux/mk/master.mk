@@ -1,9 +1,11 @@
 -include .my_make
+COMA=,
+include _aux/mk/2_term.mk
 
 define PREPARE_MAIN_TARGET
 $(1): build/$(1)/Makefile.mk build/$(1)/config.hxx
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
-	$(2) $$(MAKE) -C $$(dir $$(<)) --no-print-directory -f Makefile.mk -e $$(@)
+	$$(call invoke,$(2) $$(MAKE) -C $$(dir $$(<)) --no-print-directory -f Makefile.mk -e $$(@))
 
 mrproper-$(1): clean-$(1)
 	@$$(if $$(wildcard build/$(1)/Makefile.mk), $$(MAKE) -C build/$(1) -f Makefile.mk -e mrproper && cd build && /bin/rm -rf $(1))
@@ -25,29 +27,31 @@ FIND=find
 .NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc configure config.hxx.in
 
 .DEFAULT:
-	@$(MAKE) -f $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./_aux/empty) $(@)
+	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
+	$(call invoke,$(MAKE) -C $(dir $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./)) -f $(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk))) ./_aux/empty) $(@))
 
 all: debug
 
 bin dep doc environment install static stats tags: .my_make
-	@$(MAKE) -f $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./_aux/empty) $(@)
+	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
+	$(call invoke,$(MAKE) -C $(dir $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./)) -f $(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk))) ./_aux/empty) $(@))
 
 $(foreach T, $(MAIN_TARGETS), $(eval $(call PREPARE_MAIN_TARGET,$(T),$(OPT_$(T)))))
 
 build/%/Makefile.mk: configure Makefile.mk.in
 	@$(eval DIR = $(dir $(@))) \
-	mkdir -p $(DIR) && cd $(DIR) && ../../configure && touch config.hxx Makefile.mk
+	$(call invoke,mkdir -p $(DIR) && cd $(DIR) && ../../configure $(CONFIGURE) && touch -c config.hxx Makefile.mk)
 
 build/%/config.hxx: configure config.hxx.in
 	@$(eval DIR = $(dir $(@))) \
-	mkdir -p $(DIR) && cd $(DIR) && ../../configure && touch config.hxx Makefile.mk
+	$(call invoke,mkdir -p $(DIR) && cd $(DIR) && ../../configure $(CONFIGURE) && touch -c config.hxx Makefile.mk)
 
 build/%/yaalrc: configure yaalrc.in
 	@$(eval DIR = $(dir $(@))) \
-	mkdir -p $(DIR) && cd $(DIR) && ../../configure && touch config.hxx Makefile.mk yaalrc
+	$(call invoke,mkdir -p $(DIR) && cd $(DIR) && ../../configure $(CONFIGURE) && touch -c config.hxx Makefile.mk yaalrc)
 
 configure config.hxx.in: configure.ac _aux/aclib.m4
-	@autoreconf && touch configure config.hxx.in
+	@$(call invoke,autoreconf && touch configure config.hxx.in)
 
 mrproper: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
 
@@ -64,7 +68,7 @@ purge: mrproper
 	if [ "x${OSTYPE}" != "xcygwin" ] ; then /bin/rm -f Makefile ; fi
 
 clean-dep:
-	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
+	@$(call invoke,$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f)
 
 .my_make:
 	@./_aux/guess_make

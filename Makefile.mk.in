@@ -156,7 +156,7 @@ doc: $(SRCS) $(HDRS)
 	cat doc/doxygen.css >> doc/html/doxygen.css
 
 stats:
-	@_aux/stats
+	@cd $(DIR_ROOT) && ./_aux/stats $(DIR_ROOT)
 
 flint:
 	@flint -b _aux/flint.lnt hcore/*.$(SS) hconsole/*.$(SS) tools/*.$(SS) \
