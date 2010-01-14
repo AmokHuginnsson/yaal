@@ -36,7 +36,7 @@ namespace yaal
 namespace tools
 {
 
-char const n_pcBase64EncodeTable[][65] = { "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+_" } ;
+char const n_pcBase64EncodeTable[][65] = { "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" } ;
 u8_t n_pcBase64DecodeTable[2][ 256 ];
 
 class HBase64DecodeTableInitializer
@@ -122,8 +122,9 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 		char ch = ptr[ i ];
 		M_ENSURE( ( ( ch >= 'A' ) && ( ch <= 'Z' ) )
 				|| ( ( ch >= 'a' ) && ( ch <= 'z' ) )
-				|| ( ( ch >= '0' ) && ( ch <= '9' ) ) || ( ch == '_' )
-				|| ( ! standardCompliantMode && ( ch == '-' ) ) || ( standardCompliantMode && ( ch == '+' ) ) );
+				|| ( ( ch >= '0' ) && ( ch <= '9' ) )
+				|| ( ! standardCompliantMode && ( ch == '-' ) ) || ( standardCompliantMode && ( ch == '+' ) )
+				|| ( ! standardCompliantMode && ( ch == '_' ) ) || ( standardCompliantMode && ( ch == '/' ) ) );
 		int shift = shifts[ i % 4 ];
 		coder |= ( n_pcBase64DecodeTable[standardCompliantMode ? 1 : 0][ static_cast<int>( ptr[ i ] ) ] << shift );
 		if ( ! shift )
@@ -151,7 +152,7 @@ yaal::hcore::HString base64::decode( yaal::hcore::HString const& message, bool s
 	M_EPILOG
 	}
 
-void base64::encode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInterface& out, bool standardCompliantMode )
+void base64::encode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInterface& out, bool standardCompliantMode, int wrap_ )
 	{
 	M_PROLOG
 	int const BASE64LINELEN = 57;
@@ -159,7 +160,7 @@ void base64::encode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	int long size( 0 );
 	while ( ( size = in.read( buf, sizeof ( buf ) ) ) > 0 )
 		{
-		out << base64_raw_encode( buf, size, standardCompliantMode ) << endl;
+		out << base64_raw_encode( buf, size, standardCompliantMode ) << ( wrap_ ? endl : flush );
 		}
 	return;
 	M_EPILOG
