@@ -104,7 +104,8 @@ CXXFLAGS=${CXXFLAGS_ORIG}
 
 dnl Now we can look for all needed libraries.
 
-CXXFLAGS="${CXXFLAGS} ${EXTRA_CXXFLAGS} ${EXTRA_LXXFLAGS}"
+CXXFLAGS="${CXXFLAGS} ${EXTRA_CXXFLAGS}"
+LDFLAGS="${LDFLAGS} ${EXTRA_LXXFLAGS}"
 CPPFLAGS=$CXXFLAGS;
 AC_SEARCH_LIBS([libintl_gettext],[intl],,[AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])])])
 AC_CHECK_LIB([ncurses],[initscr],

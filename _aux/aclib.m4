@@ -74,34 +74,42 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 	LIB_PREFIX=["lib"]
 	LIB_EXT=['"so"']
 	SYMBOL_PREFIX=['""']
-	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] ; then
+	AC_CHECK_PROG([LINUX_DISTRO],[lsb_release],[yes])
+	if test ["x${LINUX_DISTRO}"] = ["xyes"] ; then
+		HOST_OS_TYPE=`lsb_release -i|awk '/Distributor/{print [$]3}'`
+		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
+	fi
+	if test ["x${HOST_OS_TYPE}"] = ["xDebian"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] \) ; then
 		AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your operating system is Debian.])
 		HOST_OS_TYPE=[Debian]
 		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
-	fi
-	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
-		if test -f [/etc/rc] ; then
-			AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
-			HOST_OS_TYPE=[FreeBSD]
-		else
-			AC_SUBST([SERIAL_DEVICE],['ttyS0'])
-		fi
-	fi
-	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] ; then
+	elif test ["x${HOST_OS_TYPE}"] = ["xUbuntu"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/00-header] \) ; then
+		AC_DEFINE([__HOST_OS_TYPE_UBUNTU__], [], [Your operating system is Ubuntu.])
+		HOST_OS_TYPE=[Ubuntu]
+		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
+	elif test ["x${HOST_OS_TYPE}"] = ["xCentOS"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
+		AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your operating system is CentOS.])
+		HOST_OS_TYPE=[CentOS]
+		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
+	elif test ["x${HOST_OS_TYPE}"] = ["xPLD"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] \) ; then
 		AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your operating system is PLD.])
 		HOST_OS_TYPE=[PLD]
 		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
-	fi
-	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] ; then
+	elif test ["x${HOST_OS_TYPE}"] = ["xSlackware"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] \) ; then
 		AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your operating system is Slackware.])
 		HOST_OS_TYPE=[Slackware]
 		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
-	fi
-	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/dfs/dfstab] ; then
+	elif test ["x${HOST_OS_TYPE}"] != ["x"] ; then
+		HOST_OS_TYPE=[Linux]
+		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(NAME)_main\""]
+	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/rc] ; then
+		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
+		HOST_OS_TYPE=[FreeBSD]
+	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/dfs/dfstab] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
-	fi
-	if test ["x${HOST_OS_TYPE}"] = ["x"] -a -d [c:/windows] ; then
+	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -d [c:/windows] ; then
 		AC_DEFINE([__HOST_OS_TYPE_WINDOWS__], [], [Your operating system is MS Windows.])
 		AC_SUBST([SYMBOL_PREFIX],[_])
 		SYMBOL_PREFIX=['"_"']
@@ -118,7 +126,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
 		AC_MSG_ERROR([Cannot recognize host operating system type!])
 	else
-		AC_MSG_RESULT([$HOST_OS_TYPE])
+		AC_MSG_RESULT([Your system type is $HOST_OS_TYPE.])
 	fi
 ])
 
@@ -133,7 +141,7 @@ AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY],
 	fi
 	PHYS_MEM="0"
 	case "x${HOST_OS_TYPE}" in
-		xDebian|xPLD|xSlackware)
+		xDebian|xUbuntu|xCentOS|xPLD|xSlackware|xLinux)
 			PHYS_MEM=`free -m | awk '/^Mem:/{print [$]2}'`
 		;;
 		xFreeBSD)

@@ -55,9 +55,6 @@ dnl We select default language.
 AC_LANG([C++])
 CXXFLAGS=["-L/usr/local/lib -I/usr/local/include"]
 
-dnl Set up how configure will handle header checks.
-AC_CONFIG_HEADERS([config.hxx])
-
 dnl Cheching for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
 AC_MSG_CHECKING([host dynamic linker])
@@ -443,7 +440,9 @@ AH_BOTTOM([
 ])
 
 dnl We have to set up proper compiler/linker flags.
-AC_OUTPUT([Makefile.mk yaalrc])
+AC_CONFIG_HEADERS(config.hxx)
+AC_CONFIG_FILES([Makefile.mk yaalrc])
+AC_OUTPUT
 AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
 AC_MSG_RESULT([[Now you can type \`make'.]])
 
