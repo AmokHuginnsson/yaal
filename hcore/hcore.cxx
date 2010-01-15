@@ -29,6 +29,7 @@ char const COPYRIGHT [ ] =
 #include <cstdlib>
 #include <cstring>
 #include <libintl.h>
+#include <locale.h>
 
 #if defined( HAVE_EXECINFO_H )
 #include <execinfo.h>
