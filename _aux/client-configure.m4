@@ -35,17 +35,15 @@ YAAL_DETECT_OPERATING_SYSTEM
 YAAL_DETECT_PHYSICAL_MEMORY
 YAAL_CHECK_GIT
 
-dnl Testing presence of c compiler
-
-dnl and for c preprocesor
-AC_PROG_CC
-AC_PROG_CPP
-
 dnl Looking for main libc headers
 AC_HEADER_MAJOR
 
-dnl and for c++ preprocesor
+dnl Testing presence of C and C++ compiler
+AC_PROG_CC
 AC_PROG_CXX
+
+dnl and for C and C++ preprocesor
+AC_PROG_CPP
 AC_PROG_CXXCPP
 
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
