@@ -75,6 +75,8 @@ HBinaryFormatter operator << ( HStreamInterface& stream_, HBinaryFormatterSeed c
 	M_EPILOG
 	}
 
+HBinaryFormatterSeed bin;
+
 }
 
 }

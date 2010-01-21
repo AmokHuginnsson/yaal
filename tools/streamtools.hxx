@@ -63,7 +63,7 @@ class HBinaryFormatterSeed
 	{
 public:
 	HBinaryFormatter create( yaal::hcore::HStreamInterface* ) const;
-	} bin;
+	} extern bin;
 
 HBinaryFormatter operator << ( yaal::hcore::HStreamInterface&, HBinaryFormatterSeed const& );
 
