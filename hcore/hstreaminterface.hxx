@@ -72,6 +72,7 @@ public:
 			OCT
 			} enum_t;
 		};
+	typedef HStreamInterface& ( *manipulator_t )( HStreamInterface& );
 protected:
 	typedef yaal::hcore::HPool<char> cache_t;
 	cache_t f_oCache; /*!< Read buffer. */
@@ -96,7 +97,7 @@ public:
 	HStreamInterface& operator << ( double long const& );
 	HStreamInterface& operator << ( float const& );
 	HStreamInterface& operator << ( void const* const& );
-	HStreamInterface& operator << ( HStreamInterface& ( *const )( HStreamInterface& ) );
+	HStreamInterface& operator << ( manipulator_t const& );
 	HStreamInterface& operator << ( HManipulator const& );
 	HStreamInterface& operator >> ( HString& );
 	HStreamInterface& operator >> ( char& );

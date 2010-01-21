@@ -185,7 +185,7 @@ HStreamInterface& HStreamInterface::operator << ( void const* const& a_pvPtr )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( HStreamInterface& ( *const HFILE_INTERFACE )( HStreamInterface& ) )
+HStreamInterface& HStreamInterface::operator << ( manipulator_t const& HFILE_INTERFACE )
 	{
 	M_PROLOG
 	return ( HFILE_INTERFACE( *this ) );
