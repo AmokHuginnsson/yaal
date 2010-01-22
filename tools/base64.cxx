@@ -87,7 +87,7 @@ yaal::hcore::HString base64_raw_encode( char const* ptr, int long length, bool s
 	for ( int long i = 0; i < length; ++ i )
 		{
 		int shift = shifts[ i % 3 ];
-		coder |= ( ptr[ i ] << shift );
+		coder |= ( static_cast<u8_t>( ptr[ i ] ) << shift );
 		if ( ! shift )
 			{
 			do_buf_3_to_4( output, coder, standardCompliantMode ? 1 : 0 );
@@ -126,7 +126,7 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 				|| ( ! standardCompliantMode && ( ch == '-' ) ) || ( standardCompliantMode && ( ch == '+' ) )
 				|| ( ! standardCompliantMode && ( ch == '_' ) ) || ( standardCompliantMode && ( ch == '/' ) ) );
 		int shift = shifts[ i % 4 ];
-		coder |= ( n_pcBase64DecodeTable[standardCompliantMode ? 1 : 0][ static_cast<int>( ptr[ i ] ) ] << shift );
+		coder |= ( n_pcBase64DecodeTable[standardCompliantMode ? 1 : 0][ static_cast<u8_t>( ptr[ i ] ) ] << shift );
 		if ( ! shift )
 			{
 			do_buf_4_to_3( output + size, coder );
