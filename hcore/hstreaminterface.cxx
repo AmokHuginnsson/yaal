@@ -255,6 +255,14 @@ int long HStreamInterface::read_until( HString& a_roMessage,
 		char const* const a_pcStopSet, bool a_bStripDelim )
 	{
 	M_PROLOG
+	return ( read_until_n( a_roMessage, meta::max_signed<int long>::value, a_pcStopSet, a_bStripDelim ) );
+	M_EPILOG
+	}
+
+int long HStreamInterface::read_until_n( HString& a_roMessage, int long const& a_lMaxCount,
+		char const* const a_pcStopSet, bool a_bStripDelim )
+	{
+	M_PROLOG
 	int long nRead = 0; /* how many bytes were read in this single invocation */
 	int long iPoolSize = f_oCache.size();
 	char* l_pcBuffer = f_oCache.raw(); /* read cache buffer */
@@ -278,7 +286,7 @@ int long HStreamInterface::read_until( HString& a_roMessage,
 		 * nRead < 0 - an error occured, read opration could be externally interrupted.
 		 */
 		}
-	while ( ( nRead > 0 ) && ! ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ++ ] ) );
+	while ( ( nRead > 0 ) && ( ! ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ] ) ) && ( ( ++ f_iOffset ) < a_lMaxCount ) );
 	if ( nRead >= 0 )
 		{
 		M_ASSERT( f_iOffset >= 0 );

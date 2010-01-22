@@ -116,10 +116,18 @@ public:
 	 * \param store - Store read date here.
 	 * \param delim - Stop reading data at any character in this set.
 	 * \param strip - Remove delimiting stop char from output buffer.
-	 * \retval code - status of operation.
-	 * \retval octets - number of bytes read so far.
+	 * \return number of bytes read.
 	 */
 	int long read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
+	/*! \brief Read data from stream until end of it or until delimiter is encountered or enough data has been acquired.
+	 *
+	 * \param store - Store read date here.
+	 * \param maxcount - A maximum number of bytes to read.
+	 * \param delim - Stop reading data at any character in this set.
+	 * \param strip - Remove delimiting stop char from output buffer.
+	 * \return number of bytes read.
+	 */
+	int long read_until_n( yaal::hcore::HString& store, int long const& maxcount, char const* const delim = eols, bool strip = true );
 	int long read( void* const, int long const& );
 	int long write( void const* const, int long const& );
 	static char const* const eols;

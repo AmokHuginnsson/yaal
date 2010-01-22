@@ -155,13 +155,42 @@ yaal::hcore::HString base64::decode( yaal::hcore::HString const& message, bool s
 void base64::encode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInterface& out, bool standardCompliantMode, int wrap_ )
 	{
 	M_PROLOG
+	M_ENSURE( wrap_ >= 0 );
 	int const BASE64LINELEN = 57;
 	char buf[BASE64LINELEN];
 	int long size( 0 );
+	HString line( 80, true );
+	int long offset( 0 );
+	bool needEndl( false );
 	while ( ( size = in.read( buf, sizeof ( buf ) ) ) > 0 )
 		{
-		out << base64_raw_encode( buf, size, standardCompliantMode ) << ( wrap_ ? endl : flush );
+		line = base64_raw_encode( buf, size, standardCompliantMode );
+		int long nRead( line.get_length() );
+		if ( wrap_ )
+			{
+			char const* ptr = line.raw();
+			while ( ( offset + nRead ) >= wrap_ )
+				{
+				int long nWrite( wrap_ - offset );
+				out.write( ptr, nWrite );
+				ptr += nWrite;
+				nRead -= nWrite;
+				offset = 0;
+				out << endl;
+				needEndl = false;
+				}
+			if ( nRead > 0 )
+				{
+				out.write( ptr, nRead );
+				offset = nRead;
+				needEndl = true;
+				}
+			}
+		else
+			out << line << flush;
 		}
+	if ( wrap_ && needEndl )
+		out << endl;
 	return;
 	M_EPILOG
 	}

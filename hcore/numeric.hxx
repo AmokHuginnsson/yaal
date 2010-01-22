@@ -193,6 +193,19 @@ struct less
 	static bool const value = val1 < val2;
 	};
 
+/*! \brief Get maximum positive number for a given type.
+ *
+ * \tparam T - type to get maximum positive number.
+ * \retval value - a maximum positive number that can be fit into variable of type T.
+ */
+template<typename T>
+struct max_signed
+	{
+	static T const value = static_cast<T>( ~( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) ) );
+	};
+template<typename T>
+T const max_signed<T>::value;
+
 }
 
 }
