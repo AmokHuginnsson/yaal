@@ -266,6 +266,8 @@ int long HStreamInterface::read_until_n( HString& a_roMessage, int long const& a
 	int long nRead = 0; /* how many bytes were read in this single invocation */
 	int long iPoolSize = f_oCache.size();
 	char* l_pcBuffer = f_oCache.raw(); /* read cache buffer */
+	bool byDelim( false );
+	bool bySize( false );
 	do
 		{
 		/* Let's check if next read wont exceed size of our read buffer.
@@ -285,12 +287,14 @@ int long HStreamInterface::read_until_n( HString& a_roMessage, int long const& a
 		 * nRead == 0 - stream is blocking and has just been closed or has no data to read and is internally non-blocking.
 		 * nRead < 0 - an error occured, read opration could be externally interrupted.
 		 */
+		byDelim = ( ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ++ ] ) ? true : false );
+		bySize = ( f_iOffset >= a_lMaxCount );
 		}
-	while ( ( nRead > 0 ) && ( ! ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ] ) ) && ( ( ++ f_iOffset ) < a_lMaxCount ) );
+	while ( ( nRead > 0 ) && ( ! byDelim ) && ( ! bySize ) );
 	if ( nRead >= 0 )
 		{
 		M_ASSERT( f_iOffset >= 0 );
-		a_roMessage.assign( l_pcBuffer, f_iOffset - ( ( f_iOffset > 0 ) && a_bStripDelim ? 1 : 0 ) );
+		a_roMessage.assign( l_pcBuffer, f_iOffset - ( ( ( f_iOffset > 0 ) && a_bStripDelim && byDelim ) ? 1 : ( nRead ? 0 : 1 ) ) );
 		nRead = f_iOffset;
 		f_iOffset = 0;
 		}
