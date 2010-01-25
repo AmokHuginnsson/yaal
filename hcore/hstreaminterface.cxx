@@ -287,14 +287,14 @@ int long HStreamInterface::read_until_n( HString& a_roMessage, int long const& a
 		 * nRead == 0 - stream is blocking and has just been closed or has no data to read and is internally non-blocking.
 		 * nRead < 0 - an error occured, read opration could be externally interrupted.
 		 */
-		byDelim = ( ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ++ ] ) ? true : false );
-		bySize = ( f_iOffset >= a_lMaxCount );
 		}
-	while ( ( nRead > 0 ) && ( ! byDelim ) && ( ! bySize ) );
+	while ( ( nRead > 0 )
+			&& ( ! ( byDelim = ( ::strchr( a_pcStopSet, l_pcBuffer[ f_iOffset ++ ] ) ? true : false ) ) ) /* We increment f_iOffset only if read succeeded. */
+			&& ( ! ( bySize = ( f_iOffset >= a_lMaxCount ) ) ) );
 	if ( nRead >= 0 )
 		{
 		M_ASSERT( f_iOffset >= 0 );
-		a_roMessage.assign( l_pcBuffer, f_iOffset - ( ( ( f_iOffset > 0 ) && a_bStripDelim && byDelim ) ? 1 : ( nRead ? 0 : 1 ) ) );
+		a_roMessage.assign( l_pcBuffer, f_iOffset - ( ( ( f_iOffset > 0 ) && a_bStripDelim && byDelim ) ? 1 : 0 ) );
 		nRead = f_iOffset;
 		f_iOffset = 0;
 		}
