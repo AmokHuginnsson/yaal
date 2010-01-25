@@ -24,9 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cctype>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "base64.hxx"
+#include "hcore/hformat.hxx"
 
 using namespace yaal::hcore;
 
@@ -107,6 +110,16 @@ yaal::hcore::HString base64::encode( yaal::hcore::HString const& message, bool s
 	M_EPILOG
 	}
 
+bool is_base64_character( char ch_, bool standardCompliantMode_ )
+	{
+	return ( ( ( ch_ >= 'A' ) && ( ch_ <= 'Z' ) )
+				|| ( ( ch_ >= 'a' ) && ( ch_ <= 'z' ) )
+				|| ( ( ch_ >= '0' ) && ( ch_ <= '9' ) )
+				|| ( ! standardCompliantMode_ && ( ch_ == '-' ) ) || ( standardCompliantMode_ && ( ch_ == '+' ) )
+				|| ( ! standardCompliantMode_ && ( ch_ == '_' ) ) || ( standardCompliantMode_ && ( ch_ == '/' ) )
+				|| ( ch_ == '=' ) );
+	}
+
 int long base64_raw_decode( yaal::hcore::HString const& message, char* output, int long bufSize, bool standardCompliantMode )
 	{
 	M_PROLOG
@@ -120,11 +133,7 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 	for ( ; ( i < length ) && ( ptr[ i ] != '=' ); ++ i )
 		{
 		char ch = ptr[ i ];
-		M_ENSURE( ( ( ch >= 'A' ) && ( ch <= 'Z' ) )
-				|| ( ( ch >= 'a' ) && ( ch <= 'z' ) )
-				|| ( ( ch >= '0' ) && ( ch <= '9' ) )
-				|| ( ! standardCompliantMode && ( ch == '-' ) ) || ( standardCompliantMode && ( ch == '+' ) )
-				|| ( ! standardCompliantMode && ( ch == '_' ) ) || ( standardCompliantMode && ( ch == '/' ) ) );
+		M_ENSURE( is_base64_character( ch, standardCompliantMode ) );
 		int shift = shifts[ i % 4 ];
 		coder |= ( n_pcBase64DecodeTable[standardCompliantMode ? 1 : 0][ static_cast<u8_t>( ptr[ i ] ) ] << shift );
 		if ( ! shift )
@@ -199,16 +208,30 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	{
 	M_PROLOG
 	int const BASE64LINELEN = 76;
-	char buf[BASE64LINELEN];
+	int const BUF_LEN = 80;
+	char buf[BUF_LEN];
 	int long size( 0 );
-	HString line;
-	while ( in.read_until( line ) )
+	HString line( BUF_LEN, true );
+	HString decodebuf( BASE64LINELEN + 1, true );
+	int long pos( 0 );
+	while ( in.read_until_n( line, BUF_LEN ) )
 		{
-		if ( line.is_empty() )
-			continue;
-		M_ENSURE( line.get_length() <= BASE64LINELEN );
-		size = base64_raw_decode( line, buf, sizeof ( buf ), standardCompliantMode );
-		out.write( buf, size );
+		char const* const ptr = line.raw();
+		int const SIZE = static_cast<int>( line.get_length() );
+		for ( int i = 0; i < SIZE; ++ i, ++ pos )
+			{
+			char ch = ptr[ i ];
+			M_ENSURE_EX( is_base64_character( ch, standardCompliantMode ) || isalpha( ch ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
+			if ( is_base64_character( ch, standardCompliantMode	) )
+				decodebuf += ch;
+			if ( decodebuf.get_length() >= BASE64LINELEN )
+				{
+				M_ASSERT( decodebuf.get_length() == BASE64LINELEN );
+				size = base64_raw_decode( decodebuf, buf, sizeof ( buf ), standardCompliantMode );
+				out.write( buf, size );
+				decodebuf.clear();
+				}
+			}
 		}
 	return;
 	M_EPILOG

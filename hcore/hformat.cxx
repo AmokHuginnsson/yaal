@@ -408,6 +408,23 @@ HString HFormat::format( void ) const
 	return ( _impl->_format );
 	}
 
+HFormat HFormat::operator % ( char const& c )
+	{
+	M_PROLOG
+	M_ENSURE( ! _impl->_format.is_empty() );
+	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::CHAR ) );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( c ) ) );
+	return ( _impl );
+	M_EPILOG
+	}
+
+HFormat HFormat::operator % ( char unsigned const& cu )
+	{
+	M_PROLOG
+	return ( operator % ( static_cast<char>( cu ) ) );
+	M_EPILOG
+	}
+
 HFormat HFormat::operator % ( int short const& is )
 	{
 	M_PROLOG
