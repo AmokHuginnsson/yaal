@@ -168,6 +168,7 @@ public:
 	tType* raw( void );
 	bool operator! ( void ) const;
 	void swap( HPointer& );
+	void reset( void );
 private:
 	bool release( void ) throw();
 	template<typename hier_t, template<typename, typename> class alien_access_t>
@@ -296,7 +297,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>::~HPointer( void )
 	{
-	f_poShared && release();
+	reset();
 	return;
 	}
 
@@ -371,6 +372,7 @@ template<typename hier_t>
 void HPointer<tType, pointer_type_t, access_type_t>::assign( tType*& to, hier_t* from )
 	{
 	to = dynamic_cast<tType*>( from );
+	return;
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
@@ -378,6 +380,7 @@ template<typename tType, template<typename>class pointer_type_t,
 void HPointer<tType, pointer_type_t, access_type_t>::assign( tType*& to, tType* from )
 	{
 	to = from;
+	return;
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
@@ -407,6 +410,16 @@ bool HPointer<tType, pointer_type_t, access_type_t>::release( void ) throw()
 		f_poShared = NULL;
 		}
 	return ( ! ( f_poShared && f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] ) );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
+void HPointer<tType, pointer_type_t, access_type_t>::reset( void )
+	{
+	f_poShared && release();
+	f_poShared = NULL;
+	f_ptObject = NULL;
+	return;
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
@@ -533,6 +546,7 @@ void HPointerStrict<tType, pointer_type_t>::initialize_from_this( HPointerFromTh
 		ptr_t const& ptr )
 	{
 	obj->initialize_observer( ptr );
+	return;
 	}
 
 template<typename tType, typename pointer_type_t>
@@ -540,6 +554,7 @@ template<typename ptr_t>
 void HPointerStrict<tType, pointer_type_t>::initialize_from_this( void*,
 		ptr_t const& )
 	{
+	return;
 	}
 
 template<typename tType>
@@ -552,6 +567,7 @@ template<typename tType>
 void HPointerFromThisInterface<tType>::initialize_observer( ptr_t const& a_oFirstOwner )
 	{
 	f_oSelfObserver = a_oFirstOwner;
+	return;
 	}
 
 template<typename tType>

@@ -138,7 +138,10 @@ int HWorkFlow::HWorker::operator()( yaal::hcore::HThread const* )
 	M_PROLOG
 	HWorkFlow::task_t t;
 	while ( !! ( t = f_poWorkFlow->pop_task() ) )
+		{
 		t->invoke();
+		t.reset();
+		}
 	return ( 0 );
 	M_EPILOG
 	}
