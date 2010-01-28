@@ -22,27 +22,27 @@ endif
 # implict pattern rule
 
 $$($(1))/%.$$(DS): $$(SRC_$(1))/%.$$(SS)
-	@$$(call msg,echo -n "$$($$(CURR_DEP_PROGRESS_INDICATOR))$$(DEP_PROGRESS_INDICATOR_SUFFIX)$$(eval $$(call PROGRESS_INDICATOR))" && ) \
+	@$$(call msg,printf "%b" "$$($$(CURR_DEP_PROGRESS_INDICATOR))$$(DEP_PROGRESS_INDICATOR_SUFFIX)$$(eval $$(call PROGRESS_INDICATOR))" && ) \
 	/bin/rm -f "$$(@)"; \
 	$$(DXX) $$(CXXFLAGS) $$(COMPILER_FLAGS_$(1)) -MM $$(<) -MT $$(@:.$$(DS)=.$$(OS)) -MT $$(@) -MF $$(@) \
-	$(call msg,&& echo -n "$(DEP_CL)")
+	$$(call msg,&& printf "%b" "$(DEP_CL)")
 
 $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
-	@$$(call msg,echo -n "$$($$(CURR_PROGRESS_INDICATOR))$$(eval $$(call PROGRESS_INDICATOR))Compiling \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... " && ) \
+	@$$(call msg,printf "%b" "$$($$(CURR_PROGRESS_INDICATOR))$$(eval $$(call PROGRESS_INDICATOR))Compiling \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... " && ) \
 	/bin/rm -f "$$(@)"; \
 	$$(call invoke,$$(CXX) $$(CXXFLAGS) $$(COMPILER_FLAGS_$(1)) -D__ID__="\"$$(<) $$(shell $$(GITID) ./$$(subst . /,./,$$(foreach IT,$$(subst /, ,$$(subst $$(DIR_ROOT),,$$(DIR_BUILD))),/..))/$$(subst $$(DIR_ROOT)/,,$$(<)))\"" $$(<) -c -o $$(@) 2>&1 | tee -a make.log ) && \
 	test -f $$(@) \
-	$$(call msg,&& echo $$(NONL) "done.$$(CL)")
+	$$(call msg,&& printf "%b$$(NL)" "done.$$(CL)")
 
 $$(REAL_TARGET): $$(OBJS_$(1)) $$(EXTRA_DEPS_$(1))
-	@$$(call msg,echo -n "Linking \`$$(@)' ... " && ) \
+	@$$(call msg,printf "%b" "Linking \`$$(@)' ... " && ) \
 	/bin/rm -f "$$(@)"; \
 	$$(call invoke,$$(LXX) $$(LXXFLAGS) $$(LXXFLAGS_$(1)) -o $$(@) $$(START_GROUP) $$(OBJS_$(1)) $$(END_GROUP) $$(LIBS) $$(LIBS_$(1)) 2>&1 | tee -a make.log )
 ifdef DO_RELEASE
 	@strip $$(REAL_TARGET)
 endif
 	@test -f $$(@) \
-	$$(call msg,&& echo $$(NONL) "done.$$(CL)")
+	$$(call msg,&& printf "%b$$(NL)" "done.$$(CL)")
 
 endef
 

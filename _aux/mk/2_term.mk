@@ -1,5 +1,5 @@
 ifeq ($(VERBOSE),yes)
-invoke = echo "$(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))" && $(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
+invoke = printf "%b$(NL)" "$(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))" && $(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
 msg =
 else
 invoke = $(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
@@ -8,11 +8,11 @@ endif
 
 ifeq ($(TERMINAL),TERM)
 
-CL						:= $(shell tput cr;tput dl1)
-BOLD					:= $(shell tput bold || tput md)
-RED						:= $(shell tput setaf 1 || tput AF 1)
-RS						:= $(shell tput sgr0 || tput me)
-NONL					:= "-n"
+CL   := $(shell tput cr;tput dl1)
+BOLD := $(shell tput bold || tput md)
+RED  := $(shell tput setaf 1 || tput AF 1)
+RS   := $(shell tput sgr0 || tput me)
+NL   := ""
 
 PROGRESS_INDICATOR_0=\\ 
 PROGRESS_INDICATOR_1=| 
@@ -35,12 +35,12 @@ endef
 
 else
 
-NEWLINE=\n
+NL=\n
 PROGRESS_INDICATOR_0=.
 PROGRESS_INDICATOR_ONCE=Generating dependencies 
 NEXT_PROGRESS_INDICATOR_ONCE=PROGRESS_INDICATOR_0
 NEXT_PROGRESS_INDICATOR_0=PROGRESS_INDICATOR_0
-CURR_PROGRESS_INDICATOR=NEWLINE
+CURR_PROGRESS_INDICATOR=NL
 CURR_DEP_PROGRESS_INDICATOR=PROGRESS_INDICATOR_ONCE
 
 define PROGRESS_INDICATOR

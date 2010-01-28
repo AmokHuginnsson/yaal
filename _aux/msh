@@ -26,28 +26,28 @@
 
 line=`grep -s LD_LIBRARY_PATH ~/.profile ~/.bashrc ~/.bash_profile ~/.cshrc ~/.tcshrc ~/.login ~/.zshrc ~/.zlogin ~/.zshenv ~/.zsh/zlogin ~/.zsh/zshrc ~/.zsh/zshenv`
 if [ "x$line" != "x" ] ; then
-	echo "Environment have been already set."
+	printf "%b\n" "Environment have been already set."
 	exit 1
 fi
 
-echo "Compilation have been finished !"
-echo "It is need to be added seweral lines to your .SHELLrc file :"
-echo "#v+"
-echo "set LIBRARY_PATH=~/usr/lib"
-echo "set C_INCLUDE_PATH=~/usr/include"
-echo "set CPLUS_INCLUDE_PATH=~/usr/include"
-echo "set OBJC_INCLUDE_PATH=~/usr/include"
-echo "set LD_LIBRARY_PATH=~/usr/lib"
-echo "#v-"
-echo "or for C shell :"
-echo "#v+"
-echo "setenv LIBRARY_PATH ~/usr/lib"
-echo "setenv C_INCLUDE_PATH ~/usr/include"
-echo "setenv CPLUS_INCLUDE_PATH ~/usr/include"
-echo "setenv OBJC_INCLUDE_PATH ~/usr/include"
-echo "setenv LD_LIBRARY_PATH ~/usr/lib"
-echo "#v-"
-echo -n "Do it now ? (yes/[no]) "
+printf "%b\n" "Compilation have been finished !"
+printf "%b\n" "It is need to be added seweral lines to your .SHELLrc file :"
+printf "%b\n" "#v+"
+printf "%b\n" "set LIBRARY_PATH=~/usr/lib"
+printf "%b\n" "set C_INCLUDE_PATH=~/usr/include"
+printf "%b\n" "set CPLUS_INCLUDE_PATH=~/usr/include"
+printf "%b\n" "set OBJC_INCLUDE_PATH=~/usr/include"
+printf "%b\n" "set LD_LIBRARY_PATH=~/usr/lib"
+printf "%b\n" "#v-"
+printf "%b\n" "or for C shell :"
+printf "%b\n" "#v+"
+printf "%b\n" "setenv LIBRARY_PATH ~/usr/lib"
+printf "%b\n" "setenv C_INCLUDE_PATH ~/usr/include"
+printf "%b\n" "setenv CPLUS_INCLUDE_PATH ~/usr/include"
+printf "%b\n" "setenv OBJC_INCLUDE_PATH ~/usr/include"
+printf "%b\n" "setenv LD_LIBRARY_PATH ~/usr/lib"
+printf "%b\n" "#v-"
+printf "%b" "Do it now ? (yes/[no]) "
 read ANSWER
 if [ -f yaalrc ] ; then
 	cd _aux
@@ -82,17 +82,17 @@ if [ "$ANSWER" ] ; then
 				;;
 		esac
 	else
-		echo "Remember to add this lines so that libraries could work properly"
+		printf "%b\n" "Remember to add this lines so that libraries could work properly"
 	fi
 else
-	echo "Remember to add this lines so that libraries could work properly"
+	printf "%b\n" "Remember to add this lines so that libraries could work properly"
 fi
 source ./shellrc 2>/dev/null
 source ./shellrc.csh 2>/dev/null
 if [ -f shellrc ] ; then
 	cd ..
 fi
-echo "Installation process ends."
+printf "%b\n" "Installation process ends."
 
 exit 0
 

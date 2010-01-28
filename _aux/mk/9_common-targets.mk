@@ -28,12 +28,12 @@ clean: clean-dep
 	@sh -c '. $(DIR_ROOT)/_aux/clean-lib.sh && clean .'
 
 mrproper: clean
-	@echo -n "Purging ... "; \
+	@printf "%b" "Purging ... "; \
 	/bin/rm -f version.hxx src/.gt_* src/tags 1exec.core; \
 	/bin/rm -rf src/1exec.core $(PRJNAME) $(DIR_BUILD); \
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
-	echo "done."
+	printf "%b\n" "done."
 
 purge: mrproper
 	/bin/rm -rf autom4te.cache build config.cache config.status \
@@ -46,9 +46,9 @@ bin:
 	@( DO_RELEASE=1 $(MAKE) ; make clean )
 
 install: $(TARGET)
-	@echo "i: you need to become root to do this"
+	@printf "%b\n" "i: you need to become root to do this"
 	@install -c -g root -o root -m=u=rwx,g=rx,o=rx $(PRJNAME) $(prefix)
 #	@install -D -g root -o root -m=u=rwx,g=rx,o=rx README COPYRIGHT $(doc)/$(PRJNAME)
 #	@install -D -g root -o root -m=u=rwx,g=rx,o=rx .$(PRJNAME)rc $(doc)/$(PRJNAME)/examples
-	@echo "i: now if you wish you can suid $(TARGET)"
+	@printf "%b\n" "i: now if you wish you can suid $(TARGET)"
 

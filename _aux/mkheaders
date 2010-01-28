@@ -1,7 +1,7 @@
 #! /bin/sh
 
 if [ -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" -o -z "${DIR_HEADERS}" ] ; then
-	echo "Core settings not found!"
+	printf "%b\n" "Core settings not found!"
 	exit 1
 fi
 
@@ -9,7 +9,7 @@ umask 022
 
 cd ${DIR_ROOT}
 
-echo -n "Making headers ... "
+printf "%b" "Making headers ... "
 
 for FILE in ${HDRS}; do
 	mkdir -p ${DIR_HEADERS}/`dirname ${FILE}`

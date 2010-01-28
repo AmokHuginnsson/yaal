@@ -87,22 +87,22 @@ LIBS_oracle			= "-lclntsh -lhcore"
 #	this is "rule" for linking libs
 
 $(LIB_PREFIX)%.$(LIB_SUFFIX):
-	@if [ "x$(NAME)" = "x" ] ; then echo "Do not use this directive externally !"; exit 1; fi; \
-	$(call msg,echo -n "Linking \`$(@) ... $(BOLD)$(RED)";) \
+	@if [ "x$(NAME)" = "x" ] ; then printf "%b\n" "Do not use this directive externally !"; exit 1; fi; \
+	$(call msg,printf "%b" "Linking \`$(@) ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LXXFLAGS) @SONAME_FLAG@ -o $(@) \
-			@START_GROUP@ $(OBJS_$(NAME)) @END_GROUP@ $(LIBS) 2>&1 | tee -a make.log;) $(call msg, echo -n "$(RS)";)
+			@START_GROUP@ $(OBJS_$(NAME)) @END_GROUP@ $(LIBS) 2>&1 | tee -a make.log;) $(call msg, printf "%b" "$(RS)";)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)
 	@$(AR) $(ARFLAGS) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log;
 endif
-	@/bin/mv -f $(@) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(DIR_TARGET)/; $(call msg,echo -n "making cache ... ";)
+	@/bin/mv -f $(@) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(DIR_TARGET)/; $(call msg,printf "%b" "making cache ... ";)
 ifeq ($(LIB_PREFIX),lib)
 	@cd $(DIR_TARGET) && $(DIR_TARGET)/mkcache && \
 	ln -sf lib$(NAME).so.$(RELEASE) lib$(NAME).so.$(VERSION).$(SUBVERSION) && \
 	ln -sf lib$(NAME).so.$(VERSION).$(SUBVERSION) lib$(NAME).so.$(VERSION) && \
 	ln -sf lib$(NAME).so.$(VERSION) lib$(NAME).so
 endif
-	@$(call msg,echo $(NONL) "done.$(CL)")
+	@$(call msg,printf "%b$(NL)" "done.$(CL)")
 
 include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 #------------------------------------------------------------------------
@@ -126,14 +126,14 @@ install-environment:
 
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
 	@env DIR_ROOT="$(DIR_ROOT)" DIR_BUILD="$(DIR_BUILD)" DIR_HEADERS="$(DIR_HEADERS)" HDRS="$(HDRS)" $(DIR_ROOT)/_aux/mkheaders; \
-	echo $(NONL) "done.$(CL)$(BOLD)"; \
-	echo "All OK!$(RS)";
+	printf "%b$(NL)" "done.$(CL)$(BOLD)"; \
+	printf "%b\n" "All OK!$(RS)";
 
 $(LD_SO_CONF): $(DIR_ROOT)/_aux/mkcache
-	@echo -n "Making environment ... "; \
-	echo $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf; \
+	@printf "%b" "Making environment ... "; \
+	printf "%b\n" $(DIR_TARGET) > $(DIR_TARGET)/ld.so.conf; \
 	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_TARGET); \
-	echo $(NONL) "done.$(CL)"
+	printf "%b$(NL)" "done.$(CL)"
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
@@ -143,11 +143,11 @@ clean: clean-dep
 	sh -c '. $(DIR_ROOT)/_aux/clean-lib.sh && clean .'
 
 mrproper: clean
-	@echo -n "Purging ... "; \
+	@printf "%b" "Purging ... "; \
 	/bin/rm -rf $(DIR_TARGET) $(DIR_HEADERS) make.log; \
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
-	echo "done."
+	printf "%b\n" "done."
 
 include $(DIR_ROOT)/_aux/mk/d_target-tags.mk
 
