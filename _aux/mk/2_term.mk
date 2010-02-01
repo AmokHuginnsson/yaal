@@ -1,5 +1,5 @@
 ifeq ($(VERBOSE),yes)
-invoke = printf "%b$(NL)" "$(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))" && $(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
+invoke = printf "%b$(NL)" '$(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))' && $(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
 msg =
 else
 invoke = $(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
@@ -12,9 +12,13 @@ CL   := $(shell tput cr;tput dl1)
 BOLD := $(shell tput bold || tput md)
 RED  := $(shell tput setaf 1 || tput AF 1)
 RS   := $(shell tput sgr0 || tput me)
-NL   := ""
+ifeq ($(VERBOSE),yes)
+	NL=\n
+else
+	NL=
+endif
 
-PROGRESS_INDICATOR_0=\\ 
+PROGRESS_INDICATOR_0=\\\ 
 PROGRESS_INDICATOR_1=| 
 PROGRESS_INDICATOR_2=/ 
 PROGRESS_INDICATOR_3=- 
@@ -49,3 +53,5 @@ CURR_PROGRESS_INDICATOR=
 endef
 
 endif
+
+

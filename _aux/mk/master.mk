@@ -5,7 +5,7 @@ include _aux/mk/2_term.mk
 define PREPARE_MAIN_TARGET
 $(1): build/$(1)/Makefile.mk build/$(1)/config.hxx
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
-	$$(call invoke,$(2) $$(MAKE) -C $$(dir $$(<)) --no-print-directory -f Makefile.mk -e $$(@))
+	$$(call invoke,$$(strip $(2) $$(MAKE) -C $$(dir $$(<)) --no-print-directory -f Makefile.mk -e $$(@)))
 
 mrproper-$(1): clean-$(1)
 	@$$(if $$(wildcard build/$(1)/Makefile.mk), $$(MAKE) -C build/$(1) -f Makefile.mk -e mrproper && cd build && /bin/rm -rf $(1))
