@@ -28,7 +28,7 @@ $$($(1))/%.$$(DS): $$(SRC_$(1))/%.$$(SS)
 	$$(call msg,&& printf "%b" "$(DEP_CL)")
 
 $$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
-	@$$(call msg,printf "%b" "$$($$(CURR_PROGRESS_INDICATOR))$$(eval $$(call PROGRESS_INDICATOR))Compiling \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... " && ) \
+	@$$(call msg_always,printf "%b" "$$($$(CURR_PROGRESS_INDICATOR))$$(eval $$(call PROGRESS_INDICATOR))Compiling \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... " && ) \
 	/bin/rm -f "$$(@)"; \
 	$$(call invoke,$$(CXX) $$(CXXFLAGS) $$(COMPILER_FLAGS_$(1)) -D__ID__="\"$$(<) $$(shell $$(GITID) ./$$(subst . /,./,$$(foreach IT,$$(subst /, ,$$(subst $$(DIR_ROOT),,$$(DIR_BUILD))),/..))/$$(subst $$(DIR_ROOT)/,,$$(<)))\"" $$(<) -c -o $$(@) 2>&1 | tee -a make.log ) && \
 	test -f $$(@) \

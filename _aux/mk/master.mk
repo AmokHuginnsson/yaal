@@ -39,16 +39,13 @@ bin dep doc environment install static stats tags: .my_make
 $(foreach T, $(MAIN_TARGETS), $(eval $(call PREPARE_MAIN_TARGET,$(T),$(OPT_$(T)))))
 
 build/%/Makefile.mk: configure Makefile.mk.in
-	@$(eval DIR = $(dir $(@))) \
-	$(call invoke,mkdir -p $(DIR) && cd $(DIR) && ../../configure $(CONFIGURE) && touch -c config.hxx Makefile.mk)
+	@$(eval DIR = $(dir $(@))) $(call invoke,mkdir -p $(DIR) && cd $(DIR) && if test -t 1 -a "x${VERBOSE}" != "xyes" ; then /bin/rm -f $(notdir $(@)) && ../../configure $(CONFIGURE) | awk '{printf "%s\r", "'`tput cr;tput dl1`'"$$0}' ; else ../../configure $(CONFIGURE) ; fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
 
 build/%/config.hxx: configure config.hxx.in
-	@$(eval DIR = $(dir $(@))) \
-	$(call invoke,mkdir -p $(DIR) && cd $(DIR) && ../../configure $(CONFIGURE) && touch -c config.hxx Makefile.mk)
+	@$(eval DIR = $(dir $(@))) $(call invoke,mkdir -p $(DIR) && cd $(DIR) && if test -t 1 -a "x${VERBOSE}" != "xyes" ; then /bin/rm -f $(notdir $(@)) && ../../configure $(CONFIGURE) | awk '{printf "%s\r", "'`tput cr;tput dl1`'"$$0}' ; else ../../configure $(CONFIGURE) ; fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
 
 build/%/yaalrc: configure yaalrc.in
-	@$(eval DIR = $(dir $(@))) \
-	$(call invoke,mkdir -p $(DIR) && cd $(DIR) && ../../configure $(CONFIGURE) && touch -c config.hxx Makefile.mk yaalrc)
+	@$(eval DIR = $(dir $(@))) $(call invoke,mkdir -p $(DIR) && cd $(DIR) && if test -t 1 -a "x${VERBOSE}" != "xyes" ; then /bin/rm -f $(notdir $(@)) && ../../configure $(CONFIGURE) | awk '{printf "%s\r", "'`tput cr;tput dl1`'"$$0}' ; else ../../configure $(CONFIGURE) ; fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
 
 configure config.hxx.in: configure.ac _aux/aclib.m4
 	@$(call invoke,autoreconf && touch configure config.hxx.in)

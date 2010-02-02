@@ -125,7 +125,8 @@ install-environment:
 	@./_aux/msh
 
 $(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
-	@env DIR_ROOT="$(DIR_ROOT)" DIR_BUILD="$(DIR_BUILD)" DIR_HEADERS="$(DIR_HEADERS)" HDRS="$(HDRS)" $(DIR_ROOT)/_aux/mkheaders; \
+	@printf "%b" "Making headers ... "; \
+	env DIR_ROOT="$(DIR_ROOT)" DIR_BUILD="$(DIR_BUILD)" DIR_HEADERS="$(DIR_HEADERS)" HDRS="$(HDRS)" $(DIR_ROOT)/_aux/mkheaders; \
 	printf "%b$(NL)" "done.$(CL)$(BOLD)"; \
 	printf "%b\n" "All OK!$(RS)";
 

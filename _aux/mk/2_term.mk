@@ -5,10 +5,10 @@ else
 invoke = $(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
 msg = $(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
 endif
+msg_always = $(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
 
 ifeq ($(TERMINAL),TERM)
 
-CL   := $(shell tput cr;tput dl1)
 BOLD := $(shell tput bold || tput md)
 RED  := $(shell tput setaf 1 || tput AF 1)
 RS   := $(shell tput sgr0 || tput me)
@@ -16,6 +16,7 @@ ifeq ($(VERBOSE),yes)
 	NL=\n
 else
 	NL=
+	CL   := $(shell tput cr;tput dl1)
 endif
 
 PROGRESS_INDICATOR_0=\\\ 
@@ -29,8 +30,16 @@ NEXT_PROGRESS_INDICATOR_2=PROGRESS_INDICATOR_3
 NEXT_PROGRESS_INDICATOR_3=PROGRESS_INDICATOR_0
 CURR_PROGRESS_INDICATOR=PROGRESS_INDICATOR_0
 CURR_DEP_PROGRESS_INDICATOR=PROGRESS_INDICATOR_0
+
+ifneq ($(VERBOSE),yes)
 DEP_PROGRESS_INDICATOR_SUFFIX= Generating dependencies ...
 DEP_CL=$(CL)
+else
+PROGRESS_INDICATOR_0=.
+NEXT_PROGRESS_INDICATOR_0=PROGRESS_INDICATOR_0
+PROGRESS_INDICATOR_ONCE=Generating dependencies 
+CURR_DEP_PROGRESS_INDICATOR=PROGRESS_INDICATOR_ONCE
+endif
 
 define PROGRESS_INDICATOR
 CURR_PROGRESS_INDICATOR:=$$(NEXT_$$(CURR_PROGRESS_INDICATOR))
@@ -44,7 +53,7 @@ PROGRESS_INDICATOR_0=.
 PROGRESS_INDICATOR_ONCE=Generating dependencies 
 NEXT_PROGRESS_INDICATOR_ONCE=PROGRESS_INDICATOR_0
 NEXT_PROGRESS_INDICATOR_0=PROGRESS_INDICATOR_0
-CURR_PROGRESS_INDICATOR=NL
+CURR_PROGRESS_INDICATOR=
 CURR_DEP_PROGRESS_INDICATOR=PROGRESS_INDICATOR_ONCE
 
 define PROGRESS_INDICATOR
@@ -53,5 +62,4 @@ CURR_PROGRESS_INDICATOR=
 endef
 
 endif
-
 

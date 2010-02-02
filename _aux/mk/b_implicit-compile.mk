@@ -8,7 +8,7 @@ define IDENT_HELPER
 endef
 
 %.$(DS): %.$(SS)
-	@$(call msg,printf "%b" "$($(CURR_DEP_PROGRESS_INDICATOR))$(DEP_PROGRESS_INDICATOR_SUFFIX)$(eval $(call PROGRESS_INDICATOR))" && ) \
+	@$(call msg_always,printf "%b" "$($(CURR_DEP_PROGRESS_INDICATOR))$(DEP_PROGRESS_INDICATOR_SUFFIX)$(eval $(call PROGRESS_INDICATOR))" && ) \
 	/bin/rm -f "$(@)" && \
 	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@:.$(DS)=.$(OS)) -MT $(@) -MF $(@) \
 	$(call msg,&& printf "%b" "$(DEP_CL)")
