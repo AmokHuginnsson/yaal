@@ -61,7 +61,7 @@ SRCS := $(filter-out %_driver.$(SS),$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.$(OS),$(OBJS_dbwrapper))
 $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT))))
 
-LIBS_hcore			=	"-lpthread -lssl -lcrypto @HCORE_LIBS@"
+LIBS_hcore			=	"-lssl -lcrypto @HCORE_LIBS@"
 DEPS_tools			= $(TARGET_hcore)
 LIBS_tools			= "-lhcore -lpthread -lxml2 -lxslt @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@ @HCORE_LIBS@"
 DEPS_dbwrapper	= $(TARGET_hcore) $(TARGET_tools)
@@ -93,7 +93,8 @@ $(LIB_PREFIX)%.$(LIB_SUFFIX):
 			@START_GROUP@ $(OBJS_$(NAME)) @END_GROUP@ $(LIBS) 2>&1 | tee -a make.log;) $(call msg, printf "%b" "$(RS)";)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)
-	@$(AR) $(ARFLAGS) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(NAME)) 2>&1 | grep -v '^ar: creating ' | tee -a make.log;
+	@$(AR) $(ARFLAGS) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(NAME)) | tee -a make.log ; \
+	ranlib lib$(NAME).$(LIB_ARCHIVE_SUFFIX)
 endif
 	@/bin/mv -f $(@) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(DIR_TARGET)/; $(call msg,printf "%b" "making cache ... ";)
 ifeq ($(LIB_PREFIX),lib)
