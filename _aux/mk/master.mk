@@ -3,7 +3,7 @@ COMA=,
 include _aux/mk/2_term.mk
 
 define PREPARE_MAIN_TARGET
-$(1): build/$(1)/Makefile.mk build/$(1)/config.hxx
+$(1): build/$(1)/Makefile.mk build/$(1)/config.hxx $$(if $$(wildcard yaalrc.in),build/$(1)/yaalrc)
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
 	$$(call invoke,$$(strip $(2) $$(MAKE) -C $$(dir $$(<)) --no-print-directory -f Makefile.mk -e $$(@)))
 

@@ -44,14 +44,15 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hcore/hlog.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hsocket.hxx"
+#include "tools.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
 namespace
 {
+
 /* char schema_err[] = "bad xml schema"; */
-char const* const DEFAULT_ENCODING = "iso-8859-2";
 typedef HResource<xmlDoc, __decltype( &xmlFreeDoc )> doc_resource_t;
 typedef HResource<xmlTextWriter, __decltype( &xmlFreeTextWriter )> writer_resource_t;
 typedef HResource<xmlCharEncodingHandler, __decltype( &xmlCharEncCloseFunc )> encoder_resource_t;
@@ -244,7 +245,7 @@ void HXmlData::clear( void ) const
 
 HXml::HXml( void )
 	: f_oConvert( new HXml::OConvert ), f_oConvertedString(),
-	f_oVarTmpBuffer(), f_oEncoding( DEFAULT_ENCODING ), f_poXml( NULL ), f_oDOM()
+	f_oVarTmpBuffer(), f_oEncoding( n_oDefaultEncoding ), f_poXml( NULL ), f_oDOM()
 	{
 	M_PROLOG
 	f_poXml = new ( std::nothrow ) HXmlData();
@@ -617,7 +618,7 @@ void HXml::create_root( yaal::hcore::HString const& a_oName, yaal::hcore::HStrin
 	{
 	M_PROLOG
 	M_ASSERT( a_oName );
-	f_oEncoding = ( !! a_oEncoding ) ? a_oEncoding : DEFAULT_ENCODING;
+	f_oEncoding = ( !! a_oEncoding ) ? a_oEncoding : n_oDefaultEncoding;
 	tree_t::node_t root = f_oDOM.create_new_root();
 	(**root).f_oText = a_oName;
 	return;

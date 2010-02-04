@@ -69,6 +69,7 @@ namespace tools
 {
 
 HString n_oSerialDevice;
+HString n_oDefaultEncoding = "ISO-8859-2";
 HSerial::speed_t n_eBaudRate = HSerial::SPEED::B_115200;
 HSerial::flag_t n_eSerialFlags = HSerial::flag_t( HSerial::FLAG::FLOW_CONTROL_HARDWARE ) | HSerial::FLAG::BITS_PER_BYTE_8;
 int n_iCollectorConnectionTimeOut = 9999;
@@ -170,6 +171,7 @@ HToolsInitDeinit::HToolsInitDeinit( void )
 			( "ignore_signal_SIGTSTP", program_options_helper::option_value( n_bIgnoreSignalSIGTSTP ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore TSTP (terminal stop, suspend) signal" )
 			( "ignore_signal_SIGQUIT", program_options_helper::option_value( n_bIgnoreSignalSIGQUIT ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore QUIT, core dump signal" )
 			( "serial_device", program_options_helper::option_value( n_oSerialDevice ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to serial device", "path" )
+			( "default_encoding", program_options_helper::option_value( n_oDefaultEncoding ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "dafault character encoding used in text documents", "encoding" )
 			( "collector_connection_timeout", program_options_helper::option_value( n_iCollectorConnectionTimeOut ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "timeout on collector device read", "seconds" );
 	int l_iCtr = 0;
 	errno = 0;

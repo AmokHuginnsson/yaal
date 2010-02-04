@@ -63,6 +63,11 @@ ignore_signal_SIGINT false
 ignore_signal_SIGTSTP false
 ignore_signal_SIGQUIT false
 
+# default_encoding
+# type: string, default: ISO-8859-2
+# specify default character encoding used in text documents
+default_encoding "ISO-8859-2"
+
 # serial port configuration
 
 # serial_device

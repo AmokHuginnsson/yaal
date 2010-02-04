@@ -41,6 +41,7 @@ namespace tools
 	{
 	
 extern yaal::hcore::HString n_oSerialDevice;
+extern yaal::hcore::HString n_oDefaultEncoding;
 extern HSerial::speed_t n_eBaudRate;
 extern HSerial::flag_t n_eSerialFlags;
 extern int n_iCollectorConnectionTimeOut;
