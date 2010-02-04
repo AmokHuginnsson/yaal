@@ -42,40 +42,78 @@ namespace hcore
  */
 struct OResourceHelper
 	{
-	static bool non_null( void* value )
-		{ return ( value != NULL ); }
-	static bool greater( int long value, int long than )
-		{ return ( value > than ); }
-	static bool greater_or_eq( int long value, int long than )
-		{ return ( value >= than ); }
+	template<typename T>
+	struct by_pointer
+		{
+		typedef T* type_t;
+		typedef T* pass_t;
+		static T* raw( T* val )
+			{ return ( val ); }
+		static T const* raw( T const* val )
+			{ return ( val ); }
+		};
+	template<typename T>
+	struct by_value
+		{
+		typedef T type_t;
+		typedef T const& pass_t;
+		static T raw( T& val )
+			{ return ( val ); }
+		static T raw( T const& val )
+			{ return ( val ); }
+		};
+	struct always_release
+		{
+		static bool is_allocated( void* )
+			{ return ( true ); }
+		};
+	struct non_null
+		{
+		static bool is_allocated( void* value )
+			{ return ( value != NULL ); }
+		};
+	template<int than>
+	struct greater
+		{
+		static bool is_allocated( int long value )
+			{ return ( value > than ); }
+		};
+	template<int than>
+	struct greater_or_eq
+		{
+		static bool is_allocated( int long value )
+			{ return ( value >= than ); }
+		};
 	};
 
 /*! \brief Raw resource life time tracker.
  */
-template<typename resource_type, typename free_t, typename allocated_t = __decltype( &OResourceHelper::non_null )>
+template<typename resource_type_t, typename free_t, template<typename>class hold_by_t = OResourceHelper::by_pointer, typename allocated_t = OResourceHelper::non_null>
 class HResource
 	{
-	resource_type f_tResource;
-	allocated_t ALLOCATED;
+	typedef typename hold_by_t<resource_type_t>::type_t type_t;
+	typedef typename hold_by_t<resource_type_t>::pass_t pass_t;
+	type_t f_tResource;
 	free_t FREE;
 public:
-	typedef resource_type resource_t;
-	HResource( resource_t resource, free_t free, allocated_t allocated = OResourceHelper::non_null )
-		: f_tResource( resource ), ALLOCATED( allocated ), FREE( free ) {}
+	typedef resource_type_t resource_t;
+	HResource( pass_t resource_, free_t free_ )
+		: f_tResource( resource_ ), FREE( free_ ) {}
 	~HResource( void )
 		{
-		if ( ALLOCATED( f_tResource ) )
+		if ( allocated_t::is_allocated( f_tResource ) )
 			FREE( f_tResource );
 		}
-	resource_t get( void ) const
+	resource_t operator*( void ) const
 		{ return ( f_tResource ); }
+	type_t get( void ) const
+		{ return ( hold_by_t<resource_t>::raw( f_tResource ) ); }
 	void swap( HResource& other )
 		{
 		if ( &other != this )
 			{
 			using yaal::swap;
 			swap( f_tResource, other.f_tResource );
-			swap( ALLOCATED, other.ALLOCATED );
 			swap( FREE, other.FREE );
 			}
 		}
@@ -86,8 +124,9 @@ private:
 
 }
 
-template<typename resource_t, typename free_t, typename allocated_t>
-inline void swap( yaal::hcore::HResource<resource_t, free_t, allocated_t>& a, yaal::hcore::HResource<resource_t, free_t, allocated_t>& b )
+template<typename resource_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
+inline void swap( yaal::hcore::HResource<resource_t, free_t, hold_by_t, allocated_t>& a,
+		yaal::hcore::HResource<resource_t, free_t, hold_by_t, allocated_t>& b )
 	{ a.swap( b ); }
 
 }

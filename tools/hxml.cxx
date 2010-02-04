@@ -52,13 +52,13 @@ namespace
 {
 /* char schema_err[] = "bad xml schema"; */
 char const* const DEFAULT_ENCODING = "iso-8859-2";
-typedef HResource<xmlDocPtr, __decltype( &xmlFreeDoc )> doc_resource_t;
-typedef HResource<xmlTextWriterPtr, __decltype( &xmlFreeTextWriter )> writer_resource_t;
-typedef HResource<xmlCharEncodingHandlerPtr, __decltype( &xmlCharEncCloseFunc )> encoder_resource_t;
-typedef HResource<xsltStylesheetPtr, __decltype( &xsltFreeStylesheet )> style_resource_t;
-typedef HResource<xmlXPathContextPtr, __decltype( &xmlXPathFreeContext )> xpath_context_resource_t;
-typedef HResource<xmlXPathObjectPtr, __decltype( &xmlXPathFreeObject )> xpath_object_resource_t;
-typedef HResource<xmlOutputBufferPtr, __decltype( &xmlOutputBufferClose )> outputbuffer_resource_t;
+typedef HResource<xmlDoc, __decltype( &xmlFreeDoc )> doc_resource_t;
+typedef HResource<xmlTextWriter, __decltype( &xmlFreeTextWriter )> writer_resource_t;
+typedef HResource<xmlCharEncodingHandler, __decltype( &xmlCharEncCloseFunc )> encoder_resource_t;
+typedef HResource<xsltStylesheet, __decltype( &xsltFreeStylesheet )> style_resource_t;
+typedef HResource<xmlXPathContext, __decltype( &xmlXPathFreeContext )> xpath_context_resource_t;
+typedef HResource<xmlXPathObject, __decltype( &xmlXPathFreeObject )> xpath_object_resource_t;
+typedef HResource<xmlOutputBuffer, __decltype( &xmlOutputBufferClose )> outputbuffer_resource_t;
 typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 
 HString get_stream_id( HStreamInterface* stream )
