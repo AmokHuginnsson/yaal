@@ -53,6 +53,16 @@ struct OResourceHelper
 			{ return ( val ); }
 		};
 	template<typename T>
+	void delete_obj( T* p )
+		{
+		delete p;
+		}
+	template<typename T>
+	void delete_array( T* p )
+		{
+		delete [] p;
+		}
+	template<typename T>
 	struct by_value
 		{
 		typedef T type_t;
@@ -71,50 +81,76 @@ struct OResourceHelper
 		{
 		static bool is_allocated( void* value )
 			{ return ( value != NULL ); }
+		template<typename T>
+		static void reset( T*& p )
+			{
+			p = NULL;
+			}
 		};
 	template<int than>
 	struct greater
 		{
 		static bool is_allocated( int long value )
 			{ return ( value > than ); }
+		template<typename T>
+		static void reset( T& p )
+			{
+			p = than;
+			}
 		};
 	template<int than>
 	struct greater_or_eq
 		{
 		static bool is_allocated( int long value )
 			{ return ( value >= than ); }
+		template<typename T>
+		static void reset( T& p )
+			{
+			p = than - 1;
+			}
 		};
 	};
 
 /*! \brief Raw resource life time tracker.
  */
-template<typename resource_type_t, typename free_t, template<typename>class hold_by_t = OResourceHelper::by_pointer, typename allocated_t = OResourceHelper::non_null>
+template<typename resource_type_t, typename free_t = void (*)( resource_type_t* ), template<typename>class hold_by_t = OResourceHelper::by_pointer, typename allocated_t = OResourceHelper::non_null>
 class HResource
 	{
 	typedef typename hold_by_t<resource_type_t>::type_t type_t;
 	typedef typename hold_by_t<resource_type_t>::pass_t pass_t;
-	type_t f_tResource;
-	free_t FREE;
+	type_t _resource;
+	free_t _free;
 public:
 	typedef resource_type_t resource_t;
-	HResource( pass_t resource_, free_t free_ )
-		: f_tResource( resource_ ), FREE( free_ ) {}
+	HResource( void ) : _resource(), _free() {}
+	template<typename real_t>
+	HResource( typename hold_by_t<real_t>::pass_t resource_, free_t free_ = OResourceHelper::template delete_obj<real_t> )
+		: _resource( resource_ ), _free( free_ ) {}
 	~HResource( void )
 		{
-		if ( allocated_t::is_allocated( f_tResource ) )
-			FREE( f_tResource );
+		reset();
+		return;
+		}
+	void reset( void )
+		{
+		if ( allocated_t::is_allocated( _resource ) )
+			{
+			_free( _resource );
+			allocated_t::reset( _resource );
+			}
+		return;
 		}
 	resource_t operator*( void ) const
-		{ return ( f_tResource ); }
+		{ return ( _resource ); }
 	type_t get( void ) const
-		{ return ( hold_by_t<resource_t>::raw( f_tResource ) ); }
+		{ return ( hold_by_t<resource_t>::raw( _resource ) ); }
 	void swap( HResource& other )
 		{
 		if ( &other != this )
 			{
 			using yaal::swap;
-			swap( f_tResource, other.f_tResource );
-			swap( FREE, other.FREE );
+			swap( _resource, other._resource );
+			swap( _free, other._free );
 			}
 		}
 private:

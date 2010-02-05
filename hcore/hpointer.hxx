@@ -137,8 +137,15 @@ class HPointer
 	 * of objects of classes from multiple-inheritance
 	 * (virtual or non-virtual) hierarchies.
 	 */
-	tType* f_ptObject;
+	/*
+	 * WARNING 2!
+	 *
+	 * Shared struct (a reference counters) must be initialized
+	 * first in HPointer constructor. In case of memory allocation
+	 * failure an object pointee must still be NULL.
+	 */
 	HShared* f_poShared;
+	tType* f_ptObject;
 public:
 	HPointer( void );
 	template<typename real_t>
@@ -276,7 +283,7 @@ tType* HPointerScalar<tType>::raw( tType* a_ptPointer )
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>::HPointer( void )
-	: f_ptObject( NULL ), f_poShared( NULL )
+	: f_poShared( NULL ), f_ptObject( NULL )
 	{
 	return;
 	}
@@ -285,7 +292,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 template<typename real_t>
 HPointer<tType, pointer_type_t, access_type_t>::HPointer( real_t* const a_ptPointer )
-	: f_ptObject( a_ptPointer ), f_poShared( new HShared( pointer_type_t<tType>::template delete_pointee<real_t> ) )
+	: f_poShared( new HShared( pointer_type_t<tType>::template delete_pointee<real_t> ) ), f_ptObject( a_ptPointer )
 	{
 	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
 	f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
@@ -304,7 +311,7 @@ HPointer<tType, pointer_type_t, access_type_t>::~HPointer( void )
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<tType, pointer_type_t, access_type_t> const& a_roPointer )
-	: f_ptObject( NULL ), f_poShared( NULL )
+	: f_poShared( NULL ), f_ptObject( NULL )
 	{
 	operator = ( a_roPointer );
 	return;
@@ -314,7 +321,7 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 template<typename hier_t, template<typename, typename>class alien_access_t>
 HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<hier_t, pointer_type_t, alien_access_t> const& a_roPointer )
-	: f_ptObject( NULL ), f_poShared( NULL )
+	: f_poShared( NULL ), f_ptObject( NULL )
 	{
 	operator = ( a_roPointer );
 	return;
