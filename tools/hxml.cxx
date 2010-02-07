@@ -214,10 +214,8 @@ protected:
 	/*}*/
 	};
 
-HXmlData::HXmlData( void ) : f_oDoc( NULL, xmlFreeDoc ),
-	f_oStyle( NULL, xsltFreeStylesheet ),
-	f_oXPathContext( NULL, xmlXPathFreeContext ),
-	f_oXPathObject( NULL, xmlXPathFreeObject ),
+HXmlData::HXmlData( void )
+	: f_oDoc(), f_oStyle(), f_oXPathContext(), f_oXPathObject(),
 	f_psNodeSet( NULL )
 	{
 	M_PROLOG
@@ -235,10 +233,8 @@ HXmlData::~HXmlData ( void )
 void HXmlData::clear( void ) const
 	{
 	M_PROLOG
-	xpath_context_resource_t ctx( NULL, xmlXPathFreeContext );
-	xpath_object_resource_t obj( NULL, xmlXPathFreeObject );
-	swap( f_oXPathObject, obj );
-	swap( f_oXPathContext, ctx );
+	f_oXPathObject.reset();
+	f_oXPathContext.reset();
 	return;
 	M_EPILOG
 	}
@@ -507,7 +503,7 @@ void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 	{
 	M_PROLOG
 	M_ENSURE( stream.is_valid() );
-	doc_resource_t doc( NULL, xmlFreeDoc );
+	doc_resource_t doc;
 	/* flush writer to DOM. */
 	M_ENSURE( !! get_root() );
 		{

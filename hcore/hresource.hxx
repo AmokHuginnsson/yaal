@@ -45,11 +45,25 @@ struct OResourceHelper
 	template<typename T>
 	struct by_pointer
 		{
-		typedef T* type_t;
-		typedef T* pass_t;
+		typedef T* hold_t;
+		typedef T const* const_hold_t;
+		typedef T* ref_t;
+		typedef T const* const_ref_t;
 		static T* raw( T* val )
 			{ return ( val ); }
 		static T const* raw( T const* val )
+			{ return ( val ); }
+		};
+	template<typename T>
+	struct by_value
+		{
+		typedef T hold_t;
+		typedef T const& const_hold_t;
+		typedef T& ref_t;
+		typedef T const& const_ref_t;
+		static T raw( T& val )
+			{ return ( val ); }
+		static T raw( T const& val )
 			{ return ( val ); }
 		};
 	template<typename T>
@@ -62,16 +76,6 @@ struct OResourceHelper
 		{
 		delete [] p;
 		}
-	template<typename T>
-	struct by_value
-		{
-		typedef T type_t;
-		typedef T const& pass_t;
-		static T raw( T& val )
-			{ return ( val ); }
-		static T raw( T const& val )
-			{ return ( val ); }
-		};
 	struct always_release
 		{
 		static bool is_allocated( void* )
@@ -116,15 +120,17 @@ struct OResourceHelper
 template<typename resource_type_t, typename free_t = void (*)( resource_type_t* ), template<typename>class hold_by_t = OResourceHelper::by_pointer, typename allocated_t = OResourceHelper::non_null>
 class HResource
 	{
-	typedef typename hold_by_t<resource_type_t>::type_t type_t;
-	typedef typename hold_by_t<resource_type_t>::pass_t pass_t;
-	type_t _resource;
+	typedef typename hold_by_t<resource_type_t>::hold_t hold_t;
+	typedef typename hold_by_t<resource_type_t>::const_hold_t const_hold_t;
+	typedef typename hold_by_t<resource_type_t>::ref_t ref_t;
+	typedef typename hold_by_t<resource_type_t>::const_ref_t const_ref_t;
+	hold_t _resource;
 	free_t _free;
 public:
 	typedef resource_type_t resource_t;
 	HResource( void ) : _resource(), _free() {}
 	template<typename real_t>
-	HResource( typename hold_by_t<real_t>::pass_t resource_, free_t free_ = OResourceHelper::template delete_obj<real_t> )
+	HResource( real_t resource_, free_t free_ = OResourceHelper::template delete_obj<real_t> )
 		: _resource( resource_ ), _free( free_ ) {}
 	~HResource( void )
 		{
@@ -140,9 +146,13 @@ public:
 			}
 		return;
 		}
-	resource_t operator*( void ) const
+	const_ref_t operator*( void ) const
 		{ return ( _resource ); }
-	type_t get( void ) const
+	ref_t operator*( void )
+		{ return ( _resource ); }
+	const_hold_t get( void ) const
+		{ return ( hold_by_t<resource_t>::raw( _resource ) ); }
+	hold_t get( void )
 		{ return ( hold_by_t<resource_t>::raw( _resource ) ); }
 	void swap( HResource& other )
 		{
