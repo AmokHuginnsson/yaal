@@ -40,7 +40,7 @@ namespace hcore
 
 /*! \brief Resource lifetime tracking helper.
  */
-struct OResourceHelper
+struct HResourceAllocatedBy
 	{
 	template<typename T>
 	struct by_pointer
@@ -66,17 +66,22 @@ struct OResourceHelper
 		static T raw( T const& val )
 			{ return ( val ); }
 		};
-	template<typename T>
-	void delete_obj( T* p )
+	};
+template<typename T>
+struct HResourceReleaseBy
+	{
+	static void delete_obj( T p )
 		{
 		delete p;
 		}
-	template<typename T>
-	void delete_array( T* p )
+	static void delete_array( T p )
 		{
 		delete [] p;
 		}
-	struct always_release
+	};
+struct HResourceReleaseWhen
+	{
+	struct always
 		{
 		static bool is_allocated( void* )
 			{ return ( true ); }
@@ -117,7 +122,7 @@ struct OResourceHelper
 
 /*! \brief Raw resource life time tracker.
  */
-template<typename resource_type_t, typename free_t = void (*)( resource_type_t* ), template<typename>class hold_by_t = OResourceHelper::by_pointer, typename allocated_t = OResourceHelper::non_null>
+template<typename resource_type_t, typename free_t = void (*)( resource_type_t* ), template<typename>class hold_by_t = HResourceAllocatedBy::by_pointer, typename allocated_t = HResourceReleaseWhen::non_null>
 class HResource
 	{
 	typedef typename hold_by_t<resource_type_t>::hold_t hold_t;
@@ -130,7 +135,7 @@ public:
 	typedef resource_type_t resource_t;
 	HResource( void ) : _resource(), _free() {}
 	template<typename real_t>
-	HResource( real_t resource_, free_t free_ = OResourceHelper::template delete_obj<real_t> )
+	HResource( real_t resource_, free_t free_ = &HResourceReleaseBy<real_t>::delete_obj )
 		: _resource( resource_ ), _free( free_ ) {}
 	~HResource( void )
 		{
