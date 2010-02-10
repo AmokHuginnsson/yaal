@@ -27,8 +27,6 @@ Copyright:
 #ifndef YAAL_HCORE_HPOOL_HXX_INCLUDED
 #define YAAL_HCORE_HPOOL_HXX_INCLUDED
 
-#line 31
-
 #include "hcore/base.hxx"
 #include "hcore/xalloc.hxx"
 

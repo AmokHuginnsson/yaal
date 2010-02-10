@@ -27,8 +27,6 @@ Copyright:
 #ifndef YAAL_TOOLS_XMATH_HXX_INCLUDED
 #define YAAL_TOOLS_XMATH_HXX_INCLUDED
 
-#line 31
-
 namespace yaal
 {
 
@@ -62,7 +60,6 @@ number_t binomial_coefficient( number_t a_iCardinal, number_t a_iSubCardinal )
 }
 
 }
-
 
 #endif /* not YAAL_TOOLS_XMATH_HXX_INCLUDED */
 

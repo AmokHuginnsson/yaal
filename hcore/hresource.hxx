@@ -32,6 +32,8 @@ Copyright:
 #ifndef YAAL_HCORE_HRESOURCE_HXX_INCLUDED
 #define YAAL_HCORE_HRESOURCE_HXX_INCLUDED
 
+#include "hcore/base.hxx"
+
 namespace yaal
 {
 
@@ -70,13 +72,15 @@ struct HResourceAllocatedBy
 template<typename T>
 struct HResourceReleaseBy
 	{
+	template<typename real_t>
 	static void delete_obj( T p )
 		{
-		delete p;
+		delete static_cast<real_t>( p );
 		}
+	template<typename real_t>
 	static void delete_array( T p )
 		{
-		delete [] p;
+		delete [] static_cast<real_t>( p );
 		}
 	};
 struct HResourceReleaseWhen
@@ -120,6 +124,15 @@ struct HResourceReleaseWhen
 		};
 	};
 
+template<typename resource_type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
+struct HResourceRef
+	{
+	typedef typename hold_by_t<resource_type_t>::hold_t hold_t;
+	hold_t _hold;
+	free_t _free;
+	explicit HResourceRef( hold_t hold_, free_t free_ ) : _hold( hold_ ), _free( free_ ) {}
+	};
+
 /*! \brief Raw resource life time tracker.
  */
 template<typename resource_type_t, typename free_t = void (*)( resource_type_t* ), template<typename>class hold_by_t = HResourceAllocatedBy::by_pointer, typename allocated_t = HResourceReleaseWhen::non_null>
@@ -135,12 +148,48 @@ public:
 	typedef resource_type_t resource_t;
 	HResource( void ) : _resource(), _free() {}
 	template<typename real_t>
-	HResource( real_t resource_, free_t free_ = &HResourceReleaseBy<real_t>::delete_obj )
+	explicit HResource( real_t resource_, free_t free_ = &HResourceReleaseBy<hold_t>::template delete_obj<real_t> )
 		: _resource( resource_ ), _free( free_ ) {}
 	~HResource( void )
 		{
 		reset();
 		return;
+		}
+	HResource( HResource& src_ ) : _resource(), _free()
+		{
+		pass( src_ );
+		return;
+		}
+	template<typename real_t>
+	HResource( HResource<real_t, free_t, hold_by_t, allocated_t>& src_ ) : _resource(), _free()
+		{
+		pass( src_ );
+		return;
+		}
+	HResource& operator = ( HResource& src_ )
+		{
+		if ( &src_ != this )
+			pass( src_ );
+		return ( *this );
+		}
+	template<typename real_t, typename real_free_t>
+	HResource& operator = ( HResource<real_t, real_free_t, hold_by_t, allocated_t>& src_ )
+		{
+		if ( &reinterpret_cast<HResource&>( src_ ) != this )
+			pass( src_ );
+		return ( *this );
+		}
+	HResource( HResourceRef<resource_type_t, free_t, hold_by_t, allocated_t> src_ ) : _resource( src_._hold ), _free( src_._free ) {}
+	HResource& operator = ( HResourceRef<resource_type_t, free_t, hold_by_t, allocated_t> src_ )
+		{
+		if ( src_._hold != _resource )
+			{
+			HResource drop( *this );
+			using yaal::swap;
+			swap( _resource, src_._hold );
+			swap( _free, src_._free );
+			}
+		return ( *this );
 		}
 	void reset( void )
 		{
@@ -155,10 +204,30 @@ public:
 		{ return ( _resource ); }
 	ref_t operator*( void )
 		{ return ( _resource ); }
+	const_hold_t operator->( void ) const
+		{ return ( hold_by_t<resource_t>::raw( _resource ) ); }
+	hold_t operator->( void )
+		{ return ( hold_by_t<resource_t>::raw( _resource ) ); }
 	const_hold_t get( void ) const
 		{ return ( hold_by_t<resource_t>::raw( _resource ) ); }
 	hold_t get( void )
 		{ return ( hold_by_t<resource_t>::raw( _resource ) ); }
+	template<typename real_t>
+	operator HResourceRef<real_t, free_t, hold_by_t, allocated_t>( void )
+		{
+		HResourceRef<real_t, free_t, hold_by_t, allocated_t> ref( _resource, _free );
+		_resource = typename hold_by_t<resource_t>::hold_t();
+		_free = free_t();
+		return ( ref );
+		}
+	template<typename real_t>
+	operator HResource<real_t, free_t, hold_by_t, allocated_t>( void )
+		{
+		HResource<real_t, free_t, hold_by_t, allocated_t> ref( _resource, _free );
+		_resource = typename hold_by_t<resource_t>::hold_t();
+		_free = free_t();
+		return ( ref );
+		}
 	void swap( HResource& other )
 		{
 		if ( &other != this )
@@ -169,8 +238,16 @@ public:
 			}
 		}
 private:
-	HResource( HResource const& );
-	HResource& operator = ( HResource const& );
+	template<typename alien_t>
+	void pass( alien_t& src_ )
+		{
+		HResource& src = reinterpret_cast<HResource&>( src_ );
+		using yaal::swap;
+		swap( _resource, src._resource );
+		swap( _free, src._free );
+		src_.reset();
+		return;
+		}
 	};
 
 }

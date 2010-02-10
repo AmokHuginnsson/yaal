@@ -27,8 +27,6 @@ Copyright:
 #ifndef YAAL_HCONSOLE_HITEM_HXX_INCLUDED
 #define YAAL_HCONSOLE_HITEM_HXX_INCLUDED
 
-#line 31
-
 #include "hcore/harray.hxx"
 #include "hcore/hinfo.hxx"
 
