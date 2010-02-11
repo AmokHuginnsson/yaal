@@ -1,3 +1,7 @@
+_aux/config.guess
+_aux/config.sub
+_aux/install-sh
+_aux/ltmain.sh
 doc/html
 yaalrc
 yaal.*
