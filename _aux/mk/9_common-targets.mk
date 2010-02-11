@@ -36,11 +36,14 @@ mrproper: clean
 	printf "%b\n" "done."
 
 purge: mrproper
-	/bin/rm -rf autom4te.cache build config.cache config.status \
-		configure.lineno configure Makefile.mk config.hxx config.hxx.in \
-		config.h config.h.in yaalrc config.log doc/html \
-		CMakeFiles Makefile CMakeCache.txt cmake_install.cmake \
-		tags GPATH GRTAGS GSYMS GTAGS make.log
+	/bin/rm -rf aclocal.m4 autom4te.cache _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing \
+		build config.cache config.status \
+		configure.lineno configure.scan configure Makefile.mk config.hxx config.hxx.in \
+		config.h config.h.in yaalrc config.log dirs.d doc/html \
+		CMakeFiles CMakeCache.txt cmake_install.cmake \
+		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj \
+		yaal.sln yaal.suo yaal.ncb *.dir debug release *.so && \
+	if [ "x${OSTYPE}" != "xcygwin" ] ; then /bin/rm -f Makefile ; fi
 
 bin:
 	@( DO_RELEASE=1 $(MAKE) ; make clean )

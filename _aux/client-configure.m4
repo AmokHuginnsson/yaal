@@ -1,7 +1,5 @@
 dnl configure.ac is integral part of yaal client project.
 
-AC_CONFIG_AUX_DIR([../yaal/_aux])
-
 m4_include([_aux/aclib.m4])
 
 if test ["$CXX"] = ["colorgcc"] -o ["$CXX"] = ["colorg++"] ; then

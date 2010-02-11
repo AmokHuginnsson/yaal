@@ -69,7 +69,7 @@ build/%/yaalrc: configure yaalrc.in
 		fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
 
 configure config.hxx.in: configure.ac _aux/aclib.m4
-	@$(call invoke,autoreconf && touch configure config.hxx.in)
+	@$(call invoke,libtoolize --quiet --force --install && autoreconf && touch configure config.hxx.in)
 
 mrproper: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
 
@@ -77,8 +77,9 @@ clean: $(foreach T, $(MAIN_TARGETS), clean-$(T))
 
 purge: mrproper
 	@sh -c '. ./_aux/clean-lib.sh && clean .' && \
-	/bin/rm -rf autom4te.cache build config.cache config.status \
-		configure.lineno configure Makefile.mk config.hxx config.hxx.in \
+	/bin/rm -rf aclocal.m4 autom4te.cache _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing \
+		build config.cache config.status \
+		configure.lineno configure.scan configure Makefile.mk config.hxx config.hxx.in \
 		config.h config.h.in yaalrc config.log dirs.d doc/html \
 		CMakeFiles CMakeCache.txt cmake_install.cmake \
 		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj \
