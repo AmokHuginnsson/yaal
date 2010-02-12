@@ -33,6 +33,7 @@ Copyright:
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: "__TID__" $" )
 #include "hexception.hxx"
 #include "xalloc.hxx"
 #include "hlog.hxx"

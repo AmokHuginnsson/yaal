@@ -49,7 +49,11 @@ Copyright:
 #include "hstring.hxx"
 #endif /* not HAVE_STRCASESTR */
 
+#include "base.hxx"
 #include "xalloc.hxx"
+
+M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: "__TID__" $" )
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
 void* memrchr( void const* ptr, int what, int long from )

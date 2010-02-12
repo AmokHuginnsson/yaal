@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hpointer.hxx"
 #include "hcore/htokenizer.hxx"
 #include "util.hxx"

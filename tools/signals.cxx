@@ -35,6 +35,7 @@ Copyright:
 
 #include "hcore/base.hxx" /* M_PROLOG, M_EPILOG */
 M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/xalloc.hxx"
 #include "hcore/hlog.hxx"       /* log object */
 #include "hcore/hstring.hxx"    /* HString class */
