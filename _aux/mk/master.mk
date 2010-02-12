@@ -69,7 +69,7 @@ build/%/yaalrc: configure yaalrc.in
 		fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
 
 configure config.hxx.in: configure.ac _aux/aclib.m4
-	@$(call invoke,libtoolize --quiet --force --install && autoreconf && touch configure config.hxx.in)
+	@$(call invoke,libtoolize --force > /dev/null 2>&1 ; automake --add-missing --force-missing > /dev/null 2>&1 ; autoreconf && touch configure config.hxx.in)
 
 mrproper: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
 
