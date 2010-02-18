@@ -36,8 +36,8 @@ mrproper: clean
 	printf "%b\n" "done."
 
 purge: mrproper
-	/bin/rm -rf aclocal.m4 autom4te.cache _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing \
-		build config.cache config.status \
+	if [ -d _aux -a ! -h _aux ] ; then /bin/rm -f _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing ; fi && \
+	/bin/rm -rf aclocal.m4 autom4te.cache build config.cache config.status \
 		configure.lineno configure.scan configure Makefile.mk config.hxx config.hxx.in \
 		config.h config.h.in yaalrc config.log dirs.d doc/html \
 		CMakeFiles CMakeCache.txt cmake_install.cmake \
