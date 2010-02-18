@@ -44,6 +44,7 @@ LIB_ARCHIVE_SUFFIX = dll.a
 endif
 CTAGS	= @CTAGS@
 GITID = @GITID@
+RANLIB= @RANLIB@
 include $(DIR_ROOT)/_aux/mk/1_basic.mk
 include $(DIR_ROOT)/_aux/mk/2_term.mk
 include $(DIR_ROOT)/_aux/mk/3_suffix.mk
@@ -94,7 +95,7 @@ $(LIB_PREFIX)%.$(LIB_SUFFIX):
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)
 	@$(AR) $(ARFLAGS) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(NAME)) | tee -a make.log ; \
-	ranlib lib$(NAME).$(LIB_ARCHIVE_SUFFIX)
+	$(RANLIB) lib$(NAME).$(LIB_ARCHIVE_SUFFIX)
 endif
 	@/bin/mv -f $(@) lib$(NAME).$(LIB_ARCHIVE_SUFFIX) $(DIR_TARGET)/; $(call msg,printf "%b" "making cache ... ";)
 ifeq ($(LIB_PREFIX),lib)
