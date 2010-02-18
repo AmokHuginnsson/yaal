@@ -82,8 +82,8 @@ AC_MSG_RESULT([--- Testing presence of C and C++ preprocesor ... ---   [[28%]]])
 AC_PROG_CPP
 AC_PROG_CXXCPP
 AC_MSG_RESULT([--- Looking standrad development software ... ---       [[33%]]])
+dnl AC_PROG_MKDIR_P dnl Centos 5.4 has obsolete version of autoconf package.
 AC_PROG_INSTALL
-AC_PROG_MKDIR_P
 AC_PROG_RANLIB
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
 

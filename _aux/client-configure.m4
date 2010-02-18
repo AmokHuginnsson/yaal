@@ -44,6 +44,9 @@ dnl and for C and C++ preprocesor
 AC_PROG_CPP
 AC_PROG_CXXCPP
 
+dnl AC_PROG_MKDIR_P dnl Centos 5.4 has obsolete version of autoconf package.
+AC_PROG_INSTALL
+AC_PROG_RANLIB
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
 
 dnl Check compiler version.
