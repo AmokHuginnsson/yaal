@@ -588,7 +588,11 @@ char unsigned HConsole::get_attr( void ) const
 		M_THROW( "not in curses mode", errno );
 	attr_t l_xAttr;
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE l_hColor = 0;
-	static_cast<void>( attr_get( &l_xAttr, &l_hColor, NULL ) ); /* Ugly macro */
+	/* A workaround for compiler warning regarding
+	 * &l_xAttr and &l_hColor never being NULL. */
+	attr_t* pa( &l_xAttr );
+	NCURSES_ATTR_GET_SECOND_ARG_TYPE* pc( &l_hColor );
+	static_cast<void>( attr_get( pa, pc, NULL ) ); /* Ugly macro */
 	int unsigned l_uiAttribute = ( l_hColor << 1 ) & 56;
 	l_uiAttribute |= ( l_hColor & 7 );
 	if ( l_xAttr & A_BOLD )
