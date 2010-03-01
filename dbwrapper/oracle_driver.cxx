@@ -47,69 +47,69 @@ using namespace yaal::hcore;
 extern "C"
 {
 
-static char const * const g_pcLogTag = "Oracle: ";
+static char const* const g_pcLogTag = "Oracle: ";
 
 HString g_oInstanceName;
 
 struct OAllocator
 	{
-	OAllocator * f_psNext;
-	char * f_pcBuffer;
+	OAllocator* f_psNext;
+	char* f_pcBuffer;
 	};
 
 typedef struct
 	{
 	int f_iStatus;
-	OCIEnv * f_psEnvironment;
-	OCIError * f_psError;
-	OCISvcCtx * f_psServiceContext;
+	OCIEnv* f_psEnvironment;
+	OCIError* f_psError;
+	OCISvcCtx* f_psServiceContext;
 	} OOracle;
 
 typedef struct
 	{
-	int * f_piStatus;
-	OCIError * f_psError;
-	OCIStmt * f_psStatement;
-	OAllocator * f_psAllocator;
+	int* f_piStatus;
+	OCIError* f_psError;
+	OCIStmt* f_psStatement;
+	OAllocator* f_psAllocator;
 	} OQuery;
 
-OOracle * g_psBrokenDB = NULL;
+OOracle* g_psBrokenDB = NULL;
 
-void db_disconnect ( void * );
-void db_unquery ( void * );
+void db_disconnect( void* );
+void db_unquery( void* );
 
-void * db_connect ( char const * /* In Oracle user name is name of schema. */,
-		char const * a_pcLogin, char const * a_pcPassword )
+void* db_connect ( char const* /* In Oracle user name is name of schema. */,
+		char const* a_pcLogin, char const* a_pcPassword )
 	{
-	OOracle * l_psOracle = NULL;
+	OOracle* l_psOracle = NULL;
 	if ( g_psBrokenDB )
 		{
-		db_disconnect ( g_psBrokenDB );
+		db_disconnect( g_psBrokenDB );
 		g_psBrokenDB = NULL;
 		}
-	l_psOracle = xcalloc < OOracle > ( 1 );
-	if ( ( l_psOracle->f_iStatus = OCIInitialize ( OCI_DEFAULT, NULL, NULL,
+	l_psOracle = xcalloc<OOracle>( 1 );
+	if ( ( l_psOracle->f_iStatus = OCIInitialize( OCI_DEFAULT, NULL, NULL,
 					NULL, NULL ) ) != OCI_SUCCESS )
 		{
 		g_psBrokenDB = l_psOracle;
 		return ( NULL );
 		}
-	if ( ( l_psOracle->f_iStatus = OCIEnvCreate ( & l_psOracle->f_psEnvironment,
+	if ( ( l_psOracle->f_iStatus = OCIEnvCreate( &l_psOracle->f_psEnvironment,
 				OCI_DEFAULT | OCI_THREADED, NULL, NULL, NULL, NULL, 0,
 				NULL ) ) != OCI_SUCCESS )
 		{
 		g_psBrokenDB = l_psOracle;
 		return ( NULL );
 		}
-	if ( ( l_psOracle->f_iStatus = OCIHandleAlloc ( l_psOracle->f_psEnvironment,
-				reinterpret_cast < void * * > ( & l_psOracle->f_psError ),
+	if ( ( l_psOracle->f_iStatus = OCIHandleAlloc( l_psOracle->f_psEnvironment,
+				reinterpret_cast<void**>( &l_psOracle->f_psError ),
 				OCI_HTYPE_ERROR, 0, NULL ) ) != OCI_SUCCESS )
 		{
 		g_psBrokenDB = l_psOracle;
 		return ( NULL );
 		}
 	if ( ( l_psOracle->f_iStatus = OCILogon ( l_psOracle->f_psEnvironment,
-				l_psOracle->f_psError, & l_psOracle->f_psServiceContext,
+				l_psOracle->f_psError, &l_psOracle->f_psServiceContext,
 				reinterpret_cast<OraText const*>( a_pcLogin ),
 				static_cast<ub4>( ::strlen( a_pcLogin ) ),
 				reinterpret_cast<OraText const*>( a_pcPassword ),
@@ -123,9 +123,9 @@ void * db_connect ( char const * /* In Oracle user name is name of schema. */,
 	return ( l_psOracle );
 	}
 
-void db_disconnect ( void * a_pvData )
+void db_disconnect( void* a_pvData )
 	{
-	OOracle * l_psOracle = static_cast < OOracle * > ( a_pvData );
+	OOracle* l_psOracle = static_cast<OOracle*>( a_pvData );
 	if ( ! l_psOracle )
 		l_psOracle = g_psBrokenDB;
 	if ( l_psOracle )
@@ -144,7 +144,7 @@ void db_disconnect ( void * a_pvData )
 	return;
 	}
 
-int db_errno ( void* a_pvData )
+int db_errno( void* a_pvData )
 	{
 	int l_iError = 0;
 	OOracle const* l_psOracle = NULL;
@@ -156,15 +156,15 @@ int db_errno ( void* a_pvData )
 	if ( ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO )
 			&& ( l_psOracle->f_iStatus != OCI_ERROR ) )
 		return ( l_psOracle->f_iStatus );
-	OCIErrorGet( l_psOracle->f_psError, 1, NULL, & l_iError, NULL, 0,
+	OCIErrorGet( l_psOracle->f_psError, 1, NULL, &l_iError, NULL, 0,
 			OCI_HTYPE_ERROR );
 	return ( l_iError );
 	}
 
-char const * db_error( void* a_pvData )
+char const* db_error( void* a_pvData )
 	{
 	sb4 code = 0;
-	static char l_pcTextBuffer [ OCI_ERROR_MAXMSG_SIZE ];
+	static char l_pcTextBuffer[ OCI_ERROR_MAXMSG_SIZE ];
 	OOracle const* l_psOracle = NULL;
 	if ( ! a_pvData )
 		a_pvData = g_psBrokenDB;
@@ -190,28 +190,28 @@ char const * db_error( void* a_pvData )
 		case ( OCI_CONTINUE ):
 			return ( "OCI_CONTINUE" );
 		default:
-			snprintf ( l_pcTextBuffer, OCI_ERROR_MAXMSG_SIZE - 2,
+			snprintf( l_pcTextBuffer, OCI_ERROR_MAXMSG_SIZE - 2,
 					"Error - %d", l_psOracle->f_iStatus );
 		}
 	return ( l_pcTextBuffer );
 	}
 
-void * db_query ( void * a_pvData, char const * a_pcQuery )
+void* db_query ( void* a_pvData, char const* a_pcQuery )
 	{
-	OOracle * l_psOracle = static_cast < OOracle * > ( a_pvData );
-	OQuery * l_psQuery = xcalloc < OQuery > ( 1 );
+	OOracle* l_psOracle = static_cast<OOracle*> ( a_pvData );
+	OQuery* l_psQuery = xcalloc<OQuery>( 1 );
 	HString l_oQuery = a_pcQuery;
 	int l_iIters = 0;
 	int l_iLength = static_cast<int>( ::strlen( a_pcQuery ) );
-	char * l_pcEnd = ( const_cast<char*>( a_pcQuery ) + l_iLength ) - 1;
+	char* l_pcEnd = ( const_cast<char*>( a_pcQuery ) + l_iLength ) - 1;
 	
-	if ( ( * l_pcEnd ) == ';' )
-		( * l_pcEnd ) = 0;
-	l_psOracle->f_iStatus = OCIStmtPrepare2 ( l_psOracle->f_psServiceContext,
-			& l_psQuery->f_psStatement, l_psOracle->f_psError,
+	if ( ( *l_pcEnd ) == ';' )
+		( *l_pcEnd ) = 0;
+	l_psOracle->f_iStatus = OCIStmtPrepare2( l_psOracle->f_psServiceContext,
+			&l_psQuery->f_psStatement, l_psOracle->f_psError,
 			reinterpret_cast<OraText const*>( a_pcQuery ),
 			static_cast<int>( ::strlen( a_pcQuery ) ), NULL, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
-	l_psQuery->f_piStatus = & l_psOracle->f_iStatus;
+	l_psQuery->f_piStatus = &l_psOracle->f_iStatus;
 	l_psQuery->f_psError = l_psOracle->f_psError;
 	if ( ( l_psOracle->f_iStatus != OCI_SUCCESS )
 			&& ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO ) )
@@ -223,7 +223,7 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 	else
 		{
 		if ( l_psOracle->f_iStatus == OCI_SUCCESS_WITH_INFO )
-			log ( LOG_TYPE::INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error ( l_psOracle ) << endl;
+			log ( LOG_TYPE::INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error( l_psOracle ) << endl;
 		l_oQuery.upper();
 		if ( l_oQuery.find ( "INSERT" ) == 0 )
 			l_iIters = 1;
@@ -238,12 +238,12 @@ void * db_query ( void * a_pvData, char const * a_pcQuery )
 		if ( ( l_psOracle->f_iStatus != OCI_SUCCESS )
 				&& ( l_psOracle->f_iStatus != OCI_SUCCESS_WITH_INFO ) )
 			{
-			log ( LOG_TYPE::ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to execute statement." << endl;
+			log( LOG_TYPE::ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to execute statement." << endl;
 			db_unquery ( l_psQuery );
 			l_psQuery = NULL;
 			}
 		else if ( l_psOracle->f_iStatus == OCI_SUCCESS_WITH_INFO )
-			log ( LOG_TYPE::INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error ( l_psOracle ) << endl;
+			log( LOG_TYPE::INFO ) << g_pcLogTag <<  __FUNCTION__ << ": " << db_error( l_psOracle ) << endl;
 		}
 	return ( l_psQuery );
 	}
@@ -282,7 +282,7 @@ char* rs_get( void* a_pvData, int long a_iRow, int a_iColumn )
 					OCI_HTYPE_STMT, l_psQuery->f_psError,
 					reinterpret_cast<void**>( &l_psParameter ), a_iColumn + 1 ) ) == OCI_SUCCESS )
 		{
-		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet( l_psParameter,
+		if ( ( ( *l_psQuery->f_piStatus ) = OCIAttrGet( l_psParameter,
 						OCI_DTYPE_PARAM, &l_iSize, 0, OCI_ATTR_DATA_SIZE,
 						l_psQuery->f_psError ) ) == OCI_SUCCESS )
 			{
@@ -327,22 +327,22 @@ int long dbrs_records_count ( void*, void* a_pvDataR )
 	{
 	int l_iRows = 0;
 	OQuery* l_psQuery = static_cast<OQuery*>( a_pvDataR );
-	( * l_psQuery->f_piStatus ) = OCIStmtFetch2 ( l_psQuery->f_psStatement,
+	( *l_psQuery->f_piStatus ) = OCIStmtFetch2 ( l_psQuery->f_psStatement,
 																								 l_psQuery->f_psError, 1,
 																								 OCI_FETCH_LAST, 0,
 																								 OCI_DEFAULT );
-	if ( ( ( * l_psQuery->f_piStatus ) != OCI_SUCCESS )
-			&& ( ( * l_psQuery->f_piStatus ) != OCI_SUCCESS_WITH_INFO ) )
+	if ( ( ( *l_psQuery->f_piStatus ) != OCI_SUCCESS )
+			&& ( ( *l_psQuery->f_piStatus ) != OCI_SUCCESS_WITH_INFO ) )
 		{
 		log ( LOG_TYPE::ERROR ) << g_pcLogTag << __FUNCTION__ << ": failed to fetch last row." << endl;
 		return ( - 1 );
 		}
-	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
-					OCI_HTYPE_STMT, & l_iRows, 0, OCI_ATTR_CURRENT_POSITION,
+	if ( ( ( *l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
+					OCI_HTYPE_STMT, &l_iRows, 0, OCI_ATTR_CURRENT_POSITION,
 					l_psQuery->f_psError ) ) != OCI_SUCCESS )
 		{
-		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
-						OCI_HTYPE_STMT, & l_iRows, 0, OCI_ATTR_ROW_COUNT,
+		if ( ( ( *l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
+						OCI_HTYPE_STMT, &l_iRows, 0, OCI_ATTR_ROW_COUNT,
 						l_psQuery->f_psError ) ) != OCI_SUCCESS )
 			l_iRows = - 1;
 		}
@@ -354,17 +354,17 @@ int long dbrs_id( void*, void* a_pvDataR )
 	int l_iNameLength = 0;
 	int long l_lId = 0;
 	HString l_oSQL;
-	text * l_pcName = NULL;
+	text* l_pcName = NULL;
 	OQuery* l_psQuery = static_cast<OQuery*>( a_pvDataR );
-	OQuery * l_psAutonumber = NULL;
-	if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
-					OCI_HTYPE_STMT, & l_pcName,
-					reinterpret_cast < ub4 * > ( & l_iNameLength ),
+	OQuery* l_psAutonumber = NULL;
+	if ( ( ( *l_psQuery->f_piStatus ) = OCIAttrGet ( l_psQuery->f_psStatement,
+					OCI_HTYPE_STMT, &l_pcName,
+					reinterpret_cast<ub4*>( &l_iNameLength ),
 					OCI_ATTR_NAME, l_psQuery->f_psError ) ) == OCI_SUCCESS )
 		{
 		l_pcName [ l_iNameLength ] = 0;
 		l_oSQL.format ( "SELECT %s_sequence.currval FROM dual;",
-				reinterpret_cast < char * > ( l_pcName ) );
+				reinterpret_cast<char*>( l_pcName ) );
 		l_psAutonumber = static_cast<OQuery*>( db_query( l_psAutonumber, l_oSQL.raw() ) );
 		l_lId = strtol ( rs_get ( l_psAutonumber, 0, 0 ), NULL, 10 );
 		db_unquery( l_psAutonumber );
@@ -375,16 +375,16 @@ int long dbrs_id( void*, void* a_pvDataR )
 char * rs_column_name ( void* a_pvDataR, int a_iField )
 	{
 	int l_iNameLength = 0;
-	text * l_pcName = NULL;
-	OCIParam * l_psParameter = NULL;
+	text* l_pcName = NULL;
+	OCIParam* l_psParameter = NULL;
 	OQuery* l_psQuery = static_cast<OQuery*>( a_pvDataR );
-	if ( ( ( * l_psQuery->f_piStatus ) = OCIParamGet ( l_psQuery->f_psStatement,
+	if ( ( ( *l_psQuery->f_piStatus ) = OCIParamGet ( l_psQuery->f_psStatement,
 					OCI_HTYPE_STMT, l_psQuery->f_psError,
-					reinterpret_cast < void * * > ( & l_psParameter ), a_iField + 1 ) ) == OCI_SUCCESS )
+					reinterpret_cast<void**>( &l_psParameter ), a_iField + 1 ) ) == OCI_SUCCESS )
 		{
-		if ( ( ( * l_psQuery->f_piStatus ) = OCIAttrGet ( l_psParameter,
-						OCI_DTYPE_PARAM, & l_pcName,
-						reinterpret_cast < ub4 * > ( & l_iNameLength ),
+		if ( ( ( *l_psQuery->f_piStatus ) = OCIAttrGet ( l_psParameter,
+						OCI_DTYPE_PARAM, &l_pcName,
+						reinterpret_cast<ub4*>( &l_iNameLength ),
 						OCI_ATTR_NAME, l_psQuery->f_psError ) ) == OCI_SUCCESS )
 			{
 			if ( l_iNameLength >= 0 )
