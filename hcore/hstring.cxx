@@ -61,6 +61,14 @@ int long kmpsearch( char const* const, int long const&, char const* const, int l
 	}
 
 char const n_pcWhiteSpace[] = "\a\b \t\v\f\r\n";
+#define D_LETTER "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define D_DIGIT "0123456789"
+char const n_pcDigit[] = D_DIGIT;
+char const n_pcLetter[] = D_LETTER;
+char const n_pcWord[] = D_LETTER D_DIGIT "_";
+#undef D_DIGIT
+#undef D_LETTER
+
 char const* n_ppcErrMsgHString[ 3 ] =
 	{
 	_( "ok" ),

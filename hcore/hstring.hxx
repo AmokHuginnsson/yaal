@@ -35,6 +35,11 @@ namespace yaal
 namespace hcore
 {
 
+extern char const n_pcWhiteSpace[];
+extern char const n_pcDigit[];
+extern char const n_pcLetter[];
+extern char const n_pcWord[];
+
 /*! \brief Implementation of high level string operations.
  */
 class HString
@@ -169,8 +174,8 @@ public:
 	 */
 	HString mid( int long start, int long length = meta::max_signed<int long>::value ) const;
 	HString right( int long const& ) const;
-	HString& trim_left( char const* const = " \t\r\n" );
-	HString& trim_right( char const* const = " \t\r\n" );
+	HString& trim_left( char const* const = n_pcWhiteSpace );
+	HString& trim_right( char const* const = n_pcWhiteSpace );
 	HString& shift_left( int long const& );
 	HString& shift_right( int long const&, char const = ' ' );
 	/*! \brief Fill portion of string with constatnt value.
@@ -217,8 +222,6 @@ namespace string_helper
 int long kmpcasesearch( char const* const, int long const&, char const* const, int long const& );
 
 }
-
-extern char const n_pcWhiteSpace[];
 
 }
 
