@@ -326,7 +326,7 @@ HString get_token( yaal::hcore::HString const& s, yaal::hcore::HString const& d,
 
 bool is_byte( int value )
 	{
-	return ( value <= static_cast<int>( meta::max_unsigned<char>::value ) );
+	return ( value <= static_cast<int>( meta::max_unsigned<char unsigned>::value ) );
 	}
 
 void show_help( void* arg )

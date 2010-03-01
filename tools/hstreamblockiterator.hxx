@@ -39,7 +39,7 @@ namespace tools
 
 /*! \brief Read stream block by block.
  */
-class HStreamBlockIterator : private yaal::HNonCopyable
+class HStreamBlockIterator : private yaal::trait::HNonCopyable
 	{
 public:
 	/*! \brief Single block of data.

@@ -32,6 +32,7 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hbitmap.hxx"
 #include "hcore/hpool.hxx"
+#include "hcore/pod.hxx"
 
 typedef yaal::hcore::HPool<char*> mem_pool_t;
 

@@ -38,6 +38,7 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hpair.hxx"
+#include "hcore/pod.hxx"
 
 namespace yaal
 {
@@ -186,7 +187,7 @@ void set_option_value_from_string( tType& object, HString const& value )
 }
 
 template<typename tType>
-class HProgramOptionsHandler::HOptionValue : public HProgramOptionsHandler::HOptionValueInterface, private HNonCopyable
+class HProgramOptionsHandler::HOptionValue : public HProgramOptionsHandler::HOptionValueInterface, private trait::HNonCopyable
 	{
 	tType& _instance;
 	typedef HProgramOptionsHandler::HOptionValue<tType> self_t;

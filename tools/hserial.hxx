@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hrawfile.hxx"
+#include "hcore/hstrongenum.hxx"
 
 namespace yaal
 {

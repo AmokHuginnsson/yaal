@@ -34,6 +34,7 @@ Copyright:
 #include "hcore/hrawfile.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/hexception.hxx"
+#include "hcore/hstrongenum.hxx"
 
 namespace yaal
 {

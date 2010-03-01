@@ -35,6 +35,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hset.hxx"
 #include "hvariant.hxx"
 #include "iterator.hxx"
+#include "hstrongenum.hxx"
 
 namespace yaal
 {

@@ -45,7 +45,7 @@ namespace hcore
 
 /*! \brief Interface for all client to singleton pattern.
  */
-class HSingletonInterface : private HNonCopyable
+class HSingletonInterface : private trait::HNonCopyable
 	{
 public:
 	static int life_time( int );

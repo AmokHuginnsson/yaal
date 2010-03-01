@@ -31,6 +31,8 @@ Copyright:
 #ifndef YAAL_HCORE_NUMERIC_HXX_INCLUDED
 #define YAAL_HCORE_NUMERIC_HXX_INCLUDED
 
+#include "hcore/static_assert.hxx"
+
 namespace yaal
 {
 
@@ -38,6 +40,31 @@ namespace yaal
  */
 namespace meta
 {
+
+/*! \brief Perform a logical negation.
+ *
+ * \tparam value_in - value to be negated.
+ * \retval value - conditional value.
+ */
+template<bool const value_in>
+struct boolean_not
+	{
+	static bool const value = ! value_in;
+	};
+
+/*! \brief Test if givent type is a signed type.
+ *
+ * \tparam T - type to perform the test on.
+ * \retval value - true iff T is a signed type.
+ *
+ * This meta-function should be placed in trait.hxx header, but numeric.hxx
+ * is already required there.
+ */
+template<typename T>
+struct is_signed
+	{
+	static bool const value = static_cast<T>( 0 ) > static_cast<T>( ~0 );
+	};
 
 /*! \brief Get maximum positive number for a given type.
  *
@@ -47,6 +74,7 @@ namespace meta
 template<typename T>
 struct max_signed
 	{
+	STATIC_ASSERT( is_signed<T>::value );
 	static T const value = static_cast<T>( ~( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) ) );
 	};
 template<typename T>
@@ -60,7 +88,8 @@ T const max_signed<T>::value;
 template<typename T>
 struct max_unsigned
 	{
-	static T const value = static_cast<T>( ~( 0 ) );
+	STATIC_ASSERT( boolean_not<is_signed<T>::value>::value );
+	static T const value = static_cast<T>( ~0 );
 	};
 template<typename T>
 T const max_unsigned<T>::value;
@@ -73,6 +102,7 @@ T const max_unsigned<T>::value;
 template<typename T>
 struct min_signed
 	{
+	STATIC_ASSERT( is_signed<T>::value );
 	static T const value = static_cast<T>( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) );
 	};
 template<typename T>
@@ -194,17 +224,6 @@ struct ternary<false, value_for_true, value_for_false>
 	static int long const value = value_for_false;
 	};
 /* \endcond */
-
-/*! \brief Perform a logical negation.
- *
- * \tparam value_in - value to be negated.
- * \retval value - conditional value.
- */
-template<bool const value_in>
-struct boolean_not
-	{
-	static bool const value = ! value_in;
-	};
 
 /*! \brief Check if one value is greater than another.
  *

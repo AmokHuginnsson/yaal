@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/hstring.hxx"
 #include "hcore/hstreaminterface.hxx"
+#include "hcore/hstrongenum.hxx"
 
 namespace yaal
 {

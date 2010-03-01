@@ -369,7 +369,7 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 	/* If user does not specify short form by hand an automatic short form value will by assigned.
 	 * Automatic short form value must be outside of byte range.
 	 */
-	int sf = shortForm ? shortForm : static_cast<int>( f_oOptions.size() ) + meta::max_unsigned<char>::value + 1;
+	int sf = shortForm ? shortForm : static_cast<int>( f_oOptions.size() ) + meta::max_unsigned<char unsigned>::value + 1;
 	OOption o( name, value, sf, type, arg, desc, callback );
 	if ( ! ( name || sf ) )
 		throw HProgramOptionsHandlerException( "unnamed option encountered" );
@@ -624,7 +624,7 @@ char const* make_short_opts( HProgramOptionsHandler::options_t const& a_oOptions
 	for ( HProgramOptionsHandler::options_t::const_iterator it = a_oOptions.begin(),
 			end = a_oOptions.end(); it != end; ++ it )
 		{
-		if ( it->f_iShortForm > static_cast<int>( meta::max_unsigned<char>::value ) )
+		if ( it->f_iShortForm > static_cast<int>( meta::max_unsigned<char unsigned>::value ) )
 			continue;
 		a_roBuffer += static_cast<char>( it->f_iShortForm );
 		switch ( it->f_eSwitchType )

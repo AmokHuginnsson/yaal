@@ -27,6 +27,8 @@ Copyright:
 #ifndef YAAL_TOOLS_HDES_HXX_INCLUDED
 #define YAAL_TOOLS_HDES_HXX_INCLUDED
 
+#include "hcore/pod.hxx"
+
 namespace yaal
 {
 

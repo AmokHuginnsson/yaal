@@ -308,6 +308,18 @@ struct is_kind_of
 	static bool const value = sizeof ( calc( static_cast<derived_t const*>( NULL ) ) ) == sizeof ( YES );
 	};
 
+/*! \brief Interface preventing copying of objects.
+ */
+class HNonCopyable
+	{
+public:
+	HNonCopyable( void ) {}
+	virtual ~HNonCopyable( void ) {}
+private:
+	HNonCopyable( HNonCopyable const& );
+	HNonCopyable& operator = ( HNonCopyable const& );
+	};
+
 /*! \brief Check if given type is a member type.
  *
  * \tparam T - type to check for being a member.

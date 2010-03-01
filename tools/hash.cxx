@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/algorithm.hxx"
+#include "hcore/pod.hxx"
 #include "hash.hxx"
 #include "hstreamblockiterator.hxx"
 #include "hbitmap.hxx"

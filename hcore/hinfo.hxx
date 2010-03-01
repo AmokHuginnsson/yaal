@@ -31,6 +31,7 @@ Copyright:
 #include "hcore/htime.hxx"
 #include "hcore/hexception.hxx" /* types definitions */
 #include "hcore/hstrongenum.hxx"
+#include "hcore/pod.hxx"
 
 namespace yaal
 {
