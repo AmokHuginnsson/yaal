@@ -119,7 +119,10 @@ class HAlike
 	int long _best;
 	bool _damerau;
 public:
-	HAlike( iter_t it, item_t const& item, bool damerau = true ) : _item( item ), _iter( it ), _best( LONG_MAX ), _damerau( damerau ) {}
+	HAlike( iter_t it, item_t const& item, bool damerau = true )
+		: _item( item ), _iter( it ),
+		_best( meta::max_signed<int long>::value ),
+		_damerau( damerau ) {}
 	void operator()( iter_t it )
 		{
 		int long dist = levenshtein_damerau( _item, *it, _damerau );

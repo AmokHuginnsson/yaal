@@ -101,7 +101,7 @@ HString const& HTokenizer::HIterator::operator* ( void ) const
 	M_ENSURE( _start >= 0 );
 	_buffer.clear();
 	int long end = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start );
-	_buffer = _owner->_string.mid( _start, end >= 0 ? ( end - _start ) : INT_MAX );
+	_buffer = _owner->_string.mid( _start, end >= 0 ? ( end - _start ) : meta::max_signed<int long>::value );
 	M_ASSERT( ( _owner->_behavior == HTokenizer::INCLUDE_EMPTY ) || ! _buffer.is_empty()  );
 	return ( _buffer );
 	M_EPILOG

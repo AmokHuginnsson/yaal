@@ -31,8 +31,6 @@ Copyright:
 #ifndef YAAL_HCORE_NUMERIC_HXX_INCLUDED
 #define YAAL_HCORE_NUMERIC_HXX_INCLUDED
 
-#include <limits.h>
-
 namespace yaal
 {
 
@@ -54,6 +52,19 @@ struct max_signed
 template<typename T>
 T const max_signed<T>::value;
 
+/*! \brief Get maximum number value for a given unsigned type.
+ *
+ * \tparam T - type to get maximum fit.
+ * \retval value - a maximum positive number that can be fit into variable of unsigned type T.
+ */
+template<typename T>
+struct max_unsigned
+	{
+	static T const value = static_cast<T>( ~( 0 ) );
+	};
+template<typename T>
+T const max_unsigned<T>::value;
+
 /*! \brief Get minimum negative number for a given type.
  *
  * \tparam T - type to get minimum negative number.
@@ -62,7 +73,7 @@ T const max_signed<T>::value;
 template<typename T>
 struct min_signed
 	{
-	static T const value = static_cast<T>( ~0 );
+	static T const value = static_cast<T>( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) );
 	};
 template<typename T>
 T const min_signed<T>::value;
@@ -86,9 +97,9 @@ struct to_bool
  */
 template<int long a0, int long a1,
 	int long a2 = min_signed<int long>::value, int long a3 = min_signed<int long>::value,
-	int long a4 = LONG_MIN, int long a5 = LONG_MIN,
-	int long a6 = LONG_MIN, int long a7 = LONG_MIN,
-	int long a8 = LONG_MIN, int long a9 = LONG_MIN>
+	int long a4 = min_signed<int long>::value, int long a5 = min_signed<int long>::value,
+	int long a6 = min_signed<int long>::value, int long a7 = min_signed<int long>::value,
+	int long a8 = min_signed<int long>::value, int long a9 = min_signed<int long>::value>
 struct max
 	{
 	static int long const b0 = a0 > a1 ? a0 : a1;

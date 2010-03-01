@@ -27,7 +27,7 @@ Copyright:
 #ifndef YAAL_HCORE_HSTRING_HXX_INCLUDED
 #define YAAL_HCORE_HSTRING_HXX_INCLUDED
 
-#include <limits.h>
+#include "hcore/numeric.hxx"
 
 namespace yaal
 {
@@ -167,7 +167,7 @@ public:
 	 * \param length - length of a substring.
 	 * \return Substring.
 	 */
-	HString mid( int long start, int long length = INT_MAX ) const;
+	HString mid( int long start, int long length = meta::max_signed<int long>::value ) const;
 	HString right( int long const& ) const;
 	HString& trim_left( char const* const = " \t\r\n" );
 	HString& trim_right( char const* const = " \t\r\n" );
