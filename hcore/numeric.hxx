@@ -41,6 +41,32 @@ namespace yaal
 namespace meta
 {
 
+/*! \brief Get maximum positive number for a given type.
+ *
+ * \tparam T - type to get maximum positive number.
+ * \retval value - a maximum positive number that can be fit into variable of type T.
+ */
+template<typename T>
+struct max_signed
+	{
+	static T const value = static_cast<T>( ~( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) ) );
+	};
+template<typename T>
+T const max_signed<T>::value;
+
+/*! \brief Get minimum negative number for a given type.
+ *
+ * \tparam T - type to get minimum negative number.
+ * \retval value - a minimum negative number that can be fit into variable of type T.
+ */
+template<typename T>
+struct min_signed
+	{
+	static T const value = static_cast<T>( ~0 );
+	};
+template<typename T>
+T const min_signed<T>::value;
+
 template<bool boolean>
 struct to_int
 	{
@@ -59,7 +85,7 @@ struct to_bool
  * \retval value - maximum integer from given set.
  */
 template<int long a0, int long a1,
-	int long a2 = LONG_MIN, int long a3 = LONG_MIN,
+	int long a2 = min_signed<int long>::value, int long a3 = min_signed<int long>::value,
 	int long a4 = LONG_MIN, int long a5 = LONG_MIN,
 	int long a6 = LONG_MIN, int long a7 = LONG_MIN,
 	int long a8 = LONG_MIN, int long a9 = LONG_MIN>
@@ -192,19 +218,6 @@ struct less
 	{
 	static bool const value = val1 < val2;
 	};
-
-/*! \brief Get maximum positive number for a given type.
- *
- * \tparam T - type to get maximum positive number.
- * \retval value - a maximum positive number that can be fit into variable of type T.
- */
-template<typename T>
-struct max_signed
-	{
-	static T const value = static_cast<T>( ~( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) ) );
-	};
-template<typename T>
-T const max_signed<T>::value;
 
 }
 
