@@ -4,9 +4,6 @@ DIR_BUILD ?= $(CURDIR)
 FIND      = find
 ARFLAGS   = cr
 VPATH     = $(DIR_ROOT)
-DIR_DEST  =
-prefix    = $(DIR_DEST)/usr/bin
-doc       = $(DIR_DEST)/usr/share/doc
 
 # this neat trick does not really blong here
 # but we want client makefiles look really simple

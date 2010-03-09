@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 #
 #---        `yaal' (c) 1978 by Marcin 'Amok' Konarski             ---
 #
@@ -24,28 +24,26 @@
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 
-line=`grep -s LD_LIBRARY_PATH ~/.profile ~/.bashrc ~/.bash_profile ~/.cshrc ~/.tcshrc ~/.login ~/.zshrc ~/.zlogin ~/.zshenv ~/.zsh/zlogin ~/.zsh/zshrc ~/.zsh/zshenv`
+line=`grep -s LD_LIBRARY_PATH ${HOME}/.profile ${HOME}/.bashrc ${HOME}/.bash_profile ${HOME}/.cshrc ${HOME}/.tcshrc ${HOME}/.login ${HOME}/.zshrc ${HOME}/.zlogin ${HOME}/.zshenv ${HOME}/.zsh/zlogin ${HOME}/.zsh/zshrc ${HOME}/.zsh/zshenv`
 if [ "x$line" != "x" ] ; then
 	printf "%b\n" "Environment have been already set."
 	exit 1
 fi
 
+shell_env() {
+	cat ${DIR_ROOT}/_aux/${1} | sed -e "s/{YAAL_PREFIX}/${YAAL_PREFIX}/g"
+}
+
+YAAL_PREFIX=`echo ${1} | sed -e 's/\//\\\\\//g'`
+
 printf "%b\n" "Compilation have been finished !"
 printf "%b\n" "It is need to be added seweral lines to your .SHELLrc file :"
 printf "%b\n" "#v+"
-printf "%b\n" "set LIBRARY_PATH=~/usr/lib"
-printf "%b\n" "set C_INCLUDE_PATH=~/usr/include"
-printf "%b\n" "set CPLUS_INCLUDE_PATH=~/usr/include"
-printf "%b\n" "set OBJC_INCLUDE_PATH=~/usr/include"
-printf "%b\n" "set LD_LIBRARY_PATH=~/usr/lib"
+shell_env shellrc
 printf "%b\n" "#v-"
 printf "%b\n" "or for C shell :"
 printf "%b\n" "#v+"
-printf "%b\n" "setenv LIBRARY_PATH ~/usr/lib"
-printf "%b\n" "setenv C_INCLUDE_PATH ~/usr/include"
-printf "%b\n" "setenv CPLUS_INCLUDE_PATH ~/usr/include"
-printf "%b\n" "setenv OBJC_INCLUDE_PATH ~/usr/include"
-printf "%b\n" "setenv LD_LIBRARY_PATH ~/usr/lib"
+shell_env shellrc.csh
 printf "%b\n" "#v-"
 printf "%b" "Do it now ? (yes/[no]) "
 read ANSWER
@@ -58,27 +56,27 @@ if [ "$ANSWER" ] ; then
 		export SH=`grep $USER /etc/passwd | tr \/ '\n'|tail -1`
 		case "$SH" in
 			sh)
-				cat shellrc >> ~/.profile
+				shell_env shellrc >> ${HOME}/.profile
 				;;
 			zsh)
-				if [ -f ~/.zsh/zshrc ] ; then
-					cat shellrc >> ~/.zsh/zshrc
-				elif [ -f ~/.zshrc ] ; then
-					cat shellrc >> ~/.zshrc
+				if [ -f ${HOME}/.zsh/zshrc ] ; then
+					shell_env shellrc >> ${HOME}/.zsh/zshrc
+				elif [ -f ${HOME}/.zshrc ] ; then
+					shell_env shellrc >> ${HOME}/.zshrc
 				fi
 				;;
 			bash)
-				if [ -f ~/.bashrc -a -f .bash_profile -a !'grep "source \~/\.bashrc" .bash_profile' ] ; then
-					cat shellrc >> ~/.bashrc
+				if [ -f ${HOME}/.bashrc -a -f .bash_profile -a !'grep "source \${HOME}/\.bashrc" .bash_profile' ] ; then
+					shell_env shellrc >> ${HOME}/.bashrc
 				else
-					cat shellrc >> ~/.bash_profile
+					shell_env shellrc >> ${HOME}/.bash_profile
 				fi
 				;;
 			csh)
-				cat shellrc.csh >> ~/.cshrc
+				shell_env shellrc.csh >> ${HOME}/.cshrc
 				;;
 			tcsh)
-				cat shellrc.csh >> ~/.tcshrc
+				shell_env shellrc.csh >> ${HOME}/.tcshrc
 				;;
 		esac
 	else
@@ -87,12 +85,8 @@ if [ "$ANSWER" ] ; then
 else
 	printf "%b\n" "Remember to add this lines so that libraries could work properly"
 fi
-source ./shellrc 2>/dev/null
-source ./shellrc.csh 2>/dev/null
-if [ -f shellrc ] ; then
-	cd ..
-fi
-printf "%b\n" "Installation process ends."
+
+printf "%b\n" "Environment setup process ends."
 
 exit 0
 

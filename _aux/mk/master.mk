@@ -43,9 +43,9 @@ build/%/Makefile.mk: configure Makefile.mk.in
 		$(call invoke,\
 		mkdir -p $(DIR) && cd $(DIR) && \
 		if test -t 1 -a "x${VERBOSE}" != "xyes" ; then \
-			/bin/rm -f $(notdir $(@)) && ../../configure $(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
+			/bin/rm -f $(notdir $(@)) && ../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
 		else \
-			../../configure $(CONFIGURE) ; \
+			../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) ; \
 		fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
 
 build/%/config.hxx: configure config.hxx.in
@@ -53,9 +53,9 @@ build/%/config.hxx: configure config.hxx.in
 		$(call invoke,\
 		mkdir -p $(DIR) && cd $(DIR) && \
 		if test -t 1 -a "x${VERBOSE}" != "xyes" ; then \
-			/bin/rm -f $(notdir $(@)) && ../../configure $(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
+			/bin/rm -f $(notdir $(@)) && ../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
 		else \
-			../../configure $(CONFIGURE) ; \
+			../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) ; \
 		fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
 
 build/%/yaalrc: configure yaalrc.in
@@ -63,9 +63,9 @@ build/%/yaalrc: configure yaalrc.in
 		$(call invoke,\
 		mkdir -p $(DIR) && cd $(DIR) && \
 		if test -t 1 -a "x${VERBOSE}" != "xyes" ; then \
-			/bin/rm -f $(notdir $(@)) && ../../configure $(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
+			/bin/rm -f $(notdir $(@)) && ../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
 		else \
-			../../configure $(CONFIGURE) ; \
+			../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) ; \
 		fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
 
 configure config.hxx.in: configure.ac _aux/aclib.m4

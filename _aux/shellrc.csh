@@ -1,5 +1,5 @@
-setenv LIBRARY_PATH ~/usr/lib
-setenv C_INCLUDE_PATH ~/usr/include
-setenv CPLUS_INCLUDE_PATH ~/usr/include
-setenv OBJC_INCLUDE_PATH ~/usr/include
-setenv LD_LIBRARY_PATH ~/usr/lib
+setenv LIBRARY_PATH {YAAL_PREFIX}/lib
+setenv C_INCLUDE_PATH {YAAL_PREFIX}/include
+setenv CPLUS_INCLUDE_PATH {YAAL_PREFIX}/include
+setenv OBJC_INCLUDE_PATH {YAAL_PREFIX}/include
+setenv LD_LIBRARY_PATH {YAAL_PREFIX}/lib
