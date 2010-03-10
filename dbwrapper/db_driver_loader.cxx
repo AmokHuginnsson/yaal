@@ -61,10 +61,10 @@ static char const* g_ppcDriver[ 7 ] =
 	{
 	"default",
 	"null",
-	LIB_PREFIX"sqlite3_driver."LIB_EXT,
-	LIB_PREFIX"postgresql_driver."LIB_EXT,
-	LIB_PREFIX"mysql_driver."LIB_EXT,
-	LIB_PREFIX"oracle_driver."LIB_EXT,
+	LIB_PREFIX"sqlite3_driver"LIB_INFIX"."LIB_EXT,
+	LIB_PREFIX"postgresql_driver"LIB_INFIX"."LIB_EXT,
+	LIB_PREFIX"mysql_driver"LIB_INFIX"."LIB_EXT,
+	LIB_PREFIX"oracle_driver"LIB_INFIX"."LIB_EXT,
 	NULL
 	};
 

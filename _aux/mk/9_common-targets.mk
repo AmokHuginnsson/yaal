@@ -3,7 +3,7 @@
 
 all: debug
 
-debug: environment $(REAL_TARGETS)
+debug release prof cov: environment $(REAL_TARGETS)
 
 environment: $(DIR_BUILD) $(DIRS)
 

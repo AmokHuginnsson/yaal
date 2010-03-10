@@ -36,6 +36,7 @@ DIR_DOC      = $(PREFIX)/share/doc/yaal
 DIRS         = $(DIR_LIB) $(DIR_HEADERS) $(DIR_BUILD)
 HAPI_HEADER  = $(DIR_HEADERS)/yaal.hxx
 LD_SO_CONF   = $(DIR_LIB)/ld.so.conf
+DO_@DO_TARGET@=1
 LIB_PREFIX   = @LIB_PREFIX@
 ifeq ($(LIB_PREFIX),lib)
 LIB_SUFFIX   = so.$(RELEASE)
@@ -66,22 +67,22 @@ $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT))))
 
 LIBS_hcore     = -lssl -lcrypto @HCORE_LIBS@
 DEPS_tools     = $(TARGET_hcore)
-LIBS_tools     = -lhcore -lpthread -lxml2 -lxslt @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@ @HCORE_LIBS@
+LIBS_tools     = -lhcore$(LIB_INFIX) -lpthread -lxml2 -lxslt @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@ @HCORE_LIBS@
 DEPS_dbwrapper = $(TARGET_hcore) $(TARGET_tools)
-LIBS_dbwrapper = -ltools -lhcore @HCORE_LIBS@
+LIBS_dbwrapper = -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) @HCORE_LIBS@
 DEPS_hconsole  = $(TARGET_hcore) $(TARGET_tools)
-LIBS_hconsole  = -ltools -lhcore -lncurses @HCONSOLE_LIBS@ @HCORE_LIBS@
+LIBS_hconsole  = -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) -lncurses @HCONSOLE_LIBS@ @HCORE_LIBS@
 DEPS_hdata     = $(TARGET_dbwrapper) $(TARGET_hconsole)
-LIBS_hdata     = -lhconsole -ldbwrapper -ltools -lhcore -lncurses @HCORE_LIBS@
+LIBS_hdata     = -lhconsole$(LIB_INFIX) -ldbwrapper$(LIB_INFIX) -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) -lncurses @HCORE_LIBS@
 
 DEPS_sqlite3_driver    = $(TARGET_hcore)
-LIBS_sqlite3_driver    = -lsqlite3 -lhcore
+LIBS_sqlite3_driver    = -lsqlite3 -lhcore$(LIB_INFIX)
 DEPS_mysql_driver      = $(TARGET_hcore)
-LIBS_mysql_driver      = -lmysqlclient -lhcore
+LIBS_mysql_driver      = -lmysqlclient -lhcore$(LIB_INFIX)
 DEPS_postgresql_driver = $(TARGET_hcore)
-LIBS_postgresql_driver = -lpq -lhcore
+LIBS_postgresql_driver = -lpq -lhcore$(LIB_INFIX)
 DEPS_oracle_driver     = $(TARGET_hcore)
-LIBS_oracle_driver     = -lclntsh -lhcore
+LIBS_oracle_driver     = -lclntsh -lhcore$(LIB_INFIX)
 
 -include $(DIR_ROOT)/local.mk
 
@@ -91,21 +92,21 @@ LIBS_oracle_driver     = -lclntsh -lhcore
 
 .SECONDEXPANSION:
 
-$(LIB_PREFIX)%.$(LIB_SUFFIX): $$(OBJS_$$(*)) $$(DEPS_$$(*))
+$(LIB_PREFIX)%$(LIB_INFIX).$(LIB_SUFFIX): $$(OBJS_$$(*)) $$(DEPS_$$(*))
 	@$(call msg,printf "%b" "Linking \`$(@) ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LXXFLAGS) @SONAME_FLAG@ -o $(@) \
 			@START_GROUP@ $(OBJS_$(*)) @END_GROUP@ $(LIBS_$(*)) 2>&1 | tee -a make.log;) $(call msg, printf "%b" "$(RS)";)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)
-	@$(AR) $(ARFLAGS) lib$(*).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(*)) | tee -a make.log ; \
-	$(RANLIB) lib$(*).$(LIB_ARCHIVE_SUFFIX)
+	@$(AR) $(ARFLAGS) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(*)) | tee -a make.log ; \
+	$(RANLIB) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX)
 endif
-	@/bin/cp -f $(@) lib$(*).$(LIB_ARCHIVE_SUFFIX) $(DIR_LIB)/; $(call msg,printf "%b" "making cache ... ";)
+	@/bin/cp -f $(@) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(DIR_LIB)/; $(call msg,printf "%b" "making cache ... ";)
 ifeq ($(LIB_PREFIX),lib)
 	@cd $(DIR_LIB) && $(DIR_LIB)/mkcache && \
-	ln -sf lib$(*).so.$(RELEASE) lib$(*).so.$(VERSION).$(SUBVERSION) && \
-	ln -sf lib$(*).so.$(VERSION).$(SUBVERSION) lib$(*).so.$(VERSION) && \
-	ln -sf lib$(*).so.$(VERSION) lib$(*).so
+	ln -sf lib$(*)$(LIB_INFIX).so.$(RELEASE) lib$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) && \
+	ln -sf lib$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) lib$(*)$(LIB_INFIX).so.$(VERSION) && \
+	ln -sf lib$(*)$(LIB_INFIX).so.$(VERSION) lib$(*)$(LIB_INFIX).so
 endif
 	@$(call msg,printf "%b$(NL)" "done.$(CL)")
 

@@ -2,6 +2,11 @@ dnl configure.ac is integral part of yaal client project.
 
 m4_include([_aux/aclib.m4])
 
+DO_TARGET="RELEASE"
+AC_ARG_ENABLE([debug],[AC_HELP_STRING([--enable-debug],[Compile with debugging symbols.])],[DO_TARGET="DEBUG" LIB_INFIX="-d"])
+AC_ARG_ENABLE([profiling],[AC_HELP_STRING([--enable-profiling],[Provide support for profiling tools.])],[DO_TARGET="PROFILING" LIB_INFIX="-p"])
+AC_ARG_ENABLE([coverage],[AC_HELP_STRING([--enable-coverage],[Get ready to gather coverage data.])],[DO_TARGET="COVERAGE" LIB_INFIX="-c"])
+
 if test ["$CXX"] = ["colorgcc"] -o ["$CXX"] = ["colorg++"] ; then
 	CXX=["g++"]
 fi
@@ -106,15 +111,15 @@ CPPFLAGS=$CXXFLAGS;
 AC_SEARCH_LIBS([libintl_gettext],[intl],,[AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])])])
 AC_CHECK_LIB([ncurses],[initscr],
 							[],[AC_MSG_ERROR([Can not continue without ncurses.])])
-AC_CHECK_LIB([hcore],[yaal_hcore_main],
+AC_CHECK_LIB([hcore${LIB_INFIX}],[yaal_hcore_main],
 							[],[AC_MSG_ERROR([Can not continue without hcore.])])
-AC_CHECK_LIB([hconsole],[yaal_hconsole_main],
+AC_CHECK_LIB([hconsole${LIB_INFIX}],[yaal_hconsole_main],
 							[],[AC_MSG_ERROR([Can not continue without hconsole.])])
-AC_CHECK_LIB([tools],[yaal_tools_main],
+AC_CHECK_LIB([tools${LIB_INFIX}],[yaal_tools_main],
 							[],[AC_MSG_ERROR([Can not continue without tools.])])
-AC_CHECK_LIB([dbwrapper],[yaal_dbwrapper_main],
+AC_CHECK_LIB([dbwrapper${LIB_INFIX}],[yaal_dbwrapper_main],
 							[],[AC_MSG_ERROR([Can not continue without dbwrapper.])])
-AC_CHECK_LIB([hdata],[yaal_hdata_main],
+AC_CHECK_LIB([hdata${LIB_INFIX}],[yaal_hdata_main],
 							[],[AC_MSG_ERROR([Can not continue without hdata.])])
 
 AC_CHECK_HEADERS([yaal/yaal.hxx],,
@@ -143,6 +148,7 @@ AC_SUBST([EXTRA_LXXFLAGS],[${EXTRA_LXXFLAGS}])
 AC_SUBST([START_GROUP],[${START_GROUP}])
 AC_SUBST([END_GROUP],[${END_GROUP}])
 AC_SUBST([RDYNAMIC],[${RDYNAMIC}])
+AC_SUBST([DO_TARGET],[${DO_TARGET}])
 
 GEN_CONFIG_HXX_IN(CLIENT_CONFIGURE_PROJECT_NAME_UC)
 

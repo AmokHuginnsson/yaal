@@ -33,18 +33,22 @@ ifeq ($(HD),1)
 endif
 COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe \
 																-D_GNU_SOURCE
+LIB_INFIX = -d
 ifdef DO_RELEASE
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations -DNDEBUG -Wno-error
+	LIB_INFIX =
 else
 	COMPILER_DEBUG_FLAGS				= -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
 endif
 ifdef DO_PROFILING
 	COMPILER_PROFILING_FLAGS = -pg
 	LINKER_PROFILING_FLAGS   = -pg
+	LIB_INFIX = -p
 endif
 ifdef DO_COVERAGE
 	COMPILER_COVERAGE_FLAGS = --coverage
 	LINKER_COVERAGE_FLAGS   = --coverage
+	LIB_INFIX = -c
 endif
 LINKER_PRIME_FLAGS  = -Wl,--demangle
 

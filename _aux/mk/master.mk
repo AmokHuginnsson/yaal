@@ -15,10 +15,25 @@ clean-$(1):
 
 endef
 
+define PREPARE_CONFIG_ITEM
+build/%/$(1): configure $(1).in
+	@$$(eval DIR = $$(dir $$(@))) \
+		$$(call invoke,\
+		mkdir -p $$(DIR) && cd $$(DIR) && \
+		if test -t 1 -a "x$${VERBOSE}" != "xyes" ; then \
+			/bin/rm -f $$(notdir $$(@)) && \
+			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
+		else \
+			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(CONFIGURE) ; \
+		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
+endef
+
 MAIN_TARGETS=debug release prof cov
-OPT_release=DO_RELEASE=1
-OPT_prof=DO_COVERAGE=1
-OPT_cov=DO_PROFILING=1
+CONFIG_ITEMS=Makefile.mk config.hxx yaalrc
+CONF_release=
+CONF_debug=--enable-debug
+CONF_prof=--enable-profiling
+CONF_cov=--enable-coverage
 
 DS=d
 FIND=find
@@ -37,36 +52,7 @@ bin dep doc environment install static stats tags: .my_make
 	$(call invoke,$(MAKE) -C $(dir $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./)) -f $(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk))) ./_aux/empty) $(@))
 
 $(foreach T, $(MAIN_TARGETS), $(eval $(call PREPARE_MAIN_TARGET,$(T),$(OPT_$(T)))))
-
-build/%/Makefile.mk: configure Makefile.mk.in
-	@$(eval DIR = $(dir $(@))) \
-		$(call invoke,\
-		mkdir -p $(DIR) && cd $(DIR) && \
-		if test -t 1 -a "x${VERBOSE}" != "xyes" ; then \
-			/bin/rm -f $(notdir $(@)) && ../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
-		else \
-			../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) ; \
-		fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
-
-build/%/config.hxx: configure config.hxx.in
-	@$(eval DIR = $(dir $(@))) \
-		$(call invoke,\
-		mkdir -p $(DIR) && cd $(DIR) && \
-		if test -t 1 -a "x${VERBOSE}" != "xyes" ; then \
-			/bin/rm -f $(notdir $(@)) && ../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
-		else \
-			../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) ; \
-		fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
-
-build/%/yaalrc: configure yaalrc.in
-	@$(eval DIR = $(dir $(@))) \
-		$(call invoke,\
-		mkdir -p $(DIR) && cd $(DIR) && \
-		if test -t 1 -a "x${VERBOSE}" != "xyes" ; then \
-			/bin/rm -f $(notdir $(@)) && ../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
-		else \
-			../../configure $(if $(PREFIX),--prefix=$(PREFIX)) $(CONFIGURE) ; \
-		fi ; test -f $(notdir $(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
+$(foreach T, $(CONFIG_ITEMS), $(eval $(call PREPARE_CONFIG_ITEM,$(T))))
 
 configure config.hxx.in: configure.ac _aux/aclib.m4
 	@$(call invoke,libtoolize --force --install > /dev/null 2>&1 || libtoolize --force > /dev/null 2>&1 && automake --add-missing --force-missing > /dev/null 2>&1 ; autoreconf && touch configure config.hxx.in)

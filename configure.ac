@@ -22,6 +22,10 @@ AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 dri
 dnl `
 AC_ARG_WITH([oracle],[AC_HELP_STRING([--with-oracle],[Compile with Oralce driver, default is `yes' if Oracle can be found.])],[ORACLE=$withval],[ORACLE="auto"])
 dnl `
+DO_TARGET="RELEASE"
+AC_ARG_ENABLE([debug],[AC_HELP_STRING([--enable-debug],[Compile with debugging symbols.])],[DO_TARGET="DEBUG" LIB_INFIX="-d"])
+AC_ARG_ENABLE([profiling],[AC_HELP_STRING([--enable-profiling],[Provide support for profiling tools.])],[DO_TARGET="PROFILING" LIB_INFIX="-p"])
+AC_ARG_ENABLE([coverage],[AC_HELP_STRING([--enable-coverage],[Get ready to gather coverage data.])],[DO_TARGET="COVERAGE" LIB_INFIX="-c"])
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 
@@ -418,6 +422,7 @@ if test ["$ORACLE"] = ["no"] -a ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a
 	AC_MSG_WARN([yaal without any data base driver will be unusable for most professional purpouses.])
 fi
 
+AC_DEFINE_UNQUOTED([LIB_INFIX],"${LIB_INFIX}",[Target dependent library name infix.])
 AC_SUBST([EXTRA_LIB_PATHS], [${EXTRA_LIB_PATHS}])
 AC_SUBST([EXTRA_INCLUDE_PATHS], [${EXTRA_INCLUDE_PATHS}])
 AC_SUBST([DEFAULT_DRIVER], [${DEFAULT_DRIVER}])
@@ -433,6 +438,7 @@ AC_SUBST([RDYNAMIC],[${RDYNAMIC}])
 AC_SUBST([HCORE_LIBS],[${HCORE_LIBS}])
 AC_SUBST([TOOLS_LIBS],[${TOOLS_LIBS}])
 AC_SUBST([HCONSOLE_LIBS],[${HCONSOLE_LIBS}])
+AC_SUBST([DO_TARGET],[${DO_TARGET}])
 AH_TOP([/* $Id$ */
 
 #ifndef YAAL_CONFIG_HXX_INCLUDED
