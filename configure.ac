@@ -119,7 +119,7 @@ if test ["x${START_GROUP}"] != ["x"] ; then
 	END_GROUP="-Wl,--end-group"
 fi
 if test ["x${SONAME_FLAG}"] != ["x"] ; then
-	SONAME_FLAG="-Wl,-soname,\$(SONAME_\$(NAME))"
+	SONAME_FLAG="-Wl,-soname,\$(SONAME_\$(*))"
 fi
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])

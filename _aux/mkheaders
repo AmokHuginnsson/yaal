@@ -1,6 +1,6 @@
 #! /bin/sh
 
-if [ -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" -o -z "${DIR_HEADERS}" ] ; then
+if [ -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" ] ; then
 	printf "%b\n" "Core settings not found!"
 	exit 1
 fi
@@ -8,6 +8,8 @@ fi
 umask 022
 
 cd ${DIR_ROOT}
+
+DIR_HEADERS="${DIR_BUILD}/yaal"
 
 for FILE in ${HDRS}; do
 	mkdir -p ${DIR_HEADERS}/`dirname ${FILE}`
@@ -24,7 +26,7 @@ cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
 EOF
 
-find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{ printf "#include <%s>\n", substr( $1, match( $1, "yaal" ), 255 ) }' | sort >> ${DIR_HEADERS}/yaal.hxx
+find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{ printf "#include <%s>\n", substr( $1, match( $1, "yaal/[^/]*/[^/]*.hxx" ), 255 ) }' | sort >> ${DIR_HEADERS}/yaal.hxx
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 

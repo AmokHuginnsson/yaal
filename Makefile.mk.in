@@ -31,10 +31,10 @@ COMPONENTS   = hcore tools dbwrapper hconsole hdata
 DRIVERS      = @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 PREFIX       = @prefix@
 DIR_LIB      = $(PREFIX)/lib
-DIR_HEADERS  = $(PREFIX)/include/yaal
+DIR_HEADERS  = $(PREFIX)/include
 DIR_DOC      = $(PREFIX)/share/doc/yaal
-DIRS         = $(DIR_LIB) $(DIR_HEADERS) $(DIR_BUILD)
-HAPI_HEADER  = $(DIR_HEADERS)/yaal.hxx
+DIRS         = $(DIR_LIB) $(DIR_BUILD)
+HAPI_HEADER  = yaal/yaal.hxx
 LD_SO_CONF   = $(DIR_LIB)/ld.so.conf
 DO_@DO_TARGET@=1
 LIB_PREFIX   = @LIB_PREFIX@
@@ -45,9 +45,10 @@ else
 LIB_SUFFIX   = dll
 LIB_ARCHIVE_SUFFIX = dll.a
 endif
-CTAGS	= @CTAGS@
-GITID = @GITID@
-RANLIB= @RANLIB@
+CTAGS   = @CTAGS@
+GITID   = @GITID@
+RANLIB  = @RANLIB@
+INSTALL = @INSTALL@
 include $(DIR_ROOT)/_aux/mk/1_basic.mk
 include $(DIR_ROOT)/_aux/mk/2_term.mk
 include $(DIR_ROOT)/_aux/mk/3_suffix.mk
@@ -93,22 +94,27 @@ LIBS_oracle_driver     = -lclntsh -lhcore$(LIB_INFIX)
 .SECONDEXPANSION:
 
 $(LIB_PREFIX)%$(LIB_INFIX).$(LIB_SUFFIX): $$(OBJS_$$(*)) $$(DEPS_$$(*))
-	@$(call msg,printf "%b" "Linking \`$(@) ... $(BOLD)$(RED)";) \
+	@$(call msg,printf "%b" "Linking \`$(@)' ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LXXFLAGS) @SONAME_FLAG@ -o $(@) \
 			@START_GROUP@ $(OBJS_$(*)) @END_GROUP@ $(LIBS_$(*)) 2>&1 | tee -a make.log;) $(call msg, printf "%b" "$(RS)";)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)
 	@$(AR) $(ARFLAGS) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(*)) | tee -a make.log ; \
 	$(RANLIB) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX)
-endif
-	@/bin/cp -f $(@) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(DIR_LIB)/; $(call msg,printf "%b" "making cache ... ";)
-ifeq ($(LIB_PREFIX),lib)
-	@cd $(DIR_LIB) && $(DIR_LIB)/mkcache && \
-	ln -sf lib$(*)$(LIB_INFIX).so.$(RELEASE) lib$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) && \
-	ln -sf lib$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) lib$(*)$(LIB_INFIX).so.$(VERSION) && \
-	ln -sf lib$(*)$(LIB_INFIX).so.$(VERSION) lib$(*)$(LIB_INFIX).so
-endif
-	@$(call msg,printf "%b$(NL)" "done.$(CL)")
+endif # just to allow shared linking during the build
+	@ln -sf lib$(*)$(LIB_INFIX).so.$(RELEASE) lib$(*)$(LIB_INFIX).so \
+	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
+
+define INSTALL_TARGET
+	$(call msg,printf "%b" "Installing \`lib$(1)$(LIB_INFIX).so.$(RELEASE)' ... $(BOLD)$(RED)";) \
+	$(INSTALL) lib$(1)$(LIB_INFIX).so.$(RELEASE) lib$(1)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(DIR_LIB)/ ; $(call msg, printf "%b" "$(RS)" && ) \
+	if [ "x$(LIB_PREFIX)" = "xlib" ] ; then \
+		ln -sf lib$(1)$(LIB_INFIX).so.$(RELEASE) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) && \
+		ln -sf lib$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION) && \
+		ln -sf lib$(1)$(LIB_INFIX).so.$(VERSION) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so ; \
+	fi && \
+	$(call msg,printf "%b$(NL)" "done.$(CL)" && )
+endef
 
 include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 #------------------------------------------------------------------------
@@ -119,26 +125,31 @@ include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 .PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags 
 .NOTPARALLEL: $(HAPI_HEADER) $(LD_SO_CONF)
 
-all debug release cov prof: environment $(TARGETS) $(HAPI_HEADER)
+$(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)
+
+all: $(TARGET)
 
 $(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 
-environment: $(DIRS) $(LD_SO_CONF)
+environment: $(DIRS)
+
+install: $(TARGET)
+	@$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call INSTALL_TARGET,$(IT))) \
+	/bin/cp -fRp $(DIR_BUILD)/yaal $(DIR_HEADERS) && \
+	$(call msg,printf "%b" "making cache ... " && ) \
+	printf "%b\n" $(DIR_LIB) > $(DIR_LIB)/ld.so.conf && \
+	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_LIB) && \
+	cd $(DIR_LIB) && $(DIR_LIB)/mkcache \
+	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
 install-environment:
 	@cd $(DIR_ROOT) && ./_aux/msh $(PREFIX)
 
-$(HAPI_HEADER): $(HDRS) $(DIR_HEADERS)
+$(HAPI_HEADER): $(HDRS)
 	@printf "%b" "Making headers ... "; \
-	env DIR_ROOT="$(DIR_ROOT)" DIR_BUILD="$(DIR_BUILD)" DIR_HEADERS="$(DIR_HEADERS)" HDRS="$(HDRS)" $(DIR_ROOT)/_aux/mkheaders; \
+	env DIR_ROOT="$(DIR_ROOT)" DIR_BUILD="$(DIR_BUILD)" HDRS="$(HDRS)" $(DIR_ROOT)/_aux/mkheaders; \
 	printf "%b$(NL)" "done.$(CL)$(BOLD)"; \
 	printf "%b\n" "All OK!$(RS)";
-
-$(LD_SO_CONF): $(DIR_ROOT)/_aux/mkcache
-	@printf "%b" "Making environment ... "; \
-	printf "%b\n" $(DIR_LIB) > $(DIR_LIB)/ld.so.conf; \
-	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_LIB); \
-	printf "%b$(NL)" "done.$(CL)"
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
@@ -149,7 +160,7 @@ clean: clean-dep
 
 mrproper: clean
 	@printf "%b" "Purging ... "; \
-	/bin/rm -rf $(DIR_LIB) $(DIR_HEADERS) make.log; \
+	/bin/rm -rf $(DIR_LIB) $(DIR_HEADERS)/yaal make.log; \
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
 	printf "%b\n" "done."

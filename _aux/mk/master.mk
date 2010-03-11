@@ -29,6 +29,7 @@ build/%/$(1): configure $(1).in
 endef
 
 MAIN_TARGETS=debug release prof cov
+DEFAULT_TARGET?=$(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(if $(wildcard ./build/$(T)/Makefile.mk),$(T))) release))
 CONFIG_ITEMS=Makefile.mk config.hxx yaalrc
 CONF_release=
 CONF_debug=--enable-debug
@@ -41,13 +42,9 @@ FIND=find
 .PHONY: all bin clean clean-cov clean-debug clean-prof clean-release clean-dep cov debug dep doc install mrproper mrproper-cov mrproper-debug mrproper-prof mrproper-release release prof purge static stats tags
 .NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc configure config.hxx.in
 
-.DEFAULT:
-	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
-	$(call invoke,$(MAKE) -C $(dir $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./)) -f $(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk))) ./_aux/empty) $(@))
+all: $(DEFAULT_TARGET)
 
-all: debug
-
-bin dep doc environment install static stats tags: .my_make
+bin dep doc environment install static stats tags .DEFAULT: .my_make $(DEFAULT_TARGET)
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
 	$(call invoke,$(MAKE) -C $(dir $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./)) -f $(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk))) ./_aux/empty) $(@))
 

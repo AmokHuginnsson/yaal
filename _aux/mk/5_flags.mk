@@ -35,17 +35,21 @@ COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe \
 																-D_GNU_SOURCE
 LIB_INFIX = -d
 ifdef DO_RELEASE
+	TARGET=release
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations -DNDEBUG -Wno-error
 	LIB_INFIX =
 else
+	TARGET=debug
 	COMPILER_DEBUG_FLAGS				= -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
 endif
 ifdef DO_PROFILING
+	TARGET=prof
 	COMPILER_PROFILING_FLAGS = -pg
 	LINKER_PROFILING_FLAGS   = -pg
 	LIB_INFIX = -p
 endif
 ifdef DO_COVERAGE
+	TARGET=cov
 	COMPILER_COVERAGE_FLAGS = --coverage
 	LINKER_COVERAGE_FLAGS   = --coverage
 	LIB_INFIX = -c
