@@ -106,8 +106,8 @@ endif # just to allow shared linking during the build
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
 define INSTALL_TARGET
-	$(call msg,printf "%b" "Installing \`lib$(1)$(LIB_INFIX).so.$(RELEASE)' ... $(BOLD)$(RED)";) \
-	$(INSTALL) lib$(1)$(LIB_INFIX).so.$(RELEASE) lib$(1)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(DIR_LIB)/ ; $(call msg, printf "%b" "$(RS)" && ) \
+	$(call msg,printf "%b" "Installing \`$(LIB_PREFIX)$(1)$(LIB_INFIX).$(LIB_SUFFIX)' ... $(BOLD)$(RED)";) \
+	$(INSTALL) $(LIB_PREFIX)$(1)$(LIB_INFIX).$(LIB_SUFFIX) lib$(1)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(DIR_LIB)/ ; $(call msg, printf "%b" "$(RS)" && ) \
 	if [ "x$(LIB_PREFIX)" = "xlib" ] ; then \
 		ln -sf lib$(1)$(LIB_INFIX).so.$(RELEASE) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) && \
 		ln -sf lib$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION) && \
