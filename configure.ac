@@ -422,7 +422,6 @@ if test ["$ORACLE"] = ["no"] -a ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a
 	AC_MSG_WARN([yaal without any data base driver will be unusable for most professional purpouses.])
 fi
 
-AC_DEFINE_UNQUOTED([LIB_INFIX],"${LIB_INFIX}",[Target dependent library name infix.])
 AC_SUBST([EXTRA_LIB_PATHS], [${EXTRA_LIB_PATHS}])
 AC_SUBST([EXTRA_INCLUDE_PATHS], [${EXTRA_INCLUDE_PATHS}])
 AC_SUBST([DEFAULT_DRIVER], [${DEFAULT_DRIVER}])

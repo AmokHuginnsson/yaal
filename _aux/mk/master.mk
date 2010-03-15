@@ -13,6 +13,9 @@ mrproper-$(1): clean-$(1)
 clean-$(1):
 	@$$(if $$(wildcard build/$(1)/Makefile.mk), $$(MAKE) -C build/$(1) -f Makefile.mk -e clean)
 
+install-$(1): $(1)
+	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
+	$$(if $$(wildcard build/$(1)/Makefile.mk), $$(MAKE) -C build/$(1) -f Makefile.mk -e install)
 endef
 
 define PREPARE_CONFIG_ITEM
@@ -39,7 +42,7 @@ CONF_cov=--enable-coverage
 DS=d
 FIND=find
 
-.PHONY: all bin clean clean-cov clean-debug clean-prof clean-release clean-dep cov debug dep doc install mrproper mrproper-cov mrproper-debug mrproper-prof mrproper-release release prof purge static stats tags
+.PHONY: all bin clean clean-cov clean-debug clean-prof clean-release clean-dep cov debug dep doc install install-cov install-debug install-prof install-release mrproper mrproper-cov mrproper-debug mrproper-prof mrproper-release release prof purge static stats tags
 .NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc configure config.hxx.in
 
 all: $(DEFAULT_TARGET)
