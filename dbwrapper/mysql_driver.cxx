@@ -116,14 +116,14 @@ int rs_fields_count( void* a_pvData )
 int long dbrs_records_count( void* a_pvDataB, void* a_pvDataR )
 	{
 	if ( a_pvDataR )
-		return ( mysql_num_rows( static_cast<MYSQL_RES*>( a_pvDataR ) ) );
+		return ( static_cast<int long>( mysql_num_rows( static_cast<MYSQL_RES*>( a_pvDataR ) ) ) );
 	else
-		return ( mysql_affected_rows( static_cast<MYSQL*>( a_pvDataB ) ) );
+		return ( static_cast<int long>( mysql_affected_rows( static_cast<MYSQL*>( a_pvDataB ) ) ) );
 	}
 
 int long dbrs_id( void* a_pvDataB, void* )
 	{
-	return ( mysql_insert_id( static_cast<MYSQL*>( a_pvDataB ) ) );
+	return ( static_cast<int long>( mysql_insert_id( static_cast<MYSQL*>( a_pvDataB ) ) ) );
 	}
 
 char* rs_column_name( void* a_pvDataR, int a_iField )
