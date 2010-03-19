@@ -2,7 +2,7 @@
 
 .sinclude ".my_make"
 
-all .DEFAULT:
+default .DEFAULT:
 	@$(MAKE) -f _aux/mk/master.mk $(@)
 
 .my_make:
