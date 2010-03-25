@@ -101,21 +101,24 @@ struct ATTR
 		}
 	};
 
-char const* const red = "\033[0m\033[31m";
-char const* const green = "\033[0m\033[32m";
-char const* const brown = "\033[0m\033[33m";
-char const* const blue = "\033[0m\033[34m";
-char const* const magenta = "\033[0m\033[35m";
-char const* const cyan = "\033[0m\033[36m";
-char const* const lightgray = "\033[0m\033[37m";
-char const* const gray = "\033[40m\033[1m";
-char const* const brightred = "\033[1m\033[31m";
-char const* const brightgreen = "\033[1m\033[32m";
-char const* const yellow = "\033[1m\033[33m";
-char const* const brightblue = "\033[1m\033[34m";
-char const* const brightmagenta = "\033[1m\033[35m";
-char const* const brightcyan = "\033[1m\033[36m";
-char const* const white = "\033[1m\033[37m";
+char const* const bold = "\033[1m";
+char const* const reset = "\033[0m";
+char const* const black = "\033[0;30m";
+char const* const red = "\033[0;31m";
+char const* const green = "\033[0;32m";
+char const* const brown = "\033[0;33m";
+char const* const blue = "\033[0;34m";
+char const* const magenta = "\033[0;35m";
+char const* const cyan = "\033[0;36m";
+char const* const lightgray = "\033[0;37m";
+char const* const gray = "\033[1;30m";
+char const* const brightred = "\033[1;31m";
+char const* const brightgreen = "\033[1;32m";
+char const* const yellow = "\033[1;33m";
+char const* const brightblue = "\033[1;34m";
+char const* const brightmagenta = "\033[1;35m";
+char const* const brightcyan = "\033[1;36m";
+char const* const white = "\033[1;37m";
 
 /* public: */
 

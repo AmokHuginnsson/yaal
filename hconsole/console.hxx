@@ -239,6 +239,9 @@ private:
 	friend class yaal::hcore::HDestructor<HConsole>;
 	};
 
+extern char const* const bold;
+extern char const* const reset;
+extern char const* const black;
 extern char const* const red;
 extern char const* const green;
 extern char const* const brown;

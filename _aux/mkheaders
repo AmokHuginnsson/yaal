@@ -13,7 +13,14 @@ DIR_HEADERS="${DIR_BUILD}/yaal"
 
 for FILE in ${HDRS}; do
 	mkdir -p ${DIR_HEADERS}/`dirname ${FILE}`
-	awk '/^#include "/ {match($0,"\"[a-z_./-]+"); printf "#include <yaal/%s>\n", substr($0,RSTART+1,RLENGTH-1) }; !/^#include "/' ${FILE} > ${DIR_HEADERS}/${FILE}
+	awk -f -  ${FILE} > ${DIR_HEADERS}/${FILE} << EOF
+/^#\\t*include "/ {
+	match(\$0, "#\\t*include");
+	printf "%s", substr( \$0, RSTART, RLENGTH );
+	match(\$0, "\"[a-z_./-]+");
+	printf " <yaal/%s>\\n", substr(\$0, RSTART + 1, RLENGTH - 1) }
+!/^#\\t*include "/
+EOF
 done
 
 cp -f "${DIR_BUILD}/config.hxx" ${DIR_HEADERS}/
