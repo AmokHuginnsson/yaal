@@ -96,22 +96,34 @@ LIBS_oracle_driver     = -lclntsh -lhcore$(LIB_INFIX)
 $(LIB_PREFIX)%$(LIB_INFIX).$(LIB_SUFFIX): $$(OBJS_$$(*)) $$(DEPS_$$(*))
 	@$(call msg,printf "%b" "Linking \`$(@)' ... $(BOLD)$(RED)";) \
 	$(call invoke,$(LXX) $(LIBS) $(LXXFLAGS) @SONAME_FLAG@ -o $(@) \
-			@START_GROUP@ $(OBJS_$(*)) @END_GROUP@ $(LIBS_$(*)) 2>&1 | tee -a make.log;) $(call msg, printf "%b" "$(RS)";)
+			@START_GROUP@ $(OBJS_$(*)) @END_GROUP@ $(LIBS_$(*)) 2>&1 | tee -a make.log) ; $(call msg, printf "%b" "$(RS)";)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)
-	@$(AR) $(ARFLAGS) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(*)) | tee -a make.log ; \
-	$(RANLIB) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX)
+	@$(call invoke,$(AR) $(ARFLAGS) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(*)) | tee -a make.log ) ; \
+	$(call invoke,$(RANLIB) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX))
 endif # just to allow shared linking during the build
-	@ln -sf lib$(*)$(LIB_INFIX).so.$(RELEASE) lib$(*)$(LIB_INFIX).so \
+	@$(call invoke,ln -sf lib$(*)$(LIB_INFIX).so.$(RELEASE) lib$(*)$(LIB_INFIX).so) \
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
 define INSTALL_TARGET
 	$(call msg,printf "%b" "Installing \`$(LIB_PREFIX)$(1)$(LIB_INFIX).$(LIB_SUFFIX)' ... $(BOLD)$(RED)";) \
-	$(INSTALL) $(LIB_PREFIX)$(1)$(LIB_INFIX).$(LIB_SUFFIX) lib$(1)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(DIR_LIB)/ ; $(call msg, printf "%b" "$(RS)" && ) \
+	$(call invoke,$(INSTALL) $(LIB_PREFIX)$(1)$(LIB_INFIX).$(LIB_SUFFIX) lib$(1)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(DIR_LIB)/ ) ; \
+	$(call msg, printf "%b" "$(RS)" && ) \
 	if [ "x$(LIB_PREFIX)" = "xlib" ] ; then \
-		ln -sf lib$(1)$(LIB_INFIX).so.$(RELEASE) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) && \
-		ln -sf lib$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION) && \
-		ln -sf lib$(1)$(LIB_INFIX).so.$(VERSION) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so ; \
+		$(call invoke,ln -sf lib$(1)$(LIB_INFIX).so.$(RELEASE) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) ) && \
+		$(call invoke,ln -sf lib$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION) ) && \
+		$(call invoke,ln -sf lib$(1)$(LIB_INFIX).so.$(VERSION) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so ) ; \
+	fi && \
+	$(call msg,printf "%b$(NL)" "done.$(CL)" && )
+endef
+
+define UNINSTALL_TARGET
+	$(call msg,printf "%b" "Uninstalling \`$(LIB_PREFIX)$(1)$(LIB_INFIX).$(LIB_SUFFIX)' ... $(BOLD)$(RED)";) \
+	$(call invoke,/bin/rm -f $(DIR_LIB)/$(LIB_PREFIX)$(1)$(LIB_INFIX).$(LIB_SUFFIX) $(DIR_LIB)/lib$(1)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) ) ; \
+	$(call msg, printf "%b" "$(RS)" && ) \
+	if [ "x$(LIB_PREFIX)" = "xlib" ] ; then \
+		$(call invoke,/bin/rm -f $(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) \
+			$(DIR_LIB)/lib$(1)$(LIB_INFIX).so.$(VERSION) $(DIR_LIB)/lib$(1)$(LIB_INFIX).so ) ; \
 	fi && \
 	$(call msg,printf "%b$(NL)" "done.$(CL)" && )
 endef
@@ -122,7 +134,7 @@ include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 
 #phony targets
-.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags 
+.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags uninstall 
 .NOTPARALLEL: $(HAPI_HEADER) $(LD_SO_CONF)
 
 $(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)
@@ -140,6 +152,12 @@ install: $(TARGET)
 	printf "%b\n" $(DIR_LIB) > $(DIR_LIB)/ld.so.conf && \
 	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_LIB) && \
 	cd $(DIR_LIB) && $(DIR_LIB)/mkcache \
+	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
+
+uninstall:
+	@$(call msg,printf "%b" "Uninstalling the library ... " && ) \
+	$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call UNINSTALL_TARGET,$(IT))) \
+	$(call invoke,/bin/rm -fr $(DIR_HEADERS)/yaal) \
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
 install-environment:
@@ -160,7 +178,7 @@ clean: clean-dep
 
 mrproper: clean
 	@printf "%b" "Purging ... "; \
-	/bin/rm -rf $(DIR_LIB) $(DIR_HEADERS)/yaal make.log; \
+	/bin/rm -rf yaal make.log; \
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
 	printf "%b\n" "done."

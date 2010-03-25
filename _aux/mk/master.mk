@@ -16,6 +16,10 @@ clean-$(1):
 install-$(1): $(1)
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
 	$$(if $$(wildcard build/$(1)/Makefile.mk), $$(MAKE) -C build/$(1) -f Makefile.mk -e install)
+
+uninstall-$(1): $(1)
+	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
+	$$(if $$(wildcard build/$(1)/Makefile.mk), $$(MAKE) -C build/$(1) -f Makefile.mk -e uninstall)
 endef
 
 define PREPARE_CONFIG_ITEM
@@ -50,8 +54,9 @@ default: $(.DEFAULT_GOAL)
 all: $(MAIN_TARGETS)
 
 install-all: $(foreach T, $(MAIN_TARGETS), install-$(T))
+uninstall-all: $(foreach T, $(MAIN_TARGETS), uninstall-$(T))
 
-bin dep doc environment install static stats tags .DEFAULT: .my_make $(.DEFAULT_GOAL)
+bin clean dep doc environment install mrproper static stats tags uninstall .DEFAULT: .my_make $(.DEFAULT_GOAL)
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
 	$(call invoke,$(MAKE) -C $(dir $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./)) -f $(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk))) ./_aux/empty) $(@))
 
@@ -61,11 +66,11 @@ $(foreach T, $(CONFIG_ITEMS), $(eval $(call PREPARE_CONFIG_ITEM,$(T))))
 configure config.hxx.in: configure.ac _aux/aclib.m4
 	@$(call invoke,libtoolize --force --install > /dev/null 2>&1 || libtoolize --force > /dev/null 2>&1 && automake --add-missing --force-missing > /dev/null 2>&1 ; autoreconf && touch configure config.hxx.in)
 
-mrproper: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
+mrproper-all: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
 
-clean: $(foreach T, $(MAIN_TARGETS), clean-$(T))
+clean-all: $(foreach T, $(MAIN_TARGETS), clean-$(T))
 
-purge: mrproper
+purge: mrproper-all
 	@sh -c '. ./_aux/clean-lib.sh && clean .' && \
 	if [ -d _aux -a ! -h _aux ] ; then /bin/rm -f _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing ; fi && \
 	/bin/rm -rf aclocal.m4 autom4te.cache build config.cache config.status \
