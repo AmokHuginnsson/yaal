@@ -162,7 +162,7 @@ private:
  */
 struct HGlobalScopeExceptionHandlingPolicy
 	{
-	static void hadle_exception( void ) __attribute__(( __noreturn__ ));
+	static void handle_exception( void ) __attribute__(( __noreturn__ ));
 	};
 
 /*! \brief Exception safe wrapper for global variables.
@@ -172,11 +172,11 @@ class HExceptionSafeGlobal
 	{
 	global_t _object;
 public:
-	HExceptionSafeGlobal( void ) try : _object() {} catch ( ... ) { exception_handling_policy_t::hadle_exception(); }
+	HExceptionSafeGlobal( void ) try : _object() {} catch ( ... ) { exception_handling_policy_t::handle_exception(); }
 	template<typename a0_t>
-	HExceptionSafeGlobal( a0_t const& a0_ ) try : _object( a0_ ) {} catch ( ... ) { exception_handling_policy_t::hadle_exception(); }
+	HExceptionSafeGlobal( a0_t const& a0_ ) try : _object( a0_ ) {} catch ( ... ) { exception_handling_policy_t::handle_exception(); }
 	template<typename a0_t, typename a1_t>
-	HExceptionSafeGlobal( a0_t const& a0_, a1_t const& a1_ ) try : _object( a0_, a1_ ) {} catch ( ... ) { exception_handling_policy_t::hadle_exception(); }
+	HExceptionSafeGlobal( a0_t const& a0_, a1_t const& a1_ ) try : _object( a0_, a1_ ) {} catch ( ... ) { exception_handling_policy_t::handle_exception(); }
 	global_t& instance( void )
 		{ return ( _object ); }
 	};

@@ -254,7 +254,7 @@ void HFailedAssertion::swap( HFailedAssertion& other )
 	return;
 	}
 
-void HGlobalScopeExceptionHandlingPolicy::hadle_exception( void )
+void HGlobalScopeExceptionHandlingPolicy::handle_exception( void )
 	{
 	try
 		{
