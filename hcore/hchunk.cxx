@@ -28,7 +28,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hchunk.hxx"
-
+#include "algorithm.hxx"
 #include "xalloc.hxx"
 
 namespace yaal
@@ -45,17 +45,17 @@ HChunk::~HChunk( void )
 	clear();
 	}
 
-void HChunk::reset( void* a_pvData )
-	{
-	clear();
-	f_pvData = a_pvData;
-	return;
-	}
-
 void HChunk::clear( void )
 	{
 	if ( f_pvData )
 		xfree( f_pvData );
+	}
+
+void HChunk::swap( HChunk& chunk_ )
+	{
+	using yaal::swap;
+	swap( f_pvData, chunk_.f_pvData );
+	return;
 	}
 
 }

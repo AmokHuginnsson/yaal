@@ -77,13 +77,9 @@ HLog::HLog( void ) : HStreamInterface(), f_bRealMode( false ), f_bNewLine( true 
 	HChunk buf( bsize + 1 );
 	passwd* any;
 	if ( ! getpwuid_r( l_iUid, &l_sPasswd, buf.get<char>(), static_cast<int>( bsize ), &any ) )
-		f_oLoginName.reset( xstrdup( l_sPasswd.pw_name ) );
+		f_oLoginName = l_sPasswd.pw_name;
 	else
-		{
-		f_oLoginName.reset( xcalloc<char>( LOGIN_NAME_MAX + 1 ) );
-		M_ENSURE( ::snprintf( f_oLoginName.get<char>(), LOGIN_NAME_MAX, "%ld",
-					static_cast<int long>( l_iUid ) ) <= LOGIN_NAME_MAX );
-		}
+		f_oLoginName = l_iUid;
 	M_ENSURE( ::gethostname( f_oHostName.get<char>(), HOSTNAME_SIZE - 1 ) == 0 );
 	return;
 	M_EPILOG
@@ -191,10 +187,10 @@ void HLog::timestamp( void )
 	if ( l_iSize > TIMESTAMP_SIZE )
 		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), l_iSize );
 	if ( f_pcProcessName )
-		::fprintf( f_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_oLoginName.get<char>(),
+		::fprintf( f_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_oLoginName.raw(),
 				f_oHostName.get<char>(), f_pcProcessName );
 	else
-		::fprintf( f_psStream, "%s %s@%s: ", l_pcBuffer, f_oLoginName.get<char>(),
+		::fprintf( f_psStream, "%s %s@%s: ", l_pcBuffer, f_oLoginName.raw(),
 			f_oHostName.get<char>() );
 	return;
 	M_EPILOG

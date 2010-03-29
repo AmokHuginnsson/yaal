@@ -57,8 +57,8 @@ public:
 	template<typename tType>
 	tType* get()
 		{ return ( static_cast<tType*>( f_pvData ) ); }
-	void reset( void* );
 	void clear( void );
+	void swap( HChunk& );
 private:
 	HChunk( HChunk const& );
 	HChunk& operator = ( HChunk const& );
@@ -71,6 +71,9 @@ int long chunk_size( int long const& count_ )
 	}
 
 }
+
+inline void swap( yaal::hcore::HChunk& a, yaal::hcore::HChunk& b )
+	{ a.swap( b ); }
 
 }
 

@@ -136,6 +136,7 @@ public:
 	bool operator ! ( void ) const;
 	char set_at( int long, char );
 	char const* raw( void ) const;
+	char const* c_str( void ) const;
 /*
 	iterator begin( void ) const;
 	iterator end( void ) const;

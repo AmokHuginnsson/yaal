@@ -70,7 +70,7 @@ private:
 	size_t		f_iBufferSize;
 	FILE*		f_psStream;
 	char*		f_pcProcessName;
-	HChunk	f_oLoginName;
+	HString	f_oLoginName;
 	HChunk	f_oHostName;
 	HChunk	f_oBuffer;
 public:

@@ -354,6 +354,11 @@ char const* HString::raw( void ) const
 	return ( f_pcBuffer ? f_pcBuffer : "" );
 	}
 
+char const* HString::c_str( void ) const
+	{
+	return ( f_pcBuffer ? f_pcBuffer : "" );
+	}
+
 HString::const_iterator HString::begin( void ) const
 	{
 	return ( f_pcBuffer );
