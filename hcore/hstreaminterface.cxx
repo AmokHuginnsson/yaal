@@ -40,7 +40,7 @@ namespace hcore
 char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
-	: f_oCache( 1, cache_t::AUTO_GROW ), f_iOffset( 0 ),
+	: f_oCache( 1, HChunk::STRATEGY::GEOMETRIC ), f_iOffset( 0 ),
 	f_oWordCache(), _fill( ' ' ), _width( 0 ), _base( BASES::DEC )
 	{
 	return;
@@ -277,7 +277,7 @@ int long HStreamInterface::read_until_n( HString& a_roMessage, int long const& a
 		 */
 		if ( ( f_iOffset + 2 ) > iPoolSize )
 			{
-			f_oCache.pool_realloc( f_iOffset + 2 );
+			f_oCache.realloc( f_iOffset + 2 );
 			l_pcBuffer = f_oCache.raw(); /* update read cache buffer ptr, reallocation could move previous buffer into another memomry position */
 			iPoolSize = f_oCache.size();
 			}

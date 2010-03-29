@@ -628,7 +628,7 @@ void HListControl::add_column( int const& a_riColumn, char const* a_pcName,
 	l_oColumnInfo.f_oName = f_oVarTmpBuffer;
 	l_oColumnInfo.f_poControl = a_poControl;
 	if ( ! f_oHeader.is_empty() && ( a_riColumn >= 0 ) )
-		f_oHeader.insert( f_oHeader.n_th( a_riColumn ), &l_oColumnInfo );
+		f_oHeader.insert( f_oHeader.n_th( a_riColumn ), l_oColumnInfo );
 	else
 		f_oHeader.push_back( l_oColumnInfo );
 	recalculate_column_widths();

@@ -29,7 +29,7 @@ Copyright:
 
 #include "hcore/hstring.hxx"
 #include "hcore/htree.hxx"
-#include "hcore/hpool.hxx"
+#include "hcore/harray.hxx"
 
 namespace yaal
 {
@@ -69,8 +69,8 @@ class HExpression
 	int f_iLength;
 	syntax_error_t f_eError;
 	double long f_pdVariables[ 26 ];
-	hcore::HPool<double long> f_oConstantsPool;
-	hcore::HPool<int> f_oTerminalIndexes;
+	hcore::HArray<double long> f_oConstantsPool;
+	hcore::HArray<int> f_oTerminalIndexes;
 	hcore::HString	f_oFormula;
 	tree_t f_oEquationTree;
 public:

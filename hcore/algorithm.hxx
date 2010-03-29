@@ -32,6 +32,7 @@ Copyright:
 #define YAAL_HCORE_ALGORITHM_HXX_INCLUDED
 
 #include "hcore/trait.hxx"
+#include "hcore/hpair.hxx"
 
 namespace yaal
 {
@@ -169,6 +170,22 @@ bool equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
 	return ( ( it1 == end1 ) && ( it2 == end2 ) );
+	}
+
+/*! \brief Checks if two ranges are same size and have same set of values.
+ * 
+ * \param it1 - begining of first range.
+ * \param end1 - one past last element of first range.
+ * \param it2 - begining of second range.
+ * \param end2 - one past last element of second range.
+ * \return true if and only if ranges have same size and same contents.
+ */
+template<typename iter1_t, typename iter2_t>
+yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
+	{
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
+		;
+	return ( make_pair( it1, it2 ) );
 	}
 
 /*! \brief Joins two sorted ranges of elements into one sorted range of elements.

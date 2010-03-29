@@ -142,12 +142,12 @@ void HLogPad::add ( yaal::hcore::HString const& a_oText )
 	M_PROLOG
 	int l_iIndexNL = 0, l_iIndexChar = 0;
 	HLogLine l_oLogLine;
-	HLogLine * it = NULL;
+	HLogLine* it = NULL;
 	if ( f_oContents.size() )
-		it = & f_oContents.tail();
+		it = &f_oContents.tail();
 	if ( ! it || ( it->f_eType != HLogLine::TEXT ) )
 		{
-		it = & l_oLogLine;
+		it = &l_oLogLine;
 		it->f_eType = HLogLine::TEXT;
 		it->f_oText = "";
 		}
@@ -171,9 +171,9 @@ void HLogPad::add ( yaal::hcore::HString const& a_oText )
 			it->f_oText += f_oVarTmpBuffer;
 			f_oVarTmpBuffer = "";
 			}
-		if ( it == & l_oLogLine )
-			f_oContents.add_tail ( it );
-		it = & l_oLogLine;
+		if ( it == &l_oLogLine )
+			f_oContents.push_back( *it );
+		it = &l_oLogLine;
 		it->f_eType = HLogLine::TEXT;
 		it->f_oText = "";
 		}

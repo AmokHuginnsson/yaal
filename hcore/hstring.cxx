@@ -36,7 +36,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "algorithm.hxx"
 #include "hstring.hxx"
 #include "xalloc.hxx"
-#include "hpool.hxx"
+#include "hchunk.hxx"
 
 namespace yaal
 {
@@ -964,9 +964,8 @@ int long strrnspn( char const* const a_pcBuffer, char const* const a_pcSkipSet,
 
 int long kmpsearch( char const* const str, int long const& lenstr, char const* const pat, int long const& lenpat )
 	{
-	typedef HPool<int> kmpnext_t;
-	kmpnext_t KMPnext( lenpat + 1 );
-	int* next = KMPnext.raw();
+	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
+	int* next = KMPnext.get<int>();
 	int b = next[ 0 ] = -1;
 	for ( int i = 1; i <= lenpat; ++ i )
 		{
@@ -991,9 +990,8 @@ int long kmpsearch( char const* const str, int long const& lenstr, char const* c
 
 int long kmpcasesearch( char const* const str, int long const& lenstr, char const* const pat, int long const& lenpat )
 	{
-	typedef HPool<int> kmpnext_t;
-	kmpnext_t KMPnext( lenpat + 1 );
-	int* next = KMPnext.raw();
+	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
+	int* next = KMPnext.get<int>();
 	int b = next[ 0 ] = -1;
 	for ( int i = 1; i <= lenpat; ++ i )
 		{

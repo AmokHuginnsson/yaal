@@ -157,8 +157,13 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 yaal::hcore::HString base64::decode( yaal::hcore::HString const& message, bool standardCompliantMode )
 	{
 	M_PROLOG
-	HPool<char> buf( message.get_length() );
-	base64_raw_decode( message, buf.raw(), buf.get_size(), standardCompliantMode );
+	int long len = message.get_length();
+	HChunk buf;
+	if ( len > 0 )
+		{
+		buf.realloc( len, HChunk::STRATEGY::EXACT );
+		base64_raw_decode( message, buf.raw(), buf.get_size(), standardCompliantMode );
+		}
 	return ( buf.raw() );
 	M_EPILOG
 	}

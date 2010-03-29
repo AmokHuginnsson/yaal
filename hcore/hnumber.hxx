@@ -27,7 +27,7 @@ Copyright:
 #ifndef YAAL_HCORE_HNUMBER_HXX_INCLUDED
 #define YAAL_HCORE_HNUMBER_HXX_INCLUDED
 
-#include "hcore/hpool.hxx"
+#include "hcore/hchunk.hxx"
 #include "hcore/hstring.hxx"
 
 namespace yaal
@@ -42,12 +42,11 @@ class HNumber
 	{
 	typedef HNumber self_t;
 private:
-	typedef HPool<char> canonical_t;
 	int long f_lPrecision;
 	bool f_bNegative;
 	int long f_lDigitCount;
 	int long f_lIntegralPartSize;
-	canonical_t f_oCanonical;
+	HChunk f_oCanonical;
 public:
 	static int DEFAULT_PRECISION;
 public:
@@ -115,7 +114,7 @@ public:
 private:
 	bool mutate_addition( char*, int long, char const* const[], int long*, int long*, bool, bool ) const;
 	int long absolute_lower( HNumber const& ) const;
-	void karatsuba( canonical_t&, char const*, int long, char const*, int long ) const;
+	void karatsuba( HChunk&, char const*, int long, char const*, int long ) const;
 	int long integral_length( void ) const;
 	int long decimal_length( void ) const;
 	void from_string( HString const& );

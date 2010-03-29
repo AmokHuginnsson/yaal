@@ -37,24 +37,64 @@ namespace yaal
 namespace hcore
 {
 
-HChunk::HChunk( int long const& size_ ) : f_pvData( size_ ? xcalloc<char>( size_ ) : NULL )
-	{}
+HChunk::HChunk( void )
+	: _size( 0 ), _data( NULL )
+	{
+	return;
+	}
+
+HChunk::HChunk( int long const& size_, STRATEGY::enum_t const& strategy_ )
+	: _size( 0 ), _data( NULL )
+	{
+	M_PROLOG
+	realloc( size_, strategy_ );
+	return;
+	M_EPILOG
+	}
 
 HChunk::~HChunk( void )
 	{
-	clear();
+	free();
+	return;
 	}
 
-void HChunk::clear( void )
+void HChunk::free( void )
 	{
-	if ( f_pvData )
-		xfree( f_pvData );
+	if ( _data )
+		xfree( _data );
+	_size = 0;
+	return;
+	}
+
+void* HChunk::realloc( int long size_, STRATEGY::enum_t const& strategy_ )
+	{
+	if ( size_ < 1 )
+		M_THROW( "bad size", size_ );
+	if ( size_ > _size )
+		{
+		if ( strategy_ == STRATEGY::GEOMETRIC )
+			{
+			int long newSize = 1;
+			while ( newSize < size_ )
+				newSize <<= 1;
+			size_ = newSize;
+			}
+		else
+			{
+			M_ASSERT( strategy_ == STRATEGY::EXACT );
+			}
+		_data = xrealloc<char>( _data, size_ );
+		::memset( static_cast<char*>( _data ) + _size, 0, size_ - _size );
+		_size = size_;
+		}
+	return ( _data );
 	}
 
 void HChunk::swap( HChunk& chunk_ )
 	{
 	using yaal::swap;
-	swap( f_pvData, chunk_.f_pvData );
+	swap( _data, chunk_._data );
+	swap( _size, chunk_._size );
 	return;
 	}
 

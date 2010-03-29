@@ -30,6 +30,7 @@ Copyright:
 #include <sys/time.h> /* timeval */
 #include <sys/types.h>
 
+#include "hcore/harray.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/hpipe.hxx"
 #include "tools/signals.hxx"
@@ -49,7 +50,7 @@ protected:
 	typedef HSignalHandlerInterface hier_t;
 	typedef int ( HProcess::* process_handler_filedes_t ) ( int );
 	typedef yaal::hcore::HHashMap<int, process_handler_filedes_t> process_filedes_map_t;
-	typedef yaal::hcore::HPool<int> dropped_fd_t;
+	typedef yaal::hcore::HArray<int> dropped_fd_t;
 	bool			f_bInitialised;					/* did process has necessery initialisation */
 	bool			f_bLoop; 								/* indicates if main loop continues */
 	int				f_iIdleCycles;					/* full select()'s without io activity */

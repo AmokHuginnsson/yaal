@@ -42,23 +42,44 @@ namespace hcore
  */
 class HChunk
 	{
-	void* f_pvData;
+	int long _size;
+	void* _data;
 public:
+	struct STRATEGY
+		{
+		typedef enum
+			{
+			GEOMETRIC,
+			EXACT
+			} enum_t;
+		};
 	typedef yaal::hcore::HPointer<HChunk> ptr_t;
+	/*! \brief Create empty memory holder.
+	 */
+	HChunk( void );
 	/*! \brief Create memory chunk guard and allocate memory for it.
 	 *
 	 * \param size - requested memory chunk size.
 	 */
-	HChunk( int long const& size = 0 );
+	HChunk( int long const& size, STRATEGY::enum_t const& = STRATEGY::EXACT );
 	~HChunk( void );
 	template<typename tType>
 	tType const* get() const
-		{ return ( static_cast<tType*>( f_pvData ) ); }
+		{ return ( static_cast<tType const*>( _data ) ); }
 	template<typename tType>
 	tType* get()
-		{ return ( static_cast<tType*>( f_pvData ) ); }
-	void clear( void );
+		{ return ( static_cast<tType*>( _data ) ); }
+	char const* raw( void ) const
+		{ return ( static_cast<char const*>( _data ) ); }
+	char* raw( void )
+		{ return ( static_cast<char*>( _data ) ); }
+	void free( void );
+	void* realloc( int long, STRATEGY::enum_t const& = STRATEGY::GEOMETRIC );
 	void swap( HChunk& );
+	int long get_size( void ) const
+		{ return ( _size ); }
+	int long size( void ) const
+		{ return ( _size ); }
 private:
 	HChunk( HChunk const& );
 	HChunk& operator = ( HChunk const& );

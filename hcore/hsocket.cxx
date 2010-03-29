@@ -274,11 +274,11 @@ void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_
 				static_cast<int short unsigned>( a_iPort ) );
 #ifdef HAVE_GETHOSTBYNAME_R
 		f_iAddressSize = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
-		f_oCache.pool_realloc( f_iAddressSize );
+		f_oCache.realloc( f_iAddressSize );
 		while ( ::gethostbyname_r( a_oAddress.raw(), &l_sHostName,
 					f_oCache.raw(), f_iAddressSize,
 					&l_psHostName, &l_iError ) == ERANGE )
-			f_oCache.pool_realloc( f_iAddressSize <<= 1 );
+			f_oCache.realloc( f_iAddressSize <<= 1 );
 		errno = l_iError;
 		M_ENSURE( l_psHostName );
 		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>(
@@ -391,7 +391,7 @@ HString const& HSocket::get_host_name( void )
 		if ( !!( f_eType & TYPE::NETWORK ) )
 			{
 			char const* name = NULL;
-			f_oCache.pool_realloc( l_iSize );
+			f_oCache.realloc( l_iSize );
 			l_psAddressNetwork = reinterpret_cast<sockaddr_in*>( f_pvAddress );
 			if ( f_bResolveHostnames )
 				{
@@ -401,7 +401,7 @@ HString const& HSocket::get_host_name( void )
 							AF_INET, &l_sHostName,
 							f_oCache.raw(),
 							l_iSize, &l_psHostName, &l_iCode ) ) == ERANGE )
-					f_oCache.pool_realloc( l_iSize <<= 1 );
+					f_oCache.realloc( l_iSize <<= 1 );
 				if ( l_iCode )
 					log_trace << error_message( l_iCode ) << endl;
 				errno = l_iError;

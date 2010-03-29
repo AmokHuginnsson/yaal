@@ -28,7 +28,7 @@ Copyright:
 #define YAAL_TOOLS_HBITSOURCE_HXX_INCLUDED
 
 #include "hcore/base.hxx"
-#include "hcore/hpool.hxx"
+#include "hcore/hchunk.hxx"
 #include "hcore/hstreaminterface.hxx"
 
 namespace yaal
@@ -76,10 +76,9 @@ public:
 		int long octets( void ) const
 			{ return ( f_lSize ); }
 		};
-	typedef yaal::hcore::HPool<char> buffer_t;
 private:
 	typedef HStreamBlockIterator self_t;
-	buffer_t f_oBuffer;
+	yaal::hcore::HChunk f_oBuffer;
 	int long f_lIndex; /*!< number of currently processed IO block */
 	int long f_lSize; /*!< requested size of IO block */
 	int long f_lBufferOffset;

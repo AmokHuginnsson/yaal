@@ -48,11 +48,11 @@ HProcess::HProcess( size_t a_uiFileHandlers )
 	: f_bInitialised( false ), f_bLoop( true ), f_iIdleCycles( 0 ),
 	f_iLatencySeconds( 0 ), f_iLatencyMicroseconds( 0 ),
 	f_sLatency(), f_xFileDescriptorSet(),
-	f_oFileDescriptorHandlers( a_uiFileHandlers ), f_oDroppedFd( a_uiFileHandlers, dropped_fd_t::AUTO_GROW ),
+	f_oFileDescriptorHandlers( a_uiFileHandlers ), f_oDroppedFd( a_uiFileHandlers ),
 	f_bCallbackContext( false ), f_oEvent()
 	{
 	M_PROLOG
-	f_oDroppedFd.reset();
+	f_oDroppedFd.clear();
 	M_ASSERT( f_oDroppedFd.is_empty() );
 	::memset( &f_sLatency, 0, sizeof ( f_sLatency ) );
 	FD_ZERO( &f_xFileDescriptorSet );
@@ -174,7 +174,7 @@ int HProcess::run( void )
 			{
 			for ( dropped_fd_t::iterator it = f_oDroppedFd.begin(); it != f_oDroppedFd.end(); ++ it )
 				unregister_file_descriptor_handler( *it );
-			f_oDroppedFd.reset();
+			f_oDroppedFd.clear();
 			}
 		}
 	do_cleanup();

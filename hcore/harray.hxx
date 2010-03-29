@@ -327,6 +327,40 @@ void HArray<value_type>::resize( int long const& a_lSize, value_type const& t )
 	M_EPILOG
 	}
 
+/*
+template<typename value_t>
+void HPool<value_t>::pool_realloc( int long const& a_ulNewSize )
+	{
+	M_PROLOG
+	if ( a_ulNewSize < 1 )
+		M_THROW( n_ppcErrMsgHPool[ ERROR::BAD_SIZE ], a_ulNewSize );
+	if ( f_ePoolType == AUTO_GROW )
+		{
+		if ( a_ulNewSize > f_lCapacity )
+			{
+			f_lCapacity = 1;
+			while ( f_lCapacity < a_ulNewSize )
+				f_lCapacity <<= 1;
+			f_ptPool = xrealloc<value_t>( f_ptPool, f_lCapacity );
+			::memset( f_ptPool + f_lSize, 0,
+					( f_lCapacity - f_lSize ) * sizeof ( value_t ) );
+			}
+		}
+	else if ( f_lCapacity != a_ulNewSize )
+		{
+		if ( f_ptPool && ( f_ePoolType == FIXED_SIZE ) )
+			M_THROW( n_ppcErrMsgHPool[ ERROR::REALLOC_FIXED ], f_lCapacity );
+		f_lCapacity = a_ulNewSize;
+		f_ptPool = xrealloc<value_t>( f_ptPool, f_lCapacity );
+		if ( a_ulNewSize > f_lSize )
+			::memset( f_ptPool + f_lSize, 0,
+					( f_lCapacity - f_lSize ) * sizeof ( value_t ) );
+		}
+	f_lSize = a_ulNewSize;
+	return;
+	M_EPILOG
+	}
+*/
 template<typename value_type>
 void HArray<value_type>::reserve( int long const& a_lNewCapacity )
 	{

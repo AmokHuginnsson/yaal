@@ -31,10 +31,8 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hbitmap.hxx"
-#include "hcore/hpool.hxx"
+#include "hcore/hchunk.hxx"
 #include "hcore/pod.hxx"
-
-typedef yaal::hcore::HPool<char*> mem_pool_t;
 
 using namespace yaal::hcore;
 using namespace yaal::meta;
@@ -91,7 +89,7 @@ void const* HBitmap::raw( void ) const
 void HBitmap::clear( void )
 	{
 	if ( f_lAllocatedBytes )
-		delete static_cast<mem_pool_t*>( f_pvData );
+		delete static_cast<HChunk*>( f_pvData );
 	f_pvData = NULL;
 	f_lAllocatedBytes = 0;
 	f_lSize = 0;
@@ -164,12 +162,12 @@ void HBitmap::copy( void const* a_pvBlock, int long const& a_lSize )
 
 void* HBitmap::block( void )
 	{
-	return ( f_lAllocatedBytes ? static_cast<mem_pool_t*>( f_pvData )->raw() : f_pvData );
+	return ( f_lAllocatedBytes ? static_cast<HChunk*>( f_pvData )->raw() : f_pvData );
 	}
 
 void const* HBitmap::block( void ) const
 	{
-	return ( f_lAllocatedBytes ? static_cast<mem_pool_t*>( f_pvData )->raw() : f_pvData );
+	return ( f_lAllocatedBytes ? static_cast<HChunk*>( f_pvData )->raw() : f_pvData );
 	}
 
 void HBitmap::ensure_pool( int long const& newSize )
@@ -178,9 +176,9 @@ void HBitmap::ensure_pool( int long const& newSize )
 	f_lSize = newSize;
 	int long newPoolSize = octets_for_bits( f_lSize );
 	if ( f_lAllocatedBytes )
-		static_cast<mem_pool_t*>( f_pvData )->pool_realloc( newPoolSize );
+		static_cast<HChunk*>( f_pvData )->realloc( newPoolSize );
 	else
-		f_pvData = new mem_pool_t( newPoolSize, mem_pool_t::AUTO_GROW );
+		f_pvData = new HChunk( newPoolSize, HChunk::STRATEGY::GEOMETRIC );
 	f_lAllocatedBytes = newPoolSize;
 	M_ENSURE( f_pvData );
 	return;

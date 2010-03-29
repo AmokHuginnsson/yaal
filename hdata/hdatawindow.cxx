@@ -183,17 +183,17 @@ int HDataWindow::init( void )
 				f_oDB->set_sort( f_psResourcesArray[ l_iCtr ].f_pcSort );
 				l_poDataControl->set_dbd( f_oDB );
 				f_poMainControl = l_poDataControl;
-				f_oViewModeControls.add_tail( &l_poDataControl );
+				f_oViewModeControls.push_back( l_poDataControl );
 				l_poDataControl->enable( true );
 				}
 			break;
 			case ( DATACONTROL_BITS::ROLE::DATA ):
 				link( l_iCtr, l_poDataControl );
-				f_oEditModeControls.add_tail( &l_poDataControl );
+				f_oEditModeControls.push_back( l_poDataControl );
 			break;
 			case ( DATACONTROL_BITS::ROLE::FILTER ):
-				l_poDataControl->enable ( true );
-				f_oViewModeControls.add_tail( &l_poDataControl );
+				l_poDataControl->enable( true );
+				f_oViewModeControls.push_back( l_poDataControl );
 			break;
 			default :
 				M_THROW ( "unknown resource purpouse",
@@ -224,16 +224,16 @@ void HDataWindow::link( int a_iChild, HDataControl* a_poDataControl )
 	M_PROLOG
 	int l_iParent = 0;
 	char l_pcName [] = "";
-	HDataListControl * l_poPDC = NULL; /* PDC stands for ParentDataControl */
+	HDataListControl* l_poPDC = NULL; /* PDC stands for ParentDataControl */
 /* CI stands for ColumnInfo */
-	OColumnInfo l_sColumnInfo, * l_psCI = & l_sColumnInfo;
+	OColumnInfo l_sColumnInfo, * l_psCI = &l_sColumnInfo;
 	l_psCI->f_iPlacement = HDataListControl::HColumnInfo::ADD_AT_THE_END;
 	l_psCI->f_pcName = l_pcName;
 	l_psCI->f_iWidth = 1; 				/* width is awlays proportional */
 	l_psCI->f_eAlign = HControl::BITS::ALIGN::LEFT;
 	l_psCI->f_eType = TYPE::HSTRING;
-	l_iParent = f_psResourcesArray [ a_iChild ].f_iParent;
-	if ( f_psResourcesArray [ l_iParent ].f_eType == DATACONTROL_BITS::TYPE::LIST )
+	l_iParent = f_psResourcesArray[ a_iChild ].f_iParent;
+	if ( f_psResourcesArray[ l_iParent ].f_eType == DATACONTROL_BITS::TYPE::LIST )
 		{
 		l_poPDC = dynamic_cast<HDataListControl*>( f_oControls.get_control_by_no( l_iParent + 1 /* 1 stands for offset caused by 'status bar' */ ) );
 		if ( ! l_poPDC )

@@ -185,8 +185,7 @@ int long HFile::read_line( HString& a_roLine, read_t const& a_eRead,
 			{
 			if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
 				M_THROW( _( "line too long" ), l_iLength );
-			f_oCache.pool_realloc( l_iLength );
-			l_pcPtr = f_oCache.raw();
+			l_pcPtr = static_cast<char*>( f_oCache.realloc( l_iLength ) );
 			M_ENSURE( static_cast<int>( ::std::fread( l_pcPtr,
 							sizeof ( char ), l_iLength,
 							static_cast<FILE*>( f_pvHandle ) ) ) == l_iLength );

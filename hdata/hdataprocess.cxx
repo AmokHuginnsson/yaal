@@ -115,14 +115,14 @@ OMenuItem* HDataProcess::build_sub_menu( HXml::HConstNodeProxy const& a_rsNode,
 			{
 			l_sMenuItem.reset();
 			build_menu_item( *it, l_sMenuItem, a_roHandlers );
-			l_oSubMenu.add_tail( &l_sMenuItem );
+			l_oSubMenu.push_back( l_sMenuItem );
 			}
 		}
 	else
 		M_THROW( HString( l_pcError ) + l_pcUnexpected + a_rsNode.get_name()
 				+ '=' + a_rsNode.get_value(), errno );
 	l_sMenuItem.reset();
-	l_oSubMenu.add_tail( &l_sMenuItem );
+	l_oSubMenu.push_back( l_sMenuItem );
 	l_psMenu = new OMenuItem[ l_oSubMenu.size() ];
 	int l_iCtr = 0;
 	for ( menu_item_list_t::iterator it = l_oSubMenu.begin(); it != l_oSubMenu.end(); ++ it, ++ l_iCtr )
@@ -257,26 +257,26 @@ int HDataProcess::create_window( void* param )
 	M_EPILOG
 	}
 
-OResource* HDataProcess::get_resource( HString const& name, HXml::HConstNodeProxy const& w )
+HDataProcess::resources_t& HDataProcess::get_resource( HString const& name, HXml::HConstNodeProxy const& w )
 	{
 	M_PROLOG
 	resource_cache_t::iterator it = f_oResourceCache.find( name );
-	OResource* r = NULL;
+	resources_t* r( NULL );
 	if ( it == f_oResourceCache.end() )
-		r = build_resource( name, w );
+		r = &build_resource( name, w );
 	else
-		r = it->second.raw();
-	return ( r );
+		r = &it->second;
+	return ( *r );
 	M_EPILOG
 	}
 
-OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceName, HXml::HConstNodeProxy const& w )
+HDataProcess::resources_t& HDataProcess::build_resource( yaal::hcore::HString const& resourceName, HXml::HConstNodeProxy const& w )
 	{
 	M_PROLOG
-	resource_pool_t r( w.child_count() + 1 );
+	resources_t r( w.child_count() + 1 );
 	int i = 0;
-	typedef HMap<int,char const*> int_to_str_t;
-	typedef HMap<HString,int> str_to_int_t;
+	typedef HMap<int, char const*> int_to_str_t;
+	typedef HMap<HString, int> str_to_int_t;
 	int_to_str_t i2s;
 	str_to_int_t s2i;
 	for ( HXml::HConstIterator it = w.begin(); it != w.end(); ++ it, ++ i )
@@ -358,11 +358,10 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 					{
 					if ( ! r[ i ].f_psColumnInfo )
 						{
-						column_pool_t c( ( (*it).child_count() - attrNo ) + 1 );
-						f_oColumnCache.push_back( column_pool_t() );
-						r[ i ].f_psColumnInfo = c.raw();
-						using yaal::swap;
-						swap( f_oColumnCache.tail(), c );
+						f_oColumnCache.add_tail();
+						HChunk& c = f_oColumnCache.tail(); 
+						c.realloc( chunk_size<OColumnInfo>( ( (*it).child_count() - attrNo ) + 1 ) );
+						r[ i ].f_psColumnInfo = c.get<OColumnInfo>();
 						}
 					r[ i ].f_psColumnInfo[ columnNo ].f_iPlacement = lexical_cast<int>( xml::attr_val( attr, "placement" ) );
 					r[ i ].f_psColumnInfo[ columnNo ].f_pcName = xml::attr_val( attr, "name" );
@@ -426,7 +425,6 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 				M_THROW( _( "auto builing of this type of control is not supported yet" ), i );
 			}
 		}
-	OResource* pr = r.raw();
 	for ( int n = 0; n < i; ++ n )
 		{
 		int_to_str_t::iterator child = i2s.find( n );
@@ -434,12 +432,12 @@ OResource* HDataProcess::build_resource( yaal::hcore::HString const& resourceNam
 			{
 			str_to_int_t::iterator parentIt = s2i.find( child->second );
 			M_ENSURE( parentIt != s2i.end() );
-			pr[ n ].f_iParent = parentIt->second;
-			pr[ n ].f_psColumnInfo = &pr[ parentIt->second ].f_psColumnInfo[ n - ( parentIt->second + 1 ) ];
+			r[ n ].f_iParent = parentIt->second;
+			r[ n ].f_psColumnInfo = &r[ parentIt->second ].f_psColumnInfo[ n - ( parentIt->second + 1 ) ];
 			}
 		}
 	swap( f_oResourceCache[ resourceName ], r );
-	return ( pr );
+	return ( f_oResourceCache[ resourceName ] );
 	M_EPILOG
 	}
 

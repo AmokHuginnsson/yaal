@@ -119,11 +119,14 @@ public:
 	typedef class HIterator<value_type const, OListBits::TREAT_AS_OPENED> const_iterator;
 	typedef class HIterator<value_type, OListBits::TREAT_AS_CLOSED> cyclic_iterator;
 	typedef class HIterator<value_type const, OListBits::TREAT_AS_CLOSED> const_cyclic_iterator;
+	/*! \brief Create an empty list.
+	 */
+	HList( void );
 	/*! \brief Creates list, with specified size.
 	 *
 	 * \param count - number of element for newly created list.
 	 */
-	HList( int count = 0 );
+	HList( int count );
 	virtual ~HList( void );
 	HList( HList const& );
 	HList& operator = ( HList const& );
@@ -146,17 +149,23 @@ public:
 	int long get_size( void ) const;
 	void swap( HList<value_type>& );
 	/*! \brief Adds new element at specified position.
+	 *
+	 * Newly created element will have default value.
 	 */
 	template<OListBits::treatment_t const treatment>
-	typename OListBits::iterator<value_type, treatment>::type insert( HIterator<value_type, treatment> const&, value_type const* = NULL );
+	typename OListBits::iterator<value_type, treatment>::type insert( HIterator<value_type, treatment> const& );
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<value_type, treatment>::type insert( HIterator<value_type, treatment> const&, value_type const& );
 	/*! \brief Adds new element at beggining of the list
+	 *
+	 * Newly created element will have default value.
 	 */
-	value_type& add_head( value_type const* = NULL );
+	value_type& add_head( void );
 	/*! \brief Adds new element at end of the list
+	 *
+	 * Newly created element will have default value.
 	 */
-	value_type& add_tail( value_type const* = NULL );
+	value_type& add_tail( void );
 	void push_back( value_type const& );
 	void pop_back( void );
 	void push_front( value_type const& );
@@ -214,7 +223,8 @@ private:
 	HElement* f_poPrevious;
 	HElement* f_poNext;
 	value_type f_tObject; /*!< The Object itself. */
-	explicit HElement( HElement*, value_type const* );
+	explicit HElement( HElement* );
+	explicit HElement( HElement*, value_type const& );
 	virtual ~HElement ();
 	HElement( HElement const & );
 	HElement& operator = ( HElement const& );
@@ -301,8 +311,26 @@ protected:
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 template<typename value_type>
-HList<value_type>::HElement::HElement( HElement* a_poElement, value_type const* a_poValue )
-	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject( a_poValue ? *a_poValue : value_type() )
+HList<value_type>::HElement::HElement( HElement* a_poElement )
+	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject()
+	{
+	if ( a_poElement == 0 )
+		{
+		f_poPrevious = this;
+		f_poNext = this;
+		}
+	else
+		{
+		f_poPrevious = a_poElement->f_poPrevious;
+		f_poNext = a_poElement;
+		a_poElement->f_poPrevious = this;
+		f_poPrevious->f_poNext = this;
+		}
+	}
+
+template<typename value_type>
+HList<value_type>::HElement::HElement( HElement* a_poElement, value_type const& a_roValue )
+	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject( a_roValue )
 	{
 	if ( a_poElement == 0 )
 		{
@@ -442,6 +470,17 @@ bool HList<value_type>::HIterator<const_qual_t, treatment>::is_valid( void ) con
 	}
 
 //============================================================================
+
+template<typename value_type>
+HList<value_type>::HList( void )
+	: OListBits(), f_iSize( 0 ),
+	f_poHook( NULL ), f_eOrder( UNSORTED ),
+	f_iIndex( 0 ), f_poIndex( NULL )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
 
 template<typename value_type>
 HList<value_type>::HList( int a_iSize )
@@ -584,7 +623,7 @@ HList<value_type>& HList<value_type>::operator = ( HList<value_type> const& a_ro
 			{
 			for ( ; l_iCtr < a_roList.f_iSize; l_iCtr ++ )	
 				{
-				add_tail( &*otherIt );
+				push_back( *otherIt );
 				if ( otherIt.f_poCurrent == a_roList.f_poHook )
 					f_poHook = f_poHook->f_poPrevious;
 				if ( otherIt.f_poCurrent == a_roList.f_poIndex )
@@ -659,11 +698,10 @@ void HList<value_type>::swap( HList<value_type>& other )
 
 template<typename value_type>
 template<OListBits::treatment_t const treatment>
-typename OListBits::iterator<value_type, treatment>::type HList<value_type>::insert( HIterator<value_type, treatment> const& it,
-		value_type const* a_ptObject )
+typename OListBits::iterator<value_type, treatment>::type HList<value_type>::insert( HIterator<value_type, treatment> const& it )
 	{
 	M_PROLOG
-	HElement* l_poElement = new HElement( it.f_poCurrent, a_ptObject );
+	HElement* l_poElement = new HElement( it.f_poCurrent );
 	if ( ( f_iSize == 0 ) || ( ( it.f_poCurrent == f_poHook ) && ( treatment == TREAT_AS_OPENED ) ) )
 		f_poHook = l_poElement;
 	f_iSize ++;
@@ -679,16 +717,22 @@ typename OListBits::iterator<value_type, treatment>::type HList<value_type>::ins
 		value_type const& val )
 	{
 	M_PROLOG
-	return ( insert( it, &val ) );
+	HElement* l_poElement = new HElement( it.f_poCurrent, val );
+	if ( ( f_iSize == 0 ) || ( ( it.f_poCurrent == f_poHook ) && ( treatment == TREAT_AS_OPENED ) ) )
+		f_poHook = l_poElement;
+	f_iSize ++;
+	f_iIndex = 0;
+	f_poIndex = NULL;
+	return ( iterator( this, l_poElement ) );
 	M_EPILOG
 	}
 
 template<typename value_type>
-value_type& HList<value_type>::add_head( value_type const* a_ptObject )
+value_type& HList<value_type>::add_head( void )
 	{
 	M_PROLOG
-	f_poHook = new HElement( f_poHook, a_ptObject );
-	f_iSize ++;
+	f_poHook = new HElement( f_poHook );
+	++ f_iSize;
 	if ( f_poIndex )
 		f_poIndex = f_poIndex->f_poPrevious;
 	return ( f_poHook->f_tObject );
@@ -696,32 +740,14 @@ value_type& HList<value_type>::add_head( value_type const* a_ptObject )
 	}
 
 template<typename value_type>
-value_type& HList<value_type>::add_tail( value_type const* a_ptObject )
+value_type& HList<value_type>::add_tail( void )
 	{
 	M_PROLOG
-	HElement* l_poElement = new HElement( f_poHook, a_ptObject );
+	HElement* l_poElement = new HElement( f_poHook );
 	if ( f_iSize == 0 )
 		f_poHook = l_poElement;
-	f_iSize ++;
+	++ f_iSize;
 	return ( l_poElement->f_tObject );
-	M_EPILOG
-	}
-
-template<typename value_type>
-void HList<value_type>::push_back( value_type const& a_rtObject )
-	{
-	M_PROLOG
-	add_tail( &a_rtObject );
-	return;
-	M_EPILOG
-	}
-
-template<typename value_type>
-void HList<value_type>::pop_back( void )
-	{
-	M_PROLOG
-	remove_tail();
-	return;
 	M_EPILOG
 	}
 
@@ -729,7 +755,22 @@ template<typename value_type>
 void HList<value_type>::push_front( value_type const& a_rtObject )
 	{
 	M_PROLOG
-	add_head( &a_rtObject );
+	f_poHook = new HElement( f_poHook, a_rtObject );
+	++ f_iSize;
+	if ( f_poIndex )
+		f_poIndex = f_poIndex->f_poPrevious;
+	return;
+	M_EPILOG
+	}
+
+template<typename value_type>
+void HList<value_type>::push_back( value_type const& a_rtObject )
+	{
+	M_PROLOG
+	HElement* l_poElement = new HElement( f_poHook, a_rtObject );
+	if ( f_iSize == 0 )
+		f_poHook = l_poElement;
+	++ f_iSize;
 	return;
 	M_EPILOG
 	}
@@ -739,6 +780,15 @@ void HList<value_type>::pop_front( void )
 	{
 	M_PROLOG
 	remove_head();
+	return;
+	M_EPILOG
+	}
+
+template<typename value_type>
+void HList<value_type>::pop_back( void )
+	{
+	M_PROLOG
+	remove_tail();
 	return;
 	M_EPILOG
 	}
@@ -768,7 +818,7 @@ value_type& HList<value_type>::add_orderly( value_type const& a_rtObject,
 	M_PROLOG
 	bool l_bBefore = false;
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iSize;
-	HElement* l_poElement = new HElement( NULL, &a_rtObject );
+	HElement* l_poElement = new HElement( NULL, a_rtObject );
 	if ( ( f_eOrder != UNSORTED ) && ( f_eOrder != a_eOrder ) )
 		M_THROW( g_ppcErrMsgHList [ ERROR::BAD_ORDER ], a_eOrder );
 	f_eOrder = a_eOrder;

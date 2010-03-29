@@ -34,7 +34,7 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hpattern.hxx"
 #include "harray.hxx"
-#include "hpool.hxx"
+#include "hchunk.hxx"
 
 namespace yaal
 {
@@ -264,7 +264,7 @@ void HPattern::prepare_error_message( HString const& a_oString ) const
 	{
 	M_PROLOG
 	int long l_iSize = ::regerror( f_iLastError, f_oCompiled.get<regex_t>(), NULL, 0 ) + 1;
-	HPool<char> l_oBuffer( l_iSize + 1 );
+	HChunk l_oBuffer( l_iSize + 1 );
 	M_ENSURE( static_cast<int>( ::regerror( f_iLastError, f_oCompiled.get<regex_t>(),
 					l_oBuffer.raw(), l_iSize ) ) < l_iSize );
 	f_oVarTmpBuffer = l_oBuffer.raw();

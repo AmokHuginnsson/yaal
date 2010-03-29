@@ -28,7 +28,7 @@ Copyright:
 #define HSTREAMINTERFACE_HXX_INCLUDED
 
 #include "hcore/hstring.hxx"
-#include "hcore/hpool.hxx"
+#include "hcore/hchunk.hxx"
 #include "hcore/hexception.hxx"
 #include "hcore/hpointer.hxx"
 
@@ -74,8 +74,7 @@ public:
 		};
 	typedef HStreamInterface& ( *manipulator_t )( HStreamInterface& );
 protected:
-	typedef yaal::hcore::HPool<char> cache_t;
-	cache_t f_oCache; /*!< Read buffer. */
+	HChunk f_oCache; /*!< Read buffer. */
 	int f_iOffset; /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
 	HString f_oWordCache; /*!< Cache for operator >> () and operator << (). */
 	int _fill; /*!< Fill character for output operations. */

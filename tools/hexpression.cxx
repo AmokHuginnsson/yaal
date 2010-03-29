@@ -131,8 +131,7 @@ static double long PI = 3.141592653589793238462643383279502884197069399375105820
 
 HExpression::HExpression( void )
 	: f_iIndex( 0 ), f_iLength( 0 ), f_eError( OK ),
-	f_oConstantsPool( 0, HPool<double long>::AUTO_GROW ),
-	f_oTerminalIndexes( 0, HPool<int>::AUTO_GROW ), f_oFormula(),
+	f_oConstantsPool(), f_oTerminalIndexes(), f_oFormula(),
 	f_oEquationTree()
 	{
 	M_PROLOG
@@ -143,8 +142,7 @@ HExpression::HExpression( void )
 
 HExpression::HExpression( HString const& formula )
 	: f_iIndex( 0 ), f_iLength( 0 ), f_eError( OK ),
-	f_oConstantsPool( 0, HPool<double long>::AUTO_GROW ),
-	f_oTerminalIndexes( 0, HPool<int>::AUTO_GROW ), f_oFormula(),
+	f_oConstantsPool(), f_oTerminalIndexes(), f_oFormula(),
 	f_oEquationTree()
 	{
 	M_PROLOG
@@ -432,7 +430,7 @@ bool HExpression::translate( HString const& a_oFormula )
 	int long l_iLength = a_oFormula.get_length();
 	f_oFormula.hs_realloc( l_iLength + 1 ); /* + 1 for trailing null */
 	f_oFormula.fillz( '\0', 0, l_iLength );
-	f_oTerminalIndexes.pool_realloc( l_iLength + 1 );
+	f_oTerminalIndexes.resize( l_iLength + 1 );
 	while ( l_iIndex < l_iLength )
 		{
 		f_oTerminalIndexes[ l_iRealIndex ] = l_iIndex;
@@ -705,7 +703,7 @@ bool HExpression::terminal_production( tree_t::node_t a_roNode )
 		 * indexes, positive and negative 0 index would conflict so
 		 * we shift negative indexes by 1, so 0 becomes -1, 1 becomes -2,
 		 * 2 becomes -3, and so on and so forth.
-		 * HPool::size() returns current access/addition peak for revelant pool,
+		 * HArray::size() returns current access/addition peak for revelant pool,
 		 * so to get index of lately added value we need to decrement size by 1. */
 		(**a_roNode).f_oVariables.push_back( static_cast<int>( - ( f_oConstantsPool.size() - 1 ) - 1 ) );
 		return ( false );
@@ -729,7 +727,7 @@ double long* HExpression::compile( HString const& a_oFormula )
 		}
 	if ( translate( a_oFormula ) )
 		throw HExpressionException( n_pcSyntaxError );
-	f_oConstantsPool.reset();
+	f_oConstantsPool.clear();
 	tree_t::node_t root = f_oEquationTree.create_new_root();
 	if ( ! addition_production( root ) )
 		{

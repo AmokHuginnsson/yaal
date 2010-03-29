@@ -35,6 +35,7 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hpipedchild.hxx"
 #include "hfsitem.hxx"
+#include "hcore/xalloc.hxx"
 
 using namespace yaal::hcore;
 
@@ -47,7 +48,7 @@ namespace tools
 HPipedChild::HPipedChild( void )
 	: HStreamInterface(), f_iPid( 0 ),
 	f_iPipeIn( -1 ), f_iPipeOut( -1 ), f_iPipeErr( -1 ),
-	f_eCSOI( STREAM::OUT ), f_oSecondLineCache( f_oCache ), f_iSecondLineOffset( f_iOffset )
+	f_eCSOI( STREAM::OUT ), f_oSecondLineCache( f_oCache.size() ), f_iSecondLineOffset( f_iOffset )
 	{
 	return;
 	}
