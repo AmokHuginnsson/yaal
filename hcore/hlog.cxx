@@ -59,11 +59,11 @@ namespace
 
 int long HLog::f_lLogMask = 0;
 
-HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( true ),
-	f_lType ( 0 ), f_iBufferSize ( BUFFER_SIZE ),
-	f_psStream ( NULL ), f_pcProcessName( NULL ),
-	f_oLoginName ( NULL ), f_oHostName( xcalloc<char>( HOSTNAME_SIZE ) ),
-	f_oBuffer ( xcalloc<char>( f_iBufferSize ) )
+HLog::HLog( void ) : HStreamInterface(), f_bRealMode( false ), f_bNewLine( true ),
+	f_lType( 0 ), f_iBufferSize( BUFFER_SIZE ),
+	f_psStream( NULL ), f_pcProcessName( NULL ),
+	f_oLoginName(), f_oHostName( xcalloc<char>( HOSTNAME_SIZE ) ),
+	f_oBuffer( xcalloc<char>( f_iBufferSize ) )
 	{
 	M_PROLOG
 	uid_t l_iUid = 0;
@@ -78,10 +78,10 @@ HLog::HLog ( void ) : HStreamInterface(), f_bRealMode ( false ), f_bNewLine ( tr
 	HChunk buf( xcalloc<char>( bsize + 1 ) );
 	passwd* any;
 	if ( ! getpwuid_r( l_iUid, &l_sPasswd, buf.get<char>(), static_cast<int>( bsize ), &any ) )
-		f_oLoginName.set( xstrdup( l_sPasswd.pw_name ) );
+		f_oLoginName.reset( xstrdup( l_sPasswd.pw_name ) );
 	else
 		{
-		f_oLoginName.set( xcalloc<char>( LOGIN_NAME_MAX + 1 ) );
+		f_oLoginName.reset( xcalloc<char>( LOGIN_NAME_MAX + 1 ) );
 		M_ENSURE( ::snprintf( f_oLoginName.get<char>(), LOGIN_NAME_MAX, "%ld",
 					static_cast<int long>( l_iUid ) ) <= LOGIN_NAME_MAX );
 		}
@@ -97,10 +97,10 @@ HLog::~HLog( void )
 		{
 		if ( f_bNewLine )
 			timestamp();
-		fprintf ( f_psStream, "Process exited normally.\n" );
+		::fprintf( f_psStream, "Process exited normally.\n" );
 		}
 	if ( ( f_psStream != stdout ) && ( f_psStream != stderr ) )
-		fclose( f_psStream );
+		::fclose( f_psStream );
 	f_psStream = NULL;
 	return;
 	M_EPILOG

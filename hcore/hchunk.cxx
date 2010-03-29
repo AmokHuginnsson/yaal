@@ -37,7 +37,10 @@ namespace yaal
 namespace hcore
 {
 
-HChunk::HChunk( void* a_pvData ) : f_pvData( a_pvData )
+HChunk::HChunk( void* const& a_pvData ) : f_pvData( a_pvData )
+	{}
+
+HChunk::HChunk( int long const& size_ ) : f_pvData( xcalloc<char>( size_ ) )
 	{}
 
 HChunk::~HChunk( void )
@@ -45,7 +48,7 @@ HChunk::~HChunk( void )
 	clear();
 	}
 
-void HChunk::set( void* a_pvData )
+void HChunk::reset( void* a_pvData )
 	{
 	clear();
 	f_pvData = a_pvData;
