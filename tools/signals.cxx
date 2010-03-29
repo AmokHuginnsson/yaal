@@ -103,7 +103,7 @@ HSignalHandlerInterface*	HSignalService::HHandlerExternal::get_base( void )
 
 int HSignalService::f_iExitStatus = 0;
 HSignalService::HSignalService( void )
-	: f_bLoop( true ), f_oLocker( xcalloc<sigset_t>( 1 ) ),
+	: f_bLoop( true ), f_oLocker( chunk_size<sigset_t>( 1 ) ),
 	f_oWorker( *this ), f_oMutex(), f_oHandlers()
 	{
 	M_PROLOG

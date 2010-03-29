@@ -154,7 +154,7 @@ HFSItem::HIterator::HIterator( HString const& a_oPath ) : f_oPath( a_oPath ), f_
 	if ( ! f_oPath.is_empty() )
 		{
 		f_pvDir = ::opendir( f_oPath.raw() );
-		f_oDirEnt = HChunk::ptr_t( new HChunk( xcalloc<dirent>( 1 ) ) );
+		f_oDirEnt = HChunk::ptr_t( new HChunk( chunk_size<dirent>( 1 ) ) );
 		operator ++();
 		}
 	return;
@@ -170,7 +170,7 @@ HFSItem::HIterator::HIterator( HIterator const& a_oIt ) : f_oPath( a_oIt.f_oPath
 		seekdir( static_cast<DIR*>( f_pvDir ), telldir( static_cast<DIR*>( a_oIt.f_pvDir ) ) );
 		if ( !! a_oIt.f_oDirEnt )
 			{
-			f_oDirEnt = HChunk::ptr_t( new HChunk( xcalloc<dirent>( 1 ) ) );
+			f_oDirEnt = HChunk::ptr_t( new HChunk( chunk_size<dirent>( 1 ) ) );
 			::memcpy( f_oDirEnt->get<void>(), a_oIt.f_oDirEnt->get<void>(), sizeof ( dirent ) );
 			}
 		f_oItem.set_path( a_oIt.f_oItem.f_oPath, a_oIt.f_oItem.f_iNameLen );

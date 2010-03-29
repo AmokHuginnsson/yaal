@@ -52,8 +52,8 @@ void do_pthread_attr_destroy( void* attr )
 	}
 
 HThread::HThread( void )
-	: f_eStatus( DEAD ), f_oAttributes( xcalloc<pthread_attr_t>( 1 ) ),
-	f_oThread( xcalloc<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::RECURSIVE ),
+	: f_eStatus( DEAD ), f_oAttributes( chunk_size<pthread_attr_t>( 1 ) ),
+	f_oThread( chunk_size<pthread_t>( 1 ) ), f_oMutex( HMutex::TYPE::RECURSIVE ),
 	f_oSemaphore(), f_oAttrDS()
 	{
 	M_PROLOG
@@ -225,8 +225,8 @@ void do_pthread_mutexattr_destroy( void* attr )
 	}
 
 HMutex::HMutex( TYPE::mutex_type_t const a_eType ) : f_eType ( a_eType ),
-	f_oAttributes( xcalloc<pthread_mutexattr_t>( 1 ) ),
-	f_oMutex( xcalloc<pthread_mutex_t>( 1 ) ), f_oAttrDS()
+	f_oAttributes( chunk_size<pthread_mutexattr_t>( 1 ) ),
+	f_oMutex( chunk_size<pthread_mutex_t>( 1 ) ), f_oAttrDS()
 	{
 	M_PROLOG
 	if ( f_eType == TYPE::DEFAULT )
@@ -289,7 +289,7 @@ HLock::~HLock( void )
 	}
 
 HSemaphore::HSemaphore( void )
-	: f_oSemaphore( xcalloc<sem_t>( 1 ) )
+	: f_oSemaphore( chunk_size<sem_t>( 1 ) )
 	{
 	M_PROLOG
 	M_ENSURE( ::sem_init( f_oSemaphore.get<sem_t>(), 0, 0 ) == 0 );
@@ -322,7 +322,7 @@ void HSemaphore::signal( void )
 	}
 
 HCondition::HCondition( HMutex& a_roMutex )
-	: f_oAttributes( xcalloc<pthread_condattr_t>( 1 ) ), f_oCondition( xcalloc<pthread_cond_t>( 1 ) ), f_roMutex( a_roMutex )
+	: f_oAttributes( chunk_size<pthread_condattr_t>( 1 ) ), f_oCondition( chunk_size<pthread_cond_t>( 1 ) ), f_roMutex( a_roMutex )
 	{
 	M_PROLOG
 	pthread_condattr_t* attr = f_oAttributes.get<pthread_condattr_t>();

@@ -57,7 +57,7 @@ include $(DIR_ROOT)/_aux/mk/5_flags.mk
 CXXFLAGS+= -D__YAAL_BUILD__ @EXTRA_CXXFLAGS@ @DEFS@ \
 					-I$(DIR_ROOT) -I$(DIR_BUILD) -I/usr/local/include \
 					@EXTRA_INCLUDE_PATHS@
-LXXFLAGS+= -L$(DIR_LIB) -L/usr/local/lib -L. @EXTRA_LIB_PATHS@ -shared @EXTRA_LXXFLAGS@ @YAAL_LXXFLAGS@
+LXXFLAGS+= -L. -L/usr/local/lib @EXTRA_LIB_PATHS@ -shared @EXTRA_LXXFLAGS@ @YAAL_LXXFLAGS@
 
 include $(DIR_ROOT)/_aux/mk/7_func.mk
 

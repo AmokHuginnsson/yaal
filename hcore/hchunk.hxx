@@ -45,16 +45,11 @@ class HChunk
 	void* f_pvData;
 public:
 	typedef yaal::hcore::HPointer<HChunk> ptr_t;
-	/*! \brief Create memory chunk guard and initialize it with externally allocated memory.
-	 *
-	 * \param mem - pointer to externally allocated memory.
-	 */
-	HChunk( void* const& = NULL );
 	/*! \brief Create memory chunk guard and allocate memory for it.
 	 *
 	 * \param size - requested memory chunk size.
 	 */
-	HChunk( int long const& size );
+	HChunk( int long const& size = 0 );
 	~HChunk( void );
 	template<typename tType>
 	tType const* get() const
@@ -68,6 +63,12 @@ private:
 	HChunk( HChunk const& );
 	HChunk& operator = ( HChunk const& );
 	};
+
+template<typename T>
+int long chunk_size( int long const& count_ )
+	{
+	return ( sizeof ( T ) * count_ );
+	}
 
 }
 

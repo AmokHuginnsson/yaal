@@ -52,7 +52,7 @@ struct OPatternState
 
 HPattern::HPattern( bool const a_bIgnoreCase ) : f_bInitialized( false ),
 	f_bIgnoreCaseDefault( a_bIgnoreCase ), f_bIgnoreCase( false ),
-	f_bExtended( false ), f_iSimpleMatchLength( 0 ), f_oCompiled( xcalloc<regex_t>( 1 ) ),
+	f_bExtended( false ), f_iSimpleMatchLength( 0 ), f_oCompiled( sizeof ( regex_t ) ),
 	f_oPatternInput(), f_oPatternReal(), f_iLastError( 0 ), f_oVarTmpBuffer()
 	{
 	M_PROLOG

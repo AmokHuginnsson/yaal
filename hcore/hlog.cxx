@@ -42,7 +42,6 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hlog.hxx"
-#include "xalloc.hxx"
 
 namespace yaal
 {
@@ -62,8 +61,8 @@ int long HLog::f_lLogMask = 0;
 HLog::HLog( void ) : HStreamInterface(), f_bRealMode( false ), f_bNewLine( true ),
 	f_lType( 0 ), f_iBufferSize( BUFFER_SIZE ),
 	f_psStream( NULL ), f_pcProcessName( NULL ),
-	f_oLoginName(), f_oHostName( xcalloc<char>( HOSTNAME_SIZE ) ),
-	f_oBuffer( xcalloc<char>( f_iBufferSize ) )
+	f_oLoginName(), f_oHostName( HOSTNAME_SIZE ),
+	f_oBuffer( f_iBufferSize )
 	{
 	M_PROLOG
 	uid_t l_iUid = 0;
@@ -75,7 +74,7 @@ HLog::HLog( void ) : HStreamInterface(), f_bRealMode( false ), f_bNewLine( true 
 	l_iUid = getuid();
 	passwd l_sPasswd;
 	long int bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
-	HChunk buf( xcalloc<char>( bsize + 1 ) );
+	HChunk buf( bsize + 1 );
 	passwd* any;
 	if ( ! getpwuid_r( l_iUid, &l_sPasswd, buf.get<char>(), static_cast<int>( bsize ), &any ) )
 		f_oLoginName.reset( xstrdup( l_sPasswd.pw_name ) );

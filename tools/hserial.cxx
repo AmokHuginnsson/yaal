@@ -64,7 +64,7 @@ HSerial::flag_t HSerial::FLAG_TEXT = HSerial::flag_t( HSerial::FLAG::DEFAULT ) |
 HSerial::HSerial( HString const& a_oDevicePath )
 				: HRawFile(), f_eSpeed( SPEED::DEFAULT ),
 	f_eFlags( FLAG::DEFAULT ), f_oDevicePath(),
-	f_oTIO( xcalloc<termios>( 1 ) ), f_oBackUpTIO( xcalloc<termios>( 1 ) )
+	f_oTIO( chunk_size<termios>( 1 ) ), f_oBackUpTIO( chunk_size<termios>( 1 ) )
 	{
 	M_PROLOG
 	if ( !! a_oDevicePath )

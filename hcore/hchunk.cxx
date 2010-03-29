@@ -37,10 +37,7 @@ namespace yaal
 namespace hcore
 {
 
-HChunk::HChunk( void* const& a_pvData ) : f_pvData( a_pvData )
-	{}
-
-HChunk::HChunk( int long const& size_ ) : f_pvData( xcalloc<char>( size_ ) )
+HChunk::HChunk( int long const& size_ ) : f_pvData( size_ ? xcalloc<char>( size_ ) : NULL )
 	{}
 
 HChunk::~HChunk( void )
