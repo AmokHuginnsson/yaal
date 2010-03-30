@@ -441,7 +441,7 @@ template<typename tType>
 void HListControler<tType>::remove_tail( void )
 	{
 	M_PROLOG
-	f_oList->remove_tail();
+	f_oList->pop_back();
 	f_poControl->invalidate();
 	return;
 	M_EPILOG

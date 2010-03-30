@@ -65,7 +65,7 @@ HTUIProcess::~HTUIProcess( void )
 	{
 	M_PROLOG
 	if ( f_oWindows->size() > 0 )
-		f_oWindows->remove_head();
+		f_oWindows->pop_front();
 #ifdef __DEBUGGER_BABUNI__
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */

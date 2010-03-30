@@ -36,7 +36,7 @@ namespace yaal
 namespace hcore
 {
 
-extern char const * const g_ppcErrMsgHList [ ];
+extern char const* const g_ppcErrMsgHList[];
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/
@@ -174,8 +174,6 @@ public:
 	 */
 	template<typename T>
 	value_type& add_orderly( value_type const&, T const&, sort_order_t = ASCENDING );
-	status_t remove_head( value_type** = NULL );
-	status_t remove_tail( value_type** = NULL );
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<value_type, treatment>::type erase( HIterator<value_type, treatment> const& );
 	/*! \brief Sets cursor at specified index or number
@@ -226,6 +224,7 @@ private:
 	explicit HElement( HElement* );
 	explicit HElement( HElement*, value_type const& );
 	virtual ~HElement ();
+	void connect( HElement* );
 	HElement( HElement const & );
 	HElement& operator = ( HElement const& );
 	friend class HList<value_type>;
@@ -314,36 +313,14 @@ template<typename value_type>
 HList<value_type>::HElement::HElement( HElement* a_poElement )
 	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject()
 	{
-	if ( a_poElement == 0 )
-		{
-		f_poPrevious = this;
-		f_poNext = this;
-		}
-	else
-		{
-		f_poPrevious = a_poElement->f_poPrevious;
-		f_poNext = a_poElement;
-		a_poElement->f_poPrevious = this;
-		f_poPrevious->f_poNext = this;
-		}
+	connect( a_poElement );
 	}
 
 template<typename value_type>
 HList<value_type>::HElement::HElement( HElement* a_poElement, value_type const& a_roValue )
 	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject( a_roValue )
 	{
-	if ( a_poElement == 0 )
-		{
-		f_poPrevious = this;
-		f_poNext = this;
-		}
-	else
-		{
-		f_poPrevious = a_poElement->f_poPrevious;
-		f_poNext = a_poElement;
-		a_poElement->f_poPrevious = this;
-		f_poPrevious->f_poNext = this;
-		}
+	connect( a_poElement );
 	}
 
 template<typename value_type>
@@ -352,6 +329,23 @@ HList<value_type>::HElement::~HElement( void )
 	f_poPrevious->f_poNext = f_poNext;
 	f_poNext->f_poPrevious = f_poPrevious;
 	return;
+	}
+
+template<typename value_type>
+void HList<value_type>::HElement::connect( HElement* a_poElement )
+	{
+	if ( a_poElement == 0 )
+		{
+		f_poPrevious = this;
+		f_poNext = this;
+		}
+	else
+		{
+		f_poPrevious = a_poElement->f_poPrevious;
+		f_poNext = a_poElement;
+		a_poElement->f_poPrevious = this;
+		f_poPrevious->f_poNext = this;
+		}
 	}
 
 //========================== Iterator ========================================
@@ -617,7 +611,7 @@ HList<value_type>& HList<value_type>::operator = ( HList<value_type> const& a_ro
 			{
 			l_iCount = f_iSize - a_roList.f_iSize;
 			while ( l_iCount -- )
-				remove_tail();
+				pop_back();
 			}
 		else if ( f_iSize < a_roList.f_iSize )
 			{
@@ -775,24 +769,6 @@ void HList<value_type>::push_back( value_type const& a_rtObject )
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::pop_front( void )
-	{
-	M_PROLOG
-	remove_head();
-	return;
-	M_EPILOG
-	}
-
-template<typename value_type>
-void HList<value_type>::pop_back( void )
-	{
-	M_PROLOG
-	remove_tail();
-	return;
-	M_EPILOG
-	}
-
 namespace
 {
 
@@ -820,7 +796,7 @@ value_type& HList<value_type>::add_orderly( value_type const& a_rtObject,
 	int l_iIndex = 0, l_iOldIndex = -1, l_iLower = 0, l_iUpper = f_iSize;
 	HElement* l_poElement = new HElement( NULL, a_rtObject );
 	if ( ( f_eOrder != UNSORTED ) && ( f_eOrder != a_eOrder ) )
-		M_THROW( g_ppcErrMsgHList [ ERROR::BAD_ORDER ], a_eOrder );
+		M_THROW( g_ppcErrMsgHList[ ERROR::BAD_ORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
 	typedef bool ( *comp_t )( value_type const&, value_type const&, T const& );
 	comp_t my_comp;
@@ -909,16 +885,13 @@ HList<value_type>::erase( HIterator<value_type, treatment> const& a_roIterator )
 	}
 
 template<typename value_type>
-OListBits::status_t HList<value_type>::remove_head( value_type** a_pptObject )
+void HList<value_type>::pop_front( void )
 	{
 	M_PROLOG
-	status_t l_eError = OK;
 	HElement* l_poElement = NULL;
 	if ( f_iSize > 0 )
 		{
 		l_poElement = f_poHook;
-		if ( a_pptObject )
-			( *a_pptObject ) = &l_poElement->f_tObject;
 		f_poHook = f_poHook->f_poNext;
 		}
 	else
@@ -933,21 +906,18 @@ OListBits::status_t HList<value_type>::remove_head( value_type** a_pptObject )
 		f_poIndex = NULL;
 		f_iIndex = 0;
 		}
-	return ( l_eError );
+	return;
 	M_EPILOG
 	}
 
 template<typename value_type>
-OListBits::status_t HList<value_type>::remove_tail( value_type** a_pptObject )
+void HList<value_type>::pop_back( void )
 	{
 	M_PROLOG
-	status_t l_eError = OK;
-	HElement * l_poElement = NULL;
+	HElement* l_poElement = NULL;
 	if ( f_iSize > 0 )
 		{
 		l_poElement = f_poHook->f_poPrevious;
-		if ( a_pptObject )
-			( *a_pptObject ) = &l_poElement->f_tObject;
 		if ( l_poElement == f_poIndex )
 			{
 			f_poIndex = l_poElement->f_poPrevious;
@@ -964,7 +934,7 @@ OListBits::status_t HList<value_type>::remove_tail( value_type** a_pptObject )
 		}
 	else
 		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
-	return ( l_eError );
+	return;
 	M_EPILOG
 	}
 

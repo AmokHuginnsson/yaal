@@ -128,7 +128,7 @@ HControl* HControlList::get_control_by_no( int a_iOffset )
 void HControlList::pop_front( void )
 	{
 	M_PROLOG
-	f_oList.remove_head();
+	f_oList.pop_front();
 	M_EPILOG
 	}
 
