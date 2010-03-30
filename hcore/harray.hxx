@@ -78,8 +78,7 @@ public:
 	virtual ~HArray( void );
 	HArray( HArray const& );
 	HArray& operator = ( HArray const& );
-	void resize( int long const& );
-	void resize( int long const&, value_type const& );
+	void resize( int long const&, value_type const& = value_t() );
 	void reserve( int long const& );
 	value_type& operator [] ( int long const& );
 	value_type const& operator [] ( int long const& ) const;
@@ -191,11 +190,11 @@ public:
 		return ( _index - it._index );
 		}
 	const_qual_t& operator* ( void )
-		{ return ( _owner->_buf.template get<value_type>()[ _index ] ); }
+		{ return ( const_cast<const_qual_t&>( _owner->_buf.template get<const_qual_t>()[ _index ] ) ); }
 	const_qual_t& operator* ( void ) const
 		{ return ( _owner->_buf.template get<const_qual_t>()[ _index ] ); }
 	const_qual_t* operator-> ( void )
-		{ return ( &_owner->_buf.template get<const_qual_t>()[ _index ] ); }
+		{ return ( const_cast<const_qual_t*>( &_owner->_buf.template get<const_qual_t>()[ _index ] ) ); }
 	const_qual_t* operator-> ( void ) const
 		{ return ( &_owner->_buf.template get<const_qual_t>()[ _index ] ); }
 	template<typename other_const_qual_t>
@@ -230,8 +229,7 @@ HArray<value_type>::HArray( int long const& size_, value_type const& fillWith_ )
 	: _buf(), _size( 0 )
 	{
 	M_PROLOG
-	if ( size_ )
-		resize( size_, fillWith_ );
+	resize( size_, fillWith_ );
 	return;
 	M_EPILOG
 	}
@@ -283,62 +281,47 @@ HArray<value_type>& HArray<value_type>::operator = ( HArray const& arr_ )
 	}
 
 template<typename value_type>
-void HArray<value_type>::resize( int long const& size_ )
+void HArray<value_type>::resize( int long const& size_, value_type const& fillWith_ )
 	{
 	M_PROLOG
-		/* TODO */
-	return;
-	M_EPILOG
-	}
+	if ( size_ > _size )
+		{
+		}
+	else if ( size_ < _size )
+		{
 
-template<typename value_type>
-void HArray<value_type>::resize( int long const& size_, value_type const& t )
-	{
-	M_PROLOG
-		/* TODO */
+		}
+	_size = size_;
 	return;
 	M_EPILOG
 	}
 
 /*
-template<typename value_t>
-void HPool<value_t>::pool_realloc( int long const& a_ulNewSize )
-	{
-	M_PROLOG
-	if ( a_ulNewSize < 1 )
-		M_THROW( n_ppcErrMsgHPool[ ERROR::BAD_SIZE ], a_ulNewSize );
-	if ( f_ePoolType == AUTO_GROW )
+	if ( a_ulNewSize > f_lCapacity )
 		{
-		if ( a_ulNewSize > f_lCapacity )
-			{
-			f_lCapacity = 1;
-			while ( f_lCapacity < a_ulNewSize )
-				f_lCapacity <<= 1;
-			f_ptPool = xrealloc<value_t>( f_ptPool, f_lCapacity );
-			::memset( f_ptPool + _size, 0,
-					( f_lCapacity - _size ) * sizeof ( value_t ) );
-			}
-		}
-	else if ( f_lCapacity != a_ulNewSize )
-		{
-		if ( f_ptPool && ( f_ePoolType == FIXED_SIZE ) )
-			M_THROW( n_ppcErrMsgHPool[ ERROR::REALLOC_FIXED ], f_lCapacity );
-		f_lCapacity = a_ulNewSize;
+		f_lCapacity = 1;
+		while ( f_lCapacity < a_ulNewSize )
+			f_lCapacity <<= 1;
 		f_ptPool = xrealloc<value_t>( f_ptPool, f_lCapacity );
-		if ( a_ulNewSize > _size )
-			::memset( f_ptPool + _size, 0,
-					( f_lCapacity - _size ) * sizeof ( value_t ) );
+		::memset( f_ptPool + _size, 0,
+				( f_lCapacity - _size ) * sizeof ( value_t ) );
 		}
-	_size = a_ulNewSize;
-	return;
-	M_EPILOG
-	}
 */
 template<typename value_type>
 void HArray<value_type>::reserve( int long const& a_lNewCapacity )
 	{
 	M_PROLOG
-	_buf.realloc( chunk_size<value_type>( a_lNewCapacity ) );
+	if ( a_lNewCapacity > _buf.size() )
+		{
+		HChunk newBuf( a_lNewCapacity );
+		value_t* dst = newBuf.get<value_t>();
+		value_t* src = _buf.template get<value_t>();
+		for ( int long i = 0; i < _size; ++ i )
+			new ( dst + i ) value_t( src + i );
+		for ( int long i = 0; i < _size; ++ i )
+			src[ i ]->~value_t();
+		_buf.swap( newBuf );
+		}
 	return;
 	M_EPILOG
 	}
