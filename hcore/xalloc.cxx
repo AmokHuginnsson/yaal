@@ -72,7 +72,7 @@ void* xrealloc_internal( void* a_pvPtr, int long a_lSize )
 		::perror( _( "xrealloc_internal: requested size lower than 0" ) );
 		::abort();
 		}
-	l_pvNewPtr = realloc ( a_pvPtr, a_lSize );
+	l_pvNewPtr = realloc( a_pvPtr, a_lSize );
 	if ( l_pvNewPtr == 0 )
 		{
 		::perror( _( "xrealloc_internal: realloc returned NULL" ) );

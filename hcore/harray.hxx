@@ -33,6 +33,7 @@ Copyright:
 #include <new>
 
 #include "hcore/base.hxx"
+#include "hcore/hchunk.hxx"
 #include "hcore/algorithm.hxx"
 
 namespace yaal
@@ -60,21 +61,19 @@ public:
 		typedef enum
 			{
 			OK = 0,        /*!< No error. */
-			BAD_SIZE,      /*!< Bad size. */
-			OUT_OF_MEMORY, /*!< Cannot allocate new memory. */
 			BAD_INDEX      /*!< Index of of bounds. */
 			} error_t;
 		};
 protected:
-	int long f_lSize;
-	int long f_lCapacity;
-	value_type* f_ptArray;
+	HChunk _buf;
+	int long _size;
 public:
 	template<typename const_qual_t>
 	class HIterator;
 	typedef HIterator<value_type> iterator;
 	typedef HIterator<value_type const> const_iterator;
-	HArray( int long const& = 0 );
+	HArray( void );
+	HArray( int long const& );
 	HArray( int long const&, value_type const& );
 	virtual ~HArray( void );
 	HArray( HArray const& );
@@ -93,6 +92,7 @@ public:
 	bool is_empty( void ) const;
 	void clear( void );
 	bool operator ! ( void ) const;
+	iterator erase( iterator, iterator );
 	iterator begin( void );
 	iterator find( int long const& );
 	iterator end( void );
@@ -124,13 +124,13 @@ template<typename const_qual_t>
 class HArray<value_type>::HIterator
 	{
 	typedef HArray<value_type> array_t;
-	array_t const* f_poOwner;
-	int long f_lIndex;
+	array_t const* _owner;
+	int long _index;
 public:
 	typedef value_type value_t;
-	HIterator( void ) : f_poOwner( NULL ), f_lIndex( 0 ) {}
+	HIterator( void ) : _owner( NULL ), _index( 0 ) {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& a_oIt ) : f_poOwner( a_oIt.f_poOwner ), f_lIndex( a_oIt.f_lIndex )
+	HIterator( HIterator<other_const_qual_t> const& a_oIt ) : _owner( a_oIt._owner ), _index( a_oIt._index )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
@@ -138,95 +138,100 @@ public:
 		{
 		if ( &a_oIt != this )
 			{
-			f_poOwner = a_oIt.f_poOwner;
-			f_lIndex = a_oIt.f_lIndex;
+			_owner = a_oIt._owner;
+			_index = a_oIt._index;
 			}
 		return ( *this );
 		}
 	HIterator& operator ++ ( void )
 		{
-		++ f_lIndex;
+		++ _index;
 		return ( *this );
 		}
 	HIterator const operator ++ ( int )
 		{
-		HIterator it( f_poOwner, f_lIndex );
-		++ f_lIndex;
+		HIterator it( _owner, _index );
+		++ _index;
 		return ( it );
 		}
 	HIterator& operator -- ( void )
 		{
-		-- f_lIndex;
+		-- _index;
 		return ( *this );
 		}
 	HIterator const operator -- ( int )
 		{
-		HIterator it( f_poOwner, f_lIndex );
-		-- f_lIndex;
+		HIterator it( _owner, _index );
+		-- _index;
 		return ( it );
 		}
 	HIterator operator + ( int long const& off_ ) const
 		{
-		HIterator it( f_poOwner, f_lIndex + off_ );
+		HIterator it( _owner, _index + off_ );
 		return ( it );
 		}
 	HIterator& operator += ( int long const& off_ )
 		{
-		f_lIndex += off_;
+		_index += off_;
 		return ( *this );
 		}
 	HIterator operator - ( int long const& off_ ) const
 		{
-		HIterator it( f_poOwner, f_lIndex - off_ );
+		HIterator it( _owner, _index - off_ );
 		return ( it );
 		}
 	HIterator& operator -= ( int long const& off_ )
 		{
-		f_lIndex -= off_;
+		_index -= off_;
 		return ( *this );
 		}
 	int long operator - ( HIterator const& it ) const
 		{
-		M_ASSERT( f_poOwner == it.f_poOwner );
-		return ( f_lIndex - it.f_lIndex );
+		M_ASSERT( _owner == it._owner );
+		return ( _index - it._index );
 		}
 	const_qual_t& operator* ( void )
-		{ return ( f_poOwner->f_ptArray[ f_lIndex ] ); }
+		{ return ( _owner->_buf.template get<value_type>()[ _index ] ); }
 	const_qual_t& operator* ( void ) const
-		{ return ( f_poOwner->f_ptArray[ f_lIndex ] ); }
+		{ return ( _owner->_buf.template get<const_qual_t>()[ _index ] ); }
 	const_qual_t* operator-> ( void )
-		{ return ( &f_poOwner->f_ptArray[ f_lIndex ] ); }
+		{ return ( &_owner->_buf.template get<const_qual_t>()[ _index ] ); }
 	const_qual_t* operator-> ( void ) const
-		{ return ( &f_poOwner->f_ptArray[ f_lIndex ] ); }
+		{ return ( &_owner->_buf.template get<const_qual_t>()[ _index ] ); }
 	template<typename other_const_qual_t>
 	bool operator == ( HIterator<other_const_qual_t> const& it ) const
-		{ return ( f_lIndex == it.f_lIndex ); }
+		{ return ( _index == it._index ); }
 	template<typename other_const_qual_t>
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
-		{ return ( f_lIndex != it.f_lIndex ); }
+		{ return ( _index != it._index ); }
 private:
 	friend class HArray<value_type>;
 	explicit HIterator( array_t const* a_poOwner, int long const& idx )
-		: f_poOwner( a_poOwner ), f_lIndex( idx ) {};
+		: _owner( a_poOwner ), _index( idx ) {};
 	};
 
 template<typename value_type>
-HArray<value_type>::HArray( int long const& a_lSize ) : f_lSize( 0 ), f_lCapacity( 0 ), f_ptArray( NULL )
+HArray<value_type>::HArray( void ) : _buf(), _size( 0 )
+	{
+	return;
+	}
+
+template<typename value_type>
+HArray<value_type>::HArray( int long const& size_ ) : _buf(), _size( 0 )
 	{
 	M_PROLOG
-	if ( a_lSize )
-		resize( a_lSize );
+	resize( size_ );
 	return;
 	M_EPILOG
 	}
 
 template<typename value_type>
-HArray<value_type>::HArray( int long const& a_lSize, value_type const& a_tFillWith )
-	: f_lSize( 0 ), f_lCapacity( 0 ), f_ptArray( NULL )
+HArray<value_type>::HArray( int long const& size_, value_type const& fillWith_ )
+	: _buf(), _size( 0 )
 	{
 	M_PROLOG
-	if ( a_lSize )
-		resize( a_lSize, a_tFillWith );
+	if ( size_ )
+		resize( size_, fillWith_ );
 	return;
 	M_EPILOG
 	}
@@ -235,11 +240,7 @@ template<typename value_type>
 HArray<value_type>::~HArray( void )
 	{
 	M_PROLOG
-	if ( f_ptArray )
-		delete [] f_ptArray;
-	f_ptArray = NULL;
-	f_lCapacity = 0;
-	f_lSize = 0;
+	clear();
 	return;
 	M_EPILOG
 	}
@@ -248,81 +249,53 @@ template<typename value_type>
 void HArray<value_type>::clear( void )
 	{
 	M_PROLOG
-	value_t c;
-	fill_n( f_ptArray, f_lSize, c );
-	f_lSize = 0;
+	erase( begin(), end() );
 	return;
 	M_EPILOG
 	}
 
 template<typename value_type>
-HArray<value_type>::HArray( HArray const& a_roArray ) : f_lSize( 0 ), f_lCapacity( 0 ), f_ptArray( NULL )
+HArray<value_type>::HArray( HArray const& arr_ )
+	: _buf( chunk_size<value_type>( arr_._size ) ), _size( arr_._size )
 	{
 	M_PROLOG
-	if ( a_roArray.f_lSize )
+	if ( _size > 0 )
 		{
-		resize( a_roArray.f_lSize );
-		copy_n( a_roArray.f_ptArray, a_roArray.f_lSize, f_ptArray );
+		value_t* dst = _buf.get<value_t>();
+		value_t const* src = arr_._buf.template get<value_t>();
+		for ( int long i = 0; i < _size; ++ i )
+			new ( dst + i ) value_t( src + i );
 		}
 	return;
 	M_EPILOG
 	}
 
 template<typename value_type>
-HArray<value_type>& HArray<value_type>::operator = ( HArray const& a_roArray )
+HArray<value_type>& HArray<value_type>::operator = ( HArray const& arr_ )
 	{
 	M_PROLOG
-	if ( &a_roArray != this )
+	if ( &arr_ != this )
 		{
-		if ( a_roArray.f_lSize > f_lCapacity )
-			{
-			HArray<value_type> tmpArray( a_roArray );
-			using yaal::swap;
-			swap( tmpArray, *this );
-			}
-		else
-			{
-			copy_n( a_roArray.f_ptArray, a_roArray.f_lSize, f_ptArray );
-			if ( f_lSize > a_roArray.f_lSize )
-				{
-				value_t c;
-				fill_n( f_ptArray + a_roArray.f_lSize, f_lSize - a_roArray.f_lSize, c );
-				}
-			f_lSize = a_roArray.f_lSize;
-			}
+		/* TODO */
 		}
 	return ( *this );
 	M_EPILOG
 	}
 
 template<typename value_type>
-void HArray<value_type>::resize( int long const& a_lSize )
+void HArray<value_type>::resize( int long const& size_ )
 	{
 	M_PROLOG
-	reserve( a_lSize );
-	if ( a_lSize < f_lSize )
-		{
-		value_t c;
-		fill_n( f_ptArray + a_lSize, f_lSize - a_lSize, c );
-		}
-	f_lSize = a_lSize;
+		/* TODO */
 	return;
 	M_EPILOG
 	}
 
 template<typename value_type>
-void HArray<value_type>::resize( int long const& a_lSize, value_type const& t )
+void HArray<value_type>::resize( int long const& size_, value_type const& t )
 	{
 	M_PROLOG
-	reserve( a_lSize );
-	if ( a_lSize > f_lSize )
-		yaal::fill_n( f_ptArray + f_lSize, a_lSize - f_lSize, t );
-	else if ( a_lSize < f_lSize )
-		{
-		value_t c;
-		fill_n( f_ptArray + a_lSize, f_lSize - a_lSize, c );
-		}
-	f_lSize = a_lSize;
+		/* TODO */
 	return;
 	M_EPILOG
 	}
@@ -342,8 +315,8 @@ void HPool<value_t>::pool_realloc( int long const& a_ulNewSize )
 			while ( f_lCapacity < a_ulNewSize )
 				f_lCapacity <<= 1;
 			f_ptPool = xrealloc<value_t>( f_ptPool, f_lCapacity );
-			::memset( f_ptPool + f_lSize, 0,
-					( f_lCapacity - f_lSize ) * sizeof ( value_t ) );
+			::memset( f_ptPool + _size, 0,
+					( f_lCapacity - _size ) * sizeof ( value_t ) );
 			}
 		}
 	else if ( f_lCapacity != a_ulNewSize )
@@ -352,11 +325,11 @@ void HPool<value_t>::pool_realloc( int long const& a_ulNewSize )
 			M_THROW( n_ppcErrMsgHPool[ ERROR::REALLOC_FIXED ], f_lCapacity );
 		f_lCapacity = a_ulNewSize;
 		f_ptPool = xrealloc<value_t>( f_ptPool, f_lCapacity );
-		if ( a_ulNewSize > f_lSize )
-			::memset( f_ptPool + f_lSize, 0,
-					( f_lCapacity - f_lSize ) * sizeof ( value_t ) );
+		if ( a_ulNewSize > _size )
+			::memset( f_ptPool + _size, 0,
+					( f_lCapacity - _size ) * sizeof ( value_t ) );
 		}
-	f_lSize = a_ulNewSize;
+	_size = a_ulNewSize;
 	return;
 	M_EPILOG
 	}
@@ -365,20 +338,7 @@ template<typename value_type>
 void HArray<value_type>::reserve( int long const& a_lNewCapacity )
 	{
 	M_PROLOG
-	if ( a_lNewCapacity < 1 )
-		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_SIZE ], a_lNewCapacity );
-	if ( a_lNewCapacity > f_lCapacity )
-		{
-		HArray<value_type> tmpArray;
-		tmpArray.f_ptArray = new ( std::nothrow ) value_type[ a_lNewCapacity ];
-		if ( ! tmpArray.f_ptArray )
-			M_THROW( n_ppcErrMsgHArray[ ERROR::OUT_OF_MEMORY ], a_lNewCapacity );
-		tmpArray.f_lCapacity = a_lNewCapacity;
-		tmpArray.f_lSize = f_lSize;
-		using yaal::swap;
-		swap_ranges( f_ptArray, f_ptArray + f_lSize, tmpArray.f_ptArray );
-		swap( tmpArray, *this );
-		}
+	_buf.realloc( chunk_size<value_type>( a_lNewCapacity ) );
 	return;
 	M_EPILOG
 	}
@@ -387,10 +347,10 @@ template<typename value_type>
 value_type& HArray<value_type>::get( int long const& a_lIndex ) const
 	{
 	M_PROLOG
-	int long idx = ( a_lIndex < 0 ) ? a_lIndex + f_lSize : a_lIndex;
-	if ( ( idx >= f_lSize ) || ( idx < 0 ) )
+	int long idx = ( a_lIndex < 0 ) ? a_lIndex + _size : a_lIndex;
+	if ( ( idx >= _size ) || ( idx < 0 ) )
 		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_INDEX ], idx );
-	return ( f_ptArray[ idx ] );
+	return ( _buf.get<value_type>()[ idx ] );
 	M_EPILOG
 	}
 
@@ -414,7 +374,7 @@ template<typename value_type>
 bool HArray<value_type>::operator ! ( void ) const
 	{
 	M_PROLOG
-	return ( ! f_ptArray );
+	return ( ! _buf.get<value_type>() );
 	M_EPILOG
 	}
 
@@ -422,7 +382,7 @@ template<typename value_type>
 int long HArray<value_type>::get_size( void ) const
 	{
 	M_PROLOG
-	return ( f_lSize );
+	return ( _size );
 	M_EPILOG
 	}
 
@@ -430,7 +390,7 @@ template<typename value_type>
 int long HArray<value_type>::size( void ) const
 	{
 	M_PROLOG
-	return ( f_lSize );
+	return ( _size );
 	M_EPILOG
 	}
 
@@ -438,7 +398,7 @@ template<typename value_type>
 bool HArray<value_type>::is_empty( void ) const
 	{
 	M_PROLOG
-	return ( f_lSize ? false : true );
+	return ( _size ? false : true );
 	M_EPILOG
 	}
 
@@ -446,7 +406,7 @@ template<typename value_type>
 bool HArray<value_type>::empty( void ) const
 	{
 	M_PROLOG
-	return ( f_lSize ? false : true );
+	return ( _size ? false : true );
 	M_EPILOG
 	}
 
@@ -459,7 +419,7 @@ int long HArray<value_type>::capacity( void ) const
 template<typename value_type>
 int long HArray<value_type>::get_capacity( void ) const
 	{
-	return ( f_lCapacity );
+	return ( _buf.size() / sizeof ( value_type ) );
 	}
 
 template<typename value_type>
@@ -471,13 +431,13 @@ typename HArray<value_type>::iterator HArray<value_type>::begin( void )
 template<typename value_type>
 typename HArray<value_type>::iterator HArray<value_type>::find( int long const& idx )
 	{
-	return ( iterator( this, min( idx, f_lSize ) ) );
+	return ( iterator( this, min( idx, _size ) ) );
 	}
 
 template<typename value_type>
 typename HArray<value_type>::iterator HArray<value_type>::end( void )
 	{
-	return ( iterator( this, f_lSize ) );
+	return ( iterator( this, _size ) );
 	}
 
 template<typename value_type>
@@ -489,22 +449,21 @@ typename HArray<value_type>::const_iterator HArray<value_type>::begin( void ) co
 template<typename value_type>
 typename HArray<value_type>::const_iterator HArray<value_type>::find( int long const& idx ) const
 	{
-	return ( const_iterator( this, min( idx, f_lSize ) ) );
+	return ( const_iterator( this, min( idx, _size ) ) );
 	}
 
 template<typename value_type>
 typename HArray<value_type>::const_iterator HArray<value_type>::end( void ) const
 	{
-	return ( const_iterator( this, f_lSize ) );
+	return ( const_iterator( this, _size ) );
 	}
 
 template<typename value_type>
 void HArray<value_type>::swap( HArray& other )
 	{
 	using yaal::swap;
-	swap( f_ptArray, other.f_ptArray );
-	swap( f_lSize, other.f_lSize );
-	swap( f_lCapacity, other.f_lCapacity );
+	swap( _buf, other._buf );
+	swap( _size, other._size );
 	return;
 	}
 
@@ -512,9 +471,9 @@ template<typename value_type>
 void HArray<value_type>::push_back( value_type const& a_tPod )
 	{
 	M_PROLOG
-	int long l_iOldTop = f_lSize;
-	resize( f_lSize + 1 );
-	f_ptArray[ l_iOldTop ] = a_tPod;
+	int long l_iOldTop = _size;
+	resize( _size + 1 );
+	_buf.get<value_type>()[ l_iOldTop ] = a_tPod;
 	return;
 	M_EPILOG
 	}
