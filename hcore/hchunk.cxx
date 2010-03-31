@@ -92,9 +92,12 @@ void* HChunk::realloc( int long size_, STRATEGY::enum_t const& strategy_ )
 
 void HChunk::swap( HChunk& chunk_ )
 	{
-	using yaal::swap;
-	swap( _data, chunk_._data );
-	swap( _size, chunk_._size );
+	if ( &chunk_ != this )
+		{
+		using yaal::swap;
+		swap( _data, chunk_._data );
+		swap( _size, chunk_._size );
+		}
 	return;
 	}
 

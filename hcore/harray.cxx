@@ -39,6 +39,7 @@ namespace hcore
 char const* const n_ppcErrMsgHArray[ 4 ] =
 	{
 	_( "ok" ),
+/* HArray::ERROR::BAD_SIZE */  _( "bad size requested" ),
 /* HArray::ERROR::BAD_INDEX */ _( "index does not fit into array" )
 	};
 
