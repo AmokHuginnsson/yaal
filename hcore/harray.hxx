@@ -84,6 +84,7 @@ public:
 	value_type& operator [] ( int long const& );
 	value_type const& operator [] ( int long const& ) const;
 	void push_back( value_type const& );
+	void pop_back( void );
 	int long get_size( void ) const;
 	int long size( void ) const;
 	int long get_capacity( void ) const;
@@ -92,6 +93,11 @@ public:
 	bool is_empty( void ) const;
 	void clear( void );
 	bool operator ! ( void ) const;
+	iterator insert( iterator, value_type const& );
+	template<typename iterator_t>
+	void insert( iterator_t, iterator_t );
+	void insert( iterator, int long, value_type const& );
+	iterator erase( iterator );
 	iterator erase( iterator, iterator );
 	iterator begin( void );
 	iterator find( int long const& );
@@ -369,6 +375,16 @@ typename HArray<value_type>::iterator HArray<value_type>::erase( iterator first,
 	}
 
 template<typename value_type>
+typename HArray<value_type>::iterator HArray<value_type>::erase( iterator it )
+	{
+	M_PROLOG
+	iterator next( it );
+	++ next;
+	return ( erase( it, next ) );
+	M_EPILOG
+	}
+
+template<typename value_type>
 value_type& HArray<value_type>::operator[] ( int long const& a_lIndex )
 	{
 	M_PROLOG
@@ -481,6 +497,7 @@ typename HArray<value_type>::const_iterator HArray<value_type>::end( void ) cons
 template<typename value_type>
 void HArray<value_type>::swap( HArray& other )
 	{
+	M_PROLOG
 	if ( &other != this )
 		{
 		using yaal::swap;
@@ -488,6 +505,7 @@ void HArray<value_type>::swap( HArray& other )
 		swap( _size, other._size );
 		}
 	return;
+	M_EPILOG
 	}
 
 template<typename value_type>
@@ -500,6 +518,17 @@ void HArray<value_type>::push_back( value_type const& val_ )
 	value_t* arr( _buf.get<value_t>() );
 	new ( arr + _size ) value_t( val_ );
 	++ _size;
+	return;
+	M_EPILOG
+	}
+
+template<typename value_type>
+void HArray<value_type>::pop_back( void )
+	{
+	M_PROLOG
+	M_ASSERT( _size > 0 );
+	value_t* arr( _buf.get<value_t>() );
+	arr[ -- _size ].~value_t();
 	return;
 	M_EPILOG
 	}

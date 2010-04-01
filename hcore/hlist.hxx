@@ -145,6 +145,7 @@ public:
 	const_iterator rend( void ) const;
 	const_iterator rbegin( void ) const;
 	void clear( void );
+	void resize( int long, value_type const& = value_type() );
 	int long size( void ) const;
 	int long get_size( void ) const;
 	void swap( HList<value_type>& );
@@ -156,6 +157,10 @@ public:
 	typename OListBits::iterator<value_type, treatment>::type insert( HIterator<value_type, treatment> const& );
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<value_type, treatment>::type insert( HIterator<value_type, treatment> const&, value_type const& );
+	template<OListBits::treatment_t const treatment, typename iterator_t>
+	void insert( HIterator<value_type, treatment> const&, iterator_t, iterator_t );
+	template<OListBits::treatment_t const treatment>
+	void insert( HIterator<value_type, treatment> const&, int long const&, value_type const& );
 	/*! \brief Adds new element at beggining of the list
 	 *
 	 * Newly created element will have default value.
@@ -201,8 +206,6 @@ private:
 	template<typename T>
 	void insert_sort( HElement*&, HElement*&, T const& );
 	void insert( HElement*, HElement* );
-	template<typename T>
-	void select_sort( HElement*&, HElement*&, int, T const& );
 	HElement* element_by_index ( int );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
@@ -695,7 +698,7 @@ template<OListBits::treatment_t const treatment>
 typename OListBits::iterator<value_type, treatment>::type HList<value_type>::insert( HIterator<value_type, treatment> const& it )
 	{
 	M_PROLOG
-	HElement* l_poElement = new HElement( it.f_poCurrent );
+	HElement* l_poElement = new HElement( it.f_poCurrent ? it.f_poCurrent : f_poHook );
 	if ( ( f_iSize == 0 ) || ( ( it.f_poCurrent == f_poHook ) && ( treatment == TREAT_AS_OPENED ) ) )
 		f_poHook = l_poElement;
 	f_iSize ++;
@@ -711,13 +714,37 @@ typename OListBits::iterator<value_type, treatment>::type HList<value_type>::ins
 		value_type const& val )
 	{
 	M_PROLOG
-	HElement* l_poElement = new HElement( it.f_poCurrent, val );
+	HElement* l_poElement = new HElement( it.f_poCurrent ? it.f_poCurrent : f_poHook, val );
 	if ( ( f_iSize == 0 ) || ( ( it.f_poCurrent == f_poHook ) && ( treatment == TREAT_AS_OPENED ) ) )
 		f_poHook = l_poElement;
 	f_iSize ++;
 	f_iIndex = 0;
 	f_poIndex = NULL;
 	return ( iterator( this, l_poElement ) );
+	M_EPILOG
+	}
+
+template<typename value_type>
+template<OListBits::treatment_t const treatment>
+void HList<value_type>::insert( HIterator<value_type, treatment> const& it,
+		int long const& count_, value_type const& val )
+	{
+	M_PROLOG
+	for ( int long i = 0; i < count_; ++ i )
+		insert( it, val );
+	return;
+	M_EPILOG
+	}
+
+template<typename value_type>
+template<OListBits::treatment_t const treatment, typename iterator_t>
+void HList<value_type>::insert( HIterator<value_type, treatment> const& it,
+		iterator_t first, iterator_t last )
+	{
+	M_PROLOG
+	for ( ; first != last; ++ first )
+		insert( it, *first );
+	return;
 	M_EPILOG
 	}
 
@@ -1259,67 +1286,6 @@ void HList<value_type>::insert( HElement* pos, HElement* elem )
 			}
 		}
 	return;
-	}
-
-template<typename value_type>
-template<typename T>
-void HList<value_type>::select_sort(
-		HElement*& a_rpoBaseLower, HElement*& a_rpoBaseUpper,
-		int distance, T const& less )
-	{
-	M_PROLOG
-	int l_iCtrLoc = 0;
-	HElement* l_poExtreamLower = NULL;
-	HElement* l_poExtreamUpper = NULL;
-	HElement* l_poBaseLower = a_rpoBaseLower;
-	HElement* l_poBaseUpper = a_rpoBaseUpper;
-	HElement* l_poPointer = NULL;
-	int ctr = distance;
-	typedef bool ( *comp_t )( value_type const&, value_type const&, T const& );
-	comp_t my_comp;
-	if ( f_eOrder == ASCENDING )
-		my_comp = asc_less<value_type, T>;
-	else
-		my_comp = desc_less<value_type, T>;
-	while ( ctr >= 0 )
-		{
-		l_iCtrLoc = ctr;
-		l_poExtreamLower = l_poBaseLower;
-		l_poExtreamUpper = l_poBaseUpper;
-		l_poPointer = l_poBaseLower;
-		while ( l_iCtrLoc -- )
-			{
-			if ( ( l_poPointer != l_poExtreamLower )
-					&& my_comp( l_poPointer->f_tObject, l_poExtreamLower->f_tObject, less ) )
-				l_poExtreamLower = l_poPointer;
-			if ( ( l_poPointer != l_poExtreamUpper )
-					&& my_comp( l_poExtreamUpper->f_tObject, l_poPointer->f_tObject, less ) )
-				l_poExtreamUpper = l_poPointer;
-			l_poPointer = l_poPointer->f_poNext;
-			}
-		if ( l_poExtreamLower != l_poBaseLower )
-			{
-			exchange( l_poBaseLower, l_poExtreamLower );
-			if ( l_poExtreamLower == l_poBaseUpper )
-				l_poBaseUpper = l_poBaseLower;
-			l_poBaseLower = l_poExtreamLower;
-			}
-		if ( l_poExtreamUpper != l_poBaseUpper )
-			{
-			exchange( l_poBaseUpper, l_poExtreamUpper );
-			l_poBaseUpper = l_poExtreamUpper;
-			}
-		if ( ctr == distance )
-			{
-			a_rpoBaseLower = l_poBaseLower;
-			a_rpoBaseUpper = l_poBaseUpper;
-			}
-		l_poBaseLower = l_poBaseLower->f_poNext;
-		l_poBaseUpper = l_poBaseUpper->f_poPrevious;
-		ctr -= 2;
-		}
-	return;
-	M_EPILOG
 	}
 
 template<typename value_type>
