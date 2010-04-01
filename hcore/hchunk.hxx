@@ -61,7 +61,7 @@ public:
 	 *
 	 * \param size - requested memory chunk size.
 	 */
-	HChunk( int long const& size, STRATEGY::enum_t const& = STRATEGY::EXACT );
+	explicit HChunk( int long const& size, STRATEGY::enum_t const& = STRATEGY::EXACT );
 	~HChunk( void );
 	template<typename tType>
 	tType const* get() const

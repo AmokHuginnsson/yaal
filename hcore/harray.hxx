@@ -74,7 +74,7 @@ public:
 	typedef HIterator<value_type> iterator;
 	typedef HIterator<value_type const> const_iterator;
 	HArray( void );
-	HArray( int long const& );
+	explicit HArray( int long const& );
 	HArray( int long const&, value_type const& );
 	virtual ~HArray( void );
 	HArray( HArray const& );

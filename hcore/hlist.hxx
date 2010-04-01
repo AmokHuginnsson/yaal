@@ -126,7 +126,7 @@ public:
 	 *
 	 * \param count - number of element for newly created list.
 	 */
-	HList( int count );
+	explicit HList( int long count );
 	virtual ~HList( void );
 	HList( HList const& );
 	HList& operator = ( HList const& );
@@ -480,13 +480,13 @@ HList<value_type>::HList( void )
 	}
 
 template<typename value_type>
-HList<value_type>::HList( int a_iSize )
+HList<value_type>::HList( int long count_ )
 	: OListBits(), f_iSize( 0 ),
 	f_poHook( NULL ), f_eOrder( UNSORTED ),
 	f_iIndex( 0 ), f_poIndex( NULL )
 	{
 	M_PROLOG
-	while ( a_iSize -- )
+	while ( count_ -- )
 		add_tail();
 	return;
 	M_EPILOG
