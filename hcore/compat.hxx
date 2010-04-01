@@ -32,8 +32,8 @@ Copyright:
 #define YAAL_HCORE_COMPAT_HXX_INCLUDED
 
 #ifdef __YAAL_BUILD__
+
 #include "config.hxx"
-#endif /* __YAAL_BUILD__ */
 
 /*! \cond */
 #if ! defined( HAVE_PRETTY_FUNCTION )
@@ -113,6 +113,8 @@ static int const LOGIN_NAME_MAX = 16;
 #define __decltype typeof
 #endif /* not HAVE_DECLTYPE */
 /*! \endcond */
+
+#endif /* __YAAL_BUILD__ */
 
 #endif /* not YAAL_HCORE_COMPAT_HXX_INCLUDED */
 

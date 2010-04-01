@@ -29,10 +29,6 @@ Copyright:
 
 #include <cstdarg>
 
-#ifdef HAVE_CONFIG_H
-#	include "config.hxx"
-#endif /* HAVE_CONFIG_H */
-
 #include "hcore/hsingleton.hxx"
 #include "hcore/hpipe.hxx"
 #include "tools/signals.hxx"

@@ -56,7 +56,7 @@ ifdef DO_COVERAGE
 endif
 LINKER_PRIME_FLAGS  = -Wl,--demangle
 
-COMPILER_PATH_FLAGS = -I$(DIR_ROOT) -I$(DIR_BUILD) -I$(VPATH) -I/usr/local/include
+COMPILER_PATH_FLAGS = -I$(DIR_BUILD) -I$(DIR_ROOT) -I$(VPATH) -I/usr/local/include
 LINKER_PATH_FLAGS   = -L/usr/local/lib
 
 CXXFLAGS += $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
