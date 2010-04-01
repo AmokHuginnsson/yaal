@@ -33,7 +33,7 @@ cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
 EOF
 
-find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{ printf "#include <%s>\n", substr( $1, match( $1, "yaal/[^/]*/[^/]*.hxx" ), 255 ) }' | sort >> ${DIR_HEADERS}/yaal.hxx
+find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{ printf "#include <%s>\n", substr( $1, match( $1, "yaal(/[^/]*)?/[^/]*.hxx" ), 255 ) }' | sort >> ${DIR_HEADERS}/yaal.hxx
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
