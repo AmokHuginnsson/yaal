@@ -32,18 +32,9 @@ Copyright:
 #define YAAL_HCORE_COMPAT_HXX_INCLUDED
 
 #ifdef __YAAL_BUILD__
-
 #include "config.hxx"
 
 /*! \cond */
-#if ! defined( HAVE_PRETTY_FUNCTION )
-#if ! defined( HAVE_FUNCTION )
-#if ! defined( HAVE_FUNC )
-#define __PRETTY_FUNCTION__ ""
-#endif
-#endif
-#endif
-
 #if ! defined( HAVE_BASENAME_ARG_CONST )
 #define basename( x ) basename( const_cast<char*>( x ) )
 #endif /* not HAVE_BASENAME_ARG_CONST */
@@ -64,25 +55,16 @@ void* memrchr( void const*, int, int long );
 #define SUN_LEN(x) ( ::std::strlen( x->sun_path ) + sizeof ( x->sun_family ) )
 #endif /* not HAVE_DECL_SUN_LEN */
 
-#if ( HAVE_DECL_ERR == 1 )
-#include <cstdlib>
-#undef ERR
-#endif /* HAVE_DECL_SUN_LEN */
-
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
-#ifdef __YAAL_BUILD__
 #include <cstdlib>
 #include <netdb.h>
 int gethostbyname_r( char const*, struct hostent*, char*, size_t, struct hostent**, int* );
-#endif /* __YAAL_BUILD__ */
 #endif /* not HAVE_GNU_GETHOSTBYNAME_R */
 
 #if ! defined( HAVE_GNU_GETHOSTBYADDR_R )
-#ifdef __YAAL_BUILD__
 #include <cstdlib>
 #include <netdb.h>
 int gethostbyaddr_r( void const*, int, int, struct hostent*, char*, size_t, struct hostent**, int* );
-#endif /* __YAAL_BUILD__ */
 #endif /* not HAVE_GNU_GETHOSTBYADDR_R */
 
 #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 )
@@ -109,12 +91,26 @@ static int const LOGIN_NAME_MAX = 16;
 #define __DYNAMIC_LINKER__ ""
 #endif /* not __DYNAMIC_LINKER__ */
 
+#endif /* __YAAL_BUILD__ */
+
+#if ! defined( HAVE_PRETTY_FUNCTION )
+#if ! defined( HAVE_FUNCTION )
+#if ! defined( HAVE_FUNC )
+#define __PRETTY_FUNCTION__ ""
+#endif
+#endif
+#endif
+
 #if ! defined( HAVE_DECLTYPE )
 #define __decltype typeof
 #endif /* not HAVE_DECLTYPE */
-/*! \endcond */
 
-#endif /* __YAAL_BUILD__ */
+#if ( HAVE_DECL_ERR == 1 )
+#include <cstdlib>
+#undef ERR
+#endif /* HAVE_DECL_ERR */
+
+/*! \endcond */
 
 #endif /* not YAAL_HCORE_COMPAT_HXX_INCLUDED */
 

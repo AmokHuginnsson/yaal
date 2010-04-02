@@ -23,6 +23,8 @@ for FILE in ${HDRS}; do
 EOF
 done
 
+sed -e 's/\<PACKAGE_/YAAL_PACKAGE_/g' "${DIR_BUILD}/config.hxx" > ${DIR_HEADERS}/config.hxx
+
 head -26 ${DIR_HEADERS}/hcore/hstreaminterface.hxx | sed -e s/hstreaminterface/yaal/ > ${DIR_HEADERS}/yaal.hxx
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
@@ -31,7 +33,7 @@ cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
 EOF
 
-find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{ printf "#include <%s>\n", substr( $1, match( $1, "yaal/[^/]*/[^/]*.hxx" ), 255 ) }' | sort >> ${DIR_HEADERS}/yaal.hxx
+find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{ printf "#include <%s>\n", substr( $1, match( $1, "yaal(/[^/]*)?/[^/]*.hxx" ), 255 ) }' | sort >> ${DIR_HEADERS}/yaal.hxx
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
