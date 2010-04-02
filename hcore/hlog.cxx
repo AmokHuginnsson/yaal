@@ -50,11 +50,14 @@ namespace hcore
 {
 
 namespace
-	{
-	static int const BUFFER_SIZE		= 1024;
-	static int const HOSTNAME_SIZE	= 128;
-	static int const TIMESTAMP_SIZE	= 16;
-	}
+{
+
+static int const BUFFER_SIZE		= 1024;
+static int const HOSTNAME_SIZE	= 128;
+static int const TIMESTAMP_SIZE	= 16;
+static int const GETPW_R_SIZE   = 1024;
+
+}
 
 int long HLog::f_lLogMask = 0;
 
@@ -74,7 +77,7 @@ HLog::HLog( void ) : HStreamInterface(), f_bRealMode( false ), f_bNewLine( true 
 	l_iUid = getuid();
 	passwd l_sPasswd;
 	long int bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
-	HChunk buf( bsize + 1 );
+	HChunk buf( bsize > 0 ? bsize + 1 : GETPW_R_SIZE );
 	passwd* any;
 	if ( ! getpwuid_r( l_iUid, &l_sPasswd, buf.get<char>(), static_cast<int>( bsize ), &any ) )
 		f_oLoginName = l_sPasswd.pw_name;
