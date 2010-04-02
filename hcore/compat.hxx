@@ -31,8 +31,9 @@ Copyright:
 #ifndef YAAL_HCORE_COMPAT_HXX_INCLUDED
 #define YAAL_HCORE_COMPAT_HXX_INCLUDED
 
-#ifdef __YAAL_BUILD__
 #include "config.hxx"
+
+#ifdef __YAAL_BUILD__
 
 /*! \cond */
 #if ! defined( HAVE_BASENAME_ARG_CONST )

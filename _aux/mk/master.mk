@@ -13,7 +13,7 @@ mrproper-$(1): clean-$(1)
 clean-$(1):
 	@$$(if $$(wildcard build/$(1)/Makefile.mk), $$(MAKE) -C build/$(1) -f Makefile.mk -e clean)
 
-install-$(1): $(1)
+install-$(1): build/$(1)/Makefile.mk
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
 	$$(if $$(wildcard build/$(1)/Makefile.mk), $$(MAKE) -C build/$(1) -f Makefile.mk -e install)
 
@@ -56,7 +56,7 @@ all: $(MAIN_TARGETS)
 install-all: $(foreach T, $(MAIN_TARGETS), install-$(T))
 uninstall-all: $(foreach T, $(MAIN_TARGETS), uninstall-$(T))
 
-bin clean dep doc environment install mrproper static stats tags uninstall .DEFAULT: .my_make $(.DEFAULT_GOAL)
+bin clean dep doc environment install mrproper static stats tags uninstall .DEFAULT: .my_make  build/$(.DEFAULT_GOAL)/Makefile.mk
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
 	$(call invoke,$(MAKE) -C $(dir $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./)) -f $(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk))) ./_aux/empty) $(@))
 

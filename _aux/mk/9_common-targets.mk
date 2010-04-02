@@ -1,5 +1,5 @@
 #phony targets
-.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags 
+.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags uninstall
 
 all: debug
 

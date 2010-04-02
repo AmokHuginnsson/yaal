@@ -134,7 +134,7 @@ include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 
 #phony targets
-.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags uninstall 
+.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags uninstall
 .NOTPARALLEL: $(HAPI_HEADER) $(LD_SO_CONF)
 
 $(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)
@@ -145,7 +145,7 @@ $(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 
 environment: $(DIRS)
 
-install: $(TARGET)
+install: all
 	@$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call INSTALL_TARGET,$(IT))) \
 	/bin/cp -fRp $(DIR_BUILD)/yaal $(DIR_HEADERS) && \
 	$(call msg,printf "%b" "making cache ... " && ) \
