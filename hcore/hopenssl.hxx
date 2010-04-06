@@ -65,15 +65,19 @@ public:
 private:
 	class OSSLContext : public HSingletonInterface
 		{
-		static int f_iUsers;
-		static HMutex f_oMutex;
-	public:
-		void* f_pvMethod;
-		void* f_pvContext;
-		void init( void );
+		static int _instances;
+		static HMutex _mutex;
+		void* _context;
+		int _users;
 	protected:
 		OSSLContext( void );
 		virtual ~OSSLContext( void );
+		void init( void );
+		virtual void* do_method( void ) const = 0;
+	public:
+		void* create_ssl( void );
+		void consume_ssl( void* );
+		void* method( void ) const;
 	private:
 		OSSLContext( OSSLContext const& );
 		OSSLContext& operator=( OSSLContext const& );
@@ -81,19 +85,22 @@ private:
 	class OSSLContextServer : public OSSLContext
 		{
 		OSSLContextServer( void );
+		virtual void* do_method( void ) const;
 		friend class HSingleton<OSSLContextServer>;
 		friend class HDestructor<OSSLContextServer>;
 		};
 	class OSSLContextClient : public OSSLContext
 		{
 		OSSLContextClient( void );
+		virtual void* do_method( void ) const;
 		friend class HSingleton<OSSLContextClient>;
 		friend class HDestructor<OSSLContextClient>;
 		};
 	typedef yaal::hcore::HSingleton<OSSLContextServer> OSSLContextServerInstance;
 	typedef yaal::hcore::HSingleton<OSSLContextClient> OSSLContextClientInstance;
-	bool f_bPendingOperation;
-	void* f_pvSSL;
+	bool _pendingOperation;
+	void* _ssl;
+	OSSLContext* _ctx;
 public:
 	typedef yaal::hcore::HPointer<HOpenSSL> ptr_t;
 	HOpenSSL( int, TYPE::ssl_context_type_t );
