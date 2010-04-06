@@ -261,11 +261,13 @@ void HArray<value_type>::clear( void )
 
 template<typename value_type>
 HArray<value_type>::HArray( HArray const& arr_ )
-	: _buf( chunk_size<value_t>( arr_._size ) ), _size( arr_._size )
+	: _buf(), _size( 0 )
 	{
 	M_PROLOG
-	if ( _size > 0 )
-		{
+	if ( arr_._size > 0 )
+		{ 
+		_buf.realloc( chunk_size<value_t>( arr_._size ) );
+		_size = arr_._size;
 		value_t* dst( _buf.get<value_t>() );
 		value_t const* src( arr_._buf.template get<value_t>() );
 		for ( int long i = 0; i < _size; ++ i )
