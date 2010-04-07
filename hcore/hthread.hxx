@@ -33,7 +33,7 @@ Copyright:
 #define YAAL_HCORE_HTHREAD_HXX_INCLUDED
 
 #include "hcore/hchunk.hxx"
-#include "hcore/hrawdestructor.hxx"
+#include "hcore/hresource.hxx"
 
 namespace yaal
 {
@@ -64,9 +64,8 @@ public:
 private:
 	/*{*/
 	TYPE::mutex_type_t f_eType;
-	HChunk f_oAttributes;
-	HChunk f_oMutex;
-	HRawDestructor f_oAttrDS;
+	HChunk _buf;
+	HResource<void> _resGuard;
 	/*}*/
 public:
 	/*{*/
@@ -117,11 +116,10 @@ class HThread
 		ZOMBIE
 		} status_t;
 	status_t f_eStatus;
-	HChunk f_oAttributes;
-	HChunk f_oThread;
+	HChunk _buf;
 	mutable HMutex f_oMutex;
 	HSemaphore f_oSemaphore;
-	HRawDestructor f_oAttrDS;
+	HResource<void> _resGuard;
 public:
 	HThread( void );
 	virtual ~HThread( void );
@@ -175,8 +173,7 @@ private:
 class HCondition
 	{
 	typedef HCondition self_t;
-	HChunk f_oAttributes;
-	HChunk f_oCondition;
+	HChunk _buf;
 	HMutex& f_roMutex;
 public:
 	typedef enum

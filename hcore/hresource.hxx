@@ -33,6 +33,7 @@ Copyright:
 #define YAAL_HCORE_HRESOURCE_HXX_INCLUDED
 
 #include "hcore/base.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal
 {
