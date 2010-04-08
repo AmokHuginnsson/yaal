@@ -105,7 +105,7 @@ struct stream_ptr<HStreamInterface::ptr_t>
 template<typename T>
 struct stream_ptr
 	{
-	static typename trait::strip_reference<T>::type* get( T& p )
+	static typename trait::strip_reference<T>::type* get( typename trait::strip_reference<T>::type& p )
 		{ return ( &p ); }
 	};
 
