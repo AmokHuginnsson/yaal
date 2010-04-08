@@ -83,33 +83,60 @@ protected:
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
-	HStreamInterface& operator << ( HString const& );
-	HStreamInterface& operator << ( char const* const& );
-	HStreamInterface& operator << ( char const& );
-	HStreamInterface& operator << ( int short const& );
-	HStreamInterface& operator << ( int short unsigned const& );
-	HStreamInterface& operator << ( int const& );
-	HStreamInterface& operator << ( int unsigned const& );
-	HStreamInterface& operator << ( int long const& );
-	HStreamInterface& operator << ( int long unsigned const& );
-	HStreamInterface& operator << ( double const& );
-	HStreamInterface& operator << ( double long const& );
-	HStreamInterface& operator << ( float const& );
-	HStreamInterface& operator << ( void const* const& );
-	HStreamInterface& operator << ( manipulator_t const& );
-	HStreamInterface& operator << ( HManipulator const& );
-	HStreamInterface& operator >> ( HString& );
-	HStreamInterface& operator >> ( char& );
-	HStreamInterface& operator >> ( int short& );
-	HStreamInterface& operator >> ( int short unsigned& );
-	HStreamInterface& operator >> ( int& );
-	HStreamInterface& operator >> ( int unsigned& );
-	HStreamInterface& operator >> ( int long& );
-	HStreamInterface& operator >> ( int long unsigned& );
-	HStreamInterface& operator >> ( double& );
-	HStreamInterface& operator >> ( double long& );
-	HStreamInterface& operator >> ( float& );
-	HStreamInterface& operator >> ( void const*& );
+	HStreamInterface& operator << ( HString const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( char const* const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( char const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( int short const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( int short unsigned const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( int const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( int unsigned const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( int long const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( int long unsigned const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( double const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( double long const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( float const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( void const* const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( manipulator_t const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( HManipulator const& val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator >> ( HString&  val_)
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( char& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( int short& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( int short unsigned& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( int& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( int unsigned& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( int long& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( int long unsigned& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( double& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( double long& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( float& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( void const*& val_ )
+		{ return ( do_input( val_ ) ); }
 	/*! \brief Read data from stream until end of it or until delimiter is encountered.
 	 *
 	 * \param store - Store read date here.
@@ -117,7 +144,8 @@ public:
 	 * \param strip - Remove delimiting stop char from output buffer.
 	 * \return number of bytes read.
 	 */
-	int long read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true );
+	int long read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true )
+		{ return ( do_read_until( store, delim, strip ) ); }
 	/*! \brief Read data from stream until end of it or until delimiter is encountered or enough data has been acquired.
 	 *
 	 * \param store - Store read date here.
@@ -126,14 +154,52 @@ public:
 	 * \param strip - Remove delimiting stop char from output buffer.
 	 * \return number of bytes read.
 	 */
-	int long read_until_n( yaal::hcore::HString& store, int long const& maxcount, char const* const delim = eols, bool strip = true );
+	int long read_until_n( yaal::hcore::HString& store, int long const& maxcount, char const* const delim = eols, bool strip = true )
+		{ return ( do_read_until_n( store, maxcount, delim, strip ) ); }
 	int long read( void* const, int long const& );
 	int long write( void const* const, int long const& );
 	static char const* const eols;
 	bool is_valid( void ) const;
-	HStreamInterface& set_fill( int );
-	HStreamInterface& set_width( int );
-	HStreamInterface& set_base( BASES::enum_t );
+	void flush( void ) const;
+	HStreamInterface& set_fill( int val_ )
+		{ return ( do_set_fill( val_ ) ); }
+	HStreamInterface& set_width( int val_ )
+		{ return ( do_set_width( val_ ) ); }
+	HStreamInterface& set_base( BASES::enum_t val_ )
+		{ return ( do_set_base( val_ ) ); }
+protected:
+	virtual HStreamInterface& do_output( HString const& );
+	virtual HStreamInterface& do_output( char const* const& );
+	virtual HStreamInterface& do_output( char const& );
+	virtual HStreamInterface& do_output( int short const& );
+	virtual HStreamInterface& do_output( int short unsigned const& );
+	virtual HStreamInterface& do_output( int const& );
+	virtual HStreamInterface& do_output( int unsigned const& );
+	virtual HStreamInterface& do_output( int long const& );
+	virtual HStreamInterface& do_output( int long unsigned const& );
+	virtual HStreamInterface& do_output( double const& );
+	virtual HStreamInterface& do_output( double long const& );
+	virtual HStreamInterface& do_output( float const& );
+	virtual HStreamInterface& do_output( void const* const& );
+	virtual HStreamInterface& do_output( manipulator_t const& );
+	virtual HStreamInterface& do_output( HManipulator const& );
+	virtual HStreamInterface& do_input( HString& );
+	virtual HStreamInterface& do_input( char& );
+	virtual HStreamInterface& do_input( int short& );
+	virtual HStreamInterface& do_input( int short unsigned& );
+	virtual HStreamInterface& do_input( int& );
+	virtual HStreamInterface& do_input( int unsigned& );
+	virtual HStreamInterface& do_input( int long& );
+	virtual HStreamInterface& do_input( int long unsigned& );
+	virtual HStreamInterface& do_input( double& );
+	virtual HStreamInterface& do_input( double long& );
+	virtual HStreamInterface& do_input( float& );
+	virtual HStreamInterface& do_input( void const*& );
+	virtual int long do_read_until( yaal::hcore::HString&, char const* const, bool );
+	virtual int long do_read_until_n( yaal::hcore::HString&, int long const&, char const* const, bool );
+	virtual HStreamInterface& do_set_fill( int );
+	virtual HStreamInterface& do_set_width( int );
+	virtual HStreamInterface& do_set_base( BASES::enum_t );
 private:
 	bool read_word( void );
 	int long reformat( void );

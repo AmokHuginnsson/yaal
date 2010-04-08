@@ -229,7 +229,7 @@ int HLog::operator() ( char const * const a_pcFormat, ... )
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 		{
 		va_start( l_xAp, a_pcFormat );
-		l_iErr = ( *this ) ( a_pcFormat, l_xAp );
+		l_iErr = ( *this )( a_pcFormat, l_xAp );
 		va_end( l_xAp );
 		}
 	return ( l_iErr );
@@ -246,18 +246,18 @@ int HLog::operator() ( int long const a_lType,
 	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 		{
 		va_start( l_xAp, a_pcFormat );
-		l_iErr = ( *this ) ( a_pcFormat, l_xAp );
+		l_iErr = ( *this )( a_pcFormat, l_xAp );
 		va_end( l_xAp );
 		}
 	return ( l_iErr );
 	M_EPILOG
 	}
 
-HLog & HLog::operator() ( int long const a_lType )
+HLog& HLog::operator() ( int long const a_lType )
 	{
 	M_PROLOG
 	f_lType = a_lType;
-	return ( * this );
+	return ( *this );
 	M_EPILOG
 	}
 

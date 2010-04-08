@@ -51,7 +51,7 @@ HStreamInterface::~HStreamInterface( void )
 	return;
 	}
 
-HStreamInterface& HStreamInterface::operator << ( HString const& a_oString )
+HStreamInterface& HStreamInterface::do_output( HString const& a_oString )
 	{
 	M_PROLOG
 	if ( ! a_oString.is_empty() )
@@ -60,7 +60,7 @@ HStreamInterface& HStreamInterface::operator << ( HString const& a_oString )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( char const* const& a_pcString )
+HStreamInterface& HStreamInterface::do_output( char const* const& a_pcString )
 	{
 	M_PROLOG
 	if ( a_pcString )
@@ -69,7 +69,7 @@ HStreamInterface& HStreamInterface::operator << ( char const* const& a_pcString 
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( char const& a_cChar )
+HStreamInterface& HStreamInterface::do_output( char const& a_cChar )
 	{
 	M_PROLOG
 	char copy( a_cChar );
@@ -78,39 +78,39 @@ HStreamInterface& HStreamInterface::operator << ( char const& a_cChar )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int short const& a_iShortInteger )
+HStreamInterface& HStreamInterface::do_output( int short const& a_iShortInteger )
 	{
 	M_PROLOG
 	int long l_lTmp = a_iShortInteger;
-	return ( operator << ( l_lTmp ) );
+	return ( do_output( l_lTmp ) );
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int short unsigned const& a_uiUnsignedShortInteger )
+HStreamInterface& HStreamInterface::do_output( int short unsigned const& a_uiUnsignedShortInteger )
 	{
 	M_PROLOG
 	int long unsigned l_ulTmp = a_uiUnsignedShortInteger;
-	return ( operator << ( l_ulTmp ) );
+	return ( do_output( l_ulTmp ) );
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int const& a_iInteger )
+HStreamInterface& HStreamInterface::do_output( int const& a_iInteger )
 	{
 	M_PROLOG
 	int long l_lTmp = a_iInteger;
-	return ( operator << ( l_lTmp ) );
+	return ( do_output( l_lTmp ) );
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int unsigned const& a_uiUnsignedInteger )
+HStreamInterface& HStreamInterface::do_output( int unsigned const& a_uiUnsignedInteger )
 	{
 	M_PROLOG
 	int long unsigned l_ulTmp = a_uiUnsignedInteger;
-	return ( operator << ( l_ulTmp ) );
+	return ( do_output( l_ulTmp ) );
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int long const& a_lLongInteger )
+HStreamInterface& HStreamInterface::do_output( int long const& a_lLongInteger )
 	{
 	M_PROLOG
 	f_oWordCache.format( _base == BASES::DEC ? "%ld" : ( _base == BASES::HEX ) ? "%lx" : "%lo", a_lLongInteger );
@@ -137,7 +137,7 @@ int long HStreamInterface::reformat( void )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( int long unsigned const& a_ulUnsignedLongInteger )
+HStreamInterface& HStreamInterface::do_output( int long unsigned const& a_ulUnsignedLongInteger )
 	{
 	M_PROLOG
 	f_oWordCache.format( "%lu", a_ulUnsignedLongInteger );
@@ -147,7 +147,7 @@ HStreamInterface& HStreamInterface::operator << ( int long unsigned const& a_ulU
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( double const& a_dDouble )
+HStreamInterface& HStreamInterface::do_output( double const& a_dDouble )
 	{
 	M_PROLOG
 	f_oWordCache.format( "%f", a_dDouble );
@@ -157,7 +157,7 @@ HStreamInterface& HStreamInterface::operator << ( double const& a_dDouble )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( double long const& a_dLongDouble )
+HStreamInterface& HStreamInterface::do_output( double long const& a_dLongDouble )
 	{
 	M_PROLOG
 	f_oWordCache.format( "%.12Lf", a_dLongDouble );
@@ -167,7 +167,7 @@ HStreamInterface& HStreamInterface::operator << ( double long const& a_dLongDoub
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( float const& a_dFloat )
+HStreamInterface& HStreamInterface::do_output( float const& a_dFloat )
 	{
 	M_PROLOG
 	f_oWordCache.format( "%f", a_dFloat );
@@ -177,7 +177,7 @@ HStreamInterface& HStreamInterface::operator << ( float const& a_dFloat )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( void const* const& a_pvPtr )
+HStreamInterface& HStreamInterface::do_output( void const* const& a_pvPtr )
 	{
 	M_PROLOG
 	f_oWordCache.format( "0x%lx", a_pvPtr );
@@ -186,14 +186,14 @@ HStreamInterface& HStreamInterface::operator << ( void const* const& a_pvPtr )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( manipulator_t const& HFILE_INTERFACE )
+HStreamInterface& HStreamInterface::do_output( manipulator_t const& HFILE_INTERFACE )
 	{
 	M_PROLOG
 	return ( HFILE_INTERFACE( *this ) );
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator << ( HManipulator const& manipulator_ )
+HStreamInterface& HStreamInterface::do_output( HManipulator const& manipulator_ )
 	{
 	M_PROLOG
 	manipulator_( *this );
@@ -252,7 +252,7 @@ HStreamInterface::HManipulator setfill( int fill_ )
 	M_EPILOG
 	}
 
-int long HStreamInterface::read_until( HString& a_roMessage,
+int long HStreamInterface::do_read_until( HString& a_roMessage,
 		char const* const a_pcStopSet, bool a_bStripDelim )
 	{
 	M_PROLOG
@@ -260,7 +260,7 @@ int long HStreamInterface::read_until( HString& a_roMessage,
 	M_EPILOG
 	}
 
-int long HStreamInterface::read_until_n( HString& a_roMessage, int long const& a_lMaxCount,
+int long HStreamInterface::do_read_until_n( HString& a_roMessage, int long const& a_lMaxCount,
 		char const* const a_pcStopSet, bool a_bStripDelim )
 	{
 	M_PROLOG
@@ -305,7 +305,7 @@ int long HStreamInterface::read_until_n( HString& a_roMessage, int long const& a
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( HString& word )
+HStreamInterface& HStreamInterface::do_input( HString& word )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -323,7 +323,7 @@ bool HStreamInterface::read_word( void )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( char& c )
+HStreamInterface& HStreamInterface::do_input( char& c )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -332,7 +332,7 @@ HStreamInterface& HStreamInterface::operator >> ( char& c )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( int short& is )
+HStreamInterface& HStreamInterface::do_input( int short& is )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -341,7 +341,7 @@ HStreamInterface& HStreamInterface::operator >> ( int short& is )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( int short unsigned& isu )
+HStreamInterface& HStreamInterface::do_input( int short unsigned& isu )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -350,7 +350,7 @@ HStreamInterface& HStreamInterface::operator >> ( int short unsigned& isu )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( int& i )
+HStreamInterface& HStreamInterface::do_input( int& i )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -359,7 +359,7 @@ HStreamInterface& HStreamInterface::operator >> ( int& i )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( int unsigned& iu )
+HStreamInterface& HStreamInterface::do_input( int unsigned& iu )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -368,7 +368,7 @@ HStreamInterface& HStreamInterface::operator >> ( int unsigned& iu )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( int long& il )
+HStreamInterface& HStreamInterface::do_input( int long& il )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -377,7 +377,7 @@ HStreamInterface& HStreamInterface::operator >> ( int long& il )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( int long unsigned& ilu )
+HStreamInterface& HStreamInterface::do_input( int long unsigned& ilu )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -386,7 +386,7 @@ HStreamInterface& HStreamInterface::operator >> ( int long unsigned& ilu )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( double& d )
+HStreamInterface& HStreamInterface::do_input( double& d )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -395,7 +395,7 @@ HStreamInterface& HStreamInterface::operator >> ( double& d )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( double long& dl )
+HStreamInterface& HStreamInterface::do_input( double long& dl )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -404,7 +404,7 @@ HStreamInterface& HStreamInterface::operator >> ( double long& dl )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( float& f )
+HStreamInterface& HStreamInterface::do_input( float& f )
 	{
 	M_PROLOG
 	if ( read_word() )
@@ -413,7 +413,7 @@ HStreamInterface& HStreamInterface::operator >> ( float& f )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::operator >> ( void const*& )
+HStreamInterface& HStreamInterface::do_input( void const*& )
 	{
 	M_PROLOG
 	return ( *this );
@@ -442,7 +442,15 @@ bool HStreamInterface::is_valid( void ) const
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::set_fill( int fill_ )
+void HStreamInterface::flush( void ) const
+	{
+	M_PROLOG
+	do_flush();
+	return;
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::do_set_fill( int fill_ )
 	{
 	M_PROLOG
 	_fill = fill_;
@@ -450,7 +458,7 @@ HStreamInterface& HStreamInterface::set_fill( int fill_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::set_width( int width_ )
+HStreamInterface& HStreamInterface::do_set_width( int width_ )
 	{
 	M_PROLOG
 	_width = width_;
@@ -458,7 +466,7 @@ HStreamInterface& HStreamInterface::set_width( int width_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::set_base( BASES::enum_t base_ )
+HStreamInterface& HStreamInterface::do_set_base( BASES::enum_t base_ )
 	{
 	M_PROLOG
 	_base = base_;
