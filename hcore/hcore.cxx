@@ -47,6 +47,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hsingleton.hxx"
 #include "hopenssl.hxx"
 #include "hsocket.hxx"
+#include "hcall.hxx"
 
 namespace yaal
 {
@@ -56,7 +57,7 @@ namespace hcore
 
 int n_iDebugLevel = 0;
 typedef HSingleton<HLog> HLogService;
-HLog& log = HLogService::get_instance( 1000 );
+HSynchronizedStream<HLog&> log( HLogService::get_instance( 1000 ) );
 
 HProgramOptionsHandler yaalOptions;
 
@@ -118,14 +119,14 @@ void decode_set_env( HString line )
 	if ( ( line.length() < 3 )
 			|| ( ( eon = line.find_one_of( " \t" ) ) == -1 ) )
 		{
-		log ( LOG_TYPE::ERROR ) << "bad set_env argument: `";
+		log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << "bad set_env argument: `";
 		log << line << '\'' << endl;
 		return;
 		}
 	int long valPos = line.find_other_than( " \t", eon );
 	if ( valPos < 0 )
 		{
-		log ( LOG_TYPE::ERROR ) << "no value for environment variable in set_env: `";
+		log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << "no value for environment variable in set_env: `";
 		log << line << '\'' << endl;
 		return;
 		}

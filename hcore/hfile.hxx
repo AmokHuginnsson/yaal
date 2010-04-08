@@ -31,7 +31,7 @@ Copyright:
 #define YAAL_HCORE_HFILE_HXX_INCLUDED
 
 #include "hcore/hstring.hxx"
-#include "hcore/hstreaminterface.hxx"
+#include "hcore/hsynchronizedstream.hxx"
 #include "hcore/hstrongenum.hxx"
 
 namespace yaal
@@ -128,9 +128,12 @@ private:
 
 typedef HExceptionT<HFile, HStreamInterfaceException> HFileException;
 
-extern HFile cin;
-extern HFile cout;
-extern HFile cerr;
+typedef HSynchronizedStream<HFile&> HSynchronizedFile;
+
+extern HSynchronizedFile cin;
+extern HSynchronizedFile cout;
+extern HSynchronizedFile cerr;
+extern HSynchronizedFile clog;
 
 }
 

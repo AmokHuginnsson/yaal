@@ -584,15 +584,16 @@ void dump_configuration( void* arg )
 	M_EPILOG
 	}
 
-void failure ( int a_iExitStatus, char const * const a_pcFormat, ... )
+void failure( int a_iExitStatus, char const * const a_pcFormat, ... )
 	{
 	M_PROLOG
+	HString msg;
 	va_list l_xAp;
-	va_start ( l_xAp, a_pcFormat );
-	vfprintf ( stderr, a_pcFormat, l_xAp );
-	log << "failure: ";
-	log ( a_pcFormat, l_xAp );
-	va_end ( l_xAp );
+	va_start( l_xAp, a_pcFormat );
+	vfprintf( stderr, a_pcFormat, l_xAp );
+	msg.vformat( a_pcFormat, l_xAp );
+	log << "failure: " << msg;
+	va_end( l_xAp );
 	throw ( a_iExitStatus );
 	M_EPILOG
 	}

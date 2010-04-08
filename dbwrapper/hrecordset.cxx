@@ -29,10 +29,11 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
-#include "hcore/hlog.hxx"
 #include "hrecordset.hxx"
 #include "hdatabase.hxx"
 #include "db_driver_loader.hxx"
+#include "hcore/hcall.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
 
@@ -51,9 +52,9 @@ HRecordSet::HRecordSet( database_ptr_t a_oDataBase,
 	{
 	M_PROLOG
 	if ( get_size() < 0 )
-		log( LOG_TYPE::ERROR ) << "SQL error (query): " << (_connector->dbrs_error)( f_oDataBase->f_pvCoreData, f_pvResult ) << endl;
+		log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << "SQL error (query): " << (_connector->dbrs_error)( f_oDataBase->f_pvCoreData, f_pvResult ) << endl;
 	if ( get_field_count() < 0 )
-		log( LOG_TYPE::ERROR ) << "SQL error (fiels count): " << (_connector->dbrs_error)( f_oDataBase->f_pvCoreData, f_pvResult ) << endl;
+		log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << "SQL error (fiels count): " << (_connector->dbrs_error)( f_oDataBase->f_pvCoreData, f_pvResult ) << endl;
 	return;
 	M_EPILOG
 	}

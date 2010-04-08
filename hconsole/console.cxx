@@ -39,11 +39,12 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
+#include "console.hxx"
+#include "hcore/hcall.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/hcore.hxx"
 #include "tools/tools.hxx"
 #include "hconsole.hxx"
-#include "console.hxx"
 
 /* curses system header is poluted with huge number of macros
  * though it cannot be included at hte top together with rest of sane
@@ -240,14 +241,14 @@ void HConsole::enter_curses( void )
 		{
 		if ( ::getenv( "DISPLAY" ) )
 			{
-			log( LOG_TYPE::INFO ) << _( "using ncurses mouse support" ) << endl;
+			log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << _( "using ncurses mouse support" ) << endl;
 			mouse::mouse_open = mouse::x_mouse_open;
 			mouse::mouse_get = mouse::x_mouse_get;
 			mouse::mouse_close = mouse::x_mouse_close;
 			}
 		else
 			{
-			log( LOG_TYPE::INFO ) << _( "using console mouse support" ) << endl;
+			log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << _( "using console mouse support" ) << endl;
 			mouse::mouse_open = mouse::console_mouse_open;
 			mouse::mouse_get = mouse::console_mouse_get;
 			mouse::mouse_close = mouse::console_mouse_close;
@@ -354,7 +355,7 @@ void HConsole::c_getmaxyx( void )
 	{
 	M_PROLOG
 	getmaxyx( stdscr, f_iHeight, f_iWidth );
-	log( LOG_TYPE::INFO ) << "New terminal dimenstions: " << f_iHeight << "x" << f_iWidth << "." << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << "New terminal dimenstions: " << f_iHeight << "x" << f_iWidth << "." << endl;
 	return;
 	M_EPILOG
 	}

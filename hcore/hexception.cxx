@@ -52,9 +52,9 @@ void* HException::ERROR_STREAM = stderr;
 char const* const n_pcExceptionType = _( "Exception type" );
 
 HException::HException( char const* const a_pcFileName,
-												 char const* const a_pcFunctionName,
-												 int const a_iLine, char const* const a_pcMessage,
-												 int const a_iCode )
+		char const* const a_pcFunctionName,
+		int const a_iLine, char const* const a_pcMessage,
+		int const a_iCode )
 	: f_bLocal( false ), f_cChar( 0 ), f_iInt( 0 ), f_lLong( 0 ),
 	f_dDouble( 0 ), f_pcCharPtr( NULL ), f_pvVoidPtr( NULL ), f_iFrame( 0 ),
 	f_pcFileName( NULL ), f_pcFunctionName( NULL ),
@@ -70,9 +70,9 @@ HException::HException( char const* const a_pcFileName,
 	}
 
 HException::HException( char const* const a_pcFileName,
-												 char const* const a_pcFunctionName,
-												 int const a_iLine, HString const& a_oMessage,
-												 int const a_iCode )
+		char const* const a_pcFunctionName,
+		int const a_iLine, HString const& a_oMessage,
+		int const a_iCode )
 	: f_bLocal( false ), f_cChar( 0 ), f_iInt( 0 ), f_lLong( 0 ),
 	f_dDouble( 0 ), f_pcCharPtr( NULL ), f_pvVoidPtr( NULL ), f_iFrame( 0 ),
 	f_pcFileName( NULL ), f_pcFunctionName( NULL ),
@@ -105,21 +105,25 @@ HException::HException( HException const& a_roException )
 	return;
 	}
 
-HException::~HException ( void )
+HException::~HException( void )
 	{
 	try
 		{
 		if ( ! f_bLocal )
-			hcore::log(
+			{
+			HString regs;
+			regs.format(
 					"Exception registers: c:0x%02x i:%d l:%ld d:%f pv:0x%lx pc:%s\n",
 					f_cChar, f_iInt, f_lLong, f_dDouble,
 					reinterpret_cast<int long>( f_pvVoidPtr ),
 					f_pcCharPtr ? f_pcCharPtr : "(null)" );
+			hcore::log << regs << endl;
+			}
 		}
 	catch ( ... )
 		{
 		::fprintf( static_cast<FILE*>( ERROR_STREAM ), _( "CRITICAL FAILURE (~HException) !\n" ) );
-		::exit( - 1 );
+		::exit( -1 );
 		}
 	if ( f_pcCharPtr )
 		xfree( f_pcCharPtr );
@@ -168,9 +172,9 @@ void HException::set( HString const& a_oStr )
 
 void HException::print_error( bool const a_bFull ) const
 	{
-	fprintf ( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", f_pcMessage, f_iCode );
+	fprintf( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", f_pcMessage, f_iCode );
 	if ( a_bFull )
-		fprintf ( static_cast<FILE*>( ERROR_STREAM ),
+		fprintf( static_cast<FILE*>( ERROR_STREAM ),
 				"Exception registers:\nc:0x%02x\ti:%d\tl:%ld\td:%f\tpv:0x%lx\npc:%s\n",
 				f_cChar, f_iInt, f_lLong, f_dDouble,
 				reinterpret_cast<int long>( f_pvVoidPtr ),
@@ -186,15 +190,15 @@ void HException::log( char const* const a_pcFileName,
 			&& ! ( ::strcmp( f_pcFileName, a_pcFileName )
 				|| ::strcmp( f_pcFunctionName, a_pcFunctionName ) ) )
 		return;
-#define M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA \
-				"Exception frame %2d: %16s : %4d : %s\n", f_iFrame,\
-				a_pcFileName + ( l_uiLength > 16 ? l_uiLength - 16 : 0 ),\
-				a_iLine, a_pcFunctionName
+	HString frame;
+	frame.format(
+				"Exception frame %2d: %16s : %4d : %s\n", f_iFrame,
+				a_pcFileName + ( l_uiLength > 16 ? l_uiLength - 16 : 0 ),
+				a_iLine, a_pcFunctionName );
 	if ( n_iDebugLevel >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK )
-		fprintf( static_cast<FILE*>( ERROR_STREAM ), M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA );
-	hcore::log( M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA );
+		fprintf( static_cast<FILE*>( ERROR_STREAM ), "%s", frame.raw() );
+	hcore::log << frame;
 	++ f_iFrame;
-#undef M_YAAL_HCORE_HEXCEPTION_LOG_LOG_DATA
 	return;
 	}
 

@@ -304,9 +304,15 @@ bool HFile::do_is_valid( void ) const
 	M_EPILOG
 	}
 
-HFile cin( HFile::OPEN::READING, stdin );
-HFile cout( HFile::OPEN::WRITING, stdout );
-HFile cerr( HFile::OPEN::WRITING, stderr );
+HFile cinInstance( HFile::OPEN::READING, stdin );
+HSynchronizedFile cin( cinInstance );
+HFile coutInstance( HFile::OPEN::WRITING, stdout );
+HSynchronizedFile cout( coutInstance );
+HFile cerrInstance( HFile::OPEN::WRITING, stderr );
+HSynchronizedFile cerr( cerrInstance );
+HFile clogInstance( HFile::OPEN::WRITING, stderr );
+HSynchronizedFile clog( clogInstance );
+
 
 }
 

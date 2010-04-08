@@ -35,9 +35,10 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
-#include "hcore/hlog.hxx"
-#include "tools.hxx"
 #include "hcollector.hxx"
+#include "tools.hxx"
+#include "hcore/hlog.hxx"
+#include "hcore/hcall.hxx"
 
 using namespace yaal::hcore;
 
@@ -201,7 +202,7 @@ int HCollector::establish_connection ( int a_iTimeOut )
 		if ( l_iError > a_iTimeOut )
 			return ( -1 );
 		}
-	log( LOG_TYPE::DEBUG ) << "Collector: Connected ! (estab)" << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::DEBUG ) ) << "Collector: Connected ! (estab)" << endl;
 	return ( l_iError );
 	M_EPILOG
 	}
@@ -222,7 +223,7 @@ int HCollector::wait_for_connection ( int a_iTimeOut )
 			return ( -1 );
 		}
 	l_iError += static_cast<int>( l_iLenght - HRawFile::write( PROTOCOL::ACK, l_iLenght ) );
-	log( LOG_TYPE::DEBUG ) << "Collector: Connected ! (wait)" << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::DEBUG ) ) << "Collector: Connected ! (wait)" << endl;
 	return ( l_iError );
 	M_EPILOG
 	}

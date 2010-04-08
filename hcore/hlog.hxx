@@ -32,7 +32,7 @@ Copyright:
 
 #include "hcore/hsingleton.hxx"
 #include "hcore/hchunk.hxx"
-#include "hcore/hstreaminterface.hxx"
+#include "hcore/hsynchronizedstream.hxx"
 
 namespace yaal
 {
@@ -81,11 +81,16 @@ public:
 	/* log file name */
 	void rehash( HString const&, char const* const = NULL );
 	int operator()( char const* const, va_list );
-	int operator()( char const* const, ... ); /* log ( "data %d", x );
-																									 will look nice */
-	/* log ( "data %d", x ); will look nice */
+	/*! \brief log ( "data %d", x ); will look nice
+	 */
+	int operator()( char const* const, ... );
+	/*! \brief log ( "data %d", x ); will look nice
+	 */
 	int operator()( int long const, char const*, ... );
-	HLog& operator()( int long const ); /* sets log type */
+	/*! \brief sets log type
+	 */
+	HLog& operator()( int long const& );
+	HLog& filter( int long const& );
 private:
 	HLog( void );
 	virtual ~HLog( void );
@@ -101,7 +106,7 @@ private:
 	};
 
 typedef HExceptionT<HLog, HStreamInterfaceException> HLogException;
-extern HLog& log;
+extern HSynchronizedStream<HLog&> log;
 
 }
 

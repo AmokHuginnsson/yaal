@@ -253,7 +253,15 @@ int HLog::operator() ( int long const a_lType,
 	M_EPILOG
 	}
 
-HLog& HLog::operator() ( int long const a_lType )
+HLog& HLog::operator() ( int long const& a_lType )
+	{
+	M_PROLOG
+	f_lType = a_lType;
+	return ( *this );
+	M_EPILOG
+	}
+
+HLog& HLog::filter( int long const& a_lType )
 	{
 	M_PROLOG
 	f_lType = a_lType;

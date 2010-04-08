@@ -41,6 +41,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hstring.hxx"    /* HString class */
 #include "signals.hxx"
 #include "tools.hxx"                /* tools namespace */
+#include "hcore/hcall.hxx"
 
 using namespace yaal::hcore;
 
@@ -270,7 +271,7 @@ int HBaseSignalHandlers::signal_INT ( int a_iSignum )
 	l_oMessage = "Interrupt signal caught, process broken: ";
 	l_oMessage += ::strsignal( a_iSignum );
 	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << l_oMessage << endl;
 	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	return ( -1 );
 	M_EPILOG
@@ -283,7 +284,7 @@ int HBaseSignalHandlers::signal_HUP( int a_iSignum )
 	l_oMessage = "Unhandled HUP received: ";
 	l_oMessage += ::strsignal( a_iSignum );
 	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << l_oMessage << endl;
 	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	return ( -1 );
 	M_EPILOG
@@ -296,7 +297,7 @@ int HBaseSignalHandlers::signal_TERM( int a_iSignum )
 	l_oMessage = "Process was explictly killed: ";
 	l_oMessage += strsignal( a_iSignum );
 	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << l_oMessage << endl;
 	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	return ( -2 );
 	M_EPILOG
@@ -311,7 +312,7 @@ int HBaseSignalHandlers::signal_QUIT ( int a_iSignum )
 	l_oMessage = "Abnormal program quit forced: ";
 	l_oMessage += ::strsignal( a_iSignum );
 	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << l_oMessage << endl;
 	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	abort();
 	return ( 0 );
@@ -327,7 +328,7 @@ int HBaseSignalHandlers::signal_TSTP( int a_iSignum )
 	l_oMessage = "Stop signal caught, process suspended: ";
 	l_oMessage += ::strsignal( a_iSignum );
 	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << l_oMessage << endl;
 	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	unlock( SIGTSTP );
 	raise( SIGTSTP );
@@ -343,7 +344,7 @@ int HBaseSignalHandlers::signal_CONT( int a_iSignum )
 	l_oMessage = "Process was resurected: ";
 	l_oMessage += ::strsignal( a_iSignum );
 	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << l_oMessage << endl;
 	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	return ( 0 );
 	M_EPILOG
@@ -356,7 +357,7 @@ int HBaseSignalHandlers::signal_fatal( int a_iSignum )
 	l_oMessage = "Process caused FATAL ERROR: ";
 	l_oMessage += ::strsignal( a_iSignum );
 	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << l_oMessage << endl;
 	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	abort();
 	M_EPILOG
@@ -369,7 +370,7 @@ int HBaseSignalHandlers::signal_USR1( int a_iSignum )
 	l_oMessage = "\nDo you play with the mouse under FreeBSD ? ";
 	l_oMessage += ::strsignal( a_iSignum );
 	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
+	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << l_oMessage << endl;
 	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
 	return ( -3 );
 	M_EPILOG
