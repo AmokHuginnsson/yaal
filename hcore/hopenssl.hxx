@@ -32,6 +32,7 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/hthread.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/harray.hxx"
 
 namespace yaal
 {
@@ -65,8 +66,11 @@ public:
 private:
 	class OSSLContext : public HSingletonInterface
 		{
+		typedef HPointer<HMutex> mutex_ptr_t;
+		typedef HArray<mutex_ptr_t> mutexes_t;
 		static int _instances;
 		static HMutex _mutex;
+		static mutexes_t _sslLibMutexes;
 		void* _context;
 		int _users;
 	protected:
@@ -74,6 +78,7 @@ private:
 		virtual ~OSSLContext( void );
 		void init( void );
 		virtual void* do_method( void ) const = 0;
+		static void libssl_rule_mutex( int, int, char const*, int );
 	public:
 		void* create_ssl( void );
 		void consume_ssl( void* );

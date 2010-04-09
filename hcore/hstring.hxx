@@ -204,6 +204,10 @@ public:
 	 * \param value - copies of this value shall be inserted.
 	 */
 	HString& insert( int long postition, int long n, char const& value );
+	HString& append( HString const& );
+	HString& append( HString const&, int long const& idx_, int long const& len_ );
+	HString& append( int long const& count_, char const& val_ );
+	HString& append( char const* const, int long const& len_ );
 	};
 
 HString operator + ( HString const&, HString const& );

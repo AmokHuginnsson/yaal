@@ -923,6 +923,52 @@ HString& HString::insert( int long a_iFrom, int long a_iLength, char const& a_cC
 	M_EPILOG
 	}
 
+HString& HString::append( HString const& str_ )
+	{
+	M_PROLOG
+	return ( append( str_.f_pcBuffer, str_.f_lSize ) );
+	M_EPILOG
+	}
+
+HString& HString::append( HString const& str_, int long const& idx_, int long const& len_ )
+	{
+	M_PROLOG
+	M_ENSURE( len_ >= 0 );
+	if ( ( len_ > 0 ) && ( idx_ < str_.f_lSize ) )
+		append( str_.f_pcBuffer + ( idx_ >= 0 ? idx_ : 0 ),
+				( ( idx_ + len_ ) < str_.f_lSize ) ? len_ : f_lSize - idx_ );
+	return ( *this );
+	M_EPILOG
+	}
+
+HString& HString::append( int long const& count_, char const& val_ )
+	{
+	M_PROLOG
+	int long oldSize( f_lSize );
+	f_lSize += count_;
+	hs_realloc( f_lSize + 1 );
+	::memset( f_pcBuffer + oldSize, val_, count_ );
+	f_pcBuffer[ f_lSize ] = 0;
+	return ( *this );
+	M_EPILOG
+	}
+
+HString& HString::append( char const* const buf_, int long const& len_ )
+	{
+	M_PROLOG
+	M_ASSERT( len_ >= 0 );
+	if ( len_ > 0 )
+		{
+		int long oldSize( f_lSize );
+		f_lSize += len_;
+		hs_realloc( f_lSize + 1 );
+		::memmove( f_pcBuffer + oldSize, buf_, len_ );
+		f_pcBuffer[ f_lSize ] = 0;
+		}
+	return ( *this );
+	M_EPILOG
+	}
+
 namespace string_helper
 {
 

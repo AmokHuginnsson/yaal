@@ -64,7 +64,7 @@ HString& format_error_message( HString& a_oBuffer, int err = 0 )
 	int long l_iCode = 0;
 	a_oBuffer = err ? ERR_error_string( err, NULL ) : "";
 	while ( ( l_iCode = ERR_get_error() ) )
-		( a_oBuffer += ( a_oBuffer.is_empty() ? "" : "\n" ) ) += ERR_error_string( l_iCode, NULL );
+		a_oBuffer.append( ( a_oBuffer.is_empty() ? "" : "\n" ) ).append( ERR_error_string( l_iCode, NULL ) );
 	return ( a_oBuffer );
 	}
 
@@ -75,9 +75,15 @@ yaal::hcore::HString HOpenSSL::f_oSSLCert;
 
 int HOpenSSL::OSSLContext::_instances = 0;
 HMutex HOpenSSL::OSSLContext::_mutex;
+HOpenSSL::OSSLContext::mutexes_t HOpenSSL::OSSLContext::_sslLibMutexes;
 
 HOpenSSL::OSSLContext::OSSLContext( void ) : _context( NULL ), _users( 0 )
 	{
+	}
+
+int long unsigned get_thread_id( void )
+	{
+	return ( HThread::get_id() );
 	}
 
 void HOpenSSL::OSSLContext::init( void )
@@ -88,6 +94,13 @@ void HOpenSSL::OSSLContext::init( void )
 		{
 		SSL_load_error_strings();
 		SSLeay_add_ssl_algorithms();
+		int numLocks( CRYPTO_num_locks() );
+		M_ENSURE( numLocks > 0 );
+		_sslLibMutexes.resize( numLocks );
+		for ( mutexes_t::iterator it( _sslLibMutexes.begin() ), endIt( _sslLibMutexes.end() ); it != endIt; ++ it )
+			*it = mutex_ptr_t( new HMutex( HMutex::TYPE::RECURSIVE ) );
+		CRYPTO_set_locking_callback( &HOpenSSL::OSSLContext::libssl_rule_mutex );
+		CRYPTO_set_id_callback( &get_thread_id );
 		}
 	SSL_METHOD* l_pxMethod = static_cast<SSL_METHOD*>( method() );
 	SSL_CTX* ctx = NULL;
@@ -130,6 +143,7 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 		ERR_free_strings();
 		EVP_cleanup();
 		CRYPTO_cleanup_all_ex_data();
+		_sslLibMutexes.clear();
 		}
 	return;
 	M_EPILOG
@@ -156,6 +170,20 @@ void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ )
 	M_ASSERT( ssl_ );
 	SSL_free( static_cast<SSL*>( ssl_ ) );
 	-- _users;
+	M_EPILOG
+	}
+
+void HOpenSSL::OSSLContext::libssl_rule_mutex( int nth, int mode, char const* file_, int line_ )
+	{
+	M_PROLOG
+	mutex_ptr_t m( _sslLibMutexes[ nth ] );
+	if ( mode & CRYPTO_LOCK )
+		m->lock();
+	else
+		m->unlock();
+	file_ = NULL;
+	line_ = 0;
+	return;
 	M_EPILOG
 	}
 
