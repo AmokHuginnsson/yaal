@@ -27,7 +27,7 @@ Copyright:
 #ifndef YAAL_TOOLS_HASYNCCALLER_HXX_INCLUDED
 #define YAAL_TOOLS_HASYNCCALLER_HXX_INCLUDED
 
-#include "hcore/hcall.hxx"
+#include "hcore/hboundcall.hxx"
 #include "hcore/hthread.hxx"
 #include "hcore/hmultimap.hxx"
 #include "hcore/hsingleton.hxx"

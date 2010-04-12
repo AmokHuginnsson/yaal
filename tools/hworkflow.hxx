@@ -28,7 +28,7 @@ Copyright:
 #define YAAL_TOOLS_HWORKFLOW_HXX_INCLUDED
 
 #include "hcore/hpointer.hxx"
-#include "hcore/hcall.hxx"
+#include "hcore/hboundcall.hxx"
 #include "hcore/hthread.hxx"
 #include "hcore/hlist.hxx"
 
