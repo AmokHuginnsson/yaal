@@ -48,7 +48,7 @@ namespace hcore
  * \tparam a1_t - second argument to given METHOD_t of CALL_t.
  * \tparam aN_t - N-th argument to given METHOD_t of CALL_t.
  */
-template<int free_args, typename return_t, typename CALL_t,
+template<int free_args, typename return_t,
 	typename a0_t = trait::no_type,	typename a1_t = trait::no_type,
 	typename a2_t = trait::no_type,	typename a3_t = trait::no_type,
 	typename a4_t = trait::no_type,	typename a5_t = trait::no_type,
@@ -59,8 +59,8 @@ class HBoundCallInterface;
 
 /*! \brief Interface to abstration of any-method of any-class invocation.
  */
-template<typename return_t, typename CALL_t>
-class HBoundCallInterface<0, return_t, CALL_t,
+template<typename return_t>
+class HBoundCallInterface<0, return_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type,	trait::no_type>
@@ -69,13 +69,13 @@ public:
 	typedef yaal::hcore::HPointer<HBoundCallInterface> ptr_t;
 	virtual ~HBoundCallInterface( void ) {}
 	return_t operator()( void )
-		{ invoke(); }
+		{ return ( do_invoke() ); }
 	return_t operator()( void ) const
-		{ invoke(); }
+		{ return ( do_invoke() ); }
 	return_t invoke( void )
-		{ do_invoke(); }
+		{ return ( do_invoke() ); }
 	return_t invoke( void ) const
-		{ do_invoke(); }
+		{ return ( do_invoke() ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -84,8 +84,8 @@ protected:
 	virtual void const* do_id( void ) const = 0;
 	};
 
-template<typename return_t, typename CALL_t, typename a0_t>
-class HBoundCallInterface<1, return_t, CALL_t,
+template<typename return_t, typename a0_t>
+class HBoundCallInterface<1, return_t,
 	a0_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type,	trait::no_type>
@@ -127,7 +127,7 @@ template<int free_args, typename return_t, typename CALL_t,
 	typename a0_t,	typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t,	typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t,	typename a9_t, typename a10_t>
-class HBoundCallBase : public HBoundCallInterface<free_args, return_t, CALL_t,
+class HBoundCallBase : public HBoundCallInterface<free_args, return_t,
 	 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	{
 protected:
@@ -139,260 +139,6 @@ protected:
 		{ return ( caller_id( _call ) ); }
 	};
 
-/*! \cond */
-
-#if 0
-template<typename CALL_t,
-	typename a0_t>
-class HBoundCall<CALL_t,
-	a0_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type> : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-public:
-	HBoundCall( CALL_t call_, a0_t a0 )
-		: base_t( call_ ),
-		_a0( a0 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0 ); }
-	};
-
-template<typename CALL_t,
-	typename a0_t, typename a1_t>
-class HBoundCall<CALL_t,
-	a0_t, a1_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type> : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-	a1_t _a1;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: base_t( call_ ),
-		_a0( a0 ), _a1( a1 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0, _a1 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0, _a1 ); }
-	};
-
-template<typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<CALL_t,
-	a0_t, a1_t, a2_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type> : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2 )
-		: base_t( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0, _a1, _a2 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0, _a1, _a2 ); }
-	};
-
-template<typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<CALL_t,
-	a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type> : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3 )
-		: base_t( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0, _a1, _a2, _a3 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0, _a1, _a2, _a3 ); }
-	};
-
-template<typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t>
-class HBoundCall<CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type,
-	trait::no_type> : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4 )
-		: base_t( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ); }
-	};
-
-template<typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t>
-class HBoundCall<CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type,	trait::no_type> : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_t( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ); }
-	};
-
-template<typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type,
-	trait::no_type> : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-	a6_t _a6;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_t( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ), _a6( a6 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ); }
-	};
-
-template<typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
-	trait::no_type,	trait::no_type> : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-	a6_t _a6;
-	a7_t _a7;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_t( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ); }
-	};
-
-template<typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t>
-class HBoundCall<CALL_t,
-	a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
-	trait::no_type> : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-	a6_t _a6;
-	a7_t _a7;
-	a8_t _a8;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
-			a8_t a8 )
-		: base_t( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ); }
-	};
-/*! \endcond */
-
 /*! \brief Implementation of abstration of any-method of any-class invocation.
  *
  * \tparam CALL_t - class on which this invocation will operate.
@@ -401,40 +147,6 @@ protected:
  * \tparam a1_t - second argument to given METHOD_t of CALL_t.
  * \tparam aN_t - N-th argument to given METHOD_t of CALL_t.
  */
-template<typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t, typename a9_t>
-class HBoundCall : public HBoundCallBase<CALL_t>
-	{
-	typedef HBoundCallBase<CALL_t> base_t;
-protected:
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-	a6_t _a6;
-	a7_t _a7;
-	a8_t _a8;
-	a9_t _a9;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7,
-			a8_t a8, a9_t a9 )
-		: base_t( call_ ),
-		_a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ),
-		_a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-protected:
-	virtual void do_invoke( void )
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ); }
-	virtual void do_invoke( void ) const
-		{ (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ); }
-	};
-
-#endif
-
 template<int free_args, typename return_t, typename CALL_t,
 	typename a0_t = trait::no_type,	typename a1_t = trait::no_type,
 	typename a2_t = trait::no_type,	typename a3_t = trait::no_type,
@@ -454,13 +166,305 @@ class HBoundCall<0, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type,	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type> base_t;
 public:
 	HBoundCall( CALL_t call_ )
-		: HBoundCallBase( call_ ) {}
+		: base_t( call_ ) {}
 	virtual return_t do_invoke( void )
-		{ (base_t::_call)(); }
+		{ return ( (base_t::_call)() ); }
 	virtual return_t do_invoke( void ) const
-		{ (base_t::_call)(); }
+		{ return ( (base_t::_call)() ); }
+	};
+
+template<typename return_t, typename CALL_t, typename a0_t>
+class HBoundCall<0, return_t, CALL_t, a0_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	a0_t _a0;
+public:
+	HBoundCall( CALL_t call_, a0_t a0 )
+		: base_t( call_ ), _a0( a0 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0 ) ); }
+	};
+
+template<typename return_t, typename CALL_t, typename a0_t, typename a1_t>
+class HBoundCall<0, return_t, CALL_t, a0_t, a1_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	a0_t _a0;
+	a1_t _a1;
+public:
+	HBoundCall( CALL_t call_, a0_t a0, a1_t a1 )
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0, _a1 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0, _a1 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t>
+class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+public:
+	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0, _a1, _a2 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0, _a1, _a2 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+public:
+	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t>
+class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+public:
+	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t>
+class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, trait::no_type, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+public:
+	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t>
+class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+	trait::no_type,	trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, a6_t, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, a6_t, trait::no_type,
+	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+public:
+	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, a6_t, a7_t,
+	trait::no_type,	trait::no_type, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, a6_t, a7_t,
+	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+public:
+	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
+			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t>
+class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+	trait::no_type>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, a6_t, a7_t,
+	a8_t,	trait::no_type, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, a6_t, a7_t,
+	a8_t,	trait::no_type, trait::no_type> base_t;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+	a8_t _a8;
+public:
+	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
+	};
+
+template<typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t>
+class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, a6_t, a7_t,
+	a8_t,	a9_t, trait::no_type>
+	{
+	typedef HBoundCallBase<0, return_t, CALL_t,
+	a0_t, a1_t, a2_t, a3_t,
+	a4_t, a5_t, a6_t, a7_t,
+	a8_t,	a9_t, trait::no_type> base_t;
+	a0_t _a0;
+	a1_t _a1;
+	a2_t _a2;
+	a3_t _a3;
+	a4_t _a4;
+	a5_t _a5;
+	a6_t _a6;
+	a7_t _a7;
+	a8_t _a8;
+	a9_t _a9;
+public:
+	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( void )
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
+	virtual return_t do_invoke( void ) const
+		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
 	};
 
 template<typename METHOD_t,
@@ -492,7 +496,7 @@ struct bound_call_calculator
 		typedef HBoundCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
 						functor_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> type;
 		typedef typename HBoundCallInterface<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
-						functor_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::ptr_t holder_type;
+						a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::ptr_t holder_type;
 		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
 			{ return holder_type( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
 		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
@@ -521,55 +525,59 @@ struct bound_call_calculator
 		typedef HFunctor<a0_t, METHOD_t> functor_t;
 		typedef HBoundCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
 						functor_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> type;
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-			{ return type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-			{ return type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-			{ return type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7, a8 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-			{ return type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-			{ return type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-			{ return type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-			{ return type( functor_t( a0, m ), a0, a1, a2, a3, a4 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-			{ return type( functor_t( a0, m ), a0, a1, a2, a3 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
-			{ return type( functor_t( a0, m ), a0, a1, a2 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1 )
-			{ return type( functor_t( a0, m ), a0, a1 ); }
-		inline static type make( METHOD_t m, a0_t a0 )
-			{ return type( functor_t( a0, m ), a0 ); }
+		typedef HBoundCallInterface<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
+						a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> holder_type;
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1 )
+			{ return holder_type( new type( functor_t( a0, m ), a0, a1 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0 )
+			{ return holder_type( new type( functor_t( a0, m ), a0 ) ); }
 		};
 	struct function
 		{
 		typedef HBoundCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
 						METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t> type;
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-			{ return type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-			{ return type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-			{ return type( m, a0, a1, a2, a3, a4, a5, a6, a7 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-			{ return type( m, a0, a1, a2, a3, a4, a5, a6 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-			{ return type( m, a0, a1, a2, a3, a4, a5 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-			{ return type( m, a0, a1, a2, a3, a4 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-			{ return type( m, a0, a1, a2, a3 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
-			{ return type( m, a0, a1, a2 ); }
-		inline static type make( METHOD_t m, a0_t a0, a1_t a1 )
-			{ return type( m, a0, a1 ); }
-		inline static type make( METHOD_t m, a0_t a0 )
-			{ return type( m, a0 ); }
-		inline static type make( METHOD_t m )
-			{ return type( m ); }
+		typedef HBoundCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
+						a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t> holder_type;
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5, a6 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return holder_type( new type( m, a0, a1, a2, a3, a4 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return holder_type( new type( m, a0, a1, a2, a3 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
+			{ return holder_type( new type( m, a0, a1, a2 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1 )
+			{ return holder_type( new type( m, a0, a1 ) ); }
+		inline static holder_type make( METHOD_t m, a0_t a0 )
+			{ return holder_type( new type( m, a0 ) ); }
+		inline static holder_type make( METHOD_t m )
+			{ return holder_type( new type( m ) ); }
 		};
 	typedef typename trait::ternary<trait::is_member<METHOD_t>::value,
 					typename trait::ternary<meta::greater<trait::find_type<a0_t,
@@ -586,279 +594,9 @@ struct bound_call_calculator
 					function>::type type;
 	};
 
-template<typename METHOD_t>
-HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD )
-	{ return ( bound_call_calculator<METHOD_t>::type::make( A_METHOD ) ); }
-
-template<typename METHOD_t, typename a0_t>
-HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0 )
-	{ return ( bound_call_calculator<METHOD_t, a0_t>::type::make( A_METHOD, a0 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t>
-HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1 )
-	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t>::type::make( A_METHOD, a0, a1 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t>
-HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2 )
-	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::make( A_METHOD, a0, a1, a2 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t>
-HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::make( A_METHOD, a0, a1, a2, a3 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t>
-HBoundCallInterface::ptr_t bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::make( A_METHOD, a0, a1, a2, a3, a4 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t>
-HBoundCallInterface::ptr_t bound_call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-	{ return ( bound_call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-HBoundCallInterface::ptr_t bound_call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-	{ return ( bound_call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-HBoundCallInterface::ptr_t bound_call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-	{ return ( bound_call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t>
-HBoundCallInterface::ptr_t bound_call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-	{ return ( bound_call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t, typename a9_t>
-HBoundCallInterface::ptr_t bound_call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-	{ return ( bound_call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t, typename a9_t, typename a10_t>
-HBoundCallInterface::ptr_t bound_call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-	{ return ( bound_call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-
 #if 0
 
-
 /*! \cond */
-
-template<typename return_t, typename CALL_t, typename a0_t>
-class HBoundCall<0, return_t, CALL_t, a0_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type>
-	{
-	CALL_t _call;
-	a0_t _a0;
-public:
-	HBoundCall( CALL_t call_, a0_t a0 )
-		: _call( call_ ), _a0( a0 ) {}
-	return_t operator()( void ) { return ( _call( _a0 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0 ) ); }
-	};
-
-template<typename return_t, typename CALL_t, typename a0_t, typename a1_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
-	{
-	CALL_t _call;
-	a0_t _a0;
-	a1_t _a1;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ) {}
-	return_t operator()( void ) { return ( _call( _a0, _a1 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0, _a1 ) ); }
-	};
-
-template<typename return_t, typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
-	{
-	CALL_t _call;
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
-	return_t operator()( void ) { return ( _call( _a0, _a1, _a2 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2 ) ); }
-	};
-
-template<typename return_t, typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type>
-	{
-	CALL_t _call;
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
-	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3 ) ); }
-	};
-
-template<typename return_t, typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type>
-	{
-	CALL_t _call;
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
-	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4 ) ); }
-	};
-
-template<typename return_t, typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
-	{
-	CALL_t _call;
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
-	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
-	};
-
-template<typename return_t, typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type, trait::no_type>
-	{
-	CALL_t _call;
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-	a6_t _a6;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
-	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
-	};
-
-template<typename return_t, typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
-	trait::no_type, trait::no_type>
-	{
-	CALL_t _call;
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-	a6_t _a6;
-	a7_t _a7;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
-			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
-	};
-
-template<typename return_t, typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
-	trait::no_type>
-	{
-	CALL_t _call;
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-	a6_t _a6;
-	a7_t _a7;
-	a8_t _a8;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
-	};
-
-template<typename return_t, typename CALL_t,
-	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t, typename a9_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-	{
-	CALL_t _call;
-	a0_t _a0;
-	a1_t _a1;
-	a2_t _a2;
-	a3_t _a3;
-	a4_t _a4;
-	a5_t _a5;
-	a6_t _a6;
-	a7_t _a7;
-	a8_t _a8;
-	a9_t _a9;
-public:
-	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	return_t operator()( void ) { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
-	return_t operator()( void ) const { return ( _call( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
-	};
 
 template<typename return_t, typename CALL_t, typename a0_t>
 class HBoundCall<1, return_t, CALL_t, a0_t,
@@ -3461,84 +3199,84 @@ public:
 
 /*! \endcond */
 
+#endif
+
 template<typename METHOD_t>
-typename call_calculator<METHOD_t>::type::type call( METHOD_t A_METHOD )
-	{ return ( call_calculator<METHOD_t>::type::make( A_METHOD ) ); }
+typename bound_call_calculator<METHOD_t>::type::holder_type bound_call( METHOD_t A_METHOD )
+	{ return ( bound_call_calculator<METHOD_t>::type::make( A_METHOD ) ); }
 
 template<typename METHOD_t, typename a0_t>
-typename call_calculator<METHOD_t, a0_t>::type::type call( METHOD_t A_METHOD, a0_t a0 )
-	{ return ( call_calculator<METHOD_t, a0_t>::type::make( A_METHOD, a0 ) ); }
+typename bound_call_calculator<METHOD_t, a0_t>::type::holder_type bound_call( METHOD_t A_METHOD, a0_t a0 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t>::type::make( A_METHOD, a0 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t>
-typename call_calculator<METHOD_t, a0_t, a1_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1 )
-	{ return ( call_calculator<METHOD_t, a0_t, a1_t>::type::make( A_METHOD, a0, a1 ) ); }
+typename bound_call_calculator<METHOD_t, a0_t, a1_t>::type::holder_type bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t>::type::make( A_METHOD, a0, a1 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t>
-typename call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2 )
-	{ return ( call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::make( A_METHOD, a0, a1, a2 ) ); }
+typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::holder_type bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::make( A_METHOD, a0, a1, a2 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t>
-typename call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-	{ return ( call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::make( A_METHOD, a0, a1, a2, a3 ) ); }
+typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::holder_type bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::make( A_METHOD, a0, a1, a2, a3 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t>
-typename call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-	{ return ( call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::make( A_METHOD, a0, a1, a2, a3, a4 ) ); }
+typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::holder_type bound_call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+	{ return ( bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::make( A_METHOD, a0, a1, a2, a3, a4 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::type call(
+typename bound_call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::holder_type bound_call(
 						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-	{ return ( call_calculator<METHOD_t,
+	{ return ( bound_call_calculator<METHOD_t,
 			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::type call(
+typename bound_call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::holder_type bound_call(
 						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-	{ return ( call_calculator<METHOD_t,
+	{ return ( bound_call_calculator<METHOD_t,
 			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::type call(
+typename bound_call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::holder_type bound_call(
 						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-	{ return ( call_calculator<METHOD_t,
+	{ return ( bound_call_calculator<METHOD_t,
 			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::type call(
+typename bound_call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::holder_type bound_call(
 						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-	{ return ( call_calculator<METHOD_t,
+	{ return ( bound_call_calculator<METHOD_t,
 			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::type call(
+typename bound_call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::holder_type bound_call(
 						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-	{ return ( call_calculator<METHOD_t,
+	{ return ( bound_call_calculator<METHOD_t,
 			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
 
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::type call(
+typename bound_call_calculator<METHOD_t,
+				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::holder_type bound_call(
 						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-	{ return ( call_calculator<METHOD_t,
+	{ return ( bound_call_calculator<METHOD_t,
 			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-
-#endif
 
 }
 
