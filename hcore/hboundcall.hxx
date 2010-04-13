@@ -172,60 +172,70 @@ struct bound_call_calculator
 		typename ra4_t = trait::no_type, typename ra5_t = trait::no_type,
 		typename ra6_t = trait::no_type, typename ra7_t = trait::no_type,
 		typename ra8_t = trait::no_type, typename ra9_t = trait::no_type,
-		typename ra10_t = trait::no_type>
+		typename ra10_t = trait::no_type,
+		typename f0_t = trait::no_type, typename f1_t = trait::no_type,
+		typename f2_t = trait::no_type, typename f3_t = trait::no_type,
+		typename f4_t = trait::no_type, typename f5_t = trait::no_type,
+		typename f6_t = trait::no_type, typename f7_t = trait::no_type,
+		typename f8_t = trait::no_type, typename f9_t = trait::no_type,
+		typename f10_t = trait::no_type>
 	struct free_standing_args
 		{
+		/* f* are types deduced from bound_call() arguments
+		 * ra* are true argument types of function/method
+		 */
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<1>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a0_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<2>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a1_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<3>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a2_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<4>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a3_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<5>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a4_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<6>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a5_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<7>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a6_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<8>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a7_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<9>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a8_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<10>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a9_t;
 		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<11>,
-			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a10_t;
 		};
-	typedef free_standing_args<
-		typename trait::argument_type<METHOD_t>::template index<0>::type,
-		typename trait::argument_type<METHOD_t>::template index<1>::type,
-		typename trait::argument_type<METHOD_t>::template index<2>::type,
-		typename trait::argument_type<METHOD_t>::template index<3>::type,
-		typename trait::argument_type<METHOD_t>::template index<4>::type,
-		typename trait::argument_type<METHOD_t>::template index<5>::type,
-		typename trait::argument_type<METHOD_t>::template index<6>::type,
-		typename trait::argument_type<METHOD_t>::template index<7>::type,
-		typename trait::argument_type<METHOD_t>::template index<8>::type,
-		typename trait::argument_type<METHOD_t>::template index<9>::type,
-		typename trait::argument_type<METHOD_t>::template index<10>::type> sorted_real_args;
 	struct functor
 		{
 		typedef HFunctor<fa0_t, METHOD_t> functor_t;
 		typedef HBoundCall<free_standing_args_count::value, METHOD_t, typename trait::return_type<METHOD_t>::type,
 						functor_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> type;
+		typedef free_standing_args<
+			typename trait::argument_type<METHOD_t>::template index<0>::type,
+			typename trait::argument_type<METHOD_t>::template index<1>::type,
+			typename trait::argument_type<METHOD_t>::template index<2>::type,
+			typename trait::argument_type<METHOD_t>::template index<3>::type,
+			typename trait::argument_type<METHOD_t>::template index<4>::type,
+			typename trait::argument_type<METHOD_t>::template index<5>::type,
+			typename trait::argument_type<METHOD_t>::template index<6>::type,
+			typename trait::argument_type<METHOD_t>::template index<7>::type,
+			typename trait::argument_type<METHOD_t>::template index<8>::type,
+			typename trait::argument_type<METHOD_t>::template index<9>::type,
+			typename trait::argument_type<METHOD_t>::template index<10>::type,
+			fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> sorted_real_args;
 		typedef HBoundCallInterface<free_standing_args_count::value, typename trait::return_type<METHOD_t>::type,
 						typename sorted_real_args::a0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
@@ -259,8 +269,24 @@ struct bound_call_calculator
 		typedef HFunctor<fa0_t, METHOD_t> functor_t;
 		typedef HBoundCall<free_standing_args_count::value, METHOD_t, typename trait::return_type<METHOD_t>::type,
 						functor_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> type;
-		typedef yaal::hcore::HPointer<HBoundCallInterface<free_standing_args_count::value,
-						fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> > holder_type;
+		typedef free_standing_args<
+			typename trait::argument_type<METHOD_t>::template index<0>::type,
+			typename trait::argument_type<METHOD_t>::template index<1>::type,
+			typename trait::argument_type<METHOD_t>::template index<2>::type,
+			typename trait::argument_type<METHOD_t>::template index<3>::type,
+			typename trait::argument_type<METHOD_t>::template index<4>::type,
+			typename trait::argument_type<METHOD_t>::template index<5>::type,
+			typename trait::argument_type<METHOD_t>::template index<6>::type,
+			typename trait::argument_type<METHOD_t>::template index<7>::type,
+			typename trait::argument_type<METHOD_t>::template index<8>::type,
+			typename trait::argument_type<METHOD_t>::template index<9>::type,
+			typename trait::argument_type<METHOD_t>::template index<10>::type,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> sorted_real_args;
+		typedef HBoundCallInterface<free_standing_args_count::value, typename trait::return_type<METHOD_t>::type,
+						typename sorted_real_args::a0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
+						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
+						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
+		typedef typename yaal::hcore::HPointer<interface_type> holder_type;
 		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
 			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ) ); }
 		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
@@ -288,8 +314,24 @@ struct bound_call_calculator
 		{
 		typedef HBoundCall<free_standing_args_count::value, METHOD_t, typename trait::return_type<METHOD_t>::type,
 						METHOD_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
-		typedef yaal::hcore::HPointer<HBoundCallInterface<free_standing_args_count::value,
-						fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> > holder_type;
+		typedef free_standing_args<
+			typename trait::argument_type<METHOD_t>::template index<0>::type,
+			typename trait::argument_type<METHOD_t>::template index<1>::type,
+			typename trait::argument_type<METHOD_t>::template index<2>::type,
+			typename trait::argument_type<METHOD_t>::template index<3>::type,
+			typename trait::argument_type<METHOD_t>::template index<4>::type,
+			typename trait::argument_type<METHOD_t>::template index<5>::type,
+			typename trait::argument_type<METHOD_t>::template index<6>::type,
+			typename trait::argument_type<METHOD_t>::template index<7>::type,
+			typename trait::argument_type<METHOD_t>::template index<8>::type,
+			typename trait::argument_type<METHOD_t>::template index<9>::type,
+			typename trait::argument_type<METHOD_t>::template index<10>::type,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> sorted_real_args;
+		typedef HBoundCallInterface<free_standing_args_count::value, typename trait::return_type<METHOD_t>::type,
+						typename sorted_real_args::a0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
+						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
+						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
+		typedef typename yaal::hcore::HPointer<interface_type> holder_type;
 		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
 			{ return holder_type( new type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
 		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
@@ -313,8 +355,8 @@ struct bound_call_calculator
 		inline static holder_type make( METHOD_t m )
 			{ return holder_type( new type( m ) ); }
 		};
-	typedef typename trait::ternary<trait::is_member<METHOD_t>::value,
-					typename trait::ternary<meta::greater<trait::find_type<fa0_t,
+	typedef typename trait::ternary<trait::is_member<METHOD_t>::value, /* we have method */
+					typename trait::ternary<meta::greater<trait::find_type<fa0_t, /* is 'this' a free standing arg? */
 					free_standing_call_args::arg<1>,
 					free_standing_call_args::arg<2>,
 					free_standing_call_args::arg<3>,
