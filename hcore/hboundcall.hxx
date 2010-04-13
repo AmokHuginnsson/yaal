@@ -48,12 +48,12 @@ namespace hcore
  * \tparam a1_t - second argument to given METHOD_t of CALL_t.
  * \tparam aN_t - N-th argument to given METHOD_t of CALL_t.
  */
-template<int free_args, typename return_t,
-	typename a0_t = trait::no_type,	typename a1_t = trait::no_type,
-	typename a2_t = trait::no_type,	typename a3_t = trait::no_type,
-	typename a4_t = trait::no_type,	typename a5_t = trait::no_type,
-	typename a6_t = trait::no_type,	typename a7_t = trait::no_type,
-	typename a8_t = trait::no_type,	typename a9_t = trait::no_type,
+template<int free_args = 0, typename return_t = void,
+	typename a0_t = trait::no_type, typename a1_t = trait::no_type,
+	typename a2_t = trait::no_type, typename a3_t = trait::no_type,
+	typename a4_t = trait::no_type, typename a5_t = trait::no_type,
+	typename a6_t = trait::no_type, typename a7_t = trait::no_type,
+	typename a8_t = trait::no_type, typename a9_t = trait::no_type,
 	typename a10_t = trait::no_type>
 class HBoundCallInterface;
 
@@ -63,10 +63,13 @@ template<typename return_t>
 class HBoundCallInterface<0, return_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 public:
-	typedef yaal::hcore::HPointer<HBoundCallInterface> ptr_t;
+	typedef yaal::hcore::HPointer<HBoundCallInterface<0, return_t,
+		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type, trait::no_type> > ptr_t;
 	virtual ~HBoundCallInterface( void ) {}
 	return_t operator()( void )
 		{ return ( do_invoke() ); }
@@ -85,13 +88,16 @@ protected:
 	};
 
 template<typename return_t, typename a0_t>
-class HBoundCallInterface<1, return_t,
-	a0_t, trait::no_type, trait::no_type, trait::no_type,
+class HBoundCallInterface<1, return_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
 public:
-	typedef yaal::hcore::HPointer<HBoundCallInterface> ptr_t;
+	typedef yaal::hcore::HPointer<HBoundCallInterface<1, return_t, a0_t,
+		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type> > ptr_t;
 	virtual ~HBoundCallInterface( void ) {}
 	template<typename fa0_t>
 	return_t operator()( fa0_t fa0 )
@@ -121,14 +127,214 @@ template<typename CLASS_t>
 void const* caller_id( CLASS_t const& object_ )
 	{ return ( &object_ ); }
 
+/*! \brief Implementation of abstration of any-method of any-class invocation.
+ *
+ * \tparam CALL_t - class on which this invocation will operate.
+ * \tparam METHOD_t - method of given class CALL_t that shall be invoked.
+ * \tparam a0_t - first argument to given METHOD_t of CALL_t.
+ * \tparam a1_t - second argument to given METHOD_t of CALL_t.
+ * \tparam aN_t - N-th argument to given METHOD_t of CALL_t.
+ */
+template<int free_args, typename METHOD_t, typename return_t, typename CALL_t,
+	typename a0_t = trait::no_type, typename a1_t = trait::no_type,
+	typename a2_t = trait::no_type, typename a3_t = trait::no_type,
+	typename a4_t = trait::no_type, typename a5_t = trait::no_type,
+	typename a6_t = trait::no_type, typename a7_t = trait::no_type,
+	typename a8_t = trait::no_type, typename a9_t = trait::no_type,
+	typename a10_t = trait::no_type>
+class HBoundCall;
+
+template<typename METHOD_t,
+	typename fa0_t = trait::no_type, typename fa1_t = trait::no_type,
+	typename fa2_t = trait::no_type, typename fa3_t = trait::no_type,
+	typename fa4_t = trait::no_type, typename fa5_t = trait::no_type,
+	typename fa6_t = trait::no_type, typename fa7_t = trait::no_type,
+	typename fa8_t = trait::no_type, typename fa9_t = trait::no_type, typename fa10_t = trait::no_type>
+struct bound_call_calculator
+	{
+	struct free_standing_args_count
+		{
+		static int const value =
+			+ meta::ternary<trait::is_kind_of<fa0_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa1_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa2_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa3_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa4_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa5_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa6_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa7_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa8_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa9_t, free_standing_call_args::arg_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa10_t, free_standing_call_args::arg_base>::value, 1, 0>::value;
+		};
+	template<typename ra0_t, typename ra1_t = trait::no_type,
+		typename ra2_t = trait::no_type, typename ra3_t = trait::no_type,
+		typename ra4_t = trait::no_type, typename ra5_t = trait::no_type,
+		typename ra6_t = trait::no_type, typename ra7_t = trait::no_type,
+		typename ra8_t = trait::no_type, typename ra9_t = trait::no_type,
+		typename ra10_t = trait::no_type>
+	struct free_standing_args
+		{
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<1>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a0_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<2>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a1_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<3>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a2_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<4>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a3_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<5>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a4_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<6>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a5_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<7>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a6_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<8>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a7_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<9>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a8_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<10>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a9_t;
+		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<11>,
+			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::value,
+			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a10_t;
+		};
+	typedef free_standing_args<
+		typename trait::argument_type<METHOD_t>::template index<0>::type,
+		typename trait::argument_type<METHOD_t>::template index<1>::type,
+		typename trait::argument_type<METHOD_t>::template index<2>::type,
+		typename trait::argument_type<METHOD_t>::template index<3>::type,
+		typename trait::argument_type<METHOD_t>::template index<4>::type,
+		typename trait::argument_type<METHOD_t>::template index<5>::type,
+		typename trait::argument_type<METHOD_t>::template index<6>::type,
+		typename trait::argument_type<METHOD_t>::template index<7>::type,
+		typename trait::argument_type<METHOD_t>::template index<8>::type,
+		typename trait::argument_type<METHOD_t>::template index<9>::type,
+		typename trait::argument_type<METHOD_t>::template index<10>::type> sorted_real_args;
+	struct functor
+		{
+		typedef HFunctor<fa0_t, METHOD_t> functor_t;
+		typedef HBoundCall<free_standing_args_count::value, METHOD_t, typename trait::return_type<METHOD_t>::type,
+						functor_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> type;
+		typedef HBoundCallInterface<free_standing_args_count::value, typename trait::return_type<METHOD_t>::type,
+						typename sorted_real_args::a0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
+						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
+						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
+		typedef typename yaal::hcore::HPointer<interface_type> holder_type;
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1, fa2, fa3, fa4 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1, fa2, fa3 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1, fa2 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa1 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0 )
+			{ return holder_type( new type( functor_t( fa0, m ) ) ); }
+		};
+	struct functor_this
+		{
+		typedef HFunctor<fa0_t, METHOD_t> functor_t;
+		typedef HBoundCall<free_standing_args_count::value, METHOD_t, typename trait::return_type<METHOD_t>::type,
+						functor_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> type;
+		typedef yaal::hcore::HPointer<HBoundCallInterface<free_standing_args_count::value,
+						fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> > holder_type;
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2, fa3 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1, fa2 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0, fa1 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0 )
+			{ return holder_type( new type( functor_t( fa0, m ), fa0 ) ); }
+		};
+	struct function
+		{
+		typedef HBoundCall<free_standing_args_count::value, METHOD_t, typename trait::return_type<METHOD_t>::type,
+						METHOD_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
+		typedef yaal::hcore::HPointer<HBoundCallInterface<free_standing_args_count::value,
+						fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> > holder_type;
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
+			{ return holder_type( new type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
+			{ return holder_type( new type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
+			{ return holder_type( new type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
+			{ return holder_type( new type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
+			{ return holder_type( new type( m, fa0, fa1, fa2, fa3, fa4, fa5 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
+			{ return holder_type( new type( m, fa0, fa1, fa2, fa3, fa4 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
+			{ return holder_type( new type( m, fa0, fa1, fa2, fa3 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
+			{ return holder_type( new type( m, fa0, fa1, fa2 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0, fa1_t fa1 )
+			{ return holder_type( new type( m, fa0, fa1 ) ); }
+		inline static holder_type make( METHOD_t m, fa0_t fa0 )
+			{ return holder_type( new type( m, fa0 ) ); }
+		inline static holder_type make( METHOD_t m )
+			{ return holder_type( new type( m ) ); }
+		};
+	typedef typename trait::ternary<trait::is_member<METHOD_t>::value,
+					typename trait::ternary<meta::greater<trait::find_type<fa0_t,
+					free_standing_call_args::arg<1>,
+					free_standing_call_args::arg<2>,
+					free_standing_call_args::arg<3>,
+					free_standing_call_args::arg<4>,
+					free_standing_call_args::arg<5>,
+					free_standing_call_args::arg<6>,
+					free_standing_call_args::arg<7>,
+					free_standing_call_args::arg<8>,
+					free_standing_call_args::arg<9>,
+					free_standing_call_args::arg<10> >::value, -1>::value, functor_this, functor>::type,
+					function>::type type;
+	};
+
 /*! \brief Base class for HBoundCall<1..10>.
  */
-template<int free_args, typename return_t, typename CALL_t,
-	typename a0_t,	typename a1_t, typename a2_t, typename a3_t,
-	typename a4_t,	typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t,	typename a9_t, typename a10_t>
-class HBoundCallBase : public HBoundCallInterface<free_args, return_t,
-	 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+template<int free_args, typename METHOD_t, typename return_t, typename CALL_t,
+	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t, typename a10_t>
+class HBoundCallBase : public bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::interface_type
 	{
 protected:
 	CALL_t _call;
@@ -139,37 +345,20 @@ protected:
 		{ return ( caller_id( _call ) ); }
 	};
 
-/*! \brief Implementation of abstration of any-method of any-class invocation.
- *
- * \tparam CALL_t - class on which this invocation will operate.
- * \tparam METHOD_t - method of given class CALL_t that shall be invoked.
- * \tparam a0_t - first argument to given METHOD_t of CALL_t.
- * \tparam a1_t - second argument to given METHOD_t of CALL_t.
- * \tparam aN_t - N-th argument to given METHOD_t of CALL_t.
- */
-template<int free_args, typename return_t, typename CALL_t,
-	typename a0_t = trait::no_type,	typename a1_t = trait::no_type,
-	typename a2_t = trait::no_type,	typename a3_t = trait::no_type,
-	typename a4_t = trait::no_type,	typename a5_t = trait::no_type,
-	typename a6_t = trait::no_type,	typename a7_t = trait::no_type,
-	typename a8_t = trait::no_type,	typename a9_t = trait::no_type,
-	typename a10_t = trait::no_type>
-class HBoundCall;
-
-template<typename return_t, typename CALL_t>
-class HBoundCall<0, return_t, CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t>
+class HBoundCall<0, METHOD_t, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
+	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	trait::no_type, trait::no_type, trait::no_type> base_t;
 public:
 	HBoundCall( CALL_t call_ )
 		: base_t( call_ ) {}
@@ -179,20 +368,20 @@ public:
 		{ return ( (base_t::_call)() ); }
 	};
 
-template<typename return_t, typename CALL_t, typename a0_t>
-class HBoundCall<0, return_t, CALL_t, a0_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
-	a0_t, trait::no_type, trait::no_type, trait::no_type,
+template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t>
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
-	a0_t, trait::no_type, trait::no_type, trait::no_type,
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 public:
 	HBoundCall( CALL_t call_, a0_t a0 )
@@ -203,19 +392,17 @@ public:
 		{ return ( (base_t::_call)( _a0 ) ); }
 	};
 
-template<typename return_t, typename CALL_t, typename a0_t, typename a1_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, trait::no_type, trait::no_type,
+template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, trait::no_type, trait::no_type,
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
 public:
@@ -227,20 +414,18 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1 ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, a2_t, trait::no_type,
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, a2_t, trait::no_type,
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -253,20 +438,18 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2 ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t,
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -280,21 +463,19 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3 ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t,
-	a4_t, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t,
-	a4_t, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -309,20 +490,16 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t,
-	a4_t, a5_t, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
-	a0_t, a1_t, a2_t, a3_t,
-	a4_t, a5_t, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -338,20 +515,20 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -369,20 +546,20 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
-	trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
-	trait::no_type,	trait::no_type, trait::no_type> base_t;
+	trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -401,21 +578,21 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
-	trait::no_type>
-		: public HBoundCallBase<0, return_t, CALL_t,
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
-	a8_t,	trait::no_type, trait::no_type>
+	a8_t, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
-	a8_t,	trait::no_type, trait::no_type> base_t;
+	a8_t, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -434,20 +611,20 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<0, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<0, return_t, CALL_t,
+class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, trait::no_type>
+		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
-	a8_t,	a9_t, trait::no_type>
+	a8_t, a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<0, return_t, CALL_t,
+	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
-	a8_t,	a9_t, trait::no_type> base_t;
+	a8_t, a9_t, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -467,141 +644,14 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
 	};
 
-template<typename METHOD_t,
-	typename a0_t = trait::no_type, typename a1_t = trait::no_type,
-	typename a2_t = trait::no_type, typename a3_t = trait::no_type,
-	typename a4_t = trait::no_type, typename a5_t = trait::no_type,
-	typename a6_t = trait::no_type, typename a7_t = trait::no_type,
-	typename a8_t = trait::no_type, typename a9_t = trait::no_type, typename a10_t = trait::no_type>
-struct bound_call_calculator
-	{
-	struct free_standing_args
-		{
-		static int const value =
-			+ meta::ternary<trait::is_kind_of<a0_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a1_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a2_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a3_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a4_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a5_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a6_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a7_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a8_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a9_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<a10_t, free_standing_call_args::arg_base>::value, 1, 0>::value;
-		};
-	struct functor
-		{
-		typedef HFunctor<a0_t, METHOD_t> functor_t;
-		typedef HBoundCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
-						functor_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> type;
-		typedef typename HBoundCallInterface<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
-						a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::ptr_t holder_type;
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-			{ return holder_type( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-			{ return holder_type( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-			{ return holder_type( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-			{ return holder_type( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6, a7 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-			{ return holder_type( new type( functor_t( a0, m ), a1, a2, a3, a4, a5, a6 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-			{ return holder_type( new type( functor_t( a0, m ), a1, a2, a3, a4, a5 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-			{ return holder_type( new type( functor_t( a0, m ), a1, a2, a3, a4 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-			{ return holder_type( new type( functor_t( a0, m ), a1, a2, a3 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
-			{ return holder_type( new type( functor_t( a0, m ), a1, a2 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1 )
-			{ return holder_type( new type( functor_t( a0, m ), a1 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0 )
-			{ return holder_type( new type( functor_t( a0, m ) ) ); }
-		};
-	struct functor_this
-		{
-		typedef HFunctor<a0_t, METHOD_t> functor_t;
-		typedef HBoundCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
-						functor_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> type;
-		typedef HBoundCallInterface<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
-						a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> holder_type;
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5, a6 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4, a5 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3, a4 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2, a3 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1, a2 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1 )
-			{ return holder_type( new type( functor_t( a0, m ), a0, a1 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0 )
-			{ return holder_type( new type( functor_t( a0, m ), a0 ) ); }
-		};
-	struct function
-		{
-		typedef HBoundCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
-						METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t> type;
-		typedef HBoundCall<free_standing_args::value, typename trait::return_type<METHOD_t>::type,
-						a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t> holder_type;
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5, a6 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-			{ return holder_type( new type( m, a0, a1, a2, a3, a4, a5 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-			{ return holder_type( new type( m, a0, a1, a2, a3, a4 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-			{ return holder_type( new type( m, a0, a1, a2, a3 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1, a2_t a2 )
-			{ return holder_type( new type( m, a0, a1, a2 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0, a1_t a1 )
-			{ return holder_type( new type( m, a0, a1 ) ); }
-		inline static holder_type make( METHOD_t m, a0_t a0 )
-			{ return holder_type( new type( m, a0 ) ); }
-		inline static holder_type make( METHOD_t m )
-			{ return holder_type( new type( m ) ); }
-		};
-	typedef typename trait::ternary<trait::is_member<METHOD_t>::value,
-					typename trait::ternary<meta::greater<trait::find_type<a0_t,
-					free_standing_call_args::arg<1>,
-					free_standing_call_args::arg<2>,
-					free_standing_call_args::arg<3>,
-					free_standing_call_args::arg<4>,
-					free_standing_call_args::arg<5>,
-					free_standing_call_args::arg<6>,
-					free_standing_call_args::arg<7>,
-					free_standing_call_args::arg<8>,
-					free_standing_call_args::arg<9>,
-					free_standing_call_args::arg<10> >::value, -1>::value, functor_this, functor>::type,
-					function>::type type;
-	};
-
 #if 0
 
 /*! \cond */
 
 template<typename return_t, typename CALL_t, typename a0_t>
 class HBoundCall<1, return_t, CALL_t, a0_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -617,8 +667,8 @@ public:
 
 template<typename return_t, typename CALL_t, typename a0_t, typename a1_t>
 class HBoundCall<1, return_t, CALL_t, a0_t, a1_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -639,8 +689,8 @@ public:
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
 class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -664,8 +714,8 @@ public:
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -693,7 +743,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
 class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -725,7 +775,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
 class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -759,7 +809,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -975,8 +1025,8 @@ public:
 
 template<typename return_t, typename CALL_t, typename a0_t, typename a1_t>
 class HBoundCall<2, return_t, CALL_t, a0_t, a1_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -997,8 +1047,8 @@ public:
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
 class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1022,8 +1072,8 @@ public:
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1051,7 +1101,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
 class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -1083,7 +1133,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
 class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1117,7 +1167,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1334,8 +1384,8 @@ public:
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
 class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1359,8 +1409,8 @@ public:
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1388,7 +1438,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
 class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -1420,7 +1470,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
 class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1454,7 +1504,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1671,8 +1721,8 @@ public:
 template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type,	trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1700,7 +1750,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
 class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -1732,7 +1782,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
 class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1766,7 +1816,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -1984,7 +2034,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
 class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
 	{
 	CALL_t _call;
@@ -2016,7 +2066,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
 class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -2050,7 +2100,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -2268,7 +2318,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
 class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type,	trait::no_type, trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -2302,7 +2352,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;
@@ -2520,7 +2570,7 @@ template<typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
-	trait::no_type,	trait::no_type, trait::no_type>
+	trait::no_type, trait::no_type, trait::no_type>
 	{
 	CALL_t _call;
 	a0_t _a0;

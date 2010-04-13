@@ -43,7 +43,7 @@ namespace tools
 class HWorkFlowInterface
 	{
 public:
-	typedef yaal::hcore::HBoundCallInterface::ptr_t task_t;
+	typedef yaal::hcore::HBoundCallInterface<>::ptr_t task_t;
 	virtual ~HWorkFlowInterface( void ){}
 	task_t pop_task( void );
 private:

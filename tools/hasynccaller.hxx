@@ -44,7 +44,7 @@ class HAbstractAsyncCaller
 	{
 protected:
 	typedef int long priority_t;
-	typedef yaal::hcore::HBoundCallInterface::ptr_t call_t;
+	typedef yaal::hcore::HBoundCallInterface<>::ptr_t call_t;
 	typedef yaal::hcore::HThreadT<HAbstractAsyncCaller> async_caller_t;
 	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
 	queue_t f_oQueue;
