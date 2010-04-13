@@ -122,7 +122,7 @@ class HBoundCallInterface<2, return_t, a0_t, a1_t,
 	trait::no_type, trait::no_type>
 	{
 public:
-	typedef yaal::hcore::HPointer<HBoundCallInterface<1, return_t, a0_t, a1_t,
+	typedef yaal::hcore::HPointer<HBoundCallInterface<2, return_t, a0_t, a1_t,
 		trait::no_type, trait::no_type, trait::no_type,
 		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 		trait::no_type, trait::no_type> > ptr_t;
@@ -138,8 +138,120 @@ public:
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
-	virtual return_t do_invoke( a0_t ) = 0;
-	virtual return_t do_invoke( a0_t ) const = 0;
+	virtual return_t do_invoke( a0_t, a1_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
+template<typename return_t, typename a0_t, typename a1_t, typename a2_t>
+class HBoundCallInterface<3, return_t, a0_t, a1_t,
+	a2_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<3, return_t, a0_t, a1_t,
+		a2_t, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2 )
+		{ return ( do_invoke( a0, a1, a2 ) ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2 ) const
+		{ return ( do_invoke( a0, a1, a2 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2 )
+		{ return ( do_invoke( a0, a1, a2 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2 ) const
+		{ return ( do_invoke( a0, a1, a2 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t, a1_t, a2_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t, a2_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
+template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+class HBoundCallInterface<4, return_t, a0_t, a1_t,
+	a2_t, a3_t, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<4, return_t, a0_t, a1_t,
+		a2_t, a3_t, trait::no_type,
+		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+		{ return ( do_invoke( a0, a1, a2, a3 ) ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 ) const
+		{ return ( do_invoke( a0, a1, a2, a3 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+		{ return ( do_invoke( a0, a1, a2, a3 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3 ) const
+		{ return ( do_invoke( a0, a1, a2, a3 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
+template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
+class HBoundCallInterface<5, return_t, a0_t, a1_t,
+	a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<5, return_t, a0_t, a1_t,
+		a2_t, a3_t, a4_t,
+		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4 ) ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
+template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
+class HBoundCallInterface<6, return_t, a0_t, a1_t,
+	a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<6, return_t, a0_t, a1_t,
+		a2_t, a3_t, a4_t,
+		a5_t, trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5 ) ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
 	};
 
@@ -410,6 +522,8 @@ protected:
 	virtual void const* do_id( void ) const
 		{ return ( caller_id( _call ) ); }
 	};
+
+/*! \cond */
 
 template<typename METHOD_t, typename return_t, typename CALL_t>
 class HBoundCall<0, METHOD_t, return_t, CALL_t,
@@ -2156,16 +2270,24 @@ public:
 				free_standing_call_args::resolve_arg<4, a6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ) ) ); }
 	};
 
-#if 0
-
-/*! \cond */
-
 template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
+		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2204,7 +2326,19 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a8_t>
 class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
+		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2244,7 +2378,19 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
 class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
+	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2287,7 +2433,19 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
 class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
+	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2334,7 +2492,20 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
+		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2362,7 +2533,20 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t>
 class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2393,7 +2577,20 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2428,7 +2625,20 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
+		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2467,7 +2677,20 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a8_t>
 class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
+		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2507,7 +2730,20 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
 class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
+	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2550,7 +2786,20 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
 class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
+	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2596,7 +2845,21 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t>
 class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2627,7 +2890,21 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2662,7 +2939,21 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
+		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2701,7 +2992,21 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a8_t>
 class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
+		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2741,7 +3046,21 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
 class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
+	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2784,7 +3103,21 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
 class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
+	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2830,7 +3163,22 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t>
 class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2865,7 +3213,22 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
+		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2904,7 +3267,22 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a8_t>
 class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
+		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2944,7 +3322,22 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
 class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
+	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2987,7 +3380,22 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
 class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
+	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3033,7 +3441,23 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
+		: public HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a7_t fa7_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3072,7 +3496,23 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a8_t>
 class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
+		: public HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a7_t fa7_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3112,7 +3552,23 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
 class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
+	typedef HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a7_t fa7_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3155,7 +3611,23 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
 class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
+	typedef HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a7_t fa7_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3202,7 +3674,24 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a8_t>
 class HBoundCall<9, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
+		: public HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
 	{
+	typedef HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a8_t fa8_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3242,7 +3731,24 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
 class HBoundCall<9, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
+	typedef HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a8_t fa8_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3285,7 +3791,24 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
 class HBoundCall<9, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
+	typedef HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a8_t fa8_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3331,7 +3854,25 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
 class HBoundCall<10, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<10, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
+	typedef HBoundCallBase<10, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a8_t fa8_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a9_t fa9_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3374,7 +3915,25 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
 class HBoundCall<10, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<10, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
+	typedef HBoundCallBase<10, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a8_t fa8_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a9_t fa9_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3420,7 +3979,26 @@ template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
 class HBoundCall<11, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<11, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
+	typedef HBoundCallBase<11, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a8_t fa8_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a9_t fa9_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a10_t fa10_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3462,8 +4040,6 @@ public:
 	};
 
 /*! \endcond */
-
-#endif
 
 template<typename METHOD_t>
 typename bound_call_calculator<METHOD_t>::type::holder_type bound_call( METHOD_t A_METHOD )
