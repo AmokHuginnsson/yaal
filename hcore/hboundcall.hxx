@@ -99,23 +99,47 @@ public:
 		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 		trait::no_type, trait::no_type> > ptr_t;
 	virtual ~HBoundCallInterface( void ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t fa0 )
-		{ invoke( fa0 ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t fa0 ) const
-		{ invoke( fa0 ); }
-	template<typename fa0_t>
-	return_t invoke( fa0_t fa0 )
-		{ do_invoke( fa0 ); }
-	template<typename fa0_t>
-	return_t invoke( fa0_t fa0 ) const
-		{ do_invoke( fa0 ); }
+	return_t operator()( a0_t a0 )
+		{ return ( do_invoke( a0 ) ); }
+	return_t operator()( a0_t a0 ) const
+		{ return ( do_invoke( a0 ) ); }
+	return_t invoke( a0_t a0 )
+		{ return ( do_invoke( a0 ) ); }
+	return_t invoke( a0_t a0 ) const
+		{ return ( do_invoke( a0 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
-	virtual return_t do_invoke( void ) = 0;
-	virtual return_t do_invoke( void ) const = 0;
+	virtual return_t do_invoke( a0_t ) = 0;
+	virtual return_t do_invoke( a0_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
+template<typename return_t, typename a0_t, typename a1_t>
+class HBoundCallInterface<2, return_t, a0_t, a1_t,
+	trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<1, return_t, a0_t, a1_t,
+		trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1 )
+		{ return ( do_invoke( a0, a1 ) ); }
+	return_t operator()( a0_t a0, a1_t a1 ) const
+		{ return ( do_invoke( a0, a1 ) ); }
+	return_t invoke( a0_t a0, a1_t a1 )
+		{ return ( do_invoke( a0, a1 ) ); }
+	return_t invoke( a0_t a0, a1_t a1 ) const
+		{ return ( do_invoke( a0, a1 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t ) = 0;
+	virtual return_t do_invoke( a0_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
 	};
 
@@ -686,109 +710,137 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
 	};
 
-#if 0
-
-/*! \cond */
-
-template<typename return_t, typename CALL_t, typename a0_t>
-class HBoundCall<1, return_t, CALL_t, a0_t,
+template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t>
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 public:
 	HBoundCall( CALL_t call_, a0_t a0 )
-		: _call( call_ ), _a0( a0 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
+		: base_t( call_ ), _a0( a0 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( _call( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( _call( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t, typename a0_t, typename a1_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t,
+template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( _call(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( _call(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t,
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( _call(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( _call(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
 	a3_t _a3;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( _call(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
 				free_standing_call_args::resolve_arg<1, a3_t, fa0_t>::get( _a3, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( _call(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
 				free_standing_call_args::resolve_arg<1, a3_t, fa0_t>::get( _a3, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -796,16 +848,14 @@ class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a4_t _a4;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( _call(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
 				free_standing_call_args::resolve_arg<1, a3_t, fa0_t>::get( _a3, a0 ),
 				free_standing_call_args::resolve_arg<1, a4_t, fa0_t>::get( _a4, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( _call(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -813,13 +863,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a4_t, fa0_t>::get( _a4, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -828,17 +886,15 @@ class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a5_t _a5;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
 				free_standing_call_args::resolve_arg<1, a3_t, fa0_t>::get( _a3, a0 ),
 				free_standing_call_args::resolve_arg<1, a4_t, fa0_t>::get( _a4, a0 ),
 				free_standing_call_args::resolve_arg<1, a5_t, fa0_t>::get( _a5, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -847,13 +903,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a5_t, fa0_t>::get( _a5, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -864,9 +928,8 @@ class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -874,8 +937,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a4_t, fa0_t>::get( _a4, a0 ),
 				free_standing_call_args::resolve_arg<1, a5_t, fa0_t>::get( _a5, a0 ),
 				free_standing_call_args::resolve_arg<1, a6_t, fa0_t>::get( _a6, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -885,13 +947,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a6_t, fa0_t>::get( _a6, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -903,9 +973,8 @@ class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -914,8 +983,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a5_t, fa0_t>::get( _a5, a0 ),
 				free_standing_call_args::resolve_arg<1, a6_t, fa0_t>::get( _a6, a0 ),
 				free_standing_call_args::resolve_arg<1, a7_t, fa0_t>::get( _a7, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -926,14 +994,22 @@ public:
 				free_standing_call_args::resolve_arg<1, a7_t, fa0_t>::get( _a7, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -945,9 +1021,8 @@ class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -957,8 +1032,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a6_t, fa0_t>::get( _a6, a0 ),
 				free_standing_call_args::resolve_arg<1, a7_t, fa0_t>::get( _a7, a0 ),
 				free_standing_call_args::resolve_arg<1, a8_t, fa0_t>::get( _a8, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -970,13 +1044,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a8_t, fa0_t>::get( _a8, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -989,9 +1071,8 @@ class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1002,8 +1083,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a7_t, fa0_t>::get( _a7, a0 ),
 				free_standing_call_args::resolve_arg<1, a8_t, fa0_t>::get( _a8, a0 ),
 				free_standing_call_args::resolve_arg<1, a9_t, fa0_t>::get( _a9, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1016,13 +1096,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a9_t, fa0_t>::get( _a9, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1036,9 +1124,8 @@ class HBoundCall<1, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10)
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1050,8 +1137,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a8_t, fa0_t>::get( _a8, a0 ),
 				free_standing_call_args::resolve_arg<1, a9_t, fa0_t>::get( _a9, a0 ),
 				free_standing_call_args::resolve_arg<1, a10_t, fa0_t>::get( _a10, a0 ) ) ); }
-	template<typename fa0_t>
-	return_t operator()( fa0_t a0 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1065,88 +1151,118 @@ public:
 				free_standing_call_args::resolve_arg<1, a10_t, fa0_t>::get( _a10, a0 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t, typename a0_t, typename a1_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t,
+template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t,
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
 	a3_t _a3;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1154,16 +1270,14 @@ class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a4_t _a4;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1171,13 +1285,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1186,17 +1309,15 @@ class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a5_t _a5;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1205,13 +1326,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1222,9 +1352,8 @@ class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1232,8 +1361,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1243,13 +1371,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1261,9 +1398,8 @@ class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1272,8 +1408,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1284,14 +1419,23 @@ public:
 				free_standing_call_args::resolve_arg<2, a7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1303,9 +1447,8 @@ class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1315,8 +1458,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1328,13 +1470,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1347,9 +1498,8 @@ class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1360,8 +1510,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1374,13 +1523,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1394,9 +1552,8 @@ class HBoundCall<2, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1408,8 +1565,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a10_t, fa0_t, fa1_t>::get( _a10, a0, a1 ) ) ); }
-	template<typename fa0_t, typename fa1_t>
-	return_t operator()( fa0_t a0, fa1_t a1 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1423,67 +1579,93 @@ public:
 				free_standing_call_args::resolve_arg<2, a10_t, fa0_t, fa1_t>::get( _a10, a0, a1 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t,
+class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
 	a3_t _a3;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
+		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1491,16 +1673,14 @@ class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a4_t _a4;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1508,13 +1688,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1523,17 +1713,15 @@ class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a5_t _a5;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1542,13 +1730,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1559,9 +1757,8 @@ class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1569,8 +1766,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1580,13 +1776,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1598,9 +1804,8 @@ class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1609,8 +1814,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1621,14 +1825,24 @@ public:
 				free_standing_call_args::resolve_arg<3, a7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
+		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1640,9 +1854,8 @@ class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1652,8 +1865,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1665,13 +1877,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1684,9 +1906,8 @@ class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1697,8 +1918,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1711,13 +1931,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1731,9 +1961,8 @@ class HBoundCall<3, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1745,8 +1974,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a10_t, fa0_t, fa1_t, fa2_t>::get( _a10, a0, a1, a2 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -1760,42 +1988,62 @@ public:
 				free_standing_call_args::resolve_arg<3, a10_t, fa0_t, fa1_t, fa2_t>::get( _a10, a0, a1, a2 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
 	a3_t _a3;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
+		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1803,16 +2051,14 @@ class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a4_t _a4;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -1820,13 +2066,24 @@ public:
 				free_standing_call_args::resolve_arg<4, a4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1835,17 +2092,15 @@ class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a5_t _a5;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -1854,13 +2109,24 @@ public:
 				free_standing_call_args::resolve_arg<4, a5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
+		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
+	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	a1_t, a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type> base_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1871,9 +2137,8 @@ class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -1881,8 +2146,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -1892,13 +2156,16 @@ public:
 				free_standing_call_args::resolve_arg<4, a6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+#if 0
+
+/*! \cond */
+
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1910,9 +2177,8 @@ class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -1921,8 +2187,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -1933,14 +2198,13 @@ public:
 				free_standing_call_args::resolve_arg<4, a7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1952,9 +2216,8 @@ class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -1964,8 +2227,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -1977,13 +2239,12 @@ public:
 				free_standing_call_args::resolve_arg<4, a8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1996,9 +2257,8 @@ class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -2009,8 +2269,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -2023,13 +2282,12 @@ public:
 				free_standing_call_args::resolve_arg<4, a9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2043,9 +2301,8 @@ class HBoundCall<4, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -2057,8 +2314,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a10_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a10, a0, a1, a2, a3 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -2072,14 +2328,13 @@ public:
 				free_standing_call_args::resolve_arg<4, a10_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a10, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2087,16 +2342,14 @@ class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a4_t _a4;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2104,13 +2357,12 @@ public:
 				free_standing_call_args::resolve_arg<5, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2119,17 +2371,15 @@ class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a5_t _a5;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2138,13 +2388,12 @@ public:
 				free_standing_call_args::resolve_arg<5, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2155,9 +2404,8 @@ class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2165,8 +2413,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2176,13 +2423,12 @@ public:
 				free_standing_call_args::resolve_arg<5, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2194,9 +2440,8 @@ class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2205,8 +2450,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2217,14 +2461,13 @@ public:
 				free_standing_call_args::resolve_arg<5, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2236,9 +2479,8 @@ class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2248,8 +2490,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2261,13 +2502,12 @@ public:
 				free_standing_call_args::resolve_arg<5, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2280,9 +2520,8 @@ class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2293,8 +2532,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2307,13 +2545,12 @@ public:
 				free_standing_call_args::resolve_arg<5, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2327,9 +2564,8 @@ class HBoundCall<5, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2341,8 +2577,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a10, a0, a1, a2, a3, a4 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -2356,13 +2591,12 @@ public:
 				free_standing_call_args::resolve_arg<5, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a10, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2371,17 +2605,15 @@ class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a5_t _a5;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2390,13 +2622,12 @@ public:
 				free_standing_call_args::resolve_arg<6, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2407,9 +2638,8 @@ class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2417,8 +2647,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2428,13 +2657,12 @@ public:
 				free_standing_call_args::resolve_arg<6, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2446,9 +2674,8 @@ class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2457,8 +2684,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2469,14 +2695,13 @@ public:
 				free_standing_call_args::resolve_arg<6, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2488,9 +2713,8 @@ class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2500,8 +2724,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2513,13 +2736,12 @@ public:
 				free_standing_call_args::resolve_arg<6, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2532,9 +2754,8 @@ class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2545,8 +2766,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2559,13 +2779,12 @@ public:
 				free_standing_call_args::resolve_arg<6, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2579,9 +2798,8 @@ class HBoundCall<6, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2593,8 +2811,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a10, a0, a1, a2, a3, a4, a5 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -2608,13 +2825,12 @@ public:
 				free_standing_call_args::resolve_arg<6, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a10, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2625,9 +2841,8 @@ class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2635,8 +2850,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2646,13 +2860,12 @@ public:
 				free_standing_call_args::resolve_arg<7, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2664,9 +2877,8 @@ class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2675,8 +2887,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2687,14 +2898,13 @@ public:
 				free_standing_call_args::resolve_arg<7, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2706,9 +2916,8 @@ class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2718,8 +2927,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2731,13 +2939,12 @@ public:
 				free_standing_call_args::resolve_arg<7, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2750,9 +2957,8 @@ class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2763,8 +2969,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2777,13 +2982,12 @@ public:
 				free_standing_call_args::resolve_arg<7, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2797,9 +3001,8 @@ class HBoundCall<7, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2811,8 +3014,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -2826,13 +3028,12 @@ public:
 				free_standing_call_args::resolve_arg<7, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<8, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2844,9 +3045,8 @@ class HBoundCall<8, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -2855,8 +3055,7 @@ public:
 				free_standing_call_args::resolve_arg<8, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -2867,14 +3066,13 @@ public:
 				free_standing_call_args::resolve_arg<8, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<8, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2886,9 +3084,8 @@ class HBoundCall<8, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -2898,8 +3095,7 @@ public:
 				free_standing_call_args::resolve_arg<8, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -2911,13 +3107,12 @@ public:
 				free_standing_call_args::resolve_arg<8, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<8, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2930,9 +3125,8 @@ class HBoundCall<8, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -2943,8 +3137,7 @@ public:
 				free_standing_call_args::resolve_arg<8, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -2957,13 +3150,12 @@ public:
 				free_standing_call_args::resolve_arg<8, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<8, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2977,9 +3169,8 @@ class HBoundCall<8, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -2991,8 +3182,7 @@ public:
 				free_standing_call_args::resolve_arg<8, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -3006,14 +3196,13 @@ public:
 				free_standing_call_args::resolve_arg<8, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<9, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<9, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3025,9 +3214,8 @@ class HBoundCall<9, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a8_t _a8;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -3037,8 +3225,7 @@ public:
 				free_standing_call_args::resolve_arg<9, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -3050,13 +3237,12 @@ public:
 				free_standing_call_args::resolve_arg<9, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<9, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<9, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3069,9 +3255,8 @@ class HBoundCall<9, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -3082,8 +3267,7 @@ public:
 				free_standing_call_args::resolve_arg<9, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -3096,13 +3280,12 @@ public:
 				free_standing_call_args::resolve_arg<9, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<9, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<9, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3116,9 +3299,8 @@ class HBoundCall<9, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, 
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -3130,8 +3312,7 @@ public:
 				free_standing_call_args::resolve_arg<9, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -3145,13 +3326,12 @@ public:
 				free_standing_call_args::resolve_arg<9, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<10, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+class HBoundCall<10, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3164,9 +3344,8 @@ class HBoundCall<10, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	a9_t _a9;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -3177,8 +3356,7 @@ public:
 				free_standing_call_args::resolve_arg<10, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -3191,13 +3369,12 @@ public:
 				free_standing_call_args::resolve_arg<10, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<10, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<10, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3211,9 +3388,8 @@ class HBoundCall<10, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -3225,8 +3401,7 @@ public:
 				free_standing_call_args::resolve_arg<10, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -3240,13 +3415,12 @@ public:
 				free_standing_call_args::resolve_arg<10, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 	};
 
-template<typename return_t, typename CALL_t,
+template<typename METHOD_t, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<11, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+class HBoundCall<11, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	{
-	CALL_t _call;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3260,9 +3434,8 @@ class HBoundCall<11, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	a10_t _a10;
 public:
 	HBoundCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: _call( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) { return ( _call(
+		: base_t( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) { return ( base_t(
 				free_standing_call_args::resolve_arg<11, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
@@ -3274,8 +3447,7 @@ public:
 				free_standing_call_args::resolve_arg<11, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-	return_t operator()( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) const { return ( _call(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) const { return ( base_t(
 				free_standing_call_args::resolve_arg<11, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
