@@ -40,12 +40,6 @@ namespace tools
  */
 class HPlugin
 	{
-	template<typename tType>
-	union caster_t
-		{
-		void* f_pvObjectPointer;
-		tType FUNCTION_POINTER;
-		};
 	typedef HPlugin self_t;
 	void* f_pvHandle;
 public:
@@ -68,9 +62,7 @@ template<typename name_t>
 void HPlugin::resolve( yaal::hcore::HString const& a_oName, name_t& handle )
 	{
 	M_PROLOG
-	caster_t<name_t> l_xCaster;
-	l_xCaster.f_pvObjectPointer = resolve( a_oName );
-	handle = l_xCaster.FUNCTION_POINTER;
+	handle = bit_cast<name_t>( resolve( a_oName ) );
 	return;
 	M_EPILOG
 	}

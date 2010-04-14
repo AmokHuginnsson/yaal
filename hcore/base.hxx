@@ -72,6 +72,27 @@ to_t lexical_cast( from_t const& val );
  */
 char const* error_message( int const& code );
 
+/*! \brief The crudest way of casting between types.
+ *
+ * It differs from reinterpret_cast<> in this regard that it can handle
+ * cast to/from method pointers.
+ *
+ * \tparam to_t - destination type.
+ * \param val - value to be converted to destination type.
+ * \return val equvalent in to_t representation.
+ */
+template<typename to_t, typename from_t>
+to_t bit_cast( from_t val_ )
+	{
+	union caster
+		{
+		from_t _from;
+		to_t _to;
+		} cast;
+	cast._from = val_;
+	return ( cast._to );
+	}
+
 }
 
 #endif /* not YAAL_HCORE_BASE_HXX_INCLUDED */
