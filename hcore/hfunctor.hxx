@@ -668,7 +668,7 @@ public:
 	return_t operator()( void ) const
 		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object ) ); }
 	void const* id( void ) const
-		{ return ( reinterpret_cast<void const*>( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::id( _object, _method ) ) ); }
+		{ return ( bit_cast<void const*>( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::id( _object, _method ) ) ); }
 	};
 
 }
