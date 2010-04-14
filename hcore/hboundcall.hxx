@@ -255,6 +255,148 @@ protected:
 	virtual void const* do_id( void ) const = 0;
 	};
 
+template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
+class HBoundCallInterface<7, return_t, a0_t, a1_t,
+	a2_t, a3_t, a4_t,
+	a5_t, a6_t, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<7, return_t, a0_t, a1_t,
+		a2_t, a3_t, a4_t,
+		a5_t, a6_t, trait::no_type, trait::no_type,
+		trait::no_type, trait::no_type> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
+template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+class HBoundCallInterface<8, return_t, a0_t, a1_t,
+	a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, trait::no_type,
+	trait::no_type, trait::no_type>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<8, return_t, a0_t, a1_t,
+		a2_t, a3_t, a4_t,
+		a5_t, a6_t, a7_t, trait::no_type,
+		trait::no_type, trait::no_type> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
+template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t>
+class HBoundCallInterface<9, return_t, a0_t, a1_t,
+	a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	trait::no_type, trait::no_type>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<9, return_t, a0_t, a1_t,
+		a2_t, a3_t, a4_t,
+		a5_t, a6_t, a7_t, a8_t,
+		trait::no_type, trait::no_type> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
+template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t, typename a9_t>
+class HBoundCallInterface<10, return_t, a0_t, a1_t,
+	a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, trait::no_type>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<10, return_t, a0_t, a1_t,
+		a2_t, a3_t, a4_t,
+		a5_t, a6_t, a7_t, a8_t,
+		a9_t, trait::no_type> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
+template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+	typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t, typename a9_t, typename a10_t>
+class HBoundCallInterface<11, return_t, a0_t, a1_t,
+	a2_t, a3_t, a4_t,
+	a5_t, a6_t, a7_t, a8_t,
+	a9_t, a10_t>
+	{
+public:
+	typedef yaal::hcore::HPointer<HBoundCallInterface<10, return_t, a0_t, a1_t,
+		a2_t, a3_t, a4_t,
+		a5_t, a6_t, a7_t, a8_t,
+		a9_t, a10_t> > ptr_t;
+	virtual ~HBoundCallInterface( void ) {}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	return_t invoke( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
+		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	void const* id( void ) const
+		{ return ( do_id() ); }
+protected:
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) = 0;
+	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) const = 0;
+	virtual void const* do_id( void ) const = 0;
+	};
+
 template<typename CLASS_t, typename METHOD_t>
 void const* caller_id( HFunctor<CLASS_t, METHOD_t> const& functor_ )
 	{ return ( functor_.id() ); }
@@ -288,6 +430,7 @@ template<typename METHOD_t,
 	typename fa8_t = trait::no_type, typename fa9_t = trait::no_type, typename fa10_t = trait::no_type>
 struct bound_call_calculator
 	{
+	typedef bound_call_calculator<METHOD_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> descriptor;
 	struct free_standing_args_count
 		{
 		static int const value =
@@ -357,7 +500,7 @@ struct bound_call_calculator
 	struct functor
 		{
 		typedef HFunctor<fa0_t, METHOD_t> functor_t;
-		typedef HBoundCall<free_standing_args_count::value, METHOD_t, typename trait::return_type<METHOD_t>::type,
+		typedef HBoundCall<free_standing_args_count::value, descriptor, typename trait::return_type<METHOD_t>::type,
 						functor_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> type;
 		typedef free_standing_args<
 			typename trait::argument_type<METHOD_t>::template index<0>::type,
@@ -403,7 +546,7 @@ struct bound_call_calculator
 	struct functor_this
 		{
 		typedef HFunctor<fa0_t, METHOD_t> functor_t;
-		typedef HBoundCall<free_standing_args_count::value, METHOD_t, typename trait::return_type<METHOD_t>::type,
+		typedef HBoundCall<free_standing_args_count::value, descriptor, typename trait::return_type<METHOD_t>::type,
 						functor_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> type;
 		typedef free_standing_args<
 			typename trait::argument_type<METHOD_t>::template index<0>::type,
@@ -448,7 +591,7 @@ struct bound_call_calculator
 		};
 	struct function
 		{
-		typedef HBoundCall<free_standing_args_count::value, METHOD_t, typename trait::return_type<METHOD_t>::type,
+		typedef HBoundCall<free_standing_args_count::value, descriptor, typename trait::return_type<METHOD_t>::type,
 						METHOD_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
 		typedef free_standing_args<
 			typename trait::argument_type<METHOD_t>::template index<0>::type,
@@ -508,11 +651,11 @@ struct bound_call_calculator
 
 /*! \brief Base class for HBoundCall<1..10>.
  */
-template<int free_args, typename METHOD_t, typename return_t, typename CALL_t,
+template<int free_args, typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCallBase : public bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::interface_type
+class HBoundCallBase : public descriptor::type::interface_type
 	{
 protected:
 	CALL_t _call;
@@ -525,17 +668,17 @@ protected:
 
 /*! \cond */
 
-template<typename METHOD_t, typename return_t, typename CALL_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t>
+class HBoundCall<0, descriptor, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type> base_t;
@@ -548,17 +691,17 @@ public:
 		{ return ( (base_t::_call)() ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t,
+template<typename descriptor, typename return_t, typename CALL_t, typename a0_t>
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
@@ -572,15 +715,15 @@ public:
 		{ return ( (base_t::_call)( _a0 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t,
+template<typename descriptor, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
@@ -594,16 +737,16 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
@@ -618,16 +761,16 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
@@ -643,17 +786,17 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
@@ -670,15 +813,15 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -695,17 +838,17 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type> base_t;
@@ -726,17 +869,17 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type, trait::no_type> base_t;
@@ -758,18 +901,18 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
 	a8_t, trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
 	a8_t, trait::no_type, trait::no_type> base_t;
@@ -791,17 +934,17 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<0, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, trait::no_type>
-		: public HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+class HBoundCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, trait::no_type>
+		: public HBoundCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
 	a8_t, a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<0, METHOD_t, return_t, CALL_t,
+	typedef HBoundCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
 	a8_t, a9_t, trait::no_type> base_t;
@@ -824,21 +967,21 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t,
+template<typename descriptor, typename return_t, typename CALL_t, typename a0_t>
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 public:
 	HBoundCall( CALL_t call_, a0_t a0 )
@@ -847,20 +990,20 @@ public:
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( _call( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t,
+template<typename descriptor, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 public:
@@ -874,21 +1017,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -905,21 +1048,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -939,22 +1082,22 @@ public:
 				free_standing_call_args::resolve_arg<1, a3_t, fa0_t>::get( _a3, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -977,21 +1120,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a4_t, fa0_t>::get( _a4, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1017,21 +1160,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a5_t, fa0_t>::get( _a5, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1061,21 +1204,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a6_t, fa0_t>::get( _a6, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1108,22 +1251,22 @@ public:
 				free_standing_call_args::resolve_arg<1, a7_t, fa0_t>::get( _a7, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1158,21 +1301,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a8_t, fa0_t>::get( _a8, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1210,21 +1353,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a9_t, fa0_t>::get( _a9, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<1, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<1, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1265,21 +1408,21 @@ public:
 				free_standing_call_args::resolve_arg<1, a10_t, fa0_t>::get( _a10, a0 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t,
+template<typename descriptor, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 public:
@@ -1293,22 +1436,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1325,22 +1468,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1360,23 +1503,23 @@ public:
 				free_standing_call_args::resolve_arg<2, a3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1399,22 +1542,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1440,22 +1583,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1485,22 +1628,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1533,23 +1676,23 @@ public:
 				free_standing_call_args::resolve_arg<2, a7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1584,22 +1727,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1637,22 +1780,22 @@ public:
 				free_standing_call_args::resolve_arg<2, a9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<2, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<2, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1693,23 +1836,23 @@ public:
 				free_standing_call_args::resolve_arg<2, a10_t, fa0_t, fa1_t>::get( _a10, a0, a1 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
-class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t,
+class HBoundCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1726,23 +1869,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1762,24 +1905,24 @@ public:
 				free_standing_call_args::resolve_arg<3, a3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
-		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1802,23 +1945,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1844,23 +1987,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1890,23 +2033,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1939,24 +2082,24 @@ public:
 				free_standing_call_args::resolve_arg<3, a7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
-		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1991,23 +2134,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2045,23 +2188,23 @@ public:
 				free_standing_call_args::resolve_arg<3, a9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<3, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<3, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2102,24 +2245,24 @@ public:
 				free_standing_call_args::resolve_arg<3, a10_t, fa0_t, fa1_t, fa2_t>::get( _a10, a0, a1, a2 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
+class HBoundCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2139,25 +2282,25 @@ public:
 				free_standing_call_args::resolve_arg<4, a3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
-		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2180,24 +2323,24 @@ public:
 				free_standing_call_args::resolve_arg<4, a4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2223,24 +2366,24 @@ public:
 				free_standing_call_args::resolve_arg<4, a5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2270,24 +2413,24 @@ public:
 				free_standing_call_args::resolve_arg<4, a6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2320,25 +2463,25 @@ public:
 				free_standing_call_args::resolve_arg<4, a7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
-		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2373,24 +2516,24 @@ public:
 				free_standing_call_args::resolve_arg<4, a8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2428,24 +2571,24 @@ public:
 				free_standing_call_args::resolve_arg<4, a9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<4, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<4, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2486,26 +2629,26 @@ public:
 				free_standing_call_args::resolve_arg<4, a10_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a10, a0, a1, a2, a3 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t>
-class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
+class HBoundCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type>
-		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2528,25 +2671,25 @@ public:
 				free_standing_call_args::resolve_arg<5, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2572,25 +2715,25 @@ public:
 				free_standing_call_args::resolve_arg<5, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2620,25 +2763,25 @@ public:
 				free_standing_call_args::resolve_arg<5, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2671,26 +2814,26 @@ public:
 				free_standing_call_args::resolve_arg<5, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
-		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2725,25 +2868,25 @@ public:
 				free_standing_call_args::resolve_arg<5, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2781,25 +2924,25 @@ public:
 				free_standing_call_args::resolve_arg<5, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<5, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<5, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2840,26 +2983,26 @@ public:
 				free_standing_call_args::resolve_arg<5, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a10, a0, a1, a2, a3, a4 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t>
-class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
+class HBoundCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2885,26 +3028,26 @@ public:
 				free_standing_call_args::resolve_arg<6, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2934,26 +3077,26 @@ public:
 				free_standing_call_args::resolve_arg<6, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -2986,27 +3129,27 @@ public:
 				free_standing_call_args::resolve_arg<6, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
-		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3041,26 +3184,26 @@ public:
 				free_standing_call_args::resolve_arg<6, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3098,26 +3241,26 @@ public:
 				free_standing_call_args::resolve_arg<6, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<6, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<6, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3158,27 +3301,27 @@ public:
 				free_standing_call_args::resolve_arg<6, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a10, a0, a1, a2, a3, a4, a5 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t>
-class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
+class HBoundCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t,
 	trait::no_type, trait::no_type, trait::no_type>
-		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3208,27 +3351,27 @@ public:
 				free_standing_call_args::resolve_arg<7, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3261,28 +3404,28 @@ public:
 				free_standing_call_args::resolve_arg<7, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
-		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3317,27 +3460,27 @@ public:
 				free_standing_call_args::resolve_arg<7, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3375,27 +3518,27 @@ public:
 				free_standing_call_args::resolve_arg<7, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<7, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<7, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3436,28 +3579,28 @@ public:
 				free_standing_call_args::resolve_arg<7, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
+class HBoundCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 	trait::no_type, trait::no_type>
-		: public HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3490,29 +3633,29 @@ public:
 				free_standing_call_args::resolve_arg<8, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
-		: public HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3547,28 +3690,28 @@ public:
 				free_standing_call_args::resolve_arg<8, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3606,28 +3749,28 @@ public:
 				free_standing_call_args::resolve_arg<8, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<8, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<8, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3668,30 +3811,30 @@ public:
 				free_standing_call_args::resolve_arg<8, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t>
-class HBoundCall<9, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
+class HBoundCall<9, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t,
 	trait::no_type>
-		: public HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+		: public HBoundCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type>
 	{
-	typedef HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a7_t fa7_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::sorted_real_args::a8_t fa8_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a8_t fa8_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3726,29 +3869,29 @@ public:
 				free_standing_call_args::resolve_arg<9, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<9, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<9, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a7_t fa7_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a8_t fa8_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a8_t fa8_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3786,29 +3929,29 @@ public:
 				free_standing_call_args::resolve_arg<9, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<9, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<9, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<9, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a7_t fa7_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a8_t fa8_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a8_t fa8_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3849,30 +3992,30 @@ public:
 				free_standing_call_args::resolve_arg<9, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t>
-class HBoundCall<10, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
-		: public HBoundCallBase<10, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<10, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>
+		: public HBoundCallBase<10, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type>
 	{
-	typedef HBoundCallBase<10, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<10, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a7_t fa7_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a8_t fa8_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::sorted_real_args::a9_t fa9_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a8_t fa8_t;
+	typedef typename descriptor::type::sorted_real_args::a9_t fa9_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3910,30 +4053,30 @@ public:
 				free_standing_call_args::resolve_arg<10, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<10, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<10, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<10, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<10, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<10, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<10, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a7_t fa7_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a8_t fa8_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a9_t fa9_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a8_t fa8_t;
+	typedef typename descriptor::type::sorted_real_args::a9_t fa9_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -3974,31 +4117,31 @@ public:
 				free_standing_call_args::resolve_arg<10, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 	};
 
-template<typename METHOD_t, typename return_t, typename CALL_t,
+template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HBoundCall<11, METHOD_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
-		: public HBoundCallBase<11, METHOD_t, return_t, CALL_t, a0_t,
+class HBoundCall<11, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+		: public HBoundCallBase<11, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t>
 	{
-	typedef HBoundCallBase<11, METHOD_t, return_t, CALL_t, a0_t,
+	typedef HBoundCallBase<11, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a0_t fa0_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a1_t fa1_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a2_t fa2_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a3_t fa3_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a4_t fa4_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a5_t fa5_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a6_t fa6_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a7_t fa7_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a8_t fa8_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a9_t fa9_t;
-	typedef typename bound_call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::sorted_real_args::a10_t fa10_t;
+	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
+	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
+	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
+	typedef typename descriptor::type::sorted_real_args::a4_t fa4_t;
+	typedef typename descriptor::type::sorted_real_args::a5_t fa5_t;
+	typedef typename descriptor::type::sorted_real_args::a6_t fa6_t;
+	typedef typename descriptor::type::sorted_real_args::a7_t fa7_t;
+	typedef typename descriptor::type::sorted_real_args::a8_t fa8_t;
+	typedef typename descriptor::type::sorted_real_args::a9_t fa9_t;
+	typedef typename descriptor::type::sorted_real_args::a10_t fa10_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
