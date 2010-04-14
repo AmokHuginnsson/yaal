@@ -549,6 +549,7 @@ struct bound_call_calculator
 		typedef HBoundCall<free_standing_args_count::value, descriptor, typename trait::return_type<METHOD_t>::type,
 						functor_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> type;
 		typedef free_standing_args<
+			typename trait::class_type<METHOD_t>::type*,
 			typename trait::argument_type<METHOD_t>::template index<0>::type,
 			typename trait::argument_type<METHOD_t>::template index<1>::type,
 			typename trait::argument_type<METHOD_t>::template index<2>::type,
@@ -559,7 +560,6 @@ struct bound_call_calculator
 			typename trait::argument_type<METHOD_t>::template index<7>::type,
 			typename trait::argument_type<METHOD_t>::template index<8>::type,
 			typename trait::argument_type<METHOD_t>::template index<9>::type,
-			typename trait::argument_type<METHOD_t>::template index<10>::type,
 			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> sorted_real_args;
 		typedef HBoundCallInterface<free_standing_args_count::value, typename trait::return_type<METHOD_t>::type,
 						typename sorted_real_args::a0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,

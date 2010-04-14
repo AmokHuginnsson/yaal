@@ -403,8 +403,8 @@ struct object_resolver
 		template<typename METHOD_t, typename CLASS_t>
 		static return_t go( METHOD_t method_, CLASS_t object_ )
 			{ return ( (object_.*method_)() ); }
-		template<typename CLASS_t>
-		static CLASS_t* id( CLASS_t& object_ )
+		template<typename CLASS_t, typename dummy_t>
+		static CLASS_t* id( CLASS_t& object_, dummy_t )
 			{ return ( &object_ ); }
 		};
 	template<typename return_t>
@@ -476,8 +476,8 @@ struct object_resolver
 		template<typename METHOD_t, typename CLASS_t>
 		static return_t go( METHOD_t method_, CLASS_t object_ )
 			{ return ( (object_->*method_)() ); }
-		template<typename CLASS_t>
-		static CLASS_t id( CLASS_t object_ )
+		template<typename CLASS_t, typename dummy_t>
+		static CLASS_t id( CLASS_t object_, dummy_t )
 			{ return ( object_ ); }
 		};
 	template<typename return_t>
@@ -549,8 +549,8 @@ struct object_resolver
 		template<typename METHOD_t, typename dummy_t, typename CLASS_t>
 		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_ )
 			{ return ( (object_->*method_)() ); }
-		template<typename CLASS_t>
-		static CLASS_t id( CLASS_t object_ )
+		template<typename dummy_t, typename CLASS_t>
+		static CLASS_t id( dummy_t, CLASS_t object_ )
 			{ return ( object_ ); }
 		};
 	};
@@ -668,7 +668,7 @@ public:
 	return_t operator()( void ) const
 		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object ) ); }
 	void const* id( void ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::id( _object ) ); }
+		{ return ( reinterpret_cast<void const*>( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::id( _object, _method ) ) ); }
 	};
 
 }
