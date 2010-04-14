@@ -88,7 +88,11 @@ to_t bit_cast( from_t val_ )
 		{
 		from_t _from;
 		to_t _to;
+		char _buf;
 		} cast;
+	/* We shall not use hcore/algorithm.hxx here or we suffer compilation slowdown. */
+	for ( int i( 0 ), SIZE( sizeof ( from_t ) > sizeof ( to_t ) ? sizeof ( from_t ) : sizeof ( to_t ) ); i < SIZE; ++ i )
+		(&cast._buf)[ i ] = 0;
 	cast._from = val_;
 	return ( cast._to );
 	}
