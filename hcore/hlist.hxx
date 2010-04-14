@@ -44,7 +44,7 @@ extern char const* const g_ppcErrMsgHList[];
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-template<typename value_type> 
+template<typename type_t> 
 class HList;
 
 /*! \brief Meta-data definition for HList<> class.
@@ -99,10 +99,10 @@ struct OListBits
 
 /*! \brief Doubly-linked list data structure and its operations.
  */
-template<typename value_type> 
+template<typename type_t> 
 class HList : public OListBits
 	{
-	typedef HList<value_type> self_t;
+	typedef HList<type_t> self_t;
 private:
 	class HElement;
 	int f_iSize;           /*!< how many elements this list contains */
@@ -112,13 +112,13 @@ private:
 	int f_iIndex;          /*!< this two fiels will allow boost operator[], int holds last */
 	HElement* f_poIndex;   /*!< index and HElement * holds pointer to this last element */
 public:
-	typedef value_type value_t;
+	typedef type_t value_type;
 	template<typename const_qual_t, OListBits::treatment_t const treatment>
 	class HIterator;
-	typedef class HIterator<value_type, OListBits::TREAT_AS_OPENED> iterator;
-	typedef class HIterator<value_type const, OListBits::TREAT_AS_OPENED> const_iterator;
-	typedef class HIterator<value_type, OListBits::TREAT_AS_CLOSED> cyclic_iterator;
-	typedef class HIterator<value_type const, OListBits::TREAT_AS_CLOSED> const_cyclic_iterator;
+	typedef class HIterator<type_t, OListBits::TREAT_AS_OPENED> iterator;
+	typedef class HIterator<type_t const, OListBits::TREAT_AS_OPENED> const_iterator;
+	typedef class HIterator<type_t, OListBits::TREAT_AS_CLOSED> cyclic_iterator;
+	typedef class HIterator<type_t const, OListBits::TREAT_AS_CLOSED> const_cyclic_iterator;
 	/*! \brief Create an empty list.
 	 */
 	HList( void );
@@ -145,55 +145,55 @@ public:
 	const_iterator rend( void ) const;
 	const_iterator rbegin( void ) const;
 	void clear( void );
-	void resize( int long, value_type const& = value_type() );
+	void resize( int long, type_t const& = type_t() );
 	int long size( void ) const;
 	int long get_size( void ) const;
-	void swap( HList<value_type>& );
+	void swap( HList<type_t>& );
 	/*! \brief Adds new element at specified position.
 	 *
 	 * Newly created element will have default value.
 	 */
 	template<OListBits::treatment_t const treatment>
-	typename OListBits::iterator<value_type, treatment>::type insert( HIterator<value_type, treatment> const& );
+	typename OListBits::iterator<type_t, treatment>::type insert( HIterator<type_t, treatment> const& );
 	template<OListBits::treatment_t const treatment>
-	typename OListBits::iterator<value_type, treatment>::type insert( HIterator<value_type, treatment> const&, value_type const& );
+	typename OListBits::iterator<type_t, treatment>::type insert( HIterator<type_t, treatment> const&, type_t const& );
 	template<OListBits::treatment_t const treatment, typename iterator_t>
-	void insert( HIterator<value_type, treatment> const&, iterator_t, iterator_t );
+	void insert( HIterator<type_t, treatment> const&, iterator_t, iterator_t );
 	template<OListBits::treatment_t const treatment>
-	void insert( HIterator<value_type, treatment> const&, int long const&, value_type const& );
+	void insert( HIterator<type_t, treatment> const&, int long const&, type_t const& );
 	/*! \brief Adds new element at beggining of the list
 	 *
 	 * Newly created element will have default value.
 	 */
-	value_type& add_head( void );
+	type_t& add_head( void );
 	/*! \brief Adds new element at end of the list
 	 *
 	 * Newly created element will have default value.
 	 */
-	value_type& add_tail( void );
-	void push_back( value_type const& );
+	type_t& add_tail( void );
+	void push_back( type_t const& );
 	void pop_back( void );
-	void push_front( value_type const& );
+	void push_front( type_t const& );
 	void pop_front( void );
 	/*! \brief Add element in the way that keeps order.
 	 */
 	template<typename T>
-	value_type& add_orderly( value_type const&, T const&, sort_order_t = ASCENDING );
+	type_t& add_orderly( type_t const&, T const&, sort_order_t = ASCENDING );
 	template<OListBits::treatment_t const treatment>
-	typename OListBits::iterator<value_type, treatment>::type erase( HIterator<value_type, treatment> const& );
+	typename OListBits::iterator<type_t, treatment>::type erase( HIterator<type_t, treatment> const& );
 	/*! \brief Sets cursor at specified index or number
 	 */
 	iterator n_th( int );
-	value_type& operator[] ( int );
-	value_type const& operator[] ( int ) const;
-	value_type& front( void );
-	value_type const& front( void ) const;
-	value_type& back( void );
-	value_type const& back( void ) const;
-	value_type& head( void );
-	value_type const& head( void ) const;
-	value_type& tail( void );
-	value_type const& tail( void ) const;
+	type_t& operator[] ( int );
+	type_t const& operator[] ( int ) const;
+	type_t& front( void );
+	type_t const& front( void ) const;
+	type_t& back( void );
+	type_t const& back( void ) const;
+	type_t& head( void );
+	type_t const& head( void ) const;
+	type_t& tail( void );
+	type_t const& tail( void ) const;
 	void exchange( iterator const&, iterator const& );
 	void sort( sort_order_t = ASCENDING );
 	template<typename T>
@@ -209,45 +209,45 @@ private:
 	HElement* element_by_index ( int );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
-	friend class HIterator<value_type, OListBits::TREAT_AS_OPENED>;
-	friend class HIterator<value_type const, OListBits::TREAT_AS_OPENED>;
-	friend class HIterator<value_type, OListBits::TREAT_AS_CLOSED>;
-	friend class HIterator<value_type const, OListBits::TREAT_AS_CLOSED>;
+	friend class HIterator<type_t, OListBits::TREAT_AS_OPENED>;
+	friend class HIterator<type_t const, OListBits::TREAT_AS_OPENED>;
+	friend class HIterator<type_t, OListBits::TREAT_AS_CLOSED>;
+	friend class HIterator<type_t const, OListBits::TREAT_AS_CLOSED>;
 	};
 
 /*! \brief HList<> element class provisions basic building block for doubly-linked list.
  */
-template<typename value_type>
-class HList<value_type>::HElement
+template<typename type_t>
+class HList<type_t>::HElement
 	{
 private:
 	HElement* f_poPrevious;
 	HElement* f_poNext;
-	value_type f_tObject; /*!< The Object itself. */
+	type_t f_tObject; /*!< The Object itself. */
 	explicit HElement( HElement* );
-	explicit HElement( HElement*, value_type const& );
+	explicit HElement( HElement*, type_t const& );
 	virtual ~HElement ();
 	void connect( HElement* );
 	HElement( HElement const & );
 	HElement& operator = ( HElement const& );
-	friend class HList<value_type>;
-	friend class HIterator<value_type, OListBits::TREAT_AS_OPENED>;
-	friend class HIterator<value_type const, OListBits::TREAT_AS_OPENED>;
-	friend class HIterator<value_type, OListBits::TREAT_AS_CLOSED>;
-	friend class HIterator<value_type const, OListBits::TREAT_AS_CLOSED>;
+	friend class HList<type_t>;
+	friend class HIterator<type_t, OListBits::TREAT_AS_OPENED>;
+	friend class HIterator<type_t const, OListBits::TREAT_AS_OPENED>;
+	friend class HIterator<type_t, OListBits::TREAT_AS_CLOSED>;
+	friend class HIterator<type_t const, OListBits::TREAT_AS_CLOSED>;
 	};
 
 /*! \brief Iterator for HList<> data structure.
  */
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-class HList<value_type>::HIterator
+class HList<type_t>::HIterator
 	{
 private:
-	HList<value_type> const* f_poOwner;
+	HList<type_t> const* f_poOwner;
 	HElement* f_poCurrent;
 public:
-	typedef value_type value_t;
+	typedef type_t value_type;
 	HIterator( void );
 	template<typename other_const_qual_t, OListBits::treatment_t family>
 	HIterator( HIterator<other_const_qual_t, family> const& );
@@ -291,7 +291,7 @@ public:
 		return ( l_oIterator );
 		M_EPILOG
 		}
-	typename HList<value_type>::template HIterator<const_qual_t, treatment>& operator = ( HIterator const& );
+	typename HList<type_t>::template HIterator<const_qual_t, treatment>& operator = ( HIterator const& );
 	bool operator == ( HIterator const & ) const;
 	bool operator != ( HIterator const & ) const;
 	const_qual_t& operator* ( void );
@@ -300,10 +300,10 @@ public:
 	const_qual_t* operator->( void ) const;
 	bool is_valid( void ) const;
 protected:
-	friend class HList<value_type>;
+	friend class HList<type_t>;
 	template<typename same_const_qual_t, OListBits::treatment_t const family>
 	friend class HIterator;
-	HIterator( HList<value_type> const* const, HElement* const );
+	HIterator( HList<type_t> const* const, HElement* const );
 	};
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -312,30 +312,30 @@ protected:
 /*++++++++++++++++++++++                             ++++++++++++++++++++++*/
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-template<typename value_type>
-HList<value_type>::HElement::HElement( HElement* a_poElement )
+template<typename type_t>
+HList<type_t>::HElement::HElement( HElement* a_poElement )
 	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject()
 	{
 	connect( a_poElement );
 	}
 
-template<typename value_type>
-HList<value_type>::HElement::HElement( HElement* a_poElement, value_type const& a_roValue )
+template<typename type_t>
+HList<type_t>::HElement::HElement( HElement* a_poElement, type_t const& a_roValue )
 	: f_poPrevious ( NULL ), f_poNext ( NULL ), f_tObject( a_roValue )
 	{
 	connect( a_poElement );
 	}
 
-template<typename value_type>
-HList<value_type>::HElement::~HElement( void )
+template<typename type_t>
+HList<type_t>::HElement::~HElement( void )
 	{
 	f_poPrevious->f_poNext = f_poNext;
 	f_poNext->f_poPrevious = f_poPrevious;
 	return;
 	}
 
-template<typename value_type>
-void HList<value_type>::HElement::connect( HElement* a_poElement )
+template<typename type_t>
+void HList<type_t>::HElement::connect( HElement* a_poElement )
 	{
 	if ( a_poElement == 0 )
 		{
@@ -353,18 +353,18 @@ void HList<value_type>::HElement::connect( HElement* a_poElement )
 
 //========================== Iterator ========================================
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-HList<value_type>::HIterator<const_qual_t, treatment>::HIterator( void )
+HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( void )
 	: f_poOwner( NULL ), f_poCurrent( NULL )
 	{
 	return;
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
 template<typename other_const_qual_t, OListBits::treatment_t family>
-HList<value_type>::HIterator<const_qual_t, treatment>::HIterator( HIterator<other_const_qual_t, family> const& a_roIterator )
+HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HIterator<other_const_qual_t, family> const& a_roIterator )
 	: f_poOwner( a_roIterator.f_poOwner ), f_poCurrent( a_roIterator.f_poCurrent )
 	{
 	M_PROLOG
@@ -373,19 +373,19 @@ HList<value_type>::HIterator<const_qual_t, treatment>::HIterator( HIterator<othe
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-HList<value_type>::HIterator<const_qual_t, treatment>::HIterator( HList<value_type> const* const a_poOwner,
+HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HList<type_t> const* const a_poOwner,
 		HElement* const a_poElement ) : f_poOwner( a_poOwner ),
 	f_poCurrent( a_poElement )
 	{
 	return;
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-typename HList<value_type>::template HIterator<const_qual_t, treatment>&
-HList<value_type>::HIterator<const_qual_t, treatment>::operator = ( HIterator const& a_roIterator )
+typename HList<type_t>::template HIterator<const_qual_t, treatment>&
+HList<type_t>::HIterator<const_qual_t, treatment>::operator = ( HIterator const& a_roIterator )
 	{
 	M_PROLOG
 	if ( reinterpret_cast<HIterator<const_qual_t, treatment> const*>( &a_roIterator ) != this )
@@ -398,22 +398,22 @@ HList<value_type>::HIterator<const_qual_t, treatment>::operator = ( HIterator co
 	}
 
 /*
-template<typename value_type>
-typename HList<value_type>::HIterator & HList< value_type >::HIterator::operator ++ ( void )
+template<typename type_t>
+typename HList<type_t>::HIterator & HList< type_t >::HIterator::operator ++ ( void )
 
-template<typename value_type>
-typename HList<value_type>::HIterator const HList< value_type >::HIterator::operator ++ ( int )
+template<typename type_t>
+typename HList<type_t>::HIterator const HList< type_t >::HIterator::operator ++ ( int )
 
-template<typename value_type>
-typename HList<value_type>::HIterator & HList< value_type >::HIterator::operator -- ( void )
+template<typename type_t>
+typename HList<type_t>::HIterator & HList< type_t >::HIterator::operator -- ( void )
 
-template<typename value_type>
-typename HList<value_type>::HIterator const HList< value_type >::HIterator::operator -- ( int )
+template<typename type_t>
+typename HList<type_t>::HIterator const HList< type_t >::HIterator::operator -- ( int )
 */
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-bool HList<value_type>::HIterator<const_qual_t, treatment>::operator == ( HIterator const& a_roIterator ) const
+bool HList<type_t>::HIterator<const_qual_t, treatment>::operator == ( HIterator const& a_roIterator ) const
 	{
 	M_PROLOG
 	M_ASSERT( ( ! ( f_poOwner && a_roIterator.f_poOwner ) ) || ( f_poOwner == a_roIterator.f_poOwner ) );
@@ -421,9 +421,9 @@ bool HList<value_type>::HIterator<const_qual_t, treatment>::operator == ( HItera
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-bool HList<value_type>::HIterator<const_qual_t, treatment>::operator!= ( HIterator const& a_roIterator ) const
+bool HList<type_t>::HIterator<const_qual_t, treatment>::operator!= ( HIterator const& a_roIterator ) const
 	{
 	M_PROLOG
 	M_ASSERT( ( ! ( f_poOwner && a_roIterator.f_poOwner ) ) || ( f_poOwner == a_roIterator.f_poOwner ) );
@@ -431,45 +431,45 @@ bool HList<value_type>::HIterator<const_qual_t, treatment>::operator!= ( HIterat
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-const_qual_t& HList<value_type>::HIterator<const_qual_t, treatment>::operator* ( void )
+const_qual_t& HList<type_t>::HIterator<const_qual_t, treatment>::operator* ( void )
 	{
 	return ( f_poCurrent->f_tObject );
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-const_qual_t& HList<value_type>::HIterator<const_qual_t, treatment>::operator* ( void ) const
+const_qual_t& HList<type_t>::HIterator<const_qual_t, treatment>::operator* ( void ) const
 	{
 	return ( f_poCurrent->f_tObject );
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-const_qual_t* HList<value_type>::HIterator<const_qual_t, treatment>::operator->( void )
+const_qual_t* HList<type_t>::HIterator<const_qual_t, treatment>::operator->( void )
 	{
 	return ( &f_poCurrent->f_tObject );
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-const_qual_t* HList<value_type>::HIterator<const_qual_t, treatment>::operator->( void ) const
+const_qual_t* HList<type_t>::HIterator<const_qual_t, treatment>::operator->( void ) const
 	{
 	return ( &f_poCurrent->f_tObject );
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-bool HList<value_type>::HIterator<const_qual_t, treatment>::is_valid( void ) const
+bool HList<type_t>::HIterator<const_qual_t, treatment>::is_valid( void ) const
 	{
 	return ( f_poOwner && f_poOwner->f_poHook && f_poCurrent );
 	}
 
 //============================================================================
 
-template<typename value_type>
-HList<value_type>::HList( void )
+template<typename type_t>
+HList<type_t>::HList( void )
 	: OListBits(), f_iSize( 0 ),
 	f_poHook( NULL ), f_eOrder( UNSORTED ),
 	f_iIndex( 0 ), f_poIndex( NULL )
@@ -479,8 +479,8 @@ HList<value_type>::HList( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-HList<value_type>::HList( int long count_ )
+template<typename type_t>
+HList<type_t>::HList( int long count_ )
 	: OListBits(), f_iSize( 0 ),
 	f_poHook( NULL ), f_eOrder( UNSORTED ),
 	f_iIndex( 0 ), f_poIndex( NULL )
@@ -492,8 +492,8 @@ HList<value_type>::HList( int long count_ )
 	M_EPILOG
 	}
 
-template<typename value_type>
-HList<value_type>::~HList( void )
+template<typename type_t>
+HList<type_t>::~HList( void )
 	{
 	M_PROLOG
 	clear();
@@ -501,8 +501,8 @@ HList<value_type>::~HList( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-HList<value_type>::HList( HList<value_type> const& a_roList )
+template<typename type_t>
+HList<type_t>::HList( HList<type_t> const& a_roList )
 	: OListBits(), f_iSize( 0 ),
 	f_poHook( NULL ), f_eOrder( UNSORTED ),
 	f_iIndex( 0 ), f_poIndex( NULL )
@@ -513,9 +513,9 @@ HList<value_type>::HList( HList<value_type> const& a_roList )
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename iter_t>
-HList<value_type>::HList( iter_t i, iter_t endIt )
+HList<type_t>::HList( iter_t i, iter_t endIt )
 	: OListBits(), f_iSize( 0 ),
 	f_poHook( NULL ), f_eOrder( UNSORTED ),
 	f_iIndex( 0 ), f_poIndex( NULL )
@@ -527,68 +527,68 @@ HList<value_type>::HList( iter_t i, iter_t endIt )
 	M_EPILOG
 	}
 
-template<typename value_type>
-typename HList<value_type>::const_iterator HList<value_type>::begin( void ) const
+template<typename type_t>
+typename HList<type_t>::const_iterator HList<type_t>::begin( void ) const
 	{
 	return ( const_iterator( this, f_poHook ) );
 	}
 
-template<typename value_type>
-typename HList<value_type>::iterator HList<value_type>::begin( void )
+template<typename type_t>
+typename HList<type_t>::iterator HList<type_t>::begin( void )
 	{
 	return ( iterator( this, f_poHook ) );
 	}
 
-template<typename value_type>
-typename HList<value_type>::const_iterator HList<value_type>::end( void ) const
+template<typename type_t>
+typename HList<type_t>::const_iterator HList<type_t>::end( void ) const
 	{
 	return ( const_iterator( this, NULL ) );
 	}
 
-template<typename value_type>
-typename HList<value_type>::iterator HList<value_type>::end( void )
+template<typename type_t>
+typename HList<type_t>::iterator HList<type_t>::end( void )
 	{
 	return ( iterator( this, NULL ) );
 	}
 
-template<typename value_type>
-typename HList<value_type>::const_iterator HList<value_type>::rbegin( void ) const
+template<typename type_t>
+typename HList<type_t>::const_iterator HList<type_t>::rbegin( void ) const
 	{
 	return ( const_iterator( this, f_poHook ? f_poHook->f_poPrevious : NULL ) );
 	}
 
-template<typename value_type>
-typename HList<value_type>::iterator HList<value_type>::rbegin( void )
+template<typename type_t>
+typename HList<type_t>::iterator HList<type_t>::rbegin( void )
 	{
 	return ( iterator( this, f_poHook ? f_poHook->f_poPrevious : NULL ) );
 	}
 
-template<typename value_type>
-typename HList<value_type>::const_iterator  HList<value_type>::rend( void ) const
+template<typename type_t>
+typename HList<type_t>::const_iterator  HList<type_t>::rend( void ) const
 	{
 	return ( const_iterator( this, NULL ) );
 	}
 
-template<typename value_type>
-typename HList<value_type>::iterator HList<value_type>::rend( void )
+template<typename type_t>
+typename HList<type_t>::iterator HList<type_t>::rend( void )
 	{
 	return ( iterator( this, NULL ) );
 	}
 
-template<typename value_type>
-typename HList<value_type>::const_cyclic_iterator HList<value_type>::hook( void ) const
+template<typename type_t>
+typename HList<type_t>::const_cyclic_iterator HList<type_t>::hook( void ) const
 	{
 	return ( const_cyclic_iterator( this, f_poHook ) );
 	}
 
-template<typename value_type>
-typename HList<value_type>::cyclic_iterator HList<value_type>::hook( void )
+template<typename type_t>
+typename HList<type_t>::cyclic_iterator HList<type_t>::hook( void )
 	{
 	return ( cyclic_iterator( this, f_poHook ) );
 	}
 
-template<typename value_type>
-HList<value_type>& HList<value_type>::operator = ( HList<value_type> const& a_roList )
+template<typename type_t>
+HList<type_t>& HList<type_t>::operator = ( HList<type_t> const& a_roList )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -636,8 +636,8 @@ HList<value_type>& HList<value_type>::operator = ( HList<value_type> const& a_ro
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::clear( void )
+template<typename type_t>
+void HList<type_t>::clear( void )
 	{
 	M_PROLOG
 	while ( f_iSize -- )
@@ -650,36 +650,36 @@ void HList<value_type>::clear( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-bool HList<value_type>::is_empty( void ) const
+template<typename type_t>
+bool HList<type_t>::is_empty( void ) const
 	{
 	return ( ! f_iSize );
 	}
 
-template<typename value_type>
-bool HList<value_type>::empty( void ) const
+template<typename type_t>
+bool HList<type_t>::empty( void ) const
 	{
 	return ( ! f_iSize );
 	}
 
-template<typename value_type>
-int long HList<value_type>::size( void ) const
+template<typename type_t>
+int long HList<type_t>::size( void ) const
 	{
 	M_PROLOG
 	return ( f_iSize );
 	M_EPILOG
 	}
 
-template<typename value_type>
-int long HList<value_type>::get_size( void ) const
+template<typename type_t>
+int long HList<type_t>::get_size( void ) const
 	{
 	M_PROLOG
 	return ( f_iSize );
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::swap( HList<value_type>& other )
+template<typename type_t>
+void HList<type_t>::swap( HList<type_t>& other )
 	{
 	if ( &other != this )
 		{
@@ -693,9 +693,9 @@ void HList<value_type>::swap( HList<value_type>& other )
 	return;
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<OListBits::treatment_t const treatment>
-typename OListBits::iterator<value_type, treatment>::type HList<value_type>::insert( HIterator<value_type, treatment> const& it )
+typename OListBits::iterator<type_t, treatment>::type HList<type_t>::insert( HIterator<type_t, treatment> const& it )
 	{
 	M_PROLOG
 	HElement* l_poElement = new HElement( it.f_poCurrent ? it.f_poCurrent : f_poHook );
@@ -708,10 +708,10 @@ typename OListBits::iterator<value_type, treatment>::type HList<value_type>::ins
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<OListBits::treatment_t const treatment>
-typename OListBits::iterator<value_type, treatment>::type HList<value_type>::insert( HIterator<value_type, treatment> const& it,
-		value_type const& val )
+typename OListBits::iterator<type_t, treatment>::type HList<type_t>::insert( HIterator<type_t, treatment> const& it,
+		type_t const& val )
 	{
 	M_PROLOG
 	HElement* l_poElement = new HElement( it.f_poCurrent ? it.f_poCurrent : f_poHook, val );
@@ -724,10 +724,10 @@ typename OListBits::iterator<value_type, treatment>::type HList<value_type>::ins
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<OListBits::treatment_t const treatment>
-void HList<value_type>::insert( HIterator<value_type, treatment> const& it,
-		int long const& count_, value_type const& val )
+void HList<type_t>::insert( HIterator<type_t, treatment> const& it,
+		int long const& count_, type_t const& val )
 	{
 	M_PROLOG
 	for ( int long i = 0; i < count_; ++ i )
@@ -736,9 +736,9 @@ void HList<value_type>::insert( HIterator<value_type, treatment> const& it,
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<OListBits::treatment_t const treatment, typename iterator_t>
-void HList<value_type>::insert( HIterator<value_type, treatment> const& it,
+void HList<type_t>::insert( HIterator<type_t, treatment> const& it,
 		iterator_t first, iterator_t last )
 	{
 	M_PROLOG
@@ -748,8 +748,8 @@ void HList<value_type>::insert( HIterator<value_type, treatment> const& it,
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type& HList<value_type>::add_head( void )
+template<typename type_t>
+type_t& HList<type_t>::add_head( void )
 	{
 	M_PROLOG
 	f_poHook = new HElement( f_poHook );
@@ -760,8 +760,8 @@ value_type& HList<value_type>::add_head( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type& HList<value_type>::add_tail( void )
+template<typename type_t>
+type_t& HList<type_t>::add_tail( void )
 	{
 	M_PROLOG
 	HElement* l_poElement = new HElement( f_poHook );
@@ -772,8 +772,8 @@ value_type& HList<value_type>::add_tail( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::push_front( value_type const& a_rtObject )
+template<typename type_t>
+void HList<type_t>::push_front( type_t const& a_rtObject )
 	{
 	M_PROLOG
 	f_poHook = new HElement( f_poHook, a_rtObject );
@@ -784,8 +784,8 @@ void HList<value_type>::push_front( value_type const& a_rtObject )
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::push_back( value_type const& a_rtObject )
+template<typename type_t>
+void HList<type_t>::push_back( type_t const& a_rtObject )
 	{
 	M_PROLOG
 	HElement* l_poElement = new HElement( f_poHook, a_rtObject );
@@ -799,23 +799,23 @@ void HList<value_type>::push_back( value_type const& a_rtObject )
 namespace
 {
 
-template<typename value_type, typename T>
-bool asc_less( value_type const& a, value_type const& b, T const& comp )
+template<typename type_t, typename T>
+bool asc_less( type_t const& a, type_t const& b, T const& comp )
 	{
 	return ( comp( a, b ) );
 	}
 
-template<typename value_type, typename T>
-bool desc_less( value_type const& a, value_type const& b, T const& comp )
+template<typename type_t, typename T>
+bool desc_less( type_t const& a, type_t const& b, T const& comp )
 	{
 	return ( comp( b, a ) );
 	}
 
 }
 
-template<typename value_type>
+template<typename type_t>
 template<typename T>
-value_type& HList<value_type>::add_orderly( value_type const& a_rtObject,
+type_t& HList<type_t>::add_orderly( type_t const& a_rtObject,
 		T const& less, sort_order_t a_eOrder )
 	{
 	M_PROLOG
@@ -825,12 +825,12 @@ value_type& HList<value_type>::add_orderly( value_type const& a_rtObject,
 	if ( ( f_eOrder != UNSORTED ) && ( f_eOrder != a_eOrder ) )
 		M_THROW( g_ppcErrMsgHList[ ERROR::BAD_ORDER ], a_eOrder );
 	f_eOrder = a_eOrder;
-	typedef bool ( *comp_t )( value_type const&, value_type const&, T const& );
+	typedef bool ( *comp_t )( type_t const&, type_t const&, T const& );
 	comp_t my_comp;
 	if ( f_eOrder == ASCENDING )
-		my_comp = asc_less<value_type, T>;
+		my_comp = asc_less<type_t, T>;
 	else
-		my_comp = desc_less<value_type, T>;
+		my_comp = desc_less<type_t, T>;
 	while ( f_iSize && ( l_iOldIndex != l_iIndex ) )
 		{
 		l_iOldIndex = l_iIndex;
@@ -866,13 +866,13 @@ value_type& HList<value_type>::add_orderly( value_type const& a_rtObject,
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<OListBits::treatment_t const treatment>
-typename OListBits::iterator<value_type, treatment>::type
-HList<value_type>::erase( HIterator<value_type, treatment> const& a_roIterator )
+typename OListBits::iterator<type_t, treatment>::type
+HList<type_t>::erase( HIterator<type_t, treatment> const& a_roIterator )
 	{
 	M_PROLOG
-	HIterator<value_type, treatment> it = a_roIterator;
+	HIterator<type_t, treatment> it = a_roIterator;
 	++ it;
 	if ( ! f_iSize )
 		M_THROW( g_ppcErrMsgHList[ ERROR::EMPTY ], errno );
@@ -911,8 +911,8 @@ HList<value_type>::erase( HIterator<value_type, treatment> const& a_roIterator )
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::pop_front( void )
+template<typename type_t>
+void HList<type_t>::pop_front( void )
 	{
 	M_PROLOG
 	HElement* l_poElement = NULL;
@@ -937,8 +937,8 @@ void HList<value_type>::pop_front( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::pop_back( void )
+template<typename type_t>
+void HList<type_t>::pop_back( void )
 	{
 	M_PROLOG
 	HElement* l_poElement = NULL;
@@ -965,16 +965,16 @@ void HList<value_type>::pop_back( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type& HList<value_type>::operator[] ( int a_iIndex )
+template<typename type_t>
+type_t& HList<type_t>::operator[] ( int a_iIndex )
 	{
 	M_PROLOG
 	return ( element_by_index( a_iIndex )->f_tObject );
 	M_EPILOG
 	}
 
-template<typename value_type>
-typename HList<value_type>::HElement* HList<value_type>::element_by_index( int a_iIndex )
+template<typename type_t>
+typename HList<type_t>::HElement* HList<type_t>::element_by_index( int a_iIndex )
 	{
 	M_PROLOG
 	if ( f_iSize == 0 )
@@ -1019,16 +1019,16 @@ we have to check if a_iIndex is lowwer or geater than f_iIndex/2
 	M_EPILOG
 	}
 
-template<typename value_type>
-typename HList<value_type>::iterator HList<value_type>::n_th( int a_iIndex )
+template<typename type_t>
+typename HList<type_t>::iterator HList<type_t>::n_th( int a_iIndex )
 	{
 	M_PROLOG
 	return ( iterator( this, element_by_index( a_iIndex ) ) );
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::exchange( HElement* a_poLeft, HElement* a_poRight )
+template<typename type_t>
+void HList<type_t>::exchange( HElement* a_poLeft, HElement* a_poRight )
 	{
 	M_PROLOG
 	HElement* l_poNext = NULL;
@@ -1065,8 +1065,8 @@ void HList<value_type>::exchange( HElement* a_poLeft, HElement* a_poRight )
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::exchange( iterator const& left, iterator const& right )
+template<typename type_t>
+void HList<type_t>::exchange( iterator const& left, iterator const& right )
 	{
 	M_PROLOG
 	if ( left != right )
@@ -1075,8 +1075,8 @@ void HList<value_type>::exchange( iterator const& left, iterator const& right )
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type& HList<value_type>::front( void )
+template<typename type_t>
+type_t& HList<type_t>::front( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
@@ -1085,8 +1085,8 @@ value_type& HList<value_type>::front( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type const& HList<value_type>::front( void ) const
+template<typename type_t>
+type_t const& HList<type_t>::front( void ) const
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
@@ -1095,24 +1095,24 @@ value_type const& HList<value_type>::front( void ) const
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type& HList<value_type>::head( void )
+template<typename type_t>
+type_t& HList<type_t>::head( void )
 	{
 	M_PROLOG
 	return ( front() );
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type const& HList<value_type>::head( void ) const
+template<typename type_t>
+type_t const& HList<type_t>::head( void ) const
 	{
 	M_PROLOG
 	return ( front() );
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type& HList<value_type>::back( void )
+template<typename type_t>
+type_t& HList<type_t>::back( void )
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
@@ -1121,8 +1121,8 @@ value_type& HList<value_type>::back( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type const& HList<value_type>::back( void ) const
+template<typename type_t>
+type_t const& HList<type_t>::back( void ) const
 	{
 	M_PROLOG
 	if ( f_poHook == 0 )
@@ -1131,25 +1131,25 @@ value_type const& HList<value_type>::back( void ) const
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type& HList<value_type>::tail( void )
+template<typename type_t>
+type_t& HList<type_t>::tail( void )
 	{
 	M_PROLOG
 	return ( back() );
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type const& HList<value_type>::tail( void ) const
+template<typename type_t>
+type_t const& HList<type_t>::tail( void ) const
 	{
 	M_PROLOG
 	return ( back() );
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename T>
-void HList<value_type>::merge_sort( HElement*& left, HElement*& right, T const& less )
+void HList<type_t>::merge_sort( HElement*& left, HElement*& right, T const& less )
 	{
 	M_PROLOG
 	HElement* leftIt = left;
@@ -1182,12 +1182,12 @@ void HList<value_type>::merge_sort( HElement*& left, HElement*& right, T const& 
 			merge_sort( rightIt, right, less );
 		HElement* first = NULL;
 		++ stepsLeft;
-		typedef bool ( *comp_t )( value_type const&, value_type const&, T const& );
+		typedef bool ( *comp_t )( type_t const&, type_t const&, T const& );
 		comp_t my_comp;
 		if ( f_eOrder == ASCENDING )
-			my_comp = asc_less<value_type, T>;
+			my_comp = asc_less<type_t, T>;
 		else
-			my_comp = desc_less<value_type, T>;
+			my_comp = desc_less<type_t, T>;
 		while ( stepsLeft -- )
 			{
 			if ( my_comp( rightIt->f_tObject, left->f_tObject, less ) )
@@ -1224,9 +1224,9 @@ void HList<value_type>::merge_sort( HElement*& left, HElement*& right, T const& 
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename T>
-void HList<value_type>::insert_sort(
+void HList<type_t>::insert_sort(
 		HElement*& a_rpoBaseLower, HElement*& a_rpoBaseUpper,
 		T const& less )
 	{
@@ -1234,12 +1234,12 @@ void HList<value_type>::insert_sort(
 	if ( a_rpoBaseLower != a_rpoBaseUpper )
 		{
 		HElement* top = a_rpoBaseLower;
-		typedef bool ( *comp_t )( value_type const&, value_type const&, T const& );
+		typedef bool ( *comp_t )( type_t const&, type_t const&, T const& );
 		comp_t my_comp;
 		if ( f_eOrder == ASCENDING )
-			my_comp = asc_less<value_type, T>;
+			my_comp = asc_less<type_t, T>;
 		else
-			my_comp = desc_less<value_type, T>;
+			my_comp = desc_less<type_t, T>;
 		while ( top != a_rpoBaseUpper )
 			{
 			top = top->f_poNext;
@@ -1263,8 +1263,8 @@ void HList<value_type>::insert_sort(
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HList<value_type>::insert( HElement* pos, HElement* elem )
+template<typename type_t>
+void HList<type_t>::insert( HElement* pos, HElement* elem )
 	{
 	M_ASSERT( pos != elem );
 	if ( pos->f_poNext == elem )
@@ -1288,18 +1288,18 @@ void HList<value_type>::insert( HElement* pos, HElement* elem )
 	return;
 	}
 
-template<typename value_type>
-void HList<value_type>::sort( sort_order_t a_eOrder )
+template<typename type_t>
+void HList<type_t>::sort( sort_order_t a_eOrder )
 	{
 	M_PROLOG
-	sort( yaal::less<value_type>, a_eOrder );
+	sort( yaal::less<type_t>, a_eOrder );
 	return;
 	M_EPILOG
 	}
 
-template<typename value_type>
+template<typename type_t>
 template<typename T>
-void HList<value_type>::sort( T const& less, sort_order_t a_eOrder )
+void HList<type_t>::sort( T const& less, sort_order_t a_eOrder )
 	{
 	M_PROLOG
 	f_eOrder = a_eOrder;
@@ -1320,8 +1320,8 @@ void HList<value_type>::sort( T const& less, sort_order_t a_eOrder )
 
 }
 
-template<typename value_type> 
-inline void swap( yaal::hcore::HList<value_type>& a, yaal::hcore::HList<value_type>& b )
+template<typename type_t> 
+inline void swap( yaal::hcore::HList<type_t>& a, yaal::hcore::HList<type_t>& b )
 	{ a.swap( b ); }
 
 }

@@ -46,12 +46,12 @@ extern char const* const n_ppcErrMsgHArray[];
 
 /*! \brief Simplest compund data structure.
  */
-template<typename value_type>
+template<typename type_t>
 class HArray
 	{
-	typedef HArray<value_type> self_t;
+	typedef HArray<type_t> self_t;
 public:
-	typedef value_type value_t;
+	typedef type_t value_type;
 	/*! \brief Error codes for HArray<> operations.
 	 */
 	struct ERROR
@@ -71,19 +71,19 @@ protected:
 public:
 	template<typename const_qual_t>
 	class HIterator;
-	typedef HIterator<value_type> iterator;
-	typedef HIterator<value_type const> const_iterator;
+	typedef HIterator<type_t> iterator;
+	typedef HIterator<type_t const> const_iterator;
 	HArray( void );
 	explicit HArray( int long const& );
-	HArray( int long const&, value_type const& );
+	HArray( int long const&, type_t const& );
 	virtual ~HArray( void );
 	HArray( HArray const& );
 	HArray& operator = ( HArray const& );
-	void resize( int long const&, value_type const& = value_t() );
+	void resize( int long const&, type_t const& = value_type() );
 	void reserve( int long const& );
-	value_type& operator [] ( int long const& );
-	value_type const& operator [] ( int long const& ) const;
-	void push_back( value_type const& );
+	type_t& operator [] ( int long const& );
+	type_t const& operator [] ( int long const& ) const;
+	void push_back( type_t const& );
 	void pop_back( void );
 	int long get_size( void ) const;
 	int long size( void ) const;
@@ -93,10 +93,10 @@ public:
 	bool is_empty( void ) const;
 	void clear( void );
 	bool operator ! ( void ) const;
-	iterator insert( iterator, value_type const& );
+	iterator insert( iterator, type_t const& );
 	template<typename iterator_t>
 	void insert( iterator_t, iterator_t );
-	void insert( iterator, int long, value_type const& );
+	void insert( iterator, int long, type_t const& );
 	iterator erase( iterator );
 	iterator erase( iterator, iterator );
 	iterator begin( void );
@@ -114,8 +114,8 @@ public:
 
 }
 
-template<typename value_type>
-inline void swap( yaal::hcore::HArray<value_type>& a, yaal::hcore::HArray<value_type>& b )
+template<typename type_t>
+inline void swap( yaal::hcore::HArray<type_t>& a, yaal::hcore::HArray<type_t>& b )
 	{ a.swap( b ); }
 
 namespace hcore
@@ -123,15 +123,15 @@ namespace hcore
 
 /*! \brief Iterator for HArray<> data structure.
  */
-template<typename value_type>
+template<typename type_t>
 template<typename const_qual_t>
-class HArray<value_type>::HIterator
+class HArray<type_t>::HIterator
 	{
-	typedef HArray<value_type> array_t;
+	typedef HArray<type_t> array_t;
 	array_t const* _owner;
 	int long _index;
 public:
-	typedef value_type value_t;
+	typedef type_t value_type;
 	HIterator( void ) : _owner( NULL ), _index( 0 ) {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& a_oIt ) : _owner( a_oIt._owner ), _index( a_oIt._index )
@@ -209,20 +209,20 @@ public:
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( _index != it._index ); }
 private:
-	friend class HArray<value_type>;
+	friend class HArray<type_t>;
 	explicit HIterator( array_t const* a_poOwner, int long const& idx )
 		: _owner( a_poOwner ), _index( idx ) {};
 	};
 
-template<typename value_type>
-HArray<value_type>::HArray( void )
+template<typename type_t>
+HArray<type_t>::HArray( void )
 	: _buf(), _size( 0 )
 	{
 	return;
 	}
 
-template<typename value_type>
-HArray<value_type>::HArray( int long const& size_ )
+template<typename type_t>
+HArray<type_t>::HArray( int long const& size_ )
 	: _buf(), _size( 0 )
 	{
 	M_PROLOG
@@ -231,8 +231,8 @@ HArray<value_type>::HArray( int long const& size_ )
 	M_EPILOG
 	}
 
-template<typename value_type>
-HArray<value_type>::HArray( int long const& size_, value_type const& fillWith_ )
+template<typename type_t>
+HArray<type_t>::HArray( int long const& size_, type_t const& fillWith_ )
 	: _buf(), _size( 0 )
 	{
 	M_PROLOG
@@ -241,8 +241,8 @@ HArray<value_type>::HArray( int long const& size_, value_type const& fillWith_ )
 	M_EPILOG
 	}
 
-template<typename value_type>
-HArray<value_type>::~HArray( void )
+template<typename type_t>
+HArray<type_t>::~HArray( void )
 	{
 	M_PROLOG
 	clear();
@@ -250,8 +250,8 @@ HArray<value_type>::~HArray( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HArray<value_type>::clear( void )
+template<typename type_t>
+void HArray<type_t>::clear( void )
 	{
 	M_PROLOG
 	erase( begin(), end() );
@@ -259,49 +259,49 @@ void HArray<value_type>::clear( void )
 	M_EPILOG
 	}
 
-template<typename value_type>
-HArray<value_type>::HArray( HArray const& arr_ )
+template<typename type_t>
+HArray<type_t>::HArray( HArray const& arr_ )
 	: _buf(), _size( 0 )
 	{
 	M_PROLOG
 	if ( arr_._size > 0 )
 		{ 
-		_buf.realloc( chunk_size<value_t>( arr_._size ) );
+		_buf.realloc( chunk_size<value_type>( arr_._size ) );
 		_size = arr_._size;
-		value_t* dst( _buf.get<value_t>() );
-		value_t const* src( arr_._buf.template get<value_t>() );
+		value_type* dst( _buf.get<value_type>() );
+		value_type const* src( arr_._buf.template get<value_type>() );
 		for ( int long i = 0; i < _size; ++ i )
-			new ( dst + i ) value_t( src[ i ] );
+			new ( dst + i ) value_type( src[ i ] );
 		}
 	return;
 	M_EPILOG
 	}
 
-template<typename value_type>
-HArray<value_type>& HArray<value_type>::operator = ( HArray const& arr_ )
+template<typename type_t>
+HArray<type_t>& HArray<type_t>::operator = ( HArray const& arr_ )
 	{
 	M_PROLOG
 	if ( &arr_ != this )
 		{
 		if ( arr_._size > get_capacity() )
 			{
-			HArray<value_t> tmp( arr_ );
+			HArray<value_type> tmp( arr_ );
 			swap( tmp );
 			}
 		else
 			{
-			value_t* dst( _buf.get<value_t>() );
-			value_t const* src( arr_._buf.template get<value_t>() );
+			value_type* dst( _buf.get<value_type>() );
+			value_type const* src( arr_._buf.template get<value_type>() );
 			copy_n( src, _size, dst );
 			if ( arr_._size > _size )
 				{
 				for ( int long i = _size; i < arr_._size; ++ i )
-					new ( dst + i ) value_t( src[ i ] );
+					new ( dst + i ) value_type( src[ i ] );
 				}
 			else if ( arr_._size < _size )
 				{
 				for ( int long i = arr_._size; i < _size; ++ i )
-					dst[ i ].~value_t();
+					dst[ i ].~value_type();
 				}
 			_size = arr_._size;
 			}
@@ -310,8 +310,8 @@ HArray<value_type>& HArray<value_type>::operator = ( HArray const& arr_ )
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HArray<value_type>::resize( int long const& size_, value_type const& fillWith_ )
+template<typename type_t>
+void HArray<type_t>::resize( int long const& size_, type_t const& fillWith_ )
 	{
 	M_PROLOG
 	if ( size_ < 0 )
@@ -319,44 +319,44 @@ void HArray<value_type>::resize( int long const& size_, value_type const& fillWi
 	if ( size_ > _size )
 		{
 		reserve( size_ );
-		value_t* arr( _buf.get<value_t>() );
+		value_type* arr( _buf.get<value_type>() );
 		for ( int long i = _size; i < size_; ++ i )
-			new ( arr + i ) value_t( fillWith_ );
+			new ( arr + i ) value_type( fillWith_ );
 		}
 	else if ( size_ < _size )
 		{
-		value_t* arr( _buf.get<value_t>() );
+		value_type* arr( _buf.get<value_type>() );
 		for ( int long i = size_; i < _size; ++ i )
-			arr[ i ].~value_t();
+			arr[ i ].~value_type();
 		}
 	_size = size_;
 	return;
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HArray<value_type>::reserve( int long const& capacity_ )
+template<typename type_t>
+void HArray<type_t>::reserve( int long const& capacity_ )
 	{
 	M_PROLOG
 	if ( capacity_ < 0 )
 		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_SIZE ], capacity_ );
 	if ( capacity_ > get_capacity() )
 		{
-		HChunk newBuf( chunk_size<value_t>( capacity_ ) );
-		value_t* dst( newBuf.get<value_t>() );
-		value_t* src( _buf.get<value_t>() );
+		HChunk newBuf( chunk_size<value_type>( capacity_ ) );
+		value_type* dst( newBuf.get<value_type>() );
+		value_type* src( _buf.get<value_type>() );
 		for ( int long i = 0; i < _size; ++ i )
-			new ( dst + i ) value_t( src[ i ] );
+			new ( dst + i ) value_type( src[ i ] );
 		for ( int long i = 0; i < _size; ++ i )
-			src[ i ].~value_t();
+			src[ i ].~value_type();
 		_buf.swap( newBuf );
 		}
 	return;
 	M_EPILOG
 	}
 
-template<typename value_type>
-typename HArray<value_type>::iterator HArray<value_type>::erase( iterator first, iterator last )
+template<typename type_t>
+typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first, iterator last )
 	{
 	M_PROLOG
 	if ( last != end() )
@@ -370,14 +370,14 @@ typename HArray<value_type>::iterator HArray<value_type>::erase( iterator first,
 	for ( iterator endIt = end();
 			( first != endIt );
 			++ first, ++ removed )
-		first->~value_t();
+		first->~value_type();
 	_size -= removed;
 	return ( last._index < _size ? last : end() );
 	M_EPILOG
 	}
 
-template<typename value_type>
-typename HArray<value_type>::iterator HArray<value_type>::erase( iterator it )
+template<typename type_t>
+typename HArray<type_t>::iterator HArray<type_t>::erase( iterator it )
 	{
 	M_PROLOG
 	iterator next( it );
@@ -386,118 +386,118 @@ typename HArray<value_type>::iterator HArray<value_type>::erase( iterator it )
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type& HArray<value_type>::operator[] ( int long const& a_lIndex )
+template<typename type_t>
+type_t& HArray<type_t>::operator[] ( int long const& a_lIndex )
 	{
 	M_PROLOG
 	int long idx = ( a_lIndex < 0 ) ? a_lIndex + _size : a_lIndex;
 	if ( ( idx >= _size ) || ( idx < 0 ) )
 		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_INDEX ], idx );
-	return ( _buf.get<value_t>()[ idx ] );
+	return ( _buf.get<value_type>()[ idx ] );
 	M_EPILOG
 	}
 
-template<typename value_type>
-value_type const& HArray<value_type>::operator[] ( int long const& a_lIndex ) const
+template<typename type_t>
+type_t const& HArray<type_t>::operator[] ( int long const& a_lIndex ) const
 	{
 	M_PROLOG
 	int long idx = ( a_lIndex < 0 ) ? a_lIndex + _size : a_lIndex;
 	if ( ( idx >= _size ) || ( idx < 0 ) )
 		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_INDEX ], idx );
-	return ( _buf.get<value_t const>()[ idx ] );
+	return ( _buf.get<value_type const>()[ idx ] );
 	M_EPILOG
 	}
 
-template<typename value_type>
-bool HArray<value_type>::operator ! ( void ) const
+template<typename type_t>
+bool HArray<type_t>::operator ! ( void ) const
 	{
 	M_PROLOG
-	return ( ! _buf.get<value_type>() );
+	return ( ! _buf.get<type_t>() );
 	M_EPILOG
 	}
 
-template<typename value_type>
-int long HArray<value_type>::get_size( void ) const
+template<typename type_t>
+int long HArray<type_t>::get_size( void ) const
 	{
 	M_PROLOG
 	return ( _size );
 	M_EPILOG
 	}
 
-template<typename value_type>
-int long HArray<value_type>::size( void ) const
+template<typename type_t>
+int long HArray<type_t>::size( void ) const
 	{
 	M_PROLOG
 	return ( _size );
 	M_EPILOG
 	}
 
-template<typename value_type>
-bool HArray<value_type>::is_empty( void ) const
+template<typename type_t>
+bool HArray<type_t>::is_empty( void ) const
 	{
 	M_PROLOG
 	return ( _size ? false : true );
 	M_EPILOG
 	}
 
-template<typename value_type>
-bool HArray<value_type>::empty( void ) const
+template<typename type_t>
+bool HArray<type_t>::empty( void ) const
 	{
 	M_PROLOG
 	return ( _size ? false : true );
 	M_EPILOG
 	}
 
-template<typename value_type>
-int long HArray<value_type>::capacity( void ) const
+template<typename type_t>
+int long HArray<type_t>::capacity( void ) const
 	{
 	return ( get_capacity() );
 	}
 
-template<typename value_type>
-int long HArray<value_type>::get_capacity( void ) const
+template<typename type_t>
+int long HArray<type_t>::get_capacity( void ) const
 	{
-	return ( _buf.size() / sizeof ( value_t ) );
+	return ( _buf.size() / sizeof ( value_type ) );
 	}
 
-template<typename value_type>
-typename HArray<value_type>::iterator HArray<value_type>::begin( void )
+template<typename type_t>
+typename HArray<type_t>::iterator HArray<type_t>::begin( void )
 	{
 	return ( iterator( this, 0 ) );
 	}
 
-template<typename value_type>
-typename HArray<value_type>::iterator HArray<value_type>::find( int long const& idx )
+template<typename type_t>
+typename HArray<type_t>::iterator HArray<type_t>::find( int long const& idx )
 	{
 	return ( iterator( this, min( idx, _size ) ) );
 	}
 
-template<typename value_type>
-typename HArray<value_type>::iterator HArray<value_type>::end( void )
+template<typename type_t>
+typename HArray<type_t>::iterator HArray<type_t>::end( void )
 	{
 	return ( iterator( this, _size ) );
 	}
 
-template<typename value_type>
-typename HArray<value_type>::const_iterator HArray<value_type>::begin( void ) const
+template<typename type_t>
+typename HArray<type_t>::const_iterator HArray<type_t>::begin( void ) const
 	{
 	return ( const_iterator( this, 0 ) );
 	}
 
-template<typename value_type>
-typename HArray<value_type>::const_iterator HArray<value_type>::find( int long const& idx ) const
+template<typename type_t>
+typename HArray<type_t>::const_iterator HArray<type_t>::find( int long const& idx ) const
 	{
 	return ( const_iterator( this, min( idx, _size ) ) );
 	}
 
-template<typename value_type>
-typename HArray<value_type>::const_iterator HArray<value_type>::end( void ) const
+template<typename type_t>
+typename HArray<type_t>::const_iterator HArray<type_t>::end( void ) const
 	{
 	return ( const_iterator( this, _size ) );
 	}
 
-template<typename value_type>
-void HArray<value_type>::swap( HArray& other )
+template<typename type_t>
+void HArray<type_t>::swap( HArray& other )
 	{
 	M_PROLOG
 	if ( &other != this )
@@ -510,27 +510,27 @@ void HArray<value_type>::swap( HArray& other )
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HArray<value_type>::push_back( value_type const& val_ )
+template<typename type_t>
+void HArray<type_t>::push_back( type_t const& val_ )
 	{
 	M_PROLOG
 	M_ASSERT( _size <= get_capacity() );
 	if ( _size == get_capacity() )
 		reserve( _size ? _size * 2 : 1 );
-	value_t* arr( _buf.get<value_t>() );
-	new ( arr + _size ) value_t( val_ );
+	value_type* arr( _buf.get<value_type>() );
+	new ( arr + _size ) value_type( val_ );
 	++ _size;
 	return;
 	M_EPILOG
 	}
 
-template<typename value_type>
-void HArray<value_type>::pop_back( void )
+template<typename type_t>
+void HArray<type_t>::pop_back( void )
 	{
 	M_PROLOG
 	M_ASSERT( _size > 0 );
-	value_t* arr( _buf.get<value_t>() );
-	arr[ -- _size ].~value_t();
+	value_type* arr( _buf.get<value_type>() );
+	arr[ -- _size ].~value_type();
 	return;
 	M_EPILOG
 	}

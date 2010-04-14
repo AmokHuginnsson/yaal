@@ -145,6 +145,7 @@ class HPointer
 	HShared* f_poShared;
 	tType* f_ptObject;
 public:
+	typedef tType value_type;
 	HPointer( void );
 	template<typename real_t>
 	explicit HPointer( real_t* const );

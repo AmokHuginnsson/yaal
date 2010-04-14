@@ -42,20 +42,20 @@ class HTree;
 
 /*! \brief Tree based data structure and operations.
  */
-template<typename value_type>
+template<typename type_t>
 class HTree
 	{
 private:
-	typedef HTree<value_type> tree_t;
+	typedef HTree<type_t> tree_t;
 public:
-	typedef value_type value_t;
+	typedef type_t value_type;
 	class HNode;
 	typedef HNode* node_t;
 	typedef HNode const* const_node_t;
 	template<typename const_qual_t>
 	class HIterator;
-	typedef HIterator<value_t> iterator;
-	typedef HIterator<value_t const> const_iterator;
+	typedef HIterator<value_type> iterator;
+	typedef HIterator<value_type const> const_iterator;
 private:
 	HNode* f_poRoot;			/* self explanary */
 public:
@@ -68,9 +68,9 @@ public:
 	node_t create_new_root( void );
 	node_t set_new_root( HNode* );
 	void clear( void );
-	void swap( HTree<value_t>& );
+	void swap( HTree<value_type>& );
 private:
-	friend class HTree<value_t>::HNode;
+	friend class HTree<value_type>::HNode;
 	};
 
 /*! \brief Basic building block of HTree<>.
@@ -79,6 +79,7 @@ template<typename value_t>
 class HTree<value_t>::HNode
 	{
 public:
+	typedef value_t value_type;
 	typedef HList<node_t> branch_t;
 private:
 	value_t f_tData;			/* object itself */
@@ -692,22 +693,22 @@ typename HTree<value_t>::node_t HTree<value_t>::set_new_root( typename HTree<val
 	M_EPILOG
 	}
 
-template<typename value_t>
-typename HTree<value_t>::node_t HTree<value_t>::get_root( void )
+template<typename type_t>
+typename HTree<type_t>::node_t HTree<type_t>::get_root( void )
 	{
 	return ( f_poRoot );
 	}
 
-template<typename value_t>
-typename HTree<value_t>::const_node_t HTree<value_t>::get_root( void ) const
+template<typename type_t>
+typename HTree<type_t>::const_node_t HTree<type_t>::get_root( void ) const
 	{
 	return ( f_poRoot );
 	}
 
 }
 
-template<typename value_t>
-inline void swap( yaal::hcore::HTree<value_t>& a, yaal::hcore::HTree<value_t>& b )
+template<typename type_t>
+inline void swap( yaal::hcore::HTree<type_t>& a, yaal::hcore::HTree<type_t>& b )
 	{ a.swap( b ); }
 
 }

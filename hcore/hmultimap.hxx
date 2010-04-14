@@ -39,48 +39,50 @@ namespace hcore
 
 struct HMultiMapStorage
 	{
-	template<typename key_t, typename value_t>
+	template<typename key_type_t, typename value_type_t>
 	struct HPacked
 		{
-		typedef value_t value_type_t;
-		typedef yaal::hcore::HPair<key_t, value_t> elem_t;
-		typedef yaal::hcore::HPair<key_t, trait::reference<value_t> > accessor_elem_t;
+		typedef value_type_t data_type;
+		typedef data_type stored_type;
+		typedef yaal::hcore::HPair<key_type_t, value_type_t> value_type;
+		typedef yaal::hcore::HPair<key_type_t, trait::reference<value_type_t> > accessor_elem_t;
 		template<typename const_qual_t>
 		struct const_aware_type
 			{
 			typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
-							elem_t const,
+							value_type const,
 							accessor_elem_t>::type accessor_t;
 			typedef accessor_t accessor_ptr_t;
 			template<typename key_provider_t, typename value_provider_t>
 			static accessor_t accessor( key_provider_t const& key_, value_provider_t& val_ )
 				{ return ( accessor_t( key_, ref( val_ ) ) ); }
 			};
-		static value_type_t value( key_t const&, value_t const& val_ )
+		static data_type value( key_type_t const&, value_type_t const& val_ )
 			{ return ( val_ ); }
-		static value_type_t value( elem_t const& elem_ )
+		static data_type value( value_type const& elem_ )
 			{ return ( elem_.second ); }
 		};
-	template<typename key_t, typename value_t>
+	template<typename key_type_t, typename value_type_t>
 	struct HTransparent
 		{
-		typedef yaal::hcore::HPair<key_t, value_t> value_type_t;
+		typedef yaal::hcore::HPair<key_type_t, value_type_t> value_type;
+		typedef value_type stored_type;
 		template<typename const_qual_t>
 		struct const_aware_type
 			{
 			typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
-							value_type_t const&,
-							value_type_t&>::type accessor_t;
+							value_type const&,
+							value_type&>::type accessor_t;
 			typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
-							value_type_t const*,
-							value_type_t*>::type accessor_ptr_t;
+							value_type const*,
+							value_type*>::type accessor_ptr_t;
 			template<typename key_provider_t, typename value_provider_t>
 			static accessor_t accessor( key_provider_t const&, value_provider_t& val_ )
 				{ return ( val_ ); }
 			};
-		static value_type_t value( key_t const& key_, value_t const& val_ )
-			{ return ( value_type_t( key_, val_ ) ); }
-		static value_type_t value( value_type_t const& elem_ )
+		static value_type value( key_type_t const& key_, value_type_t const& val_ )
+			{ return ( value_type( key_, val_ ) ); }
+		static value_type value( value_type const& elem_ )
 			{ return ( elem_ ); }
 		};
 	};
@@ -90,27 +92,27 @@ struct HMultiMapStorage
  * HMultiMap<> is a template representing self balancing binary search tree
  * data structure that holds pairs of keys and lists of values.
  *
- * \tparam key_type - type of key held in map.
- * \tparam value_type - type of value held in map.
+ * \tparam key_type_t - type of key held in map.
+ * \tparam value_type_t - type of value held in map.
  * \tparam helper_t - HSBBSTree plugable code.
  */
-template<typename key_type, typename value_type,
+template<typename key_type_t, typename value_type_t,
 	template<typename, typename>class storage_policy_t = HMultiMapStorage::HTransparent,
-	typename helper_t = map_helper<key_type const, HPointer<HList<typename storage_policy_t<key_type const, value_type>::value_type_t > > > >
+	typename helper_t = map_helper<key_type_t const, HPointer<HList<typename storage_policy_t<key_type_t const, value_type_t>::stored_type > > > >
 class HMultiMap
 	{
-	typedef key_type key_t;
-	typedef value_type value_t;
-	typedef storage_policy_t<key_t const, value_t> storage_t;
-	typedef HList<typename storage_t::value_type_t> value_list_t;
+	typedef key_type_t key_type;
+	typedef value_type_t data_type;
+	typedef storage_policy_t<key_type const, data_type> storage_t;
+	typedef HList<typename storage_t::stored_type> value_list_t;
 	typedef HPointer<value_list_t> value_list_ptr_t;
-	typedef HMap<key_t, value_list_ptr_t, helper_t> multimap_engine_t;
-	typedef HPair<key_t const, value_t> map_elem_t;
+	typedef HMap<key_type, value_list_ptr_t, helper_t> multimap_engine_t;
+	typedef HPair<key_type const, data_type> value_type;
 public:
 	template<typename const_qual_t>
 	class HIterator;
-	typedef HIterator<map_elem_t> iterator;
-	typedef HIterator<map_elem_t const> const_iterator;
+	typedef HIterator<value_type> iterator;
+	typedef HIterator<value_type const> const_iterator;
 private:
 	multimap_engine_t f_oEngine;
 public:
@@ -126,7 +128,7 @@ public:
 		}
 	bool empty( void ) const
 		{ return ( f_oEngine.empty() );	}
-	iterator push_back( key_t const& key, value_t const& value )
+	iterator push_back( key_type const& key, data_type const& value )
 		{
 		M_PROLOG
 		typename multimap_engine_t::iterator major = ensure_key( key );
@@ -135,7 +137,7 @@ public:
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 		}
-	iterator insert( map_elem_t const& e )
+	iterator insert( value_type const& e )
 		{
 		typename multimap_engine_t::iterator major = ensure_key( e.first );
 		major->second->push_back( storage_t::value( e ) );
@@ -151,7 +153,7 @@ public:
 		return;
 		M_EPILOG
 		}
-	iterator push_front( key_t const& key, value_t const& value )
+	iterator push_front( key_type const& key, data_type const& value )
 		{
 		M_PROLOG
 		typename multimap_engine_t::iterator major = ensure_key( key );
@@ -169,7 +171,7 @@ public:
 		return;
 		M_EPILOG
 		}
-	void remove_set( key_t const& key )
+	void remove_set( key_type const& key )
 		{
 		M_PROLOG
 		iterator it = find( key );
@@ -190,7 +192,7 @@ public:
 		return ( newIt );
 		M_EPILOG
 		}
-	const_iterator find( key_t const& key ) const
+	const_iterator find( key_type const& key ) const
 		{
 		M_PROLOG
 		typename multimap_engine_t::const_iterator major = f_oEngine.find( key );
@@ -200,7 +202,7 @@ public:
 		return ( const_iterator( this, major, minor ) );
 		M_EPILOG
 		}
-	iterator find( key_t const& key )
+	iterator find( key_type const& key )
 		{
 		M_PROLOG
 		typename multimap_engine_t::iterator major = f_oEngine.find( key );
@@ -210,7 +212,7 @@ public:
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 		}
-	const_iterator upper_bound( key_t const& key ) const
+	const_iterator upper_bound( key_type const& key ) const
 		{
 		M_PROLOG
 		typename multimap_engine_t::const_iterator major = f_oEngine.find( key );
@@ -222,7 +224,7 @@ public:
 		return ( const_iterator( this, major, minor ) );
 		M_EPILOG
 		}
-	iterator upper_bound( key_t const& key )
+	iterator upper_bound( key_type const& key )
 		{
 		M_PROLOG
 		typename multimap_engine_t::iterator major = f_oEngine.find( key );
@@ -284,7 +286,7 @@ public:
 		{ return ( iterator( this, f_oEngine.rend(), typename value_list_t::iterator() ) ); }
 	void clear( void )
 		{ f_oEngine.clear(); }
-	int long count( key_t const& key ) const
+	int long count( key_type const& key ) const
 		{
 		M_PROLOG
 		typename multimap_engine_t::const_iterator major = f_oEngine.find( key );
@@ -296,7 +298,7 @@ public:
 		}
 
 private:
-	typename multimap_engine_t::iterator ensure_key( key_t const& key )
+	typename multimap_engine_t::iterator ensure_key( key_type const& key )
 		{
 		M_PROLOG
 		typename multimap_engine_t::iterator major = f_oEngine.find( key );
@@ -312,13 +314,13 @@ private:
 
 /*! \brief Forward iterator for HMultiMap<>.
  */
-template<typename key_type, typename value_type, template<typename, typename> class storage_policy_t, typename helper_t>
+template<typename key_type_t, typename value_type_t, template<typename, typename> class storage_policy_t, typename helper_t>
 template<typename const_qual_t>
-class HMultiMap<key_type, value_type, storage_policy_t, helper_t>::HIterator
+class HMultiMap<key_type_t, value_type_t, storage_policy_t, helper_t>::HIterator
 	{
-	typedef key_type key_t;
-	typedef value_type value_t;
-	typedef HMultiMap<key_t, value_t, storage_policy_t, helper_t> multi_map_t;
+	typedef key_type_t key_type;
+	typedef value_type_t data_type;
+	typedef HMultiMap<key_type, data_type, storage_policy_t, helper_t> multi_map_t;
 	typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
 					typename multi_map_t::multimap_engine_t::const_iterator,
 					typename multi_map_t::multimap_engine_t::iterator>::type key_iterator_t;
@@ -396,7 +398,7 @@ public:
 	bool operator != ( HIterator const& it ) const
 		{ return ( ! ( ( f_oMajor == it.f_oMajor ) && ( f_oMinor == it.f_oMinor ) ) ); }
 private:
-	friend class HMultiMap<key_t, value_t, storage_policy_t, helper_t>;
+	friend class HMultiMap<key_type, data_type, storage_policy_t, helper_t>;
 	explicit HIterator( multi_map_t const* const a_poOwner,
 			key_iterator_t const& major,
 			value_iterator_t const& minor ) : f_poOwner( a_poOwner ), f_oMajor( major ), f_oMinor( minor ) {};
