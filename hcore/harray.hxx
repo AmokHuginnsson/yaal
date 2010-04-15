@@ -340,9 +340,10 @@ void HArray<type_t>::reserve( int long const& capacity_ )
 	M_PROLOG
 	if ( capacity_ < 0 )
 		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_SIZE ], capacity_ );
-	if ( capacity_ > get_capacity() )
+	int long curCapacity( get_capacity() );
+	if ( capacity_ > curCapacity )
 		{
-		HChunk newBuf( chunk_size<value_type>( capacity_ ) );
+		HChunk newBuf( chunk_size<value_type>( max( capacity_, curCapacity * 2 ) ) );
 		value_type* dst( newBuf.get<value_type>() );
 		value_type* src( _buf.get<value_type>() );
 		for ( int long i = 0; i < _size; ++ i )
@@ -401,7 +402,7 @@ template<typename type_t>
 type_t const& HArray<type_t>::operator[] ( int long const& a_lIndex ) const
 	{
 	M_PROLOG
-	int long idx = ( a_lIndex < 0 ) ? a_lIndex + _size : a_lIndex;
+	int long idx( ( a_lIndex < 0 ) ? a_lIndex + _size : a_lIndex );
 	if ( ( idx >= _size ) || ( idx < 0 ) )
 		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_INDEX ], idx );
 	return ( _buf.get<value_type const>()[ idx ] );
@@ -514,9 +515,10 @@ template<typename type_t>
 void HArray<type_t>::push_back( type_t const& val_ )
 	{
 	M_PROLOG
-	M_ASSERT( _size <= get_capacity() );
-	if ( _size == get_capacity() )
-		reserve( _size ? _size * 2 : 1 );
+	int long curCapacity( get_capacity() );
+	M_ASSERT( _size <= curCapacity );
+	if ( _size == curCapacity )
+		reserve( curCapacity + 1 );
 	value_type* arr( _buf.get<value_type>() );
 	new ( arr + _size ) value_type( val_ );
 	++ _size;
