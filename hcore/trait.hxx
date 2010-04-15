@@ -182,6 +182,40 @@ template<typename tType, typename t0_t, typename t1_t,
 	typename t6_t, typename t7_t, typename t8_t, typename t9_t, typename t10_t>
 int const count_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t>::value;
 
+/*! \brief Meta function used to make reference from type.
+ *
+ * \tparam T - type to make reference of.
+ * \retval type - a type T with reference trait.
+ */
+template<typename T>
+struct make_reference;
+
+/* \cond */
+template<>
+struct make_reference<void>
+	{
+	typedef void type;
+	};
+
+template<>
+struct make_reference<void const>
+	{
+	typedef void type;
+	};
+
+template<typename T>
+struct make_reference<T&>
+	{
+	typedef T& type;
+	};
+
+template<typename T>
+struct make_reference
+	{
+	typedef T& type;
+	};
+/* \endcond */
+
 /*! \brief Meta function used to strip reference from type.
  *
  * \tparam T - type to strip reference from.
@@ -201,10 +235,21 @@ struct strip_reference<T&>
 	};
 /*! \endcond */
 
+/*! \brief Meta function used to add one level of pointer to a type.
+ *
+ * \tparam T - type to add pointer to.
+ * \retval type - pointer to T type.
+ */
+template<typename T>
+struct make_pointer
+	{
+	typedef T* type;
+	};
+
 /*! \brief Meta function used to strip one level of pointer from type.
  *
  * \tparam T - type to strip pointer from.
- * \retval type - stripped new type 
+ * \retval type - stripped new type.
  */
 template<typename T>
 struct strip_pointer
@@ -217,6 +262,25 @@ template<typename T>
 struct strip_pointer<T*>
 	{
 	typedef T type;
+	};
+/*! \endcond */
+
+/*! \brief Meta function used to add const to type.
+ *
+ * \tparam T - type to add const to.
+ * \retval type - a type with constness trait.
+ */
+template<typename T>
+struct make_const
+	{
+	typedef T const type;
+	};
+
+/*! \cond */
+template<typename T>
+struct make_const<T const>
+	{
+	typedef T const type;
 	};
 /*! \endcond */
 

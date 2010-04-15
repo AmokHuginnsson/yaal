@@ -28,6 +28,7 @@ Copyright:
 #define YAAL_HCORE_HPOINTER_HXX_INCLUDED
 
 #include "hcore/base.hxx"
+#include "hcore/trait.hxx"
 
 namespace yaal
 {
@@ -59,7 +60,7 @@ template<typename tType, typename pointer_type_t>
 struct HPointerStrict
 	{
 	static tType* raw( tType* );
-	static tType& object_at( tType*, int );
+	static typename trait::make_reference<tType>::type object_at( tType*, int );
 	template<typename DELETER_t>
 	static void delete_pointee( DELETER_t const&, tType*& );
 	template<typename ptr_t>
@@ -146,6 +147,8 @@ class HPointer
 	tType* f_ptObject;
 public:
 	typedef tType value_type;
+	typedef typename trait::make_reference<tType>::type reference;
+	typedef typename trait::make_reference<tType const>::type const_reference;
 	HPointer( void );
 	template<typename real_t>
 	explicit HPointer( real_t* const );
@@ -156,10 +159,10 @@ public:
 	HPointer& operator = ( HPointer const& );
 	template<typename hier_t, template<typename, typename>class alien_access_t>
 	HPointer& operator = ( HPointer<hier_t, pointer_type_t, alien_access_t> const& );
-	tType const& operator* ( void ) const;
-	tType& operator* ( void );
-	tType const& operator[] ( int ) const;
-	tType& operator[] ( int );
+	const_reference operator* ( void ) const;
+	reference operator* ( void );
+	const_reference operator[] ( int ) const;
+	reference operator[] ( int );
 	template<typename hier_t, template<typename, typename>class alien_access_t>
 	bool operator == ( HPointer<hier_t, pointer_type_t, alien_access_t> const& ) const;
 	template<typename hier_t>
@@ -211,7 +214,7 @@ void HPointerStrict<tType, pointer_type_t>::delete_pointee( DELETER_t const& a_D
 	}
 
 template<typename tType, typename pointer_type_t>
-tType& HPointerStrict<tType, pointer_type_t>::object_at( tType* a_ptPointer, int a_iIndex )
+typename trait::make_reference<tType>::type HPointerStrict<tType, pointer_type_t>::object_at( tType* a_ptPointer, int a_iIndex )
 	{
 	return ( pointer_type_t::object_at( a_ptPointer[ a_iIndex ], a_iIndex ) );
 	}
@@ -430,7 +433,7 @@ void HPointer<tType, pointer_type_t, access_type_t>::reset( void )
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-tType const& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) const
+typename HPointer<tType, pointer_type_t, access_type_t>::const_reference HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) const
 	{
 	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	return ( *f_ptObject );
@@ -438,7 +441,7 @@ tType const& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) 
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-tType& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void )
+typename HPointer<tType, pointer_type_t, access_type_t>::reference HPointer<tType, pointer_type_t, access_type_t>::operator* ( void )
 	{
 	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	return ( *f_ptObject );
@@ -446,7 +449,7 @@ tType& HPointer<tType, pointer_type_t, access_type_t>::operator* ( void )
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-tType const& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex ) const
+typename HPointer<tType, pointer_type_t, access_type_t>::const_reference HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex ) const
 	{
 	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	M_ASSERT( a_iIndex >= 0 );
@@ -455,7 +458,7 @@ tType const& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-tType& HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex )
+typename HPointer<tType, pointer_type_t, access_type_t>::reference HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int a_iIndex )
 	{
 	M_ASSERT( f_poShared && ( f_poShared->f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 	M_ASSERT( a_iIndex >= 0 );
