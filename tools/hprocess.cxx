@@ -114,7 +114,7 @@ void HProcess::unregister_file_descriptor_handler( int a_iFileDescriptor )
 		f_oDroppedFd.push_back( a_iFileDescriptor );
 	else
 		{
-		bool fail = f_oFileDescriptorHandlers.remove( a_iFileDescriptor );
+		bool fail( f_oFileDescriptorHandlers.erase( a_iFileDescriptor ) == 1 );
 		M_ASSERT( ! fail );
 		}
 	return;
@@ -126,12 +126,12 @@ int HProcess::reconstruct_fdset( void )
 	M_PROLOG
 	f_sLatency.tv_sec = f_iLatencySeconds;
 	f_sLatency.tv_usec = f_iLatencyMicroseconds;
-	FD_ZERO ( & f_xFileDescriptorSet );
+	FD_ZERO( &f_xFileDescriptorSet );
 	if ( ! f_oFileDescriptorHandlers.size() )
 		return ( -1 );
 /* FD_SET is a macro and first argument is evaluated twice ! */
 	for ( process_filedes_map_t::iterator it = f_oFileDescriptorHandlers.begin(); it != f_oFileDescriptorHandlers.end(); ++ it )
-		FD_SET ( it->key, & f_xFileDescriptorSet );
+		FD_SET( it->first, &f_xFileDescriptorSet );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -160,9 +160,9 @@ int HProcess::run( void )
 			for ( process_filedes_map_t::iterator it = f_oFileDescriptorHandlers.begin();
 					it != f_oFileDescriptorHandlers.end(); ++ it )
 				{
-				if ( FD_ISSET( it->key, &f_xFileDescriptorSet ) )
+				if ( FD_ISSET( it->first, &f_xFileDescriptorSet ) )
 					{
-					static_cast<void>( ( this->*(it->value) )( it->key ) );
+					static_cast<void>( ( this->*(it->second) )( it->first ) );
 					f_iIdleCycles = 0;
 					}
 				}

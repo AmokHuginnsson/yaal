@@ -56,40 +56,40 @@ HHandler::~HHandler ( void )
 	M_EPILOG
 	}
 
-int HHandler::register_preprocess_handler_internal ( int a_iCodeCount, int const * a_piCodes,
+int HHandler::register_preprocess_handler_internal( int a_iCodeCount, int const * a_piCodes,
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_piCodes )
 		for ( l_iCtr = 0; l_iCtr < a_iCodeCount; l_iCtr ++ )
-			f_oPreprocessHandlers [ a_piCodes [ l_iCtr ] ] = HANDLER;
+			f_oPreprocessHandlers[ a_piCodes [ l_iCtr ] ] = HANDLER;
 	else
-		f_oPreprocessHandlers [ a_iCodeCount ] = HANDLER;
+		f_oPreprocessHandlers[ a_iCodeCount ] = HANDLER;
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HHandler::register_postprocess_handler_internal ( int a_iCodeCount, int const * a_piCodes,
+int HHandler::register_postprocess_handler_internal( int a_iCodeCount, int const * a_piCodes,
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
 	if ( a_piCodes )
 		for ( l_iCtr = 0; l_iCtr < a_iCodeCount; l_iCtr ++ )
-			f_oPostprocessHandlers [ a_piCodes [ l_iCtr ] ] = HANDLER;
+			f_oPostprocessHandlers[ a_piCodes [ l_iCtr ] ] = HANDLER;
 	else
-		f_oPostprocessHandlers [ a_iCodeCount ] = HANDLER;
+		f_oPostprocessHandlers[ a_iCodeCount ] = HANDLER;
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HHandler::process_input_with_handlers( int a_iCode, const process_handler_key_map_t & a_oMap )
+int HHandler::process_input_with_handlers( int a_iCode, process_handler_key_map_t const& a_oMap )
 	{
 	M_PROLOG
-	HANDLER_t HANDLER = NULL;
-	if ( ! a_oMap.get( a_iCode, HANDLER ) )
-		a_iCode = ( this->*HANDLER )( a_iCode, NULL );
+	process_handler_key_map_t::const_iterator it( a_oMap.find( a_iCode ) );
+	if ( it != a_oMap.end() )
+		a_iCode = ( this->*( it->second ) )( a_iCode, NULL );
 	return ( a_iCode );
 	M_EPILOG
 	}
@@ -97,14 +97,14 @@ int HHandler::process_input_with_handlers( int a_iCode, const process_handler_ke
 HString HHandler::process_command( void )
 	{
 	M_PROLOG
-	HANDLER_t HANDLER = NULL;
 	HString l_oCommand;
 	if ( ! f_oCommand.is_empty() )
 		{
 		l_oCommand = HTokenizer( f_oCommand, " \t" )[ 0 ];
-		if ( ! f_oCommandHandlers.get( l_oCommand, HANDLER ) )
+		process_handler_command_map_t::iterator it( f_oCommandHandlers.find( l_oCommand ) );
+		if ( it != f_oCommandHandlers.end() )
 			{
-			static_cast<void>( ( this->*HANDLER )( 0, f_oCommand.raw() ) );
+			static_cast<void>( ( this->*( it->second ) )( 0, f_oCommand.raw() ) );
 			f_oCommand = "";
 			}
 		}

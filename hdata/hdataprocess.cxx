@@ -155,8 +155,12 @@ void HDataProcess::build_menu_item( HXml::HConstNodeProxy const& a_rsNode,
 				HXml::HNode::properties_t::const_iterator nameIt = props.find( "name" );
 				if ( nameIt != props.end() )
 					contents = nameIt->second;
-				if ( a_roHandlers.get( contents, a_rsMenuItem.HANDLER ) && f_oAutoHandlers.get( contents, a_rsMenuItem.HANDLER ) )
+				menu_handlers_map_t::const_iterator handle( a_roHandlers.find( contents ) );
+				if ( handle == a_roHandlers.end() )
+					handle = f_oAutoHandlers.find( contents );
+				if ( handle == f_oAutoHandlers.end() )
 					M_THROW( HString( _( "no such handler: " ) ) + contents, errno );
+				a_rsMenuItem.HANDLER = handle->second;
 				HXml::HNode::properties_t::const_iterator paramIt = props.find( "param" );
 				if ( paramIt != props.end() )
 					a_rsMenuItem.f_pvParam = const_cast<HString*>( &paramIt->second );

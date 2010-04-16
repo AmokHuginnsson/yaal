@@ -37,19 +37,19 @@ namespace hcore
 
 /*! \brief Implementation of ordered pair concept.
  *
- * \tparam first_type - type of first pair element.
- * \tparam second_type - type of second pair element.
+ * \tparam first_t - type of first pair element.
+ * \tparam second_t - type of second pair element.
  */
-template<typename first_type, typename second_type>
+template<typename first_t, typename second_t>
 class HPair
 	{
 public:
-	typedef first_type first_t;
-	typedef second_type second_t;
-	first_t first;
-	second_t second;
+	typedef first_t first_type;
+	typedef second_t second_type;
+	first_type first;
+	second_type second;
 	HPair( void ) : first(), second() {}
-	HPair( first_t const& key, second_t const& value ) : first( key ), second( value ) {}
+	HPair( first_type const& key, second_type const& value ) : first( key ), second( value ) {}
 	HPair( HPair const& pair ) : first( pair.first ), second( pair.second ) {}
 	template<typename alt_first_t, typename alt_second_t>
 	HPair( HPair<alt_first_t, alt_second_t> const& p ) : first( p.first ), second( p.second ) {}
@@ -75,9 +75,9 @@ public:
 		}
 	};
 
-template<typename first_t, typename second_t>
-HPair<first_t, second_t> make_pair( first_t const& first, second_t const& second )
-	{ return ( HPair<first_t, second_t>( first, second ) ); }
+template<typename first_type, typename second_type>
+HPair<first_type, second_type> make_pair( first_type const& first, second_type const& second )
+	{ return ( HPair<first_type, second_type>( first, second ) ); }
 
 }
 

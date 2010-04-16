@@ -48,6 +48,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hopenssl.hxx"
 #include "hsocket.hxx"
 #include "hcall.hxx"
+#include "xalloc.hxx"
 
 namespace yaal
 {

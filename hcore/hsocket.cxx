@@ -164,10 +164,11 @@ void HSocket::shutdown_client( int a_iFileDescriptor )
 	ptr_t l_oClient;
 	if ( ! f_poClients )
 		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
-	if ( f_poClients->get( a_iFileDescriptor, l_oClient ) )
+	clients_t::iterator it( f_poClients->find( a_iFileDescriptor ) );
+	if ( it == f_poClients->end() )
 		M_THROW( _( "no such client" ), a_iFileDescriptor );
-	M_ASSERT( !! l_oClient );
-	f_poClients->remove( a_iFileDescriptor );
+	M_ASSERT( !! it->second );
+	f_poClients->erase( a_iFileDescriptor );
 	return;
 	M_EPILOG
 	}
@@ -233,7 +234,7 @@ HSocket::ptr_t HSocket::accept( void )
 	l_oSocket->f_bNeedShutdown = true;
 	l_oSocket->set_timeout( f_iTimeOut );
 	::memcpy( l_oSocket->f_pvAddress, l_psAddress, l_iAddressSize );
-	if ( f_poClients->has_key( l_iFileDescriptor ) )
+	if ( f_poClients->find( l_iFileDescriptor ) != f_poClients->end() )
 		M_THROW( _( "inconsitent client list state" ), l_iFileDescriptor );
 	f_poClients->operator[]( l_iFileDescriptor ) = l_oSocket;
 	return ( l_oSocket );
@@ -324,8 +325,10 @@ HSocket::ptr_t HSocket::get_client( int const a_iFileDescriptor ) const
 	ptr_t l_oClient;
 	if ( ! f_poClients )
 		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
-	f_poClients->get( a_iFileDescriptor, l_oClient );
-	return ( l_oClient );
+	clients_t::iterator it( f_poClients->find( a_iFileDescriptor ) );
+	if ( it == f_poClients->end() )
+		M_THROW( _( "no such client" ), a_iFileDescriptor );
+	return ( it->second );
 	M_EPILOG
 	}
 

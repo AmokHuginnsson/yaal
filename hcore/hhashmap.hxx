@@ -27,13 +27,11 @@ Copyright:
 #ifndef YAAL_HCORE_HHASHMAP_HXX_INCLUDED
 #define YAAL_HCORE_HHASHMAP_HXX_INCLUDED
 
-#include <cstddef>
-#include <cstdlib>
 #include <new>
 
-#include "hcore/xalloc.hxx"
+#include "hcore/hchunk.hxx"
+#include "hcore/hpair.hxx"
 #include "hcore/hexception.hxx"
-#include "hcore/hstring.hxx"
 
 namespace yaal
 {
@@ -41,130 +39,124 @@ namespace yaal
 namespace hcore
 {
 
-extern int long unsigned const* const g_pulPrimes;
+extern int long const* const g_pulPrimes;
 
-template<typename key_type>
-inline int long unsigned hash( key_type const& a_rtKey )
+template<typename key_t>
+inline int long hash( key_t const& a_rtKey )
 	{
 	return ( static_cast<int long unsigned>( a_rtKey ) );
 	}
 
 /*! \brief Hash map container implementation.
  */
-template<typename key_type, typename value_type>
+template<typename key_t, typename data_t>
 class HHashMap
 	{
-	typedef HHashMap<key_type, value_type> self_t;
+	typedef HHashMap<key_t, data_t> self_t;
 public:
-	typedef key_type key_t;
-	typedef value_type value_t;
+	typedef key_t key_type;
+	typedef data_t data_type;
+	typedef HPair<key_t, data_t> value_type;
 	template<typename const_qual_t>
 	class HIterator;
 private:
 	class HAtom
 		{
 	private:
-		/*{*/
-		HAtom* f_poNext;
-		/*}*/
-	public:
-		/*{*/
-		key_type const	key;
-		value_type	value;
-		HAtom( key_type const& );
+		HAtom* _next;
+		value_type _value;
+		HAtom( key_t const&, data_t const& );
 		virtual ~HAtom( void );
-		/*}*/
 	private:
-		/*{*/
 		HAtom( HAtom const& );
 		HAtom& operator = ( HAtom const& );
-		/*}*/
-		friend class HHashMap<key_type, value_type>;
+		friend class HHashMap<key_t, data_t>;
 		template<typename const_qual_t>
 		friend class HIterator;
 		};
-	int long unsigned f_ulPrime;
-	int f_ulSize;
-	HAtom** f_ppoAtomArray;
+	int long _prime;
+	int _size;
+	HChunk _buckets;
 public:
-	typedef HIterator<HAtom> iterator;
-	typedef HIterator<HAtom const> const_iterator;
+	typedef HIterator<value_type> iterator;
+	typedef HIterator<value_type const> const_iterator;
 	HHashMap( size_t ); /* Lower bound of size of map's table */
 	HHashMap( HHashMap const& );
 	virtual ~HHashMap( void );
 	HHashMap& operator = ( HHashMap const& );
-	value_type& operator [] ( key_type const& );
+	data_t& operator [] ( key_t const& );
 	const_iterator begin( void ) const;
 	iterator begin( void );
 	const_iterator end( void ) const;
 	iterator end( void );
-	const_iterator find( key_type const& ) const;
-	iterator find( key_type const& );
-	iterator insert( key_type const&, value_type const& );
+	const_iterator find( key_t const& ) const;
+	iterator find( key_t const& );
+	iterator insert( key_t const&, data_t const& );
 	void erase( iterator );
-	bool has_key( key_type const& ) const;
-	bool get( key_type const&, value_type& ) const;
 
 	/*! \brief  Remove given key from map.
 	 *
 	 * \param  key Key to be removed.
-	 * \return  True in case of failure.
+	 * \return  Number of erased elements.
 	 */
-	bool remove( key_type const& key );
+	int long erase( key_t const& key );
 	void clear( void );
 	int size( void ) const;
+	void swap( HHashMap& );
 private:
-	bool find( key_type const&, int long unsigned&, HAtom*& ) const;
+	bool find( key_t const&, int long&, HAtom*& ) const;
 	};
 
 /*! \brief Iterator for HHashMap<> data structure.
  */
-template<typename key_type, typename value_type>
+template<typename key_t, typename data_t>
 template<typename const_qual_t>
-class HHashMap<key_type, value_type>::HIterator
+class HHashMap<key_t, data_t>::HIterator
 	{
-	typedef HHashMap<key_type, value_type> owner_t;
-	owner_t const* f_poOwner;
-	int long unsigned f_ulIndex;
-	HAtom* f_poAtomPtr;
+	typedef typename trait::copy_const<const_qual_t, HHashMap<key_t, data_t> >::type owner_t;
+	owner_t* _owner;
+	int long _index;
+	typedef typename trait::copy_const<const_qual_t, HAtom>::type atom_t;
+	atom_t* _atom;
 public:
-	typedef key_type key_t;
-	typedef value_type value_t;
-	HIterator( void ) : f_poOwner( NULL ), f_ulIndex( 0 ), f_poAtomPtr( NULL ) {}
+	typedef key_t key_type;
+	typedef data_t data_type;
+	HIterator( void ) : _owner( NULL ), _index( 0 ), _atom( NULL ) {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& a_oIt )
-		: f_poOwner( a_oIt.f_poOwner ), f_ulIndex( a_oIt.f_ulIndex ),
-		f_poAtomPtr( a_oIt.f_poAtomPtr )
+	HIterator( HIterator<other_const_qual_t> const& it_ )
+		: _owner( it_._owner ), _index( it_._index ),
+		_atom( it_._atom )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
-	HIterator& operator = ( HIterator const& a_oIt )
+	HIterator& operator = ( HIterator const& it_ )
 		{
-		if ( &a_oIt != this )
+		if ( &it_ != this )
 			{
-			f_poOwner = a_oIt.f_poOwner;
-			f_ulIndex = a_oIt.f_ulIndex;
-			f_poAtomPtr = a_oIt.f_poAtomPtr;
+			_owner = it_._owner;
+			_index = it_._index;
+			_atom = it_._atom;
 			}
 		return ( *this );
 		}
 	HIterator& operator ++ ( void )
 		{
-		if ( f_poAtomPtr )
+		if ( _atom )
 			{
-			f_poAtomPtr = f_poAtomPtr->f_poNext;
-			if ( ! f_poAtomPtr )
-				f_ulIndex ++;
+			_atom = _atom->_next;
+			if ( ! _atom )
+				_index ++;
 			}
-		if ( ! f_poAtomPtr )
+		if ( ! _atom )
 			{
-			while ( ( f_ulIndex < f_poOwner->f_ulPrime ) && ! f_poOwner->f_ppoAtomArray[ f_ulIndex ] )
-				f_ulIndex ++;
-			if ( f_ulIndex < f_poOwner->f_ulPrime )
-				f_poAtomPtr = f_poOwner->f_ppoAtomArray[ f_ulIndex ];
+			typename trait::copy_const<const_qual_t, atom_t*>::type* buckets( _owner->_buckets.template get<atom_t*>() );
+			while ( ( _index < _owner->_prime ) && ! buckets[ _index ] )
+				_index ++;
+			if ( _index < _owner->_prime )
+				_atom = buckets[ _index ];
 			}
-		if ( ! f_poAtomPtr )
-			f_ulIndex = f_poOwner->f_ulPrime;
+		if ( ! _atom )
+			_index = _owner->_prime;
 		return ( *this );
 		}
 	HIterator const operator ++ ( int )
@@ -185,180 +177,180 @@ public:
 		}
 	const_qual_t& operator* ( void )
 		{
-		M_ASSERT( f_poAtomPtr );
-		return ( *f_poAtomPtr );
+		M_ASSERT( _atom );
+		return ( _atom->_value );
 		}
 	const_qual_t& operator* ( void ) const
 		{
-		M_ASSERT( f_poAtomPtr );
-		return ( *f_poAtomPtr );
+		M_ASSERT( _atom );
+		return ( *_atom );
 		}
 	const_qual_t* operator-> ( void )
-		{ return ( f_poAtomPtr ); }
+		{ return ( &_atom->_value ); }
 	const_qual_t* operator-> ( void ) const
-		{ return ( f_poAtomPtr ); }
+		{ return ( &_atom->_value ); }
 	template<typename other_const_qual_t>
 	bool operator == ( HIterator<other_const_qual_t> const& it ) const
 		{
-		M_ASSERT( f_poOwner == it.f_poOwner );
-		return ( ( f_ulIndex == it.f_ulIndex ) && ( f_poAtomPtr == it.f_poAtomPtr ) );
+		M_ASSERT( _owner == it._owner );
+		return ( ( _index == it._index ) && ( _atom == it._atom ) );
 		}
 	template<typename other_const_qual_t>
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( ! operator == ( it ) ); }
 private:
-	friend class HHashMap<key_type, value_type>;
-	explicit HIterator( owner_t const* a_poOwner, int unsigned long a_ulIndex, HAtom* a_poAtomPtr )
-		: f_poOwner( a_poOwner ), f_ulIndex( a_ulIndex ), f_poAtomPtr( a_poAtomPtr ) {};
+	friend class HHashMap<key_t, data_t>;
+	explicit HIterator( owner_t* owner_, int long index_, HAtom* atom_ )
+		: _owner( owner_ ), _index( index_ ), _atom( atom_ ) {};
 	};
 
-template<typename key_type, typename value_type>
-HHashMap<key_type, value_type>::HAtom::HAtom( key_type const& a_tKey )
-	: f_poNext( NULL ), key( a_tKey ), value()
+template<typename key_t, typename data_t>
+HHashMap<key_t, data_t>::HAtom::HAtom( key_t const& key_, data_t const& data_ )
+	: _next( NULL ), _value( key_, data_ )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-HHashMap<key_type, value_type>::HAtom::~HAtom( void )
+template<typename key_t, typename data_t>
+HHashMap<key_t, data_t>::HAtom::~HAtom( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-HHashMap<key_type, value_type>::HHashMap ( size_t a_uiSize ) : f_ulPrime( 0 ),
-	f_ulSize( 0 ), f_ppoAtomArray( NULL )
+template<typename key_t, typename data_t>
+HHashMap<key_t, data_t>::HHashMap( size_t a_uiSize )
+	: _prime( 0 ), _size( 0 ), _buckets()
 	{
 	M_PROLOG
-	int unsigned l_uiCtr = 0;
+	int i = 0;
 	if ( a_uiSize < 1 )
 		M_THROW ( "bad map size", a_uiSize );
 	while ( a_uiSize )
 		{
 		a_uiSize >>= 1;
-		l_uiCtr ++;
+		i ++;
 		}
-	f_ulPrime = g_pulPrimes[ l_uiCtr - 1 ];
-	f_ppoAtomArray = xcalloc<HAtom*>( f_ulPrime );
+	_prime = g_pulPrimes[ i - 1 ];
+	_buckets.realloc( chunk_size<HAtom*>( _prime ) );
 	return;
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-HHashMap<key_type, value_type>::HHashMap( HHashMap const& a_roMap ) : f_ulPrime( 0 ),
-	f_ulSize( 0 ), f_ppoAtomArray( NULL )
+template<typename key_t, typename data_t>
+HHashMap<key_t, data_t>::HHashMap( HHashMap const& map_ )
+	: _prime( 0 ), _size( 0 ), _buckets()
 	{
 	M_PROLOG
-	operator = ( a_roMap );
+	_prime = map_._prime;
+	_size = map_._size;
+	_buckets.realloc( chunk_size<HAtom*>( _prime ) );
+	HAtom* const* otherBuckets( map_._buckets.template get<HAtom const*>() );
+	HAtom** buckets( _buckets.get<HAtom*>() );
+	for ( int long l_iCtr = 0; l_iCtr < _prime; ++ l_iCtr )
+		{
+		HAtom const* origAtom( otherBuckets[ l_iCtr ] );
+		HAtom** atom( &buckets[ l_iCtr ] );
+		while ( origAtom )
+			{
+			( *atom ) = new ( std::nothrow ) HAtom( origAtom->key );
+			( *atom )->value = origAtom->value;
+			atom = &( *atom )->_next;
+			origAtom = origAtom->_next;
+			}
+		}
 	return;
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-HHashMap<key_type, value_type>::~HHashMap ( void )
+template<typename key_t, typename data_t>
+HHashMap<key_t, data_t>::~HHashMap( void )
 	{
 	M_PROLOG
 	clear();
-	if ( f_ppoAtomArray )
-		xfree( f_ppoAtomArray );
-	f_ppoAtomArray = NULL;
 	return;
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-HHashMap<key_type, value_type> & HHashMap<key_type, value_type>::operator = ( HHashMap const & a_roMap )
+template<typename key_t, typename data_t>
+HHashMap<key_t, data_t>& HHashMap<key_t, data_t>::operator = ( HHashMap const& map_ )
 	{
 	M_PROLOG
-	int unsigned l_iCtr = 0;
-	if ( & a_roMap != this )
+	int l_iCtr( 0 );
+	if ( &map_ != this )
 		{
-		clear();
-		if ( f_ppoAtomArray )
-			xfree( f_ppoAtomArray );
-		f_ppoAtomArray = NULL;
-		f_ulPrime = a_roMap.f_ulPrime;
-		f_ulSize = a_roMap.f_ulSize;
-		f_ppoAtomArray = xcalloc<HAtom*>( f_ulPrime );
-		for ( l_iCtr = 0; l_iCtr < f_ulPrime; ++ l_iCtr )
-			{
-			HAtom* l_poOrigAtom = a_roMap.f_ppoAtomArray [ l_iCtr ];
-			HAtom** l_ppoAtom = &f_ppoAtomArray[ l_iCtr ];
-			while ( l_poOrigAtom )
-				{
-				( *l_ppoAtom ) = new ( std::nothrow ) HAtom ( l_poOrigAtom->key );
-				( *l_ppoAtom )->value = l_poOrigAtom->value;
-				l_ppoAtom = &( *l_ppoAtom )->f_poNext;
-				l_poOrigAtom = l_poOrigAtom->f_poNext;
-				}
-			}
+		HHashMap tmp( map_ );
+		swap( tmp );
 		}
-	return ( * this );
+	return ( *this );
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-void HHashMap<key_type, value_type>::clear( void )
+template<typename key_t, typename data_t>
+void HHashMap<key_t, data_t>::clear( void )
 	{
 	M_PROLOG
-	int unsigned l_uiCtr = 0;
-	HAtom * l_poAtom = NULL;
-	for ( l_uiCtr = 0; l_uiCtr < f_ulPrime; l_uiCtr ++ )
-		while ( f_ppoAtomArray [ l_uiCtr ] )
+	HAtom** buckets( _buckets.get<HAtom*>() );
+	for ( int long i = 0; i < _prime; i ++ )
+		{
+		HAtom* atom( buckets[ i ] );
+		while ( atom )
 			{
-			l_poAtom = f_ppoAtomArray [ l_uiCtr ]->f_poNext;
-			delete f_ppoAtomArray [ l_uiCtr ];
-			f_ppoAtomArray [ l_uiCtr ] = l_poAtom;
+			HAtom* del( atom );
+			atom = atom->_next;
+			delete del;
 			}
-	f_ulSize = 0;
+		buckets[ i ] = NULL;
+		}
+	_size = 0;
 	return;
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-int HHashMap<key_type, value_type>::size( void ) const
+template<typename key_t, typename data_t>
+int HHashMap<key_t, data_t>::size( void ) const
 	{
 	M_PROLOG
-	return ( f_ulSize );
+	return ( _size );
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-value_type& HHashMap<key_type, value_type>::operator [] ( key_type const& a_tKey )
+template<typename key_t, typename data_t>
+data_t& HHashMap<key_t, data_t>::operator [] ( key_t const& key_ )
 	{
 	M_PROLOG
-	iterator it = insert( a_tKey, value_type() );
-	return ( it->value );
+	iterator it( insert( key_, data_t() ) );
+	return ( it->second );
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>::insert( key_type const& a_tKey, value_type const& a_tValue )
+template<typename key_t, typename data_t>
+typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::insert( key_t const& key_, data_t const& a_tValue )
 	{
 	M_PROLOG
-	iterator it = find( a_tKey );
+	iterator it = find( key_ );
 	if ( it == end() )
 		{
-		HAtom* l_poAtom = new ( std::nothrow ) HAtom( a_tKey );
-		if ( ! l_poAtom )
+		HAtom* atom = new ( std::nothrow ) HAtom( key_, a_tValue );
+		if ( ! atom )
 			M_THROW( "memory allocation error", errno );
-		int long unsigned l_ulHash = hash( a_tKey ) % f_ulPrime;
-		l_poAtom->f_poNext = f_ppoAtomArray[ l_ulHash ];
-		f_ppoAtomArray[ l_ulHash ] = l_poAtom;
-		f_ulSize ++;
-		it = iterator( this, l_ulHash, l_poAtom );
-		it->value = a_tValue;
+		int long l_ulHash = hash( key_ ) % _prime;
+		HAtom** buckets( _buckets.get<HAtom*>() );
+		atom->_next = buckets[ l_ulHash ];
+		buckets[ l_ulHash ] = atom;
+		_size ++;
+		it = iterator( this, l_ulHash, atom );
+		it->second = a_tValue;
 		}
 	return ( it );
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>::begin( void )
+template<typename key_t, typename data_t>
+typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::begin( void )
 	{
 	M_PROLOG
 	iterator it( this, 0, NULL );
@@ -366,16 +358,16 @@ typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>::end( void )
+template<typename key_t, typename data_t>
+typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::end( void )
 	{
 	M_PROLOG
-	return ( iterator( this, f_ulPrime, NULL ) );
+	return ( iterator( this, _prime, NULL ) );
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-typename HHashMap<key_type, value_type>::const_iterator HHashMap<key_type, value_type>::begin( void ) const
+template<typename key_t, typename data_t>
+typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::begin( void ) const
 	{
 	M_PROLOG
 	const_iterator it( this, 0, NULL );
@@ -383,106 +375,79 @@ typename HHashMap<key_type, value_type>::const_iterator HHashMap<key_type, value
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-typename HHashMap<key_type, value_type>::const_iterator HHashMap<key_type, value_type>::end( void ) const
+template<typename key_t, typename data_t>
+typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::end( void ) const
 	{
 	M_PROLOG
-	return ( const_iterator( this, f_ulPrime, NULL ) );
+	return ( const_iterator( this, _prime, NULL ) );
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-bool HHashMap<key_type, value_type>::has_key( key_type const& a_rtKey ) const
+template<typename key_t, typename data_t>
+typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::find( key_t const& key_ )
 	{
 	M_PROLOG
-	return ( find( a_rtKey ) != end() );
+	int long idx( 0 );
+	HAtom* atom( NULL );
+	return ( find( key_, idx, atom ) ? iterator( this, idx, atom ) : end() );
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>::find( key_type const& a_tKey )
+template<typename key_t, typename data_t>
+typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::find( key_t const& key_ ) const
 	{
 	M_PROLOG
-	int long unsigned idx = 0;
-	HAtom* l_poAtom = NULL;
-	return ( find( a_tKey, idx, l_poAtom ) ? iterator( this, idx, l_poAtom ) : end() );
+	int long idx( 0 );
+	HAtom* atom( NULL );
+	return ( find( key_, idx, atom ) ? const_iterator( this, idx, atom ) : end() );
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-typename HHashMap<key_type, value_type>::const_iterator HHashMap<key_type, value_type>::find( key_type const& a_tKey ) const
+template<typename key_t, typename data_t>
+bool HHashMap<key_t, data_t>::find( key_t const& a_rtKey, int long& a_rulIndex, HAtom*& a_rpoAtom ) const
 	{
 	M_PROLOG
-	int long unsigned idx = 0;
-	HAtom* l_poAtom = NULL;
-	return ( find( a_tKey, idx, l_poAtom ) ? const_iterator( this, idx, l_poAtom ) : end() );
-	M_EPILOG
-	}
-
-template<typename key_type, typename value_type>
-bool HHashMap<key_type, value_type>::find( key_type const& a_rtKey, int long unsigned& a_rulIndex, HAtom*& a_rpoAtom ) const
-	{
-	M_PROLOG
-	a_rulIndex = hash( a_rtKey ) % f_ulPrime;
-	a_rpoAtom = f_ppoAtomArray[ a_rulIndex ];
-	while ( a_rpoAtom && ( a_rpoAtom->key != a_rtKey ) )
-		a_rpoAtom = a_rpoAtom->f_poNext;
+	a_rulIndex = hash( a_rtKey ) % _prime;
+	a_rpoAtom = _buckets.get<HAtom*>()[ a_rulIndex ];
+	while ( a_rpoAtom && ( a_rpoAtom->_value.first != a_rtKey ) )
+		a_rpoAtom = a_rpoAtom->_next;
 	return ( a_rpoAtom ? true : false );
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-bool HHashMap<key_type, value_type>::get( key_type const& a_rtKey, value_type& a_rtValue ) const
+template<typename key_t, typename data_t>
+void HHashMap<key_t, data_t>::erase( iterator it )
 	{
 	M_PROLOG
-	const_iterator it = find( a_rtKey );
-	bool found = false;
-	if ( it != end() )
+	HAtom* atom( _buckets.get<HAtom*>()[ it._index ] );
+	HAtom* ancestor( NULL );
+	M_ASSERT( atom );
+	while ( atom != it._atom )
+		ancestor = atom, atom = atom->_next;
+	if ( atom )
 		{
-		a_rtValue = it->value;
-		found = true;
-		}
-	return ( ! found );
-	M_EPILOG
-	}
-
-template<typename key_type, typename value_type>
-void HHashMap<key_type, value_type>::erase( iterator it )
-	{
-	M_PROLOG
-	HAtom* l_poAtom = f_ppoAtomArray[ it.f_ulIndex ];
-	HAtom* l_poAncestor = NULL;
-	M_ASSERT( l_poAtom );
-	while ( l_poAtom != it.f_poAtomPtr )
-		l_poAncestor = l_poAtom, l_poAtom = l_poAtom->f_poNext;
-	if ( l_poAtom )
-		{
-		if ( l_poAncestor )
-			l_poAncestor->f_poNext = l_poAtom->f_poNext;
+		if ( ancestor )
+			ancestor->_next = atom->_next;
 		else
-			f_ppoAtomArray[ it.f_ulIndex ] = NULL;
-		delete l_poAtom;
-		f_ulSize --;
+			_buckets.get<HAtom*>()[ it._index ] = NULL;
+		delete atom;
+		-- _size;
 		}
 	return;
 	M_EPILOG
 	}
 
-template<typename key_type, typename value_type>
-bool HHashMap<key_type, value_type>::remove( key_type const& a_tKey )
+template<typename key_t, typename data_t>
+int long HHashMap<key_t, data_t>::erase( key_t const& key_ )
 	{
 	M_PROLOG
-	iterator it = find( a_tKey );
-	bool erased = it != end();
+	iterator it( find( key_ ) );
+	bool erased( it != end() );
 	if ( erased )
 		erase( it );
-	return ( ! erased );
+	return ( erased ? 1 : 0 );
 	M_EPILOG
 	}
-
-/* Helpers and premaps */
-
-int long unsigned hash( HString const& );
 
 }
 

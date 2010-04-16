@@ -106,11 +106,10 @@ int HWindow::process_input( int a_iCode )
 int HWindow::add_control( HControl::ptr_t a_oControl, int a_iShortCut )
 	{
 	M_PROLOG
-	if ( f_oPreprocessHandlers.has_key ( a_iShortCut ) )
-		M_THROW ( _ ( "shortcut occupied" ), a_iShortCut );
-	f_oControls.add_control ( a_oControl );
-	register_postprocess_handler ( a_iShortCut, NULL,
-			& HWindow::handler_jump_direct );
+	if ( f_oPreprocessHandlers.find( a_iShortCut ) != f_oPreprocessHandlers.end() )
+		M_THROW( _( "shortcut occupied" ), a_iShortCut );
+	f_oControls.add_control( a_oControl );
+	register_postprocess_handler( a_iShortCut, NULL, &HWindow::handler_jump_direct );
 	return ( 0 );
 	M_EPILOG
 	}
