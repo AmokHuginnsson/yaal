@@ -264,7 +264,7 @@ HHashMap<key_type, value_type>::~HHashMap ( void )
 	M_PROLOG
 	clear();
 	if ( f_ppoAtomArray )
-		xfree ( f_ppoAtomArray );
+		xfree( f_ppoAtomArray );
 	f_ppoAtomArray = NULL;
 	return;
 	M_EPILOG
@@ -279,7 +279,7 @@ HHashMap<key_type, value_type> & HHashMap<key_type, value_type>::operator = ( HH
 		{
 		clear();
 		if ( f_ppoAtomArray )
-			xfree ( f_ppoAtomArray );
+			xfree( f_ppoAtomArray );
 		f_ppoAtomArray = NULL;
 		f_ulPrime = a_roMap.f_ulPrime;
 		f_ulSize = a_roMap.f_ulSize;
@@ -345,7 +345,7 @@ typename HHashMap<key_type, value_type>::iterator HHashMap<key_type, value_type>
 		{
 		HAtom* l_poAtom = new ( std::nothrow ) HAtom( a_tKey );
 		if ( ! l_poAtom )
-			M_THROW ( "memory allocation error", errno );
+			M_THROW( "memory allocation error", errno );
 		int long unsigned l_ulHash = hash( a_tKey ) % f_ulPrime;
 		l_poAtom->f_poNext = f_ppoAtomArray[ l_ulHash ];
 		f_ppoAtomArray[ l_ulHash ] = l_poAtom;

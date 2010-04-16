@@ -102,6 +102,14 @@ struct HPointerArray
 	static tType& object_at( tType*, int );
 	};
 
+template<typename to_t, typename from_t, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
+typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_static_cast( HPointer<from_t, pointer_type_t, access_type_t> );
+
+template<typename to_t, typename from_t, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
+typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_dynamic_cast( HPointer<from_t, pointer_type_t, access_type_t> );
+
 /*! \brief Smart pointer, reference counting implementation.
  *
  * \tparam tType - object type which life time will be guarded.
@@ -122,6 +130,10 @@ class HPointer
 			f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 0;
 			f_piReferenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 0;
 			}
+		template<typename to_t, typename from_t, template<typename>class to_pointer_type_t, template<typename, typename>class to_access_type_t>
+		friend typename yaal::hcore::HPointer<to_t, to_pointer_type_t, to_access_type_t> pointer_static_cast( HPointer<from_t, to_pointer_type_t, to_access_type_t> );
+		template<typename to_t, typename from_t, template<typename>class to_pointer_type_t, template<typename, typename>class to_access_type_t>
+		friend typename yaal::hcore::HPointer<to_t, to_pointer_type_t, to_access_type_t> pointer_dynamic_cast( HPointer<from_t, to_pointer_type_t, to_access_type_t> );
 		friend class HPointer;
 		};
 	/*
@@ -185,6 +197,10 @@ private:
 	void assign( tType*&, tType* );
 	template<typename hier_t>
 	void assign( tType*&, hier_t* );
+	template<typename to_t, typename from_t, template<typename>class to_pointer_type_t, template<typename, typename>class to_access_type_t>
+	friend typename yaal::hcore::HPointer<to_t, to_pointer_type_t, to_access_type_t> pointer_static_cast( HPointer<from_t, to_pointer_type_t, to_access_type_t> );
+	template<typename to_t, typename from_t, template<typename>class to_pointer_type_t, template<typename, typename>class to_access_type_t>
+	friend typename yaal::hcore::HPointer<to_t, to_pointer_type_t, to_access_type_t> pointer_dynamic_cast( HPointer<from_t, to_pointer_type_t, to_access_type_t> );
 	};
 
 /*! \brief Interface for concept of getting smart pointer from `this'.
@@ -364,7 +380,6 @@ void HPointer<tType, pointer_type_t, access_type_t>::acquire( HPointer<hier_t, p
 			access_type_t<tType, pointer_type_t<tType> >::inc_reference_counter( alien.f_poShared->f_piReferenceCounter );
 			f_poShared = alien.f_poShared;
 			assign( f_ptObject, reinterpret_cast<hier_t*>( alien.f_ptObject ) );
-			f_poShared->DELETER = &pointer_type_t<tType>::template delete_pointee<tType>;
 			}
 		else
 			{
@@ -589,6 +604,34 @@ template<typename tType>
 typename HPointerFromThisInterface<tType>::ptr_t const HPointerFromThisInterface<tType>::get_pointer( void ) const
 	{
 	return ( f_oSelfObserver );
+	}
+
+template<typename to_t, typename from_t, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
+typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_static_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ )
+	{
+	HPointer<to_t, pointer_type_t, access_type_t> to;
+	if ( from_.f_ptObject )
+		{
+		to.f_poShared = reinterpret_cast<typename HPointer<to_t, pointer_type_t, access_type_t>::HShared*>( from_.f_poShared );
+		to.f_ptObject = static_cast<to_t*>( from_.f_ptObject );
+		access_type_t<to_t, pointer_type_t<to_t> >::inc_reference_counter( to.f_poShared->f_piReferenceCounter );
+		}
+	return ( to );
+	}
+
+template<typename to_t, typename from_t, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
+typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_dynamic_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ )
+	{
+	HPointer<to_t, pointer_type_t, access_type_t> to;
+	if ( dynamic_cast<to_t*>( from_.f_ptObject ) )
+		{
+		to.f_poShared = reinterpret_cast<typename HPointer<to_t, pointer_type_t, access_type_t>::HShared*>( from_.f_poShared );
+		to.f_ptObject = static_cast<to_t*>( from_.f_ptObject );
+		access_type_t<to_t, pointer_type_t<to_t> >::inc_reference_counter( to.f_poShared->f_piReferenceCounter );
+		}
+	return ( to );
 	}
 
 }
