@@ -189,10 +189,6 @@ private:
 	template<typename hier_t>
 	void assign( tType*&, hier_t* );
 	friend struct pointer_helper;
-	template<typename to_t, typename from_t, template<typename>class to_pointer_type_t, template<typename, typename>class to_access_type_t>
-	friend typename yaal::hcore::HPointer<to_t, to_pointer_type_t, to_access_type_t> pointer_static_cast( HPointer<from_t, to_pointer_type_t, to_access_type_t> );
-	template<typename to_t, typename from_t, template<typename>class to_pointer_type_t, template<typename, typename>class to_access_type_t>
-	friend typename yaal::hcore::HPointer<to_t, to_pointer_type_t, to_access_type_t> pointer_dynamic_cast( HPointer<from_t, to_pointer_type_t, to_access_type_t> );
 	};
 
 /*! \brief Interface for concept of getting smart pointer from `this'.
