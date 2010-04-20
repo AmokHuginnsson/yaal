@@ -83,12 +83,14 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 	int l_piCtrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t l_oMainWindow;
 	HProcess::init( n_iLatency );
-	register_file_descriptor_handler( STDIN_FILENO, &HTUIProcess::process_stdin );
+	register_file_descriptor_handler( STDIN_FILENO, bound_call( &HTUIProcess::process_stdin, this, _1 ) );
 	HConsole& cons = HCons::get_instance();
 	int l_iMouseDes = cons.get_mouse_fd();
 	if ( n_bUseMouse && l_iMouseDes )
-		register_file_descriptor_handler( l_iMouseDes, &HTUIProcess::process_mouse );
-	register_file_descriptor_handler( cons.get_event_fd(), &HTUIProcess::process_terminal_event );
+		register_file_descriptor_handler( l_iMouseDes, bound_call( &HTUIProcess::process_mouse, this, _1 ) );
+	register_file_descriptor_handler( cons.get_event_fd(), bound_call( &HTUIProcess::process_terminal_event, this, _1 ) );
+	add_alert_handle( bound_call( &HTUIProcess::handler_alert, this ) );
+	add_idle_handle( bound_call( &HTUIProcess::handler_idle, this ) );
 	register_postprocess_handler( CTRLS_COUNT, l_piCtrls,
 			& HTUIProcess::handler_refresh );
 	register_postprocess_handler( KEY<'x'>::command, NULL,
@@ -136,7 +138,7 @@ int HTUIProcess::add_window( HWindow::ptr_t a_oWindow )
 	M_EPILOG
 	}
 
-int HTUIProcess::process_stdin( int a_iCode )
+void HTUIProcess::process_stdin( int a_iCode )
 	{
 	M_PROLOG
 	HString l_oCommand;
@@ -193,11 +195,11 @@ int HTUIProcess::process_stdin( int a_iCode )
 	if ( a_iCode && !! (*f_oForegroundWindow) )
 		(*f_oForegroundWindow)->status_bar()->message ( COLORS::FG_RED,
 				"unknown function, err code(%d)", a_iCode );
-	return ( a_iCode );
+	return;
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_alert( int, void const* )
+void HTUIProcess::handler_alert( void )
 	{
 	M_PROLOG
 	if ( n_bNeedRepaint )
@@ -205,11 +207,11 @@ int HTUIProcess::handler_alert( int, void const* )
 		n_bNeedRepaint = false;
 		HCons::get_instance().c_refresh();
 		}
-	return ( 0 );
+	return;
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_idle( int a_iCode, void const* )
+void HTUIProcess::handler_idle( void )
 	{
 	M_PROLOG
 #ifdef __DEBUG__
@@ -225,16 +227,15 @@ int HTUIProcess::handler_idle( int a_iCode, void const* )
 		if ( !! l_oStatusBar )
 			l_oStatusBar->refresh();
 		}
-	a_iCode = HProcess::handler_idle( a_iCode );
-	return ( a_iCode );
+	return;
 	M_EPILOG
 	}
 
-int HTUIProcess::process_mouse( int )
+void HTUIProcess::process_mouse( int )
 	{
 	M_PROLOG
 	handler_mouse( 0 );
-	return ( 0 );
+	return;
 	M_EPILOG
 	}
 
@@ -257,22 +258,21 @@ int HTUIProcess::handler_mouse( int a_iCode, void const* )
 	M_EPILOG
 	}
 
-int HTUIProcess::process_terminal_event( int a_iEvent )
+void HTUIProcess::process_terminal_event( int a_iEvent )
 	{
 	M_PROLOG
 	char type;
 	::read( a_iEvent, &type, 1 );
-	int ret = 0;
 	switch( type )
 		{
 		case 'r':
-			ret = handler_refresh( 0 );
+			handler_refresh( 0 );
 		break;
 		case 'm':
-			ret = process_mouse( 0 );
+			process_mouse( 0 );
 		break;
 		}
-	return ( ret );
+	return;
 	M_EPILOG
 	}
 

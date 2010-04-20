@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/harray.hxx"
 #include "hcore/hhashmap.hxx"
+#include "hcore/hboundcall.hxx"
 #include "hcore/hpipe.hxx"
 #include "tools/signals.hxx"
 
@@ -48,8 +49,10 @@ class HProcess : public yaal::tools::HSignalHandlerInterface
 protected:
 	typedef HProcess self_t;
 	typedef HSignalHandlerInterface hier_t;
-	typedef int ( HProcess::* process_handler_filedes_t ) ( int );
-	typedef yaal::hcore::HHashMap<int, process_handler_filedes_t> process_filedes_map_t;
+	typedef yaal::hcore::HBoundCallInterface<0, void>::ptr_t delayed_call_t;
+	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
+	typedef yaal::hcore::HBoundCallInterface<1, void, int>::ptr_t process_filedes_handler_t;
+	typedef yaal::hcore::HHashMap<int, process_filedes_handler_t> process_filedes_map_t;
 	typedef yaal::hcore::HArray<int> dropped_fd_t;
 	bool			f_bInitialised;					/* did process has necessery initialisation */
 	bool			f_bLoop; 								/* indicates if main loop continues */
@@ -59,6 +62,8 @@ protected:
 	timeval		f_sLatency;							/* sleep between re-selects (helper) */
 	fd_set		f_xFileDescriptorSet; 	/* keyboard and eventual sockets */
 	process_filedes_map_t f_oFileDescriptorHandlers;
+	delayed_calls_t _alert;
+	delayed_calls_t _idle;
 	dropped_fd_t f_oDroppedFd;
 	bool f_bCallbackContext;
 	yaal::hcore::HPipe f_oEvent;
@@ -67,23 +72,20 @@ protected:
 public:
 	int run( void );
 	int init( int, int = 0 );
+	int register_file_descriptor_handler( int, process_filedes_handler_t );
+	void unregister_file_descriptor_handler( int );
+	void add_alert_handle( delayed_call_t );
+	void add_idle_handle( delayed_call_t );
 protected:
 	int reconstruct_fdset( void );
-	template<typename tType>
-	int register_file_descriptor_handler( int a_iFileDes, tType HANDLER )
-		{
-		return ( register_file_descriptor_handler_internal( a_iFileDes, static_cast<process_handler_filedes_t>( HANDLER ) ) );
-		}
-	int register_file_descriptor_handler_internal( int, process_handler_filedes_t );
-	void unregister_file_descriptor_handler( int );
 	/*! \brief Process incoming events from interrupt socket.
 	 */
-	int process_interrupt( int );
+	void process_interrupt( int );
 	/*! \brief Callback for SignalService.
 	 */
 	int handler_interrupt( int );
-	virtual int handler_alert( int, void const* = NULL );
-	virtual int handler_idle( int, void const* = NULL );
+	void handle_alerts( void );
+	void handle_idle( void );
 	virtual int do_init( void );
 	virtual int do_cleanup( void );
 private:

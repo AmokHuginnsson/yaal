@@ -60,15 +60,15 @@ public:
 	virtual ~HTUIProcess ( void );
 	int init_tui( char const* = "", HWindow::ptr_t = HWindow::ptr_t() );
 protected:
-	int process_stdin( int );
-	int process_mouse( int );
-	int process_terminal_event( int );
+	void process_stdin( int );
+	void process_mouse( int );
+	void process_terminal_event( int );
 	int process_commands( void );
 	int add_window( HWindow::ptr_t );
 	void select( HWindow const* const );
 	void refresh( bool = false );
-	virtual int handler_alert( int, void const* = NULL );
-	virtual int handler_idle( int, void const* = NULL );
+	void handler_alert( void );
+	void handler_idle( void );
 	virtual int handler_mouse( int, void const* = NULL );
 	virtual int handler_refresh( int, void const* = NULL );
 	virtual int handler_quit( int, void const* = NULL );

@@ -91,7 +91,9 @@ public:
 	iterator end( void );
 	const_iterator find( key_t const& ) const;
 	iterator find( key_t const& );
-	iterator insert( key_t const&, data_t const& );
+	HPair<iterator, bool> insert( value_type const& );
+	template<typename iterator_t>
+	void insert( iterator_t, iterator_t );
 	void erase( iterator );
 
 	/*! \brief  Remove given key from map.
@@ -100,6 +102,7 @@ public:
 	 * \return  Number of erased elements.
 	 */
 	int long erase( key_t const& key );
+	int long count( key_t const& ) const;
 	void clear( void );
 	int size( void ) const;
 	void swap( HHashMap& );
@@ -319,33 +322,44 @@ int HHashMap<key_t, data_t>::size( void ) const
 	}
 
 template<typename key_t, typename data_t>
-data_t& HHashMap<key_t, data_t>::operator [] ( key_t const& key_ )
+data_t& HHashMap<key_t, data_t>::operator[]( key_t const& key_ )
 	{
 	M_PROLOG
-	iterator it( insert( key_, data_t() ) );
-	return ( it->second );
+	return ( insert( make_pair( key_, data_t() ) ).first->second );
 	M_EPILOG
 	}
 
 template<typename key_t, typename data_t>
-typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::insert( key_t const& key_, data_t const& a_tValue )
+yaal::hcore::HPair<typename HHashMap<key_t, data_t>::iterator, bool> HHashMap<key_t, data_t>::insert( value_type const& val_ )
 	{
 	M_PROLOG
-	iterator it = find( key_ );
+	iterator it = find( val_.first );
+	bool inserted( false );
 	if ( it == end() )
 		{
-		HAtom* atom = new ( std::nothrow ) HAtom( key_, a_tValue );
+		HAtom* atom = new ( std::nothrow ) HAtom( val_.first, val_.second );
 		if ( ! atom )
 			M_THROW( "memory allocation error", errno );
-		int long l_ulHash = hash( key_ ) % _prime;
+		int long l_ulHash = hash( val_.first ) % _prime;
 		HAtom** buckets( _buckets.get<HAtom*>() );
 		atom->_next = buckets[ l_ulHash ];
 		buckets[ l_ulHash ] = atom;
 		_size ++;
 		it = iterator( this, l_ulHash, atom );
-		it->second = a_tValue;
+		inserted = true;
 		}
-	return ( it );
+	return ( make_pair( it, inserted ) );
+	M_EPILOG
+	}
+
+template<typename key_t, typename data_t>
+template<typename iterator_t>
+void HHashMap<key_t, data_t>::insert( iterator_t first, iterator_t last )
+	{
+	M_PROLOG
+	for ( ; first != last; ++ first )
+		insert( *first );
+	return;
 	M_EPILOG
 	}
 
@@ -446,6 +460,14 @@ int long HHashMap<key_t, data_t>::erase( key_t const& key_ )
 	if ( erased )
 		erase( it );
 	return ( erased ? 1 : 0 );
+	M_EPILOG
+	}
+
+template<typename key_t, typename data_t>
+int long HHashMap<key_t, data_t>::count( key_t const& key_ ) const
+	{
+	M_PROLOG
+	return ( find( key_ ) != end() ? 1 : 0 );
 	M_EPILOG
 	}
 
