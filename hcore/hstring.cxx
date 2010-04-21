@@ -45,20 +45,21 @@ namespace hcore
 {
 
 namespace string_helper
+{
+
+enum
 	{
-	enum
-		{
-		OK = 0,
-		NULL_PTR,
-		UNINITIALIZED
-		};
+	OK = 0,
+	NULL_PTR,
+	UNINITIALIZED
+	};
 
 /* Useful helpers */
 char * strrnpbrk( char const* const, char const* const,
 		int long /* no const - used */ );
 int long strrnspn( char const* const, char const* const, int long const );
 int long kmpsearch( char const* const, int long const&, char const* const, int long const& );
-	}
+}
 
 char const n_pcWhiteSpace[] = "\a\b \t\v\f\r\n";
 #define D_LETTER "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

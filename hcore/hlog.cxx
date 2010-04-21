@@ -61,19 +61,20 @@ static int const GETPW_R_SIZE   = 1024;
 
 int long HLog::f_lLogMask = 0;
 
-HLog::HLog( void ) : HStreamInterface(), f_bRealMode( false ), f_bNewLine( true ),
+HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedFile( _field ), f_bRealMode( false ), f_bNewLine( true ),
 	f_lType( 0 ), f_iBufferSize( BUFFER_SIZE ),
-	f_psStream( NULL ), f_pcProcessName( NULL ),
+	f_pcProcessName( NULL ),
 	f_oLoginName(), f_oHostName( HOSTNAME_SIZE ),
 	f_oBuffer( f_iBufferSize )
 	{
 	M_PROLOG
 	uid_t l_iUid = 0;
-	f_psStream = tmpfile();
-	if ( ! f_psStream )
-		M_THROW( "tmpfile returned", reinterpret_cast<int long>( f_psStream ) );
-	::fprintf( f_psStream, "%-10xProcess started (%ld).\n",
+	if ( ! _field )
+		M_THROW( "tmpfile() failed", errno );
+	HString intro;
+	intro.format( "%-10xProcess started (%ld).\n",
 			LOG_TYPE::NOTICE, static_cast<int long>( getpid() ) );
+	_field << intro;
 	l_iUid = getuid();
 	passwd l_sPasswd;
 	long int bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
@@ -95,11 +96,8 @@ HLog::~HLog( void )
 		{
 		if ( f_bNewLine )
 			timestamp();
-		::fprintf( f_psStream, "Process exited normally.\n" );
+		_field << "Process exited normally.\n";
 		}
-	if ( ( f_psStream != stdout ) && ( f_psStream != stderr ) )
-		::fclose( f_psStream );
-	f_psStream = NULL;
 	return;
 	M_EPILOG
 	}
@@ -118,33 +116,19 @@ void HLog::rehash( FILE* a_psStream,
 		f_pcProcessName = ::basename( a_pcProcessName );
 	if ( ! a_psStream )
 		M_THROW( "file parameter is", reinterpret_cast<int long>( a_psStream ) );
-	l_psTmpFile = f_psStream;
-	f_psStream = a_psStream;
+	l_psTmpFile = static_cast<FILE*>( _field.release() );
+	_field.open( a_psStream );
 	if ( l_psTmpFile )
 		{
 		::fseek( l_psTmpFile, 0, SEEK_SET );
 		char* buf = f_oBuffer.get<char>();
-#ifdef HAVE_GETLINE 
 		while ( ::getline( &buf, &f_iBufferSize, l_psTmpFile ) > 0 )
-#else /* HAVE_GETLINE */
-		while ( ( l_iLen = static_cast<int>( ::fread( buf, sizeof ( char ), f_iBufferSize, l_psTmpFile ) ) ) )
-#endif /* not HAVE_GETLINE */
 			{
-#ifndef HAVE_GETLINE
-			l_pcPtr = static_cast<char*>( ::memchr( buf, '\n', l_iLen ) );
-			if ( ! l_pcPtr )
-				{
-				::fprintf( f_psStream, buf );
-				continue;
-				}
-			* ++ l_pcPtr = 0;
-			::fseek( l_psTmpFile, l_pcPtr - buf - l_iLen, SEEK_CUR );
-#endif /* not HAVE_GETLINE */
 			f_lType = ::strtol( buf, NULL, 0x10 );
 			if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 				{
 				timestamp();
-				::fputs( buf + 10, f_psStream );
+				::fputs( buf + 10, a_psStream );
 				}
 			}
 		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
@@ -170,15 +154,18 @@ void HLog::rehash( HString const& a_oLogFileName,
 void HLog::timestamp( void )
 	{
 	M_PROLOG
+	char l_pcBuffer[ TIMESTAMP_SIZE ];
 	if ( ! f_bRealMode )
 		{
-		if ( f_psStream )
-			::fprintf( f_psStream, "%-10lx", f_lType );
+		if ( !! _field )
+			{
+			::snprintf( l_pcBuffer, TIMESTAMP_SIZE - 1, "%-10lx", f_lType );
+			_field << l_pcBuffer;
+			}
 		return;
 		}
 	time_t l_xCurrentTime = ::time( NULL );
 	tm* l_psBrokenTime = ::localtime( &l_xCurrentTime );
-	char l_pcBuffer[ TIMESTAMP_SIZE ];
 	::memset( l_pcBuffer, 0, TIMESTAMP_SIZE );
 	/* ISO C++ does not support the `%e' strftime format */
 	/* `%e': The day of the month like with `%d', but padded with blank */
@@ -190,11 +177,9 @@ void HLog::timestamp( void )
 	if ( l_iSize > TIMESTAMP_SIZE )
 		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), l_iSize );
 	if ( f_pcProcessName )
-		::fprintf( f_psStream, "%s %s@%s->%s: ", l_pcBuffer, f_oLoginName.raw(),
-				f_oHostName.get<char>(), f_pcProcessName );
+		_field << l_pcBuffer << " " << f_oLoginName << "@" << f_oHostName.get<char>() << "->" << f_pcProcessName << ": ";
 	else
-		::fprintf( f_psStream, "%s %s@%s: ", l_pcBuffer, f_oLoginName.raw(),
-			f_oHostName.get<char>() );
+		_field << l_pcBuffer << " " << f_oLoginName << "@" << f_oHostName.get<char>() << ": ";
 	return;
 	M_EPILOG
 	}
@@ -208,14 +193,14 @@ int HLog::operator() ( char const* const a_pcFormat, va_list a_xAp )
 	char* buf = f_oBuffer.get<char>();
 	::memset( buf, 0, f_iBufferSize );
 	l_iErr = ::vsnprintf( buf, f_iBufferSize, a_pcFormat, a_xAp );
-	::fputs( buf, f_psStream );
+	_field << buf;
 	if ( buf[ ::strlen( buf ) - 1 ] != '\n' )
 		f_bNewLine = false;
 	else
 		{
 		f_lType = 0;
 		f_bNewLine = true;
-		M_ENSURE( ::fflush( f_psStream ) == 0 );
+		_field.flush();
 		}
 	return ( l_iErr );
 	M_EPILOG
@@ -280,14 +265,14 @@ int long HLog::do_write( void const* const a_pcString, int long const& a_lSize )
 		{
 		if ( f_bNewLine )
 			timestamp();
-		len = static_cast<int>( ::std::fwrite( str, sizeof ( char ), a_lSize, f_psStream ) );
+		len = static_cast<int>( _field.write( str, a_lSize ) );
 		if ( str[ a_lSize - 1 ] != '\n' )
 			f_bNewLine = false;
 		else
 			{
 			f_bNewLine = true;
 			f_lType = 0;
-			M_ENSURE( ::std::fflush( f_psStream ) == 0 );
+			_field.flush();
 			}
 		}
 	return ( len );
@@ -297,7 +282,7 @@ int long HLog::do_write( void const* const a_pcString, int long const& a_lSize )
 void HLog::do_flush( void ) const
 	{
 	M_PROLOG
-	M_ENSURE( ::std::fflush( f_psStream ) == 0 );
+	_field.flush();
 	return;
 	M_EPILOG
 	}
@@ -310,7 +295,7 @@ int long HLog::do_read( void* const, int long const& )
 bool HLog::do_is_valid( void ) const
 	{
 	M_PROLOG
-	return ( f_psStream != NULL );
+	return ( ! _field );
 	M_EPILOG
 	}
 

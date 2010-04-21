@@ -39,31 +39,33 @@ namespace yaal
 namespace hcore
 {
 
-HFile::HFile( open_t const& a_eOpen, void* const a_pvHandle )
-	: HStreamInterface(), f_eOpen( a_eOpen ),
+HFile::HFile( void )
+	: HStreamInterface(),
+	f_pvHandle( NULL ), f_oPath(), f_oError(),
+	f_bExternal( false )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+HFile::HFile( void* const a_pvHandle )
+	: HStreamInterface(),
 	f_pvHandle( a_pvHandle ), f_oPath(), f_oError(),
 	f_bExternal( a_pvHandle ? true : false )
 	{
 	M_PROLOG
-	if ( ( ( !!( a_eOpen & OPEN::APPEND ) ) && ( !!( a_eOpen & OPEN::TRUNCATE ) ) )
-			|| ( ( !!( a_eOpen & OPEN::READING ) ) && ( !!( a_eOpen & OPEN::TRUNCATE ) ) )
-			|| ( ( !!( a_eOpen & OPEN::READING ) ) && ( !!( a_eOpen & OPEN::APPEND ) ) ) )
-		M_THROW( _( "inconsistient mode flags" ), a_eOpen.value() );
 	return;
 	M_EPILOG
 	}
 
 HFile::HFile( yaal::hcore::HString const& path, open_t const& a_eOpen )
-	: HStreamInterface(), f_eOpen( a_eOpen ),
+	: HStreamInterface(),
 	f_pvHandle( NULL ), f_oPath(), f_oError(),
 	f_bExternal( false )
 	{
 	M_PROLOG
-	if ( ( ( !!( a_eOpen & OPEN::APPEND ) ) && ( !!( a_eOpen & OPEN::TRUNCATE ) ) )
-			|| ( ( !!( a_eOpen & OPEN::READING ) ) && ( !!( a_eOpen & OPEN::TRUNCATE ) ) )
-			|| ( ( !!( a_eOpen & OPEN::READING ) ) && ( !!( a_eOpen & OPEN::APPEND ) ) ) )
-		M_THROW( _( "inconsistient mode flags" ), a_eOpen.value() );
-	open( path );
+	open( path, a_eOpen );
 	return;
 	M_EPILOG
 	}
@@ -77,26 +79,27 @@ HFile::~HFile( void )
 	M_EPILOG
 	}
 
-int HFile::open( HString const& a_oPath )
+int HFile::open( HString const& a_oPath, open_t const& open_ )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	char const* l_pcMode = NULL;
-	if ( f_eOpen == OPEN::READING )
+	if ( open_ == OPEN::READING )
 		l_pcMode = "rb";
-	else if ( ( f_eOpen == OPEN::WRITING ) || ( f_eOpen == ( open_t( OPEN::WRITING ) | open_t( OPEN::TRUNCATE ) ) ) )
+	else if ( ( open_ == OPEN::WRITING ) || ( open_ == ( open_t( OPEN::WRITING ) | open_t( OPEN::TRUNCATE ) ) ) )
 		l_pcMode = "wb";
-	else if ( f_eOpen == ( open_t( OPEN::WRITING ) | open_t( OPEN::APPEND ) ) )
+	else if ( open_ == ( open_t( OPEN::WRITING ) | open_t( OPEN::APPEND ) ) )
 		l_pcMode = "ab";
-	else if ( f_eOpen == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) ) )
+	else if ( open_ == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) ) )
 		l_pcMode = "r+b";
-	else if ( f_eOpen == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) | open_t( OPEN::TRUNCATE ) ) )
+	else if ( open_ == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) | open_t( OPEN::TRUNCATE ) ) )
 		l_pcMode = "w+b";
-	else if ( f_eOpen == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) | open_t( OPEN::APPEND ) ) )
+	else if ( open_ == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) | open_t( OPEN::APPEND ) ) )
 		l_pcMode = "a+b";
 	else
-		M_THROW( "unexpected mode setting", f_eOpen.value() );
+		M_THROW( "unexpected mode setting", open_.value() );
 	f_oPath = a_oPath;
+	M_ENSURE_EX( ! f_pvHandle, "stream already opened" );
 	f_pvHandle = ::std::fopen( a_oPath.raw(), l_pcMode );
 	if ( ! f_pvHandle )
 		{
@@ -105,6 +108,16 @@ int HFile::open( HString const& a_oPath )
 		f_oError += ": " + a_oPath;
 		return ( l_iError );
 		}
+	return ( 0 );
+	M_EPILOG
+	}
+
+int HFile::open( void* const handle )
+	{
+	M_PROLOG
+	M_ENSURE_EX( ! f_pvHandle, "stream already opened" );
+	f_pvHandle = handle;
+	f_bExternal = true;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -122,6 +135,17 @@ int HFile::close( void )
 		}
 	f_pvHandle = NULL;
 	return ( 0 );
+	M_EPILOG
+	}
+
+void* HFile::release( void )
+	{
+	M_PROLOG
+	M_ASSERT( f_pvHandle && f_bExternal );
+	void* handle( NULL );
+	using yaal::swap;
+	swap( f_pvHandle, handle );
+	return ( handle );
 	M_EPILOG
 	}
 
@@ -256,14 +280,6 @@ HString const& HFile::get_error( void ) const
 	M_EPILOG
 	}
 
-void HFile::flush( void ) const
-	{
-	M_PROLOG
-	do_flush();
-	return;
-	M_EPILOG
-	}
-
 void HFile::do_flush( void ) const
 	{
 	M_PROLOG
@@ -304,13 +320,13 @@ bool HFile::do_is_valid( void ) const
 	M_EPILOG
 	}
 
-HFile cinInstance( HFile::OPEN::READING, stdin );
+HFile cinInstance( stdin, HFile::OPEN::READING );
 HSynchronizedFile cin( cinInstance );
-HFile coutInstance( HFile::OPEN::WRITING, stdout );
+HFile coutInstance( stdout, HFile::OPEN::WRITING );
 HSynchronizedFile cout( coutInstance );
-HFile cerrInstance( HFile::OPEN::WRITING, stderr );
+HFile cerrInstance( stderr, HFile::OPEN::WRITING );
 HSynchronizedFile cerr( cerrInstance );
-HFile clogInstance( HFile::OPEN::WRITING, stderr );
+HFile clogInstance( stderr, HFile::OPEN::WRITING );
 HSynchronizedFile clog( clogInstance );
 
 

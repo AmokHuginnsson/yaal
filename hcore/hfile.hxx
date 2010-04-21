@@ -88,33 +88,35 @@ public:
 		};
 	typedef HStrongEnum<SEEK> seek_t;
 private:
-	open_t f_eOpen;
 	void* f_pvHandle;
 	HString f_oPath;
 	HString f_oError;
 	bool f_bExternal;
 public:
+	/*! \brief Create closed file stream object.
+	 */
+	HFile( void );
 	/*! \brief Create closed (or based on low level interface) file stream.
 	 *
-	 * \param mode - open mode.
 	 * \param raw - low level interface stream handler.
 	 */
-	HFile( open_t const& mode = OPEN::READING, void* const raw = NULL );
+	explicit HFile( void* const raw );
 	/*! \brief Create new file stream and open file item immediatelly.
 	 *
 	 * \param path - path to file item to be opened.
 	 * \param mode - open mode.
 	 */
-	HFile( yaal::hcore::HString const& path, open_t const& mode = OPEN::READING );
+	HFile( yaal::hcore::HString const& path, open_t const& mode );
 	virtual ~HFile( void );
-	int open( HString const& );
+	int open( HString const&, open_t const& mode );
+	int open( void* const );
 	int close( void );
+	void* release( void );
 	int long read_line( HString&, read_t const& = READ::DEFAULTS, int const = 0 );
 	int long tell( void ) const;
 	void seek( int long const&, seek_t const& = SEEK::SET );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
-	virtual void flush( void ) const;
 	bool operator ! ( void ) const;
 private:
 	virtual int long do_write( void const* const, int long const& );

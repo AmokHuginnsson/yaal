@@ -40,7 +40,6 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hchunk.hxx"
 #include "hpattern.hxx"
 #include "hlog.hxx"
-#include "hcall.hxx"
 #include "hcore.hxx"
 
 using namespace yaal;
@@ -121,7 +120,7 @@ int rc_open( HString const& a_oRcName,
 	HString l_oRcPath = make_path( a_oRcName, a_ePlacament );
 	if ( !! a_roFile )
 		a_roFile.close();
-	l_iError = a_roFile.open( l_oRcPath );
+	l_iError = a_roFile.open( l_oRcPath, HFile::OPEN::READING );
 	if ( l_iError )
 		l_oRcPath +=	" not found, ";
 	else
@@ -294,7 +293,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 	size_t l_iCtrOut = 0;
 	HFile l_oRc;
 	HString l_oOption, l_oValue, l_oMessage;
-	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << "process_rc_file(): ";
+	log( LOG_TYPE::INFO ) << "process_rc_file(): ";
 	if ( f_oOptions.is_empty() )
 		M_THROW( _( "bad variable count" ), f_oOptions.size() );
 	for ( l_iCtrOut = 0; l_iCtrOut < ( sizeof ( l_psPlacementTab ) / sizeof ( OPlacement ) ); l_iCtrOut ++ )
@@ -347,7 +346,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& a_oRcName,
 					l_oMessage.format( "Error: unknown option found: `%s', "
 								"with value: `%s', on line %d.\n",
 								l_oOption.raw(), l_oValue.raw(), l_iLine );
-					log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << l_oMessage;
+					log( LOG_TYPE::ERROR ) << l_oMessage;
 					::fputs( l_oMessage.raw(), stderr );
 					}
 				}

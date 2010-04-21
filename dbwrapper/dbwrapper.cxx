@@ -37,7 +37,6 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hstring.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
 #include "hcore/hcore.hxx"
-#include "hcore/hcall.hxx"
 #include "hconsole/hconsole.hxx"
 #include "tools/tools.hxx"
 #include "dbwrapper.hxx"
@@ -86,7 +85,7 @@ bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
 			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::ORACLE;
 		else
 			{
-			log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << "Error: `" << a_roValue;
+			log( LOG_TYPE::ERROR ) << "Error: `" << a_roValue;
 			log << "' is unknown driver." << endl;
 			exit( 1 );
 			}

@@ -46,7 +46,6 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "console.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hlog.hxx"
-#include "hcore/hcall.hxx"
 
 #ifdef HAVE_CURSES_H
 #	include <curses.h>
@@ -127,7 +126,7 @@ int console_mouse_open( void )
 		M_THROW( l_oError, errno );
 		}
 
-	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << "i have opened device: `" << l_pcTty << '\'' << endl;
+	log( LOG_TYPE::INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
 
 	return ( 0 );
 	M_EPILOG
@@ -181,7 +180,7 @@ int console_mouse_open ( void )
 		l_oError.format( "Can't open mouse connection: %s", error_message( errno ) );
 		M_THROW( l_oError, l_iVC );
 		}
-	log( call( &HLog::filter, _1, LOG_TYPE::INFO ) ) << "i have opened device: `" << l_iVC << '\'' << endl;
+	log( LOG_TYPE::INFO ) << "i have opened device: `" << l_iVC << '\'' << endl;
 	return ( gpm_fd );
 	M_EPILOG
 	}

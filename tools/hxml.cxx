@@ -46,7 +46,6 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hfile.hxx"
 #include "hcore/hsocket.hxx"
 #include "tools.hxx"
-#include "hcore/hcall.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -170,11 +169,11 @@ struct HXml::OConvert
 		if ( !! a_oEncoding )
 			encoder = ::xmlFindCharEncodingHandler( a_oEncoding.raw() );
 		else
-			log( call( &HLog::filter, _1, LOG_TYPE::WARNING ) ) << _( "HXml::WARNING: no encoding declared in `" )
+			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: no encoding declared in `" )
 				<< a_oFileName << "'." << endl;
 		if ( ! encoder )
 			{
-			log( call( &HLog::filter, _1, LOG_TYPE::WARNING ) ) << _( "HXml::WARNING: char encoding handler not found" ) << endl;
+			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: char encoding handler not found" ) << endl;
 			xmlCharEncoding l_xEncoding = ::xmlDetectCharEncoding( a_psRoot->name,
 					xmlStrlen( a_psRoot->name ) );
 			if ( ! l_xEncoding )
@@ -352,7 +351,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 			xmlFreeDoc );
 	if ( errno )
 		{
-		log( call( &HLog::filter, _1, LOG_TYPE::WARNING ) ) << error_message( errno ) << ": " << streamId;
+		log( LOG_TYPE::WARNING ) << error_message( errno ) << ": " << streamId;
 		log << ", code: " << errno << '.' << endl;
 		}
 	errno = l_iSavedErrno;

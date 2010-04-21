@@ -33,7 +33,6 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hstring.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/hfile.hxx"
-#include "hcore/hcall.hxx"
 #include "tools/hplugin.hxx"
 #include "tools/hstringstream.hxx"
 #include "db_driver_loader.hxx"
@@ -76,7 +75,7 @@ drivers_t n_oDBDrivers;
 void* null_db_connect( char const*, char const*, char const* )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "db_connect" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_connect" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -84,7 +83,7 @@ void* null_db_connect( char const*, char const*, char const* )
 void null_db_disconnect( void* )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "(db_disconnect)" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "(db_disconnect)" << eend << endl;
 	return;
 	M_EPILOG
 	}
@@ -92,7 +91,7 @@ void null_db_disconnect( void* )
 int null_dbrs_errno( void*, void* )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "db_errno" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_errno" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -100,7 +99,7 @@ int null_dbrs_errno( void*, void* )
 char const* null_dbrs_error( void*, void* )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "db_error" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_error" << eend << endl;
 	return ( _( "null database driver loaded" ) );
 	M_EPILOG
 	}
@@ -108,7 +107,7 @@ char const* null_dbrs_error( void*, void* )
 void* null_db_query( void*, char const* )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "db_query" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_query" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -116,7 +115,7 @@ void* null_db_query( void*, char const* )
 void null_rs_unquery( void* )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "db_unquery" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "db_unquery" << eend << endl;
 	return;
 	M_EPILOG
 	}
@@ -124,7 +123,7 @@ void null_rs_unquery( void* )
 char* null_rs_get( void*, int long, int )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "rs_get" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "rs_get" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -132,7 +131,7 @@ char* null_rs_get( void*, int long, int )
 int null_rs_fields_count( void* )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "rs_fields_count" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "rs_fields_count" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -140,7 +139,7 @@ int null_rs_fields_count( void* )
 int long null_dbrs_records_count( void*, void* )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "dbrs_records_count" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "dbrs_records_count" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -148,7 +147,7 @@ int long null_dbrs_records_count( void*, void* )
 int long null_dbrs_id( void*, void* )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "dbrs_id" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "dbrs_id" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -156,7 +155,7 @@ int long null_dbrs_id( void*, void* )
 char* null_rs_column_name( void*, int )
 	{
 	M_PROLOG
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << etag << "rs_column_name" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "rs_column_name" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 	}
@@ -168,7 +167,7 @@ void dbwrapper_error( void )
 	M_PROLOG
 	HString l_oMessage;
 	l_oMessage = HPlugin().error_message( 0 );
-	log( call( &HLog::filter, _1, LOG_TYPE::ERROR ) ) << l_oMessage << endl;
+	log( LOG_TYPE::ERROR ) << l_oMessage << endl;
 	::fprintf( stderr, "(%s), ", l_oMessage.raw() );
 	return;
 	M_EPILOG
@@ -192,7 +191,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t const& driverI
 		try
 			{
 			driver = make_pair( HPlugin::ptr_t( new HPlugin() ), ODBConnector() );
-			log( call( &HLog::filter, _1, LOG_TYPE::NOTICE ) ) << "Loading [" << g_ppcDriver[ driverId_ + 1 ] << "] driver ... ";
+			log( LOG_TYPE::NOTICE ) << "Loading [" << g_ppcDriver[ driverId_ + 1 ] << "] driver ... ";
 			driver.first->load( g_ppcDriver[ driverId_ + 1 ] );
 			cerr << "(linking symbols ...) " << flush;
 			driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second.db_disconnect );
@@ -210,13 +209,13 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t const& driverI
 			}
 		catch ( HPluginException& e )
 			{
-			log( call( &HLog::filter, _1, LOG_TYPE::NOTICE ) ) << "fail." << endl;
+			log( LOG_TYPE::NOTICE ) << "fail." << endl;
 			HStringStream reason;
 			reason << _( "cannot load database driver: " ) << e.what();
 			M_THROW( reason.string(), n_eDataBaseDriver );
 			}
 		if ( driver.first->is_loaded() )
-			log( call( &HLog::filter, _1, LOG_TYPE::NOTICE ) ) << "success." << endl;
+			log( LOG_TYPE::NOTICE ) << "success." << endl;
 		else
 			{
 			dbwrapper_error();

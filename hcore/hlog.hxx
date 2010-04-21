@@ -32,7 +32,7 @@ Copyright:
 
 #include "hcore/hsingleton.hxx"
 #include "hcore/hchunk.hxx"
-#include "hcore/hsynchronizedstream.hxx"
+#include "hcore/hfile.hxx"
 
 namespace yaal
 {
@@ -58,21 +58,20 @@ class HLog;
 
 /*! \brief Logging utility.
  */
-class HLog : public HStreamInterface, private HSingletonInterface
+class HLog : public HField<HFile>, public HSynchronizedFile, private HSingletonInterface
 	{
 protected:
 	typedef HLog self_t;
 	typedef HStreamInterface hier_t;
 private:
-	bool			f_bRealMode;
-	bool			f_bNewLine;
-	int long	f_lType;
-	size_t		f_iBufferSize;
-	FILE*		f_psStream;
-	char*		f_pcProcessName;
-	HString	f_oLoginName;
-	HChunk	f_oHostName;
-	HChunk	f_oBuffer;
+	bool     f_bRealMode;
+	bool     f_bNewLine;
+	int long f_lType;
+	size_t   f_iBufferSize;
+	char*    f_pcProcessName;
+	HString  f_oLoginName;
+	HChunk   f_oHostName;
+	HChunk   f_oBuffer;
 public:
 	static int long f_lLogMask;
 public:
@@ -106,7 +105,7 @@ private:
 	};
 
 typedef HExceptionT<HLog, HStreamInterfaceException> HLogException;
-extern HSynchronizedStream<HLog&> log;
+extern HLog& log;
 
 }
 

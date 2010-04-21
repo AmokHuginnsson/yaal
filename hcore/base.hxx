@@ -97,6 +97,26 @@ to_t bit_cast( from_t val_ )
 	return ( cast._to );
 	}
 
+template<typename field_t, int const id = 0>
+class HField
+	{
+protected:
+	field_t _field;
+public:
+	HField( void ) : _field() {}
+	template<typename a0_t>
+	HField( a0_t a0_ ) : _field( a0_ ) {}
+	template<typename a0_t, typename a1_t>
+	HField( a0_t a0_, a1_t a1_ ) : _field( a0_, a1_ ) {}
+	template<typename a0_t, typename a1_t, typename a2_t>
+	HField( a0_t a0_, a1_t a1_, a2_t a2_ ) : _field( a0_, a1_, a2_ ) {}
+	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_ ) : _field( a0_, a1_, a2_, a3_ ) {}
+	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
+	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_ ) : _field( a0_, a1_, a2_, a3_, a4_ ) {}
+	virtual ~HField( void ) {}
+	};
+
 }
 
 #endif /* not YAAL_HCORE_BASE_HXX_INCLUDED */
