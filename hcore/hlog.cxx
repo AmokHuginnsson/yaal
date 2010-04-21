@@ -106,6 +106,7 @@ void HLog::rehash( FILE* a_psStream,
 		char const* const a_pcProcessName )
 	{
 	M_PROLOG
+	HLock l( _mutex );
 #ifndef HAVE_GETLINE
 	char* l_pcPtr = NULL;
 	int l_iLen = 0;
@@ -122,8 +123,22 @@ void HLog::rehash( FILE* a_psStream,
 		{
 		::fseek( l_psTmpFile, 0, SEEK_SET );
 		char* buf = f_oBuffer.get<char>();
-		while ( ::getline( &buf, &f_iBufferSize, l_psTmpFile ) > 0 )
-			{
+#ifdef HAVE_GETLINE
+    while ( ::getline( &buf, &f_iBufferSize, l_psTmpFile ) > 0 )
+#else /* HAVE_GETLINE */
+    while ( ( l_iLen = static_cast<int>( ::fread( buf, sizeof ( char ), f_iBufferSize, l_psTmpFile ) ) ) )
+#endif /* not HAVE_GETLINE */
+      {
+#ifndef HAVE_GETLINE
+      l_pcPtr = static_cast<char*>( ::memchr( buf, '\n', l_iLen ) );
+      if ( ! l_pcPtr )
+        {
+        ::fprintf( a_psStream, buf );
+        continue;
+        }
+      * ++ l_pcPtr = 0;
+      ::fseek( l_psTmpFile, l_pcPtr - buf - l_iLen, SEEK_CUR );
+#endif /* not HAVE_GETLINE */
 			f_lType = ::strtol( buf, NULL, 0x10 );
 			if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 				{
@@ -143,6 +158,7 @@ void HLog::rehash( HString const& a_oLogFileName,
 		char const* const a_pcProcessName )
 	{
 	M_PROLOG
+	HLock l( _mutex );
 	if ( a_oLogFileName.is_empty() )
 		M_THROW( "new file name argument is", a_oLogFileName.get_length() );
 	rehash( ::fopen( a_oLogFileName.raw(), "a" ), a_pcProcessName );
