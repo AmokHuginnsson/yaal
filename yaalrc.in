@@ -2,7 +2,7 @@
 # yaal library configuration file.
 # comments begin with `#' char and continues until end of line
 # configuration file is divided into sections, each section
-# begins with [secttion_name] mark, each option may be placed
+# begins with [section_name] mark, each option may be placed
 # only in section it belongs to.
 # option names are case insensitive
 # in most cases option values are case insensitive also
@@ -13,7 +13,7 @@
 # we currently distinguish between four kind of value types:
 # bool   - (true|yes|on|false|no|off)
 # char   - [a-z]
-# int    - [0-1]+
+# int    - [0-9]+
 # string - .+
 #
 # example:
@@ -200,7 +200,7 @@ log_mask LOG_SQL
 
 # select data base driver
 # accepted drivers are:
-# SQLite3, SQLite, MySQL, PostgreSQL, Oracle, null, none
+# SQLite3, PostgreSQL, MySQL, Oracle, null, none
 # last two drivers disables database interface completly,
 # it can by useful for programs that does not use databases
 # or for debuging purpouses
