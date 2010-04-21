@@ -115,6 +115,10 @@ public:
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
 	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_ ) : _field( a0_, a1_, a2_, a3_, a4_ ) {}
 	virtual ~HField( void ) {}
+	field_t& ref( void )
+		{ return ( _field ); }
+	field_t const& ref( void ) const
+		{ return ( _field ); }
 	};
 
 }

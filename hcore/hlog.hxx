@@ -64,6 +64,7 @@ protected:
 	typedef HLog self_t;
 	typedef HStreamInterface hier_t;
 private:
+	typedef HField<HFile> _file;
 	bool     f_bRealMode;
 	bool     f_bNewLine;
 	int long f_lType;
