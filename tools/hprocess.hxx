@@ -49,6 +49,7 @@ class HProcess : public yaal::tools::HSignalHandlerInterface
 protected:
 	typedef HProcess self_t;
 	typedef HSignalHandlerInterface hier_t;
+private:
 	typedef yaal::hcore::HBoundCallInterface<0, void>::ptr_t delayed_call_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
 	typedef yaal::hcore::HBoundCallInterface<1, void, int>::ptr_t process_filedes_handler_t;
@@ -67,16 +68,17 @@ protected:
 	dropped_fd_t f_oDroppedFd;
 	bool f_bCallbackContext;
 	yaal::hcore::HPipe f_oEvent;
-	HProcess( size_t );
-	virtual ~HProcess( void );
 public:
+	HProcess( int, int, int = 0 );
+	virtual ~HProcess( void );
 	int run( void );
-	int init( int, int = 0 );
+	void stop( void );
+	int idle_cycles( void ) const;
 	int register_file_descriptor_handler( int, process_filedes_handler_t );
 	void unregister_file_descriptor_handler( int );
 	void add_alert_handle( delayed_call_t );
 	void add_idle_handle( delayed_call_t );
-protected:
+private:
 	int reconstruct_fdset( void );
 	/*! \brief Process incoming events from interrupt socket.
 	 */
@@ -86,14 +88,11 @@ protected:
 	int handler_interrupt( int );
 	void handle_alerts( void );
 	void handle_idle( void );
-	virtual int do_init( void );
-	virtual int do_cleanup( void );
-private:
 	HProcess( HProcess const& );
 	HProcess& operator = ( HProcess const& );
 	};
 
-typedef yaal::hcore::HExceptionT<HProcess, HSignalHandlerInterfaceException> Exception;
+typedef yaal::hcore::HExceptionT<HProcess, HSignalHandlerInterfaceException> HProcessException;
 
 }
 

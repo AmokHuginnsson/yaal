@@ -44,12 +44,12 @@ namespace yaal
 namespace tools
 {
 
-HProcess::HProcess( size_t a_uiFileHandlers )
+HProcess::HProcess( int noFileHandlers_, int a_iLatencySeconds, int a_iLatencyMicroseconds )
 	: f_bInitialised( false ), f_bLoop( true ), f_iIdleCycles( 0 ),
-	f_iLatencySeconds( 0 ), f_iLatencyMicroseconds( 0 ),
+	f_iLatencySeconds( a_iLatencySeconds ), f_iLatencyMicroseconds( a_iLatencyMicroseconds ),
 	f_sLatency(), f_xFileDescriptorSet(),
-	f_oFileDescriptorHandlers( a_uiFileHandlers ),
-	_alert(), _idle(), f_oDroppedFd( a_uiFileHandlers ),
+	f_oFileDescriptorHandlers( noFileHandlers_ ),
+	_alert(), _idle(), f_oDroppedFd( noFileHandlers_ ),
 	f_bCallbackContext( false ), f_oEvent()
 	{
 	M_PROLOG
@@ -57,6 +57,12 @@ HProcess::HProcess( size_t a_uiFileHandlers )
 	M_ASSERT( f_oDroppedFd.is_empty() );
 	::memset( &f_sLatency, 0, sizeof ( f_sLatency ) );
 	FD_ZERO( &f_xFileDescriptorSet );
+	HSignalService& ss = HSignalServiceFactory::get_instance();
+	HSignalService::HHandlerGeneric::ptr_t handler( new HSignalService::HHandlerExternal( this, &HProcess::handler_interrupt ) );
+	if ( n_iDebugLevel < DEBUG_LEVEL::GDB )
+		ss.register_handler( SIGINT, handler );
+	ss.register_handler( SIGHUP, handler );
+	register_file_descriptor_handler( f_oEvent.get_reader_fd(), bound_call( &HProcess::process_interrupt, this, _1 ) );
 	return;
 	M_EPILOG
 	}
@@ -66,37 +72,6 @@ HProcess::~HProcess( void )
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
-
-int HProcess::do_init( void )
-	{
-	M_PROLOG
-	if ( f_bInitialised )
-		M_THROW( "you can initialise your main process only once, dumbass",
-				errno );
-	HSignalService& ss = HSignalServiceFactory::get_instance();
-	HSignalService::HHandlerGeneric::ptr_t handler( new HSignalService::HHandlerExternal( this, &HProcess::handler_interrupt ) );
-	if ( n_iDebugLevel < DEBUG_LEVEL::GDB )
-		ss.register_handler( SIGINT, handler );
-	ss.register_handler( SIGHUP, handler );
-	register_file_descriptor_handler( f_oEvent.get_reader_fd(), bound_call( &HProcess::process_interrupt, this, _1 ) );
-	f_bInitialised = true;
-	return ( 0 );
-	M_EPILOG
-	}
-
-int HProcess::init( int a_iLatencySeconds, int a_iLatencyMicroseconds )
-	{
-	M_PROLOG
-	f_iLatencySeconds = a_iLatencySeconds;
-	f_iLatencyMicroseconds = a_iLatencyMicroseconds;
-	return ( 1 );
-	M_EPILOG
-	}
-
-int HProcess::do_cleanup( void )
-	{
-	return ( 0 );
 	}
 
 int HProcess::register_file_descriptor_handler( int a_iFileDescriptor, process_filedes_handler_t HANDLER )
@@ -140,11 +115,8 @@ int HProcess::run( void )
 	{
 	M_PROLOG
 	int l_iError = 0;
-	do_init();
-	if ( ! f_bInitialised )
-		M_THROW( _ ( "you have to call HProcess::init() first, dumbass" ), errno );
 	if ( ! f_oFileDescriptorHandlers.size() )
-		M_THROW( _ ( "there is no file descriptor to check activity on" ), errno );
+		M_THROW( _( "there is no file descriptor to check activity on" ), errno );
 	while ( f_bLoop )
 		{
 		f_bCallbackContext = true;
@@ -177,9 +149,19 @@ int HProcess::run( void )
 			f_oDroppedFd.clear();
 			}
 		}
-	do_cleanup();
 	return ( 0 );
 	M_EPILOG
+	}
+
+void HProcess::stop( void )
+	{
+	f_bLoop = false;
+	return;
+	}
+
+int HProcess::idle_cycles( void ) const
+	{
+	return ( f_iIdleCycles );
 	}
 
 void HProcess::process_interrupt( int )

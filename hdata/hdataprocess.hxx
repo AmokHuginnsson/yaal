@@ -90,8 +90,7 @@ private:
 public:
 	HDataProcess( void );
 	virtual ~HDataProcess( void );
-	virtual int init_xrc( char const*, char const*,
-			menu_handlers_map_t const& );
+	int init_xrc( char const*, char const*, menu_handlers_map_t const& );
 	dbwrapper::database_ptr_t data_base( void );
 protected:
 	virtual int handler_quit( int, void const* = NULL );

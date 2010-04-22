@@ -42,6 +42,7 @@ namespace hconsole
 class HHandler
 	{
 protected:
+	typedef HHandler self_t;
 	typedef int ( HHandler::* HANDLER_t ) ( int, void const* );
 	typedef hcore::HHashMap<int, HANDLER_t> process_handler_key_map_t;
 	typedef hcore::HHashMap<hcore::HString, HANDLER_t> process_handler_command_map_t;
@@ -68,6 +69,8 @@ protected:
 	int register_preprocess_handler_internal( int, int const *, HANDLER_t );
 	int register_postprocess_handler_internal( int, int const *, HANDLER_t );
 	};
+
+typedef yaal::hcore::HExceptionT<HHandler> HHandlerException;
 
 }
 

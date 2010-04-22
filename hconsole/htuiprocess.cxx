@@ -48,15 +48,13 @@ namespace yaal
 namespace hconsole
 {
 
-HTUIProcess::HTUIProcess( size_t a_uiFileHandlers, size_t a_uiKeyHandlers,
+HTUIProcess::HTUIProcess( int noFileHandlers_, size_t a_uiKeyHandlers,
 		size_t a_uiCommandHandlers )
 	: HHandler( a_uiKeyHandlers, a_uiCommandHandlers ),
-	HProcess( a_uiFileHandlers ), f_oMainWindow(), f_oForegroundWindow(),
+	_dispatcher( noFileHandlers_, n_iLatency ), f_oMainWindow(), f_oForegroundWindow(),
 	f_oWindows( new model_t() )
 	{
 	M_PROLOG
-	memset ( & f_sLatency, 0, sizeof ( f_sLatency ) );
-	FD_ZERO ( & f_xFileDescriptorSet );
 	return;
 	M_EPILOG
 	}
@@ -82,15 +80,14 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 	int l_piAlts[ ALTS_COUNT ];
 	int l_piCtrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t l_oMainWindow;
-	HProcess::init( n_iLatency );
-	register_file_descriptor_handler( STDIN_FILENO, bound_call( &HTUIProcess::process_stdin, this, _1 ) );
+	_dispatcher.register_file_descriptor_handler( STDIN_FILENO, bound_call( &HTUIProcess::process_stdin, this, _1 ) );
 	HConsole& cons = HCons::get_instance();
 	int l_iMouseDes = cons.get_mouse_fd();
 	if ( n_bUseMouse && l_iMouseDes )
-		register_file_descriptor_handler( l_iMouseDes, bound_call( &HTUIProcess::process_mouse, this, _1 ) );
-	register_file_descriptor_handler( cons.get_event_fd(), bound_call( &HTUIProcess::process_terminal_event, this, _1 ) );
-	add_alert_handle( bound_call( &HTUIProcess::handler_alert, this ) );
-	add_idle_handle( bound_call( &HTUIProcess::handler_idle, this ) );
+		_dispatcher.register_file_descriptor_handler( l_iMouseDes, bound_call( &HTUIProcess::process_mouse, this, _1 ) );
+	_dispatcher.register_file_descriptor_handler( cons.get_event_fd(), bound_call( &HTUIProcess::process_terminal_event, this, _1 ) );
+	_dispatcher.add_alert_handle( bound_call( &HTUIProcess::handler_alert, this ) );
+	_dispatcher.add_idle_handle( bound_call( &HTUIProcess::handler_idle, this ) );
 	register_postprocess_handler( CTRLS_COUNT, l_piCtrls,
 			& HTUIProcess::handler_refresh );
 	register_postprocess_handler( KEY<'x'>::command, NULL,
@@ -120,6 +117,13 @@ int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWi
 	f_oCommandHandlers[ "quit" ] = static_cast<HHandler::HANDLER_t>( &HTUIProcess::handler_quit );
 	refresh();
 	return ( 1 );
+	M_EPILOG
+	}
+
+int HTUIProcess::run( void )
+	{
+	M_PROLOG
+	return ( _dispatcher.run() );
 	M_EPILOG
 	}
 
@@ -292,7 +296,7 @@ int HTUIProcess::handler_refresh( int, void const* )
 int HTUIProcess::handler_quit( int, void const* )
 	{
 	M_PROLOG
-	f_bLoop = false;
+	_dispatcher.stop();
 	n_bNeedRepaint = false;
 	HCons::get_instance().clrscr();
 	return ( 0 );
@@ -302,7 +306,7 @@ int HTUIProcess::handler_quit( int, void const* )
 int HTUIProcess::handler_jump_meta_tab( int a_iCode, void const* )
 	{
 	M_PROLOG
-	if ( f_iIdleCycles < 5 )
+	if ( _dispatcher.idle_cycles() < 5 )
 		++ f_oForegroundWindow;
 	else
 		f_oForegroundWindow = f_oWindows->begin();

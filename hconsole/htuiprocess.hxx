@@ -43,22 +43,24 @@ namespace hconsole
 
 /*! \brief A backbone of TUI based application.
  */
-class HTUIProcess : public HHandler, public yaal::tools::HProcess
+class HTUIProcess : public HHandler
 	{
 protected:
 	typedef HTUIProcess self_t;
-	typedef yaal::tools::HProcess hier_t;
+	typedef HHandler hier_t;
 public:
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 protected:
+	yaal::tools::HProcess _dispatcher;
 	HWindow::ptr_t f_oMainWindow; /* self explanary */
 	model_t::cyclic_iterator f_oForegroundWindow; /* self explanary */
 	model_ptr_t f_oWindows;	/* current existing windows */
 public:
-	HTUIProcess ( size_t = 8, size_t = 32, size_t = 32 );
+	HTUIProcess ( int = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );
 	int init_tui( char const* = "", HWindow::ptr_t = HWindow::ptr_t() );
+	int run( void );
 protected:
 	void process_stdin( int );
 	void process_mouse( int );
@@ -79,6 +81,8 @@ private:
 	HTUIProcess( HTUIProcess const& );
 	HTUIProcess& operator = ( HTUIProcess const& );
 	};
+
+typedef yaal::hcore::HExceptionT<HTUIProcess, HHandlerException> HTUIProcessException;
 
 }
 
