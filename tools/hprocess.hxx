@@ -68,6 +68,7 @@ private:
 	dropped_fd_t f_oDroppedFd;
 	bool f_bCallbackContext;
 	yaal::hcore::HPipe f_oEvent;
+	yaal::hcore::HMutex _mutex;
 public:
 	HProcess( int, int, int = 0 );
 	virtual ~HProcess( void );

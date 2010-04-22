@@ -50,7 +50,7 @@ HProcess::HProcess( int noFileHandlers_, int a_iLatencySeconds, int a_iLatencyMi
 	f_sLatency(), f_xFileDescriptorSet(),
 	f_oFileDescriptorHandlers( noFileHandlers_ ),
 	_alert(), _idle(), f_oDroppedFd( noFileHandlers_ ),
-	f_bCallbackContext( false ), f_oEvent()
+	f_bCallbackContext( false ), f_oEvent(), _mutex()
 	{
 	M_PROLOG
 	f_oDroppedFd.clear();
@@ -153,26 +153,17 @@ int HProcess::run( void )
 	M_EPILOG
 	}
 
-void HProcess::stop( void )
-	{
-	f_bLoop = false;
-	return;
-	}
-
 int HProcess::idle_cycles( void ) const
 	{
 	return ( f_iIdleCycles );
 	}
 
-void HProcess::process_interrupt( int )
+void HProcess::stop( void )
 	{
 	M_PROLOG
-	int l_iSigNo = 0;
-	f_oEvent.read( &l_iSigNo, sizeof ( l_iSigNo ) );
-	if ( l_iSigNo == SIGINT )
-		f_bLoop = false;
-	else if ( l_iSigNo == SIGHUP )
-		program_options_helper::reload_configuration();
+	HLock l( _mutex );
+	int l_iSigNo = SIGINT;
+	M_ENSURE( f_oEvent.write( &l_iSigNo, sizeof ( l_iSigNo ) ) == sizeof ( l_iSigNo ) );
 	return;
 	M_EPILOG
 	}
@@ -180,8 +171,23 @@ void HProcess::process_interrupt( int )
 int HProcess::handler_interrupt( int a_iSigNo )
 	{
 	M_PROLOG
-	f_oEvent.write( &a_iSigNo, sizeof ( a_iSigNo ) );
+	HLock l( _mutex );
+	M_ENSURE( f_oEvent.write( &a_iSigNo, sizeof ( a_iSigNo ) ) == sizeof ( a_iSigNo ) );
 	return ( 1 );
+	M_EPILOG
+	}
+
+void HProcess::process_interrupt( int )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	int l_iSigNo = 0;
+	M_ENSURE( f_oEvent.read( &l_iSigNo, sizeof ( l_iSigNo ) ) == sizeof ( l_iSigNo ) );
+	if ( l_iSigNo == SIGINT )
+		f_bLoop = false;
+	else if ( l_iSigNo == SIGHUP )
+		program_options_helper::reload_configuration();
+	return;
 	M_EPILOG
 	}
 
