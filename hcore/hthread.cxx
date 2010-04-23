@@ -397,7 +397,8 @@ void HEvent::wait( void )
 void HEvent::signal( void )
 	{
 	M_PROLOG
-	_mutex.lock();
+	/* HCondition::signal() locks mutext before invoking actual signal action.
+	 */
 	_condition.signal();
 	return;
 	M_EPILOG

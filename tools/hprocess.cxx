@@ -89,7 +89,7 @@ void HProcess::unregister_file_descriptor_handler( int a_iFileDescriptor )
 		f_oDroppedFd.push_back( a_iFileDescriptor );
 	else
 		{
-		bool fail( f_oFileDescriptorHandlers.erase( a_iFileDescriptor ) == 1 );
+		bool fail( f_oFileDescriptorHandlers.erase( a_iFileDescriptor ) != 1 );
 		M_ASSERT( ! fail );
 		}
 	return;
