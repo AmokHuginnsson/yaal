@@ -103,14 +103,13 @@ public:
 		virtual HSignalHandlerInterface* get_base();
 		};
 private:
-	typedef yaal::hcore::HThreadT<HSignalService> signal_service_t;
 	typedef yaal::hcore::HList<HHandlerGeneric::ptr_t> handler_list_t;
 	typedef yaal::hcore::HPointer<handler_list_t> handler_list_ptr_t;
 	typedef yaal::hcore::HMultiMap<int, HHandlerGeneric::ptr_t> handlers_t;
 	static int f_iExitStatus;
 	bool f_bLoop;
 	yaal::hcore::HChunk f_oLocker;
-	signal_service_t f_oWorker;
+	yaal::hcore::HThread _thread;
 	yaal::hcore::HMutex f_oMutex;
 	handlers_t f_oHandlers;
 public:
@@ -118,14 +117,13 @@ public:
 private:
 	HSignalService( void );
 	~HSignalService( void );
-	int operator()( yaal::hcore::HThread const* );
+	void* run( void );
 	void lock_on( int );
 	static int life_time( int );
 	void schedule_exit( int );
 	static void exit( int ) __attribute__(( __noreturn__ ));
 	friend class yaal::hcore::HSingleton<HSignalService>;
 	friend class yaal::hcore::HDestructor<HSignalService>;
-	friend class yaal::hcore::HThreadT<HSignalService>;
 	};
 
 /*! \brief Get access to global signal manager.

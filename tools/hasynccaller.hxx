@@ -45,10 +45,9 @@ class HAbstractAsyncCaller
 protected:
 	typedef int long priority_t;
 	typedef yaal::hcore::HBoundCallInterface<>::ptr_t call_t;
-	typedef yaal::hcore::HThreadT<HAbstractAsyncCaller> async_caller_t;
 	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
 	queue_t f_oQueue;
-	async_caller_t f_oCaller;
+	yaal::hcore::HThread _thread;
 	yaal::hcore::HMutex f_oMutex;
 	bool f_bLoop;
 public:
@@ -60,11 +59,10 @@ protected:
 	void start( void );
 	void stop( void );
 	virtual void do_signal( void ) = 0;
-	virtual int do_work( void ) = 0;
+	virtual void* do_work( void ) = 0;
 	static int life_time( int );
 private:
-	int operator()( yaal::hcore::HThread const* );
-	friend class yaal::hcore::HThreadT<HAbstractAsyncCaller>;
+	void* run( void );
 	};
 
 /*! \brief Invoke function or method asynchronously.
@@ -74,7 +72,7 @@ class HAsyncCaller : public HAbstractAsyncCaller
 	yaal::hcore::HSemaphore f_oSemaphore;
 	HAsyncCaller( void );
 	virtual ~HAsyncCaller( void );
-	virtual int do_work( void );
+	virtual void* do_work( void );
 	virtual void do_signal( void );
 	friend class yaal::hcore::HSingleton<HAsyncCaller>;
 	friend class yaal::hcore::HDestructor<HAsyncCaller>;

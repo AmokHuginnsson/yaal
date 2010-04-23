@@ -83,16 +83,14 @@ private:
 class HWorkFlow::HWorker
 	{
 private:
-	typedef yaal::hcore::HThreadT<HWorkFlow::HWorker> worker_t;
 	HWorkFlowInterface* f_poWorkFlow;
-	worker_t f_oWorker;
+	yaal::hcore::HThread _thread;
 public:
 	HWorker( HWorkFlowInterface* );
 	void spawn( void );
 	void finish( void );
 private:
-	int operator()( yaal::hcore::HThread const* );
-	friend class yaal::hcore::HThreadT<HWorker>;
+	void* run( void );
 	HWorker( HWorker const& );
 	HWorker& operator = ( HWorker const& );
 	};

@@ -63,7 +63,7 @@ void HScheduledAsyncCaller::do_signal( void )
 	M_EPILOG
 	}
 
-int HScheduledAsyncCaller::do_work( void )
+void* HScheduledAsyncCaller::do_work( void )
 	{
 	M_PROLOG
 	HLock l( f_oMutex );

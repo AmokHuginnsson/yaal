@@ -37,7 +37,8 @@ namespace yaal
 namespace tools
 {
 
-HAbstractAsyncCaller::HAbstractAsyncCaller( void ) : f_oQueue(), f_oCaller( *this ), f_oMutex(), f_bLoop( false )
+HAbstractAsyncCaller::HAbstractAsyncCaller( void )
+	: f_oQueue(), _thread(), f_oMutex(), f_bLoop( false )
 	{
 	M_PROLOG
 	return;
@@ -49,7 +50,7 @@ void HAbstractAsyncCaller::stop( void )
 	M_PROLOG
 	f_bLoop = false;
 	do_signal();
-	f_oCaller.finish();
+	_thread.finish();
 	return;
 	M_EPILOG
 	}
@@ -58,7 +59,7 @@ void HAbstractAsyncCaller::start( void )
 	{
 	M_PROLOG
 	f_bLoop = true;
-	f_oCaller.spawn();
+	_thread.spawn( bound_call( &HAbstractAsyncCaller::run, this ) );
 	return;
 	M_EPILOG
 	}
@@ -90,7 +91,7 @@ void HAbstractAsyncCaller::flush( void* a_pvInvoker )
 	M_EPILOG
 	}
 
-int HAbstractAsyncCaller::operator()( yaal::hcore::HThread const* )
+void* HAbstractAsyncCaller::run( void )
 	{
 	M_PROLOG
 	return ( do_work() );
@@ -126,7 +127,7 @@ void HAsyncCaller::do_signal( void )
 	M_EPILOG
 	}
 
-int HAsyncCaller::do_work( void )
+void* HAsyncCaller::do_work( void )
 	{
 	M_PROLOG
 	while ( f_bLoop )

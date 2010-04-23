@@ -45,7 +45,7 @@ class HScheduledAsyncCaller : public HAbstractAsyncCaller
 	yaal::hcore::HCondition f_oCondition;
 	HScheduledAsyncCaller( void );
 	virtual ~HScheduledAsyncCaller( void );
-	virtual int do_work( void );
+	virtual void* do_work( void );
 	virtual void do_signal( void );
 	friend class yaal::hcore::HSingleton<HScheduledAsyncCaller>;
 	friend class yaal::hcore::HDestructor<HScheduledAsyncCaller>;

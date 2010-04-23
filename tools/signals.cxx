@@ -104,7 +104,7 @@ HSignalHandlerInterface*	HSignalService::HHandlerExternal::get_base( void )
 int HSignalService::f_iExitStatus = 0;
 HSignalService::HSignalService( void )
 	: f_bLoop( true ), f_oLocker( chunk_size<sigset_t>( 1 ) ),
-	f_oWorker( *this ), f_oMutex(), f_oHandlers()
+	_thread(), f_oMutex(), f_oHandlers()
 	{
 	M_PROLOG
 	M_ENSURE( sigemptyset( f_oLocker.get<sigset_t>() ) == 0 );
@@ -130,7 +130,7 @@ HSignalService::HSignalService( void )
 	register_handler( SIGSYS, fatal );
 	lock_on( SIGPIPE );
 	lock_on( SIGURG );
-	f_oWorker.spawn();
+	_thread.spawn( bound_call( &HSignalService::run, this ) );
 	return;
 	M_EPILOG
 	}
@@ -146,15 +146,15 @@ HSignalService::~HSignalService( void )
 	 * all hail to IBM Signal Managment documentation
 	 */
 	M_ENSURE( kill( getpid(), SIGURG ) == 0 );
-	f_oWorker.finish();
+	_thread.finish();
 	return;
 	M_EPILOG
 	}
 
-int HSignalService::operator()( HThread const* )
+void* HSignalService::run( void )
 	{
 	M_PROLOG
-	while ( f_bLoop && f_oWorker.is_alive() )
+	while ( f_bLoop && _thread.is_alive() )
 		{
 		int l_iSigNo = 0;
 		M_ENSURE( sigwait( f_oLocker.get<sigset_t>(), &l_iSigNo ) == 0 );

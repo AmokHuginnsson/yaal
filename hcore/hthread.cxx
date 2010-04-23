@@ -52,8 +52,8 @@ void do_pthread_attr_destroy( void* attr )
 	}
 
 HThread::HThread( void )
-	: f_eStatus( DEAD ), _buf( chunk_size<pthread_t>( 1 ) + chunk_size<pthread_attr_t>( 1 ) ),
-	f_oMutex( HMutex::TYPE::RECURSIVE ), f_oSemaphore(), _resGuard()
+	: _status( DEAD ), _buf( chunk_size<pthread_t>( 1 ) + chunk_size<pthread_attr_t>( 1 ) ),
+	_mutex( HMutex::TYPE::RECURSIVE ), _semaphore(), _resGuard(), _call()
 	{
 	M_PROLOG
 	pthread_attr_t* attr( static_cast<pthread_attr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_t ) ) ) );
@@ -69,29 +69,30 @@ HThread::HThread( void )
 HThread::~HThread( void )
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	if ( f_eStatus != DEAD )
+	HLock l_oLock( _mutex );
+	if ( _status != DEAD )
 		{
-		f_oMutex.unlock();
+		_mutex.unlock();
 		finish();
-		f_oMutex.lock();
+		_mutex.lock();
 		}
-	M_ASSERT( f_eStatus == DEAD );
+	M_ASSERT( _status == DEAD );
 	return;
 	M_EPILOG
 	}
 
-int HThread::spawn( void )
+int HThread::spawn( call_t call_ )
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	if ( f_eStatus != DEAD )
-		M_THROW( _( "thread is already running or spawning" ), f_eStatus );
-	f_eStatus = SPAWNING;
+	HLock l_oLock( _mutex );
+	if ( _status != DEAD )
+		M_THROW( _( "thread is already running or spawning" ), _status );
+	_status = SPAWNING;
+	_call = call_;
 	M_ENSURE( ::pthread_create( _buf.get<pthread_t>(),
 				static_cast<pthread_attr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_t ) ) ),
 				SPAWN, this ) == 0 );
-	f_oSemaphore.wait();
+	_semaphore.wait();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -99,27 +100,27 @@ int HThread::spawn( void )
 void HThread::schedule_finish( void )
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	if ( f_eStatus != DEAD )
-		f_eStatus = ZOMBIE;
+	HLock l_oLock( _mutex );
+	if ( _status != DEAD )
+		_status = ZOMBIE;
 	return;
 	M_EPILOG
 	}
 
-int long HThread::finish( void )
+void* HThread::finish( void )
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	if ( ( f_eStatus != ALIVE ) && ( f_eStatus != ZOMBIE ) && ( f_eStatus != SPAWNING ) )
-		M_THROW( _( "thread is not running" ), f_eStatus );
+	HLock l_oLock( _mutex );
+	if ( ( _status != ALIVE ) && ( _status != ZOMBIE ) && ( _status != SPAWNING ) )
+		M_THROW( _( "thread is not running" ), _status );
 	schedule_finish();
-	f_oMutex.unlock();
-	f_oSemaphore.wait();
-	f_oMutex.lock();
+	_mutex.unlock();
+	_semaphore.wait();
+	_mutex.lock();
 	void* l_pvReturn = NULL;
 	M_ENSURE( ::pthread_join( *_buf.get<pthread_t>(), &l_pvReturn ) == 0 );
-	f_eStatus = DEAD;
-	return ( reinterpret_cast<int long>( l_pvReturn ) );
+	_status = DEAD;
+	return ( l_pvReturn );
 	M_EPILOG
 	}
 
@@ -136,10 +137,9 @@ void* HThread::SPAWN( void* a_pvThread )
 	M_EPILOG
 	}
 
-void HThread::CLEANUP( void* a_pvThread )
+void HThread::CLEANUP( void* )
 	{
 	M_PROLOG
-	reinterpret_cast<HThread*>( a_pvThread )->do_cleanup();
 	return;
 	M_EPILOG
 	}
@@ -156,8 +156,8 @@ void* HThread::control( void )
 	 */
 	void* l_pvReturn( NULL );
 	pthread_cleanup_push( CLEANUP, this );
-	f_eStatus = ALIVE;
-	f_oSemaphore.signal();
+	_status = ALIVE;
+	_semaphore.signal();
 	/*
 	 * Setting int run(); as pure virtual exposed us to undefined behavior
 	 * at the event of two subsequent spawn() calls.
@@ -181,10 +181,10 @@ void* HThread::control( void )
 	 * That is why we have to deliver interface that allows users to not specify
 	 * any useful or meaningful int run();
 	 */
-	l_pvReturn = reinterpret_cast<void*>( do_run() );
+	l_pvReturn = _call->invoke();
 	pthread_cleanup_pop( 0 );
-	f_eStatus = ZOMBIE;
-	f_oSemaphore.signal();
+	_status = ZOMBIE;
+	_semaphore.signal();
 	return ( l_pvReturn );
 	M_EPILOG
 	}
@@ -192,26 +192,8 @@ void* HThread::control( void )
 bool HThread::is_alive( void ) const
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	return ( f_eStatus == ALIVE );
-	M_EPILOG
-	}
-
-int HThread::do_run( void )
-	{
-	M_PROLOG
-	/*
-	 * Just avoid crash on two subsequent spawn() calls.
-	 */
-	log << "Pure virtual call - ignored." << endl;
-	return( -1 );
-	M_EPILOG
-	}
-
-void HThread::do_cleanup( void )
-	{
-	M_PROLOG
-	return;
+	HLock l_oLock( _mutex );
+	return ( _status == ALIVE );
 	M_EPILOG
 	}
 
@@ -225,19 +207,19 @@ void do_pthread_mutexattr_destroy( void* attr )
 	::pthread_mutexattr_destroy( static_cast<pthread_mutexattr_t*>( attr ) );
 	}
 
-HMutex::HMutex( TYPE::mutex_type_t const a_eType ) : f_eType( a_eType ),
+HMutex::HMutex( TYPE::mutex_type_t const a_eType ) : _type( a_eType ),
 	_buf( chunk_size<pthread_mutex_t>( 1 ) + chunk_size<pthread_mutexattr_t>( 1 ) ),
 	_resGuard()
 	{
 	M_PROLOG
-	if ( f_eType == TYPE::DEFAULT )
-		f_eType = TYPE::NON_RECURSIVE;
+	if ( _type == TYPE::DEFAULT )
+		_type = TYPE::NON_RECURSIVE;
 	pthread_mutexattr_t* attr( static_cast<pthread_mutexattr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_mutex_t ) ) ) );
 	::pthread_mutexattr_init( attr );
 	HResource<void> res( attr, do_pthread_mutexattr_destroy );
 	_resGuard.swap( res );
 	M_ENSURE( ::pthread_mutexattr_settype( attr,
-				f_eType & TYPE::RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
+				_type & TYPE::RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
 	::pthread_mutex_init( _buf.get<pthread_mutex_t>(), attr );
 	return;
 	M_EPILOG
@@ -258,7 +240,7 @@ void HMutex::lock( void )
 	{
 	M_PROLOG
 	int l_iError = ::pthread_mutex_lock( _buf.get<pthread_mutex_t>() );
-	if ( ! ( f_eType & TYPE::RECURSIVE ) )
+	if ( ! ( _type & TYPE::RECURSIVE ) )
 		M_ENSURE( l_iError != EDEADLK );
 	return;
 	M_EPILOG
@@ -268,16 +250,16 @@ void HMutex::unlock( void )
 	{
 	M_PROLOG
 	int l_iError = ::pthread_mutex_unlock( _buf.get<pthread_mutex_t>() );
-	if ( ! ( f_eType & TYPE::RECURSIVE ) )
+	if ( ! ( _type & TYPE::RECURSIVE ) )
 		M_ENSURE( l_iError != EPERM );
 	return;
 	M_EPILOG
 	}
 
-HLock::HLock( HMutex& a_roMutex ) : f_roMutex( a_roMutex )
+HLock::HLock( HMutex& a_roMutex ) : _mutex( a_roMutex )
 	{
 	M_PROLOG
-	f_roMutex.lock();
+	_mutex.lock();
 	return;
 	M_EPILOG
 	}
@@ -285,16 +267,16 @@ HLock::HLock( HMutex& a_roMutex ) : f_roMutex( a_roMutex )
 HLock::~HLock( void )
 	{
 	M_PROLOG
-	f_roMutex.unlock();
+	_mutex.unlock();
 	return;
 	M_EPILOG
 	}
 
 HSemaphore::HSemaphore( void )
-	: f_oSemaphore( chunk_size<sem_t>( 1 ) )
+	: _semaphore( chunk_size<sem_t>( 1 ) )
 	{
 	M_PROLOG
-	M_ENSURE( ::sem_init( f_oSemaphore.get<sem_t>(), 0, 0 ) == 0 );
+	M_ENSURE( ::sem_init( _semaphore.get<sem_t>(), 0, 0 ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -302,7 +284,7 @@ HSemaphore::HSemaphore( void )
 HSemaphore::~HSemaphore( void )
 	{
 	M_PROLOG
-	M_ENSURE( ::sem_destroy( f_oSemaphore.get<sem_t>() ) == 0 );
+	M_ENSURE( ::sem_destroy( _semaphore.get<sem_t>() ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -310,7 +292,7 @@ HSemaphore::~HSemaphore( void )
 void HSemaphore::wait( void )
 	{
 	M_PROLOG
-	::sem_wait( f_oSemaphore.get<sem_t>() ); /* Always returns 0. */
+	::sem_wait( _semaphore.get<sem_t>() ); /* Always returns 0. */
 	return;
 	M_EPILOG
 	}
@@ -318,13 +300,13 @@ void HSemaphore::wait( void )
 void HSemaphore::signal( void )
 	{
 	M_PROLOG
-	M_ENSURE( ::sem_post( f_oSemaphore.get<sem_t>() ) == 0 );
+	M_ENSURE( ::sem_post( _semaphore.get<sem_t>() ) == 0 );
 	return;
 	M_EPILOG
 	}
 
 HCondition::HCondition( HMutex& a_roMutex )
-	: _buf( chunk_size<pthread_cond_t>( 1 ) + chunk_size<pthread_condattr_t>( 1 ) ), f_roMutex( a_roMutex )
+	: _buf( chunk_size<pthread_cond_t>( 1 ) + chunk_size<pthread_condattr_t>( 1 ) ), _mutex( a_roMutex )
 	{
 	M_PROLOG
 	pthread_condattr_t* attr( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_cond_t ) ) ) );
@@ -372,7 +354,7 @@ HCondition::status_t HCondition::wait( int long unsigned const& a_ulTimeOutSecon
 		l_sTimeOut.tv_nsec -= NANO_IN_WHOLE;
 		}
 	l_iError = ::pthread_cond_timedwait( _buf.get<pthread_cond_t>(),
-				f_roMutex._buf.get<pthread_mutex_t>(), &l_sTimeOut );
+				_mutex._buf.get<pthread_mutex_t>(), &l_sTimeOut );
 	M_ENSURE ( ( l_iError == 0 ) || ( l_iError == EINTR ) || ( l_iError == ETIMEDOUT ) );
 	return ( ( l_iError == 0 ) ? OK : ( ( l_iError == EINTR ) ? INTERRUPT : TIMEOUT ) );
 	M_EPILOG
@@ -381,8 +363,41 @@ HCondition::status_t HCondition::wait( int long unsigned const& a_ulTimeOutSecon
 void HCondition::signal( void )
 	{
 	M_PROLOG
-	HLock l_oLock( f_roMutex );
+	HLock l_oLock( _mutex );
 	::pthread_cond_signal( _buf.get<pthread_cond_t>() );
+	return;
+	M_EPILOG
+	}
+
+HEvent::HEvent( void )
+	: _mutex(), _condition( _mutex )
+	{
+	M_PROLOG
+	_mutex.lock();
+	return;
+	M_EPILOG
+	}
+
+HEvent::~HEvent( void )
+	{
+	M_PROLOG
+	_mutex.unlock();
+	return;
+	M_EPILOG
+	}
+
+void HEvent::wait( void )
+	{
+	M_PROLOG
+	_condition.wait( meta::max_signed<int long>::value, 0 );
+	return;
+	M_EPILOG
+	}
+
+void HEvent::signal( void )
+	{
+	M_PROLOG
+	_condition.signal();
 	return;
 	M_EPILOG
 	}

@@ -113,7 +113,7 @@ HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void )
 	}
 
 HWorkFlow::HWorker::HWorker( HWorkFlowInterface* a_poWorkFlow )
-	: f_poWorkFlow( a_poWorkFlow ), f_oWorker( *this )
+	: f_poWorkFlow( a_poWorkFlow ), _thread()
 	{
 	return;
 	}
@@ -121,7 +121,7 @@ HWorkFlow::HWorker::HWorker( HWorkFlowInterface* a_poWorkFlow )
 void HWorkFlow::HWorker::spawn( void )
 	{
 	M_PROLOG
-	f_oWorker.spawn();
+	_thread.spawn( bound_call( &HWorkFlow::HWorker::run, this ) );
 	return;
 	M_EPILOG
 	}
@@ -129,12 +129,12 @@ void HWorkFlow::HWorker::spawn( void )
 void HWorkFlow::HWorker::finish( void )
 	{
 	M_PROLOG
-	f_oWorker.finish();
+	_thread.finish();
 	return;
 	M_EPILOG
 	}
 
-int HWorkFlow::HWorker::operator()( yaal::hcore::HThread const* )
+void* HWorkFlow::HWorker::run( void )
 	{
 	M_PROLOG
 	HWorkFlow::task_t t;

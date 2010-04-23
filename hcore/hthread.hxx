@@ -34,6 +34,7 @@ Copyright:
 
 #include "hcore/hchunk.hxx"
 #include "hcore/hresource.hxx"
+#include "hcore/hboundcall.hxx"
 
 namespace yaal
 {
@@ -63,7 +64,7 @@ public:
 		};
 private:
 	/*{*/
-	TYPE::mutex_type_t f_eType;
+	TYPE::mutex_type_t _type;
 	HChunk _buf;
 	HResource<void> _resGuard;
 	/*}*/
@@ -90,7 +91,7 @@ typedef HExceptionT<HMutex> HMutexException;
 class HSemaphore
 	{
 	typedef HSemaphore self_t;
-	HChunk f_oSemaphore;
+	HChunk _semaphore;
 public:
 	HSemaphore( void );
 	virtual ~HSemaphore( void );
@@ -115,22 +116,22 @@ class HThread
 		ALIVE,
 		ZOMBIE
 		} status_t;
-	status_t f_eStatus;
+	status_t _status;
 	HChunk _buf;
-	mutable HMutex f_oMutex;
-	HSemaphore f_oSemaphore;
+	mutable HMutex _mutex;
+	HSemaphore _semaphore;
 	HResource<void> _resGuard;
+	typedef HBoundCallInterface<0, void*>::ptr_t call_t;
+	call_t _call;
 public:
 	HThread( void );
 	virtual ~HThread( void );
-	int spawn( void );
-	int long finish( void );
+	int spawn( call_t );
+	void* finish( void );
 	void schedule_finish( void );
  	bool is_alive( void ) const;
 	static int long get_id( void );
 private:
-	virtual int do_run( void );
-	virtual void do_cleanup( void );
 	void* control( void );
 	static void* SPAWN( void* );
 	static void CLEANUP( void* );
@@ -140,26 +141,13 @@ private:
 
 typedef HExceptionT<HThread> HThreadException;
 
-/*! \brief Interface to basic multi-threading primitive - Thread.
- */
-template<typename tType>
-class HThreadT : public HThread
-	{
-	tType& call;
-public:
-	HThreadT( tType& callee ) : call( callee ) {}
-private:
-	virtual int do_run( void )
-		{ return ( call( const_cast<HThreadT const* const>( this ) ) ); }
-	};
-
 /*! \brief HLock Implementats automatic multi-threaded synchronizing prymitive.
  *
  * Scope based automation of locking and unlocking of Mutexes.
  */
 class HLock
 	{
-	HMutex& f_roMutex;
+	HMutex& _mutex;
 public:
 	explicit HLock( HMutex& );
 	virtual ~HLock( void );
@@ -174,7 +162,7 @@ class HCondition
 	{
 	typedef HCondition self_t;
 	HChunk _buf;
-	HMutex& f_roMutex;
+	HMutex& _mutex;
 public:
 	typedef enum
 		{
@@ -192,6 +180,19 @@ private:
 	};
 
 typedef HExceptionT<HCondition> HConditionException;
+
+/*! \brief Asynchronous notification mechanizm.
+ */
+class HEvent
+	{
+	HMutex _mutex;
+	HCondition _condition;
+public:
+	HEvent( void );
+	~HEvent( void );
+	void wait( void );
+	void signal( void );
+	};
 
 }
 
