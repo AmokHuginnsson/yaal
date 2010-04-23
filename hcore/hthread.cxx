@@ -397,6 +397,7 @@ void HEvent::wait( void )
 void HEvent::signal( void )
 	{
 	M_PROLOG
+	_mutex.lock();
 	_condition.signal();
 	return;
 	M_EPILOG
