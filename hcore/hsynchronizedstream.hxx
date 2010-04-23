@@ -101,6 +101,8 @@ struct stream_ptr<HStreamInterface::ptr_t>
 	{
 	static HStreamInterface* get( HStreamInterface::ptr_t& p )
 		{ return ( p.raw() ); }
+	static HStreamInterface const* get( HStreamInterface::ptr_t const& p )
+		{ return ( p.raw() ); }
 	};
 template<typename T>
 struct stream_ptr
@@ -111,7 +113,7 @@ struct stream_ptr
 
 }
 
-template<typename stream_t>
+template<typename stream_t = HStreamInterface::ptr_t>
 class HSynchronizedStream : public HSynchronizedStreamBase
 	{
 protected:
@@ -120,15 +122,24 @@ protected:
 private:
 	stream_t _stream;
 public:
+	HSynchronizedStream( void );
 	HSynchronizedStream( stream_t );
 	template<typename call_t>
 	HSynchronizedStream& operator()( call_t );
+	void reset( stream_t = stream_t() );
 private:
 	virtual int long do_write( void const* const, int long const& );
 	virtual int long do_read( void* const, int long const& );
 	virtual void do_flush( void ) const;
 	virtual bool do_is_valid( void ) const;
 	};
+
+template<typename stream_t>
+HSynchronizedStream<stream_t>::HSynchronizedStream( void )
+	: HSynchronizedStreamBase(), _stream()
+	{
+	return;
+	}
 
 template<typename stream_t>
 HSynchronizedStream<stream_t>::HSynchronizedStream( stream_t stream_ )
@@ -138,10 +149,19 @@ HSynchronizedStream<stream_t>::HSynchronizedStream( stream_t stream_ )
 	}
 
 template<typename stream_t>
+void HSynchronizedStream<stream_t>::reset( stream_t stream_ )
+	{
+	M_PROLOG
+	_stream = stream_;
+	M_EPILOG
+	}
+
+template<typename stream_t>
 int long HSynchronizedStream<stream_t>::do_write( void const* const buf_, int long const& size_ )
 	{
 	M_PROLOG
-	return ( stream_ptr<stream_t>::get( _stream )->write( buf_, size_ ) );
+	HStreamInterface* stream( stream_ptr<stream_t>::get( _stream ) );
+	return ( stream ? stream->write( buf_, size_ ) : 0 );
 	M_EPILOG
 	}
 
@@ -149,7 +169,8 @@ template<typename stream_t>
 int long HSynchronizedStream<stream_t>::do_read( void* const buf_, int long const& size_ )
 	{
 	M_PROLOG
-	return ( stream_ptr<stream_t>::get( _stream )->read( buf_, size_ ) );
+	HStreamInterface* stream( stream_ptr<stream_t>::get( _stream ) );
+	return ( stream ? stream->read( buf_, size_ ) : 0 );
 	M_EPILOG
 	}
 
@@ -157,7 +178,9 @@ template<typename stream_t>
 void HSynchronizedStream<stream_t>::do_flush( void ) const
 	{
 	M_PROLOG
-	stream_ptr<stream_t>::get( _stream )->flush();
+	HStreamInterface const* stream( stream_ptr<stream_t>::get( _stream ) );
+	if ( stream )
+		stream->flush();
 	return;
 	M_EPILOG
 	}
@@ -166,7 +189,8 @@ template<typename stream_t>
 bool HSynchronizedStream<stream_t>::do_is_valid( void ) const
 	{
 	M_PROLOG
-	return ( stream_ptr<stream_t>::get( _stream )->is_valid() );
+	HStreamInterface const* stream( stream_ptr<stream_t>::get( _stream ) );
+	return ( stream ? stream->is_valid() : false );
 	M_EPILOG
 	}
 
@@ -176,7 +200,9 @@ HSynchronizedStream<stream_t>& HSynchronizedStream<stream_t>::operator()( call_t
 	{
 	M_PROLOG
 	HLock l( _mutex );
-	call_( stream_ptr<stream_t>::get( _stream ) );
+	HStreamInterface* stream( stream_ptr<stream_t>::get( _stream ) );
+	if ( stream )
+		call_( stream );
 	return ( *this );
 	M_EPILOG
 	}

@@ -133,9 +133,9 @@ typedef HExceptionT<HFile, HStreamInterfaceException> HFileException;
 typedef HSynchronizedStream<HFile&> HSynchronizedFile;
 
 extern HSynchronizedFile cin;
-extern HSynchronizedFile cout;
+extern HSynchronizedStream<> cout;
 extern HSynchronizedFile cerr;
-extern HSynchronizedFile clog;
+extern HSynchronizedStream<> clog;
 
 }
 
