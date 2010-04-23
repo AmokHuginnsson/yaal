@@ -6,7 +6,7 @@ CWARNING_FLAGS =	\
 						-Wendif-labels \
 						-Werror \
 						-Winline \
-						-Wlarger-than-8192 \
+						-Wlarger-than-16384 \
 						-Wlong-long \
 						-Wmissing-noreturn \
 						-Wpointer-arith \
