@@ -355,7 +355,7 @@ HCondition::status_t HCondition::wait( int long unsigned const& a_ulTimeOutSecon
 		}
 	l_iError = ::pthread_cond_timedwait( _buf.get<pthread_cond_t>(),
 				_mutex._buf.get<pthread_mutex_t>(), &l_sTimeOut );
-	M_ENSURE ( ( l_iError == 0 ) || ( l_iError == EINTR ) || ( l_iError == ETIMEDOUT ) );
+	M_ENSURE( ( l_iError == 0 ) || ( l_iError == EINTR ) || ( l_iError == ETIMEDOUT ) );
 	return ( ( l_iError == 0 ) ? OK : ( ( l_iError == EINTR ) ? INTERRUPT : TIMEOUT ) );
 	M_EPILOG
 	}
@@ -389,7 +389,7 @@ HEvent::~HEvent( void )
 void HEvent::wait( void )
 	{
 	M_PROLOG
-	_condition.wait( meta::max_signed<int long>::value, 0 );
+	_condition.wait( 0x7fffffff, 0 ); /* FreeBSD strange limit. */
 	return;
 	M_EPILOG
 	}
