@@ -98,8 +98,9 @@ int HFile::open( HString const& a_oPath, open_t const& open_ )
 		l_pcMode = "a+b";
 	else
 		M_THROW( "unexpected mode setting", open_.value() );
-	f_oPath = a_oPath;
 	M_ENSURE_EX( ! f_pvHandle, "stream already opened" );
+	f_oPath = a_oPath;
+	f_bExternal = false;
 	f_pvHandle = ::std::fopen( a_oPath.raw(), l_pcMode );
 	if ( ! f_pvHandle )
 		{
@@ -118,6 +119,7 @@ int HFile::open( void* const handle )
 	M_ENSURE_EX( ! f_pvHandle, "stream already opened" );
 	f_pvHandle = handle;
 	f_bExternal = true;
+	f_oPath.clear();
 	return ( 0 );
 	M_EPILOG
 	}

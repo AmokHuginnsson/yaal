@@ -26,6 +26,7 @@ char const COPYRIGHT [ ] =
 " FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.\n"
 "*/\n";
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <libintl.h>
@@ -235,7 +236,7 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 #if defined( __DYNAMIC_LINKER__ )
 void yaal_hcore_banner( void )
 	{
-	fprintf( stdout,
+	::printf(
 			"%s\n"
 			"Available libraries:\n"
 			"\thcore\n", COPYRIGHT );

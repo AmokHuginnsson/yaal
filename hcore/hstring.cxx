@@ -970,14 +970,14 @@ HString& HString::append( char const* const buf_, int long const& len_ )
 	M_EPILOG
 	}
 
-int long unsigned hash( HString const& a_roString )
+int long hash( HString const& a_roString )
 	{
 	char const* const l_pcBuffer = a_roString.raw();
 	int long l_iSize = a_roString.get_length();
-	int long unsigned l_ulHash = 0;
+	int long l_ulHash = 0;
 	while ( l_iSize -- )
 		{
-		l_ulHash += static_cast<char unsigned>( l_pcBuffer[ l_iSize ] );
+		l_ulHash += l_pcBuffer[ l_iSize ];
 		l_ulHash <<= 3;
 		}
 	return ( l_ulHash );

@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstdlib>
+#include <cstdio>
 #include <libintl.h>
 
 #include "hcore/base.hxx"

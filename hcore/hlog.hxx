@@ -28,7 +28,6 @@ Copyright:
 #define YAAL_HCORE_HLOG_HXX_INCLUDED
 
 #include <cstdarg>
-#include <cstdio>
 
 #include "hcore/hsingleton.hxx"
 #include "hcore/hchunk.hxx"
@@ -42,6 +41,8 @@ namespace hcore
 
 #define log_trace ( yaal::hcore::log << "Log: " << __FILE__ << " : " << " : " << __LINE__ << " : " << __PRETTY_FUNCTION__ << " : " )
 
+extern void* DEFAULT_LOG_STREAM;
+
 /*! \brief Enumeration of available log levels.
  */
 namespace LOG_TYPE
@@ -53,8 +54,6 @@ namespace LOG_TYPE
 	static int const ERROR			= 16; 
 	static int const VCSHEADER	= 32;
 	}
-
-class HLog;
 
 /*! \brief Logging utility.
  */
@@ -77,7 +76,7 @@ public:
 	static int long f_lLogMask;
 public:
 	/* already opened file */
-	void rehash( FILE* = stderr, char const* const = NULL );
+	void rehash( void* = DEFAULT_LOG_STREAM, char const* const = NULL );
 	/* log file name */
 	void rehash( HString const&, char const* const = NULL );
 	int operator()( char const* const, va_list );
@@ -94,6 +93,7 @@ public:
 private:
 	HLog( void );
 	virtual ~HLog( void );
+	void do_rehash( void*, char const* const );
 	void timestamp( void );
 	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;

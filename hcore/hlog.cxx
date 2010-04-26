@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #include <cstdarg>
 #include <ctime>
@@ -60,6 +61,8 @@ static int const GETPW_R_SIZE   = 1024;
 }
 
 int long HLog::f_lLogMask = 0;
+
+void* DEFAULT_LOG_STREAM( stderr );
 
 HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedFile( _file::ref() ), f_bRealMode( false ), f_bNewLine( true ),
 	f_lType( 0 ), f_iBufferSize( BUFFER_SIZE ),
@@ -102,54 +105,63 @@ HLog::~HLog( void )
 	M_EPILOG
 	}
 
-void HLog::rehash( FILE* a_psStream,
-		char const* const a_pcProcessName )
+void HLog::do_rehash( void* src_, char const* const a_pcProcessName )
 	{
 	M_PROLOG
-	HLock l( _mutex );
 #ifndef HAVE_GETLINE
 	char* l_pcPtr = NULL;
 	int l_iLen = 0;
 #endif /* not HAVE_GETLINE */
-	FILE* l_psTmpFile;
 	f_bRealMode = true;
 	if ( a_pcProcessName )
 		f_pcProcessName = ::basename( a_pcProcessName );
-	if ( ! a_psStream )
-		M_THROW( "file parameter is", reinterpret_cast<int long>( a_psStream ) );
-	l_psTmpFile = static_cast<FILE*>( _file::ref().release() );
-	_file::ref().open( a_psStream );
-	if ( l_psTmpFile )
+	FILE* src( static_cast<FILE*>( src_ ) );
+	if ( src )
 		{
-		::fseek( l_psTmpFile, 0, SEEK_SET );
+		::fseek( src, 0, SEEK_SET );
 		char* buf = f_oBuffer.get<char>();
 #ifdef HAVE_GETLINE
-    while ( ::getline( &buf, &f_iBufferSize, l_psTmpFile ) > 0 )
+    while ( ::getline( &buf, &f_iBufferSize, src ) > 0 )
 #else /* HAVE_GETLINE */
-    while ( ( l_iLen = static_cast<int>( ::fread( buf, sizeof ( char ), f_iBufferSize, l_psTmpFile ) ) ) )
+    while ( ( l_iLen = static_cast<int>( ::fread( buf, sizeof ( char ), f_iBufferSize, src ) ) ) )
 #endif /* not HAVE_GETLINE */
       {
 #ifndef HAVE_GETLINE
       l_pcPtr = static_cast<char*>( ::memchr( buf, '\n', l_iLen ) );
       if ( ! l_pcPtr )
         {
-        ::fprintf( a_psStream, buf );
+       	_file::ref() << buf;
         continue;
         }
       * ++ l_pcPtr = 0;
-      ::fseek( l_psTmpFile, l_pcPtr - buf - l_iLen, SEEK_CUR );
+      ::fseek( src, l_pcPtr - buf - l_iLen, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
 			f_lType = ::strtol( buf, NULL, 0x10 );
 			if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
 				{
 				timestamp();
-				::fputs( buf + 10, a_psStream );
+				_file::ref() << buf + 10;
 				}
 			}
 		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
 			f_lType = 0;
-		::fclose( l_psTmpFile );
+		::fclose( src );
 		}
+	do_flush();
+	return;
+	M_EPILOG
+	}
+
+void HLog::rehash( void* stream_,
+		char const* const a_pcProcessName )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	if ( ! stream_ )
+		M_THROW( "file parameter is", reinterpret_cast<int long>( stream_ ) );
+	void* src( _file::ref().release() );
+	_file::ref().open( stream_ );
+	do_rehash( src, a_pcProcessName );
 	return;
 	M_EPILOG
 	}
@@ -161,8 +173,9 @@ void HLog::rehash( HString const& a_oLogFileName,
 	HLock l( _mutex );
 	if ( a_oLogFileName.is_empty() )
 		M_THROW( "new file name argument is", a_oLogFileName.get_length() );
-	rehash( ::fopen( a_oLogFileName.raw(), "a" ), a_pcProcessName );
-	do_flush();
+	void* src( _file::ref().release() );
+	_file::ref().open( a_oLogFileName, HFile::open_t( HFile::OPEN::WRITING ) | HFile::OPEN::APPEND );
+	do_rehash( src, a_pcProcessName );
 	return;
 	M_EPILOG
 	}

@@ -44,7 +44,7 @@ extern int long const* const g_pulPrimes;
 template<typename key_t>
 inline int long hash( key_t const& a_rtKey )
 	{
-	return ( static_cast<int long unsigned>( a_rtKey ) );
+	return ( static_cast<int long>( a_rtKey ) );
 	}
 
 /*! \brief Hash map container implementation.
@@ -57,6 +57,7 @@ public:
 	typedef key_t key_type;
 	typedef data_t data_type;
 	typedef HPair<key_t, data_t> value_type;
+	typedef int long ( *hasher_t )( key_t const& );
 	template<typename const_qual_t>
 	class HIterator;
 private:
@@ -76,11 +77,16 @@ private:
 		};
 	int long _prime;
 	int _size;
+	hasher_t _hasher;
 	HChunk _buckets;
 public:
 	typedef HIterator<value_type> iterator;
 	typedef HIterator<value_type const> const_iterator;
-	HHashMap( size_t ); /* Lower bound of size of map's table */
+	HHashMap( void );
+	/*! \brief Lower bound of size of map's table */
+	HHashMap( int long );
+	template<typename iterator_t>
+	HHashMap( iterator_t, iterator_t );
 	HHashMap( HHashMap const& );
 	virtual ~HHashMap( void );
 	HHashMap& operator = ( HHashMap const& );
@@ -92,6 +98,7 @@ public:
 	const_iterator find( key_t const& ) const;
 	iterator find( key_t const& );
 	HPair<iterator, bool> insert( value_type const& );
+	void resize( int long );
 	template<typename iterator_t>
 	void insert( iterator_t, iterator_t );
 	void erase( iterator );
@@ -225,31 +232,20 @@ HHashMap<key_t, data_t>::HAtom::~HAtom( void )
 	}
 
 template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>::HHashMap( size_t a_uiSize )
-	: _prime( 0 ), _size( 0 ), _buckets()
+HHashMap<key_t, data_t>::HHashMap( int long size_ )
+	: _prime( 0 ), _size( 0 ), _hasher(  &hash ), _buckets()
 	{
 	M_PROLOG
-	int i = 0;
-	if ( a_uiSize < 1 )
-		M_THROW ( "bad map size", a_uiSize );
-	while ( a_uiSize )
-		{
-		a_uiSize >>= 1;
-		i ++;
-		}
-	_prime = g_pulPrimes[ i - 1 ];
-	_buckets.realloc( chunk_size<HAtom*>( _prime ) );
+	resize( size_ );
 	return;
 	M_EPILOG
 	}
 
 template<typename key_t, typename data_t>
 HHashMap<key_t, data_t>::HHashMap( HHashMap const& map_ )
-	: _prime( 0 ), _size( 0 ), _buckets()
+	: _prime( map_._prime ), _size( map_._size ), _hasher( map_._hasher), _buckets()
 	{
 	M_PROLOG
-	_prime = map_._prime;
-	_size = map_._size;
 	_buckets.realloc( chunk_size<HAtom*>( _prime ) );
 	HAtom* const* otherBuckets( map_._buckets.template get<HAtom const*>() );
 	HAtom** buckets( _buckets.get<HAtom*>() );
@@ -289,6 +285,46 @@ HHashMap<key_t, data_t>& HHashMap<key_t, data_t>::operator = ( HHashMap const& m
 		swap( tmp );
 		}
 	return ( *this );
+	M_EPILOG
+	}
+
+template<typename key_t, typename data_t>
+void HHashMap<key_t, data_t>::resize( int long size_ )
+	{
+	M_PROLOG
+	if ( size_ < 1 )
+		M_THROW ( "bad map size", size_ );
+	if ( size_ > _size )
+		{
+		int n = 0;
+		while ( size_ )
+			{
+			size_ >>= 1;
+			n ++;
+			}
+		int long prime( g_pulPrimes[ n - 1 ] );
+		HChunk buckets( chunk_size<HAtom*>( prime ), HChunk::STRATEGY::GEOMETRIC );
+		HAtom** oldBuckets( _buckets.get<HAtom*>() );
+		HAtom** newBuckets( buckets.get<HAtom*>() );
+		for ( int long i( 0 ); i < _prime; ++ i )
+			{
+			HAtom* a( oldBuckets[ i ] );
+			while ( a )
+				{
+				HAtom* atom( a );
+				a = a->_next;
+				int long newHash( _hasher( atom->_value.first ) );
+				if ( newBuckets[ newHash ] )
+					atom->_next = newBuckets[ newHash ];
+				else
+					atom->_next = NULL;
+				newBuckets[ newHash ] = atom;
+				}
+			}
+		_buckets.swap( buckets );
+		_prime = prime;
+		}
+	return;
 	M_EPILOG
 	}
 
