@@ -85,8 +85,11 @@ public:
 	HHashMap( void );
 	/*! \brief Lower bound of size of map's table */
 	HHashMap( int long );
+	HHashMap( int long, hasher_t );
 	template<typename iterator_t>
 	HHashMap( iterator_t, iterator_t );
+	template<typename iterator_t>
+	HHashMap( iterator_t, iterator_t, int long );
 	HHashMap( HHashMap const& );
 	virtual ~HHashMap( void );
 	HHashMap& operator = ( HHashMap const& );
@@ -242,23 +245,58 @@ HHashMap<key_t, data_t>::HHashMap( int long size_ )
 	}
 
 template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>::HHashMap( HHashMap const& map_ )
-	: _prime( map_._prime ), _size( map_._size ), _hasher( map_._hasher), _buckets()
+HHashMap<key_t, data_t>::HHashMap( int long size_, hasher_t hasher_ )
+	: _prime( 0 ), _size( 0 ), _hasher(  hasher_ ), _buckets()
 	{
 	M_PROLOG
-	_buckets.realloc( chunk_size<HAtom*>( _prime ) );
-	HAtom* const* otherBuckets( map_._buckets.template get<HAtom const*>() );
+	resize( size_ );
+	return;
+	M_EPILOG
+	}
+
+template<typename key_t, typename data_t>
+template<typename iterator_t>
+HHashMap<key_t, data_t>::HHashMap( iterator_t first, iterator_t last )
+	: _prime( 0 ), _size( 0 ), _hasher(  &hash ), _buckets()
+	{
+	M_PROLOG
+	for ( ; first != last; ++ first )
+		insert( *first );
+	return;
+	M_EPILOG
+	}
+
+template<typename key_t, typename data_t>
+template<typename iterator_t>
+HHashMap<key_t, data_t>::HHashMap( iterator_t first, iterator_t last, int long size_ )
+	: _prime( 0 ), _size( 0 ), _hasher(  &hash ), _buckets()
+	{
+	M_PROLOG
+	resize( size_ );
+	for ( ; first != last; ++ first )
+		insert( *first );
+	return;
+	M_EPILOG
+	}
+
+template<typename key_t, typename data_t>
+HHashMap<key_t, data_t>::HHashMap( HHashMap const& map_ )
+	: _prime( 0 ), _size( map_._size ), _hasher( map_._hasher), _buckets()
+	{
+	M_PROLOG
+	resize( _size * 2 );
+	HAtom const* const* otherBuckets( map_._buckets.template get<HAtom const*>() );
 	HAtom** buckets( _buckets.get<HAtom*>() );
-	for ( int long l_iCtr = 0; l_iCtr < _prime; ++ l_iCtr )
+	for ( int long i( 0 ); i < map_._prime; ++ i )
 		{
-		HAtom const* origAtom( otherBuckets[ l_iCtr ] );
-		HAtom** atom( &buckets[ l_iCtr ] );
+		HAtom const* origAtom( otherBuckets[ i ] );
 		while ( origAtom )
 			{
-			( *atom ) = new ( std::nothrow ) HAtom( origAtom->key );
-			( *atom )->value = origAtom->value;
-			atom = &( *atom )->_next;
+			HAtom* atom( new ( std::nothrow ) HAtom( origAtom->_value.first, origAtom->_value.second ) );
 			origAtom = origAtom->_next;
+			int long newHash( _hasher( atom->_value.first ) % _prime );
+			atom->_next = buckets[ newHash ];
+			buckets[ newHash ] = atom;
 			}
 		}
 	return;
@@ -278,7 +316,7 @@ template<typename key_t, typename data_t>
 HHashMap<key_t, data_t>& HHashMap<key_t, data_t>::operator = ( HHashMap const& map_ )
 	{
 	M_PROLOG
-	int l_iCtr( 0 );
+	int i( 0 );
 	if ( &map_ != this )
 		{
 		HHashMap tmp( map_ );
@@ -313,11 +351,8 @@ void HHashMap<key_t, data_t>::resize( int long size_ )
 				{
 				HAtom* atom( a );
 				a = a->_next;
-				int long newHash( _hasher( atom->_value.first ) );
-				if ( newBuckets[ newHash ] )
-					atom->_next = newBuckets[ newHash ];
-				else
-					atom->_next = NULL;
+				int long newHash( _hasher( atom->_value.first ) % prime );
+				atom->_next = newBuckets[ newHash ];
 				newBuckets[ newHash ] = atom;
 				}
 			}
@@ -369,19 +404,21 @@ template<typename key_t, typename data_t>
 yaal::hcore::HPair<typename HHashMap<key_t, data_t>::iterator, bool> HHashMap<key_t, data_t>::insert( value_type const& val_ )
 	{
 	M_PROLOG
-	iterator it = find( val_.first );
+	iterator it( _prime ? find( val_.first ) : end() );
 	bool inserted( false );
 	if ( it == end() )
 		{
+		if ( ( _size + 1 ) > _prime )
+			resize( ( _size + 1 ) * 2 );
 		HAtom* atom = new ( std::nothrow ) HAtom( val_.first, val_.second );
 		if ( ! atom )
 			M_THROW( "memory allocation error", errno );
-		int long l_ulHash = hash( val_.first ) % _prime;
+		int long newHash = _hasher( val_.first ) % _prime;
 		HAtom** buckets( _buckets.get<HAtom*>() );
-		atom->_next = buckets[ l_ulHash ];
-		buckets[ l_ulHash ] = atom;
-		_size ++;
-		it = iterator( this, l_ulHash, atom );
+		atom->_next = buckets[ newHash ];
+		buckets[ newHash ] = atom;
+		++ _size;
+		it = iterator( this, newHash, atom );
 		inserted = true;
 		}
 	return ( make_pair( it, inserted ) );
@@ -457,7 +494,7 @@ template<typename key_t, typename data_t>
 bool HHashMap<key_t, data_t>::find( key_t const& a_rtKey, int long& a_rulIndex, HAtom*& a_rpoAtom ) const
 	{
 	M_PROLOG
-	a_rulIndex = hash( a_rtKey ) % _prime;
+	a_rulIndex = _hasher( a_rtKey ) % _prime;
 	a_rpoAtom = _buckets.get<HAtom*>()[ a_rulIndex ];
 	while ( a_rpoAtom && ( a_rpoAtom->_value.first != a_rtKey ) )
 		a_rpoAtom = a_rpoAtom->_next;
