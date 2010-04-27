@@ -111,8 +111,6 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 		HOST_OS_TYPE=[Solaris]
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -d [c:/windows] ; then
 		AC_DEFINE([__HOST_OS_TYPE_WINDOWS__], [], [Your operating system is MS Windows.])
-		AC_SUBST([SYMBOL_PREFIX],[_])
-		SYMBOL_PREFIX=['"_"']
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--out-implib=lib\$(*).\$(LIB_ARCHIVE_SUFFIX)"]
 		HOST_OS_TYPE=[Windows]
 		LIB_PREFIX=["cyg"]

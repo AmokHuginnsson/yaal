@@ -389,7 +389,7 @@ HEvent::~HEvent( void )
 void HEvent::wait( void )
 	{
 	M_PROLOG
-	_condition.wait( 0x7fffffff, 0 ); /* FreeBSD strange limit. */
+	_condition.wait( 0x1fffffff, 0 ); /* FreeBSD strange limit. */
 	return;
 	M_EPILOG
 	}

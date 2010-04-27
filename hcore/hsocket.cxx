@@ -257,23 +257,17 @@ void HSocket::connect( yaal::hcore::HString const& a_oAddress, int const a_iPort
 void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_iPort )
 	{
 	M_PROLOG
-	int l_iError = 0;
-	sockaddr_in* l_psAddressNetwork = NULL;
-	sockaddr_un* l_psAddressFile = NULL;
-#ifdef HAVE_GETHOSTBYNAME_R
-	static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
-	hostent l_sHostName;
-	hostent* l_psHostName = NULL;
-#else /* HAVE_GETHOSTBYNAME_R */
-	addrinfo* l_psAddrInfo = NULL;
-#endif /* ! HAVE_GETHOSTBYNAME_R */
 	if ( !!( f_eType & TYPE::NETWORK ) )
 		{
-		l_psAddressNetwork = static_cast < sockaddr_in * > ( f_pvAddress );
+		int l_iError( 0 );
+		sockaddr_in* l_psAddressNetwork( static_cast<sockaddr_in*>( f_pvAddress ) );
 		l_psAddressNetwork->sin_family = AF_INET;
 		l_psAddressNetwork->sin_port = htons(
 				static_cast<int short unsigned>( a_iPort ) );
 #ifdef HAVE_GETHOSTBYNAME_R
+		static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
+		hostent l_sHostName;
+		hostent* l_psHostName( NULL );
 		f_iAddressSize = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
 		f_oCache.realloc( f_iAddressSize );
 		while ( ::gethostbyname_r( a_oAddress.raw(), &l_sHostName,
@@ -283,18 +277,19 @@ void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_
 		errno = l_iError;
 		M_ENSURE( l_psHostName );
 		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>(
-				l_sHostName.h_addr_list [ 0 ] )->s_addr;
+				l_sHostName.h_addr_list[ 0 ] )->s_addr;
 #else /* HAVE_GETHOSTBYNAME_R */
+		addrinfo* l_psAddrInfo( NULL );
 		l_iError = ::getaddrinfo( a_oAddress.raw(), NULL, NULL, &l_psAddrInfo );
 		M_ENSURE( ! l_iError && l_psAddrInfo );
-		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>( l_psAddrInfo->ai_addr )->s_addr;
+		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<sockaddr_in*>( l_psAddrInfo->ai_addr )->sin_addr.s_addr;
 		::freeaddrinfo( l_psAddrInfo );
 #endif /* not HAVE_GETHOSTBYNAME_R */
 		f_iAddressSize = sizeof ( sockaddr_in );
 		}
 	else /* f_eType & TYPE::FILE */
 		{
-		l_psAddressFile = static_cast<sockaddr_un*>( f_pvAddress );
+		sockaddr_un* l_psAddressFile( static_cast<sockaddr_un*>( f_pvAddress ) );
 		l_psAddressFile->sun_family = AF_UNIX;
 		::strncpy( l_psAddressFile->sun_path, a_oAddress.raw(),
 				sizeof ( l_psAddressFile->sun_path ) );
