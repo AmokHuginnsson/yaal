@@ -60,46 +60,23 @@ namespace
 static void dummy_signal_handler( int )
 	{ }
 
-class HBaseSignalHandlers : public HSignalHandlerInterface
+class HBaseSignalHandlers
 	{
 	typedef HBaseSignalHandlers self_t;
-protected:
-	typedef HSignalHandlerInterface hier_t;
 public:
-	void unlock( int );
-	void lock( int );
-	int signal_INT( int );
-	int signal_HUP( int );
-	int signal_TERM( int );
-	int signal_QUIT( int );
-	int signal_TSTP( int );
-	int signal_CONT( int );
-	int signal_fatal( int ) __attribute__(( __noreturn__ ));
-	int signal_USR1( int );
+	static void unlock( int );
+	static void lock( int );
+	static int signal_INT( int );
+	static int signal_HUP( int );
+	static int signal_TERM( int );
+	static int signal_QUIT( int );
+	static int signal_TSTP( int );
+	static int signal_CONT( int );
+	static int signal_fatal( int ) __attribute__(( __noreturn__ ));
+	static int signal_USR1( int );
 	};
 
 }
-
-int HSignalService::HHandlerGeneric::invoke( int a_iSigNo )
-	{
-	M_PROLOG
-	return ( (get_base()->*HANDLER)( a_iSigNo ) );
-	M_EPILOG
-	}
-
-HSignalHandlerInterface*	HSignalService::HHandlerInternal::get_base( void )
-	{
-	M_PROLOG
-	return ( &*f_oBase );
-	M_EPILOG
-	}
-
-HSignalHandlerInterface*	HSignalService::HHandlerExternal::get_base( void )
-	{
-	M_PROLOG
-	return ( f_poBase );
-	M_EPILOG
-	}
 
 int HSignalService::f_iExitStatus = 0;
 HSignalService::HSignalService( void )
@@ -108,16 +85,15 @@ HSignalService::HSignalService( void )
 	{
 	M_PROLOG
 	M_ENSURE( sigemptyset( f_oLocker.get<sigset_t>() ) == 0 );
-	HSignalHandlerInterface::ptr_t base( new HBaseSignalHandlers() );
 	if ( n_iDebugLevel < DEBUG_LEVEL::GDB )
-		register_handler( SIGINT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_INT ) ) );
-	register_handler( SIGHUP, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_HUP ) ) );
-	register_handler( SIGTERM, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_TERM ) ) );
-	register_handler( SIGQUIT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_QUIT ) ) );
-	register_handler( SIGTSTP, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_TSTP ) ) );
-	register_handler( SIGCONT, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_CONT ) ) );
-	register_handler( SIGUSR1, HHandlerGeneric::ptr_t( new HHandlerInternal( base, &HBaseSignalHandlers::signal_USR1 ) ) );
-	HHandlerGeneric::ptr_t fatal( new HHandlerInternal( base, &HBaseSignalHandlers::signal_fatal ) );
+		register_handler( SIGINT, bound_call( &HBaseSignalHandlers::signal_INT, _1 ) );
+	register_handler( SIGHUP, bound_call( &HBaseSignalHandlers::signal_HUP, _1 ) );
+	register_handler( SIGTERM, bound_call( &HBaseSignalHandlers::signal_TERM, _1 ) );
+	register_handler( SIGQUIT, bound_call( &HBaseSignalHandlers::signal_QUIT, _1 ) );
+	register_handler( SIGTSTP, bound_call( &HBaseSignalHandlers::signal_TSTP, _1 ) );
+	register_handler( SIGCONT, bound_call( &HBaseSignalHandlers::signal_CONT, _1 ) );
+	register_handler( SIGUSR1, bound_call( &HBaseSignalHandlers::signal_USR1, _1 ) );
+	handler_t fatal( bound_call( &HBaseSignalHandlers::signal_fatal, _1 ) );
 	register_handler( SIGSEGV, fatal );
 	register_handler( SIGBUS, fatal );
 	register_handler( SIGABRT, fatal );
@@ -164,7 +140,7 @@ void* HSignalService::run( void )
 			{
 			for ( ; ( it != f_oHandlers.end() ) && ( (*it).first == l_iSigNo ); ++ it )
 				{
-				HHandlerGeneric::ptr_t handler = (*it).second;
+				handler_t handler( (*it).second );
 				M_ASSERT( !! handler );
 				int status = handler->invoke( l_iSigNo );
 				if ( status > 0 )
@@ -183,7 +159,7 @@ void* HSignalService::run( void )
 	M_EPILOG
 	}
 
-void HSignalService::register_handler( int a_iSigNo, HSignalService::HHandlerGeneric::ptr_t a_oHandler )
+void HSignalService::register_handler( int a_iSigNo, handler_t a_oHandler )
 	{
 	M_PROLOG
 	f_oHandlers.push_front( a_iSigNo, a_oHandler );

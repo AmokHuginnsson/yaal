@@ -104,16 +104,16 @@ class HMultiMap
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;
 	typedef storage_policy_t<key_type const, data_type> storage_t;
+public:
 	typedef HList<typename storage_t::stored_type> value_list_t;
 	typedef HPointer<value_list_t> value_list_ptr_t;
-	typedef HMap<key_type, value_list_ptr_t, helper_t> multimap_engine_t;
 	typedef HPair<key_type const, data_type> value_type;
-public:
 	template<typename const_qual_t>
 	class HIterator;
 	typedef HIterator<value_type> iterator;
 	typedef HIterator<value_type const> const_iterator;
 private:
+	typedef HMap<key_type, value_list_ptr_t, helper_t> multimap_engine_t;
 	multimap_engine_t f_oEngine;
 public:
 	HMultiMap( void ) : f_oEngine() {};

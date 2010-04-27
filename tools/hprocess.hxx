@@ -44,11 +44,10 @@ namespace tools
 
 /*! \brief Class that provision framework for creation of multiplexing based applications.
  */
-class HProcess : public yaal::tools::HSignalHandlerInterface
+class HProcess
 	{
 protected:
 	typedef HProcess self_t;
-	typedef HSignalHandlerInterface hier_t;
 private:
 	typedef yaal::hcore::HBoundCallInterface<0, void>::ptr_t delayed_call_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
@@ -93,7 +92,7 @@ private:
 	HProcess& operator = ( HProcess const& );
 	};
 
-typedef yaal::hcore::HExceptionT<HProcess, HSignalHandlerInterfaceException> HProcessException;
+typedef yaal::hcore::HExceptionT<HProcess> HProcessException;
 
 }
 

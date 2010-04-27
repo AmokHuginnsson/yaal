@@ -149,17 +149,12 @@ void HConsole::init( void )
 	M_PROLOG
 	f_bInitialized = true;
 	HSignalService& signalService = HSignalServiceFactory::get_instance();
-	signalService.register_handler( SIGWINCH,
-			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_terminal_resize ) ) );
-	signalService.register_handler( SIGQUIT,
-			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_quit ) ) );
-	signalService.register_handler( SIGTSTP,
-			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_tstp ) ) );
-	signalService.register_handler( SIGCONT,
-			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_cont ) ) );
-	signalService.register_handler( SIGUSR1,
-			HSignalService::HHandlerGeneric::ptr_t( new HSignalService::HHandlerExternal( this, &HConsole::on_mouse ) ) );
-	HSignalService::HHandlerGeneric::ptr_t cleanup( new HSignalService::HHandlerExternal( this, &HConsole::console_cleanup ) );
+	signalService.register_handler( SIGWINCH, bound_call( &HConsole::on_terminal_resize, this, _1 ) );
+	signalService.register_handler( SIGQUIT, bound_call( &HConsole::on_quit, this, _1 ) );
+	signalService.register_handler( SIGTSTP, bound_call( &HConsole::on_tstp, this, _1 ) );
+	signalService.register_handler( SIGCONT, bound_call( &HConsole::on_cont, this, _1 ) );
+	signalService.register_handler( SIGUSR1, bound_call( &HConsole::on_mouse, this, _1 ) );
+	HSignalService::handler_t cleanup( bound_call( &HConsole::console_cleanup, this, _1 ) );
 	signalService.register_handler( SIGINT, cleanup );
 	signalService.register_handler( SIGTERM, cleanup );
 	signalService.register_handler( SIGSEGV, cleanup );

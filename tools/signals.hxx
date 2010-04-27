@@ -40,22 +40,6 @@ namespace yaal
 namespace tools
 {  
 
-/*! \brief Interface for handlers for HSignalService.
- */
-class HSignalHandlerInterface
-	{
-protected:
-	typedef HSignalHandlerInterface self_t;
-public:
-	typedef yaal::hcore::HPointer<HSignalHandlerInterface> ptr_t;
-	virtual ~HSignalHandlerInterface() { }
-	typedef int ( HSignalHandlerInterface::* HANDLER_t )( int );
-	};
-
-/*! \brief Exception generated in HSignalHandlerInterface implementator.
- */
-typedef yaal::hcore::HExceptionT<HSignalHandlerInterface> HSignalHandlerInterfaceException;
-
 /*! \brief Posix signal manager.
  *
  * Instance of HSignalService class is a global object that handles
@@ -66,48 +50,11 @@ class HSignalService
 protected:
 	typedef HSignalService self_t;
 public:
-	/*! \brief Signal hadler interface.
-	 *
-	 * HHandlerGeneric is base for all registrable handler types.
-	 */
-	class HHandlerGeneric
-		{
-		HSignalHandlerInterface::HANDLER_t HANDLER;
-	public:
-		typedef yaal::hcore::HPointer<HHandlerGeneric> ptr_t;
-		HHandlerGeneric( HSignalHandlerInterface::HANDLER_t handle ) : HANDLER( handle ) { }
-		virtual ~HHandlerGeneric( void ) { }
-		virtual HSignalHandlerInterface* get_base() = 0;
-		int invoke( int );
-		};
-	/*! \brief Create handler as method in your class.
-	 */
-	class HHandlerInternal : public HHandlerGeneric
-		{
-		HSignalHandlerInterface::ptr_t f_oBase;
-	public:
-		template<typename tType>
-		HHandlerInternal( HSignalHandlerInterface::ptr_t a_oBase, tType handle )
-			: HHandlerGeneric( static_cast<HSignalHandlerInterface::HANDLER_t>( handle ) ), f_oBase( a_oBase ) { }
-		virtual HSignalHandlerInterface* get_base();
-		};
-	/*! \brief Create handle as free standing function.
-	 */
-	class HHandlerExternal : public HHandlerGeneric
-		{
-		HSignalHandlerInterface* f_poBase;
-	public:
-		template<typename tType>
-		HHandlerExternal( HSignalHandlerInterface* a_poBase, tType handle )
-			: HHandlerGeneric( static_cast<HSignalHandlerInterface::HANDLER_t>( handle ) ), f_poBase( a_poBase ) { }
-		HHandlerExternal( HHandlerExternal const& );
-		HHandlerExternal& operator = ( HHandlerExternal const& );
-		virtual HSignalHandlerInterface* get_base();
-		};
+	typedef yaal::hcore::HBoundCallInterface<1, int, int>::ptr_t handler_t;
 private:
-	typedef yaal::hcore::HList<HHandlerGeneric::ptr_t> handler_list_t;
-	typedef yaal::hcore::HPointer<handler_list_t> handler_list_ptr_t;
-	typedef yaal::hcore::HMultiMap<int, HHandlerGeneric::ptr_t> handlers_t;
+	typedef yaal::hcore::HMultiMap<int, handler_t> handlers_t;
+	typedef handlers_t::value_list_t handler_list_t;
+	typedef handlers_t::value_list_ptr_t handler_list_ptr_t;
 	static int f_iExitStatus;
 	bool f_bLoop;
 	yaal::hcore::HChunk f_oLocker;
@@ -115,7 +62,7 @@ private:
 	yaal::hcore::HMutex f_oMutex;
 	handlers_t f_oHandlers;
 public:
-	void register_handler( int, HHandlerGeneric::ptr_t );
+	void register_handler( int, handler_t );
 private:
 	HSignalService( void );
 	~HSignalService( void );

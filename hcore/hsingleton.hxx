@@ -133,6 +133,8 @@ public:
 	static tType& get_instance( int const& = 0 );
 	};
 
+typedef HExceptionT<HSingletonInterface> HSingletonException;
+
 template<typename tType>
 tType* HSingleton<tType>::f_ptInstance = NULL;
 

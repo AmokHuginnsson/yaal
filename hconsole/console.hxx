@@ -178,11 +178,11 @@ extern bool n_bNeedRepaint;
 
 /*! \brief Low level TUI description and modifier.
  */
-class HConsole : public yaal::tools::HSignalHandlerInterface, private yaal::hcore::HSingletonInterface
+class HConsole : private yaal::hcore::HSingletonInterface
 	{
 protected:
 	typedef HConsole self_t;
-	typedef HSignalHandlerInterface hier_t;
+	typedef HSingletonInterface hier_t;
 private:
 	bool f_bInitialized;
 	int f_iWidth;
@@ -234,6 +234,8 @@ private:
 	friend class yaal::hcore::HSingleton<HConsole>;
 	friend class yaal::hcore::HDestructor<HConsole>;
 	};
+
+typedef yaal::hcore::HExceptionT<HConsole, yaal::hcore::HSingletonException> HConsoleException;
 
 extern char const* const bold;
 extern char const* const reset;

@@ -58,7 +58,7 @@ HProcess::HProcess( int noFileHandlers_, int a_iLatencySeconds, int a_iLatencyMi
 	::memset( &f_sLatency, 0, sizeof ( f_sLatency ) );
 	FD_ZERO( &f_xFileDescriptorSet );
 	HSignalService& ss = HSignalServiceFactory::get_instance();
-	HSignalService::HHandlerGeneric::ptr_t handler( new HSignalService::HHandlerExternal( this, &HProcess::handler_interrupt ) );
+	HSignalService::handler_t handler( bound_call( &HProcess::handler_interrupt, this, _1 ) );
 	if ( n_iDebugLevel < DEBUG_LEVEL::GDB )
 		ss.register_handler( SIGINT, handler );
 	ss.register_handler( SIGHUP, handler );
