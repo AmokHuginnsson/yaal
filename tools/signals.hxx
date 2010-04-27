@@ -44,6 +44,7 @@ namespace tools
  */
 class HSignalHandlerInterface
 	{
+protected:
 	typedef HSignalHandlerInterface self_t;
 public:
 	typedef yaal::hcore::HPointer<HSignalHandlerInterface> ptr_t;
@@ -62,6 +63,7 @@ typedef yaal::hcore::HExceptionT<HSignalHandlerInterface> HSignalHandlerInterfac
  */
 class HSignalService
 	{
+protected:
 	typedef HSignalService self_t;
 public:
 	/*! \brief Signal hadler interface.
