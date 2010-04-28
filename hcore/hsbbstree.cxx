@@ -456,14 +456,9 @@ void HSBBSTree::remove_rebalance( HAbstractNode* a_poNode )
 	return;
 	}
 
-int long HSBBSTree::size( void ) const
+int long HSBBSTree::get_size( void ) const
 	{
 	return ( f_lSize );
-	}
-
-bool HSBBSTree::empty( void ) const
-	{
-	return ( ! f_poRoot );
 	}
 
 bool HSBBSTree::is_empty( void ) const

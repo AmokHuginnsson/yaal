@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hset.hxx - this file is integral part of `yaal' project.
+	hmultiset.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -23,12 +23,12 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hset.hxx
- * \brief Declaration of HSet<> class.
+/*! \file hcore/hmultiset.hxx
+ * \brief Declaration of HMultiSet<> class.
  */
 
-#ifndef YAAL_HCORE_HSET_HXX_INCLUDED
-#define YAAL_HCORE_HSET_HXX_INCLUDED
+#ifndef YAAL_HCORE_HMULTISET_HXX_INCLUDED
+#define YAAL_HCORE_HMULTISET_HXX_INCLUDED
 
 #include "hcore/hsbbstree.hxx"
 
@@ -38,38 +38,44 @@ namespace yaal
 namespace hcore
 {
 
-/*! \brief HSBBSTree util, a helper for HSet<> instatiations.
+/*! \brief HSBBSTree util, a helper for HMultiSet<> instatiations.
  */
 template<typename type_t>
-struct set_helper
+struct multiset_helper
 {
 
-template<typename key_t>
-inline static bool less( key_t const& left, key_t const& right )
-	{	return ( left < right );	}
+inline static bool less( HPair<type_t, int long> const& left, HPair<type_t, int long> const& right )
+	{	return ( left.first < right.first );	}
+
+inline static bool less( type_t const& left, HPair<type_t, int long> const& right )
+	{	return ( left < right.first );	}
+
+inline static bool less( HPair<type_t, int long> const& left, type_t const& right )
+	{	return ( left.first < right );	}
 
 };
 
 /*! \brief Binary tree based set.
  *
- * HSet<> is a template representing self balancing binary search tree
+ * HMultiSet<> is a template representing self balancing binary search tree
  * data structure that holds set of keys.
  *
  * \tparam type_t - type of values held in set.
  * \tparam helper_t - HSBBSTree plugable code.
  */
-template<typename type_t, typename helper_t = set_helper<type_t> >
-class HSet
+template<typename type_t, typename helper_t = multiset_helper<type_t> >
+class HMultiSet
 	{
 public:
 	class HIterator;
 	typedef type_t value_type;
 	typedef type_t key_type;
+	typedef HPair<type_t, int long> elem_t;
 	typedef HIterator iterator;
 private:
 	HSBBSTree f_oEngine;
 public:
-	HSet( void ) : f_oEngine() {};
+	HMultiSet( void ) : f_oEngine() {};
 	int long size( void ) const
 		{ return ( get_size() ); }
 	int long get_size( void ) const
@@ -78,11 +84,13 @@ public:
 		{ return ( is_empty() );	}
 	bool is_empty( void ) const
 		{ return ( f_oEngine.is_empty() );	}
-	HPair<HIterator, bool> insert( value_type const& elem )
+	HIterator insert( value_type const& elem )
 		{
 		M_PROLOG
-		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<value_type, helper_t>( elem );
-		return ( make_pair( HIterator( p.first ), p.second ) );
+		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<elem_t, helper_t>( make_pair( elem, 1 ) );
+		if ( ! p.second )
+			++ p.first.operator*<elem_t>().second;
+		return ( HIterator( p.first ) );
 		M_EPILOG
 		}
 	template<typename iter_t>
@@ -98,7 +106,7 @@ public:
 		{
 		M_PROLOG
 		HIterator it( find( elem ) );
-		return ( it != end() ? 1 : 0 );
+		return ( it != end() ? it.f_oEngine.template operator*<elem_t>().second : 0 );
 		M_EPILOG
 		}
 	int long erase( value_type const& elem )
@@ -108,8 +116,8 @@ public:
 		int long erased( 0 );
 		if ( it != end() )
 			{
+			erased = it.f_oEngine.template operator*<elem_t>().second;
 			f_oEngine.remove( it.f_oEngine );
-			erased = 1;
 			}
 		return ( erased );
 		M_EPILOG
@@ -135,23 +143,24 @@ public:
 		{ return ( HIterator( f_oEngine.rend() ) ); }
 	void clear( void )
 		{ f_oEngine.clear(); }
-	void swap( HSet<value_type, helper_t>& other )
+	void swap( HMultiSet<value_type, helper_t>& other )
 		{
 		if ( &other != this )
 			f_oEngine.swap( other.f_oEngine );
 		}
-	void copy_from( HSet<value_type, helper_t> const& source )
+	void copy_from( HMultiSet<value_type, helper_t> const& source )
 		{
 		if ( &source != this )
 			f_oEngine.copy_from<value_type, helper_t>( source.f_oEngine );
 		}
 	};
 
-/*! \brief Iterator for HSet<> data structure.
+/*! \brief Iterator for HMultiSet<> data structure.
  */
-template<typename value_type, typename helper_t = set_helper<value_type> >
-class HSet<value_type, helper_t>::HIterator
+template<typename value_type, typename helper_t = multiset_helper<value_type> >
+class HMultiSet<value_type, helper_t>::HIterator
 	{
+	typedef HPair<value_type, int long> elem_t;
 	HSBBSTree::HIterator f_oEngine;
 public:
 	HIterator( void ) : f_oEngine() {}
@@ -185,25 +194,25 @@ public:
 		return ( it );
 		}
 	value_type const& operator * ( void )
-		{	return ( f_oEngine.operator*<value_type>() );	}
+		{	return ( f_oEngine.operator*<elem_t>().first );	}
 	value_type const* operator -> ( void )
-		{ return ( &f_oEngine.operator*<value_type>() );	}
+		{ return ( &f_oEngine.operator*<elem_t>().first );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( f_oEngine == it.f_oEngine ); }
 	bool operator != ( HIterator const& it ) const
 		{ return ( f_oEngine != it.f_oEngine ); }
 private:
-	friend class HSet<value_type, helper_t>;
+	friend class HMultiSet<value_type, helper_t>;
 	explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
 	};
 
 }
 
 template<typename value_type, typename helper_t>
-inline void swap( yaal::hcore::HSet<value_type, helper_t>& a, yaal::hcore::HSet<value_type, helper_t>& b )
+inline void swap( yaal::hcore::HMultiSet<value_type, helper_t>& a, yaal::hcore::HMultiSet<value_type, helper_t>& b )
 	{ a.swap( b ); }
 
 }
 
-#endif /* not YAAL_HCORE_HSET_HXX_INCLUDED */
+#endif /* not YAAL_HCORE_HMULTISET_HXX_INCLUDED */
 

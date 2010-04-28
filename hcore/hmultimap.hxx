@@ -118,16 +118,20 @@ private:
 public:
 	HMultiMap( void ) : f_oEngine() {};
 	int long size( void ) const
+		{ return ( get_size() ); }
+	int long get_size( void ) const
 		{
 		M_PROLOG
 		int long l_iSize = 0;
 		for ( typename multimap_engine_t::const_iterator it = f_oEngine.begin(); it != f_oEngine.end(); ++ it )
-			l_iSize += it->second->size();
+			l_iSize += it->second->get_size();
 		return ( l_iSize );
 		M_EPILOG
 		}
 	bool empty( void ) const
-		{ return ( f_oEngine.empty() );	}
+		{ return ( is_empty() );	}
+	bool is_empty( void ) const
+		{ return ( f_oEngine.is_empty() );	}
 	iterator push_back( key_type const& key, data_type const& value )
 		{
 		M_PROLOG
@@ -171,13 +175,27 @@ public:
 		return;
 		M_EPILOG
 		}
-	void remove_set( key_type const& key )
+	int long count( key_type const& key )
 		{
 		M_PROLOG
 		iterator it = find( key );
+		int long num( 0 );
 		if ( it != end() )
+			num = it.f_oMajor->second->get_size();
+		return ( num );
+		M_EPILOG
+		}
+	int long erase( key_type const& key )
+		{
+		M_PROLOG
+		iterator it = find( key );
+		int long erased( 0 );
+		if ( it != end() )
+			{
+			erased = it.f_oMajor->second->get_size();
 			f_oEngine.erase( it.f_oMajor );
-		return;
+			}
+		return ( erased );
 		M_EPILOG
 		}
 	iterator erase( iterator& it )

@@ -78,11 +78,13 @@ private:
 public:
 	HMap( void ) : f_oEngine() {};
 	int long size( void ) const
-		{ return ( f_oEngine.size() );	}
+		{ return ( get_size() ); }
+	int long get_size( void ) const
+		{ return ( f_oEngine.get_size() );	}
 	bool empty( void ) const
-		{ return ( f_oEngine.empty() );	}
+		{ return ( is_empty() );	}
 	bool is_empty( void ) const
-		{ return ( f_oEngine.empty() );	}
+		{ return ( f_oEngine.is_empty() );	}
 	HPair<iterator, bool> insert( value_type const& e )
 		{
 		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<value_type, helper_t>( e );
@@ -97,13 +99,17 @@ public:
 		return;
 		M_EPILOG
 		}
-	void remove( key_type const& key )
+	int long erase( key_type const& key )
 		{
 		M_PROLOG
 		iterator it = find( key );
+		int long erased( 0 );
 		if ( it != end() )
+			{
+			erased = 1;
 			f_oEngine.remove( it.f_oEngine );
-		return;
+			}
+		return ( erased );
 		M_EPILOG
 		}
 	iterator erase( iterator const& it )

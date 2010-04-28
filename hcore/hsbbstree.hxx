@@ -111,13 +111,10 @@ public:
 	virtual ~HSBBSTree( void );
 	template<typename tType, typename ttType>
 	HPair<HIterator, bool> insert( tType const& );
-	template<typename tType, typename ttType, typename tttType>
-	void remove( ttType const& );
 	void remove( HIterator const& );
 	template<typename tType, typename ttType, typename tttType>
 	HIterator find( ttType const& ) const;
-	int long size( void ) const;
-	bool empty( void ) const;
+	int long get_size( void ) const;
 	bool is_empty( void ) const;
 	void clear( void );
 	void swap( HSBBSTree& );
@@ -242,24 +239,6 @@ HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& a_tKey )
 	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_poParent == NULL ) );
 	M_ASSERT( ( ! f_poRoot ) || ( f_poRoot->f_eColor == HAbstractNode::BLACK ) );
 	return ( make_pair( HIterator( l_poNode ), ! l_oNode.f_bExists ) );
-	M_EPILOG
-	}
-
-template<typename tType, typename ttType, typename tttType>
-void HSBBSTree::remove( ttType const& a_tKey )
-	{
-	M_PROLOG
-	if ( f_poRoot )
-		{
-		ONodePtr l_oNode = find_node<tType, ttType, tttType>( a_tKey );
-		if ( l_oNode.f_bExists )
-			{
-			remove_node( l_oNode.f_poNode );
-			return;
-			}
-		}
-	M_THROW( n_ppcErrMsgHSBBSTree [ ERROR::NON_EXISTING_KEY ],
-			static_cast<int>( ERROR::NON_EXISTING_KEY ) );
 	M_EPILOG
 	}
 
