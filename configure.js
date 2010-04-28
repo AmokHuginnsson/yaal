@@ -67,7 +67,6 @@ function boostInfo( install_path ) {
 					if ( ( index = names[ i ].indexOf( TAG ) ) >= 0 ) {
 						foundFirstOfAKind = true;
 						var name = names[ i ].substr( index + TAG.length + 1 );
-						WScript.echo( name );
 						var verInfo = name.substr( 0, name.length - 4 ).split( "-", 4 );
 						this.version.vc = verInfo[ 0 ];
 						this.version.thread = verInfo[ 1 ];
@@ -192,8 +191,11 @@ try {
 			case "VISUAL_STUDIO_VERSION":
 				VISUAL_STUDIO_VERSION = parts[1];
 			break;
+			case "FAST":
+				FAST = 1;
+			break;
 			case "SILENT":
-				SILENT=1;
+				SILENT = 1;
 			break;
 		}
 	}
