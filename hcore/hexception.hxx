@@ -245,9 +245,9 @@ template<typename tType>
 struct context_hier
 	{
 	template<typename real_class>
-	static trait::YES has_hier( typename real_class::hier_t* );
+	static trait::true_type has_hier( typename real_class::hier_t* );
 	template<typename real_class>
-	static trait::NO has_hier( ... );
+	static trait::false_type has_hier( ... );
 	typedef typename existing_hier<sizeof ( has_hier<tType>( 0 ) ), tType>::type type;
 	};
 
@@ -257,7 +257,7 @@ struct context_hier
  * \retval type - superclass in hierarchy.
  */
 template<typename subclass_t>
-struct existing_hier<1, subclass_t>
+struct existing_hier<sizeof ( trait::true_type ), subclass_t>
 	{
 	/*! \brief Meta-function, get typedef from protected section of a type.
 	 *
@@ -274,7 +274,7 @@ struct existing_hier<1, subclass_t>
 
 /*! \cond */
 template<typename subclass>
-struct existing_hier<2, subclass>
+struct existing_hier<sizeof ( trait::false_type ), subclass>
 	{
 	typedef hier_t type;
 	};

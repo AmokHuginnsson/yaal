@@ -38,7 +38,7 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hpair.hxx"
-#include "hcore/pod.hxx"
+#include "hcore/reflection.hxx"
 
 namespace yaal
 {

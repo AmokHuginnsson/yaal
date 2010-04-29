@@ -25,61 +25,73 @@ Copyright:
 */
 
 /*! \file hcore/pod.hxx
- * \brief Higher order interfaces for PODs. 
+ * \brief Trait helpers for PODs.
  */
 
 #ifndef YAAL_HCORE_POD_HXX_INCLUDED
-#define YAAL_HCORE_POD_HXX_INCLUDED
+#define YAAL_HCORE_POD_HXX_INCLUDED 1
 
-#include "hcore/hstrongenum.hxx"
+#include "hcore/trait.hxx"
 
 namespace yaal
 {
 
-/*! \brief POD type symbols. (Some non-POD yaal types included too).
+/*! \brief Check if type is an integral type.
+ *
+ * \tparam T - type to test.
+ * \retval value - true iff T is an integral type.
+ * \retval type - true_type iff T is an integral type.
  */
-struct TYPE
+template<typename T>
+struct is_integral
 	{
-	typedef enum
-		{
-		UNKNOWN     = 0x0000,
-		BOOL        = 0x0001,
-		CHAR        = 0x0002,
-		INT_SHORT   = 0x0004,
-		INT         = 0x0008,
-		INT_LONG    = 0x0010,
-		FLOAT       = 0x0020,
-		DOUBLE      = 0x0040,
-		DOUBLE_LONG = 0x0080,
-		VOID_PTR    = 0x0100,
-		CHAR_PTR    = 0x0280,
-		HSTRING     = 0x0400,
-		HNUMBER     = 0x0800,
-		HINFO       = 0x1000,
-		HTIME       = 0x2000,
-		CONTAINER   = 0x4000,
-		VOID        = 0x8000
-		} enum_t;
-	template<typename tType>
-	struct symbolic;
+	static bool const value = false;
+	typedef trait::false_type type;
 	};
-typedef yaal::hcore::HStrongEnum<TYPE> type_t; /*!< Strong enumeration of PODs. */
-template<> struct TYPE::symbolic<void> { static enum_t const type = VOID; };
-template<> struct TYPE::symbolic<bool> { static enum_t const type = BOOL; };
-template<> struct TYPE::symbolic<char> { static enum_t const type = CHAR; };
-template<> struct TYPE::symbolic<int short> { static enum_t const type = INT_SHORT; };
-template<> struct TYPE::symbolic<int> { static enum_t const type = INT; };
-template<> struct TYPE::symbolic<int long> { static enum_t const type = INT_LONG; };
-template<> struct TYPE::symbolic<float> { static enum_t const type = FLOAT; };
-template<> struct TYPE::symbolic<double> { static enum_t const type = DOUBLE; };
-template<> struct TYPE::symbolic<double long> { static enum_t const type = DOUBLE_LONG; };
-template<> struct TYPE::symbolic<void*> { static enum_t const type = VOID_PTR; };
-template<> struct TYPE::symbolic<char*> { static enum_t const type = CHAR_PTR; };
-template<> struct TYPE::symbolic<yaal::hcore::HString> { static enum_t const type = HSTRING; };
 
-template<typename tType>
-struct TYPE::symbolic
-	{ static enum_t const type = UNKNOWN; };
+/*! \cond */
+template<>
+struct is_integral<int>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+
+template<>
+struct is_integral<int unsigned>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+
+template<>
+struct is_integral<int short>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+
+template<>
+struct is_integral<int short unsigned>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+
+template<>
+struct is_integral<int long>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+
+template<>
+struct is_integral<int long unsigned>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+/*! \endcond */
 
 typedef char unsigned u8_t; /*!< 8 bit unsigned integer. */
 typedef int short unsigned u16_t; /*!< 16 bit unsigned integer. */

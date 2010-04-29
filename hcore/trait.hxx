@@ -42,8 +42,9 @@ namespace trait
 {
 
 /*! \cond */
-typedef char YES;
-typedef struct { char x[2]; } NO;
+class true_type { char x; true_type( void ); true_type( true_type const& ); true_type& operator = ( true_type const& ); };
+class false_type { char x[100]; false_type(); false_type( false_type const& ); false_type& operator = ( false_type const& ); };
+STATIC_ASSERT( sizeof ( true_type ) != sizeof ( false_type ) );
 /*! \endcond */
 
 /*! \brief A dummy class.
@@ -57,11 +58,13 @@ class no_type {};
  * \tparam T1 - first of two types to compare.
  * \tparam T2 - second of two types.
  * \retval value - 1 is two types are in fact the same, 0 otherwise.
+ * \retval type - true_type iff types are same.
  */
 template<typename T1, typename T2>
 struct same_type
 	{
 	static bool const value = false;
+	typedef trait::false_type type;
 	};
 
 /* \cond */
@@ -69,6 +72,7 @@ template<typename T1>
 struct same_type<T1, T1>
 	{
 	static bool const value = true;
+	typedef trait::true_type type;
 	};
 /* \endcond */
 
@@ -93,6 +97,50 @@ template<typename type_for_true, typename type_for_false>
 struct ternary<false, type_for_true, type_for_false>
 	{
 	typedef type_for_false type;
+	};
+/* \endcond */
+
+/*! \brief Convert value domain boolean into type domain boolean.
+ *
+ * \tparam value - a boolean value.
+ * \retval type - boolean type.
+ */
+template<bool const value>
+struct boolean_type;
+
+/* \cond */
+template<>
+struct boolean_type<true>
+	{
+	typedef true_type type;
+	};
+
+template<>
+struct boolean_type<false>
+	{
+	typedef false_type type;
+	};
+/* \endcond */
+
+/*! \brief Convert type domain boolean into value domain boolean.
+ *
+ * \tparam type - boolean type.
+ * \retval value - a boolean value.
+ */
+template<typename boolean>
+struct boolean_value;
+
+/* \cond */
+template<>
+struct boolean_value<true_type>
+	{
+	static bool const value = true;
+	};
+
+template<>
+struct boolean_value<false_type>
+	{
+	static bool const value = false;
 	};
 /* \endcond */
 
@@ -307,11 +355,13 @@ struct strip_const<T const>
  *
  * \tparam T - type to check for pointer trait.
  * \retval value - true iff T is a pointer type.
+ * \retval type - true_type iff T is a pointer type.
  */
 template<typename T>
 struct is_pointer
 	{
 	static bool const value = false;
+	typedef trait::false_type type;
 	};
 
 /*! \cond */
@@ -319,6 +369,51 @@ template<typename T>
 struct is_pointer<T*>
 	{
 	static bool const value = true;
+	typedef trait::true_type type;
+	};
+/*! \endcond */
+
+/*! \brief Test if type is a const type.
+ *
+ * \tparam T - type to check for constness trait.
+ * \retval value - true iff T is a const type.
+ * \retval type - true_type iff T is a const type.
+ */
+template<typename T>
+struct is_const
+	{
+	static bool const value = false;
+	typedef trait::false_type type;
+	};
+
+/*! \cond */
+template<typename T>
+struct is_const<T const>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+/*! \endcond */
+
+/*! \brief Test if type is a volatile type.
+ *
+ * \tparam T - type to check for volatileness trait.
+ * \retval value - true iff T is a volatile type.
+ * \retval type - true_type iff T is a volatile type.
+ */
+template<typename T>
+struct is_volatile
+	{
+	static bool const value = false;
+	typedef trait::false_type type;
+	};
+
+/*! \cond */
+template<typename T>
+struct is_volatile<T volatile>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
 	};
 /*! \endcond */
 
@@ -326,11 +421,13 @@ struct is_pointer<T*>
  *
  * \tparam T - type to check for reference trait.
  * \retval value - true iff T is a reference type.
+ * \retval type - true_type iff T is a reference type.
  */
 template<typename T>
 struct is_reference
 	{
 	static bool const value = false;
+	typedef trait::false_type type;
 	};
 
 /*! \cond */
@@ -338,6 +435,7 @@ template<typename T>
 struct is_reference<T&>
 	{
 	static bool const value = true;
+	typedef trait::true_type type;
 	};
 /*! \endcond */
 
@@ -394,9 +492,9 @@ public:
 template<typename derived_t, typename base_t>
 struct is_kind_of
 	{
-	static YES calc( base_t const* );
-	static NO calc( ... );
-	static bool const value = sizeof ( calc( static_cast<derived_t const*>( NULL ) ) ) == sizeof ( YES );
+	static true_type calc( base_t const* );
+	static false_type calc( ... );
+	static bool const value = sizeof ( calc( static_cast<derived_t const*>( NULL ) ) ) == sizeof ( true_type );
 	};
 
 /*! \brief Interface preventing copying of objects.

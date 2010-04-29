@@ -35,6 +35,7 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/algorithm.hxx"
+#include "hcore/pod.hxx"
 
 namespace yaal
 {
@@ -65,7 +66,7 @@ public:
 			BAD_INDEX  /*!< Index of of bounds. */
 			} error_t;
 		};
-protected:
+private:
 	HChunk _buf;
 	int long _size;
 public:
@@ -75,9 +76,9 @@ public:
 	typedef HIterator<type_t const> const_iterator;
 	HArray( void );
 	explicit HArray( int long const& );
+	HArray( int long const&, type_t const& );
 	template<typename iterator_t>
 	HArray( iterator_t, iterator_t );
-	HArray( int long const&, type_t const& );
 	virtual ~HArray( void );
 	HArray( HArray const& );
 	HArray& operator = ( HArray const& );
@@ -97,7 +98,7 @@ public:
 	bool operator ! ( void ) const;
 	iterator insert( iterator, type_t const& );
 	template<typename iterator_t>
-	void insert( iterator_t, iterator_t );
+	void insert( iterator, iterator_t, iterator_t );
 	void insert( iterator, int long, type_t const& );
 	iterator erase( iterator );
 	iterator erase( iterator, iterator );
@@ -112,6 +113,10 @@ public:
 	const_iterator rbegin( void ) const;
 	const_iterator rend( void ) const;
 	void swap( HArray& );
+private:
+	template<typename iterator_t>
+	void initialize( iterator_t, iterator_t, trait::false_type const* );
+	void initialize( int long const&, type_t const&, trait::true_type const* );
 	};
 
 }
@@ -249,7 +254,7 @@ HArray<type_t>::HArray( iterator_t first, iterator_t last )
 	: _buf(), _size( 0 )
 	{
 	M_PROLOG
-	insert( first, last );
+	initialize( first, last, typename trait::make_pointer<typename is_integral<iterator_t>::type>::type() );
 	return;
 	M_EPILOG
 	}
@@ -259,6 +264,25 @@ HArray<type_t>::~HArray( void )
 	{
 	M_PROLOG
 	clear();
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+template<typename iterator_t>
+void HArray<type_t>::initialize( iterator_t first, iterator_t last, trait::false_type const* )
+	{
+	M_PROLOG
+	insert( end(), first, last );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+void HArray<type_t>::initialize( int long const& size_, type_t const& fillWith_, trait::true_type const* )
+	{
+	M_PROLOG
+	resize( size_, fillWith_ );
 	return;
 	M_EPILOG
 	}
@@ -365,6 +389,17 @@ void HArray<type_t>::reserve( int long const& capacity_ )
 			src[ i ].~value_type();
 		_buf.swap( newBuf );
 		}
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+template<typename iterator_t>
+void HArray<type_t>::insert( iterator pos, iterator_t first, iterator_t last )
+	{
+	M_PROLOG
+	for ( ; first != last; ++ first )
+		pos = insert( pos, *first );
 	return;
 	M_EPILOG
 	}
