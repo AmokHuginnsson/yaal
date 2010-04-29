@@ -133,19 +133,29 @@ private:
 public:
 	HNode( void ) : f_eType( TYPE::NODE ), f_oText(), f_oProperties() { }
 	HNode( TYPE::type_t const& type, yaal::hcore::HString const& value ) : f_eType( type ), f_oText( value ), f_oProperties() {}
-	HNode( HNode const& source ) : f_eType( source.f_eType ), f_oText( source.f_oText ), f_oProperties()
-		{ f_oProperties.copy_from( source.f_oProperties ); }
+	HNode( HNode const& source ) : f_eType( source.f_eType ), f_oText( source.f_oText ), f_oProperties( source.f_oProperties )
+		{ }
 	HNode& operator = ( HNode const& source )
 		{
 		M_PROLOG
 		if ( &source != this )
 			{
-			f_eType = source.f_eType;
-			f_oText = source.f_oText;
-			f_oProperties.copy_from( source.f_oProperties );
+			HNode tmp( source );
+			swap( tmp );
 			}
 		return ( *this );
 		M_EPILOG
+		}
+	void swap( HNode& node_ )
+		{
+		if ( &node_ != this )
+			{
+			using yaal::swap;
+			swap( f_eType, node_.f_eType );
+			swap( f_oText, node_.f_oText );
+			swap( f_oProperties, node_.f_oProperties );
+			}
+		return;
 		}
 private:
 	void clear( void )

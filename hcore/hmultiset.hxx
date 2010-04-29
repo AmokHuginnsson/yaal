@@ -75,7 +75,33 @@ public:
 private:
 	HSBBSTree f_oEngine;
 public:
-	HMultiSet( void ) : f_oEngine() {};
+	HMultiSet( void ) : f_oEngine() {}
+	template<typename iterator_t>
+	HMultiSet( iterator_t first, iterator_t last ) : f_oEngine()
+		{
+		M_PROLOG
+		insert( first, last );
+		return;
+		M_EPILOG
+		}
+	HMultiSet( HMultiSet const& source ) : f_oEngine()
+		{
+		M_PROLOG
+		f_oEngine.copy_from<value_type, helper_t>( source.f_oEngine );
+		return;
+		M_EPILOG
+		}
+	HMultiSet& operator = ( HMultiSet const& multiset_ )
+		{
+		M_PROLOG
+		if ( &multiset_ != this )
+			{
+			HMultiSet tmp( multiset_ );
+			swap( tmp );
+			}
+		return ( *this );
+		M_EPILOG
+		}
 	int long size( void ) const
 		{ return ( get_size() ); }
 	int long get_size( void ) const
@@ -146,12 +172,10 @@ public:
 	void swap( HMultiSet<value_type, helper_t>& other )
 		{
 		if ( &other != this )
+			{
+			using yaal::swap;
 			f_oEngine.swap( other.f_oEngine );
-		}
-	void copy_from( HMultiSet<value_type, helper_t> const& source )
-		{
-		if ( &source != this )
-			f_oEngine.copy_from<value_type, helper_t>( source.f_oEngine );
+			}
 		}
 	};
 

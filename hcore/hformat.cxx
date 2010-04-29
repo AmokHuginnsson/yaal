@@ -146,8 +146,8 @@ HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
 	_string( fi._string ), _tokens( fi._tokens ), _positions( new positions_t ),
 	_args( new args_t )
 	{
-	_positions->copy_from( *fi._positions );
-	_args->copy_from( *fi._args );
+	*_positions = *fi._positions;
+	*_args = *fi._args;
 	}
 
 HFormat::HFormatImpl& HFormat::HFormatImpl::operator = ( HFormat::HFormatImpl const& fi )

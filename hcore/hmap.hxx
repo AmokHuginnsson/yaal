@@ -76,7 +76,33 @@ public:
 private:
 	HSBBSTree f_oEngine;
 public:
-	HMap( void ) : f_oEngine() {};
+	HMap( void ) : f_oEngine() {}
+	template<typename iterator_t>
+	HMap( iterator_t first, iterator_t last ) : f_oEngine()
+		{
+		M_PROLOG
+		insert( first, last );
+		return;
+		M_EPILOG
+		}
+	HMap( HMap const& source ) : f_oEngine()
+		{
+		M_PROLOG
+		f_oEngine.copy_from<value_type, helper_t>( source.f_oEngine );
+		return;
+		M_EPILOG
+		}
+	HMap& operator = ( HMap const& map_ )
+		{
+		M_PROLOG
+		if ( &map_ != this )
+			{
+			HMap tmp( map_ );
+			swap( tmp );
+			}
+		return ( *this );
+		M_EPILOG
+		}
 	int long size( void ) const
 		{ return ( get_size() ); }
 	int long get_size( void ) const
@@ -152,14 +178,10 @@ public:
 	void swap( HMap<key_type, data_type, helper_t>& other )
 		{
 		if ( &other != this )
+			{
+			using yaal::swap;
 			f_oEngine.swap( other.f_oEngine );
-		}
-	void copy_from( HMap<key_type, data_type, helper_t> const& source )
-		{
-		M_PROLOG
-		if ( &source != this )
-			f_oEngine.copy_from<value_type, helper_t>( source.f_oEngine );
-		M_EPILOG
+			}
 		}
 	};
 

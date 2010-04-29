@@ -66,10 +66,9 @@ private:
 	private:
 		HAtom* _next;
 		value_type _value;
-		HAtom( key_t const&, data_t const& );
-		virtual ~HAtom( void );
-	private:
+		HAtom( value_type const& );
 		HAtom( HAtom const& );
+		virtual ~HAtom( void );
 		HAtom& operator = ( HAtom const& );
 		friend class HHashMap<key_t, data_t>;
 		template<typename const_qual_t>
@@ -218,8 +217,8 @@ private:
 	};
 
 template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>::HAtom::HAtom( key_t const& key_, data_t const& data_ )
-	: _next( NULL ), _value( key_, data_ )
+HHashMap<key_t, data_t>::HAtom::HAtom( value_type const& value_ )
+	: _next( NULL ), _value( value_ )
 	{
 	M_PROLOG
 	return;
@@ -292,7 +291,7 @@ HHashMap<key_t, data_t>::HHashMap( HHashMap const& map_ )
 		HAtom const* origAtom( otherBuckets[ i ] );
 		while ( origAtom )
 			{
-			HAtom* atom( new ( std::nothrow ) HAtom( origAtom->_value.first, origAtom->_value.second ) );
+			HAtom* atom( new ( std::nothrow ) HAtom( origAtom->_value ) );
 			origAtom = origAtom->_next;
 			int long newHash( _hasher( atom->_value.first ) % _prime );
 			atom->_next = buckets[ newHash ];
@@ -410,7 +409,7 @@ yaal::hcore::HPair<typename HHashMap<key_t, data_t>::iterator, bool> HHashMap<ke
 		{
 		if ( ( _size + 1 ) > _prime )
 			resize( ( _size + 1 ) * 2 );
-		HAtom* atom = new ( std::nothrow ) HAtom( val_.first, val_.second );
+		HAtom* atom = new ( std::nothrow ) HAtom( val_ );
 		if ( ! atom )
 			M_THROW( "memory allocation error", errno );
 		int long newHash = _hasher( val_.first ) % _prime;

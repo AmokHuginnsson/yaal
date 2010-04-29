@@ -69,7 +69,33 @@ public:
 private:
 	HSBBSTree f_oEngine;
 public:
-	HSet( void ) : f_oEngine() {};
+	HSet( void ) : f_oEngine() {}
+	template<typename iterator_t>
+	HSet( iterator_t first, iterator_t last ) : f_oEngine()
+		{
+		M_PROLOG
+		insert( first, last );
+		return;
+		M_EPILOG
+		}
+	HSet( HSet const& source )
+		{
+		M_PROLOG
+		f_oEngine.copy_from<value_type, helper_t>( source.f_oEngine );
+		return;
+		M_EPILOG
+		}
+	HSet& operator = ( HSet const& set_ )
+		{
+		M_PROLOG
+		if ( &set_ != this )
+			{
+			HSet tmp( set_ );
+			swap( tmp );
+			}
+		return ( *this );
+		M_EPILOG
+		}
 	int long size( void ) const
 		{ return ( get_size() ); }
 	int long get_size( void ) const
@@ -138,12 +164,10 @@ public:
 	void swap( HSet<value_type, helper_t>& other )
 		{
 		if ( &other != this )
+			{
+			using yaal::swap;
 			f_oEngine.swap( other.f_oEngine );
-		}
-	void copy_from( HSet<value_type, helper_t> const& source )
-		{
-		if ( &source != this )
-			f_oEngine.copy_from<value_type, helper_t>( source.f_oEngine );
+			}
 		}
 	};
 

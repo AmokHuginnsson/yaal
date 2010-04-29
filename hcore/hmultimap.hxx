@@ -116,7 +116,33 @@ private:
 	typedef HMap<key_type, value_list_ptr_t, helper_t> multimap_engine_t;
 	multimap_engine_t f_oEngine;
 public:
-	HMultiMap( void ) : f_oEngine() {};
+	HMultiMap( void ) : f_oEngine() {}
+	template<typename iterator_t>
+	HMultiMap( iterator_t first, iterator_t last ) : f_oEngine()
+		{
+		M_PROLOG
+		insert( first, last );
+		return;
+		M_EPILOG
+		}
+	HMultiMap( HMultiMap const& multimap_ ) : f_oEngine()
+		{
+		M_PROLOG
+		f_oEngine.template copy_from<value_type, helper_t>( multimap_.f_oEngine );
+		return;
+		M_EPILOG
+		}
+	HMultiMap& operator = ( HMultiMap const& multimap_ )
+		{
+		M_PROLOG
+		if ( &multimap_ != this )
+			{
+			HMultiMap tmp( multimap_ );
+			swap( multimap_ );
+			}
+		return ( *this );
+		M_EPILOG
+		}
 	int long size( void ) const
 		{ return ( get_size() ); }
 	int long get_size( void ) const
@@ -147,6 +173,15 @@ public:
 		major->second->push_back( storage_t::value( e ) );
 		typename value_list_t::iterator minor = major->second->rbegin();
 		return ( iterator( this, major, minor ) );
+		}
+	template<typename iterator_t>
+	void insert( iterator_t first, iterator_t last )
+		{
+		M_PROLOG
+		for ( ; first != last; ++ first )
+			insert( *first );
+		return;
+		M_EPILOG
 		}
 	template<typename iter_t>
 	void push_back( iter_t i, iter_t endIt )
@@ -314,7 +349,15 @@ public:
 		return ( cnt );
 		M_EPILOG
 		}
-
+	void swap( HMultiMap& multimap_ )
+		{
+		if ( &multimap_ != this )
+			{
+			using yaal::swap;
+			swap( f_oEngine, multimap_.f_oEngine );
+			}
+		return;
+		}
 private:
 	typename multimap_engine_t::iterator ensure_key( key_type const& key )
 		{
@@ -423,6 +466,10 @@ private:
 	};
 
 }
+
+template<typename value_type, typename helper_t>
+inline void swap( yaal::hcore::HMultiMap<value_type, helper_t>& a, yaal::hcore::HMultiMap<value_type, helper_t>& b )
+	{ a.swap( b ); }
 
 }
 

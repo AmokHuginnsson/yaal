@@ -75,6 +75,8 @@ public:
 	typedef HIterator<type_t const> const_iterator;
 	HArray( void );
 	explicit HArray( int long const& );
+	template<typename iterator_t>
+	HArray( iterator_t, iterator_t );
 	HArray( int long const&, type_t const& );
 	virtual ~HArray( void );
 	HArray( HArray const& );
@@ -237,6 +239,17 @@ HArray<type_t>::HArray( int long const& size_, type_t const& fillWith_ )
 	{
 	M_PROLOG
 	resize( size_, fillWith_ );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+template<typename iterator_t>
+HArray<type_t>::HArray( iterator_t first, iterator_t last )
+	: _buf(), _size( 0 )
+	{
+	M_PROLOG
+	insert( first, last );
 	return;
 	M_EPILOG
 	}

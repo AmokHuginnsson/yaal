@@ -127,13 +127,13 @@ public:
 	 * \param count - number of element for newly created list.
 	 */
 	explicit HList( int long count );
-	virtual ~HList( void );
 	HList( HList const& );
-	HList& operator = ( HList const& );
 	/*! \brief Creates list, from range of elements.
 	 */
 	template<typename iter_t>
 	HList( iter_t, iter_t );
+	virtual ~HList( void );
+	HList& operator = ( HList const& );
 	cyclic_iterator hook( void );
 	const_cyclic_iterator hook( void ) const;
 	iterator begin( void );
