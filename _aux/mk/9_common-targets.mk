@@ -1,9 +1,9 @@
 #phony targets
-.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper release prof purge static stats tags uninstall
+.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper reldeb release prof purge static stats tags uninstall
 
 all: debug
 
-debug release prof cov: environment $(REAL_TARGETS)
+debug reldeb release prof cov: environment $(REAL_TARGETS)
 
 environment: $(DIR_BUILD) $(DIRS)
 

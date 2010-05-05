@@ -33,14 +33,24 @@ ifeq ($(HD),1)
 endif
 COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe \
 																-D_GNU_SOURCE
-LIB_INFIX = -d
+
+ifdef DO_RELDEB
+	DO_RELEASE = 1
+endif
 ifdef DO_RELEASE
 	TARGET=release
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations -DNDEBUG -Wno-error
 	LIB_INFIX =
-else
+endif
+ifdef DO_RELDEB
+	TARGET=reldeb
+	COMPILER_DEBUG_FLAGS        = -g
+	LIB_INFIX = -r
+endif
+ifdef DO_DEBUG
 	TARGET=debug
-	COMPILER_DEBUG_FLAGS				= -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
+	COMPILER_DEBUG_FLAGS				= -O0 -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
+	LIB_INFIX = -d
 endif
 ifdef DO_PROFILING
 	TARGET=prof

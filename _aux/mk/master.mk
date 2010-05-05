@@ -35,10 +35,11 @@ build/%/$(1): configure $(1).in
 		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
 endef
 
-MAIN_TARGETS=debug release prof cov
+MAIN_TARGETS=debug release reldeb prof cov
 .DEFAULT_GOAL:=$(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(if $(wildcard ./build/$(T)/Makefile.mk),$(T))) $(DEFAULT_TARGET) release))
 CONFIG_ITEMS=Makefile.mk config.hxx yaalrc
 CONF_release=
+CONF_reldeb=--enable-reldeb
 CONF_debug=--enable-debug
 CONF_prof=--enable-profiling
 CONF_cov=--enable-coverage
@@ -46,7 +47,12 @@ CONF_cov=--enable-coverage
 DS=d
 FIND=find
 
-.PHONY: all bin clean clean-cov clean-debug clean-prof clean-release clean-dep cov debug dep doc install install-cov install-debug install-prof install-release mrproper mrproper-cov mrproper-debug mrproper-prof mrproper-release release prof purge static stats tags uninstall
+.PHONY: all bin \
+	clean clean-cov clean-debug clean-prof clean-reldeb clean-release clean-dep \
+	cov debug dep doc \
+	install install-cov install-debug install-prof install-reldeb install-release \
+	mrproper mrproper-cov mrproper-debug mrproper-prof mrproper-reldeb mrproper-release \
+	reldeb release prof purge static stats tags uninstall
 .NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc configure config.hxx.in
 
 default: $(.DEFAULT_GOAL)
