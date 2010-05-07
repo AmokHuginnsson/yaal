@@ -186,7 +186,7 @@ mrproper: clean
 include $(DIR_ROOT)/_aux/mk/d_target-tags.mk
 
 doc: $(SRCS) $(HDRS)
-	@doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'; \
+	@cd $(DIR_ROOT) && doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'; \
 	cat doc/doxygen.css >> doc/html/doxygen.css
 
 stats:

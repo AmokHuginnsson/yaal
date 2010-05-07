@@ -1,4 +1,4 @@
-# Doxyfile 1.4.1
+# Doxyfile 1.6.3
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -76,7 +76,7 @@ WARN_LOGFILE           =
 INPUT                  = .
 FILE_PATTERNS          = *.hxx
 RECURSIVE              = YES
-EXCLUDE                = doc
+EXCLUDE                = doc build
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = doc

@@ -2,7 +2,9 @@
 
 .sinclude ".my_make"
 
-default .DEFAULT:
+.PHONY: doc
+
+default .DEFAULT doc:
 	@$(MAKE) -f _aux/mk/master.mk $(@)
 
 .my_make:

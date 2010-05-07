@@ -1,8 +1,10 @@
 -include .my_make
 
-MAKE+=--no-print-directory
+MAKEFLAGS+=--no-print-directory
 
-default .DEFAULT:
+.PHONY: doc
+
+default .DEFAULT doc:
 	@$(MAKE) -f _aux/mk/master.mk $(@)
 
 .my_make:

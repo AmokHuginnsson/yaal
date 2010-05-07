@@ -15,31 +15,22 @@
 		<td>Debian Stable</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Ubuntu Jaunty Jackalope</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
-	</tr>
-	<tr>
 		<td>Ubuntu Intrepid Ibex</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Centos 5.2</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Centos 5.4</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>FreeBSD 8-CURRENT</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>FreeBSD 8</td><td class="good">100%</td><td class="good">100%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>FreeBSD 7</td><td class="good">100%</td><td class="good">100%</td><td class="fail">Fail</td>
+		<td>Solaris 5.10</td><td class="good">100%</td><td class="good">100%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Solaris 5.10 with GCC with GCC ld</td><td class="good">100%</td><td class="fine">95%</td><td class="fail">Fail</td>
+		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="fine">95%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="average">90%</td><td class="fail">Fail</td>
-	</tr>
-	<tr>
-		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">3)</a></td><td class="good">100%</td><td class="average">80%</td><td class="fail">Fail</td>
-	</tr>
-	<tr>
-		<td>Solaris 5.10 with GCC with Sun ld<a class="note" href="#note_sunld">4)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
+		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">3)</a></td><td class="fail">0%</td><td class="fail">0%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
 		<td>Solaris 5.10 with Sun Studio Express 2008/11<a class="note" href="#note_suncc">5)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
@@ -58,7 +49,6 @@
 	<li><i><a name="note_platform"></a>Unless specified otherwise GCC is used for compilation.</i></li>
 	<li><i><a name="note_compilation"></a>Compilation gets 100% score only when both library and all unit test can be build. On the other hand, compilation gets 0% score if non of the library components could be linked.</i></li>
 	<li><i><a name="note_fork"></a>Many important features are missing from this port due to lack of POSIX compatibility in MS Windows environment. Moreover you need a special super project <b>msvcxx</b> (git clone http://codestation.org/repo/msvcxx.git msvcxx) to be able to build both <b>yaal</b> and <b>tress</b>.</i></li>
-	<li><i><a name="note_sunld"></a><a href="http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id=6735939" target="_blank">A bug in Sun ld.</a></i></li>
 	<li><i><a name="note_suncc"></a><a href="http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=21c0039e011eafffffffff0c6ce30fa20474?bug_id=6688172" target="_blank">A bug in Sun Studio C++ compiler.</a></i></li>
 	<li><i><a name="note_SFU"></a>SFU is a joke, really, no C++, cannot mix with msvcrt.</li>
 </ol>
