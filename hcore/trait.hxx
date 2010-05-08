@@ -41,11 +41,13 @@ namespace yaal
 namespace trait
 {
 
-/*! \cond */
+/*! \brief Type that represents \e true in type calculus context.
+ */
 class true_type { char x; true_type( void ); true_type( true_type const& ); true_type& operator = ( true_type const& ); };
+/*! \brief Type that represents \e false in type calculus context.
+ */
 class false_type { char x[100]; false_type(); false_type( false_type const& ); false_type& operator = ( false_type const& ); };
 STATIC_ASSERT( sizeof ( true_type ) != sizeof ( false_type ) );
-/*! \endcond */
 
 /*! \brief A dummy class.
  *
@@ -1379,6 +1381,8 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
 	{ typedef class_t type; };
+
+/*! \endcond */
 
 }
 
