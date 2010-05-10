@@ -67,7 +67,8 @@ private:
 	class OSSLContext : public HSingletonInterface
 		{
 		typedef HPointer<HMutex> mutex_ptr_t;
-		typedef HArray<mutex_ptr_t> mutexes_t;
+		typedef HPair<mutex_ptr_t, int> mutex_info_t;
+		typedef HArray<mutex_info_t> mutexes_t;
 		static int _instances;
 		static HMutex _mutex;
 		static mutexes_t _sslLibMutexes;

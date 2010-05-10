@@ -34,6 +34,10 @@ Copyright:
 #include <openssl/engine.h>
 #include <unistd.h>
 
+#if ! defined(OPENSSL_THREADS)
+#error Thread support in OpenSSL library is missing.
+#endif /* not OPENSSL_THREADS */
+
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
@@ -74,7 +78,7 @@ yaal::hcore::HString HOpenSSL::f_oSSLKey;
 yaal::hcore::HString HOpenSSL::f_oSSLCert;
 
 int HOpenSSL::OSSLContext::_instances = 0;
-HMutex HOpenSSL::OSSLContext::_mutex;
+HMutex HOpenSSL::OSSLContext::_mutex( HMutex::TYPE::RECURSIVE );
 HOpenSSL::OSSLContext::mutexes_t HOpenSSL::OSSLContext::_sslLibMutexes;
 
 HOpenSSL::OSSLContext::OSSLContext( void ) : _context( NULL ), _users( 0 )
@@ -93,14 +97,17 @@ void HOpenSSL::OSSLContext::init( void )
 	if ( _instances == 0 )
 		{
 		SSL_load_error_strings();
-		SSLeay_add_ssl_algorithms();
 		int numLocks( CRYPTO_num_locks() );
 		M_ENSURE( numLocks > 0 );
 		_sslLibMutexes.resize( numLocks );
 		for ( mutexes_t::iterator it( _sslLibMutexes.begin() ), endIt( _sslLibMutexes.end() ); it != endIt; ++ it )
-			*it = mutex_ptr_t( new HMutex( HMutex::TYPE::RECURSIVE ) );
+			{
+			it->first = mutex_ptr_t( new HMutex( HMutex::TYPE::RECURSIVE ) );
+			it->second = 0;
+			}
 		CRYPTO_set_locking_callback( &HOpenSSL::OSSLContext::libssl_rule_mutex );
 		CRYPTO_set_id_callback( &get_thread_id );
+		SSL_library_init();
 		}
 	SSL_METHOD* l_pxMethod = static_cast<SSL_METHOD*>( method() );
 	SSL_CTX* ctx = NULL;
@@ -143,6 +150,17 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 		ERR_free_strings();
 		EVP_cleanup();
 		CRYPTO_cleanup_all_ex_data();
+		CRYPTO_set_locking_callback( NULL );
+		for ( int i( 0 ), SIZE( static_cast<int>( _sslLibMutexes.size() ) ); i < SIZE; ++ i )
+			{
+			mutex_info_t& m( _sslLibMutexes[ i ] );
+			if ( m.second > 0 )
+				{
+				log_trace << "A ssl lock " << CRYPTO_get_lock_name( i ) << " still holds " << m.second << "locks." <<endl;
+				while ( m.second -- )
+					m.first->unlock();
+				}
+			}
 		_sslLibMutexes.clear();
 		}
 	return;
@@ -173,14 +191,22 @@ void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ )
 	M_EPILOG
 	}
 
-void HOpenSSL::OSSLContext::libssl_rule_mutex( int nth, int mode, char const* file_, int line_ )
+void HOpenSSL::OSSLContext::libssl_rule_mutex( int mode, int nth, char const* file_, int line_ )
 	{
 	M_PROLOG
-	mutex_ptr_t m( _sslLibMutexes[ nth ] );
+	HLock l_oLock( _mutex );
+	mutex_info_t& m( _sslLibMutexes[ nth ] );
 	if ( mode & CRYPTO_LOCK )
-		m->lock();
+		{
+		m.first->lock();
+		++ m.second;
+		}
 	else
-		m->unlock();
+		{
+		M_ASSERT( m.second > 0 );
+		m.first->unlock();
+		-- m.second;
+		}
 	file_ = NULL;
 	line_ = 0;
 	return;
