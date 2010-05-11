@@ -56,6 +56,8 @@ template<int free_args, typename return_t, typename CALL_t,
 	typename a10_t = trait::no_type>
 class HCall;
 
+/*! \cond */
+
 template<typename METHOD_t,
 	typename a0_t = trait::no_type, typename a1_t = trait::no_type,
 	typename a2_t = trait::no_type, typename a3_t = trait::no_type,
@@ -177,7 +179,6 @@ struct call_calculator
 					function>::type type;
 	};
 
-/*! \cond */
 template<typename return_t, typename CALL_t>
 class HCall<0, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -2991,14 +2992,19 @@ public:
 
 /*! \endcond */
 
+/*! \brief Create abstract call from given function.
+ */
 template<typename METHOD_t>
 typename call_calculator<METHOD_t>::type::type call( METHOD_t A_METHOD )
 	{ return ( call_calculator<METHOD_t>::type::make( A_METHOD ) ); }
 
+/*! \brief Create abstract call from given function/method.
+ */
 template<typename METHOD_t, typename a0_t>
 typename call_calculator<METHOD_t, a0_t>::type::type call( METHOD_t A_METHOD, a0_t a0 )
 	{ return ( call_calculator<METHOD_t, a0_t>::type::make( A_METHOD, a0 ) ); }
 
+/*! \cond */
 template<typename METHOD_t, typename a0_t, typename a1_t>
 typename call_calculator<METHOD_t, a0_t, a1_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1 )
 	{ return ( call_calculator<METHOD_t, a0_t, a1_t>::type::make( A_METHOD, a0, a1 ) ); }
@@ -3058,7 +3064,14 @@ typename call_calculator<METHOD_t,
 						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
 	{ return ( call_calculator<METHOD_t,
 			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+/*! \endcond */
 
+/*! \brief Create abstract call from given function/method with given arguments.
+ *
+ * \param A_METHOD - A function/method that created call will represent.
+ * \param a0 - an object pointer in case of method or first function argument.
+ * \param a10 - tenth method arguemnt in case of method or eleventh function arguemnt.
+ */
 template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>

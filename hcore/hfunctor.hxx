@@ -38,6 +38,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \cond */
+
 namespace free_standing_call_args
 {
 
@@ -295,22 +297,26 @@ struct getter<N, -1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7
 
 }
 
+/*! \endcond */
+
 namespace
 {
 
-static const free_standing_call_args::arg<1> _1;
-static const free_standing_call_args::arg<2> _2;
-static const free_standing_call_args::arg<3> _3;
-static const free_standing_call_args::arg<4> _4;
-static const free_standing_call_args::arg<5> _5;
-static const free_standing_call_args::arg<6> _6;
-static const free_standing_call_args::arg<7> _7;
-static const free_standing_call_args::arg<8> _8;
-static const free_standing_call_args::arg<9> _9;
-static const free_standing_call_args::arg<10> _10;
-static const free_standing_call_args::arg<11> _11;
+static const free_standing_call_args::arg<1> _1; /*!< Place holder for first anonymous argument. */
+static const free_standing_call_args::arg<2> _2; /*!< Place holder for second anonymous argument. */
+static const free_standing_call_args::arg<3> _3; /*!< Place holder for third anonymous argument. */
+static const free_standing_call_args::arg<4> _4; /*!< Place holder for fourth anonymous argument. */
+static const free_standing_call_args::arg<5> _5; /*!< Place holder for fifth anonymous argument. */
+static const free_standing_call_args::arg<6> _6; /*!< Place holder for sixth anonymous argument. */
+static const free_standing_call_args::arg<7> _7; /*!< Place holder for seventh anonymous argument. */
+static const free_standing_call_args::arg<8> _8; /*!< Place holder for eighth anonymous argument. */
+static const free_standing_call_args::arg<9> _9; /*!< Place holder for ninth anonymous argument. */
+static const free_standing_call_args::arg<10> _10; /*!< Place holder for tenth anonymous argument. */
+static const free_standing_call_args::arg<11> _11; /*!< Place holder for eleventh anonymous argument. */
 
 }
+
+/*! \cond */
 
 struct object_resolver
 	{
@@ -554,6 +560,8 @@ struct object_resolver
 			{ return ( object_ ); }
 		};
 	};
+
+/*! \endcond */
 
 /*! \brief Make a functor from any (class, method) pair.
  */

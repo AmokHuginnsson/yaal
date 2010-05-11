@@ -108,12 +108,22 @@ struct min_signed
 template<typename T>
 T const min_signed<T>::value;
 
+/*! \brief Convert given boolean value to integer.
+ *
+ * \tparam boolean - boolean value.
+ * \retval value - integer value: 1 for true, 0 for false.
+ */
 template<bool boolean>
 struct to_int
 	{
 	static int const value = boolean ? 1 : 0;
 	};
 
+/*! \brief Convert given integer value to boolean.
+ *
+ * \tparam integer - integer to convert.
+ * \retval value - a converted value, false for 0, true otherwise.
+ */
 template<int long integer>
 struct to_bool
 	{

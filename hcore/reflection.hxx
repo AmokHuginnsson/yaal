@@ -64,6 +64,8 @@ struct TYPE
 	struct symbolic;
 	};
 typedef yaal::hcore::HStrongEnum<TYPE> type_t; /*!< Strong enumeration of PODs. */
+
+/*! \cond */
 template<> struct TYPE::symbolic<void> { static enum_t const type = VOID; };
 template<> struct TYPE::symbolic<bool> { static enum_t const type = BOOL; };
 template<> struct TYPE::symbolic<char> { static enum_t const type = CHAR; };
@@ -76,10 +78,16 @@ template<> struct TYPE::symbolic<double long> { static enum_t const type = DOUBL
 template<> struct TYPE::symbolic<void*> { static enum_t const type = VOID_PTR; };
 template<> struct TYPE::symbolic<char*> { static enum_t const type = CHAR_PTR; };
 template<> struct TYPE::symbolic<yaal::hcore::HString> { static enum_t const type = HSTRING; };
+/*! \endcond */
 
+/*! \brief Convert static type information to value.
+ *
+ * \tparam tType - type to convert to value.
+ * \retval value - a value that is symbolical representation of given type.
+ */
 template<typename tType>
 struct TYPE::symbolic
-	{ static enum_t const type = UNKNOWN; };
+	{ static enum_t const value = UNKNOWN; };
 
 }
 
