@@ -32,6 +32,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hash.hxx"
 #include "hstreamblockiterator.hxx"
 #include "hbitmap.hxx"
+#include "hstringstream.hxx"
 
 using namespace std;
 using namespace yaal::hcore;
@@ -106,6 +107,14 @@ yaal::hcore::HString md5( HStreamInterface::ptr_t stream )
 	M_EPILOG
 	}
 
+yaal::hcore::HString md5( HString const& string )
+	{
+	M_PROLOG
+	HStringStream ss( string );
+	return ( md5( ss ) );
+	M_EPILOG
+	}
+
 void update_sha1_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
 yaal::hcore::HString sha1( HStreamInterface& stream )
@@ -164,6 +173,14 @@ yaal::hcore::HString sha1( HStreamInterface::ptr_t stream )
 	{
 	M_PROLOG
 	return ( sha1( *stream ) );
+	M_EPILOG
+	}
+
+yaal::hcore::HString sha1( HString const& string )
+	{
+	M_PROLOG
+	HStringStream ss( string );
+	return ( sha1( ss ) );
 	M_EPILOG
 	}
 
