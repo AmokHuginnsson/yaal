@@ -15,10 +15,10 @@
 		<td>Debian Stable</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Ubuntu Intrepid Ibex</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Ubuntu 10.10 (Maverick Meerkat)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Centos 5.4</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Centos 5.4 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>FreeBSD 8</td><td class="good">100%</td><td class="good">100%</td><td class="fail">Fail</td>
@@ -27,13 +27,13 @@
 		<td>Solaris 5.10</td><td class="good">100%</td><td class="good">100%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="fine">95%</td><td class="fail">Fail</td>
+		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="fine">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">3)</a></td><td class="fail">0%</td><td class="fail">0%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Solaris 5.10 with Sun Studio Express 2008/11<a class="note" href="#note_suncc">5)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
+		<td>Solaris 5.10 with Sun Studio Express 2008/11<a class="note" href="#note_suncc">4)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
 	</tr>
 	<tr>
 		<td>Windows XP SP3 with Visual Studio C++ 2008 with SFU 3.5<a class="note" href="#note_SFU">6)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
