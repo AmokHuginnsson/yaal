@@ -36,7 +36,7 @@
 		<td>Solaris 5.10 with Sun Studio Express 2008/11<a class="note" href="#note_suncc">4)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
 	</tr>
 	<tr>
-		<td>Windows XP SP3 with Visual Studio C++ 2008 with SFU 3.5<a class="note" href="#note_SFU">6)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
+		<td>Windows XP SP3 with Visual Studio C++ 2008 with SFU 3.5<a class="note" href="#note_SFU">5)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
 	</tr>
 </table>
 <ul>
