@@ -302,7 +302,7 @@ void HOpenSSL::check_err( int code ) const
 	{
 	M_PROLOG
 	int err = SSL_get_error( static_cast<SSL*>( _ssl ), code );
-	if ( ( err != SSL_ERROR_WANT_READ ) && ( err != SSL_ERROR_WANT_WRITE ) )
+	if ( ( err != SSL_ERROR_ZERO_RETURN ) && ( err != SSL_ERROR_WANT_READ ) && ( err != SSL_ERROR_WANT_WRITE ) )
 		{
 		HString l_oBuffer;
 		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );

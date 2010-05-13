@@ -27,7 +27,7 @@
 		<td>Solaris 5.10</td><td class="good">100%</td><td class="good">100%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="fine">100%</td><td class="good">Pass</td>
+		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">3)</a></td><td class="fail">0%</td><td class="fail">0%</td><td class="fail">Fail</td>
