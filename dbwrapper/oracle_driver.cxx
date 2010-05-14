@@ -199,8 +199,8 @@ char const* db_error( void* data_ )
 void* db_query( void* data_, char const* query_ )
 	{
 	OOracle* oracle = static_cast<OOracle*> ( data_ );
-	OQuery* query = xcalloc<OQuery>( 1 );
-	HString query = query_;
+	OQuery* queryObj = xcalloc<OQuery>( 1 );
+	HString queryStr = query_;
 	int iters = 0;
 	int length = static_cast<int>( ::strlen( query_ ) );
 	char* end = ( const_cast<char*>( query_ ) + length ) - 1;
@@ -208,44 +208,44 @@ void* db_query( void* data_, char const* query_ )
 	if ( ( *end ) == ';' )
 		( *end ) = 0;
 	oracle->_status = OCIStmtPrepare2( oracle->_serviceContext,
-			&query->_statement, oracle->_error,
+			&queryObj->_statement, oracle->_error,
 			reinterpret_cast<OraText const*>( query_ ),
 			static_cast<int>( ::strlen( query_ ) ), NULL, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
-	query->_status = &oracle->_status;
-	query->_error = oracle->_error;
+	queryObj->_status = &oracle->_status;
+	queryObj->_error = oracle->_error;
 	if ( ( oracle->_status != OCI_SUCCESS )
 			&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) )
 		{
 		log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to prepare statement." << endl;
-		db_unquery ( query );
-		query = NULL;
+		db_unquery( queryObj );
+		queryObj = NULL;
 		}
 	else
 		{
 		if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
 			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( oracle ) << endl;
-		query.upper();
-		if ( query.find ( "INSERT" ) == 0 )
+		queryStr.upper();
+		if ( queryStr.find ( "INSERT" ) == 0 )
 			iters = 1;
-		else if ( query.find ( "UPDATE" ) == 0 )
+		else if ( queryStr.find ( "UPDATE" ) == 0 )
 			iters = 1;
-		else if ( query.find ( "DELETE" ) == 0 )
+		else if ( queryStr.find ( "DELETE" ) == 0 )
 			iters = 1;
 		oracle->_status = OCIStmtExecute ( oracle->_serviceContext,
-				query->_statement, oracle->_error, iters, 0,
+				queryObj->_statement, oracle->_error, iters, 0,
 				NULL, NULL,
 				OCI_DEFAULT | OCI_COMMIT_ON_SUCCESS | OCI_STMT_SCROLLABLE_READONLY );
 		if ( ( oracle->_status != OCI_SUCCESS )
 				&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) )
 			{
 			log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to execute statement." << endl;
-			db_unquery ( query );
-			query = NULL;
+			db_unquery( queryObj );
+			queryObj = NULL;
 			}
 		else if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
 			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( oracle ) << endl;
 		}
-	return ( query );
+	return ( queryObj );
 	}
 
 void db_unquery ( void * data_ )
