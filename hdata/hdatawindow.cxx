@@ -36,6 +36,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hdataeditcontrol.hxx"
 #include "hdatastatusbarcontrol.hxx"
 #include "hdataprocess.hxx"
+#include "hcore/hformat.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;
@@ -88,7 +89,7 @@ HDataWindow::~HDataWindow( void )
 int HDataWindow::init( void )
 	{
 	M_PROLOG
-	char value [ ] = "";
+	char value[] = "";
 	char const* mask = _maskDefault_;
 	HDataControl* dataControl = NULL;
 	OAttributes attributes;
@@ -104,9 +105,9 @@ int HDataWindow::init( void )
 	attributes._enabledAttribute = -1;
 	attributes._focusedAttribute = -1;
 	HWindow::init();
-	for ( int ctr( 0 ), SIZE( static_cast<int>( _resourcesArray->size() ) ); ctr < SIZE; ++ ctr )
+	for ( int i( 0 ), SIZE( static_cast<int>( _resourcesArray->size() ) ); i < SIZE; ++ i )
 		{
-		OResource& r( (*_resourcesArray)[ ctr ] );
+		OResource& r( (*_resourcesArray)[ i ] );
 		if ( r._attributes )
 			attr = r._attributes;
 		switch ( r._type )
@@ -184,7 +185,7 @@ int HDataWindow::init( void )
 				}
 			break;
 			case ( DATACONTROL_BITS::ROLE::DATA ):
-				link( ctr, dataControl );
+				link( i, dataControl );
 				_editModeControls.push_back( dataControl );
 			break;
 			case ( DATACONTROL_BITS::ROLE::FILTER ):
@@ -192,9 +193,8 @@ int HDataWindow::init( void )
 				_viewModeControls.push_back( dataControl );
 			break;
 			default :
-				M_THROW ( "unknown resource purpouse", r._role );
+				M_THROW( ( HFormat( "unknown resource purpouse at %d" ) % i ).string(), r._role );
 			}
-		ctr ++;
 		}
 	_mainControl->set_focus();
 	if ( _mainControl )
@@ -279,8 +279,8 @@ void HDataWindow::sync( HRecordSet::iterator it )
 	M_ASSERT( _syncStore );
 	M_ASSERT( _documentMode == DOCUMENT::VIEW );
 	int long count = _syncStore->_item.get_size();
-	for ( int ctr = 0; ctr < count; ctr ++ )
-		_syncStore->_item[ ctr ]( it[ ctr ].raw() );
+	for ( int i = 0; i < count; i ++ )
+		_syncStore->_item[ i ]( it[ i ].raw() );
 	if ( _syncStore->_idColNo >= 0 )
 		_syncStore->_item.m_lId = lexical_cast<int>( it[ _syncStore->_idColNo ] );
 	M_EPILOG
@@ -291,8 +291,8 @@ void HDataWindow::sync( void )
 	M_PROLOG
 	M_ASSERT( _documentMode == DOCUMENT::EDIT );
 	int count = static_cast<int>( _editModeControls.size() );
-	for ( int ctr = 0; ctr < count; ctr ++ )
-		(*_dB)[ ctr ] = _editModeControls[ ctr ]->get().get<HString const&>();
+	for ( int i = 0; i < count; i ++ )
+		(*_dB)[ i ] = _editModeControls[ i ]->get().get<HString const&>();
 	return;
 	M_EPILOG
 	}

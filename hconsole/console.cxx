@@ -141,6 +141,11 @@ HConsole::HConsole( void ) : _initialized( false ), _width( 0 ), _height( 0 ), _
 
 HConsole::~HConsole( void )
 	{
+	if ( ! isendwin() )
+		leave_curses();
+	delwin( stdscr );
+	delwin( curscr );
+	delwin( newscr );
 	return;
 	}
 
@@ -209,12 +214,12 @@ void HConsole::enter_curses( void )
 	M_ENSURE( start_color() != ERR );
 	standout(); /* Macro, returned value without meaning */
 	M_ENSURE( nonl() == OK );
-	M_ENSURE( keypad ( stdscr, true ) != ERR );
-	M_ENSURE( intrflush ( stdscr, false ) != ERR );
-	M_ENSURE( scrollok ( stdscr, false ) != ERR );
-	M_ENSURE( leaveok ( stdscr, false ) != ERR );
+	M_ENSURE( keypad( stdscr, true ) != ERR );
+	M_ENSURE( intrflush( stdscr, false ) != ERR );
+	M_ENSURE( scrollok( stdscr, false ) != ERR );
+	M_ENSURE( leaveok( stdscr, false ) != ERR );
 	immedok( stdscr, false );
-	M_ENSURE( fflush ( NULL ) == 0 );
+	M_ENSURE( fflush( NULL ) == 0 );
 	flushinp(); /* Always returns OK */
 	curs_set( CURSOR::INVISIBLE );
 	M_ENSURE( refresh() != ERR );

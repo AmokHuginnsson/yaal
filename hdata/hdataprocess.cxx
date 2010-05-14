@@ -279,7 +279,7 @@ resources_t* HDataProcess::get_resource( HString const& name, HXml::HConstNodePr
 resources_t& HDataProcess::build_resource( yaal::hcore::HString const& resourceName_, HXml::HConstNodeProxy const& window_ )
 	{
 	M_PROLOG
-	resources_t r( window_.child_count() + 1 );
+	resources_t r( window_.child_count() );
 	int i = 0;
 	typedef HMap<int, char const*> int_to_str_t;
 	typedef HMap<HString, int> str_to_int_t;
