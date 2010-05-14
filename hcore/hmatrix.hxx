@@ -1,5 +1,5 @@
 /*
----           `yaal' (a_iColumn) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' (column_) 1978 by Marcin 'Amok' Konarski            ---
 
 	hmatrix.hxx - this file is integral part of `yaal' project.
 
@@ -36,7 +36,7 @@ namespace yaal
 namespace hcore
 {
 
-extern char const* const g_ppcErrMsgHMatrix[];
+extern char const* const _errMsgHMatrix_[];
 
 /*! \brief Abstraction of Matrix, and all relevant algebraic operations.
  */
@@ -70,9 +70,9 @@ public:
 	typedef HVector<value_type> row_t;
 private:
 	typedef HArray<row_t> data_t;
-	int f_iRows;
-	int f_iColumns;
-	data_t f_oData;
+	int _rows;
+	int _columns;
+	data_t _data;
 public:
 	HMatrix( int const, int const );
 	HMatrix( HMatrix const& );
@@ -113,33 +113,33 @@ public:
 	template<typename ttType>
 	friend HMatrix operator * ( ttType const, HMatrix<ttType> const& );
 private:
-	inline void check_dimensions_columns_rows( int a_iRowsAnother ) const
+	inline void check_dimensions_columns_rows( int rowsAnother_ ) const
 		{
 		M_PROLOG
-		if ( f_iColumns != a_iRowsAnother )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::DIM_NOT_MATCH_COLUMNS_ROWS ],
-					f_iColumns - a_iRowsAnother );
+		if ( _columns != rowsAnother_ )
+			M_THROW( _errMsgHMatrix_[ ERROR::DIM_NOT_MATCH_COLUMNS_ROWS ],
+					_columns - rowsAnother_ );
 		return;
 		M_EPILOG
 		}
-	inline void check_dimensions_rows_columns( int a_iRowsAnother,
-			int a_iColumnsAnother ) const
+	inline void check_dimensions_rows_columns( int rowsAnother_,
+			int columnsAnother_ ) const
 		{
 		M_PROLOG
-		if ( f_iRows != a_iRowsAnother )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::DIM_NOT_MATCH_ROWS ],
-					f_iRows - a_iRowsAnother );
-		if ( f_iColumns != a_iColumnsAnother )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::DIM_NOT_MATCH_COLUMNS ],
-					f_iColumns - a_iColumnsAnother );
+		if ( _rows != rowsAnother_ )
+			M_THROW( _errMsgHMatrix_[ ERROR::DIM_NOT_MATCH_ROWS ],
+					_rows - rowsAnother_ );
+		if ( _columns != columnsAnother_ )
+			M_THROW( _errMsgHMatrix_[ ERROR::DIM_NOT_MATCH_COLUMNS ],
+					_columns - columnsAnother_ );
 		return;
 		M_EPILOG
 		}
 	inline void check_dimensions_square( void ) const
 		{
 		M_PROLOG
-		if ( f_iRows != f_iColumns )
-			M_THROW( g_ppcErrMsgHMatrix[ ERROR::NOT_A_SQUARE ], f_iRows - f_iColumns );
+		if ( _rows != _columns )
+			M_THROW( _errMsgHMatrix_[ ERROR::NOT_A_SQUARE ], _rows - _columns );
 		return;
 		M_EPILOG
 		}
@@ -149,34 +149,34 @@ template<typename value_type>
 HVector<value_type> T( HMatrix<value_type> const&, HVector<value_type> const& );
 
 template<typename value_type>
-HMatrix<value_type>::HMatrix( int const a_iRows, int const a_iColumns )
-	: f_iRows( a_iRows ), f_iColumns( a_iColumns ),
-	f_oData( f_iRows, row_t( a_iColumns ) )
+HMatrix<value_type>::HMatrix( int const rows_, int const columns_ )
+	: _rows( rows_ ), _columns( columns_ ),
+	_data( _rows, row_t( columns_ ) )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	if ( a_iRows < 1 )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::BAD_ROWS ], a_iRows );
+	int ctr = 0;
+	if ( rows_ < 1 )
+		M_THROW( _errMsgHMatrix_[ ERROR::BAD_ROWS ], rows_ );
 	else
-		f_iRows = a_iRows;
-	if ( a_iColumns < 1 )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::BAD_COLUMNS ], a_iColumns );
+		_rows = rows_;
+	if ( columns_ < 1 )
+		M_THROW( _errMsgHMatrix_[ ERROR::BAD_COLUMNS ], columns_ );
 	else
-		f_iColumns = a_iColumns;
+		_columns = columns_;
 	return ;
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type>::HMatrix( HMatrix const& a_roMatrix )
-	: f_iRows( a_roMatrix.f_iRows ), f_iColumns( a_roMatrix.f_iColumns ), f_oData()
+HMatrix<value_type>::HMatrix( HMatrix const& matrix_ )
+	: _rows( matrix_._rows ), _columns( matrix_._columns ), _data()
 	{
 	M_PROLOG
-	if ( ( f_iRows > 0 ) || ( f_iColumns > 0 ) )
-		check_dimensions_rows_columns( a_roMatrix.f_iRows,
-				a_roMatrix.f_iColumns );
-	data_t tmp( a_roMatrix.f_oData );
-	f_oData.swap( tmp );
+	if ( ( _rows > 0 ) || ( _columns > 0 ) )
+		check_dimensions_rows_columns( matrix_._rows,
+				matrix_._columns );
+	data_t tmp( matrix_._data );
+	_data.swap( tmp );
 	return;
 	M_EPILOG
 	}
@@ -190,12 +190,12 @@ HMatrix<value_type>::~HMatrix( void )
 	}
 
 template<typename value_type>
-int HMatrix<value_type>::set( value_type const** a_tScalar )
+int HMatrix<value_type>::set( value_type const** scalar_ )
 	{
 	M_PROLOG
-	int l_iCtr;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		this->f_ptArray [ l_iCtr ]->set( a_tScalar[ l_iCtr ] );
+	int ctr;
+	for ( ctr = 0; ctr < _rows; ctr++ )
+		this->_array [ ctr ]->set( scalar_[ ctr ] );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -204,7 +204,7 @@ template<typename value_type>
 int HMatrix<value_type>::row( void ) const
 	{
 	M_PROLOG
-	return ( f_iRows );
+	return ( _rows );
 	M_EPILOG
 	}
 
@@ -212,7 +212,7 @@ template<typename value_type>
 int HMatrix<value_type>::col( void ) const
 	{
 	M_PROLOG
-	return ( f_iColumns );
+	return ( _columns );
 	M_EPILOG
 	}
 
@@ -221,85 +221,85 @@ value_type HMatrix<value_type>::det( void ) const
 	{
 	M_PROLOG
 	check_dimensions_square();
-	int l_iCtrLocRow = 0, l_iCtrRow = 0, l_iExchanges = 0;
-	value_type l_tScalar;
-	HMatrix<value_type> l_oMatrix ( * this );
-	HVector<value_type> l_oVector ( f_iColumns );
-	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
+	int ctrLocRow = 0, ctrRow = 0, exchanges = 0;
+	value_type scalar;
+	HMatrix<value_type> matrix ( * this );
+	HVector<value_type> vector ( _columns );
+	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
 		{
-		if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ] != 0 )
+		if ( matrix [ ctrRow ] [ ctrRow ] != 0 )
 			continue;
-		for ( l_iCtrLocRow = 0; l_iCtrLocRow < l_iCtrRow; l_iCtrLocRow ++ )
-			if ( ( l_oMatrix [ l_iCtrRow ] [ l_iCtrLocRow ] != 0 )
-					&& ( l_oMatrix [ l_iCtrLocRow ] [ l_iCtrRow ] != 0 ) )
+		for ( ctrLocRow = 0; ctrLocRow < ctrRow; ctrLocRow ++ )
+			if ( ( matrix [ ctrRow ] [ ctrLocRow ] != 0 )
+					&& ( matrix [ ctrLocRow ] [ ctrRow ] != 0 ) )
 				{
-				l_oVector = l_oMatrix [ l_iCtrLocRow ];
-				l_oMatrix [ l_iCtrLocRow ] = l_oMatrix [ l_iCtrRow ];
-				l_oMatrix [ l_iCtrRow ] = l_oVector;
-				l_iExchanges ++;
+				vector = matrix [ ctrLocRow ];
+				matrix [ ctrLocRow ] = matrix [ ctrRow ];
+				matrix [ ctrRow ] = vector;
+				exchanges ++;
 				break;
 				}
-		if ( l_iCtrLocRow == l_iCtrRow )
-			for ( l_iCtrLocRow = l_iCtrRow; l_iCtrLocRow < f_iRows; l_iCtrLocRow ++ )
-				if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrLocRow ] != 0 )
+		if ( ctrLocRow == ctrRow )
+			for ( ctrLocRow = ctrRow; ctrLocRow < _rows; ctrLocRow ++ )
+				if ( matrix [ ctrRow ] [ ctrLocRow ] != 0 )
 					{
-					l_oVector = l_oMatrix [ l_iCtrLocRow ];
-					l_oMatrix [ l_iCtrLocRow ] = l_oMatrix [ l_iCtrRow ];
-					l_oMatrix [ l_iCtrRow ] = l_oVector;
-					l_iExchanges++;
+					vector = matrix [ ctrLocRow ];
+					matrix [ ctrLocRow ] = matrix [ ctrRow ];
+					matrix [ ctrRow ] = vector;
+					exchanges++;
 					break;
 					}
 		}
-	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
-		if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ] == 0 )
+	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
+		if ( matrix [ ctrRow ] [ ctrRow ] == 0 )
 			return ( 0 );
-	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
+	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
 		{
-		if ( l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ] == 0 )
+		if ( matrix [ ctrRow ] [ ctrRow ] == 0 )
 			return ( 0 );
-		for ( l_iCtrLocRow = l_iCtrRow + 1; l_iCtrLocRow < f_iRows; l_iCtrLocRow ++ )
+		for ( ctrLocRow = ctrRow + 1; ctrLocRow < _rows; ctrLocRow ++ )
 			{
-			l_tScalar = -l_oMatrix [ l_iCtrLocRow ] [ l_iCtrRow ] / l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ];
-			l_oVector = ( l_tScalar * l_oMatrix [ l_iCtrRow ] );
-			l_oMatrix [ l_iCtrLocRow ] += l_oVector;
+			scalar = -matrix [ ctrLocRow ] [ ctrRow ] / matrix [ ctrRow ] [ ctrRow ];
+			vector = ( scalar * matrix [ ctrRow ] );
+			matrix [ ctrLocRow ] += vector;
 			}
 		}
-	l_tScalar = 1;
-	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
-		l_tScalar *= l_oMatrix [ l_iCtrRow ] [ l_iCtrRow ];
-	if ( l_iExchanges % 2 )
-		l_tScalar = -l_tScalar;
-	return ( l_tScalar );
+	scalar = 1;
+	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
+		scalar *= matrix [ ctrRow ] [ ctrRow ];
+	if ( exchanges % 2 )
+		scalar = -scalar;
+	return ( scalar );
 	M_EPILOG
 	}
 
 template<typename value_type>
-value_type HMatrix<value_type>::M( int const a_iRow, int const a_iColumn )
+value_type HMatrix<value_type>::M( int const row_, int const column_ )
 	{
 	M_PROLOG
 	check_dimensions_square();
-	int l_iCtrRow = 0, l_iCtrColumn = 0, l_iCtrRowVirtual = 0, l_iCtrColumnVirtual = 0;
-	if ( a_iRow >= f_iRows )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::ROW_OUT_OF_RANGE ], a_iRow - f_iRows );
-	if ( a_iColumn >= f_iColumns )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::COLUMN_OUT_OF_RANGE ], a_iColumn - f_iColumns );
-	if ( f_iRows == 1 )
+	int ctrRow = 0, ctrColumn = 0, ctrRowVirtual = 0, ctrColumnVirtual = 0;
+	if ( row_ >= _rows )
+		M_THROW( _errMsgHMatrix_[ ERROR::ROW_OUT_OF_RANGE ], row_ - _rows );
+	if ( column_ >= _columns )
+		M_THROW( _errMsgHMatrix_[ ERROR::COLUMN_OUT_OF_RANGE ], column_ - _columns );
+	if ( _rows == 1 )
 		return ( 0 );
-	HMatrix l_oMatrix ( f_iRows - 1, f_iColumns - 1 );
-	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++, l_iCtrColumnVirtual = 0 )
+	HMatrix matrix ( _rows - 1, _columns - 1 );
+	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++, ctrColumnVirtual = 0 )
 		{
-		if ( l_iCtrRow == a_iRow )
+		if ( ctrRow == row_ )
 			continue;
-		for ( l_iCtrColumn = 0; l_iCtrColumn < f_iColumns; l_iCtrColumn ++ )
+		for ( ctrColumn = 0; ctrColumn < _columns; ctrColumn ++ )
 			{
-			if ( l_iCtrColumn == a_iColumn )
+			if ( ctrColumn == column_ )
 				continue;
-			l_oMatrix.f_oData[ l_iCtrRowVirtual ][ l_iCtrColumnVirtual ] = f_oData[ l_iCtrRow ][ l_iCtrColumn ];
-			l_iCtrColumnVirtual ++;
+			matrix._data[ ctrRowVirtual ][ ctrColumnVirtual ] = _data[ ctrRow ][ ctrColumn ];
+			ctrColumnVirtual ++;
 			}
-		l_iCtrRowVirtual ++;
+		ctrRowVirtual ++;
 		}
-	return ( l_oMatrix.det() );
+	return ( matrix.det() );
 	M_EPILOG
 	}
 
@@ -307,12 +307,12 @@ template<typename value_type>
 HMatrix<value_type> HMatrix<value_type>::T( void )
 	{
 	M_PROLOG
-	int l_iCtrRow = 0, l_iCtrColumn = 0;
-	HMatrix l_oMatrix ( f_iColumns, f_iRows );
-	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
-		for ( l_iCtrColumn = 0; l_iCtrColumn < f_iColumns; l_iCtrColumn ++ ) 
-			l_oMatrix.f_oData[ l_iCtrColumn ][ l_iCtrRow ] = f_oData[ l_iCtrRow ][ l_iCtrColumn ];
-	return ( l_oMatrix );
+	int ctrRow = 0, ctrColumn = 0;
+	HMatrix matrix ( _columns, _rows );
+	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
+		for ( ctrColumn = 0; ctrColumn < _columns; ctrColumn ++ ) 
+			matrix._data[ ctrColumn ][ ctrRow ] = _data[ ctrRow ][ ctrColumn ];
+	return ( matrix );
 	M_EPILOG
 	}
 
@@ -321,45 +321,45 @@ HMatrix<value_type> HMatrix<value_type>::_1( void )
 	{
 	M_PROLOG
 	check_dimensions_square();
-	value_type l_tScalar = 0;
-	int l_iCtrRow = 0, l_iCtrColumn = 0;
-	if ( ! ( l_tScalar = det() ) )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::ODD ], 0 );
-	HMatrix l_oMatrix( *this );
-	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ )
+	value_type scalar = 0;
+	int ctrRow = 0, ctrColumn = 0;
+	if ( ! ( scalar = det() ) )
+		M_THROW( _errMsgHMatrix_[ ERROR::ODD ], 0 );
+	HMatrix matrix( *this );
+	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
 		{
-		for ( l_iCtrColumn = 0; l_iCtrColumn < f_iColumns; l_iCtrColumn ++ )
+		for ( ctrColumn = 0; ctrColumn < _columns; ctrColumn ++ )
 			{
-			l_oMatrix.f_oData[ l_iCtrRow ][ l_iCtrColumn ] = M( l_iCtrRow,
-					l_iCtrColumn ) * ( ( ( l_iCtrRow + l_iCtrColumn ) % 2 ) ? -1 : 1 );
+			matrix._data[ ctrRow ][ ctrColumn ] = M( ctrRow,
+					ctrColumn ) * ( ( ( ctrRow + ctrColumn ) % 2 ) ? -1 : 1 );
 			}
 		}
-	return ( l_oMatrix.T() / l_tScalar );
+	return ( matrix.T() / scalar );
 	M_EPILOG
 	}
 
 template<typename value_type>
-void HMatrix<value_type>::swap( HMatrix& a_roMatrix )
+void HMatrix<value_type>::swap( HMatrix& matrix_ )
 	{
 	M_PROLOG
-	if ( &a_roMatrix != this )
+	if ( &matrix_ != this )
 		{
 		using yaal::swap;
-		swap( f_iRows, a_roMatrix.f_iRows );
-		swap( f_iColumns, a_roMatrix.f_iColumns );
-		f_oData.swap( a_roMatrix.f_oData );
+		swap( _rows, matrix_._rows );
+		swap( _columns, matrix_._columns );
+		_data.swap( matrix_._data );
 		}
 	return;
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type>& HMatrix<value_type>::operator = ( HMatrix const& a_roMatrix )
+HMatrix<value_type>& HMatrix<value_type>::operator = ( HMatrix const& matrix_ )
 	{
 	M_PROLOG
-	if ( &a_roMatrix != this )
+	if ( &matrix_ != this )
 		{
-		HMatrix<value_type> tmp( a_roMatrix );
+		HMatrix<value_type> tmp( matrix_ );
 		swap( tmp );
 		}
 	return ( *this );
@@ -370,7 +370,7 @@ template<typename value_type>
 typename HMatrix<value_type>::row_t& HMatrix<value_type>::operator[] ( int const& idx )
 	{
 	M_PROLOG
-	return ( f_oData[ idx ] );
+	return ( _data[ idx ] );
 	M_EPILOG
 	}
 
@@ -378,39 +378,39 @@ template<typename value_type>
 typename HMatrix<value_type>::row_t const& HMatrix<value_type>::operator[] ( int const& idx ) const
 	{
 	M_PROLOG
-	return ( f_oData[ idx ] );
+	return ( _data[ idx ] );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type>& HMatrix<value_type>::operator = ( value_type const a_tScalar )
+HMatrix<value_type>& HMatrix<value_type>::operator = ( value_type const scalar_ )
 	{
 	M_PROLOG
-	for ( typename data_t::iterator it = f_oData.begin(); it != f_oData.end(); ++ it )
-		yaal::fill( it->begin(), it->end(), a_tScalar );
+	for ( typename data_t::iterator it = _data.begin(); it != _data.end(); ++ it )
+		yaal::fill( it->begin(), it->end(), scalar_ );
 	return ( *this );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type> HMatrix<value_type>::operator + ( HMatrix const& a_roMatrix ) const
+HMatrix<value_type> HMatrix<value_type>::operator + ( HMatrix const& matrix_ ) const
 	{
 	M_PROLOG
-	check_dimensions_rows_columns( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
-	HMatrix l_oMatrix ( *this );
-	l_oMatrix += a_roMatrix;
-	return ( l_oMatrix );
+	check_dimensions_rows_columns( matrix_._rows, matrix_._columns );
+	HMatrix matrix ( *this );
+	matrix += matrix_;
+	return ( matrix );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type> HMatrix<value_type>::operator - ( HMatrix const& a_roMatrix ) const
+HMatrix<value_type> HMatrix<value_type>::operator - ( HMatrix const& matrix_ ) const
 	{
 	M_PROLOG
-	check_dimensions_rows_columns( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
-	HMatrix l_oMatrix ( *this );
-	l_oMatrix -= a_roMatrix;
-	return ( l_oMatrix );
+	check_dimensions_rows_columns( matrix_._rows, matrix_._columns );
+	HMatrix matrix ( *this );
+	matrix -= matrix_;
+	return ( matrix );
 	M_EPILOG
 	}
 
@@ -418,107 +418,107 @@ template<typename value_type>
 HMatrix<value_type> HMatrix<value_type>::operator - ( void ) const
 	{
 	M_PROLOG
-	HMatrix<value_type> l_oMatrix( f_iRows, f_iColumns );
-	l_oMatrix = 0;
-	l_oMatrix -= ( *this );
-	return ( l_oMatrix );
+	HMatrix<value_type> matrix( _rows, _columns );
+	matrix = 0;
+	matrix -= ( *this );
+	return ( matrix );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type> HMatrix<value_type>::operator * ( HMatrix const& a_roMatrix ) const
+HMatrix<value_type> HMatrix<value_type>::operator * ( HMatrix const& matrix_ ) const
 	{
 	M_PROLOG
-	check_dimensions_columns_rows( a_roMatrix.f_iRows );
-	value_type l_tScalar = 0;
-	int l_iCtrRow = 0, l_iCtrColumn = 0, l_iCtrRowColumn = 0;
-	HMatrix l_oMatrix( f_iRows, a_roMatrix.f_iColumns );
-	for ( l_iCtrRow = 0; l_iCtrRow < f_iRows; l_iCtrRow ++ ) 
-		for ( l_iCtrColumn = 0; l_iCtrColumn < a_roMatrix.f_iColumns; l_iCtrColumn ++, l_tScalar = 0 )
+	check_dimensions_columns_rows( matrix_._rows );
+	value_type scalar = 0;
+	int ctrRow = 0, ctrColumn = 0, ctrRowColumn = 0;
+	HMatrix matrix( _rows, matrix_._columns );
+	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ ) 
+		for ( ctrColumn = 0; ctrColumn < matrix_._columns; ctrColumn ++, scalar = 0 )
 			{
-			for ( l_iCtrRowColumn = 0; l_iCtrRowColumn < f_iColumns; l_iCtrRowColumn ++ ) 
-				l_tScalar += ( f_oData[ l_iCtrRow ][ l_iCtrRowColumn ] * a_roMatrix.f_oData[ l_iCtrRowColumn ][ l_iCtrColumn ] );
-			l_oMatrix.f_oData[ l_iCtrRow ][ l_iCtrColumn ] = l_tScalar;
+			for ( ctrRowColumn = 0; ctrRowColumn < _columns; ctrRowColumn ++ ) 
+				scalar += ( _data[ ctrRow ][ ctrRowColumn ] * matrix_._data[ ctrRowColumn ][ ctrColumn ] );
+			matrix._data[ ctrRow ][ ctrColumn ] = scalar;
 			}
-	return ( l_oMatrix );
+	return ( matrix );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type> HMatrix<value_type>::operator * ( value_type const a_tScalar ) const
+HMatrix<value_type> HMatrix<value_type>::operator * ( value_type const scalar_ ) const
 	{
 	M_PROLOG
-	HMatrix l_oMatrix ( *this );
-	l_oMatrix *= a_tScalar;
-	return ( l_oMatrix );
+	HMatrix matrix ( *this );
+	matrix *= scalar_;
+	return ( matrix );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type> HMatrix<value_type>::operator / ( value_type const a_tScalar ) const
+HMatrix<value_type> HMatrix<value_type>::operator / ( value_type const scalar_ ) const
 	{
 	M_PROLOG
-	HMatrix l_oMatrix ( *this );
-	l_oMatrix /= a_tScalar;
-	return ( l_oMatrix );
+	HMatrix matrix ( *this );
+	matrix /= scalar_;
+	return ( matrix );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type> & HMatrix<value_type>::operator += ( HMatrix const& a_roMatrix )
+HMatrix<value_type> & HMatrix<value_type>::operator += ( HMatrix const& matrix_ )
 	{
 	M_PROLOG
-	check_dimensions_rows_columns( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
-	int l_iCtr = 0;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr ++ )
-		f_oData[ l_iCtr ] += a_roMatrix.f_oData[ l_iCtr ];
+	check_dimensions_rows_columns( matrix_._rows, matrix_._columns );
+	int ctr = 0;
+	for ( ctr = 0; ctr < _rows; ctr ++ )
+		_data[ ctr ] += matrix_._data[ ctr ];
 	return ( *this );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type> & HMatrix<value_type>::operator -= ( HMatrix const & a_roMatrix )
+HMatrix<value_type> & HMatrix<value_type>::operator -= ( HMatrix const & matrix_ )
 	{
 	M_PROLOG
-	check_dimensions_rows_columns( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
-	int l_iCtr = 0;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		f_oData[ l_iCtr ] -= a_roMatrix.f_oData[ l_iCtr ];
+	check_dimensions_rows_columns( matrix_._rows, matrix_._columns );
+	int ctr = 0;
+	for ( ctr = 0; ctr < _rows; ctr++ )
+		_data[ ctr ] -= matrix_._data[ ctr ];
 	return ( *this );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type>& HMatrix<value_type>::operator *= ( HMatrix const& a_roMatrix )
+HMatrix<value_type>& HMatrix<value_type>::operator *= ( HMatrix const& matrix_ )
 	{
 	M_PROLOG
-	check_dimensions_columns_rows( a_roMatrix.f_iRows );
-	if ( a_roMatrix.f_iRows != a_roMatrix.f_iColumns )
-		M_THROW( g_ppcErrMsgHMatrix[ ERROR::DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS ],
-				a_roMatrix.f_iRows - a_roMatrix.f_iColumns );
-	( *this ) = ( *this ) * a_roMatrix;
+	check_dimensions_columns_rows( matrix_._rows );
+	if ( matrix_._rows != matrix_._columns )
+		M_THROW( _errMsgHMatrix_[ ERROR::DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS ],
+				matrix_._rows - matrix_._columns );
+	( *this ) = ( *this ) * matrix_;
 	return ( *this );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type>& HMatrix<value_type>::operator *= ( value_type const a_tScalar )
+HMatrix<value_type>& HMatrix<value_type>::operator *= ( value_type const scalar_ )
 	{
 	M_PROLOG
-	for ( typename data_t::iterator it = f_oData.begin(); it != f_oData.end(); ++ it )
-		yaal::transform( it->begin(), it->end(), it->begin(), bind2nd( yaal::multiplies<value_type>(), a_tScalar ) );
+	for ( typename data_t::iterator it = _data.begin(); it != _data.end(); ++ it )
+		yaal::transform( it->begin(), it->end(), it->begin(), bind2nd( yaal::multiplies<value_type>(), scalar_ ) );
 	return ( *this );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type> & HMatrix<value_type>::operator /= ( value_type const a_tScalar )
+HMatrix<value_type> & HMatrix<value_type>::operator /= ( value_type const scalar_ )
 	{
 	M_PROLOG
-	int l_iCtr;
-	if ( a_tScalar )
-		for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-			f_oData[ l_iCtr ] /= a_tScalar;
+	int ctr;
+	if ( scalar_ )
+		for ( ctr = 0; ctr < _rows; ctr++ )
+			_data[ ctr ] /= scalar_;
 	return ( *this );
 	M_EPILOG
 	}
@@ -527,11 +527,11 @@ template<typename value_type>
 HMatrix<value_type> HMatrix<value_type>::operator ~ ( void ) const
 	{
 	M_PROLOG
-	int l_iCtr;
-	HMatrix l_oMatrix( f_iRows, f_iColumns );
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ )
-		l_oMatrix [ l_iCtr ] = ~ f_oData[ l_iCtr ];
-	return ( l_oMatrix );
+	int ctr;
+	HMatrix matrix( _rows, _columns );
+	for ( ctr = 0; ctr < _rows; ctr++ )
+		matrix [ ctr ] = ~ _data[ ctr ];
+	return ( matrix );
 	M_EPILOG
 	}
 
@@ -544,81 +544,81 @@ value_type HMatrix<value_type>::operator ! ( void ) const
 	}
 
 template<typename value_type>
-bool HMatrix<value_type>::operator == ( HMatrix const & a_roMatrix ) const
+bool HMatrix<value_type>::operator == ( HMatrix const & matrix_ ) const
 	{
 	M_PROLOG
-	check_dimensions_rows_columns ( a_roMatrix.f_iRows, a_roMatrix.f_iColumns );
-	int l_iCtr = 0;
-	for ( l_iCtr = 0; l_iCtr < f_iRows; l_iCtr++ ) 
-		if ( this->f_ptArray [ l_iCtr ] != a_roMatrix [ l_iCtr ] )
+	check_dimensions_rows_columns ( matrix_._rows, matrix_._columns );
+	int ctr = 0;
+	for ( ctr = 0; ctr < _rows; ctr++ ) 
+		if ( this->_array [ ctr ] != matrix_ [ ctr ] )
 			return ( false );
 	return ( true );
 	M_EPILOG
 	}
 
 template<typename value_type>
-bool HMatrix<value_type>::operator != ( HMatrix const & a_roMatrix ) const
+bool HMatrix<value_type>::operator != ( HMatrix const & matrix_ ) const
 	{
 	M_PROLOG
-	return ( ! ( * this == a_roMatrix ) );
+	return ( ! ( * this == matrix_ ) );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HVector<value_type> operator * ( HVector<value_type> const & a_roVector,
-		HMatrix<value_type> const & a_roMatrix )
+HVector<value_type> operator * ( HVector<value_type> const & vector_,
+		HMatrix<value_type> const & matrix_ )
 	{
 	M_PROLOG
-	value_type l_tScalar;
+	value_type scalar;
 	int j, k;
-	if ( a_roVector.dim() == a_roMatrix.f_iRows )
+	if ( vector_.dim() == matrix_._rows )
 		{
-		HVector<value_type> l_oVector ( a_roMatrix.f_iColumns );
-		for ( j = 0; j < a_roMatrix.f_iColumns; j++ )
+		HVector<value_type> vector ( matrix_._columns );
+		for ( j = 0; j < matrix_._columns; j++ )
 			{
-			l_tScalar = 0;
-			for ( k = 0; k < a_roMatrix.f_iColumns; k++ ) 
-				l_tScalar += a_roVector [ k ] * a_roMatrix [ k ] [ j ];
-			l_oVector [ j ] = l_tScalar;
+			scalar = 0;
+			for ( k = 0; k < matrix_._columns; k++ ) 
+				scalar += vector_ [ k ] * matrix_ [ k ] [ j ];
+			vector [ j ] = scalar;
 			}
-		return ( l_oVector );
+		return ( vector );
 		}
-	return ( a_roVector );
+	return ( vector_ );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HVector<value_type> operator *= ( HVector<value_type> const& a_roVector,
-		HMatrix<value_type> const& a_roMatrix )
+HVector<value_type> operator *= ( HVector<value_type> const& vector_,
+		HMatrix<value_type> const& matrix_ )
 	{
 	M_PROLOG
-	if ( a_roVector.dim() == a_roMatrix.f_iRows == a_roMatrix.f_iColumns )
+	if ( vector_.dim() == matrix_._rows == matrix_._columns )
 		{
-		HVector<value_type> l_oVector = a_roVector * a_roMatrix;
-		a_roVector = l_oVector;
+		HVector<value_type> vector = vector_ * matrix_;
+		vector_ = vector;
 		}
-	return ( a_roVector );
+	return ( vector_ );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HMatrix<value_type> operator * ( value_type const a_tScalar,
-		HMatrix<value_type> const& a_roMatrix )
+HMatrix<value_type> operator * ( value_type const scalar_,
+		HMatrix<value_type> const& matrix_ )
 	{
 	M_PROLOG
-	HMatrix<value_type> l_oMatrix ( a_roMatrix );
-	l_oMatrix *= a_tScalar;
-	return ( l_oMatrix );
+	HMatrix<value_type> matrix ( matrix_ );
+	matrix *= scalar_;
+	return ( matrix );
 	M_EPILOG
 	}
 
 template<typename value_type>
-HVector<value_type> T ( HMatrix<value_type> const& a_roMatrix,
-		HVector<value_type> const& a_roVector )
+HVector<value_type> T ( HMatrix<value_type> const& matrix_,
+		HVector<value_type> const& vector_ )
 	{
 	M_PROLOG
-	HMatrix<value_type> l_oMatrix = a_roMatrix.T();
-	return ( a_roVector * l_oMatrix );
+	HMatrix<value_type> matrix = matrix_.T();
+	return ( vector_ * matrix );
 	M_EPILOG
 	}
 

@@ -33,21 +33,21 @@ namespace yaal
 namespace hconsole
 	{
 
-extern int	n_iLatency;
-extern int	n_iAttributeDisabled;
-extern int	n_iAttributeEnabled;
-extern int	n_iAttributeFocused;
-extern int	n_iAttributeStatusBar;
-extern int	n_iAttributeSearchHighlight;
-extern bool	n_bUseMouse;
-extern bool	n_bDisableXON;
-extern bool	n_bLeaveCtrlC;
-extern bool	n_bLeaveCtrlZ;
-extern bool	n_bLeaveCtrlS;
-extern bool	n_bLeaveCtrlQ;
-extern bool	n_bLeaveCtrlBackSlash;
-extern char	n_cCommandComposeCharacter;
-extern int	n_iCommandComposeDelay;
+extern int	_latency_;
+extern int	_attributeDisabled_;
+extern int	_attributeEnabled_;
+extern int	_attributeFocused_;
+extern int	_attributeStatusBar_;
+extern int	_attributeSearchHighlight_;
+extern bool	_useMouse_;
+extern bool	_disableXON_;
+extern bool	_leaveCtrlC_;
+extern bool	_leaveCtrlZ_;
+extern bool	_leaveCtrlS_;
+extern bool	_leaveCtrlQ_;
+extern bool	_leaveCtrlBackSlash_;
+extern char	_commandComposeCharacter_;
+extern int	_commandComposeDelay_;
 void yaal_hconsole_banner ( void );
 
 	}

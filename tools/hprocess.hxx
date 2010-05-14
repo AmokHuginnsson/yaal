@@ -54,19 +54,19 @@ private:
 	typedef yaal::hcore::HBoundCallInterface<1, void, int>::ptr_t process_filedes_handler_t;
 	typedef yaal::hcore::HHashMap<int, process_filedes_handler_t> process_filedes_map_t;
 	typedef yaal::hcore::HArray<int> dropped_fd_t;
-	bool			f_bInitialised;					/* did process has necessery initialisation */
-	bool			f_bLoop; 								/* indicates if main loop continues */
-	int				f_iIdleCycles;					/* full select()'s without io activity */
-	int				f_iLatencySeconds;			/* timeout between recall */
-	int				f_iLatencyMicroseconds;	/* of handler_idle */
-	timeval		f_sLatency;							/* sleep between re-selects (helper) */
-	fd_set		f_xFileDescriptorSet; 	/* keyboard and eventual sockets */
-	process_filedes_map_t f_oFileDescriptorHandlers;
+	bool			_initialised;					/* did process has necessery initialisation */
+	bool			_loop; 								/* indicates if main loop continues */
+	int				_idleCycles;					/* full select()'s without io activity */
+	int				_latencySeconds;			/* timeout between recall */
+	int				_latencyMicroseconds;	/* of handler_idle */
+	timeval		_latency;							/* sleep between re-selects (helper) */
+	fd_set		_fileDescriptorSet; 	/* keyboard and eventual sockets */
+	process_filedes_map_t _fileDescriptorHandlers;
 	delayed_calls_t _alert;
 	delayed_calls_t _idle;
-	dropped_fd_t f_oDroppedFd;
-	bool f_bCallbackContext;
-	yaal::hcore::HPipe f_oEvent;
+	dropped_fd_t _droppedFd;
+	bool _callbackContext;
+	yaal::hcore::HPipe _event;
 	yaal::hcore::HMutex _mutex;
 public:
 	HProcess( int, int, int = 0 );

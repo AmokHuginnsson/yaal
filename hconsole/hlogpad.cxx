@@ -38,7 +38,7 @@ namespace hconsole
 {
 
 HLogPad::HLogLine::HLogLine ( void )
-	: f_eType ( NONE ), f_iAttribute ( COLORS::ATTR_NORMAL ), f_oText()
+	: _type ( NONE ), _attribute ( COLORS::ATTR_NORMAL ), _text()
 	{
 	M_PROLOG
 	return;
@@ -52,11 +52,11 @@ HLogPad::HLogLine::~HLogLine ( void )
 	M_EPILOG
 	}
 
-HLogPad::HLogPad ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-		int a_iHeight, int a_iWidth, char const * const a_pcLabel )
-	: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcLabel ),
-	f_iLines ( 0 ), f_iOffsetRow ( 0 ), f_iOffsetColumn ( 0 ),
-	f_iAttribute ( 0 ), f_oContents()
+HLogPad::HLogPad ( HWindow * parent_, int row_, int column_,
+		int height_, int width_, char const * const label_ )
+	: HControl ( parent_, row_, column_, height_, width_, label_ ),
+	_lines ( 0 ), _offsetRow ( 0 ), _offsetColumn ( 0 ),
+	_attribute ( 0 ), _contents()
 	{
 	M_PROLOG
 	return;
@@ -73,51 +73,51 @@ HLogPad::~HLogPad ( void )
 void HLogPad::do_refresh ( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iRow = 0, l_iCursor = 0, l_iColumn = 0;
-	int l_iBG = f_bFocused ? COLORS::BG_GRAY : COLORS::BG_BLACK;
+	int ctr = 0, row = 0, cursor = 0, column = 0;
+	int bG = _focused ? COLORS::BG_GRAY : COLORS::BG_BLACK;
 	HConsole& cons = HCons::get_instance();
 	draw_label();
-	f_oVarTmpBuffer.hs_realloc( f_iWidthRaw + 1 );
-	f_oVarTmpBuffer.fillz( ' ', 0, f_iWidthRaw );
-	f_iAttribute = COLORS::ATTR_NORMAL | l_iBG;
-	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		cons.c_cmvprintf( f_iRowRaw + l_iCtr,
-				f_iColumnRaw, f_iAttribute, f_oVarTmpBuffer.raw() );
-	if ( f_oContents.size() )
+	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
+	_varTmpBuffer.fillz( ' ', 0, _widthRaw );
+	_attribute = COLORS::ATTR_NORMAL | bG;
+	for ( ctr = 0; ctr < _heightRaw; ctr ++ )
+		cons.c_cmvprintf( _rowRaw + ctr,
+				_columnRaw, _attribute, _varTmpBuffer.raw() );
+	if ( _contents.size() )
 		{
-		l_iCtr = 0;
-		for ( contents_t::iterator it = f_oContents.begin(); ( it != f_oContents.end() ) && ( l_iRow < f_iHeightRaw ); ++ it )
+		ctr = 0;
+		for ( contents_t::iterator it = _contents.begin(); ( it != _contents.end() ) && ( row < _heightRaw ); ++ it )
 			{
-			if ( it->f_eType == HLogLine::ATTRIBUTE )
-				f_iAttribute = it->f_iAttribute | l_iBG;
+			if ( it->_type == HLogLine::ATTRIBUTE )
+				_attribute = it->_attribute | bG;
 			else
 				{
-				if ( ( l_iCtr >= f_iOffsetRow ) && ( l_iCursor < f_iWidthRaw ) )
+				if ( ( ctr >= _offsetRow ) && ( cursor < _widthRaw ) )
 					{
-					if ( f_iOffsetColumn > l_iColumn )
-						f_oVarTmpBuffer = it->f_oText.mid ( f_iOffsetColumn - l_iColumn );
+					if ( _offsetColumn > column )
+						_varTmpBuffer = it->_text.mid ( _offsetColumn - column );
 					else
-						f_oVarTmpBuffer = it->f_oText;
-					if ( ( l_iCursor + f_oVarTmpBuffer.get_length() ) >= f_iWidthRaw )
-						f_oVarTmpBuffer.set_at( f_iWidthRaw - l_iCursor, 0 );
-					if ( f_oVarTmpBuffer[ 0 ] )
-						cons.c_cmvprintf( f_iRowRaw + l_iRow,
-								f_iColumnRaw + l_iCursor, f_iAttribute, f_oVarTmpBuffer.raw() );
+						_varTmpBuffer = it->_text;
+					if ( ( cursor + _varTmpBuffer.get_length() ) >= _widthRaw )
+						_varTmpBuffer.set_at( _widthRaw - cursor, 0 );
+					if ( _varTmpBuffer[ 0 ] )
+						cons.c_cmvprintf( _rowRaw + row,
+								_columnRaw + cursor, _attribute, _varTmpBuffer.raw() );
 					}
 				else
-					f_oVarTmpBuffer = "";
-				if ( it->f_eType == HLogLine::TEXT_EOL )
+					_varTmpBuffer = "";
+				if ( it->_type == HLogLine::TEXT_EOL )
 					{
-					l_iCursor = 0;
-					l_iColumn = 0;
-					if ( l_iCtr >= f_iOffsetRow )
-						l_iRow ++;
-					l_iCtr ++;
+					cursor = 0;
+					column = 0;
+					if ( ctr >= _offsetRow )
+						row ++;
+					ctr ++;
 					}
 				else
 					{
-					l_iCursor += static_cast<int>( f_oVarTmpBuffer.get_length() );
-					l_iColumn += static_cast<int>( it->f_oText.get_length() );
+					cursor += static_cast<int>( _varTmpBuffer.get_length() );
+					column += static_cast<int>( it->_text.get_length() );
 					}
 				}
 			}
@@ -126,111 +126,111 @@ void HLogPad::do_refresh ( void )
 	M_EPILOG
 	}
 
-void HLogPad::add ( int a_iAttribute )
+void HLogPad::add ( int attribute_ )
 	{
 	M_PROLOG
-	HLogLine l_oLogLine;
-	l_oLogLine.f_eType = HLogLine::ATTRIBUTE;
-	l_oLogLine.f_iAttribute = a_iAttribute;
-	f_oContents.push_back ( l_oLogLine );
+	HLogLine logLine;
+	logLine._type = HLogLine::ATTRIBUTE;
+	logLine._attribute = attribute_;
+	_contents.push_back ( logLine );
 	return;
 	M_EPILOG
 	}
 
-void HLogPad::add ( yaal::hcore::HString const& a_oText )
+void HLogPad::add ( yaal::hcore::HString const& text_ )
 	{
 	M_PROLOG
-	int l_iIndexNL = 0, l_iIndexChar = 0;
-	HLogLine l_oLogLine;
+	int indexNL = 0, indexChar = 0;
+	HLogLine logLine;
 	HLogLine* it = NULL;
-	if ( f_oContents.size() )
-		it = &f_oContents.tail();
-	if ( ! it || ( it->f_eType != HLogLine::TEXT ) )
+	if ( _contents.size() )
+		it = &_contents.tail();
+	if ( ! it || ( it->_type != HLogLine::TEXT ) )
 		{
-		it = &l_oLogLine;
-		it->f_eType = HLogLine::TEXT;
-		it->f_oText = "";
+		it = &logLine;
+		it->_type = HLogLine::TEXT;
+		it->_text = "";
 		}
-	f_oVarTmpBuffer = a_oText;
-	while ( ! f_oVarTmpBuffer.is_empty() )
+	_varTmpBuffer = text_;
+	while ( ! _varTmpBuffer.is_empty() )
 		{
-		l_iIndexNL = static_cast<int>( f_oVarTmpBuffer.find_one_of( "\r\n" ) );
-		if ( l_iIndexNL >= 0 )
+		indexNL = static_cast<int>( _varTmpBuffer.find_one_of( "\r\n" ) );
+		if ( indexNL >= 0 )
 			{
-			it->f_oText += f_oVarTmpBuffer.left( l_iIndexNL );
-			it->f_eType = HLogLine::TEXT_EOL;
-			f_iLines ++;
-			l_iIndexChar = static_cast<int>( f_oVarTmpBuffer.find_other_than( "\r\n", l_iIndexNL + 1 ) );
-			if ( l_iIndexChar >= 0 )
-				f_oVarTmpBuffer = f_oVarTmpBuffer.mid( l_iIndexChar );
+			it->_text += _varTmpBuffer.left( indexNL );
+			it->_type = HLogLine::TEXT_EOL;
+			_lines ++;
+			indexChar = static_cast<int>( _varTmpBuffer.find_other_than( "\r\n", indexNL + 1 ) );
+			if ( indexChar >= 0 )
+				_varTmpBuffer = _varTmpBuffer.mid( indexChar );
 			else
-				f_oVarTmpBuffer = "";
+				_varTmpBuffer = "";
 			}
 		else
 			{
-			it->f_oText += f_oVarTmpBuffer;
-			f_oVarTmpBuffer = "";
+			it->_text += _varTmpBuffer;
+			_varTmpBuffer = "";
 			}
-		if ( it == &l_oLogLine )
-			f_oContents.push_back( *it );
-		it = &l_oLogLine;
-		it->f_eType = HLogLine::TEXT;
-		it->f_oText = "";
+		if ( it == &logLine )
+			_contents.push_back( *it );
+		it = &logLine;
+		it->_type = HLogLine::TEXT;
+		it->_text = "";
 		}
-	if ( f_iLines > f_iHeightRaw )
-		f_iOffsetRow = f_iLines - f_iHeightRaw;
+	if ( _lines > _heightRaw )
+		_offsetRow = _lines - _heightRaw;
 	schedule_refresh();
 	return;
 	M_EPILOG
 	}
 
-void HLogPad::add ( int a_iAttribute, yaal::hcore::HString const& a_oText )
+void HLogPad::add ( int attribute_, yaal::hcore::HString const& text_ )
 	{
 	M_PROLOG
-	add ( a_iAttribute );
-	add ( a_oText );
+	add ( attribute_ );
+	add ( text_ );
 	return;
 	M_EPILOG
 	}
 
-int HLogPad::do_process_input ( int a_iCode )
+int HLogPad::do_process_input ( int code_ )
 	{
 	M_PROLOG
-	int l_iCode = 0;
-	switch ( a_iCode )
+	int code = 0;
+	switch ( code_ )
 		{
 		case ( KEY_CODES::DOWN ):
-			if ( f_iLines > ( f_iHeightRaw + f_iOffsetRow ) )
-				f_iOffsetRow ++;
+			if ( _lines > ( _heightRaw + _offsetRow ) )
+				_offsetRow ++;
 		break;
 		case ( KEY_CODES::UP ):
-			if ( f_iOffsetRow > 0 )
-				f_iOffsetRow --;
+			if ( _offsetRow > 0 )
+				_offsetRow --;
 		break;
 		case ( KEY_CODES::LEFT ):
-			if ( f_iOffsetColumn > 0 )
-				f_iOffsetColumn --;
+			if ( _offsetColumn > 0 )
+				_offsetColumn --;
 		break;
 		case ( KEY_CODES::RIGHT ):
-			f_iOffsetColumn ++;
-			if ( f_iOffsetColumn < 0 )
-				f_iOffsetColumn = 0;
+			_offsetColumn ++;
+			if ( _offsetColumn < 0 )
+				_offsetColumn = 0;
 		break;
 		case ( KEY_CODES::HOME ):
-			f_iOffsetRow = 0;
-			f_iOffsetColumn = 0;
+			_offsetRow = 0;
+			_offsetColumn = 0;
 		break;
 		case ( KEY_CODES::END ):
-			f_iOffsetColumn = 0;
-			if ( f_iLines > f_iHeightRaw )
-				f_iOffsetRow = f_iLines - f_iHeightRaw;
+			_offsetColumn = 0;
+			if ( _lines > _heightRaw )
+				_offsetRow = _lines - _heightRaw;
 		break;
 		default :
-			l_iCode = a_iCode;
+			code = code_;
 		}
-	if ( ! l_iCode )
+	if ( ! code )
 		schedule_refresh();
-	return ( l_iCode );
+	return ( code );
 	M_EPILOG
 	}
 

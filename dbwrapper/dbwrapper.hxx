@@ -35,7 +35,7 @@ namespace yaal
 namespace dbwrapper
 {
 
-extern ODBConnector::DRIVER::enum_t n_eDataBaseDriver;
+extern ODBConnector::DRIVER::enum_t _dataBaseDriver_;
 void yaal_dbwrapper_banner( void );
 
 }

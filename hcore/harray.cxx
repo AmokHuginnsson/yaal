@@ -36,7 +36,7 @@ namespace yaal
 namespace hcore
 {
 
-char const* const n_ppcErrMsgHArray[ 4 ] =
+char const* const _errMsgHArray_[ 4 ] =
 	{
 	_( "ok" ),
 /* HArray::ERROR::BAD_SIZE */  _( "bad size requested" ),

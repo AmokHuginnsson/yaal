@@ -39,10 +39,10 @@ namespace yaal
 namespace hconsole
 {
 
-HSearchableControl::HSearchableControl( bool a_bSearchable )
+HSearchableControl::HSearchableControl( bool searchable_ )
 									: HControl( NULL, 0, 0, 0, 0, NULL ),
-	f_bSearchable( a_bSearchable ), f_bSearchActived( false ),
-	f_bFiltered( false ), f_bBackwards( false ), f_oPattern()
+	_searchable( searchable_ ), _searchActived( false ),
+	_filtered( false ), _backwards( false ), _pattern()
 	{
 	M_PROLOG
 	return;
@@ -56,18 +56,18 @@ HSearchableControl::~HSearchableControl ( void )
 	M_EPILOG
 	}
 
-void HSearchableControl::search( HString const& a_oPattern, bool a_bBackwards )
+void HSearchableControl::search( HString const& pattern_, bool backwards_ )
 	{
 	M_PROLOG
 	HPattern::pluggable_flags_t pf;
-	pf.push_back( make_pair( 'f', &f_bFiltered ) );
-	f_bSearchActived = ! f_oPattern.parse( a_oPattern, &pf );
-	if ( ! f_bSearchActived )
-		f_poParent->status_bar()->message( f_oPattern.error().raw() );
+	pf.push_back( make_pair( 'f', &_filtered ) );
+	_searchActived = ! _pattern.parse( pattern_, &pf );
+	if ( ! _searchActived )
+		_parent->status_bar()->message( _pattern.error().raw() );
 	else
 		{
-		f_bBackwards = a_bBackwards;
-		if ( f_bBackwards )
+		_backwards = backwards_;
+		if ( _backwards )
 			go_to_match_previous();
 		else
 			go_to_match();
@@ -77,24 +77,24 @@ void HSearchableControl::search( HString const& a_oPattern, bool a_bBackwards )
 	M_EPILOG
 	}
 
-void HSearchableControl::highlight( int a_iRow, int a_iColumn,
-		int a_iCurrent, bool a_bCurrent )
+void HSearchableControl::highlight( int row_, int column_,
+		int currentIndex_, bool current_ )
 	{
 	M_PROLOG
-	int long l_iCtr = 0;
+	int long ctr( 0 );
 	HConsole& cons = HCons::get_instance();
-	for ( HPattern::HMatchIterator it = f_oPattern.find( f_oVarTmpBuffer.raw() ),
-			end = f_oPattern.end(); it != end; ++ it )
+	for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
+			end = _pattern.end(); it != end; ++ it )
 		{
-		if ( ( f_bFocused && ( ( a_iCurrent != l_iCtr ) || ! a_bCurrent ) )
-				|| ( ! f_bFocused && ( a_iCurrent == l_iCtr ) && a_bCurrent ) )
-			cons.set_attr( n_iAttributeSearchHighlight >> 8 );
+		if ( ( _focused && ( ( currentIndex_ != ctr ) || ! current_ ) )
+				|| ( ! _focused && ( currentIndex_ == ctr ) && current_ ) )
+			cons.set_attr( _attributeSearchHighlight_ >> 8 );
 		else
-			cons.set_attr( n_iAttributeSearchHighlight );
-		cons.c_mvprintf( a_iRow,
-				static_cast<int>( a_iColumn + ( it->raw() - f_oVarTmpBuffer.raw() ) ),
+			cons.set_attr( _attributeSearchHighlight_ );
+		cons.c_mvprintf( row_,
+				static_cast<int>( column_ + ( it->raw() - _varTmpBuffer.raw() ) ),
 				"%.*s", it->size(), it->raw() );
-		l_iCtr ++;
+		ctr ++;
 		}
 	return;
 	M_EPILOG

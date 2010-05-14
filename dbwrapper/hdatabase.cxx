@@ -42,7 +42,7 @@ namespace dbwrapper
 {
 
 HDataBase::HDataBase( void ) : HPointerFromThisInterface<HDataBase>(),
-	_connector( NULL ), f_pvCoreData( NULL )
+	_connector( NULL ), _coreData( NULL )
 	{
 	M_PROLOG
 	return;
@@ -52,36 +52,36 @@ HDataBase::HDataBase( void ) : HPointerFromThisInterface<HDataBase>(),
 HDataBase::~HDataBase( void )
 	{
 	M_PROLOG
-	if ( f_pvCoreData )
-		(_connector->db_disconnect)( f_pvCoreData );
-	f_pvCoreData = NULL;
+	if ( _coreData )
+		(_connector->db_disconnect)( _coreData );
+	_coreData = NULL;
 	return;
 	M_EPILOG
 	}
 
-int HDataBase::connect( yaal::hcore::HString const& a_oDataBase, yaal::hcore::HString const& a_oLogin,
-		yaal::hcore::HString const& a_oPassword )
+int HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HString const& login_,
+		yaal::hcore::HString const& password_ )
 	{
 	M_PROLOG
-	f_pvCoreData = (_connector->db_connect)( a_oDataBase.raw(), a_oLogin.raw(), a_oPassword.raw() );
-	if ( ! f_pvCoreData )
-		M_THROW( (_connector->dbrs_error)( f_pvCoreData, NULL ),
-				(_connector->dbrs_errno)( f_pvCoreData, NULL ) );
+	_coreData = (_connector->db_connect)( dataBase_.raw(), login_.raw(), password_.raw() );
+	if ( ! _coreData )
+		M_THROW( (_connector->dbrs_error)( _coreData, NULL ),
+				(_connector->dbrs_errno)( _coreData, NULL ) );
 	return ( 0 );
 	M_EPILOG
 	}
 
-HRecordSet::ptr_t HDataBase::query( HString const& a_oQuery )
+HRecordSet::ptr_t HDataBase::query( HString const& query_ )
 	{
 	M_PROLOG
-	if ( ! f_pvCoreData )
+	if ( ! _coreData )
 		M_THROW( "not connected to database", errno );
-	if ( HLog::f_lLogMask & LOG_TYPE::SQL )
-		log << "SQL: " << a_oQuery << endl;
-	void* l_pvResult = (_connector->db_query)( f_pvCoreData, a_oQuery.raw() );
-	if ( (_connector->dbrs_errno)( f_pvCoreData, l_pvResult ) )
-		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( f_pvCoreData, l_pvResult ) );
-	HRecordSet::ptr_t rs( l_pvResult ? new HRecordSet( get_pointer(), _connector, l_pvResult ) : NULL );
+	if ( HLog::_logMask & LOG_TYPE::SQL )
+		log << "SQL: " << query_ << endl;
+	void* result = (_connector->db_query)( _coreData, query_.raw() );
+	if ( (_connector->dbrs_errno)( _coreData, result ) )
+		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _coreData, result ) );
+	HRecordSet::ptr_t rs( result ? new HRecordSet( get_pointer(), _connector, result ) : NULL );
 	return ( rs );
 	M_EPILOG
 	}
@@ -89,14 +89,14 @@ HRecordSet::ptr_t HDataBase::query( HString const& a_oQuery )
 char const* HDataBase::get_error( void ) const
 	{
 	M_PROLOG
-	return ( (_connector->dbrs_error)( f_pvCoreData, NULL ) );
+	return ( (_connector->dbrs_error)( _coreData, NULL ) );
 	M_EPILOG
 	}
 
 int HDataBase::get_errno( void ) const
 	{
 	M_PROLOG
-	return ( (_connector->dbrs_errno)( f_pvCoreData, NULL ) );
+	return ( (_connector->dbrs_errno)( _coreData, NULL ) );
 	M_EPILOG
 	}
 

@@ -39,38 +39,38 @@ namespace hconsole
 {
 
 OMenuItem::OMenuItem( void )
-	: f_psSubMenu( NULL ), HANDLER( NULL ), f_pvParam( NULL ), f_oLabel()
+	: _subMenu( NULL ), HANDLER( NULL ), _param( NULL ), _label()
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-OMenuItem::OMenuItem( OMenuItem* const a_psMenuItem, HANDLER_t const handler,
-		void* a_pvParam, HString const& a_roLabel )
-	: f_psSubMenu( a_psMenuItem ), HANDLER( handler ),
-	f_pvParam( a_pvParam ), f_oLabel ( a_roLabel )
+OMenuItem::OMenuItem( OMenuItem* const menuItem_, HANDLER_t const handler,
+		void* param_, HString const& label_ )
+	: _subMenu( menuItem_ ), HANDLER( handler ),
+	_param( param_ ), _label ( label_ )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-OMenuItem::OMenuItem( OMenuItem const& a_roMenuItem )
-	: f_psSubMenu( a_roMenuItem.f_psSubMenu ), HANDLER( a_roMenuItem.HANDLER ),
-	f_pvParam( a_roMenuItem.f_pvParam ), f_oLabel( a_roMenuItem.f_oLabel )
+OMenuItem::OMenuItem( OMenuItem const& menuItem_ )
+	: _subMenu( menuItem_._subMenu ), HANDLER( menuItem_.HANDLER ),
+	_param( menuItem_._param ), _label( menuItem_._label )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-OMenuItem& OMenuItem::operator = ( OMenuItem const& a_roMenuItem )
+OMenuItem& OMenuItem::operator = ( OMenuItem const& menuItem_ )
 	{
 	M_PROLOG
-	if ( &a_roMenuItem != this )
+	if ( &menuItem_ != this )
 		{
-		OMenuItem item( a_roMenuItem );
+		OMenuItem item( menuItem_ );
 		swap( item );
 		}
 	return ( *this );
@@ -80,10 +80,10 @@ OMenuItem& OMenuItem::operator = ( OMenuItem const& a_roMenuItem )
 void OMenuItem::reset( void )
 	{
 	M_PROLOG
-	f_psSubMenu = NULL;
+	_subMenu = NULL;
 	HANDLER = NULL;
-	f_pvParam = NULL;
-	f_oLabel = "";
+	_param = NULL;
+	_label = "";
 	return;
 	M_EPILOG
 	}
@@ -91,7 +91,7 @@ void OMenuItem::reset( void )
 void OMenuItem::call( HTUIProcess* proc )
 	{
 	M_PROLOG
-	static_cast<void>( ( proc->*( HANDLER ) )( f_pvParam ) );
+	static_cast<void>( ( proc->*( HANDLER ) )( _param ) );
 	return;
 	M_EPILOG
 	}
@@ -102,10 +102,10 @@ void OMenuItem::swap( OMenuItem& other )
 	if ( &other != this )
 		{
 		using yaal::swap;
-		swap( f_psSubMenu, other.f_psSubMenu );
+		swap( _subMenu, other._subMenu );
 		swap( HANDLER, other.HANDLER );
-		swap( f_pvParam, other.f_pvParam );
-		swap( f_oLabel, other.f_oLabel );
+		swap( _param, other._param );
+		swap( _label, other._label );
 		}
 	return;
 	M_EPILOG

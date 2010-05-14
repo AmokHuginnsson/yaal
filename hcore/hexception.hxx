@@ -51,7 +51,7 @@ namespace yaal
 namespace hcore
 {
 
-extern int n_iDebugLevel;
+extern int _debugLevel_;
 struct DEBUG_LEVEL
 	{
 	static int const PRINT_PROGRAM_OPTIONS = 3;
@@ -67,20 +67,20 @@ struct DEBUG_LEVEL
  */
 class HException
 	{
-	mutable bool f_bLocal;
+	mutable bool _local;
 protected:
 	static void* ERROR_STREAM;
-	char f_cChar;
-	int	 f_iInt;
-	long f_lLong;
-	double f_dDouble;
-	char* f_pcCharPtr;
-	void* f_pvVoidPtr;
-	int  f_iFrame;
-	char* f_pcFileName;
-	char* f_pcFunctionName;
-	int  f_iCode;
-	char* f_pcMessage;
+	char _char;
+	int	 _int;
+	long _long;
+	double _double;
+	char* _charPtr;
+	void* _voidPtr;
+	int  _frame;
+	char* _fileName;
+	char* _functionName;
+	int  _code;
+	char* _message;
 public:
 	HException( char const* const, char const* const, int const,
 			char const* const, int const = 0 );
@@ -105,7 +105,7 @@ private:
 	HException& operator = ( HException const& );
 	};
 
-extern char const* const n_pcExceptionType;
+extern char const* const _exceptionType_;
 
 /*! \brief Template used to create type specyfic exceptions.
  */
@@ -113,21 +113,21 @@ template<typename tType, typename hier_t = HException>
 class HExceptionT : public hier_t
 	{
 public:
-	HExceptionT( char const* const a_pcReason, char* ptr = hier_t::get_type_name( typeid( tType ).name() ) )
-		: hier_t( n_pcExceptionType, ptr, 0, a_pcReason, errno )
+	HExceptionT( char const* const reason_, char* ptr = hier_t::get_type_name( typeid( tType ).name() ) )
+		: hier_t( _exceptionType_, ptr, 0, reason_, errno )
 		{ hier_t::cleanup( ptr );	}
-	HExceptionT( HString const& a_oReason, char* ptr = hier_t::get_type_name( typeid( tType ).name() ) )
-		: hier_t( n_pcExceptionType, ptr, 0, a_oReason, errno )
+	HExceptionT( HString const& reason_, char* ptr = hier_t::get_type_name( typeid( tType ).name() ) )
+		: hier_t( _exceptionType_, ptr, 0, reason_, errno )
 		{ hier_t::cleanup( ptr );	}
-	HExceptionT( char const* const a_pcFileName,
-			char const* const a_pcFunctionName, int const a_iLine,
-			char const* const a_pcReason, int const a_iCode )
-		: hier_t( a_pcFileName, a_pcFunctionName, a_iLine, a_pcReason, a_iCode )
+	HExceptionT( char const* const fileName_,
+			char const* const functionName_, int const line_,
+			char const* const reason_, int const code_ )
+		: hier_t( fileName_, functionName_, line_, reason_, code_ )
 		{	}
-	HExceptionT( char const* const a_pcFileName,
-			char const* const a_pcFunctionName, int const a_iLine,
-			HString const& a_oReason, int const a_iCode )
-		: hier_t( a_pcFileName, a_pcFunctionName, a_iLine, a_oReason, a_iCode )
+	HExceptionT( char const* const fileName_,
+			char const* const functionName_, int const line_,
+			HString const& reason_, int const code_ )
+		: hier_t( fileName_, functionName_, line_, reason_, code_ )
 		{	}
 	};
 
@@ -140,10 +140,10 @@ typedef HExceptionT<HString> HStringException;
  */
 class HFailedAssertion
 	{
-	char const* f_pcWhat;
+	char const* _what;
 public:
-	HFailedAssertion( char const* const a_pcWhat ) : f_pcWhat( a_pcWhat ) {}
-	HFailedAssertion( HFailedAssertion const& fa ) : f_pcWhat( fa.f_pcWhat ) {}
+	HFailedAssertion( char const* const what_ ) : _what( what_ ) {}
+	HFailedAssertion( HFailedAssertion const& fa ) : _what( fa._what ) {}
 	HFailedAssertion& operator = ( HFailedAssertion const& fa )
 		{
 		if ( &fa != this )
@@ -153,7 +153,7 @@ public:
 			}
 		return ( *this );
 		}
-	char const* what( void ) { return ( f_pcWhat ); }
+	char const* what( void ) { return ( _what ); }
 private:
 	void swap( HFailedAssertion& );
 	};

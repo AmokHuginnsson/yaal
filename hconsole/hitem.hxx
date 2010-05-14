@@ -51,7 +51,7 @@ public:
 	};
 
 template <typename tType>
-HItem_t<tType>::HItem_t ( int a_iSize ) : hcore::HArray<tType> ( a_iSize ),
+HItem_t<tType>::HItem_t ( int size_ ) : hcore::HArray<tType> ( size_ ),
 															 m_lId ( 0 ), m_bChecked ( false )
 	{
 	return;
@@ -64,21 +64,21 @@ HItem_t<tType>::~HItem_t ( void )
 	}
 
 template <typename tType>
-HItem_t<tType>::HItem_t ( HItem_t const & a_roItem, int ) : hcore::HArray<tType> ( a_roItem ),
-	m_lId ( a_roItem.m_lId ), m_bChecked ( a_roItem.m_bChecked )
+HItem_t<tType>::HItem_t ( HItem_t const & item_, int ) : hcore::HArray<tType> ( item_ ),
+	m_lId ( item_.m_lId ), m_bChecked ( item_.m_bChecked )
 	{
 	return;
 	}
 
 template <typename tType>
-HItem_t<tType> & HItem_t<tType>::operator = ( HItem_t<tType> const & a_roItem )
+HItem_t<tType> & HItem_t<tType>::operator = ( HItem_t<tType> const & item_ )
 	{
 	M_PROLOG
-	if ( this != & a_roItem )
+	if ( this != & item_ )
 		{
-		(*this).hcore::HArray<tType>::operator = ( a_roItem );
-		m_lId = a_roItem.m_lId;
-		m_bChecked = a_roItem.m_bChecked;
+		(*this).hcore::HArray<tType>::operator = ( item_ );
+		m_lId = item_.m_lId;
+		m_bChecked = item_.m_bChecked;
 		}
 	return ( *this );
 	M_EPILOG

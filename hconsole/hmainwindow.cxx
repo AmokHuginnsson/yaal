@@ -38,10 +38,10 @@ namespace yaal
 namespace hconsole
 {
 
-HMainWindow::HMainWindow( char const* a_pcTitle, HTUIProcess::model_ptr_t a_oWindows,
-		HTUIProcess::model_t::cyclic_iterator& a_roForegroundWindow )
-		: HWindow( a_pcTitle ), f_poMenu( NULL ), f_oWindowList( a_oWindows ),
-		f_roForegroundWindow( a_roForegroundWindow )
+HMainWindow::HMainWindow( char const* title_, HTUIProcess::model_ptr_t windows_,
+		HTUIProcess::model_t::cyclic_iterator& foregroundWindow_ )
+		: HWindow( title_ ), _menu( NULL ), _windowList( windows_ ),
+		_foregroundWindow( foregroundWindow_ )
 	{
 	M_PROLOG
 	register_postprocess_handler ( KEY<'q'>::command, NULL,
@@ -63,39 +63,39 @@ HMainWindow::~HMainWindow( void )
 int HMainWindow::init( void )
 	{
 	M_PROLOG
-	int l_iError = 0;
+	int error = 0;
 	HConsole& cons = HCons::get_instance();
-	if ( f_oFocusedChild.is_valid() && ( !! (*f_oFocusedChild) ) )
+	if ( _focusedChild.is_valid() && ( !! (*_focusedChild) ) )
 		return ( 0 );
-	l_iError = HWindow::init();
-	f_poMenu = new HMenuControl( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,
+	error = HWindow::init();
+	_menu = new HMenuControl( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,
 			" &Menu \n" );
-	f_poMenu->enable( true );
-	f_poMenu->set_focus();
-	HWindowListControl* l_poWindowList = new HWindowListControl( this, 1,
+	_menu->enable( true );
+	_menu->set_focus();
+	HWindowListControl* windowList = new HWindowListControl( this, 1,
 			- cons.get_width() / 2 + 1, - 2, - 1, " &Opened window list: \n",
-			HListControler<HWindow::ptr_t>::ptr_t( new HListControler<HWindow::ptr_t>( f_oWindowList ) ),
-			f_roForegroundWindow );
-	l_poWindowList->add_column( -1, "&Okno", 1 );
-	l_poWindowList->enable( true );
-	f_oControls.select( f_poMenu );
-	return ( l_iError );
+			HListControler<HWindow::ptr_t>::ptr_t( new HListControler<HWindow::ptr_t>( _windowList ) ),
+			_foregroundWindow );
+	windowList->add_column( -1, "&Okno", 1 );
+	windowList->enable( true );
+	_controls.select( _menu );
+	return ( error );
 	M_EPILOG
 	}
 
-void HMainWindow::init_menu( HTUIProcess* a_psProcess, OMenuItem* a_psMenu )
+void HMainWindow::init_menu( HTUIProcess* process_, OMenuItem* menu_ )
 	{
 	M_PROLOG
-	f_poMenu->init( a_psProcess,	a_psMenu );
+	_menu->init( process_,	menu_ );
 	return;
 	M_EPILOG
 	}
 
-int HMainWindow::handler_close( int a_iCode, void const* )
+int HMainWindow::handler_close( int code_, void const* )
 	{
 	M_PROLOG
-	a_iCode = KEY<'x'>::command;
-	return ( a_iCode );
+	code_ = KEY<'x'>::command;
+	return ( code_ );
 	M_EPILOG
 	}
 

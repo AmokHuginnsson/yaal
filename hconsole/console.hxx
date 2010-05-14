@@ -146,19 +146,19 @@ template<int code = 0>
 struct KEY
 	{
 	static int const meta = code + KEY_CODES::META_BASE;
-	static int meta_r( int a_iCode )
+	static int meta_r( int code_ )
 		{
-		return ( a_iCode + KEY_CODES::META_BASE );
+		return ( code_ + KEY_CODES::META_BASE );
 		}
 	static int const ctrl = code - 96;
-	static int ctrl_r( int a_iCode )
+	static int ctrl_r( int code_ )
 		{
-		return ( a_iCode - 96 );
+		return ( code_ - 96 );
 		}
 	static int const command = code + KEY_CODES::COMMAND_BASE;
-	static int command_r( int a_iCode )
+	static int command_r( int code_ )
 		{
-		return ( a_iCode + KEY_CODES::COMMAND_BASE );
+		return ( code_ + KEY_CODES::COMMAND_BASE );
 		}
 	};
 
@@ -174,7 +174,7 @@ struct EVENT
 		};
 	};
 
-extern bool n_bNeedRepaint;
+extern bool _needRepaint_;
 
 /*! \brief Low level TUI description and modifier.
  */
@@ -184,11 +184,11 @@ protected:
 	typedef HConsole self_t;
 	typedef HSingletonInterface hier_t;
 private:
-	bool f_bInitialized;
-	int f_iWidth;
-	int f_iHeight;
-	int f_iMouseDes;
-	yaal::hcore::HPipe::ptr_t f_oEvent;
+	bool _initialized;
+	int _width;
+	int _height;
+	int _mouseDes;
+	yaal::hcore::HPipe::ptr_t _event;
 public:
 	int const& get_height( void ) const;
 	int const& get_width( void ) const;

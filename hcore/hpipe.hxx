@@ -44,7 +44,7 @@ protected:
 	typedef HPipe self_t;
 	typedef HStreamInterface hier_t;
 private:
-	int f_piPipe[ 2 ];
+	int _pipe[ 2 ];
 public:
 	typedef yaal::hcore::HPointer<HPipe> ptr_t;
 	HPipe( void );

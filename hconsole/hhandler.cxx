@@ -38,11 +38,11 @@ namespace yaal
 namespace hconsole
 {
 
-HHandler::HHandler ( size_t a_uiKeyHandlers, size_t a_uiCommandHandlers )
-				: f_oPreprocessHandlers ( a_uiKeyHandlers ),
-					f_oPostprocessHandlers ( a_uiKeyHandlers ),
-					f_oCommandHandlers ( a_uiCommandHandlers ),
-					f_oCommand()
+HHandler::HHandler ( size_t keyHandlers_, size_t commandHandlers_ )
+				: _preprocessHandlers ( keyHandlers_ ),
+					_postprocessHandlers ( keyHandlers_ ),
+					_commandHandlers ( commandHandlers_ ),
+					_command()
 	{
 	M_PROLOG
 	return;
@@ -56,59 +56,59 @@ HHandler::~HHandler ( void )
 	M_EPILOG
 	}
 
-int HHandler::register_preprocess_handler_internal( int a_iCodeCount, int const * a_piCodes,
+int HHandler::register_preprocess_handler_internal( int codeCount_, int const * codes_,
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	if ( a_piCodes )
-		for ( l_iCtr = 0; l_iCtr < a_iCodeCount; l_iCtr ++ )
-			f_oPreprocessHandlers[ a_piCodes [ l_iCtr ] ] = HANDLER;
+	int ctr = 0;
+	if ( codes_ )
+		for ( ctr = 0; ctr < codeCount_; ctr ++ )
+			_preprocessHandlers[ codes_ [ ctr ] ] = HANDLER;
 	else
-		f_oPreprocessHandlers[ a_iCodeCount ] = HANDLER;
+		_preprocessHandlers[ codeCount_ ] = HANDLER;
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HHandler::register_postprocess_handler_internal( int a_iCodeCount, int const * a_piCodes,
+int HHandler::register_postprocess_handler_internal( int codeCount_, int const * codes_,
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	if ( a_piCodes )
-		for ( l_iCtr = 0; l_iCtr < a_iCodeCount; l_iCtr ++ )
-			f_oPostprocessHandlers[ a_piCodes [ l_iCtr ] ] = HANDLER;
+	int ctr = 0;
+	if ( codes_ )
+		for ( ctr = 0; ctr < codeCount_; ctr ++ )
+			_postprocessHandlers[ codes_ [ ctr ] ] = HANDLER;
 	else
-		f_oPostprocessHandlers[ a_iCodeCount ] = HANDLER;
+		_postprocessHandlers[ codeCount_ ] = HANDLER;
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HHandler::process_input_with_handlers( int a_iCode, process_handler_key_map_t const& a_oMap )
+int HHandler::process_input_with_handlers( int code_, process_handler_key_map_t const& map_ )
 	{
 	M_PROLOG
-	process_handler_key_map_t::const_iterator it( a_oMap.find( a_iCode ) );
-	if ( it != a_oMap.end() )
-		a_iCode = ( this->*( it->second ) )( a_iCode, NULL );
-	return ( a_iCode );
+	process_handler_key_map_t::const_iterator it( map_.find( code_ ) );
+	if ( it != map_.end() )
+		code_ = ( this->*( it->second ) )( code_, NULL );
+	return ( code_ );
 	M_EPILOG
 	}
 
 HString HHandler::process_command( void )
 	{
 	M_PROLOG
-	HString l_oCommand;
-	if ( ! f_oCommand.is_empty() )
+	HString command;
+	if ( ! _command.is_empty() )
 		{
-		l_oCommand = HTokenizer( f_oCommand, " \t" )[ 0 ];
-		process_handler_command_map_t::iterator it( f_oCommandHandlers.find( l_oCommand ) );
-		if ( it != f_oCommandHandlers.end() )
+		command = HTokenizer( _command, " \t" )[ 0 ];
+		process_handler_command_map_t::iterator it( _commandHandlers.find( command ) );
+		if ( it != _commandHandlers.end() )
 			{
-			static_cast<void>( ( this->*( it->second ) )( 0, f_oCommand.raw() ) );
-			f_oCommand = "";
+			static_cast<void>( ( this->*( it->second ) )( 0, _command.raw() ) );
+			_command = "";
 			}
 		}
-	return ( f_oCommand );
+	return ( _command );
 	M_EPILOG
 	}
 

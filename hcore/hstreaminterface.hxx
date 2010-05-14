@@ -74,9 +74,9 @@ public:
 		};
 	typedef HStreamInterface& ( *manipulator_t )( HStreamInterface& );
 protected:
-	HChunk f_oCache; /*!< Read buffer. */
-	int f_iOffset; /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
-	HString f_oWordCache; /*!< Cache for operator >> () and operator << (). */
+	HChunk _cache; /*!< Read buffer. */
+	int _offset; /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
+	HString _wordCache; /*!< Cache for operator >> () and operator << (). */
 	int _fill; /*!< Fill character for output operations. */
 	int _width; /*!< Next output operation width. */
 	BASES::enum_t _base;

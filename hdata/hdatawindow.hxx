@@ -68,22 +68,22 @@ public:
 	 */
 	struct ORowBuffer
 		{
-		int f_iIdColNo;
-		yaal::hconsole::HItem f_oItem;
-		ORowBuffer( int a_iIdColNo, int a_iSize ) : f_iIdColNo( a_iIdColNo ), f_oItem( a_iSize ) {}
+		int _idColNo;
+		yaal::hconsole::HItem _item;
+		ORowBuffer( int idColNo_, int size_ ) : _idColNo( idColNo_ ), _item( size_ ) {}
 		};
 protected:
-	bool f_bModified;
-	DOCUMENT::mode_t f_eDocumentMode;
-	HDataControl* f_poMainControl;
-	OResource* f_psResourcesArray;
-	ORowBuffer* f_poSyncStore;
+	bool _modified;
+	DOCUMENT::mode_t _documentMode;
+	HDataControl* _mainControl;
+	OResource* _resourcesArray;
+	ORowBuffer* _syncStore;
 	typedef yaal::hcore::HList<HDataControl*> controls_t;
-	controls_t f_oViewModeControls;
-	controls_t f_oEditModeControls;
-	HDataProcess* f_poOwner;
-	yaal::dbwrapper::HSQLDescriptor::ptr_t f_oDB;
-	yaal::dbwrapper::HSQLDescriptor::MODE::mode_t f_eMode;
+	controls_t _viewModeControls;
+	controls_t _editModeControls;
+	HDataProcess* _owner;
+	yaal::dbwrapper::HSQLDescriptor::ptr_t _dB;
+	yaal::dbwrapper::HSQLDescriptor::MODE::mode_t _mode;
 public:
 	HDataWindow( char const*, HDataProcess*, OResource* = NULL );
 	virtual ~HDataWindow( void );

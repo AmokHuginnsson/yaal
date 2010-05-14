@@ -46,19 +46,19 @@ namespace tools
 template<>
 bool HBitmap::HIterator<bool>::operator* ( void )
 	{
-	M_ASSERT( f_poOwner );
-	return ( f_poOwner->get( f_lIndex ) );
+	M_ASSERT( _owner );
+	return ( _owner->get( _index ) );
 	}
 
 template<>
 HBitmap::HBit HBitmap::HIterator<HBitmap::HBit>::operator* ( void )
 	{
-	M_ASSERT( f_poOwner );
-	return ( HBitmap::HBit( f_poOwner, f_lIndex ) );
+	M_ASSERT( _owner );
+	return ( HBitmap::HBit( _owner, _index ) );
 	}
 
 HBitmap::HBitmap( void )
-	: f_lAllocatedBytes( 0 ), f_lSize( 0 ), f_pvData( NULL )
+	: _allocatedBytes( 0 ), _size( 0 ), _data( NULL )
 	{
 	return;
 	}
@@ -73,12 +73,12 @@ HBitmap::~HBitmap( void )
 
 int long HBitmap::get_size( void ) const
 	{
-	return ( f_lSize );
+	return ( _size );
 	}
 
 int long HBitmap::size( void ) const
 	{
-	return ( f_lSize );
+	return ( _size );
 	}
 
 void const* HBitmap::raw( void ) const
@@ -88,26 +88,26 @@ void const* HBitmap::raw( void ) const
 
 void HBitmap::clear( void )
 	{
-	if ( f_lAllocatedBytes )
-		delete static_cast<HChunk*>( f_pvData );
-	f_pvData = NULL;
-	f_lAllocatedBytes = 0;
-	f_lSize = 0;
+	if ( _allocatedBytes )
+		delete static_cast<HChunk*>( _data );
+	_data = NULL;
+	_allocatedBytes = 0;
+	_size = 0;
 	return;
 	}
 
-HBitmap::HBitmap( int long const& a_lSize )
-	: f_lAllocatedBytes( 0 ), f_lSize( 0 ), f_pvData( NULL )
+HBitmap::HBitmap( int long const& size_ )
+	: _allocatedBytes( 0 ), _size( 0 ), _data( NULL )
 	{
 	M_PROLOG
-	M_ASSERT( a_lSize > 0 );
-	ensure_pool( a_lSize );
+	M_ASSERT( size_ > 0 );
+	ensure_pool( size_ );
 	return;
 	M_EPILOG
 	}
 
 HBitmap::HBitmap( HBitmap const& b )
-	: f_lAllocatedBytes( 0 ), f_lSize( 0 ), f_pvData( NULL )
+	: _allocatedBytes( 0 ), _size( 0 ), _data( NULL )
 	{
 	M_PROLOG
 	operator = ( b );
@@ -120,16 +120,16 @@ HBitmap& HBitmap::operator = ( HBitmap const& b )
 	M_PROLOG
 	if ( &b != this )
 		{
-		if ( b.f_lAllocatedBytes )
-			copy( b.block(), b.f_lSize );
+		if ( b._allocatedBytes )
+			copy( b.block(), b._size );
 		else
 			{
 			/*
 			 * The source is just reference to some external memory,
 			 * so it is meant to be writeable.
 			 */
-			if ( b.f_lSize )
-				use( const_cast<void*>( b.block() ), b.f_lSize );
+			if ( b._size )
+				use( const_cast<void*>( b.block() ), b._size );
 			else
 				clear();
 			}
@@ -138,49 +138,49 @@ HBitmap& HBitmap::operator = ( HBitmap const& b )
 	M_EPILOG
 	}
 
-void HBitmap::use( void* a_pvBlock, int long const& a_lSize )
+void HBitmap::use( void* block_, int long const& size_ )
 	{
 	M_PROLOG
-	M_ASSERT( a_lSize > 0 );
+	M_ASSERT( size_ > 0 );
 	clear();
-	f_lSize = a_lSize;
-	f_pvData = a_pvBlock;
+	_size = size_;
+	_data = block_;
 	return;
 	M_EPILOG
 	}
 
-void HBitmap::copy( void const* a_pvBlock, int long const& a_lSize )
+void HBitmap::copy( void const* block_, int long const& size_ )
 	{
 	M_PROLOG
-	M_ASSERT( a_lSize > 0 );
-	int long copyBytes = octets_for_bits( a_lSize );
-	ensure_pool( a_lSize );
-	::memcpy( block(), a_pvBlock, copyBytes );
+	M_ASSERT( size_ > 0 );
+	int long copyBytes = octets_for_bits( size_ );
+	ensure_pool( size_ );
+	::memcpy( block(), block_, copyBytes );
 	return;
 	M_EPILOG
 	}
 
 void* HBitmap::block( void )
 	{
-	return ( f_lAllocatedBytes ? static_cast<HChunk*>( f_pvData )->raw() : f_pvData );
+	return ( _allocatedBytes ? static_cast<HChunk*>( _data )->raw() : _data );
 	}
 
 void const* HBitmap::block( void ) const
 	{
-	return ( f_lAllocatedBytes ? static_cast<HChunk*>( f_pvData )->raw() : f_pvData );
+	return ( _allocatedBytes ? static_cast<HChunk*>( _data )->raw() : _data );
 	}
 
 void HBitmap::ensure_pool( int long const& newSize )
 	{
 	M_PROLOG
-	f_lSize = newSize;
-	int long newPoolSize = octets_for_bits( f_lSize );
-	if ( f_lAllocatedBytes )
-		static_cast<HChunk*>( f_pvData )->realloc( newPoolSize );
+	_size = newSize;
+	int long newPoolSize = octets_for_bits( _size );
+	if ( _allocatedBytes )
+		static_cast<HChunk*>( _data )->realloc( newPoolSize );
 	else
-		f_pvData = new HChunk( newPoolSize, HChunk::STRATEGY::GEOMETRIC );
-	f_lAllocatedBytes = newPoolSize;
-	M_ENSURE( f_pvData );
+		_data = new HChunk( newPoolSize, HChunk::STRATEGY::GEOMETRIC );
+	_allocatedBytes = newPoolSize;
+	M_ENSURE( _data );
 	return;
 	M_EPILOG
 	}
@@ -188,9 +188,9 @@ void HBitmap::ensure_pool( int long const& newSize )
 void HBitmap::push_back( bool const& bit )
 	{
 	M_PROLOG
-	M_ASSERT( f_lAllocatedBytes || ! f_pvData );
-	ensure_pool( ++ f_lSize );
-	set( f_lSize - 1, bit );
+	M_ASSERT( _allocatedBytes || ! _data );
+	ensure_pool( ++ _size );
+	set( _size - 1, bit );
 	M_EPILOG
 	}
 
@@ -202,12 +202,12 @@ int long HBitmap::octets_for_bits( int long const& bits ) const
 void HBitmap::fill( bool const& bit )
 	{
 	M_PROLOG
-	fill( 0, f_lSize, bit );
+	fill( 0, _size, bit );
 	return;
 	M_EPILOG
 	}
 
-u8_t g_pucMaskBitKeepLeft[ 8 ] =
+u8_t _maskBitKeepLeft_[ 8 ] =
 	{
 	obinary<010000000>::value,
 	obinary<011000000>::value,
@@ -219,7 +219,7 @@ u8_t g_pucMaskBitKeepLeft[ 8 ] =
 	obinary<011111111>::value
 	};
 
-u8_t g_pucMaskBitKeepRight[ 8 ] =
+u8_t _maskBitKeepRight_[ 8 ] =
 	{
 	obinary<011111111>::value,
 	obinary<001111111>::value,
@@ -244,25 +244,25 @@ void HBitmap::fill( int long const& offset, int long const& amount, bool const& 
 	if ( offset & 7 )
 		{
 		if ( bit )
-			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] | g_pucMaskBitKeepRight[ ( offset & 7 ) - 1 ] );
+			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] | _maskBitKeepRight_[ ( offset & 7 ) - 1 ] );
 		else
-			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] & g_pucMaskBitKeepLeft[ ( offset & 7 ) - 1 ] );
+			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] & _maskBitKeepLeft_[ ( offset & 7 ) - 1 ] );
 		}
 	if ( til & 7 )
 		{
 		if ( bit )
-			data[ byteOffset + byteAmount ] = static_cast<u8_t>( data[ byteOffset - 1 ] | g_pucMaskBitKeepLeft[ ( til & 7 ) - 1 ] );
+			data[ byteOffset + byteAmount ] = static_cast<u8_t>( data[ byteOffset - 1 ] | _maskBitKeepLeft_[ ( til & 7 ) - 1 ] );
 		else
-			data[ byteOffset + byteOffset ] = static_cast<u8_t>( data[ byteOffset - 1 ] & g_pucMaskBitKeepRight[ ( til & 7 ) - 1 ] );
+			data[ byteOffset + byteOffset ] = static_cast<u8_t>( data[ byteOffset - 1 ] & _maskBitKeepRight_[ ( til & 7 ) - 1 ] );
 		}
 	return;
 	M_EPILOG
 	}
 
-void HBitmap::reserve( int long const& a_lSize )
+void HBitmap::reserve( int long const& size_ )
 	{
 	M_PROLOG
-	ensure_pool( a_lSize );
+	ensure_pool( size_ );
 	return;
 	M_EPILOG
 	}
@@ -270,8 +270,8 @@ void HBitmap::reserve( int long const& a_lSize )
 bool HBitmap::operator == ( HBitmap const& b ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_lSize == b.f_lSize );
-	return ( ( f_pvData == b.f_pvData ) || ! ::memcmp( block(), b.block(), octets_for_bits( f_lSize ) ) );
+	M_ASSERT( _size == b._size );
+	return ( ( _data == b._data ) || ! ::memcmp( block(), b.block(), octets_for_bits( _size ) ) );
 	M_EPILOG
 	}
 
@@ -285,10 +285,10 @@ bool HBitmap::operator != ( HBitmap const& b ) const
 HBitmap& HBitmap::operator |= ( HBitmap const& b )
 	{
 	M_PROLOG
-	M_ASSERT( f_lSize == b.f_lSize );
+	M_ASSERT( _size == b._size );
 	char* dst = static_cast<char*>( block() );
 	char const* src = static_cast<char const*>( b.block() );
-	for ( int long i = 0; i < f_lSize; ++ i )
+	for ( int long i = 0; i < _size; ++ i )
 		dst[ i ] = static_cast<char>( dst[ i ] | src[ i ] );
 	return ( *this );
 	M_EPILOG
@@ -297,10 +297,10 @@ HBitmap& HBitmap::operator |= ( HBitmap const& b )
 HBitmap& HBitmap::operator &= ( HBitmap const& b )
 	{
 	M_PROLOG
-	M_ASSERT( f_lSize == b.f_lSize );
+	M_ASSERT( _size == b._size );
 	char* dst = static_cast<char*>( block() );
 	char const* src = static_cast<char const*>( b.block() );
-	for ( int long i = 0; i < f_lSize; ++ i )
+	for ( int long i = 0; i < _size; ++ i )
 		dst[ i ] = static_cast<char>( dst[ i ] & src[ i ] );
 	return ( *this );
 	M_EPILOG
@@ -309,10 +309,10 @@ HBitmap& HBitmap::operator &= ( HBitmap const& b )
 HBitmap& HBitmap::operator ^= ( HBitmap const& b )
 	{
 	M_PROLOG
-	M_ASSERT( f_lSize == b.f_lSize );
+	M_ASSERT( _size == b._size );
 	char* dst = static_cast<char*>( block() );
 	char const* src = static_cast<char const*>( b.block() );
-	for ( int long i = 0; i < f_lSize; ++ i )
+	for ( int long i = 0; i < _size; ++ i )
 		dst[ i ] = static_cast<char>( dst[ i ] ^ src[ i ] );
 	return ( *this );
 	M_EPILOG
@@ -355,7 +355,7 @@ HBitmap& HBitmap::operator += ( HBitmap const& bmp )
 	M_EPILOG
 	}
 
-u32_t g_pulMaskBitSet[ 32 ] = 
+u32_t _maskBitSet_[ 32 ] = 
 	{
 	power<2,31>::value,
 	power<2,30>::value,
@@ -391,43 +391,43 @@ u32_t g_pulMaskBitSet[ 32 ] =
 	obinary<01>::value
 	};
 
-u32_t g_pulMaskBitClear[ 32 ] =
+u32_t _maskBitClear_[ 32 ] =
 	{
-	0xffffffff - power<2,31>::value,
-	0xffffffff - power<2,30>::value,
-	0xffffffff - power<2,29>::value,
-	0xffffffff - power<2,28>::value,
-	0xffffffff - power<2,27>::value,
-	0xffffffff - power<2,26>::value,
-	0xffffffff - power<2,25>::value,
-	0xffffffff - power<2,24>::value,
-	0xffffffff - power<2,23>::value,
-	0xffffffff - power<2,22>::value,
-	0xffffffff - power<2,21>::value,
-	0xffffffff - power<2,20>::value,
-	0xffffffff - power<2,19>::value,
-	0xffffffff - power<2,18>::value,
-	0xffffffff - power<2,17>::value,
-	0xffffffff - power<2,16>::value,
-	0xffffffff - power<2,15>::value,
-	0xffffffff - power<2,14>::value,
-	0xffffffff - power<2,13>::value,
-	0xffffffff - power<2,12>::value,
-	0xffffffff - power<2,11>::value,
-	0xffffffff - obinary<010000000000>::value,
-	0xffffffff - obinary<01000000000>::value,
-	0xffffffff - obinary<0100000000>::value,
-	0xffffffff - obinary<010000000>::value,
-	0xffffffff - obinary<01000000>::value,
-	0xffffffff - obinary<0100000>::value,
-	0xffffffff - obinary<010000>::value,
-	0xffffffff - obinary<01000>::value,
-	0xffffffff - obinary<0100>::value,
-	0xffffffff - obinary<010>::value,
-	0xffffffff - obinary<01>::value
+	0xffffffff ^ power<2,31>::value,
+	0xffffffff ^ power<2,30>::value,
+	0xffffffff ^ power<2,29>::value,
+	0xffffffff ^ power<2,28>::value,
+	0xffffffff ^ power<2,27>::value,
+	0xffffffff ^ power<2,26>::value,
+	0xffffffff ^ power<2,25>::value,
+	0xffffffff ^ power<2,24>::value,
+	0xffffffff ^ power<2,23>::value,
+	0xffffffff ^ power<2,22>::value,
+	0xffffffff ^ power<2,21>::value,
+	0xffffffff ^ power<2,20>::value,
+	0xffffffff ^ power<2,19>::value,
+	0xffffffff ^ power<2,18>::value,
+	0xffffffff ^ power<2,17>::value,
+	0xffffffff ^ power<2,16>::value,
+	0xffffffff ^ power<2,15>::value,
+	0xffffffff ^ power<2,14>::value,
+	0xffffffff ^ power<2,13>::value,
+	0xffffffff ^ power<2,12>::value,
+	0xffffffff ^ power<2,11>::value,
+	0xffffffff ^ obinary<010000000000>::value,
+	0xffffffff ^ obinary<01000000000>::value,
+	0xffffffff ^ obinary<0100000000>::value,
+	0xffffffff ^ obinary<010000000>::value,
+	0xffffffff ^ obinary<01000000>::value,
+	0xffffffff ^ obinary<0100000>::value,
+	0xffffffff ^ obinary<010000>::value,
+	0xffffffff ^ obinary<01000>::value,
+	0xffffffff ^ obinary<0100>::value,
+	0xffffffff ^ obinary<010>::value,
+	0xffffffff ^ obinary<01>::value
 	};
 
-u8_t g_pucMaskBitSet[ 8 ] =
+u8_t _maskBitSetByte_[ 8 ] =
 	{
 	obinary<010000000>::value,
 	obinary<01000000>::value,
@@ -439,7 +439,7 @@ u8_t g_pucMaskBitSet[ 8 ] =
 	obinary<01>::value
 	};
 
-u8_t g_pucMaskBitClear[ 8 ] =
+u8_t _maskBitClearByte_[ 8 ] =
 	{
 	obinary<01111111>::value,
 	obinary<010111111>::value,
@@ -451,70 +451,71 @@ u8_t g_pucMaskBitClear[ 8 ] =
 	obinary<011111110>::value
 	};
 
-bool HBitmap::get( int long const& a_lNumber ) const
+
+bool HBitmap::get( int long const& number_ ) const
 	{
 	M_PROLOG
-	M_ASSERT( a_lNumber >= 0 );
-	M_ASSERT( a_lNumber < f_lSize );
-	int short l_hState = 0, l_iOffset = 0;
-	int long l_lDword;
-	char const* l_pcAddress = static_cast<char const*>( block() );
-	l_lDword = a_lNumber >> 3;
-	l_iOffset = static_cast<short>( a_lNumber & 7 );
-	l_hState = static_cast<short>( *( l_pcAddress + l_lDword ) & g_pucMaskBitSet[ l_iOffset ] );
-	if ( l_hState )
-		l_hState = 1;
-	return ( l_hState ? true : false );
+	M_ASSERT( number_ >= 0 );
+	M_ASSERT( number_ < _size );
+	int short state = 0, offset = 0;
+	int long dword;
+	char const* address = static_cast<char const*>( block() );
+	dword = number_ >> 3;
+	offset = static_cast<short>( number_ & 7 );
+	state = static_cast<short>( *( address + dword ) & _maskBitSetByte_[ offset ] );
+	if ( state )
+		state = 1;
+	return ( state ? true : false );
 	M_EPILOG
 	}
 	
-void HBitmap::set( int long const& a_lNumber, bool const& a_bState )
+void HBitmap::set( int long const& number_, bool const& state_ )
 	{
 	M_PROLOG
-	M_ASSERT( a_lNumber >= 0 );
-	M_ASSERT( a_lNumber < f_lSize );
-	int long l_iOffset;
-	int long l_lDword;
-	char unsigned* l_pcAddress = static_cast<char unsigned*>( block() );
-	l_lDword = a_lNumber >> 3;
-	l_iOffset = a_lNumber & 7;
+	M_ASSERT( number_ >= 0 );
+	M_ASSERT( number_ < _size );
+	int long offset;
+	int long dword;
+	char unsigned* address = static_cast<char unsigned*>( block() );
+	dword = number_ >> 3;
+	offset = number_ & 7;
 	/* FIXME g++-4.3 bug
-	if ( a_iState )
-		*( l_pcAddress + l_lDword ) |= g_pucMaskBitSet[ l_iOffset ];
+	if ( state_ )
+		*( address + dword ) |= _maskBitSet_[ offset ];
 	else
-		*( l_pcAddress + l_lDword ) &= g_pucMaskBitClear[ l_iOffset ];
+		*( address + dword ) &= _maskBitClear_[ offset ];
 	*/
-	if ( a_bState )
-		*( l_pcAddress + l_lDword ) = static_cast<char unsigned>( *( l_pcAddress + l_lDword ) | g_pucMaskBitSet[ l_iOffset ] );
+	if ( state_ )
+		*( address + dword ) = static_cast<char unsigned>( *( address + dword ) | _maskBitSetByte_[ offset ] );
 	else
-		*( l_pcAddress + l_lDword ) = static_cast<char unsigned>( *( l_pcAddress + l_lDword ) & g_pucMaskBitClear[ l_iOffset ] );
+		*( address + dword ) = static_cast<char unsigned>( *( address + dword ) & _maskBitClearByte_[ offset ] );
 	return;
 	M_EPILOG
 	}
 	
-void HBitmap::rotate_right( int long const& a_iStart,
-		int long const& a_iLen, int long const& a_iVal )
+void HBitmap::rotate_right( int long const& start_,
+		int long const& len_, int long const& val_ )
 	{
-	M_ASSERT( ( a_iVal > 0 ) && ( a_iVal < a_iLen ) && ( a_iStart >= 0 ) && ( a_iLen > 0 ) );
-	int long l_iSize = ( a_iLen + a_iStart ) / 8;
-	if ( ( a_iLen + a_iStart ) % 8 )
-		l_iSize++;
+	M_ASSERT( ( val_ > 0 ) && ( val_ < len_ ) && ( start_ >= 0 ) && ( len_ > 0 ) );
+	int long byteCount = ( len_ + start_ ) / 8;
+	if ( ( len_ + start_ ) % 8 )
+		byteCount++;
 	HBitmap tmp( *this );
-	for ( int long i = 0; i < a_iLen; i++ )
-		set( a_iStart + i, tmp.get( a_iStart + ( i + a_iVal ) % a_iLen ) );
+	for ( int long i = 0; i < len_; i++ )
+		set( start_ + i, tmp.get( start_ + ( i + val_ ) % len_ ) );
 	return ;
 	}
 	
-void HBitmap::rotate_left( int long const& a_iStart,
-		int long const& a_iLen, int long const& a_iVal )
+void HBitmap::rotate_left( int long const& start_,
+		int long const& len_, int long const& val_ )
 	{
-	M_ASSERT( ( a_iVal > 0 ) && ( a_iVal < a_iLen ) && ( a_iStart >= 0 ) && ( a_iLen > 0 ) );
-	int long l_iSize = ( a_iLen + a_iStart ) / 8;
-	if ( ( a_iLen + a_iStart ) % 8 )
-		l_iSize++;
+	M_ASSERT( ( val_ > 0 ) && ( val_ < len_ ) && ( start_ >= 0 ) && ( len_ > 0 ) );
+	int long byteCount = ( len_ + start_ ) / 8;
+	if ( ( len_ + start_ ) % 8 )
+		byteCount++;
 	HBitmap tmp( *this );
-	for ( int long i = 0; i < a_iLen; i++ )
-		set( a_iStart + ( i + a_iVal ) % a_iLen, tmp.get( a_iStart + i ) );
+	for ( int long i = 0; i < len_; i++ )
+		set( start_ + ( i + val_ ) % len_, tmp.get( start_ + i ) );
 	return ;
 	}
 
@@ -525,18 +526,18 @@ HBitmap::const_iterator HBitmap::begin( void ) const
 
 HBitmap::const_iterator HBitmap::find( int long const& idx ) const
 	{
-	M_ASSERT( ( idx >= 0 ) && ( idx < f_lSize ) );
+	M_ASSERT( ( idx >= 0 ) && ( idx < _size ) );
 	return ( const_iterator( this, idx ) );
 	}
 
 HBitmap::const_iterator HBitmap::end( void ) const
 	{
-	return ( const_iterator( this, f_lSize ) );
+	return ( const_iterator( this, _size ) );
 	}
 
 HBitmap::const_iterator HBitmap::rbegin( void ) const
 	{
-	return ( const_iterator( this, f_lSize - 1 ) );
+	return ( const_iterator( this, _size - 1 ) );
 	}
 
 HBitmap::const_iterator HBitmap::rend( void ) const
@@ -551,18 +552,18 @@ HBitmap::iterator HBitmap::begin( void )
 
 HBitmap::iterator HBitmap::find( int long const& idx )
 	{
-	M_ASSERT( ( idx >= 0 ) && ( idx < f_lSize ) );
+	M_ASSERT( ( idx >= 0 ) && ( idx < _size ) );
 	return ( iterator( this, idx ) );
 	}
 
 HBitmap::iterator HBitmap::end( void )
 	{
-	return ( iterator( this, f_lSize ) );
+	return ( iterator( this, _size ) );
 	}
 
 HBitmap::iterator HBitmap::rbegin( void )
 	{
-	return ( iterator( this, f_lSize - 1 ) );
+	return ( iterator( this, _size - 1 ) );
 	}
 
 HBitmap::iterator HBitmap::rend( void )
@@ -570,13 +571,13 @@ HBitmap::iterator HBitmap::rend( void )
 	return ( iterator( this, -1 ) );
 	}
 
-HBitmap::HBit::HBit( HBitmap* a_poOwner, int long const& idx )
-	: f_poOwner( a_poOwner ), f_lIndex( idx )
+HBitmap::HBit::HBit( HBitmap* owner_, int long const& idx )
+	: _owner( owner_ ), _index( idx )
 	{
 	}
 
 HBitmap::HBit::HBit( HBit const& bit )
-	: f_poOwner( bit.f_poOwner ), f_lIndex( bit.f_lIndex )
+	: _owner( bit._owner ), _index( bit._index )
 	{
 	}
 
@@ -584,30 +585,30 @@ HBitmap::HBit& HBitmap::HBit::operator = ( HBitmap::HBit const& bit )
 	{
 	if ( &bit != this )
 		{
-		f_poOwner = bit.f_poOwner;
-		f_lIndex = bit.f_lIndex;
+		_owner = bit._owner;
+		_index = bit._index;
 		}
 	return ( *this );
 	}
 
 bool HBitmap::HBit::operator == ( bool const& bit ) const
 	{
-	return ( f_poOwner->get( f_lIndex ) == bit );
+	return ( _owner->get( _index ) == bit );
 	}
 
 bool HBitmap::HBit::operator != ( bool const& bit ) const
 	{
-	return ( f_poOwner->get( f_lIndex ) != bit );
+	return ( _owner->get( _index ) != bit );
 	}
 
 HBitmap::HBit::operator bool ( void ) const
 	{
-	return ( f_poOwner->get( f_lIndex ) );
+	return ( _owner->get( _index ) );
 	}
 
 HBitmap::HBit& HBitmap::HBit::operator = ( bool const& bit )
 	{
-	f_poOwner->set( f_lIndex, bit );
+	_owner->set( _index, bit );
 	return ( *this );
 	}
 

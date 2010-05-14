@@ -40,7 +40,7 @@ namespace hdata
 {
 
 HDataControl::HDataControl( void )
-						: HControl( NULL, 0, 0, 0, 0, NULL ), f_psResource( NULL ), f_oSQL()
+						: HControl( NULL, 0, 0, 0, 0, NULL ), _resource( NULL ), _SQL()
 	{
 	M_PROLOG
 	return;
@@ -54,17 +54,17 @@ HDataControl::~HDataControl( void )
 	M_EPILOG
 	}
 
-void HDataControl::set_resource( OResource const* a_psResource )
+void HDataControl::set_resource( OResource const* resource_ )
 	{
 	M_PROLOG
-	f_psResource = a_psResource;
+	_resource = resource_;
 	M_EPILOG
 	}
 
 void HDataControl::set_dbd( HSQLDescriptor::ptr_t dbd )
 	{
 	M_PROLOG
-	f_oSQL = dbd;
+	_SQL = dbd;
 	M_EPILOG
 	}
 

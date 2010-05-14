@@ -42,7 +42,7 @@ namespace tools
  */
 class HScheduledAsyncCaller : public HAbstractAsyncCaller
 	{
-	yaal::hcore::HCondition f_oCondition;
+	yaal::hcore::HCondition _condition;
 	HScheduledAsyncCaller( void );
 	virtual ~HScheduledAsyncCaller( void );
 	virtual void* do_work( void );

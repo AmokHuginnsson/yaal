@@ -44,25 +44,25 @@ namespace yaal
 namespace tools
 {
 
-HProcess::HProcess( int noFileHandlers_, int a_iLatencySeconds, int a_iLatencyMicroseconds )
-	: f_bInitialised( false ), f_bLoop( true ), f_iIdleCycles( 0 ),
-	f_iLatencySeconds( a_iLatencySeconds ), f_iLatencyMicroseconds( a_iLatencyMicroseconds ),
-	f_sLatency(), f_xFileDescriptorSet(),
-	f_oFileDescriptorHandlers( noFileHandlers_ ),
-	_alert(), _idle(), f_oDroppedFd( noFileHandlers_ ),
-	f_bCallbackContext( false ), f_oEvent(), _mutex()
+HProcess::HProcess( int noFileHandlers_, int latencySeconds_, int latencyMicroseconds_ )
+	: _initialised( false ), _loop( true ), _idleCycles( 0 ),
+	_latencySeconds( latencySeconds_ ), _latencyMicroseconds( latencyMicroseconds_ ),
+	_latency(), _fileDescriptorSet(),
+	_fileDescriptorHandlers( noFileHandlers_ ),
+	_alert(), _idle(), _droppedFd( noFileHandlers_ ),
+	_callbackContext( false ), _event(), _mutex()
 	{
 	M_PROLOG
-	f_oDroppedFd.clear();
-	M_ASSERT( f_oDroppedFd.is_empty() );
-	::memset( &f_sLatency, 0, sizeof ( f_sLatency ) );
-	FD_ZERO( &f_xFileDescriptorSet );
+	_droppedFd.clear();
+	M_ASSERT( _droppedFd.is_empty() );
+	::memset( &_latency, 0, sizeof ( _latency ) );
+	FD_ZERO( &_fileDescriptorSet );
 	HSignalService& ss = HSignalServiceFactory::get_instance();
 	HSignalService::handler_t handler( bound_call( &HProcess::handler_interrupt, this, _1 ) );
-	if ( n_iDebugLevel < DEBUG_LEVEL::GDB )
+	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
 		ss.register_handler( SIGINT, handler );
 	ss.register_handler( SIGHUP, handler );
-	register_file_descriptor_handler( f_oEvent.get_reader_fd(), bound_call( &HProcess::process_interrupt, this, _1 ) );
+	register_file_descriptor_handler( _event.get_reader_fd(), bound_call( &HProcess::process_interrupt, this, _1 ) );
 	return;
 	M_EPILOG
 	}
@@ -74,22 +74,22 @@ HProcess::~HProcess( void )
 	M_EPILOG
 	}
 
-int HProcess::register_file_descriptor_handler( int a_iFileDescriptor, process_filedes_handler_t HANDLER )
+int HProcess::register_file_descriptor_handler( int fileDescriptor_, process_filedes_handler_t HANDLER )
 	{
 	M_PROLOG
-	HPair<process_filedes_map_t::iterator, bool> s( f_oFileDescriptorHandlers.insert( make_pair( a_iFileDescriptor, HANDLER ) ) );
+	HPair<process_filedes_map_t::iterator, bool> s( _fileDescriptorHandlers.insert( make_pair( fileDescriptor_, HANDLER ) ) );
 	return ( s.second ? 0 : 1 );
 	M_EPILOG
 	}
 
-void HProcess::unregister_file_descriptor_handler( int a_iFileDescriptor )
+void HProcess::unregister_file_descriptor_handler( int fileDescriptor_ )
 	{
 	M_PROLOG
-	if ( f_bCallbackContext )
-		f_oDroppedFd.push_back( a_iFileDescriptor );
+	if ( _callbackContext )
+		_droppedFd.push_back( fileDescriptor_ );
 	else
 		{
-		bool fail( f_oFileDescriptorHandlers.erase( a_iFileDescriptor ) != 1 );
+		bool fail( _fileDescriptorHandlers.erase( fileDescriptor_ ) != 1 );
 		M_ASSERT( ! fail );
 		}
 	return;
@@ -99,14 +99,14 @@ void HProcess::unregister_file_descriptor_handler( int a_iFileDescriptor )
 int HProcess::reconstruct_fdset( void )
 	{
 	M_PROLOG
-	f_sLatency.tv_sec = f_iLatencySeconds;
-	f_sLatency.tv_usec = f_iLatencyMicroseconds;
-	FD_ZERO( &f_xFileDescriptorSet );
-	if ( ! f_oFileDescriptorHandlers.size() )
+	_latency.tv_sec = _latencySeconds;
+	_latency.tv_usec = _latencyMicroseconds;
+	FD_ZERO( &_fileDescriptorSet );
+	if ( ! _fileDescriptorHandlers.size() )
 		return ( -1 );
 /* FD_SET is a macro and first argument is evaluated twice ! */
-	for ( process_filedes_map_t::iterator it = f_oFileDescriptorHandlers.begin(); it != f_oFileDescriptorHandlers.end(); ++ it )
-		FD_SET( it->first, &f_xFileDescriptorSet );
+	for ( process_filedes_map_t::iterator it = _fileDescriptorHandlers.begin(); it != _fileDescriptorHandlers.end(); ++ it )
+		FD_SET( it->first, &_fileDescriptorSet );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -114,39 +114,39 @@ int HProcess::reconstruct_fdset( void )
 int HProcess::run( void )
 	{
 	M_PROLOG
-	int l_iError = 0;
-	if ( ! f_oFileDescriptorHandlers.size() )
+	int error = 0;
+	if ( ! _fileDescriptorHandlers.size() )
 		M_THROW( _( "there is no file descriptor to check activity on" ), errno );
-	while ( f_bLoop )
+	while ( _loop )
 		{
-		f_bCallbackContext = true;
+		_callbackContext = true;
 		handle_alerts();
 		reconstruct_fdset();
-		if ( ( l_iError = ::select( FD_SETSIZE, &f_xFileDescriptorSet,
-						NULL, NULL, &f_sLatency ) ) )
+		if ( ( error = ::select( FD_SETSIZE, &_fileDescriptorSet,
+						NULL, NULL, &_latency ) ) )
 			{
-			if ( ( l_iError < 0 ) && ( errno == EINTR ) )
+			if ( ( error < 0 ) && ( errno == EINTR ) )
 				continue;
-			if ( l_iError < 0 )
-				M_THROW ( "select() returned", l_iError );
-			for ( process_filedes_map_t::iterator it = f_oFileDescriptorHandlers.begin();
-					it != f_oFileDescriptorHandlers.end(); ++ it )
+			if ( error < 0 )
+				M_THROW ( "select() returned", error );
+			for ( process_filedes_map_t::iterator it = _fileDescriptorHandlers.begin();
+					it != _fileDescriptorHandlers.end(); ++ it )
 				{
-				if ( FD_ISSET( it->first, &f_xFileDescriptorSet ) )
+				if ( FD_ISSET( it->first, &_fileDescriptorSet ) )
 					{
 					static_cast<void>( ( it->second->invoke( it->first ) ) );
-					f_iIdleCycles = 0;
+					_idleCycles = 0;
 					}
 				}
 			}
 		else
 			handle_idle();
-		f_bCallbackContext = false;
-		if ( ! f_oDroppedFd.is_empty() )
+		_callbackContext = false;
+		if ( ! _droppedFd.is_empty() )
 			{
-			for ( dropped_fd_t::iterator it = f_oDroppedFd.begin(); it != f_oDroppedFd.end(); ++ it )
+			for ( dropped_fd_t::iterator it = _droppedFd.begin(); it != _droppedFd.end(); ++ it )
 				unregister_file_descriptor_handler( *it );
-			f_oDroppedFd.clear();
+			_droppedFd.clear();
 			}
 		}
 	return ( 0 );
@@ -155,24 +155,24 @@ int HProcess::run( void )
 
 int HProcess::idle_cycles( void ) const
 	{
-	return ( f_iIdleCycles );
+	return ( _idleCycles );
 	}
 
 void HProcess::stop( void )
 	{
 	M_PROLOG
 	HLock l( _mutex );
-	int l_iSigNo = SIGINT;
-	M_ENSURE( f_oEvent.write( &l_iSigNo, sizeof ( l_iSigNo ) ) == sizeof ( l_iSigNo ) );
+	int sigNo = SIGINT;
+	M_ENSURE( _event.write( &sigNo, sizeof ( sigNo ) ) == sizeof ( sigNo ) );
 	return;
 	M_EPILOG
 	}
 
-int HProcess::handler_interrupt( int a_iSigNo )
+int HProcess::handler_interrupt( int sigNo_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
-	M_ENSURE( f_oEvent.write( &a_iSigNo, sizeof ( a_iSigNo ) ) == sizeof ( a_iSigNo ) );
+	M_ENSURE( _event.write( &sigNo_, sizeof ( sigNo_ ) ) == sizeof ( sigNo_ ) );
 	return ( 1 );
 	M_EPILOG
 	}
@@ -181,11 +181,11 @@ void HProcess::process_interrupt( int )
 	{
 	M_PROLOG
 	HLock l( _mutex );
-	int l_iSigNo = 0;
-	M_ENSURE( f_oEvent.read( &l_iSigNo, sizeof ( l_iSigNo ) ) == sizeof ( l_iSigNo ) );
-	if ( l_iSigNo == SIGINT )
-		f_bLoop = false;
-	else if ( l_iSigNo == SIGHUP )
+	int sigNo = 0;
+	M_ENSURE( _event.read( &sigNo, sizeof ( sigNo ) ) == sizeof ( sigNo ) );
+	if ( sigNo == SIGINT )
+		_loop = false;
+	else if ( sigNo == SIGHUP )
 		program_options_helper::reload_configuration();
 	return;
 	M_EPILOG
@@ -219,7 +219,7 @@ void HProcess::handle_alerts( void )
 void HProcess::handle_idle( void )
 	{
 	M_PROLOG
-	++ f_iIdleCycles;
+	++ _idleCycles;
 	for ( delayed_calls_t::iterator it( _idle.begin() ), endIt( _idle.end() ); it != endIt; ++ it )
 		(*it)->invoke();
 	return;

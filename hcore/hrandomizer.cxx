@@ -43,30 +43,30 @@ namespace
 	static long unsigned const INCREMENT  = 1;
 	}
 
-HRandomizer::HRandomizer( int long unsigned const a_ulSeed )
-	: f_ulSeed( a_ulSeed )
+HRandomizer::HRandomizer( int long unsigned const seed_ )
+	: _seed( seed_ )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 	
-void HRandomizer::set( int long unsigned const a_ulVal )
+void HRandomizer::set( int long unsigned const val_ )
 	{
 	M_PROLOG
-	f_ulSeed = a_ulVal;
+	_seed = val_;
 	return;
 	M_EPILOG
 	}
 	
-int HRandomizer::rnd( int a_iRange )
+int HRandomizer::rnd( int range_ )
 	{
 	M_PROLOG
-	f_ulSeed = MULTIPLIER * f_ulSeed + INCREMENT;
-	if ( a_iRange )
-		return ( static_cast<int>( ( f_ulSeed >> 16 ) & 0x7fff ) % a_iRange );
+	_seed = MULTIPLIER * _seed + INCREMENT;
+	if ( range_ )
+		return ( static_cast<int>( ( _seed >> 16 ) & 0x7fff ) % range_ );
 	else
-		return ( static_cast<int>( ( f_ulSeed >> 16 ) & 0x7fff ) );
+		return ( static_cast<int>( ( _seed >> 16 ) & 0x7fff ) );
 	M_EPILOG
 	}
 

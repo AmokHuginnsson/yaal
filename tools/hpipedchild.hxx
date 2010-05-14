@@ -79,13 +79,13 @@ public:
 		};
 	typedef yaal::hcore::HArray<yaal::hcore::HString> argv_t;
 private:
-	int f_iPid;
-	int f_iPipeIn;
-	int f_iPipeOut;
-	int f_iPipeErr;
-	STREAM::stream_t f_eCSOI; /* Current Stream Of Interest */
-	yaal::hcore::HChunk f_oSecondLineCache;
-	int f_iSecondLineOffset;
+	int _pid;
+	int _pipeIn;
+	int _pipeOut;
+	int _pipeErr;
+	STREAM::stream_t _cSOI; /* Current Stream Of Interest */
+	yaal::hcore::HChunk _secondLineCache;
+	int _secondLineOffset;
 public:
 	HPipedChild( void );
 	~HPipedChild( void );

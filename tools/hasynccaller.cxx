@@ -38,7 +38,7 @@ namespace tools
 {
 
 HAbstractAsyncCaller::HAbstractAsyncCaller( void )
-	: f_oQueue(), _thread(), f_oMutex(), f_bLoop( false )
+	: _queue(), _thread(), _mutex(), _loop( false )
 	{
 	M_PROLOG
 	return;
@@ -48,7 +48,7 @@ HAbstractAsyncCaller::HAbstractAsyncCaller( void )
 void HAbstractAsyncCaller::stop( void )
 	{
 	M_PROLOG
-	f_bLoop = false;
+	_loop = false;
 	do_signal();
 	_thread.finish();
 	return;
@@ -58,7 +58,7 @@ void HAbstractAsyncCaller::stop( void )
 void HAbstractAsyncCaller::start( void )
 	{
 	M_PROLOG
-	f_bLoop = true;
+	_loop = true;
 	_thread.spawn( bound_call( &HAbstractAsyncCaller::run, this ) );
 	return;
 	M_EPILOG
@@ -68,22 +68,22 @@ void HAbstractAsyncCaller::register_call( priority_t prio, call_t call )
 	{
 	M_PROLOG
 		{
-		HLock l( f_oMutex );
-		f_oQueue.push_back( prio, call );
+		HLock l( _mutex );
+		_queue.push_back( prio, call );
 		}
 	do_signal();
 	return;
 	M_EPILOG
 	}
 
-void HAbstractAsyncCaller::flush( void* a_pvInvoker )
+void HAbstractAsyncCaller::flush( void* invoker_ )
 	{
 	M_PROLOG
-	HLock l( f_oMutex );
-	for ( queue_t::iterator it = f_oQueue.begin(); it != f_oQueue.end(); )
+	HLock l( _mutex );
+	for ( queue_t::iterator it = _queue.begin(); it != _queue.end(); )
 		{
-		if ( (*it).second->id() == a_pvInvoker )
-			it = f_oQueue.erase( it );
+		if ( (*it).second->id() == invoker_ )
+			it = _queue.erase( it );
 		else
 			++ it;
 		}
@@ -103,7 +103,7 @@ int HAbstractAsyncCaller::life_time( int )
 	return ( 50 );
 	}
 
-HAsyncCaller::HAsyncCaller( void ) : f_oSemaphore()
+HAsyncCaller::HAsyncCaller( void ) : _semaphore()
 	{
 	M_PROLOG
 	start();
@@ -122,7 +122,7 @@ HAsyncCaller::~HAsyncCaller( void )
 void HAsyncCaller::do_signal( void )
 	{
 	M_PROLOG
-	f_oSemaphore.signal();
+	_semaphore.signal();
 	return;
 	M_EPILOG
 	}
@@ -130,15 +130,15 @@ void HAsyncCaller::do_signal( void )
 void* HAsyncCaller::do_work( void )
 	{
 	M_PROLOG
-	while ( f_bLoop )
+	while ( _loop )
 		{
-		f_oSemaphore.wait();
-		HLock l( f_oMutex );
-		queue_t::iterator it = f_oQueue.begin();
-		if ( it != f_oQueue.end() )
+		_semaphore.wait();
+		HLock l( _mutex );
+		queue_t::iterator it = _queue.begin();
+		if ( it != _queue.end() )
 			{
 			(*it).second->invoke();
-			f_oQueue.erase( it );
+			_queue.erase( it );
 			}
 		}
 	return ( 0 );

@@ -39,13 +39,13 @@ namespace yaal
 namespace hdata
 {
 
-HDataStatusBarControl::HDataStatusBarControl ( HDataWindow * a_poParent,
-		char const * a_pcLabel, int a_iStatusBarAttribute )
-								 : HControl ( a_poParent, - 2, 0, 2, - 1, a_pcLabel ),
-									HStatusBarControl ( NULL, NULL, a_iStatusBarAttribute )
+HDataStatusBarControl::HDataStatusBarControl ( HDataWindow * parent_,
+		char const * label_, int statusBarAttribute_ )
+								 : HControl ( parent_, - 2, 0, 2, - 1, label_ ),
+									HStatusBarControl ( NULL, NULL, statusBarAttribute_ )
 	{
 	M_PROLOG
-	f_iLabelLength += 3; /* for "[+]" */
+	_labelLength += 3; /* for "[+]" */
 	return;
 	M_EPILOG
 	}
@@ -53,15 +53,15 @@ HDataStatusBarControl::HDataStatusBarControl ( HDataWindow * a_poParent,
 void HDataStatusBarControl::do_draw_label ( void )
 	{
 	M_PROLOG
-	HDataWindow * l_poWindow = NULL;
+	HDataWindow * window = NULL;
 	HStatusBarControl::draw_label();
-	l_poWindow = dynamic_cast < HDataWindow * > ( f_poParent );
-	M_ASSERT ( l_poWindow );
-	if ( l_poWindow->is_modified() )
+	window = dynamic_cast < HDataWindow * > ( _parent );
+	M_ASSERT ( window );
+	if ( window->is_modified() )
 		{
 		set_attr_shortcut();
 		HConsole& cons = HCons::get_instance();
-		cons.c_mvprintf ( cons.get_height() - 2, f_iLabelLength - 4, "[+]" );
+		cons.c_mvprintf ( cons.get_height() - 2, _labelLength - 4, "[+]" );
 		set_attr_data();
 		}
 	return;

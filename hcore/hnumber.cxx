@@ -55,10 +55,10 @@ int const KARATSUBA_THRESHOLD = 20; /* FIXME: 20 is fine */
 int HNumber::DEFAULT_PRECISION = 100;
 
 HNumber::HNumber( void )
-	: f_lPrecision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	f_bNegative( false ), f_lDigitCount( 0 ), f_lIntegralPartSize( 0 ),
-	f_oCanonical()
+	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
+	_canonical()
 	{
 	M_PROLOG
 	return;
@@ -72,90 +72,90 @@ HNumber::~HNumber( void )
 	M_EPILOG
 	}
 
-HNumber::HNumber( double long a_dNumber )
-	: f_lPrecision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+HNumber::HNumber( double long number_ )
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	f_bNegative( false ), f_lDigitCount( 0 ), f_lIntegralPartSize( 0 ),
-	f_oCanonical()
+	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
+	_canonical()
 	{
 	M_PROLOG
-	from_double( a_dNumber );
+	from_double( number_ );
 	return;
 	M_EPILOG
 	}
 
-HNumber::HNumber( double long a_dNumber, int a_iPrecision )
-	: f_lPrecision( a_iPrecision > HARDCODED_MINIMUM_PRECISION
-			? a_iPrecision : HARDCODED_MINIMUM_PRECISION ),
-	f_bNegative( false ), f_lDigitCount( 0 ), f_lIntegralPartSize( 0 ),
-	f_oCanonical()
+HNumber::HNumber( double long number_, int precision_ )
+	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
+			? precision_ : HARDCODED_MINIMUM_PRECISION ),
+	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
+	_canonical()
 	{
 	M_PROLOG
-	from_double( a_dNumber );
+	from_double( number_ );
 	return;
 	M_EPILOG
 	}
 
-HNumber::HNumber( char const* const a_pcNumber )
-	: f_lPrecision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+HNumber::HNumber( char const* const number_ )
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	f_bNegative( false ), f_lDigitCount( 0 ), f_lIntegralPartSize( 0 ),
-	f_oCanonical()
+	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
+	_canonical()
 	{
 	M_PROLOG
-	from_string( a_pcNumber );
+	from_string( number_ );
 	return;
 	M_EPILOG
 	}
 
-HNumber::HNumber( char const* const a_pcNumber, int a_iPrecision )
-	: f_lPrecision( a_iPrecision > HARDCODED_MINIMUM_PRECISION
-			? a_iPrecision : HARDCODED_MINIMUM_PRECISION ),
-	f_bNegative( false ), f_lDigitCount( 0 ), f_lIntegralPartSize( 0 ),
-	f_oCanonical()
+HNumber::HNumber( char const* const number_, int precision_ )
+	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
+			? precision_ : HARDCODED_MINIMUM_PRECISION ),
+	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
+	_canonical()
 	{
 	M_PROLOG
-	from_string( a_pcNumber );
+	from_string( number_ );
 	return;
 	M_EPILOG
 	}
 
-HNumber::HNumber( HString const& a_oNumber )
-	: f_lPrecision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+HNumber::HNumber( HString const& number_ )
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	f_bNegative( false ), f_lDigitCount( 0 ), f_lIntegralPartSize( 0 ),
-	f_oCanonical()
+	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
+	_canonical()
 	{
 	M_PROLOG
-	from_string( a_oNumber );
+	from_string( number_ );
 	return;
 	M_EPILOG
 	}
 
-HNumber::HNumber( HString const& a_oNumber, int a_iPrecision )
-	: f_lPrecision( a_iPrecision > HARDCODED_MINIMUM_PRECISION
-			? a_iPrecision : HARDCODED_MINIMUM_PRECISION ),
-	f_bNegative( false ), f_lDigitCount( 0 ), f_lIntegralPartSize( 0 ),
-	f_oCanonical()
+HNumber::HNumber( HString const& number_, int precision_ )
+	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
+			? precision_ : HARDCODED_MINIMUM_PRECISION ),
+	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
+	_canonical()
 	{
 	M_PROLOG
-	from_string( a_oNumber );
+	from_string( number_ );
 	return;
 	M_EPILOG
 	}
 
 HNumber::HNumber( HNumber const& source )
-	: f_lPrecision( source.f_lPrecision ),
-	f_bNegative( source.f_bNegative ),
-	f_lDigitCount( source.f_lDigitCount ),
-	f_lIntegralPartSize( source.f_lIntegralPartSize ),
-	f_oCanonical()
+	: _precision( source._precision ),
+	_negative( source._negative ),
+	_digitCount( source._digitCount ),
+	_integralPartSize( source._integralPartSize ),
+	_canonical()
 	{
 	M_PROLOG
-	if ( source.f_lDigitCount )
+	if ( source._digitCount )
 		{
-		f_oCanonical.realloc( source.f_lDigitCount, HChunk::STRATEGY::EXACT );
-		::memcpy( f_oCanonical.raw(), source.f_oCanonical.raw(), f_oCanonical.get_size() );
+		_canonical.realloc( source._digitCount, HChunk::STRATEGY::EXACT );
+		::memcpy( _canonical.raw(), source._canonical.raw(), _canonical.get_size() );
 		}
 	return;
 	M_EPILOG
@@ -179,75 +179,75 @@ void HNumber::swap( HNumber& other )
 	if ( &other != this )
 		{
 		using yaal::swap;
-		swap( f_lPrecision, other.f_lPrecision );
-		swap( f_bNegative, other.f_bNegative );
-		swap( f_lDigitCount, other.f_lDigitCount );
-		swap( f_lIntegralPartSize, other.f_lIntegralPartSize );
-		swap( f_oCanonical, other.f_oCanonical );
+		swap( _precision, other._precision );
+		swap( _negative, other._negative );
+		swap( _digitCount, other._digitCount );
+		swap( _integralPartSize, other._integralPartSize );
+		swap( _canonical, other._canonical );
 		}
 	return;
 	M_EPILOG
 	}
 
-void HNumber::from_double( double long a_dNumber )
+void HNumber::from_double( double long number_ )
 	{
 	M_PROLOG
-	HString source( a_dNumber );
+	HString source( number_ );
 	from_string( source );
 	return;
 	M_EPILOG
 	}
 
-void HNumber::from_string( HString const& a_oNumber )
+void HNumber::from_string( HString const& number_ )
 	{
 	M_PROLOG
 	/* ! - represent known but invalid character, ? - represent unknown character */
-	int long start = a_oNumber.find_one_of( VALID_CHARACTERS );
+	int long start = number_.find_one_of( VALID_CHARACTERS );
 	M_ENSURE( start >= 0 ); /* exclude "!!!!" */
-	char const* const src = a_oNumber.raw();
-	f_bNegative = ( src[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
-	if ( f_bNegative )
+	char const* const src = number_.raw();
+	_negative = ( src[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
+	if ( _negative )
 		++ start;
-	int long len = a_oNumber.get_length();
+	int long len = number_.get_length();
 	M_ENSURE( start < len ); /* exclude "!!-" */
-	M_ENSURE( a_oNumber.find_one_of( VALID_CHARACTERS + A_DOT, start ) == start ); /* exclude "--" and "-!!" */
-	int long idx = a_oNumber.find_other_than( "0", start ); /* skip leading 0s */
+	M_ENSURE( number_.find_one_of( VALID_CHARACTERS + A_DOT, start ) == start ); /* exclude "--" and "-!!" */
+	int long idx = number_.find_other_than( "0", start ); /* skip leading 0s */
 	int long end = start + 1;
-	f_lIntegralPartSize = 0;
-	f_lDigitCount = 0;
+	_integralPartSize = 0;
+	_digitCount = 0;
 	if ( idx >= 0 ) do /* "!!![-][.1-9]???" or "000." */
 		{
 		int long first_valid = start;
 		start = idx;
-		int long dot = a_oNumber.find( VALID_CHARACTERS[ A_DOT ], start );
-		idx = a_oNumber.find_other_than( VALID_CHARACTERS + A_DOT, start );
+		int long dot = number_.find( VALID_CHARACTERS[ A_DOT ], start );
+		idx = number_.find_other_than( VALID_CHARACTERS + A_DOT, start );
 		if ( ( idx >= 0 ) && ( idx < dot ) ) /* "!!232!!." */
 			dot = -1;
-		int long digit = a_oNumber.find_one_of( VALID_CHARACTERS + A_ZERO, start );
+		int long digit = number_.find_one_of( VALID_CHARACTERS + A_ZERO, start );
 		if ( ( digit < 0 ) && ( first_valid < start ) )
 			break;
 		M_ENSURE( digit >= 0 ); /* must have digit */
 		M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
-		end = a_oNumber.find_other_than( VALID_CHARACTERS + ( dot >= 0 ? A_ZERO : A_DOT ), dot >= 0 ? dot + 1 : start );
+		end = number_.find_other_than( VALID_CHARACTERS + ( dot >= 0 ? A_ZERO : A_DOT ), dot >= 0 ? dot + 1 : start );
 		( end >= 0 ) || ( end = len );
 		if ( dot >= 0 )
 			{
-			idx = a_oNumber.reverse_find_other_than( "0", len - end );
+			idx = number_.reverse_find_other_than( "0", len - end );
 			end = ( idx >= 0 ) ? len - idx : start + 1;
 			}
-		f_lDigitCount = end - start;
+		_digitCount = end - start;
 		if ( dot >= 0 )
 			{
-			f_lIntegralPartSize = dot - start;
-			-- f_lDigitCount;
+			_integralPartSize = dot - start;
+			-- _digitCount;
 			}
 		else
-			f_lIntegralPartSize = f_lDigitCount;
-		if ( decimal_length() >= f_lPrecision )
-			f_lPrecision = decimal_length() + 1;
-		if ( f_lDigitCount )
-			f_oCanonical.realloc( f_lDigitCount );
-		char* dst = f_oCanonical.raw();
+			_integralPartSize = _digitCount;
+		if ( decimal_length() >= _precision )
+			_precision = decimal_length() + 1;
+		if ( _digitCount )
+			_canonical.realloc( _digitCount );
+		char* dst = _canonical.raw();
 		idx = 0;
 		for ( int long i = start; i < end; ++ i )
 			{
@@ -258,8 +258,8 @@ void HNumber::from_string( HString const& a_oNumber )
 			}
 		}
 	while ( 0 );
-	if ( f_lDigitCount == 0 )
-		f_bNegative = false;
+	if ( _digitCount == 0 )
+		_negative = false;
 	return;
 	M_EPILOG
 	}
@@ -268,17 +268,17 @@ HString HNumber::to_string( void ) const
 	{
 	M_PROLOG
 	HString str = "";
-	if ( f_bNegative )
+	if ( _negative )
 		str = VALID_CHARACTERS[ A_MINUS ];
-	char const* const src = f_oCanonical.raw();
+	char const* const src = _canonical.raw();
 	int digit = 0;
-	for ( ; digit < f_lIntegralPartSize; ++ digit )
+	for ( ; digit < _integralPartSize; ++ digit )
 		str += static_cast<char>( src[ digit ] + VALID_CHARACTERS[ A_ZERO ] );
-	if ( f_lDigitCount > f_lIntegralPartSize )
+	if ( _digitCount > _integralPartSize )
 		str += VALID_CHARACTERS[ A_DOT ];
-	for ( ; digit < f_lDigitCount; ++ digit )
+	for ( ; digit < _digitCount; ++ digit )
 		str += static_cast<char>( src[ digit ] + VALID_CHARACTERS[ A_ZERO ] );
-	if ( ! f_lDigitCount )
+	if ( ! _digitCount )
 		str = "0";
 	return ( str );
 	M_EPILOG
@@ -293,55 +293,55 @@ double long HNumber::to_double( void ) const
 
 int long HNumber::get_precision( void ) const
 	{
-	return ( f_lPrecision );
+	return ( _precision );
 	}
 
-void HNumber::set_precision( int long a_iPrecision )
+void HNumber::set_precision( int long precision_ )
 	{
 	M_PROLOG
-	if ( ( a_iPrecision >= HARDCODED_MINIMUM_PRECISION )
-			&& ( ( a_iPrecision <= f_lPrecision ) || ( decimal_length() < f_lPrecision ) ) )
-		f_lPrecision = a_iPrecision;
-	if ( ( f_lIntegralPartSize + f_lPrecision ) < f_lDigitCount )
-		f_lDigitCount = f_lIntegralPartSize + f_lPrecision;
+	if ( ( precision_ >= HARDCODED_MINIMUM_PRECISION )
+			&& ( ( precision_ <= _precision ) || ( decimal_length() < _precision ) ) )
+		_precision = precision_;
+	if ( ( _integralPartSize + _precision ) < _digitCount )
+		_digitCount = _integralPartSize + _precision;
 	return;
 	M_EPILOG
 	}
 
 int long HNumber::decimal_length( void ) const
 	{
-	return ( f_lDigitCount - f_lIntegralPartSize );
+	return ( _digitCount - _integralPartSize );
 	}
 
 bool HNumber::is_exact( void ) const
 	{
-	M_ASSERT( ( f_lDigitCount - f_lIntegralPartSize ) <= f_lPrecision );
-	return ( ( f_lDigitCount - f_lIntegralPartSize ) < f_lPrecision );
+	M_ASSERT( ( _digitCount - _integralPartSize ) <= _precision );
+	return ( ( _digitCount - _integralPartSize ) < _precision );
 	}
 
 int long HNumber::absolute_lower( HNumber const& other ) const
 	{
-	char const* p1 = f_oCanonical.raw();
-	char const* p2 = other.f_oCanonical.raw();
+	char const* p1 = _canonical.raw();
+	char const* p2 = other._canonical.raw();
 	int long cmp = 1;
-	if ( f_lIntegralPartSize < other.f_lIntegralPartSize )
+	if ( _integralPartSize < other._integralPartSize )
 		cmp = -1;
-	else if ( f_lIntegralPartSize == other.f_lIntegralPartSize )
+	else if ( _integralPartSize == other._integralPartSize )
 		{
-		int long len = min( f_lDigitCount, other.f_lDigitCount );
+		int long len = min( _digitCount, other._digitCount );
 		cmp = memcmp( p1, p2, len );
 		if ( ! cmp )
-			cmp = f_lDigitCount - other.f_lDigitCount;
+			cmp = _digitCount - other._digitCount;
 		}
 	return ( cmp );
 	}
 
 bool HNumber::operator == ( HNumber const& other ) const
 	{
-	return ( ( f_bNegative == other.f_bNegative )
-			&& ( f_lDigitCount == other.f_lDigitCount )
-			&& ( f_lIntegralPartSize == other.f_lIntegralPartSize )
-			&& ! ::memcmp( f_oCanonical.raw(), other.f_oCanonical.raw(), f_lDigitCount ) );
+	return ( ( _negative == other._negative )
+			&& ( _digitCount == other._digitCount )
+			&& ( _integralPartSize == other._integralPartSize )
+			&& ! ::memcmp( _canonical.raw(), other._canonical.raw(), _digitCount ) );
 	}
 
 bool HNumber::operator != ( HNumber const& other ) const
@@ -352,13 +352,13 @@ bool HNumber::operator != ( HNumber const& other ) const
 bool HNumber::operator < ( HNumber const& other ) const
 	{
 	bool lower = false;
-	if ( f_bNegative && ! other.f_bNegative )
+	if ( _negative && ! other._negative )
 		lower = true;
-	else if ( ( f_bNegative && other.f_bNegative ) || ( ! ( f_bNegative || other.f_bNegative ) ) )
+	else if ( ( _negative && other._negative ) || ( ! ( _negative || other._negative ) ) )
 		{
 		int long cmp = absolute_lower( other );
 		lower = cmp < 0;
-		if ( cmp && f_bNegative && other.f_bNegative )
+		if ( cmp && _negative && other._negative )
 			lower = ! lower;
 		}
 	return ( lower );
@@ -494,37 +494,37 @@ bool HNumber::mutate_addition( char* res, int long ressize,
 HNumber HNumber::operator + ( HNumber const& element ) const
 	{
 	M_PROLOG
-	int long ips = max( f_lIntegralPartSize, element.f_lIntegralPartSize );
+	int long ips = max( _integralPartSize, element._integralPartSize );
 	int long dps = max( decimal_length(), element.decimal_length() );
 	HNumber n;
 	if ( decimal_length() < element.decimal_length() )
-		n.f_lPrecision = is_exact() ? element.f_lPrecision : f_lPrecision;
+		n._precision = is_exact() ? element._precision : _precision;
 	else
-		n.f_lPrecision = element.is_exact() ? f_lPrecision : element.f_lPrecision;
-	( dps <= n.f_lPrecision ) || ( dps = n.f_lPrecision );
+		n._precision = element.is_exact() ? _precision : element._precision;
+	( dps <= n._precision ) || ( dps = n._precision );
 	int long ressize = ips + dps + 1; /* + 1 for possible carrier */
-	n.f_oCanonical.realloc( ressize );
-	n.f_lIntegralPartSize = ips;
-	char* res = n.f_oCanonical.raw();
-	char const* ep1 = f_oCanonical.raw();
-	char const* ep2 = element.f_oCanonical.raw();
-	int long lm[] = { ips - f_lIntegralPartSize, ips - element.f_lIntegralPartSize };
+	n._canonical.realloc( ressize );
+	n._integralPartSize = ips;
+	char* res = n._canonical.raw();
+	char const* ep1 = _canonical.raw();
+	char const* ep2 = element._canonical.raw();
+	int long lm[] = { ips - _integralPartSize, ips - element._integralPartSize };
 	int long rm[] = { dps - decimal_length(), dps - element.decimal_length() };
 	( rm[ 0 ] >= 0 ) || ( rm[ 0 ] = 0 );
 	( rm[ 1 ] >= 0 ) || ( rm[ 1 ] = 0 );
 	char const* ep[] = { ep1, ep2 };
-	bool sub = ( ( f_bNegative && ! element.f_bNegative ) || ( ! f_bNegative && element.f_bNegative ) );
+	bool sub = ( ( _negative && ! element._negative ) || ( ! _negative && element._negative ) );
 	bool swp = sub && ( absolute_lower( element ) < 0 );
 	mutate_addition( res, ressize, ep, lm, rm, sub, swp );
 	if ( ressize > 0 )
 		{
-		n.f_bNegative = sub ? ( f_bNegative ? ! swp : swp ) : ( f_bNegative && element.f_bNegative );
-		++ n.f_lIntegralPartSize;
+		n._negative = sub ? ( _negative ? ! swp : swp ) : ( _negative && element._negative );
+		++ n._integralPartSize;
 		}
-	n.f_lDigitCount = ressize;
+	n._digitCount = ressize;
 	n.normalize();
-	if ( n.f_lDigitCount == 0 )
-		n.f_bNegative = false;
+	if ( n._digitCount == 0 )
+		n._negative = false;
 	return ( n );
 	M_EPILOG
 	}
@@ -558,17 +558,17 @@ HNumber HNumber::operator * ( HNumber const& factor ) const
 	{
 	M_PROLOG
 	HNumber n;
-	if ( factor.f_lDigitCount < f_lDigitCount )
+	if ( factor._digitCount < _digitCount )
 		n = factor * ( *this );
-	else if ( f_lDigitCount && factor.f_lDigitCount )
+	else if ( _digitCount && factor._digitCount )
 		{
-		n.f_lDigitCount = f_lDigitCount + factor.f_lDigitCount;
-		n.f_lIntegralPartSize = f_lIntegralPartSize + factor.f_lIntegralPartSize;
-		karatsuba( n.f_oCanonical,
-				f_oCanonical.raw(), f_lDigitCount,
-				factor.f_oCanonical.raw(), factor.f_lDigitCount );
+		n._digitCount = _digitCount + factor._digitCount;
+		n._integralPartSize = _integralPartSize + factor._integralPartSize;
+		karatsuba( n._canonical,
+				_canonical.raw(), _digitCount,
+				factor._canonical.raw(), factor._digitCount );
 		n.normalize();
-		n.f_bNegative = ! ( ( f_bNegative && factor.f_bNegative ) || ! ( f_bNegative || factor.f_bNegative ) );
+		n._negative = ! ( ( _negative && factor._negative ) || ! ( _negative || factor._negative ) );
 		}
 	return ( n );
 	M_EPILOG
@@ -585,38 +585,38 @@ HNumber& HNumber::operator *= ( HNumber const& factor )
 HNumber HNumber::operator / ( HNumber const& denominator ) const
 	{
 	M_PROLOG
-	M_ENSURE( denominator.f_lDigitCount != 0 );
+	M_ENSURE( denominator._digitCount != 0 );
 	HNumber n;
-	if ( f_lDigitCount )
+	if ( _digitCount )
 		{
-		n.f_lPrecision = f_lPrecision + denominator.f_lPrecision;
-		char const* const den = denominator.f_oCanonical.raw();
+		n._precision = _precision + denominator._precision;
+		char const* const den = denominator._canonical.raw();
 		int long shift = 0;
-		while ( ( shift < denominator.f_lDigitCount ) && ( den[ shift ] == 0 ) )
+		while ( ( shift < denominator._digitCount ) && ( den[ shift ] == 0 ) )
 			++ shift;
-		int long denlen = denominator.f_lDigitCount - shift;
+		int long denlen = denominator._digitCount - shift;
 		HChunk reminder( denlen + 1 ); /* + 1 for carrier */
 		HChunk pseudoden( denlen + 1 );
-		char const* src = f_oCanonical.raw();
+		char const* src = _canonical.raw();
 		char* pden = pseudoden.raw();
 		char* rem = reminder.raw();
 		char const* ep[] = { rem, pden };
-		int long len = min( f_lDigitCount, denlen );
-		::memcpy( pden + 1, denominator.f_oCanonical.raw() + shift, denlen );
+		int long len = min( _digitCount, denlen );
+		::memcpy( pden + 1, denominator._canonical.raw() + shift, denlen );
 		::memcpy( rem + 1 + denlen - len, src, len );
 		shift = 0;
-		while ( ( shift < f_lDigitCount ) && ( src[ shift ++ ] == 0 ) )
-			++ n.f_lDigitCount;
-		shift = denominator.f_lIntegralPartSize - f_lIntegralPartSize;
+		while ( ( shift < _digitCount ) && ( src[ shift ++ ] == 0 ) )
+			++ n._digitCount;
+		shift = denominator._integralPartSize - _integralPartSize;
 		while ( -- shift > 0 )
-			++ n.f_lDigitCount;
-		if ( n.f_lDigitCount )
-			n.f_oCanonical.realloc( n.f_lDigitCount );
+			++ n._digitCount;
+		if ( n._digitCount )
+			n._canonical.realloc( n._digitCount );
 		int cmp = 0;
 		shift = 0;
-		bool carrier = ( denominator.f_lIntegralPartSize - f_lIntegralPartSize - denominator.decimal_length() ) > 0;
+		bool carrier = ( denominator._integralPartSize - _integralPartSize - denominator.decimal_length() ) > 0;
 		bool ncar = false;
-		int long pred_int = f_lIntegralPartSize - denominator.f_lIntegralPartSize + denominator.f_lDigitCount - denlen;
+		int long pred_int = _integralPartSize - denominator._integralPartSize + denominator._digitCount - denlen;
 		( pred_int >= 0 ) || ( pred_int = 0 );
 		++ pred_int;
 		do
@@ -628,7 +628,7 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 				++ digit;
 				}
 			::memmove( rem, rem + 1, denlen );
-			rem[ denlen ] = len < f_lDigitCount ? src[ len ] : '\0';
+			rem[ denlen ] = len < _digitCount ? src[ len ] : '\0';
 			if ( ! cmp )
 				{
 				::memset( rem, 0, denlen );
@@ -636,39 +636,39 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const
 				}
 			if ( digit || shift )
 				{
-				n.f_oCanonical.realloc( n.f_lDigitCount + 1 );
-				n.f_oCanonical.raw()[ n.f_lDigitCount ++ ] = static_cast<char>( digit );
+				n._canonical.realloc( n._digitCount + 1 );
+				n._canonical.raw()[ n._digitCount ++ ] = static_cast<char>( digit );
 				shift = 1;
 				}
 			if ( rem[ 0 ] && carrier && ! shift )
 				{
-				n.f_oCanonical.realloc( ++ n.f_lDigitCount );
+				n._canonical.realloc( ++ n._digitCount );
 				carrier = false;
 				}
 			else if ( rem[ 0 ] && ! shift )
 				ncar = true;
 			++ len;
 			}
-		while ( ( len <= f_lDigitCount ) || ( ( ( n.f_lDigitCount - pred_int ) < n.f_lPrecision ) && cmp ) );
-		n.f_lIntegralPartSize = f_lIntegralPartSize - denominator.f_lIntegralPartSize + denominator.f_lDigitCount - denlen + ( ! ncar ? 1 : 0 );
-		while ( n.f_lDigitCount < n.f_lIntegralPartSize )
-			n.f_oCanonical.realloc( ++ n.f_lDigitCount );
-		char* res = n.f_oCanonical.raw();
-		if ( ( n.f_lIntegralPartSize < 0 ) && ncar )
+		while ( ( len <= _digitCount ) || ( ( ( n._digitCount - pred_int ) < n._precision ) && cmp ) );
+		n._integralPartSize = _integralPartSize - denominator._integralPartSize + denominator._digitCount - denlen + ( ! ncar ? 1 : 0 );
+		while ( n._digitCount < n._integralPartSize )
+			n._canonical.realloc( ++ n._digitCount );
+		char* res = n._canonical.raw();
+		if ( ( n._integralPartSize < 0 ) && ncar )
 			{
-			n.f_oCanonical.realloc( n.f_lDigitCount + 1 );
-			res = n.f_oCanonical.raw();
-			::memmove( res + 1, res, n.f_lDigitCount );
+			n._canonical.realloc( n._digitCount + 1 );
+			res = n._canonical.raw();
+			::memmove( res + 1, res, n._digitCount );
 			res[ 0 ] = 0;
-			++ n.f_lDigitCount;
+			++ n._digitCount;
 			}
-		( n.f_lIntegralPartSize >= 0 ) || ( n.f_lIntegralPartSize = 0 );
+		( n._integralPartSize >= 0 ) || ( n._integralPartSize = 0 );
 		n.normalize();
-		if ( n.f_lDigitCount > ( n.f_lIntegralPartSize + n.f_lPrecision ) )
-			n.f_lDigitCount = n.f_lIntegralPartSize + n.f_lPrecision;
-		M_ASSERT( n.f_lIntegralPartSize >= 0 );
-		M_ASSERT( n.f_lDigitCount >= 0 );
-		n.f_bNegative = ! ( ( f_bNegative && denominator.f_bNegative ) || ! ( f_bNegative || denominator.f_bNegative ) );
+		if ( n._digitCount > ( n._integralPartSize + n._precision ) )
+			n._digitCount = n._integralPartSize + n._precision;
+		M_ASSERT( n._integralPartSize >= 0 );
+		M_ASSERT( n._digitCount >= 0 );
+		n._negative = ! ( ( _negative && denominator._negative ) || ! ( _negative || denominator._negative ) );
 		}
 	return ( n );
 	M_EPILOG
@@ -686,8 +686,8 @@ HNumber HNumber::operator - ( void ) const
 	{
 	M_PROLOG
 	HNumber n( *this );
-	if ( f_lDigitCount )
-		n.f_bNegative = ! n.f_bNegative;
+	if ( _digitCount )
+		n._negative = ! n._negative;
 	return ( n );
 	M_EPILOG
 	}
@@ -717,20 +717,20 @@ HNumber& HNumber::operator ^= ( int long unsigned exp )
 void HNumber::normalize( void )
 	{
 	M_PROLOG
-	char* res = f_oCanonical.raw();
+	char* res = _canonical.raw();
 	int shift = 0;
-	while ( ( shift < f_lIntegralPartSize ) && ( res[ shift ] == 0 ) )
+	while ( ( shift < _integralPartSize ) && ( res[ shift ] == 0 ) )
 		++ shift;
 	if ( shift )
 		{
-		f_lIntegralPartSize -= shift;
-		f_lDigitCount -= shift;
-		::memmove( res, res + shift, f_lDigitCount );
+		_integralPartSize -= shift;
+		_digitCount -= shift;
+		::memmove( res, res + shift, _digitCount );
 		}
-	while ( ( decimal_length() > 0 ) && ( res[ f_lDigitCount - 1 ] == 0 ) )
-		-- f_lDigitCount;
-	if ( f_lDigitCount == ( f_lIntegralPartSize + f_lPrecision ) )
-		++ f_lPrecision;
+	while ( ( decimal_length() > 0 ) && ( res[ _digitCount - 1 ] == 0 ) )
+		-- _digitCount;
+	if ( _digitCount == ( _integralPartSize + _precision ) )
+		++ _precision;
 	return;
 	M_EPILOG
 	}

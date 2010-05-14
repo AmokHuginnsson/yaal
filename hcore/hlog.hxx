@@ -64,16 +64,16 @@ protected:
 	typedef HStreamInterface hier_t;
 private:
 	typedef HField<HFile> _file;
-	bool     f_bRealMode;
-	bool     f_bNewLine;
-	int long f_lType;
-	size_t   f_iBufferSize;
-	char*    f_pcProcessName;
-	HString  f_oLoginName;
-	HChunk   f_oHostName;
-	HChunk   f_oBuffer;
+	bool     _realMode;
+	bool     _newLine;
+	int long _type;
+	size_t   _bufferSize;
+	char*    _processName;
+	HString  _loginName;
+	HChunk   _hostName;
+	HChunk   _buffer;
 public:
-	static int long f_lLogMask;
+	static int long _logMask;
 public:
 	/* already opened file */
 	void rehash( void* = DEFAULT_LOG_STREAM, char const* const = NULL );

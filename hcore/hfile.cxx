@@ -41,31 +41,31 @@ namespace hcore
 
 HFile::HFile( void )
 	: HStreamInterface(),
-	f_pvHandle( NULL ), f_oPath(), f_oError(),
-	f_bExternal( false )
+	_handle( NULL ), _path(), _error(),
+	_external( false )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-HFile::HFile( void* const a_pvHandle )
+HFile::HFile( void* const handle_ )
 	: HStreamInterface(),
-	f_pvHandle( a_pvHandle ), f_oPath(), f_oError(),
-	f_bExternal( a_pvHandle ? true : false )
+	_handle( handle_ ), _path(), _error(),
+	_external( handle_ ? true : false )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-HFile::HFile( yaal::hcore::HString const& path, open_t const& a_eOpen )
+HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
 	: HStreamInterface(),
-	f_pvHandle( NULL ), f_oPath(), f_oError(),
-	f_bExternal( false )
+	_handle( NULL ), _path(), _error(),
+	_external( false )
 	{
 	M_PROLOG
-	open( path, a_eOpen );
+	open( path, open_ );
 	return;
 	M_EPILOG
 	}
@@ -73,41 +73,41 @@ HFile::HFile( yaal::hcore::HString const& path, open_t const& a_eOpen )
 HFile::~HFile( void )
 	{
 	M_PROLOG
-	if ( f_pvHandle && ! f_bExternal )
+	if ( _handle && ! _external )
 		close();
 	return;
 	M_EPILOG
 	}
 
-int HFile::open( HString const& a_oPath, open_t const& open_ )
+int HFile::open( HString const& path_, open_t const& open_ )
 	{
 	M_PROLOG
-	int l_iError = 0;
-	char const* l_pcMode = NULL;
+	int error = 0;
+	char const* mode = NULL;
 	if ( open_ == OPEN::READING )
-		l_pcMode = "rb";
+		mode = "rb";
 	else if ( ( open_ == OPEN::WRITING ) || ( open_ == ( open_t( OPEN::WRITING ) | open_t( OPEN::TRUNCATE ) ) ) )
-		l_pcMode = "wb";
+		mode = "wb";
 	else if ( open_ == ( open_t( OPEN::WRITING ) | open_t( OPEN::APPEND ) ) )
-		l_pcMode = "ab";
+		mode = "ab";
 	else if ( open_ == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) ) )
-		l_pcMode = "r+b";
+		mode = "r+b";
 	else if ( open_ == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) | open_t( OPEN::TRUNCATE ) ) )
-		l_pcMode = "w+b";
+		mode = "w+b";
 	else if ( open_ == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) | open_t( OPEN::APPEND ) ) )
-		l_pcMode = "a+b";
+		mode = "a+b";
 	else
 		M_THROW( "unexpected mode setting", open_.value() );
-	M_ENSURE_EX( ! f_pvHandle, "stream already opened" );
-	f_oPath = a_oPath;
-	f_bExternal = false;
-	f_pvHandle = ::std::fopen( a_oPath.raw(), l_pcMode );
-	if ( ! f_pvHandle )
+	M_ENSURE_EX( ! _handle, "stream already opened" );
+	_path = path_;
+	_external = false;
+	_handle = ::std::fopen( path_.raw(), mode );
+	if ( ! _handle )
 		{
-		l_iError = errno;
-		f_oError = error_message( l_iError );
-		f_oError += ": " + a_oPath;
-		return ( l_iError );
+		error = errno;
+		_error = error_message( error );
+		_error += ": " + path_;
+		return ( error );
 		}
 	return ( 0 );
 	M_EPILOG
@@ -116,10 +116,10 @@ int HFile::open( HString const& a_oPath, open_t const& open_ )
 int HFile::open( void* const handle )
 	{
 	M_PROLOG
-	M_ENSURE_EX( ! f_pvHandle, "stream already opened" );
-	f_pvHandle = handle;
-	f_bExternal = true;
-	f_oPath.clear();
+	M_ENSURE_EX( ! _handle, "stream already opened" );
+	_handle = handle;
+	_external = true;
+	_path.clear();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -127,15 +127,15 @@ int HFile::open( void* const handle )
 int HFile::close( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_pvHandle );
-	int l_iError = 0;
-	l_iError = ::std::fclose( static_cast<FILE*>( f_pvHandle ) );
-	if ( l_iError )
+	M_ASSERT( _handle );
+	int error = 0;
+	error = ::std::fclose( static_cast<FILE*>( _handle ) );
+	if ( error )
 		{
-		f_oError = error_message( l_iError );
-		return ( l_iError );
+		_error = error_message( error );
+		return ( error );
 		}
-	f_pvHandle = NULL;
+	_handle = NULL;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -143,10 +143,10 @@ int HFile::close( void )
 void* HFile::release( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_pvHandle && f_bExternal );
+	M_ASSERT( _handle && _external );
 	void* handle( NULL );
 	using yaal::swap;
-	swap( f_pvHandle, handle );
+	swap( _handle, handle );
 	return ( handle );
 	M_EPILOG
 	}
@@ -154,19 +154,19 @@ void* HFile::release( void )
 int long HFile::tell( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_pvHandle );
+	M_ASSERT( _handle );
 	int long pos = 0;
-	M_ENSURE( ( pos = ::std::ftell( static_cast<FILE*>( f_pvHandle ) ) ) >= 0 );
+	M_ENSURE( ( pos = ::std::ftell( static_cast<FILE*>( _handle ) ) ) >= 0 );
 	return ( pos );
 	M_EPILOG
 	}
 
-void HFile::seek( int long const& pos, seek_t const& a_eSeek )
+void HFile::seek( int long const& pos, seek_t const& seek_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_pvHandle );
+	M_ASSERT( _handle );
 	int s = 0;
-	switch ( a_eSeek.value() )
+	switch ( seek_.value() )
 		{
 		case ( SEEK::SET ):
 			s = SEEK_SET;
@@ -181,112 +181,112 @@ void HFile::seek( int long const& pos, seek_t const& a_eSeek )
 			M_ASSERT( ! "bad seek type" );
 		break;
 		}
-	M_ENSURE( ::std::fseek( static_cast<FILE*>( f_pvHandle ), pos, s ) == 0 );
+	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ), pos, s ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-int long HFile::read_line( HString& a_roLine, read_t const& a_eRead,
-		int const a_iMaximumLength )
+int long HFile::read_line( HString& line_, read_t const& read_,
+		int const maximumLength_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_pvHandle );
-	read_t l_eRead = a_eRead;
-	if ( ( !!( l_eRead & READ::KEEP_NEWLINES ) ) && ( !!( l_eRead & READ::STRIP_NEWLINES ) ) )
-		M_THROW( _( "bad newlines setting" ), l_eRead.value() );
-	if ( ! ( ( !!( l_eRead & READ::KEEP_NEWLINES ) ) || ( !!( l_eRead & READ::STRIP_NEWLINES ) ) ) )
-		l_eRead |= READ::KEEP_NEWLINES;
-	if ( ( !!( l_eRead & READ::BUFFERED_READS ) ) && ( !!( l_eRead & READ::UNBUFFERED_READS ) ) )
-		M_THROW( _( "bad buffering setting" ), l_eRead.value() );
-	if ( ! ( ( !!( l_eRead & READ::BUFFERED_READS ) ) || ( !!( l_eRead & READ::UNBUFFERED_READS ) ) ) )
-		l_eRead |= READ::BUFFERED_READS;
-	if ( ! f_pvHandle )
+	M_ASSERT( _handle );
+	read_t readMode = read_;
+	if ( ( !!( readMode & READ::KEEP_NEWLINES ) ) && ( !!( readMode & READ::STRIP_NEWLINES ) ) )
+		M_THROW( _( "bad newlines setting" ), readMode.value() );
+	if ( ! ( ( !!( readMode & READ::KEEP_NEWLINES ) ) || ( !!( readMode & READ::STRIP_NEWLINES ) ) ) )
+		readMode |= READ::KEEP_NEWLINES;
+	if ( ( !!( readMode & READ::BUFFERED_READS ) ) && ( !!( readMode & READ::UNBUFFERED_READS ) ) )
+		M_THROW( _( "bad buffering setting" ), readMode.value() );
+	if ( ! ( ( !!( readMode & READ::BUFFERED_READS ) ) || ( !!( readMode & READ::UNBUFFERED_READS ) ) ) )
+		readMode |= READ::BUFFERED_READS;
+	if ( ! _handle )
 		M_THROW( _( "no file is opened" ), errno );
-	char * l_pcPtr = NULL;
-	int long l_iLength = -1;
-	if ( !!( l_eRead & READ::BUFFERED_READS ) )
+	char * ptr = NULL;
+	int long length = -1;
+	if ( !!( readMode & READ::BUFFERED_READS ) )
 		{
-		l_iLength = get_line_length();
-		if ( l_iLength )
+		length = get_line_length();
+		if ( length )
 			{
-			if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
-				M_THROW( _( "line too long" ), l_iLength );
-			l_pcPtr = static_cast<char*>( f_oCache.realloc( l_iLength ) );
-			M_ENSURE( static_cast<int>( ::std::fread( l_pcPtr,
-							sizeof ( char ), l_iLength,
-							static_cast<FILE*>( f_pvHandle ) ) ) == l_iLength );
-			l_pcPtr[ l_iLength ] = 0;
-			a_roLine = l_pcPtr;
+			if ( maximumLength_ && ( length > maximumLength_ ) )
+				M_THROW( _( "line too long" ), length );
+			ptr = static_cast<char*>( _cache.realloc( length ) );
+			M_ENSURE( static_cast<int>( ::std::fread( ptr,
+							sizeof ( char ), length,
+							static_cast<FILE*>( _handle ) ) ) == length );
+			ptr[ length ] = 0;
+			line_ = ptr;
 			}
 		}
 	else /* UNBUFFERED_READS */
 		{
-		l_iLength = read_until( a_roLine, HStreamInterface::eols, false );
-		if ( a_iMaximumLength && ( l_iLength > a_iMaximumLength ) )
-			M_THROW( _( "line too long" ), l_iLength );
+		length = read_until( line_, HStreamInterface::eols, false );
+		if ( maximumLength_ && ( length > maximumLength_ ) )
+			M_THROW( _( "line too long" ), length );
 		}
-	if ( l_iLength > 0 )
+	if ( length > 0 )
 		{
-		int long newLen = l_iLength;
-		if ( ( !!( l_eRead & READ::STRIP_NEWLINES ) ) && ( newLen > 0 ) )
+		int long newLen = length;
+		if ( ( !!( readMode & READ::STRIP_NEWLINES ) ) && ( newLen > 0 ) )
 			{
 			-- newLen;
-			if ( ( newLen > 0 ) && ( a_roLine[ newLen - 1 ] == '\r' ) )
+			if ( ( newLen > 0 ) && ( line_[ newLen - 1 ] == '\r' ) )
 				-- newLen;
 			}
-		if ( newLen < l_iLength )
-			a_roLine.set_at( newLen, 0 );
+		if ( newLen < length )
+			line_.set_at( newLen, 0 );
 		}
 	else
-		l_iLength = -1;
-	return ( l_iLength );
+		length = -1;
+	return ( length );
 	M_EPILOG
 	}
 
 int long HFile::get_line_length( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_pvHandle );
+	M_ASSERT( _handle );
 	static int const SCAN_BUFFER_SIZE = 8;
-	int long l_iLength = 0, l_iSize = 0;
-	char l_pcBuffer[ SCAN_BUFFER_SIZE ];
-	char const* l_pcPtr = NULL;
+	int long length = 0, size = 0;
+	char buffer[ SCAN_BUFFER_SIZE ];
+	char const* ptr = NULL;
 	do
 		{
-		l_iSize = ::std::fread( l_pcBuffer, sizeof ( char ),
-				SCAN_BUFFER_SIZE, static_cast<FILE*>( f_pvHandle ) );
-		l_iLength += l_iSize;
-		l_pcPtr = static_cast<char*>( ::std::memchr( l_pcBuffer,
-					'\n', l_iSize ) );
+		size = ::std::fread( buffer, sizeof ( char ),
+				SCAN_BUFFER_SIZE, static_cast<FILE*>( _handle ) );
+		length += size;
+		ptr = static_cast<char*>( ::std::memchr( buffer,
+					'\n', size ) );
 		}
-	while ( ! l_pcPtr && ( l_iSize == SCAN_BUFFER_SIZE ) );
-	M_ENSURE( ::std::fseek( static_cast<FILE*>( f_pvHandle ),
-				- l_iLength, SEEK_CUR ) == 0 );
-	if ( l_pcPtr )
-		l_iLength -= ( l_iSize - ( l_pcPtr + 1 - l_pcBuffer ) ); /* + 1 for \n */
-	return ( l_iLength );
+	while ( ! ptr && ( size == SCAN_BUFFER_SIZE ) );
+	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ),
+				- length, SEEK_CUR ) == 0 );
+	if ( ptr )
+		length -= ( size - ( ptr + 1 - buffer ) ); /* + 1 for \n */
+	return ( length );
 	M_EPILOG
 	}
 
 HString const& HFile::get_path( void ) const
 	{
 	M_PROLOG
-	return ( f_oPath );
+	return ( _path );
 	M_EPILOG
 	}
 
 HString const& HFile::get_error( void ) const
 	{
 	M_PROLOG
-	return ( f_oError );
+	return ( _error );
 	M_EPILOG
 	}
 
 void HFile::do_flush( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_pvHandle );
-	M_ENSURE( ::std::fflush( static_cast<FILE*>( f_pvHandle ) ) == 0 );
+	M_ASSERT( _handle );
+	M_ENSURE( ::std::fflush( static_cast<FILE*>( _handle ) ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -294,31 +294,31 @@ void HFile::do_flush( void ) const
 bool HFile::operator ! ( void ) const
 	{
 	M_PROLOG
-	return ( ! f_pvHandle );
+	return ( ! _handle );
 	M_EPILOG
 	}
 
-int long HFile::do_read( void* const a_pcBuffer, int long const& a_lSize )
+int long HFile::do_read( void* const buffer_, int long const& size_ )
 	{
 	M_PROLOG
-	int long len( ::std::fread( a_pcBuffer, sizeof ( char ), a_lSize, static_cast<FILE*>( f_pvHandle ) ) );
-	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( f_pvHandle ) ) ? -1 : len ) );
+	int long len( ::std::fread( buffer_, sizeof ( char ), size_, static_cast<FILE*>( _handle ) ) );
+	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG
 	}
 
-int long HFile::do_write( void const* const a_pcString, int long const& a_lSize )
+int long HFile::do_write( void const* const string_, int long const& size_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_pvHandle );
-	int long len( ::std::fwrite( a_pcString, sizeof ( char ), a_lSize, static_cast<FILE*>( f_pvHandle ) ) );
-	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( f_pvHandle ) ) ? -1 : len ) );
+	M_ASSERT( _handle );
+	int long len( ::std::fwrite( string_, sizeof ( char ), size_, static_cast<FILE*>( _handle ) ) );
+	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG
 	}
 
 bool HFile::do_is_valid( void ) const
 	{
 	M_PROLOG
-	return ( f_pvHandle != NULL );
+	return ( _handle != NULL );
 	M_EPILOG
 	}
 

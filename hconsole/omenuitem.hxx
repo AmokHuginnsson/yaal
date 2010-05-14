@@ -41,10 +41,10 @@ struct OMenuItem
 	{
 public: /* All is public for simpler usage. */
 	typedef int ( HTUIProcess::* HANDLER_t )( void* );
-	OMenuItem* f_psSubMenu;
+	OMenuItem* _subMenu;
 	HANDLER_t HANDLER;
-	void* f_pvParam;
-	yaal::hcore::HString f_oLabel;
+	void* _param;
+	yaal::hcore::HString _label;
 /* Methods */
 	OMenuItem( void );
 	OMenuItem( OMenuItem* const, HANDLER_t const, void*, yaal::hcore::HString const& );

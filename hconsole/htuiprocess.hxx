@@ -53,9 +53,9 @@ public:
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 protected:
 	yaal::tools::HProcess _dispatcher;
-	HWindow::ptr_t f_oMainWindow; /* self explanary */
-	model_t::cyclic_iterator f_oForegroundWindow; /* self explanary */
-	model_ptr_t f_oWindows;	/* current existing windows */
+	HWindow::ptr_t _mainWindow; /* self explanary */
+	model_t::cyclic_iterator _foregroundWindow; /* self explanary */
+	model_ptr_t _windows;	/* current existing windows */
 public:
 	HTUIProcess ( int = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );

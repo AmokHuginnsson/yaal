@@ -43,13 +43,13 @@ namespace hcore
  */
 class HInfo
 	{
-	type_t		f_eType;
-	int				f_iInt;
-	int long	f_lIntLong;
-	double		f_dDouble;
-	void*		f_pvPointer;
-	HString		f_oString;
-	HTime			f_oTime;
+	type_t		_type;
+	int				_int;
+	int long	_intLong;
+	double		_double;
+	void*		_pointer;
+	HString		_string;
+	HTime			_time;
 public:
 	HInfo( void );
 	HInfo( int const& );

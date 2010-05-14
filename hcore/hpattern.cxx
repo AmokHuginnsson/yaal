@@ -44,16 +44,16 @@ namespace hcore
 
 struct OPatternState
 	{
-	bool f_bIgnoreCase;
-	bool f_bExtended;
-	HPattern::pluggable_flags_t f_oFlags;
-	OPatternState( void ) : f_bIgnoreCase( false ), f_bExtended( false ), f_oFlags() {}
+	bool _ignoreCase;
+	bool _extended;
+	HPattern::pluggable_flags_t _flags;
+	OPatternState( void ) : _ignoreCase( false ), _extended( false ), _flags() {}
 	};
 
-HPattern::HPattern( bool const a_bIgnoreCase ) : f_bInitialized( false ),
-	f_bIgnoreCaseDefault( a_bIgnoreCase ), f_bIgnoreCase( false ),
-	f_bExtended( false ), f_iSimpleMatchLength( 0 ), f_oCompiled( sizeof ( regex_t ) ),
-	f_oPatternInput(), f_oPatternReal(), f_iLastError( 0 ), f_oVarTmpBuffer()
+HPattern::HPattern( bool const ignoreCase_ ) : _initialized( false ),
+	_ignoreCaseDefault( ignoreCase_ ), _ignoreCase( false ),
+	_extended( false ), _simpleMatchLength( 0 ), _compiled( sizeof ( regex_t ) ),
+	_patternInput(), _patternReal(), _lastError( 0 ), _varTmpBuffer()
 	{
 	M_PROLOG
 	return;
@@ -63,7 +63,7 @@ HPattern::HPattern( bool const a_bIgnoreCase ) : f_bInitialized( false ),
 HPattern::~HPattern( void )
 	{
 	M_PROLOG
-	regfree( f_oCompiled.get<regex_t>() );
+	regfree( _compiled.get<regex_t>() );
 	return;
 	M_EPILOG
 	}
@@ -72,10 +72,10 @@ void HPattern::save_state( void* sp, pluggable_flags_t* f )
 	{
 	M_PROLOG
 	OPatternState& s = *static_cast<OPatternState*>( sp );
-	s.f_bIgnoreCase = f_bIgnoreCase;
-	s.f_bExtended = f_bExtended;
+	s._ignoreCase = _ignoreCase;
+	s._extended = _extended;
 	if ( f )
-		s.f_oFlags = *f;
+		s._flags = *f;
 	return;
 	M_EPILOG
 	}
@@ -84,126 +84,126 @@ void HPattern::restore_state( void* sp, pluggable_flags_t* f )
 	{
 	M_PROLOG
 	OPatternState& s = *static_cast<OPatternState*>( sp );
-	f_bIgnoreCase = s.f_bIgnoreCase;
-	f_bExtended = s.f_bExtended;
+	_ignoreCase = s._ignoreCase;
+	_extended = s._extended;
 	if ( f )
-		*f = s.f_oFlags;
+		*f = s._flags;
 	return;
 	M_EPILOG
 	}
 
-int HPattern::parse( HString const& a_oPattern, pluggable_flags_t* externalFlags ) 
+int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags ) 
 	{
 	M_PROLOG
-	int l_iError = 0;
-	char const* const l_pcPattern = a_oPattern.raw();
-	f_oPatternInput = a_oPattern;
-	f_oVarTmpBuffer = "";
+	char const* const pattern = pattern_.raw();
+	_patternInput = pattern_;
+	_varTmpBuffer = "";
 /* making copy of flags */
 	OPatternState savePoint;
 	save_state( &savePoint, externalFlags );
 /* end of copy */
 /* clear all flags */
-	f_bIgnoreCase = f_bIgnoreCaseDefault;
-	f_bExtended = false;
+	_ignoreCase = _ignoreCaseDefault;
+	_extended = false;
 	if ( externalFlags )
 		{
 		for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it )
 			*it->second = false;
 		}
-/* FIXME g++ 4.3 bug *///		a_puhFlags[ i ] &= FLAG_MASK;
+/* FIXME g++ 4.3 bug *///		flags_[ i ] &= FLAG_MASK;
 /* end of clearing */
 /* look for switches at the beginnig of pattern */
-	int long l_iCtr = 0;
-	while ( l_pcPattern[ l_iCtr ] == '\\' )
+	int long ctr( 0 );
+	int err( 0 );
+	while ( pattern[ ctr ] == '\\' )
 		{
-		if ( set_switch( l_pcPattern[ ++ l_iCtr ], externalFlags ) )
+		if ( set_switch( pattern[ ++ ctr ], externalFlags ) )
 			{
 			restore_state( &savePoint, externalFlags );
-			l_iError = 1;
-			f_oVarTmpBuffer.format( "bad search option '%c'", l_pcPattern[ l_iCtr ] );
-			return ( l_iError );
+			err = 1;
+			_varTmpBuffer.format( "bad search option '%c'", pattern[ ctr ] );
+			return ( err );
 			}
-		l_iCtr ++;
+		ctr ++;
 		}
-	if ( l_pcPattern[ l_iCtr ] == '/' )
-		l_iCtr ++;
-	int long l_iBegin = l_iCtr;
+	if ( pattern[ ctr ] == '/' )
+		ctr ++;
+	int long begin = ctr;
 /* end of looking at begin */
 /* making copy of flags */
 	save_state( &savePoint, externalFlags );
 /* end of copy */
 /* look for switches at the end of pattern */
-	int long l_iEnd = l_iCtr = f_oPatternInput.get_length() - 1;
-	if ( l_iEnd < 0 )
+	int long endMatch( ctr = _patternInput.get_length() - 1 );
+	if ( endMatch < 0 )
 		return ( true );
-	while ( ( l_iCtr > 0 ) && ( l_pcPattern[ l_iCtr ] != '/' ) )
+	while ( ( ctr > 0 ) && ( pattern[ ctr ] != '/' ) )
 		{
-		if ( set_switch( l_pcPattern[ l_iCtr ], externalFlags ) )
+		if ( set_switch( pattern[ ctr ], externalFlags ) )
 			{
 			restore_state( &savePoint, externalFlags );
-			l_iCtr = 1;
+			ctr = 1;
 			}
-		l_iCtr --;
+		ctr --;
 		}
-	if ( l_iCtr )
-		l_iEnd = l_iCtr - 1;
+	if ( ctr )
+		endMatch = ctr - 1;
 /* end of looking at end */
-	f_oVarTmpBuffer = f_oPatternReal = f_oPatternInput.mid( l_iBegin,
-			( l_iEnd - l_iBegin ) + 1 );
-	f_iSimpleMatchLength = static_cast<int>( f_oPatternReal.get_length() );
-	if ( ! f_iSimpleMatchLength )
+	_varTmpBuffer = _patternReal = _patternInput.mid( begin,
+			( endMatch - begin ) + 1 );
+	_simpleMatchLength = static_cast<int>( _patternReal.get_length() );
+	if ( ! _simpleMatchLength )
 		{
-		l_iError = - 1;
-		f_oVarTmpBuffer = _( "empty pattern" );
+		err = -1;
+		_varTmpBuffer = _( "empty pattern" );
 		}
-	f_bInitialized = ! l_iError;
-	if ( f_bInitialized && f_bExtended )
-		l_iError = parse_re( f_oPatternReal.raw() );
-	return ( l_iError );
+	_initialized = ! err;
+	if ( _initialized && _extended )
+		err = parse_re( _patternReal.raw() );
+	return ( err );
 	M_EPILOG
 	}
 
-int HPattern::parse_re( char const* const a_pcPattern )
+int HPattern::parse_re( char const* const pattern_ )
 	{
 	M_PROLOG
-	::regfree( f_oCompiled.get<regex_t>() );
-	if ( ( f_iLastError = ::regcomp( f_oCompiled.get<regex_t>(), a_pcPattern,
-					f_bIgnoreCase ? REG_ICASE : 0 ) ) )
+	::regfree( _compiled.get<regex_t>() );
+	if ( ( _lastError = ::regcomp( _compiled.get<regex_t>(), pattern_,
+					_ignoreCase ? REG_ICASE : 0 ) ) )
 		{
-		prepare_error_message( a_pcPattern );
-		f_bInitialized = false;
+		prepare_error_message( pattern_ );
+		_initialized = false;
 		}
 	else
 		{
-		f_bInitialized = true;
-		f_bExtended = true;
-		f_iSimpleMatchLength = 1; /* it is not really a simple pattern */
+		_initialized = true;
+		_extended = true;
+		_simpleMatchLength = 1; /* it is not really a simple pattern */
 		}
-	return ( f_iLastError );
+	return ( _lastError );
 	M_EPILOG
 	}
 
 HString const& HPattern::error( void ) const
 	{
-	return ( f_oVarTmpBuffer );
+	return ( _varTmpBuffer );
 	}
 
 int HPattern::error_code( void ) const
 	{
-	return ( f_iLastError );
+	return ( _lastError );
 	}
 
-bool HPattern::set_switch( char const a_cSwitch, pluggable_flags_t* externalFlags ) 
+bool HPattern::set_switch( char const switch_, pluggable_flags_t* externalFlags ) 
 	{
 	M_PROLOG
 	bool ok( true );
-	switch ( a_cSwitch )
+	switch ( switch_ )
 		{
-		case ( 'i' ):{f_bIgnoreCase = ! f_bIgnoreCase;break;}
-		case ( 'e' ):{f_bExtended = true;break;}
-		case ( 'c' ):{f_bIgnoreCase = true;break;}
-		case ( 'C' ):{f_bIgnoreCase = false;break;}
+		case ( 'i' ):{_ignoreCase = ! _ignoreCase;break;}
+		case ( 'e' ):{_extended = true;break;}
+		case ( 'c' ):{_ignoreCase = true;break;}
+		case ( 'C' ):{_ignoreCase = false;break;}
 		default :
 			{
 			if ( externalFlags )
@@ -211,7 +211,7 @@ bool HPattern::set_switch( char const a_cSwitch, pluggable_flags_t* externalFlag
 				ok = false;
 				for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it )
 					{
-					if ( a_cSwitch == it->first )
+					if ( switch_ == it->first )
 						*it->second = ok = true;
 					break;
 					}
@@ -223,56 +223,56 @@ bool HPattern::set_switch( char const a_cSwitch, pluggable_flags_t* externalFlag
 	M_EPILOG
 	}
 
-char const* HPattern::matches( char const* const a_pcString,
-		int long* const a_piMatchLength ) const
+char const* HPattern::matches( char const* const string_,
+		int long* const matchLength_ ) const
 	{
 	M_PROLOG
-	M_ASSERT( a_pcString );
-	char const* l_pcPtr = NULL;
-	int long l_iMatchLength = 0;
-	regmatch_t l_sMatch;
-	if ( f_iSimpleMatchLength )
+	M_ASSERT( string_ );
+	char const* ptr = NULL;
+	int long matchLength = 0;
+	regmatch_t match;
+	if ( _simpleMatchLength )
 		{
-		if ( f_bExtended )
+		if ( _extended )
 			{
-			if ( ! ( f_iLastError = ::regexec( f_oCompiled.get<regex_t>(), a_pcString, 1, &l_sMatch, 0 ) ) )
+			if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 ) ) )
 				{
-				l_iMatchLength = l_sMatch.rm_eo - l_sMatch.rm_so;
-				if ( l_iMatchLength > 0 )
-					l_pcPtr = a_pcString + l_sMatch.rm_so;
+				matchLength = match.rm_eo - match.rm_so;
+				if ( matchLength > 0 )
+					ptr = string_ + match.rm_so;
 				}
 			else
-				prepare_error_message( f_oPatternReal );
+				prepare_error_message( _patternReal );
 			}
 		else
 			{
-			if ( f_bIgnoreCase )
-				l_pcPtr = ::strcasestr( a_pcString, f_oPatternReal.raw() );
+			if ( _ignoreCase )
+				ptr = ::strcasestr( string_, _patternReal.raw() );
 			else
-				l_pcPtr = ::strstr( a_pcString, f_oPatternReal.raw() );
-			if ( l_pcPtr )
-				l_iMatchLength = f_iSimpleMatchLength;
+				ptr = ::strstr( string_, _patternReal.raw() );
+			if ( ptr )
+				matchLength = _simpleMatchLength;
 			}
 		}
-	if ( a_piMatchLength )
-		( *a_piMatchLength ) = l_iMatchLength;
-	return ( l_pcPtr );
+	if ( matchLength_ )
+		( *matchLength_ ) = matchLength;
+	return ( ptr );
 	M_EPILOG
 	}
 
-void HPattern::prepare_error_message( HString const& a_oString ) const
+void HPattern::prepare_error_message( HString const& string_ ) const
 	{
 	M_PROLOG
-	int long l_iSize = ::regerror( f_iLastError, f_oCompiled.get<regex_t>(), NULL, 0 ) + 1;
-	HChunk l_oBuffer( l_iSize + 1 );
-	M_ENSURE( static_cast<int>( ::regerror( f_iLastError, f_oCompiled.get<regex_t>(),
-					l_oBuffer.raw(), l_iSize ) ) < l_iSize );
-	f_oVarTmpBuffer = l_oBuffer.raw();
-	if ( ! a_oString.empty() )
+	int long size = ::regerror( _lastError, _compiled.get<regex_t>(), NULL, 0 ) + 1;
+	HChunk buffer( size + 1 );
+	M_ENSURE( static_cast<int>( ::regerror( _lastError, _compiled.get<regex_t>(),
+					buffer.raw(), size ) ) < size );
+	_varTmpBuffer = buffer.raw();
+	if ( ! string_.empty() )
 		{
-		f_oVarTmpBuffer += ": `";
-		f_oVarTmpBuffer += a_oString;
-		f_oVarTmpBuffer += "'";
+		_varTmpBuffer += ": `";
+		_varTmpBuffer += string_;
+		_varTmpBuffer += "'";
 		}
 	return;
 	M_EPILOG

@@ -37,7 +37,7 @@ namespace yaal
 namespace hcore
 {
 
-char const * g_ppcErrMsgHVector [ 2 ] =
+char const * _errMsgHVector_ [ 2 ] =
 	{
 	_ ( "ok" ),
 /* HVector::ERROR::DIMNOTMATCH */	_ ( "dimensions do not match" )

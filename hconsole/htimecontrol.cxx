@@ -37,10 +37,10 @@ namespace yaal
 namespace hconsole
 {
 
-HTimeControl::HTimeControl ( HWindow * a_poParent, int a_iRow, int a_iColumn,
-										 int a_iHeight, int a_iWidth, char const * a_pcLabel )
-					: HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-							a_iWidth, a_pcLabel )
+HTimeControl::HTimeControl ( HWindow * parent_, int row_, int column_,
+										 int height_, int width_, char const * label_ )
+					: HControl ( parent_, row_, column_, height_,
+							width_, label_ )
 	{
 	M_PROLOG
 	return;

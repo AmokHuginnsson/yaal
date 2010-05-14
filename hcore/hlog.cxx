@@ -60,34 +60,33 @@ static int const GETPW_R_SIZE   = 1024;
 
 }
 
-int long HLog::f_lLogMask = 0;
+int long HLog::_logMask = 0;
 
 void* DEFAULT_LOG_STREAM( stderr );
 
-HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedFile( _file::ref() ), f_bRealMode( false ), f_bNewLine( true ),
-	f_lType( 0 ), f_iBufferSize( BUFFER_SIZE ),
-	f_pcProcessName( NULL ),
-	f_oLoginName(), f_oHostName( HOSTNAME_SIZE ),
-	f_oBuffer( f_iBufferSize )
+HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedFile( _file::ref() ), _realMode( false ), _newLine( true ),
+	_type( 0 ), _bufferSize( BUFFER_SIZE ),
+	_processName( NULL ),
+	_loginName(), _hostName( HOSTNAME_SIZE ),
+	_buffer( _bufferSize )
 	{
 	M_PROLOG
-	uid_t l_iUid = 0;
 	if ( ! _file::ref() )
 		M_THROW( "tmpfile() failed", errno );
 	HString intro;
 	intro.format( "%-10xProcess started (%ld).\n",
 			LOG_TYPE::NOTICE, static_cast<int long>( getpid() ) );
 	_file::ref() << intro;
-	l_iUid = getuid();
-	passwd l_sPasswd;
+	uid_t uid( getuid() );
+	passwd accountInfo;
 	long int bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
 	HChunk buf( bsize > 0 ? bsize + 1 : GETPW_R_SIZE );
 	passwd* any;
-	if ( ! getpwuid_r( l_iUid, &l_sPasswd, buf.get<char>(), static_cast<int>( bsize ), &any ) )
-		f_oLoginName = l_sPasswd.pw_name;
+	if ( ! getpwuid_r( uid, &accountInfo, buf.get<char>(), static_cast<int>( bsize ), &any ) )
+		_loginName = accountInfo.pw_name;
 	else
-		f_oLoginName = l_iUid;
-	M_ENSURE( ::gethostname( f_oHostName.get<char>(), HOSTNAME_SIZE - 1 ) == 0 );
+		_loginName = uid;
+	M_ENSURE( ::gethostname( _hostName.get<char>(), HOSTNAME_SIZE - 1 ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -95,9 +94,9 @@ HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedFile( _file::ref()
 HLog::~HLog( void )
 	{
 	M_PROLOG
-	if ( f_lLogMask & LOG_TYPE::NOTICE )
+	if ( _logMask & LOG_TYPE::NOTICE )
 		{
-		if ( f_bNewLine )
+		if ( _newLine )
 			timestamp();
 		_file::ref() << "Process exited normally.\n";
 		}
@@ -105,46 +104,46 @@ HLog::~HLog( void )
 	M_EPILOG
 	}
 
-void HLog::do_rehash( void* src_, char const* const a_pcProcessName )
+void HLog::do_rehash( void* src_, char const* const processName_ )
 	{
 	M_PROLOG
 #ifndef HAVE_GETLINE
-	char* l_pcPtr = NULL;
-	int l_iLen = 0;
+	char* ptr = NULL;
+	int len = 0;
 #endif /* not HAVE_GETLINE */
-	f_bRealMode = true;
-	if ( a_pcProcessName )
-		f_pcProcessName = ::basename( a_pcProcessName );
+	_realMode = true;
+	if ( processName_ )
+		_processName = ::basename( processName_ );
 	FILE* src( static_cast<FILE*>( src_ ) );
 	if ( src )
 		{
 		::fseek( src, 0, SEEK_SET );
-		char* buf = f_oBuffer.get<char>();
+		char* buf = _buffer.get<char>();
 #ifdef HAVE_GETLINE
-    while ( ::getline( &buf, &f_iBufferSize, src ) > 0 )
+    while ( ::getline( &buf, &_bufferSize, src ) > 0 )
 #else /* HAVE_GETLINE */
-    while ( ( l_iLen = static_cast<int>( ::fread( buf, sizeof ( char ), f_iBufferSize, src ) ) ) )
+    while ( ( len = static_cast<int>( ::fread( buf, sizeof ( char ), _bufferSize, src ) ) ) )
 #endif /* not HAVE_GETLINE */
       {
 #ifndef HAVE_GETLINE
-      l_pcPtr = static_cast<char*>( ::memchr( buf, '\n', l_iLen ) );
-      if ( ! l_pcPtr )
+      ptr = static_cast<char*>( ::memchr( buf, '\n', len ) );
+      if ( ! ptr )
         {
        	_file::ref() << buf;
         continue;
         }
-      * ++ l_pcPtr = 0;
-      ::fseek( src, l_pcPtr - buf - l_iLen, SEEK_CUR );
+      * ++ ptr = 0;
+      ::fseek( src, ptr - buf - len, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
-			f_lType = ::strtol( buf, NULL, 0x10 );
-			if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
+			_type = ::strtol( buf, NULL, 0x10 );
+			if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
 				{
 				timestamp();
 				_file::ref() << buf + 10;
 				}
 			}
 		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
-			f_lType = 0;
+			_type = 0;
 		::fclose( src );
 		}
 	do_flush();
@@ -153,7 +152,7 @@ void HLog::do_rehash( void* src_, char const* const a_pcProcessName )
 	}
 
 void HLog::rehash( void* stream_,
-		char const* const a_pcProcessName )
+		char const* const processName_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -161,21 +160,21 @@ void HLog::rehash( void* stream_,
 		M_THROW( "file parameter is", reinterpret_cast<int long>( stream_ ) );
 	void* src( _file::ref().release() );
 	_file::ref().open( stream_ );
-	do_rehash( src, a_pcProcessName );
+	do_rehash( src, processName_ );
 	return;
 	M_EPILOG
 	}
 
-void HLog::rehash( HString const& a_oLogFileName,
-		char const* const a_pcProcessName )
+void HLog::rehash( HString const& logFileName_,
+		char const* const processName_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
-	if ( a_oLogFileName.is_empty() )
-		M_THROW( "new file name argument is", a_oLogFileName.get_length() );
+	if ( logFileName_.is_empty() )
+		M_THROW( "new file name argument is", logFileName_.get_length() );
 	void* src( _file::ref().release() );
-	_file::ref().open( a_oLogFileName, HFile::open_t( HFile::OPEN::WRITING ) | HFile::OPEN::APPEND );
-	do_rehash( src, a_pcProcessName );
+	_file::ref().open( logFileName_, HFile::open_t( HFile::OPEN::WRITING ) | HFile::OPEN::APPEND );
+	do_rehash( src, processName_ );
 	return;
 	M_EPILOG
 	}
@@ -183,124 +182,124 @@ void HLog::rehash( HString const& a_oLogFileName,
 void HLog::timestamp( void )
 	{
 	M_PROLOG
-	char l_pcBuffer[ TIMESTAMP_SIZE ];
-	if ( ! f_bRealMode )
+	char buffer[ TIMESTAMP_SIZE ];
+	if ( ! _realMode )
 		{
 		if ( !! _file::ref() )
 			{
-			::snprintf( l_pcBuffer, TIMESTAMP_SIZE - 1, "%-10lx", f_lType );
-			_file::ref() << l_pcBuffer;
+			::snprintf( buffer, TIMESTAMP_SIZE - 1, "%-10lx", _type );
+			_file::ref() << buffer;
 			}
 		return;
 		}
-	time_t l_xCurrentTime = ::time( NULL );
-	tm* l_psBrokenTime = ::localtime( &l_xCurrentTime );
-	::memset( l_pcBuffer, 0, TIMESTAMP_SIZE );
+	time_t currentTime = ::time( NULL );
+	tm* brokenTime = ::localtime( &currentTime );
+	::memset( buffer, 0, TIMESTAMP_SIZE );
 	/* ISO C++ does not support the `%e' strftime format */
 	/* `%e': The day of the month like with `%d', but padded with blank */
 	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
-	int long l_iSize = ::strftime( l_pcBuffer, TIMESTAMP_SIZE, "%b %d %H:%M:%S",
-			l_psBrokenTime );
-	if ( l_iSize > TIMESTAMP_SIZE )
-		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), l_iSize );
-	if ( f_pcProcessName )
-		_file::ref() << l_pcBuffer << " " << f_oLoginName << "@" << f_oHostName.get<char>() << "->" << f_pcProcessName << ": ";
+	int long size = ::strftime( buffer, TIMESTAMP_SIZE, "%b %d %H:%M:%S",
+			brokenTime );
+	if ( size > TIMESTAMP_SIZE )
+		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), size );
+	if ( _processName )
+		_file::ref() << buffer << " " << _loginName << "@" << _hostName.get<char>() << "->" << _processName << ": ";
 	else
-		_file::ref() << l_pcBuffer << " " << f_oLoginName << "@" << f_oHostName.get<char>() << ": ";
+		_file::ref() << buffer << " " << _loginName << "@" << _hostName.get<char>() << ": ";
 	return;
 	M_EPILOG
 	}
 
-int HLog::operator() ( char const* const a_pcFormat, va_list a_xAp )
+int HLog::operator() ( char const* const format_, va_list ap_ )
 	{
 	M_PROLOG
-	int l_iErr = 0;
-	if ( f_bNewLine )
+	int err = 0;
+	if ( _newLine )
 		timestamp();
-	char* buf = f_oBuffer.get<char>();
-	::memset( buf, 0, f_iBufferSize );
-	l_iErr = ::vsnprintf( buf, f_iBufferSize, a_pcFormat, a_xAp );
+	char* buf = _buffer.get<char>();
+	::memset( buf, 0, _bufferSize );
+	err = ::vsnprintf( buf, _bufferSize, format_, ap_ );
 	_file::ref() << buf;
 	if ( buf[ ::strlen( buf ) - 1 ] != '\n' )
-		f_bNewLine = false;
+		_newLine = false;
 	else
 		{
-		f_lType = 0;
-		f_bNewLine = true;
+		_type = 0;
+		_newLine = true;
 		_file::ref().flush();
 		}
-	return ( l_iErr );
+	return ( err );
 	M_EPILOG
 	}
 
-int HLog::operator() ( char const * const a_pcFormat, ... )
+int HLog::operator() ( char const * const format_, ... )
 	{
 	M_PROLOG
-	int l_iErr = 0;
-	va_list l_xAp;
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
+	int err = 0;
+	va_list ap;
+	if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
 		{
-		va_start( l_xAp, a_pcFormat );
-		l_iErr = ( *this )( a_pcFormat, l_xAp );
-		va_end( l_xAp );
+		va_start( ap, format_ );
+		err = ( *this )( format_, ap );
+		va_end( ap );
 		}
-	return ( l_iErr );
+	return ( err );
 	M_EPILOG
 	}
 
-int HLog::operator() ( int long const a_lType,
-		char const* const a_pcFormat, ... )
+int HLog::operator() ( int long const type_,
+		char const* const format_, ... )
 	{
 	M_PROLOG
-	int l_iErr = 0;
-	va_list l_xAp;
-	f_lType = a_lType;
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
+	int err = 0;
+	va_list ap;
+	_type = type_;
+	if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
 		{
-		va_start( l_xAp, a_pcFormat );
-		l_iErr = ( *this )( a_pcFormat, l_xAp );
-		va_end( l_xAp );
+		va_start( ap, format_ );
+		err = ( *this )( format_, ap );
+		va_end( ap );
 		}
-	return ( l_iErr );
+	return ( err );
 	M_EPILOG
 	}
 
-HLog& HLog::operator() ( int long const& a_lType )
+HLog& HLog::operator() ( int long const& type_ )
 	{
 	M_PROLOG
-	f_lType = a_lType;
+	_type = type_;
 	return ( *this );
 	M_EPILOG
 	}
 
-HLog& HLog::filter( int long const& a_lType )
+HLog& HLog::filter( int long const& type_ )
 	{
 	M_PROLOG
-	f_lType = a_lType;
+	_type = type_;
 	return ( *this );
 	M_EPILOG
 	}
 
-int long HLog::do_write( void const* const a_pcString, int long const& a_lSize )
+int long HLog::do_write( void const* const string_, int long const& size_ )
 	{
 	M_PROLOG
-	if ( ! a_pcString )
+	if ( ! string_ )
 		return ( 0 );
 	int len = 0;
-	char const* const str = static_cast<char const* const>( a_pcString );
-	if ( ! ( f_lType && f_bRealMode ) || ( f_lType & f_lLogMask ) )
+	char const* const str = static_cast<char const* const>( string_ );
+	if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
 		{
-		if ( f_bNewLine )
+		if ( _newLine )
 			timestamp();
-		len = static_cast<int>( _file::ref().write( str, a_lSize ) );
-		if ( str[ a_lSize - 1 ] != '\n' )
-			f_bNewLine = false;
+		len = static_cast<int>( _file::ref().write( str, size_ ) );
+		if ( str[ size_ - 1 ] != '\n' )
+			_newLine = false;
 		else
 			{
-			f_bNewLine = true;
-			f_lType = 0;
+			_newLine = true;
+			_type = 0;
 			_file::ref().flush();
 			}
 		}

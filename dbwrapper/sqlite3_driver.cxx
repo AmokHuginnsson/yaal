@@ -41,11 +41,11 @@ extern "C"
 
 struct OSQLite
 	{
-	int f_iErrorCode;
-	HString f_oErrorMessage;
-	sqlite3* f_psDB;
+	int _errorCode;
+	HString _errorMessage;
+	sqlite3* _dB;
 	OSQLite( void )
-		: f_iErrorCode( 0 ), f_oErrorMessage(), f_psDB( NULL ) {}
+		: _errorCode( 0 ), _errorMessage(), _dB( NULL ) {}
 private:
 	OSQLite( OSQLite const& );
 	OSQLite& operator = ( OSQLite const& );
@@ -53,20 +53,20 @@ private:
 	
 struct OSQLiteResult
 	{
-	int f_iRows;
-	int f_iColumns;
-	char** f_ppcData;
-	int f_iErrorCode;
-	HString f_oErrorMessage;
+	int _rows;
+	int _columns;
+	char** _data;
+	int _errorCode;
+	HString _errorMessage;
 	OSQLiteResult( void )
-		: f_iRows( 0 ), f_iColumns( 0 ), f_ppcData( NULL ),
-		f_iErrorCode( 0 ), f_oErrorMessage() {}
+		: _rows( 0 ), _columns( 0 ), _data( NULL ),
+		_errorCode( 0 ), _errorMessage() {}
 private:
 	OSQLiteResult( OSQLiteResult const& );
 	OSQLiteResult& operator = ( OSQLiteResult const& );
 	};
 
-OSQLite* g_psBrokenDB = NULL;
+OSQLite* _brokenDB_ = NULL;
 
 void* db_query( void*, char const* );
 void rs_unquery( void* );
@@ -76,151 +76,151 @@ void db_disconnect( void* );
  * .sqlite3 or .db3 extension, and this default extension is added
  * to user supplied database name by driver during db_connect. */
 
-void* db_connect( char const* a_pcDataBase,
+void* db_connect( char const* dataBase_,
 		char const*, char const* )
 	{
-	void* l_pvPtr = NULL;
-	char const l_pcFileNameExt[] = ".sqlite3";
-	struct stat l_sStat;
-	OSQLite* l_psSQLite = NULL;
-	if ( g_psBrokenDB )
+	void* ptr = NULL;
+	char const fileNameExt[] = ".sqlite3";
+	struct stat stat;
+	OSQLite* sQLite = NULL;
+	if ( _brokenDB_ )
 		{
-		db_disconnect( g_psBrokenDB );
-		g_psBrokenDB = NULL;
+		db_disconnect( _brokenDB_ );
+		_brokenDB_ = NULL;
 		}
-	l_psSQLite = new OSQLite;
-	HString l_oDataBase( a_pcDataBase );
-	l_oDataBase += l_pcFileNameExt; 
-	if ( ::stat( l_oDataBase.raw(), &l_sStat ) )
+	sQLite = new OSQLite;
+	HString dataBase( dataBase_ );
+	dataBase += fileNameExt; 
+	if ( ::stat( dataBase.raw(), &stat ) )
 		{
-		l_oDataBase = a_pcDataBase;
-		l_oDataBase += ".db3";
-		if ( ::stat( l_oDataBase.raw(), &l_sStat ) )
+		dataBase = dataBase_;
+		dataBase += ".db3";
+		if ( ::stat( dataBase.raw(), &stat ) )
 			{
-			l_psSQLite->f_oErrorMessage.format( "Database file `%s' does not exists.", l_oDataBase.raw() );
-			g_psBrokenDB = l_psSQLite;
+			sQLite->_errorMessage.format( "Database file `%s' does not exists.", dataBase.raw() );
+			_brokenDB_ = sQLite;
 			return ( NULL );
 			}
 		}
-	l_psSQLite->f_iErrorCode = ::sqlite3_open( l_oDataBase.raw(),
-			&l_psSQLite->f_psDB );
-	if ( l_psSQLite->f_iErrorCode )
+	sQLite->_errorCode = ::sqlite3_open( dataBase.raw(),
+			&sQLite->_dB );
+	if ( sQLite->_errorCode )
 		{
-		l_psSQLite->f_oErrorMessage = ::sqlite3_errmsg( l_psSQLite->f_psDB );
-		g_psBrokenDB = l_psSQLite;
-		l_psSQLite = NULL;
+		sQLite->_errorMessage = ::sqlite3_errmsg( sQLite->_dB );
+		_brokenDB_ = sQLite;
+		sQLite = NULL;
 		}
 	else
 		{
-		l_pvPtr = db_query( l_psSQLite, "PRAGMA empty_result_callbacks = ON;" );
-		if ( l_pvPtr )
-			rs_unquery( l_pvPtr );
+		ptr = db_query( sQLite, "PRAGMA empty_result_callbacks = ON;" );
+		if ( ptr )
+			rs_unquery( ptr );
 		else
-			g_psBrokenDB = l_psSQLite, l_psSQLite = NULL;
+			_brokenDB_ = sQLite, sQLite = NULL;
 		}
-	return ( l_psSQLite );
+	return ( sQLite );
 	}
 
-void db_disconnect( void* a_pvData )
+void db_disconnect( void* data_ )
 	{
-	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
-	if ( l_psSQLite->f_psDB )
-		sqlite3_close( l_psSQLite->f_psDB );
-	delete l_psSQLite;
+	OSQLite* sQLite = static_cast<OSQLite*>( data_ );
+	if ( sQLite->_dB )
+		sqlite3_close( sQLite->_dB );
+	delete sQLite;
 	return;
 	}
 
 int dbrs_errno( void* db_, void* result_ )
 	{
-	OSQLite* l_psSQLite = static_cast<OSQLite*>( db_ );
+	OSQLite* sQLite = static_cast<OSQLite*>( db_ );
 	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
-	if ( ! l_psSQLite )
-		l_psSQLite = g_psBrokenDB;
+	if ( ! sQLite )
+		sQLite = _brokenDB_;
 	int code( errno );
-	if ( r && r->f_iErrorCode )
-		code = r->f_iErrorCode;
-	else if ( l_psSQLite )
+	if ( r && r->_errorCode )
+		code = r->_errorCode;
+	else if ( sQLite )
 		{
-		if ( l_psSQLite->f_iErrorCode )
-			code = l_psSQLite->f_iErrorCode;
+		if ( sQLite->_errorCode )
+			code = sQLite->_errorCode;
 		else
-			code = sqlite3_errcode( l_psSQLite->f_psDB );
+			code = sqlite3_errcode( sQLite->_dB );
 		}
 	return ( code );
 	}
 
 char const* dbrs_error( void* db_, void* result_ )
 	{
-	OSQLite* l_psSQLite = static_cast<OSQLite*>( db_ );
+	OSQLite* sQLite = static_cast<OSQLite*>( db_ );
 	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
-	if ( ! l_psSQLite )
-		l_psSQLite = g_psBrokenDB;
+	if ( ! sQLite )
+		sQLite = _brokenDB_;
 	char const* msg( "" );
-	if ( r && ! r->f_oErrorMessage.is_empty() )
-		msg = r->f_oErrorMessage.raw();
-	else if ( l_psSQLite )
+	if ( r && ! r->_errorMessage.is_empty() )
+		msg = r->_errorMessage.raw();
+	else if ( sQLite )
 		{
-		if ( ! l_psSQLite->f_oErrorMessage.is_empty() )
-			return ( l_psSQLite->f_oErrorMessage.raw() );
-		return ( sqlite3_errmsg( l_psSQLite->f_psDB ) );
+		if ( ! sQLite->_errorMessage.is_empty() )
+			return ( sQLite->_errorMessage.raw() );
+		return ( sqlite3_errmsg( sQLite->_dB ) );
 		}
 	return ( msg );
 	}
 
-void* db_query( void* a_pvData, char const* a_pcQuery )
+void* db_query( void* data_, char const* query_ )
 	{
-	OSQLite* l_psSQLite = static_cast<OSQLite*>( a_pvData );
-	OSQLiteResult * l_psResult = NULL;
-	l_psResult = new OSQLiteResult;
-	l_psResult->f_iColumns = 0;
-	l_psResult->f_iRows = 0;
-	l_psResult->f_ppcData = NULL;
+	OSQLite* sQLite = static_cast<OSQLite*>( data_ );
+	OSQLiteResult * result = NULL;
+	result = new OSQLiteResult;
+	result->_columns = 0;
+	result->_rows = 0;
+	result->_data = NULL;
 	char* errmsg = NULL;
-	l_psResult->f_iErrorCode = sqlite3_get_table( l_psSQLite->f_psDB,
-			a_pcQuery, &l_psResult->f_ppcData, &l_psResult->f_iRows,
-			&l_psResult->f_iColumns, &errmsg );
-	l_psResult->f_oErrorMessage = errmsg;
-	return ( l_psResult );
+	result->_errorCode = sqlite3_get_table( sQLite->_dB,
+			query_, &result->_data, &result->_rows,
+			&result->_columns, &errmsg );
+	result->_errorMessage = errmsg;
+	return ( result );
 	}
 
-void rs_unquery( void* a_pvData )
+void rs_unquery( void* data_ )
 	{
-	OSQLiteResult* pr = static_cast<OSQLiteResult*>( a_pvData );
-	sqlite3_free_table( pr->f_ppcData );
+	OSQLiteResult* pr = static_cast<OSQLiteResult*>( data_ );
+	sqlite3_free_table( pr->_data );
 	delete pr;
 	return;
 	}
 
-char* rs_get( void* a_pvData, int long a_iRow, int a_iColumn )
+char* rs_get( void* data_, int long row_, int column_ )
 	{
-	char** l_ppcData = NULL;
-	OSQLiteResult* l_psResult = static_cast<OSQLiteResult*>( a_pvData );
-	l_ppcData = l_psResult->f_ppcData;
-	return ( l_ppcData[ ( a_iRow + 1 ) * l_psResult->f_iColumns + a_iColumn ] );
+	char** data = NULL;
+	OSQLiteResult* result = static_cast<OSQLiteResult*>( data_ );
+	data = result->_data;
+	return ( data[ ( row_ + 1 ) * result->_columns + column_ ] );
 	}
 
-int rs_fields_count( void* a_pvData )
+int rs_fields_count( void* data_ )
 	{
-	return ( static_cast<OSQLiteResult*>( a_pvData )->f_iColumns );
+	return ( static_cast<OSQLiteResult*>( data_ )->_columns );
 	}
 
-int long dbrs_records_count( void* a_pvDataB, void* a_pvDataR )
+int long dbrs_records_count( void* dataB_, void* dataR_ )
 	{
-	if ( a_pvDataR )
-		return ( static_cast<OSQLiteResult*>( a_pvDataR )->f_iRows );
+	if ( dataR_ )
+		return ( static_cast<OSQLiteResult*>( dataR_ )->_rows );
 	else
-		return ( ::sqlite3_changes( static_cast<OSQLite*>( a_pvDataB )->f_psDB ) );
+		return ( ::sqlite3_changes( static_cast<OSQLite*>( dataB_ )->_dB ) );
 	}
 
-int long dbrs_id( void* a_pvDataB, void* )
+int long dbrs_id( void* dataB_, void* )
 	{
 	/* FIXME change driver interface to allow 64bit insert row id (from autoincrement) */
-	return ( static_cast<int long>( sqlite3_last_insert_rowid( static_cast<OSQLite*>( a_pvDataB )->f_psDB ) ) );
+	return ( static_cast<int long>( sqlite3_last_insert_rowid( static_cast<OSQLite*>( dataB_ )->_dB ) ) );
 	}
 
-char* rs_column_name( void* a_pvDataR, int a_iField )
+char* rs_column_name( void* dataR_, int field_ )
 	{
-	return ( static_cast<OSQLiteResult*>( a_pvDataR )->f_ppcData [ a_iField ] );
+	return ( static_cast<OSQLiteResult*>( dataR_ )->_data [ field_ ] );
 	}
 
 int yaal_sqlite3_driver_main( int, char** )

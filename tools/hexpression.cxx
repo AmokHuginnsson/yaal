@@ -113,8 +113,8 @@ int const FUNCTION::SIGNUM = 4;
 int const FUNCTION::BRACKET = 5;
 	
 
-char const* const n_pcSyntaxError = _( "syntax error" );
-char n_ppcFunctionsMnemonics [ ] [ 8 ] = 
+char const* const _syntaxError_ = _( "syntax error" );
+char _functionsMnemonics_ [ ] [ 8 ] = 
 	{
 	"sinh\0\0\0", "sin\0\0\0\0", "cosh\0\0\0", "cos\0\0\0\0",
 	"tgh\0\0\0\0", "tg\0\0\0\0\0", "ctgh\0\0\0", "ctg\0\0\0\0",
@@ -122,7 +122,7 @@ char n_ppcFunctionsMnemonics [ ] [ 8 ] =
 	"sqrt\0\0\0", "ln\0\0\0\0\0", "log\0\0\0\0"
 	};
 
-int n_piFunctionMnemonicsLength [ 16 ] = 
+int _functionMnemonicsLength_ [ 16 ] = 
 	{
 	4, 3, 4, 3, 3, 2, 4, 3, 6, 6, 5, 6, 3, 4, 2, 3
 	};
@@ -130,23 +130,23 @@ int n_piFunctionMnemonicsLength [ 16 ] =
 static double long PI = 3.141592653589793238462643383279502884197069399375105820974944592307816406286208998628034825342117067982148086513282306647093844;
 
 HExpression::HExpression( void )
-	: f_iIndex( 0 ), f_iLength( 0 ), f_eError( OK ),
-	f_oConstantsPool(), f_oTerminalIndexes(), f_oFormula(),
-	f_oEquationTree()
+	: _index( 0 ), _length( 0 ), _error( OK ),
+	_constantsPool(), _terminalIndexes(), _formula(),
+	_equationTree()
 	{
 	M_PROLOG
-	yaal::fill( f_pdVariables, f_pdVariables + 26, 0 );
+	yaal::fill( _variables, _variables + 26, 0 );
 	return;
 	M_EPILOG
 	}
 
 HExpression::HExpression( HString const& formula )
-	: f_iIndex( 0 ), f_iLength( 0 ), f_eError( OK ),
-	f_oConstantsPool(), f_oTerminalIndexes(), f_oFormula(),
-	f_oEquationTree()
+	: _index( 0 ), _length( 0 ), _error( OK ),
+	_constantsPool(), _terminalIndexes(), _formula(),
+	_equationTree()
 	{
 	M_PROLOG
-	yaal::fill( f_pdVariables, f_pdVariables + 26, 0 );
+	yaal::fill( _variables, _variables + 26, 0 );
 	compile( formula );
 	return;
 	M_EPILOG
@@ -160,13 +160,13 @@ HExpression::~HExpression( void )
 	}
 
 HExpression::HExpression( HExpression const& ex )
-	: f_iIndex( ex.f_iIndex ), f_iLength( ex.f_iLength ), f_eError( ex.f_eError ),
-	f_oConstantsPool( ex.f_oConstantsPool ),
-	f_oTerminalIndexes( ex.f_oTerminalIndexes ), f_oFormula( ex.f_oFormula ),
-	f_oEquationTree( ex.f_oEquationTree )
+	: _index( ex._index ), _length( ex._length ), _error( ex._error ),
+	_constantsPool( ex._constantsPool ),
+	_terminalIndexes( ex._terminalIndexes ), _formula( ex._formula ),
+	_equationTree( ex._equationTree )
 	{
 	M_PROLOG
-	yaal::copy( ex.f_pdVariables, ex.f_pdVariables + 26, f_pdVariables );
+	yaal::copy( ex._variables, ex._variables + 26, _variables );
 	return;
 	M_EPILOG
 	}
@@ -189,579 +189,577 @@ void HExpression::swap( HExpression& ex )
 	if ( &ex != this )
 		{
 		using yaal::swap;
-		swap( f_iIndex, ex.f_iIndex );
-		swap( f_iLength, ex.f_iLength );
-		swap( f_eError, ex.f_eError );
-		f_oConstantsPool.swap( ex.f_oConstantsPool );
-		f_oTerminalIndexes.swap( ex.f_oTerminalIndexes );
-		f_oFormula.swap( ex.f_oFormula );
-		f_oEquationTree.swap( ex.f_oEquationTree );
-		yaal::swap_ranges( f_pdVariables, f_pdVariables + 26, ex.f_pdVariables );
+		swap( _index, ex._index );
+		swap( _length, ex._length );
+		swap( _error, ex._error );
+		_constantsPool.swap( ex._constantsPool );
+		_terminalIndexes.swap( ex._terminalIndexes );
+		_formula.swap( ex._formula );
+		_equationTree.swap( ex._equationTree );
+		yaal::swap_ranges( _variables, _variables + 26, ex._variables );
 		}
 	return;
 	M_EPILOG
 	}
 
-double long HExpression::count_branch( tree_t::const_node_t a_roNode )
+double long HExpression::count_branch( tree_t::const_node_t node_ )
 	{
 	M_PROLOG
-	int l_iIndex = 0;
-	double long l_dValue = 0;
-	if ( a_roNode->has_childs() )
-		l_dValue = ( this->*( (*a_roNode)->METHOD ) )( a_roNode );
+	int index = 0;
+	double long value = 0;
+	if ( node_->has_childs() )
+		value = ( this->*( (*node_)->METHOD ) )( node_ );
 	else
 		{
-		l_iIndex = (*a_roNode)->f_oVariables.head();
-		if ( l_iIndex >= 0 )
-			l_dValue = f_pdVariables[ l_iIndex ];
+		index = (*node_)->_variables.head();
+		if ( index >= 0 )
+			value = _variables[ index ];
 		else
-			l_dValue = f_oConstantsPool[ - 1 - l_iIndex ];
+			value = _constantsPool[ - 1 - index ];
 		}
-	return ( l_dValue );
+	return ( value );
 	M_EPILOG
 	}
 
-double long HExpression::functions( tree_t::const_node_t a_roNode )
+double long HExpression::functions( tree_t::const_node_t node_ )
 	{
 	M_PROLOG
-	int l_iFunction = (*a_roNode)->f_oVariables.tail();
-	double long l_dLeftValue = 0;
-	l_dLeftValue = count_branch( &*a_roNode->begin() );
+	int function = (*node_)->_variables.tail();
+	double long leftValue = 0;
+	leftValue = count_branch( &*node_->begin() );
 	double long retVal = 0;
-	switch ( l_iFunction )
+	switch ( function )
 		{
 		case ( FUNCTION::SIN ):
-			retVal = ::std::sin( l_dLeftValue );
+			retVal = ::std::sin( leftValue );
 		break;
 		case ( FUNCTION::SINH ):
-			retVal = ::std::sinh( l_dLeftValue );
+			retVal = ::std::sinh( leftValue );
 		break;
 		case ( FUNCTION::COS ):
-			retVal = ::std::cos( l_dLeftValue );
+			retVal = ::std::cos( leftValue );
 		break;
 		case ( FUNCTION::COSH ):
-			retVal = ::std::cosh( l_dLeftValue );
+			retVal = ::std::cosh( leftValue );
 		break;
 		case ( FUNCTION::TG	):
 			{
-			if ( eq( ::std::floor( l_dLeftValue / PI + .5 ),
-						( l_dLeftValue / PI + .5 ) ) )
+			if ( eq( ::std::floor( leftValue / PI + .5 ),
+						( leftValue / PI + .5 ) ) )
 				throw HExpressionException( _( "tg: argument not in domain" ) );
-			retVal = ::std::tan( l_dLeftValue );
+			retVal = ::std::tan( leftValue );
 			}
 		break;
 		case ( FUNCTION::TGH ):
-			retVal = ::std::tanh( l_dLeftValue );
+			retVal = ::std::tanh( leftValue );
 		break;
 		case ( FUNCTION::CTG ):
 			{
-			if ( eq( ::std::floor( l_dLeftValue / PI ),
-						( l_dLeftValue / PI ) ) )
+			if ( eq( ::std::floor( leftValue / PI ),
+						( leftValue / PI ) ) )
 				throw HExpressionException( _( "ctg: argument not in domain" ) );
-			l_dLeftValue = ::std::tan( l_dLeftValue );
-			if ( l_dLeftValue == 0 )
+			leftValue = ::std::tan( leftValue );
+			if ( leftValue == 0 )
 				retVal = 0;
-			retVal = 1. / l_dLeftValue;
+			retVal = 1. / leftValue;
 			}
 		break;
 		case ( FUNCTION::CTGH ):
 			{
-			l_dLeftValue = ::std::tanh( l_dLeftValue );
-			if ( l_dLeftValue == 0 )
+			leftValue = ::std::tanh( leftValue );
+			if ( leftValue == 0 )
 				retVal = 0;
-			retVal = 1. / l_dLeftValue;
+			retVal = 1. / leftValue;
 			}
 		break;
 		case ( FUNCTION::ARCSIN ):
 			{
-			if ( ( l_dLeftValue < - PI / 2 ) || ( l_dLeftValue > PI / 2 ) )
+			if ( ( leftValue < - PI / 2 ) || ( leftValue > PI / 2 ) )
 				throw HExpressionException( _( "arcsin: argument not in domain" ) );
-			retVal = ::std::asin( l_dLeftValue );
+			retVal = ::std::asin( leftValue );
 			}
 		break;
 		case ( FUNCTION::ARCCOS ):
 			{
-			if ( ( l_dLeftValue < - PI / 2 ) || ( l_dLeftValue > PI / 2 ) )
+			if ( ( leftValue < - PI / 2 ) || ( leftValue > PI / 2 ) )
 				throw HExpressionException( _( "arccos: argument not in domain" ) );
-			retVal = ::std::acos( l_dLeftValue );
+			retVal = ::std::acos( leftValue );
 			}
 		break;
 		case ( FUNCTION::ARCTG ):
-			retVal = ::std::atan( l_dLeftValue );
+			retVal = ::std::atan( leftValue );
 		break;
 		case ( FUNCTION::ARCCTG ):
-			retVal = PI - std::atan( l_dLeftValue );
+			retVal = PI - std::atan( leftValue );
 		break;
 		case ( FUNCTION::EXP ):
-			retVal = ::std::exp( l_dLeftValue );
+			retVal = ::std::exp( leftValue );
 		break;
 		case ( FUNCTION::SQRT ):
 			{
-			if ( l_dLeftValue < 0 )
+			if ( leftValue < 0 )
 				throw HExpressionException( _( "sqrt: argument not in domain" ) );
-			retVal = ::std::sqrt( l_dLeftValue );
+			retVal = ::std::sqrt( leftValue );
 			}
 		break;
 		case ( FUNCTION::LN ):
 			{
-			if ( l_dLeftValue <= 0 )
+			if ( leftValue <= 0 )
 				throw HExpressionException( _( "ln: argument not in domain" ) );
-			retVal = ::std::log( l_dLeftValue );
+			retVal = ::std::log( leftValue );
 			}
 		break;
 		case ( FUNCTION::LOG ):
 			{
-			if ( l_dLeftValue <= 0 )
+			if ( leftValue <= 0 )
 				throw HExpressionException( _( "log: argument not in domain" ) );
-			retVal = ::std::log10( l_dLeftValue );
+			retVal = ::std::log10( leftValue );
 			}
 		break;
 		case ( FUNCTION::ABS ):
-			retVal = ( l_dLeftValue < 0 ) ? -l_dLeftValue : l_dLeftValue;
+			retVal = ( leftValue < 0 ) ? -leftValue : leftValue;
 		break;
 		default:
-			M_THROW( _( "unknown function type" ), l_iFunction );
+			M_THROW( _( "unknown function type" ), function );
 		}
 	return ( retVal );
 	M_EPILOG
 	}
 
-double long HExpression::addition( tree_t::const_node_t a_roNode )
+double long HExpression::addition( tree_t::const_node_t node_ )
 	{
 	M_PROLOG
-	int l_iOperator = 0;
-	double long l_dLeftValue = 0, l_dRightValue = 0;
-	tree_t::const_iterator it = a_roNode->begin();
-	int_list_t::const_iterator var = (*a_roNode)->f_oVariables.begin();
-	l_dLeftValue = count_branch( &*it );
-	while ( ( ++ it ) != a_roNode->end() )
+	double long leftValue = 0, rightValue = 0;
+	tree_t::const_iterator it = node_->begin();
+	int_list_t::const_iterator var = (*node_)->_variables.begin();
+	leftValue = count_branch( &*it );
+	while ( ( ++ it ) != node_->end() )
 		{
-		l_iOperator = *var;
+		int op( *var );
 		++ var;
-		l_dRightValue = count_branch( &*it );
-		switch ( l_iOperator )
+		rightValue = count_branch( &*it );
+		switch ( op )
 			{
 			case ( OPERATOR::ADD ) :
-				l_dLeftValue += l_dRightValue;
+				leftValue += rightValue;
 			break;
 			case ( OPERATOR::SUBSTRACT ) :
-				l_dLeftValue -= l_dRightValue;
+				leftValue -= rightValue;
 			break;
 			default:
-				M_THROW( _( "unknown addition operator" ), l_iOperator );
+				M_THROW( _( "unknown addition operator" ), op );
 			}
 		}
-	return ( l_dLeftValue );
+	return ( leftValue );
 	M_EPILOG
 	}
 
-double long HExpression::multiplication( tree_t::const_node_t a_roNode )
+double long HExpression::multiplication( tree_t::const_node_t node_ )
 	{
 	M_PROLOG
-	int l_iOperator = 0;
-	double long l_dLeftValue = 0, l_dRightValue = 0;
-	tree_t::const_iterator it = a_roNode->begin();
-	int_list_t::const_iterator var = (*a_roNode)->f_oVariables.begin();
-	l_dLeftValue = count_branch( &*it );
-	while ( ( ++ it ) != a_roNode->end() )
+	double long leftValue = 0, rightValue = 0;
+	tree_t::const_iterator it = node_->begin();
+	int_list_t::const_iterator var = (*node_)->_variables.begin();
+	leftValue = count_branch( &*it );
+	while ( ( ++ it ) != node_->end() )
 		{
-		l_iOperator =  *var;
+		int op =  *var;
 		++ var;
-		l_dRightValue = count_branch( &*it );
-		switch ( l_iOperator )
+		rightValue = count_branch( &*it );
+		switch ( op )
 			{
 			case ( OPERATOR::MULTIPLY ) :
-				l_dLeftValue *= l_dRightValue;
+				leftValue *= rightValue;
 			break;
 			case ( OPERATOR::DIVIDE ) :
-				if ( ! l_dRightValue )
+				if ( ! rightValue )
 					throw HExpressionException( _( "divide by 0" ) );
-				l_dLeftValue /= l_dRightValue;
+				leftValue /= rightValue;
 			break;
 			case ( OPERATOR::MODULO ) :
-				if ( ! static_cast<int long>( l_dRightValue ) )
+				if ( ! static_cast<int long>( rightValue ) )
 					throw HExpressionException( _( "modulo by 0" ) );
-				l_dLeftValue = static_cast<double long>( static_cast<int long>( l_dLeftValue ) % static_cast<int long>( l_dRightValue ) );
+				leftValue = static_cast<double long>( static_cast<int long>( leftValue ) % static_cast<int long>( rightValue ) );
 			break;
 			default:
-				M_THROW( _( "unknown multiplication operator" ), l_iOperator );
+				M_THROW( _( "unknown multiplication operator" ), op );
 			}
 		}
-	return ( l_dLeftValue );
+	return ( leftValue );
 	M_EPILOG
 	}
 
-double long HExpression::power( tree_t::const_node_t a_roNode )
+double long HExpression::power( tree_t::const_node_t node_ )
 	{
 	M_PROLOG
-	double long l_dLeftValue, l_dRightValue;
-	tree_t::const_iterator it = a_roNode->begin();
-	l_dLeftValue = count_branch ( &*it );
-	l_dRightValue = count_branch ( &*( ++ it ) );
-	if ( ( l_dLeftValue < 0 )
-			&& ( ! eq( l_dRightValue, ::floorl( l_dRightValue ) ) ) )
+	double long leftValue, rightValue;
+	tree_t::const_iterator it = node_->begin();
+	leftValue = count_branch ( &*it );
+	rightValue = count_branch ( &*( ++ it ) );
+	if ( ( leftValue < 0 )
+			&& ( ! eq( rightValue, ::floorl( rightValue ) ) ) )
 		return ( 0 );
-	return ( ::powl( l_dLeftValue, l_dRightValue ) );
+	return ( ::powl( leftValue, rightValue ) );
 	M_EPILOG
 	}
 
-double long HExpression::signum( tree_t::const_node_t a_roNode )
+double long HExpression::signum( tree_t::const_node_t node_ )
 	{
 	M_PROLOG
-	double long l_dLeftValue;
-	l_dLeftValue = count_branch( &*a_roNode->begin() );
-	return ( -l_dLeftValue );
+	double long leftValue;
+	leftValue = count_branch( &*node_->begin() );
+	return ( -leftValue );
 	M_EPILOG
 	}
 
-double long HExpression::bracket( tree_t::const_node_t a_roNode )
+double long HExpression::bracket( tree_t::const_node_t node_ )
 	{
 	M_PROLOG
-	double long l_dLeftValue;
-	l_dLeftValue = count_branch( &*a_roNode->begin() );
-	return ( l_dLeftValue );
+	double long leftValue;
+	leftValue = count_branch( &*node_->begin() );
+	return ( leftValue );
 	M_EPILOG
 	}
 
-bool HExpression::translate( HString const& a_oFormula )
+bool HExpression::translate( HString const& formula_ )
 	{
 	M_PROLOG
-	int l_iIndex = 0, l_iRealIndex = 0, l_iCtr = 0;
-	int long l_iLength = a_oFormula.get_length();
-	f_oFormula.hs_realloc( l_iLength + 1 ); /* + 1 for trailing null */
-	f_oFormula.fillz( '\0', 0, l_iLength );
-	f_oTerminalIndexes.resize( l_iLength + 1 );
-	while ( l_iIndex < l_iLength )
+	int index = 0, realIndex = 0, ctr = 0;
+	int long length = formula_.get_length();
+	_formula.hs_realloc( length + 1 ); /* + 1 for trailing null */
+	_formula.fillz( '\0', 0, length );
+	_terminalIndexes.resize( length + 1 );
+	while ( index < length )
 		{
-		f_oTerminalIndexes[ l_iRealIndex ] = l_iIndex;
-		if ( ( a_oFormula[ l_iIndex ] >= 'a' )
-				&& ( a_oFormula[ l_iIndex ] <= 'z' ) )
+		_terminalIndexes[ realIndex ] = index;
+		if ( ( formula_[ index ] >= 'a' )
+				&& ( formula_[ index ] <= 'z' ) )
 			{
-			for ( l_iCtr = 0; l_iCtr < 16; l_iCtr++ )
-				if ( strncmp( a_oFormula.raw() + l_iIndex,
-							n_ppcFunctionsMnemonics[ l_iCtr ],
-							n_piFunctionMnemonicsLength[ l_iCtr ] ) == 0 )
+			for ( ctr = 0; ctr < 16; ctr++ )
+				if ( strncmp( formula_.raw() + index,
+							_functionsMnemonics_[ ctr ],
+							_functionMnemonicsLength_[ ctr ] ) == 0 )
 				{
-				f_oFormula.set_at( l_iRealIndex, static_cast<char>( l_iCtr + 1 ) );
+				_formula.set_at( realIndex, static_cast<char>( ctr + 1 ) );
 				break;
 				}
-			if ( l_iCtr < 16 )
+			if ( ctr < 16 )
 				{
-				l_iIndex += n_piFunctionMnemonicsLength[ l_iCtr ];
-				l_iRealIndex ++;
+				index += _functionMnemonicsLength_[ ctr ];
+				realIndex ++;
 				}
 			else
 				{
-				f_eError = UNKNOWN_MNEMONIC;
-				f_iIndex = l_iRealIndex;
+				_error = UNKNOWN_MNEMONIC;
+				_index = realIndex;
 				return ( true );
 				}
 			}
 		else
 			{
-			f_oFormula.set_at( l_iRealIndex, a_oFormula[ l_iIndex ] );
-			l_iIndex ++;
-			l_iRealIndex ++;
+			_formula.set_at( realIndex, formula_[ index ] );
+			index ++;
+			realIndex ++;
 			}
-		f_iLength = l_iRealIndex;
+		_length = realIndex;
 		}
-	f_oTerminalIndexes[ l_iRealIndex ] = l_iIndex;
+	_terminalIndexes[ realIndex ] = index;
 	return ( false );
 	M_EPILOG
 	}
 
-bool HExpression::addition_production( tree_t::node_t a_roNode )
+bool HExpression::addition_production( tree_t::node_t node_ )
 	{
 	M_PROLOG
-	M_ASSERT ( a_roNode );
-	if ( multiplication_production( &*a_roNode->add_node() ) )
+	M_ASSERT ( node_ );
+	if ( multiplication_production( &*node_->add_node() ) )
 		return ( true );
-	if ( f_iIndex > f_iLength )
+	if ( _index > _length )
 		{
-		f_eError = UNEXPECTED_TERMINATION;
+		_error = UNEXPECTED_TERMINATION;
 		return ( true );
 		}
-	(**a_roNode).METHOD = &HExpression::addition;
-	if ( ( f_oFormula[ f_iIndex ] != OPERATOR::ADD )
-			&& ( f_oFormula[ f_iIndex ] != OPERATOR::SUBSTRACT ) )
+	(**node_).METHOD = &HExpression::addition;
+	if ( ( _formula[ _index ] != OPERATOR::ADD )
+			&& ( _formula[ _index ] != OPERATOR::SUBSTRACT ) )
 		{
-		shorten_the_branch( a_roNode );
+		shorten_the_branch( node_ );
 		return ( false );
 		}
-	while ( ( f_oFormula [ f_iIndex ] == OPERATOR::ADD )
-			|| ( f_oFormula [ f_iIndex ] == OPERATOR::SUBSTRACT ) )
+	while ( ( _formula [ _index ] == OPERATOR::ADD )
+			|| ( _formula [ _index ] == OPERATOR::SUBSTRACT ) )
 		{
-		(**a_roNode).f_oVariables.push_back( f_oFormula[ f_iIndex ++ ] );
-		if ( multiplication_production( &*a_roNode->add_node() ) )
+		(**node_)._variables.push_back( _formula[ _index ++ ] );
+		if ( multiplication_production( &*node_->add_node() ) )
 			return ( true );
 		}
 	return ( false );
 	M_EPILOG
 	}
 
-bool HExpression::multiplication_production( tree_t::node_t a_roNode )
+bool HExpression::multiplication_production( tree_t::node_t node_ )
 	{
 	M_PROLOG
-	if ( power_production( &*a_roNode->add_node() ) )
+	if ( power_production( &*node_->add_node() ) )
 		return ( true );
-	if ( f_iIndex > f_iLength )
+	if ( _index > _length )
 		{
-		f_eError = UNEXPECTED_TERMINATION;
+		_error = UNEXPECTED_TERMINATION;
 		return ( true );
 		}
-	(**a_roNode).METHOD = &HExpression::multiplication;
-	if ( ( f_oFormula[ f_iIndex ] != OPERATOR::MULTIPLY )
-			&& ( f_oFormula[ f_iIndex ] != OPERATOR::DIVIDE )
-			&& ( f_oFormula[ f_iIndex ] != OPERATOR::MODULO ) )
+	(**node_).METHOD = &HExpression::multiplication;
+	if ( ( _formula[ _index ] != OPERATOR::MULTIPLY )
+			&& ( _formula[ _index ] != OPERATOR::DIVIDE )
+			&& ( _formula[ _index ] != OPERATOR::MODULO ) )
 		{
-		shorten_the_branch( a_roNode );
+		shorten_the_branch( node_ );
 		return ( false );
 		}
-	while ( ( f_oFormula[ f_iIndex ] == OPERATOR::MULTIPLY )
-			|| ( f_oFormula[ f_iIndex ] == OPERATOR::DIVIDE )
-			|| ( f_oFormula[ f_iIndex ] == OPERATOR::MODULO ) )
+	while ( ( _formula[ _index ] == OPERATOR::MULTIPLY )
+			|| ( _formula[ _index ] == OPERATOR::DIVIDE )
+			|| ( _formula[ _index ] == OPERATOR::MODULO ) )
 		{
-		(**a_roNode).f_oVariables.push_back( f_oFormula[ f_iIndex ++ ] );
-		if ( power_production( &*a_roNode->add_node() ) )
+		(**node_)._variables.push_back( _formula[ _index ++ ] );
+		if ( power_production( &*node_->add_node() ) )
 			return ( true );
 		}
 	return ( false );
 	M_EPILOG
 	}
 
-void HExpression::shorten_the_branch( tree_t::node_t a_poNode )
+void HExpression::shorten_the_branch( tree_t::node_t node_ )
 	{
 	M_PROLOG
-	tree_t::node_t parent = a_poNode->get_parent();
+	tree_t::node_t parent = node_->get_parent();
 	if ( parent )
 		{
-		M_ASSERT( a_poNode->child_count() == 1 );
+		M_ASSERT( node_->child_count() == 1 );
 		tree_t::iterator it;
 		for ( it = parent->begin(); it != parent->end(); ++ it )
 			{
-			if ( &*it == a_poNode )
+			if ( &*it == node_ )
 				break;
 			}
 		M_ASSERT( it != parent->end() );
-		parent->replace_node( it, &*a_poNode->begin() );
+		parent->replace_node( it, &*node_->begin() );
 		}
 	return;
 	M_EPILOG
 	}
 
-bool HExpression::power_production( tree_t::node_t a_roNode )
+bool HExpression::power_production( tree_t::node_t node_ )
 	{
 	M_PROLOG
-	if ( signum_production( &*a_roNode->add_node() ) )
+	if ( signum_production( &*node_->add_node() ) )
 		return ( true );
-	if ( f_iIndex > f_iLength )
+	if ( _index > _length )
 		{
-		f_eError = UNEXPECTED_TERMINATION;
+		_error = UNEXPECTED_TERMINATION;
 		return ( true );
 		}
-	(**a_roNode).METHOD = &HExpression::bracket;
-	if ( f_oFormula[ f_iIndex ] == '^' )
+	(**node_).METHOD = &HExpression::bracket;
+	if ( _formula[ _index ] == '^' )
 		{
-		f_iIndex ++;
-		if ( power_production( &*a_roNode->add_node() ) )
+		_index ++;
+		if ( power_production( &*node_->add_node() ) )
 			return ( true );
-		(**a_roNode).METHOD = &HExpression::power;
+		(**node_).METHOD = &HExpression::power;
 		}
 	else
-		shorten_the_branch( a_roNode );
+		shorten_the_branch( node_ );
 	return ( false );
 	M_EPILOG
 	}
 
-bool HExpression::signum_production( tree_t::node_t a_roNode )
+bool HExpression::signum_production( tree_t::node_t node_ )
 	{
 	M_PROLOG
-	if ( f_iIndex > f_iLength )
+	if ( _index > _length )
 		{
-		f_eError = UNEXPECTED_TERMINATION;
+		_error = UNEXPECTED_TERMINATION;
 		return ( true );
 		}
-	if ( f_oFormula[ f_iIndex ] == '-' )
+	if ( _formula[ _index ] == '-' )
 		{
-		f_iIndex ++;
-		if ( terminal_production( &*a_roNode->add_node() ) )
+		_index ++;
+		if ( terminal_production( &*node_->add_node() ) )
 			return ( true );
-		(**a_roNode).METHOD = &HExpression::signum;
+		(**node_).METHOD = &HExpression::signum;
 		}
 	else
-		if ( terminal_production( a_roNode ) )
+		if ( terminal_production( node_ ) )
 			return ( true );
 	return ( false );
 	M_EPILOG
 	}
 
-bool HExpression::terminal_production( tree_t::node_t a_roNode )
+bool HExpression::terminal_production( tree_t::node_t node_ )
 	{
 	M_PROLOG
-	if ( f_iIndex > f_iLength )
+	if ( _index > _length )
 		{
-		f_eError = UNEXPECTED_TERMINATION;
+		_error = UNEXPECTED_TERMINATION;
 		return ( true );
 		}
-	switch ( f_oFormula [ f_iIndex ] )
+	switch ( _formula [ _index ] )
 		{
 		case '(' :
 			{
-			f_iIndex ++;
-			if ( addition_production ( a_roNode ) )
+			_index ++;
+			if ( addition_production ( node_ ) )
 				return ( true );
-			if ( f_oFormula [ f_iIndex ] != ')' )
+			if ( _formula [ _index ] != ')' )
 				{
-				f_eError = CLOSING_BRACKET_EXPECTED;
+				_error = CLOSING_BRACKET_EXPECTED;
 				return ( true );
 				}
 			else
-				f_iIndex ++;
+				_index ++;
 			return ( false );
 			}
 		case '|' :
 			{
-			f_iIndex ++;
-			if ( addition_production ( &*a_roNode->add_node() ) )
+			_index ++;
+			if ( addition_production ( &*node_->add_node() ) )
 				return ( true );
-			(**a_roNode).METHOD = &HExpression::functions;
-			(**a_roNode).f_oVariables.push_back( FUNCTION::ABS );
-			if ( f_oFormula[ f_iIndex ] != '|' )
+			(**node_).METHOD = &HExpression::functions;
+			(**node_)._variables.push_back( FUNCTION::ABS );
+			if ( _formula[ _index ] != '|' )
 				{
-				f_eError = CLOSING_ABSOLUTE_EXPECTED;
+				_error = CLOSING_ABSOLUTE_EXPECTED;
 				return ( true );
 				}
 			else
-				f_iIndex ++;
+				_index ++;
 			return ( false );
 			}
 		default:
 			break;
 		}
-	if ( ( f_oFormula[ f_iIndex ] >= 'A' )
-			&& ( f_oFormula[ f_iIndex ] <= 'Z' ) )
+	if ( ( _formula[ _index ] >= 'A' )
+			&& ( _formula[ _index ] <= 'Z' ) )
 		{
-		(**a_roNode).f_oVariables.push_back( f_oFormula[ f_iIndex ++ ] - 'A' );
+		(**node_)._variables.push_back( _formula[ _index ++ ] - 'A' );
 		return ( false );
 		}
-	if ( ( f_oFormula[ f_iIndex ] > FUNCTION::FUNCTIONS )
-			&& ( f_oFormula[ f_iIndex ] < FUNCTION::ABS ) )
+	if ( ( _formula[ _index ] > FUNCTION::FUNCTIONS )
+			&& ( _formula[ _index ] < FUNCTION::ABS ) )
 		{
-		f_iIndex ++;
-		if ( f_oFormula[ f_iIndex ] == '(' )
+		_index ++;
+		if ( _formula[ _index ] == '(' )
 			{
-			f_iIndex ++;
-			(**a_roNode).METHOD = &HExpression::functions;
-			(**a_roNode).f_oVariables.push_back ( static_cast<int>( f_oFormula[ f_iIndex - 2 ] ) );
-			if ( addition_production ( &*a_roNode->add_node() ) )
+			_index ++;
+			(**node_).METHOD = &HExpression::functions;
+			(**node_)._variables.push_back ( static_cast<int>( _formula[ _index - 2 ] ) );
+			if ( addition_production ( &*node_->add_node() ) )
 				return ( true );
-			if ( f_oFormula [ f_iIndex ] != ')' )
+			if ( _formula [ _index ] != ')' )
 				{
-				f_eError = CLOSING_FUNCTION_BRACKET_EXPECTED;
+				_error = CLOSING_FUNCTION_BRACKET_EXPECTED;
 				return ( true );
 				}
 			else
-				f_iIndex ++;
+				_index ++;
 			}
 		else
 			{
-			f_eError = OPENING_FUNCTION_BRACKET_EXPECTED;
+			_error = OPENING_FUNCTION_BRACKET_EXPECTED;
 			return ( true );
 			}
 		return ( false );
 		}
-	if ( ( f_oFormula [ f_iIndex ] >= '0' )
-			&& ( f_oFormula [ f_iIndex ] <= '9' ) )
+	if ( ( _formula [ _index ] >= '0' )
+			&& ( _formula [ _index ] <= '9' ) )
 		{
-		double long l_dValue = 0;
-		int l_iOffset = f_iIndex;
-		if ( f_iIndex > f_iLength )
+		double long value = 0;
+		int offset = _index;
+		if ( _index > _length )
 			{
-			f_eError = UNEXPECTED_TERMINATION;
+			_error = UNEXPECTED_TERMINATION;
 			return ( true );
 			}
-		while ( ( f_oFormula [ f_iIndex ] >= '0' )
-				&& ( f_oFormula [ f_iIndex ] <= '9' ) )
-			f_iIndex ++;
-		if ( f_oFormula [ f_iIndex ] == '.' )
+		while ( ( _formula [ _index ] >= '0' )
+				&& ( _formula [ _index ] <= '9' ) )
+			_index ++;
+		if ( _formula [ _index ] == '.' )
 			{
-			f_iIndex ++;
-			if ( ( f_oFormula [ f_iIndex ] >= '0' )
-					&& ( f_oFormula [ f_iIndex ] <= '9' ) )
-				while ( ( f_oFormula [ f_iIndex ] >= '0' )
-						&& ( f_oFormula [ f_iIndex ] <= '9' ) )
-					f_iIndex ++;
+			_index ++;
+			if ( ( _formula [ _index ] >= '0' )
+					&& ( _formula [ _index ] <= '9' ) )
+				while ( ( _formula [ _index ] >= '0' )
+						&& ( _formula [ _index ] <= '9' ) )
+					_index ++;
 			else
 				{
-				f_eError = DIGIT_EXPECTED;
+				_error = DIGIT_EXPECTED;
 				return ( true );
 				}
 			}
-		l_dValue = ::strtod( f_oFormula.raw() + l_iOffset, NULL );
-		f_oConstantsPool.push_back( l_dValue );
+		value = ::strtod( _formula.raw() + offset, NULL );
+		_constantsPool.push_back( value );
 		/* We save variables as positive indexes and constants as negative
 		 * indexes, positive and negative 0 index would conflict so
 		 * we shift negative indexes by 1, so 0 becomes -1, 1 becomes -2,
 		 * 2 becomes -3, and so on and so forth.
 		 * HArray::size() returns current access/addition peak for revelant pool,
 		 * so to get index of lately added value we need to decrement size by 1. */
-		(**a_roNode).f_oVariables.push_back( static_cast<int>( - ( f_oConstantsPool.size() - 1 ) - 1 ) );
+		(**node_)._variables.push_back( static_cast<int>( - ( _constantsPool.size() - 1 ) - 1 ) );
 		return ( false );
 		}
-	f_eError = UNEXPECTED_TOKEN;
+	_error = UNEXPECTED_TOKEN;
 	return ( true );
 	M_EPILOG
 	}
 
-double long* HExpression::compile( HString const& a_oFormula )
+double long* HExpression::compile( HString const& formula_ )
 	{
 	M_PROLOG
-	int long l_iLength = 0;
-	f_iIndex = 0;
-	f_eError = OK;
-	l_iLength = a_oFormula.get_length();
-	if ( l_iLength == 0 )
+	int long length = 0;
+	_index = 0;
+	_error = OK;
+	length = formula_.get_length();
+	if ( length == 0 )
 		{
-		f_eError = PREMATURE_TERMINATION;
-		throw HExpressionException( n_pcSyntaxError );
+		_error = PREMATURE_TERMINATION;
+		throw HExpressionException( _syntaxError_ );
 		}
-	if ( translate( a_oFormula ) )
-		throw HExpressionException( n_pcSyntaxError );
-	f_oConstantsPool.clear();
-	tree_t::node_t root = f_oEquationTree.create_new_root();
+	if ( translate( formula_ ) )
+		throw HExpressionException( _syntaxError_ );
+	_constantsPool.clear();
+	tree_t::node_t root = _equationTree.create_new_root();
 	if ( ! addition_production( root ) )
 		{
-		if ( ( f_iIndex < f_iLength ) && ( f_eError == OK ) )
-			f_eError = UNEXPECTED_TOKEN;
+		if ( ( _index < _length ) && ( _error == OK ) )
+			_error = UNEXPECTED_TOKEN;
 		}
-	else if ( f_iIndex >= f_iLength )
-		f_eError = UNEXPECTED_TERMINATION;
-	if ( f_eError != OK )
-		throw HExpressionException( n_pcSyntaxError );
-	return ( f_pdVariables );
+	else if ( _index >= _length )
+		_error = UNEXPECTED_TERMINATION;
+	if ( _error != OK )
+		throw HExpressionException( _syntaxError_ );
+	return ( _variables );
 	M_EPILOG
 	}
 
 double long* HExpression::variables( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_eError == OK );
-	return ( f_pdVariables );
+	M_ASSERT( _error == OK );
+	return ( _variables );
 	M_EPILOG
 	}
 
-double long& HExpression::operator[]( int a_iIndex )
+double long& HExpression::operator[]( int index_ )
 	{
 	M_PROLOG
-	if ( ( a_iIndex >= 'a' ) && ( a_iIndex <= 'a' ) )
-		a_iIndex = ( a_iIndex - 'a' ) + 'A';
+	if ( ( index_ >= 'a' ) && ( index_ <= 'a' ) )
+		index_ = ( index_ - 'a' ) + 'A';
 	double long* val = NULL;
-	if ( ( a_iIndex >= 0 ) && ( a_iIndex < 26 ) )
-		val = &f_pdVariables[ a_iIndex ];
-	else if ( ( a_iIndex >= 'A' ) && ( a_iIndex <= 'Z' ) )
-		val = &f_pdVariables[ a_iIndex - 'A' ];
+	if ( ( index_ >= 0 ) && ( index_ < 26 ) )
+		val = &_variables[ index_ ];
+	else if ( ( index_ >= 'A' ) && ( index_ <= 'Z' ) )
+		val = &_variables[ index_ - 'A' ];
 	else
-		M_THROW( "index out of range", a_iIndex );
+		M_THROW( "index out of range", index_ );
 	return ( *val );
 	M_EPILOG
 	}
@@ -769,9 +767,9 @@ double long& HExpression::operator[]( int a_iIndex )
 double long HExpression::evaluate( void )
 	{
 	M_PROLOG
-	tree_t::const_node_t root = f_oEquationTree.get_root();
+	tree_t::const_node_t root = _equationTree.get_root();
 	if ( ! root )
-		M_THROW( "logic tree is not compiled", f_eError );
+		M_THROW( "logic tree is not compiled", _error );
 	return ( ( this->* ( (*root)->METHOD ) ) ( root ) );
 	M_EPILOG
 	}
@@ -779,7 +777,7 @@ double long HExpression::evaluate( void )
 char const* HExpression::get_error( void ) const
 	{
 	M_PROLOG
-	switch ( f_eError )
+	switch ( _error )
 		{
 		case ( OK ):
 			return ( _( "succesful" ) );
@@ -802,7 +800,7 @@ char const* HExpression::get_error( void ) const
 		case ( PREMATURE_TERMINATION ):
 			return ( _( "premature termination" ) );
 		default :
-			M_THROW ( _( "enknown error code" ), f_eError );
+			M_THROW ( _( "enknown error code" ), _error );
 		}
 	return ( NULL );
 	M_EPILOG
@@ -811,10 +809,10 @@ char const* HExpression::get_error( void ) const
 int HExpression::get_error_token( void ) const
 	{
 	M_PROLOG
-	if ( f_iLength > f_iIndex )
-		return ( f_oTerminalIndexes [ f_iIndex ] );
-	else if ( f_iIndex >= 0 )
-		return ( f_iLength );
+	if ( _length > _index )
+		return ( _terminalIndexes [ _index ] );
+	else if ( _index >= 0 )
+		return ( _length );
 	return ( 0 );
 	M_EPILOG
 	}

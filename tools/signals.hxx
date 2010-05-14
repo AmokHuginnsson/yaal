@@ -55,12 +55,12 @@ private:
 	typedef yaal::hcore::HMultiMap<int, handler_t> handlers_t;
 	typedef handlers_t::value_list_t handler_list_t;
 	typedef handlers_t::value_list_ptr_t handler_list_ptr_t;
-	static int f_iExitStatus;
-	bool f_bLoop;
-	yaal::hcore::HChunk f_oLocker;
+	static int _exitStatus;
+	bool _loop;
+	yaal::hcore::HChunk _locker;
 	yaal::hcore::HThread _thread;
-	yaal::hcore::HMutex f_oMutex;
-	handlers_t f_oHandlers;
+	yaal::hcore::HMutex _mutex;
+	handlers_t _handlers;
 public:
 	void register_handler( int, handler_t );
 private:

@@ -44,12 +44,12 @@ HWorkFlowInterface::task_t HWorkFlowInterface::pop_task( void )
 	M_EPILOG
 	}
 
-HWorkFlow::HWorkFlow( int a_iWorkerPoolSize )
-	: f_iWorkerPoolSize( a_iWorkerPoolSize ), f_iActiveWorkers( 0 ),
-	f_iBusyWorkers( 0 ), f_oPool(), f_oQueue(), f_oSemaphore(), f_oMutex()
+HWorkFlow::HWorkFlow( int workerPoolSize_ )
+	: _workerPoolSize( workerPoolSize_ ), _activeWorkers( 0 ),
+	_busyWorkers( 0 ), _pool(), _queue(), _semaphore(), _mutex()
 	{
 	M_PROLOG
-	M_ASSERT( f_iWorkerPoolSize > 0 );
+	M_ASSERT( _workerPoolSize > 0 );
 	return;
 	M_EPILOG
 	}
@@ -58,33 +58,33 @@ HWorkFlow::~HWorkFlow( void )
 	{
 	M_PROLOG
 		{
-		HLock l( f_oMutex );
-		f_iWorkerPoolSize = 0;
+		HLock l( _mutex );
+		_workerPoolSize = 0;
 		}
-	for ( pool_t::iterator it = f_oPool.begin(); it != f_oPool.end(); ++ it )
+	for ( pool_t::iterator it = _pool.begin(); it != _pool.end(); ++ it )
 		{
-		f_oSemaphore.signal();
+		_semaphore.signal();
 		(*it)->finish();
 		}
 	return;
 	M_EPILOG
 	}
 
-void HWorkFlow::push_task( task_t a_oCall )
+void HWorkFlow::push_task( task_t call_ )
 	{
 	M_PROLOG
-	HLock l( f_oMutex );
-	M_ASSERT( f_iBusyWorkers <= f_iActiveWorkers );
-	if ( ( f_iBusyWorkers == f_iActiveWorkers ) && ( f_iActiveWorkers < f_iWorkerPoolSize ) )
+	HLock l( _mutex );
+	M_ASSERT( _busyWorkers <= _activeWorkers );
+	if ( ( _busyWorkers == _activeWorkers ) && ( _activeWorkers < _workerPoolSize ) )
 		{
 		worker_ptr_t w( new HWorker( this ) );
-		f_oPool.push_back( w );
-		++ f_iActiveWorkers;
-		++ f_iBusyWorkers;
+		_pool.push_back( w );
+		++ _activeWorkers;
+		++ _busyWorkers;
 		w->spawn();
 		}
-	f_oQueue.push_back( a_oCall );
-	f_oSemaphore.signal();
+	_queue.push_back( call_ );
+	_semaphore.signal();
 	return;
 	M_EPILOG
 	}
@@ -94,26 +94,26 @@ HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void )
 	M_PROLOG
 	bool running = true;
 		{
-		HLock l( f_oMutex );
-		-- f_iBusyWorkers;
-		running = f_iWorkerPoolSize ? true : false;
+		HLock l( _mutex );
+		-- _busyWorkers;
+		running = _workerPoolSize ? true : false;
 		}
 	if ( running )
-		f_oSemaphore.wait();
-	HLock l( f_oMutex );
+		_semaphore.wait();
+	HLock l( _mutex );
 	HWorkFlow::task_t t;
-	if ( ! f_oQueue.is_empty() )
+	if ( ! _queue.is_empty() )
 		{
-		t = f_oQueue.front();
-		f_oQueue.pop_front();
-		++ f_iBusyWorkers;
+		t = _queue.front();
+		_queue.pop_front();
+		++ _busyWorkers;
 		}
 	return ( t );
 	M_EPILOG
 	}
 
-HWorkFlow::HWorker::HWorker( HWorkFlowInterface* a_poWorkFlow )
-	: f_poWorkFlow( a_poWorkFlow ), _thread()
+HWorkFlow::HWorker::HWorker( HWorkFlowInterface* workFlow_ )
+	: _workFlow( workFlow_ ), _thread()
 	{
 	return;
 	}
@@ -138,7 +138,7 @@ void* HWorkFlow::HWorker::run( void )
 	{
 	M_PROLOG
 	HWorkFlow::task_t t;
-	while ( !! ( t = f_poWorkFlow->pop_task() ) )
+	while ( !! ( t = _workFlow->pop_task() ) )
 		{
 		t->invoke();
 		t.reset();

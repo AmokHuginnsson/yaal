@@ -63,7 +63,7 @@ enum
 	ALREADY_LISTENING
 	};
 
-char const* const n_ppcErrMsgHSocket[ 4 ] =
+char const* const _errMsgHSocket_[ 4 ] =
 	{
 	_( "ok" ),
 	_( "socket not initialized" ),
@@ -71,44 +71,44 @@ char const* const n_ppcErrMsgHSocket[ 4 ] =
 	_( "already listening" )
 	};
 
-bool HSocket::f_bResolveHostnames = true;
+bool HSocket::_resolveHostnames = true;
 
-HSocket::HSocket( socket_type_t const a_eSocketType,
-		int const a_iMaximumNumberOfClients )
-	: HRawFile( !!( a_eSocketType & TYPE::SSL_SERVER )
+HSocket::HSocket( socket_type_t const socketType_,
+		int const maximumNumberOfClients_ )
+	: HRawFile( !!( socketType_ & TYPE::SSL_SERVER )
 			? HRawFile::TYPE::SSL_SERVER
-			: ( ( ( a_eSocketType == TYPE::DEFAULT ) || ( !!( a_eSocketType & TYPE::SSL_CLIENT ) ) )
+			: ( ( ( socketType_ == TYPE::DEFAULT ) || ( !!( socketType_ & TYPE::SSL_CLIENT ) ) )
 				? HRawFile::TYPE::SSL_CLIENT : HRawFile::TYPE::DEFAULT ) ),
-	f_bNeedShutdown( false ), f_eType( a_eSocketType ),
-	f_iMaximumNumberOfClients( a_iMaximumNumberOfClients ),
-	f_iAddressSize( 0 ), f_pvAddress( NULL ), f_poClients( NULL ),
-	f_oHostName()
+	_needShutdown( false ), _type( socketType_ ),
+	_maximumNumberOfClients( maximumNumberOfClients_ ),
+	_addressSize( 0 ), _address( NULL ), _clients( NULL ),
+	_hostName()
 	{
 	M_PROLOG
-	if ( f_eType == TYPE::DEFAULT )
-		f_eType |= TYPE::SSL_CLIENT;
-	if ( ( !!( a_eSocketType & TYPE::FILE ) ) && ( !!( a_eSocketType & TYPE::NETWORK ) ) )
-		M_THROW( _( "bad socket namespace setting" ), a_eSocketType.value() );
-	if ( ! ( a_eSocketType & ( socket_type_t( TYPE::FILE ) | TYPE::NETWORK ) ) )
-		f_eType |= TYPE::NETWORK;
-	if ( ( !!( a_eSocketType & TYPE::BLOCKING ) ) && ( !!( a_eSocketType & TYPE::NONBLOCKING ) ) )
-		M_THROW( _( "bad socket option" ), a_eSocketType.value() );
-	if ( ! ( a_eSocketType & ( socket_type_t( TYPE::BLOCKING ) | TYPE::NONBLOCKING ) ) )
-		f_eType |= TYPE::BLOCKING;
-	if ( f_iMaximumNumberOfClients >= 0 )
+	if ( _type == TYPE::DEFAULT )
+		_type |= TYPE::SSL_CLIENT;
+	if ( ( !!( socketType_ & TYPE::FILE ) ) && ( !!( socketType_ & TYPE::NETWORK ) ) )
+		M_THROW( _( "bad socket namespace setting" ), socketType_.value() );
+	if ( ! ( socketType_ & ( socket_type_t( TYPE::FILE ) | TYPE::NETWORK ) ) )
+		_type |= TYPE::NETWORK;
+	if ( ( !!( socketType_ & TYPE::BLOCKING ) ) && ( !!( socketType_ & TYPE::NONBLOCKING ) ) )
+		M_THROW( _( "bad socket option" ), socketType_.value() );
+	if ( ! ( socketType_ & ( socket_type_t( TYPE::BLOCKING ) | TYPE::NONBLOCKING ) ) )
+		_type |= TYPE::BLOCKING;
+	if ( _maximumNumberOfClients >= 0 )
 		{
-		M_ENSURE( ( f_iFileDescriptor = ::socket(
-						!!( f_eType & TYPE::NETWORK ) ? PF_INET : PF_UNIX,
+		M_ENSURE( ( _fileDescriptor = ::socket(
+						!!( _type & TYPE::NETWORK ) ? PF_INET : PF_UNIX,
 						static_cast<int>( SOCK_STREAM ),
 						0 /* info libc "Creating a Socket"
 								 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
-		if ( !!( f_eType & TYPE::NONBLOCKING ) )
-			M_ENSURE( ::fcntl( f_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
+		if ( !!( _type & TYPE::NONBLOCKING ) )
+			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 		}
-	if ( !!( f_eType & TYPE::NETWORK ) )
-		f_pvAddress = xcalloc<sockaddr_in>( 1 );
+	if ( !!( _type & TYPE::NETWORK ) )
+		_address = xcalloc<sockaddr_in>( 1 );
 	else
-		f_pvAddress = xcalloc<sockaddr_un>( 1 );
+		_address = xcalloc<sockaddr_un>( 1 );
 	return;
 	M_EPILOG
 	}
@@ -119,8 +119,8 @@ HSocket::~HSocket( void )
 	shutdown();
 	/* There will be no memory leakage if shutdown() throws,
 	 * because application has to terminate. */
-	if ( f_pvAddress )
-		xfree ( f_pvAddress );
+	if ( _address )
+		xfree ( _address );
 	return;
 	M_EPILOG
 	}
@@ -135,62 +135,62 @@ void HSocket::shutdown( void )
 int HSocket::do_close( void )
 	{
 	M_PROLOG
-	sockaddr_un* l_psAddressFile = NULL;
-	if ( f_poClients )
+	sockaddr_un* addressFile = NULL;
+	if ( _clients )
 		{
-		delete f_poClients;
-		f_poClients = NULL;
-		if ( ( !!( f_eType & TYPE::FILE ) ) && ( f_pvAddress ) )
+		delete _clients;
+		_clients = NULL;
+		if ( ( !!( _type & TYPE::FILE ) ) && ( _address ) )
 			{
-			l_psAddressFile = static_cast<sockaddr_un*>( f_pvAddress );
-			if ( l_psAddressFile->sun_path [ 0 ] )
-				M_ENSURE_EX( ( ::unlink( l_psAddressFile->sun_path ) == 0 ), l_psAddressFile->sun_path );
+			addressFile = static_cast<sockaddr_un*>( _address );
+			if ( addressFile->sun_path [ 0 ] )
+				M_ENSURE_EX( ( ::unlink( addressFile->sun_path ) == 0 ), addressFile->sun_path );
 			}
 		}
-	if ( f_bNeedShutdown && ( f_iFileDescriptor >= 0 ) )
+	if ( _needShutdown && ( _fileDescriptor >= 0 ) )
 		{
-		if ( is_write_ready( f_iFileDescriptor ) )
-			M_ENSURE( ( ::shutdown( f_iFileDescriptor, SHUT_RDWR ) == 0 ) || ( errno == ENOTCONN ) || ( errno == ECONNRESET ) );
+		if ( is_write_ready( _fileDescriptor ) )
+			M_ENSURE( ( ::shutdown( _fileDescriptor, SHUT_RDWR ) == 0 ) || ( errno == ENOTCONN ) || ( errno == ECONNRESET ) );
 		HRawFile::do_close();
-		f_bNeedShutdown = false;
+		_needShutdown = false;
 		}
 	return( 0 );
 	M_EPILOG
 	}
 
-void HSocket::shutdown_client( int a_iFileDescriptor )
+void HSocket::shutdown_client( int fileDescriptor_ )
 	{
 	M_PROLOG
-	ptr_t l_oClient;
-	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
-	clients_t::iterator it( f_poClients->find( a_iFileDescriptor ) );
-	if ( it == f_poClients->end() )
-		M_THROW( _( "no such client" ), a_iFileDescriptor );
+	ptr_t client;
+	if ( ! _clients )
+		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+	clients_t::iterator it( _clients->find( fileDescriptor_ ) );
+	if ( it == _clients->end() )
+		M_THROW( _( "no such client" ), fileDescriptor_ );
 	M_ASSERT( !! it->second );
-	f_poClients->erase( a_iFileDescriptor );
+	_clients->erase( fileDescriptor_ );
 	return;
 	M_EPILOG
 	}
 
-void HSocket::listen( yaal::hcore::HString const& a_oAddress, int const a_iPort )
+void HSocket::listen( yaal::hcore::HString const& address_, int const port_ )
 	{
 	M_PROLOG
-	int l_iReuseAddr = 1;
-	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
-	if ( f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ ALREADY_LISTENING ], f_iFileDescriptor );
-	if ( f_iMaximumNumberOfClients < 1 )
-		M_THROW( _( "bad maximum number of clients" ), f_iMaximumNumberOfClients );
-	make_address( a_oAddress, a_iPort );
-	M_ENSURE( ::setsockopt( f_iFileDescriptor, SOL_SOCKET, SO_REUSEADDR,
-				reinterpret_cast<char*>( &l_iReuseAddr ), sizeof ( l_iReuseAddr ) ) == 0 );
-	M_ENSURE_EX( ( ::bind( f_iFileDescriptor,
-				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 ), a_oAddress );
-	M_ENSURE_EX( ( ::listen( f_iFileDescriptor, f_iMaximumNumberOfClients ) == 0 ), a_oAddress );
-	f_poClients = new clients_t( f_iMaximumNumberOfClients );
-	f_bNeedShutdown = true;
+	int reuseAddr = 1;
+	if ( _fileDescriptor < 0 )
+		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
+	if ( _clients )
+		M_THROW( _errMsgHSocket_[ ALREADY_LISTENING ], _fileDescriptor );
+	if ( _maximumNumberOfClients < 1 )
+		M_THROW( _( "bad maximum number of clients" ), _maximumNumberOfClients );
+	make_address( address_, port_ );
+	M_ENSURE( ::setsockopt( _fileDescriptor, SOL_SOCKET, SO_REUSEADDR,
+				reinterpret_cast<char*>( &reuseAddr ), sizeof ( reuseAddr ) ) == 0 );
+	M_ENSURE_EX( ( ::bind( _fileDescriptor,
+				static_cast<sockaddr*>( _address ), _addressSize ) == 0 ), address_ );
+	M_ENSURE_EX( ( ::listen( _fileDescriptor, _maximumNumberOfClients ) == 0 ), address_ );
+	_clients = new clients_t( _maximumNumberOfClients );
+	_needShutdown = true;
 	return;
 	M_EPILOG
 	}
@@ -198,105 +198,105 @@ void HSocket::listen( yaal::hcore::HString const& a_oAddress, int const a_iPort 
 HSocket::ptr_t HSocket::accept( void )
 	{
 	M_PROLOG
-	int l_iFileDescriptor = -1;
-	socklen_t l_iAddressSize = 0;
-	sockaddr_in l_sAddressNetwork;
-	sockaddr_un l_sAddressFile;
-	sockaddr* l_psAddress;
-	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
-	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
-	if ( !!( f_eType & TYPE::NETWORK ) )
+	int fileDescriptor = -1;
+	socklen_t addressSize = 0;
+	sockaddr_in addressNetwork;
+	sockaddr_un addressFile;
+	sockaddr* address;
+	if ( _fileDescriptor < 0 )
+		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
+	if ( ! _clients )
+		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+	if ( !!( _type & TYPE::NETWORK ) )
 		{
-		l_psAddress = static_cast<sockaddr*>(
-				static_cast<void*>( &l_sAddressNetwork ) );
-		l_iAddressSize = sizeof ( l_sAddressNetwork );
+		address = static_cast<sockaddr*>(
+				static_cast<void*>( &addressNetwork ) );
+		addressSize = sizeof ( addressNetwork );
 		}
 	else
 		{
-		l_psAddress = static_cast<sockaddr*>(
-				static_cast<void*>( &l_sAddressFile ) );
-		l_iAddressSize = sizeof ( l_sAddressFile );
+		address = static_cast<sockaddr*>(
+				static_cast<void*>( &addressFile ) );
+		addressSize = sizeof ( addressFile );
 		}
-	M_ENSURE( ( l_iFileDescriptor = ::accept( f_iFileDescriptor,
-					l_psAddress, &l_iAddressSize ) ) >= 0 );
-	if ( !!( f_eType & TYPE::NONBLOCKING ) )
-		M_ENSURE( ::fcntl( l_iFileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
+	M_ENSURE( ( fileDescriptor = ::accept( _fileDescriptor,
+					address, &addressSize ) ) >= 0 );
+	if ( !!( _type & TYPE::NONBLOCKING ) )
+		M_ENSURE( ::fcntl( fileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 	/* - 1 means that constructor shall not create socket */
-	socket_type_t l_eType = f_eType;
-	if ( !!( f_eType & ( socket_type_t( TYPE::SSL_SERVER  ) | TYPE::SSL_CLIENT ) ) )
-		l_eType &= ~socket_type_t( TYPE::SSL_CLIENT ), l_eType |= TYPE::SSL_SERVER;
-	ptr_t l_oSocket = ptr_t( new HSocket( l_eType, -1 ) );
-	M_ASSERT( ! l_oSocket->f_oSSL );
-	l_oSocket->f_iFileDescriptor = l_iFileDescriptor;
-	l_oSocket->f_iAddressSize = l_iAddressSize;
-	l_oSocket->f_bNeedShutdown = true;
-	l_oSocket->set_timeout( f_iTimeOut );
-	::memcpy( l_oSocket->f_pvAddress, l_psAddress, l_iAddressSize );
-	if ( f_poClients->find( l_iFileDescriptor ) != f_poClients->end() )
-		M_THROW( _( "inconsitent client list state" ), l_iFileDescriptor );
-	f_poClients->operator[]( l_iFileDescriptor ) = l_oSocket;
-	return ( l_oSocket );
+	socket_type_t type = _type;
+	if ( !!( _type & ( socket_type_t( TYPE::SSL_SERVER  ) | TYPE::SSL_CLIENT ) ) )
+		type &= ~socket_type_t( TYPE::SSL_CLIENT ), type |= TYPE::SSL_SERVER;
+	ptr_t socket = ptr_t( new HSocket( type, -1 ) );
+	M_ASSERT( ! socket->_sSL );
+	socket->_fileDescriptor = fileDescriptor;
+	socket->_addressSize = addressSize;
+	socket->_needShutdown = true;
+	socket->set_timeout( _timeOut );
+	::memcpy( socket->_address, address, addressSize );
+	if ( _clients->find( fileDescriptor ) != _clients->end() )
+		M_THROW( _( "inconsitent client list state" ), fileDescriptor );
+	_clients->operator[]( fileDescriptor ) = socket;
+	return ( socket );
 	M_EPILOG
 	}
 
-void HSocket::connect( yaal::hcore::HString const& a_oAddress, int const a_iPort )
+void HSocket::connect( yaal::hcore::HString const& address_, int const port_ )
 	{
 	M_PROLOG
-	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
-	make_address( a_oAddress, a_iPort );
-	M_ENSURE_EX( ( ::connect( f_iFileDescriptor,
-				static_cast<sockaddr*>( f_pvAddress ), f_iAddressSize ) == 0 ), a_oAddress );
-	f_bNeedShutdown = true;
+	if ( _fileDescriptor < 0 )
+		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
+	make_address( address_, port_ );
+	M_ENSURE_EX( ( ::connect( _fileDescriptor,
+				static_cast<sockaddr*>( _address ), _addressSize ) == 0 ), address_ );
+	_needShutdown = true;
 	return;
 	M_EPILOG
 	}
 
-void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_iPort )
+void HSocket::make_address( yaal::hcore::HString const& address_, int const port_ )
 	{
 	M_PROLOG
-	if ( !!( f_eType & TYPE::NETWORK ) )
+	if ( !!( _type & TYPE::NETWORK ) )
 		{
-		int l_iError( 0 );
-		sockaddr_in* l_psAddressNetwork( static_cast<sockaddr_in*>( f_pvAddress ) );
-		l_psAddressNetwork->sin_family = AF_INET;
-		l_psAddressNetwork->sin_port = htons(
-				static_cast<int short unsigned>( a_iPort ) );
+		int error( 0 );
+		sockaddr_in* addressNetwork( static_cast<sockaddr_in*>( _address ) );
+		addressNetwork->sin_family = AF_INET;
+		addressNetwork->sin_port = htons(
+				static_cast<int short unsigned>( port_ ) );
 #ifdef HAVE_GETHOSTBYNAME_R
 		static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
-		hostent l_sHostName;
-		hostent* l_psHostName( NULL );
-		f_iAddressSize = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
-		f_oCache.realloc( f_iAddressSize );
-		while ( ::gethostbyname_r( a_oAddress.raw(), &l_sHostName,
-					f_oCache.raw(), f_iAddressSize,
-					&l_psHostName, &l_iError ) == ERANGE )
-			f_oCache.realloc( f_iAddressSize <<= 1 );
-		errno = l_iError;
-		M_ENSURE( l_psHostName );
-		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>(
-				l_sHostName.h_addr_list[ 0 ] )->s_addr;
+		hostent hostName;
+		hostent* hostNameStatus( NULL );
+		_addressSize = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
+		_cache.realloc( _addressSize );
+		while ( ::gethostbyname_r( address_.raw(), &hostName,
+					_cache.raw(), _addressSize,
+					&hostNameStatus, &error ) == ERANGE )
+			_cache.realloc( _addressSize <<= 1 );
+		errno = error;
+		M_ENSURE( hostNameStatus );
+		addressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>(
+				hostName.h_addr_list[ 0 ] )->s_addr;
 #else /* HAVE_GETHOSTBYNAME_R */
-		addrinfo* l_psAddrInfo( NULL );
-		l_iError = ::getaddrinfo( a_oAddress.raw(), NULL, NULL, &l_psAddrInfo );
-		M_ENSURE( ! l_iError && l_psAddrInfo );
-		l_psAddressNetwork->sin_addr.s_addr = reinterpret_cast<sockaddr_in*>( l_psAddrInfo->ai_addr )->sin_addr.s_addr;
-		::freeaddrinfo( l_psAddrInfo );
+		addrinfo* addrInfo( NULL );
+		error = ::getaddrinfo( address_.raw(), NULL, NULL, &addrInfo );
+		M_ENSURE( ! error && addrInfo );
+		addressNetwork->sin_addr.s_addr = reinterpret_cast<sockaddr_in*>( addrInfo->ai_addr )->sin_addr.s_addr;
+		::freeaddrinfo( addrInfo );
 #endif /* not HAVE_GETHOSTBYNAME_R */
-		f_iAddressSize = sizeof ( sockaddr_in );
+		_addressSize = sizeof ( sockaddr_in );
 		}
-	else /* f_eType & TYPE::FILE */
+	else /* _type & TYPE::FILE */
 		{
-		sockaddr_un* l_psAddressFile( static_cast<sockaddr_un*>( f_pvAddress ) );
-		l_psAddressFile->sun_family = AF_UNIX;
-		::strncpy( l_psAddressFile->sun_path, a_oAddress.raw(),
-				sizeof ( l_psAddressFile->sun_path ) );
-		l_psAddressFile->sun_path[ sizeof ( l_psAddressFile->sun_path ) - 1 ] = 0;
-		f_iAddressSize = static_cast<int>( SUN_LEN( l_psAddressFile ) );
+		sockaddr_un* addressFile( static_cast<sockaddr_un*>( _address ) );
+		addressFile->sun_family = AF_UNIX;
+		::strncpy( addressFile->sun_path, address_.raw(),
+				sizeof ( addressFile->sun_path ) );
+		addressFile->sun_path[ sizeof ( addressFile->sun_path ) - 1 ] = 0;
+		_addressSize = static_cast<int>( SUN_LEN( addressFile ) );
 		}
-	f_oHostName = a_oAddress;
+	_hostName = address_;
 	return;
 	M_EPILOG
 	}
@@ -304,25 +304,25 @@ void HSocket::make_address( yaal::hcore::HString const& a_oAddress, int const a_
 int HSocket::get_port( void ) const
 	{
 	M_PROLOG
-	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
-	sockaddr_in* l_psAddressNetwork = NULL;
-	if ( ! ( f_eType & TYPE::NETWORK ) )
-		M_THROW( _( "unix socket has not a port attribute" ), f_eType.value() );
-	l_psAddressNetwork = static_cast<sockaddr_in*>( f_pvAddress );
-	return ( ntohs( l_psAddressNetwork->sin_port ) );
+	if ( _fileDescriptor < 0 )
+		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
+	sockaddr_in* addressNetwork = NULL;
+	if ( ! ( _type & TYPE::NETWORK ) )
+		M_THROW( _( "unix socket has not a port attribute" ), _type.value() );
+	addressNetwork = static_cast<sockaddr_in*>( _address );
+	return ( ntohs( addressNetwork->sin_port ) );
 	M_EPILOG
 	}
 
-HSocket::ptr_t HSocket::get_client( int const a_iFileDescriptor ) const
+HSocket::ptr_t HSocket::get_client( int const fileDescriptor_ ) const
 	{
 	M_PROLOG
-	ptr_t l_oClient;
-	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
-	clients_t::iterator it( f_poClients->find( a_iFileDescriptor ) );
-	if ( it == f_poClients->end() )
-		M_THROW( _( "no such client" ), a_iFileDescriptor );
+	ptr_t client;
+	if ( ! _clients )
+		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+	clients_t::iterator it( _clients->find( fileDescriptor_ ) );
+	if ( it == _clients->end() )
+		M_THROW( _( "no such client" ), fileDescriptor_ );
 	return ( it->second );
 	M_EPILOG
 	}
@@ -330,9 +330,9 @@ HSocket::ptr_t HSocket::get_client( int const a_iFileDescriptor ) const
 HSocket::clients_t::const_iterator HSocket::begin( void ) const
 	{
 	M_PROLOG
-	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
-	clients_t const* c = f_poClients;
+	if ( ! _clients )
+		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+	clients_t const* c = _clients;
 	return ( c->begin() );
 	M_EPILOG
 	}
@@ -340,20 +340,20 @@ HSocket::clients_t::const_iterator HSocket::begin( void ) const
 HSocket::clients_t::const_iterator HSocket::end( void ) const
 	{
 	M_PROLOG
-	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
-	clients_t const* c = f_poClients;
+	if ( ! _clients )
+		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+	clients_t const* c = _clients;
 	return ( c->end() );
 	M_EPILOG
 	}
 
-int long HSocket::write_until_eos( HString const& a_roMessage )
+int long HSocket::write_until_eos( HString const& message_ )
 	{
 	M_PROLOG
 	int long nSize = 0;
-	nSize = a_roMessage.get_length();
+	nSize = message_.get_length();
 	if ( nSize > 0 )
-		nSize = write( a_roMessage.raw(), nSize );
+		nSize = write( message_.raw(), nSize );
 	return ( nSize );
 	M_EPILOG
 	}
@@ -361,9 +361,9 @@ int long HSocket::write_until_eos( HString const& a_roMessage )
 int HSocket::get_client_count( void ) const
 	{
 	M_PROLOG
-	if ( ! f_poClients )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_A_SERVER ], f_iFileDescriptor );
-	return ( f_poClients->size() );
+	if ( ! _clients )
+		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+	return ( _clients->size() );
 	M_EPILOG
 	}
 
@@ -371,62 +371,62 @@ HString const& HSocket::get_host_name( void )
 	{
 	static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 	M_PROLOG
-	int l_iError = 0;
-	int l_iSize = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
-	sockaddr_in* l_psAddressNetwork = NULL;
-	sockaddr_un* l_psAddressFile = NULL;
+	int error = 0;
+	int size = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
+	sockaddr_in* addressNetwork = NULL;
+	sockaddr_un* addressFile = NULL;
 #ifdef HAVE_GETHOSTBYNAME_R
-	int l_iCode = 0;
-	hostent l_sHostName;
-	hostent* l_psHostName = NULL;
+	int code = 0;
+	hostent hostName;
+	hostent* hostNameStatus = NULL;
 #else /* HAVE_GETHOSTBYNAME_R */
-	l_iSize = NI_MAXHOST;
+	size = NI_MAXHOST;
 #endif /* ! HAVE_GETHOSTBYNAME_R */
-	if ( f_iFileDescriptor < 0 )
-		M_THROW( n_ppcErrMsgHSocket[ NOT_INITIALIZED ], f_iFileDescriptor );
-	if ( f_oHostName.is_empty() )
+	if ( _fileDescriptor < 0 )
+		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
+	if ( _hostName.is_empty() )
 		{
-		if ( !!( f_eType & TYPE::NETWORK ) )
+		if ( !!( _type & TYPE::NETWORK ) )
 			{
 			char const* name = NULL;
-			f_oCache.realloc( l_iSize );
-			l_psAddressNetwork = reinterpret_cast<sockaddr_in*>( f_pvAddress );
-			if ( f_bResolveHostnames )
+			_cache.realloc( size );
+			addressNetwork = reinterpret_cast<sockaddr_in*>( _address );
+			if ( _resolveHostnames )
 				{
 #ifdef HAVE_GETHOSTBYNAME_R
-				::memset( &l_sHostName, 0, sizeof ( hostent ) );
-				while ( ( l_iError = ::gethostbyaddr_r( &l_psAddressNetwork->sin_addr, f_iAddressSize,
-							AF_INET, &l_sHostName,
-							f_oCache.raw(),
-							l_iSize, &l_psHostName, &l_iCode ) ) == ERANGE )
-					f_oCache.realloc( l_iSize <<= 1 );
-				if ( l_iCode )
-					log_trace << error_message( l_iCode ) << endl;
-				errno = l_iError;
-				M_ENSURE( l_iError == 0 );
-				if ( l_psHostName )
-					name = l_sHostName.h_name;
+				::memset( &hostName, 0, sizeof ( hostent ) );
+				while ( ( error = ::gethostbyaddr_r( &addressNetwork->sin_addr, _addressSize,
+							AF_INET, &hostName,
+							_cache.raw(),
+							size, &hostNameStatus, &code ) ) == ERANGE )
+					_cache.realloc( size <<= 1 );
+				if ( code )
+					log_trace << error_message( code ) << endl;
+				errno = error;
+				M_ENSURE( error == 0 );
+				if ( hostNameStatus )
+					name = hostName.h_name;
 #else /* HAVE_GETHOSTBYNAME_R */
-				l_iError = getnameinfo(
-								reinterpret_cast<sockaddr*>( l_psAddressNetwork ), f_iAddressSize,
-								f_oCache.raw(), l_iSize, NULL, 0, NI_NOFQDN );
-				M_ENSURE( l_iError == 0 );
-				name = f_oCache.raw();
+				error = getnameinfo(
+								reinterpret_cast<sockaddr*>( addressNetwork ), _addressSize,
+								_cache.raw(), size, NULL, 0, NI_NOFQDN );
+				M_ENSURE( error == 0 );
+				name = _cache.raw();
 #endif /* ! HAVE_GETHOSTBYNAME_R */
 				}
 			if ( ! name )
-				name = inet_ntop( AF_INET, &l_psAddressNetwork->sin_addr,
-						f_oCache.raw(), l_iSize );
-			f_oHostName = name;
+				name = inet_ntop( AF_INET, &addressNetwork->sin_addr,
+						_cache.raw(), size );
+			_hostName = name;
 			}
 		else
 			{
-			l_psAddressFile = static_cast<sockaddr_un*>( f_pvAddress );
-			if ( l_psAddressFile->sun_path[ 0 ] )
-				f_oHostName = l_psAddressFile->sun_path[ 0 ];
+			addressFile = static_cast<sockaddr_un*>( _address );
+			if ( addressFile->sun_path[ 0 ] )
+				_hostName = addressFile->sun_path[ 0 ];
 			}
 		}
-	return ( f_oHostName );
+	return ( _hostName );
 	M_EPILOG
 	}
 

@@ -39,22 +39,22 @@ namespace yaal
 namespace tools
 {
 
-HPlugin::HPlugin( void ) : f_pvHandle( NULL )
+HPlugin::HPlugin( void ) : _handle( NULL )
 	{
 	}
 
 HPlugin::~HPlugin( void )
 	{
 	M_PROLOG
-	if ( f_pvHandle )
+	if ( _handle )
 		unload();
 	M_EPILOG
 	}
 
-void HPlugin::load( HString const& a_oPath )
+void HPlugin::load( HString const& path_ )
 	{
 	M_PROLOG
-	M_ENSURE_EX( ( ( f_pvHandle = dlopen( ! a_oPath.is_empty() ? a_oPath.raw() : NULL, RTLD_NOW | RTLD_GLOBAL ) ) != NULL ), a_oPath );
+	M_ENSURE_EX( ( ( _handle = dlopen( ! path_.is_empty() ? path_.raw() : NULL, RTLD_NOW | RTLD_GLOBAL ) ) != NULL ), path_ );
 	return;
 	M_EPILOG
 	}
@@ -63,11 +63,11 @@ void HPlugin::unload( void )
 	{
 	M_PROLOG
 #if ! defined( __HOST_OS_TYPE_FREEBSD__ )
-	M_ENSURE( dlclose( f_pvHandle ) == 0 );
+	M_ENSURE( dlclose( _handle ) == 0 );
 #else /* not __HOST_OS_TYPE_FREEBSD__ */
-	dlclose( f_pvHandle );
+	dlclose( _handle );
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
-	f_pvHandle = NULL;
+	_handle = NULL;
 	return;
 	M_EPILOG
 	}
@@ -79,19 +79,19 @@ char const* HPlugin::error_message( int )
 	M_EPILOG
 	}
 
-void* HPlugin::resolve( HString const& a_oSymbolName )
+void* HPlugin::resolve( HString const& symbolName_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_pvHandle );
+	M_ASSERT( _handle );
 	void* sym = NULL;
-	M_ENSURE_EX( ( ( sym = dlsym( f_pvHandle, a_oSymbolName.raw() ) ) != NULL ), a_oSymbolName );
+	M_ENSURE_EX( ( ( sym = dlsym( _handle, symbolName_.raw() ) ) != NULL ), symbolName_ );
 	return ( sym );
 	M_EPILOG
 	}
 
 bool HPlugin::is_loaded( void ) const
 	{
-	return ( f_pvHandle ? true : false );
+	return ( _handle ? true : false );
 	}
 
 }

@@ -48,7 +48,7 @@ namespace hdata
 {
 
 #if defined( __DYNAMIC_LINKER__ )
-static char const g_pcDynamicLinkerPath[]
+static char const _dynamicLinkerPath_[]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 void yaal_hdata_banner( void )
@@ -60,7 +60,7 @@ void yaal_hdata_banner( void )
 extern "C"
 int yaal_hdata_main( int, char** )
 	{
-	if ( g_pcDynamicLinkerPath[ 0 ] )
+	if ( _dynamicLinkerPath_[ 0 ] )
 		{
 		yaal_hcore_banner();
 		yaal_tools_banner();

@@ -50,9 +50,9 @@ public:
 	typedef HIterator<bool> const_iterator;
 	typedef HIterator<HBit> iterator;
 private:
-	int long f_lAllocatedBytes;
-	int long f_lSize;
-	void* f_pvData;
+	int long _allocatedBytes;
+	int long _size;
+	void* _data;
 public:
 	HBitmap( void );
 	~HBitmap( void );
@@ -141,65 +141,65 @@ template<typename const_qual_t>
 class HBitmap::HIterator
 	{
 	typedef typename bitmap_type_helper::owner_const_qual_from_type<const_qual_t>::owner_t owner_t;
-	owner_t f_poOwner;
-	int long f_lIndex;
+	owner_t _owner;
+	int long _index;
 public:
-	HIterator( void ) : f_poOwner( NULL ), f_lIndex( 0 ) {}
-	HIterator( HIterator const& it ) : f_poOwner( it.f_poOwner ), f_lIndex( it.f_lIndex ) {}
+	HIterator( void ) : _owner( NULL ), _index( 0 ) {}
+	HIterator( HIterator const& it ) : _owner( it._owner ), _index( it._index ) {}
 	HIterator& operator ++ ( void )
 		{
-		++ f_lIndex;
+		++ _index;
 		return ( *this );
 		}
 	HIterator operator ++ ( int )
 		{
 		HIterator it( *this );
-		++ f_lIndex;
+		++ _index;
 		return ( it );
 		}
 	HIterator& operator -- ( void )
 		{
-		-- f_lIndex;
+		-- _index;
 		return ( *this );
 		}
 	HIterator operator -- ( int )
 		{
 		HIterator it( *this );
-		-- f_lIndex;
+		-- _index;
 		return ( it );
 		}
 	HIterator& operator = ( HIterator const& it )
 		{
 		if ( &it != this )
 			{
-			f_poOwner = it.f_poOwner;
-			f_lIndex = it.f_lIndex;
+			_owner = it._owner;
+			_index = it._index;
 			}
 		return ( *this );
 		}
 	bool operator == ( HIterator const& it ) const
 		{
-		M_ASSERT( f_poOwner == it.f_poOwner );
-		return ( f_lIndex == it.f_lIndex );
+		M_ASSERT( _owner == it._owner );
+		return ( _index == it._index );
 		}
 	bool operator != ( HIterator const& it ) const
 		{
-		M_ASSERT( f_poOwner == it.f_poOwner );
-		return ( f_lIndex != it.f_lIndex );
+		M_ASSERT( _owner == it._owner );
+		return ( _index != it._index );
 		}
 	const_qual_t operator* ( void );
 private:
 	friend class yaal::tools::HBitmap;
-	HIterator( owner_t a_poOwner, int long const& idx )
-		: f_poOwner( a_poOwner ), f_lIndex( idx ) {}
+	HIterator( owner_t owner_, int long const& idx )
+		: _owner( owner_ ), _index( idx ) {}
 	};
 
 /*! \brief Writtable bit reference interface.
  */
 class HBitmap::HBit
 	{
-	HBitmap* f_poOwner;
-	int long f_lIndex;
+	HBitmap* _owner;
+	int long _index;
 public:
 	HBit( HBit const& );
 	HBit& operator = ( HBit const& );

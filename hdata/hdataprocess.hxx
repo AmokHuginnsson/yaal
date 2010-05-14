@@ -46,14 +46,14 @@ namespace hdata
 #define M_REGISTER_MENU_HANDLER( handler ) \
 	{ \
 	typedef yaal::trait::strip_pointer<__decltype( this )>::type this_t; \
-	l_oHandlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
+	handlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
 			&this_t::handler ); \
 	}
 #else /* HAVE_DECLTYPE */
 #define M_REGISTER_MENU_HANDLER( handler ) \
 	{ \
 	typedef __decltype( *this ) this_t; \
-	l_oHandlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
+	handlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
 			&this_t::handler ); \
 	}
 #endif /* not HAVE_DECLTYPE */
@@ -78,15 +78,15 @@ protected:
 	typedef yaal::hcore::HList<OListControlResource> list_cache_t;
 	typedef yaal::hcore::HList<yaal::hcore::HChunk> column_cache_t;
 	typedef yaal::hconsole::HWindow::ptr_t ( *window_factory_t )( yaal::hcore::HString const&, HDataProcess*, resources_t& );
-	dbwrapper::database_ptr_t f_oDataBase;
-	menu_handlers_map_t f_oAutoHandlers;
-	yaal::tools::HXml f_oResource;
-	resource_cache_t f_oResourceCache;
-	column_cache_t f_oColumnCache;
-	edit_cache_t f_oEditCache;
-	list_cache_t f_oListCache;
+	dbwrapper::database_ptr_t _dataBase;
+	menu_handlers_map_t _autoHandlers;
+	yaal::tools::HXml _resource;
+	resource_cache_t _resourceCache;
+	column_cache_t _columnCache;
+	edit_cache_t _editCache;
+	list_cache_t _listCache;
 private:
-	yaal::hconsole::OMenuItem* f_psRootMenu;
+	yaal::hconsole::OMenuItem* _rootMenu;
 public:
 	HDataProcess( void );
 	virtual ~HDataProcess( void );

@@ -53,20 +53,20 @@ class HLogPad : public HControl
 			TEXT,
 			TEXT_EOL
 			} type_t;
-		type_t f_eType;
-		int f_iAttribute;
-		hcore::HString f_oText;
+		type_t _type;
+		int _attribute;
+		hcore::HString _text;
 	public:
 		HLogLine ( void );
 		virtual ~HLogLine ( void );
 		friend class HLogPad;
 		};
 	typedef hcore::HList < HLogLine > contents_t;
-	int f_iLines;
-	int f_iOffsetRow;
-	int f_iOffsetColumn;
-	int f_iAttribute;
-	contents_t f_oContents;
+	int _lines;
+	int _offsetRow;
+	int _offsetColumn;
+	int _attribute;
+	contents_t _contents;
 public:
 	HLogPad( HWindow*, int, int, int, int, char const * const );
 	virtual ~HLogPad( void );

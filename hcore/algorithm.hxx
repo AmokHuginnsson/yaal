@@ -544,14 +544,14 @@ inline tType abs( tType const& val )
 
 /*! \brief Generic less (object ordering) operator.
  *
- * \param a_rtLeft - first of the objects to compare.
- * \param a_rtRight - second of the objects to compare.
- * \return True iff (if and only if) a_rtLeft < a_rtRight - first objects is lesser than second object.
+ * \param left_ - first of the objects to compare.
+ * \param right_ - second of the objects to compare.
+ * \return True iff (if and only if) left_ < right_ - first objects is lesser than second object.
  */
 template<typename tType>
-bool less( tType const& a_rtLeft, tType const& a_rtRight )
+bool less( tType const& left_, tType const& right_ )
 	{
-	return ( a_rtLeft < a_rtRight );
+	return ( left_ < right_ );
 	}
 
 }

@@ -65,8 +65,8 @@ public:
 			} mode_t;
 		};
 protected:
-	MODE::mode_t f_eMode; /* operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
-	int f_iDroppedWidth;	/* width of dropped list */
+	MODE::mode_t _mode; /* operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
+	int _droppedWidth;	/* width of dropped list */
 public:
 	HComboboxControl ( HWindow *,			/* parent */
 										 int,						/* row */
@@ -76,7 +76,7 @@ public:
 										 char const *,	/* label */
 										 int = 0, 			/* dropped width */
 										 int = 127,			/* max string length */
-										 char const * = n_pcMaskDefault,	/* regexp (mask) */
+										 char const * = _maskDefault_,	/* regexp (mask) */
 										 bool = true		/* searchable */ );		/* focused attribute */
 	virtual ~HComboboxControl ( void );
 	virtual int set_focus ( char = 0 );

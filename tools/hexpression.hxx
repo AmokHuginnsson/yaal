@@ -62,17 +62,17 @@ class HExpression
 		{
 		typedef double long ( HExpression::* METHOD_t ) ( tree_t::const_node_t );
 		METHOD_t METHOD;
-		int_list_t f_oVariables;
-		OEquationElement() : METHOD(), f_oVariables() {}
+		int_list_t _variables;
+		OEquationElement() : METHOD(), _variables() {}
 		};
-	int f_iIndex;
-	int f_iLength;
-	syntax_error_t f_eError;
-	double long f_pdVariables[ 26 ];
-	hcore::HArray<double long> f_oConstantsPool;
-	hcore::HArray<int> f_oTerminalIndexes;
-	hcore::HString	f_oFormula;
-	tree_t f_oEquationTree;
+	int _index;
+	int _length;
+	syntax_error_t _error;
+	double long _variables[ 26 ];
+	hcore::HArray<double long> _constantsPool;
+	hcore::HArray<int> _terminalIndexes;
+	hcore::HString	_formula;
+	tree_t _equationTree;
 public:
 	/*{*/
 	HExpression( void );

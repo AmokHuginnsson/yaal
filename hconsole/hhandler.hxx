@@ -46,10 +46,10 @@ protected:
 	typedef int ( HHandler::* HANDLER_t ) ( int, void const* );
 	typedef hcore::HHashMap<int, HANDLER_t> process_handler_key_map_t;
 	typedef hcore::HHashMap<hcore::HString, HANDLER_t> process_handler_command_map_t;
-	process_handler_key_map_t f_oPreprocessHandlers;
-	process_handler_key_map_t f_oPostprocessHandlers;
-	process_handler_command_map_t f_oCommandHandlers;
-	hcore::HString f_oCommand;
+	process_handler_key_map_t _preprocessHandlers;
+	process_handler_key_map_t _postprocessHandlers;
+	process_handler_command_map_t _commandHandlers;
+	hcore::HString _command;
 public:
 	HHandler( size_t = 32, size_t = 32 );
 	virtual ~HHandler( void );
@@ -57,14 +57,14 @@ protected:
 	int process_input_with_handlers( int, const process_handler_key_map_t& );
 	hcore::HString process_command( void );
 	template<typename tType>
-	int register_preprocess_handler( int a_iCount, int const* a_piTab, tType HANDLER )
+	int register_preprocess_handler( int count_, int const* tab_, tType HANDLER )
 		{
-		return ( register_preprocess_handler_internal( a_iCount, a_piTab, static_cast<HANDLER_t>( HANDLER ) ) );
+		return ( register_preprocess_handler_internal( count_, tab_, static_cast<HANDLER_t>( HANDLER ) ) );
 		}
 	template<typename tType>
-	int register_postprocess_handler( int a_iCount, int const* a_piTab, tType HANDLER )
+	int register_postprocess_handler( int count_, int const* tab_, tType HANDLER )
 		{
-		return ( register_postprocess_handler_internal( a_iCount, a_piTab, static_cast<HANDLER_t>( HANDLER ) ) );
+		return ( register_postprocess_handler_internal( count_, tab_, static_cast<HANDLER_t>( HANDLER ) ) );
 		}
 	int register_preprocess_handler_internal( int, int const *, HANDLER_t );
 	int register_postprocess_handler_internal( int, int const *, HANDLER_t );

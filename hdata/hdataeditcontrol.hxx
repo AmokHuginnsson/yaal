@@ -54,7 +54,7 @@ public:
 								char const * = "",	/* label */
 								int = 127,					/* maximum string length */
 								char const * = "",	/* initial content */
-								char const * = yaal::hconsole::n_pcMaskDefault, /* mask */
+								char const * = yaal::hconsole::_maskDefault_, /* mask */
 								bool = false,				/* replace */
 								bool = false,				/* multiline */
 								bool = false,				/* read only */

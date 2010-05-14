@@ -46,9 +46,9 @@ namespace hconsole
 {
 
 HListControl::HColumnInfo::HColumnInfo( void )
-	: f_bDescending( false ), f_iWidthRaw( 0 ), f_iWidth( 0 ), f_eAlign( BITS::ALIGN::LEFT ),
-	f_iShortcutIndex( 0 ), f_cShortcut( 0 ), f_eType( TYPE::HSTRING ), f_oName(),
-	f_poControl( NULL )
+	: _descending( false ), _widthRaw( 0 ), _width( 0 ), _align( BITS::ALIGN::LEFT ),
+	_shortcutIndex( 0 ), _shortcut( 0 ), _type( TYPE::HSTRING ), _name(),
+	_control( NULL )
 	{
 	M_PROLOG
 	return;
@@ -58,54 +58,54 @@ HListControl::HColumnInfo::HColumnInfo( void )
 HListControl::HColumnInfo::~HColumnInfo( void )
 	{
 	M_PROLOG
-	f_poControl = NULL;
+	_control = NULL;
 	return;
 	M_EPILOG
 	}
 
-HListControl::HColumnInfo::HColumnInfo( HColumnInfo const& a_roColumnInfo )
-	: f_bDescending( false ), f_iWidthRaw( 0 ), f_iWidth( 0 ), f_eAlign( BITS::ALIGN::LEFT ),
-	f_iShortcutIndex( 0 ), f_cShortcut( 0 ), f_eType( TYPE::HSTRING ), f_oName(),
-	f_poControl( NULL )
+HListControl::HColumnInfo::HColumnInfo( HColumnInfo const& columnInfo_ )
+	: _descending( false ), _widthRaw( 0 ), _width( 0 ), _align( BITS::ALIGN::LEFT ),
+	_shortcutIndex( 0 ), _shortcut( 0 ), _type( TYPE::HSTRING ), _name(),
+	_control( NULL )
 	{
 	M_PROLOG
-	( *this ) = a_roColumnInfo;
+	( *this ) = columnInfo_;
 	return;
 	M_EPILOG
 	}
 
-HListControl::HColumnInfo& HListControl::HColumnInfo::operator = ( HColumnInfo const& a_roColumnInfo )
+HListControl::HColumnInfo& HListControl::HColumnInfo::operator = ( HColumnInfo const& columnInfo_ )
 	{
 	M_PROLOG
-	if ( this != & a_roColumnInfo )
+	if ( this != & columnInfo_ )
 		{
-		f_bDescending = a_roColumnInfo.f_bDescending;
-		f_iWidthRaw = a_roColumnInfo.f_iWidthRaw;
-		f_iWidth = a_roColumnInfo.f_iWidth;
-		f_eType = a_roColumnInfo.f_eType;
-		f_eAlign = a_roColumnInfo.f_eAlign;
-		f_iShortcutIndex = a_roColumnInfo.f_iShortcutIndex;
-		f_cShortcut = a_roColumnInfo.f_cShortcut;
-		f_oName = a_roColumnInfo.f_oName;
-		f_poControl = a_roColumnInfo.f_poControl;
+		_descending = columnInfo_._descending;
+		_widthRaw = columnInfo_._widthRaw;
+		_width = columnInfo_._width;
+		_type = columnInfo_._type;
+		_align = columnInfo_._align;
+		_shortcutIndex = columnInfo_._shortcutIndex;
+		_shortcut = columnInfo_._shortcut;
+		_name = columnInfo_._name;
+		_control = columnInfo_._control;
 		}
 	return ( *this );
 	M_EPILOG
 	}
 
-HListControl::HListControl( HWindow* a_poParent, int a_iRow, int a_iColumn,
-		int a_iHeight, int a_iWidth, char const* a_pcLabel, HAbstractControler::ptr_t const& a_oData )
-						: HControl( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth,
-								a_pcLabel ),
+HListControl::HListControl( HWindow* parent_, int row_, int column_,
+		int height_, int width_, char const* label_, HAbstractControler::ptr_t const& data_ )
+						: HControl( parent_, row_, column_, height_, width_,
+								label_ ),
 							HSearchableControl( true ),
-	f_bCheckable( false ), f_bSortable( true ),
-	f_bDrawHeader( true ), f_bEditable( false ),
-	f_iControlOffset( 0 ), f_iCursorPosition( 0 ), f_iSumForOne( 0 ),
-	f_oHeader(), f_iSortColumn( -1 ), f_sMatch(),
-	f_oCursor(), f_oFirstVisibleRow(), f_oControler( a_oData )
+	_checkable( false ), _sortable( true ),
+	_drawHeader( true ), _editable( false ),
+	_controlOffset( 0 ), _cursorPosition( 0 ), _sumForOne( 0 ),
+	_header(), _sortColumn( -1 ), _match(),
+	_cursor(), _firstVisibleRow(), _controler( data_ )
 	{
 	M_PROLOG
-	f_oControler->set_control( this );
+	_controler->set_control( this );
 	schedule_refresh();
 	return;
 	M_EPILOG
@@ -119,233 +119,233 @@ HListControl::~HListControl( void )
 void HListControl::do_refresh( void )
 	{
 	M_PROLOG
-	bool l_bChecked = false;
-	int l_iCtr = 0;
-	int l_iCtrLoc = 0;
-	int l_iColumnOffset = 0;
-	int l_iTmp = 0;
-	int l_iColumns = static_cast<int>( f_oHeader.size() );
-	int l_iHR = f_bDrawHeader ? 1 : 0; /* HR stands for header row */
-	int l_iSize = static_cast<int>( f_oControler->size() );
-	HColumnInfo * l_poColumnInfo = NULL;
+	bool checked = false;
+	int ctr = 0;
+	int ctrLoc = 0;
+	int columnOffset = 0;
+	int tmp = 0;
+	int columns = static_cast<int>( _header.size() );
+	int hR = _drawHeader ? 1 : 0; /* HR stands for header row */
+	int size = static_cast<int>( _controler->size() );
+	HColumnInfo * columnInfo = NULL;
 	HConsole& cons = HCons::get_instance();
-	l_iTmp = f_iWidthRaw;
-	if ( f_bFocused )
+	tmp = _widthRaw;
+	if ( _focused )
 		cons.curs_set( CURSOR::INVISIBLE );
 	draw_label(); /* raw* set here */
-	f_iRowRaw += l_iHR;
-	if ( ! f_iSumForOne )
+	_rowRaw += hR;
+	if ( ! _sumForOne )
 		return;
-	if ( f_iWidthRaw != l_iTmp )
+	if ( _widthRaw != tmp )
 		recalculate_column_widths();
-/* we need to decrement f_iHeightRaw because we have additional row, 
+/* we need to decrement _heightRaw because we have additional row, 
  * the list control header */
-	if ( f_bDrawHeader )
-		f_iHeightRaw --;
-	f_oVarTmpBuffer.hs_realloc( f_iWidthRaw + 1 );
-	if ( l_iSize > 0 )
+	if ( _drawHeader )
+		_heightRaw --;
+	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
+	if ( size > 0 )
 		{
-		iterator_t it = f_oFirstVisibleRow;
-		for ( l_iCtr = 0;
-					l_iCtr < ( l_iSize > f_iHeightRaw ? f_iHeightRaw : l_iSize );
-					++ l_iCtr, ++ it )
+		iterator_t it = _firstVisibleRow;
+		for ( ctr = 0;
+					ctr < ( size > _heightRaw ? _heightRaw : size );
+					++ ctr, ++ it )
 			{
-			l_iColumnOffset = 0;
-			for ( l_iCtrLoc = 0; l_iCtrLoc < l_iColumns; l_iCtrLoc ++ )
+			columnOffset = 0;
+			for ( ctrLoc = 0; ctrLoc < columns; ctrLoc ++ )
 				{
-				l_poColumnInfo = & f_oHeader[ l_iCtrLoc ];
-				if ( l_poColumnInfo->f_iWidthRaw )
+				columnInfo = & _header[ ctrLoc ];
+				if ( columnInfo->_widthRaw )
 					{
-					l_bChecked = get_text_for_cell( it, l_iCtrLoc, l_poColumnInfo->f_eType );
-					draw_cell( it, l_iCtr, l_iCtrLoc, l_iColumnOffset, l_poColumnInfo, l_bChecked );
-					l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
+					checked = get_text_for_cell( it, ctrLoc, columnInfo->_type );
+					draw_cell( it, ctr, ctrLoc, columnOffset, columnInfo, checked );
+					columnOffset += columnInfo->_widthRaw;
 					}
-				if ( ( it == f_oCursor ) && l_poColumnInfo->f_poControl )
-					(*it)[ l_iCtrLoc ].set_child_control_data( l_poColumnInfo->f_poControl );
+				if ( ( it == _cursor ) && columnInfo->_control )
+					(*it)[ ctrLoc ].set_child_control_data( columnInfo->_control );
 				}
 			}
 		}
-	draw_background( l_iCtr );
-	f_iRowRaw -= l_iHR;
-	draw_header( l_iColumns );
-	f_iRowRaw += l_iHR;
-	cons.set_attr( ! f_bEnabled ?
-			( ! f_bFocused ? f_uiAttributeFocused : f_uiAttributeEnabled )
-			: f_uiAttributeDisabled );
-	if ( l_iSize > f_iHeightRaw )
-		draw_scroll( f_iColumnRaw + l_iColumnOffset - 1 );
-	f_iRowRaw -= l_iHR;
+	draw_background( ctr );
+	_rowRaw -= hR;
+	draw_header( columns );
+	_rowRaw += hR;
+	cons.set_attr( ! _enabled ?
+			( ! _focused ? _attributeFocused : _attributeEnabled )
+			: _attributeDisabled );
+	if ( size > _heightRaw )
+		draw_scroll( _columnRaw + columnOffset - 1 );
+	_rowRaw -= hR;
 	return;
 	M_EPILOG
 	}
 
-void HListControl::draw_header( int a_iColumns )
+void HListControl::draw_header( int columns_ )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	int l_iCtrLoc = 0;
-	int l_iColumnOffset = 0;
-	int l_iHR = f_bDrawHeader ? 1 : 0; /* HR stands for header row */
-	HColumnInfo * l_poColumnInfo = NULL;
+	int ctr = 0;
+	int ctrLoc = 0;
+	int columnOffset = 0;
+	int hR = _drawHeader ? 1 : 0; /* HR stands for header row */
+	HColumnInfo * columnInfo = NULL;
 	HConsole& cons = HCons::get_instance();
-	for ( l_iCtr = 0; l_iCtr < a_iColumns; l_iCtr ++ )
+	for ( ctr = 0; ctr < columns_; ctr ++ )
 		{
-		l_poColumnInfo = & f_oHeader[ l_iCtr ];
-		if ( l_poColumnInfo->f_iWidthRaw )
+		columnInfo = & _header[ ctr ];
+		if ( columnInfo->_widthRaw )
 			{
-			if ( f_bDrawHeader )
+			if ( _drawHeader )
 				{
-				f_oVarTmpBuffer = l_poColumnInfo->f_oName;
+				_varTmpBuffer = columnInfo->_name;
 				set_attr_label();
-				f_oVarTmpBuffer.format( "%%-%ds",
-							l_poColumnInfo->f_iWidthRaw );
-				M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw + l_iColumnOffset,
-							f_oVarTmpBuffer.raw(),
-								l_poColumnInfo->f_oName.left(
-									l_poColumnInfo->f_iWidthRaw ).raw() ) != C_ERR );
+				_varTmpBuffer.format( "%%-%ds",
+							columnInfo->_widthRaw );
+				M_ENSURE( cons.c_mvprintf( _rowRaw, _columnRaw + columnOffset,
+							_varTmpBuffer.raw(),
+								columnInfo->_name.left(
+									columnInfo->_widthRaw ).raw() ) != C_ERR );
 				set_attr_shortcut();
-				M_ENSURE( cons.c_mvprintf( f_iRowRaw,
-							f_iColumnRaw + l_iColumnOffset + l_poColumnInfo->f_iShortcutIndex,
-							"%c", l_poColumnInfo->f_cShortcut ) != C_ERR );
-				if ( f_iSortColumn == l_iCtr )
-					M_ENSURE( cons.c_mvprintf( f_iRowRaw,
-								f_iColumnRaw + l_iColumnOffset
-								+ l_poColumnInfo->f_iWidthRaw - 2,
-								"%c", l_poColumnInfo->f_bDescending ? '^' : 'v' ) != C_ERR );
+				M_ENSURE( cons.c_mvprintf( _rowRaw,
+							_columnRaw + columnOffset + columnInfo->_shortcutIndex,
+							"%c", columnInfo->_shortcut ) != C_ERR );
+				if ( _sortColumn == ctr )
+					M_ENSURE( cons.c_mvprintf( _rowRaw,
+								_columnRaw + columnOffset
+								+ columnInfo->_widthRaw - 2,
+								"%c", columnInfo->_descending ? '^' : 'v' ) != C_ERR );
 				}
-			l_iColumnOffset += l_poColumnInfo->f_iWidthRaw;
-			if ( l_iCtr < a_iColumns )
+			columnOffset += columnInfo->_widthRaw;
+			if ( ctr < columns_ )
 				{
-				cons.set_attr( f_uiAttributeDisabled );
-				for ( l_iCtrLoc = 0; l_iCtrLoc < ( f_iHeightRaw + l_iHR );
-						l_iCtrLoc ++ )
+				cons.set_attr( _attributeDisabled );
+				for ( ctrLoc = 0; ctrLoc < ( _heightRaw + hR );
+						ctrLoc ++ )
 					{
-					M_ENSURE( cons.c_move( f_iRowRaw + l_iCtrLoc,
-								f_iColumnRaw + l_iColumnOffset - 1 ) != C_ERR );
+					M_ENSURE( cons.c_move( _rowRaw + ctrLoc,
+								_columnRaw + columnOffset - 1 ) != C_ERR );
 					M_ENSURE( cons.c_addch( GLYPHS::VERTICAL_LINE ) != C_ERR );
 					}
 				}
 			}
 		}
-	if ( ! f_bSingleLine )
+	if ( ! _singleLine )
 		{
-		f_oVarTmpBuffer.format( " %d/%d ", f_iControlOffset + f_iCursorPosition + 1, static_cast<int>( f_oControler->size() ) );
-		if ( f_iLabelLength < f_iWidthRaw )
+		_varTmpBuffer.format( " %d/%d ", _controlOffset + _cursorPosition + 1, static_cast<int>( _controler->size() ) );
+		if ( _labelLength < _widthRaw )
 			{
-			int clip = static_cast<int>( ( ( f_iWidthRaw - f_iLabelLength ) < f_oVarTmpBuffer.get_length() ) ? f_oVarTmpBuffer.get_length() - ( f_iWidthRaw - f_iLabelLength ) : 0 );
-			cons.c_mvprintf( f_iRowRaw - 1, static_cast<int>( f_iColumnRaw + f_iWidthRaw + clip - f_oVarTmpBuffer.get_length() ), f_oVarTmpBuffer.raw() + clip );
+			int clip = static_cast<int>( ( ( _widthRaw - _labelLength ) < _varTmpBuffer.get_length() ) ? _varTmpBuffer.get_length() - ( _widthRaw - _labelLength ) : 0 );
+			cons.c_mvprintf( _rowRaw - 1, static_cast<int>( _columnRaw + _widthRaw + clip - _varTmpBuffer.get_length() ), _varTmpBuffer.raw() + clip );
 			}
 		}
 	return;
 	M_EPILOG
 	}
 
-void HListControl::draw_background( int a_iFrom )
+void HListControl::draw_background( int from_ )
 	{
 	M_PROLOG
-	int l_iCtr = a_iFrom;
+	int ctr = from_;
 	set_attr_data();
-	f_oVarTmpBuffer.fillz( '.', 0, f_iWidthRaw );
-	for ( ; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		M_ENSURE( HCons::get_instance().c_mvprintf( f_iRowRaw + l_iCtr, f_iColumnRaw,
-					f_oVarTmpBuffer.raw() ) != C_ERR );
+	_varTmpBuffer.fillz( '.', 0, _widthRaw );
+	for ( ; ctr < _heightRaw; ctr ++ )
+		M_ENSURE( HCons::get_instance().c_mvprintf( _rowRaw + ctr, _columnRaw,
+					_varTmpBuffer.raw() ) != C_ERR );
 	return;
 	M_EPILOG
 	}
 
-void HListControl::draw_scroll( int a_iPosX )
+void HListControl::draw_scroll( int posX_ )
 	{
 	M_PROLOG
-	double l_dScaled = 0;
-	int l_iSize = static_cast<int>( f_oControler->size() );
+	double scaled = 0;
+	int size = static_cast<int>( _controler->size() );
 	HConsole& cons = HCons::get_instance();
-	if ( f_iControlOffset )
+	if ( _controlOffset )
 		{
-		M_ENSURE( cons.c_move( f_iRowRaw, a_iPosX ) != C_ERR );
+		M_ENSURE( cons.c_move( _rowRaw, posX_ ) != C_ERR );
 		M_ENSURE( cons.c_addch( GLYPHS::UP_ARROW ) != C_ERR );
 		}
-	if ( ( l_iSize - f_iControlOffset ) > f_iHeightRaw )
+	if ( ( size - _controlOffset ) > _heightRaw )
 		{
-		M_ENSURE( cons.c_move( f_iRowRaw + f_iHeightRaw - 1, a_iPosX ) != C_ERR );
+		M_ENSURE( cons.c_move( _rowRaw + _heightRaw - 1, posX_ ) != C_ERR );
 		M_ENSURE( cons.c_addch( GLYPHS::DOWN_ARROW ) != C_ERR );
 		}
-	l_dScaled = f_iHeightRaw - 3;
-	l_dScaled *= static_cast<double>(
-			f_iControlOffset + f_iCursorPosition );
-	l_dScaled /= static_cast<double>( l_iSize );
+	scaled = _heightRaw - 3;
+	scaled *= static_cast<double>(
+			_controlOffset + _cursorPosition );
+	scaled /= static_cast<double>( size );
 	M_ENSURE( cons.c_mvprintf (
-				f_iRowRaw + static_cast<int>( l_dScaled + 1.5 ),
-				a_iPosX, "#" ) != C_ERR );
+				_rowRaw + static_cast<int>( scaled + 1.5 ),
+				posX_, "#" ) != C_ERR );
 	return;
 	M_EPILOG
 	}
 
-void HListControl::draw_cell( iterator_t& a_oIt, int a_iRow, int a_iColumn, int a_iColumnOffset, HColumnInfo const* const  a_poColumnInfo, bool a_bChecked )
+void HListControl::draw_cell( iterator_t& it_, int row_, int column_, int columnOffset_, HColumnInfo const* const  columnInfo_, bool checked_ )
 	{
 	M_PROLOG
-	int l_iTmp = 0;
+	int tmp = 0;
 	HConsole& cons = HCons::get_instance();
-	l_iTmp = static_cast<int>( f_oVarTmpBuffer.get_length() );
-	switch ( a_poColumnInfo->f_eAlign )
+	tmp = static_cast<int>( _varTmpBuffer.get_length() );
+	switch ( columnInfo_->_align )
 		{
 		case ( BITS::ALIGN::LEFT ):
 			{
-			if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
-				f_oVarTmpBuffer.fillz( '_', l_iTmp, a_poColumnInfo->f_iWidthRaw - l_iTmp );
+			if ( tmp < columnInfo_->_widthRaw )
+				_varTmpBuffer.fillz( '_', tmp, columnInfo_->_widthRaw - tmp );
 			}
 		break;
 		case ( BITS::ALIGN::CENTER ):
 			{
-			if ( l_iTmp > a_poColumnInfo->f_iWidthRaw )
-				f_oVarTmpBuffer = f_oVarTmpBuffer.right(
-						a_poColumnInfo->f_iWidthRaw );
-			else if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
+			if ( tmp > columnInfo_->_widthRaw )
+				_varTmpBuffer = _varTmpBuffer.right(
+						columnInfo_->_widthRaw );
+			else if ( tmp < columnInfo_->_widthRaw )
 				{
-				f_oVarTmpBuffer.insert( 0, ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) / 2, '_' );
-				l_iTmp = static_cast<int>( f_oVarTmpBuffer.get_length() );
-				f_oVarTmpBuffer.fillz( '_', l_iTmp, a_poColumnInfo->f_iWidthRaw - l_iTmp );
+				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - tmp ) / 2, '_' );
+				tmp = static_cast<int>( _varTmpBuffer.get_length() );
+				_varTmpBuffer.fillz( '_', tmp, columnInfo_->_widthRaw - tmp );
 				}
 			}
 		break;
 		case ( BITS::ALIGN::RIGHT ):
 			{
-			if ( l_iTmp > a_poColumnInfo->f_iWidthRaw )
-				f_oVarTmpBuffer.erase( 0, l_iTmp - a_poColumnInfo->f_iWidthRaw );
-			else if ( l_iTmp < a_poColumnInfo->f_iWidthRaw )
-				f_oVarTmpBuffer.insert( 0, ( a_poColumnInfo->f_iWidthRaw - l_iTmp ) - 1, '_' );
+			if ( tmp > columnInfo_->_widthRaw )
+				_varTmpBuffer.erase( 0, tmp - columnInfo_->_widthRaw );
+			else if ( tmp < columnInfo_->_widthRaw )
+				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - tmp ) - 1, '_' );
 			}
 		break;
 		default :
-			M_THROW( "unknown align", a_poColumnInfo->f_eAlign );
+			M_THROW( "unknown align", columnInfo_->_align );
 		}
-	if ( a_iRow == f_iCursorPosition )
+	if ( row_ == _cursorPosition )
 		{
-		if ( a_bChecked )
-			cons.set_attr( ! f_bEnabled
-					? ( ! f_bFocused ? ~ ( f_uiAttributeFocused >> 8 )
-						: ~ ( f_uiAttributeEnabled >> 8 ) )
-					: ~ ( f_uiAttributeDisabled >> 8 ) );
+		if ( checked_ )
+			cons.set_attr( ! _enabled
+					? ( ! _focused ? ~ ( _attributeFocused >> 8 )
+						: ~ ( _attributeEnabled >> 8 ) )
+					: ~ ( _attributeDisabled >> 8 ) );
 		else
-			cons.set_attr( f_bEnabled ? ( f_bFocused ? ~f_uiAttributeFocused
-						: ~ f_uiAttributeEnabled ) : ~ f_uiAttributeDisabled );
+			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused
+						: ~ _attributeEnabled ) : ~ _attributeDisabled );
 		}
 	else
 		{
-		if ( a_bChecked )
-			cons.set_attr( f_bEnabled
-					? ( f_bFocused ? ~ ( f_uiAttributeFocused >> 8 )
-						: ~ ( f_uiAttributeEnabled >> 8 ) )
-					: ~ ( f_uiAttributeDisabled >> 8 ) );
+		if ( checked_ )
+			cons.set_attr( _enabled
+					? ( _focused ? ~ ( _attributeFocused >> 8 )
+						: ~ ( _attributeEnabled >> 8 ) )
+					: ~ ( _attributeDisabled >> 8 ) );
 		else
 			set_attr_data();
 		}
-	M_ENSURE( cons.c_mvprintf( f_iRowRaw + a_iRow,
-				f_iColumnRaw + a_iColumnOffset, f_oVarTmpBuffer.raw()	) != C_ERR );
-	if ( f_bSearchActived )
-		highlight( f_iRowRaw + a_iRow,
-				f_iColumnRaw + a_iColumnOffset, f_sMatch.f_iMatchNumber,
-				( a_oIt == f_sMatch.f_oCurrentMatch )
-				&& ( a_iColumn == f_sMatch.f_iColumnWithMatch ) );
+	M_ENSURE( cons.c_mvprintf( _rowRaw + row_,
+				_columnRaw + columnOffset_, _varTmpBuffer.raw()	) != C_ERR );
+	if ( _searchActived )
+		highlight( _rowRaw + row_,
+				_columnRaw + columnOffset_, _match._matchNumber,
+				( it_ == _match._currentMatch )
+				&& ( column_ == _match._columnWithMatch ) );
 	return;
 	M_EPILOG
 	}
@@ -393,45 +393,45 @@ inline void cyclic_decrement( ttType& model, tType& iterator, int count )
 
 void HListControl::handle_key_page_up( void )
 	{
-	if ( ! f_iCursorPosition )
+	if ( ! _cursorPosition )
 		{
-		if ( f_iControlOffset )
+		if ( _controlOffset )
 			{
-			f_iControlOffset -= ( f_iHeightRaw - 1 );
-			decrement( f_oFirstVisibleRow, f_iHeightRaw - 1 );
+			_controlOffset -= ( _heightRaw - 1 );
+			decrement( _firstVisibleRow, _heightRaw - 1 );
 			}
 		else
 			HCons::get_instance().bell();
-		if ( f_iControlOffset < 0 )
+		if ( _controlOffset < 0 )
 			{
-			f_iControlOffset = 0;
-			f_oFirstVisibleRow = f_oControler->begin();
+			_controlOffset = 0;
+			_firstVisibleRow = _controler->begin();
 			}
 		}
 	else
 		{
-		f_iCursorPosition = 0;
-		f_oCursor = f_oFirstVisibleRow;
+		_cursorPosition = 0;
+		_cursor = _firstVisibleRow;
 		}
 	return;
 	}
 
 void HListControl::handle_key_page_down( void )
 	{
-	int l_iSize = static_cast<int>( f_oControler->size() );
-	if ( l_iSize >= f_iHeightRaw )
+	int size = static_cast<int>( _controler->size() );
+	if ( size >= _heightRaw )
 		{
-		if ( f_iCursorPosition == ( f_iHeightRaw - 1 ) )
+		if ( _cursorPosition == ( _heightRaw - 1 ) )
 			{
-			if ( f_iControlOffset < ( l_iSize - f_iHeightRaw ) )
+			if ( _controlOffset < ( size - _heightRaw ) )
 				{
-				f_iControlOffset += ( f_iHeightRaw - 1 );
-				increment( f_oFirstVisibleRow, f_iHeightRaw - 1 );
-				if ( f_iControlOffset > ( l_iSize - f_iHeightRaw ) )
+				_controlOffset += ( _heightRaw - 1 );
+				increment( _firstVisibleRow, _heightRaw - 1 );
+				if ( _controlOffset > ( size - _heightRaw ) )
 					{
-					f_iControlOffset = l_iSize - f_iHeightRaw;
-					f_oFirstVisibleRow = f_oControler->rbegin();
-					decrement( f_oFirstVisibleRow, f_iHeightRaw - 1 );
+					_controlOffset = size - _heightRaw;
+					_firstVisibleRow = _controler->rbegin();
+					decrement( _firstVisibleRow, _heightRaw - 1 );
 					}
 				}
 			else
@@ -439,17 +439,17 @@ void HListControl::handle_key_page_down( void )
 			}
 		else
 			{
-			f_iCursorPosition = f_iHeightRaw - 1;
-			f_oCursor = f_oFirstVisibleRow;
-			increment( f_oCursor, f_iHeightRaw - 1 );
+			_cursorPosition = _heightRaw - 1;
+			_cursor = _firstVisibleRow;
+			increment( _cursor, _heightRaw - 1 );
 			}
 		}
 	else
 		{
-		if ( f_iCursorPosition != ( l_iSize - 1 ) )
+		if ( _cursorPosition != ( size - 1 ) )
 			{
-			f_iCursorPosition = l_iSize - 1;
-			f_oCursor = f_oControler->rbegin();
+			_cursorPosition = size - 1;
+			_cursor = _controler->rbegin();
 			}
 		else
 			HCons::get_instance().bell();
@@ -459,18 +459,18 @@ void HListControl::handle_key_page_down( void )
 
 void HListControl::handle_key_up( void )
 	{
-	if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
+	if ( ( _controlOffset + _cursorPosition ) > 0 )
 		{
-		if ( f_iCursorPosition > 0 )
+		if ( _cursorPosition > 0 )
 			{
-			f_iCursorPosition --;
-			-- f_oCursor;
+			_cursorPosition --;
+			-- _cursor;
 			}
-		else if ( f_iControlOffset > 0 )
+		else if ( _controlOffset > 0 )
 			{
-			-- f_oFirstVisibleRow;
-			-- f_oCursor;
-			f_iControlOffset --;
+			-- _firstVisibleRow;
+			-- _cursor;
+			_controlOffset --;
 			}
 		}
 	else
@@ -486,31 +486,31 @@ void HListControl::handle_key_home( void )
 
 void HListControl::handle_key_end( void )
 	{
-	int l_iSize = static_cast<int>( f_oControler->size() );
-	f_oCursor = f_oControler->rbegin();
-	if ( l_iSize >= f_iHeightRaw )
+	int size = static_cast<int>( _controler->size() );
+	_cursor = _controler->rbegin();
+	if ( size >= _heightRaw )
 		{
-		f_iCursorPosition = f_iHeightRaw - 1;
-		f_iControlOffset = l_iSize - f_iHeightRaw;
-		f_oFirstVisibleRow = f_oCursor;
-		decrement( f_oFirstVisibleRow, f_iHeightRaw - 1 );
+		_cursorPosition = _heightRaw - 1;
+		_controlOffset = size - _heightRaw;
+		_firstVisibleRow = _cursor;
+		decrement( _firstVisibleRow, _heightRaw - 1 );
 		}
 	else
-		f_iCursorPosition = l_iSize - 1;
+		_cursorPosition = size - 1;
 	return;
 	}
 
 void HListControl::handle_key_down( void )
 	{
-	if ( ( f_iCursorPosition + f_iControlOffset ) < ( f_oControler->size() - 1 ) )
+	if ( ( _cursorPosition + _controlOffset ) < ( _controler->size() - 1 ) )
 		{
-		f_iCursorPosition ++;
-		++ f_oCursor;
-		if ( f_iCursorPosition >= f_iHeightRaw )
+		_cursorPosition ++;
+		++ _cursor;
+		if ( _cursorPosition >= _heightRaw )
 			{
-			f_iCursorPosition = f_iHeightRaw - 1;
-			f_iControlOffset ++;
-			++ f_oFirstVisibleRow;
+			_cursorPosition = _heightRaw - 1;
+			_controlOffset ++;
+			++ _firstVisibleRow;
 			}
 		}
 	else
@@ -520,7 +520,7 @@ void HListControl::handle_key_down( void )
 
 void HListControl::handle_key_ctrl_n ( void )
 	{
-	if ( f_bBackwards )
+	if ( _backwards )
 		go_to_match_previous();
 	else
 		go_to_match();
@@ -529,7 +529,7 @@ void HListControl::handle_key_ctrl_n ( void )
 
 void HListControl::handle_key_ctrl_p( void )
 	{
-	if ( f_bBackwards )
+	if ( _backwards )
 		go_to_match();
 	else
 		go_to_match_previous();
@@ -538,28 +538,28 @@ void HListControl::handle_key_ctrl_p( void )
 
 void HListControl::handle_key_space( void )
 	{
-	M_ASSERT( ! f_oControler->empty() );
-	M_ASSERT( f_oCursor.is_valid() );
-	if ( f_bCheckable )
-		f_oCursor->switch_state();
+	M_ASSERT( ! _controler->empty() );
+	M_ASSERT( _cursor.is_valid() );
+	if ( _checkable )
+		_cursor->switch_state();
 	return;
 	}
 
 void HListControl::handle_key_tab( void )
 	{
-	f_bFocused = false;	/* very  */
+	_focused = false;	/* very  */
 	schedule_refresh();				/* magic */
 	return;
 	}
 
-int HListControl::do_process_input( int a_iCode )
+int HListControl::do_process_input( int code_ )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	int l_iErrorCode = 0;
-	a_iCode = HControl::do_process_input( a_iCode );
-	f_oVarTmpBuffer = "";
-	switch ( a_iCode )
+	int ctr = 0;
+	int errorCode = 0;
+	code_ = HControl::do_process_input( code_ );
+	_varTmpBuffer = "";
+	switch ( code_ )
 		{
 		case ( KEY_CODES::PAGE_UP ):		handle_key_page_up();		break;
 		case ( KEY_CODES::PAGE_DOWN ):	handle_key_page_down();	break;
@@ -576,155 +576,155 @@ int HListControl::do_process_input( int a_iCode )
  * to another control */
 		default :
 			{
-			l_iErrorCode = static_cast<int>( f_oHeader.size() );
-			for ( l_iCtr = 0; l_iCtr < l_iErrorCode; l_iCtr ++ )
-				if ( tolower( a_iCode ) == tolower( f_oHeader[ l_iCtr ].f_cShortcut ) )
+			errorCode = static_cast<int>( _header.size() );
+			for ( ctr = 0; ctr < errorCode; ctr ++ )
+				if ( tolower( code_ ) == tolower( _header[ ctr ]._shortcut ) )
 					break;
-			if ( l_iCtr < l_iErrorCode )
+			if ( ctr < errorCode )
 				{
-				l_iErrorCode = 0;
-				sort_by_column( l_iCtr,
-						a_iCode == tolower( a_iCode ) ? OListBits::ASCENDING : OListBits::DESCENDING );
+				errorCode = 0;
+				sort_by_column( ctr,
+						code_ == tolower( code_ ) ? OListBits::ASCENDING : OListBits::DESCENDING );
 				}
 			else
-				l_iErrorCode = a_iCode;
+				errorCode = code_;
 			}
 		}
-	a_iCode = l_iErrorCode;
-	if ( ! l_iErrorCode )
+	code_ = errorCode;
+	if ( ! errorCode )
 		{
 		schedule_refresh();
-		f_poParent->status_bar()->message( COLORS::FG_LIGHTGRAY, f_oVarTmpBuffer.raw() );
+		_parent->status_bar()->message( COLORS::FG_LIGHTGRAY, _varTmpBuffer.raw() );
 		}
-	return ( a_iCode );
+	return ( code_ );
 	M_EPILOG
 	}
 
-void HListControl::add_column( int const& a_riColumn, char const* a_pcName,
-		int const& a_riWidth, BITS::ALIGN::align_t const& a_reAlign, const type_t& a_reType, 
-		HControl* a_poControl )
+void HListControl::add_column( int const& column_, char const* name_,
+		int const& width_, BITS::ALIGN::align_t const& align_, const type_t& type_, 
+		HControl* control_ )
 	{
 	M_PROLOG
-	int l_iShortcutIndex = 0;
-	HColumnInfo l_oColumnInfo;
-	int l_iSize = static_cast<int>( f_oControler->size() );
-	if ( l_iSize )
-		M_THROW( "cannot add new column when list not empty", l_iSize );
-	f_oVarTmpBuffer = a_pcName;
-	l_iShortcutIndex = static_cast<int>( f_oVarTmpBuffer.find( '&' ) );
-	if ( l_iShortcutIndex > -1 )
+	int shortcutIndex = 0;
+	HColumnInfo columnInfo;
+	int size = static_cast<int>( _controler->size() );
+	if ( size )
+		M_THROW( "cannot add new column when list not empty", size );
+	_varTmpBuffer = name_;
+	shortcutIndex = static_cast<int>( _varTmpBuffer.find( '&' ) );
+	if ( shortcutIndex > -1 )
 		{
-		f_oVarTmpBuffer.set_at( l_iShortcutIndex, 0 );
-		f_oVarTmpBuffer += a_pcName + l_iShortcutIndex + 1;
+		_varTmpBuffer.set_at( shortcutIndex, 0 );
+		_varTmpBuffer += name_ + shortcutIndex + 1;
 		}
 	else
-		l_iShortcutIndex = 0;
-	f_iSumForOne += a_riWidth;
-	l_oColumnInfo.f_iWidth = a_riWidth;
-	l_oColumnInfo.f_eType = a_reType;
-	l_oColumnInfo.f_eAlign = a_reAlign;
-	l_oColumnInfo.f_iShortcutIndex = l_iShortcutIndex;
-	l_oColumnInfo.f_cShortcut = f_oVarTmpBuffer[ l_iShortcutIndex ];
-	l_oColumnInfo.f_oName = f_oVarTmpBuffer;
-	l_oColumnInfo.f_poControl = a_poControl;
-	if ( ! f_oHeader.is_empty() && ( a_riColumn >= 0 ) )
-		f_oHeader.insert( f_oHeader.n_th( a_riColumn ), l_oColumnInfo );
+		shortcutIndex = 0;
+	_sumForOne += width_;
+	columnInfo._width = width_;
+	columnInfo._type = type_;
+	columnInfo._align = align_;
+	columnInfo._shortcutIndex = shortcutIndex;
+	columnInfo._shortcut = _varTmpBuffer[ shortcutIndex ];
+	columnInfo._name = _varTmpBuffer;
+	columnInfo._control = control_;
+	if ( ! _header.is_empty() && ( column_ >= 0 ) )
+		_header.insert( _header.n_th( column_ ), columnInfo );
 	else
-		f_oHeader.push_back( l_oColumnInfo );
+		_header.push_back( columnInfo );
 	recalculate_column_widths();
 	return;
 	M_EPILOG
 	}
 
-int HListControl::set_focus( char a_cShorcut )
+int HListControl::set_focus( char shorcut_ )
 	{
 	M_PROLOG
-	return ( HControl::set_focus( a_cShorcut ) );
+	return ( HControl::set_focus( shorcut_ ) );
 	M_EPILOG
 	}
 
 void HListControl::recalculate_column_widths( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	int l_iCtrLoc = 0;
-	int l_iColumns = 0;
-	int l_iColumnOffset = 0;
-	int l_iNewWidth = 0;
-	l_iColumns = static_cast<int>( f_oHeader.size() );
-	for ( l_iCtr = 0; l_iCtr < l_iColumns; l_iCtr ++ )
+	int ctr = 0;
+	int ctrLoc = 0;
+	int columns = 0;
+	int columnOffset = 0;
+	int newWidth = 0;
+	columns = static_cast<int>( _header.size() );
+	for ( ctr = 0; ctr < columns; ctr ++ )
 		{
-		l_iNewWidth = f_oHeader [ l_iCtr ].f_iWidth;
-		if ( l_iNewWidth )
+		newWidth = _header [ ctr ]._width;
+		if ( newWidth )
 			{
-			if ( ! f_iSumForOne )
-				M_THROW( "width of all columns equals 0", f_iSumForOne );
-			l_iNewWidth *= f_iWidthRaw;
-			l_iNewWidth /= f_iSumForOne;
-			l_iCtrLoc = l_iCtr; /* last one with non zero width */
-			f_oHeader [ l_iCtr ].f_iWidthRaw = l_iNewWidth;
-			l_iColumnOffset += l_iNewWidth;
+			if ( ! _sumForOne )
+				M_THROW( "width of all columns equals 0", _sumForOne );
+			newWidth *= _widthRaw;
+			newWidth /= _sumForOne;
+			ctrLoc = ctr; /* last one with non zero width */
+			_header [ ctr ]._widthRaw = newWidth;
+			columnOffset += newWidth;
 			}
 		}
 	/* last column with non zero width should fill space */
-	l_iColumnOffset -= f_oHeader [ l_iCtrLoc ].f_iWidthRaw;
-	f_oHeader [ l_iCtrLoc ].f_iWidthRaw = ( f_iWidthRaw - l_iColumnOffset );
+	columnOffset -= _header [ ctrLoc ]._widthRaw;
+	_header [ ctrLoc ]._widthRaw = ( _widthRaw - columnOffset );
 	return;
 	M_EPILOG
 	}
 
-void HListControl::sort_by_column( int a_iColumn, OListBits::sort_order_t a_eOrder )
+void HListControl::sort_by_column( int column_, OListBits::sort_order_t order_ )
 	{
 	M_PROLOG
-	if ( ! f_bSortable )
+	if ( ! _sortable )
 		return;
-	f_iSortColumn = a_iColumn;
-	f_oHeader[ a_iColumn ].f_bDescending = a_eOrder == OListBits::DESCENDING;
-	long int l_iSize = f_oControler->size();
-	if ( l_iSize > 128 )
-		f_poParent->status_bar()->init_progress(
-				static_cast<double>( l_iSize )
-				* static_cast<double>( l_iSize ) / 2.,
+	_sortColumn = column_;
+	_header[ column_ ]._descending = order_ == OListBits::DESCENDING;
+	long int size = _controler->size();
+	if ( size > 128 )
+		_parent->status_bar()->init_progress(
+				static_cast<double>( size )
+				* static_cast<double>( size ) / 2.,
 				" Sorting ..." );
-	list_control_helper::OSortHelper l_oHelper =
-		{ a_iColumn, a_eOrder, f_oHeader[ f_iSortColumn ].f_eType,
-		0, f_oControler->size(), f_poParent };
-	f_oControler->sort( l_oHelper );
-	f_iControlOffset = f_iCursorPosition = 0;
+	list_control_helper::OSortHelper helper =
+		{ column_, order_, _header[ _sortColumn ]._type,
+		0, _controler->size(), _parent };
+	_controler->sort( helper );
+	_controlOffset = _cursorPosition = 0;
 	return;
 	M_EPILOG
 	}
 
-int HListControl::do_click( mouse::OMouse& a_rsMouse )
+int HListControl::do_click( mouse::OMouse& mouse_ )
 	{
 	M_PROLOG
-	int l_iRow = 0, l_iColumn = 0, l_iCtr = 0;
-	int l_iWidth = 0, l_iColumns = static_cast<int>( f_oHeader.size() );
-	HColumnInfo* l_poColumnInfo = NULL;
-	if ( ! HControl::do_click( a_rsMouse ) )
+	int row = 0, column = 0, ctr = 0;
+	int width = 0, columns = static_cast<int>( _header.size() );
+	HColumnInfo* columnInfo = NULL;
+	if ( ! HControl::do_click( mouse_ ) )
 		return ( 1 );
-	l_iRow = ( a_rsMouse.f_iRow - f_iRowRaw ) - ( f_bDrawHeader ? 1 : 0 );
-	if ( l_iRow == f_iCursorPosition )
+	row = ( mouse_._row - _rowRaw ) - ( _drawHeader ? 1 : 0 );
+	if ( row == _cursorPosition )
 		return ( 1 );
-	if ( l_iRow < 0 ) /* header clicked */
+	if ( row < 0 ) /* header clicked */
 		{
-		l_iColumn = a_rsMouse.f_iColumn + f_iColumnRaw - 1;
-		for ( l_iCtr = 0; l_iCtr < l_iColumns; l_iCtr ++ )
+		column = mouse_._column + _columnRaw - 1;
+		for ( ctr = 0; ctr < columns; ctr ++ )
 			{
-			l_poColumnInfo = &f_oHeader [ l_iCtr ];
-			l_iWidth += l_poColumnInfo->f_iWidthRaw;
-			if ( l_iColumn <= l_iWidth )
+			columnInfo = &_header [ ctr ];
+			width += columnInfo->_widthRaw;
+			if ( column <= width )
 				{
-				sort_by_column( l_iCtr,
-						l_poColumnInfo->f_bDescending ? OListBits::ASCENDING : OListBits::DESCENDING );
+				sort_by_column( ctr,
+						columnInfo->_descending ? OListBits::ASCENDING : OListBits::DESCENDING );
 				schedule_refresh();
 				break;
 				}
 			}
 		}
-	else if ( l_iRow < f_oControler->size() )
+	else if ( row < _controler->size() )
 		{
-		f_iCursorPosition = l_iRow;
+		_cursorPosition = row;
 		schedule_refresh();
 		}
 	return ( 0 );
@@ -733,99 +733,99 @@ int HListControl::do_click( mouse::OMouse& a_rsMouse )
 
 bool HListControl::is_searchable( void )
 	{
-	return ( f_bSearchable );
+	return ( _searchable );
 	}
 
 void HListControl::reset( void )
 	{
 	M_PROLOG
-	f_oFirstVisibleRow = f_oCursor = f_oControler->begin();
-	f_iControlOffset = f_iCursorPosition = 0;
+	_firstVisibleRow = _cursor = _controler->begin();
+	_controlOffset = _cursorPosition = 0;
 	M_EPILOG
 	}
 
 void HListControl::go_to_match( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iSize = static_cast<int>( f_oControler->size() );
-	int l_iCount = l_iSize + 1;
-	int l_iColumns = static_cast<int>( f_oHeader.size() );
-	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
-	char const * l_pcHighlightStart = NULL;
-	char const * l_pcOutcome = NULL;
-	iterator_t l_oCursorOrig = f_oCursor;
-	iterator_t l_oFirstVisibleRowOrig = f_oFirstVisibleRow;
-	if ( ! f_bSearchActived )
+	int ctr = 0, ctrLoc = 0, moveFirstRow = 0;
+	int size = static_cast<int>( _controler->size() );
+	int count = size + 1;
+	int columns = static_cast<int>( _header.size() );
+	int controlOffsetOrig = _controlOffset, cursorPositionOrig = _cursorPosition;
+	char const * highlightStart = NULL;
+	char const * outcome = NULL;
+	iterator_t cursorOrig = _cursor;
+	iterator_t firstVisibleRowOrig = _firstVisibleRow;
+	if ( ! _searchActived )
 		return;
-	if ( f_sMatch.f_oCurrentMatch != f_oCursor )
-		f_sMatch.f_iMatchNumber = -1;
-	f_sMatch.f_oCurrentMatch = f_oCursor;
-	while ( l_iCount -- )
+	if ( _match._currentMatch != _cursor )
+		_match._matchNumber = -1;
+	_match._currentMatch = _cursor;
+	while ( count -- )
 		{
-		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr < l_iColumns; l_iCtr ++ )
+		for ( ctr = _match._columnWithMatch; ctr < columns; ctr ++ )
 			{
-			get_text_for_cell( f_oCursor, l_iCtr, TYPE::HSTRING );
-			l_pcHighlightStart = NULL;
-			l_iCtrLoc = 0;
-			for ( HPattern::HMatchIterator it = f_oPattern.find( f_oVarTmpBuffer.raw() ),
-					end = f_oPattern.end(); it != end; ++ it, ++ l_iCtrLoc )
+			get_text_for_cell( _cursor, ctr, TYPE::HSTRING );
+			highlightStart = NULL;
+			ctrLoc = 0;
+			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
+					end = _pattern.end(); it != end; ++ it, ++ ctrLoc )
 				{
-				if ( l_iCtrLoc > f_sMatch.f_iMatchNumber )
+				if ( ctrLoc > _match._matchNumber )
 					{
-					l_pcHighlightStart = it->raw();
+					highlightStart = it->raw();
 					break;
 					}
 				}
-			if ( l_pcHighlightStart )
+			if ( highlightStart )
 				break;
-			f_sMatch.f_iMatchNumber = -1;
+			_match._matchNumber = -1;
 			}
-		if ( l_pcHighlightStart )
+		if ( highlightStart )
 			break;
-		f_sMatch.f_iColumnWithMatch = 0;
+		_match._columnWithMatch = 0;
 /* this part is from process_input, but slightly modified */
-		if ( ( f_iCursorPosition + f_iControlOffset ) < ( l_iSize - 1 ) )
+		if ( ( _cursorPosition + _controlOffset ) < ( size - 1 ) )
 			{
-			f_iCursorPosition ++;
-			if ( f_iCursorPosition >= f_iHeightRaw )
+			_cursorPosition ++;
+			if ( _cursorPosition >= _heightRaw )
 				{
-				f_iCursorPosition = f_iHeightRaw - 1;
-				f_iControlOffset ++;
-				l_iMoveFirstRow ++;
+				_cursorPosition = _heightRaw - 1;
+				_controlOffset ++;
+				moveFirstRow ++;
 				}
-			++ f_oCursor;
+			++ _cursor;
 			}
 		else
 			{
-			f_oCursor = f_oFirstVisibleRow = f_oControler->begin();
-			f_iControlOffset = f_iCursorPosition = 0;
-			l_iMoveFirstRow = 0;
-			l_pcOutcome = _( "search hit BOTTOM, continuing at TOP" );
+			_cursor = _firstVisibleRow = _controler->begin();
+			_controlOffset = _cursorPosition = 0;
+			moveFirstRow = 0;
+			outcome = _( "search hit BOTTOM, continuing at TOP" );
 			}
 /* end od it */
 		}
-	if ( l_pcHighlightStart )
+	if ( highlightStart )
 		{
-		if ( l_iMoveFirstRow )
-			increment( f_oFirstVisibleRow, l_iMoveFirstRow );
-		f_sMatch.f_iColumnWithMatch = l_iCtr;
-		f_sMatch.f_iMatchNumber = l_iCtrLoc;
-		f_sMatch.f_oCurrentMatch = f_oCursor;
-		f_oVarTmpBuffer = "";
+		if ( moveFirstRow )
+			increment( _firstVisibleRow, moveFirstRow );
+		_match._columnWithMatch = ctr;
+		_match._matchNumber = ctrLoc;
+		_match._currentMatch = _cursor;
+		_varTmpBuffer = "";
 		}
 	else
 		{
-		f_oCursor = l_oCursorOrig;
-		f_oFirstVisibleRow = l_oFirstVisibleRowOrig;
-		f_iCursorPosition = l_iCursorPositionOrig;
-		f_iControlOffset = l_iControlOffsetOrig;
-		f_sMatch.f_iMatchNumber = -1;
-		f_sMatch.f_iColumnWithMatch = 0;
-		f_oVarTmpBuffer = HString( _( "pattern not found: " ) ) + f_oPattern.error();
+		_cursor = cursorOrig;
+		_firstVisibleRow = firstVisibleRowOrig;
+		_cursorPosition = cursorPositionOrig;
+		_controlOffset = controlOffsetOrig;
+		_match._matchNumber = -1;
+		_match._columnWithMatch = 0;
+		_varTmpBuffer = HString( _( "pattern not found: " ) ) + _pattern.error();
 		}
-	if ( l_pcOutcome )
-		f_oVarTmpBuffer = l_pcOutcome;
+	if ( outcome )
+		_varTmpBuffer = outcome;
 	return;
 	M_EPILOG
 	}
@@ -833,177 +833,177 @@ void HListControl::go_to_match( void )
 void HListControl::go_to_match_previous ( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iCtrLoc = 0, l_iMoveFirstRow = 0;
-	int l_iSize = static_cast<int>( f_oControler->size() );
-	int l_iCount = l_iSize + 1;
-	int l_iColumns = static_cast<int>( f_oHeader.size() );
-	int l_iControlOffsetOrig = f_iControlOffset, l_iCursorPositionOrig = f_iCursorPosition;
-	char const * l_pcHighlightStart = NULL;
-	char const * l_pcOutcome = NULL;
-	iterator_t l_oCursorOrig = f_oCursor;
-	iterator_t l_oFirstVisibleRowOrig = f_oFirstVisibleRow;
-	if ( ! f_bSearchActived )
+	int ctr = 0, ctrLoc = 0, moveFirstRow = 0;
+	int size = static_cast<int>( _controler->size() );
+	int count = size + 1;
+	int columns = static_cast<int>( _header.size() );
+	int controlOffsetOrig = _controlOffset, cursorPositionOrig = _cursorPosition;
+	char const * highlightStart = NULL;
+	char const * outcome = NULL;
+	iterator_t cursorOrig = _cursor;
+	iterator_t firstVisibleRowOrig = _firstVisibleRow;
+	if ( ! _searchActived )
 		return;
-	if ( f_sMatch.f_oCurrentMatch != f_oCursor )
-		f_sMatch.f_iMatchNumber = -1;
-	f_sMatch.f_oCurrentMatch = f_oCursor;
-	while ( l_iCount -- )
+	if ( _match._currentMatch != _cursor )
+		_match._matchNumber = -1;
+	_match._currentMatch = _cursor;
+	while ( count -- )
 		{
-		for ( l_iCtr = f_sMatch.f_iColumnWithMatch; l_iCtr >= 0; l_iCtr -- )
+		for ( ctr = _match._columnWithMatch; ctr >= 0; ctr -- )
 			{
-			get_text_for_cell( f_oCursor, l_iCtr, TYPE::HSTRING );
-			l_pcHighlightStart = NULL;
-			l_iCtrLoc = 0;
-			if ( f_sMatch.f_iMatchNumber < 0 )
-				f_sMatch.f_iMatchNumber = static_cast<int>( distance( f_oPattern.find( f_oVarTmpBuffer.raw() ), f_oPattern.end() ) );
-			for ( HPattern::HMatchIterator it = f_oPattern.find( f_oVarTmpBuffer.raw() ),
-					end = f_oPattern.end(); it != end; ++ it, ++ l_iCtrLoc )
+			get_text_for_cell( _cursor, ctr, TYPE::HSTRING );
+			highlightStart = NULL;
+			ctrLoc = 0;
+			if ( _match._matchNumber < 0 )
+				_match._matchNumber = static_cast<int>( distance( _pattern.find( _varTmpBuffer.raw() ), _pattern.end() ) );
+			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
+					end = _pattern.end(); it != end; ++ it, ++ ctrLoc )
 				{
-				if ( l_iCtrLoc == ( f_sMatch.f_iMatchNumber - 1 ) )
+				if ( ctrLoc == ( _match._matchNumber - 1 ) )
 					{
-					l_pcHighlightStart = it->raw();
+					highlightStart = it->raw();
 					break;
 					}
-				if ( l_iCtrLoc >= f_sMatch.f_iMatchNumber )
+				if ( ctrLoc >= _match._matchNumber )
 					{
-					l_pcHighlightStart = NULL;
+					highlightStart = NULL;
 					break;
 					}
 				}
-			if ( l_pcHighlightStart )
+			if ( highlightStart )
 				break;
-			f_sMatch.f_iMatchNumber = -1;
+			_match._matchNumber = -1;
 			}
-		if ( l_pcHighlightStart )
+		if ( highlightStart )
 			break;
-		f_sMatch.f_iColumnWithMatch = l_iColumns - 1;
+		_match._columnWithMatch = columns - 1;
 /* this part is from process_input, but slightly modified */
-		if ( ( f_iControlOffset + f_iCursorPosition ) > 0 )
+		if ( ( _controlOffset + _cursorPosition ) > 0 )
 			{
-			if ( f_iCursorPosition > 0 )
-				f_iCursorPosition --;
-			else if ( f_iControlOffset > 0 )
+			if ( _cursorPosition > 0 )
+				_cursorPosition --;
+			else if ( _controlOffset > 0 )
 				{
-				f_iControlOffset --;
-				l_iMoveFirstRow ++;
+				_controlOffset --;
+				moveFirstRow ++;
 				}
-			cyclic_decrement( f_oControler, f_oCursor, 1 );
+			cyclic_decrement( _controler, _cursor, 1 );
 			}
 		else
 			{
-			if ( l_iSize >= f_iHeightRaw )
+			if ( size >= _heightRaw )
 				{
-				f_oCursor = f_oControler->begin();
-				cyclic_decrement( f_oControler, f_oCursor, 1 );
-				f_oFirstVisibleRow = f_oCursor;
-				cyclic_decrement( f_oControler, f_oFirstVisibleRow, f_iHeightRaw - 1 );
-				f_iCursorPosition = f_iHeightRaw - 1;
-				f_iControlOffset = l_iSize - f_iHeightRaw;
+				_cursor = _controler->begin();
+				cyclic_decrement( _controler, _cursor, 1 );
+				_firstVisibleRow = _cursor;
+				cyclic_decrement( _controler, _firstVisibleRow, _heightRaw - 1 );
+				_cursorPosition = _heightRaw - 1;
+				_controlOffset = size - _heightRaw;
 				}
 			else
-				f_iCursorPosition = l_iSize - 1;
-			l_iMoveFirstRow = 0;
-			l_pcOutcome = _( "search hit TOP, continuing at BOTTOM" );
+				_cursorPosition = size - 1;
+			moveFirstRow = 0;
+			outcome = _( "search hit TOP, continuing at BOTTOM" );
 			}
 /* end od it */
 		}
-	if ( l_pcHighlightStart )
+	if ( highlightStart )
 		{
-		if ( l_iMoveFirstRow )
-			cyclic_decrement( f_oControler, f_oFirstVisibleRow, l_iMoveFirstRow );
-		f_sMatch.f_iColumnWithMatch = l_iCtr;
-		f_sMatch.f_iMatchNumber = l_iCtrLoc;
-		f_sMatch.f_oCurrentMatch = f_oCursor;
-		f_oVarTmpBuffer = "";
+		if ( moveFirstRow )
+			cyclic_decrement( _controler, _firstVisibleRow, moveFirstRow );
+		_match._columnWithMatch = ctr;
+		_match._matchNumber = ctrLoc;
+		_match._currentMatch = _cursor;
+		_varTmpBuffer = "";
 		}
 	else
 		{
-		f_oCursor = l_oCursorOrig;
-		f_oFirstVisibleRow = l_oFirstVisibleRowOrig;
-		f_iCursorPosition = l_iCursorPositionOrig;
-		f_iControlOffset = l_iControlOffsetOrig;
-		f_sMatch.f_iMatchNumber = -1;
-		f_sMatch.f_iColumnWithMatch = 0;
-		f_oVarTmpBuffer = _( "pattern not found" );
+		_cursor = cursorOrig;
+		_firstVisibleRow = firstVisibleRowOrig;
+		_cursorPosition = cursorPositionOrig;
+		_controlOffset = controlOffsetOrig;
+		_match._matchNumber = -1;
+		_match._columnWithMatch = 0;
+		_varTmpBuffer = _( "pattern not found" );
 		}
-	if ( l_pcOutcome )
-		f_oVarTmpBuffer = l_pcOutcome;
+	if ( outcome )
+		_varTmpBuffer = outcome;
 	return;
 	M_EPILOG
 	}
 
-void HListControl::set_flags( flag_t a_eFlags, flag_t a_eMask )
+void HListControl::set_flags( flag_t flags_, flag_t mask_ )
 	{
 	M_PROLOG
-	if ( !!( a_eMask & FLAG::SORTABLE ) )
-		f_bSortable = !!( a_eFlags & FLAG::SORTABLE ) ? true : false;
-	if ( !!( a_eMask & FLAG::CHECKABLE ) )
-		f_bCheckable = !!( a_eFlags & FLAG::CHECKABLE ) ? true : false;
-	if ( !!( a_eMask & FLAG::EDITABLE ) )
-		f_bEditable = !!( a_eFlags & FLAG::EDITABLE ) ? true : false;
-	if ( !!( a_eMask & FLAG::DRAW_HEADER ) )
-		f_bDrawHeader = !!( a_eFlags & FLAG::DRAW_HEADER ) ? true : false;
+	if ( !!( mask_ & FLAG::SORTABLE ) )
+		_sortable = !!( flags_ & FLAG::SORTABLE ) ? true : false;
+	if ( !!( mask_ & FLAG::CHECKABLE ) )
+		_checkable = !!( flags_ & FLAG::CHECKABLE ) ? true : false;
+	if ( !!( mask_ & FLAG::EDITABLE ) )
+		_editable = !!( flags_ & FLAG::EDITABLE ) ? true : false;
+	if ( !!( mask_ & FLAG::DRAW_HEADER ) )
+		_drawHeader = !!( flags_ & FLAG::DRAW_HEADER ) ? true : false;
 	return;
 	M_EPILOG
 	}
 
-bool HListControl::get_text_for_cell( iterator_t& a_oIt, int a_iColumn, type_t a_eType )
+bool HListControl::get_text_for_cell( iterator_t& it_, int column_, type_t type_ )
 	{
 	M_PROLOG
-	M_ASSERT( a_oIt.is_valid() );
-	HAbstractRow& l_oItem = *a_oIt;
-	switch ( a_eType.value() )
+	M_ASSERT( it_.is_valid() );
+	HAbstractRow& item = *it_;
+	switch ( type_.value() )
 		{
 		case ( TYPE::INT_LONG ):
-			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_long();
+			_varTmpBuffer = item [ column_ ].get_long();
 		break;
 		case ( TYPE::DOUBLE ):
-			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_double();
+			_varTmpBuffer = item [ column_ ].get_double();
 		break;
 		case ( TYPE::HSTRING ):
-			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_string();
+			_varTmpBuffer = item [ column_ ].get_string();
 		break;
 		case ( TYPE::HTIME ):
-			f_oVarTmpBuffer = l_oItem [ a_iColumn ].get_time();
+			_varTmpBuffer = item [ column_ ].get_time();
 		break;
 		default :
-			M_THROW( "unknown type", a_eType.value() );
+			M_THROW( "unknown type", type_.value() );
 		}
-	return ( l_oItem.get_checked() );
+	return ( item.get_checked() );
 	M_EPILOG
 	}
 
 list_control_helper::HAbstractControler::ptr_t& HListControl::get_controler( void )
 	{
-	return ( f_oControler );
+	return ( _controler );
 	}
 
 int long HListControl::get_row_count( void )
 	{
-	return ( f_oControler->size() );
+	return ( _controler->size() );
 	}
 
 void HListControl::remove_current_row ( void )
 	{
 	M_PROLOG
-	bool l_bFlag = true;
-	if ( f_iControlOffset
-			&& ( ( f_iControlOffset + f_iHeightRaw ) == f_oControler->size() ) )
+	bool flag = true;
+	if ( _controlOffset
+			&& ( ( _controlOffset + _heightRaw ) == _controler->size() ) )
 		{
-		f_iControlOffset --;
-		++ f_oFirstVisibleRow;
+		_controlOffset --;
+		++ _firstVisibleRow;
 		}
-	else if ( f_iCursorPosition && ( f_iCursorPosition == ( f_oControler->size() - 1 ) ) )
-		f_iCursorPosition --;
+	else if ( _cursorPosition && ( _cursorPosition == ( _controler->size() - 1 ) ) )
+		_cursorPosition --;
 	else
-		l_bFlag = false;
-	if ( f_oCursor == f_oFirstVisibleRow )
-		++ f_oFirstVisibleRow;
-	n_bNeedRepaint = true;
-	iterator_t it = f_oCursor;
-	if ( l_bFlag )
-		++ f_oCursor;
-	f_oControler->erase( it );
+		flag = false;
+	if ( _cursor == _firstVisibleRow )
+		++ _firstVisibleRow;
+	_needRepaint_ = true;
+	iterator_t it = _cursor;
+	if ( flag )
+		++ _cursor;
+	_controler->erase( it );
 	schedule_refresh();
 	return;
 	M_EPILOG
@@ -1012,20 +1012,20 @@ void HListControl::remove_current_row ( void )
 void HListControl::do_update( void )
 	{
 	M_PROLOG
-	if ( f_oControler->size() )
+	if ( _controler->size() )
 		{
-		f_iControlOffset = f_iCursorPosition = 0;
-		f_oFirstVisibleRow = f_oControler->begin();
-		f_oCursor = f_oControler->begin();
+		_controlOffset = _cursorPosition = 0;
+		_firstVisibleRow = _controler->begin();
+		_cursor = _controler->begin();
 		}
 	return;
 	M_EPILOG
 	}
 
-type_t HListControl::get_column_type( int a_iColumn )
+type_t HListControl::get_column_type( int column_ )
 	{
 	M_PROLOG
-	return ( f_oHeader[ a_iColumn ].f_eType );
+	return ( _header[ column_ ]._type );
 	M_EPILOG
 	}
 
@@ -1035,34 +1035,34 @@ namespace list_control_helper
 void OSortHelper::progress( void )
 	{
 	M_PROLOG
-	++ f_lComparedItems;
-	if ( ( f_iSize > 1024 ) && ! ( f_lComparedItems % 1024 ) )
-		f_poWindow->status_bar()->update_progress( static_cast<double>( f_lComparedItems ) );
+	++ _comparedItems;
+	if ( ( _size > 1024 ) && ! ( _comparedItems % 1024 ) )
+		_window->status_bar()->update_progress( static_cast<double>( _comparedItems ) );
 	return;
 	M_EPILOG
 	}
 
 template<>
-bool compare_cells( HInfo const& a_oLeft, HInfo const& a_oRight, OSortHelper& a_roSortHelper )
+bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHelper_ )
 	{
 	M_PROLOG
-	if ( a_roSortHelper.f_poWindow )
-		a_roSortHelper.progress();
+	if ( sortHelper_._window )
+		sortHelper_.progress();
 	bool lower = false;
-	switch ( a_roSortHelper.f_eType.value() )
+	switch ( sortHelper_._type.value() )
 		{
 		case ( TYPE::INT_LONG ):
-			lower = a_oLeft.get<long>() < a_oRight.get<long>();
+			lower = left_.get<long>() < right_.get<long>();
 		break;
 		case ( TYPE::DOUBLE ):
-			lower = a_oLeft.get<double>() < a_oRight.get<double>();
+			lower = left_.get<double>() < right_.get<double>();
 		break;
 		case ( TYPE::HSTRING ):
-			lower = strcasecmp( a_oLeft.get<HString const &>(),
-					 a_oRight.get<HString const&>() ) < 0;
+			lower = strcasecmp( left_.get<HString const &>(),
+					 right_.get<HString const&>() ) < 0;
 		break;
 		case ( TYPE::HTIME ):
-			lower = static_cast<time_t>( a_oLeft.get<HTime const&>() ) < static_cast<time_t>( a_oRight.get<HTime const&>() );
+			lower = static_cast<time_t>( left_.get<HTime const&>() ) < static_cast<time_t>( right_.get<HTime const&>() );
 		break;
 		default:
 			break;
@@ -1074,7 +1074,7 @@ bool compare_cells( HInfo const& a_oLeft, HInfo const& a_oRight, OSortHelper& a_
 template<>
 HListControler<>::model_ptr_t HListControler<>::get_model( void )
 	{
-	return ( f_oList );
+	return ( _list );
 	}
 
 HAbstractControler::~HAbstractControler( void )
@@ -1082,14 +1082,14 @@ HAbstractControler::~HAbstractControler( void )
 	return;
 	}
 
-HAbstractControler::HAbstractControler( void ) : f_poControl( NULL )
+HAbstractControler::HAbstractControler( void ) : _control( NULL )
 	{
 	return;
 	}
 
-void HAbstractControler::set_control( HListControl* a_poControl )
+void HAbstractControler::set_control( HListControl* control_ )
 	{
-	f_poControl = a_poControl;
+	_control = control_;
 	return;
 	}
 
@@ -1107,7 +1107,7 @@ template<>
 yaal::hcore::HString const HCell<>::get_long( void )
 	{
 	M_PROLOG
-	return ( HString ( (*f_rtData)[ f_iColumn ].get<int long>() ) );
+	return ( HString ( (*_data)[ _column ].get<int long>() ) );
 	M_EPILOG
 	}
 
@@ -1115,7 +1115,7 @@ template<>
 yaal::hcore::HString const HCell<>::get_double( void )
 	{
 	M_PROLOG
-	return ( HString ( (*f_rtData)[ f_iColumn ].get<double>() ) );
+	return ( HString ( (*_data)[ _column ].get<double>() ) );
 	M_EPILOG
 	}
 
@@ -1123,7 +1123,7 @@ template<>
 yaal::hcore::HString const HCell<>::get_string( void )
 	{
 	M_PROLOG
-	return ( (*f_rtData)[ f_iColumn ].get<yaal::hcore::HString const &>() );
+	return ( (*_data)[ _column ].get<yaal::hcore::HString const &>() );
 	M_EPILOG
 	}
 
@@ -1131,75 +1131,75 @@ template<>
 char const * HCell<>::get_time( void )
 	{
 	M_PROLOG
-	return ( (*f_rtData)[ f_iColumn ].get<yaal::hcore::HTime const &>() );
+	return ( (*_data)[ _column ].get<yaal::hcore::HTime const &>() );
 	M_EPILOG
 	}
 
-HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( void ) : f_oIteratorPtr()
+HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( void ) : _iteratorPtr()
 	{
 	return;
 	}
 
-HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t const& a_oIt ) : f_oIteratorPtr( a_oIt )
+HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t const& it_ ) : _iteratorPtr( it_ )
 	{
 	return;
 	}
 
 bool HAbstractControler::HModelIteratorWrapper::is_valid( void ) const
 	{
-	return ( f_oIteratorPtr->is_valid() );
+	return ( _iteratorPtr->is_valid() );
 	}
 
-bool HAbstractControler::HModelIteratorWrapper::operator==( HAbstractControler::HModelIteratorWrapper const& a_oIt )
+bool HAbstractControler::HModelIteratorWrapper::operator==( HAbstractControler::HModelIteratorWrapper const& it_ )
 	{
 	M_PROLOG
-	return ( f_oIteratorPtr.raw() ? f_oIteratorPtr->is_equal( *a_oIt.f_oIteratorPtr ) : a_oIt.f_oIteratorPtr.raw() == NULL );
+	return ( _iteratorPtr.raw() ? _iteratorPtr->is_equal( *it_._iteratorPtr ) : it_._iteratorPtr.raw() == NULL );
 	M_EPILOG
 	}
 
-bool HAbstractControler::HModelIteratorWrapper::operator!=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
+bool HAbstractControler::HModelIteratorWrapper::operator!=( HAbstractControler::HModelIteratorWrapper const& it_ )
 	{
 	M_PROLOG
-	return ( f_oIteratorPtr.raw() ? f_oIteratorPtr->is_not_equal( *a_oIt.f_oIteratorPtr ) : a_oIt.f_oIteratorPtr.raw() != NULL );
+	return ( _iteratorPtr.raw() ? _iteratorPtr->is_not_equal( *it_._iteratorPtr ) : it_._iteratorPtr.raw() != NULL );
 	M_EPILOG
 	}
 
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator++( void )
 	{
-	f_oIteratorPtr->next();
+	_iteratorPtr->next();
 	return ( *this );
 	}
 
 HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator--( void )
 	{
-	f_oIteratorPtr->previous();
+	_iteratorPtr->previous();
 	return ( *this );
 	}
 
 HAbstractRow& HAbstractControler::HModelIteratorWrapper::operator*( void )
 	{
-	return ( f_oIteratorPtr->dereference() );
+	return ( _iteratorPtr->dereference() );
 	}
 
 HAbstractRow* HAbstractControler::HModelIteratorWrapper::operator->( void )
 	{
-	return ( f_oIteratorPtr->call() );
+	return ( _iteratorPtr->call() );
 	}
 
-HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( HAbstractControler::HModelIteratorWrapper const& a_oIt )
-	: f_oIteratorPtr()
+HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( HAbstractControler::HModelIteratorWrapper const& it_ )
+	: _iteratorPtr()
 	{
-	operator=( a_oIt );
+	operator=( it_ );
 	return;
 	}
 
-HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator=( HAbstractControler::HModelIteratorWrapper const& a_oIt )
+HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator=( HAbstractControler::HModelIteratorWrapper const& it_ )
 	{
 	M_PROLOG
-	if ( &a_oIt != this )
+	if ( &it_ != this )
 		{
-		if ( a_oIt.f_oIteratorPtr.raw() )
-			a_oIt.f_oIteratorPtr->assign_to( f_oIteratorPtr );
+		if ( it_._iteratorPtr.raw() )
+			it_._iteratorPtr->assign_to( _iteratorPtr );
 		}
 	return ( *this );
 	M_EPILOG
@@ -1207,7 +1207,7 @@ HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWra
 
 HAbstractControler::iterator_ptr_t& HAbstractControler::HModelIteratorWrapper::raw( void )
 	{
-	return ( f_oIteratorPtr );
+	return ( _iteratorPtr );
 	}
 
 HAbstractControler::HAbstractModelIterator::HAbstractModelIterator( void )
@@ -1228,29 +1228,29 @@ HAbstractRow::~HAbstractRow( void )
 template<>
 void HRow<>::switch_state( void )
 	{
-	f_roIterator->m_bChecked = ! f_roIterator->m_bChecked;
+	_iterator->m_bChecked = ! _iterator->m_bChecked;
 	return;
 	}
 
 template<>
 bool HRow<>::get_checked( void )
 	{
-	return ( f_roIterator->m_bChecked );
+	return ( _iterator->m_bChecked );
 	}
 
 template<>
 int long HRow<>::get_id( void )
 	{
-	return ( f_roIterator->m_lId );
+	return ( _iterator->m_lId );
 	}
 
 template<>
-HRow<>::HRow( iterator_t& a_oIt ) : f_roIterator( a_oIt ), f_oCells( a_oIt->get_size() )
+HRow<>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( it_->get_size() )
 	{
 	M_PROLOG
-	int long l_iCellCount = a_oIt->get_size();
-	for ( int i = 0; i < l_iCellCount; ++ i )
-		f_oCells[ i ] = HCell<>::ptr_t( new HCell<>( f_roIterator, i ) );
+	int long cellCount = it_->get_size();
+	for ( int i = 0; i < cellCount; ++ i )
+		_cells[ i ] = HCell<>::ptr_t( new HCell<>( _iterator, i ) );
 	return;
 	M_EPILOG
 	}
@@ -1261,24 +1261,24 @@ HAbstractCell::~HAbstractCell( void )
 	}
 
 template<>
-void HCell<>::set_child_control_data( HControl* a_poControl )
+void HCell<>::set_child_control_data( HControl* control_ )
 	{
 	M_PROLOG
-	a_poControl->set( (*f_rtData)[ f_iColumn ] );
-	a_poControl->refresh();
+	control_->set( (*_data)[ _column ] );
+	control_->refresh();
 	return;
 	M_EPILOG
 	}
 
 template<>
-bool CompareListControlItems<>::operator() ( HItem const& a_oLeft,
-		HItem const& a_oRight ) const
+bool CompareListControlItems<>::operator() ( HItem const& left_,
+		HItem const& right_ ) const
 	{
 	M_PROLOG
-	HItem const& l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::ASCENDING ? a_oLeft : a_oRight;
-	HItem const& l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::ASCENDING ? a_oRight : a_oLeft;
-	return ( list_control_helper::compare_cells( l_oLeft[ f_roSortHelper.f_iSortColumn ],
-				l_oRight[ f_roSortHelper.f_iSortColumn ], f_roSortHelper ) );
+	HItem const& left = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? left_ : right_;
+	HItem const& right = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? right_ : left_;
+	return ( list_control_helper::compare_cells( left[ _sortHelper._sortColumn ],
+				right[ _sortHelper._sortColumn ], _sortHelper ) );
 	M_EPILOG
 	}
 

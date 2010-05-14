@@ -42,8 +42,8 @@ namespace tools
 class HFSItem
 	{
 	typedef HFSItem self_t;
-	int f_iNameLen;
-	yaal::hcore::HString f_oPath;
+	int _nameLen;
+	yaal::hcore::HString _path;
 public:
 	typedef yaal::hcore::HPointer<HFSItem> ptr_t;
 	class HIterator;
@@ -70,14 +70,14 @@ typedef yaal::hcore::HExceptionT<HFSItem> HFSItemException;
  */
 class HFSItem::HIterator
 	{
-	yaal::hcore::HString f_oPath;
-	void* f_pvDir;
-	yaal::hcore::HChunk::ptr_t f_oDirEnt;
-	HFSItem f_oItem;
+	yaal::hcore::HString _path;
+	void* _dir;
+	yaal::hcore::HChunk::ptr_t _dirEnt;
+	HFSItem _item;
 public:
-	HIterator( HIterator const& a_oIt );
+	HIterator( HIterator const& it_ );
 	~HIterator( void );
-	HIterator& operator= ( HIterator const& a_oIt );
+	HIterator& operator= ( HIterator const& it_ );
 	HIterator& operator ++ ( void );
 	HIterator const operator ++ ( int );
 	HFSItem const& operator* ( void );

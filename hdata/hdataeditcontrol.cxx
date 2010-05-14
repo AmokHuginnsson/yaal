@@ -40,20 +40,20 @@ namespace yaal
 namespace hdata
 {
 
-HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
-		int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth,
-		char const * a_pcLabel, int a_iBufferSize, char const * a_pcValue,
-		char const * a_pcMask, bool a_bReplace, bool a_bMultiLine,
-		bool a_bReadOnly, bool a_bRightAligned,
-		bool a_bPassword, int a_iMaxHistoryLevel )
-								:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-										a_iWidth, a_pcLabel ),
-									HEditControl( a_poParent,
-										a_iRow, a_iColumn, a_iHeight, a_iWidth,
-										a_pcLabel, a_iBufferSize, a_pcValue,
-										a_pcMask, a_bReplace, a_bMultiLine,
-										a_bReadOnly, a_bRightAligned,
-										a_bPassword, a_iMaxHistoryLevel ),
+HDataEditControl::HDataEditControl( HDataWindow * parent_,
+		int row_, int column_, int height_, int width_,
+		char const * label_, int bufferSize_, char const * value_,
+		char const * mask_, bool replace_, bool multiLine_,
+		bool readOnly_, bool rightAligned_,
+		bool password_, int maxHistoryLevel_ )
+								:	HControl ( parent_, row_, column_, height_,
+										width_, label_ ),
+									HEditControl( parent_,
+										row_, column_, height_, width_,
+										label_, bufferSize_, value_,
+										mask_, replace_, multiLine_,
+										readOnly_, rightAligned_,
+										password_, maxHistoryLevel_ ),
 									HDataControl()
 	{
 	M_PROLOG
@@ -61,12 +61,12 @@ HDataEditControl::HDataEditControl( HDataWindow * a_poParent,
 	M_EPILOG
 	}
 
-int HDataEditControl::do_process_input ( int a_iCode )
+int HDataEditControl::do_process_input ( int code_ )
 	{
 	M_PROLOG
-	bool l_bNoChange = false;
-	HDataWindow * l_poWindow = NULL;
-	switch ( a_iCode )
+	bool noChange = false;
+	HDataWindow * window = NULL;
+	switch ( code_ )
 		{
 		case ( '\t' ):
 		case ( '\r' ):
@@ -79,34 +79,34 @@ int HDataEditControl::do_process_input ( int a_iCode )
 		case ( KEY_CODES::INSERT ):
 		case ( KEY < 'f' >::meta ):
 		case ( KEY < 'b' >::meta ):
-			l_bNoChange = true;
+			noChange = true;
 		break;
 		case ( KEY_CODES::PAGE_UP ):
 		case ( KEY_CODES::PAGE_DOWN ):
 		case ( KEY_CODES::UP ):
 		case ( KEY_CODES::DOWN ):
-			if ( f_bMultiLine )
-				l_bNoChange = true;
+			if ( _multiLine )
+				noChange = true;
 		break;
 		case ( KEY_CODES::BACKSPACE ):
-			if ( ! ( f_iControlOffset + f_iCursorPosition ) )
-				l_bNoChange = true;
+			if ( ! ( _controlOffset + _cursorPosition ) )
+				noChange = true;
 		break;
 		case ( KEY_CODES::DELETE ):
-			if ( f_oString.is_empty() )
-				l_bNoChange = true;
+			if ( _string.is_empty() )
+				noChange = true;
 		break;
 		default:
 		break;
 		}
-	a_iCode = HEditControl::do_process_input ( a_iCode );
-	if ( ! ( a_iCode || l_bNoChange ) )
+	code_ = HEditControl::do_process_input ( code_ );
+	if ( ! ( code_ || noChange ) )
 		{
-		l_poWindow = dynamic_cast<HDataWindow*>( f_poParent );
-		M_ASSERT ( l_poWindow );
-		l_poWindow->set_modified();
+		window = dynamic_cast<HDataWindow*>( _parent );
+		M_ASSERT ( window );
+		window->set_modified();
 		}
-	return ( a_iCode );
+	return ( code_ );
 	M_EPILOG
 	}
 

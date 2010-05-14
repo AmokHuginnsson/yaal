@@ -49,7 +49,7 @@ protected:
 public:
 	typedef yaal::hcore::HPointer<HMenuControl> ptr_t;
 protected:
-	HTUIProcess* f_poProcess;
+	HTUIProcess* _process;
 public:
 	HMenuControl( HWindow*,				/* parent */
 								 int,							/* row */

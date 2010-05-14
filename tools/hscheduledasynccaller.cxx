@@ -39,7 +39,7 @@ namespace yaal
 namespace tools
 {
 
-HScheduledAsyncCaller::HScheduledAsyncCaller( void ) : f_oCondition( f_oMutex )
+HScheduledAsyncCaller::HScheduledAsyncCaller( void ) : _condition( _mutex )
 	{
 	M_PROLOG
 	start();
@@ -58,7 +58,7 @@ HScheduledAsyncCaller::~HScheduledAsyncCaller( void )
 void HScheduledAsyncCaller::do_signal( void )
 	{
 	M_PROLOG
-	f_oCondition.signal();
+	_condition.signal();
 	return;
 	M_EPILOG
 	}
@@ -66,23 +66,23 @@ void HScheduledAsyncCaller::do_signal( void )
 void* HScheduledAsyncCaller::do_work( void )
 	{
 	M_PROLOG
-	HLock l( f_oMutex );
-	while ( f_bLoop )
+	HLock l( _mutex );
+	while ( _loop )
 		{
-		queue_t::iterator it = f_oQueue.begin();
-		while ( ( it != f_oQueue.end() ) && ( (*it).first <= time( NULL ) ) )
+		queue_t::iterator it = _queue.begin();
+		while ( ( it != _queue.end() ) && ( (*it).first <= time( NULL ) ) )
 			{
 			(*it).second->invoke();
-			it = f_oQueue.erase( it );
+			it = _queue.erase( it );
 			}
-		if ( it != f_oQueue.end() )
+		if ( it != _queue.end() )
 			{
 			time_t delay = 0;
 			if ( ( delay = ( (*it).first - time( NULL ) ) ) > 0 )
-				f_oCondition.wait( static_cast<int long unsigned>( delay ), 0 );
+				_condition.wait( static_cast<int long unsigned>( delay ), 0 );
 			}
 		else
-			f_oCondition.wait( 10000, 0 );
+			_condition.wait( 10000, 0 );
 		}
 	return ( 0 );
 	M_EPILOG

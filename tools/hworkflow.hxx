@@ -59,17 +59,17 @@ private:
 	typedef yaal::hcore::HPointer<HWorker> worker_ptr_t;
 	typedef yaal::hcore::HList<worker_ptr_t> pool_t;
 	typedef yaal::hcore::HList<task_t> queue_t;
-	int f_iWorkerPoolSize;
-	int f_iActiveWorkers;
-	int f_iBusyWorkers;
+	int _workerPoolSize;
+	int _activeWorkers;
+	int _busyWorkers;
 	/*! Tasks executors.
 	 */
-	pool_t f_oPool;
+	pool_t _pool;
 	/*! Task queue.
 	 */
-	queue_t f_oQueue;
-	yaal::hcore::HSemaphore f_oSemaphore;
-	yaal::hcore::HMutex f_oMutex;
+	queue_t _queue;
+	yaal::hcore::HSemaphore _semaphore;
+	yaal::hcore::HMutex _mutex;
 public:
 	HWorkFlow( int = 1 );
 	virtual ~HWorkFlow( void );
@@ -83,7 +83,7 @@ private:
 class HWorkFlow::HWorker
 	{
 private:
-	HWorkFlowInterface* f_poWorkFlow;
+	HWorkFlowInterface* _workFlow;
 	yaal::hcore::HThread _thread;
 public:
 	HWorker( HWorkFlowInterface* );

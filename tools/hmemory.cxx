@@ -37,9 +37,9 @@ namespace tools
 {
 
 HMemory::HMemory( void* ptr, int long const& size_, INITIAL_STATE::enum_t const& initialState_ )
-	: f_pvBlock( ptr ), f_lSize( size_ ),
-	f_lValid( initialState_ == INITIAL_STATE::AUTO ? -1 : ( initialState_ == INITIAL_STATE::VALID ? size_ : 0 ) ),
-	f_lCursorRead( 0 ), f_lCursorWrite( 0 )
+	: _block( ptr ), _size( size_ ),
+	_valid( initialState_ == INITIAL_STATE::AUTO ? -1 : ( initialState_ == INITIAL_STATE::VALID ? size_ : 0 ) ),
+	_cursorRead( 0 ), _cursorWrite( 0 )
 	{
 	M_ASSERT( size_ > 0 );
 	M_ASSERT( ptr );
@@ -54,31 +54,31 @@ HMemory::~HMemory( void )
 bool HMemory::operator == ( HMemory const& other ) const
 	{
 	M_PROLOG
-	return ( ( other.f_lSize == f_lSize ) && ( ! memcmp( other.f_pvBlock, f_pvBlock, f_lSize ) ) );
+	return ( ( other._size == _size ) && ( ! memcmp( other._block, _block, _size ) ) );
 	M_EPILOG
 	}
 
 int long HMemory::do_write( void const* const src_, int long const& size_ )
 	{
 	M_PROLOG
-	if ( f_lValid == -1 ) /* First data access. */
-		f_lValid = 0;
-	int long maxWrite( f_lSize - f_lValid );
+	if ( _valid == -1 ) /* First data access. */
+		_valid = 0;
+	int long maxWrite( _size - _valid );
 	int long size( min( size_, maxWrite ) );
-	if ( ( f_lCursorWrite + size ) > f_lSize )
+	if ( ( _cursorWrite + size ) > _size )
 		{
-		int long part1( f_lSize - f_lCursorWrite );
+		int long part1( _size - _cursorWrite );
 		int long part2( size - part1 );
-		::memcpy( static_cast<char*>( f_pvBlock ) + f_lCursorWrite, src_, part1 );
-		::memcpy( static_cast<char*>( f_pvBlock ), static_cast<char const* const>( src_ ) + part1, part2 );
-		f_lCursorWrite = part2;
+		::memcpy( static_cast<char*>( _block ) + _cursorWrite, src_, part1 );
+		::memcpy( static_cast<char*>( _block ), static_cast<char const* const>( src_ ) + part1, part2 );
+		_cursorWrite = part2;
 		}
 	else
 		{
-		::memcpy( static_cast<char*>( f_pvBlock ) + f_lCursorWrite, src_, size );
-		f_lCursorWrite += size;
+		::memcpy( static_cast<char*>( _block ) + _cursorWrite, src_, size );
+		_cursorWrite += size;
 		}
-	f_lValid += size;
+	_valid += size;
 	return ( size );
 	M_EPILOG
 	}
@@ -91,23 +91,23 @@ void HMemory::do_flush( void ) const
 int long HMemory::do_read( void* const dest_, int long const& size_ )
 	{
 	M_PROLOG
-	if ( f_lValid == -1 ) /* First data access. */
-		f_lValid = f_lSize;
-	int long size( min( size_, f_lValid ) );
-	if ( ( f_lCursorRead + size ) > f_lSize )
+	if ( _valid == -1 ) /* First data access. */
+		_valid = _size;
+	int long size( min( size_, _valid ) );
+	if ( ( _cursorRead + size ) > _size )
 		{
-		int long part1( f_lSize - f_lCursorRead );
+		int long part1( _size - _cursorRead );
 		int long part2( size - part1 );
-		::memcpy( dest_, static_cast<char*>( f_pvBlock ) + f_lCursorRead, part1 );
-		::memcpy( static_cast<char*>( dest_ ) + part1, static_cast<char*>( f_pvBlock ), part2 );
-		f_lCursorWrite = part2;
+		::memcpy( dest_, static_cast<char*>( _block ) + _cursorRead, part1 );
+		::memcpy( static_cast<char*>( dest_ ) + part1, static_cast<char*>( _block ), part2 );
+		_cursorWrite = part2;
 		}
 	else
 		{
-		::memcpy( dest_, static_cast<char const* const>( f_pvBlock ) + f_lCursorRead, size );
-		f_lCursorRead += size;
+		::memcpy( dest_, static_cast<char const* const>( _block ) + _cursorRead, size );
+		_cursorRead += size;
 		}
-	f_lValid -= size;
+	_valid -= size;
 	return ( size );
 	M_EPILOG
 	}
@@ -115,7 +115,7 @@ int long HMemory::do_read( void* const dest_, int long const& size_ )
 bool HMemory::do_is_valid( void ) const
 	{
 	M_PROLOG
-	return ( ( f_lCursorRead < f_lSize ) && ( f_lCursorWrite < f_lSize ) );
+	return ( ( _cursorRead < _size ) && ( _cursorWrite < _size ) );
 	M_EPILOG
 	}
 

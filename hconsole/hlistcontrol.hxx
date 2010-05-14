@@ -57,12 +57,12 @@ namespace list_control_helper
  */
 struct OSortHelper
 	{
-	int f_iSortColumn;
-	yaal::hcore::OListBits::sort_order_t f_eOrder;
-	type_t f_eType;
-	int long f_lComparedItems;
-	int long f_iSize;
-	HWindow * f_poWindow;
+	int _sortColumn;
+	yaal::hcore::OListBits::sort_order_t _order;
+	type_t _type;
+	int long _comparedItems;
+	int long _size;
+	HWindow * _window;
 	void progress ( void );
 	};
 template<typename tType>
@@ -89,8 +89,8 @@ public:
 template<typename tType = yaal::hcore::HList<HItem>::iterator>
 class HCell : public HAbstractCell
 	{
-	int f_iColumn;
-	tType& f_rtData;
+	int _column;
+	tType& _data;
 public:
 	explicit HCell( tType&, int );
 	virtual ~HCell( void );
@@ -122,8 +122,8 @@ class HRow : public HAbstractRow
 	{
 	typedef tType iterator_t;
 	typedef yaal::hcore::HArray<HAbstractCell::ptr_t> cells_t;
-	tType& f_roIterator;
-	cells_t f_oCells;
+	tType& _iterator;
+	cells_t _cells;
 public:
 	HRow( tType& );
 	virtual HAbstractCell& operator[]( int );
@@ -159,14 +159,14 @@ public:
 		virtual ~HAbstractModelIterator( void );
 		};
 protected:
-	HListControl* f_poControl;
+	HListControl* _control;
 public:
 	typedef yaal::hcore::HPointer<HAbstractControler> ptr_t;
 	/*! \brief Model iterator proxy.
 	 */
 	class HModelIteratorWrapper
 		{
-		iterator_ptr_t f_oIteratorPtr;
+		iterator_ptr_t _iteratorPtr;
 	public:
 		HModelIteratorWrapper( void );
 		explicit HModelIteratorWrapper( iterator_ptr_t const& );
@@ -223,8 +223,8 @@ public:
 private:
 	class HModelIterator : public HAbstractModelIterator
 		{
-		iterator_t f_oIterator;
-		row_t f_oRow;
+		iterator_t _iterator;
+		row_t _row;
 		HModelIterator( void );
 		HModelIterator( HModelIterator const& );
 		explicit HModelIterator( iterator_t const& );
@@ -247,7 +247,7 @@ public:
 	typedef yaal::hcore::HPointer<HListControler<tType> > ptr_t;
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 private:
-	model_ptr_t f_oList;
+	model_ptr_t _list;
 public:
 	HListControler( model_ptr_t = model_ptr_t() );
 	void add_tail( tType const& );
@@ -298,15 +298,15 @@ public:
 	 */
 	class HColumnInfo
 		{
-		bool f_bDescending;
-		int f_iWidthRaw;
-		int f_iWidth;
-		BITS::ALIGN::align_t f_eAlign;
-		int f_iShortcutIndex;
-		char f_cShortcut;
-		type_t f_eType;
-		hcore::HString f_oName;
-		HControl * f_poControl;
+		bool _descending;
+		int _widthRaw;
+		int _width;
+		BITS::ALIGN::align_t _align;
+		int _shortcutIndex;
+		char _shortcut;
+		type_t _type;
+		hcore::HString _name;
+		HControl * _control;
 	public:
 		HColumnInfo( void );
 		virtual ~HColumnInfo( void );
@@ -316,31 +316,31 @@ public:
 		static int const ADD_AT_THE_END = -1;
 		};
 protected:
-	bool f_bCheckable;      /*!< can items be checked/unchecked */
-	bool f_bSortable;       /*!< can control content be sorted */
-	bool f_bDrawHeader;     /*!< should be header driven */
-	bool f_bEditable;       /*!< is list interactively editable */
-	int  f_iControlOffset;  /*!< when content is bigger than control
+	bool _checkable;      /*!< can items be checked/unchecked */
+	bool _sortable;       /*!< can control content be sorted */
+	bool _drawHeader;     /*!< should be header driven */
+	bool _editable;       /*!< is list interactively editable */
+	int  _controlOffset;  /*!< when content is bigger than control
 														size this variable keeps
 														offset of first row shown */
-	int  f_iCursorPosition; /*!< cursor position relative to control
+	int  _cursorPosition; /*!< cursor position relative to control
 														begining */
-	int  f_iSumForOne;      /*!< sum of percentage columns width */
-	yaal::hcore::HList<HColumnInfo> f_oHeader; /*!< list header info */
+	int  _sumForOne;      /*!< sum of percentage columns width */
+	yaal::hcore::HList<HColumnInfo> _header; /*!< list header info */
 /* for internal use only */
-	int  f_iSortColumn;     /*!< column used for current sort operation */
+	int  _sortColumn;     /*!< column used for current sort operation */
 	/*! \brief HListControl search match description.
 	 */
 	struct match_t
 		{
-		int f_iColumnWithMatch;
-		int f_iMatchNumber;
-		iterator_t f_oCurrentMatch; /*!< row that has current pattern match */
-		match_t() : f_iColumnWithMatch( 0 ), f_iMatchNumber( -1 ), f_oCurrentMatch() { }
-		} f_sMatch;
-	iterator_t f_oCursor; /*!< current row highlight (selection or mark or what ever you name it) */
-	iterator_t f_oFirstVisibleRow;	/*!< pointer to first visible row */
-	list_control_helper::HAbstractControler::ptr_t f_oControler;
+		int _columnWithMatch;
+		int _matchNumber;
+		iterator_t _currentMatch; /*!< row that has current pattern match */
+		match_t() : _columnWithMatch( 0 ), _matchNumber( -1 ), _currentMatch() { }
+		} _match;
+	iterator_t _cursor; /*!< current row highlight (selection or mark or what ever you name it) */
+	iterator_t _firstVisibleRow;	/*!< pointer to first visible row */
+	list_control_helper::HAbstractControler::ptr_t _controler;
 public:
 	HListControl ( HWindow*,		 	/* parent */
 								 int,						/* row */
@@ -402,37 +402,37 @@ namespace list_control_helper
 template<typename tType = HItem>
 class CompareListControlItems
 	{
-	list_control_helper::OSortHelper& f_roSortHelper;
+	list_control_helper::OSortHelper& _sortHelper;
 public:
-	CompareListControlItems ( list_control_helper::OSortHelper& a_roSortHelper )
-		: f_roSortHelper ( a_roSortHelper ) { }
+	CompareListControlItems ( list_control_helper::OSortHelper& sortHelper_ )
+		: _sortHelper ( sortHelper_ ) { }
 	bool operator() ( tType const&, tType const& ) const;
 	};
 
 template<typename tType>
-HListControler<tType>::HListControler( model_ptr_t a_oModel ) : HAbstractControler(), f_oList( a_oModel )
+HListControler<tType>::HListControler( model_ptr_t model_ ) : HAbstractControler(), _list( model_ )
 	{
 	}
 
 template<typename tType>
-void HListControler<tType>::add_tail( tType const& a_tRow )
+void HListControler<tType>::add_tail( tType const& row_ )
 	{
 	M_PROLOG
-	f_oList->push_back( a_tRow );
-	f_poControl->invalidate();
+	_list->push_back( row_ );
+	_control->invalidate();
 	return;
 	M_EPILOG
 	}
 
 template<typename tType>
-void HListControler<tType>::add_orderly ( tType const& a_tRow, int a_iColumn, yaal::hcore::OListBits::sort_order_t a_eOrder )
+void HListControler<tType>::add_orderly ( tType const& row_, int column_, yaal::hcore::OListBits::sort_order_t order_ )
 	{
 	M_PROLOG
-	list_control_helper::OSortHelper l_oHelper =
-		{ a_iColumn, a_eOrder, f_poControl->get_column_type( a_iColumn ),
+	list_control_helper::OSortHelper helper =
+		{ column_, order_, _control->get_column_type( column_ ),
 		0, size(), NULL };
-	f_oList->add_orderly( a_tRow, CompareListControlItems<tType> ( l_oHelper ), a_eOrder );
-	f_poControl->invalidate();
+	_list->add_orderly( row_, CompareListControlItems<tType> ( helper ), order_ );
+	_control->invalidate();
 	return;
 	M_EPILOG
 	}
@@ -441,8 +441,8 @@ template<typename tType>
 void HListControler<tType>::remove_tail( void )
 	{
 	M_PROLOG
-	f_oList->pop_back();
-	f_poControl->invalidate();
+	_list->pop_back();
+	_control->invalidate();
 	return;
 	M_EPILOG
 	}
@@ -450,41 +450,41 @@ void HListControler<tType>::remove_tail( void )
 template<typename tType>
 int long HListControler<tType>::size( void )
 	{
-	return ( f_oList->size() );
+	return ( _list->size() );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::begin( void )
 	{
-	return ( HModelIteratorWrapper( f_oList->begin() != f_oList->end() ? iterator_ptr_t( new HModelIterator( f_oList->begin() ) ) : iterator_ptr_t() ) );
+	return ( HModelIteratorWrapper( _list->begin() != _list->end() ? iterator_ptr_t( new HModelIterator( _list->begin() ) ) : iterator_ptr_t() ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::end( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( f_oList->end() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->end() ) ) ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::rbegin( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( f_oList->rbegin() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->rbegin() ) ) ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::rend( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( f_oList->rend() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->rend() ) ) ) );
 	}
 
 template<typename tType>
 bool HListControler<tType>::empty( void )
 	{
-	return ( f_oList->empty() );
+	return ( _list->empty() );
 	}
 
 template<typename tType>
-HListControler<tType>::HModelIterator::HModelIterator( iterator_t const& a_oIt ) : f_oIterator( a_oIt ), f_oRow( f_oIterator )
+HListControler<tType>::HModelIterator::HModelIterator( iterator_t const& it_ ) : _iterator( it_ ), _row( _iterator )
 	{
 	return;
 	}
@@ -498,68 +498,68 @@ HListControler<tType>::HModelIterator::~HModelIterator( void )
 template<typename tType>
 bool HListControler<tType>::HModelIterator::is_valid( void ) const
 	{
-	return ( f_oIterator.is_valid() );
+	return ( _iterator.is_valid() );
 	}
 
 template<typename tType>
 void HListControler<tType>::HModelIterator::next( void )
 	{
-	++ f_oIterator;
+	++ _iterator;
 	return;
 	}
 
 template<typename tType>
 void HListControler<tType>::HModelIterator::previous( void )
 	{
-	-- f_oIterator;
+	-- _iterator;
 	return;
 	}
 
 template<typename tType>
 HAbstractRow& HListControler<tType>::HModelIterator::dereference( void )
 	{
-	return ( f_oRow );
+	return ( _row );
 	}
 
 template<typename tType>
 HAbstractRow* HListControler<tType>::HModelIterator::call( void )
 	{
-	return ( &f_oRow );
+	return ( &_row );
 	}
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_equal( typename HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
+bool HListControler<tType>::HModelIterator::is_equal( typename HListControler<tType>::HAbstractModelIterator const& it_ ) const
 	{
-	return ( f_oIterator == static_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator );
+	return ( _iterator == static_cast<typename HListControler<tType>::HModelIterator const&>( it_ )._iterator );
 	}
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_not_equal( typename HListControler<tType>::HAbstractModelIterator const& a_oIt ) const
+bool HListControler<tType>::HModelIterator::is_not_equal( typename HListControler<tType>::HAbstractModelIterator const& it_ ) const
 	{
-	return ( f_oIterator != static_cast<typename HListControler<tType>::HModelIterator const&>( a_oIt ).f_oIterator );
+	return ( _iterator != static_cast<typename HListControler<tType>::HModelIterator const&>( it_ )._iterator );
 	}
 
 template<typename tType>
-void HListControler<tType>::HModelIterator::assign_to( HAbstractControler::iterator_ptr_t& a_oIt ) const
+void HListControler<tType>::HModelIterator::assign_to( HAbstractControler::iterator_ptr_t& it_ ) const
 	{
-	a_oIt = iterator_ptr_t( new HModelIterator( f_oIterator ) );
+	it_ = iterator_ptr_t( new HModelIterator( _iterator ) );
 	return;
 	}
 
 template<typename tType>
 typename HListControler<tType>::iterator_t& HListControler<tType>::HModelIterator::raw( void )
 	{
-	return ( f_oIterator );
+	return ( _iterator );
 	}
 
 template<typename tType>
-HAbstractCell& HRow<tType>::operator[] ( int a_iColumn )
+HAbstractCell& HRow<tType>::operator[] ( int column_ )
 	{
-	return ( *(f_oCells[ a_iColumn ]) );
+	return ( *(_cells[ column_ ]) );
 	}
 
 template<typename tType>
-HCell<tType>::HCell( tType& a_oIt, int a_iColumn ) : f_iColumn( a_iColumn ), f_rtData( a_oIt )
+HCell<tType>::HCell( tType& it_, int column_ ) : _column( column_ ), _data( it_ )
 	{
 	return;
 	}
@@ -571,20 +571,20 @@ HCell<tType>::~HCell( void )
 	}
 
 template<typename tType>
-void HListControler<tType>::sort( list_control_helper::OSortHelper& a_roHelper )
+void HListControler<tType>::sort( list_control_helper::OSortHelper& helper_ )
 	{
 	M_PROLOG
-	f_oList->sort( CompareListControlItems<tType> ( a_roHelper ) );
-	f_poControl->invalidate();
+	_list->sort( CompareListControlItems<tType> ( helper_ ) );
+	_control->invalidate();
 	M_EPILOG
 	}
 
 template<typename tType>
-void HListControler<tType>::erase( HAbstractControler::HModelIteratorWrapper& a_oIt )
+void HListControler<tType>::erase( HAbstractControler::HModelIteratorWrapper& it_ )
 	{
 	M_PROLOG
-	typename HListControler<tType>::iterator_ptr_t l_oIt = a_oIt.raw();
-	f_oList->erase( l_oIt->raw() );
+	typename HListControler<tType>::iterator_ptr_t it = it_.raw();
+	_list->erase( it->raw() );
 	return;
 	M_EPILOG
 	}

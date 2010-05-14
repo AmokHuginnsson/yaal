@@ -39,20 +39,20 @@ namespace xmath
 {
 
 template<typename number_t>
-number_t factorial( number_t a_iNumber )
+number_t factorial( number_t number_ )
 	{
 	number_t n = 1;
-	for ( number_t i = 2; i <= a_iNumber; ++ i )
+	for ( number_t i = 2; i <= number_; ++ i )
 		n *= i;
 	return ( n );
 	}
 
 template<typename number_t>
-number_t binomial_coefficient( number_t a_iCardinal, number_t a_iSubCardinal )
+number_t binomial_coefficient( number_t cardinal_, number_t subCardinal_ )
 	{
-	if ( a_iSubCardinal > ( a_iCardinal / 2 ) )
-		a_iSubCardinal = a_iCardinal - a_iSubCardinal;
-	return ( factorial( a_iCardinal ) / ( factorial( a_iSubCardinal ) * factorial( a_iCardinal - a_iSubCardinal ) ) );
+	if ( subCardinal_ > ( cardinal_ / 2 ) )
+		subCardinal_ = cardinal_ - subCardinal_;
+	return ( factorial( cardinal_ ) / ( factorial( subCardinal_ ) * factorial( cardinal_ - subCardinal_ ) ) );
 	}
 
 }

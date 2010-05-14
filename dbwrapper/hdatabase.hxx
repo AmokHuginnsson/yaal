@@ -44,7 +44,7 @@ class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase>
 	typedef HDataBase self_t;
 private:
 	ODBConnector const* _connector;
-	void* f_pvCoreData;	/*!< very internal for this class used only in base class */
+	void* _coreData;	/*!< very internal for this class used only in base class */
 public:
 	typedef yaal::hcore::HPointer<HDataBase> ptr_t;
 	/*! \brief Connect to database.

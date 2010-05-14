@@ -52,13 +52,13 @@ namespace hdata
 static int const MENU_HANDLERS_MAP_SIZE = 32;
 
 HDataProcess::HDataProcess( void )
-	: HTUIProcess(), f_oDataBase( HDataBase::get_connector() ),
-	f_oAutoHandlers( MENU_HANDLERS_MAP_SIZE ),
-	f_oResource(), f_oResourceCache(), f_oColumnCache(),
-	f_oEditCache(), f_oListCache(), f_psRootMenu( NULL )
+	: HTUIProcess(), _dataBase( HDataBase::get_connector() ),
+	_autoHandlers( MENU_HANDLERS_MAP_SIZE ),
+	_resource(), _resourceCache(), _columnCache(),
+	_editCache(), _listCache(), _rootMenu( NULL )
 	{
 	M_PROLOG
-	menu_handlers_map_t& l_oHandlers = f_oAutoHandlers;
+	menu_handlers_map_t& handlers = _autoHandlers;
 	M_REGISTER_MENU_HANDLER( create_window );
 	return;
 	M_EPILOG
@@ -67,9 +67,9 @@ HDataProcess::HDataProcess( void )
 HDataProcess::~HDataProcess( void )
 	{
 	M_PROLOG
-	if ( f_psRootMenu )
-		destroy_menu( f_psRootMenu );
-	f_psRootMenu = NULL;
+	if ( _rootMenu )
+		destroy_menu( _rootMenu );
+	_rootMenu = NULL;
 #ifdef __DEBUGGER_BABUNI__
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -77,169 +77,169 @@ HDataProcess::~HDataProcess( void )
 	M_EPILOG
 	}
 
-int HDataProcess::init_xrc( char const* a_pcProcessName,
-		char const* a_pcResource, menu_handlers_map_t const & a_roHandlers )
+int HDataProcess::init_xrc( char const* processName_,
+		char const* resource_, menu_handlers_map_t const & handlers_ )
 	{
 	M_PROLOG
-	int l_iError = HTUIProcess::init_tui( a_pcProcessName );
-	HMainWindow* l_poMainWindow = NULL;
-	if ( dbwrapper::n_oDBDrivers.is_empty() )
+	int error = HTUIProcess::init_tui( processName_ );
+	HMainWindow* mainWindow = NULL;
+	if ( dbwrapper::_dBDrivers_.is_empty() )
 		M_THROW( "no database driver loaded", errno );
-	f_oResource.load( HStreamInterface::ptr_t( new HFile( a_pcResource, HFile::OPEN::READING ) ) );
-	HXml::HNodeProxy const node = f_oResource.get_element_by_path( "/resource/menu" );
-	f_psRootMenu = build_sub_menu( node, a_roHandlers );
-	M_ASSERT( f_oForegroundWindow.is_valid() );
-	l_poMainWindow = dynamic_cast<HMainWindow*>( &*(*f_oForegroundWindow) );
-	M_ASSERT( l_poMainWindow );
-	l_poMainWindow->init_menu( this, f_psRootMenu );
-	l_poMainWindow->refresh();
-	return ( l_iError );
+	_resource.load( HStreamInterface::ptr_t( new HFile( resource_, HFile::OPEN::READING ) ) );
+	HXml::HNodeProxy const node = _resource.get_element_by_path( "/resource/menu" );
+	_rootMenu = build_sub_menu( node, handlers_ );
+	M_ASSERT( _foregroundWindow.is_valid() );
+	mainWindow = dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) );
+	M_ASSERT( mainWindow );
+	mainWindow->init_menu( this, _rootMenu );
+	mainWindow->refresh();
+	return ( error );
 	M_EPILOG
 	}
 
-OMenuItem* HDataProcess::build_sub_menu( HXml::HConstNodeProxy const& a_rsNode,
-		menu_handlers_map_t const& a_roHandlers )
+OMenuItem* HDataProcess::build_sub_menu( HXml::HConstNodeProxy const& node_,
+		menu_handlers_map_t const& handlers_ )
 	{
 	M_PROLOG
-	char const* const l_pcError = _( "malformed resource file (menu section)" );
-	char const* const l_pcUnexpected = _( ": unexpected node: " );
-	OMenuItem l_sMenuItem, * l_psMenu = NULL;
+	char const* const error = _( "malformed resource file (menu section)" );
+	char const* const unexpected = _( ": unexpected node: " );
+	OMenuItem menuItem, * menu = NULL;
 	typedef HList<OMenuItem> menu_item_list_t;
-	menu_item_list_t l_oSubMenu;
-	if ( ! a_rsNode.child_count() )
-		M_THROW( HString( l_pcError ) + l_pcUnexpected, errno );
+	menu_item_list_t subMenu;
+	if ( ! node_.child_count() )
+		M_THROW( HString( error ) + unexpected, errno );
 
-	if ( a_rsNode.get_name() == "menu" )
+	if ( node_.get_name() == "menu" )
 		{
-		for ( HXml::HConstIterator it = a_rsNode.begin(); it != a_rsNode.end(); ++ it )
+		for ( HXml::HConstIterator it = node_.begin(); it != node_.end(); ++ it )
 			{
-			l_sMenuItem.reset();
-			build_menu_item( *it, l_sMenuItem, a_roHandlers );
-			l_oSubMenu.push_back( l_sMenuItem );
+			menuItem.reset();
+			build_menu_item( *it, menuItem, handlers_ );
+			subMenu.push_back( menuItem );
 			}
 		}
 	else
-		M_THROW( HString( l_pcError ) + l_pcUnexpected + a_rsNode.get_name()
-				+ '=' + a_rsNode.get_value(), errno );
-	l_sMenuItem.reset();
-	l_oSubMenu.push_back( l_sMenuItem );
-	l_psMenu = new OMenuItem[ l_oSubMenu.size() ];
-	int l_iCtr = 0;
-	for ( menu_item_list_t::iterator it = l_oSubMenu.begin(); it != l_oSubMenu.end(); ++ it, ++ l_iCtr )
-		l_psMenu[ l_iCtr ] = *it;
-	return ( l_psMenu );
+		M_THROW( HString( error ) + unexpected + node_.get_name()
+				+ '=' + node_.get_value(), errno );
+	menuItem.reset();
+	subMenu.push_back( menuItem );
+	menu = new OMenuItem[ subMenu.size() ];
+	int ctr = 0;
+	for ( menu_item_list_t::iterator it = subMenu.begin(); it != subMenu.end(); ++ it, ++ ctr )
+		menu[ ctr ] = *it;
+	return ( menu );
 	M_EPILOG
 	}
 
-void HDataProcess::build_menu_item( HXml::HConstNodeProxy const& a_rsNode,
-		OMenuItem& a_rsMenuItem, menu_handlers_map_t const& a_roHandlers )
+void HDataProcess::build_menu_item( HXml::HConstNodeProxy const& node_,
+		OMenuItem& menuItem_, menu_handlers_map_t const& handlers_ )
 	{
 	M_PROLOG
-	char const* const l_pcError = _( "malformed resource file (menu section)" );
-	char const* const l_pcUnexpected = _( ": unexpected node: " );
-	if ( ! a_rsNode.has_childs() )
-		M_THROW ( HString ( l_pcError ) + l_pcUnexpected, errno );
+	char const* const error = _( "malformed resource file (menu section)" );
+	char const* const unexpected = _( ": unexpected node: " );
+	if ( ! node_.has_childs() )
+		M_THROW ( HString ( error ) + unexpected, errno );
 
-	if ( a_rsNode.get_name() == "menu_item" )
+	if ( node_.get_name() == "menu_item" )
 		{
-		for ( HXml::HConstIterator it = a_rsNode.begin(); it != a_rsNode.end(); ++ it )
+		for ( HXml::HConstIterator it = node_.begin(); it != node_.end(); ++ it )
 			{
 			HString const& name = (*it).get_name();
 			HXml::HConstIterator handlerIt = (*it).begin();
 			HString contents = ( ( handlerIt != (*it).end() ) && ( (*handlerIt).get_type() == HXml::HNode::TYPE::CONTENT ) ) ? (*(*it).begin()).get_value() : "";
 			if ( name == "label" )
-				a_rsMenuItem.f_oLabel = contents;
+				menuItem_._label = contents;
 			else if ( name == "handler" )
 				{
 				HXml::HNode::properties_t const& props = (*it).properties();
 				HXml::HNode::properties_t::const_iterator nameIt = props.find( "name" );
 				if ( nameIt != props.end() )
 					contents = nameIt->second;
-				menu_handlers_map_t::const_iterator handle( a_roHandlers.find( contents ) );
-				if ( handle == a_roHandlers.end() )
+				menu_handlers_map_t::const_iterator handle( handlers_.find( contents ) );
+				if ( handle == handlers_.end() )
 					{
-					handle = f_oAutoHandlers.find( contents );
-					if ( handle == f_oAutoHandlers.end() )
+					handle = _autoHandlers.find( contents );
+					if ( handle == _autoHandlers.end() )
 						M_THROW( HString( _( "no such handler: " ) ) + contents, errno );
 					}
-				a_rsMenuItem.HANDLER = handle->second;
+				menuItem_.HANDLER = handle->second;
 				HXml::HNode::properties_t::const_iterator paramIt = props.find( "param" );
 				if ( paramIt != props.end() )
-					a_rsMenuItem.f_pvParam = const_cast<HString*>( &paramIt->second );
+					menuItem_._param = const_cast<HString*>( &paramIt->second );
 				}
 			else if ( name == "menu" )
-				a_rsMenuItem.f_psSubMenu = build_sub_menu( *it, a_roHandlers );
+				menuItem_._subMenu = build_sub_menu( *it, handlers_ );
 			else
-				M_THROW( HString( l_pcError ) + l_pcUnexpected + name
+				M_THROW( HString( error ) + unexpected + name
 						+ '=' + contents, errno );
 			}
 		}
 	else
-		M_THROW( HString( l_pcError ) + l_pcUnexpected + a_rsNode.get_name()
-				+ '=' + a_rsNode.get_value(), errno );
+		M_THROW( HString( error ) + unexpected + node_.get_name()
+				+ '=' + node_.get_value(), errno );
 	return;
 	M_EPILOG
 	}
 
-void HDataProcess::destroy_menu( OMenuItem* a_psMenu )
+void HDataProcess::destroy_menu( OMenuItem* menu_ )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	M_ASSERT( a_psMenu );
-	while ( ! a_psMenu[ l_iCtr ].f_oLabel.is_empty() )
+	int ctr = 0;
+	M_ASSERT( menu_ );
+	while ( ! menu_[ ctr ]._label.is_empty() )
 		{
-		if ( a_psMenu[ l_iCtr ].f_psSubMenu )
-			destroy_menu( a_psMenu [ l_iCtr ].f_psSubMenu );
-		l_iCtr ++;
+		if ( menu_[ ctr ]._subMenu )
+			destroy_menu( menu_ [ ctr ]._subMenu );
+		ctr ++;
 		}
-	delete [ ] a_psMenu;
+	delete [ ] menu_;
 	return;
 	M_EPILOG
 	}
 
 database_ptr_t HDataProcess::data_base( void )
 	{
-	return ( f_oDataBase );
+	return ( _dataBase );
 	}
 
-int HDataProcess::handler_quit( int a_iCode, void const* )
+int HDataProcess::handler_quit( int code_, void const* )
 	{
 	M_PROLOG
-	HDataWindow* l_poWindow = NULL;
-	if ( f_oWindows->size() )
+	HDataWindow* window = NULL;
+	if ( _windows->size() )
 		{
-		model_t::iterator it = f_oWindows->begin();
-		if ( it != f_oWindows->end() )
+		model_t::iterator it = _windows->begin();
+		if ( it != _windows->end() )
 			++ it;
-		for ( ; it != f_oWindows->end(); ++ it )
+		for ( ; it != _windows->end(); ++ it )
 			{
-			l_poWindow = dynamic_cast<HDataWindow*>( static_cast<HWindow*>( &*(*it) ) );
-			if ( l_poWindow && l_poWindow->is_modified() )
+			window = dynamic_cast<HDataWindow*>( static_cast<HWindow*>( &*(*it) ) );
+			if ( window && window->is_modified() )
 				{
-				select( l_poWindow );
+				select( window );
 				handler_refresh( 0 );
-				if ( ! l_poWindow->status_bar()->confirm( "exit program" ) )
+				if ( ! window->status_bar()->confirm( "exit program" ) )
 					return ( 0 );
 				}
 			}
 		}
-	return ( HTUIProcess::handler_quit( a_iCode ) );
+	return ( HTUIProcess::handler_quit( code_ ) );
 	M_EPILOG
 	}
 
-int HDataProcess::handler_close_window( int a_iCode, void const* )
+int HDataProcess::handler_close_window( int code_, void const* )
 	{
 	M_PROLOG
-	HDataWindow* l_poWindow = NULL;
-	if ( !! (*f_oForegroundWindow) )
+	HDataWindow* window = NULL;
+	if ( !! (*_foregroundWindow) )
 		{
-		l_poWindow = dynamic_cast<HDataWindow*>( &*f_oForegroundWindow );
-		if ( l_poWindow
-				&& l_poWindow->is_modified()
-				&& ! l_poWindow->status_bar()->confirm( "close window" ) )
+		window = dynamic_cast<HDataWindow*>( &*_foregroundWindow );
+		if ( window
+				&& window->is_modified()
+				&& ! window->status_bar()->confirm( "close window" ) )
 			return ( 0 );
 		}
-	return ( HTUIProcess::handler_close_window( a_iCode ) );
+	return ( HTUIProcess::handler_close_window( code_ ) );
 	M_EPILOG
 	}
 
@@ -252,7 +252,7 @@ int HDataProcess::create_window( void* param )
 	self.resolve( *static_cast<HString*>( param ), window_factory );
 	if ( ! window_factory )
 		M_THROW( _( "cannot locate factory for this window" ), errno );
-	HXml::HConstNodeProxy w = f_oResource.get_element_by_id( *static_cast<HString*>( param ) );
+	HXml::HConstNodeProxy w = _resource.get_element_by_id( *static_cast<HString*>( param ) );
 	if ( ! w )
 		M_THROW( _( "cannot find resources for this window" ), errno );
 	HXml::HNode::properties_t const& windowProps = w.properties();
@@ -266,9 +266,9 @@ int HDataProcess::create_window( void* param )
 HDataProcess::resources_t& HDataProcess::get_resource( HString const& name, HXml::HConstNodeProxy const& w )
 	{
 	M_PROLOG
-	resource_cache_t::iterator it = f_oResourceCache.find( name );
+	resource_cache_t::iterator it = _resourceCache.find( name );
 	resources_t* r( NULL );
-	if ( it == f_oResourceCache.end() )
+	if ( it == _resourceCache.end() )
 		r = &build_resource( name, w );
 	else
 		r = &it->second;
@@ -295,31 +295,31 @@ HDataProcess::resources_t& HDataProcess::build_resource( yaal::hcore::HString co
 		HXml::HNode::properties_t::const_iterator refidIt = controlProps.find( "refid" );
 		M_ENSURE( ( roleIt != controlProps.end() ) && ( typeIt != controlProps.end() ) );
 		if ( roleIt->second == "main" )
-			r[ i ].f_eRole = DATACONTROL_BITS::ROLE::MAIN;
+			r[ i ]._role = DATACONTROL_BITS::ROLE::MAIN;
 		else if ( roleIt->second == "data" )
-			r[ i ].f_eRole = DATACONTROL_BITS::ROLE::DATA;
+			r[ i ]._role = DATACONTROL_BITS::ROLE::DATA;
 		else
 			M_THROW( _( "unknown role" ), i );
 		if ( typeIt->second == "list" )
 			{
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::LIST;
-			f_oListCache.push_back( OListControlResource() );
-			r[ i ].f_pvTypeSpecific = &f_oListCache.tail();
+			r[ i ]._type = DATACONTROL_BITS::TYPE::LIST;
+			_listCache.push_back( OListControlResource() );
+			r[ i ]._typeSpecific = &_listCache.tail();
 			}
 		else if ( typeIt->second == "edit" )
 			{
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::EDIT;
-			f_oEditCache.push_back( OEditControlResource() );
-			r[ i ].f_pvTypeSpecific = &f_oEditCache.tail();
+			r[ i ]._type = DATACONTROL_BITS::TYPE::EDIT;
+			_editCache.push_back( OEditControlResource() );
+			r[ i ]._typeSpecific = &_editCache.tail();
 			}
 		else if ( typeIt->second == "tree" )
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::TREE;
+			r[ i ]._type = DATACONTROL_BITS::TYPE::TREE;
 		else if ( typeIt->second == "combo" )
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::COMBO;
+			r[ i ]._type = DATACONTROL_BITS::TYPE::COMBO;
 		else if ( typeIt->second == "check" )
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::CHECK;
+			r[ i ]._type = DATACONTROL_BITS::TYPE::CHECK;
 		else if ( typeIt->second == "date" )
-			r[ i ].f_eType = DATACONTROL_BITS::TYPE::DATE;
+			r[ i ]._type = DATACONTROL_BITS::TYPE::DATE;
 		else
 			M_THROW( _( "unknown type" ), i );
 		if ( refidIt != controlProps.end() )
@@ -331,99 +331,99 @@ HDataProcess::resources_t& HDataProcess::build_resource( yaal::hcore::HString co
 			M_ENSURE( (*attr).get_type() == HXml::HNode::TYPE::NODE );
 			HString const attrName = (*attr).get_name();
 			if ( attrName == "label" )
-				r[ i ].f_pcLabel = xml::node_val( attr );
+				r[ i ]._label = xml::node_val( attr );
 			else if ( attrName == "db" )
 				{
-				M_ENSURE( r[ i ].f_eRole == DATACONTROL_BITS::ROLE::MAIN );
+				M_ENSURE( r[ i ]._role == DATACONTROL_BITS::ROLE::MAIN );
 				HXml::HNode::properties_t const& db = (*attr).properties();
 				HXml::HNode::properties_t::const_iterator filterIt = db.find( "filter" );
 				HXml::HNode::properties_t::const_iterator sortIt = db.find( "sort" );
-				r[ i ].f_pcTable = xml::attr_val( attr, "table" ); 
-				r[ i ].f_pcColumns = xml::attr_val( attr, "column" );
-				r[ i ].f_pcId = xml::attr_val( attr, "id_column" );
+				r[ i ]._table = xml::attr_val( attr, "table" ); 
+				r[ i ]._columns = xml::attr_val( attr, "column" );
+				r[ i ]._id = xml::attr_val( attr, "id_column" );
 				if ( filterIt != db.end() )
-					r[ i ].f_pcFilter = filterIt->second.raw();
+					r[ i ]._filter = filterIt->second.raw();
 				if ( sortIt != db.end() )
-					r[ i ].f_pcSort = sortIt->second.raw();
+					r[ i ]._sort = sortIt->second.raw();
 				}
 			else if ( attrName == "position" )
 				{
-				r[ i ].f_iRow = lexical_cast<int>( xml::attr_val( attr, "row" ) );
-				r[ i ].f_iColumn = lexical_cast<int>( xml::attr_val( attr, "column" ) );
-				r[ i ].f_iHeight = lexical_cast<int>( xml::attr_val( attr, "height" ) );
-				r[ i ].f_iWidth = lexical_cast<int>( xml::attr_val( attr, "width" ) );
+				r[ i ]._row = lexical_cast<int>( xml::attr_val( attr, "row" ) );
+				r[ i ]._column = lexical_cast<int>( xml::attr_val( attr, "column" ) );
+				r[ i ]._height = lexical_cast<int>( xml::attr_val( attr, "height" ) );
+				r[ i ]._width = lexical_cast<int>( xml::attr_val( attr, "width" ) );
 				}
 			else if ( attrName == "parent" )
 				{
 				i2s[ i ] = xml::attr_val( attr, "refid" );
 				}
-			else if ( r[ i ].f_eType == DATACONTROL_BITS::TYPE::LIST )
+			else if ( r[ i ]._type == DATACONTROL_BITS::TYPE::LIST )
 				{
-				OListControlResource* l = static_cast<OListControlResource*>( r[ i ].f_pvTypeSpecific );
+				OListControlResource* l = static_cast<OListControlResource*>( r[ i ]._typeSpecific );
 				if ( attrName == "column" )
 					{
-					if ( ! r[ i ].f_psColumnInfo )
+					if ( ! r[ i ]._columnInfo )
 						{
-						f_oColumnCache.add_tail();
-						HChunk& c = f_oColumnCache.tail(); 
+						_columnCache.add_tail();
+						HChunk& c = _columnCache.tail(); 
 						c.realloc( chunk_size<OColumnInfo>( ( (*it).child_count() - attrNo ) + 1 ) );
-						r[ i ].f_psColumnInfo = c.get<OColumnInfo>();
+						r[ i ]._columnInfo = c.get<OColumnInfo>();
 						}
-					r[ i ].f_psColumnInfo[ columnNo ].f_iPlacement = lexical_cast<int>( xml::attr_val( attr, "placement" ) );
-					r[ i ].f_psColumnInfo[ columnNo ].f_pcName = xml::attr_val( attr, "name" );
-					r[ i ].f_psColumnInfo[ columnNo ].f_iWidth = lexical_cast<int>( xml::attr_val( attr, "width" ) );
+					r[ i ]._columnInfo[ columnNo ]._placement = lexical_cast<int>( xml::attr_val( attr, "placement" ) );
+					r[ i ]._columnInfo[ columnNo ]._name = xml::attr_val( attr, "name" );
+					r[ i ]._columnInfo[ columnNo ]._width = lexical_cast<int>( xml::attr_val( attr, "width" ) );
 					HXml::HNode::properties_t const& col = (*attr).properties();
 					HXml::HNode::properties_t::const_iterator alignIt = col.find( "align" );
 					HXml::HNode::properties_t::const_iterator colTypeIt = col.find( "type" );
 					M_ENSURE( ( alignIt != col.end() ) && ( colTypeIt != col.end() ) );
 					if ( alignIt->second == "left" )
-						r[ i ].f_psColumnInfo[ columnNo ].f_eAlign = HControl::BITS::ALIGN::LEFT;
+						r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::LEFT;
 					else if ( alignIt->second == "center" )
-						r[ i ].f_psColumnInfo[ columnNo ].f_eAlign = HControl::BITS::ALIGN::CENTER;
+						r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::CENTER;
 					else if ( alignIt->second == "right" )
-						r[ i ].f_psColumnInfo[ columnNo ].f_eAlign = HControl::BITS::ALIGN::RIGHT;
+						r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::RIGHT;
 					else
 						M_THROW( _( "unknown align type" ), i );
 					if ( colTypeIt->second == "string" )
-						r[ i ].f_psColumnInfo[ columnNo ].f_eType = TYPE::HSTRING;
+						r[ i ]._columnInfo[ columnNo ]._type = TYPE::HSTRING;
 					else
 						M_THROW( _( "unknown column type" ), i );
 					++ columnNo;
 					}
 				else if ( attrName == "checkable" )
-					l->f_bCheckable = lexical_cast<bool>( xml::node_val( attr ) );
+					l->_checkable = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "sortable" )
-					l->f_bSortable = lexical_cast<bool>( xml::node_val( attr ) );
+					l->_sortable = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "searchable" )
-					l->f_bSearchable = lexical_cast<bool>( xml::node_val( attr ) );
+					l->_searchable = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "editable" )
-					l->f_bEditable = lexical_cast<bool>( xml::node_val( attr ) );
+					l->_editable = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "draw_header" )
-					l->f_bDrawHeader = lexical_cast<bool>( xml::node_val( attr ) );
+					l->_drawHeader = lexical_cast<bool>( xml::node_val( attr ) );
 				else
 					M_THROW( _( "unknown list attribute name" ), i );
 				}
-			else if ( r[ i ].f_eType == DATACONTROL_BITS::TYPE::EDIT )
+			else if ( r[ i ]._type == DATACONTROL_BITS::TYPE::EDIT )
 				{
-				OEditControlResource* e = static_cast<OEditControlResource*>( r[ i ].f_pvTypeSpecific );
+				OEditControlResource* e = static_cast<OEditControlResource*>( r[ i ]._typeSpecific );
 				if ( attrName == "max_string_size" )
-					e->f_iMaxStringSize = lexical_cast<int>( xml::node_val( attr ) );
+					e->_maxStringSize = lexical_cast<int>( xml::node_val( attr ) );
 				else if ( attrName == "value" )
-					e->f_pcValue = xml::node_val( attr );
+					e->_value = xml::node_val( attr );
 				else if ( attrName == "mask" )
-					e->f_pcMask = xml::node_val( attr );
+					e->_mask = xml::node_val( attr );
 				else if ( attrName == "replace" )
-					e->f_bReplace = lexical_cast<bool>( xml::node_val( attr ) );
+					e->_replace = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "multi_line" )
-					e->f_bMultiLine = lexical_cast<bool>( xml::node_val( attr ) );
+					e->_multiLine = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "read_only" )
-					e->f_bReadOnly = lexical_cast<bool>( xml::node_val( attr ) );
+					e->_readOnly = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "right_aligned" )
-					e->f_bRightAligned = lexical_cast<bool>( xml::node_val( attr ) );
+					e->_rightAligned = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "password" )
-					e->f_bPassword = lexical_cast<bool>( xml::node_val( attr ) );
+					e->_password = lexical_cast<bool>( xml::node_val( attr ) );
 				else if ( attrName == "max_history_level" )
-					e->f_iMaxHistoryLevel = lexical_cast<int>( xml::node_val( attr ) );
+					e->_maxHistoryLevel = lexical_cast<int>( xml::node_val( attr ) );
 				else
 					M_THROW( _( "unknown edit attribute name" ), i );
 				}
@@ -438,12 +438,12 @@ HDataProcess::resources_t& HDataProcess::build_resource( yaal::hcore::HString co
 			{
 			str_to_int_t::iterator parentIt = s2i.find( child->second );
 			M_ENSURE( parentIt != s2i.end() );
-			r[ n ].f_iParent = parentIt->second;
-			r[ n ].f_psColumnInfo = &r[ parentIt->second ].f_psColumnInfo[ n - ( parentIt->second + 1 ) ];
+			r[ n ]._parent = parentIt->second;
+			r[ n ]._columnInfo = &r[ parentIt->second ]._columnInfo[ n - ( parentIt->second + 1 ) ];
 			}
 		}
-	swap( f_oResourceCache[ resourceName ], r );
-	return ( f_oResourceCache[ resourceName ] );
+	swap( _resourceCache[ resourceName ], r );
+	return ( _resourceCache[ resourceName ] );
 	M_EPILOG
 	}
 

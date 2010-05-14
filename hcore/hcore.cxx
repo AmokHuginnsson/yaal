@@ -57,7 +57,7 @@ namespace yaal
 namespace hcore
 {
 
-int n_iDebugLevel = 0;
+int _debugLevel_ = 0;
 typedef HSingleton<HLog> HLogService;
 HLog& log( HLogService::get_instance( 1000 ) );
 
@@ -65,35 +65,35 @@ HProgramOptionsHandler yaalOptions;
 
 /* mathematical macros */
 static double long const EPSILON = 0.000001;
-bool eq( double long const& a_dLeft, double long const& a_dRight )
+bool eq( double long const& left_, double long const& right_ )
 	{
-	return ( ( ( ( ( a_dLeft ) > ( a_dRight ) )
-					? ( ( a_dLeft ) - ( a_dRight ) )
-					: ( ( a_dRight ) - ( a_dLeft ) ) ) < EPSILON ) );
+	return ( ( ( ( ( left_ ) > ( right_ ) )
+					? ( ( left_ ) - ( right_ ) )
+					: ( ( right_ ) - ( left_ ) ) ) < EPSILON ) );
 	}
 
-bool set_hcore_variables( HString& a_roOption, HString& a_roValue )
+bool set_hcore_variables( HString& option_, HString& value_ )
 	{
 	M_PROLOG
-	if ( ! strcasecmp( a_roOption, "set_env" ) )
-		decode_set_env( a_roValue );
-	else if ( ! strcasecmp( a_roOption, "log_mask" ) )
+	if ( ! strcasecmp( option_, "set_env" ) )
+		decode_set_env( value_ );
+	else if ( ! strcasecmp( option_, "log_mask" ) )
 		{
-		HTokenizer t( a_roValue, " \t" );
+		HTokenizer t( value_, " \t" );
 		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it )
 			{
 			if ( ! strcasecmp( *it, "LOG_DEBUG" ) )
-				HLog::f_lLogMask |= LOG_TYPE::DEBUG;
+				HLog::_logMask |= LOG_TYPE::DEBUG;
 			else if ( ! strcasecmp( *it, "LOG_INFO" ) )
-				HLog::f_lLogMask |= LOG_TYPE::INFO;
+				HLog::_logMask |= LOG_TYPE::INFO;
 			else if ( ! strcasecmp( *it, "LOG_NOTICE" ) )
-				HLog::f_lLogMask |= LOG_TYPE::NOTICE;
+				HLog::_logMask |= LOG_TYPE::NOTICE;
 			else if ( ! strcasecmp( *it, "LOG_WARNING" ) )
-				HLog::f_lLogMask |= LOG_TYPE::WARNING;
+				HLog::_logMask |= LOG_TYPE::WARNING;
 			else if ( ! strcasecmp( *it, "LOG_ERROR" ) )
-				HLog::f_lLogMask |= LOG_TYPE::ERROR;
+				HLog::_logMask |= LOG_TYPE::ERROR;
 			else if ( ! strcasecmp( *it, "LOG_VCSHEADER" ) )
-				HLog::f_lLogMask |= LOG_TYPE::VCSHEADER;
+				HLog::_logMask |= LOG_TYPE::VCSHEADER;
 			else
 				return ( true );
 			}
@@ -140,29 +140,29 @@ void decode_set_env( HString line )
 	}
 
 #ifdef _EXECINFO_H
-execution_info::strings_ptr_t execution_info::get_call_stack( int const& a_iLevel )
+execution_info::strings_ptr_t execution_info::get_call_stack( int const& level_ )
 #else /* _EXECINFO_H */
 execution_info::strings_ptr_t execution_info::get_call_stack( int const& )
 #endif /* not _EXECINFO_H */
 	{
 	strings_ptr_t frames( new strings_t );
 #ifdef _EXECINFO_H
-	int l_iCtr = 0, l_iSize = 0;
-	char** l_ppcStrings = NULL;
-	void** l_ppvPointer =	NULL;
+	int ctr = 0, size = 0;
+	char** strings = NULL;
+	void** pointer =	NULL;
 
-	l_ppvPointer = xcalloc<void*>( a_iLevel + 1 );
-	l_iSize = backtrace( l_ppvPointer, a_iLevel );
-	l_ppcStrings = backtrace_symbols( l_ppvPointer, l_iSize );
+	pointer = xcalloc<void*>( level_ + 1 );
+	size = backtrace( pointer, level_ );
+	strings = backtrace_symbols( pointer, size );
 
-	if ( a_iLevel < l_iSize )
-		l_iSize = a_iLevel;
+	if ( level_ < size )
+		size = level_;
 	char* ptr = NULL;
 	char* end = NULL;
 	int status = 0;
-	for ( l_iCtr = 0; l_iCtr < l_iSize; l_iCtr ++ )
+	for ( ctr = 0; ctr < size; ctr ++ )
 		{
-		ptr = strchr( l_ppcStrings[ l_iCtr ], '(' );
+		ptr = strchr( strings[ ctr ], '(' );
 		if ( ptr )
 			{
 			end = strchr( ptr, '+' );
@@ -177,8 +177,8 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int const& )
 			}
 		}
 
-	xfree( l_ppcStrings );
-	xfree( l_ppvPointer );
+	xfree( strings );
+	xfree( pointer );
 #endif /* _EXECINFO_H */
 	return ( frames );
 	}
@@ -199,10 +199,10 @@ public:
 void init_locale( char const* const package_ )
 	{
 	M_PROLOG
-	char* l_pcGettextPath( ::getenv( "GETTEXT_PATH" ) );
-	if ( l_pcGettextPath )
+	char* gettextPath( ::getenv( "GETTEXT_PATH" ) );
+	if ( gettextPath )
 		{
-		bindtextdomain( package_ ? package_ : PACKAGE_NAME, l_pcGettextPath );
+		bindtextdomain( package_ ? package_ : PACKAGE_NAME, gettextPath );
 		if ( package_ )
 			{
 			textdomain( package_ );
@@ -224,12 +224,12 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 #endif
 	errno = 0;
 	init_locale();
-	char* l_pcEnv( ::getenv( "YAAL_DEBUG" ) );
-	if ( l_pcEnv )
-		n_iDebugLevel = lexical_cast<int>( l_pcEnv );
-	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::f_oSSLKey ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL private key file.", "path" )
-		( "ssl_cert", program_options_helper::option_value( HOpenSSL::f_oSSLCert ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL certificate file.", "path" )
-		( "resolve_hostnames", program_options_helper::option_value( HSocket::f_bResolveHostnames ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Resolve IP address into host names." );
+	char* env( ::getenv( "YAAL_DEBUG" ) );
+	if ( env )
+		_debugLevel_ = lexical_cast<int>( env );
+	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::_sSLKey ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL private key file.", "path" )
+		( "ssl_cert", program_options_helper::option_value( HOpenSSL::_sSLCert ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL certificate file.", "path" )
+		( "resolve_hostnames", program_options_helper::option_value( HSocket::_resolveHostnames ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Resolve IP address into host names." );
 	yaalOptions.process_rc_file( "yaal", "core", set_hcore_variables );
 	return;
 	}
@@ -244,13 +244,13 @@ void yaal_hcore_banner( void )
 	return;
 	}
 
-static char const g_pcDynamicLinkerPath [ ]
+static char const _dynamicLinkerPath_ [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 extern "C"
 int yaal_hcore_main( int, char** )
 	{
-	if ( g_pcDynamicLinkerPath[ 0 ] )
+	if ( _dynamicLinkerPath_[ 0 ] )
 		{
 		yaal_hcore_banner();
 		::exit( 0 );

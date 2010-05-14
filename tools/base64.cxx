@@ -41,20 +41,20 @@ namespace yaal
 namespace tools
 {
 
-char const n_pcBase64EncodeTable[][65] = { "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" } ;
-u8_t n_pcBase64DecodeTable[2][ 256 ];
+char const _base64EncodeTable_[][65] = { "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" } ;
+u8_t _base64DecodeTable_[2][ 256 ];
 
 class HBase64DecodeTableInitializer
 	{
 public:
 	HBase64DecodeTableInitializer( void )
 		{
-		::memset( n_pcBase64DecodeTable[0], 0, sizeof ( n_pcBase64DecodeTable[0] ) );
-		::memset( n_pcBase64DecodeTable[1], 0, sizeof ( n_pcBase64DecodeTable[1] ) );
+		::memset( _base64DecodeTable_[0], 0, sizeof ( _base64DecodeTable_[0] ) );
+		::memset( _base64DecodeTable_[1], 0, sizeof ( _base64DecodeTable_[1] ) );
 		for ( size_t m = 0; m < 2; ++ m )
 			{
-			for ( size_t i = 0; i < sizeof ( n_pcBase64EncodeTable[m] ); ++ i )
-				n_pcBase64DecodeTable[m][ static_cast<int>( n_pcBase64EncodeTable[m][ i ] ) ] = static_cast<u8_t>( i );
+			for ( size_t i = 0; i < sizeof ( _base64EncodeTable_[m] ); ++ i )
+				_base64DecodeTable_[m][ static_cast<int>( _base64EncodeTable_[m][ i ] ) ] = static_cast<u8_t>( i );
 			}
 		}
 	} base64DecodeTableInit;
@@ -62,10 +62,10 @@ public:
 void do_buf_3_to_4( HString& out, u32_t const& in, int mode, int long pad = 0 )
 	{
 	char buf[ 5 ] = { 0, 0, 0, 0, 0 };
-	buf[ 0 ] = n_pcBase64EncodeTable[mode][ ( in >> 18 ) & 63 ];
-	buf[ 1 ] = n_pcBase64EncodeTable[mode][ ( in >> 12 ) & 63 ];
-	buf[ 2 ] = n_pcBase64EncodeTable[mode][ ( in >> 6 ) & 63 ];
-	buf[ 3 ] = n_pcBase64EncodeTable[mode][ in & 63 ];
+	buf[ 0 ] = _base64EncodeTable_[mode][ ( in >> 18 ) & 63 ];
+	buf[ 1 ] = _base64EncodeTable_[mode][ ( in >> 12 ) & 63 ];
+	buf[ 2 ] = _base64EncodeTable_[mode][ ( in >> 6 ) & 63 ];
+	buf[ 3 ] = _base64EncodeTable_[mode][ in & 63 ];
 	if ( pad )
 		::memset( ( ( buf + sizeof ( buf ) ) - pad ) - 1, '=', pad );
 	out += buf;
@@ -137,7 +137,7 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 		char ch = ptr[ i ];
 		M_ENSURE( is_base64_character( ch, standardCompliantMode ) );
 		int shift = shifts[ i % 4 ];
-		coder |= ( n_pcBase64DecodeTable[standardCompliantMode ? 1 : 0][ static_cast<u8_t>( ptr[ i ] ) ] << shift );
+		coder |= ( _base64DecodeTable_[standardCompliantMode ? 1 : 0][ static_cast<u8_t>( ptr[ i ] ) ] << shift );
 		if ( ! shift )
 			{
 			do_buf_4_to_3( output + size, coder );

@@ -70,80 +70,80 @@ fun_console_mouse_open_t mouse_open = NULL;
 fun_console_mouse_get_t mouse_get = NULL;
 fun_console_mouse_close_t mouse_close = NULL;
 
-int hunt_tty ( int a_iOffset )
+int hunt_tty ( int offset_ )
 	{
 	M_PROLOG
 	/* this hack allows to guess current controling virtual terminal screen */
-	int l_iVC = 0;
-	char const* l_pcTtyName = NULL;
-	char const* l_pcPtr = NULL;
-	l_pcTtyName = ttyname( STDIN_FILENO );
-	if ( l_pcTtyName && ! ::strncmp( l_pcTtyName, "/dev/ttyv", 8 + a_iOffset ) )
-		l_iVC = lexical_cast<int>( l_pcTtyName + 8 + a_iOffset );
+	int vC = 0;
+	char const* ttyName = NULL;
+	char const* ptr = NULL;
+	ttyName = ttyname( STDIN_FILENO );
+	if ( ttyName && ! ::strncmp( ttyName, "/dev/ttyv", 8 + offset_ ) )
+		vC = lexical_cast<int>( ttyName + 8 + offset_ );
 	else
 		{
-		l_pcTtyName = ::getenv( "STY" );
-		if ( l_pcTtyName )
+		ttyName = ::getenv( "STY" );
+		if ( ttyName )
 			{
-			if ( ( l_pcPtr = ::strstr( l_pcTtyName, ".tty" ) ) )
-				l_iVC = lexical_cast<int>( l_pcPtr + 4 + a_iOffset );
-			else if ( ( l_pcPtr = ::strstr( l_pcTtyName, ".pts" ) ) )
-				l_iVC = lexical_cast<int>( l_pcPtr + 4 + a_iOffset );
+			if ( ( ptr = ::strstr( ttyName, ".tty" ) ) )
+				vC = lexical_cast<int>( ptr + 4 + offset_ );
+			else if ( ( ptr = ::strstr( ttyName, ".pts" ) ) )
+				vC = lexical_cast<int>( ptr + 4 + offset_ );
 			}
 		else
 			M_THROW( "cannot find controling virtual console", errno );
 		}
-	return ( l_iVC );
+	return ( vC );
 	M_EPILOG
 	}
 
 #ifdef HAVE_SYS_CONSIO_H
 
-int n_iMouse = 0;
+int _mouse_ = 0;
 
 int console_mouse_open( void )
 	{
 	M_PROLOG
-	int l_iVC = 0;
-	char l_pcTty[] = "/dev/ttyv0";
-	HString l_oError;
-	mouse_info l_sMouse;
-	l_sMouse.operation = MOUSE_MODE;
-	l_sMouse.u.mode.mode = 0;
-	l_sMouse.u.mode.signal = SIGUSR1;
-	l_iVC = hunt_tty( 1 );
-	l_pcTty[ 9 ] = '0' + l_iVC;
-	n_iMouse = ::open( l_pcTty, O_RDWR );
-	if ( n_iMouse < 0 )
+	int vC = 0;
+	char tty[] = "/dev/ttyv0";
+	HString error;
+	mouse_info mouse;
+	mouse.operation = MOUSE_MODE;
+	mouse.u.mode.mode = 0;
+	mouse.u.mode.signal = SIGUSR1;
+	vC = hunt_tty( 1 );
+	tty[ 9 ] = '0' + vC;
+	_mouse_ = ::open( tty, O_RDWR );
+	if ( _mouse_ < 0 )
 		{
-		l_oError.format( _( "cannot open mouse, %s" ), error_message( errno ) );
-		M_THROW( l_oError, l_iVC );
+		error.format( _( "cannot open mouse, %s" ), error_message( errno ) );
+		M_THROW( error, vC );
 		}
-	if ( ::ioctl( n_iMouse, CONS_MOUSECTL, &l_sMouse ) < 0 )
+	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 )
 		{
-		l_oError.format( _( "cannot setup mouse mode, %s" ), error_message( errno ) );
-		TEMP_FAILURE_RETRY( ::close( n_iMouse ) );
-		M_THROW( l_oError, errno );
+		error.format( _( "cannot setup mouse mode, %s" ), error_message( errno ) );
+		TEMP_FAILURE_RETRY( ::close( _mouse_ ) );
+		M_THROW( error, errno );
 		}
 
-	log( LOG_TYPE::INFO ) << "i have opened device: `" << l_pcTty << '\'' << endl;
+	log( LOG_TYPE::INFO ) << "i have opened device: `" << tty << '\'' << endl;
 
 	return ( 0 );
 	M_EPILOG
 	}
 
-int console_mouse_get ( OMouse & a_rsMouse )
+int console_mouse_get ( OMouse & mouse_ )
 	{
 	M_PROLOG
-	mouse_info l_sMouse;
-	l_sMouse.operation = MOUSE_GETINFO;
-	if ( ::ioctl( n_iMouse, CONS_MOUSECTL, &l_sMouse ) < 0 )
+	mouse_info mouse;
+	mouse.operation = MOUSE_GETINFO;
+	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 )
 		M_THROW( "cannot get mouse data", errno );
 	else
 		{
-		a_rsMouse.f_iButtons = l_sMouse.u.data.buttons;
-		a_rsMouse.f_iRow = l_sMouse.u.data.y / 16;
-		a_rsMouse.f_iColumn = l_sMouse.u.data.x / 8;
+		mouse_._buttons = mouse.u.data.buttons;
+		mouse_._row = mouse.u.data.y / 16;
+		mouse_._column = mouse.u.data.x / 8;
 		}
 	return ( 0 );
 	M_EPILOG
@@ -152,10 +152,10 @@ int console_mouse_get ( OMouse & a_rsMouse )
 int console_mouse_close ( void )
 	{
 	M_PROLOG
-	if ( ! n_iMouse )
+	if ( ! _mouse_ )
 		M_THROW( "mouse not opened", errno );
-	TEMP_FAILURE_RETRY( ::close( n_iMouse ) );
-	n_iMouse = 0;
+	TEMP_FAILURE_RETRY( ::close( _mouse_ ) );
+	_mouse_ = 0;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -165,35 +165,35 @@ int console_mouse_close ( void )
 int console_mouse_open ( void )
 	{
 	M_PROLOG
-	int l_iVC = 0;
-	HString l_oError;
-	Gpm_Connect l_sGpm;
-	l_sGpm.minMod = 0;
-	l_sGpm.maxMod = 0;
-	l_sGpm.pid = ::getpid();
-	l_sGpm.vc = l_iVC = hunt_tty( 0 );
-	l_sGpm.eventMask = static_cast<int>( GPM_UP );
-	l_sGpm.defaultMask = static_cast<int short unsigned>( ~l_sGpm.eventMask );
+	int vC = 0;
+	HString error;
+	Gpm_Connect gpm;
+	gpm.minMod = 0;
+	gpm.maxMod = 0;
+	gpm.pid = ::getpid();
+	gpm.vc = vC = hunt_tty( 0 );
+	gpm.eventMask = static_cast<int>( GPM_UP );
+	gpm.defaultMask = static_cast<int short unsigned>( ~gpm.eventMask );
 	gpm_zerobased = true;
-	if ( Gpm_Open( &l_sGpm, l_iVC ) == -1 )
+	if ( Gpm_Open( &gpm, vC ) == -1 )
 		{
-		l_oError.format( "Can't open mouse connection: %s", error_message( errno ) );
-		M_THROW( l_oError, l_iVC );
+		error.format( "Can't open mouse connection: %s", error_message( errno ) );
+		M_THROW( error, vC );
 		}
-	log( LOG_TYPE::INFO ) << "i have opened device: `" << l_iVC << '\'' << endl;
+	log( LOG_TYPE::INFO ) << "i have opened device: `" << vC << '\'' << endl;
 	return ( gpm_fd );
 	M_EPILOG
 	}
 
-int console_mouse_get( OMouse& a_rsMouse )
+int console_mouse_get( OMouse& mouse_ )
 	{
 	M_PROLOG
-	Gpm_Event l_sEvent;
-	if ( Gpm_GetEvent( &l_sEvent ) != 1 )
+	Gpm_Event event;
+	if ( Gpm_GetEvent( &event ) != 1 )
 		M_THROW( _( "cannot retrieve event") , errno );
-	a_rsMouse.f_iButtons = l_sEvent.buttons;
-	a_rsMouse.f_iRow = l_sEvent.y;
-	a_rsMouse.f_iColumn = l_sEvent.x;
+	mouse_._buttons = event.buttons;
+	mouse_._row = event.y;
+	mouse_._column = event.x;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -246,37 +246,37 @@ int console_mouse_close( void )
 int x_mouse_open( void )
 	{
 	M_PROLOG
-	mmask_t l_xMouseMask, l_xDesiredMouseMask;
-	l_xDesiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED;
-	l_xMouseMask = mousemask( l_xDesiredMouseMask, NULL );
-	if ( ! l_xMouseMask )
+	mmask_t mouseMask, desiredMouseMask;
+	desiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED;
+	mouseMask = mousemask( desiredMouseMask, NULL );
+	if ( ! mouseMask )
 		M_THROW( "mousemask() returned 0", errno );
-	else if ( ( l_xMouseMask & l_xDesiredMouseMask ) < l_xDesiredMouseMask )
+	else if ( ( mouseMask & desiredMouseMask ) < desiredMouseMask )
 		{
-		HString l_oError;
-		HException l_oException( __FILE__, __PRETTY_FUNCTION__, __LINE__, "could not set up apropriate mask",
-				static_cast<int>( l_xMouseMask ) );
-		l_oError.format( "1 = %d, 2 = %d, 3 = %d",
-				l_xMouseMask & BUTTON1_CLICKED, l_xMouseMask & BUTTON2_CLICKED,
-				l_xMouseMask & BUTTON3_CLICKED );
-		l_oException.set( l_oError );
-		throw ( l_oException );
+		HString error;
+		HException exception( __FILE__, __PRETTY_FUNCTION__, __LINE__, "could not set up apropriate mask",
+				static_cast<int>( mouseMask ) );
+		error.format( "1 = %d, 2 = %d, 3 = %d",
+				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
+				mouseMask & BUTTON3_CLICKED );
+		exception.set( error );
+		throw ( exception );
 		}
 	return ( 0 );
 	M_EPILOG
 	}
 
-int x_mouse_get( OMouse& a_rsMouse )
+int x_mouse_get( OMouse& mouse_ )
 	{
 	M_PROLOG
-	MEVENT l_sMouse;
-	if ( getmouse( &l_sMouse ) != OK )
+	MEVENT mouse;
+	if ( getmouse( &mouse ) != OK )
 		M_THROW( "cannot get mouse data", errno );
 	else
 		{
-		a_rsMouse.f_iButtons = static_cast<int>( l_sMouse.bstate );
-		a_rsMouse.f_iRow = l_sMouse.y;
-		a_rsMouse.f_iColumn = l_sMouse.x;
+		mouse_._buttons = static_cast<int>( mouse.bstate );
+		mouse_._row = mouse.y;
+		mouse_._column = mouse.x;
 		}
 	return ( 0 );
 	M_EPILOG

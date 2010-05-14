@@ -37,7 +37,7 @@ namespace yaal
 namespace hcore
 {
 
-char const* const g_ppcErrMsgHList[ 8 ] =
+char const* const _errMsgHList_[ 8 ] =
 	{
 	_( "ok" ),
 /* HList::ERROR::BAD_INDEX */ _( "index excides list size" ),

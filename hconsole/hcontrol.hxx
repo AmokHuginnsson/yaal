@@ -69,40 +69,40 @@ public:
 	static int const DEFAULT_ATTRS = -1; /*!< Default HControl attribites (colors of label and data fore/back-ground) */
 	typedef yaal::hcore::HPointer<HControl> ptr_t;
 protected:
-	bool			f_bEnabled;						/*!< Tells if control is enabled, focus can go only to enabled control. */
-	bool			f_bFocused;						/*!< Tells if control has focus. */
-	bool			f_bDrawLabel;					/*!< Will be label driven? */
-	bool 			f_bSingleLine;				/*!< Is label in the same line as top of control? */
+	bool			_enabled;						/*!< Tells if control is enabled, focus can go only to enabled control. */
+	bool			_focused;						/*!< Tells if control has focus. */
+	bool			_drawLabel;					/*!< Will be label driven? */
+	bool 			_singleLine;				/*!< Is label in the same line as top of control? */
 	/** \name Control attributes.
 	 * High byte of attribute, in all
 	 * three cases keeps label (control title)
 	 * color, low byte keeps work place color */
 	//@{
-	int unsigned f_uiAttributeDisabled;	/*!< The attribute of disabled cotrol. */
-	int unsigned f_uiAttributeEnabled;	/*!< The attribute of enabled cotrol. */	
-	int unsigned f_uiAttributeFocused;	/*!< The attribute of focused cotrol. */
+	int unsigned _attributeDisabled;	/*!< The attribute of disabled cotrol. */
+	int unsigned _attributeEnabled;	/*!< The attribute of enabled cotrol. */	
+	int unsigned _attributeFocused;	/*!< The attribute of focused cotrol. */
 	//@}
-	int				f_iRow;								/*!< Control top coordinate relative
+	int				_row;								/*!< Control top coordinate relative
 																		 to parent window (top or bottom border). */
-	int				f_iColumn;						/*!< Control left coordinate relative
+	int				_column;						/*!< Control left coordinate relative
 																		 to parent window (left or right border). */
-	int				f_iHeight;						/*!< Height or coorinate of bottom of control. */
-	int				f_iWidth;							/*!< Width or coorinate of right of control. */
-	int				f_iRowRaw;						/*!< Control top coordinate relative
+	int				_height;						/*!< Height or coorinate of bottom of control. */
+	int				_width;							/*!< Width or coorinate of right of control. */
+	int				_rowRaw;						/*!< Control top coordinate relative
 																		 to parent window (after repositioning). */
-	int				f_iColumnRaw;					/*!< Control left coordinate relative
+	int				_columnRaw;					/*!< Control left coordinate relative
 																		 to parent window (after repositioning). */
-	int				f_iHeightRaw;					/*!< Drawing state keeping helper. */
-	int				f_iWidthRaw;					/*!< Drawing state keeping helper. */
-	hcore::HString	f_oLabel;					/*!< Control title. */
-	hcore::HString	f_oVarTmpBuffer;	/*!< Buffer for temporary operations, used
+	int				_heightRaw;					/*!< Drawing state keeping helper. */
+	int				_widthRaw;					/*!< Drawing state keeping helper. */
+	hcore::HString	_label;					/*!< Control title. */
+	hcore::HString	_varTmpBuffer;	/*!< Buffer for temporary operations, used
 																			 to keep memory fragmentation low. */
-	HWindow* f_poParent;						/*!< Window that will hold this control. */
+	HWindow* _parent;						/*!< Window that will hold this control. */
 /* this is used locally, there is no way to modify this variables explicitly */
-	int				f_iLabelLength;	 			/*!< Length of the label. */
-	int				f_iShortcutIndex;			/*!< Index of shortcut char in label. */
-	bool			f_bValid;							/*!< Is controler data in sync with control internals. */
-	bool			f_bNeedRepaint;				/*!< Does this control need to be repainted. */
+	int				_labelLength;	 			/*!< Length of the label. */
+	int				_shortcutIndex;			/*!< Index of shortcut char in label. */
+	bool			_valid;							/*!< Is controler data in sync with control internals. */
+	bool			_needRepaint;				/*!< Does this control need to be repainted. */
 public:
 /** \brief Control constructor.
  *

@@ -60,9 +60,9 @@ public:
 		static int const RECV_BUF_SIZE = 8; /* 5 should be enought but you never know */
 		};
 private:
-	int			f_iLines;
-	char		f_pcReadBuf [ PROTOCOL::RECV_BUF_SIZE + 1 /* for \0 - the terminator */ ];
-	hcore::HString	f_oLine;
+	int			_lines;
+	char		_readBuf [ PROTOCOL::RECV_BUF_SIZE + 1 /* for \0 - the terminator */ ];
+	hcore::HString	_line;
 public:
 	HCollector( char const* = NULL ); /* device path */
 	int send_line( char const* );

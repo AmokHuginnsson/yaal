@@ -54,11 +54,11 @@ public:
 			} enum_t;
 		};
 private:
-	void* f_pvBlock;
-	int long f_lSize;
-	int long f_lValid;
-	int long f_lCursorRead;
-	int long f_lCursorWrite;
+	void* _block;
+	int long _size;
+	int long _valid;
+	int long _cursorRead;
+	int long _cursorWrite;
 public:
 	/*! \brief Create new memory accessor.
 	 *

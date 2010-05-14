@@ -41,10 +41,10 @@ namespace hdata
 {
 
 HDataTreeControl::HDataTreeControl(
-		HDataWindow* a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
-		int a_iWidth, char const* a_pcTitle )
-								: HControl( a_poWindow, a_iRow, a_iColumn, a_iHeight,
-										a_iWidth, a_pcTitle ),
+		HDataWindow* window_, int row_, int column_, int height_,
+		int width_, char const* title_ )
+								: HControl( window_, row_, column_, height_,
+										width_, title_ ),
 								HTreeControl( NULL, 0, 0, 0, 0, NULL ),
 								HDataControl()
 	{
@@ -60,7 +60,7 @@ HDataTreeControl::~HDataTreeControl ( void )
 	M_EPILOG
 	}
 
-void HDataTreeControl::load ( int long /*a_iId*/ )
+void HDataTreeControl::load ( int long /*id_*/ )
 	{
 	M_PROLOG
 	return;

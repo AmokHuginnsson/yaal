@@ -53,9 +53,9 @@ public:
 	class HIterator;
 	typedef HIterator iterator;
 private:
-	mutable database_ptr_t f_oDataBase; /*!< data-base that this record-set belongs to */
+	mutable database_ptr_t _dataBase; /*!< data-base that this record-set belongs to */
 	mutable ODBConnector const* _connector; /*!< low level database engine connector */
-	mutable void* f_pvResult;	/*!< very internal for this class used only in base cla */
+	mutable void* _result;	/*!< very internal for this class used only in base cla */
 public:
 	HRecordSet( database_ptr_t, ODBConnector const*, void* );
 	virtual ~HRecordSet( void );
@@ -80,8 +80,8 @@ private:
  */
 class HRecordSet::HIterator
 	{
-	HRecordSet* f_poOwner;
-	int long f_lCursorPosition; /* cursor position in record-set */
+	HRecordSet* _owner;
+	int long _cursorPosition; /* cursor position in record-set */
 public:
 	HIterator( HIterator const& );
 	HIterator& operator = ( HIterator const& );
@@ -119,22 +119,22 @@ public:
 			} mode_t;
 		};
 private:
-	MODE::mode_t f_eMode;
-	yaal::hcore::HString f_oVarTmpBuffer;
-	yaal::hcore::HString f_oSQL;
-	yaal::hcore::HString f_oTable;			/* table name */
-	yaal::hcore::HString f_oColumns;		/* columns that should be returned by next query */
-	yaal::hcore::HString f_oFilter;		/* additional constant filter (WHERE clause) */
-	yaal::hcore::HString f_oSort;			/* additional constant sort (ORDER BY clause) */
+	MODE::mode_t _mode;
+	yaal::hcore::HString _varTmpBuffer;
+	yaal::hcore::HString _SQL;
+	yaal::hcore::HString _table;			/* table name */
+	yaal::hcore::HString _columns;		/* columns that should be returned by next query */
+	yaal::hcore::HString _filter;		/* additional constant filter (WHERE clause) */
+	yaal::hcore::HString _sort;			/* additional constant sort (ORDER BY clause) */
 	typedef yaal::hcore::HArray<yaal::hcore::HString> fields_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
 	typedef yaal::hcore::HArray<bool> mutated_t;
-	fields_t f_oFields;
-	int f_iFieldCount;		/* number of columns returned by last query */
-	int long f_lSetSize;		/* number of records returned by last query */
-	values_t f_oValues;
-	database_ptr_t f_oDataBase;
-	mutated_t f_oMutated;
+	fields_t _fields;
+	int _fieldCount;		/* number of columns returned by last query */
+	int long _setSize;		/* number of records returned by last query */
+	values_t _values;
+	database_ptr_t _dataBase;
+	mutated_t _mutated;
 public:
 	HSQLDescriptor( void );
 	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );

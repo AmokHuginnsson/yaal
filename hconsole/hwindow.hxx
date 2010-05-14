@@ -51,14 +51,14 @@ protected:
 public:
 	typedef yaal::hcore::HPointer<HWindow> ptr_t;
 protected:
-	bool								f_bInitialised;		/* was window properly initialised? */
-	bool								f_bNeedRepaint;		/*!< \brief Does this window need to be repainted? */
-	hcore::HString			f_oTitle;					/* title of window */
-	HControlList::model_t::cyclic_iterator	f_oFocusedChild;	/* points to control that has focus */
-	HControlList::model_t::cyclic_iterator f_oPreviousFocusedChild; /* control that had focus before
+	bool								_initialised;		/* was window properly initialised? */
+	bool								_needRepaint;		/*!< \brief Does this window need to be repainted? */
+	hcore::HString			_title;					/* title of window */
+	HControlList::model_t::cyclic_iterator	_focusedChild;	/* points to control that has focus */
+	HControlList::model_t::cyclic_iterator _previousFocusedChild; /* control that had focus before
 																									 focus went to status bar */	
-	HControlList				f_oControls;	/* list of all control inside _this_ wind */
-	HStatusBarControl::ptr_t		f_oStatusBar;
+	HControlList				_controls;	/* list of all control inside _this_ wind */
+	HStatusBarControl::ptr_t		_statusBar;
 public:
 	HWindow( char const* ); /* title */
 	virtual ~HWindow( void );

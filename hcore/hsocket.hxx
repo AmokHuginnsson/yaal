@@ -53,7 +53,7 @@ public:
 	typedef HSocket self_t;
 	typedef HRawFile hier_t;
 	typedef HPointer<HSocket> ptr_t;
-	static bool f_bResolveHostnames;
+	static bool _resolveHostnames;
 	/*! \brief Socket types.
 	 */
 	struct TYPE
@@ -74,13 +74,13 @@ public:
 	typedef HStrongEnum<TYPE> socket_type_t;
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;
-	bool f_bNeedShutdown;
-	socket_type_t f_eType;
-	int f_iMaximumNumberOfClients;
-	int f_iAddressSize;
-	void* f_pvAddress;
-	clients_t* f_poClients;
-	HString f_oHostName;
+	bool _needShutdown;
+	socket_type_t _type;
+	int _maximumNumberOfClients;
+	int _addressSize;
+	void* _address;
+	clients_t* _clients;
+	HString _hostName;
 public:
 	HSocket( socket_type_t const = TYPE::DEFAULT, int const = 0 );
 	virtual ~HSocket( void );

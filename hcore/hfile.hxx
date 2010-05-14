@@ -88,10 +88,10 @@ public:
 		};
 	typedef HStrongEnum<SEEK> seek_t;
 private:
-	void* f_pvHandle;
-	HString f_oPath;
-	HString f_oError;
-	bool f_bExternal;
+	void* _handle;
+	HString _path;
+	HString _error;
+	bool _external;
 public:
 	/*! \brief Create closed file stream object.
 	 */

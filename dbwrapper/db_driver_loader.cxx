@@ -56,9 +56,9 @@ char const* const eend = ") while no driver loaded.";
 
 }
 
-char const* const g_pcDone = "done.\r\n";
+char const* const _done_ = "done.\r\n";
 
-static char const* g_ppcDriver[ 7 ] =
+static char const* _driver_[ 7 ] =
 	{
 	"default",
 	"null",
@@ -69,7 +69,7 @@ static char const* g_ppcDriver[ 7 ] =
 	NULL
 	};
 
-drivers_t n_oDBDrivers;
+drivers_t _dBDrivers_;
 
 /* Null driver */
 
@@ -166,10 +166,10 @@ char* null_rs_column_name( void*, int )
 void dbwrapper_error( void )
 	{
 	M_PROLOG
-	HString l_oMessage;
-	l_oMessage = HPlugin().error_message( 0 );
-	log( LOG_TYPE::ERROR ) << l_oMessage << endl;
-	::fprintf( stderr, "(%s), ", l_oMessage.raw() );
+	HString message;
+	message = HPlugin().error_message( 0 );
+	log( LOG_TYPE::ERROR ) << message << endl;
+	::fprintf( stderr, "(%s), ", message.raw() );
 	return;
 	M_EPILOG
 	}
@@ -185,15 +185,15 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t const& driverI
 	{
 	M_PROLOG
 	M_ENSURE( ( driverId_ >= ODBConnector::DRIVER::SQLITE3 ) && ( driverId_ < ODBConnector::DRIVER::TERMINATOR ) );
-	drivers_t::const_iterator it = n_oDBDrivers.find( driverId_ );
+	drivers_t::const_iterator it = _dBDrivers_.find( driverId_ );
 	driver_t driver;
-	if ( it == n_oDBDrivers.end() ) /* given driver has not been loaded yet */
+	if ( it == _dBDrivers_.end() ) /* given driver has not been loaded yet */
 		{
 		try
 			{
 			driver = make_pair( HPlugin::ptr_t( new HPlugin() ), ODBConnector() );
-			log( LOG_TYPE::NOTICE ) << "Loading [" << g_ppcDriver[ driverId_ + 1 ] << "] driver ... ";
-			driver.first->load( g_ppcDriver[ driverId_ + 1 ] );
+			log( LOG_TYPE::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
+			driver.first->load( _driver_[ driverId_ + 1 ] );
 			cerr << "(linking symbols ...) " << flush;
 			driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second.db_disconnect );
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_errno", driver.second.dbrs_errno );
@@ -206,14 +206,14 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t const& driverI
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second.dbrs_id );
 			driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second.rs_column_name );
 			driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second.db_connect );
-			it = n_oDBDrivers.insert( make_pair( driverId_, driver ) ).first;
+			it = _dBDrivers_.insert( make_pair( driverId_, driver ) ).first;
 			}
 		catch ( HPluginException& e )
 			{
 			log( LOG_TYPE::NOTICE ) << "fail." << endl;
 			HStringStream reason;
 			reason << _( "cannot load database driver: " ) << e.what();
-			M_THROW( reason.string(), n_eDataBaseDriver );
+			M_THROW( reason.string(), _dataBaseDriver_ );
 			}
 		if ( driver.first->is_loaded() )
 			log( LOG_TYPE::NOTICE ) << "success." << endl;
@@ -231,7 +231,7 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t const& driverId_ )
 	{
 	M_PROLOG
 	errno = 0;
-	cerr << "Using dynamic database driver [" << g_ppcDriver[ driverId_ + 1 ] << "] ... " << flush;
+	cerr << "Using dynamic database driver [" << _driver_[ driverId_ + 1 ] << "] ... " << flush;
 	ODBConnector const* pConnector( NULL );
 	if ( driverId_ != ODBConnector::DRIVER::NONE )
 		{
@@ -247,7 +247,7 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t const& driverId_ )
 			pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( driverId_ ) );
 		}
 	if ( pConnector->db_connect != null_db_connect )
-		cerr << g_pcDone << flush;
+		cerr << _done_ << flush;
 	return ( pConnector );
 	M_EPILOG
 	}

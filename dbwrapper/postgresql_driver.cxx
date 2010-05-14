@@ -43,32 +43,32 @@ Copyright:
 extern "C"
 {
 
-PGconn* g_psBrokenDB = NULL;
+PGconn* _brokenDB_ = NULL;
 
 void db_disconnect( void* );
 
-void* db_connect( char const* a_pcDataBase,
-		char const* a_pcLogin, char const* a_pcPassword )
+void* db_connect( char const* dataBase_,
+		char const* login_, char const* password_ )
 	{
-	PGconn * l_psConnection = NULL;
-	if ( g_psBrokenDB )
+	PGconn * connection = NULL;
+	if ( _brokenDB_ )
 		{
-		db_disconnect ( g_psBrokenDB );
-		g_psBrokenDB = NULL;
+		db_disconnect ( _brokenDB_ );
+		_brokenDB_ = NULL;
 		}
-	l_psConnection = PQsetdbLogin( NULL /* host */,
+	connection = PQsetdbLogin( NULL /* host */,
 			NULL /* port */, NULL /* options */,
 			NULL /* debugging tty */,
-			a_pcDataBase, a_pcLogin, a_pcPassword );
-	if ( PQstatus( l_psConnection ) != CONNECTION_OK )
-		g_psBrokenDB = l_psConnection, l_psConnection = NULL;
-	return ( l_psConnection );
+			dataBase_, login_, password_ );
+	if ( PQstatus( connection ) != CONNECTION_OK )
+		_brokenDB_ = connection, connection = NULL;
+	return ( connection );
 	}
 
-void db_disconnect( void* a_pvData )
+void db_disconnect( void* data_ )
 	{
-	if ( a_pvData )
-		PQfinish( static_cast<PGconn*>( a_pvData ) );
+	if ( data_ )
+		PQfinish( static_cast<PGconn*>( data_ ) );
 	return;
 	}
 
@@ -81,48 +81,48 @@ int dbrs_errno( void*, void* result_ )
 char const* dbrs_error( void* db_, void* result_ )
 	{
 	if ( ! db_ )
-		db_ = g_psBrokenDB;
+		db_ = _brokenDB_;
 	return ( result_ ? ::PQresultErrorMessage( static_cast<PGresult*>( result_ ) ) : ::PQerrorMessage( static_cast<PGconn*>( db_ ) ) );
 	}
 
-void* db_query( void* a_pvData, char const* a_pcQuery )
+void* db_query( void* data_, char const* query_ )
 	{
-	return ( PQexec( static_cast<PGconn*>( a_pvData ), a_pcQuery ) );
+	return ( PQexec( static_cast<PGconn*>( data_ ), query_ ) );
 	}
 
-void rs_unquery( void* a_pvData )
+void rs_unquery( void* data_ )
 	{
-	PQclear( static_cast<PGresult*>( a_pvData ) );
+	PQclear( static_cast<PGresult*>( data_ ) );
 	return;
 	}
 
-char* rs_get( void* a_pvData, int long a_iRow, int a_iColumn )
+char* rs_get( void* data_, int long row_, int column_ )
 	{
-	return ( ::PQgetvalue( static_cast<PGresult*>( a_pvData ), static_cast<int>( a_iRow ), a_iColumn ) );
+	return ( ::PQgetvalue( static_cast<PGresult*>( data_ ), static_cast<int>( row_ ), column_ ) );
 	}
 
-int rs_fields_count( void* a_pvData )
+int rs_fields_count( void* data_ )
 	{
-	return ( ::PQnfields( static_cast<PGresult*>( a_pvData ) ) );
+	return ( ::PQnfields( static_cast<PGresult*>( data_ ) ) );
 	}
 
-int long dbrs_records_count( void*, void* a_pvDataR )
+int long dbrs_records_count( void*, void* dataR_ )
 	{
-	char* l_pcTmp = ::PQcmdTuples( static_cast<PGresult*>( a_pvDataR ) );
-	if ( l_pcTmp && l_pcTmp [ 0 ] )
-		return ( ::strtol( l_pcTmp, NULL, 10 ) );
+	char* tmp = ::PQcmdTuples( static_cast<PGresult*>( dataR_ ) );
+	if ( tmp && tmp [ 0 ] )
+		return ( ::strtol( tmp, NULL, 10 ) );
 	else
-		return ( ::PQntuples( static_cast<PGresult*>( a_pvDataR ) ) );
+		return ( ::PQntuples( static_cast<PGresult*>( dataR_ ) ) );
 	}
 
-int long dbrs_id( void*, void* a_pvDataR )
+int long dbrs_id( void*, void* dataR_ )
 	{
-	return ( ::PQoidValue( static_cast<PGresult*>( a_pvDataR ) ) );
+	return ( ::PQoidValue( static_cast<PGresult*>( dataR_ ) ) );
 	}
 
-char* rs_column_name( void* a_pvDataR, int a_iField )
+char* rs_column_name( void* dataR_, int field_ )
 	{
-	return ( ::PQfname( static_cast<PGresult*>( a_pvDataR ), a_iField ) );
+	return ( ::PQfname( static_cast<PGresult*>( dataR_ ), field_ ) );
 	}
 
 int yaal_postgresql_driver_main( int, char** ) __attribute__(( __noreturn__ ));

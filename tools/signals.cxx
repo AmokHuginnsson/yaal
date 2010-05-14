@@ -78,14 +78,14 @@ public:
 
 }
 
-int HSignalService::f_iExitStatus = 0;
+int HSignalService::_exitStatus = 0;
 HSignalService::HSignalService( void )
-	: f_bLoop( true ), f_oLocker( chunk_size<sigset_t>( 1 ) ),
-	_thread(), f_oMutex(), f_oHandlers()
+	: _loop( true ), _locker( chunk_size<sigset_t>( 1 ) ),
+	_thread(), _mutex(), _handlers()
 	{
 	M_PROLOG
-	M_ENSURE( sigemptyset( f_oLocker.get<sigset_t>() ) == 0 );
-	if ( n_iDebugLevel < DEBUG_LEVEL::GDB )
+	M_ENSURE( sigemptyset( _locker.get<sigset_t>() ) == 0 );
+	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
 		register_handler( SIGINT, bound_call( &HBaseSignalHandlers::signal_INT, _1 ) );
 	register_handler( SIGHUP, bound_call( &HBaseSignalHandlers::signal_HUP, _1 ) );
 	register_handler( SIGTERM, bound_call( &HBaseSignalHandlers::signal_TERM, _1 ) );
@@ -114,7 +114,7 @@ HSignalService::HSignalService( void )
 HSignalService::~HSignalService( void )
 	{
 	M_PROLOG
-	f_bLoop = false;
+	_loop = false;
 	/*
 	 * man for raise() is full of shit
 	 * raise( SIG_NO ) is NOT equivalent for kill( getpid(), SIG_NO )
@@ -130,50 +130,50 @@ HSignalService::~HSignalService( void )
 void* HSignalService::run( void )
 	{
 	M_PROLOG
-	while ( f_bLoop && _thread.is_alive() )
+	while ( _loop && _thread.is_alive() )
 		{
-		int l_iSigNo = 0;
-		M_ENSURE( sigwait( f_oLocker.get<sigset_t>(), &l_iSigNo ) == 0 );
-		HLock l_oLock( f_oMutex );
+		int sigNo = 0;
+		M_ENSURE( sigwait( _locker.get<sigset_t>(), &sigNo ) == 0 );
+		HLock lock( _mutex );
 		handlers_t::iterator it;
-		if ( ( it = f_oHandlers.find( l_iSigNo ) ) != f_oHandlers.end() )
+		if ( ( it = _handlers.find( sigNo ) ) != _handlers.end() )
 			{
-			for ( ; ( it != f_oHandlers.end() ) && ( (*it).first == l_iSigNo ); ++ it )
+			for ( ; ( it != _handlers.end() ) && ( (*it).first == sigNo ); ++ it )
 				{
 				handler_t handler( (*it).second );
 				M_ASSERT( !! handler );
-				int status = handler->invoke( l_iSigNo );
+				int status = handler->invoke( sigNo );
 				if ( status > 0 )
 					break; /* signal was entirely consumed */
 				else if ( status < 0 )
 					{
-					f_bLoop = false;
+					_loop = false;
 					schedule_exit( -1 - status );
 					}
 				}
 			}
 		else
-			M_ENSURE( ( l_iSigNo == SIGURG ) || ( l_iSigNo == SIGPIPE ) );
+			M_ENSURE( ( sigNo == SIGURG ) || ( sigNo == SIGPIPE ) );
 		}
 	return ( 0 );
 	M_EPILOG
 	}
 
-void HSignalService::register_handler( int a_iSigNo, handler_t a_oHandler )
+void HSignalService::register_handler( int sigNo_, handler_t handler_ )
 	{
 	M_PROLOG
-	f_oHandlers.push_front( a_iSigNo, a_oHandler );
-	lock_on( a_iSigNo );
+	_handlers.push_front( sigNo_, handler_ );
+	lock_on( sigNo_ );
 	M_ENSURE( kill( getpid(), SIGURG ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-void HSignalService::lock_on( int a_iSigNo )
+void HSignalService::lock_on( int sigNo_ )
 	{
 	M_PROLOG
-	M_ENSURE( sigaddset( f_oLocker.get<sigset_t>(), a_iSigNo ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_BLOCK, f_oLocker.get<sigset_t>(), NULL ) == 0 );
+	M_ENSURE( sigaddset( _locker.get<sigset_t>(), sigNo_ ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_BLOCK, _locker.get<sigset_t>(), NULL ) == 0 );
 
 	/*
 	 * FreeBSD does not wake sigwait on signal with installed
@@ -183,18 +183,18 @@ void HSignalService::lock_on( int a_iSigNo )
 	 */
 	struct sigaction act;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
-	M_ENSURE( sigaddset( &act.sa_mask, a_iSigNo ) == 0 );
+	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
 	act.sa_handler = dummy_signal_handler;
 	act.sa_flags = SA_RESTART;
-	M_ENSURE( sigaction( a_iSigNo, &act, NULL ) == 0 );
+	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-void HSignalService::schedule_exit( int a_iExitStatus )
+void HSignalService::schedule_exit( int exitStatus_ )
 	{
 	M_PROLOG
-	f_iExitStatus = a_iExitStatus;
+	_exitStatus = exitStatus_;
 	M_ENSURE( signal( SIGALRM, HSignalService::exit ) != SIG_ERR );
 	alarm( 1 );
 	M_EPILOG
@@ -202,7 +202,7 @@ void HSignalService::schedule_exit( int a_iExitStatus )
 
 void HSignalService::exit( int )
 	{
-	::exit( f_iExitStatus );
+	::exit( _exitStatus );
 	}
 
 int HSignalService::life_time( int )
@@ -215,138 +215,138 @@ namespace
 
 /* singnal handler definitions */
 
-void HBaseSignalHandlers::unlock( int a_iSigNo )
+void HBaseSignalHandlers::unlock( int sigNo_ )
 	{
 	M_PROLOG
 	sigset_t set;
 	M_ENSURE( sigemptyset( &set ) == 0 );
-	M_ENSURE( sigaddset( &set, a_iSigNo ) == 0 );
+	M_ENSURE( sigaddset( &set, sigNo_ ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &set, NULL ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-void HBaseSignalHandlers::lock( int a_iSigNo )
+void HBaseSignalHandlers::lock( int sigNo_ )
 	{
 	M_PROLOG
 	sigset_t set;
 	M_ENSURE( sigemptyset( &set ) == 0 );
-	M_ENSURE( sigaddset( &set, a_iSigNo ) == 0 );
+	M_ENSURE( sigaddset( &set, sigNo_ ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_BLOCK, &set, NULL ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-int HBaseSignalHandlers::signal_INT ( int a_iSignum )
+int HBaseSignalHandlers::signal_INT ( int signum_ )
 	{
 	M_PROLOG
-	if ( tools::n_bIgnoreSignalSIGINT )
+	if ( tools::_ignoreSignalSIGINT_ )
 		return ( 0 );
-	HString l_oMessage;
-	l_oMessage = "Interrupt signal caught, process broken: ";
-	l_oMessage += ::strsignal( a_iSignum );
-	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
-	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
+	HString message;
+	message = "Interrupt signal caught, process broken: ";
+	message += ::strsignal( signum_ );
+	message += '.';
+	log( LOG_TYPE::INFO ) << message << endl;
+	::fprintf( stderr, "\n%s\n", message.raw() );
 	return ( -1 );
 	M_EPILOG
 	}
 
-int HBaseSignalHandlers::signal_HUP( int a_iSignum )
+int HBaseSignalHandlers::signal_HUP( int signum_ )
 	{
 	M_PROLOG
-	HString l_oMessage;
-	l_oMessage = "Unhandled HUP received: ";
-	l_oMessage += ::strsignal( a_iSignum );
-	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
-	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
+	HString message;
+	message = "Unhandled HUP received: ";
+	message += ::strsignal( signum_ );
+	message += '.';
+	log( LOG_TYPE::INFO ) << message << endl;
+	::fprintf( stderr, "\n%s\n", message.raw() );
 	return ( -1 );
 	M_EPILOG
 	}
 	
-int HBaseSignalHandlers::signal_TERM( int a_iSignum )
+int HBaseSignalHandlers::signal_TERM( int signum_ )
 	{
 	M_PROLOG
-	HString l_oMessage;
-	l_oMessage = "Process was explictly killed: ";
-	l_oMessage += strsignal( a_iSignum );
-	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
-	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
+	HString message;
+	message = "Process was explictly killed: ";
+	message += strsignal( signum_ );
+	message += '.';
+	log( LOG_TYPE::INFO ) << message << endl;
+	::fprintf( stderr, "\n%s\n", message.raw() );
 	return ( -2 );
 	M_EPILOG
 	}
 	
-int HBaseSignalHandlers::signal_QUIT ( int a_iSignum )
+int HBaseSignalHandlers::signal_QUIT ( int signum_ )
 	{
 	M_PROLOG
-	if ( tools::n_bIgnoreSignalSIGQUIT )
+	if ( tools::_ignoreSignalSIGQUIT_ )
 		return ( 0 );
-	HString l_oMessage;
-	l_oMessage = "Abnormal program quit forced: ";
-	l_oMessage += ::strsignal( a_iSignum );
-	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
-	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
+	HString message;
+	message = "Abnormal program quit forced: ";
+	message += ::strsignal( signum_ );
+	message += '.';
+	log( LOG_TYPE::INFO ) << message << endl;
+	::fprintf( stderr, "\n%s\n", message.raw() );
 	abort();
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HBaseSignalHandlers::signal_TSTP( int a_iSignum )
+int HBaseSignalHandlers::signal_TSTP( int signum_ )
 	{
 	M_PROLOG
-	if ( tools::n_bIgnoreSignalSIGTSTP )
+	if ( tools::_ignoreSignalSIGTSTP_ )
 		return ( 0 );
-	HString l_oMessage;
-	l_oMessage = "Stop signal caught, process suspended: ";
-	l_oMessage += ::strsignal( a_iSignum );
-	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
-	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
+	HString message;
+	message = "Stop signal caught, process suspended: ";
+	message += ::strsignal( signum_ );
+	message += '.';
+	log( LOG_TYPE::INFO ) << message << endl;
+	::fprintf( stderr, "\n%s\n", message.raw() );
 	unlock( SIGTSTP );
 	raise( SIGTSTP );
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HBaseSignalHandlers::signal_CONT( int a_iSignum )
+int HBaseSignalHandlers::signal_CONT( int signum_ )
 	{
 	M_PROLOG
 	lock( SIGTSTP );
-	HString l_oMessage;
-	l_oMessage = "Process was resurected: ";
-	l_oMessage += ::strsignal( a_iSignum );
-	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
-	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
+	HString message;
+	message = "Process was resurected: ";
+	message += ::strsignal( signum_ );
+	message += '.';
+	log( LOG_TYPE::INFO ) << message << endl;
+	::fprintf( stderr, "\n%s\n", message.raw() );
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HBaseSignalHandlers::signal_fatal( int a_iSignum )
+int HBaseSignalHandlers::signal_fatal( int signum_ )
 	{
 	M_PROLOG
-	HString l_oMessage;
-	l_oMessage = "Process caused FATAL ERROR: ";
-	l_oMessage += ::strsignal( a_iSignum );
-	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
-	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
+	HString message;
+	message = "Process caused FATAL ERROR: ";
+	message += ::strsignal( signum_ );
+	message += '.';
+	log( LOG_TYPE::INFO ) << message << endl;
+	::fprintf( stderr, "\n%s\n", message.raw() );
 	abort();
 	M_EPILOG
 	}
 
-int HBaseSignalHandlers::signal_USR1( int a_iSignum )
+int HBaseSignalHandlers::signal_USR1( int signum_ )
 	{
 	M_PROLOG
-	HString l_oMessage;
-	l_oMessage = "\nDo you play with the mouse under FreeBSD ? ";
-	l_oMessage += ::strsignal( a_iSignum );
-	l_oMessage += '.';
-	log( LOG_TYPE::INFO ) << l_oMessage << endl;
-	::fprintf( stderr, "\n%s\n", l_oMessage.raw() );
+	HString message;
+	message = "\nDo you play with the mouse under FreeBSD ? ";
+	message += ::strsignal( signum_ );
+	message += '.';
+	log( LOG_TYPE::INFO ) << message << endl;
+	::fprintf( stderr, "\n%s\n", message.raw() );
 	return ( -3 );
 	M_EPILOG
 	}

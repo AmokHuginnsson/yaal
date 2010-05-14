@@ -40,69 +40,69 @@ namespace yaal
 namespace hcore
 {
 
-void* xmalloc_internal( int long const a_lSize )
+void* xmalloc_internal( int long const size_ )
 	{
-	register void* l_pvNewPtr = NULL;
-	if ( a_lSize < 0 )
+	register void* newPtr = NULL;
+	if ( size_ < 0 )
 		{
 		::perror( _( "xmalloc_internal: requested size lower than 0" ) );
 		::abort();
 		}
-	l_pvNewPtr = ::malloc( a_lSize );
-	if ( l_pvNewPtr == 0 )
+	newPtr = ::malloc( size_ );
+	if ( newPtr == 0 )
 		{
 		::perror( _( "xmalloc_internal: malloc returned NULL" ) );
 		::abort();
 		}
-	return ( l_pvNewPtr );
+	return ( newPtr );
 	}
 
-void* xcalloc_internal( int long a_lSize )
+void* xcalloc_internal( int long size_ )
 	{
-	register void* l_pvNewPtr = xmalloc_internal( a_lSize );
-	::memset( l_pvNewPtr, 0, a_lSize );
-	return ( l_pvNewPtr );
+	register void* newPtr = xmalloc_internal( size_ );
+	::memset( newPtr, 0, size_ );
+	return ( newPtr );
 	}
 
-void* xrealloc_internal( void* a_pvPtr, int long a_lSize )
+void* xrealloc_internal( void* ptr_, int long size_ )
 	{
-	register void* l_pvNewPtr = NULL;
-	if ( a_lSize < 0 )
+	register void* newPtr = NULL;
+	if ( size_ < 0 )
 		{
 		::perror( _( "xrealloc_internal: requested size lower than 0" ) );
 		::abort();
 		}
-	l_pvNewPtr = realloc( a_pvPtr, a_lSize );
-	if ( l_pvNewPtr == 0 )
+	newPtr = realloc( ptr_, size_ );
+	if ( newPtr == 0 )
 		{
 		::perror( _( "xrealloc_internal: realloc returned NULL" ) );
 		::abort();
 		}
-	return ( l_pvNewPtr );
+	return ( newPtr );
 	}
 
-void xfree_internal( void* a_pvPtr ) throw()
+void xfree_internal( void* ptr_ ) throw()
 	{
-	if ( a_pvPtr == NULL )
+	if ( ptr_ == NULL )
 		{
 		::perror( "xfree_internal: request to free NULL pointer" );
 		::abort();
 		}
-	::free( a_pvPtr );
+	::free( ptr_ );
 	return;
 	}
 
-char* xstrdup( char const* const a_pcStr )
+char* xstrdup( char const* const str_ )
 	{
-	char* l_pcNew = 0;
-	if ( ! a_pcStr )
+	char* str = 0;
+	if ( ! str_ )
 		{
 		::perror( "xstrdup: request to duplicate NULL pointer string" );
 		::abort();
 		}
-	l_pcNew = yaal::hcore::xcalloc<char>( ::strlen( a_pcStr ) + 1 );
-	::strcpy( l_pcNew, a_pcStr );
-	return ( l_pcNew );
+	str = yaal::hcore::xcalloc<char>( ::strlen( str_ ) + 1 );
+	::strcpy( str, str_ );
+	return ( str );
 	}
 
 }

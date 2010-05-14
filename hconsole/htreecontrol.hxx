@@ -52,11 +52,11 @@ protected:
 	class HNodeControl
 		{
 	protected:
-		bool f_bUnfolded;	/* is this branch folded? */
-		int f_iRowRaw;
-		int	f_iColumnRaw;
-		int f_iWidthRaw;
-		HItem f_oData;
+		bool _unfolded;	/* is this branch folded? */
+		int _rowRaw;
+		int	_columnRaw;
+		int _widthRaw;
+		HItem _data;
 	public:
 		HNodeControl( int = 0 );
 		virtual ~HNodeControl ( void );
@@ -69,8 +69,8 @@ protected:
 		friend class HTreeControl;
 		};
 	typedef yaal::hcore::HTree<HNodeControl> tree_t;
-	tree_t f_oTree;
-	tree_t::node_t f_poSelected;
+	tree_t _tree;
+	tree_t::node_t _selected;
 public:
 	HTreeControl( HWindow*,			/* parent */
 								 int,						/* row */

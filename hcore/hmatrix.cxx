@@ -37,7 +37,7 @@ namespace yaal
 namespace hcore
 {
 
-char const * const g_ppcErrMsgHMatrix [ 12 ] =
+char const * const _errMsgHMatrix_ [ 12 ] =
 	{
 	_( "ok" ),
 /* HMatrix::ERROR::BAD_ROWS */                           _( "rows < 1" ),

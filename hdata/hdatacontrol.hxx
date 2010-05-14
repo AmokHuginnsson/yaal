@@ -42,8 +42,8 @@ namespace hdata
 class HDataControl : public virtual hconsole::HControl
 	{
 protected:
-	OResource const* f_psResource;
-	dbwrapper::HSQLDescriptor::ptr_t f_oSQL;
+	OResource const* _resource;
+	dbwrapper::HSQLDescriptor::ptr_t _SQL;
 public:
 	HDataControl( void );
 	virtual ~HDataControl( void );

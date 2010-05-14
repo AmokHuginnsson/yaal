@@ -46,9 +46,9 @@ namespace tools
 {
 
 HPipedChild::HPipedChild( void )
-	: HStreamInterface(), f_iPid( 0 ),
-	f_iPipeIn( -1 ), f_iPipeOut( -1 ), f_iPipeErr( -1 ),
-	f_eCSOI( STREAM::OUT ), f_oSecondLineCache( f_oCache.size() ), f_iSecondLineOffset( f_iOffset )
+	: HStreamInterface(), _pid( 0 ),
+	_pipeIn( -1 ), _pipeOut( -1 ), _pipeErr( -1 ),
+	_cSOI( STREAM::OUT ), _secondLineCache( _cache.size() ), _secondLineOffset( _offset )
 	{
 	return;
 	}
@@ -56,7 +56,7 @@ HPipedChild::HPipedChild( void )
 HPipedChild::~HPipedChild( void )
 	{
 	M_PROLOG
-	if ( f_iPid > 0 )
+	if ( _pid > 0 )
 		finish();
 	return;
 	M_EPILOG
@@ -65,21 +65,21 @@ HPipedChild::~HPipedChild( void )
 HPipedChild::STATUS HPipedChild::finish( void )
 	{
 	M_PROLOG
-	if ( f_iPipeErr >= 0 )
-		TEMP_FAILURE_RETRY( ::close( f_iPipeErr ) );
-	f_iPipeErr = -1;
-	if ( f_iPipeOut >= 0 )
-		TEMP_FAILURE_RETRY( ::close( f_iPipeOut ) );
-	f_iPipeOut = -1;
-	if ( f_iPipeIn >= 0 )
-		TEMP_FAILURE_RETRY( ::close( f_iPipeIn ) );
-	f_iPipeIn = -1;
+	if ( _pipeErr >= 0 )
+		TEMP_FAILURE_RETRY( ::close( _pipeErr ) );
+	_pipeErr = -1;
+	if ( _pipeOut >= 0 )
+		TEMP_FAILURE_RETRY( ::close( _pipeOut ) );
+	_pipeOut = -1;
+	if ( _pipeIn >= 0 )
+		TEMP_FAILURE_RETRY( ::close( _pipeIn ) );
+	_pipeIn = -1;
 	STATUS s;
-	if ( f_iPid > 0 )
+	if ( _pid > 0 )
 		{
-		::kill( f_iPid, SIGKILL );
+		::kill( _pid, SIGKILL );
 		int status = 0;
-		::waitpid( f_iPid, &status, 0 );
+		::waitpid( _pid, &status, 0 );
 		if ( WIFEXITED( status ) )
 			{
 			s.type = STATUS::TYPE::NORMAL;
@@ -91,7 +91,7 @@ HPipedChild::STATUS HPipedChild::finish( void )
 			s.value = WTERMSIG( status );
 			}
 		}
-	f_iPid = 0;
+	_pid = 0;
 	return ( s );
 	M_EPILOG
 	}
@@ -122,70 +122,70 @@ static void close_and_invalidate( int& fd_ )
 	M_EPILOG
 	}
 
-void HPipedChild::spawn( HString const& a_oImage, argv_t const& a_oArgv )
+void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 	{
 	M_PROLOG
 	OPipeResGuard pipeIn, pipeOut, pipeErr;
-	int* l_piFileDesIn = pipeIn._res;
-	int* l_piFileDesOut = pipeOut._res;
-	int* l_piFileDesErr = pipeErr._res;
-	HFSItem image( a_oImage );
+	int* fileDesIn = pipeIn._res;
+	int* fileDesOut = pipeOut._res;
+	int* fileDesErr = pipeErr._res;
+	HFSItem image( image_ );
 	M_ENSURE( !! image && image.is_executable() );
-	M_ENSURE( ( ! ::pipe( l_piFileDesIn ) ) && ( ! ::pipe( l_piFileDesOut ) ) && ( ! ::pipe( l_piFileDesErr ) ) );
-	f_iPid = ::fork();
-	if ( f_iPid < 0 )
+	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
+	_pid = ::fork();
+	if ( _pid < 0 )
 		M_THROW( "fork", errno );
-	if ( ! f_iPid )
+	if ( ! _pid )
 		{
-		close_and_invalidate( l_piFileDesIn[ 1 ] );
-		close_and_invalidate( l_piFileDesOut[ 0 ] );
-		close_and_invalidate( l_piFileDesErr[ 0 ] );
-		if ( ( ::dup2( l_piFileDesIn[ 0 ], fileno( stdin ) ) < 0 )
-				|| ( ::dup2( l_piFileDesOut[ 1 ], fileno( stdout ) ) < 0 )
-				|| ( ::dup2( l_piFileDesErr[ 1 ], fileno( stderr ) ) < 0 ) )
+		close_and_invalidate( fileDesIn[ 1 ] );
+		close_and_invalidate( fileDesOut[ 0 ] );
+		close_and_invalidate( fileDesErr[ 0 ] );
+		if ( ( ::dup2( fileDesIn[ 0 ], fileno( stdin ) ) < 0 )
+				|| ( ::dup2( fileDesOut[ 1 ], fileno( stdout ) ) < 0 )
+				|| ( ::dup2( fileDesErr[ 1 ], fileno( stderr ) ) < 0 ) )
 			M_THROW( "dup2", errno );
-		char** argv = xcalloc<char*>( a_oArgv.size() + 2 );
-		argv[ 0 ] = xstrdup( a_oImage.raw() );
+		char** argv = xcalloc<char*>( argv_.size() + 2 );
+		argv[ 0 ] = xstrdup( image_.raw() );
 		int i = 1;
-		for ( argv_t::const_iterator it = a_oArgv.begin(); it != a_oArgv.end(); ++ it, ++ i )
+		for ( argv_t::const_iterator it = argv_.begin(); it != argv_.end(); ++ it, ++ i )
 			argv[ i ] = xstrdup( it->raw() );
-		::execv( a_oImage.raw(), argv );
+		::execv( image_.raw(), argv );
 		M_ENSURE( !"execv" );
 		}
 	else
 		{
-		close_and_invalidate( l_piFileDesIn[ 0 ] );
-		close_and_invalidate( l_piFileDesOut[ 1 ] );
-		close_and_invalidate( l_piFileDesErr[ 1 ] );
-		swap( f_iPipeIn, l_piFileDesIn[ 1 ] );
-		swap( f_iPipeOut, l_piFileDesOut[ 0 ] );
-		swap( f_iPipeErr, l_piFileDesErr[ 0 ] );
+		close_and_invalidate( fileDesIn[ 0 ] );
+		close_and_invalidate( fileDesOut[ 1 ] );
+		close_and_invalidate( fileDesErr[ 1 ] );
+		swap( _pipeIn, fileDesIn[ 1 ] );
+		swap( _pipeOut, fileDesOut[ 0 ] );
+		swap( _pipeErr, fileDesErr[ 0 ] );
 		}
 	return;
 	M_EPILOG
 	}
 
-int long HPipedChild::do_read( void* const a_pcBuffer, int long const& a_lSize )
+int long HPipedChild::do_read( void* const buffer_, int long const& size_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( f_iPipeOut >= 0 ) && ( f_iPipeErr >= 0 ) );
-	int fd = ( ( f_eCSOI == STREAM::OUT ) ? f_iPipeOut : f_iPipeErr );
-	return ( ::read( fd, a_pcBuffer, a_lSize ) );
+	M_ASSERT( ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
+	int fd = ( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
+	return ( ::read( fd, buffer_, size_ ) );
 	M_EPILOG
 	}
 
-int long HPipedChild::do_write( void const* const a_pcString, int long const& a_lSize )
+int long HPipedChild::do_write( void const* const string_, int long const& size_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_iPipeIn >= 0 );
+	M_ASSERT( _pipeIn >= 0 );
 	int long iWritten = 0;
 	do
 		{
-		iWritten += TEMP_FAILURE_RETRY( ::write( f_iPipeIn,
-					static_cast<char const* const>( a_pcString ) + iWritten,
-					a_lSize - iWritten ) );
+		iWritten += TEMP_FAILURE_RETRY( ::write( _pipeIn,
+					static_cast<char const* const>( string_ ) + iWritten,
+					size_ - iWritten ) );
 		}
-	while ( iWritten < a_lSize );
+	while ( iWritten < size_ );
 	return ( iWritten );
 	M_EPILOG
 	}
@@ -194,47 +194,47 @@ void HPipedChild::do_flush( void ) const
 	{
 	}
 
-bool HPipedChild::read_poll( void* a_pvTime )
+bool HPipedChild::read_poll( void* time_ )
 	{
 	M_PROLOG
-	int l_iError = - 1;
-	fd_set l_xFdSet;
-	timeval* l_pxWait = static_cast<timeval*>( a_pvTime );
-	int fd = ( ( f_eCSOI == STREAM::OUT ) ? f_iPipeOut : f_iPipeErr );
+	int error = - 1;
+	fd_set fdSet;
+	timeval* wait = static_cast<timeval*>( time_ );
+	int fd = ( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
 	do
 		{
-		FD_ZERO( &l_xFdSet );
-		FD_SET( fd, &l_xFdSet );
-		l_iError = ::select( FD_SETSIZE, &l_xFdSet, NULL, NULL, l_pxWait );
-		if ( l_iError < 0 )
+		FD_ZERO( &fdSet );
+		FD_SET( fd, &fdSet );
+		error = ::select( FD_SETSIZE, &fdSet, NULL, NULL, wait );
+		if ( error < 0 )
 			break;
-		else if ( ( l_iError > 0 )
-				&& FD_ISSET( fd, &l_xFdSet ) )
+		else if ( ( error > 0 )
+				&& FD_ISSET( fd, &fdSet ) )
 			break;
-		else if ( ! l_iError )
+		else if ( ! error )
 			break;
 		}
-	while ( l_pxWait->tv_sec || l_pxWait->tv_usec );
-	return ( l_iError <= 0 );
+	while ( wait->tv_sec || wait->tv_usec );
+	return ( error <= 0 );
 	M_EPILOG
 	}
 
 bool HPipedChild::is_running( void )
 	{
-	return ( f_iPid > 0 );
+	return ( _pid > 0 );
 	}
 
-void HPipedChild::set_csoi( STREAM::stream_t const& a_eCSOI )
+void HPipedChild::set_csoi( STREAM::stream_t const& cSOI_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( a_eCSOI == STREAM::OUT ) || ( a_eCSOI == STREAM::ERR ) );
-	if ( a_eCSOI != f_eCSOI )
+	M_ASSERT( ( cSOI_ == STREAM::OUT ) || ( cSOI_ == STREAM::ERR ) );
+	if ( cSOI_ != _cSOI )
 		{
 		using yaal::swap;
-		swap( f_iOffset, f_iSecondLineOffset );
-		swap( f_oCache, f_oSecondLineCache );
+		swap( _offset, _secondLineOffset );
+		swap( _cache, _secondLineCache );
 		}
-	f_eCSOI = a_eCSOI;
+	_cSOI = cSOI_;
 	return;
 	M_EPILOG
 	}
@@ -242,7 +242,7 @@ void HPipedChild::set_csoi( STREAM::stream_t const& a_eCSOI )
 bool HPipedChild::do_is_valid( void ) const
 	{
 	M_PROLOG
-	return ( ( f_iPid > 0 ) && ( f_iPipeIn >= 0 ) && ( f_iPipeOut >= 0 ) && ( f_iPipeErr >= 0 ) );
+	return ( ( _pid > 0 ) && ( _pipeIn >= 0 ) && ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
 	M_EPILOG
 	}
 

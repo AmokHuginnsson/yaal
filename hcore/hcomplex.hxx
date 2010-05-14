@@ -41,8 +41,8 @@ namespace hcore
 class HComplex
 	{
 	typedef HComplex self_t;
-	double f_dReal;
-	double f_dImaginary;
+	double _real;
+	double _imaginary;
 public:
 	HComplex( void );
 	HComplex( double const, double const = 0 );

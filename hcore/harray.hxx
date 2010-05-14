@@ -43,7 +43,7 @@ namespace yaal
 namespace hcore
 {
 
-extern char const* const n_ppcErrMsgHArray[];
+extern char const* const _errMsgHArray_[];
 
 /*! \brief Simplest compund data structure.
  */
@@ -141,16 +141,16 @@ public:
 	typedef type_t value_type;
 	HIterator( void ) : _owner( NULL ), _index( 0 ) {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& a_oIt ) : _owner( a_oIt._owner ), _index( a_oIt._index )
+	HIterator( HIterator<other_const_qual_t> const& it_ ) : _owner( it_._owner ), _index( it_._index )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
-	HIterator& operator= ( HIterator const& a_oIt )
+	HIterator& operator= ( HIterator const& it_ )
 		{
-		if ( &a_oIt != this )
+		if ( &it_ != this )
 			{
-			_owner = a_oIt._owner;
-			_index = a_oIt._index;
+			_owner = it_._owner;
+			_index = it_._index;
 			}
 		return ( *this );
 		}
@@ -217,8 +217,8 @@ public:
 		{ return ( _index != it._index ); }
 private:
 	friend class HArray<type_t>;
-	explicit HIterator( array_t const* a_poOwner, int long const& idx )
-		: _owner( a_poOwner ), _index( idx ) {};
+	explicit HIterator( array_t const* owner_, int long const& idx )
+		: _owner( owner_ ), _index( idx ) {};
 	};
 
 template<typename type_t>
@@ -352,7 +352,7 @@ void HArray<type_t>::resize( int long const& size_, type_t const& fillWith_ )
 	{
 	M_PROLOG
 	if ( size_ < 0 )
-		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_SIZE ], size_ );
+		M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], size_ );
 	if ( size_ > _size )
 		{
 		reserve( size_ );
@@ -376,7 +376,7 @@ void HArray<type_t>::reserve( int long const& capacity_ )
 	{
 	M_PROLOG
 	if ( capacity_ < 0 )
-		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_SIZE ], capacity_ );
+		M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], capacity_ );
 	int long curCapacity( get_capacity() );
 	if ( capacity_ > curCapacity )
 		{
@@ -436,23 +436,23 @@ typename HArray<type_t>::iterator HArray<type_t>::erase( iterator it )
 	}
 
 template<typename type_t>
-type_t& HArray<type_t>::operator[] ( int long const& a_lIndex )
+type_t& HArray<type_t>::operator[] ( int long const& index_ )
 	{
 	M_PROLOG
-	int long idx = ( a_lIndex < 0 ) ? a_lIndex + _size : a_lIndex;
+	int long idx = ( index_ < 0 ) ? index_ + _size : index_;
 	if ( ( idx >= _size ) || ( idx < 0 ) )
-		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_INDEX ], idx );
+		M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
 	return ( _buf.get<value_type>()[ idx ] );
 	M_EPILOG
 	}
 
 template<typename type_t>
-type_t const& HArray<type_t>::operator[] ( int long const& a_lIndex ) const
+type_t const& HArray<type_t>::operator[] ( int long const& index_ ) const
 	{
 	M_PROLOG
-	int long idx( ( a_lIndex < 0 ) ? a_lIndex + _size : a_lIndex );
+	int long idx( ( index_ < 0 ) ? index_ + _size : index_ );
 	if ( ( idx >= _size ) || ( idx < 0 ) )
-		M_THROW( n_ppcErrMsgHArray[ ERROR::BAD_INDEX ], idx );
+		M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
 	return ( _buf.get<value_type const>()[ idx ] );
 	M_EPILOG
 	}

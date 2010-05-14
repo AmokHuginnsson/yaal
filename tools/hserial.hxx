@@ -100,11 +100,11 @@ public:
 		};
 	typedef yaal::hcore::HStrongEnum<SPEED> speed_t;
 protected:
-	speed_t f_eSpeed;
-	flag_t f_eFlags;
-	hcore::HString f_oDevicePath;
-	hcore::HChunk f_oTIO;
-	hcore::HChunk f_oBackUpTIO;
+	speed_t _speed;
+	flag_t _flags;
+	hcore::HString _devicePath;
+	hcore::HChunk _tIO;
+	hcore::HChunk _backUpTIO;
 public:
 	HSerial( yaal::hcore::HString const& = yaal::hcore::HString() ); /* device path */
 	virtual ~HSerial( void );

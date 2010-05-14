@@ -42,7 +42,7 @@ namespace hcore
 HPipe::HPipe( void )
 	{
 	M_PROLOG
-	M_ENSURE( ::pipe( f_piPipe ) == 0 );
+	M_ENSURE( ::pipe( _pipe ) == 0 );
 	return;
 	M_EPILOG
 	}
@@ -50,38 +50,38 @@ HPipe::HPipe( void )
 HPipe::~HPipe( void )
 	{
 	M_PROLOG
-	TEMP_FAILURE_RETRY( ::close( f_piPipe[ 1 ] ) );
-	TEMP_FAILURE_RETRY( ::close( f_piPipe[ 0 ] ) );
+	TEMP_FAILURE_RETRY( ::close( _pipe[ 1 ] ) );
+	TEMP_FAILURE_RETRY( ::close( _pipe[ 0 ] ) );
 	return;
 	M_EPILOG
 	}
 
 int HPipe::get_reader_fd( void ) const
 	{
-	return ( f_piPipe[ 0 ] );
+	return ( _pipe[ 0 ] );
 	}
 
-int long HPipe::do_read( void* const a_pcBuffer, int long const& a_lSize )
+int long HPipe::do_read( void* const buffer_, int long const& size_ )
 	{
 	M_PROLOG
-	return ( ::read( f_piPipe[ 0 ], a_pcBuffer, a_lSize ) );
+	return ( ::read( _pipe[ 0 ], buffer_, size_ ) );
 	M_EPILOG
 	}
 
-int long HPipe::do_write( void const* const a_pcBuffer, int long const& a_lSize )
+int long HPipe::do_write( void const* const buffer_, int long const& size_ )
 	{
 	M_PROLOG
 	int long iWritten = -1;
-	if ( HRawFile::is_write_ready( f_piPipe[ 1 ] ) )
+	if ( HRawFile::is_write_ready( _pipe[ 1 ] ) )
 		{
 		iWritten = 0;
 		do
 			{
-			iWritten += TEMP_FAILURE_RETRY( ::write( f_piPipe[ 1 ],
-						static_cast<char const* const>( a_pcBuffer ) + iWritten,
-						a_lSize - iWritten ) );
+			iWritten += TEMP_FAILURE_RETRY( ::write( _pipe[ 1 ],
+						static_cast<char const* const>( buffer_ ) + iWritten,
+						size_ - iWritten ) );
 			}
-		while ( iWritten < a_lSize );
+		while ( iWritten < size_ );
 		}
 	return ( iWritten );
 	M_EPILOG
@@ -94,7 +94,7 @@ void HPipe::do_flush( void ) const
 bool HPipe::do_is_valid( void ) const
 	{
 	M_PROLOG
-	return ( ( f_piPipe[ 0 ] >= 0 ) && ( f_piPipe[ 1 ] >= 0 ) );
+	return ( ( _pipe[ 0 ] >= 0 ) && ( _pipe[ 1 ] >= 0 ) );
 	M_EPILOG
 	}
 

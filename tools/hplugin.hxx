@@ -41,7 +41,7 @@ namespace tools
 class HPlugin
 	{
 	typedef HPlugin self_t;
-	void* f_pvHandle;
+	void* _handle;
 public:
 	typedef yaal::hcore::HPointer<HPlugin> ptr_t;
 	HPlugin( void );
@@ -59,10 +59,10 @@ private:
 	};
 
 template<typename name_t>
-void HPlugin::resolve( yaal::hcore::HString const& a_oName, name_t& handle )
+void HPlugin::resolve( yaal::hcore::HString const& name_, name_t& handle )
 	{
 	M_PROLOG
-	handle = bit_cast<name_t>( resolve( a_oName ) );
+	handle = bit_cast<name_t>( resolve( name_ ) );
 	return;
 	M_EPILOG
 	}

@@ -38,56 +38,56 @@ namespace yaal
 namespace hconsole
 {
 
-HControlList::HControlList( model_t::cyclic_iterator& a_roFocused ) : f_oList(), f_roFocused( a_roFocused )
+HControlList::HControlList( model_t::cyclic_iterator& focused_ ) : _list(), _focused( focused_ )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-void HControlList::next_enabled( char a_cShorcut )
+void HControlList::next_enabled( char shorcut_ )
 	{
 	M_PROLOG
-	bool l_bLoop = true;
-	HControlList::model_t::cyclic_iterator it = f_roFocused;
+	bool loop = true;
+	HControlList::model_t::cyclic_iterator it = _focused;
 	do
 		{
-		++ f_roFocused;
-		if ( dynamic_cast<HStatusBarControl*>( &(*(*f_roFocused))) )
+		++ _focused;
+		if ( dynamic_cast<HStatusBarControl*>( &(*(*_focused))) )
 			continue;
-		l_bLoop = (*f_roFocused)->set_focus( a_cShorcut ) ? true : false;
-		if ( f_roFocused == it )
-			l_bLoop = false;
+		loop = (*_focused)->set_focus( shorcut_ ) ? true : false;
+		if ( _focused == it )
+			loop = false;
 		}
-	while ( l_bLoop );
-	if ( f_roFocused != it )
+	while ( loop );
+	if ( _focused != it )
 		{
 		(*it)->kill_focus();
-		(*f_roFocused)->set_focus( -1 );
+		(*_focused)->set_focus( -1 );
 		}
 	return;
 	M_EPILOG
 	}
 
-void HControlList::add_control( HControl::ptr_t a_oControl )
+void HControlList::add_control( HControl::ptr_t control_ )
 	{
 	M_PROLOG
-	f_oList.push_back( a_oControl );
-	if ( ! f_roFocused.is_valid() )
-		f_roFocused = f_oList.rbegin();
+	_list.push_back( control_ );
+	if ( ! _focused.is_valid() )
+		_focused = _list.rbegin();
 	return;
 	M_EPILOG
 	}
 
-void HControlList::refresh_all( bool a_bForce )
+void HControlList::refresh_all( bool force_ )
 	{
 	M_PROLOG
-	for ( model_t::iterator it = f_oList.begin();
-			it != f_oList.end(); ++ it )
-		if ( ( it != f_roFocused ) && ( a_bForce || (*it)->need_repaint() ) )
+	for ( model_t::iterator it = _list.begin();
+			it != _list.end(); ++ it )
+		if ( ( it != _focused ) && ( force_ || (*it)->need_repaint() ) )
 			(*it)->refresh();
-	if ( !! (*f_roFocused) && ( a_bForce || (*f_roFocused)->need_repaint() ) )
-		(*f_roFocused)->refresh();
+	if ( !! (*_focused) && ( force_ || (*_focused)->need_repaint() ) )
+		(*_focused)->refresh();
 	return;
 	M_EPILOG
 	}
@@ -95,31 +95,31 @@ void HControlList::refresh_all( bool a_bForce )
 void HControlList::update_all( void )
 	{
 	M_PROLOG
-	for ( model_t::iterator it = f_oList.begin();
-			it != f_oList.end(); ++ it )
+	for ( model_t::iterator it = _list.begin();
+			it != _list.end(); ++ it )
 			(*it)->update();
 	return;
 	M_EPILOG
 	}
 
-int HControlList::hit_test_all( mouse::OMouse& a_rsMouse )
+int HControlList::hit_test_all( mouse::OMouse& mouse_ )
 	{
 	M_PROLOG
-	if ( (*f_roFocused)->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
-		return ( (*f_roFocused)->click ( a_rsMouse ) );
-	for ( model_t::iterator it = f_oList.begin();
-			it != f_oList.end(); ++ it )
-		if ( (*it)->hit_test ( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
-			return ( (*it)->click ( a_rsMouse ) );
+	if ( (*_focused)->hit_test ( mouse_._row, mouse_._column ) )
+		return ( (*_focused)->click ( mouse_ ) );
+	for ( model_t::iterator it = _list.begin();
+			it != _list.end(); ++ it )
+		if ( (*it)->hit_test ( mouse_._row, mouse_._column ) )
+			return ( (*it)->click ( mouse_ ) );
 	return( 0 );
 	M_EPILOG
 	}
 
-HControl* HControlList::get_control_by_no( int a_iOffset )
+HControl* HControlList::get_control_by_no( int offset_ )
 	{
 	M_PROLOG
-	model_t::iterator it = f_oList.begin();
-	while ( a_iOffset -- > 0 )
+	model_t::iterator it = _list.begin();
+	while ( offset_ -- > 0 )
 		++ it;
 	return ( &**it );
 	M_EPILOG
@@ -128,43 +128,43 @@ HControl* HControlList::get_control_by_no( int a_iOffset )
 void HControlList::pop_front( void )
 	{
 	M_PROLOG
-	f_oList.pop_front();
+	_list.pop_front();
 	M_EPILOG
 	}
 
-void HControlList::select( HControl const* a_poControl )
+void HControlList::select( HControl const* control_ )
 	{
 	M_PROLOG
-	if ( (*f_roFocused) != a_poControl )
+	if ( (*_focused) != control_ )
 		{
 		model_t::iterator it;
-		for (  it = f_oList.begin(); it != f_oList.end(); ++ it )
+		for (  it = _list.begin(); it != _list.end(); ++ it )
 			{
-			if ( (*it) == a_poControl )
+			if ( (*it) == control_ )
 				{
-				f_roFocused = it;
+				_focused = it;
 				break;
 				}
 			}
-		if ( it == f_oList.end() )
-			M_THROW( "bogus object", reinterpret_cast<int long>( a_poControl ) );
+		if ( it == _list.end() )
+			M_THROW( "bogus object", reinterpret_cast<int long>( control_ ) );
 		}
 	return;
 	M_EPILOG
 	}
 
-void HControlList::select( HControl::ptr_t const& a_oControl )
+void HControlList::select( HControl::ptr_t const& control_ )
 	{
 	M_PROLOG
-	select( a_oControl.raw() );
+	select( control_.raw() );
 	return;
 	M_EPILOG
 	}
 
-void HControlList::exchange( int a_iFormer, int a_iLatter )
+void HControlList::exchange( int former_, int latter_ )
 	{
 	M_PROLOG
-	f_oList.exchange( f_oList.n_th( a_iFormer + 1 ), f_oList.n_th( a_iLatter + 1 ) );
+	_list.exchange( _list.n_th( former_ + 1 ), _list.n_th( latter_ + 1 ) );
 	return;
 	M_EPILOG
 	}

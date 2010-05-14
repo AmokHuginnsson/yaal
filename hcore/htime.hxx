@@ -38,17 +38,17 @@ namespace yaal
 namespace hcore
 {
 
-extern char const* const n_pcDefaultTimeFormat;
+extern char const* const _defaultTimeFormat_;
 
 /*! \brief Date and time handling class.
  */
 class HTime
 	{
 	typedef HTime self_t;
-	HString	f_oFormat;
-	mutable HChunk f_oCache;
-	time_t	f_xValue;
-	tm			f_sBroken;
+	HString	_format;
+	mutable HChunk _cache;
+	time_t	_value;
+	tm			_broken;
 public:
 	HTime( void );
 	HTime( HTime const& );
@@ -59,7 +59,7 @@ public:
 	virtual ~HTime ( void );
 	void set_now( void );
 	void set( time_t const& );
-	void format( char const* const = n_pcDefaultTimeFormat );
+	void format( char const* const = _defaultTimeFormat_ );
 	void set_time( int const = 0, int const = 0, int const = 0 );
 	void set_date( int const, int const = 1, int const = 1 );
 	void set_datetime( int const, int const = 1, int const = 1,

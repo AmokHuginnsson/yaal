@@ -39,7 +39,7 @@ namespace hcore
  */
 class HRandomizer
 	{
-	int long unsigned f_ulSeed;
+	int long unsigned _seed;
 public:
 /*! \brief Construct new randomizer.
  *

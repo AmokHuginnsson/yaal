@@ -42,11 +42,11 @@ class HNumber
 	{
 	typedef HNumber self_t;
 private:
-	int long f_lPrecision;
-	bool f_bNegative;
-	int long f_lDigitCount;
-	int long f_lIntegralPartSize;
-	HChunk f_oCanonical;
+	int long _precision;
+	bool _negative;
+	int long _digitCount;
+	int long _integralPartSize;
+	HChunk _canonical;
 public:
 	static int DEFAULT_PRECISION;
 public:

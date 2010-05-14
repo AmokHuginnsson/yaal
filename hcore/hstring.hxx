@@ -35,10 +35,10 @@ namespace yaal
 namespace hcore
 {
 
-extern char const n_pcWhiteSpace[];
-extern char const n_pcDigit[];
-extern char const n_pcLetter[];
-extern char const n_pcWord[];
+extern char const _whiteSpace_[];
+extern char const _digit_[];
+extern char const _letter_[];
+extern char const _word_[];
 
 /*! \brief Implementation of high level string operations.
  */
@@ -46,9 +46,9 @@ class HString
 	{
 	typedef HString self_t;
 private:
-	char*	f_pcBuffer; /*!< memory buffer pointer */
-	int	long f_lAllocatedBytes; /*!< size of memory buffer */
-	int	long f_lSize; /*!< lenght of string */
+	char*	_buffer; /*!< memory buffer pointer */
+	int	long _allocatedBytes; /*!< size of memory buffer */
+	int	long _size; /*!< lenght of string */
 public:
 	typedef char const* iterator; /*!< mutable iterator for string characters */
 	typedef char const* const_iterator; /*!< const iterator for string characters */
@@ -175,8 +175,8 @@ public:
 	 */
 	HString mid( int long start, int long length = meta::max_signed<int long>::value ) const;
 	HString right( int long const& ) const;
-	HString& trim_left( char const* const = n_pcWhiteSpace );
-	HString& trim_right( char const* const = n_pcWhiteSpace );
+	HString& trim_left( char const* const = _whiteSpace_ );
+	HString& trim_right( char const* const = _whiteSpace_ );
 	HString& shift_left( int long const& );
 	HString& shift_right( int long const&, char const = ' ' );
 	/*! \brief Fill portion of string with constatnt value.

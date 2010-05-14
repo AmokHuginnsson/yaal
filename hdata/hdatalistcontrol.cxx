@@ -42,13 +42,13 @@ namespace hdata
 {
 
 HDataListControl::HDataListControl( 
-		HDataWindow* a_poWindow, int a_iRow, int a_iColumn, int a_iHeight,
-		int a_iWidth, char const* a_pcTitle )
-								: HControl ( a_poWindow, a_iRow, a_iColumn, a_iHeight,
-										a_iWidth, a_pcTitle ),
+		HDataWindow* window_, int row_, int column_, int height_,
+		int width_, char const* title_ )
+								: HControl ( window_, row_, column_, height_,
+										width_, title_ ),
 								HSearchableControl( true ),
 								HListControl( NULL, 0, 0, 0, 0, NULL ),
-								HDataControl(), f_oDataControler( f_oControler )
+								HDataControl(), _dataControler( _controler )
 	{
 	M_PROLOG
 	return;
@@ -62,41 +62,41 @@ HDataListControl::~HDataListControl ( void )
 	M_EPILOG
 	}
 
-void HDataListControl::load( int long /*a_iId*/ )
+void HDataListControl::load( int long /*id_*/ )
 	{
 	M_PROLOG
-	f_oSQL->set_filter( "" );
-	int l_iCount = 0, l_iCtr = 0, l_iSize = static_cast<int>( f_oDataControler->size() );
-	HDataWindow* l_poParent = dynamic_cast<HDataWindow*>( f_poParent );
-	M_ASSERT ( l_poParent );
-	HRecordSet::ptr_t rs = f_oSQL->execute( HSQLDescriptor::MODE::SELECT );
+	_SQL->set_filter( "" );
+	int count = 0, ctr = 0, size = static_cast<int>( _dataControler->size() );
+	HDataWindow* parent = dynamic_cast<HDataWindow*>( _parent );
+	M_ASSERT ( parent );
+	HRecordSet::ptr_t rs = _SQL->execute( HSQLDescriptor::MODE::SELECT );
 	int idColNo = -1;
 	int const colCount = rs->get_field_count();
 	for ( int i = 0; i < colCount; ++ i )
-		if ( ! ::strcmp( rs->get_column_name( i ), f_psResource->f_pcId ) )
+		if ( ! ::strcmp( rs->get_column_name( i ), _resource->_id ) )
 			idColNo = i;
-	HDataWindow::ORowBuffer rb( idColNo, static_cast<int>( f_oHeader.size() ) );
-	l_poParent->set_sync_store( &rb );
-	l_poParent->status_bar()->init_progress ( static_cast<double>( l_iCount ), "Collecting ..." );
-	HListControler<>::model_ptr_t l_oModel = f_oDataControler->get_model();
-	HListControler<>::model_t::iterator it = l_oModel->begin();
+	HDataWindow::ORowBuffer rb( idColNo, static_cast<int>( _header.size() ) );
+	parent->set_sync_store( &rb );
+	parent->status_bar()->init_progress ( static_cast<double>( count ), "Collecting ..." );
+	HListControler<>::model_ptr_t model = _dataControler->get_model();
+	HListControler<>::model_t::iterator it = model->begin();
 	for ( HRecordSet::iterator row = rs->begin(); row != rs->end(); ++ row )
 		{
-		l_poParent->sync( row );
-		l_poParent->status_bar()->update_progress();
-		if ( it != l_oModel->end() )
+		parent->sync( row );
+		parent->status_bar()->update_progress();
+		if ( it != model->end() )
 			{	
-			(*it) = rb.f_oItem;
+			(*it) = rb._item;
 			++ it;
 			}
 		else
-			l_oModel->push_back( rb.f_oItem );
-		++ l_iCtr;
+			model->push_back( rb._item );
+		++ ctr;
 		}
-	while ( l_iCtr ++ < l_iSize )
-		f_oDataControler->remove_tail();
+	while ( ctr ++ < size )
+		_dataControler->remove_tail();
 	reset();
-	l_poParent->set_sync_store();
+	parent->set_sync_store();
 	return;
 	M_EPILOG
 	}
@@ -104,14 +104,14 @@ void HDataListControl::load( int long /*a_iId*/ )
 int long HDataListControl::get_current_id( void )
 	{
 	M_PROLOG
-	return ( f_oCursor->get_id() );
+	return ( _cursor->get_id() );
 	M_EPILOG
 	}
 
 void HDataListControl::add_new( void )
 	{
 	M_PROLOG
-	f_oDataControler->add_tail( HItem( static_cast<int>( f_oHeader.size() ) ) );
+	_dataControler->add_tail( HItem( static_cast<int>( _header.size() ) ) );
 	process_input( KEY_CODES::HOME );
 	process_input( KEY_CODES::END );
 	return;
@@ -121,8 +121,8 @@ void HDataListControl::add_new( void )
 void HDataListControl::cancel_new( void )
 	{
 	M_PROLOG
-	f_oDataControler->remove_tail();
-	if ( f_oDataControler->size() )
+	_dataControler->remove_tail();
+	if ( _dataControler->size() )
 		{
 		process_input( KEY_CODES::HOME );
 		process_input( KEY_CODES::END );

@@ -84,12 +84,12 @@ public:
 				REQUIRED
 				} enum_t;
 			};
-		char const* f_pcName;
-		HOptionValueInterface::ptr_t f_oValue;
-		int f_iShortForm;
-		TYPE::enum_t f_eSwitchType;
-		char const* f_pcDescription;
-		char const* f_pcArgument;
+		char const* _name;
+		HOptionValueInterface::ptr_t _value;
+		int _shortForm;
+		TYPE::enum_t _switchType;
+		char const* _description;
+		char const* _argument;
 		simple_callback_t CALLBACK;
 		OOption( void );
 		OOption(
@@ -105,11 +105,11 @@ public:
 	class HOptionValue;
 	typedef HArray<OOption> options_t;
 private:
-	options_t f_oOptions;
+	options_t _options;
 public:
 	/*! \brief Trivial default constructor.
 	 */
-	HProgramOptionsHandler( void ) : f_oOptions() {}
+	HProgramOptionsHandler( void ) : _options() {}
 	/*! \brief Add new option descriptor to option handler.
 	 *
 	 * \param name - option name.
@@ -161,7 +161,7 @@ public:
 	 */
 	int process_rc_file( HString const&, HString const&, RC_CALLBACK_t = NULL );
 	options_t const& get_options( void ) const
-		{ return ( f_oOptions ); }
+		{ return ( _options ); }
 private:
 	void set_option( OOption&, HString const& );
 	};

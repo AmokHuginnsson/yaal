@@ -71,22 +71,22 @@ public:
 			} restrict_t;
 		};
 protected:
-	int			f_iStatusBarAttribute;
-	int			f_iPromptLength;
-	PROMPT::mode_t f_eMode;					/* prompt mode */
-	PROMPT::restrict_t f_eRestrict;	/* prompt restrict mode */
-	hcore::HString	f_oPrompt;
+	int			_statusBarAttribute;
+	int			_promptLength;
+	PROMPT::mode_t _mode;					/* prompt mode */
+	PROMPT::restrict_t _restrict;	/* prompt restrict mode */
+	hcore::HString	_prompt;
 	/* progress bar data */
-	bool		f_bDone;
-	bool		f_bEstimate;			/* was time left count ? */
-	double	f_dProgressSize;	/* number of steps in progess bar */
-	int			f_iLastProgress;	/* last drawed step */
-	int			f_iLastPercent;		/* last writen percent */
-	int			f_iLastMinute;		/* all last* variables help */
-	int			f_iLastSecond;		/* keep progress bar refresh rate low */
-	int			f_iLastStep;
-	hcore::HString	f_oMessage;
-	hcore::HTime		f_oStart;
+	bool		_done;
+	bool		_estimate;			/* was time left count ? */
+	double	_progressSize;	/* number of steps in progess bar */
+	int			_lastProgress;	/* last drawed step */
+	int			_lastPercent;		/* last writen percent */
+	int			_lastMinute;		/* all last* variables help */
+	int			_lastSecond;		/* keep progress bar refresh rate low */
+	int			_lastStep;
+	hcore::HString	_message;
+	hcore::HTime		_start;
 	/* end of progress bar data */
 public:
 	HStatusBarControl( HWindow*, char const* const, int = -1 );

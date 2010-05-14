@@ -61,10 +61,10 @@ my_strtold_t my_strtold = dumb_strtold;
 template<>
 int long unsigned lexical_cast( HString const& val )
 	{
-	int l_iBase = 10;
+	int base = 10;
 	if ( ( val.get_length() > 2 ) && ( val[ 1 ] == 'x' ) )
-		l_iBase = 16;
-	return ( ::strtoul( val.raw(), NULL, l_iBase ) );
+		base = 16;
+	return ( ::strtoul( val.raw(), NULL, base ) );
 	}
 
 template<>
@@ -82,10 +82,10 @@ int short unsigned lexical_cast( HString const& val )
 template<>
 int long lexical_cast( HString const& val )
 	{
-	int l_iBase = 10;
+	int base = 10;
 	if ( ( val.get_length() > 2 ) && ( val[ 1 ] == 'x' ) )
-		l_iBase = 16;
-	return ( ::strtol( val.raw(), NULL, l_iBase ) );
+		base = 16;
+	return ( ::strtol( val.raw(), NULL, base ) );
 	}
 
 template<>
@@ -165,46 +165,46 @@ double lexical_cast( char const* const& val )
 	}
 
 template<>
-bool lexical_cast( char const* const& a_pcValue )
+bool lexical_cast( char const* const& value_ )
 	{
 	M_PROLOG
-	static HString l_oMessage;
+	static HString message;
 	bool bVal = false;
-	if ( ! ::strcasecmp( a_pcValue, "yes" ) )
+	if ( ! ::strcasecmp( value_, "yes" ) )
 		bVal = true;
-	else if ( ! ::strcasecmp( a_pcValue, "no" ) )
+	else if ( ! ::strcasecmp( value_, "no" ) )
 		bVal = false;
-	else if ( ! ::strcasecmp( a_pcValue, "true" ) )
+	else if ( ! ::strcasecmp( value_, "true" ) )
 		bVal = true;
-	else if ( ! ::strcasecmp( a_pcValue, "false" ) )
+	else if ( ! ::strcasecmp( value_, "false" ) )
 		bVal = false;
-	else if ( ! ::strcasecmp( a_pcValue, "on" ) )
+	else if ( ! ::strcasecmp( value_, "on" ) )
 		bVal = true;
-	else if ( ! ::strcasecmp( a_pcValue, "off" ) )
+	else if ( ! ::strcasecmp( value_, "off" ) )
 		bVal = false;
 	else
 		{
-		l_oMessage = "bad value: ";
-		l_oMessage += a_pcValue;
-		M_THROW( l_oMessage, bVal );
+		message = "bad value: ";
+		message += value_;
+		M_THROW( message, bVal );
 		}
 	return ( bVal );
 	M_EPILOG
 	}
 
 template<>
-bool lexical_cast( char* const& a_pcValue )
+bool lexical_cast( char* const& value_ )
 	{
 	M_PROLOG
-	return ( lexical_cast<bool,char const*>( a_pcValue ) );
+	return ( lexical_cast<bool,char const*>( value_ ) );
 	M_EPILOG
 	}
 
 template<>
-bool lexical_cast( HString const& a_oValue )
+bool lexical_cast( HString const& value_ )
 	{
 	M_PROLOG
-	return ( lexical_cast<bool>( a_oValue.raw() ) );
+	return ( lexical_cast<bool>( value_.raw() ) );
 	M_EPILOG
 	}
 
@@ -240,9 +240,9 @@ HString lexical_cast( HFormat const& f )
 	M_EPILOG
 	}
 
-char const* error_message( int const& a_iCode )
+char const* error_message( int const& code_ )
 	{
-	return ( ::strerror( a_iCode ) );
+	return ( ::strerror( code_ ) );
 	}
 
 }

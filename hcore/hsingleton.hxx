@@ -71,8 +71,8 @@ private:
 	typedef yaal::hcore::HList<destructor_ptr_t> destructor_list_t;
 	typedef yaal::hcore::HPointer<destructor_list_t> destructor_list_ptr_t;
 	typedef yaal::hcore::HMultiMap<int, destructor_ptr_t> map_stack_t;
-	yaal::hcore::HMutex f_oMutex;
-	map_stack_t f_oDestructors;
+	yaal::hcore::HMutex _mutex;
+	map_stack_t _destructors;
 	HLifeTimeTracker( void );
 	void do_destruct( void );
 public:
@@ -91,7 +91,7 @@ public:
 template<typename tType>
 class HDestructor : public HAbstractDestructor
 	{
-	tType*& f_rptObject;
+	tType*& _object;
 public:
 	explicit HDestructor( tType*& );
 	~HDestructor( void );
@@ -99,7 +99,7 @@ public:
 	};
 
 template<typename tType>
-HDestructor<tType>::HDestructor( tType*& a_rptObject ) : HAbstractDestructor(), f_rptObject( a_rptObject )
+HDestructor<tType>::HDestructor( tType*& object_ ) : HAbstractDestructor(), _object( object_ )
 	{
 	}
 
@@ -115,9 +115,9 @@ template<typename tType>
 void HDestructor<tType>::destruct( void )
 	{
 	M_PROLOG
-	if ( f_rptObject )
-		delete f_rptObject;
-	f_rptObject = NULL;
+	if ( _object )
+		delete _object;
+	_object = NULL;
 	M_EPILOG
 	}
 
@@ -127,7 +127,7 @@ template<typename tType>
 class HSingleton
 	{
 	typedef HSingleton<tType> self_t;
-	static tType* f_ptInstance;
+	static tType* _instance;
 	static tType* create_instance( int const& );
 public:
 	static tType& get_instance( int const& = 0 );
@@ -136,32 +136,32 @@ public:
 typedef HExceptionT<HSingletonInterface> HSingletonException;
 
 template<typename tType>
-tType* HSingleton<tType>::f_ptInstance = NULL;
+tType* HSingleton<tType>::_instance = NULL;
 
 template<typename tType>
-tType* HSingleton<tType>::create_instance( int const& a_iLifeTime )
+tType* HSingleton<tType>::create_instance( int const& lifeTime_ )
 	{
 	M_PROLOG
-	M_ASSERT( ! f_ptInstance );
+	M_ASSERT( ! _instance );
 	HLifeTimeTracker& lt = HLifeTimeTracker::get_instance();
-	HLifeTimeTracker::destructor_ptr_t p( new HDestructor<tType>( f_ptInstance ) );
-	lt.register_destructor( p, tType::life_time( a_iLifeTime ) );
+	HLifeTimeTracker::destructor_ptr_t p( new HDestructor<tType>( _instance ) );
+	lt.register_destructor( p, tType::life_time( lifeTime_ ) );
 	return ( new tType() );
 	M_EPILOG
 	}
 
 template<typename tType>
-tType& HSingleton<tType>::get_instance( int const& a_iLifeTime )
+tType& HSingleton<tType>::get_instance( int const& lifeTime_ )
 	{
 	M_PROLOG
-	if ( ! f_ptInstance )
+	if ( ! _instance )
 		{
-		static HMutex l_oMutex;
-		HLock l( l_oMutex );
-		if ( ! f_ptInstance )
-			f_ptInstance = create_instance( a_iLifeTime );
+		static HMutex mutex;
+		HLock l( mutex );
+		if ( ! _instance )
+			_instance = create_instance( lifeTime_ );
 		}
-	return ( *f_ptInstance );
+	return ( *_instance );
 	M_EPILOG
 	}
 

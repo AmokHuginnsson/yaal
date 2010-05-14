@@ -41,8 +41,8 @@ namespace hconsole
 {
 
 HTreeControl::HNodeControl::HNodeControl( int cols )
-						: f_bUnfolded( false ),
-						f_iRowRaw( 0 ), f_iColumnRaw( 0 ), f_iWidthRaw( 0 ), f_oData( cols )
+						: _unfolded( false ),
+						_rowRaw( 0 ), _columnRaw( 0 ), _widthRaw( 0 ), _data( cols )
 	{
 	M_PROLOG
 	return;
@@ -59,14 +59,14 @@ HTreeControl::HNodeControl::~HNodeControl( void )
 HInfo& HTreeControl::HNodeControl::operator[]( int idx )
 	{
 	M_PROLOG
-	return ( f_oData[ idx ] );
+	return ( _data[ idx ] );
 	M_EPILOG
 	}
 
 void HTreeControl::expand( tree_t::node_t node )
 	{
 	M_PROLOG
-	(**node).f_bUnfolded = true;
+	(**node)._unfolded = true;
 	if ( node->get_parent() )
 		expand( node->get_parent() );
 	return;
@@ -76,7 +76,7 @@ void HTreeControl::expand( tree_t::node_t node )
 void HTreeControl::collapse( tree_t::node_t node )
 	{
 	M_PROLOG
-	(**node).f_bUnfolded = false;
+	(**node)._unfolded = false;
   if ( ! node->has_childs() )
 		return;
 	for ( tree_t::iterator it = node->begin(); it != node->end(); ++ it )
@@ -85,14 +85,14 @@ void HTreeControl::collapse( tree_t::node_t node )
 	M_EPILOG
 	}
 
-bool HTreeControl::HNodeControl::hit_test( int a_iRow, int a_iColumn ) const
+bool HTreeControl::HNodeControl::hit_test( int row_, int column_ ) const
 	{
 	M_PROLOG
-	if ( f_iRowRaw == a_iRow )
+	if ( _rowRaw == row_ )
 		{
-		if ( a_iColumn >= f_iColumnRaw )
+		if ( column_ >= _columnRaw )
 			{
-			if ( a_iColumn < ( f_iColumnRaw + f_iWidthRaw - 1 ) )
+			if ( column_ < ( _columnRaw + _widthRaw - 1 ) )
 				return ( true );
 			}
 		}
@@ -100,19 +100,19 @@ bool HTreeControl::HNodeControl::hit_test( int a_iRow, int a_iColumn ) const
 	M_EPILOG
 	}
 
-void HTreeControl::HNodeControl::click( int a_iColumn )
+void HTreeControl::HNodeControl::click( int column_ )
 	{
 	M_PROLOG
-	if ( a_iColumn == f_iColumnRaw )
-		f_bUnfolded = ! f_bUnfolded;
+	if ( column_ == _columnRaw )
+		_unfolded = ! _unfolded;
 	return;
 	M_EPILOG
 	}
 
-HTreeControl::HTreeControl( HWindow* a_poParent, int a_iRow, int a_iColumn,
-		int a_iHeight, int a_iWidth, char const* a_pcLabel )
-	: HControl( a_poParent, a_iRow, a_iColumn, a_iHeight, a_iWidth, a_pcLabel ),
-	f_oTree(), f_poSelected( NULL )
+HTreeControl::HTreeControl( HWindow* parent_, int row_, int column_,
+		int height_, int width_, char const* label_ )
+	: HControl( parent_, row_, column_, height_, width_, label_ ),
+	_tree(), _selected( NULL )
 	{
 	M_PROLOG
 	return;
@@ -129,72 +129,72 @@ HTreeControl::~HTreeControl( void )
 void HTreeControl::do_refresh( void )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
+	int ctr = 0;
 	HConsole& cons = HCons::get_instance();
-	if ( f_bFocused )
+	if ( _focused )
 		cons.curs_set ( CURSOR::INVISIBLE );
 	draw_label();
-	f_oVarTmpBuffer.hs_realloc( f_iWidthRaw + 1 );
-	f_oVarTmpBuffer.fillz( '_', 0, f_iWidthRaw );
-	for ( l_iCtr = 0; l_iCtr < f_iHeightRaw; l_iCtr ++ )
-		cons.c_mvprintf( f_iRowRaw + l_iCtr, f_iColumnRaw, f_oVarTmpBuffer.raw() );
-	if ( f_oTree.get_root() )
-		draw_node( f_oTree.get_root(), f_iRowRaw );
+	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
+	_varTmpBuffer.fillz( '_', 0, _widthRaw );
+	for ( ctr = 0; ctr < _heightRaw; ctr ++ )
+		cons.c_mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );
+	if ( _tree.get_root() )
+		draw_node( _tree.get_root(), _rowRaw );
 	return;
 	M_EPILOG
 	}
 
-int HTreeControl::draw_node( tree_t::node_t a_poNode, int a_iRow )
+int HTreeControl::draw_node( tree_t::node_t node_, int row_ )
 	{
 	M_PROLOG
-	int l_iRow = a_iRow;
+	int row = row_;
 	HConsole& cons = HCons::get_instance();
-	M_ASSERT( a_poNode );
-	if ( (**a_poNode).f_oData.get_size() )
+	M_ASSERT( node_ );
+	if ( (**node_)._data.get_size() )
 		{
-		l_iRow ++;
-		HInfo const& info = (**a_poNode).f_oData[ 0 ];
+		row ++;
+		HInfo const& info = (**node_)._data[ 0 ];
 		HString const& str = info.get<HString const&>();
-		(**a_poNode).f_iRowRaw = l_iRow;
-		(**a_poNode).f_iColumnRaw = f_iColumnRaw + a_poNode->get_level() * 2 - 1; 
-		(**a_poNode).f_iWidthRaw = static_cast<int>( str.get_length() ) + 2;
+		(**node_)._rowRaw = row;
+		(**node_)._columnRaw = _columnRaw + node_->get_level() * 2 - 1; 
+		(**node_)._widthRaw = static_cast<int>( str.get_length() ) + 2;
 		set_attr_data();
-		if ( ! ( (**a_poNode).f_bUnfolded || ! a_poNode->has_childs() ) )
-			cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw, "+" );
-		else if ( a_poNode->has_childs() )
-			cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw, "-" );
-		if ( a_poNode == f_poSelected )
-			cons.set_attr( f_bEnabled ? ( f_bFocused ? ~f_uiAttributeFocused
-						: ~ f_uiAttributeEnabled ) : ~ f_uiAttributeDisabled );
-		cons.c_mvprintf( l_iRow, (**a_poNode).f_iColumnRaw + 1, str.raw() );
+		if ( ! ( (**node_)._unfolded || ! node_->has_childs() ) )
+			cons.c_mvprintf( row, (**node_)._columnRaw, "+" );
+		else if ( node_->has_childs() )
+			cons.c_mvprintf( row, (**node_)._columnRaw, "-" );
+		if ( node_ == _selected )
+			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused
+						: ~ _attributeEnabled ) : ~ _attributeDisabled );
+		cons.c_mvprintf( row, (**node_)._columnRaw + 1, str.raw() );
 		}
-	if ( a_poNode->has_childs() && ( (**a_poNode).f_bUnfolded || ! a_poNode->get_level() ) )
+	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) )
 		{
-		for ( tree_t::iterator it = a_poNode->begin(); it != a_poNode->end(); ++ it )
-			l_iRow = draw_node( &*it, l_iRow );
+		for ( tree_t::iterator it = node_->begin(); it != node_->end(); ++ it )
+			row = draw_node( &*it, row );
 		}
-	return ( l_iRow );
+	return ( row );
 	M_EPILOG
 	}
 
-int HTreeControl::do_process_input( int a_iCode )
+int HTreeControl::do_process_input( int code_ )
 	{
 	M_PROLOG
-	bool l_bWasFolded = false;
-	int l_iErrorCode = 0;
-	a_iCode = HControl::do_process_input( a_iCode );
-	tree_t::node_t l_poNode = f_poSelected;
-	switch ( a_iCode )
+	bool wasFolded = false;
+	int errorCode = 0;
+	code_ = HControl::do_process_input( code_ );
+	tree_t::node_t node = _selected;
+	switch ( code_ )
 		{
 		case ( KEY_CODES::HOME ):
-			l_poNode = f_oTree.get_root();
-			if ( l_poNode->has_childs() )
-				f_poSelected = &*l_poNode->begin();
+			node = _tree.get_root();
+			if ( node->has_childs() )
+				_selected = &*node->begin();
 		break;
 		case ( KEY_CODES::END ):
-			l_poNode = f_oTree.get_root();
-			if ( l_poNode->has_childs() )
-				f_poSelected = &*l_poNode->rbegin();
+			node = _tree.get_root();
+			if ( node->has_childs() )
+				_selected = &*node->rbegin();
 		break;
 		case ( KEY_CODES::PAGE_UP ):
 			break;
@@ -202,23 +202,23 @@ int HTreeControl::do_process_input( int a_iCode )
 			break;
 		case ( KEY_CODES::UP ):
 			{
-			f_poSelected = previous( l_poNode );
-			if ( f_poSelected == l_poNode )
+			_selected = previous( node );
+			if ( _selected == node )
 				{
-				if ( l_poNode->get_level() > 1 ) 
-					f_poSelected = l_poNode->get_parent();
+				if ( node->get_level() > 1 ) 
+					_selected = node->get_parent();
 				}
 			else
 				{
-				l_poNode = f_poSelected;
-				while ( (**l_poNode).f_bUnfolded )
+				node = _selected;
+				while ( (**node)._unfolded )
 					{
-					if ( l_poNode->has_childs() )
+					if ( node->has_childs() )
 						{
-						f_poSelected = &*l_poNode->begin();
-						l_poNode = f_poSelected;
-						f_poSelected = previous( l_poNode, true );
-						l_poNode = f_poSelected;
+						_selected = &*node->begin();
+						node = _selected;
+						_selected = previous( node, true );
+						node = _selected;
 						}
 					}
 				}
@@ -226,100 +226,100 @@ int HTreeControl::do_process_input( int a_iCode )
 		break;
 		case ( KEY_CODES::RIGHT ):
 			{
-			l_bWasFolded = ! (**l_poNode).f_bUnfolded;
-			if ( l_poNode->has_childs() )
+			wasFolded = ! (**node)._unfolded;
+			if ( node->has_childs() )
 				{
-				(**l_poNode).f_bUnfolded = true;
-				if ( l_bWasFolded )
+				(**node)._unfolded = true;
+				if ( wasFolded )
 					break;
 				}
 			}
 		/* when node is unfolded, right key works as down key */
 		case ( KEY_CODES::DOWN ):
 			{
-			if ( (**l_poNode).f_bUnfolded )
+			if ( (**node)._unfolded )
 				{
-				if ( l_poNode->has_childs() )
-					f_poSelected = &*l_poNode->begin();
+				if ( node->has_childs() )
+					_selected = &*node->begin();
 				}
 			else
 				{
-				l_poNode = f_poSelected;
-				l_poNode = next( l_poNode );
-				while ( ! l_poNode )
+				node = _selected;
+				node = next( node );
+				while ( ! node )
 					{
-					l_poNode = f_poSelected->get_parent();
-					if ( ! l_poNode || ( l_poNode->get_level() < 1 ) )
+					node = _selected->get_parent();
+					if ( ! node || ( node->get_level() < 1 ) )
 						break;
-					f_poSelected = l_poNode;
-					l_poNode = next( l_poNode );
+					_selected = node;
+					node = next( node );
 					}
-				if ( l_poNode && ( l_poNode->get_level() > 0 ) )
-					f_poSelected = l_poNode;
+				if ( node && ( node->get_level() > 0 ) )
+					_selected = node;
 				}
 			}
 		break;
 		case ( KEY_CODES::LEFT ):
-			if ( (**l_poNode).f_bUnfolded && l_poNode->get_level() )
-				(**l_poNode).f_bUnfolded = false;
-			else if ( l_poNode->get_level() > 1 )
-				f_poSelected = l_poNode->get_parent();
+			if ( (**node)._unfolded && node->get_level() )
+				(**node)._unfolded = false;
+			else if ( node->get_level() > 1 )
+				_selected = node->get_parent();
 		break;
 		case ( ' ' ):
 		case ( '\r' ):
-			if ( l_poNode->has_childs() )
-				(**l_poNode).f_bUnfolded = ! (**l_poNode).f_bUnfolded;
+			if ( node->has_childs() )
+				(**node)._unfolded = ! (**node)._unfolded;
 			else
-				l_iErrorCode = a_iCode;
+				errorCode = code_;
 		break; /* I have to think more about it. */
 		case ( '\t' ):
-			f_bFocused = false;	/* very  */
+			_focused = false;	/* very  */
 			schedule_refresh();	/* magic */
 		/* no break on purpouse, see hlistcontrol.c */
 		default :
-			l_iErrorCode = a_iCode;
+			errorCode = code_;
 		}
-	a_iCode = l_iErrorCode;
-	if ( ! l_iErrorCode )
+	code_ = errorCode;
+	if ( ! errorCode )
 		{
 		schedule_refresh();
-		f_poParent->status_bar()->message( COLORS::FG_LIGHTGRAY, "" );
+		_parent->status_bar()->message( COLORS::FG_LIGHTGRAY, "" );
 		}
-	return ( a_iCode );
+	return ( code_ );
 	M_EPILOG
 	}
 
-int HTreeControl::set_focus( char a_cShorcut )
+int HTreeControl::set_focus( char shorcut_ )
 	{
 	M_PROLOG
-	return ( HControl::set_focus ( a_cShorcut ) );
+	return ( HControl::set_focus ( shorcut_ ) );
 	M_EPILOG
 	}
 
-int HTreeControl::do_click( OMouse& a_rsMouse )
+int HTreeControl::do_click( OMouse& mouse_ )
 	{
 	M_PROLOG
-	if ( ! HControl::do_click( a_rsMouse ) )
+	if ( ! HControl::do_click( mouse_ ) )
 		return ( 1 );
-	if ( f_oTree.get_root() && do_click( f_oTree.get_root(), a_rsMouse ) )
+	if ( _tree.get_root() && do_click( _tree.get_root(), mouse_ ) )
 		schedule_refresh();
 	return ( 0 );
 	M_EPILOG
 	}
 
-bool HTreeControl::do_click( tree_t::node_t a_poNode, OMouse& a_rsMouse )
+bool HTreeControl::do_click( tree_t::node_t node_, OMouse& mouse_ )
 	{
 	M_PROLOG
-	if ( (**a_poNode).hit_test( a_rsMouse.f_iRow, a_rsMouse.f_iColumn ) )
+	if ( (**node_).hit_test( mouse_._row, mouse_._column ) )
 		{
-		(**a_poNode).click( a_rsMouse.f_iColumn );
-		f_poSelected = a_poNode;
+		(**node_).click( mouse_._column );
+		_selected = node_;
 		return ( true );
 		}
-	if ( a_poNode->has_childs() && ( (**a_poNode).f_bUnfolded || ! a_poNode->get_level() ) )
+	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) )
 		{
-		for ( tree_t::iterator it = a_poNode->begin(); it != a_poNode->end(); ++ it )
-			if ( do_click( &*it, a_rsMouse ) )
+		for ( tree_t::iterator it = node_->begin(); it != node_->end(); ++ it )
+			if ( do_click( &*it, mouse_ ) )
 				return ( true );
 		}
 	return ( false );

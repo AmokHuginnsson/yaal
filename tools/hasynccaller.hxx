@@ -46,10 +46,10 @@ protected:
 	typedef int long priority_t;
 	typedef yaal::hcore::HBoundCallInterface<>::ptr_t call_t;
 	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
-	queue_t f_oQueue;
+	queue_t _queue;
 	yaal::hcore::HThread _thread;
-	yaal::hcore::HMutex f_oMutex;
-	bool f_bLoop;
+	yaal::hcore::HMutex _mutex;
+	bool _loop;
 public:
 	void register_call( priority_t, call_t );
 	void flush( void* );
@@ -69,7 +69,7 @@ private:
  */
 class HAsyncCaller : public HAbstractAsyncCaller
 	{
-	yaal::hcore::HSemaphore f_oSemaphore;
+	yaal::hcore::HSemaphore _semaphore;
 	HAsyncCaller( void );
 	virtual ~HAsyncCaller( void );
 	virtual void* do_work( void );

@@ -59,23 +59,23 @@ namespace openssl_helper
 
 /*! \brief Format OpenSSL related error.
  *
- * \param a_oBuffer - buffer for error message.
+ * \param buffer_ - buffer for error message.
  * \param err - error code to translate to message.
  * \return Error message.
  */
-HString& format_error_message( HString& a_oBuffer, int err = 0 )
+HString& format_error_message( HString& buffer_, int err = 0 )
 	{
-	int long l_iCode = 0;
-	a_oBuffer = err ? ERR_error_string( err, NULL ) : "";
-	while ( ( l_iCode = ERR_get_error() ) )
-		a_oBuffer.append( ( a_oBuffer.is_empty() ? "" : "\n" ) ).append( ERR_error_string( l_iCode, NULL ) );
-	return ( a_oBuffer );
+	int long code = 0;
+	buffer_ = err ? ERR_error_string( err, NULL ) : "";
+	while ( ( code = ERR_get_error() ) )
+		buffer_.append( ( buffer_.is_empty() ? "" : "\n" ) ).append( ERR_error_string( code, NULL ) );
+	return ( buffer_ );
 	}
 
 }
 
-yaal::hcore::HString HOpenSSL::f_oSSLKey;
-yaal::hcore::HString HOpenSSL::f_oSSLCert;
+yaal::hcore::HString HOpenSSL::_sSLKey;
+yaal::hcore::HString HOpenSSL::_sSLCert;
 
 int HOpenSSL::OSSLContext::_instances = 0;
 HMutex HOpenSSL::OSSLContext::_mutex( HMutex::TYPE::RECURSIVE );
@@ -93,7 +93,7 @@ int long unsigned get_thread_id( void )
 void HOpenSSL::OSSLContext::init( void )
 	{
 	M_PROLOG
-	HLock l_oLock( _mutex );
+	HLock lock( _mutex );
 	if ( _instances == 0 )
 		{
 		SSL_load_error_strings();
@@ -109,25 +109,25 @@ void HOpenSSL::OSSLContext::init( void )
 		CRYPTO_set_id_callback( &get_thread_id );
 		SSL_library_init();
 		}
-	SSL_METHOD* l_pxMethod = static_cast<SSL_METHOD*>( method() );
+	SSL_METHOD* method = static_cast<SSL_METHOD*>( select_method() );
 	SSL_CTX* ctx = NULL;
-	HString l_oBuffer;
+	HString buffer;
 	ERR_clear_error();
-	_context = ctx = SSL_CTX_new( l_pxMethod );
+	_context = ctx = SSL_CTX_new( method );
 	if ( ! _context )
-		throw HOpenSSLFatalException( openssl_helper::format_error_message( l_oBuffer ) );
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
 	++ _instances;
-	if ( SSL_CTX_use_PrivateKey_file( ctx, f_oSSLKey.raw(), SSL_FILETYPE_PEM ) <= 0 )
-		throw HOpenSSLFatalException( openssl_helper::format_error_message( l_oBuffer ) );
-	if ( SSL_CTX_use_certificate_file( ctx, f_oSSLCert.raw(), SSL_FILETYPE_PEM ) <= 0 )
-		throw HOpenSSLFatalException( openssl_helper::format_error_message( l_oBuffer ) );
+	if ( SSL_CTX_use_PrivateKey_file( ctx, _sSLKey.raw(), SSL_FILETYPE_PEM ) <= 0 )
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
+	if ( SSL_CTX_use_certificate_file( ctx, _sSLCert.raw(), SSL_FILETYPE_PEM ) <= 0 )
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
 	if ( ! SSL_CTX_check_private_key( ctx ) )
-		throw HOpenSSLFatalException( openssl_helper::format_error_message( l_oBuffer ) );
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
 	return;
 	M_EPILOG
 	}
 
-void* HOpenSSL::OSSLContext::method( void ) const
+void* HOpenSSL::OSSLContext::select_method( void ) const
 	{
 	return ( do_method() );
 	}
@@ -135,7 +135,7 @@ void* HOpenSSL::OSSLContext::method( void ) const
 HOpenSSL::OSSLContext::~OSSLContext( void )
 	{
 	M_PROLOG
-	HLock l_oLock( _mutex );
+	HLock lock( _mutex );
 	M_ENSURE( ! _users );
 	if ( _context )
 		SSL_CTX_free( static_cast<SSL_CTX*>( _context ) );
@@ -170,12 +170,12 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 void* HOpenSSL::OSSLContext::create_ssl( void )
 	{
 	M_PROLOG
-	HLock l_oLock( _mutex );
+	HLock lock( _mutex );
 	M_ASSERT( _context );
 	SSL* ssl( SSL_new( static_cast<SSL_CTX*>( _context ) ) );
-	HString l_oBuffer;
+	HString buffer;
 	if ( ! ssl )
-		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+		throw HOpenSSLException( openssl_helper::format_error_message( buffer ) );
 	++ _users;
 	return ( ssl );
 	M_EPILOG
@@ -184,7 +184,7 @@ void* HOpenSSL::OSSLContext::create_ssl( void )
 void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ )
 	{
 	M_PROLOG
-	HLock l_oLock( _mutex );
+	HLock lock( _mutex );
 	M_ASSERT( ssl_ );
 	SSL_free( static_cast<SSL*>( ssl_ ) );
 	-- _users;
@@ -194,7 +194,7 @@ void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ )
 void HOpenSSL::OSSLContext::libssl_rule_mutex( int mode, int nth, char const* file_, int line_ )
 	{
 	M_PROLOG
-	HLock l_oLock( _mutex );
+	HLock lock( _mutex );
 	mutex_info_t& m( _sslLibMutexes[ nth ] );
 	if ( mode & CRYPTO_LOCK )
 		{
@@ -245,17 +245,17 @@ void* HOpenSSL::OSSLContextClient::do_method( void ) const
 	M_EPILOG
 	}
 
-HOpenSSL::HOpenSSL( int a_iFileDescriptor, TYPE::ssl_context_type_t a_eType )
+HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE::ssl_context_type_t type_ )
 	: _pendingOperation( false ), _ssl( NULL ),
-	_ctx( ( a_eType == TYPE::SERVER )
+	_ctx( ( type_ == TYPE::SERVER )
 			? static_cast<OSSLContext*>( &OSSLContextServerInstance::get_instance() )
 			: static_cast<OSSLContext*>( &OSSLContextClientInstance::get_instance() ) ),
-	do_accept_or_connect( ( a_eType == TYPE::SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect )
+	do_accept_or_connect( ( type_ == TYPE::SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect )
 	{
 	M_PROLOG
 	SSL* ssl( static_cast<SSL*>( _ctx->create_ssl() ) );
 	_ssl = ssl;
-	SSL_set_fd( ssl, a_iFileDescriptor );
+	SSL_set_fd( ssl, fileDescriptor_ );
 	accept_or_connect();
 	return;
 	M_EPILOG
@@ -304,14 +304,14 @@ void HOpenSSL::check_err( int code ) const
 	int err = SSL_get_error( static_cast<SSL*>( _ssl ), code );
 	if ( ( err != SSL_ERROR_ZERO_RETURN ) && ( err != SSL_ERROR_WANT_READ ) && ( err != SSL_ERROR_WANT_WRITE ) )
 		{
-		HString l_oBuffer;
-		throw HOpenSSLException( openssl_helper::format_error_message( l_oBuffer ) );
+		HString buffer;
+		throw HOpenSSLException( openssl_helper::format_error_message( buffer ) );
 		}
 	return;
 	M_EPILOG
 	}
 
-int long HOpenSSL::read( void* const a_pvBuffer, int long const& a_lSize )
+int long HOpenSSL::read( void* const buffer_, int long const& size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _ssl );
@@ -320,7 +320,7 @@ int long HOpenSSL::read( void* const a_pvBuffer, int long const& a_lSize )
 	int nRead = -1;
 	if ( ! _pendingOperation )
 		{
-		nRead = SSL_read( static_cast<SSL*>( _ssl ), a_pvBuffer, static_cast<int>( a_lSize ) );
+		nRead = SSL_read( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
 		if ( nRead <= 0 )
 			check_err( nRead );
 		}
@@ -328,7 +328,7 @@ int long HOpenSSL::read( void* const a_pvBuffer, int long const& a_lSize )
 	M_EPILOG
 	}
 
-int long HOpenSSL::write( void const* const a_pvBuffer, int long const& a_lSize )
+int long HOpenSSL::write( void const* const buffer_, int long const& size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _ssl );
@@ -337,7 +337,7 @@ int long HOpenSSL::write( void const* const a_pvBuffer, int long const& a_lSize 
 	int nWritten = 0;
 	if ( ! _pendingOperation )
 		{
-		nWritten = SSL_write( static_cast<SSL*>( _ssl ), a_pvBuffer, static_cast<int>( a_lSize ) );
+		nWritten = SSL_write( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
 		if ( nWritten <= 0 )
 			check_err( nWritten );
 		}

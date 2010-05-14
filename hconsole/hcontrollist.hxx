@@ -46,8 +46,8 @@ class HControlList
 public:
 	typedef hcore::HList<HControl::ptr_t> model_t;
 private:
-	model_t f_oList;
-	model_t::cyclic_iterator& f_roFocused;
+	model_t _list;
+	model_t::cyclic_iterator& _focused;
 public:
 	HControlList( model_t::cyclic_iterator& );
 	/* find next enabled control in window, if short cut char is specified */

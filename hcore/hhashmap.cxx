@@ -43,7 +43,7 @@ int long const x_tag_g_pulPrimes[ 32 ] =
 	524287,			1048573,		2097143,		4194301,		8388593,		16777213,
 	33554393,		67108859,		134217689,	268435399,	536870909,	1073741789,
 	2147483647,	0
-	}, * const g_pulPrimes = x_tag_g_pulPrimes;
+	}, * const _primes_ = x_tag_g_pulPrimes;
 
 }
 

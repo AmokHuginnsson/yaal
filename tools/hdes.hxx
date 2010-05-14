@@ -54,7 +54,7 @@ struct DES
  */
 class HDes
 	{
-	u8_t f_pppcIKeys[ DES::SIDES_COUNT ][ DES::IKEYS_COUNT ][ DES::IKEY_SIZE ];
+	u8_t _IKeys[ DES::SIDES_COUNT ][ DES::IKEYS_COUNT ][ DES::IKEY_SIZE ];
 public:
 	HDes( void );
 	virtual ~HDes( void );

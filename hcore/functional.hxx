@@ -55,17 +55,17 @@ class HBinder
 		typedef __decltype( _type_provider( arga_t(), argb_t() ) ) type;
 		};
 	function_t CALLER;
-	value_t f_tValue;
+	value_t _value;
 public:
 	HBinder( function_t, value_t );
 	template<typename tType>
 	typename type_of<function_t, value_t, tType>::type operator()( tType value ) const
-		{ return ( CALLER( value, f_tValue ) ); }
+		{ return ( CALLER( value, _value ) ); }
 	};
 
 template<typename function_t, typename value_t>
 HBinder<function_t, value_t>::HBinder( function_t func, value_t value )
-	: CALLER( func ), f_tValue( value )
+	: CALLER( func ), _value( value )
 	{ }
 
 /*! \brief Convenience function to construct HBinder<> object.

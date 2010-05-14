@@ -38,7 +38,7 @@ namespace yaal
 namespace hcore
 {
 
-char const* const n_ppcErrMsgHSBBSTree[ 4 ] =
+char const* const _errMsgHSBBSTree_[ 4 ] =
 	{
 	_( "ok" ),
 /* HSBBSTree::NON_EXISTING_KEY */			_( "key does not exists" ),
@@ -46,45 +46,45 @@ char const* const n_ppcErrMsgHSBBSTree[ 4 ] =
 	};
 
 HSBBSTree::HIterator::HIterator( void )
-	: f_poCurrent( NULL )
+	: _current( NULL )
 	{
 	return;
 	}
 
-HSBBSTree::HIterator::HIterator( HSBBSTree::HAbstractNode* const a_poNode )
-	: f_poCurrent( a_poNode )
+HSBBSTree::HIterator::HIterator( HSBBSTree::HAbstractNode* const node_ )
+	: _current( node_ )
 	{
 	return;
 	}
 
-bool HSBBSTree::HIterator::operator == ( HSBBSTree::HIterator const& a_roIterator ) const
+bool HSBBSTree::HIterator::operator == ( HSBBSTree::HIterator const& iterator_ ) const
 	{
-	return ( f_poCurrent == a_roIterator.f_poCurrent );
+	return ( _current == iterator_._current );
 	}
 
-bool HSBBSTree::HIterator::operator != ( HSBBSTree::HIterator const& a_roIterator ) const
+bool HSBBSTree::HIterator::operator != ( HSBBSTree::HIterator const& iterator_ ) const
 	{
-	return ( f_poCurrent != a_roIterator.f_poCurrent );
+	return ( _current != iterator_._current );
 	}
 
 HSBBSTree::HIterator& HSBBSTree::HIterator::operator ++ ( void )
 	{
 	M_PROLOG
-	HAbstractNode * l_poLastNode = f_poCurrent;
-	while ( f_poCurrent )
+	HAbstractNode * lastNode = _current;
+	while ( _current )
 		{
-		if ( f_poCurrent->f_poRight && ( f_poCurrent->f_poRight != l_poLastNode ) )
+		if ( _current->_right && ( _current->_right != lastNode ) )
 			{
-			f_poCurrent = f_poCurrent->f_poRight;
-			while ( f_poCurrent->f_poLeft )
-				f_poCurrent = f_poCurrent->f_poLeft;
+			_current = _current->_right;
+			while ( _current->_left )
+				_current = _current->_left;
 			break;
 			}
 		else
 			{
-			l_poLastNode = f_poCurrent;
-			f_poCurrent = f_poCurrent->f_poParent;
-			if ( f_poCurrent && ( l_poLastNode == f_poCurrent->f_poLeft ) )
+			lastNode = _current;
+			_current = _current->_parent;
+			if ( _current && ( lastNode == _current->_left ) )
 				break;
 			}
 		}
@@ -95,30 +95,30 @@ HSBBSTree::HIterator& HSBBSTree::HIterator::operator ++ ( void )
 HSBBSTree::HIterator const HSBBSTree::HIterator::operator ++ ( int )
 	{
 	M_PROLOG
-	HIterator l_oIterator( *this );
+	HIterator iterator( *this );
 	++ ( *this );
-	return ( l_oIterator );
+	return ( iterator );
 	M_EPILOG
 	}
 
 HSBBSTree::HIterator& HSBBSTree::HIterator::operator -- ( void )
 	{
 	M_PROLOG
-	HAbstractNode * l_poLastNode = f_poCurrent;
-	while ( f_poCurrent )
+	HAbstractNode * lastNode = _current;
+	while ( _current )
 		{
-		if ( f_poCurrent->f_poLeft && ( f_poCurrent->f_poLeft != l_poLastNode ) )
+		if ( _current->_left && ( _current->_left != lastNode ) )
 			{
-			f_poCurrent = f_poCurrent->f_poLeft;
-			while ( f_poCurrent->f_poRight )
-				f_poCurrent = f_poCurrent->f_poRight;
+			_current = _current->_left;
+			while ( _current->_right )
+				_current = _current->_right;
 			break;
 			}
 		else
 			{
-			l_poLastNode = f_poCurrent;
-			f_poCurrent = f_poCurrent->f_poParent;
-			if ( f_poCurrent && ( l_poLastNode == f_poCurrent->f_poRight ) )
+			lastNode = _current;
+			_current = _current->_parent;
+			if ( _current && ( lastNode == _current->_right ) )
 				break;
 			}
 		}
@@ -129,54 +129,54 @@ HSBBSTree::HIterator& HSBBSTree::HIterator::operator -- ( void )
 HSBBSTree::HIterator const HSBBSTree::HIterator::operator -- ( int )
 	{
 	M_PROLOG
-	HIterator l_oIterator( *this );
+	HIterator iterator( *this );
 	-- ( *this );
-	return ( l_oIterator );
+	return ( iterator );
 	M_EPILOG
 	}
 
-HSBBSTree::HIterator::HIterator ( HSBBSTree::HIterator const & a_roIterator )
-	: f_poCurrent ( a_roIterator.f_poCurrent )
+HSBBSTree::HIterator::HIterator ( HSBBSTree::HIterator const & iterator_ )
+	: _current ( iterator_._current )
 	{
 	return;
 	}
 
-HSBBSTree::HIterator& HSBBSTree::HIterator::operator = ( HSBBSTree::HIterator const& a_roIterator )
+HSBBSTree::HIterator& HSBBSTree::HIterator::operator = ( HSBBSTree::HIterator const& iterator_ )
 	{
-	if ( &a_roIterator != this )
-		f_poCurrent = a_roIterator.f_poCurrent;
+	if ( &iterator_ != this )
+		_current = iterator_._current;
 	return ( *this );
 	}
 
 HSBBSTree::HAbstractNode::HAbstractNode( void )
-	: f_eColor( RED ), f_poParent( NULL ),
-	f_poLeft( NULL ), f_poRight( NULL )
+	: _color( RED ), _parent( NULL ),
+	_left( NULL ), _right( NULL )
 	{
 	return;
 	}
 
 HSBBSTree::HAbstractNode::~HAbstractNode( void )
 	{
-	if ( f_poLeft )
-		delete f_poLeft;
-	f_poLeft = NULL;
-	if ( f_poRight )
-		delete f_poRight;
-	f_poRight = NULL;
+	if ( _left )
+		delete _left;
+	_left = NULL;
+	if ( _right )
+		delete _right;
+	_right = NULL;
 	return;
 	}
 
-void HSBBSTree::HAbstractNode::set_child( HAbstractNode* a_poWhich, HAbstractNode* a_poNew )
+void HSBBSTree::HAbstractNode::set_child( HAbstractNode* which_, HAbstractNode* new_ )
 	{
-	M_ASSERT( ( a_poWhich == f_poLeft ) || ( a_poWhich == f_poRight ) );
-	if ( a_poWhich == f_poLeft )
-		f_poLeft = a_poNew;
+	M_ASSERT( ( which_ == _left ) || ( which_ == _right ) );
+	if ( which_ == _left )
+		_left = new_;
 	else
-		f_poRight = a_poNew;
+		_right = new_;
 	return;
 	}
 
-HSBBSTree::HSBBSTree( void ) : f_poRoot( NULL ), f_lSize( 0 )
+HSBBSTree::HSBBSTree( void ) : _root( NULL ), _size( 0 )
 	{
 	return;
 	}
@@ -192,260 +192,260 @@ HSBBSTree::~HSBBSTree( void )
 void HSBBSTree::clear( void )
 	{
 	M_PROLOG
-	if ( f_poRoot )
-		delete f_poRoot;
-	f_poRoot = NULL;
-	f_lSize = 0;
+	if ( _root )
+		delete _root;
+	_root = NULL;
+	_size = 0;
 	M_EPILOG
 	}
 
-void HSBBSTree::insert_rebalance( HAbstractNode* a_poNode )
+void HSBBSTree::insert_rebalance( HAbstractNode* node_ )
 	{
 	M_PROLOG
 	for ( ; ; )
 		{
-		if ( a_poNode->f_poParent )
+		if ( node_->_parent )
 			{
-			if ( a_poNode->f_poParent->f_eColor == HAbstractNode::BLACK )
+			if ( node_->_parent->_color == HAbstractNode::BLACK )
 				break;
-			HAbstractNode* l_poGrandpa = a_poNode->f_poParent->f_poParent;
-			if ( l_poGrandpa )
+			HAbstractNode* grandpa = node_->_parent->_parent;
+			if ( grandpa )
 				{
-				if ( l_poGrandpa->f_poLeft && l_poGrandpa->f_poRight
-						&& ( l_poGrandpa->f_poLeft->f_eColor == HAbstractNode::RED )
-						&& ( l_poGrandpa->f_poRight->f_eColor == HAbstractNode::RED ) )
+				if ( grandpa->_left && grandpa->_right
+						&& ( grandpa->_left->_color == HAbstractNode::RED )
+						&& ( grandpa->_right->_color == HAbstractNode::RED ) )
 					{
-					l_poGrandpa->f_poLeft->f_eColor = HAbstractNode::BLACK;
-					l_poGrandpa->f_poRight->f_eColor = HAbstractNode::BLACK;
-					l_poGrandpa->f_eColor = HAbstractNode::RED;
-					a_poNode = l_poGrandpa;
+					grandpa->_left->_color = HAbstractNode::BLACK;
+					grandpa->_right->_color = HAbstractNode::BLACK;
+					grandpa->_color = HAbstractNode::RED;
+					node_ = grandpa;
 					continue;
 					}
 				else
 					{
-					if ( ( a_poNode == a_poNode->f_poParent->f_poRight ) && ( l_poGrandpa->f_poLeft == a_poNode->f_poParent ) )
-						rotate_left( a_poNode = a_poNode->f_poParent );
-					else if ( ( a_poNode == a_poNode->f_poParent->f_poLeft ) && ( l_poGrandpa->f_poRight == a_poNode->f_poParent ) )
-						rotate_right( a_poNode = a_poNode->f_poParent );
-					a_poNode->f_poParent->f_eColor = HAbstractNode::BLACK;
-					a_poNode->f_poParent->f_poParent->f_eColor = HAbstractNode::RED;
-					if ( ( a_poNode == a_poNode->f_poParent->f_poLeft )
-							&& ( a_poNode->f_poParent == a_poNode->f_poParent->f_poParent->f_poLeft ) )
-						rotate_right( a_poNode->f_poParent->f_poParent );
+					if ( ( node_ == node_->_parent->_right ) && ( grandpa->_left == node_->_parent ) )
+						rotate_left( node_ = node_->_parent );
+					else if ( ( node_ == node_->_parent->_left ) && ( grandpa->_right == node_->_parent ) )
+						rotate_right( node_ = node_->_parent );
+					node_->_parent->_color = HAbstractNode::BLACK;
+					node_->_parent->_parent->_color = HAbstractNode::RED;
+					if ( ( node_ == node_->_parent->_left )
+							&& ( node_->_parent == node_->_parent->_parent->_left ) )
+						rotate_right( node_->_parent->_parent );
 					else
 						{
-						M_ASSERT( ( a_poNode == a_poNode->f_poParent->f_poRight )
-								&& ( a_poNode->f_poParent == a_poNode->f_poParent->f_poParent->f_poRight ) );
-						rotate_left( a_poNode->f_poParent->f_poParent );
+						M_ASSERT( ( node_ == node_->_parent->_right )
+								&& ( node_->_parent == node_->_parent->_parent->_right ) );
+						rotate_left( node_->_parent->_parent );
 						}
 					}
 				}
 			}
 		else
-			a_poNode->f_eColor = HAbstractNode::BLACK;
+			node_->_color = HAbstractNode::BLACK;
 		break;
 		}
 	return;
 	M_EPILOG
 	}
 
-void HSBBSTree::rotate_left( HAbstractNode* a_poNode )
+void HSBBSTree::rotate_left( HAbstractNode* node_ )
 	{
 	/* 
 	 * At the beggining of left rotation:
-	 * a_poNode is parent node (center of the rotation)
-	 * a_poNode->f_poRight is child node (lets call it satelite)
+	 * node_ is parent node (center of the rotation)
+	 * node_->_right is child node (lets call it satelite)
 	 *
 	 * At the end of left rotation:
 	 * center of the rotation is left child
 	 * of its satelite
 	 */
-	HAbstractNode* l_poParent = a_poNode->f_poParent;
-	HAbstractNode* l_poNode = a_poNode->f_poRight;
-	if ( l_poParent )
+	HAbstractNode* parent = node_->_parent;
+	HAbstractNode* node = node_->_right;
+	if ( parent )
 		{
-		if ( l_poParent->f_poLeft == a_poNode )
-			l_poParent->f_poLeft = l_poNode;
+		if ( parent->_left == node_ )
+			parent->_left = node;
 		else
 			{
-			M_ASSERT( l_poParent->f_poRight == a_poNode );
-			l_poParent->f_poRight = l_poNode;
+			M_ASSERT( parent->_right == node_ );
+			parent->_right = node;
 			}
 		}
 	else
-		f_poRoot = l_poNode;
-	a_poNode->f_poParent = l_poNode;
-	a_poNode->f_poRight = l_poNode->f_poLeft;
-	if ( a_poNode->f_poRight )
-		a_poNode->f_poRight->f_poParent = a_poNode;
-	l_poNode->f_poLeft = a_poNode;
-	l_poNode->f_poParent = l_poParent;
+		_root = node;
+	node_->_parent = node;
+	node_->_right = node->_left;
+	if ( node_->_right )
+		node_->_right->_parent = node_;
+	node->_left = node_;
+	node->_parent = parent;
 	return;
 	}
 
-void HSBBSTree::rotate_right( HAbstractNode* a_poNode )
+void HSBBSTree::rotate_right( HAbstractNode* node_ )
 	{
-	HAbstractNode* l_poParent = a_poNode->f_poParent;
-	HAbstractNode* l_poNode = a_poNode->f_poLeft;
-	if ( l_poParent )
+	HAbstractNode* parent = node_->_parent;
+	HAbstractNode* node = node_->_left;
+	if ( parent )
 		{
-		if ( l_poParent->f_poRight == a_poNode )
-			l_poParent->f_poRight = l_poNode;
+		if ( parent->_right == node_ )
+			parent->_right = node;
 		else
 			{
-			M_ASSERT( l_poParent->f_poLeft == a_poNode );
-			l_poParent->f_poLeft = l_poNode;
+			M_ASSERT( parent->_left == node_ );
+			parent->_left = node;
 			}
 		}
 	else
-		f_poRoot = l_poNode;
-	a_poNode->f_poParent = l_poNode;
-	a_poNode->f_poLeft = l_poNode->f_poRight;
-	if ( a_poNode->f_poLeft )
-		a_poNode->f_poLeft->f_poParent = a_poNode;
-	l_poNode->f_poRight = a_poNode;
-	l_poNode->f_poParent = l_poParent;
+		_root = node;
+	node_->_parent = node;
+	node_->_left = node->_right;
+	if ( node_->_left )
+		node_->_left->_parent = node_;
+	node->_right = node_;
+	node->_parent = parent;
 	return;
 	}
 
-void HSBBSTree::remove( HIterator const& a_oIt )
+void HSBBSTree::remove( HIterator const& it_ )
 	{
-	if ( ! a_oIt.f_poCurrent )
-		M_THROW( n_ppcErrMsgHSBBSTree[ ERROR::NIL_ITERATOR ],
+	if ( ! it_._current )
+		M_THROW( _errMsgHSBBSTree_[ ERROR::NIL_ITERATOR ],
 				static_cast<int>( ERROR::NIL_ITERATOR ) );
-	remove_node( a_oIt.f_poCurrent );
+	remove_node( it_._current );
 	return;
 	}
 
-void HSBBSTree::remove_node( HAbstractNode* a_poNode )
+void HSBBSTree::remove_node( HAbstractNode* node_ )
 	{
-	if ( a_poNode->f_poLeft && a_poNode->f_poRight ) /* both children exists */
+	if ( node_->_left && node_->_right ) /* both children exists */
 		{
-		HAbstractNode* l_poNode = a_poNode->f_poLeft;
-		while ( l_poNode->f_poRight )
-			l_poNode = l_poNode->f_poRight;
-		swap( a_poNode, l_poNode );
+		HAbstractNode* node = node_->_left;
+		while ( node->_right )
+			node = node->_right;
+		swap( node_, node );
 		}
-	if ( a_poNode->f_poLeft )
+	if ( node_->_left )
 		{
-		M_ASSERT( ! a_poNode->f_poRight );
-		a_poNode->f_poLeft->f_poParent = a_poNode->f_poParent;
-		if ( a_poNode->f_poParent )
-			a_poNode->f_poParent->set_child( a_poNode, a_poNode->f_poLeft );
+		M_ASSERT( ! node_->_right );
+		node_->_left->_parent = node_->_parent;
+		if ( node_->_parent )
+			node_->_parent->set_child( node_, node_->_left );
 		else
 			{
-			M_ASSERT( f_poRoot == a_poNode );
-			f_poRoot = a_poNode->f_poLeft;
+			M_ASSERT( _root == node_ );
+			_root = node_->_left;
 			}
 		}
-	else if ( a_poNode->f_poRight )
+	else if ( node_->_right )
 		{
-		a_poNode->f_poRight->f_poParent = a_poNode->f_poParent;
-		if ( a_poNode->f_poParent )
-			a_poNode->f_poParent->set_child( a_poNode, a_poNode->f_poRight );
+		node_->_right->_parent = node_->_parent;
+		if ( node_->_parent )
+			node_->_parent->set_child( node_, node_->_right );
 		else
 			{
-			M_ASSERT( f_poRoot == a_poNode );
-			f_poRoot = a_poNode->f_poRight;
+			M_ASSERT( _root == node_ );
+			_root = node_->_right;
 			}
 		}
-	remove_rebalance( a_poNode );
-	if ( ( a_poNode->f_poParent )
-			&& ! ( a_poNode->f_poLeft || a_poNode->f_poRight ) )
-		a_poNode->f_poParent->set_child( a_poNode, NULL );
-	a_poNode->f_poLeft = a_poNode->f_poRight = NULL;
-	delete a_poNode;
-	f_lSize --;
-	if ( ! f_lSize )
-		f_poRoot = NULL;
-	M_ASSERT( ! ( f_poRoot && f_poRoot->f_poParent ) ); /* very tricky :^) */
+	remove_rebalance( node_ );
+	if ( ( node_->_parent )
+			&& ! ( node_->_left || node_->_right ) )
+		node_->_parent->set_child( node_, NULL );
+	node_->_left = node_->_right = NULL;
+	delete node_;
+	_size --;
+	if ( ! _size )
+		_root = NULL;
+	M_ASSERT( ! ( _root && _root->_parent ) ); /* very tricky :^) */
 	}
 
-void HSBBSTree::remove_rebalance( HAbstractNode* a_poNode )
+void HSBBSTree::remove_rebalance( HAbstractNode* node_ )
 	{
-	M_ASSERT( a_poNode );
-	HAbstractNode* l_poChild = a_poNode->f_poLeft ? a_poNode->f_poLeft : a_poNode->f_poRight;
-	M_ASSERT( ! l_poChild || ( a_poNode->f_poParent == l_poChild->f_poParent ) );
-	if ( a_poNode->f_eColor == HAbstractNode::BLACK )
+	M_ASSERT( node_ );
+	HAbstractNode* child = node_->_left ? node_->_left : node_->_right;
+	M_ASSERT( ! child || ( node_->_parent == child->_parent ) );
+	if ( node_->_color == HAbstractNode::BLACK )
 		{
-		if ( l_poChild && l_poChild->f_eColor == HAbstractNode::RED )
-			l_poChild->f_eColor = HAbstractNode::BLACK;
+		if ( child && child->_color == HAbstractNode::RED )
+			child->_color = HAbstractNode::BLACK;
 		else
 			{
-			if ( l_poChild )
-				a_poNode = l_poChild;
-			/* after this line a_poNode is a pivot of rebalancing
+			if ( child )
+				node_ = child;
+			/* after this line node_ is a pivot of rebalancing
 			 * no matter if it's child of removed node, or the node it self */
 			for ( int i = 0; ; ++i ) /* tail recursion may be easily changed to iteration */
 				{
-				if ( a_poNode->f_poParent == NULL )
-					f_poRoot->f_eColor = HAbstractNode::BLACK;
+				if ( node_->_parent == NULL )
+					_root->_color = HAbstractNode::BLACK;
 				else /* hard part starts here */
 					{
-					HAbstractNode* l_poSibling = sibling ( a_poNode );
-					if ( l_poSibling->f_eColor == HAbstractNode::RED )
+					HAbstractNode* sibling = get_sibling( node_ );
+					if ( sibling->_color == HAbstractNode::RED )
 						{
 						/* sibling must exists because all black nodes have siblings,
 						 * moreover if the sibling is red, we know for sure that parent
 						 * is black, due to rule that prevents two subsequent red nodes */
-						l_poSibling->f_eColor = HAbstractNode::BLACK;
-						a_poNode->f_poParent->f_eColor = HAbstractNode::RED;
-						if ( a_poNode == a_poNode->f_poParent->f_poLeft )
-							rotate_left( a_poNode->f_poParent );
+						sibling->_color = HAbstractNode::BLACK;
+						node_->_parent->_color = HAbstractNode::RED;
+						if ( node_ == node_->_parent->_left )
+							rotate_left( node_->_parent );
 						else
-							rotate_right( a_poNode->f_poParent );
-						l_poSibling = sibling( a_poNode );
+							rotate_right( node_->_parent );
+						sibling = get_sibling( node_ );
 						}
-					if ( ( a_poNode->f_poParent->f_eColor == HAbstractNode::BLACK )
-							&& ( l_poSibling->f_eColor == HAbstractNode::BLACK )
-							&& ( ! l_poSibling->f_poLeft || ( l_poSibling->f_poLeft->f_eColor == HAbstractNode::BLACK ) )
-							&& ( ! l_poSibling->f_poRight || ( l_poSibling->f_poRight->f_eColor == HAbstractNode::BLACK ) ) )
+					if ( ( node_->_parent->_color == HAbstractNode::BLACK )
+							&& ( sibling->_color == HAbstractNode::BLACK )
+							&& ( ! sibling->_left || ( sibling->_left->_color == HAbstractNode::BLACK ) )
+							&& ( ! sibling->_right || ( sibling->_right->_color == HAbstractNode::BLACK ) ) )
 						{
-						l_poSibling->f_eColor = HAbstractNode::RED;
-						a_poNode = a_poNode->f_poParent;
+						sibling->_color = HAbstractNode::RED;
+						node_ = node_->_parent;
 						continue;
 						}
-					else if ( ( a_poNode->f_poParent->f_eColor == HAbstractNode::RED )
-							&& ( l_poSibling->f_eColor == HAbstractNode::BLACK )
-							&& ( ! l_poSibling->f_poLeft || ( l_poSibling->f_poLeft->f_eColor == HAbstractNode::BLACK ) )
-							&& ( ! l_poSibling->f_poRight || ( l_poSibling->f_poRight->f_eColor == HAbstractNode::BLACK ) ) )
+					else if ( ( node_->_parent->_color == HAbstractNode::RED )
+							&& ( sibling->_color == HAbstractNode::BLACK )
+							&& ( ! sibling->_left || ( sibling->_left->_color == HAbstractNode::BLACK ) )
+							&& ( ! sibling->_right || ( sibling->_right->_color == HAbstractNode::BLACK ) ) )
 						{
-						a_poNode->f_poParent->f_eColor = HAbstractNode::BLACK;
-						l_poSibling->f_eColor = HAbstractNode::RED;
+						node_->_parent->_color = HAbstractNode::BLACK;
+						sibling->_color = HAbstractNode::RED;
 						}
 					else
 						{
-						if ( ( a_poNode == a_poNode->f_poParent->f_poLeft ) && ( l_poSibling->f_eColor == HAbstractNode::BLACK )
-								&& ( l_poSibling->f_poLeft && l_poSibling->f_poLeft->f_eColor == HAbstractNode::RED )
-								&& ( ! l_poSibling->f_poRight || ( l_poSibling->f_poRight->f_eColor == HAbstractNode::BLACK ) ) )
+						if ( ( node_ == node_->_parent->_left ) && ( sibling->_color == HAbstractNode::BLACK )
+								&& ( sibling->_left && sibling->_left->_color == HAbstractNode::RED )
+								&& ( ! sibling->_right || ( sibling->_right->_color == HAbstractNode::BLACK ) ) )
 							{
-							l_poSibling->f_eColor = HAbstractNode::RED;
-							l_poSibling->f_poLeft->f_eColor = HAbstractNode::BLACK;
-							rotate_right( l_poSibling );
-							l_poSibling = sibling( a_poNode );
+							sibling->_color = HAbstractNode::RED;
+							sibling->_left->_color = HAbstractNode::BLACK;
+							rotate_right( sibling );
+							sibling = get_sibling( node_ );
 							}
-						else if ( ( a_poNode == a_poNode->f_poParent->f_poRight ) && ( l_poSibling->f_eColor == HAbstractNode::BLACK )
-								&& ( l_poSibling->f_poRight && l_poSibling->f_poRight->f_eColor == HAbstractNode::RED )
-								&& ( ! l_poSibling->f_poLeft || ( l_poSibling->f_poLeft->f_eColor == HAbstractNode::BLACK ) ) )
+						else if ( ( node_ == node_->_parent->_right ) && ( sibling->_color == HAbstractNode::BLACK )
+								&& ( sibling->_right && sibling->_right->_color == HAbstractNode::RED )
+								&& ( ! sibling->_left || ( sibling->_left->_color == HAbstractNode::BLACK ) ) )
 							{
-							l_poSibling->f_eColor = HAbstractNode::RED;
-							l_poSibling->f_poRight->f_eColor = HAbstractNode::BLACK;
-							rotate_left( l_poSibling );
-							l_poSibling = sibling( a_poNode );
+							sibling->_color = HAbstractNode::RED;
+							sibling->_right->_color = HAbstractNode::BLACK;
+							rotate_left( sibling );
+							sibling = get_sibling( node_ );
 							}
-						l_poSibling->f_eColor = a_poNode->f_poParent->f_eColor;
-						a_poNode->f_poParent->f_eColor = HAbstractNode::BLACK;
-						if ( a_poNode == a_poNode->f_poParent->f_poLeft )
+						sibling->_color = node_->_parent->_color;
+						node_->_parent->_color = HAbstractNode::BLACK;
+						if ( node_ == node_->_parent->_left )
 							{
-							M_ASSERT( l_poSibling->f_poRight->f_eColor == HAbstractNode::RED );
-							l_poSibling->f_poRight->f_eColor = HAbstractNode::BLACK;
-							rotate_left( a_poNode->f_poParent );
+							M_ASSERT( sibling->_right->_color == HAbstractNode::RED );
+							sibling->_right->_color = HAbstractNode::BLACK;
+							rotate_left( node_->_parent );
 							}
 						else
 							{
-							M_ASSERT( l_poSibling->f_poLeft->f_eColor == HAbstractNode::RED );
-							l_poSibling->f_poLeft->f_eColor = HAbstractNode::BLACK;
-							rotate_right( a_poNode->f_poParent );
+							M_ASSERT( sibling->_left->_color == HAbstractNode::RED );
+							sibling->_left->_color = HAbstractNode::BLACK;
+							rotate_right( node_->_parent );
 							}
 						}
 					}
@@ -458,12 +458,12 @@ void HSBBSTree::remove_rebalance( HAbstractNode* a_poNode )
 
 int long HSBBSTree::get_size( void ) const
 	{
-	return ( f_lSize );
+	return ( _size );
 	}
 
 bool HSBBSTree::is_empty( void ) const
 	{
-	return ( ! f_poRoot );
+	return ( ! _root );
 	}
 
 void HSBBSTree::swap( HSBBSTree& other )
@@ -471,18 +471,18 @@ void HSBBSTree::swap( HSBBSTree& other )
 	if ( &other != this )
 		{
 		using yaal::swap;
-		swap( f_lSize, other.f_lSize );
-		swap( f_poRoot, other.f_poRoot );
+		swap( _size, other._size );
+		swap( _root, other._root );
 		}
 	return;
 	}
 
 HSBBSTree::HIterator HSBBSTree::begin( void ) const
 	{
-	HAbstractNode* l_poNode = f_poRoot;
-	while ( l_poNode && l_poNode->f_poLeft )
-		l_poNode = l_poNode->f_poLeft;
-	return ( HIterator ( l_poNode ) );
+	HAbstractNode* node = _root;
+	while ( node && node->_left )
+		node = node->_left;
+	return ( HIterator ( node ) );
 	}
 
 HSBBSTree::HIterator HSBBSTree::end( void ) const
@@ -492,10 +492,10 @@ HSBBSTree::HIterator HSBBSTree::end( void ) const
 
 HSBBSTree::HIterator HSBBSTree::rbegin( void ) const
 	{
-	HAbstractNode* l_poNode = f_poRoot;
-	while ( l_poNode && l_poNode->f_poRight )
-		l_poNode = l_poNode->f_poRight;
-	return ( HIterator ( l_poNode ) );
+	HAbstractNode* node = _root;
+	while ( node && node->_right )
+		node = node->_right;
+	return ( HIterator ( node ) );
 	}
 
 HSBBSTree::HIterator HSBBSTree::rend( void ) const
@@ -503,102 +503,102 @@ HSBBSTree::HIterator HSBBSTree::rend( void ) const
 	return ( HIterator ( NULL ) );
 	}
 
-void HSBBSTree::swap( HAbstractNode* a_poFirst, HAbstractNode* a_poSecond )
+void HSBBSTree::swap( HAbstractNode* first_, HAbstractNode* second_ )
 	{
-	M_ASSERT( a_poFirst && a_poSecond );
-	M_ASSERT( a_poFirst != a_poSecond );
-	if ( a_poFirst == f_poRoot )
-		f_poRoot = a_poSecond;
-	else if ( a_poSecond == f_poRoot )
-		f_poRoot = a_poFirst;
-	HAbstractNode* l_poFirstParent = a_poFirst->f_poParent;
-	HAbstractNode* l_poFirstLeft = a_poFirst->f_poLeft;
-	HAbstractNode* l_poFirstRight = a_poFirst->f_poRight;
-	HAbstractNode* l_poSecondParent = a_poSecond->f_poParent;
-	HAbstractNode* l_poSecondLeft = a_poSecond->f_poLeft;
-	HAbstractNode* l_poSecondRight = a_poSecond->f_poRight;
-	if ( l_poFirstParent == l_poSecondParent ) /* siblings */
+	M_ASSERT( first_ && second_ );
+	M_ASSERT( first_ != second_ );
+	if ( first_ == _root )
+		_root = second_;
+	else if ( second_ == _root )
+		_root = first_;
+	HAbstractNode* firstParent = first_->_parent;
+	HAbstractNode* firstLeft = first_->_left;
+	HAbstractNode* firstRight = first_->_right;
+	HAbstractNode* secondParent = second_->_parent;
+	HAbstractNode* secondLeft = second_->_left;
+	HAbstractNode* secondRight = second_->_right;
+	if ( firstParent == secondParent ) /* siblings */
 		{
-		M_ASSERT( l_poFirstParent );
-		if ( a_poFirst == l_poFirstParent->f_poLeft )
+		M_ASSERT( firstParent );
+		if ( first_ == firstParent->_left )
 			{
-			l_poFirstParent->f_poLeft = a_poSecond;
-			l_poFirstParent->f_poRight = a_poFirst;
+			firstParent->_left = second_;
+			firstParent->_right = first_;
 			}
 		else
 			{
-			M_ASSERT( a_poFirst == l_poFirstParent->f_poRight );
-			l_poFirstParent->f_poLeft = a_poFirst;
-			l_poFirstParent->f_poRight = a_poSecond;
+			M_ASSERT( first_ == firstParent->_right );
+			firstParent->_left = first_;
+			firstParent->_right = second_;
 			}
 		}
 	else /* not siblings */
 		{
-		if ( l_poFirstParent )
+		if ( firstParent )
 			{
-			if ( a_poFirst == l_poFirstParent->f_poLeft )
-				l_poFirstParent->f_poLeft = a_poSecond;
+			if ( first_ == firstParent->_left )
+				firstParent->_left = second_;
 			else
 				{
-				M_ASSERT( a_poFirst == l_poFirstParent->f_poRight );
-				l_poFirstParent->f_poRight = a_poSecond;
+				M_ASSERT( first_ == firstParent->_right );
+				firstParent->_right = second_;
 				}
 			}
-		if ( l_poSecondParent )
+		if ( secondParent )
 			{
-			if ( a_poSecond == l_poSecondParent->f_poLeft )
-				l_poSecondParent->f_poLeft = a_poFirst;
+			if ( second_ == secondParent->_left )
+				secondParent->_left = first_;
 			else
 				{
-				M_ASSERT( a_poSecond == l_poSecondParent->f_poRight );
-				l_poSecondParent->f_poRight = a_poFirst;
+				M_ASSERT( second_ == secondParent->_right );
+				secondParent->_right = first_;
 				}
 			}
 		}
-	if ( l_poFirstLeft )
-		l_poFirstLeft->f_poParent = a_poSecond;
-	if ( l_poFirstRight )
-		l_poFirstRight->f_poParent = a_poSecond;
-	if ( l_poSecondLeft )
-		l_poSecondLeft->f_poParent = a_poFirst;
-	if ( l_poSecondRight )
-		l_poSecondRight->f_poParent = a_poFirst;
-	if ( l_poSecondParent != a_poFirst )
-		a_poFirst->f_poParent = l_poSecondParent;
+	if ( firstLeft )
+		firstLeft->_parent = second_;
+	if ( firstRight )
+		firstRight->_parent = second_;
+	if ( secondLeft )
+		secondLeft->_parent = first_;
+	if ( secondRight )
+		secondRight->_parent = first_;
+	if ( secondParent != first_ )
+		first_->_parent = secondParent;
 	else
-		a_poFirst->f_poParent = a_poSecond;
-	if ( l_poSecondLeft != a_poFirst )
-		a_poFirst->f_poLeft = l_poSecondLeft;
+		first_->_parent = second_;
+	if ( secondLeft != first_ )
+		first_->_left = secondLeft;
 	else
-		a_poFirst->f_poLeft = a_poSecond;
-	if ( l_poSecondRight != a_poFirst )
-		a_poFirst->f_poRight = l_poSecondRight;
+		first_->_left = second_;
+	if ( secondRight != first_ )
+		first_->_right = secondRight;
 	else
-		a_poFirst->f_poRight = a_poSecond;
-	if ( l_poFirstParent != a_poSecond )
-		a_poSecond->f_poParent = l_poFirstParent;
+		first_->_right = second_;
+	if ( firstParent != second_ )
+		second_->_parent = firstParent;
 	else
-		a_poSecond->f_poParent = a_poFirst;
-	if ( l_poFirstLeft != a_poSecond )
-		a_poSecond->f_poLeft = l_poFirstLeft;
+		second_->_parent = first_;
+	if ( firstLeft != second_ )
+		second_->_left = firstLeft;
 	else
-		a_poSecond->f_poLeft = a_poFirst;
-	if ( l_poFirstRight != a_poSecond )
-		a_poSecond->f_poRight = l_poFirstRight;
+		second_->_left = first_;
+	if ( firstRight != second_ )
+		second_->_right = firstRight;
 	else
-		a_poSecond->f_poRight = a_poFirst;
-	HAbstractNode::color_t l_eColor = a_poFirst->f_eColor;
-	a_poFirst->f_eColor = a_poSecond->f_eColor;
-	a_poSecond->f_eColor = l_eColor;
+		second_->_right = first_;
+	HAbstractNode::color_t color = first_->_color;
+	first_->_color = second_->_color;
+	second_->_color = color;
 	return;
 	}
 
-HSBBSTree::HAbstractNode* HSBBSTree::sibling( HAbstractNode* a_poNode ) const
+HSBBSTree::HAbstractNode* HSBBSTree::get_sibling( HAbstractNode* node_ ) const
 	{
-	if ( a_poNode->f_poParent->f_poLeft == a_poNode )
-		return ( a_poNode->f_poParent->f_poRight );
-	M_ASSERT( a_poNode->f_poParent->f_poRight == a_poNode );
-	return ( a_poNode->f_poParent->f_poLeft );
+	if ( node_->_parent->_left == node_ )
+		return ( node_->_parent->_right );
+	M_ASSERT( node_->_parent->_right == node_ );
+	return ( node_->_parent->_left );
 	}
 
 }

@@ -55,17 +55,17 @@ public:
 	typedef HArray<flag_desc_t> pluggable_flags_t;
 private:
 	typedef HPattern self_t;
-	bool		f_bInitialized;				/*!< is pattern initialized */
-	bool		f_bIgnoreCaseDefault;	/*!< default value for ignore case switch */
-	bool		f_bIgnoreCase;				/*!< self explanary */
-	bool		f_bExtended;					/*!< simple strstr or extended RE */
-	int			f_iSimpleMatchLength;	/*!< length of simple strstr pattern */
-	HChunk	f_oCompiled;					/*!< compiled regular expression for
+	bool		_initialized;				/*!< is pattern initialized */
+	bool		_ignoreCaseDefault;	/*!< default value for ignore case switch */
+	bool		_ignoreCase;				/*!< self explanary */
+	bool		_extended;					/*!< simple strstr or extended RE */
+	int			_simpleMatchLength;	/*!< length of simple strstr pattern */
+	HChunk	_compiled;					/*!< compiled regular expression for
 																	 search patterns */
-	HString	f_oPatternInput;			/*!< current search pattern */
-	HString	f_oPatternReal;				/*!< pattern with stripped switches */
-	mutable int f_iLastError;
-	mutable HString f_oVarTmpBuffer;	/*!< error message of last operation */
+	HString	_patternInput;			/*!< current search pattern */
+	HString	_patternReal;				/*!< pattern with stripped switches */
+	mutable int _lastError;
+	mutable HString _varTmpBuffer;	/*!< error message of last operation */
 public:
 	/*! \brief Construct pattern.
 	 *

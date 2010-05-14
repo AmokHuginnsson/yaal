@@ -73,21 +73,21 @@ public:
 	typedef HPair<type_t, int long> elem_t;
 	typedef HIterator iterator;
 private:
-	HSBBSTree f_oEngine;
+	HSBBSTree _engine;
 public:
-	HMultiSet( void ) : f_oEngine() {}
+	HMultiSet( void ) : _engine() {}
 	template<typename iterator_t>
-	HMultiSet( iterator_t first, iterator_t last ) : f_oEngine()
+	HMultiSet( iterator_t first, iterator_t last ) : _engine()
 		{
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 		}
-	HMultiSet( HMultiSet const& source ) : f_oEngine()
+	HMultiSet( HMultiSet const& source ) : _engine()
 		{
 		M_PROLOG
-		f_oEngine.copy_from<value_type, helper_t>( source.f_oEngine );
+		_engine.copy_from<value_type, helper_t>( source._engine );
 		return;
 		M_EPILOG
 		}
@@ -105,15 +105,15 @@ public:
 	int long size( void ) const
 		{ return ( get_size() ); }
 	int long get_size( void ) const
-		{ return ( f_oEngine.get_size() );	}
+		{ return ( _engine.get_size() );	}
 	bool empty( void ) const
 		{ return ( is_empty() );	}
 	bool is_empty( void ) const
-		{ return ( f_oEngine.is_empty() );	}
+		{ return ( _engine.is_empty() );	}
 	HIterator insert( value_type const& elem )
 		{
 		M_PROLOG
-		HPair<HSBBSTree::HIterator, bool> p = f_oEngine.insert<elem_t, helper_t>( make_pair( elem, 1 ) );
+		HPair<HSBBSTree::HIterator, bool> p = _engine.insert<elem_t, helper_t>( make_pair( elem, 1 ) );
 		if ( ! p.second )
 			++ p.first.operator*<elem_t>().second;
 		return ( HIterator( p.first ) );
@@ -132,7 +132,7 @@ public:
 		{
 		M_PROLOG
 		HIterator it( find( elem ) );
-		return ( it != end() ? it.f_oEngine.template operator*<elem_t>().second : 0 );
+		return ( it != end() ? it._engine.template operator*<elem_t>().second : 0 );
 		M_EPILOG
 		}
 	int long erase( value_type const& elem )
@@ -142,8 +142,8 @@ public:
 		int long erased( 0 );
 		if ( it != end() )
 			{
-			erased = it.f_oEngine.template operator*<elem_t>().second;
-			f_oEngine.remove( it.f_oEngine );
+			erased = it._engine.template operator*<elem_t>().second;
+			_engine.remove( it._engine );
 			}
 		return ( erased );
 		M_EPILOG
@@ -153,28 +153,28 @@ public:
 		M_PROLOG
 		HIterator newIt( it );
 		++ newIt;
-		f_oEngine.remove( it.f_oEngine );
+		_engine.remove( it._engine );
 		return ( newIt );
 		M_EPILOG
 		}
 	HIterator find( value_type const& e ) const
-		{ return ( HIterator( f_oEngine.find<value_type, value_type, helper_t>( e ) ) ); }
+		{ return ( HIterator( _engine.find<value_type, value_type, helper_t>( e ) ) ); }
 	HIterator begin( void ) const
-		{ return ( HIterator( f_oEngine.begin() ) ); }
+		{ return ( HIterator( _engine.begin() ) ); }
 	HIterator end( void ) const
-		{ return ( HIterator( f_oEngine.end() ) ); }
+		{ return ( HIterator( _engine.end() ) ); }
 	HIterator rbegin( void ) const
-		{ return ( HIterator( f_oEngine.rbegin() ) ); }
+		{ return ( HIterator( _engine.rbegin() ) ); }
 	HIterator rend( void ) const
-		{ return ( HIterator( f_oEngine.rend() ) ); }
+		{ return ( HIterator( _engine.rend() ) ); }
 	void clear( void )
-		{ f_oEngine.clear(); }
+		{ _engine.clear(); }
 	void swap( HMultiSet<value_type, helper_t>& other )
 		{
 		if ( &other != this )
 			{
 			using yaal::swap;
-			f_oEngine.swap( other.f_oEngine );
+			_engine.swap( other._engine );
 			}
 		}
 	};
@@ -185,49 +185,49 @@ template<typename value_type, typename helper_t = multiset_helper<value_type> >
 class HMultiSet<value_type, helper_t>::HIterator
 	{
 	typedef HPair<value_type, int long> elem_t;
-	HSBBSTree::HIterator f_oEngine;
+	HSBBSTree::HIterator _engine;
 public:
-	HIterator( void ) : f_oEngine() {}
-	HIterator( HIterator const& a_oIt ) : f_oEngine( a_oIt.f_oEngine ) {}
-	HIterator& operator= ( HIterator const& a_oIt )
+	HIterator( void ) : _engine() {}
+	HIterator( HIterator const& it_ ) : _engine( it_._engine ) {}
+	HIterator& operator= ( HIterator const& it_ )
 		{
-		if ( &a_oIt != this )
-			f_oEngine = a_oIt.f_oEngine;
+		if ( &it_ != this )
+			_engine = it_._engine;
 		return ( *this );
 		}
 	HIterator& operator ++ ( void )
 		{
-		++ f_oEngine;
+		++ _engine;
 		return ( *this );
 		}
 	HIterator const operator ++ ( int )
 		{
-		HIterator it( f_oEngine );
-		++ f_oEngine;
+		HIterator it( _engine );
+		++ _engine;
 		return ( it );
 		}
 	HIterator& operator -- ( void )
 		{
-		-- f_oEngine;
+		-- _engine;
 		return ( *this );
 		}
 	HIterator const operator -- ( int )
 		{
-		HIterator it( f_oEngine );
-		-- f_oEngine;
+		HIterator it( _engine );
+		-- _engine;
 		return ( it );
 		}
 	value_type const& operator * ( void )
-		{	return ( f_oEngine.operator*<elem_t>().first );	}
+		{	return ( _engine.operator*<elem_t>().first );	}
 	value_type const* operator -> ( void )
-		{ return ( &f_oEngine.operator*<elem_t>().first );	}
+		{ return ( &_engine.operator*<elem_t>().first );	}
 	bool operator == ( HIterator const& it ) const
-		{ return ( f_oEngine == it.f_oEngine ); }
+		{ return ( _engine == it._engine ); }
 	bool operator != ( HIterator const& it ) const
-		{ return ( f_oEngine != it.f_oEngine ); }
+		{ return ( _engine != it._engine ); }
 private:
 	friend class HMultiSet<value_type, helper_t>;
-	explicit HIterator( HSBBSTree::HIterator const& it ) : f_oEngine( it ) {};
+	explicit HIterator( HSBBSTree::HIterator const& it ) : _engine( it ) {};
 	};
 
 }

@@ -49,59 +49,59 @@ namespace hcore
 
 void* HException::ERROR_STREAM = stderr;
 
-char const* const n_pcExceptionType = _( "Exception type" );
+char const* const _exceptionType_ = _( "Exception type" );
 
-HException::HException( char const* const a_pcFileName,
-		char const* const a_pcFunctionName,
-		int const a_iLine, char const* const a_pcMessage,
-		int const a_iCode )
-	: f_bLocal( false ), f_cChar( 0 ), f_iInt( 0 ), f_lLong( 0 ),
-	f_dDouble( 0 ), f_pcCharPtr( NULL ), f_pvVoidPtr( NULL ), f_iFrame( 0 ),
-	f_pcFileName( NULL ), f_pcFunctionName( NULL ),
-	f_iCode( a_iCode ), f_pcMessage( NULL )
+HException::HException( char const* const fileName_,
+		char const* const functionName_,
+		int const line_, char const* const message_,
+		int const code_ )
+	: _local( false ), _char( 0 ), _int( 0 ), _long( 0 ),
+	_double( 0 ), _charPtr( NULL ), _voidPtr( NULL ), _frame( 0 ),
+	_fileName( NULL ), _functionName( NULL ),
+	_code( code_ ), _message( NULL )
 	{
-	f_pcMessage = xstrdup( a_pcMessage );
-	f_pcFileName = xstrdup( a_pcFileName );
-	f_pcFunctionName = xstrdup( a_pcFunctionName );
-	hcore::log << "Exception: " << f_pcMessage << ", code: " << f_iCode;
+	_message = xstrdup( message_ );
+	_fileName = xstrdup( fileName_ );
+	_functionName = xstrdup( functionName_ );
+	hcore::log << "Exception: " << _message << ", code: " << _code;
 	hcore::log << '.' << endl;
-	log( a_pcFileName, a_pcFunctionName, a_iLine );
+	log( fileName_, functionName_, line_ );
 	return;
 	}
 
-HException::HException( char const* const a_pcFileName,
-		char const* const a_pcFunctionName,
-		int const a_iLine, HString const& a_oMessage,
-		int const a_iCode )
-	: f_bLocal( false ), f_cChar( 0 ), f_iInt( 0 ), f_lLong( 0 ),
-	f_dDouble( 0 ), f_pcCharPtr( NULL ), f_pvVoidPtr( NULL ), f_iFrame( 0 ),
-	f_pcFileName( NULL ), f_pcFunctionName( NULL ),
-	f_iCode( a_iCode ), f_pcMessage( NULL )
+HException::HException( char const* const fileName_,
+		char const* const functionName_,
+		int const line_, HString const& message_,
+		int const code_ )
+	: _local( false ), _char( 0 ), _int( 0 ), _long( 0 ),
+	_double( 0 ), _charPtr( NULL ), _voidPtr( NULL ), _frame( 0 ),
+	_fileName( NULL ), _functionName( NULL ),
+	_code( code_ ), _message( NULL )
 	{
-	f_pcMessage = xstrdup( a_oMessage.raw() );
-	f_pcFileName = xstrdup( a_pcFileName );
-	f_pcFunctionName = xstrdup( a_pcFunctionName );
-	hcore::log << "Exception: " << f_pcMessage << ", code: " << f_iCode;
+	_message = xstrdup( message_.raw() );
+	_fileName = xstrdup( fileName_ );
+	_functionName = xstrdup( functionName_ );
+	hcore::log << "Exception: " << _message << ", code: " << _code;
 	hcore::log << '.' << endl;
-	log( a_pcFileName, a_pcFunctionName, a_iLine );
+	log( fileName_, functionName_, line_ );
 	return;
 	}
 
-HException::HException( HException const& a_roException )
-	: f_bLocal( false ), f_cChar( a_roException.f_cChar ),
-	f_iInt( a_roException.f_iInt ), f_lLong( a_roException.f_lLong ),
-	f_dDouble( a_roException.f_dDouble ), f_pcCharPtr( NULL ),
-	f_pvVoidPtr( a_roException.f_pvVoidPtr ),
-	f_iFrame( a_roException.f_iFrame ), f_pcFileName( NULL ),
-	f_pcFunctionName( NULL ), f_iCode( a_roException.f_iCode ),
-	f_pcMessage( NULL )
+HException::HException( HException const& exception_ )
+	: _local( false ), _char( exception_._char ),
+	_int( exception_._int ), _long( exception_._long ),
+	_double( exception_._double ), _charPtr( NULL ),
+	_voidPtr( exception_._voidPtr ),
+	_frame( exception_._frame ), _fileName( NULL ),
+	_functionName( NULL ), _code( exception_._code ),
+	_message( NULL )
 	{
-	if ( a_roException.f_pcCharPtr )
-		f_pcCharPtr = xstrdup( a_roException.f_pcCharPtr );
-	f_pcMessage = xstrdup( a_roException.f_pcMessage );
-	f_pcFileName = xstrdup( a_roException.f_pcFileName );
-	f_pcFunctionName = xstrdup( a_roException.f_pcFunctionName );
-	a_roException.f_bLocal = true;
+	if ( exception_._charPtr )
+		_charPtr = xstrdup( exception_._charPtr );
+	_message = xstrdup( exception_._message );
+	_fileName = xstrdup( exception_._fileName );
+	_functionName = xstrdup( exception_._functionName );
+	exception_._local = true;
 	return;
 	}
 
@@ -109,14 +109,14 @@ HException::~HException( void )
 	{
 	try
 		{
-		if ( ! f_bLocal )
+		if ( ! _local )
 			{
 			HString regs;
 			regs.format(
 					"Exception registers: c:0x%02x i:%d l:%ld d:%f pv:0x%lx pc:%s\n",
-					f_cChar, f_iInt, f_lLong, f_dDouble,
-					reinterpret_cast<int long>( f_pvVoidPtr ),
-					f_pcCharPtr ? f_pcCharPtr : "(null)" );
+					_char, _int, _long, _double,
+					reinterpret_cast<int long>( _voidPtr ),
+					_charPtr ? _charPtr : "(null)" );
 			hcore::log << regs << endl;
 			}
 		}
@@ -125,128 +125,128 @@ HException::~HException( void )
 		::fprintf( static_cast<FILE*>( ERROR_STREAM ), _( "CRITICAL FAILURE (~HException) !\n" ) );
 		::exit( -1 );
 		}
-	if ( f_pcCharPtr )
-		xfree( f_pcCharPtr );
-	if ( f_pcFunctionName )
-		xfree( f_pcFunctionName );
-	if ( f_pcFileName )
-		xfree( f_pcFileName );
-	if ( f_pcMessage )
-		xfree( f_pcMessage );
+	if ( _charPtr )
+		xfree( _charPtr );
+	if ( _functionName )
+		xfree( _functionName );
+	if ( _fileName )
+		xfree( _fileName );
+	if ( _message )
+		xfree( _message );
 	return;
 	}
 
-void HException::set( char const a_cChar, int const a_iInt,
-		long const a_lLong, double const a_dDouble, char const* const a_pcStr,
-		void* const a_pvVoidPtr )
+void HException::set( char const char_, int const int_,
+		long const long_, double const double_, char const* const str_,
+		void* const voidPtr_ )
 	{
-	f_cChar = a_cChar;
-	f_iInt = a_iInt;
-	f_lLong = a_lLong;
-	f_dDouble = a_dDouble;
-	if ( f_pcCharPtr )
-		xfree( f_pcCharPtr );
-	if ( a_pcStr )
-		f_pcCharPtr = xstrdup( a_pcStr );
-	f_pvVoidPtr = a_pvVoidPtr;
+	_char = char_;
+	_int = int_;
+	_long = long_;
+	_double = double_;
+	if ( _charPtr )
+		xfree( _charPtr );
+	if ( str_ )
+		_charPtr = xstrdup( str_ );
+	_voidPtr = voidPtr_;
 	return;
 	}
 
-void HException::set( char const* const a_pcStr )
+void HException::set( char const* const str_ )
 	{
-	if ( f_pcCharPtr )
-		xfree( f_pcCharPtr );
-	if ( a_pcStr )
-		f_pcCharPtr = xstrdup( a_pcStr );
+	if ( _charPtr )
+		xfree( _charPtr );
+	if ( str_ )
+		_charPtr = xstrdup( str_ );
 	return;
 	}
 
-void HException::set( HString const& a_oStr )
+void HException::set( HString const& str_ )
 	{
-	if ( f_pcCharPtr )
-		xfree( f_pcCharPtr );
-	if ( ! a_oStr.is_empty() )
-		f_pcCharPtr = xstrdup( a_oStr.raw() );
+	if ( _charPtr )
+		xfree( _charPtr );
+	if ( ! str_.is_empty() )
+		_charPtr = xstrdup( str_.raw() );
 	return;
 	}
 
-void HException::print_error( bool const a_bFull ) const
+void HException::print_error( bool const full_ ) const
 	{
-	fprintf( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", f_pcMessage, f_iCode );
-	if ( a_bFull )
+	fprintf( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", _message, _code );
+	if ( full_ )
 		fprintf( static_cast<FILE*>( ERROR_STREAM ),
 				"Exception registers:\nc:0x%02x\ti:%d\tl:%ld\td:%f\tpv:0x%lx\npc:%s\n",
-				f_cChar, f_iInt, f_lLong, f_dDouble,
-				reinterpret_cast<int long>( f_pvVoidPtr ),
-				f_pcCharPtr ? f_pcCharPtr : "(null)" );
+				_char, _int, _long, _double,
+				reinterpret_cast<int long>( _voidPtr ),
+				_charPtr ? _charPtr : "(null)" );
 	return;
 	}
 
-void HException::log( char const* const a_pcFileName,
-											 char const* const a_pcFunctionName, int const a_iLine )
+void HException::log( char const* const fileName_,
+											 char const* const functionName_, int const line_ )
 	{
-	size_t l_uiLength = ::strlen( a_pcFileName );
-	if ( f_iFrame
-			&& ! ( ::strcmp( f_pcFileName, a_pcFileName )
-				|| ::strcmp( f_pcFunctionName, a_pcFunctionName ) ) )
+	size_t length = ::strlen( fileName_ );
+	if ( _frame
+			&& ! ( ::strcmp( _fileName, fileName_ )
+				|| ::strcmp( _functionName, functionName_ ) ) )
 		return;
 	HString frame;
 	frame.format(
-				"Exception frame %2d: %16s : %4d : %s\n", f_iFrame,
-				a_pcFileName + ( l_uiLength > 16 ? l_uiLength - 16 : 0 ),
-				a_iLine, a_pcFunctionName );
-	if ( n_iDebugLevel >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK )
+				"Exception frame %2d: %16s : %4d : %s\n", _frame,
+				fileName_ + ( length > 16 ? length - 16 : 0 ),
+				line_, functionName_ );
+	if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK )
 		fprintf( static_cast<FILE*>( ERROR_STREAM ), "%s", frame.raw() );
 	hcore::log << frame;
-	++ f_iFrame;
+	++ _frame;
 	return;
 	}
 
 char const* HException::what( void ) const
 	{
-	return ( f_pcMessage );
+	return ( _message );
 	}
 
 int HException::code( void ) const
 	{
-	return ( f_iCode );
+	return ( _code );
 	}
 
-void HException::failed_assert( char const* const a_pcFileName,
-		char const* const a_pcFunctionName, int const a_iLine,
-		char const* const a_pcMessage )
+void HException::failed_assert( char const* const fileName_,
+		char const* const functionName_, int const line_,
+		char const* const message_ )
 	{
 	M_PROLOG
-	hcore::log << "Failed assertion: " << a_pcMessage << " -> " << a_pcFileName << "(" << a_iLine << "): " << a_pcFunctionName << endl;
+	hcore::log << "Failed assertion: " << message_ << " -> " << fileName_ << "(" << line_ << "): " << functionName_ << endl;
 	fprintf( static_cast<FILE*>( ERROR_STREAM ), "Failed assertion: `%s' at: %s: %4d: %s\n",
-			a_pcMessage, a_pcFileName, a_iLine, a_pcFunctionName );
+			message_, fileName_, line_, functionName_ );
 	if ( ! errno )
 		++ errno;
-	if ( n_iDebugLevel >= DEBUG_LEVEL::ABORT_ON_ASSERT )
+	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
 		::abort();
-	throw ( HFailedAssertion( a_pcMessage ) );
+	throw ( HFailedAssertion( message_ ) );
 	M_EPILOG
 	}
 
-void HException::set_error_stream( void* a_pvErrorStream )
+void HException::set_error_stream( void* errorStream_ )
 	{
 	M_PROLOG
-	M_ASSERT( a_pvErrorStream );
-	ERROR_STREAM = a_pvErrorStream;
+	M_ASSERT( errorStream_ );
+	ERROR_STREAM = errorStream_;
 	return;
 	M_EPILOG
 	}
 
-char* HException::get_type_name( char const* const a_pcName )
+char* HException::get_type_name( char const* const name_ )
 	{
 	int status = 0;
-	return ( abi::__cxa_demangle( a_pcName, 0, 0, &status ) );
+	return ( abi::__cxa_demangle( name_, 0, 0, &status ) );
 	}
 
-void HException::cleanup( char* a_pcPtr )
+void HException::cleanup( char* ptr_ )
 	{
-	if ( a_pcPtr )
-		xfree( a_pcPtr );
+	if ( ptr_ )
+		xfree( ptr_ );
 	return;
 	}
 
@@ -254,7 +254,7 @@ void HFailedAssertion::swap( HFailedAssertion& other )
 	{
 	using yaal::swap;
 	if ( &other != this )
-		swap( f_pcWhat, other.f_pcWhat );
+		swap( _what, other._what );
 	return;
 	}
 

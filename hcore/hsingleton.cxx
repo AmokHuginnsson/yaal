@@ -38,13 +38,13 @@ namespace hcore
 {
 
 HLifeTimeTracker::HLifeTimeTracker( void )
-	: f_oMutex(), f_oDestructors()
+	: _mutex(), _destructors()
 	{
 	}
 
 HLifeTimeTracker::~HLifeTimeTracker( void )
 	{
-	M_ASSERT( f_oDestructors.size() == 0 );
+	M_ASSERT( _destructors.size() == 0 );
 	}
 
 HLifeTimeTracker& HLifeTimeTracker::get_instance( void )
@@ -53,20 +53,20 @@ HLifeTimeTracker& HLifeTimeTracker::get_instance( void )
 	return ( lifeTimeTracker );
 	}
 
-int HSingletonInterface::life_time( int a_iLifeTime )
+int HSingletonInterface::life_time( int lifeTime_ )
 	{
-	return ( a_iLifeTime );
+	return ( lifeTime_ );
 	}
 
 void HLifeTimeTracker::do_destruct( void )
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	map_stack_t::iterator it = f_oDestructors.begin();
-	M_ASSERT( it != f_oDestructors.end() );
+	HLock lock( _mutex );
+	map_stack_t::iterator it = _destructors.begin();
+	M_ASSERT( it != _destructors.end() );
 	destructor_ptr_t destructor = (*it).second;
 	M_ASSERT( !! destructor );
-	f_oDestructors.erase( it );
+	_destructors.erase( it );
 	destructor->destruct();
 	return;
 	M_EPILOG
@@ -99,11 +99,11 @@ inline int safe_atexit( cxa_handle_t cxa_handle )
 	}
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
 
-void HLifeTimeTracker::register_destructor( destructor_ptr_t a_oDestructor, int const& a_iLifeTime )
+void HLifeTimeTracker::register_destructor( destructor_ptr_t destructor_, int const& lifeTime_ )
 	{
 	M_PROLOG
-	HLock l_oLock( f_oMutex );
-	f_oDestructors.push_back( a_iLifeTime, a_oDestructor );
+	HLock lock( _mutex );
+	_destructors.push_back( lifeTime_, destructor_ );
 #if ! defined( __HOST_OS_TYPE_FREEBSD__ )
 	M_ENSURE( atexit( HLifeTimeTracker::destruct ) == 0 );
 #else /* not __HOST_OS_TYPE_FREEBSD__ */

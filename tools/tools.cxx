@@ -69,87 +69,87 @@ extern my_strtold_t my_strtold;
 namespace tools
 {
 
-HString n_oSerialDevice;
-HString n_oDefaultEncoding = "ISO-8859-2";
-HSerial::speed_t n_eBaudRate = HSerial::SPEED::B_115200;
-HSerial::flag_t n_eSerialFlags = HSerial::flag_t( HSerial::FLAG::FLOW_CONTROL_HARDWARE ) | HSerial::FLAG::BITS_PER_BYTE_8;
-int n_iCollectorConnectionTimeOut = 9999;
-bool n_bIgnoreSignalSIGINT = false;
-bool n_bIgnoreSignalSIGTSTP = false;
-bool n_bIgnoreSignalSIGQUIT = false;
+HString _serialDevice_;
+HString _defaultEncoding_ = "ISO-8859-2";
+HSerial::speed_t _baudRate_ = HSerial::SPEED::B_115200;
+HSerial::flag_t _serialFlags_ = HSerial::flag_t( HSerial::FLAG::FLOW_CONTROL_HARDWARE ) | HSerial::FLAG::BITS_PER_BYTE_8;
+int _collectorConnectionTimeOut_ = 9999;
+bool _ignoreSignalSIGINT_ = false;
+bool _ignoreSignalSIGTSTP_ = false;
+bool _ignoreSignalSIGQUIT_ = false;
 	
 namespace util
 	{
-extern char n_pcTransTableStripPL [ 256 ];
+extern char _transTableStripPL_ [ 256 ];
 	}
 
 /* return true means error occured, false - every thing ok */
-bool set_tools_variables( HString& a_roOption, HString& a_roValue )
+bool set_tools_variables( HString& option_, HString& value_ )
 	{
 	M_PROLOG
-	int l_iBaudRate = 0;
-	if ( ! strcasecmp( a_roOption, "set_env" ) )
-		decode_set_env( a_roValue );
-	else if ( ! strcasecmp( a_roOption, "serial_baudrate" ) )
+	int baudRate = 0;
+	if ( ! strcasecmp( option_, "set_env" ) )
+		decode_set_env( value_ );
+	else if ( ! strcasecmp( option_, "serial_baudrate" ) )
 		{
-		if ( ( a_roValue.get_length() > 1 ) && ( a_roValue [ 0 ] == 'B' ) )
+		if ( ( value_.get_length() > 1 ) && ( value_ [ 0 ] == 'B' ) )
 			{
-			l_iBaudRate = lexical_cast<int>( a_roValue.raw() + 1 );
-			switch ( l_iBaudRate )
+			baudRate = lexical_cast<int>( value_.raw() + 1 );
+			switch ( baudRate )
 				{
-				case ( 115200 ): n_eBaudRate = HSerial::SPEED::B_115200; break;
+				case ( 115200 ): _baudRate_ = HSerial::SPEED::B_115200; break;
 #if ( HAVE_DECL_B76800 )
-				case (  76800 ): n_eBaudRate = HSerial::SPEED::B_76800;  break;
+				case (  76800 ): _baudRate_ = HSerial::SPEED::B_76800;  break;
 #endif /* HAVE_DECL_B76800 */
-				case (  57600 ): n_eBaudRate = HSerial::SPEED::B_57600;  break;
-				case (  38400 ): n_eBaudRate = HSerial::SPEED::B_38400;  break;
+				case (  57600 ): _baudRate_ = HSerial::SPEED::B_57600;  break;
+				case (  38400 ): _baudRate_ = HSerial::SPEED::B_38400;  break;
 #if ( HAVE_DECL_B28800 )
-				case (  28800 ): n_eBaudRate = HSerial::SPEED::B_28800;  break;
+				case (  28800 ): _baudRate_ = HSerial::SPEED::B_28800;  break;
 #endif /* HAVE_DECL_B28800 */
-				case (  19200 ): n_eBaudRate = HSerial::SPEED::B_19200;  break;
+				case (  19200 ): _baudRate_ = HSerial::SPEED::B_19200;  break;
 #if ( HAVE_DECL_B14400 )
-				case (  14400 ): n_eBaudRate = HSerial::SPEED::B_14400;  break;
+				case (  14400 ): _baudRate_ = HSerial::SPEED::B_14400;  break;
 #endif /* HAVE_DECL_B14400 */
-				case (   9600 ): n_eBaudRate = HSerial::SPEED::B_9600;   break;
+				case (   9600 ): _baudRate_ = HSerial::SPEED::B_9600;   break;
 #if ( HAVE_DECL_B7200 )
-				case (   7200 ): n_eBaudRate = HSerial::SPEED::B_7200;   break;
+				case (   7200 ): _baudRate_ = HSerial::SPEED::B_7200;   break;
 #endif /* HAVE_DECL_B7200 */
-				case (   4800 ): n_eBaudRate = HSerial::SPEED::B_4800;   break;
-				case (   2400 ): n_eBaudRate = HSerial::SPEED::B_2400;   break;
+				case (   4800 ): _baudRate_ = HSerial::SPEED::B_4800;   break;
+				case (   2400 ): _baudRate_ = HSerial::SPEED::B_2400;   break;
 				default:
-					M_THROW( _( "unknown baud rate" ), l_iBaudRate );
+					M_THROW( _( "unknown baud rate" ), baudRate );
 				}
 			}
 		}
-	else if ( ! strcasecmp( a_roOption, "serial_flags" ) )
+	else if ( ! strcasecmp( option_, "serial_flags" ) )
 		{
-		HTokenizer t( a_roValue, " \t" );
+		HTokenizer t( value_, " \t" );
 		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it )
 			{
 			if ( ! strcasecmp( *it, "FLOW_CONTROL_HARDWARE" ) )
-				n_eSerialFlags = HSerial::FLAG::FLOW_CONTROL_HARDWARE;
+				_serialFlags_ = HSerial::FLAG::FLOW_CONTROL_HARDWARE;
 			else if ( ! strcasecmp( *it, "SOFTWARE_CONTROL_SOFTWARE" ) )
-				n_eSerialFlags = HSerial::FLAG::FLOW_CONTROL_SOFTWARE;
+				_serialFlags_ = HSerial::FLAG::FLOW_CONTROL_SOFTWARE;
 			else if ( ! strcasecmp( *it, "ECHO" ) )
-				n_eSerialFlags = HSerial::FLAG::ECHO;
+				_serialFlags_ = HSerial::FLAG::ECHO;
 			else if ( ! strcasecmp( *it, "BITS_PER_BYTE_8" ) )
-				n_eSerialFlags = HSerial::FLAG::BITS_PER_BYTE_8;
+				_serialFlags_ = HSerial::FLAG::BITS_PER_BYTE_8;
 			else if ( ! strcasecmp( *it, "BITS_PER_BYTE_7" ) )
-				n_eSerialFlags = HSerial::FLAG::BITS_PER_BYTE_7;
+				_serialFlags_ = HSerial::FLAG::BITS_PER_BYTE_7;
 			else if ( ! strcasecmp( *it, "BITS_PER_BYTE_6" ) )
-				n_eSerialFlags = HSerial::FLAG::BITS_PER_BYTE_6;
+				_serialFlags_ = HSerial::FLAG::BITS_PER_BYTE_6;
 			else if ( ! strcasecmp( *it, "BITS_PER_BYTE_5" ) )
-				n_eSerialFlags = HSerial::FLAG::BITS_PER_BYTE_5;
+				_serialFlags_ = HSerial::FLAG::BITS_PER_BYTE_5;
 			else if ( ! strcasecmp( *it, "CANONICAL" ) )
-				n_eSerialFlags = HSerial::FLAG::CANONICAL;
+				_serialFlags_ = HSerial::FLAG::CANONICAL;
 			else if ( ! strcasecmp( *it, "STOP_BITS_1" ) )
-				n_eSerialFlags = HSerial::FLAG::STOP_BITS_1;
+				_serialFlags_ = HSerial::FLAG::STOP_BITS_1;
 			else if ( ! strcasecmp( *it, "STOP_BITS_2" ) )
-				n_eSerialFlags = HSerial::FLAG::STOP_BITS_2;
+				_serialFlags_ = HSerial::FLAG::STOP_BITS_2;
 			else if ( ! strcasecmp( *it, "PARITY_CHECK" ) )
-				n_eSerialFlags = HSerial::FLAG::PARITY_CHECK;
+				_serialFlags_ = HSerial::FLAG::PARITY_CHECK;
 			else if ( ! strcasecmp( *it, "PARITY_ODD" ) )
-				n_eSerialFlags = HSerial::FLAG::PARITY_ODD;
+				_serialFlags_ = HSerial::FLAG::PARITY_ODD;
 			else
 				return ( true );
 			}
@@ -168,36 +168,36 @@ public:
 HToolsInitDeinit::HToolsInitDeinit( void )
 	{
 	M_PROLOG
-	yaalOptions( "ignore_signal_SIGINT", program_options_helper::option_value( n_bIgnoreSignalSIGINT ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore INT (interrupt) signal" )
-			( "ignore_signal_SIGTSTP", program_options_helper::option_value( n_bIgnoreSignalSIGTSTP ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore TSTP (terminal stop, suspend) signal" )
-			( "ignore_signal_SIGQUIT", program_options_helper::option_value( n_bIgnoreSignalSIGQUIT ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore QUIT, core dump signal" )
-			( "serial_device", program_options_helper::option_value( n_oSerialDevice ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to serial device", "path" )
-			( "default_encoding", program_options_helper::option_value( n_oDefaultEncoding ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "dafault character encoding used in text documents", "encoding" )
-			( "collector_connection_timeout", program_options_helper::option_value( n_iCollectorConnectionTimeOut ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "timeout on collector device read", "seconds" );
-	int l_iCtr = 0;
+	yaalOptions( "ignore_signal_SIGINT", program_options_helper::option_value( _ignoreSignalSIGINT_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore INT (interrupt) signal" )
+			( "ignore_signal_SIGTSTP", program_options_helper::option_value( _ignoreSignalSIGTSTP_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore TSTP (terminal stop, suspend) signal" )
+			( "ignore_signal_SIGQUIT", program_options_helper::option_value( _ignoreSignalSIGQUIT_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore QUIT, core dump signal" )
+			( "serial_device", program_options_helper::option_value( _serialDevice_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to serial device", "path" )
+			( "default_encoding", program_options_helper::option_value( _defaultEncoding_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "dafault character encoding used in text documents", "encoding" )
+			( "collector_connection_timeout", program_options_helper::option_value( _collectorConnectionTimeOut_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "timeout on collector device read", "seconds" );
+	int ctr = 0;
 	errno = 0;
 	extendable::my_strtold = smart_strtold;
 	yaalOptions.process_rc_file ( "yaal", "tools", set_tools_variables );
-	for ( l_iCtr = 0; l_iCtr < 256; l_iCtr ++ )
-		util::n_pcTransTableStripPL[ l_iCtr ] = static_cast<char>( l_iCtr );
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '±' ) ] = 'a';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¡' ) ] = 'A';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'æ' ) ] = 'c';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'Æ' ) ] = 'C';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'ê' ) ] = 'e';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'Ê' ) ] = 'E';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '³' ) ] = 'l';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '£' ) ] = 'L';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'ñ' ) ] = 'n';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'Ñ' ) ] = 'N';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'ó' ) ] = 'o';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( 'Ó' ) ] = 'O';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¶' ) ] = 's';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¦' ) ] = 'S';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¼' ) ] = 'z';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¬' ) ] = 'Z';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¿' ) ] = 'z';
-	util::n_pcTransTableStripPL[ static_cast<char unsigned>( '¯' ) ] = 'Z';
+	for ( ctr = 0; ctr < 256; ctr ++ )
+		util::_transTableStripPL_[ ctr ] = static_cast<char>( ctr );
+	util::_transTableStripPL_[ static_cast<char unsigned>( '±' ) ] = 'a';
+	util::_transTableStripPL_[ static_cast<char unsigned>( '¡' ) ] = 'A';
+	util::_transTableStripPL_[ static_cast<char unsigned>( 'æ' ) ] = 'c';
+	util::_transTableStripPL_[ static_cast<char unsigned>( 'Æ' ) ] = 'C';
+	util::_transTableStripPL_[ static_cast<char unsigned>( 'ê' ) ] = 'e';
+	util::_transTableStripPL_[ static_cast<char unsigned>( 'Ê' ) ] = 'E';
+	util::_transTableStripPL_[ static_cast<char unsigned>( '³' ) ] = 'l';
+	util::_transTableStripPL_[ static_cast<char unsigned>( '£' ) ] = 'L';
+	util::_transTableStripPL_[ static_cast<char unsigned>( 'ñ' ) ] = 'n';
+	util::_transTableStripPL_[ static_cast<char unsigned>( 'Ñ' ) ] = 'N';
+	util::_transTableStripPL_[ static_cast<char unsigned>( 'ó' ) ] = 'o';
+	util::_transTableStripPL_[ static_cast<char unsigned>( 'Ó' ) ] = 'O';
+	util::_transTableStripPL_[ static_cast<char unsigned>( '¶' ) ] = 's';
+	util::_transTableStripPL_[ static_cast<char unsigned>( '¦' ) ] = 'S';
+	util::_transTableStripPL_[ static_cast<char unsigned>( '¼' ) ] = 'z';
+	util::_transTableStripPL_[ static_cast<char unsigned>( '¬' ) ] = 'Z';
+	util::_transTableStripPL_[ static_cast<char unsigned>( '¿' ) ] = 'z';
+	util::_transTableStripPL_[ static_cast<char unsigned>( '¯' ) ] = 'Z';
 	return;
 	M_EPILOG
 	}
@@ -208,7 +208,7 @@ HToolsInitDeinit::~HToolsInitDeinit( void )
 	}
 
 #if defined( __DYNAMIC_LINKER__ )
-static char const g_pcDynamicLinkerPath [ ]
+static char const _dynamicLinkerPath_ [ ]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 void yaal_tools_banner ( void )
@@ -220,7 +220,7 @@ void yaal_tools_banner ( void )
 extern "C"
 int yaal_tools_main( int, char** )
 	{
-	if ( g_pcDynamicLinkerPath[ 0 ] )
+	if ( _dynamicLinkerPath_[ 0 ] )
 		{
 		yaal_hcore_banner();
 		yaal_tools_banner();

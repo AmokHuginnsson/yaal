@@ -65,12 +65,12 @@ protected:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
 	typedef enum { TO_EXTERNAL, TO_INTERNAL } way_t;
-	mutable yaal::hcore::HPointer<OConvert> f_oConvert;
-	mutable yaal::hcore::HString	f_oConvertedString;
-	yaal::hcore::HString	f_oVarTmpBuffer;
-	yaal::hcore::HString	f_oEncoding;
-	HXmlData*							f_poXml;
-	tree_t f_oDOM;
+	mutable yaal::hcore::HPointer<OConvert> _convert;
+	mutable yaal::hcore::HString	_convertedString;
+	yaal::hcore::HString	_varTmpBuffer;
+	yaal::hcore::HString	_encoding;
+	HXmlData*							_xml;
+	tree_t _dOM;
 public:
 	typedef tree_t::node_t xml_element_t;
 	typedef tree_t::const_node_t const_xml_element_t;
@@ -127,13 +127,13 @@ public:
 		};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
 private:
-	TYPE::type_t f_eType;
-	yaal::hcore::HString f_oText;
-	properties_t f_oProperties;
+	TYPE::type_t _type;
+	yaal::hcore::HString _text;
+	properties_t _properties;
 public:
-	HNode( void ) : f_eType( TYPE::NODE ), f_oText(), f_oProperties() { }
-	HNode( TYPE::type_t const& type, yaal::hcore::HString const& value ) : f_eType( type ), f_oText( value ), f_oProperties() {}
-	HNode( HNode const& source ) : f_eType( source.f_eType ), f_oText( source.f_oText ), f_oProperties( source.f_oProperties )
+	HNode( void ) : _type( TYPE::NODE ), _text(), _properties() { }
+	HNode( TYPE::type_t const& type, yaal::hcore::HString const& value ) : _type( type ), _text( value ), _properties() {}
+	HNode( HNode const& source ) : _type( source._type ), _text( source._text ), _properties( source._properties )
 		{ }
 	HNode& operator = ( HNode const& source )
 		{
@@ -151,9 +151,9 @@ public:
 		if ( &node_ != this )
 			{
 			using yaal::swap;
-			swap( f_eType, node_.f_eType );
-			swap( f_oText, node_.f_oText );
-			swap( f_oProperties, node_.f_oProperties );
+			swap( _type, node_._type );
+			swap( _text, node_._text );
+			swap( _properties, node_._properties );
 			}
 		return;
 		}
@@ -161,8 +161,8 @@ private:
 	void clear( void )
 		{
 		M_PROLOG
-		f_oText.clear();
-		f_oProperties.clear();
+		_text.clear();
+		_properties.clear();
 		return;
 		M_EPILOG
 		}
@@ -175,7 +175,7 @@ private:
  */
 class HXml::HConstNodeProxy
 	{
-	HXml::tree_t::const_node_t f_poNode;
+	HXml::tree_t::const_node_t _node;
 public:
 	HXml::HConstIterator const begin() const;
 	HXml::HConstIterator const end() const;
@@ -205,7 +205,7 @@ private:
  */
 class HXml::HNodeProxy
 	{
-	mutable HXml::tree_t::node_t f_poNode;
+	mutable HXml::tree_t::node_t _node;
 public:
 	HXml::HIterator begin();
 	HXml::HIterator const begin() const;
@@ -252,31 +252,31 @@ private:
  */
 class HXml::HIterator
 	{
-	HXml::HNodeProxy const* f_poOwner;
-	mutable HXml::tree_t::iterator f_oIterator;
+	HXml::HNodeProxy const* _owner;
+	mutable HXml::tree_t::iterator _iterator;
 public:
 	HIterator( void );
 	HIterator( HIterator const& );
 	HIterator& operator ++ ( void )
 		{
-		++ f_oIterator;
+		++ _iterator;
 		return ( *this );
 		}
 	HIterator operator ++ ( int )
 		{
 		HIterator it( *this );
-		++ f_oIterator;
+		++ _iterator;
 		return ( it );
 		}
 	HIterator& operator -- ( void )
 		{
-		-- f_oIterator;
+		-- _iterator;
 		return ( *this );
 		}
 	HIterator operator -- ( int )
 		{
 		HIterator it( *this );
-		-- f_oIterator;
+		-- _iterator;
 		return ( it );
 		}
 	HIterator& operator = ( HIterator const& );
@@ -293,31 +293,31 @@ private:
  */
 class HXml::HConstIterator
 	{
-	HXml::HConstNodeProxy const* f_poOwner;
-	mutable HXml::tree_t::const_iterator f_oIterator;
+	HXml::HConstNodeProxy const* _owner;
+	mutable HXml::tree_t::const_iterator _iterator;
 public:
 	HConstIterator( void );
 	HConstIterator( HConstIterator const& );
 	HConstIterator& operator ++ ( void )
 		{
-		++ f_oIterator;
+		++ _iterator;
 		return ( *this );
 		}
 	HConstIterator operator ++ ( int )
 		{
 		HConstIterator it( *this );
-		++ f_oIterator;
+		++ _iterator;
 		return ( it );
 		}
 	HConstIterator& operator -- ( void )
 		{
-		-- f_oIterator;
+		-- _iterator;
 		return ( *this );
 		}
 	HConstIterator operator -- ( int )
 		{
 		HConstIterator it( *this );
-		-- f_oIterator;
+		-- _iterator;
 		return ( it );
 		}
 	HConstIterator& operator = ( HConstIterator const& );

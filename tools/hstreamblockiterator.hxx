@@ -46,12 +46,12 @@ public:
 	 */
 	class HBlock
 		{
-		void* f_pvStart;
-		int long f_lSize;
+		void* _start;
+		int long _size;
 	public:
-		HBlock( void ) : f_pvStart( NULL ), f_lSize( 0 ) {}
-		HBlock( void* a_pvStart, int long const& a_lSize ) : f_pvStart( a_pvStart ), f_lSize( a_lSize ) {}
-		HBlock( HBlock const& o ) : f_pvStart( o.f_pvStart ), f_lSize( o.f_lSize ) {}
+		HBlock( void ) : _start( NULL ), _size( 0 ) {}
+		HBlock( void* start_, int long const& size_ ) : _start( start_ ), _size( size_ ) {}
+		HBlock( HBlock const& o ) : _start( o._start ), _size( o._size ) {}
 		HBlock& operator = ( HBlock const& o )
 			{
 			if ( &o != this )
@@ -66,24 +66,24 @@ public:
 			if ( &o != this )
 				{
 				using yaal::swap;
-				swap( f_pvStart, o.f_pvStart );
-				swap( f_lSize, o.f_lSize );
+				swap( _start, o._start );
+				swap( _size, o._size );
 				}
 			return;
 			}
 		void* data( void ) const
-			{ return ( f_pvStart ); }
+			{ return ( _start ); }
 		int long octets( void ) const
-			{ return ( f_lSize ); }
+			{ return ( _size ); }
 		};
 private:
 	typedef HStreamBlockIterator self_t;
-	yaal::hcore::HChunk f_oBuffer;
-	int long f_lIndex; /*!< number of currently processed IO block */
-	int long f_lSize; /*!< requested size of IO block */
-	int long f_lBufferOffset;
-	int long f_lBufferSize;
-	yaal::hcore::HStreamInterface& f_roStream;
+	yaal::hcore::HChunk _buffer;
+	int long _index; /*!< number of currently processed IO block */
+	int long _size; /*!< requested size of IO block */
+	int long _bufferOffset;
+	int long _bufferSize;
+	yaal::hcore::HStreamInterface& _stream;
 public:
 	/*! \brief Construct new block based stream reader.
 	 *

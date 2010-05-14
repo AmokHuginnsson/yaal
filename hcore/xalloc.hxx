@@ -45,28 +45,28 @@ void xfree_internal( void* ) throw();
 char* xstrdup ( char const* const );
 
 template<typename tType>
-inline tType* xmalloc( int long const a_iCount )
+inline tType* xmalloc( int long const count_ )
 	{
-	return ( static_cast<tType*>( xmalloc_internal( a_iCount * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( xmalloc_internal( count_ * sizeof ( tType ) ) ) );
 	}
 
 template<typename tType>
-inline tType* xcalloc( int long const a_iCount )
+inline tType* xcalloc( int long const count_ )
 	{
-	return ( static_cast<tType*>( xcalloc_internal( a_iCount * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( xcalloc_internal( count_ * sizeof ( tType ) ) ) );
 	}
 
 template<typename tType>
-inline tType* xrealloc( void* a_pvPointer, int long const a_iCount )
+inline tType* xrealloc( void* pointer_, int long const count_ )
 	{
-	return ( static_cast<tType*>( xrealloc_internal ( a_pvPointer, a_iCount * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( xrealloc_internal ( pointer_, count_ * sizeof ( tType ) ) ) );
 	}
 
 template<typename tType>
-inline void xfree( tType& a_tPointer ) throw()
+inline void xfree( tType& pointer_ ) throw()
 	{
-	xfree_internal( a_tPointer );
-	a_tPointer = NULL;
+	xfree_internal( pointer_ );
+	pointer_ = NULL;
 	return;
 	}
 

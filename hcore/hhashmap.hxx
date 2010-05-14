@@ -39,12 +39,12 @@ namespace yaal
 namespace hcore
 {
 
-extern int long const* const g_pulPrimes;
+extern int long const* const _primes_;
 
 template<typename key_t>
-inline int long hash( key_t const& a_rtKey )
+inline int long hash( key_t const& key_ )
 	{
-	return ( static_cast<int long>( a_rtKey ) );
+	return ( static_cast<int long>( key_ ) );
 	}
 
 /*! \brief Hash map container implementation.
@@ -339,7 +339,7 @@ void HHashMap<key_t, data_t>::resize( int long size_ )
 			size_ >>= 1;
 			n ++;
 			}
-		int long prime( g_pulPrimes[ n - 1 ] );
+		int long prime( _primes_[ n - 1 ] );
 		HChunk buckets( chunk_size<HAtom*>( prime ), HChunk::STRATEGY::GEOMETRIC );
 		HAtom** oldBuckets( _buckets.get<HAtom*>() );
 		HAtom** newBuckets( buckets.get<HAtom*>() );
@@ -490,14 +490,14 @@ typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::find( 
 	}
 
 template<typename key_t, typename data_t>
-bool HHashMap<key_t, data_t>::find( key_t const& a_rtKey, int long& a_rulIndex, HAtom*& a_rpoAtom ) const
+bool HHashMap<key_t, data_t>::find( key_t const& key_, int long& index_, HAtom*& atom_ ) const
 	{
 	M_PROLOG
-	a_rulIndex = _hasher( a_rtKey ) % _prime;
-	a_rpoAtom = _buckets.get<HAtom*>()[ a_rulIndex ];
-	while ( a_rpoAtom && ( a_rpoAtom->_value.first != a_rtKey ) )
-		a_rpoAtom = a_rpoAtom->_next;
-	return ( a_rpoAtom ? true : false );
+	index_ = _hasher( key_ ) % _prime;
+	atom_ = _buckets.get<HAtom*>()[ index_ ];
+	while ( atom_ && ( atom_->_value.first != key_ ) )
+		atom_ = atom_->_next;
+	return ( atom_ ? true : false );
 	M_EPILOG
 	}
 

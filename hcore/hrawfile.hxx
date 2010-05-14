@@ -72,10 +72,10 @@ protected:
 			WRITE
 			} action_t;
 		};
-	TYPE::raw_file_type_t f_eType;
-	file_descriptor_t f_iFileDescriptor; /* raw file descriptor of the file */
-	int f_iTimeOut;
-	HOpenSSL::ptr_t f_oSSL;
+	TYPE::raw_file_type_t _type;
+	file_descriptor_t _fileDescriptor; /* raw file descriptor of the file */
+	int _timeOut;
+	HOpenSSL::ptr_t _sSL;
 public:
 	HRawFile( TYPE::raw_file_type_t = TYPE::DEFAULT );
 	virtual ~HRawFile( void );

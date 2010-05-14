@@ -38,37 +38,37 @@ namespace yaal
 namespace hconsole
 {
 
-HWindowListControl::HWindowListControl ( HWindow * a_poParent, int a_iRow,
-		int a_iColumn, int a_iHeight, int a_iWidth, char const * a_pcLabel,
-		HAbstractControler::ptr_t const& a_oControler, model_t::cyclic_iterator& a_roForegroundWindow )
-									:	HControl ( a_poParent, a_iRow, a_iColumn, a_iHeight,
-											a_iWidth, a_pcLabel ),
+HWindowListControl::HWindowListControl ( HWindow * parent_, int row_,
+		int column_, int height_, int width_, char const * label_,
+		HAbstractControler::ptr_t const& controler_, model_t::cyclic_iterator& foregroundWindow_ )
+									:	HControl ( parent_, row_, column_, height_,
+											width_, label_ ),
 										HSearchableControl( false ),
-										HListControl( a_poParent, a_iRow, a_iColumn, a_iHeight,
-												a_iWidth, a_pcLabel, a_oControler ), f_roForegroundWindow( a_roForegroundWindow )
+										HListControl( parent_, row_, column_, height_,
+												width_, label_, controler_ ), _foregroundWindow( foregroundWindow_ )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-int HWindowListControl::do_process_input( int a_iCode )
+int HWindowListControl::do_process_input( int code_ )
 	{
 	M_PROLOG
-	a_iCode = HListControl::do_process_input( a_iCode );
-	int l_iSize = static_cast<int>( f_oControler->size() );
-	if ( l_iSize > 0 )
+	code_ = HListControl::do_process_input( code_ );
+	int size = static_cast<int>( _controler->size() );
+	if ( size > 0 )
 		{
-		if ( ( a_iCode == '\r' ) || ( a_iCode == ' ' ) )
+		if ( ( code_ == '\r' ) || ( code_ == ' ' ) )
 			{
-			a_iCode = KEY<'\t'>::meta;
-			iterator_t it = f_oControler->begin();
-			while ( it != f_oCursor )
-				++ it, ++ f_roForegroundWindow;
-			-- f_roForegroundWindow;
+			code_ = KEY<'\t'>::meta;
+			iterator_t it = _controler->begin();
+			while ( it != _cursor )
+				++ it, ++ _foregroundWindow;
+			-- _foregroundWindow;
 			}
 		}
-	return ( a_iCode );
+	return ( code_ );
 	M_EPILOG
 	}
 
@@ -79,26 +79,26 @@ template<>
 yaal::hcore::HString const HCell<HWindow::ptr_t>::get_string( void )
 	{
 	M_PROLOG
-	return ( f_rtData->get_title() );
+	return ( _data->get_title() );
 	M_EPILOG
 	}
 
 template<>
-bool compare_cells( HWindow::ptr_t const& a_oLeft, HWindow::ptr_t const& a_oRight, OSortHelper & a_roSortHelper )
+bool compare_cells( HWindow::ptr_t const& left_, HWindow::ptr_t const& right_, OSortHelper & sortHelper_ )
 	{
 	M_PROLOG
-	a_roSortHelper.progress();
-	return ( strcasecmp ( a_oLeft->get_title(),
-			 a_oRight->get_title() ) > 0 );
+	sortHelper_.progress();
+	return ( strcasecmp ( left_->get_title(),
+			 right_->get_title() ) > 0 );
 	M_EPILOG
 	}
 
 typedef yaal::hcore::HList<HWindow::ptr_t>::iterator window_iterator_t;
 
 template<>
-HRow<window_iterator_t>::HRow( iterator_t& a_oIt ) : f_roIterator( a_oIt ), f_oCells( 1 )
+HRow<window_iterator_t>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( 1 )
 	{
-	f_oCells[ 0 ] = HCell<window_iterator_t>::ptr_t( new HCell<window_iterator_t>( f_roIterator, 0 ) );
+	_cells[ 0 ] = HCell<window_iterator_t>::ptr_t( new HCell<window_iterator_t>( _iterator, 0 ) );
 	return;
 	}
 
@@ -136,7 +136,7 @@ template<>
 yaal::hcore::HString const HCell<window_iterator_t>::get_string( void )
 	{
 	M_PROLOG
-	return ( (*f_rtData)->get_title() );
+	return ( (*_data)->get_title() );
 	M_EPILOG
 	}
 
@@ -153,13 +153,13 @@ void HCell<window_iterator_t>::set_child_control_data( HControl* )
 	}
 
 template<>
-bool CompareListControlItems<HWindow::ptr_t>::operator() ( HWindow::ptr_t const& a_oLeft,
-		HWindow::ptr_t const& a_oRight ) const
+bool CompareListControlItems<HWindow::ptr_t>::operator() ( HWindow::ptr_t const& left_,
+		HWindow::ptr_t const& right_ ) const
 	{
 	M_PROLOG
-	HWindow::ptr_t const& l_oLeft = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::ASCENDING ? a_oLeft : a_oRight;
-	HWindow::ptr_t const& l_oRight = f_roSortHelper.f_eOrder == yaal::hcore::OListBits::ASCENDING ? a_oRight : a_oLeft;
-	return ( strcasecmp( l_oLeft->get_title(), l_oRight->get_title() ) > 0 );
+	HWindow::ptr_t const& left = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? left_ : right_;
+	HWindow::ptr_t const& right = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? right_ : left_;
+	return ( strcasecmp( left->get_title(), right->get_title() ) > 0 );
 	M_EPILOG
 	}
 

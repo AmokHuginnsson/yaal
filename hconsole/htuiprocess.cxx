@@ -48,11 +48,11 @@ namespace yaal
 namespace hconsole
 {
 
-HTUIProcess::HTUIProcess( int noFileHandlers_, size_t a_uiKeyHandlers,
-		size_t a_uiCommandHandlers )
-	: HHandler( a_uiKeyHandlers, a_uiCommandHandlers ),
-	_dispatcher( noFileHandlers_, n_iLatency ), f_oMainWindow(), f_oForegroundWindow(),
-	f_oWindows( new model_t() )
+HTUIProcess::HTUIProcess( int noFileHandlers_, size_t keyHandlers_,
+		size_t commandHandlers_ )
+	: HHandler( keyHandlers_, commandHandlers_ ),
+	_dispatcher( noFileHandlers_, _latency_ ), _mainWindow(), _foregroundWindow(),
+	_windows( new model_t() )
 	{
 	M_PROLOG
 	return;
@@ -62,8 +62,8 @@ HTUIProcess::HTUIProcess( int noFileHandlers_, size_t a_uiKeyHandlers,
 HTUIProcess::~HTUIProcess( void )
 	{
 	M_PROLOG
-	if ( f_oWindows->size() > 0 )
-		f_oWindows->pop_front();
+	if ( _windows->size() > 0 )
+		_windows->pop_front();
 #ifdef __DEBUGGER_BABUNI__
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -71,50 +71,50 @@ HTUIProcess::~HTUIProcess( void )
 	M_EPILOG
 	}
 
-int HTUIProcess::init_tui( char const* a_pcProcessName, HWindow::ptr_t a_oMainWindow )
+int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ )
 	{
 	M_PROLOG
 	static int const CTRLS_COUNT = 2;
 	static int const ALTS_COUNT = 10;
-	int l_iCtr = 0;
-	int l_piAlts[ ALTS_COUNT ];
-	int l_piCtrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
-	HWindow::ptr_t l_oMainWindow;
+	int ctr = 0;
+	int alts[ ALTS_COUNT ];
+	int ctrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
+	HWindow::ptr_t mainWindow;
 	_dispatcher.register_file_descriptor_handler( STDIN_FILENO, bound_call( &HTUIProcess::process_stdin, this, _1 ) );
 	HConsole& cons = HCons::get_instance();
-	int l_iMouseDes = cons.get_mouse_fd();
-	if ( n_bUseMouse && l_iMouseDes )
-		_dispatcher.register_file_descriptor_handler( l_iMouseDes, bound_call( &HTUIProcess::process_mouse, this, _1 ) );
+	int mouseDes = cons.get_mouse_fd();
+	if ( _useMouse_ && mouseDes )
+		_dispatcher.register_file_descriptor_handler( mouseDes, bound_call( &HTUIProcess::process_mouse, this, _1 ) );
 	_dispatcher.register_file_descriptor_handler( cons.get_event_fd(), bound_call( &HTUIProcess::process_terminal_event, this, _1 ) );
 	_dispatcher.add_alert_handle( bound_call( &HTUIProcess::handler_alert, this ) );
 	_dispatcher.add_idle_handle( bound_call( &HTUIProcess::handler_idle, this ) );
-	register_postprocess_handler( CTRLS_COUNT, l_piCtrls,
+	register_postprocess_handler( CTRLS_COUNT, ctrls,
 			& HTUIProcess::handler_refresh );
 	register_postprocess_handler( KEY<'x'>::command, NULL,
 			& HTUIProcess::handler_quit );
-	if ( n_bUseMouse )
+	if ( _useMouse_ )
 		register_postprocess_handler( KEY_CODES::MOUSE, NULL,
 				& HTUIProcess::handler_mouse );
-	if ( !! a_oMainWindow )
-		l_oMainWindow = a_oMainWindow;
+	if ( !! mainWindow_ )
+		mainWindow = mainWindow_;
 	else /* Create automatically default main window. */
 		{
-		l_oMainWindow = HWindow::ptr_t( new HMainWindow( a_pcProcessName, f_oWindows, f_oForegroundWindow ) );
+		mainWindow = HWindow::ptr_t( new HMainWindow( processName_, _windows, _foregroundWindow ) );
 		register_postprocess_handler( KEY<'\t'>::meta, NULL,
 				&HTUIProcess::handler_jump_meta_tab );
 		register_postprocess_handler( KEY<'q'>::command, NULL,
 				&HTUIProcess::handler_close_window );
-		for ( l_iCtr = 0; l_iCtr < ALTS_COUNT; l_iCtr ++ )
-			l_piAlts[ l_iCtr ] = KEY<>::meta_r( '0' + l_iCtr );
-		register_postprocess_handler( ALTS_COUNT, l_piAlts,
+		for ( ctr = 0; ctr < ALTS_COUNT; ctr ++ )
+			alts[ ctr ] = KEY<>::meta_r( '0' + ctr );
+		register_postprocess_handler( ALTS_COUNT, alts,
 			&HTUIProcess::handler_jump_meta_direct );
 		}
-	f_oMainWindow = l_oMainWindow;
-	add_window( l_oMainWindow );
-	if ( ! l_oMainWindow->is_initialised() )
+	_mainWindow = mainWindow;
+	add_window( mainWindow );
+	if ( ! mainWindow->is_initialised() )
 		M_THROW( _( "window has not been initialised" ), errno );
-	f_oForegroundWindow = f_oWindows->begin();
-	f_oCommandHandlers[ "quit" ] = static_cast<HHandler::HANDLER_t>( &HTUIProcess::handler_quit );
+	_foregroundWindow = _windows->begin();
+	_commandHandlers[ "quit" ] = static_cast<HHandler::HANDLER_t>( &HTUIProcess::handler_quit );
 	refresh();
 	return ( 1 );
 	M_EPILOG
@@ -127,78 +127,78 @@ int HTUIProcess::run( void )
 	M_EPILOG
 	}
 
-int HTUIProcess::add_window( HWindow::ptr_t a_oWindow )
+int HTUIProcess::add_window( HWindow::ptr_t window_ )
 	{
 	M_PROLOG
-	a_oWindow->init();
-	f_oWindows->push_back( a_oWindow );
-	f_oForegroundWindow = f_oWindows->rbegin();
-	M_ASSERT( f_oForegroundWindow.is_valid() );
-	f_oMainWindow->update_all();
-	if ( ! (*f_oForegroundWindow)->is_initialised() )
+	window_->init();
+	_windows->push_back( window_ );
+	_foregroundWindow = _windows->rbegin();
+	M_ASSERT( _foregroundWindow.is_valid() );
+	_mainWindow->update_all();
+	if ( ! (*_foregroundWindow)->is_initialised() )
 		M_THROW( _( "window has not been initialised" ), errno );
 	refresh( true );
 	return ( 0 );
 	M_EPILOG
 	}
 
-void HTUIProcess::process_stdin( int a_iCode )
+void HTUIProcess::process_stdin( int code_ )
 	{
 	M_PROLOG
-	HString l_oCommand;
+	HString command;
 	HConsole& cons = HCons::get_instance();
-	if ( ! a_iCode )
-		a_iCode = cons.get_key();
-	if ( a_iCode )
-		a_iCode = process_input_with_handlers( a_iCode, f_oPreprocessHandlers );
-	if ( a_iCode && !! (*f_oForegroundWindow) )
-			a_iCode = (*f_oForegroundWindow)->process_input( a_iCode );
-	if ( a_iCode )
-		a_iCode = process_input_with_handlers( a_iCode, f_oPostprocessHandlers );
-	if ( ! a_iCode )
+	if ( ! code_ )
+		code_ = cons.get_key();
+	if ( code_ )
+		code_ = process_input_with_handlers( code_, _preprocessHandlers );
+	if ( code_ && !! (*_foregroundWindow) )
+			code_ = (*_foregroundWindow)->process_input( code_ );
+	if ( code_ )
+		code_ = process_input_with_handlers( code_, _postprocessHandlers );
+	if ( ! code_ )
 		{
-		if ( !! (*f_oForegroundWindow) )
-			f_oCommand = (*f_oForegroundWindow)->get_command();
-		if ( ! f_oCommand.is_empty() )
-			l_oCommand = process_command();
-		if ( ! l_oCommand.is_empty()
-				&& !! (*f_oForegroundWindow) )
-			(*f_oForegroundWindow)->status_bar()->message( COLORS::FG_RED,
-					"unknown command: `%s'", l_oCommand.raw() );
+		if ( !! (*_foregroundWindow) )
+			_command = (*_foregroundWindow)->get_command();
+		if ( ! _command.is_empty() )
+			command = process_command();
+		if ( ! command.is_empty()
+				&& !! (*_foregroundWindow) )
+			(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
+					"unknown command: `%s'", command.raw() );
 		}
-	if ( n_bNeedRepaint )
+	if ( _needRepaint_ )
 		refresh();
 #ifdef __DEBUGGER_BABUNI__
-	n_bNeedRepaint = true;
-	if ( a_iCode )
+	_needRepaint_ = true;
+	if ( code_ )
 		{
-		if ( a_iCode > KEY<KEY<0>::meta>::command )
+		if ( code_ > KEY<KEY<0>::meta>::command )
 			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"COMMAND-META-%c: %5d       ",
-					a_iCode - KEY<KEY<0>::meta>::command, a_iCode );
-		else if ( a_iCode > KEY<0>::command )
+					code_ - KEY<KEY<0>::meta>::command, code_ );
+		else if ( code_ > KEY<0>::command )
 			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"     COMMAND-%c: %5d       ",
-					a_iCode - KEY<0>::command, a_iCode );
-		else if ( a_iCode > KEY<0>::meta )
+					code_ - KEY<0>::command, code_ );
+		else if ( code_ > KEY<0>::meta )
 			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"        META-%c: %5d       ",
-					a_iCode - KEY<0>::meta, a_iCode );
-		else if ( a_iCode < KEY_CODES::ESC )
+					code_ - KEY<0>::meta, code_ );
+		else if ( code_ < KEY_CODES::ESC )
 			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"        CTRL-%c: %5d       ",
-					a_iCode + 96, a_iCode);
+					code_ + 96, code_);
 		else
 			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"             %c: %5d       ",
-					a_iCode, a_iCode );
+					code_, code_ );
 		}
 	else
 		cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( a_iCode && !! (*f_oForegroundWindow) )
-		(*f_oForegroundWindow)->status_bar()->message ( COLORS::FG_RED,
-				"unknown function, err code(%d)", a_iCode );
+	if ( code_ && !! (*_foregroundWindow) )
+		(*_foregroundWindow)->status_bar()->message ( COLORS::FG_RED,
+				"unknown function, err code(%d)", code_ );
 	return;
 	M_EPILOG
 	}
@@ -206,9 +206,9 @@ void HTUIProcess::process_stdin( int a_iCode )
 void HTUIProcess::handler_alert( void )
 	{
 	M_PROLOG
-	if ( n_bNeedRepaint )
+	if ( _needRepaint_ )
 		{
-		n_bNeedRepaint = false;
+		_needRepaint_ = false;
 		HCons::get_instance().c_refresh();
 		}
 	return;
@@ -220,16 +220,16 @@ void HTUIProcess::handler_idle( void )
 	M_PROLOG
 #ifdef __DEBUG__
 	HConsole& cons = HCons::get_instance();
-	HString l_oClock( static_cast<char const *>( HTime() ) );
-	cons.c_cmvprintf( 0, static_cast<int>( cons.get_width() - l_oClock.get_length() ),
-			COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, l_oClock.raw() );
-	n_bNeedRepaint = true;
+	HString clock( static_cast<char const *>( HTime() ) );
+	cons.c_cmvprintf( 0, static_cast<int>( cons.get_width() - clock.get_length() ),
+			COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, clock.raw() );
+	_needRepaint_ = true;
 #endif /* __DEBUG__ */
-	if ( !! (*f_oForegroundWindow) )
+	if ( !! (*_foregroundWindow) )
 		{
-		HStatusBarControl::ptr_t& l_oStatusBar = (*f_oForegroundWindow)->status_bar();
-		if ( !! l_oStatusBar )
-			l_oStatusBar->refresh();
+		HStatusBarControl::ptr_t& statusBar = (*_foregroundWindow)->status_bar();
+		if ( !! statusBar )
+			statusBar->refresh();
 		}
 	return;
 	M_EPILOG
@@ -243,30 +243,30 @@ void HTUIProcess::process_mouse( int )
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_mouse( int a_iCode, void const* )
+int HTUIProcess::handler_mouse( int code_, void const* )
 	{
 	M_PROLOG
-	a_iCode = 0;
-	mouse::OMouse l_sMouse;
-	static_cast<void>( mouse::mouse_get( l_sMouse ) );
-	if ( !! (*f_oForegroundWindow) )
-		(*f_oForegroundWindow)->click( l_sMouse );
-	if ( n_bNeedRepaint )
+	code_ = 0;
+	mouse::OMouse mouse;
+	static_cast<void>( mouse::mouse_get( mouse ) );
+	if ( !! (*_foregroundWindow) )
+		(*_foregroundWindow)->click( mouse );
+	if ( _needRepaint_ )
 		refresh();
 #ifdef __DEBUGGER_BABUNI__
 	HCons::get_instance().c_cmvprintf( 0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
-			l_sMouse.f_iButtons, l_sMouse.f_iRow, l_sMouse.f_iColumn );
-	n_bNeedRepaint = true;
+			mouse._buttons, mouse._row, mouse._column );
+	_needRepaint_ = true;
 #endif /* __DEBUGGER_BABUNI__ */
-	return ( a_iCode );
+	return ( code_ );
 	M_EPILOG
 	}
 
-void HTUIProcess::process_terminal_event( int a_iEvent )
+void HTUIProcess::process_terminal_event( int event_ )
 	{
 	M_PROLOG
 	char type;
-	::read( a_iEvent, &type, 1 );
+	::read( event_, &type, 1 );
 	switch( type )
 		{
 		case 'r':
@@ -297,60 +297,60 @@ int HTUIProcess::handler_quit( int, void const* )
 	{
 	M_PROLOG
 	_dispatcher.stop();
-	n_bNeedRepaint = false;
+	_needRepaint_ = false;
 	HCons::get_instance().clrscr();
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_jump_meta_tab( int a_iCode, void const* )
+int HTUIProcess::handler_jump_meta_tab( int code_, void const* )
 	{
 	M_PROLOG
 	if ( _dispatcher.idle_cycles() < 5 )
-		++ f_oForegroundWindow;
+		++ _foregroundWindow;
 	else
-		f_oForegroundWindow = f_oWindows->begin();
+		_foregroundWindow = _windows->begin();
 	refresh( true );
-	a_iCode = 0;
-	return ( a_iCode );
+	code_ = 0;
+	return ( code_ );
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_jump_meta_direct( int a_iCode, void const* )
+int HTUIProcess::handler_jump_meta_direct( int code_, void const* )
 	{
 	M_PROLOG
-	a_iCode = ( a_iCode & 0xff ) - '0';
-	if ( a_iCode >= f_oWindows->size() )
+	code_ = ( code_ & 0xff ) - '0';
+	if ( code_ >= _windows->size() )
 		return ( 0 );
-	f_oForegroundWindow = f_oWindows->begin();
-	while ( a_iCode -- )
-		++ f_oForegroundWindow;
+	_foregroundWindow = _windows->begin();
+	while ( code_ -- )
+		++ _foregroundWindow;
 	refresh( true );
-	a_iCode = 0;
-	return ( a_iCode );
+	code_ = 0;
+	return ( code_ );
 	M_EPILOG
 	}
 
-int HTUIProcess::handler_close_window( int a_iCode, void const* )
+int HTUIProcess::handler_close_window( int code_, void const* )
 	{
 	M_PROLOG
-	model_t::cyclic_iterator it = f_oForegroundWindow;
-	-- f_oForegroundWindow;
-	f_oWindows->erase( it );
+	model_t::cyclic_iterator it = _foregroundWindow;
+	-- _foregroundWindow;
+	_windows->erase( it );
 	refresh( true );
-	a_iCode = 0;
-	return ( a_iCode );
+	code_ = 0;
+	return ( code_ );
 	M_EPILOG
 	}
 
-void HTUIProcess::select( HWindow const* const a_poWindow )
+void HTUIProcess::select( HWindow const* const window_ )
 	{
 	M_PROLOG
-	for ( model_t::iterator it = f_oWindows->begin(); it != f_oWindows->end(); ++ it )
+	for ( model_t::iterator it = _windows->begin(); it != _windows->end(); ++ it )
 		{
-		if ( (*it) == a_poWindow )
+		if ( (*it) == window_ )
 			{
-			f_oForegroundWindow = it;
+			_foregroundWindow = it;
 			break;
 			}
 		}
@@ -358,17 +358,17 @@ void HTUIProcess::select( HWindow const* const a_poWindow )
 	M_EPILOG
 	}
 
-void HTUIProcess::refresh( bool a_bForce )
+void HTUIProcess::refresh( bool force_ )
 	{
 	M_PROLOG
-	if ( f_oForegroundWindow.is_valid() && ( !! (*f_oForegroundWindow) ) )
+	if ( _foregroundWindow.is_valid() && ( !! (*_foregroundWindow) ) )
 		{
-		if ( a_bForce )
-			(*f_oForegroundWindow)->schedule_refresh();
-		(*f_oForegroundWindow)->refresh();
+		if ( force_ )
+			(*_foregroundWindow)->schedule_refresh();
+		(*_foregroundWindow)->refresh();
 		}
 	HCons::get_instance().c_refresh();
-	n_bNeedRepaint = false;
+	_needRepaint_ = false;
 	return;
 	M_EPILOG
 	}

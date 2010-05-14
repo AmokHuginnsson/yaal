@@ -40,14 +40,14 @@ namespace yaal
 namespace tools
 	{
 	
-extern yaal::hcore::HString n_oSerialDevice;
-extern yaal::hcore::HString n_oDefaultEncoding;
-extern HSerial::speed_t n_eBaudRate;
-extern HSerial::flag_t n_eSerialFlags;
-extern int n_iCollectorConnectionTimeOut;
-extern bool n_bIgnoreSignalSIGINT;
-extern bool n_bIgnoreSignalSIGTSTP;
-extern bool n_bIgnoreSignalSIGQUIT;
+extern yaal::hcore::HString _serialDevice_;
+extern yaal::hcore::HString _defaultEncoding_;
+extern HSerial::speed_t _baudRate_;
+extern HSerial::flag_t _serialFlags_;
+extern int _collectorConnectionTimeOut_;
+extern bool _ignoreSignalSIGINT_;
+extern bool _ignoreSignalSIGTSTP_;
+extern bool _ignoreSignalSIGQUIT_;
 void yaal_tools_banner( void );
 
 	}

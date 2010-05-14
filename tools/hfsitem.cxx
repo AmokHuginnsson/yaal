@@ -44,8 +44,8 @@ namespace yaal
 namespace tools
 {
 
-HFSItem::HFSItem( HString const& a_oRoot )
-	: f_iNameLen( static_cast<int>( a_oRoot.get_length() ) ), f_oPath( a_oRoot )
+HFSItem::HFSItem( HString const& root_ )
+	: _nameLen( static_cast<int>( root_.get_length() ) ), _path( root_ )
 	{
 	M_PROLOG
 	return;
@@ -59,35 +59,35 @@ HFSItem::~HFSItem( void )
 bool HFSItem::is_directory() const
 	{
 	M_PROLOG
-	struct stat l_sStat;
-	do_stat( &l_sStat );
-	return ( S_ISDIR( l_sStat.st_mode ) );
+	struct stat stat;
+	do_stat( &stat );
+	return ( S_ISDIR( stat.st_mode ) );
 	M_EPILOG
 	}
 
 bool HFSItem::is_file() const
 	{
 	M_PROLOG
-	struct stat l_sStat;
-	do_stat( &l_sStat );
-	return ( S_ISREG( l_sStat.st_mode ) );
+	struct stat stat;
+	do_stat( &stat );
+	return ( S_ISREG( stat.st_mode ) );
 	M_EPILOG
 	}
 
 bool HFSItem::is_executable() const
 	{
 	M_PROLOG
-	struct stat l_sStat;
-	do_stat( &l_sStat );
-	return ( ( l_sStat.st_mode & ( S_IXUSR | S_IXGRP | S_IXOTH ) ) ? true : false );
+	struct stat stat;
+	do_stat( &stat );
+	return ( ( stat.st_mode & ( S_IXUSR | S_IXGRP | S_IXOTH ) ) ? true : false );
 	M_EPILOG
 	}
 
 void HFSItem::do_stat( void* buf ) const
 	{
 	M_PROLOG
-	M_ENSURE( ( ::stat( f_oPath.raw(),
-					static_cast<struct stat*>( buf ) ) == 0 ) || ( ::lstat( f_oPath.raw(),
+	M_ENSURE( ( ::stat( _path.raw(),
+					static_cast<struct stat*>( buf ) ) == 0 ) || ( ::lstat( _path.raw(),
 					static_cast<struct stat*>( buf ) ) == 0 ) );
 	return;
 	M_EPILOG
@@ -95,21 +95,21 @@ void HFSItem::do_stat( void* buf ) const
 
 HString HFSItem::get_path( void ) const
 	{
-	return ( f_oPath );
+	return ( _path );
 	}
 
 HString HFSItem::get_name( void ) const
 	{
 	M_PROLOG
-	return ( f_oPath.right( f_iNameLen ) );
+	return ( _path.right( _nameLen ) );
 	M_EPILOG
 	}
 
-void HFSItem::set_path( HString const& a_oPath, int a_iNameLen )
+void HFSItem::set_path( HString const& path_, int nameLen_ )
 	{
 	M_PROLOG
-	f_iNameLen = a_iNameLen;
-	f_oPath = a_oPath;
+	_nameLen = nameLen_;
+	_path = path_;
 	return;
 	M_EPILOG
 	}
@@ -117,8 +117,8 @@ void HFSItem::set_path( HString const& a_oPath, int a_iNameLen )
 bool HFSItem::operator ! ( void ) const
 	{
 	struct stat dummy;
-	return ( ! ( ( ::stat( f_oPath.raw(),
-						&dummy ) == 0 ) || ( ::lstat( f_oPath.raw(),
+	return ( ! ( ( ::stat( _path.raw(),
+						&dummy ) == 0 ) || ( ::lstat( _path.raw(),
 							&dummy ) == 0 ) ) );
 	}
 
@@ -127,8 +127,8 @@ void HFSItem::swap( HFSItem& o )
 	if ( &o != this )
 		{
 		using yaal::swap;
-		swap( f_iNameLen, o.f_iNameLen );
-		swap( f_oPath, o.f_oPath );
+		swap( _nameLen, o._nameLen );
+		swap( _path, o._path );
 		}
 	return;
 	}
@@ -137,7 +137,7 @@ HFSItem::HIterator HFSItem::begin( void )
 	{
 	M_PROLOG
 	M_ENSURE( is_directory() );
-	return ( HIterator( f_oPath ) );
+	return ( HIterator( _path ) );
 	M_EPILOG
 	}
 
@@ -148,32 +148,32 @@ HFSItem::HIterator HFSItem::end( void )
 	M_EPILOG
 	}
 
-HFSItem::HIterator::HIterator( HString const& a_oPath ) : f_oPath( a_oPath ), f_pvDir( NULL ), f_oDirEnt(), f_oItem( "" )
+HFSItem::HIterator::HIterator( HString const& path_ ) : _path( path_ ), _dir( NULL ), _dirEnt(), _item( "" )
 	{
 	M_PROLOG
-	if ( ! f_oPath.is_empty() )
+	if ( ! _path.is_empty() )
 		{
-		f_pvDir = ::opendir( f_oPath.raw() );
-		f_oDirEnt = HChunk::ptr_t( new HChunk( chunk_size<dirent>( 1 ) ) );
+		_dir = ::opendir( _path.raw() );
+		_dirEnt = HChunk::ptr_t( new HChunk( chunk_size<dirent>( 1 ) ) );
 		operator ++();
 		}
 	return;
 	M_EPILOG
 	}
 
-HFSItem::HIterator::HIterator( HIterator const& a_oIt ) : f_oPath( a_oIt.f_oPath ), f_pvDir( NULL ), f_oDirEnt(), f_oItem( "" )
+HFSItem::HIterator::HIterator( HIterator const& it_ ) : _path( it_._path ), _dir( NULL ), _dirEnt(), _item( "" )
 	{
 	M_PROLOG
-	if ( a_oIt.f_pvDir )
+	if ( it_._dir )
 		{
-		f_pvDir = ::opendir( f_oPath.raw() );
-		seekdir( static_cast<DIR*>( f_pvDir ), telldir( static_cast<DIR*>( a_oIt.f_pvDir ) ) );
-		if ( !! a_oIt.f_oDirEnt )
+		_dir = ::opendir( _path.raw() );
+		seekdir( static_cast<DIR*>( _dir ), telldir( static_cast<DIR*>( it_._dir ) ) );
+		if ( !! it_._dirEnt )
 			{
-			f_oDirEnt = HChunk::ptr_t( new HChunk( chunk_size<dirent>( 1 ) ) );
-			::memcpy( f_oDirEnt->get<void>(), a_oIt.f_oDirEnt->get<void>(), sizeof ( dirent ) );
+			_dirEnt = HChunk::ptr_t( new HChunk( chunk_size<dirent>( 1 ) ) );
+			::memcpy( _dirEnt->get<void>(), it_._dirEnt->get<void>(), sizeof ( dirent ) );
 			}
-		f_oItem.set_path( a_oIt.f_oItem.f_oPath, a_oIt.f_oItem.f_iNameLen );
+		_item.set_path( it_._item._path, it_._item._nameLen );
 		}
 	return;
 	M_EPILOG
@@ -187,12 +187,12 @@ HFSItem::HIterator::~HIterator( void )
 	M_EPILOG
 	}
 
-HFSItem::HIterator& HFSItem::HIterator::operator = ( HFSItem::HIterator const& a_oFSItemIterator )
+HFSItem::HIterator& HFSItem::HIterator::operator = ( HFSItem::HIterator const& fSItemIterator_ )
 	{
 	M_PROLOG
-	if ( &a_oFSItemIterator != this )
+	if ( &fSItemIterator_ != this )
 		{
-		HIterator tmp( a_oFSItemIterator );
+		HIterator tmp( fSItemIterator_ );
 		swap( tmp );
 		}
 	return ( *this );
@@ -205,10 +205,10 @@ void HFSItem::HIterator::swap( HFSItem::HIterator& o )
 	if ( &o != this )
 		{
 		using yaal::swap;
-		swap( f_oPath, o.f_oPath );
-		swap( f_pvDir, o.f_pvDir );
-		swap( f_oDirEnt, o.f_oDirEnt );
-		swap( f_oItem, o.f_oItem );
+		swap( _path, o._path );
+		swap( _dir, o._dir );
+		swap( _dirEnt, o._dirEnt );
+		swap( _item, o._item );
 		}
 	M_EPILOG
 	}
@@ -217,12 +217,12 @@ bool HFSItem::HIterator::operator == ( HIterator const& it ) const
 	{
 	M_PROLOG
 	bool same = false;
-	if ( f_oPath == it.f_oPath )
+	if ( _path == it._path )
 		{
-		if ( ! ( f_pvDir || it.f_pvDir ) )
+		if ( ! ( _dir || it._dir ) )
 			same = true;
-		else if ( f_pvDir && it.f_pvDir )
-			same = ( f_oDirEnt->get<dirent>()->d_ino == it.f_oDirEnt->get<dirent>()->d_ino );
+		else if ( _dir && it._dir )
+			same = ( _dirEnt->get<dirent>()->d_ino == it._dirEnt->get<dirent>()->d_ino );
 		}
 	return ( same );
 	M_EPILOG
@@ -235,9 +235,9 @@ bool HFSItem::HIterator::operator != ( HIterator const& it ) const
 
 HFSItem::HIterator& HFSItem::HIterator::operator++( void )
 	{
-	M_ASSERT( f_pvDir );
+	M_ASSERT( _dir );
 	dirent* result = NULL;
-	readdir_r( static_cast<DIR*>( f_pvDir ), f_oDirEnt->get<dirent>(), &result );
+	readdir_r( static_cast<DIR*>( _dir ), _dirEnt->get<dirent>(), &result );
 	if ( ! result )
 		cleanup();
 	return ( *this );
@@ -246,36 +246,36 @@ HFSItem::HIterator& HFSItem::HIterator::operator++( void )
 void HFSItem::HIterator::update( void )
 	{
 	M_PROLOG
-	dirent* ent = f_oDirEnt->get<dirent>();
-	f_oItem.set_path( f_oPath + "/" + ent->d_name, static_cast<int>( ::strlen( ent->d_name ) ) );
+	dirent* ent = _dirEnt->get<dirent>();
+	_item.set_path( _path + "/" + ent->d_name, static_cast<int>( ::strlen( ent->d_name ) ) );
 	return;
 	M_EPILOG
 	}
 
 void HFSItem::HIterator::cleanup( void )
 	{
-	if ( f_pvDir )
-		closedir( static_cast<DIR*>( f_pvDir ) );
-	f_pvDir = NULL;
-	f_oPath = "";
+	if ( _dir )
+		closedir( static_cast<DIR*>( _dir ) );
+	_dir = NULL;
+	_path = "";
 	return;
 	}
 
 HFSItem const& HFSItem::HIterator::operator* ( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_pvDir );
+	M_ASSERT( _dir );
 	update();
-	return ( f_oItem );
+	return ( _item );
 	M_EPILOG
 	}
 
 HFSItem const* HFSItem::HIterator::operator->( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_pvDir );
+	M_ASSERT( _dir );
 	update();
-	return ( &f_oItem );
+	return ( &_item );
 	M_EPILOG
 	}
 

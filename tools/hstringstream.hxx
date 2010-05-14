@@ -40,9 +40,9 @@ namespace tools
  */
 class HStringStream : public yaal::hcore::HStreamInterface
 	{
-	mutable bool f_bUsed; /* FIXME Confirm mutable is necesarry here. */
-	mutable int long f_lOffset;
-	mutable yaal::hcore::HString f_oBuffer;
+	mutable bool _used; /* FIXME Confirm mutable is necesarry here. */
+	mutable int long _offset;
+	mutable yaal::hcore::HString _buffer;
 public:
 	HStringStream( void );
 	HStringStream( yaal::hcore::HString const& );

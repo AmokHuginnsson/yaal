@@ -37,12 +37,12 @@ namespace yaal
 namespace hconsole
 {
 
-extern char const* const n_pcMaskLetters;
-extern char const* const n_pcMaskDigits;
-extern char const* const n_pcMaskAlpha;
-extern char const* const n_pcMaskExtended;
-extern char const* const n_pcMaskLoose;
-extern char const* const n_pcMaskDefault;
+extern char const* const _maskLetters_;
+extern char const* const _maskDigits_;
+extern char const* const _maskAlpha_;
+extern char const* const _maskExtended_;
+extern char const* const _maskLoose_;
+extern char const* const _maskDefault_;
 
 /*! \brief Implementation of TUI Edit control class.
  *
@@ -54,25 +54,25 @@ class HEditControl : public virtual HControl
 protected:
 	typedef HEditControl self_t;
 	typedef HControl hier_t;
-	bool f_bReplace;         /*!< current edit mode */
-	bool f_bMultiLine;       /*!< is control multiline */
-	bool f_bReadOnly;        /*!< shall editing be disabled */
-	bool f_bRightAligned;    /*!< is control content right aligned,
+	bool _replace;         /*!< current edit mode */
+	bool _multiLine;       /*!< is control multiline */
+	bool _readOnly;        /*!< shall editing be disabled */
+	bool _rightAligned;    /*!< is control content right aligned,
 														 control content can be right aligned
 														 only in single line mode */
-	bool f_bPassword;        /*!< should be entered text visible */
-	int  f_iMaxStringSize;   /*!< maximum length of text in control */
-	int  f_iCursorPosition;  /*!< cursor position relative to control begining */
-	int  f_iControlOffset;   /*!< when content is bigger than control size
+	bool _password;        /*!< should be entered text visible */
+	int  _maxStringSize;   /*!< maximum length of text in control */
+	int  _cursorPosition;  /*!< cursor position relative to control begining */
+	int  _controlOffset;   /*!< when content is bigger than control size
 														 this variable keeps offset of first
 														 character shown */
-	int  f_iMaxHistoryLevel; /*!< how many instertions should history keep */
-	hcore::HPattern f_oPattern; /*!< regular expression describing what
+	int  _maxHistoryLevel; /*!< how many instertions should history keep */
+	hcore::HPattern _pattern; /*!< regular expression describing what
 																characters and in what way can be entered */
-	hcore::HString f_oString;   /*!< control content */
+	hcore::HString _string;   /*!< control content */
 	typedef hcore::HList<yaal::hcore::HString> history_t;
-	history_t	f_oHistory;    /*!< history of insertions */
-	history_t::cyclic_iterator f_oHistoryIt;
+	history_t	_history;    /*!< history of insertions */
+	history_t::cyclic_iterator _historyIt;
 public:
 	/*! \brief Constructor of edit control.
 	 *
@@ -94,7 +94,7 @@ public:
 	 */
 	HEditControl( HWindow* parent, int top, int left,	int height, int width,
 								char const* label = "", int maxlen = 127,
-								char const* val = "", char const* mask = n_pcMaskDefault,
+								char const* val = "", char const* mask = _maskDefault_,
 								bool replace = false, bool multiline = false,
 								bool readonly = false, bool rightAlign = false,				
 								bool password = false, int maxhist = 8 );

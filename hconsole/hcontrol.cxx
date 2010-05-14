@@ -45,45 +45,45 @@ namespace yaal
 namespace hconsole
 {
 
-HControl::HControl( HWindow* a_poParent, int a_iRow, int a_iColumn,
-										 int a_iHeight, int a_iWidth, char const* a_pcLabel )
-	: f_bEnabled( false ), f_bFocused( false ), f_bDrawLabel( true ),
-	f_bSingleLine( false ), f_uiAttributeDisabled( n_iAttributeDisabled ),
-	f_uiAttributeEnabled( n_iAttributeEnabled ),
-	f_uiAttributeFocused( n_iAttributeFocused ), f_iRow( a_iRow ), f_iColumn( a_iColumn ),
-	f_iHeight( a_iHeight ), f_iWidth( a_iWidth ), f_iRowRaw( 0 ),
-	f_iColumnRaw( 0 ), f_iHeightRaw( 0 ), f_iWidthRaw( 0 ),
-	f_oLabel( a_pcLabel ), f_oVarTmpBuffer(), f_poParent( a_poParent ),
-	f_iLabelLength( 0 ), f_iShortcutIndex( 0 ), f_bValid( false ), f_bNeedRepaint( false )
+HControl::HControl( HWindow* parent_, int row_, int column_,
+										 int height_, int width_, char const* label_ )
+	: _enabled( false ), _focused( false ), _drawLabel( true ),
+	_singleLine( false ), _attributeDisabled( _attributeDisabled_ ),
+	_attributeEnabled( _attributeEnabled_ ),
+	_attributeFocused( _attributeFocused_ ), _row( row_ ), _column( column_ ),
+	_height( height_ ), _width( width_ ), _rowRaw( 0 ),
+	_columnRaw( 0 ), _heightRaw( 0 ), _widthRaw( 0 ),
+	_label( label_ ), _varTmpBuffer(), _parent( parent_ ),
+	_labelLength( 0 ), _shortcutIndex( 0 ), _valid( false ), _needRepaint( false )
 	{
 	M_PROLOG
 	if ( ! HCons::get_instance().is_enabled() )
 		M_THROW ( "not in curses mode.", errno );
-	if ( ! a_poParent )
-		M_THROW ( "no parent window.", reinterpret_cast<int long>( a_poParent ) );
-	f_iShortcutIndex = static_cast<int>( f_oLabel.find( '&' ) );
-	if ( f_iShortcutIndex > -1 )
+	if ( ! parent_ )
+		M_THROW ( "no parent window.", reinterpret_cast<int long>( parent_ ) );
+	_shortcutIndex = static_cast<int>( _label.find( '&' ) );
+	if ( _shortcutIndex > -1 )
 		{
-		f_oLabel.set_at( f_iShortcutIndex, 0 );
-		f_oLabel += a_pcLabel + f_iShortcutIndex + 1;
+		_label.set_at( _shortcutIndex, 0 );
+		_label += label_ + _shortcutIndex + 1;
 		}
 	else
-		f_iShortcutIndex = 0;
-	f_iLabelLength = a_pcLabel ? static_cast<int>( f_oLabel.get_length() ) : 0;
-	if ( f_iLabelLength )
+		_shortcutIndex = 0;
+	_labelLength = label_ ? static_cast<int>( _label.get_length() ) : 0;
+	if ( _labelLength )
 		{
-		if ( f_oLabel[ f_iLabelLength - 1 ] != '\n' )
-			f_bSingleLine = true;
+		if ( _label[ _labelLength - 1 ] != '\n' )
+			_singleLine = true;
 		else
 			{
-			f_bSingleLine = false;
-			f_oLabel.set_at( -- f_iLabelLength, 0 );
+			_singleLine = false;
+			_label.set_at( -- _labelLength, 0 );
 			}
 		}
 	else
-		f_bSingleLine = true;
-	f_poParent->add_control( HControl::ptr_t ( this ),
-				KEY<>::meta_r ( f_oLabel [ f_iShortcutIndex ] ) );
+		_singleLine = true;
+	_parent->add_control( HControl::ptr_t ( this ),
+				KEY<>::meta_r ( _label [ _shortcutIndex ] ) );
 	return;
 	M_EPILOG
 	}
@@ -92,53 +92,53 @@ HControl::~HControl ( void )
 	{
 	M_PROLOG
 #ifdef __DEBUGGER_BABUNI__
-	log << "destroing control: " << f_oLabel << endl;
+	log << "destroing control: " << _label << endl;
 #endif /* __DEBUGGER_BABUNI__ */
-	f_poParent = NULL;
+	_parent = NULL;
 	return;
 	M_EPILOG
 	}
 
-void HControl::enable ( bool a_bEnable )
+void HControl::enable ( bool enable_ )
 	{
 	M_PROLOG
-	f_bEnabled = a_bEnable;
-	if ( ! f_bEnabled )
-		f_bFocused = false;
+	_enabled = enable_;
+	if ( ! _enabled )
+		_focused = false;
 	schedule_refresh();
 	return;
 	M_EPILOG
 	}
 
-int HControl::process_input ( int a_iCode )
+int HControl::process_input ( int code_ )
 	{
 	M_PROLOG
-	if ( ! f_bValid )
+	if ( ! _valid )
 		update();
-	return ( do_process_input( a_iCode ) );
+	return ( do_process_input( code_ ) );
 	M_EPILOG
 	}
 
-int HControl::do_process_input ( int a_iCode )
+int HControl::do_process_input ( int code_ )
 	{
 	M_PROLOG
-	if ( ! f_bFocused )
-		M_THROW( "input in control without focus", a_iCode );
-	return ( a_iCode );
+	if ( ! _focused )
+		M_THROW( "input in control without focus", code_ );
+	return ( code_ );
 	M_EPILOG
 	}
 
-int HControl::set_focus ( char a_cShortCut )
+int HControl::set_focus ( char shortCut_ )
 	{
 	M_PROLOG
-	if ( ! f_bEnabled )
+	if ( ! _enabled )
 		return ( 1 );
-	if ( ( a_cShortCut > 0 ) && ( f_oLabel [ f_iShortcutIndex ] != a_cShortCut ) )
+	if ( ( shortCut_ > 0 ) && ( _label [ _shortcutIndex ] != shortCut_ ) )
 		return ( 1 );
-	f_bFocused = true;
-	if ( ! a_cShortCut )
-		f_poParent->acquire_focus ( this );
-	if ( a_cShortCut <= 0 )
+	_focused = true;
+	if ( ! shortCut_ )
+		_parent->acquire_focus ( this );
+	if ( shortCut_ <= 0 )
 		schedule_refresh();
 	return ( 0 );
 	M_EPILOG
@@ -147,9 +147,9 @@ int HControl::set_focus ( char a_cShortCut )
 int HControl::kill_focus ( void )
 	{
 	M_PROLOG
-	if ( ! f_bFocused )
+	if ( ! _focused )
 		return ( 1 );
-	f_bFocused = false;
+	_focused = false;
 	schedule_refresh();
 	return ( 0 );
 	M_EPILOG
@@ -158,7 +158,7 @@ int HControl::kill_focus ( void )
 void HControl::refresh ( void )
 	{
 	M_PROLOG
-	if ( ! f_bValid )
+	if ( ! _valid )
 		update();
 	do_refresh();
 	return;
@@ -169,7 +169,7 @@ void HControl::update ( void )
 	{
 	M_PROLOG
 	do_update();
-	f_bValid = true;
+	_valid = true;
 	return;
 	M_EPILOG
 	}
@@ -186,8 +186,8 @@ void HControl::set ( HInfo const & )
 HInfo HControl::get ( void )
 	{
 	M_PROLOG
-	HInfo l_oInfo;
-	return ( l_oInfo );
+	HInfo info;
+	return ( info );
 	M_EPILOG
 	}
 
@@ -202,7 +202,7 @@ void HControl::draw_label( void )
 	{
 	M_PROLOG
 	do_draw_label();
-	f_bNeedRepaint = false;
+	_needRepaint = false;
 	return;
 	M_EPILOG
 	}
@@ -213,79 +213,79 @@ void HControl::do_draw_label( void )
 	HConsole& cons = HCons::get_instance();
 	schedule_refresh();
 /* reposition control acordingly to current parent window size */
-	f_iRowRaw = ( f_iRow >= 0 ) ? f_iRow : cons.get_height() + f_iRow;
-	f_iColumnRaw = ( f_iColumn >= 0 ) ? f_iColumn
-		: cons.get_width() + f_iColumn;
-	f_iHeightRaw = ( f_iHeight > 0 ) ? f_iHeight 
-		: cons.get_height() + f_iHeight - f_iRowRaw;
-	f_iWidthRaw = ( f_iWidth > 0 ) ? f_iWidth
-		: cons.get_width() + f_iWidth - f_iColumnRaw;
+	_rowRaw = ( _row >= 0 ) ? _row : cons.get_height() + _row;
+	_columnRaw = ( _column >= 0 ) ? _column
+		: cons.get_width() + _column;
+	_heightRaw = ( _height > 0 ) ? _height 
+		: cons.get_height() + _height - _rowRaw;
+	_widthRaw = ( _width > 0 ) ? _width
+		: cons.get_width() + _width - _columnRaw;
 /* done */
-	if ( ! f_bDrawLabel )
+	if ( ! _drawLabel )
 		{
 		set_attr_data();
 		return;
 		}
 	set_attr_label();
-	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw, f_oLabel.raw() ) != C_ERR );
+	M_ENSURE( cons.c_mvprintf( _rowRaw, _columnRaw, _label.raw() ) != C_ERR );
 	set_attr_shortcut();
-	M_ENSURE( cons.c_mvprintf( f_iRowRaw, f_iColumnRaw + f_iShortcutIndex,
-				"%c", f_oLabel[ f_iShortcutIndex ] ) != C_ERR );
+	M_ENSURE( cons.c_mvprintf( _rowRaw, _columnRaw + _shortcutIndex,
+				"%c", _label[ _shortcutIndex ] ) != C_ERR );
 	set_attr_data();
-	if ( f_bSingleLine )
-		f_iColumnRaw += f_iLabelLength, f_iWidthRaw -= f_iLabelLength;
+	if ( _singleLine )
+		_columnRaw += _labelLength, _widthRaw -= _labelLength;
 	else
-		f_iRowRaw ++, f_iHeightRaw --;
+		_rowRaw ++, _heightRaw --;
 	return;
 	M_EPILOG
 	}
 
-void HControl::set_attributes( int a_iAttributeDisabled,
-		int a_iAttributeEnabled, int a_iAttributeFocused )
+void HControl::set_attributes( int attributeDisabled_,
+		int attributeEnabled_, int attributeFocused_ )
 	{
 	M_PROLOG
-	if ( a_iAttributeDisabled == DEFAULT_ATTRS )
-		f_uiAttributeDisabled = n_iAttributeDisabled;
+	if ( attributeDisabled_ == DEFAULT_ATTRS )
+		_attributeDisabled = _attributeDisabled_;
 	else
-		f_uiAttributeDisabled = a_iAttributeDisabled;
-	if ( a_iAttributeEnabled == DEFAULT_ATTRS )
-		f_uiAttributeEnabled = n_iAttributeEnabled;
+		_attributeDisabled = attributeDisabled_;
+	if ( attributeEnabled_ == DEFAULT_ATTRS )
+		_attributeEnabled = _attributeEnabled_;
 	else
-		f_uiAttributeEnabled = a_iAttributeEnabled;
-	if ( a_iAttributeFocused == DEFAULT_ATTRS )
-		f_uiAttributeFocused = n_iAttributeFocused;
+		_attributeEnabled = attributeEnabled_;
+	if ( attributeFocused_ == DEFAULT_ATTRS )
+		_attributeFocused = _attributeFocused_;
 	else
-		f_uiAttributeFocused = a_iAttributeFocused;
+		_attributeFocused = attributeFocused_;
 	schedule_refresh();
 	return;
 	M_EPILOG
 	}
 
-void HControl::move( int a_iRow, int a_iColumn, int a_iHeight, int a_iWidth )
+void HControl::move( int row_, int column_, int height_, int width_ )
 	{
 	M_PROLOG
-	f_iRow = a_iRow;
-	f_iColumn = a_iColumn;
-	f_iHeight = a_iHeight;
-	f_iWidth = a_iWidth;
+	_row = row_;
+	_column = column_;
+	_height = height_;
+	_width = width_;
 	schedule_refresh();
 	return;
 	M_EPILOG
 	}
 
-int HControl::click( mouse::OMouse& a_roMouse )
+int HControl::click( mouse::OMouse& mouse_ )
 	{
 	M_PROLOG
-	if ( ! f_bValid )
+	if ( ! _valid )
 		update();
-	return ( do_click( a_roMouse ) );
+	return ( do_click( mouse_ ) );
 	M_EPILOG
 	}
 
 int HControl::do_click( mouse::OMouse& )
 	{
 	M_PROLOG
-	if ( f_bFocused )
+	if ( _focused )
 		return ( 1 );
 	set_focus();
 	return ( 0 );
@@ -297,13 +297,13 @@ void HControl::do_update( void )
 	return;
 	}
 
-bool HControl::hit_test( int a_iRow, int a_iColumn ) const
+bool HControl::hit_test( int row_, int column_ ) const
 	{
 	M_PROLOG
-	if ( ( a_iRow < f_iRowRaw ) || ( a_iRow > ( f_iRowRaw + f_iHeightRaw ) ) )
+	if ( ( row_ < _rowRaw ) || ( row_ > ( _rowRaw + _heightRaw ) ) )
 		return ( false );
-	if ( ( a_iColumn < f_iColumnRaw )
-			|| ( a_iColumn >= ( f_iColumnRaw + f_iWidthRaw ) ) )
+	if ( ( column_ < _columnRaw )
+			|| ( column_ >= ( _columnRaw + _widthRaw ) ) )
 		return ( false );
 	return ( true );
 	M_EPILOG
@@ -312,21 +312,21 @@ bool HControl::hit_test( int a_iRow, int a_iColumn ) const
 int HControl::attr_label( void ) const
 	{
 	M_PROLOG
-	return ( f_bEnabled ? ( f_bFocused ? f_uiAttributeFocused >> 8 : f_uiAttributeEnabled >> 8 ) : f_uiAttributeDisabled >> 8 );
+	return ( _enabled ? ( _focused ? _attributeFocused >> 8 : _attributeEnabled >> 8 ) : _attributeDisabled >> 8 );
 	M_EPILOG
 	}
 
 int HControl::attr_shortcut( void ) const
 	{
 	M_PROLOG
-	return ( ! f_bEnabled ? ( ! f_bFocused ? f_uiAttributeFocused >> 8 : f_uiAttributeEnabled >> 8 ) : f_uiAttributeDisabled >> 8 );
+	return ( ! _enabled ? ( ! _focused ? _attributeFocused >> 8 : _attributeEnabled >> 8 ) : _attributeDisabled >> 8 );
 	M_EPILOG
 	}
 
 int HControl::attr_data( void ) const
 	{
 	M_PROLOG
-	return ( f_bEnabled ? ( f_bFocused ? f_uiAttributeFocused : f_uiAttributeEnabled ) : f_uiAttributeDisabled );
+	return ( _enabled ? ( _focused ? _attributeFocused : _attributeEnabled ) : _attributeDisabled );
 	M_EPILOG
 	}
 
@@ -354,28 +354,28 @@ void HControl::set_attr_data( void ) const
 	M_EPILOG
 	}
 
-void HControl::set_draw_label( bool a_bDrawLabel )
+void HControl::set_draw_label( bool drawLabel_ )
 	{
-	f_bDrawLabel = a_bDrawLabel;
+	_drawLabel = drawLabel_;
 	return;
 	}
 
 void HControl::schedule_refresh( void )
 	{
-	f_bNeedRepaint = true;
-	n_bNeedRepaint = true;
+	_needRepaint = true;
+	_needRepaint_ = true;
 	return;
 	}
 
 void HControl::invalidate( void )
 	{
-	f_bValid = false;
+	_valid = false;
 	return;
 	}
 
 bool HControl::need_repaint( void ) const
 	{
-	return ( f_bNeedRepaint );
+	return ( _needRepaint );
 	}
 
 }

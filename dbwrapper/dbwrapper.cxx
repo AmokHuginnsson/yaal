@@ -55,37 +55,37 @@ namespace dbwrapper
 void dbwrapper_error( void );
 void dbwrapper_exit( void ) __attribute__(( __noreturn__ ));
 
-ODBConnector::DRIVER::enum_t n_eDataBaseDriver = ODBConnector::DRIVER::NONE;
+ODBConnector::DRIVER::enum_t _dataBaseDriver_ = ODBConnector::DRIVER::NONE;
 
-bool set_dbwrapper_variables( HString& a_roOption, HString& a_roValue )
+bool set_dbwrapper_variables( HString& option_, HString& value_ )
 	{
 	M_PROLOG
-	if ( ! strcasecmp( a_roOption, "set_env" ) )
-		decode_set_env( a_roValue );
-	else if ( ! strcasecmp( a_roOption, "log_mask" ) )
+	if ( ! strcasecmp( option_, "set_env" ) )
+		decode_set_env( value_ );
+	else if ( ! strcasecmp( option_, "log_mask" ) )
 		{
-		if ( ! strcasecmp( a_roValue, "LOG_SQL" ) )
-			HLog::f_lLogMask |= LOG_TYPE::SQL;
+		if ( ! strcasecmp( value_, "LOG_SQL" ) )
+			HLog::_logMask |= LOG_TYPE::SQL;
 		else
 			return ( true );
 		}
-	else if ( ! strcasecmp( a_roOption, "data_base_driver" ) )
+	else if ( ! strcasecmp( option_, "data_base_driver" ) )
 		{
-		if ( ! ( strcasecmp( a_roValue, "none" )
-					&& strcasecmp( a_roValue, "null" )
-					&& strcasecmp( a_roValue, "dummy" ) ) )
-			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::NONE;
-		else if ( a_roValue == "SQLite3" )
-			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::SQLITE3;
-		else if ( a_roValue == "PostgreSQL" )
-			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::POSTGRESQL;
-		else if ( a_roValue == "MySQL" )
-			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::MYSQL;
-		else if ( a_roValue == "Oracle" )
-			dbwrapper::n_eDataBaseDriver = ODBConnector::DRIVER::ORACLE;
+		if ( ! ( strcasecmp( value_, "none" )
+					&& strcasecmp( value_, "null" )
+					&& strcasecmp( value_, "dummy" ) ) )
+			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::NONE;
+		else if ( value_ == "SQLite3" )
+			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::SQLITE3;
+		else if ( value_ == "PostgreSQL" )
+			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::POSTGRESQL;
+		else if ( value_ == "MySQL" )
+			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::MYSQL;
+		else if ( value_ == "Oracle" )
+			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::ORACLE;
 		else
 			{
-			log( LOG_TYPE::ERROR ) << "Error: `" << a_roValue;
+			log( LOG_TYPE::ERROR ) << "Error: `" << value_;
 			log << "' is unknown driver." << endl;
 			exit( 1 );
 			}
@@ -110,10 +110,10 @@ HDBWrapperInitDeinit::HDBWrapperInitDeinit( void )
 	M_EPILOG
 	}
 
-extern char const * g_pcDone;
+extern char const * _done_;
 
 #if defined( __DYNAMIC_LINKER__ )
-static char const g_pcDynamicLinkerPath[]
+static char const _dynamicLinkerPath_[]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 void yaal_dbwrapper_banner( void )
@@ -125,7 +125,7 @@ void yaal_dbwrapper_banner( void )
 extern "C"
 int yaal_dbwrapper_main( int, char** )
 	{
-	if ( g_pcDynamicLinkerPath[ 0 ] )
+	if ( _dynamicLinkerPath_[ 0 ] )
 		{
 		yaal_hcore_banner();
 		yaal_tools_banner();

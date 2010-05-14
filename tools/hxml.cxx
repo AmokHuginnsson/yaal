@@ -126,71 +126,71 @@ HXsltParserG::~HXsltParserG( void )
 
 struct HXml::OConvert
 	{
-	encoder_resource_ptr_t f_oEncoder;
-	iconv_t f_xIconvToExternal;
-	iconv_t f_xIconvToInternal;
+	encoder_resource_ptr_t _encoder;
+	iconv_t _iconvToExternal;
+	iconv_t _iconvToInternal;
 	OConvert( void ) 
-		: f_oEncoder(),
-		f_xIconvToExternal( static_cast<iconv_t>( 0 ) ),
-		f_xIconvToInternal( static_cast<iconv_t>( 0 ) ) { }
-	OConvert( OConvert const& a_roConvert )
-		: f_oEncoder(),
-		f_xIconvToExternal( static_cast<iconv_t>( 0 ) ),
-		f_xIconvToInternal( static_cast<iconv_t>( 0 ) )
+		: _encoder(),
+		_iconvToExternal( static_cast<iconv_t>( 0 ) ),
+		_iconvToInternal( static_cast<iconv_t>( 0 ) ) { }
+	OConvert( OConvert const& convert_ )
+		: _encoder(),
+		_iconvToExternal( static_cast<iconv_t>( 0 ) ),
+		_iconvToInternal( static_cast<iconv_t>( 0 ) )
 		{
-		operator = ( a_roConvert );
+		operator = ( convert_ );
 		}
-	OConvert& operator = ( OConvert const& a_roConvert )
+	OConvert& operator = ( OConvert const& convert_ )
 		{
-		if ( &a_roConvert != this )
+		if ( &convert_ != this )
 			{
-			f_oEncoder = a_roConvert.f_oEncoder;
-			f_xIconvToExternal = a_roConvert.f_xIconvToExternal;
-			f_xIconvToInternal = a_roConvert.f_xIconvToInternal;
+			_encoder = convert_._encoder;
+			_iconvToExternal = convert_._iconvToExternal;
+			_iconvToInternal = convert_._iconvToInternal;
 			}
 		return ( *this );
 		}
-	void init( HString const& a_oEncoding )
+	void init( HString const& encoding_ )
 		{
 		M_PROLOG
-		xmlCharEncodingHandlerPtr encoder = ::xmlFindCharEncodingHandler( a_oEncoding.raw() );
+		xmlCharEncodingHandlerPtr encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
 		if ( ! encoder )
 			M_THROW( _( "cannot enable internal convertion" ), errno );
-		f_oEncoder = encoder_resource_ptr_t(
+		_encoder = encoder_resource_ptr_t(
 				new encoder_resource_t( encoder, xmlCharEncCloseFunc ) );
-		f_xIconvToExternal = (*f_oEncoder).get()->iconv_in;
-		f_xIconvToInternal = (*f_oEncoder).get()->iconv_out;
+		_iconvToExternal = (*_encoder).get()->iconv_in;
+		_iconvToInternal = (*_encoder).get()->iconv_out;
 		M_EPILOG
 		}
-	void init( yaal::hcore::HString const& a_oEncoding, xmlNodePtr a_psRoot, yaal::hcore::HString const& a_oFileName )
+	void init( yaal::hcore::HString const& encoding_, xmlNodePtr root_, yaal::hcore::HString const& fileName_ )
 		{
 		M_PROLOG
 		xmlCharEncodingHandlerPtr encoder = NULL;
-		if ( !! a_oEncoding )
-			encoder = ::xmlFindCharEncodingHandler( a_oEncoding.raw() );
+		if ( !! encoding_ )
+			encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
 		else
 			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: no encoding declared in `" )
-				<< a_oFileName << "'." << endl;
+				<< fileName_ << "'." << endl;
 		if ( ! encoder )
 			{
 			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: char encoding handler not found" ) << endl;
-			xmlCharEncoding l_xEncoding = ::xmlDetectCharEncoding( a_psRoot->name,
-					xmlStrlen( a_psRoot->name ) );
-			if ( ! l_xEncoding )
+			xmlCharEncoding encoding = ::xmlDetectCharEncoding( root_->name,
+					xmlStrlen( root_->name ) );
+			if ( ! encoding )
 				M_THROW( _( "cannot detect character encoding" ), errno );
-			encoder = xmlGetCharEncodingHandler( l_xEncoding );
+			encoder = xmlGetCharEncodingHandler( encoding );
 			}
 		if ( ! encoder )
 			M_THROW( _( "cannot enable internal convertion" ), errno );
-		f_oEncoder = encoder_resource_ptr_t(
+		_encoder = encoder_resource_ptr_t(
 				new encoder_resource_t( encoder, xmlCharEncCloseFunc ) );
-		f_xIconvToExternal = (*f_oEncoder).get()->iconv_in;
-		f_xIconvToInternal = (*f_oEncoder).get()->iconv_out;
+		_iconvToExternal = (*_encoder).get()->iconv_in;
+		_iconvToInternal = (*_encoder).get()->iconv_out;
 		M_EPILOG
 		}
 	bool operator ! ( void ) const
 		{
-		return ( ! ( f_xIconvToExternal && f_xIconvToInternal ) );
+		return ( ! ( _iconvToExternal && _iconvToInternal ) );
 		}
 	};
 
@@ -199,11 +199,11 @@ class HXmlData
 private:
 	/*{*/
 	friend class HXml;
-	doc_resource_t     f_oDoc;
-	style_resource_t   f_oStyle;
-	mutable xpath_context_resource_t f_oXPathContext;
-	mutable xpath_object_resource_t f_oXPathObject;
-	xmlNodeSetPtr      f_psNodeSet;
+	doc_resource_t     _doc;
+	style_resource_t   _style;
+	mutable xpath_context_resource_t _xPathContext;
+	mutable xpath_object_resource_t _xPathObject;
+	xmlNodeSetPtr      _nodeSet;
 	/*}*/
 protected:
 	/*{*/
@@ -216,8 +216,8 @@ protected:
 	};
 
 HXmlData::HXmlData( void )
-	: f_oDoc(), f_oStyle(), f_oXPathContext(), f_oXPathObject(),
-	f_psNodeSet( NULL )
+	: _doc(), _style(), _xPathContext(), _xPathObject(),
+	_nodeSet( NULL )
 	{
 	M_PROLOG
 	return;
@@ -234,19 +234,19 @@ HXmlData::~HXmlData ( void )
 void HXmlData::clear( void ) const
 	{
 	M_PROLOG
-	f_oXPathObject.reset();
-	f_oXPathContext.reset();
+	_xPathObject.reset();
+	_xPathContext.reset();
 	return;
 	M_EPILOG
 	}
 
 HXml::HXml( void )
-	: f_oConvert( new HXml::OConvert ), f_oConvertedString(),
-	f_oVarTmpBuffer(), f_oEncoding( n_oDefaultEncoding ), f_poXml( NULL ), f_oDOM()
+	: _convert( new HXml::OConvert ), _convertedString(),
+	_varTmpBuffer(), _encoding( _defaultEncoding_ ), _xml( NULL ), _dOM()
 	{
 	M_PROLOG
-	f_poXml = new ( std::nothrow ) HXmlData();
-	M_ENSURE( f_poXml );
+	_xml = new ( std::nothrow ) HXmlData();
+	M_ENSURE( _xml );
 	M_EPILOG
 	return;
 	}
@@ -254,9 +254,9 @@ HXml::HXml( void )
 HXml::~HXml ( void )
 	{
 	M_PROLOG
-	if ( f_poXml )
-		delete f_poXml;
-	f_poXml = NULL;
+	if ( _xml )
+		delete _xml;
+	_xml = NULL;
 	return;
 	M_EPILOG
 	}
@@ -267,73 +267,73 @@ HXml::~HXml ( void )
 #	define M_YAAL_TOOLS_HXML_ICONV_CONST /**/
 #endif /* not HAVE_ICONV_INPUT_CONST */
 
-HString const& HXml::convert( HString const& a_oData, way_t a_eWay ) const
+HString const& HXml::convert( HString const& data_, way_t way_ ) const
 	{
 	M_PROLOG
-	char M_YAAL_TOOLS_HXML_ICONV_CONST* source = const_cast<char M_YAAL_TOOLS_HXML_ICONV_CONST*>( a_oData.raw() );
-	iconv_t l_xCD = static_cast<iconv_t>( 0 );
-	switch ( a_eWay )
+	char M_YAAL_TOOLS_HXML_ICONV_CONST* source = const_cast<char M_YAAL_TOOLS_HXML_ICONV_CONST*>( data_.raw() );
+	iconv_t cD = static_cast<iconv_t>( 0 );
+	switch ( way_ )
 		{
-		case ( TO_EXTERNAL ): { l_xCD = ( *f_oConvert ).f_xIconvToExternal; break; }
-		case ( TO_INTERNAL ): { l_xCD = ( *f_oConvert ).f_xIconvToInternal; break; }
+		case ( TO_EXTERNAL ): { cD = ( *_convert )._iconvToExternal; break; }
+		case ( TO_INTERNAL ): { cD = ( *_convert )._iconvToInternal; break; }
 		default:
 			{
 			M_ASSERT( ! _( "unknown conversion way" ) );
 			}
 		}
-	size_t l_uiSizeOut = 0, l_uiSizeIn = ::strlen( source );
+	size_t sizeOut = 0, sizeIn = ::strlen( source );
 	/* The longest single character in any encoding is 6 bytes long. */
 	size_t const ICONV_OUTPUT_BUFFER_LENGTH = 8;
 	/* Additional character for nil terminator. */
-	char l_pcOutput[ ICONV_OUTPUT_BUFFER_LENGTH + 1 ];
-	f_oConvertedString = "";
+	char output[ ICONV_OUTPUT_BUFFER_LENGTH + 1 ];
+	_convertedString = "";
 	do
 		{
-		::memset( l_pcOutput, 0, ICONV_OUTPUT_BUFFER_LENGTH + 1 );
-		l_uiSizeOut = ICONV_OUTPUT_BUFFER_LENGTH;
-		char* l_pcOut = l_pcOutput;
-		M_ENSURE( ( ::iconv( l_xCD, &source, &l_uiSizeIn, &l_pcOut,
-						&l_uiSizeOut ) != static_cast<size_t>( -1 ) )
+		::memset( output, 0, ICONV_OUTPUT_BUFFER_LENGTH + 1 );
+		sizeOut = ICONV_OUTPUT_BUFFER_LENGTH;
+		char* out = output;
+		M_ENSURE( ( ::iconv( cD, &source, &sizeIn, &out,
+						&sizeOut ) != static_cast<size_t>( -1 ) )
 				|| ( errno == E2BIG ) );
-		f_oConvertedString += l_pcOutput;
+		_convertedString += output;
 		}
-	while ( l_uiSizeIn );
-	return ( f_oConvertedString );
+	while ( sizeIn );
+	return ( _convertedString );
 	M_EPILOG
 	}
 
 #undef M_YAAL_TOOLS_HXML_ICONV_CONST
 
-int HXml::get_node_set_by_path( yaal::hcore::HString const& a_oPath )
+int HXml::get_node_set_by_path( yaal::hcore::HString const& path_ )
 	{
 	M_PROLOG
-	f_oVarTmpBuffer = a_oPath;
-	int long l_iLength = f_oVarTmpBuffer.get_length() - 1;
-	xpath_context_resource_t ctx( xmlXPathNewContext( f_poXml->f_oDoc.get() ), xmlXPathFreeContext );
+	_varTmpBuffer = path_;
+	int long length = _varTmpBuffer.get_length() - 1;
+	xpath_context_resource_t ctx( xmlXPathNewContext( _xml->_doc.get() ), xmlXPathFreeContext );
 	int setSize = 0;
-	f_poXml->f_psNodeSet = NULL;
+	_xml->_nodeSet = NULL;
 	if ( ctx.get() )
 		{
 		xmlXPathObjectPtr objPtr = NULL;
-		while ( ! f_oVarTmpBuffer.is_empty() )
+		while ( ! _varTmpBuffer.is_empty() )
 			{
 			objPtr = xmlXPathEvalExpression(
-					reinterpret_cast<xmlChar const*>( f_oVarTmpBuffer.raw() ),
+					reinterpret_cast<xmlChar const*>( _varTmpBuffer.raw() ),
 					ctx.get() );
 			if ( objPtr )
 				break;
-			f_oVarTmpBuffer.set_at( l_iLength --, 0 );
+			_varTmpBuffer.set_at( length --, 0 );
 			}
 		xpath_object_resource_t obj( objPtr, xmlXPathFreeObject );
 		if ( obj.get() )
 			{
-			f_oVarTmpBuffer = a_oPath;
-			f_poXml->f_psNodeSet = obj.get()->nodesetval;
-			swap( f_poXml->f_oXPathObject, obj );
-			setSize = f_poXml->f_psNodeSet ? f_poXml->f_psNodeSet->nodeNr : 0;
+			_varTmpBuffer = path_;
+			_xml->_nodeSet = obj.get()->nodesetval;
+			swap( _xml->_xPathObject, obj );
+			setSize = _xml->_nodeSet ? _xml->_nodeSet->nodeNr : 0;
 			}
 		}
-	swap( f_poXml->f_oXPathContext, ctx );
+	swap( _xml->_xPathContext, ctx );
 	return ( setSize );
 	M_EPILOG
 	}
@@ -341,8 +341,8 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& a_oPath )
 void HXml::init( yaal::hcore::HStreamInterface& stream )
 	{
 	M_PROLOG
-	int l_iSavedErrno = errno;
-	HString l_oError;
+	int savedErrno = errno;
+	HString error;
 	HXmlParserGlobal::get_instance();
 	errno = 0;
 	HString streamId = get_stream_id( &stream );
@@ -354,11 +354,11 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 		log( LOG_TYPE::WARNING ) << error_message( errno ) << ": " << streamId;
 		log << ", code: " << errno << '.' << endl;
 		}
-	errno = l_iSavedErrno;
+	errno = savedErrno;
 	if ( ! doc.get() )
 		{
-		l_oError.format( _( "cannot parse `%s'" ), streamId.raw() );
-		throw HXmlException( l_oError );
+		error.format( _( "cannot parse `%s'" ), streamId.raw() );
+		throw HXmlException( error );
 		}
 	if ( xmlXIncludeProcess( doc.get() ) < 0 )
 		throw HXmlException( "processing XInclude failed" );
@@ -368,9 +368,9 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 #ifdef __DEBUGGER_BABUNI__
 	cout << root->name << endl;
 #endif /* __DEBUGGER_BABUNI__ */
-	(*f_oConvert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
+	(*_convert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
 			root, streamId );
-	swap( f_poXml->f_oDoc, doc );
+	swap( _xml->_doc, doc );
 	return;
 	M_EPILOG
 	}
@@ -383,101 +383,101 @@ void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream )
 	M_EPILOG
 	}
 
-void HXml::parse( xml_node_ptr_t a_pvData, tree_t::node_t a_rsNode, bool a_bStripEmpty )
+void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, bool stripEmpty_ )
 	{
 	M_PROLOG
-	xmlNodePtr l_psNode = static_cast<xmlNodePtr>( a_pvData );
-	while ( l_psNode )
+	xmlNodePtr node = static_cast<xmlNodePtr>( data_ );
+	while ( node )
 		{
-		switch ( l_psNode->type )
+		switch ( node->type )
 			{
 			case ( XML_DOCUMENT_NODE ):
-				l_psNode = l_psNode->children;
+				node = node->children;
 			continue;
 			case ( XML_DTD_NODE ):
 				{
-				xmlNodePtr child = l_psNode->children;
+				xmlNodePtr child = node->children;
 				while ( child )
 					{
-					parse( child, a_rsNode, a_bStripEmpty );
+					parse( child, node_, stripEmpty_ );
 					child = child->next;
 					}
-				l_psNode = l_psNode->next; /* FIXME add DTD handling later (keeping track of entities) */
+				node = node->next; /* FIXME add DTD handling later (keeping track of entities) */
 				}
 			continue;
 			case ( XML_ELEMENT_NODE ):
 				{
-				if ( a_rsNode )
-					a_rsNode = &*a_rsNode->add_node();
+				if ( node_ )
+					node_ = &*node_->add_node();
 				else
-					a_rsNode = f_oDOM.create_new_root();
-				(**a_rsNode).f_oText = reinterpret_cast<char const*>( l_psNode->name );
-				if ( l_psNode->properties )
+					node_ = _dOM.create_new_root();
+				(**node_)._text = reinterpret_cast<char const*>( node->name );
+				if ( node->properties )
 					{
-					xmlAttrPtr l_psAttribute = l_psNode->properties;
-					while ( l_psAttribute )
+					xmlAttrPtr attribute = node->properties;
+					while ( attribute )
 						{
-						char const* l_pcName = reinterpret_cast<char const*>( l_psAttribute->name );
-						if ( l_pcName )
+						char const* name = reinterpret_cast<char const*>( attribute->name );
+						if ( name )
 							{
-							if ( l_psAttribute->children )
-								(**a_rsNode).f_oProperties[ l_pcName ] = l_psAttribute->children->content ? convert(
-										reinterpret_cast<char*>( l_psAttribute->children->content ) ) : "";
+							if ( attribute->children )
+								(**node_)._properties[ name ] = attribute->children->content ? convert(
+										reinterpret_cast<char*>( attribute->children->content ) ) : "";
 							}
-						l_psAttribute = l_psAttribute->next;
+						attribute = attribute->next;
 						}
 					}
-				xmlNodePtr child = l_psNode->children;
+				xmlNodePtr child = node->children;
 				while ( child )
 					{
-					parse( child, a_rsNode, a_bStripEmpty );
+					parse( child, node_, stripEmpty_ );
 					child = child->next;
 					}
 				}
 			break;
 			case ( XML_ENTITY_REF_NODE ):
-			case ( XML_TEXT_NODE ): if ( l_psNode->content )
+			case ( XML_TEXT_NODE ): if ( node->content )
 				{
-				f_oVarTmpBuffer = convert( reinterpret_cast<char*>( l_psNode->content ) );
-				if ( ! a_bStripEmpty || ( f_oVarTmpBuffer.find_other_than( n_pcWhiteSpace ) >= 0 ) )
-					a_rsNode->add_node( HNode( HNode::TYPE::CONTENT, f_oVarTmpBuffer ) );
+				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
+				if ( ! stripEmpty_ || ( _varTmpBuffer.find_other_than( _whiteSpace_ ) >= 0 ) )
+					node_->add_node( HNode( HNode::TYPE::CONTENT, _varTmpBuffer ) );
 				}
 			break;
 			default:
-				log_trace << "unsupported type: " << static_cast<int>( l_psNode->type ) << endl;
+				log_trace << "unsupported type: " << static_cast<int>( node->type ) << endl;
 			break;
 			}
-		l_psNode = NULL;
+		node = NULL;
 		}
 	return;
 	M_EPILOG
 	}
 
-void HXml::parse( HString a_oXPath, bool a_bStripEmpty )
+void HXml::parse( HString xPath_, bool stripEmpty_ )
 	{
 	M_PROLOG
 	char const* const FULL_TREE = "//*";
-	if ( ! a_oXPath || ! a_oXPath[ 0 ] )
-		a_oXPath = FULL_TREE; /* scan full tree */
-	get_node_set_by_path( a_oXPath );
-	f_oDOM.clear();
-	int l_iCtr = 0;
-	while ( a_oXPath[ l_iCtr ] )
-		l_iCtr ++;
-	l_iCtr --;
-	M_ASSERT ( l_iCtr >= 0 );
-	if ( f_poXml->f_psNodeSet )
+	if ( ! xPath_ || ! xPath_[ 0 ] )
+		xPath_ = FULL_TREE; /* scan full tree */
+	get_node_set_by_path( xPath_ );
+	_dOM.clear();
+	int ctr = 0;
+	while ( xPath_[ ctr ] )
+		ctr ++;
+	ctr --;
+	M_ASSERT ( ctr >= 0 );
+	if ( _xml->_nodeSet )
 		{
-		if ( a_oXPath != FULL_TREE )
+		if ( xPath_ != FULL_TREE )
 			{
-			tree_t::node_t root = f_oDOM.create_new_root();
-			(**root).f_oText = "xpath_result_set";
-			for ( l_iCtr = 0; l_iCtr < f_poXml->f_psNodeSet->nodeNr; ++ l_iCtr )
-				parse( f_poXml->f_psNodeSet->nodeTab[ l_iCtr ],
-						root, a_bStripEmpty );
+			tree_t::node_t root = _dOM.create_new_root();
+			(**root)._text = "xpath_result_set";
+			for ( ctr = 0; ctr < _xml->_nodeSet->nodeNr; ++ ctr )
+				parse( _xml->_nodeSet->nodeTab[ ctr ],
+						root, stripEmpty_ );
 			}
 		else
-			parse( xmlDocGetRootElement( f_poXml->f_oDoc.get() ), NULL, a_bStripEmpty );
+			parse( xmlDocGetRootElement( _xml->_doc.get() ), NULL, stripEmpty_ );
 		}
 	M_EPILOG
 	}
@@ -514,9 +514,9 @@ void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 			throw HXmlException( _( "Cannot create the xml DOC writer." ) );
 		doc_resource_t dummy( pDoc, xmlFreeDoc );
 		swap( doc, dummy );
-		int rc = ::xmlTextWriterStartDocument( writer.get(), NULL, f_oEncoding.raw(), "yes" );
+		int rc = ::xmlTextWriterStartDocument( writer.get(), NULL, _encoding.raw(), "yes" );
 		if ( rc < 0 )
-			throw HXmlException( HString( "Unable to start document with encoding: " ) + f_oEncoding );
+			throw HXmlException( HString( "Unable to start document with encoding: " ) + _encoding );
 		rc = xmlTextWriterSetIndent( writer.get(), 1 );
 		if ( rc < 0 )
 			throw HXmlException( "Unable to enable indenting." );
@@ -524,31 +524,31 @@ void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 		rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( INDENTION_STRING ) );
 		if ( rc < 0 )
 			throw HXmlException( "Cannot set indent string." );
-		if ( ! (*f_oConvert) )
-			(*f_oConvert).init( f_oEncoding );
+		if ( ! (*_convert) )
+			(*_convert).init( _encoding );
 		dump_node( &writer, get_root() );
 		rc = xmlTextWriterEndDocument( writer.get() );
 		if ( rc < 0 )
 			throw HXmlException( "Unable to end document." );
 		}
-	f_poXml->clear();
-	if ( f_poXml->f_oDoc.get() )
-		xmlFreeNode( xmlDocSetRootElement( f_poXml->f_oDoc.get(), xmlDocGetRootElement( doc.get() ) ) );
+	_xml->clear();
+	if ( _xml->_doc.get() )
+		xmlFreeNode( xmlDocSetRootElement( _xml->_doc.get(), xmlDocGetRootElement( doc.get() ) ) );
 	else
-		swap( f_poXml->f_oDoc, doc );
-	M_ASSERT( f_poXml->f_oDoc.get() );
-	if ( f_poXml->f_oStyle.get() )
+		swap( _xml->_doc, doc );
+	M_ASSERT( _xml->_doc.get() );
+	if ( _xml->_style.get() )
 		{
 		outputbuffer_resource_t obuf( ::xmlOutputBufferCreateIO( writer_callback,
-							NULL, &stream, ::xmlFindCharEncodingHandler( f_oEncoding.raw() ) ),
+							NULL, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
 				xmlOutputBufferClose );
 		M_ENSURE( ::xsltSaveResultTo( obuf.get(),
-					f_poXml->f_oDoc.get(), f_poXml->f_oStyle.get() ) != -1 );
+					_xml->_doc.get(), _xml->_style.get() ) != -1 );
 		}
 	else
 		M_ENSURE( ::xmlSaveFileTo( ::xmlOutputBufferCreateIO( writer_callback,
-						NULL, &stream, ::xmlFindCharEncodingHandler( f_oEncoding.raw() ) ),
-					f_poXml->f_oDoc.get(), f_oEncoding.raw() ) != -1 );
+						NULL, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
+					_xml->_doc.get(), _encoding.raw() ) != -1 );
 	return;
 	M_EPILOG
 	}
@@ -611,13 +611,13 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const
 	M_EPILOG
 	}
 
-void HXml::create_root( yaal::hcore::HString const& a_oName, yaal::hcore::HString const& a_oEncoding )
+void HXml::create_root( yaal::hcore::HString const& name_, yaal::hcore::HString const& encoding_ )
 	{
 	M_PROLOG
-	M_ASSERT( a_oName );
-	f_oEncoding = ( !! a_oEncoding ) ? a_oEncoding : n_oDefaultEncoding;
-	tree_t::node_t root = f_oDOM.create_new_root();
-	(**root).f_oText = a_oName;
+	M_ASSERT( name_ );
+	_encoding = ( !! encoding_ ) ? encoding_ : _defaultEncoding_;
+	tree_t::node_t root = _dOM.create_new_root();
+	(**root)._text = name_;
 	return;
 	M_EPILOG
 	}
@@ -625,9 +625,9 @@ void HXml::create_root( yaal::hcore::HString const& a_oName, yaal::hcore::HStrin
 void HXml::clear( void )
 	{
 	M_PROLOG
-	f_oEncoding.clear();
-	f_oDOM.clear();
-	f_poXml->clear();
+	_encoding.clear();
+	_dOM.clear();
+	_xml->clear();
 	return;
 	M_EPILOG
 	}
@@ -635,205 +635,205 @@ void HXml::clear( void )
 HXml::HNodeProxy HXml::get_root( void )
 	{
 	M_PROLOG
-	return ( HNodeProxy( f_oDOM.get_root() ) );
+	return ( HNodeProxy( _dOM.get_root() ) );
 	M_EPILOG
 	}
 
 HXml::HConstNodeProxy const HXml::get_root( void ) const
 	{
 	M_PROLOG
-	return ( HConstNodeProxy( f_oDOM.get_root() ) );
+	return ( HConstNodeProxy( _dOM.get_root() ) );
 	M_EPILOG
 	}
 
 HXml::HNodeProxy::HNodeProxy( void )
-	: f_poNode( NULL )
+	: _node( NULL )
 	{
 	}
 
 HXml::HConstNodeProxy::HConstNodeProxy( void )
-	: f_poNode( NULL )
+	: _node( NULL )
 	{
 	}
 
-HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t a_poNode )
-	: f_poNode( a_poNode )
+HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t node_ )
+	: _node( node_ )
 	{
 	}
 
-HXml::HConstNodeProxy::HConstNodeProxy( HXml::tree_t::const_node_t a_poNode )
-	: f_poNode( a_poNode )
+HXml::HConstNodeProxy::HConstNodeProxy( HXml::tree_t::const_node_t node_ )
+	: _node( node_ )
 	{
 	}
 
 HXml::HNodeProxy::HNodeProxy( HNodeProxy const& other )
-	: f_poNode( other.f_poNode )
+	: _node( other._node )
 	{
 	}
 
 HXml::HConstNodeProxy::HConstNodeProxy( HConstNodeProxy const& other )
-	: f_poNode( other.f_poNode )
+	: _node( other._node )
 	{
 	}
 
 HXml::HConstNodeProxy::HConstNodeProxy( HNodeProxy const& other )
-	: f_poNode( other.f_poNode )
+	: _node( other._node )
 	{
 	}
 
 HXml::HNodeProxy& HXml::HNodeProxy::operator = ( HNodeProxy const& other )
 	{
 	if ( &other != this )
-		f_poNode = other.f_poNode;
+		_node = other._node;
 	return ( *this );
 	}
 
 HXml::HConstNodeProxy& HXml::HConstNodeProxy::operator = ( HConstNodeProxy const& other )
 	{
 	if ( &other != this )
-		f_poNode = other.f_poNode;
+		_node = other._node;
 	return ( *this );
 	}
 
 int HXml::HNodeProxy::get_level( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode );
-	return ( f_poNode->get_level() );
+	M_ASSERT( _node );
+	return ( _node->get_level() );
 	M_EPILOG
 	}
 
 int HXml::HConstNodeProxy::get_level( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode );
-	return ( f_poNode->get_level() );
+	M_ASSERT( _node );
+	return ( _node->get_level() );
 	M_EPILOG
 	}
 
 HXml::HNode::TYPE::type_t HXml::HNodeProxy::get_type( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode );
-	return ( (**f_poNode).f_eType );
+	M_ASSERT( _node );
+	return ( (**_node)._type );
 	M_EPILOG
 	}
 
 HXml::HNode::TYPE::type_t HXml::HConstNodeProxy::get_type( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode );
-	return ( (**f_poNode).f_eType );
+	M_ASSERT( _node );
+	return ( (**_node)._type );
 	M_EPILOG
 	}
 
 HString const& HXml::HNodeProxy::get_name( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( (**f_poNode).f_oText );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( (**_node)._text );
 	M_EPILOG
 	}
 
 HString const& HXml::HConstNodeProxy::get_name( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( (**f_poNode).f_oText );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( (**_node)._text );
 	M_EPILOG
 	}
 
 HString const& HXml::HNodeProxy::get_value( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::CONTENT ) );
-	return ( (**f_poNode).f_oText );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::CONTENT ) );
+	return ( (**_node)._text );
 	M_EPILOG
 	}
 
 HString const& HXml::HConstNodeProxy::get_value( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::CONTENT ) );
-	return ( (**f_poNode).f_oText );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::CONTENT ) );
+	return ( (**_node)._text );
 	M_EPILOG
 	}
 
 HXml::HNode::properties_t& HXml::HNodeProxy::properties( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( (**f_poNode).f_oProperties );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( (**_node)._properties );
 	M_EPILOG
 	}
 
 HXml::HNode::properties_t const& HXml::HNodeProxy::properties( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( (**f_poNode).f_oProperties );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( (**_node)._properties );
 	M_EPILOG
 	}
 
 HXml::HNode::properties_t const& HXml::HConstNodeProxy::properties( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( (**f_poNode).f_oProperties );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( (**_node)._properties );
 	M_EPILOG
 	}
 
-HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& a_eType, yaal::hcore::HString const& a_oName )
+HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& type_, yaal::hcore::HString const& name_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator it = f_poNode->add_node();
-	(**it).f_oText = a_oName;
-	(**it).f_eType = a_eType;
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::iterator it = _node->add_node();
+	(**it)._text = name_;
+	(**it)._type = type_;
 	return ( HXml::HIterator( this, it ) );
 	M_EPILOG
 	}
 
-HXml::HIterator HXml::HNodeProxy::add_node( yaal::hcore::HString const& a_oName, yaal::hcore::HString const& a_oValue )
+HXml::HIterator HXml::HNodeProxy::add_node( yaal::hcore::HString const& name_, yaal::hcore::HString const& value_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator it = f_poNode->add_node();
-	(**it).f_oText = a_oName;
-	(**it).f_eType = HXml::HNode::TYPE::NODE;
-	if ( !! a_oValue )
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::iterator it = _node->add_node();
+	(**it)._text = name_;
+	(**it)._type = HXml::HNode::TYPE::NODE;
+	if ( !! value_ )
 		{
 		tree_t::iterator value = it->add_node();
-		(**value).f_oText = a_oValue;
-		(**value).f_eType = HXml::HNode::TYPE::CONTENT;
+		(**value)._text = value_;
+		(**value)._type = HXml::HNode::TYPE::CONTENT;
 		}
 	return ( HXml::HIterator( this, it ) );
 	M_EPILOG
 	}
 
-HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, HXml::HNode::TYPE::type_t const& a_eType, yaal::hcore::HString const& a_oName )
+HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, HXml::HNode::TYPE::type_t const& type_, yaal::hcore::HString const& name_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = f_poNode->insert_node( it.f_oIterator, HNode() );
-	(**newIt).f_oText = a_oName;
-	(**newIt).f_eType = a_eType;
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::iterator newIt = _node->insert_node( it._iterator, HNode() );
+	(**newIt)._text = name_;
+	(**newIt)._type = type_;
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 	}
 
-HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, yaal::hcore::HString const& a_oName, yaal::hcore::HString const& a_oValue )
+HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, yaal::hcore::HString const& name_, yaal::hcore::HString const& value_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = f_poNode->insert_node( it.f_oIterator, HNode() );
-	(**newIt).f_oText = a_oName;
-	(**newIt).f_eType = HXml::HNode::TYPE::NODE;;
-	if ( !! a_oValue )
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::iterator newIt = _node->insert_node( it._iterator, HNode() );
+	(**newIt)._text = name_;
+	(**newIt)._type = HXml::HNode::TYPE::NODE;;
+	if ( !! value_ )
 		{
 		tree_t::iterator value = newIt->add_node();
-		(**value).f_oText = a_oValue;
-		(**value).f_eType = HXml::HNode::TYPE::CONTENT;
+		(**value)._text = value_;
+		(**value)._type = HXml::HNode::TYPE::CONTENT;
 		}
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
@@ -842,8 +842,8 @@ HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, yaal::hcore::
 HXml::HIterator HXml::HNodeProxy::move_node( HXml::HIterator it, HXml::HNodeProxy node )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = f_poNode->move_node( it.f_oIterator, node.f_poNode );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::iterator newIt = _node->move_node( it._iterator, node._node );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 	}
@@ -851,8 +851,8 @@ HXml::HIterator HXml::HNodeProxy::move_node( HXml::HIterator it, HXml::HNodeProx
 HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = f_poNode->move_node( node.f_poNode );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::iterator newIt = _node->move_node( node._node );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 	}
@@ -860,8 +860,8 @@ HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node )
 HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProxy node )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = f_poNode->copy_node( it.f_oIterator, node.f_poNode );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::iterator newIt = _node->copy_node( it._iterator, node._node );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 	}
@@ -869,8 +869,8 @@ HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProx
 HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HNodeProxy node )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = f_poNode->copy_node( node.f_poNode );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::iterator newIt = _node->copy_node( node._node );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 	}
@@ -878,168 +878,168 @@ HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HNodeProxy node )
 bool HXml::HNodeProxy::has_childs( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( f_poNode->has_childs() );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( _node->has_childs() );
 	M_EPILOG
 	}
 
 bool HXml::HConstNodeProxy::has_childs( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( f_poNode->has_childs() );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( _node->has_childs() );
 	M_EPILOG
 	}
 
 int long HXml::HNodeProxy::child_count( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( f_poNode->child_count() );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( _node->child_count() );
 	M_EPILOG
 	}
 
 int long HXml::HConstNodeProxy::child_count( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( f_poNode->child_count() );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( _node->child_count() );
 	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::begin( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HIterator( this, f_poNode->begin() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HIterator( this, _node->begin() ) );
 	M_EPILOG
 	}
 
 HXml::HIterator const HXml::HNodeProxy::begin( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HIterator( this, f_poNode->begin() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HIterator( this, _node->begin() ) );
 	M_EPILOG
 	}
 
 HXml::HConstIterator const HXml::HConstNodeProxy::begin( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HConstIterator( this, f_poNode->begin() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HConstIterator( this, _node->begin() ) );
 	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::end( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HIterator( this, f_poNode->end() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HIterator( this, _node->end() ) );
 	M_EPILOG
 	}
 
 HXml::HIterator const HXml::HNodeProxy::end( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HIterator( this, f_poNode->end() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HIterator( this, _node->end() ) );
 	M_EPILOG
 	}
 
 HXml::HConstIterator const HXml::HConstNodeProxy::end( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HConstIterator( this, f_poNode->end() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HConstIterator( this, _node->end() ) );
 	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::rbegin( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HIterator( this, f_poNode->rbegin() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HIterator( this, _node->rbegin() ) );
 	M_EPILOG
 	}
 
 HXml::HIterator const HXml::HNodeProxy::rbegin( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HIterator( this, f_poNode->rbegin() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HIterator( this, _node->rbegin() ) );
 	M_EPILOG
 	}
 
 HXml::HConstIterator const HXml::HConstNodeProxy::rbegin( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HConstIterator( this, f_poNode->rbegin() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HConstIterator( this, _node->rbegin() ) );
 	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::rend( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HIterator( this, f_poNode->rend() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HIterator( this, _node->rend() ) );
 	M_EPILOG
 	}
 
 HXml::HIterator const HXml::HNodeProxy::rend( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HIterator( this, f_poNode->rend() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HIterator( this, _node->rend() ) );
 	M_EPILOG
 	}
 
 HXml::HConstIterator const HXml::HConstNodeProxy::rend( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HConstIterator( this, f_poNode->rend() ) );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( HXml::HConstIterator( this, _node->rend() ) );
 	M_EPILOG
 	}
 
 bool HXml::HNodeProxy::operator ! ( void ) const
 	{
-	return ( ! f_poNode );
+	return ( ! _node );
 	}
 
 bool HXml::HConstNodeProxy::operator ! ( void ) const
 	{
-	return ( ! f_poNode );
+	return ( ! _node );
 	}
 
 HXml::HIterator::HIterator( void )
-	: f_poOwner( NULL ), f_oIterator()
+	: _owner( NULL ), _iterator()
 	{
 	}
 
 HXml::HConstIterator::HConstIterator( void )
-	: f_poOwner( NULL ), f_oIterator()
+	: _owner( NULL ), _iterator()
 	{
 	}
 
-HXml::HIterator::HIterator( HXml::HNodeProxy const* a_poOwner, HXml::tree_t::iterator const& it )
-	: f_poOwner( a_poOwner ), f_oIterator( it )
+HXml::HIterator::HIterator( HXml::HNodeProxy const* owner_, HXml::tree_t::iterator const& it )
+	: _owner( owner_ ), _iterator( it )
 	{
 	}
 
-HXml::HConstIterator::HConstIterator( HXml::HConstNodeProxy const* a_poOwner, HXml::tree_t::const_iterator const& it )
-	: f_poOwner( a_poOwner ), f_oIterator( it )
+HXml::HConstIterator::HConstIterator( HXml::HConstNodeProxy const* owner_, HXml::tree_t::const_iterator const& it )
+	: _owner( owner_ ), _iterator( it )
 	{
 	}
 
 HXml::HIterator::HIterator( HXml::HIterator const& other )
-	: f_poOwner( other.f_poOwner ), f_oIterator( other.f_oIterator )
+	: _owner( other._owner ), _iterator( other._iterator )
 	{
 	}
 
 HXml::HConstIterator::HConstIterator( HXml::HConstIterator const& other )
-	: f_poOwner( other.f_poOwner ), f_oIterator( other.f_oIterator )
+	: _owner( other._owner ), _iterator( other._iterator )
 	{
 	}
 
@@ -1047,8 +1047,8 @@ HXml::HIterator& HXml::HIterator::operator = ( HXml::HIterator const& other )
 	{
 	if ( &other != this )
 		{
-		f_poOwner = other.f_poOwner;
-		f_oIterator = other.f_oIterator;
+		_owner = other._owner;
+		_iterator = other._iterator;
 		}
 	return ( *this );
 	}
@@ -1057,62 +1057,62 @@ HXml::HConstIterator& HXml::HConstIterator::operator = ( HXml::HConstIterator co
 	{
 	if ( &other != this )
 		{
-		f_poOwner = other.f_poOwner;
-		f_oIterator = other.f_oIterator;
+		_owner = other._owner;
+		_iterator = other._iterator;
 		}
 	return ( *this );
 	}
 
 bool HXml::HIterator::operator == ( HXml::HIterator const& other ) const
 	{
-	return ( f_oIterator == other.f_oIterator );
+	return ( _iterator == other._iterator );
 	}
 
 bool HXml::HConstIterator::operator == ( HXml::HConstIterator const& other ) const
 	{
-	return ( f_oIterator == other.f_oIterator );
+	return ( _iterator == other._iterator );
 	}
 
 bool HXml::HIterator::operator != ( HXml::HIterator const& other ) const
 	{
-	return ( f_oIterator != other.f_oIterator );
+	return ( _iterator != other._iterator );
 	}
 
 bool HXml::HConstIterator::operator != ( HXml::HConstIterator const& other ) const
 	{
-	return ( f_oIterator != other.f_oIterator );
+	return ( _iterator != other._iterator );
 	}
 
 HXml::HNodeProxy HXml::HIterator::operator* ( void )
 	{
 	M_PROLOG
-	M_ASSERT( f_poOwner );
-	M_ASSERT( f_oIterator != f_poOwner->f_poNode->end() );
-	return ( HXml::HNodeProxy( &*f_oIterator ) );
+	M_ASSERT( _owner );
+	M_ASSERT( _iterator != _owner->_node->end() );
+	return ( HXml::HNodeProxy( &*_iterator ) );
 	M_EPILOG
 	}
 
 HXml::HConstNodeProxy const HXml::HConstIterator::operator* ( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( f_poOwner );
-	M_ASSERT( f_oIterator != f_poOwner->f_poNode->end() );
-	return ( HXml::HConstNodeProxy( &*f_oIterator ) );
+	M_ASSERT( _owner );
+	M_ASSERT( _iterator != _owner->_node->end() );
+	return ( HXml::HConstNodeProxy( &*_iterator ) );
 	M_EPILOG
 	}
 
-void HXml::apply_style( yaal::hcore::HString const& a_oPath )
+void HXml::apply_style( yaal::hcore::HString const& path_ )
 	{
 	M_PROLOG
-	M_ASSERT( f_poXml->f_oDoc.get() );
+	M_ASSERT( _xml->_doc.get() );
 	HXsltParserGlobal::get_instance();
-	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( a_oPath.raw() ) ), xsltFreeStylesheet );
-	doc_resource_t doc( xsltApplyStylesheet( style.get(), f_poXml->f_oDoc.get(), NULL ), xmlFreeDoc );
+	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( path_.raw() ) ), xsltFreeStylesheet );
+	doc_resource_t doc( xsltApplyStylesheet( style.get(), _xml->_doc.get(), NULL ), xmlFreeDoc );
 	if ( ! doc.get() )
-		throw HXmlException( HString( "cannot apply stylesheet: " ) + a_oPath );
-	f_poXml->clear();
-	swap( f_poXml->f_oDoc, doc );
-	swap( f_poXml->f_oStyle, style );
+		throw HXmlException( HString( "cannot apply stylesheet: " ) + path_ );
+	_xml->clear();
+	swap( _xml->_doc, doc );
+	swap( _xml->_style, style );
 	M_EPILOG
 	}
 
@@ -1120,8 +1120,8 @@ HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& no
 	{
 	M_PROLOG
 	const_xml_element_t result = NULL;
-	HXml::HNode::properties_t::const_iterator idIt = (*node)->f_oProperties.find( "id" );
-	if ( ( idIt != (*node)->f_oProperties.end() ) && ( idIt->second == id ) )
+	HXml::HNode::properties_t::const_iterator idIt = (*node)->_properties.find( "id" );
+	if ( ( idIt != (*node)->_properties.end() ) && ( idIt->second == id ) )
 		result = node;
 	for ( tree_t::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
 		result = get_element_by_id( &*it, id );
@@ -1132,22 +1132,22 @@ HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& no
 HXml::HNodeProxy HXml::get_element_by_id( yaal::hcore::HString const& id )
 	{
 	M_PROLOG
-	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_id( f_oDOM.get_root(), id ) ) ) );
+	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_id( _dOM.get_root(), id ) ) ) );
 	M_EPILOG
 	}
 
 HXml::HConstNodeProxy const HXml::get_element_by_id( yaal::hcore::HString const& id ) const
 	{
 	M_PROLOG
-	return ( HConstNodeProxy( get_element_by_id( f_oDOM.get_root(), id ) ) );
+	return ( HConstNodeProxy( get_element_by_id( _dOM.get_root(), id ) ) );
 	M_EPILOG
 	}
 
 HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it )
 	{
 	M_PROLOG
-	M_ASSERT( f_poNode && ( (**f_poNode).f_eType == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = f_poNode->remove_node( it.f_oIterator );
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::iterator newIt = _node->remove_node( it._iterator );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 	}
@@ -1161,10 +1161,10 @@ HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& 
 	HString name = t[ part ];
 	if ( ! name.is_empty() )
 		{
-		if ( (**node).f_oText == name )
+		if ( (**node)._text == name )
 			{
 			for ( tree_t::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
-				if ( (**it).f_eType == HXml::HNode::TYPE::NODE )
+				if ( (**it)._type == HXml::HNode::TYPE::NODE )
 					result = get_element_by_path( &*it, path, part + 1 );
 			}
 		}
@@ -1182,14 +1182,14 @@ HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& 
 HXml::HNodeProxy HXml::get_element_by_path( yaal::hcore::HString const& path )
 	{
 	M_PROLOG
-	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_path( f_oDOM.get_root(), path, 1 ) ) ) );
+	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_path( _dOM.get_root(), path, 1 ) ) ) );
 	M_EPILOG
 	}
 
 HXml::HConstNodeProxy const HXml::get_element_by_path( yaal::hcore::HString const& path ) const
 	{
 	M_PROLOG
-	return ( HConstNodeProxy( get_element_by_path( f_oDOM.get_root(), path, 1 ) ) );
+	return ( HConstNodeProxy( get_element_by_path( _dOM.get_root(), path, 1 ) ) );
 	M_EPILOG
 	}
 

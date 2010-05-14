@@ -49,8 +49,8 @@ class HOpenSSL
 	{
 	typedef HOpenSSL self_t;
 public:
-	static yaal::hcore::HString f_oSSLKey;
-	static yaal::hcore::HString f_oSSLCert;
+	static yaal::hcore::HString _sSLKey;
+	static yaal::hcore::HString _sSLCert;
 	/*! \brief SSL object types.
 	 */
 	struct TYPE
@@ -83,7 +83,7 @@ private:
 	public:
 		void* create_ssl( void );
 		void consume_ssl( void* );
-		void* method( void ) const;
+		void* select_method( void ) const;
 	private:
 		OSSLContext( OSSLContext const& );
 		OSSLContext& operator=( OSSLContext const& );
