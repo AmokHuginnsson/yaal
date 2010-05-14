@@ -252,40 +252,40 @@ int HDataProcess::create_window( void* param )
 	self.resolve( *static_cast<HString*>( param ), window_factory );
 	if ( ! window_factory )
 		M_THROW( _( "cannot locate factory for this window" ), errno );
-	HXml::HConstNodeProxy w = _resource.get_element_by_id( *static_cast<HString*>( param ) );
-	if ( ! w )
+	HXml::HConstNodeProxy window_ = _resource.get_element_by_id( *static_cast<HString*>( param ) );
+	if ( ! window_ )
 		M_THROW( _( "cannot find resources for this window" ), errno );
-	HXml::HNode::properties_t const& windowProps = w.properties();
+	HXml::HNode::properties_t const& windowProps = window_.properties();
 	HXml::HNode::properties_t::const_iterator titleIt = windowProps.find( "title" );
 	M_ENSURE( titleIt != windowProps.end() );
-	add_window( window_factory( titleIt->second, this, get_resource( *static_cast<HString*>( param ), w ) ) );
+	add_window( window_factory( titleIt->second, this, get_resource( *static_cast<HString*>( param ), window_ ) ) );
 	return ( 0 );
 	M_EPILOG
 	}
 
-HDataProcess::resources_t& HDataProcess::get_resource( HString const& name, HXml::HConstNodeProxy const& w )
+resources_t* HDataProcess::get_resource( HString const& name, HXml::HConstNodeProxy const& window_ )
 	{
 	M_PROLOG
 	resource_cache_t::iterator it = _resourceCache.find( name );
 	resources_t* r( NULL );
 	if ( it == _resourceCache.end() )
-		r = &build_resource( name, w );
+		r = &build_resource( name, window_ );
 	else
 		r = &it->second;
-	return ( *r );
+	return ( r );
 	M_EPILOG
 	}
 
-HDataProcess::resources_t& HDataProcess::build_resource( yaal::hcore::HString const& resourceName, HXml::HConstNodeProxy const& w )
+resources_t& HDataProcess::build_resource( yaal::hcore::HString const& resourceName_, HXml::HConstNodeProxy const& window_ )
 	{
 	M_PROLOG
-	resources_t r( w.child_count() + 1 );
+	resources_t r( window_.child_count() + 1 );
 	int i = 0;
 	typedef HMap<int, char const*> int_to_str_t;
 	typedef HMap<HString, int> str_to_int_t;
 	int_to_str_t i2s;
 	str_to_int_t s2i;
-	for ( HXml::HConstIterator it = w.begin(); it != w.end(); ++ it, ++ i )
+	for ( HXml::HConstIterator it = window_.begin(); it != window_.end(); ++ it, ++ i )
 		{
 		M_ENSURE( (*it).get_type() == HXml::HNode::TYPE::NODE );
 		M_ENSURE( (*it).get_name() == "control" );
@@ -428,7 +428,7 @@ HDataProcess::resources_t& HDataProcess::build_resource( yaal::hcore::HString co
 					M_THROW( _( "unknown edit attribute name" ), i );
 				}
 			else
-				M_THROW( _( "auto builing of this type of control is not supported yet" ), i );
+				M_THROW( _( "auto building of this type of control is not supported yet" ), i );
 			}
 		}
 	for ( int n = 0; n < i; ++ n )
@@ -442,8 +442,8 @@ HDataProcess::resources_t& HDataProcess::build_resource( yaal::hcore::HString co
 			r[ n ]._columnInfo = &r[ parentIt->second ]._columnInfo[ n - ( parentIt->second + 1 ) ];
 			}
 		}
-	swap( _resourceCache[ resourceName ], r );
-	return ( _resourceCache[ resourceName ] );
+	swap( _resourceCache[ resourceName_ ], r );
+	return ( _resourceCache[ resourceName_ ] );
 	M_EPILOG
 	}
 

@@ -76,7 +76,7 @@ protected:
 	bool _modified;
 	DOCUMENT::mode_t _documentMode;
 	HDataControl* _mainControl;
-	OResource* _resourcesArray;
+	resources_t* _resourcesArray;
 	ORowBuffer* _syncStore;
 	typedef yaal::hcore::HList<HDataControl*> controls_t;
 	controls_t _viewModeControls;
@@ -85,7 +85,7 @@ protected:
 	yaal::dbwrapper::HSQLDescriptor::ptr_t _dB;
 	yaal::dbwrapper::HSQLDescriptor::MODE::mode_t _mode;
 public:
-	HDataWindow( char const*, HDataProcess*, OResource* = NULL );
+	HDataWindow( char const*, HDataProcess*, resources_t* = NULL );
 	virtual ~HDataWindow( void );
 	virtual int init( void );
 	virtual hconsole::HStatusBarControl* init_bar( char const* );

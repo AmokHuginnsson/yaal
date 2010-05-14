@@ -48,7 +48,7 @@ namespace hdata
 {
 
 HDataWindow::HDataWindow( char const* title_, HDataProcess* owner_,
-		OResource* dataControlInfo_ )
+		resources_t* dataControlInfo_ )
 	: HWindow( title_ ),
 	_modified( false ), _documentMode( DOCUMENT::VIEW ), _mainControl( NULL ),
 	_resourcesArray( dataControlInfo_ ), _syncStore( NULL ),
@@ -83,16 +83,11 @@ HDataWindow::~HDataWindow( void )
 	M_EPILOG
 	}
 
-#define M_SETUP_STANDARD	_resourcesArray[ ctr ]._row,\
-						_resourcesArray[ ctr ]._column,\
-						_resourcesArray[ ctr ]._height,\
-						_resourcesArray[ ctr ]._width,\
-						_resourcesArray[ ctr ]._label
+#define M_SETUP_STANDARD r._row, r._column, r._height, r._width, r._label
 
 int HDataWindow::init( void )
 	{
 	M_PROLOG
-	int ctr = 0;
 	char value [ ] = "";
 	char const* mask = _maskDefault_;
 	HDataControl* dataControl = NULL;
@@ -100,20 +95,21 @@ int HDataWindow::init( void )
 	OAttributes* attr = &attributes;
 	OEditControlResource editControlResource;
 	OListControlResource listControlResource;
-/* ECR stands for EditControlResource */
-	OEditControlResource* eCR = &editControlResource;
+/* ecr stands for EditControlResource */
+	OEditControlResource* ecr = &editControlResource;
 /* LCR stands for ListControlResource */
-	OListControlResource* lCR = &listControlResource;
+	OListControlResource* lcr = &listControlResource;
 	attributes._drawLabel = true;
 	attributes._disabledAttribute = -1;
 	attributes._enabledAttribute = -1;
 	attributes._focusedAttribute = -1;
 	HWindow::init();
-	while ( _resourcesArray[ ctr ]._label )
+	for ( int ctr( 0 ), SIZE( static_cast<int>( _resourcesArray->size() ) ); ctr < SIZE; ++ ctr )
 		{
-		if ( _resourcesArray[ ctr ]._attributes )
-			attr = _resourcesArray[ ctr ]._attributes;
-		switch ( _resourcesArray[ ctr ]._type )
+		OResource& r( (*_resourcesArray)[ ctr ] );
+		if ( r._attributes )
+			attr = r._attributes;
+		switch ( r._type )
 			{
 			case ( DATACONTROL_BITS::TYPE::EDIT ):
 				{
@@ -126,14 +122,14 @@ int HDataWindow::init( void )
 				editControlResource._rightAligned = false;
 				editControlResource._password = false;
 				editControlResource._maxHistoryLevel = 8;
-				if ( _resourcesArray [ ctr ]._typeSpecific )
-					eCR = static_cast<OEditControlResource*>( _resourcesArray [ ctr ]._typeSpecific );
+				if ( r._typeSpecific )
+					ecr = static_cast<OEditControlResource*>( r._typeSpecific );
 				dataControl = new HDataEditControl( this,
-						M_SETUP_STANDARD, eCR->_maxStringSize, eCR->_value,
-						eCR->_mask, eCR->_replace,
-						eCR->_multiLine, eCR->_readOnly, 
-						eCR->_rightAligned, eCR->_password,
-						eCR->_maxHistoryLevel );
+						M_SETUP_STANDARD, ecr->_maxStringSize, ecr->_value,
+						ecr->_mask, ecr->_replace,
+						ecr->_multiLine, ecr->_readOnly, 
+						ecr->_rightAligned, ecr->_password,
+						ecr->_maxHistoryLevel );
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::LIST ):
@@ -142,14 +138,14 @@ int HDataWindow::init( void )
 				listControlResource._sortable = true;
 				listControlResource._searchable = true;
 				listControlResource._drawHeader = true;
-				if ( _resourcesArray [ ctr ]._typeSpecific )
-					lCR = static_cast<OListControlResource*>( _resourcesArray [ ctr ]._typeSpecific );
+				if ( r._typeSpecific )
+					lcr = static_cast<OListControlResource*>( r._typeSpecific );
 				HDataListControl* list = NULL;
 				dataControl = list = new HDataListControl( this, M_SETUP_STANDARD );
-				list->set_flags( HListControl::flag_t( lCR->_checkable ? HListControl::FLAG::CHECKABLE : HListControl::FLAG::NONE )
-						| ( lCR->_sortable ? HListControl::FLAG::SORTABLE : HListControl::FLAG::NONE )
-						| ( lCR->_editable ? HListControl::FLAG::EDITABLE : HListControl::FLAG::NONE )
-						| ( lCR->_drawHeader ? HListControl::FLAG::DRAW_HEADER : HListControl::FLAG::NONE ),
+				list->set_flags( HListControl::flag_t( lcr->_checkable ? HListControl::FLAG::CHECKABLE : HListControl::FLAG::NONE )
+						| ( lcr->_sortable ? HListControl::FLAG::SORTABLE : HListControl::FLAG::NONE )
+						| ( lcr->_editable ? HListControl::FLAG::EDITABLE : HListControl::FLAG::NONE )
+						| ( lcr->_drawHeader ? HListControl::FLAG::DRAW_HEADER : HListControl::FLAG::NONE ),
 						HListControl::FLAG::ALL );
 				}
 			break;
@@ -171,16 +167,16 @@ int HDataWindow::init( void )
 			dataControl->set_attributes( attr->_disabledAttribute,
 					attr->_enabledAttribute,
 					attr->_focusedAttribute );
-			dataControl->set_resource( &_resourcesArray[ ctr ] );
+			dataControl->set_resource( &r );
 			}
-		switch ( _resourcesArray[ ctr ]._role )
+		switch ( r._role )
 			{
 			case ( DATACONTROL_BITS::ROLE::MAIN ):
 				{
-				_dB->set_table( _resourcesArray[ ctr ]._table );
-				_dB->set_columns( _resourcesArray[ ctr ]._columns );
-				_dB->set_filter( _resourcesArray[ ctr ]._filter );
-				_dB->set_sort( _resourcesArray[ ctr ]._sort );
+				_dB->set_table( r._table );
+				_dB->set_columns( r._columns );
+				_dB->set_filter( r._filter );
+				_dB->set_sort( r._sort );
 				dataControl->set_dbd( _dB );
 				_mainControl = dataControl;
 				_viewModeControls.push_back( dataControl );
@@ -196,8 +192,7 @@ int HDataWindow::init( void )
 				_viewModeControls.push_back( dataControl );
 			break;
 			default :
-				M_THROW ( "unknown resource purpouse",
-						_resourcesArray[ ctr ]._role );
+				M_THROW ( "unknown resource purpouse", r._role );
 			}
 		ctr ++;
 		}
@@ -205,7 +200,7 @@ int HDataWindow::init( void )
 	if ( _mainControl )
 		{
 		_mainControl->load();
-		_mainControl->process_input ( KEY_CODES::HOME );
+		_mainControl->process_input( KEY_CODES::HOME );
 		}
 	refresh();
 	return ( 0 );
@@ -232,20 +227,20 @@ void HDataWindow::link( int child_, HDataControl* dataControl_ )
 	cI->_width = 1; 				/* width is awlays proportional */
 	cI->_align = HControl::BITS::ALIGN::LEFT;
 	cI->_type = TYPE::HSTRING;
-	parent = _resourcesArray[ child_ ]._parent;
-	if ( _resourcesArray[ parent ]._type == DATACONTROL_BITS::TYPE::LIST )
+	parent = (*_resourcesArray)[ child_ ]._parent;
+	if ( (*_resourcesArray)[ parent ]._type == DATACONTROL_BITS::TYPE::LIST )
 		{
 		pDC = dynamic_cast<HDataListControl*>( _controls.get_control_by_no( parent + 1 /* 1 stands for offset caused by 'status bar' */ ) );
 		if ( ! pDC )
 			M_THROW( "wrong control resource order",
 					parent );
-		if ( _resourcesArray[ child_ ]._columnInfo )
-			cI = _resourcesArray[ child_ ]._columnInfo;
+		if ( (*_resourcesArray)[ child_ ]._columnInfo )
+			cI = (*_resourcesArray)[ child_ ]._columnInfo;
 		pDC->add_column( cI->_placement, cI->_name,
 				cI->_width, cI->_align, cI->_type, dataControl_ );
 		}
 	else
-		M_THROW( "unknown parent type", _resourcesArray[ parent ]._type );
+		M_THROW( "unknown parent type", (*_resourcesArray)[ parent ]._type );
 	return;
 	M_EPILOG
 	}

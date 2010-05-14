@@ -32,6 +32,7 @@ Copyright:
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/hexception.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal
 {
@@ -341,6 +342,7 @@ void HHashMap<key_t, data_t>::resize( int long size_ )
 			}
 		int long prime( _primes_[ n - 1 ] );
 		HChunk buckets( chunk_size<HAtom*>( prime ), HChunk::STRATEGY::GEOMETRIC );
+		M_ASSERT( ( buckets.size() / static_cast<int long>( sizeof ( HAtom* ) ) ) >= prime );
 		HAtom** oldBuckets( _buckets.get<HAtom*>() );
 		HAtom** newBuckets( buckets.get<HAtom*>() );
 		for ( int long i( 0 ); i < _prime; ++ i )
@@ -412,7 +414,7 @@ yaal::hcore::HPair<typename HHashMap<key_t, data_t>::iterator, bool> HHashMap<ke
 		HAtom* atom = new ( std::nothrow ) HAtom( val_ );
 		if ( ! atom )
 			M_THROW( "memory allocation error", errno );
-		int long newHash = _hasher( val_.first ) % _prime;
+		int long newHash = abs( _hasher( val_.first ) ) % _prime;
 		HAtom** buckets( _buckets.get<HAtom*>() );
 		atom->_next = buckets[ newHash ];
 		buckets[ newHash ] = atom;
@@ -493,7 +495,7 @@ template<typename key_t, typename data_t>
 bool HHashMap<key_t, data_t>::find( key_t const& key_, int long& index_, HAtom*& atom_ ) const
 	{
 	M_PROLOG
-	index_ = _hasher( key_ ) % _prime;
+	index_ = abs( _hasher( key_ ) ) % _prime;
 	atom_ = _buckets.get<HAtom*>()[ index_ ];
 	while ( atom_ && ( atom_->_value.first != key_ ) )
 		atom_ = atom_->_next;

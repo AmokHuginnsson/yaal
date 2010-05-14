@@ -27,6 +27,7 @@ Copyright:
 #ifndef YAAL_HDATA_ORESOURCE_HXX_INCLUDED
 #define YAAL_HDATA_ORESOURCE_HXX_INCLUDED
 
+#include "hcore/harray.hxx"
 #include "hconsole/hcontrol.hxx"
 
 namespace yaal
@@ -159,6 +160,8 @@ struct OListControlResource
 	bool	_editable;
 	bool	_drawHeader;				/*!< should be header droven */
 	};
+
+typedef yaal::hcore::HArray<OResource> resources_t;
 
 }
 

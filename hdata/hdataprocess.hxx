@@ -72,12 +72,11 @@ protected:
 	typedef HDataProcess self_t;
 	typedef HTUIProcess hier_t;
 	typedef yaal::hcore::HList<yaal::hcore::HString> param_cache_t;
-	typedef yaal::hcore::HArray<OResource> resources_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, resources_t> resource_cache_t;
 	typedef yaal::hcore::HList<OEditControlResource> edit_cache_t;
 	typedef yaal::hcore::HList<OListControlResource> list_cache_t;
 	typedef yaal::hcore::HList<yaal::hcore::HChunk> column_cache_t;
-	typedef yaal::hconsole::HWindow::ptr_t ( *window_factory_t )( yaal::hcore::HString const&, HDataProcess*, resources_t& );
+	typedef yaal::hconsole::HWindow::ptr_t ( *window_factory_t )( yaal::hcore::HString const&, HDataProcess*, resources_t* );
 	dbwrapper::database_ptr_t _dataBase;
 	menu_handlers_map_t _autoHandlers;
 	yaal::tools::HXml _resource;
@@ -101,7 +100,7 @@ private:
 	void build_menu_item( yaal::tools::HXml::HConstNodeProxy const&,
 			yaal::hconsole::OMenuItem&, menu_handlers_map_t const& );
 	void destroy_menu( yaal::hconsole::OMenuItem* );
-	resources_t& get_resource( yaal::hcore::HString const&, yaal::tools::HXml::HConstNodeProxy const& );
+	resources_t* get_resource( yaal::hcore::HString const&, yaal::tools::HXml::HConstNodeProxy const& );
 	resources_t& build_resource( yaal::hcore::HString const&, yaal::tools::HXml::HConstNodeProxy const& );
 	int create_window( void* );
 private:
