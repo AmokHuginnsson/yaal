@@ -141,11 +141,14 @@ HConsole::HConsole( void ) : _initialized( false ), _width( 0 ), _height( 0 ), _
 
 HConsole::~HConsole( void )
 	{
-	if ( ! isendwin() )
-		leave_curses();
-	delwin( stdscr );
-	delwin( curscr );
-	delwin( newscr );
+	if ( _initialized )
+		{
+		if ( ! isendwin() )
+			leave_curses();
+		delwin( stdscr );
+		delwin( curscr );
+		delwin( newscr );
+		}
 	return;
 	}
 
