@@ -99,6 +99,10 @@ public:
 	HNumber& operator -= ( HNumber const& );
 	HNumber& operator /= ( HNumber const& );
 	HNumber& operator ^= ( int long unsigned );
+	HNumber& operator ++ ( void );
+	HNumber operator ++ ( int );
+	HNumber& operator -- ( void );
+	HNumber operator -- ( int );
 	HNumber operator + ( HNumber const& ) const;
 	HNumber operator * ( HNumber const& ) const;
 	HNumber operator - ( HNumber const& ) const;

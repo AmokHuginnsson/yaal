@@ -714,6 +714,40 @@ HNumber& HNumber::operator ^= ( int long unsigned exp )
 	M_EPILOG
 	}
 
+HNumber& HNumber::operator ++ ( void )
+	{
+	M_PROLOG
+	operator += ( 1 );
+	return ( *this );
+	M_EPILOG
+	}
+
+HNumber HNumber::operator ++ ( int )
+	{
+	M_PROLOG
+	HNumber n( *this );
+	operator ++ ();
+	return ( n );
+	M_EPILOG
+	}
+
+HNumber& HNumber::operator -- ( void )
+	{
+	M_PROLOG
+	operator -= ( 1 );
+	return ( *this );
+	M_EPILOG
+	}
+
+HNumber HNumber::operator -- ( int )
+	{
+	M_PROLOG
+	HNumber n( *this );
+	operator -- ();
+	return ( n );
+	M_EPILOG
+	}
+
 void HNumber::normalize( void )
 	{
 	M_PROLOG
