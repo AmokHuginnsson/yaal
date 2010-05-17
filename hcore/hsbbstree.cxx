@@ -593,6 +593,39 @@ void HSBBSTree::swap( HAbstractNode* first_, HAbstractNode* second_ )
 	return;
 	}
 
+void HSBBSTree::copy_from( HSBBSTree const& source )
+	{
+	M_PROLOG
+	if ( &source != this )
+		{
+		clear();
+		if ( source._root )
+			_root = copy_node( source._root );
+		_size = source._size;
+		}
+	return;
+	M_EPILOG
+	}
+
+HSBBSTree::HAbstractNode* HSBBSTree::copy_node( HAbstractNode const* source )
+	{
+	M_PROLOG
+	HAbstractNode* node( source->clone() );
+	node->_color = source->_color;
+	if ( source->_left )
+		{
+		node->_left = copy_node( source->_left );
+		node->_left->_parent = node;
+		}
+	if ( source->_right )
+		{
+		node->_right = copy_node( source->_right );
+		node->_right->_parent = node;
+		}
+	return ( node );
+	M_EPILOG
+	}
+
 HSBBSTree::HAbstractNode* HSBBSTree::get_sibling( HAbstractNode* node_ ) const
 	{
 	if ( node_->_parent->_left == node_ )

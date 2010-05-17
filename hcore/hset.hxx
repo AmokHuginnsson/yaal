@@ -81,7 +81,7 @@ public:
 	HSet( HSet const& source )
 		{
 		M_PROLOG
-		_engine.copy_from<value_type, helper_t>( source._engine );
+		_engine.copy_from( source._engine );
 		return;
 		M_EPILOG
 		}

@@ -128,7 +128,7 @@ public:
 	HMultiMap( HMultiMap const& multimap_ ) : _engine()
 		{
 		M_PROLOG
-		_engine.template copy_from<value_type, helper_t>( multimap_._engine );
+		_engine.copy_from( multimap_._engine );
 		return;
 		M_EPILOG
 		}

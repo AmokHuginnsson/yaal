@@ -98,6 +98,7 @@ private:
 		virtual ~HAbstractNode( void );
 		HAbstractNode( HAbstractNode const& );
 		HAbstractNode& operator = ( HAbstractNode const & );
+		virtual HAbstractNode* clone( void ) const = 0;
 		void set_child( HAbstractNode*, HAbstractNode* );
 		friend class HSBBSTree;
 		friend class HSBBSTree::HIterator;
@@ -118,7 +119,6 @@ public:
 	bool is_empty( void ) const;
 	void clear( void );
 	void swap( HSBBSTree& );
-	template<typename tType, typename ttType>
 	void copy_from( HSBBSTree const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
@@ -127,6 +127,7 @@ public:
 private:
 	template<typename tType, typename ttType, typename tttType>
 	ONodePtr find_node( ttType const& ) const;
+	HAbstractNode* copy_node( HAbstractNode const* );
 	void remove_node( HAbstractNode* );
 	void swap( HAbstractNode*, HAbstractNode* );
 	HAbstractNode* get_sibling( HAbstractNode* ) const;
@@ -171,6 +172,7 @@ class	HSBBSTree::HNode : public HSBBSTree::HAbstractNode
 	HNode( tType const& );
 	HNode( HNode const& );
 	HNode& operator = ( HNode const& );
+	virtual HAbstractNode* clone( void ) const;
 	friend class HSBBSTree;
 	friend tType& HSBBSTree::HIterator::operator*<tType>( void );
 	friend tType const& HSBBSTree::HIterator::operator*<tType>( void ) const;
@@ -201,6 +203,14 @@ HSBBSTree::HNode<tType>::HNode( tType const& key_ )
 	return;
 	}
 
+template<typename tType>
+HSBBSTree::HAbstractNode* HSBBSTree::HNode<tType>::clone( void ) const
+	{
+	M_PROLOG
+	return ( new HNode( _key ) );
+	M_EPILOG
+	}
+
 template<typename tType, typename ttType>
 HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& key_ )
 	{
@@ -214,7 +224,7 @@ HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& key_ )
 	else
 		{
 		node = new HNode<tType>( key_ );
-		_size ++;
+		++ _size;
 		if ( _root )
 			{
 			node->_parent = nodeHolder._node;
@@ -280,20 +290,6 @@ typename HSBBSTree::ONodePtr HSBBSTree::find_node( ttType const& key_ ) const
 			}
 		}
 	return ( nodePtr );
-	M_EPILOG
-	}
-
-template<typename tType, typename ttType>
-void HSBBSTree::copy_from( HSBBSTree const& source )
-	{
-	M_PROLOG
-	if ( &source != this )
-		{
-		clear();
-		for ( HIterator it = source.begin(); it != source.end(); ++ it )
-			insert<tType, ttType>( it.operator*<tType>() );
-		}
-	return;
 	M_EPILOG
 	}
 

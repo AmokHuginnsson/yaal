@@ -29,7 +29,7 @@ Copyright:
 
 #include <new>
 
-#include "hcore/hchunk.hxx"
+#include "hcore/hhashcontainer.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/hexception.hxx"
 #include "hcore/algorithm.hxx"
@@ -75,10 +75,8 @@ private:
 		template<typename const_qual_t>
 		friend class HIterator;
 		};
-	int long _prime;
-	int _size;
 	hasher_t _hasher;
-	HChunk _buckets;
+	HHashContainer _engine;
 public:
 	typedef HIterator<value_type> iterator;
 	typedef HIterator<value_type const> const_iterator;
@@ -114,107 +112,78 @@ public:
 	int long erase( key_t const& key );
 	int long count( key_t const& ) const;
 	void clear( void );
-	int size( void ) const;
+	int long get_size( void ) const;
+	int long size( void ) const;
+	bool is_empty( void ) const;
+	bool empty( void ) const;
 	void swap( HHashMap& );
 private:
 	bool find( key_t const&, int long&, HAtom*& ) const;
 	};
 
-/*! \brief Iterator for HHashMap<> data structure.
- */
-template<typename key_t, typename data_t>
+
+template<typename key_type_t, typename data_type_t>
 template<typename const_qual_t>
 class HHashMap<key_t, data_t>::HIterator
 	{
-	typedef typename trait::copy_const<const_qual_t, HHashMap<key_t, data_t> >::type owner_t;
-	owner_t* _owner;
-	int long _index;
-	typedef typename trait::copy_const<const_qual_t, HAtom>::type atom_t;
-	atom_t* _atom;
+	typedef key_type_t key_type;
+	typedef value_type_t data_type;
+	typedef HHashMap<key_type, data_type, helper_t> map_t;
+	HHashContainer::HIterator _engine;
 public:
-	typedef key_t key_type;
-	typedef data_t data_type;
-	HIterator( void ) : _owner( NULL ), _index( 0 ), _atom( NULL ) {}
+	HIterator( void ) : _engine() {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& it_ )
-		: _owner( it_._owner ), _index( it_._index ),
-		_atom( it_._atom )
+	HIterator( HIterator<other_const_qual_t> const& it_ ) : _engine( it_._engine )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
 	HIterator& operator = ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
-			{
-			_owner = it_._owner;
-			_index = it_._index;
-			_atom = it_._atom;
-			}
+			_engine = it_._engine;
 		return ( *this );
 		}
 	HIterator& operator ++ ( void )
 		{
-		if ( _atom )
-			{
-			_atom = _atom->_next;
-			if ( ! _atom )
-				_index ++;
-			}
-		if ( ! _atom )
-			{
-			typename trait::copy_const<const_qual_t, atom_t*>::type* buckets( _owner->_buckets.template get<atom_t*>() );
-			while ( ( _index < _owner->_prime ) && ! buckets[ _index ] )
-				_index ++;
-			if ( _index < _owner->_prime )
-				_atom = buckets[ _index ];
-			}
-		if ( ! _atom )
-			_index = _owner->_prime;
+		++ _engine;
 		return ( *this );
 		}
 	HIterator const operator ++ ( int )
 		{
-		HIterator it( *this );
-		operator ++ ();
+		HIterator it( _engine );
+		++ _engine;
 		return ( it );
 		}
 	HIterator& operator -- ( void )
 		{
+		-- _engine;
 		return ( *this );
 		}
 	HIterator const operator -- ( int )
 		{
-		HIterator it( *this );
-		operator -- ();
+		HIterator it( _engine );
+		-- _engine;
 		return ( it );
 		}
 	const_qual_t& operator* ( void )
-		{
-		M_ASSERT( _atom );
-		return ( _atom->_value );
-		}
+		{ return ( _engine.operator*<typename map_t::value_type>() ); }
 	const_qual_t& operator* ( void ) const
-		{
-		M_ASSERT( _atom );
-		return ( *_atom );
-		}
+		{ return ( _engine.operator*<typename map_t::value_type>() ); }
 	const_qual_t* operator-> ( void )
-		{ return ( &_atom->_value ); }
+		{ return ( &_engine.operator*<typename map_t::value_type>() ); }
 	const_qual_t* operator-> ( void ) const
-		{ return ( &_atom->_value ); }
+		{ return ( &_engine.operator*<typename map_t::value_type>() ); }
 	template<typename other_const_qual_t>
 	bool operator == ( HIterator<other_const_qual_t> const& it ) const
-		{
-		M_ASSERT( _owner == it._owner );
-		return ( ( _index == it._index ) && ( _atom == it._atom ) );
-		}
+		{ return ( _engine == it._engine ); }
 	template<typename other_const_qual_t>
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
-		{ return ( ! operator == ( it ) ); }
+		{ return ( _engine != it._engine ); }
 private:
-	friend class HHashMap<key_t, data_t>;
-	explicit HIterator( owner_t* owner_, int long index_, HAtom* atom_ )
-		: _owner( owner_ ), _index( index_ ), _atom( atom_ ) {};
+	friend class HMap<key_type, data_type, helper_t>;
+	template<typename other_const_qual_t>
+	friend class HIterator;
+	explicit HIterator( HHashContainer::HIterator const& it ) : _engine( it ) {};
 	};
 
 template<typename key_t, typename data_t>
@@ -236,20 +205,20 @@ HHashMap<key_t, data_t>::HAtom::~HAtom( void )
 
 template<typename key_t, typename data_t>
 HHashMap<key_t, data_t>::HHashMap( int long size_ )
-	: _prime( 0 ), _size( 0 ), _hasher(  &hash ), _buckets()
+	: _hasher(  &hash ), _engine()
 	{
 	M_PROLOG
-	resize( size_ );
+	_engine.resize( size_ );
 	return;
 	M_EPILOG
 	}
 
 template<typename key_t, typename data_t>
 HHashMap<key_t, data_t>::HHashMap( int long size_, hasher_t hasher_ )
-	: _prime( 0 ), _size( 0 ), _hasher(  hasher_ ), _buckets()
+	: _hasher(  hasher_ ), _engine()
 	{
 	M_PROLOG
-	resize( size_ );
+	_engine.resize( size_ );
 	return;
 	M_EPILOG
 	}
@@ -257,7 +226,7 @@ HHashMap<key_t, data_t>::HHashMap( int long size_, hasher_t hasher_ )
 template<typename key_t, typename data_t>
 template<typename iterator_t>
 HHashMap<key_t, data_t>::HHashMap( iterator_t first, iterator_t last )
-	: _prime( 0 ), _size( 0 ), _hasher(  &hash ), _buckets()
+	: _hasher(  &hash ), _engine()
 	{
 	M_PROLOG
 	for ( ; first != last; ++ first )
@@ -269,7 +238,7 @@ HHashMap<key_t, data_t>::HHashMap( iterator_t first, iterator_t last )
 template<typename key_t, typename data_t>
 template<typename iterator_t>
 HHashMap<key_t, data_t>::HHashMap( iterator_t first, iterator_t last, int long size_ )
-	: _prime( 0 ), _size( 0 ), _hasher(  &hash ), _buckets()
+	: _hasher(  &hash ), _engine()
 	{
 	M_PROLOG
 	resize( size_ );
@@ -281,10 +250,10 @@ HHashMap<key_t, data_t>::HHashMap( iterator_t first, iterator_t last, int long s
 
 template<typename key_t, typename data_t>
 HHashMap<key_t, data_t>::HHashMap( HHashMap const& map_ )
-	: _prime( 0 ), _size( map_._size ), _hasher( map_._hasher), _buckets()
+	: _hasher( map_._hasher ), _engine()
 	{
 	M_PROLOG
-	resize( _size * 2 );
+	_engine.resize( _size * 2 );
 	HAtom const* const* otherBuckets( map_._buckets.template get<HAtom const*>() );
 	HAtom** buckets( _buckets.get<HAtom*>() );
 	for ( int long i( 0 ); i < map_._prime; ++ i )
@@ -368,28 +337,40 @@ template<typename key_t, typename data_t>
 void HHashMap<key_t, data_t>::clear( void )
 	{
 	M_PROLOG
-	HAtom** buckets( _buckets.get<HAtom*>() );
-	for ( int long i = 0; i < _prime; i ++ )
-		{
-		HAtom* atom( buckets[ i ] );
-		while ( atom )
-			{
-			HAtom* del( atom );
-			atom = atom->_next;
-			delete del;
-			}
-		buckets[ i ] = NULL;
-		}
-	_size = 0;
+	_engine.clear();
 	return;
 	M_EPILOG
 	}
 
 template<typename key_t, typename data_t>
-int HHashMap<key_t, data_t>::size( void ) const
+int long HHashMap<key_t, data_t>::get_size( void ) const
 	{
 	M_PROLOG
-	return ( _size );
+	return ( _engine.get_size() );
+	M_EPILOG
+	}
+
+template<typename key_t, typename data_t>
+int long HHashMap<key_t, data_t>::size( void ) const
+	{
+	M_PROLOG
+	return ( _engine.get_size() );
+	M_EPILOG
+	}
+
+template<typename key_t, typename data_t>
+bool HHashMap<key_t, data_t>::is_empty( void ) const
+	{
+	M_PROLOG
+	return ( _engine.is_empty() );
+	M_EPILOG
+	}
+
+template<typename key_t, typename data_t>
+bool HHashMap<key_t, data_t>::empty( void ) const
+	{
+	M_PROLOG
+	return ( _engine.is_empty() );
 	M_EPILOG
 	}
 
@@ -441,8 +422,7 @@ template<typename key_t, typename data_t>
 typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::begin( void )
 	{
 	M_PROLOG
-	iterator it( this, 0, NULL );
-	return ( ++ it );
+	return ( _engine.begin() );
 	M_EPILOG
 	}
 
@@ -450,7 +430,7 @@ template<typename key_t, typename data_t>
 typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::end( void )
 	{
 	M_PROLOG
-	return ( iterator( this, _prime, NULL ) );
+	return ( _engine.end() );
 	M_EPILOG
 	}
 
@@ -492,35 +472,10 @@ typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::find( 
 	}
 
 template<typename key_t, typename data_t>
-bool HHashMap<key_t, data_t>::find( key_t const& key_, int long& index_, HAtom*& atom_ ) const
-	{
-	M_PROLOG
-	index_ = abs( _hasher( key_ ) ) % _prime;
-	atom_ = _buckets.get<HAtom*>()[ index_ ];
-	while ( atom_ && ( atom_->_value.first != key_ ) )
-		atom_ = atom_->_next;
-	return ( atom_ ? true : false );
-	M_EPILOG
-	}
-
-template<typename key_t, typename data_t>
 void HHashMap<key_t, data_t>::erase( iterator it )
 	{
 	M_PROLOG
-	HAtom* atom( _buckets.get<HAtom*>()[ it._index ] );
-	HAtom* ancestor( NULL );
-	M_ASSERT( atom );
-	while ( atom != it._atom )
-		ancestor = atom, atom = atom->_next;
-	if ( atom )
-		{
-		if ( ancestor )
-			ancestor->_next = atom->_next;
-		else
-			_buckets.get<HAtom*>()[ it._index ] = NULL;
-		delete atom;
-		-- _size;
-		}
+	_engine.erase( it._engine );
 	return;
 	M_EPILOG
 	}
