@@ -44,6 +44,11 @@ int long const x_tag_g_pulPrimes[ 32 ] =
 	2147483647,	0
 	}, * const _primes_ = x_tag_g_pulPrimes;
 
+HHashContainer::HHashContainer( void )
+	: _prime( 0 ), _size( 0 ), _buckets()
+	{
+	}
+
 int long HHashContainer::get_size( void ) const
 	{
 	M_PROLOG
@@ -119,14 +124,14 @@ void HHashContainer::copy_from( HHashContainer const& src_ )
 	{
 	M_PROLOG
 	HChunk newBuckets( src_._buckets.get_size(), HChunk::STRATEGY::EXACT );
-	HAbstractAtom const* const* otherBuckets( map_._buckets.get<HAbstractAtom const*>() );
+	HAbstractAtom const* const* otherBuckets( src_._buckets.get<HAbstractAtom const*>() );
 	HAbstractAtom** buckets( newBuckets.get<HAbstractAtom*>() );
-	for ( int long i( 0 ); i < map_._prime; ++ i )
+	for ( int long i( 0 ); i < src_._prime; ++ i )
 		{
-		HAtom const* origAtom( otherBuckets[ i ] );
+		HAbstractAtom const* origAtom( otherBuckets[ i ] );
 		while ( origAtom )
 			{
-			HAbstractAtom* atom( new ( std::nothrow ) HAtom( origAtom->_value ) );
+			HAbstractAtom* atom( origAtom->clone() );
 			origAtom = origAtom->_next;
 			atom->_next = buckets[ i ];
 			buckets[ i ] = atom;

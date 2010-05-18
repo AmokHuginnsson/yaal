@@ -70,7 +70,7 @@ bool HSBBSTree::HIterator::operator != ( HSBBSTree::HIterator const& iterator_ )
 HSBBSTree::HIterator& HSBBSTree::HIterator::operator ++ ( void )
 	{
 	M_PROLOG
-	HAbstractNode * lastNode = _current;
+	HAbstractNode* lastNode = _current;
 	while ( _current )
 		{
 		if ( _current->_right && ( _current->_right != lastNode ) )
@@ -104,7 +104,7 @@ HSBBSTree::HIterator const HSBBSTree::HIterator::operator ++ ( int )
 HSBBSTree::HIterator& HSBBSTree::HIterator::operator -- ( void )
 	{
 	M_PROLOG
-	HAbstractNode * lastNode = _current;
+	HAbstractNode* lastNode = _current;
 	while ( _current )
 		{
 		if ( _current->_left && ( _current->_left != lastNode ) )

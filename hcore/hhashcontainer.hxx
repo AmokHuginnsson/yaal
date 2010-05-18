@@ -30,14 +30,23 @@ Copyright:
 #ifndef YAAL_HCORE_HHASHCONTAINER_HXX_INCLUDED
 #define YAAL_HCORE_HHASHCONTAINER_HXX_INCLUDED 1
 
+#include <new>
+
 #include "hcore/trait.hxx"
 #include "hcore/hchunk.hxx"
+#include "hcore/hpair.hxx"
 
 namespace yaal
 {
 
 namespace hcore
 {
+
+template<typename key_t>
+inline int long hash( key_t const& key_ )
+	{
+	return ( static_cast<int long>( key_ ) );
+	}
 
 extern int long const* const _primes_;
 
@@ -49,18 +58,19 @@ private:
 		{
 	private:
 		HAbstractAtom* _next;
+		HAbstractAtom( void ) : _next( NULL ) {}
 		HAbstractAtom( HAbstractAtom const& );
-		virtual ~HAbstractAtom( void );
+		virtual ~HAbstractAtom( void ) {}
 		HAbstractAtom& operator = ( HAbstractAtom const& );
 		virtual HAbstractAtom* clone( void ) const = 0;
 		friend class HHashContainer;
 		friend class HIterator;
 		};
-	template<typename tType>
+	template<typename value_t>
 	class HAtom : public HAbstractAtom
 		{
-		tType _value;
-		HAtom( tType const& value_ ) : HAbstractAtom(), _value( value_ ) {}
+		value_t _value;
+		HAtom( value_t const& value_ ) : HAbstractAtom(), _value( value_ ) {}
 		virtual HAbstractAtom* clone( void ) const
 			{ return ( new HAtom( _value ) ); }
 		friend class HHashContainer;
@@ -70,27 +80,29 @@ private:
 	int _size;
 	HChunk _buckets;
 public:
+	HHashContainer( void );
 	int long get_size( void ) const;
 	bool is_empty( void ) const;
 	void clear( void );
+	template<typename key_t, typename hasher_t>
+	HIterator find( key_t const&, hasher_t const& ) const;
+	template<typename value_t, typename hasher_t>
+	HPair<HIterator, bool> insert( value_t const&, hasher_t const& );
 	void erase( HIterator const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
 	HIterator rbegin( void ) const;
 	HIterator rend( void ) const;
-	template<typename tType>
-	void resize( int long, tType const& );
-private:
+	template<typename hasher_t>
+	void resize( int long, hasher_t const& );
 	void copy_from( HHashContainer const& );
-	template<typename tType>
-	bool find_atom( tType const& key_, int long& index_, HAtom<tType>*& atom_ ) const;
 	};
 
 /*! \brief Iterator for HHashContainer data structure.
  */
 class HHashContainer::HIterator
 	{
-	HHashContainer* _owner;
+	HHashContainer const* _owner;
 	int long _index;
 	HHashContainer::HAbstractAtom* _atom;
 public:
@@ -120,7 +132,7 @@ public:
 			}
 		if ( ! _atom )
 			{
-			HHashContainer::HAbstractAtom** buckets( _owner->_buckets.get<HHashContainer::HAbstractAtom*>() );
+			HHashContainer::HAbstractAtom* const* buckets( _owner->_buckets.get<HHashContainer::HAbstractAtom*>() );
 			while ( ( _index < _owner->_prime ) && ! buckets[ _index ] )
 				_index ++;
 			if ( _index < _owner->_prime )
@@ -167,24 +179,49 @@ public:
 		{ return ( ! operator == ( it ) ); }
 private:
 	friend class HHashContainer;
-	explicit HIterator( HHashContainer* owner_, int long index_, HHashContainer::HAbstractAtom* atom_ )
+	explicit HIterator( HHashContainer const* owner_, int long index_, HHashContainer::HAbstractAtom* atom_ )
 		: _owner( owner_ ), _index( index_ ), _atom( atom_ ) {};
 	};
 
-template<typename tType>
-bool HHashContainer::find_atom( tType const& key_, int long& index_, HAtom<tType>*& atom_ ) const
+template<typename key_t, typename hasher_t>
+HHashContainer::HIterator HHashContainer::find( key_t const& key_, hasher_t const& hasher_ ) const
 	{
 	M_PROLOG
-	index_ = abs( _hasher( key_ ) ) % _prime;
-	atom_ = _buckets.get<HAtom<tType>*>()[ index_ ];
-	while ( atom_ && ( atom_->_value.first != key_ ) )
-		atom_ = atom_->_next;
-	return ( atom_ ? true : false );
+	int long idx( abs( hasher_( key_ ) ) % _prime );
+	HAtom<typename hasher_t::value_type>* atom( _buckets.get<HAtom<typename hasher_t::value_type>*>()[ idx ] );
+	while ( atom && ! hasher_( atom->_value, key_ ) )
+		atom = static_cast<HAtom<typename hasher_t::value_type>*>( atom->_next );
+	return ( atom ? HIterator( this, idx, atom ) : end() );
 	M_EPILOG
 	}
 
-template<typename tType>
-void HHashContainer::resize( int long size_, tType const& hasher_ )
+template<typename tType, typename hasher_t>
+HPair<HHashContainer::HIterator, bool> HHashContainer::insert( tType const& val_, hasher_t const& hasher_ )
+	{
+	M_PROLOG
+	HIterator it( _prime ? find( val_, hasher_ ) : end() );
+	bool inserted( false );
+	if ( it == end() )
+		{
+		if ( ( _size + 1 ) > _prime )
+			resize( ( _size + 1 ) * 2, hasher_ );
+		HAtom<typename hasher_t::value_type>* atom = new ( std::nothrow ) HAtom<typename hasher_t::value_type>( val_ );
+		if ( ! atom )
+			M_THROW( "memory allocation error", errno );
+		int long newHash = abs( hasher_( val_ ) ) % _prime;
+		HAtom<typename hasher_t::value_type>** buckets( _buckets.get<HAtom<typename hasher_t::value_type>*>() );
+		atom->_next = buckets[ newHash ];
+		buckets[ newHash ] = atom;
+		++ _size;
+		it = HIterator( this, newHash, atom );
+		inserted = true;
+		}
+	return ( make_pair( it, inserted ) );
+	M_EPILOG
+	}
+
+template<typename hasher_t>
+void HHashContainer::resize( int long size_, hasher_t const& hasher_ )
 	{
 	M_PROLOG
 	if ( size_ < 1 )
@@ -198,17 +235,17 @@ void HHashContainer::resize( int long size_, tType const& hasher_ )
 			n ++;
 			}
 		int long prime( _primes_[ n - 1 ] );
-		HChunk buckets( chunk_size<HAtom<typename tType::value_type>*>( prime ), HChunk::STRATEGY::GEOMETRIC );
-		M_ASSERT( ( buckets.size() / static_cast<int long>( sizeof ( HAtom<typename tType::value_type>* ) ) ) >= prime );
-		HAtom<typename tType::value_type>** oldBuckets( _buckets.get<HAtom<typename tType::value_type>*>() );
-		HAtom<typename tType::value_type>** newBuckets( buckets.get<HAtom<typename tType::value_type>*>() );
+		HChunk buckets( chunk_size<HAtom<typename hasher_t::value_type>*>( prime ), HChunk::STRATEGY::GEOMETRIC );
+		M_ASSERT( ( buckets.size() / static_cast<int long>( sizeof ( HAtom<typename hasher_t::value_type>* ) ) ) >= prime );
+		HAtom<typename hasher_t::value_type>** oldBuckets( _buckets.get<HAtom<typename hasher_t::value_type>*>() );
+		HAtom<typename hasher_t::value_type>** newBuckets( buckets.get<HAtom<typename hasher_t::value_type>*>() );
 		for ( int long i( 0 ); i < _prime; ++ i )
 			{
-			HAtom<typename tType::value_type>* a( oldBuckets[ i ] );
+			HAtom<typename hasher_t::value_type>* a( oldBuckets[ i ] );
 			while ( a )
 				{
-				HAtom<typename tType::value_type>* atom( a );
-				a = a->_next;
+				HAtom<typename hasher_t::value_type>* atom( a );
+				a = static_cast<HAtom<typename hasher_t::value_type>*>( a->_next );
 				int long newHash( hasher_( atom->_value ) % prime );
 				atom->_next = newBuckets[ newHash ];
 				newBuckets[ newHash ] = atom;
