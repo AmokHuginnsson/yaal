@@ -34,6 +34,16 @@ namespace yaal
 namespace hcore
 {
 
+int long const x_tag_g_pulPrimes[ 32 ] =
+	{
+	1,					3,					7,					13,					31,					61,					
+	127,				251,				509,				1021,				2039,				4093,
+	8191,				16381,			32749,			65521,			131071,			262139,
+	524287,			1048573,		2097143,		4194301,		8388593,		16777213,
+	33554393,		67108859,		134217689,	268435399,	536870909,	1073741789,
+	2147483647,	0
+	}, * const _primes_ = x_tag_g_pulPrimes;
+
 int long HHashContainer::get_size( void ) const
 	{
 	M_PROLOG
@@ -41,21 +51,7 @@ int long HHashContainer::get_size( void ) const
 	M_EPILOG
 	}
 
-int long HHashContainer::size( void ) const
-	{
-	M_PROLOG
-	return ( _size );
-	M_EPILOG
-	}
-
 bool HHashContainer::is_empty( void ) const
-	{
-	M_PROLOG
-	return ( ! _size );
-	M_EPILOG
-	}
-
-bool HHashContainer::empty( void ) const
 	{
 	M_PROLOG
 	return ( ! _size );
@@ -116,6 +112,31 @@ HHashContainer::HIterator HHashContainer::end( void ) const
 	{
 	M_PROLOG
 	return ( HIterator( this, _prime, NULL ) );
+	M_EPILOG
+	}
+
+void HHashContainer::copy_from( HHashContainer const& src_ )
+	{
+	M_PROLOG
+	HChunk newBuckets( src_._buckets.get_size(), HChunk::STRATEGY::EXACT );
+	HAbstractAtom const* const* otherBuckets( map_._buckets.get<HAbstractAtom const*>() );
+	HAbstractAtom** buckets( newBuckets.get<HAbstractAtom*>() );
+	for ( int long i( 0 ); i < map_._prime; ++ i )
+		{
+		HAtom const* origAtom( otherBuckets[ i ] );
+		while ( origAtom )
+			{
+			HAbstractAtom* atom( new ( std::nothrow ) HAtom( origAtom->_value ) );
+			origAtom = origAtom->_next;
+			atom->_next = buckets[ i ];
+			buckets[ i ] = atom;
+			}
+		}
+	clear();
+	_prime = src_._prime;
+	_size = src_._size;
+	_buckets.swap( newBuckets );
+	return;
 	M_EPILOG
 	}
 

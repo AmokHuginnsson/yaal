@@ -30,6 +30,7 @@ Copyright:
 #ifndef YAAL_HCORE_HHASHCONTAINER_HXX_INCLUDED
 #define YAAL_HCORE_HHASHCONTAINER_HXX_INCLUDED 1
 
+#include "hcore/trait.hxx"
 #include "hcore/hchunk.hxx"
 
 namespace yaal
@@ -38,7 +39,9 @@ namespace yaal
 namespace hcore
 {
 
-class HHashContainer
+extern int long const* const _primes_;
+
+class HHashContainer : private trait::HNonCopyable
 	{
 	class HIterator;
 private:
@@ -49,23 +52,36 @@ private:
 		HAbstractAtom( HAbstractAtom const& );
 		virtual ~HAbstractAtom( void );
 		HAbstractAtom& operator = ( HAbstractAtom const& );
+		virtual HAbstractAtom* clone( void ) const = 0;
 		friend class HHashContainer;
 		friend class HIterator;
 		};
 	template<typename tType>
-	class HAtom;
+	class HAtom : public HAbstractAtom
+		{
+		tType _value;
+		HAtom( tType const& value_ ) : HAbstractAtom(), _value( value_ ) {}
+		virtual HAbstractAtom* clone( void ) const
+			{ return ( new HAtom( _value ) ); }
+		friend class HHashContainer;
+		friend class HIterator;
+		};
 	int long _prime;
 	int _size;
 	HChunk _buckets;
 public:
-	void resize( int long );
+	int long get_size( void ) const;
+	bool is_empty( void ) const;
 	void clear( void );
 	void erase( HIterator const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
 	HIterator rbegin( void ) const;
 	HIterator rend( void ) const;
+	template<typename tType>
+	void resize( int long, tType const& );
 private:
+	void copy_from( HHashContainer const& );
 	template<typename tType>
 	bool find_atom( tType const& key_, int long& index_, HAtom<tType>*& atom_ ) const;
 	};
@@ -164,6 +180,44 @@ bool HHashContainer::find_atom( tType const& key_, int long& index_, HAtom<tType
 	while ( atom_ && ( atom_->_value.first != key_ ) )
 		atom_ = atom_->_next;
 	return ( atom_ ? true : false );
+	M_EPILOG
+	}
+
+template<typename tType>
+void HHashContainer::resize( int long size_, tType const& hasher_ )
+	{
+	M_PROLOG
+	if ( size_ < 1 )
+		M_THROW ( "bad new container size", size_ );
+	if ( size_ > _size )
+		{
+		int n = 0;
+		while ( size_ )
+			{
+			size_ >>= 1;
+			n ++;
+			}
+		int long prime( _primes_[ n - 1 ] );
+		HChunk buckets( chunk_size<HAtom<typename tType::value_type>*>( prime ), HChunk::STRATEGY::GEOMETRIC );
+		M_ASSERT( ( buckets.size() / static_cast<int long>( sizeof ( HAtom<typename tType::value_type>* ) ) ) >= prime );
+		HAtom<typename tType::value_type>** oldBuckets( _buckets.get<HAtom<typename tType::value_type>*>() );
+		HAtom<typename tType::value_type>** newBuckets( buckets.get<HAtom<typename tType::value_type>*>() );
+		for ( int long i( 0 ); i < _prime; ++ i )
+			{
+			HAtom<typename tType::value_type>* a( oldBuckets[ i ] );
+			while ( a )
+				{
+				HAtom<typename tType::value_type>* atom( a );
+				a = a->_next;
+				int long newHash( hasher_( atom->_value ) % prime );
+				atom->_next = newBuckets[ newHash ];
+				newBuckets[ newHash ] = atom;
+				}
+			}
+		_buckets.swap( buckets );
+		_prime = prime;
+		}
+	return;
 	M_EPILOG
 	}
 

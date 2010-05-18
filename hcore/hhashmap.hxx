@@ -40,8 +40,6 @@ namespace yaal
 namespace hcore
 {
 
-extern int long const* const _primes_;
-
 template<typename key_t>
 inline int long hash( key_t const& key_ )
 	{
@@ -50,32 +48,28 @@ inline int long hash( key_t const& key_ )
 
 /*! \brief Hash map container implementation.
  */
-template<typename key_t, typename data_t>
+template<typename key_t, typename data_t, typename hash_function_t = int long(*)( key_t const& )>
 class HHashMap
 	{
-	typedef HHashMap<key_t, data_t> self_t;
 public:
 	typedef key_t key_type;
 	typedef data_t data_type;
 	typedef HPair<key_t, data_t> value_type;
-	typedef int long ( *hasher_t )( key_t const& );
 	template<typename const_qual_t>
 	class HIterator;
 private:
-	class HAtom
+	struct hasher
 		{
-	private:
-		HAtom* _next;
-		value_type _value;
-		HAtom( value_type const& );
-		HAtom( HAtom const& );
-		virtual ~HAtom( void );
-		HAtom& operator = ( HAtom const& );
-		friend class HHashMap<key_t, data_t>;
-		template<typename const_qual_t>
-		friend class HIterator;
+		typedef typename HHashMap<key_t, data_t, hash_function_t>::value_type value_type;
+		hash_function_t _hasher;
+		hasher( hash_function_t hashFunction_ ) : _hasher( hashFunction_ ) {}
+		int long operator()( value_type const& val_ )
+			{ return ( _hasher( val_._first ) ); }
+		bool operator()( value_type const& a_, value_type const& b_ )
+			{ return ( a_._first == b_._first ); }
 		};
-	hasher_t _hasher;
+	typedef HHashMap<key_t, data_t> self_t;
+	hasher _hasher;
 	HHashContainer _engine;
 public:
 	typedef HIterator<value_type> iterator;
@@ -83,7 +77,7 @@ public:
 	HHashMap( void );
 	/*! \brief Lower bound of size of map's table */
 	HHashMap( int long );
-	HHashMap( int long, hasher_t );
+	HHashMap( int long, hash_function_t );
 	template<typename iterator_t>
 	HHashMap( iterator_t, iterator_t );
 	template<typename iterator_t>
@@ -118,17 +112,16 @@ public:
 	bool empty( void ) const;
 	void swap( HHashMap& );
 private:
-	bool find( key_t const&, int long&, HAtom*& ) const;
 	};
 
 
-template<typename key_type_t, typename data_type_t>
+template<typename key_type_t, typename data_type_t, typename hash_function_t>
 template<typename const_qual_t>
-class HHashMap<key_t, data_t>::HIterator
+class HHashMap<key_type_t, data_type_t, hash_function_t>::HIterator
 	{
 	typedef key_type_t key_type;
-	typedef value_type_t data_type;
-	typedef HHashMap<key_type, data_type, helper_t> map_t;
+	typedef data_type_t data_type;
+	typedef HHashMap<key_type, data_type, hash_function_t> map_t;
 	HHashContainer::HIterator _engine;
 public:
 	HIterator( void ) : _engine() {}
@@ -180,52 +173,35 @@ public:
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( _engine != it._engine ); }
 private:
-	friend class HMap<key_type, data_type, helper_t>;
+	friend class HMap<key_type, data_type, hash_function_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( HHashContainer::HIterator const& it ) : _engine( it ) {};
 	};
 
-template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>::HAtom::HAtom( value_type const& value_ )
-	: _next( NULL ), _value( value_ )
-	{
-	M_PROLOG
-	return;
-	M_EPILOG
-	}
-
-template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>::HAtom::~HAtom( void )
-	{
-	M_PROLOG
-	return;
-	M_EPILOG
-	}
-
-template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>::HHashMap( int long size_ )
+template<typename key_t, typename data_t, typename hash_function_t>
+HHashMap<key_t, data_t, hash_function_t>::HHashMap( int long size_ )
 	: _hasher(  &hash ), _engine()
 	{
 	M_PROLOG
-	_engine.resize( size_ );
+	_engine.resize( size_, _hasher );
 	return;
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>::HHashMap( int long size_, hasher_t hasher_ )
+template<typename key_t, typename data_t, typename hash_function_t>
+HHashMap<key_t, data_t, hash_function_t>::HHashMap( int long size_, hash_function_t hasher_ )
 	: _hasher(  hasher_ ), _engine()
 	{
 	M_PROLOG
-	_engine.resize( size_ );
+	_engine.resize( size_, _hasher );
 	return;
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
+template<typename key_t, typename data_t, typename hash_function_t>
 template<typename iterator_t>
-HHashMap<key_t, data_t>::HHashMap( iterator_t first, iterator_t last )
+HHashMap<key_t, data_t, hash_function_t>::HHashMap( iterator_t first, iterator_t last )
 	: _hasher(  &hash ), _engine()
 	{
 	M_PROLOG
@@ -235,45 +211,31 @@ HHashMap<key_t, data_t>::HHashMap( iterator_t first, iterator_t last )
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
+template<typename key_t, typename data_t, typename hash_function_t>
 template<typename iterator_t>
-HHashMap<key_t, data_t>::HHashMap( iterator_t first, iterator_t last, int long size_ )
+HHashMap<key_t, data_t, hash_function_t>::HHashMap( iterator_t first, iterator_t last, int long size_ )
 	: _hasher(  &hash ), _engine()
 	{
 	M_PROLOG
-	resize( size_ );
+	resize( size_, _hasher );
 	for ( ; first != last; ++ first )
 		insert( *first );
 	return;
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>::HHashMap( HHashMap const& map_ )
+template<typename key_t, typename data_t, typename hash_function_t>
+HHashMap<key_t, data_t, hash_function_t>::HHashMap( HHashMap const& map_ )
 	: _hasher( map_._hasher ), _engine()
 	{
 	M_PROLOG
-	_engine.resize( _size * 2 );
-	HAtom const* const* otherBuckets( map_._buckets.template get<HAtom const*>() );
-	HAtom** buckets( _buckets.get<HAtom*>() );
-	for ( int long i( 0 ); i < map_._prime; ++ i )
-		{
-		HAtom const* origAtom( otherBuckets[ i ] );
-		while ( origAtom )
-			{
-			HAtom* atom( new ( std::nothrow ) HAtom( origAtom->_value ) );
-			origAtom = origAtom->_next;
-			int long newHash( _hasher( atom->_value.first ) % _prime );
-			atom->_next = buckets[ newHash ];
-			buckets[ newHash ] = atom;
-			}
-		}
+	_engine.copy_from( map_._engine );
 	return;
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>::~HHashMap( void )
+template<typename key_t, typename data_t, typename hash_function_t>
+HHashMap<key_t, data_t, hash_function_t>::~HHashMap( void )
 	{
 	M_PROLOG
 	clear();
@@ -281,8 +243,8 @@ HHashMap<key_t, data_t>::~HHashMap( void )
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-HHashMap<key_t, data_t>& HHashMap<key_t, data_t>::operator = ( HHashMap const& map_ )
+template<typename key_t, typename data_t, typename hash_function_t>
+HHashMap<key_t, data_t, hash_function_t>& HHashMap<key_t, data_t, hash_function_t>::operator = ( HHashMap const& map_ )
 	{
 	M_PROLOG
 	int i( 0 );
@@ -295,46 +257,17 @@ HHashMap<key_t, data_t>& HHashMap<key_t, data_t>::operator = ( HHashMap const& m
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-void HHashMap<key_t, data_t>::resize( int long size_ )
+template<typename key_t, typename data_t, typename hash_function_t>
+void HHashMap<key_t, data_t, hash_function_t>::resize( int long size_ )
 	{
 	M_PROLOG
-	if ( size_ < 1 )
-		M_THROW ( "bad map size", size_ );
-	if ( size_ > _size )
-		{
-		int n = 0;
-		while ( size_ )
-			{
-			size_ >>= 1;
-			n ++;
-			}
-		int long prime( _primes_[ n - 1 ] );
-		HChunk buckets( chunk_size<HAtom*>( prime ), HChunk::STRATEGY::GEOMETRIC );
-		M_ASSERT( ( buckets.size() / static_cast<int long>( sizeof ( HAtom* ) ) ) >= prime );
-		HAtom** oldBuckets( _buckets.get<HAtom*>() );
-		HAtom** newBuckets( buckets.get<HAtom*>() );
-		for ( int long i( 0 ); i < _prime; ++ i )
-			{
-			HAtom* a( oldBuckets[ i ] );
-			while ( a )
-				{
-				HAtom* atom( a );
-				a = a->_next;
-				int long newHash( _hasher( atom->_value.first ) % prime );
-				atom->_next = newBuckets[ newHash ];
-				newBuckets[ newHash ] = atom;
-				}
-			}
-		_buckets.swap( buckets );
-		_prime = prime;
-		}
+	_engine.resize( size_, _hasher );
 	return;
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-void HHashMap<key_t, data_t>::clear( void )
+template<typename key_t, typename data_t, typename hash_function_t>
+void HHashMap<key_t, data_t, hash_function_t>::clear( void )
 	{
 	M_PROLOG
 	_engine.clear();
@@ -342,48 +275,48 @@ void HHashMap<key_t, data_t>::clear( void )
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-int long HHashMap<key_t, data_t>::get_size( void ) const
+template<typename key_t, typename data_t, typename hash_function_t>
+int long HHashMap<key_t, data_t, hash_function_t>::get_size( void ) const
 	{
 	M_PROLOG
 	return ( _engine.get_size() );
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-int long HHashMap<key_t, data_t>::size( void ) const
+template<typename key_t, typename data_t, typename hash_function_t>
+int long HHashMap<key_t, data_t, hash_function_t>::size( void ) const
 	{
 	M_PROLOG
 	return ( _engine.get_size() );
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-bool HHashMap<key_t, data_t>::is_empty( void ) const
+template<typename key_t, typename data_t, typename hash_function_t>
+bool HHashMap<key_t, data_t, hash_function_t>::is_empty( void ) const
 	{
 	M_PROLOG
 	return ( _engine.is_empty() );
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-bool HHashMap<key_t, data_t>::empty( void ) const
+template<typename key_t, typename data_t, typename hash_function_t>
+bool HHashMap<key_t, data_t, hash_function_t>::empty( void ) const
 	{
 	M_PROLOG
 	return ( _engine.is_empty() );
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-data_t& HHashMap<key_t, data_t>::operator[]( key_t const& key_ )
+template<typename key_t, typename data_t, typename hash_function_t>
+data_t& HHashMap<key_t, data_t, hash_function_t>::operator[]( key_t const& key_ )
 	{
 	M_PROLOG
 	return ( insert( make_pair( key_, data_t() ) ).first->second );
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-yaal::hcore::HPair<typename HHashMap<key_t, data_t>::iterator, bool> HHashMap<key_t, data_t>::insert( value_type const& val_ )
+template<typename key_t, typename data_t, typename hash_function_t>
+yaal::hcore::HPair<typename HHashMap<key_t, data_t, hash_function_t>::iterator, bool> HHashMap<key_t, data_t, hash_function_t>::insert( value_type const& val_ )
 	{
 	M_PROLOG
 	iterator it( _prime ? find( val_.first ) : end() );
@@ -407,9 +340,9 @@ yaal::hcore::HPair<typename HHashMap<key_t, data_t>::iterator, bool> HHashMap<ke
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
+template<typename key_t, typename data_t, typename hash_function_t>
 template<typename iterator_t>
-void HHashMap<key_t, data_t>::insert( iterator_t first, iterator_t last )
+void HHashMap<key_t, data_t, hash_function_t>::insert( iterator_t first, iterator_t last )
 	{
 	M_PROLOG
 	for ( ; first != last; ++ first )
@@ -418,24 +351,24 @@ void HHashMap<key_t, data_t>::insert( iterator_t first, iterator_t last )
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::begin( void )
+template<typename key_t, typename data_t, typename hash_function_t>
+typename HHashMap<key_t, data_t, hash_function_t>::iterator HHashMap<key_t, data_t, hash_function_t>::begin( void )
 	{
 	M_PROLOG
 	return ( _engine.begin() );
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::end( void )
+template<typename key_t, typename data_t, typename hash_function_t>
+typename HHashMap<key_t, data_t, hash_function_t>::iterator HHashMap<key_t, data_t, hash_function_t>::end( void )
 	{
 	M_PROLOG
 	return ( _engine.end() );
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::begin( void ) const
+template<typename key_t, typename data_t, typename hash_function_t>
+typename HHashMap<key_t, data_t, hash_function_t>::const_iterator HHashMap<key_t, data_t, hash_function_t>::begin( void ) const
 	{
 	M_PROLOG
 	const_iterator it( this, 0, NULL );
@@ -443,16 +376,16 @@ typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::begin(
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::end( void ) const
+template<typename key_t, typename data_t, typename hash_function_t>
+typename HHashMap<key_t, data_t, hash_function_t>::const_iterator HHashMap<key_t, data_t, hash_function_t>::end( void ) const
 	{
 	M_PROLOG
 	return ( const_iterator( this, _prime, NULL ) );
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::find( key_t const& key_ )
+template<typename key_t, typename data_t, typename hash_function_t>
+typename HHashMap<key_t, data_t, hash_function_t>::iterator HHashMap<key_t, data_t, hash_function_t>::find( key_t const& key_ )
 	{
 	M_PROLOG
 	int long idx( 0 );
@@ -461,8 +394,8 @@ typename HHashMap<key_t, data_t>::iterator HHashMap<key_t, data_t>::find( key_t 
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::find( key_t const& key_ ) const
+template<typename key_t, typename data_t, typename hash_function_t>
+typename HHashMap<key_t, data_t, hash_function_t>::const_iterator HHashMap<key_t, data_t, hash_function_t>::find( key_t const& key_ ) const
 	{
 	M_PROLOG
 	int long idx( 0 );
@@ -471,8 +404,8 @@ typename HHashMap<key_t, data_t>::const_iterator HHashMap<key_t, data_t>::find( 
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-void HHashMap<key_t, data_t>::erase( iterator it )
+template<typename key_t, typename data_t, typename hash_function_t>
+void HHashMap<key_t, data_t, hash_function_t>::erase( iterator it )
 	{
 	M_PROLOG
 	_engine.erase( it._engine );
@@ -480,8 +413,8 @@ void HHashMap<key_t, data_t>::erase( iterator it )
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-int long HHashMap<key_t, data_t>::erase( key_t const& key_ )
+template<typename key_t, typename data_t, typename hash_function_t>
+int long HHashMap<key_t, data_t, hash_function_t>::erase( key_t const& key_ )
 	{
 	M_PROLOG
 	iterator it( find( key_ ) );
@@ -492,8 +425,8 @@ int long HHashMap<key_t, data_t>::erase( key_t const& key_ )
 	M_EPILOG
 	}
 
-template<typename key_t, typename data_t>
-int long HHashMap<key_t, data_t>::count( key_t const& key_ ) const
+template<typename key_t, typename data_t, typename hash_function_t>
+int long HHashMap<key_t, data_t, hash_function_t>::count( key_t const& key_ ) const
 	{
 	M_PROLOG
 	return ( find( key_ ) != end() ? 1 : 0 );
