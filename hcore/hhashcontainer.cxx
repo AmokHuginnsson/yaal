@@ -27,6 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hhashcontainer.hxx"
+#include "algorithm.hxx"
 
 namespace yaal
 {
@@ -143,6 +144,18 @@ void HHashContainer::copy_from( HHashContainer const& src_ )
 	_buckets.swap( newBuckets );
 	return;
 	M_EPILOG
+	}
+
+void HHashContainer::swap( HHashContainer& hc_ )
+	{
+	if ( &hc_ != this )
+		{
+		using yaal::swap;
+		swap( _prime, hc_._prime );
+		swap( _size, hc_._size );
+		swap( _buckets, hc_._buckets );
+		}
+	return;
 	}
 
 }

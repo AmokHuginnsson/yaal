@@ -96,6 +96,7 @@ public:
 	template<typename hasher_t>
 	void resize( int long, hasher_t const& );
 	void copy_from( HHashContainer const& );
+	void swap( HHashContainer& );
 	};
 
 /*! \brief Iterator for HHashContainer data structure.
@@ -259,6 +260,9 @@ void HHashContainer::resize( int long size_, hasher_t const& hasher_ )
 	}
 
 }
+
+inline void swap( yaal::hcore::HHashContainer& a, yaal::hcore::HHashContainer& b )
+	{ a.swap( b );	}
 
 }
 
