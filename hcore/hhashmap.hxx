@@ -69,7 +69,9 @@ private:
 public:
 	typedef HIterator<value_type> iterator;
 	typedef HIterator<value_type const> const_iterator;
-	HHashMap( void );
+	HHashMap( void )
+		: _hasher( &hash ), _engine()
+		{}
 	/*! \brief Lower bound of size of map's table */
 	HHashMap( int long size_ )
 		: _hasher(  &hash ), _engine()

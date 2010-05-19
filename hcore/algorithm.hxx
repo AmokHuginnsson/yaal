@@ -554,6 +554,17 @@ bool less( tType const& left_, tType const& right_ )
 	return ( left_ < right_ );
 	}
 
+/*! \brief Callculate booleant exclisive or value.
+ *
+ * \param p - first predicate.
+ * \param q - second predicate.
+ * \return p exor q <=> ( p ^ q ) v ( ~ ( p v q ) )
+ */
+inline bool exor ( bool p, bool q )
+	{
+	return ( ( p && q ) || ( ! ( p || q ) ) );
+	}
+
 }
 
 #endif /* not YAAL_HCORE_ALGORITHM_HXX_INCLUDED */

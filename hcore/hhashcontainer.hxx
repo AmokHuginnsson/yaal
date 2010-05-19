@@ -56,7 +56,7 @@ class HHashContainer : private trait::HNonCopyable
 private:
 	class HAbstractAtom
 		{
-	private:
+	private: /* for UT */
 		HAbstractAtom* _next;
 		HAbstractAtom( void ) : _next( NULL ) {}
 		HAbstractAtom( HAbstractAtom const& );
@@ -69,6 +69,7 @@ private:
 	template<typename value_t>
 	class HAtom : public HAbstractAtom
 		{
+	private: /* for UT */
 		value_t _value;
 		HAtom( value_t const& value_ ) : HAbstractAtom(), _value( value_ ) {}
 		virtual HAbstractAtom* clone( void ) const
