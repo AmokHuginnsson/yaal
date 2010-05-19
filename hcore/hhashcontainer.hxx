@@ -248,7 +248,7 @@ void HHashContainer::resize( int long size_, hasher_t const& hasher_ )
 				{
 				HAtom<typename hasher_t::value_type>* atom( a );
 				a = static_cast<HAtom<typename hasher_t::value_type>*>( a->_next );
-				int long newHash( hasher_( atom->_value ) % prime );
+				int long newHash( abs( hasher_( atom->_value ) ) % prime );
 				atom->_next = newBuckets[ newHash ];
 				newBuckets[ newHash ] = atom;
 				}
