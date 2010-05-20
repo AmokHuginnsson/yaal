@@ -52,6 +52,7 @@ extern int long const* const _primes_;
 
 class HHashContainer : private trait::HNonCopyable
 	{
+public:
 	class HIterator;
 private:
 	class HAbstractAtom
@@ -189,10 +190,15 @@ template<typename key_t, typename hasher_t>
 HHashContainer::HIterator HHashContainer::find( key_t const& key_, hasher_t const& hasher_ ) const
 	{
 	M_PROLOG
-	int long idx( abs( hasher_( key_ ) ) % _prime );
-	HAtom<typename hasher_t::value_type>* atom( _buckets.get<HAtom<typename hasher_t::value_type>*>()[ idx ] );
-	while ( atom && ! hasher_( atom->_value, key_ ) )
-		atom = static_cast<HAtom<typename hasher_t::value_type>*>( atom->_next );
+	int long idx( 0 );
+	HAtom<typename hasher_t::value_type>* atom( NULL );
+	if ( _prime )
+		{
+		idx = abs( hasher_( key_ ) ) % _prime;
+		atom = _buckets.get<HAtom<typename hasher_t::value_type>*>()[ idx ];
+		while ( atom && ! hasher_( atom->_value, key_ ) )
+			atom = static_cast<HAtom<typename hasher_t::value_type>*>( atom->_next );
+		}
 	return ( atom ? HIterator( this, idx, atom ) : end() );
 	M_EPILOG
 	}
