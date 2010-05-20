@@ -88,7 +88,8 @@ void HHashContainer::clear( void )
 void HHashContainer::erase( HIterator const& it )
 	{
 	M_PROLOG
-	HAbstractAtom* atom( _buckets.get<HAbstractAtom*>()[ it._index ] );
+	HAbstractAtom** buckets( _buckets.get<HAbstractAtom*>() );
+	HAbstractAtom* atom( buckets[ it._index ] );
 	HAbstractAtom* ancestor( NULL );
 	M_ASSERT( atom );
 	while ( atom != it._atom )
@@ -98,7 +99,7 @@ void HHashContainer::erase( HIterator const& it )
 		if ( ancestor )
 			ancestor->_next = atom->_next;
 		else
-			_buckets.get<HAbstractAtom*>()[ it._index ] = NULL;
+			buckets[ it._index ] = atom->_next;
 		delete atom;
 		-- _size;
 		}

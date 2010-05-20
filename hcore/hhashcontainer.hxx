@@ -210,6 +210,9 @@ HPair<HHashContainer::HIterator, bool> HHashContainer::insert( tType const& val_
 		HAtom<typename hasher_t::value_type>* atom = new ( std::nothrow ) HAtom<typename hasher_t::value_type>( val_ );
 		if ( ! atom )
 			M_THROW( "memory allocation error", errno );
+
+		/* I cannot use index calculated in find() call above because here we use different prime.
+		 */
 		int long newHash = abs( hasher_( val_ ) ) % _prime;
 		HAtom<typename hasher_t::value_type>** buckets( _buckets.get<HAtom<typename hasher_t::value_type>*>() );
 		atom->_next = buckets[ newHash ];
