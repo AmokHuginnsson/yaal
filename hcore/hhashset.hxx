@@ -39,36 +39,29 @@ namespace hcore
 
 /*! \brief Hash set container implementation.
  */
-template<typename key_t, typename data_t, typename hash_function_t = int long(*)( key_t const& )>
+template<typename type_t, typename hash_function_t = int long(*)( type_t const& )>
 class HHashSet
 	{
 public:
-	typedef key_t key_type;
-	typedef data_t data_type;
-	typedef HPair<key_t, data_t> value_type;
-	template<typename const_qual_t>
 	class HIterator;
+	typedef type_t key_type;
+	typedef type_t value_type;
+	typedef HIterator iterator;
 private:
 	struct hasher
 		{
-		typedef typename HHashSet<key_t, data_t, hash_function_t>::value_type value_type;
+		typedef typename HHashSet<type_t, hash_function_t>::value_type value_type;
 		hash_function_t _hasher;
 		hasher( hash_function_t hashFunction_ ) : _hasher( hashFunction_ ) {}
 		int long operator()( value_type const& val_ ) const
-			{ return ( _hasher( val_.first ) ); }
-		int long operator()( key_t const& key_ ) const
-			{ return ( _hasher( key_ ) ); }
+			{ return ( _hasher( val_ ) ); }
 		bool operator()( value_type const& a_, value_type const& b_ ) const
-			{ return ( a_.first == b_.first ); }
-		bool operator()( value_type const& a_, key_t const& b_ ) const
-			{ return ( a_.first == b_ ); }
+			{ return ( a_ == b_ ); }
 		};
-	typedef HHashSet<key_t, data_t> self_t;
+	typedef HHashSet<type_t> self_t;
 	hasher _hasher;
 	HHashContainer _engine;
 public:
-	typedef HIterator<value_type> iterator;
-	typedef HIterator<value_type const> const_iterator;
 	HHashSet( void )
 		: _hasher( &hash ), _engine()
 		{}
@@ -137,19 +130,11 @@ public:
 		return ( *this );
 		M_EPILOG
 		}
-	data_t& operator [] ( key_t const& key_ )
-		{ M_PROLOG return ( insert( make_pair( key_, data_t() ) ).first->second ); M_EPILOG }
-	const_iterator begin( void ) const
-		{ M_PROLOG return ( const_iterator( _engine.begin() ) ); M_EPILOG }
 	iterator begin( void )
 		{ M_PROLOG return ( iterator( _engine.begin() ) ); M_EPILOG }
-	const_iterator end( void ) const
-		{ M_PROLOG return ( const_iterator( _engine.end() ) ); M_EPILOG }
 	iterator end( void )
 		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
-	const_iterator find( key_t const& key_ ) const
-		{ M_PROLOG return ( const_iterator( _engine.find( key_, _hasher ) ) ); M_EPILOG }
-	iterator find( key_t const& key_ )
+	iterator find( type_t const& key_ )
 		{ M_PROLOG return ( iterator( _engine.find( key_, _hasher ) ) ); M_EPILOG }
 	HPair<iterator, bool> insert( value_type const& val_ )
 		{
@@ -186,7 +171,7 @@ public:
 	 * \param key_ - key to be removed.
 	 * \return Number of erased elements.
 	 */
-	int long erase( key_t const& key_ )
+	int long erase( type_t const& key_ )
 		{
 		M_PROLOG
 		iterator it( find( key_ ) );
@@ -196,7 +181,7 @@ public:
 		return ( erased ? 1 : 0 );
 		M_EPILOG
 		}
-	int long count( key_t const& key_ ) const
+	int long count( type_t const& key_ ) const
 		{ M_PROLOG return ( find( key_ ) != end() ? 1 : 0 ); M_EPILOG }
 	void clear( void )
 		{ M_PROLOG _engine.clear(); return; M_EPILOG }
@@ -222,21 +207,14 @@ private:
 	};
 
 
-template<typename key_type_t, typename data_type_t, typename hash_function_t>
-template<typename const_qual_t>
-class HHashSet<key_type_t, data_type_t, hash_function_t>::HIterator
+template<typename key_type_t, typename hash_function_t>
+class HHashSet<key_type_t, hash_function_t>::HIterator
 	{
 	typedef key_type_t key_type;
-	typedef data_type_t data_type;
-	typedef HHashSet<key_type, data_type, hash_function_t> map_t;
+	typedef HHashSet<key_type, hash_function_t> set_t;
 	HHashContainer::HIterator _engine;
 public:
 	HIterator( void ) : _engine() {}
-	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& it_ ) : _engine( it_._engine )
-		{
-		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
-		}
 	HIterator& operator = ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
@@ -265,31 +243,23 @@ public:
 		-- _engine;
 		return ( it );
 		}
-	const_qual_t& operator* ( void )
-		{ return ( _engine.operator*<typename map_t::value_type>() ); }
-	const_qual_t& operator* ( void ) const
-		{ return ( _engine.operator*<typename map_t::value_type>() ); }
-	const_qual_t* operator-> ( void )
-		{ return ( &_engine.operator*<typename map_t::value_type>() ); }
-	const_qual_t* operator-> ( void ) const
-		{ return ( &_engine.operator*<typename map_t::value_type>() ); }
-	template<typename other_const_qual_t>
-	bool operator == ( HIterator<other_const_qual_t> const& it ) const
+	key_type const& operator* ( void ) const
+		{ return ( _engine.operator*<typename set_t::value_type>() ); }
+	key_type const* operator-> ( void ) const
+		{ return ( &_engine.operator*<typename set_t::value_type>() ); }
+	bool operator == ( HIterator const& it ) const
 		{ return ( _engine == it._engine ); }
-	template<typename other_const_qual_t>
-	bool operator != ( HIterator<other_const_qual_t> const& it ) const
+	bool operator != ( HIterator const& it ) const
 		{ return ( _engine != it._engine ); }
 private:
-	friend class HHashSet<key_type, data_type, hash_function_t>;
-	template<typename other_const_qual_t>
-	friend class HIterator;
+	friend class HHashSet<key_type, hash_function_t>;
 	explicit HIterator( HHashContainer::HIterator const& it ) : _engine( it ) {};
 	};
 
 }
 
-template<typename key_type, typename data_type, typename hash_function_t>
-inline void swap( yaal::hcore::HHashSet<key_type, data_type, hash_function_t>& a, yaal::hcore::HHashSet<key_type, data_type, hash_function_t>& b )
+template<typename key_type, typename hash_function_t>
+inline void swap( yaal::hcore::HHashSet<key_type, hash_function_t>& a, yaal::hcore::HHashSet<key_type, hash_function_t>& b )
 	{ a.swap( b ); }
 
 }
