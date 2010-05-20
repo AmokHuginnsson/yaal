@@ -63,7 +63,7 @@ private:
 		bool operator()( value_type const& a_, key_t const& b_ ) const
 			{ return ( a_.first == b_ ); }
 		};
-	typedef HHashMap<key_t, data_t> self_t;
+	typedef HHashMap<key_t, data_t, hash_function_t> self_t;
 	hasher _hasher;
 	HHashContainer _engine;
 public:

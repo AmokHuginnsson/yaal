@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hhashset.hxx - this file is integral part of `yaal' project.
+	hhashmultiset.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef YAAL_HCORE_HHASHSET_HXX_INCLUDED
-#define YAAL_HCORE_HHASHSET_HXX_INCLUDED
+#ifndef YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED
+#define YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED
 
 #include "hcore/hhashcontainer.hxx"
 #include "hcore/hexception.hxx"
@@ -40,33 +40,38 @@ namespace hcore
 /*! \brief Hash set container implementation.
  */
 template<typename type_t, typename hash_function_t = int long(*)( type_t const& )>
-class HHashSet
+class HHashMultiSet
 	{
 public:
 	class HIterator;
 	typedef type_t key_type;
 	typedef type_t value_type;
+	typedef HPair<type_t, int long> elem_t;
 	typedef HIterator iterator;
 private:
 	struct hasher
 		{
-		typedef typename HHashSet<type_t, hash_function_t>::value_type value_type;
+		typedef typename HHashMultiSet<type_t, hash_function_t>::elem_t value_type;
 		hash_function_t _hasher;
 		hasher( hash_function_t hashFunction_ ) : _hasher( hashFunction_ ) {}
 		int long operator()( value_type const& val_ ) const
-			{ return ( _hasher( val_ ) ); }
+			{ return ( _hasher( val_.first ) ); }
+		int long operator()( type_t const& key_ ) const
+			{ return ( _hasher( key_ ) ); }
 		bool operator()( value_type const& a_, value_type const& b_ ) const
-			{ return ( a_ == b_ ); }
+			{ return ( a_.first == b_.first ); }
+		bool operator()( value_type const& a_, type_t const& b_ ) const
+			{ return ( a_.first == b_ ); }
 		};
-	typedef HHashSet<type_t, hash_function_t> self_t;
+	typedef HHashMultiSet<type_t, hash_function_t> self_t;
 	hasher _hasher;
 	HHashContainer _engine;
 public:
-	HHashSet( void )
+	HHashMultiSet( void )
 		: _hasher( &hash ), _engine()
 		{}
 	/*! \brief Lower bound of size of map's table */
-	HHashSet( int long size_ )
+	HHashMultiSet( int long size_ )
 		: _hasher(  &hash ), _engine()
 		{
 		M_PROLOG
@@ -74,7 +79,7 @@ public:
 		return;
 		M_EPILOG
 		}
-	HHashSet( int long size_, hash_function_t hasher_ )
+	HHashMultiSet( int long size_, hash_function_t hasher_ )
 		: _hasher(  hasher_ ), _engine()
 		{
 		M_PROLOG
@@ -83,7 +88,7 @@ public:
 		M_EPILOG
 		}
 	template<typename iterator_t>
-	HHashSet( iterator_t first, iterator_t last )
+	HHashMultiSet( iterator_t first, iterator_t last )
 		: _hasher(  &hash ), _engine()
 		{
 		M_PROLOG
@@ -93,7 +98,7 @@ public:
 		M_EPILOG
 		}
 	template<typename iterator_t>
-	HHashSet( iterator_t first, iterator_t last, int long size_ )
+	HHashMultiSet( iterator_t first, iterator_t last, int long size_ )
 		: _hasher(  &hash ), _engine()
 		{
 		M_PROLOG
@@ -103,7 +108,7 @@ public:
 		return;
 		M_EPILOG
 		}
-	HHashSet( HHashSet const& set_ )
+	HHashMultiSet( HHashMultiSet const& set_ )
 		: _hasher( set_._hasher ), _engine()
 		{
 		M_PROLOG
@@ -111,20 +116,20 @@ public:
 		return;
 		M_EPILOG
 		}
-	virtual ~HHashSet( void )
+	virtual ~HHashMultiSet( void )
 		{
 		M_PROLOG
 		clear();
 		return;
 		M_EPILOG
 		}
-	HHashSet& operator = ( HHashSet const& set_ )
+	HHashMultiSet& operator = ( HHashMultiSet const& set_ )
 		{
 		M_PROLOG
 		int i( 0 );
 		if ( &set_ != this )
 			{
-			HHashSet tmp( set_ );
+			HHashMultiSet tmp( set_ );
 			swap( tmp );
 			}
 		return ( *this );
@@ -193,7 +198,7 @@ public:
 		{ M_PROLOG return ( _engine.is_empty() ); M_EPILOG }
 	bool empty( void ) const
 		{ M_PROLOG return ( _engine.is_empty() ); M_EPILOG }
-	void swap( HHashSet& set_ )
+	void swap( HHashMultiSet& set_ )
 		{
 		if ( &set_ != this )
 			{
@@ -208,10 +213,10 @@ private:
 
 
 template<typename key_type_t, typename hash_function_t>
-class HHashSet<key_type_t, hash_function_t>::HIterator
+class HHashMultiSet<key_type_t, hash_function_t>::HIterator
 	{
 	typedef key_type_t key_type;
-	typedef HHashSet<key_type, hash_function_t> set_t;
+	typedef HHashMultiSet<key_type, hash_function_t> set_t;
 	HHashContainer::HIterator _engine;
 public:
 	HIterator( void ) : _engine() {}
@@ -244,25 +249,25 @@ public:
 		return ( it );
 		}
 	key_type const& operator* ( void ) const
-		{ return ( _engine.operator*<typename set_t::value_type>() ); }
+		{ return ( _engine.operator*<typename set_t::elem_t>().first ); }
 	key_type const* operator-> ( void ) const
-		{ return ( &_engine.operator*<typename set_t::value_type>() ); }
+		{ return ( &_engine.operator*<typename set_t::elem_t>().first ); }
 	bool operator == ( HIterator const& it ) const
 		{ return ( _engine == it._engine ); }
 	bool operator != ( HIterator const& it ) const
 		{ return ( _engine != it._engine ); }
 private:
-	friend class HHashSet<key_type, hash_function_t>;
+	friend class HHashMultiSet<key_type, hash_function_t>;
 	explicit HIterator( HHashContainer::HIterator const& it ) : _engine( it ) {};
 	};
 
 }
 
 template<typename key_type, typename hash_function_t>
-inline void swap( yaal::hcore::HHashSet<key_type, hash_function_t>& a, yaal::hcore::HHashSet<key_type, hash_function_t>& b )
+inline void swap( yaal::hcore::HHashMultiSet<key_type, hash_function_t>& a, yaal::hcore::HHashMultiSet<key_type, hash_function_t>& b )
 	{ a.swap( b ); }
 
 }
 
-#endif /* not YAAL_HCORE_HHASHSET_HXX_INCLUDED */
+#endif /* not YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED */
 
