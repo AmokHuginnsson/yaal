@@ -15,15 +15,24 @@ class YaalHCoreHStringPrinter:
 		return 'string'
 
 def yaal_lookup_function( val ):
-	lookup_tag = val.type.tag
-	regex = re.compile( "^yaal::hcore::HString$" )
+	lookup_tag = val.type.strip_typedefs().tag
 	if lookup_tag == None:
 		return None
+	regex = re.compile( "^yaal::hcore::HString$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHStringPrinter( val )
 	regex = re.compile( "^yaal::hcore::HArray<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHArrayPrinter( val )
+	regex = re.compile( "^yaal::hcore::HList<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHListPrinter( val )
+	regex = re.compile( "^yaal::hcore::HMap<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHMapPrinter( val )
+	regex = re.compile( "^yaal::hcore::HNumber$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHNumberPrinter( val )
 
 	return None
 
@@ -61,10 +70,131 @@ class YaalHCoreHArrayPrinter:
 		return self._iterator(self.val['_buf']['_data'].cast(self.val.type.template_argument( 0 ).pointer()), self.val['_size'])
 
 	def to_string( self ):
-		return ( 'yaal::hcore::HArray of %s of length %d, capacity %d' % ( self.val.type.template_argument( 0 ), self.val['_size'], self.capacity() ) )
+		return ( "yaal::hcore::HArray of `%s' of length %d, capacity %d" % ( self.val.type.template_argument( 0 ), self.val['_size'], self.capacity() ) )
 
 	def display_hint( self ):
 		return 'array'
+
+class YaalHCoreHListPrinter:
+	"Print a yaal::hcore::HArray"
+
+	class _iterator:
+		def __init__ (self, start, size):
+			self.item = start
+			self.size = size
+			self.count = 0
+
+		def __iter__(self):
+			return self
+
+		def next(self):
+			if self.count == self.size:
+				raise StopIteration
+			count = self.count
+			self.count = self.count + 1
+			elt = self.item['_value']
+			self.item = self.item['_next']
+			return ('[%d]' % count, elt)
+
+	def __init__(self, val):
+		self.val = val
+	
+	def children( self ):
+		return self._iterator(self.val['_hook'], self.val['_size'])
+
+	def to_string( self ):
+		return ( "yaal::hcore::HList of `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val['_size'] ) )
+
+	def display_hint( self ):
+		return 'array'
+
+class YaalHCoreHMapPrinter:
+	"Print a yaal::hcore::HMap"
+
+	class _iterator:
+		def __init__( self, owner, start, size ):
+			self._owner = owner
+			self.item = start
+			self.size = size
+			self.count = 0
+
+		def __iter__(self):
+			return self
+
+		def do_next( self, it ):
+			lastNode = it;
+			while it != 0:
+				if ( it['_right'] != 0 ) and ( it['_right'] != lastNode ):
+					it = it['_right']
+					while ( it['_left'] ):
+						it = it['_left']
+					break
+				else:
+					lastNode = it
+					it = it['_parent']
+					if ( it != 0 ) and ( lastNode == it['_left'] ):
+						break
+			return it
+
+		def next(self):
+			if self.count == ( self.size * 2 ):
+				raise StopIteration
+			count = self.count
+			valuetype = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._owner.type.template_argument( 0 ).const(), self._owner.type.template_argument( 1 ) ) )
+			nodetype = gdb.lookup_type( "yaal::hcore::HSBBSTree::HNode<%s>" % ( valuetype ) ).pointer()
+			if ( count % 2 ) == 0:
+				elt = self.item.cast( nodetype )['_key']['first']
+			else:
+				elt = self.item.cast( nodetype )['_key']['second']
+				self.item = self.do_next( self.item )
+			self.count = self.count + 1
+			return ('[%d]' % count, elt)
+
+	def __init__( self, val ):
+		self.val = val
+
+	def begin( self ):
+		node = self.val['_engine']['_root']
+		while node['_left'] != 0:
+			node = node['_left']
+		return node
+
+	def children( self ):
+		return self._iterator( self.val, self.begin(), self.val['_engine']['_size'] )
+
+	def to_string( self ):
+		return ( "yaal::hcore::HMap of `%s' to `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val.type.template_argument( 1 ), self.val['_engine']['_size'] ) )
+
+	def display_hint( self ):
+		return 'map'
+
+class YaalHCoreHNumberPrinter:
+	"Print a yaal::hcore::HNumber"
+
+	def __init__( self, val ):
+		self._val = val
+
+	def to_string( self ):
+		s = ""
+		if self._val['_digitCount'] > 0:
+			if self._val['_negative']:
+				s = s + "-"
+			digit = 0
+			data = self._val['_canonical']['_data'].cast( gdb.lookup_type( "char" ).pointer() ).string( 'ascii', 'ignore', self._val['_digitCount'] )
+			while digit < self._val['_integralPartSize']:
+				s = s + chr( ord( data[digit] ) + ord( '0' ) )
+				digit = digit + 1
+			if self._val['_digitCount'] > self._val['_integralPartSize']:
+				s = s + "."
+			while digit < self._val['_digitCount']:
+				s = s + chr( ord( data[digit] ) + ord( '0' ) )
+				digit = digit + 1
+		else:
+			s = "0"
+		return s
+
+	def display_hint( self ):
+		return 'string'
 
 gdb.pretty_printers.append( yaal_lookup_function )
 
