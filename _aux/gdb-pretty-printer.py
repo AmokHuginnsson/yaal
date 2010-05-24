@@ -30,6 +30,9 @@ def yaal_lookup_function( val ):
 	regex = re.compile( "^yaal::hcore::HMap<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHMapPrinter( val )
+	regex = re.compile( "^yaal::hcore::HHashMap<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHHashMapPrinter( val )
 	regex = re.compile( "^yaal::hcore::HNumber$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHNumberPrinter( val )
@@ -164,6 +167,74 @@ class YaalHCoreHMapPrinter:
 
 	def to_string( self ):
 		return ( "yaal::hcore::HMap of `%s' to `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val.type.template_argument( 1 ), self.val['_engine']['_size'] ) )
+
+	def display_hint( self ):
+		return 'map'
+
+class YaalHCoreHHashMapPrinter:
+	"Print a yaal::hcore::HHashMap"
+
+	class _iterator:
+		def __init__( self, owner, start, size ):
+			self._owner = owner
+			self.item = start
+			self.size = size
+			self.count = 0
+
+		def __iter__(self):
+			return self
+
+		def do_next( self, it ):
+			lastNode = it;
+			while it != 0:
+				if ( it['_right'] != 0 ) and ( it['_right'] != lastNode ):
+					it = it['_right']
+					while ( it['_left'] ):
+						it = it['_left']
+					break
+				else:
+					lastNode = it
+					it = it['_parent']
+					if ( it != 0 ) and ( lastNode == it['_left'] ):
+						break
+			return it
+
+		def nodetype( self ):
+			valuetype = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._owner.type.template_argument( 0 ).const(), self._owner.type.template_argument( 1 ) ) )
+			nodetype = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( valuetype ) ).pointer()
+			return nodetype
+
+		def next(self):
+			if self.count == ( self.size * 2 ):
+				raise StopIteration
+			count = self.count
+			nodetype = self.nodetype()
+			if ( count % 2 ) == 0:
+				elt = self.item.cast( nodetype )['_value']['first']
+			else:
+				elt = self.item.cast( nodetype )['_value']['second']
+				self.item = self.do_next( self.item )
+			self.count = self.count + 1
+			return ('[%d]' % count, elt)
+
+	def __init__( self, val ):
+		self.val = val
+
+	def buckets( self ):
+		buckets = self.val['_engine']['_buckets']['_data']
+		return buckets.cast( self.nodetype() ).pointer()
+
+	def begin( self ):
+		node = self.val['_engine']['_root']
+		while node['_left'] != 0:
+			node = node['_left']
+		return node
+
+	def children( self ):
+		return self._iterator( self.val, self.begin(), self.val['_engine']['_size'] )
+
+	def to_string( self ):
+		return ( "yaal::hcore::HHashMap of `%s' to `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val.type.template_argument( 1 ), self.val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'map'
