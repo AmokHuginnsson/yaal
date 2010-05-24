@@ -217,6 +217,10 @@ public:
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 		}
+	const_iterator lower_bound( key_type const& key_ ) const
+		{ M_PROLOG return ( find( key_ ) ); M_EPILOG }
+	iterator lower_bound( key_type const& key_ )
+		{ M_PROLOG return ( find( key_ ) ); M_EPILOG }
 	const_iterator upper_bound( key_type const& key ) const
 		{
 		M_PROLOG

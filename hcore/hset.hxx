@@ -120,7 +120,7 @@ public:
 		return;
 		M_EPILOG
 		}
-	int long count( value_type const& elem )
+	int long count( value_type const& elem ) const
 		{
 		M_PROLOG
 		HIterator it( find( elem ) );

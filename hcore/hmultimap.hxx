@@ -161,16 +161,6 @@ public:
 		return;
 		M_EPILOG
 		}
-	int long count( key_type const& key )
-		{
-		M_PROLOG
-		iterator it = find( key );
-		int long num( 0 );
-		if ( it != end() )
-			num = it._major->second->get_size();
-		return ( num );
-		M_EPILOG
-		}
 	int long erase( key_type const& key )
 		{
 		M_PROLOG
@@ -206,6 +196,10 @@ public:
 		return ( const_iterator( this, major, minor ) );
 		M_EPILOG
 		}
+	const_iterator lower_bound( key_type const& key_ ) const
+		{ M_PROLOG return ( find( key_ ) ); M_EPILOG }
+	iterator lower_bound( key_type const& key_ )
+		{ M_PROLOG return ( find( key_ ) ); M_EPILOG }
 	iterator find( key_type const& key )
 		{
 		M_PROLOG

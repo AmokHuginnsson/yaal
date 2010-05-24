@@ -173,6 +173,8 @@ public:
 		return ( insert( value_type( key, data_type() ) ).first->second );
 		M_EPILOG
 		}
+	int long count( key_type const& key_ ) const
+		{ M_PROLOG return ( find( key_ ) != end() ? 1 : 0 ); M_EPILOG }
 	void clear( void )
 		{ _engine.clear(); }
 	void swap( HMap<key_type, data_type, helper_t>& other )

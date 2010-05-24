@@ -135,17 +135,19 @@ public:
 		return ( *this );
 		M_EPILOG
 		}
-	iterator begin( void )
+	iterator begin( void ) const
 		{ M_PROLOG return ( iterator( _engine.begin() ) ); M_EPILOG }
-	iterator end( void )
+	iterator end( void ) const
 		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
-	iterator find( type_t const& key_ )
+	iterator find( type_t const& key_ ) const
 		{ M_PROLOG return ( iterator( _engine.find( key_, _hasher ) ) ); M_EPILOG }
-	HPair<iterator, bool> insert( value_type const& val_ )
+	iterator insert( value_type const& val_ )
 		{
 		M_PROLOG
-		HPair<HHashContainer::HIterator, bool> it( _engine.insert( val_, _hasher ) );
-		return ( make_pair( iterator( it.first ), it.second ) );
+		HPair<HHashContainer::HIterator, bool> p( _engine.insert( make_pair( val_, 1L ), _hasher ) );
+		if ( ! p.second )
+			++ p.first.operator*<elem_t>().second;
+		return ( iterator( p.first ) );
 		M_EPILOG
 		}
 	void resize( int long size_ )
@@ -186,14 +188,26 @@ public:
 		return ( erased ? 1 : 0 );
 		M_EPILOG
 		}
-	int long count( type_t const& key_ ) const
-		{ M_PROLOG return ( find( key_ ) != end() ? 1 : 0 ); M_EPILOG }
+	int long count( value_type const& elem ) const
+		{
+		M_PROLOG
+		HIterator it( find( elem ) );
+		return ( it != end() ? it._engine.template operator*<elem_t>().second : 0 );
+		M_EPILOG
+		}
 	void clear( void )
 		{ M_PROLOG _engine.clear(); return; M_EPILOG }
 	int long get_size( void ) const
-		{ M_PROLOG return ( _engine.get_size() ); M_EPILOG }
+		{
+		M_PROLOG
+		int long sizeAcc( 0 );
+		for ( HHashContainer::HIterator it = _engine.begin(); it != _engine.end(); ++ it )
+			sizeAcc += it.operator*<elem_t>().second;
+		return ( sizeAcc );
+		M_EPILOG
+		}
 	int long size( void ) const
-		{ M_PROLOG return ( _engine.get_size() ); M_EPILOG }
+		{ M_PROLOG return ( get_size() ); M_EPILOG }
 	bool is_empty( void ) const
 		{ M_PROLOG return ( _engine.is_empty() ); M_EPILOG }
 	bool empty( void ) const

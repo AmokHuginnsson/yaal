@@ -105,7 +105,14 @@ public:
 	int long size( void ) const
 		{ return ( get_size() ); }
 	int long get_size( void ) const
-		{ return ( _engine.get_size() );	}
+		{
+		M_PROLOG
+		int long sizeAcc( 0 );
+		for ( HSBBSTree::HIterator it = _engine.begin(); it != _engine.end(); ++ it )
+			sizeAcc += it.operator*<elem_t>().second;
+		return ( sizeAcc );
+		M_EPILOG
+		}
 	bool empty( void ) const
 		{ return ( is_empty() );	}
 	bool is_empty( void ) const
@@ -113,7 +120,7 @@ public:
 	HIterator insert( value_type const& elem )
 		{
 		M_PROLOG
-		HPair<HSBBSTree::HIterator, bool> p = _engine.insert<elem_t, helper_t>( make_pair( elem, 1 ) );
+		HPair<HSBBSTree::HIterator, bool> p( _engine.insert<elem_t, helper_t>( make_pair( elem, 1 ) ) );
 		if ( ! p.second )
 			++ p.first.operator*<elem_t>().second;
 		return ( HIterator( p.first ) );
@@ -128,7 +135,7 @@ public:
 		return;
 		M_EPILOG
 		}
-	int long count( value_type const& elem )
+	int long count( value_type const& elem ) const
 		{
 		M_PROLOG
 		HIterator it( find( elem ) );
@@ -158,7 +165,7 @@ public:
 		M_EPILOG
 		}
 	HIterator find( value_type const& e ) const
-		{ return ( HIterator( _engine.find<value_type, value_type, helper_t>( e ) ) ); }
+		{ return ( HIterator( _engine.find<elem_t, value_type, helper_t>( e ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( _engine.begin() ) ); }
 	HIterator end( void ) const

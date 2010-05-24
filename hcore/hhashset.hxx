@@ -130,11 +130,11 @@ public:
 		return ( *this );
 		M_EPILOG
 		}
-	iterator begin( void )
+	iterator begin( void ) const
 		{ M_PROLOG return ( iterator( _engine.begin() ) ); M_EPILOG }
-	iterator end( void )
+	iterator end( void ) const
 		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
-	iterator find( type_t const& key_ )
+	iterator find( type_t const& key_ ) const
 		{ M_PROLOG return ( iterator( _engine.find( key_, _hasher ) ) ); M_EPILOG }
 	HPair<iterator, bool> insert( value_type const& val_ )
 		{
