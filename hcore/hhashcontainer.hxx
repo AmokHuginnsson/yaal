@@ -35,6 +35,7 @@ Copyright:
 #include "hcore/trait.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal
 {
@@ -194,7 +195,7 @@ HHashContainer::HIterator HHashContainer::find( key_t const& key_, hasher_t cons
 	HAtom<typename hasher_t::value_type>* atom( NULL );
 	if ( _prime )
 		{
-		idx = abs( hasher_( key_ ) ) % _prime;
+		idx = yaal::abs( hasher_( key_ ) ) % _prime;
 		atom = _buckets.get<HAtom<typename hasher_t::value_type>*>()[ idx ];
 		while ( atom && ! hasher_( atom->_value, key_ ) )
 			atom = static_cast<HAtom<typename hasher_t::value_type>*>( atom->_next );
@@ -219,7 +220,7 @@ HPair<HHashContainer::HIterator, bool> HHashContainer::insert( tType const& val_
 
 		/* I cannot use index calculated in find() call above because here we use different prime.
 		 */
-		int long newHash = abs( hasher_( val_ ) ) % _prime;
+		int long newHash = yaal::abs( hasher_( val_ ) ) % _prime;
 		HAtom<typename hasher_t::value_type>** buckets( _buckets.get<HAtom<typename hasher_t::value_type>*>() );
 		atom->_next = buckets[ newHash ];
 		buckets[ newHash ] = atom;
@@ -257,7 +258,7 @@ void HHashContainer::resize( int long size_, hasher_t const& hasher_ )
 				{
 				HAtom<typename hasher_t::value_type>* atom( a );
 				a = static_cast<HAtom<typename hasher_t::value_type>*>( a->_next );
-				int long newHash( abs( hasher_( atom->_value ) ) % prime );
+				int long newHash( yaal::abs( hasher_( atom->_value ) ) % prime );
 				atom->_next = newBuckets[ newHash ];
 				newBuckets[ newHash ] = atom;
 				}
