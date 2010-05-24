@@ -192,19 +192,29 @@ template<typename value_type, typename helper_t = multiset_helper<value_type> >
 class HMultiSet<value_type, helper_t>::HIterator
 	{
 	typedef HPair<value_type, int long> elem_t;
+	int long _index;
 	HSBBSTree::HIterator _engine;
 public:
-	HIterator( void ) : _engine() {}
-	HIterator( HIterator const& it_ ) : _engine( it_._engine ) {}
+	HIterator( void ) : _index( 0 ), _engine() {}
+	HIterator( HIterator const& it_ ) : _index( it_._index ), _engine( it_._engine ) {}
 	HIterator& operator= ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
+			{
+			_index = it_._index;
 			_engine = it_._engine;
+			}
 		return ( *this );
 		}
 	HIterator& operator ++ ( void )
 		{
-		++ _engine;
+		if ( _index < ( _engine.operator*<elem_t>().second - 1 ) )
+			++ _index;
+		else
+			{
+			_index = 0;
+			++ _engine;
+			}
 		return ( *this );
 		}
 	HIterator const operator ++ ( int )
@@ -229,12 +239,12 @@ public:
 	value_type const* operator -> ( void )
 		{ return ( &_engine.operator*<elem_t>().first );	}
 	bool operator == ( HIterator const& it ) const
-		{ return ( _engine == it._engine ); }
+		{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
 	bool operator != ( HIterator const& it ) const
-		{ return ( _engine != it._engine ); }
+		{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
 private:
 	friend class HMultiSet<value_type, helper_t>;
-	explicit HIterator( HSBBSTree::HIterator const& it ) : _engine( it ) {};
+	explicit HIterator( HSBBSTree::HIterator const& it ) : _index( 0 ), _engine( it ) {};
 	};
 
 }

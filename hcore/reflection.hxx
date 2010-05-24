@@ -66,18 +66,18 @@ struct TYPE
 typedef yaal::hcore::HStrongEnum<TYPE> type_t; /*!< Strong enumeration of PODs. */
 
 /*! \cond */
-template<> struct TYPE::symbolic<void> { static enum_t const type = VOID; };
-template<> struct TYPE::symbolic<bool> { static enum_t const type = BOOL; };
-template<> struct TYPE::symbolic<char> { static enum_t const type = CHAR; };
-template<> struct TYPE::symbolic<int short> { static enum_t const type = INT_SHORT; };
-template<> struct TYPE::symbolic<int> { static enum_t const type = INT; };
-template<> struct TYPE::symbolic<int long> { static enum_t const type = INT_LONG; };
-template<> struct TYPE::symbolic<float> { static enum_t const type = FLOAT; };
-template<> struct TYPE::symbolic<double> { static enum_t const type = DOUBLE; };
-template<> struct TYPE::symbolic<double long> { static enum_t const type = DOUBLE_LONG; };
-template<> struct TYPE::symbolic<void*> { static enum_t const type = VOID_PTR; };
-template<> struct TYPE::symbolic<char*> { static enum_t const type = CHAR_PTR; };
-template<> struct TYPE::symbolic<yaal::hcore::HString> { static enum_t const type = HSTRING; };
+template<> struct TYPE::symbolic<void> { static enum_t const value = VOID; };
+template<> struct TYPE::symbolic<bool> { static enum_t const value = BOOL; };
+template<> struct TYPE::symbolic<char> { static enum_t const value = CHAR; };
+template<> struct TYPE::symbolic<int short> { static enum_t const value = INT_SHORT; };
+template<> struct TYPE::symbolic<int> { static enum_t const value = INT; };
+template<> struct TYPE::symbolic<int long> { static enum_t const value = INT_LONG; };
+template<> struct TYPE::symbolic<float> { static enum_t const value = FLOAT; };
+template<> struct TYPE::symbolic<double> { static enum_t const value = DOUBLE; };
+template<> struct TYPE::symbolic<double long> { static enum_t const value = DOUBLE_LONG; };
+template<> struct TYPE::symbolic<void*> { static enum_t const value = VOID_PTR; };
+template<> struct TYPE::symbolic<char*> { static enum_t const value = CHAR_PTR; };
+template<> struct TYPE::symbolic<yaal::hcore::HString> { static enum_t const value = HSTRING; };
 /*! \endcond */
 
 /*! \brief Convert static type information to value.

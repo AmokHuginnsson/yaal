@@ -36,6 +36,8 @@ Copyright:
 
 #include "hcore/hpointer.hxx"
 #include "hcore/harray.hxx"
+#include "hcore/hlist.hxx"
+#include "hcore/hset.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/reflection.hxx"
@@ -173,6 +175,33 @@ typedef HExceptionT<HProgramOptionsHandler> HProgramOptionsHandlerException;
 namespace program_options_helper
 {
 
+template<typename tType>
+void set_option_value_from_string( HArray<tType>& object, HString const& value )
+	{
+	M_PROLOG
+	object.push_back( lexical_cast<tType>( value ) );
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+void set_option_value_from_string( HList<tType>& object, HString const& value )
+	{
+	M_PROLOG
+	object.push_back( lexical_cast<tType>( value ) );
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+void set_option_value_from_string( HSet<tType>& object, HString const& value )
+	{
+	M_PROLOG
+	object.insert( lexical_cast<tType>( value ) );
+	return;
+	M_EPILOG
+	}
+
 /*! \brief Set variable value based on string.
  */
 template<typename tType>
@@ -206,7 +235,7 @@ protected:
 		}
 	virtual type_t do_get_type( void ) const
 		{
-		return ( TYPE::symbolic<tType>::type );
+		return ( TYPE::symbolic<tType>::value );
 		}
 	virtual void const* do_get( void ) const
 		{

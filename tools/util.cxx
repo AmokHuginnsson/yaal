@@ -502,7 +502,7 @@ void dump_configuration( void* arg )
 		::printf( "# %s, type: ", o._name );
 		if ( !! o._value )
 			{
-			switch( o._value->get_type().value() )
+			switch ( o._value->get_type().value() )
 				{
 				case ( TYPE::BOOL ): ::printf( "boolean\n" ); break;
 				case ( TYPE::INT ): case ( TYPE::INT_SHORT ): case ( TYPE::INT_LONG ): ::printf( "integer\n" ); break;

@@ -231,18 +231,29 @@ class HHashMultiSet<key_type_t, hash_function_t>::HIterator
 	{
 	typedef key_type_t key_type;
 	typedef HHashMultiSet<key_type, hash_function_t> set_t;
+	int long _index;
 	HHashContainer::HIterator _engine;
 public:
-	HIterator( void ) : _engine() {}
+	HIterator( void ) : _index( 0 ), _engine() {}
+	HIterator( HIterator const& it_ ) : _index( it_._index ), _engine( it_._engine ) {}
 	HIterator& operator = ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
+			{
+			_index = it_._index;
 			_engine = it_._engine;
+			}
 		return ( *this );
 		}
 	HIterator& operator ++ ( void )
 		{
-		++ _engine;
+		if ( _index < ( _engine.operator*<typename set_t::elem_t>().second - 1 ) )
+			++ _index;
+		else
+			{
+			_index = 0;
+			++ _engine;
+			}
 		return ( *this );
 		}
 	HIterator const operator ++ ( int )
@@ -267,12 +278,12 @@ public:
 	key_type const* operator-> ( void ) const
 		{ return ( &_engine.operator*<typename set_t::elem_t>().first ); }
 	bool operator == ( HIterator const& it ) const
-		{ return ( _engine == it._engine ); }
+		{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
 	bool operator != ( HIterator const& it ) const
-		{ return ( _engine != it._engine ); }
+		{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
 private:
 	friend class HHashMultiSet<key_type, hash_function_t>;
-	explicit HIterator( HHashContainer::HIterator const& it ) : _engine( it ) {};
+	explicit HIterator( HHashContainer::HIterator const& it ) : _index( 0 ), _engine( it ) {};
 	};
 
 }
