@@ -147,6 +147,14 @@ public:
 		return ( newIt );
 		M_EPILOG
 		}
+	void erase( iterator first_, iterator const& last_ )
+		{
+		M_PROLOG
+		while ( first_ != last_ )
+			first_ = erase( first_ );
+		return ( first_ );
+		M_EPILOG
+		}
 	iterator find( key_type const& e )
 		{ return ( iterator( _engine.find<value_type, key_type, helper_t>( e ) ) ); }
 	const_iterator find( key_type const& e ) const

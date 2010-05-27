@@ -164,6 +164,14 @@ public:
 		return ( newIt );
 		M_EPILOG
 		}
+	void erase( HIterator first_, HIterator const& last_ )
+		{
+		M_PROLOG
+		while ( first_ != last_ )
+			first_ = erase( first_ );
+		return ( first_ );
+		M_EPILOG
+		}
 	HIterator find( value_type const& e ) const
 		{ return ( HIterator( _engine.find<elem_t, value_type, helper_t>( e ) ) ); }
 	HIterator begin( void ) const

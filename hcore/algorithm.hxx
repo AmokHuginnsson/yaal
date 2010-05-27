@@ -164,7 +164,7 @@ void copy_n( src_it_t src, int long const& count, dst_it_t dst )
  * \return new end of range - none of elements in resulting range meet a condition.
  */
 template<typename iterator_t, typename condition_t>
-void remove_if( iterator_t first_, iterator_t const& last_, condition_t condition_ )
+iterator_t remove_if( iterator_t first_, iterator_t const& last_, condition_t condition_ )
 	{
 	bool move( false );
 	for ( iterator_t it( first_ ); it != last_; ++ it )

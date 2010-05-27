@@ -181,6 +181,8 @@ public:
 	type_t& add_orderly( type_t const&, T const&, sort_order_t = ASCENDING );
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<type_t, treatment>::type erase( HIterator<type_t, treatment> const& );
+	template<OListBits::treatment_t const treatment>
+	typename OListBits::iterator<type_t, treatment>::type erase( HIterator<type_t, treatment>, HIterator<type_t, treatment> const& );
 	/*! \brief Sets cursor at specified index or number
 	 */
 	iterator n_th( int );
@@ -910,6 +912,18 @@ HList<type_t>::erase( HIterator<type_t, treatment> const& iterator_ )
 	_index = 0;
 	_indexElement = NULL;
 	return ( it );
+	M_EPILOG
+	}
+
+template<typename type_t>
+template<OListBits::treatment_t const treatment>
+typename OListBits::iterator<type_t, treatment>::type
+HList<type_t>::erase( HIterator<type_t, treatment> first_, HIterator<type_t, treatment> const& last_ )
+	{
+	M_PROLOG
+	while ( first_ != last_ )
+		first_ = erase( first_ );
+	return ( first_ );
 	M_EPILOG
 	}
 

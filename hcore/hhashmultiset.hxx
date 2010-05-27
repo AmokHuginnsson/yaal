@@ -188,6 +188,14 @@ public:
 		return ( erased ? 1 : 0 );
 		M_EPILOG
 		}
+	void erase( iterator first_, iterator const& last_ )
+		{
+		M_PROLOG
+		while ( first_ != last_ )
+			first_ = erase( first_ );
+		return ( first_ );
+		M_EPILOG
+		}
 	int long count( value_type const& elem ) const
 		{
 		M_PROLOG
