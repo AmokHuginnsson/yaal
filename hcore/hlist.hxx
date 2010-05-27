@@ -200,6 +200,8 @@ public:
 	void sort( T const&, sort_order_t = ASCENDING );
 	bool empty( void ) const;
 	bool is_empty( void ) const;
+	bool operator == ( HList const& ) const;
+	bool operator < ( HList const& ) const;
 private:
 	template<typename T>
 	void merge_sort( HElement*&, HElement*&, T const& );
@@ -1316,6 +1318,22 @@ void HList<type_t>::sort( T const& less, sort_order_t order_ )
 		}
 	return;
 	M_EPILOG;
+	}
+
+template<typename type_t>
+bool HList<type_t>::operator == ( HList const& l_ ) const
+	{
+	M_PROLOG
+	return ( equals( begin(), end(), l_.begin(), l_.end() ) );
+	M_EPILOG
+	}
+
+template<typename type_t>
+bool HList<type_t>::operator < ( HList const& l_ ) const
+	{
+	M_PROLOG
+	return ( lexicographical_compare( begin(), end(), l_.begin(), l_.end() ) );
+	M_EPILOG
 	}
 
 }

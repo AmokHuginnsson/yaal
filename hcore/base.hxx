@@ -114,6 +114,16 @@ public:
 	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_ ) : _field( a0_, a1_, a2_, a3_ ) {}
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
 	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_ ) : _field( a0_, a1_, a2_, a3_, a4_ ) {}
+	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
+	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_ ) {}
+	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
+	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_, a6_ ) {}
+	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_ ) {}
+	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t>
+	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_ ) {}
+	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t, typename a9_t>
+	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_, a9_t a9_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_ ) {}
 	virtual ~HField( void ) {}
 	field_t& ref( void )
 		{ return ( _field ); }

@@ -218,6 +218,10 @@ public:
 			}
 		return;
 		}
+	bool operator == ( HHashMap const& map_ ) const
+		{ M_PROLOG return ( equals( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
+	bool operator < ( HHashMap const& map_ ) const
+		{ M_PROLOG return ( lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
 private:
 	};
 

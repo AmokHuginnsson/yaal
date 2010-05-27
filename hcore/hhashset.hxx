@@ -203,6 +203,10 @@ public:
 			}
 		return;
 		}
+	bool operator == ( HHashSet const& set_ ) const
+		{ M_PROLOG return ( equals( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
+	bool operator < ( HHashSet const& set_ ) const
+		{ M_PROLOG return ( lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 private:
 	};
 

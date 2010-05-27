@@ -156,6 +156,31 @@ void copy_n( src_it_t src, int long const& count, dst_it_t dst )
 	return;
 	}
 
+/*! \brief Remove elements meeting a predicate from range.
+ *
+ * \param first_ - begining of range of elements to filter.
+ * \param last_ - one past the end of range of elements to filter.
+ * \param condition_ - a predicate that element must fulfill to be removed.
+ * \return new end of range - none of elements in resulting range meet a condition.
+ */
+template<typename iterator_t, typename condition_t>
+void remove_if( iterator_t first_, iterator_t const& last_, condition_t condition_ )
+	{
+	bool move( false );
+	for ( iterator_t it( first_ ); it != last_; ++ it )
+		{
+		if ( condition_( *it ) )
+			{
+			move = true;
+			continue;
+			}
+		if ( move )
+			*first_ = *it;
+		++ first_;
+		}
+	return ( first_ );
+	}
+
 /*! \brief Checks if two ranges are same size and have same set of values.
  * 
  * \param it1 - begining of first range.
@@ -170,6 +195,23 @@ bool equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
 	return ( ( it1 == end1 ) && ( it2 == end2 ) );
+	}
+
+/*! \brief Checks if one range is lexicographicaly before another range.
+ * 
+ * \param it1 - begining of first range.
+ * \param end1 - one past last element of first range.
+ * \param it2 - begining of second range.
+ * \param end2 - one past last element of second range.
+ * \return true if and only if first range is lexicographicaly before second range.
+ */
+template<typename iter1_t, typename iter2_t>
+bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
+	{
+	/* skip equals */
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
+		;
+	return ( ( ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 < *it2 ) ) || ( ( it1 == end1 ) && ( it2 != end2 ) ) );
 	}
 
 /*! \brief Checks if two ranges are same size and have same set of values.

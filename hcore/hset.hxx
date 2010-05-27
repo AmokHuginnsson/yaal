@@ -216,6 +216,10 @@ public:
 		{ return ( _engine == it._engine ); }
 	bool operator != ( HIterator const& it ) const
 		{ return ( _engine != it._engine ); }
+	bool operator == ( HSet const& set_ ) const
+		{ M_PROLOG return ( equals( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
+	bool operator < ( HSet const& set_ ) const
+		{ M_PROLOG return ( lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 private:
 	friend class HSet<value_type, helper_t>;
 	explicit HIterator( HSBBSTree::HIterator const& it ) : _engine( it ) {};

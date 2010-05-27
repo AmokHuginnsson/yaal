@@ -113,6 +113,8 @@ public:
 	const_iterator rbegin( void ) const;
 	const_iterator rend( void ) const;
 	void swap( HArray& );
+	bool operator == ( HArray const& ) const;
+	bool operator < ( HArray const& ) const;
 private:
 	template<typename iterator_t>
 	void initialize( iterator_t, iterator_t, trait::false_type const* );
@@ -582,6 +584,22 @@ void HArray<type_t>::pop_back( void )
 	value_type* arr( _buf.get<value_type>() );
 	arr[ -- _size ].~value_type();
 	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+bool HArray<type_t>::operator == ( HArray const& a_ ) const
+	{
+	M_PROLOG
+	return ( equals( begin(), end(), a_.begin(), a_.end() ) );
+	M_EPILOG
+	}
+
+template<typename type_t>
+bool HArray<type_t>::operator < ( HArray const& a_ ) const
+	{
+	M_PROLOG
+	return ( lexicographical_compare( begin(), end(), a_.begin(), a_.end() ) );
 	M_EPILOG
 	}
 
