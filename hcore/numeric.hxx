@@ -139,7 +139,13 @@ template<int long a0, int long a1,
 	int long a2 = min_signed<int long>::value, int long a3 = min_signed<int long>::value,
 	int long a4 = min_signed<int long>::value, int long a5 = min_signed<int long>::value,
 	int long a6 = min_signed<int long>::value, int long a7 = min_signed<int long>::value,
-	int long a8 = min_signed<int long>::value, int long a9 = min_signed<int long>::value>
+	int long a8 = min_signed<int long>::value, int long a9 = min_signed<int long>::value,
+	int long a10 = min_signed<int long>::value, int long a11 = min_signed<int long>::value,
+	int long a12 = min_signed<int long>::value, int long a13 = min_signed<int long>::value,
+	int long a14 = min_signed<int long>::value, int long a15 = min_signed<int long>::value,
+	int long a16 = min_signed<int long>::value, int long a17 = min_signed<int long>::value,
+	int long a18 = min_signed<int long>::value, int long a19 = min_signed<int long>::value,
+	int long a20 = min_signed<int long>::value>
 struct max
 	{
 	static int long const b0 = a0 > a1 ? a0 : a1;
@@ -150,7 +156,18 @@ struct max
 	static int long const b5 = b4 > a6 ? b4 : a6;
 	static int long const b6 = b5 > a7 ? b5 : a7;
 	static int long const b7 = b6 > a8 ? b6 : a8;
-	static int long const value = b7 > a9 ? b7 : a9;
+	static int long const b8 = b7 > a9 ? b7 : a9;
+	static int long const b9 = b8 > a10 ? b8 : a10;
+	static int long const b10 = b9 > a11 ? b9 : a11;
+	static int long const b11 = b10 > a12 ? b10 : a12;
+	static int long const b12 = b11 > a13 ? b11 : a13;
+	static int long const b13 = b12 > a14 ? b12 : a14;
+	static int long const b14 = b13 > a15 ? b13 : a15;
+	static int long const b15 = b14 > a16 ? b14 : a16;
+	static int long const b16 = b15 > a17 ? b15 : a17;
+	static int long const b17 = b16 > a18 ? b16 : a18;
+	static int long const b18 = b17 > a19 ? b17 : a19;
+	static int long const value = b18 > a20 ? b18 : a20;
 	};
 
 /*! \brief Simulate binary literal.

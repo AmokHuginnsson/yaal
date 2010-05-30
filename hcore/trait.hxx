@@ -157,7 +157,12 @@ template<typename tType, typename t0_t, typename t1_t = no_type,
 	typename t4_t = no_type, typename t5_t = no_type,
 	typename t6_t = no_type, typename t7_t = no_type,
 	typename t8_t = no_type, typename t9_t = no_type,
-	typename t10_t = no_type>
+	typename t10_t = no_type, typename t11_t = no_type,
+	typename t12_t = no_type, typename t13_t = no_type,
+	typename t14_t = no_type, typename t15_t = no_type,
+	typename t16_t = no_type, typename t17_t = no_type,
+	typename t18_t = no_type, typename t19_t = no_type,
+	typename t20_t = no_type>
 struct find_type
 	{
 	static int const value = -1
@@ -171,7 +176,17 @@ struct find_type
 		+ 8 * meta::to_int<same_type<t7_t, tType>::value>::value
 		+ 9 * meta::to_int<same_type<t8_t, tType>::value>::value
 		+ 10 * meta::to_int<same_type<t9_t, tType>::value>::value
-		+ 11 * meta::to_int<same_type<t10_t, tType>::value>::value>::value;
+		+ 11 * meta::to_int<same_type<t10_t, tType>::value>::value
+		+ 12 * meta::to_int<same_type<t11_t, tType>::value>::value
+		+ 13 * meta::to_int<same_type<t12_t, tType>::value>::value
+		+ 14 * meta::to_int<same_type<t13_t, tType>::value>::value
+		+ 15 * meta::to_int<same_type<t14_t, tType>::value>::value
+		+ 16 * meta::to_int<same_type<t15_t, tType>::value>::value
+		+ 17 * meta::to_int<same_type<t16_t, tType>::value>::value
+		+ 18 * meta::to_int<same_type<t17_t, tType>::value>::value
+		+ 19 * meta::to_int<same_type<t18_t, tType>::value>::value
+		+ 20 * meta::to_int<same_type<t19_t, tType>::value>::value
+		+ 21 * meta::to_int<same_type<t20_t, tType>::value>::value>::value;
 	};
 
 /*! \brief Get type from given list by index.
@@ -180,25 +195,40 @@ struct find_type
  * \tparam t0_t, t1_t, ..., t9_t - list of types.
  * \retval type - type from list at given index.
  */
-template<int const index, typename t0_t, typename t1_t = trait::no_type,
-	typename t2_t = trait::no_type, typename t3_t = trait::no_type,
-	typename t4_t = trait::no_type, typename t5_t = trait::no_type,
-	typename t6_t = trait::no_type, typename t7_t = trait::no_type,
-	typename t8_t = trait::no_type, typename t9_t = trait::no_type,
-	typename t10_t = trait::no_type>
+template<int const index, typename t0_t, typename t1_t = no_type,
+	typename t2_t = no_type, typename t3_t = no_type,
+	typename t4_t = no_type, typename t5_t = no_type,
+	typename t6_t = no_type, typename t7_t = no_type,
+	typename t8_t = no_type, typename t9_t = no_type,
+	typename t10_t = no_type, typename t11_t = no_type,
+	typename t12_t = no_type, typename t13_t = no_type,
+	typename t14_t = no_type, typename t15_t = no_type,
+	typename t16_t = no_type, typename t17_t = no_type,
+	typename t18_t = no_type, typename t19_t = no_type,
+	typename t20_t = no_type>
 struct select_index
 	{
-	typedef typename trait::ternary<index == 0, t0_t,
-					typename trait::ternary<index == 1, t1_t,
-					typename trait::ternary<index == 2, t2_t,
-					typename trait::ternary<index == 3, t3_t,
-					typename trait::ternary<index == 4, t4_t,
-					typename trait::ternary<index == 5, t5_t,
-					typename trait::ternary<index == 6, t6_t,
-					typename trait::ternary<index == 7, t7_t,
-					typename trait::ternary<index == 8, t8_t,
-					typename trait::ternary<index == 9, t9_t,
-					typename trait::ternary<index == 10, t10_t, trait::no_type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type type;
+	typedef typename ternary<index == 0, t0_t,
+					typename ternary<index == 1, t1_t,
+					typename ternary<index == 2, t2_t,
+					typename ternary<index == 3, t3_t,
+					typename ternary<index == 4, t4_t,
+					typename ternary<index == 5, t5_t,
+					typename ternary<index == 6, t6_t,
+					typename ternary<index == 7, t7_t,
+					typename ternary<index == 8, t8_t,
+					typename ternary<index == 9, t9_t,
+					typename ternary<index == 10, t10_t,
+					typename ternary<index == 11, t11_t,
+					typename ternary<index == 12, t12_t,
+					typename ternary<index == 13, t13_t,
+					typename ternary<index == 14, t14_t,
+					typename ternary<index == 15, t15_t,
+					typename ternary<index == 16, t16_t,
+					typename ternary<index == 17, t17_t,
+					typename ternary<index == 18, t18_t,
+					typename ternary<index == 19, t19_t,
+					typename ternary<index == 20, t20_t, no_type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type type;
 	};
 
 /*! \brief Count occurences of a type.
@@ -211,7 +241,13 @@ template<typename tType, typename t0_t, typename t1_t = no_type,
 	typename t2_t = no_type, typename t3_t = no_type,
 	typename t4_t = no_type, typename t5_t = no_type,
 	typename t6_t = no_type, typename t7_t = no_type,
-	typename t8_t = no_type, typename t9_t = no_type, typename t10_t = no_type>
+	typename t8_t = no_type, typename t9_t = no_type,
+	typename t10_t = no_type, typename t11_t = no_type,
+	typename t12_t = no_type, typename t13_t = no_type,
+	typename t14_t = no_type, typename t15_t = no_type,
+	typename t16_t = no_type, typename t17_t = no_type,
+	typename t18_t = no_type, typename t19_t = no_type,
+	typename t20_t = no_type>
 struct count_type
 	{
 	static int const value =
@@ -225,12 +261,25 @@ struct count_type
 		+ meta::to_int<same_type<t7_t, tType>::value>::value
 		+ meta::to_int<same_type<t8_t, tType>::value>::value
 		+ meta::to_int<same_type<t9_t, tType>::value>::value
-		+ meta::to_int<same_type<t10_t, tType>::value>::value;
+		+ meta::to_int<same_type<t10_t, tType>::value>::value
+		+ meta::to_int<same_type<t11_t, tType>::value>::value
+		+ meta::to_int<same_type<t12_t, tType>::value>::value
+		+ meta::to_int<same_type<t13_t, tType>::value>::value
+		+ meta::to_int<same_type<t14_t, tType>::value>::value
+		+ meta::to_int<same_type<t15_t, tType>::value>::value
+		+ meta::to_int<same_type<t16_t, tType>::value>::value
+		+ meta::to_int<same_type<t17_t, tType>::value>::value
+		+ meta::to_int<same_type<t18_t, tType>::value>::value
+		+ meta::to_int<same_type<t19_t, tType>::value>::value
+		+ meta::to_int<same_type<t20_t, tType>::value>::value;
 	};
 template<typename tType, typename t0_t, typename t1_t,
 	typename t2_t, typename t3_t, typename t4_t, typename t5_t,
-	typename t6_t, typename t7_t, typename t8_t, typename t9_t, typename t10_t>
-int const count_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t>::value;
+	typename t6_t, typename t7_t, typename t8_t, typename t9_t,
+	typename t10_t, typename t11_t, typename t12_t, typename t13_t,
+	typename t14_t, typename t15_t, typename t16_t, typename t17_t,
+	typename t18_t, typename t19_t, typename t20_t>
+int const count_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::value;
 
 /*! \brief Meta function used to make reference from type.
  *
