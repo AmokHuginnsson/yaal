@@ -90,8 +90,8 @@ HBinder<function_t, value_t> bind2nd( function_t func, value_t value )
 template<typename res_t, typename arg_t>
 struct unary_function
 	{
-	typedef res_t result_t;
-	typedef arg_t argument_t;
+	typedef res_t result_type;
+	typedef arg_t argument_type;
 	};
 
 /*! \brief Meta-data definition for binary function functors.
@@ -105,24 +105,24 @@ struct unary_function
 template<typename res_t, typename arg1st_t, typename arg2nd_t>
 struct binary_function
 	{
-	typedef res_t result_t;
-	typedef arg1st_t argument1st_t;
-	typedef arg2nd_t argument2nd_t;
+	typedef res_t result_type;
+	typedef arg1st_t first_argument_type;
+	typedef arg2nd_t second_argument_type;
 	};
 
 /*! \brief Meta-function functor for binding given invariable argument as second argument.
  *
  * Type descriptions:
  *
- * \tparam result_t - result type of resulting unary function.
- * \tparam argument2nd_t - type of invariant argument.
+ * \tparam result_type - result type of resulting unary function.
+ * \tparam second_argument_type - type of invariant argument.
  */
 template<typename operation_t>
-struct binder1st : public unary_function<typename operation_t::result_t, typename operation_t::argument2nd_t>
+struct binder1st : public unary_function<typename operation_t::result_type, typename operation_t::second_argument_type>
 	{
-	typename operation_t::argument2nd_t const _bound;
-	binder1st( typename operation_t::argument2nd_t const& bound ) : _bound( bound ) {}
-	typename operation_t::result_t operator()( typename operation_t::argument1st_t const& arg )
+	typename operation_t::second_argument_type const _bound;
+	binder1st( typename operation_t::second_argument_type const& bound ) : _bound( bound ) {}
+	typename operation_t::result_type operator()( typename operation_t::first_argument_type const& arg )
 		{ return ( operation_t( arg, _bound ) ); }
 	};
 
@@ -202,6 +202,137 @@ struct divides : public binary_function<tType, tType, tType>
 	 */
 	tType operator()( tType const& a, tType const& b ) const
 		{ return ( a / b ); }
+	};
+
+/*! \brief Generic less (object ordering) operator.
+ *
+ * \tparam tType - type of compared objects.
+ */
+template<typename tType>
+struct less : public binary_function<bool, tType, tType>
+	{
+	/*! \brief Comparation executor.
+	 *
+	 * \param left_ - first of the objects to compare.
+	 * \param right_ - second of the objects to compare.
+	 * \return True iff (if and only if) left_ < right_ - first objects is lesser than second object.
+	 */
+	bool operator()( tType const& left_, tType const& right_ ) const
+		{
+		return ( left_ < right_ );
+		}
+	};
+
+/*! \brief Generic greater (object ordering) operator.
+ *
+ * \tparam tType - type of compared objects.
+ */
+template<typename tType>
+struct greater : public binary_function<bool, tType, tType>
+	{
+	/*! \brief Comparation executor.
+	 *
+	 * \param left_ - first of the objects to compare.
+	 * \param right_ - second of the objects to compare.
+	 * \return True iff (if and only if) left_ > right_ - first objects is greater than second object.
+	 */
+	bool operator()( tType const& left_, tType const& right_ ) const
+		{
+		return ( left_ > right_ );
+		}
+	};
+
+/*! \brief Generic less or equal (object ordering) operator.
+ *
+ * \tparam tType - type of compared objects.
+ */
+template<typename tType>
+struct less_equal : public binary_function<bool, tType, tType>
+	{
+	/*! \brief Comparation executor.
+	 *
+	 * \param left_ - first of the objects to compare.
+	 * \param right_ - second of the objects to compare.
+	 * \return True iff (if and only if) left_ <= right_ - first objects is lesser or equal than second object.
+	 */
+	bool operator()( tType const& left_, tType const& right_ ) const
+		{
+		return ( left_ <= right_ );
+		}
+	};
+
+/*! \brief Generic greater or equal (object ordering) operator.
+ *
+ * \tparam tType - type of compared objects.
+ */
+template<typename tType>
+struct greater_equal : public binary_function<bool, tType, tType>
+	{
+	/*! \brief Comparation executor.
+	 *
+	 * \param left_ - first of the objects to compare.
+	 * \param right_ - second of the objects to compare.
+	 * \return True iff (if and only if) left_ >= right_ - first objects is greater or equal than second object.
+	 */
+	bool operator()( tType const& left_, tType const& right_ ) const
+		{
+		return ( left_ >= right_ );
+		}
+	};
+
+/*! \brief Logical negation operator.
+ */
+template<typename tType = bool>
+struct logical_not : public unary_function<bool, bool>
+	{
+	bool operator()( bool value_ ) const
+		{
+		return ( ! value_ );
+		}
+	};
+
+/*! \brief Logical `and' operator.
+ */
+template<typename tType = bool>
+struct logical_and : public binary_function<bool, bool, bool>
+	{
+	bool operator()( bool a_, bool b_ ) const
+		{
+		return ( a_ && b_ );
+		}
+	};
+
+/*! \brief Logical `or' operator.
+ */
+template<typename tType = bool>
+struct logical_or : public binary_function<bool, bool, bool>
+	{
+	bool operator()( bool a_, bool b_ ) const
+		{
+		return ( a_ || b_ );
+		}
+	};
+
+/*! \brief Callculate booleant exclisive or value.
+ *
+ * \param p - first predicate.
+ * \param q - second predicate.
+ * \return p exor q <=> ( p ^ q ) v ( ~ ( p v q ) )
+ */
+inline bool exor( bool p, bool q )
+	{
+	return ( ( p && q ) || ( ! ( p || q ) ) );
+	}
+
+/*! \brief Logical `xor' operator.
+ */
+template<typename tType = bool>
+struct logical_xor : public binary_function<bool, bool, bool>
+	{
+	bool operator()( bool a_, bool b_ ) const
+		{
+		return ( exor( a_, b_ ) );
+		}
 	};
 
 }

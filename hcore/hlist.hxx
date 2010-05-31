@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/base.hxx"
 #include "hcore/algorithm.hxx"
+#include "hcore/functional.hxx"
 
 namespace yaal
 {
@@ -1308,7 +1309,7 @@ template<typename type_t>
 void HList<type_t>::sort( sort_order_t order_ )
 	{
 	M_PROLOG
-	sort( yaal::less<type_t>, order_ );
+	sort( yaal::less<type_t>(), order_ );
 	return;
 	M_EPILOG
 	}

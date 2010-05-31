@@ -584,29 +584,6 @@ inline tType abs( tType const& val )
 	return ( val >= 0 ? val : - val );
 	}
 
-/*! \brief Generic less (object ordering) operator.
- *
- * \param left_ - first of the objects to compare.
- * \param right_ - second of the objects to compare.
- * \return True iff (if and only if) left_ < right_ - first objects is lesser than second object.
- */
-template<typename tType>
-bool less( tType const& left_, tType const& right_ )
-	{
-	return ( left_ < right_ );
-	}
-
-/*! \brief Callculate booleant exclisive or value.
- *
- * \param p - first predicate.
- * \param q - second predicate.
- * \return p exor q <=> ( p ^ q ) v ( ~ ( p v q ) )
- */
-inline bool exor ( bool p, bool q )
-	{
-	return ( ( p && q ) || ( ! ( p || q ) ) );
-	}
-
 }
 
 #endif /* not YAAL_HCORE_ALGORITHM_HXX_INCLUDED */
