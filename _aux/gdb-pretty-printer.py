@@ -2,18 +2,6 @@
 
 import re
 
-class YaalHCoreHStringPrinter:
-	"Print a yaal::hcore::HString"
-
-	def __init__( self, val ):
-		self._val = val
-
-	def to_string( self ):
-		return self._val['_buffer']
-
-	def display_hint( self ):
-		return 'string'
-
 def yaal_lookup_function( val ):
 	lookup_tag = val.type.strip_typedefs().tag
 	if lookup_tag == None:
@@ -42,8 +30,23 @@ def yaal_lookup_function( val ):
 	regex = re.compile( "^yaal::hcore::HNumber$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHNumberPrinter( val )
+	regex = re.compile( "^yaal::hcore::HVariant<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHVariantPrinter( val )
 
 	return None
+
+class YaalHCoreHStringPrinter:
+	"Print a yaal::hcore::HString"
+
+	def __init__( self, val ):
+		self._val = val
+
+	def to_string( self ):
+		return self._val['_buffer']
+
+	def display_hint( self ):
+		return 'string'
 
 class YaalHCoreHArrayPrinter:
 	"Print a yaal::hcore::HArray"
@@ -343,6 +346,22 @@ class YaalHCoreHNumberPrinter:
 		else:
 			s = "0"
 		return s
+
+	def display_hint( self ):
+		return 'string'
+
+class YaalHCoreHVariantPrinter:
+	"Print a yaal::hcore::HVariant"
+
+	def __init__( self, val ):
+		self._val = val
+
+	def to_string( self ):
+		val = "<uninitialized variant>"
+		typeid = self._val['_type']
+		if typeid != -1:
+			val = self._val['_mem'].cast( self._val.type.template_argument( typeid ).pointer() ).dereference()
+		return val
 
 	def display_hint( self ):
 		return 'string'
