@@ -204,6 +204,77 @@ struct divides : public binary_function<tType, tType, tType>
 		{ return ( a / b ); }
 	};
 
+/*! \brief A functor performing modulo operation.
+ *
+ * \tparam tType - type of divided/ing objects.
+ */
+template<typename tType>
+struct modulus : public binary_function<tType, tType, tType>
+	{
+	/*! \brief Functor executor.
+	 *
+	 * \param a - dividend part of division.
+	 * \param b - divisor part of division.
+	 * \return quotient of a modulo b.
+	 */
+	tType operator()( tType const& a, tType const& b ) const
+		{ return ( a % b ); }
+	};
+
+/*! \brief Calculate negative value of a number.
+ *
+ * \tparam tType - number type to be negated.
+ */
+template<typename tType>
+struct negate : public unary_function<tType, tType>
+	{
+	/*! \brief Functor executor.
+	 *
+	 * \param val_ - value to be negated.
+	 * \return A negated value, that is: -val_.
+	 */
+	tType operator()( tType const& val_ )
+		{ return ( - val_ ); }
+	};
+
+/*! \brief Generic equality comparision operator.
+ *
+ * \tparam tType - type of compared objects.
+ */
+template<typename tType>
+struct equal_to : public binary_function<bool, tType, tType>
+	{
+	/*! \brief Comparation executor.
+	 *
+	 * \param left_ - first of the objects to compare.
+	 * \param right_ - second of the objects to compare.
+	 * \return True iff (if and only if) left_ == right_ - object are equal.
+	 */
+	bool operator()( tType const& left_, tType const& right_ ) const
+		{
+		return ( left_ == right_ );
+		}
+	};
+
+/*! \brief Generic non equality comparision operator.
+ *
+ * \tparam tType - type of compared objects.
+ */
+template<typename tType>
+struct not_equal_to : public binary_function<bool, tType, tType>
+	{
+	/*! \brief Comparation executor.
+	 *
+	 * \param left_ - first of the objects to compare.
+	 * \param right_ - second of the objects to compare.
+	 * \return True iff (if and only if) left_ != right_ - object are not equal.
+	 */
+	bool operator()( tType const& left_, tType const& right_ ) const
+		{
+		return ( left_ != right_ );
+		}
+	};
+
 /*! \brief Generic less (object ordering) operator.
  *
  * \tparam tType - type of compared objects.
