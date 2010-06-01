@@ -45,39 +45,45 @@ namespace yaal
  * \tparam function_t - type of function to be bound.
  * \tparam value_t - type of invariable argument to be bound.
  */
-template<typename function_t, typename value_t>
+template<typename function_t, typename value_t, int bound_no>
 class HBinder
 	{
-	template<typename func_t, typename arga_t, typename argb_t>
-	struct type_of
-		{
-		static func_t _type_provider;
-		typedef __decltype( _type_provider( arga_t(), argb_t() ) ) type;
-		};
-	function_t CALLER;
+	function_t _call;
 	value_t _value;
 public:
 	HBinder( function_t, value_t );
 	template<typename tType>
-	typename type_of<function_t, value_t, tType>::type operator()( tType value ) const
-		{ return ( CALLER( value, _value ) ); }
+	typename trait::return_type<function_t>::type operator()( tType value ) const
+		{ return ( _call( bound_no ? value : _value, bound_no ? _value : value ) ); }
 	};
 
-template<typename function_t, typename value_t>
-HBinder<function_t, value_t>::HBinder( function_t func, value_t value )
-	: CALLER( func ), _value( value )
+template<typename function_t, typename value_t, int bound_no>
+HBinder<function_t, value_t, bound_no>::HBinder( function_t func, value_t value )
+	: _call( func ), _value( value )
 	{ }
 
 /*! \brief Convenience function to construct HBinder<> object.
  *
- * \param func - function to bind argument to.
+ * \param func - function to bind first argument to.
  * \param value - a bound value.
  * \return HBinder<>, a function object that encapsulates func function and its bound value.
  */
 template<typename function_t, typename value_t>
-HBinder<function_t, value_t> bind2nd( function_t func, value_t value )
+HBinder<function_t, value_t, 0> bind1st( function_t func, value_t value )
 	{
-	return ( HBinder<function_t, value_t>( func, value ) );
+	return ( HBinder<function_t, value_t, 0>( func, value ) );
+	}
+
+/*! \brief Convenience function to construct HBinder<> object.
+ *
+ * \param func - function to bind second argument to.
+ * \param value - a bound value.
+ * \return HBinder<>, a function object that encapsulates func function and its bound value.
+ */
+template<typename function_t, typename value_t>
+HBinder<function_t, value_t, 1> bind2nd( function_t func, value_t value )
+	{
+	return ( HBinder<function_t, value_t, 1>( func, value ) );
 	}
 
 /*! \brief Meta-data definition for unary function functors.

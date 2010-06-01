@@ -400,7 +400,7 @@ public:
 	HIterator const operator -- ( int )
 		{
 		HIterator it( _owner, _major, _minor );
-		-- _engine;
+		operator--();
 		return ( it );
 		}
 	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void )

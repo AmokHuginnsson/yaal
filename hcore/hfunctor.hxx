@@ -52,6 +52,7 @@ struct arg_base
 template<int arg_no>
 struct arg : public arg_base
 	{
+	arg( void ) {}
 	};
 
 template<int, int, typename, typename, typename = trait::no_type, typename = trait::no_type,
