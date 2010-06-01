@@ -36,6 +36,38 @@ Copyright:
 namespace yaal
 {
 
+/*! \brief Meta-data definition for unary function functors.
+ *
+ * Type descriptions:
+ *
+ * \tparam res_t - result type of unary function.
+ * \tparam arg_t - argument type of unary function.
+ */
+template<typename res_t, typename arg_t>
+struct unary_function
+	{
+	typedef res_t result_type;
+	typedef arg_t argument_type;
+	typedef unary_function<result_type, argument_type> self_t;
+	};
+
+/*! \brief Meta-data definition for binary function functors.
+ *
+ * Type descriptions:
+ *
+ * \tparam res_t - result type of binary function.
+ * \tparam arg1st_t - first argument type of binary function.
+ * \tparam arg2nd_t - second argument type of binary function.
+ */
+template<typename res_t, typename arg1st_t, typename arg2nd_t>
+struct binary_function
+	{
+	typedef res_t result_type;
+	typedef arg1st_t first_argument_type;
+	typedef arg2nd_t second_argument_type;
+	typedef binary_function<result_type, first_argument_type, second_argument_type> self_t;
+	};
+
 /*! \brief Meta-function functor for binding given invariable argument as second argument to any function.
  *
  * Invariable argument may be bound to meta-function functor as well as old style C free standing function.
@@ -46,14 +78,23 @@ namespace yaal
  * \tparam value_t - type of invariable argument to be bound.
  */
 template<typename function_t, typename value_t, int bound_no>
-class HBinder
+class HBinder : public unary_function<
+			typename trait::return_type<function_t>::type,
+			typename trait::argument_type<function_t>::template index<bound_no>::type
+		>
 	{
+	typedef unary_function<
+			typename trait::return_type<function_t>::type,
+			typename trait::argument_type<function_t>::template index<bound_no>::type
+		> self_t;
+	typedef typename self_t::result_type result_type;
+	typedef typename self_t::argument_type argument_type;
 	function_t _call;
 	value_t _value;
 public:
 	HBinder( function_t, value_t );
 	template<typename tType>
-	typename trait::return_type<function_t>::type operator()( tType value ) const
+	result_type operator()( tType value ) const
 		{ return ( _call( bound_no ? value : _value, bound_no ? _value : value ) ); }
 	};
 
@@ -85,52 +126,6 @@ HBinder<function_t, value_t, 1> bind2nd( function_t func, value_t value )
 	{
 	return ( HBinder<function_t, value_t, 1>( func, value ) );
 	}
-
-/*! \brief Meta-data definition for unary function functors.
- *
- * Type descriptions:
- *
- * \tparam res_t - result type of unary function.
- * \tparam arg_t - argument type of unary function.
- */
-template<typename res_t, typename arg_t>
-struct unary_function
-	{
-	typedef res_t result_type;
-	typedef arg_t argument_type;
-	};
-
-/*! \brief Meta-data definition for binary function functors.
- *
- * Type descriptions:
- *
- * \tparam res_t - result type of binary function.
- * \tparam arg1st_t - first argument type of binary function.
- * \tparam arg2nd_t - second argument type of binary function.
- */
-template<typename res_t, typename arg1st_t, typename arg2nd_t>
-struct binary_function
-	{
-	typedef res_t result_type;
-	typedef arg1st_t first_argument_type;
-	typedef arg2nd_t second_argument_type;
-	};
-
-/*! \brief Meta-function functor for binding given invariable argument as second argument.
- *
- * Type descriptions:
- *
- * \tparam result_type - result type of resulting unary function.
- * \tparam second_argument_type - type of invariant argument.
- */
-template<typename operation_t>
-struct binder1st : public unary_function<typename operation_t::result_type, typename operation_t::second_argument_type>
-	{
-	typename operation_t::second_argument_type const _bound;
-	binder1st( typename operation_t::second_argument_type const& bound ) : _bound( bound ) {}
-	typename operation_t::result_type operator()( typename operation_t::first_argument_type const& arg )
-		{ return ( operation_t( arg, _bound ) ); }
-	};
 
 /*! \brief Convenience function, returns trait::reference<> object.
  *

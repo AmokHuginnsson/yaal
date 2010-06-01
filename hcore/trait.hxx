@@ -769,7 +769,8 @@ struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6
  * \retval type - return type of given member or function.
  */
 template<typename T>
-struct return_type;
+struct return_type
+	{ typedef typename T::result_type type; };
 
 /*! \cond */
 template<typename return_t, typename class_t>
@@ -1015,7 +1016,13 @@ struct return_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_
  * \retval type - type of given argument of given member or function.
  */
 template<typename T>
-struct argument_type;
+struct argument_type
+	{
+	template<int const no> struct index
+		{
+		typedef typename select_index<no, typename T::first_argument_type, typename T::second_argument_type>::type type;
+		};
+	};
 
 template<typename return_t, typename class_t>
 struct argument_type<return_t ( class_t::* )( void )>
@@ -1237,7 +1244,10 @@ struct argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a
  * \retval type - return type of given member or function.
  */
 template<typename T>
-struct class_type;
+struct class_type
+	{
+	typedef typename T::self_t type;
+	};
 
 /*! \cond */
 template<typename return_t, typename class_t>
