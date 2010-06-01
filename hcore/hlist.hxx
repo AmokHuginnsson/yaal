@@ -1339,7 +1339,7 @@ template<typename type_t>
 bool HList<type_t>::operator == ( HList const& l_ ) const
 	{
 	M_PROLOG
-	return ( equals( begin(), end(), l_.begin(), l_.end() ) );
+	return ( ( &l_ == this ) || equal( begin(), end(), l_.begin(), l_.end() ) );
 	M_EPILOG
 	}
 

@@ -591,7 +591,7 @@ template<typename type_t>
 bool HArray<type_t>::operator == ( HArray const& a_ ) const
 	{
 	M_PROLOG
-	return ( equals( begin(), end(), a_.begin(), a_.end() ) );
+	return ( ( &a_ == this ) || equal( begin(), end(), a_.begin(), a_.end() ) );
 	M_EPILOG
 	}
 

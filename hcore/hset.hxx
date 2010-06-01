@@ -177,6 +177,10 @@ public:
 			_engine.swap( other._engine );
 			}
 		}
+	bool operator == ( HSet const& set_ ) const
+		{ M_PROLOG return ( ( &set_ == this ) || equal( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
+	bool operator < ( HSet const& set_ ) const
+		{ M_PROLOG return ( lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 	};
 
 /*! \brief Iterator for HSet<> data structure.
