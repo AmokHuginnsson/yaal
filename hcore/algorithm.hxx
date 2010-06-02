@@ -86,6 +86,44 @@ iterator_t find_if( iterator_t it, iterator_t end, condition_t cond )
 	return ( it );
 	}
 
+/*! \brief Count number of occurences of element in range.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param v - look for this value in given range.
+ * \return Number of occurences of v in range.
+ */
+template<typename iterator_t, typename value_t>
+int long count( iterator_t it, iterator_t end, value_t const& v )
+	{
+	int long counter( 0 );
+	for ( ; it != end; ++ it )
+		{
+		if ( *it == v )
+			++ counter;
+		}
+	return ( counter );
+	}
+
+/*! \brief Count number of element meeting a predicate in range.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param cond - condition which must be satified.
+ * \return Number of elements in range that satify a given condition.
+ */
+template<typename iterator_t, typename condition_t>
+int long count_if( iterator_t it, iterator_t end, condition_t cond )
+	{
+	int long counter( 0 );
+	for ( ; it != end; ++ it )
+		{
+		if ( cond( *it ) )
+			++ counter;
+		}
+	return ( counter );
+	}
+
 /*! \brief For each element in range pass its value into function.
  *
  * \param it - begining of the range.

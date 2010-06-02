@@ -454,6 +454,49 @@ template<typename F, typename G1, typename G2>
 binary_compose<F, G1, G2> compose2( F f_, G1 g1_, G2 g2_ )
 	{ return ( binary_compose<F, G1, G2>( f_, g1_, g2_ ) ); }
 
+template<typename F>
+class unary_negate : public unary_function<typename F::result_type, typename F::argument_type>
+	{
+public:
+	typedef unary_function<typename F::result_type, typename F::argument_type> hier_t;
+	typedef typename hier_t::result_type result_type;
+	typedef typename hier_t::argument_type argument_type;
+private:
+	F _f;
+public:
+	unary_negate( F f_ ) : _f( f_ ) {}
+	result_type operator()( argument_type const& arg_ ) const
+		{
+		return ( ! _f( arg_ ) );
+		}
+	};
+
+template<typename F>
+unary_negate<F> not1( F f_ )
+	{ return ( unary_negate<F>( f_ ) ); }
+
+template<typename F>
+class binary_negate : public binary_function<typename F::result_type, typename F::first_argument_type, typename F::second_argument_type>
+	{
+public:
+	typedef binary_function<typename F::result_type, typename F::first_argument_type, typename F::second_argument_type> hier_t;
+	typedef typename hier_t::result_type result_type;
+	typedef typename hier_t::first_argument_type first_argument_type;
+	typedef typename hier_t::second_argument_type second_argument_type;
+private:
+	F _f;
+public:
+	binary_negate( F f_ ) : _f( f_ ) {}
+	result_type operator()( first_argument_type const& a1_, second_argument_type const& a2_ ) const
+		{
+		return ( ! _f( a1_, a2_ ) );
+		}
+	};
+
+template<typename F>
+binary_negate<F> not2( F f_ )
+	{ return ( binary_negate<F>( f_ ) ); }
+
 }
 
 #endif /* not YAAL_HCORE_FUNCTIONAL_HXX_INCLUDED */
