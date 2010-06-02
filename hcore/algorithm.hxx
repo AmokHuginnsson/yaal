@@ -113,6 +113,24 @@ void transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op )
 		*dst = op( *it );
 	}
 
+/*! \brief Replace elements in destination container by selected transformed elements from source range.
+ *
+ * \param it - begining of source range.
+ * \param end - one past the end of source range.
+ * \param dst - begining of destination container.
+ * \param op - transforming operation, an unary function.
+ * \param cond - condition that has to be met to perform a transformation.
+ */
+template<typename src_iter_t, typename dst_iter_t, typename operation_t, typename condition_t>
+void transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op, condition_t cond )
+	{
+	for ( ; it != end; ++ it, ++ dst )
+		{
+		if ( cond( *it ) )
+			*dst = op( *it );
+		}
+	}
+
 /*! \brief Replace elements in destination container by elements resulting from transformation of elements from source range and another container.
  *
  * \param it - begining of source range.
@@ -179,6 +197,28 @@ iterator_t remove_if( iterator_t first_, iterator_t const& last_, condition_t co
 		++ first_;
 		}
 	return ( first_ );
+	}
+
+/*! \brief Copy elements meeting a not predicate from first range to another.
+ *
+ * \param first_ - begining of range of elements to filter.
+ * \param last_ - one past the end of range of elements to filter.
+ * \param res_ - begining of output range.
+ * \param condition_ - a predicate that element must fulfill to be removed.
+ * \return end of output range - none of elements in resulting range meet a condition.
+ */
+template<typename iter1_t, typename iter2_t, typename condition_t>
+iter2_t remove_copy_if( iter1_t first_, iter1_t const& last_, iter2_t res_, condition_t condition_ )
+	{
+	for ( ; first_ != last_; ++ first_ )
+		{
+		if ( ! condition_( *first_ ) )
+			{
+			*res_ = *first_;
+			++ res_;
+			}
+		}
+	return ( res_ );
 	}
 
 /*! \brief Checks if two ranges are same size and have same set of values.

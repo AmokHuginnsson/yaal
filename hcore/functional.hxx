@@ -83,12 +83,14 @@ class HBinder : public unary_function<
 			typename trait::argument_type<function_t>::template index<bound_no>::type
 		>
 	{
+public:
 	typedef unary_function<
 			typename trait::return_type<function_t>::type,
 			typename trait::argument_type<function_t>::template index<bound_no>::type
-		> self_t;
-	typedef typename self_t::result_type result_type;
-	typedef typename self_t::argument_type argument_type;
+		> hier_t;
+	typedef typename hier_t::result_type result_type;
+	typedef typename hier_t::argument_type argument_type;
+private:
 	function_t _call;
 	value_t _value;
 public:
@@ -234,7 +236,7 @@ struct negate : public unary_function<tType, tType>
 	 * \param val_ - value to be negated.
 	 * \return A negated value, that is: -val_.
 	 */
-	tType operator()( tType const& val_ )
+	tType operator()( tType const& val_ ) const
 		{ return ( - val_ ); }
 	};
 
@@ -406,6 +408,51 @@ struct logical_xor : public binary_function<bool, bool, bool>
 		return ( exor( a_, b_ ) );
 		}
 	};
+
+template<typename F, typename G>
+class unary_compose : public unary_function<typename F::result_type, typename G::argument_type>
+	{
+public:
+	typedef unary_function<typename F::result_type, typename G::argument_type> hier_t;
+	typedef typename hier_t::result_type result_type;
+	typedef typename hier_t::argument_type argument_type;
+private:
+	F _f;
+	G _g;
+public:
+	unary_compose( F f_, G g_ ) : _f( f_ ), _g( g_ ) {}
+	result_type operator()( argument_type const& arg_ ) const
+		{
+		return ( _f( _g( arg_ ) ) );
+		}
+	};
+
+template<typename F, typename G>
+unary_compose<F, G> compose1( F f_, G g_ )
+	{ return ( unary_compose<F, G>( f_, g_ ) ); }
+
+template<typename F, typename G1, typename G2>
+class binary_compose : public unary_function<typename F::result_type, typename G1::argument_type>
+	{
+public:
+	typedef unary_function<typename F::result_type, typename G1::argument_type> hier_t;
+	typedef typename hier_t::result_type result_type;
+	typedef typename hier_t::argument_type argument_type;
+private:
+	F _f;
+	G1 _g1;
+	G2 _g2;
+public:
+	binary_compose( F f_, G1 g1_, G2 g2_ ) : _f( f_ ), _g1( g1_ ), _g2( g2_ ) {}
+	result_type operator()( argument_type const& arg_ ) const
+		{
+		return ( _f( _g1( arg_ ), _g2( arg_ ) ) );
+		}
+	};
+
+template<typename F, typename G1, typename G2>
+binary_compose<F, G1, G2> compose2( F f_, G1 g1_, G2 g2_ )
+	{ return ( binary_compose<F, G1, G2>( f_, g1_, g2_ ) ); }
 
 }
 

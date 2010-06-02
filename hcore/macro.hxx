@@ -85,6 +85,9 @@ Copyright:
 #else /* NDEBUG */
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
+/*! \brief Convinience macro to obtain number of elements of declared array.
+ */
+#define countof( array ) ( sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) ) )
 
 #endif /* not YAAL_HCORE_MACRO_HXX_INCLUDED */
 

@@ -131,6 +131,9 @@ public:
 		{ return ( _field ); }
 	};
 
+template <typename T, size_t N>
+char ( &YaalArrayElementCountHelper( T ( &YaalArrayElementCountHelperArray )[N] ) )[N];
+
 }
 
 #endif /* not YAAL_HCORE_BASE_HXX_INCLUDED */
