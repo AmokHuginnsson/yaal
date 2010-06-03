@@ -497,6 +497,47 @@ template<typename F>
 binary_negate<F> not2( F f_ )
 	{ return ( binary_negate<F>( f_ ) ); }
 
+template<typename tType>
+struct identity : public unary_function<tType, tType>
+	{
+	tType operator()( tType const& v_ ) const
+		{ return ( v_ ); }
+	};
+
+template<typename return_t, typename argument_t>
+class pointer_to_unary_function : public unary_function<return_t, argument_t>
+	{
+public:
+	typedef return_t ( *function_t )( argument_t );
+private:
+	function_t _function;
+public:
+	pointer_to_unary_function( function_t function_ ) : _function( function_ ) {}
+	return_t operator()( argument_t arg_ ) const
+		{ return ( _function( arg_ ) ); }
+	};
+
+template<typename return_t, typename argument_t>
+pointer_to_unary_function<return_t, argument_t> ptr_fun( return_t (*function_)( argument_t ) )
+	{ return ( pointer_to_unary_function<return_t, argument_t>( function_ ) ); }
+
+template<typename return_t, typename first_argument_t, typename second_argument_t>
+class pointer_to_binary_function : public binary_function<return_t, first_argument_t, second_argument_t>
+	{
+public:
+	typedef return_t ( *function_t )( first_argument_t, second_argument_t );
+private:
+	function_t _function;
+public:
+	pointer_to_binary_function( function_t function_ ) : _function( function_ ) {}
+	return_t operator()( first_argument_t firstArgument_, second_argument_t secondArgument_ ) const
+		{ return ( _function( firstArgument_, secondArgument_ ) ); }
+	};
+
+template<typename return_t, typename first_argument_t, typename second_argument_t>
+pointer_to_binary_function<return_t, first_argument_t, second_argument_t> ptr_fun( return_t (*function_)( first_argument_t, second_argument_t ) )
+	{ return ( pointer_to_binary_function<return_t, first_argument_t, second_argument_t>( function_ ) ); }
+
 }
 
 #endif /* not YAAL_HCORE_FUNCTIONAL_HXX_INCLUDED */
