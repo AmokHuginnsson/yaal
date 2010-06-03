@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCORE_HCALL_HXX_INCLUDED
 
 #include "hcore/hfunctor.hxx"
+#include "hcore/bound.hxx"
 
 namespace yaal
 {
@@ -164,6 +165,18 @@ struct call_calculator
 		inline static type make( METHOD_t m )
 			{ return type( m ); }
 		};
+	struct field
+		{
+		typedef HCall<-2, a0_t, METHOD_t> type;
+		inline static type make( METHOD_t m, a0_t a0 )
+			{ return ( type( a0, m ) ); }
+		};
+	struct field_this
+		{
+		typedef HCall<-1, void, METHOD_t> type;
+		inline static type make( METHOD_t m, a0_t )
+			{ return ( type( m ) ); }
+		};
 	typedef typename trait::ternary<trait::is_member<METHOD_t>::value,
 					typename trait::ternary<meta::greater<trait::find_type<a0_t,
 					free_standing_call_args::arg<1>,
@@ -175,8 +188,66 @@ struct call_calculator
 					free_standing_call_args::arg<7>,
 					free_standing_call_args::arg<8>,
 					free_standing_call_args::arg<9>,
-					free_standing_call_args::arg<10> >::value, -1>::value, functor_this, functor>::type,
-					function>::type type;
+					free_standing_call_args::arg<10> >::value, -1>::value,
+						functor_this, functor>::type,
+						typename trait::ternary<trait::is_field<METHOD_t>::value,
+							typename trait::ternary<trait::same_type<a0_t, free_standing_call_args::arg<1> >::value,
+								field_this, field>::type, function>::type>::type type;
+	};
+
+template<typename class_t, typename field_t>
+class HCall<-2, class_t, field_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+	{
+	class_t _object;
+	field_t _field;
+public:
+	HCall( class_t object_, field_t field_ ) : _object( object_ ), _field( field_ ) {}
+	typename trait::field_type<field_t>::type const& operator()( void ) const
+		{
+		return ( _object->*_field );
+		}
+	};
+
+template<typename class_t, typename field_t>
+class HCall<-1, class_t, field_t,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
+	trait::no_type, trait::no_type>
+	{
+public:
+	typedef typename trait::field_type<field_t>::type argument_type;
+private:
+	field_t _field;
+public:
+	HCall( field_t field_ ) : _field( field_ ) {}
+	template<typename holder_t>
+	typename trait::field_type<field_t>::type const& operator()( holder_t const& obj_ ) const
+		{
+		return ( (*obj_).*_field );
+		}
+	template<typename other_t>
+	bound_less<HCall<-1, class_t, field_t>, other_t> operator < ( other_t const& other_ )
+		{
+		return ( bound_less<HCall<-1, class_t, field_t>, other_t>( *this, other_ ) );
+		}
+	template<typename other_t>
+	bound_greater<HCall<-1, class_t, field_t>, other_t> operator > ( other_t const& other_ )
+		{
+		return ( bound_greater<HCall<-1, class_t, field_t>, other_t>( *this, other_ ) );
+		}
+	template<typename other_t>
+	bound_less_equal<HCall<-1, class_t, field_t>, other_t> operator <= ( other_t const& other_ )
+		{
+		return ( bound_less_equal<HCall<-1, class_t, field_t>, other_t>( *this, other_ ) );
+		}
+	template<typename other_t>
+	bound_greater_equal<HCall<-1, class_t, field_t>, other_t> operator >= ( other_t const& other_ )
+		{
+		return ( bound_greater_equal<HCall<-1, class_t, field_t>, other_t>( *this, other_ ) );
+		}
 	};
 
 template<typename return_t, typename CALL_t>

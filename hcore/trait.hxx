@@ -560,6 +560,19 @@ private:
 	HNonCopyable& operator = ( HNonCopyable const& );
 	};
 
+/*! \brief Check if given type is a field type (actually a pointer to a field).
+ *
+ * \tparam T - type to check for being a field.
+ * \retval value - true iff given type is a field type.
+ */
+template<typename T>
+struct is_field
+	{ static bool const value = false; };
+
+template<typename class_t, typename T>
+struct is_field<T class_t::*>
+	{ static bool const value = true; };
+
 /*! \brief Check if given type is a member type.
  *
  * \tparam T - type to check for being a member.
@@ -1442,6 +1455,15 @@ struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a
 	{ typedef class_t type; };
 
 /*! \endcond */
+
+template<typename field_t>
+struct field_type;
+
+template<typename class_t, typename field_t>
+struct field_type<field_t class_t::*>
+	{
+	typedef field_t type;
+	};
 
 }
 
