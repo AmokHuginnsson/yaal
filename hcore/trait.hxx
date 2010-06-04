@@ -1454,6 +1454,10 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
 	{ typedef class_t type; };
 
+template<typename class_t, typename field_t>
+struct class_type<field_t class_t::*>
+	{ typedef class_t type; };
+
 /*! \endcond */
 
 template<typename field_t>

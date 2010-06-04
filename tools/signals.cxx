@@ -86,14 +86,14 @@ HSignalService::HSignalService( void )
 	M_PROLOG
 	M_ENSURE( sigemptyset( _locker.get<sigset_t>() ) == 0 );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
-		register_handler( SIGINT, bound_call( &HBaseSignalHandlers::signal_INT, _1 ) );
-	register_handler( SIGHUP, bound_call( &HBaseSignalHandlers::signal_HUP, _1 ) );
-	register_handler( SIGTERM, bound_call( &HBaseSignalHandlers::signal_TERM, _1 ) );
-	register_handler( SIGQUIT, bound_call( &HBaseSignalHandlers::signal_QUIT, _1 ) );
-	register_handler( SIGTSTP, bound_call( &HBaseSignalHandlers::signal_TSTP, _1 ) );
-	register_handler( SIGCONT, bound_call( &HBaseSignalHandlers::signal_CONT, _1 ) );
-	register_handler( SIGUSR1, bound_call( &HBaseSignalHandlers::signal_USR1, _1 ) );
-	handler_t fatal( bound_call( &HBaseSignalHandlers::signal_fatal, _1 ) );
+		register_handler( SIGINT, call( &HBaseSignalHandlers::signal_INT, _1 ) );
+	register_handler( SIGHUP, call( &HBaseSignalHandlers::signal_HUP, _1 ) );
+	register_handler( SIGTERM, call( &HBaseSignalHandlers::signal_TERM, _1 ) );
+	register_handler( SIGQUIT, call( &HBaseSignalHandlers::signal_QUIT, _1 ) );
+	register_handler( SIGTSTP, call( &HBaseSignalHandlers::signal_TSTP, _1 ) );
+	register_handler( SIGCONT, call( &HBaseSignalHandlers::signal_CONT, _1 ) );
+	register_handler( SIGUSR1, call( &HBaseSignalHandlers::signal_USR1, _1 ) );
+	handler_t fatal( call( &HBaseSignalHandlers::signal_fatal, _1 ) );
 	register_handler( SIGSEGV, fatal );
 	register_handler( SIGBUS, fatal );
 	register_handler( SIGABRT, fatal );
@@ -106,7 +106,7 @@ HSignalService::HSignalService( void )
 	register_handler( SIGSYS, fatal );
 	lock_on( SIGPIPE );
 	lock_on( SIGURG );
-	_thread.spawn( bound_call( &HSignalService::run, this ) );
+	_thread.spawn( call( &HSignalService::run, this ) );
 	return;
 	M_EPILOG
 	}
@@ -142,7 +142,7 @@ void* HSignalService::run( void )
 				{
 				handler_t handler( (*it).second );
 				M_ASSERT( !! handler );
-				int status = handler->invoke( sigNo );
+				int status = handler( sigNo );
 				if ( status > 0 )
 					break; /* signal was entirely consumed */
 				else if ( status < 0 )

@@ -50,7 +50,7 @@ class HSignalService
 protected:
 	typedef HSignalService self_t;
 public:
-	typedef yaal::hcore::HBoundCallInterface<1, int, int>::ptr_t handler_t;
+	typedef yaal::hcore::HBoundCall<1, int, int> handler_t;
 private:
 	typedef yaal::hcore::HMultiMap<int, handler_t> handlers_t;
 	typedef handlers_t::value_list_t handler_list_t;

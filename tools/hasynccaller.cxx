@@ -59,7 +59,7 @@ void HAbstractAsyncCaller::start( void )
 	{
 	M_PROLOG
 	_loop = true;
-	_thread.spawn( bound_call( &HAbstractAsyncCaller::run, this ) );
+	_thread.spawn( call( &HAbstractAsyncCaller::run, this ) );
 	return;
 	M_EPILOG
 	}
@@ -82,7 +82,7 @@ void HAbstractAsyncCaller::flush( void* invoker_ )
 	HLock l( _mutex );
 	for ( queue_t::iterator it = _queue.begin(); it != _queue.end(); )
 		{
-		if ( (*it).second->id() == invoker_ )
+		if ( (*it).second.id() == invoker_ )
 			it = _queue.erase( it );
 		else
 			++ it;
@@ -137,7 +137,7 @@ void* HAsyncCaller::do_work( void )
 		queue_t::iterator it = _queue.begin();
 		if ( it != _queue.end() )
 			{
-			(*it).second->invoke();
+			(*it).second();
 			_queue.erase( it );
 			}
 		}

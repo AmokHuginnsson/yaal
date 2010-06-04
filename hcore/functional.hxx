@@ -49,6 +49,7 @@ struct unary_function
 	typedef res_t result_type;
 	typedef arg_t argument_type;
 	typedef unary_function<result_type, argument_type> self_t;
+	virtual ~unary_function( void ) {}
 	};
 
 /*! \brief Meta-data definition for binary function functors.
@@ -66,6 +67,7 @@ struct binary_function
 	typedef arg1st_t first_argument_type;
 	typedef arg2nd_t second_argument_type;
 	typedef binary_function<result_type, first_argument_type, second_argument_type> self_t;
+	virtual ~binary_function( void ) {}
 	};
 
 /*! \brief Meta-function functor for binding given invariable argument as second argument to any function.

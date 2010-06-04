@@ -181,7 +181,7 @@ void* HThread::control( void )
 	 * That is why we have to deliver interface that allows users to not specify
 	 * any useful or meaningful int run();
 	 */
-	returnValue = _call->invoke();
+	returnValue = _call();
 	pthread_cleanup_pop( 0 );
 	_status = ZOMBIE;
 	_semaphore.signal();

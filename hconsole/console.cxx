@@ -157,12 +157,12 @@ void HConsole::init( void )
 	M_PROLOG
 	_initialized = true;
 	HSignalService& signalService = HSignalServiceFactory::get_instance();
-	signalService.register_handler( SIGWINCH, bound_call( &HConsole::on_terminal_resize, this, _1 ) );
-	signalService.register_handler( SIGQUIT, bound_call( &HConsole::on_quit, this, _1 ) );
-	signalService.register_handler( SIGTSTP, bound_call( &HConsole::on_tstp, this, _1 ) );
-	signalService.register_handler( SIGCONT, bound_call( &HConsole::on_cont, this, _1 ) );
-	signalService.register_handler( SIGUSR1, bound_call( &HConsole::on_mouse, this, _1 ) );
-	HSignalService::handler_t cleanup( bound_call( &HConsole::console_cleanup, this, _1 ) );
+	signalService.register_handler( SIGWINCH, call( &HConsole::on_terminal_resize, this, _1 ) );
+	signalService.register_handler( SIGQUIT, call( &HConsole::on_quit, this, _1 ) );
+	signalService.register_handler( SIGTSTP, call( &HConsole::on_tstp, this, _1 ) );
+	signalService.register_handler( SIGCONT, call( &HConsole::on_cont, this, _1 ) );
+	signalService.register_handler( SIGUSR1, call( &HConsole::on_mouse, this, _1 ) );
+	HSignalService::handler_t cleanup( call( &HConsole::console_cleanup, this, _1 ) );
 	signalService.register_handler( SIGINT, cleanup );
 	signalService.register_handler( SIGTERM, cleanup );
 	signalService.register_handler( SIGSEGV, cleanup );

@@ -49,9 +49,9 @@ class HProcess
 protected:
 	typedef HProcess self_t;
 private:
-	typedef yaal::hcore::HBoundCallInterface<0, void>::ptr_t delayed_call_t;
+	typedef yaal::hcore::HBoundCall<0, void> delayed_call_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
-	typedef yaal::hcore::HBoundCallInterface<1, void, int>::ptr_t process_filedes_handler_t;
+	typedef yaal::hcore::HBoundCall<1, void, int> process_filedes_handler_t;
 	typedef yaal::hcore::HHashMap<int, process_filedes_handler_t> process_filedes_map_t;
 	typedef yaal::hcore::HArray<int> dropped_fd_t;
 	bool			_initialised;					/* did process has necessery initialisation */

@@ -121,7 +121,7 @@ class HThread
 	mutable HMutex _mutex;
 	HSemaphore _semaphore;
 	HResource<void> _resGuard;
-	typedef HBoundCallInterface<0, void*>::ptr_t call_t;
+	typedef HBoundCall<0, void*> call_t;
 	call_t _call;
 public:
 	HThread( void );

@@ -58,11 +58,11 @@ HProcess::HProcess( int noFileHandlers_, int latencySeconds_, int latencyMicrose
 	::memset( &_latency, 0, sizeof ( _latency ) );
 	FD_ZERO( &_fileDescriptorSet );
 	HSignalService& ss = HSignalServiceFactory::get_instance();
-	HSignalService::handler_t handler( bound_call( &HProcess::handler_interrupt, this, _1 ) );
+	HSignalService::handler_t handler( call( &HProcess::handler_interrupt, this, _1 ) );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
 		ss.register_handler( SIGINT, handler );
 	ss.register_handler( SIGHUP, handler );
-	register_file_descriptor_handler( _event.get_reader_fd(), bound_call( &HProcess::process_interrupt, this, _1 ) );
+	register_file_descriptor_handler( _event.get_reader_fd(), call( &HProcess::process_interrupt, this, _1 ) );
 	return;
 	M_EPILOG
 	}
@@ -134,7 +134,7 @@ int HProcess::run( void )
 				{
 				if ( FD_ISSET( it->first, &_fileDescriptorSet ) )
 					{
-					static_cast<void>( ( it->second->invoke( it->first ) ) );
+					static_cast<void>( ( it->second( it->first ) ) );
 					_idleCycles = 0;
 					}
 				}
@@ -211,7 +211,7 @@ void HProcess::handle_alerts( void )
 	{
 	M_PROLOG
 	for ( delayed_calls_t::iterator it( _alert.begin() ), endIt( _alert.end() ); it != endIt; ++ it )
-		(*it)->invoke();
+		(*it)();
 	return;
 	M_EPILOG
 	}
@@ -221,7 +221,7 @@ void HProcess::handle_idle( void )
 	M_PROLOG
 	++ _idleCycles;
 	for ( delayed_calls_t::iterator it( _idle.begin() ), endIt( _idle.end() ); it != endIt; ++ it )
-		(*it)->invoke();
+		(*it)();
 	return;
 	M_EPILOG
 	}

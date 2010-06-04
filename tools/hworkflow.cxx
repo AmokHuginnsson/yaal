@@ -121,7 +121,7 @@ HWorkFlow::HWorker::HWorker( HWorkFlowInterface* workFlow_ )
 void HWorkFlow::HWorker::spawn( void )
 	{
 	M_PROLOG
-	_thread.spawn( bound_call( &HWorkFlow::HWorker::run, this ) );
+	_thread.spawn( call( &HWorkFlow::HWorker::run, this ) );
 	return;
 	M_EPILOG
 	}
@@ -140,7 +140,7 @@ void* HWorkFlow::HWorker::run( void )
 	HWorkFlow::task_t t;
 	while ( !! ( t = _workFlow->pop_task() ) )
 		{
-		t->invoke();
+		t();
 		t.reset();
 		}
 	return ( 0 );

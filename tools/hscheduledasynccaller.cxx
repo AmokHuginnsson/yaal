@@ -72,7 +72,7 @@ void* HScheduledAsyncCaller::do_work( void )
 		queue_t::iterator it = _queue.begin();
 		while ( ( it != _queue.end() ) && ( (*it).first <= time( NULL ) ) )
 			{
-			(*it).second->invoke();
+			(*it).second();
 			it = _queue.erase( it );
 			}
 		if ( it != _queue.end() )

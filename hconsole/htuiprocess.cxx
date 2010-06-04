@@ -80,14 +80,14 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 	int alts[ ALTS_COUNT ];
 	int ctrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t mainWindow;
-	_dispatcher.register_file_descriptor_handler( STDIN_FILENO, bound_call( &HTUIProcess::process_stdin, this, _1 ) );
+	_dispatcher.register_file_descriptor_handler( STDIN_FILENO, call( &HTUIProcess::process_stdin, this, _1 ) );
 	HConsole& cons = HCons::get_instance();
 	int mouseDes = cons.get_mouse_fd();
 	if ( _useMouse_ && mouseDes )
-		_dispatcher.register_file_descriptor_handler( mouseDes, bound_call( &HTUIProcess::process_mouse, this, _1 ) );
-	_dispatcher.register_file_descriptor_handler( cons.get_event_fd(), bound_call( &HTUIProcess::process_terminal_event, this, _1 ) );
-	_dispatcher.add_alert_handle( bound_call( &HTUIProcess::handler_alert, this ) );
-	_dispatcher.add_idle_handle( bound_call( &HTUIProcess::handler_idle, this ) );
+		_dispatcher.register_file_descriptor_handler( mouseDes, call( &HTUIProcess::process_mouse, this, _1 ) );
+	_dispatcher.register_file_descriptor_handler( cons.get_event_fd(), call( &HTUIProcess::process_terminal_event, this, _1 ) );
+	_dispatcher.add_alert_handle( call( &HTUIProcess::handler_alert, this ) );
+	_dispatcher.add_idle_handle( call( &HTUIProcess::handler_idle, this ) );
 	register_postprocess_handler( CTRLS_COUNT, ctrls,
 			& HTUIProcess::handler_refresh );
 	register_postprocess_handler( KEY<'x'>::command, NULL,
