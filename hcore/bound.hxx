@@ -48,8 +48,8 @@ private:
 	getter2_t _getter2;
 public:
 	bound_less( getter1_t const& getter1_, getter2_t const& getter2_ ) : _getter1( getter1_ ), _getter2( getter2_ ) {}
-	template<typename tType>
-	bool operator()( tType const& left_, tType const& right_ ) const
+	template<typename T1, typename T2>
+	bool operator()( T1 const& left_, T2 const& right_ ) const
 		{
 		return ( _getter1( left_ ) < _getter2( right_ ) );
 		}
@@ -64,8 +64,8 @@ private:
 	getter2_t _getter2;
 public:
 	bound_greater( getter1_t const& getter1_, getter2_t const& getter2_ ) : _getter1( getter1_ ), _getter2( getter2_ ) {}
-	template<typename tType>
-	bool operator()( tType const& left_, tType const& right_ ) const
+	template<typename T1, typename T2>
+	bool operator()( T1 const& left_, T2 const& right_ ) const
 		{
 		return ( _getter1( left_ ) > _getter2( right_ ) );
 		}
@@ -80,8 +80,8 @@ private:
 	getter2_t _getter2;
 public:
 	bound_less_equal( getter1_t const& getter1_, getter2_t const& getter2_ ) : _getter1( getter1_ ), _getter2( getter2_ ) {}
-	template<typename tType>
-	bool operator()( tType const& left_, tType const& right_ ) const
+	template<typename T1, typename T2>
+	bool operator()( T1 const& left_, T2 const& right_ ) const
 		{
 		return ( _getter1( left_ ) <= _getter2( right_ ) );
 		}
@@ -96,8 +96,8 @@ private:
 	getter2_t _getter2;
 public:
 	bound_greater_equal( getter1_t const& getter1_, getter2_t const& getter2_ ) : _getter1( getter1_ ), _getter2( getter2_ ) {}
-	template<typename tType>
-	bool operator()( tType const& left_, tType const& right_ ) const
+	template<typename T1, typename T2>
+	bool operator()( T1 const& left_, T2 const& right_ ) const
 		{
 		return ( _getter1( left_ ) >= _getter2( right_ ) );
 		}
