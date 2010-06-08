@@ -321,8 +321,8 @@ static const free_standing_call_args::arg<11> _11; /*!< Place holder for elevent
 
 struct object_resolver
 	{
-	typedef enum { REF, PTR, FREE } object_type_t;
-	template<typename CLASS_t>
+	typedef enum { REF, PTR, FREE_REF, FREE_PTR } object_type_t;
+	template<typename CLASS_t, typename arg_t = int>
 	struct object_type
 		{
 		static object_type_t const value = static_cast<object_type_t>( meta::ternary<meta::greater<trait::find_type<CLASS_t,
@@ -336,7 +336,8 @@ struct object_resolver
 					free_standing_call_args::arg<8>,
 					free_standing_call_args::arg<9>,
 					free_standing_call_args::arg<10> >::value, -1>::value,
-				FREE, meta::ternary<trait::is_pointer<CLASS_t>::value, PTR, REF>::value>::value );
+				meta::ternary<trait::is_pointer<arg_t>::value, FREE_PTR, FREE_REF>::value,
+				meta::ternary<trait::is_pointer<CLASS_t>::value, PTR, REF>::value>::value );
 		};
 	template<typename return_t, object_type_t>
 	struct invoke;
@@ -488,7 +489,80 @@ struct object_resolver
 			{ return ( object_ ); }
 		};
 	template<typename return_t>
-	struct invoke<return_t, FREE>
+	struct invoke<return_t, FREE_REF>
+		{
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+			typename a8_t, typename a9_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
+			typename a8_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6, a7_t a7 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t, typename a6_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5, a6_t a6 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5, a6 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t, typename a5_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
+			a5_t a5 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4, a5 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
+			typename a4_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3, a4 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
+			{ return ( (object_.*method_)( a0, a1, a2, a3 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t, typename a2_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1, a2_t a2 )
+			{ return ( (object_.*method_)( a0, a1, a2 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t, typename a1_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0, a1_t a1 )
+			{ return ( (object_.*method_)( a0, a1 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t a0 )
+			{ return ( (object_.*method_)( a0 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_ )
+			{ return ( (object_.*method_)() ); }
+		template<typename dummy_t, typename CLASS_t>
+		static CLASS_t* id( dummy_t, CLASS_t object_ )
+			{ return ( &object_ ); }
+		};
+	template<typename return_t>
+	struct invoke<return_t, FREE_PTR>
 		{
 		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
 			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -580,98 +654,98 @@ public:
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 		typename a8_t, typename a9_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 		typename a8_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 		typename a8_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6, a7_t a7 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t, typename a6_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5, a6_t a6 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5, a6 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t, typename a5_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4,
 			a5_t a5 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4, a5 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 		typename a4_t>
 	return_t operator()(
 			a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3, a4 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3, a4 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2, a3 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2, a3 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t>
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2 ) ); }
 	template<typename a0_t, typename a1_t, typename a2_t>
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1, a2 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1, a2 ) ); }
 	template<typename a0_t, typename a1_t>
 	return_t operator()( a0_t a0, a1_t a1 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1 ) ); }
 	template<typename a0_t, typename a1_t>
 	return_t operator()( a0_t a0, a1_t a1 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0, a1 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0, a1 ) ); }
 	template<typename a0_t>
 	return_t operator()( a0_t a0 )
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0 ) ); }
 	template<typename a0_t>
 	return_t operator()( a0_t a0 ) const
-		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object, a0 ) ); }
+		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t, a0_t>::value>::go( _method, _object, a0 ) ); }
 	return_t operator()( void )
 		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object ) ); }
 	return_t operator()( void ) const
