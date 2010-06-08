@@ -281,6 +281,106 @@ template<typename tType, typename t0_t, typename t1_t,
 	typename t18_t, typename t19_t, typename t20_t>
 int const count_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::value;
 
+/*! \brief Test if type is a pointer type.
+ *
+ * \tparam T - type to check for pointer trait.
+ * \retval value - true iff T is a pointer type.
+ * \retval type - true_type iff T is a pointer type.
+ */
+template<typename T>
+struct is_pointer
+	{
+	static bool const value = false;
+	typedef trait::false_type type;
+	};
+
+/*! \cond */
+template<typename T>
+struct is_pointer<T*>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+template<typename T>
+struct is_pointer<T const*>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+/*! \endcond */
+
+/*! \brief Test if type is a const type.
+ *
+ * \tparam T - type to check for constness trait.
+ * \retval value - true iff T is a const type.
+ * \retval type - true_type iff T is a const type.
+ */
+template<typename T>
+struct is_const
+	{
+	static bool const value = false;
+	typedef trait::false_type type;
+	};
+
+/*! \cond */
+template<typename T>
+struct is_const<T const>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+/*! \endcond */
+
+/*! \brief Test if type is a volatile type.
+ *
+ * \tparam T - type to check for volatileness trait.
+ * \retval value - true iff T is a volatile type.
+ * \retval type - true_type iff T is a volatile type.
+ */
+template<typename T>
+struct is_volatile
+	{
+	static bool const value = false;
+	typedef trait::false_type type;
+	};
+
+/*! \cond */
+template<typename T>
+struct is_volatile<T volatile>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+/*! \endcond */
+
+/*! \brief Test if type is a reference type.
+ *
+ * \tparam T - type to check for reference trait.
+ * \retval value - true iff T is a reference type.
+ * \retval type - true_type iff T is a reference type.
+ */
+template<typename T>
+struct is_reference
+	{
+	static bool const value = false;
+	typedef trait::false_type type;
+	};
+
+/*! \cond */
+template<typename T>
+struct is_reference<T&>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+template<typename T>
+struct is_reference<T const&>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+/*! \endcond */
+
 /*! \brief Meta function used to make reference from type.
  *
  * \tparam T - type to make reference of.
@@ -402,94 +502,6 @@ struct strip_const<T const>
 	};
 /*! \endcond */
 
-/*! \brief Test if type is a pointer type.
- *
- * \tparam T - type to check for pointer trait.
- * \retval value - true iff T is a pointer type.
- * \retval type - true_type iff T is a pointer type.
- */
-template<typename T>
-struct is_pointer
-	{
-	static bool const value = false;
-	typedef trait::false_type type;
-	};
-
-/*! \cond */
-template<typename T>
-struct is_pointer<T*>
-	{
-	static bool const value = true;
-	typedef trait::true_type type;
-	};
-/*! \endcond */
-
-/*! \brief Test if type is a const type.
- *
- * \tparam T - type to check for constness trait.
- * \retval value - true iff T is a const type.
- * \retval type - true_type iff T is a const type.
- */
-template<typename T>
-struct is_const
-	{
-	static bool const value = false;
-	typedef trait::false_type type;
-	};
-
-/*! \cond */
-template<typename T>
-struct is_const<T const>
-	{
-	static bool const value = true;
-	typedef trait::true_type type;
-	};
-/*! \endcond */
-
-/*! \brief Test if type is a volatile type.
- *
- * \tparam T - type to check for volatileness trait.
- * \retval value - true iff T is a volatile type.
- * \retval type - true_type iff T is a volatile type.
- */
-template<typename T>
-struct is_volatile
-	{
-	static bool const value = false;
-	typedef trait::false_type type;
-	};
-
-/*! \cond */
-template<typename T>
-struct is_volatile<T volatile>
-	{
-	static bool const value = true;
-	typedef trait::true_type type;
-	};
-/*! \endcond */
-
-/*! \brief Test if type is a reference type.
- *
- * \tparam T - type to check for reference trait.
- * \retval value - true iff T is a reference type.
- * \retval type - true_type iff T is a reference type.
- */
-template<typename T>
-struct is_reference
-	{
-	static bool const value = false;
-	typedef trait::false_type type;
-	};
-
-/*! \cond */
-template<typename T>
-struct is_reference<T&>
-	{
-	static bool const value = true;
-	typedef trait::true_type type;
-	};
-/*! \endcond */
-
 /*! \brief Copy constness (or lack of it) from on type to another.
  *
  * \tparam source - get constness from this type.
@@ -509,6 +521,21 @@ struct copy_const<source const, destination>
 	typedef destination const type;
 	};
 /*! \endcond */
+
+template<typename T>
+struct make_const_ref_ptr
+	{
+	typedef typename ternary<is_reference<T>::value,
+						typename make_reference<
+							typename ternary<is_pointer<typename strip_reference<T>::type>::value,
+								typename make_pointer<typename strip_pointer<typename strip_reference<T>::type>::type const>::type,
+								typename strip_reference<T>::type const
+							>::type
+						>::type,
+						typename ternary<is_pointer<typename strip_reference<T>::type>::value,
+							typename make_pointer<typename strip_pointer<typename strip_reference<T>::type>::type const>::type,
+							T const>::type>::type type;
+	};
 
 /*! \brief A reference type wrapper.
  * 
