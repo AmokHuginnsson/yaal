@@ -52,6 +52,30 @@ struct boolean_not
 	static bool const value = ! value_in;
 	};
 
+/*! \brief Perform a exclusive or logical operation.
+ *
+ * \tparam p - first predicate.
+ * \tparam q - second predicate.
+ * \retval value - an exclusive or of p and q.
+ */
+template<bool const p, bool const q>
+struct boolean_xor
+	{
+	static bool const value = ( p && !q ) || ( !p && q );
+	};
+
+/*! \brief Perform a logical biconditional operation.
+ *
+ * \tparam p - first predicate.
+ * \tparam q - second predicate.
+ * \retval value - p <=> q.
+ */
+template<bool const p, bool const q>
+struct boolean_xnor
+	{
+	static bool const value = ( p && q ) || ( ! ( p || q ) );
+	};
+
 /*! \brief Test if givent type is a signed type.
  *
  * \tparam T - type to perform the test on.

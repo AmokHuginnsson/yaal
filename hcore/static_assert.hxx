@@ -31,13 +31,16 @@ Copyright:
 #ifndef YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED
 #define YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED
 
+#define M_CONCAT_REAL( a, b ) a ## b
+#define M_CONCAT( a, b ) M_CONCAT_REAL( a, b )
+
 /*! \brief Perform static (compile time) code check.
  *
  * \param condition - condition to be check during compilation.
  *
  * \post Unmet condition will make compilation fail on line where STATIC_ASSERT is used.
  */
-#define STATIC_ASSERT( condition ) typedef char SAF##__LINE__[ static_assert_failure<( condition )>::value ]
+#define STATIC_ASSERT( condition ) typedef char M_CONCAT( SAF, __LINE__ )[ static_assert_failure<( condition )>::value ]
 
 namespace yaal
 {

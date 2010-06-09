@@ -39,85 +39,26 @@ namespace yaal
 namespace hcore
 {
 
-template<typename getter1_t, typename getter2_t>
-class bound_less : public binary_function<bool, typename getter1_t::argument_type, typename getter2_t::argument_type>
+template<int free_args, typename descriptor_t, typename return_t, typename CALL_t,	typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t,	typename a4_t, typename a5_t,	typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t,	typename a10_t,
+	int free_args2, typename descriptor2_t, typename return2_t, typename CALL2_t, typename b0_t, typename b1_t,
+	typename b2_t, typename b3_t,	typename b4_t, typename b5_t,	typename b6_t, typename b7_t,
+	typename b8_t, typename b9_t,	typename b10_t>
+typename call_calculator<
+	binary_composition<
+		less<return_t>,
+		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
+		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
+	>,
+	free_standing_call_args::arg<1>,
+	free_standing_call_args::arg<2>
+>::type::type
+	operator < ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
+			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ )
 	{
-public:
-private:
-	getter1_t _getter1;
-	getter2_t _getter2;
-public:
-	bound_less( getter1_t const& getter1_, getter2_t const& getter2_ ) : _getter1( getter1_ ), _getter2( getter2_ ) {}
-	template<typename T1, typename T2>
-	bool operator()( T1 const& left_, T2 const& right_ ) const
-		{
-		return ( _getter1( left_ ) < _getter2( right_ ) );
-		}
-	};
-
-template<typename getter1_t, typename constans_t>
-class bound_less_const_right : public unary_function<bool, typename getter1_t::argument_type>
-	{
-public:
-private:
-	getter1_t _getter1;
-	constans_t _constans;
-public:
-	bound_less_const_right( getter1_t const& getter1_, constans_t const& constans_ ) : _getter1( getter1_ ), _constans( constans_ ) {}
-	template<typename T1>
-	bool operator()( T1 const& left_ ) const
-		{
-		return ( _getter1( left_ ) < _constans );
-		}
-	};
-
-template<typename getter1_t, typename getter2_t>
-class bound_greater : public binary_function<bool, typename getter1_t::argument_type, typename getter2_t::argument_type>
-	{
-public:
-private:
-	getter1_t _getter1;
-	getter2_t _getter2;
-public:
-	bound_greater( getter1_t const& getter1_, getter2_t const& getter2_ ) : _getter1( getter1_ ), _getter2( getter2_ ) {}
-	template<typename T1, typename T2>
-	bool operator()( T1 const& left_, T2 const& right_ ) const
-		{
-		return ( _getter1( left_ ) > _getter2( right_ ) );
-		}
-	};
-
-template<typename getter1_t, typename getter2_t>
-class bound_less_equal : public binary_function<bool, typename getter1_t::argument_type, typename getter2_t::argument_type>
-	{
-public:
-private:
-	getter1_t _getter1;
-	getter2_t _getter2;
-public:
-	bound_less_equal( getter1_t const& getter1_, getter2_t const& getter2_ ) : _getter1( getter1_ ), _getter2( getter2_ ) {}
-	template<typename T1, typename T2>
-	bool operator()( T1 const& left_, T2 const& right_ ) const
-		{
-		return ( _getter1( left_ ) <= _getter2( right_ ) );
-		}
-	};
-
-template<typename getter1_t, typename getter2_t>
-class bound_greater_equal : public binary_function<bool, typename getter1_t::argument_type, typename getter2_t::argument_type>
-	{
-public:
-private:
-	getter1_t _getter1;
-	getter2_t _getter2;
-public:
-	bound_greater_equal( getter1_t const& getter1_, getter2_t const& getter2_ ) : _getter1( getter1_ ), _getter2( getter2_ ) {}
-	template<typename T1, typename T2>
-	bool operator()( T1 const& left_, T2 const& right_ ) const
-		{
-		return ( _getter1( left_ ) >= _getter2( right_ ) );
-		}
-	};
+	return ( call( compose_binary( less<return_t>(), left_, right_ ), _1, _2 ) );
+	}
 
 template<int free_args, typename descriptor_t, typename return_t, typename CALL_t,	typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t,	typename a4_t, typename a5_t,	typename a6_t, typename a7_t,
@@ -125,70 +66,125 @@ template<int free_args, typename descriptor_t, typename return_t, typename CALL_
 	int free_args2, typename descriptor2_t, typename return2_t, typename CALL2_t, typename b0_t, typename b1_t,
 	typename b2_t, typename b3_t,	typename b4_t, typename b5_t,	typename b6_t, typename b7_t,
 	typename b8_t, typename b9_t,	typename b10_t>
-bound_less<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >
-					operator < ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
-							HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ )
+typename call_calculator<
+	binary_composition<
+		greater<return_t>,
+		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
+		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
+	>,
+	free_standing_call_args::arg<1>,
+	free_standing_call_args::arg<2>
+>::type::type
+	operator > ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
+			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ )
 	{
-	return ( bound_less<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( left_, right_ ) );
+	return ( call( compose_binary( greater<return_t>(), left_, right_ ), _1, _2 ) );
+	}
+
+template<int free_args, typename descriptor_t, typename return_t, typename CALL_t,	typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t,	typename a4_t, typename a5_t,	typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t,	typename a10_t,
+	int free_args2, typename descriptor2_t, typename return2_t, typename CALL2_t, typename b0_t, typename b1_t,
+	typename b2_t, typename b3_t,	typename b4_t, typename b5_t,	typename b6_t, typename b7_t,
+	typename b8_t, typename b9_t,	typename b10_t>
+typename call_calculator<
+	binary_composition<
+		less_equal<return_t>,
+		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
+		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
+	>,
+	free_standing_call_args::arg<1>,
+	free_standing_call_args::arg<2>
+>::type::type
+	operator <= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
+			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ )
+	{
+	return ( call( compose_binary( less_equal<return_t>(), left_, right_ ), _1, _2 ) );
+	}
+
+template<int free_args, typename descriptor_t, typename return_t, typename CALL_t,	typename a0_t, typename a1_t,
+	typename a2_t, typename a3_t,	typename a4_t, typename a5_t,	typename a6_t, typename a7_t,
+	typename a8_t, typename a9_t,	typename a10_t,
+	int free_args2, typename descriptor2_t, typename return2_t, typename CALL2_t, typename b0_t, typename b1_t,
+	typename b2_t, typename b3_t,	typename b4_t, typename b5_t,	typename b6_t, typename b7_t,
+	typename b8_t, typename b9_t,	typename b10_t>
+typename call_calculator<
+	binary_composition<
+		greater_equal<return_t>,
+		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
+		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
+	>,
+	free_standing_call_args::arg<1>,
+	free_standing_call_args::arg<2>
+>::type::type
+	operator >= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
+			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ )
+	{
+	return ( call( compose_binary( greater_equal<return_t>(), left_, right_ ), _1, _2 ) );
 	}
 
 template<int free_args, typename descriptor_t, typename return_t, typename CALL_t,	typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t,	typename a4_t, typename a5_t,	typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t,	typename a10_t,
 	typename constans_t>
-bound_less_const_right<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>, constans_t>
-					operator < ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
-							constans_t right_ )
+typename call_calculator<
+	unary_compose<
+		HBinder<less<return_t>, constans_t, 1>,
+		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+	>,
+	free_standing_call_args::arg<1>
+>::type::type
+	operator < ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constans_t const& constans_ )
 	{
-	return ( bound_less_const_right<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-			constans_t>( left_, right_ ) );
+	return ( call( compose1( bind2nd( less<return_t>(), constans_ ), var_ ), _1 ) );
 	}
 
 template<int free_args, typename descriptor_t, typename return_t, typename CALL_t,	typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t,	typename a4_t, typename a5_t,	typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t,	typename a10_t,
-	int free_args2, typename descriptor2_t, typename return2_t, typename CALL2_t, typename b0_t, typename b1_t,
-	typename b2_t, typename b3_t,	typename b4_t, typename b5_t,	typename b6_t, typename b7_t,
-	typename b8_t, typename b9_t,	typename b10_t>
-bound_greater<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >
-					operator > ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
-							HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ )
+	typename constans_t>
+typename call_calculator<
+	unary_compose<
+		HBinder<greater<return_t>, constans_t, 1>,
+		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+	>,
+	free_standing_call_args::arg<1>
+>::type::type
+	operator > ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constans_t const& constans_ )
 	{
-	return ( bound_greater<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( left_, right_ ) );
+	return ( call( compose1( bind2nd( greater<return_t>(), constans_ ), var_ ), _1 ) );
 	}
 
 template<int free_args, typename descriptor_t, typename return_t, typename CALL_t,	typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t,	typename a4_t, typename a5_t,	typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t,	typename a10_t,
-	int free_args2, typename descriptor2_t, typename return2_t, typename CALL2_t, typename b0_t, typename b1_t,
-	typename b2_t, typename b3_t,	typename b4_t, typename b5_t,	typename b6_t, typename b7_t,
-	typename b8_t, typename b9_t,	typename b10_t>
-bound_less_equal<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >
-					operator <= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
-							HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ )
+	typename constans_t>
+typename call_calculator<
+	unary_compose<
+		HBinder<less_equal<return_t>, constans_t, 1>,
+		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+	>,
+	free_standing_call_args::arg<1>
+>::type::type
+	operator <= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constans_t const& constans_ )
 	{
-	return ( bound_less_equal<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( left_, right_ ) );
+	return ( call( compose1( bind2nd( less_equal<return_t>(), constans_ ), var_ ), _1 ) );
 	}
 
 template<int free_args, typename descriptor_t, typename return_t, typename CALL_t,	typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t,	typename a4_t, typename a5_t,	typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t,	typename a10_t,
-	int free_args2, typename descriptor2_t, typename return2_t, typename CALL2_t, typename b0_t, typename b1_t,
-	typename b2_t, typename b3_t,	typename b4_t, typename b5_t,	typename b6_t, typename b7_t,
-	typename b8_t, typename b9_t,	typename b10_t>
-bound_greater_equal<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >
-					operator >= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
-							HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ )
+	typename constans_t>
+typename call_calculator<
+	unary_compose<
+		HBinder<greater_equal<return_t>, constans_t, 1>,
+		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
+	>,
+	free_standing_call_args::arg<1>
+>::type::type
+	operator >= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constans_t const& constans_ )
 	{
-	return ( bound_greater_equal<HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
-			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( left_, right_ ) );
+	return ( call( compose1( bind2nd( greater_equal<return_t>(), constans_ ), var_ ), _1 ) );
 	}
 
 }

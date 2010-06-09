@@ -1055,226 +1055,288 @@ struct return_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_
  * \tparam no - index of an argument to get type of.
  * \retval type - type of given argument of given member or function.
  */
+
 template<typename T>
-struct argument_type
-	{
-	template<int const no> struct index
-		{
-		typedef typename select_index<no, typename T::first_argument_type, typename T::second_argument_type>::type type;
-		};
-	};
+struct generic_argument_type
+	{ template<int const> struct index { typedef no_type type; }; };
 
 template<typename return_t, typename class_t>
-struct argument_type<return_t ( class_t::* )( void )>
+struct generic_argument_type<return_t ( class_t::* )( void )>
 	{ template<int const> struct index { typedef no_type type; }; };
 template<typename return_t, typename class_t>
-struct argument_type<return_t ( class_t::* )( void ) const>
+struct generic_argument_type<return_t ( class_t::* )( void ) const>
 	{ template<int const> struct index { typedef no_type type; }; };
 template<typename return_t, typename class_t>
-struct argument_type<return_t ( class_t::* )( void ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( void ) volatile>
 	{ template<int const> struct index { typedef no_type type; }; };
 template<typename return_t, typename class_t>
-struct argument_type<return_t ( class_t::* )( void ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( void ) const volatile>
 	{ template<int const> struct index { typedef no_type type; }; };
 template<typename return_t>
-struct argument_type<return_t ( * )( void )>
+struct generic_argument_type<return_t ( * )( void )>
 	{ template<int const> struct index { typedef no_type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t>
-struct argument_type<return_t ( class_t::* )( a0_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t>
-struct argument_type<return_t ( class_t::* )( a0_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t>
-struct argument_type<return_t ( class_t::* )( a0_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t>
-struct argument_type<return_t ( class_t::* )( a0_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t>::type type; }; };
 template<typename return_t, typename a0_t>
-struct argument_type<return_t ( * )( a0_t )>
+struct generic_argument_type<return_t ( * )( a0_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t>
-struct argument_type<return_t ( * )( a0_t, a1_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t>
-struct argument_type<return_t ( * )( a0_t, a1_t, a2_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t, a2_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-struct argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
-struct argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-struct argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-struct argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
 	typename a7_t>
-struct argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
 	typename a7_t, typename a8_t>
-struct argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
 	typename a7_t, typename a8_t, typename a9_t>
-struct argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type type; }; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t, typename a10_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t )>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t, typename a10_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) const>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) const>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t, typename a10_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type type; }; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t, typename a10_t>
-struct argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) const volatile>
+struct generic_argument_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) const volatile>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type type; }; };
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t,
 	typename a7_t, typename a8_t, typename a9_t, typename a10_t>
-struct argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t )>
+struct generic_argument_type<return_t ( * )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type type; }; };
+
+template<typename T>
+struct functional_argument_type
+	{
+	template<typename real_class>
+	static true_type has_argument_type( typename strip_reference<typename real_class::argument_type>::type* );
+	template<typename real_class>
+	static false_type has_argument_type( ... );
+	template<typename real_class>
+	static true_type has_first_argument_type( typename strip_reference<typename real_class::first_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_first_argument_type( ... );
+	template<typename real_class>
+	static true_type has_second_argument_type( typename strip_reference<typename real_class::second_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_second_argument_type( ... );
+
+	static bool const a0 = ( sizeof ( has_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
+	static bool const a1 = ( sizeof ( has_first_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
+	static bool const a2 = ( sizeof ( has_second_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
+
+	template<typename U, int const no>
+	struct get
+		{ typedef no_type type; };
+
+	template<typename U>
+	struct get<U, 0>
+		{ typedef typename U::argument_type type; };
+	template<typename U>
+	struct get<U, 1>
+		{ typedef typename U::first_argument_type type; };
+	template<typename U>
+	struct get<U, 2>
+		{ typedef typename U::second_argument_type type; };
+
+	template<int const no> struct index
+		{
+		static int const idx = meta::ternary<( no == 0 ), meta::ternary<a0, 0, meta::ternary<a1, 1, -1>::value>::value,
+														meta::ternary<( no == 1 ) && a2, 2,
+														-1>::value>::value;
+		typedef typename get<T, idx>::type type;
+		};
+	};
+
+template<typename T, int const no>
+struct argument_type
+	{
+	template<bool const force, typename U>
+	struct resolve;
+
+	template<typename U>
+	struct resolve<false, U>
+		{
+		typedef U type;
+		};
+
+	template<typename U>
+	struct resolve<true, U>
+		{
+		typedef typename generic_argument_type<T>::template index<no>::type type;
+		};
+
+	typedef typename functional_argument_type<T>::template index<no>::type functional_argument_type_t;
+
+	typedef typename resolve<same_type<functional_argument_type_t, no_type>::value, functional_argument_type_t>::type type;
+	};
 
 /*! \endcond */
 

@@ -82,13 +82,13 @@ struct binary_function
 template<typename function_t, typename value_t, int bound_no>
 class HBinder : public unary_function<
 			typename trait::return_type<function_t>::type,
-			typename trait::argument_type<function_t>::template index<bound_no>::type
+			typename trait::argument_type<function_t, bound_no>::type
 		>
 	{
 public:
 	typedef unary_function<
 			typename trait::return_type<function_t>::type,
-			typename trait::argument_type<function_t>::template index<bound_no>::type
+			typename trait::argument_type<function_t, bound_no>::type
 		> hier_t;
 	typedef typename hier_t::result_type result_type;
 	typedef typename hier_t::argument_type argument_type;
@@ -389,25 +389,47 @@ struct logical_or : public binary_function<bool, bool, bool>
 		}
 	};
 
-/*! \brief Callculate booleant exclisive or value.
+/*! \brief Callculate exclusive or boolean value.
  *
  * \param p - first predicate.
  * \param q - second predicate.
- * \return p exor q <=> ( p ^ q ) v ( ~ ( p v q ) )
+ * \return p exor q <=> ( p ^ ~q ) v ( ~p ^ q ) )
  */
 inline bool exor( bool p, bool q )
 	{
-	return ( ( p && q ) || ( ! ( p || q ) ) );
+	return ( ( p && !q ) || ( !p && q ) );
 	}
 
 /*! \brief Logical `xor' operator.
  */
 template<typename tType = bool>
-struct logical_xor : public binary_function<bool, bool, bool>
+struct logical_exor : public binary_function<bool, bool, bool>
 	{
 	bool operator()( bool a_, bool b_ ) const
 		{
 		return ( exor( a_, b_ ) );
+		}
+	};
+
+/*! \brief Callculate logical biconditional value.
+ *
+ * \param p - first predicate.
+ * \param q - second predicate.
+ * \return p xnor q <=> ( p ^ q ) v ( ~ ( p v q ) )
+ */
+inline bool xnor( bool p, bool q )
+	{
+	return ( ( p && q ) || ( ! ( p || q ) ) );
+	}
+
+/*! \brief Logical `xnor' operator.
+ */
+template<typename tType = bool>
+struct logical_xnor : public binary_function<bool, bool, bool>
+	{
+	bool operator()( bool a_, bool b_ ) const
+		{
+		return ( xnor( a_, b_ ) );
 		}
 	};
 
@@ -539,6 +561,30 @@ public:
 template<typename return_t, typename first_argument_t, typename second_argument_t>
 pointer_to_binary_function<return_t, first_argument_t, second_argument_t> ptr_fun( return_t (*function_)( first_argument_t, second_argument_t ) )
 	{ return ( pointer_to_binary_function<return_t, first_argument_t, second_argument_t>( function_ ) ); }
+
+template<typename F, typename G1, typename G2>
+class binary_composition : public binary_function<typename F::result_type, typename G1::argument_type, typename G2::argument_type>
+	{
+public:
+	typedef binary_function<typename F::result_type, typename G1::argument_type, typename G2::argument_type> hier_t;
+	typedef typename hier_t::result_type result_type;
+	typedef typename hier_t::first_argument_type first_argument_type;
+	typedef typename hier_t::second_argument_type second_argument_type;
+private:
+	F _f;
+	G1 _g1;
+	G2 _g2;
+public:
+	binary_composition( F f_, G1 g1_, G2 g2_ ) : _f( f_ ), _g1( g1_ ), _g2( g2_ ) {}
+	result_type operator()( first_argument_type const& arg1_, second_argument_type const& arg2_ ) const
+		{
+		return ( _f( _g1( arg1_ ), _g2( arg2_ ) ) );
+		}
+	};
+
+template<typename F, typename G1, typename G2>
+binary_composition<F, G1, G2> compose_binary( F f_, G1 g1_, G2 g2_ )
+	{ return ( binary_composition<F, G1, G2>( f_, g1_, g2_ ) ); }
 
 }
 
