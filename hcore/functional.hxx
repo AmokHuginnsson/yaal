@@ -524,7 +524,9 @@ binary_negate<F> not2( F f_ )
 template<typename tType>
 struct identity : public unary_function<tType, tType>
 	{
-	tType operator()( tType const& v_ ) const
+	tType const& operator()( tType const& v_ ) const
+		{ return ( v_ ); }
+	tType& operator()( tType& v_ )
 		{ return ( v_ ); }
 	};
 
