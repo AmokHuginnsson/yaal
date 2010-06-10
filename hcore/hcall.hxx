@@ -612,10 +612,10 @@ template<typename descriptor, typename return_t, typename class_t, typename fiel
 class HCall<-1, descriptor, return_t, class_t, field_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type> : public unary_function<return_t, typename trait::class_type<field_t>::type*>
+	trait::no_type, trait::no_type> : public unary_function<return_t, typename trait::class_type<field_t>::type>
 	{
 public:
-	typedef unary_function<return_t, typename trait::class_type<field_t>::type*> hier_t;
+	typedef unary_function<return_t, typename trait::class_type<field_t>::type> hier_t;
 	typedef typename hier_t::result_type result_type;
 	typedef typename hier_t::argument_type argument_type;
 private:
@@ -624,7 +624,11 @@ public:
 	HCall( field_t field_ ) : _field( field_ ) {}
 	return_t const& operator()( argument_type const& obj_ ) const
 		{
-		return ( (*obj_).*_field );
+		return ( obj_.*_field );
+		}
+	return_t& operator()( argument_type& obj_ )
+		{
+		return ( obj_.*_field );
 		}
 	};
 
