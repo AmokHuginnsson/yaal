@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <cstdio>
+#include <cstring>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )

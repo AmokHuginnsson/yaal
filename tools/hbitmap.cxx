@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <cstdlib>
+#include <cstring>
 #include <cstdio>
 
 #include "hcore/base.hxx"
