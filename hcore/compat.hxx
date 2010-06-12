@@ -57,14 +57,10 @@ void* memrchr( void const*, int, int long );
 #endif /* not HAVE_DECL_SUN_LEN */
 
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
-#include <cstdlib>
-#include <netdb.h>
 int gethostbyname_r( char const*, struct hostent*, char*, size_t, struct hostent**, int* );
 #endif /* not HAVE_GNU_GETHOSTBYNAME_R */
 
 #if ! defined( HAVE_GNU_GETHOSTBYADDR_R )
-#include <cstdlib>
-#include <netdb.h>
 int gethostbyaddr_r( void const*, int, int, struct hostent*, char*, size_t, struct hostent**, int* );
 #endif /* not HAVE_GNU_GETHOSTBYADDR_R */
 

@@ -33,7 +33,7 @@ Copyright:
 #define YAAL_HCORE_HEXCEPTION_HXX_INCLUDED
 
 #include <cerrno>
-#include <cstring>
+#include <cstddef>
 #include <typeinfo>
 
 #ifdef __YAAL_BUILD__

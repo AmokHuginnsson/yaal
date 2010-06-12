@@ -24,9 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstring>
 #include <unistd.h>
 #include <poll.h>
-#include <cstdlib>
 #include <libintl.h>
 #include <sys/time.h> /* timeval */
 
