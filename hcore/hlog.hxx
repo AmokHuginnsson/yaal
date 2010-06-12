@@ -60,8 +60,8 @@ namespace LOG_TYPE
 class HLog : public HField<HFile>, public HSynchronizedFile, private HSingletonInterface
 	{
 protected:
-	typedef HLog self_t;
-	typedef HStreamInterface hier_t;
+	typedef HLog this_type;
+	typedef HStreamInterface base_type;
 private:
 	typedef HField<HFile> _file;
 	bool     _realMode;

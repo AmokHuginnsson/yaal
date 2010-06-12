@@ -40,7 +40,7 @@ namespace hcore
  */
 class HComplex
 	{
-	typedef HComplex self_t;
+	typedef HComplex this_type;
 	double _real;
 	double _imaginary;
 public:

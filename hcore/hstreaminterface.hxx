@@ -49,8 +49,8 @@ HStreamInterface& oct( HStreamInterface& );
  */
 class HStreamInterface
 	{
-	typedef HStreamInterface self_t;
 public:
+	typedef HStreamInterface this_type;
 	class HManipulator
 		{
 		int _value;

@@ -77,7 +77,7 @@ public:
 			{ return ( _size ); }
 		};
 private:
-	typedef HStreamBlockIterator self_t;
+	typedef HStreamBlockIterator this_type;
 	yaal::hcore::HChunk _buffer;
 	int long _index; /*!< number of currently processed IO block */
 	int long _size; /*!< requested size of IO block */

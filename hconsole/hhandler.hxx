@@ -42,7 +42,7 @@ namespace hconsole
 class HHandler
 	{
 protected:
-	typedef HHandler self_t;
+	typedef HHandler this_type;
 	typedef int ( HHandler::* HANDLER_t ) ( int, void const* );
 	typedef hcore::HHashMap<int, HANDLER_t> process_handler_key_map_t;
 	typedef hcore::HHashMap<hcore::HString, HANDLER_t> process_handler_command_map_t;

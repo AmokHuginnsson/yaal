@@ -41,8 +41,8 @@ namespace hcore
 class HPipe : public yaal::hcore::HStreamInterface
 	{
 protected:
-	typedef HPipe self_t;
-	typedef HStreamInterface hier_t;
+	typedef HPipe this_type;
+	typedef HStreamInterface base_type;
 private:
 	int _pipe[ 2 ];
 public:

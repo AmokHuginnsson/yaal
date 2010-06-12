@@ -47,7 +47,7 @@ namespace hcore
  */
 class HOpenSSL
 	{
-	typedef HOpenSSL self_t;
+	typedef HOpenSSL this_type;
 public:
 	static yaal::hcore::HString _sSLKey;
 	static yaal::hcore::HString _sSLCert;

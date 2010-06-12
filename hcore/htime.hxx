@@ -44,7 +44,7 @@ extern char const* const _defaultTimeFormat_;
  */
 class HTime
 	{
-	typedef HTime self_t;
+	typedef HTime this_type;
 	HString	_format;
 	mutable HChunk _cache;
 	time_t	_value;

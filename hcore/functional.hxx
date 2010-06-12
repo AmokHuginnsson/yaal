@@ -48,7 +48,7 @@ struct unary_function
 	{
 	typedef res_t result_type;
 	typedef arg_t argument_type;
-	typedef unary_function<result_type, argument_type> self_t;
+	typedef unary_function<result_type, argument_type> this_type;
 	virtual ~unary_function( void ) {}
 	};
 
@@ -66,7 +66,7 @@ struct binary_function
 	typedef res_t result_type;
 	typedef arg1st_t first_argument_type;
 	typedef arg2nd_t second_argument_type;
-	typedef binary_function<result_type, first_argument_type, second_argument_type> self_t;
+	typedef binary_function<result_type, first_argument_type, second_argument_type> this_type;
 	virtual ~binary_function( void ) {}
 	};
 
@@ -89,9 +89,9 @@ public:
 	typedef unary_function<
 			typename trait::return_type<function_t>::type,
 			typename trait::argument_type<function_t, bound_no>::type
-		> hier_t;
-	typedef typename hier_t::result_type result_type;
-	typedef typename hier_t::argument_type argument_type;
+		> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::argument_type argument_type;
 private:
 	function_t _call;
 	value_t _value;
@@ -437,9 +437,9 @@ template<typename F, typename G>
 class unary_compose : public unary_function<typename F::result_type, typename G::argument_type>
 	{
 public:
-	typedef unary_function<typename F::result_type, typename G::argument_type> hier_t;
-	typedef typename hier_t::result_type result_type;
-	typedef typename hier_t::argument_type argument_type;
+	typedef unary_function<typename F::result_type, typename G::argument_type> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::argument_type argument_type;
 private:
 	F _f;
 	G _g;
@@ -459,9 +459,9 @@ template<typename F, typename G1, typename G2>
 class binary_compose : public unary_function<typename F::result_type, typename G1::argument_type>
 	{
 public:
-	typedef unary_function<typename F::result_type, typename G1::argument_type> hier_t;
-	typedef typename hier_t::result_type result_type;
-	typedef typename hier_t::argument_type argument_type;
+	typedef unary_function<typename F::result_type, typename G1::argument_type> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::argument_type argument_type;
 private:
 	F _f;
 	G1 _g1;
@@ -482,9 +482,9 @@ template<typename F>
 class unary_negate : public unary_function<typename F::result_type, typename F::argument_type>
 	{
 public:
-	typedef unary_function<typename F::result_type, typename F::argument_type> hier_t;
-	typedef typename hier_t::result_type result_type;
-	typedef typename hier_t::argument_type argument_type;
+	typedef unary_function<typename F::result_type, typename F::argument_type> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::argument_type argument_type;
 private:
 	F _f;
 public:
@@ -503,10 +503,10 @@ template<typename F>
 class binary_negate : public binary_function<typename F::result_type, typename F::first_argument_type, typename F::second_argument_type>
 	{
 public:
-	typedef binary_function<typename F::result_type, typename F::first_argument_type, typename F::second_argument_type> hier_t;
-	typedef typename hier_t::result_type result_type;
-	typedef typename hier_t::first_argument_type first_argument_type;
-	typedef typename hier_t::second_argument_type second_argument_type;
+	typedef binary_function<typename F::result_type, typename F::first_argument_type, typename F::second_argument_type> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::first_argument_type first_argument_type;
+	typedef typename base_type::second_argument_type second_argument_type;
 private:
 	F _f;
 public:
@@ -568,10 +568,10 @@ template<typename F, typename G1, typename G2>
 class binary_composition : public binary_function<typename F::result_type, typename G1::argument_type, typename G2::argument_type>
 	{
 public:
-	typedef binary_function<typename F::result_type, typename G1::argument_type, typename G2::argument_type> hier_t;
-	typedef typename hier_t::result_type result_type;
-	typedef typename hier_t::first_argument_type first_argument_type;
-	typedef typename hier_t::second_argument_type second_argument_type;
+	typedef binary_function<typename F::result_type, typename G1::argument_type, typename G2::argument_type> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::first_argument_type first_argument_type;
+	typedef typename base_type::second_argument_type second_argument_type;
 private:
 	F _f;
 	G1 _g1;

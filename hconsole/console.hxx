@@ -181,8 +181,8 @@ extern bool _needRepaint_;
 class HConsole : private yaal::hcore::HSingletonInterface
 	{
 protected:
-	typedef HConsole self_t;
-	typedef HSingletonInterface hier_t;
+	typedef HConsole this_type;
+	typedef HSingletonInterface base_type;
 private:
 	bool _initialized;
 	int _width;

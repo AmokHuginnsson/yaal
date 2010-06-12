@@ -49,8 +49,8 @@ class HComboboxControl : public virtual HEditControl,
 	public virtual HListControl
 	{
 protected:
-	typedef HComboboxControl self_t;
-	typedef HListControl hier_t;
+	typedef HComboboxControl this_type;
+	typedef HListControl base_type;
 public:
 	/*! \brief Current combobox state.
 	 */

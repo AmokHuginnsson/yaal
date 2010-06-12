@@ -42,8 +42,8 @@ namespace tools
 class HMemory : public yaal::hcore::HStreamInterface
 	{
 public:
-	typedef HMemory self_t;
-	typedef yaal::hcore::HStreamInterface hier_t;
+	typedef HMemory this_type;
+	typedef yaal::hcore::HStreamInterface base_type;
 	struct INITIAL_STATE
 		{
 		typedef enum

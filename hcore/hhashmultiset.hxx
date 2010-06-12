@@ -63,7 +63,7 @@ private:
 		bool operator()( value_type const& a_, type_t const& b_ ) const
 			{ return ( a_.first == b_ ); }
 		};
-	typedef HHashMultiSet<type_t, hash_function_t> self_t;
+	typedef HHashMultiSet<type_t, hash_function_t> this_type;
 	hasher _hasher;
 	HHashContainer _engine;
 public:

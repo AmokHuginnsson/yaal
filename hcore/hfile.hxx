@@ -45,8 +45,8 @@ namespace hcore
 class HFile : public HStreamInterface
 	{
 protected:
-	typedef HFile self_t;
-	typedef HStreamInterface hier_t;
+	typedef HFile this_type;
+	typedef HStreamInterface base_type;
 public:
 	/*! \brief Bits user for specyfying the way files are opened.
 	 */

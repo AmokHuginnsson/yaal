@@ -44,8 +44,8 @@ namespace hconsole
 class HMenuControl : public HTreeControl
 	{
 protected:
-	typedef HMenuControl self_t;
-	typedef HTreeControl hier_t;
+	typedef HMenuControl this_type;
+	typedef HTreeControl base_type;
 public:
 	typedef yaal::hcore::HPointer<HMenuControl> ptr_t;
 protected:

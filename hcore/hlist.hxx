@@ -103,7 +103,7 @@ struct OListBits
 template<typename type_t> 
 class HList : public OListBits
 	{
-	typedef HList<type_t> self_t;
+	typedef HList<type_t> this_type;
 private:
 	class HElement;
 	int _size;           /*!< how many elements this list contains */

@@ -42,7 +42,7 @@ namespace tools
  */
 class HBitmap
 	{
-	typedef HBitmap self_t;
+	typedef HBitmap this_type;
 public:
 	class HBit;
 	template<typename const_qual_t>

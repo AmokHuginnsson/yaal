@@ -52,8 +52,8 @@ extern char const* const _maskDefault_;
 class HEditControl : public virtual HControl
 	{
 protected:
-	typedef HEditControl self_t;
-	typedef HControl hier_t;
+	typedef HEditControl this_type;
+	typedef HControl base_type;
 	bool _replace;         /*!< current edit mode */
 	bool _multiLine;       /*!< is control multiline */
 	bool _readOnly;        /*!< shall editing be disabled */

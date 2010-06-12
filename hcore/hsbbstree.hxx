@@ -49,7 +49,7 @@ extern char const * const _errMsgHSBBSTree_ [ ];
  */
 class HSBBSTree
 	{
-	typedef HSBBSTree self_t;
+	typedef HSBBSTree this_type;
 public:
 	/*! \brief HSBBSTree operation error types.
 	 */

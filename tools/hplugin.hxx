@@ -40,7 +40,7 @@ namespace tools
  */
 class HPlugin
 	{
-	typedef HPlugin self_t;
+	typedef HPlugin this_type;
 	void* _handle;
 public:
 	typedef yaal::hcore::HPointer<HPlugin> ptr_t;

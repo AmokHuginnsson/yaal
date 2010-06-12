@@ -44,7 +44,7 @@ extern char const _word_[];
  */
 class HString
 	{
-	typedef HString self_t;
+	typedef HString this_type;
 private:
 	char*	_buffer; /*!< memory buffer pointer */
 	int	long _allocatedBytes; /*!< size of memory buffer */

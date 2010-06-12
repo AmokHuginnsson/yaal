@@ -42,21 +42,7 @@ namespace yaal
 namespace hdata
 {
 
-#if defined( HAVE_DECLTYPE )
-#define M_REGISTER_MENU_HANDLER( handler ) \
-	{ \
-	typedef yaal::trait::strip_pointer<__decltype( this )>::type this_t; \
-	handlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
-			&this_t::handler ); \
-	}
-#else /* HAVE_DECLTYPE */
-#define M_REGISTER_MENU_HANDLER( handler ) \
-	{ \
-	typedef __decltype( *this ) this_t; \
-	handlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( \
-			&this_t::handler ); \
-	}
-#endif /* not HAVE_DECLTYPE */
+#define M_REGISTER_MENU_HANDLER( handler ) do {	handlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( &this_type::handler ); } while ( 0 )
 
 typedef yaal::hcore::HHashMap<yaal::hcore::HString,
 				yaal::hconsole::OMenuItem::HANDLER_t> menu_handlers_map_t;
@@ -69,8 +55,8 @@ typedef yaal::hcore::HHashMap<yaal::hcore::HString,
 class HDataProcess : public hconsole::HTUIProcess
 	{
 protected:
-	typedef HDataProcess self_t;
-	typedef HTUIProcess hier_t;
+	typedef HDataProcess this_type;
+	typedef HTUIProcess base_type;
 	typedef yaal::hcore::HList<yaal::hcore::HString> param_cache_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, resources_t> resource_cache_t;
 	typedef yaal::hcore::HList<OEditControlResource> edit_cache_t;

@@ -64,7 +64,7 @@ public:
  */
 class HLifeTimeTracker
 	{
-	typedef HLifeTimeTracker self_t;
+	typedef HLifeTimeTracker this_type;
 public:
 	typedef yaal::hcore::HPointer<HAbstractDestructor> destructor_ptr_t;
 private:
@@ -126,7 +126,7 @@ void HDestructor<tType>::destruct( void )
 template<typename tType>
 class HSingleton
 	{
-	typedef HSingleton<tType> self_t;
+	typedef HSingleton<tType> this_type;
 	static tType* _instance;
 	static tType* create_instance( int const& );
 public:

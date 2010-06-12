@@ -54,7 +54,7 @@ public:
 	typedef HPair<char, bool*> flag_desc_t;
 	typedef HArray<flag_desc_t> pluggable_flags_t;
 private:
-	typedef HPattern self_t;
+	typedef HPattern this_type;
 	bool		_initialized;				/*!< is pattern initialized */
 	bool		_ignoreCaseDefault;	/*!< default value for ignore case switch */
 	bool		_ignoreCase;				/*!< self explanary */

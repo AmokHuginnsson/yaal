@@ -47,7 +47,7 @@ template<typename value_type>
 class HVector
 	{
 	typedef HArray<value_type> data_t;
-	typedef HVector<value_type> self_t;
+	typedef HVector<value_type> this_type;
 	data_t _data;
 public:
 	typedef value_type value_t;

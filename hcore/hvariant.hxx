@@ -58,7 +58,7 @@ template<typename t0_t, typename t1_t = trait::no_type,
 class HVariant
 	{
 public:
-	typedef HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t> self_t;
+	typedef HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t> this_type;
 	static int const SIZE = yaal::meta::max<
 		sizeof ( t0_t ),
 		sizeof ( t1_t ),
@@ -306,7 +306,7 @@ HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_
 	{
 	if ( &v != this )
 		{
-		self_t tmp( v );
+		this_type tmp( v );
 		swap( tmp );
 		}
 	return ( *this );

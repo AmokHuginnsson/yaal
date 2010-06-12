@@ -49,8 +49,8 @@ class HDataProcess;
 class HDataWindow : public hconsole::HWindow
 	{
 protected:
-	typedef HDataWindow self_t;
-	typedef HWindow hier_t;
+	typedef HDataWindow this_type;
+	typedef HWindow base_type;
 public:
 	/*! \brief Data window operation mode.
 	 */

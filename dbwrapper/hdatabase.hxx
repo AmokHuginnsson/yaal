@@ -41,7 +41,7 @@ namespace dbwrapper
  */
 class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase>
 	{
-	typedef HDataBase self_t;
+	typedef HDataBase this_type;
 private:
 	ODBConnector const* _connector;
 	void* _coreData;	/*!< very internal for this class used only in base class */

@@ -41,7 +41,7 @@ namespace tools
  */
 class HExpression
 	{
-	typedef HExpression self_t;
+	typedef HExpression this_type;
 	typedef enum
 		{
 		OK = 0,

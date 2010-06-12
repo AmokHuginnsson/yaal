@@ -42,8 +42,8 @@ Copyright:
 #include "hcore/trait.hxx"
 #include "hcore/hstring.hxx"
 
-typedef void self_t;
-typedef void hier_t;
+typedef void this_type;
+typedef void base_type;
 
 namespace yaal
 {
@@ -109,25 +109,25 @@ extern char const* const _exceptionType_;
 
 /*! \brief Template used to create type specyfic exceptions.
  */
-template<typename tType, typename hier_t = HException>
-class HExceptionT : public hier_t
+template<typename tType, typename base_type = HException>
+class HExceptionT : public base_type
 	{
 public:
-	HExceptionT( char const* const reason_, char* ptr = hier_t::get_type_name( typeid( tType ).name() ) )
-		: hier_t( _exceptionType_, ptr, 0, reason_, errno )
-		{ hier_t::cleanup( ptr );	}
-	HExceptionT( HString const& reason_, char* ptr = hier_t::get_type_name( typeid( tType ).name() ) )
-		: hier_t( _exceptionType_, ptr, 0, reason_, errno )
-		{ hier_t::cleanup( ptr );	}
+	HExceptionT( char const* const reason_, char* ptr = base_type::get_type_name( typeid( tType ).name() ) )
+		: base_type( _exceptionType_, ptr, 0, reason_, errno )
+		{ base_type::cleanup( ptr );	}
+	HExceptionT( HString const& reason_, char* ptr = base_type::get_type_name( typeid( tType ).name() ) )
+		: base_type( _exceptionType_, ptr, 0, reason_, errno )
+		{ base_type::cleanup( ptr );	}
 	HExceptionT( char const* const fileName_,
 			char const* const functionName_, int const line_,
 			char const* const reason_, int const code_ )
-		: hier_t( fileName_, functionName_, line_, reason_, code_ )
+		: base_type( fileName_, functionName_, line_, reason_, code_ )
 		{	}
 	HExceptionT( char const* const fileName_,
 			char const* const functionName_, int const line_,
 			HString const& reason_, int const code_ )
-		: hier_t( fileName_, functionName_, line_, reason_, code_ )
+		: base_type( fileName_, functionName_, line_, reason_, code_ )
 		{	}
 	};
 
@@ -245,7 +245,7 @@ template<typename tType>
 struct context_hier
 	{
 	template<typename real_class>
-	static trait::true_type has_hier( typename real_class::hier_t* );
+	static trait::true_type has_hier( typename real_class::base_type* );
 	template<typename real_class>
 	static trait::false_type has_hier( ... );
 	typedef typename existing_hier<sizeof ( has_hier<tType>( 0 ) ), tType>::type type;
@@ -267,7 +267,7 @@ struct existing_hier<sizeof ( trait::true_type ), subclass_t>
 	template<typename hermetic>
 	struct get_protected_typedef : public hermetic
 		{
-		typedef typename hermetic::hier_t type;
+		typedef typename hermetic::base_type type;
 		};
 	typedef typename get_protected_typedef<subclass_t>::type type;
 	};
@@ -276,7 +276,7 @@ struct existing_hier<sizeof ( trait::true_type ), subclass_t>
 template<typename subclass>
 struct existing_hier<sizeof ( trait::false_type ), subclass>
 	{
-	typedef hier_t type;
+	typedef base_type type;
 	};
 /*! \endcond */
 

@@ -62,7 +62,7 @@ static void dummy_signal_handler( int )
 
 class HBaseSignalHandlers
 	{
-	typedef HBaseSignalHandlers self_t;
+	typedef HBaseSignalHandlers this_type;
 public:
 	static void unlock( int );
 	static void lock( int );

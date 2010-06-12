@@ -50,7 +50,7 @@ extern char const* const _errMsgHArray_[];
 template<typename type_t>
 class HArray
 	{
-	typedef HArray<type_t> self_t;
+	typedef HArray<type_t> this_type;
 public:
 	typedef type_t value_type;
 	/*! \brief Error codes for HArray<> operations.

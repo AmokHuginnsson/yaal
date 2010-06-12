@@ -58,7 +58,7 @@ private:
 		bool operator()( value_type const& a_, value_type const& b_ ) const
 			{ return ( a_ == b_ ); }
 		};
-	typedef HHashSet<type_t, hash_function_t> self_t;
+	typedef HHashSet<type_t, hash_function_t> this_type;
 	hasher _hasher;
 	HHashContainer _engine;
 public:

@@ -49,8 +49,8 @@ namespace hcore
 class HSynchronizedStreamBase : public HStreamInterface
 	{
 protected:
-	typedef HSynchronizedStreamBase self_t;
-	typedef HStreamInterface hier_t;
+	typedef HSynchronizedStreamBase this_type;
+	typedef HStreamInterface base_type;
 	HMutex _mutex;
 public:
 	HSynchronizedStreamBase( void );
@@ -117,8 +117,8 @@ template<typename stream_t = HStreamInterface::ptr_t>
 class HSynchronizedStream : public HSynchronizedStreamBase
 	{
 protected:
-	typedef HSynchronizedStream self_t;
-	typedef HSynchronizedStreamBase hier_t;
+	typedef HSynchronizedStream this_type;
+	typedef HSynchronizedStreamBase base_type;
 private:
 	stream_t _stream;
 public:

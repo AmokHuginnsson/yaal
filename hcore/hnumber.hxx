@@ -40,7 +40,7 @@ namespace hcore
  */
 class HNumber
 	{
-	typedef HNumber self_t;
+	typedef HNumber this_type;
 private:
 	int long _precision;
 	bool _negative;

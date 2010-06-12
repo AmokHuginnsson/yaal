@@ -43,7 +43,7 @@ extern char const* const _errMsgHMatrix_[];
 template<typename value_type>
 class HMatrix
 	{
-	typedef HMatrix<value_type> self_t;
+	typedef HMatrix<value_type> this_type;
 public:
 	typedef value_type value_t;
 	/*! \brief Error codes for HMatrix<> operations.

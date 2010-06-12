@@ -1348,7 +1348,7 @@ struct argument_type
 template<typename T>
 struct class_type
 	{
-	typedef typename T::self_t type;
+	typedef typename T::this_type type;
 	};
 
 /*! \cond */

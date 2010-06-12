@@ -51,7 +51,7 @@ class HXmlData;
  */
 class HXml
 	{
-	typedef HXml self_t;
+	typedef HXml this_type;
 public:
 	class HNode;
 	class HNodeProxy;

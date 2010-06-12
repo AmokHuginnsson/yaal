@@ -47,7 +47,7 @@ namespace tools
 class HProcess
 	{
 protected:
-	typedef HProcess self_t;
+	typedef HProcess this_type;
 private:
 	typedef yaal::hcore::HBoundCall<0, void> delayed_call_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;

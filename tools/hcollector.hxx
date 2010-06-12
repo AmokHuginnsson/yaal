@@ -44,8 +44,8 @@ namespace tools
 class HCollector : public HSerial
 	{
 protected:
-	typedef HCollector self_t;
-	typedef HSerial hier_t;
+	typedef HCollector this_type;
+	typedef HSerial base_type;
 public:
 	/*! \brief Protocol description for Collector device.
 	 */

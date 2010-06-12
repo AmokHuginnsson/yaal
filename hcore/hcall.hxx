@@ -86,9 +86,9 @@ class HCallInterface<1, return_t, a0_t,
 	trait::no_type, trait::no_type> : public unary_function<return_t, a0_t>
 	{
 public:
-	typedef unary_function<return_t, a0_t> hier_t;
-	typedef typename hier_t::result_type result_type;
-	typedef typename hier_t::argument_type argument_type;
+	typedef unary_function<return_t, a0_t> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::argument_type argument_type;
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0 )
 		{ return ( do_invoke( a0 ) ); }
@@ -110,10 +110,10 @@ class HCallInterface<2, return_t, a0_t, a1_t,
 		: public binary_function<return_t, a0_t, a1_t>
 	{
 public:
-	typedef binary_function<return_t, a0_t, a1_t> hier_t;
-	typedef typename hier_t::result_type result_type;
-	typedef typename hier_t::first_argument_type first_argument_type;
-	typedef typename hier_t::second_argument_type second_argument_type;
+	typedef binary_function<return_t, a0_t, a1_t> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::first_argument_type first_argument_type;
+	typedef typename base_type::second_argument_type second_argument_type;
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1 )
 		{ return ( do_invoke( a0, a1 ) ); }
@@ -615,9 +615,9 @@ class HCall<-1, descriptor, return_t, class_t, field_t,
 	trait::no_type, trait::no_type> : public unary_function<return_t, typename trait::class_type<field_t>::type>
 	{
 public:
-	typedef unary_function<return_t, typename trait::class_type<field_t>::type> hier_t;
-	typedef typename hier_t::result_type result_type;
-	typedef typename hier_t::argument_type argument_type;
+	typedef unary_function<return_t, typename trait::class_type<field_t>::type> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::argument_type argument_type;
 private:
 	field_t _field;
 public:

@@ -50,8 +50,8 @@ namespace hcore
 class HSocket : public HRawFile
 	{
 public:
-	typedef HSocket self_t;
-	typedef HRawFile hier_t;
+	typedef HSocket this_type;
+	typedef HRawFile base_type;
 	typedef HPointer<HSocket> ptr_t;
 	static bool _resolveHostnames;
 	/*! \brief Socket types.

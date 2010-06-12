@@ -43,8 +43,8 @@ typedef int file_descriptor_t;
 class HRawFile : public HStreamInterface
 	{
 protected:
-	typedef HRawFile self_t;
-	typedef HStreamInterface hier_t;
+	typedef HRawFile this_type;
+	typedef HStreamInterface base_type;
 	typedef int long ( HRawFile::* READER_t )( void* const, int long const& );
 	typedef int long ( HRawFile::* WRITER_t )( void const* const, int long const& );
 	typedef int ( HRawFile::* CLOSER_t )( void );

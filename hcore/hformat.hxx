@@ -42,7 +42,7 @@ namespace hcore
  */
 class HFormat
 	{
-	typedef HFormat self_t;
+	typedef HFormat this_type;
 	class HFormatImpl;
 	typedef HPointer<HFormatImpl> format_impl_ptr_t;
 	format_impl_ptr_t _impl;

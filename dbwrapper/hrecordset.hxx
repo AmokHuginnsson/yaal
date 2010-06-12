@@ -46,7 +46,7 @@ typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
  */
 class HRecordSet
 	{
-	typedef HRecordSet self_t;
+	typedef HRecordSet this_type;
 public:
 	typedef yaal::hcore::HPointer<HRecordSet> ptr_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
@@ -102,8 +102,8 @@ private:
 class HSQLDescriptor
 	{
 public:
-	typedef HSQLDescriptor self_t;
-	typedef yaal::hcore::HPointer<self_t> ptr_t;
+	typedef HSQLDescriptor this_type;
+	typedef yaal::hcore::HPointer<this_type> ptr_t;
 	/*! \brief Query types.
 	 */
 	struct MODE

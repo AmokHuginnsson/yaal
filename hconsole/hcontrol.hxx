@@ -46,7 +46,7 @@ class HWindow;
  */
 class HControl
 	{
-	typedef HControl self_t;
+	typedef HControl this_type;
 public:
 /*! \brief Various configuration bits for HControl hierarchy.
  */

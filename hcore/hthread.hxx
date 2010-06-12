@@ -47,7 +47,7 @@ class HCondition;
  */
 class HMutex
 	{
-	typedef HMutex self_t;
+	typedef HMutex this_type;
 public:
 	/*! \brief Mutex types.
 	 */
@@ -90,7 +90,7 @@ typedef HExceptionT<HMutex> HMutexException;
  */
 class HSemaphore
 	{
-	typedef HSemaphore self_t;
+	typedef HSemaphore this_type;
 	HChunk _semaphore;
 public:
 	HSemaphore( void );
@@ -108,7 +108,7 @@ typedef HExceptionT<HSemaphore> HSemaphoreException;
  */
 class HThread
 	{
-	typedef HThread self_t;
+	typedef HThread this_type;
 	typedef enum
 		{
 		DEAD,
@@ -160,7 +160,7 @@ private:
  */
 class HCondition
 	{
-	typedef HCondition self_t;
+	typedef HCondition this_type;
 	HChunk _buf;
 	HMutex& _mutex;
 public:

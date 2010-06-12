@@ -41,8 +41,8 @@ namespace tools
 class HPipedChild : public yaal::hcore::HStreamInterface
 	{
 protected:
-	typedef HPipedChild self_t;
-	typedef HStreamInterface hier_t;
+	typedef HPipedChild this_type;
+	typedef HStreamInterface base_type;
 public:
 	/*! \brief Child process output stream types.
 	 */

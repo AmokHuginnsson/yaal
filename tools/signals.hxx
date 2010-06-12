@@ -48,7 +48,7 @@ namespace tools
 class HSignalService
 	{
 protected:
-	typedef HSignalService self_t;
+	typedef HSignalService this_type;
 public:
 	typedef yaal::hcore::HBoundCall<1, int, int> handler_t;
 private:

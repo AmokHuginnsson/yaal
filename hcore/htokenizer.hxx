@@ -44,7 +44,7 @@ namespace hcore
  */
 class HTokenizer
 	{
-	typedef HTokenizer self_t;
+	typedef HTokenizer this_type;
 public:
 	typedef enum
 		{
@@ -71,7 +71,7 @@ private:
  */
 class HTokenizer::HIterator
 	{
-	typedef HTokenizer::HIterator self_t;
+	typedef HTokenizer::HIterator this_type;
 	HTokenizer const* _owner;
 	int long _start;
 	mutable HString _buffer;

@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/base.hxx"
 #include "hcore/trait.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal
 {
@@ -157,23 +158,23 @@ public:
 	explicit HPointer( real_t* const );
 	virtual ~HPointer( void );
 	HPointer( HPointer const& );
-	template<typename hier_t, template<typename, typename>class alien_access_t>
-	HPointer( HPointer<hier_t, pointer_type_t, alien_access_t> const& );
+	template<typename alien_t, template<typename, typename>class alien_access_t>
+	HPointer( HPointer<alien_t, pointer_type_t, alien_access_t> const& );
 	HPointer& operator = ( HPointer const& );
-	template<typename hier_t, template<typename, typename>class alien_access_t>
-	HPointer& operator = ( HPointer<hier_t, pointer_type_t, alien_access_t> const& );
+	template<typename alien_t, template<typename, typename>class alien_access_t>
+	HPointer& operator = ( HPointer<alien_t, pointer_type_t, alien_access_t> const& );
 	const_reference operator* ( void ) const;
 	reference operator* ( void );
 	const_reference operator[] ( int ) const;
 	reference operator[] ( int );
-	template<typename hier_t, template<typename, typename>class alien_access_t>
-	bool operator == ( HPointer<hier_t, pointer_type_t, alien_access_t> const& ) const;
-	template<typename hier_t>
-	bool operator == ( hier_t const* const ) const;
-	template<typename hier_t, template<typename, typename>class alien_access_t>
-	bool operator != ( HPointer<hier_t, pointer_type_t, alien_access_t> const& ) const;
-	template<typename hier_t>
-	bool operator != ( hier_t const* const ) const;
+	template<typename alien_t, template<typename, typename>class alien_access_t>
+	bool operator == ( HPointer<alien_t, pointer_type_t, alien_access_t> const& ) const;
+	template<typename alien_t>
+	bool operator == ( alien_t const* const ) const;
+	template<typename alien_t, template<typename, typename>class alien_access_t>
+	bool operator != ( HPointer<alien_t, pointer_type_t, alien_access_t> const& ) const;
+	template<typename alien_t>
+	bool operator != ( alien_t const* const ) const;
 	tType const* operator->( void ) const;
 	tType* operator->( void );
 	tType const* raw( void ) const;
@@ -183,11 +184,11 @@ public:
 	void reset( void );
 private:
 	bool release( void ) throw();
-	template<typename hier_t, template<typename, typename> class alien_access_t>
-	void acquire( HPointer<hier_t, pointer_type_t, alien_access_t> const& );
+	template<typename alien_t, template<typename, typename> class alien_access_t>
+	void acquire( HPointer<alien_t, pointer_type_t, alien_access_t> const& );
 	void assign( tType*&, tType* );
-	template<typename hier_t>
-	void assign( tType*&, hier_t* );
+	template<typename alien_t>
+	void assign( tType*&, alien_t* );
 	friend struct pointer_helper;
 	};
 
@@ -325,8 +326,8 @@ HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<tType, pointe
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-template<typename hier_t, template<typename, typename>class alien_access_t>
-HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<hier_t, pointer_type_t, alien_access_t> const& pointer_ )
+template<typename alien_t, template<typename, typename>class alien_access_t>
+HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ )
 	: _shared( NULL ), _object( NULL )
 	{
 	acquire( pointer_ );
@@ -343,8 +344,8 @@ HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, 
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-template<typename hier_t, template<typename, typename>class alien_access_t>
-HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<hier_t, pointer_type_t, alien_access_t> const& pointer_ )
+template<typename alien_t, template<typename, typename>class alien_access_t>
+HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ )
 	{
 	acquire( pointer_ );
 	return ( *this );
@@ -352,22 +353,22 @@ HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, 
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-template<typename hier_t, template<typename, typename>class alien_access_t>
-void HPointer<tType, pointer_type_t, access_type_t>::acquire( HPointer<hier_t, pointer_type_t, alien_access_t> const& from )
+template<typename alien_t, template<typename, typename>class alien_access_t>
+void HPointer<tType, pointer_type_t, access_type_t>::acquire( HPointer<alien_t, pointer_type_t, alien_access_t> const& from )
 	{
 	HPointer const& alien = reinterpret_cast<HPointer const&>( from );
 	if ( ( &alien != this ) && ( _shared != alien._shared ) )
 		{
 		M_ASSERT( ( ! ( _shared && alien._shared ) )
 				|| ( ( _shared && alien._shared )
-					&& ( _object != reinterpret_cast<hier_t*>( alien._object ) ) ) );
+					&& ( _object != reinterpret_cast<alien_t*>( alien._object ) ) ) );
 		if ( _shared )
 			release();
 		if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) )
 			{
 			access_type_t<tType, pointer_type_t<tType> >::inc_reference_counter( alien._shared->_referenceCounter );
 			_shared = alien._shared;
-			assign( _object, reinterpret_cast<hier_t*>( alien._object ) );
+			assign( _object, reinterpret_cast<alien_t*>( alien._object ) );
 			}
 		else
 			{
@@ -380,8 +381,8 @@ void HPointer<tType, pointer_type_t, access_type_t>::acquire( HPointer<hier_t, p
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-template<typename hier_t>
-void HPointer<tType, pointer_type_t, access_type_t>::assign( tType*& to, hier_t* from )
+template<typename alien_t>
+void HPointer<tType, pointer_type_t, access_type_t>::assign( tType*& to, alien_t* from )
 	{
 	to = dynamic_cast<tType*>( from );
 	return;
@@ -470,47 +471,47 @@ typename HPointer<tType, pointer_type_t, access_type_t>::reference HPointer<tTyp
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-template<typename hier_t, template<typename, typename>class alien_access_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator == ( HPointer<hier_t, pointer_type_t, alien_access_t>const & pointer_ ) const
+template<typename alien_t, template<typename, typename>class alien_access_t>
+bool HPointer<tType, pointer_type_t, access_type_t>::operator == ( HPointer<alien_t, pointer_type_t, alien_access_t>const & pointer_ ) const
 	{
 	HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-	return ( _object == reinterpret_cast<hier_t*>( alien->_object ) );
+	return ( _object == reinterpret_cast<alien_t*>( alien->_object ) );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-template<typename hier_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator == ( hier_t const* const pointer_ ) const
+template<typename alien_t>
+bool HPointer<tType, pointer_type_t, access_type_t>::operator == ( alien_t const* const pointer_ ) const
 	{
 	return ( _object == pointer_ );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-template<typename hier_t, template<typename, typename>class alien_access_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator != ( HPointer<hier_t, pointer_type_t, alien_access_t>const & pointer_ ) const
+template<typename alien_t, template<typename, typename>class alien_access_t>
+bool HPointer<tType, pointer_type_t, access_type_t>::operator != ( HPointer<alien_t, pointer_type_t, alien_access_t>const & pointer_ ) const
 	{
 	return ( ! operator == ( pointer_ ) );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
-template<typename hier_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator != ( hier_t const* const pointer_ ) const
+template<typename alien_t>
+bool HPointer<tType, pointer_type_t, access_type_t>::operator != ( alien_t const* const pointer_ ) const
 	{
 	return ( ! operator == ( pointer_ ) );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t, typename hier_t>
-bool operator == ( hier_t const* const pointer_, HPointer<tType, pointer_type_t, access_type_t> const& smartPointer_ )
+				 template<typename, typename>class access_type_t, typename alien_t>
+bool operator == ( alien_t const* const pointer_, HPointer<tType, pointer_type_t, access_type_t> const& smartPointer_ )
 	{
 	return ( smartPointer_ == pointer_ );
 	}
 
 template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t, typename hier_t>
-bool operator != ( hier_t const* const pointer_, HPointer<tType, pointer_type_t, access_type_t> const& smartPointer_ )
+				 template<typename, typename>class access_type_t, typename alien_t>
+bool operator != ( alien_t const* const pointer_, HPointer<tType, pointer_type_t, access_type_t> const& smartPointer_ )
 	{
 	return ( smartPointer_ != pointer_ );
 	}
@@ -643,7 +644,7 @@ typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_dyna
 }
 
 template<typename tType, template<typename>class pointer_type_t, template<typename, typename>class access_type_t>
-inline void swap( yaal::hcore::HPointer<hier_t, pointer_type_t, access_type_t>& a, yaal::hcore::HPointer<hier_t, pointer_type_t, access_type_t>& b )
+inline void swap( yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& a, yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& b )
 	{ a.swap( b ); }
 
 }
