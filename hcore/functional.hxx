@@ -524,10 +524,9 @@ binary_negate<F> not2( F f_ )
 template<typename tType>
 struct identity : public unary_function<tType, tType>
 	{
-	typedef typename trait::strip_reference<tType>::type type;
-	type const& operator()( type const& v_ ) const
+	typename trait::make_reference<tType const>::type operator()( typename trait::make_reference<tType const>::type v_ ) const
 		{ return ( v_ ); }
-	type& operator()( type& v_ )
+	typename trait::make_reference<tType>::type operator()( typename trait::make_reference<tType>::type v_ )
 		{ return ( v_ ); }
 	};
 
