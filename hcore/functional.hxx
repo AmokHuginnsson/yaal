@@ -578,7 +578,7 @@ private:
 	G2 _g2;
 public:
 	binary_composition( F f_, G1 g1_, G2 g2_ ) : _f( f_ ), _g1( g1_ ), _g2( g2_ ) {}
-	result_type operator()( first_argument_type const& arg1_, second_argument_type const& arg2_ ) const
+	result_type operator()( typename trait::make_reference<first_argument_type const>::type arg1_, typename trait::make_reference<second_argument_type const>::type arg2_ ) const
 		{
 		return ( _f( _g1( arg1_ ), _g2( arg2_ ) ) );
 		}
