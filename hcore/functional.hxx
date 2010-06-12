@@ -445,7 +445,7 @@ private:
 	G _g;
 public:
 	unary_compose( F f_, G g_ ) : _f( f_ ), _g( g_ ) {}
-	result_type operator()( argument_type const& arg_ ) const
+	result_type operator()( typename trait::make_reference<argument_type const>::type arg_ ) const
 		{
 		return ( _f( _g( arg_ ) ) );
 		}
