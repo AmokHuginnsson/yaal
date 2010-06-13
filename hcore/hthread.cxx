@@ -24,9 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <ctime> /* clock_gettime */
+#include <cstring>
 #include <pthread.h>
 #include <semaphore.h>
-#include <cstring>
 #include <unistd.h>
 #include <libintl.h>
 
