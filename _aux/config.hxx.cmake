@@ -1,3 +1,5 @@
+#ifndef YAAL_CONFIG_HXX_INCLUDED
+#define YAAL_CONFIG_HXX_INCLUDED 1
 #define PACKAGE_NAME "yaal"
 #define PACKAGE_VERSION "0.0.0"
 #cmakedefine01 HAVE_STRCASESTR
@@ -44,4 +46,11 @@
 #define localtime_r( x, y ) localtime_s( ( y ), ( x ) )
 #define gmtime_r( x, y ) gmtime_s( ( y ), ( x ) )
 #define __va_copy( x, y ) ( ( x ) = ( y ) )
+#ifdef _CTIME_
+#include <pthread.h>
+static int const CLOCK_REALTIME = 0;
+#endif /* _CTIME */
+inline char const* strptime( char const*, char const*, struct tm* )
+	{	return ( "" ); }
 #endif /* __MSVCXX__ */
+#endif /* not YAAL_CONFIG_HXX_INCLUDED */

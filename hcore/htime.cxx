@@ -55,7 +55,7 @@ HTime::HTime( char const* const strTime_ )
 	_cache( 1, HChunk::STRATEGY::GEOMETRIC ), _value(), _broken()
 	{
 	M_PROLOG
-	char* err = ::strptime( strTime_, _format.raw(), &_broken );
+	char const* err( ::strptime( strTime_, _format.raw(), &_broken ) );
 	if ( ! err )
 		err = ::strptime( strTime_, "%F %T", &_broken );
 	M_ENSURE( err );
