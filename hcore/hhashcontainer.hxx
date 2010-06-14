@@ -136,7 +136,7 @@ public:
 			}
 		if ( ! _atom )
 			{
-			HHashContainer::HAbstractAtom* const* buckets( _owner->_buckets.get<HHashContainer::HAbstractAtom*>() );
+			HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
 			while ( ( _index < _owner->_prime ) && ! buckets[ _index ] )
 				_index ++;
 			if ( _index < _owner->_prime )

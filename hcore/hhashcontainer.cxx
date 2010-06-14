@@ -68,7 +68,7 @@ void HHashContainer::clear( void )
 	{
 	M_PROLOG
 	
-	HAbstractAtom** buckets( _buckets.get<HAbstractAtom*>() );
+	HAbstractAtom** buckets = _buckets.get<HAbstractAtom*>();
 	for ( int long i = 0; i < _prime; i ++ )
 		{
 		HAbstractAtom* atom( buckets[ i ] );
@@ -88,7 +88,7 @@ void HHashContainer::clear( void )
 void HHashContainer::erase( HIterator const& it )
 	{
 	M_PROLOG
-	HAbstractAtom** buckets( _buckets.get<HAbstractAtom*>() );
+	HAbstractAtom** buckets = _buckets.get<HAbstractAtom*>();
 	HAbstractAtom* atom( buckets[ it._index ] );
 	HAbstractAtom* ancestor( NULL );
 	M_ASSERT( atom );
@@ -126,8 +126,8 @@ void HHashContainer::copy_from( HHashContainer const& src_ )
 	{
 	M_PROLOG
 	HChunk newBuckets( src_._buckets.get_size(), HChunk::STRATEGY::EXACT );
-	HAbstractAtom const* const* otherBuckets( src_._buckets.get<HAbstractAtom const*>() );
-	HAbstractAtom** buckets( newBuckets.get<HAbstractAtom*>() );
+	HAbstractAtom const* const* otherBuckets = src_._buckets.get<HAbstractAtom const*>();
+	HAbstractAtom** buckets = newBuckets.get<HAbstractAtom*>();
 	for ( int long i( 0 ); i < src_._prime; ++ i )
 		{
 		HAbstractAtom const* origAtom( otherBuckets[ i ] );

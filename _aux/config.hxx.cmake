@@ -28,3 +28,20 @@
 #cmakedefine01 HAVE_GPM_H
 #cmakedefine01 HAVE_NCURSES_CURSES_H
 #cmakedefine01 HAVE_CURSES_H
+#ifndef __GNUC__
+#define __attribute__( x ) /**/
+#endif /* not __GNUC__ */
+#ifdef __MSVCXX__
+#pragma warning( disable : 4068 )
+#pragma warning( disable : 4180 )
+#pragma warning( disable : 4250 )
+#pragma warning( disable : 4351 )
+#pragma warning( disable : 4355 )
+#pragma warning( disable : 4646 )
+#pragma warning( disable : 4996 )
+#define snprintf _snprintf
+#define strcasecmp stricmp
+#define localtime_r( x, y ) localtime_s( ( y ), ( x ) )
+#define gmtime_r( x, y ) gmtime_s( ( y ), ( x ) )
+#define __va_copy( x, y ) ( ( x ) = ( y ) )
+#endif /* __MSVCXX__ */
