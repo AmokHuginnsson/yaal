@@ -108,9 +108,9 @@ void HZipStream::init( void )
 	zstream->opaque = Z_NULL;
 	zstream->avail_in = 0;
 	zstream->next_in = Z_NULL;
-	zstream->avail_out = 0;
+	zstream->avail_out = static_cast<uInt>( _zBufferOut.get_size() );
 	zstream->next_out = Z_NULL;
-	M_ENSURE( ( _error = ( ( _mode == MODE::DEFLATE ) ? deflateInit( zstream, _compressionLevel_ ) : inflateInit( zstream ) ) ) );
+	M_ENSURE( ( _error = ( ( _mode == MODE::DEFLATE ) ? deflateInit( zstream, _compressionLevel_ ) : inflateInit( zstream ) ) ) == Z_OK );
 	return;
 	M_EPILOG
 	}
@@ -170,12 +170,16 @@ int long HZipStream::prepare_data( void )
 	int long const CHUNK( _zBufferIn.get_size() );
 	void* in = _zBufferIn.raw();
 	int long nRead( _streamRef->read( in, CHUNK ) );
-	zstream->next_in = static_cast<Bytef*>( in );
-	zstream->avail_in = static_cast<uInt>( nRead );
-	zstream->next_out = reinterpret_cast<Bytef*>( _zBufferOut.raw() );
-	zstream->avail_out = static_cast<uInt>( CHUNK );
-	_error = inflate( zstream, Z_NO_FLUSH );
-	return ( _error != Z_STREAM_END ? CHUNK - zstream->avail_out : 0 );
+	if ( nRead > 0 )
+		{
+		zstream->next_in = static_cast<Bytef*>( in );
+		zstream->avail_in = static_cast<uInt>( nRead );
+		zstream->next_out = reinterpret_cast<Bytef*>( _zBufferOut.raw() );
+		zstream->avail_out = static_cast<uInt>( CHUNK );
+		_error = inflate( zstream, Z_NO_FLUSH );
+		M_ENSURE( ( _error == Z_OK ) || ( _error == Z_STREAM_END ) );
+		}
+	return ( nRead > 0 ? CHUNK - zstream->avail_out : 0 );
 	M_EPILOG
 	}
 
@@ -185,21 +189,22 @@ int long HZipStream::do_read( void* const buf_, int long const& size_ )
 	M_ASSERT( _streamRef );
 	z_stream* zstream( _zStream.get<z_stream>() );
 	int long const CHUNK( _zBufferOut.get_size() );
-	int long toCopy( size_ );
-	while ( toCopy > 0 )
+	char* buf( _zBufferOut.raw() );
+	int long copied( 0 );
+	while ( copied < size_ )
 		{
-		int long have( min( CHUNK - zstream->avail_out, toCopy ) );
-		if ( ! have )
+		int long have( min( ( CHUNK - zstream->avail_out ) - _offset, size_ - copied ) );
+		if ( have < 1 )
 			{
-			if ( ! prepare_data() )
+			if ( ( _error == Z_STREAM_END ) || ! prepare_data() )
 				break;
 			continue;
 			}
-		::memcpy( buf_, zstream->next_out + _offset, have );
-		toCopy -= have;
+		::memcpy( static_cast<char*>( buf_ ) + copied, buf + _offset, have );
+		copied += have;
 		_offset += have;
 		}
-	return ( _offset );
+	return ( copied );
 	M_EPILOG
 	}
 
