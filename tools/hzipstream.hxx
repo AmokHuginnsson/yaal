@@ -63,7 +63,9 @@ private:
 	owned_stream_t _streamOwned;
 	yaal::hcore::HStreamInterface* _streamRef;
 	yaal::hcore::HChunk _zStream;
-	yaal::hcore::HChunk _zBuffer;
+	yaal::hcore::HChunk _zBufferIn;
+	yaal::hcore::HChunk _zBufferOut;
+	int long _offset;
 public:
 	HZipStream( MODE::mode_t );
 	virtual ~HZipStream( void );
@@ -76,6 +78,8 @@ public:
 	char const* error_message( int );
 private:
 	void init( void );
+	void cleanup( void );
+	int long prepare_data( void );
 	virtual int long do_write( void const* const, int long const& );
 	virtual int long do_read( void* const, int long const& );
 	virtual void do_flush( void ) const;
