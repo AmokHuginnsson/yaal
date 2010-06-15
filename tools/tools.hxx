@@ -45,6 +45,8 @@ extern yaal::hcore::HString _defaultEncoding_;
 extern HSerial::speed_t _baudRate_;
 extern HSerial::flag_t _serialFlags_;
 extern int _collectorConnectionTimeOut_;
+extern int _compressionLevel_;
+extern int long _zBufferSize_;
 extern bool _ignoreSignalSIGINT_;
 extern bool _ignoreSignalSIGTSTP_;
 extern bool _ignoreSignalSIGQUIT_;

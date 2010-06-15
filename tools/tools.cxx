@@ -77,7 +77,7 @@ int _collectorConnectionTimeOut_ = 9999;
 bool _ignoreSignalSIGINT_ = false;
 bool _ignoreSignalSIGTSTP_ = false;
 bool _ignoreSignalSIGQUIT_ = false;
-	
+
 namespace util
 	{
 extern char _transTableStripPL_ [ 256 ];
@@ -173,6 +173,8 @@ HToolsInitDeinit::HToolsInitDeinit( void )
 			( "ignore_signal_SIGQUIT", program_options_helper::option_value( _ignoreSignalSIGQUIT_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore QUIT, core dump signal" )
 			( "serial_device", program_options_helper::option_value( _serialDevice_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to serial device", "path" )
 			( "default_encoding", program_options_helper::option_value( _defaultEncoding_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "dafault character encoding used in text documents", "encoding" )
+			( "compression_level", program_options_helper::option_value( _compressionLevel_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "default compression level for zlib library", "level" )
+			( "compression_buffer_size", program_options_helper::option_value( _zBufferSize_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "size for compression buffer used in zlib library", "numBytes" )
 			( "collector_connection_timeout", program_options_helper::option_value( _collectorConnectionTimeOut_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "timeout on collector device read", "seconds" );
 	int ctr = 0;
 	errno = 0;

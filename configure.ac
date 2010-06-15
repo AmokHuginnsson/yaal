@@ -162,6 +162,7 @@ AC_SEARCH_LIBS([getaddrinfo],[socket getaddrinfo],,[AC_MSG_ERROR([Cannot continu
 AC_SEARCH_LIBS([libintl_gettext],[intl],,[AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([libiconv],[iconv]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([xml2],[xmlParseFile],,[AC_MSG_ERROR([Cannot continue without XML library.])]) LIBS=""
+AC_CHECK_LIB([z],[deflateEnd],,[AC_MSG_ERROR([Cannot continue without zlib library.])]) LIBS=""
 AC_CHECK_LIB([xslt],[xsltParseStylesheetFile],,[AC_MSG_ERROR([Cannot continue without XSLT library.])]) LIBS=""
 AC_SEARCH_LIBS([dlopen],[dl],,[AC_MSG_ERROR([Cannot continue without dynamic dynamic linker library.])]) TOOLS_LIBS="${TOOLS_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ncurses],[initscr],,[AC_MSG_ERROR([Cannot continue without ncurses.])]) LIBS=""
@@ -366,6 +367,7 @@ AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 LIBS="${HCORE_LIBS}"
 AC_CHECK_FUNCS([getline memrchr gethostbyname_r gethostbyaddr_r strcasestr strtold asprintf])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
+AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
 AC_MSG_CHECKING([whether basename is declared in string.h])
 AC_COMPILE_IFELSE([#include <string.h>
 									 int main( int, char** ){ char* p = NULL; basename( p ); return ( 0 ); }],[AC_MSG_RESULT([yes])],

@@ -68,6 +68,17 @@ ignore_signal_SIGQUIT false
 # specify default character encoding used in text documents
 default_encoding "ISO-8859-2"
 
+# compression_level
+# type: integer, default: -1
+# valid levels [-1..9]
+# sets default compression level for zlib libraary
+compression_level -1
+
+# compression_buffer_size
+# type: integer, default 262144
+# set size (in bytes) for memory buffer used for (de)compression in zlib libraary
+compression_buffer_size 262144
+
 # serial port configuration
 
 # serial_device
