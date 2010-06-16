@@ -193,7 +193,7 @@ int long HZipStream::do_read( void* const buf_, int long const& size_ )
 	int long copied( 0 );
 	while ( copied < size_ )
 		{
-		int long have( min( ( CHUNK - zstream->avail_out ) - _offset, size_ - copied ) );
+		int long have( min<int long>( ( CHUNK - zstream->avail_out ) - _offset, size_ - copied ) );
 		if ( have < 1 )
 			{
 			if ( ( _error == Z_STREAM_END ) || ! prepare_data() )
