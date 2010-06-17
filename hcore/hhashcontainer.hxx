@@ -221,7 +221,7 @@ HPair<HHashContainer::HIterator, bool> HHashContainer::insert( tType const& val_
 		/* I cannot use index calculated in find() call above because here we use different prime.
 		 */
 		int long newHash = yaal::abs( hasher_( val_ ) ) % _prime;
-		HAtom<typename hasher_t::value_type>** buckets( _buckets.get<HAtom<typename hasher_t::value_type>*>() );
+		HAtom<typename hasher_t::value_type>** buckets = _buckets.get<HAtom<typename hasher_t::value_type>*>();
 		atom->_next = buckets[ newHash ];
 		buckets[ newHash ] = atom;
 		++ _size;
@@ -249,8 +249,8 @@ void HHashContainer::resize( int long size_, hasher_t const& hasher_ )
 		int long prime( _primes_[ n - 1 ] );
 		HChunk buckets( chunk_size<HAtom<typename hasher_t::value_type>*>( prime ), HChunk::STRATEGY::GEOMETRIC );
 		M_ASSERT( ( buckets.size() / static_cast<int long>( sizeof ( HAtom<typename hasher_t::value_type>* ) ) ) >= prime );
-		HAtom<typename hasher_t::value_type>** oldBuckets( _buckets.get<HAtom<typename hasher_t::value_type>*>() );
-		HAtom<typename hasher_t::value_type>** newBuckets( buckets.get<HAtom<typename hasher_t::value_type>*>() );
+		HAtom<typename hasher_t::value_type>** oldBuckets = _buckets.get<HAtom<typename hasher_t::value_type>*>();
+		HAtom<typename hasher_t::value_type>** newBuckets = buckets.get<HAtom<typename hasher_t::value_type>*>();
 		for ( int long i( 0 ); i < _prime; ++ i )
 			{
 			HAtom<typename hasher_t::value_type>* a( oldBuckets[ i ] );
