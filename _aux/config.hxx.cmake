@@ -34,6 +34,8 @@
 #define __attribute__( x ) /**/
 #endif /* not __GNUC__ */
 #ifdef __MSVCXX__
+#define WIN32_LEAN_AND_MEAN 1
+#define VC_EXTRALEAN 1
 #pragma warning( disable : 4068 )
 #pragma warning( disable : 4180 )
 #pragma warning( disable : 4250 )
@@ -41,16 +43,28 @@
 #pragma warning( disable : 4355 )
 #pragma warning( disable : 4646 )
 #pragma warning( disable : 4996 )
+#undef HAVE_DECL_TEMP_FAILURE_RETRY
+#undef TEMP_FAILURE_RETRY
 #define snprintf _snprintf
 #define strcasecmp stricmp
-#define localtime_r( x, y ) localtime_s( ( y ), ( x ) )
-#define gmtime_r( x, y ) gmtime_s( ( y ), ( x ) )
 #define __va_copy( x, y ) ( ( x ) = ( y ) )
+#ifdef PTHREAD_H
+#define pthread_self() pthread_self().p
+#endif /* PTHREAD_H */
 #ifdef _CTIME_
 #include <pthread.h>
+#include <bits/types.h>
+extern int clock_gettime( __clockid_t, struct timespec* );
 static int const CLOCK_REALTIME = 0;
 #endif /* _CTIME */
-inline char const* strptime( char const*, char const*, struct tm* )
-	{	return ( "" ); }
+#ifdef _CSTRING_
+#include <pthread.h>
+/* Those functions are available from libgw32c library, but declarations
+ * are placed in glibc/string.h which horribly conflicts with Visual C++. */
+extern void* memrchr( void const*, int, size_t );
+extern char *basename ( char const* );
+extern char* strptime( char const*, char const*, struct tm* );
+#endif /* _CSTRING_ */
+#include "cleanup.hxx"
 #endif /* __MSVCXX__ */
 #endif /* not YAAL_CONFIG_HXX_INCLUDED */
