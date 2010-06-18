@@ -39,6 +39,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hxml.hxx"
+
 #include "hcore/htokenizer.hxx"
 #include "hcore/hsingleton.hxx"
 #include "hcore/hresource.hxx"
@@ -54,13 +55,13 @@ namespace
 {
 
 /* char schema_err[] = "bad xml schema"; */
-typedef HResource<xmlDoc, __decltype( &xmlFreeDoc )> doc_resource_t;
-typedef HResource<xmlTextWriter, __decltype( &xmlFreeTextWriter )> writer_resource_t;
-typedef HResource<xmlCharEncodingHandler, __decltype( &xmlCharEncCloseFunc )> encoder_resource_t;
-typedef HResource<xsltStylesheet, __decltype( &xsltFreeStylesheet )> style_resource_t;
-typedef HResource<xmlXPathContext, __decltype( &xmlXPathFreeContext )> xpath_context_resource_t;
-typedef HResource<xmlXPathObject, __decltype( &xmlXPathFreeObject )> xpath_object_resource_t;
-typedef HResource<xmlOutputBuffer, __decltype( &xmlOutputBufferClose )> outputbuffer_resource_t;
+typedef HResource<xmlDoc, void (*)( xmlDocPtr )> doc_resource_t;
+typedef HResource<xmlTextWriter, void (*)( xmlTextWriterPtr )> writer_resource_t;
+typedef HResource<xmlCharEncodingHandler, int (*)( xmlCharEncodingHandler* )> encoder_resource_t;
+typedef HResource<xsltStylesheet, void (*)( xsltStylesheetPtr )> style_resource_t;
+typedef HResource<xmlXPathContext, void (*)( xmlXPathContextPtr )> xpath_context_resource_t;
+typedef HResource<xmlXPathObject, void (*)( xmlXPathObjectPtr )> xpath_object_resource_t;
+typedef HResource<xmlOutputBuffer, int (*)( xmlOutputBufferPtr )> outputbuffer_resource_t;
 typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 
 HString get_stream_id( HStreamInterface* stream )

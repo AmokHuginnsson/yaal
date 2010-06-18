@@ -10,9 +10,14 @@
 #define __intptr_t_defined 1
 #endif /* _WIN64 */
 
+#define __dev_t_defined 1
+
 #define ip_opts CONCATENATE( ip_opts, __COUNTER__ )
 #define unlink CONCATENATE( unlink, __COUNTER__ )
 #define unlink1 unlink
+
+#define _exit CONCATENATE( _exit, __COUNTER__ )
+#define _exit1 _exit
 
 #define swab CONCATENATE( swab, __COUNTER__ )
 #define swab0 swab
