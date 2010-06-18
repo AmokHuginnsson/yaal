@@ -20,5 +20,7 @@
 #define _restrict m_restrict0
 #define restrict_t restrict_t0
 
+#define _WINSOCKAPI_ 1
+
 #endif /* not YAAL_MSVCXX_FIX_HXX_INCLUDED */
 

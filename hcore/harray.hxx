@@ -421,7 +421,7 @@ typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first, iterato
 	for ( iterator endIt = end();
 			( first != endIt );
 			++ first, ++ removed )
-		first->~value_type();
+		(*first).~value_type();
 	_size -= removed;
 	return ( last._index < _size ? last : end() );
 	M_EPILOG

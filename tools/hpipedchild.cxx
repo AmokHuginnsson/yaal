@@ -27,9 +27,9 @@ Copyright:
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+#include <csignal> /* for FreeBSD */
 #include <sys/wait.h>
 #include <unistd.h>
-#include <signal.h> /* for FreeBSD */
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )

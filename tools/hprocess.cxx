@@ -26,8 +26,8 @@ Copyright:
 
 #include <cstring>
 #include <cstdio>
+#include <csignal>
 #include <unistd.h>
-#include <signal.h>
 #include <libintl.h>
 
 #include "hcore/base.hxx"
