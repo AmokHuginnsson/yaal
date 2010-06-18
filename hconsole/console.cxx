@@ -417,7 +417,7 @@ int HConsole::c_vmvprintf( int row_, int column_,
 		}
 	else
 		M_ENSURE( move( row_, column_ ) != ERR );
-	error = vw_printw ( stdscr, format_, ap );
+	error = vw_printw( stdscr, format_, ap );
 	M_ENSURE( move( origRow, origColumn ) != ERR );
 	return ( error );
 	M_EPILOG
