@@ -66,7 +66,7 @@ HStreamInterface& HStreamInterface::do_output( char const* const& string_ )
 	{
 	M_PROLOG
 	if ( string_ )
-		do_write( string_, ::strlen( string_ ) );
+		do_write( string_, static_cast<int long>( ::strlen( string_ ) ) );
 	return ( *this );
 	M_EPILOG
 	}

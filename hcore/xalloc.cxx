@@ -100,7 +100,7 @@ char* xstrdup( char const* const str_ )
 		::perror( "xstrdup: request to duplicate NULL pointer string" );
 		::abort();
 		}
-	str = yaal::hcore::xcalloc<char>( ::strlen( str_ ) + 1 );
+	str = yaal::hcore::xcalloc<char>( static_cast<int long>( ::strlen( str_ ) ) + 1 );
 	::strcpy( str, str_ );
 	return ( str );
 	}

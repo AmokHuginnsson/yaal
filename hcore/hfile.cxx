@@ -253,8 +253,8 @@ int long HFile::get_line_length( void )
 	char const* ptr = NULL;
 	do
 		{
-		size = ::std::fread( buffer, sizeof ( char ),
-				SCAN_BUFFER_SIZE, static_cast<FILE*>( _handle ) );
+		size = static_cast<int long>( ::std::fread( buffer, sizeof ( char ),
+			SCAN_BUFFER_SIZE, static_cast<FILE*>( _handle ) ) );
 		length += size;
 		ptr = static_cast<char*>( ::std::memchr( buffer,
 					'\n', size ) );
@@ -263,7 +263,7 @@ int long HFile::get_line_length( void )
 	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ),
 				- length, SEEK_CUR ) == 0 );
 	if ( ptr )
-		length -= ( size - ( ptr + 1 - buffer ) ); /* + 1 for \n */
+		length -= ( size - static_cast<int long>( ptr + 1 - buffer ) ); /* + 1 for \n */
 	return ( length );
 	M_EPILOG
 	}
@@ -301,7 +301,7 @@ bool HFile::operator ! ( void ) const
 int long HFile::do_read( void* const buffer_, int long const& size_ )
 	{
 	M_PROLOG
-	int long len( ::std::fread( buffer_, sizeof ( char ), size_, static_cast<FILE*>( _handle ) ) );
+	int long len( static_cast<int long>( ::std::fread( buffer_, sizeof ( char ), size_, static_cast<FILE*>( _handle ) ) ) );
 	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG
 	}
@@ -310,7 +310,7 @@ int long HFile::do_write( void const* const string_, int long const& size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _handle );
-	int long len( ::std::fwrite( string_, sizeof ( char ), size_, static_cast<FILE*>( _handle ) ) );
+	int long len( static_cast<int long>( ::std::fwrite( string_, sizeof ( char ), size_, static_cast<FILE*>( _handle ) ) ) );
 	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG
 	}

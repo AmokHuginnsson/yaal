@@ -301,7 +301,7 @@ HTime::operator char const* ( void ) const
 					size, _format.raw(), &_broken ) ) < size );
 #else /* HAVE_SMART_STRFTIME */
 	_cache.realloc( 64 ); /* FIXME that is pretty dumb hack */
-	size = ::strftime( _cache.raw(), 63, _format.raw(), &_broken ) + 1;
+	size = static_cast<int long>( ::strftime( _cache.raw(), 63, _format.raw(), &_broken ) ) + 1;
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */

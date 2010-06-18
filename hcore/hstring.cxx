@@ -147,7 +147,7 @@ HString::HString( char const* const str_ )
 	M_PROLOG
 	if ( str_ )
 		{
-		_size = ::std::strlen( str_ );
+		_size = static_cast<int long>( ::std::strlen( str_ ) );
 		hs_realloc( _size + 1 );
 		::std::strcpy( _buffer, str_ );
 		}
@@ -493,7 +493,7 @@ int long HString::find( char const char_, int long after_ ) const
 	char* str = static_cast<char*>( ::std::memchr( _buffer + after_, char_, _size - after_ ) );
 	if ( ! str )
 		return ( - 1 );
-	return ( str - _buffer );
+	return ( static_cast<int long>( str - _buffer ) );
 	M_EPILOG
 	}
 
@@ -536,7 +536,7 @@ int long HString::find_one_of( char const* const set_,
 	char * str = ::std::strpbrk( _buffer + after_, set_ );
 	if ( ! str )
 		return ( - 1 );
-	return ( str - _buffer );
+	return ( static_cast<int long>( str - _buffer ) );
 	M_EPILOG
 	}
 
@@ -554,7 +554,7 @@ int long HString::reverse_find_one_of( char const* const set_,
 			set_, _size - before_ );
 	if ( ! str )
 		return ( - 1 );
-	return ( ( _size - 1 ) - ( str - _buffer ) );
+	return ( static_cast<int long>( ( _size - 1 ) - ( str - _buffer ) ) );
 	M_EPILOG
 	}
 
@@ -570,7 +570,7 @@ int long HString::find_other_than( char const* const set_,
 		return ( 0 );
 	if ( _size <= after_ )
 		return ( -1 );
-	int long index = ::std::strspn( _buffer + after_, set_ );
+	int long index = static_cast<int long>( ::std::strspn( _buffer + after_, set_ ) );
 	if ( ( index + after_ ) >= _size )
 		return ( - 1 );
 	return ( index + after_ );
@@ -607,7 +607,7 @@ int long HString::reverse_find( char const char_, int long before_ ) const
 	char* str = static_cast<char*>( ::memrchr( _buffer, char_, _size - before_ ) );
 	if ( ! str )
 		return ( -1 );
-	return ( ( _size - 1 ) - ( str - _buffer ) );
+	return ( static_cast<int long>( ( _size - 1 ) - ( str - _buffer ) ) );
 	M_EPILOG
 	}
 
@@ -905,7 +905,7 @@ HString& HString::insert( int long from_, int long length_, char const* chunk_ )
 HString& HString::insert( int long from_, char const* chunk_ )
 	{
 	M_PROLOG
-	return ( insert( from_, ::strlen( chunk_ ), chunk_ ) );
+	return ( insert( from_, static_cast<int long>( ::strlen( chunk_ ) ), chunk_ ) );
 	M_EPILOG
 	}
 
@@ -994,8 +994,8 @@ char* strrnpbrk( char const* const buffer_,
 	M_PROLOG
 	if ( length_ < 1 )
 		return ( NULL );
-	int long stopSetSize = ::std::strlen( stopSet_ );
-	int long index = length_ - 1;
+	int long stopSetSize( static_cast<int long>( ::std::strlen( stopSet_ ) ) );
+	int long index( length_ - 1 );
 	while ( index )
 		{
 		if ( ::std::memchr( stopSet_, buffer_[ index ], stopSetSize ) )
@@ -1010,8 +1010,8 @@ int long strrnspn( char const* const buffer_, char const* const skipSet_,
 		int const long length_ )
 	{
 	M_PROLOG
-	int long skipSetSize = ::std::strlen( skipSet_ );
-	int long index = length_ - 1;
+	int long skipSetSize( static_cast<int long>( ::std::strlen( skipSet_ ) ) );
+	int long index( length_ - 1 );
 	while ( index )
 		{
 		if ( ! ::std::memchr( skipSet_, buffer_[ index ], skipSetSize ) )

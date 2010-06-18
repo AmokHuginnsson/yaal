@@ -72,7 +72,7 @@ void* memrchr( void const* ptr, int what, int long from )
 #include <cstring>
 char* strcasestr( char const* haystack, char const* needle )
 	{
-	int long idx = ::yaal::hcore::string_helper::kmpcasesearch( ( haystack ), ::std::strlen( haystack ), ( needle ), ::std::strlen( needle ) );
+	int long idx = ::yaal::hcore::string_helper::kmpcasesearch( ( haystack ), static_cast<int long>( ::std::strlen( haystack ) ), ( needle ), static_cast<int long>( ::std::strlen( needle ) ) );
 	return ( idx >= 0 ? const_cast<char*>( haystack ) + idx : 0 );
 	}
 #endif /* not HAVE_STRCASESTR */

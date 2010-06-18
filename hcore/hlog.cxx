@@ -133,7 +133,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ )
         continue;
         }
       * ++ ptr = 0;
-      ::fseek( src, ptr - buf - len, SEEK_CUR );
+      ::fseek( src, static_cast<int long>( ptr - buf ) - len, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
 			_type = ::strtol( buf, NULL, 0x10 );
 			if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
@@ -200,8 +200,8 @@ void HLog::timestamp( void )
 	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
-	int long size = ::strftime( buffer, TIMESTAMP_SIZE, "%b %d %H:%M:%S",
-			brokenTime );
+	int long size = static_cast<int long>( ::strftime( buffer, TIMESTAMP_SIZE, "%b %d %H:%M:%S",
+			brokenTime ) );
 	if ( size > TIMESTAMP_SIZE )
 		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), size );
 	if ( _processName )

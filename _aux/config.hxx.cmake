@@ -62,9 +62,16 @@ static int const CLOCK_REALTIME = 0;
 /* Those functions are available from libgw32c library, but declarations
  * are placed in glibc/string.h which horribly conflicts with Visual C++. */
 extern void* memrchr( void const*, int, size_t );
-extern char *basename ( char const* );
+extern char* basename( char const* );
 extern char* strptime( char const*, char const*, struct tm* );
+extern char* strsignal( int );
 #endif /* _CSTRING_ */
+#ifdef _CSIGNAL_
+#include <glibc/signal.h>
+#endif /* _CSIGNAL_ */
+#ifdef _UNISTD_H
+#include <sys/select.h>
+#endif /* _UNISTD_H */
 #include "cleanup.hxx"
 #endif /* __MSVCXX__ */
 #endif /* not YAAL_CONFIG_HXX_INCLUDED */

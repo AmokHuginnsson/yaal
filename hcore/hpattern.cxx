@@ -263,7 +263,7 @@ char const* HPattern::matches( char const* const string_,
 void HPattern::prepare_error_message( HString const& string_ ) const
 	{
 	M_PROLOG
-	int long size = ::regerror( _lastError, _compiled.get<regex_t>(), NULL, 0 ) + 1;
+	int long size( static_cast<int long>( ::regerror( _lastError, _compiled.get<regex_t>(), NULL, 0 ) ) + 1 );
 	HChunk buffer( size + 1 );
 	M_ENSURE( static_cast<int>( ::regerror( _lastError, _compiled.get<regex_t>(),
 					buffer.raw(), size ) ) < size );

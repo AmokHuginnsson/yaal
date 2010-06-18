@@ -36,6 +36,34 @@ Copyright:
 namespace yaal
 {
 
+/*! \brief Check if type is a POD type.
+ *
+ * \tparam T - type to test.
+ * \retval value - true iff T is a POD type.
+ * \retval type - true_type iff T is a POD type.
+ */
+template<typename T>
+struct is_pod
+	{
+	static bool const value = trait::is_pointer<T>::value;
+	typedef typename trait::ternary<trait::is_pointer<T>::value, trait::true_type, trait::false_type>::type type;
+	};
+
+/*! \cond */
+template<> struct is_pod<bool> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<char> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<char unsigned> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<int short> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<int short unsigned> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<int> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<int unsigned> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<int long> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<int long unsigned> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<double> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<double long> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<float> { static bool const value = true; typedef trait::true_type type; };
+/*! \endcond */
+
 /*! \brief Check if type is an integral type.
  *
  * \tparam T - type to test.
