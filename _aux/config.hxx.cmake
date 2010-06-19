@@ -27,7 +27,7 @@
 #cmakedefine01 HAVE_LIBXML2_LIBXML_XMLVERSION_H
 #cmakedefine01 HAVE_EXECINFO_H
 #cmakedefine HAVE_SYS_CONSIO_H
-#cmakedefine01 HAVE_GPM_H
+#cmakedefine HAVE_GPM_H
 #cmakedefine01 HAVE_NCURSES_CURSES_H
 #cmakedefine01 HAVE_CURSES_H
 #ifndef __GNUC__
@@ -45,6 +45,8 @@
 #pragma warning( disable : 4996 )
 #undef HAVE_DECL_TEMP_FAILURE_RETRY
 #undef TEMP_FAILURE_RETRY
+#undef HAVE_GETHOSTBYNAME_R
+#define HAVE_GETHOSTBYNAME_R 1
 #define snprintf _snprintf
 #define strcasecmp stricmp
 #define __va_copy( x, y ) ( ( x ) = ( y ) )
@@ -72,6 +74,9 @@ extern char* strsignal( int );
 #ifdef _UNISTD_H
 #include <sys/select.h>
 #endif /* _UNISTD_H */
+#ifdef _SYS_SOCKET_H
+#include <glibc/errno.h>
+#endif /* _SYS_SOCKET_H */
 #include "cleanup.hxx"
 #endif /* __MSVCXX__ */
 #endif /* not YAAL_CONFIG_HXX_INCLUDED */

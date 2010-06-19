@@ -11,10 +11,11 @@
 #endif /* _WIN64 */
 
 #define __dev_t_defined 1
+#define __ino_t_defined 1
 
 #define ip_opts CONCATENATE( ip_opts, __COUNTER__ )
 #define unlink CONCATENATE( unlink, __COUNTER__ )
-#define unlink1 unlink
+#define unlink6 unlink1
 
 #define _exit CONCATENATE( _exit, __COUNTER__ )
 #define _exit1 _exit
