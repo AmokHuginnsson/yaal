@@ -14,8 +14,6 @@
 #define __ino_t_defined 1
 
 #define ip_opts CONCATENATE( ip_opts, __COUNTER__ )
-#define unlink CONCATENATE( unlink, __COUNTER__ )
-#define unlink6 unlink1
 
 #define _exit CONCATENATE( _exit, __COUNTER__ )
 #define _exit1 _exit
@@ -27,6 +25,12 @@
 #define restrict_t restrict_t0
 
 #define _WINSOCKAPI_ 1
+
+/* It must be included before <features.h> from GnuWin32 */
+#include <typeinfo>
+
+/* We do not need it and it gives linker a headache. */
+#define _INC_SWPRINTF_INL_ 1
 
 #endif /* not YAAL_MSVCXX_FIX_HXX_INCLUDED */
 
