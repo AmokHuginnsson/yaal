@@ -73,10 +73,8 @@ extern char* strsignal( int );
 #endif /* _CSIGNAL_ */
 #ifdef _UNISTD_H
 #include <sys/select.h>
-#endif /* _UNISTD_H */
-#ifdef _SYS_SOCKET_H
 #include <glibc/errno.h>
-#endif /* _SYS_SOCKET_H */
+#endif /* _UNISTD_H */
 #include "cleanup.hxx"
 #endif /* __MSVCXX__ */
 #endif /* not YAAL_CONFIG_HXX_INCLUDED */

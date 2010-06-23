@@ -19,6 +19,8 @@
 #undef clear
 #undef erase
 #undef move
+#undef write
+#undef read
 
 #ifndef YAAL_MSVCXX_CLEANUP_HXX_INCLUDED
 #define YAAL_MSVCXX_CLEANUP_HXX_INCLUDED

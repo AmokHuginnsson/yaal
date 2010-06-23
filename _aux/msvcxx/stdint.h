@@ -6,3 +6,4 @@
 #undef uintptr_t
 
 #endif /* not YAAL_MSVCXX_STDINT_H_INCLUDED */
+

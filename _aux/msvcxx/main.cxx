@@ -1,20 +1,5 @@
+#undef _INC_SWPRINTF_INL_
 #include <list>
-#include <WinSock2.h>
-#include <Windows.h>
-#include <dbghelp.h>
-#include <io.h>
-#include <cstdio>
-#include <cstdlib>
-
-#include "hcore/base.hxx"
-#include "hcore/xalloc.hxx"
-#include "hcore/hthread.hxx"
-#include "hcore/hlog.hxx"
-#include "tools/hpipedchild.hxx"
-
-#include "cxxabi.h"
-
-#include "cleanup.hxx"
 
 #define access gnu_access
 #define close gnu_close
@@ -23,22 +8,90 @@
 #define write gnu_write
 #define dup gnu_dup
 #define dup2 gnu_dup2
+#undef swab
 #define swab gnu_swab
 #define _environ gnu__environ
-#undef TEMP_FAILURE_RETRY
+#define fd_set gnu_fdset
+#define select gnu_select
+#define isatty gnu_isatty
+#define timespec gnu_timespec
+#define timeval gnu_timeval
+#define execl gnu_execl
+#define execle gnu_execle
+#define execv gnu_execv
+#define execve gnu_execve
+#define execlp gnu_execlp
+#define execvp gnu_execvp
+#define getpid gnu_getpid
 
-#include <glibc/sys/time.h>
 #include <unistd.h>
+#include <glibc/sys/time.h>
 #include <curses.h>
-#include <signal.h>
-#include <dirent.h>
 #include <pwd.h>
-#include <sys/wait.h>
+
+#define gethostname ms_gethostname
+#undef FD_SET
+#undef FD_CLR
+#undef FD_SETSIZE
+#undef FD_ISSET
+#undef FD_ZERO
+#undef access
+#undef close
+#undef lseek
+#undef read
+#undef write
+#undef dup
+#undef dup2
+#undef swab
+#undef _environ
+#undef fd_set
+#undef select
+#undef isatty
+#undef __volatile
+#undef timespec
+#undef timeval
+#undef execl
+#undef execle
+#undef execv
+#undef execve
+#undef execlp
+#undef execvp
+#undef getpid
+#undef timerclear
+#undef timercmp
+#undef MOUSE_MOVED
+#undef _WINSOCKAPI_
+
+#include <WinSock2.h>
+#include <Windows.h>
+#include <dbghelp.h>
+#include <process.h>
+#include <io.h>
+#include <cstdio>
+#include <cstdlib>
+
+#undef gethostname
+
+#include "hcore/base.hxx"
+#include "hcore/xalloc.hxx"
+#include "cleanup.hxx"
+#include "hcore/hthread.hxx"
+#include "hcore/hlog.hxx"
+#include "tools/hpipedchild.hxx"
+
+#include "cxxabi.h"
+
+#include "cleanup.hxx"
+
+#undef TEMP_FAILURE_RETRY
+#define TEMP_FAILURE_RETRY( x ) ( x )
 
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
+
+static int const SIGURG = 33;
 
 namespace abi
 {
@@ -77,7 +130,7 @@ bool SynchronizedQueue<T>::pop( T& elem )
 	if ( ! f_oData.empty() )
 		{
 		found = true;
-		elem = f_oData.head();
+		elem = f_oData.front();
 		f_oData.pop_front();
 		}
 	return ( ! found );
@@ -284,8 +337,6 @@ int listen( int const& s, int const& backlog )
 	return ( ret );
 	}
 
-
-#if 0
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
 	{
 	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, in_, out_, err_ ) );
@@ -335,5 +386,3 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	xfree( argv );
 	return ( pid );
 	}
-
-#endif
