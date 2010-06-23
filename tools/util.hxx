@@ -144,6 +144,18 @@ HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, bool damerau = tr
 
 }
 
+template<typename tType>
+class HScopedValueReplacement
+	{
+	tType _orig;
+	tType& _value;
+public:
+	HScopedValueReplacement( tType& value_ ) : _orig( value_), _value( value_ ) {}
+	HScopedValueReplacement( tType& value_, tType const& tmp_ ) : _orig( value_), _value( value_ ) { _value = tmp_; }
+	~HScopedValueReplacement( void )
+		{ _value = _orig; }
+	};
+
 }
 
 }
