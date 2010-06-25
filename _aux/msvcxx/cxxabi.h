@@ -7,6 +7,7 @@ namespace abi
 char* __cxa_demangle( char const* const, int, int, int* );
 
 }
+extern "C"
 int setenv( char const*, char const*, int const& );
 
 #endif /* not YAAL_MSVCXX_CXXABI_H_INCLUDED */

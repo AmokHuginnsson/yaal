@@ -1,4 +1,5 @@
 #undef _INC_SWPRINTF_INL_
+#define NtCurrentTeb NtCurrentTeb_off
 #include <list>
 
 #define access gnu_access
@@ -30,6 +31,16 @@
 #include <pwd.h>
 
 #define gethostname ms_gethostname
+#undef socket
+#undef bind
+#undef listen
+#undef accept
+#undef connect
+#undef shutdown
+#undef setsockopt
+#undef htons
+#undef ntohs
+#undef inet_ntop
 #undef FD_SET
 #undef FD_CLR
 #undef FD_SETSIZE
@@ -217,6 +228,7 @@ int getmouse( MEVENT* ev_ )
 	return ( 0 );
 	}
 
+extern "C"
 int poll( struct pollfd*, int, int )
 	{
 	return ( 0 );
@@ -273,7 +285,8 @@ int WSAAPI unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exc
 	return ( ret );
 	}
 
-SOCKET WSAAPI unix_socket( IN int af, IN int type, IN int protocol )
+extern "C"
+int unix_socket( int af, int type, int protocol )
 	{
 	SOCKET s = -1;
 	if ( af == PF_UNIX )
@@ -283,7 +296,8 @@ SOCKET WSAAPI unix_socket( IN int af, IN int type, IN int protocol )
 	return ( s );
 	}
 
-int WSAAPI unix_bind( int& s, __in_bcount(namelen) const struct sockaddr FAR * name, IN int namelen )
+extern "C"
+int unix_bind( int s, const struct sockaddr* name, socklen_t namelen )
 	{
 	int ret = 0;
 	if ( name->sa_family == PF_UNIX )
@@ -324,7 +338,8 @@ int WSAAPI unix_bind( int& s, __in_bcount(namelen) const struct sockaddr FAR * n
 	return ( ret );
 	}
 
-int listen( int const& s, int const& backlog )
+extern "C"
+int unix_listen( int const& s, int const& backlog )
 	{
 	int ret = 0;
 	if ( s < 1000 )
@@ -335,6 +350,62 @@ int listen( int const& s, int const& backlog )
 	else
 		ret = listen( static_cast<SOCKET>( s ), backlog );
 	return ( ret );
+	}
+
+extern "C"
+int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
+	{
+	return ( 0 );
+	}
+
+extern "C"
+int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
+	{
+	return ( 0 );
+	}
+
+extern "C"
+int unix_shutdown( int fd_, int how_ )
+	{
+	return ( 0 );
+	}
+
+extern "C"
+int unix_setsockopt( int fd_, int level_, int optname_, const void* optval_, socklen_t optlen_)
+	{
+	return ( 0 );
+	}
+
+typedef short unsigned uint16_t;
+
+extern "C"
+uint16_t unix_htons( uint16_t hostshort_ )
+	{
+	return ( 0 );
+	}
+
+extern "C"
+uint16_t unix_ntohs( uint16_t hostshort_ )
+	{
+	return ( 0 );
+	}
+
+extern "C"
+const char* unix_inet_ntop( int af_, const void* cp_, char* buf_, socklen_t len_ )
+	{
+	return ( 0 );
+	}
+
+extern "C"
+int long long unsigned __udivdi3( int long long unsigned a, int long long unsigned b )
+	{
+	return ( a / b );
+	}
+
+extern "C"
+int long long unsigned __umoddi3( int long long unsigned a, int long long unsigned b )
+	{
+	return ( a % b );
 	}
 
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )

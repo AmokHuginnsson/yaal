@@ -56,17 +56,17 @@
 #ifdef _CTIME_
 #include <pthread.h>
 #include <bits/types.h>
-extern int clock_gettime( __clockid_t, struct timespec* );
+extern "C" int clock_gettime( __clockid_t, struct timespec* );
 static int const CLOCK_REALTIME = 0;
 #endif /* _CTIME */
 #ifdef _CSTRING_
 #include <pthread.h>
 /* Those functions are available from libgw32c library, but declarations
  * are placed in glibc/string.h which horribly conflicts with Visual C++. */
-extern void* memrchr( void const*, int, size_t );
-extern char* basename( char const* );
-extern char* strptime( char const*, char const*, struct tm* );
-extern char* strsignal( int );
+extern "C" void* memrchr( void const*, int, size_t );
+extern "C" char* basename( char const* );
+extern "C" char* strptime( char const*, char const*, struct tm* );
+extern "C" char* strsignal( int );
 #endif /* _CSTRING_ */
 #ifdef _CSIGNAL_
 #include <glibc/signal.h>
