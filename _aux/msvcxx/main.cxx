@@ -28,9 +28,12 @@
 #include <unistd.h>
 #include <glibc/sys/time.h>
 #include <curses.h>
-#include <pwd.h>
 
-#define gethostname ms_gethostname
+#define getpwuid_r getpwuid_r_off
+#include <pwd.h>
+#undef getpwuid_r
+
+#undef gethostname
 #undef socket
 #undef bind
 #undef listen
@@ -189,6 +192,7 @@ int pthread_sigmask( int, sigset_t*, void* )
 	return ( 0 );
 	}
 
+extern "C"
 int getpwuid_r( uid_t, struct passwd* p, char* buf, int size, struct passwd** )
 	{
 	p->pw_name = buf;
@@ -196,12 +200,13 @@ int getpwuid_r( uid_t, struct passwd* p, char* buf, int size, struct passwd** )
 	return ( ! GetUserName( buf, &s ) );
 	}
 
+extern "C"
 int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, size_t a3, struct hostent** a4, int* a5 )
 	{
 	return ( 0 );
 	}
 
-int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a4, size_t a5, struct hostent** a6, int* a7 )
+int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a4, int long unsigned a5, struct hostent** a6, int* a7 )
 	{
 	return ( 0 );
 	}

@@ -163,6 +163,8 @@ add_dependencies( hdata${LIB_INFIX} hconsole${LIB_INFIX} dbwrapper${LIB_INFIX} t
 if ( CMAKE_HOST_WIN32 )
 	add_dependencies( hcore${LIB_INFIX} msvcxx )
 	target_link_libraries( hcore${LIB_INFIX} libgw32c libintl pthreadVCE2 libeay32MDd ssleay32MDd Ws2_32 Dbghelp regex curses msvcxx )
+	target_link_libraries( tools${LIB_INFIX} hcore${LIB_INFIX} )
+	target_link_libraries( dbwrapper${LIB_INFIX} tools${LIB_INFIX} )
 	message( "Processing component: " msvcxx )
 	file( GLOB SRCS ${yaal_SOURCE_DIR}/_aux/msvcxx/*.cxx )
 	file( GLOB HDRS ${yaal_SOURCE_DIR}/_aux/msvcxx/*.hxx ${yaal_SOURCE_DIR}/_aux/msvcxx/*.h ${yaal_SOURCE_DIR}/_aux/msvcxx/*/*.h )

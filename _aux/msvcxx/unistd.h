@@ -2,6 +2,7 @@
 #define YAAL_MSVCXX_UNISTD_H_INCLUDED 1
 
 #define unlink unlink_gnu
+#define gethostname w32_gethostname
 
 #include <glibc/unistd.h>
 
@@ -11,7 +12,7 @@
 
 #include "tools/hpipedchild.hxx"
 
-#define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( a_oImage, a_oArgv, l_piFileDesIn, l_piFileDesOut, l_piFileDesErr )
+#define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, fileDesIn, fileDesOut, fileDesErr )
 class HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn
 	{
 	int* _in;
