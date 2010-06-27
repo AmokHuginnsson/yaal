@@ -110,7 +110,11 @@ HDBWrapperInitDeinit::HDBWrapperInitDeinit( void )
 	M_EPILOG
 	}
 
-extern char const * _done_;
+extern char const* _done_;
+
+}
+
+}
 
 #if defined( __DYNAMIC_LINKER__ )
 static char const _dynamicLinkerPath_[]
@@ -135,8 +139,4 @@ int yaal_dbwrapper_main( int, char** )
 	return ( 0 );
 	}
 #endif /* __DYNAMIC_LINKER__ */
-
-}
-
-}
 

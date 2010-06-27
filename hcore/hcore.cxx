@@ -234,6 +234,10 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	return;
 	}
 
+}
+
+}
+
 #if defined( __DYNAMIC_LINKER__ )
 void yaal_hcore_banner( void )
 	{
@@ -244,7 +248,7 @@ void yaal_hcore_banner( void )
 	return;
 	}
 
-static char const _dynamicLinkerPath_ [ ]
+static char const _dynamicLinkerPath_[]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
 
 extern "C"
@@ -258,8 +262,4 @@ int yaal_hcore_main( int, char** )
 	return ( 0 );
 	}
 #endif /* __DYNAMIC_LINKER__ */
-
-}
-
-}
 

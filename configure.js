@@ -120,11 +120,11 @@ function makeBoostDesc( boostInfo ) {
 }
 
 function msg( str ) {
+	if ( str.charAt( str.length - 1 ) == '\n' )
+		str = str.substr( 0, str.length - 1 );
 	if ( ! FAST ) {
-		globalMessageBuffer += str;
-		if ( str.charAt( str.length - 1 ) != '\n' )
-			globalMessageBuffer += "\n";
-	} else {
+		globalMessageBuffer += ( str + "\n" );
+	} else if ( str.length > 0 ) {
 		WScript.echo( str );
 	}
 }
@@ -235,8 +235,14 @@ try {
 	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" " + CMAKELISTS_PATH;
 	msg( "Executing: " + cmdline );
 	cmd = shell.exec( cmdline );
-	msg( cmd.stdout.readAll() );
-	msg( cmd.stderr.readAll() );
+	var eoo = 0;
+	var eoe = 0;
+	while ( ( ! ( eoo = cmd.stdout.AtEndOfStream ) ) || ( ! ( eoe = cmd.stderr.AtEndOfStream ) ) ) {
+		if ( ! eoo )
+			msg( cmd.stdout.readLine() );
+		if ( ! eoe )
+			msg( cmd.stderr.readLine() );
+	}
 	if ( ! SILENT ) {
 		msg( "Done!" );
 		terminate( 0 );

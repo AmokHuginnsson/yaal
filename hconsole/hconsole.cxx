@@ -188,6 +188,10 @@ HConsoleInitDeinit::HConsoleInitDeinit( void )
 	M_EPILOG
 	}
 
+}
+
+}
+
 #if defined( __DYNAMIC_LINKER__ )
 static char const _dynamicLinkerPath_[]
 	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
@@ -211,8 +215,4 @@ int yaal_hconsole_main( int, char** )
 	return ( 0 );
 	}
 #endif /* __DYNAMIC_LINKER__ */
-
-}
-
-}
 
