@@ -1,5 +1,6 @@
 #undef _INC_SWPRINTF_INL_
 #define NtCurrentTeb NtCurrentTeb_off
+
 #include <list>
 
 #define access gnu_access
@@ -83,6 +84,7 @@
 #include <io.h>
 #include <cstdio>
 #include <cstdlib>
+#include <malloc.h>
 
 #undef gethostname
 
@@ -402,18 +404,6 @@ extern "C"
 const char* unix_inet_ntop( int af_, const void* cp_, char* buf_, socklen_t len_ )
 	{
 	return ( 0 );
-	}
-
-extern "C"
-int long long unsigned __udivdi3( int long long unsigned a, int long long unsigned b )
-	{
-	return ( a / b );
-	}
-
-extern "C"
-int long long unsigned __umoddi3( int long long unsigned a, int long long unsigned b )
-	{
-	return ( a % b );
 	}
 
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )

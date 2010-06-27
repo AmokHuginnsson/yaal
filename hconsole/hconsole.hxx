@@ -31,7 +31,7 @@ namespace yaal
 {
 
 namespace hconsole
-	{
+{
 
 extern int	_latency_;
 extern int	_attributeDisabled_;
@@ -48,9 +48,9 @@ extern bool	_leaveCtrlQ_;
 extern bool	_leaveCtrlBackSlash_;
 extern char	_commandComposeCharacter_;
 extern int	_commandComposeDelay_;
-void yaal_hconsole_banner ( void );
+void banner( void );
 
-	}
+}
 
 }
 

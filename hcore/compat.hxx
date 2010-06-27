@@ -84,6 +84,10 @@ int asprintf( char**, char const*, ... );
 static int const LOGIN_NAME_MAX = 16;
 #endif /* not LOGIN_NAME_MAX */
 
+#if ! defined( __DYNAMIC_LINKER__ )
+#define __DYNAMIC_LINKER__ ""
+#endif /* not __DYNAMIC_LINKER__ */
+
 #endif /* __YAAL_BUILD__ */
 
 #if ! defined( HAVE_PRETTY_FUNCTION )

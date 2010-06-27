@@ -44,6 +44,7 @@
 #pragma warning( disable : 4646 )
 #pragma warning( disable : 4996 )
 #undef HAVE_DECL_TEMP_FAILURE_RETRY
+#define HAVE_ICONV_INPUT_CONST 1
 #undef TEMP_FAILURE_RETRY
 #undef HAVE_GETHOSTBYNAME_R
 #define HAVE_GETHOSTBYNAME_R 1

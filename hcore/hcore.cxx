@@ -234,32 +234,29 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	return;
 	}
 
-}
-
-}
-
-#if defined( __DYNAMIC_LINKER__ )
-void yaal_hcore_banner( void )
+void banner( void )
 	{
 	::printf(
-			"%s\n"
-			"Available libraries:\n"
-			"\thcore\n", COPYRIGHT );
+		"%s\n"
+		"Available libraries:\n"
+		"\thcore\n", COPYRIGHT );
 	return;
 	}
 
-static char const _dynamicLinkerPath_[]
-	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
+}
+
+}
 
 extern "C"
 int yaal_hcore_main( int, char** )
 	{
-	if ( _dynamicLinkerPath_[ 0 ] )
+	static char const dynamicLinkerPath[]
+		__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
+	if ( dynamicLinkerPath[ 0 ] )
 		{
-		yaal_hcore_banner();
+		yaal::hcore::banner();
 		::exit( 0 );
 		}
 	return ( 0 );
 	}
-#endif /* __DYNAMIC_LINKER__ */
 

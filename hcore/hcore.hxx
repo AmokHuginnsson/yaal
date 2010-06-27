@@ -68,11 +68,13 @@ struct execution_info
  */
 void dump_call_stack( int const& frames );
 void init_locale( char const* const = NULL );
-void yaal_hcore_banner( void );
+void banner( void );
 
 }
 
 }
+
+
 
 #endif /* not YAAL_HCORE_HCORE_HXX_INCLUDED */
 

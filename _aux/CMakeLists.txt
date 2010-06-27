@@ -146,7 +146,8 @@ macro( yaal_make_component name )
 		get_target_property( TARGET_NAME ${name}${LIB_INFIX}-static LOCATION )
 		get_filename_component( TARGET_PATH ${TARGET_NAME} PATH )
 		add_custom_command( TARGET ${name}${LIB_INFIX}-static POST_BUILD COMMAND dumpbin /linkermember:1 ${TARGET_NAME} /out:${TARGET_PATH}/${name}${LIB_INFIX}.sym )
-		add_custom_command( TARGET ${name}${LIB_INFIX}-static POST_BUILD COMMAND makedef ${TARGET_PATH}/${name}${LIB_INFIX}.sym ${TARGET_PATH}/${name}${LIB_INFIX}.def )
+		add_custom_command( TARGET ${name}${LIB_INFIX}-static POST_BUILD COMMAND makedef ${TARGET_PATH}/${name}${LIB_INFIX}.sym ${TARGET_PATH}/${name}${LIB_INFIX}.def _yaal_hcore_main,_yaal_tools_main,_yaal_dbwrapper_main,_yaal_hconsole_main,_yaal_hdata_main,__CTA1H,__TI1H,_acosl,_asinl,_atanl,_coshl,_cosl,_expl,_floorl,_log10l,_logl,_powl,_sinhl,_sinl,_sqrtl,_tanhl,_tanl )
+
 		set_target_properties( ${name}${LIB_INFIX} PROPERTIES LINK_FLAGS "/DEF:${TARGET_PATH}/${name}${LIB_INFIX}.def /IGNORE:4102" )
 	endif ( CMAKE_HOST_WIN32 )
 	set_target_properties( ${name}${LIB_INFIX} PROPERTIES LINKER_LANGUAGE CXX LIBRARY_OUTPUT_DIRECTORY build/${CMAKE_BUILD_TYPE} )
@@ -173,7 +174,7 @@ add_dependencies( hdata${LIB_INFIX} hconsole${LIB_INFIX} dbwrapper${LIB_INFIX} t
 
 if ( CMAKE_HOST_WIN32 )
 	add_dependencies( hcore${LIB_INFIX} msvcxx )
-	target_link_libraries( hcore${LIB_INFIX} libgw32c libintl pthreadVCE2 libeay32MDd ssleay32MDd Ws2_32 Dbghelp regex curses msvcxx )
+	target_link_libraries( hcore${LIB_INFIX} libgw32c libintl pthreadVCE2 libeay32MDd ssleay32MDd Ws2_32 Dbghelp regex curses msvcxx libgcc )
 	target_link_libraries( tools${LIB_INFIX} hcore${LIB_INFIX} libxml2 libxslt zlib libiconv )
 	target_link_libraries( dbwrapper${LIB_INFIX} tools${LIB_INFIX} )
 	target_link_libraries( hconsole${LIB_INFIX} tools${LIB_INFIX} hcore${LIB_INFIX} )

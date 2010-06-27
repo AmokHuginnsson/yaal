@@ -38,7 +38,7 @@ namespace yaal
  * easies performing complex tasks.
  */
 namespace tools
-	{
+{
 	
 extern yaal::hcore::HString _serialDevice_;
 extern yaal::hcore::HString _defaultEncoding_;
@@ -50,9 +50,9 @@ extern int long _zBufferSize_;
 extern bool _ignoreSignalSIGINT_;
 extern bool _ignoreSignalSIGTSTP_;
 extern bool _ignoreSignalSIGQUIT_;
-void yaal_tools_banner( void );
+void banner( void );
 
-	}
+}
 
 }
 

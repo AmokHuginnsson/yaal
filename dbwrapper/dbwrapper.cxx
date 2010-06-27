@@ -112,31 +112,28 @@ HDBWrapperInitDeinit::HDBWrapperInitDeinit( void )
 
 extern char const* _done_;
 
-}
-
-}
-
-#if defined( __DYNAMIC_LINKER__ )
-static char const _dynamicLinkerPath_[]
-	__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
-
-void yaal_dbwrapper_banner( void )
+void banner( void )
 	{
-	fprintf ( stdout, "\tdbwrapper\n" );
+	::printf( "\tdbwrapper\n" );
 	return;
 	}
+
+}
+
+}
 
 extern "C"
 int yaal_dbwrapper_main( int, char** )
 	{
-	if ( _dynamicLinkerPath_[ 0 ] )
+	static char const dynamicLinkerPath[]
+		__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
+	if ( dynamicLinkerPath[ 0 ] )
 		{
-		yaal_hcore_banner();
-		yaal_tools_banner();
-		yaal_dbwrapper_banner();
+		yaal::hcore::banner();
+		yaal::tools::banner();
+		yaal::dbwrapper::banner();
 		::exit( 0 );
 		}
 	return ( 0 );
 	}
-#endif /* __DYNAMIC_LINKER__ */
 
