@@ -119,6 +119,7 @@ char* __cxa_demangle( char const* const a, int, int, int* )
 
 }
 
+extern "C"
 int sigemptyset( sigset_t* )
 	{
 	return ( 0 );
@@ -170,6 +171,7 @@ int kill( int pid, int signo )
 	return ( 0 );
 	}
 
+extern "C"
 int sigwait( sigset_t*, int* signo )
 	{
 	if ( g_oSignalQueue.pop( *signo ) )
@@ -187,6 +189,7 @@ void win_signal_handler( int signo )
 	g_oSignalQueue.push( signo );
 	}
 
+extern "C"
 int pthread_sigmask( int, sigset_t*, void* )
 	{
 	return ( 0 );
