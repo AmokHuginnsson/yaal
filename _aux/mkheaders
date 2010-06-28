@@ -28,8 +28,8 @@ sed -e 's/define[ \t]*PACKAGE_/define YAAL_PACKAGE_/g' "${DIR_BUILD}/config.hxx"
 head -26 ${DIR_HEADERS}/hcore/hstreaminterface.hxx | sed -e s/hstreaminterface/yaal/ > ${DIR_HEADERS}/yaal.hxx
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
-#ifndef YAAL_HXX_INCLUDED
-#define YAAL_HXX_INCLUDED
+#ifndef YAAL_YAAL_HXX_INCLUDED
+#define YAAL_YAAL_HXX_INCLUDED 1
 
 EOF
 
@@ -37,7 +37,7 @@ find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{ printf "#include <%s>\n"
 
 cat << EOF >> ${DIR_HEADERS}/yaal.hxx
 
-#endif /* not YAAL_HXX_INCLUDED */
+#endif /* not YAAL_YAAL_HXX_INCLUDED */
 
 EOF
 
