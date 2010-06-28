@@ -30,6 +30,7 @@
 #cmakedefine HAVE_GPM_H
 #cmakedefine01 HAVE_NCURSES_CURSES_H
 #cmakedefine01 HAVE_CURSES_H
+#ifdef __YAAL_BUILD__
 #ifndef __GNUC__
 #define __attribute__( x ) /**/
 #endif /* not __GNUC__ */
@@ -78,4 +79,5 @@ extern "C" char* strsignal( int );
 #endif /* _UNISTD_H */
 #include "cleanup.hxx"
 #endif /* __MSVCXX__ */
+#endif /* __YAAL_BUILD__ */
 #endif /* not YAAL_CONFIG_HXX_INCLUDED */

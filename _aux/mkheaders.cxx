@@ -37,6 +37,9 @@ void create_fucking_new_directory_no_matter_fucking_what( string const& );
 void remove_all( string const& );
 bool is_directory( string const& );
 string dirname( string const& );
+string basename( string const& );
+string strip_prefix( string, string );
+string dirname_basename( string const& );
 
 int main( int argc_, char** argv_ )
 	{
@@ -61,15 +64,17 @@ int main( int argc_, char** argv_ )
 		string dirRoot( argv_[1] );
 		string dirBuild( argv_[2] );
 		typedef set<string> paths_t;
+		vector<string> paths;
+		tokenize( argv_[3], paths, " \t;" );
 		set<string> headers;
-		tokenize( argv_[3], headers, " \t;" );
+		transform( paths.begin(), paths.end(), inserter( headers, headers.begin() ), bind2nd( ptr_fun( strip_prefix ), dirRoot + "/" ) );
 		if ( ! is_directory( dirRoot ) )
 			throw invalid_argument( "mkheaders: DIR_ROOT not a directory" );
 		if ( ! is_directory( dirBuild ) )
 			throw invalid_argument( "mkheaders: DIR_BUILD not a directory" );
 		string dirHeaders( dirBuild + "/yaal" );
 		set<string> components;
-		transform( headers.begin(), headers.end(), inserter( components, components.begin() ), dirname );
+		transform( paths.begin(), paths.end(), inserter( components, components.begin() ), dirname_basename );
 		cout << "Making headers ... " << endl
 			<< "dir root: " << dirRoot << endl
 			<< "dir build: " << dirBuild << endl
@@ -85,7 +90,7 @@ int main( int argc_, char** argv_ )
 		int toProcess( headers.size() );
 		cout << "Files to process: " << toProcess << endl;
 		for ( paths_t::const_iterator it = headers.begin(), end = headers.end(); it != end; ++ it )
-			process_file( *it, dirHeaders + "/" + *it );
+			process_file( dirRoot + "/" + *it, dirHeaders + "/" + *it );
 //		copy_file( s._configPath, s._destinationPath / s._configPath.leaf() );
 		ofstream o( ( dirHeaders + "/yaal.hxx" ).c_str() );
 		static char const D_UNIQ[] = "hstreaminterface";
@@ -108,6 +113,19 @@ int main( int argc_, char** argv_ )
 		for ( paths_t::const_iterator it = headers.begin(), end = headers.end(); it != end; ++ it )
 			o << "#include <yaal/" << *it << ">" << endl;
 		o << endl << "#endif /* not YAAL_YAAL_HXX_INCLUDED */" << endl << endl;
+		ifstream ci( ( dirRoot + "/config.hxx" ).c_str() );
+		ofstream co( ( dirHeaders + "/config.hxx" ).c_str() );
+		static char const PACKAGE_S[] = "define PACKAGE_";
+		while ( ! getline( ci, line ).fail() )
+			{
+			int pos = 0;
+			if ( ( pos = line.find( PACKAGE_S ) ) != string::npos )
+				{
+				line.erase( pos, sizeof ( PACKAGE_S ) - 1 );
+				line.insert( pos, "define YAAL_PACKAGE_" );
+				}
+			co << line << endl;
+			}
 		}
 	catch ( exception const& e )
 		{
@@ -167,7 +185,7 @@ void delete_fucking_old_files_no_matter_fucking_what( string const& p )
 void create_fucking_new_directory_no_matter_fucking_what( string const& p )
 	{
 	bool fail( false );
-	while ( ! is_directory( p ) );
+	while ( ! is_directory( p ) )
 		{
 		if ( fail )
 			{
@@ -204,6 +222,13 @@ string dirname( string const& p )
 			dir = p;
 		}
 	return ( dir );
+	}
+
+string basename( string const& p )
+	{
+	int long idx( 0 );
+	string name( ( ( idx = p.find_last_of( "/\\" ) ) != string::npos ) ? string( p, idx + 1 ) : p );
+	return ( name );
 	}
 
 void remove_all( string const& p )
@@ -262,5 +287,13 @@ void remove_all( string const& p )
 		}
 	else
 		unlink( toRemove.c_str() );
+	}
+
+string dirname_basename( string const& p )
+	{ return basename( dirname( p ) ); }
+
+string strip_prefix( string item_, string prefix_ )
+	{
+	return ( item_.find( prefix_ ) == 0 ? string( item_, prefix_.size() ) : item_ );
 	}
 
