@@ -14,9 +14,9 @@ else ( "${CMAKE_BUILD_TYPE}" STREQUAL "release" )
 	set( LIB_INFIX "" )
 endif ( "${CMAKE_BUILD_TYPE}" STREQUAL "debug" )
 
-if ( NOT ( $ENV{PREFIX} STREQUAL "" ) )
+if ( NOT ( "$ENV{PREFIX}" STREQUAL "" ) )
 	set( CMAKE_INSTALL_PREFIX $ENV{PREFIX} )
-endif ( NOT ( $ENV{PREFIX} STREQUAL "" ) )
+endif ( NOT ( "$ENV{PREFIX}" STREQUAL "" ) )
 
 #set( CMAKE_VERBOSE_MAKEFILE true )
 enable_language( C )
@@ -202,6 +202,6 @@ else ( CMAKE_HOST_WIN32 )
 	set_target_properties( headers PROPERTIES PUBLIC_HEADER ${HEADERS} )
 endif ( CMAKE_HOST_WIN32 )
 
-install( TARGETS ${COMPONENTS} ${DRIVERS} LIBRARY DESTINATION lib )
+install( TARGETS ${COMPONENTS} ${DRIVERS} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib )
 install( DIRECTORY ${TARGET_PATH}/yaal DESTINATION include )
 
