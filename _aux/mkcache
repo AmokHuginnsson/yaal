@@ -1,14 +1,15 @@
 #! /bin/sh
 
-/bin/rm -f ~/usr/lib/ld.so.cache
 HOST_OS_TYPE=`uname`
 
-if [ ! -z "${MAKE_CACHE}" ] ; then
+if [ ! -z "${PREFIX}" ] ; then
+
+	/bin/rm -f ${PREFIX}/lib/ld.so.cache
 
 	if [ "${HOST_OS_TYPE}" = "FreeBSD" ] ; then
-		/sbin/ldconfig -i -f ~/usr/lib/ld.so.cache ~/usr/lib
+		/sbin/ldconfig -i -f ${PREFIX}/lib/ld.so.cache ${PREFIX}/lib
 	elif [ "${HOST_OS_TYPE}" = "Linux" ] ; then
-		/sbin/ldconfig -f ~/lib/ld.so.conf -C ~/usr/lib/ld.so.cache ~/usr/lib > /dev/null 2> /dev/null
+		/sbin/ldconfig -f ${PREFIX}/lib/ld.so.conf -C ${PREFIX}/lib/ld.so.cache ${PREFIX}/lib > /dev/null 2> /dev/null
 	else
 		echo "Unknown host operating system type!"
 		exit 1
