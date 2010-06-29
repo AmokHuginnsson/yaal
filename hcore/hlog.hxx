@@ -1,5 +1,5 @@
 /*
----          libsource (c) 1978 by Marcin 'Amok' Konarski           ---
+---          `yaal' (c) 1978 by Marcin 'Amok' Konarski           ---
 
 	hlog.hxx - this file is integral part of `yaal' project.
 
@@ -68,7 +68,7 @@ private:
 	bool     _newLine;
 	int long _type;
 	size_t   _bufferSize;
-	char*    _processName;
+	char const* _processName;
 	HString  _loginName;
 	HChunk   _hostName;
 	HChunk   _buffer;

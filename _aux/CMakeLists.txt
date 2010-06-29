@@ -53,8 +53,15 @@ check_function_exists( gethostbyaddr_r HAVE_GETHOSTBYADDR_R )
 check_function_exists( memrchr HAVE_MEMRCHR )
 include( CheckSymbolExists )
 check_symbol_exists( TEMP_FAILURE_RETRY unistd.h HAVE_DECL_TEMP_FAILURE_RETRY )
-check_symbol_exists( getaddrinfo  netdb.h;netinet/in.h;sys/socket.h HAVE_DECL_GETADDRINFO )
+check_symbol_exists( getaddrinfo netdb.h;netinet/in.h;sys/socket.h HAVE_DECL_GETADDRINFO )
 check_symbol_exists( SUN_LEN sys/un.h HAVE_DECL_SUN_LEN )
+check_symbol_exists( B76800 termios.h HAVE_DECL_B76800 )
+check_symbol_exists( B28800 termios.h HAVE_DECL_B28800 )
+check_symbol_exists( B14400 termios.h HAVE_DECL_B14400 )
+check_symbol_exists( B7200 termios.h HAVE_DECL_B7200 )
+check_symbol_exists( SIGIOT csignal HAVE_DECL_SIGIOT )
+check_symbol_exists( VSWTC termios.h HAVE_DECL_VSWTC )
+check_symbol_exists( ERR cstdlib HAVE_DECL_ERR )
 if ( CMAKE_HOST_WIN32 )
 	set( CMAKE_REQUIRED_INCLUDES )
 	set( CMAKE_REQUIRED_LIBRARIES )
@@ -100,20 +107,61 @@ else ( HAVE_NCURSES_CURSES_H )
 	set( CURSES_PATH "curses.h" )
 endif ( HAVE_NCURSES_CURSES_H )
 include( CheckCXXSourceCompiles )
-check_cxx_source_compiles("#include<cmath>
+check_cxx_source_compiles("#include <cmath>
 	int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }" HAVE_POWL )
-check_cxx_source_compiles("#include<cmath>
+check_cxx_source_compiles("#include <cmath>
 	int main( int, char** ) { ::floorl( 0. ); return ( 0 ); }" HAVE_DECL_FLOORL )
-check_cxx_source_compiles("#include<netdb.h>
-#define NULL	0
+check_cxx_source_compiles("#include <netdb.h>
 int main( int, char const* const* const )
 	{
-	int i = 0;
-	char* p = NULL;
-	struct hostent h, * ph = NULL;
+	int i( 0 );
+	char* p( 0 );
+	struct hostent h, * ph( 0 );
 	::gethostbyname_r( \"\", &h, p, 0, &ph, &i );
 	return ( 0 );
 	}" HAVE_GNU_GETHOSTBYNAME_R )
+check_cxx_source_compiles("#include <netdb.h>
+int main( int, char const* const* const )
+	{
+	int i( 0 );
+	char* p( 0 );
+	struct hostent h, * ph( 0 );
+	::gethostbyaddr_r( 0, 0, 0, &h, p, 0, &ph, &i );
+	return ( 0 );
+	}" HAVE_GNU_GETHOSTBYADDR_R )
+check_cxx_source_compiles("#include <cstring>
+int main( int, char** )
+	{
+	char* p( NULL );
+	basename( p );
+	return ( 0 );
+	}" HAVE_BASENAME_IN_CSTRING )
+check_cxx_source_compiles("#include<cstring>
+int main( int, char const* const* const )
+	{
+	char const* const p( NULL );
+	basename( p );
+	return ( 0 );
+	}" HAVE_BASENAME_ARG_CONST )
+check_cxx_source_compiles("#include <ctime>
+int main( int, char const* const* const )
+	{
+	time_t t( time( NULL ) );
+	struct tm broken;
+	localtime_r( &t, &broken );
+	int size( strftime( NULL, 1024, \"%F %T\", &broken ) );
+	return ( ! size );
+	}" HAVE_SMART_STRFTIME )
+check_cxx_source_compiles("#include <iconv.h>
+int main( int, char const* const* const )
+	{
+	iconv_t conv( 0 );
+	size_t size( 0 );
+	char const* in( NULL );
+	char* out( NULL );
+	iconv( conv, &in, &size, &out, &size );
+	return ( 0 );
+	}" HAVE_ICONV_INPUT_CONST )
 if ( CMAKE_HOST_WIN32 )
 	add_definitions( -D__value=value_ /FIfix.hxx )
 	set( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int 1 )

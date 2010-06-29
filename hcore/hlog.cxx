@@ -24,10 +24,9 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstring>
 #include <cstdlib>
 #include <cstdio>
-#include <cstring>
-#include <cstdarg>
 #include <ctime>
 #include <unistd.h>
 #include <pwd.h>
@@ -35,9 +34,9 @@ Copyright:
 
 #include "config.hxx"
 
-#ifdef HAVE_BASENAME_IN_LIBGEN
+#ifndef HAVE_BASENAME_IN_CSTRING
 #	include <libgen.h>
-#endif /* HAVE_BASENAME_IN_LIBGEN */
+#endif /* not HAVE_BASENAME_IN_CSTRING */
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )

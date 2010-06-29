@@ -221,29 +221,26 @@ AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether strftime() returns required buffer size])
 RESULT=["no"]
-AC_RUN_IFELSE([#include <time.h>
-#define NULL	0
+AC_RUN_IFELSE([#include <ctime>
 int main( int, char const* const* const )
 	{
-	int size = 0;
-	time_t t = time( NULL );
+	time_t t( time( NULL ) );
 	struct tm broken;
 	localtime_r( &t, &broken );
-	size = strftime( NULL, 1024, "%F %T", &broken );
+	int size( strftime( NULL, 1024, "%F %T", &broken ) );
 	return ( ! size );
 	}], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether contents of input buffer for iconv() is const])
 RESULT=["no"]
-AC_COMPILE_IFELSE([#include<iconv.h>
-#define NULL	0
+AC_COMPILE_IFELSE([#include <iconv.h>
 int main( int, char const* const* const )
 	{
-	iconv_t conv = 0;
-	size_t size = 0;
-	char const* in = NULL;
-	char* out = NULL;
+	iconv_t conv( 0 );
+	size_t size( 0 );
+	char const* in( NULL );
+	char* out( NULL );
 	iconv( conv, &in, &size, &out, &size );
 	return ( 0 );
 	}], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
@@ -251,11 +248,10 @@ AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether arg for basename is const])
 RESULT=["no"]
-AC_COMPILE_IFELSE([#include<libgen.h>
-#define NULL	0
+AC_COMPILE_IFELSE([#include <cstring>
 int main( int, char const* const* const )
 	{
-	char const* const p = NULL;
+	char const* const p( NULL );
 	basename( p );
 	return ( 0 );
 	}], [AC_DEFINE([HAVE_BASENAME_ARG_CONST],[],[Is your argument to basename a pointer to const?])] RESULT=["yes"])
@@ -263,13 +259,12 @@ AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether gethostbyname_r is GNU variant])
 RESULT=["no"]
-AC_COMPILE_IFELSE([#include<netdb.h>
-#define NULL	0
+AC_COMPILE_IFELSE([#include <netdb.h>
 int main( int, char const* const* const )
 	{
-	int i = 0;
-	char* p = NULL;
-	struct hostent h, * ph = NULL;
+	int i( 0 );
+	char* p( 0 );
+	struct hostent h, * ph( 0 );
 	::gethostbyname_r( "", &h, p, 0, &ph, &i );
 	return ( 0 );
 	}], [AC_DEFINE([HAVE_GNU_GETHOSTBYNAME_R],[],[Is gethostbyname_r a GNU flavour?])] RESULT=["yes"])
@@ -278,13 +273,12 @@ AC_MSG_RESULT([$RESULT])
 AC_MSG_CHECKING([whether gethostbyaddr_r is GNU variant])
 RESULT=["no"]
 AC_COMPILE_IFELSE([#include<netdb.h>
-#define NULL	0
 int main( int, char const* const* const )
 	{
-	int i = 0;
-	char* p = NULL;
-	struct hostent h, * ph = NULL;
-	::gethostbyaddr_r( NULL, 0, 0, &h, p, 0, &ph, &i );
+	int i( 0 );
+	char* p( 0 );
+	struct hostent h, * ph( 0 );
+	::gethostbyaddr_r( 0, 0, 0, &h, p, 0, &ph, &i );
 	return ( 0 );
 	}], [AC_DEFINE([HAVE_GNU_GETHOSTBYADDR_R],[],[Is gethostbyaddr_r a GNU flavour?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
@@ -368,10 +362,11 @@ LIBS="${HCORE_LIBS}"
 AC_CHECK_FUNCS([getline memrchr gethostbyname_r gethostbyaddr_r strcasestr strtold asprintf])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
-AC_MSG_CHECKING([whether basename is declared in string.h])
-AC_COMPILE_IFELSE([#include <string.h>
-									 int main( int, char** ){ char* p = NULL; basename( p ); return ( 0 ); }],[AC_MSG_RESULT([yes])],
-									 [AC_DEFINE([HAVE_BASENAME_IN_LIBGEN],[1],[Does your basename() is included in libgen library?]) AC_MSG_RESULT([no])])
+AC_MSG_CHECKING([whether basename is declared in cstring])
+AC_COMPILE_IFELSE([#include <cstring>
+	int main( int, char** ){ char* p( NULL ); basename( p ); return ( 0 ); }],
+	[AC_DEFINE([HAVE_BASENAME_IN_CSTRING],[1],[Does your basename() is included in cstring header?]) AC_MSG_RESULT([yes])],
+	[AC_MSG_RESULT([no])])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
 AC_CHECK_DECLS([floorl],[],[],[#include <cmath>])
@@ -380,10 +375,10 @@ AC_CHECK_DECLS([SUN_LEN],[],[],[#include <cstdlib>
 								#include <sys/un.h>])
 AC_CHECK_DECLS([ERR],[],[],[#include <cstdlib>])
 AC_CHECK_DECLS([getaddrinfo],[],[],[#include <netdb.h>
-								#include<netinet/in.h>
-								#include<sys/socket.h>])
+								#include <netinet/in.h>
+								#include <sys/socket.h>])
 AC_MSG_CHECKING([whether powl is available])
-AC_COMPILE_IFELSE([#include<cmath>
+AC_COMPILE_IFELSE([#include <cmath>
 									 int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }],
 	[AC_DEFINE([HAVE_POWL],[1],[We have ::powl().]) AC_MSG_RESULT([yes])], AC_MSG_RESULT([no]))
 
