@@ -42,6 +42,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hlog.hxx"
+#include "system.hxx"
 
 namespace yaal
 {
@@ -74,7 +75,7 @@ HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedFile( _file::ref()
 		M_THROW( "tmpfile() failed", errno );
 	HString intro;
 	intro.format( "%-10xProcess started (%ld).\n",
-			LOG_TYPE::NOTICE, static_cast<int long>( getpid() ) );
+			LOG_TYPE::NOTICE, static_cast<int long>( get_pid() ) );
 	_file::ref() << intro;
 	uid_t uid( getuid() );
 	passwd accountInfo;

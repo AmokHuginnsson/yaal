@@ -46,6 +46,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "console.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hlog.hxx"
+#include "hcore/system.hxx"
 
 #ifdef HAVE_CURSES_H
 #	include <curses.h>
@@ -122,7 +123,7 @@ int console_mouse_open( void )
 	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 )
 		{
 		error.format( _( "cannot setup mouse mode, %s" ), error_message( errno ) );
-		TEMP_FAILURE_RETRY( ::close( _mouse_ ) );
+		TEMP_FAILURE_RETRY( close_fd( _mouse_ ) );
 		M_THROW( error, errno );
 		}
 
@@ -149,12 +150,12 @@ int console_mouse_get ( OMouse & mouse_ )
 	M_EPILOG
 	}
 
-int console_mouse_close ( void )
+int console_mouse_close( void )
 	{
 	M_PROLOG
 	if ( ! _mouse_ )
 		M_THROW( "mouse not opened", errno );
-	TEMP_FAILURE_RETRY( ::close( _mouse_ ) );
+	TEMP_FAILURE_RETRY( close_fd( _mouse_ ) );
 	_mouse_ = 0;
 	return ( 0 );
 	M_EPILOG
@@ -170,7 +171,7 @@ int console_mouse_open ( void )
 	Gpm_Connect gpm;
 	gpm.minMod = 0;
 	gpm.maxMod = 0;
-	gpm.pid = ::getpid();
+	gpm.pid = ::get_pid();
 	gpm.vc = vC = hunt_tty( 0 );
 	gpm.eventMask = static_cast<int>( GPM_UP );
 	gpm.defaultMask = static_cast<int short unsigned>( ~gpm.eventMask );

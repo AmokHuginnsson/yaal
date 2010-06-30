@@ -34,6 +34,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hrawfile.hxx"
+#include "system.hxx"
 #include "hclock.hxx"
 
 namespace yaal
@@ -99,7 +100,7 @@ int HRawFile::do_close ( void )
 	int error = 0;
 	if ( _fileDescriptor < 0 )
 		M_THROW( "file is not opened", errno );
-	error = static_cast<int>( TEMP_FAILURE_RETRY( ::close( _fileDescriptor ) ) );
+	error = static_cast<int>( TEMP_FAILURE_RETRY( close_fd( _fileDescriptor ) ) );
 	_fileDescriptor = -1;
 	return ( error );
 	M_EPILOG

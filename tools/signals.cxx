@@ -39,6 +39,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/xalloc.hxx"
 #include "hcore/hlog.hxx"       /* log object */
 #include "hcore/hstring.hxx"    /* HString class */
+#include "hcore/system.hxx"
 #include "signals.hxx"
 #include "tools.hxx"                /* tools namespace */
 
@@ -117,11 +118,11 @@ HSignalService::~HSignalService( void )
 	_loop = false;
 	/*
 	 * man for raise() is full of shit
-	 * raise( SIG_NO ) is NOT equivalent for kill( getpid(), SIG_NO )
+	 * raise( SIG_NO ) is NOT equivalent for kill( get_pid(), SIG_NO )
 	 * with respect to multi-thread environment at least
 	 * all hail to IBM Signal Managment documentation
 	 */
-	M_ENSURE( kill( getpid(), SIGURG ) == 0 );
+	M_ENSURE( kill( get_pid(), SIGURG ) == 0 );
 	_thread.finish();
 	return;
 	M_EPILOG
@@ -164,7 +165,7 @@ void HSignalService::register_handler( int sigNo_, handler_t handler_ )
 	M_PROLOG
 	_handlers.push_front( sigNo_, handler_ );
 	lock_on( sigNo_ );
-	M_ENSURE( kill( getpid(), SIGURG ) == 0 );
+	M_ENSURE( kill( get_pid(), SIGURG ) == 0 );
 	return;
 	M_EPILOG
 	}

@@ -30,8 +30,8 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hpipe.hxx"
-
 #include "hrawfile.hxx"
+#include "system.hxx"
 
 namespace yaal
 {
@@ -50,8 +50,8 @@ HPipe::HPipe( void )
 HPipe::~HPipe( void )
 	{
 	M_PROLOG
-	TEMP_FAILURE_RETRY( ::close( _pipe[ 1 ] ) );
-	TEMP_FAILURE_RETRY( ::close( _pipe[ 0 ] ) );
+	TEMP_FAILURE_RETRY( close_fd( _pipe[ 1 ] ) );
+	TEMP_FAILURE_RETRY( close_fd( _pipe[ 0 ] ) );
 	return;
 	M_EPILOG
 	}

@@ -32,7 +32,6 @@ Copyright:
 #include <openssl/err.h>
 #include <openssl/conf.h>
 #include <openssl/engine.h>
-#include <unistd.h>
 
 #if ! defined(OPENSSL_THREADS)
 #error Thread support in OpenSSL library is missing.
@@ -42,6 +41,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hopenssl.hxx"
+#include "system.hxx"
 #include "hlog.hxx"
 
 #include "hcore.hxx"
@@ -143,7 +143,7 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 	-- _instances;
 	if ( _instances == 0 )
 		{
-		ERR_remove_state( getpid() );
+		ERR_remove_state( get_pid() );
 		ERR_remove_state( 0 );
 		ENGINE_cleanup();
 		CONF_modules_unload( 1 );
