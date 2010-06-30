@@ -28,8 +28,8 @@ Copyright:
 #include <cstdio>
 #include <cstdlib>
 #include <csignal>
-#include <libintl.h>
 #include <cxxabi.h>
+#include <libintl.h>
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -51,134 +51,45 @@ void* HException::ERROR_STREAM = stderr;
 
 char const* const _exceptionType_ = _( "Exception type" );
 
-HException::HException( char const* const fileName_,
-		char const* const functionName_,
-		int const line_, char const* const message_,
-		int const code_ )
-	: _local( false ), _char( 0 ), _int( 0 ), _long( 0 ),
-	_double( 0 ), _charPtr( NULL ), _voidPtr( NULL ), _frame( 0 ),
-	_fileName( NULL ), _functionName( NULL ),
-	_code( code_ ), _message( NULL )
-	{
-	_message = xstrdup( message_ );
-	_fileName = xstrdup( fileName_ );
-	_functionName = xstrdup( functionName_ );
-	hcore::log << "Exception: " << _message << ", code: " << _code;
-	hcore::log << '.' << endl;
-	log( fileName_, functionName_, line_ );
-	return;
-	}
-
-HException::HException( char const* const fileName_,
-		char const* const functionName_,
+HException::HException( HString const& fileName_,
+		HString const& functionName_,
 		int const line_, HString const& message_,
 		int const code_ )
-	: _local( false ), _char( 0 ), _int( 0 ), _long( 0 ),
-	_double( 0 ), _charPtr( NULL ), _voidPtr( NULL ), _frame( 0 ),
-	_fileName( NULL ), _functionName( NULL ),
-	_code( code_ ), _message( NULL )
+	: _code( code_ ), _frame( 0 ),
+	_fileName( fileName_ ),
+	_functionName( functionName_ ),
+	_message( message_ )
 	{
-	_message = xstrdup( message_.raw() );
-	_fileName = xstrdup( fileName_ );
-	_functionName = xstrdup( functionName_ );
 	hcore::log << "Exception: " << _message << ", code: " << _code;
 	hcore::log << '.' << endl;
-	log( fileName_, functionName_, line_ );
+	log( fileName_.raw(), functionName_.raw(), line_ );
 	return;
 	}
 
 HException::HException( HException const& exception_ )
-	: _local( false ), _char( exception_._char ),
-	_int( exception_._int ), _long( exception_._long ),
-	_double( exception_._double ), _charPtr( NULL ),
-	_voidPtr( exception_._voidPtr ),
-	_frame( exception_._frame ), _fileName( NULL ),
-	_functionName( NULL ), _code( exception_._code ),
-	_message( NULL )
+	: _code( exception_._code ), _frame( exception_._frame ),
+	_fileName( exception_._fileName ),
+	_functionName( exception_._functionName ),
+	_message( exception_._message )
 	{
-	if ( exception_._charPtr )
-		_charPtr = xstrdup( exception_._charPtr );
-	_message = xstrdup( exception_._message );
-	_fileName = xstrdup( exception_._fileName );
-	_functionName = xstrdup( exception_._functionName );
-	exception_._local = true;
 	return;
 	}
 
 HException::~HException( void )
 	{
-	try
-		{
-		if ( ! _local )
-			{
-			HString regs;
-			regs.format(
-					"Exception registers: c:0x%02x i:%d l:%ld d:%f pv:0x%lx pc:%s\n",
-					_char, _int, _long, _double,
-					reinterpret_cast<int long>( _voidPtr ),
-					_charPtr ? _charPtr : "(null)" );
-			hcore::log << regs << endl;
-			}
-		}
-	catch ( ... )
-		{
-		::fprintf( static_cast<FILE*>( ERROR_STREAM ), _( "CRITICAL FAILURE (~HException) !\n" ) );
-		::exit( -1 );
-		}
-	if ( _charPtr )
-		xfree( _charPtr );
-	if ( _functionName )
-		xfree( _functionName );
-	if ( _fileName )
-		xfree( _fileName );
-	if ( _message )
-		xfree( _message );
-	return;
-	}
-
-void HException::set( char const char_, int const int_,
-		long const long_, double const double_, char const* const str_,
-		void* const voidPtr_ )
-	{
-	_char = char_;
-	_int = int_;
-	_long = long_;
-	_double = double_;
-	if ( _charPtr )
-		xfree( _charPtr );
-	if ( str_ )
-		_charPtr = xstrdup( str_ );
-	_voidPtr = voidPtr_;
-	return;
-	}
-
-void HException::set( char const* const str_ )
-	{
-	if ( _charPtr )
-		xfree( _charPtr );
-	if ( str_ )
-		_charPtr = xstrdup( str_ );
 	return;
 	}
 
 void HException::set( HString const& str_ )
 	{
-	if ( _charPtr )
-		xfree( _charPtr );
-	if ( ! str_.is_empty() )
-		_charPtr = xstrdup( str_.raw() );
+	_message += ": ";
+	_message += str_;
 	return;
 	}
 
-void HException::print_error( bool const full_ ) const
+void HException::print_error( void ) const
 	{
-	fprintf( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", _message, _code );
-	if ( full_ )
-		fprintf( static_cast<FILE*>( ERROR_STREAM ),
-				"Exception registers:\nc:0x%02x\ti:%d\tl:%ld\td:%f\tpv:0x%lx\npc:%s\n",
-				_char, _int, _long, _double,
-				reinterpret_cast<int long>( _voidPtr ),
-				_charPtr ? _charPtr : "(null)" );
+	fprintf( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", _message.raw(), _code );
 	return;
 	}
 
@@ -187,8 +98,8 @@ void HException::log( char const* const fileName_,
 	{
 	size_t length = ::strlen( fileName_ );
 	if ( _frame
-			&& ! ( ::strcmp( _fileName, fileName_ )
-				|| ::strcmp( _functionName, functionName_ ) ) )
+			&& ( _fileName == fileName_ )
+			&& ( _functionName == functionName_ ) )
 		return;
 	HString frame;
 	frame.format(
@@ -204,7 +115,7 @@ void HException::log( char const* const fileName_,
 
 char const* HException::what( void ) const
 	{
-	return ( _message );
+	return ( _message.raw() );
 	}
 
 int HException::code( void ) const
@@ -237,19 +148,6 @@ void HException::set_error_stream( void* errorStream_ )
 	M_EPILOG
 	}
 
-char* HException::get_type_name( char const* const name_ )
-	{
-	int status = 0;
-	return ( abi::__cxa_demangle( name_, 0, 0, &status ) );
-	}
-
-void HException::cleanup( char* ptr_ )
-	{
-	if ( ptr_ )
-		xfree( ptr_ );
-	return;
-	}
-
 void HFailedAssertion::swap( HFailedAssertion& other )
 	{
 	using yaal::swap;
@@ -273,6 +171,19 @@ void HGlobalScopeExceptionHandlingPolicy::handle_exception( void )
 		cerr << "Exception of unknown type thrown from outside of main() scope." << endl;
 		}
 	exit( 1 );
+	}
+
+HString demangle( char const* symbolName_ )
+	{
+	int status = 0;
+	HString symbol;
+	char* p( abi::__cxa_demangle( symbolName_, 0, 0, &status ) );
+	if ( p )
+		{
+		symbol = p;
+		xfree( p );
+		}
+	return ( symbol );
 	}
 
 }

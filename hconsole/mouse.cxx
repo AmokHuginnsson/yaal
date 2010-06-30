@@ -133,7 +133,7 @@ int console_mouse_open( void )
 	M_EPILOG
 	}
 
-int console_mouse_get ( OMouse & mouse_ )
+int console_mouse_get( OMouse& mouse_ )
 	{
 	M_PROLOG
 	mouse_info mouse;
@@ -163,7 +163,7 @@ int console_mouse_close( void )
 
 #elif defined ( HAVE_GPM_H )
 
-int console_mouse_open ( void )
+int console_mouse_open( void )
 	{
 	M_PROLOG
 	int vC = 0;
@@ -210,7 +210,7 @@ int console_mouse_close( void )
 
 #else /* HAVE_GPM_H */
 
-int console_mouse_open ( void )
+int console_mouse_open( void )
 	{
 	M_PROLOG
 	int a( 1 );

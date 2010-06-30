@@ -1,7 +1,7 @@
 /*
----           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore.hxx - this file is integral part of `yaal' project.
+	introspect.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -23,18 +23,16 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hcore.hxx
- * \brief Basic system level stuff.
- *
- * This file holds (except HException class declaration) main #defines,
- * macros and global variables used acros whole yaal.
+/*! \file hcore/introspect.hxx
+ * \brief C++ process introspection routines.
  */
 
-#ifndef YAAL_HCORE_HCORE_HXX_INCLUDED
-#define YAAL_HCORE_HCORE_HXX_INCLUDED
+#ifndef YAAL_HCORE_INTROSPECT_HXX_INCLUDED
+#define YAAL_HCORE_INTROSPECT_HXX_INCLUDED 1
 
+#include "hcore/hpointer.hxx"
+#include "hcore/hlist.hxx"
 #include "hcore/hstring.hxx"
-#include "hcore/hprogramoptionshandler.hxx"
 
 namespace yaal
 {
@@ -42,18 +40,30 @@ namespace yaal
 namespace hcore
 {
 
-extern HProgramOptionsHandler yaalOptions;
-bool eq( double long const&, double long const& );
-void set_env( HString const&, HString const&, bool = true );
-void decode_set_env( HString );
-void init_locale( char const* const = NULL );
-void banner( void );
+/*! \brief Low-level run-time information regarding program execution.
+ */
+struct execution_info
+	{
+	typedef HList<HString> strings_t;
+	typedef HPointer<strings_t> strings_ptr_t;
+	/*! \brief Get current call stack information.
+	 *
+	 * \param frames - number of frames to get.
+	 * \return Current call stack as list of strings.
+	 */
+	static strings_ptr_t get_call_stack( int const& frames );
+	};
+
+/*! \brief Print current call stack on the console.
+ *
+ * \param frames - numbers of frames to print.
+ */
+void dump_call_stack( int const& frames );
+
 
 }
 
 }
 
-
-
-#endif /* not YAAL_HCORE_HCORE_HXX_INCLUDED */
+#endif /* not YAAL_HCORE_INTROSPECT_HXX_INCLUDED */
 

@@ -67,45 +67,46 @@ struct DEBUG_LEVEL
  */
 class HException
 	{
-	mutable bool _local;
 protected:
 	static void* ERROR_STREAM;
-	char _char;
-	int	 _int;
-	long _long;
-	double _double;
-	char* _charPtr;
-	void* _voidPtr;
-	int  _frame;
-	char* _fileName;
-	char* _functionName;
 	int  _code;
-	char* _message;
+	int  _frame;
+	HString _fileName;
+	HString _functionName;
+	HString _message;
 public:
-	HException( char const* const, char const* const, int const,
-			char const* const, int const = 0 );
-	HException( char const* const, char const* const, int const,
-			HString const&, int const = 0 );
+	/*! \brief Construct exception object.
+	 *
+	 * \param fileName_ - source code file name where exception has been generated.
+	 * \param functionName_ - name of the function that throws this exception.
+	 * \param line_ - line of code where throw occured.
+	 * \param message_ - an exception description.
+	 * \param code_ - error code.
+	 */
+	HException( HString const& fileName_, HString const& functionName_, int const line_,
+			HString const& message_, int const code_ = 0 );
 	HException( HException const& );
-	virtual ~HException( void ) ;
-	void set( char const = 0, int const = 0, long const = 0, double const = 0,
-			char const* const = 0, void* const = 0 );
-	void set( char const* );
+	virtual ~HException( void );
 	void set( HString const& );
-	void print_error( bool const ) const;
+	void print_error( void ) const;
 	void log( char const* const, char const* const, int const );
 	char const* what( void ) const;
 	int code( void ) const;
 	static void failed_assert( char const* const, char const* const, int const,
 			char const* const ) __attribute__(( __noreturn__ ));
 	static void set_error_stream( void* );
-	static char* get_type_name( char const* const );
-	static void cleanup( char* );
 private:
 	HException& operator = ( HException const& );
 	};
 
 extern char const* const _exceptionType_;
+
+/*! \brief Demangle symbol name.
+ *
+ * \param symbol_ - a symbol name to demangle.
+ * \return demangled version of symbol name.
+ */
+HString demangle( char const* );
 
 /*! \brief Template used to create type specyfic exceptions.
  */
@@ -113,19 +114,11 @@ template<typename tType, typename base_type = HException>
 class HExceptionT : public base_type
 	{
 public:
-	HExceptionT( char const* const reason_, char* ptr = base_type::get_type_name( typeid( tType ).name() ) )
-		: base_type( _exceptionType_, ptr, 0, reason_, errno )
-		{ base_type::cleanup( ptr );	}
-	HExceptionT( HString const& reason_, char* ptr = base_type::get_type_name( typeid( tType ).name() ) )
-		: base_type( _exceptionType_, ptr, 0, reason_, errno )
-		{ base_type::cleanup( ptr );	}
-	HExceptionT( char const* const fileName_,
-			char const* const functionName_, int const line_,
-			char const* const reason_, int const code_ )
-		: base_type( fileName_, functionName_, line_, reason_, code_ )
-		{	}
-	HExceptionT( char const* const fileName_,
-			char const* const functionName_, int const line_,
+	HExceptionT( HString const& reason_, HString const& symbol_ = demangle( typeid( tType ).name() ) )
+		: base_type( _exceptionType_, symbol_, 0, reason_, errno )
+		{ }
+	HExceptionT( HString const& fileName_,
+			HString const& functionName_, int const line_,
 			HString const& reason_, int const code_ )
 		: base_type( fileName_, functionName_, line_, reason_, code_ )
 		{	}

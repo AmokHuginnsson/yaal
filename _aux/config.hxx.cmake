@@ -56,6 +56,7 @@
 #pragma warning( disable : 4996 )
 #undef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCSIG__
+#define HAVE_PRETTY_FUNCTION 1
 #undef HAVE_DECL_TEMP_FAILURE_RETRY
 #define HAVE_ICONV_INPUT_CONST 1
 #undef TEMP_FAILURE_RETRY
