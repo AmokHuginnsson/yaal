@@ -23,6 +23,7 @@
 #cmakedefine01 HAVE_DECL_SIGIOT
 #cmakedefine01 HAVE_DECL_ERR
 #cmakedefine01 HAVE_MEMRCHR
+#cmakedefine01 HAVE_GETLINE
 #define LIB_PREFIX "@LIB_PREFIX@"
 #define LIB_INFIX "@LIB_INFIX@"
 #define LIB_EXT "@LIB_EXT@"
