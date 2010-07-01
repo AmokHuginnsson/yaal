@@ -14,6 +14,8 @@ if ( NOT ( "$ENV{PREFIX}" STREQUAL "" ) )
 	set( CMAKE_INSTALL_PREFIX $ENV{PREFIX} CACHE PATH "Install prefix." FORCE )
 endif ( NOT ( "$ENV{PREFIX}" STREQUAL "" ) )
 
+set( CMAKE_MODULE_PATH ../yaal/_aux )
+
 include( CheckCXXSourceCompiles )
 include( CheckCXXCompilerFlag )
 include( CheckIncludeFileCXX )
