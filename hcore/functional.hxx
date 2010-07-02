@@ -36,17 +36,31 @@ Copyright:
 namespace yaal
 {
 
+/*! \brief Meta-data definition for generator function functors.
+ *
+ * Type descriptions:
+ *
+ * \tparam result_t - result type of generator function.
+ */
+template<typename result_t>
+struct generator_function
+	{
+	typedef result_t result_type;
+	typedef generator_function<result_type> this_type;
+	virtual ~generator_function( void ) {}
+	};
+
 /*! \brief Meta-data definition for unary function functors.
  *
  * Type descriptions:
  *
- * \tparam res_t - result type of unary function.
+ * \tparam result_t - result type of unary function.
  * \tparam arg_t - argument type of unary function.
  */
-template<typename res_t, typename arg_t>
+template<typename result_t, typename arg_t>
 struct unary_function
 	{
-	typedef res_t result_type;
+	typedef result_t result_type;
 	typedef arg_t argument_type;
 	typedef unary_function<result_type, argument_type> this_type;
 	virtual ~unary_function( void ) {}
@@ -56,14 +70,14 @@ struct unary_function
  *
  * Type descriptions:
  *
- * \tparam res_t - result type of binary function.
+ * \tparam result_t - result type of binary function.
  * \tparam arg1st_t - first argument type of binary function.
  * \tparam arg2nd_t - second argument type of binary function.
  */
-template<typename res_t, typename arg1st_t, typename arg2nd_t>
+template<typename result_t, typename arg1st_t, typename arg2nd_t>
 struct binary_function
 	{
-	typedef res_t result_type;
+	typedef result_t result_type;
 	typedef arg1st_t first_argument_type;
 	typedef arg2nd_t second_argument_type;
 	typedef binary_function<result_type, first_argument_type, second_argument_type> this_type;
@@ -528,6 +542,18 @@ struct identity : public unary_function<tType, tType>
 		{ return ( v_ ); }
 	typename trait::make_reference<tType>::type operator()( typename trait::make_reference<tType>::type v_ )
 		{ return ( v_ ); }
+	};
+
+template<typename tType>
+class constant : public generator_function<tType>
+	{
+	typedef generator_function<tType> base_type;
+	typedef typename base_type::result_type result_type;
+	tType _constant;
+public:
+	constant( tType constant_ ) : _constant( constant_ ) {}
+	result_type operator()( void )
+		{ return ( _constant ); }
 	};
 
 template<typename return_t, typename argument_t>
