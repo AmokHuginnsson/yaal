@@ -120,7 +120,7 @@ function makeBoostDesc( boostInfo ) {
 }
 
 function msg( str ) {
-	if ( str.charAt( str.length - 1 ) == '\n' )
+	while ( ( str.length > 0 ) && ( ( str.charAt( str.length - 1 ) == '\n' ) || ( str.charAt( str.length - 1 ) == '\r' ) ) )
 		str = str.substr( 0, str.length - 1 );
 	if ( ! FAST ) {
 		globalMessageBuffer += ( str + "\n" );
@@ -235,13 +235,18 @@ try {
 	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" " + CMAKELISTS_PATH;
 	msg( "Executing: " + cmdline );
 	cmd = shell.exec( cmdline );
-	var eoo = 0;
-	var eoe = 0;
-	while ( ( ! ( eoo = cmd.stdout.AtEndOfStream ) ) || ( ! ( eoe = cmd.stderr.AtEndOfStream ) ) ) {
-		if ( ! eoo )
-			msg( cmd.stdout.readLine() );
-		if ( ! eoe )
-			msg( cmd.stderr.readLine() );
+	if ( FAST ) {
+		var eoo = 0;
+		var eoe = 0;
+		while ( ( ! ( eoo = cmd.stdout.AtEndOfStream ) ) || ( ! ( eoe = cmd.stderr.AtEndOfStream ) ) ) {
+			if ( ! eoo )
+				msg( cmd.stdout.readLine() );
+			if ( ! eoe )
+				msg( cmd.stderr.readLine() );
+		}
+	} else {
+		msg( cmd.stdout.readAll() );
+		msg( cmd.stderr.readAll() );
 	}
 	if ( ! SILENT ) {
 		msg( "Done!" );

@@ -26,12 +26,12 @@ Copyright:
 
 #include <cstring>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <fcntl.h>
 #include <libintl.h>
 
 #include "config.hxx"

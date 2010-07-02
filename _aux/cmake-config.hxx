@@ -66,6 +66,7 @@
 #define snprintf _snprintf
 #define strcasecmp stricmp
 #define __va_copy( x, y ) ( ( x ) = ( y ) )
+extern "C" int setenv( char const*, char  const*, int );
 #ifdef PTHREAD_H
 #define pthread_self() pthread_self().p
 #endif /* PTHREAD_H */
@@ -84,6 +85,9 @@ extern "C" char* basename( char const* );
 extern "C" char* strptime( char const*, char const*, struct tm* );
 extern "C" char* strsignal( int );
 #endif /* _CSTRING_ */
+#ifdef _CSTDIO_
+extern "C" int long getline( char**, size_t*, FILE* );
+#endif /* _CSTDIO_ */
 #ifdef _CSIGNAL_
 #include <glibc/signal.h>
 #endif /* _CSIGNAL_ */

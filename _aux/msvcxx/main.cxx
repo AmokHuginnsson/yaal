@@ -211,6 +211,7 @@ int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, size_t a3, st
 	return ( 0 );
 	}
 
+extern "C"
 int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a4, int long unsigned a5, struct hostent** a6, int* a7 )
 	{
 	return ( 0 );
