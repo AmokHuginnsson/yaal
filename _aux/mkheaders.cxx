@@ -113,7 +113,7 @@ int main( int argc_, char** argv_ )
 		for ( paths_t::const_iterator it = headers.begin(), end = headers.end(); it != end; ++ it )
 			o << "#include <yaal/" << *it << ">" << endl;
 		o << endl << "#endif /* not YAAL_YAAL_HXX_INCLUDED */" << endl << endl;
-		ifstream ci( ( dirRoot + "/config.hxx" ).c_str() );
+		ifstream ci( ( dirBuild + "/config.hxx" ).c_str() );
 		ofstream co( ( dirHeaders + "/config.hxx" ).c_str() );
 		static char const PACKAGE_S[] = "define PACKAGE_";
 		while ( ! getline( ci, line ).fail() )
