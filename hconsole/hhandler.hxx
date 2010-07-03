@@ -27,8 +27,6 @@ Copyright:
 #ifndef YAAL_HCONSOLE_HHANDLER_HXX_INCLUDED
 #define YAAL_HCONSOLE_HHANDLER_HXX_INCLUDED
 
-#include <sys/types.h>
-
 #include "hcore/hhashmap.hxx"
 
 namespace yaal

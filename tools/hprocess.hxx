@@ -27,9 +27,6 @@ Copyright:
 #ifndef YAAL_TOOLS_HPROCESS_HXX_INCLUDED
 #define YAAL_TOOLS_HPROCESS_HXX_INCLUDED
 
-#include <sys/time.h> /* timeval */
-#include <sys/types.h>
-
 #include "hcore/harray.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/hboundcall.hxx"
@@ -54,13 +51,12 @@ private:
 	typedef yaal::hcore::HBoundCall<1, void, int> process_filedes_handler_t;
 	typedef yaal::hcore::HHashMap<int, process_filedes_handler_t> process_filedes_map_t;
 	typedef yaal::hcore::HArray<int> dropped_fd_t;
-	bool			_initialised;					/* did process has necessery initialisation */
-	bool			_loop; 								/* indicates if main loop continues */
-	int				_idleCycles;					/* full select()'s without io activity */
-	int				_latencySeconds;			/* timeout between recall */
-	int				_latencyMicroseconds;	/* of handler_idle */
-	timeval		_latency;							/* sleep between re-selects (helper) */
-	fd_set		_fileDescriptorSet; 	/* keyboard and eventual sockets */
+	bool _initialised;					/* did process has necessery initialisation */
+	bool _loop; 								/* indicates if main loop continues */
+	int _idleCycles;					/* full select()'s without io activity */
+	int _latencySeconds;			/* timeout between recall */
+	int _latencyMicroseconds;	/* of handler_idle */
+	yaal::hcore::HChunk _select;
 	process_filedes_map_t _fileDescriptorHandlers;
 	delayed_calls_t _alert;
 	delayed_calls_t _idle;

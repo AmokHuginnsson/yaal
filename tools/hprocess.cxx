@@ -29,6 +29,7 @@ Copyright:
 #include <csignal>
 #include <unistd.h>
 #include <libintl.h>
+#include <sys/types.h> /* timeval */
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -47,7 +48,7 @@ namespace tools
 HProcess::HProcess( int noFileHandlers_, int latencySeconds_, int latencyMicroseconds_ )
 	: _initialised( false ), _loop( true ), _idleCycles( 0 ),
 	_latencySeconds( latencySeconds_ ), _latencyMicroseconds( latencyMicroseconds_ ),
-	_latency(), _fileDescriptorSet(),
+	_select( sizeof ( fd_set ) + sizeof ( timeval ) ),
 	_fileDescriptorHandlers( noFileHandlers_ ),
 	_alert(), _idle(), _droppedFd( noFileHandlers_ ),
 	_callbackContext( false ), _event(), _mutex()
@@ -55,8 +56,7 @@ HProcess::HProcess( int noFileHandlers_, int latencySeconds_, int latencyMicrose
 	M_PROLOG
 	_droppedFd.clear();
 	M_ASSERT( _droppedFd.is_empty() );
-	::memset( &_latency, 0, sizeof ( _latency ) );
-	FD_ZERO( &_fileDescriptorSet );
+	FD_ZERO( _select.get<fd_set>() );
 	HSignalService& ss = HSignalServiceFactory::get_instance();
 	HSignalService::handler_t handler( call( &HProcess::handler_interrupt, this, _1 ) );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
@@ -99,14 +99,15 @@ void HProcess::unregister_file_descriptor_handler( int fileDescriptor_ )
 int HProcess::reconstruct_fdset( void )
 	{
 	M_PROLOG
-	_latency.tv_sec = _latencySeconds;
-	_latency.tv_usec = _latencyMicroseconds;
-	FD_ZERO( &_fileDescriptorSet );
+	timeval& latency( *static_cast<timeval*>( static_cast<void*>( _select.raw() + sizeof ( fd_set ) ) ) );
+	latency.tv_sec = _latencySeconds;
+	latency.tv_usec = _latencyMicroseconds;
+	FD_ZERO( _select.get<fd_set>() );
 	if ( ! _fileDescriptorHandlers.size() )
 		return ( -1 );
 /* FD_SET is a macro and first argument is evaluated twice ! */
 	for ( process_filedes_map_t::iterator it = _fileDescriptorHandlers.begin(); it != _fileDescriptorHandlers.end(); ++ it )
-		FD_SET( it->first, &_fileDescriptorSet );
+		FD_SET( it->first, _select.get<fd_set>() );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -122,8 +123,8 @@ int HProcess::run( void )
 		_callbackContext = true;
 		handle_alerts();
 		reconstruct_fdset();
-		if ( ( error = ::select( FD_SETSIZE, &_fileDescriptorSet,
-						NULL, NULL, &_latency ) ) )
+		if ( ( error = ::select( FD_SETSIZE, _select.get<fd_set>(),
+						NULL, NULL, static_cast<timeval*>( static_cast<void*>( _select.raw() + sizeof ( fd_set ) ) ) ) ) )
 			{
 			if ( ( error < 0 ) && ( errno == EINTR ) )
 				continue;
@@ -132,7 +133,7 @@ int HProcess::run( void )
 			for ( process_filedes_map_t::iterator it = _fileDescriptorHandlers.begin();
 					it != _fileDescriptorHandlers.end(); ++ it )
 				{
-				if ( FD_ISSET( it->first, &_fileDescriptorSet ) )
+				if ( FD_ISSET( it->first, _select.get<fd_set>() ) )
 					{
 					static_cast<void>( ( it->second( it->first ) ) );
 					_idleCycles = 0;
