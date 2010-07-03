@@ -362,11 +362,11 @@ int long dbrs_id( void*, void* dataR_ )
 					reinterpret_cast<ub4*>( &nameLength ),
 					OCI_ATTR_NAME, query->_error ) ) == OCI_SUCCESS )
 		{
-		name [ nameLength ] = 0;
+		name[ nameLength ] = 0;
 		sQL.format ( "SELECT %s_sequence.currval FROM dual;",
 				reinterpret_cast<char*>( name ) );
 		autonumber = static_cast<OQuery*>( db_query( autonumber, sQL.raw() ) );
-		id = strtol ( rs_get ( autonumber, 0, 0 ), NULL, 10 );
+		id = strtol( rs_get( autonumber, 0, 0 ), NULL, 10 );
 		db_unquery( autonumber );
 		}
 	return ( id );

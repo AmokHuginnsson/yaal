@@ -637,27 +637,27 @@ int HConsole::wait_for_user_input( int& key_, mouse::OMouse& mouse_,
 	fd_set fdSet;
 	wait.tv_sec = timeOutSec_;
 	wait.tv_usec = timeOutUsec_;
-	FD_ZERO ( & fdSet );
-	FD_SET ( STDIN_FILENO, & fdSet );
+	FD_ZERO( &fdSet );
+	FD_SET( STDIN_FILENO, &fdSet );
 	if ( _mouseDes )
-		FD_SET ( _mouseDes, & fdSet );
+		FD_SET ( _mouseDes, &fdSet );
 	do
 		{
-		error = ::select( FD_SETSIZE, & fdSet, NULL, NULL,
-				( timeOutSec_ || timeOutUsec_ ) ? & wait : NULL );
+		error = ::select( FD_SETSIZE, &fdSet, NULL, NULL,
+				( timeOutSec_ || timeOutUsec_ ) ? &wait : NULL );
 		}
 	while ( ( error == -1 ) && ( errno == EINTR ) );
 	if ( error > 0 )
 		{
-		if ( FD_ISSET ( STDIN_FILENO, & fdSet ) )
+		if ( FD_ISSET( STDIN_FILENO, &fdSet ) )
 			{
 			key_ = get_key(), eventType = EVENT::KEYBOARD;
 			if ( key_ == KEY_MOUSE )
 				eventType = 0;
 			}
 		if ( ( key_ == KEY_MOUSE )
-				|| ( _mouseDes && FD_ISSET ( _mouseDes, & fdSet ) ) )
-			eventType |= EVENT::MOUSE, static_cast < void > ( mouse::mouse_get ( mouse_ ) );
+				|| ( _mouseDes && FD_ISSET( _mouseDes, &fdSet ) ) )
+			eventType |= EVENT::MOUSE, static_cast<void>( mouse::mouse_get( mouse_ ) );
 		}
 	return ( eventType );
 	M_EPILOG

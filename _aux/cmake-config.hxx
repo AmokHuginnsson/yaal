@@ -57,14 +57,14 @@
 #undef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #define HAVE_PRETTY_FUNCTION 1
+#define snprintf _snprintf
+#define strcasecmp stricmp
 #ifdef __YAAL_BUILD__
 #undef HAVE_DECL_TEMP_FAILURE_RETRY
 #define HAVE_ICONV_INPUT_CONST 1
 #undef TEMP_FAILURE_RETRY
 #undef HAVE_GETHOSTBYNAME_R
 #define HAVE_GETHOSTBYNAME_R 1
-#define snprintf _snprintf
-#define strcasecmp stricmp
 #define __va_copy( x, y ) ( ( x ) = ( y ) )
 extern "C" int setenv( char const*, char  const*, int );
 #ifdef PTHREAD_H

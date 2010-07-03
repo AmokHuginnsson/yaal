@@ -155,9 +155,9 @@ public:
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
 	template<typename tType>
-	tType& operator* ( void );
+	tType& get( void );
 	template<typename tType>
-	tType const& operator* ( void ) const;
+	tType const& get( void ) const;
 private:
 	friend class HSBBSTree;
 	explicit HIterator( HAbstractNode* const );
@@ -174,12 +174,12 @@ class	HSBBSTree::HNode : public HSBBSTree::HAbstractNode
 	HNode& operator = ( HNode const& );
 	virtual HAbstractNode* clone( void ) const;
 	friend class HSBBSTree;
-	friend tType& HSBBSTree::HIterator::operator*<tType>( void );
-	friend tType const& HSBBSTree::HIterator::operator*<tType>( void ) const;
+	friend tType& HSBBSTree::HIterator::get<tType>( void );
+	friend tType const& HSBBSTree::HIterator::get<tType>( void ) const;
 	};
 
 template<typename tType>
-tType& HSBBSTree::HIterator::operator* ( void )
+tType& HSBBSTree::HIterator::get( void )
 	{
 	M_PROLOG
 	M_ASSERT( _current );
@@ -188,7 +188,7 @@ tType& HSBBSTree::HIterator::operator* ( void )
 	}
 
 template<typename tType>
-tType const& HSBBSTree::HIterator::operator* ( void ) const
+tType const& HSBBSTree::HIterator::get( void ) const
 	{
 	M_PROLOG
 	M_ASSERT( _current );

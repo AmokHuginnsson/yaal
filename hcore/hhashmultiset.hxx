@@ -146,7 +146,7 @@ public:
 		M_PROLOG
 		HPair<HHashContainer::HIterator, bool> p( _engine.insert( make_pair( val_, 1L ), _hasher ) );
 		if ( ! p.second )
-			++ p.first.operator*<elem_t>().second;
+			++ p.first.get<elem_t>().second;
 		return ( iterator( p.first ) );
 		M_EPILOG
 		}
@@ -200,7 +200,7 @@ public:
 		{
 		M_PROLOG
 		HIterator it( find( elem ) );
-		return ( it != end() ? it._engine.template operator*<elem_t>().second : 0 );
+		return ( it != end() ? it._engine.template get<elem_t>().second : 0 );
 		M_EPILOG
 		}
 	void clear( void )
@@ -210,7 +210,7 @@ public:
 		M_PROLOG
 		int long sizeAcc( 0 );
 		for ( HHashContainer::HIterator it = _engine.begin(); it != _engine.end(); ++ it )
-			sizeAcc += it.operator*<elem_t>().second;
+			sizeAcc += it.get<elem_t>().second;
 		return ( sizeAcc );
 		M_EPILOG
 		}
@@ -259,7 +259,7 @@ public:
 		}
 	HIterator& operator ++ ( void )
 		{
-		if ( _index < ( _engine.operator*<typename set_t::elem_t>().second - 1 ) )
+		if ( _index < ( _engine.get<typename set_t::elem_t>().second - 1 ) )
 			++ _index;
 		else
 			{
@@ -286,9 +286,9 @@ public:
 		return ( it );
 		}
 	key_type const& operator* ( void ) const
-		{ return ( _engine.operator*<typename set_t::elem_t>().first ); }
+		{ return ( _engine.get<typename set_t::elem_t>().first ); }
 	key_type const* operator-> ( void ) const
-		{ return ( &_engine.operator*<typename set_t::elem_t>().first ); }
+		{ return ( &_engine.get<typename set_t::elem_t>().first ); }
 	bool operator == ( HIterator const& it ) const
 		{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
 	bool operator != ( HIterator const& it ) const

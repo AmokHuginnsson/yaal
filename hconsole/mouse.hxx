@@ -61,20 +61,20 @@ typedef struct
 	int _column;  /*!< Cursor X position. */
 	} OMouse;
 
-typedef int ( * fun_console_mouse_open_t ) ( void );
-typedef int ( * fun_console_mouse_get_t ) ( OMouse & );
-typedef int ( * fun_console_mouse_close_t ) ( void );
+typedef int ( * fun_console_mouse_open_t )( void );
+typedef int ( * fun_console_mouse_get_t )( OMouse& );
+typedef int ( * fun_console_mouse_close_t )( void );
 
 extern fun_console_mouse_open_t mouse_open;
 extern fun_console_mouse_get_t mouse_get;
 extern fun_console_mouse_close_t mouse_close;
 
-int console_mouse_open ( void );
-int console_mouse_get ( OMouse & );
-int console_mouse_close ( void );
-int x_mouse_open ( void );
-int x_mouse_get ( OMouse & );
-int x_mouse_close ( void );
+int console_mouse_open( void );
+int console_mouse_get( OMouse& );
+int console_mouse_close( void );
+int x_mouse_open( void );
+int x_mouse_get( OMouse& );
+int x_mouse_close( void );
 
 }
 

@@ -88,7 +88,7 @@ HControl::HControl( HWindow* parent_, int row_, int column_,
 	M_EPILOG
 	}
 
-HControl::~HControl ( void )
+HControl::~HControl( void )
 	{
 	M_PROLOG
 #ifdef __DEBUGGER_BABUNI__
@@ -99,7 +99,7 @@ HControl::~HControl ( void )
 	M_EPILOG
 	}
 
-void HControl::enable ( bool enable_ )
+void HControl::enable( bool enable_ )
 	{
 	M_PROLOG
 	_enabled = enable_;
@@ -110,7 +110,7 @@ void HControl::enable ( bool enable_ )
 	M_EPILOG
 	}
 
-int HControl::process_input ( int code_ )
+int HControl::process_input( int code_ )
 	{
 	M_PROLOG
 	if ( ! _valid )
@@ -128,16 +128,16 @@ int HControl::do_process_input ( int code_ )
 	M_EPILOG
 	}
 
-int HControl::set_focus ( char shortCut_ )
+int HControl::set_focus( char shortCut_ )
 	{
 	M_PROLOG
 	if ( ! _enabled )
 		return ( 1 );
-	if ( ( shortCut_ > 0 ) && ( _label [ _shortcutIndex ] != shortCut_ ) )
+	if ( ( shortCut_ > 0 ) && ( _label[ _shortcutIndex ] != shortCut_ ) )
 		return ( 1 );
 	_focused = true;
 	if ( ! shortCut_ )
-		_parent->acquire_focus ( this );
+		_parent->acquire_focus( this );
 	if ( shortCut_ <= 0 )
 		schedule_refresh();
 	return ( 0 );
@@ -155,7 +155,7 @@ int HControl::kill_focus ( void )
 	M_EPILOG
 	}
 
-void HControl::refresh ( void )
+void HControl::refresh( void )
 	{
 	M_PROLOG
 	if ( ! _valid )
@@ -165,7 +165,7 @@ void HControl::refresh ( void )
 	M_EPILOG
 	}
 
-void HControl::update ( void )
+void HControl::update( void )
 	{
 	M_PROLOG
 	do_update();
@@ -174,7 +174,7 @@ void HControl::update ( void )
 	M_EPILOG
 	}
 
-void HControl::set ( HInfo const & )
+void HControl::set( HInfo const & )
 	{
 	M_PROLOG
 	if ( errno || ! errno )
@@ -183,7 +183,7 @@ void HControl::set ( HInfo const & )
 	M_EPILOG
 	}
 
-HInfo HControl::get ( void )
+HInfo HControl::get( void )
 	{
 	M_PROLOG
 	HInfo info;
@@ -191,7 +191,7 @@ HInfo HControl::get ( void )
 	M_EPILOG
 	}
 
-bool HControl::is_searchable ( void )
+bool HControl::is_searchable( void )
 	{
 	M_PROLOG
 	return ( false );

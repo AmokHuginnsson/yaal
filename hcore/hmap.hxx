@@ -245,13 +245,13 @@ public:
 		return ( it );
 		}
 	const_qual_t& operator* ( void )
-		{ return ( _engine.operator*<typename map_t::value_type>() ); }
+		{ return ( _engine.get<typename map_t::value_type>() ); }
 	const_qual_t& operator* ( void ) const
-		{ return ( _engine.operator*<typename map_t::value_type>() ); }
+		{ return ( _engine.get<typename map_t::value_type>() ); }
 	const_qual_t* operator-> ( void )
-		{ return ( &_engine.operator*<typename map_t::value_type>() ); }
+		{ return ( &_engine.get<typename map_t::value_type>() ); }
 	const_qual_t* operator-> ( void ) const
-		{ return ( &_engine.operator*<typename map_t::value_type>() ); }
+		{ return ( &_engine.get<typename map_t::value_type>() ); }
 	template<typename other_const_qual_t>
 	bool operator == ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( _engine == it._engine ); }

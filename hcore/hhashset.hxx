@@ -256,9 +256,9 @@ public:
 		return ( it );
 		}
 	key_type const& operator* ( void ) const
-		{ return ( _engine.operator*<typename set_t::value_type>() ); }
+		{ return ( _engine.get<typename set_t::value_type>() ); }
 	key_type const* operator-> ( void ) const
-		{ return ( &_engine.operator*<typename set_t::value_type>() ); }
+		{ return ( &_engine.get<typename set_t::value_type>() ); }
 	bool operator == ( HIterator const& it ) const
 		{ return ( _engine == it._engine ); }
 	bool operator != ( HIterator const& it ) const

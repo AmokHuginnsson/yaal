@@ -163,13 +163,13 @@ public:
 		return ( it );
 		}
 	template<typename tType>
-	tType& operator* ( void )
+	tType& get( void )
 		{
 		M_ASSERT( _atom );
 		return ( static_cast<HHashContainer::HAtom<tType>*>( _atom )->_value );
 		}
 	template<typename tType>
-	tType const& operator* ( void ) const
+	tType const& get( void ) const
 		{
 		M_ASSERT( _atom );
 		return ( static_cast<HHashContainer::HAtom<tType> const*>( _atom )->_value );

@@ -109,7 +109,7 @@ public:
 		M_PROLOG
 		int long sizeAcc( 0 );
 		for ( HSBBSTree::HIterator it = _engine.begin(); it != _engine.end(); ++ it )
-			sizeAcc += it.operator*<elem_t>().second;
+			sizeAcc += it.get<elem_t>().second;
 		return ( sizeAcc );
 		M_EPILOG
 		}
@@ -122,7 +122,7 @@ public:
 		M_PROLOG
 		HPair<HSBBSTree::HIterator, bool> p( _engine.insert<elem_t, helper_t>( make_pair( elem, 1 ) ) );
 		if ( ! p.second )
-			++ p.first.operator*<elem_t>().second;
+			++ p.first.get<elem_t>().second;
 		return ( HIterator( p.first ) );
 		M_EPILOG
 		}
@@ -139,7 +139,7 @@ public:
 		{
 		M_PROLOG
 		HIterator it( find( elem ) );
-		return ( it != end() ? it._engine.template operator*<elem_t>().second : 0 );
+		return ( it != end() ? it._engine.template get<elem_t>().second : 0 );
 		M_EPILOG
 		}
 	int long erase( value_type const& elem )
@@ -149,7 +149,7 @@ public:
 		int long erased( 0 );
 		if ( it != end() )
 			{
-			erased = it._engine.template operator*<elem_t>().second;
+			erased = it._engine.template get<elem_t>().second;
 			_engine.remove( it._engine );
 			}
 		return ( erased );
@@ -220,7 +220,7 @@ public:
 		}
 	HIterator& operator ++ ( void )
 		{
-		if ( _index < ( _engine.operator*<elem_t>().second - 1 ) )
+		if ( _index < ( _engine.get<elem_t>().second - 1 ) )
 			++ _index;
 		else
 			{
@@ -247,9 +247,9 @@ public:
 		return ( it );
 		}
 	value_type const& operator * ( void )
-		{	return ( _engine.operator*<elem_t>().first );	}
+		{	return ( _engine.get<elem_t>().first );	}
 	value_type const* operator -> ( void )
-		{ return ( &_engine.operator*<elem_t>().first );	}
+		{ return ( &_engine.get<elem_t>().first );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
 	bool operator != ( HIterator const& it ) const

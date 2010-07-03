@@ -221,9 +221,9 @@ public:
 		return ( it );
 		}
 	value_type const& operator * ( void )
-		{	return ( _engine.operator*<value_type>() );	}
+		{	return ( _engine.get<value_type>() );	}
 	value_type const* operator -> ( void )
-		{ return ( &_engine.operator*<value_type>() );	}
+		{ return ( &_engine.get<value_type>() );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( _engine == it._engine ); }
 	bool operator != ( HIterator const& it ) const
