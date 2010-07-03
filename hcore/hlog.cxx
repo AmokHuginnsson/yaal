@@ -139,7 +139,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ )
 			if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
 				{
 				timestamp();
-				_file::ref() << _loginName << " " << buf + 10 + 1; /* 10 for timestamp, 1 for space between timestamp and login name*/
+				_file::ref() << buf + 10; /* 10 for timestamp */
 				}
 			}
 		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
