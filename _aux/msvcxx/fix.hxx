@@ -26,6 +26,8 @@
 
 #define _WINSOCKAPI_ 1
 
+#define tmpfile tmpfile_windows
+
 /* It must be included before <features.h> from GnuWin32 */
 #include <typeinfo>
 
