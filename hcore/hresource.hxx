@@ -70,15 +70,13 @@ struct HResourceAllocatedBy
 			{ return ( val ); }
 		};
 	};
-template<typename T>
+template<typename T, typename real_t>
 struct HResourceReleaseBy
 	{
-	template<typename real_t>
 	static void delete_obj( T p )
 		{
 		delete static_cast<real_t>( p );
 		}
-	template<typename real_t>
 	static void delete_array( T p )
 		{
 		delete [] static_cast<real_t>( p );
@@ -149,7 +147,9 @@ public:
 	typedef type_t value_type;
 	HResource( void );
 	template<typename real_t>
-	explicit HResource( real_t, free_t = &HResourceReleaseBy<hold_t>::template delete_obj<real_t> );
+	explicit HResource( real_t );
+	template<typename real_t, typename deleter_t>
+	HResource( real_t, deleter_t );
 	~HResource( void );
 	HResource( HResource& );
 	template<typename real_t>
@@ -192,7 +192,15 @@ HResource<type_t, free_t, hold_by_t, allocated_t>::~HResource( void )
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 template<typename real_t>
-HResource<type_t, free_t, hold_by_t, allocated_t>::HResource( real_t resource_, free_t free_ )
+HResource<type_t, free_t, hold_by_t, allocated_t>::HResource( real_t resource_ )
+		: _resource( resource_ ), _free( &HResourceReleaseBy<hold_t, real_t>::delete_obj )
+	{
+	return;
+	}
+
+template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
+template<typename real_t, typename deleter_t>
+HResource<type_t, free_t, hold_by_t, allocated_t>::HResource( real_t resource_, deleter_t free_ )
 		: _resource( resource_ ), _free( free_ )
 	{
 	return;
