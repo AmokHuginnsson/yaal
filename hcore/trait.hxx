@@ -1346,206 +1346,244 @@ struct argument_type
  * \retval type - return type of given member or function.
  */
 template<typename T>
-struct class_type
-	{
-	typedef typename T::this_type type;
-	};
+struct class_type;
+
+template<typename T>
+struct class_type_from_member;
+template<typename T>
+struct class_type_from_field;
 
 /*! \cond */
 template<typename return_t, typename class_t>
-struct class_type<return_t ( class_t::* )( void )>
+struct class_type_from_member<return_t ( class_t::* )( void )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t>
-struct class_type<return_t ( class_t::* )( void ) const>
+struct class_type_from_member<return_t ( class_t::* )( void ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t>
-struct class_type<return_t ( class_t::* )( void ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( void ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t>
-struct class_type<return_t ( class_t::* )( void ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( void ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t>
-struct class_type<return_t ( class_t::* )( a0_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t>
-struct class_type<return_t ( class_t::* )( a0_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t>
-struct class_type<return_t ( class_t::* )( a0_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t>
-struct class_type<return_t ( class_t::* )( a0_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) volatile>
 	{ typedef class_t type; };
 template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a2_t, typename a3_t, typename a4_t, typename a5_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-struct class_type<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
+struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
 	{ typedef class_t type; };
 
 template<typename class_t, typename field_t>
-struct class_type<field_t class_t::*>
+struct class_type_from_field<field_t class_t::*>
 	{ typedef class_t type; };
+
+template<typename class_t>
+struct class_type
+	{
+	template<typename real_class>
+	static true_type has_this_type( typename strip_reference<typename real_class::this_type>::type* );
+	template<typename real_class>
+	static false_type has_this_type( ... );
+	static bool const is_functional = ( sizeof ( has_this_type<class_t>( 0 ) ) == sizeof ( true_type ) );
+	template<typename U, int const no>
+	struct get
+		{ typedef no_type type; };
+
+	template<typename U>
+	struct get<U, 1>
+		{ typedef typename U::this_type type; };
+
+	template<typename U>
+	struct get<U, 2>
+		{ typedef typename class_type_from_member<U>::type type; };
+
+	template<typename U>
+	struct get<U, 3>
+		{ typedef typename class_type_from_field<U>::type type; };
+
+	typedef typename get<class_t,
+					meta::ternary<
+						is_member<class_t>::value,
+						2,
+						meta::ternary<
+							is_field<class_t>::value,
+							3,
+							is_functional ? 1 : 0
+						>::value
+					>::value>::type type;
+	};
 
 /*! \endcond */
 

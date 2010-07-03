@@ -143,12 +143,14 @@ void for_each( iterator_t it, iterator_t const& end, call_t CALL )
  * \param end - one past the end of source range.
  * \param dst - begining of destination container.
  * \param op - transforming operation, an unary function.
+ * \return end of output range.
  */
 template<typename src_iter_t, typename dst_iter_t, typename operation_t>
-void transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op )
+dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op )
 	{
 	for ( ; it != end; ++ it, ++ dst )
 		*dst = op( *it );
+	return ( dst );
 	}
 
 /*! \brief Replace elements in destination container by selected transformed elements from source range.
@@ -158,15 +160,17 @@ void transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op )
  * \param dst - begining of destination container.
  * \param op - transforming operation, an unary function.
  * \param cond - condition that has to be met to perform a transformation.
+ * \return end of output range.
  */
 template<typename src_iter_t, typename dst_iter_t, typename operation_t, typename condition_t>
-void transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op, condition_t cond )
+dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op, condition_t cond )
 	{
 	for ( ; it != end; ++ it, ++ dst )
 		{
 		if ( cond( *it ) )
 			*dst = op( *it );
 		}
+	return ( dst );
 	}
 
 /*! \brief Replace elements in destination container by elements resulting from transformation of elements from source range and another container.
@@ -176,12 +180,14 @@ void transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op
  * \param arg - begining of second source container.
  * \param dst - begining of destination container.
  * \param op - transforming operation, a binary function.
+ * \return end of output range.
  */
 template<typename src_iter_t, typename arg_iter_t, typename dst_iter_t, typename operation_t>
-void transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t dst, operation_t op )
+dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t dst, operation_t op )
 	{
 	for ( ; it != end; ++ it, ++ arg, ++ dst )
 		*dst = op( *arg, *it );
+	return ( dst );
 	}
 
 /*! \brief Copy range of values onto another range.
