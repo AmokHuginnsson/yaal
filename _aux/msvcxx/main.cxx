@@ -349,7 +349,9 @@ int unix_bind( int s, const struct sockaddr* name, socklen_t namelen )
 	return ( ret );
 	}
 
-extern "C"
+namespace msvcxx
+{
+
 int unix_listen( int const& s, int const& backlog )
 	{
 	int ret = 0;
@@ -363,23 +365,23 @@ int unix_listen( int const& s, int const& backlog )
 	return ( ret );
 	}
 
-extern "C"
+
 int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
 	return ( 0 );
 	}
 
-extern "C"
 int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 	{
 	return ( 0 );
 	}
 
-extern "C"
 int unix_shutdown( int fd_, int how_ )
 	{
 	return ( 0 );
 	}
+
+}
 
 extern "C"
 int unix_setsockopt( int fd_, int level_, int optname_, const void* optval_, socklen_t optlen_)
