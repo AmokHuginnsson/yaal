@@ -1,13 +1,16 @@
 #ifndef YAAL_MSVCXX_UNISTD_H_INCLUDED
 #define YAAL_MSVCXX_UNISTD_H_INCLUDED 1
 
-#define gethostname w32_gethostname
 #include <cstdio>
 #define unlink unlink_gnu
 #undef tmpfile
 extern "C" FILE* tmpfile (void);
 
 #include <glibc/unistd.h>
+
+#undef gethostname
+#define gethostname ms_gethostname
+int ms_gethostname( char*, int );
 
 #define fork ms_fork
 

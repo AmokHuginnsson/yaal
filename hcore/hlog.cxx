@@ -77,15 +77,6 @@ HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedFile( _file::ref()
 	intro.format( "%-10xProcess started (%ld).\n",
 			LOG_TYPE::NOTICE, static_cast<int long>( get_pid() ) );
 	_file::ref() << intro;
-	uid_t uid( getuid() );
-	passwd accountInfo;
-	long int bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
-	HChunk buf( bsize > 0 ? bsize + 1 : GETPW_R_SIZE );
-	passwd* any;
-	if ( ! getpwuid_r( uid, &accountInfo, buf.get<char>(), static_cast<int>( bsize ), &any ) )
-		_loginName = accountInfo.pw_name;
-	else
-		_loginName = uid;
 	M_ENSURE( ::gethostname( _hostName.get<char>(), HOSTNAME_SIZE - 1 ) == 0 );
 	return;
 	M_EPILOG
@@ -117,6 +108,15 @@ void HLog::do_rehash( void* src_, char const* const processName_ )
 	FILE* src( static_cast<FILE*>( src_ ) );
 	if ( src )
 		{
+		uid_t uid( getuid() );
+		passwd accountInfo;
+		long int bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
+		HChunk login( bsize > 0 ? bsize + 1 : GETPW_R_SIZE );
+		passwd* any;
+		if ( ! getpwuid_r( uid, &accountInfo, login.get<char>(), static_cast<int>( bsize ), &any ) )
+			_loginName = accountInfo.pw_name;
+		else
+			_loginName = uid;
 		::fseek( src, 0, SEEK_SET );
 		char* buf = _buffer.get<char>();
 #ifdef HAVE_GETLINE
@@ -139,7 +139,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ )
 			if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
 				{
 				timestamp();
-				_file::ref() << buf + 10;
+				_file::ref() << _loginName << " " << buf + 10 + 1; /* 10 for timestamp, 1 for space between timestamp and login name*/
 				}
 			}
 		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )

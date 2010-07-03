@@ -25,6 +25,7 @@
 #define execlp gnu_execlp
 #define execvp gnu_execvp
 #define getpid gnu_getpid
+#define gethostname gethostname_off
 
 #include <unistd.h>
 #include <glibc/sys/time.h>
@@ -202,7 +203,21 @@ int getpwuid_r( uid_t, struct passwd* p, char* buf, int size, struct passwd** )
 	{
 	p->pw_name = buf;
 	DWORD s = size;
-	return ( ! GetUserName( buf, &s ) );
+	int err( ! GetUserName( buf, &s ) );
+	return ( err );
+	}
+
+int ms_gethostname( char* buf_, int len_ )
+	{
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	int err;
+
+	wVersionRequested = MAKEWORD( 2, 2 );
+
+	err = WSAStartup( wVersionRequested, &wsaData );
+
+	return ( gethostname( buf_, len_ ) );
 	}
 
 extern "C"
