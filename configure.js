@@ -141,11 +141,7 @@ try {
 	fs = new ActiveXObject( "Scripting.FileSystemObject" );
 	dirRoot = fs.GetFolder(".").path.replace( /\\/gm, "/" );
 
-	if ( ! ( fs.FolderExists( dirRoot + "/hcore" )
-				&& fs.FolderExists( dirRoot + "/tools" )
-				&& fs.FolderExists( dirRoot + "/dbwrapper" )
-				&& fs.FolderExists( dirRoot + "/hconsole" )
-				&& fs.FolderExists( dirRoot + "/hdata" ) ) ) {
+	if ( ! fs.FileExists( dirRoot + "/configure.ac" ) ) {
 		WScript.echo( "This script must be runned from project main directory." );
 		WScript.quit( 1 );
 	}

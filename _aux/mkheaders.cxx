@@ -40,6 +40,7 @@ string dirname( string const& );
 string basename( string const& );
 string strip_prefix( string, string );
 string dirname_basename( string const& );
+void copy_file( string const&, string const& );
 
 int main( int argc_, char** argv_ )
 	{
@@ -126,6 +127,10 @@ int main( int argc_, char** argv_ )
 				}
 			co << line << endl;
 			}
+#ifndef __GNUC__
+		copy_file( dirRoot + "/_aux/msvcxx/cleanup.hxx", dirHeaders + "/cleanup.hxx" );
+		copy_file( dirRoot + "/_aux/msvcxx/client-fix.hxx", dirHeaders + "/fix.hxx" );
+#endif /* not __GNUC__ */
 		}
 	catch ( exception const& e )
 		{
@@ -136,6 +141,16 @@ int main( int argc_, char** argv_ )
 		{
 		}
 	return ( errorCode );
+	}
+
+void copy_file( string const& src_, string const& dst_ )
+	{
+	ifstream i( src_.c_str() );
+	ofstream o( dst_.c_str() );
+	string line;
+	while ( ! getline( i, line ).fail() )
+		o << line << endl;
+	return;
 	}
 
 void process_file( string const& from, string const& to )

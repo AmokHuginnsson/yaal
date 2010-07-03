@@ -19,6 +19,6 @@
 #undef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #define HAVE_PRETTY_FUNCTION 1
-#include "cleanup.hxx"
+#include <yaal/cleanup.hxx>
 #endif /* __MSVCXX__ */
 #endif /* not @PROJECT_NAME_UC@_CONFIG_HXX_INCLUDED */

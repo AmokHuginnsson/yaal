@@ -41,7 +41,6 @@
 #cmakedefine HAVE_GPM_H
 #cmakedefine01 HAVE_NCURSES_CURSES_H
 #cmakedefine01 HAVE_CURSES_H
-#ifdef __YAAL_BUILD__
 #ifndef __GNUC__
 #define __attribute__( x ) /**/
 #endif /* not __GNUC__ */
@@ -58,6 +57,7 @@
 #undef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #define HAVE_PRETTY_FUNCTION 1
+#ifdef __YAAL_BUILD__
 #undef HAVE_DECL_TEMP_FAILURE_RETRY
 #define HAVE_ICONV_INPUT_CONST 1
 #undef TEMP_FAILURE_RETRY
@@ -96,6 +96,6 @@ extern "C" int long getline( char**, size_t*, FILE* );
 #include <glibc/errno.h>
 #endif /* _UNISTD_H */
 #include "cleanup.hxx"
-#endif /* __MSVCXX__ */
 #endif /* __YAAL_BUILD__ */
+#endif /* __MSVCXX__ */
 #endif /* not YAAL_CONFIG_HXX_INCLUDED */
