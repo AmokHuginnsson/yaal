@@ -134,10 +134,13 @@ char* __cxa_demangle( char const* const a, int, int, int* )
 template<typename T>
 class SynchronizedQueue
 	{
-	list<T> f_oData;
-	yaal::hcore::HMutex f_oMutex;
-	yaal::hcore::HSemaphore f_oSemaphore;
+	list<T> _data;
+	yaal::hcore::HMutex _mutex;
+	yaal::hcore::HSemaphore _semaphore;
 public:
+	SynchronizedQueue( void )
+		: _data(), _mutex(), _semaphore()
+		{ /* HSemaphore leak is intentional. */ }
 	bool pop( T& );
 	void push( T const& );
 	};
@@ -145,14 +148,14 @@ public:
 template<typename T>
 bool SynchronizedQueue<T>::pop( T& elem )
 	{
-	f_oSemaphore.wait();
-	HLock l( f_oMutex );
+	_semaphore.wait();
+	HLock l( _mutex );
 	bool found = false;
-	if ( ! f_oData.empty() )
+	if ( ! _data.empty() )
 		{
 		found = true;
-		elem = f_oData.front();
-		f_oData.pop_front();
+		elem = _data.front();
+		_data.pop_front();
 		}
 	return ( ! found );
 	}
@@ -160,18 +163,18 @@ bool SynchronizedQueue<T>::pop( T& elem )
 template<typename T>
 void SynchronizedQueue<T>::push( T const& elem )
 	{
-	HLock l( f_oMutex );
-	f_oData.push_back( elem );
-	f_oSemaphore.signal();
+	HLock l( _mutex );
+	_data.push_back( elem );
+	_semaphore.signal();
 	return;
 	}
 
-SynchronizedQueue<int> g_oSignalQueue;
+SynchronizedQueue<int> _signalQueue_;
 
 int kill( int pid, int signo )
 	{
 	if ( pid == getpid() )
-		g_oSignalQueue.push( signo );
+		_signalQueue_.push( signo );
 	else
 		TerminateProcess( reinterpret_cast<HANDLE>( pid ), signo );
 	return ( 0 );
@@ -179,7 +182,7 @@ int kill( int pid, int signo )
 
 int sigwait( sigset_t*, int* signo )
 	{
-	if ( g_oSignalQueue.pop( *signo ) )
+	if ( _signalQueue_.pop( *signo ) )
 		*signo = SIGURG;
 	return ( 0 );
 	}
@@ -196,7 +199,7 @@ int sigemptyset( sigset_t* )
 
 void win_signal_handler( int signo )
 	{
-	g_oSignalQueue.push( signo );
+	_signalQueue_.push( signo );
 	}
 
 int sigaction( int signo, struct sigaction*, void* )

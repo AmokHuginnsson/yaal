@@ -89,5 +89,15 @@ Copyright:
  */
 #define countof( array ) ( static_cast<int long>( sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) ) ) )
 
+#ifdef __MSVCXX__
+#ifdef __YAAL_BUILD__
+#define M_YAAL_PUBLIC_API __declspec( dllexport )
+#else /* __YAAL_BUILD__ */
+#define M_YAAL_PUBLIC_API __declspec( dllimport )
+#endif /* not __YAAL_BUILD__ */
+#else /* __MSVCXX__ */
+#define M_YAAL_PUBLIC_API /**/
+#endif /* not __MSVCXX__ */
+
 #endif /* not YAAL_HCORE_MACRO_HXX_INCLUDED */
 
