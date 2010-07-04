@@ -170,7 +170,7 @@ HConsoleInitDeinit::HConsoleInitDeinit( void )
 	M_PROLOG
 	errno = 0;
 	int escdelay( 0 );
-	yaalOptions( "use_mouse", program_options_helper::option_value( _useMouse_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "enable mouse support" )
+	yaal_options()( "use_mouse", program_options_helper::option_value( _useMouse_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "enable mouse support" )
 		( "disable_XON", program_options_helper::option_value( _disableXON_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable flow control events" )
 		( "leave_ctrl_c", program_options_helper::option_value( _leaveCtrlC_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+C sequence" )
 		( "leave_ctrl_z", program_options_helper::option_value( _leaveCtrlZ_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+Z sequence" )
@@ -182,7 +182,7 @@ HConsoleInitDeinit::HConsoleInitDeinit( void )
 		( "command_compose_character", program_options_helper::option_value( _commandComposeCharacter_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED,
 			"character that shall be uses as command composition base", "character" )
 		( "command_compose_delay", program_options_helper::option_value( _commandComposeDelay_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "command composition time span", "seconds" );
-	yaalOptions.process_rc_file( "yaal", "console", set_hconsole_variables );
+	yaal_options().process_rc_file( "yaal", "console", set_hconsole_variables );
 	HConsole::set_escdelay( escdelay );
 	return;
 	M_EPILOG

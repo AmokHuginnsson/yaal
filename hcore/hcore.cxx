@@ -54,7 +54,13 @@ int _debugLevel_ = 0;
 typedef HSingleton<HLog> HLogService;
 HLog& log( HLogService::get_instance( 1000 ) );
 
-HProgramOptionsHandler yaalOptions;
+HProgramOptionsHandler& yaal_options( void )
+	{
+	M_PROLOG
+	static HProgramOptionsHandler yaalOptions;
+	return ( yaalOptions );
+	M_EPILOG
+	}
 
 /* mathematical macros */
 static double long const EPSILON = 0.000001;
@@ -169,10 +175,10 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	char* env( ::getenv( "YAAL_DEBUG" ) );
 	if ( env )
 		_debugLevel_ = lexical_cast<int>( env );
-	yaalOptions( "ssl_key", program_options_helper::option_value( HOpenSSL::_sSLKey ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL private key file.", "path" )
+	yaal_options()( "ssl_key", program_options_helper::option_value( HOpenSSL::_sSLKey ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL private key file.", "path" )
 		( "ssl_cert", program_options_helper::option_value( HOpenSSL::_sSLCert ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL certificate file.", "path" )
 		( "resolve_hostnames", program_options_helper::option_value( HSocket::_resolveHostnames ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Resolve IP address into host names." );
-	yaalOptions.process_rc_file( "yaal", "core", set_hcore_variables );
+	yaal_options().process_rc_file( "yaal", "core", set_hcore_variables );
 	return;
 	}
 

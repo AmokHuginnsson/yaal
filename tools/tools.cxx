@@ -168,7 +168,7 @@ public:
 HToolsInitDeinit::HToolsInitDeinit( void )
 	{
 	M_PROLOG
-	yaalOptions( "ignore_signal_SIGINT", program_options_helper::option_value( _ignoreSignalSIGINT_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore INT (interrupt) signal" )
+	yaal_options()( "ignore_signal_SIGINT", program_options_helper::option_value( _ignoreSignalSIGINT_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore INT (interrupt) signal" )
 			( "ignore_signal_SIGTSTP", program_options_helper::option_value( _ignoreSignalSIGTSTP_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore TSTP (terminal stop, suspend) signal" )
 			( "ignore_signal_SIGQUIT", program_options_helper::option_value( _ignoreSignalSIGQUIT_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore QUIT, core dump signal" )
 			( "serial_device", program_options_helper::option_value( _serialDevice_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to serial device", "path" )
@@ -179,7 +179,7 @@ HToolsInitDeinit::HToolsInitDeinit( void )
 	int ctr = 0;
 	errno = 0;
 	extendable::my_strtold = smart_strtold;
-	yaalOptions.process_rc_file ( "yaal", "tools", set_tools_variables );
+	yaal_options().process_rc_file ( "yaal", "tools", set_tools_variables );
 	for ( ctr = 0; ctr < 256; ctr ++ )
 		util::_transTableStripPL_[ ctr ] = static_cast<char>( ctr );
 	util::_transTableStripPL_[ static_cast<char unsigned>( '±' ) ] = 'a';

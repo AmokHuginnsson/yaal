@@ -105,7 +105,7 @@ public:
 HDBWrapperInitDeinit::HDBWrapperInitDeinit( void )
 	{
 	M_PROLOG
-	yaalOptions.process_rc_file( "yaal", "dbwrapper", set_dbwrapper_variables );
+	yaal_options().process_rc_file( "yaal", "dbwrapper", set_dbwrapper_variables );
 	return;
 	M_EPILOG
 	}

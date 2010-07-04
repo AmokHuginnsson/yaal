@@ -42,7 +42,7 @@ namespace yaal
 namespace hcore
 {
 
-extern HProgramOptionsHandler yaalOptions;
+HProgramOptionsHandler& yaal_options( void );
 bool eq( double long const&, double long const& );
 void set_env( HString const&, HString const&, bool = true );
 void decode_set_env( HString );
