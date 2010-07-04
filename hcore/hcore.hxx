@@ -48,6 +48,15 @@ void set_env( HString const&, HString const&, bool = true );
 void decode_set_env( HString );
 void init_locale( char const* const = NULL );
 void banner( void );
+double long strtold( HString const& );
+
+namespace extendable
+{
+
+typedef double long ( *yaal_strtold_t )( HString const& );
+void set_strtold_impl( yaal_strtold_t );
+
+}
 
 }
 

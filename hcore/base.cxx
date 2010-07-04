@@ -33,31 +33,12 @@ M_VCSID( "$Id: "__TID__" $" )
 
 #include "hstring.hxx"
 #include "hformat.hxx"
+#include "hcore.hxx"
 
 using namespace yaal::hcore;
 
 namespace yaal
 {
-
-namespace
-{
-
-double long dumb_strtold( HString const& str )
-	{
-	return ( ::strtold( str.raw(), NULL ) );
-	}
-
-}
-
-/*! \brief Extend features of one library in another library.
- */
-namespace extendable
-{
-
-typedef double long ( *my_strtold_t )( HString const& );
-my_strtold_t my_strtold = dumb_strtold;
-
-}
 
 template<>
 int long unsigned lexical_cast( HString const& val )
@@ -129,7 +110,7 @@ template<>
 double long lexical_cast( HString const& val )
 	{
 	M_PROLOG
-	return ( extendable::my_strtold( val ) );
+	return ( hcore::strtold( val ) );
 	M_EPILOG
 	}
 

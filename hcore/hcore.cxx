@@ -138,6 +138,36 @@ void decode_set_env( HString line )
 	M_EPILOG
 	}
 
+namespace
+{
+
+double long std_strtold( HString const& str_ )
+	{
+	return ( ::strtold( str_.raw(), NULL ) );
+	}
+
+}
+
+/*! \brief Extend features of one library in another library.
+ */
+namespace extendable
+{
+
+typedef double long ( *yaal_strtold_t )( HString const& );
+yaal_strtold_t acting_strtold = &std_strtold;
+
+void set_strtold_impl( yaal_strtold_t newStrtold_ )
+	{
+	acting_strtold = newStrtold_;
+	}
+
+}
+
+double long strtold( HString const& str_ )
+	{
+	return ( extendable::acting_strtold( str_ ) );
+	}
+
 class HCoreInitDeinit
 	{
 public:

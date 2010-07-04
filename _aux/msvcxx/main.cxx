@@ -29,7 +29,6 @@
 
 #include <unistd.h>
 #include <glibc/sys/time.h>
-#include <curses.h>
 
 #define getpwuid_r getpwuid_r_off
 #include <pwd.h>
@@ -85,7 +84,19 @@
 #include <io.h>
 #include <cstdio>
 #include <cstdlib>
-#include <malloc.h>
+#include <csignal>
+
+#define sigaddset sigaddset_off
+#define sigwait sigwait_off
+#define sigemptyset sigemptyset_off
+#define kill kill_off
+#define pthread_sigmask pthread_sigmask_off
+#include <glibc/signal.h>
+#undef pthread_sigmask
+#undef sigaddset
+#undef sigwait
+#undef sigemptyset
+#undef kill
 
 #undef gethostname
 
@@ -108,8 +119,6 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-static int const SIGURG = 33;
-
 namespace abi
 {
 
@@ -121,12 +130,6 @@ char* __cxa_demangle( char const* const a, int, int, int* )
 	}
 
 }
-
-extern "C"
-int sigemptyset( sigset_t* )
-	{
-	return ( 0 );
-	}
 
 template<typename T>
 class SynchronizedQueue
@@ -174,7 +177,6 @@ int kill( int pid, int signo )
 	return ( 0 );
 	}
 
-extern "C"
 int sigwait( sigset_t*, int* signo )
 	{
 	if ( g_oSignalQueue.pop( *signo ) )
@@ -187,9 +189,21 @@ int sigaddset( sigset_t*, int )
 	return ( 0 );
 	}
 
+int sigemptyset( sigset_t* )
+	{
+	return ( 0 );
+	}
+
 void win_signal_handler( int signo )
 	{
 	g_oSignalQueue.push( signo );
+	}
+
+int sigaction( int signo, struct sigaction*, void* )
+	{
+	if ( ( signo != SIGURG ) && ( signo != SIGBUS ) && ( signo != SIGTRAP ) && ( signo != SIGSYS ) ) //&& ( signo != 5 ) && ( signo != 12 ) )
+		signal( signo, win_signal_handler );
+	return ( 0 );
 	}
 
 extern "C"
@@ -232,27 +246,7 @@ int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a
 	return ( 0 );
 	}
 
-int attr_get( attr_t*, int*, void* )
-	{
-	return ( 0 );
-	}
-
-int vw_printw( WINDOW* win_, char const* format_, va_list va_ )
-	{
-	static int const maxCols( 1024 ); /* not very likely that someone has more that 1024 column wide terminal */
-	char buf[maxCols]; 
-	int const size( vsnprintf( buf, maxCols - 1, format_, va_ ) );
-	wprintw( win_, buf );
-	return ( size );
-	}
-
 int ESCDELAY = 0;
-
-int getmouse( MEVENT* ev_ )
-	{
-	ev_->x = ev_->y = ev_->bstate = 0;
-	return ( 0 );
-	}
 
 extern "C"
 int poll( struct pollfd*, int, int )

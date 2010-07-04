@@ -49,20 +49,12 @@ namespace yaal
 namespace
 {
 
-double long smart_strtold( HString const& str )
+double long yaal_strtold( HString const& str_ )
 	{
 	M_PROLOG
-	return ( tools::util::atof_ex( str, true ) );
+	return ( tools::util::atof_ex( str_, true ) );
 	M_EPILOG
 	}
-
-}
-
-namespace extendable
-{
-
-typedef double long ( *my_strtold_t )( HString const& );
-extern my_strtold_t my_strtold;
 
 }
 
@@ -178,7 +170,7 @@ HToolsInitDeinit::HToolsInitDeinit( void )
 			( "collector_connection_timeout", program_options_helper::option_value( _collectorConnectionTimeOut_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "timeout on collector device read", "seconds" );
 	int ctr = 0;
 	errno = 0;
-	extendable::my_strtold = smart_strtold;
+	extendable::set_strtold_impl( &yaal_strtold );
 	yaal_options().process_rc_file ( "yaal", "tools", set_tools_variables );
 	for ( ctr = 0; ctr < 256; ctr ++ )
 		util::_transTableStripPL_[ ctr ] = static_cast<char>( ctr );
