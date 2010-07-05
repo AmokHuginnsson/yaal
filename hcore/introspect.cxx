@@ -67,7 +67,6 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int const& )
 		size = level_;
 	char* ptr = NULL;
 	char* end = NULL;
-	int status = 0;
 	for ( ctr = 0; ctr < size; ctr ++ )
 		{
 		ptr = strchr( strings[ ctr ], '(' );
@@ -76,7 +75,7 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int const& )
 			end = strchr( ptr, '+' );
 			if ( end )
 				(*end) = 0;
-			HString symbol( abi::__cxa_demangle( ptr + 1, 0, 0, &status ) );
+			HString symbol( demangle( ptr + 1 ) );
 			if ( ! symbol.is_empty() )
 				frames->push_back( symbol );
 			}
