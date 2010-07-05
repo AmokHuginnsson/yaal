@@ -538,10 +538,42 @@ binary_negate<F> not2( F f_ )
 template<typename tType>
 struct identity : public unary_function<tType, tType>
 	{
-	typename trait::make_reference<tType const>::type operator()( typename trait::make_reference<tType const>::type v_ ) const
+	typedef identity<tType> this_type;
+	typedef unary_function<tType, tType> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::argument_type argument_type;
+	typename trait::make_reference<result_type const>::type operator()( typename trait::make_reference<argument_type const>::type v_ ) const
 		{ return ( v_ ); }
-	typename trait::make_reference<tType>::type operator()( typename trait::make_reference<tType>::type v_ )
+	typename trait::make_reference<result_type>::type operator()( typename trait::make_reference<argument_type>::type v_ )
 		{ return ( v_ ); }
+	};
+
+template<typename first_t, typename second_t>
+struct project1st : public binary_function<first_t, first_t, second_t>
+	{
+	typedef project1st<first_t, second_t> this_type;
+	typedef binary_function<first_t, first_t, second_t> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::first_argument_type first_argument_type;
+	typedef typename base_type::second_argument_type second_argument_type;
+	typename trait::make_reference<result_type const>::type operator()( typename trait::make_reference<first_argument_type const>::type first_, typename trait::make_reference<second_argument_type const>::type ) const
+		{ return ( first_ ); }
+	typename trait::make_reference<result_type>::type operator()( typename trait::make_reference<first_argument_type>::type first_, typename trait::make_reference<second_argument_type>::type )
+		{ return ( first_ ); }
+	};
+
+template<typename first_t, typename second_t>
+struct project2nd : public binary_function<second_t, first_t, second_t>
+	{
+	typedef project2nd<first_t, second_t> this_type;
+	typedef binary_function<second_t, first_t, second_t> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::first_argument_type first_argument_type;
+	typedef typename base_type::second_argument_type second_argument_type;
+	typename trait::make_reference<result_type const>::type operator()( typename trait::make_reference<first_argument_type const>::type, typename trait::make_reference<second_argument_type const>::type second_ ) const
+		{ return ( second_ ); }
+	typename trait::make_reference<result_type>::type operator()( typename trait::make_reference<first_argument_type>::type, typename trait::make_reference<second_argument_type>::type second_ )
+		{ return ( second_ ); }
 	};
 
 template<typename tType>
@@ -613,6 +645,32 @@ public:
 template<typename F, typename G1, typename G2>
 binary_composition<F, G1, G2> compose_binary( F f_, G1 g1_, G2 g2_ )
 	{ return ( binary_composition<F, G1, G2>( f_, g1_, g2_ ) ); }
+
+template<typename T>
+struct select1st : public unary_function<typename T::first_type, T>
+	{
+	typedef select1st<T> this_type;
+	typedef unary_function<typename T::first_type, T> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::argument_type argument_type;
+	typename trait::make_reference<result_type const>::type operator()( typename trait::make_reference<argument_type const>::type arg_ ) const
+		{ return ( arg_.first ); }
+	typename trait::make_reference<result_type>::type operator()( typename trait::make_reference<argument_type>::type arg_ )
+		{ return ( arg_.first ); }
+	};
+
+template<typename T>
+struct select2nd : public unary_function<typename T::second_type, T>
+	{
+	typedef select2nd<T> this_type;
+	typedef unary_function<typename T::second_type, T> base_type;
+	typedef typename base_type::result_type result_type;
+	typedef typename base_type::argument_type argument_type;
+	typename trait::make_reference<result_type const>::type operator()( typename trait::make_reference<argument_type const>::type arg_ ) const
+		{ return ( arg_.second ); }
+	typename trait::make_reference<result_type>::type operator()( typename trait::make_reference<argument_type>::type arg_ )
+		{ return ( arg_.second ); }
+	};
 
 }
 

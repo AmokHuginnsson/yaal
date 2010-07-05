@@ -25,7 +25,6 @@ Copyright:
 */
 
 #include <cstring>   /* strsignal */
-#include <cstdio>	   /* perror function */
 #include <csignal>   /* signal handling */
 #include <unistd.h>  /* kill function */
 #include <cstdlib>   /* exit */
@@ -37,11 +36,13 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/xalloc.hxx"
-#include "hcore/hlog.hxx"       /* log object */
-#include "hcore/hstring.hxx"    /* HString class */
-#include "hcore/system.hxx"
+#include "hcore/hlog.hxx"     /* log object */
+#include "hcore/hset.hxx"
+#include "hcore/hstring.hxx"  /* HString class */
+#include "hcore/system.hxx"   /* get_pid() */
+#include "hcore/iterator.hxx"
 #include "signals.hxx"
-#include "tools.hxx"                /* tools namespace */
+#include "tools.hxx"          /* tools namespace */
 
 using namespace yaal::hcore;
 
@@ -124,6 +125,9 @@ HSignalService::~HSignalService( void )
 	 */
 	M_ENSURE( kill( get_pid(), SIGURG ) == 0 );
 	_thread.finish();
+	HSet<int> signals;
+	transform( _handlers.begin(), _handlers.end(), insert_iterator( signals ), select1st<handlers_t::value_type>() );
+	for_each( signals.begin(), signals.end(), call( &HSignalService::reset_signal, this, _1 ) );
 	return;
 	M_EPILOG
 	}
@@ -183,11 +187,29 @@ void HSignalService::lock_on( int sigNo_ )
 	 * signal as blocked.
 	 */
 	struct sigaction act;
+	::memset( &act, 0, sizeof ( struct sigaction ) );
+	act.sa_flags = SA_RESTART;
+	act.sa_handler = dummy_signal_handler;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
 	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
-	act.sa_handler = dummy_signal_handler;
-	act.sa_flags = SA_RESTART;
 	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
+	return;
+	M_EPILOG
+	}
+
+void HSignalService::reset_signal( int sigNo_ )
+	{
+	M_PROLOG
+	M_ENSURE( _handlers.count( sigNo_ ) );
+	struct sigaction act;
+	::memset( &act, 0, sizeof ( struct sigaction ) );
+	act.sa_handler = SIG_DFL;
+	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
+	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
+	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &act.sa_mask, NULL ) == 0 );
+	M_ENSURE( sigdelset( _locker.get<sigset_t>(), sigNo_ ) == 0 );
+	_handlers.erase( sigNo_ );
 	return;
 	M_EPILOG
 	}
@@ -248,7 +270,7 @@ int HBaseSignalHandlers::signal_INT ( int signum_ )
 	message += ::strsignal( signum_ );
 	message += '.';
 	log( LOG_TYPE::INFO ) << message << endl;
-	::fprintf( stderr, "\n%s\n", message.raw() );
+	cerr << "\n" << message << endl;
 	return ( -1 );
 	M_EPILOG
 	}
@@ -261,7 +283,7 @@ int HBaseSignalHandlers::signal_HUP( int signum_ )
 	message += ::strsignal( signum_ );
 	message += '.';
 	log( LOG_TYPE::INFO ) << message << endl;
-	::fprintf( stderr, "\n%s\n", message.raw() );
+	cerr << "\n" << message << endl;
 	return ( -1 );
 	M_EPILOG
 	}
@@ -274,7 +296,7 @@ int HBaseSignalHandlers::signal_TERM( int signum_ )
 	message += strsignal( signum_ );
 	message += '.';
 	log( LOG_TYPE::INFO ) << message << endl;
-	::fprintf( stderr, "\n%s\n", message.raw() );
+	cerr << "\n" << message << endl;
 	return ( -2 );
 	M_EPILOG
 	}
@@ -289,7 +311,7 @@ int HBaseSignalHandlers::signal_QUIT ( int signum_ )
 	message += ::strsignal( signum_ );
 	message += '.';
 	log( LOG_TYPE::INFO ) << message << endl;
-	::fprintf( stderr, "\n%s\n", message.raw() );
+	cerr << "\n" << message << endl;
 	abort();
 	return ( 0 );
 	M_EPILOG
@@ -305,7 +327,7 @@ int HBaseSignalHandlers::signal_TSTP( int signum_ )
 	message += ::strsignal( signum_ );
 	message += '.';
 	log( LOG_TYPE::INFO ) << message << endl;
-	::fprintf( stderr, "\n%s\n", message.raw() );
+	cerr << "\n" << message << endl;
 	unlock( SIGTSTP );
 	raise( SIGTSTP );
 	return ( 0 );
@@ -321,7 +343,7 @@ int HBaseSignalHandlers::signal_CONT( int signum_ )
 	message += ::strsignal( signum_ );
 	message += '.';
 	log( LOG_TYPE::INFO ) << message << endl;
-	::fprintf( stderr, "\n%s\n", message.raw() );
+	cerr << "\n" << message << endl;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -334,7 +356,7 @@ int HBaseSignalHandlers::signal_fatal( int signum_ )
 	message += ::strsignal( signum_ );
 	message += '.';
 	log( LOG_TYPE::INFO ) << message << endl;
-	::fprintf( stderr, "\n%s\n", message.raw() );
+	cerr << "\n" << message << endl;
 	abort();
 	M_EPILOG
 	}
@@ -347,7 +369,7 @@ int HBaseSignalHandlers::signal_USR1( int signum_ )
 	message += ::strsignal( signum_ );
 	message += '.';
 	log( LOG_TYPE::INFO ) << message << endl;
-	::fprintf( stderr, "\n%s\n", message.raw() );
+	cerr << "\n" << message << endl;
 	return ( -3 );
 	M_EPILOG
 	}

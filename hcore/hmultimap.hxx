@@ -161,10 +161,15 @@ public:
 		return;
 		M_EPILOG
 		}
-	int long erase( key_type const& key )
+	/*! \brief Erase all elements of given \e key.
+	 *
+	 * \param key_ - erase elements with this key.
+	 * \return number of elements actualy erased.
+	 */
+	int long erase( key_type const& key_ )
 		{
 		M_PROLOG
-		iterator it = find( key );
+		iterator it = find( key_ );
 		int long erased( 0 );
 		if ( it != end() )
 			{

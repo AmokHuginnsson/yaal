@@ -91,6 +91,8 @@ HLog::~HLog( void )
 			timestamp();
 		_file::ref() << "Process exited normally.\n";
 		}
+	if ( ! _realMode )
+		_file::ref().close();
 	return;
 	M_EPILOG
 	}
