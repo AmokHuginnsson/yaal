@@ -169,11 +169,17 @@ int long HZipStream::prepare_data( void )
 	z_stream* zstream( _zStream.get<z_stream>() );
 	int long const CHUNK( _zBufferIn.get_size() );
 	void* in = _zBufferIn.raw();
-	int long nRead( _streamRef->read( in, CHUNK ) );
-	if ( nRead > 0 )
+	int long nRead( 0 );
+	if ( zstream->avail_out )
 		{
+		nRead = _streamRef->read( in, CHUNK );
 		zstream->next_in = static_cast<Bytef*>( in );
 		zstream->avail_in = static_cast<uInt>( nRead );
+		}
+	else
+		nRead = zstream->avail_in;
+	if ( nRead > 0 )
+		{
 		zstream->next_out = reinterpret_cast<Bytef*>( _zBufferOut.raw() );
 		zstream->avail_out = static_cast<uInt>( CHUNK );
 		_error = inflate( zstream, Z_NO_FLUSH );

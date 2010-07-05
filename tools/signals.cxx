@@ -119,9 +119,9 @@ HSignalService::~HSignalService( void )
 	_loop = false;
 	/*
 	 * man for raise() is full of shit
-	 * raise( SIG_NO ) is NOT equivalent for kill( get_pid(), SIG_NO )
+	 * raise( SIG_NO ) is NOT equivalent for kill( getpid(), SIG_NO )
 	 * with respect to multi-thread environment at least
-	 * all hail to IBM Signal Managment documentation
+	 * all hail to IBM Signal Managment documentation.
 	 */
 	M_ENSURE( kill( get_pid(), SIGURG ) == 0 );
 	_thread.finish();
