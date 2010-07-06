@@ -10,6 +10,8 @@ if [ ! -z "${PREFIX}" ] ; then
 		/sbin/ldconfig -i -f ${PREFIX}/lib/ld.so.cache ${PREFIX}/lib
 	elif [ "${HOST_OS_TYPE}" = "Linux" ] ; then
 		/sbin/ldconfig -f ${PREFIX}/lib/ld.so.conf -C ${PREFIX}/lib/ld.so.cache ${PREFIX}/lib > /dev/null 2> /dev/null
+	elif [ "${HOST_OS_TYPE}" = "SunOS" ] ; then
+		/bin/crle -64 -c ${PREFIX}/lib/ls.so.conf -l ${PREFIX}/lib
 	else
 		echo "Unknown host operating system type!"
 		exit 1
