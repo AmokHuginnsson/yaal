@@ -29,6 +29,7 @@ Copyright:
 #include <csignal>
 #include <unistd.h>
 #include <libintl.h>
+#include <sys/time.h> /* timeval on Cygwin */
 #include <sys/types.h> /* timeval */
 
 #include "hcore/base.hxx"
