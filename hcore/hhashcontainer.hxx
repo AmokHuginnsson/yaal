@@ -49,7 +49,7 @@ inline int long hash( key_t const& key_ )
 	return ( static_cast<int long>( key_ ) );
 	}
 
-extern int long const* const _primes_;
+extern M_YAAL_PUBLIC_API int long const* const _primes_;
 
 class HHashContainer : private trait::HNonCopyable
 	{
@@ -237,7 +237,7 @@ void HHashContainer::resize( int long size_, hasher_t const& hasher_ )
 	{
 	M_PROLOG
 	if ( size_ < 1 )
-		M_THROW ( "bad new container size", size_ );
+		M_THROW( "bad new container size", size_ );
 	if ( size_ > _size )
 		{
 		int n = 0;

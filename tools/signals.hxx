@@ -64,6 +64,7 @@ private:
 public:
 	void register_handler( int, handler_t );
 	void reset_signal( int );
+	void stop( void	);
 private:
 	HSignalService( void );
 	~HSignalService( void );

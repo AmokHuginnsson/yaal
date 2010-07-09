@@ -36,7 +36,7 @@ namespace yaal
 namespace hcore
 {
 
-extern char const* const _errMsgHMatrix_[];
+extern M_YAAL_PUBLIC_API char const* const _errMsgHMatrix_[];
 
 /*! \brief Abstraction of Matrix, and all relevant algebraic operations.
  */

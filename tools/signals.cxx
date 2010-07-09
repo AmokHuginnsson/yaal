@@ -116,18 +116,30 @@ HSignalService::HSignalService( void )
 HSignalService::~HSignalService( void )
 	{
 	M_PROLOG
-	_loop = false;
-	/*
-	 * man for raise() is full of shit
-	 * raise( SIG_NO ) is NOT equivalent for kill( getpid(), SIG_NO )
-	 * with respect to multi-thread environment at least
-	 * all hail to IBM Signal Managment documentation.
-	 */
-	M_ENSURE( kill( get_pid(), SIGURG ) == 0 );
-	_thread.finish();
-	HSet<int> signals;
-	transform( _handlers.begin(), _handlers.end(), insert_iterator( signals ), select1st<handlers_t::value_type>() );
-	for_each( signals.begin(), signals.end(), call( &HSignalService::reset_signal, this, _1 ) );
+	if ( _loop )
+		stop();
+	return;
+	M_EPILOG
+	}
+
+void HSignalService::stop( void )
+	{
+	M_PROLOG
+	if ( _loop )
+		{
+		_loop = false;
+		/*
+		 * man for raise() is full of shit
+		 * raise( SIG_NO ) is NOT equivalent for kill( getpid(), SIG_NO )
+		 * with respect to multi-thread environment at least
+		 * all hail to IBM Signal Managment documentation.
+		 */
+		M_ENSURE( kill( get_pid(), SIGURG ) == 0 );
+		_thread.finish();
+		HSet<int> signals;
+		transform( _handlers.begin(), _handlers.end(), insert_iterator( signals ), select1st<handlers_t::value_type>() );
+		for_each( signals.begin(), signals.end(), call( &HSignalService::reset_signal, this, _1 ) );
+		}
 	return;
 	M_EPILOG
 	}

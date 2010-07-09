@@ -19,7 +19,7 @@ int ms_gethostname( char*, int );
 #include "tools/hpipedchild.hxx"
 
 #define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, fileDesIn, fileDesOut, fileDesErr )
-class HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn
+class M_YAAL_PUBLIC_API HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn
 	{
 	int* _in;
 	int* _out;

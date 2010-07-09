@@ -39,7 +39,7 @@ namespace yaal
 namespace hcore
 {
 
-extern char const * const _errMsgHSBBSTree_ [ ];
+extern M_YAAL_PUBLIC_API char const * const _errMsgHSBBSTree_ [ ];
 
 /*! \brief HSBBSTree stands for: Self-balancing binary search tree.
  *

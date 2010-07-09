@@ -142,7 +142,7 @@ class SynchronizedQueue
 public:
 	SynchronizedQueue( void )
 		: _data(), _mutex(), _semaphore()
-		{ /* HSemaphore leak is intentional. */ }
+		{ }
 	bool pop( T& );
 	void push( T const& );
 	};
@@ -194,6 +194,11 @@ int sigaddset( sigset_t*, int )
 	return ( 0 );
 	}
 
+int sigdelset( sigset_t*, int )
+	{
+	return ( 0 );
+	}
+
 int sigemptyset( sigset_t* )
 	{
 	return ( 0 );
@@ -212,7 +217,7 @@ int sigaction( int signo, struct sigaction*, void* )
 	}
 
 extern "C"
-int pthread_sigmask( int, sigset_t*, void* )
+M_YAAL_PUBLIC_API int pthread_sigmask( int, sigset_t*, void* )
 	{
 	return ( 0 );
 	}
