@@ -2,17 +2,20 @@
 #define YAAL_MSVCXX_CSIGNAL_INCLUDED 1
 
 #define sigaddset sigaddset_off
+#define sigdelset sigdelset_off
 #define sigwait sigwait_off
 #define sigemptyset sigemptyset_off
 #define kill kill_off
 #include <../include/csignal>
 #include <unistd.h>
 #undef sigaddset
+#undef sigdelset
 #undef sigwait
 #undef sigemptyset
 #undef kill
 
 int sigaddset( sigset_t*, int );
+int sigdelset( sigset_t*, int );
 int sigwait( sigset_t*, int* );
 int sigaction( int, struct sigaction*, void* );
 int sigemptyset( sigset_t* );

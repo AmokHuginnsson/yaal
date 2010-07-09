@@ -19,16 +19,22 @@ int main( int argc_, char** argv_ )
 		cout << "makedef: this program requires exactly three arguments" << endl;
 		sane = false;
 		}
+	vector<string> symbolFiles;
+	tokenize( argv_[1], symbolFiles, "," );
 	if ( sane )
 		{
-		ifstream in( argv_[1] );
-		if ( ! in )
+		for ( vector<string>::iterator it( symbolFiles.begin() ), end( symbolFiles.end() );
+			sane && ( it != end ); ++ it )
 			{
-			cout << "makedef: given symbol file `" << argv_[1] << "' does not exists" << endl;
-			sane = false;
+			ifstream in( it->c_str() );
+			if ( ! in )
+				{
+				cout << "makedef: given symbol file `" << *it << "' does not exists" << endl;
+				sane = false;
+				}
 			}
 		ofstream out( argv_[2] );
-		if ( ! in )
+		if ( ! out )
 			{
 			cout << "makedef: cannot create `" << argv_[2] << "' .DEF file" << endl;
 			sane = false;
@@ -38,24 +44,28 @@ int main( int argc_, char** argv_ )
 			set<string> exclude;
 			tokenize( argv_[3], exclude, "," );
 			string line;
-			bool inSymbols( false );
 			typedef set<string> symbols_t;
 			symbols_t s;
-			while ( ! getline( in, line ).fail() )
+			for ( vector<string>::iterator it( symbolFiles.begin() ), end( symbolFiles.end() ); it != end; ++ it )
 				{
-				if ( line.find( "public symbols" ) != string::npos )
+				bool inSymbols( false );
+				ifstream in( it->c_str() );
+				while ( ! getline( in, line ).fail() )
 					{
-					inSymbols = true;
-					continue;
-					}
-				if ( line.find( "  Summary" ) != string::npos )
-					break;
-				if ( inSymbols )
-					{
-					vector<string> t;
-					tokenize( line, t );
-					if ( t.size() > 1 )
-						s.insert( t[1] );
+					if ( line.find( "public symbols" ) != string::npos )
+						{
+						inSymbols = true;
+						continue;
+						}
+					if ( line.find( "  Summary" ) != string::npos )
+						break;
+					if ( inSymbols )
+						{
+						vector<string> t;
+						tokenize( line, t );
+						if ( t.size() > 1 )
+							s.insert( t[1] );
+						}
 					}
 				}
 			out << "EXPORTS" << endl;

@@ -87,6 +87,7 @@
 #include <csignal>
 
 #define sigaddset sigaddset_off
+#define sigdelset sigdelset_off
 #define sigwait sigwait_off
 #define sigemptyset sigemptyset_off
 #define kill kill_off
@@ -94,6 +95,7 @@
 #include <glibc/signal.h>
 #undef pthread_sigmask
 #undef sigaddset
+#undef sigdelset
 #undef sigwait
 #undef sigemptyset
 #undef kill
@@ -308,18 +310,9 @@ int WSAAPI unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exc
 	return ( ret );
 	}
 
-extern "C"
-int unix_socket( int af, int type, int protocol )
-	{
-	SOCKET s = -1;
-	if ( af == PF_UNIX )
-		s = ::socket( PF_INET, SOCK_STREAM, 0 );
-	else
-		s = socket( af, type, protocol );
-	return ( s );
-	}
+namespace msvcxx
+{
 
-extern "C"
 int unix_bind( int s, const struct sockaddr* name, socklen_t namelen )
 	{
 	int ret = 0;
@@ -361,8 +354,15 @@ int unix_bind( int s, const struct sockaddr* name, socklen_t namelen )
 	return ( ret );
 	}
 
-namespace msvcxx
-{
+int unix_socket( int af, int type, int protocol )
+	{
+	SOCKET s = -1;
+	if ( af == PF_UNIX )
+		s = ::socket( PF_INET, SOCK_STREAM, 0 );
+	else
+		s = socket( af, type, protocol );
+	return ( s );
+	}
 
 int unix_listen( int const& s, int const& backlog )
 	{
@@ -406,13 +406,13 @@ typedef short unsigned uint16_t;
 extern "C"
 uint16_t unix_htons( uint16_t hostshort_ )
 	{
-	return ( 0 );
+	return ( htons( hostshort_ ) );
 	}
 
 extern "C"
 uint16_t unix_ntohs( uint16_t hostshort_ )
 	{
-	return ( 0 );
+	return ( ntohs( hostshort_ ) );
 	}
 
 extern "C"
