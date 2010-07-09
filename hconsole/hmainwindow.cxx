@@ -64,7 +64,7 @@ int HMainWindow::init( void )
 	{
 	M_PROLOG
 	int error = 0;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	if ( _focusedChild.is_valid() && ( !! (*_focusedChild) ) )
 		return ( 0 );
 	error = HWindow::init();

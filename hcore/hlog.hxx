@@ -57,11 +57,11 @@ namespace LOG_TYPE
 
 /*! \brief Logging utility.
  */
-class HLog : public HField<HFile>, public HSynchronizedFile, private HSingletonInterface
+class HLog : public HField<HFile>, public HSynchronizedStream, public HSingleton<HLog>
 	{
 protected:
 	typedef HLog this_type;
-	typedef HStreamInterface base_type;
+	typedef HSynchronizedStream base_type;
 private:
 	typedef HField<HFile> _file;
 	bool     _realMode;
@@ -105,7 +105,7 @@ private:
 	friend class yaal::hcore::HDestructor<HLog>;
 	};
 
-typedef HExceptionT<HLog, HStreamInterfaceException> HLogException;
+typedef HExceptionT<HLog, HSynchronizedStreamException> HLogException;
 extern M_YAAL_PUBLIC_API HLog& log;
 
 }

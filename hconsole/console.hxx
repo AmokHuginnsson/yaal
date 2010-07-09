@@ -178,11 +178,11 @@ extern bool _needRepaint_;
 
 /*! \brief Low level TUI description and modifier.
  */
-class HConsole : private yaal::hcore::HSingletonInterface
+class HConsole : public yaal::hcore::HSingleton<HConsole>
 	{
 protected:
 	typedef HConsole this_type;
-	typedef HSingletonInterface base_type;
+	typedef yaal::hcore::HSingleton<HConsole> base_type;
 private:
 	bool _initialized;
 	int _width;
@@ -255,8 +255,6 @@ extern char const* const brightblue;
 extern char const* const brightmagenta;
 extern char const* const brightcyan;
 extern char const* const white;
-
-typedef yaal::hcore::HSingleton<HConsole> HCons;
 
 }
 

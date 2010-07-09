@@ -78,15 +78,13 @@ namespace yaal
 namespace tools
 {
 
-class HXmlParserG : public HSingletonInterface
+class HXmlParserG : public HSingleton<HXmlParserG>
 	{
 	HXmlParserG( void );
 	~HXmlParserG( void );
 	friend class HSingleton<HXmlParserG>;
 	friend class HDestructor<HXmlParserG>;
 	};
-
-typedef HSingleton<HXmlParserG> HXmlParserGlobal;
 
 HXmlParserG::HXmlParserG( void )
 	{
@@ -101,15 +99,13 @@ HXmlParserG::~HXmlParserG( void )
 	M_EPILOG
 	}
 
-class HXsltParserG : public HSingletonInterface
+class HXsltParserG : public HSingleton<HXsltParserG>
 	{
 	HXsltParserG( void );
 	~HXsltParserG( void );
 	friend class HSingleton<HXsltParserG>;
 	friend class HDestructor<HXsltParserG>;
 	};
-
-typedef HSingleton<HXsltParserG> HXsltParserGlobal;
 
 HXsltParserG::HXsltParserG( void )
 	{
@@ -344,7 +340,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 	M_PROLOG
 	int savedErrno = errno;
 	HString error;
-	HXmlParserGlobal::get_instance();
+	HXmlParserG::get_instance();
 	errno = 0;
 	HString streamId = get_stream_id( &stream );
 	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, streamId.raw(), NULL,
@@ -1106,7 +1102,7 @@ void HXml::apply_style( yaal::hcore::HString const& path_ )
 	{
 	M_PROLOG
 	M_ASSERT( _xml->_doc.get() );
-	HXsltParserGlobal::get_instance();
+	HXsltParserG::get_instance();
 	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( path_.raw() ) ), xsltFreeStylesheet );
 	doc_resource_t doc( xsltApplyStylesheet( style.get(), _xml->_doc.get(), NULL ), xmlFreeDoc );
 	if ( ! doc.get() )

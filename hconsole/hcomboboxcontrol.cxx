@@ -78,7 +78,7 @@ int HComboboxControl::kill_focus ( void )
 	if ( _mode == MODE::LISTCONTROL )
 		{
 		_mode = MODE::EDITCONTROL;
-		HCons::get_instance().clrscr();
+		HConsole::get_instance().clrscr();
 		_parent->schedule_refresh();
 		}
 	return ( HControl::kill_focus() );
@@ -90,7 +90,7 @@ void HComboboxControl::do_refresh ( void )
 	M_PROLOG
 	int width = 0;
 	int height = 0;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	if ( _mode == MODE::EDITCONTROL )
 		{
 /* ripped from HControl::draw_label() */
@@ -156,7 +156,7 @@ int HComboboxControl::do_click( mouse::OMouse& mouse_ )
 		{
 		HEditControl::do_click( mouse_ );
 		_widthRaw = ( _width > 0 ) ? _width
-			: HCons::get_instance().get_width() + _width - _columnRaw;
+			: HConsole::get_instance().get_width() + _width - _columnRaw;
 		if ( mouse_._column == ( _columnRaw + _widthRaw - 1 ) )
 			{
 			_mode = MODE::LISTCONTROL;

@@ -47,8 +47,8 @@ namespace hcore
  */
 class HOpenSSL
 	{
-	typedef HOpenSSL this_type;
 public:
+	typedef HOpenSSL this_type;
 	static yaal::hcore::HString _sSLKey;
 	static yaal::hcore::HString _sSLCert;
 	/*! \brief SSL object types.
@@ -64,7 +64,7 @@ public:
 			} ssl_context_type_t;
 		};
 private:
-	class OSSLContext : public HSingletonInterface
+	class OSSLContext
 		{
 		typedef HPointer<HMutex> mutex_ptr_t;
 		typedef HPair<mutex_ptr_t, int> mutex_info_t;
@@ -88,22 +88,20 @@ private:
 		OSSLContext( OSSLContext const& );
 		OSSLContext& operator=( OSSLContext const& );
 		};
-	class OSSLContextServer : public OSSLContext
+	class OSSLContextServer : public OSSLContext, public HSingleton<OSSLContextServer>
 		{
 		OSSLContextServer( void );
 		virtual void* do_method( void ) const;
 		friend class HSingleton<OSSLContextServer>;
 		friend class HDestructor<OSSLContextServer>;
 		};
-	class OSSLContextClient : public OSSLContext
+	class OSSLContextClient : public OSSLContext, public HSingleton<OSSLContextClient>
 		{
 		OSSLContextClient( void );
 		virtual void* do_method( void ) const;
 		friend class HSingleton<OSSLContextClient>;
 		friend class HDestructor<OSSLContextClient>;
 		};
-	typedef yaal::hcore::HSingleton<OSSLContextServer> OSSLContextServerInstance;
-	typedef yaal::hcore::HSingleton<OSSLContextClient> OSSLContextClientInstance;
 	bool _pendingOperation;
 	void* _ssl;
 	OSSLContext* _ctx;

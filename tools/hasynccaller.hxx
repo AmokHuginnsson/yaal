@@ -42,6 +42,8 @@ namespace tools
  */
 class HAbstractAsyncCaller
 	{
+public:
+	typedef HAbstractAsyncCaller this_type;
 protected:
 	typedef int long priority_t;
 	typedef yaal::hcore::HBoundCall<> call_t;
@@ -65,10 +67,16 @@ private:
 	void* run( void );
 	};
 
+typedef yaal::hcore::HExceptionT<HAbstractAsyncCaller> HAbstractAsyncCallerException;
+
 /*! \brief Invoke function or method asynchronously.
  */
-class HAsyncCaller : public HAbstractAsyncCaller
+class HAsyncCaller : public HAbstractAsyncCaller, yaal::hcore::HSingleton<HAsyncCaller>
 	{
+public:
+	typedef HAbstractAsyncCaller base_type;
+	typedef HAsyncCaller this_type;
+private:
 	yaal::hcore::HSemaphore _semaphore;
 	HAsyncCaller( void );
 	virtual ~HAsyncCaller( void );
@@ -78,7 +86,7 @@ class HAsyncCaller : public HAbstractAsyncCaller
 	friend class yaal::hcore::HDestructor<HAsyncCaller>;
 	};
 
-typedef yaal::hcore::HSingleton<HAsyncCaller> HAsyncCallerService;
+typedef yaal::hcore::HExceptionT<HAsyncCaller, HAbstractAsyncCallerException> HAsyncCallerException;
 
 }
 

@@ -86,7 +86,7 @@ HStatusBarControl::~HStatusBarControl( void )
 void HStatusBarControl::do_draw_label( void )
 	{
 	M_PROLOG
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	cons.c_move( cons.get_height() - 2, 0 );
 	cons.c_clrtoeol();
 	HControl::do_draw_label();
@@ -103,7 +103,7 @@ void HStatusBarControl::do_refresh( void )
 	M_PROLOG
 	int origRow = 0;
 	int origColumn = 0;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	if ( ! _focused )
 		cons.c_getyx( origRow, origColumn );
 	if ( _promptLength )
@@ -212,7 +212,7 @@ void HStatusBarControl::update_progress( double step_,
 	int nextMinute = 0;
 	int nextSecond = 0;
 	HTime stoper, now, left;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	now.format ( "(%T)" );
 	if ( _done )
 		return;
@@ -285,7 +285,7 @@ void HStatusBarControl::message( int attribute_,
 		va_list ap;
 		va_start( ap, format_ );
 		if ( format_ && format_ [ 0 ] )
-			HCons::get_instance().bell();
+			HConsole::get_instance().bell();
 		_varTmpBuffer.vformat( format_, &ap );
 		set( _varTmpBuffer );
 		va_end( ap );
@@ -307,7 +307,7 @@ void HStatusBarControl::message( char const* format_, ... )
 		va_list ap;
 		va_start( ap, format_ );
 		if ( format_ && format_ [ 0 ] )
-			HCons::get_instance().bell();
+			HConsole::get_instance().bell();
 		_varTmpBuffer.vformat( format_, &ap );
 		set( _varTmpBuffer );
 		va_end( ap );
@@ -320,7 +320,7 @@ void HStatusBarControl::message( char const* format_, ... )
 void HStatusBarControl::bar( char const* bar_ )
 	{
 	M_PROLOG
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	set_attr_data();
 	if ( bar_ )
 		{
@@ -377,7 +377,7 @@ int HStatusBarControl::process_input_normal( int code_ )
 			}
 		break;
 		case ( '\t' ):
-		HCons::get_instance().bell();
+		HConsole::get_instance().bell();
 		break;
 		default :
 			code_ = code;

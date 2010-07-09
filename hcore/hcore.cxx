@@ -51,8 +51,7 @@ namespace hcore
 {
 
 int _debugLevel_ = 0;
-typedef HSingleton<HLog> HLogService;
-HLog& log( HLogService::get_instance( 1000 ) );
+HLog& log( HLog::get_instance( 1000 ) );
 
 HProgramOptionsHandler& yaal_options( void )
 	{

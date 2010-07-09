@@ -96,7 +96,7 @@ HEditControl::HEditControl( HWindow* parent_,
  * _widthRaw until draw_label(), which is called from refresh()
  * because ... see next comment */
 	_widthRaw = ( _width > 0 ) ? _width
-		: HCons::get_instance().get_width() + _width - _columnRaw;
+		: HConsole::get_instance().get_width() + _width - _columnRaw;
 /* _widthRaw must be set up properly before setting up _cursorPosition and
  * _controlOffset whose are used in refresh() */
 	if ( length >= _widthRaw )
@@ -122,7 +122,7 @@ HEditControl::~HEditControl( void )
 void HEditControl::do_refresh( void )
 	{
 	M_PROLOG
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	draw_label();
 	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
 	if ( ! _password )
@@ -452,7 +452,7 @@ int HEditControl::do_process_input ( int code_ )
 	int errorCode = 0;
 	int oldControlOffset = 0;
 	int oldCursorPosition = 0;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	code_ = HControl::do_process_input ( code_ );
 	_varTmpBuffer = _string;
 	oldControlOffset = _controlOffset;

@@ -323,11 +323,11 @@ bool HFile::do_is_valid( void ) const
 	}
 
 HFile cinInstance( stdin );
-HSynchronizedFile cin( cinInstance );
-HSynchronizedStream<> cout( HStreamInterface::ptr_t( new HFile( stdout ) ) );
+HSynchronizedStream cin( cinInstance );
+HSynchronizedStream cout( HStreamInterface::ptr_t( new HFile( stdout ) ) );
 HFile cerrInstance( stderr );
-HSynchronizedFile cerr( cerrInstance );
-HSynchronizedStream<> clog;
+HSynchronizedStream cerr( cerrInstance );
+HSynchronizedStream clog;
 
 }
 

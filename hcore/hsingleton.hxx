@@ -124,9 +124,11 @@ void HDestructor<tType>::destruct( void )
 /*! \brief Singleton pattern implementation.
  */
 template<typename tType>
-class HSingleton
+class HSingleton : private HSingletonInterface
 	{
+public:
 	typedef HSingleton<tType> this_type;
+private:
 	static tType* _instance;
 	static tType* create_instance( int const& );
 public:

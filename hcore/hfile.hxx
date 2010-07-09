@@ -130,12 +130,10 @@ private:
 
 typedef HExceptionT<HFile, HStreamInterfaceException> HFileException;
 
-typedef HSynchronizedStream<HFile&> HSynchronizedFile;
-
-extern M_YAAL_PUBLIC_API HSynchronizedFile cin;
-extern M_YAAL_PUBLIC_API HSynchronizedStream<> cout;
-extern M_YAAL_PUBLIC_API HSynchronizedFile cerr;
-extern M_YAAL_PUBLIC_API HSynchronizedStream<> clog;
+extern M_YAAL_PUBLIC_API HSynchronizedStream cin;
+extern M_YAAL_PUBLIC_API HSynchronizedStream cout;
+extern M_YAAL_PUBLIC_API HSynchronizedStream cerr;
+extern M_YAAL_PUBLIC_API HSynchronizedStream clog;
 
 }
 

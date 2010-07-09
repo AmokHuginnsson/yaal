@@ -27,7 +27,7 @@ Copyright:
 /*! \file hcore/hsynchronizedstream.hxx
  * \brief Synchronize access to any stream.
  *
- * Declaration of HSynchronizedStreamBase class.
+ * Declaration of HSynchronizedStream class.
  */
 
 #ifndef YAAL_HCORE_HSYNCHRONIZEDSTREAM_HXX_INCLUDED
@@ -44,16 +44,28 @@ namespace yaal
 namespace hcore
 {
 
-/*! \brief HSynchronizedStreamBase makes use of HStreamInterface derivates thread safe.
+/*! \brief HSynchronizedStream makes use of HStreamInterface derivates thread safe.
  */
-class HSynchronizedStreamBase : public HStreamInterface
+class HSynchronizedStream : public HStreamInterface
 	{
-protected:
-	typedef HSynchronizedStreamBase this_type;
-	typedef HStreamInterface base_type;
-	HMutex _mutex;
 public:
-	HSynchronizedStreamBase( void );
+	typedef HSynchronizedStream this_type;
+	typedef HStreamInterface base_type;
+	typedef HStreamInterface::ptr_t owned_stream_t;
+	typedef HStreamInterface& ref_stream_t;
+protected:
+	HMutex _mutex;
+private:
+	owned_stream_t _streamOwned;
+	yaal::hcore::HStreamInterface* _streamRef;
+public:
+	HSynchronizedStream( void );
+	explicit HSynchronizedStream( owned_stream_t );
+	explicit HSynchronizedStream( ref_stream_t );
+	void reset( owned_stream_t = owned_stream_t() );
+	void reset( ref_stream_t );
+	template<typename call_t>
+	HSynchronizedStream& operator()( call_t );
 protected:
 	virtual HStreamInterface& do_output( HString const& );
 	virtual HStreamInterface& do_output( char const* const& );
@@ -87,122 +99,25 @@ protected:
 	virtual HStreamInterface& do_set_fill( int );
 	virtual HStreamInterface& do_set_width( int );
 	virtual HStreamInterface& do_set_base( BASES::enum_t );
-	};
-
-typedef HExceptionT<HSynchronizedStreamBase, HStreamInterfaceException> HSynchronizedStreamBaseException;
-
-namespace
-{
-
-template<typename T>
-struct stream_ptr;
-template<>
-struct stream_ptr<HStreamInterface::ptr_t>
-	{
-	static HStreamInterface* get( HStreamInterface::ptr_t& p )
-		{ return ( p.raw() ); }
-	static HStreamInterface const* get( HStreamInterface::ptr_t const& p )
-		{ return ( p.raw() ); }
-	};
-template<typename T>
-struct stream_ptr
-	{
-	static typename trait::strip_reference<T>::type* get( typename trait::strip_reference<T>::type& p )
-		{ return ( &p ); }
-	};
-
-}
-
-template<typename stream_t = HStreamInterface::ptr_t>
-class HSynchronizedStream : public HSynchronizedStreamBase
-	{
-protected:
-	typedef HSynchronizedStream this_type;
-	typedef HSynchronizedStreamBase base_type;
-private:
-	stream_t _stream;
-public:
-	HSynchronizedStream( void );
-	HSynchronizedStream( stream_t );
-	template<typename call_t>
-	HSynchronizedStream& operator()( call_t );
-	void reset( stream_t = stream_t() );
-private:
 	virtual int long do_write( void const* const, int long const& );
 	virtual int long do_read( void* const, int long const& );
 	virtual void do_flush( void ) const;
 	virtual bool do_is_valid( void ) const;
+private:
+	HSynchronizedStream( HSynchronizedStream const& );
+	HSynchronizedStream& operator = ( HSynchronizedStream const& );
 	};
 
-template<typename stream_t>
-HSynchronizedStream<stream_t>::HSynchronizedStream( void )
-	: HSynchronizedStreamBase(), _stream()
-	{
-	return;
-	}
+typedef HExceptionT<HSynchronizedStream, HStreamInterfaceException> HSynchronizedStreamException;
 
-template<typename stream_t>
-HSynchronizedStream<stream_t>::HSynchronizedStream( stream_t stream_ )
-	: HSynchronizedStreamBase(), _stream( stream_ )
-	{
-	return;
-	}
 
-template<typename stream_t>
-void HSynchronizedStream<stream_t>::reset( stream_t stream_ )
-	{
-	M_PROLOG
-	_stream = stream_;
-	M_EPILOG
-	}
-
-template<typename stream_t>
-int long HSynchronizedStream<stream_t>::do_write( void const* const buf_, int long const& size_ )
-	{
-	M_PROLOG
-	HStreamInterface* stream( stream_ptr<stream_t>::get( _stream ) );
-	return ( stream ? stream->write( buf_, size_ ) : 0 );
-	M_EPILOG
-	}
-
-template<typename stream_t>
-int long HSynchronizedStream<stream_t>::do_read( void* const buf_, int long const& size_ )
-	{
-	M_PROLOG
-	HStreamInterface* stream( stream_ptr<stream_t>::get( _stream ) );
-	return ( stream ? stream->read( buf_, size_ ) : 0 );
-	M_EPILOG
-	}
-
-template<typename stream_t>
-void HSynchronizedStream<stream_t>::do_flush( void ) const
-	{
-	M_PROLOG
-	HStreamInterface const* stream( stream_ptr<stream_t>::get( _stream ) );
-	if ( stream )
-		stream->flush();
-	return;
-	M_EPILOG
-	}
-
-template<typename stream_t>
-bool HSynchronizedStream<stream_t>::do_is_valid( void ) const
-	{
-	M_PROLOG
-	HStreamInterface const* stream( stream_ptr<stream_t>::get( _stream ) );
-	return ( stream ? stream->is_valid() : false );
-	M_EPILOG
-	}
-
-template<typename stream_t>
 template<typename call_t>
-HSynchronizedStream<stream_t>& HSynchronizedStream<stream_t>::operator()( call_t call_ )
+HSynchronizedStream& HSynchronizedStream::operator()( call_t call_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
-	HStreamInterface* stream( stream_ptr<stream_t>::get( _stream ) );
-	if ( stream )
-		call_( stream );
+	if ( _streamRef )
+		call_( _streamRef );
 	return ( *this );
 	M_EPILOG
 	}

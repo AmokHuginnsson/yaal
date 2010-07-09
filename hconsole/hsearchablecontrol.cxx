@@ -82,7 +82,7 @@ void HSearchableControl::highlight( int row_, int column_,
 	{
 	M_PROLOG
 	int long ctr( 0 );
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
 			end = _pattern.end(); it != end; ++ it )
 		{

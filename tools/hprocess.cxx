@@ -58,7 +58,7 @@ HProcess::HProcess( int noFileHandlers_, int latencySeconds_, int latencyMicrose
 	_droppedFd.clear();
 	M_ASSERT( _droppedFd.is_empty() );
 	FD_ZERO( _select.get<fd_set>() );
-	HSignalService& ss = HSignalServiceFactory::get_instance();
+	HSignalService& ss = HSignalService::get_instance();
 	HSignalService::handler_t handler( call( &HProcess::handler_interrupt, this, _1 ) );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
 		ss.register_handler( SIGINT, handler );

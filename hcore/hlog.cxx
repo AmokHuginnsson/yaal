@@ -64,7 +64,7 @@ int long HLog::_logMask = 0;
 
 void* DEFAULT_LOG_STREAM( stderr );
 
-HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedFile( _file::ref() ), _realMode( false ), _newLine( true ),
+HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedStream( _file::ref() ), _realMode( false ), _newLine( true ),
 	_type( 0 ), _bufferSize( BUFFER_SIZE ),
 	_processName( NULL ),
 	_loginName(), _hostName( HOSTNAME_SIZE ),

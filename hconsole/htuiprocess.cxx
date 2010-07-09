@@ -81,7 +81,7 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 	int ctrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t mainWindow;
 	_dispatcher.register_file_descriptor_handler( STDIN_FILENO, call( &HTUIProcess::process_stdin, this, _1 ) );
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	int mouseDes = cons.get_mouse_fd();
 	if ( _useMouse_ && mouseDes )
 		_dispatcher.register_file_descriptor_handler( mouseDes, call( &HTUIProcess::process_mouse, this, _1 ) );
@@ -146,7 +146,7 @@ void HTUIProcess::process_stdin( int code_ )
 	{
 	M_PROLOG
 	HString command;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	if ( ! code_ )
 		code_ = cons.get_key();
 	if ( code_ )
@@ -209,7 +209,7 @@ void HTUIProcess::handler_alert( void )
 	if ( _needRepaint_ )
 		{
 		_needRepaint_ = false;
-		HCons::get_instance().c_refresh();
+		HConsole::get_instance().c_refresh();
 		}
 	return;
 	M_EPILOG
@@ -219,7 +219,7 @@ void HTUIProcess::handler_idle( void )
 	{
 	M_PROLOG
 #ifdef __DEBUG__
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	HString clock( static_cast<char const *>( HTime() ) );
 	cons.c_cmvprintf( 0, static_cast<int>( cons.get_width() - clock.get_length() ),
 			COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, clock.raw() );
@@ -254,7 +254,7 @@ int HTUIProcess::handler_mouse( int code_, void const* )
 	if ( _needRepaint_ )
 		refresh();
 #ifdef __DEBUGGER_BABUNI__
-	HCons::get_instance().c_cmvprintf( 0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
+	HConsole::get_instance().c_cmvprintf( 0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			mouse._buttons, mouse._row, mouse._column );
 	_needRepaint_ = true;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -283,7 +283,7 @@ void HTUIProcess::process_terminal_event( int event_ )
 int HTUIProcess::handler_refresh( int, void const* )
 	{
 	M_PROLOG
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	cons.endwin();
 	cons.kbhit(); /* cleans all trash from stdio buffer */
 	cons.c_refresh();
@@ -298,7 +298,7 @@ int HTUIProcess::handler_quit( int, void const* )
 	M_PROLOG
 	_dispatcher.stop();
 	_needRepaint_ = false;
-	HCons::get_instance().clrscr();
+	HConsole::get_instance().clrscr();
 	return ( 0 );
 	M_EPILOG
 	}
@@ -367,7 +367,7 @@ void HTUIProcess::refresh( bool force_ )
 			(*_foregroundWindow)->schedule_refresh();
 		(*_foregroundWindow)->refresh();
 		}
-	HCons::get_instance().c_refresh();
+	HConsole::get_instance().c_refresh();
 	_needRepaint_ = false;
 	return;
 	M_EPILOG

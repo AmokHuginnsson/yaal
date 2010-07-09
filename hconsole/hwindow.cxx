@@ -51,7 +51,7 @@ HWindow::HWindow( char const * title_ ) : _initialised( false ),
 	M_PROLOG
 	int cmds [] = { ':', KEY<':'>::command };
 	int search [] = { '/', KEY<'/'>::command, '?', KEY<'?'>::command };
-	if ( ! HCons::get_instance().is_enabled() )
+	if ( ! HConsole::get_instance().is_enabled() )
 		M_THROW( "console not initialised.", errno );
 	register_postprocess_handler( '\t', NULL, &HWindow::handler_jump_tab );
 	register_postprocess_handler( 2, cmds, &HWindow::handler_command );
@@ -123,7 +123,7 @@ void HWindow::refresh( void )
 	{
 	M_PROLOG
 	if ( _needRepaint )
-		HCons::get_instance().clrscr();
+		HConsole::get_instance().clrscr();
 	if ( ( !! _statusBar ) && ( _statusBar != *_focusedChild ) )
 		_statusBar->refresh();
 	_controls.refresh_all( _needRepaint );

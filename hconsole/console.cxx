@@ -157,7 +157,7 @@ void HConsole::init( void )
 	{
 	M_PROLOG
 	_initialized = true;
-	HSignalService& signalService = HSignalServiceFactory::get_instance();
+	HSignalService& signalService = HSignalService::get_instance();
 	signalService.register_handler( SIGWINCH, call( &HConsole::on_terminal_resize, this, _1 ) );
 	signalService.register_handler( SIGQUIT, call( &HConsole::on_quit, this, _1 ) );
 	signalService.register_handler( SIGTSTP, call( &HConsole::on_tstp, this, _1 ) );

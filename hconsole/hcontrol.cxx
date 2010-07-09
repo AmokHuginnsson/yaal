@@ -57,7 +57,7 @@ HControl::HControl( HWindow* parent_, int row_, int column_,
 	_labelLength( 0 ), _shortcutIndex( 0 ), _valid( false ), _needRepaint( false )
 	{
 	M_PROLOG
-	if ( ! HCons::get_instance().is_enabled() )
+	if ( ! HConsole::get_instance().is_enabled() )
 		M_THROW ( "not in curses mode.", errno );
 	if ( ! parent_ )
 		M_THROW ( "no parent window.", reinterpret_cast<int long>( parent_ ) );
@@ -210,7 +210,7 @@ void HControl::draw_label( void )
 void HControl::do_draw_label( void )
 	{
 	M_PROLOG
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	schedule_refresh();
 /* reposition control acordingly to current parent window size */
 	_rowRaw = ( _row >= 0 ) ? _row : cons.get_height() + _row;
@@ -333,7 +333,7 @@ int HControl::attr_data( void ) const
 void HControl::set_attr_label( void ) const
 	{
 	M_PROLOG
-	HCons::get_instance().set_attr( attr_label() );
+	HConsole::get_instance().set_attr( attr_label() );
 	return;
 	M_EPILOG
 	}
@@ -341,7 +341,7 @@ void HControl::set_attr_label( void ) const
 void HControl::set_attr_shortcut( void ) const
 	{
 	M_PROLOG
-	HCons::get_instance().set_attr( attr_shortcut() );
+	HConsole::get_instance().set_attr( attr_shortcut() );
 	return;
 	M_EPILOG
 	}
@@ -349,7 +349,7 @@ void HControl::set_attr_shortcut( void ) const
 void HControl::set_attr_data( void ) const
 	{
 	M_PROLOG
-	HCons::get_instance().set_attr( attr_data() );
+	HConsole::get_instance().set_attr( attr_data() );
 	return;
 	M_EPILOG
 	}

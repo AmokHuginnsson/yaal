@@ -248,8 +248,8 @@ void* HOpenSSL::OSSLContextClient::do_method( void ) const
 HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE::ssl_context_type_t type_ )
 	: _pendingOperation( false ), _ssl( NULL ),
 	_ctx( ( type_ == TYPE::SERVER )
-			? static_cast<OSSLContext*>( &OSSLContextServerInstance::get_instance() )
-			: static_cast<OSSLContext*>( &OSSLContextClientInstance::get_instance() ) ),
+			? static_cast<OSSLContext*>( &OSSLContextServer::get_instance() )
+			: static_cast<OSSLContext*>( &OSSLContextClient::get_instance() ) ),
 	do_accept_or_connect( ( type_ == TYPE::SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect )
 	{
 	M_PROLOG

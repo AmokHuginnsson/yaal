@@ -75,7 +75,7 @@ void HLogPad::do_refresh ( void )
 	M_PROLOG
 	int ctr = 0, row = 0, cursor = 0, column = 0;
 	int bG = _focused ? COLORS::BG_GRAY : COLORS::BG_BLACK;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	draw_label();
 	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
 	_varTmpBuffer.fillz( ' ', 0, _widthRaw );

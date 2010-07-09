@@ -130,7 +130,7 @@ void HTreeControl::do_refresh( void )
 	{
 	M_PROLOG
 	int ctr = 0;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	if ( _focused )
 		cons.curs_set ( CURSOR::INVISIBLE );
 	draw_label();
@@ -148,7 +148,7 @@ int HTreeControl::draw_node( tree_t::node_t node_, int row_ )
 	{
 	M_PROLOG
 	int row = row_;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	M_ASSERT( node_ );
 	if ( (**node_)._data.get_size() )
 		{

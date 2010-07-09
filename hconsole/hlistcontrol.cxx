@@ -128,7 +128,7 @@ void HListControl::do_refresh( void )
 	int hR = _drawHeader ? 1 : 0; /* HR stands for header row */
 	int size = static_cast<int>( _controler->size() );
 	HColumnInfo * columnInfo = NULL;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	tmp = _widthRaw;
 	if ( _focused )
 		cons.curs_set( CURSOR::INVISIBLE );
@@ -187,7 +187,7 @@ void HListControl::draw_header( int columns_ )
 	int columnOffset = 0;
 	int hR = _drawHeader ? 1 : 0; /* HR stands for header row */
 	HColumnInfo * columnInfo = NULL;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	for ( ctr = 0; ctr < columns_; ctr ++ )
 		{
 		columnInfo = & _header[ ctr ];
@@ -247,7 +247,7 @@ void HListControl::draw_background( int from_ )
 	set_attr_data();
 	_varTmpBuffer.fillz( '.', 0, _widthRaw );
 	for ( ; ctr < _heightRaw; ctr ++ )
-		M_ENSURE( HCons::get_instance().c_mvprintf( _rowRaw + ctr, _columnRaw,
+		M_ENSURE( HConsole::get_instance().c_mvprintf( _rowRaw + ctr, _columnRaw,
 					_varTmpBuffer.raw() ) != C_ERR );
 	return;
 	M_EPILOG
@@ -258,7 +258,7 @@ void HListControl::draw_scroll( int posX_ )
 	M_PROLOG
 	double scaled = 0;
 	int size = static_cast<int>( _controler->size() );
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	if ( _controlOffset )
 		{
 		M_ENSURE( cons.c_move( _rowRaw, posX_ ) != C_ERR );
@@ -284,7 +284,7 @@ void HListControl::draw_cell( iterator_t& it_, int row_, int column_, int column
 	{
 	M_PROLOG
 	int tmp = 0;
-	HConsole& cons = HCons::get_instance();
+	HConsole& cons = HConsole::get_instance();
 	tmp = static_cast<int>( _varTmpBuffer.get_length() );
 	switch ( columnInfo_->_align )
 		{
@@ -401,7 +401,7 @@ void HListControl::handle_key_page_up( void )
 			decrement( _firstVisibleRow, _heightRaw - 1 );
 			}
 		else
-			HCons::get_instance().bell();
+			HConsole::get_instance().bell();
 		if ( _controlOffset < 0 )
 			{
 			_controlOffset = 0;
@@ -435,7 +435,7 @@ void HListControl::handle_key_page_down( void )
 					}
 				}
 			else
-				HCons::get_instance().bell();
+				HConsole::get_instance().bell();
 			}
 		else
 			{
@@ -452,7 +452,7 @@ void HListControl::handle_key_page_down( void )
 			_cursor = _controler->rbegin();
 			}
 		else
-			HCons::get_instance().bell();
+			HConsole::get_instance().bell();
 		}
 	return;
 	}
@@ -474,7 +474,7 @@ void HListControl::handle_key_up( void )
 			}
 		}
 	else
-		HCons::get_instance().bell();
+		HConsole::get_instance().bell();
 	return;
 	}
 
@@ -514,7 +514,7 @@ void HListControl::handle_key_down( void )
 			}
 		}
 	else
-		HCons::get_instance().bell();
+		HConsole::get_instance().bell();
 	return;
 	}
 
