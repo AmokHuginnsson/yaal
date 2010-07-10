@@ -95,7 +95,7 @@ struct ODBConnector
 ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t const& );
 typedef yaal::hcore::HPair<yaal::tools::HPlugin::ptr_t, ODBConnector> driver_t;
 typedef yaal::hcore::HMap<ODBConnector::DRIVER::enum_t, driver_t> drivers_t;
-extern M_YAAL_PUBLIC_API drivers_t _dBDrivers_;
+extern M_YAAL_DBWRAPPER_PUBLIC_API drivers_t _dBDrivers_;
 
 }
 

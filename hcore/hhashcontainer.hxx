@@ -49,7 +49,7 @@ inline int long hash( key_t const& key_ )
 	return ( static_cast<int long>( key_ ) );
 	}
 
-extern M_YAAL_PUBLIC_API int long const* const _primes_;
+extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 
 class HHashContainer : private trait::HNonCopyable
 	{

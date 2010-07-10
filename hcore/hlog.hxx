@@ -106,7 +106,7 @@ private:
 	};
 
 typedef HExceptionT<HLog, HSynchronizedStreamException> HLogException;
-extern M_YAAL_PUBLIC_API HLog& log;
+extern M_YAAL_HCORE_PUBLIC_API HLog& log;
 
 }
 

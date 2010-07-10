@@ -54,7 +54,8 @@ HPlugin::~HPlugin( void )
 void HPlugin::load( HString const& path_ )
 	{
 	M_PROLOG
-	M_ENSURE_EX( ( ( _handle = dlopen( ! path_.is_empty() ? path_.raw() : NULL, RTLD_NOW | RTLD_GLOBAL ) ) != NULL ), path_ );
+	_handle = dlopen( ! path_.is_empty() ? path_.raw() : NULL, RTLD_NOW | RTLD_GLOBAL );
+	M_ENSURE_EX( ( ( _handle != NULL ) && ( _handle != reinterpret_cast<void const*>( -1 ) ) ), path_ );
 	return;
 	M_EPILOG
 	}

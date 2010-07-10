@@ -38,10 +38,10 @@ namespace yaal
 namespace hcore
 {
 
-extern M_YAAL_PUBLIC_API char const _whiteSpace_[];
-extern M_YAAL_PUBLIC_API char const _digit_[];
-extern M_YAAL_PUBLIC_API char const _letter_[];
-extern M_YAAL_PUBLIC_API char const _word_[];
+extern M_YAAL_HCORE_PUBLIC_API char const _whiteSpace_[];
+extern M_YAAL_HCORE_PUBLIC_API char const _digit_[];
+extern M_YAAL_HCORE_PUBLIC_API char const _letter_[];
+extern M_YAAL_HCORE_PUBLIC_API char const _word_[];
 
 /*! \brief Implementation of high level string operations.
  */

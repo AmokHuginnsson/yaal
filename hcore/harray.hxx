@@ -43,7 +43,7 @@ namespace yaal
 namespace hcore
 {
 
-extern M_YAAL_PUBLIC_API char const* const _errMsgHArray_[];
+extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHArray_[];
 
 /*! \brief Simplest compund data structure.
  */

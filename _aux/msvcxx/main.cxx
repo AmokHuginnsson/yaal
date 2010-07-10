@@ -173,7 +173,7 @@ void SynchronizedQueue<T>::push( T const& elem )
 
 SynchronizedQueue<int> _signalQueue_;
 
-int kill( int pid, int signo )
+__declspec( dllexport ) int kill( int pid, int signo )
 	{
 	if ( pid == getpid() )
 		_signalQueue_.push( signo );
@@ -182,24 +182,24 @@ int kill( int pid, int signo )
 	return ( 0 );
 	}
 
-int sigwait( sigset_t*, int* signo )
+__declspec( dllexport ) int sigwait( sigset_t*, int* signo )
 	{
 	if ( _signalQueue_.pop( *signo ) )
 		*signo = SIGURG;
 	return ( 0 );
 	}
 
-int sigaddset( sigset_t*, int )
+__declspec( dllexport ) int sigaddset( sigset_t*, int )
 	{
 	return ( 0 );
 	}
 
-int sigdelset( sigset_t*, int )
+__declspec( dllexport ) int sigdelset( sigset_t*, int )
 	{
 	return ( 0 );
 	}
 
-int sigemptyset( sigset_t* )
+__declspec( dllexport ) int sigemptyset( sigset_t* )
 	{
 	return ( 0 );
 	}
@@ -209,7 +209,7 @@ void win_signal_handler( int signo )
 	_signalQueue_.push( signo );
 	}
 
-int sigaction( int signo, struct sigaction*, void* )
+__declspec( dllexport ) int sigaction( int signo, struct sigaction*, void* )
 	{
 	if ( ( signo != SIGURG ) && ( signo != SIGBUS ) && ( signo != SIGTRAP ) && ( signo != SIGSYS ) ) //&& ( signo != 5 ) && ( signo != 12 ) )
 		signal( signo, win_signal_handler );
@@ -217,7 +217,7 @@ int sigaction( int signo, struct sigaction*, void* )
 	}
 
 extern "C"
-M_YAAL_PUBLIC_API int pthread_sigmask( int, sigset_t*, void* )
+__declspec( dllexport ) int pthread_sigmask( int, sigset_t*, void* )
 	{
 	return ( 0 );
 	}

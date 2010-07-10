@@ -47,7 +47,12 @@ namespace yaal
 namespace hcore
 {
 
-void* HException::ERROR_STREAM = stderr;
+namespace
+{
+
+FILE* ERROR_STREAM = stderr;
+
+}
 
 char const* const _exceptionType_ = _( "Exception type" );
 
@@ -129,7 +134,7 @@ void HException::failed_assert( char const* const fileName_,
 	{
 	M_PROLOG
 	hcore::log << "Failed assertion: " << message_ << " -> " << fileName_ << "(" << line_ << "): " << functionName_ << endl;
-	fprintf( static_cast<FILE*>( ERROR_STREAM ), "Failed assertion: `%s' at: %s: %4d: %s\n",
+	fprintf( ERROR_STREAM, "Failed assertion: `%s' at: %s: %4d: %s\n",
 			message_, fileName_, line_, functionName_ );
 	if ( ! errno )
 		++ errno;
@@ -143,7 +148,7 @@ void HException::set_error_stream( void* errorStream_ )
 	{
 	M_PROLOG
 	M_ASSERT( errorStream_ );
-	ERROR_STREAM = errorStream_;
+	ERROR_STREAM = static_cast<FILE*>( errorStream_ );
 	return;
 	M_EPILOG
 	}

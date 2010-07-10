@@ -94,13 +94,37 @@ class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LIN
 #define countof( array ) ( static_cast<int long>( sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) ) ) )
 
 #ifdef __MSVCXX__
-#ifdef __YAAL_BUILD__
-#define M_YAAL_PUBLIC_API __declspec( dllexport )
-#else /* __YAAL_BUILD__ */
-#define M_YAAL_PUBLIC_API __declspec( dllimport )
-#endif /* not __YAAL_BUILD__ */
+#ifdef __YAAL_HCORE_BUILD__
+#define M_YAAL_HCORE_PUBLIC_API __declspec( dllexport )
+#else /* __YAAL_HCORE_BUILD__ */
+#define M_YAAL_HCORE_PUBLIC_API __declspec( dllimport )
+#endif /* not __YAAL_HCORE_BUILD__ */
+#ifdef __YAAL_TOOLS_BUILD__
+#define M_YAAL_TOOLS_PUBLIC_API __declspec( dllexport )
+#else /* __YAAL_TOOLS_BUILD__ */
+#define M_YAAL_TOOLS_PUBLIC_API __declspec( dllimport )
+#endif /* not __YAAL_TOOLS_BUILD__ */
+#ifdef __YAAL_DBWRAPPER_BUILD__
+#define M_YAAL_DBWRAPPER_PUBLIC_API __declspec( dllexport )
+#else /* __YAAL_DBWRAPPER_BUILD__ */
+#define M_YAAL_DBWRAPPER_PUBLIC_API __declspec( dllimport )
+#endif /* not __YAAL_DBWRAPPER_BUILD__ */
+#ifdef __YAAL_HCONSOLE_BUILD__
+#define M_YAAL_HCONSOLE_PUBLIC_API __declspec( dllexport )
+#else /* __YAAL_HCONSOLE_BUILD__ */
+#define M_YAAL_HCONSOLE_PUBLIC_API __declspec( dllimport )
+#endif /* not __YAAL_HCONSOLE_BUILD__ */
+#ifdef __YAAL_HDATA_BUILD__
+#define M_YAAL_HDATA_PUBLIC_API __declspec( dllexport )
+#else /* __YAAL_HDATA_BUILD__ */
+#define M_YAAL_HDATA_PUBLIC_API __declspec( dllimport )
+#endif /* not __YAAL_HDATA_BUILD__ */
 #else /* __MSVCXX__ */
-#define M_YAAL_PUBLIC_API /**/
+#define M_YAAL_HCORE_PUBLIC_API /**/
+#define M_YAAL_TOOLS_PUBLIC_API /**/
+#define M_YAAL_DBWRAPPER_PUBLIC_API /**/
+#define M_YAAL_HCONSOLE_PUBLIC_API /**/
+#define M_YAAL_HDATA_PUBLIC_API /**/
 #endif /* not __MSVCXX__ */
 
 #endif /* not YAAL_HCORE_MACRO_HXX_INCLUDED */

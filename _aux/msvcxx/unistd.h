@@ -2,10 +2,12 @@
 #define YAAL_MSVCXX_UNISTD_H_INCLUDED 1
 
 #include <cstdio>
+#include <cerrno>
 #define unlink unlink_gnu
 #undef tmpfile
 extern "C" FILE* tmpfile (void);
 
+#undef EDEADLOCK
 #include <glibc/unistd.h>
 
 #undef gethostname
@@ -19,7 +21,7 @@ int ms_gethostname( char*, int );
 #include "tools/hpipedchild.hxx"
 
 #define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, fileDesIn, fileDesOut, fileDesErr )
-class M_YAAL_PUBLIC_API HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn
+class M_YAAL_HCORE_PUBLIC_API HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn
 	{
 	int* _in;
 	int* _out;

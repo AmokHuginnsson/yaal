@@ -37,7 +37,7 @@ namespace yaal
 namespace hcore
 {
 
-extern M_YAAL_PUBLIC_API char const* const _errMsgHList_[];
+extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHList_[];
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 /*+++++++++++++++++++++++                          ++++++++++++++++++++++++*/

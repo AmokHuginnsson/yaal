@@ -33,21 +33,21 @@ namespace yaal
 namespace hconsole
 {
 
-extern M_YAAL_PUBLIC_API int _latency_;
-extern M_YAAL_PUBLIC_API int _attributeDisabled_;
-extern M_YAAL_PUBLIC_API int _attributeEnabled_;
-extern M_YAAL_PUBLIC_API int _attributeFocused_;
-extern M_YAAL_PUBLIC_API int _attributeStatusBar_;
-extern M_YAAL_PUBLIC_API int _attributeSearchHighlight_;
-extern M_YAAL_PUBLIC_API bool _useMouse_;
-extern M_YAAL_PUBLIC_API bool _disableXON_;
-extern M_YAAL_PUBLIC_API bool _leaveCtrlC_;
-extern M_YAAL_PUBLIC_API bool _leaveCtrlZ_;
-extern M_YAAL_PUBLIC_API bool _leaveCtrlS_;
-extern M_YAAL_PUBLIC_API bool _leaveCtrlQ_;
-extern M_YAAL_PUBLIC_API bool _leaveCtrlBackSlash_;
-extern M_YAAL_PUBLIC_API char _commandComposeCharacter_;
-extern M_YAAL_PUBLIC_API int _commandComposeDelay_;
+extern M_YAAL_HCONSOLE_PUBLIC_API int _latency_;
+extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeDisabled_;
+extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeEnabled_;
+extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeFocused_;
+extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeStatusBar_;
+extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeSearchHighlight_;
+extern M_YAAL_HCONSOLE_PUBLIC_API bool _useMouse_;
+extern M_YAAL_HCONSOLE_PUBLIC_API bool _disableXON_;
+extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlC_;
+extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlZ_;
+extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlS_;
+extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlQ_;
+extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlBackSlash_;
+extern M_YAAL_HCONSOLE_PUBLIC_API char _commandComposeCharacter_;
+extern M_YAAL_HCONSOLE_PUBLIC_API int _commandComposeDelay_;
 void banner( void );
 
 }

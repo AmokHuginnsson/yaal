@@ -39,7 +39,7 @@ namespace yaal
 namespace hcore
 {
 
-extern M_YAAL_PUBLIC_API char const* _errMsgHVector_[];
+extern M_YAAL_HCORE_PUBLIC_API char const* _errMsgHVector_[];
 
 /*! \brief Vector class for linear algebra calculus.
  */

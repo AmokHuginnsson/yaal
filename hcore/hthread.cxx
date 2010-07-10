@@ -128,13 +128,26 @@ void* HThread::finish( void )
 void* HThread::SPAWN( void* thread_ )
 	{
 	M_PROLOG
-	return ( reinterpret_cast<HThread*>( thread_ )->control() );
 	/*
 	 * We cannot afford silencing uncaught exceptions here.
 	 * Because of not catching an exception at the thread owner layer
 	 * is a severe coding bug, application must crash in the event
 	 * of uncaught exception.
 	 */
+	try
+		{
+		return ( reinterpret_cast<HThread*>( thread_ )->control() );
+		}
+	catch ( HException const& e )
+		{
+		log( LOG_TYPE::ERROR ) << "Uncaught exception: `" << e.what() << "' in thread!" << endl;
+		throw;
+		}
+	catch ( ... )
+		{
+		log( LOG_TYPE::ERROR ) << "Unknown uncaught exception in thread!" << endl;
+		throw;
+		}
 	M_EPILOG
 	}
 

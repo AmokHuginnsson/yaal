@@ -38,7 +38,7 @@ namespace yaal
 namespace hcore
 {
 
-extern M_YAAL_PUBLIC_API char const* const _defaultTimeFormat_;
+extern M_YAAL_HCORE_PUBLIC_API char const* const _defaultTimeFormat_;
 
 /*! \brief Date and time handling class.
  */
