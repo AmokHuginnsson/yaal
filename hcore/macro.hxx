@@ -83,6 +83,12 @@ Copyright:
 #else /* NDEBUG */
 #	define M_ASSERT( c ) /**/
 #endif /* not NDEBUG */
+/*! \brief Run given code exactly once at the end of currnt scope.
+ *
+ * \param code - code to be run.
+ */
+#define M_AT_END_OF_SCOPE( code ) \
+class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LINE__ )( void ) {} ~M_CONCAT( AtEndOfScope, __LINE__ )( void ) { do { code } while ( 0 ); } } M_CONCAT( atEndOfScope, __LINE__ )
 /*! \brief Convinience macro to obtain number of elements of declared array.
  */
 #define countof( array ) ( static_cast<int long>( sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) ) ) )
