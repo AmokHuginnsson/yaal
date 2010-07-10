@@ -237,24 +237,24 @@ private:
 
 typedef yaal::hcore::HExceptionT<HConsole, yaal::hcore::HSingletonException> HConsoleException;
 
-extern char const* const bold;
-extern char const* const reset;
-extern char const* const black;
-extern char const* const red;
-extern char const* const green;
-extern char const* const brown;
-extern char const* const blue;
-extern char const* const magenta;
-extern char const* const cyan;
-extern char const* const lightgray;
-extern char const* const gray;
-extern char const* const brightred;
-extern char const* const brightgreen;
-extern char const* const yellow;
-extern char const* const brightblue;
-extern char const* const brightmagenta;
-extern char const* const brightcyan;
-extern char const* const white;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const bold;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const reset;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const black;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const red;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const green;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brown;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const blue;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const magenta;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const cyan;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const lightgray;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const gray;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightred;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightgreen;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const yellow;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightblue;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightmagenta;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightcyan;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const white;
 
 }
 

@@ -9,6 +9,8 @@ extern "C" FILE* tmpfile (void);
 
 #undef EDEADLOCK
 #include <glibc/unistd.h>
+#include <libintl.h>
+#undef fprintf
 
 #undef gethostname
 #define gethostname ms_gethostname
