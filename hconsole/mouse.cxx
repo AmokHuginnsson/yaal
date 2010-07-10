@@ -255,13 +255,10 @@ int x_mouse_open( void )
 	else if ( ( mouseMask & desiredMouseMask ) < desiredMouseMask )
 		{
 		HString error;
-		HException exception( __FILE__, __PRETTY_FUNCTION__, __LINE__, "could not set up apropriate mask",
-				static_cast<int>( mouseMask ) );
-		error.format( "1 = %d, 2 = %d, 3 = %d",
+		error.format( "could not set up apropriate mask: 1 = %d, 2 = %d, 3 = %d",
 				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
 				mouseMask & BUTTON3_CLICKED );
-		exception.set( error );
-		throw ( exception );
+		throw ( HException( __FILE__, __PRETTY_FUNCTION__, __LINE__, error, static_cast<int>( mouseMask ) ) );
 		}
 	return ( 0 );
 	M_EPILOG

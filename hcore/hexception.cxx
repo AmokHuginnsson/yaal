@@ -85,13 +85,6 @@ HException::~HException( void )
 	return;
 	}
 
-void HException::set( HString const& str_ )
-	{
-	_message += ": ";
-	_message += str_;
-	return;
-	}
-
 void HException::print_error( void ) const
 	{
 	fprintf( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", _message.raw(), _code );
