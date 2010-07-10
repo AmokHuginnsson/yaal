@@ -88,6 +88,11 @@ void* HScheduledAsyncCaller::do_work( void )
 	M_EPILOG
 	}
 
+int HScheduledAsyncCaller::life_time( int )
+	{
+	return ( 50 );
+	}
+
 }
 
 }

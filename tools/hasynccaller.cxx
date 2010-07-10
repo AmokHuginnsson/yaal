@@ -98,11 +98,6 @@ void* HAbstractAsyncCaller::run( void )
 	M_EPILOG
 	}
 
-int HAbstractAsyncCaller::life_time( int )
-	{
-	return ( 50 );
-	}
-
 HAsyncCaller::HAsyncCaller( void ) : _semaphore()
 	{
 	M_PROLOG
@@ -143,6 +138,11 @@ void* HAsyncCaller::do_work( void )
 		}
 	return ( 0 );
 	M_EPILOG
+	}
+
+int HAsyncCaller::life_time( int )
+	{
+	return ( 50 );
 	}
 
 }

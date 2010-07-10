@@ -62,7 +62,6 @@ protected:
 	void stop( void );
 	virtual void do_signal( void ) = 0;
 	virtual void* do_work( void ) = 0;
-	static int life_time( int );
 private:
 	void* run( void );
 	};
@@ -71,7 +70,7 @@ typedef yaal::hcore::HExceptionT<HAbstractAsyncCaller> HAbstractAsyncCallerExcep
 
 /*! \brief Invoke function or method asynchronously.
  */
-class HAsyncCaller : public HAbstractAsyncCaller, yaal::hcore::HSingleton<HAsyncCaller>
+class HAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HAsyncCaller>
 	{
 public:
 	typedef HAbstractAsyncCaller base_type;
@@ -82,6 +81,7 @@ private:
 	virtual ~HAsyncCaller( void );
 	virtual void* do_work( void );
 	virtual void do_signal( void );
+	static int life_time( int );
 	friend class yaal::hcore::HSingleton<HAsyncCaller>;
 	friend class yaal::hcore::HDestructor<HAsyncCaller>;
 	};
