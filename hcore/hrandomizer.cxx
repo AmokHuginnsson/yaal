@@ -30,6 +30,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hrandomizer.hxx"
+#include "hexception.hxx"
 
 namespace yaal
 {

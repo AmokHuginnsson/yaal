@@ -28,6 +28,7 @@ Copyright:
 #define YAAL_HCORE_HPAIR_HXX_INCLUDED
 
 #include "hcore/base.hxx"
+#include "hcore/hexception.hxx"
 
 namespace yaal
 {

@@ -32,6 +32,7 @@ Copyright:
 #ifndef YAAL_HCORE_HTOKENIZER_HXX_INCLUDED
 #define YAAL_HCORE_HTOKENIZER_HXX_INCLUDED
 
+#include "hcore/hexception.hxx"
 #include "hcore/hstring.hxx"
 
 namespace yaal

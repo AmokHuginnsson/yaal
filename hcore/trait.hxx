@@ -31,6 +31,8 @@ Copyright:
 #ifndef YAAL_HCORE_TRAIT_HXX_INCLUDED
 #define YAAL_HCORE_TRAIT_HXX_INCLUDED
 
+#include <cstddef>
+
 #include "hcore/numeric.hxx"
 
 namespace yaal

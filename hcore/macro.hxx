@@ -29,9 +29,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_MACRO_HXX_INCLUDED
-#define YAAL_HCORE_MACRO_HXX_INCLUDED
-
-#include "hcore/hexception.hxx"
+#define YAAL_HCORE_MACRO_HXX_INCLUDED 1
 
 /*! \brief gettext library API convenience macro.
  */

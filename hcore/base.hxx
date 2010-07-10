@@ -131,7 +131,7 @@ public:
 		{ return ( _field ); }
 	};
 
-template <typename T, size_t N>
+template <typename T, int long unsigned N>
 char ( &YaalArrayElementCountHelper( T ( &YaalArrayElementCountHelperArray )[N] ) )[N];
 
 }

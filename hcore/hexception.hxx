@@ -51,7 +51,7 @@ namespace yaal
 namespace hcore
 {
 
-extern int _debugLevel_;
+extern M_YAAL_PUBLIC_API int _debugLevel_;
 struct DEBUG_LEVEL
 	{
 	static int const PRINT_PROGRAM_OPTIONS = 3;
@@ -99,7 +99,7 @@ private:
 	HException& operator = ( HException const& );
 	};
 
-extern char const* const _exceptionType_;
+extern M_YAAL_PUBLIC_API char const* const _exceptionType_;
 
 /*! \brief Demangle symbol name.
  *

@@ -25,8 +25,11 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HSTRING_HXX_INCLUDED
-#define YAAL_HCORE_HSTRING_HXX_INCLUDED
+#define YAAL_HCORE_HSTRING_HXX_INCLUDED 1
 
+#include <cstddef>
+
+#include "hcore/macro.hxx"
 #include "hcore/numeric.hxx"
 
 namespace yaal
@@ -35,10 +38,10 @@ namespace yaal
 namespace hcore
 {
 
-extern char const _whiteSpace_[];
-extern char const _digit_[];
-extern char const _letter_[];
-extern char const _word_[];
+extern M_YAAL_PUBLIC_API char const _whiteSpace_[];
+extern M_YAAL_PUBLIC_API char const _digit_[];
+extern M_YAAL_PUBLIC_API char const _letter_[];
+extern M_YAAL_PUBLIC_API char const _word_[];
 
 /*! \brief Implementation of high level string operations.
  */

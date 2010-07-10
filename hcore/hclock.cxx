@@ -33,6 +33,8 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hclock.hxx"
+#include "hexception.hxx"
+#include "numeric.hxx"
 
 using namespace yaal::meta;
 

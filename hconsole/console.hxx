@@ -174,7 +174,7 @@ struct EVENT
 		};
 	};
 
-extern bool _needRepaint_;
+extern M_YAAL_PUBLIC_API bool _needRepaint_;
 
 /*! \brief Low level TUI description and modifier.
  */

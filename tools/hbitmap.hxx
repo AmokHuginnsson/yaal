@@ -32,6 +32,8 @@ Copyright:
 #ifndef YAAL_TOOLS_HBITMAP_HXX_INCLUDED
 #define YAAL_TOOLS_HBITMAP_HXX_INCLUDED
 
+#include "hcore/hexception.hxx"
+
 namespace yaal
 {
 

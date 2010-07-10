@@ -37,12 +37,12 @@ namespace yaal
 namespace hconsole
 {
 
-extern char const* const _maskLetters_;
-extern char const* const _maskDigits_;
-extern char const* const _maskAlpha_;
-extern char const* const _maskExtended_;
-extern char const* const _maskLoose_;
-extern char const* const _maskDefault_;
+extern M_YAAL_PUBLIC_API char const* const _maskLetters_;
+extern M_YAAL_PUBLIC_API char const* const _maskDigits_;
+extern M_YAAL_PUBLIC_API char const* const _maskAlpha_;
+extern M_YAAL_PUBLIC_API char const* const _maskExtended_;
+extern M_YAAL_PUBLIC_API char const* const _maskLoose_;
+extern M_YAAL_PUBLIC_API char const* const _maskDefault_;
 
 /*! \brief Implementation of TUI Edit control class.
  *
