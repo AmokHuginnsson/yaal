@@ -58,6 +58,7 @@ public:
 	HIterator end( void );
 	bool operator ! ( void ) const;
 	void swap( HFSItem& );
+	yaal::hcore::HString error_message( int ) const;
 private:
 	void do_stat( void* ) const;
 	void set_path( yaal::hcore::HString const&, int );

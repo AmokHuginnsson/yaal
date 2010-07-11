@@ -280,6 +280,11 @@ HFSItem const* HFSItem::HIterator::operator->( void )
 	M_EPILOG
 	}
 
+HString HFSItem::error_message( int errno_ ) const
+	{
+	return ( _path + ": " + strerror( errno_ ) );
+	}
+
 }
 
 }
