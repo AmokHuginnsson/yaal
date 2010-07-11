@@ -229,7 +229,7 @@ __declspec( dllexport ) void* dlopen_fix( char const* name_, int flag_ )
 	if ( ! name_ )
 		handle = GetModuleHandle( NULL );
 	else
-		dlopen( name_, flag_ );
+		handle = dlopen( name_, flag_ );
 	return ( handle );
 	}
 
