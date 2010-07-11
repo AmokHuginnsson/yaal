@@ -94,6 +94,7 @@ class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LIN
 #define countof( array ) ( static_cast<int long>( sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) ) ) )
 
 #ifdef __MSVCXX__
+#define M_EXPORT_SYMBOL __declspec( dllexport )
 #ifdef __YAAL_HCORE_BUILD__
 #define M_YAAL_HCORE_PUBLIC_API __declspec( dllexport )
 #else /* __YAAL_HCORE_BUILD__ */
@@ -120,6 +121,7 @@ class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LIN
 #define M_YAAL_HDATA_PUBLIC_API __declspec( dllimport )
 #endif /* not __YAAL_HDATA_BUILD__ */
 #else /* __MSVCXX__ */
+#define M_EXPORT_SYMBOL /**/
 #define M_YAAL_HCORE_PUBLIC_API /**/
 #define M_YAAL_TOOLS_PUBLIC_API /**/
 #define M_YAAL_DBWRAPPER_PUBLIC_API /**/

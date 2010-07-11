@@ -222,6 +222,17 @@ __declspec( dllexport ) int pthread_sigmask( int, sigset_t*, void* )
 	return ( 0 );
 	}
 
+extern "C" void* dlopen( char const*, int );
+__declspec( dllexport ) void* dlopen_fix( char const* name_, int flag_ )
+	{
+	HANDLE handle( 0 );
+	if ( ! name_ )
+		handle = GetModuleHandle( NULL );
+	else
+		dlopen( name_, flag_ );
+	return ( handle );
+	}
+
 extern "C"
 int getpwuid_r( uid_t, struct passwd* p, char* buf, int size, struct passwd** )
 	{

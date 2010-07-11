@@ -131,7 +131,7 @@ class HPointer
 		friend struct pointer_helper;
 		friend class HPointer;
 		template<typename T1, typename T2>
-		friend class HPointerStrict;
+		friend struct HPointerStrict;
 		};
 	/*
 	 * WARNING!
