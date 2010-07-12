@@ -196,7 +196,7 @@ public:
 		M_PROLOG
 		while ( first_ != last_ )
 			first_ = erase( first_ );
-		return ( first_ );
+		return;
 		M_EPILOG
 		}
 	const_iterator find( key_type const& key ) const

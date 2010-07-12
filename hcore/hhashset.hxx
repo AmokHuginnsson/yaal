@@ -186,7 +186,7 @@ public:
 		M_PROLOG
 		while ( first_ != last_ )
 			first_ = erase( first_ );
-		return ( first_ );
+		return;
 		M_EPILOG
 		}
 	int long count( type_t const& key_ ) const
