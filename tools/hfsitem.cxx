@@ -60,27 +60,27 @@ HFSItem::~HFSItem( void )
 bool HFSItem::is_directory() const
 	{
 	M_PROLOG
-	struct stat stat;
-	do_stat( &stat );
-	return ( S_ISDIR( stat.st_mode ) );
+	struct stat s;
+	do_stat( &s );
+	return ( S_ISDIR( s.st_mode ) );
 	M_EPILOG
 	}
 
 bool HFSItem::is_file() const
 	{
 	M_PROLOG
-	struct stat stat;
-	do_stat( &stat );
-	return ( S_ISREG( stat.st_mode ) );
+	struct stat s;
+	do_stat( &s );
+	return ( S_ISREG( s.st_mode ) );
 	M_EPILOG
 	}
 
 bool HFSItem::is_executable() const
 	{
 	M_PROLOG
-	struct stat stat;
-	do_stat( &stat );
-	return ( ( stat.st_mode & ( S_IXUSR | S_IXGRP | S_IXOTH ) ) ? true : false );
+	struct stat s;
+	do_stat( &s );
+	return ( ( s.st_mode & ( S_IXUSR | S_IXGRP | S_IXOTH ) ) ? true : false );
 	M_EPILOG
 	}
 

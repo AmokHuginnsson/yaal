@@ -196,7 +196,13 @@ public:
 	 * \param count - fill that many bytes.
 	 */
 	HString& fillz( char value = '\0', int long position = 0, int long count = 0 );
-	HString& erase( int long, int long );
+	/*! \brief Erase part of the string.
+	 *
+	 * \param position_ - start position for part to be erased.
+	 * \param length_ - length of part to be erased.
+	 * \return self.
+	 */
+	HString& erase( int long position_, int long length_ = meta::max_signed<int long>::value );
 	HString& insert( int long, int long, char const* = NULL );
 	HString& insert( int long, char const* = NULL );
 	HString& insert( int long, char const*, int long );

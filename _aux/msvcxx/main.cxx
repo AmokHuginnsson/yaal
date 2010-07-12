@@ -81,6 +81,7 @@
 #include <Windows.h>
 #include <dbghelp.h>
 #include <process.h>
+#include <../include/sys/stat.h>
 #include <io.h>
 #include <cstdio>
 #include <cstdlib>
@@ -231,6 +232,27 @@ __declspec( dllexport ) void* dlopen_fix( char const* name_, int flag_ )
 	else
 		handle = dlopen( name_, flag_ );
 	return ( handle );
+	}
+
+__declspec( dllexport ) int unix_stat( char const* path_, struct stat* s_ )
+	{
+	string path( path_ );
+	int lastNonSeparator( static_cast<int>( path.find_last_not_of( "/\\" ) ) );
+	int len( path.length() );
+	if ( lastNonSeparator != string::npos )
+		path.erase( lastNonSeparator + 1 );
+	else
+		path.erase( 1 );
+	int res( stat( path.c_str(), s_ ) );
+	if ( ! res )
+		{
+		if ( ( len != path.length() ) && ! ( S_IFDIR & s_->st_mode ) )
+			{
+			res = -1;
+			errno = ENOTDIR;
+			}
+		}
+	return ( res );
 	}
 
 extern "C"
