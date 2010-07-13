@@ -32,6 +32,8 @@ Copyright:
 
 #include "hcore/hfunctor.hxx"
 #include "hcore/functional.hxx"
+#include "hcore/hpointer.hxx"
+#include "hcore/hresource.hxx"
 
 namespace yaal
 {
@@ -94,6 +96,14 @@ public:
 		{ return ( do_invoke( a0 ) ); }
 	return_t operator()( a0_t a0 ) const
 		{ return ( do_invoke( a0 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0 )
+		{ return ( do_invoke( *a0 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0 ) const
+		{ return ( do_invoke( *a0 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0 )
+		{ return ( do_invoke( *a0 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0 ) const
+		{ return ( do_invoke( *a0 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:

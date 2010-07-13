@@ -48,13 +48,17 @@ struct HResourceAllocatedBy
 	template<typename T>
 	struct by_pointer
 		{
-		typedef T* hold_t;
+		typedef typename trait::strip_const<T>::type* hold_t;
 		typedef T const* const_hold_t;
-		typedef T* ref_t;
-		typedef T const* const_ref_t;
-		static T* raw( T* val )
+		typedef typename trait::make_reference<typename trait::strip_const<T>::type>::type ref_t;
+		typedef typename trait::make_reference<T const>::type const_ref_t;
+		static ref_t ref( hold_t val )
+			{ return ( *val ); }
+		static const_ref_t ref( const_hold_t val )
+			{ return ( *val ); }
+		static T* raw( hold_t val )
 			{ return ( val ); }
-		static T const* raw( T const* val )
+		static T const* raw( const_hold_t val )
 			{ return ( val ); }
 		};
 	template<typename T>
@@ -64,6 +68,10 @@ struct HResourceAllocatedBy
 		typedef T const& const_hold_t;
 		typedef T& ref_t;
 		typedef T const& const_ref_t;
+		static T ref( T& val )
+			{ return ( val ); }
+		static T ref( T const& val )
+			{ return ( val ); }
 		static T raw( T& val )
 			{ return ( val ); }
 		static T raw( T const& val )
@@ -283,13 +291,15 @@ HResource<type_t, free_t, hold_by_t, allocated_t>::operator HResource<real_t, fr
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 typename HResource<type_t, free_t, hold_by_t, allocated_t>::const_ref_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator*( void ) const
 	{
-	return ( _resource );
+	M_ASSERT( allocated_t::is_allocated( _resource ) );
+	return ( hold_by_t<value_type>::ref( _resource ) );
 	}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 typename HResource<type_t, free_t, hold_by_t, allocated_t>::ref_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator*( void )
 	{
-	return ( _resource );
+	M_ASSERT( allocated_t::is_allocated( _resource ) );
+	return ( hold_by_t<value_type>::ref( _resource ) );
 	}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
