@@ -59,6 +59,9 @@ HThread::HThread( void )
 	M_PROLOG
 	pthread_attr_t* attr( static_cast<pthread_attr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_t ) ) ) );
 	M_ENSURE( ::pthread_attr_init( attr ) == 0 );
+	size_t stackSize( 0 );
+	M_ENSURE( pthread_attr_getstacksize( attr, &stackSize ) == 0 );
+	log( LOG_TYPE::DEBUG ) << "Thread stack size: " << stackSize << "." << endl;
 	HResource<void> res( attr, do_pthread_attr_destroy );
 	_resGuard.swap( res );
 	M_ENSURE( ::pthread_attr_setdetachstate( attr, PTHREAD_CREATE_JOINABLE ) == 0 );
