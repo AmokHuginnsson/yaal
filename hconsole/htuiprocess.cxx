@@ -220,7 +220,7 @@ void HTUIProcess::handler_idle( void )
 	M_PROLOG
 #ifdef __DEBUG__
 	HConsole& cons = HConsole::get_instance();
-	HString clock( static_cast<char const *>( HTime() ) );
+	HString clock( HTime().string() );
 	cons.c_cmvprintf( 0, static_cast<int>( cons.get_width() - clock.get_length() ),
 			COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, clock.raw() );
 	_needRepaint_ = true;

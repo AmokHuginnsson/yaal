@@ -78,7 +78,7 @@ public:
 	virtual yaal::hcore::HString const get_long( void ) = 0;
 	virtual yaal::hcore::HString const get_double( void ) = 0;
 	virtual yaal::hcore::HString const get_string( void ) = 0;
-	virtual char const* get_time( void ) = 0;
+	virtual yaal::hcore::HString get_time( void ) = 0;
 	virtual void set_child_control_data( HControl* ) = 0;
 	};
 
@@ -97,7 +97,7 @@ public:
 	virtual yaal::hcore::HString const get_long( void );
 	virtual yaal::hcore::HString const get_double( void );
 	virtual yaal::hcore::HString const get_string( void );
-	virtual char const* get_time( void );
+	virtual yaal::hcore::HString get_time( void );
 	virtual void set_child_control_data( HControl* );
 	};
 

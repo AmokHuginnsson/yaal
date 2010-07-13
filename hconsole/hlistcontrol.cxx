@@ -1062,7 +1062,7 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 					 right_.get<HString const&>() ) < 0;
 		break;
 		case ( TYPE::HTIME ):
-			lower = static_cast<time_t>( left_.get<HTime const&>() ) < static_cast<time_t>( right_.get<HTime const&>() );
+			lower = left_.get<HTime const&>().raw() < right_.get<HTime const&>().raw();
 		break;
 		default:
 			break;
@@ -1128,10 +1128,10 @@ yaal::hcore::HString const HCell<>::get_string( void )
 	}
 
 template<>
-char const * HCell<>::get_time( void )
+yaal::hcore::HString HCell<>::get_time( void )
 	{
 	M_PROLOG
-	return ( (*_data)[ _column ].get<yaal::hcore::HTime const &>() );
+	return ( ( (*_data)[ _column ].get<yaal::hcore::HTime const &>() ).string() );
 	M_EPILOG
 	}
 

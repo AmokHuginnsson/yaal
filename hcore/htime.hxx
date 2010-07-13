@@ -79,8 +79,8 @@ public:
 	bool operator >= ( time_t const& ) const;
 	bool operator < ( time_t const& ) const;
 	bool operator > ( time_t const& ) const;
-	operator char const* ( void ) const;
-	operator time_t ( void ) const;
+	HString string( void ) const;
+	time_t raw( void ) const;
 	};
 
 typedef HExceptionT<HTime> HTimeException;

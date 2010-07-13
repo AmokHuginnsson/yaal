@@ -288,7 +288,7 @@ bool HTime::operator > ( time_t const& time_ ) const
 	M_EPILOG
 	}
 
-HTime::operator char const* ( void ) const
+HString HTime::string( void ) const
 	{
 	M_PROLOG
 	int long size = 0;
@@ -305,11 +305,11 @@ HTime::operator char const* ( void ) const
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */
-	return ( _cache.raw() );
+	return ( HString( _cache.raw() ) );
 	M_EPILOG
 	}
 
-HTime::operator time_t ( void ) const
+time_t HTime::raw( void ) const
 	{
 	return ( _value );
 	}

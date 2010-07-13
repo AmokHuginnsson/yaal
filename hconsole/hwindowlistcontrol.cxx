@@ -141,7 +141,7 @@ yaal::hcore::HString const HCell<window_iterator_t>::get_string( void )
 	}
 
 template<>
-char const * HCell<window_iterator_t>::get_time( void )
+HString HCell<window_iterator_t>::get_time( void )
 	{
 	return ( "" );
 	}

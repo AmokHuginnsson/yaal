@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hpointer.hxx"
+#include "hcore/htime.hxx"
 
 namespace yaal
 {
@@ -52,8 +53,13 @@ public:
 	bool is_directory( void ) const;
 	bool is_file( void ) const;
 	bool is_executable( void ) const;
+	int long get_size( void ) const;
+	int long size( void ) const;
 	yaal::hcore::HString get_path() const;
 	yaal::hcore::HString get_name() const;
+	yaal::hcore::HTime modified() const;
+	yaal::hcore::HTime created() const;
+	yaal::hcore::HTime accessed() const;
 	HIterator begin( void );
 	HIterator end( void );
 	bool operator ! ( void ) const;

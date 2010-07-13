@@ -84,6 +84,49 @@ bool HFSItem::is_executable() const
 	M_EPILOG
 	}
 
+int long HFSItem::get_size() const
+	{
+	M_PROLOG
+	struct stat s;
+	do_stat( &s );
+	return ( s.st_size );
+	M_EPILOG
+	}
+
+int long HFSItem::size() const
+	{
+	M_PROLOG
+	return ( get_size() );
+	M_EPILOG
+	}
+
+yaal::hcore::HTime HFSItem::modified() const
+	{
+	M_PROLOG
+	struct stat s;
+	do_stat( &s );
+	return ( s.st_mtime );
+	M_EPILOG
+	}
+
+yaal::hcore::HTime HFSItem::created() const
+	{
+	M_PROLOG
+	struct stat s;
+	do_stat( &s );
+	return ( s.st_ctime );
+	M_EPILOG
+	}
+
+yaal::hcore::HTime HFSItem::accessed() const
+	{
+	M_PROLOG
+	struct stat s;
+	do_stat( &s );
+	return ( s.st_atime );
+	M_EPILOG
+	}
+
 void HFSItem::do_stat( void* buf ) const
 	{
 	M_PROLOG
