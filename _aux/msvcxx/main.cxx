@@ -29,6 +29,9 @@
 
 #include <unistd.h>
 #include <glibc/sys/time.h>
+#include <dirent.h>
+#undef dirent
+#undef readdir_r
 
 #define getpwuid_r getpwuid_r_off
 #include <pwd.h>
@@ -253,6 +256,21 @@ __declspec( dllexport ) int unix_stat( char const* path_, struct stat* s_ )
 			}
 		}
 	return ( res );
+	}
+
+__declspec( dllexport ) int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ )
+	{
+	dirent* result;
+	dirent broken;
+	int error( readdir_r( dir_, &broken, &result ) );
+	if ( ( ! error ) && result )
+		{
+		*result_ = reinterpret_cast<unix_dirent*>( result );
+		entry_->d_fileno = (*result_)->d_fileno;
+		entry_->d_type = (*result_)->d_type;
+		strncpy( entry_->d_name, (*result_)->d_name, NAME_MAX );
+		}
+	return ( error );
 	}
 
 extern "C"
