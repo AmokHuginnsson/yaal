@@ -228,6 +228,7 @@ try {
 	var env = shell.Environment( "USER" );
 	env( "CMAKE_INCLUDE_PATH" ) = EXTRA_INCLUDE_PATH;
 	env( "CMAKE_LIBRARY_PATH" ) = EXTRA_LIBRARY_PATH;
+	env( "BOOST_INSTALL_PATH" ) = BOOST_INSTALL_PATH;
 	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" " + CMAKELISTS_PATH;
 	msg( "Executing: " + cmdline );
 	cmd = shell.exec( cmdline );
