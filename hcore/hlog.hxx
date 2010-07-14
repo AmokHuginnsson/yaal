@@ -79,7 +79,6 @@ public:
 	void rehash( void* = DEFAULT_LOG_STREAM, char const* const = NULL );
 	/* log file name */
 	void rehash( HString const&, char const* const = NULL );
-	int operator()( char const* const, va_list );
 	/*! \brief log ( "data %d", x ); will look nice
 	 */
 	int operator()( char const* const, ... );
@@ -95,6 +94,8 @@ private:
 	virtual ~HLog( void );
 	void do_rehash( void*, char const* const );
 	void timestamp( void );
+	int vformat( char const* const, va_list );
+	void eol_reset( char const* const, int long );
 	virtual int long do_write( void const* const, int long const& );
 	virtual void do_flush( void ) const;
 	virtual int long do_read( void* const, int long const& );

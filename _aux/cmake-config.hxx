@@ -2,6 +2,9 @@
 #define YAAL_CONFIG_HXX_INCLUDED 1
 #define PACKAGE_NAME "yaal"
 #define PACKAGE_VERSION "0.0.0"
+#cmakedefine HAVE_PRETTY_FUNCTION
+#cmakedefine HAVE_FUNCTION
+#cmakedefine HAVE_FUNC
 #cmakedefine01 HAVE_STRCASESTR
 #cmakedefine01 HAVE_ASPRINTF
 #cmakedefine01 HAVE_STRTOLD

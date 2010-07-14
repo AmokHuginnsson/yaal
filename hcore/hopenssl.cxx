@@ -74,9 +74,6 @@ HString& format_error_message( HString& buffer_, int err = 0 )
 
 }
 
-yaal::hcore::HString HOpenSSL::_sSLKey;
-yaal::hcore::HString HOpenSSL::_sSLCert;
-
 int HOpenSSL::OSSLContext::_instances = 0;
 HMutex HOpenSSL::OSSLContext::_mutex( HMutex::TYPE::RECURSIVE );
 HOpenSSL::OSSLContext::mutexes_t HOpenSSL::OSSLContext::_sslLibMutexes;

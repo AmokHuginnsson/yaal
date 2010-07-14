@@ -100,6 +100,7 @@ HLog::~HLog( void )
 void HLog::do_rehash( void* src_, char const* const processName_ )
 	{
 	M_PROLOG
+	M_ASSERT( ! _realMode );
 #ifndef HAVE_GETLINE
 	char* ptr = NULL;
 	int len = 0;
@@ -138,7 +139,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ )
       ::fseek( src, static_cast<int long>( ptr - buf ) - len, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
 			_type = ::strtol( buf, NULL, 0x10 );
-			if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
+			if ( ! _type || ( _type & _logMask ) )
 				{
 				timestamp();
 				_file::ref() << buf + 10; /* 10 for timestamp */
@@ -214,7 +215,22 @@ void HLog::timestamp( void )
 	M_EPILOG
 	}
 
-int HLog::operator() ( char const* const format_, va_list ap_ )
+void HLog::eol_reset( char const* const buf_, int long len_ )
+	{
+	M_PROLOG
+	if ( buf_[ len_ - 1 ] != '\n' )
+		_newLine = false;
+	else
+		{
+		_type = 0;
+		_newLine = true;
+		_file::ref().flush();
+		}
+	return;
+	M_EPILOG
+	}
+
+int HLog::vformat( char const* const format_, va_list ap_ )
 	{
 	M_PROLOG
 	int err = 0;
@@ -223,15 +239,9 @@ int HLog::operator() ( char const* const format_, va_list ap_ )
 	char* buf = _buffer.get<char>();
 	::memset( buf, 0, _bufferSize );
 	err = ::vsnprintf( buf, _bufferSize, format_, ap_ );
-	_file::ref() << buf;
-	if ( buf[ ::strlen( buf ) - 1 ] != '\n' )
-		_newLine = false;
-	else
-		{
-		_type = 0;
-		_newLine = true;
-		_file::ref().flush();
-		}
+	if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
+		_file::ref() << buf;
+	eol_reset( buf, ::strlen( buf ) );
 	return ( err );
 	M_EPILOG
 	}
@@ -241,12 +251,9 @@ int HLog::operator() ( char const * const format_, ... )
 	M_PROLOG
 	int err = 0;
 	va_list ap;
-	if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
-		{
-		va_start( ap, format_ );
-		err = ( *this )( format_, ap );
-		va_end( ap );
-		}
+	va_start( ap, format_ );
+	err = vformat( format_, ap );
+	va_end( ap );
 	return ( err );
 	M_EPILOG
 	}
@@ -258,12 +265,9 @@ int HLog::operator() ( int long const type_,
 	int err = 0;
 	va_list ap;
 	_type = type_;
-	if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
-		{
-		va_start( ap, format_ );
-		err = ( *this )( format_, ap );
-		va_end( ap );
-		}
+	va_start( ap, format_ );
+	err = vformat( format_, ap );
+	va_end( ap );
 	return ( err );
 	M_EPILOG
 	}
@@ -296,15 +300,8 @@ int long HLog::do_write( void const* const string_, int long const& size_ )
 		if ( _newLine )
 			timestamp();
 		len = static_cast<int>( _file::ref().write( str, size_ ) );
-		if ( str[ size_ - 1 ] != '\n' )
-			_newLine = false;
-		else
-			{
-			_newLine = true;
-			_type = 0;
-			_file::ref().flush();
-			}
 		}
+	eol_reset( str, size_ );
 	return ( len );
 	M_EPILOG
 	}

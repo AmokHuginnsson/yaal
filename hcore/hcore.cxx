@@ -53,6 +53,9 @@ namespace hcore
 int _debugLevel_ = 0;
 HLog& log( HLog::get_instance( 1000 ) );
 
+yaal::hcore::HString HOpenSSL::_sSLKey;
+yaal::hcore::HString HOpenSSL::_sSLCert;
+
 HProgramOptionsHandler& yaal_options( void )
 	{
 	M_PROLOG

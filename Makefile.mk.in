@@ -78,10 +78,10 @@ LIBS_hdata     = -lhconsole$(LIB_INFIX) -ldbwrapper$(LIB_INFIX) -ltools$(LIB_INF
 
 DEPS_sqlite3_driver    = $(TARGET_hcore)
 LIBS_sqlite3_driver    = -lsqlite3 -lhcore$(LIB_INFIX)
-DEPS_mysql_driver      = $(TARGET_hcore)
-LIBS_mysql_driver      = -lmysqlclient -lhcore$(LIB_INFIX)
 DEPS_postgresql_driver = $(TARGET_hcore)
 LIBS_postgresql_driver = -lpq -lhcore$(LIB_INFIX)
+DEPS_mysql_driver      = $(TARGET_hcore)
+LIBS_mysql_driver      = -lmysqlclient -lhcore$(LIB_INFIX)
 DEPS_oracle_driver     = $(TARGET_hcore)
 LIBS_oracle_driver     = -lclntsh -lhcore$(LIB_INFIX)
 

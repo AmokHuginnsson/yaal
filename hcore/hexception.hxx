@@ -205,28 +205,6 @@ struct void_to_exception<void>
 	};
 /*! \endcond */
 
-/*! \brief exception auto-hierarchy helper
- *
- * void_to_base metafunction resolves non void tType type to type and void to base.
- *
- * \tparam tType - main type for type resolving.
- * \tparam base_t - base type for type resolving.
- * \retval type - resolved type of base exception.
- */
-template<typename tType, typename base_t>
-struct void_to_base
-	{
-	typedef tType type;
-	};
-
-/*! \cond */
-template<typename base_t>
-struct void_to_base<void, base_t>
-	{
-	typedef base_t type;
-	};
-/*! \endcond */
-
 template<int const, typename>
 struct existing_hier;
 
