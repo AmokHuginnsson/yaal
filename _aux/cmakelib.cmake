@@ -1,6 +1,9 @@
 cmake_minimum_required( VERSION 2.8 )
 string( TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC )
-set( CMAKE_CONFIGURATION_TYPES debug release )
+
+# setting CMAKE_CONFIGURATION_TYPES breaks default CMAKE_INSTALL_CONFIG_NAME.
+# set( CMAKE_CONFIGURATION_TYPES debug release )
+
 if ( NOT CMAKE_BUILD_TYPE )
 	set( CMAKE_BUILD_TYPE debug CACHE STRING "Choose the type of build, options are: debug, release." FORCE )
 endif ( NOT CMAKE_BUILD_TYPE )
