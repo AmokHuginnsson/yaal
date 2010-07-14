@@ -217,6 +217,7 @@ int long HFile::read_line( HString& line_, read_t const& read_,
 							static_cast<FILE*>( _handle ) ) ) == length );
 			ptr[ length ] = 0;
 			line_ = ptr;
+			length = line_.get_length();
 			}
 		}
 	else /* UNBUFFERED_READS */

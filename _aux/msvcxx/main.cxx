@@ -137,6 +137,16 @@ char* __cxa_demangle( char const* const a, int, int, int* )
 
 }
 
+extern "C" int backtrace( void**, int )
+	{
+	return ( 0 );
+	}
+
+extern "C" char** backtrace_symbols( void* const*, int )
+	{
+	return ( 0 );
+	}
+
 template<typename T>
 class SynchronizedQueue
 	{
