@@ -92,7 +92,7 @@ public:
 	void spawn( yaal::hcore::HString const&, argv_t const& = argv_t() );
 	bool read_poll( void* );
 	STATUS finish( void );
-	bool is_running( void );
+	bool is_running( void ) const;
 	void set_csoi( STREAM::stream_t const& );
 private:
 	virtual int long do_write( void const* const, int long const& );

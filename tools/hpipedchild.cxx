@@ -180,15 +180,17 @@ int long HPipedChild::do_write( void const* const string_, int long const& size_
 	{
 	M_PROLOG
 	M_ASSERT( _pipeIn >= 0 );
-	int long iWritten = 0;
+	int long nWritten( 0 );
+	int long nWriteChunk( 0 );
 	do
 		{
-		iWritten += TEMP_FAILURE_RETRY( ::write( _pipeIn,
-					static_cast<char const* const>( string_ ) + iWritten,
-					size_ - iWritten ) );
+		nWriteChunk = TEMP_FAILURE_RETRY( ::write( _pipeIn,
+					static_cast<char const* const>( string_ ) + nWritten,
+					size_ - nWritten ) );
+		nWritten += nWriteChunk;
 		}
-	while ( iWritten < size_ );
-	return ( iWritten );
+	while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
+	return ( nWritten );
 	M_EPILOG
 	}
 
@@ -221,9 +223,12 @@ bool HPipedChild::read_poll( void* time_ )
 	M_EPILOG
 	}
 
-bool HPipedChild::is_running( void )
+bool HPipedChild::is_running( void ) const
 	{
-	return ( _pid > 0 );
+	int err( 0 );
+	if ( _pid > 0 )
+		err = system::kill( _pid, 0 );
+	return ( ( _pid > 0 ) && ! err );
 	}
 
 void HPipedChild::set_csoi( STREAM::stream_t const& cSOI_ )
@@ -244,7 +249,7 @@ void HPipedChild::set_csoi( STREAM::stream_t const& cSOI_ )
 bool HPipedChild::do_is_valid( void ) const
 	{
 	M_PROLOG
-	return ( ( _pid > 0 ) && ( _pipeIn >= 0 ) && ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
+	return ( is_running() && ( _pipeIn >= 0 ) && ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
 	M_EPILOG
 	}
 
