@@ -68,13 +68,13 @@ HPipedChild::STATUS HPipedChild::finish( void )
 	{
 	M_PROLOG
 	if ( _pipeErr >= 0 )
-		TEMP_FAILURE_RETRY( close_fd( _pipeErr ) );
+		TEMP_FAILURE_RETRY( system::close( _pipeErr ) );
 	_pipeErr = -1;
 	if ( _pipeOut >= 0 )
-		TEMP_FAILURE_RETRY( close_fd( _pipeOut ) );
+		TEMP_FAILURE_RETRY( system::close( _pipeOut ) );
 	_pipeOut = -1;
 	if ( _pipeIn >= 0 )
-		TEMP_FAILURE_RETRY( close_fd( _pipeIn ) );
+		TEMP_FAILURE_RETRY( system::close( _pipeIn ) );
 	_pipeIn = -1;
 	STATUS s;
 	if ( _pid > 0 )
@@ -108,9 +108,9 @@ struct OPipeResGuard
 	~OPipeResGuard( void )
 		{
 		if ( _res[ 0 ] >= 0 )
-			TEMP_FAILURE_RETRY( close_fd( _res[ 0 ] ) );
+			TEMP_FAILURE_RETRY( system::close( _res[ 0 ] ) );
 		if ( _res[ 1 ] >= 0 )
-			TEMP_FAILURE_RETRY( close_fd( _res[ 1 ] ) );
+			TEMP_FAILURE_RETRY( system::close( _res[ 1 ] ) );
 		}
 	};
 
@@ -118,7 +118,7 @@ static void close_and_invalidate( int& fd_ )
 	{
 	M_PROLOG
 	if ( fd_ >= 0 )
-		M_ENSURE( TEMP_FAILURE_RETRY( close_fd( fd_ ) ) == 0 );
+		M_ENSURE( TEMP_FAILURE_RETRY( system::close( fd_ ) ) == 0 );
 	fd_ = -1;
 	return;
 	M_EPILOG

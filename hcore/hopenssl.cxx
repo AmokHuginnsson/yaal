@@ -140,7 +140,7 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 	-- _instances;
 	if ( _instances == 0 )
 		{
-		ERR_remove_state( get_pid() );
+		ERR_remove_state( system::getpid() );
 		ERR_remove_state( 0 );
 		ENGINE_cleanup();
 		CONF_modules_unload( 1 );

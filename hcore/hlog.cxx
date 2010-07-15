@@ -75,7 +75,7 @@ HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedStream( _file::ref
 		M_THROW( "tmpfile() failed", errno );
 	HString intro;
 	intro.format( "%-10xProcess started (%ld).\n",
-			LOG_TYPE::NOTICE, static_cast<int long>( get_pid() ) );
+			LOG_TYPE::NOTICE, static_cast<int long>( system::getpid() ) );
 	_file::ref() << intro;
 	M_ENSURE( ::gethostname( _hostName.get<char>(), HOSTNAME_SIZE - 1 ) == 0 );
 	return;
@@ -154,7 +154,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ )
 	M_EPILOG
 	}
 
-void HLog::rehash( void* stream_,
+void HLog::rehash_stream( void* stream_,
 		char const* const processName_ )
 	{
 	M_PROLOG

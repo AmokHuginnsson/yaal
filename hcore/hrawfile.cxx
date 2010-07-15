@@ -100,7 +100,7 @@ int HRawFile::do_close ( void )
 	int error = 0;
 	if ( _fileDescriptor < 0 )
 		M_THROW( "file is not opened", errno );
-	error = static_cast<int>( TEMP_FAILURE_RETRY( close_fd( _fileDescriptor ) ) );
+	error = static_cast<int>( TEMP_FAILURE_RETRY( system::close( _fileDescriptor ) ) );
 	_fileDescriptor = -1;
 	return ( error );
 	M_EPILOG

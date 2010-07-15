@@ -76,7 +76,7 @@ public:
 	static int long _logMask;
 public:
 	/* already opened file */
-	void rehash( void* = DEFAULT_LOG_STREAM, char const* const = NULL );
+	void rehash_stream( void* = DEFAULT_LOG_STREAM, char const* const = NULL );
 	/* log file name */
 	void rehash( HString const&, char const* const = NULL );
 	/*! \brief log ( "data %d", x ); will look nice

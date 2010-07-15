@@ -24,6 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <csignal>
 #include <unistd.h>
 
 #include "hcore/base.hxx"
@@ -36,15 +37,25 @@ namespace yaal
 namespace hcore
 {
 
-int close_fd( int fd_ )
+namespace system
+{
+
+int close( int fd_ )
 	{
 	return ( ::close( fd_ ) );
 	}
 
-int get_pid( void )
+int getpid( void )
 	{
 	return ( ::getpid() );
 	}
+
+int kill( int pid_, int signal_ )
+	{
+	return ( ::kill( pid_, signal_ ) );
+	}
+
+}
 
 }
 

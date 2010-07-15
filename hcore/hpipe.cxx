@@ -50,8 +50,8 @@ HPipe::HPipe( void )
 HPipe::~HPipe( void )
 	{
 	M_PROLOG
-	TEMP_FAILURE_RETRY( close_fd( _pipe[ 1 ] ) );
-	TEMP_FAILURE_RETRY( close_fd( _pipe[ 0 ] ) );
+	TEMP_FAILURE_RETRY( system::close( _pipe[ 1 ] ) );
+	TEMP_FAILURE_RETRY( system::close( _pipe[ 0 ] ) );
 	return;
 	M_EPILOG
 	}

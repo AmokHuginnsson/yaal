@@ -36,8 +36,14 @@ namespace yaal
 namespace hcore
 {
 
-int close_fd( int );
-int get_pid( void );
+namespace system
+{
+
+int close( int );
+int getpid( void );
+int kill( int, int );
+
+}
 
 }
 
