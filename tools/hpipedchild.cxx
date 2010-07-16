@@ -79,7 +79,7 @@ HPipedChild::STATUS HPipedChild::finish( void )
 	STATUS s;
 	if ( _pid > 0 )
 		{
-		::kill( _pid, SIGKILL );
+		system::kill( _pid, SIGKILL );
 		int status = 0;
 		::waitpid( _pid, &status, 0 );
 		if ( WIFEXITED( status ) )
