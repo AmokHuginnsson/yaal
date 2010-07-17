@@ -73,6 +73,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 	HOST_OS_TYPE=""
 	LIB_PREFIX=["lib"]
 	LIB_EXT=['"so"']
+	EXE_SUFFIX=[""]
 	SYMBOL_PREFIX=['""']
 	AC_CHECK_PROG([LINUX_DISTRO],[lsb_release],[yes])
 	if test ["x${LINUX_DISTRO}"] = ["xyes"] ; then
@@ -121,6 +122,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 	AC_DEFINE_UNQUOTED([LIB_PREFIX],"${LIB_PREFIX}",[Dynamic library file name prefix used on this platform.])
 	AC_DEFINE_UNQUOTED([LIB_INFIX],"${LIB_INFIX}",[Target dependent library name infix.])
 	AC_DEFINE_UNQUOTED([LIB_EXT],${LIB_EXT},[Dynamic library file name extension used on this platform.])
+	AC_DEFINE_UNQUOTED([EXE_SUFFIX],${EXE_SUFFIX},[Suffix used for binary program executable on this platform.])
 
 	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
 		AC_MSG_ERROR([Cannot recognize host operating system type!])

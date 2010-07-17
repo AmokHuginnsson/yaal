@@ -158,7 +158,7 @@ public:
 		{ return ( do_read_until_n( store, maxcount, delim, strip ) ); }
 	int long read( void* const, int long const& );
 	int long write( void const* const, int long const& );
-	static char const* const eols;
+	M_YAAL_HCORE_PUBLIC_API static char const* const eols;
 	bool is_valid( void ) const;
 	void flush( void ) const;
 	HStreamInterface& set_fill( int val_ )

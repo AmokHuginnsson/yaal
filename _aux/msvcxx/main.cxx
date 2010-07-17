@@ -189,11 +189,14 @@ SynchronizedQueue<int> _signalQueue_;
 
 __declspec( dllexport ) int kill( int pid, int signo )
 	{
+	int err( 0 );
 	if ( pid == getpid() )
 		_signalQueue_.push( signo );
-	else
+	else if ( signo )
 		TerminateProcess( reinterpret_cast<HANDLE>( pid ), signo );
-	return ( 0 );
+	else
+		err = ( ( GetProcessId( reinterpret_cast<HANDLE>( pid ) ) != 0 ) ? 0 : -1 );
+	return ( err );
 	}
 
 __declspec( dllexport ) int sigwait( sigset_t*, int* signo )
