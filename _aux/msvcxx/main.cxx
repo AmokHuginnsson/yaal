@@ -353,7 +353,7 @@ void log_windows_error( char const* pszAPI )
 	return;
 	}
 
-int close( short const& fd )
+int unix_close( int const& fd )
 	{
 	return ( fd < 1000 ? ::_close( static_cast<int>( fd ) ) : closesocket( fd ) );
 	}

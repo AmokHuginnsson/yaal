@@ -81,6 +81,7 @@ public:
 }
 
 int HSignalService::_exitStatus = 0;
+
 HSignalService::HSignalService( void )
 	: _loop( true ), _locker( chunk_size<sigset_t>( 1 ) ),
 	_thread(), _mutex(), _handlers()

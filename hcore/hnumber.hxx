@@ -48,7 +48,7 @@ private:
 	int long _integralPartSize;
 	HChunk _canonical;
 public:
-	static int DEFAULT_PRECISION;
+	M_YAAL_HCORE_PUBLIC_API static int DEFAULT_PRECISION;
 public:
 	HNumber( void );
 	HNumber( double long );

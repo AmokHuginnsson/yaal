@@ -1,6 +1,7 @@
 #ifndef YAAL_MSVCXX_UNISTD_H_INCLUDED
 #define YAAL_MSVCXX_UNISTD_H_INCLUDED 1
 
+#define close close_off
 #include <cstdio>
 #include <cerrno>
 #define unlink unlink_gnu
@@ -11,6 +12,7 @@ extern "C" FILE* tmpfile (void);
 #include <glibc/unistd.h>
 #include <libintl.h>
 #undef fprintf
+#undef close
 
 #undef gethostname
 #define gethostname ms_gethostname
@@ -35,6 +37,12 @@ public:
 	HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t const&, int*, int*, int* );
 	int operator()( void );
 	};
+
+int unix_close( int const& );
+
+template<typename T>
+inline int close( T const& fd_ )
+	{ return ( unix_close( fd_ ) ); }
 
 #endif /* not YAAL_MSVCXX_UNISTD_H_INCLUDED */
 
