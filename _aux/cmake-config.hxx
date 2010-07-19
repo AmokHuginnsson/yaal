@@ -32,19 +32,19 @@
 #define LIB_EXT "@LIB_EXT@"
 #define SYMBOL_PREFIX "@SYMBOL_PREFIX@"
 #define EXE_SUFFIX "@EXE_SUFFIX@"
-#define NCURSES_ATTR_GET_SECOND_ARG_TYPE @NCURSES_ATTR_GET_SECOND_ARG_TYPE@
-#cmakedefine01 HAVE_SQLITE3_H
-#cmakedefine01 HAVE_POSTGRESQL_LIBPQ_FE_H
-#cmakedefine01 HAVE_LIBPQ_FE_H
-#cmakedefine01 HAVE_MYSQL_MYSQL_H
-#cmakedefine01 HAVE_OCI_H
 #cmakedefine01 HAVE_OPENSSL_SSL_H
 #cmakedefine01 HAVE_LIBXML2_LIBXML_XMLVERSION_H
 #cmakedefine01 HAVE_EXECINFO_H
+#cmakedefine HAVE_SQLITE3_H
+#cmakedefine HAVE_POSTGRESQL_LIBPQ_FE_H
+#cmakedefine HAVE_LIBPQ_FE_H
+#cmakedefine HAVE_MYSQL_MYSQL_H
+#cmakedefine HAVE_OCI_H
 #cmakedefine HAVE_SYS_CONSIO_H
 #cmakedefine HAVE_GPM_H
 #cmakedefine01 HAVE_NCURSES_CURSES_H
 #cmakedefine01 HAVE_CURSES_H
+#define NCURSES_ATTR_GET_SECOND_ARG_TYPE @NCURSES_ATTR_GET_SECOND_ARG_TYPE@
 #ifndef __GNUC__
 #define __attribute__( x ) /**/
 #endif /* not __GNUC__ */
