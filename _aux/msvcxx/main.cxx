@@ -137,14 +137,17 @@ char* __cxa_demangle( char const* const a, int, int, int* )
 
 }
 
-extern "C" int backtrace( void**, int )
+extern "C" int backtrace( void** buf_, int size_ )
 	{
-	return ( 0 );
+	return ( CaptureStackBackTrace( 0, std::min( size_, 63 ), buf_, NULL ) );
 	}
 
-extern "C" char** backtrace_symbols( void* const*, int )
+extern "C" char** backtrace_symbols( void* const* buf_, int size_ )
 	{
-	return ( 0 );
+	char** strings = xcalloc<char*>( size_ );
+	for ( int i( 0 ); i < size_; ++ i )
+		strings[i] = reinterpret_cast<char*>( buf_[i] );
+	return ( strings );
 	}
 
 template<typename T>
