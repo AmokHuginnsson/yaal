@@ -361,7 +361,8 @@ HCondition::status_t HCondition::wait( int long unsigned const& timeOutSeconds_,
 	M_PROLOG
 	int error = 0;
 	timespec timeOut;
-	clock_gettime( CLOCK_REALTIME, &timeOut );
+	::memset( &timeOut, 0, sizeof ( timespec ) );
+	M_ENSURE( clock_gettime( CLOCK_REALTIME, &timeOut ) == 0 );
 	static int long const NANO_IN_WHOLE = meta::power<10, 9>::value;
 	timeOut.tv_sec += timeOutSeconds_;
 	timeOut.tv_nsec += timeOutNanoSeconds_;

@@ -45,7 +45,7 @@ namespace tools
  * Instance of HSignalService class is a global object that handles
  * dispatching of operating system level signals.
  */
-class HSignalService : public yaal::hcore::HSingleton<HSignalService>
+class M_YAAL_TOOLS_PUBLIC_API HSignalService : public yaal::hcore::HSingleton<HSignalService>
 	{
 public:
 	typedef yaal::hcore::HSingleton<HSignalService> base_type;
