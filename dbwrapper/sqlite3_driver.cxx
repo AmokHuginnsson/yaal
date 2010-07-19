@@ -68,15 +68,15 @@ private:
 
 OSQLite* _brokenDB_ = NULL;
 
-void* db_query( void*, char const* );
-void rs_unquery( void* );
-void db_disconnect( void* );
+M_EXPORT_SYMBOL void* db_query( void*, char const* );
+M_EXPORT_SYMBOL void rs_unquery( void* );
+M_EXPORT_SYMBOL void db_disconnect( void* );
 
 /* sqlite3 driver uses convention that database file name should have
  * .sqlite3 or .db3 extension, and this default extension is added
  * to user supplied database name by driver during db_connect. */
 
-void* db_connect( char const* dataBase_,
+M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
 		char const*, char const* )
 	{
 	void* ptr = NULL;
@@ -121,7 +121,7 @@ void* db_connect( char const* dataBase_,
 	return ( sQLite );
 	}
 
-void db_disconnect( void* data_ )
+M_EXPORT_SYMBOL void db_disconnect( void* data_ )
 	{
 	OSQLite* sQLite = static_cast<OSQLite*>( data_ );
 	if ( sQLite->_dB )
@@ -130,7 +130,7 @@ void db_disconnect( void* data_ )
 	return;
 	}
 
-int dbrs_errno( void* db_, void* result_ )
+M_EXPORT_SYMBOL int dbrs_errno( void* db_, void* result_ )
 	{
 	OSQLite* sQLite = static_cast<OSQLite*>( db_ );
 	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
@@ -149,7 +149,7 @@ int dbrs_errno( void* db_, void* result_ )
 	return ( code );
 	}
 
-char const* dbrs_error( void* db_, void* result_ )
+M_EXPORT_SYMBOL char const* dbrs_error( void* db_, void* result_ )
 	{
 	OSQLite* sQLite = static_cast<OSQLite*>( db_ );
 	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
@@ -167,7 +167,7 @@ char const* dbrs_error( void* db_, void* result_ )
 	return ( msg );
 	}
 
-void* db_query( void* data_, char const* query_ )
+M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
 	{
 	OSQLite* sQLite = static_cast<OSQLite*>( data_ );
 	OSQLiteResult * result = NULL;
@@ -183,7 +183,7 @@ void* db_query( void* data_, char const* query_ )
 	return ( result );
 	}
 
-void rs_unquery( void* data_ )
+M_EXPORT_SYMBOL void rs_unquery( void* data_ )
 	{
 	OSQLiteResult* pr = static_cast<OSQLiteResult*>( data_ );
 	sqlite3_free_table( pr->_data );
@@ -191,7 +191,7 @@ void rs_unquery( void* data_ )
 	return;
 	}
 
-char* rs_get( void* data_, int long row_, int column_ )
+M_EXPORT_SYMBOL char* rs_get( void* data_, int long row_, int column_ )
 	{
 	char** data = NULL;
 	OSQLiteResult* result = static_cast<OSQLiteResult*>( data_ );
@@ -199,12 +199,12 @@ char* rs_get( void* data_, int long row_, int column_ )
 	return ( data[ ( row_ + 1 ) * result->_columns + column_ ] );
 	}
 
-int rs_fields_count( void* data_ )
+M_EXPORT_SYMBOL int rs_fields_count( void* data_ )
 	{
 	return ( static_cast<OSQLiteResult*>( data_ )->_columns );
 	}
 
-int long dbrs_records_count( void* dataB_, void* dataR_ )
+M_EXPORT_SYMBOL int long dbrs_records_count( void* dataB_, void* dataR_ )
 	{
 	if ( dataR_ )
 		return ( static_cast<OSQLiteResult*>( dataR_ )->_rows );
@@ -212,13 +212,13 @@ int long dbrs_records_count( void* dataB_, void* dataR_ )
 		return ( ::sqlite3_changes( static_cast<OSQLite*>( dataB_ )->_dB ) );
 	}
 
-int long dbrs_id( void* dataB_, void* )
+M_EXPORT_SYMBOL int long dbrs_id( void* dataB_, void* )
 	{
 	/* FIXME change driver interface to allow 64bit insert row id (from autoincrement) */
 	return ( static_cast<int long>( sqlite3_last_insert_rowid( static_cast<OSQLite*>( dataB_ )->_dB ) ) );
 	}
 
-char* rs_column_name( void* dataR_, int field_ )
+M_EXPORT_SYMBOL char* rs_column_name( void* dataR_, int field_ )
 	{
 	return ( static_cast<OSQLiteResult*>( dataR_ )->_data [ field_ ] );
 	}
