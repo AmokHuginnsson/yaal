@@ -9,8 +9,10 @@
 extern "C" FILE* tmpfile (void);
 
 #undef EDEADLOCK
+#define select select_off
 #include <glibc/unistd.h>
 #include <libintl.h>
+#undef select
 #undef fprintf
 #undef close
 

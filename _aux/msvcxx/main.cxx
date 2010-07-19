@@ -4,7 +4,6 @@
 #include <list>
 
 #define access gnu_access
-#define close gnu_close
 #define lseek gnu_lseek
 #define read gnu_read
 #define write gnu_write
@@ -14,7 +13,6 @@
 #define swab gnu_swab
 #define _environ gnu__environ
 #define fd_set gnu_fdset
-#define select gnu_select
 #define isatty gnu_isatty
 #define timespec gnu_timespec
 #define timeval gnu_timeval
@@ -26,10 +24,11 @@
 #define execvp gnu_execvp
 #define getpid gnu_getpid
 #define gethostname gethostname_off
-
-#include <unistd.h>
+#define select select_off
 #include <glibc/sys/time.h>
+#include <unistd.h>
 #include <dirent.h>
+#undef select
 #undef dirent
 #undef readdir_r
 
@@ -63,7 +62,6 @@
 #undef swab
 #undef _environ
 #undef fd_set
-#undef select
 #undef isatty
 #undef __volatile
 #undef timespec
@@ -361,7 +359,8 @@ int unix_close( int const& fd )
 	return ( fd < 1000 ? ::_close( static_cast<int>( fd ) ) : closesocket( fd ) );
 	}
 
-int WSAAPI unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
+M_EXPORT_SYMBOL
+int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
 	{
 	int count = ( readFds ? readFds->fd_count : 0 ) + ( writeFds ? writeFds->fd_count : 0 ) + ( exceptFds ? exceptFds->fd_count : 0 );
 	fd_set set;
@@ -374,7 +373,7 @@ int WSAAPI unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exc
 		++ count;
 		readFds = &set;
 		}
-	int ret = select( ndfs ? ndfs : FD_SETSIZE, readFds, writeFds, exceptFds, timeout );
+	int ret = ::select( ndfs ? ndfs : FD_SETSIZE, readFds, writeFds, exceptFds, timeout );
 	int err = WSAGetLastError();
 	char const* p = strerror( err );
 	if ( s >= 0 )
