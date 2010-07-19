@@ -76,7 +76,7 @@ HSerial::HSerial( HString const& devicePath_ )
 	M_EPILOG
 	}
 
-HSerial::~HSerial ( void )
+HSerial::~HSerial( void )
 	{
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
@@ -95,7 +95,7 @@ bool HSerial::open( void )
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	_fileDescriptor = ::open( _devicePath.raw(), O_RDWR | O_NOCTTY | O_NONBLOCK );
 	M_ENSURE( _fileDescriptor >= 0 );
-	if ( ! isatty ( _fileDescriptor ) )
+	if ( ! isatty( _fileDescriptor ) )
 		M_THROW( "not a tty", _fileDescriptor );
 	::tcgetattr( _fileDescriptor, _backUpTIO.get<termios>() );
 	::fcntl( _fileDescriptor, F_SETFD, 0 );
@@ -107,7 +107,7 @@ bool HSerial::open( void )
 	M_EPILOG
 	}
 
-int HSerial::do_close ( void )
+int HSerial::do_close( void )
 	{
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
@@ -117,7 +117,7 @@ int HSerial::do_close ( void )
 	M_EPILOG
 	}
 
-void HSerial::compile ( void )
+void HSerial::compile( void )
 	{
 	M_PROLOG
 	termios& tIO = *_tIO.get<termios>();
@@ -153,7 +153,7 @@ void HSerial::compile ( void )
 	M_EPILOG
 	}
 
-void HSerial::set_speed ( speed_t speed_ )
+void HSerial::set_speed( speed_t speed_ )
 	{
 	M_PROLOG
 	_speed = speed_;
@@ -161,7 +161,7 @@ void HSerial::set_speed ( speed_t speed_ )
 	M_EPILOG
 	}
 
-void HSerial::compile_speed ( void )
+void HSerial::compile_speed( void )
 	{
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
@@ -309,13 +309,13 @@ void HSerial::compile_flags( void )
 	M_EPILOG
 	}
 
-void HSerial::flush ( int type_ )
+void HSerial::flush( int type_ )
 	{
 	M_PROLOG
 	HString errMsg;
 	if ( _fileDescriptor < 0 )
 		M_THROW( _eNotOpened_, errno );
-	if ( tcflush ( _fileDescriptor, type_ ) )
+	if ( tcflush( _fileDescriptor, type_ ) )
 		{
 		switch ( type_ )
 			{
@@ -358,10 +358,10 @@ int HSerial::timed_read( void* const buffer_, int const size_,
 	fd_set fdSet;
 	wait.tv_sec = timeOutSec_;
 	wait.tv_usec = timeOutUsec_;
-	FD_ZERO ( & fdSet );
-	FD_SET ( _fileDescriptor, & fdSet );
-	error = select ( FD_SETSIZE, & fdSet, NULL, NULL, & wait );
-	if ( ( error > 0 ) && FD_ISSET ( _fileDescriptor, & fdSet ) )
+	FD_ZERO( &fdSet );
+	FD_SET( _fileDescriptor, &fdSet );
+	error = ::select( FD_SETSIZE, &fdSet, NULL, NULL, &wait );
+	if ( ( error > 0 ) && FD_ISSET ( _fileDescriptor, &fdSet ) )
 		return ( static_cast<int>( HRawFile::read( buffer_, size_ ) ) );
 	return ( -1 );
 	M_EPILOG
