@@ -123,7 +123,7 @@ int console_mouse_open( void )
 	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 )
 		{
 		error.format( _( "cannot setup mouse mode, %s" ), error_message( errno ) );
-		TEMP_FAILURE_RETRY( hcore::system::close_fd( _mouse_ ) );
+		TEMP_FAILURE_RETRY( hcore::system::close( _mouse_ ) );
 		M_THROW( error, errno );
 		}
 
@@ -155,7 +155,7 @@ int console_mouse_close( void )
 	M_PROLOG
 	if ( ! _mouse_ )
 		M_THROW( "mouse not opened", errno );
-	TEMP_FAILURE_RETRY( hcore::system::close_fd( _mouse_ ) );
+	TEMP_FAILURE_RETRY( hcore::system::close( _mouse_ ) );
 	_mouse_ = 0;
 	return ( 0 );
 	M_EPILOG
