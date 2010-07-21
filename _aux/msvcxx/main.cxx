@@ -310,9 +310,17 @@ int ms_gethostname( char* buf_, int len_ )
 	}
 
 extern "C"
-int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, size_t a3, struct hostent** a4, int* a5 )
+int gethostbyname_r( char const* name_, struct hostent* buf_, char* /* unused */, size_t /* unused */, struct hostent** result_, int* err_ )
 	{
-	return ( 0 );
+	*result_ = gethostbyname( name_ );
+	if ( *result_ )
+		{
+		::memcpy( buf_, *result_, sizeof ( struct hostent ) );
+		*result_ = buf_;
+		}
+	else
+		*err_ = WSAGetLastError();
+	return ( *result_ ? 0 : -1 );
 	}
 
 extern "C"
@@ -370,7 +378,7 @@ __declspec( dllexport ) int unix_fcntl( int fd_, int cmd_, int arg_ )
 	return ( fcntl( fd_, cmd_, arg_ ) );
 	}
 
-static int const NETWORK_SOCKET_RANGE_START = 4049;
+static int const NETWORK_SOCKET_RANGE_START = 2048;
 
 int unix_close( int const& fd )
 	{
@@ -399,15 +407,15 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 	return ( ret );
 	}
 
-namespace msvcxx
+namespace msvcxx	
 {
 
-int unix_bind( int& s, const struct sockaddr* name, socklen_t namelen )
+int unix_bind( int& fd_, const struct sockaddr* addr_, socklen_t len_ )
 	{
 	int ret = 0;
-	if ( name->sa_family == PF_UNIX )
+	if ( addr_->sa_family == PF_UNIX )
 		{
-		HANDLE h = CreateFile( name->sa_data,                // name of the write
+		HANDLE h = ::CreateFile( addr_->sa_data,                // name of the write
                        GENERIC_WRITE,          // open for writing
                        0,                      // do not share
                        NULL,                   // default security
@@ -416,13 +424,13 @@ int unix_bind( int& s, const struct sockaddr* name, socklen_t namelen )
                        NULL);                  // no attr. template
 		if ( h != INVALID_HANDLE_VALUE )
 			{
-			CloseHandle( h );
+			::CloseHandle( h );
 			HString n( "\\\\.\\pipe" );
-			n += name->sa_data;
+			n += addr_->sa_data;
 			n.replace( "/", "\\" );
 			h = CreateNamedPipe( n.raw(),
 				PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE,
-				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT ,
+				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT,
 				1, 1024, 1024, 1000, NULL );
 			}
 		LPVOID lpMsgBuf = NULL;
@@ -433,14 +441,14 @@ int unix_bind( int& s, const struct sockaddr* name, socklen_t namelen )
 			}
 		else
 			{
-			closesocket( s );
-			s = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
+			::closesocket( fd_ );
+			fd_ = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
 			}
 		if ( lpMsgBuf )
 			LocalFree(lpMsgBuf);
 		}
 	else
-		ret = ::bind( s, name, namelen );
+		ret = ::bind( fd_, addr_, len_ );
 	return ( ret );
 	}
 
@@ -451,32 +459,62 @@ int unix_socket( int af, int type, int protocol )
 		s = ::socket( PF_INET, SOCK_STREAM, 0 );
 	else
 		s = ::socket( af, type, protocol );
-	M_ENSURE( s > NETWORK_SOCKET_RANGE_START );
+	if ( s < NETWORK_SOCKET_RANGE_START )
+		M_THROW( "unexpected socket fd value", s );
 	return ( s );
 	}
 
-int unix_listen( int const& s, int const& backlog )
+int unix_listen( int const& fd_, int const& backlog_ )
 	{
-	int ret = 0;
-	if ( s < NETWORK_SOCKET_RANGE_START )
-		{
-		if ( !ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( s ) ), NULL ) )
-			ret = -1;
-		}
-	else
-		ret = listen( static_cast<SOCKET>( s ), backlog );
+	int ret( 0 );
+	if ( fd_ >= NETWORK_SOCKET_RANGE_START )
+		ret = listen( static_cast<SOCKET>( fd_ ), backlog_ );
 	return ( ret );
 	}
 
 
 int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
-	return ( 0 );
+	int ret( 0 );
+	if ( fd_ < NETWORK_SOCKET_RANGE_START )
+		{
+		if ( ! ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ ) ), NULL ) )
+			{
+			log_windows_error( "ConnectNamedPipe" );
+			ret = -1;
+			}
+		}
+	else
+		{
+		int len = *len_;
+		ret = ::accept( fd_, addr_, &len );
+		}
+	return ( -1 );
 	}
 
-int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
+int unix_connect( int& fd_, struct sockaddr* addr_, socklen_t len_ )
 	{
-	return ( 0 );
+	int ret( 0 );
+	if ( addr_->sa_family == PF_UNIX )
+		{
+		HString n( "\\\\.\\pipe" );
+		n += addr_->sa_data;
+		n.replace( "/", "\\" );
+		HANDLE h( CreateFile( n.raw(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0 ) );
+		if ( h == INVALID_HANDLE_VALUE )
+			{
+			log_windows_error( "CreateNamedPipe" );
+			ret = -1;
+			}
+		else
+			{
+			::closesocket( fd_ );
+			fd_ = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
+			}
+		}
+	else
+		ret = ::connect( fd_, addr_, len_ );
+	return ( ret );
 	}
 
 int unix_shutdown( int fd_, int how_ )

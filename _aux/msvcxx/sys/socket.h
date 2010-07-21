@@ -25,7 +25,7 @@ namespace msvcxx
 int unix_socket( int, int, int );
 int unix_listen( int const&, int const& );
 int unix_accept( int, struct sockaddr*, socklen_t* );
-int unix_connect( int, struct sockaddr*, socklen_t );
+int unix_connect( int&, struct sockaddr*, socklen_t );
 int unix_shutdown( int, int );
 int unix_bind( int&, const struct sockaddr*, socklen_t );
 
@@ -43,7 +43,7 @@ inline int listen( int s_, int backlog_ )
 inline int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{ return ( msvcxx::unix_accept( fd_, addr_, len_ ) ); }
 
-inline int connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
+inline int connect( int& fd_, struct sockaddr* addr_, socklen_t len_ )
 	{ return ( msvcxx::unix_connect( fd_, addr_, len_ ) ); }
 
 inline int shutdown( int fd_, int how_ )

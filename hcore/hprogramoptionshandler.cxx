@@ -687,7 +687,7 @@ int HProgramOptionsHandler::process_command_line( int const& argc_,
 	option* optionArray = NULL;
 	HString shortOptBuffer;
 	HChunk longOptBuffer( chunk_size<option>( _options.size() + 1 ) ); /* + 1 for array terminator */
-	hcore::log << "Decoding switches ... ";
+	hcore::log( LOG_TYPE::INFO ) << "Decoding switches ... ";
 	shortOpts = make_short_opts( _options, shortOptBuffer );
 	optionArray = make_option_array( _options, longOptBuffer );
 	while ( ( val = ::getopt_long( argc_, argv_, shortOpts,

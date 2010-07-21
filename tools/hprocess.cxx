@@ -129,8 +129,7 @@ int HProcess::run( void )
 			{
 			if ( ( error < 0 ) && ( errno == EINTR ) )
 				continue;
-			if ( error < 0 )
-				M_THROW ( "select() returned", error );
+			M_ENSURE( error >= 0 );
 			for ( process_filedes_map_t::iterator it = _fileDescriptorHandlers.begin();
 					it != _fileDescriptorHandlers.end(); ++ it )
 				{
