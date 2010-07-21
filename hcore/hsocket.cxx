@@ -104,7 +104,11 @@ HSocket::HSocket( socket_type_t const socketType_,
 						0 /* info libc "Creating a Socket"
 								 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
 		if ( !!( _type & TYPE::NONBLOCKING ) )
-			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
+			{
+			int flags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
+			M_ENSURE( flags >= 0 );
+			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, flags | O_NONBLOCK ) == 0 );
+			}
 		}
 	if ( !!( _type & TYPE::NETWORK ) )
 		_address = xcalloc<sockaddr_in>( 1 );
@@ -222,8 +226,6 @@ HSocket::ptr_t HSocket::accept( void )
 		}
 	M_ENSURE( ( fileDescriptor = ::accept( _fileDescriptor,
 					address, &addressSize ) ) >= 0 );
-	if ( !!( _type & TYPE::NONBLOCKING ) )
-		M_ENSURE( ::fcntl( fileDescriptor, F_SETFL, O_NONBLOCK ) == 0 );
 	/* - 1 means that constructor shall not create socket */
 	socket_type_t type = _type;
 	if ( !!( _type & ( socket_type_t( TYPE::SSL_SERVER  ) | TYPE::SSL_CLIENT ) ) )
@@ -231,6 +233,12 @@ HSocket::ptr_t HSocket::accept( void )
 	ptr_t socket = ptr_t( new HSocket( type, -1 ) );
 	M_ASSERT( ! socket->_sSL );
 	socket->_fileDescriptor = fileDescriptor;
+	if ( !!( _type & TYPE::NONBLOCKING ) )
+		{
+		int flags( ::fcntl( socket->_fileDescriptor, F_GETFL, 0 ) );
+		M_ENSURE( flags >= 0 );
+		M_ENSURE( ::fcntl( socket->_fileDescriptor, F_SETFL, flags | O_NONBLOCK ) == 0 );
+		}
 	socket->_addressSize = addressSize;
 	socket->_needShutdown = true;
 	socket->set_timeout( _timeOut );

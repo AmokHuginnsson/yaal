@@ -27,14 +27,14 @@ int unix_listen( int const&, int const& );
 int unix_accept( int, struct sockaddr*, socklen_t* );
 int unix_connect( int, struct sockaddr*, socklen_t );
 int unix_shutdown( int, int );
-int unix_bind( int, const struct sockaddr*, socklen_t );
+int unix_bind( int&, const struct sockaddr*, socklen_t );
 
 }
 
 inline int socket( int af_, int type_, int protocol_ )
 	{ return ( msvcxx::unix_socket( af_, type_, protocol_ ) ); }
 
-inline int bind( int s_, const struct sockaddr* name_, socklen_t namelen_ )
+inline int bind( int& s_, const struct sockaddr* name_, socklen_t namelen_ )
 	{ return ( msvcxx::unix_bind( s_, name_, namelen_ ) ); }
 
 inline int listen( int s_, int backlog_ )
@@ -48,6 +48,24 @@ inline int connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 
 inline int shutdown( int fd_, int how_ )
 	{ return ( msvcxx::unix_shutdown( fd_, how_ ) ); }
+
+int get_socket_error( void );
+void set_socket_error( int );
+
+class SocketErrno
+	{
+public:
+	SocketErrno& operator = ( int errno_ )
+		{
+		set_socket_error( errno_ );
+		return ( *this );
+		}
+	operator int ( void ) const
+		{ return ( get_socket_error() ); }
+	};
+
+#undef errno
+#define errno SocketErrno()
 
 #endif /* not YAAL_MSVCXX_SYS_SOCKET_H_INCLUDED */
 

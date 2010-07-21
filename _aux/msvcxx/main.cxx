@@ -354,9 +354,27 @@ void log_windows_error( char const* pszAPI )
 	return;
 	}
 
+int get_socket_error( void )
+	{
+	return ( WSAGetLastError() );
+	}
+
+void set_socket_error( int errno_ )
+	{
+	WSASetLastError( errno_ );
+	}
+
+extern "C" int fcntl( int fd_, int cmd_, ... );
+__declspec( dllexport ) int unix_fcntl( int fd_, int cmd_, int arg_ )
+	{
+	return ( fcntl( fd_, cmd_, arg_ ) );
+	}
+
+static int const NETWORK_SOCKET_RANGE_START = 4049;
+
 int unix_close( int const& fd )
 	{
-	return ( fd < 1000 ? ::_close( static_cast<int>( fd ) ) : closesocket( fd ) );
+	return ( fd < NETWORK_SOCKET_RANGE_START ? ::_close( static_cast<int>( fd ) ) : ::closesocket( fd ) );
 	}
 
 M_EXPORT_SYMBOL
@@ -377,20 +395,18 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 	int err = WSAGetLastError();
 	char const* p = strerror( err );
 	if ( s >= 0 )
-		closesocket( s );
+		::closesocket( s );
 	return ( ret );
 	}
 
 namespace msvcxx
 {
 
-int unix_bind( int s, const struct sockaddr* name, socklen_t namelen )
+int unix_bind( int& s, const struct sockaddr* name, socklen_t namelen )
 	{
 	int ret = 0;
 	if ( name->sa_family == PF_UNIX )
 		{
-		closesocket( s );
-		s = -1;
 		HANDLE h = CreateFile( name->sa_data,                // name of the write
                        GENERIC_WRITE,          // open for writing
                        0,                      // do not share
@@ -416,12 +432,15 @@ int unix_bind( int s, const struct sockaddr* name, socklen_t namelen )
 			ret = -1;
 			}
 		else
+			{
+			closesocket( s );
 			s = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
+			}
 		if ( lpMsgBuf )
 			LocalFree(lpMsgBuf);
 		}
 	else
-		ret = bind( s, name, namelen );
+		ret = ::bind( s, name, namelen );
 	return ( ret );
 	}
 
@@ -431,17 +450,18 @@ int unix_socket( int af, int type, int protocol )
 	if ( af == PF_UNIX )
 		s = ::socket( PF_INET, SOCK_STREAM, 0 );
 	else
-		s = socket( af, type, protocol );
+		s = ::socket( af, type, protocol );
+	M_ENSURE( s > NETWORK_SOCKET_RANGE_START );
 	return ( s );
 	}
 
 int unix_listen( int const& s, int const& backlog )
 	{
 	int ret = 0;
-	if ( s < 1000 )
+	if ( s < NETWORK_SOCKET_RANGE_START )
 		{
-		//if ( !ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( s ) ), NULL ) )
-		//	ret = -1;
+		if ( !ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( s ) ), NULL ) )
+			ret = -1;
 		}
 	else
 		ret = listen( static_cast<SOCKET>( s ), backlog );
@@ -467,9 +487,9 @@ int unix_shutdown( int fd_, int how_ )
 }
 
 extern "C"
-int unix_setsockopt( int fd_, int level_, int optname_, const void* optval_, socklen_t optlen_)
+int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_)
 	{
-	return ( 0 );
+	return ( setsockopt( fd_, level_, optname_, static_cast<char const*>( optval_ ), optlen_ ) );
 	}
 
 typedef short unsigned uint16_t;
