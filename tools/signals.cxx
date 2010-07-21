@@ -135,7 +135,7 @@ void HSignalService::stop( void )
 		 * with respect to multi-thread environment at least
 		 * all hail to IBM Signal Managment documentation.
 		 */
-		M_ENSURE( system::kill( system::getpid(), SIGURG ) == 0 );
+		M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
 		_thread.finish();
 		HSet<int> signals;
 		transform( _handlers.begin(), _handlers.end(), insert_iterator( signals ), select1st<handlers_t::value_type>() );
@@ -182,7 +182,7 @@ void HSignalService::register_handler( int sigNo_, handler_t handler_ )
 	M_PROLOG
 	_handlers.push_front( sigNo_, handler_ );
 	lock_on( sigNo_ );
-	M_ENSURE( system::kill( system::getpid(), SIGURG ) == 0 );
+	M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
 	return;
 	M_EPILOG
 	}
