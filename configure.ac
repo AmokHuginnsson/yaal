@@ -159,6 +159,7 @@ AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue with
 AC_SEARCH_LIBS([clock_gettime],[rt],,[AC_MSG_ERROR([Cannot continue without rt library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([getaddrinfo],[socket getaddrinfo],,[AC_MSG_ERROR([Cannot continue without getaddrinfo feature.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+AC_SEARCH_LIBS([getnameinfo],[socket getaddrinfo],,[AC_MSG_ERROR([Cannot continue without getnameinfo feature.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([libintl_gettext],[intl],,[AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([libiconv],[iconv]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([xml2],[xmlParseFile],,[AC_MSG_ERROR([Cannot continue without XML library.])]) LIBS=""
@@ -359,7 +360,7 @@ AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 
 AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 LIBS="${HCORE_LIBS}"
-AC_CHECK_FUNCS([getline memrchr gethostbyname_r gethostbyaddr_r strcasestr strtold asprintf])
+AC_CHECK_FUNCS([getline memrchr getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr strtold asprintf])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
 AC_MSG_CHECKING([whether basename is declared in cstring])
@@ -374,9 +375,6 @@ AC_CHECK_DECLS([SIGIOT],[],[],[#include <csignal>])
 AC_CHECK_DECLS([SUN_LEN],[],[],[#include <cstdlib>
 								#include <sys/un.h>])
 AC_CHECK_DECLS([ERR],[],[],[#include <cstdlib>])
-AC_CHECK_DECLS([getaddrinfo],[],[],[#include <netdb.h>
-								#include <netinet/in.h>
-								#include <sys/socket.h>])
 AC_MSG_CHECKING([whether powl is available])
 AC_COMPILE_IFELSE([#include <cmath>
 									 int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }],

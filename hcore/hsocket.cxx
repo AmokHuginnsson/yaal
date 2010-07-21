@@ -36,12 +36,6 @@ Copyright:
 
 #include "config.hxx"
 
-#if ! defined( HAVE_GETHOSTBYNAME_R ) || ( HAVE_GETHOSTBYNAME_R == 0 )
-#if ! defined( HAVE_DECL_GETADDRINFO ) || ( HAVE_DECL_GETADDRINFO == 0 )
-#	include <getaddrinfo.h>
-#endif /* not HAVE_DECL_GETADDRINFO */
-#endif /* not HAVE_GETHOSTBYNAME_R */
-
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
@@ -273,7 +267,13 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int const port
 		addressNetwork->sin_family = AF_INET;
 		addressNetwork->sin_port = htons(
 				static_cast<int short unsigned>( port_ ) );
-#ifdef HAVE_GETHOSTBYNAME_R
+#if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 )
+		addrinfo* addrInfo( NULL );
+		error = ::getaddrinfo( address_.raw(), NULL, NULL, &addrInfo );
+		M_ENSURE( ! error && addrInfo );
+		addressNetwork->sin_addr.s_addr = reinterpret_cast<sockaddr_in*>( addrInfo->ai_addr )->sin_addr.s_addr;
+		::freeaddrinfo( addrInfo );
+#else /* #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 ) */
 		static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
 		hostent hostName;
 		hostent* hostNameStatus( NULL );
@@ -287,13 +287,7 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int const port
 		M_ENSURE( hostNameStatus );
 		addressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>(
 				hostName.h_addr_list[ 0 ] )->s_addr;
-#else /* HAVE_GETHOSTBYNAME_R */
-		addrinfo* addrInfo( NULL );
-		error = ::getaddrinfo( address_.raw(), NULL, NULL, &addrInfo );
-		M_ENSURE( ! error && addrInfo );
-		addressNetwork->sin_addr.s_addr = reinterpret_cast<sockaddr_in*>( addrInfo->ai_addr )->sin_addr.s_addr;
-		::freeaddrinfo( addrInfo );
-#endif /* not HAVE_GETHOSTBYNAME_R */
+#endif /* #else #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 ) */
 		_addressSize = sizeof ( sockaddr_in );
 		}
 	else /* _type & TYPE::FILE */
@@ -384,13 +378,13 @@ HString const& HSocket::get_host_name( void )
 	int size = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
 	sockaddr_in* addressNetwork = NULL;
 	sockaddr_un* addressFile = NULL;
-#ifdef HAVE_GETHOSTBYNAME_R
+#if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 )
+	size = NI_MAXHOST;
+#else /* #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
 	int code = 0;
 	hostent hostName;
 	hostent* hostNameStatus = NULL;
-#else /* HAVE_GETHOSTBYNAME_R */
-	size = NI_MAXHOST;
-#endif /* ! HAVE_GETHOSTBYNAME_R */
+#endif /* #else #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
 	if ( _fileDescriptor < 0 )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
 	if ( _hostName.is_empty() )
@@ -402,7 +396,13 @@ HString const& HSocket::get_host_name( void )
 			addressNetwork = reinterpret_cast<sockaddr_in*>( _address );
 			if ( _resolveHostnames )
 				{
-#ifdef HAVE_GETHOSTBYNAME_R
+#if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 )
+				error = getnameinfo(
+								reinterpret_cast<sockaddr*>( addressNetwork ), _addressSize,
+								_cache.raw(), size, NULL, 0, NI_NOFQDN );
+				M_ENSURE( error == 0 );
+				name = _cache.raw();
+#else /* #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
 				::memset( &hostName, 0, sizeof ( hostent ) );
 				while ( ( error = ::gethostbyaddr_r( &addressNetwork->sin_addr, _addressSize,
 							AF_INET, &hostName,
@@ -415,13 +415,7 @@ HString const& HSocket::get_host_name( void )
 				M_ENSURE( error == 0 );
 				if ( hostNameStatus )
 					name = hostName.h_name;
-#else /* HAVE_GETHOSTBYNAME_R */
-				error = getnameinfo(
-								reinterpret_cast<sockaddr*>( addressNetwork ), _addressSize,
-								_cache.raw(), size, NULL, 0, NI_NOFQDN );
-				M_ENSURE( error == 0 );
-				name = _cache.raw();
-#endif /* ! HAVE_GETHOSTBYNAME_R */
+#endif /* #else #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
 				}
 			if ( ! name )
 				name = inet_ntop( AF_INET, &addressNetwork->sin_addr,

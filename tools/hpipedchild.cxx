@@ -68,18 +68,18 @@ HPipedChild::STATUS HPipedChild::finish( void )
 	{
 	M_PROLOG
 	if ( _pipeErr >= 0 )
-		TEMP_FAILURE_RETRY( system::close( _pipeErr ) );
+		TEMP_FAILURE_RETRY( hcore::system::close( _pipeErr ) );
 	_pipeErr = -1;
 	if ( _pipeOut >= 0 )
-		TEMP_FAILURE_RETRY( system::close( _pipeOut ) );
+		TEMP_FAILURE_RETRY( hcore::system::close( _pipeOut ) );
 	_pipeOut = -1;
 	if ( _pipeIn >= 0 )
-		TEMP_FAILURE_RETRY( system::close( _pipeIn ) );
+		TEMP_FAILURE_RETRY( hcore::system::close( _pipeIn ) );
 	_pipeIn = -1;
 	STATUS s;
 	if ( _pid > 0 )
 		{
-		system::kill( _pid, SIGKILL );
+		hcore::system::kill( _pid, SIGKILL );
 		int status = 0;
 		::waitpid( _pid, &status, 0 );
 		if ( WIFEXITED( status ) )
@@ -108,9 +108,9 @@ struct OPipeResGuard
 	~OPipeResGuard( void )
 		{
 		if ( _res[ 0 ] >= 0 )
-			TEMP_FAILURE_RETRY( system::close( _res[ 0 ] ) );
+			TEMP_FAILURE_RETRY( hcore::system::close( _res[ 0 ] ) );
 		if ( _res[ 1 ] >= 0 )
-			TEMP_FAILURE_RETRY( system::close( _res[ 1 ] ) );
+			TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) );
 		}
 	};
 
@@ -118,7 +118,7 @@ static void close_and_invalidate( int& fd_ )
 	{
 	M_PROLOG
 	if ( fd_ >= 0 )
-		M_ENSURE( TEMP_FAILURE_RETRY( system::close( fd_ ) ) == 0 );
+		M_ENSURE( TEMP_FAILURE_RETRY( hcore::system::close( fd_ ) ) == 0 );
 	fd_ = -1;
 	return;
 	M_EPILOG
@@ -227,7 +227,7 @@ bool HPipedChild::is_running( void ) const
 	{
 	int err( 0 );
 	if ( _pid > 0 )
-		err = system::kill( _pid, 0 );
+		err = hcore::system::kill( _pid, 0 );
 	return ( ( _pid > 0 ) && ! err );
 	}
 

@@ -89,7 +89,7 @@ int long HFSItem::get_size() const
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );
-	return ( s.st_size );
+	return ( static_cast<int long>( s.st_size ) );
 	M_EPILOG
 	}
 
