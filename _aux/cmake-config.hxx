@@ -54,7 +54,10 @@
 #define VC_EXTRALEAN 1
 #pragma warning( disable : 4068 )
 #pragma warning( disable : 4180 )
+#pragma warning( disable : 4221 )
 #pragma warning( disable : 4250 )
+#pragma warning( disable : 4251 )
+#pragma warning( disable : 4275 )
 #pragma warning( disable : 4351 )
 #pragma warning( disable : 4355 )
 #pragma warning( disable : 4646 )
@@ -85,6 +88,11 @@ static int const CLOCK_REALTIME = 0;
 #endif /* _CTIME */
 #ifdef _CSTRING_
 #include <pthread.h>
+#undef ENOTSUP
+#undef ETIMEDOUT
+#undef SIG_BLOCK
+#undef SIG_UNBLOCK
+#undef SIG_SETMASK
 /* Those functions are available from libgw32c library, but declarations
  * are placed in glibc/string.h which horribly conflicts with Visual C++. */
 extern "C" void* memrchr( void const*, int, size_t );
@@ -96,6 +104,9 @@ extern "C" char* strsignal( int );
 extern "C" int long getline( char**, size_t*, FILE* );
 #endif /* _CSTDIO_ */
 #ifdef _CSIGNAL_
+#undef SIG_ERR
+#undef SIG_DFL
+#undef SIG_IGN
 #include <glibc/signal.h>
 #endif /* _CSIGNAL_ */
 #ifdef _UNISTD_H

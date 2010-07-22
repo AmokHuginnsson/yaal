@@ -13,8 +13,6 @@
 #define __dev_t_defined 1
 #define __ino_t_defined 1
 
-#define ip_opts CONCATENATE( ip_opts, __COUNTER__ )
-
 #define _exit CONCATENATE( _exit, __COUNTER__ )
 #define _exit1 _exit
 
@@ -23,8 +21,6 @@
 
 #define _restrict m_restrict0
 #define restrict_t restrict_t0
-
-#define _WINSOCKAPI_ 1
 
 #define tmpfile tmpfile_windows
 

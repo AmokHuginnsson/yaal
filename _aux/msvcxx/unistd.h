@@ -6,10 +6,11 @@
 #include <cerrno>
 #define unlink unlink_gnu
 #undef tmpfile
-extern "C" FILE* tmpfile (void);
+extern "C" FILE* tmpfile( void );
 
 #undef EDEADLOCK
 #define select select_off
+#define __socklen_t_defined 1
 #include <glibc/unistd.h>
 #include <libintl.h>
 #undef select

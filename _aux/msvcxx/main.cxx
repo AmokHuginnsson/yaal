@@ -25,9 +25,11 @@
 #define getpid gnu_getpid
 #define gethostname gethostname_off
 #define select select_off
+#define socklen_t socklen_t_off
 #include <glibc/sys/time.h>
 #include <unistd.h>
 #include <dirent.h>
+#undef socklen_t
 #undef select
 #undef dirent
 #undef readdir_r
@@ -78,8 +80,7 @@
 #undef MOUSE_MOVED
 #undef _WINSOCKAPI_
 
-#include <WinSock2.h>
-#include <Windows.h>
+#include <ws2tcpip.h>
 #include <dbghelp.h>
 #include <process.h>
 #include <../include/sys/stat.h>
@@ -309,26 +310,6 @@ int ms_gethostname( char* buf_, int len_ )
 	return ( gethostname( buf_, len_ ) );
 	}
 
-extern "C"
-int gethostbyname_r( char const* name_, struct hostent* buf_, char* /* unused */, size_t /* unused */, struct hostent** result_, int* err_ )
-	{
-	*result_ = gethostbyname( name_ );
-	if ( *result_ )
-		{
-		::memcpy( buf_, *result_, sizeof ( struct hostent ) );
-		*result_ = buf_;
-		}
-	else
-		*err_ = WSAGetLastError();
-	return ( *result_ ? 0 : -1 );
-	}
-
-extern "C"
-int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a4, int long unsigned a5, struct hostent** a6, int* a7 )
-	{
-	return ( 0 );
-	}
-
 int ESCDELAY = 0;
 
 extern "C"
@@ -409,6 +390,28 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 
 namespace msvcxx	
 {
+
+int unix_getaddrinfo( char const* node_,
+								char const* service_,
+								struct addrinfo const* hints_,
+								struct addrinfo** res_ )
+	{
+	return ( getaddrinfo( node_, service_, hints_, res_ ) );
+	}
+
+void unix_freeaddrinfo( struct addrinfo* res_ )
+	{
+	freeaddrinfo( res_ );
+	}
+
+int unix_getnameinfo( struct sockaddr const* sa_,
+								 socklen_t salen_,
+								 char* host_, size_t hostlen_,
+                 char* serv_, size_t servlen_,
+                 int flags_ )
+	{
+	return ( getnameinfo( sa_, salen_, host_, hostlen_, serv_, servlen_, flags_ ) );
+	}
 
 int unix_bind( int& fd_, const struct sockaddr* addr_, socklen_t len_ )
 	{
@@ -522,33 +525,12 @@ int unix_shutdown( int fd_, int how_ )
 	return ( 0 );
 	}
 
-}
-
-extern "C"
-int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_)
+int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
 	{
 	return ( setsockopt( fd_, level_, optname_, static_cast<char const*>( optval_ ), optlen_ ) );
 	}
 
-typedef short unsigned uint16_t;
-
-extern "C"
-uint16_t unix_htons( uint16_t hostshort_ )
-	{
-	return ( htons( hostshort_ ) );
-	}
-
-extern "C"
-uint16_t unix_ntohs( uint16_t hostshort_ )
-	{
-	return ( ntohs( hostshort_ ) );
-	}
-
-extern "C"
-const char* unix_inet_ntop( int af_, const void* cp_, char* buf_, socklen_t len_ )
-	{
-	return ( 0 );
-	}
+}
 
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
 	{

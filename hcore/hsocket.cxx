@@ -119,7 +119,7 @@ HSocket::~HSocket( void )
 	/* There will be no memory leakage if shutdown() throws,
 	 * because application has to terminate. */
 	if ( _address )
-		xfree ( _address );
+		xfree( _address );
 	return;
 	M_EPILOG
 	}
@@ -239,7 +239,7 @@ HSocket::ptr_t HSocket::accept( void )
 	::memcpy( socket->_address, address, addressSize );
 	if ( _clients->find( fileDescriptor ) != _clients->end() )
 		M_THROW( _( "inconsitent client list state" ), fileDescriptor );
-	_clients->operator[]( fileDescriptor ) = socket;
+	_clients->insert( make_pair( fileDescriptor, socket ) );
 	return ( socket );
 	M_EPILOG
 	}

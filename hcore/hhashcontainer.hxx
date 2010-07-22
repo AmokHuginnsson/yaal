@@ -55,19 +55,20 @@ class HHashContainer : private trait::HNonCopyable
 	{
 public:
 	class HIterator;
-private:
 	class HAbstractAtom
 		{
 	private: /* for UT */
 		HAbstractAtom* _next;
 		HAbstractAtom( void ) : _next( NULL ) {}
 		HAbstractAtom( HAbstractAtom const& );
-		virtual ~HAbstractAtom( void ) {}
 		HAbstractAtom& operator = ( HAbstractAtom const& );
 		virtual HAbstractAtom* clone( void ) const = 0;
 		friend class HHashContainer;
 		friend class HIterator;
+	public:
+		virtual ~HAbstractAtom( void ) {}
 		};
+private:
 	template<typename value_t>
 	class HAtom : public HAbstractAtom
 		{
