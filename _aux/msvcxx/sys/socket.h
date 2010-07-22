@@ -20,9 +20,11 @@
 #undef gethostname
 #define gethostname gethostname_off
 #define select select_off
+#define inet_ntop inet_ntop_off
 #define __inline inline
 #include <ws2tcpip.h>
 #include "cleanup.hxx"
+#undef inet_ntop
 #undef select
 #undef gethostname
 #undef fd_set
@@ -104,6 +106,11 @@ inline int getnameinfo( struct sockaddr const* sa_,
                  int flags_ )
 	{
 	return ( msvcxx::unix_getnameinfo( sa_, salen_, host_, hostlen_, serv_, servlen_, flags_ ) );
+	}
+
+inline char const* inet_ntop( int af_, void const* src_, char* dst, socklen_t size_ )
+	{
+	return ( 0 );
 	}
 
 int get_socket_error( void );
