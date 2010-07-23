@@ -11,7 +11,7 @@
 #define getaddrinfo getaddrinfo_off
 #define getnameinfo getnameinfo_off
 #define freeaddrinfo freeaddrinfo_off
-#define fd_set fd_set_off
+#define fd_set fd_set_win_off
 #define timeval timeval_off
 #define _SYS_UN_H 1
 #define _NETINET_IN_H 1
@@ -19,9 +19,13 @@
 #define _ARPA_INET_H 1
 #undef gethostname
 #define gethostname gethostname_off
-#define select select_off
+#define select select_win_off
 #define inet_ntop inet_ntop_off
-#define __inline inline
+#undef FD_CLR
+#undef FD_SET
+#undef FD_ZERO
+#undef timercmp
+#undef timerclear
 #include <ws2tcpip.h>
 #include "cleanup.hxx"
 #undef inet_ntop
@@ -108,9 +112,12 @@ inline int getnameinfo( struct sockaddr const* sa_,
 	return ( msvcxx::unix_getnameinfo( sa_, salen_, host_, hostlen_, serv_, servlen_, flags_ ) );
 	}
 
-inline char const* inet_ntop( int af_, void const* src_, char* dst, socklen_t size_ )
+inline char const* inet_ntop( int af_, void const* src_, char* dst_, socklen_t size_ )
 	{
-	return ( 0 );
+	char* name = inet_ntoa( *static_cast<in_addr const*>( src_ ) );
+	if ( name )
+		::strncpy( dst_, name, size_ );
+	return ( name ? dst_ : NULL );
 	}
 
 int get_socket_error( void );

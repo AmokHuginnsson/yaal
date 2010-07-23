@@ -3,7 +3,6 @@
 
 #define NCURSES_MOUSE_VERSION 1
 
-#define _INC_WCHAR 1
 #include <../include/curses.h>
 
 #define newscr NULL

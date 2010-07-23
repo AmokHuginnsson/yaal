@@ -27,8 +27,5 @@
 /* It must be included before <features.h> from GnuWin32 */
 #include <typeinfo>
 
-/* We do not need it and it gives linker a headache. */
-#define _INC_SWPRINTF_INL_ 1
-
 #endif /* not YAAL_MSVCXX_FIX_HXX_INCLUDED */
 

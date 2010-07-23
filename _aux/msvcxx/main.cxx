@@ -1,109 +1,62 @@
-#undef _INC_SWPRINTF_INL_
 #define NtCurrentTeb NtCurrentTeb_off
 
+#include <sys/cdefs.h>
 #include <list>
-
-#define access gnu_access
-#define lseek gnu_lseek
-#define read gnu_read
-#define write gnu_write
-#define dup gnu_dup
-#define dup2 gnu_dup2
-#undef swab
-#define swab gnu_swab
-#define _environ gnu__environ
-#define fd_set gnu_fdset
-#define isatty gnu_isatty
-#define timespec gnu_timespec
-#define timeval gnu_timeval
-#define execl gnu_execl
-#define execle gnu_execle
-#define execv gnu_execv
-#define execve gnu_execve
-#define execlp gnu_execlp
-#define execvp gnu_execvp
-#define getpid gnu_getpid
-#define gethostname gethostname_off
-#define select select_off
-#define socklen_t socklen_t_off
-#include <glibc/sys/time.h>
-#include <unistd.h>
-#include <dirent.h>
-#undef socklen_t
-#undef select
-#undef dirent
-#undef readdir_r
-
-#define getpwuid_r getpwuid_r_off
-#include <pwd.h>
-#undef getpwuid_r
-
-#undef gethostname
-#undef socket
-#undef bind
-#undef listen
-#undef accept
-#undef connect
-#undef shutdown
-#undef setsockopt
-#undef htons
-#undef ntohs
-#undef inet_ntop
-#undef FD_SET
-#undef FD_CLR
-#undef FD_SETSIZE
-#undef FD_ISSET
-#undef FD_ZERO
-#undef access
-#undef close
-#undef lseek
-#undef read
-#undef write
-#undef dup
-#undef dup2
-#undef swab
-#undef _environ
-#undef fd_set
-#undef isatty
-#undef __volatile
-#undef timespec
-#undef timeval
-#undef execl
-#undef execle
-#undef execv
-#undef execve
-#undef execlp
-#undef execvp
-#undef getpid
-#undef timerclear
-#undef timercmp
-#undef MOUSE_MOVED
-#undef _WINSOCKAPI_
-
+#include <cstdio>
+#include <cstdlib>
+#define fd_set fd_set_win_off
 #include <ws2tcpip.h>
 #include <dbghelp.h>
 #include <process.h>
 #include <../include/sys/stat.h>
 #include <io.h>
-#include <cstdio>
-#include <cstdlib>
-#include <csignal>
 
-#define sigaddset sigaddset_off
-#define sigdelset sigdelset_off
-#define sigwait sigwait_off
-#define sigemptyset sigemptyset_off
-#define kill kill_off
 #define pthread_sigmask pthread_sigmask_off
-#include <glibc/signal.h>
-#undef pthread_sigmask
-#undef sigaddset
-#undef sigdelset
-#undef sigwait
-#undef sigemptyset
-#undef kill
+#define execl execl_off
+#define execle execle_off
+#define execv execv_off
+#define execve execve_off
+#define execlp execlp_off
+#define execvp execvp_off
+#define gethostname gethostname_off
+#define timeval timeval_off
+#define access access_off
+#define lseek lseek_off
+#define read read_off
+#define write write_off
+#define dup dup_off
+#define dup2 dup2_off
+#define getpid getpid_off
+#define isatty isatty_off
+#define getpwuid_r getpwuid_r_off
 
+#undef fd_set
+#undef FD_SET
+#undef FD_CLR
+#undef FD_ISSET
+#undef FD_ZERO
+#undef FD_SETSIZE
+#undef timerclear
+#undef timercmp
+
+#include <csignal>
+#include <dirent.h>
+#include <pwd.h>
+
+#undef getpwuid_r
+#undef access
+#undef lseek
+#undef read
+#undef pthread_sigmask
 #undef gethostname
+#undef timeval
+#undef write
+#undef dup
+#undef dup2
+#undef getpid
+#undef isatty
+#undef readdir_r
+#undef dirent
 
 #include "hcore/base.hxx"
 #include "hcore/xalloc.hxx"
@@ -369,6 +322,7 @@ int unix_close( int const& fd )
 M_EXPORT_SYMBOL
 int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
 	{
+#if 0
 	int count = ( readFds ? readFds->fd_count : 0 ) + ( writeFds ? writeFds->fd_count : 0 ) + ( exceptFds ? exceptFds->fd_count : 0 );
 	fd_set set;
 	int s = -1;
@@ -385,7 +339,8 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 	char const* p = strerror( err );
 	if ( s >= 0 )
 		::closesocket( s );
-	return ( ret );
+#endif
+	return ( 0 );
 	}
 
 namespace msvcxx	

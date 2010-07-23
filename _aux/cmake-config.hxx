@@ -89,7 +89,6 @@ static int const CLOCK_REALTIME = 0;
 #ifdef _CSTRING_
 #include <pthread.h>
 #undef ENOTSUP
-#undef ETIMEDOUT
 #undef SIG_BLOCK
 #undef SIG_UNBLOCK
 #undef SIG_SETMASK
@@ -109,10 +108,6 @@ extern "C" int long getline( char**, size_t*, FILE* );
 #undef SIG_IGN
 #include <glibc/signal.h>
 #endif /* _CSIGNAL_ */
-#ifdef _UNISTD_H
-#include <sys/select.h>
-#include <glibc/errno.h>
-#endif /* _UNISTD_H */
 #include "cleanup.hxx"
 #endif /* __YAAL_BUILD__ */
 #endif /* __MSVCXX__ */
