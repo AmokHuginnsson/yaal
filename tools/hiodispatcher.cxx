@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hprocess.cxx - this file is integral part of `yaal' project.
+	hiodispatcher.cxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -35,7 +35,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
-#include "hprocess.hxx"
+#include "hiodispatcher.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
 
 using namespace yaal::hcore;
@@ -46,11 +46,11 @@ namespace yaal
 namespace tools
 {
 
-HProcess::HProcess( int noFileHandlers_, int latencySeconds_, int latencyMicroseconds_ )
+HIODispatcher::HIODispatcher( int noFileHandlers_, int latencySeconds_, int latencyMicroseconds_ )
 	: _initialised( false ), _loop( true ), _idleCycles( 0 ),
 	_latencySeconds( latencySeconds_ ), _latencyMicroseconds( latencyMicroseconds_ ),
-	_select( sizeof ( fd_set ) + sizeof ( timeval ) ),
-	_fileDescriptorHandlers( noFileHandlers_ ),
+	_select( sizeof ( fd_set ) * 2 + sizeof ( timeval ) ), /* * 2 because 1 for readers and 1 for writters */
+	_readers( noFileHandlers_ ), _writers( noFileHandlers_ ),
 	_alert(), _idle(), _droppedFd( noFileHandlers_ ),
 	_callbackContext( false ), _event(), _mutex()
 	{
@@ -58,82 +58,98 @@ HProcess::HProcess( int noFileHandlers_, int latencySeconds_, int latencyMicrose
 	_droppedFd.clear();
 	M_ASSERT( _droppedFd.is_empty() );
 	FD_ZERO( _select.get<fd_set>() );
+	FD_ZERO( _select.get<fd_set>() + 1 );
 	HSignalService& ss = HSignalService::get_instance();
-	HSignalService::handler_t handler( call( &HProcess::handler_interrupt, this, _1 ) );
+	HSignalService::handler_t handler( call( &HIODispatcher::handler_interrupt, this, _1 ) );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
 		ss.register_handler( SIGINT, handler );
 	ss.register_handler( SIGHUP, handler );
-	register_file_descriptor_handler( _event.get_reader_fd(), call( &HProcess::process_interrupt, this, _1 ) );
+	register_file_descriptor_handler( _event.get_reader_fd(), call( &HIODispatcher::process_interrupt, this, _1 ) );
 	return;
 	M_EPILOG
 	}
 
-HProcess::~HProcess( void )
+HIODispatcher::~HIODispatcher( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-int HProcess::register_file_descriptor_handler( int fileDescriptor_, process_filedes_handler_t HANDLER )
+int HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, process_filedes_handler_t HANDLER, FD_TYPE::fd_type_t const& fdType_ )
 	{
 	M_PROLOG
-	HPair<process_filedes_map_t::iterator, bool> s( _fileDescriptorHandlers.insert( make_pair( fileDescriptor_, HANDLER ) ) );
+	process_filedes_map_t& fds( fdType_ == FD_TYPE::READER ? _readers : _writers );
+	HPair<process_filedes_map_t::iterator, bool> s( fds.insert( make_pair( fileDescriptor_, HANDLER ) ) );
 	return ( s.second ? 0 : 1 );
 	M_EPILOG
 	}
 
-void HProcess::unregister_file_descriptor_handler( int fileDescriptor_ )
+void HIODispatcher::unregister_file_descriptor_handler( int fileDescriptor_ )
 	{
 	M_PROLOG
 	if ( _callbackContext )
 		_droppedFd.push_back( fileDescriptor_ );
 	else
 		{
-		bool fail( _fileDescriptorHandlers.erase( fileDescriptor_ ) != 1 );
+		bool fail( ( _readers.erase( fileDescriptor_ ) != 1 ) && ( _writers.erase( fileDescriptor_ ) != 1 ) );
 		M_ASSERT( ! fail );
 		}
 	return;
 	M_EPILOG
 	}
 
-int HProcess::reconstruct_fdset( void )
+int HIODispatcher::reconstruct_fdset( void )
 	{
 	M_PROLOG
-	timeval& latency( *static_cast<timeval*>( static_cast<void*>( _select.raw() + sizeof ( fd_set ) ) ) );
+	timeval& latency( *static_cast<timeval*>( static_cast<void*>( _select.raw() + sizeof ( fd_set ) * 2 ) ) );
 	latency.tv_sec = _latencySeconds;
 	latency.tv_usec = _latencyMicroseconds;
 	FD_ZERO( _select.get<fd_set>() );
-	if ( ! _fileDescriptorHandlers.size() )
+	FD_ZERO( _select.get<fd_set>() + 1 );
+	if ( _readers.is_empty() && _writers.is_empty() )
 		return ( -1 );
 /* FD_SET is a macro and first argument is evaluated twice ! */
-	for ( process_filedes_map_t::iterator it = _fileDescriptorHandlers.begin(); it != _fileDescriptorHandlers.end(); ++ it )
+	for ( process_filedes_map_t::iterator it = _readers.begin(); it != _readers.end(); ++ it )
 		FD_SET( it->first, _select.get<fd_set>() );
+	for ( process_filedes_map_t::iterator it = _writers.begin(); it != _writers.end(); ++ it )
+		FD_SET( it->first, _select.get<fd_set>() + 1 );
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HProcess::run( void )
+int HIODispatcher::run( void )
 	{
 	M_PROLOG
 	int error = 0;
-	if ( ! _fileDescriptorHandlers.size() )
+	if ( _readers.is_empty() && _writers.is_empty() )
 		M_THROW( _( "there is no file descriptor to check activity on" ), errno );
 	while ( _loop )
 		{
 		_callbackContext = true;
 		handle_alerts();
 		reconstruct_fdset();
-		if ( ( error = ::select( FD_SETSIZE, _select.get<fd_set>(),
-						NULL, NULL, static_cast<timeval*>( static_cast<void*>( _select.raw() + sizeof ( fd_set ) ) ) ) ) )
+		if ( ( error = ::select( FD_SETSIZE,
+						_select.get<fd_set>(),
+						_select.get<fd_set>() + 1,
+						NULL, static_cast<timeval*>( static_cast<void*>( _select.raw() + sizeof ( fd_set ) * 2 ) ) ) ) )
 			{
 			if ( ( error < 0 ) && ( errno == EINTR ) )
 				continue;
 			M_ENSURE( error >= 0 );
-			for ( process_filedes_map_t::iterator it = _fileDescriptorHandlers.begin();
-					it != _fileDescriptorHandlers.end(); ++ it )
+			for ( process_filedes_map_t::iterator it = _readers.begin();
+					it != _readers.end(); ++ it )
 				{
 				if ( FD_ISSET( it->first, _select.get<fd_set>() ) )
+					{
+					static_cast<void>( ( it->second( it->first ) ) );
+					_idleCycles = 0;
+					}
+				}
+			for ( process_filedes_map_t::iterator it = _writers.begin();
+					it != _writers.end(); ++ it )
+				{
+				if ( FD_ISSET( it->first, _select.get<fd_set>() + 1 ) )
 					{
 					static_cast<void>( ( it->second( it->first ) ) );
 					_idleCycles = 0;
@@ -154,12 +170,12 @@ int HProcess::run( void )
 	M_EPILOG
 	}
 
-int HProcess::idle_cycles( void ) const
+int HIODispatcher::idle_cycles( void ) const
 	{
 	return ( _idleCycles );
 	}
 
-void HProcess::stop( void )
+void HIODispatcher::stop( void )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -169,7 +185,7 @@ void HProcess::stop( void )
 	M_EPILOG
 	}
 
-int HProcess::handler_interrupt( int sigNo_ )
+int HIODispatcher::handler_interrupt( int sigNo_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -178,7 +194,7 @@ int HProcess::handler_interrupt( int sigNo_ )
 	M_EPILOG
 	}
 
-void HProcess::process_interrupt( int )
+void HIODispatcher::process_interrupt( int )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -192,7 +208,7 @@ void HProcess::process_interrupt( int )
 	M_EPILOG
 	}
 
-void HProcess::add_idle_handle( delayed_call_t call_ )
+void HIODispatcher::add_idle_handle( delayed_call_t call_ )
 	{
 	M_PROLOG
 	_idle.push_back( call_ );
@@ -200,7 +216,7 @@ void HProcess::add_idle_handle( delayed_call_t call_ )
 	M_EPILOG
 	}
 
-void HProcess::add_alert_handle( delayed_call_t call_ )
+void HIODispatcher::add_alert_handle( delayed_call_t call_ )
 	{
 	M_PROLOG
 	_alert.push_back( call_ );
@@ -208,7 +224,7 @@ void HProcess::add_alert_handle( delayed_call_t call_ )
 	M_EPILOG
 	}
 
-void HProcess::handle_alerts( void )
+void HIODispatcher::handle_alerts( void )
 	{
 	M_PROLOG
 	for ( delayed_calls_t::iterator it( _alert.begin() ), endIt( _alert.end() ); it != endIt; ++ it )
@@ -217,7 +233,7 @@ void HProcess::handle_alerts( void )
 	M_EPILOG
 	}
 
-void HProcess::handle_idle( void )
+void HIODispatcher::handle_idle( void )
 	{
 	M_PROLOG
 	++ _idleCycles;

@@ -30,7 +30,7 @@ Copyright:
 #ifndef YAAL_HCONSOLE_HTUIPROCESS_HXX_INCLUDED
 #define YAAL_HCONSOLE_HTUIPROCESS_HXX_INCLUDED
 
-#include "tools/hprocess.hxx"
+#include "tools/hiodispatcher.hxx"
 #include "hconsole/hhandler.hxx"
 #include "hconsole/hwindow.hxx"
 #include "hconsole/hwindowlistcontrol.hxx"
@@ -52,7 +52,7 @@ public:
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 protected:
-	yaal::tools::HProcess _dispatcher;
+	yaal::tools::HIODispatcher _dispatcher;
 	HWindow::ptr_t _mainWindow; /* self explanary */
 	model_t::cyclic_iterator _foregroundWindow; /* self explanary */
 	model_ptr_t _windows;	/* current existing windows */

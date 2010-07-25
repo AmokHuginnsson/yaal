@@ -39,12 +39,21 @@ namespace yaal
 namespace tools
 {
 
-/*! \brief Class that provision framework for creation of multiplexing based applications.
+/*! \brief Input/output (fd) event listner and notification dispatcher.
  */
-class HProcess
+class HIODispatcher
 	{
+public:
+	struct FD_TYPE
+		{
+		typedef enum
+			{
+			READER,
+			WRITER
+			} fd_type_t;
+		};
 protected:
-	typedef HProcess this_type;
+	typedef HIODispatcher this_type;
 private:
 	typedef yaal::hcore::HBoundCall<0, void> delayed_call_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
@@ -57,7 +66,8 @@ private:
 	int _latencySeconds;			/* timeout between recall */
 	int _latencyMicroseconds;	/* of handler_idle */
 	yaal::hcore::HChunk _select;
-	process_filedes_map_t _fileDescriptorHandlers;
+	process_filedes_map_t _readers;
+	process_filedes_map_t _writers;
 	delayed_calls_t _alert;
 	delayed_calls_t _idle;
 	dropped_fd_t _droppedFd;
@@ -65,12 +75,12 @@ private:
 	yaal::hcore::HPipe _event;
 	yaal::hcore::HMutex _mutex;
 public:
-	HProcess( int, int, int = 0 );
-	virtual ~HProcess( void );
+	HIODispatcher( int, int, int = 0 );
+	virtual ~HIODispatcher( void );
 	int run( void );
 	void stop( void );
 	int idle_cycles( void ) const;
-	int register_file_descriptor_handler( int, process_filedes_handler_t );
+	int register_file_descriptor_handler( int, process_filedes_handler_t, FD_TYPE::fd_type_t const& = FD_TYPE::READER );
 	void unregister_file_descriptor_handler( int );
 	void add_alert_handle( delayed_call_t );
 	void add_idle_handle( delayed_call_t );
@@ -84,11 +94,11 @@ private:
 	int handler_interrupt( int );
 	void handle_alerts( void );
 	void handle_idle( void );
-	HProcess( HProcess const& );
-	HProcess& operator = ( HProcess const& );
+	HIODispatcher( HIODispatcher const& );
+	HIODispatcher& operator = ( HIODispatcher const& );
 	};
 
-typedef yaal::hcore::HExceptionT<HProcess> HProcessException;
+typedef yaal::hcore::HExceptionT<HIODispatcher> HIODispatcherException;
 
 }
 
