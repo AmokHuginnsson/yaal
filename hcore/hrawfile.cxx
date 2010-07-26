@@ -148,7 +148,7 @@ bool HRawFile::is_write_ready( int fileDescriptor_ )
 	::memset( &writer, 0, sizeof ( writer ) );
 	writer.fd = fileDescriptor_;
 	writer.events = POLLOUT;
-	return ( ( poll( &writer, 1, 0 ) == 1 ) && ( writer.revents & POLLOUT ) && ! ( writer.revents & POLLHUP ) );
+	return ( ( ::poll( &writer, 1, 0 ) == 1 ) && ( writer.revents & POLLOUT ) && ! ( writer.revents & POLLHUP ) );
 	}
 
 int long HRawFile::do_write( void const* const buffer_, int long const& size_ )
@@ -166,7 +166,7 @@ bool HRawFile::wait_for( ACTION::action_t const& action_, void* time_ )
 	timeval* wait = static_cast<timeval*>( time_ );
 	while ( wait->tv_sec || wait->tv_usec )
 		{
-		FD_ZERO( & fdSet );
+		FD_ZERO( &fdSet );
 		FD_SET( _fileDescriptor, &fdSet );
 		error = static_cast<int>( TEMP_FAILURE_RETRY( ::select( FD_SETSIZE,
 						( action_ == ACTION::READ ) ? &fdSet : NULL,

@@ -353,17 +353,11 @@ int HSerial::timed_read( void* const buffer_, int const size_,
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
 		M_THROW( _eNotOpened_, errno );
-	int error = 0;
-	timeval wait;
-	fd_set fdSet;
-	wait.tv_sec = timeOutSec_;
-	wait.tv_usec = timeOutUsec_;
-	FD_ZERO( &fdSet );
-	FD_SET( _fileDescriptor, &fdSet );
-	error = ::select( FD_SETSIZE, &fdSet, NULL, NULL, &wait );
-	if ( ( error > 0 ) && FD_ISSET ( _fileDescriptor, &fdSet ) )
-		return ( static_cast<int>( HRawFile::read( buffer_, size_ ) ) );
-	return ( -1 );
+	timeval wait = { timeOutSec_, timeOutUsec_ };
+	int nRead( -1 );
+	if ( ! wait_for( ACTION::READ, &wait ) )
+		nRead = static_cast<int>( HRawFile::read( buffer_, size_ ) );
+	return ( nRead );
 	M_EPILOG
 	}
 
