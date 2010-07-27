@@ -43,6 +43,17 @@ int close( int );
 int getpid( void );
 int kill( int, int );
 
+/*! \brief Wait for input/output event on given descriptor set.
+ *
+ * \param[in,out] input_ - set of input descriptors to observe.
+ * \param inputCount_ - a number of input descriptors to observe.
+ * \param[in,out] output_ set of output descriptors to observe.
+ * \param outputCount_ - a number of output descriptors to observe.
+ * \param timeOut - wait that many miliseconds for an event.
+ * \return number of signaled events.
+ */
+int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& outputCount_, int long* timeOut_ );
+
 }
 
 }

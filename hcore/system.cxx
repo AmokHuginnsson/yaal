@@ -26,10 +26,13 @@ Copyright:
 
 #include <csignal>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "system.hxx"
+#include "algorithm.hxx"
+#include "hclock.hxx"
 
 namespace yaal
 {
@@ -53,6 +56,45 @@ int getpid( void )
 int kill( int pid_, int signal_ )
 	{
 	return ( ::kill( pid_, signal_ ) );
+	}
+
+int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& outputCount_, int long* timeOut_ )
+	{
+	M_ASSERT( ( inputCount_ >= 0 ) && ( outputCount_ >= 0 ) && ( ( inputCount_ + outputCount_ ) > 0 ) );
+	M_ASSERT( ! inputCount_ || input_ );
+	M_ASSERT( ! outputCount_ || output_ );
+	HClock clock;
+	fd_set readers;
+	fd_set writers;
+	if ( inputCount_ )
+		FD_ZERO( &readers );
+	if ( outputCount_ )
+		FD_ZERO( &writers );
+/* FD_SET is a macro and first argument is evaluated twice ! */
+	for ( int i( 0 ); i < inputCount_; ++ i )
+		FD_SET( input_[ i ], &readers );
+	for ( int i( 0 ); i < outputCount_; ++ i )
+		FD_SET( output_[ i ], &writers );
+	timeval timeOut, * timeOutP = timeOut_ ? &timeOut : NULL;
+	if ( timeOut_ )
+		{
+		timeOut.tv_usec = *timeOut_ * 1000;
+		timeOut.tv_sec = *timeOut_ / 1000;
+		}
+	int ret( ::select( FD_SETSIZE, inputCount_ ? &readers : NULL, outputCount_ ? &writers : NULL, NULL, timeOutP ) );
+	for ( int i( 0 ); i < inputCount_; ++ i )
+		{
+		if ( ! FD_ISSET( input_[ i ], &readers ) )
+			input_[ i ] = -1;
+		}
+	for ( int i( 0 ); i < outputCount_; ++ i )
+		{
+		if ( ! FD_ISSET( output_[ i ], &writers ) )
+			output_[ i ] = -1;
+		}
+	if ( timeOut_ )
+		*timeOut_ -= min( *timeOut_, clock.get_time_elapsed( HClock::UNIT::MILISECOND ) );
+	return ( ret );
 	}
 
 }
