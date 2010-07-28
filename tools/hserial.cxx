@@ -348,14 +348,14 @@ void HSerial::wait_for_eot( void )
 	}
 
 int HSerial::timed_read( void* const buffer_, int const size_,
-		int const timeOutSec_, int const timeOutUsec_ )
+		int const& timeOut_ )
 	{
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
 		M_THROW( _eNotOpened_, errno );
-	timeval wait = { timeOutSec_, timeOutUsec_ };
+	int long timeOut( timeOut_ );
 	int nRead( -1 );
-	if ( ! wait_for( ACTION::READ, &wait ) )
+	if ( ! wait_for( ACTION::READ, &timeOut ) )
 		nRead = static_cast<int>( HRawFile::read( buffer_, size_ ) );
 	return ( nRead );
 	M_EPILOG

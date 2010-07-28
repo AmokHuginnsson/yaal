@@ -57,7 +57,7 @@ protected:
 	model_t::cyclic_iterator _foregroundWindow; /* self explanary */
 	model_ptr_t _windows;	/* current existing windows */
 public:
-	HTUIProcess ( int = 8, size_t = 32, size_t = 32 );
+	HTUIProcess( int = 8, size_t = 32, size_t = 32 );
 	virtual ~HTUIProcess ( void );
 	int init_tui( char const* = "", HWindow::ptr_t = HWindow::ptr_t() );
 	int run( void );

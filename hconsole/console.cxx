@@ -30,7 +30,6 @@ Copyright:
 #include <csignal>  /* signal handling */
 #include <unistd.h>
 #include <termios.h>
-#include <sys/time.h> /* timeval */
 #include <libintl.h>
 
 #undef ECHO
@@ -43,6 +42,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "console.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/hcore.hxx"
+#include "hcore/system.hxx"
 #include "tools/tools.hxx"
 #include "hconsole.hxx"
 
@@ -551,21 +551,21 @@ int HConsole::get_key( void ) const
 	M_ENSURE( echo() != ERR );
 	switch ( key )
 		{
-		case ( KEY_NPAGE ):			key = KEY_CODES::PAGE_DOWN;	break;
-		case ( KEY_PPAGE ):			key = KEY_CODES::PAGE_UP;		break;
-		case ( KEY_HOME ):			key = KEY_CODES::HOME;				break;
+		case ( KEY_NPAGE ):     key = KEY_CODES::PAGE_DOWN; break;
+		case ( KEY_PPAGE ):     key = KEY_CODES::PAGE_UP;   break;
+		case ( KEY_HOME ):      key = KEY_CODES::HOME;      break;
 		case ( 347 ):
-		case ( KEY_END ):				key = KEY_CODES::END;				break;
+		case ( KEY_END ):       key = KEY_CODES::END;       break;
 		case ( 8 ):
 		case ( 127 ):
-		case ( KEY_BACKSPACE ):	key = KEY_CODES::BACKSPACE;	break;
-		case ( KEY_UP ):				key = KEY_CODES::UP;					break;
-		case ( KEY_DOWN ):			key = KEY_CODES::DOWN;				break;
-		case ( KEY_LEFT ):			key = KEY_CODES::LEFT;				break;
-		case ( KEY_RIGHT ):			key = KEY_CODES::RIGHT;			break;
-		case ( KEY_DC ):				key = KEY_CODES::DELETE;			break;
-		case ( KEY_IC ):				key = KEY_CODES::INSERT;			break;
-		case ( KEY_MOUSE ):			key = KEY_CODES::MOUSE;			break;
+		case ( KEY_BACKSPACE ): key = KEY_CODES::BACKSPACE; break;
+		case ( KEY_UP ):        key = KEY_CODES::UP;        break;
+		case ( KEY_DOWN ):      key = KEY_CODES::DOWN;      break;
+		case ( KEY_LEFT ):      key = KEY_CODES::LEFT;      break;
+		case ( KEY_RIGHT ):     key = KEY_CODES::RIGHT;     break;
+		case ( KEY_DC ):        key = KEY_CODES::DELETE;    break;
+		case ( KEY_IC ):        key = KEY_CODES::INSERT;    break;
+		case ( KEY_MOUSE ):     key = KEY_CODES::MOUSE;     break;
 		default:
 		break;
 		}
@@ -628,35 +628,23 @@ bool HConsole::is_enabled( void ) const
 	M_EPILOG
 	}
 
-int HConsole::wait_for_user_input( int& key_, mouse::OMouse& mouse_,
-		int timeOutSec_, int timeOutUsec_ ) const
+int HConsole::wait_for_user_input( int& key_, mouse::OMouse& mouse_, int timeOut_ ) const
 	{
 	M_PROLOG
-	int error = - 1, eventType = 0;
-	timeval wait;
-	fd_set fdSet;
-	wait.tv_sec = timeOutSec_;
-	wait.tv_usec = timeOutUsec_;
-	FD_ZERO( &fdSet );
-	FD_SET( STDIN_FILENO, &fdSet );
-	if ( _mouseDes )
-		FD_SET ( _mouseDes, &fdSet );
-	do
-		{
-		error = ::select( FD_SETSIZE, &fdSet, NULL, NULL,
-				( timeOutSec_ || timeOutUsec_ ) ? &wait : NULL );
-		}
-	while ( ( error == -1 ) && ( errno == EINTR ) );
+	int fds[2] = { STDIN_FILENO, _mouseDes };
+	int long wait( timeOut_ );
+	int error( system::wait_for_io( fds, _mouseDes ? 2 : 1, NULL, 0, timeOut_ ? &wait : NULL ) );
+	int eventType( 0 );
 	if ( error > 0 )
 		{
-		if ( FD_ISSET( STDIN_FILENO, &fdSet ) )
+		if ( fds[0] != -1 )
 			{
 			key_ = get_key(), eventType = EVENT::KEYBOARD;
 			if ( key_ == KEY_MOUSE )
 				eventType = 0;
 			}
 		if ( ( key_ == KEY_MOUSE )
-				|| ( _mouseDes && FD_ISSET( _mouseDes, &fdSet ) ) )
+				|| ( _mouseDes && ( fds[1] != -1 ) ) )
 			eventType |= EVENT::MOUSE, static_cast<void>( mouse::mouse_get( mouse_ ) );
 		}
 	return ( eventType );

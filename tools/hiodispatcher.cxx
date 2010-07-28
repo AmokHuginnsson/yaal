@@ -27,16 +27,14 @@ Copyright:
 #include <cstring>
 #include <cstdio>
 #include <csignal>
-#include <unistd.h>
 #include <libintl.h>
-#include <sys/time.h> /* timeval on Cygwin */
-#include <sys/types.h> /* timeval */
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hiodispatcher.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
+#include "hcore/system.hxx"
 
 using namespace yaal::hcore;
 
@@ -46,19 +44,17 @@ namespace yaal
 namespace tools
 {
 
-HIODispatcher::HIODispatcher( int noFileHandlers_, int latencySeconds_, int latencyMicroseconds_ )
+HIODispatcher::HIODispatcher( int noFileHandlers_, int latency_ )
 	: _initialised( false ), _loop( true ), _idleCycles( 0 ),
-	_latencySeconds( latencySeconds_ ), _latencyMicroseconds( latencyMicroseconds_ ),
-	_select( sizeof ( fd_set ) * 2 + sizeof ( timeval ) ), /* * 2 because 1 for readers and 1 for writters */
-	_readers( noFileHandlers_ ), _writers( noFileHandlers_ ),
+	_latency( latency_ ),
+	_select( chunk_size<int>( noFileHandlers_ ) * 2 ), /* * 2 because 1 for readers and 1 for writters */
+	_readers(), _writers(),
 	_alert(), _idle(), _droppedFd( noFileHandlers_ ),
 	_callbackContext( false ), _event(), _mutex()
 	{
 	M_PROLOG
 	_droppedFd.clear();
 	M_ASSERT( _droppedFd.is_empty() );
-	FD_ZERO( _select.get<fd_set>() );
-	FD_ZERO( _select.get<fd_set>() + 1 );
 	HSignalService& ss = HSignalService::get_instance();
 	HSignalService::handler_t handler( call( &HIODispatcher::handler_interrupt, this, _1 ) );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
@@ -76,12 +72,19 @@ HIODispatcher::~HIODispatcher( void )
 	M_EPILOG
 	}
 
-int HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, process_filedes_handler_t HANDLER, FD_TYPE::fd_type_t const& fdType_ )
+int HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, call_fd_t HANDLER, FD_TYPE::fd_type_t const& fdType_ )
 	{
 	M_PROLOG
-	process_filedes_map_t& fds( fdType_ == FD_TYPE::READER ? _readers : _writers );
-	HPair<process_filedes_map_t::iterator, bool> s( fds.insert( make_pair( fileDescriptor_, HANDLER ) ) );
-	return ( s.second ? 0 : 1 );
+	io_handlers_t& fds( fdType_ == FD_TYPE::READER ? _readers : _writers );
+	io_handlers_t::iterator it( find_if( _readers.begin(), _readers.end(),
+				compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) ) );
+	int ret( 0 );
+	if ( it == fds.end() )
+		fds.push_back( make_pair( fileDescriptor_, HANDLER ) );
+	else
+		ret = 1;
+	_select.realloc( chunk_size<int>( _readers.get_size() + _writers.get_size() ) );
+	return ( ret );
 	M_EPILOG
 	}
 
@@ -92,7 +95,20 @@ void HIODispatcher::unregister_file_descriptor_handler( int fileDescriptor_ )
 		_droppedFd.push_back( fileDescriptor_ );
 	else
 		{
-		bool fail( ( _readers.erase( fileDescriptor_ ) != 1 ) && ( _writers.erase( fileDescriptor_ ) != 1 ) );
+		io_handlers_t::iterator it( find_if( _readers.begin(), _readers.end(),
+					compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) ) );
+		bool fail( false );
+		if ( it != _readers.end() )
+			_readers.erase( it );
+		else
+			{
+			it = find_if( _writers.begin(), _writers.end(),
+					compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) );
+			if ( it != _writers.end() )
+				_writers.erase( it );
+			else
+				fail = true;
+			}
 		M_ASSERT( ! fail );
 		}
 	return;
@@ -102,18 +118,11 @@ void HIODispatcher::unregister_file_descriptor_handler( int fileDescriptor_ )
 int HIODispatcher::reconstruct_fdset( void )
 	{
 	M_PROLOG
-	timeval& latency( *static_cast<timeval*>( static_cast<void*>( _select.raw() + sizeof ( fd_set ) * 2 ) ) );
-	latency.tv_sec = _latencySeconds;
-	latency.tv_usec = _latencyMicroseconds;
-	FD_ZERO( _select.get<fd_set>() );
-	FD_ZERO( _select.get<fd_set>() + 1 );
 	if ( _readers.is_empty() && _writers.is_empty() )
 		return ( -1 );
+	transform( _readers.begin(), _readers.end(), _select.get<int>(), select1st<io_handlers_t::value_type>() );
+	transform( _writers.begin(), _writers.end(), _select.get<int>() + _readers.get_size(), select1st<io_handlers_t::value_type>() );
 /* FD_SET is a macro and first argument is evaluated twice ! */
-	for ( process_filedes_map_t::iterator it = _readers.begin(); it != _readers.end(); ++ it )
-		FD_SET( it->first, _select.get<fd_set>() );
-	for ( process_filedes_map_t::iterator it = _writers.begin(); it != _writers.end(); ++ it )
-		FD_SET( it->first, _select.get<fd_set>() + 1 );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -129,29 +138,29 @@ int HIODispatcher::run( void )
 		_callbackContext = true;
 		handle_alerts();
 		reconstruct_fdset();
-		if ( ( error = ::select( FD_SETSIZE,
-						_select.get<fd_set>(),
-						_select.get<fd_set>() + 1,
-						NULL, static_cast<timeval*>( static_cast<void*>( _select.raw() + sizeof ( fd_set ) * 2 ) ) ) ) )
+		int long wait( _latency );
+		int nReaders( static_cast<int>( _readers.get_size() ) );
+		int nWriters( static_cast<int>( _writers.get_size() ) );
+		int* readers( _select.get<int>() );
+		int* writers( _select.get<int>() + nReaders );
+		if ( ( error = system::wait_for_io( readers, nReaders, writers, nWriters, &wait ) ) )
 			{
-			if ( ( error < 0 ) && ( errno == EINTR ) )
-				continue;
 			M_ENSURE( error >= 0 );
-			for ( process_filedes_map_t::iterator it = _readers.begin();
-					it != _readers.end(); ++ it )
+			for ( int i( 0 ); i < nReaders; ++ i )
 				{
-				if ( FD_ISSET( it->first, _select.get<fd_set>() ) )
+				if ( readers[ i ] != -1 )
 					{
-					static_cast<void>( ( it->second( it->first ) ) );
+					io_handler_t& h( _readers[ i ] );
+					static_cast<void>( h.second( h.first ) );
 					_idleCycles = 0;
 					}
 				}
-			for ( process_filedes_map_t::iterator it = _writers.begin();
-					it != _writers.end(); ++ it )
+			for ( int i( 0 ); i < nWriters; ++ i )
 				{
-				if ( FD_ISSET( it->first, _select.get<fd_set>() + 1 ) )
+				if ( writers[ i ] != -1 )
 					{
-					static_cast<void>( ( it->second( it->first ) ) );
+					io_handler_t& h( _writers[ i ] );
+					static_cast<void>( h.second( h.first ) );
 					_idleCycles = 0;
 					}
 				}

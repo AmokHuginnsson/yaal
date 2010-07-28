@@ -56,18 +56,18 @@ protected:
 	typedef HIODispatcher this_type;
 private:
 	typedef yaal::hcore::HBoundCall<0, void> delayed_call_t;
-	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
-	typedef yaal::hcore::HBoundCall<1, void, int> process_filedes_handler_t;
-	typedef yaal::hcore::HHashMap<int, process_filedes_handler_t> process_filedes_map_t;
+	typedef yaal::hcore::HBoundCall<1, void, int> call_fd_t;
+	typedef yaal::hcore::HPair<int, call_fd_t> io_handler_t;
 	typedef yaal::hcore::HArray<int> dropped_fd_t;
-	bool _initialised;					/* did process has necessery initialisation */
-	bool _loop; 								/* indicates if main loop continues */
-	int _idleCycles;					/* full select()'s without io activity */
-	int _latencySeconds;			/* timeout between recall */
-	int _latencyMicroseconds;	/* of handler_idle */
+	typedef yaal::hcore::HArray<io_handler_t> io_handlers_t;
+	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
+	bool _initialised;					/*!<< did process has necessery initialisation */
+	bool _loop; 								/*!<< indicates if main loop continues */
+	int _idleCycles;					/*!<< full select()'s without io activity */
+	int _latency;			/*!<< timeout between recall (miliseconds) */
 	yaal::hcore::HChunk _select;
-	process_filedes_map_t _readers;
-	process_filedes_map_t _writers;
+	io_handlers_t _readers;
+	io_handlers_t _writers;
 	delayed_calls_t _alert;
 	delayed_calls_t _idle;
 	dropped_fd_t _droppedFd;
@@ -75,12 +75,12 @@ private:
 	yaal::hcore::HPipe _event;
 	yaal::hcore::HMutex _mutex;
 public:
-	HIODispatcher( int, int, int = 0 );
+	HIODispatcher( int, int );
 	virtual ~HIODispatcher( void );
 	int run( void );
 	void stop( void );
 	int idle_cycles( void ) const;
-	int register_file_descriptor_handler( int, process_filedes_handler_t, FD_TYPE::fd_type_t const& = FD_TYPE::READER );
+	int register_file_descriptor_handler( int, call_fd_t, FD_TYPE::fd_type_t const& = FD_TYPE::READER );
 	void unregister_file_descriptor_handler( int );
 	void add_alert_handle( delayed_call_t );
 	void add_idle_handle( delayed_call_t );

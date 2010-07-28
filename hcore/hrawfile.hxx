@@ -100,7 +100,7 @@ protected:
 	virtual int long do_read( void* const, int long const& );
 	virtual void do_flush( void ) const;
 	virtual bool do_is_valid( void ) const;
-	bool wait_for( ACTION::action_t const&, void* );
+	bool wait_for( ACTION::action_t const&, int long* );
 	};
 
 typedef HExceptionT<HRawFile, HStreamInterfaceException> HRawFileException;

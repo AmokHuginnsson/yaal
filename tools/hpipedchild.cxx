@@ -198,28 +198,11 @@ void HPipedChild::do_flush( void ) const
 	{
 	}
 
-bool HPipedChild::read_poll( void* time_ )
+bool HPipedChild::read_poll( int long* time_ )
 	{
 	M_PROLOG
-	int error = - 1;
-	fd_set fdSet;
-	timeval* wait = static_cast<timeval*>( time_ );
-	int fd = ( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
-	do
-		{
-		FD_ZERO( &fdSet );
-		FD_SET( fd, &fdSet );
-		error = ::select( FD_SETSIZE, &fdSet, NULL, NULL, wait );
-		if ( error < 0 )
-			break;
-		else if ( ( error > 0 )
-				&& FD_ISSET( fd, &fdSet ) )
-			break;
-		else if ( ! error )
-			break;
-		}
-	while ( wait->tv_sec || wait->tv_usec );
-	return ( error <= 0 );
+	int fd( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
+	return ( system::wait_for_io( &fd, 1, NULL, 0, time_ ) <= 0 );
 	M_EPILOG
 	}
 

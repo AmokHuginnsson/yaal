@@ -47,12 +47,13 @@ int kill( int, int );
  *
  * \param[in,out] input_ - set of input descriptors to observe.
  * \param inputCount_ - a number of input descriptors to observe.
- * \param[in,out] output_ set of output descriptors to observe.
+ * \param[in,out] output_ - set of output descriptors to observe.
  * \param outputCount_ - a number of output descriptors to observe.
- * \param timeOut - wait that many miliseconds for an event.
+ * \param timeOut_ - wait that many miliseconds for an event.
+ * \param restartable_ - should wait be automatically restarted after interrupt from signal.
  * \return number of signaled events.
  */
-int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& outputCount_, int long* timeOut_ );
+int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& outputCount_, int long* timeOut_, bool restartable_ = true );
 
 }
 
@@ -60,5 +61,5 @@ int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& o
 
 }
 
-#endif /* not YAAL_HCORE_SYSTEM_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_SYSTEM_HXX_INCLUDED */
 

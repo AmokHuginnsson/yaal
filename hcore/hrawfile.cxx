@@ -159,28 +159,14 @@ int long HRawFile::do_write( void const* const buffer_, int long const& size_ )
 	M_EPILOG
 	}
 
-bool HRawFile::wait_for( ACTION::action_t const& action_, void* time_ )
+bool HRawFile::wait_for( ACTION::action_t const& action_, int long* time_ )
 	{
-	int error = - 1;
-	fd_set fdSet;
-	timeval* wait = static_cast<timeval*>( time_ );
-	while ( wait->tv_sec || wait->tv_usec )
-		{
-		FD_ZERO( &fdSet );
-		FD_SET( _fileDescriptor, &fdSet );
-		error = static_cast<int>( TEMP_FAILURE_RETRY( ::select( FD_SETSIZE,
-						( action_ == ACTION::READ ) ? &fdSet : NULL,
-						( action_ == ACTION::WRITE ) ? &fdSet : NULL,
-						NULL, wait ) ) );
-		if ( error < 0 )
-			break;
-		else if ( ( error > 0 )
-				&& FD_ISSET( _fileDescriptor, &fdSet ) )
-			break;
-		else if ( ! error )
-			break;
-		}
-	return ( error <= 0 );
+	int fd( _fileDescriptor );
+	int error( system::wait_for_io( action_ == ACTION::READ ? &fd : NULL,
+				action_ == ACTION::READ ? 1 : 0,
+				action_ == ACTION::WRITE ? &fd : NULL,
+				action_ == ACTION::WRITE ? 1 : 0, time_ ) );
+	return ( ( error <= 0 ) || ( fd == -1 ) );
 	}
 
 int long HRawFile::write_plain( void const* const buffer_, int long const& size_ )
@@ -189,10 +175,10 @@ int long HRawFile::write_plain( void const* const buffer_, int long const& size_
 	if ( _fileDescriptor < 0 )
 		M_THROW( _error_, errno );
 	int long iWritten = 0;
-	timeval tv = { _timeOut, 0 };
+	int long timeOut( _timeOut );
 	do
 		{
-		if ( ( _timeOut > 0 ) && wait_for( ACTION::WRITE, &tv ) )
+		if ( ( _timeOut > 0 ) && wait_for( ACTION::WRITE, &timeOut ) )
 			throw HStreamInterfaceException( _( "timeout on write" ) );
 		int long ret = TEMP_FAILURE_RETRY( ::write( _fileDescriptor,
 					static_cast<char const* const>( buffer_ ) + iWritten,

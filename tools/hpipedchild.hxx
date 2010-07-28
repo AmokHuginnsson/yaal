@@ -90,7 +90,7 @@ public:
 	HPipedChild( void );
 	~HPipedChild( void );
 	void spawn( yaal::hcore::HString const&, argv_t const& = argv_t() );
-	bool read_poll( void* );
+	bool read_poll( int long* );
 	STATUS finish( void );
 	bool is_running( void ) const;
 	void set_csoi( STREAM::stream_t const& );

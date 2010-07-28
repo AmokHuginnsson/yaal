@@ -113,7 +113,7 @@ public:
 	void set_flags( flag_t );
 	void flush( int );
 	void wait_for_eot( void );
-	int timed_read( void* const, int const, int const, int const = 0 );
+	int timed_read( void* const, int const, int const& );
 	static flag_t FLAG_TEXT; /* flags for textmode operation */
 protected:
 	virtual int do_close( void );

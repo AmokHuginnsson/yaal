@@ -58,7 +58,7 @@ int kill( int pid_, int signal_ )
 	return ( ::kill( pid_, signal_ ) );
 	}
 
-int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& outputCount_, int long* timeOut_ )
+int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& outputCount_, int long* timeOut_, bool restartable_ )
 	{
 	M_ASSERT( ( inputCount_ >= 0 ) && ( outputCount_ >= 0 ) && ( ( inputCount_ + outputCount_ ) > 0 ) );
 	M_ASSERT( ! inputCount_ || input_ );
@@ -81,7 +81,15 @@ int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& o
 		timeOut.tv_usec = *timeOut_ * 1000;
 		timeOut.tv_sec = *timeOut_ / 1000;
 		}
-	int ret( ::select( FD_SETSIZE, inputCount_ ? &readers : NULL, outputCount_ ? &writers : NULL, NULL, timeOutP ) );
+	int ret( 0 );
+	do
+		{
+		ret = ::select( FD_SETSIZE, inputCount_ ? &readers : NULL, outputCount_ ? &writers : NULL, NULL, timeOutP );
+		}
+	while ( restartable_
+			&& ( ret == -1 )
+			&& ( errno == EINTR )
+			&& ( ! timeOut_ || ( clock.get_time_elapsed( HClock::UNIT::MILISECOND ) < *timeOut_ ) ) );
 	for ( int i( 0 ); i < inputCount_; ++ i )
 		{
 		if ( ! FD_ISSET( input_[ i ], &readers ) )
