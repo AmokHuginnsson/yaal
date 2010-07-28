@@ -84,7 +84,6 @@ public:
 	READER_t reader;
 	WRITER_t writer;
 	CLOSER_t closer;
-	static bool is_write_ready( int );
 	void set_timeout( int );
 protected:
 	virtual int do_close( void );

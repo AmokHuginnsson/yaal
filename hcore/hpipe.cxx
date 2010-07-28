@@ -71,19 +71,18 @@ int long HPipe::do_read( void* const buffer_, int long const& size_ )
 int long HPipe::do_write( void const* const buffer_, int long const& size_ )
 	{
 	M_PROLOG
-	int long iWritten = -1;
-	if ( HRawFile::is_write_ready( _pipe[ 1 ] ) )
+	M_ASSERT( _pipe[1] >= 0 );
+	int long nWritten( 0 );
+	int long nWriteChunk( 0 );
+	do
 		{
-		iWritten = 0;
-		do
-			{
-			iWritten += TEMP_FAILURE_RETRY( ::write( _pipe[ 1 ],
-						static_cast<char const* const>( buffer_ ) + iWritten,
-						size_ - iWritten ) );
-			}
-		while ( iWritten < size_ );
+		nWriteChunk = TEMP_FAILURE_RETRY( ::write( _pipe[ 1 ],
+					static_cast<char const* const>( buffer_ ) + nWritten,
+					size_ - nWritten ) );
+		nWritten += nWriteChunk;
 		}
-	return ( iWritten );
+	while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
+	return ( nWritten );
 	M_EPILOG
 	}
 
