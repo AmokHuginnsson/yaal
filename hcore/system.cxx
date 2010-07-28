@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <csignal>
+#include <cstring>
 #include <unistd.h>
 #include <sys/time.h>
 
