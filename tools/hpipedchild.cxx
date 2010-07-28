@@ -202,7 +202,7 @@ bool HPipedChild::read_poll( int long* time_ )
 	{
 	M_PROLOG
 	int fd( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
-	return ( system::wait_for_io( &fd, 1, NULL, 0, time_ ) <= 0 );
+	return ( hcore::system::wait_for_io( &fd, 1, NULL, 0, time_ ) <= 0 );
 	M_EPILOG
 	}
 

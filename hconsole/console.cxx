@@ -633,7 +633,7 @@ int HConsole::wait_for_user_input( int& key_, mouse::OMouse& mouse_, int timeOut
 	M_PROLOG
 	int fds[2] = { STDIN_FILENO, _mouseDes };
 	int long wait( timeOut_ );
-	int error( system::wait_for_io( fds, _mouseDes ? 2 : 1, NULL, 0, timeOut_ ? &wait : NULL ) );
+	int error( hcore::system::wait_for_io( fds, _mouseDes ? 2 : 1, NULL, 0, timeOut_ ? &wait : NULL ) );
 	int eventType( 0 );
 	if ( error > 0 )
 		{
