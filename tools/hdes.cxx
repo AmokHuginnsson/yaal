@@ -61,13 +61,15 @@ extern const u8_t _sBlock_[][ 4 ][ 16 ];
 
 using namespace des;
 
-HDes::HDes ( void )
+HDes::HDes( HString const& password_ )
 	{
 	flush_keys();
+	generate_keys( reinterpret_cast<u8_t const*>( password_.raw() ),
+			static_cast<int>( password_.get_length() ) );
 	return;
 	}
 
-HDes::~HDes ( void )
+HDes::~HDes( void )
 	{
 	M_PROLOG
 	flush_keys();
@@ -75,17 +77,16 @@ HDes::~HDes ( void )
 	M_EPILOG
 	}
 
-void HDes::generate_keys( u8_t* password_ )
+void HDes::generate_keys( u8_t const* password_, int const& len_ )
 	{
 	int ctr = 0, ctrLoc = 0;
 	u8_t iKeyLow[ DES::BLOCK_SIZE ];
 	u8_t iKeyHigh[ DES::BLOCK_SIZE ];
 	u8_t tmpKey[ DES::BLOCK_SIZE ];
-	flush_keys();
 	for ( ctr = 0; ctr < DES::BLOCK_SIZE; ++ ctr )
 		{
-		iKeyHigh[ ctr ] = password_[ ctr ];
-		iKeyLow[ ctr ] = password_[ ctr + DES::BLOCK_SIZE ];
+		iKeyHigh[ ctr ] = password_[ ctr % len_ ];
+		iKeyLow[ ctr ] = password_[ ( ctr + DES::BLOCK_SIZE ) % len_ ];
 		}
 	permutate( iKeyHigh, _keyPermutation_, 56 );
 	permutate( iKeyLow, _keyPermutation_, 56 );
@@ -110,38 +111,38 @@ void HDes::generate_keys( u8_t* password_ )
 		for ( ctrLoc = 0; ctrLoc < 6; ctrLoc ++ )
 			_IKeys[ 1 ][ ctr ][ ctrLoc ] = tmpKey[ ctrLoc ];
 		}
-	memset ( password_, 0, DES::PASSWORD_SIZE );
-	return ;
+	return;
 	}
 
-void HDes::flush_keys ( void )
+void HDes::flush_keys( void )
 	{
 	int ctr = 0, ctrLoc = 0;
 	for ( ctr = 0; ctr < DES::SIDES_COUNT; ctr ++ )
 		for ( ctrLoc = 0; ctrLoc < DES::IKEYS_COUNT; ctrLoc ++ )
-			memset ( _IKeys[ ctr ][ ctrLoc ], 0, DES::IKEY_SIZE );
+			::memset( _IKeys[ ctr ][ ctrLoc ], 0, DES::IKEY_SIZE );
 	return;
 	}
 
-void HDes::crypt ( u8_t* buffer_, int blockCount_, int side_ )
+void HDes::crypt( u8_t* buffer_, int const& blockCount_, action_t const& action_ )
 	{
+	M_ASSERT( ( action_ == CRYPT ) || ( action_ == DECRYPT ) );
 	int ctr;
 	for ( ctr = 0; ctr < blockCount_; ctr ++ )
-		_3des( buffer_ + ( ctr << 3 ), side_ );
+		_3des( buffer_ + ( ctr << 3 ), action_ );
 	return;
 	}
 	
-void HDes::_3des( u8_t* block_, int side_ )
+void HDes::_3des( u8_t* block_, int action_ )
 	{
 	permutate( block_, _beginingPermutation_, 64 );
-	_des ( block_, side_, 0 );
-	_des ( block_, 1 - side_, 1 );
-	_des ( block_, side_, 0 );
+	_des( block_, action_, 0 );
+	_des( block_, 1 - action_, 1 );
+	_des( block_, action_, 0 );
 	permutate( block_, _endingPermutation_, 64 );
 	return;
 	}
 	
-void HDes::_des( u8_t* block_, int side_, int part_ )
+void HDes::_des( u8_t* block_, int action_, int part_ )
 	{
 	int cycle = 0, ctr = 0, ctrLoc, col, row;
 	u8_t buf[ DES::BLOCK_SIZE ], bufT[ DES::BLOCK_SIZE ];
@@ -159,7 +160,7 @@ void HDes::_des( u8_t* block_, int side_, int part_ )
 	for ( cycle = 0; cycle < DES::IKEYS_COUNT; cycle ++ )
 		{
 		reinterpret_cast<u32_t*>( buf )[ 0 ] = 0;
-		if ( side_ )
+		if ( action_ )
 			endKey = _IKeys[ part_ ][ cycle ];
 		else
 			endKey = _IKeys[ part_ ][ 15 - cycle ];

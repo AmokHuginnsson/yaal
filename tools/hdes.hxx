@@ -28,6 +28,7 @@ Copyright:
 #define YAAL_TOOLS_HDES_HXX_INCLUDED
 
 #include "hcore/pod.hxx"
+#include "hcore/hstring.hxx"
 
 namespace yaal
 {
@@ -54,14 +55,22 @@ struct DES
  */
 class HDes
 	{
+public:
+	typedef HDes this_type;
+	typedef enum
+		{
+		CRYPT = 0,
+		DECRYPT = 1
+		} action_t;
+private:
 	u8_t _IKeys[ DES::SIDES_COUNT ][ DES::IKEYS_COUNT ][ DES::IKEY_SIZE ];
 public:
-	HDes( void );
+	HDes( yaal::hcore::HString const& );
 	virtual ~HDes( void );
-	void crypt( u8_t*, int, int );
-	void generate_keys( u8_t* );
+	void crypt( u8_t*, int const&, action_t const& );
 	void flush_keys( void );
 private:
+	void generate_keys( u8_t const*, int const& );
 	void _des( u8_t* /* block */, int /* side */, int /* part */ );
 	void _3des( u8_t* /* block */, int /* side */ );
 	void permutate( u8_t* /* buffer */, const u8_t* /* tab */, int /* len */ ) const;
