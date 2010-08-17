@@ -71,8 +71,8 @@ public:
 	void flush_keys( void );
 private:
 	void generate_keys( u8_t const*, int const& );
-	void _des( u8_t* /* block */, int /* side */, int /* part */ );
-	void _3des( u8_t* /* block */, int /* side */ );
+	void _des( u8_t* /* block */, int /* action */, int /* part */ );
+	void _3des( u8_t* /* block */, int /* action */ );
 	void permutate( u8_t* /* buffer */, const u8_t* /* tab */, int /* len */ ) const;
 	};
 
