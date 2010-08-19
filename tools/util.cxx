@@ -39,6 +39,8 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "util.hxx"
 #include "hexpression.hxx"
 #include "hcore/hlog.hxx"
+#include "hdes.hxx"
+#include "hcore/hrandomizer.hxx"
 
 using namespace yaal::hcore;
 
@@ -694,6 +696,95 @@ int levenshtein_damerau( yaal::hcore::HString const& one_, yaal::hcore::HString 
 			}
 		}
 	return ( distanceMatrix[ lengthOne ][ lengthTwo ] );
+	M_EPILOG
+	}
+
+}
+
+namespace crypto
+{
+
+void crypt_3des( yaal::hcore::HStreamInterface::ptr_t src_, yaal::hcore::HStreamInterface::ptr_t dst_, HString const& key_ )
+	{
+	M_PROLOG
+	crypt_3des( *src_, *dst_, key_ );
+	return;
+	M_EPILOG
+	}
+
+void crypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInterface& dst_, HString const& key_ )
+	{
+	M_PROLOG
+	static int const BUF_SIZE( 128 );
+	HChunk buf( BUF_SIZE );
+	HDes des( key_ );
+	HRandomizer r;
+	randomizer_helper::init_randomizer_from_time( r );
+	int long const toRead( buf.get_size() );
+	M_ASSERT( toRead == BUF_SIZE );
+	char gap( 0 );
+	int long nRead( 0 );
+	while ( ( nRead = src_.read( buf.raw(), toRead ) ) > 0 )
+		{
+		gap = static_cast<char>( nRead % 8 );
+		if ( gap )
+			{
+			gap = static_cast<char>( 8 - gap );
+			generate_n( buf.raw() + nRead, gap, call( &HRandomizer::rnd, &r, 255 ) );
+			}
+		int long toWrite( nRead + gap );
+		M_ASSERT( toWrite <= toRead );
+		des.crypt( buf.get<u8_t>(), toWrite, HDes::CRYPT );
+		dst_.write( buf.raw(), toWrite );
+		}
+	dst_.write( &gap, 1 );
+	return;
+	M_EPILOG
+	}
+
+void decrypt_3des( yaal::hcore::HStreamInterface::ptr_t src_, yaal::hcore::HStreamInterface::ptr_t dst_, yaal::hcore::HString const& key_ )
+	{
+	M_PROLOG
+	decrypt_3des( *src_, *dst_, key_ );
+	return;
+	M_EPILOG
+	}
+
+void decrypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInterface& dst_, yaal::hcore::HString const& key_ )
+	{
+	M_PROLOG
+	static int const BUF_SIZE( 128 );
+	HChunk bufA( BUF_SIZE );
+	HChunk bufB( BUF_SIZE );
+	HDes des( key_ );
+	int long const toRead( bufA.get_size() );
+	M_ASSERT( toRead == BUF_SIZE );
+	M_ASSERT( bufB.get_size() == BUF_SIZE );
+	char gap( 0 );
+	int long nRead( 0 );
+	int long toWrite( 0 );
+	while ( ( ( nRead = src_.read( bufA.raw(), toRead ) ) > 0 ) || ( toWrite > 0 ) )
+		{
+		if ( toWrite > 0 )
+			dst_.write( bufB.raw(), toWrite );
+		toWrite = 0;
+		if ( nRead > 0 )
+			{
+			gap = static_cast<char>( nRead % 8 );
+			if ( gap )
+				{
+				M_ENSURE_EX( gap == 1, "malformed encrypted packet" );
+				-- nRead;
+				gap = bufA.get<char>()[ nRead ];
+				}
+			toWrite = nRead;
+			if ( toWrite > 0 )
+				des.crypt( bufA.get<u8_t>(), toWrite, HDes::DECRYPT );
+			toWrite -= gap;
+			bufA.swap( bufB );
+			}
+		}
+	return;
 	M_EPILOG
 	}
 

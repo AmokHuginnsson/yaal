@@ -33,6 +33,24 @@ namespace yaal
 namespace hcore
 {
 
+template<typename T>
+struct iterator_interface
+	{
+	typedef T value_type;
+	};
+
+template<typename iterator>
+struct iterator_traits
+	{
+	typedef typename iterator::value_type value_type;
+	};
+
+template<typename T>
+struct iterator_traits<T*>
+	{
+	typedef T value_type;
+	};
+
 /*! \brief (Back)Insertion concept for HInsertIterator.
  *
  * May be used for collections that support back insertion.

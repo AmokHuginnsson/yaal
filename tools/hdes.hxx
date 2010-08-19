@@ -67,7 +67,7 @@ private:
 public:
 	HDes( yaal::hcore::HString const& );
 	virtual ~HDes( void );
-	void crypt( u8_t*, int const&, action_t const& );
+	void crypt( u8_t*, int long const&, action_t const& );
 	void flush_keys( void );
 private:
 	void generate_keys( u8_t const*, int const& );

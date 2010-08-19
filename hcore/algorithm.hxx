@@ -33,6 +33,7 @@ Copyright:
 
 #include "hcore/trait.hxx"
 #include "hcore/hpair.hxx"
+#include "hcore/iterator.hxx"
 
 namespace yaal
 {
@@ -477,7 +478,7 @@ template<typename iterator_t, typename generator_t>
 void generate_n( iterator_t it, int long const& count, generator_t generator )
 	{
 	for ( int long i = 0; i < count; ++ i, ++ it )
-		*it = generator();
+		*it = static_cast<typename hcore::iterator_traits<iterator_t>::value_type>( generator() );
 	return;
 	}
 

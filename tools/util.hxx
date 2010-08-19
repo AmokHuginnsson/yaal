@@ -90,6 +90,18 @@ int second( int, bool = false );
 
 }
 
+/*! \brief 3DES cropto algorithm functions.
+ */
+namespace crypto
+{
+
+void crypt_3des( yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HString const& );
+void crypt_3des( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, yaal::hcore::HString const& );
+void decrypt_3des( yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HString const& );
+void decrypt_3des( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, yaal::hcore::HString const& );
+
+}
+
 /*! \brief The Levenshtein and Levenshtein-Damerau string distance functions.
  */
 namespace distance

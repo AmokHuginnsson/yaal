@@ -123,12 +123,12 @@ void HDes::flush_keys( void )
 	return;
 	}
 
-void HDes::crypt( u8_t* buffer_, int const& blockCount_, action_t const& action_ )
+void HDes::crypt( u8_t* buffer_, int long const& size_, action_t const& action_ )
 	{
 	M_ASSERT( ( action_ == CRYPT ) || ( action_ == DECRYPT ) );
-	int ctr;
-	for ( ctr = 0; ctr < blockCount_; ctr ++ )
-		_3des( buffer_ + ( ctr << 3 ), action_ );
+	M_ASSERT( ! ( size_ % 8 ) );
+	for ( int long i( 0 ); i < size_; i += 8 )
+		_3des( buffer_ + i, action_ );
 	return;
 	}
 	
