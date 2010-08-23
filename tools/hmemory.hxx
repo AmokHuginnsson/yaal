@@ -63,7 +63,7 @@ public:
 	/*! \brief Create new memory accessor.
 	 *
 	 * \param ptr - pointer to memory block to be wrapped.
-	 * \param size - size of memoru block in octets.
+	 * \param size - size of memory block in octets.
 	 */
 	HMemory( void* ptr, int long const& size, INITIAL_STATE::enum_t const& = INITIAL_STATE::AUTO );
 	/*! \brief Copy constructor.

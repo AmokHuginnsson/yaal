@@ -763,7 +763,9 @@ void decrypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInte
 	char gap( 0 );
 	int long nRead( 0 );
 	int long toWrite( 0 );
-	while ( ( ( nRead = src_.read( bufA.raw(), toRead ) ) > 0 ) || ( toWrite > 0 ) )
+	char* readBuf( bufA.raw() );
+	char* writeBuf( bufB.raw() );
+	while ( ( ( nRead = src_.read( readBuf, toRead ) ) > 0 ) || ( toWrite > 0 ) )
 		{
 		/* There are 3 cases for non-malformed encrypted data:
 		 * 1 - we read only full blocks
@@ -777,21 +779,21 @@ void decrypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInte
 				{
 				M_ENSURE_EX( gap == 1, "malformed encrypted packet" );
 				-- nRead;
-				gap = bufA.get<char>()[ nRead ];
+				gap = readBuf[ nRead ];
 				M_ENSURE_EX( ( gap >= 0 ) && ( gap < 8 ) && ( gap <= toWrite ), "malformed gap" );
 				}
 			if ( toWrite > 0 )
-				dst_.write( bufB.raw(), toRead > 0 ? toWrite /* full blocks from previous read */ : toWrite - gap /* only gap has been read */ );
+				dst_.write( writeBuf, toRead > 0 ? toWrite /* full blocks from previous read */ : toWrite - gap /* only gap has been read */ );
 			toWrite = nRead;
 			M_ASSERT( ! ( toWrite % 8 ) );
 			if ( toWrite > 0 )
-				des.crypt( bufA.get<u8_t>(), toWrite, HDes::DECRYPT );
+				des.crypt( reinterpret_cast<u8_t*>( readBuf ), toWrite, HDes::DECRYPT );
 			toWrite -= gap;
-			bufA.swap( bufB );
+			swap( readBuf, writeBuf );
 			}
 		else if ( toWrite > 0 )
 			{
-			dst_.write( bufB.raw(), toWrite );
+			dst_.write( writeBuf, toWrite );
 			toWrite = 0;
 			}
 		}

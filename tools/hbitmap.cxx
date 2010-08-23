@@ -457,12 +457,10 @@ bool HBitmap::get( int long const& number_ ) const
 	M_PROLOG
 	M_ASSERT( number_ >= 0 );
 	M_ASSERT( number_ < _size );
-	int short state = 0, offset = 0;
-	int long dword;
+	int long byteNo( number_ >> 3 );
 	char const* address = static_cast<char const*>( block() );
-	dword = number_ >> 3;
-	offset = static_cast<short>( number_ & 7 );
-	state = static_cast<short>( *( address + dword ) & _maskBitSetByte_[ offset ] );
+	int short offset( static_cast<short>( number_ & 7 ) );
+	int short state(static_cast<short>( *( address + byteNo ) & _maskBitSetByte_[ offset ] ) );
 	if ( state )
 		state = 1;
 	return ( state ? true : false );
@@ -474,21 +472,19 @@ void HBitmap::set( int long const& number_, bool const& state_ )
 	M_PROLOG
 	M_ASSERT( number_ >= 0 );
 	M_ASSERT( number_ < _size );
-	int long offset;
-	int long dword;
+	int long offset( number_ & 7 );
+	int long byteNo( number_ >> 3 );
 	char unsigned* address = static_cast<char unsigned*>( block() );
-	dword = number_ >> 3;
-	offset = number_ & 7;
 	/* FIXME g++-4.3 bug
 	if ( state_ )
-		*( address + dword ) |= _maskBitSet_[ offset ];
+		*( address + byteNo ) |= _maskBitSet_[ offset ];
 	else
-		*( address + dword ) &= _maskBitClear_[ offset ];
+		*( address + byteNo ) &= _maskBitClear_[ offset ];
 	*/
 	if ( state_ )
-		*( address + dword ) = static_cast<char unsigned>( *( address + dword ) | _maskBitSetByte_[ offset ] );
+		*( address + byteNo ) = static_cast<char unsigned>( *( address + byteNo ) | _maskBitSetByte_[ offset ] );
 	else
-		*( address + dword ) = static_cast<char unsigned>( *( address + dword ) & _maskBitClearByte_[ offset ] );
+		*( address + byteNo ) = static_cast<char unsigned>( *( address + byteNo ) & _maskBitClearByte_[ offset ] );
 	return;
 	M_EPILOG
 	}
