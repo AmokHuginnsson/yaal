@@ -50,7 +50,7 @@ class M_YAAL_TOOLS_PUBLIC_API HSignalService : public yaal::hcore::HSingleton<HS
 public:
 	typedef yaal::hcore::HSingleton<HSignalService> base_type;
 	typedef HSignalService this_type;
-	typedef yaal::hcore::HBoundCall<1, int, int> handler_t;
+	typedef yaal::hcore::HBoundCall<int ( int )> handler_t;
 private:
 	typedef yaal::hcore::HMultiMap<int, handler_t> handlers_t;
 	typedef handlers_t::value_list_t handler_list_t;

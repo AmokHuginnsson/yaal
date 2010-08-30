@@ -55,8 +55,8 @@ public:
 protected:
 	typedef HIODispatcher this_type;
 private:
-	typedef yaal::hcore::HBoundCall<0, void> delayed_call_t;
-	typedef yaal::hcore::HBoundCall<1, void, int> call_fd_t;
+	typedef yaal::hcore::HBoundCall<> delayed_call_t;
+	typedef yaal::hcore::HBoundCall<void ( int )> call_fd_t;
 	typedef yaal::hcore::HPair<int, call_fd_t> io_handler_t;
 	typedef yaal::hcore::HArray<int> dropped_fd_t;
 	typedef yaal::hcore::HArray<io_handler_t> io_handlers_t;

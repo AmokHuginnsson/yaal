@@ -39,16 +39,23 @@ namespace yaal
 namespace hcore
 {
 
-template<int free_args = 0, typename return_t = void,
-	typename a0_t = trait::no_type, typename a1_t = trait::no_type,
-	typename a2_t = trait::no_type, typename a3_t = trait::no_type,
-	typename a4_t = trait::no_type, typename a5_t = trait::no_type,
-	typename a6_t = trait::no_type, typename a7_t = trait::no_type,
-	typename a8_t = trait::no_type, typename a9_t = trait::no_type,
-	typename a10_t = trait::no_type>
+template<typename signature_t = void ( void )>
 class HBoundCall
 	{
-	typedef HCallInterface<free_args, return_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> call_t;
+	typedef typename trait::return_type<signature_t>::type return_t;
+	typedef HCallInterface<trait::argument_count<signature_t>::value,
+					return_t,
+					typename trait::argument_type<signature_t, 0>::type,
+					typename trait::argument_type<signature_t, 1>::type,
+					typename trait::argument_type<signature_t, 2>::type,
+					typename trait::argument_type<signature_t, 3>::type,
+					typename trait::argument_type<signature_t, 4>::type,
+					typename trait::argument_type<signature_t, 5>::type,
+					typename trait::argument_type<signature_t, 6>::type,
+					typename trait::argument_type<signature_t, 7>::type,
+					typename trait::argument_type<signature_t, 8>::type,
+					typename trait::argument_type<signature_t, 9>::type,
+					typename trait::argument_type<signature_t, 10>::type> call_t;
 	typedef HPointer<call_t> call_ptr_t;
 	call_ptr_t _call;
 public:
