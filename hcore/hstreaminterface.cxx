@@ -142,7 +142,7 @@ int long HStreamInterface::reformat( void )
 HStreamInterface& HStreamInterface::do_output( int long unsigned const& unsignedLongInteger_ )
 	{
 	M_PROLOG
-	_wordCache.format( "%lu", unsignedLongInteger_ );
+	_wordCache.format( _base == BASES::DEC ? "%lu" : ( _base == BASES::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
 	int long len( reformat() );
 	do_write( _wordCache.raw(), len );
 	return ( *this );
