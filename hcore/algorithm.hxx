@@ -673,6 +673,77 @@ inline tType max( tType const& left, tType const& right )
 	return ( left >= right ? left : right );
 	}
 
+/*! \brief Find minimum element in a range.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \return iterator pointing to found position or end of range.
+ */
+template<typename iterator_t>
+iterator_t min_element( iterator_t it, iterator_t end )
+	{
+	iterator_t min( it );
+	++ it;
+	for ( ; ( it != end ); ++ it )
+		{
+		if ( *it < *min )
+			min = it;
+		}
+	return ( min );
+	}
+
+/*! \brief Find element in a range that is best with respect to some predicate.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param pred - predicate to test.
+ * \return iterator pointing to found position or end of range.
+ */
+template<typename iterator_t, typename predicate_t>
+iterator_t min_element( iterator_t it, iterator_t end, predicate_t predicate_ )
+	{
+	iterator_t min( it );
+	++ it;
+	for ( ; ( it != end ); ++ it )
+		{
+		if ( predicate_( *it, *min ) )
+			min = it;
+		}
+	return ( min );
+	}
+
+/*! \brief Find maximum element in a range.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \return iterator pointing to found position or end of range.
+ */
+template<typename iterator_t>
+iterator_t max_element( iterator_t it, iterator_t end )
+	{
+	iterator_t max( it );
+	++ it;
+	for ( ; ( it != end ); ++ it )
+		{
+		if ( *it > *max )
+			max = it;
+		}
+	return ( max );
+	}
+
+/*! \brief Find element in a range that is best with respect to some predicate.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param pred - predicate to test.
+ * \return iterator pointing to found position or end of range.
+ */
+template<typename iterator_t, typename predicate_t>
+iterator_t max_element( iterator_t it, iterator_t end, predicate_t predicate_ )
+	{
+	return ( min_element( it, end, predicate_ ) );
+	}
+
 /*! \brief Calculate absolute value of a number.
  *
  * \param val - a number which absolute value shall be calculated.

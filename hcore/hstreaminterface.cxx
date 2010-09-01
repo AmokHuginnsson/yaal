@@ -207,6 +207,7 @@ HStreamInterface& endl( HStreamInterface& file_ )
 	{
 	M_PROLOG
 	file_.do_write( "\n", 1 );
+	file_.do_flush();
 	return ( file_ );
 	M_EPILOG
 	}
