@@ -43,11 +43,11 @@ namespace yaal
  * \tparam result_t - result type of generator function.
  */
 template<typename result_t>
-struct generator_function
+struct nullary_function
 	{
 	typedef result_t result_type;
-	typedef generator_function<result_type> this_type;
-	virtual ~generator_function( void ) {}
+	typedef nullary_function<result_type> this_type;
+	virtual ~nullary_function( void ) {}
 	};
 
 /*! \brief Meta-data definition for unary function functors.
@@ -577,9 +577,9 @@ struct project2nd : public binary_function<second_t, first_t, second_t>
 	};
 
 template<typename tType>
-class constant : public generator_function<tType>
+class constant : public nullary_function<tType>
 	{
-	typedef generator_function<tType> base_type;
+	typedef nullary_function<tType> base_type;
 	typedef typename base_type::result_type result_type;
 	tType _constant;
 public:
@@ -621,6 +621,82 @@ public:
 template<typename return_t, typename first_argument_t, typename second_argument_t>
 pointer_to_binary_function<return_t, first_argument_t, second_argument_t> ptr_fun( return_t (*function_)( first_argument_t, second_argument_t ) )
 	{ return ( pointer_to_binary_function<return_t, first_argument_t, second_argument_t>( function_ ) ); }
+
+template<typename R, typename C>
+class pointer_to_nullary_member_function
+	{
+	typedef R (C::*member_t)( void );
+	member_t _member;
+public:
+	pointer_to_nullary_member_function( member_t member_ ) : _member( member_ ) {}
+	R operator()( C* object_ )
+		{
+		return ( (object_->*_member)() );
+		}
+	};
+
+template<typename R, typename C>
+class pointer_to_nullary_member_function_ref
+	{
+	typedef R (C::*member_t)( void );
+	member_t _member;
+public:
+	pointer_to_nullary_member_function_ref( member_t member_ ) : _member( member_ ) {}
+	R operator()( C& object_ )
+		{
+		return ( (object_.*_member)() );
+		}
+	};
+
+template<typename R, typename C>
+pointer_to_nullary_member_function<R, C> mem_fun( R (C::*member_)( void ) )
+	{
+	return ( pointer_to_nullary_member_function<R, C>( member_ ) );
+	}
+
+template<typename R, typename C>
+pointer_to_nullary_member_function_ref<R, C> mem_fun_ref( R (C::*member_)( void ) )
+	{
+	return ( pointer_to_nullary_member_function_ref<R, C>( member_ ) );
+	}
+
+template<typename R, typename C, typename T>
+class pointer_to_unary_member_function
+	{
+	typedef R (C::*member_t)( T );
+	member_t _member;
+public:
+	pointer_to_unary_member_function( member_t member_ ) : _member( member_ ) {}
+	R operator()( C* object_, T arg_ )
+		{
+		return ( (object_->*_member)( arg_ ) );
+		}
+	};
+
+template<typename R, typename C, typename T>
+class pointer_to_unary_member_function_ref
+	{
+	typedef R (C::*member_t)( T );
+	member_t _member;
+public:
+	pointer_to_unary_member_function_ref( member_t member_ ) : _member( member_ ) {}
+	R operator()( C& object_, T arg_ )
+		{
+		return ( (object_.*_member)( arg_ ) );
+		}
+	};
+
+template<typename R, typename C, typename T>
+pointer_to_unary_member_function<R, C, T> mem_fun1( R (C::*member_)( T ) )
+	{
+	return ( pointer_to_unary_member_function<R, C, T>( member_ ) );
+	}
+
+template<typename R, typename C, typename T>
+pointer_to_unary_member_function_ref<R, C, T> mem_fun1_ref( R (C::*member_)( T ) )
+	{
+	return ( pointer_to_unary_member_function_ref<R, C, T>( member_ ) );
+	}
 
 template<typename F, typename G1, typename G2>
 class binary_composition : public binary_function<typename F::result_type, typename G1::argument_type, typename G2::argument_type>

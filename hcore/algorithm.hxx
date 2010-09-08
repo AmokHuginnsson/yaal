@@ -187,7 +187,7 @@ template<typename src_iter_t, typename arg_iter_t, typename dst_iter_t, typename
 dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t dst, operation_t op )
 	{
 	for ( ; it != end; ++ it, ++ arg, ++ dst )
-		*dst = op( *arg, *it );
+		*dst = op( *it, *arg );
 	return ( dst );
 	}
 
