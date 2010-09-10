@@ -147,7 +147,7 @@ environment: $(DIRS)
 
 install: all
 	@$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call INSTALL_TARGET,$(IT))) \
-	/bin/cp -fRp $(DIR_BUILD)/yaal $(DIR_HEADERS) && \
+	/bin/cp -fRp $(DIR_BUILD)/yaal $(DIR_HEADERS)/ && \
 	$(call msg,printf "%b" "making cache ... " && ) \
 	printf "%b\n" $(DIR_LIB) > $(DIR_LIB)/ld.so.conf && \
 	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_LIB) && \
