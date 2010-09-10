@@ -135,8 +135,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 	M_ENSURE( !! image && image.is_executable() );
 	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
 	_pid = ::fork();
-	if ( _pid < 0 )
-		M_THROW( "fork", errno );
+	M_ENSURE_EX( _pid >= 0, "fork()" );
 	if ( ! _pid )
 		{
 		close_and_invalidate( fileDesIn[ 1 ] );
