@@ -807,7 +807,8 @@ namespace generic_helper
 {
 
 template<typename T>
-struct return_type;
+struct return_type
+	{ typedef no_type type; };
 
 template<typename return_t, typename class_t>
 struct return_type<return_t ( class_t::* )( void )>
@@ -1726,8 +1727,12 @@ struct field_type<field_t class_t::*>
 	typedef field_t type;
 	};
 
+namespace generic_helper
+{
+
 template<typename field_t>
-struct argument_count;
+struct argument_count
+	{ static int const value = 0; };
 
 template<typename return_t, typename class_t>
 struct argument_count<return_t ( class_t::* )( void )>
@@ -2010,6 +2015,61 @@ template<typename return_t, typename a0_t, typename a1_t,
 struct argument_count<return_t ( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
 	{ static int const value = 10; };
 /*! \endcond */
+
+}
+
+template<typename T>
+struct functional_argument_count
+	{
+	template<typename real_class>
+	static true_type has_argument_type( typename strip_reference<typename real_class::argument_type>::type* );
+	template<typename real_class>
+	static false_type has_argument_type( ... );
+	template<typename real_class>
+	static true_type has_first_argument_type( typename strip_reference<typename real_class::first_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_first_argument_type( ... );
+	template<typename real_class>
+	static true_type has_second_argument_type( typename strip_reference<typename real_class::second_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_second_argument_type( ... );
+
+	static bool const a0 = ( sizeof ( has_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
+	static bool const a1 = ( sizeof ( has_first_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
+	static bool const a2 = ( sizeof ( has_second_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
+
+	static int const value = meta::ternary<a0 || a1 || a2,
+		meta::ternary<a0,
+			1,
+			meta::ternary<a1 || a2,
+				2,
+				-1>::value
+			>::value,
+		-1>::value;
+	};
+
+template<typename T>
+struct argument_count
+	{
+	template<bool const force, int const count>
+	struct resolve;
+
+	template<int const count>
+	struct resolve<false, count>
+		{
+		static int const value = count;
+		};
+
+	template<int const count>
+	struct resolve<true, count>
+		{
+		static int const value = generic_helper::argument_count<T>::value;
+		};
+
+	static int const functional_argument_count = functional_argument_count<T>::value;
+
+	static int const value = resolve<functional_argument_count == -1, functional_argument_count>::value;
+	};
 
 }
 
