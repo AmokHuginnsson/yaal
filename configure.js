@@ -160,6 +160,7 @@ try {
 	var EXTRA_INCLUDE_PATH = "";
 	var EXTRA_LIBRARY_PATH = "";
 	var SILENT = 0;
+	var VERBOSE = 0;
 	var VISUAL_STUDIO_VERSION = vcVersion();
 
 	try {
@@ -189,6 +190,9 @@ try {
 			break;
 			case "FAST":
 				FAST = 1;
+			break;
+			case "VERBOSE":
+				VERBOSE = 1;
 			break;
 			case "SILENT":
 				SILENT = 1;
@@ -225,12 +229,16 @@ try {
 	msg( makeBoostDesc( boostInfo ) );
 
 	var shell = WScript.createObject( "WScript.Shell" );
-	var env = shell.Environment( "USER" );
-	env( "CMAKE_INCLUDE_PATH" ) = EXTRA_INCLUDE_PATH;
-	env( "CMAKE_LIBRARY_PATH" ) = EXTRA_LIBRARY_PATH;
+	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" ";
+	if ( VERBOSE )
+		cmdline += "-DVERBOSE=1 ";
+	if ( EXTRA_INCLUDE_PATH != null )
+		cmdline += ( "-DCMAKE_INCLUDE_PATH=" + EXTRA_INCLUDE_PATH + " " );
+	if ( EXTRA_LIBRARY_PATH != null )
+		cmdline += ( "-DCMAKE_LIBRARY_PATH=" + EXTRA_LIBRARY_PATH + " " );
 	if ( BOOST_INSTALL_PATH != null )
-		env( "BOOST_INSTALL_PATH" ) = BOOST_INSTALL_PATH;
-	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" " + CMAKELISTS_PATH;
+		cmdline += ( "-DBOOST_INSTALL_PATH=" + BOOST_INSTALL_PATH + " " );
+	cmdline += CMAKELISTS_PATH;
 	msg( "Executing: " + cmdline );
 	cmd = shell.exec( cmdline );
 	if ( FAST ) {

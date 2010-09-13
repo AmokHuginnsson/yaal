@@ -108,9 +108,9 @@ endif ( "${CMAKE_BUILD_TYPE}" STREQUAL "debug" )
 
 add_definitions( -D__ID__="" -D__TID__="" )
 set( TARGET_PATH "${CMAKE_HOME_DIRECTORY}/build/${CMAKE_BUILD_TYPE}" )
-include_directories( ${TARGET_PATH} ${CMAKE_HOME_DIRECTORY} $ENV{CMAKE_INCLUDE_PATH} )
+include_directories( ${TARGET_PATH} ${CMAKE_HOME_DIRECTORY} ${CMAKE_INCLUDE_PATH} )
 #set( CMAKE_VERBOSE_MAKEFILE true )
 enable_language( C )
 
-link_directories( $ENV{CMAKE_LIBRARY_PATH} )
+link_directories( ${CMAKE_LIBRARY_PATH} )
 
