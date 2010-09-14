@@ -39,7 +39,14 @@ namespace yaal
 namespace hcore
 {
 
-template<typename signature_t = void ( void )>
+namespace defaults
+{
+
+typedef void simple_call( void );
+
+}
+
+template<typename signature_t = defaults::simple_call>
 class HBoundCall
 	{
 	typedef typename trait::return_type<signature_t>::type return_t;

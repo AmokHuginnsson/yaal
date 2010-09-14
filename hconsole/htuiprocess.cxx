@@ -74,15 +74,15 @@ HTUIProcess::~HTUIProcess( void )
 int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ )
 	{
 	M_PROLOG
-	static int const CTRLS_COUNT = 2;
-	static int const ALTS_COUNT = 10;
-	int ctr = 0;
+	static int const CTRLS_COUNT( 2 );
+	static int const ALTS_COUNT( 10 );
+	int ctr( 0 );
 	int alts[ ALTS_COUNT ];
 	int ctrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t mainWindow;
 	_dispatcher.register_file_descriptor_handler( STDIN_FILENO, call( &HTUIProcess::process_stdin, this, _1 ) );
 	HConsole& cons = HConsole::get_instance();
-	int mouseDes = cons.get_mouse_fd();
+	int mouseDes( cons.get_mouse_fd() );
 	if ( _useMouse_ && mouseDes )
 		_dispatcher.register_file_descriptor_handler( mouseDes, call( &HTUIProcess::process_mouse, this, _1 ) );
 	_dispatcher.register_file_descriptor_handler( cons.get_event_fd(), call( &HTUIProcess::process_terminal_event, this, _1 ) );
@@ -197,7 +197,7 @@ void HTUIProcess::process_stdin( int code_ )
 		cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( code_ && !! (*_foregroundWindow) )
-		(*_foregroundWindow)->status_bar()->message ( COLORS::FG_RED,
+		(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
 				"unknown function, err code(%d)", code_ );
 	return;
 	M_EPILOG
