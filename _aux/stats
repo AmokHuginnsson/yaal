@@ -1,14 +1,14 @@
 #! /bin/sh
 
 if [ ${#} -eq 1 -a "${1}" = "show" ] ; then
-	find . -path ./build -prune -a -type f -o \( ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<M_[A-Z_]\+"
-	find . -path ./build -prune -a -type f -o \( ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "\<M_\|_HXX_INCLUDED\>" | grep --color " [a-zA-Z_]\+"
-	find . -path ./build -prune -a -type f -o \( ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) \) | xargs grep -En --color "(\<reinterpret_cast\>|\<const_cast\>|\<dynamic_cast\>)"
+	find . \( -path ./build -prune -o -path ./_aux -prune \) -a -type f -o \( ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "VCSID" | grep --color "\<M_[A-Z_]\+"
+	find . \( -path ./build -prune -o -path ./_aux -prune \) -a -type f -o \( ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) \) | xargs grep -n "^#[[:space:]]*define[[:space:]]\+" | grep -v "\<M_\|_HXX_INCLUDED\>" | grep --color " [a-zA-Z_]\+"
+	find . \( -path ./build -prune -o -path ./_aux -prune \) -a -type f -o \( ! -name 'config.hxx' -a \( -name '*.hxx' -o -name '*.cxx' \) \) | xargs grep -En --color "(\<reinterpret_cast\>|\<const_cast\>|\<dynamic_cast\>)"
 	exit 0
 else
 	AWK="gawk"
-	SOURCES=`find . -path ./build -prune -a -type f -o -name '*.cxx'`
-	HEADERS=`find . -path ./build -prune -a -type f -o \( ! -name 'config.hxx' -a -name '*.hxx' \)`
+	SOURCES=`find . \( -path ./build -prune -o -path ./_aux -prune \) -a -type f -o -name '*.cxx'`
+	HEADERS=`find . \( -path ./build -prune -o -path ./_aux -prune \) -a -type f -o \( ! -name 'config.hxx' -a -name '*.hxx' \)`
 	ALL="${SOURCES} ${HEADERS}"
 
 	SOURCES_COUNT=`echo ${SOURCES} | tr " " "\n" | wc -l`
