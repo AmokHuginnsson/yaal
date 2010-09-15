@@ -2,6 +2,8 @@
 #define YAAL_MSVCXX_UNISTD_H_INCLUDED 1
 
 #define close close_off
+#define read read_off
+#define write write_off
 #include <cstdio>
 #include <cerrno>
 #define unlink unlink_gnu
@@ -23,6 +25,8 @@ extern "C" FILE* tmpfile( void );
 #undef select
 #undef fprintf
 #undef close
+#undef read
+#undef write
 
 #undef gethostname
 #define gethostname ms_gethostname
@@ -33,6 +37,14 @@ int ms_gethostname( char*, int );
 #undef unlink
 
 int unix_close( int const& );
+__declspec( dllimport ) int long unix_read( int const&, void*, int long );
+__declspec( dllimport ) int long unix_write( int const&, void const*, int long );
+
+inline int long read( int const& fd_, void* buf_, int long size_ )
+	{ return ( unix_read( fd_, buf_, size_ ) ); }
+
+inline int long write( int const& fd_, void const* buf_, int long size_ )
+	{ return ( unix_write( fd_, buf_, size_ ) ); }
 
 template<typename T>
 inline int close( T const& fd_ )

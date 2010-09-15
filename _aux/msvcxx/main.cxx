@@ -22,8 +22,6 @@
 #define timeval timeval_off
 #define access access_off
 #define lseek lseek_off
-#define read read_off
-#define write write_off
 #define dup dup_off
 #define dup2 dup2_off
 #define getpid getpid_off
@@ -46,11 +44,9 @@
 #undef getpwuid_r
 #undef access
 #undef lseek
-#undef read
 #undef pthread_sigmask
 #undef gethostname
 #undef timeval
-#undef write
 #undef dup
 #undef dup2
 #undef getpid
@@ -161,17 +157,17 @@ __declspec( dllexport ) int sigwait( sigset_t*, int* signo )
 	return ( 0 );
 	}
 
-__declspec( dllexport ) int sigaddset( sigset_t*, int )
+int sigaddset( sigset_t*, int )
 	{
 	return ( 0 );
 	}
 
-__declspec( dllexport ) int sigdelset( sigset_t*, int )
+int sigdelset( sigset_t*, int )
 	{
 	return ( 0 );
 	}
 
-__declspec( dllexport ) int sigemptyset( sigset_t* )
+int sigemptyset( sigset_t* )
 	{
 	return ( 0 );
 	}
@@ -181,7 +177,7 @@ void win_signal_handler( int signo )
 	_signalQueue_.push( signo );
 	}
 
-__declspec( dllexport ) int sigaction( int signo, struct sigaction*, void* )
+int sigaction( int signo, struct sigaction*, void* )
 	{
 	if ( ( signo != SIGURG ) && ( signo != SIGBUS ) && ( signo != SIGTRAP ) && ( signo != SIGSYS ) ) //&& ( signo != 5 ) && ( signo != 12 ) )
 		signal( signo, win_signal_handler );
@@ -226,7 +222,7 @@ __declspec( dllexport ) int unix_stat( char const* path_, struct stat* s_ )
 	return ( res );
 	}
 
-__declspec( dllexport ) int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ )
+int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ )
 	{
 	dirent* result;
 	dirent broken;
@@ -316,11 +312,23 @@ static int const NETWORK_SOCKET_RANGE_START = 2048;
 
 int unix_close( int const& fd )
 	{
-	return ( fd < NETWORK_SOCKET_RANGE_START ? ::_close( static_cast<int>( fd ) ) : ::closesocket( fd ) );
+	return ( fd < NETWORK_SOCKET_RANGE_START ? ::_close( fd ) : ::closesocket( fd ) );
+	}
+
+M_EXPORT_SYMBOL
+int long unix_read( int const& fd_, void* buf_, int long size_ )
+	{
+	return ( fd_ < NETWORK_SOCKET_RANGE_START ? ::_read( fd_, buf_, size_ ) : ::recv( fd_, static_cast<char*>( buf_ ), size_, 0 ) );
+	}
+
+M_EXPORT_SYMBOL
+int long unix_write( int const& fd_, void const* buf_, int long size_ )
+	{
+	return ( fd_ < NETWORK_SOCKET_RANGE_START ? ::_write( fd_, buf_, size_ ) : ::send( fd_, static_cast<char const*>( buf_ ), size_, 0 ) );
 	}
 
 HANDLE os_cast( int fd_ )
-	{ return ( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ ) ) ); }
+	{ return ( reinterpret_cast<HANDLE>( fd_ < NETWORK_SOCKET_RANGE_START ? _get_osfhandle( fd_ ) : fd_ ) ); }
 
 M_EXPORT_SYMBOL
 int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
