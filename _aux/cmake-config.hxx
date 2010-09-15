@@ -81,7 +81,14 @@ extern "C" int setenv( char const*, char  const*, int );
 #ifdef _CTIME_
 #include <pthread.h>
 #include <bits/types.h>
-extern "C" int clock_gettime( __clockid_t, struct timespec* );
+/* clock_gettime() in libgw32c has a serious bug:
+ * the `address of' operator (&tp_) is applied
+ * again to object of type `timespec*',
+ * so getntptimeofday() is presented with object of type
+ * `timespec**' while it expects object of type `timespec*'. */
+extern "C" int getntptimeofday( struct timespec*, struct timezone* );
+inline int clock_gettime( __clockid_t, struct timespec* tp_ )
+	{ return ( getntptimeofday( tp_, NULL ) ); }
 static int const CLOCK_REALTIME = 0;
 #endif /* _CTIME */
 #ifdef _CSTRING_

@@ -319,27 +319,28 @@ int unix_close( int const& fd )
 	return ( fd < NETWORK_SOCKET_RANGE_START ? ::_close( static_cast<int>( fd ) ) : ::closesocket( fd ) );
 	}
 
+HANDLE os_cast( int fd_ )
+	{ return ( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ ) ) ); }
+
 M_EXPORT_SYMBOL
 int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
 	{
-#if 0
-	int count = ( readFds ? readFds->fd_count : 0 ) + ( writeFds ? writeFds->fd_count : 0 ) + ( exceptFds ? exceptFds->fd_count : 0 );
-	fd_set set;
-	int s = -1;
-	if ( ! count )
+	int long miliseconds( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) );
+	if ( readFds || writeFds )
 		{
-		s = ::socket( PF_INET, SOCK_STREAM, 0 );
-		FD_ZERO( &set );
-		FD_SET( s, &set );
-		++ count;
-		readFds = &set;
+		int count( ( readFds ? readFds->size() : 0 ) + ( writeFds ? writeFds->size() : 0 ) );
+		M_ENSURE( count <= MAXIMUM_WAIT_OBJECTS );
+		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
+		HANDLE* hStart( handles );
+		readFds && ( hStart = yaal::transform( readFds->begin(), readFds->end(), hStart, os_cast ) );
+		writeFds && yaal::transform( writeFds->begin(), writeFds->end(), hStart, os_cast );
+		::WaitForMultipleObjects( count, handles, false, miliseconds );
 		}
-	int ret = ::select( ndfs ? ndfs : FD_SETSIZE, readFds, writeFds, exceptFds, timeout );
-	int err = WSAGetLastError();
-	char const* p = strerror( err );
-	if ( s >= 0 )
-		::closesocket( s );
-#endif
+	else
+		{
+		M_ASSERT( timeout );
+		::Sleep( miliseconds );
+		}
 	return ( 0 );
 	}
 

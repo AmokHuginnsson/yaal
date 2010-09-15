@@ -1,7 +1,7 @@
 #ifndef YAAL_MSVCXX_SYS_TIME_H_INCLUDED
 #define YAAL_MSVCXX_SYS_TIME_H_INCLUDED 1
 
-#include <hash_set>
+#include <set>
 
 #define select select_off
 #define fd_set fd_set_off
@@ -13,7 +13,7 @@
 #undef FD_SET
 #undef select
 
-typedef stdext::hash_set<int> fd_set;
+typedef std::set<int> fd_set;
 
 namespace asio
 {

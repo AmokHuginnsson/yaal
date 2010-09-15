@@ -144,7 +144,7 @@ void for_each( iterator_t it, iterator_t const& end, call_t CALL )
  * \param end - one past the end of source range.
  * \param dst - begining of destination container.
  * \param op - transforming operation, an unary function.
- * \return end of output range.
+ * \return one past end of output range.
  */
 template<typename src_iter_t, typename dst_iter_t, typename operation_t>
 dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op )
@@ -161,7 +161,7 @@ dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t
  * \param dst - begining of destination container.
  * \param op - transforming operation, an unary function.
  * \param cond - condition that has to be met to perform a transformation.
- * \return end of output range.
+ * \return one past end of output range.
  */
 template<typename src_iter_t, typename dst_iter_t, typename operation_t, typename condition_t>
 dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op, condition_t cond )
@@ -196,13 +196,14 @@ dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t 
  * \param src - begining of source range of elements.
  * \param end - one past the end of source range of elements.
  * \param dst - begining of destination range.
+ * \return one past end of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
-void copy( src_it_t src, src_it_t const& end, dst_it_t dst )
+dst_it_t copy( src_it_t src, src_it_t const& end, dst_it_t dst )
 	{
 	for ( ; src != end; ++ src, ++ dst )
 		*dst = *src;
-	return;
+	return ( dst );
 	}
 
 /*! \brief Copy given number of elements from range of values onto another range.
@@ -210,13 +211,14 @@ void copy( src_it_t src, src_it_t const& end, dst_it_t dst )
  * \param src - begining of source range of elements.
  * \param count - number of elements to copy.
  * \param dst - begining of destination range.
+ * \return one past end of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
-void copy_n( src_it_t src, int long const& count, dst_it_t dst )
+dst_it_t copy_n( src_it_t src, int long const& count, dst_it_t dst )
 	{
 	for ( int long i = 0; i < count; ++ i, ++ src, ++ dst )
 		*dst = *src;
-	return;
+	return ( dst );
 	}
 
 /*! \brief Remove elements meeting a predicate from range.
