@@ -309,26 +309,55 @@ __declspec( dllexport ) int unix_fcntl( int fd_, int cmd_, int arg_ )
 	}
 
 static int const NETWORK_SOCKET_RANGE_START = 2048;
+static int const NAMED_PIPE_RANGE_START = 0x8000;
 
-int unix_close( int const& fd )
+int unix_close( int const& fd_ )
 	{
-	return ( fd < NETWORK_SOCKET_RANGE_START ? ::_close( fd ) : ::closesocket( fd ) );
+	int ret( 0 );
+	if ( fd_ < NETWORK_SOCKET_RANGE_START )
+		ret = ::_close( fd_ );
+	else if ( fd_ < NAMED_PIPE_RANGE_START )
+		ret = ::closesocket( fd_ );
+	else
+		ret = CloseHandle( reinterpret_cast<HANDLE>( fd_ - NAMED_PIPE_RANGE_START ) );
+	return ( ret );
 	}
 
 M_EXPORT_SYMBOL
 int long unix_read( int const& fd_, void* buf_, int long size_ )
 	{
-	return ( fd_ < NETWORK_SOCKET_RANGE_START ? ::_read( fd_, buf_, size_ ) : ::recv( fd_, static_cast<char*>( buf_ ), size_, 0 ) );
+	int long nRead( 0 );
+	if ( fd_ < NETWORK_SOCKET_RANGE_START )
+		nRead = ::_read( fd_, buf_, size_ );
+	else if ( fd_ < NAMED_PIPE_RANGE_START )
+		nRead = ::recv( fd_, static_cast<char*>( buf_ ), size_, 0 );
+	else
+		nRead = ::_read( fd_ - NAMED_PIPE_RANGE_START, buf_, size_ );
+	return ( nRead );
 	}
 
 M_EXPORT_SYMBOL
 int long unix_write( int const& fd_, void const* buf_, int long size_ )
 	{
-	return ( fd_ < NETWORK_SOCKET_RANGE_START ? ::_write( fd_, buf_, size_ ) : ::send( fd_, static_cast<char const*>( buf_ ), size_, 0 ) );
+	int long nWritten( 0 );
+	if ( fd_ < NETWORK_SOCKET_RANGE_START )
+		nWritten = ::_write( fd_, buf_, size_ );
+	else if ( fd_ < NAMED_PIPE_RANGE_START )
+		nWritten = ::send( fd_, static_cast<char const*>( buf_ ), size_, 0 );
+	else
+		nWritten = ::_write( fd_ - NAMED_PIPE_RANGE_START, buf_, size_ );
+	return ( nWritten );
 	}
 
 HANDLE os_cast( int fd_ )
-	{ return ( reinterpret_cast<HANDLE>( fd_ < NETWORK_SOCKET_RANGE_START ? _get_osfhandle( fd_ ) : fd_ ) ); }
+	{
+	HANDLE h;
+	if ( fd_ < NAMED_PIPE_RANGE_START )
+		h = reinterpret_cast<HANDLE>( fd_ < NETWORK_SOCKET_RANGE_START ? _get_osfhandle( fd_ ) : fd_ );
+	else
+		h = reinterpret_cast<HANDLE>( fd_ - NAMED_PIPE_RANGE_START );
+	return ( h );
+	}
 
 M_EXPORT_SYMBOL
 int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
@@ -428,13 +457,24 @@ int unix_socket( int af, int type, int protocol )
 		s = ::socket( af, type, protocol );
 	if ( s < NETWORK_SOCKET_RANGE_START )
 		M_THROW( "unexpected socket fd value", s );
-	return ( s );
+	else
+		clog << "socket: " << s << endl;
+	return ( s + ( type == PF_UNIX ? NAMED_PIPE_RANGE_START : 0 ) );
 	}
 
 int unix_listen( int const& fd_, int const& backlog_ )
 	{
 	int ret( 0 );
-	if ( fd_ >= NETWORK_SOCKET_RANGE_START )
+	M_ASSERT( fd_ >= NETWORK_SOCKET_RANGE_START );
+	if ( fd_ >= NAMED_PIPE_RANGE_START )
+		{
+		if ( ! ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ ) ), NULL ) )
+			{
+			log_windows_error( "ConnectNamedPipe" );
+			ret = -1;
+			}		
+		}
+	else
 		ret = listen( static_cast<SOCKET>( fd_ ), backlog_ );
 	return ( ret );
 	}
@@ -443,20 +483,13 @@ int unix_listen( int const& fd_, int const& backlog_ )
 int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
 	int ret( 0 );
-	if ( fd_ < NETWORK_SOCKET_RANGE_START )
-		{
-		if ( ! ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ ) ), NULL ) )
-			{
-			log_windows_error( "ConnectNamedPipe" );
-			ret = -1;
-			}
-		}
-	else
+	M_ASSERT( fd_ >= NETWORK_SOCKET_RANGE_START );
+	if ( fd_ < NAMED_PIPE_RANGE_START )
 		{
 		int len = *len_;
 		ret = ::accept( fd_, addr_, &len );
 		}
-	return ( -1 );
+	return ( ret );
 	}
 
 int unix_connect( int& fd_, struct sockaddr* addr_, socklen_t len_ )
@@ -491,7 +524,10 @@ int unix_shutdown( int fd_, int how_ )
 
 int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
 	{
-	return ( setsockopt( fd_, level_, optname_, static_cast<char const*>( optval_ ), optlen_ ) );
+	int ret( 0 );
+	if ( fd_ < NAMED_PIPE_RANGE_START )
+		ret = setsockopt( fd_, level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
+	return ( ret );
 	}
 
 }
