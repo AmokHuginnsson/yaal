@@ -103,6 +103,8 @@ extern "C" void* memrchr( void const*, int, size_t );
 extern "C" char* basename( char const* );
 extern "C" char* strptime( char const*, char const*, struct tm* );
 extern "C" char* strsignal( int );
+#define strerror windows_strerror
+__declspec( dllimport ) char const* windows_strerror( int );
 #endif /* _CSTRING_ */
 #ifdef _CSTDIO_
 extern "C" int long getline( char**, size_t*, FILE* );

@@ -138,7 +138,8 @@ void SynchronizedQueue<T>::push( T const& elem )
 
 SynchronizedQueue<int> _signalQueue_;
 
-__declspec( dllexport ) int kill( int pid, int signo )
+M_EXPORT_SYMBOL
+int kill( int pid, int signo )
 	{
 	int err( 0 );
 	if ( pid == getpid() )
@@ -150,7 +151,8 @@ __declspec( dllexport ) int kill( int pid, int signo )
 	return ( err );
 	}
 
-__declspec( dllexport ) int sigwait( sigset_t*, int* signo )
+M_EXPORT_SYMBOL
+int sigwait( sigset_t*, int* signo )
 	{
 	if ( _signalQueue_.pop( *signo ) )
 		*signo = SIGURG;
@@ -185,13 +187,15 @@ int sigaction( int signo, struct sigaction*, void* )
 	}
 
 extern "C"
-__declspec( dllexport ) int pthread_sigmask( int, sigset_t*, void* )
+M_EXPORT_SYMBOL
+int pthread_sigmask( int, sigset_t*, void* )
 	{
 	return ( 0 );
 	}
 
 extern "C" void* dlopen( char const*, int );
-__declspec( dllexport ) void* dlopen_fix( char const* name_, int flag_ )
+M_EXPORT_SYMBOL
+void* dlopen_fix( char const* name_, int flag_ )
 	{
 	HANDLE handle( 0 );
 	if ( ! name_ )
@@ -201,7 +205,8 @@ __declspec( dllexport ) void* dlopen_fix( char const* name_, int flag_ )
 	return ( handle );
 	}
 
-__declspec( dllexport ) int unix_stat( char const* path_, struct stat* s_ )
+M_EXPORT_SYMBOL
+int unix_stat( char const* path_, struct stat* s_ )
 	{
 	string path( path_ );
 	int lastNonSeparator( static_cast<int>( path.find_last_not_of( "/\\" ) ) );
@@ -267,28 +272,30 @@ int poll( struct pollfd*, int, int )
 	return ( 0 );
 	}
 
-void log_windows_error( char const* pszAPI )
+M_EXPORT_SYMBOL
+char const* windows_strerror( int code_ )
 	{
-	LPVOID lpvMessageBuffer;
-	CHAR szPrintBuffer[512];
+	static int const MAX_MSG_LEN( 512 );
+	static char msg[512];
+	char* p( msg );
 
-	DWORD err = GetLastError(); 
-	
 	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
 		NULL,
-		err,
+		code_,
 		MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-		(LPTSTR)&lpvMessageBuffer, 0, NULL );
+		p, MAX_MSG_LEN - 1, NULL );
 
-	wsprintf(szPrintBuffer,
-		"ERROR: API    = %s.\n   error code = %d.\n   message    = %s.\n",
-		pszAPI, err, static_cast<char*>( lpvMessageBuffer ) );
+	return ( msg );
+	}
 
-	log << szPrintBuffer << endl;
-	LocalFree(lpvMessageBuffer);
+void log_windows_error( char const* api_ )
+	{
+	int err( GetLastError() );
+	log << "ERROR: API = " << api_
+		<< ", code = " << err
+		<< ", message = " << windows_strerror( err ) << endl;
 	return;
 	}
 
@@ -308,18 +315,24 @@ __declspec( dllexport ) int unix_fcntl( int fd_, int cmd_, int arg_ )
 	return ( fcntl( fd_, cmd_, arg_ ) );
 	}
 
-static int const NETWORK_SOCKET_RANGE_START = 2048;
-static int const NAMED_PIPE_RANGE_START = 0x8000;
+static int const SOCKET_NETWORK = 0x4000;
+static int const SOCKET_PIPE = 0x8000;
+static int const SOCKET_MASK = SOCKET_NETWORK | SOCKET_PIPE;
+static int const SOCKET_HANDLE_MASK = 0x3fff;
 
 int unix_close( int const& fd_ )
 	{
 	int ret( 0 );
-	if ( fd_ < NETWORK_SOCKET_RANGE_START )
+	if ( fd_ & SOCKET_PIPE )
+		ret = CloseHandle( reinterpret_cast<HANDLE>( fd_ & SOCKET_HANDLE_MASK ) );
+	else if ( fd_ & SOCKET_NETWORK )
+		ret = ::closesocket( fd_ & SOCKET_HANDLE_MASK );
+	else if ( ! ( fd_ & SOCKET_MASK ) )
 		ret = ::_close( fd_ );
-	else if ( fd_ < NAMED_PIPE_RANGE_START )
-		ret = ::closesocket( fd_ );
 	else
-		ret = CloseHandle( reinterpret_cast<HANDLE>( fd_ - NAMED_PIPE_RANGE_START ) );
+		{
+		M_ASSERT( ! "invalid HANDLE" );
+		}
 	return ( ret );
 	}
 
@@ -327,12 +340,16 @@ M_EXPORT_SYMBOL
 int long unix_read( int const& fd_, void* buf_, int long size_ )
 	{
 	int long nRead( 0 );
-	if ( fd_ < NETWORK_SOCKET_RANGE_START )
+	if ( fd_ & SOCKET_PIPE )
+		nRead = ::_read( fd_ & SOCKET_HANDLE_MASK, buf_, size_ );
+	else if ( fd_ & SOCKET_NETWORK )
+		nRead = ::recv( fd_ & SOCKET_HANDLE_MASK, static_cast<char*>( buf_ ), size_, 0 );
+	else if ( ! ( fd_ & SOCKET_MASK ) )
 		nRead = ::_read( fd_, buf_, size_ );
-	else if ( fd_ < NAMED_PIPE_RANGE_START )
-		nRead = ::recv( fd_, static_cast<char*>( buf_ ), size_, 0 );
 	else
-		nRead = ::_read( fd_ - NAMED_PIPE_RANGE_START, buf_, size_ );
+		{
+		M_ASSERT( ! "invalid HANDLE" );
+		}
 	return ( nRead );
 	}
 
@@ -340,23 +357,22 @@ M_EXPORT_SYMBOL
 int long unix_write( int const& fd_, void const* buf_, int long size_ )
 	{
 	int long nWritten( 0 );
-	if ( fd_ < NETWORK_SOCKET_RANGE_START )
+	if ( fd_ & SOCKET_PIPE )
+		nWritten = ::_write( fd_ & SOCKET_HANDLE_MASK, buf_, size_ );
+	else if ( fd_ & SOCKET_NETWORK )
+		nWritten = ::send( fd_ & SOCKET_HANDLE_MASK, static_cast<char const*>( buf_ ), size_, 0 );
+	else if ( ! ( fd_ & SOCKET_MASK ) )
 		nWritten = ::_write( fd_, buf_, size_ );
-	else if ( fd_ < NAMED_PIPE_RANGE_START )
-		nWritten = ::send( fd_, static_cast<char const*>( buf_ ), size_, 0 );
 	else
-		nWritten = ::_write( fd_ - NAMED_PIPE_RANGE_START, buf_, size_ );
+		{
+		M_ASSERT( ! "invalid HANDLE" );
+		}
 	return ( nWritten );
 	}
 
 HANDLE os_cast( int fd_ )
 	{
-	HANDLE h;
-	if ( fd_ < NAMED_PIPE_RANGE_START )
-		h = reinterpret_cast<HANDLE>( fd_ < NETWORK_SOCKET_RANGE_START ? _get_osfhandle( fd_ ) : fd_ );
-	else
-		h = reinterpret_cast<HANDLE>( fd_ - NAMED_PIPE_RANGE_START );
-	return ( h );
+	return ( reinterpret_cast<HANDLE>( ( fd_ & SOCKET_MASK ) ? ( fd_ & SOCKET_HANDLE_MASK ) : _get_osfhandle( fd_ ) ) );
 	}
 
 M_EXPORT_SYMBOL
@@ -409,9 +425,10 @@ int unix_getnameinfo( struct sockaddr const* sa_,
 int unix_bind( int& fd_, const struct sockaddr* addr_, socklen_t len_ )
 	{
 	int ret = 0;
+	char const* path( addr_->sa_data + 2 );
 	if ( addr_->sa_family == PF_UNIX )
 		{
-		HANDLE h = ::CreateFile( addr_->sa_data,                // name of the write
+		HANDLE h = ::CreateFile( path,                // name of the write
                        GENERIC_WRITE,          // open for writing
                        0,                      // do not share
                        NULL,                   // default security
@@ -422,60 +439,65 @@ int unix_bind( int& fd_, const struct sockaddr* addr_, socklen_t len_ )
 			{
 			::CloseHandle( h );
 			HString n( "\\\\.\\pipe" );
-			n += addr_->sa_data;
+			n += path;
 			n.replace( "/", "\\" );
 			h = CreateNamedPipe( n.raw(),
 				PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE,
 				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT,
 				1, 1024, 1024, 1000, NULL );
 			}
-		LPVOID lpMsgBuf = NULL;
 		if ( h == INVALID_HANDLE_VALUE )
 			{
-			log_windows_error( "CreateNamedPipe" );
+//			log_windows_error( "CreateNamedPipe" );
 			ret = -1;
 			}
 		else
 			{
-			::closesocket( fd_ );
+			::closesocket( fd_ & SOCKET_HANDLE_MASK );
 			fd_ = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
+			fd_ |= SOCKET_PIPE;
 			}
-		if ( lpMsgBuf )
-			LocalFree(lpMsgBuf);
 		}
 	else
-		ret = ::bind( fd_, addr_, len_ );
+		ret = ::bind( fd_ & SOCKET_HANDLE_MASK, addr_, len_ );
 	return ( ret );
 	}
 
 int unix_socket( int af, int type, int protocol )
 	{
 	SOCKET s = -1;
+	int MARK( 0 );
 	if ( af == PF_UNIX )
+		{
 		s = ::socket( PF_INET, SOCK_STREAM, 0 );
+		MARK = SOCKET_PIPE;
+		}
 	else
+		{
 		s = ::socket( af, type, protocol );
-	if ( s < NETWORK_SOCKET_RANGE_START )
+		MARK = SOCKET_NETWORK;
+		}
+	if ( s & SOCKET_MASK )
 		M_THROW( "unexpected socket fd value", s );
 	else
 		clog << "socket: " << s << endl;
-	return ( s + ( type == PF_UNIX ? NAMED_PIPE_RANGE_START : 0 ) );
+	return ( s | MARK );
 	}
 
 int unix_listen( int const& fd_, int const& backlog_ )
 	{
 	int ret( 0 );
-	M_ASSERT( fd_ >= NETWORK_SOCKET_RANGE_START );
-	if ( fd_ >= NAMED_PIPE_RANGE_START )
+	M_ASSERT( fd_ & SOCKET_MASK );
+	if ( fd_ & SOCKET_PIPE )
 		{
-		if ( ! ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ ) ), NULL ) )
+		if ( ! ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ & SOCKET_HANDLE_MASK ) ), NULL ) )
 			{
 			log_windows_error( "ConnectNamedPipe" );
 			ret = -1;
 			}		
 		}
 	else
-		ret = listen( static_cast<SOCKET>( fd_ ), backlog_ );
+		ret = listen( static_cast<SOCKET>( fd_ & SOCKET_HANDLE_MASK ), backlog_ );
 	return ( ret );
 	}
 
@@ -483,11 +505,11 @@ int unix_listen( int const& fd_, int const& backlog_ )
 int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
 	int ret( 0 );
-	M_ASSERT( fd_ >= NETWORK_SOCKET_RANGE_START );
-	if ( fd_ < NAMED_PIPE_RANGE_START )
+	M_ASSERT( fd_ & SOCKET_MASK );
+	if ( fd_ & SOCKET_PIPE )
 		{
 		int len = *len_;
-		ret = ::accept( fd_, addr_, &len );
+		ret = ::accept( fd_ & SOCKET_HANDLE_MASK, addr_, &len );
 		}
 	return ( ret );
 	}
@@ -508,12 +530,13 @@ int unix_connect( int& fd_, struct sockaddr* addr_, socklen_t len_ )
 			}
 		else
 			{
-			::closesocket( fd_ );
+			::closesocket( fd_ & SOCKET_HANDLE_MASK );
 			fd_ = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
+			fd_ |= SOCKET_PIPE;
 			}
 		}
 	else
-		ret = ::connect( fd_, addr_, len_ );
+		ret = ::connect( fd_ & SOCKET_HANDLE_MASK, addr_, len_ );
 	return ( ret );
 	}
 
@@ -525,8 +548,9 @@ int unix_shutdown( int fd_, int how_ )
 int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
 	{
 	int ret( 0 );
-	if ( fd_ < NAMED_PIPE_RANGE_START )
-		ret = setsockopt( fd_, level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
+	M_ASSERT( fd_ & SOCKET_MASK );
+	if ( fd_ & SOCKET_NETWORK )
+		ret = setsockopt( fd_ & SOCKET_HANDLE_MASK, level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 
