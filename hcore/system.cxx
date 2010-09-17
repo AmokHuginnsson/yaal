@@ -79,7 +79,7 @@ int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& o
 	timeval timeOut, * timeOutP = timeOut_ ? &timeOut : NULL;
 	if ( timeOut_ )
 		{
-		timeOut.tv_usec = *timeOut_ * 1000;
+		timeOut.tv_usec = ( *timeOut_ % 1000 ) * 1000;
 		timeOut.tv_sec = *timeOut_ / 1000;
 		}
 	int ret( 0 );

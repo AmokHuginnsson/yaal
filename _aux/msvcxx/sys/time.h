@@ -1,7 +1,7 @@
 #ifndef YAAL_MSVCXX_SYS_TIME_H_INCLUDED
 #define YAAL_MSVCXX_SYS_TIME_H_INCLUDED 1
 
-#include <set>
+#include <algorithm>
 
 #define select select_off
 #define fd_set fd_set_off
@@ -13,19 +13,25 @@
 #undef FD_SET
 #undef select
 
-typedef std::set<int> fd_set;
+
+struct fd_set
+	{
+	static int const MAXIMUM_FD_WAIT_OBJECTS = 64;
+	int _data[MAXIMUM_FD_WAIT_OBJECTS];
+	int _count;
+	};
 
 namespace asio
 {
 
 inline bool FD_ISSET( int const& fd_, fd_set const* fdset_ )
-	{ return ( fdset_->count( fd_ ) == 1 ); }
+	{ return ( ( fdset_->_count > 0 ) && ( fdset_->_data[ 0 ] == fd_ ) ); }
 
 inline void FD_ZERO( fd_set* fdset_ )
-	{ fdset_->clear(); }
+	{ ::memset( fdset_->_data, -1, fd_set::MAXIMUM_FD_WAIT_OBJECTS * sizeof ( int ) ); fdset_->_count = 0; }
 
 inline void FD_SET( int const& fd_, fd_set* fdset_ )
-	{ fdset_->insert( fd_ ); }
+	{ fdset_->_data[ fdset_->_count ++ ] = fd_; }
 
 }
 

@@ -35,6 +35,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hiodispatcher.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
 #include "hcore/system.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
 
@@ -43,6 +44,8 @@ namespace yaal
 
 namespace tools
 {
+
+static int const LOW_LATENCY_WARNING = 100; 
 
 HIODispatcher::HIODispatcher( int noFileHandlers_, int latency_ )
 	: _initialised( false ), _loop( true ), _idleCycles( 0 ),
@@ -61,6 +64,8 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int latency_ )
 		ss.register_handler( SIGINT, handler );
 	ss.register_handler( SIGHUP, handler );
 	register_file_descriptor_handler( _event.get_reader_fd(), call( &HIODispatcher::process_interrupt, this, _1 ) );
+	if ( _latency < LOW_LATENCY_WARNING )
+		log( LOG_TYPE::WARNING ) << "Low latency on IO Dispatcher!" << endl;
 	return;
 	M_EPILOG
 	}

@@ -372,29 +372,56 @@ int long unix_write( int const& fd_, void const* buf_, int long size_ )
 
 HANDLE os_cast( int fd_ )
 	{
-	return ( reinterpret_cast<HANDLE>( ( fd_ & SOCKET_MASK ) ? ( fd_ & SOCKET_HANDLE_MASK ) : _get_osfhandle( fd_ ) ) );
+	return ( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ & SOCKET_HANDLE_MASK ) ) );
 	}
 
 M_EXPORT_SYMBOL
 int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
 	{
-	int long miliseconds( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) );
+	int ret( 0 );
+	int long miliseconds( timeout ? ( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) ) : 0 );
 	if ( readFds || writeFds )
 		{
-		int count( ( readFds ? readFds->size() : 0 ) + ( writeFds ? writeFds->size() : 0 ) );
+		int count( ( readFds ? readFds->_count : 0 ) + ( writeFds ? writeFds->_count : 0 ) );
 		M_ENSURE( count <= MAXIMUM_WAIT_OBJECTS );
 		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
 		HANDLE* hStart( handles );
-		readFds && ( hStart = yaal::transform( readFds->begin(), readFds->end(), hStart, os_cast ) );
-		writeFds && yaal::transform( writeFds->begin(), writeFds->end(), hStart, os_cast );
-		::WaitForMultipleObjects( count, handles, false, miliseconds );
+		readFds && ( hStart = yaal::transform( readFds->_data, readFds->_data + readFds->_count, hStart, os_cast ) );
+		writeFds && yaal::transform( writeFds->_data, writeFds->_data + writeFds->_count, hStart, os_cast );
+		int up( ::WaitForMultipleObjects( count, handles, false, miliseconds ) );
+		if ( up == WAIT_FAILED )
+			{
+			ret = -1;
+			log_windows_error( "WaitForMultipleObjects" );
+			}
+		else
+			{
+			int fdIdx( up - WAIT_OBJECT_0 );
+			if ( fdIdx >= 0 )
+				{
+				if ( readFds && ( fdIdx < readFds->_count ) )
+					{
+					int fd( readFds->_data[ fdIdx ] );
+					asio::FD_ZERO( readFds );
+					asio::FD_SET( fd, readFds );
+					}
+				else if ( writeFds )
+					{
+					int idx( fdIdx - ( readFds ? readFds->_count : 0 ) );
+					int fd( readFds->_data[ idx ] );
+					asio::FD_ZERO( writeFds );
+					asio::FD_SET( fd, writeFds );
+					}
+				ret = 1;
+				}
+			}
 		}
 	else
 		{
 		M_ASSERT( timeout );
 		::Sleep( miliseconds );
 		}
-	return ( 0 );
+	return ( ret );
 	}
 
 namespace msvcxx	
@@ -424,7 +451,7 @@ int unix_getnameinfo( struct sockaddr const* sa_,
 
 int unix_bind( int& fd_, const struct sockaddr* addr_, socklen_t len_ )
 	{
-	int ret = 0;
+	int ret( -1 );
 	char const* path( addr_->sa_data + 2 );
 	if ( addr_->sa_family == PF_UNIX )
 		{
@@ -446,16 +473,12 @@ int unix_bind( int& fd_, const struct sockaddr* addr_, socklen_t len_ )
 				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT,
 				1, 1024, 1024, 1000, NULL );
 			}
-		if ( h == INVALID_HANDLE_VALUE )
-			{
-//			log_windows_error( "CreateNamedPipe" );
-			ret = -1;
-			}
-		else
+		if ( h != INVALID_HANDLE_VALUE )
 			{
 			::closesocket( fd_ & SOCKET_HANDLE_MASK );
 			fd_ = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
 			fd_ |= SOCKET_PIPE;
+			ret = 0;
 			}
 		}
 	else
@@ -492,8 +515,11 @@ int unix_listen( int const& fd_, int const& backlog_ )
 		{
 		if ( ! ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ & SOCKET_HANDLE_MASK ) ), NULL ) )
 			{
-			log_windows_error( "ConnectNamedPipe" );
-			ret = -1;
+			if ( GetLastError() != ERROR_PIPE_LISTENING )
+				{
+				log_windows_error( "ConnectNamedPipe" );
+				ret = -1;
+				}
 			}		
 		}
 	else
@@ -506,7 +532,7 @@ int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
 	int ret( 0 );
 	M_ASSERT( fd_ & SOCKET_MASK );
-	if ( fd_ & SOCKET_PIPE )
+	if ( fd_ & SOCKET_NETWORK )
 		{
 		int len = *len_;
 		ret = ::accept( fd_ & SOCKET_HANDLE_MASK, addr_, &len );
@@ -519,8 +545,9 @@ int unix_connect( int& fd_, struct sockaddr* addr_, socklen_t len_ )
 	int ret( 0 );
 	if ( addr_->sa_family == PF_UNIX )
 		{
+		char const* path( addr_->sa_data + 2 );
 		HString n( "\\\\.\\pipe" );
-		n += addr_->sa_data;
+		n += path;
 		n.replace( "/", "\\" );
 		HANDLE h( CreateFile( n.raw(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0 ) );
 		if ( h == INVALID_HANDLE_VALUE )
