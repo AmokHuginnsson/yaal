@@ -25,10 +25,18 @@ namespace asio
 {
 
 inline bool FD_ISSET( int const& fd_, fd_set const* fdset_ )
-	{ return ( ( fdset_->_count > 0 ) && ( fdset_->_data[ 0 ] == fd_ ) ); }
+	{
+	int isSet( false );
+	if ( fdset_->_count > 0 )
+		isSet = ( std::find( fdset_->_data, fdset_->_data + fdset_->_count, fd_ ) != ( fdset_->_data + fdset_->_count ) );
+	return ( isSet );
+	}
 
 inline void FD_ZERO( fd_set* fdset_ )
-	{ ::memset( fdset_->_data, -1, fd_set::MAXIMUM_FD_WAIT_OBJECTS * sizeof ( int ) ); fdset_->_count = 0; }
+	{
+	std::fill_n( fdset_->_data, fd_set::MAXIMUM_FD_WAIT_OBJECTS, -1 );
+	fdset_->_count = 0;
+	}
 
 inline void FD_SET( int const& fd_, fd_set* fdset_ )
 	{ fdset_->_data[ fdset_->_count ++ ] = fd_; }

@@ -315,6 +315,19 @@ __declspec( dllexport ) int unix_fcntl( int fd_, int cmd_, int arg_ )
 	return ( fcntl( fd_, cmd_, arg_ ) );
 	}
 
+M_EXPORT_SYMBOL
+int unix_pipe( int* fds_ )
+	{
+	HANDLE p[2];
+	bool ok( CreatePipe( &(p[0]), &(p[1]), NULL, 4069 ) );
+	if ( ok )
+		{
+		fds_[ 0 ] = _open_osfhandle( reinterpret_cast<long>( p[0] ), 0 );
+		fds_[ 1 ] = _open_osfhandle( reinterpret_cast<long>( p[1] ), 0 );
+		}
+	return ( ok ? 0 : -1 );
+	}
+
 static int const SOCKET_NETWORK = 0x4000;
 static int const SOCKET_PIPE = 0x8000;
 static int const SOCKET_MASK = SOCKET_NETWORK | SOCKET_PIPE;
@@ -394,25 +407,40 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 			ret = -1;
 			log_windows_error( "WaitForMultipleObjects" );
 			}
-		else
+		else if ( ( up >= WAIT_OBJECT_0 ) && ( up < ( WAIT_OBJECT_0 + count ) ) )
 			{
-			int fdIdx( up - WAIT_OBJECT_0 );
-			if ( fdIdx >= 0 )
+			for ( int i( 0 ); i < count; ++ i )
 				{
-				if ( readFds && ( fdIdx < readFds->_count ) )
+				up = ::WaitForSingleObject( handles[ i ], 0 );
+				if ( up == WAIT_OBJECT_0 )
 					{
-					int fd( readFds->_data[ fdIdx ] );
-					asio::FD_ZERO( readFds );
-					asio::FD_SET( fd, readFds );
+					int fdIdx( up - WAIT_OBJECT_0 );
+					if ( fdIdx >= 0 )
+						{
+						char buf;
+						DWORD nRead( 0 );
+						DWORD nAvail( 0 );
+						if ( PeekNamedPipe( handles[fdIdx], &buf, 1, &nRead, &nAvail, NULL ) && nRead )
+							{
+							if ( readFds && ( fdIdx < readFds->_count ) )
+								{
+								int fd( readFds->_data[ fdIdx ] );
+								asio::FD_ZERO( readFds );
+								asio::FD_SET( fd, readFds );
+								}
+							else if ( writeFds )
+								{
+								int idx( fdIdx - ( readFds ? readFds->_count : 0 ) );
+								int fd( readFds->_data[ idx ] );
+								asio::FD_ZERO( writeFds );
+								asio::FD_SET( fd, writeFds );
+								}
+							ret = 1;
+							}
+						else
+							log_windows_error( "PeekNamedPipe" );
+						}
 					}
-				else if ( writeFds )
-					{
-					int idx( fdIdx - ( readFds ? readFds->_count : 0 ) );
-					int fd( readFds->_data[ idx ] );
-					asio::FD_ZERO( writeFds );
-					asio::FD_SET( fd, writeFds );
-					}
-				ret = 1;
 				}
 			}
 		}

@@ -15,6 +15,7 @@ extern "C" FILE* tmpfile( void );
 #define __socklen_t_defined 1
 #undef environ
 #define fd_set fd_set_off
+#define pipe pipe_off
 #include <glibc/unistd.h>
 #include <sys/types.h>
 #include <libintl.h>
@@ -27,6 +28,7 @@ extern "C" FILE* tmpfile( void );
 #undef close
 #undef read
 #undef write
+#undef pipe
 
 #undef gethostname
 #define gethostname ms_gethostname
@@ -39,6 +41,10 @@ int ms_gethostname( char*, int );
 int unix_close( int const& );
 __declspec( dllimport ) int long unix_read( int const&, void*, int long );
 __declspec( dllimport ) int long unix_write( int const&, void const*, int long );
+__declspec( dllimport ) int unix_pipe( int* );
+
+inline int pipe( int* fds_ )
+	{ return ( unix_pipe( fds_ ) ); }
 
 inline int long read( int const& fd_, void* buf_, int long size_ )
 	{ return ( unix_read( fd_, buf_, size_ ) ); }
