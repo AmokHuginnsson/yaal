@@ -10,6 +10,7 @@
 #include <process.h>
 #include <../include/sys/stat.h>
 #include <io.h>
+#include <../include/fcntl.h>
 
 #define pthread_sigmask pthread_sigmask_off
 #define execl execl_off
@@ -315,33 +316,35 @@ __declspec( dllexport ) int unix_fcntl( int fd_, int cmd_, int arg_ )
 	return ( fcntl( fd_, cmd_, arg_ ) );
 	}
 
+static int const FD_NAMED_PIPE = 0x40000;
+static int const FD_SOCKET = 0x20000;
+static int const FD_PIPE = 0x10000;
+static int const FD_MASK = FD_SOCKET | FD_NAMED_PIPE | FD_PIPE;
+static int const FD_FILTER = 0xffff;
+
 M_EXPORT_SYMBOL
 int unix_pipe( int* fds_ )
 	{
-	HANDLE p[2];
-	bool ok( CreatePipe( &(p[0]), &(p[1]), NULL, 4069 ) );
-	if ( ok )
+	int ret( _pipe( fds_, 4096, O_BINARY | O_NOINHERIT ) );
+	if ( ! ret )
 		{
-		fds_[ 0 ] = _open_osfhandle( reinterpret_cast<long>( p[0] ), 0 );
-		fds_[ 1 ] = _open_osfhandle( reinterpret_cast<long>( p[1] ), 0 );
+		if ( ( fds_[0] | fds_[1] ) & FD_MASK )
+			M_THROW( "unexpected fd value", ( fds_[0] | fds_[1] ) );
+		fds_[0] |= FD_PIPE;
+		fds_[1] |= FD_PIPE;
 		}
-	return ( ok ? 0 : -1 );
+	return ( ret );
 	}
-
-static int const SOCKET_NETWORK = 0x4000;
-static int const SOCKET_PIPE = 0x8000;
-static int const SOCKET_MASK = SOCKET_NETWORK | SOCKET_PIPE;
-static int const SOCKET_HANDLE_MASK = 0x3fff;
 
 int unix_close( int const& fd_ )
 	{
 	int ret( 0 );
-	if ( fd_ & SOCKET_PIPE )
-		ret = CloseHandle( reinterpret_cast<HANDLE>( fd_ & SOCKET_HANDLE_MASK ) );
-	else if ( fd_ & SOCKET_NETWORK )
-		ret = ::closesocket( fd_ & SOCKET_HANDLE_MASK );
-	else if ( ! ( fd_ & SOCKET_MASK ) )
-		ret = ::_close( fd_ );
+	if ( fd_ & FD_NAMED_PIPE )
+		ret = CloseHandle( reinterpret_cast<HANDLE>( fd_ & FD_FILTER ) );
+	else if ( fd_ & FD_SOCKET )
+		ret = ::closesocket( fd_ & FD_FILTER );
+	else if ( fd_ & FD_PIPE )
+		ret = ::_close( fd_ & FD_FILTER );
 	else
 		{
 		M_ASSERT( ! "invalid HANDLE" );
@@ -353,12 +356,12 @@ M_EXPORT_SYMBOL
 int long unix_read( int const& fd_, void* buf_, int long size_ )
 	{
 	int long nRead( 0 );
-	if ( fd_ & SOCKET_PIPE )
-		nRead = ::_read( fd_ & SOCKET_HANDLE_MASK, buf_, size_ );
-	else if ( fd_ & SOCKET_NETWORK )
-		nRead = ::recv( fd_ & SOCKET_HANDLE_MASK, static_cast<char*>( buf_ ), size_, 0 );
-	else if ( ! ( fd_ & SOCKET_MASK ) )
-		nRead = ::_read( fd_, buf_, size_ );
+	if ( fd_ & FD_NAMED_PIPE )
+		nRead = ::_read( fd_ & FD_FILTER, buf_, size_ );
+	else if ( fd_ & FD_SOCKET )
+		nRead = ::recv( fd_ & FD_FILTER, static_cast<char*>( buf_ ), size_, 0 );
+	else if ( fd_ & FD_PIPE )
+		nRead = ::_read( fd_ & FD_FILTER, buf_, size_ );
 	else
 		{
 		M_ASSERT( ! "invalid HANDLE" );
@@ -370,12 +373,12 @@ M_EXPORT_SYMBOL
 int long unix_write( int const& fd_, void const* buf_, int long size_ )
 	{
 	int long nWritten( 0 );
-	if ( fd_ & SOCKET_PIPE )
-		nWritten = ::_write( fd_ & SOCKET_HANDLE_MASK, buf_, size_ );
-	else if ( fd_ & SOCKET_NETWORK )
-		nWritten = ::send( fd_ & SOCKET_HANDLE_MASK, static_cast<char const*>( buf_ ), size_, 0 );
-	else if ( ! ( fd_ & SOCKET_MASK ) )
-		nWritten = ::_write( fd_, buf_, size_ );
+	if ( fd_ & FD_NAMED_PIPE )
+		nWritten = ::_write( fd_ & FD_FILTER, buf_, size_ );
+	else if ( fd_ & FD_SOCKET )
+		nWritten = ::send( fd_ & FD_FILTER, static_cast<char const*>( buf_ ), size_, 0 );
+	else if ( fd_ & FD_PIPE )
+		nWritten = ::_write( fd_ & FD_FILTER, buf_, size_ );
 	else
 		{
 		M_ASSERT( ! "invalid HANDLE" );
@@ -385,9 +388,44 @@ int long unix_write( int const& fd_, void const* buf_, int long size_ )
 
 HANDLE os_cast( int fd_ )
 	{
-	return ( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ & SOCKET_HANDLE_MASK ) ) );
+	return ( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ & FD_FILTER ) ) );
 	}
 
+inline bool is_pipe( int fd_ )
+	{
+	return ( ( ( fd_ != -1 ) && ( fd_ & FD_PIPE ) ) ? true : false );
+	}
+
+int check_pipes( int* fds_, int* fdsEnd_ )
+	{
+	int count( 0 );
+	for ( int* fd( fds_ ); fd != fdsEnd_; ++ fd )
+		{
+		if ( is_pipe( *fd ) )
+			{
+			char buf;
+			DWORD nRead( 0 );
+			DWORD nAvail( 0 );
+			if ( PeekNamedPipe( os_cast( *fd ), &buf, 1, &nRead, &nAvail, NULL ) )
+				{
+				if ( nRead == 0 )
+					*fd = -1;
+				else if ( nRead > 0 )
+					++ count;
+				}
+			else
+				log_windows_error( "PeekNamedPipe" );
+			}
+		}
+	return ( count );
+	}
+
+/*
+ * We simulate UNIX ::select() with ::WaitForMultipleObjects(),
+ * unfortunatelly ::WFMO() does not work with pipes (as in _pipe()).
+ * We need to recoginze pipe fds, filter them out from all fds,
+ * and treat them separately.
+ */
 M_EXPORT_SYMBOL
 int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
 	{
@@ -397,11 +435,27 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 		{
 		int count( ( readFds ? readFds->_count : 0 ) + ( writeFds ? writeFds->_count : 0 ) );
 		M_ENSURE( count <= MAXIMUM_WAIT_OBJECTS );
+		int fds[MAXIMUM_WAIT_OBJECTS]; /* we copy all fds (intput and output) here. */
+		int waitable[MAXIMUM_WAIT_OBJECTS]; /* we copy all fds that can work with ::WFMO(). */
 		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
-		HANDLE* hStart( handles );
-		readFds && ( hStart = yaal::transform( readFds->_data, readFds->_data + readFds->_count, hStart, os_cast ) );
-		writeFds && yaal::transform( writeFds->_data, writeFds->_data + writeFds->_count, hStart, os_cast );
-		int up( ::WaitForMultipleObjects( count, handles, false, miliseconds ) );
+		HANDLE* hEnd( handles );
+
+		/* copy all fds (both read and write) into one array */
+		int* fdsEnd( fds );
+		readFds && ( fdsEnd = std::copy( readFds->_data, readFds->_data + readFds->_count, fdsEnd ) );
+		writeFds && ( fdsEnd = std::copy( writeFds->_data, writeFds->_data + writeFds->_count, fdsEnd ) );
+
+		/* get fds that work with ::WFMO() */
+		int* waitableEnd( std::remove_copy_if( fds, fdsEnd, waitable, std::not1( std::ptr_fun( is_pipe ) ) ) );
+
+		/* convert fds to HANDLES */
+		std::transform( waitable, waitableEnd, handles, os_cast );
+
+		int pipesEarly( ret = check_pipes( fds, fdsEnd ) );
+		if ( ret > 0 )
+			miliseconds = 0;
+		/* First we use ::WFMO() to wait on waitable fds. */
+		int up( ::WaitForMultipleObjects( waitableEnd - waitable, handles, false, miliseconds ) );
 		if ( up == WAIT_FAILED )
 			{
 			ret = -1;
@@ -409,38 +463,35 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 			}
 		else if ( ( up >= WAIT_OBJECT_0 ) && ( up < ( WAIT_OBJECT_0 + count ) ) )
 			{
+			int handleNo( 0 );
 			for ( int i( 0 ); i < count; ++ i )
 				{
-				up = ::WaitForSingleObject( handles[ i ], 0 );
+				if ( is_pipe( fds[ i ] ) )
+					continue;
+				up = ::WaitForSingleObject( handles[ handleNo ++ ], 0 );
 				if ( up == WAIT_OBJECT_0 )
-					{
-					int fdIdx( up - WAIT_OBJECT_0 );
-					if ( fdIdx >= 0 )
-						{
-						char buf;
-						DWORD nRead( 0 );
-						DWORD nAvail( 0 );
-						if ( PeekNamedPipe( handles[fdIdx], &buf, 1, &nRead, &nAvail, NULL ) && nRead )
-							{
-							if ( readFds && ( fdIdx < readFds->_count ) )
-								{
-								int fd( readFds->_data[ fdIdx ] );
-								asio::FD_ZERO( readFds );
-								asio::FD_SET( fd, readFds );
-								}
-							else if ( writeFds )
-								{
-								int idx( fdIdx - ( readFds ? readFds->_count : 0 ) );
-								int fd( readFds->_data[ idx ] );
-								asio::FD_ZERO( writeFds );
-								asio::FD_SET( fd, writeFds );
-								}
-							ret = 1;
-							}
-						else
-							log_windows_error( "PeekNamedPipe" );
-						}
-					}
+					++ ret;
+				else
+					fds[ i ] = -1;
+				}
+			}
+		else
+			std::replace_if( fds, fdsEnd, std::not1( std::ptr_fun( is_pipe ) ), -1 );
+		/* Next we check if anything can be read from pipes. */
+		if ( miliseconds && ( ret != -1 ) )
+			{
+			ret += check_pipes( fds, fdsEnd );
+			/* here fds contains valid fdses for fds that can be read and -1 for fds that cannot be read */
+			if ( writeFds )
+				{
+				int readCount( readFds ? readFds->_count : 0 );
+				int* validEnd( std::remove_copy( fds + readCount, fds + count, writeFds->_data, -1 ) );
+				writeFds->_count = ( validEnd - fds ) - readCount;
+				}
+			if ( readFds )
+				{
+				int* validEnd( std::remove_copy( fds, fds + readFds->_count, readFds->_data, -1 ) );
+				readFds->_count = validEnd - fds;
 				}
 			}
 		}
@@ -503,14 +554,16 @@ int unix_bind( int& fd_, const struct sockaddr* addr_, socklen_t len_ )
 			}
 		if ( h != INVALID_HANDLE_VALUE )
 			{
-			::closesocket( fd_ & SOCKET_HANDLE_MASK );
+			::closesocket( fd_ & FD_FILTER );
 			fd_ = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
-			fd_ |= SOCKET_PIPE;
+			if ( fd_ & FD_MASK )
+				M_THROW( "unexpected socket fd value", fd_ );
+			fd_ |= FD_NAMED_PIPE;
 			ret = 0;
 			}
 		}
 	else
-		ret = ::bind( fd_ & SOCKET_HANDLE_MASK, addr_, len_ );
+		ret = ::bind( fd_ & FD_FILTER, addr_, len_ );
 	return ( ret );
 	}
 
@@ -521,14 +574,14 @@ int unix_socket( int af, int type, int protocol )
 	if ( af == PF_UNIX )
 		{
 		s = ::socket( PF_INET, SOCK_STREAM, 0 );
-		MARK = SOCKET_PIPE;
+		MARK = FD_NAMED_PIPE;
 		}
 	else
 		{
 		s = ::socket( af, type, protocol );
-		MARK = SOCKET_NETWORK;
+		MARK = FD_SOCKET;
 		}
-	if ( s & SOCKET_MASK )
+	if ( s & FD_MASK )
 		M_THROW( "unexpected socket fd value", s );
 	else
 		clog << "socket: " << s << endl;
@@ -538,10 +591,10 @@ int unix_socket( int af, int type, int protocol )
 int unix_listen( int const& fd_, int const& backlog_ )
 	{
 	int ret( 0 );
-	M_ASSERT( fd_ & SOCKET_MASK );
-	if ( fd_ & SOCKET_PIPE )
+	M_ASSERT( fd_ & FD_MASK );
+	if ( fd_ & FD_NAMED_PIPE )
 		{
-		if ( ! ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ & SOCKET_HANDLE_MASK ) ), NULL ) )
+		if ( ! ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ & FD_FILTER ) ), NULL ) )
 			{
 			if ( GetLastError() != ERROR_PIPE_LISTENING )
 				{
@@ -551,7 +604,7 @@ int unix_listen( int const& fd_, int const& backlog_ )
 			}		
 		}
 	else
-		ret = listen( static_cast<SOCKET>( fd_ & SOCKET_HANDLE_MASK ), backlog_ );
+		ret = listen( static_cast<SOCKET>( fd_ & FD_FILTER ), backlog_ );
 	return ( ret );
 	}
 
@@ -559,11 +612,11 @@ int unix_listen( int const& fd_, int const& backlog_ )
 int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
 	int ret( 0 );
-	M_ASSERT( fd_ & SOCKET_MASK );
-	if ( fd_ & SOCKET_NETWORK )
+	M_ASSERT( fd_ & FD_MASK );
+	if ( fd_ & FD_SOCKET )
 		{
 		int len = *len_;
-		ret = ::accept( fd_ & SOCKET_HANDLE_MASK, addr_, &len );
+		ret = ::accept( fd_ & FD_FILTER, addr_, &len );
 		}
 	return ( ret );
 	}
@@ -585,13 +638,15 @@ int unix_connect( int& fd_, struct sockaddr* addr_, socklen_t len_ )
 			}
 		else
 			{
-			::closesocket( fd_ & SOCKET_HANDLE_MASK );
+			::closesocket( fd_ & FD_FILTER );
 			fd_ = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
-			fd_ |= SOCKET_PIPE;
+			if ( fd_ & FD_MASK )
+				M_THROW( "unexpected socket fd value", fd_ );
+			fd_ |= FD_NAMED_PIPE;
 			}
 		}
 	else
-		ret = ::connect( fd_ & SOCKET_HANDLE_MASK, addr_, len_ );
+		ret = ::connect( fd_ & FD_FILTER, addr_, len_ );
 	return ( ret );
 	}
 
@@ -603,9 +658,9 @@ int unix_shutdown( int fd_, int how_ )
 int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
 	{
 	int ret( 0 );
-	M_ASSERT( fd_ & SOCKET_MASK );
-	if ( fd_ & SOCKET_NETWORK )
-		ret = setsockopt( fd_ & SOCKET_HANDLE_MASK, level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
+	M_ASSERT( fd_ & FD_MASK );
+	if ( fd_ & FD_SOCKET )
+		ret = setsockopt( fd_ & FD_FILTER, level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 
