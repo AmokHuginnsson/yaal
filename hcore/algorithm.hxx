@@ -191,6 +191,40 @@ dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t 
 	return ( dst );
 	}
 
+/*! \brief Replace all occurences of given value in range with new value.
+ * \param it - begining of range to modify.
+ * \param end - one past the end of range to modify.
+ * \param oldVal_ - old value that shall to be replaced.
+ * \param newVal_ - a value that shall replace old values.
+ */
+template<typename iterator_t, typename value_t>
+void replace( iterator_t it, iterator_t end, value_t const& oldVal_, value_t const& newVal_ )
+	{
+	for ( ; it != end; ++ it )
+		{
+		if ( *it == oldVal_ )
+			*it = newVal_;
+		}
+	return;
+	}
+
+/*! \brief Replace all occurences of values in range fulfilling given predicate with new value.
+ * \param it - begining of range to modify.
+ * \param end - one past the end of range to modify.
+ * \param predicate_ - a predicate to fulfill so a value could be replaced.
+ * \param newVal_ - a value that shall replace old values.
+ */
+template<typename iterator_t, typename value_t, typename pred_t>
+void replace_if( iterator_t it, iterator_t end, pred_t predicate_, value_t const& newVal_ )
+	{
+	for ( ; it != end; ++ it )
+		{
+		if ( predicate_( *it ) )
+			*it = newVal_;
+		}
+	return;
+	}
+
 /*! \brief Copy range of values onto another range.
  *
  * \param src - begining of source range of elements.
@@ -221,6 +255,31 @@ dst_it_t copy_n( src_it_t src, int long const& count, dst_it_t dst )
 	return ( dst );
 	}
 
+/*! \brief Remove all occurences of given value from range.
+ *
+ * \param first_ - begining of range of elements to filter.
+ * \param last_ - one past the end of range of elements to filter.
+ * \param value_ - a value to be removed.
+ * \return new end of range - none of elements in resulting range meet a condition.
+ */
+template<typename iterator_t, typename value_t>
+iterator_t remove( iterator_t first_, iterator_t const& last_, value_t value_ )
+	{
+	bool move( false );
+	for ( iterator_t it( first_ ); it != last_; ++ it )
+		{
+		if ( *it == value_ )
+			{
+			move = true;
+			continue;
+			}
+		if ( move )
+			*first_ = *it;
+		++ first_;
+		}
+	return ( first_ );
+	}
+
 /*! \brief Remove elements meeting a predicate from range.
  *
  * \param first_ - begining of range of elements to filter.
@@ -246,7 +305,29 @@ iterator_t remove_if( iterator_t first_, iterator_t const& last_, condition_t co
 	return ( first_ );
 	}
 
-/*! \brief Copy elements meeting a not predicate from first range to another.
+/*! \brief Copy elements all elements not equal to given value from one range to another.
+ *
+ * \param first_ - begining of range of elements to filter.
+ * \param last_ - one past the end of range of elements to filter.
+ * \param res_ - begining of output range.
+ * \param value_ - elements not equal to this value will be copied..
+ * \return end of output range - none of elements in resulting range are equal to given value.
+ */
+template<typename iter1_t, typename iter2_t, typename value_t>
+iter2_t remove_copy( iter1_t first_, iter1_t const& last_, iter2_t res_, value_t value_ )
+	{
+	for ( ; first_ != last_; ++ first_ )
+		{
+		if ( *first_ != value_ )
+			{
+			*res_ = *first_;
+			++ res_;
+			}
+		}
+	return ( res_ );
+	}
+
+/*! \brief Copy elements that do not meet given predicate from first one to another.
  *
  * \param first_ - begining of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
@@ -277,7 +358,7 @@ iter2_t remove_copy_if( iter1_t first_, iter1_t const& last_, iter2_t res_, cond
  * \return true if and only if ranges have same size and same contents.
  */
 template<typename iter1_t, typename iter2_t>
-bool equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
+bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
 	{
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
@@ -299,6 +380,22 @@ bool equal( iter1_t it1, iter1_t end1, iter2_t it2 )
 	return ( it1 == end1 );
 	}
 
+/*! \brief Checks if two ranges are equivalent according to some predicate.
+ * 
+ * \param it1 - begining of first range.
+ * \param end1 - one past last element of first range.
+ * \param it2 - begining of second range.
+ * \param predicate_ - a predicate to test, an equity equivalence.
+ * \return true if and only if ranges have same size and same contents.
+ */
+template<typename iter1_t, typename iter2_t, typename pred_t>
+bool equal( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ )
+	{
+	for ( ; ( it1 != end1 ) && predicate_( *it1 == *it2 ); ++ it1, ++ it2 )
+		;
+	return ( it1 == end1 );
+	}
+
 /*! \brief Checks if one range is lexicographicaly before another range.
  * 
  * \param it1 - begining of first range.
@@ -316,18 +413,49 @@ bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t en
 	return ( ( ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 < *it2 ) ) || ( ( it1 == end1 ) && ( it2 != end2 ) ) );
 	}
 
-/*! \brief Checks if two ranges are same size and have same set of values.
+/*! \brief Find first difference in ranges values or difference in range sizes.
  * 
  * \param it1 - begining of first range.
  * \param end1 - one past last element of first range.
  * \param it2 - begining of second range.
  * \param end2 - one past last element of second range.
- * \return true if and only if ranges have same size and same contents.
+ * \return A pair of iteators which point to first differentiating element.
  */
 template<typename iter1_t, typename iter2_t>
-yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
+yaal::hcore::HPair<iter1_t, iter2_t> safe_mismatch( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
 	{
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
+		;
+	return ( make_pair( it1, it2 ) );
+	}
+
+/*! \brief Find first difference in ranges of values.
+ * 
+ * \param it1 - begining of first range.
+ * \param end1 - one past last element of first range.
+ * \param it2 - begining of second range.
+ * \return A pair of iteators which point to first differentiating element.
+ */
+template<typename iter1_t, typename iter2_t>
+yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2 )
+	{
+	for ( ; ( it1 != end1 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
+		;
+	return ( make_pair( it1, it2 ) );
+	}
+
+/*! \brief Find first difference in ranges of values.
+ * 
+ * \param it1 - begining of first range.
+ * \param end1 - one past last element of first range.
+ * \param it2 - begining of second range.
+ * \param predicate_ - a predicate to test a differences with.
+ * \return A pair of iteators which point to first differentiating element.
+ */
+template<typename iter1_t, typename iter2_t, typename pred_t>
+yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ )
+	{
+	for ( ; ( it1 != end1 ) && predicate_( *it1, *it2 ); ++ it1, ++ it2 )
 		;
 	return ( make_pair( it1, it2 ) );
 	}
