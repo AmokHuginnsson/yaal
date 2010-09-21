@@ -59,9 +59,9 @@ namespace msvcxx
 int unix_socket( int, int, int );
 int unix_listen( int const&, int const& );
 int unix_accept( int, struct sockaddr*, socklen_t* );
-int unix_connect( int&, struct sockaddr*, socklen_t );
+int unix_connect( int, struct sockaddr*, socklen_t );
 int unix_shutdown( int, int );
-int unix_bind( int&, struct sockaddr const*, socklen_t );
+int unix_bind( int, struct sockaddr const*, socklen_t );
 int unix_getaddrinfo( char const*, char const*, struct addrinfo const*, struct addrinfo** );
 void unix_freeaddrinfo( struct addrinfo* );
 int unix_getnameinfo( struct sockaddr const*, socklen_t, char*, size_t, char*, size_t, int );

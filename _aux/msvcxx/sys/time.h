@@ -26,7 +26,7 @@ namespace asio
 
 inline bool FD_ISSET( int const& fd_, fd_set const* fdset_ )
 	{
-	int isSet( false );
+	bool isSet( false );
 	if ( fdset_->_count > 0 )
 		isSet = ( std::find( fdset_->_data, fdset_->_data + fdset_->_count, fd_ ) != ( fdset_->_data + fdset_->_count ) );
 	return ( isSet );

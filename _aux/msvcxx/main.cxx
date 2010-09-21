@@ -2,6 +2,7 @@
 
 #include <sys/cdefs.h>
 #include <list>
+#include <hash_map>
 #include <cstdio>
 #include <cstdlib>
 #define fd_set fd_set_win_off
@@ -316,146 +317,170 @@ __declspec( dllexport ) int unix_fcntl( int fd_, int cmd_, int arg_ )
 	return ( fcntl( fd_, cmd_, arg_ ) );
 	}
 
-static int const FD_NAMED_PIPE = 0x40000;
-static int const FD_SOCKET = 0x20000;
-static int const FD_PIPE = 0x10000;
-static int const FD_MASK = FD_SOCKET | FD_NAMED_PIPE | FD_PIPE;
-static int const FD_FILTER = 0xffff;
+struct IO
+	{
+	struct TYPE
+		{
+		typedef enum
+			{
+			TERMINAL,
+			PIPE,
+			NAMED_PIPE,
+			SOCKET
+			} type_t;
+		};
+	TYPE::type_t _t;
+	HANDLE _h;
+	OVERLAPPED _o;
+	char _b;
+	bool _f; /* buffer has some data */
+	string _p;
+	IO( TYPE::type_t t_, HANDLE h_, HANDLE e_ = NULL, string const& p_ = string() )
+		: _t( t_ ), _h( h_ ), _o(), _b( 0 ), _f( false ), _p( p_ )
+		{
+		_o.hEvent = e_ ? e_ : ::CreateEvent( NULL, true, true, NULL );
+		}
+	~IO( void )
+		{
+		if ( _o.hEvent )
+			CloseHandle( _o.hEvent );
+		}
+private:
+	IO( IO const& );
+	IO& operator = ( IO const& );
+	};
+
+typedef tr1::shared_ptr<IO> io_ptr_t;
+
+class SystemIO
+	{
+	static int const MANAGED_IO = 0x10000;
+	typedef stdext::hash_map<int, io_ptr_t> io_table_t;
+	io_table_t _ioTable;
+	HMutex _mutex;
+	int _idPool;
+public:
+	typedef io_table_t::value_type io_t;
+	io_t& create_io( IO::TYPE::type_t type_, HANDLE h_, string const& p_ = string() )
+		{
+		HLock l( _mutex );
+		HANDLE e(  );
+		return ( *( _ioTable.insert( std::make_pair( _idPool ++, io_ptr_t( new IO( type_, h_, NULL, p_ ) ) ) ).first ) );
+		}
+	io_t& get_io( int id_ )
+		{
+		HLock l( _mutex );
+		io_table_t::iterator i( _ioTable.find( id_ ) );
+		if ( i != _ioTable.end() )
+			return ( *i );
+		M_ASSERT( id_ < MANAGED_IO );
+		HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( id_ ) ) );
+		return ( *( _ioTable.insert( std::make_pair( id_, io_ptr_t( new IO( IO::TYPE::TERMINAL, h, h ) ) ) ).first ) );
+		}
+	void erase_io( int id_ )
+		{
+		HLock l( _mutex );
+		_ioTable.erase( id_ );
+		}
+	static SystemIO& get_instance( void )
+		{
+		static SystemIO instance;
+		return ( instance );
+		}
+private:
+	SystemIO( void ) : _ioTable(), _mutex(), _idPool( MANAGED_IO ) {}
+	};
+
+void sched_read( IO& io_ )
+	{
+	DWORD nRead( 0 );
+	::ReadFile( io_._h, &io_._b, 1, &nRead, &io_._o ); 
+	io_._f = ( nRead == 1 );
+	return;
+	}
 
 M_EXPORT_SYMBOL
 int unix_pipe( int* fds_ )
 	{
-	int ret( _pipe( fds_, 4096, O_BINARY | O_NOINHERIT ) );
-	if ( ! ret )
+	SystemIO& sysIo( SystemIO::get_instance() );
+	HANDLE hRead( NULL );
+	HANDLE hWrite( NULL );
+	bool ok( ::CreatePipe( &hRead, &hWrite, NULL, 4096 ) ? true : false );
+	if ( ok )
 		{
-		if ( ( fds_[0] | fds_[1] ) & FD_MASK )
-			M_THROW( "unexpected fd value", ( fds_[0] | fds_[1] ) );
-		fds_[0] |= FD_PIPE;
-		fds_[1] |= FD_PIPE;
+		SystemIO::io_t readIO( sysIo.create_io( IO::TYPE::PIPE, hRead ) );
+		SystemIO::io_t writeIO( sysIo.create_io( IO::TYPE::PIPE, hWrite ) );
+		fds_[0] = readIO.first;
+		fds_[1] = writeIO.first;
+		sched_read( *(readIO.second) );
 		}
-	return ( ret );
+	return ( ok ? 0 : -1 );
 	}
 
 int unix_close( int const& fd_ )
 	{
+	SystemIO& sysIo( SystemIO::get_instance() );
 	int ret( 0 );
-	if ( fd_ & FD_NAMED_PIPE )
-		ret = CloseHandle( reinterpret_cast<HANDLE>( fd_ & FD_FILTER ) );
-	else if ( fd_ & FD_SOCKET )
-		ret = ::closesocket( fd_ & FD_FILTER );
-	else if ( fd_ & FD_PIPE )
-		ret = ::_close( fd_ & FD_FILTER );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	if ( ( io._t == IO::TYPE::PIPE ) || ( io._t == IO::TYPE::NAMED_PIPE ) )
+		ret = ( ::CloseHandle( io._h ) == S_OK ) ? 0 : -1;
+	else if ( io._t == IO::TYPE::SOCKET )
+		ret = ::closesocket( reinterpret_cast<SOCKET>( io._h ) );
 	else
 		{
 		M_ASSERT( ! "invalid HANDLE" );
 		}
+	sysIo.erase_io( fd_ );
 	return ( ret );
 	}
 
 M_EXPORT_SYMBOL
 int long unix_read( int const& fd_, void* buf_, int long size_ )
 	{
-	int long nRead( 0 );
-	if ( fd_ & FD_NAMED_PIPE )
-		nRead = ::_read( fd_ & FD_FILTER, buf_, size_ );
-	else if ( fd_ & FD_SOCKET )
-		nRead = ::recv( fd_ & FD_FILTER, static_cast<char*>( buf_ ), size_, 0 );
-	else if ( fd_ & FD_PIPE )
-		nRead = ::_read( fd_ & FD_FILTER, buf_, size_ );
-	else
-		{
-		M_ASSERT( ! "invalid HANDLE" );
-		}
-	return ( nRead );
+	SystemIO& sysIo( SystemIO::get_instance() );
+	DWORD nRead( 0 );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	int off( ( io._f ? 1 : 0 ) );
+	bool ok( ::ReadFile( io._h, static_cast<char*>( buf_ ) + off, size_ - off, &nRead, &io._o ) ? true : false );
+	io._f = false;
+	if ( size_ == ( nRead + off ) )
+		sched_read( io );
+	return ( ok ? nRead + off : -1 );
 	}
 
 M_EXPORT_SYMBOL
 int long unix_write( int const& fd_, void const* buf_, int long size_ )
 	{
-	int long nWritten( 0 );
-	if ( fd_ & FD_NAMED_PIPE )
-		nWritten = ::_write( fd_ & FD_FILTER, buf_, size_ );
-	else if ( fd_ & FD_SOCKET )
-		nWritten = ::send( fd_ & FD_FILTER, static_cast<char const*>( buf_ ), size_, 0 );
-	else if ( fd_ & FD_PIPE )
-		nWritten = ::_write( fd_ & FD_FILTER, buf_, size_ );
-	else
+	SystemIO& sysIo( SystemIO::get_instance() );
+	DWORD nWritten( 0 );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	bool ok( ::WriteFile( io._h, buf_, size_, &nWritten, NULL ) ? true : false );
+	return ( ok ? nWritten : -1 );
+	}
+
+struct OsCast
+	{
+	SystemIO& _sysIO;
+	OsCast() : _sysIO( SystemIO::get_instance() ) {}
+	HANDLE operator()( int id_ )
 		{
-		M_ASSERT( ! "invalid HANDLE" );
+		return ( _sysIO.get_io( id_ ).second->_o.hEvent );
 		}
-	return ( nWritten );
-	}
+	};
 
-HANDLE os_cast( int fd_ )
-	{
-	return ( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ & FD_FILTER ) ) );
-	}
-
-inline bool is_pipe( int fd_ )
-	{
-	return ( ( ( fd_ != -1 ) && ( fd_ & FD_PIPE ) ) ? true : false );
-	}
-
-int check_pipes( int* fds_, int* fdsEnd_ )
-	{
-	int count( 0 );
-	for ( int* fd( fds_ ); fd != fdsEnd_; ++ fd )
-		{
-		if ( is_pipe( *fd ) )
-			{
-			char buf;
-			DWORD nRead( 0 );
-			DWORD nAvail( 0 );
-			if ( PeekNamedPipe( os_cast( *fd ), &buf, 1, &nRead, &nAvail, NULL ) )
-				{
-				if ( nRead == 0 )
-					*fd = -1;
-				else if ( nRead > 0 )
-					++ count;
-				}
-			else
-				log_windows_error( "PeekNamedPipe" );
-			}
-		}
-	return ( count );
-	}
-
-/*
- * We simulate UNIX ::select() with ::WaitForMultipleObjects(),
- * unfortunatelly ::WFMO() does not work with pipes (as in _pipe()).
- * We need to recoginze pipe fds, filter them out from all fds,
- * and treat them separately.
- */
 M_EXPORT_SYMBOL
 int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
 	{
 	int ret( 0 );
 	int long miliseconds( timeout ? ( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) ) : 0 );
-	if ( readFds || writeFds )
+	if ( readFds )
 		{
 		int count( ( readFds ? readFds->_count : 0 ) + ( writeFds ? writeFds->_count : 0 ) );
 		M_ENSURE( count <= MAXIMUM_WAIT_OBJECTS );
-		int fds[MAXIMUM_WAIT_OBJECTS]; /* we copy all fds (intput and output) here. */
-		int waitable[MAXIMUM_WAIT_OBJECTS]; /* we copy all fds that can work with ::WFMO(). */
 		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
-		HANDLE* hEnd( handles );
+		std::transform( readFds->_data, readFds->_data + readFds->_count, handles, OsCast() );
 
-		/* copy all fds (both read and write) into one array */
-		int* fdsEnd( fds );
-		readFds && ( fdsEnd = std::copy( readFds->_data, readFds->_data + readFds->_count, fdsEnd ) );
-		writeFds && ( fdsEnd = std::copy( writeFds->_data, writeFds->_data + writeFds->_count, fdsEnd ) );
-
-		/* get fds that work with ::WFMO() */
-		int* waitableEnd( std::remove_copy_if( fds, fdsEnd, waitable, std::not1( std::ptr_fun( is_pipe ) ) ) );
-
-		/* convert fds to HANDLES */
-		std::transform( waitable, waitableEnd, handles, os_cast );
-
-		int pipesEarly( ret = check_pipes( fds, fdsEnd ) );
-		if ( ret > 0 )
-			miliseconds = 0;
-		/* First we use ::WFMO() to wait on waitable fds. */
-		int up( ::WaitForMultipleObjects( waitableEnd - waitable, handles, false, miliseconds ) );
+		int up( ::WaitForMultipleObjects( readFds->_count, handles, false, miliseconds ) );
 		if ( up == WAIT_FAILED )
 			{
 			ret = -1;
@@ -463,37 +488,20 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 			}
 		else if ( ( up >= WAIT_OBJECT_0 ) && ( up < ( WAIT_OBJECT_0 + count ) ) )
 			{
-			int handleNo( 0 );
 			for ( int i( 0 ); i < count; ++ i )
 				{
-				if ( is_pipe( fds[ i ] ) )
-					continue;
-				up = ::WaitForSingleObject( handles[ handleNo ++ ], 0 );
+				up = ::WaitForSingleObject( handles[ i ], 0 );
 				if ( up == WAIT_OBJECT_0 )
 					++ ret;
 				else
-					fds[ i ] = -1;
+					readFds->_data[ i ] = -1;
 				}
+			std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
+			readFds->_count = ret;
+			ret += ( writeFds ? writeFds->_count : 0 );
 			}
 		else
-			std::replace_if( fds, fdsEnd, std::not1( std::ptr_fun( is_pipe ) ), -1 );
-		/* Next we check if anything can be read from pipes. */
-		if ( miliseconds && ( ret != -1 ) )
-			{
-			ret += check_pipes( fds, fdsEnd );
-			/* here fds contains valid fdses for fds that can be read and -1 for fds that cannot be read */
-			if ( writeFds )
-				{
-				int readCount( readFds ? readFds->_count : 0 );
-				int* validEnd( std::remove_copy( fds + readCount, fds + count, writeFds->_data, -1 ) );
-				writeFds->_count = ( validEnd - fds ) - readCount;
-				}
-			if ( readFds )
-				{
-				int* validEnd( std::remove_copy( fds, fds + readFds->_count, readFds->_data, -1 ) );
-				readFds->_count = validEnd - fds;
-				}
-			}
+			FD_ZERO( readFds );
 		}
 	else
 		{
@@ -528,12 +536,15 @@ int unix_getnameinfo( struct sockaddr const* sa_,
 	return ( getnameinfo( sa_, salen_, host_, hostlen_, serv_, servlen_, flags_ ) );
 	}
 
-int unix_bind( int& fd_, const struct sockaddr* addr_, socklen_t len_ )
+int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 	{
 	int ret( -1 );
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	char const* path( addr_->sa_data + 2 );
 	if ( addr_->sa_family == PF_UNIX )
 		{
+		M_ASSERT( io._t == IO::TYPE::NAMED_PIPE );
 		HANDLE h = ::CreateFile( path,                // name of the write
                        GENERIC_WRITE,          // open for writing
                        0,                      // do not share
@@ -541,62 +552,53 @@ int unix_bind( int& fd_, const struct sockaddr* addr_, socklen_t len_ )
                        CREATE_NEW,          // overwrite existing
                        FILE_ATTRIBUTE_NORMAL,  // normal file
                        NULL);                  // no attr. template
+		HString n( "\\\\.\\pipe" );
 		if ( h != INVALID_HANDLE_VALUE )
 			{
 			::CloseHandle( h );
-			HString n( "\\\\.\\pipe" );
 			n += path;
 			n.replace( "/", "\\" );
 			h = CreateNamedPipe( n.raw(),
-				PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE,
-				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT,
+				PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
+				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE,
 				1, 1024, 1024, 1000, NULL );
 			}
 		if ( h != INVALID_HANDLE_VALUE )
 			{
-			::closesocket( fd_ & FD_FILTER );
-			fd_ = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
-			if ( fd_ & FD_MASK )
-				M_THROW( "unexpected socket fd value", fd_ );
-			fd_ |= FD_NAMED_PIPE;
+			::closesocket( reinterpret_cast<SOCKET>( io._h ) );
+			io._h = h;
+			io._p = n.raw();
 			ret = 0;
 			}
 		}
 	else
-		ret = ::bind( fd_ & FD_FILTER, addr_, len_ );
+		{
+		M_ASSERT( io._t == IO::TYPE::SOCKET );
+		ret = ::bind( reinterpret_cast<SOCKET>( io._h ), addr_, len_ );
+		}
 	return ( ret );
 	}
 
 int unix_socket( int af, int type, int protocol )
 	{
 	SOCKET s = -1;
-	int MARK( 0 );
-	if ( af == PF_UNIX )
-		{
-		s = ::socket( PF_INET, SOCK_STREAM, 0 );
-		MARK = FD_NAMED_PIPE;
-		}
-	else
-		{
+	if ( af != PF_UNIX )
 		s = ::socket( af, type, protocol );
-		MARK = FD_SOCKET;
-		}
-	if ( s & FD_MASK )
-		M_THROW( "unexpected socket fd value", s );
-	else
-		clog << "socket: " << s << endl;
-	return ( s | MARK );
+	SystemIO& sysIo( SystemIO::get_instance() );
+	SystemIO::io_t sock( sysIo.create_io( af == PF_UNIX ? IO::TYPE::NAMED_PIPE : IO::TYPE::SOCKET, reinterpret_cast<HANDLE>( s ) ) );
+	return ( sock.first );
 	}
 
 int unix_listen( int const& fd_, int const& backlog_ )
 	{
 	int ret( 0 );
-	M_ASSERT( fd_ & FD_MASK );
-	if ( fd_ & FD_NAMED_PIPE )
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	if ( io._t == IO::TYPE::NAMED_PIPE )
 		{
-		if ( ! ConnectNamedPipe( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ & FD_FILTER ) ), NULL ) )
+		if ( ! ::ConnectNamedPipe( io._h, &io._o ) )
 			{
-			if ( GetLastError() != ERROR_PIPE_LISTENING )
+			if ( ::GetLastError() != ERROR_PIPE_LISTENING )
 				{
 				log_windows_error( "ConnectNamedPipe" );
 				ret = -1;
@@ -604,33 +606,38 @@ int unix_listen( int const& fd_, int const& backlog_ )
 			}		
 		}
 	else
-		ret = listen( static_cast<SOCKET>( fd_ & FD_FILTER ), backlog_ );
+		ret = listen( reinterpret_cast<SOCKET>( io._h ), backlog_ );
 	return ( ret );
 	}
-
 
 int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
 	int ret( 0 );
-	M_ASSERT( fd_ & FD_MASK );
-	if ( fd_ & FD_SOCKET )
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	if ( io._t == IO::TYPE::SOCKET )
 		{
 		int len = *len_;
-		ret = ::accept( fd_ & FD_FILTER, addr_, &len );
+		ret = ::accept( reinterpret_cast<SOCKET>( io._h ), addr_, &len );
+		}
+	else
+		{
 		}
 	return ( ret );
 	}
 
-int unix_connect( int& fd_, struct sockaddr* addr_, socklen_t len_ )
+int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 	{
 	int ret( 0 );
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	if ( addr_->sa_family == PF_UNIX )
 		{
 		char const* path( addr_->sa_data + 2 );
 		HString n( "\\\\.\\pipe" );
 		n += path;
 		n.replace( "/", "\\" );
-		HANDLE h( CreateFile( n.raw(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0 ) );
+		HANDLE h( ::CreateFile( n.raw(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0 ) );
 		if ( h == INVALID_HANDLE_VALUE )
 			{
 			log_windows_error( "CreateNamedPipe" );
@@ -638,15 +645,12 @@ int unix_connect( int& fd_, struct sockaddr* addr_, socklen_t len_ )
 			}
 		else
 			{
-			::closesocket( fd_ & FD_FILTER );
-			fd_ = _open_osfhandle( reinterpret_cast<long>( h ), 0 );
-			if ( fd_ & FD_MASK )
-				M_THROW( "unexpected socket fd value", fd_ );
-			fd_ |= FD_NAMED_PIPE;
+			::closesocket( reinterpret_cast<SOCKET>( io._h ) );
+			io._h = h;
 			}
 		}
 	else
-		ret = ::connect( fd_ & FD_FILTER, addr_, len_ );
+		ret = ::connect( reinterpret_cast<SOCKET>( io._h ), addr_, len_ );
 	return ( ret );
 	}
 
@@ -658,9 +662,10 @@ int unix_shutdown( int fd_, int how_ )
 int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
 	{
 	int ret( 0 );
-	M_ASSERT( fd_ & FD_MASK );
-	if ( fd_ & FD_SOCKET )
-		ret = setsockopt( fd_ & FD_FILTER, level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	if ( io._t == IO::TYPE::SOCKET )
+		ret = setsockopt( reinterpret_cast<SOCKET>( io._h ), level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 
