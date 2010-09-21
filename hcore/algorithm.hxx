@@ -225,6 +225,46 @@ void replace_if( iterator_t it, iterator_t end, pred_t predicate_, value_t const
 	return;
 	}
 
+/*! \brief Copies one range onto the another but with replacing all occurences of given value with new value.
+ * \param it - begining of range to copy.
+ * \param end - one past the end of range to copy.
+ * \param out_ - begining of output range.
+ * \param oldVal_ - old value that shall to be replaced.
+ * \param newVal_ - a value that shall replace old values.
+ */
+template<typename iterator_t, typename output_iterator_t, typename value_t>
+void replace_copy( iterator_t it, iterator_t end, output_iterator_t out, value_t const& oldVal_, value_t const& newVal_ )
+	{
+	for ( ; it != end; ++ it, ++ out )
+		{
+		if ( *it == oldVal_ )
+			*out = newVal_;
+		else
+			*out = *it;
+		}
+	return;
+	}
+
+/*! \brief Copies one range onto the another but with replacing all occurences of value satifying a given predicate with new value.
+ * \param it - begining of range to copy.
+ * \param end - one past the end of range to copy.
+ * \param out_ - begining of output range.
+ * \param predicate_ - replace all elements that satify this predicate.
+ * \param newVal_ - a value that shall replace old values.
+ */
+template<typename iterator_t, typename output_iterator_t, typename pred_t, typename value_t>
+void replace_copy_if( iterator_t it, iterator_t end, output_iterator_t out, pred_t predicate_, value_t const& newVal_ )
+	{
+	for ( ; it != end; ++ it, ++ out )
+		{
+		if ( predicate_( *it ) )
+			*out = newVal_;
+		else
+			*out = *it;
+		}
+	return;
+	}
+
 /*! \brief Copy range of values onto another range.
  *
  * \param src - begining of source range of elements.
