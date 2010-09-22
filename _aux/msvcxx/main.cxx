@@ -3,6 +3,7 @@
 #include <sys/cdefs.h>
 #include <list>
 #include <hash_map>
+#include <sstream>
 #include <cstdio>
 #include <cstdlib>
 #define fd_set fd_set_win_off
@@ -317,6 +318,72 @@ __declspec( dllexport ) int unix_fcntl( int fd_, int cmd_, int arg_ )
 	return ( fcntl( fd_, cmd_, arg_ ) );
 	}
 
+int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
+		LPHANDLE lpWritePipe,
+		LPSECURITY_ATTRIBUTES lpPipeAttributes,
+		DWORD nSize,
+		DWORD dwReadMode,
+		DWORD dwWriteMode )
+	{
+	HANDLE ReadPipeHandle, WritePipeHandle;
+	DWORD dwError;
+
+	//
+	// Only one valid OpenMode flag - FILE_FLAG_OVERLAPPED
+	//
+
+	if ( ( dwReadMode | dwWriteMode ) & ( ~FILE_FLAG_OVERLAPPED ) )
+		{
+		SetLastError( ERROR_INVALID_PARAMETER );
+		return FALSE;
+		}
+
+	//
+	//  Set the default timeout to 120 seconds
+	//
+
+	if ( nSize == 0 )
+		nSize = 4096;
+	static int PipeSerialNumber = 0;
+	stringstream PipeName;
+	PipeName << "\\\\.\\Pipe\\RemoteExeAnon." << GetCurrentProcessId() << ( PipeSerialNumber ++ );
+
+	ReadPipeHandle = CreateNamedPipe(
+		PipeName.str().c_str(),
+		PIPE_ACCESS_INBOUND | dwReadMode,
+		PIPE_TYPE_BYTE | PIPE_WAIT,
+		1,             // Number of pipes
+		nSize,         // Out buffer size
+		nSize,         // In buffer size
+		120 * 1000,    // Timeout in ms
+		lpPipeAttributes );
+
+	if ( ! ReadPipeHandle )
+		return FALSE;
+
+	WritePipeHandle = CreateFile(
+		PipeName.str().c_str(),
+		GENERIC_WRITE,
+		0,                         // No sharing
+		lpPipeAttributes,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL | dwWriteMode,
+		NULL );
+
+	if ( INVALID_HANDLE_VALUE == WritePipeHandle )
+		{
+		dwError = GetLastError();
+		CloseHandle( ReadPipeHandle );
+		SetLastError( dwError );
+		return FALSE;
+		}
+
+	*lpReadPipe = ReadPipeHandle;
+	*lpWritePipe = WritePipeHandle;
+	return ( 1 );
+	}
+
+
 struct IO
 	{
 	struct TYPE
@@ -338,12 +405,12 @@ struct IO
 	IO( TYPE::type_t t_, HANDLE h_, HANDLE e_ = NULL, string const& p_ = string() )
 		: _t( t_ ), _h( h_ ), _o(), _b( 0 ), _f( false ), _p( p_ )
 		{
-		_o.hEvent = e_ ? e_ : ::CreateEvent( NULL, true, true, NULL );
+		_o.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
 		}
 	~IO( void )
 		{
 		if ( _o.hEvent )
-			CloseHandle( _o.hEvent );
+			::CloseHandle( _o.hEvent );
 		}
 private:
 	IO( IO const& );
@@ -361,11 +428,11 @@ class SystemIO
 	int _idPool;
 public:
 	typedef io_table_t::value_type io_t;
-	io_t& create_io( IO::TYPE::type_t type_, HANDLE h_, string const& p_ = string() )
+	io_t& create_io( IO::TYPE::type_t type_, HANDLE h_, HANDLE e_ = NULL, string const& p_ = string() )
 		{
 		HLock l( _mutex );
 		HANDLE e(  );
-		return ( *( _ioTable.insert( std::make_pair( _idPool ++, io_ptr_t( new IO( type_, h_, NULL, p_ ) ) ) ).first ) );
+		return ( *( _ioTable.insert( std::make_pair( _idPool ++, io_ptr_t( new IO( type_, h_, e_, p_ ) ) ) ).first ) );
 		}
 	io_t& get_io( int id_ )
 		{
@@ -394,7 +461,7 @@ private:
 void sched_read( IO& io_ )
 	{
 	DWORD nRead( 0 );
-	::ReadFile( io_._h, &io_._b, 1, &nRead, &io_._o ); 
+	::ReadFile( io_._h, &io_._b, 1, &nRead, &io_._o );
 	io_._f = ( nRead == 1 );
 	return;
 	}
@@ -405,7 +472,7 @@ int unix_pipe( int* fds_ )
 	SystemIO& sysIo( SystemIO::get_instance() );
 	HANDLE hRead( NULL );
 	HANDLE hWrite( NULL );
-	bool ok( ::CreatePipe( &hRead, &hWrite, NULL, 4096 ) ? true : false );
+	bool ok( ::CreatePipeEx( &hRead, &hWrite, NULL, 4096, FILE_FLAG_OVERLAPPED , FILE_FLAG_OVERLAPPED ) ? true : false );
 	if ( ok )
 		{
 		SystemIO::io_t readIO( sysIo.create_io( IO::TYPE::PIPE, hRead ) );
@@ -442,6 +509,8 @@ int long unix_read( int const& fd_, void* buf_, int long size_ )
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	int off( ( io._f ? 1 : 0 ) );
 	bool ok( ::ReadFile( io._h, static_cast<char*>( buf_ ) + off, size_ - off, &nRead, &io._o ) ? true : false );
+	if ( ! ok )
+		log_windows_error( "ReadFile" );
 	io._f = false;
 	if ( size_ == ( nRead + off ) )
 		sched_read( io );
@@ -480,7 +549,7 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
 		std::transform( readFds->_data, readFds->_data + readFds->_count, handles, OsCast() );
 
-		int up( ::WaitForMultipleObjects( readFds->_count, handles, false, miliseconds ) );
+ 		int up( ::WaitForMultipleObjects( readFds->_count, handles, false, miliseconds ) );
 		if ( up == WAIT_FAILED )
 			{
 			ret = -1;
@@ -490,8 +559,8 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 			{
 			for ( int i( 0 ); i < count; ++ i )
 				{
-				up = ::WaitForSingleObject( handles[ i ], 0 );
-				if ( up == WAIT_OBJECT_0 )
+				int upL( ::WaitForSingleObject( handles[ i ], 0 ) );
+				if ( ( i == ( up - WAIT_OBJECT_0 ) || ( upL == WAIT_OBJECT_0 ) ) )
 					++ ret;
 				else
 					readFds->_data[ i ] = -1;
@@ -560,12 +629,11 @@ int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 			n.replace( "/", "\\" );
 			h = CreateNamedPipe( n.raw(),
 				PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
-				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE,
-				1, 1024, 1024, 1000, NULL );
+				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
+				PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL );
 			}
 		if ( h != INVALID_HANDLE_VALUE )
 			{
-			::closesocket( reinterpret_cast<SOCKET>( io._h ) );
 			io._h = h;
 			io._p = n.raw();
 			ret = 0;
@@ -596,17 +664,19 @@ int unix_listen( int const& fd_, int const& backlog_ )
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	if ( io._t == IO::TYPE::NAMED_PIPE )
 		{
-		if ( ! ::ConnectNamedPipe( io._h, &io._o ) )
+		if ( ::ConnectNamedPipe( io._h, &io._o ) )
 			{
-			if ( ::GetLastError() != ERROR_PIPE_LISTENING )
-				{
-				log_windows_error( "ConnectNamedPipe" );
-				ret = -1;
-				}
+			log_windows_error( "ConnectNamedPipe" );
+			ret = -1;
 			}		
 		}
 	else
-		ret = listen( reinterpret_cast<SOCKET>( io._h ), backlog_ );
+		{
+		SOCKET s( reinterpret_cast<SOCKET>( io._h ) );
+		if ( WSAEventSelect( s, io._o.hEvent, FD_ACCEPT ) )
+			log_windows_error( "WSAEventSelect" );
+		ret = listen( s, backlog_ );
+		}
 	return ( ret );
 	}
 
@@ -619,6 +689,10 @@ int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 		{
 		int len = *len_;
 		ret = ::accept( reinterpret_cast<SOCKET>( io._h ), addr_, &len );
+		SystemIO::io_t sock( sysIo.create_io( IO::TYPE::SOCKET, reinterpret_cast<HANDLE>( ret ) ) );
+		if ( WSAEventSelect( ret, sock.second->_o.hEvent, FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
+			log_windows_error( "WSAEventSelect" );
+		ret = sock.first;
 		}
 	else
 		{
@@ -644,13 +718,15 @@ int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 			ret = -1;
 			}
 		else
-			{
-			::closesocket( reinterpret_cast<SOCKET>( io._h ) );
 			io._h = h;
-			}
 		}
 	else
-		ret = ::connect( reinterpret_cast<SOCKET>( io._h ), addr_, len_ );
+		{
+		SOCKET s( reinterpret_cast<SOCKET>( io._h ) );
+		ret = ::connect( s, addr_, len_ );
+		if ( WSAEventSelect( s, io._o.hEvent, FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
+			log_windows_error( "WSAEventSelect" );
+		}
 	return ( ret );
 	}
 
