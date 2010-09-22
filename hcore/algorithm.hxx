@@ -154,7 +154,53 @@ dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t
 	return ( dst );
 	}
 
-/*! \brief Replace elements in destination container by selected transformed elements from source range.
+/*! \brief Replace elements in destination container by transformed elements, from source range, that are not equal to some value.
+ *
+ * \param it - begining of source range.
+ * \param end - one past the end of source range.
+ * \param dst - begining of destination container.
+ * \param skip_ - value that should be skipped while performing range transformation.
+ * \param op - transforming operation, an unary function.
+ * \return one past end of output range.
+ */
+template<typename src_iter_t, typename dst_iter_t, typename skip_t, typename operation_t>
+dst_iter_t remove_transform( src_iter_t it, src_iter_t end, dst_iter_t dst, skip_t skip_, operation_t op )
+	{
+	for ( ; it != end; ++ it )
+		{
+		if ( *it != skip_ )
+			{
+			*dst = op( *it );
+			++ dst;
+			}
+		}
+	return ( dst );
+	}
+
+/*! \brief Replace elements in destination container by transformed elements, from source range, that do not satisfy some predicate.
+ *
+ * \param it - begining of source range.
+ * \param end - one past the end of source range.
+ * \param dst - begining of destination container.
+ * \param predicate_ - predicate used to filter out unwantted elements.
+ * \param op - transforming operation, an unary function.
+ * \return one past end of output range.
+ */
+template<typename src_iter_t, typename dst_iter_t, typename pred_t, typename operation_t>
+dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, pred_t predicate_, operation_t op )
+	{
+	for ( ; it != end; ++ it )
+		{
+		if ( ! predicate_( *it ) )
+			{
+			*dst = op( *it );
+			++ dst;
+			}
+		}
+	return ( dst );
+	}
+
+/*! \brief Replace elements in destination container by elements from source range conditionaly transformed.
  *
  * \param it - begining of source range.
  * \param end - one past the end of source range.
@@ -170,6 +216,8 @@ dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operatio
 		{
 		if ( cond( *it ) )
 			*dst = op( *it );
+		else
+			*dst = *it;
 		}
 	return ( dst );
 	}
