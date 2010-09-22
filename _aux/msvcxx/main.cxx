@@ -1,11 +1,6 @@
-#define NtCurrentTeb NtCurrentTeb_off
-
 #include <sys/cdefs.h>
-#include <list>
 #include <hash_map>
 #include <sstream>
-#include <cstdio>
-#include <cstdlib>
 #define fd_set fd_set_win_off
 #include <ws2tcpip.h>
 #include <dbghelp.h>
@@ -39,21 +34,26 @@
 #undef FD_SETSIZE
 #undef timerclear
 #undef timercmp
+#undef O_RDONLY
+#undef O_WRONLY
+#undef O_RDWR
+#undef O_CREAT
+#undef O_EXCL
+#undef O_TRUNC
+#undef O_APPEND
+#undef fd_set
+#undef FD_SET
 
-#include <csignal>
+#include <unistd.h>
 #include <dirent.h>
 #include <pwd.h>
+#define _FCNTL_H 1
+#include <bits/fcntl.h>
 
 #undef getpwuid_r
-#undef access
-#undef lseek
-#undef pthread_sigmask
 #undef gethostname
 #undef timeval
-#undef dup
-#undef dup2
 #undef getpid
-#undef isatty
 #undef readdir_r
 #undef dirent
 
@@ -67,9 +67,6 @@
 #include "cxxabi.h"
 
 #include "cleanup.hxx"
-
-#undef TEMP_FAILURE_RETRY
-#define TEMP_FAILURE_RETRY( x ) ( x )
 
 using namespace std;
 using namespace yaal;
@@ -99,101 +96,6 @@ extern "C" char** backtrace_symbols( void* const* buf_, int size_ )
 	for ( int i( 0 ); i < size_; ++ i )
 		strings[i] = reinterpret_cast<char*>( buf_[i] );
 	return ( strings );
-	}
-
-template<typename T>
-class SynchronizedQueue
-	{
-	list<T> _data;
-	yaal::hcore::HMutex _mutex;
-	yaal::hcore::HSemaphore _semaphore;
-public:
-	SynchronizedQueue( void )
-		: _data(), _mutex(), _semaphore()
-		{ }
-	bool pop( T& );
-	void push( T const& );
-	};
-
-template<typename T>
-bool SynchronizedQueue<T>::pop( T& elem )
-	{
-	_semaphore.wait();
-	HLock l( _mutex );
-	bool found = false;
-	if ( ! _data.empty() )
-		{
-		found = true;
-		elem = _data.front();
-		_data.pop_front();
-		}
-	return ( ! found );
-	}
-
-template<typename T>
-void SynchronizedQueue<T>::push( T const& elem )
-	{
-	HLock l( _mutex );
-	_data.push_back( elem );
-	_semaphore.signal();
-	return;
-	}
-
-SynchronizedQueue<int> _signalQueue_;
-
-M_EXPORT_SYMBOL
-int kill( int pid, int signo )
-	{
-	int err( 0 );
-	if ( pid == getpid() )
-		_signalQueue_.push( signo );
-	else if ( signo )
-		TerminateProcess( reinterpret_cast<HANDLE>( pid ), signo );
-	else
-		err = ( ( GetProcessId( reinterpret_cast<HANDLE>( pid ) ) != 0 ) ? 0 : -1 );
-	return ( err );
-	}
-
-M_EXPORT_SYMBOL
-int sigwait( sigset_t*, int* signo )
-	{
-	if ( _signalQueue_.pop( *signo ) )
-		*signo = SIGURG;
-	return ( 0 );
-	}
-
-int sigaddset( sigset_t*, int )
-	{
-	return ( 0 );
-	}
-
-int sigdelset( sigset_t*, int )
-	{
-	return ( 0 );
-	}
-
-int sigemptyset( sigset_t* )
-	{
-	return ( 0 );
-	}
-
-void win_signal_handler( int signo )
-	{
-	_signalQueue_.push( signo );
-	}
-
-int sigaction( int signo, struct sigaction*, void* )
-	{
-	if ( ( signo != SIGURG ) && ( signo != SIGBUS ) && ( signo != SIGTRAP ) && ( signo != SIGSYS ) ) //&& ( signo != 5 ) && ( signo != 12 ) )
-		signal( signo, win_signal_handler );
-	return ( 0 );
-	}
-
-extern "C"
-M_EXPORT_SYMBOL
-int pthread_sigmask( int, sigset_t*, void* )
-	{
-	return ( 0 );
 	}
 
 extern "C" void* dlopen( char const*, int );
@@ -256,24 +158,13 @@ int getpwuid_r( uid_t, struct passwd* p, char* buf, int size, struct passwd** )
 
 int ms_gethostname( char* buf_, int len_ )
 	{
-	WORD wVersionRequested;
 	WSADATA wsaData;
-	int err;
-
-	wVersionRequested = MAKEWORD( 2, 2 );
-
-	err = WSAStartup( wVersionRequested, &wsaData );
-
+	WORD wVersionRequested( MAKEWORD( 2, 2 ) );
+	int err( WSAStartup( wVersionRequested, &wsaData ) );
 	return ( gethostname( buf_, len_ ) );
 	}
 
 int ESCDELAY = 0;
-
-extern "C"
-int poll( struct pollfd*, int, int )
-	{
-	return ( 0 );
-	}
 
 M_EXPORT_SYMBOL
 char const* windows_strerror( int code_ )
@@ -283,11 +174,8 @@ char const* windows_strerror( int code_ )
 	char* p( msg );
 
 	FormatMessage(
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		code_,
-		MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, code_, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
 		p, MAX_MSG_LEN - 1, NULL );
 
 	return ( msg );
@@ -312,12 +200,6 @@ void set_socket_error( int errno_ )
 	WSASetLastError( errno_ );
 	}
 
-extern "C" int fcntl( int fd_, int cmd_, ... );
-__declspec( dllexport ) int unix_fcntl( int fd_, int cmd_, int arg_ )
-	{
-	return ( fcntl( fd_, cmd_, arg_ ) );
-	}
-
 int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 		LPHANDLE lpWritePipe,
 		LPSECURITY_ATTRIBUTES lpPipeAttributes,
@@ -328,19 +210,12 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 	HANDLE ReadPipeHandle, WritePipeHandle;
 	DWORD dwError;
 
-	//
 	// Only one valid OpenMode flag - FILE_FLAG_OVERLAPPED
-	//
-
 	if ( ( dwReadMode | dwWriteMode ) & ( ~FILE_FLAG_OVERLAPPED ) )
 		{
 		SetLastError( ERROR_INVALID_PARAMETER );
 		return FALSE;
 		}
-
-	//
-	//  Set the default timeout to 120 seconds
-	//
 
 	if ( nSize == 0 )
 		nSize = 4096;
@@ -355,6 +230,7 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 		1,             // Number of pipes
 		nSize,         // Out buffer size
 		nSize,         // In buffer size
+	//  Set the default timeout to 120 seconds
 		120 * 1000,    // Timeout in ms
 		lpPipeAttributes );
 
@@ -383,7 +259,6 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 	return ( 1 );
 	}
 
-
 struct IO
 	{
 	struct TYPE
@@ -396,21 +271,22 @@ struct IO
 			SOCKET
 			} type_t;
 		};
-	TYPE::type_t _t;
-	HANDLE _h;
-	OVERLAPPED _o;
-	char _b;
-	bool _s; /* io has been scheduled */
-	string _p;
+	TYPE::type_t _type;
+	HANDLE _handle;
+	OVERLAPPED _overlapped;
+	char _buffer;
+	bool _scheduled; /* io has been scheduled */
+	bool _nonBlocking;
+	string _path;
 	IO( TYPE::type_t t_, HANDLE h_, HANDLE e_ = NULL, string const& p_ = string() )
-		: _t( t_ ), _h( h_ ), _o(), _b( 0 ), _s( false ), _p( p_ )
+		: _type( t_ ), _handle( h_ ), _overlapped(), _buffer( 0 ), _scheduled( false ), _nonBlocking( false ), _path( p_ )
 		{
-		_o.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
+		_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
 		}
 	~IO( void )
 		{
-		if ( _o.hEvent )
-			::CloseHandle( _o.hEvent );
+		if ( _overlapped.hEvent )
+			::CloseHandle( _overlapped.hEvent );
 		}
 private:
 	IO( IO const& );
@@ -421,7 +297,9 @@ typedef tr1::shared_ptr<IO> io_ptr_t;
 
 class SystemIO
 	{
+public:
 	static int const MANAGED_IO = 0x10000;
+private:
 	typedef stdext::hash_map<int, io_ptr_t> io_table_t;
 	io_table_t _ioTable;
 	HMutex _mutex;
@@ -458,11 +336,54 @@ private:
 	SystemIO( void ) : _ioTable(), _mutex(), _idPool( MANAGED_IO ) {}
 	};
 
+extern "C" int fcntl( int fd_, int cmd_, ... );
+
+int do_unix_fcntl( int fd_, int cmd_, void* arg_ )
+	{
+	int ret( -1 );
+	if ( fd_ < SystemIO::MANAGED_IO )
+		ret = fcntl( fd_, cmd_, arg_ );
+	else if ( cmd_ == F_SETFL )
+		{
+		int arg( reinterpret_cast<int>( arg_ ) );
+		SystemIO& sysIo( SystemIO::get_instance() );
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		io._nonBlocking = ( ( arg & O_NONBLOCK ) ? true : false );
+		}
+	else if ( cmd_ == F_GETFL )
+		{
+		int* arg( static_cast<int*>( arg_ ) );
+		SystemIO& sysIo( SystemIO::get_instance() );
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		*arg = io._nonBlocking ? O_NONBLOCK : 0;
+		}
+	return ( ret );
+	}
+
+M_EXPORT_SYMBOL
+int unix_fcntl( int fd_, int cmd_, ... )
+	{
+  va_list ap;
+  void *arg;
+
+  va_start( ap, cmd_ );
+  arg = va_arg( ap, void* );
+  va_end( ap );
+
+	if ( fd_ < 0 )
+		{
+		SetLastError( EBADF );
+		return -1;
+		}
+	return do_unix_fcntl( fd_, cmd_, arg );
+	}
+
+
 void sched_read( IO& io_ )
 	{
 	DWORD nRead( 0 );
-	::ReadFile( io_._h, &io_._b, 1, &nRead, &io_._o );
-	io_._s = true;
+	::ReadFile( io_._handle, &io_._buffer, 1, &nRead, &io_._overlapped );
+	io_._scheduled = true;
 	return;
 	}
 
@@ -489,10 +410,10 @@ int unix_close( int const& fd_ )
 	SystemIO& sysIo( SystemIO::get_instance() );
 	int ret( 0 );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( ( io._t == IO::TYPE::PIPE ) || ( io._t == IO::TYPE::NAMED_PIPE ) )
-		ret = ( ::CloseHandle( io._h ) == S_OK ) ? 0 : -1;
-	else if ( io._t == IO::TYPE::SOCKET )
-		ret = ::closesocket( reinterpret_cast<SOCKET>( io._h ) );
+	if ( ( io._type == IO::TYPE::PIPE ) || ( io._type == IO::TYPE::NAMED_PIPE ) )
+		ret = ( ::CloseHandle( io._handle ) == S_OK ) ? 0 : -1;
+	else if ( io._type == IO::TYPE::SOCKET )
+		ret = ::closesocket( reinterpret_cast<SOCKET>( io._handle ) );
 	else
 		{
 		M_ASSERT( ! "invalid HANDLE" );
@@ -509,24 +430,24 @@ int long unix_read( int const& fd_, void* buf_, int long size_ )
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	int off( 0 );
 	bool ok( false );
-	if ( io._s )
+	if ( io._scheduled )
 		{
-		static_cast<char*>( buf_ )[0] = io._b;
-		io._s = false;
+		static_cast<char*>( buf_ )[0] = io._buffer;
+		io._scheduled = false;
 		-- size_;
 		++ off;
 		ok = true;
 		}
 	if ( size_ > 0 )
 		{
-		ok = ::ReadFile( io._h, static_cast<char*>( buf_ ) + off, size_ - off, &nRead, &io._o ) ? true : false;
+		ok = ::ReadFile( io._handle, static_cast<char*>( buf_ ) + off, size_ - off, &nRead, &io._overlapped ) ? true : false;
 		if ( ! ok )
 			log_windows_error( "ReadFile" );
-		ok = ::GetOverlappedResult( io._h, &io._o, &nRead, false ) ? true : false;
+		ok = ::GetOverlappedResult( io._handle, &io._overlapped, &nRead, false ) ? true : false;
 		if ( ! ok )
 			log_windows_error( "GetOverlappedResult" );
 		}
-	if ( ! ( nRead + off ) && ( io._t != IO::TYPE::SOCKET ) )
+	if ( ! ( nRead + off ) && ( io._type != IO::TYPE::SOCKET ) )
 		sched_read( io );
 	return ( ok ? nRead + off : -1 );
 	}
@@ -537,7 +458,7 @@ int long unix_write( int const& fd_, void const* buf_, int long size_ )
 	SystemIO& sysIo( SystemIO::get_instance() );
 	DWORD nWritten( 0 );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	bool ok( ::WriteFile( io._h, buf_, size_, &nWritten, NULL ) ? true : false );
+	bool ok( ::WriteFile( io._handle, buf_, size_, &nWritten, NULL ) ? true : false );
 	return ( ok ? nWritten : -1 );
 	}
 
@@ -551,7 +472,7 @@ struct OsCast
 		}
 	HANDLE operator()( IO* io_ )
 		{
-		return ( io_->_o.hEvent );
+		return ( io_->_overlapped.hEvent );
 		}
 	};
 
@@ -584,9 +505,9 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 					{
 					++ ret;
 					DWORD nRead( 0 );
-					if ( ios[i]->_s )
+					if ( ios[i]->_scheduled )
 						{
-						if ( ! ( ::GetOverlappedResult( ios[i]->_h, &ios[i]->_o, &nRead, true ) || nRead ) )
+						if ( ! ( ::GetOverlappedResult( ios[i]->_handle, &ios[i]->_overlapped, &nRead, true ) || nRead ) )
 							log_windows_error( "GetOverlappedResult (scheduled)" );
 						}
 					}
@@ -635,11 +556,11 @@ int unix_getnameinfo( struct sockaddr const* sa_,
 
 int make_pipe_instance( IO& io_ )
 	{
-	io_._h = CreateNamedPipe( io_._p.c_str(),
+	io_._handle = CreateNamedPipe( io_._path.c_str(),
 		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
 		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
 		PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL );
-	return ( io_._h != INVALID_HANDLE_VALUE ? 0 : -1 );
+	return ( io_._handle != INVALID_HANDLE_VALUE ? 0 : -1 );
 	}
 
 int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
@@ -650,7 +571,7 @@ int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 	char const* path( addr_->sa_data + 2 );
 	if ( addr_->sa_family == PF_UNIX )
 		{
-		M_ASSERT( io._t == IO::TYPE::NAMED_PIPE );
+		M_ASSERT( io._type == IO::TYPE::NAMED_PIPE );
 		HANDLE h = ::CreateFile( path,                // name of the write
                        GENERIC_WRITE,          // open for writing
                        0,                      // do not share
@@ -664,14 +585,14 @@ int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 			::CloseHandle( h );
 			n += path;
 			n.replace( "/", "\\" );
-			io._p = n.raw();
+			io._path = n.raw();
 			ret = make_pipe_instance( io );
 			}
 		}
 	else
 		{
-		M_ASSERT( io._t == IO::TYPE::SOCKET );
-		ret = ::bind( reinterpret_cast<SOCKET>( io._h ), addr_, len_ );
+		M_ASSERT( io._type == IO::TYPE::SOCKET );
+		ret = ::bind( reinterpret_cast<SOCKET>( io._handle ), addr_, len_ );
 		}
 	return ( ret );
 	}
@@ -691,9 +612,10 @@ int unix_listen( int const& fd_, int const& backlog_ )
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( io._t == IO::TYPE::NAMED_PIPE )
+	io._nonBlocking = true;
+	if ( io._type == IO::TYPE::NAMED_PIPE )
 		{
-		if ( ::ConnectNamedPipe( io._h, &io._o ) )
+		if ( ::ConnectNamedPipe( io._handle, &io._overlapped ) )
 			{
 			log_windows_error( "ConnectNamedPipe" );
 			ret = -1;
@@ -701,8 +623,8 @@ int unix_listen( int const& fd_, int const& backlog_ )
 		}
 	else
 		{
-		SOCKET s( reinterpret_cast<SOCKET>( io._h ) );
-		if ( WSAEventSelect( s, io._o.hEvent, FD_ACCEPT ) )
+		SOCKET s( reinterpret_cast<SOCKET>( io._handle ) );
+		if ( WSAEventSelect( s, io._overlapped.hEvent, FD_ACCEPT ) )
 			log_windows_error( "WSAEventSelect" );
 		ret = listen( s, backlog_ );
 		}
@@ -714,19 +636,19 @@ int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( io._t == IO::TYPE::SOCKET )
+	if ( io._type == IO::TYPE::SOCKET )
 		{
 		int len = *len_;
-		ret = ::accept( reinterpret_cast<SOCKET>( io._h ), addr_, &len );
+		ret = ::accept( reinterpret_cast<SOCKET>( io._handle ), addr_, &len );
 		SystemIO::io_t sock( sysIo.create_io( IO::TYPE::SOCKET, reinterpret_cast<HANDLE>( ret ) ) );
-		if ( WSAEventSelect( ret, sock.second->_o.hEvent, FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
+		if ( WSAEventSelect( ret, sock.second->_overlapped.hEvent, FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
 			log_windows_error( "WSAEventSelect" );
 		ret = sock.first;
 		}
 	else
 		{
-		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE, io._h ) );
-		std::swap( io._o, np.second->_o );
+		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE, io._handle ) );
+		std::swap( io._overlapped, np.second->_overlapped );
 		ret = make_pipe_instance( io );
 		if ( ! ret )
 			{
@@ -755,13 +677,13 @@ int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 			ret = -1;
 			}
 		else
-			io._h = h;
+			io._handle = h;
 		}
 	else
 		{
-		SOCKET s( reinterpret_cast<SOCKET>( io._h ) );
+		SOCKET s( reinterpret_cast<SOCKET>( io._handle ) );
 		ret = ::connect( s, addr_, len_ );
-		if ( WSAEventSelect( s, io._o.hEvent, FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
+		if ( WSAEventSelect( s, io._overlapped.hEvent, FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
 			log_windows_error( "WSAEventSelect" );
 		}
 	return ( ret );
@@ -777,59 +699,10 @@ int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, soc
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( io._t == IO::TYPE::SOCKET )
-		ret = setsockopt( reinterpret_cast<SOCKET>( io._h ), level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
+	if ( io._type == IO::TYPE::SOCKET )
+		ret = setsockopt( reinterpret_cast<SOCKET>( io._handle ), level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 
 }
 
-HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
-	{
-	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, in_, out_, err_ ) );
-	}
-
-HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
-	: _path( path_ ), _argv( argv_ ), _in( in_ ), _out( out_ ), _err( err_ )
-	{
-	}
-
-int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
-	{
-	/* Make a backup of original descriptors. */
-	int hStdIn = _dup( _fileno( stdin ) );
-	int hStdOut = _dup( _fileno( stdout ) );
-	int hStdErr = _dup( _fileno( stderr ) );
-
-	/* ensure backup went ok */
-	M_ENSURE( ( hStdIn >= 0 ) && ( hStdOut >= 0 ) && ( hStdErr >= 0 ) );
-
-	/* Overwrite *standard* descrptors with our communication pipe descriptors. */
-	M_ENSURE( _dup2( _in[0], _fileno( stdin ) ) == 0 );
-	M_ENSURE( _dup2( _out[1], _fileno( stdout ) ) == 0 );
-	M_ENSURE( _dup2( _err[1], _fileno( stderr ) ) == 0 );
-
-	char** argv = xcalloc<char*>( _argv.size() + 2 );
-	argv[ 0 ] = xstrdup( _path.raw() );
-	int i = 1;
-	for ( HPipedChild::argv_t::iterator it = _argv.begin(); it != _argv.end(); ++ it, ++ i )
-		argv[ i ] = xstrdup( it->raw() );
-	
-	int pid = spawnvp( P_NOWAIT, _path.raw(), argv );
-
-	/* Restore backed up standard descriptors. */
-	M_ENSURE( _dup2( hStdIn, _fileno( stdin ) ) == 0 );
-	M_ENSURE( _dup2( hStdOut, _fileno( stdout ) ) == 0 );
-	M_ENSURE( _dup2( hStdErr, _fileno( stderr ) ) == 0 );
-
-	/* Close backups. */
-	if ( TEMP_FAILURE_RETRY( ::close( hStdIn ) )
-		|| TEMP_FAILURE_RETRY( ::close( hStdOut ) )
-		|| TEMP_FAILURE_RETRY( ::close( hStdErr ) ) )
-		M_THROW( "close", errno );
-
-	for ( int  k = 0, size = _argv.size(); k < size; ++ k )
-		xfree( argv[ k ] );
-	xfree( argv );
-	return ( pid );
-	}

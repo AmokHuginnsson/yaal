@@ -59,7 +59,7 @@ inline int close( T const& fd_ )
 #include "tools/hpipedchild.hxx"
 
 #define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, fileDesIn, fileDesOut, fileDesErr )
-class M_YAAL_HCORE_PUBLIC_API HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn
+class HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn
 	{
 	int* _in;
 	int* _out;

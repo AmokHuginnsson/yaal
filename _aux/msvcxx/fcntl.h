@@ -5,8 +5,9 @@
 #include <glibc/fcntl.h>
 #undef fcntl
 
-int unix_fcntl( int, int, int );
-inline int fcntl( int fd_, int cmd_, int arg_ )
+int unix_fcntl( int, int, ... );
+template<typename arg_t>
+inline int fcntl( int fd_, int cmd_, arg_t arg_ )
 	{ return ( unix_fcntl( fd_, cmd_, arg_ ) ); }
 
 #endif /* not YAAL_MSVCXX_FCNTL_H_INCLUDED */
