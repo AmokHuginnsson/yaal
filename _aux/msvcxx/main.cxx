@@ -400,10 +400,10 @@ struct IO
 	HANDLE _h;
 	OVERLAPPED _o;
 	char _b;
-	bool _f; /* buffer has some data */
+	bool _s; /* io has been scheduled */
 	string _p;
 	IO( TYPE::type_t t_, HANDLE h_, HANDLE e_ = NULL, string const& p_ = string() )
-		: _t( t_ ), _h( h_ ), _o(), _b( 0 ), _f( false ), _p( p_ )
+		: _t( t_ ), _h( h_ ), _o(), _b( 0 ), _s( false ), _p( p_ )
 		{
 		_o.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
 		}
@@ -462,7 +462,7 @@ void sched_read( IO& io_ )
 	{
 	DWORD nRead( 0 );
 	::ReadFile( io_._h, &io_._b, 1, &nRead, &io_._o );
-	io_._f = ( nRead == 1 );
+	io_._s = true;
 	return;
 	}
 
@@ -507,12 +507,26 @@ int long unix_read( int const& fd_, void* buf_, int long size_ )
 	SystemIO& sysIo( SystemIO::get_instance() );
 	DWORD nRead( 0 );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	int off( ( io._f ? 1 : 0 ) );
-	bool ok( ::ReadFile( io._h, static_cast<char*>( buf_ ) + off, size_ - off, &nRead, &io._o ) ? true : false );
-	if ( ! ok )
-		log_windows_error( "ReadFile" );
-	io._f = false;
-	if ( size_ == ( nRead + off ) )
+	int off( 0 );
+	bool ok( false );
+	if ( io._s )
+		{
+		static_cast<char*>( buf_ )[0] = io._b;
+		io._s = false;
+		-- size_;
+		++ off;
+		ok = true;
+		}
+	if ( size_ > 0 )
+		{
+		ok = ::ReadFile( io._h, static_cast<char*>( buf_ ) + off, size_ - off, &nRead, &io._o ) ? true : false;
+		if ( ! ok )
+			log_windows_error( "ReadFile" );
+		ok = ::GetOverlappedResult( io._h, &io._o, &nRead, false ) ? true : false;
+		if ( ! ok )
+			log_windows_error( "GetOverlappedResult" );
+		}
+	if ( ! ( nRead + off ) && ( io._t != IO::TYPE::SOCKET ) )
 		sched_read( io );
 	return ( ok ? nRead + off : -1 );
 	}
@@ -531,9 +545,13 @@ struct OsCast
 	{
 	SystemIO& _sysIO;
 	OsCast() : _sysIO( SystemIO::get_instance() ) {}
-	HANDLE operator()( int id_ )
+	IO* operator()( int id_ )
 		{
-		return ( _sysIO.get_io( id_ ).second->_o.hEvent );
+		return ( _sysIO.get_io( id_ ).second.get() );
+		}
+	HANDLE operator()( IO* io_ )
+		{
+		return ( io_->_o.hEvent );
 		}
 	};
 
@@ -546,9 +564,11 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 		{
 		int count( ( readFds ? readFds->_count : 0 ) + ( writeFds ? writeFds->_count : 0 ) );
 		M_ENSURE( count <= MAXIMUM_WAIT_OBJECTS );
+		IO* ios[MAXIMUM_WAIT_OBJECTS];
 		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
-		std::transform( readFds->_data, readFds->_data + readFds->_count, handles, OsCast() );
-
+		OsCast osCast;
+		std::transform( readFds->_data, readFds->_data + readFds->_count, ios, osCast );
+		std::transform( ios, ios + readFds->_count, handles, osCast );
  		int up( ::WaitForMultipleObjects( readFds->_count, handles, false, miliseconds ) );
 		if ( up == WAIT_FAILED )
 			{
@@ -561,7 +581,15 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 				{
 				int upL( ::WaitForSingleObject( handles[ i ], 0 ) );
 				if ( ( i == ( up - WAIT_OBJECT_0 ) || ( upL == WAIT_OBJECT_0 ) ) )
+					{
 					++ ret;
+					DWORD nRead( 0 );
+					if ( ios[i]->_s )
+						{
+						if ( ! ( ::GetOverlappedResult( ios[i]->_h, &ios[i]->_o, &nRead, true ) || nRead ) )
+							log_windows_error( "GetOverlappedResult (scheduled)" );
+						}
+					}
 				else
 					readFds->_data[ i ] = -1;
 				}
@@ -605,6 +633,15 @@ int unix_getnameinfo( struct sockaddr const* sa_,
 	return ( getnameinfo( sa_, salen_, host_, hostlen_, serv_, servlen_, flags_ ) );
 	}
 
+int make_pipe_instance( IO& io_ )
+	{
+	io_._h = CreateNamedPipe( io_._p.c_str(),
+		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
+		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
+		PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL );
+	return ( io_._h != INVALID_HANDLE_VALUE ? 0 : -1 );
+	}
+
 int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 	{
 	int ret( -1 );
@@ -627,16 +664,8 @@ int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 			::CloseHandle( h );
 			n += path;
 			n.replace( "/", "\\" );
-			h = CreateNamedPipe( n.raw(),
-				PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
-				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
-				PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL );
-			}
-		if ( h != INVALID_HANDLE_VALUE )
-			{
-			io._h = h;
 			io._p = n.raw();
-			ret = 0;
+			ret = make_pipe_instance( io );
 			}
 		}
 	else
@@ -696,6 +725,14 @@ int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 		}
 	else
 		{
+		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE, io._h ) );
+		std::swap( io._o, np.second->_o );
+		ret = make_pipe_instance( io );
+		if ( ! ret )
+			{
+			ret = np.first;
+			sched_read( *( np.second ) );
+			}
 		}
 	return ( ret );
 	}

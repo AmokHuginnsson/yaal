@@ -196,7 +196,7 @@ void HSignalService::lock_on( int sigNo_ )
 	/*
 	 * FreeBSD does not wake sigwait on signal with installed
 	 * default hadlers with INGORE action.
-	 * FreeBSD does not wake sigwait even if one specify INGNORED
+	 * FreeBSD does not wake sigwait even if one specify IGNORED
 	 * signal as blocked.
 	 */
 	struct sigaction act;
