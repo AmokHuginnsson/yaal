@@ -360,7 +360,7 @@ AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 
 AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 LIBS="${HCORE_LIBS}"
-AC_CHECK_FUNCS([getline memrchr getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr strtold asprintf])
+AC_CHECK_FUNCS([getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr strtold asprintf])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
 AC_MSG_CHECKING([whether basename is declared in cstring])

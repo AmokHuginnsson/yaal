@@ -32,9 +32,9 @@ Copyright:
 #include <cmath>
 #endif /* not HAVE_POWL *//* not HAVE_DECL_FLOORL */
 
-#if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
+#if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 ) || ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 )
 #include <cstring>
-#endif /* not HAVE_MEMRCHR */
+#endif /* #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 ) || ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
 
 #if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 )
 #include <cstdio>
@@ -67,6 +67,14 @@ void* memrchr( void const* ptr, int what, int long from )
 	return ( from >= 0 ? const_cast<char*>( str + from ) : 0 );
 	}
 #endif /* not HAVE_MEMRCHR */
+
+#if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 )
+int long strnlen( char const* str_, int long maxLen_ )
+	{
+	char const* end( static_cast<char const*>( ::memchr( str_, 0, maxLen_ ) ) );
+	return ( end ? end - str_ : maxLen_ );
+	}
+#endif /* #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
 
 #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
 #include <cstring>

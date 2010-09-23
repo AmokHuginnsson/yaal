@@ -52,6 +52,10 @@ char* strcasestr( char const*, char const* );
 void* memrchr( void const*, int, int long );
 #endif /* not HAVE_MEMRCHR */
 
+#if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 )
+int long strnlen( char const*, int long );
+#endif /* #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
+
 #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 )
 #define SUN_LEN(x) ( ::std::strlen( x->sun_path ) + sizeof ( x->sun_family ) )
 #endif /* not HAVE_DECL_SUN_LEN */
