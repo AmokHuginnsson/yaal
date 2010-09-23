@@ -68,8 +68,8 @@ char const* const _errMsgHSocket_[ 4 ] =
 
 bool HSocket::_resolveHostnames = true;
 
-HSocket::HSocket( socket_type_t const socketType_,
-		int const maximumNumberOfClients_ )
+HSocket::HSocket( socket_type_t const& socketType_,
+		int const& maximumNumberOfClients_ )
 	: HRawFile( !!( socketType_ & TYPE::SSL_SERVER )
 			? HRawFile::TYPE::SSL_SERVER
 			: ( ( ( socketType_ == TYPE::DEFAULT ) || ( !!( socketType_ & TYPE::SSL_CLIENT ) ) )
@@ -156,7 +156,7 @@ int HSocket::do_close( void )
 	M_EPILOG
 	}
 
-void HSocket::shutdown_client( int fileDescriptor_ )
+void HSocket::shutdown_client( int const& fileDescriptor_ )
 	{
 	M_PROLOG
 	ptr_t client;
@@ -171,7 +171,7 @@ void HSocket::shutdown_client( int fileDescriptor_ )
 	M_EPILOG
 	}
 
-void HSocket::listen( yaal::hcore::HString const& address_, int const port_ )
+void HSocket::listen( yaal::hcore::HString const& address_, int const& port_ )
 	{
 	M_PROLOG
 	int reuseAddr = 1;
@@ -243,7 +243,7 @@ HSocket::ptr_t HSocket::accept( void )
 	M_EPILOG
 	}
 
-void HSocket::connect( yaal::hcore::HString const& address_, int const port_ )
+void HSocket::connect( yaal::hcore::HString const& address_, int const& port_ )
 	{
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
@@ -256,7 +256,7 @@ void HSocket::connect( yaal::hcore::HString const& address_, int const port_ )
 	M_EPILOG
 	}
 
-void HSocket::make_address( yaal::hcore::HString const& address_, int const port_ )
+void HSocket::make_address( yaal::hcore::HString const& address_, int const& port_ )
 	{
 	M_PROLOG
 	if ( !!( _type & TYPE::NETWORK ) )
@@ -316,7 +316,7 @@ int HSocket::get_port( void ) const
 	M_EPILOG
 	}
 
-HSocket::ptr_t HSocket::get_client( int const fileDescriptor_ ) const
+HSocket::ptr_t HSocket::get_client( int const& fileDescriptor_ ) const
 	{
 	M_PROLOG
 	ptr_t client;

@@ -82,15 +82,15 @@ protected:
 	clients_t* _clients;
 	HString _hostName;
 public:
-	HSocket( socket_type_t const = TYPE::DEFAULT, int const = 0 );
+	HSocket( socket_type_t const& = TYPE::DEFAULT, int const& = 0 );
 	virtual ~HSocket( void );
-	void listen( yaal::hcore::HString const&, int const = 0 );
+	void listen( yaal::hcore::HString const&, int const& = 0 );
 	ptr_t accept( void );
-	void connect( yaal::hcore::HString const&, int const = 0 );
+	void connect( yaal::hcore::HString const&, int const& = 0 );
 	int get_port( void ) const;
 	void shutdown( void );
-	void shutdown_client( int );
-	ptr_t get_client( int ) const;
+	void shutdown_client( int const& );
+	ptr_t get_client( int const& ) const;
 	clients_t::const_iterator begin( void ) const;
 	clients_t::const_iterator end( void ) const;
 	int long write_until_eos( HString const& );
@@ -98,7 +98,7 @@ public:
 	HString const& get_host_name( void );
 protected:
 	virtual int do_close( void );
-	void make_address( yaal::hcore::HString const&, int const );
+	void make_address( yaal::hcore::HString const&, int const& );
 private:
 	HSocket( HSocket const& );
 	HSocket& operator = ( HSocket const& );
