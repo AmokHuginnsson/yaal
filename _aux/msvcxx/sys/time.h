@@ -13,7 +13,6 @@
 #undef FD_SET
 #undef select
 
-
 struct fd_set
 	{
 	static int const MAXIMUM_FD_WAIT_OBJECTS = 64;

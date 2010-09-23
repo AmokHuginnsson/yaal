@@ -3,28 +3,12 @@
 #include <sstream>
 #define fd_set fd_set_win_off
 #include <ws2tcpip.h>
-#include <dbghelp.h>
-#include <process.h>
-#include <../include/sys/stat.h>
 #include <io.h>
 #include <../include/fcntl.h>
 
-#define pthread_sigmask pthread_sigmask_off
-#define execl execl_off
-#define execle execle_off
-#define execv execv_off
-#define execve execve_off
-#define execlp execlp_off
-#define execvp execvp_off
-#define gethostname gethostname_off
 #define timeval timeval_off
-#define access access_off
-#define lseek lseek_off
 #define dup dup_off
 #define dup2 dup2_off
-#define getpid getpid_off
-#define isatty isatty_off
-#define getpwuid_r getpwuid_r_off
 
 #undef fd_set
 #undef FD_SET
@@ -44,151 +28,20 @@
 #undef fd_set
 #undef FD_SET
 
-#include <unistd.h>
-#include <dirent.h>
-#include <pwd.h>
+#include <sys/time.h>
 #define _FCNTL_H 1
 #include <bits/fcntl.h>
 
-#undef getpwuid_r
-#undef gethostname
 #undef timeval
-#undef getpid
-#undef readdir_r
-#undef dirent
 
 #include "hcore/base.hxx"
-#include "hcore/xalloc.hxx"
+#include "hcore/hexception.hxx"
 #include "cleanup.hxx"
-#include "hcore/hthread.hxx"
-#include "hcore/hlog.hxx"
-#include "tools/hpipedchild.hxx"
-
-#include "cxxabi.h"
-
-#include "cleanup.hxx"
+#include "crit.hxx"
+#include "emu_unistd.hxx"
 
 using namespace std;
 using namespace yaal;
-using namespace yaal::hcore;
-using namespace yaal::tools;
-
-namespace abi
-{
-
-char* __cxa_demangle( char const* const a, int, int, int* )
-	{
-	char* buf = xcalloc<char>( 1024 );
-	UnDecorateSymbolName( a, buf, 1023, 0 );
-	return ( buf );
-	}
-
-}
-
-extern "C" int backtrace( void** buf_, int size_ )
-	{
-	return ( CaptureStackBackTrace( 0, std::min( size_, 63 ), buf_, NULL ) );
-	}
-
-extern "C" char** backtrace_symbols( void* const* buf_, int size_ )
-	{
-	char** strings = xcalloc<char*>( size_ );
-	for ( int i( 0 ); i < size_; ++ i )
-		strings[i] = reinterpret_cast<char*>( buf_[i] );
-	return ( strings );
-	}
-
-extern "C" void* dlopen( char const*, int );
-M_EXPORT_SYMBOL
-void* dlopen_fix( char const* name_, int flag_ )
-	{
-	HANDLE handle( 0 );
-	if ( ! name_ )
-		handle = GetModuleHandle( NULL );
-	else
-		handle = dlopen( name_, flag_ );
-	return ( handle );
-	}
-
-M_EXPORT_SYMBOL
-int unix_stat( char const* path_, struct stat* s_ )
-	{
-	string path( path_ );
-	int lastNonSeparator( static_cast<int>( path.find_last_not_of( "/\\" ) ) );
-	int len( path.length() );
-	if ( lastNonSeparator != string::npos )
-		path.erase( lastNonSeparator + 1 );
-	else
-		path.erase( 1 );
-	int res( stat( path.c_str(), s_ ) );
-	if ( ! res )
-		{
-		if ( ( len != path.length() ) && ! ( S_IFDIR & s_->st_mode ) )
-			{
-			res = -1;
-			errno = ENOTDIR;
-			}
-		}
-	return ( res );
-	}
-
-int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ )
-	{
-	dirent* result;
-	dirent broken;
-	int error( readdir_r( dir_, &broken, &result ) );
-	if ( ( ! error ) && result )
-		{
-		*result_ = reinterpret_cast<unix_dirent*>( result );
-		entry_->d_fileno = (*result_)->d_fileno;
-		entry_->d_type = (*result_)->d_type;
-		strncpy( entry_->d_name, (*result_)->d_name, NAME_MAX );
-		}
-	return ( error );
-	}
-
-extern "C"
-int getpwuid_r( uid_t, struct passwd* p, char* buf, int size, struct passwd** )
-	{
-	p->pw_name = buf;
-	DWORD s = size;
-	int err( ! GetUserName( buf, &s ) );
-	return ( err );
-	}
-
-int ms_gethostname( char* buf_, int len_ )
-	{
-	WSADATA wsaData;
-	WORD wVersionRequested( MAKEWORD( 2, 2 ) );
-	int err( WSAStartup( wVersionRequested, &wsaData ) );
-	return ( gethostname( buf_, len_ ) );
-	}
-
-int ESCDELAY = 0;
-
-M_EXPORT_SYMBOL
-char const* windows_strerror( int code_ )
-	{
-	static int const MAX_MSG_LEN( 512 );
-	static char msg[512];
-	char* p( msg );
-
-	FormatMessage(
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, code_, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-		p, MAX_MSG_LEN - 1, NULL );
-
-	return ( msg );
-	}
-
-void log_windows_error( char const* api_ )
-	{
-	int err( GetLastError() );
-	log << "ERROR: API = " << api_
-		<< ", code = " << err
-		<< ", message = " << windows_strerror( err ) << endl;
-	return;
-	}
 
 int get_socket_error( void )
 	{
@@ -302,19 +155,19 @@ public:
 private:
 	typedef stdext::hash_map<int, io_ptr_t> io_table_t;
 	io_table_t _ioTable;
-	HMutex _mutex;
+	CMutex _mutex;
 	int _idPool;
 public:
 	typedef io_table_t::value_type io_t;
 	io_t& create_io( IO::TYPE::type_t type_, HANDLE h_, HANDLE e_ = NULL, string const& p_ = string() )
 		{
-		HLock l( _mutex );
+		CLock l( _mutex );
 		HANDLE e(  );
 		return ( *( _ioTable.insert( std::make_pair( _idPool ++, io_ptr_t( new IO( type_, h_, e_, p_ ) ) ) ).first ) );
 		}
 	io_t& get_io( int id_ )
 		{
-		HLock l( _mutex );
+		CLock l( _mutex );
 		io_table_t::iterator i( _ioTable.find( id_ ) );
 		if ( i != _ioTable.end() )
 			return ( *i );
@@ -324,7 +177,7 @@ public:
 		}
 	void erase_io( int id_ )
 		{
-		HLock l( _mutex );
+		CLock l( _mutex );
 		_ioTable.erase( id_ );
 		}
 	static SystemIO& get_instance( void )
@@ -579,13 +432,13 @@ int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
                        CREATE_NEW,          // overwrite existing
                        FILE_ATTRIBUTE_NORMAL,  // normal file
                        NULL);                  // no attr. template
-		HString n( "\\\\.\\pipe" );
+		string n( "\\\\.\\pipe" );
 		if ( h != INVALID_HANDLE_VALUE )
 			{
 			::CloseHandle( h );
 			n += path;
-			n.replace( "/", "\\" );
-			io._path = n.raw();
+			replace( n.begin(), n.end(), '/', '\\' );
+			io._path = n;
 			ret = make_pipe_instance( io );
 			}
 		}
@@ -667,10 +520,10 @@ int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 	if ( addr_->sa_family == PF_UNIX )
 		{
 		char const* path( addr_->sa_data + 2 );
-		HString n( "\\\\.\\pipe" );
+		string n( "\\\\.\\pipe" );
 		n += path;
-		n.replace( "/", "\\" );
-		HANDLE h( ::CreateFile( n.raw(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0 ) );
+		replace( n.begin(), n.end(), '/', '\\' );
+		HANDLE h( ::CreateFile( n.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0 ) );
 		if ( h == INVALID_HANDLE_VALUE )
 			{
 			log_windows_error( "CreateNamedPipe" );
