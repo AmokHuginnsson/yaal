@@ -203,9 +203,40 @@ public:
 	 * \return self.
 	 */
 	HString& erase( int long position_, int long length_ = meta::max_signed<int long>::value );
-	HString& insert( int long, int long, char const* = NULL );
-	HString& insert( int long, char const* = NULL );
-	HString& insert( int long, char const*, int long );
+	/*! \brief Insert given string at given position.
+	 *
+	 * \param pos - position where given string has to be inserted.
+	 * \param str - string to be inserted.
+	 * \return self.
+	 */
+	HString& insert( int long pos, HString const& str );
+	/*! \brief Insert given string at given position.
+	 *
+	 * \param pos - position where given string has to be inserted.
+	 * \param len - lenght of string to be inserted.
+	 * \param str - string to be inserted.
+	 * \return self.
+	 *
+	 * \pre \e str real length must not be smaller than \e len.
+	 */
+	HString& insert( int long pos, int long len, char const* str = NULL );
+	/*! \brief Insert given string at given position.
+	 *
+	 * \param pos - position where given string has to be inserted.
+	 * \param str - string to be inserted.
+	 * \return self.
+	 */
+	HString& insert( int long pos, char const* str = NULL );
+	/*! \brief Insert given string at given position.
+	 *
+	 * \param pos - position where given string has to be inserted.
+	 * \param str - string to be inserted.
+	 * \param len - lenght of string to be inserted.
+	 * \return self.
+	 *
+	 * \pre \e str real length must not be smaller than \e len.
+	 */
+	HString& insert( int long pos, char const* str, int long len );
 	/*! \brief Insert n copies of value before given position.
 	 *
 	 * \param postition - where put inserted block.

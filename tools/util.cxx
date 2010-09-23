@@ -782,8 +782,9 @@ void decrypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInte
 				gap = readBuf[ nRead ];
 				M_ENSURE_EX( ( gap >= 0 ) && ( gap < 8 ) && ( toWrite > 0 ? ( gap <= toWrite ) : ( gap <= nRead ) ), "malformed gap" );
 				}
+			toWrite -= ( nRead > 0 ? 0 /* full blocks from previous read */ : gap /* only gap has been read */ );
 			if ( toWrite > 0 )
-				dst_.write( writeBuf, nRead > 0 ? toWrite /* full blocks from previous read */ : toWrite - gap /* only gap has been read */ );
+				dst_.write( writeBuf, toWrite );
 			toWrite = nRead;
 			M_ASSERT( ! ( toWrite % 8 ) );
 			if ( toWrite > 0 )

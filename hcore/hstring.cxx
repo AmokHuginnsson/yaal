@@ -872,6 +872,13 @@ HString& HString::erase( int long from_, int long length_ )
 	M_EPILOG
 	}
 
+HString& HString::insert( int long from_, HString const& str_ )
+	{
+	M_PROLOG
+	return ( insert( from_, str_.get_length(), str_.raw() ) );
+	M_EPILOG
+	}
+
 HString& HString::insert( int long from_, int long length_, char const* chunk_ )
 	{
 	M_PROLOG
