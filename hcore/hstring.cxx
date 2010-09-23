@@ -887,7 +887,7 @@ HString& HString::insert( int long from_, int long length_, char const* chunk_ )
 		length_ += from_;
 		if ( chunk_ )
 			{
-			if ( static_cast< ::std::size_t>( -from_ ) > ::std::strlen( chunk_ ) )
+			if ( static_cast< ::std::size_t>( -from_ ) > ::strnlen( chunk_, length_ ) )
 				M_THROW( "negative offset caused chunk overflow", from_ );
 			chunk_ += -from_;
 			}
@@ -895,7 +895,7 @@ HString& HString::insert( int long from_, int long length_, char const* chunk_ )
 		}
 	if ( ( length_ > 0 ) && ( from_ <= _size ) )
 		{
-		int long chunkLen = chunk_ ? static_cast<int long>( ::std::strlen( chunk_ ) ) : 0;
+		int long chunkLen = chunk_ ? static_cast<int long>( ::strnlen( chunk_, length_ ) ) : 0;
 		if ( chunk_ && ( length_ > chunkLen ) )
 			M_THROW( "length too big for this chunk (by)", length_ - chunkLen );
 		int long oldSize = _size;
