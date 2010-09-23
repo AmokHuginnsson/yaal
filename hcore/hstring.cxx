@@ -884,13 +884,13 @@ HString& HString::insert( int long from_, int long length_, char const* chunk_ )
 	M_PROLOG
 	if ( from_ < 0 )
 		{
-		length_ += from_;
 		if ( chunk_ )
 			{
 			if ( static_cast< ::std::size_t>( -from_ ) > ::strnlen( chunk_, length_ ) )
 				M_THROW( "negative offset caused chunk overflow", from_ );
 			chunk_ += -from_;
 			}
+		length_ += from_;
 		from_ = 0;
 		}
 	if ( ( length_ > 0 ) && ( from_ <= _size ) )
