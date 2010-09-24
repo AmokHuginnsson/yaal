@@ -36,6 +36,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hrawfile.hxx"
 #include "system.hxx"
 #include "hclock.hxx"
+#include "hlog.hxx"
 
 namespace yaal
 {
@@ -44,9 +45,10 @@ namespace hcore
 {
 
 char const* const _error_ = _( "file is not opened" );
+int long _writeTimeout_ = 4 * 1000; /* 4 seconds */
 
 HRawFile::HRawFile ( TYPE::raw_file_type_t type_ )
-	: _type( type_ ), _fileDescriptor( -1 ), _timeOut( 0 ), _sSL(),
+	: _type( type_ ), _fileDescriptor( -1 ), _timeout( _writeTimeout_ ), _sSL(),
 	reader( ( ( type_ & TYPE::SSL_SERVER )
 				|| ( type_ & TYPE::SSL_CLIENT ) ) ? &HRawFile::read_ssl_loader : &HRawFile::read_plain ),
 	writer( ( ( type_ & TYPE::SSL_SERVER )
@@ -164,10 +166,10 @@ int long HRawFile::write_plain( void const* const buffer_, int long const& size_
 	if ( _fileDescriptor < 0 )
 		M_THROW( _error_, errno );
 	int long iWritten = 0;
-	int long timeOut( _timeOut );
+	int long timeOut( _timeout );
 	do
 		{
-		if ( ( _timeOut > 0 ) && wait_for( ACTION::WRITE, &timeOut ) )
+		if ( ( _timeout > 0 ) && wait_for( ACTION::WRITE, &timeOut ) )
 			throw HStreamInterfaceException( _( "timeout on write" ) );
 		int long ret = TEMP_FAILURE_RETRY( ::write( _fileDescriptor,
 					static_cast<char const* const>( buffer_ ) + iWritten,
@@ -194,7 +196,7 @@ int long HRawFile::write_ssl( void const* const buffer_, int long const& size_ )
 	int long nWritten = 0;
 	do
 		{
-		if ( _timeOut  && ( clk.get_time_elapsed() > _timeOut ) )
+		if ( _timeout  && ( clk.get_time_elapsed() > _timeout ) )
 			throw HStreamInterfaceException( _( "timeout on write" ) );
 		int long ret = _sSL->write( static_cast<char const* const>( buffer_ ) + nWritten, size_ );
 		if ( ! ret )
@@ -232,9 +234,11 @@ void HRawFile::do_flush( void ) const
 	{
 	}
 
-void HRawFile::set_timeout( int timeout_ )
+void HRawFile::set_timeout( int long const& timeout_ )
 	{
-	_timeOut = timeout_;
+	_timeout = timeout_;
+	if ( _timeout < LOW_TIMEOUT_WARNING )
+		log( LOG_TYPE::WARNING ) << "Low timout for write operations!" << endl;
 	return;
 	}
 

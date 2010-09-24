@@ -47,7 +47,7 @@ namespace tools
 
 static int const LOW_LATENCY_WARNING = 100; 
 
-HIODispatcher::HIODispatcher( int noFileHandlers_, int latency_ )
+HIODispatcher::HIODispatcher( int const& noFileHandlers_, int long const& latency_ )
 	: _initialised( false ), _loop( true ), _idleCycles( 0 ),
 	_latency( latency_ ),
 	_select( chunk_size<int>( noFileHandlers_ ) * 2 ), /* * 2 because 1 for readers and 1 for writters */

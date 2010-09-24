@@ -36,6 +36,12 @@
 # LOG_DEBUG, LOG_INFO, LOG_NOTICE, LOG_WARNING, LOG_ERROR, LOG_VCSHEADER
 log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_VCSHEADER
 
+# write_timeout
+# type: integer, dafault 4000
+# write_timeout specifies how long non-blocking write operations should wait
+# before they fail with timeout in case operation did not succeeded in given time.
+write_timeout 4000
+
 # resolve_hostnames
 # type: bool, default true
 # resolve_hostnames switch enables/disables resolving IP address into host names.

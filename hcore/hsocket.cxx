@@ -234,7 +234,7 @@ HSocket::ptr_t HSocket::accept( void )
 		}
 	socket->_addressSize = addressSize;
 	socket->_needShutdown = true;
-	socket->set_timeout( _timeOut );
+	socket->set_timeout( _timeout );
 	::memcpy( socket->_address, address, addressSize );
 	if ( _clients->find( fileDescriptor ) != _clients->end() )
 		M_THROW( _( "inconsitent client list state" ), fileDescriptor );

@@ -74,17 +74,21 @@ protected:
 		};
 	TYPE::raw_file_type_t _type;
 	file_descriptor_t _fileDescriptor; /* raw file descriptor of the file */
-	int _timeOut;
+	int long _timeout;
 	HOpenSSL::ptr_t _sSL;
+	READER_t reader;
+	WRITER_t writer;
+	CLOSER_t closer;
 public:
 	HRawFile( TYPE::raw_file_type_t = TYPE::DEFAULT );
 	virtual ~HRawFile( void );
 	int close( void );
 	file_descriptor_t get_file_descriptor( void ) const;
-	READER_t reader;
-	WRITER_t writer;
-	CLOSER_t closer;
-	void set_timeout( int );
+	/*! \brief Set write timeout for this raw file.
+	 *
+	 * \param timeout - a new timeout value in miliseconds.
+	 */
+	void set_timeout( int long const& timeout );
 protected:
 	virtual int do_close( void );
 	int close_plain( void );
@@ -103,6 +107,9 @@ protected:
 	};
 
 typedef HExceptionT<HRawFile, HStreamInterfaceException> HRawFileException;
+
+static int const LOW_TIMEOUT_WARNING = 100; /* miliseconds */
+extern int long _writeTimeout_;
 
 }
 

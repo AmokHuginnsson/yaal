@@ -211,6 +211,10 @@ void HLog::timestamp( void )
 		_file::ref() << buffer << " " << _loginName << "@" << _hostName.get<char>() << "->" << _processName << ": ";
 	else
 		_file::ref() << buffer << " " << _loginName << "@" << _hostName.get<char>() << ": ";
+	if ( _type & LOG_TYPE::WARNING )
+		_file::ref() << "(WARNING) ";
+	else if ( _type & LOG_TYPE::ERROR )
+		_file::ref() << "(ERROR) ";
 	return;
 	M_EPILOG
 	}

@@ -64,7 +64,7 @@ private:
 	bool _initialised;					/*!<< did process has necessery initialisation */
 	bool _loop; 								/*!<< indicates if main loop continues */
 	int _idleCycles;					/*!<< full select()'s without io activity */
-	int _latency;			/*!<< timeout between recall (miliseconds) */
+	int long _latency;			/*!<< timeout between recall (miliseconds) */
 	yaal::hcore::HChunk _select;
 	io_handlers_t _readers;
 	io_handlers_t _writers;
@@ -75,7 +75,12 @@ private:
 	yaal::hcore::HPipe _event;
 	yaal::hcore::HMutex _mutex;
 public:
-	HIODispatcher( int, int );
+	/*! \brief Create new io-dispatcher object.
+	 *
+	 * \param initialFdBuckets - initial number of file descriptor buckets.
+	 * \param latency - how long should dispatcher sleep during select, between invoking idle actions.
+	 */
+	HIODispatcher( int const& initialFdBuckets, int long const& latency );
 	virtual ~HIODispatcher( void );
 	int run( void );
 	void stop( void );
