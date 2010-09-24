@@ -91,9 +91,9 @@ public:
 	HIterator operator -- ( int );
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
-	yaal::hcore::HString operator[] ( int const& ) const;
+	yaal::hcore::HString operator[] ( int ) const;
 private:
-	HIterator( HRecordSet*, int long const& );
+	HIterator( HRecordSet*, int long );
 	friend class HRecordSet;
 	};
 

@@ -61,14 +61,14 @@ int HPipe::get_reader_fd( void ) const
 	return ( _pipe[ 0 ] );
 	}
 
-int long HPipe::do_read( void* const buffer_, int long const& size_ )
+int long HPipe::do_read( void* const buffer_, int long size_ )
 	{
 	M_PROLOG
 	return ( ::read( _pipe[ 0 ], buffer_, size_ ) );
 	M_EPILOG
 	}
 
-int long HPipe::do_write( void const* const buffer_, int long const& size_ )
+int long HPipe::do_write( void const* const buffer_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _pipe[1] >= 0 );

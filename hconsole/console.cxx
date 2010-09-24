@@ -324,7 +324,7 @@ void HConsole::set_attr( int attr_ ) const
 	M_EPILOG
 	}
 
-int HConsole::c_move( int const& row_, int const& column_ )
+int HConsole::c_move( int row_, int column_ )
 	{
 	return ( ::move( row_, column_ ) );
 	}
@@ -339,7 +339,7 @@ CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &cursor_ ) const
 	return ( CURSOR::INVISIBLE );
 	}
 
-int HConsole::c_addch( int const& char_ )
+int HConsole::c_addch( int char_ )
 	{
 	return ( ::addch( char_ ) );
 	}
@@ -375,12 +375,12 @@ void HConsole::c_clrtoeol( void )
 	return;
 	}
 
-int const& HConsole::get_height( void ) const
+int HConsole::get_height( void ) const
 	{
 	return ( _height );
 	}
 
-int const& HConsole::get_width( void ) const
+int HConsole::get_width( void ) const
 	{
 	return ( _width );
 	}

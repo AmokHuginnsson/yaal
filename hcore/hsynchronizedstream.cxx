@@ -80,7 +80,7 @@ HStreamInterface& HSynchronizedStream::do_output( HString const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( char const* const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( char const* val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -88,7 +88,7 @@ HStreamInterface& HSynchronizedStream::do_output( char const* const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( char const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( bool val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -96,7 +96,7 @@ HStreamInterface& HSynchronizedStream::do_output( char const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( int short const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( char val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -104,7 +104,7 @@ HStreamInterface& HSynchronizedStream::do_output( int short const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( int short unsigned const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( char unsigned val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -112,7 +112,7 @@ HStreamInterface& HSynchronizedStream::do_output( int short unsigned const& val_
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( int const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( int short val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -120,7 +120,7 @@ HStreamInterface& HSynchronizedStream::do_output( int const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( int unsigned const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( int short unsigned val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -128,7 +128,7 @@ HStreamInterface& HSynchronizedStream::do_output( int unsigned const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( int long const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( int val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -136,7 +136,7 @@ HStreamInterface& HSynchronizedStream::do_output( int long const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( int long unsigned const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( int unsigned val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -144,7 +144,7 @@ HStreamInterface& HSynchronizedStream::do_output( int long unsigned const& val_ 
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( double const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( int long val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -152,7 +152,7 @@ HStreamInterface& HSynchronizedStream::do_output( double const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( double long const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( int long unsigned val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -160,7 +160,7 @@ HStreamInterface& HSynchronizedStream::do_output( double long const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( float const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( double val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -168,7 +168,23 @@ HStreamInterface& HSynchronizedStream::do_output( float const& val_ )
 	M_EPILOG
 	}
 
-HStreamInterface& HSynchronizedStream::do_output( void const* const& val_ )
+HStreamInterface& HSynchronizedStream::do_output( double long val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_output( val_ ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HSynchronizedStream::do_output( float val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_output( val_ ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HSynchronizedStream::do_output( void const* val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -200,7 +216,23 @@ HStreamInterface& HSynchronizedStream::do_input( HString& val_ )
 	M_EPILOG
 	}
 
+HStreamInterface& HSynchronizedStream::do_input( bool& val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_input( val_ ) );
+	M_EPILOG
+	}
+
 HStreamInterface& HSynchronizedStream::do_input( char& val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_input( val_ ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HSynchronizedStream::do_input( char unsigned& val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -296,7 +328,7 @@ int long HSynchronizedStream::do_read_until( yaal::hcore::HString& store, char c
 	M_EPILOG
 	}
 
-int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int long const& maxcount, char const* const delim = eols, bool strip = true )
+int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int long maxcount, char const* const delim = eols, bool strip = true )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -328,14 +360,14 @@ HStreamInterface& HSynchronizedStream::do_set_base( BASES::enum_t val_ )
 	M_EPILOG
 	}
 
-int long HSynchronizedStream::do_write( void const* const buf_, int long const& size_ )
+int long HSynchronizedStream::do_write( void const* const buf_, int long size_ )
 	{
 	M_PROLOG
 	return ( _streamRef ? _streamRef->write( buf_, size_ ) : 0 );
 	M_EPILOG
 	}
 
-int long HSynchronizedStream::do_read( void* const buf_, int long const& size_ )
+int long HSynchronizedStream::do_read( void* const buf_, int long size_ )
 	{
 	M_PROLOG
 	return ( _streamRef ? _streamRef->read( buf_, size_ ) : 0 );

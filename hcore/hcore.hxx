@@ -43,7 +43,7 @@ namespace hcore
 {
 
 HProgramOptionsHandler& yaal_options( void );
-bool eq( double long const&, double long const& );
+bool eq( double long, double long );
 void set_env( HString const&, HString const&, bool = true );
 void decode_set_env( HString );
 void init_locale( char const* const = NULL );

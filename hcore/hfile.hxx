@@ -114,14 +114,14 @@ public:
 	void* release( void );
 	int long read_line( HString&, read_t const& = READ::DEFAULTS, int const = 0 );
 	int long tell( void ) const;
-	void seek( int long const&, seek_t const& = SEEK::SET );
+	void seek( int long, seek_t const& = SEEK::SET );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	bool operator ! ( void ) const;
 private:
-	virtual int long do_write( void const* const, int long const& );
+	virtual int long do_write( void const* const, int long );
 	virtual void do_flush( void ) const;
-	virtual int long do_read( void* const, int long const& );
+	virtual int long do_read( void* const, int long );
 	virtual bool do_is_valid( void ) const;
 	int long get_line_length( void );
 	HFile( HFile const& );

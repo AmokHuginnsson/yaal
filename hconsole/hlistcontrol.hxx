@@ -349,9 +349,9 @@ public:
 								 int,						/* width */
 								 char const*, list_control_helper::HAbstractControler::ptr_t const& = list_control_helper::HListControler<>::ptr_t( new list_control_helper::HListControler<>( list_control_helper::HListControler<>::model_ptr_t( new list_control_helper::HListControler<>::model_t() ) ) ) );	/* label */
 	virtual ~HListControl ( void );
-	void add_column( int const&,									/* at position */
+	void add_column( int,									/* at position */
 			char const*,									/* column name */
-			int const&,									/* width */
+			int,									/* width */
 			BITS::ALIGN::align_t const& = BITS::ALIGN::LEFT,		/* align */
 			const type_t& = TYPE::HSTRING,	/* type */
 			HControl * = NULL );					/* control associated */

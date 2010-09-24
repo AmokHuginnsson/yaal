@@ -53,7 +53,7 @@ int kill( int, int );
  * \param restartable_ - should wait be automatically restarted after interrupt from signal.
  * \return number of signaled events.
  */
-int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& outputCount_, int long* timeOut_, bool restartable_ = true );
+int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ = true );
 
 }
 

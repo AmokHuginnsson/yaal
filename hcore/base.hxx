@@ -70,7 +70,7 @@ to_t lexical_cast( from_t const& val );
  * \param code - error code to describe.
  * \return Message string describing error of given error code.
  */
-char const* error_message( int const& code );
+char const* error_message( int code );
 
 /*! \brief The crudest way of casting between types.
  *

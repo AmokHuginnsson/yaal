@@ -96,7 +96,7 @@ void HBitmap::clear( void )
 	return;
 	}
 
-HBitmap::HBitmap( int long const& size_ )
+HBitmap::HBitmap( int long size_ )
 	: _allocatedBytes( 0 ), _size( 0 ), _data( NULL )
 	{
 	M_PROLOG
@@ -138,7 +138,7 @@ HBitmap& HBitmap::operator = ( HBitmap const& b )
 	M_EPILOG
 	}
 
-void HBitmap::use( void* block_, int long const& size_ )
+void HBitmap::use( void* block_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( size_ > 0 );
@@ -149,7 +149,7 @@ void HBitmap::use( void* block_, int long const& size_ )
 	M_EPILOG
 	}
 
-void HBitmap::copy( void const* block_, int long const& size_ )
+void HBitmap::copy( void const* block_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( size_ > 0 );
@@ -170,7 +170,7 @@ void const* HBitmap::block( void ) const
 	return ( _allocatedBytes ? static_cast<HChunk*>( _data )->raw() : _data );
 	}
 
-void HBitmap::ensure_pool( int long const& newSize )
+void HBitmap::ensure_pool( int long newSize )
 	{
 	M_PROLOG
 	_size = newSize;
@@ -185,7 +185,7 @@ void HBitmap::ensure_pool( int long const& newSize )
 	M_EPILOG
 	}
 
-void HBitmap::push_back( bool const& bit )
+void HBitmap::push_back( bool bit )
 	{
 	M_PROLOG
 	M_ASSERT( _allocatedBytes || ! _data );
@@ -194,12 +194,12 @@ void HBitmap::push_back( bool const& bit )
 	M_EPILOG
 	}
 
-int long HBitmap::octets_for_bits( int long const& bits ) const
+int long HBitmap::octets_for_bits( int long bits ) const
 	{
 	return ( ( ( bits >> 3 ) + ( ( bits & 7 ) ? 1 : 0 ) ) );
 	}
 
-void HBitmap::fill( bool const& bit )
+void HBitmap::fill( bool bit )
 	{
 	M_PROLOG
 	fill( 0, _size, bit );
@@ -231,7 +231,7 @@ u8_t _maskBitKeepRight_[ 8 ] =
 	obinary<000000001>::value
 	};
 
-void HBitmap::fill( int long const& offset, int long const& amount, bool const& bit )
+void HBitmap::fill( int long offset, int long amount, bool bit )
 	{
 	M_PROLOG
 	int long byteOffset = octets_for_bits( offset );
@@ -259,7 +259,7 @@ void HBitmap::fill( int long const& offset, int long const& amount, bool const& 
 	M_EPILOG
 	}
 
-void HBitmap::reserve( int long const& size_ )
+void HBitmap::reserve( int long size_ )
 	{
 	M_PROLOG
 	ensure_pool( size_ );
@@ -452,7 +452,7 @@ u8_t _maskBitClearByte_[ 8 ] =
 	};
 
 
-bool HBitmap::get( int long const& number_ ) const
+bool HBitmap::get( int long number_ ) const
 	{
 	M_PROLOG
 	M_ASSERT( number_ >= 0 );
@@ -467,7 +467,7 @@ bool HBitmap::get( int long const& number_ ) const
 	M_EPILOG
 	}
 	
-void HBitmap::set( int long const& number_, bool const& state_ )
+void HBitmap::set( int long number_, bool state_ )
 	{
 	M_PROLOG
 	M_ASSERT( number_ >= 0 );
@@ -489,8 +489,8 @@ void HBitmap::set( int long const& number_, bool const& state_ )
 	M_EPILOG
 	}
 	
-void HBitmap::rotate_right( int long const& start_,
-		int long const& len_, int long const& val_ )
+void HBitmap::rotate_right( int long start_,
+		int long len_, int long val_ )
 	{
 	M_ASSERT( ( val_ > 0 ) && ( val_ < len_ ) && ( start_ >= 0 ) && ( len_ > 0 ) );
 	int long byteCount = ( len_ + start_ ) / 8;
@@ -502,8 +502,8 @@ void HBitmap::rotate_right( int long const& start_,
 	return ;
 	}
 	
-void HBitmap::rotate_left( int long const& start_,
-		int long const& len_, int long const& val_ )
+void HBitmap::rotate_left( int long start_,
+		int long len_, int long val_ )
 	{
 	M_ASSERT( ( val_ > 0 ) && ( val_ < len_ ) && ( start_ >= 0 ) && ( len_ > 0 ) );
 	int long byteCount = ( len_ + start_ ) / 8;
@@ -520,7 +520,7 @@ HBitmap::const_iterator HBitmap::begin( void ) const
 	return ( const_iterator( this, 0 ) );
 	}
 
-HBitmap::const_iterator HBitmap::find( int long const& idx ) const
+HBitmap::const_iterator HBitmap::find( int long idx ) const
 	{
 	M_ASSERT( ( idx >= 0 ) && ( idx < _size ) );
 	return ( const_iterator( this, idx ) );
@@ -546,7 +546,7 @@ HBitmap::iterator HBitmap::begin( void )
 	return ( iterator( this, 0 ) );
 	}
 
-HBitmap::iterator HBitmap::find( int long const& idx )
+HBitmap::iterator HBitmap::find( int long idx )
 	{
 	M_ASSERT( ( idx >= 0 ) && ( idx < _size ) );
 	return ( iterator( this, idx ) );
@@ -567,7 +567,7 @@ HBitmap::iterator HBitmap::rend( void )
 	return ( iterator( this, -1 ) );
 	}
 
-HBitmap::HBit::HBit( HBitmap* owner_, int long const& idx )
+HBitmap::HBit::HBit( HBitmap* owner_, int long idx )
 	: _owner( owner_ ), _index( idx )
 	{
 	}
@@ -587,12 +587,12 @@ HBitmap::HBit& HBitmap::HBit::operator = ( HBitmap::HBit const& bit )
 	return ( *this );
 	}
 
-bool HBitmap::HBit::operator == ( bool const& bit ) const
+bool HBitmap::HBit::operator == ( bool bit ) const
 	{
 	return ( _owner->get( _index ) == bit );
 	}
 
-bool HBitmap::HBit::operator != ( bool const& bit ) const
+bool HBitmap::HBit::operator != ( bool bit ) const
 	{
 	return ( _owner->get( _index ) != bit );
 	}
@@ -602,7 +602,7 @@ HBitmap::HBit::operator bool ( void ) const
 	return ( _owner->get( _index ) );
 	}
 
-HBitmap::HBit& HBitmap::HBit::operator = ( bool const& bit )
+HBitmap::HBit& HBitmap::HBit::operator = ( bool bit )
 	{
 	_owner->set( _index, bit );
 	return ( *this );

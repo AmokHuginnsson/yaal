@@ -276,7 +276,7 @@ int HLog::operator() ( int long const type_,
 	M_EPILOG
 	}
 
-HLog& HLog::operator() ( int long const& type_ )
+HLog& HLog::operator() ( int long type_ )
 	{
 	M_PROLOG
 	_type = type_;
@@ -284,7 +284,7 @@ HLog& HLog::operator() ( int long const& type_ )
 	M_EPILOG
 	}
 
-HLog& HLog::filter( int long const& type_ )
+HLog& HLog::filter( int long type_ )
 	{
 	M_PROLOG
 	_type = type_;
@@ -292,7 +292,7 @@ HLog& HLog::filter( int long const& type_ )
 	M_EPILOG
 	}
 
-int long HLog::do_write( void const* const string_, int long const& size_ )
+int long HLog::do_write( void const* const string_, int long size_ )
 	{
 	M_PROLOG
 	if ( ! string_ )
@@ -318,7 +318,7 @@ void HLog::do_flush( void ) const
 	M_EPILOG
 	}
 
-int long HLog::do_read( void* const, int long const& )
+int long HLog::do_read( void* const, int long )
 	{
 	return ( 0 );
 	}

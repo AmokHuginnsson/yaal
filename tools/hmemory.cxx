@@ -38,7 +38,7 @@ namespace yaal
 namespace tools
 {
 
-HMemory::HMemory( void* ptr, int long const& size_, INITIAL_STATE::enum_t const& initialState_ )
+HMemory::HMemory( void* ptr, int long size_, INITIAL_STATE::enum_t initialState_ )
 	: _block( ptr ), _size( size_ ),
 	_valid( initialState_ == INITIAL_STATE::AUTO ? -1 : ( initialState_ == INITIAL_STATE::VALID ? size_ : 0 ) ),
 	_cursorRead( 0 ), _cursorWrite( 0 )
@@ -60,7 +60,7 @@ bool HMemory::operator == ( HMemory const& other ) const
 	M_EPILOG
 	}
 
-int long HMemory::do_write( void const* const src_, int long const& size_ )
+int long HMemory::do_write( void const* const src_, int long size_ )
 	{
 	M_PROLOG
 	if ( _valid == -1 ) /* First data access. */
@@ -90,7 +90,7 @@ void HMemory::do_flush( void ) const
 	return;
 	}
 
-int long HMemory::do_read( void* const dest_, int long const& size_ )
+int long HMemory::do_read( void* const dest_, int long size_ )
 	{
 	M_PROLOG
 	if ( _valid == -1 ) /* First data access. */

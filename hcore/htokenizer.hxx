@@ -63,7 +63,7 @@ public:
 	HTokenizer( HString const&, HString const&, behavoir_t const& = INCLUDE_EMPTY );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
-	HString const& operator[] ( int long const& ) const;
+	HString const& operator[] ( int long ) const;
 private:
 	friend class HIterator;
 	};
@@ -83,7 +83,7 @@ public:
 	bool operator != ( HIterator const& ) const;
 	HIterator& operator ++ ( void );
 private:
-	HIterator( HTokenizer const*, int long const& );
+	HIterator( HTokenizer const*, int long );
 	friend class HTokenizer;
 	};
 

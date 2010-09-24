@@ -161,7 +161,7 @@ public:
 	template<OListBits::treatment_t const treatment, typename iterator_t>
 	void insert( HIterator<type_t, treatment> const&, iterator_t, iterator_t );
 	template<OListBits::treatment_t const treatment>
-	void insert( HIterator<type_t, treatment> const&, int long const&, type_t const& );
+	void insert( HIterator<type_t, treatment> const&, int long, type_t const& );
 	/*! \brief Adds new element at beggining of the list
 	 *
 	 * Newly created element will have default value.
@@ -732,7 +732,7 @@ typename OListBits::iterator<type_t, treatment>::type HList<type_t>::insert( HIt
 template<typename type_t>
 template<OListBits::treatment_t const treatment>
 void HList<type_t>::insert( HIterator<type_t, treatment> const& it,
-		int long const& count_, type_t const& val )
+		int long count_, type_t const& val )
 	{
 	M_PROLOG
 	for ( int long i = 0; i < count_; ++ i )

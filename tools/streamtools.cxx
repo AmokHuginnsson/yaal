@@ -49,7 +49,7 @@ HStreamInterface& HBinaryFormatter::operator << ( HStreamInterface::manipulator_
 	M_EPILOG
 	}
 
-HBinaryFormatter& HBinaryFormatter::binary( void const* buf_, int const& size_ )
+HBinaryFormatter& HBinaryFormatter::binary( void const* buf_, int size_ )
 	{
 	M_PROLOG
 	int const mask[] = { 128, 64, 32, 16, 8, 4, 2, 1 };

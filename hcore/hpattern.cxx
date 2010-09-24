@@ -292,7 +292,7 @@ HPattern::HMatchIterator HPattern::end( void ) const
 	return ( HMatchIterator( this, NULL, 0 ) );
 	}
 
-HPattern::HMatch::HMatch( char const* const& start_, int long const& size_ )
+HPattern::HMatch::HMatch( char const* start_, int long size_ )
 	: _size( size_ ), _start( start_ )
 	{
 	}
@@ -307,7 +307,7 @@ char const* HPattern::HMatch::raw( void ) const
 	return ( _start );
 	}
 
-HPattern::HMatchIterator::HMatchIterator( HPattern const* owner_, char const* const start_, int long const& len_ )
+HPattern::HMatchIterator::HMatchIterator( HPattern const* owner_, char const* const start_, int long len_ )
 	: _owner( owner_ ), _match( start_, len_ )
 	{
 	}

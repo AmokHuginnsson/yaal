@@ -102,8 +102,8 @@ public:
 	value_type operator ! ( void ) const;
 	bool operator == ( HMatrix const & ) const;
 	bool operator != ( HMatrix const & ) const;
-	row_t& operator[] ( int const& );
-	row_t const& operator[] ( int const& ) const;
+	row_t& operator[] ( int );
+	row_t const& operator[] ( int ) const;
 	template<typename ttType>
 	friend HVector<ttType> operator * ( HVector<ttType> const&,
 			HMatrix const& );
@@ -367,7 +367,7 @@ HMatrix<value_type>& HMatrix<value_type>::operator = ( HMatrix const& matrix_ )
 	}
 
 template<typename value_type>
-typename HMatrix<value_type>::row_t& HMatrix<value_type>::operator[] ( int const& idx )
+typename HMatrix<value_type>::row_t& HMatrix<value_type>::operator[] ( int idx )
 	{
 	M_PROLOG
 	return ( _data[ idx ] );
@@ -375,7 +375,7 @@ typename HMatrix<value_type>::row_t& HMatrix<value_type>::operator[] ( int const
 	}
 
 template<typename value_type>
-typename HMatrix<value_type>::row_t const& HMatrix<value_type>::operator[] ( int const& idx ) const
+typename HMatrix<value_type>::row_t const& HMatrix<value_type>::operator[] ( int idx ) const
 	{
 	M_PROLOG
 	return ( _data[ idx ] );

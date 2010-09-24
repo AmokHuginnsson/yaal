@@ -68,7 +68,7 @@ yaal::hcore::HString const& HStringStream::string( void ) const
 	return ( _buffer );
 	}
 
-int long HStringStream::do_write( void const* const buffer_, int long const& size_ )
+int long HStringStream::do_write( void const* const buffer_, int long size_ )
 	{
 	M_PROLOG
 	if ( _used )
@@ -88,7 +88,7 @@ void HStringStream::do_flush( void ) const
 	M_EPILOG
 	}
 
-int long HStringStream::do_read( void* const buffer_, int long const& size_ )
+int long HStringStream::do_read( void* const buffer_, int long size_ )
 	{
 	M_PROLOG
 	int long length = yaal::min( _buffer.get_length() - _offset, size_ );

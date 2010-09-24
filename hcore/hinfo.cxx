@@ -43,7 +43,7 @@ HInfo::HInfo( void )
 	M_EPILOG
 	}
 
-HInfo::HInfo( int const& int_ )
+HInfo::HInfo( int int_ )
 	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
 	{
 	M_PROLOG
@@ -53,7 +53,7 @@ HInfo::HInfo( int const& int_ )
 	M_EPILOG
 	}
 
-HInfo::HInfo( int long const& longInt_ )
+HInfo::HInfo( int long longInt_ )
 	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
 	{
 	M_PROLOG
@@ -63,7 +63,7 @@ HInfo::HInfo( int long const& longInt_ )
 	M_EPILOG
 	}
 
-HInfo::HInfo ( double const& double_ )
+HInfo::HInfo ( double double_ )
 	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
 	{
 	M_PROLOG

@@ -58,7 +58,7 @@ enum
 char * strrnpbrk( char const* const, char const* const,
 		int long /* no const - used */ );
 int long strrnspn( char const* const, char const* const, int long const );
-int long kmpsearch( char const* const, int long const&, char const* const, int long const& );
+int long kmpsearch( char const* const, int long, char const* const, int long );
 }
 
 char const _whiteSpace_[] = "\a\b \t\v\f\r\n";
@@ -709,7 +709,7 @@ HString& HString::reverse( void )
 	M_EPILOG
 	}
 
-HString HString::left( int long const& to_ ) const
+HString HString::left( int long to_ ) const
 	{
 	M_PROLOG
 	HString str;
@@ -741,7 +741,7 @@ HString HString::mid( int long from_, int long length_ ) const
 	M_EPILOG
 	}
 
-HString HString::right( int long const& fromEnd_ ) const
+HString HString::right( int long fromEnd_ ) const
 	{
 	M_PROLOG
 	HString str;
@@ -787,7 +787,7 @@ HString& HString::trim_right( char const* const set_ )
 	M_EPILOG
 	}
 
-HString& HString::shift_left( int long const& shift_ )
+HString& HString::shift_left( int long shift_ )
 	{
 	M_PROLOG
 	if ( shift_ < 0 )
@@ -809,7 +809,7 @@ HString& HString::shift_left( int long const& shift_ )
 	M_EPILOG
 	}
 
-HString& HString::shift_right( int long const& shift_, char const filler_ )
+HString& HString::shift_right( int long shift_, char const filler_ )
 	{
 	M_PROLOG
 	if ( shift_ < 0 )
@@ -923,7 +923,7 @@ HString& HString::insert( int long from_, char const* chunk_, int long length_ )
 	M_EPILOG
 	}
 
-HString& HString::insert( int long from_, int long length_, char const& char_ )
+HString& HString::insert( int long from_, int long length_, char char_ )
 	{
 	M_PROLOG
 	insert( from_, length_ );
@@ -938,7 +938,7 @@ HString& HString::append( HString const& str_ )
 	M_EPILOG
 	}
 
-HString& HString::append( HString const& str_, int long const& idx_, int long const& len_ )
+HString& HString::append( HString const& str_, int long idx_, int long len_ )
 	{
 	M_PROLOG
 	M_ENSURE( len_ >= 0 );
@@ -949,7 +949,7 @@ HString& HString::append( HString const& str_, int long const& idx_, int long co
 	M_EPILOG
 	}
 
-HString& HString::append( int long const& count_, char const& val_ )
+HString& HString::append( int long count_, char val_ )
 	{
 	M_PROLOG
 	int long oldSize( _size );
@@ -961,7 +961,7 @@ HString& HString::append( int long const& count_, char const& val_ )
 	M_EPILOG
 	}
 
-HString& HString::append( char const* const buf_, int long const& len_ )
+HString& HString::append( char const* const buf_, int long len_ )
 	{
 	M_PROLOG
 	M_ASSERT( len_ >= 0 );
@@ -1029,7 +1029,7 @@ int long strrnspn( char const* const buffer_, char const* const skipSet_,
 	M_EPILOG
 	}
 
-int long kmpsearch( char const* const str, int long const& lenstr, char const* const pat, int long const& lenpat )
+int long kmpsearch( char const* const str, int long lenstr, char const* const pat, int long lenpat )
 	{
 	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
 	int* next = KMPnext.get<int>();
@@ -1055,7 +1055,7 @@ int long kmpsearch( char const* const str, int long const& lenstr, char const* c
 	return ( start );
 	}
 
-int long kmpcasesearch( char const* const str, int long const& lenstr, char const* const pat, int long const& lenpat )
+int long kmpcasesearch( char const* const str, int long lenstr, char const* const pat, int long lenpat )
 	{
 	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
 	int* next = KMPnext.get<int>();

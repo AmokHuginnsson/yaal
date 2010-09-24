@@ -166,7 +166,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 	M_EPILOG
 	}
 
-int long HPipedChild::do_read( void* const buffer_, int long const& size_ )
+int long HPipedChild::do_read( void* const buffer_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
@@ -175,7 +175,7 @@ int long HPipedChild::do_read( void* const buffer_, int long const& size_ )
 	M_EPILOG
 	}
 
-int long HPipedChild::do_write( void const* const string_, int long const& size_ )
+int long HPipedChild::do_write( void const* const string_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _pipeIn >= 0 );

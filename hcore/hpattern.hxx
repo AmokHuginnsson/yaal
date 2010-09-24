@@ -103,7 +103,7 @@ public:
 	int long size() const;
 	char const* raw() const;
 private:
-	HMatch( char const* const&, int long const& );
+	HMatch( char const*, int long );
 	friend class HPattern::HMatchIterator;
 	};
 
@@ -120,7 +120,7 @@ public:
 	bool operator == ( HMatchIterator const& ) const;
 	HMatchIterator& operator ++ ( void );
 private:
-	HMatchIterator( HPattern const*, char const*, int long const& );
+	HMatchIterator( HPattern const*, char const*, int long );
 	friend class HPattern;
 	};
 

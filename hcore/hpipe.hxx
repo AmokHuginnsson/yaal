@@ -51,8 +51,8 @@ public:
 	~HPipe( void );
 	int get_reader_fd( void ) const;
 protected:
-	virtual int long do_write( void const* const, int long const& );
-	virtual int long do_read( void* const, int long const& );
+	virtual int long do_write( void const* const, int long );
+	virtual int long do_read( void* const, int long );
 	virtual void do_flush( void ) const;
 	virtual bool do_is_valid( void ) const;
 	};

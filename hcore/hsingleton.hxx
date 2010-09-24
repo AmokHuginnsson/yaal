@@ -78,7 +78,7 @@ private:
 public:
 	~HLifeTimeTracker( void );
 	static HLifeTimeTracker& get_instance( void );
-	void register_destructor( destructor_ptr_t, int const& );
+	void register_destructor( destructor_ptr_t, int );
 #if ! defined( __HOST_OS_TYPE_FREEBSD__ )
 	static void destruct( void );
 #else /* not __HOST_OS_TYPE_FREEBSD__ */
@@ -130,9 +130,9 @@ public:
 	typedef HSingleton<tType> this_type;
 private:
 	static tType* _instance;
-	static tType* create_instance( int const& );
+	static tType* create_instance( int );
 public:
-	static tType& get_instance( int const& = 0 );
+	static tType& get_instance( int = 0 );
 	};
 
 typedef HExceptionT<HSingletonInterface> HSingletonException;
@@ -141,7 +141,7 @@ template<typename tType>
 tType* HSingleton<tType>::_instance = NULL;
 
 template<typename tType>
-tType* HSingleton<tType>::create_instance( int const& lifeTime_ )
+tType* HSingleton<tType>::create_instance( int lifeTime_ )
 	{
 	M_PROLOG
 	M_ASSERT( ! _instance );
@@ -153,7 +153,7 @@ tType* HSingleton<tType>::create_instance( int const& lifeTime_ )
 	}
 
 template<typename tType>
-tType& HSingleton<tType>::get_instance( int const& lifeTime_ )
+tType& HSingleton<tType>::get_instance( int lifeTime_ )
 	{
 	M_PROLOG
 	if ( ! _instance )

@@ -58,7 +58,7 @@ private:
 public:
 	HBitmap( void );
 	~HBitmap( void );
-	HBitmap( int long const& );
+	HBitmap( int long );
 	HBitmap( HBitmap const& );
 	HBitmap& operator = ( HBitmap const& );
 	bool operator == ( HBitmap const& ) const;
@@ -66,41 +66,41 @@ public:
 	HBitmap& operator |= ( HBitmap const& );
 	HBitmap& operator &= ( HBitmap const& );
 	HBitmap& operator ^= ( HBitmap const& );
-	HBitmap& operator <<= ( int long const& );
-	HBitmap& operator >>= ( int long const& );
+	HBitmap& operator <<= ( int long );
+	HBitmap& operator >>= ( int long );
 	HBitmap operator | ( HBitmap const& ) const;
 	HBitmap operator & ( HBitmap const& ) const;
 	HBitmap operator ^ ( HBitmap const& ) const;
-	HBitmap operator << ( int long const& );
-	HBitmap operator >> ( int long const& );
+	HBitmap operator << ( int long );
+	HBitmap operator >> ( int long );
 	HBitmap& operator += ( HBitmap const& );
 	void clear( void );
-	void fill( bool const& );
-	void fill( int long const&, int long const&, bool const& );
-	void push_back( bool const& );
+	void fill( bool );
+	void fill( int long, int long, bool );
+	void push_back( bool );
 	int long get_size( void ) const;
 	int long size( void ) const;
 	void const* raw( void ) const;
-	void copy( void const*, int long const& );
-	void use( void*, int long const& );
-	void reserve( int long const& );
+	void copy( void const*, int long );
+	void use( void*, int long );
+	void reserve( int long );
 	const_iterator begin( void ) const;
-	const_iterator find( int long const& ) const;
+	const_iterator find( int long ) const;
 	const_iterator end( void ) const;
 	const_iterator rbegin( void ) const;
 	const_iterator rend( void ) const;
 	iterator begin( void );
-	iterator find( int long const& );
+	iterator find( int long );
 	iterator end( void );
 	iterator rbegin( void );
 	iterator rend( void );
-	bool get( int long const& ) const;
-	void set( int long const&, bool const& );
-	void rotate_left( int long const&, int long const&, int long const& );
-	void rotate_right( int long const&, int long const&, int long const& );
+	bool get( int long ) const;
+	void set( int long, bool );
+	void rotate_left( int long, int long, int long );
+	void rotate_right( int long, int long, int long );
 private:
-	void ensure_pool( int long const& );
-	int long octets_for_bits( int long const& ) const;
+	void ensure_pool( int long );
+	int long octets_for_bits( int long ) const;
 	void* block( void );
 	void const* block( void ) const;
 	};
@@ -192,7 +192,7 @@ public:
 	const_qual_t operator* ( void );
 private:
 	friend class yaal::tools::HBitmap;
-	HIterator( owner_t owner_, int long const& idx )
+	HIterator( owner_t owner_, int long idx )
 		: _owner( owner_ ), _index( idx ) {}
 	};
 
@@ -205,13 +205,13 @@ class HBitmap::HBit
 public:
 	HBit( HBit const& );
 	HBit& operator = ( HBit const& );
-	HBit& operator = ( bool const& );
-	bool operator == ( bool const& ) const;
-	bool operator != ( bool const& ) const;
+	HBit& operator = ( bool );
+	bool operator == ( bool ) const;
+	bool operator != ( bool ) const;
 	operator bool ( void ) const;
 private:
 	friend class HBitmap::HIterator<HBitmap::HBit>;
-	HBit( HBitmap*, int long const& );
+	HBit( HBitmap*, int long );
 	};
 
 }

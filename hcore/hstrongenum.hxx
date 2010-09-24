@@ -40,7 +40,7 @@ class HStrongEnum
 	{
 	typename EnumID::enum_t _value;
 public:
-	HStrongEnum( typename EnumID::enum_t const& value_ ) : _value( value_ ) {}
+	HStrongEnum( typename EnumID::enum_t value_ ) : _value( value_ ) {}
 	HStrongEnum( HStrongEnum const& e ) : _value( e._value ) {}
 	HStrongEnum operator | ( HStrongEnum const& other ) const
 		{

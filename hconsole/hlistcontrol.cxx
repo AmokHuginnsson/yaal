@@ -600,8 +600,8 @@ int HListControl::do_process_input( int code_ )
 	M_EPILOG
 	}
 
-void HListControl::add_column( int const& column_, char const* name_,
-		int const& width_, BITS::ALIGN::align_t const& align_, const type_t& type_, 
+void HListControl::add_column( int column_, char const* name_,
+		int width_, BITS::ALIGN::align_t const& align_, const type_t& type_, 
 		HControl* control_ )
 	{
 	M_PROLOG

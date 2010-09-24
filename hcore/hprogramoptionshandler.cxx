@@ -213,7 +213,7 @@ HProgramOptionsHandler::OOption::OOption( void )
 HProgramOptionsHandler::OOption::OOption(
 		char const* name_,
 		HOptionValueInterface::ptr_t value_,
-		int const& shortForm_,
+		int shortForm_,
 		TYPE::enum_t switchType_,
 		char const* argument_,
 		char const* description_,
@@ -361,7 +361,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 		char const* name, HOptionValueInterface::ptr_t value,
-		int const& shortForm, OOption::TYPE::enum_t const& type,
+		int shortForm, OOption::TYPE::enum_t type,
 		char const* desc, char const* arg,
 		simple_callback_t const& callback )
 	{
@@ -392,7 +392,7 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 		char const* name, HOptionValueInterface::ptr_t value,
-		char const* shortForm, OOption::TYPE::enum_t const& type,
+		char const* shortForm, OOption::TYPE::enum_t type,
 		char const* desc, char const* arg,
 		simple_callback_t const& callback )
 	{
@@ -403,7 +403,7 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 		char const* name, HOptionValueInterface::ptr_t value,
-		char const* shortForm, OOption::TYPE::enum_t const& type,
+		char const* shortForm, OOption::TYPE::enum_t type,
 		char const* desc, simple_callback_t const& callback )
 	{
 	M_PROLOG
@@ -413,7 +413,7 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 		char const* name, HOptionValueInterface::ptr_t value,
-		int const& shortForm, OOption::TYPE::enum_t const& type,
+		int shortForm, OOption::TYPE::enum_t type,
 		char const* desc, simple_callback_t const& callback )
 	{
 	M_PROLOG
@@ -423,7 +423,7 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 		char const* name, HOptionValueInterface::ptr_t value,
-		OOption::TYPE::enum_t const& type,
+		OOption::TYPE::enum_t type,
 		char const* desc, simple_callback_t const& callback )
 	{
 	M_PROLOG
@@ -433,7 +433,7 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 		char const* name, HOptionValueInterface::ptr_t value,
-		OOption::TYPE::enum_t const& type,
+		OOption::TYPE::enum_t type,
 		char const* desc, char const* arg,
 		simple_callback_t const& callback )
 	{
@@ -676,7 +676,7 @@ option* make_option_array( HProgramOptionsHandler::options_t const& options_, HC
 	M_EPILOG
 	}
 
-int HProgramOptionsHandler::process_command_line( int const& argc_,
+int HProgramOptionsHandler::process_command_line( int argc_,
 		char* const* const argv_,
 		int* const unknown_ )
 	{

@@ -74,7 +74,7 @@ HDes::~HDes( void )
 	M_EPILOG
 	}
 
-void HDes::generate_keys( u8_t const* password_, int const& len_ )
+void HDes::generate_keys( u8_t const* password_, int len_ )
 	{
 	int ctr = 0, ctrLoc = 0;
 	u8_t iKeyLow[ DES::BLOCK_SIZE ];
@@ -120,7 +120,7 @@ void HDes::flush_keys( void )
 	return;
 	}
 
-void HDes::crypt( u8_t* buffer_, int long const& size_, action_t const& action_ )
+void HDes::crypt( u8_t* buffer_, int long size_, action_t const& action_ )
 	{
 	M_ASSERT( ( action_ == CRYPT ) || ( action_ == DECRYPT ) );
 	M_ASSERT( ! ( size_ % 8 ) );

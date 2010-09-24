@@ -222,7 +222,7 @@ HString lexical_cast( HFormat const& f )
 	M_EPILOG
 	}
 
-char const* error_message( int const& code_ )
+char const* error_message( int code_ )
 	{
 	return ( ::strerror( code_ ) );
 	}

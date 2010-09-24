@@ -80,7 +80,7 @@ public:
 	 * \param initialFdBuckets - initial number of file descriptor buckets.
 	 * \param latency - how long should dispatcher sleep during select, between invoking idle actions.
 	 */
-	HIODispatcher( int const& initialFdBuckets, int long const& latency );
+	HIODispatcher( int initialFdBuckets, int long latency );
 	virtual ~HIODispatcher( void );
 	int run( void );
 	void stop( void );

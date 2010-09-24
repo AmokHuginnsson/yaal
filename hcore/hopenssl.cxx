@@ -308,7 +308,7 @@ void HOpenSSL::check_err( int code ) const
 	M_EPILOG
 	}
 
-int long HOpenSSL::read( void* const buffer_, int long const& size_ )
+int long HOpenSSL::read( void* const buffer_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _ssl );
@@ -325,7 +325,7 @@ int long HOpenSSL::read( void* const buffer_, int long const& size_ )
 	M_EPILOG
 	}
 
-int long HOpenSSL::write( void const* const buffer_, int long const& size_ )
+int long HOpenSSL::write( void const* const buffer_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _ssl );

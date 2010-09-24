@@ -57,7 +57,7 @@ private:
 	mutable int long _moment[2];
 public:
 	HClock( void );
-	int long get_time_elapsed( UNIT::unit_t const& = UNIT::SECOND, bool const& = false ) const;
+	int long get_time_elapsed( UNIT::unit_t const& = UNIT::SECOND, bool = false ) const;
 	};
 
 }

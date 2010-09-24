@@ -65,7 +65,7 @@ public:
 	 * \param ptr - pointer to memory block to be wrapped.
 	 * \param size - size of memory block in octets.
 	 */
-	HMemory( void* ptr, int long const& size, INITIAL_STATE::enum_t const& = INITIAL_STATE::AUTO );
+	HMemory( void* ptr, int long size, INITIAL_STATE::enum_t = INITIAL_STATE::AUTO );
 	/*! \brief Copy constructor.
 	 *
 	 * \param src - original HMemory object to be copied.
@@ -85,9 +85,9 @@ public:
 	 */
 	bool operator == ( HMemory const& other ) const;
 private:
-	virtual int long do_write( void const* const, int long const& );
+	virtual int long do_write( void const* const, int long );
 	virtual void do_flush( void ) const;
-	virtual int long do_read( void* const, int long const& );
+	virtual int long do_read( void* const, int long );
 	virtual bool do_is_valid( void ) const;
 	};
 

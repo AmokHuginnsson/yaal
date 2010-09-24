@@ -190,14 +190,14 @@ private:
 	int _mouseDes;
 	yaal::hcore::HPipe::ptr_t _event;
 public:
-	int const& get_height( void ) const;
-	int const& get_width( void ) const;
+	int get_height( void ) const;
+	int get_width( void ) const;
 	void enter_curses( void );
 	void leave_curses( void );
 	void set_attr( int ) const;
-	int c_move ( int const&, int const& );
+	int c_move ( int, int );
 	CURSOR::cursor_t curs_set( CURSOR::cursor_t const& ) const;
-	int c_addch( int const& );
+	int c_addch( int );
 	int c_refresh( void );
 	int endwin( void );
 	void c_getmaxyx( void );

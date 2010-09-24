@@ -336,7 +336,7 @@ dst_it_t copy( src_it_t src, src_it_t const& end, dst_it_t dst )
  * \return one past end of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
-dst_it_t copy_n( src_it_t src, int long const& count, dst_it_t dst )
+dst_it_t copy_n( src_it_t src, int long count, dst_it_t dst )
 	{
 	for ( int long i = 0; i < count; ++ i, ++ src, ++ dst )
 		*dst = *src;
@@ -680,7 +680,7 @@ void fill( dst_it_t it, dst_it_t end, filler_t const& filler )
  * \param filler - value to be set for all elements in range.
  */
 template<typename dst_it_t, typename filler_t>
-void fill_n( dst_it_t it, int long const& count, filler_t const& filler )
+void fill_n( dst_it_t it, int long count, filler_t const& filler )
 	{
 	for ( int long i = 0; i < count; ++ i, ++ it )
 		*it = filler;
@@ -708,7 +708,7 @@ void generate( iterator_t it, iterator_t const& end, generator_t generator )
  * \param generator - function object that creates new values for range.
  */
 template<typename iterator_t, typename generator_t>
-void generate_n( iterator_t it, int long const& count, generator_t generator )
+void generate_n( iterator_t it, int long count, generator_t generator )
 	{
 	for ( int long i = 0; i < count; ++ i, ++ it )
 		*it = static_cast<typename hcore::iterator_traits<iterator_t>::value_type>( generator() );
@@ -861,7 +861,7 @@ int long distance( iter_t first, iter_t last )
  * \param dist - how far iterator shall be moved.
  */
 template<typename iter_t>
-void advance( iter_t& it, int long const& dist )
+void advance( iter_t& it, int long dist )
 	{
 	for ( int long i = 0; i < dist; ++ i, ++ it )
 		;

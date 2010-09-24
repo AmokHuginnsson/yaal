@@ -56,7 +56,7 @@ public:
 		return ( binary( &v, sizeof ( T ) ) );
 		}
 	yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface::manipulator_t const& );
-	HBinaryFormatter& binary( void const*, int const& );
+	HBinaryFormatter& binary( void const*, int );
 	};
 
 class HBinaryFormatterSeed

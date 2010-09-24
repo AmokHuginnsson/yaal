@@ -111,23 +111,23 @@ class HFormat::HFormatImpl
 	void swap( HFormatImpl& );
 	int next_token( conversion_t const& );
 	friend class HFormat;
-	static bool has_conversion( HString const&, int const& );
+	static bool has_conversion( HString const&, int );
 	static OToken next_conversion( HString const&, int& );
-	static bool has_constant( HString const&, int const& );
+	static bool has_constant( HString const&, int );
 	static OToken next_constant( HString const&, int& );
-	static bool has_position( HString const&, int const& );
+	static bool has_position( HString const&, int );
 	static int get_position( HString const&, int& );
-	static bool has_flag( HString const&, int const& );
+	static bool has_flag( HString const&, int );
 	static flag_t get_flag( HString const&, int& );
-	static bool has_width( HString const&, int const& );
+	static bool has_width( HString const&, int );
 	static int get_width( HString const&, int& );
-	static bool has_precision( HString const&, int const& );
+	static bool has_precision( HString const&, int );
 	static int get_precision( HString const&, int& );
 	static conversion_t get_conversion( HString const&, int& );
 	template<typename T>
 	struct variant_shell
 		{
-		static T get( HFormat::HFormatImpl::args_t const& args, int const& idx )
+		static T get( HFormat::HFormatImpl::args_t const& args, int idx )
 			{
 			HFormat::HFormatImpl::args_t::const_iterator it = args.find( idx );
 			M_ASSERT( it != args.end() );
@@ -411,7 +411,7 @@ HString HFormat::format( void ) const
 	return ( _impl->_format );
 	}
 
-HFormat HFormat::operator % ( char const& c )
+HFormat HFormat::operator % ( char c )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -421,14 +421,14 @@ HFormat HFormat::operator % ( char const& c )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( char unsigned const& cu )
+HFormat HFormat::operator % ( char unsigned cu )
 	{
 	M_PROLOG
 	return ( operator % ( static_cast<char>( cu ) ) );
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( int short const& is )
+HFormat HFormat::operator % ( int short is )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -438,7 +438,7 @@ HFormat HFormat::operator % ( int short const& is )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( int short unsigned const& isu )
+HFormat HFormat::operator % ( int short unsigned isu )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -449,7 +449,7 @@ HFormat HFormat::operator % ( int short unsigned const& isu )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( int const& i )
+HFormat HFormat::operator % ( int i )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -459,7 +459,7 @@ HFormat HFormat::operator % ( int const& i )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( int unsigned const& iu )
+HFormat HFormat::operator % ( int unsigned iu )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -469,7 +469,7 @@ HFormat HFormat::operator % ( int unsigned const& iu )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( int long const& il )
+HFormat HFormat::operator % ( int long il )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -479,7 +479,7 @@ HFormat HFormat::operator % ( int long const& il )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( int long unsigned const& ilu )
+HFormat HFormat::operator % ( int long unsigned ilu )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -490,7 +490,7 @@ HFormat HFormat::operator % ( int long unsigned const& ilu )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( double const& d )
+HFormat HFormat::operator % ( double d )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -500,7 +500,7 @@ HFormat HFormat::operator % ( double const& d )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( double long const& dl )
+HFormat HFormat::operator % ( double long dl )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -510,7 +510,7 @@ HFormat HFormat::operator % ( double long const& dl )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( float const& f )
+HFormat HFormat::operator % ( float f )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -520,7 +520,7 @@ HFormat HFormat::operator % ( float const& f )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( char const* const& s )
+HFormat HFormat::operator % ( char const* s )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -530,7 +530,7 @@ HFormat HFormat::operator % ( char const* const& s )
 	M_EPILOG
 	}
 
-HFormat HFormat::operator % ( void const* const& p )
+HFormat HFormat::operator % ( void const* p )
 	{
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
@@ -576,7 +576,7 @@ HStreamFormatProxy operator << ( HStreamInterface& stream, HFormat const& format
 	M_EPILOG
 	}
 
-bool HFormat::HFormatImpl::has_conversion( HString const& s, int const& i )
+bool HFormat::HFormatImpl::has_conversion( HString const& s, int i )
 	{
 	M_PROLOG
 	return ( ( i < s.get_length() ) && ( s[ i ] == '%' ) );
@@ -601,7 +601,7 @@ HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_conversion( HString cons
 	M_EPILOG
 	}
 
-bool HFormat::HFormatImpl::has_constant( HString const& s, int const& i )
+bool HFormat::HFormatImpl::has_constant( HString const& s, int i )
 	{
 	M_PROLOG
 	return ( ( i < s.get_length() ) && ( s[ i ] != '%' ) );
@@ -620,7 +620,7 @@ HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_constant( HString const&
 	M_EPILOG
 	}
 
-bool HFormat::HFormatImpl::has_flag( HString const& s, int const& i )
+bool HFormat::HFormatImpl::has_flag( HString const& s, int i )
 	{
 	M_PROLOG
 	HString flags = "#0- +";
@@ -628,14 +628,14 @@ bool HFormat::HFormatImpl::has_flag( HString const& s, int const& i )
 	M_EPILOG
 	}
 
-bool HFormat::HFormatImpl::has_precision( HString const& s, int const& i )
+bool HFormat::HFormatImpl::has_precision( HString const& s, int i )
 	{
 	M_PROLOG
 	return ( ( i < s.get_length() ) && ( s[ i ] == '.' ) );
 	M_EPILOG
 	}
 
-bool HFormat::HFormatImpl::has_position( HString const& s, int const& i )
+bool HFormat::HFormatImpl::has_position( HString const& s, int i )
 	{
 	M_PROLOG
 	bool hasPosition = false;
@@ -652,7 +652,7 @@ bool HFormat::HFormatImpl::has_position( HString const& s, int const& i )
 	M_EPILOG
 	}
 
-bool HFormat::HFormatImpl::has_width( HString const& s, int const& i )
+bool HFormat::HFormatImpl::has_width( HString const& s, int i )
 	{
 	M_PROLOG
 	return ( ( i < s.get_length() ) && ( ( s[ i ] == '*' ) || ( ( s[ i ] >= '0' ) && ( s[ i ] <= '9' ) ) ) );

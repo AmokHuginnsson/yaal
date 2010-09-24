@@ -61,7 +61,7 @@ public:
 	 *
 	 * \param size - requested memory chunk size.
 	 */
-	explicit HChunk( int long const& size, STRATEGY::enum_t const& = STRATEGY::EXACT );
+	explicit HChunk( int long size, STRATEGY::enum_t = STRATEGY::EXACT );
 	~HChunk( void );
 	template<typename tType>
 	tType const* get() const
@@ -74,7 +74,7 @@ public:
 	char* raw( void )
 		{ return ( static_cast<char*>( _data ) ); }
 	void free( void );
-	void* realloc( int long, STRATEGY::enum_t const& = STRATEGY::GEOMETRIC );
+	void* realloc( int long, STRATEGY::enum_t = STRATEGY::GEOMETRIC );
 	void swap( HChunk& );
 	int long get_size( void ) const
 		{ return ( _size ); }
@@ -86,7 +86,7 @@ private:
 	};
 
 template<typename T>
-int long chunk_size( int long const& count_ )
+int long chunk_size( int long count_ )
 	{
 	return ( sizeof ( T ) * count_ );
 	}

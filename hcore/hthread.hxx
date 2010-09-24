@@ -172,7 +172,7 @@ public:
 		} status_t;
 	HCondition( HMutex& );
 	virtual ~HCondition( void );
-	status_t wait( int long unsigned const&, int long unsigned const& );
+	status_t wait( int long unsigned, int long unsigned );
 	void signal( void );
 private:
 	HCondition( HCondition const& );

@@ -169,7 +169,7 @@ public:
 	HString& upper( void );
 	HString& lower( void );
 	HString& reverse( void );
-	HString left( int long const& ) const;
+	HString left( int long ) const;
 	/*! \brief Get substring of this string by start position and length.
 	 *
 	 * \param start - position for begining of a substring.
@@ -177,11 +177,11 @@ public:
 	 * \return Substring.
 	 */
 	HString mid( int long start, int long length = meta::max_signed<int long>::value ) const;
-	HString right( int long const& ) const;
+	HString right( int long ) const;
 	HString& trim_left( char const* const = _whiteSpace_ );
 	HString& trim_right( char const* const = _whiteSpace_ );
-	HString& shift_left( int long const& );
-	HString& shift_right( int long const&, char const = ' ' );
+	HString& shift_left( int long );
+	HString& shift_right( int long, char const = ' ' );
 	/*! \brief Fill portion of string with constatnt value.
 	 *
 	 * \param value - use this value as a filler.
@@ -243,11 +243,11 @@ public:
 	 * \param n - number of bytes to insert.
 	 * \param value - copies of this value shall be inserted.
 	 */
-	HString& insert( int long postition, int long n, char const& value );
+	HString& insert( int long postition, int long n, char value );
 	HString& append( HString const& );
-	HString& append( HString const&, int long const& idx_, int long const& len_ );
-	HString& append( int long const& count_, char const& val_ );
-	HString& append( char const* const, int long const& len_ );
+	HString& append( HString const&, int long idx_, int long len_ );
+	HString& append( int long count_, char val_ );
+	HString& append( char const* const, int long len_ );
 	};
 
 HString operator + ( HString const&, HString const& );
@@ -265,7 +265,7 @@ int long hash( HString const& );
 namespace string_helper
 {
 
-int long kmpcasesearch( char const* const, int long const&, char const* const, int long const& );
+int long kmpcasesearch( char const* const, int long, char const* const, int long );
 
 }
 

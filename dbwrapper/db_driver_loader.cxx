@@ -181,7 +181,7 @@ void dbwrapper_exit( void )
 	exit( 1 );
 	}
 
-ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t const& driverId_ )
+ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ )
 	{
 	M_PROLOG
 	M_ENSURE( ( driverId_ >= ODBConnector::DRIVER::SQLITE3 ) && ( driverId_ < ODBConnector::DRIVER::TERMINATOR ) );
@@ -227,7 +227,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t const& driverI
 	M_EPILOG
 	}
 
-ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t const& driverId_ )
+ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ )
 	{
 	M_PROLOG
 	errno = 0;

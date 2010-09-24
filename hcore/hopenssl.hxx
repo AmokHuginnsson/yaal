@@ -109,8 +109,8 @@ public:
 	typedef yaal::hcore::HPointer<HOpenSSL> ptr_t;
 	HOpenSSL( int, TYPE::ssl_context_type_t );
 	~HOpenSSL( void );
-	int long read( void* const, int long const& );
-	int long write( void const* const, int long const& );
+	int long read( void* const, int long );
+	int long write( void const* const, int long );
 	void shutdown( void );
 private:
 	void accept_or_connect( void );

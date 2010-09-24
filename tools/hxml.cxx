@@ -1150,7 +1150,7 @@ HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it )
 	}
 
 HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& node,
-		HString const& path, int const& part ) const
+		HString const& path, int part ) const
 	{
 	M_PROLOG
 	const_xml_element_t result = NULL;
@@ -1190,7 +1190,7 @@ HXml::HConstNodeProxy const HXml::get_element_by_path( yaal::hcore::HString cons
 	M_EPILOG
 	}
 
-char const* HXml::error_message( int const& code ) const
+char const* HXml::error_message( int code ) const
 	{
 	M_PROLOG
 	char const* msg = "Unknow error code";

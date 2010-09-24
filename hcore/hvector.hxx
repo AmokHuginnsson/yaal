@@ -66,7 +66,7 @@ public:
 	typedef typename data_t::iterator iterator;
 	typedef typename data_t::const_iterator const_iterator;
 public:
-	HVector( int long const& = 0 );
+	HVector( int long = 0 );
 	HVector( HVector const& );
 	~HVector( void );
 	void set( data_t const& );
@@ -86,8 +86,8 @@ public:
 	HVector& operator /= ( value_type const& );
 	value_type operator | ( HVector const& ) const;
 	value_type operator ! ( void ) const;
-	value_type const& operator[] ( int long const& ) const;
-	value_type& operator[] ( int long const& );
+	value_type const& operator[] ( int long ) const;
+	value_type& operator[] ( int long );
 	bool operator == ( HVector const& ) const;
 	bool operator != ( HVector const& ) const;
 	iterator begin( void );
@@ -107,7 +107,7 @@ private:
 	};
 
 template<typename value_type>
-HVector<value_type>::HVector( int long const& dimension_ ) : _data( dimension_, 0.0 )
+HVector<value_type>::HVector( int long dimension_ ) : _data( dimension_, 0.0 )
 	{
 	M_PROLOG
 	return;
@@ -331,7 +331,7 @@ value_type HVector<value_type>::operator ! ( void ) const
 	}
 
 template<typename value_type>
-value_type const& HVector<value_type>::operator[] ( int long const& idx ) const
+value_type const& HVector<value_type>::operator[] ( int long idx ) const
 	{
 	M_PROLOG
 	return ( _data[ idx ] );
@@ -339,7 +339,7 @@ value_type const& HVector<value_type>::operator[] ( int long const& idx ) const
 	}
 
 template<typename value_type>
-value_type& HVector<value_type>::operator[] ( int long const& idx )
+value_type& HVector<value_type>::operator[] ( int long idx )
 	{
 	M_PROLOG
 	return ( _data[ idx ] );

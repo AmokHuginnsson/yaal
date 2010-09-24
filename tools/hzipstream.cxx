@@ -135,7 +135,7 @@ void HZipStream::reset( ref_stream_t stream_ )
 	M_EPILOG
 	}
 
-int long HZipStream::do_write( void const* const buf_, int long const& size_ )
+int long HZipStream::do_write( void const* const buf_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _streamRef );
@@ -189,7 +189,7 @@ int long HZipStream::prepare_data( void )
 	M_EPILOG
 	}
 
-int long HZipStream::do_read( void* const buf_, int long const& size_ )
+int long HZipStream::do_read( void* const buf_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _streamRef );

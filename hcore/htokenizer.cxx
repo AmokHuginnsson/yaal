@@ -40,7 +40,7 @@ HTokenizer::HTokenizer( HString const& str_, HString const& delim_, behavoir_t c
 	{
 	}
 
-HString const& HTokenizer::operator[] ( int long const& nth_ ) const
+HString const& HTokenizer::operator[] ( int long nth_ ) const
 	{
 	M_PROLOG
 	M_ENSURE( nth_ >= 0 );
@@ -74,7 +74,7 @@ HTokenizer::HIterator HTokenizer::end( void ) const
 	M_EPILOG
 	}
 
-HTokenizer::HIterator::HIterator( HTokenizer const* owner_, int long const& start_ )
+HTokenizer::HIterator::HIterator( HTokenizer const* owner_, int long start_ )
 	: _owner( owner_ ), _start( start_ ), _buffer()
 	{
 	}

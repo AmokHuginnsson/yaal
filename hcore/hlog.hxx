@@ -87,8 +87,8 @@ public:
 	int operator()( int long const, char const*, ... );
 	/*! \brief sets log type
 	 */
-	HLog& operator()( int long const& );
-	HLog& filter( int long const& );
+	HLog& operator()( int long );
+	HLog& filter( int long );
 private:
 	HLog( void );
 	virtual ~HLog( void );
@@ -96,9 +96,9 @@ private:
 	void timestamp( void );
 	int vformat( char const* const, va_list );
 	void eol_reset( char const* const, int long );
-	virtual int long do_write( void const* const, int long const& );
+	virtual int long do_write( void const* const, int long );
 	virtual void do_flush( void ) const;
-	virtual int long do_read( void* const, int long const& );
+	virtual int long do_read( void* const, int long );
 	virtual bool do_is_valid( void ) const;
 	HLog( HLog const& );
 	HLog& operator= ( HLog const& );

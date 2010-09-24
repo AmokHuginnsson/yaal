@@ -52,9 +52,9 @@ class HInfo
 	HTime			_time;
 public:
 	HInfo( void );
-	HInfo( int const& );
-	HInfo( int long const& );
-	HInfo( double const& );
+	HInfo( int );
+	HInfo( int long );
+	HInfo( double );
 	HInfo( char const* const );
 	HInfo( HString const& );
 	HInfo( HTime const& );

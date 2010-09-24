@@ -59,7 +59,7 @@ int kill( int pid_, int signal_ )
 	return ( ::kill( pid_, signal_ ) );
 	}
 
-int wait_for_io( int* input_, int const& inputCount_, int* output_, int const& outputCount_, int long* timeOut_, bool restartable_ )
+int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ )
 	{
 	M_ASSERT( ( inputCount_ >= 0 ) && ( outputCount_ >= 0 ) && ( ( inputCount_ + outputCount_ ) > 0 ) );
 	M_ASSERT( ! inputCount_ || input_ );

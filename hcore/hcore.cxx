@@ -66,7 +66,7 @@ HProgramOptionsHandler& yaal_options( void )
 
 /* mathematical macros */
 static double long const EPSILON = 0.000001;
-bool eq( double long const& left_, double long const& right_ )
+bool eq( double long left_, double long right_ )
 	{
 	return ( ( ( ( ( left_ ) > ( right_ ) )
 					? ( ( left_ ) - ( right_ ) )

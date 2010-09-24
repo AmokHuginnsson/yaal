@@ -327,7 +327,7 @@ int long HSQLDescriptor::get_size( void ) const
 	return ( _setSize );
 	}
 
-HRecordSet::HIterator::HIterator( HRecordSet* owner_, int long const& position_ )
+HRecordSet::HIterator::HIterator( HRecordSet* owner_, int long position_ )
 	: _owner( owner_ ), _cursorPosition( position_ )
 	{
 	}
@@ -382,7 +382,7 @@ HRecordSet::HIterator HRecordSet::HIterator::operator ++ ( int )
 	M_EPILOG
 	}
 
-yaal::hcore::HString HRecordSet::HIterator::operator[] ( int const& field_ ) const
+yaal::hcore::HString HRecordSet::HIterator::operator[] ( int field_ ) const
 	{
 	M_PROLOG
 	M_ASSERT( _owner );

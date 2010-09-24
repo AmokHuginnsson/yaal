@@ -75,17 +75,17 @@ public:
 	typedef HIterator<type_t> iterator;
 	typedef HIterator<type_t const> const_iterator;
 	HArray( void );
-	explicit HArray( int long const& );
-	HArray( int long const&, type_t const& );
+	explicit HArray( int long );
+	HArray( int long, type_t const& );
 	template<typename iterator_t>
 	HArray( iterator_t, iterator_t );
 	virtual ~HArray( void );
 	HArray( HArray const& );
 	HArray& operator = ( HArray const& );
-	void resize( int long const&, type_t const& = value_type() );
-	void reserve( int long const& );
-	type_t& operator [] ( int long const& );
-	type_t const& operator [] ( int long const& ) const;
+	void resize( int long, type_t const& = value_type() );
+	void reserve( int long );
+	type_t& operator [] ( int long );
+	type_t const& operator [] ( int long ) const;
 	void push_back( type_t const& );
 	void pop_back( void );
 	int long get_size( void ) const;
@@ -103,10 +103,10 @@ public:
 	iterator erase( iterator );
 	iterator erase( iterator, iterator );
 	iterator begin( void );
-	iterator find( int long const& );
+	iterator find( int long );
 	iterator end( void );
 	const_iterator begin( void ) const;
-	const_iterator find( int long const& ) const;
+	const_iterator find( int long ) const;
 	const_iterator end( void ) const;
 	iterator rbegin( void );
 	iterator rend( void );
@@ -118,7 +118,7 @@ public:
 private:
 	template<typename iterator_t>
 	void initialize( iterator_t, iterator_t, trait::false_type const* );
-	void initialize( int long const&, type_t const&, trait::true_type const* );
+	void initialize( int long, type_t const&, trait::true_type const* );
 	};
 
 }
@@ -178,22 +178,22 @@ public:
 		-- _index;
 		return ( it );
 		}
-	HIterator operator + ( int long const& off_ ) const
+	HIterator operator + ( int long off_ ) const
 		{
 		HIterator it( _owner, _index + off_ );
 		return ( it );
 		}
-	HIterator& operator += ( int long const& off_ )
+	HIterator& operator += ( int long off_ )
 		{
 		_index += off_;
 		return ( *this );
 		}
-	HIterator operator - ( int long const& off_ ) const
+	HIterator operator - ( int long off_ ) const
 		{
 		HIterator it( _owner, _index - off_ );
 		return ( it );
 		}
-	HIterator& operator -= ( int long const& off_ )
+	HIterator& operator -= ( int long off_ )
 		{
 		_index -= off_;
 		return ( *this );
@@ -219,7 +219,7 @@ public:
 		{ return ( _index != it._index ); }
 private:
 	friend class HArray<type_t>;
-	explicit HIterator( array_t const* owner_, int long const& idx )
+	explicit HIterator( array_t const* owner_, int long idx )
 		: _owner( owner_ ), _index( idx ) {};
 	};
 
@@ -231,7 +231,7 @@ HArray<type_t>::HArray( void )
 	}
 
 template<typename type_t>
-HArray<type_t>::HArray( int long const& size_ )
+HArray<type_t>::HArray( int long size_ )
 	: _buf(), _size( 0 )
 	{
 	M_PROLOG
@@ -241,7 +241,7 @@ HArray<type_t>::HArray( int long const& size_ )
 	}
 
 template<typename type_t>
-HArray<type_t>::HArray( int long const& size_, type_t const& fillWith_ )
+HArray<type_t>::HArray( int long size_, type_t const& fillWith_ )
 	: _buf(), _size( 0 )
 	{
 	M_PROLOG
@@ -281,7 +281,7 @@ void HArray<type_t>::initialize( iterator_t first, iterator_t last, trait::false
 	}
 
 template<typename type_t>
-void HArray<type_t>::initialize( int long const& size_, type_t const& fillWith_, trait::true_type const* )
+void HArray<type_t>::initialize( int long size_, type_t const& fillWith_, trait::true_type const* )
 	{
 	M_PROLOG
 	resize( size_, fillWith_ );
@@ -350,7 +350,7 @@ HArray<type_t>& HArray<type_t>::operator = ( HArray const& arr_ )
 	}
 
 template<typename type_t>
-void HArray<type_t>::resize( int long const& size_, type_t const& fillWith_ )
+void HArray<type_t>::resize( int long size_, type_t const& fillWith_ )
 	{
 	M_PROLOG
 	if ( size_ < 0 )
@@ -374,7 +374,7 @@ void HArray<type_t>::resize( int long const& size_, type_t const& fillWith_ )
 	}
 
 template<typename type_t>
-void HArray<type_t>::reserve( int long const& capacity_ )
+void HArray<type_t>::reserve( int long capacity_ )
 	{
 	M_PROLOG
 	if ( capacity_ < 0 )
@@ -438,7 +438,7 @@ typename HArray<type_t>::iterator HArray<type_t>::erase( iterator it )
 	}
 
 template<typename type_t>
-type_t& HArray<type_t>::operator[] ( int long const& index_ )
+type_t& HArray<type_t>::operator[] ( int long index_ )
 	{
 	M_PROLOG
 	int long idx = ( index_ < 0 ) ? index_ + _size : index_;
@@ -449,7 +449,7 @@ type_t& HArray<type_t>::operator[] ( int long const& index_ )
 	}
 
 template<typename type_t>
-type_t const& HArray<type_t>::operator[] ( int long const& index_ ) const
+type_t const& HArray<type_t>::operator[] ( int long index_ ) const
 	{
 	M_PROLOG
 	int long idx( ( index_ < 0 ) ? index_ + _size : index_ );
@@ -518,7 +518,7 @@ typename HArray<type_t>::iterator HArray<type_t>::begin( void )
 	}
 
 template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::find( int long const& idx )
+typename HArray<type_t>::iterator HArray<type_t>::find( int long idx )
 	{
 	return ( iterator( this, min( idx, _size ) ) );
 	}
@@ -536,7 +536,7 @@ typename HArray<type_t>::const_iterator HArray<type_t>::begin( void ) const
 	}
 
 template<typename type_t>
-typename HArray<type_t>::const_iterator HArray<type_t>::find( int long const& idx ) const
+typename HArray<type_t>::const_iterator HArray<type_t>::find( int long idx ) const
 	{
 	return ( const_iterator( this, min( idx, _size ) ) );
 	}

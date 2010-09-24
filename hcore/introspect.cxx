@@ -48,9 +48,9 @@ namespace hcore
 {
 
 #ifdef _EXECINFO_H
-execution_info::strings_ptr_t execution_info::get_call_stack( int const& level_ )
+execution_info::strings_ptr_t execution_info::get_call_stack( int level_ )
 #else /* _EXECINFO_H */
-execution_info::strings_ptr_t execution_info::get_call_stack( int const& )
+execution_info::strings_ptr_t execution_info::get_call_stack( int )
 #endif /* not _EXECINFO_H */
 	{
 	strings_ptr_t frames( new strings_t );
@@ -87,7 +87,7 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int const& )
 	return ( frames );
 	}
 
-void dump_call_stack( int const& no )
+void dump_call_stack( int no )
 	{
 	execution_info::strings_ptr_t frames = execution_info::get_call_stack( no );
 	hcore::log << "Obtained " << frames->get_size() << " stack frames." << endl;

@@ -100,7 +100,7 @@ int HDataBase::get_errno( void ) const
 	M_EPILOG
 	}
 
-HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t const& driverId_ )
+HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t driverId_ )
 	{
 	M_PROLOG
 	ptr_t p( new HDataBase() );

@@ -96,7 +96,7 @@ public:
 		OOption( void );
 		OOption(
 				char const*, HOptionValueInterface::ptr_t,
-				int const&, TYPE::enum_t,
+				int, TYPE::enum_t,
 				char const*, char const*,
 				HProgramOptionsHandler::simple_callback_t const& );
 		OOption( OOption const& );
@@ -123,25 +123,25 @@ public:
 	 * \param callback - a function invoked when option is encountered.
 	 */
 	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			int const& shortForm, OOption::TYPE::enum_t const& argType,
+			int shortForm, OOption::TYPE::enum_t argType,
 			char const* desc = NULL, char const* argName = NULL,
 			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
 	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			int const& shortForm, OOption::TYPE::enum_t const& argType,
+			int shortForm, OOption::TYPE::enum_t argType,
 			char const* desc,
 			simple_callback_t const& callback );
 	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			OOption::TYPE::enum_t const& argType, char const* desc,
+			OOption::TYPE::enum_t argType, char const* desc,
 			simple_callback_t const& callback );
 	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			char const* shortForm, OOption::TYPE::enum_t const& argType,
+			char const* shortForm, OOption::TYPE::enum_t argType,
 			char const* desc = NULL, char const* argName = NULL,
 			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
 	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			char const* shortForm, OOption::TYPE::enum_t const& argType,
+			char const* shortForm, OOption::TYPE::enum_t argType,
 			char const* desc, simple_callback_t const& callback );
 	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			OOption::TYPE::enum_t const& argType,
+			OOption::TYPE::enum_t argType,
 			char const* desc = NULL, char const* argName = NULL,
 			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
 	/*! \brief Parse command line options and set program setup variables.
@@ -155,7 +155,7 @@ public:
 	 * \param count - number of supported program options.
 	 * \param[out] unknown - index of first unknown option in \e argv.
 	 */
-	int process_command_line( int const& argc, char* const* const argv, int* const unknown = NULL );
+	int process_command_line( int argc, char* const* const argv, int* const unknown = NULL );
 	/*! \brief Reading configuration files.
 	 *
 	 * process_rc_file gives easy to use API for reading configuration files

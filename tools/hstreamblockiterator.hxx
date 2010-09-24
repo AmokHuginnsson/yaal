@@ -50,7 +50,7 @@ public:
 		int long _size;
 	public:
 		HBlock( void ) : _start( NULL ), _size( 0 ) {}
-		HBlock( void* start_, int long const& size_ ) : _start( start_ ), _size( size_ ) {}
+		HBlock( void* start_, int long size_ ) : _start( start_ ), _size( size_ ) {}
 		HBlock( HBlock const& o ) : _start( o._start ), _size( o._size ) {}
 		HBlock& operator = ( HBlock const& o )
 			{

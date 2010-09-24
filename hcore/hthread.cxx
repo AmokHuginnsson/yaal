@@ -355,8 +355,8 @@ HCondition::~HCondition( void )
  * are lost!
  */
 
-HCondition::status_t HCondition::wait( int long unsigned const& timeOutSeconds_,
-		int long unsigned const& timeOutNanoSeconds_ )
+HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
+		int long unsigned timeOutNanoSeconds_ )
 	{
 	M_PROLOG
 	int error = 0;

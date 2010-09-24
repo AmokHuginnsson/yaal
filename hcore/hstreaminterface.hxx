@@ -85,29 +85,33 @@ public:
 	virtual ~HStreamInterface( void );
 	HStreamInterface& operator << ( HString const& val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( char const* const& val_ )
+	HStreamInterface& operator << ( char const* val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( char const& val_ )
+	HStreamInterface& operator << ( bool val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( int short const& val_ )
+	HStreamInterface& operator << ( char val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( int short unsigned const& val_ )
+	HStreamInterface& operator << ( char unsigned val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( int const& val_ )
+	HStreamInterface& operator << ( int short val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( int unsigned const& val_ )
+	HStreamInterface& operator << ( int short unsigned val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( int long const& val_ )
+	HStreamInterface& operator << ( int val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( int long unsigned const& val_ )
+	HStreamInterface& operator << ( int unsigned val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( double const& val_ )
+	HStreamInterface& operator << ( int long val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( double long const& val_ )
+	HStreamInterface& operator << ( int long unsigned val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( float const& val_ )
+	HStreamInterface& operator << ( double val_ )
 		{ return ( do_output( val_ ) ); }
-	HStreamInterface& operator << ( void const* const& val_ )
+	HStreamInterface& operator << ( double long val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( float val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( void const* val_ )
 		{ return ( do_output( val_ ) ); }
 	HStreamInterface& operator << ( manipulator_t const& val_ )
 		{ return ( do_output( val_ ) ); }
@@ -115,7 +119,11 @@ public:
 		{ return ( do_output( val_ ) ); }
 	HStreamInterface& operator >> ( HString&  val_)
 		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( bool& val_ )
+		{ return ( do_input( val_ ) ); }
 	HStreamInterface& operator >> ( char& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( char unsigned& val_ )
 		{ return ( do_input( val_ ) ); }
 	HStreamInterface& operator >> ( int short& val_ )
 		{ return ( do_input( val_ ) ); }
@@ -154,10 +162,10 @@ public:
 	 * \param strip - Remove delimiting stop char from output buffer.
 	 * \return number of bytes read.
 	 */
-	int long read_until_n( yaal::hcore::HString& store, int long const& maxcount, char const* const delim = eols, bool strip = true )
+	int long read_until_n( yaal::hcore::HString& store, int long maxcount, char const* const delim = eols, bool strip = true )
 		{ return ( do_read_until_n( store, maxcount, delim, strip ) ); }
-	int long read( void* const, int long const& );
-	int long write( void const* const, int long const& );
+	int long read( void* const, int long );
+	int long write( void const* const, int long );
 	M_YAAL_HCORE_PUBLIC_API static char const* const eols;
 	bool is_valid( void ) const;
 	void flush( void ) const;
@@ -169,22 +177,26 @@ public:
 		{ return ( do_set_base( val_ ) ); }
 protected:
 	virtual HStreamInterface& do_output( HString const& );
-	virtual HStreamInterface& do_output( char const* const& );
-	virtual HStreamInterface& do_output( char const& );
-	virtual HStreamInterface& do_output( int short const& );
-	virtual HStreamInterface& do_output( int short unsigned const& );
-	virtual HStreamInterface& do_output( int const& );
-	virtual HStreamInterface& do_output( int unsigned const& );
-	virtual HStreamInterface& do_output( int long const& );
-	virtual HStreamInterface& do_output( int long unsigned const& );
-	virtual HStreamInterface& do_output( double const& );
-	virtual HStreamInterface& do_output( double long const& );
-	virtual HStreamInterface& do_output( float const& );
-	virtual HStreamInterface& do_output( void const* const& );
+	virtual HStreamInterface& do_output( char const* );
+	virtual HStreamInterface& do_output( bool );
+	virtual HStreamInterface& do_output( char );
+	virtual HStreamInterface& do_output( char unsigned );
+	virtual HStreamInterface& do_output( int short );
+	virtual HStreamInterface& do_output( int short unsigned );
+	virtual HStreamInterface& do_output( int );
+	virtual HStreamInterface& do_output( int unsigned );
+	virtual HStreamInterface& do_output( int long );
+	virtual HStreamInterface& do_output( int long unsigned );
+	virtual HStreamInterface& do_output( double );
+	virtual HStreamInterface& do_output( double long );
+	virtual HStreamInterface& do_output( float );
+	virtual HStreamInterface& do_output( void const* );
 	virtual HStreamInterface& do_output( manipulator_t const& );
 	virtual HStreamInterface& do_output( HManipulator const& );
 	virtual HStreamInterface& do_input( HString& );
+	virtual HStreamInterface& do_input( bool& );
 	virtual HStreamInterface& do_input( char& );
+	virtual HStreamInterface& do_input( char unsigned & );
 	virtual HStreamInterface& do_input( int short& );
 	virtual HStreamInterface& do_input( int short unsigned& );
 	virtual HStreamInterface& do_input( int& );
@@ -196,15 +208,15 @@ protected:
 	virtual HStreamInterface& do_input( float& );
 	virtual HStreamInterface& do_input( void const*& );
 	virtual int long do_read_until( yaal::hcore::HString&, char const* const, bool );
-	virtual int long do_read_until_n( yaal::hcore::HString&, int long const&, char const* const, bool );
+	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const* const, bool );
 	virtual HStreamInterface& do_set_fill( int );
 	virtual HStreamInterface& do_set_width( int );
 	virtual HStreamInterface& do_set_base( BASES::enum_t );
 private:
 	bool read_word( void );
 	int long reformat( void );
-	virtual int long do_write( void const* const, int long const& ) = 0;
-	virtual int long do_read( void* const, int long const& ) = 0;
+	virtual int long do_write( void const* const, int long ) = 0;
+	virtual int long do_read( void* const, int long ) = 0;
 	virtual void do_flush( void ) const = 0;
 	virtual bool do_is_valid( void ) const = 0;
 	friend HStreamInterface& endl( HStreamInterface& );

@@ -161,7 +161,7 @@ int long HFile::tell( void ) const
 	M_EPILOG
 	}
 
-void HFile::seek( int long const& pos, seek_t const& seek_ )
+void HFile::seek( int long pos, seek_t const& seek_ )
 	{
 	M_PROLOG
 	M_ASSERT( _handle );
@@ -299,7 +299,7 @@ bool HFile::operator ! ( void ) const
 	M_EPILOG
 	}
 
-int long HFile::do_read( void* const buffer_, int long const& size_ )
+int long HFile::do_read( void* const buffer_, int long size_ )
 	{
 	M_PROLOG
 	int long len( static_cast<int long>( ::std::fread( buffer_, sizeof ( char ), size_, static_cast<FILE*>( _handle ) ) ) );
@@ -307,7 +307,7 @@ int long HFile::do_read( void* const buffer_, int long const& size_ )
 	M_EPILOG
 	}
 
-int long HFile::do_write( void const* const string_, int long const& size_ )
+int long HFile::do_write( void const* const string_, int long size_ )
 	{
 	M_PROLOG
 	M_ASSERT( _handle );

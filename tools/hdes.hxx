@@ -67,10 +67,10 @@ private:
 public:
 	HDes( yaal::hcore::HString const& );
 	virtual ~HDes( void );
-	void crypt( u8_t*, int long const&, action_t const& );
+	void crypt( u8_t*, int long, action_t const& );
 	void flush_keys( void );
 private:
-	void generate_keys( u8_t const*, int const& );
+	void generate_keys( u8_t const*, int );
 	void _des( u8_t* /* block */, int /* action */, int /* part */ );
 	void _3des( u8_t* /* block */, int /* action */ );
 	void permutate( u8_t* /* buffer */, const u8_t* /* tab */, int /* len */ ) const;

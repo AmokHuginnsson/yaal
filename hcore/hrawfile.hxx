@@ -45,8 +45,8 @@ class HRawFile : public HStreamInterface
 protected:
 	typedef HRawFile this_type;
 	typedef HStreamInterface base_type;
-	typedef int long ( HRawFile::* READER_t )( void* const, int long const& );
-	typedef int long ( HRawFile::* WRITER_t )( void const* const, int long const& );
+	typedef int long ( HRawFile::* READER_t )( void* const, int long );
+	typedef int long ( HRawFile::* WRITER_t )( void const* const, int long );
 	typedef int ( HRawFile::* CLOSER_t )( void );
 	/*! \brief Type of underneath file descriptor.
 	 */
@@ -88,19 +88,19 @@ public:
 	 *
 	 * \param timeout - a new timeout value in miliseconds.
 	 */
-	void set_timeout( int long const& timeout );
+	void set_timeout( int long timeout );
 protected:
 	virtual int do_close( void );
 	int close_plain( void );
 	int close_ssl( void );
-	int long read_plain( void* const, int long const& );
-	int long write_plain( void const* const, int long const& );
-	int long read_ssl_loader( void* const, int long const& );
-	int long write_ssl_loader( void const* const, int long const& );
-	int long read_ssl( void* const, int long const& );
-	int long write_ssl( void const* const, int long const& );
-	virtual int long do_write( void const* const, int long const& );
-	virtual int long do_read( void* const, int long const& );
+	int long read_plain( void* const, int long );
+	int long write_plain( void const* const, int long );
+	int long read_ssl_loader( void* const, int long );
+	int long write_ssl_loader( void const* const, int long );
+	int long read_ssl( void* const, int long );
+	int long write_ssl( void const* const, int long );
+	virtual int long do_write( void const* const, int long );
+	virtual int long do_read( void* const, int long );
 	virtual void do_flush( void ) const;
 	virtual bool do_is_valid( void ) const;
 	bool wait_for( ACTION::action_t const&, int long* );
