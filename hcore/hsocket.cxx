@@ -42,6 +42,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hsocket.hxx"
 #include "xalloc.hxx"
 #include "hstring.hxx"
+#include "system.hxx"
 #include "hlog.hxx"
 
 namespace yaal
@@ -248,9 +249,25 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ )
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
+	int saveErrno( errno );
 	make_address( address_, port_ );
-	M_ENSURE_EX( ( ::connect( _fileDescriptor,
-				static_cast<sockaddr*>( _address ), _addressSize ) == 0 ), address_ );
+	int error( ::connect( _fileDescriptor, static_cast<sockaddr*>( _address ), _addressSize ) );
+	if ( ( !!( _type & TYPE::NONBLOCKING ) ) && error && ( errno == EINPROGRESS ) )
+		{
+		int fd( _fileDescriptor );
+		int long timeout( _timeout );
+		int up( hcore::system::wait_for_io( NULL, 0, &fd, 1, &timeout ) );
+		if ( up == 1 )
+			{
+			M_ASSERT( fd == _fileDescriptor );
+			socklen_t optLen( sizeof ( error ) );
+			M_ENSURE( ::getsockopt( _fileDescriptor, SOL_SOCKET, SO_ERROR, &error, &optLen ) == 0 );
+			}
+		else if ( ! timeout )
+			M_ENSURE_EX( ! "connection timedout", address_ );
+		}
+	M_ENSURE_EX( error == 0, address_ );
+	errno = saveErrno;
 	_needShutdown = true;
 	return;
 	M_EPILOG
