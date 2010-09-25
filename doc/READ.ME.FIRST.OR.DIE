@@ -20,9 +20,8 @@ please look into HTML documentation.]
 If your platform is not on above list, it is very likely that yaal
 will not compile/link/work.
 
-Yaal does not intend to support any "stable" release of any
-system. Yaal was meant to be compatible only with systems at
-bleeding edge of development stage. Above statements mean:
+Yaal is meant to be compatible only with systems at
+bleeding edge of development stage. Above statement means:
 We do not maintain backward compatibility of any kind,
 if you want increase your yaal integration success probability
 please use newest development (build) tools available,

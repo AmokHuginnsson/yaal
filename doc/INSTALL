@@ -61,7 +61,7 @@ a new shell instance is spawned. Existence of this line of code in your shell
 initialization script will cause that form now on a new environment variable
 will exist, variable named PREFIX with value representing path to some directory
 (in case of our example it will be the `usr' directory located directly in your home
-directory.
+directory).
 
 In step 2x you cause your shell to load its initialization file and through that
 to include newly added persistent environment variable to currently running shell session.
