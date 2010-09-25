@@ -1,88 +1,100 @@
-*** yaal documentation ***
+*** yaal documentation - installation instructions ***
 
 First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 
-* System requirements:
+* System requirements.
 
-	libraries for:
+  required libraries:
     - pthread (libpthread)
     - ssl (libssl)
     - rt (librt)
-		- xml (libxml2)
-		- xslt (libxslt1)
-		- dl (libdl)
-		- ncurses (ncurses)
+    - xml (libxml2)
+    - xslt (libxslt1)
+    - dl (libdl)
+    - z (zlib)
+    - ncurses (ncurses)
 	
-	optional libraries:
-		- SQLite3
-		- SQLite
-		- MySQL
-		- PostGreSQL
-		- OCI
-		- gpm
+  optional libraries:
+    - SQLite3
+    - PostGreSQL
+    - MySQL
+    - OCI
+    - gpm
 
-	tools:
-		- autoconf
-		- GNU make
-		- gcc/g++
+  required tools:
+    - autoreconf
+    - autoheader
+    - autoconf
+    - GNU make
+    - g++
 
-	other:
-		- lots of grace and patience
+  other:
+    - lots of grace and patience
 
-* Installation process:
+* Installation process.
 
-Installation process can vary from platform type (FreeBSD/non-FreeBSD),
-usage so far (fresh install/update), and your expirience (expert/non-expert).
-So we have six posibilities (yes I know that 2*2*2==8) which we explain below.
+  1. Create new (possibly persistent) environment variable (see your shell documentation)
+     named PREFIX and set its value to desired installation destination directory.
+  2. Go to sources directory and type `make', i.e:.
+  3. (Required only once.) Still in yaal sources directory type `make install-environment'.
+  4. Still in yaal sources directory type `make install'.
+  5. Spawn new shell instance to get yaal installed headers and libraries visible.
 
-Lines that starts with `$' represent commands, lines that start with `#'
-represent comments, for example:
+(0)  $ cd
+(1a) $ echo 'export PREFIX="${HOME}/usr/"' >> .bashrc     # for bash shell
+(1b) $ echo 'setenv PREFIX "${HOME}/usr/"' >> .tcshrc     # for tcsh shell
+(2a) $ . ${HOME}/.bashrc                                  # for bash shell
+(2b) $ source ${HOME}/.tcshrc                             # for tcsh shell
+(3)  $ cd ~/src/yaal/
+(4)  $ make
+(5)  $ make install-environment
+(6)  $ make install
 
-	$ rm -fr /
-	# this is comment, and the line above is a funny command
+Next spawn new shell and you are done!
 
-Let installation begin.
+* Understanding the installation process:
 
-# common step for all cases
-	$ cd /path/to/yaal/
-	$ git pull
+In step 0 we make sure we start the procedure from your home directory.
 
-# first case (FreeBSD/update/expert)
-	$ make
+In step 1x you add a line of code to file that is read by your shell every time
+a new shell instance is spawned. Existence of this line of code in your shell
+initialization script will cause that form now on a new environment variable
+will exist, variable named PREFIX with value representing path to some directory
+(in case of our example it will be the `usr' directory located directly in your home
+directory.
 
-# second case (FreeBSD/update/non-expert)
-	$ make purge # it may fail
-	$ make
+In step 2x you cause your shell to load its initialization file and through that
+to include newly added persistent environment variable to currently running shell session.
 
-# third case (FreeBSD/fresh install)
-	$ make
-# (next step applays only if you have not struggled with LD_LIBRARY_PATH
-# already, if you have modified LD_LIBRARY_PATH before you have to use
-# the source Luke (_aux/msh) and see what has to be done.)
-	$ make install
+In step 3 you are expected to enter a directory with `yaal' sources.
 
-# fourth case (non-FreeBSD/update/expert)
-	$ autoconf
-	$ ./configure
-	$ make
+In step 4 you run build of `yaal' sources.
 
-# fifth case (non-FreeBSD/update/non-expert)
-	$ make purge # it may fail
-	$ autoconf
-	$ ./configure
-	$ make mrproper
-	$ make
+By default `yaal' is build into shared (aka dynamically loaded) libraries,
+moreover one does not need root privileges to install `yaal' libraries.
+All installed files can be stored in your home directory.
+Because you will install yaal headers outside of default header directory location 
+(like /usr/include or /usr/local/include), and you will install binary libraries
+outside of default directory location (like /usr/lib or /usr/local/lib) you will
+need to tell your compiler (GCC) and operating system dynamic linker (ld-so)
+where to find these files. To do that you will need to persistently add four
+special variables (C_INCLUDE_PATH, CPLUS_INCLUDE_PATH, LIBRARY_PATH, LD_LIBRARY_PATH)
+to your environment. In step 5 you will do precisely that.
 
-# sixth case (non-FreeBSD/fresh install)
-	$ autoconf
-	$ ./configure
-	$ make
-# (next step applays only if you have not struggled with LD_LIBRARY_PATH
-# already, if you have modified LD_LIBRARY_PATH before you have to use
-# the source Luke (_aux/msh) and see what has to be done.)
-	$ make install
+In step 6 you will install `yaal' headers and binary libraries into correct paths:
+headers into ${PREFIX}/include, libraries into ${PREFIX}/lib.
 
-# common step for all cases
-# in case of error, read FAQ, if reading FAQ did not help email
-# developer with full info about your problem
+* Testing the installation.
+
+`yaal' has its own test suite that is a speparate application.
+To confirm that `yaal' installation was in fact successful you will need
+to get, build and run this suite.
+
+The suite is called `tress' and can be obtained from git repository.
+
+$ git clone https://codestation.org/repo/tress.git tress
+
+After you get `tress' sources look for README file there.
+
+Good luck!
 
