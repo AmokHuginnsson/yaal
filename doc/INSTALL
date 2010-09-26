@@ -33,22 +33,28 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 
 * Installation process.
 
-  1. Create new (possibly persistent) environment variable (see your shell documentation)
-     named PREFIX and set its value to desired installation destination directory.
+  1. Create new (possibly persistent) environment variables (see your shell documentation)
+     one named PREFIX and set its value to desired installation destination directory,
+		 another named DEFAULT_TARGET and set to desired build mode, a `debug' value is advised.
   2. Go to sources directory and type `make', i.e:.
   3. (Required only once.) Still in yaal sources directory type `make install-environment'.
   4. Still in yaal sources directory type `make install'.
   5. Spawn new shell instance to get yaal installed headers and libraries visible.
 
-(0)  $ cd
-(1a) $ echo 'export PREFIX="${HOME}/usr/"' >> .bashrc     # for bash shell
-(1b) $ echo 'setenv PREFIX "${HOME}/usr/"' >> .tcshrc     # for tcsh shell
-(2a) $ . ${HOME}/.bashrc                                  # for bash shell
-(2b) $ source ${HOME}/.tcshrc                             # for tcsh shell
-(3)  $ cd ~/src/yaal/
-(4)  $ make
-(5)  $ make install-environment
-(6)  $ make install
+( 0 ) $ cd
+( 1a) $ echo 'export PREFIX="${HOME}/usr/"' >> .bashrc                 # for bash shell
+( 1b) $ echo 'setenv PREFIX "${HOME}/usr/"' >> .tcshrc                 # for tcsh shell
+( 2a) $ echo 'export DEFAULT_TARGET="debug"' >> .bashrc                # for bash shell
+( 2b) $ echo 'setenv DEFAULT_TARGET "debug"' >> .tcshrc                # for tcsh shell
+( 3a) $ . "${HOME}/.bashrc"                                            # for bash shell
+( 3b) $ source "${HOME}/.tcshrc"                                       # for tcsh shell
+( 4 ) $ cd "${HOME}/src/yaal/"
+( 5 ) $ make
+( 6 ) $ make install-environment                                       # required only once
+( 7 ) $ make install
+( 8 ) $ mkdir -p "${HOME}/etc/conf"
+( 9 ) $ cd "${HOME}/etc/conf"
+(10 ) $ ln -s "${HOME}/src/yaal/build/${DEFAULT_TARGET}/yaalrc" yaalrc # required only once
 
 Next spawn new shell and you are done!
 
@@ -63,12 +69,15 @@ will exist, variable named PREFIX with value representing path to some directory
 (in case of our example it will be the `usr' directory located directly in your home
 directory).
 
-In step 2x you cause your shell to load its initialization file and through that
-to include newly added persistent environment variable to currently running shell session.
+Similarly to step 1x in step 2x you will set new persistent environment variable
+named DEFAULT_TARGET.
 
-In step 3 you are expected to enter a directory with `yaal' sources.
+In step 3x you cause your shell to load its initialization file and through that
+to include newly added persistent environment variables to currently running shell session.
 
-In step 4 you run build of `yaal' sources.
+In step 4 you are expected to enter a directory with `yaal' sources.
+
+In step 5 you run build of `yaal' sources.
 
 By default `yaal' is build into shared (aka dynamically loaded) libraries,
 moreover one does not need root privileges to install `yaal' libraries.
@@ -79,14 +88,27 @@ outside of default directory location (like /usr/lib or /usr/local/lib) you will
 need to tell your compiler (GCC) and operating system dynamic linker (ld-so)
 where to find these files. To do that you will need to persistently add four
 special variables (C_INCLUDE_PATH, CPLUS_INCLUDE_PATH, LIBRARY_PATH, LD_LIBRARY_PATH)
-to your environment. In step 5 you will do precisely that.
+to your environment. In step 6 you will do precisely that.
 
-In step 6 you will install `yaal' headers and binary libraries into correct paths:
+In step 7 you will install `yaal' headers and binary libraries into correct paths:
 headers into ${PREFIX}/include, libraries into ${PREFIX}/lib.
+
+Any time `yaal' library is loaded by client application, it reads an initialization file
+from its default location: ${HOME}/etc/conf/yaalrc.
+In step 8 you create a directory where `yaal' and all its clients will store their respective
+configuration files.
+
+In step 9 we enter directory created in step 8.
+
+In step 10 we create link to `yaal' configuration file.
+
+Please observe that in steps 4 and 10 we assumed you downloaded `yaal' sources
+into "${HOME}/src/yaal' directory, if not please modify paths in those steps
+accordingly.
 
 * Testing the installation.
 
-`yaal' has its own test suite that is a speparate application.
+`yaal' has its own test suite that is a separate application.
 To confirm that `yaal' installation was in fact successful you will need
 to get, build and run this suite.
 
