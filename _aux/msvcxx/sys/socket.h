@@ -35,7 +35,7 @@ inline int ms_socket( int af_, int type_, int protocol_ )
 inline int bind( int s_, struct sockaddr const* name_, socklen_t namelen_ )
 	{ return ( msvcxx::unix_bind( s_, name_, namelen_ ) ); }
 
-inline int ms_listen( int s_, int backlog_ )
+inline int listen( int s_, int backlog_ )
 	{ return ( msvcxx::unix_listen( s_, backlog_ ) ); }
 
 inline int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )

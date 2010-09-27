@@ -428,7 +428,7 @@ int unix_listen( int fd_, int backlog_ )
 		SOCKET s( reinterpret_cast<SOCKET>( io._handle ) );
 		if ( WSAEventSelect( s, io._overlapped.hEvent, FD_ACCEPT ) )
 			log_windows_error( "WSAEventSelect" );
-		ret = listen( s, backlog_ );
+		ret = ::listen( s, backlog_ );
 		}
 	return ( ret );
 	}
