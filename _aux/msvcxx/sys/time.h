@@ -8,22 +8,10 @@
 #define _NETDB_H 1
 #define _ARPA_INET_H 1
 #define select select_off
-#define setsockopt setsockopt_off
-#define getsockopt getsockopt_off
-#define socket socket_off
-#define accept accept_off
-#define listen listen_off
-#define shutdown shutdown_off
 #define fd_set fd_set_off
 #define inet_ntop inet_ntop_off
 #include <ws2tcpip.h>
 #undef inet_ntop
-#undef setsockopt
-#undef getsockopt
-#undef shutdown
-#undef listen
-#undef accept
-#undef socket
 #undef inet_ntop
 #undef select
 #undef fd_set

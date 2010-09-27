@@ -178,6 +178,7 @@ extern "C" int fcntl( int fd_, int cmd_, ... );
 M_EXPORT_SYMBOL
 int unix_fcntl( int fd_, int cmd_, int arg_ )
 	{
+#undef fcntl
 	int ret( 0 );
 	if ( fd_ < SystemIO::MANAGED_IO )
 		ret = fcntl( fd_, cmd_, arg_ );
@@ -243,8 +244,8 @@ M_EXPORT_SYMBOL
 int long unix_read( int const& fd_, void* buf_, int long size_ )
 	{
 	SystemIO& sysIo( SystemIO::get_instance() );
-	DWORD nRead( 0 );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	DWORD nRead( 0 );
 	int off( 0 );
 	bool ok( false );
 	if ( io._scheduled )
@@ -260,7 +261,7 @@ int long unix_read( int const& fd_, void* buf_, int long size_ )
 		ok = ::ReadFile( io._handle, static_cast<char*>( buf_ ) + off, size_ - off, &nRead, &io._overlapped ) ? true : false;
 		if ( ! ok )
 			log_windows_error( "ReadFile" );
-		ok = ::GetOverlappedResult( io._handle, &io._overlapped, &nRead, false ) ? true : false;
+		ok = ::GetOverlappedResult( io._handle, &io._overlapped, &nRead, ! io._nonBlocking ) ? true : false;
 		if ( ! ok )
 			log_windows_error( "GetOverlappedResult" );
 		}
@@ -275,7 +276,10 @@ int long unix_write( int const& fd_, void const* buf_, int long size_ )
 	SystemIO& sysIo( SystemIO::get_instance() );
 	DWORD nWritten( 0 );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	bool ok( ::WriteFile( io._handle, buf_, size_, &nWritten, NULL ) ? true : false );
+	bool ok( ::WriteFile( io._handle, buf_, size_, &nWritten, &io._overlapped ) ? true : false );
+	ok = ::GetOverlappedResult( io._handle, &io._overlapped, &nWritten, true ) ? true : false;
+	if ( ! ok )
+		log_windows_error( "GetOverlappedResult" );
 	return ( ok ? nWritten : -1 );
 	}
 
@@ -338,6 +342,8 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 		else
 			FD_ZERO( readFds );
 		}
+	else if ( writeFds )
+		ret = writeFds->_count;
 	else
 		{
 		M_ASSERT( timeout );
@@ -360,6 +366,7 @@ int make_pipe_instance( IO& io_ )
 
 int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 	{
+#undef bind
 	int ret( -1 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -394,6 +401,7 @@ int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 
 int unix_socket( int af, int type, int protocol )
 	{
+#undef socket
 	SOCKET s = -1;
 	if ( af != PF_UNIX )
 		s = ::socket( af, type, protocol );
@@ -404,6 +412,7 @@ int unix_socket( int af, int type, int protocol )
 
 int unix_listen( int const& fd_, int const& backlog_ )
 	{
+#undef listen
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -428,6 +437,7 @@ int unix_listen( int const& fd_, int const& backlog_ )
 
 int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
+#undef accept
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -456,6 +466,7 @@ int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 
 int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 	{
+#undef connect
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -486,11 +497,18 @@ int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 
 int unix_shutdown( int fd_, int how_ )
 	{
-	return ( 0 );
+#undef shutdown
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	int ret( 0 );
+	if ( io._type == IO::TYPE::SOCKET )
+		ret = ::shutdown( reinterpret_cast<SOCKET>( io._handle ), how_ );
+	return ( ret );
 	}
 
 int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
 	{
+#undef setsockopt
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -501,6 +519,7 @@ int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, soc
 
 int unix_getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ )
 	{
+#undef getsockopt
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
