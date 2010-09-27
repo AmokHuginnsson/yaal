@@ -1,34 +1,18 @@
 #include <sys/cdefs.h>
-#define fd_set fd_set_win_off
 #include <string>
-#include <ws2tcpip.h>
+#include <sys/time.h>
 #include <dbghelp.h>
 #include <../include/sys/stat.h>
 
-#define gethostname gethostname_off
-#define timeval timeval_off
 #define getpid getpid_off
 #define isatty isatty_off
 #define getpwuid_r getpwuid_r_off
-
-#undef fd_set
-#undef FD_SET
-#undef FD_CLR
-#undef FD_ISSET
-#undef FD_ZERO
-#undef FD_SETSIZE
-#undef timerclear
-#undef timercmp
-#undef fd_set
-#undef FD_SET
 
 #include <unistd.h>
 #include <dirent.h>
 #include <pwd.h>
 
 #undef getpwuid_r
-#undef gethostname
-#undef timeval
 #undef getpid
 #undef readdir_r
 #undef dirent
@@ -135,6 +119,7 @@ int ms_gethostname( char* buf_, int len_ )
 	WSADATA wsaData;
 	WORD wVersionRequested( MAKEWORD( 2, 2 ) );
 	int err( WSAStartup( wVersionRequested, &wsaData ) );
+#undef gethostname
 	return ( gethostname( buf_, len_ ) );
 	}
 

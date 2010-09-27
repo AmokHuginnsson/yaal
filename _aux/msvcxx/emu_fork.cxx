@@ -1,17 +1,13 @@
 #include <sys/cdefs.h>
-#define fd_set fd_set_win_off
 #include <process.h>
 #include <io.h>
 
-#define pthread_sigmask pthread_sigmask_off
 #define execl execl_off
 #define execle execle_off
 #define execv execv_off
 #define execve execve_off
 #define execlp execlp_off
 #define execvp execvp_off
-#define gethostname gethostname_off
-#define timeval timeval_off
 #define access access_off
 #define lseek lseek_off
 #define dup dup_off
@@ -19,17 +15,6 @@
 #define getpid getpid_off
 #define isatty isatty_off
 #define getpwuid_r getpwuid_r_off
-
-#undef fd_set
-#undef FD_SET
-#undef FD_CLR
-#undef FD_ISSET
-#undef FD_ZERO
-#undef FD_SETSIZE
-#undef timerclear
-#undef timercmp
-#undef fd_set
-#undef FD_SET
 
 #include <unistd.h>
 

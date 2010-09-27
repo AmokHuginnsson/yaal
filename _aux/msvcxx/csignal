@@ -6,11 +6,7 @@
 #define sigwait sigwait_off
 #define sigemptyset sigemptyset_off
 #define kill kill_off
-#define fd_set fd_set_off
 #include <../include/csignal>
-#include <sys/types.h>
-#undef fd_set
-#undef FD_SET
 #include <unistd.h>
 #undef sigaddset
 #undef sigdelset

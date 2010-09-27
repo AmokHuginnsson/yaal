@@ -26,7 +26,6 @@ Copyright:
 
 #include <cstring>
 #include <unistd.h>
-#include <poll.h>
 #include <libintl.h>
 #include <sys/time.h> /* timeval */
 

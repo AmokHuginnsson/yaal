@@ -1,21 +1,9 @@
 #include <sys/cdefs.h>
 #include <hash_map>
 #include <sstream>
-#define fd_set fd_set_win_off
-#include <ws2tcpip.h>
 #include <io.h>
 #include <../include/fcntl.h>
 
-#define timeval timeval_off
-#define dup dup_off
-#define dup2 dup2_off
-
-#undef fd_set
-#undef FD_SET
-#undef FD_CLR
-#undef FD_ISSET
-#undef FD_ZERO
-#undef FD_SETSIZE
 #undef timerclear
 #undef timercmp
 #undef O_RDONLY
@@ -25,14 +13,10 @@
 #undef O_EXCL
 #undef O_TRUNC
 #undef O_APPEND
-#undef fd_set
-#undef FD_SET
 
-#include <sys/time.h>
+#include <sys/socket.h>
 #define _FCNTL_H 1
 #include <bits/fcntl.h>
-
-#undef timeval
 
 #include "hcore/base.hxx"
 #include "hcore/hexception.hxx"
@@ -349,7 +333,7 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 			ret = -1;
 			log_windows_error( "WaitForMultipleObjects" );
 			}
-		else if ( ( up >= WAIT_OBJECT_0 ) && ( up < ( WAIT_OBJECT_0 + count ) ) )
+		else if ( ( up >= static_cast<int>( WAIT_OBJECT_0 ) ) && ( up < ( static_cast<int>( WAIT_OBJECT_0 ) + count ) ) )
 			{
 			for ( int i( 0 ); i < count; ++ i )
 				{
@@ -384,28 +368,6 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 
 namespace msvcxx	
 {
-
-int unix_getaddrinfo( char const* node_,
-								char const* service_,
-								struct addrinfo const* hints_,
-								struct addrinfo** res_ )
-	{
-	return ( getaddrinfo( node_, service_, hints_, res_ ) );
-	}
-
-void unix_freeaddrinfo( struct addrinfo* res_ )
-	{
-	freeaddrinfo( res_ );
-	}
-
-int unix_getnameinfo( struct sockaddr const* sa_,
-								 socklen_t salen_,
-								 char* host_, size_t hostlen_,
-                 char* serv_, size_t servlen_,
-                 int flags_ )
-	{
-	return ( getnameinfo( sa_, salen_, host_, hostlen_, serv_, servlen_, flags_ ) );
-	}
 
 int make_pipe_instance( IO& io_ )
 	{
@@ -554,6 +516,16 @@ int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, soc
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	if ( io._type == IO::TYPE::SOCKET )
 		ret = setsockopt( reinterpret_cast<SOCKET>( io._handle ), level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
+	return ( ret );
+	}
+
+int unix_getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ )
+	{
+	int ret( 0 );
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	if ( io._type == IO::TYPE::SOCKET )
+		ret = getsockopt( reinterpret_cast<SOCKET>( io._handle ), level_, optname_, static_cast<char*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 

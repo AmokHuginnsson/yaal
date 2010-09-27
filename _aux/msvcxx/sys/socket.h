@@ -1,51 +1,12 @@
 #ifndef YAAL_MSVCXX_SYS_SOCKET_H_INCLUDED
 #define YAAL_MSVCXX_SYS_SOCKET_H_INCLUDED 1
 
-#define setsockopt setsockopt_off
-#define socket socket_off
-#define accept accept_off
-#define connect connect_off
-#define listen listen_off
-#define shutdown shutdown_off
-#define bind bind_off
-#define getaddrinfo getaddrinfo_off
-#define getnameinfo getnameinfo_off
-#define freeaddrinfo freeaddrinfo_off
-#define fd_set fd_set_win_off
-#define timeval timeval_off
-#define _SYS_UN_H 1
-#define _NETINET_IN_H 1
-#define _NETDB_H 1
-#define _ARPA_INET_H 1
-#undef gethostname
-#define gethostname gethostname_off
-#define select select_win_off
-#define inet_ntop inet_ntop_off
-#undef FD_CLR
-#undef FD_SET
-#undef FD_ZERO
-#undef timercmp
-#undef timerclear
-#include <ws2tcpip.h>
-#include "cleanup.hxx"
-#undef inet_ntop
-#undef select
-#undef gethostname
-#undef fd_set
-#undef timeval
-#undef getaddrinfo
-#undef getnameinfo
-#undef freeaddrinfo
-#undef setsockopt
-#undef shutdown
-#undef listen
-#undef connect
-#undef accept
-#undef socket
-#undef bind
+#include <sys/time.h>
+
 #define ENOTCONN WSAENOTCONN
 #define ECONNRESET WSAECONNRESET
-static int const SHUT_RDWR = 1 | 2;
+#define EINPROGRESS WSAEINPROGRESS
+static int const SHUT_RDWR = SD_RECEIVE | SD_SEND;
 
 struct sockaddr_un
 	{
@@ -62,10 +23,8 @@ int unix_accept( int, struct sockaddr*, socklen_t* );
 int unix_connect( int, struct sockaddr*, socklen_t );
 int unix_shutdown( int, int );
 int unix_bind( int, struct sockaddr const*, socklen_t );
-int unix_getaddrinfo( char const*, char const*, struct addrinfo const*, struct addrinfo** );
-void unix_freeaddrinfo( struct addrinfo* );
-int unix_getnameinfo( struct sockaddr const*, socklen_t, char*, size_t, char*, size_t, int );
 int unix_setsockopt( int, int, int, void const*, socklen_t );
+int unix_getsockopt( int, int, int, void*, socklen_t* );
 
 }
 
@@ -90,33 +49,14 @@ inline int shutdown( int fd_, int how_ )
 inline int setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
 	{	return ( msvcxx::unix_setsockopt( fd_, level_, optname_, optval_, optlen_ ) ); }
 
-inline int getaddrinfo( char const* node_,
-								char const* service_,
-								struct addrinfo const* hints_,
-								struct addrinfo** res_ )
-	{
-	return ( msvcxx::unix_getaddrinfo( node_, service_, hints_, res_ ) );
-	}
-
-inline void freeaddrinfo( struct addrinfo* res_ )
-	{
-	msvcxx::unix_freeaddrinfo( res_ );
-	}
-
-inline int getnameinfo( struct sockaddr const* sa_,
-								 socklen_t salen_,
-								 char* host_, size_t hostlen_,
-                 char* serv_, size_t servlen_,
-                 int flags_ )
-	{
-	return ( msvcxx::unix_getnameinfo( sa_, salen_, host_, hostlen_, serv_, servlen_, flags_ ) );
-	}
+inline int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ )
+	{	return ( msvcxx::unix_getsockopt( fd_, level_, optname_, optval_, optlen_ ) ); }
 
 inline char const* inet_ntop( int af_, void const* src_, char* dst_, socklen_t size_ )
 	{
 	char* name = inet_ntoa( *static_cast<in_addr const*>( src_ ) );
 	if ( name )
-		::strncpy( dst_, name, size_ );
+		::strncpy_s( dst_, size_, name, size_ );
 	return ( name ? dst_ : NULL );
 	}
 
@@ -135,8 +75,14 @@ public:
 		{ return ( get_socket_error() ); }
 	};
 
+inline SocketErrno& get_socket_errno( void )
+	{
+	static SocketErrno socketErrno;
+	return ( socketErrno );
+	}
+
 #undef errno
-#define errno SocketErrno()
+#define errno get_socket_errno()
 
 #endif /* not YAAL_MSVCXX_SYS_SOCKET_H_INCLUDED */
 

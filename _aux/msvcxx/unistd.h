@@ -1,27 +1,28 @@
 #ifndef YAAL_MSVCXX_UNISTD_H_INCLUDED
 #define YAAL_MSVCXX_UNISTD_H_INCLUDED 1
 
-#define close close_off
-#define read read_off
-#define write write_off
 #include <cstdio>
 #include <cerrno>
-#define unlink unlink_gnu
 #undef tmpfile
 extern "C" FILE* tmpfile( void );
 
+#define _SYS_SOCKET_H 1
+#define _SYS_RESOURCE_H 1
 #undef EDEADLOCK
-#define select select_off
 #define __socklen_t_defined 1
 #undef environ
-#define fd_set fd_set_off
+#define unlink unlink_off
 #define pipe pipe_off
+#define close close_off
+#define read read_off
+#define write write_off
+#define timeval timeval_off
+#define gethostname gethostname_off
 #include <glibc/unistd.h>
+#undef gethostname
 #include <sys/types.h>
 #include <libintl.h>
-#undef fd_set
-#undef FD_SET
-#include <sys/time.h>
+#undef timeval
 #undef environ
 #undef select
 #undef fprintf
@@ -29,14 +30,14 @@ extern "C" FILE* tmpfile( void );
 #undef read
 #undef write
 #undef pipe
+#undef unlink
 
-#undef gethostname
-#define gethostname ms_gethostname
-int ms_gethostname( char*, int );
+#include <sys/time.h>
 
 #define fork ms_fork
+#define gethostname ms_gethostname
 
-#undef unlink
+int ms_gethostname( char*, int );
 
 int unix_close( int const& );
 __declspec( dllimport ) int long unix_read( int const&, void*, int long );
