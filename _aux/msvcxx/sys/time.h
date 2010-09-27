@@ -29,7 +29,7 @@ struct fd_set
 namespace asio
 {
 
-inline bool FD_ISSET( int const& fd_, fd_set const* fdset_ )
+inline bool FD_ISSET( int fd_, fd_set const* fdset_ )
 	{
 	bool isSet( false );
 	if ( fdset_->_count > 0 )
@@ -43,9 +43,9 @@ inline void FD_ZERO( fd_set* fdset_ )
 	fdset_->_count = 0;
 	}
 
-inline void FD_SET( int const& fd_, fd_set* fdset_ )
+inline void FD_SET( int fd_, fd_set* fdset_ )
 	{ fdset_->_data[ fdset_->_count ++ ] = fd_; }
-inline void FD_SET_ms( int const& fd_, fd_set* fdset_ )
+inline void FD_SET_ms( int fd_, fd_set* fdset_ )
 	{ FD_SET( fd_, fdset_ ); }
 #define FD_SET FD_SET_ms
 

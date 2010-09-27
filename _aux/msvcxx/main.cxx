@@ -366,7 +366,6 @@ int make_pipe_instance( IO& io_ )
 
 int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 	{
-#undef bind
 	int ret( -1 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -410,9 +409,8 @@ int unix_socket( int af, int type, int protocol )
 	return ( sock.first );
 	}
 
-int unix_listen( int const& fd_, int const& backlog_ )
+int unix_listen( int fd_, int backlog_ )
 	{
-#undef listen
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -437,7 +435,6 @@ int unix_listen( int const& fd_, int const& backlog_ )
 
 int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
-#undef accept
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -466,7 +463,6 @@ int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 
 int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 	{
-#undef connect
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -488,7 +484,7 @@ int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 	else
 		{
 		SOCKET s( reinterpret_cast<SOCKET>( io._handle ) );
-		ret = ::connect( s, addr_, len_ );
+		ret = ::connect( s, const_cast<sockaddr const*>( addr_ ), static_cast<int>( len_ ) );
 		if ( WSAEventSelect( s, io._overlapped.hEvent, FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
 			log_windows_error( "WSAEventSelect" );
 		}
@@ -497,7 +493,6 @@ int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 
 int unix_shutdown( int fd_, int how_ )
 	{
-#undef shutdown
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	int ret( 0 );
@@ -508,23 +503,21 @@ int unix_shutdown( int fd_, int how_ )
 
 int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
 	{
-#undef setsockopt
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	if ( io._type == IO::TYPE::SOCKET )
-		ret = setsockopt( reinterpret_cast<SOCKET>( io._handle ), level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
+		ret = ::setsockopt( reinterpret_cast<SOCKET>( io._handle ), level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 
 int unix_getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ )
 	{
-#undef getsockopt
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	if ( io._type == IO::TYPE::SOCKET )
-		ret = getsockopt( reinterpret_cast<SOCKET>( io._handle ), level_, optname_, static_cast<char*>( optval_ ), optlen_ );
+		ret = ::getsockopt( reinterpret_cast<SOCKET>( io._handle ), level_, optname_, static_cast<char*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 

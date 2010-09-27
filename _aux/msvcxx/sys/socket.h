@@ -18,7 +18,7 @@ namespace msvcxx
 {
 
 int unix_socket( int, int, int );
-int unix_listen( int const&, int const& );
+int unix_listen( int, int );
 int unix_accept( int, struct sockaddr*, socklen_t* );
 int unix_connect( int, struct sockaddr*, socklen_t );
 int unix_shutdown( int, int );
@@ -32,33 +32,26 @@ inline int ms_socket( int af_, int type_, int protocol_ )
 	{ return ( msvcxx::unix_socket( af_, type_, protocol_ ) ); }
 #define socket ms_socket
 
-inline int ms_bind( int& s_, struct sockaddr const* name_, socklen_t namelen_ )
+inline int bind( int s_, struct sockaddr const* name_, socklen_t namelen_ )
 	{ return ( msvcxx::unix_bind( s_, name_, namelen_ ) ); }
-#define bind ms_bind
 
 inline int ms_listen( int s_, int backlog_ )
 	{ return ( msvcxx::unix_listen( s_, backlog_ ) ); }
-#define listen ms_listen
 
-inline int ms_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
+inline int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{ return ( msvcxx::unix_accept( fd_, addr_, len_ ) ); }
-#define accept ms_accept
 
-inline int ms_connect( int& fd_, struct sockaddr* addr_, socklen_t len_ )
+inline int connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 	{ return ( msvcxx::unix_connect( fd_, addr_, len_ ) ); }
-#define connect ms_connect
 
-inline int ms_shutdown( int fd_, int how_ )
+inline int shutdown( int fd_, int how_ )
 	{ return ( msvcxx::unix_shutdown( fd_, how_ ) ); }
-#define shutdown ms_shutdown
 
-inline int ms_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
+inline int setsockopt( int fd_, int level_, int optname_, char* optval_, int unsigned optlen_ )
 	{	return ( msvcxx::unix_setsockopt( fd_, level_, optname_, optval_, optlen_ ) ); }
-#define setsockopt ms_setsockopt
 
-inline int ms_getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ )
+inline int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ )
 	{	return ( msvcxx::unix_getsockopt( fd_, level_, optname_, optval_, optlen_ ) ); }
-#define getsockopt ms_getsockopt
 
 inline char const* inet_ntop( int af_, void const* src_, char* dst_, socklen_t size_ )
 	{
