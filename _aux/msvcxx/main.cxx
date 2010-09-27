@@ -175,46 +175,26 @@ private:
 
 extern "C" int fcntl( int fd_, int cmd_, ... );
 
-int do_unix_fcntl( int fd_, int cmd_, void* arg_ )
+M_EXPORT_SYMBOL
+int unix_fcntl( int fd_, int cmd_, int arg_ )
 	{
-	int ret( -1 );
+	int ret( 0 );
 	if ( fd_ < SystemIO::MANAGED_IO )
 		ret = fcntl( fd_, cmd_, arg_ );
 	else if ( cmd_ == F_SETFL )
 		{
-		int arg( reinterpret_cast<int>( arg_ ) );
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
-		io._nonBlocking = ( ( arg & O_NONBLOCK ) ? true : false );
+		io._nonBlocking = ( ( arg_ & O_NONBLOCK ) ? true : false );
 		}
 	else if ( cmd_ == F_GETFL )
 		{
-		int* arg( static_cast<int*>( arg_ ) );
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
-		*arg = io._nonBlocking ? O_NONBLOCK : 0;
+		ret = io._nonBlocking ? O_NONBLOCK : 0;
 		}
 	return ( ret );
 	}
-
-M_EXPORT_SYMBOL
-int unix_fcntl( int fd_, int cmd_, ... )
-	{
-  va_list ap;
-  void *arg;
-
-  va_start( ap, cmd_ );
-  arg = va_arg( ap, void* );
-  va_end( ap );
-
-	if ( fd_ < 0 )
-		{
-		SetLastError( EBADF );
-		return -1;
-		}
-	return do_unix_fcntl( fd_, cmd_, arg );
-	}
-
 
 void sched_read( IO& io_ )
 	{
