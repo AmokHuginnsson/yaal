@@ -16,26 +16,34 @@
 #define isatty isatty_off
 #define getpwuid_r getpwuid_r_off
 
+#include <algorithm>
+
+#define fill fill_off
 #include <unistd.h>
+#undef fill
 
 #include "hcore/xalloc.hxx"
 #include "cleanup.hxx"
+#include "msio.hxx"
 
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
+M_EXPORT_SYMBOL
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
 	{
 	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, in_, out_, err_ ) );
 	}
 
+M_EXPORT_SYMBOL
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
 	: _path( path_ ), _argv( argv_ ), _in( in_ ), _out( out_ ), _err( err_ )
 	{
 	}
 
+M_EXPORT_SYMBOL
 int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	{
 	/* Make a backup of original descriptors. */
@@ -47,9 +55,9 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	M_ENSURE( ( hStdIn >= 0 ) && ( hStdOut >= 0 ) && ( hStdErr >= 0 ) );
 
 	/* Overwrite *standard* descrptors with our communication pipe descriptors. */
-	M_ENSURE( _dup2( _in[0], _fileno( stdin ) ) == 0 );
-	M_ENSURE( _dup2( _out[1], _fileno( stdout ) ) == 0 );
-	M_ENSURE( _dup2( _err[1], _fileno( stderr ) ) == 0 );
+	M_ENSURE( ms_dup2( _in[0], _fileno( stdin ) ) == 0 );
+	M_ENSURE( ms_dup2( _out[1], _fileno( stdout ) ) == 0 );
+	M_ENSURE( ms_dup2( _err[1], _fileno( stderr ) ) == 0 );
 
 	char** argv = xcalloc<char*>( _argv.size() + 2 );
 	argv[ 0 ] = xstrdup( _path.raw() );
@@ -60,9 +68,9 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	int pid = spawnvp( P_NOWAIT, _path.raw(), argv );
 
 	/* Restore backed up standard descriptors. */
-	M_ENSURE( _dup2( hStdIn, _fileno( stdin ) ) == 0 );
-	M_ENSURE( _dup2( hStdOut, _fileno( stdout ) ) == 0 );
-	M_ENSURE( _dup2( hStdErr, _fileno( stderr ) ) == 0 );
+	M_ENSURE( ms_dup2( hStdIn, _fileno( stdin ) ) == 0 );
+	M_ENSURE( ms_dup2( hStdOut, _fileno( stdout ) ) == 0 );
+	M_ENSURE( ms_dup2( hStdErr, _fileno( stderr ) ) == 0 );
 
 	/* Close backups. */
 	if ( TEMP_FAILURE_RETRY( ::close( hStdIn ) )
@@ -75,3 +83,4 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	xfree( argv );
 	return ( pid );
 	}
+

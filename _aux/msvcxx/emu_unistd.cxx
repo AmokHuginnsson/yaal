@@ -43,12 +43,14 @@ char* __cxa_demangle( char const* const a, int, int, int* )
 
 }
 
-extern "C" int backtrace( void** buf_, int size_ )
+extern "C" 
+int backtrace( void** buf_, int size_ )
 	{
 	return ( CaptureStackBackTrace( 0, std::min( size_, 63 ), buf_, NULL ) );
 	}
 
-extern "C" char** backtrace_symbols( void* const* buf_, int size_ )
+extern "C"
+char** backtrace_symbols( void* const* buf_, int size_ )
 	{
 	char** strings = xcalloc<char*>( size_ );
 	for ( int i( 0 ); i < size_; ++ i )

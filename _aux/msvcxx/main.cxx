@@ -1,5 +1,4 @@
 #include <sys/cdefs.h>
-#include <hash_map>
 #include <sstream>
 #include <io.h>
 #include <../include/fcntl.h>
@@ -21,8 +20,8 @@
 #include "hcore/base.hxx"
 #include "hcore/hexception.hxx"
 #include "cleanup.hxx"
-#include "crit.hxx"
 #include "emu_unistd.hxx"
+#include "msio.hxx"
 
 using namespace std;
 using namespace yaal;
@@ -96,82 +95,6 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 	return ( 1 );
 	}
 
-struct IO
-	{
-	struct TYPE
-		{
-		typedef enum
-			{
-			TERMINAL,
-			PIPE,
-			NAMED_PIPE,
-			SOCKET
-			} type_t;
-		};
-	TYPE::type_t _type;
-	HANDLE _handle;
-	OVERLAPPED _overlapped;
-	char _buffer;
-	bool _scheduled; /* io has been scheduled */
-	bool _nonBlocking;
-	string _path;
-	IO( TYPE::type_t t_, HANDLE h_, HANDLE e_ = NULL, string const& p_ = string() )
-		: _type( t_ ), _handle( h_ ), _overlapped(), _buffer( 0 ), _scheduled( false ), _nonBlocking( false ), _path( p_ )
-		{
-		_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
-		}
-	~IO( void )
-		{
-		if ( _overlapped.hEvent )
-			::CloseHandle( _overlapped.hEvent );
-		}
-private:
-	IO( IO const& );
-	IO& operator = ( IO const& );
-	};
-
-typedef tr1::shared_ptr<IO> io_ptr_t;
-
-class SystemIO
-	{
-public:
-	static int const MANAGED_IO = 0x10000;
-private:
-	typedef stdext::hash_map<int, io_ptr_t> io_table_t;
-	io_table_t _ioTable;
-	CMutex _mutex;
-	int _idPool;
-public:
-	typedef io_table_t::value_type io_t;
-	io_t& create_io( IO::TYPE::type_t type_, HANDLE h_, HANDLE e_ = NULL, string const& p_ = string() )
-		{
-		CLock l( _mutex );
-		HANDLE e(  );
-		return ( *( _ioTable.insert( std::make_pair( _idPool ++, io_ptr_t( new IO( type_, h_, e_, p_ ) ) ) ).first ) );
-		}
-	io_t& get_io( int id_ )
-		{
-		CLock l( _mutex );
-		io_table_t::iterator i( _ioTable.find( id_ ) );
-		if ( i != _ioTable.end() )
-			return ( *i );
-		M_ASSERT( id_ < MANAGED_IO );
-		HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( id_ ) ) );
-		return ( *( _ioTable.insert( std::make_pair( id_, io_ptr_t( new IO( IO::TYPE::TERMINAL, h, h ) ) ) ).first ) );
-		}
-	void erase_io( int id_ )
-		{
-		CLock l( _mutex );
-		_ioTable.erase( id_ );
-		}
-	static SystemIO& get_instance( void )
-		{
-		static SystemIO instance;
-		return ( instance );
-		}
-private:
-	SystemIO( void ) : _ioTable(), _mutex(), _idPool( MANAGED_IO ) {}
-	};
 
 extern "C" int fcntl( int fd_, int cmd_, ... );
 
@@ -193,6 +116,21 @@ int unix_fcntl( int fd_, int cmd_, int arg_ )
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		ret = io._nonBlocking ? O_NONBLOCK : 0;
+		}
+	return ( ret );
+	}
+
+M_EXPORT_SYMBOL
+int ms_dup2( int fd1_, int fd2_ )
+	{
+	int ret( -1 );
+	if ( fd1_ < SystemIO::MANAGED_IO )
+		ret = _dup2( fd1_, fd2_ );
+	else
+		{
+		SystemIO& sysIo( SystemIO::get_instance() );
+		IO& io( *( sysIo.get_io( fd1_ ).second ) );
+		ret = _dup2( _open_osfhandle( reinterpret_cast<intptr_t>( io._handle ), 0 ), fd2_ );
 		}
 	return ( ret );
 	}
@@ -227,15 +165,22 @@ int unix_close( int const& fd_ )
 	{
 	SystemIO& sysIo( SystemIO::get_instance() );
 	int ret( 0 );
-	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( ( io._type == IO::TYPE::PIPE ) || ( io._type == IO::TYPE::NAMED_PIPE ) )
-		ret = ( ::CloseHandle( io._handle ) == S_OK ) ? 0 : -1;
-	else if ( io._type == IO::TYPE::SOCKET )
-		ret = ::closesocket( reinterpret_cast<SOCKET>( io._handle ) );
+	if ( fd_ < SystemIO::MANAGED_IO )
+		ret = ::close( fd_ );
 	else
 		{
-		M_ASSERT( ! "invalid HANDLE" );
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		if ( ( io._type == IO::TYPE::PIPE ) || ( io._type == IO::TYPE::NAMED_PIPE ) )
+			ret = ::CloseHandle( io._handle ) ? 0 : -1;
+		else if ( io._type == IO::TYPE::SOCKET )
+			ret = ::closesocket( reinterpret_cast<SOCKET>( io._handle ) );
+		else
+			{
+			M_ASSERT( ! "invalid HANDLE" );
+			}
 		}
+	if ( ret < 0 )
+		log_windows_error( "unix_close" );
 	sysIo.erase_io( fd_ );
 	return ( ret );
 	}
@@ -243,44 +188,58 @@ int unix_close( int const& fd_ )
 M_EXPORT_SYMBOL
 int long unix_read( int const& fd_, void* buf_, int long size_ )
 	{
-	SystemIO& sysIo( SystemIO::get_instance() );
-	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	DWORD nRead( 0 );
-	int off( 0 );
-	bool ok( false );
-	if ( io._scheduled )
+	int long nRead( -1 );
+	if ( fd_ < SystemIO::MANAGED_IO )
+		nRead = ::read( fd_, buf_, size_ ); 
+	else
 		{
-		static_cast<char*>( buf_ )[0] = io._buffer;
-		io._scheduled = false;
-		-- size_;
-		++ off;
-		ok = true;
+		SystemIO& sysIo( SystemIO::get_instance() );
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		DWORD iRead( 0 );
+		int off( 0 );
+		bool ok( false );
+		if ( io._scheduled )
+			{
+			static_cast<char*>( buf_ )[0] = io._buffer;
+			io._scheduled = false;
+			-- size_;
+			++ off;
+			ok = true;
+			}
+		if ( size_ > 0 )
+			{
+			ok = ::ReadFile( io._handle, static_cast<char*>( buf_ ) + off, size_ - off, &iRead, &io._overlapped ) ? true : false;
+			if ( ! ok )
+				log_windows_error( "ReadFile" );
+			ok = ::GetOverlappedResult( io._handle, &io._overlapped, &iRead, ! io._nonBlocking ) ? true : false;
+			if ( ! ok )
+				log_windows_error( "GetOverlappedResult" );
+			}
+		if ( ! ( nRead + off ) && ( io._type != IO::TYPE::SOCKET ) )
+			sched_read( io );
+		nRead = ok ? iRead + off : -1;
 		}
-	if ( size_ > 0 )
-		{
-		ok = ::ReadFile( io._handle, static_cast<char*>( buf_ ) + off, size_ - off, &nRead, &io._overlapped ) ? true : false;
-		if ( ! ok )
-			log_windows_error( "ReadFile" );
-		ok = ::GetOverlappedResult( io._handle, &io._overlapped, &nRead, ! io._nonBlocking ) ? true : false;
-		if ( ! ok )
-			log_windows_error( "GetOverlappedResult" );
-		}
-	if ( ! ( nRead + off ) && ( io._type != IO::TYPE::SOCKET ) )
-		sched_read( io );
-	return ( ok ? nRead + off : -1 );
+	return ( nRead );
 	}
 
 M_EXPORT_SYMBOL
 int long unix_write( int const& fd_, void const* buf_, int long size_ )
 	{
-	SystemIO& sysIo( SystemIO::get_instance() );
-	DWORD nWritten( 0 );
-	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	bool ok( ::WriteFile( io._handle, buf_, size_, &nWritten, &io._overlapped ) ? true : false );
-	ok = ::GetOverlappedResult( io._handle, &io._overlapped, &nWritten, true ) ? true : false;
-	if ( ! ok )
-		log_windows_error( "GetOverlappedResult" );
-	return ( ok ? nWritten : -1 );
+	int long nWritten( -1 );
+	if ( fd_ < SystemIO::MANAGED_IO )
+		nWritten = ::write( fd_, buf_, size_ );
+	else
+		{
+		SystemIO& sysIo( SystemIO::get_instance() );
+		DWORD iWritten( 0 );
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		bool ok( ::WriteFile( io._handle, buf_, size_, &iWritten, &io._overlapped ) ? true : false );
+		ok = ::GetOverlappedResult( io._handle, &io._overlapped, &iWritten, true ) ? true : false;
+		if ( ! ok )
+			log_windows_error( "GetOverlappedResult" );
+		nWritten = ok ? iWritten : -1;
+		}
+	return ( nWritten );
 	}
 
 struct OsCast

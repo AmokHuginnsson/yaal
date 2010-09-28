@@ -37,12 +37,14 @@ extern "C" FILE* tmpfile( void );
 #define fork ms_fork
 #define gethostname ms_gethostname
 
+#include "hcore/macro.hxx"
+
 int ms_gethostname( char*, int );
 
 int unix_close( int const& );
-__declspec( dllimport ) int long unix_read( int const&, void*, int long );
-__declspec( dllimport ) int long unix_write( int const&, void const*, int long );
-__declspec( dllimport ) int unix_pipe( int* );
+M_YAAL_HCORE_PUBLIC_API int long unix_read( int const&, void*, int long );
+M_YAAL_HCORE_PUBLIC_API int long unix_write( int const&, void const*, int long );
+M_YAAL_HCORE_PUBLIC_API int unix_pipe( int* );
 
 inline int pipe( int* fds_ )
 	{ return ( unix_pipe( fds_ ) ); }
@@ -57,10 +59,12 @@ template<typename T>
 inline int close( T const& fd_ )
 	{ return ( unix_close( fd_ ) ); }
 
+int ms_dup2( int, int );
+
 #include "tools/hpipedchild.hxx"
 
 #define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, fileDesIn, fileDesOut, fileDesErr )
-class HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn
+class M_YAAL_HCORE_PUBLIC_API HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn
 	{
 	int* _in;
 	int* _out;
