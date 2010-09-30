@@ -250,10 +250,20 @@ HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE::ssl_context_type_t type_ )
 	do_accept_or_connect( ( type_ == TYPE::SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect )
 	{
 	M_PROLOG
-	SSL* ssl( static_cast<SSL*>( _ctx->create_ssl() ) );
-	_ssl = ssl;
-	SSL_set_fd( ssl, fileDescriptor_ );
-	accept_or_connect();
+	try
+		{
+		SSL* ssl( static_cast<SSL*>( _ctx->create_ssl() ) );
+		_ssl = ssl;
+		SSL_set_fd( ssl, fileDescriptor_ );
+		accept_or_connect();
+		}
+	catch ( HOpenSSLException const& )
+		{
+		if ( _ssl )
+			_ctx->consume_ssl( _ssl );
+		_ssl = NULL;
+		throw;
+		}
 	return;
 	M_EPILOG
 	}
