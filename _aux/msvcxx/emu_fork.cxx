@@ -25,6 +25,7 @@
 #include "hcore/xalloc.hxx"
 #include "cleanup.hxx"
 #include "msio.hxx"
+#include "emu_unistd.hxx"
 
 using namespace std;
 using namespace yaal;
@@ -66,6 +67,8 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 		argv[ i ] = xstrdup( it->raw() );
 	
 	int pid = spawnvp( P_NOWAIT, _path.raw(), argv );
+	if ( pid == -1 )
+		log_windows_error( "spawnvp" );
 
 	/* Restore backed up standard descriptors. */
 	M_ENSURE( ms_dup2( hStdIn, _fileno( stdin ) ) == 0 );
