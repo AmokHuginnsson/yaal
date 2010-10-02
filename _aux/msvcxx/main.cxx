@@ -95,6 +95,13 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 	return ( 1 );
 	}
 
+void sched_read( IO& io_ )
+	{
+	DWORD nRead( 0 );
+	::ReadFile( io_._handle, &io_._buffer, 1, &nRead, &io_._overlapped );
+	io_._scheduled = true;
+	return;
+	}
 
 extern "C" int fcntl( int fd_, int cmd_, ... );
 
@@ -110,6 +117,8 @@ int unix_fcntl( int fd_, int cmd_, int arg_ )
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		io._nonBlocking = ( ( arg_ & O_NONBLOCK ) ? true : false );
+		if ( ( io._nonBlocking ) && ( ( io._type == IO::TYPE::NAMED_PIPE ) || ( io._type == IO::TYPE::PIPE ) ) )
+			sched_read( io );
 		}
 	else if ( cmd_ == F_GETFL )
 		{
@@ -135,14 +144,6 @@ int ms_dup2( int fd1_, int fd2_ )
 	return ( ret );
 	}
 
-void sched_read( IO& io_ )
-	{
-	DWORD nRead( 0 );
-	::ReadFile( io_._handle, &io_._buffer, 1, &nRead, &io_._overlapped );
-	io_._scheduled = true;
-	return;
-	}
-
 M_EXPORT_SYMBOL
 int unix_pipe( int* fds_ )
 	{
@@ -156,7 +157,6 @@ int unix_pipe( int* fds_ )
 		SystemIO::io_t writeIO( sysIo.create_io( IO::TYPE::PIPE, hWrite ) );
 		fds_[0] = readIO.first;
 		fds_[1] = writeIO.first;
-		sched_read( *(readIO.second) );
 		}
 	return ( ok ? 0 : -1 );
 	}
