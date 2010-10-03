@@ -27,5 +27,8 @@
 /* It must be included before <features.h> from GnuWin32 */
 #include <typeinfo>
 
+/* warning LNK4221 goes bye bye */
+namespace { char dummy_symbol_to_quiet_down_LNK4221_warning = 0; };
+
 #endif /* not YAAL_MSVCXX_FIX_HXX_INCLUDED */
 

@@ -5,9 +5,15 @@
 #include <glibc/fcntl.h>
 #undef fcntl
 
-int unix_fcntl( int, int, int );
+namespace msvcxx
+{
+
+int fcntl( int, int, int );
+
+} /* namespace msvcxx */
+
 inline int fcntl( int fd_, int cmd_, int arg_ )
-	{ return ( unix_fcntl( fd_, cmd_, arg_ ) ); }
+	{ return ( msvcxx::fcntl( fd_, cmd_, arg_ ) ); }
 
 #endif /* not YAAL_MSVCXX_FCNTL_H_INCLUDED */
 

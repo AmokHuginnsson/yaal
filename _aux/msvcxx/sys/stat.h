@@ -20,12 +20,15 @@
 #include <../include/sys/stat.h>
 #undef _INC_STAT_INL
 
-int unix_stat( char const*, struct stat* );
+namespace msvcxx
+{
+int stat( char const*, struct stat* );
+}
 
 inline int stat( char const* path_, struct stat* s_ )
-	{ return ( unix_stat( path_, s_ ) ); }
+	{ return ( msvcxx::stat( path_, s_ ) ); }
 
 inline int lstat( char const* path_, struct stat* s_ )
-	{ return ( unix_stat( path_, s_ ) ); }
+	{ return ( msvcxx::stat( path_, s_ ) ); }
 
 #endif /* not YAAL_MSVCXX_SYS_STAT_H_INCLUDED */

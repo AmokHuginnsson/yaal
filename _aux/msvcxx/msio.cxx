@@ -6,6 +6,9 @@
 
 #include "msio.hxx"
 
+namespace msvcxx
+{
+
 SystemIO::SystemIO( void )
 	: _ioTable(), _mutex(), _idPool( MANAGED_IO )
 	{}
@@ -38,3 +41,5 @@ void SystemIO::erase_io( int id_ )
 	CLock l( _mutex );
 	_ioTable.erase( id_ );
 	}
+
+} /* namespace msvcxx */

@@ -8,6 +8,9 @@
 #include "crit.hxx"
 #include "hcore/macro.hxx"
 
+namespace msvcxx
+{
+
 struct IO
 	{
 	struct TYPE
@@ -62,5 +65,7 @@ public:
 private:
 	SystemIO( void );
 	};
+
+} /* namespace msvcxx */
 
 #endif /* #ifndef YAAL_MSVCXX_MSIO_H_INCLUDED */

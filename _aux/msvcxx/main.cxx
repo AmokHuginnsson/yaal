@@ -26,6 +26,8 @@
 using namespace std;
 using namespace yaal;
 
+extern "C" int fcntl( int fd_, int cmd_, ... );
+
 int get_socket_error( void )
 	{
 	return ( WSAGetLastError() );
@@ -35,6 +37,9 @@ void set_socket_error( int errno_ )
 	{
 	WSASetLastError( errno_ );
 	}
+
+namespace msvcxx	
+{
 
 int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 		LPHANDLE lpWritePipe,
@@ -103,10 +108,8 @@ void sched_read( IO& io_ )
 	return;
 	}
 
-extern "C" int fcntl( int fd_, int cmd_, ... );
-
 M_EXPORT_SYMBOL
-int unix_fcntl( int fd_, int cmd_, int arg_ )
+int fcntl( int fd_, int cmd_, int arg_ )
 	{
 #undef fcntl
 	int ret( 0 );
@@ -130,7 +133,7 @@ int unix_fcntl( int fd_, int cmd_, int arg_ )
 	}
 
 M_EXPORT_SYMBOL
-int ms_dup2( int fd1_, int fd2_ )
+int dup2( int fd1_, int fd2_ )
 	{
 	int ret( -1 );
 	if ( fd1_ < SystemIO::MANAGED_IO )
@@ -145,12 +148,12 @@ int ms_dup2( int fd1_, int fd2_ )
 	}
 
 M_EXPORT_SYMBOL
-int unix_pipe( int* fds_ )
+int pipe( int* fds_ )
 	{
 	SystemIO& sysIo( SystemIO::get_instance() );
 	HANDLE hRead( NULL );
 	HANDLE hWrite( NULL );
-	bool ok( ::CreatePipeEx( &hRead, &hWrite, NULL, 4096, FILE_FLAG_OVERLAPPED , FILE_FLAG_OVERLAPPED ) ? true : false );
+	bool ok( CreatePipeEx( &hRead, &hWrite, NULL, 4096, FILE_FLAG_OVERLAPPED , FILE_FLAG_OVERLAPPED ) ? true : false );
 	if ( ok )
 		{
 		SystemIO::io_t readIO( sysIo.create_io( IO::TYPE::PIPE, hRead ) );
@@ -161,7 +164,7 @@ int unix_pipe( int* fds_ )
 	return ( ok ? 0 : -1 );
 	}
 
-int unix_close( int const& fd_ )
+int close( int const& fd_ )
 	{
 	SystemIO& sysIo( SystemIO::get_instance() );
 	int ret( 0 );
@@ -180,13 +183,13 @@ int unix_close( int const& fd_ )
 			}
 		}
 	if ( ret < 0 )
-		log_windows_error( "unix_close" );
+		log_windows_error( "close" );
 	sysIo.erase_io( fd_ );
 	return ( ret );
 	}
 
 M_EXPORT_SYMBOL
-int long unix_read( int const& fd_, void* buf_, int long size_ )
+int long read( int const& fd_, void* buf_, int long size_ )
 	{
 	int long nRead( -1 );
 	if ( fd_ < SystemIO::MANAGED_IO )
@@ -223,7 +226,7 @@ int long unix_read( int const& fd_, void* buf_, int long size_ )
 	}
 
 M_EXPORT_SYMBOL
-int long unix_write( int const& fd_, void const* buf_, int long size_ )
+int long write( int const& fd_, void const* buf_, int long size_ )
 	{
 	int long nWritten( -1 );
 	if ( fd_ < SystemIO::MANAGED_IO )
@@ -257,7 +260,7 @@ struct OsCast
 	};
 
 M_EXPORT_SYMBOL
-int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
+int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout )
 	{
 	int ret( 0 );
 	int long miliseconds( timeout ? ( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) ) : 0 );
@@ -311,9 +314,6 @@ int unix_select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds,
 	return ( ret );
 	}
 
-namespace msvcxx	
-{
-
 int make_pipe_instance( IO& io_ )
 	{
 	io_._handle = CreateNamedPipe( io_._path.c_str(),
@@ -323,7 +323,7 @@ int make_pipe_instance( IO& io_ )
 	return ( io_._handle != INVALID_HANDLE_VALUE ? 0 : -1 );
 	}
 
-int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
+int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 	{
 	int ret( -1 );
 	SystemIO& sysIo( SystemIO::get_instance() );
@@ -357,9 +357,9 @@ int unix_bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 	return ( ret );
 	}
 
-int unix_socket( int af, int type, int protocol )
-	{
 #undef socket
+int socket( int af, int type, int protocol )
+	{
 	SOCKET s = -1;
 	if ( af != PF_UNIX )
 		s = ::socket( af, type, protocol );
@@ -368,7 +368,7 @@ int unix_socket( int af, int type, int protocol )
 	return ( sock.first );
 	}
 
-int unix_listen( int fd_, int backlog_ )
+int listen( int fd_, int backlog_ )
 	{
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
@@ -392,7 +392,7 @@ int unix_listen( int fd_, int backlog_ )
 	return ( ret );
 	}
 
-int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
+int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	{
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
@@ -420,7 +420,7 @@ int unix_accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	return ( ret );
 	}
 
-int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
+int connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 	{
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
@@ -450,7 +450,7 @@ int unix_connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 	return ( ret );
 	}
 
-int unix_shutdown( int fd_, int how_ )
+int shutdown( int fd_, int how_ )
 	{
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -460,7 +460,7 @@ int unix_shutdown( int fd_, int how_ )
 	return ( ret );
 	}
 
-int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
+int setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ )
 	{
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
@@ -470,7 +470,7 @@ int unix_setsockopt( int fd_, int level_, int optname_, void const* optval_, soc
 	return ( ret );
 	}
 
-int unix_getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ )
+int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ )
 	{
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );

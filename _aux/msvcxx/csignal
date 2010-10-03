@@ -7,7 +7,11 @@
 #define sigemptyset sigemptyset_off
 #define kill kill_off
 #include <../include/csignal>
+#define signal signal_off
+#define raise raise_off
 #include <unistd.h>
+#undef signal
+#undef raise
 #undef sigaddset
 #undef sigdelset
 #undef sigwait

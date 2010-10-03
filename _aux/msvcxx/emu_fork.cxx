@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <sys/cdefs.h>
 #include <process.h>
 #include <io.h>
@@ -11,12 +12,9 @@
 #define access access_off
 #define lseek lseek_off
 #define dup dup_off
-#define dup2 dup2_off
 #define getpid getpid_off
 #define isatty isatty_off
 #define getpwuid_r getpwuid_r_off
-
-#include <algorithm>
 
 #define fill fill_off
 #include <unistd.h>
@@ -31,6 +29,7 @@ using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
+using namespace msvcxx;
 
 M_EXPORT_SYMBOL
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
@@ -56,9 +55,9 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	M_ENSURE( ( hStdIn >= 0 ) && ( hStdOut >= 0 ) && ( hStdErr >= 0 ) );
 
 	/* Overwrite *standard* descrptors with our communication pipe descriptors. */
-	M_ENSURE( ms_dup2( _in[0], _fileno( stdin ) ) == 0 );
-	M_ENSURE( ms_dup2( _out[1], _fileno( stdout ) ) == 0 );
-	M_ENSURE( ms_dup2( _err[1], _fileno( stderr ) ) == 0 );
+	M_ENSURE( ::dup2( _in[0], _fileno( stdin ) ) == 0 );
+	M_ENSURE( ::dup2( _out[1], _fileno( stdout ) ) == 0 );
+	M_ENSURE( ::dup2( _err[1], _fileno( stderr ) ) == 0 );
 
 	char** argv = xcalloc<char*>( _argv.size() + 2 );
 	argv[ 0 ] = xstrdup( _path.raw() );
@@ -71,9 +70,9 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 		log_windows_error( "spawnvp" );
 
 	/* Restore backed up standard descriptors. */
-	M_ENSURE( ms_dup2( hStdIn, _fileno( stdin ) ) == 0 );
-	M_ENSURE( ms_dup2( hStdOut, _fileno( stdout ) ) == 0 );
-	M_ENSURE( ms_dup2( hStdErr, _fileno( stderr ) ) == 0 );
+	M_ENSURE( ::dup2( hStdIn, _fileno( stdin ) ) == 0 );
+	M_ENSURE( ::dup2( hStdOut, _fileno( stdout ) ) == 0 );
+	M_ENSURE( ::dup2( hStdErr, _fileno( stderr ) ) == 0 );
 
 	/* Close backups. */
 	if ( TEMP_FAILURE_RETRY( ::close( hStdIn ) )

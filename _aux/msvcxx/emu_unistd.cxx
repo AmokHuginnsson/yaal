@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <pwd.h>
+#include <sys/socket.h>
 
 #undef getpwuid_r
 #undef getpid
@@ -30,6 +31,9 @@ using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
+
+__declspec( thread ) int SocketErrno::_errno = 0;
+int ESCDELAY = 0;
 
 namespace abi
 {
@@ -70,8 +74,11 @@ void* dlopen_fix( char const* name_, int flag_ )
 	return ( handle );
 	}
 
+namespace msvcxx
+{
+
 M_EXPORT_SYMBOL
-int unix_stat( char const* path_, struct stat* s_ )
+int stat( char const* path_, struct stat* s_ )
 	{
 	string path( path_ );
 	int lastNonSeparator( static_cast<int>( path.find_last_not_of( "/\\" ) ) );
@@ -80,7 +87,7 @@ int unix_stat( char const* path_, struct stat* s_ )
 		path.erase( lastNonSeparator + 1 );
 	else
 		path.erase( 1 );
-	int res( stat( path.c_str(), s_ ) );
+	int res( ::stat( path.c_str(), s_ ) );
 	if ( ! res )
 		{
 		if ( ( len != path.length() ) && ! ( S_IFDIR & s_->st_mode ) )
@@ -91,6 +98,33 @@ int unix_stat( char const* path_, struct stat* s_ )
 		}
 	return ( res );
 	}
+
+M_EXPORT_SYMBOL
+char const* windows_strerror( int code_ )
+	{
+	static int const MAX_MSG_LEN( 512 );
+	static char msg[512];
+	char* p( msg );
+
+	FormatMessage(
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, code_, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
+		p, MAX_MSG_LEN - 1, NULL );
+
+	return ( msg );
+	}
+
+M_EXPORT_SYMBOL
+void log_windows_error( char const* api_ )
+	{
+	int err( GetLastError() );
+	log << "ERROR: API = " << api_
+		<< ", code = " << err
+		<< ", message = " << windows_strerror( err ) << endl;
+	return;
+	}
+
+}
 
 int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ )
 	{
@@ -123,29 +157,4 @@ int ms_gethostname( char* buf_, int len_ )
 	int err( WSAStartup( wVersionRequested, &wsaData ) );
 #undef gethostname
 	return ( gethostname( buf_, len_ ) );
-	}
-
-int ESCDELAY = 0;
-
-char const* windows_strerror( int code_ )
-	{
-	static int const MAX_MSG_LEN( 512 );
-	static char msg[512];
-	char* p( msg );
-
-	FormatMessage(
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, code_, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-		p, MAX_MSG_LEN - 1, NULL );
-
-	return ( msg );
-	}
-
-void log_windows_error( char const* api_ )
-	{
-	int err( GetLastError() );
-	log << "ERROR: API = " << api_
-		<< ", code = " << err
-		<< ", message = " << windows_strerror( err ) << endl;
-	return;
 	}

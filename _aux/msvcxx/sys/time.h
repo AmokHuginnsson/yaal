@@ -19,6 +19,8 @@
 #undef FD_ZERO
 #undef FD_SET
 
+#include "hcore/macro.hxx"
+
 struct fd_set
 	{
 	static int const MAXIMUM_FD_WAIT_OBJECTS = FD_SETSIZE;
@@ -53,12 +55,18 @@ inline void FD_SET_ms( int fd_, fd_set* fdset_ )
 
 using namespace asio;
 
-__declspec( dllimport )
-int unix_select( int, fd_set*, fd_set*, fd_set*, struct timeval* );
+namespace msvcxx
+{
+
+M_YAAL_HCORE_PUBLIC_API
+int select( int, fd_set*, fd_set*, fd_set*, struct timeval* );
+
+}
+
 inline int select( int ndfs_,
-		fd_set* readfs_, fd_set* writefs_,
-		fd_set* extrafs_, struct timeval* timeout_ )
-	{ return ( unix_select( ndfs_, readfs_, writefs_, extrafs_, timeout_ ) ); }
+									fd_set* readfs_, fd_set* writefs_,
+									fd_set* extrafs_, struct timeval* timeout_ )
+	{ return ( msvcxx::select( ndfs_, readfs_, writefs_, extrafs_, timeout_ ) ); }
 
 extern "C"
 int gettimeofday( struct timeval*, struct timezone* );

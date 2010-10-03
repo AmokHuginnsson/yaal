@@ -18,6 +18,7 @@ extern "C" FILE* tmpfile( void );
 #define write write_off
 #define timeval timeval_off
 #define gethostname gethostname_off
+#define dup2 dup2_off
 #include <glibc/unistd.h>
 #undef gethostname
 #include <sys/types.h>
@@ -31,6 +32,7 @@ extern "C" FILE* tmpfile( void );
 #undef write
 #undef pipe
 #undef unlink
+#undef dup2
 
 #include <sys/time.h>
 
@@ -41,25 +43,30 @@ extern "C" FILE* tmpfile( void );
 
 int ms_gethostname( char*, int );
 
-int unix_close( int const& );
-M_YAAL_HCORE_PUBLIC_API int long unix_read( int const&, void*, int long );
-M_YAAL_HCORE_PUBLIC_API int long unix_write( int const&, void const*, int long );
-M_YAAL_HCORE_PUBLIC_API int unix_pipe( int* );
+namespace msvcxx
+{
+
+int close( int const& );
+M_YAAL_HCORE_PUBLIC_API int long read( int const&, void*, int long );
+M_YAAL_HCORE_PUBLIC_API int long write( int const&, void const*, int long );
+M_YAAL_HCORE_PUBLIC_API int pipe( int* );
+int dup2( int, int );
+#define dup2 msvcxx::dup2
+
+}
 
 inline int pipe( int* fds_ )
-	{ return ( unix_pipe( fds_ ) ); }
+	{ return ( msvcxx::pipe( fds_ ) ); }
 
 inline int long read( int const& fd_, void* buf_, int long size_ )
-	{ return ( unix_read( fd_, buf_, size_ ) ); }
+	{ return ( msvcxx::read( fd_, buf_, size_ ) ); }
 
 inline int long write( int const& fd_, void const* buf_, int long size_ )
-	{ return ( unix_write( fd_, buf_, size_ ) ); }
+	{ return ( msvcxx::write( fd_, buf_, size_ ) ); }
 
 template<typename T>
 inline int close( T const& fd_ )
-	{ return ( unix_close( fd_ ) ); }
-
-int ms_dup2( int, int );
+	{ return ( msvcxx::close( fd_ ) ); }
 
 #include "tools/hpipedchild.hxx"
 
