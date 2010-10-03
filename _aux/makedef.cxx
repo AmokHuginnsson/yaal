@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <vector>
 #include <set>
+#include <map>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -8,71 +9,98 @@
 
 #include "helper.hxx"
 
+#define ASSERT( cond ) do { if ( ! ( cond ) ) { throw logic_error( string( "Assertion failed: `" ) + #cond + "'." ); } } while ( 0 )
+#define ENSURE( cond ) do { if ( ! ( cond ) ) { throw runtime_error( string( "Bad input would derail the execution flow: `" ) + #cond + "'." ); } } while ( 0 )
+
 using namespace std;
 using namespace string_helper;
 
+typedef map<string, string> dictionary_t;
+
+void handle_options( int argc_, char** argv_, dictionary_t& opts_ )
+	{
+	for ( int i( 1 ); i < argc_; ++ i )
+		{
+		ASSERT( i % 2 ); /* option name */
+		string name( argv_[ i ] );
+		if ( name.substr( 0, 2 ) != "--" )
+			throw runtime_error( "Expected option, got: `" + name + "'." );
+		dictionary_t::iterator it( opts_.find( name ) );
+		if ( it == opts_.end() )
+			throw runtime_error( "Option: `" + name + "' is not supported." );
+		ENSURE( ++ i < argc_ );
+		it->second = argv_[i];
+		}
+	return;
+	}
+
 int main( int argc_, char** argv_ )
 	{
-	bool sane( true );
-	if ( argc_ != 4 )
+	int ret( 0 );
+	dictionary_t options;
+	options.insert( make_pair<string, string>( "--source", "" ) );
+	options.insert( make_pair<string, string>( "--destination", "" ) );
+	options.insert( make_pair<string, string>( "--append", "" ) );
+	options.insert( make_pair<string, string>( "--exclude", "" ) );
+	try
 		{
-		cout << "makedef: this program requires exactly three arguments" << endl;
-		sane = false;
-		}
-	vector<string> symbolFiles;
-	tokenize( argv_[1], symbolFiles, "," );
-	if ( sane )
-		{
-		for ( vector<string>::iterator it( symbolFiles.begin() ), end( symbolFiles.end() );
-			sane && ( it != end ); ++ it )
+		typedef set<string> word_list_t;
+		word_list_t exclude;
+		handle_options( argc_, argv_, options );
+		dictionary_t::const_iterator excludeOption( options.find( "--exclude" ) );
+		ASSERT( excludeOption != options.end() );
+
+		if ( ! excludeOption->second.empty() )
 			{
-			ifstream in( it->c_str() );
-			if ( ! in )
-				{
-				cout << "makedef: given symbol file `" << *it << "' does not exists" << endl;
-				sane = false;
-				}
-			}
-		ofstream out( argv_[2] );
-		if ( ! out )
-			{
-			cout << "makedef: cannot create `" << argv_[2] << "' .DEF file" << endl;
-			sane = false;
-			}
-		if ( sane )
-			{
-			set<string> exclude;
-			tokenize( argv_[3], exclude, "," );
+			ifstream excludeFile( excludeOption->second.c_str() );
+			ENSURE( !! excludeFile );
 			string line;
-			typedef set<string> symbols_t;
-			symbols_t s;
-			for ( vector<string>::iterator it( symbolFiles.begin() ), end( symbolFiles.end() ); it != end; ++ it )
-				{
-				bool inSymbols( false );
-				ifstream in( it->c_str() );
-				while ( ! getline( in, line ).fail() )
-					{
-					if ( line.find( "public symbols" ) != string::npos )
-						{
-						inSymbols = true;
-						continue;
-						}
-					if ( line.find( "  Summary" ) != string::npos )
-						break;
-					if ( inSymbols )
-						{
-						vector<string> t;
-						tokenize( line, t );
-						if ( t.size() > 1 )
-							s.insert( t[1] );
-						}
-					}
-				}
-			out << "EXPORTS" << endl;
-			set_difference( s.begin(), s.end(),
-				exclude.begin(), exclude.end(),
-				ostream_iterator<string>( out, "\n" ) );
+			while ( ! getline( excludeFile, line ).fail() )
+				exclude.insert( line );
 			}
+		dictionary_t::const_iterator sourceOption( options.find( "--source" ) );
+		ASSERT( sourceOption != options.end() );
+		ENSURE( ! sourceOption->second.empty() );
+		dictionary_t::const_iterator destinationOption( options.find( "--destination" ) );
+		ASSERT( destinationOption != options.end() );
+		ENSURE( ! destinationOption->second.empty() );
+		dictionary_t::const_iterator appendOption( options.find( "--append" ) );
+		ASSERT( appendOption != options.end() );
+		ifstream sourceFile( sourceOption->second.c_str() );
+		ENSURE( !! sourceFile );
+		ofstream destinationFile( destinationOption->second.c_str(),
+			( appendOption->second == "true" ) ? ios::app : 0 );
+		ENSURE( !! destinationFile );
+		string line;
+		word_list_t s;
+		bool inSymbols( false );
+		while ( ! getline( sourceFile, line ).fail() )
+			{
+			if ( line.find( "public symbols" ) != string::npos )
+				{
+				inSymbols = true;
+				continue;
+				}
+			if ( line.find( "  Summary" ) != string::npos )
+				break;
+			if ( inSymbols )
+				{
+				vector<string> t;
+				tokenize( line, t );
+				if ( t.size() > 1 )
+					s.insert( t[1] );
+				}
+			}
+		if ( appendOption->second != "true" )
+			destinationFile << "EXPORTS" << endl;
+		set_difference( s.begin(), s.end(),
+			exclude.begin(), exclude.end(),
+			ostream_iterator<string>( destinationFile, "\n" ) );
 		}
-	return ( sane ? 0 : 1 );
+	catch ( exception const& e )
+		{
+		ret = 1;
+		cerr << "Exception caught: " << e.what() << endl;
+		}
+	return ( ret );
 	}
