@@ -132,7 +132,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 	int* fileDesOut = pipeOut._res;
 	int* fileDesErr = pipeErr._res;
 	HFSItem image( image_ );
-	M_ENSURE( !! image && image.is_executable() );
+	M_ENSURE_EX( !! image && image.is_executable(), image_ );
 	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
 	_pid = ::fork();
 	M_ENSURE_EX( _pid >= 0, "fork()" );
