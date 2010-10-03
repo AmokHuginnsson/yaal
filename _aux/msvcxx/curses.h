@@ -3,6 +3,7 @@
 
 #define NCURSES_MOUSE_VERSION 1
 
+#undef MOUSE_MOVED
 #include <../include/curses.h>
 
 #define newscr NULL
