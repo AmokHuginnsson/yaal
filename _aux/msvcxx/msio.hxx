@@ -30,16 +30,13 @@ struct IO
 	bool _scheduled; /* io has been scheduled */
 	bool _nonBlocking;
 	std::string _path;
-	IO( TYPE::type_t t_, HANDLE h_, HANDLE e_ = NULL, std::string const& p_ = std::string() )
-		: _type( t_ ), _handle( h_ ), _overlapped(), _buffer( 0 ), _scheduled( false ), _nonBlocking( false ), _path( p_ )
-		{
-		_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
-		}
-	~IO( void )
-		{
-		if ( _overlapped.hEvent )
-			::CloseHandle( _overlapped.hEvent );
-		}
+	IO( TYPE::type_t, HANDLE, HANDLE = NULL, std::string const& = std::string() );
+	~IO( void );
+	void schedule_read( void );
+	void sync_read( void );
+	int long read( void*, int long );
+	int long write( void const*, int long );
+	int close( void );
 private:
 	IO( IO const& );
 	IO& operator = ( IO const& );

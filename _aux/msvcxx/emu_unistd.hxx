@@ -4,8 +4,12 @@
 namespace msvcxx
 {
 
-char const* windows_strerror( int );
-void log_windows_error( char const* );
+int close( int const& );
+M_YAAL_HCORE_PUBLIC_API int long read( int const&, void*, int long );
+M_YAAL_HCORE_PUBLIC_API int long write( int const&, void const*, int long );
+M_YAAL_HCORE_PUBLIC_API int pipe( int* );
+M_YAAL_HCORE_PUBLIC_API int dup2( int, int );
+M_YAAL_HCORE_PUBLIC_API void log_windows_error( char const* );
 
 } /* namespace msvcxx */
 

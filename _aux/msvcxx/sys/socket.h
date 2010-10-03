@@ -8,25 +8,14 @@
 #define EINPROGRESS WSAEINPROGRESS
 static int const SHUT_RDWR = SD_RECEIVE | SD_SEND;
 
+#include "emu_socket.hxx"
+
 struct sockaddr_un
 	{
 	int sun_family;
 	char sun_path[MAX_PATH];		/* Path name.  */
 	};
 #define SUN_LEN(ptr) ((size_t) (((struct sockaddr_un *) 0)->sun_path) + strlen ((ptr)->sun_path))
-namespace msvcxx
-{
-
-int socket( int, int, int );
-int listen( int, int );
-int accept( int, struct sockaddr*, socklen_t* );
-int connect( int, struct sockaddr*, socklen_t );
-int shutdown( int, int );
-int bind( int, struct sockaddr const*, socklen_t );
-int setsockopt( int, int, int, void const*, socklen_t );
-int getsockopt( int, int, int, void*, socklen_t* );
-
-}
 
 inline int ms_socket( int af_, int type_, int protocol_ )
 	{ return ( msvcxx::socket( af_, type_, protocol_ ) ); }

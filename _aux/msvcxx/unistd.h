@@ -40,20 +40,11 @@ extern "C" FILE* tmpfile( void );
 #define gethostname ms_gethostname
 
 #include "hcore/macro.hxx"
+#include "emu_unistd.hxx"
 
 int ms_gethostname( char*, int );
 
-namespace msvcxx
-{
-
-int close( int const& );
-M_YAAL_HCORE_PUBLIC_API int long read( int const&, void*, int long );
-M_YAAL_HCORE_PUBLIC_API int long write( int const&, void const*, int long );
-M_YAAL_HCORE_PUBLIC_API int pipe( int* );
-int dup2( int, int );
 #define dup2 msvcxx::dup2
-
-}
 
 inline int pipe( int* fds_ )
 	{ return ( msvcxx::pipe( fds_ ) ); }

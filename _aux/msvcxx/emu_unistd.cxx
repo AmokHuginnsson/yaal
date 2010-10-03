@@ -1,18 +1,23 @@
 #include <sys/cdefs.h>
-#include <string>
+#include <sstream>
+#include <io.h>
 #include <sys/time.h>
-#include <dbghelp.h>
 #include <../include/sys/stat.h>
 
 #define getpid getpid_off
 #define isatty isatty_off
 #define getpwuid_r getpwuid_r_off
+#define access access_off
+#define lseek lseek_off
+#define dup dup_off
 
+#define fill fill_off
 #include <unistd.h>
+#undef fill
 #include <dirent.h>
 #include <pwd.h>
-#include <sys/socket.h>
-
+#define _FCNTL_H 1
+#include <bits/fcntl.h>
 #undef getpwuid_r
 #undef getpid
 #undef readdir_r
@@ -26,56 +31,213 @@
 #include "cxxabi.h"
 
 #include "cleanup.hxx"
+#include "msio.hxx"
 
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-__declspec( thread ) int SocketErrno::_errno = 0;
-int ESCDELAY = 0;
-
-namespace abi
-{
-
-char* __cxa_demangle( char const* const a, int, int, int* )
-	{
-	char* buf = xcalloc<char>( 1024 );
-	UnDecorateSymbolName( a, buf, 1023, 0 );
-	return ( buf );
-	}
-
-}
-
-extern "C" 
-int backtrace( void** buf_, int size_ )
-	{
-	return ( CaptureStackBackTrace( 0, std::min( size_, 63 ), buf_, NULL ) );
-	}
-
-extern "C"
-char** backtrace_symbols( void* const* buf_, int size_ )
-	{
-	char** strings = xcalloc<char*>( size_ );
-	for ( int i( 0 ); i < size_; ++ i )
-		strings[i] = reinterpret_cast<char*>( buf_[i] );
-	return ( strings );
-	}
-
-extern "C" void* dlopen( char const*, int );
-M_EXPORT_SYMBOL
-void* dlopen_fix( char const* name_, int flag_ )
-	{
-	HANDLE handle( 0 );
-	if ( ! name_ )
-		handle = GetModuleHandle( NULL );
-	else
-		handle = dlopen( name_, flag_ );
-	return ( handle );
-	}
-
 namespace msvcxx
 {
+
+extern "C" int fcntl( int fd_, int cmd_, ... );
+
+int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
+	LPHANDLE lpWritePipe,
+	LPSECURITY_ATTRIBUTES lpPipeAttributes,
+	DWORD nSize,
+	DWORD dwReadMode,
+	DWORD dwWriteMode )
+	{
+	HANDLE ReadPipeHandle, WritePipeHandle;
+	DWORD dwError;
+
+	// Only one valid OpenMode flag - FILE_FLAG_OVERLAPPED
+	if ( ( dwReadMode | dwWriteMode ) & ( ~FILE_FLAG_OVERLAPPED ) )
+		{
+		SetLastError( ERROR_INVALID_PARAMETER );
+		return FALSE;
+		}
+
+	if ( nSize == 0 )
+		nSize = 4096;
+	static int PipeSerialNumber = 0;
+	stringstream PipeName;
+	PipeName << "\\\\.\\Pipe\\RemoteExeAnon." << GetCurrentProcessId() << ( PipeSerialNumber ++ );
+
+	ReadPipeHandle = CreateNamedPipe(
+		PipeName.str().c_str(),
+		PIPE_ACCESS_INBOUND | dwReadMode,
+		PIPE_TYPE_BYTE | PIPE_WAIT,
+		1,             // Number of pipes
+		nSize,         // Out buffer size
+		nSize,         // In buffer size
+		//  Set the default timeout to 120 seconds
+		120 * 1000,    // Timeout in ms
+		lpPipeAttributes );
+
+	if ( ! ReadPipeHandle )
+		return FALSE;
+
+	WritePipeHandle = CreateFile(
+		PipeName.str().c_str(),
+		GENERIC_WRITE,
+		0,                         // No sharing
+		lpPipeAttributes,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL | dwWriteMode,
+		NULL );
+
+	if ( INVALID_HANDLE_VALUE == WritePipeHandle )
+		{
+		dwError = GetLastError();
+		CloseHandle( ReadPipeHandle );
+		SetLastError( dwError );
+		return FALSE;
+		}
+
+	*lpReadPipe = ReadPipeHandle;
+	*lpWritePipe = WritePipeHandle;
+	return ( 1 );
+	}
+
+M_EXPORT_SYMBOL
+int fcntl( int fd_, int cmd_, int arg_ )
+	{
+#undef fcntl
+	int ret( 0 );
+	if ( fd_ < SystemIO::MANAGED_IO )
+		ret = fcntl( fd_, cmd_, arg_ );
+	else if ( cmd_ == F_SETFL )
+		{
+		SystemIO& sysIo( SystemIO::get_instance() );
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		io._nonBlocking = ( ( arg_ & O_NONBLOCK ) ? true : false );
+		if ( ( io._nonBlocking ) && ( ( io._type == IO::TYPE::NAMED_PIPE ) || ( io._type == IO::TYPE::PIPE ) ) )
+			io.schedule_read();
+		}
+	else if ( cmd_ == F_GETFL )
+		{
+		SystemIO& sysIo( SystemIO::get_instance() );
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		ret = io._nonBlocking ? O_NONBLOCK : 0;
+		}
+	return ( ret );
+	}
+
+M_EXPORT_SYMBOL
+int dup2( int fd1_, int fd2_ )
+	{
+	int ret( -1 );
+	if ( fd1_ < SystemIO::MANAGED_IO )
+		ret = _dup2( fd1_, fd2_ );
+	else
+		{
+		SystemIO& sysIo( SystemIO::get_instance() );
+		IO& io( *( sysIo.get_io( fd1_ ).second ) );
+		ret = _dup2( _open_osfhandle( reinterpret_cast<intptr_t>( io._handle ), 0 ), fd2_ );
+		}
+	return ( ret );
+	}
+
+M_EXPORT_SYMBOL
+int pipe( int* fds_ )
+	{
+	SystemIO& sysIo( SystemIO::get_instance() );
+	HANDLE hRead( NULL );
+	HANDLE hWrite( NULL );
+	bool ok( CreatePipeEx( &hRead, &hWrite, NULL, 4096, FILE_FLAG_OVERLAPPED , FILE_FLAG_OVERLAPPED ) ? true : false );
+	if ( ok )
+		{
+		SystemIO::io_t readIO( sysIo.create_io( IO::TYPE::PIPE, hRead ) );
+		SystemIO::io_t writeIO( sysIo.create_io( IO::TYPE::PIPE, hWrite ) );
+		fds_[0] = readIO.first;
+		fds_[1] = writeIO.first;
+		}
+	return ( ok ? 0 : -1 );
+	}
+
+int close( int const& fd_ )
+	{
+	SystemIO& sysIo( SystemIO::get_instance() );
+	int ret( 0 );
+	if ( fd_ < SystemIO::MANAGED_IO )
+		ret = ::close( fd_ );
+	else
+		{
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		if ( ( io._type == IO::TYPE::PIPE ) || ( io._type == IO::TYPE::NAMED_PIPE ) )
+			ret = ::CloseHandle( io._handle ) ? 0 : -1;
+		else if ( io._type == IO::TYPE::SOCKET )
+			ret = ::closesocket( reinterpret_cast<SOCKET>( io._handle ) );
+		else
+			{
+			M_ASSERT( ! "invalid HANDLE" );
+			}
+		}
+	if ( ret < 0 )
+		log_windows_error( "close" );
+	sysIo.erase_io( fd_ );
+	return ( ret );
+	}
+
+M_EXPORT_SYMBOL
+int long read( int const& fd_, void* buf_, int long size_ )
+	{
+	int long nRead( -1 );
+	if ( fd_ < SystemIO::MANAGED_IO )
+		nRead = ::read( fd_, buf_, size_ ); 
+	else
+		{
+		SystemIO& sysIo( SystemIO::get_instance() );
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		DWORD iRead( 0 );
+		int off( 0 );
+		bool ok( false );
+		if ( io._scheduled )
+			{
+			static_cast<char*>( buf_ )[0] = io._buffer;
+			io._scheduled = false;
+			-- size_;
+			++ off;
+			ok = true;
+			}
+		if ( size_ > 0 )
+			{
+			ok = ::ReadFile( io._handle, static_cast<char*>( buf_ ) + off, size_ - off, &iRead, &io._overlapped ) ? true : false;
+			if ( ! ok )
+				log_windows_error( "ReadFile" );
+			ok = ::GetOverlappedResult( io._handle, &io._overlapped, &iRead, ! io._nonBlocking ) ? true : false;
+			if ( ! ok )
+				log_windows_error( "GetOverlappedResult" );
+			}
+		if ( ! ( nRead + off ) && ( io._type != IO::TYPE::SOCKET ) )
+			io.schedule_read();
+		nRead = ok ? iRead + off : -1;
+		}
+	return ( nRead );
+	}
+
+M_EXPORT_SYMBOL
+int long write( int const& fd_, void const* buf_, int long size_ )
+	{
+	int long nWritten( -1 );
+	if ( fd_ < SystemIO::MANAGED_IO )
+		nWritten = ::write( fd_, buf_, size_ );
+	else
+		{
+		SystemIO& sysIo( SystemIO::get_instance() );
+		DWORD iWritten( 0 );
+		IO& io( *( sysIo.get_io( fd_ ).second ) );
+		bool ok( ::WriteFile( io._handle, buf_, size_, &iWritten, &io._overlapped ) ? true : false );
+		ok = ::GetOverlappedResult( io._handle, &io._overlapped, &iWritten, true ) ? true : false;
+		if ( ! ok )
+			log_windows_error( "GetOverlappedResult" );
+		nWritten = ok ? iWritten : -1;
+		}
+	return ( nWritten );
+	}
 
 M_EXPORT_SYMBOL
 int stat( char const* path_, struct stat* s_ )
@@ -125,36 +287,3 @@ void log_windows_error( char const* api_ )
 	}
 
 }
-
-int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ )
-	{
-	dirent* result;
-	dirent broken;
-	int error( readdir_r( dir_, &broken, &result ) );
-	if ( ( ! error ) && result )
-		{
-		*result_ = reinterpret_cast<unix_dirent*>( result );
-		entry_->d_fileno = (*result_)->d_fileno;
-		entry_->d_type = (*result_)->d_type;
-		strncpy( entry_->d_name, (*result_)->d_name, NAME_MAX );
-		}
-	return ( error );
-	}
-
-extern "C"
-int getpwuid_r( uid_t, struct passwd* p, char* buf, int size, struct passwd** )
-	{
-	p->pw_name = buf;
-	DWORD s = size;
-	int err( ! GetUserName( buf, &s ) );
-	return ( err );
-	}
-
-int ms_gethostname( char* buf_, int len_ )
-	{
-	WSADATA wsaData;
-	WORD wVersionRequested( MAKEWORD( 2, 2 ) );
-	int err( WSAStartup( wVersionRequested, &wsaData ) );
-#undef gethostname
-	return ( gethostname( buf_, len_ ) );
-	}

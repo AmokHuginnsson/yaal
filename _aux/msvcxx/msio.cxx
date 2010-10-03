@@ -9,6 +9,45 @@
 namespace msvcxx
 {
 
+IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
+: _type( t_ ), _handle( h_ ), _overlapped(), _buffer( 0 ), _scheduled( false ), _nonBlocking( false ), _path( p_ )
+	{
+	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
+	}
+
+IO::~IO( void )
+	{
+	if ( _overlapped.hEvent )
+		::CloseHandle( _overlapped.hEvent );
+	}
+
+void IO::schedule_read( void )
+	{
+	DWORD nRead( 0 );
+	::ReadFile( _handle, &_buffer, 1, &nRead, &_overlapped );
+	_scheduled = true;
+	return;
+	}
+
+void IO::sync_read( void )
+	{
+	}
+
+int long IO::read( void*, int long )
+	{
+	return ( 0 );
+	}
+
+int long IO::write( void const*, int long )
+	{
+	return ( 0 );
+	}
+
+int IO::close( void )
+	{
+	return ( 0 );
+	}
+
 SystemIO::SystemIO( void )
 	: _ioTable(), _mutex(), _idPool( MANAGED_IO )
 	{}
