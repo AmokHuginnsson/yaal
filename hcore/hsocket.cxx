@@ -135,6 +135,7 @@ void HSocket::shutdown( void )
 int HSocket::do_close( void )
 	{
 	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	sockaddr_un* addressFile = NULL;
 	if ( _clients )
 		{
@@ -175,6 +176,7 @@ void HSocket::shutdown_client( int fileDescriptor_ )
 void HSocket::listen( yaal::hcore::HString const& address_, int port_ )
 	{
 	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	int reuseAddr = 1;
 	if ( _fileDescriptor < 0 )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );

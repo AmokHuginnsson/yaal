@@ -375,6 +375,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream )
 	{
 	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	init( *stream );
 	return;
 	M_EPILOG
@@ -453,6 +454,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, bool stripEmpty_ )
 void HXml::parse( HString xPath_, bool stripEmpty_ )
 	{
 	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	char const* const FULL_TREE = "//*";
 	if ( ! xPath_ || ! xPath_[ 0 ] )
 		xPath_ = FULL_TREE; /* scan full tree */
@@ -462,7 +464,7 @@ void HXml::parse( HString xPath_, bool stripEmpty_ )
 	while ( xPath_[ ctr ] )
 		ctr ++;
 	ctr --;
-	M_ASSERT ( ctr >= 0 );
+	M_ASSERT( ctr >= 0 );
 	if ( _xml->_nodeSet )
 		{
 		if ( xPath_ != FULL_TREE )
@@ -482,6 +484,7 @@ void HXml::parse( HString xPath_, bool stripEmpty_ )
 void HXml::load( yaal::hcore::HStreamInterface& stream )
 	{
 	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	M_ENSURE( stream.is_valid() );
 	init( stream );
 	parse( HString(), true );
@@ -500,6 +503,7 @@ void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream )
 void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 	{
 	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	M_ENSURE( stream.is_valid() );
 	doc_resource_t doc;
 	/* flush writer to DOM. */

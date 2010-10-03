@@ -38,6 +38,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hfsitem.hxx"
 #include "hcore/xalloc.hxx"
 #include "hcore/system.hxx"
+#include "util.hxx"
 
 using namespace yaal::hcore;
 
@@ -127,6 +128,7 @@ static void close_and_invalidate( int& fd_ )
 void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 	{
 	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OPipeResGuard pipeIn, pipeOut, pipeErr;
 	int* fileDesIn = pipeIn._res;
 	int* fileDesOut = pipeOut._res;

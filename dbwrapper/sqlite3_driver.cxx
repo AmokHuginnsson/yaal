@@ -80,7 +80,7 @@ M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
 		char const*, char const* )
 	{
 	void* ptr = NULL;
-	char const fileNameExt[] = ".sqlite3";
+	char const fileNameExt[] = ".sqlite";
 	struct stat stat;
 	OSQLite* sQLite = NULL;
 	if ( _brokenDB_ )
@@ -90,11 +90,9 @@ M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
 		}
 	sQLite = new OSQLite;
 	HString dataBase( dataBase_ );
-	dataBase += fileNameExt; 
 	if ( ::stat( dataBase.raw(), &stat ) )
 		{
-		dataBase = dataBase_;
-		dataBase += ".db3";
+		dataBase += fileNameExt; 
 		if ( ::stat( dataBase.raw(), &stat ) )
 			{
 			sQLite->_errorMessage.format( "Database file `%s' does not exists.", dataBase.raw() );
