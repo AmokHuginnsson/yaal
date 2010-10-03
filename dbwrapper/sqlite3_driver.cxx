@@ -72,8 +72,8 @@ M_EXPORT_SYMBOL void* db_query( void*, char const* );
 M_EXPORT_SYMBOL void rs_unquery( void* );
 M_EXPORT_SYMBOL void db_disconnect( void* );
 
-/* sqlite3 driver uses convention that database file name should have
- * .sqlite3 or .db3 extension, and this default extension is added
+/* sqlite driver uses convention that database file name should have
+ * .sqlite extension or no extension at all, and this default extension is added
  * to user supplied database name by driver during db_connect. */
 
 M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
