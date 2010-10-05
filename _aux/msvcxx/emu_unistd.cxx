@@ -109,19 +109,11 @@ int fcntl( int fd_, int cmd_, int arg_ )
 	int ret( 0 );
 	if ( fd_ < SystemIO::MANAGED_IO )
 		ret = fcntl( fd_, cmd_, arg_ );
-	else if ( cmd_ == F_SETFL )
+	else
 		{
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
-		io._nonBlocking = ( ( arg_ & O_NONBLOCK ) ? true : false );
-		if ( ( io._nonBlocking ) && ( ( io._type == IO::TYPE::NAMED_PIPE ) || ( io._type == IO::TYPE::PIPE ) ) )
-			io.schedule_read();
-		}
-	else if ( cmd_ == F_GETFL )
-		{
-		SystemIO& sysIo( SystemIO::get_instance() );
-		IO& io( *( sysIo.get_io( fd_ ).second ) );
-		ret = io._nonBlocking ? O_NONBLOCK : 0;
+		ret = io.fcntl( cmd_, arg_ );
 		}
 	return ( ret );
 	}
@@ -130,13 +122,12 @@ M_EXPORT_SYMBOL
 int dup2( int fd1_, int fd2_ )
 	{
 	int ret( -1 );
-	if ( fd1_ < SystemIO::MANAGED_IO )
+	if ( ( fd1_ < SystemIO::MANAGED_IO ) && ( fd2_ < SystemIO::MANAGED_IO ) )
 		ret = _dup2( fd1_, fd2_ );
 	else
 		{
 		SystemIO& sysIo( SystemIO::get_instance() );
-		IO& io( *( sysIo.get_io( fd1_ ).second ) );
-		ret = _dup2( _open_osfhandle( reinterpret_cast<intptr_t>( io._handle ), 0 ), fd2_ );
+		ret = sysIo.dup2_io( fd1_, fd2_ );
 		}
 	return ( ret );
 	}
@@ -160,25 +151,13 @@ int pipe( int* fds_ )
 
 int close( int const& fd_ )
 	{
-	SystemIO& sysIo( SystemIO::get_instance() );
 	int ret( 0 );
 	if ( fd_ < SystemIO::MANAGED_IO )
 		ret = ::close( fd_ );
 	else
-		{
-		IO& io( *( sysIo.get_io( fd_ ).second ) );
-		if ( ( io._type == IO::TYPE::PIPE ) || ( io._type == IO::TYPE::NAMED_PIPE ) )
-			ret = ::CloseHandle( io._handle ) ? 0 : -1;
-		else if ( io._type == IO::TYPE::SOCKET )
-			ret = ::closesocket( reinterpret_cast<SOCKET>( io._handle ) );
-		else
-			{
-			M_ASSERT( ! "invalid HANDLE" );
-			}
-		}
+		ret = SystemIO::get_instance().close_io( fd_ );
 	if ( ret < 0 )
 		log_windows_error( "close" );
-	sysIo.erase_io( fd_ );
 	return ( ret );
 	}
 
@@ -192,29 +171,7 @@ int long read( int const& fd_, void* buf_, int long size_ )
 		{
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
-		DWORD iRead( 0 );
-		int off( 0 );
-		bool ok( false );
-		if ( io._scheduled )
-			{
-			static_cast<char*>( buf_ )[0] = io._buffer;
-			io._scheduled = false;
-			-- size_;
-			++ off;
-			ok = true;
-			}
-		if ( size_ > 0 )
-			{
-			ok = ::ReadFile( io._handle, static_cast<char*>( buf_ ) + off, size_ - off, &iRead, &io._overlapped ) ? true : false;
-			if ( ! ok )
-				log_windows_error( "ReadFile" );
-			ok = ::GetOverlappedResult( io._handle, &io._overlapped, &iRead, ! io._nonBlocking ) ? true : false;
-			if ( ! ok )
-				log_windows_error( "GetOverlappedResult" );
-			}
-		if ( ! ( nRead + off ) && ( io._type != IO::TYPE::SOCKET ) )
-			io.schedule_read();
-		nRead = ok ? iRead + off : -1;
+		nRead = io.read( buf_, size_ );
 		}
 	return ( nRead );
 	}
@@ -228,13 +185,8 @@ int long write( int const& fd_, void const* buf_, int long size_ )
 	else
 		{
 		SystemIO& sysIo( SystemIO::get_instance() );
-		DWORD iWritten( 0 );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
-		bool ok( ::WriteFile( io._handle, buf_, size_, &iWritten, &io._overlapped ) ? true : false );
-		ok = ::GetOverlappedResult( io._handle, &io._overlapped, &iWritten, true ) ? true : false;
-		if ( ! ok )
-			log_windows_error( "GetOverlappedResult" );
-		nWritten = ok ? iWritten : -1;
+		nWritten = io.write( buf_, size_ );
 		}
 	return ( nWritten );
 	}

@@ -11,8 +11,11 @@
 namespace msvcxx
 {
 
-struct IO
+class SystemIO;
+
+class IO
 	{
+public:
 	struct TYPE
 		{
 		typedef enum
@@ -23,6 +26,7 @@ struct IO
 			SOCKET
 			} type_t;
 		};
+private:
 	TYPE::type_t _type;
 	HANDLE _handle;
 	OVERLAPPED _overlapped;
@@ -30,14 +34,24 @@ struct IO
 	bool _scheduled; /* io has been scheduled */
 	bool _nonBlocking;
 	std::string _path;
+public:
 	IO( TYPE::type_t, HANDLE, HANDLE = NULL, std::string const& = std::string() );
 	~IO( void );
+	HANDLE event( void ) const;
 	void schedule_read( void );
 	void sync_read( void );
 	int long read( void*, int long );
 	int long write( void const*, int long );
-	int close( void );
+	int fcntl( int, int );
+	void set_handle( HANDLE );
+	HANDLE handle( void ) const;
+	TYPE::type_t type( void ) const;
+	OVERLAPPED* overlapped( void );
+	std::string path( void ) const;
+	void set_path( std::string const& );
 private:
+	friend class SystemIO;
+	int close( void );
 	IO( IO const& );
 	IO& operator = ( IO const& );
 	};
@@ -57,7 +71,8 @@ public:
 	typedef io_table_t::value_type io_t;
 	io_t& create_io( IO::TYPE::type_t, HANDLE, HANDLE = NULL, std::string const& = std::string() );
 	io_t& get_io( int );
-	void erase_io( int );
+	int close_io( int );
+	int dup2_io( int, int );
 	static SystemIO& get_instance( void );
 private:
 	SystemIO( void );

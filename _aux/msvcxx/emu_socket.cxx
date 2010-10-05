@@ -23,7 +23,8 @@ struct OsCast
 		}
 	HANDLE operator()( IO* io_ )
 		{
-		return ( io_->_overlapped.hEvent );
+		io_->schedule_read();
+		return ( io_->event() );
 		}
 	};
 
@@ -53,18 +54,11 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 				{
 				int upL( ::WaitForSingleObject( handles[ i ], 0 ) );
 				if ( ( i == ( up - WAIT_OBJECT_0 ) || ( upL == WAIT_OBJECT_0 ) ) )
-					{
 					++ ret;
-					DWORD nRead( 0 );
-					if ( ios[i]->_scheduled )
-						{
-						if ( ! ( ::GetOverlappedResult( ios[i]->_handle, &ios[i]->_overlapped, &nRead, true ) || nRead ) )
-							log_windows_error( "GetOverlappedResult (scheduled)" );
-						}
-					}
 				else
 					readFds->_data[ i ] = -1;
 				}
+			for_each( ios, ios + readFds->_count, mem_fun( &IO::sync_read ) );
 			std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
 			readFds->_count = ret;
 			ret += ( writeFds ? writeFds->_count : 0 );
@@ -84,11 +78,11 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 
 int make_pipe_instance( IO& io_ )
 	{
-	io_._handle = CreateNamedPipe( io_._path.c_str(),
+	io_.set_handle( CreateNamedPipe( io_.path().c_str(),
 		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
 		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
-		PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL );
-	return ( io_._handle != INVALID_HANDLE_VALUE ? 0 : -1 );
+		PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL ) );
+	return ( io_.handle() != INVALID_HANDLE_VALUE ? 0 : -1 );
 	}
 
 int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
@@ -99,7 +93,7 @@ int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 	char const* path( addr_->sa_data + 2 );
 	if ( addr_->sa_family == PF_UNIX )
 		{
-		M_ASSERT( io._type == IO::TYPE::NAMED_PIPE );
+		M_ASSERT( io.type() == IO::TYPE::NAMED_PIPE );
 		HANDLE h = ::CreateFile( path,                // name of the write
                        GENERIC_WRITE,          // open for writing
                        0,                      // do not share
@@ -113,14 +107,14 @@ int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 			::CloseHandle( h );
 			n += path;
 			replace( n.begin(), n.end(), '/', '\\' );
-			io._path = n;
+			io.set_path( n );
 			ret = make_pipe_instance( io );
 			}
 		}
 	else
 		{
-		M_ASSERT( io._type == IO::TYPE::SOCKET );
-		ret = ::bind( reinterpret_cast<SOCKET>( io._handle ), addr_, len_ );
+		M_ASSERT( io.type() == IO::TYPE::SOCKET );
+		ret = ::bind( reinterpret_cast<SOCKET>( io.handle() ), addr_, len_ );
 		}
 	return ( ret );
 	}
@@ -141,10 +135,9 @@ int listen( int fd_, int backlog_ )
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	io._nonBlocking = true;
-	if ( io._type == IO::TYPE::NAMED_PIPE )
+	if ( io.type() == IO::TYPE::NAMED_PIPE )
 		{
-		if ( ::ConnectNamedPipe( io._handle, &io._overlapped ) )
+		if ( ::ConnectNamedPipe( io.handle(), io.overlapped() ) )
 			{
 			log_windows_error( "ConnectNamedPipe" );
 			ret = -1;
@@ -152,8 +145,8 @@ int listen( int fd_, int backlog_ )
 		}
 	else
 		{
-		SOCKET s( reinterpret_cast<SOCKET>( io._handle ) );
-		if ( WSAEventSelect( s, io._overlapped.hEvent, FD_ACCEPT ) )
+		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
+		if ( WSAEventSelect( s, io.event(), FD_ACCEPT ) )
 			log_windows_error( "WSAEventSelect" );
 		ret = ::listen( s, backlog_ );
 		}
@@ -165,19 +158,19 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( io._type == IO::TYPE::SOCKET )
+	if ( io.type() == IO::TYPE::SOCKET )
 		{
 		int len = *len_;
-		ret = ::accept( reinterpret_cast<SOCKET>( io._handle ), addr_, &len );
+		ret = ::accept( reinterpret_cast<SOCKET>( io.handle() ), addr_, &len );
 		SystemIO::io_t sock( sysIo.create_io( IO::TYPE::SOCKET, reinterpret_cast<HANDLE>( ret ) ) );
-		if ( WSAEventSelect( ret, sock.second->_overlapped.hEvent, FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
+		if ( WSAEventSelect( ret, sock.second->event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
 			log_windows_error( "WSAEventSelect" );
 		ret = sock.first;
 		}
 	else
 		{
-		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE, io._handle ) );
-		std::swap( io._overlapped, np.second->_overlapped );
+		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE, io.handle() ) );
+		std::swap( *io.overlapped(), *np.second->overlapped() );
 		ret = make_pipe_instance( io );
 		if ( ! ret )
 			{
@@ -206,13 +199,13 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 			ret = -1;
 			}
 		else
-			io._handle = h;
+			io.set_handle( h );
 		}
 	else
 		{
-		SOCKET s( reinterpret_cast<SOCKET>( io._handle ) );
+		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
 		ret = ::connect( s, const_cast<sockaddr const*>( addr_ ), static_cast<int>( len_ ) );
-		if ( WSAEventSelect( s, io._overlapped.hEvent, FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
+		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
 			log_windows_error( "WSAEventSelect" );
 		}
 	return ( ret );
@@ -223,8 +216,8 @@ int shutdown( int fd_, int how_ )
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	int ret( 0 );
-	if ( io._type == IO::TYPE::SOCKET )
-		ret = ::shutdown( reinterpret_cast<SOCKET>( io._handle ), how_ );
+	if ( io.type() == IO::TYPE::SOCKET )
+		ret = ::shutdown( reinterpret_cast<SOCKET>( io.handle() ), how_ );
 	return ( ret );
 	}
 
@@ -233,8 +226,8 @@ int setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( io._type == IO::TYPE::SOCKET )
-		ret = ::setsockopt( reinterpret_cast<SOCKET>( io._handle ), level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
+	if ( io.type() == IO::TYPE::SOCKET )
+		ret = ::setsockopt( reinterpret_cast<SOCKET>( io.handle() ), level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 
@@ -243,8 +236,8 @@ int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* opt
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( io._type == IO::TYPE::SOCKET )
-		ret = ::getsockopt( reinterpret_cast<SOCKET>( io._handle ), level_, optname_, static_cast<char*>( optval_ ), optlen_ );
+	if ( io.type() == IO::TYPE::SOCKET )
+		ret = ::getsockopt( reinterpret_cast<SOCKET>( io.handle() ), level_, optname_, static_cast<char*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 
