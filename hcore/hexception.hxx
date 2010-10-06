@@ -236,6 +236,7 @@ struct existing_hier<sizeof ( trait::true_type ), subclass_t>
 	template<typename hermetic>
 	struct get_protected_typedef : public hermetic
 		{
+		~get_protected_typedef( void );
 		typedef typename hermetic::base_type type;
 		};
 	typedef typename get_protected_typedef<subclass_t>::type type;

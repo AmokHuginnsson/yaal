@@ -32,6 +32,7 @@ private:
 	OVERLAPPED _overlapped;
 	char _buffer;
 	bool _scheduled; /* io has been scheduled */
+	bool _ready; /* data is ready */
 	bool _nonBlocking;
 	std::string _path;
 public:

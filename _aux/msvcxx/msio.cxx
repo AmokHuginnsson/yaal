@@ -14,7 +14,8 @@ namespace msvcxx
 {
 
 IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
-: _type( t_ ), _handle( h_ ), _overlapped(), _buffer( 0 ), _scheduled( false ), _nonBlocking( false ), _path( p_ )
+: _type( t_ ), _handle( h_ ), _overlapped(), _buffer( 0 ),
+	_scheduled( false ), _ready( false ), _nonBlocking( false ), _path( p_ )
 	{
 	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
 	}
@@ -28,13 +29,21 @@ IO::~IO( void )
 void IO::schedule_read( void )
 	{
 	DWORD nRead( 0 );
-	::ReadFile( _handle, &_buffer, 1, &nRead, &_overlapped );
+	if ( ! _scheduled )
+		::ReadFile( _handle, &_buffer, 1, &nRead, &_overlapped );
 	_scheduled = true;
 	return;
 	}
 
 void IO::sync_read( void )
 	{
+	DWORD iRead( 0 );
+	if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iRead, true ) || ( iRead != 1 ) )
+		log_windows_error( "GetOverlappedResult" );
+	else
+		_ready = true;
+	_scheduled = false;
+	return;
 	}
 
 int long IO::read( void* buf_, int long size_ )
@@ -43,24 +52,24 @@ int long IO::read( void* buf_, int long size_ )
 	int off( 0 );
 	bool ok( false );
 	if ( _scheduled )
+		sync_read();
+	if ( _ready )
 		{
 		static_cast<char*>( buf_ )[0] = _buffer;
-		_scheduled = false;
+		_ready = false;
 		-- size_;
 		++ off;
 		ok = true;
 		}
 	if ( size_ > 0 )
 		{
-		ok = ::ReadFile( _handle, static_cast<char*>( buf_ ) + off, size_ - off, &iRead, &_overlapped ) ? true : false;
-		if ( ! ok )
+		ok = ::ReadFile( _handle, static_cast<char*>( buf_ ) + off, size_, &iRead, &_overlapped ) ? true : false;
+		if ( ! ok && ( ::GetLastError() != ERROR_IO_PENDING ) )
 			log_windows_error( "ReadFile" );
 		ok = ::GetOverlappedResult( _handle, &_overlapped, &iRead, ! _nonBlocking ) ? true : false;
 		if ( ! ok )
 			log_windows_error( "GetOverlappedResult" );
 		}
-	if ( ! ( iRead + off ) && ( _type != IO::TYPE::SOCKET ) )
-		schedule_read();
 	return ( ok ? iRead + off : -1 );
 	}
 

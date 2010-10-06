@@ -58,7 +58,6 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 				else
 					readFds->_data[ i ] = -1;
 				}
-			for_each( ios, ios + readFds->_count, mem_fun( &IO::sync_read ) );
 			std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
 			readFds->_count = ret;
 			ret += ( writeFds ? writeFds->_count : 0 );
