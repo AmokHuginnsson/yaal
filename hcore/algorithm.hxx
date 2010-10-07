@@ -328,6 +328,27 @@ dst_it_t copy( src_it_t src, src_it_t const& end, dst_it_t dst )
 	return ( dst );
 	}
 
+/*! \brief Copy range of values onto another range.
+ *
+ * \param first - begining of source range of elements.
+ * \param last - one past the end of source range of elements.
+ * \param dst - one past end of destination range.
+ * \return begining of destination range.
+ */
+template<typename src_it_t, typename dst_it_t>
+dst_it_t copy_backward( src_it_t const& first, src_it_t last, dst_it_t dst )
+	{
+	if ( first != last )
+		{
+		-- last;
+		-- dst;
+		for ( ; first != last; -- last, -- dst )
+			*dst = *last;
+		*dst = *last;
+		}
+	return ( dst );
+	}
+
 /*! \brief Copy given number of elements from range of values onto another range.
  *
  * \param src - begining of source range of elements.

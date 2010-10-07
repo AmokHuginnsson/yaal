@@ -397,12 +397,38 @@ void HArray<type_t>::reserve( int long capacity_ )
 
 template<typename type_t>
 template<typename iterator_t>
-void HArray<type_t>::insert( iterator pos, iterator_t first, iterator_t last )
+void HArray<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ )
 	{
 	M_PROLOG
-	for ( ; first != last; ++ first )
-		pos = insert( pos, *first );
+	iterator endIt( end() );
+	resize( _size + distance( first_, last_ ) );
+	copy_backward( pos_, endIt, end() );
+	copy( first_, last_, pos_ );
 	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+void HArray<type_t>::insert( iterator pos_, int long count_, type_t const& value_ )
+	{
+	M_PROLOG
+	iterator endIt( end() );
+	resize( _size + count_ );
+	copy_backward( pos_, endIt, end() );
+	fill( pos_, endIt, value_ );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+typename HArray<type_t>::iterator HArray<type_t>::insert( iterator pos_, type_t const& value_ )
+	{
+	M_PROLOG
+	iterator endIt( end() );
+	resize( _size + 1 );
+	copy_backward( pos_, endIt, end() );
+	*pos_ = value_;
+	return ( pos_ );
 	M_EPILOG
 	}
 
