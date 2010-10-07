@@ -74,6 +74,8 @@ public:
 	class HIterator;
 	typedef HIterator<type_t> iterator;
 	typedef HIterator<type_t const> const_iterator;
+	typedef HReverseIterator<iterator> reverse_iterator;
+	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	HArray( void );
 	explicit HArray( int long );
 	HArray( int long, type_t const& );

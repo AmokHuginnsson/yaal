@@ -120,6 +120,8 @@ public:
 	typedef class HIterator<type_t const, OListBits::TREAT_AS_OPENED> const_iterator;
 	typedef class HIterator<type_t, OListBits::TREAT_AS_CLOSED> cyclic_iterator;
 	typedef class HIterator<type_t const, OListBits::TREAT_AS_CLOSED> const_cyclic_iterator;
+	typedef HReverseIterator<iterator> reverse_iterator;
+	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	/*! \brief Create an empty list.
 	 */
 	HList( void );

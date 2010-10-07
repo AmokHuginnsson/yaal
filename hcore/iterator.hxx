@@ -51,6 +51,68 @@ struct iterator_traits<T*>
 	typedef T value_type;
 	};
 
+template<typename iterator_t>
+class HReverseIterator
+	{
+	iterator_t _iterator;
+public:
+	HReverseIterator( void ) : _iterator() {}
+	HReverseIterator( HReverseIterator const& iterator_ ) : _iterator( iterator_._iterator ) {}
+	HReverseIterator( iterator_t const& iterator_ ) : _iterator( iterator_ ) { -- _iterator; }
+	HReverseIterator& operator = ( HReverseIterator const& iterator_ )
+		{
+		if ( &iterator_ != this )
+			_iterator = iterator_._iterator;
+		return ( *this );
+		}
+	HReverseIterator& operator ++ ( void )
+		{
+		-- _iterator;
+		return ( *this );
+		}
+	HReverseIterator operator ++ ( int )
+		{
+		HReverseIterator it( *this );
+		-- _iterator;
+		return ( it );
+		}
+	HReverseIterator& operator -- ( void )
+		{
+		++ _iterator;
+		return ( *this );
+		}
+	HReverseIterator operator -- ( int )
+		{
+		HReverseIterator it( *this );
+		++ _iterator;
+		return ( it );
+		}
+	typename iterator_t::value_type const& operator*( void ) const
+		{
+		return ( *_iterator );
+		}
+	typename iterator_t::value_type& operator*( void )
+		{
+		return ( *_iterator );
+		}
+	typename iterator_t::value_type const* operator->( void ) const
+		{
+		return ( &*_iterator );
+		}
+	typename iterator_t::value_type* operator->( void )
+		{
+		return ( &*_iterator );
+		}
+	bool operator == ( HReverseIterator const& iterator_ ) const
+		{
+		return ( _iterator == iterator_._iterator );
+		}
+	bool operator != ( HReverseIterator const& iterator_ ) const
+		{
+		return ( _iterator != iterator_._iterator );
+		}
+	};
+
 /*! \brief (Back)Insertion concept for HInsertIterator.
  *
  * May be used for collections that support back insertion.
