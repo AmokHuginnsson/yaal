@@ -27,7 +27,7 @@ else
 
 	LINES=`wc -l ${TMP_FILE} | ${AWK} '{print $1}'`
 	LINES=`expr ${LINES} - \( ${TOTAL} \* 21 \)`
-	UNIQUE_LINES=`sort -u ${TMP_FILE} | wc -l`
+	UNIQUE_LINES=`sort -b -u ${TMP_FILE} | wc -l`
 	UNIQUE_LINES=`expr ${UNIQUE_LINES} - 21`
 
 	PROG_M="/VCSID|_HXX_INCLUDED\>/{next}/^#[ \t]*define[ \t]+/{print substr(\$0,match(\$0,\"[ \t]M_[A-Z_]*\"),RLENGTH)}"

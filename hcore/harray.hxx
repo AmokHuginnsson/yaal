@@ -119,6 +119,7 @@ private:
 	template<typename iterator_t>
 	void initialize( iterator_t, iterator_t, trait::false_type const* );
 	void initialize( int long, type_t const&, trait::true_type const* );
+	void insert_space( int long, int long );
 	};
 
 }
@@ -331,7 +332,7 @@ HArray<type_t>& HArray<type_t>::operator = ( HArray const& arr_ )
 			{
 			value_type* dst( _buf.get<value_type>() );
 			value_type const* src( arr_._buf.template get<value_type>() );
-			copy_n( src, _size, dst );
+			copy_n( src, min( _size, arr_._size ), dst );
 			if ( arr_._size > _size )
 				{
 				for ( int long i = _size; i < arr_._size; ++ i )
@@ -400,10 +401,10 @@ template<typename iterator_t>
 void HArray<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ )
 	{
 	M_PROLOG
-	iterator endIt( end() );
-	resize( _size + distance( first_, last_ ) );
-	copy_backward( pos_, endIt, end() );
-	copy( first_, last_, pos_ );
+	insert_space( pos_._index, distance( first_, last_ ) );
+	value_type* arr( _buf.get<value_type>() );
+	for ( int long i( pos_._index ); first_ != last_; ++ first_,  ++ i )
+		new ( arr + i ) value_type( *first_ );
 	return;
 	M_EPILOG
 	}
@@ -412,10 +413,10 @@ template<typename type_t>
 void HArray<type_t>::insert( iterator pos_, int long count_, type_t const& value_ )
 	{
 	M_PROLOG
-	iterator endIt( end() );
-	resize( _size + count_ );
-	copy_backward( pos_, endIt, end() );
-	fill( pos_, endIt, value_ );
+	insert_space( pos_._index, count_ );
+	value_type* arr( _buf.get<value_type>() );
+	for ( int long i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i )
+		new ( arr + i ) value_type( value_ );
 	return;
 	M_EPILOG
 	}
@@ -424,11 +425,27 @@ template<typename type_t>
 typename HArray<type_t>::iterator HArray<type_t>::insert( iterator pos_, type_t const& value_ )
 	{
 	M_PROLOG
-	iterator endIt( end() );
-	resize( _size + 1 );
-	copy_backward( pos_, endIt, end() );
-	*pos_ = value_;
+	insert_space( pos_._index, 1 );
+	value_type* arr( _buf.get<value_type>() );
+	new ( arr + pos_._index ) value_type( value_ );
 	return ( pos_ );
+	M_EPILOG
+	}
+
+template<typename type_t>
+void HArray<type_t>::insert_space( int long pos_, int long size_ )
+	{
+	M_PROLOG
+	int long oldSize( _size );
+	reserve( _size + size_ );
+	_size += size_;
+	value_type* arr( _buf.get<value_type>() );
+	for ( int long src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst )
+		{
+		new ( arr + dst ) value_type( arr[ src ] );
+		arr[ src ].~value_type();
+		}
+	return;
 	M_EPILOG
 	}
 
@@ -436,15 +453,12 @@ template<typename type_t>
 typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first, iterator last )
 	{
 	M_PROLOG
-	if ( last != end() )
-		{
-		for ( iterator second = last, endIt = end();
-				( second != endIt );
-				++ first, ++ second )
-			*first = *second;
-		}
+	for ( iterator second( last ), endIt( end() );
+			( second != endIt );
+			++ first, ++ second )
+		*first = *second;
 	int long removed( 0 );
-	for ( iterator endIt = end();
+	for ( iterator endIt( end() );
 			( first != endIt );
 			++ first, ++ removed )
 		(*first).~value_type();
