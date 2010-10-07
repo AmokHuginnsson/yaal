@@ -186,7 +186,7 @@ template<typename tType>
 struct minus : public binary_function<tType, tType, tType>
 	{
 	tType operator()( tType const& a, tType const& b ) const
-		{ return ( a + b ); }
+		{ return ( a - b ); }
 	};
 
 /*! \brief A functor performing multiplication operation.
