@@ -3,6 +3,8 @@
 #include <io.h>
 #include <sys/time.h>
 #include <../include/sys/stat.h>
+#define YAAL_MSVCXX_OPENSSL_RSA_H_INCLUDED 1
+#include <openssl/ssl.h>
 
 #define getpid getpid_off
 #define isatty isatty_off
@@ -236,6 +238,18 @@ void log_windows_error( char const* api_ )
 		<< ", code = " << err
 		<< ", message = " << windows_strerror( err ) << endl;
 	return;
+	}
+
+M_EXPORT_SYMBOL int SSL_set_fd( SSL* ssl_, int fd_ )
+	{
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	int ret( 0 );
+	if ( io.type() == IO::TYPE::SOCKET )
+		ret = ::SSL_set_fd( ssl_, reinterpret_cast<int>( io.handle() ) );
+	else
+		ret = ::SSL_set_fd( ssl_, fd_ );
+	return ( ret );
 	}
 
 }
