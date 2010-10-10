@@ -97,3 +97,27 @@ int ms_gethostname( char* buf_, int len_ )
 #undef gethostname
 	return ( gethostname( buf_, len_ ) );
 	}
+
+void* get_module_func_address( char const* moduleName_, char const* funcName_ )
+	{
+	HMODULE h( ::GetModuleHandle( moduleName_ ) );
+	void* p( ::GetProcAddress( h, funcName_ ) );
+	return ( p );
+	}
+
+int* iconv_errno( void )
+	{
+	static int* (*msvcrt_errno)( void ) = NULL;
+	__declspec( thread ) static int errorNumber( 0 );
+	errorNumber = ::GetLastError();
+	if ( ! errorNumber )
+		{
+		if ( ! msvcrt_errno )
+			{
+			void* p( get_module_func_address( "msvcrt.dll", "_errno" ) );
+			msvcrt_errno = p ? static_cast<int* (*)( void )>( p ) : &_errno;
+			}
+		errorNumber = *msvcrt_errno();
+		}
+	return ( &errorNumber );
+	}
