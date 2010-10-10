@@ -11,7 +11,10 @@
 #define VC_EXTRALEAN 1
 #pragma warning( disable : 4068 )
 #pragma warning( disable : 4180 )
+#pragma warning( disable : 4221 )
 #pragma warning( disable : 4250 )
+#pragma warning( disable : 4251 )
+#pragma warning( disable : 4275 )
 #pragma warning( disable : 4351 )
 #pragma warning( disable : 4355 )
 #pragma warning( disable : 4646 )

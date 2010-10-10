@@ -82,7 +82,7 @@ HFile::~HFile( void )
 int HFile::open( HString const& path_, open_t const& open_ )
 	{
 	M_PROLOG
-	int error = 0;
+	int saveErrno( errno );
 	char const* mode = NULL;
 	if ( open_ == OPEN::READING )
 		mode = "rb";
@@ -102,14 +102,15 @@ int HFile::open( HString const& path_, open_t const& open_ )
 	_path = path_;
 	_external = false;
 	_handle = ::std::fopen( path_.raw(), mode );
+	int error( 0 );
 	if ( ! _handle )
 		{
 		error = errno;
 		_error = error_message( error );
 		_error += ": " + path_;
-		return ( error );
 		}
-	return ( 0 );
+	errno = saveErrno;
+	return ( error );
 	M_EPILOG
 	}
 

@@ -121,3 +121,30 @@ int* iconv_errno( void )
 		}
 	return ( &errorNumber );
 	}
+
+namespace msvcxx
+{
+
+Errno::operator int& ( void )
+	{
+	return ( _errno = ::GetLastError() );
+	}
+
+Errno::operator int ( void ) const
+	{
+	return ( _errno = ::GetLastError() );
+	}
+
+Errno& Errno::operator = ( int errno_ )
+	{
+	::SetLastError( _errno = errno_ );
+	return ( *this );
+	}
+
+Errno& get_errno( void )
+	{
+	static Errno smartErrno;
+	return ( smartErrno );
+	}
+
+}
