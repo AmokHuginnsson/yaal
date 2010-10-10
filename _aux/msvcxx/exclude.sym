@@ -23,6 +23,7 @@
 ?_ignoreSignalSIGTSTP_@tools@yaal@@3_NA
 ?_instance@?$HSingleton@VHSignalService@tools@yaal@@@hcore@yaal@@0PAVHSignalService@tools@3@A
 ?_letter_@hcore@yaal@@3QBDB
+?_logMask@HLog@hcore@yaal@@2JA
 ?_maskAlpha_@hconsole@yaal@@3QBDB
 ?_maskDefault_@hconsole@yaal@@3QBDB
 ?_maskDigits_@hconsole@yaal@@3QBDB

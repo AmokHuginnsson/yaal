@@ -73,7 +73,7 @@ private:
 	HChunk   _hostName;
 	HChunk   _buffer;
 public:
-	static int long _logMask;
+	M_YAAL_HCORE_PUBLIC_API static int long _logMask;
 public:
 	/* already opened file */
 	void rehash_stream( void* = DEFAULT_LOG_STREAM, char const* const = NULL );
