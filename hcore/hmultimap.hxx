@@ -114,8 +114,8 @@ public:
 		M_PROLOG
 		typename multimap_engine_t::iterator major = ensure_key( key );
 		major->second->push_back( storage_t::value( key, value ) );
-		typename value_list_t::iterator minor = major->second->rbegin();
-		return ( iterator( this, major, minor ) );
+		typename value_list_t::reverse_iterator minor = major->second->rbegin();
+		return ( iterator( this, major, minor.base() ) );
 		M_EPILOG
 		}
 	iterator insert( value_type const& e )
@@ -355,6 +355,7 @@ class HMultiMap<key_type_t, value_type_t, storage_policy_t, helper_t>::HIterator
 	value_iterator_t _minor;
 public:
 	HIterator( void ) : _owner( NULL ), _major(), _minor() {}
+	HIterator( HIterator const& it_ ) : _owner( it_._owner ), _major( it_._major ), _minor( it_._minor ) {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ ) : _owner( it_._owner ), _major( it_._major ), _minor( it_._minor )
 		{
@@ -374,7 +375,7 @@ public:
 		{
 		M_PROLOG
 		++ _minor;
-		if ( ! _minor.is_valid() )
+		if ( _minor == _major->second->end() )
 			{
 			++ _major;
 			if ( _major != _owner->_engine.end() )
@@ -393,11 +394,11 @@ public:
 		{
 		M_PROLOG
 		-- _minor;
-		if ( ! _minor.is_valid() )
+		if ( _minor == _major->second.rend().base() )
 			{
 			-- _major;
-			if ( _major != _owner->_engine.rend() )
-				_minor = _major->second->rbegin();
+			if ( _major != _owner->_engine.rend().base() )
+				_minor = _major->second->rbegin().base();
 			}
 		return ( *this );
 		M_EPILOG

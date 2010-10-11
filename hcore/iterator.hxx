@@ -37,6 +37,7 @@ template<typename T>
 struct iterator_interface
 	{
 	typedef T value_type;
+	virtual ~iterator_interface( void ) {}
 	};
 
 template<typename iterator>
@@ -86,6 +87,10 @@ public:
 		HReverseIterator it( *this );
 		++ _iterator;
 		return ( it );
+		}
+	iterator_t base( void ) const
+		{
+		return ( _iterator );
 		}
 	typename iterator_t::value_type const& operator*( void ) const
 		{

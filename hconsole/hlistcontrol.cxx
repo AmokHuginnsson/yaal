@@ -385,7 +385,7 @@ inline void cyclic_decrement( ttType& model, tType& iterator, int count )
 		{
 		-- iterator;
 		if ( ! iterator.is_valid() )
-			iterator = model->rbegin();
+			iterator = model->rbegin().base();
 		}
 	}
 

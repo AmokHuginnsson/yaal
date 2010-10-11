@@ -110,10 +110,10 @@ public:
 	const_iterator begin( void ) const;
 	const_iterator find( int long ) const;
 	const_iterator end( void ) const;
-	iterator rbegin( void );
-	iterator rend( void );
-	const_iterator rbegin( void ) const;
-	const_iterator rend( void ) const;
+	reverse_iterator rbegin( void );
+	reverse_iterator rend( void );
+	const_reverse_iterator rbegin( void ) const;
+	const_reverse_iterator rend( void ) const;
 	void swap( HArray& );
 	bool operator == ( HArray const& ) const;
 	bool operator < ( HArray const& ) const;
@@ -587,6 +587,30 @@ template<typename type_t>
 typename HArray<type_t>::const_iterator HArray<type_t>::end( void ) const
 	{
 	return ( const_iterator( this, _size ) );
+	}
+
+template<typename type_t>
+typename HArray<type_t>::reverse_iterator HArray<type_t>::rbegin( void )
+	{
+	return ( end() );
+	}
+
+template<typename type_t>
+typename HArray<type_t>::reverse_iterator HArray<type_t>::rend( void )
+	{
+	return ( begin() );
+	}
+
+template<typename type_t>
+typename HArray<type_t>::const_reverse_iterator HArray<type_t>::rbegin( void ) const
+	{
+	return ( end() );
+	}
+
+template<typename type_t>
+typename HArray<type_t>::const_reverse_iterator HArray<type_t>::rend( void ) const
+	{
+	return ( begin() );
 	}
 
 template<typename type_t>

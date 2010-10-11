@@ -56,6 +56,8 @@ public:
 	class HIterator;
 	typedef HIterator<value_type> iterator;
 	typedef HIterator<value_type const> const_iterator;
+	typedef HReverseIterator<iterator> reverse_iterator;
+	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
 	HNode* _root;			/* self explanary */
 public:
@@ -81,6 +83,10 @@ class HTree<value_t>::HNode
 public:
 	typedef value_t value_type;
 	typedef HList<node_t> branch_t;
+	typedef typename tree_t::iterator iterator;
+	typedef typename tree_t::reverse_iterator reverse_iterator;
+	typedef typename tree_t::const_iterator const_iterator;
+	typedef typename tree_t::const_reverse_iterator const_reverse_iterator;
 private:
 	value_t _data;			/* object itself */
 	branch_t _branch;	/* list of next level nodes */
@@ -99,14 +105,14 @@ public:
 	typename tree_t::iterator add_node( void );
 	typename tree_t::iterator replace_node( typename tree_t::iterator, typename HTree<value_t>::HNode* );
 	typename tree_t::iterator remove_node( typename tree_t::iterator );
-	typename tree_t::iterator begin();
-	typename tree_t::const_iterator begin() const;
-	typename tree_t::iterator end();
-	typename tree_t::const_iterator end() const;
-	typename tree_t::iterator rbegin();
-	typename tree_t::const_iterator rbegin() const;
-	typename tree_t::iterator rend();
-	typename tree_t::const_iterator rend() const;
+	iterator begin();
+	const_iterator begin() const;
+	iterator end();
+	const_iterator end() const;
+	reverse_iterator rbegin();
+	const_reverse_iterator rbegin() const;
+	reverse_iterator rend();
+	const_reverse_iterator rend() const;
 	node_t get_parent( void );
 	const_node_t get_parent( void ) const;
 	value_t* operator->( void );
@@ -132,7 +138,7 @@ private:
  */
 template<typename value_t>
 template<typename const_qual_t>
-class HTree<value_t>::HIterator
+class HTree<value_t>::HIterator : public iterator_interface<value_t>
 	{
 	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
 	typedef typename trait::copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;
@@ -270,27 +276,27 @@ typename HTree<value_t>::const_iterator HTree<value_t>::HNode::end() const
 	}
 
 template<typename value_t>
-typename HTree<value_t>::iterator HTree<value_t>::HNode::rbegin()
+typename HTree<value_t>::reverse_iterator HTree<value_t>::HNode::rbegin()
 	{
-	return ( iterator( this, _branch.rbegin() ) );
+	return ( end() );
 	}
 
 template<typename value_t>
-typename HTree<value_t>::const_iterator HTree<value_t>::HNode::rbegin() const
+typename HTree<value_t>::const_reverse_iterator HTree<value_t>::HNode::rbegin() const
 	{
-	return ( const_iterator( this, _branch.rbegin() ) );
+	return ( end() );
 	}
 
 template<typename value_t>
-typename HTree<value_t>::iterator HTree<value_t>::HNode::rend()
+typename HTree<value_t>::reverse_iterator HTree<value_t>::HNode::rend()
 	{
-	return ( iterator( this, _branch.rend() ) );
+	return ( begin() );
 	}
 
 template<typename value_t>
-typename HTree<value_t>::const_iterator HTree<value_t>::HNode::rend() const
+typename HTree<value_t>::const_reverse_iterator HTree<value_t>::HNode::rend() const
 	{
-	return ( const_iterator( this, _branch.rend() ) );
+	return ( begin() );
 	}
 
 template<typename value_t>
@@ -324,7 +330,7 @@ typename HTree<value_t>::iterator HTree<value_t>::HNode::add_node( value_t const
 	node_t n = NULL;
 	_branch.push_back( n = new HNode( this ) );
 	**n = value;
-	return ( iterator( this, _branch.rbegin() ) );
+	return ( iterator( this, _branch.rbegin().base() ) );
 	M_EPILOG
 	}
 
@@ -334,7 +340,7 @@ typename HTree<value_t>::iterator HTree<value_t>::HNode::add_node( void )
 	M_PROLOG
 	node_t n = NULL;
 	_branch.push_back( n = new HNode( this ) );
-	return ( iterator( this, _branch.rbegin() ) );
+	return ( iterator( this, _branch.rbegin().base() ) );
 	M_EPILOG
 	}
 
@@ -418,12 +424,12 @@ typename HTree<value_t>::iterator HTree<value_t>::HNode::move_node( typename HTr
 #if ! defined(NDEBUG)
 	disjointed( begin(), node );
 #endif
-	iterator it = rbegin();
-	if ( ( it == rend() ) || ( *it._iterator != node ) )
+	iterator it = rbegin().base();
+	if ( ( it == rend().base() ) || ( *it._iterator != node ) )
 		{
 		node->detach();
 		_branch.push_back( node );
-		it = iterator( this, _branch.rbegin() );
+		it = iterator( this, _branch.rbegin().base() );
 		node->_trunk = this;
 		}
 	return ( it );
@@ -447,10 +453,10 @@ typename HTree<value_t>::iterator HTree<value_t>::HNode::copy_node( typename HTr
 	{
 	M_PROLOG
 #if ! defined(NDEBUG)
-	disjointed( rbegin(), node );
+	disjointed( rbegin().base(), node );
 #endif
 	_branch.push_back( node->clone( this ) );
-	iterator it( this, _branch.rbegin() );
+	iterator it( this, _branch.rbegin().base() );
 	return ( it );
 	M_EPILOG
 	}

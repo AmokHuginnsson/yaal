@@ -487,6 +487,7 @@ HSBBSTree::HIterator HSBBSTree::begin( void ) const
 
 HSBBSTree::HIterator HSBBSTree::end( void ) const
 	{
+#error FIXME
 	return ( HIterator( NULL ) );
 	}
 

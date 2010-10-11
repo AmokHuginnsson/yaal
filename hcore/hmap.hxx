@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hsbbstree.hxx"
 #include "hcore/hpair.hxx"
+#include "hcore/iterator.hxx"
 
 namespace yaal
 {
@@ -73,6 +74,8 @@ public:
 	class HIterator;
 	typedef HIterator<value_type> iterator;
 	typedef HIterator<value_type const> const_iterator;
+	typedef HReverseIterator<iterator> reverse_iterator;
+	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
 	HSBBSTree _engine;
 public:

@@ -141,12 +141,12 @@ public:
 	const_cyclic_iterator hook( void ) const;
 	iterator begin( void );
 	iterator end( void );
-	iterator rend( void );
-	iterator rbegin( void );
+	reverse_iterator rend( void );
+	reverse_iterator rbegin( void );
 	const_iterator begin( void ) const;
 	const_iterator end( void ) const;
-	const_iterator rend( void ) const;
-	const_iterator rbegin( void ) const;
+	const_reverse_iterator rend( void ) const;
+	const_reverse_iterator rbegin( void ) const;
 	void clear( void );
 	void resize( int long, type_t const& = type_t() );
 	int long size( void ) const;
@@ -248,14 +248,14 @@ private:
  */
 template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-class HList<type_t>::HIterator
+class HList<type_t>::HIterator : public iterator_interface<type_t>
 	{
 private:
 	HList<type_t> const* _owner;
 	HElement* _current;
 public:
-	typedef type_t value_type;
 	HIterator( void );
+	HIterator( HIterator const& );
 	template<typename other_const_qual_t, OListBits::treatment_t family>
 	HIterator( HIterator<other_const_qual_t, family> const& );
 	HIterator& operator ++ ( void )
@@ -305,7 +305,6 @@ public:
 	const_qual_t& operator* ( void ) const;
 	const_qual_t* operator->( void );
 	const_qual_t* operator->( void ) const;
-	bool is_valid( void ) const;
 protected:
 	friend class HList<type_t>;
 	template<typename same_const_qual_t, OListBits::treatment_t const family>
@@ -366,6 +365,16 @@ HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( void )
 	: _owner( NULL ), _current( NULL )
 	{
 	return;
+	}
+
+template<typename type_t>
+template<typename const_qual_t, OListBits::treatment_t const treatment>
+HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HIterator const& iterator_ )
+	: _owner( iterator_._owner ), _current( iterator_._current )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
 	}
 
 template<typename type_t>
@@ -466,13 +475,6 @@ const_qual_t* HList<type_t>::HIterator<const_qual_t, treatment>::operator->( voi
 	return ( &_current->_value );
 	}
 
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-bool HList<type_t>::HIterator<const_qual_t, treatment>::is_valid( void ) const
-	{
-	return ( _owner && _owner->_hook && _current );
-	}
-
 //============================================================================
 
 template<typename type_t>
@@ -549,6 +551,7 @@ typename HList<type_t>::iterator HList<type_t>::begin( void )
 template<typename type_t>
 typename HList<type_t>::const_iterator HList<type_t>::end( void ) const
 	{
+#error FIXME
 	return ( const_iterator( this, NULL ) );
 	}
 
@@ -559,27 +562,27 @@ typename HList<type_t>::iterator HList<type_t>::end( void )
 	}
 
 template<typename type_t>
-typename HList<type_t>::const_iterator HList<type_t>::rbegin( void ) const
+typename HList<type_t>::const_reverse_iterator HList<type_t>::rbegin( void ) const
 	{
-	return ( const_iterator( this, _hook ? _hook->_previous : NULL ) );
+	return ( end() );
 	}
 
 template<typename type_t>
-typename HList<type_t>::iterator HList<type_t>::rbegin( void )
+typename HList<type_t>::reverse_iterator HList<type_t>::rbegin( void )
 	{
-	return ( iterator( this, _hook ? _hook->_previous : NULL ) );
+	return ( end() );
 	}
 
 template<typename type_t>
-typename HList<type_t>::const_iterator  HList<type_t>::rend( void ) const
+typename HList<type_t>::const_reverse_iterator  HList<type_t>::rend( void ) const
 	{
-	return ( const_iterator( this, NULL ) );
+	return ( begin() );
 	}
 
 template<typename type_t>
-typename HList<type_t>::iterator HList<type_t>::rend( void )
+typename HList<type_t>::reverse_iterator HList<type_t>::rend( void )
 	{
-	return ( iterator( this, NULL ) );
+	return ( begin() );
 	}
 
 template<typename type_t>

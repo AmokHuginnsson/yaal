@@ -175,14 +175,20 @@ private:
  */
 class HXml::HConstNodeProxy
 	{
+public:
+	typedef HXml::HConstIterator const_iterator;
+	typedef HXml::HIterator iterator;
+	typedef yaal::hcore::HReverseIterator<const_iterator> const_reverse_iterator;
+	typedef yaal::hcore::HReverseIterator<iterator> reverse_iterator;
+private:
 	HXml::tree_t::const_node_t _node;
 public:
-	HXml::HConstIterator const begin() const;
-	HXml::HConstIterator const end() const;
-	HXml::HConstIterator const rbegin() const;
-	HXml::HConstIterator const rend() const;
-	HXml::HConstIterator const get_element_by_id( yaal::hcore::HString const& ) const;
-	HXml::HConstIterator const query( yaal::hcore::HString const& ) const;
+	const_iterator begin() const;
+	const_iterator end() const;
+	const_reverse_iterator rbegin() const;
+	const_reverse_iterator rend() const;
+	const_iterator get_element_by_id( yaal::hcore::HString const& ) const;
+	const_iterator query( yaal::hcore::HString const& ) const;
 	HXml::HNode::TYPE::type_t get_type() const;
 	bool has_childs( void ) const;
 	int long child_count( void ) const;
@@ -191,6 +197,7 @@ public:
 	yaal::hcore::HString const& get_value( void ) const;
 	HXml::HNode::properties_t const& properties( void ) const;
 	HConstNodeProxy( void );
+	virtual ~HConstNodeProxy( void ) {}
 	HConstNodeProxy( HConstNodeProxy const& );
 	HConstNodeProxy( HNodeProxy const& );
 	HConstNodeProxy& operator = ( HConstNodeProxy const& );
@@ -203,30 +210,25 @@ private:
 
 /*! \brief XML document node.
  */
-class HXml::HNodeProxy
+class HXml::HNodeProxy : public HXml::HConstNodeProxy
 	{
-	mutable HXml::tree_t::node_t _node;
 public:
-	HXml::HIterator begin();
-	HXml::HIterator const begin() const;
-	HXml::HIterator end();
-	HXml::HIterator const end() const;
-	HXml::HIterator rbegin();
-	HXml::HIterator const rbegin() const;
-	HXml::HIterator rend();
-	HXml::HIterator const rend() const;
-	HXml::HIterator query( yaal::hcore::HString const& );
-	HXml::HIterator const query( yaal::hcore::HString const& ) const;
-	HXml::HNode::TYPE::type_t get_type() const;
-	bool has_childs( void ) const;
-	int long child_count( void ) const;
-	int get_level( void ) const;
-	yaal::hcore::HString const& get_name( void ) const;
-	yaal::hcore::HString const& get_value( void ) const;
+	typedef HXml::HConstIterator const_iterator;
+	typedef HXml::HIterator iterator;
+	typedef yaal::hcore::HReverseIterator<const_iterator> const_reverse_iterator;
+	typedef yaal::hcore::HReverseIterator<iterator> reverse_iterator;
+private:
+	HXml::tree_t::node_t _node;
+public:
+	iterator begin();
+	iterator end();
+	reverse_iterator rbegin();
+	reverse_iterator rend();
+	iterator get_element_by_id( yaal::hcore::HString const& );
+	iterator query( yaal::hcore::HString const& );
 	void set_name( yaal::hcore::HString const& );
 	void set_value( yaal::hcore::HString const& );
 	HXml::HNode::properties_t& properties( void );
-	HXml::HNode::properties_t const& properties( void ) const;
 	HXml::HIterator remove_node( HXml::HIterator );
 	HXml::HIterator replace_node( HXml::HIterator, HXml::HNodeProxy );
 	HXml::HIterator add_node( HXml::HNode::TYPE::type_t const&, yaal::hcore::HString const& );
@@ -250,10 +252,10 @@ private:
 
 /*! \brief XML node iterator.
  */
-class HXml::HIterator
+class HXml::HIterator : public yaal::hcore::iterator_interface<HXml::HNodeProxy>
 	{
 	HXml::HNodeProxy const* _owner;
-	mutable HXml::tree_t::iterator _iterator;
+	HXml::tree_t::iterator _iterator;
 public:
 	HIterator( void );
 	HIterator( HIterator const& );
@@ -291,10 +293,10 @@ private:
 
 /*! \brief XML immutable node iterator.
  */
-class HXml::HConstIterator
+class HXml::HConstIterator : public yaal::hcore::iterator_interface<HXml::HConstNodeProxy>
 	{
 	HXml::HConstNodeProxy const* _owner;
-	mutable HXml::tree_t::const_iterator _iterator;
+	HXml::tree_t::const_iterator _iterator;
 public:
 	HConstIterator( void );
 	HConstIterator( HConstIterator const& );
