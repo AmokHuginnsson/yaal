@@ -46,97 +46,99 @@ char const* const _errMsgHSBBSTree_[ 4 ] =
 	};
 
 HSBBSTree::HIterator::HIterator( void )
-	: _current( NULL )
+	: _owner( NULL ), _current( NULL )
 	{
 	return;
 	}
 
-HSBBSTree::HIterator::HIterator( HSBBSTree::HAbstractNode* const node_ )
-	: _current( node_ )
+HSBBSTree::HIterator::HIterator( HSBBSTree const* owner_, HSBBSTree::HAbstractNode* const node_ )
+	: _owner( owner_ ), _current( node_ )
 	{
 	return;
 	}
 
 bool HSBBSTree::HIterator::operator == ( HSBBSTree::HIterator const& iterator_ ) const
 	{
+	M_ASSERT( _owner == iterator_._owner );
 	return ( _current == iterator_._current );
 	}
 
 bool HSBBSTree::HIterator::operator != ( HSBBSTree::HIterator const& iterator_ ) const
 	{
+	M_ASSERT( _owner == iterator_._owner );
 	return ( _current != iterator_._current );
 	}
 
 HSBBSTree::HIterator& HSBBSTree::HIterator::operator ++ ( void )
 	{
 	M_PROLOG
-	HAbstractNode* lastNode = _current;
-	while ( _current )
+	if ( _current )
 		{
-		if ( _current->_right && ( _current->_right != lastNode ) )
+		HAbstractNode* lastNode( _current );
+		while ( _current )
 			{
-			_current = _current->_right;
-			while ( _current->_left )
-				_current = _current->_left;
-			break;
-			}
-		else
-			{
-			lastNode = _current;
-			_current = _current->_parent;
-			if ( _current && ( lastNode == _current->_left ) )
+			if ( _current->_right && ( _current->_right != lastNode ) )
+				{
+				_current = _current->_right;
+				while ( _current->_left )
+					_current = _current->_left;
 				break;
+				}
+			else
+				{
+				lastNode = _current;
+				_current = _current->_parent;
+				if ( _current && ( lastNode == _current->_left ) )
+					break;
+				}
 			}
 		}
+	else
+		{
+		_current = _owner->_root;
+		while ( _current && _current->_left )
+			_current = _current->_left;
+		}
 	return ( *this );
-	M_EPILOG
-	}
-
-HSBBSTree::HIterator const HSBBSTree::HIterator::operator ++ ( int )
-	{
-	M_PROLOG
-	HIterator iterator( *this );
-	++ ( *this );
-	return ( iterator );
 	M_EPILOG
 	}
 
 HSBBSTree::HIterator& HSBBSTree::HIterator::operator -- ( void )
 	{
 	M_PROLOG
-	HAbstractNode* lastNode = _current;
-	while ( _current )
+	if ( _current )
 		{
-		if ( _current->_left && ( _current->_left != lastNode ) )
+		HAbstractNode* lastNode( _current );
+		while ( _current )
 			{
-			_current = _current->_left;
-			while ( _current->_right )
-				_current = _current->_right;
-			break;
-			}
-		else
-			{
-			lastNode = _current;
-			_current = _current->_parent;
-			if ( _current && ( lastNode == _current->_right ) )
+			if ( _current->_left && ( _current->_left != lastNode ) )
+				{
+				_current = _current->_left;
+				while ( _current->_right )
+					_current = _current->_right;
 				break;
+				}
+			else
+				{
+				lastNode = _current;
+				_current = _current->_parent;
+				if ( _current && ( lastNode == _current->_right ) )
+					break;
+				}
 			}
+		}
+	else
+		{
+		_current = _owner->_root;
+		while ( _current && _current->_right )
+			_current = _current->_right;
 		}
 	return ( *this );
 	M_EPILOG
 	}
 
-HSBBSTree::HIterator const HSBBSTree::HIterator::operator -- ( int )
-	{
-	M_PROLOG
-	HIterator iterator( *this );
-	-- ( *this );
-	return ( iterator );
-	M_EPILOG
-	}
-
-HSBBSTree::HIterator::HIterator ( HSBBSTree::HIterator const & iterator_ )
-	: _current ( iterator_._current )
+HSBBSTree::HIterator::HIterator( HSBBSTree::HIterator const & iterator_ )
+	: _owner( iterator_._owner ), _current ( iterator_._current )
 	{
 	return;
 	}
@@ -144,7 +146,10 @@ HSBBSTree::HIterator::HIterator ( HSBBSTree::HIterator const & iterator_ )
 HSBBSTree::HIterator& HSBBSTree::HIterator::operator = ( HSBBSTree::HIterator const& iterator_ )
 	{
 	if ( &iterator_ != this )
+		{
+		_owner = iterator_._owner;
 		_current = iterator_._current;
+		}
 	return ( *this );
 	}
 
@@ -482,26 +487,12 @@ HSBBSTree::HIterator HSBBSTree::begin( void ) const
 	HAbstractNode* node = _root;
 	while ( node && node->_left )
 		node = node->_left;
-	return ( HIterator ( node ) );
+	return ( HIterator( this, node ) );
 	}
 
 HSBBSTree::HIterator HSBBSTree::end( void ) const
 	{
-#error FIXME
-	return ( HIterator( NULL ) );
-	}
-
-HSBBSTree::HIterator HSBBSTree::rbegin( void ) const
-	{
-	HAbstractNode* node = _root;
-	while ( node && node->_right )
-		node = node->_right;
-	return ( HIterator ( node ) );
-	}
-
-HSBBSTree::HIterator HSBBSTree::rend( void ) const
-	{
-	return ( HIterator ( NULL ) );
+	return ( HIterator( this, NULL ) );
 	}
 
 void HSBBSTree::swap( HAbstractNode* first_, HAbstractNode* second_ )

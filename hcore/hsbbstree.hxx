@@ -122,8 +122,6 @@ public:
 	void copy_from( HSBBSTree const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
-	HIterator rbegin( void ) const;
-	HIterator rend( void ) const;
 private:
 	template<typename tType, typename ttType, typename tttType>
 	ONodePtr find_node( ttType const& ) const;
@@ -143,14 +141,13 @@ private:
  */
 class HSBBSTree::HIterator
 	{
+	HSBBSTree const* _owner;
 	HAbstractNode* _current;
 public:
 	HIterator( void );
 	HIterator( HIterator const& );
 	HIterator& operator ++ ( void );
-	HIterator const operator ++ ( int );
 	HIterator& operator -- ( void );
-	HIterator const operator -- ( int );
 	HIterator& operator = ( HIterator const& );
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
@@ -160,7 +157,7 @@ public:
 	tType const& get( void ) const;
 private:
 	friend class HSBBSTree;
-	explicit HIterator( HAbstractNode* const );
+	explicit HIterator( HSBBSTree const*, HAbstractNode* const );
 	};
 
 /*! \brief True HSBBSTree contents.
@@ -248,7 +245,7 @@ HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& key_ )
 		}
 	M_ASSERT( ( ! _root ) || ( _root->_parent == NULL ) );
 	M_ASSERT( ( ! _root ) || ( _root->_color == HAbstractNode::BLACK ) );
-	return ( make_pair( HIterator( node ), ! nodeHolder._exists ) );
+	return ( make_pair( HIterator( this, node ), ! nodeHolder._exists ) );
 	M_EPILOG
 	}
 
@@ -257,7 +254,7 @@ HSBBSTree::HIterator HSBBSTree::find( ttType const& key_ ) const
 	{
 	M_PROLOG
 	ONodePtr nodePtr = find_node<tType, ttType, tttType>( key_ );
-	return ( HIterator( nodePtr._exists ? nodePtr._node : NULL ) );
+	return ( HIterator( this, nodePtr._exists ? nodePtr._node : NULL ) );
 	M_EPILOG
 	}
 

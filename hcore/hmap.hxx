@@ -170,14 +170,14 @@ public:
 		{ return ( iterator( _engine.end() ) ); }
 	const_iterator end( void ) const
 		{ return ( const_iterator( _engine.end() ) ); }
-	iterator rbegin( void )
-		{ return ( iterator( _engine.rbegin() ) ); }
-	const_iterator rbegin( void ) const
-		{ return ( const_iterator( _engine.rbegin() ) ); }
-	iterator rend( void )
-		{ return ( iterator( _engine.rend() ) ); }
-	const_iterator rend( void ) const
-		{ return ( const_iterator( _engine.rend() ) ); }
+	reverse_iterator rbegin( void )
+		{ return ( end() ); }
+	const_reverse_iterator rbegin( void ) const
+		{ return ( end() ); }
+	reverse_iterator rend( void )
+		{ return ( begin() ); }
+	const_reverse_iterator rend( void ) const
+		{ return ( begin() ); }
 	data_type& operator[] ( key_type const& key )
 		{
 		M_PROLOG
@@ -206,7 +206,7 @@ public:
  */
 template<typename key_type_t, typename value_type_t, typename helper_t>
 template<typename const_qual_t>
-class HMap<key_type_t, value_type_t, helper_t>::HIterator
+class HMap<key_type_t, value_type_t, helper_t>::HIterator : public iterator_interface<typename HMap<key_type_t, value_type_t, helper_t>::value_type>
 	{
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;

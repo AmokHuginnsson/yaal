@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCORE_HSET_HXX_INCLUDED
 
 #include "hcore/hsbbstree.hxx"
+#include "hcore/iterator.hxx"
 
 namespace yaal
 {
@@ -66,6 +67,7 @@ public:
 	typedef type_t value_type;
 	typedef type_t key_type;
 	typedef HIterator iterator;
+	typedef HReverseIterator<iterator> reverse_iterator;
 private:
 	HSBBSTree _engine;
 public:
@@ -163,10 +165,10 @@ public:
 		{ return ( HIterator( _engine.begin() ) ); }
 	HIterator end( void ) const
 		{ return ( HIterator( _engine.end() ) ); }
-	HIterator rbegin( void ) const
-		{ return ( HIterator( _engine.rbegin() ) ); }
-	HIterator rend( void ) const
-		{ return ( HIterator( _engine.rend() ) ); }
+	reverse_iterator rbegin( void ) const
+		{ return ( end() ); }
+	reverse_iterator rend( void ) const
+		{ return ( HIterator( begin() ) ); }
 	void clear( void )
 		{ _engine.clear(); }
 	void swap( HSet<value_type, helper_t>& other )
@@ -186,7 +188,7 @@ public:
 /*! \brief Iterator for HSet<> data structure.
  */
 template<typename value_type, typename helper_t = set_helper<value_type> >
-class HSet<value_type, helper_t>::HIterator
+class HSet<value_type, helper_t>::HIterator : public iterator_interface<value_type>
 	{
 	HSBBSTree::HIterator _engine;
 public:
@@ -228,10 +230,6 @@ public:
 		{ return ( _engine == it._engine ); }
 	bool operator != ( HIterator const& it ) const
 		{ return ( _engine != it._engine ); }
-	bool operator == ( HSet const& set_ ) const
-		{ M_PROLOG return ( equals( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
-	bool operator < ( HSet const& set_ ) const
-		{ M_PROLOG return ( lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 private:
 	friend class HSet<value_type, helper_t>;
 	explicit HIterator( HSBBSTree::HIterator const& it ) : _engine( it ) {};

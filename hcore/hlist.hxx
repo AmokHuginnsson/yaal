@@ -267,6 +267,8 @@ public:
 			if ( ( treatment == OListBits::TREAT_AS_OPENED ) && ( _current == _owner->_hook ) )
 				_current = NULL;
 			}
+		else if ( treatment == OListBits::TREAT_AS_OPENED )
+			_current = _owner->_hook;
 		return ( *this );
 		M_EPILOG
 		}
@@ -287,6 +289,8 @@ public:
 			if ( ( treatment == OListBits::TREAT_AS_OPENED ) && ( _current == _owner->_hook->_previous ) )
 				_current = NULL;
 			}
+		else if ( treatment == OListBits::TREAT_AS_OPENED )
+			_current = _owner->_hook->_previous;
 		return ( *this );
 		M_EPILOG
 		}
@@ -551,7 +555,6 @@ typename HList<type_t>::iterator HList<type_t>::begin( void )
 template<typename type_t>
 typename HList<type_t>::const_iterator HList<type_t>::end( void ) const
 	{
-#error FIXME
 	return ( const_iterator( this, NULL ) );
 	}
 

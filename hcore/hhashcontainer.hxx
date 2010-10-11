@@ -95,8 +95,6 @@ public:
 	void erase( HIterator const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
-	HIterator rbegin( void ) const;
-	HIterator rend( void ) const;
 	template<typename hasher_t>
 	void resize( int long, hasher_t const& );
 	void copy_from( HHashContainer const& );
@@ -133,13 +131,15 @@ public:
 			{
 			_atom = _atom->_next;
 			if ( ! _atom )
-				_index ++;
+				++ _index;
 			}
 		if ( ! _atom )
 			{
 			HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
+			if ( _index == _owner->_prime )
+				_index = 0;
 			while ( ( _index < _owner->_prime ) && ! buckets[ _index ] )
-				_index ++;
+				++ _index;
 			if ( _index < _owner->_prime )
 				_atom = buckets[ _index ];
 			}
@@ -147,21 +147,24 @@ public:
 			_index = _owner->_prime;
 		return ( *this );
 		}
-	HIterator const operator ++ ( int )
-		{
-		HIterator it( *this );
-		operator ++ ();
-		return ( it );
-		}
 	HIterator& operator -- ( void )
 		{
+		HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
+		if ( _atom )
+			{
+			HHashContainer::HAbstractAtom* atom( buckets[ _index ] );
+			while ( ( atom != _atom ) && ( atom->_next != _atom ) )
+				atom = atom->_next;
+			if ( atom == _atom )
+				_atom = NULL;
+			else
+				_atom = atom;
+			}
+		if ( ! _atom )
+			{
+#error IMPLEMENT ME!
+			}
 		return ( *this );
-		}
-	HIterator const operator -- ( int )
-		{
-		HIterator it( *this );
-		operator -- ();
-		return ( it );
 		}
 	template<typename tType>
 	tType& get( void )

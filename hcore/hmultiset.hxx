@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCORE_HMULTISET_HXX_INCLUDED
 
 #include "hcore/hsbbstree.hxx"
+#include "hcore/iterator.hxx"
 
 namespace yaal
 {
@@ -72,6 +73,7 @@ public:
 	typedef type_t key_type;
 	typedef HPair<type_t, int long> elem_t;
 	typedef HIterator iterator;
+	typedef HReverseIterator<iterator> reverse_iterator;
 private:
 	HSBBSTree _engine;
 public:
@@ -178,10 +180,10 @@ public:
 		{ return ( HIterator( _engine.begin() ) ); }
 	HIterator end( void ) const
 		{ return ( HIterator( _engine.end() ) ); }
-	HIterator rbegin( void ) const
-		{ return ( HIterator( _engine.rbegin() ) ); }
-	HIterator rend( void ) const
-		{ return ( HIterator( _engine.rend() ) ); }
+	reverse_iterator rbegin( void ) const
+		{ return ( HIterator( end() ) ); }
+	reverse_iterator rend( void ) const
+		{ return ( HIterator( begin() ) ); }
 	void clear( void )
 		{ _engine.clear(); }
 	void swap( HMultiSet<value_type, helper_t>& other )
