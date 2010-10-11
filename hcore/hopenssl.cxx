@@ -115,9 +115,9 @@ void HOpenSSL::OSSLContext::init( void )
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
 	++ _instances;
 	if ( SSL_CTX_use_PrivateKey_file( ctx, _sSLKey.raw(), SSL_FILETYPE_PEM ) <= 0 )
-		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ", key: `" + _sSLKey + "'" );
 	if ( SSL_CTX_use_certificate_file( ctx, _sSLCert.raw(), SSL_FILETYPE_PEM ) <= 0 )
-		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ": cert: `" + _sSLCert + "'" );
 	if ( ! SSL_CTX_check_private_key( ctx ) )
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
 	return;
