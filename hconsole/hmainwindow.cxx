@@ -65,7 +65,7 @@ int HMainWindow::init( void )
 	M_PROLOG
 	int error = 0;
 	HConsole& cons = HConsole::get_instance();
-	if ( _focusedChild.is_valid() && ( !! (*_focusedChild) ) )
+	if ( ( _focusedChild != HControlList::model_t::cyclic_iterator() ) && ( !! (*_focusedChild) ) )
 		return ( 0 );
 	error = HWindow::init();
 	_menu = new HMenuControl( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,

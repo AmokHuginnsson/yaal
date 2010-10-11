@@ -261,6 +261,7 @@ public:
 	HIterator& operator ++ ( void )
 		{
 		M_PROLOG
+		M_ASSERT( _owner );
 		if ( _current )
 			{
 			_current = _current->_next;
@@ -283,13 +284,14 @@ public:
 	HIterator& operator -- ( void )
 		{
 		M_PROLOG
+		M_ASSERT( _owner );
 		if ( _current )
 			{
 			_current = _current->_previous;
 			if ( ( treatment == OListBits::TREAT_AS_OPENED ) && ( _current == _owner->_hook->_previous ) )
 				_current = NULL;
 			}
-		else if ( treatment == OListBits::TREAT_AS_OPENED )
+		else if ( ( treatment == OListBits::TREAT_AS_OPENED ) && ( _owner->_hook ) )
 			_current = _owner->_hook->_previous;
 		return ( *this );
 		M_EPILOG

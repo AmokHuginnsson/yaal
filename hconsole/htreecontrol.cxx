@@ -194,7 +194,7 @@ int HTreeControl::do_process_input( int code_ )
 		case ( KEY_CODES::END ):
 			node = _tree.get_root();
 			if ( node->has_childs() )
-				_selected = &*node->rbegin();
+				_selected = &*node->rbegin().base();
 		break;
 		case ( KEY_CODES::PAGE_UP ):
 			break;
@@ -341,7 +341,7 @@ HTreeControl::tree_t::node_t HTreeControl::previous( tree_t::node_t node, bool w
 			if ( it == parent->begin() )
 				{
 				if ( wrap )
-					it = parent->rbegin();
+					it = parent->rbegin().base();
 				}
 			else
 				-- it;

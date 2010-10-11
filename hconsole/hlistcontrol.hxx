@@ -468,13 +468,13 @@ HAbstractControler::HModelIteratorWrapper HListControler<tType>::end( void )
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::rbegin( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->rbegin() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->rbegin().base() ) ) ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::rend( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->rend() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->rend().base() ) ) ) );
 	}
 
 template<typename tType>
@@ -493,12 +493,6 @@ template<typename tType>
 HListControler<tType>::HModelIterator::~HModelIterator( void )
 	{
 	return;
-	}
-
-template<typename tType>
-bool HListControler<tType>::HModelIterator::is_valid( void ) const
-	{
-	return ( _iterator.is_valid() );
 	}
 
 template<typename tType>

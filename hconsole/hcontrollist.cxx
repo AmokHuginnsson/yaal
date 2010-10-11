@@ -73,8 +73,8 @@ void HControlList::add_control( HControl::ptr_t control_ )
 	{
 	M_PROLOG
 	_list.push_back( control_ );
-	if ( ! _focused.is_valid() )
-		_focused = _list.rbegin();
+	if ( _focused == _list.end() )
+		_focused = _list.rbegin().base();
 	return;
 	M_EPILOG
 	}

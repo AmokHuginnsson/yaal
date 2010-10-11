@@ -132,8 +132,8 @@ int HTUIProcess::add_window( HWindow::ptr_t window_ )
 	M_PROLOG
 	window_->init();
 	_windows->push_back( window_ );
-	_foregroundWindow = _windows->rbegin();
-	M_ASSERT( _foregroundWindow.is_valid() );
+	_foregroundWindow = _windows->rbegin().base();
+	M_ASSERT( _foregroundWindow != _windows->end() );
 	_mainWindow->update_all();
 	if ( ! (*_foregroundWindow)->is_initialised() )
 		M_THROW( _( "window has not been initialised" ), errno );
