@@ -223,11 +223,13 @@ public:
 private:
 	class HModelIterator : public HAbstractModelIterator
 		{
+		HListControler const* _owner;
 		iterator_t _iterator;
 		row_t _row;
 		HModelIterator( void );
 		HModelIterator( HModelIterator const& );
-		explicit HModelIterator( iterator_t const& );
+		explicit HModelIterator( HListControler const*, iterator_t const& );
+		HModelIterator& operator = ( HModelIterator const& );
 		virtual HAbstractRow& dereference( void );
 		virtual HAbstractRow* call( void );
 		virtual void next( void );
@@ -263,6 +265,7 @@ public:
 	virtual HModelIteratorWrapper rend();
 	virtual void erase( HModelIteratorWrapper& );
 	virtual void add_tail( void );
+	friend class HModelIterator;
 	};
 
 }
@@ -456,25 +459,25 @@ int long HListControler<tType>::size( void )
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::begin( void )
 	{
-	return ( HModelIteratorWrapper( _list->begin() != _list->end() ? iterator_ptr_t( new HModelIterator( _list->begin() ) ) : iterator_ptr_t() ) );
+	return ( HModelIteratorWrapper( _list->begin() != _list->end() ? iterator_ptr_t( new HModelIterator( this, _list->begin() ) ) : iterator_ptr_t() ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::end( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->end() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( this, _list->end() ) ) ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::rbegin( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->rbegin().base() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( this, _list->rbegin().base() ) ) ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::rend( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( _list->rend().base() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( this, _list->rend().base() ) ) ) );
 	}
 
 template<typename tType>
@@ -484,7 +487,8 @@ bool HListControler<tType>::empty( void )
 	}
 
 template<typename tType>
-HListControler<tType>::HModelIterator::HModelIterator( iterator_t const& it_ ) : _iterator( it_ ), _row( _iterator )
+HListControler<tType>::HModelIterator::HModelIterator( HListControler const* owner_, iterator_t const& it_ )
+	: _owner( owner_ ), _iterator( it_ ), _row( _iterator )
 	{
 	return;
 	}
@@ -493,6 +497,13 @@ template<typename tType>
 HListControler<tType>::HModelIterator::~HModelIterator( void )
 	{
 	return;
+	}
+
+template<typename tType>
+bool HListControler<tType>::HModelIterator::is_valid( void ) const
+	{
+	HListControler* lc( const_cast<HListControler*>( _owner ) );
+	return ( ( _iterator != iterator_t() ) && ( _iterator != lc->_list->end() ) );
 	}
 
 template<typename tType>
@@ -536,7 +547,7 @@ bool HListControler<tType>::HModelIterator::is_not_equal( typename HListControle
 template<typename tType>
 void HListControler<tType>::HModelIterator::assign_to( HAbstractControler::iterator_ptr_t& it_ ) const
 	{
-	it_ = iterator_ptr_t( new HModelIterator( _iterator ) );
+	it_ = iterator_ptr_t( new HModelIterator( _owner, _iterator ) );
 	return;
 	}
 
@@ -568,7 +579,7 @@ template<typename tType>
 void HListControler<tType>::sort( list_control_helper::OSortHelper& helper_ )
 	{
 	M_PROLOG
-	_list->sort( CompareListControlItems<tType> ( helper_ ) );
+	_list->sort( CompareListControlItems<tType>( helper_ ) );
 	_control->invalidate();
 	M_EPILOG
 	}

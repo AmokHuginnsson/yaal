@@ -361,7 +361,7 @@ void HTUIProcess::select( HWindow const* const window_ )
 void HTUIProcess::refresh( bool force_ )
 	{
 	M_PROLOG
-	if ( _foregroundWindow.is_valid() && ( !! (*_foregroundWindow) ) )
+	if ( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) )
 		{
 		if ( force_ )
 			(*_foregroundWindow)->schedule_refresh();
