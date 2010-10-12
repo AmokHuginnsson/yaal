@@ -88,7 +88,7 @@ int HDataProcess::init_xrc( char const* processName_,
 	_resource.load( HStreamInterface::ptr_t( new HFile( resource_, HFile::OPEN::READING ) ) );
 	HXml::HNodeProxy const node = _resource.get_element_by_path( "/resource/menu" );
 	_rootMenu = build_sub_menu( node, handlers_ );
-	M_ASSERT( ( _foregroundWindow	!= HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
+	M_ASSERT( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
 	mainWindow = dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) );
 	M_ASSERT( mainWindow );
 	mainWindow->init_menu( this, _rootMenu );

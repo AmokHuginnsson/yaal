@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/algorithm.hxx"
 #include "hcore/functional.hxx"
+#include "hcore/pod.hxx"
 
 namespace yaal
 {
@@ -131,6 +132,12 @@ public:
 	 */
 	explicit HList( int long count );
 	HList( HList const& );
+	/*! \brief Create list and initialize it with copies of given value.
+	 *
+	 * \param count - size of new list.
+	 * \param value - list initializer value.
+	 */
+	HList( int long count, type_t const& value );
 	/*! \brief Creates list, from range of elements.
 	 */
 	template<typename iter_t>
@@ -208,6 +215,9 @@ public:
 	bool operator == ( HList const& ) const;
 	bool operator < ( HList const& ) const;
 private:
+	template<typename iterator_t>
+	void initialize( iterator_t, iterator_t, trait::false_type const* );
+	void initialize( int long, type_t const&, trait::true_type const* );
 	template<typename T>
 	void merge_sort( HElement*&, HElement*&, T const& );
 	template<typename T>
@@ -508,6 +518,18 @@ HList<type_t>::HList( int long count_ )
 	}
 
 template<typename type_t>
+HList<type_t>::HList( int long count_, type_t const& value_ )
+	: OListBits(), _size( 0 ),
+	_hook( NULL ), _order( UNSORTED ),
+	_index( 0 ), _indexElement( NULL )
+	{
+	M_PROLOG
+	resize( count_, value_ );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
 HList<type_t>::~HList( void )
 	{
 	M_PROLOG
@@ -530,14 +552,52 @@ HList<type_t>::HList( HList<type_t> const& list_ )
 
 template<typename type_t>
 template<typename iter_t>
-HList<type_t>::HList( iter_t i, iter_t endIt )
+HList<type_t>::HList( iter_t first, iter_t last )
 	: OListBits(), _size( 0 ),
 	_hook( NULL ), _order( UNSORTED ),
 	_index( 0 ), _indexElement( NULL )
 	{
 	M_PROLOG
-	for ( ; i != endIt; ++ i )
-		push_back( *i );
+	initialize( first, last, typename trait::make_pointer<typename is_integral<iter_t>::type>::type() );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+template<typename iterator_t>
+void HList<type_t>::initialize( iterator_t first, iterator_t last, trait::false_type const* )
+	{
+	M_PROLOG
+	for ( ; first != last; ++ first )
+		push_back( *first );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+void HList<type_t>::initialize( int long size_, type_t const& fillWith_, trait::true_type const* )
+	{
+	M_PROLOG
+	resize( size_, fillWith_ );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+void HList<type_t>::resize( int long size_, type_t const& value_ )
+	{
+	M_PROLOG
+	int long diff( abs( _size - size_ ) );
+	if ( _size > size_ )
+		{
+		while ( diff -- )
+			pop_back();
+		}
+	else if ( _size < size_ )
+		{
+		while ( size_ -- )
+			push_back( value_ );
+		}
 	return;
 	M_EPILOG
 	}
