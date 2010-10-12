@@ -561,16 +561,16 @@ int HListControl::do_process_input( int code_ )
 	_varTmpBuffer = "";
 	switch ( code_ )
 		{
-		case ( KEY_CODES::PAGE_UP ):		handle_key_page_up();		break;
-		case ( KEY_CODES::PAGE_DOWN ):	handle_key_page_down();	break;
-		case ( KEY_CODES::UP ):					handle_key_up();				break;
-		case ( KEY_CODES::HOME ):				handle_key_home();			break;
-		case ( KEY_CODES::END ):				handle_key_end();				break;
-		case ( KEY_CODES::DOWN ):				handle_key_down();			break;
-		case ( KEY<'n'>::ctrl ):				handle_key_ctrl_n();		break;
-		case ( KEY<'p'>::ctrl ):				handle_key_ctrl_p();		break;
-		case ( ' ' ):											handle_key_space();			break;
-		case ( '\t' ):										handle_key_tab();
+		case ( KEY_CODES::PAGE_UP ):   handle_key_page_up();   break;
+		case ( KEY_CODES::PAGE_DOWN ): handle_key_page_down(); break;
+		case ( KEY_CODES::UP ):        handle_key_up();        break;
+		case ( KEY_CODES::HOME ):      handle_key_home();      break;
+		case ( KEY_CODES::END ):       handle_key_end();       break;
+		case ( KEY_CODES::DOWN ):      handle_key_down();      break;
+		case ( KEY<'n'>::ctrl ):       handle_key_ctrl_n();    break;
+		case ( KEY<'p'>::ctrl ):       handle_key_ctrl_p();    break;
+		case ( ' ' ):                  handle_key_space();     break;
+		case ( '\t' ):                 handle_key_tab();
 /* there is no break in previous `case():', because this list must give up
  * its focus and be refreshed and parent window must give focus
  * to another control */
@@ -830,7 +830,7 @@ void HListControl::go_to_match( void )
 	M_EPILOG
 	}
 
-void HListControl::go_to_match_previous ( void )
+void HListControl::go_to_match_previous( void )
 	{
 	M_PROLOG
 	int ctr = 0, ctrLoc = 0, moveFirstRow = 0;
@@ -901,7 +901,10 @@ void HListControl::go_to_match_previous ( void )
 				_controlOffset = size - _heightRaw;
 				}
 			else
+				{
+				cyclic_decrement( _controler, _cursor, 1 );
 				_cursorPosition = size - 1;
+				}
 			moveFirstRow = 0;
 			outcome = _( "search hit TOP, continuing at BOTTOM" );
 			}

@@ -927,7 +927,9 @@ HString& HString::insert( int long from_, int long length_, char char_ )
 	{
 	M_PROLOG
 	insert( from_, length_ );
-	return ( fill( char_, from_, length_ ) );
+	if ( ( from_ + length_ ) > 0 )
+		fill( char_, from_, length_ );
+	return ( *this );
 	M_EPILOG
 	}
 
