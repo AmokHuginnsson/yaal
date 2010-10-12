@@ -648,7 +648,7 @@ HXml::HConstNodeProxy const HXml::get_root( void ) const
 	}
 
 HXml::HNodeProxy::HNodeProxy( void )
-	: _node( NULL )
+	: HConstNodeProxy()
 	{
 	}
 
@@ -658,17 +658,17 @@ HXml::HConstNodeProxy::HConstNodeProxy( void )
 	}
 
 HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t node_ )
-	: _node( node_ )
+	: HConstNodeProxy( node_ )
 	{
 	}
 
 HXml::HConstNodeProxy::HConstNodeProxy( HXml::tree_t::const_node_t node_ )
-	: _node( node_ )
+	: _node( const_cast<HXml::tree_t::node_t>( node_ ) )
 	{
 	}
 
 HXml::HNodeProxy::HNodeProxy( HNodeProxy const& other )
-	: HConstNodeProxy( other ), _node( other._node )
+	: HConstNodeProxy( other )
 	{
 	}
 
@@ -864,7 +864,7 @@ HXml::HConstIterator HXml::HConstNodeProxy::begin( void ) const
 	{
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HConstIterator( this, _node->begin() ) );
+	return ( HXml::HConstIterator( this, const_cast<HXml::tree_t::const_node_t>( _node )->begin() ) );
 	M_EPILOG
 	}
 
@@ -880,7 +880,7 @@ HXml::HConstIterator HXml::HConstNodeProxy::end( void ) const
 	{
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	return ( HXml::HConstIterator( this, _node->end() ) );
+	return ( HXml::HConstIterator( this, const_cast<HXml::tree_t::const_node_t>( _node )->end() ) );
 	M_EPILOG
 	}
 
@@ -1009,7 +1009,7 @@ HXml::HConstNodeProxy const HXml::HConstIterator::operator* ( void ) const
 	{
 	M_PROLOG
 	M_ASSERT( _owner );
-	M_ASSERT( _iterator != _owner->_node->end() );
+	M_ASSERT( _iterator != const_cast<HXml::tree_t::const_node_t>( _owner->_node )->end() );
 	return ( HXml::HConstNodeProxy( &*_iterator ) );
 	M_EPILOG
 	}

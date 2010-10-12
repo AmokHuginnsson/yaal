@@ -48,6 +48,10 @@ public:
 	typedef HPair<key_t const, data_t> value_type;
 	template<typename const_qual_t>
 	class HIterator;
+	typedef HIterator<value_type> iterator;
+	typedef HIterator<value_type const> const_iterator;
+	typedef HReverseIterator<iterator> reverse_iterator;
+	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
 	struct hasher
 		{
@@ -67,8 +71,6 @@ private:
 	hasher _hasher;
 	HHashContainer _engine;
 public:
-	typedef HIterator<value_type> iterator;
-	typedef HIterator<value_type const> const_iterator;
 	HHashMap( void )
 		: _hasher( &hash ), _engine()
 		{}

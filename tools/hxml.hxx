@@ -180,8 +180,8 @@ public:
 	typedef HXml::HIterator iterator;
 	typedef yaal::hcore::HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef yaal::hcore::HReverseIterator<iterator> reverse_iterator;
-private:
-	HXml::tree_t::const_node_t _node;
+protected:
+	HXml::tree_t::node_t _node;
 public:
 	const_iterator begin() const;
 	const_iterator end() const;
@@ -217,8 +217,6 @@ public:
 	typedef HXml::HIterator iterator;
 	typedef yaal::hcore::HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef yaal::hcore::HReverseIterator<iterator> reverse_iterator;
-private:
-	HXml::tree_t::node_t _node;
 public:
 	iterator begin();
 	iterator end();

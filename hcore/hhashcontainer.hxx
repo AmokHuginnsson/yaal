@@ -128,6 +128,7 @@ public:
 	HIterator& operator ++ ( void )
 		{
 		M_ASSERT( _owner );
+		int long oldIndex( _index );
 		if ( _atom )
 			{
 			_atom = _atom->_next;
@@ -137,7 +138,7 @@ public:
 		if ( ! _atom )
 			{
 			HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
-			if ( _index == _owner->_prime )
+			if ( oldIndex == _owner->_prime )
 				_index = 0;
 			while ( ( _index < _owner->_prime ) && ! buckets[ _index ] )
 				++ _index;
