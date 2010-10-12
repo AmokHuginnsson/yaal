@@ -122,7 +122,7 @@ public:
 		{
 		typename multimap_engine_t::iterator major = ensure_key( e.first );
 		major->second->push_back( storage_t::value( e ) );
-		typename value_list_t::iterator minor = major->second->rbegin();
+		typename value_list_t::iterator minor = major->second->rbegin().base();
 		return ( iterator( this, major, minor ) );
 		}
 	template<typename iterator_t>

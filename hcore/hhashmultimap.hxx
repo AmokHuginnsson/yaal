@@ -380,7 +380,7 @@ public:
 		{
 		M_PROLOG
 		++ _minor;
-		if ( ! _minor.is_valid() )
+		if ( _minor == _major->second->end() )
 			{
 			++ _major;
 			if ( _major != _owner->_engine.end() )
@@ -399,7 +399,7 @@ public:
 		{
 		M_PROLOG
 		-- _minor;
-		if ( ! _minor.is_valid() )
+		if ( _minor == _major->second.rend().base() )
 			{
 			-- _major;
 			if ( _major != _owner->_engine.rend() )

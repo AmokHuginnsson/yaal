@@ -54,8 +54,8 @@ public:
 	typedef HNode const* const_node_t;
 	template<typename const_qual_t>
 	class HIterator;
-	typedef HIterator<value_type> iterator;
-	typedef HIterator<value_type const> const_iterator;
+	typedef HIterator<HNode> iterator;
+	typedef HIterator<HNode const> const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
@@ -138,7 +138,7 @@ private:
  */
 template<typename value_t>
 template<typename const_qual_t>
-class HTree<value_t>::HIterator : public iterator_interface<value_t>
+class HTree<value_t>::HIterator : public iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type>
 	{
 	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
 	typedef typename trait::copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;

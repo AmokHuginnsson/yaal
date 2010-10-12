@@ -137,7 +137,7 @@ namespace hcore
  */
 template<typename type_t>
 template<typename const_qual_t>
-class HArray<type_t>::HIterator
+class HArray<type_t>::HIterator : public iterator_interface<const_qual_t>
 	{
 	typedef HArray<type_t> array_t;
 	array_t const* _owner;
@@ -145,6 +145,7 @@ class HArray<type_t>::HIterator
 public:
 	typedef type_t value_type;
 	HIterator( void ) : _owner( NULL ), _index( 0 ) {}
+	HIterator( HIterator const& it_ ) : _owner( it_._owner ), _index( it_._index ) {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ ) : _owner( it_._owner ), _index( it_._index )
 		{

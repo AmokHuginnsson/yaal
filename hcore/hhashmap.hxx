@@ -236,7 +236,7 @@ private:
 
 template<typename key_type_t, typename data_type_t, typename hash_function_t>
 template<typename const_qual_t>
-class HHashMap<key_type_t, data_type_t, hash_function_t>::HIterator
+class HHashMap<key_type_t, data_type_t, hash_function_t>::HIterator : public iterator_interface<const_qual_t>
 	{
 	typedef key_type_t key_type;
 	typedef data_type_t data_type;

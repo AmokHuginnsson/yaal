@@ -206,7 +206,7 @@ public:
  */
 template<typename key_type_t, typename value_type_t, typename helper_t>
 template<typename const_qual_t>
-class HMap<key_type_t, value_type_t, helper_t>::HIterator : public iterator_interface<typename HMap<key_type_t, value_type_t, helper_t>::value_type>
+class HMap<key_type_t, value_type_t, helper_t>::HIterator : public iterator_interface<const_qual_t>
 	{
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;

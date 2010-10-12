@@ -248,7 +248,7 @@ private:
  */
 template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
-class HList<type_t>::HIterator : public iterator_interface<type_t>
+class HList<type_t>::HIterator : public iterator_interface<const_qual_t>
 	{
 private:
 	HList<type_t> const* _owner;
