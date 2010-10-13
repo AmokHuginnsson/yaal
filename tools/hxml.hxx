@@ -219,14 +219,21 @@ public:
 	typedef yaal::hcore::HReverseIterator<iterator> reverse_iterator;
 public:
 	iterator begin();
+	using HConstNodeProxy::begin;
 	iterator end();
+	using HConstNodeProxy::end;
 	reverse_iterator rbegin();
+	using HConstNodeProxy::rbegin;
 	reverse_iterator rend();
+	using HConstNodeProxy::rend;
 	iterator get_element_by_id( yaal::hcore::HString const& );
+	using HConstNodeProxy::get_element_by_id;
 	iterator query( yaal::hcore::HString const& );
+	using HConstNodeProxy::query;
 	void set_name( yaal::hcore::HString const& );
 	void set_value( yaal::hcore::HString const& );
 	HXml::HNode::properties_t& properties( void );
+	using HConstNodeProxy::properties;
 	HXml::HIterator remove_node( HXml::HIterator );
 	HXml::HIterator replace_node( HXml::HIterator, HXml::HNodeProxy );
 	HXml::HIterator add_node( HXml::HNode::TYPE::type_t const&, yaal::hcore::HString const& );
