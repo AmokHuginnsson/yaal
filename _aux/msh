@@ -37,7 +37,7 @@ shell_env() {
 YAAL_PREFIX=`echo ${1} | sed -e 's/\//\\\\\//g'`
 
 printf "%b\n" "Compilation have been finished !"
-printf "%b\n" "It is need to be added seweral lines to your .SHELLrc file :"
+printf "%b\n" "It is need to be added several lines to your .SHELLrc file :"
 printf "%b\n" "#v+"
 shell_env shellrc
 printf "%b\n" "#v-"
