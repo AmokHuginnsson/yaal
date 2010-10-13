@@ -13,7 +13,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
     - dl (libdl)
     - z (zlib)
     - ncurses (ncurses)
-	
+
   optional libraries:
     - SQLite3
     - PostGreSQL
@@ -25,7 +25,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
     - autoreconf
     - autoheader
     - autoconf
-		- libtool
+    - libtool
     - GNU make
     - g++
 
@@ -36,7 +36,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 
   1. Create new (possibly persistent) environment variables (see your shell documentation)
      one named PREFIX and set its value to desired installation destination directory,
-		 another named DEFAULT_TARGET and set to desired build mode, a `debug' value is advised.
+     another named DEFAULT_TARGET and set to desired build mode, a `debug' value is advised.
   2. Go to sources directory and type `make', i.e:.
   3. (Required only once.) Still in yaal sources directory type `make install-environment'.
   4. Still in yaal sources directory type `make install'.
