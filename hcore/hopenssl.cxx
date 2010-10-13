@@ -32,6 +32,7 @@ Copyright:
 #include <openssl/err.h>
 #include <openssl/conf.h>
 #include <openssl/engine.h>
+#include <unistd.h>
 
 #if ! defined(OPENSSL_THREADS)
 #error Thread support in OpenSSL library is missing.
@@ -86,6 +87,75 @@ int long unsigned get_thread_id( void )
 	{
 	return ( HThread::get_id() );
 	}
+
+int bio_read( BIO* bio_, char* buf_, int size_ )
+	{
+	M_PROLOG
+	return ( static_cast<int>( ::read( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
+	M_EPILOG
+	}
+
+int bio_write( BIO* bio_, char const* buf_, int size_ )
+	{
+	M_PROLOG
+	return ( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
+	M_EPILOG
+	}
+
+int bio_puts( BIO*, char const* ) __attribute__(( __noreturn__ ));
+int bio_puts( BIO*, char const* )
+	{
+	M_PROLOG
+	M_ENSURE( ! "BIO_puts call not implemented!" );
+	M_EPILOG
+	}
+
+int bio_gets( BIO*, char*, int ) __attribute__(( __noreturn__ ));
+int bio_gets( BIO*, char*, int )
+	{
+	M_PROLOG
+	M_ENSURE( ! "BIO_gets call not implemented!" );
+	M_EPILOG
+	}
+
+int long bio_ctrl( BIO*, int, int long, void* ) __attribute__(( __noreturn__ ));
+int long bio_ctrl( BIO*, int, int long, void* )
+	{
+	M_PROLOG
+	M_ENSURE( ! "BIO_ctrl call not implemented!" );
+	M_EPILOG
+	}
+
+//int bio_create( BIO* ) __attribute__(( __noreturn__ ));
+int bio_create( BIO* )
+	{
+	M_PROLOG
+	//M_ENSURE( ! "BIO_create call not implemented!" );
+	return ( 0 );
+	M_EPILOG
+	}
+
+int bio_destroy( BIO* ) __attribute__(( __noreturn__ ));
+int bio_destroy( BIO* )
+	{
+	M_PROLOG
+	M_ENSURE( ! "BIO_destroy call not implemented!" );
+	M_EPILOG
+	}
+
+BIO_METHOD fd_method =
+	{
+	BIO_TYPE_SOURCE_SINK,
+	"yaal-stream",
+	bio_write,
+	bio_read,
+	bio_puts,
+	bio_gets,
+	bio_ctrl,
+	bio_create,
+	bio_destroy,
+	NULL
+	};
 
 void HOpenSSL::OSSLContext::init( void )
 	{
@@ -183,7 +253,11 @@ void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ )
 	M_PROLOG
 	HLock lock( _mutex );
 	M_ASSERT( ssl_ );
-	SSL_free( static_cast<SSL*>( ssl_ ) );
+	SSL* ssl( static_cast<SSL*>( ssl_ ) );
+	BIO* bio( SSL_get_rbio( ssl ) );
+	if ( bio )
+		BIO_free( bio );
+	SSL_free( ssl );
 	-- _users;
 	M_EPILOG
 	}
@@ -254,7 +328,17 @@ HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE::ssl_context_type_t type_ )
 		{
 		SSL* ssl( static_cast<SSL*>( _ctx->create_ssl() ) );
 		_ssl = ssl;
-		SSL_set_fd( ssl, fileDescriptor_ );
+		/* We throw if BIO_new() fails.
+		 * During stack unwindig we call consume_ssl().
+		 * In consume_ssl() we free `bio'.
+		 * We shall free only `bio' we created so we shall nullify original bios
+		 * before call to BIO_new().
+		 */
+		SSL_set_bio( ssl, NULL, NULL );
+		BIO* bio( BIO_new( &fd_method ) );
+		M_ENSURE( bio );
+		bio->ptr = reinterpret_cast<void*>( fileDescriptor_ );
+		SSL_set_bio( ssl, bio, bio );
 		accept_or_connect();
 		}
 	catch ( HOpenSSLException const& )
