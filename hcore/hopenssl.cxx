@@ -118,28 +118,41 @@ int bio_gets( BIO*, char*, int )
 	M_EPILOG
 	}
 
-int long bio_ctrl( BIO*, int, int long, void* ) __attribute__(( __noreturn__ ));
-int long bio_ctrl( BIO*, int, int long, void* )
+int long bio_ctrl( BIO*, int cmd_, int long, void* )
 	{
 	M_PROLOG
-	M_ENSURE( ! "BIO_ctrl call not implemented!" );
+	int code( 0 );
+	switch ( cmd_ )
+		{
+		case ( BIO_CTRL_EOF ): break;
+		case ( BIO_CTRL_RESET ): break;
+		case ( BIO_C_FILE_SEEK ): break;
+		case ( BIO_C_FILE_TELL ): break;
+		case ( BIO_CTRL_INFO ): break;
+		case ( BIO_CTRL_PENDING ): break;
+		case ( BIO_CTRL_WPENDING ): break;
+		case ( BIO_CTRL_DUP ): break;
+		case ( BIO_CTRL_FLUSH ): code = 1; break;
+		default: break;
+		}
+	return ( code );
 	M_EPILOG
 	}
 
-//int bio_create( BIO* ) __attribute__(( __noreturn__ ));
-int bio_create( BIO* )
+int bio_create( BIO* bio_ )
 	{
 	M_PROLOG
-	//M_ENSURE( ! "BIO_create call not implemented!" );
-	return ( 0 );
+	bio_->init = bio_->shutdown = 1;
+	bio_->num = bio_->flags = 0;
+	bio_->ptr = NULL;
+	return ( 1 );
 	M_EPILOG
 	}
 
-int bio_destroy( BIO* ) __attribute__(( __noreturn__ ));
 int bio_destroy( BIO* )
 	{
 	M_PROLOG
-	M_ENSURE( ! "BIO_destroy call not implemented!" );
+	return ( 1 );
 	M_EPILOG
 	}
 
@@ -253,11 +266,7 @@ void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ )
 	M_PROLOG
 	HLock lock( _mutex );
 	M_ASSERT( ssl_ );
-	SSL* ssl( static_cast<SSL*>( ssl_ ) );
-	BIO* bio( SSL_get_rbio( ssl ) );
-	if ( bio )
-		BIO_free( bio );
-	SSL_free( ssl );
+	SSL_free( static_cast<SSL*>( ssl_ ) );
 	-- _users;
 	M_EPILOG
 	}
@@ -328,13 +337,6 @@ HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE::ssl_context_type_t type_ )
 		{
 		SSL* ssl( static_cast<SSL*>( _ctx->create_ssl() ) );
 		_ssl = ssl;
-		/* We throw if BIO_new() fails.
-		 * During stack unwindig we call consume_ssl().
-		 * In consume_ssl() we free `bio'.
-		 * We shall free only `bio' we created so we shall nullify original bios
-		 * before call to BIO_new().
-		 */
-		SSL_set_bio( ssl, NULL, NULL );
 		BIO* bio( BIO_new( &fd_method ) );
 		M_ENSURE( bio );
 		bio->ptr = reinterpret_cast<void*>( fileDescriptor_ );
