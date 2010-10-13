@@ -97,37 +97,38 @@ class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LIN
 #define M_EXPORT_SYMBOL __declspec( dllexport )
 #ifdef __YAAL_HCORE_BUILD__
 #define M_YAAL_HCORE_PUBLIC_API __declspec( dllexport )
-#else /* __YAAL_HCORE_BUILD__ */
+#else /* #ifdef __YAAL_HCORE_BUILD__ */
 #define M_YAAL_HCORE_PUBLIC_API __declspec( dllimport )
-#endif /* not __YAAL_HCORE_BUILD__ */
+#endif /* #else #ifdef __YAAL_HCORE_BUILD__ */
 #ifdef __YAAL_TOOLS_BUILD__
 #define M_YAAL_TOOLS_PUBLIC_API __declspec( dllexport )
-#else /* __YAAL_TOOLS_BUILD__ */
+#else /* #ifdef __YAAL_TOOLS_BUILD__ */
 #define M_YAAL_TOOLS_PUBLIC_API __declspec( dllimport )
-#endif /* not __YAAL_TOOLS_BUILD__ */
+#endif /* #else #ifdef __YAAL_TOOLS_BUILD__ */
 #ifdef __YAAL_DBWRAPPER_BUILD__
 #define M_YAAL_DBWRAPPER_PUBLIC_API __declspec( dllexport )
-#else /* __YAAL_DBWRAPPER_BUILD__ */
+#else /* #ifdef __YAAL_DBWRAPPER_BUILD__ */
 #define M_YAAL_DBWRAPPER_PUBLIC_API __declspec( dllimport )
-#endif /* not __YAAL_DBWRAPPER_BUILD__ */
+#endif /* #else #ifdef __YAAL_DBWRAPPER_BUILD__ */
 #ifdef __YAAL_HCONSOLE_BUILD__
 #define M_YAAL_HCONSOLE_PUBLIC_API __declspec( dllexport )
-#else /* __YAAL_HCONSOLE_BUILD__ */
+#else /* #ifdef __YAAL_HCONSOLE_BUILD__ */
 #define M_YAAL_HCONSOLE_PUBLIC_API __declspec( dllimport )
-#endif /* not __YAAL_HCONSOLE_BUILD__ */
+#endif /* #else #ifdef __YAAL_HCONSOLE_BUILD__ */
 #ifdef __YAAL_HDATA_BUILD__
 #define M_YAAL_HDATA_PUBLIC_API __declspec( dllexport )
-#else /* __YAAL_HDATA_BUILD__ */
+#else /* #ifdef __YAAL_HDATA_BUILD__ */
 #define M_YAAL_HDATA_PUBLIC_API __declspec( dllimport )
-#endif /* not __YAAL_HDATA_BUILD__ */
-#else /* __MSVCXX__ */
+#endif /* #else #ifdef __YAAL_HDATA_BUILD__ */
+#else /* #ifdef __MSVCXX__ */
 #define M_EXPORT_SYMBOL /**/
 #define M_YAAL_HCORE_PUBLIC_API /**/
 #define M_YAAL_TOOLS_PUBLIC_API /**/
 #define M_YAAL_DBWRAPPER_PUBLIC_API /**/
 #define M_YAAL_HCONSOLE_PUBLIC_API /**/
 #define M_YAAL_HDATA_PUBLIC_API /**/
-#endif /* not __MSVCXX__ */
+#define __declspec( x ) /**/
+#endif /* #else #ifdef __MSVCXX__ */
 
 #endif /* not YAAL_HCORE_MACRO_HXX_INCLUDED */
 

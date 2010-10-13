@@ -24,6 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <unistd.h> /* read(), write() for BIO */
 #include <openssl/rsa.h>       /* SSLeay stuff */
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
@@ -32,7 +33,6 @@ Copyright:
 #include <openssl/err.h>
 #include <openssl/conf.h>
 #include <openssl/engine.h>
-#include <unistd.h>
 
 #if ! defined(OPENSSL_THREADS)
 #error Thread support in OpenSSL library is missing.

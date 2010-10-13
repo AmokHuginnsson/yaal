@@ -1,5 +1,6 @@
 ??_7?$HSingleton@VHSignalService@tools@yaal@@@hcore@yaal@@6B@
 ??_7HSignalService@tools@yaal@@6B@
+?DEFAULT@HSemaphore@hcore@yaal@@2W4type_t@TYPE@123@A
 ?DEFAULT_PRECISION@HNumber@hcore@yaal@@2HA
 ?MANAGED_IO@SystemIO@msvcxx@@2HB
 ?_baudRate_@tools@yaal@@3V?$HStrongEnum@USPEED@HSerial@tools@yaal@@@hcore@2@A
