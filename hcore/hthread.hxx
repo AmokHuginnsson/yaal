@@ -84,16 +84,43 @@ private:
 	/*}*/
 	};
 
+class HSemaphoreImplementationInterface
+	{
+	typedef HSemaphoreImplementationInterface this_type;
+public:
+	HSemaphoreImplementationInterface( void ) {}
+	virtual ~HSemaphoreImplementationInterface( void ) {}
+	void wait( void );
+	void signal( void );
+private:
+	virtual void do_wait( void ) = 0;
+	virtual void do_signal( void ) = 0;
+	HSemaphoreImplementationInterface( HSemaphoreImplementationInterface const& );
+	HSemaphoreImplementationInterface& operator = ( HSemaphoreImplementationInterface const& );
+	};
+
 typedef HExceptionT<HMutex> HMutexException;
 
 /*! \brief Multi-threaded synchronizing prymitive - Semaphore.
  */
 class HSemaphore
 	{
-	typedef HSemaphore this_type;
-	HChunk _semaphore;
 public:
-	HSemaphore( void );
+	typedef HSemaphore this_type;
+	typedef HResource<HSemaphoreImplementationInterface> semaphore_implementation_t;
+	struct TYPE
+		{
+		typedef enum
+			{
+			POSIX,
+			YAAL
+			} type_t;
+		};
+	M_YAAL_HCORE_PUBLIC_API static TYPE::type_t DEFAULT;
+private:
+	semaphore_implementation_t _impl;
+public:
+	HSemaphore( TYPE::type_t = DEFAULT );
 	virtual ~HSemaphore( void );
 	void wait( void );
 	void signal( void );

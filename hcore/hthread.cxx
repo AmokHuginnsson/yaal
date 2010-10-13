@@ -44,6 +44,8 @@ namespace yaal
 namespace hcore
 {
 
+HSemaphore::TYPE::type_t HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
+
 void do_pthread_attr_destroy( void* attr )
 	{
 	M_PROLOG
@@ -289,27 +291,145 @@ HLock::~HLock( void )
 	M_EPILOG
 	}
 
-HSemaphore::HSemaphore( void )
-	: _semaphore( chunk_size<sem_t>( 1 ) )
+class HPosixSemaphore : public HSemaphoreImplementationInterface
+	{
+public:
+	typedef HPosixSemaphore this_type;
+	typedef HSemaphoreImplementationInterface base_type;
+private:
+	sem_t _sem;
+public:
+	HPosixSemaphore( void );
+	virtual ~HPosixSemaphore( void );
+private:
+	virtual void do_wait( void );
+	virtual void do_signal( void );
+	HPosixSemaphore( HPosixSemaphore const& );
+	HPosixSemaphore& operator = ( HPosixSemaphore const& );
+	};
+
+HPosixSemaphore::HPosixSemaphore( void )
+	: _sem()
 	{
 	M_PROLOG
-	M_ENSURE( ::sem_init( _semaphore.get<sem_t>(), 0, 0 ) == 0 );
+	M_ENSURE( ::sem_init( &_sem, 0, 0 ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-HSemaphore::~HSemaphore( void )
+HPosixSemaphore::~HPosixSemaphore( void )
 	{
 	M_PROLOG
-	M_ENSURE( ::sem_destroy( _semaphore.get<sem_t>() ) == 0 );
+	M_ENSURE( ::sem_destroy( &_sem ) == 0 );
 	return;
 	M_EPILOG
+	}
+
+void HPosixSemaphore::do_wait( void )
+	{
+	M_PROLOG
+	::sem_wait( &_sem ); /* Always returns 0. */
+	return;
+	M_EPILOG
+	}
+
+void HPosixSemaphore::do_signal( void )
+	{
+	M_PROLOG
+	M_ENSURE( ::sem_post( &_sem ) == 0 );
+	return;
+	M_EPILOG
+	}
+
+void HSemaphoreImplementationInterface::wait( void )
+	{
+	M_PROLOG
+	do_wait();
+	return;
+	M_EPILOG
+	}
+
+void HSemaphoreImplementationInterface::signal( void )
+	{
+	M_PROLOG
+	do_signal();
+	return;
+	M_EPILOG
+	}
+
+class HYaalSemaphore : public HSemaphoreImplementationInterface
+	{
+public:
+	typedef HYaalSemaphore this_type;
+	typedef HSemaphoreImplementationInterface base_type;
+private:
+	HMutex _mutex;
+	HCondition _cond;
+	int long _count;
+public:
+	HYaalSemaphore( void );
+	virtual ~HYaalSemaphore( void );
+private:
+	virtual void do_wait( void );
+	virtual void do_signal( void );
+	HYaalSemaphore( HYaalSemaphore const& );
+	HYaalSemaphore& operator = ( HYaalSemaphore const& );
+	};
+
+HYaalSemaphore::HYaalSemaphore( void )
+	: _mutex(), _cond( _mutex ), _count( 0 )
+	{
+	return;
+	}
+
+HYaalSemaphore::~HYaalSemaphore( void )
+	{
+	return;
+	}
+
+void HYaalSemaphore::do_wait( void )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	if ( _count > 0 )
+		-- _count;
+	else
+		{
+		do
+			{
+			_cond.wait( 0x1fffffff, 0 );
+			}
+		while ( ! _count );
+		-- _count;
+		}
+	return;
+	M_EPILOG
+	}
+
+void HYaalSemaphore::do_signal( void )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	++ _count;
+	_cond.signal();
+	return;
+	M_EPILOG
+	}
+
+HSemaphore::HSemaphore( TYPE::type_t type_ )
+	: _impl( type_ == TYPE::POSIX ? semaphore_implementation_t( new HPosixSemaphore() ) : semaphore_implementation_t( new HYaalSemaphore() ) )
+	{
+	}
+
+HSemaphore::~HSemaphore( void )
+	{
+	return;
 	}
 
 void HSemaphore::wait( void )
 	{
 	M_PROLOG
-	::sem_wait( _semaphore.get<sem_t>() ); /* Always returns 0. */
+	_impl->wait();
 	return;
 	M_EPILOG
 	}
@@ -317,7 +437,7 @@ void HSemaphore::wait( void )
 void HSemaphore::signal( void )
 	{
 	M_PROLOG
-	M_ENSURE( ::sem_post( _semaphore.get<sem_t>() ) == 0 );
+	_impl->signal();
 	return;
 	M_EPILOG
 	}
@@ -381,7 +501,6 @@ HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
 void HCondition::signal( void )
 	{
 	M_PROLOG
-	HLock lock( _mutex );
 	::pthread_cond_signal( _buf.get<pthread_cond_t>() );
 	return;
 	M_EPILOG

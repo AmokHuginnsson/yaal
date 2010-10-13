@@ -76,6 +76,7 @@ bool eq( double long left_, double long right_ )
 bool set_hcore_variables( HString& option_, HString& value_ )
 	{
 	M_PROLOG
+	bool fail( false );
 	if ( ! strcasecmp( option_, "set_env" ) )
 		decode_set_env( value_ );
 	else if ( ! strcasecmp( option_, "log_mask" ) )
@@ -96,12 +97,21 @@ bool set_hcore_variables( HString& option_, HString& value_ )
 			else if ( ! strcasecmp( *it, "LOG_VCSHEADER" ) )
 				HLog::_logMask |= LOG_TYPE::VCSHEADER;
 			else
-				return ( true );
+				fail = true;
 			}
 		}
+	else if ( ! strcasecmp( option_, "semaphore_type" ) )
+		{
+		if ( value_ == "POSIX" )
+			HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
+		else if ( value_ == "YAAL" )
+			HSemaphore::DEFAULT = HSemaphore::TYPE::YAAL;
+		else
+			fail = true;
+		}
 	else
-		return ( true );
-	return ( false );
+		fail = true;
+	return ( fail );
 	M_EPILOG
 	}
 
@@ -207,9 +217,11 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	char* env( ::getenv( "YAAL_DEBUG" ) );
 	if ( env )
 		_debugLevel_ = lexical_cast<int>( env );
+	HString dummy;
 	yaal_options()( "ssl_key", program_options_helper::option_value( HOpenSSL::_sSLKey ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL private key file.", "path" )
 		( "ssl_cert", program_options_helper::option_value( HOpenSSL::_sSLCert ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL certificate file.", "path" )
 		( "resolve_hostnames", program_options_helper::option_value( HSocket::_resolveHostnames ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Resolve IP address into host names." )
+		( "semaphore_type", program_options_helper::option_value( dummy ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Default semaphore implementation type.", "type" )
 		( "write_timeout", program_options_helper::option_value( _writeTimeout_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Time-out for low level write operations." );
 	yaal_options().process_rc_file( "yaal", "core", set_hcore_variables );
 	if ( _writeTimeout_ < LOW_TIMEOUT_WARNING )

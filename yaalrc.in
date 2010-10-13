@@ -42,6 +42,12 @@ log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_VCSHEADER
 # before they fail with timeout in case operation did not succeeded in given time.
 write_timeout 4000
 
+# semaphore_type
+# type: special(alternative-flag), default: POSIX
+# semaphore_type selects preferred default semaphore implementation to be used by Yaal Threads.
+# valid semaphore types are: POSIX or YAAL.
+semaphore_type POSIX
+
 # resolve_hostnames
 # type: bool, default true
 # resolve_hostnames switch enables/disables resolving IP address into host names.
