@@ -25,6 +25,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
     - autoreconf
     - autoheader
     - autoconf
+		- libtool
     - GNU make
     - g++
 
