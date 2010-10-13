@@ -8,7 +8,7 @@
 
 ** Software:
 	- Debian (latest development branch, currently `unstable' aka `Sid') (Debian stable releases are not supported!)
-	- Ubuntu (latest development branch and latest stable release, currently 10.10 and 10.04 respectively)
+	- Ubuntu (latest development branch and latest stable release, currently 11.04 and 10.10 respectively)
 	- Centos (latest stable release, currently 5.5)
 	- FreeBSD (latest stable release, currently 8.1-RELEASE)
 	- Solaris (latest stable release, currently 5.10)

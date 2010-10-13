@@ -142,9 +142,7 @@ int long bio_ctrl( BIO*, int cmd_, int long, void* )
 int bio_create( BIO* bio_ )
 	{
 	M_PROLOG
-	bio_->init = bio_->shutdown = 1;
-	bio_->num = bio_->flags = 0;
-	bio_->ptr = NULL;
+	bio_->init = 1;
 	return ( 1 );
 	M_EPILOG
 	}
