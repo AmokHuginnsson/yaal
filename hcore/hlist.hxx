@@ -378,7 +378,7 @@ void HList<type_t>::HElement::connect( HElement* element_ )
 template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
 HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( void )
-	: _owner( NULL ), _current( NULL )
+	: iterator_interface<const_qual_t>(), _owner( NULL ), _current( NULL )
 	{
 	return;
 	}
@@ -386,7 +386,7 @@ HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( void )
 template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
 HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HIterator const& iterator_ )
-	: _owner( iterator_._owner ), _current( iterator_._current )
+	: iterator_interface<const_qual_t>(), _owner( iterator_._owner ), _current( iterator_._current )
 	{
 	M_PROLOG
 	return;
@@ -397,7 +397,7 @@ template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
 template<typename other_const_qual_t, OListBits::treatment_t family>
 HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HIterator<other_const_qual_t, family> const& iterator_ )
-	: _owner( iterator_._owner ), _current( iterator_._current )
+	: iterator_interface<const_qual_t>(), _owner( iterator_._owner ), _current( iterator_._current )
 	{
 	M_PROLOG
 	STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
@@ -408,8 +408,8 @@ HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HIterator<other_co
 template<typename type_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
 HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HList<type_t> const* const owner_,
-		HElement* const element_ ) : _owner( owner_ ),
-	_current( element_ )
+		HElement* const element_ )
+	: iterator_interface<const_qual_t>(), _owner( owner_ ), _current( element_ )
 	{
 	return;
 	}

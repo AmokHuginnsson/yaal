@@ -140,6 +140,7 @@ template<typename value_t>
 template<typename const_qual_t>
 class HTree<value_t>::HIterator : public iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type>
 	{
+	typedef iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type> base_type;
 	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
 	typedef typename trait::copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;
 	typedef typename HTree<value_t>::const_node_t owner_t;
@@ -529,7 +530,7 @@ int HTree<value_t>::HNode::get_level( void ) const
 template<typename value_t>
 template<typename const_qual_t>
 HTree<value_t>::HIterator<const_qual_t>::HIterator( void )
-	: _owner( NULL ), _iterator()
+	: base_type(), _owner( NULL ), _iterator()
 	{
 	return;
 	}
@@ -539,7 +540,7 @@ template<typename const_qual_t>
 HTree<value_t>::HIterator<const_qual_t>::HIterator( const_node_t owner_,
 		typename HTree<value_t>::HNode::branch_t::template HIterator<const_qual_node_ptr_t,
 		OListBits::TREAT_AS_OPENED> const& iterator_ )
-	: _owner( owner_ ), _iterator( iterator_ )
+	: base_type(), _owner( owner_ ), _iterator( iterator_ )
 	{
 	return;
 	}
@@ -547,7 +548,7 @@ HTree<value_t>::HIterator<const_qual_t>::HIterator( const_node_t owner_,
 template<typename value_t>
 template<typename const_qual_t>
 HTree<value_t>::HIterator<const_qual_t>::HIterator( typename HTree<value_t>::template HIterator<const_qual_t> const& it )
-	: _owner( it._owner ), _iterator( it._iterator )
+	: base_type(), _owner( it._owner ), _iterator( it._iterator )
 	{
 	return;
 	}

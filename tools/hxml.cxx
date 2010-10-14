@@ -927,32 +927,32 @@ bool HXml::HConstNodeProxy::operator ! ( void ) const
 	}
 
 HXml::HIterator::HIterator( void )
-	: _owner( NULL ), _iterator()
+	: iterator_interface<HXml::HNodeProxy>(), _owner( NULL ), _iterator()
 	{
 	}
 
 HXml::HConstIterator::HConstIterator( void )
-	: _owner( NULL ), _iterator()
+	: iterator_interface<HXml::HConstNodeProxy>(), _owner( NULL ), _iterator()
 	{
 	}
 
 HXml::HIterator::HIterator( HXml::HNodeProxy const* owner_, HXml::tree_t::iterator const& it )
-	: _owner( owner_ ), _iterator( it )
+	: iterator_interface<HXml::HNodeProxy>(), _owner( owner_ ), _iterator( it )
 	{
 	}
 
 HXml::HConstIterator::HConstIterator( HXml::HConstNodeProxy const* owner_, HXml::tree_t::const_iterator const& it )
-	: _owner( owner_ ), _iterator( it )
+	: iterator_interface<HXml::HConstNodeProxy>(), _owner( owner_ ), _iterator( it )
 	{
 	}
 
 HXml::HIterator::HIterator( HXml::HIterator const& other )
-	: _owner( other._owner ), _iterator( other._iterator )
+	: iterator_interface<HXml::HNodeProxy>(), _owner( other._owner ), _iterator( other._iterator )
 	{
 	}
 
 HXml::HConstIterator::HConstIterator( HXml::HConstIterator const& other )
-	: _owner( other._owner ), _iterator( other._iterator )
+	: iterator_interface<HXml::HConstNodeProxy>(), _owner( other._owner ), _iterator( other._iterator )
 	{
 	}
 

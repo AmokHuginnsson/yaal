@@ -192,9 +192,9 @@ class HSet<value_type, helper_t>::HIterator : public iterator_interface<value_ty
 	{
 	HSBBSTree::HIterator _engine;
 public:
-	HIterator( void ) : _engine() {}
-	HIterator( HIterator const& it_ ) : _engine( it_._engine ) {}
-	HIterator& operator= ( HIterator const& it_ )
+	HIterator( void ) : iterator_interface<value_type>(), _engine() {}
+	HIterator( HIterator const& it_ ) : iterator_interface<value_type>(), _engine( it_._engine ) {}
+	HIterator& operator = ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
 			_engine = it_._engine;
@@ -232,7 +232,8 @@ public:
 		{ return ( _engine != it._engine ); }
 private:
 	friend class HSet<value_type, helper_t>;
-	explicit HIterator( HSBBSTree::HIterator const& it ) : _engine( it ) {};
+	explicit HIterator( HSBBSTree::HIterator const& it )
+		: iterator_interface<value_type>(), _engine( it ) {}
 	};
 
 }

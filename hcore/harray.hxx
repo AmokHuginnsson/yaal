@@ -144,10 +144,10 @@ class HArray<type_t>::HIterator : public iterator_interface<const_qual_t>
 	int long _index;
 public:
 	typedef type_t value_type;
-	HIterator( void ) : _owner( NULL ), _index( 0 ) {}
-	HIterator( HIterator const& it_ ) : _owner( it_._owner ), _index( it_._index ) {}
+	HIterator( void ) : iterator_interface<const_qual_t>(), _owner( NULL ), _index( 0 ) {}
+	HIterator( HIterator const& it_ ) : iterator_interface<const_qual_t>(), _owner( it_._owner ), _index( it_._index ) {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& it_ ) : _owner( it_._owner ), _index( it_._index )
+	HIterator( HIterator<other_const_qual_t> const& it_ ) : iterator_interface<const_qual_t>(), _owner( it_._owner ), _index( it_._index )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
@@ -224,7 +224,7 @@ public:
 private:
 	friend class HArray<type_t>;
 	explicit HIterator( array_t const* owner_, int long idx )
-		: _owner( owner_ ), _index( idx ) {};
+		: iterator_interface<const_qual_t>(), _owner( owner_ ), _index( idx ) {};
 	};
 
 template<typename type_t>
