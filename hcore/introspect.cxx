@@ -55,24 +55,19 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int )
 	{
 	strings_ptr_t frames( new strings_t );
 #ifdef _EXECINFO_H
-	int ctr = 0, size = 0;
-	char** strings = NULL;
-	void** pointer =	NULL;
-
-	pointer = xcalloc<void*>( level_ + 1 );
-	size = backtrace( pointer, level_ );
-	strings = backtrace_symbols( pointer, size );
+	
+	void** pointer( xcalloc<void*>( level_ + 1 ) );
+	int size( backtrace( pointer, level_ ) );
+	char** strings( backtrace_symbols( pointer, size ) );
 
 	if ( level_ < size )
 		size = level_;
-	char* ptr = NULL;
-	char* end = NULL;
-	for ( ctr = 0; ctr < size; ctr ++ )
+	for ( int ctr( 0 ); ctr < size; ++ ctr )
 		{
-		ptr = strchr( strings[ ctr ], '(' );
+		char* ptr( strchr( strings[ ctr ], '(' ) );
 		if ( ptr )
 			{
-			end = strchr( ptr, '+' );
+			char* end( strchr( ptr, '+' ) );
 			if ( end )
 				(*end) = 0;
 			HString symbol( demangle( ptr + 1 ) );
