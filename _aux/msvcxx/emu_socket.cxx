@@ -172,10 +172,7 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 		std::swap( *io.overlapped(), *np.second->overlapped() );
 		ret = make_pipe_instance( io );
 		if ( ! ret )
-			{
 			ret = np.first;
-			np.second->schedule_read();
-			}
 		}
 	return ( ret );
 	}

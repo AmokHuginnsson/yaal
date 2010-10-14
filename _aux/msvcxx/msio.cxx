@@ -77,9 +77,12 @@ int long IO::write( void const* buf_, int long size_ )
 	{
 	DWORD iWritten( 0 );
 	bool ok( ::WriteFile( _handle, buf_, size_, &iWritten, &_overlapped ) ? true : false );
-	ok = ::GetOverlappedResult( _handle, &_overlapped, &iWritten, true ) ? true : false;
-	if ( ! ok )
-		log_windows_error( "GetOverlappedResult" );
+	if ( ::GetLastError() == ERROR_IO_PENDING )
+		{
+		ok = ::GetOverlappedResult( _handle, &_overlapped, &iWritten, true ) ? true : false;
+		if ( ! ok )
+			log_windows_error( "GetOverlappedResult" );
+		}
 	return ( ok ? iWritten : -1 );
 	}
 

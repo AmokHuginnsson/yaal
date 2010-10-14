@@ -494,7 +494,7 @@ HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
 	error = ::pthread_cond_timedwait( _buf.get<pthread_cond_t>(),
 				_mutex._buf.get<pthread_mutex_t>(), &timeOut );
 	M_ENSURE( ( error == 0 ) || ( error == EINTR ) || ( error == ETIMEDOUT ) );
-	return ( ( error == 0 ) ? OK : ( ( error == EINTR ) ? INTERRUPT : TIMEOUT ) );
+	return ( ( error == 0 ) ? OK : ( ( errno == EINTR ) ? INTERRUPT : TIMEOUT ) );
 	M_EPILOG
 	}
 
@@ -534,8 +534,7 @@ void HEvent::wait( void )
 void HEvent::signal( void )
 	{
 	M_PROLOG
-	/* HCondition::signal() locks mutext before invoking actual signal action.
-	 */
+	HLock l( _mutex );
 	_condition.signal();
 	return;
 	M_EPILOG
