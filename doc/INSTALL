@@ -43,11 +43,11 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
   5. Spawn new shell instance to get yaal installed headers and libraries visible.
 
 ( 0 ) $ cd
-( 1a) $ echo 'export PREFIX="${HOME}/usr/"' >> .bashrc                 # for bash shell
+( 1a) $ echo 'export PREFIX="${HOME}/usr/"' >> .bashrc                 # for bash or zsh shells
 ( 1b) $ echo 'setenv PREFIX "${HOME}/usr/"' >> .tcshrc                 # for tcsh shell
-( 2a) $ echo 'export DEFAULT_TARGET="debug"' >> .bashrc                # for bash shell
+( 2a) $ echo 'export DEFAULT_TARGET="debug"' >> .bashrc                # for bash or zsh shells
 ( 2b) $ echo 'setenv DEFAULT_TARGET "debug"' >> .tcshrc                # for tcsh shell
-( 3a) $ . "${HOME}/.bashrc"                                            # for bash shell
+( 3a) $ . "${HOME}/.bashrc"                                            # for bash or zsh shells
 ( 3b) $ source "${HOME}/.tcshrc"                                       # for tcsh shell
 ( 4 ) $ cd "${HOME}/src/yaal/"
 ( 5 ) $ make

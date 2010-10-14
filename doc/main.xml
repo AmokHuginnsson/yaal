@@ -3,8 +3,8 @@
 </p>
 <table class="yaal">
 	<tr>
-		<th>Platform <a class="note" href="#note_platform">1)</a></th>
-		<th>Compilation <a class="note" href="#note_compilation">2)</a></th>
+		<th>Platform <a class="note" href="#note_platform">1)</a><a class="note" href="#note_platform_not_supported">2)</a></th>
+		<th>Compilation <a class="note" href="#note_compilation">3)</a></th>
 		<th>Best case</th>
 		<th>Ultimate</th>
 	</tr>
@@ -30,13 +30,7 @@
 		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">3)</a></td><td class="fail">0%</td><td class="fail">0%</td><td class="fail">Fail</td>
-	</tr>
-	<tr>
-		<td>Solaris 5.10 with Sun Studio Express 2008/11<a class="note" href="#note_suncc">4)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
-	</tr>
-	<tr>
-		<td>Windows XP SP3 with Visual Studio C++ 2008 with SFU 3.5<a class="note" href="#note_SFU">5)</a></td><td class="envbug">0%</td><td class="envbug">0%</td><td class="envbug">Fail</td>
+		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">4)</a></td><td class="good">100%</td><td class="good">100%</td><td class="fail">Fail</td>
 	</tr>
 </table>
 <ul>
@@ -47,8 +41,7 @@
 </ul>
 <ol>
 	<li><i><a name="note_platform"></a>Unless specified otherwise GCC is used for compilation.</i></li>
+	<li><i><a name="note_platform_not_supported"></a>Following platforms are not supported: Solaris 5.10 with Sun Studio Express 2008/11 (<a href="http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=21c0039e011eafffffffff0c6ce30fa20474?bug_id=6688172" target="_blank">A bug in Sun Studio C++ compiler.</a>), Windows XP SP3 with Visual Studio C++ 2008 with SFU 3.5 (SFU is a joke, really, no C++, cannot mix with msvcrt.)</i></li>
 	<li><i><a name="note_compilation"></a>Compilation gets 100% score only when both library and all unit test can be build. On the other hand, compilation gets 0% score if non of the library components could be linked.</i></li>
-	<li><i><a name="note_fork"></a>Many important features are missing from this port due to lack of POSIX compatibility in MS Windows environment. Moreover you need a special super project <b>msvcxx</b> (git clone http://codestation.org/repo/msvcxx.git msvcxx) to be able to build both <b>yaal</b> and <b>tress</b>.</i></li>
-	<li><i><a name="note_suncc"></a><a href="http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=21c0039e011eafffffffff0c6ce30fa20474?bug_id=6688172" target="_blank">A bug in Sun Studio C++ compiler.</a></i></li>
-	<li><i><a name="note_SFU"></a>SFU is a joke, really, no C++, cannot mix with msvcrt.</li>
+	<li><i><a name="note_fork"></a>Many important features are missing from this port due to lack of POSIX compatibility in MS Windows environment. Moreover you need to download additional libraries and tools (i.e. cmake and boost) to both build and run <b>yaal</b> and <b>tress</b>.</i></li>
 </ol>

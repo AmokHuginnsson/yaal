@@ -26,7 +26,7 @@
 $(foreach DIR,$(subst /, ,$(CURDIR)), $(eval $(eval DIR_ROOT_TEST=$(DIR_ROOT_TEST)/$(DIR)) $(if $(wildcard $(DIR_ROOT_TEST)/Makefile.mk.in),export DIR_ROOT ?= $(DIR_ROOT_TEST))))
 VERSION      = 0
 SUBVERSION   = 0
-EXTRAVERSION = 20
+EXTRAVERSION = 21
 COMPONENTS   = hcore tools dbwrapper hconsole hdata
 DRIVERS      = @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 PREFIX       = @prefix@
