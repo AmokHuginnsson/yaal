@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/hpointer.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/hstreaminterface.hxx"
 
 namespace yaal
 {
@@ -58,7 +59,7 @@ struct execution_info
  *
  * \param frames - numbers of frames to print.
  */
-void dump_call_stack( int frames );
+void dump_call_stack( HStreamInterface&, int frames );
 
 
 }

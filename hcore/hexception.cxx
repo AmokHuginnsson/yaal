@@ -38,6 +38,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "xalloc.hxx"
 #include "hlog.hxx"
 #include "hfile.hxx"
+#include "introspect.hxx"
 
 using namespace yaal;
 
@@ -133,6 +134,8 @@ void HException::failed_assert( char const* const fileName_,
 		++ errno;
 	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
 		::abort();
+	static int const DUMP_DEPTH = 64;
+	dump_call_stack( clog, DUMP_DEPTH );
 	throw ( HFailedAssertion( message_ ) );
 	M_EPILOG
 	}

@@ -73,6 +73,8 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int )
 			HString symbol( demangle( ptr + 1 ) );
 			if ( ! symbol.is_empty() )
 				frames->push_back( symbol );
+			else if ( strings[ ctr ] )
+				frames->push_back( strings[ ctr ] );
 			}
 		}
 
@@ -82,11 +84,11 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int )
 	return ( frames );
 	}
 
-void dump_call_stack( int no )
+void dump_call_stack( HStreamInterface& stream, int no )
 	{
 	execution_info::strings_ptr_t frames = execution_info::get_call_stack( no );
 	hcore::log << "Obtained " << frames->get_size() << " stack frames." << endl;
-	yaal::copy( frames->begin(), frames->end(), stream_iterator( hcore::log, hcore::endl ) );
+	yaal::copy( frames->begin(), frames->end(), stream_iterator( stream, hcore::endl ) );
 	}
 
 }
