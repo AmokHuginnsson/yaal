@@ -40,6 +40,19 @@ HTokenizer::HTokenizer( HString const& str_, HString const& delim_, behavoir_t c
 	{
 	}
 
+HTokenizer::HTokenizer( HString const& delim_, behavoir_t const& behavoir_ )
+	: _behavior( behavoir_ ), _string(), _delimiter( delim_ ), _buffer()
+	{
+	}
+
+void HTokenizer::split( HString const& str_ )
+	{
+	M_PROLOG
+	_string = str_;
+	return;
+	M_EPILOG
+	}
+
 HString const& HTokenizer::operator[] ( int long nth_ ) const
 	{
 	M_PROLOG
