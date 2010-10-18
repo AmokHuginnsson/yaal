@@ -66,6 +66,7 @@ public:
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
 	HString const& operator[] ( int long ) const;
+	HString tail( HIterator ) const;
 private:
 	friend class HIterator;
 	};

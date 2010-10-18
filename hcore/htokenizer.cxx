@@ -53,6 +53,13 @@ void HTokenizer::split( HString const& str_ )
 	M_EPILOG
 	}
 
+HString HTokenizer::tail( HIterator it_ ) const
+	{
+	M_PROLOG
+	return ( _string.mid( it_._start ) );
+	M_EPILOG
+	}
+
 HString const& HTokenizer::operator[] ( int long nth_ ) const
 	{
 	M_PROLOG
@@ -89,6 +96,11 @@ HTokenizer::HIterator HTokenizer::end( void ) const
 
 HTokenizer::HIterator::HIterator( HTokenizer const* owner_, int long start_ )
 	: _owner( owner_ ), _start( start_ ), _buffer()
+	{
+	}
+
+HTokenizer::HIterator::HIterator( HTokenizer::HIterator const& it_ )
+	: _owner( it_._owner ), _start( it_._start ), _buffer( it_._buffer )
 	{
 	}
 

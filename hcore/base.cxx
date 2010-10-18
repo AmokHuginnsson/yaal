@@ -219,6 +219,14 @@ HString lexical_cast( HString const& val )
 	}
 
 template<>
+HString lexical_cast( int const& val_ )
+	{
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+	}
+
+template<>
 HString lexical_cast( HFormat const& f )
 	{
 	M_PROLOG
