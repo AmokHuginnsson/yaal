@@ -115,6 +115,14 @@ bool HTokenizer::HIterator::operator != ( HIterator const& it ) const
 	M_EPILOG
 	}
 
+bool HTokenizer::HIterator::operator == ( HIterator const& it ) const
+	{
+	M_PROLOG
+	M_ASSERT( it._owner == _owner );
+	return ( it._start == _start );
+	M_EPILOG
+	}
+
 }
 
 }
