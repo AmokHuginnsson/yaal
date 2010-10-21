@@ -376,9 +376,9 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::replace_node( typename HTree<value_t>::iterator pos, typename HTree<value_t>::HNode* node )
 	{
 	M_PROLOG
-#if ! defined(NDEBUG)
+#if defined( __DEBUG__ )
 	disjointed( pos, node );
-#endif
+#endif /* defined( __DEBUG__ ) */
 	if ( *pos._iterator != node )
 		{
 		node->detach();
@@ -404,9 +404,9 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::move_node( typename HTree<value_t>::iterator const& pos, typename HTree<value_t>::HNode* node )
 	{
 	M_PROLOG
-#if ! defined(NDEBUG)
+#if defined( __DEBUG__ )
 	disjointed( pos, node );
-#endif
+#endif /* defined( __DEBUG__ ) */
 	iterator it = pos;
 	if ( *pos._iterator != node )
 		{
@@ -422,9 +422,9 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::move_node( typename HTree<value_t>::HNode* node )
 	{
 	M_PROLOG
-#if ! defined(NDEBUG)
+#if defined( __DEBUG__ )
 	disjointed( begin(), node );
-#endif
+#endif /* defined( __DEBUG__ ) */
 	iterator it = rbegin().base();
 	if ( ( it == rend().base() ) || ( *it._iterator != node ) )
 		{
@@ -441,9 +441,9 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::copy_node( typename HTree<value_t>::iterator const& pos, typename HTree<value_t>::HNode* node )
 	{
 	M_PROLOG
-#if ! defined(NDEBUG)
+#if defined( __DEBUG__ )
 	disjointed( pos, node );
-#endif
+#endif /* defined( __DEBUG__ ) */
 	iterator it( this, _branch.insert( pos._iterator, node->clone( this ) ) );
 	return ( it );
 	M_EPILOG
@@ -453,9 +453,9 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::copy_node( typename HTree<value_t>::HNode* node )
 	{
 	M_PROLOG
-#if ! defined(NDEBUG)
+#if defined( __DEBUG__ )
 	disjointed( rbegin().base(), node );
-#endif
+#endif /* defined( __DEBUG__ ) */
 	_branch.push_back( node->clone( this ) );
 	iterator it( this, _branch.rbegin().base() );
 	return ( it );
