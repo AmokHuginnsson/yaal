@@ -117,6 +117,7 @@ int main( int argc_, char** argv_ )
 		ifstream ci( ( dirBuild + "/config.hxx" ).c_str() );
 		ofstream co( ( dirHeaders + "/config.hxx" ).c_str() );
 		static char const PACKAGE_S[] = "define PACKAGE_";
+		static char const LIB_INFIX[] = "define LIB_INFIX";
 		while ( ! getline( ci, line ).fail() )
 			{
 			int pos = 0;
@@ -125,6 +126,8 @@ int main( int argc_, char** argv_ )
 				line.erase( pos, sizeof ( PACKAGE_S ) - 1 );
 				line.insert( pos, "define YAAL_PACKAGE_" );
 				}
+			else if ( line.find( LIB_INFIX ) != string::npos )
+				line = "#undef LIB_INFIX";
 			co << line << endl;
 			}
 #ifndef __GNUC__
